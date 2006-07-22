@@ -1,0 +1,276 @@
+
+#include "main.h"
+#include "structs.h"
+#include "edit.h"
+#include "edit_misc.h"
+#include "doom_map.h"
+#include "dm_vertex.h"
+#include "dm_line.h"
+#include "input.h"
+#include "draw.h"
+
+vector<point2_t>	ldraw_points;
+
+bool				ldraw_bound_start = false;
+rect_t				ldraw_bound(-1, -1, -1, -1);
+
+CVAR(Bool, edit_auto_createsector, true, CVAR_SAVE)
+
+extern DoomMap d_map;
+extern rgba_t col_linedraw;
+
+EXTERN_CVAR(Bool, line_aa)
+EXTERN_CVAR(Float, line_size)
+
+// lines_clockwise: Checks if a group of lines are all facing eachother
+// ----------------------------------------------------------------- >>
+bool lines_clockwise(vector<Line*> &list)
+{
+	for (int a = 0; a < list.size(); a++)
+	{
+		rect_t linerect = list[a]->get_rect();
+		point2_t mid = linerect.middle();
+		point2_t vec(linerect.x2() - linerect.x1(), linerect.y2() - linerect.y1());
+		int x = vec.y;
+		int y = vec.x;
+		x = -x;
+		point2_t side(mid.x + x, mid.y + y);
+
+		bool intersect = false;
+		for (int b = 0; b < list.size(); b++)
+		{
+			if (b != a)
+			{
+				rect_t line = list[b]->get_rect();
+
+				int x1 = line.x1();
+				int x2 = line.x2();
+				int y1 = line.y1();
+				int y2 = line.y2();
+
+				point2_t r1 = mid;
+				point2_t r2 = side;
+
+				float u_ray = (float(x2 - x1) * float(r1.y - y1) - float(y2 - y1) * float(r1.x - x1)) /
+							(float(y2 - y1) * float(r2.x - r1.x) - float(x2 - x1) * float(r2.y - r1.y));
+
+				float u_line = (float(r2.x - r1.x) * float(r1.y - y1) - float(r2.y - r1.y) * float(r1.x - x1)) /
+							(float(y2 - y1) * float(r2.x - r1.x) - float(x2 - x1) * float(r2.y - r1.y));
+
+				if((u_ray >= 0) && (u_line >= 0) && (u_line <= 1))
+					intersect = true;
+			}
+		}
+
+		if (!intersect)
+			return true;
+	}
+
+	return false;
+}
+
+void ldraw_end()
+{
+	// Add vertices
+	vector<Vertex*> new_verts;
+
+	for (int a = 0; a < ldraw_points.size() - 1; a++)
+	{
+		int v = d_map.check_vertex_spot(ldraw_points[a]);
+
+		if (v == -1)
+			new_verts.push_back(new Vertex(ldraw_points[a].x, ldraw_points[a].y, &d_map));
+		else
+			new_verts.push_back(d_map.vertex(v));
+	}
+
+	// Check for line splits
+	for (int a = 0; a < new_verts.size(); a++)
+		d_map.check_split(new_verts[a]);
+
+	// Add lines
+	vector<Line*> new_lines;
+
+	for (int a = 0; a < new_verts.size() - 1; a++)
+		new_lines.push_back(new Line(new_verts[a], new_verts[a+1], NULL));
+
+	// If it's not a split add a line from last to first
+	if (ldraw_points[0].x == ldraw_points.back().x && ldraw_points[0].y == ldraw_points.back().y)
+		new_lines.push_back(new Line(new_verts.back(), new_verts[0], NULL));
+
+	// Check for new line splits
+	for (int a = 0; a < d_map.n_verts(); a++)
+		d_map.check_split(d_map.vertex(a), new_lines);
+
+	// Remove overlapping lines
+	d_map.remove_overlapping_lines(new_lines);
+
+	// Add new lines to map
+	for (int a = 0; a < new_lines.size(); a++)
+	{
+		d_map.add_line(new_lines[a]);
+		new_lines[a]->set_side1(d_map.side(-1));
+		new_lines[a]->set_side2(d_map.side(-1));
+		//new_lines[a]->apply_default_textures();
+	}
+
+	//log_message(s_fmt("Created %d lines", new_lines.size()));
+
+	if (edit_auto_createsector && new_lines.size() > 0)
+	{
+		bool *fs = new bool[d_map.n_lines()];
+		bool *bs = new bool[d_map.n_lines()];
+		memset(fs, 0, d_map.n_lines());
+		memset(bs, 0, d_map.n_lines());
+
+		for (int a = 0; a < new_lines.size(); a++)
+		{
+			if (!fs[d_map.index(new_lines[a])])
+				sector_create(new_lines[a]->get_side_point(true), fs, bs);
+
+			if (!bs[d_map.index(new_lines[a])])
+				sector_create(new_lines[a]->get_side_point(false), fs, bs);
+		}
+
+		/*
+		if (lines_clockwise(new_lines))
+		{
+			sector_create(new_lines[0]->get_side_point(false));
+			sector_create(new_lines[0]->get_side_point(true));
+			sector_create(new_lines[0]->get_side_point(false));
+		}
+		else
+		{
+			sector_create(new_lines[0]->get_side_point(true));
+			sector_create(new_lines[0]->get_side_point(false));
+		}
+		*/
+	}
+
+	ldraw_points.clear();
+	change_state();
+	d_map.clear_selection();
+	ldraw_bound_start = false;
+}
+
+void ldraw_addpoint(bool nearest_vert)
+{
+	if (state(STATE_LINEDRAW))
+	{
+		int x = snap_to_grid(down_pos(true).x);
+		int y = snap_to_grid(down_pos(true).y);
+
+		if (nearest_vert)
+		{
+			int v = d_map.get_hilight_vertex(down_pos(true));
+
+			if (v != -1)
+			{
+				x = d_map.vertex(v)->x_pos();
+				y = d_map.vertex(v)->y_pos();
+			}
+		}
+
+		for (int a = 0; a < ldraw_points.size(); a++)
+		{
+			if (ldraw_points[a].x == x && ldraw_points[a].y == y)
+			{
+				ldraw_points.push_back(point2_t(x, y));
+				ldraw_end();
+				return;
+			}
+		}
+
+		ldraw_points.push_back(point2_t(x, y));
+	}
+
+	if (state(STATE_SHAPEDRAW))
+	{
+		if (!ldraw_bound_start)
+		{
+			ldraw_bound_start = true;
+			ldraw_bound.tl.set(snap_to_grid(down_pos(true).x), snap_to_grid(down_pos(true).y));
+		}
+		else
+			ldraw_end();
+	}
+}
+
+void ldraw_drawrect(point2_t mouse, bool square)
+{
+	if (!ldraw_bound_start)
+		return;
+
+	ldraw_bound.br.set(mouse);
+
+	if (square)
+	{
+		int size_x = snap_to_grid(max(ldraw_bound.awidth(), ldraw_bound.aheight()));
+		int size_y = snap_to_grid(max(ldraw_bound.awidth(), ldraw_bound.aheight()));
+
+		if (ldraw_bound.width() < 0)
+			size_x = -size_x;
+
+		if (ldraw_bound.height() < 0)
+			size_y = -size_y;
+
+		ldraw_bound.br.set(ldraw_bound.tl.x + size_x, ldraw_bound.tl.y + size_y);
+	}
+
+	ldraw_points.clear();
+	ldraw_points.push_back(point2_t(snap_to_grid(ldraw_bound.x1()),
+									snap_to_grid(ldraw_bound.y1())));
+	ldraw_points.push_back(point2_t(snap_to_grid(ldraw_bound.x2()),
+									snap_to_grid(ldraw_bound.y1())));
+	ldraw_points.push_back(point2_t(snap_to_grid(ldraw_bound.x2()),
+									snap_to_grid(ldraw_bound.y2())));
+	ldraw_points.push_back(point2_t(snap_to_grid(ldraw_bound.x1()),
+									snap_to_grid(ldraw_bound.y2())));
+	ldraw_points.push_back(point2_t(snap_to_grid(ldraw_bound.x1()),
+									snap_to_grid(ldraw_bound.y1())));
+}
+
+void ldraw_removepoint()
+{
+	if (state(STATE_SHAPEDRAW))
+	{
+		ldraw_points.clear();
+		ldraw_bound_start = false;
+		change_state();
+		return;
+	}
+
+	ldraw_points.pop_back();
+
+	if (ldraw_points.size() == 0)
+		change_state();
+}
+
+void ldraw_draw_lines(point2_t mouse)
+{
+	point2_t mp(snap_to_grid(mouse.x), snap_to_grid(mouse.y));
+
+	glEnable(GL_POINT_SMOOTH);
+	glLineStipple(4, 0xBBBB);
+	glEnable(GL_LINE_STIPPLE);
+
+	if (ldraw_points.size() > 1)
+	{
+		for (int a = 0; a < ldraw_points.size() - 1; a++)
+		{
+			draw_line(rect_t(ldraw_points[a], ldraw_points[a+1]), col_linedraw, line_aa, true, line_size);
+			draw_point(ldraw_points[a].x, ldraw_points[a].y, 8, col_linedraw);
+		}
+	}
+
+	if (ldraw_points.size() > 0 && !state(STATE_SHAPEDRAW))
+	{
+		draw_line(rect_t(ldraw_points.back(), mp), col_linedraw, line_aa, true, line_size);
+		draw_point(ldraw_points.back().x, ldraw_points.back().y, 8, col_linedraw);
+	}
+
+	draw_point(mp.x, mp.y, 8, col_linedraw);
+
+	glDisable(GL_LINE_STIPPLE);
+	glDisable(GL_POINT_SMOOTH);
+}
