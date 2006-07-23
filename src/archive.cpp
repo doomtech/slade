@@ -6,6 +6,7 @@
 #include <wx/zipstrm.h>
 #include <wx/ptr_scpd.h>
 
+/*
 void testy()
 {
 	// 'smart pointer' type created with wxDEFINE_SCOPED_PTR_TYPE
@@ -39,6 +40,7 @@ void testy()
 		entry = zip.GetNextEntry();
 	}
 }
+*/
 
 // dump_from_pk3: Finds 'entry' in slade.pk3 and dumps it to sladetemp, 
 // returns false if 'entry' isn't found in slade.pk3

@@ -15,13 +15,23 @@ typedef std::map<string, string> props_t;
 
 #include <algorithm>
 
+#ifdef _MSC_VER
+typedef unsigned __int32 uint32_t;
+typedef __int32 int32_t;
+#else
+#include <stdint.h>
+#endif
+
 // Define some variable types
 #ifndef _VAR_TYPES
-#define _VAR_TYPES
-#define BYTE unsigned char
-#define WORD unsigned short
-#define DWORD unsigned long
-#define SWORD signed short
+typedef unsigned char BYTE;
+typedef unsigned short WORD;
+typedef   signed short SWORD;
+#ifdef _WIN32
+typedef unsigned long DWORD;
+#else
+typedef uint32_t DWORD;
+#endif
 #endif
 
 // A macro to check if a value exists in a vector

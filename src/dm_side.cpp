@@ -48,17 +48,17 @@ Side::Side(doomside_t s, DoomMap *parent)
 	temp[8] = 0;
 
 	memcpy(temp, s.tex_lower, 8);
-	this->tex_lower = strupr(temp);
+	this->tex_lower = str_upper(temp);
 	tex = get_texture(this->tex_lower);
 	if (tex) tex->use_count++;
 
 	memcpy(temp, s.tex_middle, 8);
-	this->tex_middle = strupr(temp);
+	this->tex_middle = str_upper(temp);
 	tex = get_texture(this->tex_middle);
 	if (tex) tex->use_count++;
 
 	memcpy(temp, s.tex_upper, 8);
-	this->tex_upper = strupr(temp);
+	this->tex_upper = str_upper(temp);
 	tex = get_texture(this->tex_upper);
 	if (tex) tex->use_count++;
 

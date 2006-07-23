@@ -134,7 +134,7 @@ void ClickableTexBox::clicked(wxMouseEvent &event)
 			texname = "-";
 	}
 	else
-		texname = entry->GetValue();//game.get_ttype(atoi(wx_to_str(entry->GetValue()).c_str()))->name;
+		texname = (char*)entry->GetValue().c_str();
 
 	setup_tex_browser(textype);
 	TextureBrowser tb(texname);

@@ -3,6 +3,7 @@
 #include "structs.h"
 #include "textures.h"
 
+#include <stdarg.h>
 #include <GL/gl.h>
 
 char charmap[16][16] =

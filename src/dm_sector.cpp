@@ -53,12 +53,12 @@ Sector::Sector(doomsector_t s, DoomMap *parent)
 	temp[8] = 0;
 
 	memcpy(temp, s.f_tex, 8);
-	f_tex = strupr(temp);
+	f_tex = str_upper(temp);
 	tex = get_texture(f_tex);
 	if (tex) tex->use_count++;
 
 	memcpy(temp, s.c_tex, 8);
-	c_tex = strupr(temp);
+	c_tex = str_upper(temp);
 	tex = get_texture(c_tex);
 	if (tex) tex->use_count++;
 

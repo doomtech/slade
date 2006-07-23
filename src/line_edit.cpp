@@ -590,11 +590,11 @@ void SidePropertiesPage::setup_widgets()
 		tex_lower->set_texture(sides[0]->get_texname(TEX_LOWER), 1);
 
 	// Offsets
-	entry_xoff->SetValue(wxString::Format("%d", sides[0]->get_xoff()));
-	entry_yoff->SetValue(wxString::Format("%d", sides[0]->get_yoff()));
+	entry_xoff->SetValue(wxString::Format(_T("%d"), sides[0]->get_xoff()));
+	entry_yoff->SetValue(wxString::Format(_T("%d"), sides[0]->get_yoff()));
 
 	// Sector ref
-	entry_sector->SetValue(wxString::Format("%d", d_map.hilight_line()->sector_index(side == 1)));
+	entry_sector->SetValue(wxString::Format(_T("%d"), d_map.hilight_line()->sector_index(side == 1)));
 
 	// Check for inconsistency
 	for (int a = 0; a < sides.size(); a++)

@@ -119,8 +119,8 @@ public:
 	bool	hexen() { return !!(flags & MAP_HEXEN); }
 	bool	opened() { return !!(flags & MAP_OPEN); }
 
-	vector<int>	selection() { return selected_items; }
-	int			hilight()	{ return hilight_item; }
+	vector<int>&	selection() { return selected_items; }
+	int				hilight()	{ return hilight_item; }
 
 	Vertex*	hilight_vertex();
 	Line*	hilight_line();

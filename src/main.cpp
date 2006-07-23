@@ -268,7 +268,7 @@ bool MainApp::OnInit()
 	wad_manager = new WadManager(editor_window);
 	splash_hide();
 
-	testy();
+	//testy();
 
 	return true;
 }
