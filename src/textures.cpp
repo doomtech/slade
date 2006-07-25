@@ -877,7 +877,7 @@ void Texture::purge()
 
 bool Texture::gen_gl_tex()
 {
-	if (id_generated)
+	if (id_generated || !allow_tex_load)
 		return true;
 
 	if (data)
@@ -1017,40 +1017,39 @@ void Texture::gen_from_data(int width, int height, BYTE *data, int swidth, int s
 		gl_filter = filter;
 
 	// Generate gl tex
-	if (gl_filter == 1)
+	switch(gl_filter)
 	{
+		case 1:
 		glGenTextures(1, &gl_id);
 		glBindTexture(GL_TEXTURE_2D, gl_id);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, rwidth, rheight, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-	}
+		break;
 
-	if (gl_filter == 2)
-	{
+		case 2:
 		glGenTextures(1, &gl_id);
 		glBindTexture(GL_TEXTURE_2D, gl_id);
 		glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 		glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, rwidth, rheight, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-	}
+		break;
 
-	if (gl_filter == 3)
-	{
+		case 3:
 		glGenTextures(1, &gl_id);
 		glBindTexture(GL_TEXTURE_2D, gl_id);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, rwidth, rheight, GL_RGBA, GL_UNSIGNED_BYTE, data);
-	}
+		break;
 
-	if (gl_filter == 4)
-	{
+		case 4:
 		glGenTextures(1, &gl_id);
 		glBindTexture(GL_TEXTURE_2D, gl_id);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, rwidth, rheight, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		break;
 	}
 
 	//wxLogMessage("Generated tex %s", name.c_str());

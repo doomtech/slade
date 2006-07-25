@@ -86,12 +86,12 @@ MapCanvas::MapCanvas(wxWindow *parent)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
+	gl_context = GetContext();
+
 	allow_tex_load = true;
 	wxSafeYield();
 	glEnable(GL_TEXTURE_2D);
 	init_textures();
-
-	gl_context = GetContext();
 
 	xoff = 0;
 	yoff = 0;

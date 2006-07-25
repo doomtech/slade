@@ -6,6 +6,8 @@
 #include <wx/zipstrm.h>
 #include <wx/ptr_scpd.h>
 
+extern string app_path;
+
 /*
 void testy()
 {
@@ -49,7 +51,7 @@ bool dump_from_pk3(string entry_name)
 {
 	wxZipEntry* entry;
 
-	wxFFileInputStream in(_T("slade.pk3"));
+	wxFFileInputStream in(wxString::Format(_T("%sslade.pk3"), app_path.c_str()));
 	wxZipInputStream zip(in);
 
 	entry = zip.GetNextEntry();
@@ -64,7 +66,7 @@ bool dump_from_pk3(string entry_name)
 			FILE *fp = fopen("sladetemp", "wb");
 			fwrite(buffer, entry->GetSize(), 1, fp);
 			fclose(fp);
-			delete buffer;
+			delete[] buffer;
 			return true;
 		}
 
