@@ -20,6 +20,15 @@ ImageBox::ImageBox(wxWindow *parent, string filename)
 		SetSizeHints(image->GetWidth(), image->GetHeight());
 }
 
+ImageBox::ImageBox(wxWindow *parent, wxImage img)
+	: wxPanel(parent, -1)
+{
+	image = new wxImage(img);
+
+	if (image->Ok())
+		SetSizeHints(image->GetWidth(), image->GetHeight());
+}
+
 ImageBox::~ImageBox()
 {
 	delete image;

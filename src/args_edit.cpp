@@ -66,8 +66,7 @@ ArgValueDialog::ArgValueDialog(BYTE value, argtype_t *arg_type)
 
 	vbox->Add(CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND|wxALL, 4);
 
-	dump_from_pk3("slade.ico");
-	SetIcon(wxIcon(_T("sladetemp"),  wxBITMAP_TYPE_ICO, -1, -1));
+	SetIcon(wxIcon(_T("slade.ico"),  wxBITMAP_TYPE_ICO, -1, -1));
 
 	Layout();
 	SetBestFittingSize();

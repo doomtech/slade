@@ -59,8 +59,7 @@ ConsoleWindow::ConsoleWindow()
 	entry->SetFocus();
 	vbox->Add(entry, 0, wxEXPAND|wxTOP, 4);
 
-	dump_from_pk3("slade.ico");
-	SetIcon(wxIcon(_T("sladetemp"),  wxBITMAP_TYPE_ICO, -1, -1));
+	SetIcon(wxIcon(_T("slade.ico"),  wxBITMAP_TYPE_ICO, -1, -1));
 
 	SetSizeHints(560, 380);
 	Layout();

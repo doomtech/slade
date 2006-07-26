@@ -72,9 +72,10 @@ bool GameConfig::load_config(string filename)
 {
 	// Open File
 	Tokenizer tz;
-	dump_from_pk3(filename);
-	if (!tz.open_file("sladetemp", 0, 0))
-		return false;
+	MemLump ml;
+
+	get_from_pk3(ml, filename);
+	tz.open_mem((char*)ml.get_data(), ml.get_size());
 
 	string token = tz.get_token();
 
@@ -237,6 +238,8 @@ bool GameConfig::load_config(string filename)
 // ------------------------------------------------------------------ >>
 void GameConfig::read_types(Tokenizer *mr, BYTE sections)
 {
+	MemLump ml;
+
 	string token = mr->get_token();
 	while (token != "!END")
 	{
@@ -254,8 +257,8 @@ void GameConfig::read_types(Tokenizer *mr, BYTE sections)
 				if (token == "import")
 				{
 					Tokenizer mr2;
-					dump_from_pk3("games/" + mr->get_token());
-					mr2.open_file("sladetemp");
+					get_from_pk3(ml, "games/" + mr->get_token());
+					mr2.open_mem((char*)ml.get_data(), ml.get_size());
 					read_types(&mr2, SECT_THINGS);
 				}
 
@@ -277,8 +280,8 @@ void GameConfig::read_types(Tokenizer *mr, BYTE sections)
 				if (token == "import")
 				{
 					Tokenizer mr2;
-					dump_from_pk3("games/" + mr->get_token());
-					mr2.open_file("sladetemp");
+					get_from_pk3(ml, "games/" + mr->get_token());
+					mr2.open_mem((char*)ml.get_data(), ml.get_size());
 					read_types(&mr2, SECT_SPECIALS);
 				}
 
@@ -304,8 +307,8 @@ void GameConfig::read_types(Tokenizer *mr, BYTE sections)
 				if (token == "import")
 				{
 					Tokenizer mr2;
-					dump_from_pk3("games/" + mr->get_token());
-					mr2.open_file("sladetemp");
+					get_from_pk3(ml, "games/" + mr->get_token());
+					mr2.open_mem((char*)ml.get_data(), ml.get_size());
 					read_types(&mr2, SECT_SECTORS);
 				}
 
@@ -331,8 +334,8 @@ void GameConfig::read_types(Tokenizer *mr, BYTE sections)
 				if (token == "import")
 				{
 					Tokenizer mr2;
-					dump_from_pk3("games/" + mr->get_token());
-					mr2.open_file("sladetemp");
+					get_from_pk3(ml, "games/" + mr->get_token());
+					mr2.open_mem((char*)ml.get_data(), ml.get_size());
 					read_types(&mr2, SECT_ARGS);
 				}
 
@@ -358,8 +361,8 @@ void GameConfig::read_types(Tokenizer *mr, BYTE sections)
 				if (token == "import")
 				{
 					Tokenizer mr2;
-					dump_from_pk3("games/" + mr->get_token());
-					mr2.open_file("sladetemp");
+					get_from_pk3(ml, "games/" + mr->get_token());
+					mr2.open_mem((char*)ml.get_data(), ml.get_size());
 					read_types(&mr2, SECT_TFLAGS);
 				}
 
@@ -385,8 +388,8 @@ void GameConfig::read_types(Tokenizer *mr, BYTE sections)
 				if (token == "import")
 				{
 					Tokenizer mr2;
-					dump_from_pk3("games/" + mr->get_token());
-					mr2.open_file("sladetemp");
+					get_from_pk3(ml, "games/" + mr->get_token());
+					mr2.open_mem((char*)ml.get_data(), ml.get_size());
 					read_types(&mr2, SECT_LFLAGS);
 				}
 

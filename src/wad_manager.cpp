@@ -43,7 +43,6 @@ extern DoomMap d_map;
 extern GameConfig game;
 extern EditorWindow *editor_window;
 extern bool allow_tex_load;
-//extern vector<string> valid_map_names;
 extern wxGLContext *gl_context;
 extern rgba_t col_background, col_line_solid;
 
@@ -377,8 +376,7 @@ WadManager::WadManager(wxWindow *parent)
 
 	game.read_decorate_lumps();
 
-	dump_from_pk3("slade.ico");
-	SetIcon(wxIcon(_T("sladetemp"),  wxBITMAP_TYPE_ICO, -1, -1));
+	SetIcon(wxIcon(_T("slade.ico"),  wxBITMAP_TYPE_ICO, -1, -1));
 
 	Layout();
 	SetSize(512, 384);
@@ -395,57 +393,6 @@ wxStaticBoxSizer *WadManager::setup_game_combo_frame(wxWindow *panel)
 	wxStaticBox *frame = new wxStaticBox(panel, -1, _T("Game:"));
 	wxStaticBoxSizer *ret = new wxStaticBoxSizer(frame, wxVERTICAL);
 
-	/*
-	// Get all valid game configuration filenames
-	wxDir dir;
-	wxArrayString games;
-
-	if (dir.Open(_T("./games/")))
-	{
-		string def = game_config;
-		wxString filename;
-		bool cont = dir.GetFirst(&filename, _T("*.cfg"));
-
-		while (cont)
-		{
-			Tokenizer tokenizer;
-			string path = "games/";
-			path += wx_to_str(filename);
-			tokenizer.open_file(path, 0, 0);
-
-			string temp = tokenizer.get_token();
-
-			if (temp == "game") // If it's a valid SLADE game configuration
-			{
-				// Add the file path to the game config list
-				game_config_paths.push_back(path);
-
-				// And add the game name to the combo
-				string name = tokenizer.get_token();
-				games.Add(str_to_wx(name));
-				game_config_names.push_back(name);
-
-				if (name == def)
-					cur_game = games.GetCount() - 1;
-			}
-
-			cont = dir.GetNext(&filename);
-		}
-
-		game_combo = new wxChoice(panel, WM_GAME_COMBO, wxDefaultPosition, wxDefaultSize, games);
-		game_combo->SetSelection(cur_game);
-
-		ret->Add(game_combo, 1, wxEXPAND);
-
-		game.load_config(game_config_paths[cur_game]);
-	}
-	else
-	{
-		wxMessageBox(_T("No /games/ folder found!"), _T("Error"), wxICON_ERROR);
-		wxTheApp->ExitMainLoop();
-	}
-	*/
-
 	string def = game_config;
 	wxZipEntryPtr entry;
 	wxArrayString games;
@@ -458,8 +405,6 @@ wxStaticBoxSizer *WadManager::setup_game_combo_frame(wxWindow *panel)
         wxString name = entry->GetName(wxPATH_UNIX);
 		if (!name.compare(0, 6, _T("games/")) && entry->GetSize() > 0)
 		{
-			//wxLogMessage(name);
-
 			BYTE* buffer = new BYTE[entry->GetSize()];
 			zip.Read(buffer, entry->GetSize());
 

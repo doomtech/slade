@@ -16,6 +16,7 @@
 #include "archive.h"
 
 #include <wx/image.h>
+#include <wx/zipstrm.h>
 #include <map>
 
 
@@ -348,9 +349,11 @@ void init_textures()
 	load_editor_texture("_logo", "res/edit_tex/logo.png", -1, -1, 1);
 	*/
 
-	dump_from_pk3("res/edit_tex/edit_tex.txt");
+	MemLump *ml = get_from_pk3("res/edit_tex/edit_tex.txt");
 	Tokenizer tz;
-	tz.open_file("sladetemp", 0, 0);
+	tz.open_mem((char*)ml->get_data(), ml->get_size());
+	delete ml;
+
 	string token = tz.get_token();
 
 	while (token != "!END")
@@ -1307,25 +1310,24 @@ FileTexture::~FileTexture()
 {
 }
 
+wxImage get_image_from_pk3(string entry_name, int type);
+
 bool FileTexture::gen_gl_tex()
 {
 	if (id_generated)
 		return true;
 
-	string fn = filename;
+	wxImage image = get_image_from_pk3(filename, wxBITMAP_TYPE_PNG);
 
-	if (dump_from_pk3(filename))
-		fn = "sladetemp";
+	if (!image.Ok())
+		image.LoadFile(str_to_wx(filename));
 
-	//wxLogMessage("gen file tex %s", name.c_str());
-	wxImage *image = new wxImage(str_to_wx(fn));
-
-	if (image->Ok())
+	if (image.Ok())
 	{
-		if (width == -1) width = image->GetWidth();
-		if (height == -1) height = image->GetHeight();
-		rwidth = image->GetWidth();
-		rheight = image->GetHeight();
+		if (width == -1) width = image.GetWidth();
+		if (height == -1) height = image.GetHeight();
+		rwidth = image.GetWidth();
+		rheight = image.GetHeight();
 
 		BYTE* data = (BYTE*)malloc(rwidth * rheight * 4);
 
@@ -1334,14 +1336,14 @@ bool FileTexture::gen_gl_tex()
 		{
 			for (int x = 0; x < rwidth; x++)
 			{
-				data[c++] = image->GetRed(x, y);
-				data[c++] = image->GetGreen(x, y);
-				data[c++] = image->GetBlue(x, y);
+				data[c++] = image.GetRed(x, y);
+				data[c++] = image.GetGreen(x, y);
+				data[c++] = image.GetBlue(x, y);
 
-				if (image->HasAlpha())
-					data[c++] = image->GetAlpha(x, y);
+				if (image.HasAlpha())
+					data[c++] = image.GetAlpha(x, y);
 #if wxCHECK_VERSION(2, 6, 0)
-				else if (image->HasMask() && image->IsTransparent(x, y))
+				else if (image.HasMask() && image.IsTransparent(x, y))
 					data[c++] = 0;
 #endif
 				else
@@ -1351,7 +1353,7 @@ bool FileTexture::gen_gl_tex()
 
 		gen_from_data(rwidth, rheight, data);
 
-		delete image;
+		//delete image;
 		return true;
 	}
 	else

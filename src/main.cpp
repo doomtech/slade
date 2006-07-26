@@ -31,7 +31,6 @@
 #include <CoreFoundation/CFString.h>
 #include <CoreFoundation/CFBundle.h>
 #include <cstdlib>
-string userPath;
 #elif wxCHECK_VERSION(2, 6, 0)
 // Everyone else uses wxWidgets-provided paths
 #include <wx/stdpaths.h>
@@ -40,6 +39,9 @@ string userPath;
 
 // Variables ----------------------------- >>
 string app_path;
+string tmp_path;
+string usr_path;
+
 WadManager *wad_manager = NULL;
 bool startup = false;
 
@@ -97,7 +99,7 @@ void load_main_config(bool wads_open)
 {
 	Tokenizer mr;
 
-	if (!mr.open_file(c_path("slade.cfg", true), 0, 0))
+	if (!mr.open_file(c_path("slade.cfg", DIR_USR), 0, 0))
 		return;
 
 	string token = mr.get_token();
@@ -135,7 +137,7 @@ void load_main_config(bool wads_open)
 // ------------------------------------------------------ >>
 void save_main_config()
 {
-	FILE *fp = fopen(c_path("slade.cfg", true).c_str(), "wt");
+	FILE *fp = fopen(c_path("slade.cfg", DIR_USR).c_str(), "wt");
 
 	save_cvars(fp);
 	save_game_iwads(fp);
@@ -147,18 +149,14 @@ void save_main_config()
 	fclose(fp);
 }
 
-string c_path(string filename, bool userdir)
+string c_path(string filename, BYTE dir)
 {
-	string prefix = app_path;
-
-	if (userdir)
-	{
-#ifdef __APPLE__
-		prefix = userDir;
-#endif
-	}
-
-	return s_fmt("%s%s", prefix.c_str(), filename.c_str());
+	if (dir == DIR_APP)
+		return s_fmt("%s%s", app_path.c_str(), filename.c_str());
+	if (dir == DIR_TMP)
+		return s_fmt("%s%s", tmp_path.c_str(), filename.c_str());
+	if (dir == DIR_USR)
+		return s_fmt("%s%s", usr_path.c_str(), filename.c_str());
 }
 
 void update_statusbar()
@@ -186,6 +184,23 @@ void change_edit_mode(int mode)
 	d_map.clear_selection();
 }
 
+void setup_directories()
+{
+	// Temporary directory
+#ifdef UNIX
+	tmp_path = "/tmp/";
+#else
+	tmp_path = app_path;
+#endif
+
+	// User directory
+#ifdef __APPLE__
+	usr_path = string(getenv("HOME")) + string("/Library/Application Support/Slade");
+#else
+	usr_path = app_path;
+#endif
+}
+
 
 class MainApp : public wxApp
 {
@@ -200,6 +215,7 @@ bool MainApp::OnInit()
 {
 	srand(wxGetLocalTime());
 
+	/*
 	// Setup working directory
 #ifdef __APPLE__
 	CFURLRef bundleRef = CFBundleCopyBundleURL(CFBundleGetMainBundle());
@@ -213,26 +229,16 @@ bool MainApp::OnInit()
 	wxStandardPaths sp;
 	wxString dataDir = sp.GetDataDir();
 #endif
+	*/
 
 	// Init logfile
-	wxLog::SetActiveTarget(new wxLogStderr(fopen(c_path("slade.log", true).c_str(), "wt")));
+	wxLog::SetActiveTarget(new wxLogStderr(fopen(c_path("slade.log", DIR_USR).c_str(), "wt")));
 
 	// Allow high-colour toolbar icons
 	wxSystemOptions::SetOption(wxT("msw.remap"), 0);
 
 	// Load image handlers
 	wxImage::AddHandler(new wxPNGHandler);
-
-	/*
-	// Setup app_path
-	app_path = wx_to_str(dataDir);
-
-#ifdef WIN32
-	app_path += "\\";
-#else
-	app_path += "/";
-#endif
-	*/
 
 	startup = true;
 
@@ -241,30 +247,30 @@ bool MainApp::OnInit()
 
 	// Parse command line
 	bool wads_opened = false;
-	if (argc > 0)
-	{
-		// Setup app path
-		app_path = argv[0];
 
-		int i = 5;
+	// Setup app path
+	app_path = argv[0];
+
+	int i = 5;	// 'slade'
 #ifdef WIN32
-		i = 9;
+	i = 9;		// 'slade.exe'
 #endif
-		for (int a = 0; a < i; a++)
-			app_path.erase(app_path.end() - 1);
 
-		//log_message(app_path);
+	for (int a = 0; a < i; a++)
+		app_path.erase(app_path.end() - 1);
 
-		for (int a = 1; a < argc; a++)
+	setup_directories();
+
+	// Parse command line args
+	for (int a = 1; a < argc; a++)
+	{
+		wxString arg = argv[a];
+
+		if (arg.Right(4).CmpNoCase(_T(".wad")))
 		{
-			wxString arg = argv[a];
-
-			if (arg.Right(4).CmpNoCase(_T(".wad")))
-			{
-				//log_message(s_fmt("Opening wad %s", wx_to_str(arg).c_str()));
-				wads.open_wad(wx_to_str(arg));
-				wads_opened = true;
-			}
+			//log_message(s_fmt("Opening wad %s", wx_to_str(arg).c_str()));
+			wads.open_wad(wx_to_str(arg));
+			wads_opened = true;
 		}
 	}
 
@@ -278,7 +284,11 @@ bool MainApp::OnInit()
 	wad_manager = new WadManager(editor_window);
 	splash_hide();
 
-	//testy();
+	/*
+	MemLump *test = new MemLump();
+	get_from_pk3(test, "slade.ico");
+	test->dump_to_file("testy.ico");
+	*/
 
 	return true;
 }

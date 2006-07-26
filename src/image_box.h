@@ -11,6 +11,7 @@ private:
 
 public:
 	ImageBox(wxWindow *parent, string filename);
+	ImageBox(wxWindow *parent, wxImage img);
 	~ImageBox();
 
 	void paint(wxPaintEvent &event);

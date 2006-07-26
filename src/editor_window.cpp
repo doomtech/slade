@@ -89,8 +89,7 @@ EditorWindow::EditorWindow(const wxChar *title, int xpos, int ypos, int width, i
 
 	SetSizeHints(800, 600, -1, -1);
 
-	dump_from_pk3("slade.ico");
-	SetIcon(wxIcon(_T("sladetemp"),  wxBITMAP_TYPE_ICO, -1, -1));
+	SetIcon(wxIcon(_T("slade.ico"),  wxBITMAP_TYPE_ICO, -1, -1));
 	Maximize(true);
 	Show();
 
@@ -110,6 +109,8 @@ EditorWindow::~EditorWindow()
 	remove("sladetemp.bak");
 }
 
+wxImage get_image_from_pk3(string entry_name, int type);
+
 void EditorWindow::setup_toolbar()
 {
 	CreateToolBar();
@@ -117,40 +118,27 @@ void EditorWindow::setup_toolbar()
 
 	tb->SetToolBitmapSize(wxSize(16, 17));
 
-	dump_from_pk3("res/tbar/tb_temp16.png");
-	tb->AddTool(EWMENU_FILE_WADMANAGER, _T("Wad Manager"), wxBitmap(wxImage(_T("sladetemp"), wxBITMAP_TYPE_PNG)), _T("Wad Manager"));
+	tb->AddTool(EWMENU_FILE_WADMANAGER, _T("Wad Manager"), wxBitmap(get_image_from_pk3("res/tbar/tb_temp16.png", wxBITMAP_TYPE_PNG)), _T("Wad Manager"));
 	tb->AddSeparator();
-	dump_from_pk3("res/tbar/tb_save16.png");
-	tb->AddTool(EWMENU_FILE_SAVE, _T("Save Map"), wxBitmap(wxImage(_T("sladetemp"), wxBITMAP_TYPE_PNG)), _T("Save Map"));
-	dump_from_pk3("res/tbar/tb_saveas16.png");
-	tb->AddTool(EWMENU_FILE_SAVEAS, _T("Save Map As"), wxBitmap(wxImage(_T("sladetemp"), wxBITMAP_TYPE_PNG)), _T("Save Map As"));
-	dump_from_pk3("res/tbar/tb_run16.png");
-	tb->AddTool(EWMENU_FILE_RUN, _T("Run Map"), wxBitmap(wxImage(_T("sladetemp"), wxBITMAP_TYPE_PNG)), _T("Run Map"));
-	dump_from_pk3("res/tbar/tb_close16.png");
-	tb->AddTool(EWMENU_FILE_CLOSE, _T("Close"), wxBitmap(wxImage(_T("sladetemp"), wxBITMAP_TYPE_PNG)), _T("Close Map"));
+	tb->AddTool(EWMENU_FILE_SAVE, _T("Save Map"), wxBitmap(get_image_from_pk3("res/tbar/tb_save16.png", wxBITMAP_TYPE_PNG)), _T("Save Map"));
+	tb->AddTool(EWMENU_FILE_SAVEAS, _T("Save Map As"), wxBitmap(get_image_from_pk3("res/tbar/tb_saveas16.png", wxBITMAP_TYPE_PNG)), _T("Save Map As"));
+	tb->AddTool(EWMENU_FILE_RUN, _T("Run Map"), wxBitmap(get_image_from_pk3("res/tbar/tb_run16.png", wxBITMAP_TYPE_PNG)), _T("Run Map"));
+	tb->AddTool(EWMENU_FILE_CLOSE, _T("Close"), wxBitmap(get_image_from_pk3("res/tbar/tb_close16.png", wxBITMAP_TYPE_PNG)), _T("Close Map"));
 	tb->AddSeparator();
-	dump_from_pk3("res/tbar/tb_verts16.png");
-	tb->AddRadioTool(EWMENU_MODE_VERTS, _T("Vertices Mode"), wxBitmap(wxImage(_T("sladetemp"), wxBITMAP_TYPE_PNG)),
-						wxBitmap(wxImage(_T("sladetemp"), wxBITMAP_TYPE_PNG)), _T("Vertices Mode"));
-	dump_from_pk3("res/tbar/tb_lines16.png");
-	tb->AddRadioTool(EWMENU_MODE_LINES, _T("Lines Mode"), wxBitmap(wxImage(_T("sladetemp"), wxBITMAP_TYPE_PNG)),
-						wxBitmap(wxImage(_T("sladetemp"), wxBITMAP_TYPE_PNG)), _T("Lines Mode"));
-	dump_from_pk3("res/tbar/tb_sectors16.png");
-	tb->AddRadioTool(EWMENU_MODE_SECTORS, _T("Sectors Mode"), wxBitmap(wxImage(_T("sladetemp"), wxBITMAP_TYPE_PNG)),
-						wxBitmap(wxImage(_T("sladetemp"), wxBITMAP_TYPE_PNG)), _T("Sectors Mode"));
-	dump_from_pk3("res/tbar/tb_things16.png");
-	tb->AddRadioTool(EWMENU_MODE_THINGS, _T("Things Mode"), wxBitmap(wxImage(_T("sladetemp"), wxBITMAP_TYPE_PNG)),
-						wxBitmap(wxImage(_T("sladetemp"), wxBITMAP_TYPE_PNG)), _T("Things Mode"));
+	tb->AddRadioTool(EWMENU_MODE_VERTS, _T("Vertices Mode"), wxBitmap(get_image_from_pk3("res/tbar/tb_verts16.png", wxBITMAP_TYPE_PNG)),
+						wxBitmap(get_image_from_pk3("res/tbar/tb_vertsd16.png", wxBITMAP_TYPE_PNG)), _T("Vertices Mode"));
+	tb->AddRadioTool(EWMENU_MODE_LINES, _T("Lines Mode"), wxBitmap(get_image_from_pk3("res/tbar/tb_lines16.png", wxBITMAP_TYPE_PNG)),
+						wxBitmap(get_image_from_pk3("res/tbar/tb_linesd16.png", wxBITMAP_TYPE_PNG)), _T("Lines Mode"));
+	tb->AddRadioTool(EWMENU_MODE_SECTORS, _T("Sectors Mode"), wxBitmap(get_image_from_pk3("res/tbar/tb_sectors16.png", wxBITMAP_TYPE_PNG)),
+						wxBitmap(get_image_from_pk3("res/tbar/tb_sectorsd16.png", wxBITMAP_TYPE_PNG)), _T("Sectors Mode"));
+	tb->AddRadioTool(EWMENU_MODE_THINGS, _T("Things Mode"), wxBitmap(get_image_from_pk3("res/tbar/tb_things16.png", wxBITMAP_TYPE_PNG)),
+						wxBitmap(get_image_from_pk3("res/tbar/tb_thingsd16.png", wxBITMAP_TYPE_PNG)), _T("Things Mode"));
 	tb->AddSeparator();
-	dump_from_pk3("res/tbar/tb_3d16.png");
-	tb->AddTool(EWMENU_MODE_3D, _T("3D Mode"), wxBitmap(wxImage(_T("sladetemp"), wxBITMAP_TYPE_PNG)), _T("3d Mode"));
+	tb->AddTool(EWMENU_MODE_3D, _T("3D Mode"), wxBitmap(get_image_from_pk3("res/tbar/tb_3d16.png", wxBITMAP_TYPE_PNG)), _T("3d Mode"));
 	tb->AddSeparator();
-	dump_from_pk3("res/tbar/tb_mirrorx16.png");
-	tb->AddTool(EWMENU_EDIT_MIRRORX, _T("Mirror X"), wxBitmap(wxImage(_T("sladetemp"), wxBITMAP_TYPE_PNG)), _T("Mirror X"));
-	dump_from_pk3("res/tbar/tb_mirrory16.png");
-	tb->AddTool(EWMENU_EDIT_MIRRORY, _T("Mirror Y"), wxBitmap(wxImage(_T("sladetemp"), wxBITMAP_TYPE_PNG)), _T("Mirror Y"));
-	dump_from_pk3("res/tbar/tb_rotate16.png");
-	tb->AddTool(EWMENU_EDIT_ROTATE, _T("Rotate"), wxBitmap(wxImage(_T("sladetemp"), wxBITMAP_TYPE_PNG)), _T("Rotate"));
+	tb->AddTool(EWMENU_EDIT_MIRRORX, _T("Mirror X"), wxBitmap(get_image_from_pk3("res/tbar/tb_mirrorx16.png", wxBITMAP_TYPE_PNG)), _T("Mirror X"));
+	tb->AddTool(EWMENU_EDIT_MIRRORY, _T("Mirror Y"), wxBitmap(get_image_from_pk3("res/tbar/tb_mirrory16.png", wxBITMAP_TYPE_PNG)), _T("Mirror Y"));
+	tb->AddTool(EWMENU_EDIT_ROTATE, _T("Rotate"), wxBitmap(get_image_from_pk3("res/tbar/tb_rotate16.png", wxBITMAP_TYPE_PNG)), _T("Rotate"));
 
 	tb->ToggleTool(EWMENU_MODE_LINES, true);
 	tb->Realize();

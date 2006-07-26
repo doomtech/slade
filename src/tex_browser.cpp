@@ -95,8 +95,7 @@ TextureBrowser::TextureBrowser(string tex, bool fullscreen)
 	if (fullscreen)
 		ShowFullScreen(true);
 
-	dump_from_pk3("slade.ico");
-	SetIcon(wxIcon(_T("sladetemp"),  wxBITMAP_TYPE_ICO, -1, -1));
+	SetIcon(wxIcon(_T("slade.ico"),  wxBITMAP_TYPE_ICO, -1, -1));
 
 	SetMinSize(wxSize(320, 240));
 }

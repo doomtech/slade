@@ -57,8 +57,12 @@ string str_upper(string str);
 string s_fmt(char *str, ...);
 void log_message(string message);
 void message_box(string message, string caption = "SLADE");
-string c_path(string filename, bool userdir = false);
+string c_path(string filename, BYTE dir = 0);
 void redraw_map(bool map = false, bool grid = false);
 void update_statusbar();
 void change_edit_mode(int mode);
 void save_main_config();
+
+#define DIR_APP	0
+#define DIR_TMP	1
+#define DIR_USR	2
