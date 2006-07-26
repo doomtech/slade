@@ -201,7 +201,7 @@ void load_editor_texture(string name, string filename, int width = -1, int heigh
 	if (filter != -1)
 		tex->filter = filter;
 
-	tex->gen_gl_tex();
+	//tex->gen_gl_tex();
 
 	if (width >= 0)
 		tex->width = width;
