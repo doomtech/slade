@@ -208,12 +208,11 @@ bool MainApp::OnInit()
 	userPath = string(getenv("HOME")) + string("/Library/Application Support/Slade");
 	if(!wxDirExists(str_to_wx(userPath)))
 		wxMkdir(str_to_wx(userPath), 0700);
+	wxSetWorkingDirectory(dataDir);
 #elif wxCHECK_VERSION(2, 6, 0)
 	wxStandardPaths sp;
 	wxString dataDir = sp.GetDataDir();
 #endif
-
-	wxSetWorkingDirectory(dataDir);
 
 	// Init logfile
 	wxLog::SetActiveTarget(new wxLogStderr(fopen(c_path("slade.log", true).c_str(), "wt")));
@@ -224,6 +223,7 @@ bool MainApp::OnInit()
 	// Load image handlers
 	wxImage::AddHandler(new wxPNGHandler);
 
+	/*
 	// Setup app_path
 	app_path = wx_to_str(dataDir);
 
@@ -232,6 +232,7 @@ bool MainApp::OnInit()
 #else
 	app_path += "/";
 #endif
+	*/
 
 	startup = true;
 
@@ -242,8 +243,17 @@ bool MainApp::OnInit()
 	bool wads_opened = false;
 	if (argc > 0)
 	{
-		for (int a = 0; a < argc; a++)
-			wxLogMessage(argv[a]);
+		// Setup app path
+		app_path = argv[0];
+
+		int i = 5;
+#ifdef WIN32
+		i = 9;
+#endif
+		for (int a = 0; a < i; a++)
+			app_path.erase(app_path.end() - 1);
+
+		//log_message(app_path);
 
 		for (int a = 1; a < argc; a++)
 		{
