@@ -43,16 +43,16 @@ void dump_cvars()
 		if (!(cvars[c]->flags & CVAR_SECRET))
 		{
 			if (cvars[c]->type == CVAR_INTEGER)
-				printf("%s %d\n", cvars[c]->name.c_str(), cvars[c]->GetValue().Int);
+				printf("%s %d\n", chr(cvars[c]->name), cvars[c]->GetValue().Int);
 
 			if (cvars[c]->type == CVAR_BOOLEAN)
-				printf("%s %d\n", cvars[c]->name.c_str(), cvars[c]->GetValue().Bool);
+				printf("%s %d\n", chr(cvars[c]->name), cvars[c]->GetValue().Bool);
 
 			if (cvars[c]->type == CVAR_FLOAT)
-				printf("%s %1.2f\n", cvars[c]->name.c_str(), cvars[c]->GetValue().Float);
+				printf("%s %1.2f\n", chr(cvars[c]->name), cvars[c]->GetValue().Float);
 
 			if (cvars[c]->type == CVAR_STRING)
-				printf("%s \"%s\"\n", cvars[c]->name.c_str(), ((CStringCVar *)cvars[c])->value.c_str());
+				printf("%s \"%s\"\n", chr(cvars[c]->name), chr(((CStringCVar *)cvars[c])->value));
 		}
 	}
 }
@@ -89,7 +89,7 @@ void save_cvars(FILE* fp)
 	{
 		if (cvars[c]->flags & CVAR_SAVE)
 		{
-			fprintf(fp, "\t%s ", cvars[c]->name.c_str());
+			fprintf(fp, "\t%s ", chr(cvars[c]->name));
 
 			int spaces = max_size - cvars[c]->name.size();
 			for (int a = 0; a < spaces; a++) fprintf(fp, " ");
@@ -104,7 +104,7 @@ void save_cvars(FILE* fp)
 				fprintf(fp, "%1.2f\n", cvars[c]->GetValue().Float);
 
 			if (cvars[c]->type == CVAR_STRING)
-				fprintf(fp, "\"%s\"\n", ((CStringCVar *)cvars[c])->value.c_str());
+				fprintf(fp, "\"%s\"\n", chr(((CStringCVar *)cvars[c])->value));
 		}
 	}
 
@@ -115,9 +115,9 @@ void save_cvars(FILE* fp)
 // --------------------------------------- >>
 void load_cvars(Tokenizer *mr)
 {
-	string token = "";
+	string token = _T("");
 
-	while (token != "}" && token != "!END")
+	while (token != _T("}") && token != _T("!END"))
 	{
 		token = mr->get_token();
 

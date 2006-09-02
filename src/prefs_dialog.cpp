@@ -1,7 +1,6 @@
 
 #include "main.h"
 #include "prefs_dialog.h"
-#include "archive.h"
 
 PrefsDialog::PrefsDialog()
 :	wxDialog(NULL, -1, _T("Preferences"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER)

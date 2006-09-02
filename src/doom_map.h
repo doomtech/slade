@@ -27,11 +27,11 @@ class Thing;
 #define MISTYLE_MOVING		3
 #define MISTYLE_TAGGED		4
 
-#define MTYPE_VERTEX		0
-#define MTYPE_LINE			1
-#define MTYPE_SECTOR		2
-#define MTYPE_THING			3
-#define MTYPE_SIDE			4
+#define MTYPE_VERTEX		0x01
+#define MTYPE_LINE			0x02
+#define MTYPE_SECTOR		0x04
+#define MTYPE_THING			0x08
+#define MTYPE_SIDE			0x10
 
 #define MC_SAVE_NEEDED	0x01
 #define MC_NODE_REBUILD	0x02
@@ -110,11 +110,11 @@ public:
 	int		index(Thing* i, bool force_search = false);
 	void	update_indices(BYTE types =  255);
 
-	bool	valid(Vertex* i);
-	bool	valid(Line* i);
-	bool	valid(Side* i);
-	bool	valid(Sector* i);
-	bool	valid(Thing* i);
+	bool	valid(Vertex* i, bool fullcheck = false);
+	bool	valid(Line* i, bool fullcheck = false);
+	bool	valid(Side* i, bool fullcheck = false);
+	bool	valid(Sector* i, bool fullcheck = false);
+	bool	valid(Thing* i, bool fullcheck = false);
 
 	bool	hexen() { return !!(flags & MAP_HEXEN); }
 	bool	opened() { return !!(flags & MAP_OPEN); }
@@ -126,6 +126,11 @@ public:
 	Line*	hilight_line();
 	Sector*	hilight_sector();
 	Thing*	hilight_thing();
+
+	void	get_selection(vector<Vertex*> &list, bool hilight = false);
+	void	get_selection(vector<Line*> &list, bool hilight = false);
+	void	get_selection(vector<Sector*> &list, bool hilight = false);
+	void	get_selection(vector<Thing*> &list, bool hilight = false);
 
 	void	set_hexen(bool b);
 	void	set_name(string name);
@@ -166,18 +171,22 @@ public:
 	void move_items(point2_t mouse);
 	void clear_move_items();
 
-	void get_lines_to_vert(int vertex, vector<int> &list);
+	void get_lines_to_vert(int vertex, vector<int> &list, bool allowdup = true);
+	void update_vertex_refs();
 
 	// Checks
 	int		get_free_tag();
 	int		remove_unused_vertices();
 	int		remove_unused_sectors();
 	int		check_vertex_spot(point2_t pos);
-	void	remove_overlapping_lines(vector<Line*> &list);
+	int		remove_zerolength_lines();
+	void	remove_overlapping_lines(vector<Line*> &list, bool merge = false);
 	void	check_split(Vertex* vert);
 	void	check_split(Vertex* vert, vector<Line*> &list);
 	void	merge_vertices(Vertex* v1, Vertex* v2);
+	void	merge_under_vertex(Vertex* v);
 	void	merge_like_sectors();
+	void	merge_vertices_spot(point2_t pos);
 };
 
 #endif

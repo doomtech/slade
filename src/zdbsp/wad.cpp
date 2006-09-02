@@ -19,6 +19,10 @@
 */
 #include "wad.h"
 
+#ifndef WIN32
+#define strnicmp strncasecmp
+#endif
+
 static const char MapLumpNames[12][9] =
 {
 	"THINGS",

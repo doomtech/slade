@@ -16,8 +16,8 @@
 
 #else
 
-#define swap32(x)
-#define swap16(x)
+#define swap32(x) x
+#define swap16(x) x
 
 #define lefread(ptr, size, nmemb, stream) fread(ptr, size, nmemb, stream)
 #define lefwrite(ptr, size, nmemb, stream) fwrite(ptr, size, nmemb, stream)

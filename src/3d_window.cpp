@@ -23,6 +23,7 @@ CVAR(Int, vid_width_3d, -1, CVAR_SAVE)
 CVAR(Int, vid_height_3d, -1, CVAR_SAVE)
 CVAR(Int, vid_bpp_3d, -1, CVAR_SAVE)
 CVAR(Int, vid_refresh_3d, -1, CVAR_SAVE)
+CVAR(Int, vid_frametime_3d, 10, CVAR_SAVE)
 
 extern wxGLContext *gl_context;
 extern EditorWindow *editor_window;
@@ -116,13 +117,16 @@ BEGIN_EVENT_TABLE(Render3dCanvas, wxGLCanvas)
 	EVT_SIZE(Render3dCanvas::size_event)
 END_EVENT_TABLE()
 
+wxStopWatch sw;
+
 void Render3dCanvas::do_loop()
 {
-	elapsed = wxGetElapsedTime(false);
-	if (elapsed >= 10)
+	elapsed = sw.Time();
+	if (elapsed >= vid_frametime_3d)
 	{
 		// Reset timer
-		wxStartTimer();
+		//wxStartTimer();
+		sw.Start();
 
 		// Process input
 		if (!keys_3d(elapsed * 0.1))
@@ -172,36 +176,36 @@ bool reset = true;
 void Render3dCanvas::mouse_event(wxMouseEvent &event)
 {
 	if (event.LeftDown() || event.LeftDClick())
-		binds.set("Mouse1", NULL, event.ShiftDown(), event.ControlDown(), event.AltDown());
+		binds.set(_T("Mouse1"), NULL, event.ShiftDown(), event.ControlDown(), event.AltDown());
 
 	if (event.MiddleDown() || event.MiddleDClick())
-		binds.set("Mouse2", NULL, event.ShiftDown(), event.ControlDown(), event.AltDown());
+		binds.set(_T("Mouse2"), NULL, event.ShiftDown(), event.ControlDown(), event.AltDown());
 
 	if (event.RightDown() || event.RightDClick())
-		binds.set("Mouse3", NULL, event.ShiftDown(), event.ControlDown(), event.AltDown());
+		binds.set(_T("Mouse3"), NULL, event.ShiftDown(), event.ControlDown(), event.AltDown());
 
 	if (event.LeftUp())
-		binds.unset("Mouse1", NULL, event.ShiftDown(), event.ControlDown(), event.AltDown());
+		binds.unset(_T("Mouse1"), NULL, event.ShiftDown(), event.ControlDown(), event.AltDown());
 
 	if (event.MiddleUp())
-		binds.unset("Mouse2", NULL, event.ShiftDown(), event.ControlDown(), event.AltDown());
+		binds.unset(_T("Mouse2"), NULL, event.ShiftDown(), event.ControlDown(), event.AltDown());
 
 	if (event.RightUp())
-		binds.unset("Mouse3", NULL, event.ShiftDown(), event.ControlDown(), event.AltDown());
+		binds.unset(_T("Mouse3"), NULL, event.ShiftDown(), event.ControlDown(), event.AltDown());
 
 	if (event.GetWheelRotation() > 0)
 	{
-		binds.set("MWheel Up", NULL, event.ShiftDown(), event.ControlDown(), event.AltDown());
+		binds.set(_T("MWheel Up"), NULL, event.ShiftDown(), event.ControlDown(), event.AltDown());
 		keys_3d(1.0f, true);
 	}
 	else if (event.GetWheelRotation() < 0)
 	{
-		binds.set("MWheel Down", NULL, event.ShiftDown(), event.ControlDown(), event.AltDown());
+		binds.set(_T("MWheel Down"), NULL, event.ShiftDown(), event.ControlDown(), event.AltDown());
 		keys_3d(1.0f, true);
 	}
 
-	binds.unset("MWheel Up", NULL, event.ShiftDown(), event.ControlDown(), event.AltDown());
-	binds.unset("MWheel Down", NULL, event.ShiftDown(), event.ControlDown(), event.AltDown());
+	binds.unset(_T("MWheel Up"), NULL, event.ShiftDown(), event.ControlDown(), event.AltDown());
+	binds.unset(_T("MWheel Down"), NULL, event.ShiftDown(), event.ControlDown(), event.AltDown());
 
 	if (event.Moving())
 	{
@@ -283,7 +287,7 @@ void start_3d_mode()
 		return;
 	remove("sladetemp");
 
-	splash("Setup 3d mode data");
+	splash(_T("Setup 3d mode data"));
 
 	if (lines_visible) delete lines_visible;
 	lines_visible = new bool[d_map.n_lines()];
@@ -311,7 +315,7 @@ void start_3d_mode()
 	editor_window->Hide();
 	frame_3d->ShowFullScreen(true);
 	canvas_3d->render();
-	wxStartTimer();
+	//wxStartTimer();
 
 	reset_3d_mouse();
 }

@@ -2,6 +2,7 @@
 #include "main.h"
 #include "doom_map.h"
 #include "dm_vertex.h"
+#include "dm_line.h"
 #include "draw.h"
 
 extern rgba_t col_vertex, col_selection, col_hilight, col_moving;
@@ -34,8 +35,8 @@ Vertex::Vertex(int x, int y, DoomMap *parent)
 Vertex::Vertex(doomvertex_t v, DoomMap *parent)
 {
 	this->parent = parent;
-	this->x = v.x;
-	this->y = v.y;
+	this->x = wxINT16_SWAP_ON_BE(v.x);
+	this->y = wxINT16_SWAP_ON_BE(v.y);
 	ref_count = 0;
 	index = -1;
 
@@ -92,8 +93,8 @@ doomvertex_t Vertex::to_doomformat()
 {
 	doomvertex_t ret;
 
-	ret.x = (short)x;
-	ret.y = (short)y;
+	ret.x = wxINT16_SWAP_ON_BE((short)x);
+	ret.y = wxINT16_SWAP_ON_BE((short)y);
 
 	return ret;
 }
@@ -105,4 +106,17 @@ void Vertex::move(int xd, int yd)
 
 	if (parent)
 		parent->change_level(MC_NODE_REBUILD);
+}
+
+void Vertex::update_refs()
+{
+	if (!parent)
+		return;
+
+	ref_count = 0;
+	for (int a = 0; a < parent->n_lines(); a++)
+	{
+		if (parent->line(a)->has_vertex(this))
+			ref_count++;
+	}
 }

@@ -2,7 +2,6 @@
 #include "main.h"
 #include "console_window.h"
 #include "console.h"
-#include "archive.h"
 
 ConsoleWindow	*console_window;
 

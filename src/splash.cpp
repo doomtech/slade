@@ -9,7 +9,6 @@
 #include "main.h"
 #include "wx_stuff.h"
 #include "image_box.h"
-#include "archive.h"
 
 
 class SplashWindow : public wxFrame

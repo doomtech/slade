@@ -4,8 +4,12 @@
 #include <windows.h>
 #endif
 
+// String stuff
+#include <wx/string.h>
 #include <string>
-using std::string;
+typedef wxString string;
+#define s_fmt wxString::Format
+const char* chr(wxString str);
 
 #include <vector>
 using std::vector;
@@ -53,15 +57,15 @@ typedef uint32_t DWORD;
 
 #include "cvar.h"
 
-string str_upper(string str);
-string s_fmt(char *str, ...);
-void log_message(string message);
-void message_box(string message, string caption = "SLADE");
 string c_path(string filename, BYTE dir = 0);
 void redraw_map(bool map = false, bool grid = false);
 void update_statusbar();
+void update_infobar();
 void change_edit_mode(int mode);
 void save_main_config();
+void message_box(string message, string caption = _T(""));
+void log_message(string message);
+float get_zoom();
 
 #define DIR_APP	0
 #define DIR_TMP	1

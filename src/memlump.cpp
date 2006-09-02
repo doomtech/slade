@@ -72,7 +72,7 @@ void MemLump::dump_to_file(string filename)
 	if (!has_data())
 		return;
 
-	FILE* fp = fopen(filename.c_str(), "wb");
+	FILE* fp = fopen(chr(filename), "wb");
 	fwrite(data, size, 1, fp);
 	fclose(fp);
 }

@@ -119,7 +119,8 @@ inline fixed_t DMulScale32 (fixed_t a, fixed_t b, fixed_t c, fixed_t d)
 
 #pragma warning (default: 4035)
 
-#elif defined(__GNUC__)
+//#elif defined(__GNUC__)
+#elif defined(__GNUC__) && defined(__i386__)
 
 inline fixed_t Scale (fixed_t a, fixed_t b, fixed_t c)
 {
@@ -198,7 +199,8 @@ inline fixed_t DMulScale32 (fixed_t a, fixed_t b, fixed_t c, fixed_t d)
 #endif
 
 // FIXME: No macros defined for big-endian machines.
-#define LittleShort(x)	(x)
-#define LittleLong(x)	(x)
+#include "../byteswap.h"
+#define LittleShort(x) swap16(x)
+#define LittleLong(x)  swap32(x)
 
 #endif //__ZDBSP_H__

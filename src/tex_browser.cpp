@@ -4,7 +4,6 @@
 #include "doom_map.h"
 #include "draw.h"
 #include "game_config.h"
-#include "archive.h"
 
 #include <wx/spinctrl.h>
 
@@ -284,7 +283,7 @@ void TexBrowseCanvas::redraw()
 			if (vis_items[a]->tex)
 				draw_texture_scale(rect, vis_items[a]->tex);
 
-			draw_text(rect.middle().x, rect.bottom() - 8, COL_WHITE, 1, vis_items[a]->retval.c_str());
+			draw_text(rect.middle().x, rect.bottom() - 8, COL_WHITE, 1, false, vis_items[a]->retval.c_str());
 		}
 
 		col++;

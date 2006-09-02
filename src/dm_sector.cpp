@@ -6,6 +6,7 @@
 #include "game_config.h"
 
 extern GameConfig game;
+extern bool startup;
 
 /*
 string	def_ftex = "MFLR8_1";
@@ -19,16 +20,20 @@ Sector::Sector(DoomMap *parent)
 {
 	this->parent = parent;
 
-	f_height = game.def_fheight;
-	c_height = game.def_cheight;
-	f_tex = game.def_ftex;
-	c_tex = game.def_ctex;
-	light = game.def_light;
 	special = 0;
 	tag = 0;
 	tex_f = NULL;
 	tex_c = NULL;
 	index = -1;
+
+	if (startup)
+	{
+		f_height = game.def_fheight;
+		c_height = game.def_cheight;
+		f_tex = game.def_ftex;
+		c_tex = game.def_ctex;
+		light = game.def_light;
+	}
 
 	if (parent)
 		parent->add_sector(this);
@@ -43,22 +48,22 @@ Sector::Sector(doomsector_t s, DoomMap *parent)
 
 	this->parent = parent;
 
-	f_height = s.f_height;
-	c_height = s.c_height;
-	light = s.light;
-	special = s.special;
-	tag = s.tag;
+	f_height = wxINT16_SWAP_ON_BE(s.f_height);
+	c_height = wxINT16_SWAP_ON_BE(s.c_height);
+	light = wxINT16_SWAP_ON_BE(s.light);
+	special = wxINT16_SWAP_ON_BE(s.special);
+	tag = wxINT16_SWAP_ON_BE(s.tag);
 
 	char temp[9];
 	temp[8] = 0;
 
 	memcpy(temp, s.f_tex, 8);
-	f_tex = str_upper(temp);
+	f_tex = wxString::FromAscii(temp).Upper();
 	tex = get_texture(f_tex);
 	if (tex) tex->use_count++;
 
 	memcpy(temp, s.c_tex, 8);
-	c_tex = str_upper(temp);
+	c_tex = wxString::FromAscii(temp).Upper();
 	tex = get_texture(c_tex);
 	if (tex) tex->use_count++;
 
@@ -104,11 +109,11 @@ doomsector_t Sector::to_doomformat()
 {
 	doomsector_t ret;
 
-	ret.c_height = (short)c_height;
-	ret.f_height = (short)f_height;
-	ret.light = (short)light;
-	ret.special = (short)special;
-	ret.tag = (short)tag;
+	ret.c_height = wxINT16_SWAP_ON_BE((short)c_height);
+	ret.f_height = wxINT16_SWAP_ON_BE((short)f_height);
+	ret.light = wxINT16_SWAP_ON_BE((short)light);
+	ret.special = wxINT16_SWAP_ON_BE((short)special);
+	ret.tag = wxINT16_SWAP_ON_BE((short)tag);
 
 	for (int a = 0; a < 8; a++)
 	{

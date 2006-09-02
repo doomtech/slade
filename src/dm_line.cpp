@@ -83,9 +83,9 @@ Line::Line(doomline_t l, DoomMap *parent, bool &ok)
 {
 	this->parent = parent;
 
-	flags = l.flags;
-	type = l.type;
-	sector_tag = l.sector_tag;
+	flags = wxINT16_SWAP_ON_BE(l.flags);
+	type = wxINT16_SWAP_ON_BE(l.type);
+	sector_tag = wxINT16_SWAP_ON_BE(l.sector_tag);
 
 	v1 = NULL;
 	v2 = NULL;
@@ -97,8 +97,8 @@ Line::Line(doomline_t l, DoomMap *parent, bool &ok)
 		return;
 
 	// Vertices
-	v1 = parent->vertex(l.vertex1);
-	v2 = parent->vertex(l.vertex2);
+	v1 = parent->vertex(wxINT32_SWAP_ON_BE(l.vertex1));
+	v2 = parent->vertex(wxINT32_SWAP_ON_BE(l.vertex2));
 
 	if (!parent->valid(v1))
 	{
@@ -117,13 +117,13 @@ Line::Line(doomline_t l, DoomMap *parent, bool &ok)
 		v2->add_ref();
 
 	// Sides
-	int side1 = l.side1;
-	int side2 = l.side2;
+	int side1 = wxINT16_SWAP_ON_BE(l.side1);
+	int side2 = wxINT16_SWAP_ON_BE(l.side2);
 
 	if (parent->n_sides() > 32767)
 	{
-		side1 = static_cast<unsigned short>(l.side1);
-		side2 = static_cast<unsigned short>(l.side2);
+		side1 = wxINT16_SWAP_ON_BE(static_cast<unsigned short>(l.side1));
+		side2 = wxINT16_SWAP_ON_BE(static_cast<unsigned short>(l.side2));
 	}
 
 	if ((side1 < -1 || side1 > parent->n_sides()) && side1 != 65535)
@@ -153,7 +153,7 @@ Line::Line(hexenline_t l, DoomMap *parent, bool &ok)
 {
 	this->parent = parent;
 
-	flags = l.flags;
+	flags = wxINT16_SWAP_ON_BE(l.flags);
 	type = l.type;
 	memcpy(args, l.args, 5);
 
@@ -167,8 +167,8 @@ Line::Line(hexenline_t l, DoomMap *parent, bool &ok)
 		return;
 
 	// Vertices
-	v1 = parent->vertex(l.vertex1);
-	v2 = parent->vertex(l.vertex2);
+	v1 = parent->vertex(wxINT16_SWAP_ON_BE(l.vertex1));
+	v2 = parent->vertex(wxINT16_SWAP_ON_BE(l.vertex2));
 
 	if (!parent->valid(v1))
 	{
@@ -192,8 +192,8 @@ Line::Line(hexenline_t l, DoomMap *parent, bool &ok)
 
 	if (parent->n_sides() > 32767)
 	{
-		side1 = static_cast<unsigned short>(l.side1);
-		side2 = static_cast<unsigned short>(l.side2);
+		side1 = wxINT16_SWAP_ON_BE(static_cast<unsigned short>(l.side1));
+		side2 = wxINT16_SWAP_ON_BE(static_cast<unsigned short>(l.side2));
 	}
 
 	if ((side1 < -1 || side1 > parent->n_sides()) && side1 != 65535)
@@ -484,13 +484,31 @@ doomline_t Line::to_doomformat()
 {
 	doomline_t ret;
 
-	ret.flags = (short)flags;
-	ret.sector_tag = (short)sector_tag;
-	ret.type = (short)type;
-	ret.vertex1 = parent->index(v1);
-	ret.vertex2 = parent->index(v2);
-	ret.side1 = parent->index(s1);
-	ret.side2 = parent->index(s2);
+	ret.flags = wxINT16_SWAP_ON_BE((short)flags);
+	ret.sector_tag = wxINT16_SWAP_ON_BE((short)sector_tag);
+	ret.type = wxINT16_SWAP_ON_BE((short)type);
+	ret.vertex1 = wxINT16_SWAP_ON_BE((short)parent->index(v1));
+	ret.vertex2 = wxINT16_SWAP_ON_BE((short)parent->index(v2));
+
+	int side1 = parent->index(s1);
+	int side2 = parent->index(s2);
+
+	ret.side1 = (short)side1;
+	ret.side2 = (short)side2;
+
+	if (parent)
+	{
+		if (parent->n_sides() > 32767)
+		{
+			WORD temp = side1;
+			ret.side1 = static_cast<short>(temp);
+			temp = side2;
+			ret.side2 = static_cast<short>(temp);
+		}
+	}
+
+	ret.side1 = wxINT16_SWAP_ON_BE(ret.side1);
+	ret.side2 = wxINT16_SWAP_ON_BE(ret.side2);
 
 	return ret;
 }
@@ -499,15 +517,33 @@ hexenline_t Line::to_hexenformat()
 {
 	hexenline_t hl;
 
-	hl.flags = (short)flags;
+	hl.flags = wxINT16_SWAP_ON_BE((short)flags);
 	hl.type = (BYTE)type;
-	hl.vertex1 = parent->index(v1);
-	hl.vertex2 = parent->index(v2);
-	hl.side1 = parent->index(s1);
-	hl.side2 = parent->index(s2);
+	hl.vertex1 = wxINT16_SWAP_ON_BE((short)parent->index(v1));
+	hl.vertex2 = wxINT16_SWAP_ON_BE((short)parent->index(v2));
 
 	for (int a = 0; a < 5; a++)
 		hl.args[a] = args[a];
+
+	int side1 = parent->index(s1);
+	int side2 = parent->index(s2);
+
+	hl.side1 = (short)side1;
+	hl.side2 = (short)side2;
+
+	if (parent)
+	{
+		if (parent->n_sides() > 32767)
+		{
+			WORD temp = side1;
+			hl.side1 = static_cast<short>(temp);
+			temp = side2;
+			hl.side2 = static_cast<short>(temp);
+		}
+	}
+
+	hl.side1 = wxINT16_SWAP_ON_BE(hl.side1);
+	hl.side2 = wxINT16_SWAP_ON_BE(hl.side2);
 
 	return hl;
 }
@@ -632,7 +668,7 @@ void Line::set_sector(int side, Sector* sector)
 		}
 
 		s2->set_sector(sector);
-		s2->set_texture("-");
+		//s2->set_texture("-");
 	}
 }
 
@@ -696,6 +732,12 @@ point2_t Line::get_side_point(bool front)
 
 Line* Line::split(Vertex* vert)
 {
+	if (parent)
+	{
+		if (!parent->valid(vert))
+			return this;
+	}
+
 	Line* l = new Line(vert, v2, parent);
 	v2->rem_ref();
 	v2 = vert;
@@ -736,6 +778,12 @@ void Line::copy(Line *line)
 
 void Line::set_vertex1(Vertex* v)
 {
+	if (parent)
+	{
+		if (!parent->valid(v))
+			return;
+	}
+
 	v1->rem_ref();
 	v1 = v;
 	v1->add_ref();
@@ -743,6 +791,12 @@ void Line::set_vertex1(Vertex* v)
 
 void Line::set_vertex2(Vertex* v)
 {
+	if (parent)
+	{
+		if (!parent->valid(v))
+			return;
+	}
+
 	v2->rem_ref();
 	v2 = v;
 	v2->add_ref();

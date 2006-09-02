@@ -2,6 +2,9 @@
 #ifndef __WAD_H__
 #define __WAD_H__
 
+class Wad;
+
+/*
 class Lump
 {
 private:
@@ -10,30 +13,38 @@ private:
 	DWORD	size;
 	string	name;
 	BYTE	*data;
+	Wad		*parent;
+
+	vector<string>	dir;
 
 public:
 	// Constructors
-	Lump() { data = (BYTE *)NULL; size = 0; offset = 0; }
-	Lump(DWORD offset, DWORD size, string name)
+	Lump() { data = (BYTE *)NULL; size = 0; offset = 0; parent = NULL; }
+	Lump(DWORD offset, DWORD size, string name, Wad* parent = NULL)
 	{
 		this->offset = offset;
 		this->size = size;
 		this->name = name;
+		this->parent = parent;
 
-		data = (BYTE *)malloc(size);
+		data = new BYTE[size];
 	}
 
 	// Destructor
-	~Lump() { free(data); }
+	~Lump() { if (data) delete[] data; }
 
 	DWORD	Offset()	{ return offset;	}
 	DWORD	Size()		{ return size;		}
-	string	Name()		{ return name;		}
+	string	Name(bool path = true, bool ext = true);
 	BYTE*	Data()		{ return data;		}
 	DWORD	Index()		{ return index;		}
+	Wad*	Parent()	{ return parent;	}
 
 	void	SetOffset(DWORD offset)	{ this->offset = offset;	}
 	void	Rename(string name)		{ this->name = name;		}
+
+	void	AddDir(string name)		{ dir.push_back(name); }
+	void	ClearDir()				{ dir.clear(); }
 
 	void	Resize(DWORD newsize)
 	{
@@ -67,8 +78,8 @@ public:
 	DWORD	dir_offset;
 
 	// Dierctory
-	Lump*	*directory;
-	//vector<Lump*> directory;
+	//Lump*	*directory;
+	vector<Lump*> directory;
 
 	// Stuff
 	int		patches[2];
@@ -80,11 +91,11 @@ public:
 
 	// Flags
 	bool	locked;	// True if wad cannot be written to (for IWADs)
+	bool	zip;
 
 	// Constructor/Destructor
 	Wad()
 	{
-		directory = (Lump **)NULL;
 		num_lumps = 0;
 		dir_offset = 0;
 		locked = false;
@@ -101,17 +112,13 @@ public:
 
 	~Wad()
 	{
-		if (directory)
-		{
-			for (DWORD l = 0; l < num_lumps; l++)
-				delete directory[l];
-
-			free(directory);
-		}
+		for (DWORD l = 0; l < directory.size(); l++)
+			delete directory[l];
 	}
 
 	// Member Functions
 	bool	open(string filename);
+	bool	open_zip(string filename);
 	void	save(bool nodes, string mapname = "");
 	void	close();
 
@@ -128,7 +135,141 @@ public:
 
 	void	calculate_offsets();
 };
+*/
 
+class Lump
+{
+private:
+	long		offset;
+	long		size;
+	string		name;
+	BYTE		*data;
+	int			type;
+	bool		loaded;
+	Wad*		parent;
+
+	vector<string>	directory;
+
+public:
+	Lump(long offset = 0, long size = 0, string name = _T(""), Wad* parent = NULL);
+	~Lump();
+
+	long	getOffset() { return offset;	}
+	long	getSize()	{ return size;		}
+	string	getName(bool full = true, bool ext = true);
+	int		getType()	{ return type;		}
+	bool	isLoaded()	{ return loaded;	}
+	Wad*	getParent() { return parent;	}
+	BYTE*	getData(bool load = true);
+
+	string	getDir(int index);
+	string	getFullDir();
+	int		dirLevel()	{ return (int)directory.size(); }
+	void	addDir(string name, int index = -1);
+	void	renameDir(string nname, int index);
+
+	void	setOffset(DWORD o);
+	void	reSize(DWORD s);
+	void	setName(string n);
+	void	setParent(Wad* p)	{ parent = p;	}
+
+	void	dumpToFile(string filename);
+	bool	loadFile(string filename);
+	void	loadStream(FILE *fp);
+	void	loadData(BYTE* buf, DWORD size);
+
+	bool	isFolder();
+};
+
+class Wad
+{
+private:
+	vector<Lump*>	directory;
+
+public:
+	Lump	*parent;
+
+	// Wad path
+	string		path;
+
+	// Stuff
+	int		patches[2];
+	int		flats[2];
+	int		sprites[2];
+	int		tx[2];
+
+	vector<string>	available_maps;
+
+	// Flags
+	bool	locked;	// True if wad cannot be written to (for IWADs)
+	bool	zip;
+
+	// Constructor/Destructor
+	Wad();
+	~Wad()
+	{
+		for (DWORD l = 0; l < directory.size(); l++)
+			delete directory[l];
+	}
+
+	DWORD	numLumps() { return (DWORD)directory.size(); }
+
+	// Member Functions
+	bool	open(string filename, bool load_data = false);
+	bool	openZip(string filename, bool load_data = false);
+	void	save(bool nodes, string mapname = _T(""));
+	void	saveZip();
+	void	close();
+
+	long	getLumpIndex(string name, DWORD offset = 0, bool dir = false, bool ext = false);
+	long	lumpIndex(Lump* lump);
+	Lump*	getLump(string name, DWORD offset = 0, bool dir = false, bool ext = false);
+	Lump*	lumpAt(int index);
+	Lump*	lastLump();
+
+	void	addDir(string path);
+	void	renameDir(Lump* dirlump, string newname);
+	Lump*	addLump(string name, long index);
+	void	replaceLump(long index, DWORD new_size, BYTE *data);
+	void	deleteLump(string name, DWORD offset = 0);
+	void	deleteLump(long index, bool delfolder = true);
+	void	swapLumps(long index1, long index2);
+	void	swapLumps(Lump* lump1, Lump* lump2);
+
+	void	deleteAllLumps();
+
+	void	dumpDirectory();
+	bool	needsSave();
+	void	findMaps();
+};
+
+class WadList
+{
+private:
+	vector<Wad*>	wads;
+	Wad*			iwad;
+
+public:
+	WadList() { iwad = new Wad(); }
+	~WadList();
+
+	int		nWads() { return (int)wads.size(); }
+
+	bool	open(string filename, BYTE flags = 0);
+	bool	close(string filename);
+	void	closeAll();
+	void	reloadAll();
+	Wad*	getWad(int index = -1);
+	Wad*	getLast();
+	Wad*	getLastWithMaps();
+	Wad*	getWadWithLump(string name);
+	Lump*	getLump(string name);
+};
+
+#define WL_IWAD	0x01
+#define WL_ZIP	0x02
+
+/*
 class WadList
 {
 private:
@@ -284,6 +425,7 @@ public:
 			printf("%s\n", wads[w]->path.c_str());
 	}
 };
+*/
 
 #define START	0
 #define	END		1

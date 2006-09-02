@@ -18,7 +18,7 @@
 // ------------------------------------------------------------- >>
 bool Tokenizer::open_file(string filename, DWORD offset, DWORD length)
 {
-	FILE *fp = fopen(filename.c_str(), "rb");
+	FILE *fp = fopen(chr(filename), "rb");
 
 	if (!fp)
 		return false;
@@ -147,7 +147,7 @@ string Tokenizer::get_token()
 		{
 			if (!increment_current())
 			{
-				ret_str = "!END";
+				ret_str = _T("!END");
 				return ret_str;
 			}
 		}
@@ -176,7 +176,7 @@ string Tokenizer::get_token()
 		// Check for end of text
 		if (position == size)
 		{
-			ret_str = "!END";
+			ret_str = _T("!END");
 			return ret_str;
 		}
 	}
@@ -268,10 +268,7 @@ bool Tokenizer::get_bool()
 {
 	string token = get_token();
 
-	if (token == "no" || token == "No" || token == "NO")
-		return false;
-
-	if (token == "false" || token == "False" || token == "FALSE")
+	if (!token.CmpNoCase(_T("no")) || !token.CmpNoCase(_T("false")))
 		return false;
 
 	return !!atoi(token.c_str());

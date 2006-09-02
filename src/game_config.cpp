@@ -5,7 +5,6 @@
 #include "wx_stuff.h"
 #include "wad.h"
 #include "colours.h"
-#include "archive.h"
 
 GameConfig game;
 
@@ -27,15 +26,16 @@ extern DoomMap d_map;
 extern WadList wads;
 extern vector<string> spritenames;
 extern bool mix_tex;
+extern Wad reswad;
 
 void load_game_iwads(Tokenizer *tz)
 {
-	tz->check_token("{");
+	tz->check_token(_T("{"));
 
 	string token = tz->get_token();
-	while (token != "}")
+	while (token != _T("}"))
 	{
-		if (token == "game")
+		if (token == _T("game"))
 		{
 			iwadinfo_t ii;
 			ii.game = tz->get_token();
@@ -52,7 +52,7 @@ void save_game_iwads(FILE* fp)
 	fprintf(fp, "iwads\n{\n");
 
 	for (int a = 0; a < game_iwads.size(); a++)
-		fprintf(fp, "\tgame \"%s\" \"%s\"\n", game_iwads[a].game.c_str(), game_iwads[a].iwad_path.c_str());
+		fprintf(fp, "\tgame \"%s\" \"%s\"\n", chr(game_iwads[a].game), chr(game_iwads[a].iwad_path));
 
 	fprintf(fp, "}\n\n");
 }
@@ -60,8 +60,16 @@ void save_game_iwads(FILE* fp)
 GameConfig::GameConfig()
 {
 	game_flags = 0;
-	special_none.name = "None";
+	special_none.name = _T("None");
 	special_none.type = 0;
+
+	def_ftex = _T("");
+	def_ctex = _T("");
+	def_uptex = _T("");
+	def_lotex = _T("");
+	def_midtex = _T("");
+	def_doortex = _T("");
+	def_tracktex = _T("");
 }
 
 GameConfig::~GameConfig()
@@ -72,16 +80,17 @@ bool GameConfig::load_config(string filename)
 {
 	// Open File
 	Tokenizer tz;
-	MemLump ml;
+	//MemLump ml;
 
-	get_from_pk3(ml, filename);
-	tz.open_mem((char*)ml.get_data(), ml.get_size());
+	//get_from_pk3(ml, filename);
+	Lump* lump = reswad.getLump(filename, 0, true, true);
+	tz.open_mem((char*)lump->getData(), lump->getSize());
 
 	string token = tz.get_token();
 
-	if (token != "game")
+	if (token != _T("game"))
 	{
-		message_box("Invalid game configuration file (must begin with \"game\")", "Error");
+		message_box(_T("Invalid game configuration file (must begin with \"game\")"), _T("Error"));
 		return false;
 	}
 
@@ -96,17 +105,17 @@ bool GameConfig::load_config(string filename)
 			i = a;
 	}
 
-	string iwad_path = "";
+	string iwad_path = _T("");
 	if (i == -1)
 	{
-		wxMessageBox(str_to_wx(s_fmt("Please browse for the \"%s\" game IWAD...", token.c_str())), _T("IWAD Needed"));
-		
-		string filename = "";
+		wxMessageBox(s_fmt(_T("Please browse for the \"%s\" game IWAD..."), chr(token)), _T("IWAD Needed"));
+
+		string filename = _T("");
 		wxFileDialog browse(NULL, _T("Browse IWAD"), _T(""), _T(""), _T("Doom Wad Files (*.wad)|*.wad"), wxOPEN|wxFILE_MUST_EXIST);
 		if (browse.ShowModal() == wxID_OK)
-			filename = wx_to_str(browse.GetPath());
+			filename = browse.GetPath();
 
-		if (filename != "")
+		if (filename != _T(""))
 			iwad_path = filename;
 		else
 			return false;
@@ -114,7 +123,7 @@ bool GameConfig::load_config(string filename)
 	else
 		iwad_path = game_iwads[i].iwad_path;
 
-	wads.get_iwad()->close();
+	wads.getWad()->close();
 	action_specials.clear();
 	thing_types.clear();
 	valid_map_names.clear();
@@ -124,9 +133,9 @@ bool GameConfig::load_config(string filename)
 	// Check opening brace
 	tz.check_token("{");
 
-	if (!wads.open_iwad(iwad_path))
+	if (!wads.open(iwad_path, WL_IWAD))
 	{
-		wxMessageBox(str_to_wx(s_fmt("Couldn't open IWAD \"%s\"!", iwad_path.c_str())), _T("Error"));
+		wxMessageBox(s_fmt(_T("Couldn't open IWAD \"%s\"!"), chr(iwad_path)), _T("Error"));
 		game_iwads.erase(game_iwads.begin() + i);
 		return false;
 	}
@@ -140,9 +149,9 @@ bool GameConfig::load_config(string filename)
 
 	// Read game section
 	token = tz.get_token();
-	while (token != "}")
+	while (token != _T("}"))
 	{
-		if (token == "boom")
+		if (token == _T("boom"))
 		{
 			if(tz.get_bool())
 				game_flags |= GAME_BOOM;
@@ -150,10 +159,10 @@ bool GameConfig::load_config(string filename)
 				game_flags = (game_flags & ~GAME_BOOM);
 		}
 
-		if (token == "hexen")
+		if (token == _T("hexen"))
 			d_map.set_hexen(tz.get_bool());
 
-		if (token == "zdoom")
+		if (token == _T("zdoom"))
 		{
 			if(tz.get_bool())
 				game_flags |= GAME_ZDOOM;
@@ -163,7 +172,7 @@ bool GameConfig::load_config(string filename)
 			mix_tex = zdoom();
 		}
 
-		if (token == "map_names")
+		if (token == _T("map_names"))
 		{
 			if(tz.get_bool())
 				game_flags |= GAME_MAPNAMES;
@@ -175,54 +184,57 @@ bool GameConfig::load_config(string filename)
 	}
 
 	// Read map names
-	if (tz.get_token() == "map_names")
+	token = tz.get_token();
+	if (token == _T("map_names"))
 	{
-		tz.check_token("{");
+		tz.check_token(_T("{"));
 		token = tz.get_token();
 
-		while (token != "}")
+		while (token != _T("}"))
 		{
 			valid_map_names.push_back(token);
 			token = tz.get_token();
 		}
+
+		token = tz.get_token();
 	}
 
 	// Read defaults
-	if (tz.get_token() == "defaults")
+	if (token == _T("defaults"))
 	{
-		tz.check_token("{");
+		tz.check_token(_T("{"));
 		token = tz.get_token();
 
-		while (token != "}")
+		while (token != _T("}"))
 		{
-			if (token == "floor_tex")
+			if (token == _T("floor_tex"))
 				def_ftex = tz.get_token();
 
-			if (token == "ceil_tex")
+			if (token == _T("ceil_tex"))
 				def_ctex = tz.get_token();
 
-			if (token == "upper_tex")
+			if (token == _T("upper_tex"))
 				def_uptex = tz.get_token();
 
-			if (token == "lower_tex")
+			if (token == _T("lower_tex"))
 				def_lotex = tz.get_token();
 
-			if (token == "middle_tex")
+			if (token == _T("middle_tex"))
 				def_midtex = tz.get_token();
 
-			if (token == "door_tex")
+			if (token == _T("door_tex"))
 				def_doortex = tz.get_token();
 
-			if (token == "dtrack_tex")
+			if (token == _T("dtrack_tex"))
 				def_tracktex = tz.get_token();
 
-			if (token == "floor_height")
+			if (token == _T("floor_height"))
 				def_fheight = tz.get_integer();
 
-			if (token == "ceil_height")
+			if (token == _T("ceil_height"))
 				def_cheight = tz.get_integer();
 
-			if (token == "light")
+			if (token == _T("light"))
 				def_light = tz.get_integer();
 
 			token = tz.get_token();
@@ -238,27 +250,25 @@ bool GameConfig::load_config(string filename)
 // ------------------------------------------------------------------ >>
 void GameConfig::read_types(Tokenizer *mr, BYTE sections)
 {
-	MemLump ml;
-
 	string token = mr->get_token();
-	while (token != "!END")
+	while (token != _T("!END"))
 	{
 		// Thing types
-		if (sections & SECT_THINGS && token == "thing_types")
+		if (sections & SECT_THINGS && token == _T("thing_types"))
 		{
-			mr->check_token("{");
+			mr->check_token(_T("{"));
 
 			token = mr->get_token();
-			while (token != "}")
+			while (token != _T("}"))
 			{
-				if (token == "group")
+				if (token == _T("group"))
 					parse_thing_group(mr);
 
-				if (token == "import")
+				if (token == _T("import"))
 				{
 					Tokenizer mr2;
-					get_from_pk3(ml, "games/" + mr->get_token());
-					mr2.open_mem((char*)ml.get_data(), ml.get_size());
+					Lump* lump = reswad.getLump(_T("games/") + mr->get_token(), 0, true, true);
+					mr2.open_mem((char*)lump->getData(), lump->getSize());
 					read_types(&mr2, SECT_THINGS);
 				}
 
@@ -267,21 +277,21 @@ void GameConfig::read_types(Tokenizer *mr, BYTE sections)
 		}
 
 		// Action specials
-		if (sections & SECT_SPECIALS && token == "action_specials")
+		if (sections & SECT_SPECIALS && token == _T("action_specials"))
 		{
-			mr->check_token("{");
+			mr->check_token(_T("{"));
 
 			token = mr->get_token();
-			while (token != "}")
+			while (token != _T("}"))
 			{
-				if (token == "group")
+				if (token == _T("group"))
 					parse_action_group(mr);
 
-				if (token == "import")
+				if (token == _T("import"))
 				{
 					Tokenizer mr2;
-					get_from_pk3(ml, "games/" + mr->get_token());
-					mr2.open_mem((char*)ml.get_data(), ml.get_size());
+					Lump* lump = reswad.getLump(_T("games/") + mr->get_token(), 0, true, true);
+					mr2.open_mem((char*)lump->getData(), lump->getSize());
 					read_types(&mr2, SECT_SPECIALS);
 				}
 
@@ -290,25 +300,25 @@ void GameConfig::read_types(Tokenizer *mr, BYTE sections)
 		}
 
 		// Sector types
-		if (sections & SECT_SECTORS && token == "sector_types")
+		if (sections & SECT_SECTORS && token == _T("sector_types"))
 		{
-			mr->check_token("{");
+			mr->check_token(_T("{"));
 
 			token = mr->get_token();
-			while (token != "}")
+			while (token != _T("}"))
 			{
-				if (token == "type")
+				if (token == _T("type"))
 				{
 					sectortype_t *stype = new sectortype_t();
 					stype->parse(mr);
 					sector_types.push_back(stype);
 				}
 
-				if (token == "import")
+				if (token == _T("import"))
 				{
 					Tokenizer mr2;
-					get_from_pk3(ml, "games/" + mr->get_token());
-					mr2.open_mem((char*)ml.get_data(), ml.get_size());
+					Lump* lump = reswad.getLump(_T("games/") + mr->get_token(), 0, true, true);
+					mr2.open_mem((char*)lump->getData(), lump->getSize());
 					read_types(&mr2, SECT_SECTORS);
 				}
 
@@ -317,25 +327,25 @@ void GameConfig::read_types(Tokenizer *mr, BYTE sections)
 		}
 
 		// Arg types
-		if (sections & SECT_ARGS && token == "arg_types")
+		if (sections & SECT_ARGS && token == _T("arg_types"))
 		{
-			mr->check_token("{");
+			mr->check_token(_T("{"));
 
 			token = mr->get_token();
-			while (token != "}")
+			while (token != _T("}"))
 			{
-				if (token == "type")
+				if (token == _T("type"))
 				{
 					argtype_t *type = new argtype_t();
 					type->parse(mr);
 					arg_types.push_back(type);
 				}
 
-				if (token == "import")
+				if (token == _T("import"))
 				{
 					Tokenizer mr2;
-					get_from_pk3(ml, "games/" + mr->get_token());
-					mr2.open_mem((char*)ml.get_data(), ml.get_size());
+					Lump* lump = reswad.getLump(_T("games/") + mr->get_token(), 0, true, true);
+					mr2.open_mem((char*)lump->getData(), lump->getSize());
 					read_types(&mr2, SECT_ARGS);
 				}
 
@@ -343,14 +353,14 @@ void GameConfig::read_types(Tokenizer *mr, BYTE sections)
 			}
 		}
 
-		if (sections & SECT_TFLAGS && token == "thing_flags")
+		if (sections & SECT_TFLAGS && token == _T("thing_flags"))
 		{
-			mr->check_token("{");
+			mr->check_token(_T("{"));
 
 			token = mr->get_token();
-			while (token != "}")
+			while (token != _T("}"))
 			{
-				if (token == "flag")
+				if (token == _T("flag"))
 				{
 					int val = mr->get_integer();
 					string name = mr->get_token();
@@ -358,11 +368,11 @@ void GameConfig::read_types(Tokenizer *mr, BYTE sections)
 					thing_flags.push_back(key_value_t(name, val));
 				}
 
-				if (token == "import")
+				if (token == _T("import"))
 				{
 					Tokenizer mr2;
-					get_from_pk3(ml, "games/" + mr->get_token());
-					mr2.open_mem((char*)ml.get_data(), ml.get_size());
+					Lump* lump = reswad.getLump(_T("games/") + mr->get_token(), 0, true, true);
+					mr2.open_mem((char*)lump->getData(), lump->getSize());
 					read_types(&mr2, SECT_TFLAGS);
 				}
 
@@ -370,14 +380,14 @@ void GameConfig::read_types(Tokenizer *mr, BYTE sections)
 			}
 		}
 
-		if (sections & SECT_LFLAGS && token == "line_flags")
+		if (sections & SECT_LFLAGS && token == _T("line_flags"))
 		{
-			mr->check_token("{");
+			mr->check_token(_T("{"));
 
 			token = mr->get_token();
-			while (token != "}")
+			while (token != _T("}"))
 			{
-				if (token == "flag")
+				if (token == _T("flag"))
 				{
 					int val = mr->get_integer();
 					string name = mr->get_token();
@@ -385,11 +395,11 @@ void GameConfig::read_types(Tokenizer *mr, BYTE sections)
 					line_flags.push_back(key_value_t(name, val));
 				}
 
-				if (token == "import")
+				if (token == _T("import"))
 				{
 					Tokenizer mr2;
-					get_from_pk3(ml, "games/" + mr->get_token());
-					mr2.open_mem((char*)ml.get_data(), ml.get_size());
+					Lump* lump = reswad.getLump(_T("games/") + mr->get_token(), 0, true, true);
+					mr2.open_mem((char*)lump->getData(), lump->getSize());
 					read_types(&mr2, SECT_LFLAGS);
 				}
 
@@ -433,34 +443,34 @@ string GameConfig::ask_map_name()
 		return wx_to_str(wxGetSingleChoice(_T("Select Map Name"), _T("Rename Map"), mapnames)).c_str();
 	}
 
-	return "";
+	return _T("");
 }
 
 void GameConfig::parse_thing_group(Tokenizer *tz)
 {
 	thing_defaults.group = tz->get_token();
 
-	tz->check_token("{");
+	tz->check_token(_T("{"));
 
 	// Parse the group
 	string token = tz->get_token();
-	while (token != "}")
+	while (token != _T("}"))
 	{
-		if (token == "default_colour")
+		if (token == _T("default_colour"))
 		{
 			rgba_t col;
 			parse_rgba(tz, &col);
 			col.a = 255;
 			thing_defaults.colour.set(col);
 		}
-		if (token == "default_size")
+		if (token == _T("default_size"))
 			thing_defaults.radius = tz->get_integer();
-		if (token == "angle")
+		if (token == _T("angle"))
 			thing_defaults.set_flag(TTYPE_ANGLE, tz->get_bool());
-		if (token == "hanging")
+		if (token == _T("hanging"))
 			thing_defaults.set_flag(TTYPE_HANGING, tz->get_bool());
 
-		if (token == "thing")
+		if (token == _T("thing"))
 		{
 			ThingType newtype(&thing_defaults);
 			newtype.parse(tz);
@@ -513,19 +523,19 @@ void GameConfig::parse_action_group(Tokenizer *tz)
 	// Get group name
 	string group = tz->get_token();
 
-	tz->check_token("{");
+	tz->check_token(_T("{"));
 
 	// Parse the group
 	string token = tz->get_token();
-	while (token != "}")
+	while (token != _T("}"))
 	{
-		if (token == "tagged")
+		if (token == _T("tagged"))
 			tagged = tz->get_bool();
-		if (token == "arg_tag")
+		if (token == _T("arg_tag"))
 			arg_tag = tz->get_integer();
-		if (token == "tagtype")
+		if (token == _T("tagtype"))
 			tagtype = tz->get_integer();
-		if (token == "type")
+		if (token == _T("type"))
 		{
 			ActionSpecial newspecial(group);
 			newspecial.tagtype = tagtype;
@@ -565,28 +575,29 @@ string GameConfig::get_sector_type(int type)
 			return sector_types[a]->name;
 	}
 
-	return "Unknown";
+	return _T("Unknown");
 }
 
 void GameConfig::read_decorate_things(Wad* wad, Lump* lump)
 {
-	lump->DumpToFile("sladetemp");
+	/*
+	lump->DumpToFile(_T("sladetemp"));
 
 	Tokenizer *tz = new Tokenizer();
-	tz->open_file("sladetemp", 0, 0);
+	tz->open_file(_T("sladetemp"), 0, 0);
 
 	string token = tz->get_token();
 
-	while (token != "!END")
+	while (token != _T("!END"))
 	{
 		//wxLogMessage("%s", token.c_str());
-		if (token == "#include")
+		if (token == _T("#include"))
 		{
 			//wxLogMessage("Include %s", tz->peek_token().c_str());
 			read_decorate_things(wad, wad->get_lump(tz->get_token(), 0));
 		}
 
-		if (token == "actor" || token == "ACTOR" || token == "Actor")
+		if (token.CmpNoCase(_T("Actor")))
 		{
 			ThingType newtype;
 
@@ -594,7 +605,7 @@ void GameConfig::read_decorate_things(Wad* wad, Lump* lump)
 			newtype.name = tz->get_token();
 
 			// Skip parent class if present
-			if (tz->peek_token() == ":")
+			if (tz->peek_token() == _T(":"))
 			{
 				tz->get_token();
 				tz->get_token();
@@ -602,12 +613,12 @@ void GameConfig::read_decorate_things(Wad* wad, Lump* lump)
 
 			// Read doomednum if present
 			newtype.type = -100;
-			if (tz->peek_token() != "{")
+			if (tz->peek_token() != _T("{"))
 				newtype.type = tz->get_integer();
 
 			// Read through actor definition
 			token = tz->get_token();
-			if (token == "{")
+			if (token == _T("{"))
 			{
 				int level = 1;
 
@@ -615,16 +626,16 @@ void GameConfig::read_decorate_things(Wad* wad, Lump* lump)
 				{
 					token = tz->get_token();
 
-					if (token == "{")
+					if (token == _T("{"))
 						level++;
 
-					if (token == "}")
+					if (token == _T("}"))
 						level--;
 
-					if (token == "//$Category")
+					if (token == _T("//$Category"))
 						newtype.group = tz->get_token();
 
-					if (token == "//$EditorSprite")
+					if (token == _T("//$EditorSprite"))
 					{
 						string spritename = tz->get_token();
 
@@ -634,23 +645,23 @@ void GameConfig::read_decorate_things(Wad* wad, Lump* lump)
 						newtype.spritename = spritename;
 					}
 
-					if (token == "radius")
+					if (token == _T("radius"))
 						newtype.radius = tz->get_integer();
 
-					if (token == "xscale")
+					if (token == _T("xscale"))
 						newtype.x_scale = tz->get_float();
 
-					if (token == "yscale")
+					if (token == _T("yscale"))
 						newtype.y_scale = tz->get_float();
 
-					if (token == "scale")
+					if (token == _T("scale"))
 					{
 						float scale = tz->get_float();
 						newtype.x_scale = scale;
 						newtype.y_scale = scale;
 					}
 
-					if (token == "alpha")
+					if (token == _T("alpha"))
 						newtype.alpha = tz->get_float();
 				}
 			}
@@ -665,6 +676,7 @@ void GameConfig::read_decorate_things(Wad* wad, Lump* lump)
 
 		token = tz->get_token();
 	}
+	*/
 }
 
 void GameConfig::clear_decorate_things()
@@ -683,6 +695,7 @@ void GameConfig::clear_decorate_things()
 
 void GameConfig::read_decorate_lumps()
 {
+	/*
 	if (!zdoom())
 		return;
 
@@ -690,7 +703,8 @@ void GameConfig::read_decorate_lumps()
 
 	for (int a = 0; a < wads.n_wads; a++)
 	{
-		if (wads.get_wad(a)->get_lump("DECORATE", 0))
-			read_decorate_things(wads.get_wad(a), wads.get_wad(a)->get_lump("DECORATE", 0));
+		if (wads.get_wad(a)->get_lump(_T("DECORATE"), 0))
+			read_decorate_things(wads.get_wad(a), wads.get_wad(a)->get_lump(_T("DECORATE"), 0));
 	}
+	*/
 }

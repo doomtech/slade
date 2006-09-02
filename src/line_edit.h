@@ -2,6 +2,7 @@
 
 #include "wx_stuff.h"
 #include <wx/spinctrl.h>
+#include <wx/notebook.h>
 #include "tex_box.h"
 
 class FlagCheckBox : public wxCheckBox

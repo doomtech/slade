@@ -58,7 +58,12 @@
 #include "zdbsp.h"
 #include "wad.h"
 #include "processor.h"
+
+#ifdef WIN32
 #include "getopt.h"
+#else
+#include <getopt.h>
+#endif
 
 // MACROS ------------------------------------------------------------------
 

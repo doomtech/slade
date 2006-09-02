@@ -2,6 +2,7 @@
 #include "main.h"
 #include "editor_window.h"
 #include "doom_map.h"
+#include "dm_thing.h"
 #include "game_config.h"
 #include "wad_manager.h"
 #include "info_bar.h"
@@ -9,16 +10,17 @@
 #include "3d_window.h"
 #include "console_window.h"
 //#include "script_editor.h"
-//#include "tex_browser.h"
+#include "tex_browser.h"
 #include "edit_misc.h"
 //#include "checks.h"
 #include "input.h"
-//#include "ttype_select.h"
+#include "ttype_select.h"
 #include "edit.h"
 //#include "sidebar.h"
-#include "archive.h"
 
 #include <wx/image.h>
+#include <wx/filename.h>
+#include <wx/numdlg.h>
 
 Wad	*edit_wad = NULL;
 EditorWindow *editor_window = NULL;
@@ -46,6 +48,9 @@ extern WadManager *wad_manager;
 extern WadList wads;
 extern ConsoleWindow *console_window;
 extern int edit_mode, gridsize;
+extern Wad reswad;
+extern bool lock_hilight;
+extern Thing last_thing;
 
 EXTERN_CVAR(Bool, edit_snap_grid)
 
@@ -109,7 +114,21 @@ EditorWindow::~EditorWindow()
 	remove("sladetemp.bak");
 }
 
-wxImage get_image_from_pk3(string entry_name, int type);
+wxImage get_image_from_pk3(string entry_name, int type)
+{
+	Lump* lump = reswad.getLump(entry_name, 0, true, true);
+	wxImage image;
+
+	if (lump)
+	{
+		string path = c_path(_T("sladetemp"), DIR_TMP);
+		lump->dumpToFile(path);
+		image.LoadFile(path, type);
+		remove(chr(path));
+	}
+
+	return image;
+}
 
 void EditorWindow::setup_toolbar()
 {
@@ -187,6 +206,7 @@ void EditorWindow::setup_menu()
 	line_context_menu->Append(EWMENU_EDIT_ALIGNX, _T("Align &X"), _T("Align selected lines' textures along the x axis"));
 	line_context_menu->Append(EWMENU_EDIT_CORRECTREFS, _T("Correct Sector &References"), _T("Attempts to set the correct sector references for the line"));
 	line_context_menu->Append(EWMENU_EDIT_SPLITLINE, _T("&Split Line"), _T("Split selected line(s)"));
+	line_context_menu->Append(EWMENU_LINE_SPLITAT, _T("Split &Here"), _T("Split hilighted line near mouse point"));
 	line_context_menu->Append(EWMENU_EDIT_EXTRUDELINE, _T("&Extrude Line"), _T("'Extrudes' selected lines"));
 	line_context_menu->Append(EWMENU_EDIT_FLIPLINE, _T("&Flip Line"), _T("Flips the selected lines"));
 
@@ -276,20 +296,49 @@ bool EditorWindow::open_map(Wad* wad, string mapname)
 {
 	if (wad)
 	{
-		if (!wad->get_lump(mapname, 0))
-			d_map.create(mapname);
+		if (wad->zip)
+		{
+			// Get map lump
+			Lump* mlump = wad->getLump(_T("maps/") + mapname, 0, true, false);
+
+			// If it doesn't exist create it
+			bool exists = !!mlump;
+			if (!mlump)
+			{
+				mlump = wad->addLump(mapname + _T(".wad"), wad->numLumps());
+				mlump->addDir(_T("maps"));
+			}
+
+			Wad *nwad = new Wad();
+			nwad->parent = mlump;
+
+			if (exists)
+				d_map.open(nwad, mapname);
+			else
+				d_map.create(mapname);
+
+			wxFileName fn(wad->path);
+			nwad->path = fn.GetFullName() + _T("/maps/") + mapname;
+			nwad->deleteAllLumps();
+			wad = nwad;
+		}
 		else
 		{
-			if (!d_map.open(wad, mapname))
-				return false;
+			if (!wad->getLump(mapname, 0))
+				d_map.create(mapname);
+			else
+			{
+				if (!d_map.open(wad, mapname))
+					return false;
+			}
 		}
 
-		SetTitle(wxString::Format(_T("SLADE (%s, %s)"), wad->path.c_str(), mapname.c_str()));
+		SetTitle(s_fmt(_T("SLADE (%s, %s)"), wad->path, mapname));
 	}
 	else
 	{
 		d_map.create(mapname);
-		SetTitle(wxString::Format(_T("SLADE (unsaved, %s)"), mapname.c_str()));
+		SetTitle(s_fmt(_T("SLADE (unsaved, %s)"), mapname));
 	}
 
 	// Reset zoom and offset (0,0 and fully zoomed in)
@@ -440,6 +489,9 @@ BEGIN_EVENT_TABLE(EditorWindow, wxFrame)
 
 	// Thing context menu
 	EVT_MENU(EWMENU_THING_INSERT,	EditorWindow::thing_insert)
+
+	// Line context menu
+	EVT_MENU(EWMENU_LINE_SPLITAT,	EditorWindow::line_splitat)
 END_EVENT_TABLE()
 
 void EditorWindow::close(wxCloseEvent &event)
@@ -517,7 +569,9 @@ void EditorWindow::file_save(wxCommandEvent &event)
 			edit_wad->save(true);
 			d_map.clear_change(MC_SAVE_NEEDED);
 			SetTitle(wxString::Format(_T("SLADE (%s, %s)"), edit_wad->path.c_str(), d_map.map_name().c_str()));
-			add_recent_wad(edit_wad->path);
+
+			if (!edit_wad->parent)
+				add_recent_wad(edit_wad->path);
 		}
 	}
 	else
@@ -540,7 +594,7 @@ void EditorWindow::file_saveas(wxCommandEvent &event)
 		d_map.add_to_wad(edit_wad);
 		edit_wad->save(true);
 		add_recent_wad(filename);
-		wads.open_wad(edit_wad->path);
+		wads.open(edit_wad->path);
 
 		d_map.clear_change(MC_SAVE_NEEDED);
 		SetTitle(wxString::Format(_T("SLADE (%s, %s)"), edit_wad->path.c_str(), d_map.map_name().c_str()));
@@ -781,126 +835,105 @@ void EditorWindow::edit_rotate(wxCommandEvent &event)
 
 void EditorWindow::edit_alignx(wxCommandEvent &event)
 {
-	/*
-	if (!map.opened)
+	if (!d_map.opened())
 		return;
 
 	line_align_x();
-	*/
 }
 
 void EditorWindow::edit_correctrefs(wxCommandEvent &event)
 {
-	/*
-	if (!map.opened)
+	if (!d_map.opened())
 		return;
 
 	lock_hilight = true;
 	line_correct_references();
 	lock_hilight = false;
-	*/
 }
 
 void EditorWindow::edit_splitline(wxCommandEvent &event)
 {
-	/*
-	if (!map.opened)
+	if (!d_map.opened())
 		return;
 
 	lock_hilight = true;
-	long splits = wxGetNumberFromUser(_T(""), _T("Enter Number of Splits:"), _T("Split Line"), 2, 2, 100);
-
-	//wxLogMessage(_T("Split line %d"), splits);
+	long splits = wxGetNumberFromUser(_T(""), _T("Enter Number of Segments:"), _T("Split Line"), 2, 2, 100);
 
 	line_split(splits);
 	lock_hilight = false;
-	*/
 }
 
 void EditorWindow::edit_extrudeline(wxCommandEvent &event)
 {
-	/*
-	if (!map.opened)
+	if (!d_map.opened())
 		return;
 
 	lock_hilight = true;
-	int dist = atoi(wx_to_str(wxGetTextFromUser(_T("Enter Distance to Extrude:"), _T("Extrude Line"), _T("8"))).c_str());
+	int dist = atoi(chr(wxGetTextFromUser(_T("Enter Distance to Extrude:"), _T("Extrude Line"), _T("8"))));
 
 	line_extrude(dist);
 	lock_hilight = false;
-	*/
 }
 
 void EditorWindow::edit_flipline(wxCommandEvent &event)
 {
-	/*
-	if (!map.opened)
+	if (!d_map.opened())
 		return;
 
 	lock_hilight = true;
 	line_flip(true, true);
 	lock_hilight = false;
-	redraw_map(true, false);
-	*/
+
+	redraw_map();
 }
 
 void EditorWindow::edit_createsector(wxCommandEvent &event)
 {
-	/*
-	if (!map.opened)
+	if (!d_map.opened())
 		return;
 
-	int x = ((down_pos.x - ((double)vid_width / 2)) / zoom) + xoff;
-	int y = -((down_pos.y - ((double)vid_height / 2)) / zoom) + yoff;
-
-	sector_create(point2_t(x, y));
-	*/
+	vector<Sector*> temp;
+	sector_create(down_pos(true), temp);
 }
 
 void EditorWindow::edit_mergesectors(wxCommandEvent &event)
 {
-	/*
-	if (!map.opened)
+	if (!d_map.opened())
 		return;
 
 	sector_merge(false);
-	*/
 }
 
 void EditorWindow::edit_joinsectors(wxCommandEvent &event)
 {
-	/*
-	if (!map.opened)
+	if (!d_map.opened())
 		return;
 
 	sector_merge(true);
-	*/
 }
 
 void EditorWindow::edit_createdoor(wxCommandEvent &event)
 {
-	/*
-	if (!map.opened)
+	if (!d_map.opened())
 		return;
 
 	lock_hilight = true;
 	string tex = "";
 
-	TextureBrowser tb(TEXTURES_WALLS, def_doortex);
+	setup_tex_browser(TEXTURES_WALLS);
+	TextureBrowser tb(game.def_doortex);
 	if (tb.ShowModal() == wxID_OK)
 		tex = tb.get_texture();
-	else 
+	else
 		return;
 
 	sector_create_door(tex);
 	lock_hilight = false;
-	*/
 }
 
 void EditorWindow::edit_createstairs(wxCommandEvent &event)
 {
-	/*
-	if (!map.opened)
+	if (!d_map.opened())
 		return;
 
 	lock_hilight = true;
@@ -922,16 +955,14 @@ void EditorWindow::edit_createstairs(wxCommandEvent &event)
 	dlg.SetBestFittingSize();
 
 	if (dlg.ShowModal() == wxID_OK)
-		sector_create_stairs(atoi(wx_to_str(entry_floor->GetValue()).c_str()), atoi(wx_to_str(entry_ceil->GetValue()).c_str()));
+		sector_create_stairs(atoi(chr(entry_floor->GetValue())), atoi(chr(entry_ceil->GetValue())));
 
 	lock_hilight = false;
-	*/
 }
 
 void EditorWindow::edit_lightgradient(wxCommandEvent &event)
 {
-	/*
-	if (!map.opened)
+	if (!d_map.opened())
 		return;
 
 	// Custom dialog ahoy
@@ -953,9 +984,8 @@ void EditorWindow::edit_lightgradient(wxCommandEvent &event)
 		if (cb_first_to_last->GetValue())
 			sector_light_gradient(9999);
 		else
-			sector_light_gradient(atoi(wx_to_str(entry_step->GetValue()).c_str()));
+			sector_light_gradient(atoi(chr(entry_step->GetValue())));
 	}
-	*/
 }
 
 void EditorWindow::mode_vertices(wxCommandEvent &event)
@@ -1057,24 +1087,20 @@ void EditorWindow::check_removeverts(wxCommandEvent &event)
 
 void EditorWindow::check_removelines(wxCommandEvent &event)
 {
-	/*
-	if (!map.opened)
+	if (!d_map.opened())
 		return;
 
-	int l = remove_zerolength_lines();
+	int l = d_map.remove_zerolength_lines();
 	wxMessageBox(wxString::Format(_T("Removed %d Zero-Length Lines"), l));
-	*/
 }
 
 void EditorWindow::check_removesectors(wxCommandEvent &event)
 {
-	/*
-	if (!map.opened)
+	if (!d_map.opened())
 		return;
 
-	int s = remove_unused_sectors();
+	int s = d_map.remove_unused_sectors();
 	wxMessageBox(wxString::Format(_T("Removed %d Unused Sectors"), s));
-	*/
 }
 
 void EditorWindow::check_removesides(wxCommandEvent &event)
@@ -1100,17 +1126,23 @@ void EditorWindow::check_checktextures(wxCommandEvent &event)
 
 void EditorWindow::thing_insert(wxCommandEvent &event)
 {
-	/*
-	if (!map.opened)
+	if (!d_map.opened())
 		return;
 
-	TTypeSelectDialog td(last_thing.type);
+	TTypeSelectDialog td(last_thing.get_type());
 
 	if (td.ShowModal() == wxID_OK)
 	{
-		last_thing.type = td.get_type();
-		create_thing();
+		last_thing.set_type(td.get_type());
+		create_thing(map_area->get_down_pos(true));
 		redraw_map(true, false);
 	}
-	*/
+}
+
+void EditorWindow::line_splitat(wxCommandEvent &event)
+{
+	if (!d_map.opened())
+		return;
+
+	line_split_at(down_pos(true));
 }

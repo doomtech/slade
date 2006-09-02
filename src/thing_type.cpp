@@ -45,7 +45,7 @@ void ThingType::setup(int type, string name, string group)
 
 	colour.set(200, 200, 200, 255, 0);
 	radius = -1;
-	spritename = "_unknownsprite";
+	spritename = _T("_unknownsprite");
 	flags = TTYPE_ANGLE;
 	alpha = 1.0f;
 	x_scale = 1.0f;
@@ -53,14 +53,14 @@ void ThingType::setup(int type, string name, string group)
 	x_offset = 0;
 	y_offset = 0;
 
-	args[0] = "Arg 1";
-	args[1] = "Arg 2";
-	args[2] = "Arg 3";
-	args[3] = "Arg 4";
-	args[4] = "Arg 5";
+	args[0] = _T("Arg 1");
+	args[1] = _T("Arg 2");
+	args[2] = _T("Arg 3");
+	args[3] = _T("Arg 4");
+	args[4] = _T("Arg 5");
 
 	for (int a = 0; a < 5; a++)
-		arg_types[a] = "";
+		arg_types[a] = _T("");
 }
 
 void ThingType::set_flag(BYTE flag, bool value)
@@ -76,32 +76,32 @@ void ThingType::parse(Tokenizer *tz)
 	type = tz->get_integer();
 	name = tz->get_token();
 
-	if (tz->peek_token() == "{")
+	if (tz->peek_token() == _T("{"))
 	{
-		tz->check_token("{");
+		tz->check_token(_T("{"));
 
 		string token = tz->get_token();
-		while (token != "}")
+		while (token != _T("}"))
 		{
-			if (token == "size")
+			if (token == _T("size"))
 				radius = tz->get_integer();
-			if (token == "colour")
+			if (token == _T("colour"))
 				parse_rgba(tz, &colour);
-			if (token == "sprite")
+			if (token == _T("sprite"))
 			{
 				spritename = tz->get_token();
 
 				if (!(vector_exists(spritenames, spritename)))
 					spritenames.push_back(spritename);
 			}
-			if (token == "angle")
+			if (token == _T("angle"))
 			{
 				if (tz->get_bool())
 					flags |= TTYPE_ANGLE;
 				else
 					flags = (flags & ~TTYPE_ANGLE);
 			}
-			if (token == "hanging")
+			if (token == _T("hanging"))
 			{
 				if (tz->get_bool())
 					flags |= TTYPE_HANGING;
@@ -109,52 +109,52 @@ void ThingType::parse(Tokenizer *tz)
 					flags = (flags & ~TTYPE_HANGING);
 			}
 
-			if (token == "arg1")
+			if (token == _T("arg1"))
 			{
 				args[0] = tz->get_token();
 				flags |= TTYPE_HASARGS;
 			}
-			if (token == "arg2")
+			if (token == _T("arg2"))
 			{
 				args[1] = tz->get_token();
 				flags |= TTYPE_HASARGS;
 			}
-			if (token == "arg3")
+			if (token == _T("arg3"))
 			{
 				args[2] = tz->get_token();
 				flags |= TTYPE_HASARGS;
 			}
-			if (token == "arg4")
+			if (token == _T("arg4"))
 			{
 				args[3] = tz->get_token();
 				flags |= TTYPE_HASARGS;
 			}
-			if (token == "arg5")
+			if (token == _T("arg5"))
 			{
 				args[4] = tz->get_token();
 				flags |= TTYPE_HASARGS;
 			}
 
-			if (token == "arg1_type")
+			if (token == _T("arg1_type"))
 				arg_types[0] = tz->get_token();
-			if (token == "arg2_type")
+			if (token == _T("arg2_type"))
 				arg_types[1] = tz->get_token();
-			if (token == "arg3_type")
+			if (token == _T("arg3_type"))
 				arg_types[2] = tz->get_token();
-			if (token == "arg4_type")
+			if (token == _T("arg4_type"))
 				arg_types[3] = tz->get_token();
-			if (token == "arg5_type")
+			if (token == _T("arg5_type"))
 				arg_types[4] = tz->get_token();
 
-			if (token == "alpha")
+			if (token == _T("alpha"))
 				alpha = tz->get_float();
-			if (token == "x_scale")
+			if (token == _T("x_scale"))
 				x_scale = tz->get_float();
-			if (token == "y_scale")
+			if (token == _T("y_scale"))
 				y_scale = tz->get_float();
-			if (token == "x_offset")
+			if (token == _T("x_offset"))
 				x_offset = tz->get_integer();
-			if (token == "y_offset")
+			if (token == _T("y_offset"))
 				y_offset = tz->get_integer();
 
 			token = tz->get_token();

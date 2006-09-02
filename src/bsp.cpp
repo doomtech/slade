@@ -34,14 +34,14 @@ bool build_gl_nodes()
 	d_map.remove_unused_sectors();
 
 	Wad tempwad;
-	tempwad.path = "sladetemp";
+	tempwad.path = _T("sladetemp");
 
 	d_map.add_to_wad(&tempwad);
 	tempwad.save(false);
 
 	tempwad.close();
 
-	splash("Building GL Nodes");
+	splash(_T("Building GL Nodes"));
 
 	FWadReader inwad("sladetemp");
 	FWadWriter outwad("sladetemp.wad", inwad.IsIWAD());
@@ -72,20 +72,20 @@ bool build_gl_nodes()
 	int unit_count = 0;
 	int unit_size = 0;
 
-	if (!wad.open("sladetemp.wad"))
+	if (!wad.open(_T("sladetemp.wad")))
 	{
-		message_box("Failed to build GL nodes!\n");
+		message_box(_T("Failed to build GL nodes!\n"));
 		splash_hide();
 		return false;
 	}
 
-	FILE* fp = fopen(wad.path.c_str(), "rb");
+	FILE* fp = fopen(chr(wad.path), "rb");
 
 	// Load map verts
-	current_lump = wad.get_lump_index("VERTEXES");
+	current_lump = wad.getLumpIndex(_T("VERTEXES"));
 
-	fseek(fp, wad.directory[current_lump]->Offset(), SEEK_SET);
-	for (int a = 0; a < wad.directory[current_lump]->Size() / 4; a++)
+	fseek(fp, wad.lumpAt(current_lump)->getOffset(), SEEK_SET);
+	for (int a = 0; a < wad.lumpAt(current_lump)->getSize() / 4; a++)
 	{
 		short x, y;
 		lefread(&x, 2, 1, fp);
@@ -96,23 +96,23 @@ bool build_gl_nodes()
 	// << ---------------------- >>
 	// << -- Load GL vertices -- >>
 	// << ---------------------- >>
-	current_lump = wad.get_lump_index("GL_VERT");
+	current_lump = wad.getLumpIndex(_T("GL_VERT"));
 
 	if (current_lump == -1)
 	{
-		log_message("Gwa has no GL_VERT lump.");
+		log_message(_T("Gwa has no GL_VERT lump."));
 		splash_hide();
 		return false;
 	}
 
 	// Setup sizes
 	unit_size = sizeof(gl_vertex_t);
-	unit_count = (wad.directory[current_lump]->Size() - 4) / unit_size;
+	unit_count = (wad.lumpAt(current_lump)->getSize() - 4) / unit_size;
 
 	// Read vertices from file
 	int temp = 0;
 
-	fseek(fp, wad.directory[current_lump]->Offset() + 4, SEEK_SET);
+	fseek(fp, wad.lumpAt(current_lump)->getOffset() + 4, SEEK_SET);
 	for (DWORD v = 0; v < unit_count; v++)
 	{
 		gl_vertex_t glv;
@@ -126,21 +126,21 @@ bool build_gl_nodes()
 	// << ------------------ >>
 	// << -- Load GL segs -- >>
 	// << ------------------ >>
-	current_lump = wad.get_lump_index("GL_SEGS");
+	current_lump = wad.getLumpIndex(_T("GL_SEGS"));
 
 	if (current_lump == -1)
 	{
-		log_message("Gwa has no GL_SEGS lump.");
+		log_message(_T("Gwa has no GL_SEGS lump."));
 		splash_hide();
 		return false;
 	}
 
 	// Setup sizes
 	unit_size = sizeof(gl_seg_t);
-	unit_count = (wad.directory[current_lump]->Size()) / unit_size;
+	unit_count = (wad.lumpAt(current_lump)->getSize()) / unit_size;
 
 	// Read segs
-	fseek(fp, wad.directory[current_lump]->Offset(), SEEK_SET);
+	fseek(fp, wad.lumpAt(current_lump)->getOffset(), SEEK_SET);
 
 	for (int a = 0; a < unit_count; a++)
 	{
@@ -152,20 +152,20 @@ bool build_gl_nodes()
 	// << ---------------------- >>
 	// << -- Load GL ssectors -- >>
 	// << ---------------------- >>
-	current_lump = wad.get_lump_index("GL_SSECT");
+	current_lump = wad.getLumpIndex(_T("GL_SSECT"));
 
 	if (current_lump == -1)
 	{
-		log_message("Gwa has no GL_SSECT lump.");
+		log_message(_T("Gwa has no GL_SSECT lump."));
 		splash_hide();
 		return false;
 	}
 
 	// Setup sizes
 	unit_size = sizeof(gl_ssect_t);
-	unit_count = (wad.directory[current_lump]->Size()) / unit_size;
+	unit_count = (wad.lumpAt(current_lump)->getSize()) / unit_size;
 
-	fseek(fp, wad.directory[current_lump]->Offset(), SEEK_SET);
+	fseek(fp, wad.lumpAt(current_lump)->getOffset(), SEEK_SET);
 	for (int a = 0; a < unit_count; a++)
 	{
 		gl_ssect_t ssect;
@@ -179,20 +179,20 @@ bool build_gl_nodes()
 	// << ------------------- >>
 	// << -- Load GL nodes -- >>
 	// << ------------------- >>
-	current_lump = wad.get_lump_index("GL_NODES");
+	current_lump = wad.getLumpIndex(_T("GL_NODES"));
 
 	if (current_lump == -1)
 	{
-		log_message("Gwa has no GL_NODES lump.");
+		log_message(_T("Gwa has no GL_NODES lump."));
 		splash_hide();
 		return false;
 	}
 
 	// Setup sizes
 	unit_size = sizeof(gl_node_t);
-	unit_count = (wad.directory[current_lump]->Size()) / unit_size;
+	unit_count = (wad.lumpAt(current_lump)->getSize()) / unit_size;
 
-	fseek(fp, wad.directory[current_lump]->Offset(), SEEK_SET);
+	fseek(fp, wad.lumpAt(current_lump)->getOffset(), SEEK_SET);
 	for (int n = 0; n < unit_count; n++)
 	{
 		gl_node_t node;

@@ -18,10 +18,9 @@
 #include "dm_side.h"
 #include "dm_sector.h"
 #include "dm_vertex.h"
-//#include "struct_3d.h"
 #include "mathstuff.h"
-//#include "undoredo.h"
-//#include "linedraw.h"
+
+Sector *last_copy_sector = NULL;
 
 extern DoomMap d_map;
 
@@ -40,6 +39,12 @@ struct csline_t
 // ----------------------------------------------------------------- >>
 bool cycle_clockwise(vector<csline_t> &list)
 {
+	//string lines = "";
+	//for (int a = 0; a < list.size(); a++)
+	//	lines += s_fmt("%d, ", list[a].line);
+
+	//log_message(s_fmt("Check cycle: %s", lines));
+
 	for (int a = 0; a < list.size(); a++)
 	{
 		rect_t linerect = d_map.line(list[a].line)->get_rect();
@@ -84,12 +89,12 @@ bool cycle_clockwise(vector<csline_t> &list)
 
 		if (!intersect)
 		{
-			//message_box("Clockwise");
+			//log_message("Clockwise");
 			return true;
 		}
 	}
 
-	//message_box("Anticlockwise");
+	//log_message("Anticlockwise");
 	return false;
 }
 
@@ -234,7 +239,7 @@ rect_t get_cycle_border(vector<csline_t> &cycle)
 	return rect_t(min_x, min_y, max_x, max_y);
 }
 
-bool sector_create(point2_t point, bool* front_sides, bool* back_sides)
+bool sector_create(point2_t point, vector<Sector*> &new_sectors, bool* front_sides, bool* back_sides)
 {
 	double min_dist = -1;
 	int line = -1;
@@ -284,7 +289,7 @@ bool sector_create(point2_t point, bool* front_sides, bool* back_sides)
 		else
 		{
 			// Check for void
-			if (first)
+			//if (first) // what was this check for in the first place? All it seems to do is screw up void detection :P
 			{
 				for (int a = 0; a < lines.size(); a++)
 				{
@@ -506,10 +511,10 @@ bool sector_create(point2_t point, bool* front_sides, bool* back_sides)
 
 		if (all_lines[a].orientation == ORTN_FRONT)
 		{
-			if (d_map.valid(side1) && !copy_sector)
+			if (d_map.valid(side1) && !copy_sector && !(vector_exists(new_sectors, side1->get_sector())))
 				copy_sector = side1->get_sector();
 
-			if (d_map.valid(side2) && !copy_sector)
+			if (d_map.valid(side2) && !copy_sector && !(vector_exists(new_sectors, side2->get_sector())))
 				copy_sector = side2->get_sector();
 
 			if (front_sides)
@@ -519,10 +524,10 @@ bool sector_create(point2_t point, bool* front_sides, bool* back_sides)
 		}
 		else
 		{
-			if (d_map.valid(side2) && !copy_sector)
+			if (d_map.valid(side2) && !copy_sector && !(vector_exists(new_sectors, side2->get_sector())))
 				copy_sector = side2->get_sector();
 
-			if (d_map.valid(side1) && !copy_sector)
+			if (d_map.valid(side1) && !copy_sector && !(vector_exists(new_sectors, side1->get_sector())))
 				copy_sector = side1->get_sector();
 
 			if (back_sides)
@@ -533,10 +538,14 @@ bool sector_create(point2_t point, bool* front_sides, bool* back_sides)
 	}
 
 	if (copy_sector)
+	{
 		sector->copy(copy_sector);
+		last_copy_sector = copy_sector;
+	}
+	else
+		new_sectors.push_back(sector);
 
 	d_map.change_level(MC_NODE_REBUILD|MC_SECTORS|MC_LINES);
-	//d_map.remove_unused_sectors();
 	redraw_map();
 
 	return true;

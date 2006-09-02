@@ -144,7 +144,7 @@ void ClickableTexBox::clicked(wxMouseEvent &event)
 		if (textype != TEXTURES_SPRITES)
 		{
 			texture = get_texture(tb.get_texture(), textype, false);
-			entry->SetValue(str_to_wx(str_upper(texture->name)));
+			entry->SetValue(texture->name.Upper());
 		}
 		else
 		{

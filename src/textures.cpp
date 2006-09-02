@@ -13,10 +13,10 @@
 #include "structs.h"
 #include "wad.h"
 #include "wx_stuff.h"
-#include "archive.h"
 
 #include <wx/image.h>
 #include <wx/zipstrm.h>
+#include <wx/mstream.h>
 #include <map>
 
 
@@ -44,6 +44,7 @@ static const WORD valid_dimensions[] = { 2, 4, 8, 16, 32, 64, 128, 256, 512, 102
 
 // External Variables -------------------- >>
 extern WadList wads;
+extern Wad reswad;
 
 
 // is_valid_dimension: Checks if a value is a power of 2
@@ -262,7 +263,7 @@ void init_textures()
 	}
 
 	no_tex = new Texture();
-	no_tex->name = "_notex";
+	no_tex->name = _T("_notex");
 	no_tex->gen_from_data(128, 128, data, -1, -1, true);
 
 	data = new BYTE[128 * 128 * 4];
@@ -310,7 +311,7 @@ void init_textures()
 	}
 
 	blank_tex = new Texture();
-	blank_tex->name = "-";
+	blank_tex->name = _T("-");
 	blank_tex->gen_from_data(128, 128, data, -1, -1, true);
 
 	/*
@@ -349,16 +350,16 @@ void init_textures()
 	load_editor_texture("_logo", "res/edit_tex/logo.png", -1, -1, 1);
 	*/
 
-	MemLump *ml = get_from_pk3("res/edit_tex/edit_tex.txt");
+	//MemLump *ml = get_from_pk3(_T("res/edit_tex/edit_tex.txt"));
+	Lump* lump = reswad.getLump(_T("res/edit_tex/edit_tex.txt"), 0, true, true);
 	Tokenizer tz;
-	tz.open_mem((char*)ml->get_data(), ml->get_size());
-	delete ml;
+	tz.open_mem((char*)lump->getData(), lump->getSize());
 
 	string token = tz.get_token();
 
-	while (token != "!END")
+	while (token != _T("!END"))
 	{
-		if (token == "tex")
+		if (token == _T("tex"))
 		{
 			string tex = tz.get_token();
 			string tex_fname = tz.get_token();
@@ -366,13 +367,13 @@ void init_textures()
 			int height = -1;
 			int filter = -1;
 
-			if (tz.peek_token() != "tex" && tz.peek_token() != "!END")
+			if (tz.peek_token() != _T("tex") && tz.peek_token() != _T("!END"))
 				width = tz.get_integer();
 
-			if (tz.peek_token() != "tex" && tz.peek_token() != "!END")
+			if (tz.peek_token() != _T("tex") && tz.peek_token() != _T("!END"))
 				height = tz.get_integer();
 
-			if (tz.peek_token() != "tex" && tz.peek_token() != "!END")
+			if (tz.peek_token() != _T("tex") && tz.peek_token() != _T("!END"))
 				filter = tz.get_integer();
 
 			load_editor_texture(tex, tex_fname, width, height, filter);
@@ -384,11 +385,11 @@ void init_textures()
 
 wxImage* lump_to_image(Wad* wadfile, int lump_index, bool alpha)
 {
-	if (lump_index < 0 || lump_index > wadfile->num_lumps)
+	if (lump_index < 0 || lump_index > wadfile->numLumps())
 		return NULL;
 
-	Lump* lump = wadfile->directory[lump_index];
-	BYTE* data = lump->Data();
+	Lump* lump = wadfile->lumpAt(lump_index);
+	BYTE* data = lump->getData();
 
 	// Check for PNG header
 	if (data[0] == 137 && data[1] == 80 &&
@@ -396,7 +397,7 @@ wxImage* lump_to_image(Wad* wadfile, int lump_index, bool alpha)
 		data[4] == 13 && data[5] == 10 &&
 		data[6] == 26 && data[7] == 10)
 	{
-		lump->DumpToFile("sladetemp");
+		lump->dumpToFile(_T("sladetemp"));
 		wxImage *image = new wxImage(_T("sladetemp"), wxBITMAP_TYPE_PNG);
 		remove("sladetemp");
 
@@ -410,8 +411,8 @@ wxImage* lump_to_image(Wad* wadfile, int lump_index, bool alpha)
 		BYTE			n_pix = 0;
 		BYTE			colour = 0;
 
-		FILE *fp = fopen(wadfile->path.c_str(), "rb");
-		fseek(fp, lump->Offset(), SEEK_SET);
+		FILE *fp = fopen(chr(wadfile->path), "rb");
+		fseek(fp, lump->getOffset(), SEEK_SET);
 
 		// Get header & offsets
 		lefread(&header.width, 2, 1, fp);
@@ -429,7 +430,7 @@ wxImage* lump_to_image(Wad* wadfile, int lump_index, bool alpha)
 		for (int c = 0; c < header.width; c++)
 		{
 			// Go to start of column
-			fseek(fp, lump->Offset(), SEEK_SET);
+			fseek(fp, lump->getOffset(), SEEK_SET);
 			fseek(fp, columns[c], SEEK_CUR);
 
 			// Read posts
@@ -449,17 +450,8 @@ wxImage* lump_to_image(Wad* wadfile, int lump_index, bool alpha)
 				for (BYTE p = 0; p < n_pix; p++)
 				{
 					lefread(&colour, 1, 1, fp);
-					//tex->add_pixel(c, row + p, colour);
-					//if (colour == 240 && alpha)
-					//{
-					//	image->SetAlpha(c, row + p, 0);
-					//	image->SetRGB(c, row + p, 0, 0, 0);
-					//}
-					//else
-					//{
-						image->SetAlpha(c, row + p, 255);
-						image->SetRGB(c, row + p, palette[colour].r, palette[colour].g, palette[colour].b);
-					//}
+					image->SetAlpha(c, row + p, 255);
+					image->SetRGB(c, row + p, palette[colour].r, palette[colour].g, palette[colour].b);
 				}
 				lefread(&colour, 1, 1, fp); // Skip buffer & go to next row offset
 			}
@@ -475,10 +467,10 @@ wxImage* lump_to_image(Wad* wadfile, int lump_index, bool alpha)
 // --------------------------------------- >>
 void read_palette(Wad* wad)
 {
-	Lump *pal = wad->get_lump("PLAYPAL", 0);
-	FILE *fp = fopen(wad->path.c_str(), "rb");
+	Lump *pal = wad->getLump(_T("PLAYPAL"), 0);
+	FILE *fp = fopen(chr(wad->path), "rb");
 
-	fseek(fp, pal->Offset(), SEEK_SET);
+	fseek(fp, pal->getOffset(), SEEK_SET);
 	for (DWORD c = 0; c < 256; c++)
 	{
 		lefread(&palette[c].r, 1, 1, fp);
@@ -507,8 +499,8 @@ void load_textures_lump(Wad* wad, Lump *lump, bool iwad = false)
 	short yoff = 0;
 	short patch = 0;
 
-	FILE *fp = fopen(wad->path.c_str(), "rb");
-	fseek(fp, lump->Offset(), SEEK_SET);
+	FILE *fp = fopen(chr(wad->path), "rb");
+	fseek(fp, lump->getOffset(), SEEK_SET);
 
 	// Get no. of textures and tex info offsets
 	lefread(&n_tex, 4, 1, fp);
@@ -518,7 +510,7 @@ void load_textures_lump(Wad* wad, Lump *lump, bool iwad = false)
 	for (int t = 0; t < n_tex; t++)
 	{
 		// Go to start of tex definition
-		fseek(fp, lump->Offset(), SEEK_SET);
+		fseek(fp, lump->getOffset(), SEEK_SET);
 		fseek(fp, offsets[t], SEEK_CUR);
 
 		// Read texture name
@@ -537,7 +529,7 @@ void load_textures_lump(Wad* wad, Lump *lump, bool iwad = false)
 		Texture *tex = get_texture(texname, 1, true);
 
 		bool i = iwad;
-		if (tex->name != "_notex")
+		if (tex->name != _T("_notex"))
 		{
 			i = tex->flags & TEX_IWAD;
 			delete tex;
@@ -582,10 +574,10 @@ void load_pnames(Wad* wad)
 {
 	pnames.clear();
 	DWORD n_pnames = 0;
-	FILE *fp = fopen(wad->path.c_str(), "rb");
-	Lump *lump = wad->get_lump("PNAMES", 0);
+	FILE *fp = fopen(chr(wad->path), "rb");
+	Lump *lump = wad->getLump(_T("PNAMES"), 0);
 
-	fseek(fp, lump->Offset(), SEEK_SET);
+	fseek(fp, lump->getOffset(), SEEK_SET);
 	lefread(&n_pnames, 4, 1, fp);
 
 	for (DWORD p = 0; p < n_pnames; p++)
@@ -606,36 +598,36 @@ void load_textures()
 	clear_textures(1);
 
 	// Read the palette
-	read_palette(wads.get_wad_with_lump("PLAYPAL"));
+	read_palette(wads.getWadWithLump(_T("PLAYPAL")));
 
-	splash("Loading Textures");
+	splash(_T("Loading Textures"));
 
 	// Load PNAMES
-	load_pnames(wads.get_iwad());
+	load_pnames(wads.getWad());
 
 	// Load TEXTURE1 from the iwad
-	load_textures_lump(wads.get_iwad(), wads.get_iwad()->get_lump("TEXTURE1", 0), true);
+	load_textures_lump(wads.getWad(), wads.getWad()->getLump(_T("TEXTURE1"), 0), true);
 
 	// Load TEXTURE2 if it exists
-	if (wads.get_iwad()->get_lump("TEXTURE2", 0))
-		load_textures_lump(wads.get_iwad(), wads.get_iwad()->get_lump("TEXTURE2", 0), true);
+	if (wads.getWad()->getLump(_T("TEXTURE2"), 0))
+		load_textures_lump(wads.getWad(), wads.getWad()->getLump(_T("TEXTURE2"), 0), true);
 
-	for (int a = 0; a < wads.n_wads; a++)
+	for (int a = 0; a < wads.nWads(); a++)
 	{
 		// Get the TEXTURE1 lump
-		if (!(wads.get_wad(a)->get_lump("TEXTURE1", 0)) &&
-			!(wads.get_wad(a)->get_lump("TEXTURE2", 0)))
+		if (!(wads.getWad(a)->getLump(_T("TEXTURE1"), 0)) &&
+			!(wads.getWad(a)->getLump(_T("TEXTURE2"), 0)))
 			continue;
 
 		// Load PNAMES
-		load_pnames(wads.get_wad(a));
+		load_pnames(wads.getWad(a));
 
 		// Load TEXTURE1
-		load_textures_lump(wads.get_wad(a), wads.get_wad(a)->get_lump("TEXTURE1", 0));
+		load_textures_lump(wads.getWad(a), wads.getWad(a)->getLump(_T("TEXTURE1"), 0));
 
 		// Load TEXTURE2 if it exists
-		if (wads.get_wad(a)->get_lump("TEXTURE2", 0))
-			load_textures_lump(wads.get_wad(a), wads.get_wad(a)->get_lump("TEXTURE2", 0));
+		if (wads.getWad(a)->getLump(_T("TEXTURE2"), 0))
+			load_textures_lump(wads.getWad(a), wads.getWad(a)->getLump(_T("TEXTURE2"), 0));
 	}
 }
 
@@ -644,13 +636,13 @@ void load_textures()
 void load_flats()
 {
 	clear_textures(2);
-	splash("Loading Flats");
+	splash(_T("Loading Flats"));
 
 	vector<Wad*> all_wads;
 
-	all_wads.push_back(wads.get_iwad());
-	for (DWORD w = 0; w < wads.n_wads; w++)
-		all_wads.push_back(wads.get_wad(w));
+	all_wads.push_back(wads.getWad());
+	for (DWORD w = 0; w < wads.nWads(); w++)
+		all_wads.push_back(wads.getWad(w));
 
 	for (DWORD a = 0; a < all_wads.size(); a++)
 	{
@@ -663,34 +655,33 @@ void load_flats()
 			lump++;
 			while (lump < wad->flats[END])
 			{
-				if (wad->directory[lump]->Size() > 0)
+				if (wad->lumpAt(lump)->getSize() > 0)
 				{
 					// Create the texture
-					Texture *tex = get_texture(wad->directory[lump]->Name(), 2, true);
-					if (tex->name == "_notex")
+					Texture *tex = get_texture(wad->lumpAt(lump)->getName(false, false), 2, true);
+					if (tex->name == _T("_notex"))
 					{
 						tex = new DoomFlat();
-						tex->name = wad->directory[lump]->Name();
+						tex->name = wad->lumpAt(lump)->getName(false, false);
 						tex->flags |= TEX_NOALPHA;
 						tex->flags |= TEX_STRETCH;
-						//tex->setup(wad->directory[lump]->Name(), 8, 64, 64, false);
 						flats.push_back(tex);
 					}
 
 					// Set or unset IWAD flag
-					if (all_wads[a] == wads.get_iwad())
+					if (all_wads[a] == wads.getWad())
 						tex->flags |= TEX_IWAD;
 					else
 						tex->flags = (tex->flags & ~TEX_IWAD);
 
 					((DoomFlat*)tex)->set_data(wad, lump);
 
-					if (wad->directory[lump]->Size() == 4096)
+					if (wad->lumpAt(lump)->getSize() == 4096)
 					{
 						tex->width = 64;
 						tex->height = 64;
 					}
-					else if (wad->directory[lump]->Size() == 8192)
+					else if (wad->lumpAt(lump)->getSize() == 8192)
 					{
 						tex->width = 64;
 						tex->height = 128;
@@ -711,7 +702,7 @@ void load_flats()
 void load_sprites()
 {
 	clear_textures(3);
-	splash("Loading Sprites");
+	splash(_T("Loading Sprites"));
 
 	for (int s = 0; s < spritenames.size(); s++)
 	{
@@ -740,21 +731,22 @@ void load_sprites()
 
 void load_tx_textures()
 {
-	for (DWORD w = 0; w < wads.n_wads; w++)
+	for (DWORD w = 0; w < wads.nWads(); w++)
 	{
-		if (wads.get_wad(w)->tx[START] != -1)
-		{
-			splash("Loading TX_ Textures");
+		Wad* wad = wads.getWad(w);
 
-			Wad* wad = wads.get_wad(w);
+		if (!wad->zip && wad->tx[START] != -1)
+		{
+			splash(_T("Loading TX_ Textures"));
+
 			bool done = false;
 			long lump = wad->tx[START] + 1;
 
 			while (!done)
 			{
-				Texture *tex = get_texture(wad->directory[lump]->Name(), 1, true);
+				Texture *tex = get_texture(wad->lumpAt(lump)->getName(false, false), 1, true);
 
-				if (tex->name != "_notex")
+				if (tex->name != _T("_notex"))
 				{
 					delete tex;
 					textures.erase(find(textures.begin(), textures.end(), tex));
@@ -762,15 +754,38 @@ void load_tx_textures()
 				}
 
 				tex = new SimpleTexture();
-				tex->name = wad->directory[lump]->Name();
+				tex->name = wad->lumpAt(lump)->getName(false, false);
 				tex->flags |= TEX_STRETCH;
 				((SimpleTexture*)tex)->set_data(wad, tex->name);
 				textures.push_back(tex);
 
 				lump++;
 
-				if (lump == wad->tx[END] || lump == wad->num_lumps)
+				if (lump == wad->tx[END] || lump == wad->numLumps())
 					done = true;
+			}
+		}
+		else if (wad->zip)
+		{
+			for (int a = 0; a < wad->numLumps(); a++)
+			{
+				if (wad->lumpAt(a)->getDir(0) == _T("textures"))
+				{
+					Texture *tex = get_texture(wad->lumpAt(a)->getName(false, false), 1, true);
+
+					if (tex->name != _T("_notex"))
+					{
+						delete tex;
+						textures.erase(find(textures.begin(), textures.end(), tex));
+						tex = NULL;
+					}
+
+					tex = new SimpleTexture();
+					tex->name = wad->lumpAt(a)->getName(false, false);
+					tex->flags |= TEX_STRETCH;
+					((SimpleTexture*)tex)->set_data(wad, wad->lumpAt(a)->getName());
+					textures.push_back(tex);
+				}
 			}
 		}
 	}
@@ -778,20 +793,19 @@ void load_tx_textures()
 
 void load_hirestex_textures()
 {
-	for (DWORD w = 0; w < wads.n_wads; w++)
+	for (DWORD w = 0; w < wads.nWads(); w++)
 	{
-		Lump* lump = wads.get_wad(w)->get_lump("HIRESTEX", 0);
+		Lump* lump = wads.getWad(w)->getLump(_T("HIRESTEX"), 0);
 
 		if (lump)
 		{
-			lump->DumpToFile("sladetemp");
 			Tokenizer tz;
-			tz.open_file("sladetemp", 0, 0);
+			tz.open_mem((char*)lump->getData(), lump->getSize());
 
 			string token = tz.get_token();
-			while (token != "!END")
+			while (token != _T("!END"))
 			{
-				if (token == "define")
+				if (!token.CmpNoCase(_T("define")))
 				{
 					string name = tz.get_token();
 					int width = tz.get_integer();
@@ -799,7 +813,7 @@ void load_hirestex_textures()
 
 					Texture *tex = get_texture(name, 1, true);
 
-					if (tex->name != "_notex")
+					if (tex->name != _T("_notex"))
 					{
 						delete tex;
 						textures.erase(find(textures.begin(), textures.end(), tex));
@@ -809,20 +823,20 @@ void load_hirestex_textures()
 					tex = new SimpleTexture();
 					tex->name = name;
 					tex->flags |= TEX_STRETCH;
-					((SimpleTexture*)tex)->set_data(wads.get_wad(w), name);
+					((SimpleTexture*)tex)->set_data(wads.getWad(w), name);
 					tex->width = width;
 					tex->height = height;
 					textures.push_back(tex);
 				}
 
-				if (token == "remap")
+				if (!token.CmpNoCase(_T("remap")))
 				{
 					string orig = tz.get_token();
 					string rep = tz.get_token();
 
 					Texture *tex = get_texture(orig, 0, false);
 
-					if (tex->name != "_notex")
+					if (tex->name != _T("_notex"))
 					{
 						tex->gen_gl_tex();
 						int owidth = tex->width;
@@ -835,7 +849,7 @@ void load_hirestex_textures()
 						tex = new SimpleTexture();
 						tex->name = orig;
 						tex->flags |= TEX_STRETCH;
-						((SimpleTexture*)tex)->set_data(wads.get_wad(w), rep);
+						((SimpleTexture*)tex)->set_data(wads.getWad(w), rep);
 						tex->width = owidth;
 						tex->height = oheight;
 						textures.push_back(tex);
@@ -1104,13 +1118,13 @@ bool SimpleTexture::gen_gl_tex()
 
 	if (!data_wad)
 	{
-		data_wad = wads.get_wad_with_lump(lump_name);
+		data_wad = wads.getWadWithLump(lump_name);
 
 		if (!data_wad)
 			return false;
 	}
 
-	int index = data_wad->get_lump_index(lump_name);
+	int index = data_wad->getLumpIndex(lump_name, 0, true, true);
 
 	if (index == -1)
 		return false;
@@ -1181,25 +1195,25 @@ bool DoomTexture::gen_gl_tex()
 	for (int p = 0; p < patches.size(); p++)
 	{
 		Wad* wad = patches[p].wad;
-		Wad* iwad = wads.get_iwad();
+		Wad* iwad = wads.getWad();
 		int patchlump = -1;
-		string patch = str_upper(patches[p].patch);
+		string patch = patches[p].patch.Upper();
 
 		// Well, patches _should_ be within P(P)_START and P(P)_END, but some popular wads leave these markers out
 		// so I have it like this for compatibility reasons (and doom/2.exe doesn't seem to mind missing markers)
-		if (patches[p].wad->patches[START] == -1)
-			patchlump = patches[p].wad->get_lump_index(patch, 0);
+		if (wad->patches[START] == -1)
+			patchlump = wad->getLumpIndex(patch, 0);
 		else
-			patchlump = patches[p].wad->get_lump_index(patch, patches[p].wad->patches[START]);
+			patchlump = wad->getLumpIndex(patch, wad->patches[START]);
 
 		if (patchlump == -1)
 		{
-			patchlump = iwad->get_lump_index(patch, iwad->patches[START]);
+			patchlump = iwad->getLumpIndex(patch, iwad->patches[START]);
 			wad = iwad;
 
 			if (patchlump == -1)
 			{
-				wxLogMessage(_T("Patch \"%s\" doesn't exist!\n"), patch.c_str());
+				log_message(s_fmt(_T("Patch \"%s\" doesn't exist!\n"), chr(patch)));
 				continue;
 			}
 		}
@@ -1274,16 +1288,16 @@ bool DoomFlat::gen_gl_tex()
 	if (!data_wad)
 		return false;
 
-	if (data_lump < 0 || data_lump > data_wad->num_lumps)
+	if (data_lump < 0 || data_lump > data_wad->numLumps())
 		return false;
 
-	Lump* lump = data_wad->directory[data_lump];
-	FILE *fp = fopen(data_wad->path.c_str(), "rb");
+	Lump* lump = data_wad->lumpAt(data_lump);
+	FILE *fp = fopen(chr(data_wad->path), "rb");
 
 	BYTE* data = new BYTE[width * height * 4];
 
 	// Read flat data
-	fseek(fp, lump->Offset(), SEEK_SET);
+	fseek(fp, lump->getOffset(), SEEK_SET);
 
 	BYTE p = 0;
 	DWORD a = 0;
@@ -1310,17 +1324,27 @@ FileTexture::~FileTexture()
 {
 }
 
-wxImage get_image_from_pk3(string entry_name, int type);
+//wxImage get_image_from_pk3(string entry_name, int type);
 
 bool FileTexture::gen_gl_tex()
 {
 	if (id_generated)
 		return true;
 
-	wxImage image = get_image_from_pk3(filename, wxBITMAP_TYPE_PNG);
+	//wxImage image = get_image_from_pk3(filename, wxBITMAP_TYPE_PNG);
+	Lump* lump = reswad.getLump(filename, 0, true, true);
+	wxImage image;
 
-	if (!image.Ok())
-		image.LoadFile(str_to_wx(filename));
+	if (lump)
+	{
+		//lump->dumpToFile(_T("sladetemp"));
+		wxMemoryInputStream stream(lump->getData(), lump->getSize());
+		//image.LoadFile(_T("sladetemp"));
+		image.LoadFile(stream);
+		//remove("sladetemp");
+	}
+	else
+		image.LoadFile(filename);
 
 	if (image.Ok())
 	{
@@ -1358,7 +1382,7 @@ bool FileTexture::gen_gl_tex()
 	}
 	else
 	{
-		wxLogMessage(_T("Error loading %s"), filename.c_str());
+		log_message(s_fmt(_T("Error loading %s"), chr(filename)));
 		return false;
 	}
 

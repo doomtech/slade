@@ -91,22 +91,45 @@ bool point_in_rect(int x1, int y1, int x2, int y2, int x, int y)
 	return (x >= x1) && (x <= x2) && (y >= y1) && (y <= y2);
 }
 
+/*
+string test(rect_t line)
+{
+	return s_fmt(_T("(%d, %d) to (%d, %d)"), line.x1(), line.y1(), line.x2(), line.y2());
+}
+*/
+
 // lines_intersect: Checks if 2 lines intersect eachother
 // --------------------------------------------------- >>
-bool lines_intersect(rect_t line1, rect_t line2)
+bool lines_intersect(rect_t line1, rect_t line2, fpoint2_t *ip)
 {
-	float r, s;
+	double a1 = line1.y2() - line1.y1();
+	double a2 = line2.y2() - line2.y1();
+	double b1 = line1.x1() - line1.x2();
+	double b2 = line2.x1() - line2.x2();
+	double c1 = (a1 * line1.x1()) + (b1 * line1.y1());
+	double c2 = (a2 * line2.x1()) + (b2 * line2.y1());
 
-	r = float(line1.y1()-line2.y1())*float(line2.width())-float(line1.x1()-line2.x1())*float(line2.height()) /
-		float(line1.width())*float(line2.height())-float(line1.height())*float(line2.width());
-
-	s = float(line1.y1()-line2.y1())*float(line1.width())-float(line1.x1()-line2.x1())*float(line1.height()) / 
-		float(line1.width())*float(line2.height())-float(line1.height())*float(line2.width());
-
-	if (0.0f <= r <= 1.0f && 0.0f <= s <= 1.0f)
-		return true;
-	else
+	double det = a1*b2 - a2*b1;
+	if (det == 0)
 		return false;
+	else
+	{
+		double x = (b2*c1 - b1*c2) / det;
+        double y = (a1*c2 - a2*c1) / det;
+
+		//log_message(s_fmt(_T("L1 %s"), test(line1)));
+		//log_message(s_fmt(_T("L2 %s"), test(line2)));
+		//log_message(s_fmt(_T("%1.2f %1.2f"), x, y));
+
+		if (x <= line1.right() && x >= line1.left() && y >= line1.top() && y <= line1.bottom() &&
+			x <= line2.right() && x >= line2.left() && y >= line2.top() && y <= line2.bottom())
+		{
+			if (ip) ip->set(x, y);
+			return true;
+		}
+	}
+
+	return false;
 }
 
 // cross: Returns the cross product of 2 vectors

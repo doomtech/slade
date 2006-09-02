@@ -40,11 +40,11 @@ Thing::Thing(doomthing_t t, DoomMap *parent)
 {
 	this->parent = parent;
 
-	x = t.x;
-	y = t.y;
-	type = t.type;
-	flags = t.flags;
-	angle = t.angle;
+	x = wxINT16_SWAP_ON_BE(t.x);
+	y = wxINT16_SWAP_ON_BE(t.y);
+	type = wxINT16_SWAP_ON_BE(t.type);
+	flags = wxINT16_SWAP_ON_BE(t.flags);
+	angle = wxINT16_SWAP_ON_BE(t.angle);
 	tid = 0;
 	z = 0;
 	special = 0;
@@ -60,13 +60,13 @@ Thing::Thing(hexenthing_t t, DoomMap *parent)
 {
 	this->parent = parent;
 
-	x = t.x;
-	y = t.y;
-	type = t.type;
-	flags = t.flags;
-	angle = t.angle;
-	tid = t.tid;
-	z = t.z;
+	x = wxINT16_SWAP_ON_BE(t.x);
+	y = wxINT16_SWAP_ON_BE(t.y);
+	type = wxINT16_SWAP_ON_BE(t.type);
+	flags = wxINT16_SWAP_ON_BE(t.flags);
+	angle = wxINT16_SWAP_ON_BE(t.angle);
+	tid = wxINT16_SWAP_ON_BE(t.tid);
+	z = wxINT16_SWAP_ON_BE(t.z);
 	special = t.special;
 	memcpy(args, t.args, 5);
 	ttype = game.get_ttype(type);
@@ -252,11 +252,11 @@ doomthing_t	Thing::to_doomformat()
 {
 	doomthing_t ret;
 
-	ret.x = (short)x;
-	ret.y = (short)y;
-	ret.angle = (short)angle;
-	ret.flags = (short)flags;
-	ret.type = (short)type;
+	ret.x = wxINT16_SWAP_ON_BE((short)x);
+	ret.y = wxINT16_SWAP_ON_BE((short)y);
+	ret.angle = wxINT16_SWAP_ON_BE((short)angle);
+	ret.flags = wxINT16_SWAP_ON_BE((short)flags);
+	ret.type = wxINT16_SWAP_ON_BE((short)type);
 
 	return ret;
 }
@@ -265,14 +265,14 @@ hexenthing_t Thing::to_hexenformat()
 {
 	hexenthing_t ret;
 
-	ret.x = (short)x;
-	ret.y = (short)y;
-	ret.z = (short)z;
-	ret.tid = (short)tid;
-	ret.angle = (short)angle;
-	ret.flags = (short)flags;
+	ret.x = wxINT16_SWAP_ON_BE((short)x);
+	ret.y = wxINT16_SWAP_ON_BE((short)y);
+	ret.z = wxINT16_SWAP_ON_BE((short)z);
+	ret.tid = wxINT16_SWAP_ON_BE((short)tid);
+	ret.angle = wxINT16_SWAP_ON_BE((short)angle);
+	ret.flags = wxINT16_SWAP_ON_BE((short)flags);
 	ret.special = (BYTE)special;
-	ret.type = (short)type;
+	ret.type = wxINT16_SWAP_ON_BE((short)type);
 	
 	for (int a = 0; a < 5; a++)
 		ret.args[a] = args[a];

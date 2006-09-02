@@ -11,6 +11,7 @@
 #include "tex_browser.h"
 #include "3dmode.h"
 #include "bsp.h"
+#include "edit_misc.h"
 
 float grav = 0.5f;
 
@@ -62,6 +63,9 @@ void init_3d_mode()
 // ----------------------------------------- >>
 void apply_gravity()
 {
+	if (elapsed == 0)
+		elapsed = 1;
+
 	float mult = elapsed * 0.1f;
 	int sector = d_map.get_hilight_sector(point2_t(camera.position.x, camera.position.y));
 
@@ -163,7 +167,7 @@ void change_offsets_3d(int x, int y)
 
 		side->set_xoff(side->get_xoff() + x);
 		side->set_yoff(side->get_yoff() + y);
-		add_3d_message(s_fmt("Offsets: (%d, %d)", side->get_xoff(), side->get_yoff()));
+		add_3d_message(s_fmt(_T("Offsets: (%d, %d)"), side->get_xoff(), side->get_yoff()));
 		d_map.change_level(MC_SAVE_NEEDED);
 	}
 }
@@ -192,12 +196,12 @@ void change_sector_height_3d(int amount, bool floor, bool force)
 	if (floor)
 	{
 		d_map.sector(sector)->set_floor(d_map.sector(sector)->floor() + amount);
-		add_3d_message(s_fmt("Floor Height: %d", d_map.sector(sector)->floor()));
+		add_3d_message(s_fmt(_T("Floor Height: %d"), d_map.sector(sector)->floor()));
 	}
 	else
 	{
 		d_map.sector(sector)->set_ceil(d_map.sector(sector)->ceiling() + amount);
-		add_3d_message(s_fmt("Ceiling Height: %d", d_map.sector(sector)->ceiling()));
+		add_3d_message(s_fmt(_T("Ceiling Height: %d"), d_map.sector(sector)->ceiling()));
 	}
 
 	d_map.change_level(MC_SAVE_NEEDED);
@@ -222,7 +226,7 @@ void change_texture_3d(bool paint)
 		if (hl_part == PART_LO1 || hl_part == PART_LO2)
 			part = 2;
 
-		string otex = "";
+		string otex = _T("");
 
 		if (side)
 			otex = hl_line->side1()->get_texname(part);
@@ -244,7 +248,7 @@ void change_texture_3d(bool paint)
 	}
 	else if (hl_sector != -1)
 	{
-		string otex = "";
+		string otex = _T("");
 
 		if (hl_part == PART_FLOOR)
 			otex = d_map.sector(hl_sector)->tex_floor();
@@ -289,11 +293,11 @@ void copy_texture_3d()
 		else
 			c_wall = hl_line->side2()->get_texname(part);
 
-		add_3d_message(s_fmt("Copied texture \"%s\"", c_wall.c_str()));
+		add_3d_message(s_fmt(_T("Copied texture \"%s\""), c_wall.c_str()));
 	}
 	else if (hl_sector != -1)
 	{
-		string ctex = "";
+		string ctex = _T("");
 
 		if (hl_part == PART_FLOOR)
 			ctex = d_map.sector(hl_sector)->tex_floor();
@@ -305,7 +309,7 @@ void copy_texture_3d()
 		else
 			c_flat = ctex;
 
-		add_3d_message(s_fmt("Copied texture \"%s\"", ctex.c_str()));
+		add_3d_message(s_fmt(_T("Copied texture \"%s\""), ctex.c_str()));
 	}
 }
 
@@ -325,14 +329,20 @@ void paste_texture_3d(bool paint)
 		if (hl_part == PART_LO1 || hl_part == PART_LO2)
 			part = 2;
 
-		if (c_wall != "")
+		if (c_wall != _T(""))
 		{
-			if (side)
-				hl_line->side1()->set_texture(c_wall, part);
+			if (!paint)
+			{
+				hl_line->side(side)->set_texture(c_wall, part);
+				add_3d_message(s_fmt(_T("Pasted texture \"%s\""), c_wall));
+			}
 			else
-				hl_line->side2()->set_texture(c_wall, part);
+			{
+				vector<int> lines;
+				line_paint_tex(d_map.index(hl_line), side, hl_line->side(side)->get_texname(part), c_wall, lines);
 
-			add_3d_message(s_fmt("Pasted texture \"%s\"", c_wall.c_str()));
+				add_3d_message(s_fmt(_T("Painted texture \"%s\""), c_wall));
+			}
 		}
 	}
 	else if (hl_sector != -1)
@@ -344,14 +354,14 @@ void paste_texture_3d(bool paint)
 		else
 			ntex = c_flat;
 
-		if (ntex != "")
+		if (ntex != _T(""))
 		{
 			if (hl_part == PART_FLOOR)
 				d_map.sector(hl_sector)->set_ftex(ntex);
 			if (hl_part == PART_CEIL)
 				d_map.sector(hl_sector)->set_ctex(ntex);
 
-			add_3d_message(s_fmt("Pasted texture \"%s\"", ntex.c_str()));
+			add_3d_message(s_fmt(_T("Pasted texture \"%s\""), ntex));
 		}
 	}
 }
@@ -373,13 +383,13 @@ void copy_side_3d(bool xoff, bool yoff, bool textures)
 		if (xoff)
 		{
 			copy_side->set_xoff(side->get_xoff());
-			add_3d_message("Copied X offset");
+			add_3d_message(_T("Copied X offset"));
 		}
 
 		if (yoff)
 		{
 			copy_side->set_yoff(side->get_yoff());
-			add_3d_message("Copied Y offset");
+			add_3d_message(_T("Copied Y offset"));
 		}
 
 		if (textures)
@@ -387,7 +397,7 @@ void copy_side_3d(bool xoff, bool yoff, bool textures)
 			copy_side->set_texture(side->get_texname(0), 0);
 			copy_side->set_texture(side->get_texname(1), 1);
 			copy_side->set_texture(side->get_texname(2), 2);
-			add_3d_message("Copied textures");
+			add_3d_message(_T("Copied textures"));
 		}
 	}
 }
@@ -406,13 +416,13 @@ void paste_side_3d(bool xoff, bool yoff, bool textures)
 		if (xoff)
 		{
 			side->set_xoff(copy_side->get_xoff());
-			add_3d_message("Copied X offset");
+			add_3d_message(_T("Copied X offset"));
 		}
 
 		if (yoff)
 		{
 			side->set_yoff(copy_side->get_yoff());
-			add_3d_message("Copied Y offset");
+			add_3d_message(_T("Copied Y offset"));
 		}
 
 		if (textures)
@@ -420,7 +430,7 @@ void paste_side_3d(bool xoff, bool yoff, bool textures)
 			side->set_texture(copy_side->get_texname(0), 0);
 			side->set_texture(copy_side->get_texname(1), 1);
 			side->set_texture(copy_side->get_texname(2), 2);
-			add_3d_message("Copied textures");
+			add_3d_message(_T("Copied textures"));
 		}
 
 		d_map.change_level(MC_SAVE_NEEDED);
@@ -435,20 +445,20 @@ void toggle_texture_peg_3d(bool upper)
 		if (upper)
 		{
 			hl_line->toggle_flag(0x0008);
-			msg = "Upper texture unpegged: ";
+			msg = _T("Upper texture unpegged: ");
 			if (hl_line->check_flag(0x0008))
-				msg += "On";
+				msg += _T("On");
 			else
-				msg += "Off";
+				msg += _T("Off");
 		}
 		else
 		{
 			hl_line->toggle_flag(0x0010);
-			msg = "Lower texture unpegged: ";
+			msg = _T("Lower texture unpegged: ");
 			if (hl_line->check_flag(0x0010))
-				msg += "On";
+				msg += _T("On");
 			else
-				msg += "Off";
+				msg += _T("Off");
 		}
 
 		add_3d_message(msg);
@@ -486,7 +496,7 @@ void change_light_3d(int amount)
 	
 	d_map.sector(sector)->set_light(light);
 
-	add_3d_message(s_fmt("Light level: %d", light));
+	add_3d_message(s_fmt(_T("Light level: %d"), light));
 	d_map.change_level(MC_SAVE_NEEDED);
 }
 
@@ -504,13 +514,13 @@ void reset_offsets_3d(bool x, bool y)
 		if (x)
 		{
 			side->set_xoff(0);
-			add_3d_message("X Offset reset");
+			add_3d_message(_T("X Offset reset"));
 		}
 
 		if (y)
 		{
 			side->set_yoff(0);
-			add_3d_message("Y Offset reset");
+			add_3d_message(_T("Y Offset reset"));
 		}
 
 		d_map.change_level(MC_SAVE_NEEDED);
@@ -531,4 +541,30 @@ void reset_offsets_3d(bool x, bool y)
 		}
 	}
 	*/
+}
+
+void auto_align_x_3d()
+{
+	if (!hl_line)
+		return;
+
+	bool side = true;
+	BYTE part = 1;
+
+	if (hl_part == PART_MID2 || hl_part == PART_LO2 || hl_part == PART_UP2)
+		side = false;
+
+	if (hl_part == PART_UP1 || hl_part == PART_UP2)
+		part = 0;
+
+	if (hl_part == PART_LO1 || hl_part == PART_LO2)
+		part = 2;
+
+	Texture* tex = hl_line->side(side)->get_tex(part);
+
+	vector<int> lines;
+	line_auto_align_x(d_map.index(hl_line), -51403, side, tex->name, tex->width, lines);
+
+	add_3d_message("Auto X-Alignment done");
+	d_map.change_level(MC_SAVE_NEEDED);
 }

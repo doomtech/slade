@@ -8,6 +8,7 @@
 #include "dm_line.h"
 #include "input.h"
 #include "draw.h"
+#include "mathstuff.h"
 
 vector<point2_t>	ldraw_points;
 
@@ -18,9 +19,11 @@ CVAR(Bool, edit_auto_createsector, true, CVAR_SAVE)
 
 extern DoomMap d_map;
 extern rgba_t col_linedraw;
+extern Sector* last_copy_sector;
 
 EXTERN_CVAR(Bool, line_aa)
 EXTERN_CVAR(Float, line_size)
+EXTERN_CVAR(Bool, edit_snap_grid)
 
 // lines_clockwise: Checks if a group of lines are all facing eachother
 // ----------------------------------------------------------------- >>
@@ -74,6 +77,26 @@ void ldraw_end()
 	// Add vertices
 	vector<Vertex*> new_verts;
 
+	bool gsnap = edit_snap_grid;
+	edit_snap_grid = false;
+	for (int a = 0; a < ldraw_points.size() - 1; a++)
+	{
+		int lines = d_map.n_lines();
+		for (int b = 0; b < lines; b++)
+		{
+			rect_t r1 = d_map.line(b)->get_rect();
+			rect_t r2(ldraw_points[a], ldraw_points[a+1]);
+
+			fpoint2_t ip;
+			if (lines_intersect(r1, r2, &ip))
+			{
+				//log_message(s_fmt(_T("Intersect with line %d at %1.2f,%1.2f"), b, ip.x, ip.y));
+				create_vertex(point2_t(round(ip.x), round(ip.y)));
+			}
+		}
+	}
+	edit_snap_grid = gsnap;
+
 	for (int a = 0; a < ldraw_points.size() - 1; a++)
 	{
 		int v = d_map.check_vertex_spot(ldraw_points[a]);
@@ -94,9 +117,14 @@ void ldraw_end()
 	for (int a = 0; a < new_verts.size() - 1; a++)
 		new_lines.push_back(new Line(new_verts[a], new_verts[a+1], NULL));
 
-	// If it's not a split add a line from last to first
+	// If it's not a split add a line from last to first,
+	// and also check wether they are clockwise or not
+	bool clockwise = true;
 	if (ldraw_points[0].x == ldraw_points.back().x && ldraw_points[0].y == ldraw_points.back().y)
+	{
 		new_lines.push_back(new Line(new_verts.back(), new_verts[0], NULL));
+		clockwise = lines_clockwise(new_lines);
+	}
 
 	// Check for new line splits
 	for (int a = 0; a < d_map.n_verts(); a++)
@@ -105,13 +133,29 @@ void ldraw_end()
 	// Remove overlapping lines
 	d_map.remove_overlapping_lines(new_lines);
 
+	// Flip lines if anticlockwise
+	if (!clockwise)
+	{
+		for (int a = 0; a < new_lines.size(); a++)
+			new_lines[a]->flip(true, false);
+	}
+
+	// Check wether to run create sector on the back sides of the new lines
+	bool *cs_back = new bool[new_lines.size()];
+	memset(cs_back, 0, new_lines.size());
+	for (int a = 0; a < new_lines.size(); a++)
+	{
+		point2_t pos = new_lines[a]->get_side_point(false);
+		if (d_map.get_hilight_sector(pos) != -1)
+			cs_back[a] = true;
+	}
+
 	// Add new lines to map
 	for (int a = 0; a < new_lines.size(); a++)
 	{
 		d_map.add_line(new_lines[a]);
 		new_lines[a]->set_side1(d_map.side(-1));
 		new_lines[a]->set_side2(d_map.side(-1));
-		//new_lines[a]->apply_default_textures();
 	}
 
 	//log_message(s_fmt("Created %d lines", new_lines.size()));
@@ -122,29 +166,23 @@ void ldraw_end()
 		bool *bs = new bool[d_map.n_lines()];
 		memset(fs, 0, d_map.n_lines());
 		memset(bs, 0, d_map.n_lines());
+		vector<Sector*> new_sectors;
+		last_copy_sector = NULL;
 
 		for (int a = 0; a < new_lines.size(); a++)
 		{
 			if (!fs[d_map.index(new_lines[a])])
-				sector_create(new_lines[a]->get_side_point(true), fs, bs);
-
-			if (!bs[d_map.index(new_lines[a])])
-				sector_create(new_lines[a]->get_side_point(false), fs, bs);
+				sector_create(new_lines[a]->get_side_point(true), new_sectors, fs, bs);
+			
+			if (!bs[d_map.index(new_lines[a])] && cs_back[a])
+				sector_create(new_lines[a]->get_side_point(false), new_sectors, fs, bs);
 		}
 
-		/*
-		if (lines_clockwise(new_lines))
+		if (last_copy_sector)
 		{
-			sector_create(new_lines[0]->get_side_point(false));
-			sector_create(new_lines[0]->get_side_point(true));
-			sector_create(new_lines[0]->get_side_point(false));
+			for (int a = 0; a < new_sectors.size(); a++)
+				new_sectors[a]->copy(last_copy_sector);
 		}
-		else
-		{
-			sector_create(new_lines[0]->get_side_point(true));
-			sector_create(new_lines[0]->get_side_point(false));
-		}
-		*/
 	}
 
 	ldraw_points.clear();
@@ -254,19 +292,31 @@ void ldraw_draw_lines(point2_t mouse)
 	glLineStipple(4, 0xBBBB);
 	glEnable(GL_LINE_STIPPLE);
 
+	rgba_t c = col_linedraw;
+	int tr = col_linedraw.r + 64;
+	int tg = col_linedraw.g + 64;
+	int tb = col_linedraw.b + 64;
+	if (tr > 255) tr = 255;
+	if (tg > 255) tg = 255;
+	if (tb > 255) tb = 255;
+
 	if (ldraw_points.size() > 1)
 	{
 		for (int a = 0; a < ldraw_points.size() - 1; a++)
 		{
-			draw_line(rect_t(ldraw_points[a], ldraw_points[a+1]), col_linedraw, line_aa, true, line_size);
+			rect_t r(ldraw_points[a], ldraw_points[a+1]);
+			draw_line(r, col_linedraw, line_aa, false, line_size);
 			draw_point(ldraw_points[a].x, ldraw_points[a].y, 8, col_linedraw);
+			draw_text(r.middle().x, r.middle().y, rgba_t(tr, tg, tb, col_linedraw.a, col_linedraw.blend), 1, true, "%d", round(r.length()));
 		}
 	}
 
 	if (ldraw_points.size() > 0 && !state(STATE_SHAPEDRAW))
 	{
-		draw_line(rect_t(ldraw_points.back(), mp), col_linedraw, line_aa, true, line_size);
+		rect_t r(ldraw_points.back(), mp);
+		draw_line(r, col_linedraw, line_aa, false, line_size);
 		draw_point(ldraw_points.back().x, ldraw_points.back().y, 8, col_linedraw);
+		draw_text(r.middle().x, r.middle().y, rgba_t(tr, tg, tb, col_linedraw.a, col_linedraw.blend), 1, true, "%d", round(r.length()));
 	}
 
 	draw_point(mp.x, mp.y, 8, col_linedraw);

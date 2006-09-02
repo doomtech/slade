@@ -114,6 +114,11 @@ struct point2_t
 	{
 		return point2_t(-y, x);
 	}
+
+	bool operator==(point2_t p)
+	{
+		return x == p.x && y == p.y;
+	}
 };
 
 // fpoint2_t: An accurate 2d point ;)
@@ -164,6 +169,11 @@ struct fpoint2_t
 	point2_t to_int()
 	{
 		return point2_t((int)x, (int)y);
+	}
+
+	bool operator==(fpoint2_t p)
+	{
+		return x == p.x && y == p.y;
 	}
 };
 

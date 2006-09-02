@@ -30,7 +30,7 @@ public:
 
 	void set_defaults();
 
-	void add(string name, string key, BYTE mods = 0);
+	void add(char* name, char* key, BYTE mods = 0);
 	void set(string key, vector<string> *list, bool shift = false, bool ctrl = false, bool alt = false);
 	void unset(string key, vector<string> *list, bool shift = false, bool ctrl = false, bool alt = false);
 	bool pressed(string name);

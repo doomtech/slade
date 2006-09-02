@@ -5,6 +5,7 @@
 #include "byteswap.h"
 #include "mathstuff.h"
 #include "edit.h"
+#include "edit_misc.h"
 #include "3dmode.h"
 #include "editor_window.h"
 
@@ -20,6 +21,9 @@ CVAR(Float, edit_split_dist, 2, CVAR_SAVE)
 
 extern int edit_mode;
 extern EditorWindow* editor_window;
+
+EXTERN_CVAR(Bool, edit_auto_merge)
+EXTERN_CVAR(Bool, edit_auto_split)
 
 string map_lumps[12] =
 {
@@ -250,14 +254,14 @@ void DoomMap::delete_selection(int type)
 		if (type == 0)
 		{
 			delete_vertex(hilight_item);
-			update_indices(MTYPE_SIDE|MTYPE_LINE|MTYPE_VERTEX);
+			update_indices(MTYPE_LINE|MTYPE_SIDE|MTYPE_VERTEX);
 			remove_unused_vertices();
 		}
 
 		if (type == 1)
 		{
 			delete_line(hilight_item);
-			update_indices(MTYPE_SIDE|MTYPE_LINE|MTYPE_VERTEX);
+			update_indices(MTYPE_LINE|MTYPE_SIDE|MTYPE_VERTEX);
 			remove_unused_vertices();
 		}
 
@@ -287,7 +291,7 @@ void DoomMap::delete_selection(int type)
 			for (int a = 0; a < delete_verts.size(); a++)
 				delete_vertex(delete_verts[a]);
 
-			update_indices(MTYPE_SIDE|MTYPE_LINE|MTYPE_VERTEX);
+			update_indices(MTYPE_LINE|MTYPE_SIDE|MTYPE_VERTEX);
 			remove_unused_vertices();
 		}
 
@@ -301,7 +305,7 @@ void DoomMap::delete_selection(int type)
 			for (int a = 0; a < delete_lines.size(); a++)
 				delete_line(delete_lines[a]);
 
-			update_indices(MTYPE_SIDE|MTYPE_LINE|MTYPE_VERTEX);
+			update_indices(MTYPE_LINE|MTYPE_VERTEX|MTYPE_SIDE);
 			remove_unused_vertices();
 		}
 
@@ -585,41 +589,103 @@ int	DoomMap::index(Thing* i, bool force_search)
 	return -1;
 }
 
-bool DoomMap::valid(Vertex* i)
+bool DoomMap::valid(Vertex* i, bool fullcheck)
 {
-	return !(i == def_vertex || !i);
+	if (i == def_vertex || !i)
+		return false;
+
+	if (fullcheck)
+	{
+		if (index(i, true) == -1)
+			return false;
+	}
+
+	return true;
 }
 
-bool DoomMap::valid(Line* i)
+bool DoomMap::valid(Line* i, bool fullcheck)
 {
-	return !(i == def_line || !i);
+	if (i == def_line || !i)
+		return false;
+
+	if (fullcheck)
+	{
+		if (index(i, true) == -1)
+			return false;
+	}
+
+	return true;
 }
 
-bool DoomMap::valid(Side* i)
+bool DoomMap::valid(Side* i, bool fullcheck)
 {
-	return !(i == def_side || !i);
+	if (i == def_side || !i)
+		return false;
+
+	if (fullcheck)
+	{
+		if (index(i, true) == -1)
+			return false;
+	}
+
+	return true;
 }
 
-bool DoomMap::valid(Sector* i)
+bool DoomMap::valid(Sector* i, bool fullcheck)
 {
-	return !(i == def_sector || !i);
+	if (i == def_sector || !i)
+		return false;
+
+	if (fullcheck)
+	{
+		if (index(i, true) == -1)
+			return false;
+	}
+
+	return true;
 }
 
-bool DoomMap::valid(Thing* i)
+bool DoomMap::valid(Thing* i, bool fullcheck)
 {
-	return !(i == def_thing || !i);
+	if (i == def_thing || !i)
+		return false;
+
+	if (fullcheck)
+	{
+		if (index(i, true) == -1)
+			return false;
+	}
+
+	return true;
 }
 
 bool DoomMap::open(Wad* wad, string mapname)
 {
+	if (wad->zip)
+	{
+		message_box(_T("Can't load a map straight from a zip!"));
+		return false;
+	}
+
 	Lump* lump = NULL;
-	long offset = wad->get_lump_index(mapname);
-	FILE* fp = fopen(wad->path.c_str(), "rb");
+	long offset = wad->getLumpIndex(mapname);
+	FILE* fp = NULL;
 	long unit_size = 0;
+
+	if (wad->parent)
+	{
+		string p = c_path(_T("sladetemp.wad"), DIR_TMP);
+		wad->parent->dumpToFile(p);
+		wad->open(p);
+		fp = fopen(chr(p), "rb");
+		offset = 0;
+	}
+	else
+		fp = fopen(chr(wad->path), "rb");
 
 	if (offset == -1)
 	{
-		printf("Map %s not found\n", mapname.c_str());
+		log_message(s_fmt(_T("Map %s not found\n"), chr(mapname)));
 		return false;
 	}
 
@@ -631,32 +697,32 @@ bool DoomMap::open(Wad* wad, string mapname)
 	{
 		index++;
 
-		if (index == wad->num_lumps)
+		if (index >= wad->numLumps())
 		{
 			index--;
 			done = true;
 		}
-		else if (!strncmp(wad->directory[index]->Name().c_str(), "THINGS", 6) ||
-			!strncmp(wad->directory[index]->Name().c_str(), "LINEDEFS", 8) ||
-			!strncmp(wad->directory[index]->Name().c_str(), "SIDEDEFS", 8) ||
-			!strncmp(wad->directory[index]->Name().c_str(), "VERTEXES", 8) ||
-			!strncmp(wad->directory[index]->Name().c_str(), "SEGS", 4) ||
-			!strncmp(wad->directory[index]->Name().c_str(), "SSECTORS", 8) ||
-			!strncmp(wad->directory[index]->Name().c_str(), "NODES", 5) ||
-			!strncmp(wad->directory[index]->Name().c_str(), "SECTORS", 7) ||
-			!strncmp(wad->directory[index]->Name().c_str(), "REJECT", 6) ||
-			!strncmp(wad->directory[index]->Name().c_str(), "SCRIPTS", 7) ||
-			!strncmp(wad->directory[index]->Name().c_str(), "BLOCKMAP", 8))
+		else if (wad->lumpAt(index)->getName() == _T("THINGS")	||
+				wad->lumpAt(index)->getName() == _T("LINEDEFS") ||
+				wad->lumpAt(index)->getName() == _T("SIDEDEFS") ||
+				wad->lumpAt(index)->getName() == _T("VERTEXES") ||
+				wad->lumpAt(index)->getName() == _T("SEGS")		||
+				wad->lumpAt(index)->getName() == _T("SSECTORS") ||
+				wad->lumpAt(index)->getName() == _T("NODES")	||
+				wad->lumpAt(index)->getName() == _T("SECTORS")	||
+				wad->lumpAt(index)->getName() == _T("REJECT")	||
+				wad->lumpAt(index)->getName() == _T("SCRIPTS")	||
+				wad->lumpAt(index)->getName() == _T("BLOCKMAP"))
 		{
 			done = false;
 		}
-		else if (strncmp(wad->directory[index]->Name().c_str(), "BEHAVIOR", 8) == 0)
+		else if (wad->lumpAt(index)->getName() == _T("BEHAVIOR"))
 		{
 			if (hexen())
 				done = true;
 			else
 			{
-				message_box("This looks like a hexen-format map, please select a different game configuration!", "Error");
+				message_box(_T("This looks like a hexen-format map, please select a different game configuration!"), _T("Error"));
 				return false;
 			}
 		}
@@ -664,9 +730,9 @@ bool DoomMap::open(Wad* wad, string mapname)
 			done = true;
 	}
 
-	if (strncmp(wad->directory[index]->Name().c_str(), "BEHAVIOR", 8) != 0 && hexen())
+	if (wad->lumpAt(index)->getName() != _T("BEHAVIOR") && hexen())
 	{
-		message_box("Map has no BEHAVIOR lump", "Error");
+		message_box(_T("Map has no BEHAVIOR lump"), _T("Error"));
 		return false;
 	}
 
@@ -687,137 +753,137 @@ bool DoomMap::open(Wad* wad, string mapname)
 	name = mapname;
 
 	// << ---- Read Vertices ---- >>
-	splash("Loading Vertices");
-	lump = wad->get_lump("VERTEXES", offset);
+	splash(_T("Loading Vertices"));
+	lump = wad->getLump(_T("VERTEXES"), offset);
 
 	if (!lump)
 	{
-		printf("Map has no VERTEXES lump\n");
+		log_message(_T("Map has no VERTEXES lump\n"));
 		splash_hide();
 		return false;
 	}
 
 	// Seek to lump
-	fseek(fp, lump->Offset(), SEEK_SET);
+	fseek(fp, lump->getOffset(), SEEK_SET);
 
 	// Read vertex data
-	for (DWORD i = 0; i < lump->Size() / 4; i++)
+	for (DWORD i = 0; i < lump->getSize() / 4; i++)
 	{
 		doomvertex_t v;
-		lefread(&v, 4, 1, fp);
+		fread(&v, 4, 1, fp);
 		new Vertex(v, this);
 	}
 
 	// << ---- Read sectors ---- >>
-	splash("Loading Sectors");
-	lump = wad->get_lump("SECTORS", offset);
+	splash(_T("Loading Sectors"));
+	lump = wad->getLump(_T("SECTORS"), offset);
 
 	if (!lump)
 	{
-		printf("Map has no SECTORS lump\n");
+		log_message(_T("Map has no SECTORS lump\n"));
 		splash_hide();
 		return false;
 	}
 
 	// Seek to lump
-	fseek(fp, lump->Offset(), SEEK_SET);
+	fseek(fp, lump->getOffset(), SEEK_SET);
 
-	for (int a = 0; a < lump->Size() / 26; a++)
+	for (int a = 0; a < lump->getSize() / 26; a++)
 	{
 		doomsector_t s;
-		lefread(&s, 26, 1, fp);
+		fread(&s, 26, 1, fp);
 		new Sector(s, this);
 	}
 
 	// << ---- Read sides ---- >>
-	splash("Loading Sides");
-	lump = wad->get_lump("SIDEDEFS", offset);
+	splash(_T("Loading Sides"));
+	lump = wad->getLump(_T("SIDEDEFS"), offset);
 
 	if (!lump)
 	{
-		printf("Map has no SIDEDEFS lump\n");
+		log_message(_T("Map has no SIDEDEFS lump\n"));
 		splash_hide();
 		return false;
 	}
 
 	// Seek to lump
-	fseek(fp, lump->Offset(), SEEK_SET);
+	fseek(fp, lump->getOffset(), SEEK_SET);
 
 	// Read side data
-	for (DWORD i = 0; i < lump->Size() / 30; i++)
+	for (DWORD i = 0; i < lump->getSize() / 30; i++)
 	{
 		doomside_t s;
-		lefread(&s, 30, 1, fp);
+		fread(&s, 30, 1, fp);
 		new Side(s, this);
 	}
 
 	// << ---- Read Lines ---- >>
-	splash("Loading Lines");
+	splash(_T("Loading Lines"));
 	int max_vert = 0;
-	lump = wad->get_lump("LINEDEFS", offset);
+	lump = wad->getLump(_T("LINEDEFS"), offset);
 
 	if (!lump)
 	{
-		printf("Map has no LINEDEFS lump\n");
+		log_message(_T("Map has no LINEDEFS lump\n"));
 		splash_hide();
 		return false;
 	}
 
 	// Seek to lump
-	fseek(fp, lump->Offset(), SEEK_SET);
+	fseek(fp, lump->getOffset(), SEEK_SET);
 
 	if (hexen())
 	{
-		for (int a = 0; a < lump->Size() / 16; a++)
+		for (int a = 0; a < lump->getSize() / 16; a++)
 		{
 			bool ok = true;
 			hexenline_t l;
-			lefread(&l, 16, 1, fp);
+			fread(&l, 16, 1, fp);
 			Line* line = new Line(l, this, ok);
 			if (!ok) delete line;
 		}
 	}
 	else
 	{
-		for (int a = 0; a < lump->Size() / 14; a++)
+		for (int a = 0; a < lump->getSize() / 14; a++)
 		{
 			bool ok = true;
 			doomline_t l;
-			lefread(&l, 14, 1, fp);
+			fread(&l, 14, 1, fp);
 			Line* line = new Line(l, this, ok);
 			if (!ok) delete line;
 		}
 	}
 
 	// << ---- Read Things ---- >>
-	splash("Loading Things");
-	lump = wad->get_lump("THINGS", offset);
+	splash(_T("Loading Things"));
+	lump = wad->getLump(_T("THINGS"), offset);
 
 	if (!lump)
 	{
-		printf("Map has no THINGS lump\n");
+		log_message(_T("Map has no THINGS lump\n"));
 		splash_hide();
 		return false;
 	}
 
 	// Seek to lump
-	fseek(fp, lump->Offset(), SEEK_SET);
+	fseek(fp, lump->getOffset(), SEEK_SET);
 
 	if (hexen())
 	{
-		for (int a = 0; a < lump->Size() / 20; a++)
+		for (int a = 0; a < lump->getSize() / 20; a++)
 		{
 			hexenthing_t t;
-			lefread(&t, 20, 1, fp);
+			fread(&t, 20, 1, fp);
 			new Thing(t, this);
 		}
 	}
 	else
 	{
-		for (int a = 0; a < lump->Size() / 10; a++)
+		for (int a = 0; a < lump->getSize() / 10; a++)
 		{
 			doomthing_t t;
-			lefread(&t, 10, 1, fp);
+			fread(&t, 10, 1, fp);
 			new Thing(t, this);
 		}
 	}
@@ -825,46 +891,34 @@ bool DoomMap::open(Wad* wad, string mapname)
 	// << ---- Read Scripts/Behavior ---- >>
 	if (hexen())
 	{
-		lump = wad->get_lump("SCRIPTS", offset);
+		lump = wad->getLump("SCRIPTS", offset);
 
 		if (lump)
 		{
-			fseek(fp, lump->Offset(), SEEK_SET);
-			scripts = new Lump(0, lump->Size(), "SCRIPTS");
-			lefread(scripts->Data(), lump->Size(), 1, fp);
+			scripts = new Lump(0, lump->getSize(), _T("SCRIPTS"));
+			scripts->loadData(lump->getData(), lump->getSize());
 		}
 		else
-			scripts = new Lump(0, 0, "SCRIPTS");
+			scripts = new Lump(0, 0, _T("SCRIPTS"));
 
-		lump = wad->get_lump("BEHAVIOR", offset);
+		lump = wad->getLump(_T("BEHAVIOR"), offset);
 
 		if (lump)
 		{
-			fseek(fp, lump->Offset(), SEEK_SET);
-			behavior = new Lump(0, lump->Size(), "BEHAVIOR");
-			lefread(behavior->Data(), lump->Size(), 1, fp);
+			behavior = new Lump(0, lump->getSize(), _T("BEHAVIOR"));
+			behavior->loadData(lump->getData(), lump->getSize());
 		}
 		else
-			behavior = new Lump(0, 0, "BEHAVIOR");
+			behavior = new Lump(0, 0, _T("BEHAVIOR"));
 	}
 
-	log_message(s_fmt("%d Lines: %d bytes", n_lines(), n_lines() * sizeof(Line)));
-	log_message(s_fmt("%d Sides: %d bytes", n_sides(), n_sides() * sizeof(Side)));
-	log_message(s_fmt("%d Vertices: %d bytes", n_verts(), n_verts() * sizeof(Vertex)));
-	log_message(s_fmt("%d Sectors: %d bytes", n_sectors(), n_sectors() * sizeof(Sector)));
-	log_message(s_fmt("%d Things: %d bytes", n_things(), n_things() * sizeof(Thing)));
+	log_message(s_fmt(_T("%d Lines: %d bytes"), n_lines(), n_lines() * sizeof(Line)));
+	log_message(s_fmt(_T("%d Sides: %d bytes"), n_sides(), n_sides() * sizeof(Side)));
+	log_message(s_fmt(_T("%d Vertices: %d bytes"), n_verts(), n_verts() * sizeof(Vertex)));
+	log_message(s_fmt(_T("%d Sectors: %d bytes"), n_sectors(), n_sectors() * sizeof(Sector)));
+	log_message(s_fmt(_T("%d Things: %d bytes"), n_things(), n_things() * sizeof(Thing)));
 
-	/*
-	splash("Checking Lines");
-	if (check_lines())
-		console_window->Show();
-
-	splash("Checking Sides");
-	if (check_sides())
-		console_window->Show();
-	*/
-
-	splash("Removing Unused Vertices");
+	splash(_T("Removing Unused Vertices"));
 	remove_unused_vertices();
 
 	flags |= MAP_OPEN;
@@ -1139,7 +1193,7 @@ void DoomMap::select_lines_box(rect_t box)
 
 int DoomMap::get_hilight_vertex(point2_t mouse)
 {
-	double min_dist = 32;
+	double min_dist = 32 / editor_window->map()->get_zoom();
 	int vert = -1;
 
 	for (int v = 0; v < vertices.size(); v++)
@@ -1191,6 +1245,18 @@ int	DoomMap::get_hilight_sector(point2_t mouse)
 
 void DoomMap::select_sectors_box(rect_t box)
 {
+	for (int a = 0; a < lines.size(); a++)
+	{
+		if (point_in_rect(box.left(), box.top(), box.right(), box.bottom(), lines[a]->x1(), lines[a]->y1())
+			&& point_in_rect(box.left(), box.top(), box.right(), box.bottom(), lines[a]->x2(), lines[a]->y2()))
+		{
+			if (lines[a]->sector_index(true) != -1)
+				vector_add_nodup(selected_items, lines[a]->sector_index(true));
+
+			if (lines[a]->sector_index(false) != -1)
+				vector_add_nodup(selected_items, lines[a]->sector_index(false));
+		}
+	}
 }
 
 int	DoomMap::get_hilight_thing(point2_t mouse)
@@ -1307,7 +1373,7 @@ bool DoomMap::add_to_wad(Wad *wad)
 	if (wad->locked)
 		return false;
 
-	splash("Saving map...");
+	splash(_T("Saving map..."));
 
 	BYTE*	things_data = NULL;
 	BYTE*	lines_data = NULL;
@@ -1325,7 +1391,7 @@ bool DoomMap::add_to_wad(Wad *wad)
 	}
 
 	// Cleanup/check map
-	//remove_zerolength_lines();
+	remove_zerolength_lines();
 	//remove_unused_sectors();
 	//remove_unused_sides();
 	remove_unused_vertices();
@@ -1348,9 +1414,9 @@ bool DoomMap::add_to_wad(Wad *wad)
 		p += (t * thing_size);
 
 		if (hexen())
-			lememcpy(p, &(thing(t)->to_hexenformat()), thing_size);
+			memcpy(p, &(thing(t)->to_hexenformat()), thing_size);
 		else
-			lememcpy(p, &(thing(t)->to_doomformat()), thing_size);
+			memcpy(p, &(thing(t)->to_doomformat()), thing_size);
 
 	}
 
@@ -1366,9 +1432,9 @@ bool DoomMap::add_to_wad(Wad *wad)
 		p += (l * line_size);
 
 		if (hexen())
-			lememcpy(p, &(line(l)->to_hexenformat()), line_size);
+			memcpy(p, &(line(l)->to_hexenformat()), line_size);
 		else
-			lememcpy(p, &(line(l)->to_doomformat()), line_size);
+			memcpy(p, &(line(l)->to_doomformat()), line_size);
 
 		prog++;
 		if (prog % 20 == 0)
@@ -1381,7 +1447,7 @@ bool DoomMap::add_to_wad(Wad *wad)
 	for (DWORD s = 0; s < n_sides(); s++)
 	{
 		BYTE* p = sides_data + (s * 30);
-		lememcpy(p, &(side(s)->to_doomformat()), 30);
+		memcpy(p, &(side(s)->to_doomformat()), 30);
 	}
 
 	// Setup vertices data
@@ -1390,7 +1456,7 @@ bool DoomMap::add_to_wad(Wad *wad)
 	for (DWORD v = 0; v < n_verts(); v++)
 	{
 		BYTE* p = verts_data + (v * 4);
-		lememcpy(p, &(vertex(v)->to_doomformat()), 4);
+		memcpy(p, &(vertex(v)->to_doomformat()), 4);
 	}
 
 	// Setup sectors data
@@ -1399,7 +1465,7 @@ bool DoomMap::add_to_wad(Wad *wad)
 	for (DWORD s = 0; s < n_sectors(); s++)
 	{
 		BYTE* p = sectors_data + (s * 26);
-		lememcpy(p, &(sector(s)->to_doomformat()), 26);
+		memcpy(p, &(sector(s)->to_doomformat()), 26);
 	}
 
 	// *** WRITE DATA TO WADFILE ***
@@ -1407,7 +1473,7 @@ bool DoomMap::add_to_wad(Wad *wad)
 	bool behavior = false;
 
 	// If map already exists in wad, delete it
-	long mapindex = wad->get_lump_index(this->name, 0);
+	long mapindex = wad->getLumpIndex(this->name, 0);
 
 	if (mapindex != -1)
 	{
@@ -1416,30 +1482,30 @@ bool DoomMap::add_to_wad(Wad *wad)
 
 		while (!done)
 		{
-			if (index == wad->num_lumps)
+			if (index == wad->numLumps())
 				done = true;
-			else if (strncmp(wad->directory[index]->Name().c_str(), "THINGS", 6) == 0 ||
-				strncmp(wad->directory[index]->Name().c_str(), "LINEDEFS", 8) == 0 ||
-				strncmp(wad->directory[index]->Name().c_str(), "SIDEDEFS", 8) == 0 ||
-				strncmp(wad->directory[index]->Name().c_str(), "VERTEXES", 8) == 0 ||
-				strncmp(wad->directory[index]->Name().c_str(), "SEGS", 4) == 0 ||
-				strncmp(wad->directory[index]->Name().c_str(), "SSECTORS", 8) == 0 ||
-				strncmp(wad->directory[index]->Name().c_str(), "NODES", 5) == 0 ||
-				strncmp(wad->directory[index]->Name().c_str(), "SECTORS", 7) == 0 ||
-				strncmp(wad->directory[index]->Name().c_str(), "REJECT", 6) == 0 ||
-				strncmp(wad->directory[index]->Name().c_str(), "BLOCKMAP", 8) == 0)
+			else if (wad->lumpAt(index)->getName() == _T("THINGS") ||
+				wad->lumpAt(index)->getName() == _T("LINEDEFS") ||
+				wad->lumpAt(index)->getName() == _T("SIDEDEFS") ||
+				wad->lumpAt(index)->getName() == _T("VERTEXES") ||
+				wad->lumpAt(index)->getName() == _T("SEGS") ||
+				wad->lumpAt(index)->getName() == _T("SSECTORS") ||
+				wad->lumpAt(index)->getName() == _T("NODES") ||
+				wad->lumpAt(index)->getName() == _T("SECTORS") ||
+				wad->lumpAt(index)->getName() == _T("REJECT") ||
+				wad->lumpAt(index)->getName() == _T("BLOCKMAP"))
 			{
 				//print(true, "Deleting map entry %s\n", wadfile->directory[index]->Name().c_str());
-				wad->delete_lump(wad->directory[index]->Name(), mapindex);
+				wad->deleteLump(index);
 				done = false;
 			}
-			else if (strncmp(wad->directory[index]->Name().c_str(), "BEHAVIOR", 8) == 0)
+			else if (wad->lumpAt(index)->getName() == _T("BEHAVIOR"))
 			{
 				done = false;
 				index++;
 				behavior = true;
 			}
-			else if (strncmp(wad->directory[index]->Name().c_str(), "SCRIPTS", 7) == 0)
+			else if (wad->lumpAt(index)->getName() == _T("SCRIPTS"))
 			{
 				done = false;
 				index++;
@@ -1455,36 +1521,36 @@ bool DoomMap::add_to_wad(Wad *wad)
 	else
 	{
 		mapindex = 0;
-		wad->add_lump(name, mapindex);
+		wad->addLump(name, mapindex);
 	}
 
 	// Add map lumps
 	if (hexen())
 	{
 		if (!scripts)
-			wad->add_lump("SCRIPTS", mapindex + 1);
+			wad->addLump(_T("SCRIPTS"), mapindex + 1);
 
 		if (!behavior)
-			wad->add_lump("BEHAVIOR", mapindex + 1);
+			wad->addLump(_T("BEHAVIOR"), mapindex + 1);
 	}
 
-	wad->add_lump("SECTORS", mapindex + 1);
-	wad->add_lump("VERTEXES", mapindex + 1);
-	wad->add_lump("SIDEDEFS", mapindex + 1);
-	wad->add_lump("LINEDEFS", mapindex + 1);
-	wad->add_lump("THINGS", mapindex + 1);
+	wad->addLump(_T("SECTORS"), mapindex + 1);
+	wad->addLump(_T("VERTEXES"), mapindex + 1);
+	wad->addLump(_T("SIDEDEFS"), mapindex + 1);
+	wad->addLump(_T("LINEDEFS"), mapindex + 1);
+	wad->addLump(_T("THINGS"), mapindex + 1);
 
 	// Write map data
-	wad->replace_lump("THINGS", thing_size * n_things(), things_data, mapindex);
-	wad->replace_lump("LINEDEFS", line_size * n_lines(), lines_data, mapindex);
-	wad->replace_lump("SIDEDEFS", 30 * n_sides(), sides_data, mapindex);
-	wad->replace_lump("VERTEXES", 4 * n_verts(), verts_data, mapindex);
-	wad->replace_lump("SECTORS", 26 * n_sectors(), sectors_data, mapindex);
+	wad->replaceLump(wad->getLumpIndex(_T("THINGS"), mapindex), thing_size * n_things(), things_data);
+	wad->replaceLump(wad->getLumpIndex(_T("LINEDEFS"), mapindex), line_size * n_lines(), lines_data);
+	wad->replaceLump(wad->getLumpIndex(_T("SIDEDEFS"), mapindex), 30 * n_sides(), sides_data);
+	wad->replaceLump(wad->getLumpIndex(_T("VERTEXES"), mapindex), 4 * n_verts(), verts_data);
+	wad->replaceLump(wad->getLumpIndex(_T("SECTORS"), mapindex), 26 * n_sectors(), sectors_data);
 
 	if (hexen())
 	{
-		wad->replace_lump("SCRIPTS", this->scripts->Size(), this->scripts->Data(), mapindex);
-		wad->replace_lump("BEHAVIOR", this->behavior->Size(), this->behavior->Data(), mapindex);
+		wad->replaceLump(wad->getLumpIndex(_T("SCRIPTS"), mapindex), this->scripts->getSize(), this->scripts->getData());
+		wad->replaceLump(wad->getLumpIndex(_T("BEHAVIOR"), mapindex), this->behavior->getSize(), this->behavior->getData());
 	}
 
 	splash_hide();
@@ -1679,10 +1745,45 @@ void DoomMap::move_items(point2_t mouse)
 
 void DoomMap::clear_move_items()
 {
+	if (edit_mode < 3 && (edit_auto_merge || edit_auto_split))
+	{
+		// Get moving vertices
+		vector<Vertex*> m_verts;
+		for (int a = 0; a < moving_items.size(); a++)
+			m_verts.push_back(vertex(moving_items[a]));
+
+		if (edit_auto_merge)
+		{
+			for (int a = 0; a < m_verts.size(); a++)
+				merge_under_vertex(m_verts[a]);
+
+			remove_zerolength_lines();
+		}
+
+		/*
+		for (int a = 0; a < m_verts.size(); a++)
+		{
+			if (!valid(m_verts[a], true))
+				message_box("A moving vertex was deleted somehow!");
+		}
+		*/
+
+		if (edit_auto_split)
+		{
+			// Split lines under vertices
+			for (int a = 0; a < m_verts.size(); a++)
+				check_split(m_verts[a]);
+		}
+
+		update_indices(MTYPE_VERTEX);
+	}
+
 	moving_items.clear();
+	selected_items.clear();
+	hilight_item = -1;
 }
 
-void DoomMap::get_lines_to_vert(int vert, vector<int> &list)
+void DoomMap::get_lines_to_vert(int vert, vector<int> &list, bool allowdup)
 {
 	Vertex *v = vertex(vert);
 
@@ -1692,6 +1793,12 @@ void DoomMap::get_lines_to_vert(int vert, vector<int> &list)
 	int c = 0;
 	for (int a = 0; a < n_lines(); a++)
 	{
+		if (!allowdup)
+		{
+			if (vector_exists(list, a))
+				continue;
+		}
+
 		if (line(a)->has_vertex(v))
 		{
 			list.push_back(a);
@@ -1700,6 +1807,18 @@ void DoomMap::get_lines_to_vert(int vert, vector<int> &list)
 
 		if (c == v->refs())
 			break;
+	}
+}
+
+void DoomMap::update_vertex_refs()
+{
+	for (int a = 0; a < n_verts(); a++)
+		vertices[a]->set_refs(0);
+
+	for (int a = 0; a < n_lines(); a++)
+	{
+		lines[a]->vertex1()->add_ref();
+		lines[a]->vertex2()->add_ref();
 	}
 }
 
@@ -1735,6 +1854,22 @@ int	DoomMap::remove_unused_sectors()
 	return c;
 }
 
+int	DoomMap::remove_zerolength_lines()
+{
+	int ret = 0;
+	for (int a = 0; a < n_lines(); a++)
+	{
+		if (line(a)->vertex1() == line(a)->vertex2())
+		{
+			delete_line(line(a));
+			a--;
+			ret++;
+		}
+	}
+
+	return ret;
+}
+
 int DoomMap::check_vertex_spot(point2_t pos)
 {
 	for (int a = 0; a < n_verts(); a++)
@@ -1746,12 +1881,15 @@ int DoomMap::check_vertex_spot(point2_t pos)
 	return -1;
 }
 
-void DoomMap::remove_overlapping_lines(vector<Line*> &list)
+void DoomMap::remove_overlapping_lines(vector<Line*> &list, bool merge)
 {
 	for (int a = 0; a < list.size(); a++)
 	{
 		for (int l = 0; l < n_lines(); l++)
 		{
+			if (vector_exists(list, line(l)))
+				continue;
+
 			if (line(l)->has_vertex(list[a]->vertex1()) &&
 				line(l)->has_vertex(list[a]->vertex2()))
 			{
@@ -1769,6 +1907,9 @@ void DoomMap::remove_overlapping_lines(vector<Line*> &list)
 
 void DoomMap::check_split(Vertex* vert)
 {
+	if (!valid(vert))
+		return;
+
 	for (int a = 0; a < n_lines(); a++)
 	{
 		if (line(a)->has_vertex(vert))
@@ -1783,6 +1924,9 @@ void DoomMap::check_split(Vertex* vert)
 
 void DoomMap::check_split(Vertex* vert, vector<Line*> &list)
 {
+	if (!valid(vert))
+		return;
+
 	for (int a = 0; a < list.size(); a++)
 	{
 		if (list[a]->has_vertex(vert))
@@ -1804,8 +1948,7 @@ void DoomMap::merge_vertices(Vertex* v1, Vertex* v2)
 	{
 		if (line(a)->vertex1() == v2)
 			line(a)->set_vertex1(v1);
-
-		if (line(a)->vertex2() == v2)
+		else if (line(a)->vertex2() == v2)
 			line(a)->set_vertex2(v1);
 	}
 
@@ -1814,5 +1957,97 @@ void DoomMap::merge_vertices(Vertex* v1, Vertex* v2)
 
 void DoomMap::merge_like_sectors()
 {
+}
 
+void DoomMap::merge_under_vertex(Vertex* v)
+{
+	if (!valid(v))
+		return;
+
+	for (int a = 0; a < n_verts(); a++)
+	{
+		if (vertices[a] == v)
+			continue;
+
+		if (vertex(a)->pos() == v->pos())
+		{
+			merge_vertices(v, vertex(a));
+			a--;
+		}
+	}
+}
+
+void DoomMap::merge_vertices_spot(point2_t pos)
+{
+	vector<Vertex*> merge;
+
+	for (DWORD v = 0; v < n_verts(); v++)
+	{
+		if (vertices[v]->pos() == pos)
+			merge.push_back(vertices[v]);
+	}
+
+	for (DWORD v = 1; v < merge.size(); v++)
+		merge_vertices(merge[0], merge[v]);
+}
+
+
+void DoomMap::get_selection(vector<Vertex*> &list, bool hilight)
+{
+	if (selected_items.size() == 0 && valid(hilight_vertex()) && hilight)
+	{
+		list.push_back(hilight_vertex());
+		return;
+	}
+
+	for (int a = 0; a < selected_items.size(); a++)
+	{
+		if (valid(vertex(selected_items[a])))
+			list.push_back(vertex(selected_items[a]));
+	}
+}
+
+void DoomMap::get_selection(vector<Line*> &list, bool hilight)
+{
+	if (selected_items.size() == 0 && valid(hilight_line()) && hilight)
+	{
+		list.push_back(hilight_line());
+		return;
+	}
+
+	for (int a = 0; a < selected_items.size(); a++)
+	{
+		if (valid(line(selected_items[a])))
+			list.push_back(line(selected_items[a]));
+	}
+}
+
+void DoomMap::get_selection(vector<Sector*> &list, bool hilight)
+{
+	if (selected_items.size() == 0 && valid(hilight_sector()) && hilight)
+	{
+		list.push_back(hilight_sector());
+		return;
+	}
+
+	for (int a = 0; a < selected_items.size(); a++)
+	{
+		if (valid(sector(selected_items[a])))
+			list.push_back(sector(selected_items[a]));
+	}
+}
+
+void DoomMap::get_selection(vector<Thing*> &list, bool hilight)
+{
+	if (selected_items.size() == 0 && valid(hilight_thing()) && hilight)
+	{
+		list.push_back(hilight_thing());
+		return;
+	}
+
+	for (int a = 0; a < selected_items.size(); a++)
+	{
+		if (valid(thing(selected_items[a])))
+			list.push_back(thing(selected_items[a]));
+	}
 }

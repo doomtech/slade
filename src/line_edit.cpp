@@ -8,7 +8,6 @@
 #include "special_select.h"
 #include "args_edit.h"
 #include "game_config.h"
-#include "archive.h"
 
 #include <wx/list.h>
 #include <wx/notebook.h>

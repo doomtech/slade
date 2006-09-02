@@ -6,6 +6,7 @@
 #include "dm_thing.h"
 #include "dm_line.h"
 #include "dm_sector.h"
+#include "mathstuff.h"
 
 int	gridsize = 32;		// Grid size
 int	edit_mode = 1;		// Edit mode: 0=vertices, 1=lines, 2=sectors, 3=things
@@ -142,7 +143,13 @@ void create_vertex(point2_t mouse)
 		mouse.y = snap_to_grid(mouse.y);
 	}
 
+	if (d_map.check_vertex_spot(mouse) != -1)
+		return;
+
 	Vertex *v = new Vertex(mouse.x, mouse.y, &d_map);
+
+	if (edit_auto_split)
+		d_map.check_split(v);
 }
 
 void create_line(bool close)
@@ -221,17 +228,4 @@ void create_thing(point2_t mouse)
 	Thing *t = new Thing(&d_map);
 	t->copy(&last_thing);
 	t->set_pos(mouse.x, mouse.y);
-}
-
-void line_flip(bool verts, bool sides)
-{
-	vector<int> selection = d_map.selection();
-
-	if (selection.size() == 0 && d_map.hilight() != -1)
-		d_map.hilight_line()->flip(verts, sides);
-	else if (selection.size() > 0)
-	{
-		for (int a = 0; a < selection.size(); a++)
-			d_map.line(selection[a])->flip(verts, sides);
-	}
 }

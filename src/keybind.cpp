@@ -23,118 +23,118 @@ struct keyname_t
 
 keyname_t key_names[] =
 {
-	{ "Up", WXK_UP },
-	{ "Down", WXK_DOWN },
-	{ "Left", WXK_LEFT },
-	{ "Right", WXK_RIGHT },
-	{ "Backspace", WXK_BACK },
-	{ "Tab", WXK_TAB },
-	{ "Return", WXK_RETURN },
-	{ "Escape", WXK_ESCAPE },
-	{ "Space", WXK_SPACE },
-	{ "Delete", WXK_DELETE },
+	{ _T("Up"), WXK_UP },
+	{ _T("Down"), WXK_DOWN },
+	{ _T("Left"), WXK_LEFT },
+	{ _T("Right"), WXK_RIGHT },
+	{ _T("Backspace"), WXK_BACK },
+	{ _T("Tab"), WXK_TAB },
+	{ _T("Return"), WXK_RETURN },
+	{ _T("Escape"), WXK_ESCAPE },
+	{ _T("Space"), WXK_SPACE },
+	{ _T("Delete"), WXK_DELETE },
 
-	{ "Start", WXK_START },
-	{ "LButton", WXK_LBUTTON },
-	{ "RButton", WXK_RBUTTON },
-	{ "Cancel", WXK_CANCEL },
-	{ "MButton", WXK_MBUTTON },
-	{ "Clear", WXK_CLEAR },
-	{ "Shift", WXK_SHIFT },
-	{ "Alt", WXK_ALT },
-	{ "Ctrl", WXK_CONTROL },
-	{ "Menu", WXK_MENU },
-	{ "Pause", WXK_PAUSE },
-	{ "Caps Lock", WXK_CAPITAL },
-	{ "Page Up", WXK_PRIOR },
-	{ "Page Down", WXK_NEXT },
-	{ "End", WXK_END },
-	{ "Home", WXK_HOME },
-	{ "Select", WXK_SELECT },
-	{ "Print", WXK_PRINT },
-	{ "Execute", WXK_EXECUTE },
-	{ "Snapshot", WXK_SNAPSHOT },
-	{ "Insert", WXK_INSERT },
-	{ "Help", WXK_HELP },
+	{ _T("Start"), WXK_START },
+	{ _T("LButton"), WXK_LBUTTON },
+	{ _T("RButton"), WXK_RBUTTON },
+	{ _T("Cancel"), WXK_CANCEL },
+	{ _T("MButton"), WXK_MBUTTON },
+	{ _T("Clear"), WXK_CLEAR },
+	{ _T("Shift"), WXK_SHIFT },
+	{ _T("Alt"), WXK_ALT },
+	{ _T("Ctrl"), WXK_CONTROL },
+	{ _T("Menu"), WXK_MENU },
+	{ _T("Pause"), WXK_PAUSE },
+	{ _T("Caps Lock"), WXK_CAPITAL },
+	{ _T("Page Up"), WXK_PRIOR },
+	{ _T("Page Down"), WXK_NEXT },
+	{ _T("End"), WXK_END },
+	{ _T("Home"), WXK_HOME },
+	{ _T("Select"), WXK_SELECT },
+	{ _T("Print"), WXK_PRINT },
+	{ _T("Execute"), WXK_EXECUTE },
+	{ _T("Snapshot"), WXK_SNAPSHOT },
+	{ _T("Insert"), WXK_INSERT },
+	{ _T("Help"), WXK_HELP },
 
-	{ "Numpad 0", WXK_NUMPAD0 },
-	{ "Numpad 1", WXK_NUMPAD1 },
-	{ "Numpad 2", WXK_NUMPAD2 },
-	{ "Numpad 3", WXK_NUMPAD3 },
-	{ "Numpad 4", WXK_NUMPAD4 },
-	{ "Numpad 5", WXK_NUMPAD5 },
-	{ "Numpad 6", WXK_NUMPAD6 },
-	{ "Numpad 7", WXK_NUMPAD7 },
-	{ "Numpad 8", WXK_NUMPAD8 },
-	{ "Numpad 9", WXK_NUMPAD9 },
-	{ "Multiply", WXK_MULTIPLY },
-	{ "Add", WXK_ADD },
-	{ "Separator", WXK_SEPARATOR },
-	{ "Subtract", WXK_SUBTRACT },
-	{ "Decimal", WXK_DECIMAL },
-	{ "Divide", WXK_DIVIDE },
+	{ _T("Numpad 0"), WXK_NUMPAD0 },
+	{ _T("Numpad 1"), WXK_NUMPAD1 },
+	{ _T("Numpad 2"), WXK_NUMPAD2 },
+	{ _T("Numpad 3"), WXK_NUMPAD3 },
+	{ _T("Numpad 4"), WXK_NUMPAD4 },
+	{ _T("Numpad 5"), WXK_NUMPAD5 },
+	{ _T("Numpad 6"), WXK_NUMPAD6 },
+	{ _T("Numpad 7"), WXK_NUMPAD7 },
+	{ _T("Numpad 8"), WXK_NUMPAD8 },
+	{ _T("Numpad 9"), WXK_NUMPAD9 },
+	{ _T("Multiply"), WXK_MULTIPLY },
+	{ _T("Add"), WXK_ADD },
+	{ _T("Separator"), WXK_SEPARATOR },
+	{ _T("Subtract"), WXK_SUBTRACT },
+	{ _T("Decimal"), WXK_DECIMAL },
+	{ _T("Divide"), WXK_DIVIDE },
 
-	{ "F1", WXK_F1 },
-	{ "F2", WXK_F2 },
-	{ "F3", WXK_F3 },
-	{ "F4", WXK_F4 },
-	{ "F5", WXK_F5 },
-	{ "F6", WXK_F6 },
-	{ "F7", WXK_F7 },
-	{ "F8", WXK_F8 },
-	{ "F9", WXK_F9 },
-	{ "F10", WXK_F10 },
-	{ "F11", WXK_F11 },
-	{ "F12", WXK_F12 },
-	{ "F13", WXK_F13 },
-	{ "F14", WXK_F14 },
-	{ "F15", WXK_F15 },
-	{ "F16", WXK_F16 },
-	{ "F17", WXK_F17 },
-	{ "F18", WXK_F18 },
-	{ "F19", WXK_F19 },
-	{ "F20", WXK_F20 },
-	{ "F21", WXK_F21 },
-	{ "F22", WXK_F22 },
-	{ "F23", WXK_F23 },
-	{ "F24", WXK_F24 },
-	{ "Num Lock", WXK_NUMLOCK },
-	{ "Scroll Lock", WXK_SCROLL },
-	{ "Page Up", WXK_PAGEUP },
-	{ "Page Down", WXK_PAGEDOWN },
+	{ _T("F1"), WXK_F1 },
+	{ _T("F2"), WXK_F2 },
+	{ _T("F3"), WXK_F3 },
+	{ _T("F4"), WXK_F4 },
+	{ _T("F5"), WXK_F5 },
+	{ _T("F6"), WXK_F6 },
+	{ _T("F7"), WXK_F7 },
+	{ _T("F8"), WXK_F8 },
+	{ _T("F9"), WXK_F9 },
+	{ _T("F10"), WXK_F10 },
+	{ _T("F11"), WXK_F11 },
+	{ _T("F12"), WXK_F12 },
+	{ _T("F13"), WXK_F13 },
+	{ _T("F14"), WXK_F14 },
+	{ _T("F15"), WXK_F15 },
+	{ _T("F16"), WXK_F16 },
+	{ _T("F17"), WXK_F17 },
+	{ _T("F18"), WXK_F18 },
+	{ _T("F19"), WXK_F19 },
+	{ _T("F20"), WXK_F20 },
+	{ _T("F21"), WXK_F21 },
+	{ _T("F22"), WXK_F22 },
+	{ _T("F23"), WXK_F23 },
+	{ _T("F24"), WXK_F24 },
+	{ _T("Num Lock"), WXK_NUMLOCK },
+	{ _T("Scroll Lock"), WXK_SCROLL },
+	{ _T("Page Up"), WXK_PAGEUP },
+	{ _T("Page Down"), WXK_PAGEDOWN },
 
-    { "Numpad Space", WXK_NUMPAD_SPACE },
-    { "Numpad Tab", WXK_NUMPAD_TAB },
-    { "Numpad Enter", WXK_NUMPAD_ENTER },
-    { "Numpad F1", WXK_NUMPAD_F1 },
-    { "Numpad F2", WXK_NUMPAD_F2 },
-    { "Numpad F3", WXK_NUMPAD_F3 },
-    { "Numpad F4", WXK_NUMPAD_F4 },
-    { "Numpad Home", WXK_NUMPAD_HOME },
-    { "Numpad Left", WXK_NUMPAD_LEFT },
-    { "Numpad Up", WXK_NUMPAD_UP },
-    { "Numpad Right", WXK_NUMPAD_RIGHT },
-    { "Numpad Down", WXK_NUMPAD_DOWN },
-    { "Numpad Page Up", WXK_NUMPAD_PRIOR },
-    { "Numpad Page Up", WXK_NUMPAD_PAGEUP },
-    { "Numpad Page Down", WXK_NUMPAD_NEXT },
-    { "Numpad Page Down", WXK_NUMPAD_PAGEDOWN },
-    { "Numpad End", WXK_NUMPAD_END },
-    { "Numpad Home", WXK_NUMPAD_BEGIN },
-    { "Numpad Insert", WXK_NUMPAD_INSERT },
-    { "Numpad Delete", WXK_NUMPAD_DELETE },
-    { "Numpad Equal", WXK_NUMPAD_EQUAL },
-    { "Numpad Multiply", WXK_NUMPAD_MULTIPLY },
-    { "Numpad Add", WXK_NUMPAD_ADD },
-    { "Numpad Separator", WXK_NUMPAD_SEPARATOR },
-    { "Numpad Subtract", WXK_NUMPAD_SUBTRACT },
-    { "Numpad Decimal", WXK_NUMPAD_DECIMAL },
-    { "Numpad Divide", WXK_NUMPAD_DIVIDE },
+    { _T("Numpad Space"), WXK_NUMPAD_SPACE },
+    { _T("Numpad Tab"), WXK_NUMPAD_TAB },
+    { _T("Numpad Enter"), WXK_NUMPAD_ENTER },
+    { _T("Numpad F1"), WXK_NUMPAD_F1 },
+    { _T("Numpad F2"), WXK_NUMPAD_F2 },
+    { _T("Numpad F3"), WXK_NUMPAD_F3 },
+    { _T("Numpad F4"), WXK_NUMPAD_F4 },
+    { _T("Numpad Home"), WXK_NUMPAD_HOME },
+    { _T("Numpad Left"), WXK_NUMPAD_LEFT },
+    { _T("Numpad Up"), WXK_NUMPAD_UP },
+    { _T("Numpad Right"), WXK_NUMPAD_RIGHT },
+    { _T("Numpad Down"), WXK_NUMPAD_DOWN },
+    { _T("Numpad Page Up"), WXK_NUMPAD_PRIOR },
+    { _T("Numpad Page Up"), WXK_NUMPAD_PAGEUP },
+    { _T("Numpad Page Down"), WXK_NUMPAD_NEXT },
+    { _T("Numpad Page Down"), WXK_NUMPAD_PAGEDOWN },
+    { _T("Numpad End"), WXK_NUMPAD_END },
+    { _T("Numpad Home"), WXK_NUMPAD_BEGIN },
+    { _T("Numpad Insert"), WXK_NUMPAD_INSERT },
+    { _T("Numpad Delete"), WXK_NUMPAD_DELETE },
+    { _T("Numpad Equal"), WXK_NUMPAD_EQUAL },
+    { _T("Numpad Multiply"), WXK_NUMPAD_MULTIPLY },
+    { _T("Numpad Add"), WXK_NUMPAD_ADD },
+    { _T("Numpad Separator"), WXK_NUMPAD_SEPARATOR },
+    { _T("Numpad Subtract"), WXK_NUMPAD_SUBTRACT },
+    { _T("Numpad Decimal"), WXK_NUMPAD_DECIMAL },
+    { _T("Numpad Divide"), WXK_NUMPAD_DIVIDE },
 
-    { "Windows Left", WXK_WINDOWS_LEFT },
-    { "Windows Right", WXK_WINDOWS_RIGHT },
-    { "Windows Menu", WXK_WINDOWS_MENU },
-    { "Windows Command", WXK_COMMAND },
+    { _T("Windows Left"), WXK_WINDOWS_LEFT },
+    { _T("Windows Right"), WXK_WINDOWS_RIGHT },
+    { _T("Windows Menu"), WXK_WINDOWS_MENU },
+    { _T("Windows Command"), WXK_COMMAND },
 };
 int n_key_names = sizeof(key_names) / sizeof(keyname_t);
 
@@ -148,7 +148,7 @@ string get_key_name(int key)
 
 	if (key < 255)
 	{
-		string ret = "";
+		string ret = _T("");
 		ret += (char)key;
 		return ret;
 	}
@@ -206,7 +206,8 @@ void BindList::set_defaults()
 	add("line_flipboth", "F", KMOD_SHIFT|KMOD_CTRL);
 	add("line_begindraw", "Space");
 	add("line_begindraw_rect", "Space", KMOD_SHIFT);
-	add("line_correctrefs", "S", KMOD_CTRL|KMOD_SHIFT);
+	add("line_correctrefs", "R", KMOD_CTRL|KMOD_SHIFT);
+	add("line_split", "S", KMOD_SHIFT);
 
 	add("ldraw_drawpoint", "Mouse1");
 	add("ldraw_cancelpoint", "Mouse3");
@@ -322,16 +323,17 @@ void BindList::set_defaults()
 
 // add: Adds a key binding to the bind list
 // ------------------------------------- >>
-void BindList::add(string name, string key, BYTE mods)
+void BindList::add(char* name, char* key, BYTE mods)
 {
 	keybind_t newkey;
-	newkey.key = key;
+	newkey.key = wxString::FromAscii(key);
 	newkey.mods = mods;
+	string n = wxString::FromAscii(name);
 
 	bool found = false;
 	for (int a = 0; a < controls.size(); a++)
 	{
-		if (controls[a].name == name)
+		if (controls[a].name == n)
 		{
 			controls[a].keys.push_back(newkey);
 			controls[a].defaults.push_back(newkey);
@@ -345,7 +347,7 @@ void BindList::add(string name, string key, BYTE mods)
 	{
 		control_t newcont;
 		newcont.pressed = false;
-		newcont.name = name;
+		newcont.name = n;
 		newcont.keys.push_back(newkey);
 		newcont.defaults.push_back(newkey);
 		controls.push_back(newcont);
@@ -543,18 +545,18 @@ void BindList::save(FILE* fp)
 		if (controls[a].keys.size() == 0)
 			continue;
 
-		fprintf(fp, "\tkey %s ", controls[a].name.c_str());
+		fprintf(fp, "\tkey %s ", chr(controls[a].name));
 
 		int spaces = max_size - controls[a].name.size();
 		for (int b = 0; b < spaces; b++) fprintf(fp, " ");
 
 		if (controls[a].keys.size() == 1)
-			fprintf(fp, "\"%s\" %d\n", controls[a].keys[0].key.c_str(), controls[a].keys[0].mods);
+			fprintf(fp, "\"%s\" %d\n", chr(controls[a].keys[0].key), controls[a].keys[0].mods);
 		else
 		{
 			fprintf(fp, "{ ");
 			for (int b = 0; b < controls[a].keys.size(); b++)
-				fprintf(fp, "\"%s\" %d ", controls[a].keys[b].key.c_str(), controls[a].keys[b].mods);
+				fprintf(fp, "\"%s\" %d ", chr(controls[a].keys[b].key), controls[a].keys[b].mods);
 			fprintf(fp, "}\n");
 		}
 	}
@@ -564,24 +566,24 @@ void BindList::save(FILE* fp)
 
 void BindList::load(Tokenizer *tz)
 {
-	tz->check_token("{");
+	tz->check_token(_T("{"));
 
 	string token = tz->get_token();
-	while (token != "}")
+	while (token != _T("}"))
 	{
-		if (token == "key")
+		if (token == _T("key"))
 		{
 			string name = tz->get_token();
 			string key = tz->get_token();
 
-			if (key == "{")
+			if (key == _T("{"))
 			{
 				int index = 0;
 				while (1)
 				{
 					key = tz->get_token();
 
-					if (key == "}")
+					if (key == _T("}"))
 						break;
 
 					BYTE mods = tz->get_integer();

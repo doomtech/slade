@@ -9,7 +9,6 @@
 //#include "checks.h"
 #include "args_edit.h"
 #include "game_config.h"
-#include "archive.h"
 
 extern Thing last_thing;
 extern DoomMap d_map;

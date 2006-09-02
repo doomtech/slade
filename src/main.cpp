@@ -19,8 +19,6 @@
 #include "console.h"
 
 
-#include "archive.h"
-
 #include <wx/image.h>
 #include <wx/sysopt.h>
 
@@ -45,6 +43,8 @@ string usr_path;
 WadManager *wad_manager = NULL;
 bool startup = false;
 
+Wad reswad;
+
 CVAR(Bool, reopen_wads, true, CVAR_SAVE)
 
 
@@ -56,74 +56,37 @@ extern BindList binds;
 extern int edit_mode;
 
 
-// str_upper: Returns a string in uppercase
-// ------------------------------------- >>
-string str_upper(string str)
-{
-	for(unsigned i = 0; i < str.length(); ++i)
-		str[i] = (char)toupper(str[i]);
-
-	string retval = str;
-	return retval;
-}
-
-string s_fmt(char *str, ...)
-{
-	char text[512] = "";
-	va_list ap;
-
-	va_start(ap, str);
-	vsprintf(text, str, ap);
-	va_end(ap);
-
-	string ret = text;
-	return ret;
-}
-
-void log_message(string message)
-{
-	if (!startup)
-		return;
-
-	wxLogMessage(str_to_wx(message));
-}
-
-void message_box(string message, string caption)
-{
-	wxMessageBox(str_to_wx(message), str_to_wx(caption));
-}
-
 // load_main_config: Loads the main SLADE configuration file
 // ------------------------------------------------------ >>
 void load_main_config(bool wads_open)
 {
 	Tokenizer mr;
 
-	if (!mr.open_file(c_path("slade.cfg", DIR_USR), 0, 0))
+	if (!mr.open_file(c_path(_T("slade.cfg"), DIR_USR), 0, 0))
 		return;
 
 	string token = mr.get_token();
 
-	while (token != "!END")
+	while (token != _T("!END"))
 	{
-		if (token == "cvars")
+		if (token == _T("cvars"))
 			load_cvars(&mr);
 
-		if (token == "colours")
+		if (token == _T("colours"))
 			load_colours(&mr);
 
-		if (token == "iwads")
+		if (token == _T("iwads"))
 			load_game_iwads(&mr);
 
-		if (token == "recent_wads")
+		if (token == _T("recent_wads"))
 			load_recent_wads(&mr);
 
-		if (token == "open_wads" && reopen_wads && !wads_open)
+		if (token == _T("open_wads") && reopen_wads && !wads_open)
 			load_open_wads(&mr);
 
-		if (token == "key_binds")
+		if (token == _T("key_binds"))
 			binds.load(&mr);
-		
+
 		/*
 		if (token == "window_props")
 			load_window_properties(&mr);
@@ -137,7 +100,7 @@ void load_main_config(bool wads_open)
 // ------------------------------------------------------ >>
 void save_main_config()
 {
-	FILE *fp = fopen(c_path("slade.cfg", DIR_USR).c_str(), "wt");
+	FILE *fp = fopen(chr(c_path("slade.cfg", DIR_USR)), "wt");
 
 	save_cvars(fp);
 	save_game_iwads(fp);
@@ -149,14 +112,56 @@ void save_main_config()
 	fclose(fp);
 }
 
+/*
+// str: Converts a wxString to a std::string, converting from unicode to ASCII if necessary
+// ------------------------------------------------------------------------------------- >>
+std::string str(string in)
+{
+	wxCharBuffer buffer = in.ToAscii();
+	std::string ret = (const char*)buffer;
+	return ret;
+}
+*/
+
+// chr: Converts a wxString to an ascii character string
+// -------------------------------------------------- >>
+const char* chr(string str)
+{
+#ifdef UNICODE
+	wxCharBuffer buffer = str.ToAscii();
+	const char* data = buffer;
+	return data;
+#else
+	return (const char*)str.ToAscii();
+#endif
+}
+
+// message_box: Pops up a message box
+// ------------------------------- >>
+void message_box(string message, string caption)
+{
+	wxMessageBox(message, caption);
+}
+
+// log_message: Writes a message to slade.log
+// --------------------------------------- >>
+void log_message(string message)
+{
+	wxLogMessage(message);
+}
+
+// c_path: Adds a path to a filename
+// ------------------------------ >>
 string c_path(string filename, BYTE dir)
 {
 	if (dir == DIR_APP)
-		return s_fmt("%s%s", app_path.c_str(), filename.c_str());
+		return s_fmt(_T("%s%s"), chr(app_path), chr(filename));
 	if (dir == DIR_TMP)
-		return s_fmt("%s%s", tmp_path.c_str(), filename.c_str());
+		return s_fmt(_T("%s%s"), chr(tmp_path), chr(filename));
 	if (dir == DIR_USR)
-		return s_fmt("%s%s", usr_path.c_str(), filename.c_str());
+		return s_fmt(_T("%s%s"), chr(usr_path), chr(filename));
+
+	return _T("");
 }
 
 void update_statusbar()
@@ -164,9 +169,19 @@ void update_statusbar()
 	editor_window->update_statusbar();
 }
 
+void update_infobar()
+{
+	editor_window->update_infobar();
+}
+
 void redraw_map(bool map, bool grid)
 {
 	editor_window->map()->redraw(map, grid);
+}
+
+float get_zoom()
+{
+	return (float)editor_window->map()->get_zoom();
 }
 
 void change_edit_mode(int mode)
@@ -215,35 +230,27 @@ bool MainApp::OnInit()
 {
 	srand(wxGetLocalTime());
 
-	/*
-	// Setup working directory
-#ifdef __APPLE__
-	CFURLRef bundleRef = CFBundleCopyBundleURL(CFBundleGetMainBundle());
-	CFStringRef bundlePath = CFURLCopyFileSystemPath(bundleRef, kCFURLPOSIXPathStyle);
-	wxString dataDir = str_to_wx(string(CFStringGetCStringPtr(bundlePath, CFStringGetSystemEncoding())) + "/Contents/Resources/");
-	userPath = string(getenv("HOME")) + string("/Library/Application Support/Slade");
-	if(!wxDirExists(str_to_wx(userPath)))
-		wxMkdir(str_to_wx(userPath), 0700);
-	wxSetWorkingDirectory(dataDir);
-#elif wxCHECK_VERSION(2, 6, 0)
-	wxStandardPaths sp;
-	wxString dataDir = sp.GetDataDir();
-#endif
-	*/
-
 	// Init logfile
-	wxLog::SetActiveTarget(new wxLogStderr(fopen(c_path("slade.log", DIR_USR).c_str(), "wt")));
+	wxLog::SetActiveTarget(new wxLogStderr(fopen(chr(c_path("slade.log", DIR_USR)), "wt")));
 
 	// Allow high-colour toolbar icons
-	wxSystemOptions::SetOption(wxT("msw.remap"), 0);
+	wxSystemOptions::SetOption(_T("msw.remap"), 0);
 
 	// Load image handlers
 	wxImage::AddHandler(new wxPNGHandler);
 
+	if (!reswad.openZip(c_path(_T("slade.pk3"), DIR_APP)))
+	{
+		message_box(_T("Unable to open slade.pk3!"), _T("Error"));
+		save_main_config();
+		wxTheApp->ExitMainLoop();
+		return false;
+	}
+
 	startup = true;
 
 	setup_splash();
-	splash("Starting up...", false);
+	splash(_T("Starting up..."), false);
 
 	// Parse command line
 	bool wads_opened = false;
@@ -264,12 +271,19 @@ bool MainApp::OnInit()
 	// Parse command line args
 	for (int a = 1; a < argc; a++)
 	{
-		wxString arg = argv[a];
+		string arg = argv[a];
 
-		if (arg.Right(4).CmpNoCase(_T(".wad")))
+		if (arg.Right(4).CmpNoCase(_T(".wad")) == 0)
 		{
 			//log_message(s_fmt("Opening wad %s", wx_to_str(arg).c_str()));
-			wads.open_wad(wx_to_str(arg));
+			wads.open(arg);
+			wads_opened = true;
+		}
+
+		if (arg.Right(4).CmpNoCase(_T(".pk3")) == 0 || arg.Right(4).CmpNoCase(_T(".zip")) == 0)
+		{
+			//log_message(s_fmt("Opening wad %s", wx_to_str(arg).c_str()));
+			wads.open(arg, WL_ZIP);
 			wads_opened = true;
 		}
 	}
@@ -283,12 +297,6 @@ bool MainApp::OnInit()
 
 	wad_manager = new WadManager(editor_window);
 	splash_hide();
-
-	/*
-	MemLump *test = new MemLump();
-	get_from_pk3(test, "slade.ico");
-	test->dump_to_file("testy.ico");
-	*/
 
 	return true;
 }

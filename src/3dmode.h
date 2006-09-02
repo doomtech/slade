@@ -13,3 +13,4 @@ void paste_side_3d(bool xoff, bool yoff, bool textures = false);
 void toggle_texture_peg_3d(bool upper);
 void change_light_3d(int amount);
 void reset_offsets_3d(bool x = true, bool y = true);
+void auto_align_x_3d();

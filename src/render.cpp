@@ -374,10 +374,10 @@ void render_line(Line* line, BYTE part, bool hl = false)
 			trans_lines.push_back(line);
 	}
 
-	bool up_sky = (line->side1()->get_sector()->tex_ceil() == "F_SKY1" &&
-					line->side2()->get_sector()->tex_ceil() == "F_SKY1");
-	bool lo_sky = (line->side1()->get_sector()->tex_floor() == "F_SKY1" &&
-					line->side2()->get_sector()->tex_floor() == "F_SKY1");
+	bool up_sky = (line->side1()->get_sector()->tex_ceil() == _T("F_SKY1") &&
+					line->side2()->get_sector()->tex_ceil() == _T("F_SKY1"));
+	bool lo_sky = (line->side1()->get_sector()->tex_floor() == _T("F_SKY1") &&
+					line->side2()->get_sector()->tex_floor() == _T("F_SKY1"));
 
 	if (!render_sky)
 	{
@@ -819,6 +819,9 @@ void render_hilight_ssects()
 
 void render_ssect(unsigned int ssect)
 {
+	if (!ssect_sectors)
+		return;
+
 	if (ssect_sectors[ssect] == -1)
 		return;
 
@@ -840,7 +843,7 @@ void render_ssect(unsigned int ssect)
 	int v = 0;
 
 	// Draw floor
-	bool draw = (sec->get_tex()->name != "F_SKY1" || !render_sky);
+	bool draw = (sec->get_tex()->name != _T("F_SKY1") || !render_sky);
 
 	if (draw)
 	{
@@ -923,7 +926,7 @@ void render_ssect(unsigned int ssect)
 	// Draw ceiling
 	dist = dist_ray_plane(camera.position, dir, c_plane);
 	hit = camera.position + (dir * dist);
-	draw = (sec->get_tex(false)->name != "F_SKY1" || !render_sky);
+	draw = (sec->get_tex(false)->name != _T("F_SKY1") || !render_sky);
 
 	if (draw)
 	{
@@ -1070,7 +1073,7 @@ void render_skydome()
 	glDisable(GL_DEPTH_TEST);
 	glDepthMask(GL_FALSE);
 
-	Texture* stex = get_texture("SKY1", 1);
+	Texture* stex = get_texture(_T("SKY1"), 1);
 	bind_tex(stex->get_gl_id());
 
 	glBegin(GL_QUADS);
@@ -1212,7 +1215,7 @@ void render_3d_view(int width, int height)
 	glLoadIdentity();
 
 	// Crosshair
-	draw_texture((width / 2) - 16, (height / 2) - 16, 32, 32, "_xhair", 4, col_3d_crosshair);
+	draw_texture((width / 2) - 16, (height / 2) - 16, 32, 32, _T("_xhair"), 4, col_3d_crosshair);
 
 	// Messages
 	for (int a = 0; a < messages_3d.size(); a++)
@@ -1233,8 +1236,8 @@ void render_3d_view(int width, int height)
 		messages_3d[a].fade -= 7;
 	}
 
-	draw_text(0, height - 10, COL_WHITE, 0, "Lines: %d", vis_line);
-	draw_text(0, height - 20, COL_WHITE, 0, "Ssects: %d", vis_ssect);
+	draw_text(0, height - 10, COL_WHITE, 0, false, "Lines: %d", vis_line);
+	draw_text(0, height - 20, COL_WHITE, 0, false, "Ssects: %d", vis_ssect);
 	vis_line = vis_ssect = 0;
 }
 

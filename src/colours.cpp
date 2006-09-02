@@ -63,26 +63,26 @@ crosshair       {	255	255	0	50	1	}
 
 coldef_t colours[] =
 {
-	{ "background",			"Background",				col_background },
-	{ "grid",				"Grid",						col_grid },
-	{ "64grid",				"64 Grid",					col_64grid },
-	{ "line_solid",			"Solid Line",				col_line_solid },
-	{ "line_2s",			"2-Sided Line",				col_line_2s },
-	{ "line_monster",		"Monster Blocking Line",	col_line_monster },
-	{ "line_special",		"Special Line",				col_line_special },
-	{ "line_nofirst",		"Invalid Line",				col_line_nofirst },
-	{ "hilight",			"Hilighted Item",			col_hilight },
-	{ "selection",			"Selected Item",			col_selection },
-	{ "moving",				"Moving Item",				col_moving },
-	{ "tagged",				"Tagged Item",				col_tagged },
-	{ "vertex",				"Vertex",					col_vertex },
-	{ "linedraw",			"Draw Lines",				col_linedraw },
-	{ "selbox",				"Selection Box Inside",		col_selbox },
-	{ "selbox_line",		"Selection Box Outline",	col_selbox_line },
-	{ "crosshair",			"2D Mode Crosshair",		col_crosshair },
-	{ "3d_crosshair",		"3D Mode Crosshair",		col_3d_crosshair },
-	{ "3d_hilight",			"3D Mode Hilight Shade",	col_3d_hilight },
-	{ "3d_hilight_line",	"3D Mode Hilight Outline",	col_3d_hilight_line },
+	{ _T("background"),			_T("Background"),				col_background },
+	{ _T("grid"),				_T("Grid"),						col_grid },
+	{ _T("64grid"),				_T("64 Grid"),					col_64grid },
+	{ _T("line_solid"),			_T("Solid Line"),				col_line_solid },
+	{ _T("line_2s"),			_T("2-Sided Line"),				col_line_2s },
+	{ _T("line_monster"),		_T("Monster Blocking Line"),	col_line_monster },
+	{ _T("line_special"),		_T("Special Line"),				col_line_special },
+	{ _T("line_nofirst"),		_T("Invalid Line"),				col_line_nofirst },
+	{ _T("hilight"),			_T("Hilighted Item"),			col_hilight },
+	{ _T("selection"),			_T("Selected Item"),			col_selection },
+	{ _T("moving"),				_T("Moving Item"),				col_moving },
+	{ _T("tagged"),				_T("Tagged Item"),				col_tagged },
+	{ _T("vertex"),				_T("Vertex"),					col_vertex },
+	{ _T("linedraw"),			_T("Draw Lines"),				col_linedraw },
+	{ _T("selbox"),				_T("Selection Box Inside"),		col_selbox },
+	{ _T("selbox_line"),		_T("Selection Box Outline"),	col_selbox_line },
+	{ _T("crosshair"),			_T("2D Mode Crosshair"),		col_crosshair },
+	{ _T("3d_crosshair"),		_T("3D Mode Crosshair"),		col_3d_crosshair },
+	{ _T("3d_hilight"),			_T("3D Mode Hilight Shade"),	col_3d_hilight },
+	{ _T("3d_hilight_line"),	_T("3D Mode Hilight Outline"),	col_3d_hilight_line },
 };
 int n_colours = sizeof(colours) / sizeof(coldef_t);
 
@@ -92,7 +92,7 @@ int n_colours = sizeof(colours) / sizeof(coldef_t);
 void parse_rgba(Tokenizer *tz, rgba_t* col)
 {
 	// Read opening brace
-	tz->check_token("{");
+	tz->check_token(_T("{"));
 
 	// Read rgba
 	col->r = tz->get_integer();
@@ -100,15 +100,15 @@ void parse_rgba(Tokenizer *tz, rgba_t* col)
 	col->b = tz->get_integer();
 
 	// Read alpha if specified
-	if (tz->peek_token() != "}")
+	if (tz->peek_token() != _T("}"))
 		col->a = tz->get_integer();
 
 	// Read blend if specified
-	if (tz->peek_token() != "}")
+	if (tz->peek_token() != _T("}"))
 		col->blend = tz->get_integer();
 
 	// Read closing brace
-	tz->check_token("}");
+	tz->check_token(_T("}"));
 }
 
 // load_colour_config: Reads a colour configuration file
@@ -121,10 +121,10 @@ void load_colour_config(string filename)
 
 	string token = tz.get_token();
 
-	if (token != "colour_config")
+	if (token != _T("colour_config"))
 		return;
 
-	tz.check_token("{");
+	tz.check_token(_T("{"));
 
 	hilight_size = 3.0f;
 	selection_size = 5.0f;
@@ -132,17 +132,17 @@ void load_colour_config(string filename)
 	hilight_style = 0;
 
 	token = tz.get_token();
-	while (token != "}")
+	while (token != _T("}"))
 	{
 		string name = token;
 		
-		if (name == "hilight_size")
+		if (name == _T("hilight_size"))
 			hilight_size = tz.get_float();
-		else if (name == "selection_size")
+		else if (name == _T("selection_size"))
 			selection_size = tz.get_float();
-		else if (name == "moving_size")
+		else if (name == _T("moving_size"))
 			moving_size = tz.get_float();
-		else if (name == "hilight_style")
+		else if (name == _T("hilight_style"))
 			hilight_style = tz.get_integer();
 		else
 		{
@@ -164,7 +164,7 @@ void load_colour_config(string filename)
 // --------------------------------------- >>
 void load_colours(Tokenizer *tz)
 {
-	tz->check_token("{");
+	tz->check_token(_T("{"));
 
 	hilight_size = 3.0f;
 	selection_size = 5.0f;
@@ -172,17 +172,17 @@ void load_colours(Tokenizer *tz)
 	hilight_style = 0;
 
 	string token = tz->get_token();
-	while (token != "}")
+	while (token != _T("}"))
 	{
 		string name = token;
 
-		if (name == "hilight_size")
+		if (name == _T("hilight_size"))
 			hilight_size = tz->get_float();
-		else if (name == "selection_size")
+		else if (name == _T("selection_size"))
 			selection_size = tz->get_float();
-		else if (name == "moving_size")
+		else if (name == _T("moving_size"))
 			moving_size = tz->get_float();
-		else if (name == "hilight_style")
+		else if (name == _T("hilight_style"))
 			hilight_style = tz->get_integer();
 		else
 		{
@@ -204,7 +204,7 @@ void load_colours(Tokenizer *tz)
 // ----------------------------------------------------------------- >>
 void save_colour_config(string filename)
 {
-	if (filename == "")
+	if (filename == _T(""))
 		return;
 
 	int max_size = 0;
@@ -214,14 +214,14 @@ void save_colour_config(string filename)
 			max_size = colours[c].name.size();
 	}
 
-	FILE* fp = fopen(filename.c_str(), "wt");
+	FILE* fp = fopen(chr(filename), "wt");
 
 	fprintf(fp, "\ncolour_config\n");
 	fprintf(fp, "{\n");
 
 	for (int a = 0; a < n_colours; a++)
 	{
-		fprintf(fp, "\t%s ", colours[a].name.c_str());
+		fprintf(fp, "\t%s ", chr(colours[a].name));
 
 		int spaces = max_size - colours[a].name.size();
 		for (int b = 0; b < spaces; b++) fprintf(fp, " ");
@@ -256,7 +256,7 @@ void save_colours(FILE* fp)
 
 	for (int a = 0; a < n_colours; a++)
 	{
-		fprintf(fp, "\t%s ", colours[a].name.c_str());
+		fprintf(fp, "\t%s ", chr(colours[a].name));
 
 		int spaces = max_size - colours[a].name.size();
 		for (int b = 0; b < spaces; b++) fprintf(fp, " ");

@@ -87,6 +87,9 @@ public:
 
 		// Thing context menu
 		EWMENU_THING_INSERT,
+
+		// Line context menu
+		EWMENU_LINE_SPLITAT,
 	};
 
 	EditorWindow(const wxChar *title, int xpos, int ypos, int width, int height);
@@ -160,6 +163,8 @@ public:
 	void check_checktextures(wxCommandEvent &event);
 
 	void thing_insert(wxCommandEvent &event);
+
+	void line_splitat(wxCommandEvent &event);
 
 	DECLARE_EVENT_TABLE()
 };

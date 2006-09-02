@@ -68,6 +68,8 @@ public:
 	Side*	side1()		{ return s1; }
 	Side*	side2()		{ return s2; }
 
+	Side*	side(bool front) { if (front) return s1; else return s2; }
+
 	int		get_flags() { return flags; }
 	int		get_sector_tag() { return sector_tag; }
 	int		get_special() { return type; }

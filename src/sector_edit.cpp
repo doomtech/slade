@@ -5,7 +5,6 @@
 #include "dm_sector.h"
 #include "game_config.h"
 #include "stype_select.h"
-#include "archive.h"
 
 extern DoomMap d_map;
 extern GameConfig game;

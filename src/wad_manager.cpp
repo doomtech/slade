@@ -16,7 +16,6 @@
 #include "doom_map.h"
 #include "editor_window.h"
 #include "draw.h"
-#include "archive.h"
 
 #include <wx/dir.h>
 #include <wx/notebook.h>
@@ -80,7 +79,10 @@ void load_open_wads(Tokenizer *tz)
 	while (token != "}")
 	{
 		if (token == "wad")
-			wads.open_wad(tz->get_token());
+			wads.open(tz->get_token());
+
+		if (token == "zip")
+			wads.open(tz->get_token(), WL_ZIP);
 
 		token = tz->get_token();
 	}
@@ -90,8 +92,18 @@ void save_open_wads(FILE *fp)
 {
 	fprintf(fp, "open_wads\n{\n");
 
-	for (int a = 0; a < wads.n_wads; a++)
-		fprintf(fp, "\twad \"%s\"\n", wads.get_wad(a)->path.c_str());
+	for (int a = 0; a < wads.nWads(); a++)
+	{
+		Wad* wad = wads.getWad(a);
+
+		if (!wad->parent)
+		{
+			if (wad->zip)
+				fprintf(fp, "\tzip \"%s\"\n", chr(wad->path));
+			else
+				fprintf(fp, "\twad \"%s\"\n", chr(wad->path));
+		}
+	}
 
 	fprintf(fp, "}\n\n");
 }
@@ -167,7 +179,7 @@ void MapPreviewCanvas::preview_map(Wad* wad, string mapname)
 	preview_lines.clear();
 	dimensions.set(0, 0);
 
-	if (!wad || mapname == "")
+	if (!wad || mapname == "" || wad->zip)
 		return;
 
 	//wxLogMessage(_T("Preview map %s in %s"), mapname.c_str(), wad->path.c_str());
@@ -175,8 +187,8 @@ void MapPreviewCanvas::preview_map(Wad* wad, string mapname)
 	vector<point2_t> verts;
 	bool hexen_format = false;
 
-	long offset = wad->get_lump_index(mapname);
-	FILE* fp = fopen(wad->path.c_str(), "rb");
+	long offset = wad->getLumpIndex(mapname);
+	//FILE* fp = fopen(str(wad->path).c_str(), "rb");
 
 	// Check for BEHAVIOR lump
 	long index = offset;
@@ -186,23 +198,23 @@ void MapPreviewCanvas::preview_map(Wad* wad, string mapname)
 	{
 		index++;
 
-		if (index >= wad->num_lumps)
+		if (index >= wad->numLumps())
 			done = true;
-		else if (!strncmp(wad->directory[index]->Name().c_str(), "THINGS", 6) ||
-			!strncmp(wad->directory[index]->Name().c_str(), "LINEDEFS", 8) ||
-			!strncmp(wad->directory[index]->Name().c_str(), "SIDEDEFS", 8) ||
-			!strncmp(wad->directory[index]->Name().c_str(), "VERTEXES", 8) ||
-			!strncmp(wad->directory[index]->Name().c_str(), "SEGS", 4) ||
-			!strncmp(wad->directory[index]->Name().c_str(), "SSECTORS", 8) ||
-			!strncmp(wad->directory[index]->Name().c_str(), "NODES", 5) ||
-			!strncmp(wad->directory[index]->Name().c_str(), "SECTORS", 7) ||
-			!strncmp(wad->directory[index]->Name().c_str(), "REJECT", 6) ||
-			!strncmp(wad->directory[index]->Name().c_str(), "SCRIPTS", 7) ||
-			!strncmp(wad->directory[index]->Name().c_str(), "BLOCKMAP", 8))
+		else if (wad->lumpAt(index)->getName() == _T("THINGS")	||
+				wad->lumpAt(index)->getName() == _T("LINEDEFS") ||
+				wad->lumpAt(index)->getName() == _T("SIDEDEFS") ||
+				wad->lumpAt(index)->getName() == _T("VERTEXES") ||
+				wad->lumpAt(index)->getName() == _T("SEGS")		||
+				wad->lumpAt(index)->getName() == _T("SSECTORS") ||
+				wad->lumpAt(index)->getName() == _T("NODES")	||
+				wad->lumpAt(index)->getName() == _T("SECTORS")	||
+				wad->lumpAt(index)->getName() == _T("REJECT")	||
+				wad->lumpAt(index)->getName() == _T("SCRIPTS")	||
+				wad->lumpAt(index)->getName() == _T("BLOCKMAP"))
 		{
 			done = false;
 		}
-		else if (strncmp(wad->directory[index]->Name().c_str(), "BEHAVIOR", 8) == 0)
+		else if (wad->lumpAt(index)->getName() == _T("BEHAVIOR"))
 		{
 			hexen_format = true;
 			done = true;
@@ -212,23 +224,26 @@ void MapPreviewCanvas::preview_map(Wad* wad, string mapname)
 	}
 
 	// Read vertices
-	Lump* lump = wad->get_lump("VERTEXES", offset);
+	Lump* lump = wad->getLump(_T("VERTEXES"), offset);
 
 	if (!lump)
 		return;
 
-	fseek(fp, lump->Offset(), SEEK_SET);
-	int n_verts = lump->Size() / 4;
+	int n_verts = lump->getSize() / 4;
 
 	short min_x = 20000;
 	short min_y = 20000;
 	short max_x = -20000;
 	short max_y = -20000;
+
+	BYTE* data = lump->getData();
 	for (int a = 0; a < n_verts; a++)
 	{
 		short x, y;
-		lefread(&x, 2, 1, fp);
-		lefread(&y, 2, 1, fp);
+		memcpy(&x, data, 2);
+		data += 2;
+		memcpy(&y, data, 2);
+		data += 2;
 
 		y = -y;
 
@@ -256,34 +271,31 @@ void MapPreviewCanvas::preview_map(Wad* wad, string mapname)
 	max_x += 256;
 	max_y += 256;
 	dimensions.set(max_x - min_x, max_y - min_y);
-	//preview_lines.push_back(rect_t(min_x - 256, min_y - 256, max_x + 256, max_y + 256));
 
 	// Read lines
-	lump = wad->get_lump("LINEDEFS", offset);
+	lump = wad->getLump(_T("LINEDEFS"), offset);
 
 	if (!lump)
 		return;
-
-	fseek(fp, lump->Offset(), SEEK_SET);
 
 	int size = 0;
 	if (hexen_format) size = 16;
 	else size = 14;
 
-	int n_lines = lump->Size() / size;
+	int n_lines = lump->getSize() / size;
 
+	data = lump->getData();
 	for (int a = 0; a < n_lines; a++)
 	{
 		short v1, v2;
-		lefread(&v1, 2, 1, fp);
-		lefread(&v2, 2, 1, fp);
-		//wxLogMessage("v1 %d v2 %d t %d", v1, v2, verts.size());
+		memcpy(&v1, data, 2);
+		data += 2;
+		memcpy(&v2, data, 2);
+		data += 2;
 
 		preview_lines.push_back(rect_t(verts[v1], verts[v2]));
-		fseek(fp, size - 4, SEEK_CUR);
+		data += (size - 4);
 	}
-
-	fclose(fp);
 }
 
 BEGIN_EVENT_TABLE(MapPreviewCanvas, wxGLCanvas)
@@ -501,10 +513,10 @@ wxStaticBoxSizer *WadManager::setup_map_list_frame(wxWindow *panel)
 void WadManager::populate_wad_list()
 {
 	open_wads_list->Clear();
-	open_wads_list->Append(str_to_wx(wads.get_iwad()->path));
+	open_wads_list->Append(wads.getWad()->path);
 
-	for (int a = 0; a < wads.n_wads; a++)
-		open_wads_list->Append(str_to_wx(wads.get_wad(a)->path));
+	for (int a = 0; a < wads.nWads(); a++)
+		open_wads_list->Append(wads.getWad(a)->path);
 }
 
 void WadManager::populate_recent_wads_list()
@@ -512,24 +524,24 @@ void WadManager::populate_recent_wads_list()
 	recent_wads_list->Clear();
 
 	for (int a = 0; a < recent_wads.size(); a++)
-		recent_wads_list->Append(str_to_wx(recent_wads[a]));
+		recent_wads_list->Append(recent_wads[a]);
 }
 
 void WadManager::populate_map_list()
 {
 	available_maps->Clear();
 	
-	Wad* wad = wads.get_iwad();
+	Wad* wad = wads.getWad();
 	int index = open_wads_list->GetSelection();
-	
+
 	if (index == wxNOT_FOUND)
 		return;
 
 	if (index > 0)
-		wad = wads.get_wad(index - 1);
+		wad = wads.getWad(index - 1);
 
 	for (int a = 0; a < wad->available_maps.size(); a++)
-			available_maps->Append(str_to_wx(wad->available_maps[a]));
+		available_maps->Append(wad->available_maps[a]);
 }
 
 BEGIN_EVENT_TABLE(WadManager, wxFrame)
@@ -562,6 +574,7 @@ void WadManager::close(wxCloseEvent &event)
 	}
 
 	Hide();
+	editor_window->Raise();
 }
 
 void WadManager::game_combo_changed(wxCommandEvent &event)
@@ -594,12 +607,12 @@ void WadManager::open_wads_list_changed(wxCommandEvent &event)
 	int index = open_wads_list->GetSelection();
 	if (index == 0)
 	{
-		selected_wad = wads.get_iwad();
+		selected_wad = wads.getWad();
 		btn_new_map->Enable(false);
 	}
 	else if (index != wxNOT_FOUND)
 	{
-		selected_wad = wads.get_wad(index - 1);
+		selected_wad = wads.getWad(index - 1);
 		btn_new_map->Enable(true);
 	}
 	else
@@ -611,21 +624,26 @@ void WadManager::open_wads_list_changed(wxCommandEvent &event)
 
 void WadManager::map_list_changed(wxCommandEvent &event)
 {
-	map_preview->preview_map(selected_wad, wx_to_str(available_maps->GetString(available_maps->GetSelection())));
+	map_preview->preview_map(selected_wad, available_maps->GetString(available_maps->GetSelection()));
 	map_preview->Refresh();
 	tabs->SetSelection(1);
 }
 
 void WadManager::open_wad_clicked(wxCommandEvent &event)
 {
-	string filename = "";
-	wxFileDialog browse(NULL, _T("Open PWAD"), _T(""), _T(""), _T("Doom Wad Files (*.wad)|*.wad"), wxOPEN|wxFILE_MUST_EXIST);
+	string filename = _T("");
+	wxFileDialog browse(NULL, _T("Open PWAD"), _T(""), _T(""), _T("Doom Wad Files (*.wad)|*.wad|Zip Files (*.zip)|*.zip|PK3 Zip Files (*.pk3)|*.pk3"), wxOPEN|wxFILE_MUST_EXIST);
 	if (browse.ShowModal() == wxID_OK)
-		filename = wx_to_str(browse.GetPath());
+		filename = browse.GetPath();
 
-	if (filename != "")
+	if (filename != _T(""))
 	{
-		wads.open_wad(filename);
+		BYTE flags = 0;
+
+		if (!filename.Right(3).CmpNoCase(_T("zip")) || !filename.Right(3).CmpNoCase(_T("pk3")))
+			flags = WL_ZIP;
+
+		wads.open(filename, flags);
 		populate_wad_list();
 		add_recent_wad(filename);
 		populate_recent_wads_list();
@@ -637,7 +655,7 @@ void WadManager::open_wad_clicked(wxCommandEvent &event)
 
 void WadManager::close_wad_clicked(wxCommandEvent &event)
 {
-	wads.close_wad(wx_to_str(open_wads_list->GetString(open_wads_list->GetSelection())));
+	wads.close(open_wads_list->GetString(open_wads_list->GetSelection()));
 	populate_wad_list();
 	game_changed = true;
 	game.read_decorate_lumps();
@@ -645,7 +663,7 @@ void WadManager::close_wad_clicked(wxCommandEvent &event)
 
 void WadManager::close_all_clicked(wxCommandEvent &event)
 {
-	wads.close_all();
+	wads.closeAll();
 	populate_wad_list();
 	game_changed = true;
 	game.read_decorate_lumps();
@@ -653,7 +671,7 @@ void WadManager::close_all_clicked(wxCommandEvent &event)
 
 void WadManager::new_standalone_clicked(wxCommandEvent &event)
 {
-	if (wads.get_iwad()->path == "")
+	if (!wads.getWad())
 	{
 		wxMessageBox(_T("No IWAD Loaded!"), _T("Error"), wxICON_ERROR);
 		return;
@@ -677,14 +695,19 @@ void WadManager::new_standalone_clicked(wxCommandEvent &event)
 
 		editor_window->open_map(NULL, mapname);
 		Hide();
+		editor_window->Raise();
 	}
 }
 
 void WadManager::recent_wads_list_activated(wxCommandEvent &event)
 {
-	string filename = wx_to_str(recent_wads_list->GetString(recent_wads_list->GetSelection()));
+	string filename = recent_wads_list->GetString(recent_wads_list->GetSelection());
+	BYTE flags = 0;
 
-	if (!wads.open_wad(filename))
+	if (!filename.Right(3).CmpNoCase(_T("zip")) || !filename.Right(3).CmpNoCase(_T("pk3")))
+		flags = WL_ZIP;
+
+	if (!wads.open(filename, flags))
 		wxMessageBox(wxString::Format(_T("Failed opening wadfile \"%s\""), filename.c_str()), _T("Error"), wxICON_ERROR);
 	else
 	{
@@ -699,13 +722,13 @@ void WadManager::recent_wads_list_activated(wxCommandEvent &event)
 
 void WadManager::maps_list_activated(wxCommandEvent &event)
 {
-	if (wads.get_iwad()->path == "")
+	if (!wads.getWad())
 	{
 		wxMessageBox(_T("No IWAD Loaded!"), _T("Error"), wxICON_ERROR);
 		return;
 	}
 
-	string mapname = wx_to_str(available_maps->GetString(available_maps->GetSelection()));
+	string mapname = available_maps->GetString(available_maps->GetSelection());
 
 	if (mapname == "")
 		return;
@@ -717,11 +740,12 @@ void WadManager::maps_list_activated(wxCommandEvent &event)
 		return;
 
 	Hide();
+	editor_window->Raise();
 }
 
 void WadManager::new_map_clicked(wxCommandEvent &event)
 {
-	if (wads.get_iwad()->path == "")
+	if (!wads.getWad())
 	{
 		wxMessageBox(_T("No IWAD Loaded!"), _T("Error"), wxICON_ERROR);
 		return;
@@ -729,11 +753,11 @@ void WadManager::new_map_clicked(wxCommandEvent &event)
 
 	string mapname = game.ask_map_name();
 
-	if (mapname != "")
+	if (mapname != _T(""))
 	{
 		if (vector_exists(selected_wad->available_maps, mapname))
 		{
-			wxMessageBox(wxString::Format(_T("Map %s already exists in the wad!"), mapname.c_str()));
+			message_box(s_fmt(_T("Map %s already exists in the wad!"), chr(mapname)));
 			return;
 		}
 

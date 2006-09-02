@@ -17,7 +17,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
-#ifndef NO_MAP_VIEWER
+//#ifndef NO_MAP_VIEWER
+#if !defined(NO_MAP_VIEWER) && defined(WIN32)
 
 #define WIN32_LEAN_AND_MEAN
 #define _WIN32_WINNT 0x0400
@@ -1048,5 +1049,15 @@ void ResetViews ()
 	DesiredSubsector = 0;
 	DesiredSector = 0;
 }
+
+#else
+
+#include "zdbsp.h"
+#include "doomdata.h"
+
+void ShowView (FLevel *)
+{
+}
+
 
 #endif /* !NO_MAP_VIEWER */

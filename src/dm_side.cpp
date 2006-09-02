@@ -41,33 +41,33 @@ Side::Side(doomside_t s, DoomMap *parent)
 
 	this->parent = parent;
 
-	this->x_offset = s.x_offset;
-	this->y_offset = s.y_offset;
+	this->x_offset = wxINT16_SWAP_ON_BE(s.x_offset);
+	this->y_offset = wxINT16_SWAP_ON_BE(s.y_offset);
 
 	char temp[9] = "";
 	temp[8] = 0;
 
 	memcpy(temp, s.tex_lower, 8);
-	this->tex_lower = str_upper(temp);
+	this->tex_lower = wxString::FromAscii(temp).Upper();
 	tex = get_texture(this->tex_lower);
 	if (tex) tex->use_count++;
 
 	memcpy(temp, s.tex_middle, 8);
-	this->tex_middle = str_upper(temp);
+	this->tex_middle = wxString::FromAscii(temp).Upper();
 	tex = get_texture(this->tex_middle);
 	if (tex) tex->use_count++;
 
 	memcpy(temp, s.tex_upper, 8);
-	this->tex_upper = str_upper(temp);
+	this->tex_upper = wxString::FromAscii(temp).Upper();
 	tex = get_texture(this->tex_upper);
 	if (tex) tex->use_count++;
 
 	if (parent)
 	{
 		parent->add_side(this);
-		sector = parent->sector(s.sector);
+		sector = parent->sector(wxINT16_SWAP_ON_BE(s.sector));
 		if (!parent->valid(sector))
-			log_message(s_fmt("Invalid sector %d", s.sector));
+			log_message(s_fmt("Invalid sector %d", wxINT16_SWAP_ON_BE(s.sector)));
 	}
 }
 
@@ -131,9 +131,9 @@ doomside_t Side::to_doomformat()
 {
 	doomside_t ret;
 
-	ret.sector = short(parent->index(sector));
-	ret.x_offset = (short)x_offset;
-	ret.y_offset = (short)y_offset;
+	ret.sector = wxINT16_SWAP_ON_BE(short(parent->index(sector)));
+	ret.x_offset = wxINT16_SWAP_ON_BE((short)x_offset);
+	ret.y_offset = wxINT16_SWAP_ON_BE((short)y_offset);
 
 	for (int a = 0; a < 8; a++)
 	{

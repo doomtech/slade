@@ -2,7 +2,6 @@
 #include "main.h"
 #include "ttype_select.h"
 #include "game_config.h"
-#include "archive.h"
 
 extern GameConfig game;
 

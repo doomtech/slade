@@ -37,8 +37,8 @@ CVAR(Float, move_speed_3d, 0.2f, CVAR_SAVE)
 CVAR(Float, mouse_speed_3d, 1.0f, CVAR_SAVE)
 CVAR(Int, key_delay_3d, 12, CVAR_SAVE)
 
-#define PRESSED(name) vector_exists(pressed_keys, name)
-#define RELEASED(name) vector_exists(released_keys, name)
+#define PRESSED(name) vector_exists(pressed_keys, _T(name))
+#define RELEASED(name) vector_exists(released_keys, _T(name))
 
 // External Variables --------------------- >>
 extern BindList binds;
@@ -156,6 +156,9 @@ void keys_edit()
 		if (edit_mode == 1)
 			d_map.select_lines_box(selection);
 
+		if (edit_mode == 2)
+			d_map.select_sectors_box(selection);
+
 		if (edit_mode == 3)
 			d_map.select_things_box(selection);
 
@@ -242,7 +245,7 @@ void keys_edit()
 	// Popup context menu
 	if (RELEASED("view_contextmenu") && state())
 	{
-		binds.clear("view_contextmenu");
+		binds.clear(_T("view_contextmenu"));
 		editor_window->popup_context_menu();
 	}
 
@@ -352,7 +355,7 @@ void keys_edit()
 		}
 
 		//get_hilight_item(mouse.x, mouse.y);
-		binds.clear("edit_createitem");
+		binds.clear(_T("edit_createitem"));
 	}
 
 	// Create item 2
@@ -391,7 +394,7 @@ void keys_edit()
 		}
 
 		//get_hilight_item(mouse.x, mouse.y);
-		binds.clear("edit_createitem2");
+		binds.clear(_T("edit_createitem2"));
 	}
 
 	// Select item
@@ -401,7 +404,6 @@ void keys_edit()
 		redraw_map();
 	}
 
-	/*
 	// Sector height quick changes (8 units)
 	if (PRESSED("sector_upfloor8"))
 	{
@@ -500,7 +502,6 @@ void keys_edit()
 		//binds.clear("sector_downlight");
 		sector_changelight(-16);
 	}
-	*/
 
 	// Flip line
 	if (RELEASED("line_flip") && state())
@@ -542,7 +543,7 @@ void keys_edit()
 
 		change_state(STATE_LINEDRAW);
 
-		binds.clear("line_begindraw");
+		binds.clear(_T("line_begindraw"));
 	}
 
 	// Begin rectangle draw
@@ -550,7 +551,7 @@ void keys_edit()
 	{
 		change_state(STATE_SHAPEDRAW);
 
-		binds.clear("line_begindraw_rect");
+		binds.clear(_T("line_begindraw_rect"));
 	}
 
 	/*
@@ -569,17 +570,23 @@ void keys_edit()
 
 	if (RELEASED("edit_createsector"))
 	{
-		sector_create(down_pos(true));
+		vector<Sector*> n_s;
+		sector_create(down_pos(true), n_s);
 	}
 
 	// Edit item
 	if (RELEASED("edit_edititem") && state())
 	{
 		edit_item();
-		binds.clear("edit_edititem");
+		binds.clear(_T("edit_edititem"));
 	}
 
-	/*
+	if (RELEASED("line_split") && state())
+	{
+		line_split_at(down_pos(true));
+		binds.clear(_T("line_split"));
+	}
+
 	// Merge sectors
 	if (RELEASED("sector_merge") && state())
 	{
@@ -593,12 +600,11 @@ void keys_edit()
 		sector_merge(true);
 		binds.clear("sector_join");
 	}
-	*/
 
 	if (RELEASED("view_3dmode") && state())
 	{
-		binds.clear("view_3dmode");
-		binds.clear("3d_exit");
+		binds.clear(_T("view_3dmode"));
+		binds.clear(_T("3d_exit"));
 		start_3d_mode();
 	}
 
@@ -630,13 +636,14 @@ void keys_edit()
 		change_state();
 		editor_window->redraw_map(true, false);
 	}
+	*/
 
 	// Toggle grid snap
 	if (RELEASED("edit_gridsnap"))
 	{
 		binds.clear("edit_gridsnap");
 		edit_snap_grid = !edit_snap_grid;
-		editor_window->redraw_map(false, false);
+		redraw_map();
 	}
 
 	// Toggle hilight lock
@@ -645,7 +652,6 @@ void keys_edit()
 		binds.clear("edit_lockhilight");
 		lock_hilight = !lock_hilight;
 	}
-	*/
 }
 
 void keys_linedraw()
@@ -796,7 +802,7 @@ void keys_linedraw()
 }
 
 //#define KEY_3D_DELAY 7
-int key_3d_rep = 0;
+double key_3d_rep = 0;
 
 bool keys_3d(float mult, bool mwheel)
 {
@@ -808,8 +814,8 @@ bool keys_3d(float mult, bool mwheel)
 
 	if (binds.pressed("3d_exit"))
 	{
-		binds.clear("view_3dmode");
-		binds.clear("3d_exit");
+		binds.clear(_T("view_3dmode"));
+		binds.clear(_T("3d_exit"));
 		return false;
 	}
 
@@ -845,19 +851,19 @@ bool keys_3d(float mult, bool mwheel)
 
 	if (binds.pressed("3d_toggle_fullbright"))
 	{
-		binds.clear("3d_toggle_fullbright");
+		binds.clear(_T("3d_toggle_fullbright"));
 		render_fullbright = !render_fullbright;
 	}
 
 	if (binds.pressed("3d_toggle_fog"))
 	{
-		binds.clear("3d_toggle_fog");
+		binds.clear(_T("3d_toggle_fog"));
 		render_fog = !render_fog;
 	}
 
 	if (binds.pressed("3d_toggle_sky"))
 	{
-		binds.clear("3d_toggle_sky");
+		binds.clear(_T("3d_toggle_sky"));
 		render_sky = !render_sky;
 	}
 	
@@ -874,13 +880,13 @@ bool keys_3d(float mult, bool mwheel)
 
 	if (binds.pressed("3d_toggle_gravity"))
 	{
-		binds.clear("3d_toggle_gravity");
+		binds.clear(_T("3d_toggle_gravity"));
 		camera.gravity = !camera.gravity;
 
 		if (camera.gravity)
-			add_3d_message("Gravity ON");
+			add_3d_message(_T("Gravity ON"));
 		else
-			add_3d_message("Gravity OFF");
+			add_3d_message(_T("Gravity OFF"));
 	}
 
 	// Sector height quick changes (8 units)
@@ -1013,45 +1019,45 @@ bool keys_3d(float mult, bool mwheel)
 
 	if (binds.pressed("3d_toggle_hilight"))
 	{
-		binds.clear("3d_toggle_hilight");
+		binds.clear(_T("3d_toggle_hilight"));
 		render_hilight = !render_hilight;
 	}
 
 	// Upper/Lower unpegged toggle
 	if (binds.pressed("3d_upperunpegged"))
 	{
-		binds.clear("3d_upperunpegged");
+		binds.clear(_T("3d_upperunpegged"));
 		toggle_texture_peg_3d(true);
 	}
 
 	if (binds.pressed("3d_lowerunpegged"))
 	{
-		binds.clear("3d_lowerunpegged");
+		binds.clear(_T("3d_lowerunpegged"));
 		toggle_texture_peg_3d(false);
 	}
 
 	// Change light level
 	if (binds.pressed("3d_uplightlevel"))
 	{
-		binds.clear("3d_uplightlevel");
+		binds.clear(_T("3d_uplightlevel"));
 		change_light_3d(16);
 	}
 
 	if (binds.pressed("3d_downlightlevel"))
 	{
-		binds.clear("3d_downlightlevel");
+		binds.clear(_T("3d_downlightlevel"));
 		change_light_3d(-16);
 	}
 
 	if (binds.pressed("3d_uplightlevel1"))
 	{
-		binds.clear("3d_uplightlevel1");
+		binds.clear(_T("3d_uplightlevel1"));
 		change_light_3d(1);
 	}
 
 	if (binds.pressed("3d_downlightlevel1"))
 	{
-		binds.clear("3d_downlightlevel1");
+		binds.clear(_T("3d_downlightlevel1"));
 		change_light_3d(-1);
 	}
 
@@ -1096,112 +1102,112 @@ bool keys_3d(float mult, bool mwheel)
 			key_3d_rep = key_delay_3d;
 		}
 	}
+	*/
 
-	if (binds.pressed("3d_align_tex_x"))
+	if (binds.pressed(_T("3d_align_tex_x")))
 	{
-		binds.clear("3d_align_tex_x");
+		binds.clear(_T("3d_align_tex_x"));
 		auto_align_x_3d();
 	}
-	*/
 
 	// Reset offsets
 	if (binds.pressed("3d_reset_offsets"))
 	{
-		binds.clear("3d_reset_offsets");
+		binds.clear(_T("3d_reset_offsets"));
 		reset_offsets_3d();
 	}
 
 	if (binds.pressed("3d_reset_xoffset"))
 	{
-		binds.clear("3d_reset_xoffset");
+		binds.clear(_T("3d_reset_xoffset"));
 		reset_offsets_3d(true, false);
 	}
 
 	if (binds.pressed("3d_reset_yoffset"))
 	{
-		binds.clear("3d_reset_yoffset");
+		binds.clear(_T("3d_reset_yoffset"));
 		reset_offsets_3d(false, true);
 	}
 
 	// Change (browse) texture
 	if (binds.pressed("3d_change_texture"))
 	{
-		binds.clear("3d_change_texture");
+		binds.clear(_T("3d_change_texture"));
 		change_texture_3d(false);
 	}
 
 	if (binds.pressed("3d_change_tex_paint"))
 	{
-		binds.clear("3d_change_tex_paint");
+		binds.clear(_T("3d_change_tex_paint"));
 		change_texture_3d(true);
 	}
 
 	// Copy/Paste texture
 	if (binds.pressed("3d_copy_texture"))
 	{
-		binds.clear("3d_copy_texture");
+		binds.clear(_T("3d_copy_texture"));
 		copy_texture_3d();
 	}
 
 	if (binds.pressed("3d_paste_texture"))
 	{
-		binds.clear("3d_paste_texture");
+		binds.clear(_T("3d_paste_texture"));
 		paste_texture_3d(false);
 	}
 
 	if (binds.pressed("3d_paste_paint"))
 	{
-		binds.clear("3d_paste_paint");
+		binds.clear(_T("3d_paste_paint"));
 		paste_texture_3d(true);
 	}
 
 	// Copy/paste side properties
 	if (binds.pressed("3d_copy_side"))
 	{
-		binds.clear("3d_copy_side");
+		binds.clear(_T("3d_copy_side"));
 		copy_side_3d(true, true, true);
 	}
 
 	if (binds.pressed("3d_paste_side"))
 	{
-		binds.clear("3d_paste_side");
+		binds.clear(_T("3d_paste_side"));
 		paste_side_3d(true, true, true);
 	}
 
 	// Copy/paste offsets
 	if (binds.pressed("3d_copy_offsets"))
 	{
-		binds.clear("3d_copy_offsets");
+		binds.clear(_T("3d_copy_offsets"));
 		copy_side_3d(true, true);
 	}
 
 	if (binds.pressed("3d_paste_offsets"))
 	{
-		binds.clear("3d_paste_offsets");
+		binds.clear(_T("3d_paste_offsets"));
 		paste_side_3d(true, true);
 	}
 
 	if (binds.pressed("3d_copy_xoffset"))
 	{
-		binds.clear("3d_copy_xoffset");
+		binds.clear(_T("3d_copy_xoffset"));
 		copy_side_3d(true, false);
 	}
 
 	if (binds.pressed("3d_paste_xoffset"))
 	{
-		binds.clear("3d_paste_xoffset");
+		binds.clear(_T("3d_paste_xoffset"));
 		paste_side_3d(true, false);
 	}
 
 	if (binds.pressed("3d_copy_yoffset"))
 	{
-		binds.clear("3d_copy_yoffset");
+		binds.clear(_T("3d_copy_yoffset"));
 		copy_side_3d(false, true);
 	}
 
 	if (binds.pressed("3d_paste_yoffset"))
 	{
-		binds.clear("3d_paste_yoffset");
+		binds.clear(_T("3d_paste_yoffset"));
 		paste_side_3d(false, true);
 	}
 

@@ -6,6 +6,7 @@
 #include "structs.h"
 #include "wad.h"
 #include <wx/glcanvas.h>
+#include <wx/notebook.h>
 
 class MapPreviewCanvas : public wxGLCanvas
 {

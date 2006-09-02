@@ -260,7 +260,7 @@ void draw_texture_scale(rect_t rect, Texture* tex, rgba_t col, float scalef)
 
 // draw_text: Draws a string of text at x, y (characters are 8x8)
 // ----------------------------------------------------------- >>
-void draw_text(int x, int y, rgba_t colour, BYTE alignment, const char* text, ...)
+void draw_text(int x, int y, rgba_t colour, BYTE alignment, bool map, const char* text, ...)
 {
 	float tx1, tx2, ty1, ty2;
 	char string[256];
@@ -273,6 +273,9 @@ void draw_text(int x, int y, rgba_t colour, BYTE alignment, const char* text, ..
 	float size_x = 8;
 	float size_y = 8;
 
+	if (map)
+		size_x = size_y = size_x / get_zoom();
+
 	// Alignment
 	if (alignment == 1) // Center
 		x -= (((int)strlen(string) * size_x) / 2);
@@ -282,7 +285,7 @@ void draw_text(int x, int y, rgba_t colour, BYTE alignment, const char* text, ..
 
 	set_gl_colour(colour);
 
-	Texture* tex = get_texture("_font", 4);
+	Texture* tex = get_texture(_T("_font"), 4);
 
 	if (!tex)
 		return;
@@ -304,6 +307,13 @@ void draw_text(int x, int y, rgba_t colour, BYTE alignment, const char* text, ..
 					tx2 = (float)(column + 1) * 0.0625f;
 					ty1 = (float)row * 0.0625f;
 					ty2 = (float)(row + 1) * 0.0625f;
+
+					if (map)
+					{
+						float temp = ty1;
+						ty1 = ty2;
+						ty2 = temp;
+					}
 
 					glBegin(GL_QUADS);
 						glTexCoord2f(tx1, ty1); glVertex2d((char_num * size_x) + x, y);
@@ -341,7 +351,7 @@ void draw_text_scale(int x, int y, rgba_t colour, BYTE alignment, int scale, con
 
 	set_gl_colour(colour);
 
-	Texture* tex = get_texture("_font", 4);
+	Texture* tex = get_texture(_T("_font"), 4);
 
 	if (!tex)
 		return;

@@ -42,6 +42,8 @@ public:
 
 	void add_ref();
 	bool rem_ref();
+	void set_refs(int n) { ref_count = n; }
+	void update_refs();
 
 	point2_t pos();
 
