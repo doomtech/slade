@@ -125,7 +125,11 @@ std::string str(string in)
 
 // chr: Converts a wxString to an ascii character string
 // -------------------------------------------------- >>
+#ifdef __GNUC__
 const char* chr(string str)
+#else
+const char* chr(string &str)
+#endif
 {
 #ifdef UNICODE
 	wxCharBuffer buffer = str.ToAscii();

@@ -9,7 +9,12 @@
 #include <string>
 typedef wxString string;
 #define s_fmt wxString::Format
+
+#ifdef __GNUC__	// gcc doesn't like the reference version of chr, but the value version crashes in win32
 const char* chr(wxString str);
+#else
+const char* chr(wxString &str);
+#endif
 
 #include <vector>
 using std::vector;
