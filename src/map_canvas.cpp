@@ -106,7 +106,7 @@ MapCanvas::~MapCanvas()
 point2_t MapCanvas::mouse_pos(bool translate)
 {
 	if (translate)
-		return point2_t(round(translate_x(mouse.x)), round(translate_y(mouse.y)));
+		return point2_t(lround(translate_x(mouse.x)), lround(translate_y(mouse.y)));
 	else
 		return mouse;
 }
@@ -114,7 +114,7 @@ point2_t MapCanvas::mouse_pos(bool translate)
 point2_t MapCanvas::get_down_pos(bool translate)
 {
 	if (translate)
-		return point2_t(round(translate_x(down_pos.x)), round(translate_y(down_pos.y)));
+		return point2_t(lround(translate_x(down_pos.x)), lround(translate_y(down_pos.y)));
 	else
 		return down_pos;
 }
@@ -456,7 +456,7 @@ void MapCanvas::mouse_motion(wxMouseEvent& event)
 	}
 
 	// Moving items
-	point2_t m_mouse(round(translate_x(mouse.x)), round(translate_y(mouse.y)));
+	point2_t m_mouse(lround(translate_x(mouse.x)), lround(translate_y(mouse.y)));
 	if (state(STATE_MOVING))
 	{
 		d_map.move_items(m_mouse);

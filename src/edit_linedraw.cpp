@@ -91,7 +91,7 @@ void ldraw_end()
 			if (lines_intersect(r1, r2, &ip))
 			{
 				//log_message(s_fmt(_T("Intersect with line %d at %1.2f,%1.2f"), b, ip.x, ip.y));
-				create_vertex(point2_t(round(ip.x), round(ip.y)));
+				create_vertex(point2_t(lround(ip.x), lround(ip.y)));
 			}
 		}
 	}
@@ -307,7 +307,7 @@ void ldraw_draw_lines(point2_t mouse)
 			rect_t r(ldraw_points[a], ldraw_points[a+1]);
 			draw_line(r, col_linedraw, line_aa, false, line_size);
 			draw_point(ldraw_points[a].x, ldraw_points[a].y, 8, col_linedraw);
-			draw_text(r.middle().x, r.middle().y, rgba_t(tr, tg, tb, col_linedraw.a, col_linedraw.blend), 1, true, "%d", round(r.length()));
+			draw_text(r.middle().x, r.middle().y, rgba_t(tr, tg, tb, col_linedraw.a, col_linedraw.blend), 1, true, "%d", lround(r.length()));
 		}
 	}
 
@@ -316,7 +316,7 @@ void ldraw_draw_lines(point2_t mouse)
 		rect_t r(ldraw_points.back(), mp);
 		draw_line(r, col_linedraw, line_aa, false, line_size);
 		draw_point(ldraw_points.back().x, ldraw_points.back().y, 8, col_linedraw);
-		draw_text(r.middle().x, r.middle().y, rgba_t(tr, tg, tb, col_linedraw.a, col_linedraw.blend), 1, true, "%d", round(r.length()));
+		draw_text(r.middle().x, r.middle().y, rgba_t(tr, tg, tb, col_linedraw.a, col_linedraw.blend), 1, true, "%d", lround(r.length()));
 	}
 
 	draw_point(mp.x, mp.y, 8, col_linedraw);

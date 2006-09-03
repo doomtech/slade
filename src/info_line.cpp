@@ -177,7 +177,7 @@ void LineInfoBar::update()
 	// Main frame
 	Line* line = d_map.hilight_line();
 	main_frame->SetLabel(wxString::Format(_T("Line #%d"), d_map.hilight()));
-	label_length->SetLabel(wxString::Format(_T("Length: %d (%d %d)"), round(line->get_rect().length()), d_map.index(line->vertex1()), d_map.index(line->vertex2())));
+	label_length->SetLabel(wxString::Format(_T("Length: %d (%d %d)"), lround(line->get_rect().length()), d_map.index(line->vertex1()), d_map.index(line->vertex2())));
 	label_front->SetLabel(wxString::Format(_T("Front Sector: %d"), line->sector_index(true)));
 	label_back->SetLabel(wxString::Format(_T("Back Sector: %d"), line->sector_index(false)));
 	label_special->SetLabel(wxString::Format(_T("Special: %d (%s)"),

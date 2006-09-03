@@ -402,6 +402,8 @@ bool Wad::open(string filename, bool load_data)
 
 	findMaps();
 
+	dumpDirectory();
+
 	return true;
 }
 
@@ -669,8 +671,8 @@ void Wad::save(bool nodes, string mapname)
 	fwrite(&dir_offset, 4, 1, fp);
 
 	// Write the lumps
-	for (DWORD l = 0; l < num_lumps; l++)
-		lefwrite(directory[l]->getData(false), directory[l]->getSize(), 1, fp);
+	for (DWORD l = 0; l < numLumps(); l++)
+		fwrite(directory[l]->getData(false), directory[l]->getSize(), 1, fp);
 
 	// Write the directory
 	for (DWORD l = 0; l < numLumps(); l++)

@@ -333,12 +333,12 @@ bool EditorWindow::open_map(Wad* wad, string mapname)
 			}
 		}
 
-		SetTitle(s_fmt(_T("SLADE (%s, %s)"), wad->path, mapname));
+		SetTitle(s_fmt(_T("SLADE (%s, %s)"), chr(wad->path), chr(mapname)));
 	}
 	else
 	{
 		d_map.create(mapname);
-		SetTitle(s_fmt(_T("SLADE (unsaved, %s)"), mapname));
+		SetTitle(s_fmt(_T("SLADE (unsaved, %s)"), chr(mapname)));
 	}
 
 	// Reset zoom and offset (0,0 and fully zoomed in)

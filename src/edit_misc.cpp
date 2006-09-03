@@ -677,7 +677,7 @@ void line_split_at(point2_t pos)
 	double iy = double(rect.y1()) + u * double(rect.y2() - rect.y1());
 
 	// Create a new vertex at intersection point and split the line there
-	Vertex *v = new Vertex(round(ix), round(iy), &d_map);
+	Vertex *v = new Vertex(lround(ix), lround(iy), &d_map);
 	line->split(v);
 }
 

@@ -63,7 +63,10 @@ void load_main_config(bool wads_open)
 	Tokenizer mr;
 
 	if (!mr.open_file(c_path(_T("slade.cfg"), DIR_USR), 0, 0))
+	{
+		log_message(_T("slade.cfg not found, creating"));
 		return;
+	}
 
 	string token = mr.get_token();
 
@@ -203,6 +206,10 @@ void change_edit_mode(int mode)
 	d_map.clear_selection();
 }
 
+#ifdef __APPLE__
+const char *getBundleResourceDir(void);
+#endif
+
 void setup_directories()
 {
 	// Temporary directory
@@ -214,7 +221,8 @@ void setup_directories()
 
 	// User directory
 #ifdef __APPLE__
-	usr_path = string(getenv("HOME")) + string("/Library/Application Support/Slade");
+	app_path = string(getBundleResourceDir()) + _T("/");
+	usr_path = string(getenv("HOME")) + string("/Library/Application Support/Slade/");
 #else
 	usr_path = app_path;
 #endif
@@ -233,6 +241,7 @@ IMPLEMENT_APP(MainApp)
 bool MainApp::OnInit()
 {
 	srand(wxGetLocalTime());
+	setup_directories();
 
 	// Init logfile
 	wxLog::SetActiveTarget(new wxLogStderr(fopen(chr(c_path("slade.log", DIR_USR)), "wt")));
@@ -269,8 +278,6 @@ bool MainApp::OnInit()
 
 	for (int a = 0; a < i; a++)
 		app_path.erase(app_path.end() - 1);
-
-	setup_directories();
 
 	// Parse command line args
 	for (int a = 1; a < argc; a++)

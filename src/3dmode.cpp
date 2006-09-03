@@ -293,7 +293,7 @@ void copy_texture_3d()
 		else
 			c_wall = hl_line->side2()->get_texname(part);
 
-		add_3d_message(s_fmt(_T("Copied texture \"%s\""), c_wall.c_str()));
+		add_3d_message(s_fmt(_T("Copied texture \"%s\""), chr(c_wall)));
 	}
 	else if (hl_sector != -1)
 	{
@@ -309,7 +309,7 @@ void copy_texture_3d()
 		else
 			c_flat = ctex;
 
-		add_3d_message(s_fmt(_T("Copied texture \"%s\""), ctex.c_str()));
+		add_3d_message(s_fmt(_T("Copied texture \"%s\""), chr(ctex)));
 	}
 }
 
@@ -334,14 +334,14 @@ void paste_texture_3d(bool paint)
 			if (!paint)
 			{
 				hl_line->side(side)->set_texture(c_wall, part);
-				add_3d_message(s_fmt(_T("Pasted texture \"%s\""), c_wall));
+				add_3d_message(s_fmt(_T("Pasted texture \"%s\""), chr(c_wall)));
 			}
 			else
 			{
 				vector<int> lines;
 				line_paint_tex(d_map.index(hl_line), side, hl_line->side(side)->get_texname(part), c_wall, lines);
 
-				add_3d_message(s_fmt(_T("Painted texture \"%s\""), c_wall));
+				add_3d_message(s_fmt(_T("Painted texture \"%s\""), chr(c_wall)));
 			}
 		}
 	}
@@ -361,7 +361,7 @@ void paste_texture_3d(bool paint)
 			if (hl_part == PART_CEIL)
 				d_map.sector(hl_sector)->set_ctex(ntex);
 
-			add_3d_message(s_fmt(_T("Pasted texture \"%s\""), ntex));
+			add_3d_message(s_fmt(_T("Pasted texture \"%s\""), chr(ntex)));
 		}
 	}
 }

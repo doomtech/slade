@@ -110,7 +110,7 @@ void render_line_trans(Line* line, bool s, bool hl = false)
 	set_light(rgba_t(l, l, l, 255), l);
 
 	rect_t rect = line->get_rect();
-	int length = round(rect.length());
+	int length = lround(rect.length());
 	int ceil1 = line->side1()->get_sector()->ceiling();
 	int floor1 = line->side1()->get_sector()->floor();
 	int ceil2 = line->side2()->get_sector()->ceiling();
@@ -269,7 +269,7 @@ void render_line(Line* line, BYTE part, bool hl = false)
 	vis_line++;
 
 	rect_t rect = line->get_rect();
-	int length = round(rect.length());
+	int length = lround(rect.length());
 	int ceil1 = line->side1()->get_sector()->ceiling();
 	int floor1 = line->side1()->get_sector()->floor();
 	int ceil2 = line->side2()->get_sector()->ceiling();

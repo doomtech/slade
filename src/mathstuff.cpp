@@ -242,7 +242,7 @@ float get_2d_angle(point3_t p1, point3_t p2, point3_t p3)
 }
 
 #ifdef WIN32
-int round(double val)
+int lround(double val)
 {
 	int ret = (int)val;
 	if ((val - (double)ret) >= 0.5) ret++;

@@ -22,7 +22,7 @@ float dist_ray_plane(point3_t r_o, point3_t r_v, plane_t plane);
 bool lines_intersect(rect_t line1, rect_t line2, fpoint2_t *ip = NULL);
 
 #ifdef WIN32
-int round(double val);
+int lround(double val);
 #else
 #include <math.h>
 #endif

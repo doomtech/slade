@@ -245,6 +245,9 @@ void MapPreviewCanvas::preview_map(Wad* wad, string mapname)
 		memcpy(&y, data, 2);
 		data += 2;
 
+		x = wxINT16_SWAP_ON_BE(x);
+		y = wxINT16_SWAP_ON_BE(y);
+
 		y = -y;
 
 		if (x < min_x)
@@ -292,6 +295,9 @@ void MapPreviewCanvas::preview_map(Wad* wad, string mapname)
 		data += 2;
 		memcpy(&v2, data, 2);
 		data += 2;
+
+		v1 = wxINT16_SWAP_ON_BE(v1);
+		v2 = wxINT16_SWAP_ON_BE(v2);
 
 		preview_lines.push_back(rect_t(verts[v1], verts[v2]));
 		data += (size - 4);
