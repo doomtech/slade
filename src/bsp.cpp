@@ -88,8 +88,10 @@ bool build_gl_nodes()
 	for (int a = 0; a < wad.lumpAt(current_lump)->getSize() / 4; a++)
 	{
 		short x, y;
-		lefread(&x, 2, 1, fp);
-		lefread(&y, 2, 1, fp);
+		fread(&x, 2, 1, fp);
+		fread(&y, 2, 1, fp);
+		wxINT16_SWAP_ON_BE(x);
+		wxINT16_SWAP_ON_BE(y);
 		map_verts.push_back(point2_t(x, y));
 	}
 
@@ -116,10 +118,10 @@ bool build_gl_nodes()
 	for (DWORD v = 0; v < unit_count; v++)
 	{
 		gl_vertex_t glv;
-		lefread(&temp, 4, 1, fp);
-		glv.x = temp / 65536.0f;
-		lefread(&temp, 4, 1, fp);
-		glv.y = temp / 65536.0f;
+		fread(&temp, 4, 1, fp);
+		glv.x = wxINT32_SWAP_ON_BE(temp) / 65536.0f;
+		fread(&temp, 4, 1, fp);
+		glv.y = wxINT32_SWAP_ON_BE(temp) / 65536.0f;
 		gl_verts.push_back(glv);
 	}
 
@@ -145,7 +147,14 @@ bool build_gl_nodes()
 	for (int a = 0; a < unit_count; a++)
 	{
 		gl_seg_t seg;
-		lefread(&seg, unit_size, 1, fp);
+		fread(&seg, unit_size, 1, fp);
+
+		seg.start_vertex = wxINT32_SWAP_ON_BE(seg.start_vertex);
+		seg.end_vertex = wxINT32_SWAP_ON_BE(seg.end_vertex);
+		seg.linedef = wxINT16_SWAP_ON_BE(seg.linedef);
+		seg.side = wxINT16_SWAP_ON_BE(seg.side);
+		seg.partner_seg = wxINT32_SWAP_ON_BE(seg.partner_seg);
+
 		gl_segs.push_back(seg);
 	}
 
@@ -169,7 +178,11 @@ bool build_gl_nodes()
 	for (int a = 0; a < unit_count; a++)
 	{
 		gl_ssect_t ssect;
-		lefread(&ssect, unit_size, 1, fp);
+		fread(&ssect, unit_size, 1, fp);
+
+		ssect.count = wxINT32_SWAP_ON_BE(ssect.count);
+		ssect.first_seg = wxINT32_SWAP_ON_BE(ssect.first_seg);
+
 		gl_ssects.push_back(ssect);
 	}
 
@@ -196,14 +209,28 @@ bool build_gl_nodes()
 	for (int n = 0; n < unit_count; n++)
 	{
 		gl_node_t node;
-		lefread(&node.x, 2, 1, fp);
-		lefread(&node.y, 2, 1, fp);
-		lefread(&node.dx, 2, 1, fp);
-		lefread(&node.dy, 2, 1, fp);
-		lefread(node.right_bbox, 2, 4, fp);
-		lefread(node.left_bbox, 2, 4, fp);
-		lefread(&node.right_child, 4, 1, fp);
-		lefread(&node.left_child, 4, 1, fp);
+		fread(&node.x, 2, 1, fp);
+		fread(&node.y, 2, 1, fp);
+		fread(&node.dx, 2, 1, fp);
+		fread(&node.dy, 2, 1, fp);
+		fread(node.right_bbox, 2, 4, fp);
+		fread(node.left_bbox, 2, 4, fp);
+		fread(&node.right_child, 4, 1, fp);
+		fread(&node.left_child, 4, 1, fp);
+
+		node.x = wxINT16_SWAP_ON_BE(node.x);
+		node.y = wxINT16_SWAP_ON_BE(node.y);
+		node.dx = wxINT16_SWAP_ON_BE(node.dx);
+		node.dy = wxINT16_SWAP_ON_BE(node.dy);
+		node.left_child = wxINT32_SWAP_ON_BE(node.left_child);
+		node.right_child = wxINT32_SWAP_ON_BE(node.right_child);
+		
+		for (int a = 0; a < 4; a++)
+		{
+			node.left_bbox[a] = wxINT16_SWAP_ON_BE(node.left_bbox[a]);
+			node.right_bbox[a] = wxINT16_SWAP_ON_BE(node.right_bbox[a]);
+		}
+
 		gl_nodes.push_back(node);
 	}
 

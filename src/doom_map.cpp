@@ -27,18 +27,18 @@ EXTERN_CVAR(Bool, edit_auto_split)
 
 string map_lumps[12] =
 {
-	"THINGS",
-	"VERTEXES",
-	"LINEDEFS",
-	"SIDEDEFS",
-	"SECTORS",
-	"SEGS",
-	"SSECTORS",
-	"NODES",
-	"BLOCKMAP",
-	"REJECT",
-	"SCRIPTS",
-	"BEHAVIOR"
+	_T("THINGS"),
+	_T("VERTEXES"),
+	_T("LINEDEFS"),
+	_T("SIDEDEFS"),
+	_T("SECTORS"),
+	_T("SEGS"),
+	_T("SSECTORS"),
+	_T("NODES"),
+	_T("BLOCKMAP"),
+	_T("REJECT"),
+	_T("SCRIPTS"),
+	_T("BEHAVIOR")
 };
 
 DoomMap::DoomMap()

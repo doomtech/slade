@@ -254,9 +254,7 @@ void Wad::findMaps()
 		for (DWORD l = 0; l < numLumps(); l++)
 		{
 			bool done = false;
-			bool existing_map_lumps[12] = { false, false, false, false,
-				false, false, false, false,
-				false, false, false, false };
+			BYTE existing_map_lumps[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 			int index = l;
 			while (!done)
@@ -273,8 +271,9 @@ void Wad::findMaps()
 				{
 					if (name == map_lumps[s])
 					{
-						existing_map_lumps[s] = true;
+						existing_map_lumps[s] = 1;
 						done = false;
+						break;
 					}
 				}
 			}

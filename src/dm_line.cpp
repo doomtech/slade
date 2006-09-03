@@ -97,8 +97,8 @@ Line::Line(doomline_t l, DoomMap *parent, bool &ok)
 		return;
 
 	// Vertices
-	v1 = parent->vertex(wxINT32_SWAP_ON_BE(l.vertex1));
-	v2 = parent->vertex(wxINT32_SWAP_ON_BE(l.vertex2));
+	v1 = parent->vertex(wxINT16_SWAP_ON_BE(l.vertex1));
+	v2 = parent->vertex(wxINT16_SWAP_ON_BE(l.vertex2));
 
 	if (!parent->valid(v1))
 	{
