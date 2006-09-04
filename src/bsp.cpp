@@ -34,7 +34,7 @@ bool build_gl_nodes()
 	d_map.remove_unused_sectors();
 
 	Wad tempwad;
-	tempwad.path = _T("sladetemp");
+	tempwad.path = c_path(_T("sladetemp"), DIR_TMP);
 
 	d_map.add_to_wad(&tempwad);
 	tempwad.save(false);
@@ -43,8 +43,8 @@ bool build_gl_nodes()
 
 	splash(_T("Building GL Nodes"));
 
-	FWadReader inwad("sladetemp");
-	FWadWriter outwad("sladetemp.wad", inwad.IsIWAD());
+	FWadReader inwad(chr(c_path(_T("sladetemp"), DIR_TMP)));
+	FWadWriter outwad(chr(c_path(_T("sladetemp.wad"), DIR_TMP)), inwad.IsIWAD());
 
 	GLOnly = true;
 	BuildGLNodes = true;
@@ -72,7 +72,7 @@ bool build_gl_nodes()
 	int unit_count = 0;
 	int unit_size = 0;
 
-	if (!wad.open(_T("sladetemp.wad")))
+	if (!wad.open(chr(c_path(_T("sladetemp.wad"), DIR_TMP))))
 	{
 		message_box(_T("Failed to build GL nodes!\n"));
 		splash_hide();

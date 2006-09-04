@@ -23,12 +23,8 @@
 #include <wx/sysopt.h>
 
 #ifdef __APPLE__
-// Doing our own thing for Apple path handling, since 10.4 only ships
-// with wxWidgets 2.5, and besides we need to make sure to write to
-// the user's path instead of /Applications
-#include <CoreFoundation/CFString.h>
-#include <CoreFoundation/CFBundle.h>
-#include <cstdlib>
+const char *getBundleResourceDir(void);
+const char *getTempDir(void);
 #elif wxCHECK_VERSION(2, 6, 0)
 // Everyone else uses wxWidgets-provided paths
 #include <wx/stdpaths.h>
@@ -206,15 +202,13 @@ void change_edit_mode(int mode)
 	d_map.clear_selection();
 }
 
-#ifdef __APPLE__
-const char *getBundleResourceDir(void);
-#endif
-
 void setup_directories()
 {
 	// Temporary directory
 #ifdef UNIX
 	tmp_path = "/tmp/";
+#elif defined(__APPLE__)
+	tmp_path = getTempDir();
 #else
 	tmp_path = app_path;
 #endif

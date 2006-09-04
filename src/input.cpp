@@ -812,7 +812,7 @@ bool keys_3d(float mult, bool mwheel)
 	if (key_3d_rep == 0)
 		key_3d_allow = true;
 
-	if (binds.pressed("3d_exit"))
+	if (binds.pressed(_T("3d_exit")))
 	{
 		binds.clear(_T("view_3dmode"));
 		binds.clear(_T("3d_exit"));

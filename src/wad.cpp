@@ -698,7 +698,7 @@ void Wad::save(bool nodes, string mapname)
 		string wadpath = path;
 
 		if (parent)
-			wadpath = _T("sladetemp.wad");
+			wadpath = c_path(_T("sladetemp.wad"), DIR_TMP);
 
 		splash(_T("Building Nodes"), true);
 
