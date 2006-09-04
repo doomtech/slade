@@ -6,19 +6,20 @@
 #include "tex_browser.h"
 #include "game_config.h"
 
-extern wxGLContext *gl_context;
+//extern wxGLContext *gl_context;
+extern wxGLCanvas *share_canvas;
 extern GameConfig game;
 
 TextureBox::TextureBox(wxWindow *parent, int width, int height, string texture, int textype, float scale, int id)
-:	wxGLCanvas(parent, gl_context, id, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER)
+:	wxGLCanvas(parent, share_canvas, id, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER)
 {
 	if (texture != "_none_")
 		this->texture = get_texture(texture, textype, false);
 	else
 		this->texture = NULL;
 
-	if (this->texture)
-		this->texture->gen_gl_tex();
+	//if (this->texture)
+	//	this->texture->gen_gl_tex();
 
 	this->scale = scale;
 
@@ -42,7 +43,7 @@ TextureBox::~TextureBox()
 
 BEGIN_EVENT_TABLE(TextureBox, wxGLCanvas)
 	EVT_PAINT(TextureBox::paint)
-	EVT_SIZE(TextureBox::size)
+	//EVT_SIZE(TextureBox::size)
 END_EVENT_TABLE()
 
 void TextureBox::paint(wxPaintEvent &event)
@@ -69,7 +70,20 @@ void TextureBox::size(wxSizeEvent &event)
 
 void TextureBox::redraw()
 {
+	if (!IsShown())
+		return;
+
 	SetCurrent();
+
+	glViewport(0, 0, GetClientSize().x, GetClientSize().y);
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+
+	glOrtho(0.0f, GetClientSize().x, GetClientSize().y, 0.0f, -1.0f, 1.0f);
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
 
 	rgba_t col(180, 180, 180, 255, 0);
 

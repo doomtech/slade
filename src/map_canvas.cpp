@@ -37,7 +37,8 @@ CVAR(Bool, line_aa, true, CVAR_SAVE)
 vector<string> pressed_keys;
 vector<string> released_keys;
 
-wxGLContext *gl_context = NULL;
+//wxGLContext *gl_context = NULL;
+wxGLCanvas *share_canvas = NULL;
 
 extern bool allow_tex_load, lock_hilight;
 extern BindList binds;
@@ -86,7 +87,8 @@ MapCanvas::MapCanvas(wxWindow *parent)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	gl_context = GetContext();
+	//gl_context = GetContext();
+	share_canvas = this;
 
 	allow_tex_load = true;
 	wxSafeYield();

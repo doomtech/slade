@@ -42,7 +42,8 @@ extern DoomMap d_map;
 extern GameConfig game;
 extern EditorWindow *editor_window;
 extern bool allow_tex_load;
-extern wxGLContext *gl_context;
+//extern wxGLContext *gl_context;
+extern wxGLCanvas *share_canvas;
 extern rgba_t col_background, col_line_solid;
 
 EXTERN_CVAR(Bool, line_aa)
@@ -142,8 +143,12 @@ void begin_mapedit()
 }
 
 MapPreviewCanvas::MapPreviewCanvas(wxWindow *parent)
-:	wxGLCanvas(parent, gl_context, -1, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER)
+:	wxGLCanvas(parent, share_canvas, -1, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER)
 {
+	Enable(false);
+	Show(true);
+	Raise();
+
 	SetCurrent();
 	glViewport(0, 0, GetSize().x, GetSize().y);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -164,10 +169,6 @@ MapPreviewCanvas::MapPreviewCanvas(wxWindow *parent)
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-
-	Enable(false);
-	Show(true);
-	Raise();
 }
 
 MapPreviewCanvas::~MapPreviewCanvas()

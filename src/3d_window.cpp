@@ -25,7 +25,8 @@ CVAR(Int, vid_bpp_3d, -1, CVAR_SAVE)
 CVAR(Int, vid_refresh_3d, -1, CVAR_SAVE)
 CVAR(Int, vid_frametime_3d, 10, CVAR_SAVE)
 
-extern wxGLContext *gl_context;
+//extern wxGLContext *gl_context;
+extern wxGLCanvas *share_canvas;
 extern EditorWindow *editor_window;
 extern Camera camera;
 extern BindList binds;
@@ -86,7 +87,7 @@ void restore_resolution()
 }
 
 Render3dCanvas::Render3dCanvas(wxWindow *parent)
-:	wxGLCanvas(parent, gl_context, -1)
+:	wxGLCanvas(parent, share_canvas, -1)
 {
 }
 

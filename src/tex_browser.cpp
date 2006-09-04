@@ -16,7 +16,8 @@ vector<browse_info_t>	browse_items;
 vector<browse_info_t*>	vis_items;
 int						browse_type = -1;
 
-extern wxGLContext *gl_context;
+//extern wxGLContext *gl_context;
+extern wxGLCanvas *share_canvas;
 
 extern bool mix_tex;
 
@@ -244,7 +245,7 @@ void TextureBrowser::columns_changed(wxSpinEvent &event)
 
 
 TexBrowseCanvas::TexBrowseCanvas(wxWindow *parent)
-:	wxGLCanvas(parent, gl_context, -1, wxDefaultPosition, wxDefaultSize, wxWANTS_CHARS)
+:	wxGLCanvas(parent, share_canvas, -1, wxDefaultPosition, wxDefaultSize, wxWANTS_CHARS)
 {
 }
 
@@ -374,7 +375,7 @@ void TexBrowseCanvas::select_name(string name)
 
 BEGIN_EVENT_TABLE(TexBrowseCanvas, wxGLCanvas)
 	EVT_PAINT(TexBrowseCanvas::paint)
-	EVT_SIZE(TexBrowseCanvas::resize)
+	//EVT_SIZE(TexBrowseCanvas::resize)
 	EVT_KEY_DOWN(TexBrowseCanvas::key_down)
 	EVT_MOUSE_EVENTS(TexBrowseCanvas::mouse_event)
 END_EVENT_TABLE()
@@ -382,6 +383,24 @@ END_EVENT_TABLE()
 void TexBrowseCanvas::paint(wxPaintEvent &event)
 {
 	wxPaintDC dc(this);
+
+	int width = GetClientSize().x / browser_columns;
+	int rows = (vis_items.size() / browser_columns) + 1;
+	int rows_page = GetClientSize().y / width;
+	vscroll->SetScrollbar(vscroll->GetThumbPosition(), GetClientSize().y, rows*width, rows_page*width);
+	scroll_to_selected();
+
+	SetCurrent();
+
+	glViewport(0, 0, GetClientSize().x, GetClientSize().y);
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+
+	glOrtho(0.0f, GetClientSize().x, GetClientSize().y, 0.0f, -1.0f, 1.0f);
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
 
 	redraw();
 }
