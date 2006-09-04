@@ -826,10 +826,10 @@ bool keys_3d(float mult, bool mwheel)
 		camera.move_camera(-speed);
 
 	if (binds.pressed("3d_left"))
-		camera.rotate_view(speed, 0.0f, 0.0f, 0.5f);
+		camera.rotate_view((speed*0.002f), 0.0f, 0.0f, 1.0f);
 
 	if (binds.pressed("3d_right"))
-		camera.rotate_view(-speed, 0.0f, 0.0f, 0.5f);
+		camera.rotate_view(-(speed*0.002f), 0.0f, 0.0f, 1.0f);
 
 	if (binds.pressed("3d_strafeleft"))
 		camera.strafe_camera(-speed);

@@ -1752,6 +1752,20 @@ void DoomMap::clear_move_items()
 		for (int a = 0; a < moving_items.size(); a++)
 			m_verts.push_back(vertex(moving_items[a]));
 
+		// Get relevant lines
+		vector<Line*> m_lines;
+		for (int l = 0; l < n_lines(); l++)
+		{
+			for (int a = 0; a < m_verts.size(); a++)
+			{
+				if (d_map.line(l)->has_vertex(m_verts[a]))
+				{
+					m_lines.push_back(d_map.line(l));
+					break;
+				}
+			}
+		}
+
 		if (edit_auto_merge)
 		{
 			for (int a = 0; a < m_verts.size(); a++)
@@ -1760,20 +1774,15 @@ void DoomMap::clear_move_items()
 			remove_zerolength_lines();
 		}
 
-		/*
-		for (int a = 0; a < m_verts.size(); a++)
-		{
-			if (!valid(m_verts[a], true))
-				message_box("A moving vertex was deleted somehow!");
-		}
-		*/
-
 		if (edit_auto_split)
 		{
 			// Split lines under vertices
 			for (int a = 0; a < m_verts.size(); a++)
 				check_split(m_verts[a]);
 		}
+
+		if (edit_auto_merge)
+			remove_overlapping_lines(m_lines, true);
 
 		update_indices(MTYPE_VERTEX);
 	}
@@ -1893,11 +1902,21 @@ void DoomMap::remove_overlapping_lines(vector<Line*> &list, bool merge)
 			if (line(l)->has_vertex(list[a]->vertex1()) &&
 				line(l)->has_vertex(list[a]->vertex2()))
 			{
-				list[a]->vertex1()->rem_ref();
-				list[a]->vertex2()->rem_ref();
-				delete list[a];
+				if (merge)
+				{
+					delete_line(list[a]);
+					line_correct_references(l);
+				}
+				else
+				{
+					list[a]->vertex1()->rem_ref();
+					list[a]->vertex2()->rem_ref();
+					delete list[a];
+				}
+
 				list[a] = list.back();
 				list.pop_back();
+
 				a--;
 				break;
 			}

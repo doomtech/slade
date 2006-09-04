@@ -353,6 +353,7 @@ void start_3d_mode()
 
 	editor_window->Hide();
 	frame_3d->ShowFullScreen(true);
+	canvas_3d->SetFocus();
 	canvas_3d->init();
 	canvas_3d->render();
 	//wxStartTimer();
