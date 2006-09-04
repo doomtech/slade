@@ -13,7 +13,7 @@ extern GameConfig game;
 TextureBox::TextureBox(wxWindow *parent, int width, int height, string texture, int textype, float scale, int id)
 :	wxGLCanvas(parent, share_canvas, id, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER)
 {
-	if (texture != "_none_")
+	if (texture != _T("_none_"))
 		this->texture = get_texture(texture, textype, false);
 	else
 		this->texture = NULL;
@@ -104,7 +104,7 @@ void TextureBox::set_size(int width, int height)
 
 void TextureBox::set_texture(string tex, int textype)
 {
-	if (tex == "_none_")
+	if (tex == _T("_none_"))
 	{
 		if (texture)
 		{
@@ -143,15 +143,15 @@ void ClickableTexBox::clicked(wxMouseEvent &event)
 		if (texture)
 			texname = texture->name;
 		else
-			texname = "-";
+			texname = _T("-");
 	}
 	else
-		texname = (char*)entry->GetValue().c_str();
+		texname = entry->GetValue().c_str();
 
 	setup_tex_browser(textype);
 	TextureBrowser tb(texname);
 
-	if (tb.ShowModal() == wxID_OK && tb.get_texture() != "")
+	if (tb.ShowModal() == wxID_OK && tb.get_texture() != _T(""))
 	{
 		if (textype != TEXTURES_SPRITES)
 		{

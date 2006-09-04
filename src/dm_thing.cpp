@@ -109,23 +109,23 @@ void Thing::set_flag(int flag, bool value)
 string Thing::angle_string()
 {
 	if (angle == 0) // east
-		return "East";
+		return _T("East");
 	else if (angle == 45) // northeast
-		return "Northeast";
+		return _T("Northeast");
 	else if (angle == 90) // north
-		return "North";
+		return _T("North");
 	else if (angle == 135) // northwest
-		return "Northwest";
+		return _T("Northwest");
 	else if (angle == 180) // west
-		return "West";
+		return _T("West");
 	else if (angle == 225) // southwest
-		return "Southwest";
+		return _T("Southwest");
 	else if (angle == 270) // south
-		return "South";
+		return _T("South");
 	else if (angle == 315) // southeast
-		return "Southeast";
+		return _T("Southeast");
 	else // Invalid angle
-		return "Invalid Angle";
+		return _T("Invalid Angle");
 }
 
 string Thing::difficulty_string()
@@ -133,18 +133,18 @@ string Thing::difficulty_string()
 	if (!(flags & THING_EASY)
 		&& !(flags & THING_MEDIUM)
 		&& !(flags & THING_HARD))
-		return "None";
+		return _T("None");
 
 	string str;
 
 	if (flags & THING_EASY)
-		str += "Easy ";
+		str += _T("Easy ");
 
 	if (flags & THING_MEDIUM)
-		str += "Med ";
+		str += _T("Med ");
 
 	if (flags & THING_HARD)
-		str += "Hard";
+		str += _T("Hard");
 
 	return str;
 }
@@ -185,7 +185,7 @@ bool Thing::draw(rect_t vis_area, BYTE style)
 			if (ttype->spritename[0] == '_')
 				tex = ttype->spritename;
 			else
-				tex = "_thing";
+				tex = _T("_thing");
 
 			draw_texture(t_rect.x1(), t_rect.y1(), t_rect.width(), t_rect.height(), tex, -1, ttype->colour);
 		}

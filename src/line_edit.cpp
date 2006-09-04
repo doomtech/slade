@@ -188,10 +188,10 @@ void LinePropertiesPage::setup_widgets()
 		}
 
 		// Properties
-		entry_special->SetValue(str_to_wx(s_fmt("%d", d_map.hilight_line()->get_special())));
+		entry_special->SetValue(str_to_wx(s_fmt(_T("%d"), d_map.hilight_line()->get_special())));
 
 		if (!d_map.hexen())
-			entry_tag->SetValue(str_to_wx(s_fmt("%d", d_map.hilight_line()->get_sector_tag())));
+			entry_tag->SetValue(str_to_wx(s_fmt(_T("%d"), d_map.hilight_line()->get_sector_tag())));
 		else
 		{
 			combo_trigger->Select(d_map.hilight_line()->get_trigger() + 1);
@@ -218,10 +218,10 @@ void LinePropertiesPage::setup_widgets()
 		}
 
 		// Properties
-		entry_special->SetValue(str_to_wx(s_fmt("%d", oline->get_special())));
+		entry_special->SetValue(str_to_wx(s_fmt(_T("%d"), oline->get_special())));
 
 		if (!d_map.hexen())
-			entry_tag->SetValue(str_to_wx(s_fmt("%d", oline->get_sector_tag())));
+			entry_tag->SetValue(str_to_wx(s_fmt(_T("%d"), oline->get_sector_tag())));
 		else
 		{
 			combo_trigger->Select(oline->get_trigger() + 1);
@@ -345,7 +345,7 @@ void LinePropertiesPage::change_special_clicked(wxCommandEvent &event)
 	if (sd.ShowModal() == wxID_OK)
 	{
 		if (sd.get_special() != -1)
-			entry_special->SetValue(str_to_wx(s_fmt("%d", sd.get_special())));
+			entry_special->SetValue(str_to_wx(s_fmt(_T("%d"), sd.get_special())));
 	}
 }
 
@@ -424,7 +424,7 @@ SidePropertiesPage::SidePropertiesPage(wxWindow *parent, int side)
 
 	vbox->Add(new wxStaticText(this, -1, _T("Upper"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER), 0, wxEXPAND);
 	entry_upper = new wxTextCtrl(this, SP_ENTRY_UPPER, _T(""), wxDefaultPosition, wxDefaultSize, wxTE_CENTRE);
-	tex_upper = new ClickableTexBox(this, 96, 96, entry_upper, "_none_", 1, 5.0f, SP_TEX_UPPER);
+	tex_upper = new ClickableTexBox(this, 96, 96, entry_upper, _T("_none_"), 1, 5.0f, SP_TEX_UPPER);
 	tex_upper->Enable(true);
 	vbox->Add(tex_upper, 0, wxEXPAND|wxTOP, 4);
 	vbox->Add(entry_upper, 0, wxEXPAND|wxTOP, 4);
@@ -436,7 +436,7 @@ SidePropertiesPage::SidePropertiesPage(wxWindow *parent, int side)
 
 	vbox->Add(new wxStaticText(this, -1, _T("Middle"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER), 0, wxEXPAND);
 	entry_middle = new wxTextCtrl(this, SP_ENTRY_MIDDLE, _T(""), wxDefaultPosition, wxDefaultSize, wxTE_CENTRE);
-	tex_middle = new ClickableTexBox(this, 96, 96, entry_middle, "_none_", 1, 5.0f, SP_TEX_MIDDLE);
+	tex_middle = new ClickableTexBox(this, 96, 96, entry_middle, _T("_none_"), 1, 5.0f, SP_TEX_MIDDLE);
 	tex_middle->Enable(true);
 	vbox->Add(tex_middle, 0, wxEXPAND|wxTOP, 4);
 	vbox->Add(entry_middle, 0, wxEXPAND|wxTOP, 4);
@@ -447,7 +447,7 @@ SidePropertiesPage::SidePropertiesPage(wxWindow *parent, int side)
 
 	vbox->Add(new wxStaticText(this, -1, _T("Lower"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER), 0, wxEXPAND);
 	entry_lower = new wxTextCtrl(this, SP_ENTRY_LOWER, _T(""), wxDefaultPosition, wxDefaultSize, wxTE_CENTRE);
-	tex_lower = new ClickableTexBox(this, 96, 96, entry_lower, "_none_", 1, 5.0f, SP_TEX_LOWER);
+	tex_lower = new ClickableTexBox(this, 96, 96, entry_lower, _T("_none_"), 1, 5.0f, SP_TEX_LOWER);
 	tex_lower->Enable(true);
 	vbox->Add(tex_lower, 0, wxEXPAND|wxTOP, 4);
 	vbox->Add(entry_lower, 0, wxEXPAND|wxTOP, 4);
@@ -568,22 +568,22 @@ void SidePropertiesPage::setup_widgets()
 
 	// Upper texture
 	entry_upper->SetValue(str_to_wx(sides[0]->get_texname(TEX_UPPER)));
-	if (sides[0]->get_texname(TEX_UPPER) == "-")
-		tex_upper->set_texture("_none_");
+	if (sides[0]->get_texname(TEX_UPPER) == _T("-"))
+		tex_upper->set_texture(_T("_none_"));
 	else
 		tex_upper->set_texture(sides[0]->get_texname(TEX_UPPER), 1);
 
 	// Middle texture
 	entry_middle->SetValue(str_to_wx(sides[0]->get_texname(TEX_MIDDLE)));
-	if (sides[0]->get_texname(TEX_MIDDLE) == "-")
-		tex_middle->set_texture("_none_");
+	if (sides[0]->get_texname(TEX_MIDDLE) == _T("-"))
+		tex_middle->set_texture(_T("_none_"));
 	else
 		tex_middle->set_texture(sides[0]->get_texname(TEX_MIDDLE), 1);
 
 	// Lower texture
 	entry_lower->SetValue(str_to_wx(sides[0]->get_texname(TEX_LOWER)));
-	if (sides[0]->get_texname(TEX_LOWER) == "-")
-		tex_lower->set_texture("_none_");
+	if (sides[0]->get_texname(TEX_LOWER) == _T("-"))
+		tex_lower->set_texture(_T("_none_"));
 	else
 		tex_lower->set_texture(sides[0]->get_texname(TEX_LOWER), 1);
 
@@ -602,7 +602,7 @@ void SidePropertiesPage::setup_widgets()
 			if (sides[a]->get_texname(TEX_UPPER) != sides[0]->get_texname(TEX_UPPER))
 			{
 				entry_upper->SetValue(_T(""));
-				tex_upper->set_texture("_none_", 1);
+				tex_upper->set_texture(_T("_none_"), 1);
 			}
 		}
 
@@ -611,7 +611,7 @@ void SidePropertiesPage::setup_widgets()
 			if (sides[a]->get_texname(TEX_MIDDLE) != sides[0]->get_texname(TEX_MIDDLE))
 			{
 				entry_middle->SetValue(_T(""));
-				tex_middle->set_texture("_none_", 1);
+				tex_middle->set_texture(_T("_none_"), 1);
 			}
 		}
 
@@ -620,7 +620,7 @@ void SidePropertiesPage::setup_widgets()
 			if (sides[a]->get_texname(TEX_LOWER) != sides[0]->get_texname(TEX_LOWER))
 			{
 				entry_lower->SetValue(_T(""));
-				tex_lower->set_texture("_none_", 1);
+				tex_lower->set_texture(_T("_none_"), 1);
 			}
 		}
 

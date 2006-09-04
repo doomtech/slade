@@ -64,7 +64,7 @@ ThingEditor::ThingEditor(int type)
 	box->Add(hbox2, 1, wxEXPAND);
 
 	type_entry = new wxTextCtrl(this, TE_ENTRY_TYPE, _T(""));
-	sprite = new ClickableTexBox(this, 96, 96, type_entry, "_none_", 3, 2.0f);
+	sprite = new ClickableTexBox(this, 96, 96, type_entry, _T("_none_"), 3, 2.0f);
 	sprite->Enable(true);
 	hbox2->Add(sprite, 1, wxEXPAND|wxALL, 4);
 
@@ -416,7 +416,7 @@ void ThingEditor::angle_radio_changed(wxCommandEvent &event)
 	}
 
 	if (angle != -1)
-		angle_entry->SetValue(str_to_wx(s_fmt("%d", angle)));
+		angle_entry->SetValue(str_to_wx(s_fmt(_T("%d"), angle)));
 	else
 		angle_entry->SetValue(_T(""));
 }
@@ -432,7 +432,7 @@ void ThingEditor::type_entry_changed(wxCommandEvent &event)
 	else
 	{
 		type_label->SetLabel(_T("(Inconsistent / Don't Change)"));
-		sprite->set_texture("_none_", 3);
+		sprite->set_texture(_T("_none_"), 3);
 	}
 }
 
@@ -472,7 +472,7 @@ void ThingEditor::change_type_clicked(wxCommandEvent &event)
 	if (td.ShowModal() == wxID_OK)
 	{
 		if (td.get_type() != -1)
-			type_entry->SetValue(str_to_wx(s_fmt("%d", td.get_type())));
+			type_entry->SetValue(str_to_wx(s_fmt(_T("%d"), td.get_type())));
 	}
 }
 

@@ -27,8 +27,8 @@ EditorWindow *editor_window = NULL;
 //ScriptEditor *script_editor = NULL;
 
 CVAR(Int, show_sidebar, 0, CVAR_SAVE)
-CVAR(String, path_doomexe, "", CVAR_SAVE)
-CVAR(String, run_parameters, "-file %a", CVAR_SAVE)
+CVAR(String, path_doomexe, _T(""), CVAR_SAVE)
+CVAR(String, run_parameters, _T("-file %a"), CVAR_SAVE)
 
 /*
 extern int edit_mode, gridsize, vid_width, vid_height;
@@ -139,27 +139,27 @@ void EditorWindow::setup_toolbar()
 
 	tb->SetToolBitmapSize(wxSize(16, 17));
 
-	tb->AddTool(EWMENU_FILE_WADMANAGER, _T("Wad Manager"), wxBitmap(get_image_from_pk3("res/tbar/tb_temp16.png", wxBITMAP_TYPE_PNG)), _T("Wad Manager"));
+	tb->AddTool(EWMENU_FILE_WADMANAGER, _T("Wad Manager"), wxBitmap(get_image_from_pk3(_T("res/tbar/tb_temp16.png"), wxBITMAP_TYPE_PNG)), _T("Wad Manager"));
 	tb->AddSeparator();
-	tb->AddTool(EWMENU_FILE_SAVE, _T("Save Map"), wxBitmap(get_image_from_pk3("res/tbar/tb_save16.png", wxBITMAP_TYPE_PNG)), _T("Save Map"));
-	tb->AddTool(EWMENU_FILE_SAVEAS, _T("Save Map As"), wxBitmap(get_image_from_pk3("res/tbar/tb_saveas16.png", wxBITMAP_TYPE_PNG)), _T("Save Map As"));
-	tb->AddTool(EWMENU_FILE_RUN, _T("Run Map"), wxBitmap(get_image_from_pk3("res/tbar/tb_run16.png", wxBITMAP_TYPE_PNG)), _T("Run Map"));
-	tb->AddTool(EWMENU_FILE_CLOSE, _T("Close"), wxBitmap(get_image_from_pk3("res/tbar/tb_close16.png", wxBITMAP_TYPE_PNG)), _T("Close Map"));
+	tb->AddTool(EWMENU_FILE_SAVE, _T("Save Map"), wxBitmap(get_image_from_pk3(_T("res/tbar/tb_save16.png"), wxBITMAP_TYPE_PNG)), _T("Save Map"));
+	tb->AddTool(EWMENU_FILE_SAVEAS, _T("Save Map As"), wxBitmap(get_image_from_pk3(_T("res/tbar/tb_saveas16.png"), wxBITMAP_TYPE_PNG)), _T("Save Map As"));
+	tb->AddTool(EWMENU_FILE_RUN, _T("Run Map"), wxBitmap(get_image_from_pk3(_T("res/tbar/tb_run16.png"), wxBITMAP_TYPE_PNG)), _T("Run Map"));
+	tb->AddTool(EWMENU_FILE_CLOSE, _T("Close"), wxBitmap(get_image_from_pk3(_T("res/tbar/tb_close16.png"), wxBITMAP_TYPE_PNG)), _T("Close Map"));
 	tb->AddSeparator();
-	tb->AddRadioTool(EWMENU_MODE_VERTS, _T("Vertices Mode"), wxBitmap(get_image_from_pk3("res/tbar/tb_verts16.png", wxBITMAP_TYPE_PNG)),
-						wxBitmap(get_image_from_pk3("res/tbar/tb_vertsd16.png", wxBITMAP_TYPE_PNG)), _T("Vertices Mode"));
-	tb->AddRadioTool(EWMENU_MODE_LINES, _T("Lines Mode"), wxBitmap(get_image_from_pk3("res/tbar/tb_lines16.png", wxBITMAP_TYPE_PNG)),
-						wxBitmap(get_image_from_pk3("res/tbar/tb_linesd16.png", wxBITMAP_TYPE_PNG)), _T("Lines Mode"));
-	tb->AddRadioTool(EWMENU_MODE_SECTORS, _T("Sectors Mode"), wxBitmap(get_image_from_pk3("res/tbar/tb_sectors16.png", wxBITMAP_TYPE_PNG)),
-						wxBitmap(get_image_from_pk3("res/tbar/tb_sectorsd16.png", wxBITMAP_TYPE_PNG)), _T("Sectors Mode"));
-	tb->AddRadioTool(EWMENU_MODE_THINGS, _T("Things Mode"), wxBitmap(get_image_from_pk3("res/tbar/tb_things16.png", wxBITMAP_TYPE_PNG)),
-						wxBitmap(get_image_from_pk3("res/tbar/tb_thingsd16.png", wxBITMAP_TYPE_PNG)), _T("Things Mode"));
+	tb->AddRadioTool(EWMENU_MODE_VERTS, _T("Vertices Mode"), wxBitmap(get_image_from_pk3(_T("res/tbar/tb_verts16.png"), wxBITMAP_TYPE_PNG)),
+						wxBitmap(get_image_from_pk3(_T("res/tbar/tb_vertsd16.png"), wxBITMAP_TYPE_PNG)), _T("Vertices Mode"));
+	tb->AddRadioTool(EWMENU_MODE_LINES, _T("Lines Mode"), wxBitmap(get_image_from_pk3(_T("res/tbar/tb_lines16.png"), wxBITMAP_TYPE_PNG)),
+						wxBitmap(get_image_from_pk3(_T("res/tbar/tb_linesd16.png"), wxBITMAP_TYPE_PNG)), _T("Lines Mode"));
+	tb->AddRadioTool(EWMENU_MODE_SECTORS, _T("Sectors Mode"), wxBitmap(get_image_from_pk3(_T("res/tbar/tb_sectors16.png"), wxBITMAP_TYPE_PNG)),
+						wxBitmap(get_image_from_pk3(_T("res/tbar/tb_sectorsd16.png"), wxBITMAP_TYPE_PNG)), _T("Sectors Mode"));
+	tb->AddRadioTool(EWMENU_MODE_THINGS, _T("Things Mode"), wxBitmap(get_image_from_pk3(_T("res/tbar/tb_things16.png"), wxBITMAP_TYPE_PNG)),
+						wxBitmap(get_image_from_pk3(_T("res/tbar/tb_thingsd16.png"), wxBITMAP_TYPE_PNG)), _T("Things Mode"));
 	tb->AddSeparator();
-	tb->AddTool(EWMENU_MODE_3D, _T("3D Mode"), wxBitmap(get_image_from_pk3("res/tbar/tb_3d16.png", wxBITMAP_TYPE_PNG)), _T("3d Mode"));
+	tb->AddTool(EWMENU_MODE_3D, _T("3D Mode"), wxBitmap(get_image_from_pk3(_T("res/tbar/tb_3d16.png"), wxBITMAP_TYPE_PNG)), _T("3d Mode"));
 	tb->AddSeparator();
-	tb->AddTool(EWMENU_EDIT_MIRRORX, _T("Mirror X"), wxBitmap(get_image_from_pk3("res/tbar/tb_mirrorx16.png", wxBITMAP_TYPE_PNG)), _T("Mirror X"));
-	tb->AddTool(EWMENU_EDIT_MIRRORY, _T("Mirror Y"), wxBitmap(get_image_from_pk3("res/tbar/tb_mirrory16.png", wxBITMAP_TYPE_PNG)), _T("Mirror Y"));
-	tb->AddTool(EWMENU_EDIT_ROTATE, _T("Rotate"), wxBitmap(get_image_from_pk3("res/tbar/tb_rotate16.png", wxBITMAP_TYPE_PNG)), _T("Rotate"));
+	tb->AddTool(EWMENU_EDIT_MIRRORX, _T("Mirror X"), wxBitmap(get_image_from_pk3(_T("res/tbar/tb_mirrorx16.png"), wxBITMAP_TYPE_PNG)), _T("Mirror X"));
+	tb->AddTool(EWMENU_EDIT_MIRRORY, _T("Mirror Y"), wxBitmap(get_image_from_pk3(_T("res/tbar/tb_mirrory16.png"), wxBITMAP_TYPE_PNG)), _T("Mirror Y"));
+	tb->AddTool(EWMENU_EDIT_ROTATE, _T("Rotate"), wxBitmap(get_image_from_pk3(_T("res/tbar/tb_rotate16.png"), wxBITMAP_TYPE_PNG)), _T("Rotate"));
 
 	tb->ToggleTool(EWMENU_MODE_LINES, true);
 	tb->Realize();
@@ -587,7 +587,7 @@ void EditorWindow::file_saveas(wxCommandEvent &event)
 
 	string filename = wx_to_str(wxFileSelector(_T("Save Wadfile"), _T(""), _T(""), _T("*.wad"), _T("Doom Wad Files (*.wad)|*.wad"), wxSAVE|wxOVERWRITE_PROMPT));
 
-	if (filename != "")
+	if (filename != _T(""))
 	{
 		if (!edit_wad)
 			edit_wad = new Wad();
@@ -610,7 +610,7 @@ void EditorWindow::file_savestandalone(wxCommandEvent &event)
 
 	string filename = wx_to_str(wxFileSelector(_T("Save Standalone Map"), _T(""), _T(""), _T("*.wad"), _T("Doom Wad Files (*.wad)|*.wad"), wxSAVE|wxOVERWRITE_PROMPT));
 
-	if (filename != "")
+	if (filename != _T(""))
 	{
 		edit_wad = new Wad();
 		edit_wad->path = filename;
@@ -633,7 +633,7 @@ void EditorWindow::file_rename(wxCommandEvent &event)
 
 	string mapname = game.ask_map_name();
 
-	if (mapname != "")
+	if (mapname != _T(""))
 	{
 		if (edit_wad)
 		{
@@ -657,7 +657,7 @@ void EditorWindow::file_run(wxCommandEvent &event)
 {
 	/*
 	string exe_path = path_doomexe;
-	if (exe_path == "")
+	if (exe_path == _T(""))
 	{
 		wxMessageBox(_T("No executable set. See edit->preferences->misc"));
 		return;
@@ -710,12 +710,12 @@ void EditorWindow::file_run(wxCommandEvent &event)
 
 void EditorWindow::file_importmap(wxCommandEvent &event)
 {
-	string filename = "";
+	string filename = _T("");
 	wxFileDialog browse(NULL, _T("Open Wad"), _T(""), _T(""), _T("Doom Wad Files (*.wad)|*.wad"), wxOPEN|wxFILE_MUST_EXIST);
 	if (browse.ShowModal() == wxID_OK)
 		filename = wx_to_str(browse.GetPath());
 
-	if (filename != "")
+	if (filename != _T(""))
 	{
 		Wad temp_wad;
 
@@ -738,7 +738,7 @@ void EditorWindow::file_importmap(wxCommandEvent &event)
 
 		mapname = wx_to_str(wxGetSingleChoice(_T("Select Map"), _T("Import Map"), mapnames));
 
-		if (mapname == "")
+		if (mapname == _T(""))
 			return;
 
 		d_map.close();
@@ -871,7 +871,7 @@ void EditorWindow::edit_extrudeline(wxCommandEvent &event)
 		return;
 
 	lock_hilight = true;
-	int dist = atoi(chr(wxGetTextFromUser(_T("Enter Distance to Extrude:"), _T("Extrude Line"), _T("8"))));
+	int dist = atoi((wxGetTextFromUser(_T("Enter Distance to Extrude:"), _T("Extrude Line"), _T("8"))).c_str());
 
 	line_extrude(dist);
 	lock_hilight = false;
@@ -920,7 +920,7 @@ void EditorWindow::edit_createdoor(wxCommandEvent &event)
 		return;
 
 	lock_hilight = true;
-	string tex = "";
+	string tex = _T("");
 
 	setup_tex_browser(TEXTURES_WALLS);
 	TextureBrowser tb(game.def_doortex);
@@ -957,7 +957,7 @@ void EditorWindow::edit_createstairs(wxCommandEvent &event)
 	dlg.SetBestFittingSize();
 
 	if (dlg.ShowModal() == wxID_OK)
-		sector_create_stairs(atoi(chr(entry_floor->GetValue())), atoi(chr(entry_ceil->GetValue())));
+		sector_create_stairs(atoi((entry_floor->GetValue()).c_str()), atoi((entry_ceil->GetValue()).c_str()));
 
 	lock_hilight = false;
 }
@@ -986,7 +986,7 @@ void EditorWindow::edit_lightgradient(wxCommandEvent &event)
 		if (cb_first_to_last->GetValue())
 			sector_light_gradient(9999);
 		else
-			sector_light_gradient(atoi(chr(entry_step->GetValue())));
+			sector_light_gradient(atoi((entry_step->GetValue()).c_str()));
 	}
 }
 

@@ -6,14 +6,14 @@
 
 // String stuff
 #include <wx/string.h>
-#include <string>
 typedef wxString string;
 #define s_fmt wxString::Format
 
-#ifdef __GNUC__	// gcc doesn't like the reference version of chr, but the value version crashes in win32
-const char* chr(wxString str);
-#else
-const char* chr(wxString &str);
+const char* chr(const wxString &str);
+
+#if wxUSE_UNICODE
+#define atoi(s)	((int)wcstol(s, NULL, 10))
+#define atof(s) ((float)wcstod(s, NULL))
 #endif
 
 #include <vector>

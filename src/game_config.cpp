@@ -131,7 +131,7 @@ bool GameConfig::load_config(string filename)
 	line_flags.clear();
 
 	// Check opening brace
-	tz.check_token("{");
+	tz.check_token(_T("{"));
 
 	if (!wads.open(iwad_path, WL_IWAD))
 	{

@@ -9,7 +9,7 @@ struct browse_info_t
 	string	retval;
 	Texture	*tex;
 
-	browse_info_t() { retval = ""; tex = NULL; }
+	browse_info_t() : retval(_T("")), tex(NULL) { }
 
 	int use_count()
 	{
@@ -69,7 +69,7 @@ public:
 		BROWSER_CB_HIDEUNUSED,
 	};
 
-	TextureBrowser(string tex = "-", bool fullscreen = false);
+	TextureBrowser(string tex = _T("-"), bool fullscreen = false);
 	~TextureBrowser();
 
 	string get_texture();

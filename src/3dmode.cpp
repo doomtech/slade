@@ -16,8 +16,8 @@
 float grav = 0.5f;
 
 // Copy/paste stuff
-string	c_wall = "";
-string	c_flat = "";
+string	c_wall = _T("");
+string	c_flat = _T("");
 Side*	copy_side;
 
 extern DoomMap d_map;
@@ -236,7 +236,7 @@ void change_texture_3d(bool paint)
 		setup_tex_browser(1);
 		TextureBrowser tb(otex, true);
 
-		if (tb.ShowModal() == wxID_OK && tb.get_texture() != "")
+		if (tb.ShowModal() == wxID_OK && tb.get_texture() != _T(""))
 		{
 			if (side)
 				hl_line->side1()->set_texture(tb.get_texture(), part);
@@ -259,7 +259,7 @@ void change_texture_3d(bool paint)
 		setup_tex_browser(2);
 		TextureBrowser tb(otex, true);
 
-		if (tb.ShowModal() == wxID_OK && tb.get_texture() != "")
+		if (tb.ShowModal() == wxID_OK && tb.get_texture() != _T(""))
 		{
 			if (hl_part == PART_FLOOR)
 				d_map.sector(hl_sector)->set_ftex(tb.get_texture());
@@ -565,6 +565,6 @@ void auto_align_x_3d()
 	vector<int> lines;
 	line_auto_align_x(d_map.index(hl_line), -51403, side, tex->name, tex->width, lines);
 
-	add_3d_message("Auto X-Alignment done");
+	add_3d_message(_T("Auto X-Alignment done"));
 	d_map.change_level(MC_SAVE_NEEDED);
 }

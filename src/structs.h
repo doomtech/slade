@@ -437,7 +437,7 @@ struct key_value_t
 	string	name;
 	int		value;
 
-	key_value_t() { name = ""; value = 0; }
+	key_value_t() : name(_T("")), value(0) { }
 	key_value_t(string name, int value)
 	{
 		this->name = name;

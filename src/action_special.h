@@ -13,7 +13,7 @@ public:
 	string	args[5];
 	string	arg_types[5];
 
-	ActionSpecial(string group = "");
+	ActionSpecial(string group = _T(""));
 	~ActionSpecial();
 
 	void parse(Tokenizer *tz);

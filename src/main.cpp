@@ -99,7 +99,7 @@ void load_main_config(bool wads_open)
 // ------------------------------------------------------ >>
 void save_main_config()
 {
-	FILE *fp = fopen(chr(c_path("slade.cfg", DIR_USR)), "wt");
+	FILE *fp = fopen(chr(c_path(_T("slade.cfg"), DIR_USR)), "wt");
 
 	save_cvars(fp);
 	save_game_iwads(fp);
@@ -124,11 +124,7 @@ std::string str(string in)
 
 // chr: Converts a wxString to an ascii character string
 // -------------------------------------------------- >>
-#ifdef __GNUC__
-const char* chr(string str)
-#else
-const char* chr(string &str)
-#endif
+const char* chr(const string &str)
 {
 #ifdef UNICODE
 	wxCharBuffer buffer = str.ToAscii();
@@ -238,7 +234,7 @@ bool MainApp::OnInit()
 	setup_directories();
 
 	// Init logfile
-	wxLog::SetActiveTarget(new wxLogStderr(fopen(chr(c_path("slade.log", DIR_USR)), "wt")));
+	wxLog::SetActiveTarget(new wxLogStderr(fopen(chr(c_path(_T("slade.log"), DIR_USR)), "wt")));
 
 	// Allow high-colour toolbar icons
 	wxSystemOptions::SetOption(_T("msw.remap"), 0);

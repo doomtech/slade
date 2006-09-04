@@ -153,7 +153,7 @@ string get_key_name(int key)
 		return ret;
 	}
 
-	return s_fmt("Key%d", key);
+	return s_fmt(_T("Key%d"), key);
 }
 
 // set_defaults: Sets the default key bindings

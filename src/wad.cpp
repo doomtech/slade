@@ -25,8 +25,8 @@
 // Variables ----------------------------- >>
 WadList	wads;
 
-CVAR(String, nodebuilder_path, "", CVAR_SAVE)
-CVAR(String, nodebuilder_params, "", CVAR_SAVE)
+CVAR(String, nodebuilder_path, _T(""), CVAR_SAVE)
+CVAR(String, nodebuilder_params, _T(""), CVAR_SAVE)
 
 // External Variables -------------------- >>
 extern string map_lumps[12];
@@ -62,7 +62,7 @@ BYTE* Lump::getData(bool load)
 
 	if (size > 0 && parent)
 	{
-		FILE* fp = fopen(parent->path.c_str(), "rb");
+		FILE* fp = fopen(chr(parent->path), "rb");
 		fseek(fp, offset, SEEK_SET);
 		fread(data, size, 1, fp);
 		fclose(fp);
@@ -129,14 +129,14 @@ void Lump::dumpToFile(string filename)
 	if (!data)
 		return;
 
-	FILE *fp = fopen((char*)filename.c_str(), "wb");
+	FILE *fp = fopen(chr(filename), "wb");
 	fwrite(data, size, 1, fp);
 	fclose(fp);
 }
 
 bool Lump::loadFile(string filename)
 {
-	FILE *fp = fopen((char*)filename.c_str(), "rb");
+	FILE *fp = fopen(chr(filename), "rb");
 
 	if (!fp)
 		return false;
@@ -714,7 +714,7 @@ void Wad::save(bool nodes, string mapname)
 		while (lump < max)
 		{
 			if (inwad.IsMap (lump) &&
-				(mapname == _T("") || mapname.CmpNoCase(inwad.LumpName(lump)) == 0)) //stricmp (inwad.LumpName (lump), str(mapname).c_str()) == 0))
+				(mapname == _T("") || mapname.CmpNoCase(wxString::FromAscii(inwad.LumpName(lump))) == 0)) //stricmp (inwad.LumpName (lump), str(mapname).c_str()) == 0))
 			{
 				splash(s_fmt(_T("Building nodes on %s"), inwad.LumpName(lump)), true);
 				FProcessor builder(inwad, lump);
@@ -742,9 +742,9 @@ void Wad::save(bool nodes, string mapname)
 
 		outwad.Close();
 
-		remove(path.c_str());
+		remove(chr(path));
 		copy_file(s_fmt(_T("%s.temp"), chr(wadpath)), wadpath);
-		remove(chr(s_fmt("%s.temp", chr(wadpath))));
+		remove(chr((s_fmt(_T("%s.temp"), chr(wadpath)))));
 
 		splash_hide();
 	}

@@ -102,7 +102,7 @@ Line::Line(doomline_t l, DoomMap *parent, bool &ok)
 
 	if (!parent->valid(v1))
 	{
-		log_message(s_fmt("Invalid first vertex %d", l.vertex1));
+		log_message(s_fmt(_T("Invalid first vertex %d"), l.vertex1));
 		ok = false;
 	}
 	else
@@ -110,7 +110,7 @@ Line::Line(doomline_t l, DoomMap *parent, bool &ok)
 
 	if (!parent->valid(v2))
 	{
-		log_message(s_fmt("Invalid second vertex %d", l.vertex2));
+		log_message(s_fmt(_T("Invalid second vertex %d"), l.vertex2));
 		ok = false;
 	}
 	else
@@ -128,7 +128,7 @@ Line::Line(doomline_t l, DoomMap *parent, bool &ok)
 
 	if ((side1 < -1 || side1 > parent->n_sides()) && side1 != 65535)
 	{
-		log_message(s_fmt("Invalid first side %d", side1));
+		log_message(s_fmt(_T("Invalid first side %d"), side1));
 		s1 = parent->side(-1);
 	}
 	else
@@ -136,7 +136,7 @@ Line::Line(doomline_t l, DoomMap *parent, bool &ok)
 
 	if ((side2 < -1 || side2 > parent->n_sides()) && side2 != 65535)
 	{
-		log_message(s_fmt("Invalid second side %d", side2));
+		log_message(s_fmt(_T("Invalid second side %d"), side2));
 		s2 = parent->side(-1);
 	}
 	else
@@ -172,7 +172,7 @@ Line::Line(hexenline_t l, DoomMap *parent, bool &ok)
 
 	if (!parent->valid(v1))
 	{
-		log_message(s_fmt("Invalid first vertex %d", l.vertex1));
+		log_message(s_fmt(_T("Invalid first vertex %d"), l.vertex1));
 		ok = false;
 	}
 	else
@@ -180,7 +180,7 @@ Line::Line(hexenline_t l, DoomMap *parent, bool &ok)
 
 	if (!parent->valid(v2))
 	{
-		log_message(s_fmt("Invalid second vertex %d", l.vertex2));
+		log_message(s_fmt(_T("Invalid second vertex %d"), l.vertex2));
 		ok = false;
 	}
 	else
@@ -198,7 +198,7 @@ Line::Line(hexenline_t l, DoomMap *parent, bool &ok)
 
 	if ((side1 < -1 || side1 > parent->n_sides()) && side1 != 65535)
 	{
-		log_message(s_fmt("Invalid first side %d", side1));
+		log_message(s_fmt(_T("Invalid first side %d"), side1));
 		s1 = parent->side(-1);
 	}
 	else
@@ -206,7 +206,7 @@ Line::Line(hexenline_t l, DoomMap *parent, bool &ok)
 
 	if ((side2 < -1 || side2 > parent->n_sides()) && side2 != 65535)
 	{
-		log_message(s_fmt("Invalid second side %d", side2));
+		log_message(s_fmt(_T("Invalid second side %d"), side2));
 		s2 = parent->side(-1);
 	}
 	else
@@ -262,26 +262,26 @@ WORD Line::get_trigger()
 
 string Line::get_trigger_string()
 {
-	WORD trigger = get_trigger();
-
-	if (trigger == 0)
-		return "Player Crosses Line";
-	if (trigger == 1)
-		return "Player Uses Line";
-	if (trigger == 2)
-		return "Monster Crosses Line";
-	if (trigger == 3)
-		return "Projectile Hits Line";
-	if (trigger == 4)
-		return "Player Bumps Line";
-	if (trigger == 5)
-		return "Projectile Crosses Line";
-	if (trigger == 6)
-		return "Player Uses Line (PassThru)";
-	if (trigger == 7)
-		return "Projectile Hits OR Crosses Line";
-
-	return "Unknown";
+	switch(get_trigger()) {
+		case 0:
+			return _T("Player Crosses Line");
+		case 1:
+			return _T("Player Uses Line");
+		case 2:
+			return _T("Monster Crosses Line");
+		case 3:
+			return _T("Projectile Hits Line");
+		case 4:
+			return _T("Player Bumps Line");
+		case 5:
+			return _T("Projectile Crosses Line");
+		case 6:
+			return _T("Player Uses Line (PassThru)");
+		case 7:
+			return _T("Projectile Hits OR Crosses Line");
+		default:
+			return _T("Unknown");
+	}
 }
 
 rect_t Line::get_rect()
@@ -463,7 +463,7 @@ bool Line::needs_middle(bool front)
 			return true;
 		else
 		{
-			if (parent->side(side1)->get_texname(TEX_MIDDLE) == "-")
+			if (parent->side(side1)->get_texname(TEX_MIDDLE) == _T("-"))
 				return false;
 			else
 				return true;
@@ -471,7 +471,7 @@ bool Line::needs_middle(bool front)
 	}
 	else if (side1 != -1)
 	{
-		if (parent->side(side2)->get_texname(TEX_MIDDLE) == "-")
+		if (parent->side(side2)->get_texname(TEX_MIDDLE) == _T("-"))
 			return false;
 		else
 			return true;
@@ -653,7 +653,7 @@ void Line::set_sector(int side, Sector* sector)
 				clear_flag(1);
 
 				if (parent->valid(s1))
-					s1->set_texture("-");
+					s1->set_texture(_T("-"));
 			}
 			else
 			{

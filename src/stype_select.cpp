@@ -102,7 +102,7 @@ STypeSelectDialog::~STypeSelectDialog()
 int STypeSelectDialog::get_value()
 {
 	int ret = 0;
-	sscanf(wx_to_str(list_types->GetStringSelection()).c_str(), "%d", &ret);
+	sscanf(chr(list_types->GetStringSelection()), "%d", &ret);
 
 	if (game.boom())
 	{

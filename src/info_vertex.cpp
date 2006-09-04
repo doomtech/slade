@@ -43,9 +43,9 @@ void VertexInfoBar::update()
 	}
 	else
 	{
-		main_frame->SetLabel(str_to_wx(s_fmt("Vertex #%d", d_map.hilight())));
-		label_x->SetLabel(str_to_wx(s_fmt("X Position: %d", d_map.vertex(d_map.hilight())->x_pos())));
-		label_y->SetLabel(str_to_wx(s_fmt("Y Position: %d", d_map.vertex(d_map.hilight())->y_pos())));
+		main_frame->SetLabel(str_to_wx(s_fmt(_T("Vertex #%d"), d_map.hilight())));
+		label_x->SetLabel(str_to_wx(s_fmt(_T("X Position: %d"), d_map.vertex(d_map.hilight())->x_pos())));
+		label_y->SetLabel(str_to_wx(s_fmt(_T("Y Position: %d"), d_map.vertex(d_map.hilight())->y_pos())));
 	}
 
 	Layout();

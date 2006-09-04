@@ -72,7 +72,7 @@ bool build_gl_nodes()
 	int unit_count = 0;
 	int unit_size = 0;
 
-	if (!wad.open(chr(c_path(_T("sladetemp.wad"), DIR_TMP))))
+	if (!wad.open((c_path(_T("sladetemp.wad"), DIR_TMP)).c_str()))
 	{
 		message_box(_T("Failed to build GL nodes!\n"));
 		splash_hide();

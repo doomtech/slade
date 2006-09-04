@@ -134,7 +134,7 @@ void Tokenizer::skip_multiline_comment()
 // ------------------------------------------------------ >>
 string Tokenizer::get_token()
 {
-	string ret_str = "";
+	string ret_str = _T("");
 	bool ready = false;
 
 	// Increment pointer to next token

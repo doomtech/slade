@@ -33,7 +33,7 @@ vector<string>	recent_wads;
 Wad*			selected_wad;
 bool			game_changed = true;
 
-CVAR(String, game_config, "Doom 2", CVAR_SAVE)
+CVAR(String, game_config, _T("Doom 2"), CVAR_SAVE)
 CVAR(Int, n_recent_wads, 6, CVAR_SAVE)
 
 // External Variables --------------------------- >>
@@ -50,12 +50,12 @@ EXTERN_CVAR(Bool, line_aa)
 
 void load_recent_wads(Tokenizer *tz)
 {
-	tz->check_token("{");
+	tz->check_token(_T("{"));
 
 	string token = tz->get_token();
-	while (token != "}")
+	while (token != _T("}"))
 	{
-		if (token == "wad")
+		if (token == _T("wad"))
 			recent_wads.push_back(tz->get_token());
 
 		token = tz->get_token();
@@ -74,15 +74,15 @@ void save_recent_wads(FILE *fp)
 
 void load_open_wads(Tokenizer *tz)
 {
-	tz->check_token("{");
+	tz->check_token(_T("{"));
 
 	string token = tz->get_token();
-	while (token != "}")
+	while (token != _T("}"))
 	{
-		if (token == "wad")
+		if (token == _T("wad"))
 			wads.open(tz->get_token());
 
-		if (token == "zip")
+		if (token == _T("zip"))
 			wads.open(tz->get_token(), WL_ZIP);
 
 		token = tz->get_token();
@@ -180,7 +180,7 @@ void MapPreviewCanvas::preview_map(Wad* wad, string mapname)
 	preview_lines.clear();
 	dimensions.set(0, 0);
 
-	if (!wad || mapname == "" || wad->zip)
+	if (!wad || mapname == _T("") || wad->zip)
 		return;
 
 	//wxLogMessage(_T("Preview map %s in %s"), mapname.c_str(), wad->path.c_str());
@@ -432,7 +432,7 @@ wxStaticBoxSizer *WadManager::setup_game_combo_frame(wxWindow *panel)
 
 			string temp = tz.get_token();
 
-			if (temp == "game") // If it's a valid SLADE game configuration
+			if (temp == _T("game")) // If it's a valid SLADE game configuration
 			{
 				// Add the file path to the game config list
 				game_config_paths.push_back(wx_to_str(name));
@@ -695,7 +695,7 @@ void WadManager::new_standalone_clicked(wxCommandEvent &event)
 
 	string mapname = game.ask_map_name();
 
-	if (mapname != "")
+	if (mapname != _T(""))
 	{
 		if (game_changed)
 			begin_mapedit();
@@ -737,7 +737,7 @@ void WadManager::maps_list_activated(wxCommandEvent &event)
 
 	string mapname = available_maps->GetString(available_maps->GetSelection());
 
-	if (mapname == "")
+	if (mapname == _T(""))
 		return;
 
 	if (game_changed)

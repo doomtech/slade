@@ -38,7 +38,7 @@ SplashWindow::SplashWindow()
 	wxBoxSizer *vbox = new wxBoxSizer(wxVERTICAL);
 	SetSizer(vbox);
 
-	logo = new ImageBox(this, get_image_from_pk3("res/edit_tex/logo.png", wxBITMAP_TYPE_PNG));
+	logo = new ImageBox(this, get_image_from_pk3(_T("res/edit_tex/logo.png"), wxBITMAP_TYPE_PNG));
 	vbox->Add(logo, 0, wxEXPAND);
 
 	message = new wxStaticText(this, -1, _T("Hello"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);

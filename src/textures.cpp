@@ -127,7 +127,7 @@ void purge_textures()
 
 Texture* get_texture(string name, int type, bool force)
 {
-	if (name == "-")
+	if (name == _T("-"))
 		return blank_tex;
 
 	bool mix = mix_tex;
@@ -526,7 +526,7 @@ void load_textures_lump(Wad* wad, Lump *lump, bool iwad = false)
 		lefread(&height, 2, 1, fp);
 
 		// Add texture
-		Texture *tex = get_texture(texname, 1, true);
+		Texture *tex = get_texture(wxString::FromAscii(texname), 1, true);
 
 		bool i = iwad;
 		if (tex->name != _T("_notex"))
@@ -538,7 +538,7 @@ void load_textures_lump(Wad* wad, Lump *lump, bool iwad = false)
 		}
 
 		tex = new DoomTexture();
-		tex->name = texname;
+		tex->name = wxString::FromAscii(texname);
 		tex->width = width;
 		tex->height = height;
 		tex->flags |= TEX_STRETCH;
@@ -587,7 +587,7 @@ void load_pnames(Wad* wad)
 		lefread(name, 1, 8, fp);
 		name[8] = 0;
 
-		pnames.push_back(name);
+		pnames.push_back(wxString::FromAscii(name));
 	}
 
 	fclose(fp);

@@ -24,7 +24,7 @@ SectorEditor::SectorEditor()
 	hbox->Add(box, 0, wxEXPAND|wxALL, 4);
 
 	entry_ftex = new wxTextCtrl(this, SE_ENTRY_FTEX, _T(""), wxDefaultPosition, wxDefaultSize, wxTE_CENTRE);
-	tbox_ftex = new ClickableTexBox(this, 128, 128, entry_ftex, "_none_", 2, 5.0f);
+	tbox_ftex = new ClickableTexBox(this, 128, 128, entry_ftex, _T("_none_"), 2, 5.0f);
 	tbox_ftex->Enable(true);
 	box->Add(tbox_ftex, 0, wxEXPAND|wxALL, 4);
 	box->Add(entry_ftex, 0, wxEXPAND|wxALL, 4);
@@ -42,7 +42,7 @@ SectorEditor::SectorEditor()
 	hbox->Add(box, 0, wxEXPAND|wxALL, 4);
 
 	entry_ctex = new wxTextCtrl(this, SE_ENTRY_CTEX, _T(""), wxDefaultPosition, wxDefaultSize, wxTE_CENTRE);
-	tbox_ctex = new ClickableTexBox(this, 128, 128, entry_ctex, "_none_", 2, 5.0f);
+	tbox_ctex = new ClickableTexBox(this, 128, 128, entry_ctex, _T("_none_"), 2, 5.0f);
 	tbox_ctex->Enable(true);
 	box->Add(tbox_ctex, 0, wxEXPAND|wxALL, 4);
 	box->Add(entry_ctex, 0, wxEXPAND|wxALL, 4);
@@ -143,14 +143,14 @@ void SectorEditor::setup_widgets()
 			// Floor tex
 			if (d_map.sector(selection[a])->tex_floor() != s->tex_floor())
 			{
-				tbox_ftex->set_texture("_none_", 2);
+				tbox_ftex->set_texture(_T("_none_"), 2);
 				entry_ftex->SetValue(_T(""));
 			}
 
 			// Ceiling tex
 			if (d_map.sector(selection[a])->tex_ceil() != s->tex_ceil())
 			{
-				tbox_ctex->set_texture("_none_", 2);
+				tbox_ctex->set_texture(_T("_none_"), 2);
 				entry_ctex->SetValue(_T(""));
 			}
 

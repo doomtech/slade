@@ -14,7 +14,7 @@ protected:
 	float		scale;
 
 public:
-	TextureBox(wxWindow *parent, int width, int height, string texture = "_notex", int textype = 0, float scale = 1.0f, int id = -1);
+	TextureBox(wxWindow *parent, int width, int height, string texture = _T("_notex"), int textype = 0, float scale = 1.0f, int id = -1);
 	~TextureBox();
 
 	void set_size(int width, int height);
@@ -36,7 +36,7 @@ private:
 
 public:
 	ClickableTexBox(wxWindow *parent, int width, int height, wxTextCtrl *entry,
-		string texture = "_notex", int textype = 0, float scale = 1.0f, int id = -1)
+		string texture = _T("_notex"), int textype = 0, float scale = 1.0f, int id = -1)
 		: TextureBox(parent, width, height, texture, textype, scale, id)
 	{
 		this->entry = entry;

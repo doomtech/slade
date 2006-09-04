@@ -134,7 +134,7 @@ public:
 */
 
 #define CVAR(type, name, val, flags) \
-	C##type##CVar name (#name, val, flags);
+	C##type##CVar name (_T(#name), val, flags);
 
 #define EXTERN_CVAR(type, name) extern C##type##CVar name;
 

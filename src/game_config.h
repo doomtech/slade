@@ -24,7 +24,7 @@ struct sectortype_t
 	int		type;
 	string	name;
 
-	sectortype_t(string name = "Unknown", int type = -1)
+	sectortype_t(string name = _T("Unknown"), int type = -1)
 	{
 		this->name = name;
 		this->type = type;

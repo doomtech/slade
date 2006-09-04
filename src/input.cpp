@@ -21,6 +21,7 @@
 #include "3dmode.h"
 #include "ttype_select.h"
 #include "edit_misc.h"
+#include "copypaste.h"
 
 /*
 #include "map.h"
@@ -29,7 +30,6 @@
 #include "mathstuff.h"
 #include "console.h"
 //#include "console_window.h"
-#include "copypaste.h"
 #include "linedraw.h"
 */
 
@@ -46,13 +46,13 @@ extern int edit_mode;
 extern bool lock_hilight;
 extern Camera camera;
 extern Thing last_thing;
+extern Clipboard clipboard;
 
 /*
 extern float xoff, yoff, zoom;
 extern bool paste_mode, lock_hilight;
 extern point2_t mouse, down_pos;
 extern rect_t sel_box;
-extern Clipboard clipboard;
 
 */
 extern vector<string> pressed_keys;
@@ -85,6 +85,11 @@ void cycle_edit_mode()
 point2_t down_pos(bool translate)
 {
 	return editor_window->map()->get_down_pos(translate);
+}
+
+point2_t mouse_pos(bool translate)
+{
+	return editor_window->map()->mouse_pos(translate);
 }
 
 // edit_item: When the edit item key is pressed
@@ -591,14 +596,14 @@ void keys_edit()
 	if (RELEASED("sector_merge") && state())
 	{
 		sector_merge(false);
-		binds.clear("sector_merge");
+		binds.clear(_T("sector_merge"));
 	}
 
 	// Join sectors
 	if (RELEASED("sector_join") && state())
 	{
 		sector_merge(true);
-		binds.clear("sector_join");
+		binds.clear(_T("sector_join"));
 	}
 
 	if (RELEASED("view_3dmode") && state())
@@ -614,34 +619,35 @@ void keys_edit()
 		binds.clear("open_console");
 		//popup_console();
 	}
+	*/
 
+	// Copy/Paste stuff
 	if (RELEASED("copy"))
 	{
-		binds.clear("copy");
+		binds.clear(_T("copy"));
 		clipboard.Copy();
 	}
 
 	if (RELEASED("paste") && state())
 	{
-		binds.clear("paste");
+		binds.clear(_T("paste"));
 		//paste_mode = true;
 		change_state(STATE_PASTE);
-		clear_selection();
+		d_map.clear_selection();
 	}
 
 	if (RELEASED("cancel_paste"))
 	{
-		binds.clear("cancel_paste");
+		binds.clear(_T("cancel_paste"));
 		//paste_mode = false;
 		change_state();
-		editor_window->redraw_map(true, false);
+		redraw_map();
 	}
-	*/
 
 	// Toggle grid snap
 	if (RELEASED("edit_gridsnap"))
 	{
-		binds.clear("edit_gridsnap");
+		binds.clear(_T("edit_gridsnap"));
 		edit_snap_grid = !edit_snap_grid;
 		redraw_map();
 	}
@@ -649,7 +655,7 @@ void keys_edit()
 	// Toggle hilight lock
 	if (RELEASED("edit_lockhilight"))
 	{
-		binds.clear("edit_lockhilight");
+		binds.clear(_T("edit_lockhilight"));
 		lock_hilight = !lock_hilight;
 	}
 }
@@ -819,56 +825,56 @@ bool keys_3d(float mult, bool mwheel)
 		return false;
 	}
 
-	if (binds.pressed("3d_forward"))
+	if (binds.pressed(_T("3d_forward")))
 		camera.move_camera(speed);
 
-	if (binds.pressed("3d_back"))
+	if (binds.pressed(_T("3d_back")))
 		camera.move_camera(-speed);
 
-	if (binds.pressed("3d_left"))
-		camera.rotate_view((speed*0.002f), 0.0f, 0.0f, 1.0f);
+	if (binds.pressed(_T("3d_left")))
+		camera.rotate_view((speed*0.002f), 0.0f, 0.0f, 0.5f);
 
-	if (binds.pressed("3d_right"))
-		camera.rotate_view(-(speed*0.002f), 0.0f, 0.0f, 1.0f);
+	if (binds.pressed(_T("3d_right")))
+		camera.rotate_view(-(speed*0.002f), 0.0f, 0.0f, 0.5f);
 
-	if (binds.pressed("3d_strafeleft"))
+	if (binds.pressed(_T("3d_strafeleft")))
 		camera.strafe_camera(-speed);
 
-	if (binds.pressed("3d_straferight"))
+	if (binds.pressed(_T("3d_straferight")))
 		camera.strafe_camera(speed);
 
-	if (binds.pressed("3d_moveup"))
+	if (binds.pressed(_T("3d_moveup")))
 	{
 		camera.position.z += speed;
 		camera.view.z += speed;
 	}
 
-	if (binds.pressed("3d_movedown"))
+	if (binds.pressed(_T("3d_movedown")))
 	{
 		camera.position.z -= speed;
 		camera.view.z -= speed;
 	}
 
-	if (binds.pressed("3d_toggle_fullbright"))
+	if (binds.pressed(_T("3d_toggle_fullbright")))
 	{
 		binds.clear(_T("3d_toggle_fullbright"));
 		render_fullbright = !render_fullbright;
 	}
 
-	if (binds.pressed("3d_toggle_fog"))
+	if (binds.pressed(_T("3d_toggle_fog")))
 	{
 		binds.clear(_T("3d_toggle_fog"));
 		render_fog = !render_fog;
 	}
 
-	if (binds.pressed("3d_toggle_sky"))
+	if (binds.pressed(_T("3d_toggle_sky")))
 	{
 		binds.clear(_T("3d_toggle_sky"));
 		render_sky = !render_sky;
 	}
 	
 	/*
-	if (binds.pressed("3d_toggle_things"))
+	if (binds.pressed(_T("3d_toggle_things")))
 	{
 		binds.clear("3d_toggle_things");
 		render_things = render_things + 1;
@@ -878,7 +884,7 @@ bool keys_3d(float mult, bool mwheel)
 	}
 	*/
 
-	if (binds.pressed("3d_toggle_gravity"))
+	if (binds.pressed(_T("3d_toggle_gravity")))
 	{
 		binds.clear(_T("3d_toggle_gravity"));
 		camera.gravity = !camera.gravity;
@@ -890,38 +896,38 @@ bool keys_3d(float mult, bool mwheel)
 	}
 
 	// Sector height quick changes (8 units)
-	if (binds.pressed("3d_upfloor8") && (key_3d_allow || mwheel))
+	if (binds.pressed(_T("3d_upfloor8")) && (key_3d_allow || mwheel))
 	{
 		change_sector_height_3d(8);
 		key_3d_rep = key_delay_3d;
 	}
 
-	if (binds.pressed("3d_downfloor8") && (key_3d_allow || mwheel))
+	if (binds.pressed(_T("3d_downfloor8")) && (key_3d_allow || mwheel))
 	{
 		change_sector_height_3d(-8);
 		key_3d_rep = key_delay_3d;
 	}
 
-	if (binds.pressed("3d_upceil8") && (key_3d_allow || mwheel))
+	if (binds.pressed(_T("3d_upceil8")) && (key_3d_allow || mwheel))
 	{
 		change_sector_height_3d(8, false);
 		key_3d_rep = key_delay_3d;
 	}
 
-	if (binds.pressed("3d_downceil8") && (key_3d_allow || mwheel))
+	if (binds.pressed(_T("3d_downceil8")) && (key_3d_allow || mwheel))
 	{
 		change_sector_height_3d(-8, false);
 		key_3d_rep = key_delay_3d;
 	}
 
-	if (binds.pressed("3d_upboth8") && (key_3d_allow || mwheel))
+	if (binds.pressed(_T("3d_upboth8")) && (key_3d_allow || mwheel))
 	{
 		change_sector_height_3d(8, true, true);
 		change_sector_height_3d(8, false, true);
 		key_3d_rep = key_delay_3d;
 	}
 
-	if (binds.pressed("3d_downboth8") && (key_3d_allow || mwheel))
+	if (binds.pressed(_T("3d_downboth8")) && (key_3d_allow || mwheel))
 	{
 		change_sector_height_3d(-8, true, true);
 		change_sector_height_3d(-8, false, true);
@@ -929,38 +935,38 @@ bool keys_3d(float mult, bool mwheel)
 	}
 
 	// Sector height quick changes (1 unit)
-	if (binds.pressed("3d_upfloor") && (key_3d_allow || mwheel))
+	if (binds.pressed(_T("3d_upfloor")) && (key_3d_allow || mwheel))
 	{
 		change_sector_height_3d(1);
 		key_3d_rep = key_delay_3d;
 	}
 
-	if (binds.pressed("3d_downfloor") && (key_3d_allow || mwheel))
+	if (binds.pressed(_T("3d_downfloor")) && (key_3d_allow || mwheel))
 	{
 		change_sector_height_3d(-1);
 		key_3d_rep = key_delay_3d;
 	}
 
-	if (binds.pressed("3d_upceil") && (key_3d_allow || mwheel))
+	if (binds.pressed(_T("3d_upceil")) && (key_3d_allow || mwheel))
 	{
 		change_sector_height_3d(1, false);
 		key_3d_rep = key_delay_3d;
 	}
 
-	if (binds.pressed("3d_downceil") && (key_3d_allow || mwheel))
+	if (binds.pressed(_T("3d_downceil")) && (key_3d_allow || mwheel))
 	{
 		change_sector_height_3d(-1, false);
 		key_3d_rep = key_delay_3d;
 	}
 
-	if (binds.pressed("3d_upboth") && (key_3d_allow || mwheel))
+	if (binds.pressed(_T("3d_upboth")) && (key_3d_allow || mwheel))
 	{
 		change_sector_height_3d(1, true, true);
 		change_sector_height_3d(1, false, true);
 		key_3d_rep = key_delay_3d;
 	}
 
-	if (binds.pressed("3d_downboth") && (key_3d_allow || mwheel))
+	if (binds.pressed(_T("3d_downboth")) && (key_3d_allow || mwheel))
 	{
 		change_sector_height_3d(-1, true, true);
 		change_sector_height_3d(-1, false, true);
@@ -968,94 +974,94 @@ bool keys_3d(float mult, bool mwheel)
 	}
 
 	// Texture offset
-	if (binds.pressed("3d_upyoffset") && (key_3d_allow || mwheel))
+	if (binds.pressed(_T("3d_upyoffset")) && (key_3d_allow || mwheel))
 	{
 		change_offsets_3d(0, 1);
 		key_3d_rep = key_delay_3d;
 	}
 
-	if (binds.pressed("3d_downyoffset") && (key_3d_allow || mwheel))
+	if (binds.pressed(_T("3d_downyoffset")) && (key_3d_allow || mwheel))
 	{
 		change_offsets_3d(0, -1);
 		key_3d_rep = key_delay_3d;
 	}
 
-	if (binds.pressed("3d_upxoffset") && (key_3d_allow || mwheel))
+	if (binds.pressed(_T("3d_upxoffset")) && (key_3d_allow || mwheel))
 	{
 		change_offsets_3d(1, 0);
 		key_3d_rep = key_delay_3d;
 	}
 
-	if (binds.pressed("3d_downxoffset") && (key_3d_allow || mwheel))
+	if (binds.pressed(_T("3d_downxoffset")) && (key_3d_allow || mwheel))
 	{
 		change_offsets_3d(-1, 0);
 		key_3d_rep = key_delay_3d;
 	}
 
 	// Texture offset x8
-	if (binds.pressed("3d_upyoffset8") && (key_3d_allow || mwheel))
+	if (binds.pressed(_T("3d_upyoffset8")) && (key_3d_allow || mwheel))
 	{
 		change_offsets_3d(0, 8);
 		key_3d_rep = key_delay_3d;
 	}
 
-	if (binds.pressed("3d_downyoffset8") && (key_3d_allow || mwheel))
+	if (binds.pressed(_T("3d_downyoffset8")) && (key_3d_allow || mwheel))
 	{
 		change_offsets_3d(0, -8);
 		key_3d_rep = key_delay_3d;
 	}
 
-	if (binds.pressed("3d_upxoffset8") && (key_3d_allow || mwheel))
+	if (binds.pressed(_T("3d_upxoffset8")) && (key_3d_allow || mwheel))
 	{
 		change_offsets_3d(8, 0);
 		key_3d_rep = key_delay_3d;
 	}
 
-	if (binds.pressed("3d_downxoffset8") && (key_3d_allow || mwheel))
+	if (binds.pressed(_T("3d_downxoffset8")) && (key_3d_allow || mwheel))
 	{
 		change_offsets_3d(-8, 0);
 		key_3d_rep = key_delay_3d;
 	}
 
-	if (binds.pressed("3d_toggle_hilight"))
+	if (binds.pressed(_T("3d_toggle_hilight")))
 	{
 		binds.clear(_T("3d_toggle_hilight"));
 		render_hilight = !render_hilight;
 	}
 
 	// Upper/Lower unpegged toggle
-	if (binds.pressed("3d_upperunpegged"))
+	if (binds.pressed(_T("3d_upperunpegged")))
 	{
 		binds.clear(_T("3d_upperunpegged"));
 		toggle_texture_peg_3d(true);
 	}
 
-	if (binds.pressed("3d_lowerunpegged"))
+	if (binds.pressed(_T("3d_lowerunpegged")))
 	{
 		binds.clear(_T("3d_lowerunpegged"));
 		toggle_texture_peg_3d(false);
 	}
 
 	// Change light level
-	if (binds.pressed("3d_uplightlevel"))
+	if (binds.pressed(_T("3d_uplightlevel")))
 	{
 		binds.clear(_T("3d_uplightlevel"));
 		change_light_3d(16);
 	}
 
-	if (binds.pressed("3d_downlightlevel"))
+	if (binds.pressed(_T("3d_downlightlevel")))
 	{
 		binds.clear(_T("3d_downlightlevel"));
 		change_light_3d(-16);
 	}
 
-	if (binds.pressed("3d_uplightlevel1"))
+	if (binds.pressed(_T("3d_uplightlevel1")))
 	{
 		binds.clear(_T("3d_uplightlevel1"));
 		change_light_3d(1);
 	}
 
-	if (binds.pressed("3d_downlightlevel1"))
+	if (binds.pressed(_T("3d_downlightlevel1")))
 	{
 		binds.clear(_T("3d_downlightlevel1"));
 		change_light_3d(-1);
@@ -1063,13 +1069,13 @@ bool keys_3d(float mult, bool mwheel)
 
 	/*
 	// Change thing angle
-	if (binds.pressed("3d_upthingangle") && (key_3d_allow || mwheel))
+	if (binds.pressed(_T("3d_upthingangle")) && (key_3d_allow || mwheel))
 	{
 		change_thing_angle_3d(45);
 		key_3d_rep = key_delay_3d;
 	}
 
-	if (binds.pressed("3d_downthingangle") && (key_3d_allow || mwheel))
+	if (binds.pressed(_T("3d_downthingangle")) && (key_3d_allow || mwheel))
 	{
 		change_thing_angle_3d(-45);
 		key_3d_rep = key_delay_3d;
@@ -1078,25 +1084,25 @@ bool keys_3d(float mult, bool mwheel)
 	// Change thing z height
 	if (map.hexen)
 	{
-		if (binds.pressed("3d_upthingz8") && (key_3d_allow || mwheel))
+		if (binds.pressed(_T("3d_upthingz8")) && (key_3d_allow || mwheel))
 		{
 			change_thing_z_3d(8);
 			key_3d_rep = key_delay_3d;
 		}
 
-		if (binds.pressed("3d_downthingz8") && (key_3d_allow || mwheel))
+		if (binds.pressed(_T("3d_downthingz8")) && (key_3d_allow || mwheel))
 		{
 			change_thing_z_3d(-8);
 			key_3d_rep = key_delay_3d;
 		}
 
-		if (binds.pressed("3d_upthingz") && (key_3d_allow || mwheel))
+		if (binds.pressed(_T("3d_upthingz")) && (key_3d_allow || mwheel))
 		{
 			change_thing_z_3d(1);
 			key_3d_rep = key_delay_3d;
 		}
 
-		if (binds.pressed("3d_downthingz") && (key_3d_allow || mwheel))
+		if (binds.pressed(_T("3d_downthingz")) && (key_3d_allow || mwheel))
 		{
 			change_thing_z_3d(-1);
 			key_3d_rep = key_delay_3d;
@@ -1111,101 +1117,101 @@ bool keys_3d(float mult, bool mwheel)
 	}
 
 	// Reset offsets
-	if (binds.pressed("3d_reset_offsets"))
+	if (binds.pressed(_T("3d_reset_offsets")))
 	{
 		binds.clear(_T("3d_reset_offsets"));
 		reset_offsets_3d();
 	}
 
-	if (binds.pressed("3d_reset_xoffset"))
+	if (binds.pressed(_T("3d_reset_xoffset")))
 	{
 		binds.clear(_T("3d_reset_xoffset"));
 		reset_offsets_3d(true, false);
 	}
 
-	if (binds.pressed("3d_reset_yoffset"))
+	if (binds.pressed(_T("3d_reset_yoffset")))
 	{
 		binds.clear(_T("3d_reset_yoffset"));
 		reset_offsets_3d(false, true);
 	}
 
 	// Change (browse) texture
-	if (binds.pressed("3d_change_texture"))
+	if (binds.pressed(_T("3d_change_texture")))
 	{
 		binds.clear(_T("3d_change_texture"));
 		change_texture_3d(false);
 	}
 
-	if (binds.pressed("3d_change_tex_paint"))
+	if (binds.pressed(_T("3d_change_tex_paint")))
 	{
 		binds.clear(_T("3d_change_tex_paint"));
 		change_texture_3d(true);
 	}
 
 	// Copy/Paste texture
-	if (binds.pressed("3d_copy_texture"))
+	if (binds.pressed(_T("3d_copy_texture")))
 	{
 		binds.clear(_T("3d_copy_texture"));
 		copy_texture_3d();
 	}
 
-	if (binds.pressed("3d_paste_texture"))
+	if (binds.pressed(_T("3d_paste_texture")))
 	{
 		binds.clear(_T("3d_paste_texture"));
 		paste_texture_3d(false);
 	}
 
-	if (binds.pressed("3d_paste_paint"))
+	if (binds.pressed(_T("3d_paste_paint")))
 	{
 		binds.clear(_T("3d_paste_paint"));
 		paste_texture_3d(true);
 	}
 
 	// Copy/paste side properties
-	if (binds.pressed("3d_copy_side"))
+	if (binds.pressed(_T("3d_copy_side")))
 	{
 		binds.clear(_T("3d_copy_side"));
 		copy_side_3d(true, true, true);
 	}
 
-	if (binds.pressed("3d_paste_side"))
+	if (binds.pressed(_T("3d_paste_side")))
 	{
 		binds.clear(_T("3d_paste_side"));
 		paste_side_3d(true, true, true);
 	}
 
 	// Copy/paste offsets
-	if (binds.pressed("3d_copy_offsets"))
+	if (binds.pressed(_T("3d_copy_offsets")))
 	{
 		binds.clear(_T("3d_copy_offsets"));
 		copy_side_3d(true, true);
 	}
 
-	if (binds.pressed("3d_paste_offsets"))
+	if (binds.pressed(_T("3d_paste_offsets")))
 	{
 		binds.clear(_T("3d_paste_offsets"));
 		paste_side_3d(true, true);
 	}
 
-	if (binds.pressed("3d_copy_xoffset"))
+	if (binds.pressed(_T("3d_copy_xoffset")))
 	{
 		binds.clear(_T("3d_copy_xoffset"));
 		copy_side_3d(true, false);
 	}
 
-	if (binds.pressed("3d_paste_xoffset"))
+	if (binds.pressed(_T("3d_paste_xoffset")))
 	{
 		binds.clear(_T("3d_paste_xoffset"));
 		paste_side_3d(true, false);
 	}
 
-	if (binds.pressed("3d_copy_yoffset"))
+	if (binds.pressed(_T("3d_copy_yoffset")))
 	{
 		binds.clear(_T("3d_copy_yoffset"));
 		copy_side_3d(false, true);
 	}
 
-	if (binds.pressed("3d_paste_yoffset"))
+	if (binds.pressed(_T("3d_paste_yoffset")))
 	{
 		binds.clear(_T("3d_paste_yoffset"));
 		paste_side_3d(false, true);

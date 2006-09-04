@@ -62,7 +62,7 @@ ThingInfoBar::ThingInfoBar(wxWindow *parent)
 	box = new wxStaticBoxSizer(sprite_frame, wxVERTICAL);
 	hbox->Add(box, 0, wxEXPAND);
 
-	tex_sprite = new TextureBox(this, 96, 96, "_none_", 3, 2.0f);
+	tex_sprite = new TextureBox(this, 96, 96, _T("_none_"), 3, 2.0f);
 	box->Add(tex_sprite, 1, wxALIGN_CENTER);
 
 	SetSizeHints(-1, 128, -1, 128);
@@ -102,7 +102,7 @@ void ThingInfoBar::update()
 			label_multiplayer->SetLabel(_T("Multiplayer:"));
 		}
 
-		tex_sprite->set_texture("_none_");
+		tex_sprite->set_texture(_T("_none_"));
 
 		return;
 	}

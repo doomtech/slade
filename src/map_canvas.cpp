@@ -11,6 +11,7 @@
 #include "doom_map.h"
 #include "mathstuff.h"
 #include "edit_misc.h"
+#include "copypaste.h"
 
 /*
 #include "map.h"
@@ -18,7 +19,6 @@
 
 #include "linedraw.h"
 #include "undoredo.h"
-#include "copypaste.h"
 */
 
 //bool thing_quickangle = false;
@@ -46,6 +46,7 @@ extern EditorWindow *editor_window;
 extern rgba_t col_background, col_grid, col_64grid, col_selbox, col_selbox_line;
 extern DoomMap d_map;
 extern int gridsize, edit_mode;
+extern Clipboard clipboard;
 
 /*
 extern int vid_width, vid_height, hilight_item, edit_mode;
@@ -53,7 +54,6 @@ extern int vid_width, vid_height, hilight_item, edit_mode;
 extern point2_t mouse, down_pos;
 extern bool allow_tex_load;//, line_draw;
 
-extern Clipboard clipboard;
 
 extern rgba_t col_line_solid;
 extern float xoff, yoff;
@@ -327,6 +327,9 @@ void MapCanvas::draw_map()
 
 	glLineWidth(line_size);
 	d_map.draw(rect, edit_mode);
+
+	if (state(STATE_PASTE))
+		clipboard.DrawPaste();
 }
 
 void MapCanvas::redraw(bool map, bool grid)
@@ -435,9 +438,9 @@ void MapCanvas::mouse_event(wxMouseEvent &event)
 
 	if (event.Leaving())
 	{
-		binds.unset("Mouse1", &released_keys, false, false, false);
-		binds.unset("Mouse2", &released_keys, false, false, false);
-		binds.unset("Mouse3", &released_keys, false, false, false);
+		binds.unset(_T("Mouse1"), &released_keys, false, false, false);
+		binds.unset(_T("Mouse2"), &released_keys, false, false, false);
+		binds.unset(_T("Mouse3"), &released_keys, false, false, false);
 		if (state(STATE_MAPPAN))
 			change_state();
 	}
@@ -461,7 +464,7 @@ void MapCanvas::mouse_motion(wxMouseEvent& event)
 	}
 	else
 	{
-		if (binds.pressed("edit_selectbox"))
+		if (binds.pressed(_T("edit_selectbox")))
 		{
 			sel_box.tl.set(down_pos);
 			sel_box.br.set(down_pos);
@@ -478,7 +481,7 @@ void MapCanvas::mouse_motion(wxMouseEvent& event)
 	}
 	else
 	{
-		if (binds.pressed("edit_moveitems"))
+		if (binds.pressed(_T("edit_moveitems")))
 		{
 			if (change_state(STATE_MOVING))
 				d_map.move_items(m_mouse);
@@ -494,7 +497,7 @@ void MapCanvas::mouse_motion(wxMouseEvent& event)
 	}
 	else
 	{
-		if (binds.pressed("thing_quickangle"))
+		if (binds.pressed(_T("thing_quickangle")))
 		{
 			make_backup(false, false, false, false, true);
 			if (change_state(STATE_THINGANGLE))
@@ -514,12 +517,16 @@ void MapCanvas::mouse_motion(wxMouseEvent& event)
 	}
 	else
 	{
-		if (binds.pressed("view_panmap"))
+		if (binds.pressed(_T("view_panmap")))
 		{
 			if (change_state(STATE_MAPPAN))
 				down_pos = mouse;
 		}
 	}
+
+	// Paste
+	if (state(STATE_PASTE))
+		redraw();
 
 	if (state(STATE_LINEDRAW) || state(STATE_SHAPEDRAW))
 	{
@@ -567,7 +574,7 @@ void MapCanvas::mouse_down(wxMouseEvent& event)
 		if (event.Button(wxMOUSE_BTN_LEFT))
 		{
 			change_state();
-			//clipboard.Paste();
+			clipboard.Paste();
 		}
 	}
 	else
@@ -576,13 +583,13 @@ void MapCanvas::mouse_down(wxMouseEvent& event)
 		string key;
 
 		if (event.Button(wxMOUSE_BTN_LEFT))
-			binds.set("Mouse1", &pressed_keys, event.ShiftDown(), event.ControlDown(), event.AltDown());
+			binds.set(_T("Mouse1"), &pressed_keys, event.ShiftDown(), event.ControlDown(), event.AltDown());
 
 		if (event.Button(wxMOUSE_BTN_RIGHT))
-			binds.set("Mouse3", &pressed_keys, event.ShiftDown(), event.ControlDown(), event.AltDown());
+			binds.set(_T("Mouse3"), &pressed_keys, event.ShiftDown(), event.ControlDown(), event.AltDown());
 
 		if (event.Button(wxMOUSE_BTN_MIDDLE))
-			binds.set("Mouse2", &pressed_keys, event.ShiftDown(), event.ControlDown(), event.AltDown());
+			binds.set(_T("Mouse2"), &pressed_keys, event.ShiftDown(), event.ControlDown(), event.AltDown());
 
 		if (state(STATE_LINEDRAW) || state(STATE_SHAPEDRAW))
 			keys_linedraw();
@@ -601,13 +608,13 @@ void MapCanvas::mouse_up(wxMouseEvent& event)
 		return;
 
 	if (event.Button(wxMOUSE_BTN_LEFT))
-		binds.unset("Mouse1", &released_keys, event.ShiftDown(), event.ControlDown(), event.AltDown());
+		binds.unset(_T("Mouse1"), &released_keys, event.ShiftDown(), event.ControlDown(), event.AltDown());
 
 	if (event.Button(wxMOUSE_BTN_RIGHT))
-		binds.unset("Mouse3", &released_keys, event.ShiftDown(), event.ControlDown(), event.AltDown());
+		binds.unset(_T("Mouse3"), &released_keys, event.ShiftDown(), event.ControlDown(), event.AltDown());
 
 	if (event.Button(wxMOUSE_BTN_MIDDLE))
-		binds.unset("Mouse2", &released_keys, event.ShiftDown(), event.ControlDown(), event.AltDown());
+		binds.unset(_T("Mouse2"), &released_keys, event.ShiftDown(), event.ControlDown(), event.AltDown());
 
 	if (state(STATE_LINEDRAW) || state(STATE_SHAPEDRAW))
 		keys_linedraw();
@@ -619,12 +626,12 @@ void MapCanvas::mouse_up(wxMouseEvent& event)
 
 void MapCanvas::mouse_wheel(wxMouseEvent& event)
 {
-	string key = "";
+	string key = _T("");
 
 	if (event.GetWheelRotation() > 0)
-		key = "MWheel Up";
+		key = _T("MWheel Up");
 	else if (event.GetWheelRotation() < 0)
-		key = "MWheel Down";
+		key = _T("MWheel Down");
 	else
 		return;
 

@@ -4,12 +4,14 @@
 //#include "undoredo.h"
 #include "draw.h"
 #include "edit_misc.h"
+#include "edit.h"
 #include "doom_map.h"
 #include "dm_vertex.h"
 #include "dm_line.h"
 #include "dm_side.h"
 #include "dm_sector.h"
 #include "dm_thing.h"
+#include "input.h"
 
 Clipboard clipboard;
 
@@ -18,6 +20,7 @@ extern int edit_mode;
 extern rgba_t col_line_solid;
 extern rgba_t col_moving;
 extern float moving_size;
+extern DoomMap d_map;
 
 EXTERN_CVAR(Float, line_size)
 EXTERN_CVAR(Bool, line_aa)
@@ -60,8 +63,7 @@ void Clipboard::Clear()
 
 void Clipboard::Copy()
 {
-	/*
-	if (selected_items.size() == 0 && hilight_item == -1)
+	if (d_map.selection().size() == 0 && d_map.hilight() == -1)
 		return;
 
 	// Clear the clipboard
@@ -72,65 +74,48 @@ void Clipboard::Copy()
 	{
 		copy_type = COPY_THINGS;
 
-		if (selected_items.size() > 0)
+		vector<Thing*> list;
+		d_map.get_selection(list, true);
+
+		// Get middle point
+		int min_x = list[0]->pos().x;
+		int min_y = list[0]->pos().y;
+		int max_x = min_x;
+		int max_y = min_y;
+
+		for (int a = 0; a < list.size(); a++)
 		{
-			// Get middle point
-			int min_x = map.things[selected_items[0]]->x;
-			int min_y = map.things[selected_items[0]]->y;
-			int max_x = map.things[selected_items[0]]->x;
-			int max_y = map.things[selected_items[0]]->y;
+			int x = list[a]->pos().x;
+			int y = list[a]->pos().y;
 
-			for (int a = 0; a < selected_items.size(); a++)
-			{
-				int x = map.things[selected_items[a]]->x;
-				int y = map.things[selected_items[a]]->y;
-
-				if (x < min_x) min_x = x;
-				if (x > max_x) max_x = x;
-				if (y < min_y) min_y = y;
-				if (y > max_y) max_y = y;
-			}
-
-			int mid_x = min_x + ((max_x - min_x) / 2);
-			int mid_y = min_y + ((max_y - min_y) / 2);
-
-			// Add things
-			for (int a = 0; a < selected_items.size(); a++)
-			{
-				thing_t *t = new thing_t();
-				memcpy(t, map.things[selected_items[a]], sizeof(thing_t));
-
-				t->x -= mid_x;
-				t->y -= mid_y;
-
-				things.push_back(t);
-			}
+			if (x < min_x) min_x = x;
+			if (x > max_x) max_x = x;
+			if (y < min_y) min_y = y;
+			if (y > max_y) max_y = y;
 		}
-		else
+
+		int mid_x = min_x + ((max_x - min_x) / 2);
+		int mid_y = min_y + ((max_y - min_y) / 2);
+
+		// Add things
+		for (int a = 0; a < list.size(); a++)
 		{
-			thing_t *t = new thing_t();
-			memcpy(t, map.things[hilight_item], sizeof(thing_t));
-			t->x = 0;
-			t->y = 0;
+			Thing *t = new Thing();
+			t->copy(list[a]);
+			t->set_pos(t->pos().x - mid_x, t->pos().y - mid_y);
 			things.push_back(t);
 		}
 	}
 
+	/*
 	// Architecture copy
 	if (edit_mode > 0 && edit_mode < 3)
 	{
-		vector<int> copy_lines;
+		//vector<int> copy_lines;
+		vector<Line*> copy_lines;
 
 		if (edit_mode == 1)
-		{
-			if (selected_items.size() > 0)
-			{
-				for (int a = 0; a < selected_items.size(); a++)
-					copy_lines.push_back(selected_items[a]);
-			}
-			else
-				copy_lines.push_back(hilight_item);
-		}
+			d_map.get_selection(copy_lines, true);
 
 		if (edit_mode == 2)
 		{
@@ -314,22 +299,23 @@ void Clipboard::Copy()
 
 void Clipboard::Paste()
 {
-	/*
 	if (copy_type == COPY_THINGS && things.size() > 0)
 	{
-		make_backup(false, false, false, false, true);
-		map.change_level(MC_THINGS);
+		//make_backup(false, false, false, false, true);
+		d_map.change_level(MC_THINGS);
 
 		for (int a = 0; a < things.size(); a++)
 		{
-			int t = map.add_thing(0, 0, *things[a]);
-			memcpy(map.things[t], things[a], sizeof(thing_t));
+			Thing* t = new Thing();
+			t->copy(things[a]);
+			t->set_pos(snap_to_grid(mouse_pos(true).x) + t->pos().x,
+						snap_to_grid(mouse_pos(true).y) + t->pos().y);
 
-			map.things[t]->x = snap_to_grid(m_x(mouse.x) + things[a]->x);
-			map.things[t]->y = snap_to_grid(-m_y(mouse.y) + things[a]->y);
+			d_map.add_thing(t);
 		}
 	}
 
+	/*
 	if (copy_type == COPY_ARCHITECTURE && lines.size() > 0)
 	{
 		int vert_offset = map.n_verts;
@@ -413,22 +399,23 @@ void Clipboard::Paste()
 
 void Clipboard::DrawPaste()
 {
-	/*
 	if (copy_type == COPY_THINGS && things.size() > 0)
 	{
-		thing_t* t = new thing_t();
+		Thing* t = new Thing();
 
 		for (int a = 0; a < things.size(); a++)
 		{
-			memcpy(t, things[a], sizeof(thing_t));
-			t->x = snap_to_grid(m_x(mouse.x) + things[a]->x);
-			t->y = snap_to_grid(-m_y(mouse.y) + things[a]->y);
-			draw_thing(t, true);
+			t->copy(things[a]);
+			t->set_pos(snap_to_grid(mouse_pos(true).x) + t->pos().x,
+						snap_to_grid(mouse_pos(true).y) + t->pos().y);
+			t->draw(rect_t(0, 0, 65535, 65535, RECT_CENTER));
+			t->draw(rect_t(0, 0, 65535, 65535, RECT_CENTER), MISTYLE_MOVING);
 		}
 
 		delete t;
 	}
 
+	/*
 	if (copy_type == COPY_ARCHITECTURE && lines.size() > 0)
 	{
 		for (int a = 0; a < lines.size(); a++)

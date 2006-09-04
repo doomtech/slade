@@ -24,6 +24,8 @@ extern Sector* last_copy_sector;
 EXTERN_CVAR(Bool, line_aa)
 EXTERN_CVAR(Float, line_size)
 EXTERN_CVAR(Bool, edit_snap_grid)
+EXTERN_CVAR(Bool, edit_auto_merge)
+EXTERN_CVAR(Bool, edit_auto_split)
 
 // lines_clockwise: Checks if a group of lines are all facing eachother
 // ----------------------------------------------------------------- >>
@@ -101,15 +103,18 @@ void ldraw_end()
 	{
 		int v = d_map.check_vertex_spot(ldraw_points[a]);
 
-		if (v == -1)
+		if (v == -1 || edit_auto_merge)
 			new_verts.push_back(new Vertex(ldraw_points[a].x, ldraw_points[a].y, &d_map));
 		else
 			new_verts.push_back(d_map.vertex(v));
 	}
 
 	// Check for line splits
-	for (int a = 0; a < new_verts.size(); a++)
-		d_map.check_split(new_verts[a]);
+	if (edit_auto_split)
+	{
+		for (int a = 0; a < new_verts.size(); a++)
+			d_map.check_split(new_verts[a]);
+	}
 
 	// Add lines
 	vector<Line*> new_lines;
@@ -127,8 +132,11 @@ void ldraw_end()
 	}
 
 	// Check for new line splits
-	for (int a = 0; a < d_map.n_verts(); a++)
-		d_map.check_split(d_map.vertex(a), new_lines);
+	if (edit_auto_split)
+	{
+		for (int a = 0; a < d_map.n_verts(); a++)
+			d_map.check_split(d_map.vertex(a), new_lines);
+	}
 
 	// Remove overlapping lines
 	d_map.remove_overlapping_lines(new_lines);

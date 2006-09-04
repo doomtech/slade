@@ -28,11 +28,11 @@ public:
 	string		args[5];
 	string		arg_types[5];
 
-	ThingType(int type = -1, string name = "Unknown", string group = "");
+	ThingType(int type = -1, string name = _T("Unknown"), string group = _T(""));
 	ThingType(ThingType *ttype);
 	~ThingType();
 
-	void setup(int type = -1, string name = "Unknown", string group = "");
+	void setup(int type = -1, string name = _T("Unknown"), string group = _T(""));
 	void set_flag(BYTE flag, bool value);
 	void parse(Tokenizer *tz);
 };

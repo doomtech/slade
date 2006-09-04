@@ -6,7 +6,6 @@
 #include "keybind.h"
 #include "input.h"
 #include "3dmode.h"
-//#include "tex_browser.h"
 #include "editor_window.h"
 #include "3d_window.h"
 #include "doom_map.h"
@@ -163,7 +162,6 @@ void Render3dCanvas::do_loop()
 	if (elapsed >= vid_frametime_3d)
 	{
 		// Reset timer
-		//wxStartTimer();
 		sw.Start();
 
 		// Process input
@@ -178,9 +176,6 @@ void Render3dCanvas::do_loop()
 		// Gravity
 		if (camera.gravity)
 			apply_gravity();
-
-		// Get hilighted item
-		//determine_hilight();
 	}
 
 	// Render
@@ -356,7 +351,6 @@ void start_3d_mode()
 	canvas_3d->SetFocus();
 	canvas_3d->init();
 	canvas_3d->render();
-	//wxStartTimer();
 
 	reset_3d_mouse();
 }

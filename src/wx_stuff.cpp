@@ -17,7 +17,7 @@ string wx_to_str(wxString str)
 
 	wxCharBuffer buffer = str.ToAscii();
 	const char* data = buffer;
-	ret = data;
+	ret = wxString::FromAscii(data);
 
 	return ret;
 }
@@ -31,7 +31,7 @@ wxString str_to_wx(string str)
 		return wxString();
 
 	wchar_t *multibyteString = new wchar_t[str.length() * 5];
-	mbstowcs(multibyteString, str.c_str(), str.length() * 5);
+	mbstowcs(multibyteString, str.ToAscii(), str.length() * 5);
 	wxString ret(multibyteString);
 	delete[] multibyteString;
 	return ret;

@@ -66,9 +66,9 @@ LineInfoBar::LineInfoBar(wxWindow *parent)
 	box->SetMinSize(192, -1);
 	hbox->Add(box, 0, wxEXPAND|wxRIGHT, 4);
 
-	tex_upper1 = new TextureBox(this, 64, 64, "_none_", 1, 2.0f);
-	tex_middle1 = new TextureBox(this, 64, 64, "_none_", 1, 2.0f);
-	tex_lower1 = new TextureBox(this, 64, 64, "_none_", 1, 2.0f);
+	tex_upper1 = new TextureBox(this, 64, 64, _T("_none_"), 1, 2.0f);
+	tex_middle1 = new TextureBox(this, 64, 64, _T("_none_"), 1, 2.0f);
+	tex_lower1 = new TextureBox(this, 64, 64, _T("_none_"), 1, 2.0f);
 	label_upper1 = new wxStaticText(this, -1, _T(""), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
 	label_middle1 = new wxStaticText(this, -1, _T(""), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
 	label_lower1 = new wxStaticText(this, -1, _T(""), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
@@ -98,9 +98,9 @@ LineInfoBar::LineInfoBar(wxWindow *parent)
 	box->SetMinSize(192, -1);
 	hbox->Add(box, 0, wxEXPAND);
 
-	tex_upper2 = new TextureBox(this, 64, 64, "_none_", 1, 2.0f);
-	tex_middle2 = new TextureBox(this, 64, 64, "_none_", 1, 2.0f);
-	tex_lower2 = new TextureBox(this, 64, 64, "_none_", 1, 2.0f);
+	tex_upper2 = new TextureBox(this, 64, 64, _T("_none_"), 1, 2.0f);
+	tex_middle2 = new TextureBox(this, 64, 64, _T("_none_"), 1, 2.0f);
+	tex_lower2 = new TextureBox(this, 64, 64, _T("_none_"), 1, 2.0f);
 	label_upper2 = new wxStaticText(this, -1, _T(""), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
 	label_middle2 = new wxStaticText(this, -1, _T(""), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
 	label_lower2 = new wxStaticText(this, -1, _T(""), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
@@ -146,9 +146,9 @@ void LineInfoBar::update()
 		label_upper1->SetLabel(_T(""));
 		label_middle1->SetLabel(_T(""));
 		label_lower1->SetLabel(_T(""));
-		tex_upper1->set_texture("_none_");
-		tex_middle1->set_texture("_none_");
-		tex_lower1->set_texture("_none_");
+		tex_upper1->set_texture(_T("_none_"));
+		tex_middle1->set_texture(_T("_none_"));
+		tex_lower1->set_texture(_T("_none_"));
 
 		back_frame->SetLabel(_T("Back Side"));
 
@@ -228,37 +228,37 @@ void LineInfoBar::update()
 	Side *side = line->side1();
 	if (d_map.valid(side))
 	{
-		front_frame->SetLabel(str_to_wx(s_fmt("Front Side: %d", d_map.index(side))));
+		front_frame->SetLabel(str_to_wx(s_fmt(_T("Front Side: %d"), d_map.index(side))));
 
 		// Upper texture
 		label_upper1->SetLabel(str_to_wx(side->get_texname(TEX_UPPER)));
 		if (line->needs_upper(true))
 			tex_upper1->set_texture(side->get_texname(TEX_UPPER), 1);
 		else
-			tex_upper1->set_texture("_none_");
+			tex_upper1->set_texture(_T("_none_"));
 
 		// Middle texture
 		label_middle1->SetLabel(str_to_wx(side->get_texname(TEX_MIDDLE)));
 		if (line->needs_middle(true))
 			tex_middle1->set_texture(side->get_texname(TEX_MIDDLE), 1);
 		else
-			tex_middle1->set_texture("_none_");
+			tex_middle1->set_texture(_T("_none_"));
 
 		// Lower texture
 		label_lower1->SetLabel(str_to_wx(side->get_texname(TEX_LOWER)));
 		if (line->needs_lower(true))
 			tex_lower1->set_texture(side->get_texname(TEX_LOWER), 1);
 		else
-			tex_lower1->set_texture("_none_");
+			tex_lower1->set_texture(_T("_none_"));
 
-		label_offsets1->SetLabel(str_to_wx(s_fmt("Front Offsets: (%d, %d)", side->get_xoff(), side->get_yoff())));
+		label_offsets1->SetLabel(str_to_wx(s_fmt(_T("Front Offsets: (%d, %d)"), side->get_xoff(), side->get_yoff())));
 	}
 	else
 	{
 		front_frame->SetLabel(_T("Front Side"));
-		tex_upper1->set_texture("_none_");
-		tex_middle1->set_texture("_none_");
-		tex_lower1->set_texture("_none_");
+		tex_upper1->set_texture(_T("_none_"));
+		tex_middle1->set_texture(_T("_none_"));
+		tex_lower1->set_texture(_T("_none_"));
 		label_upper1->SetLabel(_T(""));
 		label_middle1->SetLabel(_T(""));
 		label_lower1->SetLabel(_T(""));
@@ -269,37 +269,37 @@ void LineInfoBar::update()
 	side = line->side2();
 	if (d_map.valid(side))
 	{
-		back_frame->SetLabel(str_to_wx(s_fmt("Back Side: %d", d_map.index(side))));
+		back_frame->SetLabel(str_to_wx(s_fmt(_T("Back Side: %d"), d_map.index(side))));
 
 		// Upper texture
 		label_upper2->SetLabel(str_to_wx(side->get_texname(TEX_UPPER)));
 		if (line->needs_upper(false))
 			tex_upper2->set_texture(side->get_texname(TEX_UPPER), 1);
 		else
-			tex_upper2->set_texture("_none_");
+			tex_upper2->set_texture(_T("_none_"));
 
 		// Middle texture
 		label_middle2->SetLabel(str_to_wx(side->get_texname(TEX_MIDDLE)));
 		if (line->needs_middle(false))
 			tex_middle2->set_texture(side->get_texname(TEX_MIDDLE), 1);
 		else
-			tex_middle2->set_texture("_none_");
+			tex_middle2->set_texture(_T("_none_"));
 
 		// Lower texture
 		label_lower2->SetLabel(str_to_wx(side->get_texname(TEX_LOWER)));
 		if (line->needs_lower(false))
 			tex_lower2->set_texture(side->get_texname(TEX_LOWER), 1);
 		else
-			tex_lower2->set_texture("_none_");
+			tex_lower2->set_texture(_T("_none_"));
 
-		label_offsets2->SetLabel(str_to_wx(s_fmt("Back Offsets: (%d, %d)", side->get_xoff(), side->get_yoff())));
+		label_offsets2->SetLabel(str_to_wx(s_fmt(_T("Back Offsets: (%d, %d)"), side->get_xoff(), side->get_yoff())));
 	}
 	else
 	{
 		back_frame->SetLabel(_T("Back Side"));
-		tex_upper2->set_texture("_none_");
-		tex_middle2->set_texture("_none_");
-		tex_lower2->set_texture("_none_");
+		tex_upper2->set_texture(_T("_none_"));
+		tex_middle2->set_texture(_T("_none_"));
+		tex_lower2->set_texture(_T("_none_"));
 		label_upper2->SetLabel(_T(""));
 		label_middle2->SetLabel(_T(""));
 		label_lower2->SetLabel(_T(""));

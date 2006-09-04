@@ -107,7 +107,7 @@ TextureBrowser::~TextureBrowser()
 string TextureBrowser::get_texture()
 {
 	if (browse_area->selected_item == -1)
-		return "";
+		return _T("");
 
 	return vis_items[browse_area->selected_item]->retval;
 }
@@ -151,7 +151,7 @@ void TextureBrowser::sort(int sorting)
 
 void TextureBrowser::update_vis_items()
 {
-	string cur_val = "";
+	string cur_val = _T("");
 	int sel = browse_area->selected_item;
 
 	if (sel >= 0 && sel < vis_items.size())
@@ -284,7 +284,7 @@ void TexBrowseCanvas::redraw()
 			if (vis_items[a]->tex)
 				draw_texture_scale(rect, vis_items[a]->tex);
 
-			draw_text(rect.middle().x, rect.bottom() - 8, COL_WHITE, 1, false, vis_items[a]->retval.c_str());
+			draw_text(rect.middle().x, rect.bottom() - 8, COL_WHITE, 1, false, chr(vis_items[a]->retval));
 		}
 
 		col++;
@@ -552,7 +552,7 @@ void setup_tex_browser(int type)
 			ThingType tt = game.get_ttypes()[a];
 
 			browse_info_t bi;
-			bi.retval = s_fmt("%d", tt.type);
+			bi.retval = s_fmt(_T("%d"), tt.type);
 			bi.tex = get_texture(tt.spritename, 3);
 			browse_items.push_back(bi);
 		}
@@ -561,7 +561,7 @@ void setup_tex_browser(int type)
 	}
 
 	browse_info_t blank;
-	blank.retval = "-";
+	blank.retval = _T("-");
 	blank.tex = NULL;
 	browse_items.push_back(blank);
 

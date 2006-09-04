@@ -4,7 +4,7 @@
 
 argtype_t::argtype_t()
 {
-	this->name = "";
+	this->name = _T("");
 	this->has_flags = false;
 	this->has_values = false;
 	//arg_types.push_back(this);
@@ -16,19 +16,19 @@ void argtype_t::parse(Tokenizer *tz)
 {
 	this->name = tz->get_token();
 
-	tz->check_token("{");
+	tz->check_token(_T("{"));
 	string token = tz->get_token();
 
-	while (token != "}")
+	while (token != _T("}"))
 	{
-		if (token == "value")
+		if (token == _T("value"))
 		{
 			short val = tz->get_integer();
 			string nname = tz->get_token();
 			add_value(nname, val, false);
 		}
 
-		if (token == "flag")
+		if (token == _T("flag"))
 		{
 			short val = tz->get_integer();
 			string nname = tz->get_token();
@@ -43,7 +43,7 @@ void argtype_t::parse(Tokenizer *tz)
 
 string argtype_t::get_name(short value)
 {
-	string ret = "";
+	string ret = _T("");
 	short tempval = value;
 
 	if (has_values)
@@ -69,7 +69,7 @@ string argtype_t::get_name(short value)
 	if (has_flags)
 	{
 		if (has_values)
-			ret += " (";
+			ret += _T(" (");
 
 		bool flag = false;
 		for (int a = 0; a < values.size(); a++)
@@ -77,7 +77,7 @@ string argtype_t::get_name(short value)
 			if (values[a].flag && value & values[a].value)
 			{
 				ret += values[a].name;
-				ret += ", ";
+				ret += _T(", ");
 				flag = true;
 			}
 		}
@@ -93,14 +93,14 @@ string argtype_t::get_name(short value)
 			if (!flag)
 				ret.erase(ret.end() - 1);
 			else
-				ret += ")";
+				ret += _T(")");
 		}
 		else if (!flag)
-			ret = "None";
+			ret = _T("None");
 	}
 
-	if (ret == "" || ret == " ")
-		ret = "Unknown";
+	if (ret == _T("") || ret == _T(" "))
+		ret = _T("Unknown");
 
 	return ret;
 }

@@ -78,8 +78,8 @@ void DoomMap::create(string name)
 	if (behavior)
 		delete behavior;
 
-	scripts = new Lump(0, 0, "SCRIPTS");
-	behavior = new Lump(0, 0, "BEHAVIOR");
+	scripts = new Lump(0, 0, _T("SCRIPTS"));
+	behavior = new Lump(0, 0, _T("BEHAVIOR"));
 	changed = 255;
 }
 
@@ -126,7 +126,7 @@ Vertex* DoomMap::vertex(int index)
 {
 	if (index < 0 || index >= vertices.size())
 	{
-		log_message(s_fmt("Vertex %d doesn't exist", index));
+		log_message(s_fmt(_T("Vertex %d doesn't exist"), index));
 		return def_vertex;
 	}
 	else
@@ -138,7 +138,7 @@ Line* DoomMap::line(int index)
 	if (index < 0 || index >= lines.size())
 	{
 		if (index != 65535)
-			log_message(s_fmt("Line %d doesn't exist", index));
+			log_message(s_fmt(_T("Line %d doesn't exist"), index));
 		return def_line;
 	}
 	else
@@ -150,7 +150,7 @@ Side* DoomMap::side(int index)
 	if (index < 0 || index >= sides.size())
 	{
 		if (index != -1 && index != 65535)
-			log_message(s_fmt("Side %d doesn't exist", index));
+			log_message(s_fmt(_T("Side %d doesn't exist"), index));
 
 		return def_side;
 	}
@@ -163,7 +163,7 @@ Sector* DoomMap::sector(int index)
 	if (index < 0 || index >= sectors.size())
 	{
 		if (index != -1)
-			log_message(s_fmt("Sector %d doesn't exist", index));
+			log_message(s_fmt(_T("Sector %d doesn't exist"), index));
 		return def_sector;
 	}
 	else
@@ -174,7 +174,7 @@ Thing* DoomMap::thing(int index)
 {
 	if (index < 0 || index >= things.size())
 	{
-		log_message(s_fmt("Thing %d doesn't exist", index));
+		log_message(s_fmt(_T("Thing %d doesn't exist"), index));
 		return def_thing;
 	}
 	else
@@ -891,7 +891,7 @@ bool DoomMap::open(Wad* wad, string mapname)
 	// << ---- Read Scripts/Behavior ---- >>
 	if (hexen())
 	{
-		lump = wad->getLump("SCRIPTS", offset);
+		lump = wad->getLump(_T("SCRIPTS"), offset);
 
 		if (lump)
 		{
@@ -1392,8 +1392,9 @@ bool DoomMap::add_to_wad(Wad *wad)
 
 	// Cleanup/check map
 	remove_zerolength_lines();
-	//remove_unused_sectors();
+	remove_unused_sectors();
 	//remove_unused_sides();
+	update_vertex_refs();
 	remove_unused_vertices();
 	update_indices();
 

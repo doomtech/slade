@@ -1,3 +1,4 @@
+#include <wx/wxchar.h>
 
 // Version string
-#define __SLADEVERS	"v2.00 Alpha"
+#define __SLADEVERS	_T("v2.00 Alpha")

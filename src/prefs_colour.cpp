@@ -170,20 +170,20 @@ void ColourPrefs::save_clicked(wxCommandEvent &event)
 	string filename = wx_to_str(wxFileSelector(_T("Save Colour Configuration"), _T("./config/colours"), _T(""),
 							_T("*.cfg"), _T("Configuration Files (*.cfg)|*.cfg"), wxSAVE|wxOVERWRITE_PROMPT));
 
-	if (filename != "")
+	if (filename != _T(""))
 		save_colour_config(filename);
 }
 
 void ColourPrefs::load_clicked(wxCommandEvent &event)
 {
-	string filename = "";
+	string filename = _T("");
 	wxFileDialog browse(NULL, _T("Load Colour Configuration"), _T("./config/colours"), _T(""), _T("Configuration Files (*.cfg)|*.cfg"), wxOPEN|wxFILE_MUST_EXIST);
 	if (browse.ShowModal() == wxID_OK)
 		filename = wx_to_str(browse.GetPath());
 
 	log_message(filename);
 
-	if (filename != "")
+	if (filename != _T(""))
 		load_colour_config(filename);
 
 	redraw_map();

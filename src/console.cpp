@@ -87,7 +87,7 @@ void console_nextcommand()
 
 	if (console_hcmd >= cmd_history.size())
 	{
-		cmd_line = "";
+		cmd_line = _T("");
 		console_hcmd = -1;
 	}
 	else
@@ -101,7 +101,7 @@ void init_console()
 	console_window = new ConsoleWindow();
 
 	string line = _T("<< S.L.A.D.E. -- \"SlayeR's LeetAss Doom Editor\" (");
-	line += _T(__SLADEVERS);
+	line += __SLADEVERS;
 	line += _T(")");
 	for (int a = 0; a < 21 - sizeof(__SLADEVERS); a++)
 		line += _T(" ");
@@ -138,7 +138,6 @@ void console_parsecommand()
 	if (cmd_line == _T(""))
 		return;
 
-	bool parsed = false;
 	Tokenizer tz;
 	tz.open_string(cmd_line, 0, 0);
 
@@ -156,18 +155,20 @@ void console_parsecommand()
 		// Check if we want to change the value
 		if (tz.peek_token() != _T("!END"))
 		{
-			if (cvar->type == CVAR_INTEGER)
+			switch(cvar->type) {
+			case CVAR_INTEGER:
 				*((CIntCVar *)cvar) = tz.get_integer();
-
-			if (cvar->type == CVAR_BOOLEAN)
+				break;
+			case CVAR_BOOLEAN:
 				*((CBoolCVar *)cvar) = !!(tz.get_integer());
-
-			if (cvar->type == CVAR_FLOAT)
+				break;
+			case CVAR_FLOAT:
 				*((CFloatCVar *)cvar) = tz.get_float();
-
-			if (cvar->type == CVAR_STRING)
+				break;
+			case CVAR_STRING:
 				*((CStringCVar *)cvar) = tz.get_token();
-
+				break;
+			}
 			changed = true;
 		}
 
@@ -180,27 +181,28 @@ void console_parsecommand()
 		else
 			msg += _T("\" is ");
 
-		char val[16] = _T("");
+		string val;
+		
+		switch(cvar->type) {
+		case CVAR_INTEGER:
+			val = s_fmt(_T("\"%d\""), cvar->GetValue().Int);
+			break;
+		case CVAR_STRING:
+			val = s_fmt(_T("\"%s\""), ((CStringCVar *)cvar)->value.c_str());
+			break;
+		case CVAR_BOOLEAN:
+			val = s_fmt(_T("\"%d\""), cvar->GetValue().Bool);
+			break;
+		case CVAR_FLOAT:
+			val = s_fmt(_T("\"%f\""), cvar->GetValue().Float);
+			break;
+		}
 
-		if (cvar->type == CVAR_INTEGER)
-			sprintf(val, "\"%d\"", cvar->GetValue().Int);
-
-		if (cvar->type == CVAR_STRING)
-			sprintf(val, "\"%s\"", ((CStringCVar *)cvar)->value.c_str());
-
-		if (cvar->type == CVAR_BOOLEAN)
-			sprintf(val, "\"%d\"", cvar->GetValue().Bool);
-
-		if (cvar->type == CVAR_FLOAT)
-			sprintf(val, "\"%1.2f\"", cvar->GetValue().Float);
-
-		console_print(msg + val);
-
-		parsed = true;
+		console_print(msg+val);
 	}
 
 	// "cvarlist" command
-	if (token == _T("cvarlist"))
+	else if (token == _T("cvarlist"))
 	{
 		console_print(_T("- All CVars:"));
 
@@ -208,47 +210,42 @@ void console_parsecommand()
 
 		for (DWORD s = 0; s < l_cvars.size(); s++)
 		{
-			char temp[128] = "";
-			sprintf(temp, "\"%s\"", l_cvars[s].c_str());
-			console_print(temp);
+			console_print(_T("\"")+l_cvars[s]+_T("\""));
 		}
-
-		parsed = true;
 	}
 
 	// "dump_textures" command
-	if (token == _T("dump_textures"))
+	else if (token == _T("dump_textures"))
 	{
 		for (int a = 0; a < textures.size(); a++)
 			console_print(s_fmt(_T("%s, %dx%d"), chr(textures[a]->name), textures[a]->width, textures[a]->height));
 
-		parsed = true;
 	}
 
 	// "dump_flats" command
-	if (token == _T("dump_flats"))
+	else if (token == _T("dump_flats"))
 	{
 		for (int a = 0; a < flats.size(); a++)
 			console_print(flats[a]->name);
 
-		parsed = true;
 	}
 
 	// "tex_browse" command
-	if (token == _T("tex_browse"))
+	else if (token == _T("tex_browse"))
 	{
 		//string stex = open_texture_browser(true, true, true);
 		//console_print(parse_string("Selected \"%s\"", stex.c_str()));
-		parsed = true;
 	}
 
 	// "splash" command
 	// If msg isn't specified, a random quote is shown instead
-	if (token == _T("splash"))
+	else if (token == _T("splash"))
 	{
 		// Get a random number that isn't what was previously shown :P
 		int q = p_q;
-		while (q == p_q) q = float((float)rand() / RAND_MAX) * n_quotes;
+		do {
+			q = (int)(n_quotes*rand()/(RAND_MAX + 1.0)); //use high-order bits
+		} while (q == p_q);
 		p_q = q;
 
 		string msg = qdb[q];
@@ -270,11 +267,10 @@ void console_parsecommand()
 		else
 			splash_hide();
 
-		parsed = true;
 	}
 
 	// "cmdlist" command
-	if (token == _T("cmdlist"))
+	else if (token == _T("cmdlist"))
 	{
 		console_print(_T("Available Commands:"));
 		console_print(_T("cmdlist"));
@@ -282,24 +278,24 @@ void console_parsecommand()
 		console_print(_T("dump_flats"));
 		console_print(_T("dump_textures"));
 		console_print(_T("splash"));
-		parsed = true;
 	}
 
-	if (token == "listverts")
+	else if (token == _T("listverts"))
 	{
 		for (int a = 0; a < d_map.n_verts(); a++)
 		{
 			Vertex* v = d_map.vertex(a);
-			console_print(s_fmt("Vertex %d: i%d x%d y%d r%d", a, d_map.index(v), v->x_pos(), v->y_pos(), v->refs()));
+			console_print(s_fmt(_T("Vertex %d: i%d x%d y%d r%d"), a, d_map.index(v), v->x_pos(), v->y_pos(), v->refs()));
 		}
 	}
 
 	// Unknown command
-	if (!parsed)
+	else 
 	{
 		char temp[276] = "";
 		sprintf(temp, "- Unknown Command \"%s\"", chr(cmd_line));
-		console_print(temp);
+		//console_print(temp);
+		console_print(_T("- Unknown Command \"")+cmd_line+_T("\""));
 	}
 
 	// Finish up

@@ -127,17 +127,20 @@ void load_cvars(Tokenizer *mr)
 			{
 				token = mr->get_token();
 
-				if (cvars[c]->type == CVAR_INTEGER)
+				switch(cvars[c]->type) {
+				case CVAR_INTEGER:
 					*((CIntCVar *)cvars[c]) = atoi(token.c_str());
-
-				if (cvars[c]->type == CVAR_BOOLEAN)
-					*((CBoolCVar *)cvars[c]) = !!(atoi(token.c_str()));
-
-				if (cvars[c]->type == CVAR_FLOAT)
+					break;
+				case CVAR_BOOLEAN:
+					*((CBoolCVar *)cvars[c]) = !!atoi(token.c_str());
+					break;
+				case CVAR_FLOAT:
 					*((CFloatCVar *)cvars[c]) = (float)atof(token.c_str());
-
-				if (cvars[c]->type == CVAR_STRING)
+					break;
+				case CVAR_STRING:
 					*((CStringCVar *)cvars[c]) = token;
+					break;
+				}
 			}
 		}
 	}

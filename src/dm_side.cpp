@@ -22,9 +22,9 @@ Side::Side(DoomMap *parent)
 	sector = NULL;
 	index = -1;
 
-	tex_middle = "-";
-	tex_upper = "-";
-	tex_lower = "-";
+	tex_middle = _T("-");
+	tex_upper = _T("-");
+	tex_lower = _T("-");
 
 	if (parent)
 		parent->add_side(this);
@@ -67,7 +67,7 @@ Side::Side(doomside_t s, DoomMap *parent)
 		parent->add_side(this);
 		sector = parent->sector(wxINT16_SWAP_ON_BE(s.sector));
 		if (!parent->valid(sector))
-			log_message(s_fmt("Invalid sector %d", wxINT16_SWAP_ON_BE(s.sector)));
+			log_message(s_fmt(_T("Invalid sector %d"), wxINT16_SWAP_ON_BE(s.sector)));
 	}
 }
 
