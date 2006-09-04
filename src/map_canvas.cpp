@@ -66,6 +66,15 @@ EXTERN_CVAR(Bool, line_aa)
 MapCanvas::MapCanvas(wxWindow *parent)
 :	wxGLCanvas(parent, -1)
 {
+	share_canvas = this;
+}
+
+MapCanvas::~MapCanvas()
+{
+}
+
+void MapCanvas::init()
+{
 	SetCurrent();
 	glViewport(0, 0, GetSize().x, GetSize().y);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -87,9 +96,6 @@ MapCanvas::MapCanvas(wxWindow *parent)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	//gl_context = GetContext();
-	share_canvas = this;
-
 	allow_tex_load = true;
 	wxSafeYield();
 	glEnable(GL_TEXTURE_2D);
@@ -99,10 +105,6 @@ MapCanvas::MapCanvas(wxWindow *parent)
 	yoff = 0;
 	zoom = 1;
 	sel_box.set(-1, -1, -1, -1);
-}
-
-MapCanvas::~MapCanvas()
-{
 }
 
 point2_t MapCanvas::mouse_pos(bool translate)
@@ -331,6 +333,16 @@ void MapCanvas::redraw(bool map, bool grid)
 {
 	SetCurrent();
 
+	glViewport(0, 0, GetSize().x, GetSize().y);
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+
+	glOrtho(0.0f, GetSize().x, GetSize().y, 0.0f, -1.0f, 1.0f);
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
 	glClearColor(col_background.fr(), col_background.fg(), col_background.fb(), 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -371,7 +383,7 @@ void MapCanvas::popup_menu()
 
 BEGIN_EVENT_TABLE(MapCanvas, wxGLCanvas)
 	EVT_PAINT(MapCanvas::paint)
-	EVT_SIZE(MapCanvas::resize)
+	//EVT_SIZE(MapCanvas::resize)
 	EVT_MOUSE_EVENTS(MapCanvas::mouse_event)
 	EVT_MOUSEWHEEL(MapCanvas::mouse_wheel)
 	EVT_KEY_DOWN(MapCanvas::key_down)

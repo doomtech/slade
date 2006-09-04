@@ -18,9 +18,6 @@ TextureBox::TextureBox(wxWindow *parent, int width, int height, string texture, 
 	else
 		this->texture = NULL;
 
-	//if (this->texture)
-	//	this->texture->gen_gl_tex();
-
 	this->scale = scale;
 
 	if (width == -1)
@@ -70,8 +67,9 @@ void TextureBox::size(wxSizeEvent &event)
 
 void TextureBox::redraw()
 {
-	if (!IsShown())
-		return;
+	//if (!IsShown())
+	//	return;
+	Show(true);
 
 	SetCurrent();
 
@@ -134,7 +132,7 @@ void TextureBox::set_texture(string tex, int textype)
 BEGIN_EVENT_TABLE(ClickableTexBox, wxGLCanvas)
 	EVT_LEFT_DOWN(ClickableTexBox::clicked)
 	EVT_PAINT(TextureBox::paint)
-	EVT_SIZE(TextureBox::size)
+	//EVT_SIZE(TextureBox::size)
 END_EVENT_TABLE()
 
 void ClickableTexBox::clicked(wxMouseEvent &event)

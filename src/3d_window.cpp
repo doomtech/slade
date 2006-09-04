@@ -102,11 +102,48 @@ void Render3dCanvas::render()
 {
 	SetCurrent();
 
-	//glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glViewport(0, 0, GetClientSize().x, GetClientSize().y);
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+
+	gluPerspective(60.0f, (GLfloat)320/(GLfloat)200, 0.1f, 1000.0f);
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
 	render_3d_view(GetClientSize().x, GetClientSize().y);
 
 	SwapBuffers();
+}
+
+void Render3dCanvas::init()
+{
+	SetCurrent();
+
+	GLfloat fogColor[4]= {0.0f, 0.0f, 0.0f, 1.0f};
+
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClearDepth(1.0);
+	glShadeModel(GL_SMOOTH);
+	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glCullFace(GL_FRONT);
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_TEXTURE_2D);
+
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
+	glDepthRange(0, 1);
+
+	glFogi(GL_FOG_MODE, GL_LINEAR);
+	glFogfv(GL_FOG_COLOR, fogColor);
+	glFogf(GL_FOG_DENSITY, 2.0f);
+	glHint(GL_FOG_HINT, GL_NICEST);
+	glFogf(GL_FOG_START, 0.0f);
+	glFogf(GL_FOG_END, 40.0f);
+	glEnable(GL_FOG);
 }
 
 BEGIN_EVENT_TABLE(Render3dCanvas, wxGLCanvas)
@@ -115,7 +152,7 @@ BEGIN_EVENT_TABLE(Render3dCanvas, wxGLCanvas)
 	EVT_KEY_DOWN(Render3dCanvas::key_down)
 	EVT_KEY_UP(Render3dCanvas::key_up)
 	EVT_MOUSE_EVENTS(Render3dCanvas::mouse_event)
-	EVT_SIZE(Render3dCanvas::size_event)
+	//EVT_SIZE(Render3dCanvas::size_event)
 END_EVENT_TABLE()
 
 wxStopWatch sw;
@@ -241,7 +278,6 @@ void Render3dCanvas::size_event(wxSizeEvent &event)
 
 	GLfloat fogColor[4]= {0.0f, 0.0f, 0.0f, 1.0f};
 
-	glViewport(0, 0, GetClientSize().x, GetClientSize().y);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClearDepth(1.0);
 	glShadeModel(GL_SMOOTH);
@@ -263,6 +299,8 @@ void Render3dCanvas::size_event(wxSizeEvent &event)
 	glFogf(GL_FOG_START, 0.0f);
 	glFogf(GL_FOG_END, 40.0f);
 	glEnable(GL_FOG);
+
+	glViewport(0, 0, GetClientSize().x, GetClientSize().y);
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -315,6 +353,7 @@ void start_3d_mode()
 
 	editor_window->Hide();
 	frame_3d->ShowFullScreen(true);
+	canvas_3d->init();
 	canvas_3d->render();
 	//wxStartTimer();
 

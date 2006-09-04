@@ -98,6 +98,8 @@ EditorWindow::EditorWindow(const wxChar *title, int xpos, int ypos, int width, i
 	Maximize(true);
 	Show();
 
+	map_area->init();
+
 	/*
 	if (show_sidebar != 1)
 		sb_draw->Show(false);

@@ -33,6 +33,8 @@ public:
 	point2_t mouse_pos(bool translate);
 	point2_t get_down_pos(bool translate);
 
+	void init();
+
 	double get_zoom() { return zoom; }
 
 	bool selection();

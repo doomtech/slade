@@ -10,6 +10,7 @@ public:
 	Render3dCanvas(wxWindow *parent);
 	~Render3dCanvas();
 
+	void init();
 	void do_loop();
 	void render();
 
