@@ -19,6 +19,7 @@
 #include "console.h"
 
 
+#include <wx/filename.h>
 #include <wx/image.h>
 #include <wx/sysopt.h>
 
@@ -71,19 +72,19 @@ void load_main_config(bool wads_open)
 		if (token == _T("cvars"))
 			load_cvars(&mr);
 
-		if (token == _T("colours"))
+		else if (token == _T("colours"))
 			load_colours(&mr);
 
-		if (token == _T("iwads"))
+		else if (token == _T("iwads"))
 			load_game_iwads(&mr);
 
-		if (token == _T("recent_wads"))
+		else if (token == _T("recent_wads"))
 			load_recent_wads(&mr);
 
-		if (token == _T("open_wads") && reopen_wads && !wads_open)
+		else if (token == _T("open_wads") && reopen_wads && !wads_open)
 			load_open_wads(&mr);
 
-		if (token == _T("key_binds"))
+		else if (token == _T("key_binds"))
 			binds.load(&mr);
 
 		/*
@@ -122,19 +123,6 @@ std::string str(string in)
 }
 */
 
-// chr: Converts a wxString to an ascii character string
-// -------------------------------------------------- >>
-const char* chr(const string &str)
-{
-#ifdef UNICODE
-	wxCharBuffer buffer = str.ToAscii();
-	const char* data = buffer;
-	return data;
-#else
-	return (const char*)str.ToAscii();
-#endif
-}
-
 // message_box: Pops up a message box
 // ------------------------------- >>
 void message_box(string message, string caption)
@@ -154,13 +142,13 @@ void log_message(string message)
 string c_path(string filename, BYTE dir)
 {
 	if (dir == DIR_APP)
-		return s_fmt(_T("%s%s"), chr(app_path), chr(filename));
-	if (dir == DIR_TMP)
-		return s_fmt(_T("%s%s"), chr(tmp_path), chr(filename));
-	if (dir == DIR_USR)
-		return s_fmt(_T("%s%s"), chr(usr_path), chr(filename));
-
-	return _T("");
+		return app_path+filename;
+	else if (dir == DIR_TMP)
+		return tmp_path+filename;
+	else if (dir == DIR_USR)
+		return usr_path+filename;
+	else 
+		return _T("");
 }
 
 void update_statusbar()
@@ -202,7 +190,7 @@ void setup_directories()
 {
 	// Temporary directory
 #ifdef UNIX
-	tmp_path = "/tmp/";
+	tmp_path = _T("/tmp/");
 #elif defined(__APPLE__)
 	tmp_path = getTempDir();
 #else
@@ -210,9 +198,12 @@ void setup_directories()
 #endif
 
 	// User directory
-#ifdef __APPLE__
+#ifdef UNIX
+	app_path = wxString::FromAscii(SHARE_DIR);
+	usr_path = string(wxFileName::GetHomeDir()) + string(_T("/.slade/"));
+#elif defined(__APPLE__)
 	app_path = string(getBundleResourceDir()) + _T("/");
-	usr_path = string(getenv("HOME")) + string("/Library/Application Support/Slade/");
+	usr_path = wxFileName::GetHomeDir() + string(_T("/Library/Application Support/Slade/"));
 #else
 	usr_path = app_path;
 #endif
@@ -234,7 +225,16 @@ bool MainApp::OnInit()
 	setup_directories();
 
 	// Init logfile
-	wxLog::SetActiveTarget(new wxLogStderr(fopen(chr(c_path(_T("slade.log"), DIR_USR)), "wt")));
+	wxLog::SetActiveTarget(new wxLogStderr(fopen(chr(c_path(_T("slade.log"), DIR_TMP)), "wt")));
+
+#ifdef UNIX
+	// Create User Directory if it doesn't already exist
+	if(!wxFileName::DirExists(usr_path)) {
+		if(mkdir(chr(usr_path), S_IRUSR | S_IWUSR | S_IXUSR) == -1) {
+			log_message(s_fmt(_T("Could not create %s"), chr(usr_path)));
+		}
+	}
+#endif
 
 	// Allow high-colour toolbar icons
 	wxSystemOptions::SetOption(_T("msw.remap"), 0);
@@ -258,6 +258,7 @@ bool MainApp::OnInit()
 	// Parse command line
 	bool wads_opened = false;
 
+#ifndef UNIX
 	// Setup app path
 	app_path = argv[0];
 
@@ -268,6 +269,7 @@ bool MainApp::OnInit()
 
 	for (int a = 0; a < i; a++)
 		app_path.erase(app_path.end() - 1);
+#endif
 
 	// Parse command line args
 	for (int a = 1; a < argc; a++)

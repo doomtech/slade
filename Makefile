@@ -2,7 +2,8 @@
 # BSD licensed (GPL compatible)
 CXX=g++
 CXXFLAGS=-O2
-CXXFLAGS+=`wx-config --cxxflags` -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp -DNO_MAP_VIEWER=1
+SHARE_DIR=data_files/
+CXXFLAGS+=`wx-config --cxxflags` -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp -DNO_MAP_VIEWER=1 -DUNIX=1 -DSHARE_DIR="\"$(SHARE_DIR)\""
 LDFLAGS+=`wx-config --libs --gl-libs`
 EXE?=slade
 SRC=$(wildcard src/*.cpp src/zdbsp/*.cpp)

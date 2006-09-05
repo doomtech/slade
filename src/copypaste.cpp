@@ -107,7 +107,6 @@ void Clipboard::Copy()
 		}
 	}
 
-	/*
 	// Architecture copy
 	if (edit_mode > 0 && edit_mode < 3)
 	{
@@ -119,36 +118,22 @@ void Clipboard::Copy()
 
 		if (edit_mode == 2)
 		{
-			if (selected_items.size() > 0)
+			vector<Sector*> selection;
+			d_map.get_selection(selection, true);
+
+			if (selection.size() > 0)
 			{
-				for (int l = 0; l < map.n_lines; l++)
+				for (int a = 0; a < d_map.n_lines(); a++)
 				{
-					if (vector_exists(selected_items, map.l_getsector1(l)))
+					if (vector_exists(selection, d_map.line(a)->side1()->get_sector()))
 					{
-						copy_lines.push_back(l);
+						copy_lines.push_back(d_map.line(a));
 						continue;
 					}
 
-					if (vector_exists(selected_items, map.l_getsector2(l)))
+					if (vector_exists(selection, d_map.line(a)->side2()->get_sector()))
 					{
-						copy_lines.push_back(l);
-						continue;
-					}
-				}
-			}
-			else
-			{
-				for (int l = 0; l < map.n_lines; l++)
-				{
-					if (map.l_getsector1(l) == hilight_item)
-					{
-						copy_lines.push_back(l);
-						continue;
-					}
-
-					if (map.l_getsector2(l) == hilight_item)
-					{
-						copy_lines.push_back(l);
+						copy_lines.push_back(d_map.line(a));
 						continue;
 					}
 				}
@@ -158,47 +143,44 @@ void Clipboard::Copy()
 		if (copy_lines.size() == 0)
 			return;
 
+		/*
 		copy_type = COPY_ARCHITECTURE;
 
-		// Get sectors to copy
-		vector<int> copy_sectors;
+		// Get sides and sectors to copy
+		vector<Sector*> copy_sectors;
+		vector<Side*> copy_sides;
 		for (int a = 0; a < copy_lines.size(); a++)
 		{
-			if (map.l_getsector1(copy_lines[a]) != -1)
-				vector_add_nodup(copy_sectors, map.l_getsector1(copy_lines[a]));
+			if (copy_lines[a]->sector_index(true) != -1)
+			{
+				vector_add_nodup(copy_sectors, copy_lines[a]->side1()->get_sector());
+				copy_sides.push_back(copy_lines[a]->side1());
+			}
 
-			if (map.l_getsector2(copy_lines[a]) != -1)
-				vector_add_nodup(copy_sectors, map.l_getsector2(copy_lines[a]));
+			if (copy_lines[a]->sector_index(false) != -1)
+			{
+				vector_add_nodup(copy_sectors, copy_lines[a]->side2()->get_sector());
+				copy_sides.push_back(copy_lines[a]->side2());
+			}
 		}
 
 		// Copy the sectors
 		for (int a = 0; a < copy_sectors.size(); a++)
 		{
-			sector_t* sector = new sector_t();
-			memcpy(sector, map.sectors[copy_sectors[a]], sizeof(sector_t));
+			Sector* sector = new Sector();
+			sector->copy(copy_sectors[a]);
 			sectors.push_back(sector);
-		}
-
-		// Get sides to copy
-		vector<int> copy_sides;
-		for (int a = 0; a < copy_lines.size(); a++)
-		{
-			if (map.lines[copy_lines[a]]->side1 != -1)
-				copy_sides.push_back(map.lines[copy_lines[a]]->side1);
-
-			if (map.lines[copy_lines[a]]->side2 != -1)
-				copy_sides.push_back(map.lines[copy_lines[a]]->side2);
 		}
 
 		// Copy the sides
 		for (int a = 0; a < copy_sides.size(); a++)
 		{
-			sidedef_t* side = new sidedef_t();
-			memcpy(side, map.sides[copy_sides[a]], sizeof(sidedef_t));
+			Side* side = new Side();
+			side->copy(copy_sides[a]);
 
 			for (int a = 0; a < copy_sectors.size(); a++)
 			{
-				if (side->sector == copy_sectors[a])
+				if (side->get_sector() == copy_sectors[a])
 				{
 					side->sector = a;
 					break;
@@ -293,8 +275,8 @@ void Clipboard::Copy()
 
 			lines.push_back(line);
 		}
+		*/
 	}
-	*/
 }
 
 void Clipboard::Paste()

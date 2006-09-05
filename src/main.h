@@ -9,7 +9,8 @@
 typedef wxString string;
 #define s_fmt wxString::Format
 
-const char* chr(const wxString &str);
+// the temp object was destroyed before it was used when this was a function
+#define chr(s) (const char*)s.ToAscii()
 
 #if wxUSE_UNICODE
 #define atoi(s)	((int)wcstol(s, NULL, 10))

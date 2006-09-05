@@ -43,16 +43,20 @@ void dump_cvars()
 		if (!(cvars[c]->flags & CVAR_SECRET))
 		{
 			if (cvars[c]->type == CVAR_INTEGER)
+			switch(cvars[c]->type) {
+			case CVAR_INTEGER:
 				printf("%s %d\n", chr(cvars[c]->name), cvars[c]->GetValue().Int);
-
-			if (cvars[c]->type == CVAR_BOOLEAN)
+				break;
+			case CVAR_BOOLEAN:
 				printf("%s %d\n", chr(cvars[c]->name), cvars[c]->GetValue().Bool);
-
-			if (cvars[c]->type == CVAR_FLOAT)
+				break;
+			case CVAR_FLOAT:
 				printf("%s %1.2f\n", chr(cvars[c]->name), cvars[c]->GetValue().Float);
-
-			if (cvars[c]->type == CVAR_STRING)
+				break;
+			case CVAR_STRING:
 				printf("%s \"%s\"\n", chr(cvars[c]->name), chr(((CStringCVar *)cvars[c])->value));
+				break;
+			}
 		}
 	}
 }
