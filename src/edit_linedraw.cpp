@@ -103,7 +103,7 @@ void ldraw_end()
 	{
 		int v = d_map.check_vertex_spot(ldraw_points[a]);
 
-		if (v == -1 || edit_auto_merge)
+		if (v == -1 || !edit_auto_merge)
 			new_verts.push_back(new Vertex(ldraw_points[a].x, ldraw_points[a].y, &d_map));
 		else
 			new_verts.push_back(d_map.vertex(v));
