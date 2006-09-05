@@ -54,7 +54,7 @@ SectorInfoBar::SectorInfoBar(wxWindow *parent)
 	tex_ceil = new TextureBox(this, 96, 96, _T("_none_"), 1, 2.0f);
 	box->Add(tex_ceil, 1, wxALIGN_CENTER);
 
-	SetSizeHints(-1, 128, -1, 128);
+	SetSizeHints(-1, 128, -1, -1);
 }
 
 SectorInfoBar::~SectorInfoBar()

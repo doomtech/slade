@@ -27,7 +27,7 @@ rgba_t col_vertex(140, 140, 255, 255, 0);
 rgba_t col_background(0, 0, 0, 255, 0);
 rgba_t col_selbox(0, 140, 220, 100, 1);
 rgba_t col_selbox_line(100, 180, 220, 200, 1);
-rgba_t col_linedraw(127, 0, 255, 255, 0);
+rgba_t col_linedraw(0, 128, 0, 255, 0);
 rgba_t col_crosshair(255, 255, 0, 50, 1);
 rgba_t col_line_solid(200, 200, 200, 255, 0);
 rgba_t col_line_2s(97, 119, 143, 255, 0);

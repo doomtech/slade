@@ -26,7 +26,7 @@ VertexInfoBar::VertexInfoBar(wxWindow *parent)
 	box->Add(label_x);
 	box->Add(label_y);
 
-	SetSizeHints(-1, 128, -1, 128);
+	SetSizeHints(-1, 128, -1, -1);
 };
 
 VertexInfoBar::~VertexInfoBar()
