@@ -133,7 +133,6 @@ public:
 	DECLARE_EVENT_TABLE()
 };
 
-/*
 class InputTextCtrl : public wxTextCtrl
 {
 private:
@@ -165,31 +164,29 @@ public:
 class InputPrefs : public wxPanel
 {
 private:
-	wxListBox		*list_controls;
-	wxListBox		*list_binds;
-	wxButton		*btn_addcontrol;
+	wxListBox	*list_controls;
+	wxListBox	*list_binds;
 
-	InputTextCtrl	*entry_binding;
-	wxStaticText	*label_modifiers;
-	wxButton		*btn_set_accept;
-	wxButton		*btn_default_cancel;
+	wxButton	*btn_addbind;
+	wxButton	*btn_removebind;
+	wxButton	*btn_changebind;
+	wxButton	*btn_defaultbind;
 
-	wxButton		*btn_defaults;
-	wxButton		*btn_loadconfig;
-	wxButton		*btn_saveconfig;
+	wxButton	*btn_defaults;
+	wxButton	*btn_loadconfig;
+	wxButton	*btn_saveconfig;
 
 public:
 	enum
 	{
 		IP_LIST_CONTROLS,
 		IP_LIST_BINDS,
-		IP_BTN_ADDCONTROL,
 
-		IP_ENTRY_BINDING,
-		IP_LABEL_MODS,
-		IP_BTN_SETACCEPT,
-		IP_BTN_DEFAULTCANCEL,
-		
+		IP_BTN_ADDBIND,
+		IP_BTN_REMOVEBIND,
+		IP_BTN_CHANGEBIND,
+		IP_BTN_DEFAULTBIND,
+
 		IP_BTN_DEFAULTS,
 		IP_BTN_LOADCONFIG,
 		IP_BTN_SAVECONFIG,
@@ -199,17 +196,18 @@ public:
 	~InputPrefs();
 
 	void list_controls_changed(wxCommandEvent &event);
-	void btn_setaccept_clicked(wxCommandEvent &event);
-	void btn_defaultcancel_clicked(wxCommandEvent &event);
 	void btn_defaults_clicked(wxCommandEvent &event);
 	void btn_loadconfig_clicked(wxCommandEvent &event);
 	void btn_saveconfig_clicked(wxCommandEvent &event);
-	void btn_addcontrol_clicked(wxCommandEvent &event);
-	void entry_binding_enter(wxCommandEvent &event);
+	void btn_addbind_clicked(wxCommandEvent &event);
+	void btn_removebind_clicked(wxCommandEvent &event);
+	void btn_changebind_clicked(wxCommandEvent &event);
+	void btn_defaultbind_clicked(wxCommandEvent &event);
 
 	DECLARE_EVENT_TABLE()
 };
 
+/*
 class RenderPrefs : public wxPanel
 {
 private:

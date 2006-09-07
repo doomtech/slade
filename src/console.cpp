@@ -103,7 +103,7 @@ void init_console()
 	string line = _T("<< S.L.A.D.E. -- \"SlayeR's LeetAss Doom Editor\" (");
 	line += __SLADEVERS;
 	line += _T(")");
-	for (int a = 0; a < 21 - sizeof(__SLADEVERS); a++)
+	for (int a = 0; a < 21 - sizeof(__SLADEVERS)/sizeof(wxChar); a++)
 		line += _T(" ");
 	line += _T(">>");
 	console_print(_T("<< ------------------------------------------------------------------ >>"));
@@ -124,9 +124,9 @@ void console_print(string message)
 	if (message[message.size() - 1] != '\n')
 		message += _T("\n");
 
-	console_log.insert(console_log.size(), str_to_wx(message));
+	console_log.insert(console_log.size(), message);
 
-	wxLogMessage(str_to_wx(message));
+	wxLogMessage(message);
 
 	console_window->update_log();
 }

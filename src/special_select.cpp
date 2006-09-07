@@ -31,7 +31,7 @@ SpecialSelectDialog::SpecialSelectDialog(int init)
 		bool found = false;
 		for (int g = 0; g < groups.size(); g++)
 		{
-			if (tree->GetItemText(groups[g]) == str_to_wx(as.group))
+			if (tree->GetItemText(groups[g]) == as.group)
 			{
 				group = groups[g];
 				found = true;
@@ -41,12 +41,12 @@ SpecialSelectDialog::SpecialSelectDialog(int init)
 
 		if (!found)
 		{
-			group = tree->AppendItem(root, str_to_wx(as.group));
+			group = tree->AppendItem(root, as.group);
 			groups.push_back(group);
 		}
 
 		string text = s_fmt(_T("%d: %s"), as.type, as.name.c_str());
-		item = tree->AppendItem(group, str_to_wx(text));
+		item = tree->AppendItem(group, text);
 
 		if (selected_val == as.type)
 		{

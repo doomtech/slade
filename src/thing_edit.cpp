@@ -47,7 +47,7 @@ ThingEditor::ThingEditor(int type)
 			if (f >= game.n_thing_flags())
 				continue;
 
-			setup_flag_checkbox(game.thing_flag(f).value, str_to_wx(game.thing_flag(f).name), vbox);
+			setup_flag_checkbox(game.thing_flag(f).value, game.thing_flag(f).name, vbox);
 			f++;
 		}
 	}
@@ -339,11 +339,11 @@ void ThingEditor::apply_changes()
 
 		// Type
 		if (type_entry->GetValue() != _T(""))
-			items[a]->set_type(atoi(wx_to_str(type_entry->GetValue()).c_str()));
+			items[a]->set_type(atoi(chr(type_entry->GetValue())));
 
 		// Angle
 		if (angle_entry->GetValue() != _T(""))
-			items[a]->set_angle(atoi(wx_to_str(angle_entry->GetValue()).c_str()));
+			items[a]->set_angle(atoi(chr(angle_entry->GetValue())));
 
 		if (d_map.hexen())
 		{
@@ -356,15 +356,15 @@ void ThingEditor::apply_changes()
 
 			// TID
 			if (tid_entry->GetValue() != _T(""))
-				items[a]->set_tid(atoi(wx_to_str(tid_entry->GetValue()).c_str()));
+				items[a]->set_tid(atoi(chr(tid_entry->GetValue())));
 
 			// Z height
 			if (z_entry->GetValue() != _T(""))
-				items[a]->set_z(atoi(wx_to_str(z_entry->GetValue()).c_str()));
+				items[a]->set_z(atoi(chr(z_entry->GetValue())));
 
 			// Special
 			for (int a = 0; a < items.size(); a++)
-				items[a]->set_special(atoi(wx_to_str(special_entry->GetValue()).c_str()));
+				items[a]->set_special(atoi(chr(special_entry->GetValue())));
 		}
 
 		items[a]->update_ttype();
@@ -416,7 +416,7 @@ void ThingEditor::angle_radio_changed(wxCommandEvent &event)
 	}
 
 	if (angle != -1)
-		angle_entry->SetValue(str_to_wx(s_fmt(_T("%d"), angle)));
+		angle_entry->SetValue(s_fmt(_T("%d"), angle));
 	else
 		angle_entry->SetValue(_T(""));
 }
@@ -425,8 +425,8 @@ void ThingEditor::type_entry_changed(wxCommandEvent &event)
 {
 	if (type_entry->GetValue() != _T(""))
 	{
-		ThingType *ttype = game.get_ttype(atoi(wx_to_str(type_entry->GetValue()).c_str()));
-		type_label->SetLabel(str_to_wx(ttype->name));
+		ThingType *ttype = game.get_ttype(atoi(chr(type_entry->GetValue())));
+		type_label->SetLabel(ttype->name);
 		sprite->set_texture(ttype->spritename, 3);
 	}
 	else
@@ -441,7 +441,7 @@ void ThingEditor::angle_entry_changed(wxCommandEvent &event)
 	angle_unknown->SetValue(true);
 	if (angle_entry->GetValue() != _T(""))
 	{
-		int angle = atoi(wx_to_str(angle_entry->GetValue()).c_str());
+		int angle = atoi(chr(angle_entry->GetValue()));
 
 		if (angle == 0)
 			angle_e->SetValue(true);
@@ -466,13 +466,13 @@ void ThingEditor::change_type_clicked(wxCommandEvent &event)
 {
 	int val = 0;
 	if (type_entry->GetValue() != _T(""))
-		val = atoi(wx_to_str(type_entry->GetValue()).c_str());
+		val = atoi(chr(type_entry->GetValue()));
 
 	TTypeSelectDialog td(val);
 	if (td.ShowModal() == wxID_OK)
 	{
 		if (td.get_type() != -1)
-			type_entry->SetValue(str_to_wx(s_fmt(_T("%d"), td.get_type())));
+			type_entry->SetValue(s_fmt(_T("%d"), td.get_type()));
 	}
 }
 
@@ -488,7 +488,7 @@ void ThingEditor::change_special_clicked(wxCommandEvent &event)
 {
 	int val = 0;
 	if (special_entry->GetValue() != _T(""))
-		val = atoi(wx_to_str(special_entry->GetValue()).c_str());
+		val = atoi(chr(special_entry->GetValue()));
 
 	SpecialSelectDialog sd(val);
 	if (sd.ShowModal() == wxID_OK)
@@ -502,7 +502,7 @@ void ThingEditor::edit_args_clicked(wxCommandEvent &event)
 {
 	int type = -1;
 	if (type_entry->GetValue() != _T(""))
-		type = atoi(wx_to_str(type_entry->GetValue()).c_str());
+		type = atoi(chr(type_entry->GetValue()));
 
 	ThingType *tt = game.get_ttype(type);
 	int result;
@@ -517,7 +517,7 @@ void ThingEditor::edit_args_clicked(wxCommandEvent &event)
 	{
 		int special = 0;
 		if (special_entry->GetValue() != _T(""))
-			special = atoi(wx_to_str(special_entry->GetValue()).c_str());
+			special = atoi(chr(special_entry->GetValue()));
 
 		ActionSpecial *as = game.get_special(special);
 

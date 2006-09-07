@@ -156,6 +156,21 @@ string get_key_name(int key)
 	return s_fmt(_T("Key%d"), key);
 }
 
+string keybind_t::get_string()
+{
+	string ret = _T("");
+
+	if (mods & KMOD_SHIFT)
+		ret += _T("Shift+");
+	if (mods & KMOD_CTRL)
+		ret += _T("Ctrl+");
+	if (mods & KMOD_ALT)
+		ret += _T("Alt+");
+
+	ret += key;
+	return ret;
+}
+
 // set_defaults: Sets the default key bindings
 // ---------------------------------------- >>
 void BindList::set_defaults()

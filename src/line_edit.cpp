@@ -87,7 +87,7 @@ LinePropertiesPage::LinePropertiesPage(wxWindow *parent)
 			if (f >= game.n_line_flags())
 				continue;
 
-			setup_flag_checkbox(game.line_flag(f).value, str_to_wx(game.line_flag(f).name), vbox);
+			setup_flag_checkbox(game.line_flag(f).value, game.line_flag(f).name, vbox);
 			f++;
 		}
 	}
@@ -188,10 +188,10 @@ void LinePropertiesPage::setup_widgets()
 		}
 
 		// Properties
-		entry_special->SetValue(str_to_wx(s_fmt(_T("%d"), d_map.hilight_line()->get_special())));
+		entry_special->SetValue(s_fmt(_T("%d"), d_map.hilight_line()->get_special()));
 
 		if (!d_map.hexen())
-			entry_tag->SetValue(str_to_wx(s_fmt(_T("%d"), d_map.hilight_line()->get_sector_tag())));
+			entry_tag->SetValue(s_fmt(_T("%d"), d_map.hilight_line()->get_sector_tag()));
 		else
 		{
 			combo_trigger->Select(d_map.hilight_line()->get_trigger() + 1);
@@ -218,10 +218,10 @@ void LinePropertiesPage::setup_widgets()
 		}
 
 		// Properties
-		entry_special->SetValue(str_to_wx(s_fmt(_T("%d"), oline->get_special())));
+		entry_special->SetValue(s_fmt(_T("%d"), oline->get_special()));
 
 		if (!d_map.hexen())
-			entry_tag->SetValue(str_to_wx(s_fmt(_T("%d"), oline->get_sector_tag())));
+			entry_tag->SetValue(s_fmt(_T("%d"), oline->get_sector_tag()));
 		else
 		{
 			combo_trigger->Select(oline->get_trigger() + 1);
@@ -295,7 +295,7 @@ void LinePropertiesPage::apply_changes()
 	if (entry_special->GetValue() != _T(""))
 	{
 		for (int a = 0; a < items.size(); a++)
-			items[a]->set_special(atoi(wx_to_str(entry_special->GetValue()).c_str()));
+			items[a]->set_special(atoi(chr(entry_special->GetValue())));
 	}
 
 	if (!d_map.hexen())
@@ -304,7 +304,7 @@ void LinePropertiesPage::apply_changes()
 		if (entry_tag->GetValue() != _T(""))
 		{
 			for (int a = 0; a < items.size(); a++)
-				items[a]->set_sector_tag(atoi(wx_to_str(entry_tag->GetValue()).c_str()));
+				items[a]->set_sector_tag(atoi(chr(entry_tag->GetValue())));
 		}
 	}
 	else
@@ -339,13 +339,13 @@ void LinePropertiesPage::change_special_clicked(wxCommandEvent &event)
 {
 	int val = 0;
 	if (entry_special->GetValue() != _T(""))
-		val = atoi(wx_to_str(entry_special->GetValue()).c_str());
+		val = atoi(chr(entry_special->GetValue()));
 
 	SpecialSelectDialog sd(val);
 	if (sd.ShowModal() == wxID_OK)
 	{
 		if (sd.get_special() != -1)
-			entry_special->SetValue(str_to_wx(s_fmt(_T("%d"), sd.get_special())));
+			entry_special->SetValue(s_fmt(_T("%d"), sd.get_special()));
 	}
 }
 
@@ -359,7 +359,7 @@ void LinePropertiesPage::edit_args_clicked(wxCommandEvent &event)
 {
 	int type = 0;
 	if (entry_special->GetValue() != _T(""))
-		type = atoi(wx_to_str(entry_special->GetValue()).c_str());
+		type = atoi(chr(entry_special->GetValue()));
 
 	ActionSpecial *as = game.get_special(type);
 
@@ -374,8 +374,8 @@ void LinePropertiesPage::entry_special_changed(wxCommandEvent &event)
 		label_special->SetLabel(_T("Special:"));
 	else
 	{
-		ActionSpecial *as = game.get_special(atoi(wx_to_str(entry_special->GetValue()).c_str()));
-		label_special->SetLabel(wxString::Format(_T("Special: %s"), as->name.c_str()));
+		ActionSpecial *as = game.get_special(atoi(chr(entry_special->GetValue())));
+		label_special->SetLabel(wxString::Format(_T("Special: %s"), chr(as->name)));
 	}
 }
 
@@ -567,21 +567,21 @@ void SidePropertiesPage::setup_widgets()
 
 
 	// Upper texture
-	entry_upper->SetValue(str_to_wx(sides[0]->get_texname(TEX_UPPER)));
+	entry_upper->SetValue(sides[0]->get_texname(TEX_UPPER));
 	if (sides[0]->get_texname(TEX_UPPER) == _T("-"))
 		tex_upper->set_texture(_T("_none_"));
 	else
 		tex_upper->set_texture(sides[0]->get_texname(TEX_UPPER), 1);
 
 	// Middle texture
-	entry_middle->SetValue(str_to_wx(sides[0]->get_texname(TEX_MIDDLE)));
+	entry_middle->SetValue(sides[0]->get_texname(TEX_MIDDLE));
 	if (sides[0]->get_texname(TEX_MIDDLE) == _T("-"))
 		tex_middle->set_texture(_T("_none_"));
 	else
 		tex_middle->set_texture(sides[0]->get_texname(TEX_MIDDLE), 1);
 
 	// Lower texture
-	entry_lower->SetValue(str_to_wx(sides[0]->get_texname(TEX_LOWER)));
+	entry_lower->SetValue(sides[0]->get_texname(TEX_LOWER));
 	if (sides[0]->get_texname(TEX_LOWER) == _T("-"))
 		tex_lower->set_texture(_T("_none_"));
 	else
@@ -674,24 +674,24 @@ void SidePropertiesPage::apply_changes()
 	{
 		// Textures
 		if (entry_upper->GetValue() != _T(""))
-			sides[a]->set_texture(wx_to_str(entry_upper->GetValue()), TEX_UPPER);
+			sides[a]->set_texture(entry_upper->GetValue(), TEX_UPPER);
 
 		if (entry_middle->GetValue() != _T(""))
-			sides[a]->set_texture(wx_to_str(entry_middle->GetValue()), TEX_MIDDLE);
+			sides[a]->set_texture(entry_middle->GetValue(), TEX_MIDDLE);
 
 		if (entry_lower->GetValue() != _T(""))
-			sides[a]->set_texture(wx_to_str(entry_lower->GetValue()), TEX_LOWER);
+			sides[a]->set_texture(entry_lower->GetValue(), TEX_LOWER);
 
 		// Offsets
 		if (entry_xoff->GetValue() != _T(""))
-			sides[a]->set_xoff(atoi(wx_to_str(entry_xoff->GetValue()).c_str()));
+			sides[a]->set_xoff(atoi(chr(entry_xoff->GetValue())));
 
 		if (entry_yoff->GetValue() != _T(""))
-			sides[a]->set_yoff(atoi(wx_to_str(entry_yoff->GetValue()).c_str()));
+			sides[a]->set_yoff(atoi(chr(entry_yoff->GetValue())));
 
 		// Sector ref
 		if (entry_sector->GetValue() != _T(""))
-			sides[a]->set_sector(atoi(wx_to_str(entry_sector->GetValue()).c_str()));
+			sides[a]->set_sector(atoi(chr(entry_sector->GetValue())));
 	}
 }
 
@@ -705,21 +705,21 @@ void SidePropertiesPage::upper_tex_entry_changed(wxCommandEvent &event)
 {
 	wxString str = entry_upper->GetValue();
 	str.UpperCase();
-	tex_upper->set_texture(wx_to_str(str), 1);
+	tex_upper->set_texture(str, 1);
 }
 
 void SidePropertiesPage::middle_tex_entry_changed(wxCommandEvent &event)
 {
 	wxString str = entry_middle->GetValue();
 	str.UpperCase();
-	tex_middle->set_texture(wx_to_str(str), 1);
+	tex_middle->set_texture(str, 1);
 }
 
 void SidePropertiesPage::lower_tex_entry_changed(wxCommandEvent &event)
 {
 	wxString str = entry_lower->GetValue();
 	str.UpperCase();
-	tex_lower->set_texture(wx_to_str(str), 1);
+	tex_lower->set_texture(str, 1);
 }
 
 void SidePropertiesPage::upper_tex_clicked(wxMouseEvent &event)

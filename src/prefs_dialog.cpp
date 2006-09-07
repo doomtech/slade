@@ -13,7 +13,7 @@ PrefsDialog::PrefsDialog()
 
 	tabs->AddPage(new VisualPrefs(tabs), _T("Visual"));
 	tabs->AddPage(new ColourPrefs(tabs), _T("Colours"));
-	//tabs->AddPage(new InputPrefs(tabs), _T("Input"));
+	tabs->AddPage(new InputPrefs(tabs), _T("Input"));
 	//tabs->AddPage(new RenderPrefs(tabs), _T("3d Mode"));
 	//tabs->AddPage(new MiscPrefs(tabs), _T("Misc"));
 

@@ -118,12 +118,12 @@ void SectorEditor::setup_widgets()
 
 	// Floor
 	tbox_ftex->set_texture(s->tex_floor(), 2);
-	entry_ftex->SetValue(str_to_wx(s->tex_floor()));
+	entry_ftex->SetValue(s->tex_floor());
 	entry_fheight->SetValue(wxString::Format(_T("%d"), s->floor()));
 
 	// Ceiling
 	tbox_ctex->set_texture(s->tex_ceil(), 2);
-	entry_ctex->SetValue(str_to_wx(s->tex_ceil()));
+	entry_ctex->SetValue(s->tex_ceil());
 	entry_cheight->SetValue(wxString::Format(_T("%d"), s->ceiling()));
 
 	// Special
@@ -196,31 +196,31 @@ void SectorEditor::apply_changes()
 	{
 		// Floor tex
 		if (entry_ftex->GetValue() != _T(""))
-			items[a]->set_ftex(wx_to_str(entry_ftex->GetValue().Upper()));
+			items[a]->set_ftex(entry_ftex->GetValue().Upper());
 
 		// Floor height
 		if (entry_fheight->GetValue() != _T(""))
-			items[a]->set_floor(atoi(wx_to_str(entry_fheight->GetValue()).c_str()));
+			items[a]->set_floor(atoi(chr(entry_fheight->GetValue())));
 
 		// Ceiling tex
 		if (entry_ctex->GetValue() != _T(""))
-			items[a]->set_ctex(wx_to_str(entry_ctex->GetValue().Upper()));
+			items[a]->set_ctex(entry_ctex->GetValue().Upper());
 
 		// Ceiling height
 		if (entry_cheight->GetValue() != _T(""))
-			items[a]->set_ceil(atoi(wx_to_str(entry_cheight->GetValue()).c_str()));
+			items[a]->set_ceil(atoi(chr(entry_cheight->GetValue())));
 
 		// Special
 		if (entry_special->GetValue() != _T(""))
-			items[a]->set_special(atoi(wx_to_str(entry_special->GetValue()).c_str()));
+			items[a]->set_special(atoi(chr(entry_special->GetValue())));
 
 		// Tag
 		if (entry_tag->GetValue() != _T(""))
-			items[a]->set_tag(atoi(wx_to_str(entry_tag->GetValue()).c_str()));
+			items[a]->set_tag(atoi(chr(entry_tag->GetValue())));
 
 		// Light
 		if (entry_light->GetValue() != _T(""))
-			items[a]->set_light(atoi(wx_to_str(entry_light->GetValue()).c_str()));
+			items[a]->set_light(atoi(chr(entry_light->GetValue())));
 	}
 
 	d_map.change_level(MC_SECTORS|MC_SSECTS);
@@ -236,7 +236,7 @@ END_EVENT_TABLE()
 
 void SectorEditor::btn_changespecial_clicked(wxCommandEvent &event)
 {
-	STypeSelectDialog sd(atoi(wx_to_str(entry_special->GetValue()).c_str()));
+	STypeSelectDialog sd(atoi(chr(entry_special->GetValue())));
 	if (sd.ShowModal() == wxID_OK)
 		entry_special->SetValue(wxString::Format(_T("%d"), sd.get_value()));
 }
@@ -249,13 +249,13 @@ void SectorEditor::btn_findtag_clicked(wxCommandEvent &event)
 
 void SectorEditor::entry_ftex_changed(wxCommandEvent &event)
 {
-	string tex = wx_to_str(entry_ftex->GetValue().Upper());
+	string tex = entry_ftex->GetValue().Upper();
 	tbox_ftex->set_texture(tex, 2);
 }
 
 void SectorEditor::entry_ctex_changed(wxCommandEvent &event)
 {
-	string tex = wx_to_str(entry_ftex->GetValue().Upper());
+	string tex = entry_ftex->GetValue().Upper();
 	tbox_ftex->set_texture(tex, 2);
 }
 
@@ -265,7 +265,7 @@ void SectorEditor::entry_special_changed(wxCommandEvent &event)
 		label_special->SetLabel(_T(""));
 	else
 	{
-		string st = game.get_sector_type(Sector::strip_special(atoi(wx_to_str(entry_special->GetValue()).c_str()), d_map.hexen()));
-		label_special->SetLabel(str_to_wx(st));
+		string st = game.get_sector_type(Sector::strip_special(atoi(chr(entry_special->GetValue())), d_map.hexen()));
+		label_special->SetLabel(st);
 	}
 }

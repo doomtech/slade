@@ -87,7 +87,7 @@ ColourEdit::ColourEdit(wxWindow *parent, rgba_t *colour, string name)
 	wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
 	SetSizer(hbox);
 
-	hbox->Add(new wxStaticText(this, -1, str_to_wx(name)), 1, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
+	hbox->Add(new wxStaticText(this, -1, name), 1, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
 
 	cbox_colour = new ColourBox(this, col);
 	hbox->Add(cbox_colour, 0, wxEXPAND|wxRIGHT, 4);
@@ -167,8 +167,8 @@ END_EVENT_TABLE()
 
 void ColourPrefs::save_clicked(wxCommandEvent &event)
 {
-	string filename = wx_to_str(wxFileSelector(_T("Save Colour Configuration"), _T("./config/colours"), _T(""),
-							_T("*.cfg"), _T("Configuration Files (*.cfg)|*.cfg"), wxSAVE|wxOVERWRITE_PROMPT));
+	string filename = wxFileSelector(_T("Save Colour Configuration"), _T("./config/colours"), _T(""),
+							_T("*.cfg"), _T("Configuration Files (*.cfg)|*.cfg"), wxSAVE|wxOVERWRITE_PROMPT);
 
 	if (filename != _T(""))
 		save_colour_config(filename);
@@ -179,7 +179,7 @@ void ColourPrefs::load_clicked(wxCommandEvent &event)
 	string filename = _T("");
 	wxFileDialog browse(NULL, _T("Load Colour Configuration"), _T("./config/colours"), _T(""), _T("Configuration Files (*.cfg)|*.cfg"), wxOPEN|wxFILE_MUST_EXIST);
 	if (browse.ShowModal() == wxID_OK)
-		filename = wx_to_str(browse.GetPath());
+		filename = browse.GetPath();
 
 	log_message(filename);
 

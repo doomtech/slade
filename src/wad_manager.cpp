@@ -416,7 +416,7 @@ wxStaticBoxSizer *WadManager::setup_game_combo_frame(wxWindow *panel)
 	wxZipEntryPtr entry;
 	wxArrayString games;
 
-    wxFFileInputStream in(_T("slade.pk3"));
+    wxFFileInputStream in(c_path(_T("slade.pk3"), DIR_APP));
     wxZipInputStream zip(in);
 
     while (entry.reset(zip.GetNextEntry()), entry.get() != NULL)
@@ -435,11 +435,11 @@ wxStaticBoxSizer *WadManager::setup_game_combo_frame(wxWindow *panel)
 			if (temp == _T("game")) // If it's a valid SLADE game configuration
 			{
 				// Add the file path to the game config list
-				game_config_paths.push_back(wx_to_str(name));
+				game_config_paths.push_back(name);
 
 				// And add the game name to the combo
 				string gamename = tz.get_token();
-				games.Add(str_to_wx(gamename));
+				games.Add(gamename);
 				game_config_names.push_back(gamename);
 
 				if (gamename == def)

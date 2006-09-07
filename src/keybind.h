@@ -3,6 +3,8 @@ struct keybind_t
 {
 	string	key;
 	BYTE	mods;
+
+	string	get_string();
 };
 
 struct control_t

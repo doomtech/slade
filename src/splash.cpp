@@ -59,7 +59,7 @@ SplashWindow::~SplashWindow()
 
 void SplashWindow::SetMessage(string message)
 {
-	this->message->SetLabel(str_to_wx(message));
+	this->message->SetLabel(message);
 	Layout();
 }
 

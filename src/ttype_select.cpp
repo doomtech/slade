@@ -28,7 +28,7 @@ TTypeSelectDialog::TTypeSelectDialog(int init)
 		bool found = false;
 		for (int g = 0; g < groups.size(); g++)
 		{
-			if (tree->GetItemText(groups[g]) == str_to_wx(tt.group))
+			if (tree->GetItemText(groups[g]) == tt.group)
 			{
 				group = groups[g];
 				found = true;
@@ -38,12 +38,12 @@ TTypeSelectDialog::TTypeSelectDialog(int init)
 
 		if (!found)
 		{
-			group = tree->AppendItem(root, str_to_wx(tt.group));
+			group = tree->AppendItem(root, tt.group);
 			groups.push_back(group);
 		}
 
-		string text = s_fmt(_T("%d: %s"), tt.type, tt.name.c_str());
-		wxTreeItemId item = tree->AppendItem(group, str_to_wx(text));
+		string text = s_fmt(_T("%d: %s"), tt.type, chr(tt.name));
+		wxTreeItemId item = tree->AppendItem(group, text);
 
 		if (selected_val == tt.type)
 		{

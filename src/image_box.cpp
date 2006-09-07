@@ -14,7 +14,7 @@
 ImageBox::ImageBox(wxWindow *parent, string filename)
 	: wxPanel(parent, -1)
 {
-	image = new wxImage(str_to_wx(filename));
+	image = new wxImage(filename);
 
 	if (image->Ok())
 		SetSizeHints(image->GetWidth(), image->GetHeight());

@@ -27,14 +27,14 @@ void ConsoleEntry::key_down(wxKeyEvent &event)
 	{
 		console_prevcommand();
 		SetValue(_T(""));
-		WriteText(str_to_wx(cmd_line));
+		WriteText(cmd_line);
 		SetInsertionPointEnd();
 	}
 	else if (event.GetKeyCode() == WXK_DOWN)
 	{
 		console_nextcommand();
 		SetValue(_T(""));
-		WriteText(str_to_wx(cmd_line));
+		WriteText(cmd_line);
 		SetInsertionPointEnd();
 	}
 
@@ -94,7 +94,7 @@ void ConsoleWindow::close(wxCloseEvent &event)
 
 void ConsoleWindow::cmd_activated(wxCommandEvent &event)
 {
-	cmd_line = wx_to_str(entry->GetValue());
+	cmd_line = entry->GetValue();
 	console_parsecommand();
 	entry->SetValue(_T(""));
 }

@@ -29,7 +29,7 @@ ArgValueDialog::ArgValueDialog(BYTE value, argtype_t *arg_type)
 		{
 			if (!arg_type->values[a].flag)
 			{
-				values.Add(str_to_wx(arg_type->values[a].name));
+				values.Add(arg_type->values[a].name);
 				this->values.push_back(arg_type->values[a].value);
 				if (arg_type->values[a].value == value)
 					index = a;
@@ -53,7 +53,7 @@ ArgValueDialog::ArgValueDialog(BYTE value, argtype_t *arg_type)
 			if (arg_type->values[a].flag)
 			{
 				flags.push_back(arg_type->values[a].value);
-				wxCheckBox *cbox = new wxCheckBox(this, -1, str_to_wx(arg_type->values[a].name));
+				wxCheckBox *cbox = new wxCheckBox(this, -1, arg_type->values[a].name);
 				cbox_flags.push_back(cbox);
 				box->Add(cbox, 0, wxEXPAND|wxBOTTOM, 2);
 
@@ -135,8 +135,8 @@ void ArgEdit::entry_arg_changed(wxCommandEvent &event)
 		label_arg->SetLabel(wxString::Format(_T("%s"), argname.c_str()));
 	else if (arg_type)
 	{
-		int val = atoi(wx_to_str(entry_arg->GetValue()).c_str());
-		label_arg->SetLabel(wxString::Format(_T("%s: %s"), argname.c_str(), arg_type->get_name(val).c_str()));
+		int val = atoi(chr(entry_arg->GetValue()));
+		label_arg->SetLabel(wxString::Format(_T("%s: %s"), chr(argname), chr(arg_type->get_name(val))));
 #if wxCHECK_VERSION(2, 6, 2)
 		label_arg->Wrap(200);
 #endif
@@ -154,7 +154,7 @@ void ArgEdit::change_clicked(wxCommandEvent &event)
 
 	int val = 0;
 	if (entry_arg->GetValue() != _T(""))
-		val = atoi(wx_to_str(entry_arg->GetValue()).c_str());
+		val = atoi(chr(entry_arg->GetValue()));
 
 	ArgValueDialog av(val, arg_type);
 	if (av.ShowModal() == wxID_OK)
@@ -167,7 +167,7 @@ int ArgEdit::get_value()
 
 	if (entry_arg->GetValue() != _T(""))
 	{
-		ret = atoi(wx_to_str(entry_arg->GetValue()).c_str());
+		ret = atoi(chr(entry_arg->GetValue()));
 
 		if (ret > 255)
 			ret = 255;

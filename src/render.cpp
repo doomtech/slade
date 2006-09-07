@@ -1231,7 +1231,7 @@ void render_3d_view(int width, int height)
 		if (messages_3d[a].fade < 255)
 			al = messages_3d[a].fade;
 
-		draw_text_scale(0, a*(10*render_text_scale), rgba_t(255, 255, 255, al), 0, render_text_scale, messages_3d[a].message.c_str());
+		draw_text_scale(0, a*(10*render_text_scale), rgba_t(255, 255, 255, al), 0, render_text_scale, chr(messages_3d[a].message));
 
 		messages_3d[a].fade -= 7;
 	}

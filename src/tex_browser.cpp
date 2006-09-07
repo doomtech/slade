@@ -224,7 +224,7 @@ void TextureBrowser::scroll_event(wxScrollEvent &event)
 
 void TextureBrowser::search_changed(wxCommandEvent &event)
 {
-	browse_area->search_str(wx_to_str(search->GetValue().Upper()));
+	browse_area->search_str(search->GetValue().Upper());
 	browse_area->SetFocus();
 }
 

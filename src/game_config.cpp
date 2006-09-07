@@ -432,15 +432,15 @@ string GameConfig::ask_map_name()
 		mname = wxGetTextFromUser(_T("Enter Map Name:"), _T("Rename Map"));
 		mname.UpperCase();
 		mname.Truncate(8);
-		return wx_to_str(mname);
+		return mname;
 	}
 	else
 	{
 		wxArrayString mapnames;
 		for (int a = 0; a < valid_map_names.size(); a++)
-			mapnames.Add(str_to_wx(valid_map_names[a]));
+			mapnames.Add(valid_map_names[a]);
 
-		return wx_to_str(wxGetSingleChoice(_T("Select Map Name"), _T("Rename Map"), mapnames)).c_str();
+		return wxGetSingleChoice(_T("Select Map Name"), _T("Rename Map"), mapnames);
 	}
 
 	return _T("");

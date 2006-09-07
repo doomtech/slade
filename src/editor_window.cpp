@@ -585,7 +585,7 @@ void EditorWindow::file_saveas(wxCommandEvent &event)
 	if (!d_map.opened())
 		return;
 
-	string filename = wx_to_str(wxFileSelector(_T("Save Wadfile"), _T(""), _T(""), _T("*.wad"), _T("Doom Wad Files (*.wad)|*.wad"), wxSAVE|wxOVERWRITE_PROMPT));
+	string filename = wxFileSelector(_T("Save Wadfile"), _T(""), _T(""), _T("*.wad"), _T("Doom Wad Files (*.wad)|*.wad"), wxSAVE|wxOVERWRITE_PROMPT);
 
 	if (filename != _T(""))
 	{
@@ -599,7 +599,7 @@ void EditorWindow::file_saveas(wxCommandEvent &event)
 		wads.open(edit_wad->path);
 
 		d_map.clear_change(MC_SAVE_NEEDED);
-		SetTitle(wxString::Format(_T("SLADE (%s, %s)"), edit_wad->path.c_str(), d_map.map_name().c_str()));
+		SetTitle(wxString::Format(_T("SLADE (%s, %s)"), chr(edit_wad->path), chr(d_map.map_name())));
 	}
 }
 
@@ -608,7 +608,7 @@ void EditorWindow::file_savestandalone(wxCommandEvent &event)
 	if (!d_map.opened())
 		return;
 
-	string filename = wx_to_str(wxFileSelector(_T("Save Standalone Map"), _T(""), _T(""), _T("*.wad"), _T("Doom Wad Files (*.wad)|*.wad"), wxSAVE|wxOVERWRITE_PROMPT));
+	string filename = wxFileSelector(_T("Save Standalone Map"), _T(""), _T(""), _T("*.wad"), _T("Doom Wad Files (*.wad)|*.wad"), wxSAVE|wxOVERWRITE_PROMPT);
 
 	if (filename != _T(""))
 	{
@@ -619,7 +619,7 @@ void EditorWindow::file_savestandalone(wxCommandEvent &event)
 		add_recent_wad(filename);
 
 		d_map.clear_change(MC_SAVE_NEEDED);
-		SetTitle(wxString::Format(_T("SLADE (%s, %s)"), edit_wad->path.c_str(), d_map.map_name().c_str()));
+		SetTitle(wxString::Format(_T("SLADE (%s, %s)"), chr(edit_wad->path), chr(d_map.map_name())));
 	}
 }
 
@@ -713,7 +713,7 @@ void EditorWindow::file_importmap(wxCommandEvent &event)
 	string filename = _T("");
 	wxFileDialog browse(NULL, _T("Open Wad"), _T(""), _T(""), _T("Doom Wad Files (*.wad)|*.wad"), wxOPEN|wxFILE_MUST_EXIST);
 	if (browse.ShowModal() == wxID_OK)
-		filename = wx_to_str(browse.GetPath());
+		filename = browse.GetPath();
 
 	if (filename != _T(""))
 	{
@@ -728,7 +728,7 @@ void EditorWindow::file_importmap(wxCommandEvent &event)
 		string mapname;
 		wxArrayString mapnames;
 		for (int a = 0; a < temp_wad.available_maps.size(); a++)
-			mapnames.Add(str_to_wx(temp_wad.available_maps[a]));
+			mapnames.Add(temp_wad.available_maps[a]);
 
 		if (mapnames.size() == 0)
 		{
@@ -736,7 +736,7 @@ void EditorWindow::file_importmap(wxCommandEvent &event)
 			return;
 		}
 
-		mapname = wx_to_str(wxGetSingleChoice(_T("Select Map"), _T("Import Map"), mapnames));
+		mapname = wxGetSingleChoice(_T("Select Map"), _T("Import Map"), mapnames);
 
 		if (mapname == _T(""))
 			return;
