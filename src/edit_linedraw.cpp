@@ -286,10 +286,13 @@ void ldraw_removepoint()
 		return;
 	}
 
-	ldraw_points.pop_back();
-
 	if (ldraw_points.size() == 0)
+	{
 		change_state();
+		return;
+	}
+
+	ldraw_points.pop_back();
 }
 
 void ldraw_draw_lines(point2_t mouse)
