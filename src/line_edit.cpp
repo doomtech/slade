@@ -285,6 +285,8 @@ void LinePropertiesPage::apply_changes()
 	// Flags
 	for (int a = 0; a < items.size(); a++)
 	{
+		d_map.index(items[a], true);
+
 		WORD nflags = (WORD)items[a]->get_flags();
 		for (int b = 0; b < flags.size(); b++)
 			flags[b]->apply_flag(&nflags);
@@ -597,6 +599,8 @@ void SidePropertiesPage::setup_widgets()
 	// Check for inconsistency
 	for (int a = 0; a < sides.size(); a++)
 	{
+		d_map.index(sides[a], true);
+
 		if (entry_upper->GetValue() != _T(""))
 		{
 			if (sides[a]->get_texname(TEX_UPPER) != sides[0]->get_texname(TEX_UPPER))
