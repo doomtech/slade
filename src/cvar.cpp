@@ -133,13 +133,13 @@ void load_cvars(Tokenizer *mr)
 
 				switch(cvars[c]->type) {
 				case CVAR_INTEGER:
-					*((CIntCVar *)cvars[c]) = atoi(token.c_str());
+					*((CIntCVar *)cvars[c]) = atoi(chr(token));
 					break;
 				case CVAR_BOOLEAN:
-					*((CBoolCVar *)cvars[c]) = !!atoi(token.c_str());
+					*((CBoolCVar *)cvars[c]) = !!atoi(chr(token));
 					break;
 				case CVAR_FLOAT:
-					*((CFloatCVar *)cvars[c]) = (float)atof(token.c_str());
+					*((CFloatCVar *)cvars[c]) = atof(chr(token));
 					break;
 				case CVAR_STRING:
 					*((CStringCVar *)cvars[c]) = token;

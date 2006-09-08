@@ -188,7 +188,7 @@ void console_parsecommand()
 			val = s_fmt(_T("\"%d\""), cvar->GetValue().Int);
 			break;
 		case CVAR_STRING:
-			val = s_fmt(_T("\"%s\""), ((CStringCVar *)cvar)->value.c_str());
+			val = s_fmt(_T("\"%s\""), chr(((CStringCVar *)cvar)->value));
 			break;
 		case CVAR_BOOLEAN:
 			val = s_fmt(_T("\"%d\""), cvar->GetValue().Bool);

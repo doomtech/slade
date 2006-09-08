@@ -54,7 +54,7 @@ public:
 
 	void DumpToFile(string filename)
 	{
-		FILE *fp = fopen(filename.c_str(), "wb");
+		FILE *fp = fopen(chr(filename), "wb");
 		fwrite(data, 1, size, fp);
 		fclose(fp);
 	}
@@ -419,10 +419,10 @@ public:
 
 	void list_wads()
 	{
-		printf("%s\n", iwad->path.c_str());
+		printf("%s\n", chr(iwad->path));
 
 		for (DWORD w = 0; w < n_wads; w++)
-			printf("%s\n", wads[w]->path.c_str());
+			printf("%s\n", chr(wads[w]->path));
 	}
 };
 */

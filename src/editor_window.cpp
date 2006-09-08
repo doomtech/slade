@@ -570,7 +570,7 @@ void EditorWindow::file_save(wxCommandEvent &event)
 			d_map.add_to_wad(edit_wad);
 			edit_wad->save(true);
 			d_map.clear_change(MC_SAVE_NEEDED);
-			SetTitle(wxString::Format(_T("SLADE (%s, %s)"), edit_wad->path.c_str(), d_map.map_name().c_str()));
+			SetTitle(wxString::Format(_T("SLADE (%s, %s)"), chr(edit_wad->path), chr(d_map.map_name())));
 
 			if (!edit_wad->parent)
 				add_recent_wad(edit_wad->path);
@@ -647,9 +647,9 @@ void EditorWindow::file_rename(wxCommandEvent &event)
 		d_map.set_name(mapname);
 
 		if (edit_wad)
-			SetTitle(wxString::Format(_T("SLADE (%s, %s)"), edit_wad->path.c_str(), d_map.map_name().c_str()));
+			SetTitle(wxString::Format(_T("SLADE (%s, %s)"), chr(edit_wad->path), chr(d_map.map_name())));
 		else
-			SetTitle(wxString::Format(_T("SLADE (unsaved, %s)"), d_map.map_name().c_str()));
+			SetTitle(wxString::Format(_T("SLADE (unsaved, %s)"), chr(d_map.map_name())));
 	}
 }
 
@@ -871,7 +871,7 @@ void EditorWindow::edit_extrudeline(wxCommandEvent &event)
 		return;
 
 	lock_hilight = true;
-	int dist = atoi((wxGetTextFromUser(_T("Enter Distance to Extrude:"), _T("Extrude Line"), _T("8"))).c_str());
+	int dist = atoi(chr(wxGetTextFromUser(_T("Enter Distance to Extrude:"), _T("Extrude Line"), _T("8"))));
 
 	line_extrude(dist);
 	lock_hilight = false;
@@ -957,7 +957,7 @@ void EditorWindow::edit_createstairs(wxCommandEvent &event)
 	dlg.SetBestFittingSize();
 
 	if (dlg.ShowModal() == wxID_OK)
-		sector_create_stairs(atoi((entry_floor->GetValue()).c_str()), atoi((entry_ceil->GetValue()).c_str()));
+		sector_create_stairs(atoi(chr(entry_floor->GetValue())), atoi(chr(entry_ceil->GetValue())));
 
 	lock_hilight = false;
 }
@@ -986,7 +986,7 @@ void EditorWindow::edit_lightgradient(wxCommandEvent &event)
 		if (cb_first_to_last->GetValue())
 			sector_light_gradient(9999);
 		else
-			sector_light_gradient(atoi((entry_step->GetValue()).c_str()));
+			sector_light_gradient(atoi(chr(entry_step->GetValue())));
 	}
 }
 

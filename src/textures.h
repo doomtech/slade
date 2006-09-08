@@ -31,7 +31,7 @@ public:
 	rgba_t		avg_col;
 
 	Texture();
-	~Texture();
+	virtual ~Texture();
 
 	bool load_file(string filename);
 	void gen_from_data(int width, int height, BYTE* data, int swidth = -1, int sheight = -1, bool save_data = false);
@@ -49,7 +49,7 @@ private:
 
 public:
 	SimpleTexture();
-	~SimpleTexture();
+	virtual ~SimpleTexture();
 
 	void set_data(Wad* wad, string lump);
 
@@ -85,7 +85,7 @@ private:
 
 public:
 	DoomTexture();
-	~DoomTexture();
+	virtual ~DoomTexture();
 
 	void add_patch(short xoff, short yoff, Wad* wad, string patch)
 	{
@@ -108,7 +108,7 @@ private:
 
 public:
 	DoomFlat();
-	~DoomFlat();
+	virtual ~DoomFlat();
 
 	void set_data(Wad* wad, int index)
 	{
@@ -126,7 +126,7 @@ private:
 
 public:
 	FileTexture(string filename) { this->filename = filename; }
-	~FileTexture();
+	virtual ~FileTexture();
 
 	bool gen_gl_tex();
 };

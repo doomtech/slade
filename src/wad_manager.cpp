@@ -67,7 +67,7 @@ void save_recent_wads(FILE *fp)
 	fprintf(fp, "recent_wads\n{\n");
 
 	for (int a = 0; a < recent_wads.size(); a++)
-		fprintf(fp, "\twad \"%s\"\n", recent_wads[a].c_str());
+		fprintf(fp, "\twad \"%s\"\n", chr(recent_wads[a]));
 
 	fprintf(fp, "}\n\n");
 }
@@ -183,7 +183,7 @@ void MapPreviewCanvas::preview_map(Wad* wad, string mapname)
 	if (!wad || mapname == _T("") || wad->zip)
 		return;
 
-	//wxLogMessage(_T("Preview map %s in %s"), mapname.c_str(), wad->path.c_str());
+	//wxLogMessage(_T("Preview map %s in %s"), chr(mapname), chr(wad->path));
 
 	vector<point2_t> verts;
 	bool hexen_format = false;
@@ -590,7 +590,7 @@ void WadManager::game_combo_changed(wxCommandEvent &event)
 
 	if (!game.load_config(game_config_paths[index]))
 	{
-		wxMessageBox(wxString::Format(_T("Error loading game configuration \"%s\""), game_config_paths[index].c_str()),
+		wxMessageBox(wxString::Format(_T("Error loading game configuration \"%s\""), chr(game_config_paths[index])),
 					_T("Error"));
 		game_combo->SetSelection(cur_game);
 	}
@@ -715,7 +715,7 @@ void WadManager::recent_wads_list_activated(wxCommandEvent &event)
 		flags = WL_ZIP;
 
 	if (!wads.open(filename, flags))
-		wxMessageBox(wxString::Format(_T("Failed opening wadfile \"%s\""), filename.c_str()), _T("Error"), wxICON_ERROR);
+		wxMessageBox(wxString::Format(_T("Failed opening wadfile \"%s\""), chr(filename)), _T("Error"), wxICON_ERROR);
 	else
 	{
 		add_recent_wad(filename);

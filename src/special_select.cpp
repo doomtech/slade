@@ -45,7 +45,7 @@ SpecialSelectDialog::SpecialSelectDialog(int init)
 			groups.push_back(group);
 		}
 
-		string text = s_fmt(_T("%d: %s"), as.type, as.name.c_str());
+		string text = s_fmt(_T("%d: %s"), as.type, chr(as.name));
 		item = tree->AppendItem(group, text);
 
 		if (selected_val == as.type)

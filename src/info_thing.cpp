@@ -109,18 +109,18 @@ void ThingInfoBar::update()
 
 	Thing* thing = d_map.hilight_thing();
 
-	main_frame->SetLabel(wxString::Format(_T("Thing #%d: %s"), d_map.hilight(), thing->get_ttype()->name.c_str()));
-	label_type->SetLabel(wxString::Format(_T("Type: %d"), thing->get_type()).c_str());
+	main_frame->SetLabel(wxString::Format(_T("Thing #%d: %s"), d_map.hilight(), chr(thing->get_ttype()->name)));
+	label_type->SetLabel(wxString::Format(_T("Type: %d"), thing->get_type()));
 	if (d_map.hexen())
 		label_position->SetLabel(wxString::Format(_T("Position: (%d, %d, %d)"), thing->pos().x, thing->pos().y, thing->z_pos()));
 	else
-		label_position->SetLabel(wxString::Format(_T("Position: (%d, %d)"), thing->pos().x, thing->pos().y).c_str());
-	label_angle->SetLabel(wxString::Format(_T("Angle: %d (%s)"), thing->get_angle(), thing->angle_string().c_str()));
-	label_difficulty->SetLabel(wxString::Format(_T("Difficulty: %s"), thing->difficulty_string().c_str()));
-	label_deaf->SetLabel(wxString::Format(_T("Deaf: %s"), bool_to_yesno(thing->check_flag(THING_DEAF)).c_str()));
+		label_position->SetLabel(wxString::Format(_T("Position: (%d, %d)"), thing->pos().x, thing->pos().y));
+	label_angle->SetLabel(wxString::Format(_T("Angle: %d (%s)"), thing->get_angle(), chr(thing->angle_string())));
+	label_difficulty->SetLabel(wxString::Format(_T("Difficulty: %s"), chr(thing->difficulty_string())));
+	label_deaf->SetLabel(wxString::Format(_T("Deaf: %s"), chr(bool_to_yesno(thing->check_flag(THING_DEAF)))));
 
 	if (!d_map.hexen())
-		label_multiplayer->SetLabel(wxString::Format(_T("Multiplayer: %s"), bool_to_yesno(thing->check_flag(0x0010)).c_str()));
+		label_multiplayer->SetLabel(wxString::Format(_T("Multiplayer: %s"), chr(bool_to_yesno(thing->check_flag(0x0010)))));
 	else
 		label_multiplayer->SetLabel(wxString::Format(_T("TID: %d"), thing->get_tid()));
 
@@ -132,33 +132,33 @@ void ThingInfoBar::update()
 
 		argtype_t *at = game.get_arg_type(ttype->arg_types[0]);
 		if (at)
-			label_arg1->SetLabel(wxString::Format(_T("%s: %d (%s)"), ttype->args[0].c_str(), thing->arg(0), at->get_name(thing->arg(0)).c_str()));
+			label_arg1->SetLabel(wxString::Format(_T("%s: %d (%s)"), chr(ttype->args[0]), thing->arg(0), chr(at->get_name(thing->arg(0)))));
 		else
-			label_arg1->SetLabel(wxString::Format(_T("%s: %d"), ttype->args[0].c_str(), thing->arg(0)));
+			label_arg1->SetLabel(wxString::Format(_T("%s: %d"), chr(ttype->args[0]), thing->arg(0)));
 
 		at = game.get_arg_type(ttype->arg_types[1]);
 		if (at)
-			label_arg2->SetLabel(wxString::Format(_T("%s: %d (%s)"), ttype->args[1].c_str(), thing->arg(1), at->get_name(thing->arg(1)).c_str()));
+			label_arg2->SetLabel(wxString::Format(_T("%s: %d (%s)"), chr(ttype->args[1]), thing->arg(1), chr(at->get_name(thing->arg(1)))));
 		else
-			label_arg2->SetLabel(wxString::Format(_T("%s: %d"), ttype->args[1].c_str(), thing->arg(1)));
+			label_arg2->SetLabel(wxString::Format(_T("%s: %d"), chr(ttype->args[1]), thing->arg(1)));
 
 		at = game.get_arg_type(ttype->arg_types[2]);
 		if (at)
-			label_arg3->SetLabel(wxString::Format(_T("%s: %d (%s)"), ttype->args[2].c_str(), thing->arg(2), at->get_name(thing->arg(2)).c_str()));
+			label_arg3->SetLabel(wxString::Format(_T("%s: %d (%s)"), chr(ttype->args[2]), thing->arg(2), chr(at->get_name(thing->arg(2)))));
 		else
-			label_arg3->SetLabel(wxString::Format(_T("%s: %d"), ttype->args[2].c_str(), thing->arg(2)));
+			label_arg3->SetLabel(wxString::Format(_T("%s: %d"), chr(ttype->args[2]), thing->arg(2)));
 
 		at = game.get_arg_type(ttype->arg_types[3]);
 		if (at)
-			label_arg4->SetLabel(wxString::Format(_T("%s: %d (%s)"), ttype->args[3].c_str(), thing->arg(3), at->get_name(thing->arg(3)).c_str()));
+			label_arg4->SetLabel(wxString::Format(_T("%s: %d (%s)"), chr(ttype->args[3]), thing->arg(3), chr(at->get_name(thing->arg(3)))));
 		else
-			label_arg4->SetLabel(wxString::Format(_T("%s: %d"), ttype->args[3].c_str(), thing->arg(3)));
+			label_arg4->SetLabel(wxString::Format(_T("%s: %d"), chr(ttype->args[3]), thing->arg(3)));
 
 		at = game.get_arg_type(ttype->arg_types[4]);
 		if (at)
-			label_arg5->SetLabel(wxString::Format(_T("%s: %d (%s)"), ttype->args[4].c_str(), thing->arg(4), at->get_name(thing->arg(4)).c_str()));
+			label_arg5->SetLabel(wxString::Format(_T("%s: %d (%s)"), chr(ttype->args[4]), thing->arg(4), chr(at->get_name(thing->arg(4)))));
 		else
-			label_arg5->SetLabel(wxString::Format(_T("%s: %d"), ttype->args[4].c_str(), thing->arg(4)));
+			label_arg5->SetLabel(wxString::Format(_T("%s: %d"), chr(ttype->args[4]), thing->arg(4)));
 	}
 
 	Layout();

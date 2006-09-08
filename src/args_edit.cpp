@@ -100,11 +100,11 @@ ArgEdit::ArgEdit(wxWindow *parent, int val, string argname, argtype_t *arg_type)
 	wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
 	SetSizer(hbox);
 
-	label_arg = new wxStaticText(this, -1, wxString::Format(_T("%s"), argname.c_str()));
+	label_arg = new wxStaticText(this, -1, wxString::Format(_T("%s"), chr(argname)));
 	hbox->Add(label_arg, 1, wxALIGN_CENTER_VERTICAL);
 
 	if (arg_type && val != -1)
-		label_arg->SetLabel(wxString::Format(_T("%s: %s"), argname.c_str(), arg_type->get_name(val).c_str()));
+		label_arg->SetLabel(argname + _T(": ") + arg_type->get_name(val));
 
 #if wxCHECK_VERSION(2, 6, 2)
 	label_arg->Wrap(200);
@@ -132,11 +132,11 @@ END_EVENT_TABLE()
 void ArgEdit::entry_arg_changed(wxCommandEvent &event)
 {
 	if (entry_arg->GetValue() == _T(""))
-		label_arg->SetLabel(wxString::Format(_T("%s"), argname.c_str()));
+		label_arg->SetLabel(argname);
 	else if (arg_type)
 	{
 		int val = atoi(chr(entry_arg->GetValue()));
-		label_arg->SetLabel(wxString::Format(_T("%s: %s"), chr(argname), chr(arg_type->get_name(val))));
+		label_arg->SetLabel(argname + _T(": ") + arg_type->get_name(val));
 #if wxCHECK_VERSION(2, 6, 2)
 		label_arg->Wrap(200);
 #endif

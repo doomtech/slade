@@ -714,7 +714,7 @@ void Wad::save(bool nodes, string mapname)
 		while (lump < max)
 		{
 			if (inwad.IsMap (lump) &&
-				(mapname == _T("") || mapname.CmpNoCase(wxString::FromAscii(inwad.LumpName(lump))) == 0)) //stricmp (inwad.LumpName (lump), str(mapname).c_str()) == 0))
+				(mapname == _T("") || mapname.CmpNoCase(wxString::FromAscii(inwad.LumpName(lump))) == 0)) //stricmp (inwad.LumpName (lump), chr(str(mapname))) == 0))
 			{
 				splash(s_fmt(_T("Building nodes on %s"), inwad.LumpName(lump)), true);
 				FProcessor builder(inwad, lump);
@@ -743,7 +743,7 @@ void Wad::save(bool nodes, string mapname)
 		outwad.Close();
 
 		remove(chr(path));
-		copy_file(s_fmt(_T("%s.temp"), chr(wadpath)), wadpath);
+		copy_file(wadpath + _T(".temp"), wadpath);
 		remove(chr((s_fmt(_T("%s.temp"), chr(wadpath)))));
 
 		splash_hide();

@@ -38,7 +38,7 @@ public:
 	CVar		*next;
 
 	CVar(){ next = NULL; }
-	~CVar(){}
+	virtual ~CVar(){}
 
 	virtual CVarValue GetValue() { CVarValue val; val.Int = 0; return val; }
 };

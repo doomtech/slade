@@ -92,11 +92,11 @@ void SectorInfoBar::update()
 	label_tag->SetLabel(s_fmt(_T("Tag: %d"), sector->sector_tag()));
 
 	// Floor frame
-	floor_frame->SetLabel(s_fmt(_T("Floor: %s"), sector->tex_floor().c_str()));
+	floor_frame->SetLabel(s_fmt(_T("Floor: %s"), chr(sector->tex_floor())));
 	tex_floor->set_texture(sector->tex_floor(), 2);
 
 	// Ceiling frame
-	ceil_frame->SetLabel(s_fmt(_T("Ceiling: %s"), sector->tex_ceil().c_str()));
+	ceil_frame->SetLabel(s_fmt(_T("Ceiling: %s"), chr(sector->tex_ceil())));
 	tex_ceil->set_texture(sector->tex_ceil(), 2);
 
 	Layout();

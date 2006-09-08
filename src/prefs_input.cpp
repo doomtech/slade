@@ -137,13 +137,13 @@ void InputTextCtrl::mouse_event(wxMouseEvent &event)
 	if (event.ButtonDown())
 	{
 		if (event.Button(wxMOUSE_BTN_LEFT))
-			key = "Mouse1";
+			key = _T("Mouse1");
 
 		if (event.Button(wxMOUSE_BTN_RIGHT))
-			key = "Mouse3";
+			key = _T("Mouse3");
 
 		if (event.Button(wxMOUSE_BTN_MIDDLE))
-			key = "Mouse2";
+			key = _T("Mouse2");
 
 		if (event.ShiftDown())
 			mods |= KMOD_SHIFT;
@@ -161,7 +161,7 @@ void InputTextCtrl::mouse_event(wxMouseEvent &event)
 	// Mouse wheel
 	if (event.GetWheelRotation() > 0)
 	{
-		key = "MWheel Up";
+		key = _T("MWheel Up");
 
 		if (event.ShiftDown())
 			mods |= KMOD_SHIFT;
@@ -177,7 +177,7 @@ void InputTextCtrl::mouse_event(wxMouseEvent &event)
 	}
 	else if (event.GetWheelRotation() < 0)
 	{
-		key = "MWheel Down";
+		key = _T("MWheel Down");
 
 		if (event.ShiftDown())
 			mods |= KMOD_SHIFT;
@@ -294,7 +294,7 @@ void InputPrefs::btn_loadconfig_clicked(wxCommandEvent &event)
 	string filename = wxFileSelector(_T("Open Key Configuration"), _T("./config/keys"), _T(""), _T("*.cfg"),
 									_T("Configuration Files|*.cfg"), wxOPEN|wxFILE_MUST_EXIST);
 
-	if (filename != "")
+	if (filename != _T(""))
 	{
 		Tokenizer tz;
 		tz.open_file(filename, 0, 0);
@@ -307,9 +307,9 @@ void InputPrefs::btn_saveconfig_clicked(wxCommandEvent &event)
 	string filename = wxFileSelector(_T("Save Key Configuration"), _T("./config/keys"), _T(""), _T("*.cfg"),
 									_T("Configuration Files|*.cfg"), wxSAVE|wxOVERWRITE_PROMPT);
 
-	if (filename != "")
+	if (filename != _T(""))
 	{
-		FILE *fp = fopen(filename.c_str(), "wt");
+		FILE *fp = fopen(chr(filename), "wt");
 		binds.save(fp);
 		fclose(fp);
 	}

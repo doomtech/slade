@@ -12,11 +12,6 @@ typedef wxString string;
 // the temp object was destroyed before it was used when this was a function
 #define chr(s) (const char*)s.ToAscii()
 
-#if wxUSE_UNICODE
-#define atoi(s)	((int)wcstol(s, NULL, 10))
-#define atof(s) ((float)wcstod(s, NULL))
-#endif
-
 #include <vector>
 using std::vector;
 

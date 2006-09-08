@@ -182,12 +182,12 @@ void LineInfoBar::update()
 	label_back->SetLabel(wxString::Format(_T("Back Sector: %d"), line->sector_index(false)));
 	label_special->SetLabel(wxString::Format(_T("Special: %d (%s)"),
 											line->get_special(),
-											game.get_special(line->get_special())->name.c_str()));
+											chr(game.get_special(line->get_special())->name)));
 
 	if (!d_map.hexen())
 		label_tag->SetLabel(wxString::Format(_T("Sector Tag: %d"), line->get_sector_tag()));
 	else
-		label_tag->SetLabel(wxString::Format(_T("Trigger: %s"), line->get_trigger_string().c_str()));
+		label_tag->SetLabel(wxString::Format(_T("Trigger: %s"), chr(line->get_trigger_string())));
 
 	if (d_map.hexen())
 	{
@@ -195,33 +195,33 @@ void LineInfoBar::update()
 
 		argtype_t *at = game.get_arg_type(as->arg_types[0]);
 		if (at)
-			label_arg1->SetLabel(wxString::Format(_T("%s: %d (%s)"), as->args[0].c_str(), line->arg(0), at->get_name(line->arg(0)).c_str()));
+			label_arg1->SetLabel(wxString::Format(_T("%s: %d (%s)"), chr(as->args[0]), line->arg(0), chr(at->get_name(line->arg(0)))));
 		else
-			label_arg1->SetLabel(wxString::Format(_T("%s: %d"), as->args[0].c_str(), line->arg(0)));
+			label_arg1->SetLabel(wxString::Format(_T("%s: %d"), chr(as->args[0]), line->arg(0)));
 
 		at = game.get_arg_type(as->arg_types[1]);
 		if (at)
-			label_arg2->SetLabel(wxString::Format(_T("%s: %d (%s)"), as->args[1].c_str(), line->arg(1), at->get_name(line->arg(1)).c_str()));
+			label_arg2->SetLabel(wxString::Format(_T("%s: %d (%s)"), chr(as->args[1]), line->arg(1), chr(at->get_name(line->arg(1)))));
 		else
-			label_arg2->SetLabel(wxString::Format(_T("%s: %d"), as->args[1].c_str(), line->arg(1)));
+			label_arg2->SetLabel(wxString::Format(_T("%s: %d"), chr(as->args[1]), line->arg(1)));
 
 		at = game.get_arg_type(as->arg_types[2]);
 		if (at)
-			label_arg3->SetLabel(wxString::Format(_T("%s: %d (%s)"), as->args[2].c_str(), line->arg(2), at->get_name(line->arg(2)).c_str()));
+			label_arg3->SetLabel(wxString::Format(_T("%s: %d (%s)"), chr(as->args[2]), line->arg(2), chr(at->get_name(line->arg(2)))));
 		else
-			label_arg3->SetLabel(wxString::Format(_T("%s: %d"), as->args[2].c_str(), line->arg(2)));
+			label_arg3->SetLabel(wxString::Format(_T("%s: %d"), chr(as->args[2]), line->arg(2)));
 
 		at = game.get_arg_type(as->arg_types[3]);
 		if (at)
-			label_arg4->SetLabel(wxString::Format(_T("%s: %d (%s)"), as->args[3].c_str(), line->arg(3), at->get_name(line->arg(3)).c_str()));
+			label_arg4->SetLabel(wxString::Format(_T("%s: %d (%s)"), chr(as->args[3]), line->arg(3), chr(at->get_name(line->arg(3)))));
 		else
-			label_arg4->SetLabel(wxString::Format(_T("%s: %d"), as->args[3].c_str(), line->arg(3)));
+			label_arg4->SetLabel(wxString::Format(_T("%s: %d"), chr(as->args[3]), line->arg(3)));
 
 		at = game.get_arg_type(as->arg_types[4]);
 		if (at)
-			label_arg5->SetLabel(wxString::Format(_T("%s: %d (%s)"), as->args[4].c_str(), line->arg(4), at->get_name(line->arg(4)).c_str()));
+			label_arg5->SetLabel(wxString::Format(_T("%s: %d (%s)"), chr(as->args[4]), line->arg(4), chr(at->get_name(line->arg(4)))));
 		else
-			label_arg5->SetLabel(wxString::Format(_T("%s: %d"), as->args[4].c_str(), line->arg(4)));
+			label_arg5->SetLabel(wxString::Format(_T("%s: %d"), chr(as->args[4]), line->arg(4)));
 	}
 
 	// Front side frame

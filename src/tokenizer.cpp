@@ -57,7 +57,7 @@ bool Tokenizer::open_string(string text, DWORD offset, DWORD length)
 	size = length;
 	position = 0;
 	start = current = (char *)malloc(size);
-	memcpy(start, text.c_str(), size);
+	memcpy(start, chr(text), size);
 
 	return true;
 }
@@ -250,7 +250,7 @@ int Tokenizer::get_integer()
 {
 	string token = get_token();
 
-	return atoi(token.c_str());
+	return atoi(chr(token));
 }
 
 // Tokenizer::get_float: Reads a token and returns it's floating point value
@@ -259,7 +259,7 @@ float Tokenizer::get_float()
 {
 	string token = get_token();
 
-	return (float)atof(token.c_str());
+	return (float)atof(chr(token));
 }
 
 // Tokenizer::get_bool: Reads a token and returns it's boolean value
@@ -271,5 +271,5 @@ bool Tokenizer::get_bool()
 	if (!token.CmpNoCase(_T("no")) || !token.CmpNoCase(_T("false")))
 		return false;
 
-	return !!atoi(token.c_str());
+	return !!atoi(chr(token));
 }

@@ -146,7 +146,7 @@ void ClickableTexBox::clicked(wxMouseEvent &event)
 			texname = _T("-");
 	}
 	else
-		texname = entry->GetValue().c_str();
+		texname = entry->GetValue();
 
 	setup_tex_browser(textype);
 	TextureBrowser tb(texname);
@@ -160,7 +160,7 @@ void ClickableTexBox::clicked(wxMouseEvent &event)
 		}
 		else
 		{
-			int type = atoi(tb.get_texture().c_str());
+			int type = atoi(chr(tb.get_texture()));
 			ThingType* ttype = game.get_ttype(type);
 			texture = get_texture(ttype->spritename, textype, false);
 			entry->SetValue(wxString::Format(_T("%d"), ttype->type));

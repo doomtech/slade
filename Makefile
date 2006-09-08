@@ -1,7 +1,7 @@
 # Makefile by Jim Bentler on 7/16/2006
 # BSD licensed (GPL compatible)
 CXX=g++
-CXXFLAGS=-O2
+CXXFLAGS=-Wall -O2
 SHARE_DIR=data_files/
 CXXFLAGS+=`wx-config --cxxflags` -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp -DNO_MAP_VIEWER=1 -DUNIX=1 -DSHARE_DIR="\"$(SHARE_DIR)\""
 LDFLAGS+=`wx-config --libs --gl-libs`
@@ -21,4 +21,5 @@ slade: ${OBJ}
 
 clean:
 	rm -f src/*.o slade
+
 

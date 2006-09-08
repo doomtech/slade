@@ -25,7 +25,7 @@ STypeSelectDialog::STypeSelectDialog(int init)
 
 	for (int a = 1; a < game.get_stypes().size(); a++)
 	{
-		list_types->Append(wxString::Format(_T("%d: %s"), game.get_stypes()[a]->type, game.get_stypes()[a]->name.c_str()));
+		list_types->Append(wxString::Format(_T("%d: %s"), game.get_stypes()[a]->type, chr(game.get_stypes()[a]->name)));
 		if (Sector::strip_special(init, d_map.hexen()) == game.get_stypes()[a]->type)
 			list_types->SetSelection(a-1);
 	}

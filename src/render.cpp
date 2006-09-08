@@ -68,6 +68,11 @@ void bind_tex(GLuint id)
 
 void set_light(rgba_t col, int light)
 {
+	if (light > 255)
+		light = 255;
+	if (light < 0)
+		light = 0;
+
 	if ((render_fullbright || light == 255) && col.r == col.g && col.r == col.b)
 	{
 		glDisable(GL_FOG);
