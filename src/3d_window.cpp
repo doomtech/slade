@@ -48,32 +48,40 @@ void set_3d_resolution()
 		vid_bpp_3d != -1 &&
 		vid_refresh_3d != -1)
 	{
+		int w = vid_width_3d;
+		int h = vid_height_3d;
+		int b = vid_bpp_3d;
+		int r = vid_refresh_3d;
+
 		DEVMODE new_mode;
 		new_mode.dmFields = DM_PELSWIDTH|DM_PELSHEIGHT|DM_BITSPERPEL|DM_DISPLAYFREQUENCY;
-		new_mode.dmPelsWidth = vid_width_3d;
-		new_mode.dmPelsHeight = vid_height_3d;
-		new_mode.dmBitsPerPel = vid_bpp_3d;
-		new_mode.dmDisplayFrequency = vid_refresh_3d;
+		new_mode.dmPelsWidth = w;
+		new_mode.dmPelsHeight = h;
+		new_mode.dmBitsPerPel = b;
+		new_mode.dmDisplayFrequency = r;
 
 		long ret = ChangeDisplaySettings(&new_mode, CDS_FULLSCREEN);
 
-		if (ret == DISP_CHANGE_RESTART)
-			wxMessageBox(_T("Restart required to set screen resolution"));
+		if (ret != DISP_CHANGE_SUCCESSFUL)
+		{
+			if (ret == DISP_CHANGE_RESTART)
+				wxMessageBox(_T("Restart required to set screen resolution"));
 
-		if (ret == DISP_CHANGE_BADFLAGS)
-			wxMessageBox(_T("Error: Bad flags"));
+			else if (ret == DISP_CHANGE_BADFLAGS)
+				wxMessageBox(_T("Error: Bad flags"));
 
-		if (ret == DISP_CHANGE_BADPARAM)
-			wxMessageBox(_T("Error: Bad parameters"));
+			else if (ret == DISP_CHANGE_BADPARAM)
+				wxMessageBox(_T("Error: Bad parameters"));
 
-		if (ret == DISP_CHANGE_FAILED)
-			wxMessageBox(_T("Resolution change failed"));
+			else if (ret == DISP_CHANGE_FAILED)
+				wxMessageBox(_T("Resolution change failed"));
 
-		if (ret == DISP_CHANGE_BADMODE)
-			wxMessageBox(_T("Resolution not supported"));
+			else if (ret == DISP_CHANGE_BADMODE)
+				wxMessageBox(_T("Resolution not supported"));
 
-		//if (ret == DISP_CHANGE_NOTUPDATED)
-		//	wxMessageBox(_T("Restart required to set screen resolution!"));
+			else
+				wxMessageBox(_T("Resolution change failed"));
+		}
 	}
 #endif
 }

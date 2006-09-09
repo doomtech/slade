@@ -133,36 +133,6 @@ public:
 	DECLARE_EVENT_TABLE()
 };
 
-/*
-class InputTextCtrl : public wxTextCtrl
-{
-private:
-	keybind_t		*bind;
-	wxStaticText	*mod_label;
-
-	string			key;
-	BYTE			mods;
-
-public:
-	InputTextCtrl(wxWindow *parent, int id = -1);
-	~InputTextCtrl();
-
-	void update();
-	void set_bind(keybind_t *b);
-	void set_modlabel(wxStaticText* ml) { mod_label = ml; }
-	void accept_changes();
-	void cancel_changes();
-	void set_default();
-	void set_key(string k) { key = k; }
-
-	void key_down(wxKeyEvent &event);
-	void mouse_event(wxMouseEvent &event);
-	void key_char(wxKeyEvent &event);
-
-	DECLARE_EVENT_TABLE()
-};
-*/
-
 class InputTextCtrl : public wxTextCtrl
 {
 private:
@@ -254,7 +224,6 @@ public:
 	DECLARE_EVENT_TABLE()
 };
 
-/*
 class RenderPrefs : public wxPanel
 {
 private:
@@ -306,6 +275,7 @@ public:
 	DECLARE_EVENT_TABLE()
 };
 
+/*
 class MiscPrefs : public wxPanel
 {
 private:
