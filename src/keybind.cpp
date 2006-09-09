@@ -191,7 +191,7 @@ void BindList::set_defaults()
 	add("view_3dmode", "Q");
 	add("view_contextmenu", "Mouse3");
 	add("view_mousecenter", "Mouse3", KMOD_CTRL);
-	add("view_panmap", "Mouse3", KMOD_SHIFT);
+	add("view_panmap", "Mouse2");
 
 	add("view_hidesidebar", "F1");
 	add("view_drawsidebar", "F2");
@@ -247,7 +247,7 @@ void BindList::set_defaults()
 	add("sector_merge", "J", KMOD_CTRL);
 	add("sector_join", "J");
 
-	add("thing_quickangle", "Mouse2");
+	add("thing_quickangle", "Mouse2", KMOD_SHIFT);
 
 	add("copy", "C", KMOD_CTRL);
 	add("paste", "V", KMOD_CTRL);
@@ -283,6 +283,19 @@ void BindList::set_defaults()
 	add("3d_downboth8", "Numpad Subtract", KMOD_ALT);
 	add("3d_upboth", "Numpad Add", KMOD_ALT|KMOD_CTRL);
 	add("3d_downboth", "Numpad Subtract", KMOD_ALT|KMOD_CTRL);
+
+	add("3d_upceil8", "MWheel Up");
+	add("3d_downceil8", "MWheel Down");
+	add("3d_upceil", "MWheel Up", KMOD_CTRL);
+	add("3d_downceil", "MWheel Down", KMOD_CTRL);
+	add("3d_upfloor8", "MWheel Up", KMOD_SHIFT);
+	add("3d_downfloor8", "MWheel Down", KMOD_SHIFT);
+	add("3d_upfloor", "MWheel Up", KMOD_SHIFT|KMOD_CTRL);
+	add("3d_downfloor", "MWheel Down", KMOD_SHIFT|KMOD_CTRL);
+	add("3d_upboth8", "MWheel Up", KMOD_ALT);
+	add("3d_downboth8", "MWheel Down", KMOD_ALT);
+	add("3d_upboth", "MWheel Up", KMOD_ALT|KMOD_CTRL);
+	add("3d_downboth", "MWheel Down", KMOD_ALT|KMOD_CTRL);
 
 	add("3d_upyoffset", "Numpad 8", KMOD_CTRL);
 	add("3d_downyoffset", "Numpad 2", KMOD_CTRL);

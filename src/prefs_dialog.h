@@ -133,6 +133,7 @@ public:
 	DECLARE_EVENT_TABLE()
 };
 
+/*
 class InputTextCtrl : public wxTextCtrl
 {
 private:
@@ -157,6 +158,52 @@ public:
 	void key_down(wxKeyEvent &event);
 	void mouse_event(wxMouseEvent &event);
 	void key_char(wxKeyEvent &event);
+
+	DECLARE_EVENT_TABLE()
+};
+*/
+
+class InputTextCtrl : public wxTextCtrl
+{
+private:
+	wxToggleButton	*btn_shift;
+	wxToggleButton	*btn_ctrl;
+	wxToggleButton	*btn_alt;
+
+public:
+	InputTextCtrl(wxWindow *parent, int id);
+	~InputTextCtrl();
+
+	void set_buttons(wxToggleButton *s, wxToggleButton *c, wxToggleButton *a);
+
+	void key_down(wxKeyEvent &event);
+
+	DECLARE_EVENT_TABLE()
+};
+
+class InputControlDialog : public wxDialog
+{
+private:
+	InputTextCtrl	*text_key;
+	wxChoice		*combo_keys;
+	wxToggleButton	*btn_shift;
+	wxToggleButton	*btn_ctrl;
+	wxToggleButton	*btn_alt;
+
+public:
+	enum
+	{
+		ICD_TEXT_KEY,
+		ICD_COMBO_KEYS,
+	};
+
+	InputControlDialog(wxWindow *parent, keybind_t *init = NULL);
+	~InputControlDialog();
+
+	string	get_key();
+	BYTE	get_mods();
+
+	void	combo_keys_changed(wxCommandEvent &event);
 
 	DECLARE_EVENT_TABLE()
 };

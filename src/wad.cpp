@@ -401,7 +401,7 @@ bool Wad::open(string filename, bool load_data)
 
 	findMaps();
 
-	dumpDirectory();
+	//dumpDirectory();
 
 	return true;
 }
@@ -487,7 +487,7 @@ bool Wad::openZip(string filename, bool load_data)
 void Wad::dumpDirectory()
 {
 	for (DWORD l = 0; l < numLumps(); l++)
-		log_message(s_fmt(_T("%d: %s (%db at %d)\n"), l, directory[l]->getName().c_str(), directory[l]->getSize(), directory[l]->getOffset()));
+		log_message(s_fmt(_T("%d: %s (%db at %d)"), l, directory[l]->getName().c_str(), directory[l]->getSize(), directory[l]->getOffset()));
 }
 
 // Wad::get_lump_index: Returns the index of the first lump with the specified name

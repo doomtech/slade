@@ -356,7 +356,7 @@ void MapPreviewCanvas::resize(wxSizeEvent &event)
 }
 
 WadManager::WadManager(wxWindow *parent)
-:	wxFrame(parent, -1, _T("Wad Manager"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE|wxFRAME_FLOAT_ON_PARENT)
+:	wxFrame(parent, -1, _T("Wad Manager"))
 {
 	wxPanel *back_panel = new wxPanel(this, -1);
 	//wxFrame *back_panel = this;

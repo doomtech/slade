@@ -23,7 +23,6 @@ PrefsDialog::PrefsDialog()
 
 	Layout();
 	SetBestFittingSize();
-	SetSize(400, -1);
 }
 
 PrefsDialog::~PrefsDialog()
