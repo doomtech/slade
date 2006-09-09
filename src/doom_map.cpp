@@ -685,7 +685,7 @@ bool DoomMap::open(Wad* wad, string mapname)
 
 	if (offset == -1)
 	{
-		log_message(s_fmt(_T("Map %s not found\n"), chr(mapname)));
+		log_message(s_fmt(_T("Map %s not found\n"), mapname.c_str()));
 		return false;
 	}
 

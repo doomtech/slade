@@ -116,11 +116,11 @@ void ThingInfoBar::update()
 	else
 		label_position->SetLabel(wxString::Format(_T("Position: (%d, %d)"), thing->pos().x, thing->pos().y));
 	label_angle->SetLabel(wxString::Format(_T("Angle: %d (%s)"), thing->get_angle(), chr(thing->angle_string())));
-	label_difficulty->SetLabel(wxString::Format(_T("Difficulty: %s"), chr(thing->difficulty_string())));
-	label_deaf->SetLabel(wxString::Format(_T("Deaf: %s"), chr(bool_to_yesno(thing->check_flag(THING_DEAF)))));
+	label_difficulty->SetLabel(_T("Difficulty: " + thing->difficulty_string()));
+	label_deaf->SetLabel(_T("Deaf: ") + bool_to_yesno(thing->check_flag(THING_DEAF)));
 
 	if (!d_map.hexen())
-		label_multiplayer->SetLabel(wxString::Format(_T("Multiplayer: %s"), chr(bool_to_yesno(thing->check_flag(0x0010)))));
+		label_multiplayer->SetLabel(_T("Multiplayer: " + bool_to_yesno(thing->check_flag(0x0010))));
 	else
 		label_multiplayer->SetLabel(wxString::Format(_T("TID: %d"), thing->get_tid()));
 

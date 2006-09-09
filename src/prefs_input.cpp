@@ -294,7 +294,7 @@ void InputPrefs::btn_loadconfig_clicked(wxCommandEvent &event)
 	string filename = wxFileSelector(_T("Open Key Configuration"), _T("./config/keys"), _T(""), _T("*.cfg"),
 									_T("Configuration Files|*.cfg"), wxOPEN|wxFILE_MUST_EXIST);
 
-	if (filename != _T(""))
+	if (filename.size())
 	{
 		Tokenizer tz;
 		tz.open_file(filename, 0, 0);
@@ -307,7 +307,7 @@ void InputPrefs::btn_saveconfig_clicked(wxCommandEvent &event)
 	string filename = wxFileSelector(_T("Save Key Configuration"), _T("./config/keys"), _T(""), _T("*.cfg"),
 									_T("Configuration Files|*.cfg"), wxSAVE|wxOVERWRITE_PROMPT);
 
-	if (filename != _T(""))
+	if (filename.size())
 	{
 		FILE *fp = fopen(chr(filename), "wt");
 		binds.save(fp);

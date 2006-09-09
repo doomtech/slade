@@ -170,7 +170,7 @@ void ColourPrefs::save_clicked(wxCommandEvent &event)
 	string filename = wxFileSelector(_T("Save Colour Configuration"), _T("./config/colours"), _T(""),
 							_T("*.cfg"), _T("Configuration Files (*.cfg)|*.cfg"), wxSAVE|wxOVERWRITE_PROMPT);
 
-	if (filename != _T(""))
+	if (filename.size())
 		save_colour_config(filename);
 }
 
@@ -183,7 +183,7 @@ void ColourPrefs::load_clicked(wxCommandEvent &event)
 
 	log_message(filename);
 
-	if (filename != _T(""))
+	if (filename.size())
 		load_colour_config(filename);
 
 	redraw_map();

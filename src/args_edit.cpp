@@ -100,7 +100,7 @@ ArgEdit::ArgEdit(wxWindow *parent, int val, string argname, argtype_t *arg_type)
 	wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
 	SetSizer(hbox);
 
-	label_arg = new wxStaticText(this, -1, wxString::Format(_T("%s"), chr(argname)));
+	label_arg = new wxStaticText(this, -1, argname);
 	hbox->Add(label_arg, 1, wxALIGN_CENTER_VERTICAL);
 
 	if (arg_type && val != -1)
@@ -131,7 +131,7 @@ END_EVENT_TABLE()
 
 void ArgEdit::entry_arg_changed(wxCommandEvent &event)
 {
-	if (entry_arg->GetValue() == _T(""))
+	if (entry_arg->GetValue().empty())
 		label_arg->SetLabel(argname);
 	else if (arg_type)
 	{

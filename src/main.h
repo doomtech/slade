@@ -10,7 +10,7 @@ typedef wxString string;
 #define s_fmt wxString::Format
 
 // the temp object was destroyed before it was used when this was a function
-#define chr(s) (const char*)s.ToAscii()
+#define chr(s) ((const char*)(s).ToAscii())
 
 #include <vector>
 using std::vector;

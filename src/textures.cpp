@@ -1213,7 +1213,7 @@ bool DoomTexture::gen_gl_tex()
 
 			if (patchlump == -1)
 			{
-				log_message(s_fmt(_T("Patch \"%s\" doesn't exist!\n"), chr(patch)));
+				log_message(s_fmt(_T("Patch \"%s\" doesn't exist!\n"), patch.c_str()));
 				continue;
 			}
 		}
@@ -1382,7 +1382,7 @@ bool FileTexture::gen_gl_tex()
 	}
 	else
 	{
-		log_message(s_fmt(_T("Error loading %s"), chr(filename)));
+		log_message(_T("Error loading ") + filename);
 		return false;
 	}
 

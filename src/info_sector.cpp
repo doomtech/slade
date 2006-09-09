@@ -88,15 +88,15 @@ void SectorInfoBar::update()
 	label_ceil->SetLabel(s_fmt(_T("Ceiling Height: %d"), sector->ceiling()));
 	label_height->SetLabel(s_fmt(_T("Height: %d"), sector->ceiling() - sector->floor()));
 	label_light->SetLabel(s_fmt(_T("Light: %d"), sector->light_level()));
-	label_special->SetLabel(s_fmt(_T("Special: %d (%s)"), sector->action_special(), chr(game.get_sector_type(sector->stripped_special()))));
+	label_special->SetLabel(s_fmt(_T("Special: %d (%s)"), sector->action_special(), game.get_sector_type(sector->stripped_special()).c_str()));
 	label_tag->SetLabel(s_fmt(_T("Tag: %d"), sector->sector_tag()));
 
 	// Floor frame
-	floor_frame->SetLabel(s_fmt(_T("Floor: %s"), chr(sector->tex_floor())));
+	floor_frame->SetLabel(_T("Floor: ") + sector->tex_floor());
 	tex_floor->set_texture(sector->tex_floor(), 2);
 
 	// Ceiling frame
-	ceil_frame->SetLabel(s_fmt(_T("Ceiling: %s"), chr(sector->tex_ceil())));
+	ceil_frame->SetLabel(_T("Ceiling: ") + sector->tex_ceil());
 	tex_ceil->set_texture(sector->tex_ceil(), 2);
 
 	Layout();

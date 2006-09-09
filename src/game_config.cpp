@@ -108,14 +108,14 @@ bool GameConfig::load_config(string filename)
 	string iwad_path = _T("");
 	if (i == -1)
 	{
-		wxMessageBox(s_fmt(_T("Please browse for the \"%s\" game IWAD..."), chr(token)), _T("IWAD Needed"));
+		wxMessageBox(s_fmt(_T("Please browse for the \"%s\" game IWAD..."), token.c_str()), _T("IWAD Needed"));
 
 		string filename = _T("");
 		wxFileDialog browse(NULL, _T("Browse IWAD"), _T(""), _T(""), _T("Doom Wad Files (*.wad)|*.wad"), wxOPEN|wxFILE_MUST_EXIST);
 		if (browse.ShowModal() == wxID_OK)
 			filename = browse.GetPath();
 
-		if (filename != _T(""))
+		if (filename.size())
 			iwad_path = filename;
 		else
 			return false;
@@ -135,7 +135,7 @@ bool GameConfig::load_config(string filename)
 
 	if (!wads.open(iwad_path, WL_IWAD))
 	{
-		wxMessageBox(s_fmt(_T("Couldn't open IWAD \"%s\"!"), chr(iwad_path)), _T("Error"));
+		wxMessageBox(s_fmt(_T("Couldn't open IWAD \"%s\"!"), iwad_path.c_str()), _T("Error"));
 		game_iwads.erase(game_iwads.begin() + i);
 		return false;
 	}

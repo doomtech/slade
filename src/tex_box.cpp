@@ -151,7 +151,7 @@ void ClickableTexBox::clicked(wxMouseEvent &event)
 	setup_tex_browser(textype);
 	TextureBrowser tb(texname);
 
-	if (tb.ShowModal() == wxID_OK && tb.get_texture() != _T(""))
+	if (tb.ShowModal() == wxID_OK && tb.get_texture().size())
 	{
 		if (textype != TEXTURES_SPRITES)
 		{

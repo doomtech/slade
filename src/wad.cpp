@@ -250,7 +250,7 @@ void Wad::findMaps()
 	}
 	else
 	{
-		//log_message(s_fmt(_T("Finding maps in %s..."), chr(path)));
+		//log_message(s_fmt(_T("Finding maps in %s..."), path.c_str()));
 		for (DWORD l = 0; l < numLumps(); l++)
 		{
 			bool done = false;
@@ -293,7 +293,7 @@ void Wad::findMaps()
 // ------------------------ >>
 bool Wad::open(string filename, bool load_data)
 {
-	if (filename == _T(""))
+	if (filename.empty())
 		return false;
 
 	close();
@@ -306,7 +306,7 @@ bool Wad::open(string filename, bool load_data)
 	// Check if it opened correctly
 	if (!fp)
 	{
-		log_message(s_fmt(_T("Wad file \"%s\" cannot be found.\n"), chr(filename)));
+		log_message(s_fmt(_T("Wad file \"%s\" cannot be found.\n"), filename.c_str()));
 		close();
 		return false;
 	}
@@ -487,7 +487,7 @@ bool Wad::openZip(string filename, bool load_data)
 void Wad::dumpDirectory()
 {
 	for (DWORD l = 0; l < numLumps(); l++)
-		log_message(s_fmt(_T("%d: %s (%db at %d)\n"), l, chr(directory[l]->getName()), directory[l]->getSize(), directory[l]->getOffset()));
+		log_message(s_fmt(_T("%d: %s (%db at %d)\n"), l, directory[l]->getName().c_str(), directory[l]->getSize(), directory[l]->getOffset()));
 }
 
 // Wad::get_lump_index: Returns the index of the first lump with the specified name
@@ -706,7 +706,7 @@ void Wad::save(bool nodes, string mapname)
 		BuildGLNodes = false;
 
 		FWadReader inwad(chr(wadpath));
-		FWadWriter outwad(chr(s_fmt(_T("%s.temp"), chr(wadpath))), inwad.IsIWAD());
+		FWadWriter outwad(chr(wadpath + _T(".temp")), inwad.IsIWAD());
 
 		int lump = 0;
 		int max = inwad.NumLumps();
@@ -714,9 +714,9 @@ void Wad::save(bool nodes, string mapname)
 		while (lump < max)
 		{
 			if (inwad.IsMap (lump) &&
-				(mapname == _T("") || mapname.CmpNoCase(wxString::FromAscii(inwad.LumpName(lump))) == 0)) //stricmp (inwad.LumpName (lump), chr(str(mapname))) == 0))
+				(mapname.empty() || mapname.CmpNoCase(wxString::FromAscii(inwad.LumpName(lump))) == 0)) //stricmp (inwad.LumpName (lump), chr(str(mapname))) == 0))
 			{
-				splash(s_fmt(_T("Building nodes on %s"), inwad.LumpName(lump)), true);
+				splash(_T("Building nodes on ") + wxString::FromAscii(inwad.LumpName(lump)), true);
 				FProcessor builder(inwad, lump);
 				builder.Write (outwad);
 
@@ -744,7 +744,7 @@ void Wad::save(bool nodes, string mapname)
 
 		remove(chr(path));
 		copy_file(wadpath + _T(".temp"), wadpath);
-		remove(chr((s_fmt(_T("%s.temp"), chr(wadpath)))));
+		remove(chr(wadpath + _T(".temp")));
 
 		splash_hide();
 	}
@@ -793,7 +793,7 @@ void Wad::saveZip()
 // ---------------------------- >>
 void Wad::close()
 {
-	if (path == _T(""))
+	if (path.empty())
 		return;
 
 	available_maps.clear();
@@ -1453,9 +1453,9 @@ void Wad::save(bool nodes, string mapname)
 		while (lump < max)
 		{
 			if (inwad.IsMap (lump) &&
-				(mapname == _T("") || mapname.CmpNoCase(inwad.LumpName(lump)) == 0)) //stricmp (inwad.LumpName (lump), str(mapname).c_str()) == 0))
+				(mapname.empty() || mapname.CmpNoCase(inwad.LumpName(lump)) == 0)) //stricmp (inwad.LumpName (lump), str(mapname).c_str()) == 0))
 			{
-				splash(s_fmt(_T("Building nodes on %s"), inwad.LumpName(lump)), true);
+				splash(_T("Building nodes on ") + inwad.LumpName(lump), true);
 				FProcessor builder(inwad, lump);
 				builder.Write (outwad);
 
@@ -1491,7 +1491,7 @@ void Wad::save(bool nodes, string mapname)
 
 void Wad::close()
 {
-	if (path == _T(""))
+	if (path.empty())
 		return;
 
 	available_maps.clear();

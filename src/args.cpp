@@ -99,7 +99,7 @@ string argtype_t::get_name(short value)
 			ret = _T("None");
 	}
 
-	if (ret == _T("") || ret == _T(" "))
+	if (ret.empty() || ret == _T(" "))
 		ret = _T("Unknown");
 
 	return ret;

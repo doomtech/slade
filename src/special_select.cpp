@@ -45,7 +45,7 @@ SpecialSelectDialog::SpecialSelectDialog(int init)
 			groups.push_back(group);
 		}
 
-		string text = s_fmt(_T("%d: %s"), as.type, chr(as.name));
+		string text = s_fmt(_T("%d: "), as.type) + as.name;
 		item = tree->AppendItem(group, text);
 
 		if (selected_val == as.type)
@@ -80,7 +80,7 @@ void SpecialSelectDialog::tree_selection_changed(wxTreeEvent &event)
 	{
 		wxString spec = tree->GetItemText(event.GetItem());
 
-		if (spec != _T(""))
+		if (spec.size())
 			sscanf(chr(spec), "%d", &selected_val);
 	}
 }

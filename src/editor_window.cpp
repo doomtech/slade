@@ -335,12 +335,12 @@ bool EditorWindow::open_map(Wad* wad, string mapname)
 			}
 		}
 
-		SetTitle(s_fmt(_T("SLADE (%s, %s)"), chr(wad->path), chr(mapname)));
+		SetTitle(s_fmt(_T("SLADE (%s, %s)"), wad->path.c_str(), mapname.c_str()));
 	}
 	else
 	{
 		d_map.create(mapname);
-		SetTitle(s_fmt(_T("SLADE (unsaved, %s)"), chr(mapname)));
+		SetTitle(s_fmt(_T("SLADE (unsaved, %s)"), mapname.c_str()));
 	}
 
 	// Reset zoom and offset (0,0 and fully zoomed in)
@@ -570,7 +570,7 @@ void EditorWindow::file_save(wxCommandEvent &event)
 			d_map.add_to_wad(edit_wad);
 			edit_wad->save(true);
 			d_map.clear_change(MC_SAVE_NEEDED);
-			SetTitle(wxString::Format(_T("SLADE (%s, %s)"), chr(edit_wad->path), chr(d_map.map_name())));
+			SetTitle(wxString::Format(_T("SLADE (%s, %s)"), edit_wad->path.c_str(), d_map.map_name().c_str()));
 
 			if (!edit_wad->parent)
 				add_recent_wad(edit_wad->path);
@@ -587,7 +587,7 @@ void EditorWindow::file_saveas(wxCommandEvent &event)
 
 	string filename = wxFileSelector(_T("Save Wadfile"), _T(""), _T(""), _T("*.wad"), _T("Doom Wad Files (*.wad)|*.wad"), wxSAVE|wxOVERWRITE_PROMPT);
 
-	if (filename != _T(""))
+	if (filename.size())
 	{
 		if (!edit_wad)
 			edit_wad = new Wad();
@@ -599,7 +599,7 @@ void EditorWindow::file_saveas(wxCommandEvent &event)
 		wads.open(edit_wad->path);
 
 		d_map.clear_change(MC_SAVE_NEEDED);
-		SetTitle(wxString::Format(_T("SLADE (%s, %s)"), chr(edit_wad->path), chr(d_map.map_name())));
+		SetTitle(wxString::Format(_T("SLADE (%s, %s)"), edit_wad->path.c_str(), d_map.map_name().c_str()));
 	}
 }
 
@@ -610,7 +610,7 @@ void EditorWindow::file_savestandalone(wxCommandEvent &event)
 
 	string filename = wxFileSelector(_T("Save Standalone Map"), _T(""), _T(""), _T("*.wad"), _T("Doom Wad Files (*.wad)|*.wad"), wxSAVE|wxOVERWRITE_PROMPT);
 
-	if (filename != _T(""))
+	if (filename.size())
 	{
 		edit_wad = new Wad();
 		edit_wad->path = filename;
@@ -619,7 +619,7 @@ void EditorWindow::file_savestandalone(wxCommandEvent &event)
 		add_recent_wad(filename);
 
 		d_map.clear_change(MC_SAVE_NEEDED);
-		SetTitle(wxString::Format(_T("SLADE (%s, %s)"), chr(edit_wad->path), chr(d_map.map_name())));
+		SetTitle(wxString::Format(_T("SLADE (%s, %s)"), edit_wad->path.c_str(), d_map.map_name().c_str()));
 	}
 }
 
@@ -633,7 +633,7 @@ void EditorWindow::file_rename(wxCommandEvent &event)
 
 	string mapname = game.ask_map_name();
 
-	if (mapname != _T(""))
+	if (mapname.size())
 	{
 		if (edit_wad)
 		{
@@ -647,9 +647,9 @@ void EditorWindow::file_rename(wxCommandEvent &event)
 		d_map.set_name(mapname);
 
 		if (edit_wad)
-			SetTitle(wxString::Format(_T("SLADE (%s, %s)"), chr(edit_wad->path), chr(d_map.map_name())));
+			SetTitle(wxString::Format(_T("SLADE (%s, %s)"), edit_wad->path.c_str(), d_map.map_name().c_str()));
 		else
-			SetTitle(wxString::Format(_T("SLADE (unsaved, %s)"), chr(d_map.map_name())));
+			SetTitle(wxString::Format(_T("SLADE (unsaved, %s)"), d_map.map_name().c_str()));
 	}
 }
 
@@ -657,7 +657,7 @@ void EditorWindow::file_run(wxCommandEvent &event)
 {
 	/*
 	string exe_path = path_doomexe;
-	if (exe_path == _T(""))
+	if (exe_path.empty())
 	{
 		wxMessageBox(_T("No executable set. See edit->preferences->misc"));
 		return;
@@ -715,7 +715,7 @@ void EditorWindow::file_importmap(wxCommandEvent &event)
 	if (browse.ShowModal() == wxID_OK)
 		filename = browse.GetPath();
 
-	if (filename != _T(""))
+	if (filename.size())
 	{
 		Wad temp_wad;
 
@@ -738,7 +738,7 @@ void EditorWindow::file_importmap(wxCommandEvent &event)
 
 		mapname = wxGetSingleChoice(_T("Select Map"), _T("Import Map"), mapnames);
 
-		if (mapname == _T(""))
+		if (mapname.empty())
 			return;
 
 		d_map.close();

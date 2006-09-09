@@ -231,7 +231,7 @@ bool MainApp::OnInit()
 	// Create User Directory if it doesn't already exist
 	if(!wxFileName::DirExists(usr_path)) {
 		if(mkdir(chr(usr_path), S_IRUSR | S_IWUSR | S_IXUSR) == -1) {
-			log_message(s_fmt(_T("Could not create %s"), chr(usr_path)));
+			log_message(_T("Could not create ") + usr_path);
 		}
 	}
 #endif
@@ -278,14 +278,14 @@ bool MainApp::OnInit()
 
 		if (arg.Right(4).CmpNoCase(_T(".wad")) == 0)
 		{
-			//log_message(s_fmt("Opening wad %s", wx_to_str(arg).c_str()));
+			//log_message(_T("Opening wad ") + arg);
 			wads.open(arg);
 			wads_opened = true;
 		}
 
 		if (arg.Right(4).CmpNoCase(_T(".pk3")) == 0 || arg.Right(4).CmpNoCase(_T(".zip")) == 0)
 		{
-			//log_message(s_fmt("Opening wad %s", wx_to_str(arg).c_str()));
+			//log_message(_T("Opening wad ") + arg);
 			wads.open(arg, WL_ZIP);
 			wads_opened = true;
 		}

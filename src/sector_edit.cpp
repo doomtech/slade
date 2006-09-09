@@ -195,31 +195,31 @@ void SectorEditor::apply_changes()
 	for (int a = 0; a < items.size(); a++)
 	{
 		// Floor tex
-		if (entry_ftex->GetValue() != _T(""))
+		if (entry_ftex->GetValue().size())
 			items[a]->set_ftex(entry_ftex->GetValue().Upper());
 
 		// Floor height
-		if (entry_fheight->GetValue() != _T(""))
+		if (entry_fheight->GetValue().size())
 			items[a]->set_floor(atoi(chr(entry_fheight->GetValue())));
 
 		// Ceiling tex
-		if (entry_ctex->GetValue() != _T(""))
+		if (entry_ctex->GetValue().size())
 			items[a]->set_ctex(entry_ctex->GetValue().Upper());
 
 		// Ceiling height
-		if (entry_cheight->GetValue() != _T(""))
+		if (entry_cheight->GetValue().size())
 			items[a]->set_ceil(atoi(chr(entry_cheight->GetValue())));
 
 		// Special
-		if (entry_special->GetValue() != _T(""))
+		if (entry_special->GetValue().size())
 			items[a]->set_special(atoi(chr(entry_special->GetValue())));
 
 		// Tag
-		if (entry_tag->GetValue() != _T(""))
+		if (entry_tag->GetValue().size())
 			items[a]->set_tag(atoi(chr(entry_tag->GetValue())));
 
 		// Light
-		if (entry_light->GetValue() != _T(""))
+		if (entry_light->GetValue().size())
 			items[a]->set_light(atoi(chr(entry_light->GetValue())));
 	}
 
@@ -261,7 +261,7 @@ void SectorEditor::entry_ctex_changed(wxCommandEvent &event)
 
 void SectorEditor::entry_special_changed(wxCommandEvent &event)
 {
-	if (entry_special->GetValue() == _T(""))
+	if (entry_special->GetValue().empty())
 		label_special->SetLabel(_T(""));
 	else
 	{

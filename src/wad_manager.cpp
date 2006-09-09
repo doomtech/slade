@@ -180,7 +180,7 @@ void MapPreviewCanvas::preview_map(Wad* wad, string mapname)
 	preview_lines.clear();
 	dimensions.set(0, 0);
 
-	if (!wad || mapname == _T("") || wad->zip)
+	if (!wad || mapname.empty() || wad->zip)
 		return;
 
 	//wxLogMessage(_T("Preview map %s in %s"), chr(mapname), chr(wad->path));
@@ -590,7 +590,7 @@ void WadManager::game_combo_changed(wxCommandEvent &event)
 
 	if (!game.load_config(game_config_paths[index]))
 	{
-		wxMessageBox(wxString::Format(_T("Error loading game configuration \"%s\""), chr(game_config_paths[index])),
+		wxMessageBox(s_fmt(_T("Error loading game configuration \"%s\""), game_config_paths[index].c_str()),
 					_T("Error"));
 		game_combo->SetSelection(cur_game);
 	}
@@ -643,7 +643,7 @@ void WadManager::open_wad_clicked(wxCommandEvent &event)
 	if (browse.ShowModal() == wxID_OK)
 		filename = browse.GetPath();
 
-	if (filename != _T(""))
+	if (filename.size())
 	{
 		BYTE flags = 0;
 
@@ -695,7 +695,7 @@ void WadManager::new_standalone_clicked(wxCommandEvent &event)
 
 	string mapname = game.ask_map_name();
 
-	if (mapname != _T(""))
+	if (mapname.size())
 	{
 		if (game_changed)
 			begin_mapedit();
@@ -715,7 +715,7 @@ void WadManager::recent_wads_list_activated(wxCommandEvent &event)
 		flags = WL_ZIP;
 
 	if (!wads.open(filename, flags))
-		wxMessageBox(wxString::Format(_T("Failed opening wadfile \"%s\""), chr(filename)), _T("Error"), wxICON_ERROR);
+		wxMessageBox(s_fmt(_T("Failed opening wadfile \"%s\""), filename.c_str()), _T("Error"), wxICON_ERROR);
 	else
 	{
 		add_recent_wad(filename);
@@ -737,7 +737,7 @@ void WadManager::maps_list_activated(wxCommandEvent &event)
 
 	string mapname = available_maps->GetString(available_maps->GetSelection());
 
-	if (mapname == _T(""))
+	if (mapname.empty())
 		return;
 
 	if (game_changed)
@@ -760,11 +760,11 @@ void WadManager::new_map_clicked(wxCommandEvent &event)
 
 	string mapname = game.ask_map_name();
 
-	if (mapname != _T(""))
+	if (mapname.size())
 	{
 		if (vector_exists(selected_wad->available_maps, mapname))
 		{
-			message_box(s_fmt(_T("Map %s already exists in the wad!"), chr(mapname)));
+			message_box(s_fmt(_T("Map %s already exists in the wad!"), mapname.c_str()));
 			return;
 		}
 

@@ -135,7 +135,7 @@ void console_print(string message)
 // ----------------------------------------------------- >>
 void console_parsecommand()
 {
-	if (cmd_line == _T(""))
+	if (cmd_line.empty())
 		return;
 
 	Tokenizer tz;
@@ -188,7 +188,7 @@ void console_parsecommand()
 			val = s_fmt(_T("\"%d\""), cvar->GetValue().Int);
 			break;
 		case CVAR_STRING:
-			val = s_fmt(_T("\"%s\""), chr(((CStringCVar *)cvar)->value));
+			val = s_fmt(_T("\"%s\""), ((CStringCVar *)cvar)->value.c_str());
 			break;
 		case CVAR_BOOLEAN:
 			val = s_fmt(_T("\"%d\""), cvar->GetValue().Bool);
@@ -218,7 +218,7 @@ void console_parsecommand()
 	else if (token == _T("dump_textures"))
 	{
 		for (int a = 0; a < textures.size(); a++)
-			console_print(s_fmt(_T("%s, %dx%d"), chr(textures[a]->name), textures[a]->width, textures[a]->height));
+			console_print(s_fmt(_T("%s, %dx%d"), textures[a]->name.c_str(), textures[a]->width, textures[a]->height));
 
 	}
 

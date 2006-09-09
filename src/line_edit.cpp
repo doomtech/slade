@@ -294,7 +294,7 @@ void LinePropertiesPage::apply_changes()
 	}
 
 	// Action special
-	if (entry_special->GetValue() != _T(""))
+	if (entry_special->GetValue().size())
 	{
 		for (int a = 0; a < items.size(); a++)
 			items[a]->set_special(atoi(chr(entry_special->GetValue())));
@@ -303,7 +303,7 @@ void LinePropertiesPage::apply_changes()
 	if (!d_map.hexen())
 	{
 		// Sector tag
-		if (entry_tag->GetValue() != _T(""))
+		if (entry_tag->GetValue().size())
 		{
 			for (int a = 0; a < items.size(); a++)
 				items[a]->set_sector_tag(atoi(chr(entry_tag->GetValue())));
@@ -340,7 +340,7 @@ END_EVENT_TABLE()
 void LinePropertiesPage::change_special_clicked(wxCommandEvent &event)
 {
 	int val = 0;
-	if (entry_special->GetValue() != _T(""))
+	if (entry_special->GetValue().size())
 		val = atoi(chr(entry_special->GetValue()));
 
 	SpecialSelectDialog sd(val);
@@ -360,7 +360,7 @@ void LinePropertiesPage::get_free_tag_clicked(wxCommandEvent &event)
 void LinePropertiesPage::edit_args_clicked(wxCommandEvent &event)
 {
 	int type = 0;
-	if (entry_special->GetValue() != _T(""))
+	if (entry_special->GetValue().size())
 		type = atoi(chr(entry_special->GetValue()));
 
 	ActionSpecial *as = game.get_special(type);
@@ -372,12 +372,12 @@ void LinePropertiesPage::edit_args_clicked(wxCommandEvent &event)
 
 void LinePropertiesPage::entry_special_changed(wxCommandEvent &event)
 {
-	if (entry_special->GetValue() == _T(""))
+	if (entry_special->GetValue().empty())
 		label_special->SetLabel(_T("Special:"));
 	else
 	{
 		ActionSpecial *as = game.get_special(atoi(chr(entry_special->GetValue())));
-		label_special->SetLabel(wxString::Format(_T("Special: %s"), chr(as->name)));
+		label_special->SetLabel(_T("Special: ") + as->name);
 	}
 }
 
@@ -601,7 +601,7 @@ void SidePropertiesPage::setup_widgets()
 	{
 		d_map.index(sides[a], true);
 
-		if (entry_upper->GetValue() != _T(""))
+		if (entry_upper->GetValue().size())
 		{
 			if (sides[a]->get_texname(TEX_UPPER) != sides[0]->get_texname(TEX_UPPER))
 			{
@@ -610,7 +610,7 @@ void SidePropertiesPage::setup_widgets()
 			}
 		}
 
-		if (entry_middle->GetValue() != _T(""))
+		if (entry_middle->GetValue().size())
 		{
 			if (sides[a]->get_texname(TEX_MIDDLE) != sides[0]->get_texname(TEX_MIDDLE))
 			{
@@ -619,7 +619,7 @@ void SidePropertiesPage::setup_widgets()
 			}
 		}
 
-		if (entry_lower->GetValue() != _T(""))
+		if (entry_lower->GetValue().size())
 		{
 			if (sides[a]->get_texname(TEX_LOWER) != sides[0]->get_texname(TEX_LOWER))
 			{
@@ -677,24 +677,24 @@ void SidePropertiesPage::apply_changes()
 	for (int a = 0; a < sides.size(); a++)
 	{
 		// Textures
-		if (entry_upper->GetValue() != _T(""))
+		if (entry_upper->GetValue().size())
 			sides[a]->set_texture(entry_upper->GetValue(), TEX_UPPER);
 
-		if (entry_middle->GetValue() != _T(""))
+		if (entry_middle->GetValue().size())
 			sides[a]->set_texture(entry_middle->GetValue(), TEX_MIDDLE);
 
-		if (entry_lower->GetValue() != _T(""))
+		if (entry_lower->GetValue().size())
 			sides[a]->set_texture(entry_lower->GetValue(), TEX_LOWER);
 
 		// Offsets
-		if (entry_xoff->GetValue() != _T(""))
+		if (entry_xoff->GetValue().size())
 			sides[a]->set_xoff(atoi(chr(entry_xoff->GetValue())));
 
-		if (entry_yoff->GetValue() != _T(""))
+		if (entry_yoff->GetValue().size())
 			sides[a]->set_yoff(atoi(chr(entry_yoff->GetValue())));
 
 		// Sector ref
-		if (entry_sector->GetValue() != _T(""))
+		if (entry_sector->GetValue().size())
 			sides[a]->set_sector(atoi(chr(entry_sector->GetValue())));
 	}
 }

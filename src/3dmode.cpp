@@ -236,7 +236,7 @@ void change_texture_3d(bool paint)
 		setup_tex_browser(1);
 		TextureBrowser tb(otex, true);
 
-		if (tb.ShowModal() == wxID_OK && tb.get_texture() != _T(""))
+		if (tb.ShowModal() == wxID_OK && tb.get_texture().size())
 		{
 			if (side)
 				hl_line->side1()->set_texture(tb.get_texture(), part);
@@ -259,7 +259,7 @@ void change_texture_3d(bool paint)
 		setup_tex_browser(2);
 		TextureBrowser tb(otex, true);
 
-		if (tb.ShowModal() == wxID_OK && tb.get_texture() != _T(""))
+		if (tb.ShowModal() == wxID_OK && tb.get_texture().size())
 		{
 			if (hl_part == PART_FLOOR)
 				d_map.sector(hl_sector)->set_ftex(tb.get_texture());
@@ -293,7 +293,7 @@ void copy_texture_3d()
 		else
 			c_wall = hl_line->side2()->get_texname(part);
 
-		add_3d_message(s_fmt(_T("Copied texture \"%s\""), chr(c_wall)));
+		add_3d_message(s_fmt(_T("Copied texture \"%s\""), c_wall.c_str()));
 	}
 	else if (hl_sector != -1)
 	{
@@ -309,7 +309,7 @@ void copy_texture_3d()
 		else
 			c_flat = ctex;
 
-		add_3d_message(s_fmt(_T("Copied texture \"%s\""), chr(ctex)));
+		add_3d_message(s_fmt(_T("Copied texture \"%s\""), ctex.c_str()));
 	}
 }
 
@@ -329,19 +329,19 @@ void paste_texture_3d(bool paint)
 		if (hl_part == PART_LO1 || hl_part == PART_LO2)
 			part = 2;
 
-		if (c_wall != _T(""))
+		if (c_wall.size())
 		{
 			if (!paint)
 			{
 				hl_line->side(side)->set_texture(c_wall, part);
-				add_3d_message(s_fmt(_T("Pasted texture \"%s\""), chr(c_wall)));
+				add_3d_message(s_fmt(_T("Pasted texture \"%s\""), c_wall.c_str()));
 			}
 			else
 			{
 				vector<int> lines;
 				line_paint_tex(d_map.index(hl_line), side, hl_line->side(side)->get_texname(part), c_wall, lines);
 
-				add_3d_message(s_fmt(_T("Painted texture \"%s\""), chr(c_wall)));
+				add_3d_message(s_fmt(_T("Painted texture \"%s\""), c_wall.c_str()));
 			}
 		}
 	}
@@ -354,14 +354,14 @@ void paste_texture_3d(bool paint)
 		else
 			ntex = c_flat;
 
-		if (ntex != _T(""))
+		if (ntex.size())
 		{
 			if (hl_part == PART_FLOOR)
 				d_map.sector(hl_sector)->set_ftex(ntex);
 			if (hl_part == PART_CEIL)
 				d_map.sector(hl_sector)->set_ctex(ntex);
 
-			add_3d_message(s_fmt(_T("Pasted texture \"%s\""), chr(ntex)));
+			add_3d_message(s_fmt(_T("Pasted texture \"%s\""), ntex.c_str()));
 		}
 	}
 }

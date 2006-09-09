@@ -42,7 +42,7 @@ TTypeSelectDialog::TTypeSelectDialog(int init)
 			groups.push_back(group);
 		}
 
-		string text = s_fmt(_T("%d: %s"), tt.type, chr(tt.name));
+		string text = s_fmt(_T("%d: "), tt.type) + tt.name;
 		wxTreeItemId item = tree->AppendItem(group, text);
 
 		if (selected_val == tt.type)
@@ -77,7 +77,7 @@ void TTypeSelectDialog::tree_selection_changed(wxTreeEvent &event)
 	{
 		wxString spec = tree->GetItemText(event.GetItem());
 
-		if (spec != _T(""))
+		if (spec.size())
 			sscanf(chr(spec), "%d", &selected_val);
 	}
 }

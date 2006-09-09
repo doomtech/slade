@@ -43,7 +43,7 @@ bool cycle_clockwise(vector<csline_t> &list)
 	//for (int a = 0; a < list.size(); a++)
 	//	lines += s_fmt("%d, ", list[a].line);
 
-	//log_message(s_fmt("Check cycle: %s", lines));
+	//log_message(_T("Check cycle: ") + lines);
 
 	for (int a = 0; a < list.size(); a++)
 	{

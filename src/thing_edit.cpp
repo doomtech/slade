@@ -338,11 +338,11 @@ void ThingEditor::apply_changes()
 		items[a]->set_flags(nflags);
 
 		// Type
-		if (type_entry->GetValue() != _T(""))
+		if (type_entry->GetValue().size())
 			items[a]->set_type(atoi(chr(type_entry->GetValue())));
 
 		// Angle
-		if (angle_entry->GetValue() != _T(""))
+		if (angle_entry->GetValue().size())
 			items[a]->set_angle(atoi(chr(angle_entry->GetValue())));
 
 		if (d_map.hexen())
@@ -355,11 +355,11 @@ void ThingEditor::apply_changes()
 			}
 
 			// TID
-			if (tid_entry->GetValue() != _T(""))
+			if (tid_entry->GetValue().size())
 				items[a]->set_tid(atoi(chr(tid_entry->GetValue())));
 
 			// Z height
-			if (z_entry->GetValue() != _T(""))
+			if (z_entry->GetValue().size())
 				items[a]->set_z(atoi(chr(z_entry->GetValue())));
 
 			// Special
@@ -423,7 +423,7 @@ void ThingEditor::angle_radio_changed(wxCommandEvent &event)
 
 void ThingEditor::type_entry_changed(wxCommandEvent &event)
 {
-	if (type_entry->GetValue() != _T(""))
+	if (type_entry->GetValue().size())
 	{
 		ThingType *ttype = game.get_ttype(atoi(chr(type_entry->GetValue())));
 		type_label->SetLabel(ttype->name);
@@ -439,7 +439,7 @@ void ThingEditor::type_entry_changed(wxCommandEvent &event)
 void ThingEditor::angle_entry_changed(wxCommandEvent &event)
 {
 	angle_unknown->SetValue(true);
-	if (angle_entry->GetValue() != _T(""))
+	if (angle_entry->GetValue().size())
 	{
 		int angle = atoi(chr(angle_entry->GetValue()));
 
@@ -465,7 +465,7 @@ void ThingEditor::angle_entry_changed(wxCommandEvent &event)
 void ThingEditor::change_type_clicked(wxCommandEvent &event)
 {
 	int val = 0;
-	if (type_entry->GetValue() != _T(""))
+	if (type_entry->GetValue().size())
 		val = atoi(chr(type_entry->GetValue()));
 
 	TTypeSelectDialog td(val);
@@ -487,7 +487,7 @@ void ThingEditor::find_tid_clicked(wxCommandEvent &event)
 void ThingEditor::change_special_clicked(wxCommandEvent &event)
 {
 	int val = 0;
-	if (special_entry->GetValue() != _T(""))
+	if (special_entry->GetValue().size())
 		val = atoi(chr(special_entry->GetValue()));
 
 	SpecialSelectDialog sd(val);
@@ -501,7 +501,7 @@ void ThingEditor::change_special_clicked(wxCommandEvent &event)
 void ThingEditor::edit_args_clicked(wxCommandEvent &event)
 {
 	int type = -1;
-	if (type_entry->GetValue() != _T(""))
+	if (type_entry->GetValue().size())
 		type = atoi(chr(type_entry->GetValue()));
 
 	ThingType *tt = game.get_ttype(type);
@@ -516,7 +516,7 @@ void ThingEditor::edit_args_clicked(wxCommandEvent &event)
 	else
 	{
 		int special = 0;
-		if (special_entry->GetValue() != _T(""))
+		if (special_entry->GetValue().size())
 			special = atoi(chr(special_entry->GetValue()));
 
 		ActionSpecial *as = game.get_special(special);

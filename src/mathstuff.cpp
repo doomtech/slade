@@ -117,8 +117,8 @@ bool lines_intersect(rect_t line1, rect_t line2, fpoint2_t *ip)
 		double x = (b2*c1 - b1*c2) / det;
         double y = (a1*c2 - a2*c1) / det;
 
-		//log_message(s_fmt(_T("L1 %s"), test(line1)));
-		//log_message(s_fmt(_T("L2 %s"), test(line2)));
+		//log_message(_T("L1 %s") + test(line1));
+		//log_message(_T("L2 %s") + test(line2));
 		//log_message(s_fmt(_T("%1.2f %1.2f"), x, y));
 
 		if (x <= line1.right() && x >= line1.left() && y >= line1.top() && y <= line1.bottom() &&

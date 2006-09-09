@@ -204,7 +204,7 @@ void load_colours(Tokenizer *tz)
 // ----------------------------------------------------------------- >>
 void save_colour_config(string filename)
 {
-	if (filename == _T(""))
+	if (filename.empty())
 		return;
 
 	int max_size = 0;
