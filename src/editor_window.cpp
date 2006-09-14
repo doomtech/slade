@@ -344,7 +344,7 @@ bool EditorWindow::open_map(Wad* wad, string mapname)
 	}
 
 	// Reset zoom and offset (0,0 and fully zoomed in)
-	map_area->zoom_view(100, false);
+	map_area->zoom_view(100, false, false);
 	map_area->set_offsets(d_map.middle(), false);
 
 	if (d_map.n_verts() == 0)
@@ -367,7 +367,7 @@ bool EditorWindow::open_map(Wad* wad, string mapname)
 				bounds.x2() > border.x2() ||
 				bounds.y2() > border.y2())
 			{
-				if (!map_area->zoom_view(0.8, false))
+				if (!map_area->zoom_view(0.8, false, false))
 					done = false;
 			}
 		}

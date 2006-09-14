@@ -33,6 +33,7 @@ CVAR(Bool, thing_force_angle, false, CVAR_SAVE)
 CVAR(Bool, grid_dashed, false, CVAR_SAVE)
 CVAR(Bool, grid_64grid, true, CVAR_SAVE)
 CVAR(Bool, line_aa, true, CVAR_SAVE)
+CVAR(Bool, zoom_mousecursor, false, CVAR_SAVE)
 
 vector<string> pressed_keys;
 vector<string> released_keys;
@@ -136,9 +137,11 @@ void MapCanvas::pan_view(double x, double y, bool redraw)
 	if (redraw) this->redraw();
 }
 
-bool MapCanvas::zoom_view(double factor, bool redraw)
+bool MapCanvas::zoom_view(double factor, bool redraw, bool mouse)
 {
 	bool limit = false;
+
+	fpoint2_t mpos(translate_x(this->mouse.x), translate_y(this->mouse.y));
 
 	zoom = zoom * factor;
 	if (zoom < 0.005f)
@@ -152,7 +155,13 @@ bool MapCanvas::zoom_view(double factor, bool redraw)
 		zoom = 10.0f;
 		limit = true;
 	}
-	
+
+	if (!limit && zoom_mousecursor && mouse)
+	{
+		xoff = mpos.x + (double(xoff - mpos.x) / factor);
+		yoff = mpos.y + (double(yoff - mpos.y) / factor);
+	}
+
 	if (redraw) this->redraw();
 
 	return limit;

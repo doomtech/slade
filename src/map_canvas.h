@@ -46,7 +46,7 @@ public:
 	void popup_menu();
 
 	void pan_view(double x, double y, bool redraw = true);
-	bool zoom_view(double factor, bool redraw = true);
+	bool zoom_view(double factor, bool redraw = true, bool mouse = true);
 	void set_view();
 	void set_offsets(point2_t offsets, bool redraw = true);
 

@@ -91,7 +91,7 @@ int get_side_sector(int line, int side)
 	else
 	{
 		rect_t r = d_map.line(nearest_line)->get_rect();
-		if (determine_line_side(r, mid.x, mid.y))
+		if (determine_line_side(r, mid.x, mid.y) >= 0)
 			return d_map.line(nearest_line)->sector_index();
 		else
 			return d_map.line(nearest_line)->sector_index(false);

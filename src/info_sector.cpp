@@ -83,7 +83,7 @@ void SectorInfoBar::update()
 	Sector *sector = d_map.hilight_sector();
 
 	// Main frame
-	main_frame->SetLabel(s_fmt(_T("Secor #%d"), d_map.hilight()));
+	main_frame->SetLabel(s_fmt(_T("Sector #%d"), d_map.hilight()));
 	label_floor->SetLabel(s_fmt(_T("Floor Height: %d"), sector->floor()));
 	label_ceil->SetLabel(s_fmt(_T("Ceiling Height: %d"), sector->ceiling()));
 	label_height->SetLabel(s_fmt(_T("Height: %d"), sector->ceiling() - sector->floor()));
