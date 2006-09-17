@@ -206,6 +206,18 @@ void keys_edit()
 
 	// **** Other controls ****
 
+	if (RELEASED("file_save"))
+	{
+		wxCommandEvent evt;
+		editor_window->file_save(evt);
+	}
+
+	if (RELEASED("file_run"))
+	{
+		wxCommandEvent evt;
+		editor_window->file_run(evt);
+	}
+
 	// Scroll up
 	if (PRESSED("view_up"))
 		editor_window->map()->pan_view(0, 96);

@@ -177,6 +177,9 @@ void BindList::set_defaults()
 {
 	controls.clear();
 
+	add("file_save", "S", KMOD_CTRL);
+	add("file_run", "R", KMOD_CTRL);
+
 	add("view_up", "Up");
 	add("view_down", "Down");
 	add("view_left", "Left");

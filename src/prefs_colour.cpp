@@ -7,7 +7,7 @@
 #include "colours.h"
 
 extern coldef_t colours[];
-extern int n_colours;
+extern unsigned int n_colours;
 
 ColourBox::ColourBox(wxWindow *parent, rgba_t *colour)
 :	wxPanel(parent, -1, wxDefaultPosition, wxSize(32, 24), wxSUNKEN_BORDER)
