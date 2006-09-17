@@ -511,24 +511,10 @@ void SidePropertiesPage::setup_widgets()
 {
 	bool missingside = false;
 
-	vector<int> selection = d_map.selection();
-
 	// Get list of relevant sidedefs
+	vector<Line*> selection;
+	d_map.get_selection(selection, true);
 	vector<Side*> sides;
-	if (selection.size() == 0 && d_map.hilight() != -1)
-	{
-		Side* sd;
-
-		if (side == 1)
-			sd = d_map.hilight_line()->side1();
-		else
-			sd = d_map.hilight_line()->side2();
-
-		if (d_map.valid(sd))
-			sides.push_back(sd);
-		else
-			missingside = true;
-	}
 
 	if (selection.size() > 0)
 	{
@@ -537,9 +523,9 @@ void SidePropertiesPage::setup_widgets()
 			Side* sd;
 
 			if (side == 1)
-				sd = d_map.line(selection[a])->side1();
+				sd = selection[a]->side1();
 			else
-				sd = d_map.line(selection[a])->side2();
+				sd = selection[a]->side2();
 
 			if (d_map.valid(sd))
 				sides.push_back(sd);
@@ -551,8 +537,6 @@ void SidePropertiesPage::setup_widgets()
 	// If there are no sides in the list, disable all widgets except the 'create' button
 	if (sides.size() == 0)
 	{
-		//wxList list = GetChildren();
-		//wxNode *node = list.GetFirst();
 		wxNode *node = (wxNode*)(GetChildren().GetFirst());
 
 		while (node)
@@ -594,7 +578,7 @@ void SidePropertiesPage::setup_widgets()
 	entry_yoff->SetValue(wxString::Format(_T("%d"), sides[0]->get_yoff()));
 
 	// Sector ref
-	entry_sector->SetValue(wxString::Format(_T("%d"), d_map.hilight_line()->sector_index(side == 1)));
+	entry_sector->SetValue(wxString::Format(_T("%d"), selection[0]->sector_index(side == 1)));
 
 	// Check for inconsistency
 	for (int a = 0; a < sides.size(); a++)
@@ -641,22 +625,10 @@ void SidePropertiesPage::setup_widgets()
 
 void SidePropertiesPage::apply_changes()
 {
-	vector<int> selection = d_map.selection();
-
 	// Get list of relevant sidedefs
+	vector<Line*> selection;
+	d_map.get_selection(selection, true);
 	vector<Side*> sides;
-	if (selection.size() == 0 && d_map.hilight() != -1)
-	{
-		Side* sd;
-
-		if (side == 1)
-			sd = d_map.hilight_line()->side1();
-		else
-			sd = d_map.hilight_line()->side2();
-
-		if (d_map.valid(sd))
-			sides.push_back(sd);
-	}
 
 	if (selection.size() > 0)
 	{
@@ -665,9 +637,9 @@ void SidePropertiesPage::apply_changes()
 			Side* sd;
 
 			if (side == 1)
-				sd = d_map.line(selection[a])->side1();
+				sd = selection[a]->side1();
 			else
-				sd = d_map.line(selection[a])->side2();
+				sd = selection[a]->side2();
 
 			if (d_map.valid(sd))
 				sides.push_back(sd);
