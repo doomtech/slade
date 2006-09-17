@@ -49,14 +49,14 @@ string argtype_t::get_name(short value)
 	if (has_values)
 	{
 		// Strip flags
-		for (int a = 0; a < values.size(); a++)
+		for (unsigned int a = 0; a < values.size(); a++)
 		{
 			if (values[a].flag)
 				tempval = (tempval & ~values[a].value);
 		}
 
 		// Get value name
-		for (int a = 0; a < values.size(); a++)
+		for (unsigned int a = 0; a < values.size(); a++)
 		{
 			if (!values[a].flag && tempval == values[a].value)
 			{
@@ -72,7 +72,7 @@ string argtype_t::get_name(short value)
 			ret += _T(" (");
 
 		bool flag = false;
-		for (int a = 0; a < values.size(); a++)
+		for (unsigned int a = 0; a < values.size(); a++)
 		{
 			if (values[a].flag && value & values[a].value)
 			{

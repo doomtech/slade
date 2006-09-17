@@ -23,13 +23,13 @@ SpecialSelectDialog::SpecialSelectDialog(int init)
 		tree->SelectItem(item, true);
 
 	vector<wxTreeItemId> groups;
-	for (int a = 0; a < game.get_specials().size(); a++)
+	for (unsigned int a = 0; a < game.get_specials().size(); a++)
 	{
 		ActionSpecial as = game.get_specials()[a];
 
 		wxTreeItemId group;
 		bool found = false;
-		for (int g = 0; g < groups.size(); g++)
+		for (unsigned int g = 0; g < groups.size(); g++)
 		{
 			if (tree->GetItemText(groups[g]) == as.group)
 			{

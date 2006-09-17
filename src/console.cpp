@@ -103,7 +103,7 @@ void init_console()
 	string line = _T("<< S.L.A.D.E. -- \"SlayeR's LeetAss Doom Editor\" (");
 	line += __SLADEVERS;
 	line += _T(")");
-	for (int a = 0; a < 21 - sizeof(__SLADEVERS)/sizeof(wxChar); a++)
+	for (unsigned int a = 0; a < 21 - sizeof(__SLADEVERS)/sizeof(wxChar); a++)
 		line += _T(" ");
 	line += _T(">>");
 	console_print(_T("<< ------------------------------------------------------------------ >>"));
@@ -217,7 +217,7 @@ void console_parsecommand()
 	// "dump_textures" command
 	else if (token == _T("dump_textures"))
 	{
-		for (int a = 0; a < textures.size(); a++)
+		for (unsigned int a = 0; a < textures.size(); a++)
 			console_print(s_fmt(_T("%s, %dx%d"), textures[a]->name.c_str(), textures[a]->width, textures[a]->height));
 
 	}
@@ -225,7 +225,7 @@ void console_parsecommand()
 	// "dump_flats" command
 	else if (token == _T("dump_flats"))
 	{
-		for (int a = 0; a < flats.size(); a++)
+		for (unsigned int a = 0; a < flats.size(); a++)
 			console_print(flats[a]->name);
 
 	}
@@ -282,7 +282,7 @@ void console_parsecommand()
 
 	else if (token == _T("listverts"))
 	{
-		for (int a = 0; a < d_map.n_verts(); a++)
+		for (unsigned int a = 0; a < d_map.n_verts(); a++)
 		{
 			Vertex* v = d_map.vertex(a);
 			console_print(s_fmt(_T("Vertex %d: i%d x%d y%d r%d"), a, d_map.index(v), v->x_pos(), v->y_pos(), v->refs()));

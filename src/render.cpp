@@ -731,7 +731,7 @@ void render_lines()
 	trans_lines.clear();
 	hl_line = NULL;
 
-	for (int a = 0; a < d_map.n_lines(); a++)
+	for (unsigned int a = 0; a < d_map.n_lines(); a++)
 	{
 		if (lines_visible[a])
 			render_line(d_map.line(a), 255);
@@ -743,7 +743,7 @@ void render_trans_lines()
 	glEnable(GL_ALPHA_TEST);
 	glAlphaFunc(GL_GREATER, 0.8f);
 	glDepthMask(GL_TRUE);
-	for (int a = 0; a < trans_lines.size(); a++)
+	for (unsigned int a = 0; a < trans_lines.size(); a++)
 	{
 		render_line_trans(trans_lines[a], true);
 		render_line_trans(trans_lines[a], false);
@@ -1014,7 +1014,7 @@ void render_ssects()
 {
 	hl_sector = -1;
 
-	for (int a = 0; a < gl_ssects.size(); a++)
+	for (unsigned int a = 0; a < gl_ssects.size(); a++)
 	{
 		if (ssects_visible[a])
 			render_ssect(a);
@@ -1223,7 +1223,7 @@ void render_3d_view(int width, int height)
 	draw_texture((width / 2) - 16, (height / 2) - 16, 32, 32, _T("_xhair"), 4, col_3d_crosshair);
 
 	// Messages
-	for (int a = 0; a < messages_3d.size(); a++)
+	for (unsigned int a = 0; a < messages_3d.size(); a++)
 	{
 		if (messages_3d[a].fade <= 0)
 		{

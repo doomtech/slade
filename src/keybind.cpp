@@ -359,7 +359,7 @@ void BindList::add(char* name, char* key, BYTE mods)
 	string n = wxString::FromAscii(name);
 
 	bool found = false;
-	for (int a = 0; a < controls.size(); a++)
+	for (unsigned int a = 0; a < controls.size(); a++)
 	{
 		if (controls[a].name == n)
 		{
@@ -386,7 +386,7 @@ void BindList::add(char* name, char* key, BYTE mods)
 // ------------------------------------- >>
 bool BindList::pressed(string name)
 {
-	for (int a = 0; a < controls.size(); a++)
+	for (unsigned int a = 0; a < controls.size(); a++)
 	{
 		if (controls[a].name == name)
 			return controls[a].pressed;
@@ -399,9 +399,9 @@ bool BindList::pressed(string name)
 // ----------------- >>
 void BindList::set(string key, vector<string> *list, bool shift, bool ctrl, bool alt)
 {
-	for (int a = 0; a < controls.size(); a++)
+	for (unsigned int a = 0; a < controls.size(); a++)
 	{
-		for (int b = 0; b < controls[a].keys.size(); b++)
+		for (unsigned int b = 0; b < controls[a].keys.size(); b++)
 		{
 			if (controls[a].keys[b].key == key)
 			{
@@ -459,9 +459,9 @@ void BindList::set(string key, vector<string> *list, bool shift, bool ctrl, bool
 // -------------------- >>
 void BindList::unset(string key, vector<string> *list, bool shift, bool ctrl, bool alt)
 {
-	for (int a = 0; a < controls.size(); a++)
+	for (unsigned int a = 0; a < controls.size(); a++)
 	{
-		for (int b = 0; b < controls[a].keys.size(); b++)
+		for (unsigned int b = 0; b < controls[a].keys.size(); b++)
 		{
 			if (controls[a].keys[b].key == key)
 			{
@@ -480,7 +480,7 @@ void BindList::unset(string key, vector<string> *list, bool shift, bool ctrl, bo
 // --------------------------------------------------- >>
 void BindList::clear(string name)
 {
-	for (int a = 0; a < controls.size(); a++)
+	for (unsigned int a = 0; a < controls.size(); a++)
 	{
 		if (controls[a].name == name)
 		{
@@ -494,7 +494,7 @@ void BindList::clear(string name)
 // ------------------------------------------------------- >>
 void BindList::press(string name)
 {
-	for (int a = 0; a < controls.size(); a++)
+	for (unsigned int a = 0; a < controls.size(); a++)
 	{
 		if (controls[a].name == name)
 		{
@@ -508,7 +508,7 @@ void BindList::press(string name)
 // ------------------------ >>
 void BindList::clear_all()
 {
-	for (int a = 0; a < controls.size(); a++)
+	for (unsigned int a = 0; a < controls.size(); a++)
 		clear(controls[a].name);
 }
 
@@ -516,7 +516,7 @@ void BindList::clear_all()
 // -------------------------- >>
 void BindList::change(string name, int index, string key, BYTE mods)
 {
-	for (int a = 0; a < controls.size(); a++)
+	for (unsigned int a = 0; a < controls.size(); a++)
 	{
 		if (controls[a].name == name)
 		{
@@ -545,12 +545,12 @@ void BindList::change(string name, int index, string key, BYTE mods)
 // ---------------------------------------------------------- >>
 void BindList::change_default(string name)
 {
-	for (int a = 0; a < controls.size(); a++)
+	for (unsigned int a = 0; a < controls.size(); a++)
 	{
 		if (controls[a].name == name)
 		{
 			controls[a].keys.clear();
-			for (int b = 0; b < controls[a].defaults.size(); b++)
+			for (unsigned int b = 0; b < controls[a].defaults.size(); b++)
 				controls[a].keys.push_back(controls[a].defaults[b]);
 			break;
 		}
@@ -559,7 +559,7 @@ void BindList::change_default(string name)
 
 void BindList::save(FILE* fp)
 {
-	int max_size = 0;
+	unsigned int max_size = 0;
 	for (DWORD a = 0; a < controls.size(); a++)
 	{
 		if (controls[a].name.size() > max_size)
@@ -568,7 +568,7 @@ void BindList::save(FILE* fp)
 
 	fprintf(fp, "key_binds\n{\n");
 
-	for (int a = 0; a < controls.size(); a++)
+	for (unsigned int a = 0; a < controls.size(); a++)
 	{
 		if (controls[a].keys.size() == 0)
 			continue;
@@ -583,7 +583,7 @@ void BindList::save(FILE* fp)
 		else
 		{
 			fprintf(fp, "{ ");
-			for (int b = 0; b < controls[a].keys.size(); b++)
+			for (unsigned int b = 0; b < controls[a].keys.size(); b++)
 				fprintf(fp, "\"%s\" %d ", chr(controls[a].keys[b].key), controls[a].keys[b].mods);
 			fprintf(fp, "}\n");
 		}

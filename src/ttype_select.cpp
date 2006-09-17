@@ -20,13 +20,13 @@ TTypeSelectDialog::TTypeSelectDialog(int init)
 	wxTreeItemId root = tree->AddRoot(_T(""));
 
 	vector<wxTreeItemId> groups;
-	for (int a = 0; a < game.get_ttypes().size(); a++)
+	for (unsigned int a = 0; a < game.get_ttypes().size(); a++)
 	{
 		ThingType tt = game.get_ttypes()[a];
 
 		wxTreeItemId group;
 		bool found = false;
-		for (int g = 0; g < groups.size(); g++)
+		for (unsigned int g = 0; g < groups.size(); g++)
 		{
 			if (tree->GetItemText(groups[g]) == tt.group)
 			{

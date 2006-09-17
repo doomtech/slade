@@ -51,7 +51,7 @@ void save_game_iwads(FILE* fp)
 {
 	fprintf(fp, "iwads\n{\n");
 
-	for (int a = 0; a < game_iwads.size(); a++)
+	for (unsigned int a = 0; a < game_iwads.size(); a++)
 		fprintf(fp, "\tgame \"%s\" \"%s\"\n", chr(game_iwads[a].game), chr(game_iwads[a].iwad_path));
 
 	fprintf(fp, "}\n\n");
@@ -99,7 +99,7 @@ bool GameConfig::load_config(string filename)
 
 	// Load IWAD
 	int i = -1;
-	for (int a = 0; a < game_iwads.size(); a++)
+	for (unsigned int a = 0; a < game_iwads.size(); a++)
 	{
 		if (game_iwads[a].game == token)
 			i = a;
@@ -437,7 +437,7 @@ string GameConfig::ask_map_name()
 	else
 	{
 		wxArrayString mapnames;
-		for (int a = 0; a < valid_map_names.size(); a++)
+		for (unsigned int a = 0; a < valid_map_names.size(); a++)
 			mapnames.Add(valid_map_names[a]);
 
 		return wxGetSingleChoice(_T("Select Map Name"), _T("Rename Map"), mapnames);
@@ -485,7 +485,7 @@ void GameConfig::parse_thing_group(Tokenizer *tz)
 
 ThingType* GameConfig::get_ttype(int type)
 {
-	for (int a = 0; a < thing_types.size(); a++)
+	for (unsigned int a = 0; a < thing_types.size(); a++)
 	{
 		if (thing_types[a].type == type)
 			return &thing_types[a];
@@ -496,7 +496,7 @@ ThingType* GameConfig::get_ttype(int type)
 
 void GameConfig::clear_arg_types()
 {
-	for (int a = 0; a < arg_types.size(); a++)
+	for (unsigned int a = 0; a < arg_types.size(); a++)
 		delete arg_types[a];
 
 	arg_types.clear();
@@ -504,7 +504,7 @@ void GameConfig::clear_arg_types()
 
 argtype_t* GameConfig::get_arg_type(string name)
 {
-	for (int a = 0; a < arg_types.size(); a++)
+	for (unsigned int a = 0; a < arg_types.size(); a++)
 	{
 		if (arg_types[a]->name == name)
 			return arg_types[a];
@@ -558,7 +558,7 @@ ActionSpecial* GameConfig::get_special(int type)
 	if (type == 0)
 		return &special_none;
 
-	for (int a = 0; a < action_specials.size(); a++)
+	for (unsigned int a = 0; a < action_specials.size(); a++)
 	{
 		if (action_specials[a].type == type)
 			return &action_specials[a];
@@ -569,7 +569,7 @@ ActionSpecial* GameConfig::get_special(int type)
 
 string GameConfig::get_sector_type(int type)
 {
-	for (int a = 0; a < sector_types.size(); a++)
+	for (unsigned int a = 0; a < sector_types.size(); a++)
 	{
 		if (sector_types[a]->type == type)
 			return sector_types[a]->name;
@@ -681,7 +681,7 @@ void GameConfig::read_decorate_things(Wad* wad, Lump* lump)
 
 void GameConfig::clear_decorate_things()
 {
-	for (int a = 0; a < thing_types.size(); a++)
+	for (unsigned int a = 0; a < thing_types.size(); a++)
 	{
 		if (thing_types[a].flags & TTYPE_DECORATE)
 		{

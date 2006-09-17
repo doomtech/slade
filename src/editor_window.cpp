@@ -730,7 +730,7 @@ void EditorWindow::file_importmap(wxCommandEvent &event)
 
 		string mapname;
 		wxArrayString mapnames;
-		for (int a = 0; a < temp_wad.available_maps.size(); a++)
+		for (unsigned int a = 0; a < temp_wad.available_maps.size(); a++)
 			mapnames.Add(temp_wad.available_maps[a]);
 
 		if (mapnames.size() == 0)

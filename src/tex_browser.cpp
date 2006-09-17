@@ -121,7 +121,7 @@ void TextureBrowser::sort(int sorting)
 	// Sort alphabetically
 	if (sorting == 0 && browse_type != 3)
 	{
-		for (int p = 1; p < vis_items.size(); p++)
+		for (unsigned int p = 1; p < vis_items.size(); p++)
 		{
 			browse_info_t* tmp = vis_items[p];
 			int j;
@@ -136,7 +136,7 @@ void TextureBrowser::sort(int sorting)
 	// Sort by use
 	else if (sorting == 1)
 	{
-		for (int p = 1; p < vis_items.size(); p++)
+		for (unsigned int p = 1; p < vis_items.size(); p++)
 		{
 			browse_info_t* tmp = vis_items[p];
 			int j;
@@ -162,7 +162,7 @@ void TextureBrowser::update_vis_items()
 	if (browse_type != 3)
 		vis_items.push_back(&browse_items[0]);
 
-	for (int a = 0; a < browse_items.size(); a++)
+	for (unsigned int a = 0; a < browse_items.size(); a++)
 	{
 		if (!browse_items[a].tex)
 			continue;
@@ -267,7 +267,7 @@ void TexBrowseCanvas::redraw()
 	int col = 0;
 	int row = 0;
 
-	for (int a = 0; a < vis_items.size(); a++)
+	for (unsigned int a = 0; a < vis_items.size(); a++)
 	{
 		rect_t rect(col * width, (row * width) - top, width, width, 0);
 
@@ -363,7 +363,7 @@ void TexBrowseCanvas::select_name(string name)
 {
 	selected_item = -1;
 
-	for (int a = 0; a < vis_items.size(); a++)
+	for (unsigned int a = 0; a < vis_items.size(); a++)
 	{
 		if (vis_items[a]->retval == name)
 		{
@@ -547,7 +547,7 @@ void setup_tex_browser(int type)
 	// Things
 	if (type == 3)
 	{
-		for (int a = 0; a < game.get_ttypes().size(); a++)
+		for (unsigned int a = 0; a < game.get_ttypes().size(); a++)
 		{
 			ThingType tt = game.get_ttypes()[a];
 
@@ -568,7 +568,7 @@ void setup_tex_browser(int type)
 	// Textures
 	if (type == 1 || mix_tex)
 	{
-		for (int a = 0; a < textures.size(); a++)
+		for (unsigned int a = 0; a < textures.size(); a++)
 		{
 			browse_info_t bi;
 			bi.retval = textures[a]->name;
@@ -580,7 +580,7 @@ void setup_tex_browser(int type)
 	// Flats
 	if (type == 2 || mix_tex)
 	{
-		for (int a = 0; a < flats.size(); a++)
+		for (unsigned int a = 0; a < flats.size(); a++)
 		{
 			browse_info_t bi;
 			bi.retval = flats[a]->name;

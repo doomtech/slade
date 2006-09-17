@@ -45,7 +45,7 @@ bool cycle_clockwise(vector<csline_t> &list)
 
 	//log_message(_T("Check cycle: ") + lines);
 
-	for (int a = 0; a < list.size(); a++)
+	for (unsigned int a = 0; a < list.size(); a++)
 	{
 		rect_t linerect = d_map.line(list[a].line)->get_rect();
 		point2_t mid = linerect.middle();
@@ -62,7 +62,7 @@ bool cycle_clockwise(vector<csline_t> &list)
 
 		bool intersect = false;
 
-		for (int b = 0; b < list.size(); b++)
+		for (unsigned int b = 0; b < list.size(); b++)
 		{
 			if (b != a)
 			{
@@ -133,7 +133,7 @@ void get_line_cycle(csline_t start_line, vector<csline_t> &list)
 		}
 		else
 		{
-			for (int a = 0; a < a_lines.size(); a++)
+			for (unsigned int a = 0; a < a_lines.size(); a++)
 			{
 				float angle = 0.0f;
 				csline_t t_line(a_lines[a], ORTN_FRONT);
@@ -184,7 +184,7 @@ void get_line_cycle(csline_t start_line, vector<csline_t> &list)
 		if (line.line == -1)
 			return;
 
-		for (int a = 0; a < list.size(); a++)
+		for (unsigned int a = 0; a < list.size(); a++)
 		{
 			if (list[a].line == line.line &&
 				list[a].orientation == line.orientation)
@@ -207,7 +207,7 @@ rect_t get_cycle_border(vector<csline_t> &cycle)
 	int max_y = -999999;
 	int min_y = 999999;
 
-	for (int a = 0; a < cycle.size(); a++)
+	for (unsigned int a = 0; a < cycle.size(); a++)
 	{
 		rect_t r = d_map.line(cycle[a].line)->get_rect();
 
@@ -244,7 +244,7 @@ bool sector_create(point2_t point, vector<Sector*> &new_sectors, bool* front_sid
 	double min_dist = -1;
 	int line = -1;
 
-	for (int l = 0; l < d_map.n_lines(); l++)
+	for (unsigned int l = 0; l < d_map.n_lines(); l++)
 	{
 		rect_t r = d_map.line(l)->get_rect();
 
@@ -279,7 +279,7 @@ bool sector_create(point2_t point, vector<Sector*> &new_sectors, bool* front_sid
 		else
 			get_line_cycle(csline_t(line, ORTN_BACK), lines);
 
-		for (int a = 0; a < lines.size(); a++)
+		for (unsigned int a = 0; a < lines.size(); a++)
 			all_lines.push_back(lines[a]);
 
 		border.set(get_cycle_border(all_lines));
@@ -291,11 +291,11 @@ bool sector_create(point2_t point, vector<Sector*> &new_sectors, bool* front_sid
 			// Check for void
 			//if (first) // what was this check for in the first place? All it seems to do is screw up void detection :P
 			{
-				for (int a = 0; a < lines.size(); a++)
+				for (unsigned int a = 0; a < lines.size(); a++)
 				{
 					int nl = -1;
 					min_dist = -1;
-					for (int l = 0; l < d_map.n_lines(); l++)
+					for (unsigned int l = 0; l < d_map.n_lines(); l++)
 					{
 						rect_t r = d_map.line(l)->get_rect();
 						point2_t p = r.middle();
@@ -322,7 +322,7 @@ bool sector_create(point2_t point, vector<Sector*> &new_sectors, bool* front_sid
 					{
 						if (front_sides)
 						{
-							for (int b = 0; b < lines.size(); b++)
+							for (unsigned int b = 0; b < lines.size(); b++)
 							{
 								if (lines[a].orientation == ORTN_FRONT)
 									front_sides[lines[b].line] = true;
@@ -331,7 +331,7 @@ bool sector_create(point2_t point, vector<Sector*> &new_sectors, bool* front_sid
 
 						if (back_sides)
 						{
-							for (int b = 0; b < lines.size(); b++)
+							for (unsigned int b = 0; b < lines.size(); b++)
 							{
 								if (lines[a].orientation == ORTN_BACK)
 									back_sides[lines[b].line] = true;
@@ -346,7 +346,7 @@ bool sector_create(point2_t point, vector<Sector*> &new_sectors, bool* front_sid
 			min_dist = -1;
 			line = -1;
 
-			for (int l = 0; l < d_map.n_lines(); l++)
+			for (unsigned int l = 0; l < d_map.n_lines(); l++)
 			{
 				rect_t r = d_map.line(l)->get_rect();
 
@@ -372,10 +372,10 @@ bool sector_create(point2_t point, vector<Sector*> &new_sectors, bool* front_sid
 
 	// Get all lines within the border that aren't part of the sector yet
 	vector<int> in_lines;
-	for (int a = 0; a < d_map.n_lines(); a++)
+	for (unsigned int a = 0; a < d_map.n_lines(); a++)
 	{
 		bool cont = false;
-		for (int b = 0; b < all_lines.size(); b++)
+		for (unsigned int b = 0; b < all_lines.size(); b++)
 		{
 			if (all_lines[b].line == a)
 			{
@@ -418,7 +418,7 @@ bool sector_create(point2_t point, vector<Sector*> &new_sectors, bool* front_sid
 
 	if (in_lines.size() > 0)
 	{
-		for (int a = 0; a < all_lines.size(); a++)
+		for (unsigned int a = 0; a < all_lines.size(); a++)
 		{
 			// Get closest inside line
 			point.set(d_map.line(all_lines[a].line)->get_rect().middle());
@@ -447,9 +447,9 @@ bool sector_create(point2_t point, vector<Sector*> &new_sectors, bool* front_sid
 				get_line_cycle(csline_t(line, ORTN_BACK), lines);
 
 			// Add lines to all_lines list and remove them from in_lines
-			for (int b = 0; b < lines.size(); b++)
+			for (unsigned int b = 0; b < lines.size(); b++)
 			{
-				for (int l = 0; l < in_lines.size(); l++)
+				for (unsigned int l = 0; l < in_lines.size(); l++)
 				{
 					if (lines[b].line == in_lines[l])
 					{
@@ -503,7 +503,7 @@ bool sector_create(point2_t point, vector<Sector*> &new_sectors, bool* front_sid
 	Sector* sector = new Sector(&d_map);
 	Sector* copy_sector = NULL;
 
-	for (int a = 0; a < all_lines.size(); a++)
+	for (unsigned int a = 0; a < all_lines.size(); a++)
 	{
 		Line* line = d_map.line(all_lines[a].line);
 		Side* side1 = line->side1();

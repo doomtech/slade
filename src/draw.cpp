@@ -155,11 +155,11 @@ void draw_texture_scale(rect_t rect, string texname, int textype, rgba_t col, fl
 
 	tex->gen_gl_tex();
 
-	int texwidth = tex->width * scalef;
-	int texheight = tex->height * scalef;
-	int nwidth = texwidth;
-	int nheight = texheight;
-	int dim = min(rect.width(), rect.height());
+	unsigned int texwidth = tex->width * scalef;
+	unsigned int texheight = tex->height * scalef;
+	unsigned int nwidth = texwidth;
+	unsigned int nheight = texheight;
+	unsigned int dim = min(rect.width(), rect.height());
 	int midx = rect.x1() + (rect.width() / 2);
 	int midy = rect.y1() + (rect.height() / 2);
 
@@ -211,11 +211,11 @@ void draw_texture_scale(rect_t rect, Texture* tex, rgba_t col, float scalef)
 
 	tex->gen_gl_tex();
 
-	int texwidth = tex->width * scalef;
-	int texheight = tex->height * scalef;
-	int nwidth = texwidth;
-	int nheight = texheight;
-	int dim = min(rect.width(), rect.height());
+	unsigned int texwidth = tex->width * scalef;
+	unsigned int texheight = tex->height * scalef;
+	unsigned int nwidth = texwidth;
+	unsigned int nheight = texheight;
+	unsigned int dim = min(rect.width(), rect.height());
 	int midx = rect.x1() + (rect.width() / 2);
 	int midy = rect.y1() + (rect.height() / 2);
 
@@ -278,10 +278,10 @@ void draw_text(int x, int y, rgba_t colour, BYTE alignment, bool map, const char
 
 	// Alignment
 	if (alignment == 1) // Center
-		x -= (((int)strlen(string) * size_x) / 2);
+		x -= ((strlen(string) * size_x) / 2);
 
-	if (alignment == 2) // Right
-		x -= ((int)strlen(string) * size_x);
+	else if (alignment == 2) // Right
+		x -= (strlen(string) * size_x);
 
 	set_gl_colour(colour);
 
@@ -344,10 +344,10 @@ void draw_text_scale(int x, int y, rgba_t colour, BYTE alignment, int scale, con
 
 	// Alignment
 	if (alignment == 1) // Center
-		x -= (((int)strlen(string) * size_x) / 2);
+		x -= ((strlen(string) * size_x) / 2);
 
-	if (alignment == 2) // Right
-		x -= ((int)strlen(string) * size_x);
+	else if (alignment == 2) // Right
+		x -= (strlen(string) * size_x);
 
 	set_gl_colour(colour);
 

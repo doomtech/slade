@@ -181,7 +181,7 @@ void LinePropertiesPage::setup_widgets()
 	if (d_map.selection().size() == 0 && d_map.hilight() != -1)
 	{
 		// Flags
-		for (int a = 0; a < flags.size(); a++)
+		for (unsigned int a = 0; a < flags.size(); a++)
 		{
 			if (d_map.hilight_line()->check_flag(flags[a]->flag))
 				flags[a]->Set3StateValue(wxCHK_CHECKED);
@@ -196,7 +196,7 @@ void LinePropertiesPage::setup_widgets()
 		{
 			combo_trigger->Select(d_map.hilight_line()->get_trigger() + 1);
 
-			for (int a = 0; a < 5; a++)
+			for (unsigned int a = 0; a < 5; a++)
 				args[a] = d_map.hilight_line()->arg(a);
 			memset(args_consistent, 1, 5);
 		}
@@ -211,7 +211,7 @@ void LinePropertiesPage::setup_widgets()
 		Line *oline = d_map.line(selection[0]);
 
 		// Flags
-		for (int a = 0; a < flags.size(); a++)
+		for (unsigned int a = 0; a < flags.size(); a++)
 		{
 			if (oline->check_flag(flags[a]->flag))
 				flags[a]->Set3StateValue(wxCHK_CHECKED);
@@ -226,17 +226,17 @@ void LinePropertiesPage::setup_widgets()
 		{
 			combo_trigger->Select(oline->get_trigger() + 1);
 
-			for (int a = 0; a < 5; a++)
+			for (unsigned int a = 0; a < 5; a++)
 				args[a] = oline->arg(a);
 			memset(args_consistent, 1, 5);
 		}
 
 		// Check for inconsistency
-		for (int a = 0; a < selection.size(); a++)
+		for (unsigned int a = 0; a < selection.size(); a++)
 		{
 			Line* line = d_map.line(selection[a]);
 
-			for (int b = 0; b < flags.size(); b++)
+			for (unsigned int b = 0; b < flags.size(); b++)
 			{
 				if (flags[b]->Get3StateValue() == wxCHK_UNDETERMINED)
 					continue;
@@ -258,7 +258,7 @@ void LinePropertiesPage::setup_widgets()
 
 			if (d_map.hexen())
 			{
-				for (int b = 0; b < 5; b++)
+				for (unsigned int b = 0; b < 5; b++)
 				{
 					if (line->arg(b) != oline->arg(b))
 						args_consistent[b] = false;
@@ -278,17 +278,17 @@ void LinePropertiesPage::apply_changes()
 
 	if (d_map.selection().size() > 0)
 	{
-		for (int a = 0; a < d_map.selection().size(); a++)
+		for (unsigned int a = 0; a < d_map.selection().size(); a++)
 			items.push_back(d_map.line(d_map.selection()[a]));
 	}
 
 	// Flags
-	for (int a = 0; a < items.size(); a++)
+	for (unsigned int a = 0; a < items.size(); a++)
 	{
 		d_map.index(items[a], true);
 
 		WORD nflags = (WORD)items[a]->get_flags();
-		for (int b = 0; b < flags.size(); b++)
+		for (unsigned int b = 0; b < flags.size(); b++)
 			flags[b]->apply_flag(&nflags);
 		items[a]->set_flags(nflags);
 	}
@@ -296,7 +296,7 @@ void LinePropertiesPage::apply_changes()
 	// Action special
 	if (entry_special->GetValue().size())
 	{
-		for (int a = 0; a < items.size(); a++)
+		for (unsigned int a = 0; a < items.size(); a++)
 			items[a]->set_special(atoi(chr(entry_special->GetValue())));
 	}
 
@@ -305,7 +305,7 @@ void LinePropertiesPage::apply_changes()
 		// Sector tag
 		if (entry_tag->GetValue().size())
 		{
-			for (int a = 0; a < items.size(); a++)
+			for (unsigned int a = 0; a < items.size(); a++)
 				items[a]->set_sector_tag(atoi(chr(entry_tag->GetValue())));
 		}
 	}
@@ -314,16 +314,16 @@ void LinePropertiesPage::apply_changes()
 		// Trigger
 		if (combo_trigger->GetSelection() > 0)
 		{
-			for (int a = 0; a < items.size(); a++)
+			for (unsigned int a = 0; a < items.size(); a++)
 				items[a]->set_trigger(combo_trigger->GetSelection() - 1);
 		}
 
 		// Args
-		for (int a = 0; a < 5; a++)
+		for (unsigned int a = 0; a < 5; a++)
 		{
 			if (args_consistent[a])
 			{
-				for (int b = 0; b < items.size(); b++)
+				for (unsigned int b = 0; b < items.size(); b++)
 					items[b]->set_arg(a, args[a]);
 			}
 		}
@@ -518,7 +518,7 @@ void SidePropertiesPage::setup_widgets()
 
 	if (selection.size() > 0)
 	{
-		for (int a = 0; a < selection.size(); a++)
+		for (unsigned int a = 0; a < selection.size(); a++)
 		{
 			Side* sd;
 
@@ -581,7 +581,7 @@ void SidePropertiesPage::setup_widgets()
 	entry_sector->SetValue(wxString::Format(_T("%d"), selection[0]->sector_index(side == 1)));
 
 	// Check for inconsistency
-	for (int a = 0; a < sides.size(); a++)
+	for (unsigned int a = 0; a < sides.size(); a++)
 	{
 		d_map.index(sides[a], true);
 
@@ -632,7 +632,7 @@ void SidePropertiesPage::apply_changes()
 
 	if (selection.size() > 0)
 	{
-		for (int a = 0; a < selection.size(); a++)
+		for (unsigned int a = 0; a < selection.size(); a++)
 		{
 			Side* sd;
 
@@ -646,7 +646,7 @@ void SidePropertiesPage::apply_changes()
 		}
 	}
 
-	for (int a = 0; a < sides.size(); a++)
+	for (unsigned int a = 0; a < sides.size(); a++)
 	{
 		// Textures
 		if (entry_upper->GetValue().size())

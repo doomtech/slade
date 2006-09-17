@@ -35,27 +35,27 @@ Clipboard::~Clipboard()
 
 void Clipboard::Clear()
 {
-	for (int a = 0; a < things.size(); a++)
+	for (unsigned int a = 0; a < things.size(); a++)
 		delete things[a];
 
 	things.clear();
 
-	for (int a = 0; a < lines.size(); a++)
+	for (unsigned int a = 0; a < lines.size(); a++)
 		delete lines[a];
 
 	lines.clear();
 
-	for (int a = 0; a < sides.size(); a++)
+	for (unsigned int a = 0; a < sides.size(); a++)
 		delete sides[a];
 
 	sides.clear();
 
-	for (int a = 0; a < sectors.size(); a++)
+	for (unsigned int a = 0; a < sectors.size(); a++)
 		delete sectors[a];
 
 	sectors.clear();
 
-	for (int a = 0; a < verts.size(); a++)
+	for (unsigned int a = 0; a < verts.size(); a++)
 		delete verts[a];
 
 	verts.clear();
@@ -83,7 +83,7 @@ void Clipboard::Copy()
 		int max_x = min_x;
 		int max_y = min_y;
 
-		for (int a = 0; a < list.size(); a++)
+		for (unsigned int a = 0; a < list.size(); a++)
 		{
 			int x = list[a]->pos().x;
 			int y = list[a]->pos().y;
@@ -98,7 +98,7 @@ void Clipboard::Copy()
 		int mid_y = min_y + ((max_y - min_y) / 2);
 
 		// Add things
-		for (int a = 0; a < list.size(); a++)
+		for (unsigned int a = 0; a < list.size(); a++)
 		{
 			Thing *t = new Thing();
 			t->copy(list[a]);
@@ -123,7 +123,7 @@ void Clipboard::Copy()
 
 			if (selection.size() > 0)
 			{
-				for (int a = 0; a < d_map.n_lines(); a++)
+				for (unsigned int a = 0; a < d_map.n_lines(); a++)
 				{
 					if (vector_exists(selection, d_map.line(a)->side1()->get_sector()))
 					{
@@ -286,7 +286,7 @@ void Clipboard::Paste()
 		//make_backup(false, false, false, false, true);
 		d_map.change_level(MC_THINGS);
 
-		for (int a = 0; a < things.size(); a++)
+		for (unsigned int a = 0; a < things.size(); a++)
 		{
 			Thing* t = new Thing();
 			t->copy(things[a]);
@@ -385,7 +385,7 @@ void Clipboard::DrawPaste()
 	{
 		Thing* t = new Thing();
 
-		for (int a = 0; a < things.size(); a++)
+		for (unsigned int a = 0; a < things.size(); a++)
 		{
 			t->copy(things[a]);
 			t->set_pos(snap_to_grid(mouse_pos(true).x) + t->pos().x,

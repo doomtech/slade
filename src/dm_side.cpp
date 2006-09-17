@@ -142,13 +142,13 @@ doomside_t Side::to_doomformat()
 		ret.tex_upper[a] = 0;
 	}
 
-	for (int a = 0; a < tex_lower.size(); a++)
+	for (unsigned int a = 0; a < tex_lower.size(); a++)
 		ret.tex_lower[a] = tex_lower[a];
 
-	for (int a = 0; a < tex_middle.size(); a++)
+	for (unsigned int a = 0; a < tex_middle.size(); a++)
 		ret.tex_middle[a] = tex_middle[a];
 
-	for (int a = 0; a < tex_upper.size(); a++)
+	for (unsigned int a = 0; a < tex_upper.size(); a++)
 		ret.tex_upper[a] = tex_upper[a];
 
 	return ret;

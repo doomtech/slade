@@ -256,8 +256,8 @@ void Render3dCanvas::mouse_event(wxMouseEvent &event)
 			return;
 		}
 
-		int center_x = GetClientSize().x * 0.5;
-		int center_y = GetClientSize().y * 0.5;
+		int center_x = GetClientSize().x / 2;
+		int center_y = GetClientSize().y / 2;
 		float angle_x = -(event.GetX() - center_x) * (0.001f * mouse_speed_3d);
 		float angle_y = -(event.GetY() - center_y) * (0.001f * mouse_speed_3d);
 
@@ -369,5 +369,5 @@ void reset_3d_mouse()
 		return;
 
 	reset = true;
-	frame_3d->WarpPointer(frame_3d->GetClientSize().x * 0.5, frame_3d->GetClientSize().y * 0.5);
+	frame_3d->WarpPointer(frame_3d->GetClientSize().x / 2, frame_3d->GetClientSize().y / 2);
 }

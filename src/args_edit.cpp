@@ -25,7 +25,7 @@ ArgValueDialog::ArgValueDialog(BYTE value, argtype_t *arg_type)
 
 		wxArrayString values;
 		int index = 0;
-		for (int a = 0; a < arg_type->values.size(); a++)
+		for (unsigned int a = 0; a < arg_type->values.size(); a++)
 		{
 			if (!arg_type->values[a].flag)
 			{
@@ -48,7 +48,7 @@ ArgValueDialog::ArgValueDialog(BYTE value, argtype_t *arg_type)
 		wxStaticBoxSizer *box = new wxStaticBoxSizer(frame, wxVERTICAL);
 		vbox->Add(box, 0, wxEXPAND|wxALL, 4);
 
-		for (int a = 0; a < arg_type->values.size(); a++)
+		for (unsigned int a = 0; a < arg_type->values.size(); a++)
 		{
 			if (arg_type->values[a].flag)
 			{
@@ -82,7 +82,7 @@ BYTE ArgValueDialog::get_value()
 	if (combo_value)
 		val = values[combo_value->GetSelection()];
 
-	for (int a = 0; a < cbox_flags.size(); a++)
+	for (unsigned int a = 0; a < cbox_flags.size(); a++)
 	{
 		if (cbox_flags[a]->GetValue())
 			val |= flags[a];

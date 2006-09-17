@@ -85,23 +85,23 @@ void DoomMap::create(string name)
 
 void DoomMap::close()
 {
-	for (int a = 0; a < vertices.size(); a++)
+	for (unsigned int a = 0; a < vertices.size(); a++)
 		delete vertices[a];
 	vertices.clear();
 
-	for (int a = 0; a < lines.size(); a++)
+	for (unsigned int a = 0; a < lines.size(); a++)
 		delete lines[a];
 	lines.clear();
 
-	for (int a = 0; a < sides.size(); a++)
+	for (unsigned int a = 0; a < sides.size(); a++)
 		delete sides[a];
 	sides.clear();
 
-	for (int a = 0; a < sectors.size(); a++)
+	for (unsigned int a = 0; a < sectors.size(); a++)
 		delete sectors[a];
 	sectors.clear();
 
-	for (int a = 0; a < things.size(); a++)
+	for (unsigned int a = 0; a < things.size(); a++)
 		delete things[a];
 	things.clear();
 
@@ -181,27 +181,27 @@ Thing* DoomMap::thing(int index)
 		return things[index];
 }
 
-int	DoomMap::n_verts()
+unsigned int DoomMap::n_verts()
 {
 	return vertices.size();
 }
 
-int	DoomMap::n_lines()
+unsigned int DoomMap::n_lines()
 {
 	return lines.size();
 }
 
-int	DoomMap::n_sides()
+unsigned int DoomMap::n_sides()
 {
 	return sides.size();
 }
 
-int	DoomMap::n_sectors()
+unsigned int DoomMap::n_sectors()
 {
 	return sectors.size();
 }
 
-int	DoomMap::n_things()
+unsigned int DoomMap::n_things()
 {
 	return things.size();
 }
@@ -258,20 +258,20 @@ void DoomMap::delete_selection(int type)
 			remove_unused_vertices();
 		}
 
-		if (type == 1)
+		else if (type == 1)
 		{
 			delete_line(hilight_item);
 			update_indices(MTYPE_LINE|MTYPE_SIDE|MTYPE_VERTEX);
 			remove_unused_vertices();
 		}
 
-		if (type == 2)
+		else if (type == 2)
 		{
 			delete_sector(hilight_item);
 			update_indices(MTYPE_SECTOR);
 		}
 
-		if (type == 3)
+		else if (type == 3)
 		{
 			delete_thing(hilight_item);
 			update_indices(MTYPE_THING);
@@ -285,51 +285,51 @@ void DoomMap::delete_selection(int type)
 		{
 			vector<Vertex*> delete_verts;
 
-			for (int a = 0; a < selected_items.size(); a++)
+			for (unsigned int a = 0; a < selected_items.size(); a++)
 				delete_verts.push_back(vertex(selected_items[a]));
 			
-			for (int a = 0; a < delete_verts.size(); a++)
+			for (unsigned int a = 0; a < delete_verts.size(); a++)
 				delete_vertex(delete_verts[a]);
 
 			update_indices(MTYPE_LINE|MTYPE_SIDE|MTYPE_VERTEX);
 			remove_unused_vertices();
 		}
 
-		if (type == 1)
+		else if (type == 1)
 		{
 			vector<Line*> delete_lines;
 
-			for (int a = 0; a < selected_items.size(); a++)
+			for (unsigned int a = 0; a < selected_items.size(); a++)
 				delete_lines.push_back(line(selected_items[a]));
 			
-			for (int a = 0; a < delete_lines.size(); a++)
+			for (unsigned int a = 0; a < delete_lines.size(); a++)
 				delete_line(delete_lines[a]);
 
 			update_indices(MTYPE_LINE|MTYPE_VERTEX|MTYPE_SIDE);
 			remove_unused_vertices();
 		}
 
-		if (type == 2)
+		else if (type == 2)
 		{
 			vector<Sector*> delete_sectors;
 
-			for (int a = 0; a < selected_items.size(); a++)
+			for (unsigned int a = 0; a < selected_items.size(); a++)
 				delete_sectors.push_back(sector(selected_items[a]));
 			
-			for (int a = 0; a < delete_sectors.size(); a++)
+			for (unsigned int a = 0; a < delete_sectors.size(); a++)
 				delete_sector(delete_sectors[a]);
 
 			update_indices(MTYPE_SECTOR);
 		}
 
-		if (type == 3)
+		else if (type == 3)
 		{
 			vector<Thing*> delete_things;
 
-			for (int a = 0; a < selected_items.size(); a++)
+			for (unsigned int a = 0; a < selected_items.size(); a++)
 				delete_things.push_back(thing(selected_items[a]));
 			
-			for (int a = 0; a < delete_things.size(); a++)
+			for (unsigned int a = 0; a < delete_things.size(); a++)
 				delete_thing(delete_things[a]);
 
 			update_indices(MTYPE_THING);
@@ -354,7 +354,7 @@ void DoomMap::delete_vertex(int index)
 	// Delete any attached lines before deleting the vertex
 	if (vertex(index)->refs() > 0)
 	{
-		for (int a = 0; a < lines.size(); a++)
+		for (unsigned int a = 0; a < lines.size(); a++)
 		{
 			if (lines[a]->has_vertex(vert))
 			{
@@ -413,7 +413,7 @@ void DoomMap::delete_side(int index)
 
 	Side* s = side(index);
 
-	for (int a = 0; a < n_lines(); a++)
+	for (unsigned int a = 0; a < n_lines(); a++)
 	{
 		if (line(a)->side1() == s)
 			line(a)->remove_side1();
@@ -442,7 +442,7 @@ void DoomMap::delete_sector(int index, bool check)
 
 	if (check)
 	{
-		for (int a = 0; a < n_sides(); a++)
+		for (unsigned int a = 0; a < n_sides(); a++)
 		{
 			if (sides[a]->get_sector() == s)
 			{
@@ -485,7 +485,7 @@ int	DoomMap::index(Vertex* i, bool force_search)
 	if (i == def_vertex)
 		return -1;
 
-	for (int a = 0; a < vertices.size(); a++)
+	for (unsigned int a = 0; a < vertices.size(); a++)
 	{
 		if (vertices[a] == i)
 		{
@@ -508,7 +508,7 @@ int	DoomMap::index(Line* i, bool force_search)
 	if (i == def_line)
 		return -1;
 
-	for (int a = 0; a < lines.size(); a++)
+	for (unsigned int a = 0; a < lines.size(); a++)
 	{
 		if (lines[a] == i)
 		{
@@ -531,7 +531,7 @@ int	DoomMap::index(Side* i, bool force_search)
 	if (i == def_side)
 		return -1;
 
-	for (int a = 0; a < sides.size(); a++)
+	for (unsigned int a = 0; a < sides.size(); a++)
 	{
 		if (sides[a] == i)
 		{
@@ -554,7 +554,7 @@ int	DoomMap::index(Sector* i, bool force_search)
 	if (i == def_sector)
 		return -1;
 
-	for (int a = 0; a < sectors.size(); a++)
+	for (unsigned int a = 0; a < sectors.size(); a++)
 	{
 		if (sectors[a] == i)
 		{
@@ -577,7 +577,7 @@ int	DoomMap::index(Thing* i, bool force_search)
 	if (i == def_thing)
 		return -1;
 
-	for (int a = 0; a < things.size(); a++)
+	for (unsigned int a = 0; a < things.size(); a++)
 	{
 		if (things[a] == i)
 		{
@@ -690,7 +690,7 @@ bool DoomMap::open(Wad* wad, string mapname)
 	}
 
 	// Check for BEHAVIOR lump
-	long index = offset;
+	unsigned long index = offset;
 	bool done = false;
 
 	while (!done)
@@ -950,13 +950,13 @@ void DoomMap::draw(rect_t vis_area, BYTE type)
 
 		if (state())
 		{
-			for (int a = 0; a < selected_items.size(); a++)
+			for (unsigned int a = 0; a < selected_items.size(); a++)
 				vertex(selected_items[a])->draw(MISTYLE_SELECTED);
 		}
 
 		if (state(STATE_MOVING))
 		{
-			for (int a = 0; a < moving_items.size(); a++)
+			for (unsigned int a = 0; a < moving_items.size(); a++)
 				vertex(moving_items[a])->draw(MISTYLE_MOVING);
 		}
 
@@ -973,10 +973,10 @@ void DoomMap::draw(rect_t vis_area, BYTE type)
 
 		if (state())
 		{
-			for (int a = 0; a < selected_items.size(); a++)
+			for (unsigned int a = 0; a < selected_items.size(); a++)
 				line(selected_items[a])->draw(true, MISTYLE_SELECTED);
 
-			for (int a = 0; a < tagged_items.size(); a++)
+			for (unsigned int a = 0; a < tagged_items.size(); a++)
 				line(tagged_items[a])->draw(false, MISTYLE_TAGGED);
 
 			if (hilight_item != -1)
@@ -988,7 +988,7 @@ void DoomMap::draw(rect_t vis_area, BYTE type)
 			if (hilight_item != -1 && selected_items.size() == 0)
 				hilight_line()->draw(true, MISTYLE_MOVING);
 
-			for (int a = 0; a < selected_items.size(); a++)
+			for (unsigned int a = 0; a < selected_items.size(); a++)
 				line(selected_items[a])->draw(true, MISTYLE_MOVING);
 		}
 	}
@@ -998,12 +998,12 @@ void DoomMap::draw(rect_t vis_area, BYTE type)
 	{
 		draw_lines(vis_area, false);
 
-		for (int a = 0; a < n_lines(); a++)
+		for (unsigned int a = 0; a < n_lines(); a++)
 		{
 			int s1 = line(a)->sector_index(true);
 			int s2 = line(a)->sector_index(false);
 
-			for (int b = 0; b < selected_items.size(); b++)
+			for (unsigned int b = 0; b < selected_items.size(); b++)
 			{
 				if (selected_items[b] == s1 || selected_items[b] == s2)
 				{
@@ -1027,7 +1027,7 @@ void DoomMap::draw(rect_t vis_area, BYTE type)
 
 		if (state())
 		{
-			for (int b = 0; b < tagged_items.size(); b++)
+			for (unsigned int b = 0; b < tagged_items.size(); b++)
 				line(tagged_items[b])->draw(true, MISTYLE_TAGGED);
 		}
 	}
@@ -1037,18 +1037,18 @@ void DoomMap::draw(rect_t vis_area, BYTE type)
 	{
 		draw_lines(vis_area, false);
 
-		for (int a = 0; a < n_things(); a++)
+		for (unsigned int a = 0; a < n_things(); a++)
 			things[a]->draw(vis_area, MISTYLE_NORMAL);
 
 		if (state())
 		{
-			for (int a = 0; a < selected_items.size(); a++)
+			for (unsigned int a = 0; a < selected_items.size(); a++)
 				thing(selected_items[a])->draw(vis_area, MISTYLE_SELECTED);
 		}
 
 		if (state(STATE_MOVING))
 		{
-			for (int a = 0; a < moving_items.size(); a++)
+			for (unsigned int a = 0; a < moving_items.size(); a++)
 				thing(moving_items[a])->draw(vis_area, MISTYLE_MOVING);
 		}
 
@@ -1059,7 +1059,7 @@ void DoomMap::draw(rect_t vis_area, BYTE type)
 
 void DoomMap::draw_lines(rect_t vis_area, bool side)
 {
-	for (int a = 0; a < lines.size(); a++)
+	for (unsigned int a = 0; a < lines.size(); a++)
 	{
 		bool visible = false;
 		point2_t v1(lines[a]->x1(), lines[a]->y1());
@@ -1164,7 +1164,7 @@ int DoomMap::get_hilight_line(point2_t mouse, int m_d)
 	double min_dist = m_d;
 	int line = -1;
 
-	for (int a = 0; a < lines.size(); a++)
+	for (unsigned int a = 0; a < lines.size(); a++)
 	{
 		rect_t r = lines[a]->get_rect();
 
@@ -1183,7 +1183,7 @@ int DoomMap::get_hilight_line(point2_t mouse, int m_d)
 
 void DoomMap::select_lines_box(rect_t box)
 {
-	for (int a = 0; a < lines.size(); a++)
+	for (unsigned int a = 0; a < lines.size(); a++)
 	{
 		if (point_in_rect(box.left(), box.top(), box.right(), box.bottom(), lines[a]->x1(), lines[a]->y1())
 			&& point_in_rect(box.left(), box.top(), box.right(), box.bottom(), lines[a]->x2(), lines[a]->y2()))
@@ -1196,7 +1196,7 @@ int DoomMap::get_hilight_vertex(point2_t mouse)
 	double min_dist = 32 / editor_window->map()->get_zoom();
 	int vert = -1;
 
-	for (int v = 0; v < vertices.size(); v++)
+	for (unsigned int v = 0; v < vertices.size(); v++)
 	{
 		double dist = distance(vertex(v)->x_pos(), vertex(v)->y_pos(), mouse.x, mouse.y);
 
@@ -1213,7 +1213,7 @@ int DoomMap::get_hilight_vertex(point2_t mouse)
 
 void DoomMap::select_vertices_box(rect_t box)
 {
-	for (int a = 0; a < vertices.size(); a++)
+	for (unsigned int a = 0; a < vertices.size(); a++)
 	{
 		if (point_in_rect(box.left(), box.top(), box.right(), box.bottom(), vertices[a]->x_pos(), vertices[a]->y_pos()))
 			vector_add_nodup(selected_items, a);
@@ -1245,7 +1245,7 @@ int	DoomMap::get_hilight_sector(point2_t mouse)
 
 void DoomMap::select_sectors_box(rect_t box)
 {
-	for (int a = 0; a < lines.size(); a++)
+	for (unsigned int a = 0; a < lines.size(); a++)
 	{
 		if (point_in_rect(box.left(), box.top(), box.right(), box.bottom(), lines[a]->x1(), lines[a]->y1())
 			&& point_in_rect(box.left(), box.top(), box.right(), box.bottom(), lines[a]->x2(), lines[a]->y2()))
@@ -1281,7 +1281,7 @@ int	DoomMap::get_hilight_thing(point2_t mouse)
 
 void DoomMap::select_things_box(rect_t box)
 {
-	for (int a = 0; a < n_things(); a++)
+	for (unsigned int a = 0; a < n_things(); a++)
 	{
 		if (point_in_rect(box.left(), box.top(), box.right(), box.bottom(), things[a]->pos().x, things[a]->pos().y))
 			selected_items.push_back(a);
@@ -1292,7 +1292,7 @@ int DoomMap::remove_unused_vertices()
 {
 	int deleted = 0;
 
-	for (int a = 0; a < vertices.size(); a++)
+	for (unsigned int a = 0; a < vertices.size(); a++)
 	{
 		if (vertices[a]->refs() == 0)
 		{
@@ -1312,7 +1312,7 @@ rect_t DoomMap::bounds()
 	int max_y = -999999;
 	int min_y = 999999;
 
-	for (int v = 0; v < n_verts(); v++)
+	for (unsigned int v = 0; v < n_verts(); v++)
 	{
 		if (vertices[v]->x_pos() < min_x)
 			min_x = vertices[v]->x_pos();
@@ -1333,7 +1333,7 @@ rect_t DoomMap::bounds()
 point2_t DoomMap::middle()
 {
 	rect_t rect = bounds();
-	return point2_t(rect.left() + (float(rect.width()) / 2.0f), rect.top() + (float(rect.height()) / 2.0f));
+	return point2_t(rect.left() + rect.width() / 2, rect.top() + rect.height() / 2);
 }
 
 Vertex* DoomMap::hilight_vertex()
@@ -1478,7 +1478,7 @@ bool DoomMap::add_to_wad(Wad *wad)
 
 	if (mapindex != -1)
 	{
-		long index = mapindex + 1;
+		unsigned long index = mapindex + 1;
 		bool done = false;
 
 		while (!done)
@@ -1613,31 +1613,31 @@ void DoomMap::update_indices(BYTE types)
 {
 	if (types & MTYPE_VERTEX)
 	{
-		for (int a = 0; a < n_verts(); a++)
+		for (unsigned int a = 0; a < n_verts(); a++)
 			vertices[a]->set_index(a);
 	}
 
 	if (types & MTYPE_LINE)
 	{
-		for (int a = 0; a < n_lines(); a++)
+		for (unsigned int a = 0; a < n_lines(); a++)
 			lines[a]->set_index(a);
 	}
 
 	if (types & MTYPE_SIDE)
 	{
-		for (int a = 0; a < n_sides(); a++)
+		for (unsigned int a = 0; a < n_sides(); a++)
 			sides[a]->set_index(a);
 	}
 
 	if (types & MTYPE_SECTOR)
 	{
-		for (int a = 0; a < n_sectors(); a++)
+		for (unsigned int a = 0; a < n_sectors(); a++)
 			sectors[a]->set_index(a);
 	}
 
 	if (types & MTYPE_THING)
 	{
-		for (int a = 0; a < n_things(); a++)
+		for (unsigned int a = 0; a < n_things(); a++)
 			things[a]->set_index(a);
 	}
 }
@@ -1659,7 +1659,7 @@ void DoomMap::move_items(point2_t mouse)
 				moving_items.push_back(hilight_item);
 			else if (selected_items.size() > 0)
 			{
-				for (int a = 0; a < selected_items.size(); a++)
+				for (unsigned int a = 0; a < selected_items.size(); a++)
 					moving_items.push_back(selected_items[a]);
 			}
 		}
@@ -1674,7 +1674,7 @@ void DoomMap::move_items(point2_t mouse)
 			}
 			else if (selected_items.size() > 0)
 			{
-				for (int a = 0; a < selected_items.size(); a++)
+				for (unsigned int a = 0; a < selected_items.size(); a++)
 				{
 					int v1 = index(line(selected_items[a])->vertex1());
 					int v2 = index(line(selected_items[a])->vertex2());
@@ -1687,7 +1687,7 @@ void DoomMap::move_items(point2_t mouse)
 		// Sectors
 		if (edit_mode == 2)
 		{
-			for (int a = 0; a < n_lines(); a++)
+			for (unsigned int a = 0; a < n_lines(); a++)
 			{
 				bool add = false;
 
@@ -1724,7 +1724,7 @@ void DoomMap::move_items(point2_t mouse)
 			vertex(moving_items[0])->set_pos(pos.x, pos.y);
 		else
 		{
-			for (int a = 0; a < moving_items.size(); a++)
+			for (unsigned int a = 0; a < moving_items.size(); a++)
 				vertex(moving_items[a])->move(pos.x - origin.x, pos.y - origin.y);
 		}
 	}
@@ -1736,7 +1736,7 @@ void DoomMap::move_items(point2_t mouse)
 			thing(moving_items[0])->set_pos(pos.x, pos.y);
 		else
 		{
-			for (int a = 0; a < moving_items.size(); a++)
+			for (unsigned int a = 0; a < moving_items.size(); a++)
 				thing(moving_items[a])->move(pos.x - origin.x, pos.y - origin.y);
 		}
 	}
@@ -1750,14 +1750,14 @@ void DoomMap::clear_move_items()
 	{
 		// Get moving vertices
 		vector<Vertex*> m_verts;
-		for (int a = 0; a < moving_items.size(); a++)
+		for (unsigned int a = 0; a < moving_items.size(); a++)
 			m_verts.push_back(vertex(moving_items[a]));
 
 		// Get relevant lines
 		vector<Line*> m_lines;
-		for (int l = 0; l < n_lines(); l++)
+		for (unsigned int l = 0; l < n_lines(); l++)
 		{
-			for (int a = 0; a < m_verts.size(); a++)
+			for (unsigned int a = 0; a < m_verts.size(); a++)
 			{
 				if (d_map.line(l)->has_vertex(m_verts[a]))
 				{
@@ -1769,7 +1769,7 @@ void DoomMap::clear_move_items()
 
 		if (edit_auto_merge)
 		{
-			for (int a = 0; a < m_verts.size(); a++)
+			for (unsigned int a = 0; a < m_verts.size(); a++)
 				merge_under_vertex(m_verts[a]);
 
 			remove_zerolength_lines();
@@ -1778,7 +1778,7 @@ void DoomMap::clear_move_items()
 		if (edit_auto_split)
 		{
 			// Split lines under vertices
-			for (int a = 0; a < m_verts.size(); a++)
+			for (unsigned int a = 0; a < m_verts.size(); a++)
 				check_split(m_verts[a]);
 		}
 
@@ -1801,7 +1801,7 @@ void DoomMap::get_lines_to_vert(int vert, vector<int> &list, bool allowdup)
 		return;
 
 	int c = 0;
-	for (int a = 0; a < n_lines(); a++)
+	for (unsigned int a = 0; a < n_lines(); a++)
 	{
 		if (!allowdup)
 		{
@@ -1822,10 +1822,10 @@ void DoomMap::get_lines_to_vert(int vert, vector<int> &list, bool allowdup)
 
 void DoomMap::update_vertex_refs()
 {
-	for (int a = 0; a < n_verts(); a++)
+	for (unsigned int a = 0; a < n_verts(); a++)
 		vertices[a]->set_refs(0);
 
-	for (int a = 0; a < n_lines(); a++)
+	for (unsigned int a = 0; a < n_lines(); a++)
 	{
 		lines[a]->vertex1()->add_ref();
 		lines[a]->vertex2()->add_ref();
@@ -1843,13 +1843,13 @@ int	DoomMap::remove_unused_sectors()
 		done = true;
 		used_sectors.clear();
 
-		for (int s = 0; s < n_sides(); s++)
+		for (unsigned int s = 0; s < n_sides(); s++)
 		{
 			if (!(vector_exists(used_sectors, side(s)->get_sector())))
 				used_sectors.push_back(side(s)->get_sector());
 		}
 
-		for (int s = 0; s < n_sectors(); s++)
+		for (unsigned int s = 0; s < n_sectors(); s++)
 		{
 			if (!(vector_exists(used_sectors, sector(s))))
 			{
@@ -1867,7 +1867,7 @@ int	DoomMap::remove_unused_sectors()
 int	DoomMap::remove_zerolength_lines()
 {
 	int ret = 0;
-	for (int a = 0; a < n_lines(); a++)
+	for (unsigned int a = 0; a < n_lines(); a++)
 	{
 		if (line(a)->vertex1() == line(a)->vertex2())
 		{
@@ -1882,7 +1882,7 @@ int	DoomMap::remove_zerolength_lines()
 
 int DoomMap::check_vertex_spot(point2_t pos)
 {
-	for (int a = 0; a < n_verts(); a++)
+	for (unsigned int a = 0; a < n_verts(); a++)
 	{
 		if (vertices[a]->pos().x == pos.x && vertices[a]->pos().y == pos.y)
 			return a;
@@ -1893,9 +1893,9 @@ int DoomMap::check_vertex_spot(point2_t pos)
 
 void DoomMap::remove_overlapping_lines(vector<Line*> &list, bool merge)
 {
-	for (int a = 0; a < list.size(); a++)
+	for (unsigned int a = 0; a < list.size(); a++)
 	{
-		for (int l = 0; l < n_lines(); l++)
+		for (unsigned int l = 0; l < n_lines(); l++)
 		{
 			if (vector_exists(list, line(l)))
 				continue;
@@ -1930,7 +1930,7 @@ void DoomMap::check_split(Vertex* vert)
 	if (!valid(vert))
 		return;
 
-	for (int a = 0; a < n_lines(); a++)
+	for (unsigned int a = 0; a < n_lines(); a++)
 	{
 		if (line(a)->has_vertex(vert))
 			continue;
@@ -1947,7 +1947,7 @@ void DoomMap::check_split(Vertex* vert, vector<Line*> &list)
 	if (!valid(vert))
 		return;
 
-	for (int a = 0; a < list.size(); a++)
+	for (unsigned int a = 0; a < list.size(); a++)
 	{
 		if (list[a]->has_vertex(vert))
 			continue;
@@ -1964,7 +1964,7 @@ void DoomMap::check_split(Vertex* vert, vector<Line*> &list)
 
 void DoomMap::merge_vertices(Vertex* v1, Vertex* v2)
 {
-	for (int a = 0; a < n_lines(); a++)
+	for (unsigned int a = 0; a < n_lines(); a++)
 	{
 		if (line(a)->vertex1() == v2)
 			line(a)->set_vertex1(v1);
@@ -1984,7 +1984,7 @@ void DoomMap::merge_under_vertex(Vertex* v)
 	if (!valid(v))
 		return;
 
-	for (int a = 0; a < n_verts(); a++)
+	for (unsigned int a = 0; a < n_verts(); a++)
 	{
 		if (vertices[a] == v)
 			continue;
@@ -2020,7 +2020,7 @@ void DoomMap::get_selection(vector<Vertex*> &list, bool hilight)
 		return;
 	}
 
-	for (int a = 0; a < selected_items.size(); a++)
+	for (unsigned int a = 0; a < selected_items.size(); a++)
 	{
 		if (valid(vertex(selected_items[a])))
 			list.push_back(vertex(selected_items[a]));
@@ -2035,7 +2035,7 @@ void DoomMap::get_selection(vector<Line*> &list, bool hilight)
 		return;
 	}
 
-	for (int a = 0; a < selected_items.size(); a++)
+	for (unsigned int a = 0; a < selected_items.size(); a++)
 	{
 		if (valid(line(selected_items[a])))
 			list.push_back(line(selected_items[a]));
@@ -2050,7 +2050,7 @@ void DoomMap::get_selection(vector<Sector*> &list, bool hilight)
 		return;
 	}
 
-	for (int a = 0; a < selected_items.size(); a++)
+	for (unsigned int a = 0; a < selected_items.size(); a++)
 	{
 		if (valid(sector(selected_items[a])))
 			list.push_back(sector(selected_items[a]));
@@ -2065,7 +2065,7 @@ void DoomMap::get_selection(vector<Thing*> &list, bool hilight)
 		return;
 	}
 
-	for (int a = 0; a < selected_items.size(); a++)
+	for (unsigned int a = 0; a < selected_items.size(); a++)
 	{
 		if (valid(thing(selected_items[a])))
 			list.push_back(thing(selected_items[a]));

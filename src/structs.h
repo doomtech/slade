@@ -205,7 +205,7 @@ struct rect_t
 			br.set(x + width, y + height);
 		}
 
-		if (align == 1) // Centered
+		else if (align == 1) // Centered
 		{
 			tl.set(x - (width / 2), y - (height / 2));
 			br.set(x + (width / 2), y + (height / 2));

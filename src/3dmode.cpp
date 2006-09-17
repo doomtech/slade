@@ -41,7 +41,7 @@ void init_3d_mode()
 	if (ssect_sectors) delete ssect_sectors;
 	ssect_sectors = new int[gl_ssects.size()];
 
-	for (int a = 0; a < gl_ssects.size(); a++)
+	for (unsigned int a = 0; a < gl_ssects.size(); a++)
 	{
 		ssect_sectors[a] = -1;
 

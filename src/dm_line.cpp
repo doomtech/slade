@@ -308,8 +308,8 @@ rgba_t Line::get_colour()
 
 	if (type != 0)
 	{
-		rgba_t spec2s(col_line_special.r * 0.8, col_line_special.g * 0.8,
-					col_line_special.b * 0.8, col_line_special.a, col_line_special.blend);
+		rgba_t spec2s(col_line_special.r * 4 / 5, col_line_special.g * 4 / 5,
+					col_line_special.b * 4 / 5, col_line_special.a, col_line_special.blend);
 
 		if (flags & LINE_TWOSIDED)
 			ret.set(spec2s);

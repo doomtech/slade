@@ -161,7 +161,7 @@ void create_line(bool close)
 
 	vector<int> n_lines;
 
-	for (int a = 0; a < selection.size() - 1; a++)
+	for (unsigned int a = 0; a < selection.size() - 1; a++)
 	{
 		Line* l = new Line(d_map.vertex(selection[a]), d_map.vertex(selection[a+1]), &d_map);
 		n_lines.push_back(d_map.index(l));
@@ -176,7 +176,7 @@ void create_line(bool close)
 	change_edit_mode(1);
 	d_map.clear_selection();
 
-	for (int a = 0; a < n_lines.size(); a++)
+	for (unsigned int a = 0; a < n_lines.size(); a++)
 		d_map.select_item(n_lines[a]);
 }
 
@@ -189,7 +189,7 @@ void create_sector()
 
 	Sector *ns = new Sector(&d_map);
 
-	for (int a = 0; a < selection.size(); a++)
+	for (unsigned int a = 0; a < selection.size(); a++)
 	{
 		if (d_map.valid(d_map.line(selection[a])->side1()))
 		{
@@ -204,7 +204,7 @@ void create_sector()
 		}
 	}
 
-	for (int a = 0; a < selection.size(); a++)
+	for (unsigned int a = 0; a < selection.size(); a++)
 	{
 		Side *s1 = d_map.line(selection[a])->side1();
 		Side *s2 = d_map.line(selection[a])->side2();

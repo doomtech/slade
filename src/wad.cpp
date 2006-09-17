@@ -202,7 +202,7 @@ string Lump::getFullDir()
 		return _T("");
 
 	string ret;
-	for (int a = 0; a < directory.size(); a++)
+	for (unsigned int a = 0; a < directory.size(); a++)
 	{
 		ret += directory[a];
 		ret += _T("/");
@@ -237,7 +237,7 @@ void Wad::findMaps()
 	// Find all maps
 	if (zip)
 	{
-		for (int a = 0; a < numLumps(); a++)
+		for (unsigned int a = 0; a < numLumps(); a++)
 		{
 			if (lumpAt(a)->dirLevel() == 1 && lumpAt(a)->getDir(0).CmpNoCase(_T("maps")) == 0)
 			{
@@ -366,25 +366,25 @@ bool Wad::open(string filename, bool load_data)
 		if (nlump->getName() == _T("P_START") || nlump->getName() == _T("PP_START"))
 			patches[START] = d;
 
-		if (nlump->getName() == _T("P_END") || nlump->getName() == _T("PP_END"))
+		else if (nlump->getName() == _T("P_END") || nlump->getName() == _T("PP_END"))
 			patches[END] = d;
 
-		if (nlump->getName() == _T("F_START") || nlump->getName() == _T("FF_START"))
+		else if (nlump->getName() == _T("F_START") || nlump->getName() == _T("FF_START"))
 			flats[START] = d;
 
-		if (nlump->getName() == _T("F_END") || nlump->getName() == _T("FF_END"))
+		else if (nlump->getName() == _T("F_END") || nlump->getName() == _T("FF_END"))
 			flats[END] = d;
 
-		if (nlump->getName() == _T("S_START") || nlump->getName() == _T("SS_START"))
+		else if (nlump->getName() == _T("S_START") || nlump->getName() == _T("SS_START"))
 			sprites[START] = d;
 
-		if (nlump->getName() == _T("S_END") || nlump->getName() == _T("SS_END"))
+		else if (nlump->getName() == _T("S_END") || nlump->getName() == _T("SS_END"))
 			sprites[END] = d;
 
-		if (nlump->getName() == _T("TX_START"))
+		else if (nlump->getName() == _T("TX_START"))
 			tx[START] = d;
 
-		if (nlump->getName() == _T("TX_END"))
+		else if (nlump->getName() == _T("TX_END"))
 			tx[END] = d;
 
 		directory.push_back(nlump);
@@ -443,14 +443,14 @@ bool Wad::openZip(string filename, bool load_data)
 
 			// Get directory info
 			wxArrayString dirs = fn.GetDirs();
-			for (int a = 0; a < dirs.size(); a++)
+			for (unsigned int a = 0; a < dirs.size(); a++)
 				nlump->addDir(dirs[a]);
 
 			if (dirs.size() > 0)
 			{
 				string dir = dirs[0] + _T("/");
 				vector_add_nodup(alldirs, dir);
-				for (int a = 1; a < dirs.size(); a++)
+				for (unsigned int a = 1; a < dirs.size(); a++)
 				{
 					dir += dirs[a] + _T("/");
 					vector_add_nodup(alldirs, dir);
@@ -466,7 +466,7 @@ bool Wad::openZip(string filename, bool load_data)
 		entry = zip.GetNextEntry();
 	}
 
-	for (int a = 0; a < alldirs.size(); a++)
+	for (unsigned int a = 0; a < alldirs.size(); a++)
 	{
 		wxFileName fn(alldirs[a], wxPATH_UNIX);
 		wxArrayString dirs2 = fn.GetDirs();
@@ -571,13 +571,13 @@ void Wad::deleteLump(long index, bool delfolder)
 		ldir.RemoveLast();
 		dirs.push_back(ldir);
 
-		for (int a = 0; a < numLumps(); a++)
+		for (unsigned int a = 0; a < numLumps(); a++)
 		{
 			if (lumpAt(a)->dirLevel() < dirs.size())
 				continue;
 
 			bool in = true;
-			for (int d = 0; d < dirs.size(); d++)
+			for (unsigned int d = 0; d < dirs.size(); d++)
 			{
 				if (dirs[d] != lumpAt(a)->getDir(d))
 				{
@@ -680,7 +680,7 @@ void Wad::save(bool nodes, string mapname)
 		long offset = directory[l]->getOffset();
 		long size = directory[l]->getSize();
 
-		for (int c = 0; c < directory[l]->getName().length(); c++)
+		for (unsigned int c = 0; c < directory[l]->getName().length(); c++)
 			name[c] = directory[l]->getName()[c];
 
 		offset = wxINT32_SWAP_ON_BE(offset);
@@ -773,7 +773,7 @@ void Wad::saveZip()
 
 	wxZipOutputStream zip(out, 9);
 
-	for (int a = 0; a < directory.size(); a++)
+	for (unsigned int a = 0; a < directory.size(); a++)
 	{
 		if (directory[a]->isFolder())
 			zip.PutNextDirEntry(directory[a]->getName());
@@ -798,7 +798,7 @@ void Wad::close()
 
 	available_maps.clear();
 
-	for (int a = 0; a < directory.size(); a++)
+	for (unsigned int a = 0; a < directory.size(); a++)
 		delete directory[a];
 
 	directory.clear();
@@ -817,7 +817,7 @@ Lump* Wad::lumpAt(int index)
 
 long Wad::lumpIndex(Lump* lump)
 {
-	for (int a = 0; a < directory.size(); a++)
+	for (unsigned int a = 0; a < directory.size(); a++)
 	{
 		if (directory[a] == lump)
 			return a;
@@ -851,7 +851,7 @@ void Wad::swapLumps(Lump* lump1, Lump* lump2)
 
 void Wad::renameDir(Lump* dirlump, string newname)
 {
-	for (int a = 0; a < numLumps(); a++)
+	for (unsigned int a = 0; a < numLumps(); a++)
 	{
 		Lump* lump = directory[a];
 
@@ -891,7 +891,7 @@ void Wad::addDir(string path)
 WadList::~WadList()
 {
 	delete iwad;
-	for (int a = 0; a < wads.size(); a++)
+	for (unsigned int a = 0; a < wads.size(); a++)
 		delete wads[a];
 }
 
@@ -920,7 +920,7 @@ bool WadList::open(string filename, BYTE flags)
 
 bool WadList::close(string filename)
 {
-	for (int a = 0; a < wads.size(); a++)
+	for (unsigned int a = 0; a < wads.size(); a++)
 	{
 		if (wads[a]->path == filename)
 		{
@@ -936,7 +936,7 @@ bool WadList::close(string filename)
 
 void WadList::closeAll()
 {
-	for (int a = 0; a < wads.size(); a++)
+	for (unsigned int a = 0; a < wads.size(); a++)
 		delete wads[a];
 
 	wads.clear();
@@ -944,7 +944,7 @@ void WadList::closeAll()
 
 void WadList::reloadAll()
 {
-	for (int a = 0; a < wads.size(); a++)
+	for (unsigned int a = 0; a < wads.size(); a++)
 	{
 		string path = wads[a]->path;
 		wads[a]->close();

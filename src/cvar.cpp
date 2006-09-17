@@ -80,7 +80,7 @@ vector<string> get_cvar_list()
 // ------------------------------------- >>
 void save_cvars(FILE* fp)
 {
-	int max_size = 0;
+	unsigned int max_size = 0;
 	for (DWORD c = 0; c < n_cvars; c++)
 	{
 		if (cvars[c]->name.size() > max_size)

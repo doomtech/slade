@@ -69,8 +69,8 @@ bool build_gl_nodes()
 	// Open GWA file
 	Wad wad;
 	int current_lump = -1;
-	int unit_count = 0;
-	int unit_size = 0;
+	unsigned int unit_count = 0;
+	unsigned int unit_size = 0;
 
 	if (!wad.open(c_path(_T("sladetemp.wad"), DIR_TMP)))
 	{
@@ -144,7 +144,7 @@ bool build_gl_nodes()
 	// Read segs
 	fseek(fp, wad.lumpAt(current_lump)->getOffset(), SEEK_SET);
 
-	for (int a = 0; a < unit_count; a++)
+	for (unsigned int a = 0; a < unit_count; a++)
 	{
 		gl_seg_t seg;
 		fread(&seg, unit_size, 1, fp);
@@ -175,7 +175,7 @@ bool build_gl_nodes()
 	unit_count = (wad.lumpAt(current_lump)->getSize()) / unit_size;
 
 	fseek(fp, wad.lumpAt(current_lump)->getOffset(), SEEK_SET);
-	for (int a = 0; a < unit_count; a++)
+	for (unsigned int a = 0; a < unit_count; a++)
 	{
 		gl_ssect_t ssect;
 		fread(&ssect, unit_size, 1, fp);
@@ -206,7 +206,7 @@ bool build_gl_nodes()
 	unit_count = (wad.lumpAt(current_lump)->getSize()) / unit_size;
 
 	fseek(fp, wad.lumpAt(current_lump)->getOffset(), SEEK_SET);
-	for (int n = 0; n < unit_count; n++)
+	for (unsigned int n = 0; n < unit_count; n++)
 	{
 		gl_node_t node;
 		fread(&node.x, 2, 1, fp);
@@ -292,10 +292,10 @@ void block_seg(float x1, float y1, float x2, float y2)
 
 void block_behind()
 {
-	float mult = camera.view.z - camera.position.z;
+	int mult = (camera.view.z - camera.position.z) * 2250;
 	if (mult < 0) mult = -mult;
 
-	for (int a = 1000 + (mult * 2250); a < 5500 - (mult * 2250); a++)
+	for (int a = 1000 + mult; a < 5500 - mult; a++)
 		vis_buffer[a] = 1;
 }
 

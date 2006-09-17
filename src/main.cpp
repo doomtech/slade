@@ -189,7 +189,7 @@ void change_edit_mode(int mode)
 void setup_directories()
 {
 	// Temporary directory
-#ifdef UNIX
+#ifdef unix
 	tmp_path = _T("/tmp/");
 #elif defined(__APPLE__)
 	tmp_path = getTempDir();
@@ -198,7 +198,7 @@ void setup_directories()
 #endif
 
 	// User directory
-#ifdef UNIX
+#ifdef unix
 	app_path = wxString::FromAscii(SHARE_DIR);
 	usr_path = string(wxFileName::GetHomeDir()) + string(_T("/.slade/"));
 #elif defined(__APPLE__)
@@ -227,7 +227,7 @@ bool MainApp::OnInit()
 	// Init logfile
 	wxLog::SetActiveTarget(new wxLogStderr(fopen(chr(c_path(_T("slade.log"), DIR_TMP)), "wt")));
 
-#ifdef UNIX
+#ifdef unix
 	// Create User Directory if it doesn't already exist
 	if(!wxFileName::DirExists(usr_path)) {
 		if(mkdir(chr(usr_path), S_IRUSR | S_IWUSR | S_IXUSR) == -1) {
@@ -258,7 +258,7 @@ bool MainApp::OnInit()
 	// Parse command line
 	bool wads_opened = false;
 
-#ifndef UNIX
+#ifndef unix
 	// Setup app path
 	app_path = argv[0];
 

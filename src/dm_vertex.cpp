@@ -114,7 +114,7 @@ void Vertex::update_refs()
 		return;
 
 	ref_count = 0;
-	for (int a = 0; a < parent->n_lines(); a++)
+	for (unsigned int a = 0; a < parent->n_lines(); a++)
 	{
 		if (parent->line(a)->has_vertex(this))
 			ref_count++;

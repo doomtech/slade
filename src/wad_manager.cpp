@@ -66,7 +66,7 @@ void save_recent_wads(FILE *fp)
 {
 	fprintf(fp, "recent_wads\n{\n");
 
-	for (int a = 0; a < recent_wads.size(); a++)
+	for (unsigned int a = 0; a < recent_wads.size(); a++)
 		fprintf(fp, "\twad \"%s\"\n", chr(recent_wads[a]));
 
 	fprintf(fp, "}\n\n");
@@ -321,15 +321,15 @@ void MapPreviewCanvas::paint(wxPaintEvent &event)
 	if (preview_lines.size() == 0)
 		return;
 
-	for (int a = 0; a < preview_lines.size(); a++)
+	for (unsigned int a = 0; a < preview_lines.size(); a++)
 	{
 		int dim = min(GetClientSize().x, GetClientSize().y);
-		int dim2 = max(dimensions.x, dimensions.y);
+		float dim2 = max(dimensions.x, dimensions.y);
 
-		float x1_m = (float)(preview_lines[a].x1() + 256) / (float)dim2;
-		float x2_m = (float)(preview_lines[a].x2() + 256) / (float)dim2;
-		float y1_m = (float)(preview_lines[a].y1() + 256) / (float)dim2;
-		float y2_m = (float)(preview_lines[a].y2() + 256) / (float)dim2;
+		float x1_m = (float)(preview_lines[a].x1() + 256) / dim2;
+		float x2_m = (float)(preview_lines[a].x2() + 256) / dim2;
+		float y1_m = (float)(preview_lines[a].y1() + 256) / dim2;
+		float y2_m = (float)(preview_lines[a].y2() + 256) / dim2;
 
 		rect_t line(x1_m * dim, y1_m * dim, x2_m * dim, y2_m * dim);
 		draw_line(line, col_line_solid, line_aa, false);
@@ -530,7 +530,7 @@ void WadManager::populate_recent_wads_list()
 {
 	recent_wads_list->Clear();
 
-	for (int a = 0; a < recent_wads.size(); a++)
+	for (unsigned int a = 0; a < recent_wads.size(); a++)
 		recent_wads_list->Append(recent_wads[a]);
 }
 
@@ -547,7 +547,7 @@ void WadManager::populate_map_list()
 	if (index > 0)
 		wad = wads.getWad(index - 1);
 
-	for (int a = 0; a < wad->available_maps.size(); a++)
+	for (unsigned int a = 0; a < wad->available_maps.size(); a++)
 		available_maps->Append(wad->available_maps[a]);
 }
 

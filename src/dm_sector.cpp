@@ -115,16 +115,16 @@ doomsector_t Sector::to_doomformat()
 	ret.special = wxINT16_SWAP_ON_BE((short)special);
 	ret.tag = wxINT16_SWAP_ON_BE((short)tag);
 
-	for (int a = 0; a < 8; a++)
+	for (unsigned int a = 0; a < 8; a++)
 	{
 		ret.f_tex[a] = 0;
 		ret.c_tex[a] = 0;
 	}
 
-	for (int a = 0; a < f_tex.size(); a++)
+	for (unsigned int a = 0; a < f_tex.size(); a++)
 		ret.f_tex[a] = f_tex[a];
 
-	for (int a = 0; a < c_tex.size(); a++)
+	for (unsigned int a = 0; a < c_tex.size(); a++)
 		ret.c_tex[a] = c_tex[a];
 
 	return ret;

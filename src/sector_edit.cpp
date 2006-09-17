@@ -138,7 +138,7 @@ void SectorEditor::setup_widgets()
 	// Multiple items, check for inconsistency
 	if (selection.size() > 0)
 	{
-		for (int a = 0; a < selection.size(); a++)
+		for (unsigned int a = 0; a < selection.size(); a++)
 		{
 			// Floor tex
 			if (d_map.sector(selection[a])->tex_floor() != s->tex_floor())
@@ -188,11 +188,11 @@ void SectorEditor::apply_changes()
 
 	if (selection.size() > 0)
 	{
-		for (int a = 0; a < selection.size(); a++)
+		for (unsigned int a = 0; a < selection.size(); a++)
 			items.push_back(d_map.sector(selection[a]));
 	}
 
-	for (int a = 0; a < items.size(); a++)
+	for (unsigned int a = 0; a < items.size(); a++)
 	{
 		// Floor tex
 		if (entry_ftex->GetValue().size())

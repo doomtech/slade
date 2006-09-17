@@ -204,7 +204,7 @@ void ThingEditor::setup_widgets()
 		Thing *t = d_map.hilight_thing();
 
 		// Flags
-		for (int a = 0; a < flags.size(); a++)
+		for (unsigned int a = 0; a < flags.size(); a++)
 		{
 			if (t->check_flag(flags[a]->flag))
 				flags[a]->Set3StateValue(wxCHK_CHECKED);
@@ -240,7 +240,7 @@ void ThingEditor::setup_widgets()
 		Thing *othing = d_map.thing(selection[0]);
 
 		// Flags
-		for (int a = 0; a < flags.size(); a++)
+		for (unsigned int a = 0; a < flags.size(); a++)
 		{
 			if (othing->check_flag(flags[a]->flag))
 				flags[a]->Set3StateValue(wxCHK_CHECKED);
@@ -274,7 +274,7 @@ void ThingEditor::setup_widgets()
 		{
 			Thing* thing = d_map.thing(selection[a]);
 
-			for (int b = 0; b < flags.size(); b++)
+			for (unsigned int b = 0; b < flags.size(); b++)
 			{
 				if (flags[b]->Get3StateValue() == wxCHK_UNDETERMINED)
 					continue;
@@ -329,11 +329,11 @@ void ThingEditor::apply_changes()
 			items.push_back(d_map.thing(selection[a]));
 	}
 
-	for (int a = 0; a < items.size(); a++)
+	for (unsigned int a = 0; a < items.size(); a++)
 	{
 		// Flags
 		WORD nflags = (WORD)items[a]->get_flags();
-		for (int b = 0; b < flags.size(); b++)
+		for (unsigned int b = 0; b < flags.size(); b++)
 			flags[b]->apply_flag(&nflags);
 		items[a]->set_flags(nflags);
 
@@ -363,7 +363,7 @@ void ThingEditor::apply_changes()
 				items[a]->set_z(atoi(chr(z_entry->GetValue())));
 
 			// Special
-			for (int a = 0; a < items.size(); a++)
+			for (unsigned int a = 0; a < items.size(); a++)
 				items[a]->set_special(atoi(chr(special_entry->GetValue())));
 		}
 

@@ -196,24 +196,44 @@ bool Thing::draw(rect_t vis_area, BYTE style)
 		{
 			int x2, y2;
 
-			// east
-			if (angle == 0)			{ x2 = p.x + r; y2 = p.y; }
-			// northeast
-			else if (angle == 45)	{ x2 = p.x + (r*0.75); y2 = p.y + (r*0.75); }
-			// north
-			else if (angle == 90)	{ x2 = p.x; y2 = p.y + r; }
-			// northwest
-			else if (angle == 135)	{ x2 = p.x - (r*0.75); y2 = p.y + (r*0.75); }
-			// west
-			else if (angle == 180)	{ x2 = p.x - r; y2 = p.y; }
-			// southwest
-			else if (angle == 225)	{ x2 = p.x - (r*0.75); y2 = p.y - (r*0.75); }
-			// south
-			else if (angle == 270)	{ x2 = p.x; y2 = p.y - r; }
-			// southeast
-			else if (angle == 315)	{ x2 = p.x + (r*0.75); y2 = p.y - (r*0.75); }
-			// Invalid angle
-			else	{ x2 = p.x; y2 = p.y; }
+			switch(angle) {
+				case 0: // east
+					x2 = p.x + r;
+					y2 = p.y;
+					break;
+				case 45: // northeast
+					x2 = p.x + (r * 3) / 4;
+					y2 = p.y + (r * 3) / 4;
+					break;
+				case 90: // north
+					x2 = p.x;
+					y2 = p.y + r;
+					break;
+				case 135: // northwest
+					x2 = p.x - (r * 3) / 4;
+					y2 = p.y + (r * 3) / 4;
+					break;
+				case 180: // west
+					x2 = p.x - r;
+					y2 = p.y;
+					break;
+				case 225: // southwest
+					x2 = p.x - (r * 3) / 4;
+					y2 = p.y - (r * 3) / 4;
+					break;
+				case 270: // south	
+					x2 = p.x;
+					y2 = p.y - r;
+					break;
+				case 315: // southeast
+					x2 = p.x + (r * 3) / 4;
+					y2 = p.y - (r * 3) / 4;
+					break;
+				default: // Invalid angle
+					x2 = p.x;
+					y2 = p.y;
+					break;
+			}
 
 			glEnable(GL_POINT_SMOOTH);
 

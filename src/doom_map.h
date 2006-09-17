@@ -77,11 +77,11 @@ public:
 	Sector*	sector(int index);
 	Thing*	thing(int index);
 
-	int		n_verts();
-	int		n_lines();
-	int		n_sides();
-	int		n_sectors();
-	int		n_things();
+	unsigned int	n_verts();
+	unsigned int	n_lines();
+	unsigned int	n_sides();
+	unsigned int	n_sectors();
+	unsigned int	n_things();
 
 	string	map_name() { return name; }
 

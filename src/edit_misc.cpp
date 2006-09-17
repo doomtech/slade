@@ -151,7 +151,7 @@ void sector_light_gradient(int step)
 	}
 
 	int l = d_map.sector(selection[0])->light_level();
-	for (int a = 0; a < selection.size(); a++)
+	for (unsigned int a = 0; a < selection.size(); a++)
 	{
 		if (l > 255)
 			l = 255;
@@ -183,11 +183,11 @@ void sector_create_door(string texture)
 		items.push_back(d_map.hilight_sector());
 	else
 	{
-		for (int a = 0; a < selection.size(); a++)
+		for (unsigned int a = 0; a < selection.size(); a++)
 			items.push_back(d_map.sector(selection[a]));
 	}
 
-	for (int a = 0; a < items.size(); a++)
+	for (unsigned int a = 0; a < items.size(); a++)
 	{
 		Sector* s = items[a];
 
@@ -195,7 +195,7 @@ void sector_create_door(string texture)
 		s->set_ceil(s->floor());
 		
 		// Go through lines in the sector, set their texture and type accordingly
-		for (int l = 0; l < d_map.n_lines(); l++)
+		for (unsigned int l = 0; l < d_map.n_lines(); l++)
 		{
 			Line* line = d_map.line(l);
 
@@ -262,7 +262,7 @@ void sector_merge(bool remove_lines)
 
 	int sector = selection[0];
 
-	for (int l = 0; l < d_map.n_lines(); l++)
+	for (unsigned int l = 0; l < d_map.n_lines(); l++)
 	{
 		Line* line = d_map.line(l);
 		bool s1_in = vector_exists(selection, line->sector_index(true));
@@ -310,7 +310,7 @@ void sector_changeheight(bool floor, int amount)
 	}
 	else
 	{
-		for (int a = 0; a < selection.size(); a++)
+		for (unsigned int a = 0; a < selection.size(); a++)
 		{
 			Sector* s = d_map.sector(selection[a]);
 
@@ -344,12 +344,12 @@ void sector_changelight(int amount)
 		sectors.push_back(d_map.hilight_sector());
 	else
 	{
-		for (int a = 0; a < selection.size(); a++)
+		for (unsigned int a = 0; a < selection.size(); a++)
 			vector_add_nodup(sectors, d_map.sector(selection[a]));
 	}
 
 	// Change light levels
-	for (int a = 0; a < sectors.size(); a++)
+	for (unsigned int a = 0; a < sectors.size(); a++)
 	{
 		int light = sectors[a]->light_level();
 
@@ -376,49 +376,40 @@ void sector_paint_tex(int sector, string tex, bool floor, vector<int> &sectors)
 		return;
 
 	sectors.push_back(sector);
-	for (int a = 0; a < d_map.n_lines(); a++)
-	{
-		int s1 = d_map.line(a)->sector_index(true);
-		int s2 = d_map.line(a)->sector_index(false);
 
-		if (vector_exists(sectors, s1) && s2 != -1 && !(vector_exists(sectors, s2)))
+	bool cont;
+	do {
+		cont = false;
+		for (unsigned int a = 0; a < d_map.n_lines(); a++)
 		{
-			bool match = false;
+			int s1 = d_map.line(a)->sector_index(true);
+			int s2 = d_map.line(a)->sector_index(false);
 
-			if (floor && d_map.sector(s1)->floor() == d_map.sector(s2)->floor())
-				match = true;
-
-			if (!floor && d_map.sector(s1)->ceiling() == d_map.sector(s2)->ceiling())
-				match = true;
-
-			if (match)
+			if (vector_exists(sectors, s1) && s2 != -1 && !(vector_exists(sectors, s2)))
 			{
-				vector_add_nodup(sectors, s2);
-				a = -1;
-				continue;
+				if ((floor && d_map.sector(s1)->floor() == d_map.sector(s2)->floor()) ||
+				    (!floor && d_map.sector(s1)->ceiling() == d_map.sector(s2)->ceiling()))
+				{
+					vector_add_nodup(sectors, s2);
+					cont = true;
+					break;
+				}
+			}
+
+			if (vector_exists(sectors, s2) && s1 != -1 && !(vector_exists(sectors, s1)))
+			{
+				if ((floor && d_map.sector(s1)->floor() == d_map.sector(s2)->floor()) ||
+				    (!floor && d_map.sector(s1)->ceiling() == d_map.sector(s2)->ceiling()))
+				{
+					vector_add_nodup(sectors, s1);
+					cont = true;
+					break;
+				}
 			}
 		}
+	} while(cont);
 
-		if (vector_exists(sectors, s2) && s1 != -1 && !(vector_exists(sectors, s1)))
-		{
-			bool match = false;
-
-			if (floor && d_map.sector(s1)->floor() == d_map.sector(s2)->floor())
-				match = true;
-
-			if (!floor && d_map.sector(s1)->ceiling() == d_map.sector(s2)->ceiling())
-				match = true;
-
-			if (match)
-			{
-				vector_add_nodup(sectors, s1);
-				a = -1;
-				continue;
-			}
-		}
-	}
-
-	for (int a = 0; a < sectors.size(); a++)
+	for (unsigned int a = 0; a < sectors.size(); a++)
 	{
 		int s = sectors[a];
 
@@ -445,7 +436,7 @@ void line_extrude(int amount)
 
 	//make_backup(true, true, true, false, false);
 
-	for (int a = 0; a < lines.size(); a++)
+	for (unsigned int a = 0; a < lines.size(); a++)
 	{
 		rect_t rect = lines[a]->get_rect();
 
@@ -479,7 +470,7 @@ void line_align_x()
 		return;
 
 	int offset = lines[0]->get_rect().length();
-	for (int a = 1; a < lines.size(); a++)
+	for (unsigned int a = 1; a < lines.size(); a++)
 	{
 		Side *side = lines[a]->side1();
 		if (d_map.valid(side)) side->set_xoff(offset);
@@ -509,7 +500,7 @@ void line_correct_references(int line)
 	if (lines.size() == 0)
 		return;
 
-	for (int a = 0; a < lines.size(); a++)
+	for (unsigned int a = 0; a < lines.size(); a++)
 	{
 		lines[a]->set_sector(1, d_map.sector(get_side_sector(d_map.index(lines[a]), 1)));
 		lines[a]->set_sector(2, d_map.sector(get_side_sector(d_map.index(lines[a]), 2)));
@@ -554,7 +545,7 @@ void line_paint_tex(int line, bool front, string otex, string ntex, vector<int> 
 	d_map.get_lines_to_vert(d_map.index(l->vertex1()), a_lines);
 	d_map.get_lines_to_vert(d_map.index(l->vertex2()), a_lines);
 
-	for (int a = 0; a < a_lines.size(); a++)
+	for (unsigned int a = 0; a < a_lines.size(); a++)
 	{
 		if (find(processed_lines.begin(), processed_lines.end(), a_lines[a]) == processed_lines.end())
 		{
@@ -589,7 +580,7 @@ void line_auto_align_x(int line, int offset, bool front, string tex, int texwidt
 	else
 		d_map.get_lines_to_vert(d_map.index(d_map.line(line)->vertex1()), a_lines);
 
-	for (int a = 0; a < a_lines.size(); a++)
+	for (unsigned int a = 0; a < a_lines.size(); a++)
 	{
 		if (find(processed_lines.begin(), processed_lines.end(), a_lines[a]) == processed_lines.end())
 		{
@@ -624,7 +615,7 @@ void line_split(int splits)
 
 	//make_backup(true, true, true, false, false);
 
-	for (int a = 0; a < lines.size(); a++)
+	for (unsigned int a = 0; a < lines.size(); a++)
 	{
 		rect_t rect = lines[a]->get_rect();
 
@@ -689,6 +680,6 @@ void line_flip(bool verts, bool sides)
 	if (lines.size() == 0)
 		return;
 
-	for (int a = 0; a < lines.size(); a++)
+	for (unsigned int a = 0; a < lines.size(); a++)
 		lines[a]->flip(verts, sides);
 }

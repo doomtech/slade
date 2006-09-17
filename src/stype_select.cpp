@@ -23,7 +23,7 @@ STypeSelectDialog::STypeSelectDialog(int init)
 	box->Add(list_types, 1, wxEXPAND, 4);
 	//populate_list_stypes(list_types, init);
 
-	for (int a = 1; a < game.get_stypes().size(); a++)
+	for (unsigned int a = 1; a < game.get_stypes().size(); a++)
 	{
 		list_types->Append(s_fmt(_T("%d: %s"), game.get_stypes()[a]->type, game.get_stypes()[a]->name.c_str()));
 		if (Sector::strip_special(init, d_map.hexen()) == game.get_stypes()[a]->type)

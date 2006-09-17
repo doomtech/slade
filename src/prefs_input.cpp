@@ -135,7 +135,7 @@ InputPrefs::InputPrefs(wxWindow *parent)
 	list_controls = new wxListBox(this, IP_LIST_CONTROLS);
 	box->Add(list_controls, 1, wxEXPAND|wxALL, 4);
 
-	for (int a = 0; a < binds.n_keys(); a++)
+	for (unsigned int a = 0; a < binds.n_keys(); a++)
 		list_controls->Append(binds.get_bind(a)->name);
 
 	wxBoxSizer *vbox = new wxBoxSizer(wxVERTICAL);
@@ -203,7 +203,7 @@ void InputPrefs::list_controls_changed(wxCommandEvent &event)
 	if (!c)
 		return;
 
-	for (int a = 0; a < c->keys.size(); a++)
+	for (unsigned int a = 0; a < c->keys.size(); a++)
 		list_binds->Append(c->keys[a].get_string());
 }
 

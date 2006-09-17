@@ -3,7 +3,7 @@
 CXX=g++
 CXXFLAGS=-Wall -O2
 SHARE_DIR=data_files/
-CXXFLAGS+=`wx-config --cxxflags` -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp -DNO_MAP_VIEWER=1 -DUNIX=1 -DSHARE_DIR="\"$(SHARE_DIR)\""
+CXXFLAGS+=`wx-config --cxxflags` -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp -DNO_MAP_VIEWER=1 -DSHARE_DIR="\"$(SHARE_DIR)\""
 LDFLAGS+=`wx-config --libs --gl-libs`
 EXE?=slade
 SRC=$(wildcard src/*.cpp src/zdbsp/*.cpp)
@@ -21,5 +21,6 @@ slade: ${OBJ}
 
 clean:
 	rm -f src/*.o slade
+
 
 

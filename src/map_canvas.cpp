@@ -551,17 +551,20 @@ void MapCanvas::mouse_motion(wxMouseEvent& event)
 
 		point2_t trans_mouse(translate_x(mouse.x), translate_y(mouse.y));
 
-		if (edit_mode == 0)
-			d_map.get_hilight_vertex(trans_mouse);
-
-		if (edit_mode == 1)
-			d_map.get_hilight_line(trans_mouse);
-
-		if (edit_mode == 2)
-			d_map.get_hilight_sector(trans_mouse);
-
-		if (edit_mode == 3)
-			d_map.get_hilight_thing(trans_mouse);
+		switch(edit_mode) {
+			case 0:
+				d_map.get_hilight_vertex(trans_mouse);
+				break;
+			case 1:
+				d_map.get_hilight_line(trans_mouse);
+				break;
+			case 2:
+				d_map.get_hilight_sector(trans_mouse);
+				break;
+			case 3:
+				d_map.get_hilight_thing(trans_mouse);
+				break;
+		}
 
 		if (old_hilight != d_map.hilight())
 		{

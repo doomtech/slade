@@ -31,7 +31,7 @@ EXTERN_CVAR(Bool, edit_auto_split)
 // ----------------------------------------------------------------- >>
 bool lines_clockwise(vector<Line*> &list)
 {
-	for (int a = 0; a < list.size(); a++)
+	for (unsigned int a = 0; a < list.size(); a++)
 	{
 		rect_t linerect = list[a]->get_rect();
 		point2_t mid = linerect.middle();
@@ -42,7 +42,7 @@ bool lines_clockwise(vector<Line*> &list)
 		point2_t side(mid.x + x, mid.y + y);
 
 		bool intersect = false;
-		for (int b = 0; b < list.size(); b++)
+		for (unsigned int b = 0; b < list.size(); b++)
 		{
 			if (b != a)
 			{
@@ -81,7 +81,7 @@ void ldraw_end()
 
 	bool gsnap = edit_snap_grid;
 	edit_snap_grid = false;
-	for (int a = 0; a < ldraw_points.size() - 1; a++)
+	for (unsigned int a = 0; a < ldraw_points.size() - 1; a++)
 	{
 		int lines = d_map.n_lines();
 		for (int b = 0; b < lines; b++)
@@ -99,7 +99,7 @@ void ldraw_end()
 	}
 	edit_snap_grid = gsnap;
 
-	for (int a = 0; a < ldraw_points.size() - 1; a++)
+	for (unsigned int a = 0; a < ldraw_points.size() - 1; a++)
 	{
 		int v = d_map.check_vertex_spot(ldraw_points[a]);
 
@@ -112,14 +112,14 @@ void ldraw_end()
 	// Check for line splits
 	if (edit_auto_split)
 	{
-		for (int a = 0; a < new_verts.size(); a++)
+		for (unsigned int a = 0; a < new_verts.size(); a++)
 			d_map.check_split(new_verts[a]);
 	}
 
 	// Add lines
 	vector<Line*> new_lines;
 
-	for (int a = 0; a < new_verts.size() - 1; a++)
+	for (unsigned int a = 0; a < new_verts.size() - 1; a++)
 		new_lines.push_back(new Line(new_verts[a], new_verts[a+1], NULL));
 
 	// If it's not a split add a line from last to first,
@@ -134,7 +134,7 @@ void ldraw_end()
 	// Check for new line splits
 	if (edit_auto_split)
 	{
-		for (int a = 0; a < d_map.n_verts(); a++)
+		for (unsigned int a = 0; a < d_map.n_verts(); a++)
 			d_map.check_split(d_map.vertex(a), new_lines);
 	}
 
@@ -144,14 +144,14 @@ void ldraw_end()
 	// Flip lines if anticlockwise
 	if (!clockwise)
 	{
-		for (int a = 0; a < new_lines.size(); a++)
+		for (unsigned int a = 0; a < new_lines.size(); a++)
 			new_lines[a]->flip(true, false);
 	}
 
 	// Check wether to run create sector on the back sides of the new lines
 	bool *cs_back = new bool[new_lines.size()];
 	memset(cs_back, 0, new_lines.size());
-	for (int a = 0; a < new_lines.size(); a++)
+	for (unsigned int a = 0; a < new_lines.size(); a++)
 	{
 		point2_t pos = new_lines[a]->get_side_point(false);
 		if (d_map.get_hilight_sector(pos) != -1)
@@ -159,7 +159,7 @@ void ldraw_end()
 	}
 
 	// Add new lines to map
-	for (int a = 0; a < new_lines.size(); a++)
+	for (unsigned int a = 0; a < new_lines.size(); a++)
 	{
 		d_map.add_line(new_lines[a]);
 		new_lines[a]->set_side1(d_map.side(-1));
@@ -177,7 +177,7 @@ void ldraw_end()
 		vector<Sector*> new_sectors;
 		last_copy_sector = NULL;
 
-		for (int a = 0; a < new_lines.size(); a++)
+		for (unsigned int a = 0; a < new_lines.size(); a++)
 		{
 			if (!fs[d_map.index(new_lines[a])])
 				sector_create(new_lines[a]->get_side_point(true), new_sectors, fs, bs);
@@ -188,7 +188,7 @@ void ldraw_end()
 
 		if (last_copy_sector)
 		{
-			for (int a = 0; a < new_sectors.size(); a++)
+			for (unsigned int a = 0; a < new_sectors.size(); a++)
 				new_sectors[a]->copy(last_copy_sector);
 		}
 	}
@@ -217,7 +217,7 @@ void ldraw_addpoint(bool nearest_vert)
 			}
 		}
 
-		for (int a = 0; a < ldraw_points.size(); a++)
+		for (unsigned int a = 0; a < ldraw_points.size(); a++)
 		{
 			if (ldraw_points[a].x == x && ldraw_points[a].y == y)
 			{
@@ -313,7 +313,7 @@ void ldraw_draw_lines(point2_t mouse)
 
 	if (ldraw_points.size() > 1)
 	{
-		for (int a = 0; a < ldraw_points.size() - 1; a++)
+		for (unsigned int a = 0; a < ldraw_points.size() - 1; a++)
 		{
 			rect_t r(ldraw_points[a], ldraw_points[a+1]);
 			draw_line(r, col_linedraw, line_aa, false, line_size);

@@ -84,7 +84,7 @@ coldef_t colours[] =
 	{ _T("3d_hilight"),			_T("3D Mode Hilight Shade"),	col_3d_hilight },
 	{ _T("3d_hilight_line"),	_T("3D Mode Hilight Outline"),	col_3d_hilight_line },
 };
-int n_colours = sizeof(colours) / sizeof(coldef_t);
+unsigned int n_colours = sizeof(colours) / sizeof(coldef_t);
 
 
 // parse_rgba: Parses a colour like { R G B (A) (Bl) }
@@ -149,7 +149,7 @@ void load_colour_config(string filename)
 			rgba_t colour;
 			parse_rgba(&tz, &colour);
 
-			for (int a = 0; a < n_colours; a++)
+			for (unsigned int a = 0; a < n_colours; a++)
 			{
 				if (colours[a].name == name)
 					colours[a].col = colour;
@@ -189,7 +189,7 @@ void load_colours(Tokenizer *tz)
 			rgba_t colour;
 			parse_rgba(tz, &colour);
 
-			for (int a = 0; a < n_colours; a++)
+			for (unsigned int a = 0; a < n_colours; a++)
 			{
 				if (colours[a].name == name)
 					colours[a].col = colour;
@@ -207,7 +207,7 @@ void save_colour_config(string filename)
 	if (filename.empty())
 		return;
 
-	int max_size = 0;
+	unsigned int max_size = 0;
 	for (DWORD c = 0; c < n_colours; c++)
 	{
 		if (colours[c].name.size() > max_size)
@@ -219,7 +219,7 @@ void save_colour_config(string filename)
 	fprintf(fp, "\ncolour_config\n");
 	fprintf(fp, "{\n");
 
-	for (int a = 0; a < n_colours; a++)
+	for (unsigned int a = 0; a < n_colours; a++)
 	{
 		fprintf(fp, "\t%s ", chr(colours[a].name));
 
@@ -244,7 +244,7 @@ void save_colour_config(string filename)
 // ------------------------------------- >>
 void save_colours(FILE* fp)
 {
-	int max_size = 0;
+	unsigned int max_size = 0;
 	for (DWORD c = 0; c < n_colours; c++)
 	{
 		if (colours[c].name.size() > max_size)
@@ -254,7 +254,7 @@ void save_colours(FILE* fp)
 	fprintf(fp, "colours\n");
 	fprintf(fp, "{\n");
 
-	for (int a = 0; a < n_colours; a++)
+	for (unsigned int a = 0; a < n_colours; a++)
 	{
 		fprintf(fp, "\t%s ", chr(colours[a].name));
 

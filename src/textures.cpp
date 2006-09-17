@@ -84,23 +84,23 @@ void clear_textures(int type)
 {
 	if (type == 1)
 	{
-		for (int a = 0; a < textures.size(); a++)
+		for (unsigned int a = 0; a < textures.size(); a++)
 			delete textures[a];
 
 		textures.clear();
 	}
 
-	if (type == 2)
+	else if (type == 2)
 	{
-		for (int a = 0; a < flats.size(); a++)
+		for (unsigned int a = 0; a < flats.size(); a++)
 			delete flats[a];
 
 		flats.clear();
 	}
 
-	if (type == 3)
+	else if (type == 3)
 	{
-		for (int a = 0; a < sprites.size(); a++)
+		for (unsigned int a = 0; a < sprites.size(); a++)
 			delete sprites[a];
 
 		sprites.clear();
@@ -109,16 +109,16 @@ void clear_textures(int type)
 
 void purge_textures()
 {
-	for (int a = 0; a < textures.size(); a++)
+	for (unsigned int a = 0; a < textures.size(); a++)
 		textures[a]->purge();
 
-	for (int a = 0; a < flats.size(); a++)
+	for (unsigned int a = 0; a < flats.size(); a++)
 		flats[a]->purge();
 
-	for (int a = 0; a < sprites.size(); a++)
+	for (unsigned int a = 0; a < sprites.size(); a++)
 		sprites[a]->purge();
 
-	for (int a = 0; a < edit_textures.size(); a++)
+	for (unsigned int a = 0; a < edit_textures.size(); a++)
 		edit_textures[a]->purge();
 
 	no_tex->purge();
@@ -138,7 +138,7 @@ Texture* get_texture(string name, int type, bool force)
 	{
 		if (type == 0 || type == TEXTURES_WALLS || (type == TEXTURES_FLATS && mix))
 		{
-			for (int a = 0; a < textures.size(); a++)
+			for (unsigned int a = 0; a < textures.size(); a++)
 			{
 				if (textures[a]->name == name)
 					return textures[a];
@@ -147,7 +147,7 @@ Texture* get_texture(string name, int type, bool force)
 
 		if (type == 0 || type == TEXTURES_FLATS || (type == TEXTURES_WALLS && mix))
 		{
-			for (int a = 0; a < flats.size(); a++)
+			for (unsigned int a = 0; a < flats.size(); a++)
 			{
 				if (flats[a]->name == name)
 					return flats[a];
@@ -159,7 +159,7 @@ Texture* get_texture(string name, int type, bool force)
 	{
 		if (type == 0 || type == TEXTURES_FLATS || (type == TEXTURES_WALLS && mix))
 		{
-			for (int a = 0; a < flats.size(); a++)
+			for (unsigned int a = 0; a < flats.size(); a++)
 			{
 				if (flats[a]->name == name)
 					return flats[a];
@@ -168,7 +168,7 @@ Texture* get_texture(string name, int type, bool force)
 
 		if (type == 0 || type == TEXTURES_WALLS || (type == TEXTURES_FLATS && mix))
 		{
-			for (int a = 0; a < textures.size(); a++)
+			for (unsigned int a = 0; a < textures.size(); a++)
 			{
 				if (textures[a]->name == name)
 					return textures[a];
@@ -179,7 +179,7 @@ Texture* get_texture(string name, int type, bool force)
 	// Search sprites
 	if (type == 0 || type == TEXTURES_SPRITES)
 	{
-		for (int a = 0; a < sprites.size(); a++)
+		for (unsigned int a = 0; a < sprites.size(); a++)
 		{
 			if (sprites[a]->name == name)
 				return sprites[a];
@@ -187,7 +187,7 @@ Texture* get_texture(string name, int type, bool force)
 	}
 
 	// Search editor textures
-	for (int a = 0; a < edit_textures.size(); a++)
+	for (unsigned int a = 0; a < edit_textures.size(); a++)
 	{
 		if (edit_textures[a]->name == name)
 			return edit_textures[a];
@@ -704,7 +704,7 @@ void load_sprites()
 	clear_textures(3);
 	splash(_T("Loading Sprites"));
 
-	for (int s = 0; s < spritenames.size(); s++)
+	for (unsigned int s = 0; s < spritenames.size(); s++)
 	{
 		int inter = (spritenames.size() / 20);
 		if (inter == 0) inter = 1;
@@ -767,7 +767,7 @@ void load_tx_textures()
 		}
 		else if (wad->zip)
 		{
-			for (int a = 0; a < wad->numLumps(); a++)
+			for (unsigned int a = 0; a < wad->numLumps(); a++)
 			{
 				if (wad->lumpAt(a)->getDir(0) == _T("textures"))
 				{
@@ -1192,7 +1192,7 @@ bool DoomTexture::gen_gl_tex()
 	//log_message(s_fmt("Get tex %s, %d patches", name.c_str(), patches.size()));
 
 	// Add patches
-	for (int p = 0; p < patches.size(); p++)
+	for (unsigned int p = 0; p < patches.size(); p++)
 	{
 		Wad* wad = patches[p].wad;
 		Wad* iwad = wads.getWad();
