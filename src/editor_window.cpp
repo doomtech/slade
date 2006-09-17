@@ -573,7 +573,10 @@ void EditorWindow::file_save(wxCommandEvent &event)
 			SetTitle(wxString::Format(_T("SLADE (%s, %s)"), edit_wad->path.c_str(), d_map.map_name().c_str()));
 
 			if (!edit_wad->parent)
+			{
 				add_recent_wad(edit_wad->path);
+				edit_wad->open(edit_wad->path);
+			}
 		}
 	}
 	else
