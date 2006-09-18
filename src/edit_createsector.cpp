@@ -462,7 +462,7 @@ bool sector_create(point2_t point, vector<Sector*> &new_sectors, bool* front_sid
 			}
 
 			// Re-check in-lines
-			for (int b = 0; b < in_lines.size(); b++)
+			for (DWORD b = 0; b < in_lines.size(); b++)
 			{
 				rect_t r = d_map.line(in_lines[b])->get_rect();
 				point2_t midpoint = r.middle();

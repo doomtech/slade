@@ -90,7 +90,12 @@ Side::~Side()
 
 Sector* Side::get_sector()
 {
-	return sector;
+	if (sector)
+		return sector;
+	else if (parent)
+		return parent->sector(-1);
+	else
+		return NULL;
 }
 
 string Side::get_texname(BYTE part)

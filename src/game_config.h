@@ -73,10 +73,10 @@ public:
 	GameConfig();
 	~GameConfig();
 
-	bool hexen() { return game_flags & GAME_HEXEN; }
-	bool boom() { return game_flags & GAME_BOOM; }
-	bool zdoom() { return game_flags & GAME_ZDOOM; }
-	bool mapnames() { return game_flags & GAME_MAPNAMES; }
+	bool hexen() { return !!(game_flags & GAME_HEXEN); }
+	bool boom() { return !!(game_flags & GAME_BOOM); }
+	bool zdoom() { return !!(game_flags & GAME_ZDOOM); }
+	bool mapnames() { return !!(game_flags & GAME_MAPNAMES); }
 
 	bool load_config(string filename);
 	void read_types(Tokenizer *mr, BYTE sections);
@@ -96,10 +96,10 @@ public:
 	string					get_sector_type(int type);
 	vector<sectortype_t*>&	get_stypes() { return sector_types; }
 
-	int			n_line_flags() { return line_flags.size(); }
+	int			n_line_flags() { return (int)line_flags.size(); }
 	key_value_t	line_flag(int index) { return line_flags[index]; }
 
-	int			n_thing_flags() { return thing_flags.size(); }
+	int			n_thing_flags() { return (int)thing_flags.size(); }
 	key_value_t	thing_flag(int index) { return thing_flags[index]; }
 
 	vector<ActionSpecial>& get_specials() { return action_specials; }

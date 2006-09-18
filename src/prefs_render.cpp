@@ -124,7 +124,7 @@ RenderPrefs::RenderPrefs(wxWindow *parent)
 					vid_height_3d == dm.dmPelsHeight &&
 					vid_bpp_3d == dm.dmBitsPerPel &&
 					vid_refresh_3d == dm.dmDisplayFrequency)
-					index = win32_modes.size() - 1;
+					index = (int)win32_modes.size() - 1;
 			}
 
 			i++;

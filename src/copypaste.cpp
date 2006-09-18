@@ -143,13 +143,12 @@ void Clipboard::Copy()
 		if (copy_lines.size() == 0)
 			return;
 
-		/*
 		copy_type = COPY_ARCHITECTURE;
 
 		// Get sides and sectors to copy
 		vector<Sector*> copy_sectors;
 		vector<Side*> copy_sides;
-		for (int a = 0; a < copy_lines.size(); a++)
+		for (DWORD a = 0; a < copy_lines.size(); a++)
 		{
 			if (copy_lines[a]->sector_index(true) != -1)
 			{
@@ -165,7 +164,7 @@ void Clipboard::Copy()
 		}
 
 		// Copy the sectors
-		for (int a = 0; a < copy_sectors.size(); a++)
+		for (DWORD a = 0; a < copy_sectors.size(); a++)
 		{
 			Sector* sector = new Sector();
 			sector->copy(copy_sectors[a]);
@@ -173,16 +172,17 @@ void Clipboard::Copy()
 		}
 
 		// Copy the sides
-		for (int a = 0; a < copy_sides.size(); a++)
+		for (DWORD a = 0; a < copy_sides.size(); a++)
 		{
 			Side* side = new Side();
 			side->copy(copy_sides[a]);
 
-			for (int a = 0; a < copy_sectors.size(); a++)
+			// Get relative sector
+			for (DWORD b = 0; b < copy_sectors.size(); b++)
 			{
-				if (side->get_sector() == copy_sectors[a])
+				if (copy_sides[a]->get_sector() == copy_sectors[b])
 				{
-					side->sector = a;
+					side->set_sector(sectors[b]);
 					break;
 				}
 			}
@@ -191,91 +191,91 @@ void Clipboard::Copy()
 		}
 
 		// Get vertices to copy, and the average midpoint of the vertices
-		vector<int> copy_verts;
+		vector<Vertex*> copy_verts;
 		int min_x = 9999999;
 		int min_y = 9999999;
 		int max_x = -9999999;
 		int max_y = -9999999;
 
-		for (int a = 0; a < copy_lines.size(); a++)
+		for (DWORD a = 0; a < copy_lines.size(); a++)
 		{
-			vector_add_nodup(copy_verts, map.lines[copy_lines[a]]->vertex1);
-			vector_add_nodup(copy_verts, map.lines[copy_lines[a]]->vertex2);
+			Vertex *v1 = copy_lines[a]->vertex1();
+			Vertex *v2 = copy_lines[a]->vertex2();
+			vector_add_nodup(copy_verts, v1);
+			vector_add_nodup(copy_verts, v2);
 
-			int x1 = map.verts[map.lines[copy_lines[a]]->vertex1]->x;
-			int y1 = map.verts[map.lines[copy_lines[a]]->vertex1]->y;
-			int x2 = map.verts[map.lines[copy_lines[a]]->vertex2]->x;
-			int y2 = map.verts[map.lines[copy_lines[a]]->vertex2]->y;
+			if (v1->x_pos() < min_x) min_x = v1->x_pos();
+			if (v1->x_pos() > max_x) max_x = v1->x_pos();
+			if (v1->y_pos() < min_y) min_y = v1->y_pos();
+			if (v1->y_pos() > max_y) max_y = v1->y_pos();
 
-			if (x1 < min_x) min_x = x1;
-			if (x1 > max_x) max_x = x1;
-			if (y1 < min_y) min_y = y1;
-			if (y1 > max_y) max_y = y1;
-
-			if (x2 < min_x) min_x = x2;
-			if (x2 > max_x) max_x = x2;
-			if (y2 < min_y) min_y = y2;
-			if (y2 > max_y) max_y = y2;
+			if (v2->x_pos() < min_x) min_x = v2->x_pos();
+			if (v2->x_pos() > max_x) max_x = v2->x_pos();
+			if (v2->y_pos() < min_y) min_y = v2->y_pos();
+			if (v2->y_pos() > max_y) max_y = v2->y_pos();
 		}
 
 		int mid_x = snap_to_grid(min_x + ((max_x - min_x) / 2));
 		int mid_y = snap_to_grid(min_y + ((max_y - min_y) / 2));
 
 		// Copy the vertices
-		for (int a = 0; a < copy_verts.size(); a++)
+		for (DWORD a = 0; a < copy_verts.size(); a++)
 		{
-			vertex_t* vertex = new vertex_t();
-			memcpy(vertex, map.verts[copy_verts[a]], sizeof(vertex_t));
-			vertex->x -= mid_x;
-			vertex->y -= mid_y;
+			Vertex* vertex = new Vertex();
+			vertex->set_pos(copy_verts[a]->x_pos() - mid_x, copy_verts[a]->y_pos() - mid_y);
 			verts.push_back(vertex);
 		}
 
 		// Finally, copy the lines
-		for (int a = 0; a < copy_lines.size(); a++)
+		for (DWORD a = 0; a < copy_lines.size(); a++)
 		{
-			linedef_t* line = new linedef_t();
-			memcpy(line, map.lines[copy_lines[a]], sizeof(linedef_t));
+			Line* line = new Line();
+			line->copy(copy_lines[a]);
 
 			// Get relative sides
 			bool s1 = false;
 			bool s2 = false;
-			for (int a = 0; a < copy_sides.size(); a++)
+			for (DWORD b = 0; b < copy_sides.size(); b++)
 			{
-				if (line->side1 == copy_sides[a] && !s1)
+				if (copy_lines[a]->side1() == copy_sides[b] && !s1)
 				{
+					line->set_side1(sides[b]);
 					s1 = true;
-					line->side1 = a;
 				}
 
-				if (line->side2 == copy_sides[a] && !s2)
+				if (copy_lines[a]->side2() == copy_sides[b] && !s2)
 				{
+					line->set_side2(sides[b]);
 					s2 = true;
-					line->side2 = a;
 				}
+
+				if (s1 && s2)
+					break;
 			}
 
 			// Get relative verts
 			bool v1 = false;
 			bool v2 = false;
-			for (int a = 0; a < copy_verts.size(); a++)
+			for (DWORD b = 0; b < copy_verts.size(); b++)
 			{
-				if (line->vertex1 == copy_verts[a] && !v1)
+				if (copy_lines[a]->vertex1() == copy_verts[b] && !v1)
 				{
+					line->set_vertex1(verts[b]);
 					v1 = true;
-					line->vertex1 = a;
 				}
 
-				if (line->vertex2 == copy_verts[a] && !v2)
+				if (copy_lines[a]->vertex2() == copy_verts[b] && !v2)
 				{
+					line->set_vertex2(verts[b]);
 					v2 = true;
-					line->vertex2 = a;
 				}
+
+				if (v1 && v2)
+					break;
 			}
 
 			lines.push_back(line);
 		}
-		*/
 	}
 }
 
@@ -297,86 +297,122 @@ void Clipboard::Paste()
 		}
 	}
 
-	/*
 	if (copy_type == COPY_ARCHITECTURE && lines.size() > 0)
 	{
-		int vert_offset = map.n_verts;
-		int side_offset = map.n_sides;
-		int sect_offset = map.n_sectors;
-		int line_offset = map.n_lines;
-
-		make_backup(true, true, true, true, false);
+		//make_backup(true, true, true, true, false);
 
 		// Add vertices
-		for (int a = 0; a < verts.size(); a++)
+		vector<Vertex*> new_verts;
+		for (DWORD a = 0; a < verts.size(); a++)
 		{
-			int x = snap_to_grid(m_x(mouse.x)) + verts[a]->x;
-			int y = snap_to_grid(-m_y(mouse.y)) + verts[a]->y;
-			map.add_vertex(x, y);
+			Vertex* v = new Vertex();
+			v->set_pos(snap_to_grid(mouse_pos(true).x) + verts[a]->x_pos(),
+							snap_to_grid(mouse_pos(true).y) + verts[a]->y_pos());
+			d_map.add_vertex(v);
+			new_verts.push_back(v);
 		}
 
 		// Add sectors
-		for (int a = 0; a < sectors.size(); a++)
+		vector<Sector*> new_sectors;
+		for (DWORD a = 0; a < sectors.size(); a++)
 		{
-			int s = map.add_sector();
-			memcpy(map.sectors[s], sectors[a], sizeof(sector_t));
+			Sector *s = new Sector();
+			s->copy(sectors[a]);
+			d_map.add_sector(s);
+			new_sectors.push_back(s);
 		}
 
 		// Add sides
-		for (int a = 0; a < sides.size(); a++)
+		vector<Side*> new_sides;
+		for (DWORD a = 0; a < sides.size(); a++)
 		{
-			int s = map.add_side();
-			memcpy(map.sides[s], sides[a], sizeof(sidedef_t));
-			
-			if (sides[a]->sector != -1)
-				map.sides[s]->sector = sides[a]->sector + sect_offset;
-		}
+			Side *s = new Side();
+			s->copy(sides[a]);
+			d_map.add_side(s);
+			new_sides.push_back(s);
 
-		// Add lines
-		for (int a = 0; a < lines.size(); a++)
-		{
-			int l = map.add_line(0, 0);
-			memcpy(map.lines[l], lines[a], sizeof(linedef_t));
-
-			map.lines[l]->vertex1 = vert_offset + lines[a]->vertex1;
-			map.lines[l]->vertex2 = vert_offset + lines[a]->vertex2;
-
-			if (lines[a]->side1 != -1)
-				map.lines[l]->side1 = lines[a]->side1 + side_offset;
-
-			if (lines[a]->side2 != -1)
-				map.lines[l]->side2 = lines[a]->side2 + side_offset;
-		}
-
-		merge_verts();
-
-		for (int a = vert_offset; a < map.n_verts; a++)
-		{
-			int split = check_vertex_split(a);
-			if (split != -1)
-				map.l_split(split, a);
-		}
-
-		vector<int> lines;
-		for (int a = line_offset; a < map.n_lines-1; a++)
-			lines.push_back(a);
-
-		if (check_overlapping_lines(lines))
-		{
-			while(merge_overlapping_lines(lines))
+			// Set relative sector
+			for (DWORD b = 0; b < sectors.size(); b++)
 			{
-				lines.clear();
-				for (int a = line_offset; a < map.n_lines-1; a++)
-					lines.push_back(a);
+				if (sides[a]->get_sector() == sectors[b])
+				{
+					s->set_sector(new_sectors[b]);
+					break;
+				}
 			}
 		}
 
-		for (int a = line_offset; a < map.n_lines; a++)
-			line_correct_references(a);
+		// Add lines
+		vector<Line*> new_lines;
+		for (DWORD a = 0; a < lines.size(); a++)
+		{
+			Line *l = new Line();
+			l->copy(lines[a]);
+			d_map.add_line(l);
+			new_lines.push_back(l);
 
-		remove_unused_sectors();
+			// Set relative sides
+			bool s1 = false;
+			bool s2 = false;
+			for (DWORD b = 0; b < sides.size(); b++)
+			{
+				if (lines[a]->side1() == sides[b] && !s1)
+				{
+					l->set_side1(new_sides[b]);
+					s1 = true;
+				}
+
+				if (lines[a]->side2() == sides[b] && !s2)
+				{
+					l->set_side2(new_sides[b]);
+					s2 = true;
+				}
+
+				if (s1 && s2)
+					break;
+			}
+
+			// Set relative vertices
+			bool v1 = false;
+			bool v2 = false;
+			for (DWORD b = 0; b < verts.size(); b++)
+			{
+				if (lines[a]->vertex1() == verts[b] && !v1)
+				{
+					l->set_vertex1(new_verts[b]);
+					v1 = true;
+				}
+
+				if (lines[a]->vertex2() == verts[b] && !v2)
+				{
+					l->set_vertex2(new_verts[b]);
+					v2 = true;
+				}
+
+				if (v1 && v2)
+					break;
+			}
+		}
+
+		d_map.update_indices(MTYPE_LINE|MTYPE_SIDE|MTYPE_VERTEX|MTYPE_SECTOR);
+
+		// Merge vertices
+		for (DWORD a = 0; a < new_verts.size(); a++)
+			d_map.merge_under_vertex(new_verts[a]);
+
+		// Split lines
+		for (DWORD a = 0; a < new_verts.size(); a++)
+			d_map.check_split(new_verts[a]);
+
+		// Merge lines
+		d_map.remove_overlapping_lines(new_lines, true);
+
+		d_map.update_indices(MTYPE_LINE|MTYPE_SIDE|MTYPE_VERTEX|MTYPE_SECTOR);
+
+		// Correct refs (maybe i'll change this to only correct refs on the lines/sides that need it)
+		for (DWORD a = 0; a < new_lines.size(); a++)
+			line_correct_references(d_map.index(new_lines[a]));
 	}
-	*/
 }
 
 void Clipboard::DrawPaste()
@@ -385,7 +421,7 @@ void Clipboard::DrawPaste()
 	{
 		Thing* t = new Thing();
 
-		for (unsigned int a = 0; a < things.size(); a++)
+		for (DWORD a = 0; a < things.size(); a++)
 		{
 			t->copy(things[a]);
 			t->set_pos(snap_to_grid(mouse_pos(true).x) + t->pos().x,
@@ -397,25 +433,28 @@ void Clipboard::DrawPaste()
 		delete t;
 	}
 
-	/*
 	if (copy_type == COPY_ARCHITECTURE && lines.size() > 0)
 	{
-		for (int a = 0; a < lines.size(); a++)
+		Line* drawline = new Line();
+		Vertex* v1 = new Vertex();
+		Vertex* v2 = new Vertex();
+		drawline->set_vertex1(v1);
+		drawline->set_vertex2(v2);
+
+		for (DWORD a = 0; a < lines.size(); a++)
 		{
-			int x = snap_to_grid(m_x(mouse.x));
-			int y = -snap_to_grid(-m_y(mouse.y));
+			drawline->copy(lines[a]);
+			drawline->set_side1(lines[a]->side1());
+			drawline->set_side2(lines[a]->side2());
+			v1->set_pos(snap_to_grid(mouse_pos(true).x) + lines[a]->vertex1()->x_pos(),
+						snap_to_grid(mouse_pos(true).y) + lines[a]->vertex1()->y_pos());
+			v2->set_pos(snap_to_grid(mouse_pos(true).x) + lines[a]->vertex2()->x_pos(),
+						snap_to_grid(mouse_pos(true).y) + lines[a]->vertex2()->y_pos());
 
-			int x1 = s_x(x + verts[lines[a]->vertex1]->x);
-			int y1 = s_y(y - verts[lines[a]->vertex1]->y);
-			int x2 = s_x(x + verts[lines[a]->vertex2]->x);
-			int y2 = s_y(y - verts[lines[a]->vertex2]->y);
-
-			glLineWidth(line_size);
-			draw_line(rect_t(x1, y1, x2, y2), col_line_solid, line_aa, true);
-			glLineWidth(moving_size);
-			draw_line(rect_t(x1, y1, x2, y2), col_moving, line_aa, true);
-			glLineWidth(line_size);
+			drawline->draw(edit_mode == 1);
+			drawline->draw(edit_mode == 1, MISTYLE_MOVING);
 		}
+
+		delete drawline;
 	}
-	*/
 }

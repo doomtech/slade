@@ -270,7 +270,7 @@ void ThingEditor::setup_widgets()
 		}
 
 		// Check for inconsistency
-		for (int a = 0; a < selection.size(); a++)
+		for (DWORD a = 0; a < selection.size(); a++)
 		{
 			Thing* thing = d_map.thing(selection[a]);
 
@@ -325,7 +325,7 @@ void ThingEditor::apply_changes()
 
 	if (selection.size() > 0)
 	{
-		for (int a = 0; a < selection.size(); a++)
+		for (DWORD a = 0; a < selection.size(); a++)
 			items.push_back(d_map.thing(selection[a]));
 	}
 
@@ -505,7 +505,6 @@ void ThingEditor::edit_args_clicked(wxCommandEvent &event)
 		type = atoi(chr(type_entry->GetValue()));
 
 	ThingType *tt = game.get_ttype(type);
-	int result;
 
 	if (tt->flags & TTYPE_HASARGS)
 	{

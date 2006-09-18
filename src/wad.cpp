@@ -184,7 +184,7 @@ void Lump::addDir(string name, int index)
 
 string Lump::getDir(int index)
 {
-	if (index < 0 || index >= directory.size())
+	if (index < 0 || index >= (int)directory.size())
 		return _T("");
 	else
 		return directory[index];
@@ -192,7 +192,7 @@ string Lump::getDir(int index)
 
 void Lump::renameDir(string nname, int index)
 {
-	if (index >= 0 && index < directory.size())
+	if (index >= 0 && index < (int)directory.size())
 		directory[index] = nname;
 }
 
@@ -341,7 +341,7 @@ bool Wad::open(string filename, bool load_data)
 
 	// Read the directory
 	fseek(fp, dir_offset, SEEK_SET);
-	for (DWORD d = 0; d < num_lumps; d++)
+	for (int d = 0; d < num_lumps; d++)
 	{
 		char name[9] = "";
 		DWORD offset = 0;
@@ -354,7 +354,7 @@ bool Wad::open(string filename, bool load_data)
 		offset = wxINT32_SWAP_ON_BE(offset);
 		size = wxINT32_SWAP_ON_BE(size);
 
-		if (offset + size > filesize)
+		if (offset + size > (DWORD)filesize)
 		{
 			message_box(_T("Not a valid Doom wad file!"), _T("Error"));
 			return false;
@@ -473,7 +473,7 @@ bool Wad::openZip(string filename, bool load_data)
 
 		Lump* lump = addLump(dirs2[fn.GetDirCount()-1] + _T("/"), 0);
 
-		for (int a = 0; a < dirs2.size()-1; a++)
+		for (DWORD a = 0; a < dirs2.size()-1; a++)
 			lump->addDir(dirs2[a]);
 	}
 
@@ -526,7 +526,7 @@ Lump* Wad::addLump(string name, long index)
 {
 	Lump* nlump = new Lump(0, 0, name, this);
 
-	if (index < 0 || index >= numLumps())
+	if (index < 0 || index >= (int)numLumps())
 		directory.push_back(nlump);
 	else
 		directory.insert(directory.begin() + index, nlump);
@@ -538,7 +538,7 @@ Lump* Wad::addLump(string name, long index)
 // ------------------------------------------------ >>
 void Wad::replaceLump(long index, DWORD new_size, BYTE *data)
 {
-	if (index > -1 && index < numLumps())
+	if (index > -1 && index < (int)numLumps())
 	{
 		directory[index]->reSize(new_size);
 		memcpy(directory[index]->getData(false), data, new_size);
@@ -557,7 +557,7 @@ void Wad::deleteLump(string name, DWORD offset)
 // ----------------------------- >>
 void Wad::deleteLump(long index, bool delfolder)
 {
-	if (index < 0 || index > numLumps())
+	if (index < 0 || index > (int)numLumps())
 		return;
 
 	Lump *lump = lumpAt(index);
@@ -573,7 +573,7 @@ void Wad::deleteLump(long index, bool delfolder)
 
 		for (unsigned int a = 0; a < numLumps(); a++)
 		{
-			if (lumpAt(a)->dirLevel() < dirs.size())
+			if (lumpAt(a)->dirLevel() < (int)dirs.size())
 				continue;
 
 			bool in = true;
@@ -809,7 +809,7 @@ void Wad::close()
 
 Lump* Wad::lumpAt(int index)
 {
-	if (index < 0 || index >= numLumps())
+	if (index < 0 || index >= (int)numLumps())
 		 return NULL;
 
 	return directory[index];
@@ -956,7 +956,7 @@ Wad* WadList::getWad(int index)
 {
 	if (index == -1)
 		return iwad;
-	else if (index > -1 && index < wads.size())
+	else if (index > -1 && index < (int)wads.size())
 		return wads[index];
 	else
 		return NULL;
@@ -972,7 +972,7 @@ Wad* WadList::getLast()
 
 Wad* WadList::getLastWithMaps()
 {
-	for (int a = wads.size() - 1; a >= 0; a--)
+	for (int a = (int)wads.size() - 1; a >= 0; a--)
 	{
 		if (wads[a]->available_maps.size() > 0)
 			return wads[a];
@@ -983,7 +983,7 @@ Wad* WadList::getLastWithMaps()
 
 Wad* WadList::getWadWithLump(string name)
 {
-	for (int a = wads.size() - 1; a >= 0; a--)
+	for (int a = (int)wads.size() - 1; a >= 0; a--)
 	{
 		if (wads[a]->getLump(name))
 			return wads[a];
@@ -997,7 +997,7 @@ Wad* WadList::getWadWithLump(string name)
 
 Lump* WadList::getLump(string name)
 {
-	for (int a = wads.size() - 1; a >= 0; a--)
+	for (int a = (int)wads.size() - 1; a >= 0; a--)
 	{
 		int index = wads[a]->getLumpIndex(name);
 		if (index != -1)

@@ -70,7 +70,7 @@ void console_prevcommand()
 	if (console_hcmd == -1)
 	{
 		if (cmd_history.size() > 0)
-			console_hcmd = cmd_history.size() - 1;
+			console_hcmd = (int)cmd_history.size() - 1;
 	}
 
 	if (console_hcmd != -1)
@@ -85,7 +85,7 @@ void console_nextcommand()
 	if (console_hcmd != -1)
 		console_hcmd++;
 
-	if (console_hcmd >= cmd_history.size())
+	if (console_hcmd >= (int)cmd_history.size())
 	{
 		cmd_line = _T("");
 		console_hcmd = -1;

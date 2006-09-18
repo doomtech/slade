@@ -126,7 +126,7 @@ Line::Line(doomline_t l, DoomMap *parent, bool &ok)
 		side2 = wxINT16_SWAP_ON_BE(static_cast<unsigned short>(l.side2));
 	}
 
-	if ((side1 < -1 || side1 > parent->n_sides()) && side1 != 65535)
+	if ((side1 < -1 || side1 > (int)parent->n_sides()) && side1 != 65535)
 	{
 		log_message(s_fmt(_T("Invalid first side %d"), side1));
 		s1 = parent->side(-1);
@@ -134,7 +134,7 @@ Line::Line(doomline_t l, DoomMap *parent, bool &ok)
 	else
 		s1 = parent->side(side1);
 
-	if ((side2 < -1 || side2 > parent->n_sides()) && side2 != 65535)
+	if ((side2 < -1 || side2 > (int)parent->n_sides()) && side2 != 65535)
 	{
 		log_message(s_fmt(_T("Invalid second side %d"), side2));
 		s2 = parent->side(-1);
@@ -196,7 +196,7 @@ Line::Line(hexenline_t l, DoomMap *parent, bool &ok)
 		side2 = wxINT16_SWAP_ON_BE(static_cast<unsigned short>(l.side2));
 	}
 
-	if ((side1 < -1 || side1 > parent->n_sides()) && side1 != 65535)
+	if ((side1 < -1 || side1 > (int)parent->n_sides()) && side1 != 65535)
 	{
 		log_message(s_fmt(_T("Invalid first side %d"), side1));
 		s1 = parent->side(-1);
@@ -204,7 +204,7 @@ Line::Line(hexenline_t l, DoomMap *parent, bool &ok)
 	else
 		s1 = parent->side(side1);
 
-	if ((side2 < -1 || side2 > parent->n_sides()) && side2 != 65535)
+	if ((side2 < -1 || side2 > (int)parent->n_sides()) && side2 != 65535)
 	{
 		log_message(s_fmt(_T("Invalid second side %d"), side2));
 		s2 = parent->side(-1);
@@ -784,7 +784,8 @@ void Line::set_vertex1(Vertex* v)
 			return;
 	}
 
-	v1->rem_ref();
+	if (v1) v1->rem_ref();
+
 	v1 = v;
 	v1->add_ref();
 }
@@ -797,7 +798,73 @@ void Line::set_vertex2(Vertex* v)
 			return;
 	}
 
-	v2->rem_ref();
+	if (v2) v2->rem_ref();
 	v2 = v;
 	v2->add_ref();
+}
+
+void Line::set_parent(DoomMap *parent, bool init)
+{
+	this->parent = parent;
+
+	if (parent && init)
+	{
+		if (!s1)
+			s1 = parent->side(-1);
+		if (!s2)
+			s2 = parent->side(-1);
+
+		if (!v1)
+			v1 = parent->vertex(-1);
+		if (!v2)
+			v2 = parent->vertex(-1);
+	}
+}
+
+Vertex* Line::vertex1()
+{
+	if (v1)
+		return v1;
+	else if (parent)
+		return parent->vertex(-1);
+	else
+		return NULL;
+}
+
+Vertex* Line::vertex2()
+{
+	if (v2)
+		return v2;
+	else if (parent)
+		return parent->vertex(-1);
+	else
+		return NULL;
+}
+
+Side* Line::side1()
+{
+	if (s1)
+		return s1;
+	else if (parent)
+		return parent->side(-1);
+	else
+		return NULL;
+}
+
+Side* Line::side2()
+{
+	if (s2)
+		return s2;
+	else if (parent)
+		return parent->side(-1);
+	else
+		return NULL;
+}
+
+Side* Line::side(bool front)
+{
+	if (front)
+		return side1();
+	else
+		return side2();
 }

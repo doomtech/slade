@@ -115,7 +115,7 @@ void camera_to_start()
 	point3_t pos;
 	point3_t view;
 
-	for (int a = 0; a < d_map.n_things(); a++)
+	for (DWORD a = 0; a < d_map.n_things(); a++)
 	{
 		Thing* t = d_map.thing(a);
 		if (t->get_type() == 1)

@@ -63,12 +63,12 @@ public:
 	Line(hexenline_t l, DoomMap *parent, bool &ok);
 	~Line();
 
-	Vertex* vertex1()	{ return v1; }
-	Vertex* vertex2()	{ return v2; }
-	Side*	side1()		{ return s1; }
-	Side*	side2()		{ return s2; }
+	Vertex* vertex1();
+	Vertex* vertex2();
+	Side*	side1();
+	Side*	side2();
 
-	Side*	side(bool front) { if (front) return s1; else return s2; }
+	Side*	side(bool front);
 
 	int		get_flags() { return flags; }
 	int		get_sector_tag() { return sector_tag; }
@@ -84,14 +84,14 @@ public:
 	void	set_flags(WORD nflags) { flags = nflags; }
 	void	set_side1(Side* s) { s1 = s; }
 	void	set_side2(Side* s) { s2 = s; }
-	void	set_parent(DoomMap* parent) { this->parent = parent; }
+	void	set_parent(DoomMap* parent, bool init = true);
 	void	set_vertex1(Vertex* v);
 	void	set_vertex2(Vertex* v);
 
 	bool	toggle_flag(WORD flag);
 	void	set_flag(WORD flag)		{ flags |= flag; }
 	void	clear_flag(WORD flag)	{ flags = (flags & ~flag); }
-	bool	check_flag(WORD flag)	{ return (flags & flag); }
+	bool	check_flag(WORD flag)	{ return !!(flags & flag); }
 
 	int		get_index() { return index; }
 	void	set_index(int i) { index = i; }

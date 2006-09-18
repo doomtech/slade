@@ -385,7 +385,7 @@ void init_textures()
 
 wxImage* lump_to_image(Wad* wadfile, int lump_index, bool alpha)
 {
-	if (lump_index < 0 || lump_index > wadfile->numLumps())
+	if (lump_index < 0 || lump_index > (int)wadfile->numLumps())
 		return NULL;
 
 	Lump* lump = wadfile->lumpAt(lump_index);
@@ -531,7 +531,7 @@ void load_textures_lump(Wad* wad, Lump *lump, bool iwad = false)
 		bool i = iwad;
 		if (tex->name != _T("_notex"))
 		{
-			i = tex->flags & TEX_IWAD;
+			i = !!(tex->flags & TEX_IWAD);
 			delete tex;
 			textures.erase(find(textures.begin(), textures.end(), tex));
 			tex = NULL;
@@ -562,7 +562,7 @@ void load_textures_lump(Wad* wad, Lump *lump, bool iwad = false)
 			// Skip unused
 			lefread(&temp, 1, 4, fp);
 
-			if (patch < pnames.size())
+			if (patch < (int)pnames.size())
 				((DoomTexture*)tex)->add_patch(xoff, yoff, wad, pnames[patch]);
 		}
 	}
@@ -641,7 +641,7 @@ void load_flats()
 	vector<Wad*> all_wads;
 
 	all_wads.push_back(wads.getWad());
-	for (DWORD w = 0; w < wads.nWads(); w++)
+	for (int w = 0; w < wads.nWads(); w++)
 		all_wads.push_back(wads.getWad(w));
 
 	for (DWORD a = 0; a < all_wads.size(); a++)
@@ -706,7 +706,7 @@ void load_sprites()
 
 	for (unsigned int s = 0; s < spritenames.size(); s++)
 	{
-		int inter = (spritenames.size() / 20);
+		int inter = ((int)spritenames.size() / 20);
 		if (inter == 0) inter = 1;
 
 		if (s % inter == 0)
@@ -731,7 +731,7 @@ void load_sprites()
 
 void load_tx_textures()
 {
-	for (DWORD w = 0; w < wads.nWads(); w++)
+	for (int w = 0; w < wads.nWads(); w++)
 	{
 		Wad* wad = wads.getWad(w);
 
@@ -793,7 +793,7 @@ void load_tx_textures()
 
 void load_hirestex_textures()
 {
-	for (DWORD w = 0; w < wads.nWads(); w++)
+	for (int w = 0; w < wads.nWads(); w++)
 	{
 		Lump* lump = wads.getWad(w)->getLump(_T("HIRESTEX"), 0);
 
@@ -1288,7 +1288,7 @@ bool DoomFlat::gen_gl_tex()
 	if (!data_wad)
 		return false;
 
-	if (data_lump < 0 || data_lump > data_wad->numLumps())
+	if (data_lump < 0 || data_lump > (int)data_wad->numLumps())
 		return false;
 
 	Lump* lump = data_wad->lumpAt(data_lump);

@@ -80,9 +80,9 @@ InputControlDialog::InputControlDialog(wxWindow *parent, keybind_t *init)
 	if (init)
 	{
 		text_key->SetValue(init->key);
-		btn_shift->SetValue(init->mods & KMOD_SHIFT);
-		btn_ctrl->SetValue(init->mods & KMOD_CTRL);
-		btn_alt->SetValue(init->mods & KMOD_ALT);
+		btn_shift->SetValue(!!(init->mods & KMOD_SHIFT));
+		btn_ctrl->SetValue(!!(init->mods & KMOD_CTRL));
+		btn_alt->SetValue(!!(init->mods & KMOD_ALT));
 	}
 
 	text_key->set_buttons(btn_shift, btn_ctrl, btn_alt);

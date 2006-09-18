@@ -526,7 +526,7 @@ void BindList::change(string name, int index, string key, BYTE mods)
 			if (index < 0)
 				return;
 
-			if (index < controls[a].keys.size())
+			if (index < (int)controls[a].keys.size())
 			{
 				controls[a].keys[index].key = key;
 				controls[a].keys[index].mods = mods;
@@ -566,7 +566,7 @@ void BindList::save(FILE* fp)
 	for (DWORD a = 0; a < controls.size(); a++)
 	{
 		if (controls[a].name.size() > max_size)
-			max_size = controls[a].name.size();
+			max_size = (unsigned int)controls[a].name.size();
 	}
 
 	fprintf(fp, "key_binds\n{\n");
@@ -637,7 +637,7 @@ void BindList::load(Tokenizer *tz)
 // -------------------------------------- >>
 control_t* BindList::get_bind(int index)
 {
-	if (index < controls.size() && index >= 0)
+	if (index < (int)controls.size() && index >= 0)
 		return &controls[index];
 	else
 		return NULL;

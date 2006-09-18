@@ -211,7 +211,7 @@ void save_colour_config(string filename)
 	for (DWORD c = 0; c < n_colours; c++)
 	{
 		if (colours[c].name.size() > max_size)
-			max_size = colours[c].name.size();
+			max_size = (unsigned int)colours[c].name.size();
 	}
 
 	FILE* fp = fopen(chr(filename), "wt");
@@ -248,7 +248,7 @@ void save_colours(FILE* fp)
 	for (DWORD c = 0; c < n_colours; c++)
 	{
 		if (colours[c].name.size() > max_size)
-			max_size = colours[c].name.size();
+			max_size = (unsigned int)colours[c].name.size();
 	}
 
 	fprintf(fp, "colours\n");

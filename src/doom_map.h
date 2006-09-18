@@ -165,7 +165,7 @@ public:
 	point2_t	middle();
 
 	void change_level(BYTE flags);
-	bool check_changed(BYTE flag) { return changed & flag; }
+	bool check_changed(BYTE flag) { return !!(changed & flag); }
 	void clear_change(BYTE flag) { changed = (changed & ~flag); }
 
 	void move_items(point2_t mouse);

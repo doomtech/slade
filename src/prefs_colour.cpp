@@ -137,7 +137,7 @@ ColourPrefs::ColourPrefs(wxWindow *parent)
 
 	ColourEdit *cedit = NULL;
 
-	for (int a = 0; a < n_colours; a++)
+	for (DWORD a = 0; a < n_colours; a++)
 	{
 		cedit = new ColourEdit(s_window, &colours[a].col, colours[a].desc);
 		vbox->Add(cedit, 0, wxEXPAND|wxALL, 4);

@@ -46,9 +46,6 @@ DoomMap::DoomMap()
 	def_vertex = new Vertex();
 	def_vertex->set_parent(this);
 
-	def_line = new Line();
-	def_line->set_parent(this);
-
 	def_sector = new Sector();
 	def_sector->set_parent(this);
 
@@ -57,6 +54,9 @@ DoomMap::DoomMap()
 
 	def_thing = new Thing();
 	def_thing->set_parent(this);
+
+	def_line = new Line();
+	def_line->set_parent(this, false);
 
 	def_side->set_sector(def_sector);
 	def_line->set_side1(def_side);
@@ -124,7 +124,7 @@ void DoomMap::set_name(string name)
 
 Vertex* DoomMap::vertex(int index)
 {
-	if (index < 0 || index >= vertices.size())
+	if (index < 0 || index >= (int)vertices.size())
 	{
 		log_message(s_fmt(_T("Vertex %d doesn't exist"), index));
 		return def_vertex;
@@ -135,7 +135,7 @@ Vertex* DoomMap::vertex(int index)
 
 Line* DoomMap::line(int index)
 {
-	if (index < 0 || index >= lines.size())
+	if (index < 0 || index >= (int)lines.size())
 	{
 		if (index != 65535)
 			log_message(s_fmt(_T("Line %d doesn't exist"), index));
@@ -147,7 +147,7 @@ Line* DoomMap::line(int index)
 
 Side* DoomMap::side(int index)
 {
-	if (index < 0 || index >= sides.size())
+	if (index < 0 || index >= (int)sides.size())
 	{
 		if (index != -1 && index != 65535)
 			log_message(s_fmt(_T("Side %d doesn't exist"), index));
@@ -160,7 +160,7 @@ Side* DoomMap::side(int index)
 
 Sector* DoomMap::sector(int index)
 {
-	if (index < 0 || index >= sectors.size())
+	if (index < 0 || index >= (int)sectors.size())
 	{
 		if (index != -1)
 			log_message(s_fmt(_T("Sector %d doesn't exist"), index));
@@ -172,7 +172,7 @@ Sector* DoomMap::sector(int index)
 
 Thing* DoomMap::thing(int index)
 {
-	if (index < 0 || index >= things.size())
+	if (index < 0 || index >= (int)things.size())
 	{
 		log_message(s_fmt(_T("Thing %d doesn't exist"), index));
 		return def_thing;
@@ -183,34 +183,34 @@ Thing* DoomMap::thing(int index)
 
 unsigned int DoomMap::n_verts()
 {
-	return vertices.size();
+	return (unsigned int)vertices.size();
 }
 
 unsigned int DoomMap::n_lines()
 {
-	return lines.size();
+	return (unsigned int)lines.size();
 }
 
 unsigned int DoomMap::n_sides()
 {
-	return sides.size();
+	return (unsigned int)sides.size();
 }
 
 unsigned int DoomMap::n_sectors()
 {
-	return sectors.size();
+	return (unsigned int)sectors.size();
 }
 
 unsigned int DoomMap::n_things()
 {
-	return things.size();
+	return (unsigned int)things.size();
 }
 
 void DoomMap::add_vertex(Vertex* vertex)
 {
 	vertices.push_back(vertex);
 	vertex->set_parent(this);
-	vertex->set_index(vertices.size() - 1);
+	vertex->set_index((int)vertices.size() - 1);
 	change_level(MC_SAVE_NEEDED);
 }
 
@@ -218,21 +218,21 @@ void DoomMap::add_line(Line *line)
 {
 	lines.push_back(line);
 	line->set_parent(this);
-	line->set_index(lines.size() - 1);
+	line->set_index((int)lines.size() - 1);
 	change_level(MC_NODE_REBUILD);
 }
 
 void DoomMap::add_side(Side* side)
 {
 	sides.push_back(side);
-	side->set_index(sides.size() - 1);
+	side->set_index((int)sides.size() - 1);
 	side->set_parent(this);
 }
 
 void DoomMap::add_sector(Sector* sector)
 {
 	sectors.push_back(sector);
-	sector->set_index(sectors.size() - 1);
+	sector->set_index((int)sectors.size() - 1);
 	sector->set_parent(this);
 }
 
@@ -240,7 +240,7 @@ void DoomMap::add_thing(Thing* thing)
 {
 	things.push_back(thing);
 	thing->set_parent(this);
-	thing->set_index(things.size() - 1);
+	thing->set_index((int)things.size() - 1);
 	change_level(MC_THINGS);
 }
 
@@ -767,7 +767,7 @@ bool DoomMap::open(Wad* wad, string mapname)
 	fseek(fp, lump->getOffset(), SEEK_SET);
 
 	// Read vertex data
-	for (DWORD i = 0; i < lump->getSize() / 4; i++)
+	for (int i = 0; i < lump->getSize() / 4; i++)
 	{
 		doomvertex_t v;
 		fread(&v, 4, 1, fp);
@@ -810,7 +810,7 @@ bool DoomMap::open(Wad* wad, string mapname)
 	fseek(fp, lump->getOffset(), SEEK_SET);
 
 	// Read side data
-	for (DWORD i = 0; i < lump->getSize() / 30; i++)
+	for (int i = 0; i < lump->getSize() / 30; i++)
 	{
 		doomside_t s;
 		fread(&s, 30, 1, fp);
@@ -941,7 +941,7 @@ void DoomMap::draw(rect_t vis_area, BYTE type)
 
 		glEnable(GL_POINT_SMOOTH);
 
-		for (int a = 0; a < vertices.size(); a++)
+		for (DWORD a = 0; a < vertices.size(); a++)
 		{
 			if (vertices[a]->x_pos() > vis_area.x1() && vertices[a]->x_pos() < vis_area.x2() &&
 				vertices[a]->y_pos() > vis_area.y1() && vertices[a]->y_pos() < vis_area.y2())
@@ -1746,7 +1746,7 @@ void DoomMap::move_items(point2_t mouse)
 
 void DoomMap::clear_move_items()
 {
-	if (edit_mode < 3 && (edit_auto_merge || edit_auto_split))
+	if (edit_mode != 3 && (edit_auto_merge || edit_auto_split))
 	{
 		// Get moving vertices
 		vector<Vertex*> m_verts;
@@ -1900,13 +1900,15 @@ void DoomMap::remove_overlapping_lines(vector<Line*> &list, bool merge)
 			if (vector_exists(list, line(l)))
 				continue;
 
+			Line* cl = line(l);
+
 			if (line(l)->has_vertex(list[a]->vertex1()) &&
 				line(l)->has_vertex(list[a]->vertex2()))
 			{
 				if (merge)
 				{
 					delete_line(list[a]);
-					line_correct_references(l);
+					line_correct_references(index(cl, true));
 				}
 				else
 				{

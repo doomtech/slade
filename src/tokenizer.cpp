@@ -52,7 +52,7 @@ bool Tokenizer::open_file(string filename, DWORD offset, DWORD length)
 bool Tokenizer::open_string(string text, DWORD offset, DWORD length)
 {
 	if (length == 0)
-		length = text.length();
+		length = (DWORD)text.length();
 
 	size = length;
 	position = 0;

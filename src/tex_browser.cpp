@@ -154,7 +154,7 @@ void TextureBrowser::update_vis_items()
 	string cur_val = _T("");
 	int sel = browse_area->selected_item;
 
-	if (sel >= 0 && sel < vis_items.size())
+	if (sel >= 0 && sel < (int)vis_items.size())
 		cur_val = vis_items[browse_area->selected_item]->retval;
 
 	vis_items.clear();
@@ -304,7 +304,7 @@ void TexBrowseCanvas::scroll_to_selected()
 	if (vis_items.size() == 0)
 		return;
 
-	int rows = (vis_items.size() / browser_columns) + 1;
+	int rows = ((int)vis_items.size() / browser_columns) + 1;
 	int width = GetClientSize().x / browser_columns;
 	int top = vscroll->GetThumbPosition();
 	int bottom = top + GetClientSize().y;
@@ -329,7 +329,7 @@ void TexBrowseCanvas::scroll_to_selected()
 			}
 			a++;
 
-			if (a >= vis_items.size())
+			if (a >= (int)vis_items.size())
 				return;
 		}
 	}
@@ -385,7 +385,7 @@ void TexBrowseCanvas::paint(wxPaintEvent &event)
 	wxPaintDC dc(this);
 
 	int width = GetClientSize().x / browser_columns;
-	int rows = (vis_items.size() / browser_columns) + 1;
+	int rows = ((int)vis_items.size() / browser_columns) + 1;
 	int rows_page = GetClientSize().y / width;
 	vscroll->SetScrollbar(vscroll->GetThumbPosition(), GetClientSize().y, rows*width, rows_page*width);
 	scroll_to_selected();
@@ -408,7 +408,7 @@ void TexBrowseCanvas::paint(wxPaintEvent &event)
 void TexBrowseCanvas::resize(wxSizeEvent &event)
 {
 	int width = GetClientSize().x / browser_columns;
-	int rows = (vis_items.size() / browser_columns) + 1;
+	int rows = ((int)vis_items.size() / browser_columns) + 1;
 	int rows_page = GetClientSize().y / width;
 	vscroll->SetScrollbar(vscroll->GetThumbPosition(), GetClientSize().y, rows*width, rows_page*width);
 	scroll_to_selected();
@@ -455,14 +455,14 @@ void TexBrowseCanvas::key_down(wxKeyEvent &event)
 	if (event.GetKeyCode() == WXK_RIGHT)
 	{
 		done = true;
-		if (index < vis_items.size() - 1)
+		if (index < (int)vis_items.size() - 1)
 			index++;
 	}
 
 	if (event.GetKeyCode() == WXK_DOWN)
 	{
 		done = true;
-		if (index < vis_items.size() - browser_columns)
+		if (index < (int)vis_items.size() - browser_columns)
 			index += browser_columns;
 	}
 
@@ -480,10 +480,10 @@ void TexBrowseCanvas::key_down(wxKeyEvent &event)
 		event.GetKeyCode() == WXK_NEXT)
 	{
 		done = true;
-		if (index < vis_items.size() - (browser_columns * rows))
+		if (index < (int)vis_items.size() - (browser_columns * rows))
 			index += (browser_columns * rows);
 		else
-			index = vis_items.size() - 1;
+			index = (int)vis_items.size() - 1;
 	}
 
 	if (done)
@@ -510,7 +510,7 @@ void TexBrowseCanvas::mouse_event(wxMouseEvent &event)
 		int col = event.GetPosition().x / width;
 		int index = (row * browser_columns) + col;
 
-		if (index < vis_items.size())
+		if (index < (int)vis_items.size())
 			selected_item = index;
 
 		redraw();

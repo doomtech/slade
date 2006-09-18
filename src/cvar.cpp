@@ -84,7 +84,7 @@ void save_cvars(FILE* fp)
 	for (DWORD c = 0; c < n_cvars; c++)
 	{
 		if (cvars[c]->name.size() > max_size)
-			max_size = cvars[c]->name.size();
+			max_size = (unsigned int)cvars[c]->name.size();
 	}
 
 	fprintf(fp, "cvars\n{\n");

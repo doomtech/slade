@@ -459,5 +459,5 @@ void update_visibility()
 	memset(ssects_visible, 0, gl_ssects.size());
 	set_visbuffer(0);
 	block_behind();
-	walk_bsp_tree(gl_nodes.size() - 1);
+	walk_bsp_tree((DWORD)gl_nodes.size() - 1);
 }

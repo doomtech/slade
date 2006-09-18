@@ -95,7 +95,7 @@ void Thing::update_ttype()
 
 bool Thing::check_flag(int flag)
 {
-	return (flags & flag);
+	return !!(flags & flag);
 }
 
 void Thing::set_flag(int flag, bool value)

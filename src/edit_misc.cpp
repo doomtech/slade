@@ -372,7 +372,7 @@ void sector_changelight(int amount)
 
 void sector_paint_tex(int sector, string tex, bool floor, vector<int> &sectors)
 {
-	if (sector < 0 || sector > d_map.n_sectors())
+	if (sector < 0 || sector > (int)d_map.n_sectors())
 		return;
 
 	sectors.push_back(sector);
@@ -549,11 +549,11 @@ void line_paint_tex(int line, bool front, string otex, string ntex, vector<int> 
 	{
 		if (find(processed_lines.begin(), processed_lines.end(), a_lines[a]) == processed_lines.end())
 		{
-			if (line_hastex(d_map.line(a_lines[a]), 1, otex))
-				line_paint_tex(a_lines[a], 1, otex, ntex, processed_lines);
+			if (line_hastex(d_map.line(a_lines[a]), true, otex))
+				line_paint_tex(a_lines[a], true, otex, ntex, processed_lines);
 
-			if (line_hastex(d_map.line(a_lines[a]), 2, otex))
-				line_paint_tex(a_lines[a], 2, otex, ntex, processed_lines);
+			if (line_hastex(d_map.line(a_lines[a]), false, otex))
+				line_paint_tex(a_lines[a], false, otex, ntex, processed_lines);
 		}
 	}
 }

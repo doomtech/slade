@@ -199,7 +199,7 @@ void MapPreviewCanvas::preview_map(Wad* wad, string mapname)
 	{
 		index++;
 
-		if (index >= wad->numLumps())
+		if (index >= (int)wad->numLumps())
 			done = true;
 		else if (wad->lumpAt(index)->getName() == _T("THINGS")	||
 				wad->lumpAt(index)->getName() == _T("LINEDEFS") ||
@@ -443,7 +443,7 @@ wxStaticBoxSizer *WadManager::setup_game_combo_frame(wxWindow *panel)
 				game_config_names.push_back(gamename);
 
 				if (gamename == def)
-					cur_game = games.GetCount() - 1;
+					cur_game = (int)games.GetCount() - 1;
 			}
 
 			delete buffer;
