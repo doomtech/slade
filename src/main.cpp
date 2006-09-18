@@ -222,6 +222,20 @@ IMPLEMENT_APP(MainApp)
 bool MainApp::OnInit()
 {
 	srand(wxGetLocalTime());
+
+	#ifndef unix
+	// Setup app path
+	app_path = argv[0];
+
+	int i = 5;	// 'slade'
+#ifdef WIN32
+	i = 9;		// 'slade.exe'
+#endif
+
+	for (int a = 0; a < i; a++)
+		app_path.erase(app_path.end() - 1);
+#endif
+
 	setup_directories();
 
 	// Init logfile
@@ -257,19 +271,6 @@ bool MainApp::OnInit()
 
 	// Parse command line
 	bool wads_opened = false;
-
-#ifndef unix
-	// Setup app path
-	app_path = argv[0];
-
-	int i = 5;	// 'slade'
-#ifdef WIN32
-	i = 9;		// 'slade.exe'
-#endif
-
-	for (int a = 0; a < i; a++)
-		app_path.erase(app_path.end() - 1);
-#endif
 
 	// Parse command line args
 	for (int a = 1; a < argc; a++)
