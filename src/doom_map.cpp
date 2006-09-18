@@ -8,6 +8,7 @@
 #include "edit_misc.h"
 #include "3dmode.h"
 #include "editor_window.h"
+#include "undoredo.h"
 
 #include "dm_vertex.h"
 #include "dm_line.h"
@@ -253,6 +254,7 @@ void DoomMap::delete_selection(int type)
 
 		if (type == 0)
 		{
+			make_backup(BKUP_VERTS|BKUP_LINES|BKUP_SIDES);
 			delete_vertex(hilight_item);
 			update_indices(MTYPE_LINE|MTYPE_SIDE|MTYPE_VERTEX);
 			remove_unused_vertices();
@@ -260,6 +262,7 @@ void DoomMap::delete_selection(int type)
 
 		else if (type == 1)
 		{
+			make_backup(BKUP_VERTS|BKUP_LINES|BKUP_SIDES);
 			delete_line(hilight_item);
 			update_indices(MTYPE_LINE|MTYPE_SIDE|MTYPE_VERTEX);
 			remove_unused_vertices();
@@ -267,12 +270,14 @@ void DoomMap::delete_selection(int type)
 
 		else if (type == 2)
 		{
+			make_backup(BKUP_LINES|BKUP_SIDES);
 			delete_sector(hilight_item);
 			update_indices(MTYPE_SECTOR);
 		}
 
 		else if (type == 3)
 		{
+			make_backup(BKUP_THINGS);
 			delete_thing(hilight_item);
 			update_indices(MTYPE_THING);
 		}
@@ -283,6 +288,7 @@ void DoomMap::delete_selection(int type)
 	{
 		if (type == 0)
 		{
+			make_backup(BKUP_VERTS|BKUP_LINES|BKUP_SIDES);
 			vector<Vertex*> delete_verts;
 
 			for (unsigned int a = 0; a < selected_items.size(); a++)
@@ -297,6 +303,7 @@ void DoomMap::delete_selection(int type)
 
 		else if (type == 1)
 		{
+			make_backup(BKUP_VERTS|BKUP_LINES|BKUP_SIDES);
 			vector<Line*> delete_lines;
 
 			for (unsigned int a = 0; a < selected_items.size(); a++)
@@ -311,6 +318,7 @@ void DoomMap::delete_selection(int type)
 
 		else if (type == 2)
 		{
+			make_backup(BKUP_LINES|BKUP_SIDES);
 			vector<Sector*> delete_sectors;
 
 			for (unsigned int a = 0; a < selected_items.size(); a++)
@@ -324,6 +332,7 @@ void DoomMap::delete_selection(int type)
 
 		else if (type == 3)
 		{
+			make_backup(BKUP_THINGS);
 			vector<Thing*> delete_things;
 
 			for (unsigned int a = 0; a < selected_items.size(); a++)
@@ -378,16 +387,6 @@ void DoomMap::delete_line(int index, Vertex *vertex)
 {
 	if (!valid(line(index)))
 		return;
-
-	/*
-	if (lines[index]->vertex1()->rem_ref() &&
-		lines[index]->vertex1() != vertex)
-		//delete_vertex(lines[index]->vertex1());
-
-	if (lines[index]->vertex2()->rem_ref() &&
-		lines[index]->vertex2() != vertex)
-		//delete_vertex(lines[index]->vertex2());
-		*/
 
 	if (lines[index]->vertex1() != vertex)
 		lines[index]->vertex1()->rem_ref();
@@ -1649,6 +1648,11 @@ void DoomMap::move_items(point2_t mouse)
 
 	if (moving_items.size() == 0)
 	{
+		if (edit_mode == 3)
+			make_backup(BKUP_THINGS|BKUP_MODIFY);
+		else
+			make_backup(BKUP_VERTS|BKUP_MODIFY);
+
 		// Add move items
 		origin.set(pos);
 
@@ -1748,6 +1752,8 @@ void DoomMap::clear_move_items()
 {
 	if (edit_mode != 3 && (edit_auto_merge || edit_auto_split))
 	{
+		make_backup(BKUP_LINES|BKUP_SIDES|BKUP_VERTS);
+
 		// Get moving vertices
 		vector<Vertex*> m_verts;
 		for (unsigned int a = 0; a < moving_items.size(); a++)
@@ -1861,6 +1867,8 @@ int	DoomMap::remove_unused_sectors()
 		}
 	}
 
+	update_indices(MTYPE_SECTOR);
+
 	return c;
 }
 
@@ -1876,6 +1884,8 @@ int	DoomMap::remove_zerolength_lines()
 			ret++;
 		}
 	}
+
+	update_indices(MTYPE_LINE);
 
 	return ret;
 }
@@ -2072,4 +2082,39 @@ void DoomMap::get_selection(vector<Thing*> &list, bool hilight)
 		if (valid(thing(selected_items[a])))
 			list.push_back(thing(selected_items[a]));
 	}
+}
+
+void DoomMap::clear_verts()
+{
+	for (DWORD a = 0; a < vertices.size(); a++)
+		delete vertices[a];
+	vertices.clear();
+}
+
+void DoomMap::clear_lines()
+{
+	for (DWORD a = 0; a < lines.size(); a++)
+		delete lines[a];
+	lines.clear();
+}
+
+void DoomMap::clear_sides()
+{
+	for (DWORD a = 0; a < sides.size(); a++)
+		delete sides[a];
+	sides.clear();
+}
+
+void DoomMap::clear_sectors()
+{
+	for (DWORD a = 0; a < sectors.size(); a++)
+		delete sectors[a];
+	sectors.clear();
+}
+
+void DoomMap::clear_things()
+{
+	for (DWORD a = 0; a < things.size(); a++)
+		delete things[a];
+	things.clear();
 }

@@ -9,6 +9,7 @@
 #include "input.h"
 #include "draw.h"
 #include "mathstuff.h"
+#include "undoredo.h"
 
 vector<point2_t>	ldraw_points;
 
@@ -76,6 +77,8 @@ bool lines_clockwise(vector<Line*> &list)
 
 void ldraw_end()
 {
+	make_backup(BKUP_VERTS|BKUP_LINES|BKUP_SIDES|BKUP_SECTORS);
+
 	// Add vertices
 	vector<Vertex*> new_verts;
 
@@ -196,6 +199,7 @@ void ldraw_end()
 	ldraw_points.clear();
 	change_state();
 	d_map.clear_selection();
+	d_map.remove_unused_sectors();
 	ldraw_bound_start = false;
 }
 

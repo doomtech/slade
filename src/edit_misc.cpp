@@ -9,6 +9,7 @@
 #include "dm_thing.h"
 #include "structs.h"
 #include "game_config.h"
+#include "undoredo.h"
 
 extern DoomMap d_map;
 extern int edit_mode;
@@ -111,7 +112,7 @@ void sector_create_stairs(int floor_step, int ceil_step)
 	if (selection.size() <= 1 || edit_mode != 2)
 		return;
 
-	//make_backup(false, false, false, true, false);
+	make_backup(false, false, false, true, false);
 
 	// Floor
 	int height = d_map.sector(selection[0])->floor();
@@ -141,7 +142,7 @@ void sector_light_gradient(int step)
 	if (selection.size() <= 1 || edit_mode != 2)
 		return;
 
-	//make_backup(false, false, false, true, false);
+	make_backup(false, false, false, true, false);
 
 	if (step > 255)
 	{
@@ -175,7 +176,7 @@ void sector_create_door(string texture)
 	if ((selection.size() == 0 && d_map.hilight() == -1) || edit_mode != 2)
 		return;
 
-	//make_backup(true, true, false, true, false);
+	make_backup(true, true, false, true, false);
 
 	vector<Sector*> items;
 
@@ -258,7 +259,7 @@ void sector_merge(bool remove_lines)
 	if (selection.size() == 0 || edit_mode != 2)
 		return;
 
-	//make_backup(true, true, false, true, false);
+	make_backup(true, true, false, true, false);
 
 	int sector = selection[0];
 
@@ -335,7 +336,7 @@ void sector_changelight(int amount)
 	if (edit_mode != 2 || (selection.size() == 0 && d_map.hilight() == -1))
 		return;
 
-	//make_backup(false, false, false, true, false);
+	make_backup(false, false, false, true, false);
 
 	vector<Sector*> sectors;
 
@@ -434,7 +435,7 @@ void line_extrude(int amount)
 	if (lines.size() == 0)
 		return;
 
-	//make_backup(true, true, true, false, false);
+	make_backup(true, true, true, false, false);
 
 	for (unsigned int a = 0; a < lines.size(); a++)
 	{
@@ -469,6 +470,8 @@ void line_align_x()
 	if (lines.size() <= 1)
 		return;
 
+	make_backup(false, true, false, false, false);
+
 	int offset = lines[0]->get_rect().length();
 	for (unsigned int a = 1; a < lines.size(); a++)
 	{
@@ -488,6 +491,8 @@ void line_correct_references(int line)
 {
 	if (line != -1 && d_map.valid(d_map.line(line)))
 	{
+		make_backup(true, true, false, false, false);
+
 		d_map.line(line)->set_sector(1, d_map.sector(get_side_sector(line, 1)));
 		d_map.line(line)->set_sector(2, d_map.sector(get_side_sector(line, 2)));
 
@@ -499,6 +504,8 @@ void line_correct_references(int line)
 
 	if (lines.size() == 0)
 		return;
+
+	make_backup(true, true, false, false, false);
 
 	for (unsigned int a = 0; a < lines.size(); a++)
 	{
@@ -613,7 +620,7 @@ void line_split(int splits)
 	if (lines.size() == 0)
 		return;
 
-	//make_backup(true, true, true, false, false);
+	make_backup(true, true, true, false, false);
 
 	for (unsigned int a = 0; a < lines.size(); a++)
 	{
@@ -642,6 +649,8 @@ void line_split_at(point2_t pos)
 	Line* line = d_map.line(l);
 	if (!d_map.valid(line))
 		return;
+
+	make_backup(true, true, true, false, false);
 
 	rect_t rect = line->get_rect();
 
@@ -679,6 +688,8 @@ void line_flip(bool verts, bool sides)
 
 	if (lines.size() == 0)
 		return;
+
+	make_backup(true, false, false, false, false);
 
 	for (unsigned int a = 0; a < lines.size(); a++)
 		lines[a]->flip(verts, sides);

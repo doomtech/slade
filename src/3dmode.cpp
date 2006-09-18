@@ -12,6 +12,7 @@
 #include "3dmode.h"
 #include "bsp.h"
 #include "edit_misc.h"
+#include "undoredo.h"
 
 float grav = 0.5f;
 
@@ -238,10 +239,20 @@ void change_texture_3d(bool paint)
 
 		if (tb.ShowModal() == wxID_OK && tb.get_texture().size())
 		{
-			if (side)
-				hl_line->side1()->set_texture(tb.get_texture(), part);
+			make_backup(BKUP_SIDES|BKUP_3DMODE|BKUP_MODIFY);
+
+			if (paint)
+			{
+				vector<int> lines;
+				line_paint_tex(d_map.index(hl_line), side, otex, tb.get_texture(), lines);
+			}
 			else
-				hl_line->side2()->set_texture(tb.get_texture(), part);
+			{
+				if (side)
+					hl_line->side1()->set_texture(tb.get_texture(), part);
+				else
+					hl_line->side2()->set_texture(tb.get_texture(), part);
+			}
 		}
 
 		reset_3d_mouse();
@@ -261,11 +272,20 @@ void change_texture_3d(bool paint)
 
 		if (tb.ShowModal() == wxID_OK && tb.get_texture().size())
 		{
-			if (hl_part == PART_FLOOR)
-				d_map.sector(hl_sector)->set_ftex(tb.get_texture());
+			make_backup(BKUP_SECTORS|BKUP_3DMODE|BKUP_MODIFY);
 
-			if (hl_part == PART_CEIL)
-				d_map.sector(hl_sector)->set_ctex(tb.get_texture());
+			if (paint)
+			{
+				vector<int> temp;
+				sector_paint_tex(hl_sector, tb.get_texture(), hl_part == PART_FLOOR, temp);
+			}
+			else
+			{
+				if (hl_part == PART_FLOOR)
+					d_map.sector(hl_sector)->set_ftex(tb.get_texture());
+				else if (hl_part == PART_CEIL)
+					d_map.sector(hl_sector)->set_ctex(tb.get_texture());
+			}
 		}
 
 		reset_3d_mouse();
@@ -331,6 +351,8 @@ void paste_texture_3d(bool paint)
 
 		if (c_wall.size())
 		{
+			make_backup(BKUP_SIDES|BKUP_3DMODE|BKUP_MODIFY);
+
 			if (!paint)
 			{
 				hl_line->side(side)->set_texture(c_wall, part);
@@ -356,12 +378,23 @@ void paste_texture_3d(bool paint)
 
 		if (ntex.size())
 		{
-			if (hl_part == PART_FLOOR)
-				d_map.sector(hl_sector)->set_ftex(ntex);
-			if (hl_part == PART_CEIL)
-				d_map.sector(hl_sector)->set_ctex(ntex);
+			make_backup(BKUP_SECTORS|BKUP_3DMODE|BKUP_MODIFY);
 
-			add_3d_message(s_fmt(_T("Pasted texture \"%s\""), ntex.c_str()));
+			if (paint)
+			{
+				vector<int> temp;
+				sector_paint_tex(hl_sector, ntex, hl_part == PART_FLOOR, temp);
+				add_3d_message(s_fmt(_T("Painted texture \"%s\""), ntex.c_str()));
+			}
+			else
+			{
+				if (hl_part == PART_FLOOR)
+					d_map.sector(hl_sector)->set_ftex(ntex);
+				else if (hl_part == PART_CEIL)
+					d_map.sector(hl_sector)->set_ctex(ntex);
+
+				add_3d_message(s_fmt(_T("Pasted texture \"%s\""), ntex.c_str()));
+			}
 		}
 	}
 }
@@ -407,7 +440,8 @@ void paste_side_3d(bool xoff, bool yoff, bool textures)
 	if (hl_line && copy_side)
 	{
 		Side *side = NULL;
-		
+		make_backup(BKUP_SIDES|BKUP_3DMODE|BKUP_MODIFY);
+
 		if (hl_part == PART_MID1 || hl_part == PART_UP1 || hl_part == PART_LO1)
 			side = hl_line->side1();
 		else
@@ -505,6 +539,7 @@ void reset_offsets_3d(bool x, bool y)
 	if (hl_line)
 	{
 		Side* side = NULL;
+		make_backup(BKUP_SIDES|BKUP_3DMODE|BKUP_MODIFY);
 
 		if (hl_part == PART_MID2 || hl_part == PART_LO2 || hl_part == PART_UP2)
 			side = hl_line->side2();
@@ -547,6 +582,8 @@ void auto_align_x_3d()
 {
 	if (!hl_line)
 		return;
+
+	make_backup(BKUP_SIDES|BKUP_3DMODE|BKUP_MODIFY);
 
 	bool side = true;
 	BYTE part = 1;

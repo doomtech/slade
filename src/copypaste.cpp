@@ -1,7 +1,7 @@
 
 #include "main.h"
 #include "copypaste.h"
-//#include "undoredo.h"
+#include "undoredo.h"
 #include "draw.h"
 #include "edit_misc.h"
 #include "edit.h"
@@ -283,7 +283,7 @@ void Clipboard::Paste()
 {
 	if (copy_type == COPY_THINGS && things.size() > 0)
 	{
-		//make_backup(false, false, false, false, true);
+		make_backup(false, false, false, false, true);
 		d_map.change_level(MC_THINGS);
 
 		for (unsigned int a = 0; a < things.size(); a++)
@@ -299,7 +299,7 @@ void Clipboard::Paste()
 
 	if (copy_type == COPY_ARCHITECTURE && lines.size() > 0)
 	{
-		//make_backup(true, true, true, true, false);
+		make_backup(true, true, true, true, false);
 
 		// Add vertices
 		vector<Vertex*> new_verts;

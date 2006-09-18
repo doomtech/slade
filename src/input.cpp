@@ -22,10 +22,10 @@
 #include "ttype_select.h"
 #include "edit_misc.h"
 #include "copypaste.h"
+#include "undoredo.h"
 
 /*
 #include "map.h"
-#include "undoredo.h"
 #include "struct_3d.h"
 #include "mathstuff.h"
 #include "console.h"
@@ -117,21 +117,30 @@ void edit_item()
 	{
 		LineEditor le;
 		if (le.ShowModal() == wxID_OK)
+		{
+			make_backup(BKUP_LINES|BKUP_SIDES);
 			le.apply_changes();
+		}
 	}
 
 	if (edit_mode == 3)
 	{
 		ThingEditor te;
 		if (te.ShowModal() == wxID_OK)
+		{
+			make_backup(BKUP_THINGS|BKUP_MODIFY);
 			te.apply_changes();
+		}
 	}
 
 	if (edit_mode == 2)
 	{
 		SectorEditor se;
 		if (se.ShowModal() == wxID_OK)
+		{
+			make_backup(BKUP_SECTORS|BKUP_MODIFY);
 			se.apply_changes();
+		}
 	}
 
 	redraw_map();
@@ -242,22 +251,13 @@ void keys_edit()
 	if (PRESSED("view_zoomout"))
 		editor_window->map()->zoom_view(0.8);
 
-	/*
 	// Center view on mouse
 	if (RELEASED("view_mousecenter"))
-	{
-		xoff = m_x(mouse.x);
-		yoff = m_y(mouse.y);
-		editor_window->redraw_map(true, true);
-	}
+		editor_window->map()->set_offsets(mouse_pos(true));
 
 	// Set offsets to 0, 0
 	if (RELEASED("view_origin"))
-	{
-		xoff = yoff = 0;
-		editor_window->redraw_map(true, true);
-	}
-	*/
+		editor_window->map()->set_offsets(point2_t(0, 0));
 
 	// Popup context menu
 	if (RELEASED("view_contextmenu") && state())
@@ -337,11 +337,7 @@ void keys_edit()
 	{
 		d_map.delete_selection(edit_mode);
 		redraw_map();
-		//lock_hilight = false;
 	}
-
-	//if (PRESSED("edit_deleteitem") && state())
-	//	lock_hilight = true;
 
 	// Create item
 	if (RELEASED("edit_createitem") && state())
@@ -509,16 +505,10 @@ void keys_edit()
 
 	// Sector light change
 	if (PRESSED("sector_uplight"))
-	{
-		//binds.clear("sector_uplight");
 		sector_changelight(16);
-	}
 
 	if (PRESSED("sector_downlight"))
-	{
-		//binds.clear("sector_downlight");
 		sector_changelight(-16);
-	}
 
 	// Flip line
 	if (RELEASED("line_flip") && state())
@@ -547,23 +537,17 @@ void keys_edit()
 		redraw_map();
 	}
 
-	/*
 	if (RELEASED("line_correctrefs") && state())
 		line_correct_references();
-		*/
 
 	// Begin line draw
 	if (PRESSED("line_begindraw"))
 	{
-		//if (!line_draw)
-		//	line_draw = true;
-
 		change_state(STATE_LINEDRAW);
-
 		binds.clear(_T("line_begindraw"));
 	}
 
-	// Begin rectangle draw
+	// Begin shape draw
 	if (PRESSED("line_begindraw_rect"))
 	{
 		change_state(STATE_SHAPEDRAW);
@@ -571,23 +555,20 @@ void keys_edit()
 		binds.clear(_T("line_begindraw_rect"));
 	}
 
-	/*
 	// Undo
 	if (RELEASED("edit_undo") && state())
 	{
 		undo();
-		clear_selection();
-		hilight_item = -1;
-		editor_window->redraw_map(true, true);
-		//map_changelevel(3);
-		map.change_level(MC_NODE_REBUILD);
+		d_map.clear_selection();
+		redraw_map();
+		d_map.change_level(MC_NODE_REBUILD);
 		binds.clear("edit_undo");
 	}
-	*/
 
 	if (RELEASED("edit_createsector"))
 	{
 		vector<Sector*> n_s;
+		make_backup(BKUP_LINES|BKUP_SIDES|BKUP_SECTORS);
 		sector_create(down_pos(true), n_s);
 	}
 
@@ -643,7 +624,6 @@ void keys_edit()
 	if (RELEASED("paste") && state())
 	{
 		binds.clear(_T("paste"));
-		//paste_mode = true;
 		change_state(STATE_PASTE);
 		d_map.clear_selection();
 	}
@@ -1227,6 +1207,13 @@ bool keys_3d(float mult, bool mwheel)
 	{
 		binds.clear(_T("3d_paste_yoffset"));
 		paste_side_3d(false, true);
+	}
+
+	// Undo
+	if (binds.pressed(_T("edit_undo")))
+	{
+		binds.clear(_T("edit_undo"));
+		undo(true);
 	}
 
 	if (mult < 1.0f)

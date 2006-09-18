@@ -7,6 +7,7 @@
 #include "dm_line.h"
 #include "dm_sector.h"
 #include "mathstuff.h"
+#include "undoredo.h"
 
 int	gridsize = 32;		// Grid size
 int	edit_mode = 1;		// Edit mode: 0=vertices, 1=lines, 2=sectors, 3=things
@@ -146,6 +147,8 @@ void create_vertex(point2_t mouse)
 	if (d_map.check_vertex_spot(mouse) != -1)
 		return;
 
+	make_backup(BKUP_VERTS|BKUP_LINES|BKUP_SIDES);
+
 	Vertex *v = new Vertex(mouse.x, mouse.y, &d_map);
 
 	if (edit_auto_split)
@@ -158,6 +161,8 @@ void create_line(bool close)
 
 	if (selection.size() <= 1)
 		return;
+
+	make_backup(BKUP_VERTS|BKUP_LINES|BKUP_SIDES);
 
 	vector<int> n_lines;
 
@@ -186,6 +191,8 @@ void create_sector()
 
 	if (selection.size() == 0)
 		return;
+
+	make_backup(BKUP_LINES|BKUP_SIDES|BKUP_SECTORS);
 
 	Sector *ns = new Sector(&d_map);
 
@@ -219,6 +226,8 @@ void create_sector()
 
 void create_thing(point2_t mouse)
 {
+	make_backup(BKUP_THINGS);
+
 	if (edit_snap_grid)
 	{
 		mouse.x = snap_to_grid(mouse.x);

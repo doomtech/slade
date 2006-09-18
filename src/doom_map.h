@@ -103,6 +103,12 @@ public:
 	void	delete_thing(Thing* thing);
 	void	delete_thing(int index);
 
+	void	clear_verts();
+	void	clear_lines();
+	void	clear_sides();
+	void	clear_sectors();
+	void	clear_things();
+
 	int		index(Vertex* i, bool force_search = false);
 	int		index(Line* i, bool force_search = false);
 	int		index(Side* i, bool force_search = false);

@@ -11,6 +11,7 @@
 #include "doom_map.h"
 #include "bsp.h"
 #include "splash.h"
+#include "undoredo.h"
 
 #include <wx/image.h>
 
@@ -31,6 +32,7 @@ extern Camera camera;
 extern BindList binds;
 extern DoomMap d_map;
 extern bool* lines_visible;
+extern BackupManager bm;
 
 EXTERN_CVAR(Float, mouse_speed_3d)
 
@@ -103,6 +105,7 @@ Render3dCanvas::~Render3dCanvas()
 	editor_window->Show(true);
 	restore_resolution();
 	frame_3d = NULL;
+	bm.clear_3d();
 }
 
 void Render3dCanvas::render()
