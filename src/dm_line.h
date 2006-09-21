@@ -128,7 +128,7 @@ public:
 	void	apply_default_textures(bool front = true, bool back = true);
 
 	Line*	split(Vertex* vert);
-	void	copy(Line* line);
+	void	copy(Line* line, bool copy_sides = true);
 
 	doomline_t	to_doomformat();
 	hexenline_t	to_hexenformat();

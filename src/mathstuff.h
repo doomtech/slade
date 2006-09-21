@@ -20,6 +20,7 @@ float dot_product(point3_t v1, point3_t v2);
 float line_intersect(point3_t r1, point3_t r2, float x1, float y1, float x2, float y2);
 float dist_ray_plane(point3_t r_o, point3_t r_v, plane_t plane);
 bool lines_intersect(rect_t line1, rect_t line2, fpoint2_t *ip = NULL);
+bool rects_intersect(rect_t r1, rect_t r2);
 
 #ifdef WIN32
 int lround(double val);

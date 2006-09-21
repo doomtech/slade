@@ -259,6 +259,9 @@ void InputPrefs::btn_addbind_clicked(wxCommandEvent &event)
 
 void InputPrefs::btn_removebind_clicked(wxCommandEvent &event)
 {
+	if (list_binds->GetSelection() == -1)
+		return;
+
 	control_t *c = binds.get_bind(list_controls->GetSelection());
 
 	if (!c)
@@ -275,6 +278,9 @@ void InputPrefs::btn_removebind_clicked(wxCommandEvent &event)
 
 void InputPrefs::btn_changebind_clicked(wxCommandEvent &event)
 {
+	if (list_binds->GetSelection() == -1)
+		return;
+
 	control_t *c = binds.get_bind(list_controls->GetSelection());
 
 	if (!c)

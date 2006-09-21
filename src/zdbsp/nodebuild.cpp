@@ -25,12 +25,12 @@
 #include <stdio.h>
 #include <math.h>
 
-#include "../main.h"
-#include "../splash.h"
-
 #include "zdbsp.h"
 #include "nodebuild.h"
 #include "templates.h"
+
+#include "../main.h"
+#include "../splash.h"
 
 #define Printf printf
 #define STACK_ARGS

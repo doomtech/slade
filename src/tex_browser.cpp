@@ -304,11 +304,14 @@ void TexBrowseCanvas::scroll_to_selected()
 	if (vis_items.size() == 0)
 		return;
 
+	if (selected_item == -1)
+		return;
+
 	int rows = ((int)vis_items.size() / browser_columns) + 1;
 	int width = GetClientSize().x / browser_columns;
 	int top = vscroll->GetThumbPosition();
 	int bottom = top + GetClientSize().y;
-	int rows_page = GetClientSize().y / width;
+	int rows_page = width ? GetClientSize().y / width : 1;
 
 	vscroll->SetScrollbar(vscroll->GetThumbPosition(), GetClientSize().y, rows*width, rows_page*width);
 
@@ -386,7 +389,7 @@ void TexBrowseCanvas::paint(wxPaintEvent &event)
 
 	int width = GetClientSize().x / browser_columns;
 	int rows = ((int)vis_items.size() / browser_columns) + 1;
-	int rows_page = GetClientSize().y / width;
+	int rows_page = width ? GetClientSize().y / width : 1;
 	vscroll->SetScrollbar(vscroll->GetThumbPosition(), GetClientSize().y, rows*width, rows_page*width);
 	scroll_to_selected();
 
@@ -409,7 +412,7 @@ void TexBrowseCanvas::resize(wxSizeEvent &event)
 {
 	int width = GetClientSize().x / browser_columns;
 	int rows = ((int)vis_items.size() / browser_columns) + 1;
-	int rows_page = GetClientSize().y / width;
+	int rows_page = width ? GetClientSize().y / width : 1;
 	vscroll->SetScrollbar(vscroll->GetThumbPosition(), GetClientSize().y, rows*width, rows_page*width);
 	scroll_to_selected();
 
@@ -432,7 +435,7 @@ void TexBrowseCanvas::key_down(wxKeyEvent &event)
 {
 	//wxMessageBox("Key down");
 	int width = GetClientSize().x / browser_columns;
-	int rows = GetClientSize().y / width;
+	int rows = width ? GetClientSize().y / width : 1;
 
 	int index = selected_item;
 

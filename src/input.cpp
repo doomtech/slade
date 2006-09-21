@@ -562,7 +562,7 @@ void keys_edit()
 		d_map.clear_selection();
 		redraw_map();
 		d_map.change_level(MC_NODE_REBUILD);
-		binds.clear("edit_undo");
+		binds.clear(_T("edit_undo"));
 	}
 
 	if (RELEASED("edit_createsector"))

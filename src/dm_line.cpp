@@ -746,7 +746,7 @@ Line* Line::split(Vertex* vert)
 	return l;
 }
 
-void Line::copy(Line *line)
+void Line::copy(Line *line, bool copy_sides)
 {
 	flags = line->get_flags();
 	type = line->get_special();
@@ -756,7 +756,7 @@ void Line::copy(Line *line)
 	for (int a = 0; a < 5; a++)
 		args[a] = line->arg(a);
 
-	if (parent)
+	if (parent && copy_sides)
 	{
 		if (parent->valid(line->side1()))
 		{

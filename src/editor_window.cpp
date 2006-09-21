@@ -658,45 +658,44 @@ void EditorWindow::file_rename(wxCommandEvent &event)
 
 void EditorWindow::file_run(wxCommandEvent &event)
 {
-	/*
 	string exe_path = path_doomexe;
 	if (exe_path.empty())
 	{
-		wxMessageBox(_T("No executable set. See edit->preferences->misc"));
+		message_box(_T("No executable set. See edit->preferences->misc"));
 		return;
 	}
-	
+
 	Tokenizer tz;
 	tz.open_string(run_parameters, 0, 0);
 
 	Wad *temp_wad = new Wad();
-	map.add_to_wad(temp_wad);
-	temp_wad->path = parse_string("%ssladetemp.wad", app_path.c_str());
+	d_map.add_to_wad(temp_wad);
+	temp_wad->path = c_path(_T("sladetemp.wad"), DIR_TMP);
 	temp_wad->save(true);
-	wads.open_wad(temp_wad->path);
+	wads.open(temp_wad->path);
 
 	string token = tz.get_token();
-	while (token != "!END")
+	while (token != _T("!END"))
 	{
-		exe_path += " ";
+		exe_path += _T(" ");
 
-		if (token == "%w")
+		if (token == _T("%w"))
 		{
 			if (edit_wad)
-				exe_path += parse_string("\"%s\" ", edit_wad->path.c_str());
+				exe_path += s_fmt(_T("\"%s\" "), edit_wad->path.c_str());
 		}
 
-		else if (token == "%a")
+		else if (token == _T("%a"))
 		{
-			for (int a = 0; a < wads.n_wads; a++)
-				exe_path += parse_string("\"%s\" ", wads.get_wad(a)->path.c_str());
+			for (int a = 0; a < wads.nWads(); a++)
+				exe_path += s_fmt(_T("\"%s\" "), wads.getWad(a)->path.c_str());
 		}
 
-		else if (token == "%m")
-			exe_path += map.name;
+		else if (token == _T("%m"))
+			exe_path += d_map.map_name();
 
-		else if (token == "%i")
-			exe_path += parse_string("\"%s\" ", wads.get_iwad()->path.c_str());
+		else if (token == _T("%i"))
+			exe_path += s_fmt(_T("\"%s\" "), wads.getWad()->path.c_str());
 
 		else
 			exe_path += token;
@@ -704,11 +703,10 @@ void EditorWindow::file_run(wxCommandEvent &event)
 		token = tz.get_token();
 	}
 
-	wads.close_wad(temp_wad->path);
+	wads.close(temp_wad->path);
 
-	if (wxExecute(str_to_wx(exe_path)) == -1)
-		wxMessageBox(_T("Couldn't find executable! Check the path at edit->preferences->misc"));
-		*/
+	if (wxExecute(exe_path) == -1)
+		message_box(_T("Couldn't find executable! Check the path at edit->preferences->misc"));
 }
 
 void EditorWindow::file_importmap(wxCommandEvent &event)
@@ -1121,12 +1119,10 @@ void EditorWindow::check_removesides(wxCommandEvent &event)
 
 void EditorWindow::check_checktextures(wxCommandEvent &event)
 {
-	/*
-	if (!map.opened)
+	if (!d_map.opened())
 		return;
 
 	check_textures();
-	*/
 }
 
 void EditorWindow::thing_insert(wxCommandEvent &event)

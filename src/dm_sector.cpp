@@ -170,7 +170,7 @@ Texture* Sector::get_tex(bool floor)
 	}
 }
 
-void Sector::copy(Sector* s)
+void Sector::copy(Sector* s, bool update_tex)
 {
 	parent = s->parent;
 	index = -1;
@@ -181,6 +181,15 @@ void Sector::copy(Sector* s)
 	special = s->action_special();
 	tag = s->sector_tag();
 
-	set_ctex(s->tex_ceil());
-	set_ftex(s->tex_floor());
+	if (update_tex)
+	{
+		set_ctex(s->tex_ceil());
+		set_ftex(s->tex_floor());
+	}
+	else
+	{
+		tex_f = tex_c = NULL;
+		f_tex = s->tex_floor();
+		c_tex = s->tex_ceil();
+	}
 }

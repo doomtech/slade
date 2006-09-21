@@ -91,12 +91,17 @@ bool point_in_rect(int x1, int y1, int x2, int y2, int x, int y)
 	return (x >= x1) && (x <= x2) && (y >= y1) && (y <= y2);
 }
 
-/*
+bool rects_intersect(rect_t r1, rect_t r2)
+{
+	return !(r1.left() > r2.right() || r1.right() < r2.left() ||
+		r1.top() > r2.bottom() || r1.bottom() < r2.top());
+}
+
 string test(rect_t line)
 {
 	return s_fmt(_T("(%d, %d) to (%d, %d)"), line.x1(), line.y1(), line.x2(), line.y2());
 }
-*/
+
 
 // lines_intersect: Checks if 2 lines intersect eachother
 // --------------------------------------------------- >>
@@ -117,12 +122,14 @@ bool lines_intersect(rect_t line1, rect_t line2, fpoint2_t *ip)
 		double x = (b2*c1 - b1*c2) / det;
         double y = (a1*c2 - a2*c1) / det;
 
-		//log_message(_T("L1 %s") + test(line1));
-		//log_message(_T("L2 %s") + test(line2));
+		//log_message(_T("L1 ") + test(line1));
+		//log_message(_T("L2 ") + test(line2));
 		//log_message(s_fmt(_T("%1.2f %1.2f"), x, y));
 
-		if (x <= line1.right() && x >= line1.left() && y >= line1.top() && y <= line1.bottom() &&
-			x <= line2.right() && x >= line2.left() && y >= line2.top() && y <= line2.bottom())
+		//if (point_in_rect(line1.left(), line1.top(), line1.right(), line1.bottom(), lround(x), lround(y)) &&
+		//	point_in_rect(line2.left(), line2.top(), line2.right(), line2.bottom(), lround(x), lround(y)))
+		if (distance_to_line(line1.left(), line1.top(), line1.right(), line1.bottom(), x, y) <= 1 &&
+			distance_to_line(line2.left(), line2.top(), line2.right(), line2.bottom(), x, y) <= 1)
 		{
 			if (ip) ip->set(x, y);
 			return true;
@@ -220,25 +227,6 @@ float get_2d_angle(point3_t p1, point3_t p2, point3_t p3)
 	}
 
 	return (float)value;
-
-	/*
-	float a = angle_between_vectors_2(p1.normalize(), p2.normalize());
-	float side = p2.y * p1.x - p2.x * p1.y;
-
-	float ret;
-
-	if (side > 0.0f)
-		ret = 360.0f - a;
-	else
-		ret = a;
-
-	if (ret > 360.0f)
-		ret = 360.0f;
-	if (ret < 0.0f)
-		ret = 0.0f;
-
-	return ret;
-	*/
 }
 
 #ifdef WIN32

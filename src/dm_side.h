@@ -60,7 +60,7 @@ public:
 	int		get_index() { return index; }
 	void	set_index(int i) { index = i; }
 
-	void	copy(Side* side);
+	void	copy(Side* side, bool update_tex = true);
 
 	doomside_t	to_doomformat();
 };

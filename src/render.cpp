@@ -832,14 +832,14 @@ void render_ssect(unsigned int ssect)
 
 	Sector* sec = d_map.sector(ssect_sectors[ssect]);
 
-	plane_t c_plane, f_plane;
-	f_plane.set(0.0f, 0.0f, 1.0f, sec->floor());
-	c_plane.set(0.0f, 0.0f, 1.0f, sec->ceiling());
-
 	vis_ssect++;
 
 	int l = sec->light_level();
 	set_light(rgba_t(l, l, l, 255), sec->light_level());
+
+	plane_t c_plane, f_plane;
+	f_plane.set(0.0f, 0.0f, 1.0f, sec->floor());
+	c_plane.set(0.0f, 0.0f, 1.0f, sec->ceiling());
 
 	float x = 0;
 	float y = 0;
@@ -1068,6 +1068,16 @@ void render_ssects()
 
 	glEnable(GL_TEXTURE_2D);
 	*/
+}
+
+void render_thing(Thing* t)
+{
+}
+
+void render_mapthings()
+{
+	for (int a = 0; a < d_map.n_things(); a++)
+		render_thing(d_map.thing(a));
 }
 
 void render_skydome()

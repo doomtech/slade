@@ -462,7 +462,7 @@ bool sector_create(point2_t point, vector<Sector*> &new_sectors, bool* front_sid
 			}
 
 			// Re-check in-lines
-			for (DWORD b = 0; b < in_lines.size(); b++)
+			for (int b = 0; b < (int)in_lines.size(); b++)
 			{
 				rect_t r = d_map.line(in_lines[b])->get_rect();
 				point2_t midpoint = r.middle();
@@ -511,10 +511,10 @@ bool sector_create(point2_t point, vector<Sector*> &new_sectors, bool* front_sid
 
 		if (all_lines[a].orientation == ORTN_FRONT)
 		{
-			if (d_map.valid(side1) && !copy_sector && !(vector_exists(new_sectors, side1->get_sector())))
+			if (d_map.valid(side1->get_sector()) && !copy_sector && !(vector_exists(new_sectors, side1->get_sector())))
 				copy_sector = side1->get_sector();
 
-			if (d_map.valid(side2) && !copy_sector && !(vector_exists(new_sectors, side2->get_sector())))
+			if (d_map.valid(side2->get_sector()) && !copy_sector && !(vector_exists(new_sectors, side2->get_sector())))
 				copy_sector = side2->get_sector();
 
 			if (front_sides)
@@ -524,10 +524,10 @@ bool sector_create(point2_t point, vector<Sector*> &new_sectors, bool* front_sid
 		}
 		else
 		{
-			if (d_map.valid(side2) && !copy_sector && !(vector_exists(new_sectors, side2->get_sector())))
+			if (d_map.valid(side2->get_sector()) && !copy_sector && !(vector_exists(new_sectors, side2->get_sector())))
 				copy_sector = side2->get_sector();
 
-			if (d_map.valid(side1) && !copy_sector && !(vector_exists(new_sectors, side1->get_sector())))
+			if (d_map.valid(side1->get_sector()) && !copy_sector && !(vector_exists(new_sectors, side1->get_sector())))
 				copy_sector = side1->get_sector();
 
 			if (back_sides)
@@ -535,6 +535,9 @@ bool sector_create(point2_t point, vector<Sector*> &new_sectors, bool* front_sid
 
 			line->set_sector(2, sector);
 		}
+
+		if (copy_sector == sector)
+			copy_sector = NULL;
 	}
 
 	if (copy_sector)

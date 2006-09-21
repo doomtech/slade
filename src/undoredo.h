@@ -22,11 +22,16 @@ class Backup
 private:
 	WORD	flags;
 
-	vector<Vertex*>			verts;
-	vector<bkup_line_t*>	lines;
-	vector<bkup_side_t*>	sides;
-	vector<Sector*>			sectors;
-	vector<Thing*>			things;
+	Thing*			things;
+	DWORD			n_things;
+	Vertex*			verts;
+	DWORD			n_verts;
+	bkup_line_t*	lines;
+	DWORD			n_lines;
+	Sector*			sectors;
+	DWORD			n_sectors;
+	bkup_side_t*	sides;
+	DWORD			n_sides;
 
 public:
 	Backup();
@@ -41,7 +46,9 @@ public:
 class BackupManager
 {
 private:
-	vector<Backup*>	backups;
+	//vector<Backup*>	backups;
+	Backup*		*backups;
+	int			n_backups;
 
 public:
 	BackupManager();

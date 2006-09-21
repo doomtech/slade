@@ -229,14 +229,17 @@ void change_texture_3d(bool paint)
 
 		string otex = _T("");
 
+		//log_message("1");
 		if (side)
 			otex = hl_line->side1()->get_texname(part);
 		else
 			otex = hl_line->side2()->get_texname(part);
 
+		//log_message("2");
 		setup_tex_browser(1);
 		TextureBrowser tb(otex, true);
 
+		//log_message("3");
 		if (tb.ShowModal() == wxID_OK && tb.get_texture().size())
 		{
 			make_backup(BKUP_SIDES|BKUP_3DMODE|BKUP_MODIFY);

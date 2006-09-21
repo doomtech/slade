@@ -211,13 +211,23 @@ void Side::set_sector(int sector)
 		this->sector = parent->sector(sector);
 }
 
-void Side::copy(Side* side)
+void Side::copy(Side* side, bool update_tex)
 {
 	index = -1;
 
-	set_texture(side->get_texname(0), 0);
-	set_texture(side->get_texname(1), 1);
-	set_texture(side->get_texname(2), 2);
+	if (update_tex)
+	{
+		set_texture(side->get_texname(0), 0);
+		set_texture(side->get_texname(1), 1);
+		set_texture(side->get_texname(2), 2);
+	}
+	else
+	{
+		tx_upper = tx_middle = tx_lower = NULL;
+		tex_upper = side->get_texname(TEX_UPPER);
+		tex_middle = side->get_texname(TEX_MIDDLE);
+		tex_lower = side->get_texname(TEX_LOWER);
+	}
 
 	set_xoff(side->get_xoff());
 	set_yoff(side->get_yoff());

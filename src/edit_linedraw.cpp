@@ -82,6 +82,8 @@ void ldraw_end()
 	// Add vertices
 	vector<Vertex*> new_verts;
 
+	// Check for intersections
+	// (still seem to be some problems with this due to the inaccuracy of the doom map format, oh well)
 	bool gsnap = edit_snap_grid;
 	edit_snap_grid = false;
 	for (unsigned int a = 0; a < ldraw_points.size() - 1; a++)
@@ -92,11 +94,19 @@ void ldraw_end()
 			rect_t r1 = d_map.line(b)->get_rect();
 			rect_t r2(ldraw_points[a], ldraw_points[a+1]);
 
+			if (!rects_intersect(r1, r2))
+				continue;
+
 			fpoint2_t ip;
 			if (lines_intersect(r1, r2, &ip))
 			{
-				//log_message(s_fmt(_T("Intersect with line %d at %1.2f,%1.2f"), b, ip.x, ip.y));
-				create_vertex(point2_t(lround(ip.x), lround(ip.y)));
+				//log_message(s_fmt("intersect at %1.2f,%1.2f", ip.x, ip.y));
+				if (d_map.check_vertex_spot(point2_t(lround(ip.x), lround(ip.y))) == -1)
+				{
+					Vertex *v = new Vertex(lround(ip.x), lround(ip.y), &d_map);
+					d_map.line(b)->split(v);
+					lines = d_map.n_lines();
+				}
 			}
 		}
 	}
@@ -200,6 +210,7 @@ void ldraw_end()
 	change_state();
 	d_map.clear_selection();
 	d_map.remove_unused_sectors();
+	d_map.update_vertex_refs();
 	ldraw_bound_start = false;
 }
 

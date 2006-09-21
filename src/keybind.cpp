@@ -617,6 +617,9 @@ void BindList::load(Tokenizer *tz)
 					if (key == _T("}"))
 						break;
 
+					if (key.size() == 1)
+						key.UpperCase();
+
 					BYTE mods = tz->get_integer();
 					change(name, index, key, mods);
 					index++;
@@ -624,6 +627,9 @@ void BindList::load(Tokenizer *tz)
 			}
 			else
 			{
+				if (key.size() == 1)
+					key.UpperCase();
+
 				BYTE mods = tz->get_integer();
 				change(name, 0, key, mods);
 			}

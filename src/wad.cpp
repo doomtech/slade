@@ -6,13 +6,13 @@
 // << ------------------------------------ >>
 
 // Includes ------------------------------ >>
+#include "zdbsp/wad.h"
+#include "zdbsp/processor.h"
+
 #include "byteswap.h"
 #include "main.h"
 #include "wad.h"
 #include "splash.h"
-
-#include "zdbsp/wad.h"
-#include "zdbsp/processor.h"
 
 #include <wx/filename.h>
 #include <wx/wfstream.h>

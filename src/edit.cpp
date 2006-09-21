@@ -136,7 +136,7 @@ bool state(BYTE state_test)
 	return (state_test == edit_state);
 }
 
-void create_vertex(point2_t mouse)
+Vertex* create_vertex(point2_t mouse)
 {
 	if (edit_snap_grid)
 	{
@@ -145,7 +145,7 @@ void create_vertex(point2_t mouse)
 	}
 
 	if (d_map.check_vertex_spot(mouse) != -1)
-		return;
+		return NULL;
 
 	make_backup(BKUP_VERTS|BKUP_LINES|BKUP_SIDES);
 
@@ -153,6 +153,8 @@ void create_vertex(point2_t mouse)
 
 	if (edit_auto_split)
 		d_map.check_split(v);
+
+	return v;
 }
 
 void create_line(bool close)
@@ -237,4 +239,125 @@ void create_thing(point2_t mouse)
 	Thing *t = new Thing(&d_map);
 	t->copy(&last_thing);
 	t->set_pos(mouse.x, mouse.y);
+}
+
+
+void check_textures()
+{
+	d_map.clear_selection();
+	hilight_item = -1;
+	int line = -1;
+
+	// Check line textures
+	for (int l = 0; l < d_map.n_lines(); l++)
+	{
+		//sidedef_t *side = map.l_getside(l, 1);
+		Side* side = d_map.line(l)->side1();
+
+		if (d_map.valid(side))
+		{
+			string tex = side->get_texname(TEX_UPPER);
+			if (get_texture(tex, 1)->name == _T("_notex") && tex != _T("-"))
+			{
+				string line = s_fmt(_T("Line %d has invalid front upper texture \"%s\"\n'Yes' to edit, 'No' to stop checking"),
+											l, tex.c_str());
+				//if (!yesno_box(line))
+				//	return;
+
+				hilight_item = l;
+				//open_line_edit();
+			}
+
+			tex = side->get_texname(TEX_MIDDLE);
+			if (get_texture(tex, 1)->name == _T("_notex") && tex != _T("-"))
+			{
+				string line = s_fmt(_T("Line %d has invalid front middle texture \"%s\"\n'Yes' to edit, 'No' to stop checking"),
+											l, side->get_texname(TEX_MIDDLE).c_str());
+				//if (!yesno_box(line))
+				//	return;
+
+				hilight_item = l;
+				//open_line_edit();
+			}
+
+			tex = side->get_texname(TEX_LOWER);
+			if (get_texture(tex, 1)->name == _T("_notex") && tex != _T("-"))
+			{
+				string line = s_fmt(_T("Line %d has invalid front lower texture \"%s\"\n'Yes' to edit, 'No' to stop checking"),
+											l, tex.c_str());
+				//if (!yesno_box(line))
+				//	return;
+
+				hilight_item = l;
+				//open_line_edit();
+			}
+		}
+
+		side = d_map.line(l)->side2();
+
+		if (d_map.valid(side))
+		{
+			string tex = side->get_texname(TEX_UPPER);
+			if (get_texture(tex, 1)->name == _T("_notex") && tex != _T("-"))
+			{
+				string line = s_fmt(_T("Line %d has invalid back upper texture \"%s\"\n'Yes' to edit, 'No' to stop checking"),
+											l, tex.c_str());
+				//if (!yesno_box(line))
+				//	return;
+
+				hilight_item = l;
+				//open_line_edit();
+			}
+
+			tex = side->get_texname(TEX_MIDDLE);
+			if (get_texture(tex, 1)->name == _T("_notex") && tex != _T("-"))
+			{
+				string line = s_fmt(_T("Line %d has invalid back middle texture \"%s\"\n'Yes' to edit, 'No' to stop checking"),
+											l, tex.c_str());
+				//if (!yesno_box(line))
+				//	return;
+
+				hilight_item = l;
+				//open_line_edit();
+			}
+
+			tex = side->get_texname(TEX_LOWER);
+			if (get_texture(tex, 1)->name == _T("_notex") && tex != _T("-"))
+			{
+				string line = s_fmt(_T("Line %d has invalid back lower texture \"%s\"\n'Yes' to edit, 'No' to stop checking"),
+											l, tex.c_str());
+				//if (!yesno_box(line))
+				//	return;
+
+				hilight_item = l;
+				//open_line_edit();
+			}
+		}
+	}
+
+	// Check flat textures
+	for (int s = 0; s < d_map.n_sectors(); s++)
+	{
+		if (get_texture(d_map.sector(s)->tex_floor(), 2)->name == _T("_notex"))
+		{
+			string line = s_fmt(_T("Sector %d has invalid floor texture \"%s\"\n'Yes' to edit, 'No' to stop checking"),
+										s, d_map.sector(s)->tex_floor().c_str());
+			//if (!yesno_box(line))
+			//	return;
+
+			hilight_item = s;
+			//open_sector_edit();
+		}
+
+		if (get_texture(d_map.sector(s)->tex_ceil(), 2)->name == _T("_notex"))
+		{
+			string line = s_fmt(_T("Sector %d has invalid ceiling texture \"%s\"\n'Yes' to edit, 'No' to stop checking"),
+										s, d_map.sector(s)->tex_ceil().c_str());
+			//if (!yesno_box(line))
+			//	return;
+
+			hilight_item = s;
+			//open_sector_edit();
+		}
+	}
 }

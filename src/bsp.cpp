@@ -1,4 +1,7 @@
 
+#include "zdbsp/wad.h"
+#include "zdbsp/processor.h"
+
 #include "main.h"
 #include "byteswap.h"
 #include "bsp.h"
@@ -10,9 +13,6 @@
 #include "splash.h"
 #include "mathstuff.h"
 #include "camera.h"
-
-#include "zdbsp/wad.h"
-#include "zdbsp/processor.h"
 
 vector<point2_t>	map_verts;
 vector<gl_vertex_t>	gl_verts;

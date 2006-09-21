@@ -155,11 +155,11 @@ void draw_texture_scale(rect_t rect, string texname, int textype, rgba_t col, fl
 
 	tex->gen_gl_tex();
 
-	unsigned int texwidth = tex->width * scalef;
-	unsigned int texheight = tex->height * scalef;
-	unsigned int nwidth = texwidth;
-	unsigned int nheight = texheight;
-	unsigned int dim = min(rect.width(), rect.height());
+	int texwidth = tex->width * scalef;
+	int texheight = tex->height * scalef;
+	int nwidth = texwidth;
+	int nheight = texheight;
+	int dim = min(rect.width(), rect.height());
 	int midx = rect.x1() + (rect.width() / 2);
 	int midy = rect.y1() + (rect.height() / 2);
 
@@ -211,11 +211,11 @@ void draw_texture_scale(rect_t rect, Texture* tex, rgba_t col, float scalef)
 
 	tex->gen_gl_tex();
 
-	unsigned int texwidth = tex->width * scalef;
-	unsigned int texheight = tex->height * scalef;
-	unsigned int nwidth = texwidth;
-	unsigned int nheight = texheight;
-	unsigned int dim = min(rect.width(), rect.height());
+	int texwidth = tex->width * scalef;
+	int texheight = tex->height * scalef;
+	int nwidth = texwidth;
+	int nheight = texheight;
+	int dim = min(rect.width(), rect.height());
 	int midx = rect.x1() + (rect.width() / 2);
 	int midy = rect.y1() + (rect.height() / 2);
 

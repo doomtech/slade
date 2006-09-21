@@ -68,7 +68,7 @@ public:
 
 	static int	strip_special(int spec, bool hexen);
 
-	void	copy(Sector* s);
+	void	copy(Sector* s, bool update_tex = true);
 
 	doomsector_t	to_doomformat();
 };

@@ -16,6 +16,8 @@
 #include "dm_thing.h"
 #include "undoredo.h"
 
+#include <wx/stopwatch.h>
+
 // Variables ------------------------------------ >>
 BackupManager bm;
 
@@ -28,94 +30,123 @@ extern DoomMap d_map;
 Backup::Backup()
 {
 	flags = 0;
+	n_lines = 0;
+	n_verts = 0;
+	n_sides = 0;
+	n_sectors = 0;
+	n_things = 0;
+	lines = NULL;
+	sides = NULL;
+	verts = NULL;
+	sectors = NULL;
+	things = NULL;
 }
 
 Backup::~Backup()
 {
-	for (DWORD a = 0; a < verts.size(); a++)
-		delete verts[a];
-
-	for (DWORD a = 0; a < lines.size(); a++)
-		delete lines[a];
-
-	for (DWORD a = 0; a < sides.size(); a++)
-		delete sides[a];
-
-	for (DWORD a = 0; a < sectors.size(); a++)
-		delete sectors[a];
-
-	for (DWORD a = 0; a < things.size(); a++)
-		delete things[a];
+	delete[] verts;
+	delete[] lines;
+	delete[] sides;
+	delete[] sectors;
+	delete[] things;
 }
 
 void Backup::do_backup(WORD flags)
 {
+	long t_update = 0;
+	long t_verts = 0;
+	long t_sectors = 0;
+	long t_sides = 0;
+	long t_lines = 0;
+	long t_things = 0;
 	this->flags = flags;
+
+	wxStopWatch sw;
 	d_map.update_indices(MTYPE_SECTOR|MTYPE_SIDE|MTYPE_VERTEX);
+	t_update = sw.Time();
+	sw.Start();
 
 	if (flags & BKUP_VERTS)
 	{
+		n_verts = d_map.n_verts();
+		verts = new Vertex[n_verts];
+
 		for (DWORD a = 0; a < d_map.n_verts(); a++)
-		{
-			Vertex *v = new Vertex();
-			v->set_pos(d_map.vertex(a)->x_pos(), d_map.vertex(a)->y_pos());
-			verts.push_back(v);
-		}
+			verts[a].set_pos(d_map.vertex(a)->x_pos(), d_map.vertex(a)->y_pos());
 	}
+	t_verts = sw.Time();
+	sw.Start();
 
 	if (flags & BKUP_SECTORS)
 	{
+		n_sectors = d_map.n_sectors();
+		sectors = new Sector[n_sectors];
+
 		for (DWORD a = 0; a < d_map.n_sectors(); a++)
-		{
-			Sector *s = new Sector();
-			s->copy(d_map.sector(a));
-			sectors.push_back(s);
-		}
+			sectors[a].copy(d_map.sector(a), false);
 	}
+	t_sectors = sw.Time();
+	sw.Start();
 
 	if (flags & BKUP_SIDES)
 	{
+		n_sides = d_map.n_sides();
+		sides = new bkup_side_t[n_sides];
+
 		for (DWORD a = 0; a < d_map.n_sides(); a++)
 		{
-			bkup_side_t *s = new bkup_side_t;
-			s->side.copy(d_map.side(a));
-			s->sector = d_map.index(d_map.side(a)->get_sector());
-			sides.push_back(s);
+			sides[a].side.copy(d_map.side(a), false);
+			sides[a].sector = d_map.side(a)->get_sector()->get_index();
 		}
 	}
+	t_sides = sw.Time();
+	sw.Start();
 
 	if (flags & BKUP_LINES)
 	{
+		n_lines = d_map.n_lines();
+		lines = new bkup_line_t[n_lines];
+
 		for (DWORD a = 0; a < d_map.n_lines(); a++)
 		{
-			bkup_line_t *l = new bkup_line_t;
-			l->line.copy(d_map.line(a));
-			l->s1 = d_map.index(d_map.line(a)->side1());
-			l->s2 = d_map.index(d_map.line(a)->side2());
-			l->v1 = d_map.index(d_map.line(a)->vertex1());
-			l->v2 = d_map.index(d_map.line(a)->vertex2());
-			lines.push_back(l);
+			lines[a].line.copy(d_map.line(a));
+			lines[a].s1 = d_map.line(a)->side1()->get_index();
+			lines[a].s2 = d_map.line(a)->side2()->get_index();
+			lines[a].v1 = d_map.line(a)->vertex1()->get_index();
+			lines[a].v2 = d_map.line(a)->vertex2()->get_index();
 		}
 	}
+	t_lines = sw.Time();
+	sw.Start();
 
 	if (flags & BKUP_THINGS)
 	{
+		n_things = d_map.n_things();
+		things = new Thing[n_things];
+
 		for (DWORD a = 0; a < d_map.n_things(); a++)
-		{
-			Thing *t = new Thing();
-			t->copy(d_map.thing(a));
-			things.push_back(t);
-		}
+			things[a].copy(d_map.thing(a));
 	}
+	t_things = sw.Time();
+
+	log_message(s_fmt("update indices %d", t_update));
+	log_message(s_fmt("verts %d", t_verts));
+	log_message(s_fmt("sectors %d", t_sectors));
+	log_message(s_fmt("sides %d", t_sides));
+	log_message(s_fmt("lines %d", t_lines));
+	log_message(s_fmt("things %d", t_things));
 }
 
 DWORD Backup::get_size()
 {
-	return (DWORD)(verts.size() * sizeof(Vertex) +
-					lines.size() * sizeof(Line) +
-					sides.size() * sizeof(Side) +
-					sectors.size() * sizeof(Sector) +
-					things.size() * sizeof(Thing));
+	DWORD ret = (DWORD)(n_verts * sizeof(Vertex) +
+					n_lines * sizeof(bkup_line_t) +
+					n_sides * sizeof(bkup_side_t) +
+					n_sectors * sizeof(Sector) +
+					n_things * sizeof(Thing));
+
+	log_message(s_fmt("backup size %d bytes", ret));
+	return ret;
 }
 
 void Backup::do_undo()
@@ -124,19 +155,19 @@ void Backup::do_undo()
 	{
 		if (flags & BKUP_MODIFY)
 		{
-			if (d_map.n_verts() == verts.size())
+			if (d_map.n_verts() == n_verts)
 			{
 				for (DWORD a = 0; a < d_map.n_verts(); a++)
-					d_map.vertex(a)->set_pos(verts[a]->x_pos(), verts[a]->y_pos());
+					d_map.vertex(a)->set_pos(verts[a].x_pos(), verts[a].y_pos());
 			}
 		}
 		else
 		{
 			d_map.clear_verts();
-			for (DWORD a = 0; a < verts.size(); a++)
+			for (DWORD a = 0; a < n_verts; a++)
 			{
 				Vertex *i = new Vertex();
-				memcpy(i, verts[a], sizeof(Vertex));
+				i->set_pos(verts[a].x_pos(), verts[a].y_pos());
 				d_map.add_vertex(i);
 			}
 		}
@@ -146,19 +177,19 @@ void Backup::do_undo()
 	{
 		if (flags & BKUP_MODIFY)
 		{
-			if (d_map.n_sectors() == sectors.size())
+			if (d_map.n_sectors() == n_sectors)
 			{
 				for (DWORD a = 0; a < d_map.n_sectors(); a++)
-					d_map.sector(a)->copy(sectors[a]);
+					d_map.sector(a)->copy(&sectors[a]);
 			}
 		}
 		else
 		{
 			d_map.clear_sectors();
-			for (DWORD a = 0; a < sectors.size(); a++)
+			for (DWORD a = 0; a < n_sectors; a++)
 			{
 				Sector *i = new Sector();
-				memcpy(i, sectors[a], sizeof(Sector));
+				i->copy(&sectors[a], false);
 				d_map.add_sector(i);
 			}
 		}
@@ -168,21 +199,21 @@ void Backup::do_undo()
 	{
 		if (flags & BKUP_MODIFY)
 		{
-			if (d_map.n_sides() == sides.size())
+			if (d_map.n_sides() == n_sides)
 			{
 				for (DWORD a = 0; a < d_map.n_sides(); a++)
-					d_map.side(a)->copy(&sides[a]->side);
+					d_map.side(a)->copy(&sides[a].side);
 			}
 		}
 		else
 		{
 			d_map.clear_sides();
-			for (DWORD a = 0; a < sides.size(); a++)
+			for (DWORD a = 0; a < n_sides; a++)
 			{
 				Side *i = new Side();
-				memcpy(i, &sides[a]->side, sizeof(Side));
+				i->copy(&sides[a].side, false);
 				d_map.add_side(i);
-				i->set_sector(d_map.sector(sides[a]->sector));
+				i->set_sector(d_map.sector(sides[a].sector));
 			}
 		}
 	}
@@ -191,24 +222,24 @@ void Backup::do_undo()
 	{
 		if (flags & BKUP_MODIFY)
 		{
-			if (d_map.n_lines() == lines.size())
+			if (d_map.n_lines() == n_lines)
 			{
 				for (DWORD a = 0; a < d_map.n_lines(); a++)
-					d_map.line(a)->copy(&lines[a]->line);
+					d_map.line(a)->copy(&lines[a].line);
 			}
 		}
 		else
 		{
 			d_map.clear_lines();
-			for (DWORD a = 0; a < lines.size(); a++)
+			for (DWORD a = 0; a < n_lines; a++)
 			{
 				Line *i = new Line();
-				memcpy(i, &lines[a]->line, sizeof(Line));
+				i->copy(&lines[a].line, false);
 				d_map.add_line(i);
-				i->set_vertex1(d_map.vertex(lines[a]->v1));
-				i->set_vertex2(d_map.vertex(lines[a]->v2));
-				i->set_side1(d_map.side(lines[a]->s1));
-				i->set_side2(d_map.side(lines[a]->s2));
+				i->set_vertex1(d_map.vertex(lines[a].v1));
+				i->set_vertex2(d_map.vertex(lines[a].v2));
+				i->set_side1(d_map.side(lines[a].s1));
+				i->set_side2(d_map.side(lines[a].s2));
 			}
 		}
 	}
@@ -217,19 +248,19 @@ void Backup::do_undo()
 	{
 		if (flags & BKUP_MODIFY)
 		{
-			if (d_map.n_things() == things.size())
+			if (d_map.n_things() == n_things)
 			{
 				for (DWORD a = 0; a < d_map.n_things(); a++)
-					d_map.thing(a)->copy(things[a]);
+					d_map.thing(a)->copy(&things[a]);
 			}
 		}
 		else
 		{
 			d_map.clear_things();
-			for (DWORD a = 0; a < things.size(); a++)
+			for (DWORD a = 0; a < n_things; a++)
 			{
 				Thing *i = new Thing();
-				memcpy(i, things[a], sizeof(Thing));
+				i->copy(&things[a]);
 				d_map.add_thing(i);
 			}
 		}
@@ -248,39 +279,49 @@ void BackupManager::backup(BYTE flags)
 {
 	Backup *b = new Backup();
 	b->do_backup(flags);
-	backups.push_back(b);
+	backups = (Backup**)realloc(backups, sizeof(Backup*) * ++n_backups);
+	backups[n_backups - 1] = b;
 
 	DWORD size = 0;
-	for (DWORD a = 0; a < backups.size(); a++)
-		size += backups[a]->get_size();
+	for (DWORD a = 0; a < n_backups; a++)
+	{
+		if (backups[a])
+			size += backups[a]->get_size();
+	}
 
 	if (size > max_undo_size)
-		backups.erase(backups.begin());
+	{
+		//message_box("max undo size reached");
+		delete backups[0];
+		for (int a = 0; a < n_backups-1; a++)
+			backups[a] = backups[a+1];
+		backups = (Backup**)realloc(backups, sizeof(Backup*) * --n_backups);
+	}
 }
 
 void BackupManager::undo(bool m3d)
 {
-	if (backups.size() == 0)
+	if (n_backups == 0)
 		return;
 
-	if (m3d && !(backups.back()->check_flag(BKUP_3DMODE)))
-	{
-		message_box("ghgggg");
+	if (m3d && !(backups[n_backups-1]->check_flag(BKUP_3DMODE)))
 		return;
-	}
 
-	backups.back()->do_undo();
-	backups.pop_back();
+	backups[n_backups-1]->do_undo();
+	delete backups[n_backups-1];
+	backups = (Backup**)realloc(backups, sizeof(Backup*) * --n_backups);
 }
 
 void BackupManager::clear_3d()
 {
-	for (DWORD a = 0; a < backups.size(); a++)
+	for (DWORD a = 0; a < n_backups; a++)
 	{
 		if (backups[a]->check_flag(BKUP_3DMODE))
 		{
-			backups.erase(backups.begin() + a);
-			a--;
+			delete backups[a];
+			for (int b = a; b < n_backups-1; b++)
+			backups[b] = backups[b+1];
+			backups = (Backup**)realloc(backups, sizeof(Backup*) * --n_backups);
 		}
 	}
 }

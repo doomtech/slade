@@ -192,7 +192,7 @@ void setup_directories()
 #ifdef unix
 	tmp_path = _T("/tmp/");
 #elif defined(__APPLE__)
-	tmp_path = getTempDir();
+	tmp_path = string(getTempDir()) + _T("/");
 #else
 	tmp_path = app_path;
 #endif
@@ -223,16 +223,9 @@ bool MainApp::OnInit()
 {
 	srand(wxGetLocalTime());
 
-	#ifndef unix
-	// Setup app path
-	app_path = argv[0];
-
-	int i = 5;	// 'slade'
 #ifdef WIN32
-	i = 9;		// 'slade.exe'
-#endif
-
-	for (int a = 0; a < i; a++)
+	app_path = argv[0];
+	for (int a = 0; a < 9; a++)
 		app_path.erase(app_path.end() - 1);
 #endif
 
