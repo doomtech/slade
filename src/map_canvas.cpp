@@ -32,8 +32,10 @@ CVAR(Bool, thing_sprites, false, CVAR_SAVE)
 CVAR(Bool, thing_force_angle, false, CVAR_SAVE)
 CVAR(Bool, grid_dashed, false, CVAR_SAVE)
 CVAR(Bool, grid_64grid, true, CVAR_SAVE)
+CVAR(Bool, grid_origin, true, CVAR_SAVE)
 CVAR(Bool, line_aa, true, CVAR_SAVE)
 CVAR(Bool, zoom_mousecursor, false, CVAR_SAVE)
+CVAR(Bool, pan_detail, true, CVAR_SAVE)
 
 vector<string> pressed_keys;
 vector<string> released_keys;
@@ -44,7 +46,7 @@ wxGLCanvas *share_canvas = NULL;
 extern bool allow_tex_load, lock_hilight;
 extern BindList binds;
 extern EditorWindow *editor_window;
-extern rgba_t col_background, col_grid, col_64grid, col_selbox, col_selbox_line;
+extern rgba_t col_background, col_grid, col_64grid, col_selbox, col_selbox_line, col_crosshair;
 extern DoomMap d_map;
 extern int gridsize, edit_mode;
 extern Clipboard clipboard;
@@ -270,6 +272,9 @@ void MapCanvas::draw_grid()
 					draw_line(rect_t(x, start_y, x, end_y), col_grid, false);
 				}
 			}
+
+			if (x == 0 && grid_origin)
+				draw_line(rect_t(x, start_y, x, end_y), col_grid.ampf(1.0f, 1.0f, 1.0f, 0.75f), false);
 		}
 
 		for (int y = start_y; y < end_y; y += ys)
@@ -284,6 +289,9 @@ void MapCanvas::draw_grid()
 					ys = gridsize;
 				}
 			}
+
+			if (y == 0 && grid_origin)
+				draw_line(rect_t(start_x, y, end_x, y), col_grid.ampf(1.0f, 1.0f, 1.0f, 0.75f), false);
 		}
 	}
 
@@ -335,7 +343,11 @@ void MapCanvas::draw_map()
 	rect_t rect(translate(tl).x, translate(br).y, translate(br).x, translate(tl).y);
 
 	glLineWidth(line_size);
-	d_map.draw(rect, edit_mode);
+
+	if (state(STATE_MAPPAN) && !pan_detail)
+		d_map.draw_lines(rect);
+	else
+		d_map.draw(rect, edit_mode);
 
 	if (state(STATE_PASTE))
 		clipboard.DrawPaste();
@@ -363,19 +375,58 @@ void MapCanvas::redraw(bool map, bool grid)
 
 	if (d_map.opened())
 	{
-		draw_grid();
+		// Grid
+		if (!(state(STATE_MAPPAN) && !pan_detail))
+			draw_grid();
+
+		// Crosshair
+		if (crosshair_2d > 0)
+		{
+			int x = snap_to_grid(mouse_pos(true).x);
+			int y = snap_to_grid(mouse_pos(true).y);
+
+			glLineWidth(2.0f);
+
+			// Full
+			if (crosshair_2d == 1)
+			{
+				draw_line(rect_t(x, (int)translate_y(0),
+							x, (int)translate_y(GetSize().y)),
+							col_crosshair, false, false);
+
+				draw_line(rect_t((int)translate_x(0), y,
+							(int)translate_x(GetSize().x), y),
+							col_crosshair, false, false);
+			}
+
+			// Small
+			if (crosshair_2d == 2)
+			{
+				int size = 8/zoom;
+				draw_line(rect_t(x, y-size, x, y+size), col_crosshair, false, false);
+				draw_line(rect_t(x-size, y, x+size, y), col_crosshair, false, false);
+			}
+
+			glLineWidth(1.0f);
+		}
+
+		// Map
 		draw_map();
 
+		// Draw lines
 		if (state(STATE_LINEDRAW) || state(STATE_SHAPEDRAW))
 			ldraw_draw_lines(point2_t(translate_x(mouse.x), translate_y(mouse.y)));
 	}
 
 	glLoadIdentity();
 
+	// Selection box
 	if (sel_box.x1() != -1)
 	{
+		glLineWidth(2.0f);
 		draw_rect(sel_box, col_selbox, true);
 		draw_rect(sel_box, col_selbox_line, false);
+		glLineWidth(1.0f);
 	}
 
 	SwapBuffers();
@@ -450,8 +501,17 @@ void MapCanvas::mouse_event(wxMouseEvent &event)
 		binds.unset(_T("Mouse1"), &released_keys, false, false, false);
 		binds.unset(_T("Mouse2"), &released_keys, false, false, false);
 		binds.unset(_T("Mouse3"), &released_keys, false, false, false);
+
 		if (state(STATE_MAPPAN))
+		{
+			SetCursor(wxCursor(wxCURSOR_ARROW));
 			change_state();
+		}
+
+		if (sel_box.x1() != -1 && state())
+			clear_selection();
+
+		redraw();
 	}
 
 	mouse_wheel(event);
@@ -529,7 +589,10 @@ void MapCanvas::mouse_motion(wxMouseEvent& event)
 		if (binds.pressed(_T("view_panmap")))
 		{
 			if (change_state(STATE_MAPPAN))
+			{
+				SetCursor(wxCursor(wxCURSOR_SIZING));
 				down_pos = mouse;
+			}
 		}
 	}
 
@@ -572,6 +635,8 @@ void MapCanvas::mouse_motion(wxMouseEvent& event)
 			d_map.update_tagged(edit_mode);
 			redraw();
 		}
+		else if (crosshair_2d > 0)
+			redraw();
 	}
 
 	editor_window->update_statusbar();

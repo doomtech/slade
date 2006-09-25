@@ -193,3 +193,11 @@ void Sector::copy(Sector* s, bool update_tex)
 		c_tex = s->tex_ceil();
 	}
 }
+
+void Sector::add_tex_counts()
+{
+	Texture *t = get_tex();
+	if (t) t->use_count++;
+	t = get_tex(false);
+	if (t) t->use_count++;
+}

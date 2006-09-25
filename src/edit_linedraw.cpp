@@ -175,8 +175,8 @@ void ldraw_end()
 	for (unsigned int a = 0; a < new_lines.size(); a++)
 	{
 		d_map.add_line(new_lines[a]);
-		new_lines[a]->set_side1(d_map.side(-1));
-		new_lines[a]->set_side2(d_map.side(-1));
+		new_lines[a]->set_side1(d_map.side(-1, false));
+		new_lines[a]->set_side2(d_map.side(-1, false));
 	}
 
 	//log_message(s_fmt("Created %d lines", new_lines.size()));
@@ -318,13 +318,7 @@ void ldraw_draw_lines(point2_t mouse)
 	glLineStipple(4, 0xBBBB);
 	glEnable(GL_LINE_STIPPLE);
 
-	rgba_t c = col_linedraw;
-	int tr = col_linedraw.r + 64;
-	int tg = col_linedraw.g + 64;
-	int tb = col_linedraw.b + 64;
-	if (tr > 255) tr = 255;
-	if (tg > 255) tg = 255;
-	if (tb > 255) tb = 255;
+	rgba_t c = col_linedraw.amp(64, 64, 64, 0);
 
 	if (ldraw_points.size() > 1)
 	{
@@ -333,7 +327,7 @@ void ldraw_draw_lines(point2_t mouse)
 			rect_t r(ldraw_points[a], ldraw_points[a+1]);
 			draw_line(r, col_linedraw, line_aa, false, line_size);
 			draw_point(ldraw_points[a].x, ldraw_points[a].y, 8, col_linedraw);
-			draw_text(r.middle().x, r.middle().y, rgba_t(tr, tg, tb, col_linedraw.a, col_linedraw.blend), 1, true, "%d", lround(r.length()));
+			draw_text(r.middle().x, r.middle().y, c, 1, true, "%d", lround(r.length()));
 		}
 	}
 
@@ -342,7 +336,7 @@ void ldraw_draw_lines(point2_t mouse)
 		rect_t r(ldraw_points.back(), mp);
 		draw_line(r, col_linedraw, line_aa, false, line_size);
 		draw_point(ldraw_points.back().x, ldraw_points.back().y, 8, col_linedraw);
-		draw_text(r.middle().x, r.middle().y, rgba_t(tr, tg, tb, col_linedraw.a, col_linedraw.blend), 1, true, "%d", lround(r.length()));
+		draw_text(r.middle().x, r.middle().y, c, 1, true, "%d", lround(r.length()));
 	}
 
 	draw_point(mp.x, mp.y, 8, col_linedraw);

@@ -549,7 +549,7 @@ bool sector_create(point2_t point, vector<Sector*> &new_sectors, bool* front_sid
 		new_sectors.push_back(sector);
 
 	d_map.change_level(MC_NODE_REBUILD|MC_SECTORS|MC_LINES);
-	redraw_map();
+	//redraw_map();
 
 	return true;
 }

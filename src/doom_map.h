@@ -71,11 +71,11 @@ public:
 	DoomMap();
 	~DoomMap();
 
-	Vertex* vertex(int index);
-	Line*	line(int index);
-	Side*	side(int index);
-	Sector*	sector(int index);
-	Thing*	thing(int index);
+	Vertex* vertex(int index, bool warnoninvalid = true);
+	Line*	line(int index, bool warnoninvalid = true);
+	Side*	side(int index, bool warnoninvalid = true);
+	Sector*	sector(int index, bool warnoninvalid = true);
+	Thing*	thing(int index, bool warnoninvalid = true);
 
 	unsigned int	n_verts();
 	unsigned int	n_lines();
@@ -148,6 +148,7 @@ public:
 	void	select_deselect();
 	void	select_item(int index);
 	void	clear_selection();
+	void	clear_hilight() { hilight_item = -1; }
 	void	update_tagged(int type);
 
 	void	draw(rect_t vis_area, BYTE type = 1);

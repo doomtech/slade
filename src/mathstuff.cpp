@@ -107,6 +107,15 @@ string test(rect_t line)
 // --------------------------------------------------- >>
 bool lines_intersect(rect_t line1, rect_t line2, fpoint2_t *ip)
 {
+	/*
+	double a1 = line1.y2() - line1.y1();
+	double a2 = line2.y2() - line2.y1();
+	double b1 = line1.x1() - line1.x2();
+	double b2 = line2.x1() - line2.x2();
+	double c1 = (a1 * line1.x1()) + (b1 * line1.y1());
+	double c2 = (a2 * line2.x1()) + (b2 * line2.y1());
+	*/
+
 	double a1 = line1.y2() - line1.y1();
 	double a2 = line2.y2() - line2.y1();
 	double b1 = line1.x1() - line1.x2();
@@ -128,8 +137,8 @@ bool lines_intersect(rect_t line1, rect_t line2, fpoint2_t *ip)
 
 		//if (point_in_rect(line1.left(), line1.top(), line1.right(), line1.bottom(), lround(x), lround(y)) &&
 		//	point_in_rect(line2.left(), line2.top(), line2.right(), line2.bottom(), lround(x), lround(y)))
-		if (distance_to_line(line1.left(), line1.top(), line1.right(), line1.bottom(), x, y) <= 1 &&
-			distance_to_line(line2.left(), line2.top(), line2.right(), line2.bottom(), x, y) <= 1)
+		if (distance_to_line(line1.x1(), line1.y1(), line1.x2(), line1.y2(), x, y) <= 1.5 &&
+			distance_to_line(line2.x1(), line2.y1(), line2.x2(), line2.y2(), x, y) <= 1.5)
 		{
 			if (ip) ip->set(x, y);
 			return true;

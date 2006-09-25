@@ -65,7 +65,7 @@ Side::Side(doomside_t s, DoomMap *parent)
 	if (parent)
 	{
 		parent->add_side(this);
-		sector = parent->sector(wxINT16_SWAP_ON_BE(s.sector));
+		sector = parent->sector(wxINT16_SWAP_ON_BE(s.sector), false);
 		if (!parent->valid(sector))
 			log_message(s_fmt(_T("Invalid sector %d"), wxINT16_SWAP_ON_BE(s.sector)));
 	}
@@ -93,7 +93,7 @@ Sector* Side::get_sector()
 	if (sector)
 		return sector;
 	else if (parent)
-		return parent->sector(-1);
+		return parent->sector(-1, false);
 	else
 		return NULL;
 }
@@ -233,4 +233,14 @@ void Side::copy(Side* side, bool update_tex)
 	set_yoff(side->get_yoff());
 
 	sector = side->get_sector();
+}
+
+void Side::add_tex_counts()
+{
+	Texture *t = get_tex(TEX_UPPER);
+	if (t) t->use_count++;
+	t = get_tex(TEX_MIDDLE);
+	if (t) t->use_count++;
+	t = get_tex(TEX_LOWER);
+	if (t) t->use_count++;
 }

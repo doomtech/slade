@@ -23,8 +23,10 @@ private:
 	wxCheckBox	*cb_grid_dash;
 	wxCheckBox	*cb_64_grid;
 	wxCheckBox	*cb_snap_to_grid;
+	wxCheckBox	*cb_grid_origin;
 	wxCheckBox	*cb_thing_sprites;
 	wxCheckBox	*cb_thing_angles;
+	wxCheckBox	*cb_pan_detail;
 	wxChoice	*ch_2d_xhair;
 
 	wxSlider	*sl_line_size;
@@ -39,10 +41,14 @@ public:
 		VP_GRID_DASH,
 		VP_64_GRID,
 		VP_SNAP_GRID,
+		VP_GRID_ORIGIN,
 		VP_THING_SPRITES,
 		VP_THING_ANGLES,
 		VP_LINE_AA,
 		VP_TEX_NP2,
+		VP_PAN_DETAIL,
+
+		VP_CBOX_END,
 
 		VP_LINE_SIZE,
 		VP_TEX_FILTER,
@@ -52,6 +58,7 @@ public:
 	VisualPrefs(wxWindow *parent);
 	~VisualPrefs();
 
+	/*
 	void grid_dash_toggled(wxCommandEvent &event);
 	void grid_64_toggled(wxCommandEvent &event);
 	void grid_snap_toggled(wxCommandEvent &event);
@@ -59,6 +66,9 @@ public:
 	void thing_angles_toggled(wxCommandEvent &event);
 	void line_aa_toggled(wxCommandEvent &event);
 	void tex_np2_toggled(wxCommandEvent &event);
+	void pan_detail_toggled(wxCommandEvent &event);
+	*/
+	void cbox_toggled(wxCommandEvent &event);
 
 	void filter_changed(wxCommandEvent &event);
 	void xhair_2d_changed(wxCommandEvent &event);

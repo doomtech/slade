@@ -411,7 +411,7 @@ void Clipboard::Paste()
 
 		// Correct refs (maybe i'll change this to only correct refs on the lines/sides that need it)
 		for (DWORD a = 0; a < new_lines.size(); a++)
-			line_correct_references(d_map.index(new_lines[a]));
+			line_correct_references(d_map.index(new_lines[a]), false);
 	}
 }
 

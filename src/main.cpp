@@ -180,10 +180,12 @@ void change_edit_mode(int mode)
 	}
 
 	edit_mode = mode;
+	d_map.clear_selection();
+	d_map.clear_hilight();
+
 	redraw_map();
 	editor_window->change_infobar();
 	update_statusbar();
-	d_map.clear_selection();
 }
 
 void setup_directories()

@@ -16,7 +16,7 @@ struct browse_info_t
 		if (tex)
 			return tex->use_count;
 		else
-			return 0;
+			return 999999999;
 	}
 };
 

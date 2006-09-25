@@ -42,10 +42,10 @@ Line::Line(DoomMap *parent)
 	if (parent)
 	{
 		parent->add_line(this);
-		v1 = parent->vertex(-1);
-		v2 = parent->vertex(-1);
-		s1 = parent->side(-1);
-		s2 = parent->side(-1);
+		v1 = parent->vertex(-1, false);
+		v2 = parent->vertex(-1, false);
+		s1 = parent->side(-1, false);
+		s2 = parent->side(-1, false);
 	}
 
 	index = -1;
@@ -72,8 +72,8 @@ Line::Line(Vertex* v1, Vertex* v2, DoomMap* parent)
 	if (parent)
 	{
 		parent->add_line(this);
-		s1 = parent->side(-1);
-		s2 = parent->side(-1);
+		s1 = parent->side(-1, false);
+		s2 = parent->side(-1, false);
 	}
 
 	index = -1;
@@ -129,18 +129,18 @@ Line::Line(doomline_t l, DoomMap *parent, bool &ok)
 	if ((side1 < -1 || side1 > (int)parent->n_sides()) && side1 != 65535)
 	{
 		log_message(s_fmt(_T("Invalid first side %d"), side1));
-		s1 = parent->side(-1);
+		s1 = parent->side(-1, false);
 	}
 	else
-		s1 = parent->side(side1);
+		s1 = parent->side(side1, false);
 
 	if ((side2 < -1 || side2 > (int)parent->n_sides()) && side2 != 65535)
 	{
 		log_message(s_fmt(_T("Invalid second side %d"), side2));
-		s2 = parent->side(-1);
+		s2 = parent->side(-1, false);
 	}
 	else
-		s2 = parent->side(side2);
+		s2 = parent->side(side2, false);
 
 	//sector1 = parent->index(s1->get_sector());
 	//sector2 = parent->index(s2->get_sector());
@@ -199,18 +199,18 @@ Line::Line(hexenline_t l, DoomMap *parent, bool &ok)
 	if ((side1 < -1 || side1 > (int)parent->n_sides()) && side1 != 65535)
 	{
 		log_message(s_fmt(_T("Invalid first side %d"), side1));
-		s1 = parent->side(-1);
+		s1 = parent->side(-1, false);
 	}
 	else
-		s1 = parent->side(side1);
+		s1 = parent->side(side1, false);
 
 	if ((side2 < -1 || side2 > (int)parent->n_sides()) && side2 != 65535)
 	{
 		log_message(s_fmt(_T("Invalid second side %d"), side2));
-		s2 = parent->side(-1);
+		s2 = parent->side(-1, false);
 	}
 	else
-		s2 = parent->side(side2);
+		s2 = parent->side(side2, false);
 
 	//sector1 = parent->index(s1->get_sector());
 	//sector2 = parent->index(s2->get_sector());
@@ -308,11 +308,8 @@ rgba_t Line::get_colour()
 
 	if (type != 0)
 	{
-		rgba_t spec2s(col_line_special.r * 4 / 5, col_line_special.g * 4 / 5,
-					col_line_special.b * 4 / 5, col_line_special.a, col_line_special.blend);
-
 		if (flags & LINE_TWOSIDED)
-			ret.set(spec2s);
+			ret.set(col_line_special.ampf(0.8f, 0.8f, 0.8f, 0.8f));
 		else
 			ret.set(col_line_special);
 	}
@@ -562,7 +559,7 @@ void Line::remove_side1()
 		return;
 
 	//parent->delete_side(s1);
-	s1 = parent->side(-1);
+	s1 = parent->side(-1, false);
 
 	if (parent->valid(s2))
 	{
@@ -588,7 +585,7 @@ void Line::remove_side2()
 		return;
 
 	//parent->delete_side(s2);
-	s2 = parent->side(-1);
+	s2 = parent->side(-1, false);
 	set_flag(1);
 	clear_flag(4);
 }
@@ -810,14 +807,14 @@ void Line::set_parent(DoomMap *parent, bool init)
 	if (parent && init)
 	{
 		if (!s1)
-			s1 = parent->side(-1);
+			s1 = parent->side(-1, false);
 		if (!s2)
-			s2 = parent->side(-1);
+			s2 = parent->side(-1, false);
 
 		if (!v1)
-			v1 = parent->vertex(-1);
+			v1 = parent->vertex(-1, false);
 		if (!v2)
-			v2 = parent->vertex(-1);
+			v2 = parent->vertex(-1, false);
 	}
 }
 
@@ -826,7 +823,7 @@ Vertex* Line::vertex1()
 	if (v1)
 		return v1;
 	else if (parent)
-		return parent->vertex(-1);
+		return parent->vertex(-1, false);
 	else
 		return NULL;
 }
@@ -836,7 +833,7 @@ Vertex* Line::vertex2()
 	if (v2)
 		return v2;
 	else if (parent)
-		return parent->vertex(-1);
+		return parent->vertex(-1, false);
 	else
 		return NULL;
 }
@@ -846,7 +843,7 @@ Side* Line::side1()
 	if (s1)
 		return s1;
 	else if (parent)
-		return parent->side(-1);
+		return parent->side(-1, false);
 	else
 		return NULL;
 }
@@ -856,7 +853,7 @@ Side* Line::side2()
 	if (s2)
 		return s2;
 	else if (parent)
-		return parent->side(-1);
+		return parent->side(-1, false);
 	else
 		return NULL;
 }

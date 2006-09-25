@@ -70,6 +70,8 @@ public:
 
 	void	copy(Sector* s, bool update_tex = true);
 
+	void	add_tex_counts();
+
 	doomsector_t	to_doomformat();
 };
 

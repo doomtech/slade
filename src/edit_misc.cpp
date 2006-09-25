@@ -487,14 +487,14 @@ void line_align_x()
 
 // line_correct_references: Attempts to correct a line's sector references
 // -------------------------------------------------------------------- >>
-void line_correct_references(int line)
+void line_correct_references(int line, bool backup)
 {
 	if (line != -1 && d_map.valid(d_map.line(line)))
 	{
-		make_backup(true, true, false, false, false);
+		if (backup) make_backup(true, true, false, false, false);
 
-		d_map.line(line)->set_sector(1, d_map.sector(get_side_sector(line, 1)));
-		d_map.line(line)->set_sector(2, d_map.sector(get_side_sector(line, 2)));
+		d_map.line(line)->set_sector(1, d_map.sector(get_side_sector(line, 1), false));
+		d_map.line(line)->set_sector(2, d_map.sector(get_side_sector(line, 2), false));
 
 		return;
 	}
@@ -505,12 +505,12 @@ void line_correct_references(int line)
 	if (lines.size() == 0)
 		return;
 
-	make_backup(true, true, false, false, false);
+	if (backup) make_backup(true, true, false, false, false);
 
 	for (unsigned int a = 0; a < lines.size(); a++)
 	{
-		lines[a]->set_sector(1, d_map.sector(get_side_sector(d_map.index(lines[a]), 1)));
-		lines[a]->set_sector(2, d_map.sector(get_side_sector(d_map.index(lines[a]), 2)));
+		lines[a]->set_sector(1, d_map.sector(get_side_sector(d_map.index(lines[a]), 1), false));
+		lines[a]->set_sector(2, d_map.sector(get_side_sector(d_map.index(lines[a]), 2), false));
 	}
 }
 

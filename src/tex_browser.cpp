@@ -2,6 +2,8 @@
 #include "main.h"
 #include "tex_browser.h"
 #include "doom_map.h"
+#include "dm_side.h"
+#include "dm_sector.h"
 #include "draw.h"
 #include "game_config.h"
 
@@ -121,7 +123,7 @@ void TextureBrowser::sort(int sorting)
 	// Sort alphabetically
 	if (sorting == 0 && browse_type != 3)
 	{
-		for (unsigned int p = 1; p < vis_items.size(); p++)
+		for (int p = 1; p < (int)vis_items.size(); p++)
 		{
 			browse_info_t* tmp = vis_items[p];
 			int j;
@@ -136,7 +138,7 @@ void TextureBrowser::sort(int sorting)
 	// Sort by use
 	else if (sorting == 1)
 	{
-		for (unsigned int p = 1; p < vis_items.size(); p++)
+		for (int p = 1; p < (int)vis_items.size(); p++)
 		{
 			browse_info_t* tmp = vis_items[p];
 			int j;
@@ -151,12 +153,6 @@ void TextureBrowser::sort(int sorting)
 
 void TextureBrowser::update_vis_items()
 {
-	string cur_val = _T("");
-	int sel = browse_area->selected_item;
-
-	if (sel >= 0 && sel < (int)vis_items.size())
-		cur_val = vis_items[browse_area->selected_item]->retval;
-
 	vis_items.clear();
 
 	if (browse_type != 3)
@@ -181,8 +177,6 @@ void TextureBrowser::update_vis_items()
 		if (vis)
 			vis_items.push_back(&browse_items[a]);
 	}
-
-	browse_area->select_name(cur_val);
 }
 
 BEGIN_EVENT_TABLE(TextureBrowser, wxDialog)
@@ -196,18 +190,32 @@ END_EVENT_TABLE()
 
 void TextureBrowser::cb_hideunused_toggled(wxCommandEvent &event)
 {
+	string cur_val = _T("");
+	int sel = browse_area->selected_item;
+
+	if (sel >= 0 && sel < (int)vis_items.size())
+		cur_val = vis_items[sel]->retval;
+
 	browser_hideunused = cb_hide_unused->GetValue();
 	update_vis_items();
 	sort(browser_sort);
+	browse_area->select_name(cur_val);
 	browse_area->scroll_to_selected();
 	browse_area->redraw();
 }
 
 void TextureBrowser::cb_iwadtextures_toggled(wxCommandEvent &event)
 {
+	string cur_val = _T("");
+	int sel = browse_area->selected_item;
+
+	if (sel >= 0 && sel < (int)vis_items.size())
+		cur_val = vis_items[sel]->retval;
+
 	browser_iwadtex = cb_iwad_textures->GetValue();
 	update_vis_items();
 	sort(browser_sort);
+	browse_area->select_name(cur_val);
 	browse_area->scroll_to_selected();
 	browse_area->redraw();
 }
@@ -304,9 +312,6 @@ void TexBrowseCanvas::scroll_to_selected()
 	if (vis_items.size() == 0)
 		return;
 
-	if (selected_item == -1)
-		return;
-
 	int rows = ((int)vis_items.size() / browser_columns) + 1;
 	int width = GetClientSize().x / browser_columns;
 	int top = vscroll->GetThumbPosition();
@@ -314,6 +319,9 @@ void TexBrowseCanvas::scroll_to_selected()
 	int rows_page = width ? GetClientSize().y / width : 1;
 
 	vscroll->SetScrollbar(vscroll->GetThumbPosition(), GetClientSize().y, rows*width, rows_page*width);
+
+	if (selected_item == -1)
+		return;
 
 	int a = 0;
 	for (int y = 0; y < rows; y++)
@@ -541,6 +549,24 @@ void TexBrowseCanvas::mouse_event(wxMouseEvent &event)
 
 void setup_tex_browser(int type)
 {
+	if (type != 3 && type == 1 || mix_tex)
+	{
+		for (int a = 0; a < (int)textures.size(); a++)
+			textures[a]->use_count = 0;
+
+		for (int a = 0; a < (int)d_map.n_sides(); a++)
+			d_map.side(a)->add_tex_counts();
+	}
+
+	if (type != 3 && type == 2 || mix_tex)
+	{
+		for (int a = 0; a < (int)flats.size(); a++)
+			flats[a]->use_count = 0;
+
+		for (int a = 0; a < (int)d_map.n_sectors(); a++)
+			d_map.sector(a)->add_tex_counts();
+	}
+
 	if (browse_type == type)
 		return;
 

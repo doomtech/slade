@@ -123,35 +123,36 @@ void DoomMap::set_name(string name)
 	this->name = name;
 }
 
-Vertex* DoomMap::vertex(int index)
+Vertex* DoomMap::vertex(int index, bool warnoninvalid)
 {
 	if (index < 0 || index >= (int)vertices.size())
 	{
-		log_message(s_fmt(_T("Vertex %d doesn't exist"), index));
+		if (warnoninvalid) log_message(s_fmt(_T("Vertex %d doesn't exist"), index));
 		return def_vertex;
 	}
 	else
 		return vertices[index];
 }
 
-Line* DoomMap::line(int index)
+Line* DoomMap::line(int index, bool warnoninvalid)
 {
 	if (index < 0 || index >= (int)lines.size())
 	{
-		if (index != 65535)
-			log_message(s_fmt(_T("Line %d doesn't exist"), index));
+		if (warnoninvalid) log_message(s_fmt(_T("Line %d doesn't exist"), index));
 		return def_line;
 	}
 	else
 		return lines[index];
 }
 
-Side* DoomMap::side(int index)
+Side* DoomMap::side(int index, bool warnoninvalid)
 {
 	if (index < 0 || index >= (int)sides.size())
 	{
-		if (index != -1 && index != 65535)
-			log_message(s_fmt(_T("Side %d doesn't exist"), index));
+		if (index != 65535)
+		{
+			if (warnoninvalid) log_message(s_fmt(_T("Side %d doesn't exist"), index));
+		}
 
 		return def_side;
 	}
@@ -159,23 +160,22 @@ Side* DoomMap::side(int index)
 		return sides[index];
 }
 
-Sector* DoomMap::sector(int index)
+Sector* DoomMap::sector(int index, bool warnoninvalid)
 {
 	if (index < 0 || index >= (int)sectors.size())
 	{
-		if (index != -1)
-			log_message(s_fmt(_T("Sector %d doesn't exist"), index));
+		if (warnoninvalid) log_message(s_fmt(_T("Sector %d doesn't exist"), index));
 		return def_sector;
 	}
 	else
 		return sectors[index];
 }
 
-Thing* DoomMap::thing(int index)
+Thing* DoomMap::thing(int index, bool warnoninvalid)
 {
 	if (index < 0 || index >= (int)things.size())
 	{
-		log_message(s_fmt(_T("Thing %d doesn't exist"), index));
+		if (warnoninvalid) log_message(s_fmt(_T("Thing %d doesn't exist"), index));
 		return def_thing;
 	}
 	else
@@ -1129,10 +1129,10 @@ void DoomMap::update_tagged(int type)
 		{
 			bool tagged = false;
 
-			if (sector(line(l)->sector_index(true))->sector_tag() == tag)
+			if (sector(line(l)->sector_index(true), false)->sector_tag() == tag)
 				tagged = true;
 
-			if (sector(line(l)->sector_index(false))->sector_tag() == tag)
+			if (sector(line(l)->sector_index(false), false)->sector_tag() == tag)
 				tagged = true;
 
 			if (tagged)
@@ -1234,7 +1234,7 @@ int	DoomMap::get_hilight_sector(point2_t mouse)
 	bool side = (determine_line_side(this->line(line)->get_rect(), mouse.x, mouse.y) > 0);
 	sector = this->line(line)->sector_index(side);
 
-	if (!valid(this->sector(sector)))
+	if (!valid(this->sector(sector, false)))
 		hilight_item = -1;
 	else
 		hilight_item = sector;
@@ -1918,7 +1918,7 @@ void DoomMap::remove_overlapping_lines(vector<Line*> &list, bool merge)
 				if (merge)
 				{
 					delete_line(list[a]);
-					line_correct_references(index(cl, true));
+					line_correct_references(index(cl, true), false);
 				}
 				else
 				{

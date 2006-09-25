@@ -238,8 +238,8 @@ void Backup::do_undo()
 				d_map.add_line(i);
 				i->set_vertex1(d_map.vertex(lines[a].v1));
 				i->set_vertex2(d_map.vertex(lines[a].v2));
-				i->set_side1(d_map.side(lines[a].s1));
-				i->set_side2(d_map.side(lines[a].s2));
+				i->set_side1(d_map.side(lines[a].s1, lines[a].s1 != -1));
+				i->set_side2(d_map.side(lines[a].s2, lines[a].s2 != -1));
 			}
 		}
 	}
@@ -310,6 +310,9 @@ void BackupManager::undo(bool m3d)
 	backups[n_backups-1]->do_undo();
 	delete backups[n_backups-1];
 	backups = (Backup**)realloc(backups, sizeof(Backup*) * --n_backups);
+
+	d_map.clear_selection();
+	d_map.clear_hilight();
 }
 
 void BackupManager::clear_3d()

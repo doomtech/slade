@@ -210,6 +210,7 @@ void keys_edit()
 	{
 		change_state();
 		redraw_map();
+		editor_window->map()->SetCursor(wxCursor(wxCURSOR_ARROW));
 		return;
 	}
 
@@ -570,6 +571,7 @@ void keys_edit()
 		vector<Sector*> n_s;
 		make_backup(BKUP_LINES|BKUP_SIDES|BKUP_SECTORS);
 		sector_create(down_pos(true), n_s);
+		redraw_map();
 	}
 
 	// Edit item

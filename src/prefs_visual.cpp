@@ -10,9 +10,11 @@ EXTERN_CVAR(Bool, thing_sprites)
 EXTERN_CVAR(Bool, thing_force_angle)
 EXTERN_CVAR(Bool, grid_dashed)
 EXTERN_CVAR(Bool, grid_64grid)
+EXTERN_CVAR(Bool, grid_origin)
 EXTERN_CVAR(Bool, edit_snap_grid)
 EXTERN_CVAR(Bool, allow_np2_tex)
 EXTERN_CVAR(Int, tex_filter)
+EXTERN_CVAR(Bool, pan_detail)
 
 VisualPrefs::VisualPrefs(wxWindow *parent)
 :	wxPanel(parent, -1)
@@ -22,11 +24,14 @@ VisualPrefs::VisualPrefs(wxWindow *parent)
 
 	// Editor frame
 	wxStaticBox *frame = new wxStaticBox(this, -1, _T("Editor"));
-	wxStaticBoxSizer *box = new wxStaticBoxSizer(frame, wxHORIZONTAL);
+	wxStaticBoxSizer *box = new wxStaticBoxSizer(frame, wxVERTICAL);
 	m_vbox->Add(box, 0, wxEXPAND|wxALL, 4);
 
+	wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
+	box->Add(hbox, 0, wxBOTTOM|wxEXPAND, 2);
+
 	wxBoxSizer *vbox = new wxBoxSizer(wxVERTICAL);
-	box->Add(vbox, 1, wxEXPAND);
+	hbox->Add(vbox, 1, wxEXPAND);
 
 	cb_grid_dash = new wxCheckBox(this, VP_GRID_DASH, _T("Dashed grid"));
 	if (grid_dashed) cb_grid_dash->SetValue(true);
@@ -36,9 +41,16 @@ VisualPrefs::VisualPrefs(wxWindow *parent)
 	if (grid_64grid) cb_64_grid->SetValue(true);
 	vbox->Add(cb_64_grid, 0, wxBOTTOM, 2);
 
+	cb_grid_origin = new wxCheckBox(this, VP_GRID_ORIGIN, _T("Hilight (0,0) on grid"));
+	if (grid_origin) cb_grid_origin->SetValue(true);
+	vbox->Add(cb_grid_origin, 0, wxBOTTOM, 2);
+
 	cb_snap_to_grid = new wxCheckBox(this, VP_SNAP_GRID, _T("Snap to grid"));
 	if (edit_snap_grid) cb_snap_to_grid->SetValue(true);
 	vbox->Add(cb_snap_to_grid, 0, wxBOTTOM, 2);
+
+	vbox = new wxBoxSizer(wxVERTICAL);
+	hbox->Add(vbox, 1, wxEXPAND);
 
 	cb_thing_sprites = new wxCheckBox(this, VP_THING_SPRITES, _T("Show things as sprites"));
 	if (thing_sprites) cb_thing_sprites->SetValue(true);
@@ -48,8 +60,12 @@ VisualPrefs::VisualPrefs(wxWindow *parent)
 	if (thing_force_angle) cb_thing_angles->SetValue(true);
 	vbox->Add(cb_thing_angles, 0, wxBOTTOM, 2);
 
-	wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
-	vbox->Add(hbox, 0, wxBOTTOM|wxEXPAND, 2);
+	cb_pan_detail = new wxCheckBox(this, VP_PAN_DETAIL, _T("Full detail map panning"));
+	if (pan_detail) cb_pan_detail->SetValue(true);
+	vbox->Add(cb_pan_detail, 0, wxBOTTOM, 2);
+
+	hbox = new wxBoxSizer(wxHORIZONTAL);
+	box->Add(hbox, 0, wxBOTTOM|wxEXPAND, 2);
 
 	hbox->Add(new wxStaticText(this, -1, _T("Crosshair:")), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
 
@@ -108,15 +124,78 @@ BEGIN_EVENT_TABLE(VisualPrefs, wxPanel)
 	EVT_CHOICE(VP_TEX_FILTER, VisualPrefs::filter_changed)
 	EVT_CHOICE(VP_XHAIR_2D, VisualPrefs::xhair_2d_changed)
 	EVT_COMMAND_SCROLL(VP_LINE_SIZE, VisualPrefs::line_size_changed)
-	EVT_CHECKBOX(VP_GRID_DASH, VisualPrefs::grid_dash_toggled)
-	EVT_CHECKBOX(VP_64_GRID, VisualPrefs::grid_64_toggled)
-	EVT_CHECKBOX(VP_SNAP_GRID, VisualPrefs::grid_snap_toggled)
-	EVT_CHECKBOX(VP_THING_SPRITES, VisualPrefs::thing_sprites_toggled)
-	EVT_CHECKBOX(VP_THING_ANGLES, VisualPrefs::thing_angles_toggled)
-	EVT_CHECKBOX(VP_LINE_AA, VisualPrefs::line_aa_toggled)
-	EVT_CHECKBOX(VP_TEX_NP2, VisualPrefs::tex_np2_toggled)
+	EVT_CHECKBOX(VP_GRID_DASH, VisualPrefs::cbox_toggled)
+	EVT_CHECKBOX(VP_64_GRID, VisualPrefs::cbox_toggled)
+	EVT_CHECKBOX(VP_SNAP_GRID, VisualPrefs::cbox_toggled)
+	EVT_CHECKBOX(VP_GRID_ORIGIN, VisualPrefs::cbox_toggled)
+	EVT_CHECKBOX(VP_THING_SPRITES, VisualPrefs::cbox_toggled)
+	EVT_CHECKBOX(VP_THING_ANGLES, VisualPrefs::cbox_toggled)
+	EVT_CHECKBOX(VP_LINE_AA, VisualPrefs::cbox_toggled)
+	EVT_CHECKBOX(VP_TEX_NP2, VisualPrefs::cbox_toggled)
+	EVT_CHECKBOX(VP_PAN_DETAIL, VisualPrefs::cbox_toggled)
 END_EVENT_TABLE()
 
+void VisualPrefs::cbox_toggled(wxCommandEvent &event)
+{
+	switch(event.GetId())
+	{
+	case VP_GRID_DASH:
+		grid_dashed = false;
+		if (cb_grid_dash->GetValue()) grid_dashed = true;
+		redraw_map();
+		break;
+
+	case VP_64_GRID:
+		grid_64grid = false;
+		if (cb_64_grid->GetValue()) grid_64grid = true;
+		redraw_map();
+		break;
+
+	case VP_GRID_ORIGIN:
+		grid_origin = false;
+		if (cb_grid_origin->GetValue()) grid_origin = true;
+		redraw_map();
+		break;
+
+	case VP_SNAP_GRID:
+		edit_snap_grid = false;
+		if (cb_snap_to_grid->GetValue()) edit_snap_grid = true;
+		break;
+
+	case VP_THING_SPRITES:
+		thing_sprites = false;
+		if (cb_thing_sprites->GetValue()) thing_sprites = true;
+		redraw_map();
+		break;
+
+	case VP_THING_ANGLES:
+		thing_force_angle = false;
+		if (cb_thing_angles->GetValue()) thing_force_angle = true;
+		redraw_map();
+		break;
+
+	case VP_LINE_AA:
+		line_aa = false;
+		if (cb_line_aa->GetValue()) line_aa = true;
+		redraw_map();
+		break;
+
+	case VP_TEX_NP2:
+		allow_np2_tex = false;
+		if (cb_tex_np2->GetValue()) allow_np2_tex = true;
+		break;
+
+	case VP_PAN_DETAIL:
+		pan_detail = false;
+		if (cb_pan_detail->GetValue()) pan_detail = true;
+		break;
+
+	default:
+		break;
+	}
+}
+
+/*
 void VisualPrefs::grid_dash_toggled(wxCommandEvent &event)
 {
 	grid_dashed = false;
@@ -163,6 +242,13 @@ void VisualPrefs::tex_np2_toggled(wxCommandEvent &event)
 	allow_np2_tex = false;
 	if (cb_tex_np2->GetValue()) allow_np2_tex = true;
 }
+
+void VisualPrefs::pan_detail_toggled(wxCommandEvent &event)
+{
+	pan_detail = false;
+	if (cb_pan_detail->GetValue()) pan_detail = true;
+}
+*/
 
 void VisualPrefs::filter_changed(wxCommandEvent &event)
 {

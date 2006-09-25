@@ -62,6 +62,8 @@ public:
 
 	void	copy(Side* side, bool update_tex = true);
 
+	void	add_tex_counts();
+
 	doomside_t	to_doomformat();
 };
 

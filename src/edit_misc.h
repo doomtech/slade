@@ -14,7 +14,7 @@ void line_paint_tex(int line, bool front, string otex, string ntex, vector<int> 
 void line_auto_align_x(int line, int offset, bool front, string tex, int texwidth, vector<int> &processed_lines);
 void line_extrude(int amount);
 void line_align_x();
-void line_correct_references(int line = -1);
+void line_correct_references(int line = -1, bool backup = true);
 void line_split(int splits = 2);
 void line_flip(bool verts, bool sides);
 void line_split_at(point2_t pos);

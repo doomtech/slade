@@ -607,6 +607,12 @@ void BindList::load(Tokenizer *tz)
 			string name = tz->get_token();
 			string key = tz->get_token();
 
+			for (DWORD a = 0; a < controls.size(); a++)
+			{
+				if (controls[a].name == name)
+					controls[a].keys.clear();
+			}
+
 			if (key == _T("{"))
 			{
 				int index = 0;

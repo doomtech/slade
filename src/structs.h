@@ -54,6 +54,46 @@ struct rgba_t
 		else if (blend == 1)
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	}
+
+	// Amplify/fade colour
+	rgba_t amp(BYTE R, BYTE G, BYTE B, BYTE A)
+	{
+		int nr = r + R;
+		int ng = g + G;
+		int nb = b + B;
+		int na = a + A;
+
+		if (nr > 255) nr = 255;
+		if (nr < 0) nr = 0;
+		if (ng > 255) ng = 255;
+		if (ng < 0) ng = 0;
+		if (nb > 255) nb = 255;
+		if (nb < 0) nb = 0;
+		if (na > 255) na = 255;
+		if (na < 0) na = 0;
+
+		return rgba_t((BYTE)nr, (BYTE)ng, (BYTE)nb, (BYTE)na, blend);
+	}
+
+	// Amplify/fade colour by factor
+	rgba_t ampf(float fr, float fg, float fb, float fa)
+	{
+		int nr = r * fr;
+		int ng = g * fg;
+		int nb = b * fb;
+		int na = a * fa;
+
+		if (nr > 255) nr = 255;
+		if (nr < 0) nr = 0;
+		if (ng > 255) ng = 255;
+		if (ng < 0) ng = 0;
+		if (nb > 255) nb = 255;
+		if (nb < 0) nb = 0;
+		if (na > 255) na = 255;
+		if (na < 0) na = 0;
+
+		return rgba_t((BYTE)nr, (BYTE)ng, (BYTE)nb, (BYTE)na, blend);
+	}
 };
 
 #define COL_BLEND_DONTCARE	-1
