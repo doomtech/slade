@@ -267,7 +267,6 @@ void keys_edit()
 		editor_window->popup_context_menu();
 	}
 
-	/*
 	// Sidebar stuff
 	wxCommandEvent event;
 	if (RELEASED("view_hidesidebar"))
@@ -278,7 +277,6 @@ void keys_edit()
 
 	if (RELEASED("view_themesidebar"))
 		editor_window->view_themesidebar(event);
-	*/
 
 	// Vertices mode
 	if (RELEASED("mode_vertices"))

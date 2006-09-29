@@ -291,6 +291,45 @@ void ldraw_drawrect(point2_t mouse, bool square)
 									snap_to_grid(ldraw_bound.y1())));
 }
 
+// line_drawcircle: Draws a circle or ellipse within the selection box
+// ---------------------------------------------------------------- >>
+void ldraw_drawcircle(point2_t mouse, int sides, bool circle)
+{
+	if (!ldraw_bound_start)
+		return;
+
+	ldraw_points.clear();
+	ldraw_bound.br.set(mouse);
+
+	rect_t box(snap_to_grid(ldraw_bound.x1()), snap_to_grid(ldraw_bound.y1()),
+				snap_to_grid(ldraw_bound.x2()), snap_to_grid(ldraw_bound.y2()));
+
+	point2_t mid(box.x1() + (box.width() / 2), box.y1() + (box.height() / 2));
+
+	int width = box.width() / 2;
+	int height = box.height() / 2;
+
+	if (circle)
+	{
+		width = box.length() / 2;
+		height = box.length() / 2;
+	}
+
+	double rot = 0;
+	point2_t start;
+	for (int a = 0; a < sides; a++)
+	{
+		point2_t point(lround((double)mid.x + sin(rot) * (double)width), lround((double)mid.y - cos(rot) * (double)height));
+		ldraw_points.push_back(point);
+		rot += (3.1415926535897932384626433832795 * 2) / (double)sides;
+
+		if (a == 0)
+			start = point;
+	}
+
+	ldraw_points.push_back(start);
+}
+
 void ldraw_removepoint()
 {
 	if (state(STATE_SHAPEDRAW))
@@ -339,7 +378,8 @@ void ldraw_draw_lines(point2_t mouse)
 		draw_text(r.middle().x, r.middle().y, c, 1, true, "%d", lround(r.length()));
 	}
 
-	draw_point(mp.x, mp.y, 8, col_linedraw);
+	if (state(STATE_LINEDRAW) || !ldraw_bound_start)
+		draw_point(mp.x, mp.y, 8, col_linedraw);
 
 	glDisable(GL_LINE_STIPPLE);
 	glDisable(GL_POINT_SMOOTH);

@@ -18,7 +18,8 @@
 
 DoomMap d_map;
 
-CVAR(Float, edit_split_dist, 2, CVAR_SAVE)
+CVAR(Float, edit_split_dist, 1.5f, CVAR_SAVE)
+CVAR(Bool, edit_keep_selection, true, CVAR_SAVE)
 
 extern int edit_mode;
 extern EditorWindow* editor_window;
@@ -1765,9 +1766,9 @@ void DoomMap::clear_move_items()
 		{
 			for (unsigned int a = 0; a < m_verts.size(); a++)
 			{
-				if (d_map.line(l)->has_vertex(m_verts[a]))
+				if (line(l)->has_vertex(m_verts[a]))
 				{
-					m_lines.push_back(d_map.line(l));
+					m_lines.push_back(line(l));
 					break;
 				}
 			}
@@ -2117,4 +2118,86 @@ void DoomMap::clear_things()
 	for (DWORD a = 0; a < things.size(); a++)
 		delete things[a];
 	things.clear();
+}
+
+void DoomMap::change_edit_mode(int mode)
+{
+	if (mode == edit_mode)
+	{
+		clear_selection();
+		return;
+	}
+
+	// Keep selections between modes if possible
+	if (edit_mode == 2 && mode != 3 && edit_keep_selection) // Sectors -> Lines or Sectors -> Vertices
+	{
+		vector<int> lines;
+		vector<Sector*> selection;
+		get_selection(selection);
+
+		// Get lines
+		for (int a = 0; a < (int)n_lines(); a++)
+		{
+			if (vector_exists(selection, line(a)->side1()->get_sector()))
+			{
+				lines.push_back(a);
+				continue;
+			}
+
+			if (vector_exists(selection, line(a)->side2()->get_sector()))
+			{
+				lines.push_back(a);
+				continue;
+			}
+		}
+
+		if (mode == 1)
+		{
+			clear_selection();
+			for (int a = 0; a < (int)lines.size(); a++)
+				selected_items.push_back(lines[a]);
+		}
+
+		if (mode == 0)
+		{
+			clear_selection();
+			for (int a = 0; a < (int)n_verts(); a++)
+			{
+				for (int l = 0; l < (int)lines.size(); l++)
+				{
+					if (line(lines[l])->has_vertex(vertex(a)))
+					{
+						selected_items.push_back(a);
+						break;
+					}
+				}
+			}
+		}
+	}
+	else if (edit_mode == 1 && mode == 0 && edit_keep_selection) // Lines -> Vertices
+	{
+		vector<int> lines;
+
+		for (int a = 0; a < (int)selected_items.size(); a++)
+			lines.push_back(selected_items[a]);
+
+		clear_selection();
+
+		for (int a = 0; a < (int)n_verts(); a++)
+		{
+			for (int l = 0; l < (int)lines.size(); l++)
+			{
+				if (line(lines[l])->has_vertex(vertex(a)))
+				{
+					selected_items.push_back(a);
+					break;
+				}
+			}
+		}
+	}
+	else
+		clear_selection();
+
+	edit_mode = mode;
+	clear_hilight();
 }

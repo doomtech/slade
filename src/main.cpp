@@ -173,16 +173,7 @@ float get_zoom()
 
 void change_edit_mode(int mode)
 {
-	if (mode == edit_mode)
-	{
-		d_map.clear_selection();
-		return;
-	}
-
-	edit_mode = mode;
-	d_map.clear_selection();
-	d_map.clear_hilight();
-
+	d_map.change_edit_mode(mode);
 	redraw_map();
 	editor_window->change_infobar();
 	update_statusbar();

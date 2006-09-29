@@ -97,6 +97,7 @@ public:
 
 	void setup_menu();
 	void setup_toolbar();
+	void setup_theme_sidebar();
 
 	bool open_map(Wad* wad, string mapname);
 	void update_infobar() { info_bar->update(); }

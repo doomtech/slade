@@ -2,7 +2,7 @@
 #include "main.h"
 #include "game_config.h"
 #include "doom_map.h"
-#include "wx_stuff.h"
+#include "editor_window.h"
 #include "wad.h"
 #include "colours.h"
 
@@ -27,6 +27,7 @@ extern WadList wads;
 extern vector<string> spritenames;
 extern bool mix_tex;
 extern Wad reswad;
+extern EditorWindow *editor_window;
 
 void load_game_iwads(Tokenizer *tz)
 {
@@ -242,6 +243,9 @@ bool GameConfig::load_config(string filename)
 	}
 
 	read_types(&tz, 255);
+
+	// Load default textures/info to theme sidebar
+	editor_window->setup_theme_sidebar();
 
 	return true;
 }

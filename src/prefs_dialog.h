@@ -48,8 +48,6 @@ public:
 		VP_TEX_NP2,
 		VP_PAN_DETAIL,
 
-		VP_CBOX_END,
-
 		VP_LINE_SIZE,
 		VP_TEX_FILTER,
 		VP_XHAIR_2D,
@@ -58,16 +56,6 @@ public:
 	VisualPrefs(wxWindow *parent);
 	~VisualPrefs();
 
-	/*
-	void grid_dash_toggled(wxCommandEvent &event);
-	void grid_64_toggled(wxCommandEvent &event);
-	void grid_snap_toggled(wxCommandEvent &event);
-	void thing_sprites_toggled(wxCommandEvent &event);
-	void thing_angles_toggled(wxCommandEvent &event);
-	void line_aa_toggled(wxCommandEvent &event);
-	void tex_np2_toggled(wxCommandEvent &event);
-	void pan_detail_toggled(wxCommandEvent &event);
-	*/
 	void cbox_toggled(wxCommandEvent &event);
 
 	void filter_changed(wxCommandEvent &event);
@@ -83,8 +71,6 @@ class ColourBox : public wxPanel
 {
 private:
 	rgba_t		*rgba;
-	//wxColour	colour;
-	//float		alpha;
 
 public:
 	ColourBox(wxWindow *parent, rgba_t *colour);
@@ -281,6 +267,31 @@ public:
 	void cb_invertmouse_toggled(wxCommandEvent &event);
 	void cb_desktopres_toggled(wxCommandEvent &event);
 	void combo_res_changed(wxCommandEvent &event);
+
+	DECLARE_EVENT_TABLE()
+};
+
+class EditPrefs : public wxPanel
+{
+private:
+	wxCheckBox		*cb_auto_split;
+	wxCheckBox		*cb_auto_merge;
+	wxCheckBox		*cb_auto_createsector;
+	wxCheckBox		*cb_keep_selection;
+	wxCheckBox		*cb_zoom_cursor;
+
+public:
+	enum
+	{
+		EP_CB_AUTOSPLIT,
+		EP_CB_AUTOMERGE,
+		EP_CB_AUTOCREATE,
+		EP_CB_KEEPSELECTION,
+		EP_CB_ZOOMCURSOR,
+	};
+
+	EditPrefs(wxWindow *parent);
+	~EditPrefs();
 
 	DECLARE_EVENT_TABLE()
 };

@@ -31,23 +31,29 @@ RenderPrefs::RenderPrefs(wxWindow *parent)
 	wxStaticBoxSizer *box = new wxStaticBoxSizer(frame, wxVERTICAL);
 	m_vbox->Add(box, 0, wxEXPAND|wxALL, 4);
 
+	wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
+	box->Add(hbox, 0, wxEXPAND);
+
 	cb_fog = new wxCheckBox(this, RP_CB_FOG, _T("Depth Fog"));
 	if (render_fog) cb_fog->SetValue(true);
-	box->Add(cb_fog, 0, wxBOTTOM, 2);
+	hbox->Add(cb_fog, 1, wxBOTTOM, 2);
 
 	cb_fullbright = new wxCheckBox(this, RP_CB_FULLBRIGHT, _T("Fullbright"));
 	if (render_fullbright) cb_fullbright->SetValue(true);
-	box->Add(cb_fullbright, 0, wxBOTTOM, 2);
+	hbox->Add(cb_fullbright, 1, wxBOTTOM, 2);
+
+	hbox = new wxBoxSizer(wxHORIZONTAL);
+	box->Add(hbox, 0, wxEXPAND);
 
 	cb_hilight = new wxCheckBox(this, RP_CB_HILIGHT, _T("Show Hilight"));
 	if (render_hilight) cb_hilight->SetValue(true);
-	box->Add(cb_hilight, 0, wxBOTTOM, 2);
+	hbox->Add(cb_hilight, 1, wxBOTTOM, 2);
 
 	cb_hilightthings = new wxCheckBox(this, RP_CB_HLTHINGS, _T("Always Show Thing Hilight"));
 	if (render_thing_hilight) cb_hilightthings->SetValue(true);
-	box->Add(cb_hilightthings, 0, wxBOTTOM, 2);
+	hbox->Add(cb_hilightthings, 1, wxBOTTOM, 2);
 
-	wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
+	hbox = new wxBoxSizer(wxHORIZONTAL);
 	box->Add(hbox, 0);
 
 	hbox->Add(new wxStaticText(this, -1, _T("Things:")), 0, wxRIGHT|wxALIGN_CENTER_VERTICAL, 4);

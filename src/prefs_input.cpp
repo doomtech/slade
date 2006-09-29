@@ -152,17 +152,20 @@ InputPrefs::InputPrefs(wxWindow *parent)
 	wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
 	box->Add(hbox, 0, wxEXPAND);
 
-	btn_addbind = new wxButton(this, IP_BTN_ADDBIND, _T("Add"), wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT);
-	hbox->Add(btn_addbind, 0, wxEXPAND|wxALL, 4);
+	btn_addbind = new wxButton(this, IP_BTN_ADDBIND, _T("Add"), wxDefaultPosition, wxDefaultSize);
+	hbox->Add(btn_addbind, 1, wxEXPAND|wxRIGHT, 4);
 
-	btn_removebind = new wxButton(this, IP_BTN_REMOVEBIND, _T("Del"), wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT);
-	hbox->Add(btn_removebind, 0, wxEXPAND|wxALL, 4);
+	btn_removebind = new wxButton(this, IP_BTN_REMOVEBIND, _T("Del"), wxDefaultPosition, wxDefaultSize);
+	hbox->Add(btn_removebind, 1, wxEXPAND);
 
-	btn_changebind = new wxButton(this, IP_BTN_CHANGEBIND, _T("Change"), wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT);
-	hbox->Add(btn_changebind, 0, wxEXPAND|wxALL, 4);
+	hbox = new wxBoxSizer(wxHORIZONTAL);
+	box->Add(hbox, 0, wxEXPAND|wxTOP, 4);
+
+	btn_changebind = new wxButton(this, IP_BTN_CHANGEBIND, _T("Change"), wxDefaultPosition, wxDefaultSize);
+	hbox->Add(btn_changebind, 1, wxEXPAND|wxRIGHT, 4);
 
 	btn_defaultbind = new wxButton(this, IP_BTN_DEFAULTBIND, _T("Default"), wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT);
-	hbox->Add(btn_defaultbind, 0, wxEXPAND|wxALL, 4);
+	hbox->Add(btn_defaultbind, 1, wxEXPAND);
 
 	// Config frame
 	frame = new wxStaticBox(this, -1, _T("Configuration"));

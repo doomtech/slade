@@ -7,6 +7,7 @@ void ldraw_addpoint(bool nearest_vert);
 void ldraw_draw_lines(point2_t mouse);
 void ldraw_removepoint();
 void ldraw_drawrect(point2_t mouse, bool square);
+void ldraw_drawcircle(point2_t mouse, int sides, bool circle);
 
 int get_side_sector(int line, int side);
 

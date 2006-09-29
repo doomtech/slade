@@ -181,6 +181,8 @@ public:
 	void get_lines_to_vert(int vertex, vector<int> &list, bool allowdup = true);
 	void update_vertex_refs();
 
+	void change_edit_mode(int mode);
+
 	// Checks
 	int		get_free_tag();
 	int		remove_unused_vertices();

@@ -16,7 +16,7 @@
 #include "input.h"
 #include "ttype_select.h"
 #include "edit.h"
-//#include "sidebar.h"
+#include "sidebar.h"
 
 #include <wx/image.h>
 #include <wx/filename.h>
@@ -75,14 +75,12 @@ EditorWindow::EditorWindow(const wxChar *title, int xpos, int ypos, int width, i
 	hbox->Add(map_area, 1, wxEXPAND);
 	map_area->set_menus(line_context_menu, sector_context_menu, thing_context_menu);
 
-	/*
 	// Sidebar
 	sb_draw = new DrawSideBar(this);
 	hbox->Add(sb_draw, 0, wxEXPAND);
 
 	sb_theme = new ThemeSideBar(this);
 	hbox->Add(sb_theme, 0, wxEXPAND);
-	*/
 
 	// Info bar
 	info_bar = new LineInfoBar(this);
@@ -100,12 +98,10 @@ EditorWindow::EditorWindow(const wxChar *title, int xpos, int ypos, int width, i
 
 	map_area->init();
 
-	/*
 	if (show_sidebar != 1)
 		sb_draw->Show(false);
 	if (show_sidebar != 2)
 		sb_theme->Show(false);
-		*/
 
 	Layout();
 }
@@ -292,6 +288,11 @@ void EditorWindow::setup_menu()
 	menu_bar->Append(checks_menu, _T("&Checks"));
 }
 
+void EditorWindow::setup_theme_sidebar()
+{
+	((ThemeSideBar*)sb_theme)->setup();
+}
+
 // open_map: Opens a map to edit, if wad is NULL then it's a new/standalone map
 // ------------------------------------------------------------------------- >>
 bool EditorWindow::open_map(Wad* wad, string mapname)
@@ -426,8 +427,8 @@ void EditorWindow::update_statusbar()
 
 void EditorWindow::draw_shape()
 {
-	//((DrawSideBar*)sb_draw)->draw_shape();
-	ldraw_drawrect(map_area->mouse_pos(true), false);
+	((DrawSideBar*)sb_draw)->draw_shape();
+	//ldraw_drawrect(map_area->mouse_pos(true), false);
 }
 
 BEGIN_EVENT_TABLE(EditorWindow, wxFrame)
@@ -575,7 +576,7 @@ void EditorWindow::file_save(wxCommandEvent &event)
 			if (!edit_wad->parent)
 			{
 				add_recent_wad(edit_wad->path);
-				edit_wad->open(edit_wad->path);
+				//edit_wad->open(edit_wad->path);
 			}
 		}
 	}
@@ -1023,32 +1024,26 @@ void EditorWindow::mode_3d(wxCommandEvent &event)
 
 void EditorWindow::view_drawsidebar(wxCommandEvent &event)
 {
-	/*
 	show_sidebar = 1;
 	sb_draw->Show();
 	sb_theme->Show(false);
 	Layout();
-	*/
 }
 
 void EditorWindow::view_themesidebar(wxCommandEvent &event)
 {
-	/*
 	show_sidebar = 2;
 	sb_draw->Show(false);
 	sb_theme->Show();
 	Layout();
-	*/
 }
 
 void EditorWindow::view_hidesidebar(wxCommandEvent &event)
 {
-	/*
 	show_sidebar = 0;
 	sb_draw->Show(false);
 	sb_theme->Show(false);
 	Layout();
-	*/
 }
 
 void EditorWindow::view_console(wxCommandEvent &event)
