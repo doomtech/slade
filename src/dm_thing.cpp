@@ -5,12 +5,14 @@
 #include "game_config.h"
 #include "draw.h"
 #include "editor_window.h"
+#include "input.h"
+#include "edit.h"
 
 Thing last_thing;
 
 extern EditorWindow *editor_window;
 extern GameConfig game;
-extern rgba_t col_hilight, col_selection, col_moving;
+extern rgba_t col_hilight, col_selection, col_moving, col_linedraw;
 
 EXTERN_CVAR(Bool, thing_sprites)
 EXTERN_CVAR(Bool, thing_force_angle)
@@ -31,6 +33,7 @@ Thing::Thing(DoomMap *parent)
 	memset(args, 0, 5);
 	ttype = game.get_ttype(type);
 	index = -1;
+	sector = -2;
 
 	if (parent)
 		parent->add_thing(this);
@@ -51,6 +54,7 @@ Thing::Thing(doomthing_t t, DoomMap *parent)
 	memset(args, 0, 5);
 	ttype = game.get_ttype(type);
 	index = -1;
+	sector = -2;
 
 	if (parent)
 		parent->add_thing(this);
@@ -71,6 +75,7 @@ Thing::Thing(hexenthing_t t, DoomMap *parent)
 	memcpy(args, t.args, 5);
 	ttype = game.get_ttype(type);
 	index = -1;
+	sector = -2;
 
 	if (parent)
 		parent->add_thing(this);
@@ -251,12 +256,20 @@ bool Thing::draw(rect_t vis_area, BYTE style)
 	}
 
 	if (style == MISTYLE_HILIGHTED)
+	{
 		draw_rect(rect_t(x, y, r*2, r*2, RECT_CENTER), col_hilight, true);
+
+		if (state(STATE_THINGANGLE))
+			draw_line(rect_t(pos(), mouse_pos(true)), col_linedraw, line_aa, false, 1.0f);
+	}
 
 	if (style == MISTYLE_SELECTED)
 	{
 		r += 4;
 		draw_rect(rect_t(x, y, r*2, r*2, RECT_CENTER), col_selection, true);
+
+		if (state(STATE_THINGANGLE))
+			draw_line(rect_t(pos(), mouse_pos(true)), col_linedraw, line_aa, false, 1.0f);
 	}
 
 	if (style == MISTYLE_MOVING)
@@ -300,18 +313,62 @@ hexenthing_t Thing::to_hexenformat()
 	return ret;
 }
 
+int Thing::get_sector(bool check)
+{
+	if (sector == -2 && parent && check)
+		sector = parent->get_hilight_sector(point2_t(x, y));
+
+	return sector;
+}
+
 void Thing::move(int xd, int yd)
 {
 	x += xd;
 	y += yd;
 
 	if (parent)
+	{
 		parent->change_level(MC_THINGS);
+		sector = parent->get_hilight_sector(point2_t(x, y));
+	}
+}
+
+void Thing::set_pos(int x, int y)
+{
+	this->x = x;
+	this->y = y;
+
+	if (parent)
+	{
+		parent->change_level(MC_THINGS);
+		sector = parent->get_hilight_sector(point2_t(x, y));
+	}
+}
+
+void Thing::set_type(int type)
+{
+	this->type = type;
+	ttype = game.get_ttype(type);
+}
+
+void Thing::set_angle(int angle)
+{
+	if (angle > 315)
+		angle = 0;
+	if (angle < 0)
+		angle = 315;
+
+	this->angle = angle;
+}
+
+void Thing::set_sector(int sec)
+{
+	sector = sec;
 }
 
 void Thing::copy(Thing *t)
 {
-	this->parent = t->get_parent();
+	//this->parent = t->get_parent();
 
 	x = t->pos().x;
 	y = t->pos().y;
@@ -323,6 +380,7 @@ void Thing::copy(Thing *t)
 	special = t->get_special();
 	ttype = game.get_ttype(type);
 	index = -1;
+	sector = t->sector;
 
 	for (int a = 0; a < 5; a++)
 		args[a] = t->arg(a);

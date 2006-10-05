@@ -397,9 +397,11 @@ wxImage* lump_to_image(Wad* wadfile, int lump_index, bool alpha)
 		data[4] == 13 && data[5] == 10 &&
 		data[6] == 26 && data[7] == 10)
 	{
-		lump->dumpToFile(_T("sladetemp"));
-		wxImage *image = new wxImage(_T("sladetemp"), wxBITMAP_TYPE_PNG);
-		remove("sladetemp");
+		string path = c_path(_T("sladetemp"), DIR_TMP);
+
+		lump->dumpToFile(path);
+		wxImage *image = new wxImage(path, wxBITMAP_TYPE_PNG);
+		remove(chr(path));
 
 		return image;
 	}
@@ -1118,7 +1120,7 @@ bool SimpleTexture::gen_gl_tex()
 
 	if (!data_wad)
 	{
-		data_wad = wads.getWadWithLump(lump_name);
+		data_wad = wads.getWadWithLump(lump_name, true, true);
 
 		if (!data_wad)
 			return false;

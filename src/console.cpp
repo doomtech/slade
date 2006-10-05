@@ -11,12 +11,15 @@
 #include "console.h"
 #include "colours.h"
 #include "textures.h"
-//#include "tex_browser.h"
 #include "splash.h"
 #include "version.h"
 #include "console_window.h"
 #include "doom_map.h"
 #include "dm_vertex.h"
+#include "dm_side.h"
+#include "dm_sector.h"
+#include "dm_thing.h"
+#include "game_config.h"
 
 // Variables ----------------------------- >>
 //GtkTextBuffer	*console_log;
@@ -61,6 +64,7 @@ extern vector<Texture*>	flats;
 extern bool dev_log;
 extern ConsoleWindow *console_window;
 extern DoomMap d_map;
+extern GameConfig game;
 
 void console_prevcommand()
 {
@@ -272,12 +276,17 @@ void console_parsecommand()
 	// "cmdlist" command
 	else if (token == _T("cmdlist"))
 	{
-		console_print(_T("Available Commands:"));
-		console_print(_T("cmdlist"));
-		console_print(_T("cvarlist"));
-		console_print(_T("dump_flats"));
-		console_print(_T("dump_textures"));
-		console_print(_T("splash"));
+		string tmp = _T("Available Commands:");
+		tmp += _T("\ncmdlist");
+		tmp += _T("\ncvarlist");
+		tmp += _T("\ndump_flats");
+		tmp += _T("\ndump_textures");
+		tmp += _T("\nsplash");
+		tmp += _T("\nstats_map");
+		tmp += _T("\nstats_textures");
+		tmp += _T("\nstats_flats");
+		tmp += _T("\nstats_things");
+		console_print(tmp);
 	}
 
 	else if (token == _T("listverts"))
@@ -287,6 +296,84 @@ void console_parsecommand()
 			Vertex* v = d_map.vertex(a);
 			console_print(s_fmt(_T("Vertex %d: i%d x%d y%d r%d"), a, d_map.index(v), v->x_pos(), v->y_pos(), v->refs()));
 		}
+	}
+
+	else if (token == _T("stats_map"))
+	{
+		string tmp = _T("Map Statistics:");
+		tmp += s_fmt(_T("\n%d Vertices"), d_map.n_verts());
+		tmp += s_fmt(_T("\n%d Lines"), d_map.n_lines());
+		tmp += s_fmt(_T("\n%d Sides"), d_map.n_sides());
+		tmp += s_fmt(_T("\n%d Sectors"), d_map.n_sectors());
+		tmp += s_fmt(_T("\n%d Things"), d_map.n_things());
+		console_print(tmp);
+	}
+
+	else if (token == _T("stats_textures"))
+	{
+		for (int a = 0; a < (int)textures.size(); a++)
+			textures[a]->use_count = 0;
+
+		for (int a = 0; a < d_map.n_sides(); a++)
+			d_map.side(a)->add_tex_counts();
+
+		string tmp = _T("Texture Usage Statistics:");
+		for (int a = 0; a < (int)textures.size(); a++)
+		{
+			if (textures[a]->use_count > 0)
+				tmp += s_fmt(_T("\n\"%s\" x %d"), textures[a]->name.c_str(), textures[a]->use_count);
+		}
+
+		console_print(tmp);
+	}
+
+	else if (token == _T("stats_flats"))
+	{
+		for (int a = 0; a < (int)flats.size(); a++)
+			flats[a]->use_count = 0;
+
+		for (int a = 0; a < d_map.n_sectors(); a++)
+			d_map.sector(a)->add_tex_counts();
+
+		string tmp = _T("Flat Usage Statistics:");
+		for (int a = 0; a < (int)flats.size(); a++)
+		{
+			if (flats[a]->use_count > 0)
+				tmp += s_fmt(_T("\n\"%s\" x %d"), flats[a]->name.c_str(), flats[a]->use_count);
+		}
+
+		console_print(tmp);
+	}
+
+	else if (token == _T("stats_things"))
+	{
+		int n_ttypes = (int)game.get_ttypes().size();
+		int *counts = new int[n_ttypes];
+		memset(counts, 0, n_ttypes * sizeof(int));
+
+		for (int a = 0; a < (int)d_map.n_things(); a++)
+		{
+			for (int b = 0; b < n_ttypes; b++)
+			{
+				ThingType *tt = &game.get_ttypes()[b];
+				if (tt == d_map.thing(a)->get_ttype())
+				{
+					counts[b]++;
+					break;
+				}
+			}
+		}
+
+		string tmp = _T("Thing Usage Statistics:");
+		for (int a = 0; a < n_ttypes; a++)
+		{
+			ThingType *tt = &game.get_ttypes()[a];
+			if (counts[a] > 0)
+				tmp += s_fmt(_T("\n\"%s\" (%d) x %d"), tt->name, tt->type, counts[a]);
+		}
+
+		console_print(tmp);
+		delete[] counts;
 	}
 
 	// Unknown command

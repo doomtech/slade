@@ -249,7 +249,7 @@ void check_textures()
 	int line = -1;
 
 	// Check line textures
-	for (int l = 0; l < d_map.n_lines(); l++)
+	for (int l = 0; l < (int)d_map.n_lines(); l++)
 	{
 		//sidedef_t *side = map.l_getside(l, 1);
 		Side* side = d_map.line(l)->side1();
@@ -336,7 +336,7 @@ void check_textures()
 	}
 
 	// Check flat textures
-	for (int s = 0; s < d_map.n_sectors(); s++)
+	for (int s = 0; s < (int)d_map.n_sectors(); s++)
 	{
 		if (get_texture(d_map.sector(s)->tex_floor(), 2)->name == _T("_notex"))
 		{

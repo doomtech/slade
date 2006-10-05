@@ -135,6 +135,9 @@ void begin_mapedit()
 		load_hirestex_textures();
 	}
 
+	for (int a = 0; a < (int)game.get_ttypes().size(); a++)
+		game.get_ttypes()[a].sprite = NULL;
+
 	game_changed = false;
 	allow_tex_load = true;
 	//d_map.change_level(MC_NODE_REBUILD|MC_LINES|MC_SSECTS|MC_THINGS);

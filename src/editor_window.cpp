@@ -495,6 +495,9 @@ BEGIN_EVENT_TABLE(EditorWindow, wxFrame)
 
 	// Line context menu
 	EVT_MENU(EWMENU_LINE_SPLITAT,	EditorWindow::line_splitat)
+
+	// Any context menu
+	EVT_MENU(EWMENU_CONTEXT_3DSTART, EditorWindow::set_3d_start)
 END_EVENT_TABLE()
 
 void EditorWindow::close(wxCloseEvent &event)
@@ -778,8 +781,7 @@ void EditorWindow::edit_properties(wxCommandEvent &event)
 
 void EditorWindow::edit_mirrorx(wxCommandEvent &event)
 {
-	/*
-	if (!map.opened)
+	if (!d_map.opened())
 		return;
 
 	lock_hilight = true;
@@ -790,13 +792,11 @@ void EditorWindow::edit_mirrorx(wxCommandEvent &event)
 		vert_mirror(true, false);
 
 	lock_hilight = false;
-	*/
 }
 
 void EditorWindow::edit_mirrory(wxCommandEvent &event)
 {
-	/*
-	if (!map.opened)
+	if (!d_map.opened())
 		return;
 
 	lock_hilight = true;
@@ -807,13 +807,11 @@ void EditorWindow::edit_mirrory(wxCommandEvent &event)
 		vert_mirror(false, true);
 
 	lock_hilight = false;
-	*/
 }
 
 void EditorWindow::edit_rotate(wxCommandEvent &event)
 {
-	/*
-	if (!map.opened)
+	if (!d_map.opened())
 		return;
 
 	lock_hilight = true;
@@ -834,7 +832,6 @@ void EditorWindow::edit_rotate(wxCommandEvent &event)
 
 		lock_hilight = false;
 	}
-	*/
 }
 
 void EditorWindow::edit_alignx(wxCommandEvent &event)
@@ -1141,4 +1138,8 @@ void EditorWindow::line_splitat(wxCommandEvent &event)
 		return;
 
 	line_split_at(down_pos(true));
+}
+
+void EditorWindow::set_3d_start(wxCommandEvent &event)
+{
 }

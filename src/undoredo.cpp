@@ -129,12 +129,14 @@ void Backup::do_backup(WORD flags)
 	}
 	t_things = sw.Time();
 
+	/*
 	log_message(s_fmt("update indices %d", t_update));
 	log_message(s_fmt("verts %d", t_verts));
 	log_message(s_fmt("sectors %d", t_sectors));
 	log_message(s_fmt("sides %d", t_sides));
 	log_message(s_fmt("lines %d", t_lines));
 	log_message(s_fmt("things %d", t_things));
+	*/
 }
 
 DWORD Backup::get_size()
@@ -145,7 +147,7 @@ DWORD Backup::get_size()
 					n_sectors * sizeof(Sector) +
 					n_things * sizeof(Thing));
 
-	log_message(s_fmt("backup size %d bytes", ret));
+	//log_message(s_fmt("backup size %d bytes", ret));
 	return ret;
 }
 

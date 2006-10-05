@@ -25,6 +25,7 @@ ThingType::ThingType(ThingType *ttype)
 	y_scale = ttype->y_scale;
 	x_offset = ttype->x_offset;
 	y_offset = ttype->y_offset;
+	sprite = NULL;
 
 	for (int a = 0; a < 5; a++)
 		args[a] = ttype->args[a];
@@ -52,6 +53,7 @@ void ThingType::setup(int type, string name, string group)
 	y_scale = 1.0f;
 	x_offset = 0;
 	y_offset = 0;
+	sprite = NULL;
 
 	args[0] = _T("Arg 1");
 	args[1] = _T("Arg 2");

@@ -5,6 +5,7 @@
 #include "dm_side.h"
 #include "dm_sector.h"
 #include "dm_vertex.h"
+#include "dm_thing.h"
 #include "camera.h"
 #include "textures.h"
 #include "draw.h"
@@ -28,6 +29,7 @@ vector<Line*>	trans_lines;
 
 int vis_line = 0;
 int vis_ssect = 0;
+int vis_thing = 0;
 float render_hilight_width = 3.0f;
 float min_dist = -1;
 int *ssect_sectors = NULL;
@@ -36,6 +38,7 @@ rgba_t sky_avg_col;
 Line*			hl_line = NULL;
 BYTE			hl_part = 0;
 int				hl_sector = -1;
+Thing*			hl_thing = NULL;
 
 CVAR(Bool, render_fog, true, CVAR_SAVE)
 CVAR(Bool, render_fullbright, false, CVAR_SAVE)
@@ -56,6 +59,7 @@ extern vector<gl_seg_t> gl_segs;
 extern vector<gl_vertex_t> gl_verts;
 extern vector<point2_t> map_verts;
 extern bool* ssects_visible;
+extern BYTE *vis_sectors;
 
 void bind_tex(GLuint id)
 {
@@ -831,6 +835,7 @@ void render_ssect(unsigned int ssect)
 		return;
 
 	Sector* sec = d_map.sector(ssect_sectors[ssect]);
+	vis_sectors[ssect_sectors[ssect]] = 1;
 
 	vis_ssect++;
 
@@ -1070,16 +1075,6 @@ void render_ssects()
 	*/
 }
 
-void render_thing(Thing* t)
-{
-}
-
-void render_mapthings()
-{
-	for (int a = 0; a < d_map.n_things(); a++)
-		render_thing(d_map.thing(a));
-}
-
 void render_skydome()
 {
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -1158,6 +1153,371 @@ void render_skydome()
 	glEnable(GL_DEPTH_TEST);
 }
 
+void render_3d_thing_box(Thing* t)
+{
+	// Get thing sector
+	int sec = t->get_sector();
+	if (sec < 0 || sec > d_map.n_sectors())
+		return;
+
+	// Return if sector isn't visible
+	if (!vis_sectors[sec])
+		return;
+
+	// Get thing sprite if it isn't initialised
+	if (!t->get_ttype()->sprite)
+		t->get_ttype()->sprite = get_texture(t->get_ttype()->spritename, 3, true);
+
+	if (!t->get_ttype()->sprite)
+		return;
+
+	float r = ((t->get_ttype()->sprite->width / 2) * t->get_ttype()->x_scale);
+	float h = (t->get_ttype()->sprite->height * t->get_ttype()->y_scale);
+
+	float shrink = 0.001f;
+	float f = 0.0f;
+
+	if (t->get_ttype()->flags & TTYPE_HANGING)
+		f = d_map.sector(sec)->ceiling() - h;
+		//f = plane_height(sector_info[sector].c_plane, x, y) - h;
+	else
+		f = d_map.sector(sec)->floor();
+		//f = plane_height(sector_info[sector].f_plane, x, y);
+
+	if (d_map.hexen() && t->get_type() != 9500 && t->get_type() != 9501)
+		f += t->z_pos();
+
+	if (t->get_ttype()->radius == -1)
+		f -= 4;
+
+	float x1 = t->pos().x - t->get_ttype()->radius;
+	float y1 = t->pos().y - t->get_ttype()->radius;
+	float x2 = t->pos().x + t->get_ttype()->radius;
+	float y2 = t->pos().y + t->get_ttype()->radius;
+
+	// Draw floor box
+	if (render_things >= 2)
+	{
+		rgba_t col = t->get_ttype()->colour;
+		glColor4f(col.fr(), col.fg(), col.fb(), 0.8f);
+
+		// Outline
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glLineWidth(4.0f);
+		glBegin(GL_QUADS);
+		glVertex3f(x1, y1, f + shrink);
+		glVertex3f(x2, y1, f + shrink);
+		glVertex3f(x2, y2, f + shrink);
+		glVertex3f(x1, y2, f + shrink);
+		glEnd();
+
+		// Direction
+		if (t->get_ttype()->flags & TTYPE_ANGLE)
+		{
+			glBegin(GL_LINES);
+			glLineWidth(10.0f);
+			glVertex3f(t->pos().x, t->pos().y, f + shrink);
+
+			glLineWidth(4.0f);
+			int angle = t->get_angle();
+
+			switch (angle)
+			{
+			case 0:
+				glVertex3f(x2, t->pos().y, f + shrink); break;
+			case 45:
+				glVertex3f(x2, y2, f + shrink); break;
+			case 90:
+				glVertex3f(t->pos().x, y2, f + shrink); break;
+			case 135:
+				glVertex3f(x1, y2, f + shrink); break;
+			case 180:
+				glVertex3f(x1, t->pos().y, f + shrink); break;
+			case 225:
+				glVertex3f(x1, y1, f + shrink); break;
+			case 270:
+				glVertex3f(t->pos().x, y1, f + shrink); break;
+			case 315:
+				glVertex3f(x2, y1, f + shrink); break;
+			default:
+				glVertex3f(t->pos().x, t->pos().y, f + shrink); break;
+			}
+
+			glEnd();
+		}
+
+		// Fill
+		glColor4f(col.fr(), col.fg(), col.fb(), 0.3f);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glBegin(GL_QUADS);
+		glVertex3f(x1, y1, f + shrink);
+		glVertex3f(x2, y1, f + shrink);
+		glVertex3f(x2, y2, f + shrink);
+		glVertex3f(x1, y2, f + shrink);
+		glEnd();
+	}
+
+	// Draw full box
+	if (render_things >= 3)
+	{
+		float top = f + h;
+		rgba_t col = t->get_ttype()->colour;
+
+		// OUTLINES
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glColor4f(col.fr(), col.fg(), col.fb(), 0.8f);
+
+		// Top
+		glBegin(GL_QUADS);
+		glVertex3f(x1, y1, top - shrink);
+		glVertex3f(x2, y1, top - shrink);
+		glVertex3f(x2, y2, top - shrink);
+		glVertex3f(x1, y2, top - shrink);
+		glEnd();
+
+		// Left
+		glBegin(GL_QUADS);
+		glVertex3f(x1, y1, top - shrink);
+		glVertex3f(x1, y2, top - shrink);
+		glVertex3f(x1, y2, f + shrink);
+		glVertex3f(x1, y1, f + shrink);
+		glEnd();
+
+		// Right
+		glBegin(GL_QUADS);
+		glVertex3f(x2, y2, top - shrink);
+		glVertex3f(x2, y1, top - shrink);
+		glVertex3f(x2, y1, f + shrink);
+		glVertex3f(x2, y2, f + shrink);
+		glEnd();
+
+		// Front
+		glBegin(GL_QUADS);
+		glVertex3f(x1, y2, top - shrink);
+		glVertex3f(x2, y2, top - shrink);
+		glVertex3f(x2, y2, f + shrink);
+		glVertex3f(x1, y2, f + shrink);
+		glEnd();
+
+		// Back
+		glBegin(GL_QUADS);
+		glVertex3f(x2, y1, top - shrink);
+		glVertex3f(x1, y1, top - shrink);
+		glVertex3f(x1, y1, f + shrink);
+		glVertex3f(x2, y1, f + shrink);
+		glEnd();
+
+
+		// FILLS
+		glColor4f(col.fr(), col.fg(), col.fb(), 0.3f);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+		// Top
+		glBegin(GL_QUADS);
+		glVertex3f(x1, y1, top - shrink);
+		glVertex3f(x2, y1, top - shrink);
+		glVertex3f(x2, y2, top - shrink);
+		glVertex3f(x1, y2, top - shrink);
+		glEnd();
+
+		// Left
+		glBegin(GL_QUADS);
+		glVertex3f(x1, y1, top - shrink);
+		glVertex3f(x1, y2, top - shrink);
+		glVertex3f(x1, y2, f + shrink);
+		glVertex3f(x1, y1, f + shrink);
+		glEnd();
+
+		// Right
+		glBegin(GL_QUADS);
+		glVertex3f(x2, y2, top - shrink);
+		glVertex3f(x2, y1, top - shrink);
+		glVertex3f(x2, y1, f + shrink);
+		glVertex3f(x2, y2, f + shrink);
+		glEnd();
+
+		// Front
+		glBegin(GL_QUADS);
+		glVertex3f(x1, y2, top - shrink);
+		glVertex3f(x2, y2, top - shrink);
+		glVertex3f(x2, y2, f + shrink);
+		glVertex3f(x1, y2, f + shrink);
+		glEnd();
+
+		// Back
+		glBegin(GL_QUADS);
+		glVertex3f(x2, y1, top - shrink);
+		glVertex3f(x1, y1, top - shrink);
+		glVertex3f(x1, y1, f + shrink);
+		glVertex3f(x2, y1, f + shrink);
+		glEnd();
+	}
+}
+
+void render_3d_thing(Thing* t, bool hilight)
+{
+	// Get thing sector
+	int sec = t->get_sector();
+	if (sec < 0 || sec > d_map.n_sectors())
+	{
+		log_message(s_fmt("thing in invalid sector %d", sec));
+		return;
+	}
+
+	// Return if sector isn't visible
+	if (!vis_sectors[sec])
+		return;
+
+	// Get thing sprite if it isn't initialised
+	if (!t->get_ttype()->sprite)
+		t->get_ttype()->sprite = get_texture(t->get_ttype()->spritename, 3, true);
+
+	if (!t->get_ttype()->sprite)
+		return;
+
+	vis_thing++;
+	float r = ((t->get_ttype()->sprite->width / 2) * t->get_ttype()->x_scale);
+	float h = (t->get_ttype()->sprite->height * t->get_ttype()->y_scale);
+	float f;
+
+	if (t->get_ttype()->flags & TTYPE_HANGING)
+		f = d_map.sector(sec)->ceiling() - h;
+		//f = plane_height(sector_info[sector].c_plane, x, y) - h;
+	else
+		f = d_map.sector(sec)->floor();
+		//f = plane_height(sector_info[sector].f_plane, x, y);
+
+	if (d_map.hexen() && t->get_type() != 9500 && t->get_type() != 9501)
+		f += t->z_pos();
+
+	if (t->get_ttype()->radius == -1)
+	{
+		r = 4;
+		h = 8;
+		f -= 4;
+	}
+
+	float x1 = t->pos().x - camera.strafe.x * r;
+	float y1 = t->pos().y - camera.strafe.y * r;
+	float x2 = t->pos().x + camera.strafe.x * r;
+	float y2 = t->pos().y + camera.strafe.y * r;
+
+	int l = d_map.sector(sec)->light_level();
+	set_light(rgba_t(l, l, l, 255 * t->get_ttype()->alpha), l);
+
+	if (t->get_ttype()->alpha < 1.0f)
+	{
+		glDisable(GL_ALPHA_TEST);
+		glDepthMask(GL_FALSE);
+	}
+	else
+	{
+		glEnable(GL_ALPHA_TEST);
+		glAlphaFunc(GL_GREATER, 0.8f);
+		glDepthMask(GL_TRUE);
+	}
+
+	if (hilight)
+	{
+		// Outline
+		glDisable(GL_FOG);
+		glDisable(GL_DEPTH_TEST);
+		glDisable(GL_TEXTURE_2D);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glLineWidth(render_hilight_width);
+		set_gl_colour(col_3d_hilight_line);
+
+		glBegin(GL_QUADS);
+		glVertex3f(x1, y1, f + h);
+		glVertex3f(x2, y2, f + h);
+		glVertex3f(x2, y2, f);
+		glVertex3f(x1, y1, f);
+		glEnd();
+
+		/*
+		// Fill
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		set_gl_colour(col_3d_hilight);
+
+		glBegin(GL_QUADS);
+		glVertex3f(x1, y1, f + h);
+		glVertex3f(x2, y2, f + h);
+		glVertex3f(x2, y2, f);
+		glVertex3f(x1, y1, f);
+		glEnd();
+		*/
+
+		glEnable(GL_TEXTURE_2D);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glEnable(GL_DEPTH_TEST);
+
+		return;
+	}
+
+	glCullFace(GL_FRONT);
+
+	// Bind texture
+	Texture* tex = t->get_ttype()->sprite;
+	glBindTexture(GL_TEXTURE_2D, tex->get_gl_id());
+
+	// Draw sprite
+	glBegin(GL_QUADS);
+	glTexCoord2f(0.0f, 0.0f);
+	glVertex3f(x1, y1, f + h);
+	glTexCoord2f(tex->t_x, 0.0f);
+	glVertex3f(x2, y2, f + h);
+	glTexCoord2f(tex->t_x, tex->t_y);
+	glVertex3f(x2, y2, f);
+	glTexCoord2f(0.0f, tex->t_y);
+	glVertex3f(x1, y1, f);
+	glEnd();
+
+	// Check for hilight
+	float dist = line_intersect(camera.position, camera.view, x1, y1, x2, y2);
+	if (dist != -1 && dist < min_dist)
+	{
+		point3_t direction = camera.view - camera.position;
+
+		point3_t hit_point(camera.position.x + (direction.x * dist),
+			camera.position.y + (direction.y * dist),
+			camera.position.z + (direction.z * dist));
+
+		if (hit_point.z >= f && hit_point.z <= f + h)
+		{
+			min_dist = dist;
+			hl_thing = t;
+			hl_line = NULL;
+			hl_sector = -1;
+		}
+	}
+}
+
+void render_3d_things()
+{
+	if (render_things == 0)
+		return;
+
+	for (int a = 0; a < (int)d_map.n_things(); a++)
+		render_3d_thing(d_map.thing(a), false);
+
+	if (render_things >= 2)
+	{
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+		glDisable(GL_ALPHA_TEST);
+		glDepthMask(GL_FALSE);
+		glDisable(GL_CULL_FACE);
+		glDisable(GL_TEXTURE_2D);
+
+		for (int a = 0; a < (int)d_map.n_things(); a++)
+			render_3d_thing_box(d_map.thing(a));
+	}
+
+	glDepthMask(GL_TRUE);
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_TEXTURE_2D);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+}
+
 void render_3d_view(int width, int height)
 {
 	// Set 3d screen
@@ -1182,6 +1542,8 @@ void render_3d_view(int width, int height)
 	camera.look();
 
 	update_visibility();
+	memset(vis_sectors, 0, d_map.n_sectors());
+	hl_thing = NULL;
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	min_dist = -1;
@@ -1193,6 +1555,7 @@ void render_3d_view(int width, int height)
 	render_lines();
 	render_ssects();
 	render_trans_lines();
+	render_3d_things();
 
 	// Render hilight
 	if (render_hilight)
@@ -1204,17 +1567,21 @@ void render_3d_view(int width, int height)
 		glEnable(GL_BLEND);
 		glLineWidth(render_hilight_width);
 		glEnable(GL_LINE_SMOOTH);
+		glDisable(GL_ALPHA_TEST);
 
 		if (hl_line)
 			render_line(hl_line, hl_part, true);
 		else if (hl_sector != -1)
 			render_hilight_ssects();
+		else if (hl_thing)
+			render_3d_thing(hl_thing, true);
 
 		glLineWidth(1.0f);
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_FOG);
 		glEnable(GL_CULL_FACE);
 		glEnable(GL_TEXTURE_2D);
+		glEnable(GL_ALPHA_TEST);
 	}
 
 	// 2d Stuff
@@ -1253,7 +1620,8 @@ void render_3d_view(int width, int height)
 
 	draw_text(0, height - 10, COL_WHITE, 0, false, "Lines: %d", vis_line);
 	draw_text(0, height - 20, COL_WHITE, 0, false, "Ssects: %d", vis_ssect);
-	vis_line = vis_ssect = 0;
+	draw_text(0, height - 30, COL_WHITE, 0, false, "Things: %d", vis_thing);
+	vis_line = vis_ssect = vis_thing = 0;
 }
 
 void add_3d_message(string message)

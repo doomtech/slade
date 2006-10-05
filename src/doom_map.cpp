@@ -1040,7 +1040,7 @@ void DoomMap::draw(rect_t vis_area, BYTE type)
 		for (unsigned int a = 0; a < n_things(); a++)
 			things[a]->draw(vis_area, MISTYLE_NORMAL);
 
-		if (state())
+		if (state() || state(STATE_THINGANGLE))
 		{
 			for (unsigned int a = 0; a < selected_items.size(); a++)
 				thing(selected_items[a])->draw(vis_area, MISTYLE_SELECTED);
@@ -1052,7 +1052,7 @@ void DoomMap::draw(rect_t vis_area, BYTE type)
 				thing(moving_items[a])->draw(vis_area, MISTYLE_MOVING);
 		}
 
-		if (state() && hilight_item != -1)
+		if ((state() || state(STATE_THINGANGLE)) && hilight_item != -1)
 			thing(hilight_item)->draw(vis_area, MISTYLE_HILIGHTED);
 	}
 }
@@ -2200,4 +2200,15 @@ void DoomMap::change_edit_mode(int mode)
 
 	edit_mode = mode;
 	clear_hilight();
+}
+
+void DoomMap::clear_thing_sectors(int sector)
+{
+	for (DWORD a = 0; a < n_things(); a++)
+	{
+		if (sector == -1)
+			thing(a)->set_sector(-1);
+		else if (thing(a)->get_sector(false) == sector)
+			thing(a)->set_sector(-1);
+	}
 }

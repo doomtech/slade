@@ -332,14 +332,14 @@ void start_3d_mode()
 		return;
 	remove("sladetemp");
 
-	splash(_T("Setup 3d mode data"));
+	//splash(_T("Setup 3d mode data"));
 
 	if (lines_visible) delete lines_visible;
 	lines_visible = new bool[d_map.n_lines()];
 
 	init_3d_mode();
 
-	splash_hide();
+	//splash_hide();
 
 	// Set resolution
 	set_3d_resolution();

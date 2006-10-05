@@ -90,6 +90,9 @@ public:
 
 		// Line context menu
 		EWMENU_LINE_SPLITAT,
+
+		// All context menus
+		EWMENU_CONTEXT_3DSTART,
 	};
 
 	EditorWindow(const wxChar *title, int xpos, int ypos, int width, int height);
@@ -166,6 +169,8 @@ public:
 	void thing_insert(wxCommandEvent &event);
 
 	void line_splitat(wxCommandEvent &event);
+
+	void set_3d_start(wxCommandEvent &event);
 
 	DECLARE_EVENT_TABLE()
 };

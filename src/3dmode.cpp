@@ -13,13 +13,17 @@
 #include "bsp.h"
 #include "edit_misc.h"
 #include "undoredo.h"
+#include "splash.h"
 
 float grav = 0.5f;
+
+BYTE	*vis_sectors = NULL;
 
 // Copy/paste stuff
 string	c_wall = _T("");
 string	c_flat = _T("");
 Side*	copy_side;
+int		c_ttype = -1;
 
 extern DoomMap d_map;
 extern Camera camera;
@@ -28,6 +32,7 @@ extern double elapsed;
 extern Line* hl_line;
 extern BYTE hl_part;
 extern int hl_sector;
+extern Thing* hl_thing;
 
 extern vector<point2_t> map_verts;
 extern vector<gl_vertex_t> gl_verts;
@@ -39,8 +44,20 @@ extern bool mix_tex;
 
 void init_3d_mode()
 {
-	if (ssect_sectors) delete ssect_sectors;
+	if (ssect_sectors) delete[] ssect_sectors;
 	ssect_sectors = new int[gl_ssects.size()];
+
+	if (vis_sectors) delete[] vis_sectors;
+	vis_sectors = new BYTE[d_map.n_sectors()];
+
+	splash(_T("Init Things..."), true);
+	for (int a = 0; a < (int)d_map.n_things(); a++)
+	{
+		d_map.thing(a)->get_sector();
+		if (a % 20 == 0)
+			splash_progress((double)a / (double)d_map.n_things());
+	}
+	splash_hide();
 
 	for (unsigned int a = 0; a < gl_ssects.size(); a++)
 	{
@@ -293,6 +310,21 @@ void change_texture_3d(bool paint)
 
 		reset_3d_mouse();
 	}
+	else if (hl_thing)
+	{
+		string othing = s_fmt(_T("%d"), hl_thing->get_type());
+		
+		setup_tex_browser(3);
+		TextureBrowser tb(othing, true);
+
+		if (tb.ShowModal() == wxID_OK && tb.get_texture().size())
+		{
+			make_backup(BKUP_THINGS|BKUP_3DMODE|BKUP_MODIFY);
+			hl_thing->set_type(atoi(chr(tb.get_texture())));
+		}
+
+		reset_3d_mouse();
+	}
 }
 
 void copy_texture_3d()
@@ -333,6 +365,11 @@ void copy_texture_3d()
 			c_flat = ctex;
 
 		add_3d_message(s_fmt(_T("Copied texture \"%s\""), ctex.c_str()));
+	}
+	else if (hl_thing)
+	{
+		c_ttype = hl_thing->get_type();
+		add_3d_message(s_fmt(_T("Copied thing type \"%s\""), hl_thing->get_ttype()->name.c_str()));
 	}
 }
 
@@ -398,6 +435,14 @@ void paste_texture_3d(bool paint)
 
 				add_3d_message(s_fmt(_T("Pasted texture \"%s\""), ntex.c_str()));
 			}
+		}
+	}
+	else if (hl_thing)
+	{
+		if (c_ttype != -1)
+		{
+			hl_thing->set_type(c_ttype);
+			add_3d_message(s_fmt(_T("Pasted thing type \"%s\""), hl_thing->get_ttype()->name.c_str()));
 		}
 	}
 }
@@ -564,21 +609,13 @@ void reset_offsets_3d(bool x, bool y)
 		d_map.change_level(MC_SAVE_NEEDED);
 	}
 
-	/*
 	else if (hl_thing)
 	{
-		for (int a = 0; a < things_3d.size(); a++)
-		{
-			if (things_3d[a] == hl_thing)
-			{
-				map.things[a]->z = 0;
-				add_3d_message(parse_string("Z height reset", map.things[a]->z));
-				map.change_level(MC_SAVE_NEEDED);
-				return;
-			}
-		}
+		hl_thing->set_z(0);
+		add_3d_message(_T("Z height reset"));
+		d_map.change_level(MC_SAVE_NEEDED);
+		return;
 	}
-	*/
 }
 
 void auto_align_x_3d()
@@ -607,4 +644,29 @@ void auto_align_x_3d()
 
 	add_3d_message(_T("Auto X-Alignment done"));
 	d_map.change_level(MC_SAVE_NEEDED);
+}
+
+
+void change_thing_angle_3d(int amount)
+{
+	if (hl_thing)
+	{
+		hl_thing->set_angle(hl_thing->get_angle() + amount);
+		add_3d_message(s_fmt(_T("Angle: %s"), hl_thing->angle_string().c_str()));
+		d_map.change_level(MC_SAVE_NEEDED);
+	}
+}
+
+void change_thing_z_3d(int amount)
+{
+	if (hl_thing)
+	{
+		// Disallow changing z height of slope things for now
+		if (hl_thing->get_type() == 9500 || hl_thing->get_type() == 9501)
+			return;
+
+		hl_thing->set_z(hl_thing->z_pos() + amount);
+		add_3d_message(s_fmt(_T("Z Height: %d"), hl_thing->z_pos()));
+		d_map.change_level(MC_SAVE_NEEDED);
+	}
 }

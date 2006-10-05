@@ -12,18 +12,7 @@
 #include "mathstuff.h"
 #include "edit_misc.h"
 #include "copypaste.h"
-
-/*
-#include "map.h"
-
-
-#include "linedraw.h"
 #include "undoredo.h"
-*/
-
-//bool thing_quickangle = false;
-//bool items_moving = false;
-//bool paste_mode = false;
 
 CVAR(Bool, draw_debuginfo, false, CVAR_SECRET)
 CVAR(Float, line_size, 1.5, CVAR_SAVE)
@@ -40,7 +29,6 @@ CVAR(Bool, pan_detail, true, CVAR_SAVE)
 vector<string> pressed_keys;
 vector<string> released_keys;
 
-//wxGLContext *gl_context = NULL;
 wxGLCanvas *share_canvas = NULL;
 
 extern bool allow_tex_load, lock_hilight;
@@ -519,6 +507,7 @@ void MapCanvas::mouse_event(wxMouseEvent &event)
 
 void MapCanvas::mouse_motion(wxMouseEvent& event)
 {
+	bool do_redraw = false;
 	mouse.set(event.GetPosition().x, event.GetPosition().y);
 
 	// Selection box
@@ -529,7 +518,7 @@ void MapCanvas::mouse_motion(wxMouseEvent& event)
 		if (state(STATE_LINEDRAW))
 			editor_window->draw_shape();
 
-		redraw();
+		do_redraw = true;
 	}
 	else
 	{
@@ -537,7 +526,7 @@ void MapCanvas::mouse_motion(wxMouseEvent& event)
 		{
 			sel_box.tl.set(down_pos);
 			sel_box.br.set(down_pos);
-			redraw();
+			do_redraw = true;
 		}
 	}
 
@@ -546,7 +535,7 @@ void MapCanvas::mouse_motion(wxMouseEvent& event)
 	if (state(STATE_MOVING))
 	{
 		d_map.move_items(m_mouse);
-		redraw();
+		do_redraw = true;
 	}
 	else
 	{
@@ -557,12 +546,11 @@ void MapCanvas::mouse_motion(wxMouseEvent& event)
 		}
 	}
 
-	/*
 	// Quick thing angle
 	if (state(STATE_THINGANGLE))
 	{
 		thing_setquickangle();
-		update_map = true;
+		do_redraw = true;
 	}
 	else
 	{
@@ -571,17 +559,16 @@ void MapCanvas::mouse_motion(wxMouseEvent& event)
 			make_backup(false, false, false, false, true);
 			if (change_state(STATE_THINGANGLE))
 				thing_setquickangle();
-			update_map = true;
+			do_redraw = true;
 		}
 	}
-	*/
 
 	// Map panning
 	if (state(STATE_MAPPAN))
 	{
 		xoff += (down_pos.x - mouse.x) / zoom;
 		yoff -= (down_pos.y - mouse.y) / zoom;
-		redraw();
+		do_redraw = true;
 		down_pos = mouse;
 	}
 	else
@@ -598,14 +585,14 @@ void MapCanvas::mouse_motion(wxMouseEvent& event)
 
 	// Paste
 	if (state(STATE_PASTE))
-		redraw();
+		do_redraw = true;
 
 	if (state(STATE_LINEDRAW) || state(STATE_SHAPEDRAW))
 	{
 		if (state(STATE_SHAPEDRAW))
 			editor_window->draw_shape();
 
-		redraw();
+		do_redraw = true;
 	}
 
 	if (state() && sel_box.x1() == -1 && !lock_hilight && !event.Dragging())
@@ -633,11 +620,14 @@ void MapCanvas::mouse_motion(wxMouseEvent& event)
 		{
 			editor_window->update_infobar();
 			d_map.update_tagged(edit_mode);
-			redraw();
+			do_redraw = true;
 		}
 		else if (crosshair_2d > 0)
-			redraw();
+			do_redraw = true;
 	}
+
+	if (do_redraw)
+		redraw();
 
 	editor_window->update_statusbar();
 }

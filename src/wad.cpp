@@ -981,30 +981,30 @@ Wad* WadList::getLastWithMaps()
 	return NULL;
 }
 
-Wad* WadList::getWadWithLump(string name)
+Wad* WadList::getWadWithLump(string name, bool full, bool ext)
 {
 	for (int a = (int)wads.size() - 1; a >= 0; a--)
 	{
-		if (wads[a]->getLump(name))
+		if (wads[a]->getLump(name, 0, full, ext))
 			return wads[a];
 	}
 
-	if (iwad->getLump(name))
+	if (iwad->getLump(name, 0, full, ext))
 		return iwad;
 
 	return NULL;
 }
 
-Lump* WadList::getLump(string name)
+Lump* WadList::getLump(string name, bool full, bool ext)
 {
 	for (int a = (int)wads.size() - 1; a >= 0; a--)
 	{
-		int index = wads[a]->getLumpIndex(name);
+		int index = wads[a]->getLumpIndex(name, 0, full, ext);
 		if (index != -1)
 			return wads[a]->lumpAt(index);
 	}
 
-	int index = iwad->getLumpIndex(name);
+	int index = iwad->getLumpIndex(name, 0, full, ext);
 	if (index != -1)
 		return iwad->lumpAt(index);
 

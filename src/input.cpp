@@ -23,12 +23,12 @@
 #include "edit_misc.h"
 #include "copypaste.h"
 #include "undoredo.h"
+#include "console_window.h"
 
 /*
 #include "map.h"
 #include "struct_3d.h"
 #include "mathstuff.h"
-#include "console.h"
 //#include "console_window.h"
 #include "linedraw.h"
 */
@@ -47,6 +47,7 @@ extern bool lock_hilight;
 extern Camera camera;
 extern Thing last_thing;
 extern Clipboard clipboard;
+extern ConsoleWindow *console_window;
 
 /*
 extern float xoff, yoff, zoom;
@@ -190,16 +191,13 @@ void keys_edit()
 		return;
 	}
 
-	/*
 	// Quick thing angle
 	if (state(STATE_THINGANGLE) && RELEASED("thing_quickangle"))
 	{
-		//thing_quickangle = false;
 		change_state();
-		editor_window->redraw_map(true, false);
+		redraw_map();
 		return;
 	}
-	*/
 
 	// Moving items
 	if (state(STATE_MOVING) || editor_window->map()->selection())
@@ -606,13 +604,11 @@ void keys_edit()
 		start_3d_mode();
 	}
 
-	/*
 	if (RELEASED("open_console"))
 	{
-		binds.clear("open_console");
-		//popup_console();
+		binds.clear(_T("open_console"));
+		console_window->Show();
 	}
-	*/
 
 	// Copy/Paste stuff
 	if (RELEASED("copy"))
@@ -865,16 +861,14 @@ bool keys_3d(float mult, bool mwheel)
 		render_sky = !render_sky;
 	}
 	
-	/*
 	if (binds.pressed(_T("3d_toggle_things")))
 	{
-		binds.clear("3d_toggle_things");
+		binds.clear(_T("3d_toggle_things"));
 		render_things = render_things + 1;
 
 		if (render_things > 3)
 			render_things = 0;
 	}
-	*/
 
 	if (binds.pressed(_T("3d_toggle_gravity")))
 	{
@@ -1059,7 +1053,6 @@ bool keys_3d(float mult, bool mwheel)
 		change_light_3d(-1);
 	}
 
-	/*
 	// Change thing angle
 	if (binds.pressed(_T("3d_upthingangle")) && (key_3d_allow || mwheel))
 	{
@@ -1074,7 +1067,7 @@ bool keys_3d(float mult, bool mwheel)
 	}
 
 	// Change thing z height
-	if (map.hexen)
+	if (d_map.hexen())
 	{
 		if (binds.pressed(_T("3d_upthingz8")) && (key_3d_allow || mwheel))
 		{
@@ -1100,7 +1093,6 @@ bool keys_3d(float mult, bool mwheel)
 			key_3d_rep = key_delay_3d;
 		}
 	}
-	*/
 
 	if (binds.pressed(_T("3d_align_tex_x")))
 	{

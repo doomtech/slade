@@ -130,6 +130,11 @@ void Tokenizer::skip_multiline_comment()
 	increment_current();
 }
 
+void Tokenizer::next_line()
+{
+	skip_line_comment();
+}
+
 // Tokenizer::get_token: Gets the next 'token' from the text
 // ------------------------------------------------------ >>
 string Tokenizer::get_token()
@@ -201,7 +206,7 @@ string Tokenizer::get_token()
 	}
 	else
 	{
-		// Read token (don't include whitespace
+		// Read token (don't include whitespace)
 		while (!is_whitespace(current[0]))
 		{
 			ret_str += current[0];

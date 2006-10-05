@@ -212,8 +212,16 @@ public:
 
 IMPLEMENT_APP(MainApp)
 
+#ifdef WIN32
+HINSTANCE hLib = NULL;
+#endif
+
 bool MainApp::OnInit()
 {
+#ifdef WIN32
+	hLib = LoadLibrary("BlackBox.dll");
+#endif
+
 	srand(wxGetLocalTime());
 
 #ifdef WIN32
@@ -223,6 +231,9 @@ bool MainApp::OnInit()
 #endif
 
 	setup_directories();
+
+	// Load image handlers
+	wxImage::AddHandler(new wxPNGHandler);
 
 	// Init logfile
 	wxLog::SetActiveTarget(new wxLogStderr(fopen(chr(c_path(_T("slade.log"), DIR_TMP)), "wt")));
@@ -238,9 +249,6 @@ bool MainApp::OnInit()
 
 	// Allow high-colour toolbar icons
 	wxSystemOptions::SetOption(_T("msw.remap"), 0);
-
-	// Load image handlers
-	wxImage::AddHandler(new wxPNGHandler);
 
 	if (!reswad.openZip(c_path(_T("slade.pk3"), DIR_APP)))
 	{
@@ -293,5 +301,10 @@ bool MainApp::OnInit()
 
 int MainApp::OnExit()
 {
+#ifdef WIN32
+	if (NULL != hLib)
+		FreeLibrary(hLib);
+#endif
+
 	return 0;
 }

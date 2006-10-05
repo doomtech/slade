@@ -172,7 +172,7 @@ Texture* Sector::get_tex(bool floor)
 
 void Sector::copy(Sector* s, bool update_tex)
 {
-	parent = s->parent;
+	//parent = s->parent;
 	index = -1;
 
 	f_height = s->floor();

@@ -22,6 +22,7 @@ public:
 	bool increment_current();
 	void skip_line_comment();
 	void skip_multiline_comment();
+	void next_line();
 	string get_token();
 	string peek_token();
 	bool check_token(string check);

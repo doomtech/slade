@@ -14,3 +14,5 @@ void toggle_texture_peg_3d(bool upper);
 void change_light_3d(int amount);
 void reset_offsets_3d(bool x = true, bool y = true);
 void auto_align_x_3d();
+void change_thing_angle_3d(int amount);
+void change_thing_z_3d(int amount);

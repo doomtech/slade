@@ -49,6 +49,7 @@ private:
 	BYTE	args[5];
 
 	ThingType	*ttype;
+	int			sector;
 	props_t		ex_props;
 
 	int		index;
@@ -72,24 +73,26 @@ public:
 	string		angle_string();
 	string		difficulty_string();
 	int			get_flags() { return flags; }
+	int			get_sector(bool check = true);
 
 	void		set_flag(int flag, bool value);
-	void		set_type(int type) { this->type = type; }
+	void		set_type(int type);
 	void		set_z(int z) { this->z = z; }
-	void		set_angle(int angle) { this->angle = angle; }
+	void		set_angle(int angle);
 	void		set_tid(int tid) { this->tid = tid; }
 	void		set_special(BYTE special) { this->special = special; }
 	void		set_arg(int index, BYTE value) { if (index >= 0 && index < 5) args[index] = value; }
 	void		set_flags(int nflags) { flags = nflags; }
 	void		set_parent(DoomMap* parent) { this->parent = parent; }
+	void		set_sector(int sec);
 
 	int		get_index() { return index; }
 	void	set_index(int i) { index = i; }
 
 	void	move(int xd, int yd);
-	void	set_pos(int x, int y) { this->x = x; this->y = y; }
+	void	set_pos(int x, int y);
 
-	void		update_ttype();
+	void	update_ttype();
 
 	bool draw(rect_t vis_area, BYTE style = 0);
 

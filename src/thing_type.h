@@ -9,6 +9,8 @@
 #define TTYPE_HASARGS	0x04
 #define TTYPE_DECORATE	0x08
 
+class Texture;
+
 class ThingType
 {
 public:
@@ -24,6 +26,7 @@ public:
 	float		y_scale;
 	int			x_offset;
 	int			y_offset;
+	Texture		*sprite;
 
 	string		args[5];
 	string		arg_types[5];

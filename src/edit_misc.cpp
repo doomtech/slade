@@ -10,10 +10,12 @@
 #include "structs.h"
 #include "game_config.h"
 #include "undoredo.h"
+#include "input.h"
 
 extern DoomMap d_map;
 extern int edit_mode;
 extern GameConfig game;
+extern Thing last_thing;
 
 // get_side_sector: Attempts to find what sector a line's side is in
 // -------------------------------------------------------------- >>
@@ -693,4 +695,418 @@ void line_flip(bool verts, bool sides)
 
 	for (unsigned int a = 0; a < lines.size(); a++)
 		lines[a]->flip(verts, sides);
+}
+
+
+
+
+void vert_mirror(bool mirror_x, bool mirror_y)
+{
+	vector<Vertex*> items;
+	vector<Line*> lines;
+
+	make_backup(false, false, true, false, false);
+
+	if (edit_mode == 0)
+		d_map.get_selection(items);
+
+	if (edit_mode == 1)
+	{
+		d_map.get_selection(lines, true);
+
+		if (lines.size() > 0)
+		{
+			for (int a = 0; a < (int)lines.size(); a++)
+			{
+				vector_add_nodup(items, lines[a]->vertex1());
+				vector_add_nodup(items, lines[a]->vertex2());
+			}
+		}
+	}
+
+	if (edit_mode == 2)
+	{
+		vector<Sector*> selection;
+		d_map.get_selection(selection, true);
+
+		for (int a = 0; a < (int)d_map.n_lines(); a++)
+		{
+			if (selection.size() > 0)
+			{
+				if (vector_exists(selection, d_map.line(a)->side1()->get_sector())
+					|| vector_exists(selection, d_map.line(a)->side2()->get_sector()))
+				{
+					vector_add_nodup(items, d_map.line(a)->vertex1());
+					vector_add_nodup(items, d_map.line(a)->vertex2());
+					vector_add_nodup(lines, d_map.line(a));
+				}
+			}
+		}
+	}
+
+	if (items.size() == 0)
+		return;
+
+	// Get midpoint
+	double mid_x, mid_y;
+
+	double max_x = -32767;
+	double max_y = -32767;
+	double min_x = 32767;
+	double min_y = 32767;
+	for (int a = 0; a < (int)items.size(); a++)
+	{
+		if (items[a]->x_pos() > max_x)
+			max_x = items[a]->x_pos();
+
+		if (items[a]->x_pos() < min_x)
+			min_x = items[a]->x_pos();
+
+		if (items[a]->y_pos() > max_y)
+			max_y = items[a]->y_pos();
+
+		if (items[a]->y_pos() < min_y)
+			min_y = items[a]->y_pos();
+	}
+
+	mid_x = min_x + ((max_x - min_x) * 0.5);
+	mid_y = min_y + ((max_y - min_y) * 0.5);
+
+	for (int a = 0; a < (int)items.size(); a++)
+	{
+		if (mirror_x)
+			items[a]->set_pos(lround(mid_x - (items[a]->x_pos() - mid_x)), items[a]->y_pos());
+
+		if (mirror_y)
+			items[a]->set_pos(items[a]->x_pos(), lround(mid_y - (items[a]->y_pos() - mid_y)));
+	}
+
+	for (int a = 0; a < (int)lines.size(); a++)
+		lines[a]->flip(true, false);
+}
+
+void vert_rotate(double angle)
+{
+	vector<Vertex*> items;
+
+	make_backup(false, false, true, false, false);
+
+	// Gather vertices to rotate
+	if (edit_mode == 0)
+		d_map.get_selection(items);
+
+	if (edit_mode == 1)
+	{
+		vector<Line*> selection;
+		d_map.get_selection(selection, true);
+
+		if (selection.size() > 0)
+		{
+			for (int a = 0; a < (int)selection.size(); a++)
+			{
+				vector_add_nodup(items, selection[a]->vertex1());
+				vector_add_nodup(items, selection[a]->vertex2());
+			}
+		}
+	}
+
+	if (edit_mode == 2)
+	{
+		vector<Sector*> selection;
+		d_map.get_selection(selection, true);
+
+		for (int a = 0; a < (int)d_map.n_lines(); a++)
+		{
+			if (selection.size() > 0)
+			{
+				if (vector_exists(selection, d_map.line(a)->side1()->get_sector())
+					|| vector_exists(selection, d_map.line(a)->side2()->get_sector()))
+				{
+					vector_add_nodup(items, d_map.line(a)->vertex1());
+					vector_add_nodup(items, d_map.line(a)->vertex2());
+				}
+			}
+		}
+	}
+
+	if (items.size() == 0)
+		return;
+
+	// Get midpoint
+	double mid_x, mid_y;
+
+	double max_x = -32767;
+	double max_y = -32767;
+	double min_x = 32767;
+	double min_y = 32767;
+	for (int a = 0; a < (int)items.size(); a++)
+	{
+		if (items[a]->x_pos() > max_x)
+			max_x = items[a]->x_pos();
+
+		if (items[a]->x_pos() < min_x)
+			min_x = items[a]->x_pos();
+
+		if (items[a]->y_pos() > max_y)
+			max_y = items[a]->y_pos();
+
+		if (items[a]->y_pos() < min_y)
+			min_y = items[a]->y_pos();
+	}
+
+	mid_x = min_x + ((max_x - min_x) * 0.5);
+	mid_y = min_y + ((max_y - min_y) * 0.5);
+
+	double rot = (3.1415926535897932384626433832795 * 2.0) * ((360.0 - angle) / 360.0);
+	double srot = sin(rot);
+	double crot = cos(rot);
+
+	for (int a = 0; a < (int)items.size(); a++)
+	{
+		double x = items[a]->x_pos() - mid_x;
+		double y = items[a]->y_pos() - mid_y;
+
+		double nx = crot * x - srot * y;
+		double ny = srot * x + crot * y;
+
+		items[a]->set_pos(lround(mid_x + nx), lround(mid_y + ny));
+	}
+
+	d_map.change_level(MC_NODE_REBUILD);
+	redraw_map();
+}
+
+
+
+void thing_mirror(bool mirror_x, bool mirror_y, bool angles)
+{
+	vector<Thing*> items;
+
+	make_backup(false, false, false, false, true);
+
+	if (edit_mode == 3)
+		d_map.get_selection(items, true);
+
+	if (items.size() == 0)
+		return;
+
+	// Get midpoint
+	double mid_x, mid_y;
+
+	double max_x = -32767;
+	double max_y = -32767;
+	double min_x = 32767;
+	double min_y = 32767;
+	for (int a = 0; a < (int)items.size(); a++)
+	{
+		if (items[a]->pos().x > max_x)
+			max_x = items[a]->pos().x;
+
+		if (items[a]->pos().x < min_x)
+			min_x = items[a]->pos().x;
+
+		if (items[a]->pos().y > max_y)
+			max_y = items[a]->pos().y;
+
+		if (items[a]->pos().y < min_y)
+			min_y = items[a]->pos().y;
+	}
+
+	mid_x = min_x + ((max_x - min_x) * 0.5);
+	mid_y = min_y + ((max_y - min_y) * 0.5);
+
+	for (int a = 0; a < (int)items.size(); a++)
+	{
+		if (mirror_x)
+		{
+			items[a]->set_pos(lround(mid_x - (items[a]->pos().x - mid_x)), items[a]->pos().y);
+
+			if (angles)
+			{
+				switch (items[a]->get_angle())
+				{
+				case 0:
+					items[a]->set_angle(180); break;
+				case 45:
+					items[a]->set_angle(135); break;
+				case 135:
+					items[a]->set_angle(45); break;
+				case 180:
+					items[a]->set_angle(0); break;
+				case 225:
+					items[a]->set_angle(315); break;
+				case 315:
+					items[a]->set_angle(225); break;
+				}
+			}
+		}
+
+		if (mirror_y)
+		{
+			items[a]->set_pos(items[a]->pos().x, lround(mid_y - (items[a]->pos().y - mid_y)));
+
+			if (angles)
+			{
+				switch (items[a]->get_angle())
+				{
+				case 90:
+					items[a]->set_angle(270); break;
+				case 45:
+					items[a]->set_angle(315); break;
+				case 315:
+					items[a]->set_angle(45); break;
+				case 270:
+					items[a]->set_angle(90); break;
+				case 135:
+					items[a]->set_angle(225); break;
+				case 225:
+					items[a]->set_angle(135); break;
+				}
+			}
+		}
+	}
+
+	d_map.change_level(MC_THINGS);
+	redraw_map();
+}
+
+void thing_rotate(double angle, bool rot_angles)
+{
+	vector<Thing*> items;
+
+	make_backup(false, false, false, false, true);
+
+	d_map.get_selection(items, true);
+
+	if (items.size() == 0)
+		return;
+
+	// Get midpoint
+	double mid_x, mid_y;
+
+	double max_x = -32767;
+	double max_y = -32767;
+	double min_x = 32767;
+	double min_y = 32767;
+	for (int a = 0; a < (int)items.size(); a++)
+	{
+		if (items[a]->pos().x > max_x)
+			max_x = items[a]->pos().x;
+
+		if (items[a]->pos().x < min_x)
+			min_x = items[a]->pos().x;
+
+		if (items[a]->pos().y > max_y)
+			max_y = items[a]->pos().y;
+
+		if (items[a]->pos().y < min_y)
+			min_y = items[a]->pos().y;
+	}
+
+	mid_x = min_x + ((max_x - min_x) * 0.5);
+	mid_y = min_y + ((max_y - min_y) * 0.5);
+
+	double rot = (3.1415926535897932384626433832795 * 2.0) * ((360.0 - angle) / 360.0);
+	double srot = sin(rot);
+	double crot = cos(rot);
+
+	for (int a = 0; a < (int)items.size(); a++)
+	{
+		double x = items[a]->pos().x - mid_x;
+		double y = items[a]->pos().y - mid_y;
+
+		double nx = crot * x - srot * y;
+		double ny = srot * x + crot * y;
+
+		items[a]->set_pos(lround(mid_x + nx), lround(mid_y + ny));
+
+		if (rot_angles)
+		{
+			int cang = items[a]->get_angle();
+			cang += (angle - 90);
+
+			if (cang >= 360)
+				cang -= 360;
+			if (cang < 0)
+				cang += 360;
+
+			if (cang < 68 && cang > 22)
+				cang = 45;
+
+			if (cang < 113 && cang > 67)
+				cang = 90;
+
+			if (cang < 158 && cang > 112)
+				cang = 135;
+
+			if (cang < 203 && cang > 157)
+				cang = 180;
+
+			if (cang < 248 && cang > 202)
+				cang = 225;
+
+			if (cang < 293 && cang > 247)
+				cang = 270;
+
+			if (cang < 338 && cang > 292)
+				cang = 315;
+
+			if (cang < 23 || cang > 337)
+				cang = 0;
+
+			items[a]->set_angle(cang);
+		}
+	}
+
+	d_map.change_level(MC_THINGS);
+	redraw_map();
+}
+
+
+// get_angle: Gets a doom thing angle from two points
+// ----------------------------------------------- >>
+short get_angle(point2_t origin, point2_t point)
+{
+	// Get a direction vector
+	point2_t vec(point.x - origin.x, point.y - origin.y);
+	float mag = (float)sqrt(float((vec.x * vec.x) + (vec.y * vec.y)));
+	float x = vec.x / mag;
+	float y = vec.y / mag;
+
+	if (x > 0.89)	// east
+		return 0;
+	if (x < -0.89)	// west
+		return 180;
+	if (y > 0.89)	// north
+		return 90;
+	if (y < -0.89)	// south
+		return 270;
+	if (x > 0 && y > 0)	// northeast
+		return 45;
+	if (x < 0 && y > 0)	// northwest
+		return 135;
+	if (x < 0 && y < 0)	// southwest
+		return 225;
+	if (x > 0 && y < 0)	// southeast
+		return 315;
+
+	return 0;
+}
+
+void thing_setquickangle()
+{
+	if (edit_mode != 3)
+		return;
+
+	vector<Thing*> things;
+	d_map.get_selection(things, true);
+	
+	for (int a = 0; a < (int)things.size(); a++)
+	{
+		int angle = get_angle(things[a]->pos(), mouse_pos(true));
+		things[a]->set_angle(angle);
+
+		if (a == 0 && things.size() == 1)
+			last_thing.set_angle(angle);
+	}
 }

@@ -160,6 +160,8 @@ int FWadReader::FindMapLump (const char *name, int map) const
 				return map+k;
 			}
 			k++;
+			if (map+k == NumLumps())
+				return -1;
 		}
 	}
 	return -1;

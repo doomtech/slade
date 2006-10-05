@@ -584,26 +584,21 @@ string GameConfig::get_sector_type(int type)
 
 void GameConfig::read_decorate_things(Wad* wad, Lump* lump)
 {
-	/*
-	lump->DumpToFile(_T("sladetemp"));
-
 	Tokenizer *tz = new Tokenizer();
-	tz->open_file(_T("sladetemp"), 0, 0);
+	//tz->open_file(_T("sladetemp"), 0, 0);
+	tz->open_mem((char*)lump->getData(), lump->getSize());
 
 	string token = tz->get_token();
 
 	while (token != _T("!END"))
 	{
-		//wxLogMessage("%s", token.c_str());
 		if (token == _T("#include"))
-		{
-			//wxLogMessage("Include %s", tz->peek_token().c_str());
-			read_decorate_things(wad, wad->get_lump(tz->get_token(), 0));
-		}
+			read_decorate_things(wad, wad->getLump(tz->get_token(), 0, true, true));
 
-		if (token.CmpNoCase(_T("Actor")))
+		if (!token.CmpNoCase(_T("Actor")))
 		{
 			ThingType newtype;
+			newtype.type = -100;
 
 			// Read name
 			newtype.name = tz->get_token();
@@ -615,58 +610,122 @@ void GameConfig::read_decorate_things(Wad* wad, Lump* lump)
 				tz->get_token();
 			}
 
-			// Read doomednum if present
-			newtype.type = -100;
-			if (tz->peek_token() != _T("{"))
-				newtype.type = tz->get_integer();
+			// Skip 'replaces' stuff
+			if (!tz->peek_token().CmpNoCase(_T("replaces")))
+			{
+				tz->get_token();
+				tz->get_token();
+			}
+			else
+			{
+				// Read doomednum if present
+				if (tz->peek_token() != _T("{"))
+					newtype.type = tz->get_integer();
+			}
 
 			// Read through actor definition
 			token = tz->get_token();
 			if (token == _T("{"))
 			{
+				if (newtype.type != -100)
+					log_message(s_fmt("heh %s", newtype.name));
+
 				int level = 1;
+				bool states = false;
 
 				while (level > 0)
 				{
 					token = tz->get_token();
 
 					if (token == _T("{"))
+					{
 						level++;
+						continue;
+					}
 
 					if (token == _T("}"))
+					{
 						level--;
-
-					if (token == _T("//$Category"))
-						newtype.group = tz->get_token();
-
-					if (token == _T("//$EditorSprite"))
-					{
-						string spritename = tz->get_token();
-
-						if (!(vector_exists(spritenames, spritename)))
-							spritenames.push_back(spritename);
-
-						newtype.spritename = spritename;
+						states = false;
+						continue;
 					}
 
-					if (token == _T("radius"))
-						newtype.radius = tz->get_integer();
-
-					if (token == _T("xscale"))
-						newtype.x_scale = tz->get_float();
-
-					if (token == _T("yscale"))
-						newtype.y_scale = tz->get_float();
-
-					if (token == _T("scale"))
+					if (newtype.type != -100)
 					{
-						float scale = tz->get_float();
-						newtype.x_scale = scale;
-						newtype.y_scale = scale;
-					}
+						if (!token.CmpNoCase(_T("//$Category")))
+							newtype.group = tz->get_token();
 
-					if (token == _T("alpha"))
-						newtype.alpha = tz->get_float();
+						if (!token.CmpNoCase(_T("states")))
+						{
+							states = true;
+							continue;
+						}
+
+						if (!token.CmpNoCase(_T("radius")))
+							newtype.radius = tz->get_integer();
+
+						if (!token.CmpNoCase(_T("xscale")))
+							newtype.x_scale = tz->get_float();
+
+						if (!token.CmpNoCase(_T("yscale")))
+							newtype.y_scale = tz->get_float();
+
+						if (!token.CmpNoCase(_T("scale")))
+						{
+							float scale = tz->get_float();
+							newtype.x_scale = scale;
+							newtype.y_scale = scale;
+						}
+
+						if (!token.CmpNoCase(_T("alpha")))
+							newtype.alpha = tz->get_float();
+
+						// Try to get sprite from states
+						if (states)
+						{
+							if (token.Right(1) == _T(":"))
+								continue;
+
+							string sprite = token;
+							if (tz->peek_token() == _T("}"))
+								continue;
+
+							string frames = tz->get_token();
+							if (tz->peek_token() == _T("}"))
+								continue;
+
+							string len = tz->get_token();
+							log_message(len);
+
+							if (len.IsNumber() && len != _T("0"))
+							{
+								string spritename = sprite + frames.Left(1) + _T("0");
+								log_message(spritename);
+								Lump *lump = wads.getLump(spritename);
+								if (!lump)
+								{
+									log_message("not found");
+									spritename = sprite + frames.Left(1) + _T("1");
+									log_message(spritename);
+									lump = wads.getLump(spritename);
+								}
+
+								if (lump)
+								{
+									if (!(vector_exists(spritenames, lump->getName())))
+										spritenames.push_back(lump->getName());
+
+									newtype.spritename = lump->getName();
+									states = false;
+									log_message(s_fmt("sprite %s", lump->getName()));
+								}
+								else
+									log_message("not found");
+							}
+							else
+								tz->next_line();
+						}
+					}
 				}
 			}
 
@@ -680,7 +739,6 @@ void GameConfig::read_decorate_things(Wad* wad, Lump* lump)
 
 		token = tz->get_token();
 	}
-	*/
 }
 
 void GameConfig::clear_decorate_things()
@@ -699,16 +757,14 @@ void GameConfig::clear_decorate_things()
 
 void GameConfig::read_decorate_lumps()
 {
-	/*
 	if (!zdoom())
 		return;
 
 	clear_decorate_things();
 
-	for (int a = 0; a < wads.n_wads; a++)
+	for (int a = 0; a < wads.nWads(); a++)
 	{
-		if (wads.get_wad(a)->get_lump(_T("DECORATE"), 0))
-			read_decorate_things(wads.get_wad(a), wads.get_wad(a)->get_lump(_T("DECORATE"), 0));
+		if (wads.getWad(a)->getLump(_T("DECORATE"), 0))
+			read_decorate_things(wads.getWad(a), wads.getWad(a)->getLump(_T("DECORATE"), 0));
 	}
-	*/
 }

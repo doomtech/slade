@@ -262,8 +262,8 @@ public:
 	Wad*	getWad(int index = -1);
 	Wad*	getLast();
 	Wad*	getLastWithMaps();
-	Wad*	getWadWithLump(string name);
-	Lump*	getLump(string name);
+	Wad*	getWadWithLump(string name, bool full = false, bool ext = false);
+	Lump*	getLump(string name, bool full = false, bool ext = false);
 };
 
 #define WL_IWAD	0x01
