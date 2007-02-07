@@ -9,7 +9,7 @@
 #include "prefs_dialog.h"
 #include "3d_window.h"
 #include "console_window.h"
-//#include "script_editor.h"
+#include "script_editor.h"
 #include "tex_browser.h"
 #include "edit_misc.h"
 //#include "checks.h"
@@ -24,7 +24,7 @@
 
 Wad	*edit_wad = NULL;
 EditorWindow *editor_window = NULL;
-//ScriptEditor *script_editor = NULL;
+ScriptEditor *script_editor = NULL;
 
 CVAR(Int, show_sidebar, 0, CVAR_SAVE)
 CVAR(String, path_doomexe, _T(""), CVAR_SAVE)
@@ -572,7 +572,7 @@ void EditorWindow::file_save(wxCommandEvent &event)
 		if (!edit_wad->locked)
 		{
 			d_map.add_to_wad(edit_wad);
-			edit_wad->save(true);
+			edit_wad->save(true, d_map.map_name());
 			d_map.clear_change(MC_SAVE_NEEDED);
 			SetTitle(wxString::Format(_T("SLADE (%s, %s)"), edit_wad->path.c_str(), d_map.map_name().c_str()));
 
@@ -601,7 +601,7 @@ void EditorWindow::file_saveas(wxCommandEvent &event)
 
 		edit_wad->path = filename;
 		d_map.add_to_wad(edit_wad);
-		edit_wad->save(true);
+		edit_wad->save(true, d_map.map_name());
 		add_recent_wad(filename);
 		wads.open(edit_wad->path);
 
@@ -622,7 +622,7 @@ void EditorWindow::file_savestandalone(wxCommandEvent &event)
 		edit_wad = new Wad();
 		edit_wad->path = filename;
 		d_map.add_to_wad(edit_wad);
-		edit_wad->save(true);
+		edit_wad->save(true, d_map.map_name());
 		add_recent_wad(filename);
 
 		d_map.clear_change(MC_SAVE_NEEDED);
@@ -754,15 +754,13 @@ void EditorWindow::file_importmap(wxCommandEvent &event)
 
 void EditorWindow::edit_scripts(wxCommandEvent &event)
 {
-	/*
-	if (!map.hexen)
+	if (!d_map.hexen())
 		return;
 
 	if (!script_editor)
 		script_editor = new ScriptEditor(this);
 
 	script_editor->Show();
-	*/
 }
 
 void EditorWindow::edit_prefs(wxCommandEvent &event)

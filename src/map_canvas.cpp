@@ -55,7 +55,7 @@ EXTERN_CVAR(Bool, line_aa)
 */
 
 MapCanvas::MapCanvas(wxWindow *parent)
-:	wxGLCanvas(parent, -1)
+:	wxGLCanvas(parent, -1, wxDefaultPosition)
 {
 	share_canvas = this;
 }

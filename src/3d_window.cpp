@@ -11,6 +11,7 @@
 #include "doom_map.h"
 #include "bsp.h"
 #include "splash.h"
+#include "dm_thing.h"
 #include "undoredo.h"
 
 #include <wx/image.h>
@@ -167,10 +168,14 @@ END_EVENT_TABLE()
 
 wxStopWatch sw;
 
+bool reset = true;
+bool exit_3dmode = false;
+fpoint2_t mouse_dir(0, 0);
 void Render3dCanvas::do_loop()
 {
-	elapsed = sw.Time();
-	if (elapsed >= vid_frametime_3d)
+	//elapsed = sw.Time();
+	elapsed = 20.0f;
+	//if (elapsed >= vid_frametime_3d)
 	{
 		// Reset timer
 		sw.Start();
@@ -181,6 +186,7 @@ void Render3dCanvas::do_loop()
 			if (GetParent())
 				GetParent()->Destroy();
 
+			exit_3dmode = true;
 			return;
 		}
 
@@ -188,6 +194,13 @@ void Render3dCanvas::do_loop()
 		if (camera.gravity)
 			apply_gravity();
 	}
+
+	// Mouse
+	point3_t axis = (camera.view - camera.position).cross(camera.up_vector);
+	axis = axis.normalize();
+	camera.rotate_view(mouse_dir.x, 0, 0, 1);
+	camera.rotate_view(mouse_dir.y, axis.x, axis.y, axis.z);
+	mouse_dir.set(mouse_dir.x * 0.45f, mouse_dir.y * 0.45f);
 
 	// Render
 	render();
@@ -216,9 +229,29 @@ void Render3dCanvas::key_up(wxKeyEvent &event)
 	binds.unset(get_key_name(event.GetKeyCode()), NULL, event.ShiftDown(), event.ControlDown(), event.AltDown());
 }
 
-bool reset = true;
 void Render3dCanvas::mouse_event(wxMouseEvent &event)
 {
+	if (event.Moving())
+	{
+		if (reset)
+		{
+			reset = false;
+			return;
+		}
+
+		int center_x = GetClientSize().x / 2;
+		int center_y = GetClientSize().y / 2;
+		float angle_x = -(event.GetX() - center_x) * (0.001f * mouse_speed_3d);
+		float angle_y = -(event.GetY() - center_y) * (0.001f * mouse_speed_3d);
+
+		if (invert_mouse_3d)
+			angle_y = -angle_y;
+
+		mouse_dir.set(mouse_dir.x + angle_x, mouse_dir.y + angle_y);
+
+		reset_3d_mouse();
+	}
+
 	if (event.LeftDown() || event.LeftDClick())
 		binds.set(_T("Mouse1"), NULL, event.ShiftDown(), event.ControlDown(), event.AltDown());
 
@@ -250,32 +283,6 @@ void Render3dCanvas::mouse_event(wxMouseEvent &event)
 
 	binds.unset(_T("MWheel Up"), NULL, event.ShiftDown(), event.ControlDown(), event.AltDown());
 	binds.unset(_T("MWheel Down"), NULL, event.ShiftDown(), event.ControlDown(), event.AltDown());
-
-	if (event.Moving())
-	{
-		if (reset)
-		{
-			reset = false;
-			return;
-		}
-
-		int center_x = GetClientSize().x / 2;
-		int center_y = GetClientSize().y / 2;
-		float angle_x = -(event.GetX() - center_x) * (0.001f * mouse_speed_3d);
-		float angle_y = -(event.GetY() - center_y) * (0.001f * mouse_speed_3d);
-
-		if (invert_mouse_3d)
-			angle_y = -angle_y;
-
-		point3_t axis = (camera.view - camera.position).cross(camera.up_vector);
-		axis = axis.normalize();
-
-		camera.rotate_view(angle_x, 0, 0, 1);
-		camera.rotate_view(angle_y, axis.x, axis.y, axis.z);
-
-		reset = true;
-		WarpPointer(center_x, center_y);
-	}
 }
 
 void Render3dCanvas::size_event(wxSizeEvent &event)
@@ -337,6 +344,11 @@ void start_3d_mode()
 	if (lines_visible) delete lines_visible;
 	lines_visible = new bool[d_map.n_lines()];
 
+	// Until I can figure out a way to update this stuff
+	// properly, just setup all things every time 3d mode starts
+	for (int a = 0; a < (int)d_map.n_things(); a++)
+		d_map.thing(a)->set_sector(-2);
+
 	init_3d_mode();
 
 	//splash_hide();
@@ -359,11 +371,16 @@ void start_3d_mode()
 
 	editor_window->Hide();
 	frame_3d->ShowFullScreen(true);
+	//frame_3d->Show(true);
 	canvas_3d->SetFocus();
 	canvas_3d->init();
 	canvas_3d->render();
 
 	reset_3d_mouse();
+
+	//exit_3dmode = false;
+	//while (!exit_3dmode)
+	//	canvas_3d->do_loop();
 }
 
 void reset_3d_mouse()

@@ -627,9 +627,6 @@ void GameConfig::read_decorate_things(Wad* wad, Lump* lump)
 			token = tz->get_token();
 			if (token == _T("{"))
 			{
-				if (newtype.type != -100)
-					log_message(s_fmt("heh %s", newtype.name));
-
 				int level = 1;
 				bool states = false;
 
@@ -680,6 +677,10 @@ void GameConfig::read_decorate_things(Wad* wad, Lump* lump)
 						if (!token.CmpNoCase(_T("alpha")))
 							newtype.alpha = tz->get_float();
 
+						// Spawn state overrides others
+						if (!token.CmpNoCase(_T("spawn:")))
+							states = true;
+
 						// Try to get sprite from states
 						if (states)
 						{
@@ -695,18 +696,14 @@ void GameConfig::read_decorate_things(Wad* wad, Lump* lump)
 								continue;
 
 							string len = tz->get_token();
-							log_message(len);
 
 							if (len.IsNumber() && len != _T("0"))
 							{
 								string spritename = sprite + frames.Left(1) + _T("0");
-								log_message(spritename);
 								Lump *lump = wads.getLump(spritename);
 								if (!lump)
 								{
-									log_message("not found");
 									spritename = sprite + frames.Left(1) + _T("1");
-									log_message(spritename);
 									lump = wads.getLump(spritename);
 								}
 
@@ -717,10 +714,7 @@ void GameConfig::read_decorate_things(Wad* wad, Lump* lump)
 
 									newtype.spritename = lump->getName();
 									states = false;
-									log_message(s_fmt("sprite %s", lump->getName()));
 								}
-								else
-									log_message("not found");
 							}
 							else
 								tz->next_line();

@@ -12,6 +12,7 @@
 #include "bsp.h"
 #include "mathstuff.h"
 #include "render.h"
+#include "game_config.h"
 
 #include <GL/gl.h>
 #include <GL/glu.h>
@@ -34,6 +35,9 @@ float render_hilight_width = 3.0f;
 float min_dist = -1;
 int *ssect_sectors = NULL;
 rgba_t sky_avg_col;
+
+plane_t *f_planes = NULL;
+plane_t *c_planes = NULL;
 
 Line*			hl_line = NULL;
 BYTE			hl_part = 0;
@@ -60,6 +64,7 @@ extern vector<gl_vertex_t> gl_verts;
 extern vector<point2_t> map_verts;
 extern bool* ssects_visible;
 extern BYTE *vis_sectors;
+extern GameConfig game;
 
 void bind_tex(GLuint id)
 {
@@ -115,8 +120,21 @@ void render_line_trans(Line* line, bool s, bool hl = false)
 	else
 		side = line->side2();
 
+	BYTE a = 255;
+	if (game.zdoom() && line->get_special() == 208 && line->arg(0) == 0)
+	{
+		glDisable(GL_ALPHA_TEST);
+		glDepthMask(GL_FALSE);
+		a = line->arg(1);
+	}
+	else
+	{
+		glEnable(GL_ALPHA_TEST);
+		glDepthMask(GL_TRUE);
+	}
+
 	int l = side->get_sector()->light_level();
-	set_light(rgba_t(l, l, l, 255), l);
+	set_light(rgba_t(l, l, l, a), l);
 
 	rect_t rect = line->get_rect();
 	int length = lround(rect.length());
@@ -763,11 +781,12 @@ void render_ssect_hilight(unsigned int ssect)
 
 	int height = 0;
 
+	plane_t plane;
 	if (hl_part == PART_FLOOR)
-		height = d_map.sector(hl_sector)->floor();
+		plane = f_planes[hl_sector];
 
 	if (hl_part == PART_CEIL)
-		height = d_map.sector(hl_sector)->ceiling();
+		plane = c_planes[hl_sector];
 
 	for (int s = start; s < end; s++)
 	{
@@ -804,8 +823,8 @@ void render_ssect_hilight(unsigned int ssect)
 		}
 
 		glBegin(GL_LINES);
-		glVertex3f(x1, y1, height);
-		glVertex3f(x2, y2, height);
+		glVertex3f(x1, y1, plane_height(plane, x1, y1));
+		glVertex3f(x2, y2, plane_height(plane, x2, y2));
 		glEnd();
 	}
 }
@@ -843,8 +862,8 @@ void render_ssect(unsigned int ssect)
 	set_light(rgba_t(l, l, l, 255), sec->light_level());
 
 	plane_t c_plane, f_plane;
-	f_plane.set(0.0f, 0.0f, 1.0f, sec->floor());
-	c_plane.set(0.0f, 0.0f, 1.0f, sec->ceiling());
+	f_plane = f_planes[ssect_sectors[ssect]];
+	c_plane = c_planes[ssect_sectors[ssect]];
 
 	float x = 0;
 	float y = 0;
@@ -882,8 +901,8 @@ void render_ssect(unsigned int ssect)
 
 	if (draw)
 	{
-		glTexCoord2f(x * (1.0f / sec->get_tex()->width), y * (1.0f / sec->get_tex()->height));
-		glVertex3f(x, y, sec->floor());
+		glTexCoord2f(x * (1.0f / sec->get_tex()->width), -y * (1.0f / sec->get_tex()->height));
+		glVertex3f(x, y, plane_height(f_plane, x, y));
 	}
 
 	last_x = x;
@@ -911,8 +930,8 @@ void render_ssect(unsigned int ssect)
 
 		if (draw)
 		{
-			glTexCoord2f(x * (1.0f / sec->get_tex()->width), y * (1.0f / sec->get_tex()->height));
-			glVertex3f(x, y, sec->floor());
+			glTexCoord2f(x * (1.0f / sec->get_tex()->width), -y * (1.0f / sec->get_tex()->height));
+			glVertex3f(x, y, plane_height(f_plane, x, y));
 		}
 
 		if (in)
@@ -960,8 +979,8 @@ void render_ssect(unsigned int ssect)
 
 	if (draw)
 	{
-		glTexCoord2f(x * (1.0f / sec->get_tex(false)->width), y * (1.0f / sec->get_tex(false)->height));
-		glVertex3f(x, y, sec->ceiling());
+		glTexCoord2f(x * (1.0f / sec->get_tex(false)->width), -y * (1.0f / sec->get_tex(false)->height));
+		glVertex3f(x, y, plane_height(c_plane, x, y));
 	}
 
 	last_x = x;
@@ -989,8 +1008,8 @@ void render_ssect(unsigned int ssect)
 
 		if (draw)
 		{
-			glTexCoord2f(x * (1.0f / sec->get_tex(false)->width), y * (1.0f / sec->get_tex(false)->height));
-			glVertex3f(x, y, sec->ceiling());
+			glTexCoord2f(x * (1.0f / sec->get_tex(false)->width), -y * (1.0f / sec->get_tex(false)->height));
+			glVertex3f(x, y, plane_height(c_plane, x, y));
 		}
 
 		if (in)
@@ -1360,7 +1379,7 @@ void render_3d_thing(Thing* t, bool hilight)
 	int sec = t->get_sector();
 	if (sec < 0 || sec > d_map.n_sectors())
 	{
-		log_message(s_fmt("thing in invalid sector %d", sec));
+		//log_message(s_fmt("thing in invalid sector %d", sec));
 		return;
 	}
 

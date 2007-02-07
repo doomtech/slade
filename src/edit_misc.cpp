@@ -423,6 +423,31 @@ void sector_paint_tex(int sector, string tex, bool floor, vector<int> &sectors)
 	}
 }
 
+Sector* copy_sector = NULL;
+void sector_copy_properties()
+{
+	Sector* sec = d_map.hilight_sector();
+
+	if (sec)
+	{
+		if (!copy_sector)
+			copy_sector = new Sector();
+
+		copy_sector->copy(sec);
+	}
+}
+
+void sector_paste_properties()
+{
+	if (!copy_sector)
+		return;
+
+	vector<Sector*> sectors;
+	d_map.get_selection(sectors, true);
+
+	for (int a = 0; a < sectors.size(); a++)
+		sectors[a]->copy(copy_sector);
+}
 
 
 // LINES

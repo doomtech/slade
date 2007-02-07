@@ -449,7 +449,7 @@ wxStaticBoxSizer *WadManager::setup_game_combo_frame(wxWindow *panel)
 					cur_game = (int)games.GetCount() - 1;
 			}
 
-			delete buffer;
+			delete[] buffer;
 		}
     }
 

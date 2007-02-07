@@ -391,6 +391,8 @@ wxImage* lump_to_image(Wad* wadfile, int lump_index, bool alpha)
 	Lump* lump = wadfile->lumpAt(lump_index);
 	BYTE* data = lump->getData();
 
+	//log_message(s_fmt(_T("loading lump %s to image"), lump->getName()));
+
 	// Check for PNG header
 	if (data[0] == 137 && data[1] == 80 &&
 		data[2] == 78 && data[3] == 71 &&
@@ -403,6 +405,7 @@ wxImage* lump_to_image(Wad* wadfile, int lump_index, bool alpha)
 		wxImage *image = new wxImage(path, wxBITMAP_TYPE_PNG);
 		remove(chr(path));
 
+		log_message(_T("ok"));
 		return image;
 	}
 	else // Normal doom format patch
@@ -413,16 +416,25 @@ wxImage* lump_to_image(Wad* wadfile, int lump_index, bool alpha)
 		BYTE			n_pix = 0;
 		BYTE			colour = 0;
 
-		FILE *fp = fopen(chr(wadfile->path), "rb");
-		fseek(fp, lump->getOffset(), SEEK_SET);
+		string path = c_path(_T("sladetemp"), DIR_TMP);
+		lump->dumpToFile(path);
+		FILE *fp = fopen(chr(path), "rb");
+		//fseek(fp, lump->getOffset(), SEEK_SET);
 
 		// Get header & offsets
-		lefread(&header.width, 2, 1, fp);
-		lefread(&header.height, 2, 1, fp);
-		lefread(&header.left, 2, 1, fp);
-		lefread(&header.top, 2, 1, fp);
+		fread(&header.width, 2, 1, fp);
+		fread(&header.height, 2, 1, fp);
+		fread(&header.left, 2, 1, fp);
+		fread(&header.top, 2, 1, fp);
 		columns = (long *)calloc(header.width, sizeof(long));
-		lefread(columns, sizeof(long), header.width, fp);
+		fread(columns, sizeof(long), header.width, fp);
+
+		wxINT16_SWAP_ON_BE(header.width);
+		wxINT16_SWAP_ON_BE(header.height);
+		wxINT16_SWAP_ON_BE(header.top);
+		wxINT16_SWAP_ON_BE(header.left);
+		for (int a = 0; a < header.width; a++)
+			wxINT32_SWAP_ON_BE(columns[a]);
 
 		wxImage *image = new wxImage(header.width, header.height);
 		image->SetAlpha();
@@ -432,7 +444,7 @@ wxImage* lump_to_image(Wad* wadfile, int lump_index, bool alpha)
 		for (int c = 0; c < header.width; c++)
 		{
 			// Go to start of column
-			fseek(fp, lump->getOffset(), SEEK_SET);
+			fseek(fp, 0, SEEK_SET);
 			fseek(fp, columns[c], SEEK_CUR);
 
 			// Read posts
@@ -445,22 +457,24 @@ wxImage* lump_to_image(Wad* wadfile, int lump_index, bool alpha)
 					break;
 
 				// Get no. of pixels
-				lefread(&n_pix, 1, 1, fp);
+				fread(&n_pix, 1, 1, fp);
 
 				// Read pixels
-				lefread(&colour, 1, 1, fp); // Skip buffer
+				fread(&colour, 1, 1, fp); // Skip buffer
 				for (BYTE p = 0; p < n_pix; p++)
 				{
-					lefread(&colour, 1, 1, fp);
+					fread(&colour, 1, 1, fp);
 					image->SetAlpha(c, row + p, 255);
 					image->SetRGB(c, row + p, palette[colour].r, palette[colour].g, palette[colour].b);
 				}
-				lefread(&colour, 1, 1, fp); // Skip buffer & go to next row offset
+				fread(&colour, 1, 1, fp); // Skip buffer & go to next row offset
 			}
 		}
 
 		fclose(fp);
+		remove(chr(path));
 
+		//log_message(_T("ok"));
 		return image;
 	}
 }
@@ -475,9 +489,9 @@ void read_palette(Wad* wad)
 	fseek(fp, pal->getOffset(), SEEK_SET);
 	for (DWORD c = 0; c < 256; c++)
 	{
-		lefread(&palette[c].r, 1, 1, fp);
-		lefread(&palette[c].g, 1, 1, fp);
-		lefread(&palette[c].b, 1, 1, fp);
+		fread(&palette[c].r, 1, 1, fp);
+		fread(&palette[c].g, 1, 1, fp);
+		fread(&palette[c].b, 1, 1, fp);
 		palette[c].a = 255;
 	}
 	fclose(fp);
@@ -505,9 +519,12 @@ void load_textures_lump(Wad* wad, Lump *lump, bool iwad = false)
 	fseek(fp, lump->getOffset(), SEEK_SET);
 
 	// Get no. of textures and tex info offsets
-	lefread(&n_tex, 4, 1, fp);
+	fread(&n_tex, 4, 1, fp);
+	wxINT32_SWAP_ON_BE(n_tex);
 	offsets = (long *)calloc(n_tex, 4);
-	lefread(offsets, 4, n_tex, fp);
+	fread(offsets, 4, n_tex, fp);
+	for (int a = 0; a < n_tex; a++)
+		wxINT32_SWAP_ON_BE(offsets[a]);
 
 	for (int t = 0; t < n_tex; t++)
 	{
@@ -517,15 +534,17 @@ void load_textures_lump(Wad* wad, Lump *lump, bool iwad = false)
 
 		// Read texture name
 		char texname[9] = "";
-		lefread(texname, 1, 8, fp);
+		fread(texname, 1, 8, fp);
 		texname[8] = 0;
 
 		// Skip unused stuff
-		lefread(&temp, 1, 4, fp);
+		fread(&temp, 1, 4, fp);
 
 		// Read width & height
-		lefread(&width, 2, 1, fp);
-		lefread(&height, 2, 1, fp);
+		fread(&width, 2, 1, fp);
+		fread(&height, 2, 1, fp);
+		wxINT16_SWAP_ON_BE(width);
+		wxINT16_SWAP_ON_BE(height);
 
 		// Add texture
 		Texture *tex = get_texture(wxString::FromAscii(texname), 1, true);
@@ -548,21 +567,26 @@ void load_textures_lump(Wad* wad, Lump *lump, bool iwad = false)
 		textures.push_back(tex);
 
 		// Skip more unused stuff
-		lefread(&temp, 1, 4, fp);
+		fread(&temp, 1, 4, fp);
 
 		// Read no. of patches in texture
-		lefread(&patches, 2, 1, fp);
+		fread(&patches, 2, 1, fp);
+		wxINT16_SWAP_ON_BE(patches);
 
 		// Add patches
 		for (int p = 0; p < patches; p++)
 		{
 			// Read patch info
-			lefread(&xoff, 2, 1, fp);
-			lefread(&yoff, 2, 1, fp);
-			lefread(&patch, 2, 1, fp);
+			fread(&xoff, 2, 1, fp);
+			fread(&yoff, 2, 1, fp);
+			fread(&patch, 2, 1, fp);
+
+			wxINT16_SWAP_ON_BE(xoff);
+			wxINT16_SWAP_ON_BE(yoff);
+			wxINT16_SWAP_ON_BE(patch);
 
 			// Skip unused
-			lefread(&temp, 1, 4, fp);
+			fread(&temp, 1, 4, fp);
 
 			if (patch < (int)pnames.size())
 				((DoomTexture*)tex)->add_patch(xoff, yoff, wad, pnames[patch]);
@@ -580,13 +604,14 @@ void load_pnames(Wad* wad)
 	Lump *lump = wad->getLump(_T("PNAMES"), 0);
 
 	fseek(fp, lump->getOffset(), SEEK_SET);
-	lefread(&n_pnames, 4, 1, fp);
+	fread(&n_pnames, 4, 1, fp);
+	wxINT32_SWAP_ON_BE(n_pnames);
 
 	for (DWORD p = 0; p < n_pnames; p++)
 	{
 		char name[9] = "";
 
-		lefread(name, 1, 8, fp);
+		fread(name, 1, 8, fp);
 		name[8] = 0;
 
 		pnames.push_back(wxString::FromAscii(name));
@@ -1307,7 +1332,7 @@ bool DoomFlat::gen_gl_tex()
 	{
 		for (BYTE x = 0; x < width; x++)
 		{
-			lefread(&p, 1, 1, fp);
+			fread(&p, 1, 1, fp);
 			//tex->add_pixel(x, y, p);
 			data[a++] = palette[p].r;
 			data[a++] = palette[p].g;

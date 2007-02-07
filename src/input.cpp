@@ -507,6 +507,13 @@ void keys_edit()
 	if (PRESSED("sector_downlight"))
 		sector_changelight(-16);
 
+	// Sector properties copy/paste
+	if (RELEASED("sector_copyprops") && state())
+		sector_copy_properties();
+
+	if (RELEASED("sector_pasteprops") && state())
+		sector_paste_properties();
+
 	// Flip line
 	if (RELEASED("line_flip") && state())
 	{

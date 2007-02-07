@@ -243,6 +243,8 @@ void BindList::set_defaults()
 	add("sector_downboth8", ",", KMOD_ALT);
 	add("sector_upboth", ".", KMOD_CTRL|KMOD_ALT);
 	add("sector_downboth", ",", KMOD_CTRL|KMOD_ALT);
+	add("sector_copyprops", "C", KMOD_CTRL|KMOD_SHIFT);
+	add("sector_pasteprops", "V", KMOD_CTRL|KMOD_SHIFT);
 
 	add("sector_uplight", "\'");
 	add("sector_downlight", ";");

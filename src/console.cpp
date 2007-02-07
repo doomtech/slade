@@ -19,6 +19,7 @@
 #include "dm_side.h"
 #include "dm_sector.h"
 #include "dm_thing.h"
+#include "dm_line.h"
 #include "game_config.h"
 
 // Variables ----------------------------- >>
@@ -286,6 +287,8 @@ void console_parsecommand()
 		tmp += _T("\nstats_textures");
 		tmp += _T("\nstats_flats");
 		tmp += _T("\nstats_things");
+		tmp += _T("\nfind_tex");
+		tmp += _T("\nline_midpoint");
 		console_print(tmp);
 	}
 
@@ -375,6 +378,64 @@ void console_parsecommand()
 		console_print(tmp);
 		delete[] counts;
 	}
+
+	else if (token == _T("find_tex"))
+	{
+		string stex = tz.get_token().Upper();
+		bool found = false;
+
+		for (int a = 0; a < d_map.n_lines(); a++)
+		{
+			point2_t mid = d_map.line(a)->get_rect().middle();
+
+			if (d_map.line(a)->side1()->get_texname(0) == stex ||
+				d_map.line(a)->side1()->get_texname(1) == stex ||
+				d_map.line(a)->side1()->get_texname(2) == stex ||
+				d_map.line(a)->side2()->get_texname(0) == stex ||
+				d_map.line(a)->side2()->get_texname(1) == stex ||
+				d_map.line(a)->side2()->get_texname(2) == stex)
+			{
+				console_print(s_fmt(_T("Line %d has texture \"%s\""), a, chr(stex)));
+				found = true;
+			}
+		}
+
+		for (int a = 0; a < d_map.n_sectors(); a++)
+		{
+			if (d_map.sector(a)->tex_ceil() == stex)
+			{
+				console_print(s_fmt(_T("Sector %d has ceiling texture \"%s\""), a, chr(stex)));
+				found = true;
+			}
+
+			if (d_map.sector(a)->tex_floor() == stex)
+			{
+				console_print(s_fmt(_T("Sector %d has floor texture \"%s\""), a, chr(stex)));
+				found = true;
+			}
+		}
+
+		if (!found)
+			console_print(s_fmt(_T("Texture \"%s\" is unused"), chr(stex)));
+	}
+
+	else if (token == _T("line_midpoint"))
+	{
+		if (tz.peek_token() != _T("!END"))
+		{
+			int l = tz.get_integer();
+			if (l < 0 || l > d_map.n_lines())
+				console_print(_T("Invalid line index"));
+			else
+			{
+				point2_t mid = d_map.line(l)->get_rect().middle();
+				console_print(s_fmt(_T("Line %d midpoint: (%d, %d)"), l, mid.x, mid.y));
+			}
+		}
+		else
+			console_print(_T("No line index specified"));
+	}
+
 
 	// Unknown command
 	else 

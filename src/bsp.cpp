@@ -23,8 +23,12 @@ vector<gl_node_t>	gl_nodes;
 bool	*lines_visible = NULL;
 bool	*ssects_visible = NULL;
 
+CVAR(Bool, render_altclip, true, 0)
+
 const int VBUF_SIZE = 7000;
 BYTE vis_buffer[VBUF_SIZE];
+
+Clipper clipper;
 
 extern DoomMap d_map;
 extern Camera camera;
@@ -256,38 +260,56 @@ void set_visbuffer(int blocked)
 
 bool seg_is_visible(float x1, float y1, float x2, float y2)
 {
-	int a1 = (int)(get_2d_angle_rad(point3_t(x1, y1, 0.0f), camera.position, camera.view) * 1000);
-	int a2 = (int)(get_2d_angle_rad(point3_t(x2, y2, 0.0f), camera.position, camera.view) * 1000);
-
-	if (a1 > a2)
+	if (render_altclip)
 	{
-		if (memchr(vis_buffer + a1, 0, VBUF_SIZE - a1) != NULL)
-			return true;
-
-		if (memchr(vis_buffer, 0, a2) != NULL)
-			return true;
+		return clipper.checkRange(get_2d_angle_rad(point3_t(x1, y1, 0.0f), camera.position, camera.view),
+									get_2d_angle_rad(point3_t(x2, y2, 0.0f), camera.position, camera.view));
 	}
 	else
 	{
-		if (memchr(vis_buffer + a1, 0, a2 - a1) != NULL)
-			return true;
-	}
+		int a1 = (int)(get_2d_angle_rad(point3_t(x1, y1, 0.0f), camera.position, camera.view) * 1000);
+		int a2 = (int)(get_2d_angle_rad(point3_t(x2, y2, 0.0f), camera.position, camera.view) * 1000);
 
-	return false;
+		if (a1 > a2)
+		{
+			if (memchr(vis_buffer + a1, 0, VBUF_SIZE - a1) != NULL)
+				return true;
+
+			if (memchr(vis_buffer, 0, a2) != NULL)
+				return true;
+		}
+		else
+		{
+			if (memchr(vis_buffer + a1, 0, a2 - a1) != NULL)
+				return true;
+		}
+
+		return false;
+	}
 }
 
+//float minang = 1000.0f;
+//float maxang = -1000.0f;
 void block_seg(float x1, float y1, float x2, float y2)
 {
-	int a1 = (int)(get_2d_angle_rad(point3_t(x1, y1, 0.0f), camera.position, camera.view) * 1000);
-	int a2 = (int)(get_2d_angle_rad(point3_t(x2, y2, 0.0f), camera.position, camera.view) * 1000);
-
-	if (a1 > a2)
+	if (render_altclip)
 	{
-		memset(vis_buffer + a1, 1, VBUF_SIZE - a1);
-		memset(vis_buffer, 1, a2);
+		clipper.blockRange(get_2d_angle_rad(point3_t(x1, y1, 0.0f), camera.position, camera.view),
+							get_2d_angle_rad(point3_t(x2, y2, 0.0f), camera.position, camera.view));
 	}
 	else
-		memset(vis_buffer + a1, 1, a2 - a1);
+	{
+		int a1 = (int)(get_2d_angle_rad(point3_t(x1, y1, 0.0f), camera.position, camera.view) * 1000);
+		int a2 = (int)(get_2d_angle_rad(point3_t(x2, y2, 0.0f), camera.position, camera.view) * 1000);
+
+		if (a1 > a2)
+		{
+			memset(vis_buffer + a1, 1, VBUF_SIZE - a1);
+			memset(vis_buffer, 1, a2);
+		}
+		else
+			memset(vis_buffer + a1, 1, a2 - a1);
+	}
 }
 
 void block_behind()
@@ -418,7 +440,13 @@ void walk_bsp_tree(unsigned int node)
 		return;
 	}
 
-	if (view_buffer_full())
+	bool clipfull = false;
+	if (render_altclip)
+		clipfull = clipper.allBlocked();
+	else
+		clipfull = view_buffer_full();
+
+	if (clipfull)
 		return;
 
 	int x1 = gl_nodes[node].x;
@@ -457,7 +485,163 @@ void update_visibility()
 {
 	memset(lines_visible, 0, d_map.n_lines());
 	memset(ssects_visible, 0, gl_ssects.size());
-	set_visbuffer(0);
-	block_behind();
+
+	if (render_altclip)
+	{
+		clipper.clear();
+		clipper.blockBehind();
+	}
+	else
+	{
+		set_visbuffer(0);
+		block_behind();
+	}
+
 	walk_bsp_tree((DWORD)gl_nodes.size() - 1);
+	//log_message(s_fmt(_T("Min: %1.3f, Max: %1.3f"), minang, maxang));
+}
+
+
+// Clipper stuff
+ViewRange::ViewRange(float s, float e)
+{
+	next = NULL;
+	prev = NULL;
+	start = s;
+	end = e;
+}
+
+ViewRange::~ViewRange()
+{
+}
+
+bool ViewRange::checkRange(float s, float e)
+{
+	if (e >= s)
+	{
+		if (s > end || e < start) // No intersection
+			return false;
+		else
+			return true;
+	}
+	else
+		return (checkRange(0.0f, e) || checkRange(s, 6.283f));
+}
+
+bool ViewRange::block(float s, float e)
+{
+	// No intersection
+	if (s > end || e < start)
+		return false;
+
+	// Completely within (split)
+	if (s > start && e < end)
+	{
+		ViewRange *v = new ViewRange(e, end);
+		end = s;
+		next->setPrev(v);
+		v->setNext(next);
+		v->setPrev(this);
+		next = v;
+		return false;
+	}
+
+	// Completely around (delete)
+	if (s <= start && e >= end)
+	{
+		next->setPrev(prev);
+		if (prev) prev->setNext(next);
+		return true;
+	}
+
+	// Partial intersection (resize)
+	if (s > start)
+		end = s;
+	else
+		start = e;
+
+	return false;
+}
+
+Clipper::Clipper()
+{
+	start = new ViewRange(0.0f, 6.283f);
+	end = new ViewRange();
+	start->setNext(end);
+}
+
+Clipper::~Clipper()
+{
+}
+
+bool Clipper::checkRange(float s, float e)
+{
+	ViewRange *v = start;
+	while (v != end)
+	{
+		if (v->checkRange(s, e))
+			return true;
+
+		v = v->getNext();
+	}
+
+	return false;
+}
+
+void Clipper::blockRange(float s, float e)
+{
+	if (s > e && s < 6.283f)
+	{
+		blockRange(0.0f, e);
+		blockRange(s, 6.283f);
+		return;
+	}
+
+	ViewRange *v = start;
+	while (v != end)
+	{
+		ViewRange *n = v->getNext();
+
+		if (v->block(s, e))
+		{
+			if (v == start)
+				start = n;
+
+			delete v;
+		}
+
+		v = n;
+	}
+}
+
+void Clipper::clear()
+{
+	ViewRange *v = start;
+	while (v != end)
+	{
+		ViewRange *n = v->getNext();
+		delete v;
+		v = n;
+	}
+
+	start = new ViewRange(0.0f, 6.283f);
+	start->setNext(end);
+}
+
+bool Clipper::allBlocked()
+{
+	if (start == end)
+		return true;
+	else
+		return false;
+}
+
+void Clipper::blockBehind()
+{
+	float vm = camera.view.z - camera.position.z;
+	if (vm < 0.0f)
+		vm = -vm;
+
+	float mid = 6.283f * 0.5f;
+	blockRange(mid - 2.2f + (vm * 2.2f), mid + 2.2f - (vm * 2.2f));
 }

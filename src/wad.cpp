@@ -13,6 +13,7 @@
 #include "main.h"
 #include "wad.h"
 #include "splash.h"
+#include "wx_stuff.h"
 
 #include <wx/filename.h>
 #include <wx/wfstream.h>
@@ -27,6 +28,7 @@ WadList	wads;
 
 CVAR(String, nodebuilder_path, _T(""), CVAR_SAVE)
 CVAR(String, nodebuilder_params, _T(""), CVAR_SAVE)
+CVAR(Bool, nodebuilder_useinternal, true, CVAR_SAVE)
 
 // External Variables -------------------- >>
 extern string map_lumps[12];
@@ -634,6 +636,7 @@ void Wad::save(bool nodes, string mapname)
 		return;
 	}
 
+	// Make backup
 	if (!parent)
 	{
 		// Remove old backup file
@@ -654,12 +657,18 @@ void Wad::save(bool nodes, string mapname)
 	}
 
 	// Open wadfile for writing
-	FILE *fp = NULL;
+	string wadpath = path;
 
-	if (!parent)
-		fp = fopen(chr(path), "wb");
-	else
-		fp = fopen(chr(c_path(_T("sladetemp.wad"), DIR_TMP)), "wb");
+	if (parent)
+		wadpath = c_path(_T("sladetemp.wad"), DIR_TMP);
+
+	FILE *fp = fopen(chr(wadpath), "wb");
+
+	if (!fp)
+	{
+		message_box(_T("Error opening wadfile to write!"), _T("Error"));
+		return;
+	}
 
 	// Write the header
 	long num_lumps = numLumps();
@@ -695,56 +704,91 @@ void Wad::save(bool nodes, string mapname)
 	// Build nodes
 	if (nodes)
 	{
-		string wadpath = path;
+		string temp_path = wadpath + _T("-temp.wad");
+		splash(_T("Building Nodes"), false);
+		bool ext_nosetup = ((nodebuilder_path == _T("")) || nodebuilder_params == _T(""));
 
-		if (parent)
-			wadpath = c_path(_T("sladetemp.wad"), DIR_TMP);
+		if (!(nodebuilder_useinternal) && ext_nosetup)
+			message_box(_T("No external nodebuilder has been set, using the internal builder"), _T("SLADE"));
 
-		splash(_T("Building Nodes"), true);
+		copy_file(wadpath, temp_path);
 
-		GLOnly = false;
-		BuildGLNodes = false;
-
-		FWadReader inwad(chr(wadpath));
-		FWadWriter outwad(chr(wadpath + _T(".temp")), inwad.IsIWAD());
-
-		int lump = 0;
-		int max = inwad.NumLumps();
-
-		while (lump < max)
+		if (nodebuilder_useinternal || ext_nosetup)
 		{
-			if (inwad.IsMap (lump) &&
-				(mapname.empty() || mapname.CmpNoCase(wxString::FromAscii(inwad.LumpName(lump))) == 0)) //stricmp (inwad.LumpName (lump), chr(str(mapname))) == 0))
-			{
-				splash(_T("Building nodes on ") + wxString::FromAscii(inwad.LumpName(lump)), true);
-				FProcessor builder(inwad, lump);
-				builder.Write (outwad);
+			GLOnly = false;
+			BuildGLNodes = false;
 
-				lump = inwad.LumpAfterMap (lump);
-			}
-			else if (inwad.IsGLNodes (lump))
+			FWadReader inwad(chr(wadpath));
+			FWadWriter outwad(chr(temp_path), inwad.IsIWAD());
+
+			int lump = 0;
+			int max = inwad.NumLumps();
+
+			while (lump < max)
 			{
-				// Ignore GL nodes from the input for any maps we process.
-				if (BuildNodes && (Map == NULL || stricmp(inwad.LumpName (lump)+3, Map) == 0))
-					lump = inwad.SkipGLNodes (lump);
+				if (inwad.IsMap (lump) &&
+					(mapname.empty() || mapname.CmpNoCase(wxString::FromAscii(inwad.LumpName(lump))) == 0)) //stricmp (inwad.LumpName (lump), chr(str(mapname))) == 0))
+				{
+					splash(_T("Building nodes on ") + wxString::FromAscii(inwad.LumpName(lump)), true);
+					FProcessor builder(inwad, lump);
+					builder.Write (outwad);
+
+					lump = inwad.LumpAfterMap (lump);
+				}
+				else if (inwad.IsGLNodes (lump))
+				{
+					// Ignore GL nodes from the input for any maps we process.
+					if (BuildNodes && (Map == NULL || stricmp(inwad.LumpName (lump)+3, Map) == 0))
+						lump = inwad.SkipGLNodes (lump);
+					else
+					{
+						outwad.CopyLump (inwad, lump);
+						++lump;
+					}
+				}
 				else
 				{
 					outwad.CopyLump (inwad, lump);
 					++lump;
 				}
 			}
-			else
+
+			outwad.Close();
+		}
+		else
+		{
+			string command = nodebuilder_path;
+			command += _T(" ");
+
+			// Parse node builder params
+			Tokenizer tz;
+			tz.open_string(nodebuilder_params);
+			string token = tz.get_token();
+			while (token != _T("!END"))
 			{
-				outwad.CopyLump (inwad, lump);
-				++lump;
+				if (token == _T("%w"))
+					command += wadpath;
+				else if (token == _T("%t"))
+					command += temp_path;
+				else if (token == _T("%m") && mapname != _T(""))
+					command += mapname;
+				else
+					command += token;
+
+				command += _T(" ");
+				token = tz.get_token();
 			}
+
+			log_message(command);
+
+			wxArrayString out;
+			if (wxExecute(command, out, 1) == -1)
+				message_box(_T("External nodebuilder not found!"), _T("Error"));
 		}
 
-		outwad.Close();
-
-		remove(chr(path));
-		copy_file(wadpath + _T(".temp"), wadpath);
-		remove(chr(wadpath + _T(".temp")));
+		remove(chr(temp_path));
+		close();
+		open(wadpath, true);
 
 		splash_hide();
 	}
@@ -1010,513 +1054,3 @@ Lump* WadList::getLump(string name, bool full, bool ext)
 
 	return NULL;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-string Lump::Name(bool path, bool ext)
-{
-	if (parent->zip)
-	{
-		string ret;
-
-		if (path && dir.size() > 0)
-		{
-			for (int a = 0; a < dir.size(); a++)
-			{
-				ret += dir[a];
-				ret += _T("/");
-			}
-		}
-
-		if (ext)
-			ret += name;
-		else
-		{
-			wxFileName fn(name);
-			ret += fn.GetName();
-		}
-
-		return ret;
-	}
-	else
-		return name;
-}
-
-// Wad::open: Opens a wad file
-// ------------------------ >>
-bool Wad::open(string filename)
-{
-	close();
-	path = filename;
-
-	// Open the file
-	FILE *fp = fopen(str(filename).c_str(), "rb");
-
-	// Check if it opened correctly
-	if (!fp)
-	{
-		//printf("Wad file \"%s\" cannot be found.\n", filename.c_str());
-		return false;
-	}
-
-	// Read the header
-	lefread(&type, 1, 4, fp);			// Wad type
-	lefread(&num_lumps, 4, 1, fp);	// No. of lumps in wad
-	lefread(&dir_offset, 4, 1, fp);	// Offset to directory
-
-	// Lock the wad if IWAD
-	if (type[0] == 'I')
-		locked = true;
-	else
-		locked = false;
-
-	// Setup the directory
-	//directory = (dir_entry_t *)calloc(num_lumps, sizeof(dir_entry_t));
-	directory = (Lump **)calloc(num_lumps, sizeof(Lump*));
-
-	// Read the directory
-	fseek(fp, dir_offset, SEEK_SET);
-	for (DWORD d = 0; d < num_lumps; d++)
-	{
-		char name[9] = "";
-		DWORD offset = 0;
-		DWORD size = 0;
-
-		lefread(&offset, 4, 1, fp);	// Offset
-		lefread(&size, 4, 1, fp);		// Size
-		lefread(name, 1, 8, fp);		// Name
-
-		name[8] = '\0';
-		directory[d] = new Lump(offset, size, wxString::FromAscii(name).Upper(), this);
-
-		if (directory[d]->Name() == _T("P_START") || directory[d]->Name() == _T("PP_START"))
-			patches[START] = d;
-
-		if (directory[d]->Name() == _T("P_END") || directory[d]->Name() == _T("PP_END"))
-			patches[END] = d;
-
-		if (directory[d]->Name() == _T("F_START") || directory[d]->Name() == _T("FF_START"))
-			flats[START] = d;
-
-		if (directory[d]->Name() == _T("F_END") || directory[d]->Name() == _T("FF_END"))
-			flats[END] = d;
-
-		if (directory[d]->Name() == _T("S_START") || directory[d]->Name() == _T("SS_START"))
-			sprites[START] = d;
-
-		if (directory[d]->Name() == _T("S_END") || directory[d]->Name() == _T("SS_END"))
-			sprites[END] = d;
-
-		if (directory[d]->Name() == _T("TX_START"))
-			tx[START] = d;
-
-		if (directory[d]->Name() == _T("TX_END"))
-			tx[END] = d;
-	}
-
-	// Read wad data into memory (only if wad isn't locked)
-	if (!locked)
-	{
-		for (DWORD d = 0; d < num_lumps; d++)
-		{
-			//directory[d].data = (BYTE *)malloc(directory[d].size);
-
-			fseek(fp, directory[d]->Offset(), SEEK_SET);
-			lefread(directory[d]->Data(), 1, directory[d]->Size(), fp);
-		}
-	}
-
-	// Find all available maps
-	for (DWORD l = 0; l < num_lumps; l++)
-	{
-		//if (directory[l]->Size() == 0)
-		//{
-			string mapname = directory[l]->Name();
-			bool done = false;
-			bool existing_map_lumps[12] = { false, false, false, false,
-											false, false, false, false,
-											false, false, false, false };
-
-			while (!done)
-			{
-				l++;
-
-				if (l == num_lumps)
-					break;
-
-				string name = directory[l]->Name();
-				done = true;
-
-				for (int s = 0; s < 12; s++)
-				{
-					if (name.substr(0, map_lumps[s].length()) == map_lumps[s])
-					{
-						existing_map_lumps[s] = true;
-						done = false;
-					}
-				}
-			}
-			
-			l--;
-
-			if (!memchr(existing_map_lumps, 0, 5))
-				available_maps.push_back(mapname);
-		//}
-	}
-
-	sort(available_maps.begin(), available_maps.end());
-	//available_maps.sort();
-
-	zip = false;
-	fclose(fp);
-	return true;
-}
-
-bool Wad::open_zip(string filename)
-{
-	path = filename;
-
-	wxZipEntry* entry;
-
-	wxFFileInputStream in(filename);
-	if (!in.IsOk())
-		return false;
-
-	wxZipInputStream zip(in);
-	if (!zip.IsOk())
-	{
-		message_box(_T("Invalid zip file!"));
-		return false;
-	}
-
-	vector<string> alldirs;
-	entry = zip.GetNextEntry();
-	while (entry)
-	{
-		if (!entry->IsDir())
-		{
-			wxFileName fn(entry->GetName(wxPATH_UNIX), wxPATH_UNIX);
-
-			// Create lump
-			Lump *nlump = new Lump(0, entry->GetSize(), fn.GetFullName(), this);
-
-			// Load data
-			BYTE* buffer = new BYTE[entry->GetSize()];
-			zip.Read(buffer, entry->GetSize());
-			//nlump->loadData(buffer, entry->GetSize());
-			nlump->LoadData(buffer, entry->GetSize());
-			delete[] buffer;
-
-			// Get directory info
-			wxArrayString dirs = fn.GetDirs();
-			for (int a = 0; a < dirs.size(); a++)
-				nlump->AddDir(dirs[a]);
-
-			if (dirs.size() > 0)
-			{
-				string dir = dirs[0] + _T("/");
-				vector_add_nodup(alldirs, dir)
-				for (int a = 1; a < dirs.size(); a++)
-				{
-					dir += dirs[a] + _T("/");
-					vector_add_nodup(alldirs, dir)
-				}
-			}
-
-			// Add to directory
-			directory.push_back(nlump);
-		}
-		else
-			vector_add_nodup(alldirs, entry->GetName(wxPATH_UNIX));
-
-		entry = zip.GetNextEntry();
-	}
-
-	for (int a = 0; a < alldirs.size(); a++)
-	{
-		wxFileName fn(alldirs[a], wxPATH_UNIX);
-		wxArrayString dirs2 = fn.GetDirs();
-
-		Lump* lump = addLump(dirs2[fn.GetDirCount()-1] + _T("/"), 0);
-
-		for (int a = 0; a < dirs2.size()-1; a++)
-			lump->addDir(dirs2[a]);
-	}
-
-	zip = true;
-	return true;
-}
-
-// Wad::dump_directory: Writes all directory entries to the logfile
-// ------------------------------------------------------------- >>
-void Wad::dump_directory()
-{
-	for (DWORD l = 0; l < num_lumps; l++)
-		log_message(s_fmt(_T("%d: %s (%db at %d)\n"), l, directory[l]->Name(), directory[l]->Size(), directory[l]->Offset()));
-}
-
-// Wad::get_lump_index: Returns the index of the first lump with the specified name
-//                      Returns -1 if no matching lump is found
-// ----------------------------------------------------------------------------- >>
-long Wad::get_lump_index(string name)
-{
-	for (DWORD l = 0; l < num_lumps; l++)
-	{
-		if (directory[l]->Name().CmpNoCase(name) == 0)
-			return l;
-	}
-
-	return -1;
-}
-
-// Same as above but searches from an offset
-// -------------------------------------- >>
-long Wad::get_lump_index(string name, DWORD offset)
-{
-	if (num_lumps == 0)
-		return -1;
-
-	for (DWORD l = offset; l < num_lumps; l++)
-	{
-		if (directory[l]->Name().CmpNoCase(name) == 0)
-			return l;
-	}
-
-	return -1;
-}
-
-// Wad::get_lump: Returns a pointer to the first matching lump from offset
-// -------------------------------------------------------------------- >>
-Lump* Wad::get_lump(string name, DWORD offset)
-{
-	for (DWORD l = offset; l < num_lumps; l++)
-	{
-		if (directory[l]->Name().CmpNoCase(name) == 0)
-			return directory[l];
-	}
-
-	return NULL;
-}
-
-// Wad::add_lump: Adds a new 0-sized lump before <index>
-// -------------------------------------------------- >>
-Lump* Wad::add_lump(string name, long index)
-{
-	Lump* nlump = new Lump(0, 0, name, this);
-
-	if (index < 0 || index >= directory.size())
-		directory.push_back(nlump);
-	else
-		directory.insert(directory.begin() + index, nlump);
-
-	return nlump;
-}
-
-// Wad::replace_lump: Replaces lump data with new data
-// ------------------------------------------------ >>
-void Wad::replace_lump(string name, DWORD new_size, BYTE *data, DWORD offset)
-{
-	int index = get_lump_index(name, offset);
-
-	if (index > -1)
-	{
-		//free(directory[index]->Data());
-		directory[index]->Resize(new_size);
-		memcpy(directory[index]->Data(), data, new_size);
-	}
-}
-
-// Wad::delete_lump: Deletes a lump
-// ----------------------------- >>
-void Wad::delete_lump(string name, DWORD offset)
-{
-	long index = -1;
-
-	for (DWORD l = offset; l < num_lumps; l++)
-	{
-		if (directory[l]->Name().CmpNoCase(name) == 0)
-		{
-			index = l;
-			break;
-		}
-	}
-
-	if (index == -1)
-		return;
-
-	delete directory[index];
-
-	for (DWORD l = index; l < num_lumps - 1; l++)
-		directory[l] = directory[l + 1];
-
-	num_lumps--;
-	directory = (Lump **)realloc(directory, num_lumps * sizeof(Lump *));
-}
-
-void copy_file(string input, string output)
-{
-	FILE *in = fopen(str(input).c_str(), "rb");
-	if (in)
-	{
-		FILE *out = fopen(str(output).c_str(), "wb");
-		while (!feof(in))
-		{
-			BYTE b = 0;
-			lefread(&b, 1, 1, in);
-			lefwrite(&b, 1, 1, out);
-		}
-		fclose(out);
-		fclose(in);
-	}
-}
-
-// Wad::save: Saves a wad file to disk (backs up the file, then overwrites it)
-// ------------------------------------------------------------------------ >>
-void Wad::save(bool nodes, string mapname)
-{
-	if (locked)
-	{
-		message_box(_T("Saving to the IWAD is disallowed. Use 'Save As' instead."), _T("Save Disallowed"));
-		return;
-	}
-
-	string bakfile = path + _T(".bak");
-	//printf("%s\n%s\n", path.c_str(), bakfile.c_str());
-
-	// Remove old backup file
-	remove(str(bakfile).c_str());
-
-	// Copy current file contents to new backup file
-	copy_file(path, bakfile);
-
-	// Determine directory offset & individual lump offsets
-	dir_offset = 12;
-
-	for (DWORD l = 0; l < num_lumps; l++)
-	{
-		directory[l]->SetOffset(dir_offset);
-		dir_offset += directory[l]->Size();
-	}
-
-	// Open wadfile for writing
-	FILE *fp = fopen(str(path).c_str(), "wb");
-
-	// Write the header
-	lefwrite(type, 1, 4, fp);
-	lefwrite(&num_lumps, 4, 1, fp);
-	lefwrite(&dir_offset, 4, 1, fp);
-
-	// Write the lumps
-	for (DWORD l = 0; l < num_lumps; l++)
-		lefwrite(directory[l]->Data(), 1, directory[l]->Size(), fp);
-
-	// Write the directory
-	for (DWORD l = 0; l < num_lumps; l++)
-	{
-		char name[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-		long offset = directory[l]->Offset();
-		long size = directory[l]->Size();
-
-		for (int c = 0; c < directory[l]->Name().length(); c++)
-			name[c] = directory[l]->Name()[c];
-
-		lefwrite(&offset, 4, 1, fp);
-		lefwrite(&size, 4, 1, fp);
-		lefwrite(name, 1, 8, fp);
-	}
-
-	fclose(fp);
-
-	// Build nodes
-	if (nodes)
-	{
-		splash(_T("Building Nodes"), true);
-
-		FWadReader inwad(str(path).c_str());
-		FWadWriter outwad(str(s_fmt(_T("%s.temp"), path)).c_str(), inwad.IsIWAD());
-
-		int lump = 0;
-		int max = inwad.NumLumps();
-
-		while (lump < max)
-		{
-			if (inwad.IsMap (lump) &&
-				(mapname.empty() || mapname.CmpNoCase(inwad.LumpName(lump)) == 0)) //stricmp (inwad.LumpName (lump), str(mapname).c_str()) == 0))
-			{
-				splash(_T("Building nodes on ") + inwad.LumpName(lump), true);
-				FProcessor builder(inwad, lump);
-				builder.Write (outwad);
-
-				lump = inwad.LumpAfterMap (lump);
-			}
-			else if (inwad.IsGLNodes (lump))
-			{
-				// Ignore GL nodes from the input for any maps we process.
-				if (BuildNodes && (Map == NULL || stricmp (inwad.LumpName (lump)+3, Map) == 0))
-					lump = inwad.SkipGLNodes (lump);
-				else
-				{
-					outwad.CopyLump (inwad, lump);
-					++lump;
-				}
-			}
-			else
-			{
-				outwad.CopyLump (inwad, lump);
-				++lump;
-			}
-		}
-
-		outwad.Close();
-
-		remove(path.c_str());
-		copy_file(s_fmt(_T("%s.temp"), path), path);
-		remove(str(s_fmt("%s.temp", path)).c_str());
-
-		splash_hide();
-	}
-}
-
-void Wad::close()
-{
-	if (path.empty())
-		return;
-
-	available_maps.clear();
-
-	for (int a = 0; a < num_lumps; a++)
-		delete directory[a];
-
-	free(directory);
-	directory = NULL;
-
-	num_lumps = 0;
-	path = "";
-	locked = true;
-}
-
-void Wad::calculate_offsets()
-{
-	// Determine directory offset & individual lump offsets
-	dir_offset = 12;
-
-	for (DWORD l = 0; l < num_lumps; l++)
-	{
-		directory[l]->SetOffset(dir_offset);
-		dir_offset += directory[l]->Size();
-	}
-}
-
-*/

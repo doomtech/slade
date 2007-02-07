@@ -6,6 +6,7 @@
 #include "dm_thing.h"
 #include "dm_line.h"
 #include "dm_side.h"
+#include "dm_vertex.h"
 #include "camera.h"
 #include "render.h"
 #include "tex_browser.h"
@@ -14,6 +15,8 @@
 #include "edit_misc.h"
 #include "undoredo.h"
 #include "splash.h"
+#include "mathstuff.h"
+#include "game_config.h"
 
 float grav = 0.5f;
 
@@ -41,6 +44,157 @@ extern vector<gl_ssect_t> gl_ssects;
 extern vector<gl_node_t> gl_nodes;
 extern int* ssect_sectors;
 extern bool mix_tex;
+extern plane_t *f_planes, *c_planes;
+extern GameConfig game;
+
+
+void setup_slopes_3d(int sector)
+{
+	// Check lines
+	for (DWORD a = 0; a < d_map.n_lines(); a++)
+	{
+		Line *l = d_map.line(a);
+
+		if (sector != -1 &&
+			l->sector_index() != sector &&
+			l->sector_index(false) != sector)
+			continue;
+
+		// Plane_Align
+		if (game.zdoom() && l->get_special() == 181)
+		{
+			// Get start height and end height depending on the type of slope
+			float f_start_height = 0;
+			float f_end_height = 0;
+			float c_start_height = 0;
+			float c_end_height = 0;
+			bool valid = false;
+			int sector = -1;
+
+			// Slope front side floor
+			if (l->arg(0) == 1 && d_map.valid(l->side1()) && d_map.valid(l->side2()))
+			{
+				f_start_height = l->side2()->get_sector()->floor();
+				f_end_height = l->side1()->get_sector()->floor();
+				sector = l->sector_index();
+			}
+
+			// Slope back side floor
+			if (l->arg(0) == 2 && d_map.valid(l->side1()) && d_map.valid(l->side2()))
+			{
+				f_start_height = l->side1()->get_sector()->floor();
+				f_end_height = l->side2()->get_sector()->floor();
+				sector = l->sector_index(false);
+			}
+
+			// Slope front side ceiling
+			if (l->arg(1) == 1 && d_map.valid(l->side1()) && d_map.valid(l->side2()))
+			{
+				c_start_height = l->side2()->get_sector()->ceiling();
+				c_end_height = l->side1()->get_sector()->ceiling();
+				sector = l->sector_index();
+			}
+
+			// Slope back side ceiling
+			if (l->arg(1) == 2 && d_map.valid(l->side1()) && d_map.valid(l->side2()))
+			{
+				c_start_height = l->side1()->get_sector()->ceiling();
+				c_end_height = l->side2()->get_sector()->ceiling();
+				sector = l->sector_index(false);
+			}
+
+			if (sector != -1)
+			{
+				bool c_sloped = false;
+				bool f_sloped = false;
+				point3_t c_1, c_2, c_3;
+				point3_t f_1, f_2, f_3;
+
+				// Set start point
+				rect_t s_line = l->get_rect();
+				if (l->arg(0) > 0)
+				{
+					f_1.set(s_line.x1(), s_line.y1(), f_start_height);
+					f_2.set(s_line.x2(), s_line.y2(), f_start_height);
+					f_sloped = true;
+				}
+
+				if (l->arg(1) > 0)
+				{
+					c_1.set(s_line.x1(), s_line.y1(), c_start_height);
+					c_2.set(s_line.x2(), s_line.y2(), c_start_height);
+					c_sloped = true;
+				}
+
+				// Get end point
+				point3_t mid(float(s_line.x1()) + ((s_line.x2() - s_line.x1()) / 2.0f),
+					float(s_line.y1()) + ((s_line.y2() - s_line.y1()) / 2.0f), 0.0f);
+				point3_t dir(float(s_line.y2() - s_line.y1()), -float(s_line.x2() - s_line.x1()), 0.1f);
+				point3_t side(mid.x + dir.x, mid.y + dir.y, mid.z + dir.z);
+				float max_dist = 0.0f;
+				float min_dist = 0.0f;
+
+				// Run through all lines in the sector and get their vertices
+				vector<Vertex*> verts;
+				for (DWORD l2 = 0; l2 < d_map.n_lines(); l2++)
+				{
+					Line *line = d_map.line(l2);
+					if ((line->sector_index() == sector ||
+						line->sector_index(false) == sector) &&
+						l2 != a)
+					{
+						verts.push_back(line->vertex1());
+						verts.push_back(line->vertex2());
+					}
+				}
+
+				for (DWORD b = 0; b < verts.size(); b++)
+				{
+					float x1 = (float)verts[b]->x_pos();
+					float x2 = x1 + float(s_line.x2() - s_line.x1());
+					float y1 = (float)verts[b]->y_pos();
+					float y2 = y1 + float(s_line.y2() - s_line.y1());
+
+					if ((y2 - y1) * (side.x - mid.x) - (x2 - x1) * (side.y - mid.y) != 0.0f)
+					{
+						float dist = ((x2 - x1) * (mid.y - y1) - (y2 - y1) * (mid.x - (x1))) /
+							((y2 - y1) * (side.x - mid.x) - (x2 - x1) * (side.y - mid.y));
+
+						if (dist > max_dist)
+							max_dist = dist;
+
+						if (dist < min_dist)
+							min_dist = dist;
+					}
+				}
+
+				// Get 2 intersection points: max for side1 and min for side2
+				float max_x = float(mid.x) + (float(dir.x) * max_dist);
+				float max_y = float(mid.y) + (float(dir.y) * max_dist);
+				float min_x = float(mid.x) + (float(dir.x) * min_dist);
+				float min_y = float(mid.y) + (float(dir.y) * min_dist);
+
+				if (l->arg(0) == 1)
+					f_3.set(max_x, max_y, f_end_height);
+
+				if (l->arg(0) == 2)
+					f_3.set(min_x, min_y, f_end_height);
+
+				if (l->arg(1) == 1)
+					c_3.set(max_x, max_y, c_end_height);
+
+				if (l->arg(1) == 2)
+					c_3.set(min_x, min_y, c_end_height);
+
+				if (f_sloped)
+					f_planes[sector].from_triangle(f_3, f_1, f_2);
+
+				if (c_sloped)
+					c_planes[sector].from_triangle(c_3, c_1, c_2);
+			}
+		}
+	}
+}
 
 void init_3d_mode()
 {
@@ -75,7 +229,32 @@ void init_3d_mode()
 			}
 		}
 	}
+
+	if (f_planes)
+		delete[] f_planes;
+	if (c_planes)
+		delete[] c_planes;
+
+	f_planes = new plane_t[d_map.n_sectors()];
+	c_planes = new plane_t[d_map.n_sectors()];
+
+	if (game.zdoom())
+		splash(_T("Init Slopes..."), true);
+
+	for (DWORD a = 0; a < d_map.n_sectors(); a++)
+	{
+		f_planes[a].set(0.0f, 0.0f, 1.0f, d_map.sector(a)->floor());
+		c_planes[a].set(0.0f, 0.0f, 1.0f, d_map.sector(a)->ceiling());
+
+		if (game.zdoom())
+		{
+			setup_slopes_3d(a);
+			if (a % 20 == 0)
+				splash_progress((double)a / (double)d_map.n_sectors());
+		}
+	}
 }
+
 
 // apply_gravity: Applies gravity to the camera
 // ----------------------------------------- >>
@@ -87,12 +266,12 @@ void apply_gravity()
 	float mult = elapsed * 0.1f;
 	int sector = d_map.get_hilight_sector(point2_t(camera.position.x, camera.position.y));
 
-	if (sector != -1)
+	if (sector != -1 && sector < d_map.n_sectors())
 	{
-		//float f_h = plane_height(sector_info[sector].f_plane, camera.position.x, camera.position.y) + (40 * SCALE_3D);
-		//float c_h = plane_height(sector_info[sector].c_plane, camera.position.x, camera.position.y);
-		float f_h = (float)d_map.sector(sector)->floor() + 40.0f;
-		float c_h = (float)d_map.sector(sector)->ceiling();
+		float f_h = plane_height(f_planes[sector], camera.position.x, camera.position.y) + 40.0f;
+		float c_h = plane_height(c_planes[sector], camera.position.x, camera.position.y);
+		//float f_h = (float)d_map.sector(sector)->floor() + 40.0f;
+		//float c_h = (float)d_map.sector(sector)->ceiling();
 
 		if (f_h >= c_h)
 		{
@@ -215,11 +394,13 @@ void change_sector_height_3d(int amount, bool floor, bool force)
 	{
 		d_map.sector(sector)->set_floor(d_map.sector(sector)->floor() + amount);
 		add_3d_message(s_fmt(_T("Floor Height: %d"), d_map.sector(sector)->floor()));
+		f_planes[sector].set(0.0f, 0.0f, 1.0f, d_map.sector(sector)->floor());
 	}
 	else
 	{
 		d_map.sector(sector)->set_ceil(d_map.sector(sector)->ceiling() + amount);
 		add_3d_message(s_fmt(_T("Ceiling Height: %d"), d_map.sector(sector)->ceiling()));
+		c_planes[sector].set(0.0f, 0.0f, 1.0f, d_map.sector(sector)->ceiling());
 	}
 
 	d_map.change_level(MC_SAVE_NEEDED);

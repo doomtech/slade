@@ -219,7 +219,7 @@ HINSTANCE hLib = NULL;
 bool MainApp::OnInit()
 {
 #ifdef WIN32
-	hLib = LoadLibrary("BlackBox.dll");
+	hLib = LoadLibrary("crashrep.dll");
 #endif
 
 	srand(wxGetLocalTime());

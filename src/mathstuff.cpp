@@ -283,3 +283,10 @@ float dist_ray_plane(point3_t r_o, point3_t r_v, plane_t plane)
     
     return (delta_d / cos_a);
 }
+
+// plane_height: Returns the z height at a point (x,y) on a plane
+// ----------------------------------------------------------- >>
+float plane_height(plane_t plane, float x, float y)
+{
+	return ((-plane.a * x) + (-plane.b * y) + plane.d) / plane.c;
+}

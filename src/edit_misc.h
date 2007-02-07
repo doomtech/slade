@@ -32,6 +32,8 @@ void sector_light_gradient(int step);
 void sector_paint_tex(int sector, string tex, bool floor, vector<int> &sectors);
 void sector_changelight(int amount);
 void sector_changeheight(bool floor, int amount);
+void sector_copy_properties();
+void sector_paste_properties();
 
 
 void vert_rotate(double angle);

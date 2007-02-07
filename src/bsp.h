@@ -39,3 +39,43 @@ struct gl_node_t
 
 bool build_gl_nodes();
 void update_visibility();
+
+
+class ViewRange
+{
+private:
+	float		start;
+	float		end;
+	ViewRange	*prev;
+	ViewRange	*next;
+
+public:
+	ViewRange(float s = 0.0f, float e = 0.0f);
+	~ViewRange();
+
+	void		setNext(ViewRange *n) { next = n; }
+	ViewRange*	getNext() { return next; }
+	void		setPrev(ViewRange *n) { prev = n; }
+	ViewRange*	getPrev() { return prev; }
+
+	bool		checkRange(float s, float e);
+	bool		block(float s, float e);
+};
+
+class Clipper
+{
+private:
+	ViewRange	*start;
+	ViewRange	*end;
+
+public:
+	Clipper();
+	~Clipper();
+
+	bool	checkRange(float s, float e);
+	void	blockRange(float s, float e);
+
+	void	clear();
+	void	blockBehind();
+	bool	allBlocked();
+};
