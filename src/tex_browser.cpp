@@ -94,8 +94,10 @@ TextureBrowser::TextureBrowser(string tex, bool fullscreen)
 	browse_area->parent = this;
 	browse_area->SetFocus();
 
+#ifndef __WXGTK__	// For some reason in wxGTK making the dialog fullscreen un-modals it
 	if (fullscreen)
 		ShowFullScreen(true);
+#endif
 
 	SetIcon(wxIcon(_T("slade.ico"),  wxBITMAP_TYPE_ICO, -1, -1));
 
