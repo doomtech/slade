@@ -2,6 +2,7 @@
 #include "wx_stuff.h"
 #include <wx/notebook.h>
 #include <wx/choicebk.h>
+#include <wx/spinctrl.h>
 
 class DrawSideBar : public wxPanel
 {

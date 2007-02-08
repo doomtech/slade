@@ -20,6 +20,7 @@ wxFrame *frame_3d = NULL;
 
 double elapsed = 0;
 CVAR(Bool, invert_mouse_3d, false, CVAR_SAVE)
+CVAR(Bool, vid_usetimer_3d, true, CVAR_SAVE)
 CVAR(Int, vid_width_3d, -1, CVAR_SAVE)
 CVAR(Int, vid_height_3d, -1, CVAR_SAVE)
 CVAR(Int, vid_bpp_3d, -1, CVAR_SAVE)
@@ -173,9 +174,12 @@ bool exit_3dmode = false;
 fpoint2_t mouse_dir(0, 0);
 void Render3dCanvas::do_loop()
 {
-	//elapsed = sw.Time();
-	elapsed = 20.0f;
-	//if (elapsed >= vid_frametime_3d)
+	if (vid_usetimer_3d)
+		elapsed = sw.Time();
+	else
+		elapsed = 20.0f;
+
+	if (!vid_usetimer_3d || elapsed >= vid_frametime_3d)
 	{
 		// Reset timer
 		sw.Start();
@@ -193,14 +197,14 @@ void Render3dCanvas::do_loop()
 		// Gravity
 		if (camera.gravity)
 			apply_gravity();
-	}
 
-	// Mouse
-	point3_t axis = (camera.view - camera.position).cross(camera.up_vector);
-	axis = axis.normalize();
-	camera.rotate_view(mouse_dir.x, 0, 0, 1);
-	camera.rotate_view(mouse_dir.y, axis.x, axis.y, axis.z);
-	mouse_dir.set(mouse_dir.x * 0.45f, mouse_dir.y * 0.45f);
+		// Mouse
+		point3_t axis = (camera.view - camera.position).cross(camera.up_vector);
+		axis = axis.normalize();
+		camera.rotate_view(mouse_dir.x, 0, 0, 1);
+		camera.rotate_view(mouse_dir.y, axis.x, axis.y, axis.z);
+		mouse_dir.set(mouse_dir.x * 0.45f, mouse_dir.y * 0.45f);
+	}
 
 	// Render
 	render();

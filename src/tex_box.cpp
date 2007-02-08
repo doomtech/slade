@@ -52,6 +52,10 @@ void TextureBox::paint(wxPaintEvent &event)
 
 void TextureBox::size(wxSizeEvent &event)
 {
+	/*
+	if (!IsShownOnScreen())
+		return;
+
 	SetCurrent();
 
 	glViewport(0, 0, GetClientSize().x, GetClientSize().y);
@@ -63,13 +67,13 @@ void TextureBox::size(wxSizeEvent &event)
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
+	*/
 }
 
 void TextureBox::redraw()
 {
-	//if (!IsShown())
-	//	return;
-	Show(true);
+	if (!IsShownOnScreen())
+		return;
 
 	SetCurrent();
 
