@@ -105,6 +105,9 @@ public:
 	vector<ActionSpecial>& get_specials() { return action_specials; }
 	vector<ThingType>& get_ttypes() { return thing_types; }
 
+	void get_ttype_groups(vector<string>& list);
+	void get_ttypes_group(string group, vector<ThingType*>& list);
+
 	void read_decorate_things(Wad* wad, Lump* lump);
 	void clear_decorate_things();
 	void read_decorate_lumps();

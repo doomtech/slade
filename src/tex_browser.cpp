@@ -578,6 +578,7 @@ void setup_tex_browser(int type)
 	// Things
 	if (type == 3)
 	{
+		/*
 		for (unsigned int a = 0; a < game.get_ttypes().size(); a++)
 		{
 			ThingType tt = game.get_ttypes()[a];
@@ -586,6 +587,23 @@ void setup_tex_browser(int type)
 			bi.retval = s_fmt(_T("%d"), tt.type);
 			bi.tex = get_texture(tt.spritename, 3);
 			browse_items.push_back(bi);
+		}
+		*/
+		vector<string> groups;
+		game.get_ttype_groups(groups);
+
+		for (int a = 0; a < groups.size(); a++)
+		{
+			vector<ThingType*> g_things;
+			game.get_ttypes_group(groups[a], g_things);
+
+			for (int t = 0; t < g_things.size(); t++)
+			{
+				browse_info_t bi;
+				bi.retval = s_fmt(_T("%d"), g_things[t]->type);
+				bi.tex = get_texture(g_things[t]->spritename, 3);
+				browse_items.push_back(bi);
+			}
 		}
 
 		return;

@@ -198,7 +198,19 @@ void setup_directories()
 	app_path = string(getBundleResourceDir()) + _T("/");
 	usr_path = wxFileName::GetHomeDir() + string(_T("/Library/Application Support/Slade/"));
 #else
-	usr_path = app_path;
+	//usr_path = wxFileName::GetHomeDir() + string(_T("/Application Data/SLADE/"));
+	usr_path = wxString::FromAscii(getenv("APPDATA")) + string(_T("/SLADE/"));
+#endif
+}
+
+void create_dir(string dir)
+{
+#ifdef unix
+	if (mkdir(chr(dir), S_IRUSR|S_IWUSR|S_IXUSR) == -1)
+		log_message(_T("Could not create ") + dir);
+#else
+	if (mkdir(chr(dir)) == -1)
+		log_message(_T("Could not create ") + dir);
 #endif
 }
 
@@ -238,14 +250,26 @@ bool MainApp::OnInit()
 	// Init logfile
 	wxLog::SetActiveTarget(new wxLogStderr(fopen(chr(c_path(_T("slade.log"), DIR_TMP)), "wt")));
 
-#ifdef unix
+	log_message(wxString::FromAscii(getenv("APPDATA")));
+
 	// Create User Directory if it doesn't already exist
-	if(!wxFileName::DirExists(usr_path)) {
-		if(mkdir(chr(usr_path), S_IRUSR | S_IWUSR | S_IXUSR) == -1) {
+#ifdef unix
+	if(!wxFileName::DirExists(usr_path))
+	{
+		if(mkdir(chr(usr_path), S_IRUSR | S_IWUSR | S_IXUSR) == -1)
 			log_message(_T("Could not create ") + usr_path);
-		}
 	}
+#elif WIN32
+	if (!wxFileName::DirExists(c_path(_T(""), DIR_USR)))
+		create_dir(c_path(_T(""), DIR_USR));
 #endif
+
+	// Create user config directories
+	if (!wxFileName::DirExists(c_path(_T("colours/"), DIR_USR)))
+		create_dir(c_path(_T("colours/"), DIR_USR));
+
+	if (!wxFileName::DirExists(c_path(_T("keys/"), DIR_USR)))
+		create_dir(c_path(_T("keys/"), DIR_USR));
 
 	// Allow high-colour toolbar icons
 	wxSystemOptions::SetOption(_T("msw.remap"), 0);

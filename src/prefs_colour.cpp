@@ -5,9 +5,11 @@
 #include "main.h"
 #include "prefs_dialog.h"
 #include "colours.h"
+#include "wad.h"
 
 extern coldef_t colours[];
 extern unsigned int n_colours;
+extern Wad reswad;
 
 ColourBox::ColourBox(wxWindow *parent, rgba_t *colour)
 :	wxPanel(parent, -1, wxDefaultPosition, wxSize(32, 24), wxSUNKEN_BORDER)
@@ -127,6 +129,17 @@ ColourPrefs::ColourPrefs(wxWindow *parent)
 	wxStaticBoxSizer *box = new wxStaticBoxSizer(frame, wxVERTICAL);
 	m_vbox->Add(box, 1, wxEXPAND|wxALL, 4);
 
+	// Get configs from slade.pk3
+	wxArrayString configs;
+	for (DWORD a = 0; a < reswad.numLumps(); a++)
+	{
+		if (reswad.lumpAt(a)->getDir(1) == _T("colours"))
+			configs.Add(reswad.lumpAt(a)->getName(false, false));
+	}
+
+	combo_configs = new wxChoice(this, CP_COMBO_CONFIGS, wxDefaultPosition, wxDefaultSize, configs);
+	box->Add(combo_configs, 0, wxEXPAND|wxBOTTOM, 4);
+
 	box->Add(new wxStaticText(this, -1, _T("Right click the colour boxes to set alpha")), 0, wxEXPAND|wxBOTTOM, 2);
 
 	wxScrolledWindow *s_window = new wxScrolledWindow(this, -1, wxDefaultPosition, wxDefaultSize, wxVSCROLL|wxSUNKEN_BORDER);
@@ -149,10 +162,10 @@ ColourPrefs::ColourPrefs(wxWindow *parent)
 
 	hbox->AddSpacer(1);
 
-	btn_loadconfig = new wxButton(this, CP_BTN_LOAD, _T("Load Config"));
+	btn_loadconfig = new wxButton(this, CP_BTN_LOAD, _T("Load Custom Config"));
 	hbox->Add(btn_loadconfig, 0, wxEXPAND|wxRIGHT, 4);
 
-	btn_saveconfig = new wxButton(this, CP_BTN_SAVE, _T("Save Config"));
+	btn_saveconfig = new wxButton(this, CP_BTN_SAVE, _T("Save Custom Config"));
 	hbox->Add(btn_saveconfig, 0, wxEXPAND);
 }
 
@@ -163,11 +176,12 @@ ColourPrefs::~ColourPrefs()
 BEGIN_EVENT_TABLE(ColourPrefs, wxPanel)
 	EVT_BUTTON(CP_BTN_LOAD, ColourPrefs::load_clicked)
 	EVT_BUTTON(CP_BTN_SAVE, ColourPrefs::save_clicked)
+	EVT_CHOICE(CP_COMBO_CONFIGS, ColourPrefs::combo_configs_changed)
 END_EVENT_TABLE()
 
 void ColourPrefs::save_clicked(wxCommandEvent &event)
 {
-	string filename = wxFileSelector(_T("Save Colour Configuration"), _T("./config/colours"), _T(""),
+	string filename = wxFileSelector(_T("Save Colour Configuration"), c_path(_T("colours/"), DIR_USR), _T(""),
 							_T("*.cfg"), _T("Configuration Files (*.cfg)|*.cfg"), wxSAVE|wxOVERWRITE_PROMPT);
 
 	if (filename.size())
@@ -177,7 +191,7 @@ void ColourPrefs::save_clicked(wxCommandEvent &event)
 void ColourPrefs::load_clicked(wxCommandEvent &event)
 {
 	string filename = _T("");
-	wxFileDialog browse(NULL, _T("Load Colour Configuration"), _T("./config/colours"), _T(""), _T("Configuration Files (*.cfg)|*.cfg"), wxOPEN|wxFILE_MUST_EXIST);
+	wxFileDialog browse(NULL, _T("Load Colour Configuration"), c_path(_T("colours/"), DIR_USR), _T(""), _T("Configuration Files (*.cfg)|*.cfg"), wxOPEN|wxFILE_MUST_EXIST);
 	if (browse.ShowModal() == wxID_OK)
 		filename = browse.GetPath();
 
@@ -185,6 +199,24 @@ void ColourPrefs::load_clicked(wxCommandEvent &event)
 
 	if (filename.size())
 		load_colour_config(filename);
+
+	redraw_map();
+}
+
+void ColourPrefs::combo_configs_changed(wxCommandEvent &event)
+{
+	string name = combo_configs->GetString(combo_configs->GetSelection());
+
+	for (DWORD a = 0; a < reswad.numLumps(); a++)
+	{
+		if (reswad.lumpAt(a)->getDir(1) == _T("colours") && reswad.lumpAt(a)->getName(false, false) == name)
+		{
+			reswad.lumpAt(a)->dumpToFile(c_path(_T("sladetemp"), DIR_TMP));
+			load_colour_config(c_path(_T("sladetemp"), DIR_TMP));
+			remove(chr(c_path(_T("sladetemp"), DIR_TMP)));
+			break;
+		}
+	}
 
 	redraw_map();
 }

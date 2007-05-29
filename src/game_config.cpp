@@ -762,3 +762,22 @@ void GameConfig::read_decorate_lumps()
 			read_decorate_things(wads.getWad(a), wads.getWad(a)->getLump(_T("DECORATE"), 0));
 	}
 }
+
+void GameConfig::get_ttype_groups(vector<string>& list)
+{
+	for (unsigned int a = 0; a < thing_types.size(); a++)
+	{
+		string group = thing_types[a].group;
+		if (!(vector_exists(list, group)))
+			list.push_back(group);
+	}
+}
+
+void GameConfig::get_ttypes_group(string group, vector<ThingType*>& list)
+{
+	for (unsigned int a = 0; a < thing_types.size(); a++)
+	{
+		if (thing_types[a].group == group)
+			list.push_back(&thing_types[a]);
+	}
+}

@@ -225,7 +225,7 @@ void create_sector()
 	}
 }
 
-
+bool lt_init = false;
 void create_thing(point2_t mouse)
 {
 	make_backup(BKUP_THINGS);
@@ -234,6 +234,18 @@ void create_thing(point2_t mouse)
 	{
 		mouse.x = snap_to_grid(mouse.x);
 		mouse.y = snap_to_grid(mouse.y);
+	}
+
+	if (!lt_init)
+	{
+		if (d_map.hexen())
+		{
+			last_thing.set_flag(256, true);
+			last_thing.set_flag(512, true);
+			last_thing.set_flag(1024, true);
+		}
+
+		lt_init = true;
 	}
 
 	Thing *t = new Thing(&d_map);

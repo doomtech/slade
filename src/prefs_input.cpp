@@ -1,8 +1,10 @@
 
 #include "main.h"
 #include "prefs_dialog.h"
+#include "wad.h"
 
 extern BindList binds;
+extern Wad reswad;
 
 InputTextCtrl::InputTextCtrl(wxWindow *parent, int id)
 :	wxTextCtrl(parent, id, _T(""), wxDefaultPosition, wxSize(64, -1))
@@ -172,13 +174,13 @@ InputPrefs::InputPrefs(wxWindow *parent)
 	box = new wxStaticBoxSizer(frame, wxVERTICAL);
 	vbox->Add(box, 0, wxEXPAND|wxALL, 4);
 
-	btn_defaults = new wxButton(this, IP_BTN_DEFAULTS, _T("Restore Defaults"));
-	box->Add(btn_defaults, 0, wxEXPAND|wxBOTTOM, 4);
+	btn_readconfig = new wxButton(this, IP_BTN_READCONFIG, _T("Load Config"));
+	box->Add(btn_readconfig, 0, wxEXPAND|wxBOTTOM, 4);
 
-	btn_loadconfig = new wxButton(this, IP_BTN_LOADCONFIG, _T("Load Config"));
+	btn_loadconfig = new wxButton(this, IP_BTN_LOADCONFIG, _T("Load Custom Config"));
 	box->Add(btn_loadconfig, 0, wxEXPAND|wxBOTTOM, 4);
 
-	btn_saveconfig = new wxButton(this, IP_BTN_SAVECONFIG, _T("Save Config"));
+	btn_saveconfig = new wxButton(this, IP_BTN_SAVECONFIG, _T("Save Custom Config"));
 	box->Add(btn_saveconfig, 0, wxEXPAND|wxBOTTOM, 4);
 }
 
@@ -188,7 +190,7 @@ InputPrefs::~InputPrefs()
 
 BEGIN_EVENT_TABLE(InputPrefs, wxPanel)
 	EVT_LISTBOX(IP_LIST_CONTROLS, InputPrefs::list_controls_changed)
-	EVT_BUTTON(IP_BTN_DEFAULTS, InputPrefs::btn_defaults_clicked)
+	EVT_BUTTON(IP_BTN_READCONFIG, InputPrefs::btn_readconfig_clicked)
 	EVT_BUTTON(IP_BTN_SAVECONFIG, InputPrefs::btn_saveconfig_clicked)
 	EVT_BUTTON(IP_BTN_LOADCONFIG, InputPrefs::btn_loadconfig_clicked)
 	EVT_BUTTON(IP_BTN_ADDBIND, InputPrefs::btn_addbind_clicked)
@@ -210,15 +212,44 @@ void InputPrefs::list_controls_changed(wxCommandEvent &event)
 		list_binds->Append(c->keys[a].get_string());
 }
 
-void InputPrefs::btn_defaults_clicked(wxCommandEvent &event)
+void InputPrefs::btn_readconfig_clicked(wxCommandEvent &event)
 {
-	binds.set_defaults();
-	list_controls_changed(event);
+	//binds.set_defaults();
+	//list_controls_changed(event);
+
+	vector<Lump*> config_lumps;
+	wxArrayString configs;
+	configs.Add(_T("SLADE Defaults"));
+
+	for (DWORD a = 0; a < reswad.numLumps(); a++)
+	{
+		if (reswad.lumpAt(a)->getDir(1) == _T("keys"))
+		{
+			configs.Add(reswad.lumpAt(a)->getName(false, false));
+			config_lumps.push_back(reswad.lumpAt(a));
+		}
+	}
+
+	int index = wxGetSingleChoiceIndex(_T("Select a configuration to load"), _T("Load Config"), configs);
+
+	if (index == 0)
+	{
+		binds.set_defaults();
+		list_controls_changed(event);
+	}
+	else if (index > 0)
+	{
+		config_lumps[index-1]->dumpToFile(c_path(_T("sladetemp"), DIR_TMP));
+		Tokenizer tz;
+		tz.open_file(c_path(_T("sladetemp"), DIR_TMP));
+		binds.load(&tz);
+		remove(chr(c_path(_T("sladetemp"), DIR_TMP)));
+	}
 }
 
 void InputPrefs::btn_loadconfig_clicked(wxCommandEvent &event)
 {
-	string filename = wxFileSelector(_T("Open Key Configuration"), _T("./config/keys"), _T(""), _T("*.cfg"),
+	string filename = wxFileSelector(_T("Open Key Configuration"), c_path(_T("keys/"), DIR_USR), _T(""), _T("*.cfg"),
 									_T("Configuration Files|*.cfg"), wxOPEN|wxFILE_MUST_EXIST);
 
 	if (filename.size())
@@ -231,7 +262,7 @@ void InputPrefs::btn_loadconfig_clicked(wxCommandEvent &event)
 
 void InputPrefs::btn_saveconfig_clicked(wxCommandEvent &event)
 {
-	string filename = wxFileSelector(_T("Save Key Configuration"), _T("./config/keys"), _T(""), _T("*.cfg"),
+	string filename = wxFileSelector(_T("Save Key Configuration"), c_path(_T("keys/"), DIR_USR), _T(""), _T("*.cfg"),
 									_T("Configuration Files|*.cfg"), wxSAVE|wxOVERWRITE_PROMPT);
 
 	if (filename.size())

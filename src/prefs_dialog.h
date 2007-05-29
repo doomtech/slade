@@ -110,6 +110,7 @@ class ColourPrefs : public wxPanel
 private:
 	wxButton		*btn_saveconfig;
 	wxButton		*btn_loadconfig;
+	wxChoice		*combo_configs;
 
 public:
 	enum
@@ -185,7 +186,7 @@ private:
 	wxButton	*btn_changebind;
 	wxButton	*btn_defaultbind;
 
-	wxButton	*btn_defaults;
+	wxButton	*btn_readconfig;
 	wxButton	*btn_loadconfig;
 	wxButton	*btn_saveconfig;
 
@@ -200,7 +201,7 @@ public:
 		IP_BTN_CHANGEBIND,
 		IP_BTN_DEFAULTBIND,
 
-		IP_BTN_DEFAULTS,
+		IP_BTN_READCONFIG,
 		IP_BTN_LOADCONFIG,
 		IP_BTN_SAVECONFIG,
 	};
@@ -209,7 +210,7 @@ public:
 	~InputPrefs();
 
 	void list_controls_changed(wxCommandEvent &event);
-	void btn_defaults_clicked(wxCommandEvent &event);
+	void btn_readconfig_clicked(wxCommandEvent &event);
 	void btn_loadconfig_clicked(wxCommandEvent &event);
 	void btn_saveconfig_clicked(wxCommandEvent &event);
 	void btn_addbind_clicked(wxCommandEvent &event);

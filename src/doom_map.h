@@ -198,6 +198,7 @@ public:
 	void	merge_under_vertex(Vertex* v);
 	void	merge_like_sectors();
 	void	merge_vertices_spot(point2_t pos);
+
 };
 
 #endif
