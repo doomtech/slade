@@ -710,7 +710,11 @@ void EditorWindow::file_run(wxCommandEvent &event)
 
 	wads.close(temp_wad->path);
 
-	if (wxExecute(exe_path) == -1)
+	// Remove ending space
+	if (exe_path.Right(1) == _T(" "))
+		exe_path.RemoveLast();
+
+	if (wxExecute(exe_path, wxEXEC_SYNC) == -1)
 		message_box(_T("Couldn't find executable! Check the path at edit->preferences->misc"));
 }
 

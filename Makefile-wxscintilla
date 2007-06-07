@@ -3,8 +3,8 @@
 CXX=g++
 CXXFLAGS=-Wall -O2
 SHARE_DIR=data_files/
-CXXFLAGS+=`wx-config --cxxflags` -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp -DNO_MAP_VIEWER=1 -DSHARE_DIR="\"$(SHARE_DIR)\""
-LDFLAGS+=`wx-config --libs --gl-libs`
+CXXFLAGS+=`wx-config --cxxflags` -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp -DNO_MAP_VIEWER=1 -DSHARE_DIR="\"$(SHARE_DIR)\"" -DUSE_WXSCINTILLA
+LDFLAGS+=`wx-config --libs --gl-libs` -lwxscintilla
 EXE?=slade
 SRC=$(wildcard src/*.cpp src/zdbsp/*.cpp)
 OBJ=$(patsubst %.cpp,%.o,${SRC})
