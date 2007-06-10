@@ -103,13 +103,13 @@ END_EVENT_TABLE()
 void MiscPrefs::entry_doomexe_changed(wxCommandEvent &event)
 {
 	if (init)
-		path_doomexe = chr(entry_path_doomexe->GetValue());
+		path_doomexe = entry_path_doomexe->GetValue();
 }
 
 void MiscPrefs::entry_runparams_changed(wxCommandEvent &event)
 {
 	if (init)
-		run_parameters = chr(entry_runparams->GetValue());
+		run_parameters = entry_runparams->GetValue();
 }
 
 void MiscPrefs::btn_doomexe_clicked(wxCommandEvent &event)
@@ -123,13 +123,13 @@ void MiscPrefs::btn_doomexe_clicked(wxCommandEvent &event)
 void MiscPrefs::entry_nodepath_changed(wxCommandEvent &event)
 {
 	if (init)
-		nodebuilder_path = chr(entry_path_nodebuilder->GetValue());
+		nodebuilder_path = entry_path_nodebuilder->GetValue();
 }
 
 void MiscPrefs::entry_nodeparams_changed(wxCommandEvent &event)
 {
 	if (init)
-		nodebuilder_params = chr(entry_nodes_params->GetValue());
+		nodebuilder_params = entry_nodes_params->GetValue();
 }
 
 void MiscPrefs::btn_nodepath_clicked(wxCommandEvent &event)

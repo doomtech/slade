@@ -6,7 +6,7 @@
 
 #include <wx/filename.h>
 
-CVAR(String, path_acc, "", CVAR_SAVE)
+CVAR(String, path_acc, _T(""), CVAR_SAVE)
 
 extern DoomMap d_map;
 
@@ -233,7 +233,7 @@ void ScriptEditor::btn_compile_clicked(wxCommandEvent &event)
 	scriptlump->dumpToFile(acs_path);
 
 	// Compile the script
-	string temp = _T(path_acc);
+	string temp = path_acc;
 	if (wxExecute(wxString::Format(_T("\"%s\" \"%s\" \"%s\""), temp, acs_path, o_path), wxEXEC_SYNC) == -1)
 	{
 		wxMessageBox(_T("Acc(.exe) not found! Please check the path"));
@@ -261,7 +261,7 @@ void ScriptEditor::btn_compile_clicked(wxCommandEvent &event)
 			char* text = (char*)malloc(len);
 			fseek(fp, 0, SEEK_SET);
 			fread(text, 1, len, fp);
-			string error = _T(text);
+			string error = wxString(text, wxConvISO8859_1);;
 			free(text);
 
 			wxDialog dlg(NULL, -1, _T("ACC Error Message"), wxDefaultPosition, wxDefaultSize);

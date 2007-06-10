@@ -366,7 +366,7 @@ void MapCanvas::redraw(bool map, bool grid)
 	if (d_map.opened())
 	{
 		// BG Tex
-		if (bg_tex != "-")
+		if (bg_tex != _T("-"))
 		{
 			Texture* tex = get_texture(bg_tex, 2);
 			

@@ -611,7 +611,7 @@ void copy_file(string input, string output)
 		FILE *out = fopen(chr(output), "wb");
 
 		if (!out)
-			log_message(s_fmt("cant open %s for out", chr(output)));
+			log_message(s_fmt(_T("cant open %s for out"), chr(output)));
 		else
 		{
 			while (!feof(in))
@@ -626,7 +626,7 @@ void copy_file(string input, string output)
 		fclose(in);
 	}
 	else
-		log_message(s_fmt("cant open %s for in", chr(input)));
+		log_message(s_fmt(_T("cant open %s for in"), chr(input)));
 }
 
 // Wad::save: Saves a wad file to disk (backs up the file, then overwrites it)
