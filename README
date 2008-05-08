@@ -1,0 +1,5 @@
+
+SLADE Requires the following libraries to compile:
+
+wxWidgets 2.6.2 or newer: http://www.wxwidgets.org/
+wxScintilla 1.68.1 or newer: http://wxcode.sourceforge.net/components/wxscintilla/

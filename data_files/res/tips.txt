@@ -1,0 +1,5 @@
+_("You can quickly change the angles of selected/highlighted things by holding and dragging middle click to the position you want them to face")
+_("You can press space to begin line drawing in any editing mode, then left click to place each point. Or you can press shift+space to begin drawing a shape. Shape drawing is configurable from the 'drawing' sidebar, accessible from the View menu")
+_("Check the input preferences dialog for a list of commands and their bindings (you can change the bindings too). Edit->Preferences->Input")
+_("A useful feature of SLADE is the 'paint texture' shortcuts for 3d mode. When you change a wall or floor texture in 3d mode, hold shift when you left click on a wall/floor (by default) to select a texture, and that texture will be 'painted' along all the walls or floors of the 'room'. Play around with it to get used to how it works, it saves a lot of time!")
+_("Check http://slade.mancubus.net for updates regularly")

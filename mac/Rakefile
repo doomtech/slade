@@ -1,0 +1,181 @@
+#################
+# Configuration #
+#################
+
+NAME = 'Slade'
+
+WXCONFIG = '/usr/local/wx26/bin/wx-config'
+CXX = 'c++'
+LDFLAGS = ''
+LIBS = "`#{WXCONFIG} --libs std gl` -framework OpenGL"
+INCLUDES = "`#{WXCONFIG} --cppflags std gl` -I/usr/X11R6/include"
+CXXFLAGS = '-g'
+MAKEDEPEND = '/usr/X11R6/bin/makedepend'
+
+#####################
+# Support functions #
+#####################
+
+def installRule(dir, file)
+	target = File::join(dir, File::basename(file))
+	file(target => [dir, file]) do |t|
+		cp(file, target)
+	end
+end
+
+def installTask(taskName, dir, files)
+	if files.is_a?(String)
+		files = [files]
+	end
+
+	array = []
+	for f in files do
+		array << File::join(dir, File::basename(f))
+		installRule(dir, f)
+	end
+	task(taskName => array)
+end
+
+def bundleDir(dir)
+	file(dir) do |t|
+		sh("/Developer/Tools/SetFile -a B #{dir}")
+	end
+end
+
+####################
+# Bundle structure #
+####################
+
+directory(BUNDLEDIR = "#{NAME}.app")
+directory(CONTENTSDIR = "#{BUNDLEDIR}/Contents")
+directory(BINDIR = "#{CONTENTSDIR}/MacOS")
+directory(RESOURCEDIR = "#{CONTENTSDIR}/Resources")
+
+bundleDir(BUNDLEDIR)
+
+installTask(:setup, CONTENTSDIR, 'mac/Info.plist')
+task(:bundle => :setup)
+
+############
+# App data #
+############
+
+directory(RESDIR = "#{RESOURCEDIR}/res")
+installTask(:data, RESDIR, Dir::glob('data_files/res/*'))
+
+directory(GAMESDIR = "#{RESOURCEDIR}/games")
+installTask(:data, GAMESDIR, Dir::glob('data_files/games/*.cfg'))
+
+directory(COLOURSDIR = "#{RESOURCEDIR}/config/colours")
+installTask(:data, COLOURSDIR, Dir::glob('data_files/config/colours/*.cfg'))
+
+directory(KEYSDIR = "#{RESOURCEDIR}/config/keys")
+installTask(:data, KEYSDIR, Dir::glob('data_files/config/keys/*.cfg'))
+
+installTask(:data, RESOURCEDIR, 'mac/Slade.icns')
+
+task(:bundle => :data)
+
+##############
+# App binary #
+##############
+
+sources = %w(
+src/3d_setup.cpp
+src/3d_window.cpp
+src/3dmode.cpp
+src/action_special.cpp
+src/args.cpp
+src/args_edit.cpp
+src/bsp.cpp
+src/byteswap.cpp
+src/camera.cpp
+src/checks.cpp
+src/colours.cpp
+src/console.cpp
+src/console_window.cpp
+src/copypaste.cpp
+src/cvar.cpp
+src/draw.cpp
+src/edit.cpp
+src/edit_misc.cpp
+src/edit_move.cpp
+src/editor_window.cpp
+src/game_config.cpp
+src/image_box.cpp
+src/info_bar.cpp
+src/info_line.cpp
+src/info_sector.cpp
+src/info_thing.cpp
+src/info_vertex.cpp
+src/input.cpp
+src/keybind.cpp
+src/line_edit.cpp
+src/linedraw.cpp
+src/main.cpp
+src/map.cpp
+src/map_canvas.cpp
+src/mathstuff.cpp
+src/prefs_3d.cpp
+src/prefs_colour.cpp
+src/prefs_dialog.cpp
+src/prefs_input.cpp
+src/prefs_misc.cpp
+src/prefs_visual.cpp
+src/render.cpp
+src/script_editor.cpp
+src/sector.cpp
+src/sector_edit.cpp
+src/sidebar.cpp
+src/sidedef.cpp
+src/special_select.cpp
+src/splash.cpp
+src/stype_select.cpp
+src/tex_box.cpp
+src/tex_browser.cpp
+src/textures.cpp
+src/thing_edit.cpp
+src/thing_type.cpp
+src/tokenizer.cpp
+src/ttype_select.cpp
+src/undoredo.cpp
+src/wad.cpp
+src/wad_manager.cpp
+)
+
+cleanfiles = []
+objects = []
+for source in sources
+	object = "#{File::dirname(source)}/#{File::basename(source, '.*')}.o"
+	file(object => source) do |task|
+		sh("#{CXX} #{CXXFLAGS} #{INCLUDES} -o #{task.name} -c #{task.prerequisites[0]}")
+	end
+	objects.push(object)
+	cleanfiles.push(object)
+end
+
+require 'rake/loaders/makefile'
+file('depends.mf' => sources) do |task|
+	sh("#{MAKEDEPEND} -f- -- #{INCLUDES} -- #{task.prerequisites} > #{task.name} 2> /dev/null")
+end
+import 'depends.mf'
+cleanfiles.push('depends.mf')
+
+file("#{BINDIR}/#{NAME}" => [BINDIR, *objects]) do |task|
+	sh("#{CXX} #{LDFLAGS} -o #{task.name} #{task.prerequisites[1..-1].join(' ')} #{LIBS}")
+end
+
+task(:binary => "#{BINDIR}/#{NAME}")
+task(:bundle => :binary)
+
+################
+# Main targets #
+################
+
+task(:default => :bundle)
+
+task(:clean) do |task|
+	rm_rf(cleanfiles)
+	rm_rf(BUNDLEDIR)
+end
+

@@ -1,0 +1,46 @@
+Shit to do
+
+BEFORE NEXT RELEASE:
+
+'Maybe' Stuff:
+ - 'Notes' edit mode
+
+Misc:
+ - Finish Hexen game config
+ - Boom generalized line types
+ - Default thing/line flags read from game configs
+ - 'Set sector' context menu items for lines
+ - 'Copy properties' function for lines/sectors/things
+ - Rework map handling (and 3d mode) *Probably for v2.0*
+
+Feature Requests / Bug Reports:
+ - Limit viewing angle in 3d mode, somehow
+ - Read thing information from DEHACKED lumps
+ - Convert non-hexen wads to hexen format
+ - Scale
+ - Undo in 3d mode
+ - ZDoom hires textures
+ - Finish colours dialog functionality
+
+DONE:
+ - Autocomplete for the ACS script editor
+ - Finish DECORATE loading
+ - Read DECORATE lump
+ - Map panning
+ - 2d texture preview thing
+ - Sector edit dialog
+ - Browser sorting/searching
+ - Thing browsing
+ - New map button
+ - Finish preferences dialog
+ - Script editor
+ - Move thing/line flags to game configurations
+ - Disable 'new map' button when no wad is selected
+ - Pgup/dn in tex browser
+ - Input dialog entry (return/teb key) fix
+ - Copy/paste offsets only in 3d mode
+ - 'Run map' option
+ - Show line sizes when moving lines/vertices
+ - Rotate
+ - Finish Boom config
+ - Syntax hilighting etc in script editor

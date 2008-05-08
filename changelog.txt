@@ -1,0 +1,365 @@
+Gtk-SLADE changelog
+-------------------
+
+Goes in bottom-up order
+
+*: Fixed
++: Added
+-: Removed
+~: Changed
+': Note
+
+[23/05/06]
+* Fixed crash when the texture browser had no textures visible
++ Added autocomplete popup to script editor (ctrl+space to activate)
+~ DECORATE things are now added/removed as wads are opened/closed
++ Added support for '#include' in DECORATE lumps
+~ Improved 2d map performance slightly :P
+* Fixed an obscure crash, having a tagged item hilighted while changing maps could crash slade. I really need to rework
+  my map class to eliminate any other crashes to do with attempting to access illegal array indices...
++ Added map panning (drag alt+rightclick by default)
+~ Implemented an edit state system (replaces the ugly multiple bool's, like line_draw, items_moving, paste_mode etc)
+~ Optimised the update_grid function, should be faster (although I don't notice any real speed improvement)
+
+[09/05/06]
+* Fixed script editor crashing when trying to save/compile scripts without a map open
++ Script editor highlighting is now implemented, colours/font styles are customisable, but not via the GUI yet (config/scripts/styles.cfg)
++ Changed script editor to use wxScintilla, now it has line numbers and proper 4-space tabs ;)
+
+[03/05/06]
++ Scaling and transparency are now taken into account for DECORATE things (in 3d mode and 2d mode+things as sprites)
++ Added support for DECORATE things (only the new DECORATE format for now)
+
+[03/04/06]
++ Added 'Hide IWAD Textures' option to the texture browser
+* Set texture browser minimum size to 320x240, since resizing it to be really small would crash SLADE
+
+[14/03/06]
++ Added 'Import map' feature
+* 'Run map' now works when the map is unsaved (the current map is saved to sladetemp.wad and added to the list of open wads temporarily)
+* Pixels of palette entry 240 are no longer transparent in sprites (health bonus sprites don't have holes now)
++ Added rotate feature (not 100% accurate, but it'll do :P)
+
+[06/03/06]
++ Current grid size is now shown in the status bar
+
+[04/03/06]
+~ The hilight is now locked while the delete_item key is pressed
++ Added an undo point before stitching vertices after moving them (only while in vertices mode though)
++ Line lengths are now shown when moving either vertices or lines
++ Added tab to prefs dialog to setup executable paths
++ Wad files passed as parameters are now loaded on startup
+* SLADE no longer crashes on startup when used for 'open with' or when a file is dragged onto it in Explorer
++ Added 'run map' command
++ Paths to the node builders are now configurable
++ Paths to glbsp and acc are now configurable
+
+[02/03/06]
+~ 3d mode things are now reset when nodes rebuilt
+
+[01/03/06]
++ Added 'flip line' to line context menu
+
+[24/02/06]
++ Added ability to define default door and doortrack textures (used for the 'create door' function)
++ Added a 'theme' sidebar
++ Added controls to toggle the sidebar
++ Added controls to reset x and y offsets separately in 3d mode
+
+[23/02/06]
+~ Line drawing controls now configurable (ldraw_drawpoint, ldraw_cancelpoint, ldraw_nearestvert)
+~ View related keys now work while line drawing
++ Added a 'drawing options' sidebar, can be toggled in the view menu
+~ Increased the accuracy of circle drawing
++ Added a 'tip of the day' feature. Not many tips yet, but I'll add to them whenever I think of one :P
++ Extended room painting functionality to flats, now it'll paint the texture to and adjacent floors/ceilings at the same height as the hilighted flat
++ Added a new control, 'change_3d_tex_paint', which browses for a texture then paints the room with it
+
+[22/02/06]
++ Added an option the the rectangle draw function to force a square
++ Started on code for ellipse/circle drawing ;) It's in, just have to create a new 'draw options' dialog now
++ Added 'edit_createitem2' control: in vertices mode this acts like pressing shift+insert in DEU/DETH, in lines mode it is the same as edit_createitem, and in things mode it pops up the thing type selection dialog and creates a thing of the selected type
++ Added 'insert thing' option to the thing context menu (no type submenus unfortunately, since it's pretty much impossible to do with the wxwidgets menu system :/)
++ Added thing context menu (only 'properties' for now, eventually I'll add 'insert thing' with a type submenu or something)
++ Added 'properties' options to line and sector context menus
+~ Item hilight is no longer drawn while moving items
+~ Doubled the maximum mouse speed for the slider in the 3d mode preferences dialog
+~ Selecting a different control from the input dialog now resets the 'set/accept/default/cancel' etc buttons
+* Sloped floors/ceilings who's parent sectors had equal floor & ceiling heights weren't drawn
++ Added support for HIRESTEX remaps
+* Re-enabled support for HIRESTEX textures
+
+[21/02/06]
+~ Disabled XP theme background gradients for tabs, since some winxp skins don't seem to like it (ie my favourite one :P)
+
+[20/02/06] * First changelog entry for new wxWidgets version (v1.1+)
+* Fixed a crash when previewing a map in a recently saved/modified wadfile (lump offsets needed reloading after node build)
+~ Map is now 'cleaned' upon saving (Removes free vertices, unused sectors, unused sides and zero-length lines)
++ Added 'remove unused sidedefs' function to the Checks menu
+* Replacement flats from opened pwads weren't replacing previously loaded flats
+~ When a vertex is inserted it is now automatically hilighted
+
+' Thought I'd fire up the ol' changelog again :P Here's a general list of changes since the last entry:
+' ~ Moved UI to wxWidgets, which looks much better in Windows while keeping cross-platform capability
+' + Map preview in the wad manager
+' ~ Improvements to the args editing UI stuff
+' + Option to scale text messages in 3d mode
+' ~ Improved hilight lines in 3d mode
+' + Context menus in line and sector edit mode (pops up the edit->line or edit->sector menus. Right click by default)
+' + Middle click to snap to the nearest vertex in line draw mode
+' + Mouse wheel is now configurable and usable for 3d mode controls
+' + Line and sector specials are now shown on their respective edit dialogs
+' ~ Thing and line flags are now defined in game configurations instead of being hardcoded
+' * Page Up/Down keys now work in the texture browser
+' ~ Greatly reduced loading time, textures are no longer all loaded at startup
+' * Tab and Return keys now work in the input preferences dialog
+' + Simple 'create sector' function (doesn't work in all situations though)
+' ~ Hexen-format line and thing information is shown on the infobar (args etc)
+' + 'Light gradient' function
+' + Added ability to set a 'background texture' in 2d mode, useful for aligning map architecture to flat textures
+' * Thing args are now saved properly when changed
+' + Added back the 'Checks' menu
+
+[15/12/05] * Last GTK-SLADE changes (v1.02)
+~ Arg type dialog now creates multiple columns if there are more than 15 values (needed for the long spawn ID list)
+~ Updated zdoom config with spawn IDs
+* Tagged sector/line pairs now work with hexen-format maps
++ Added a key shortcut to correct a line's sector references (ctrl+shift+s by default)
+
+[14/12/05]
+* Selecting sectors with the selection box would select single sectors multiple times (the selected items array should never have duplicates)
+* Thing Z height wasn't initialised in the thine edit dialog (so editing a thing with an existing z height reset it to 0)
+
+[12/12/05]
++ Added cvar 'reopen_wads', when true any wads that are open when SLADE is closed will be reopened next time SLADE is run
+* Thing quick angle selection control now only works in things mode (dragging middle click could cause a crash when not in things mode)
+* 'Create Door' in zdoom/hexen mode now sets the repeatable flag and sets the trigger to 'player uses'
+
+[07/12/05]
+* Fixed a problem with remove_unused_verts that could cause more than just the unused vertices to be deleted :P
+
+[28/11/05]
++ Added copy/paste sidedef data in 3d mode
++ Added sort by usage frequency for the texture browser (browser_sort cvar, 0: alphabetic, 1: usage freq)
++ Updated the input preferences dialog for the new system
+~ 'Floor Boxes' for hanging things in 3d mode are now drawn on the ceiling
++ Mouse buttons are now configurable ;)
+~ Changed how key modifiers are handled ready for adding mouse buttons to the input system
+* Line drawing 'over' vertices now works correctly (draw points are added at vertices)
++ Added input controls to increase/decrease sector(s) light level in 2d mode
+* The map wasn't redrawn when changing the edit mode using the "change_mode" key
+
+[26/11/05]
++ Added a snap to grid toggle
++ Added a simple status bar
+* Fixed a few issues with the splash window at startup
+~ The splash window is now destroyed when closed rather than hidden
+
+[24/11/05]
+~ Console and about dialog now show the correct versions :P
++ Mouse scroll to zoom in and out
++ Window properties are now saved to slade.cfg
+* The map wasn't being redrawn properly when the editor window was resized
++ Added ability to set the resolution for 3d mode (windows only for now)
+
+[23/11/05]
+* Fixed the gtk warnings when opening dialogs that had texture boxes
+* Added checks so that flats can't be selected from the wrong side
+~ Wads are now reloaded every time the wad manager is opened in case an external program has modified them
++ Line merging now works much better, still a few problems with it though
++ Copy+Paste works with sectors and lines (I don't see any point in being able to copy+paste vertices)
++ Added a key to cancel a paste (Escape by default)
++ Added simple copy/paste (things only so far)
+
+[22/11/05]
+* Fixed some problems with upper/lower textures within sloped sectors
++ Added functionality to the 'New Map' button on the wad manager window
+* Sometimes the map/grid lists wouldn't update correctly (casing them to disappear at certain times)
+* PNG files missing an alpha channel wouldn't load correctly
+* Starting 3d mode with no map open would crash
++ Added option to invert the mouse Y axis in 3d mode
++ Gravity in 3d mode is now toggleable
+
+[21/11/05]
+~ A message is now shown if a hexen format map is loaded when a non-hexen format game is selected
+* Textures weren't reloading properly (I wasn't clearing the PNAMES data)
+~ Greatly improved map loading speed (especially for large maps)
+* Things in 3d mode could be drawn wrong when translucent walls were in view
+* Fixed a few things with mixing flats/textures
+~ Right clicking no longer begins an item move (it doesn't start until the mouse is moved while right click is held)
++ Added 'Correct Sector References' to the edit->line menu
++ Added 3d mode options to the preferences dialog
+~ Sprites are no longer 'stretched' when allow_np2_tex is off
++ Added exit/close confirmation when there are unsaved changes
+~ Changed how map changes are handled (now moving a thing doesn't require the gl nodes to be rebuilt etc etc)
++ Added search to texture browser
+
+[19/11/05]
++ Texture browser can now be navigated with the arrow keys
++ Added texture paint function (shift+p by default, instead of the old shift+click)
++ Missing textures ("-") are now a blue/white checkerboard, invalid textures are the old red/black
++ Opening a recent wad will move it to the top of the list
++ New wads created are now added to the recent wads list
++ Added 'Align X' menu command (aligns the selected lines in selection order, reguardless of textures etc)
++ Added auto x-alignment feature to 3d mode
++ Added line trigger selection to line edit dialog
++ Added thing boxes and editing in 3d mode
+
+[18/11/05]
++ Things are now drawn in 3d mode (no bounding boxes or editing yet though)
+
+[16/11/05]
+* Wad manager window is now centered
+* Maps with over 32767 sidedefs no longer crash SLADE
++ Added some checks to prevent crashes if map data is corrupted
++ Added 'recent wads' list to wad manager window
+
+[14/11/05]
+* Texture boxes on the line info bar weren't cleared if their side didn't exist
++ Added most of the old 3d editing features (except for the automatic texture alignment and 'paint texture' features, they need a rewrite)
+
+[13/11/05]
++ Added wall & flat hilighting, ready for 3d editing
+~ Changed the way line data is setup in 3d mode to make line hilighting (for 3d editing) easier
+
+[10/11/05]
++ Added slopes stuff to 3d mode
++ Binds are now saved to slade.cfg
++ Added input configuration to the preferences dialog
+
+[09/11/05]
++ Added 'splash' command to the console, initially for testing, but added some fun stuff :P
+* Hopefully fixed 3d mode flickering, again :P
++ Added a proper splash screen (instead of just popping up the console like before)
+' Moved over to VC++ 2005 Express, now intellisense works with GTK. No more constantly checking the API docs ;)
+
+[07/11/05]
+* Right clicking a texture box on the side edit dialog no longer clears the texture
++ Added 'sector reference' entry to the side edit dialog
+* X and Y offset entry boxes weren't setup properly on the side edit dialog
+
+[06/11/05]
+~ Moved game iwads out of the game configurations and into their own section in slade.cfg. (If a game's IWAD isn't specified, the user is asked to browse for it)
++ 3d Mode is now fully textured ;)
+
+[02/11/05]
++ Flats are now rendered, I also have everything ready for slopes again
++ Added back the bsp stuff from slade, and _hopefully_ also fixed that 'flickering' bug
+
+[31/10/05]
++ 3d mode movement controls added
++ Basic untextured walls are now drawn in 3d mode ;)
+
+[27/10/05]
+* Fixed the 'notex' texture showing up all white
++ Added sector editing functions (stuff in the edit->sector menu: join, merge, create door, create stairs)
+
+[21/10/05]
++ Added a functional scripts editor (no hilighting or anything fancy yet, though)
++ SCRIPTS and BEHAVIOR lumps are no longer overwritten when saving a map that already had them
+
+[20/10/05]
++ Added the up and down keys to the console window entry to cycle through previously entered commands
++ Added a z height entry to the thing edit dialog (totally forgot about this before :P)
+* Fixed an error in the map saving that caused thing args to be saved wrong
++ Added save/save as, which officially makes it a (basic) fully-functional editor ;)
++ Finished the sector edit dialog (including boom generalized sector specials)
++ Implemented the 'change' buttons on the arg editor
++ Sector edit dialog is mostly finished (only need to add special selection and generalized flags)
++ Sector specials are loaded from game configurations and displayed on the sector info bar
+
+[19/10/05]
++ Started on the sector edit dialog
++ Added arg editing to the line and thing edit dialogs (the 'change' buttons aren't implemented yet though)
++ Arg types are now read from game configurations
+* Fixed crash when clicking in blank space in the texture browser
++ Added tex_filter cvar to control texture filtering
++ Added the 'visual' tab to the preferences dialog
+
+[18/10/05]
++ Valid map names are now read from game configurations (if defined)
++ Clicking on the sprite image in the thing edit dialog now brings up the thing browser, so it's consistent with the line edit dialog (clicking the textures opens the texture browser)
++ Texture browser now scrolls to the currently hilighted texture when appropriate
+* Fixed a possible crash on undo
++ Re-added quick thing angle selection (hold and drag the middle mouse button)
++ Added double right click in the editor window to edit an item
++ Double-clicking a texture in the browser now selects that texture
+~ Changed to GTK-2.8, now that there is finally a gladewin32 gtk2.8 package
++ Added cvar 'allow_np2_tex'. If set to false, non-power-of-two textures will be resized. Should be set to true only if the video card supports opengl 2.0.
+
+[17/10/05]
++ Added TID and action special selection to the thing edit dialog
++ Re-added drawing things as sprites on the 2d editor (cvar thing_sprites)
++ Mouse scroll wheel now works in the texture browser
++ Added thing type and angle selection to the thing edit dialog (including thing browser)
++ Added action special selection dialog
++ Texture names are now shown in the texture browser
+
+[16/10/05]
++ Defaults are now read from game configurations again (something I forgot to do before)
++ Added in the old text drawing code
++ Textures can now be selected from the texture browser (mouse only for now)
+' Got a nice new 19" LCD monitor after my old 17" CRT died ;)
+
+[14/10/05]
++ The texture browser is up, can't do anything but view the textures for now.
+~ Changed the texture system to use opengl textures instead of pixbufs, since they were proving too slow for the texture browser.
+
+[07/10/05]
++ Started on the texture browser
++ Started on the sidedef part of the line edit dialog
+
+[06/10/05]
+* Fixed crash when creating a new thing (wasn't updating it's thing definition)
+~ Replaced all the images on the info bar with my new tex_box_t structs. Makes things much easier (from a programming perspective :P)
+
+[05/10/05]
++ Started on thing edit dialog
+
+[02/10/05]
+~ Changed default interpolation to bilinear
+* Transparency now loads correctly (I was setting the default palette entry to 0 instead of 247)
++ Finished the line info bar
+
+[01/10/05]
++ Added borders and backgrounds for textures on the info bar
++ Added thing types and sprites to thing info bar
++ Thing types are now loaded from game configurations
++ Action specials are now loaded from game configurations
++ Added ability to create and save colour configurations
++ Added a 'preferences' dialog, and merged the colour configuration dialog into it
+
+[30/09/05]
++ Added flat images to the sector info bar
++ Flats are now loaded
++ Added a progress bar to the console when loading textures
+* Textures on the line info bar are now scaled correctly (probably a bit small for my liking though, but theres not much that can be done about that)
+* Fixed texture loading stuff, now they are loaded on-demand.
++ Added basic texture loading. For now all textures are loaded as pixbufs. I can't quite figure out how to generate them on the fly (which is plenty fast enough) without it chewing up ram like nothing because the generated pixbufs aren't being deleted. It's times like these i'm beginning to regret moving away from gtkmm and it's nice memory management :P
++ Finished up the wad manager window, it's now (nearly) fully functional.
+~ Changed the editor window to be the 'main' window (rather than the 'wad manager window' as its called now).
+
+[29/09/05]
++ Implemented tag hilighting. I had the colour there, but I haven't actually had the feature implemented ever :P (It was in the very first SLADE, but I never re-implemented it after the rewrite post-0.1)
++ Added a colour configuration dialog, which mostly works except for creating/saving new schemes. Couple other problems with it too I need to sort out.
+~ Reworked the colour configurations a bit (now they are in seperate files rather than one)
+
+[28/09/05]
+~ Converted a bunch of ints to doubles. Now working at very high zoom levels is much more accurate
+
+[27/09/05]
++ Added the rest of the infobar stuff (minus stuff that needs textures/game configs)
++ Added 'blend' variable to rgba_t, now blend modes can be specified for colour config colours:
+	-1 = doesn't matter, 0 = normal, 1 = additive
++ Basic line information shows up (minus the special name and side info)
++ Colour configuration can be changed via the console
++ Added back the SLADE colour configurations
++ The main linedef edit dialog works now (except 'change special' which needs game configs)
++ Implemented basic thing drawing (grey squares until I get game configs and textures loading)
++ Added a menu and toolbar to the editor window, with some nice icons I made ;)
+~ Moved back to GTK 2.6 until there is a decent 2.8 win32 port (the official one has much too small fonts)
+* Fixed a linux crash in setup_game_combo
+
+[22/09/05]
++ Added console command parsing. Now it's just as functional as the original SLADE 3d mode console ;)
++ Added a function to wait for all gtk events, needed for the console and eventually for the splash screen and any progress bars.
