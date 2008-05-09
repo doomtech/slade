@@ -7,6 +7,8 @@ class MainApp : public wxApp
 public:
 	virtual bool OnInit();
 	virtual int OnExit();
+
+	void initLogFile();
 };
 
 #endif //__MAINAPP_H__

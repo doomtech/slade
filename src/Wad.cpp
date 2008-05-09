@@ -1,6 +1,6 @@
 
 /*******************************************************************
- * SLADE - It's a Map Editor
+ * SLADE - It's a Doom Editor
  * Copyright (C) 2008 Simon Judd
  * 
  * Email:       veilofsorrow@gmail.com
@@ -30,6 +30,7 @@
 #include "Main.h"
 #include "Wad.h"
 #include "Lump.h"
+#include <wx/log.h>
 
 /* Wad::Wad
  * Wad class constructor
@@ -57,7 +58,10 @@ bool Wad::openFile(string filename_)
 
 	// Check if opening the file failed
 	if (!fp)
+	{
+		wxLogMessage(_T("Wad::openFile: Failed to open wadfile %s"), filename_);
 		return false;
+	}
 
 	// Get file size
 	long filesize = 0;
@@ -79,7 +83,10 @@ bool Wad::openFile(string filename_)
 
 	// Check the header
 	if (type[1] != 'W' || type[2] != 'A' || type[3] != 'D')
+	{
+		wxLogMessage(_T("Wad::openFile: File %s has invalid header"), filename_);
 		return false;
+	}
 
 	// Read the directory
 	fseek(fp, dir_offset, SEEK_SET);
@@ -103,7 +110,7 @@ bool Wad::openFile(string filename_)
 		// the wadfile is invalid
 		if (offset + size > (DWORD)filesize)
 		{
-			//message_box(_T("Not a valid Doom wad file!"), _T("Error"));
+			wxLogMessage(_T("Wad::openFile: File %s is invalid or corrupt"), filename_);
 			return false;
 		}
 
@@ -115,6 +122,47 @@ bool Wad::openFile(string filename_)
 	}
 
 	// Close the file
+	fclose(fp);
+
+	filename = filename_;
+
+	return true;
+}
+
+/* Wad::loadLump
+ * Loads a lump's data from the wadfile
+ * Returns true if successful, false otherwise
+ *******************************************************************/
+bool Wad::loadLump(Lump* lump)
+{
+	// Check that the lump belongs to this wadfile
+	if (lump->getParent() != this)
+	{
+		wxLogMessage(_T("Wad::LoadLump: Lump %s attempting to load data from wrong parent!"), lump->getName());
+		return false;
+	}
+
+	// Open wadfile
+	FILE *fp = fopen(chr(filename), "rb");
+
+	// Check if opening the file failed
+	if (!fp)
+	{
+		wxLogMessage(_T("Wad::LoadLump: Failed to open wadfile %s"), filename);
+		return false;
+	}
+
+	// Allocate memory for lump data
+	BYTE* data = new BYTE[lump->getSize()];
+
+	// Seek to lump offset in file and read it in
+	fseek(fp, lump->getOffset(), SEEK_SET);
+	fread(data, lump->getSize(), 1, fp);
+
+	// Set lump data to newly allocated memory
+	lump->setData(data);
+
+	// Close file
 	fclose(fp);
 
 	return true;

@@ -5,8 +5,9 @@
  * 
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
- * Filename:    MainApp.cpp
- * Description: MainApp class functions.
+ * Filename:    WadManager.cpp
+ * Description: WadManager class. Manages all open Wadfiles and
+ *              the interactions between them.
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -28,46 +29,20 @@
  * INCLUDES
  *******************************************************************/
 #include "Main.h"
-#include "WxStuff.h"
-#include "MainApp.h"
-#include "WxStuff.h"
-#include "MainWindow.h"
+#include "WadManager.h"
+#include "Wad.h"
+#include "Lump.h"
 
-IMPLEMENT_APP(MainApp)
-
-/* MainApp::OnInit
- * Application initialization, run when program is started
+/* WadManager::WadManager
+ * WadManager class constructor
  *******************************************************************/
-bool MainApp::OnInit()
+WadManager::WadManager()
 {
-	// Init logfile
-	initLogFile();
-
-	// Create a MainWindow and show it
-	MainWindow *heh = new MainWindow();
-	heh->Show(true);
-
-	return true;
 }
 
-/* MainApp::OnInit
- * Application shutdown, run when program is closed
+/* WadManager::~WadManager
+ * WadManager class destructor
  *******************************************************************/
-int MainApp::OnExit()
+WadManager::~WadManager()
 {
-	return 0;
-}
-
-/* MainApp::initLogFile
- * Sets up the SLADE log file
- *******************************************************************/
-void MainApp::initLogFile()
-{
-	// Set wxLog target
-	wxLog::SetActiveTarget(new wxLogStderr(fopen("slade.log", "wt")));
-
-	// Write logfile header
-	wxLogMessage(_T("SLADE - It's a Doom Editor"));
-	wxLogMessage(_T("Written by Simon Judd, 2008"));
-	wxLogMessage(_T("---------------------------"));
 }

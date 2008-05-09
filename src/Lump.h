@@ -15,6 +15,7 @@ private:
 	DWORD			offset;
 	BYTE*			data;
 	DWORD			size;
+	bool			data_loaded;
 
 	PropertyList	ex_props;
 
@@ -27,13 +28,14 @@ public:
 	string		getName() { return name; }
 	DWORD		getOffset() { return offset; }
 	DWORD		getSize() { return size; }
-	BYTE*		getData() { return data; }
+	BYTE*		getData(bool allow_load = true);
 
 	// Modifiers
 	void		setParent(Wad* parent_) { parent = parent_; }
 	void		setName(string name_) { name = name_; }
 	void		setOffset(DWORD offset_) { offset = offset_; }
 	void		setSize(DWORD size_) { size = size_; }
+	void		setData(BYTE* data_) { data = data_; }
 
 
 	// Extra properties stuff

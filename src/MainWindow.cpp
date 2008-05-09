@@ -1,6 +1,6 @@
 
 /*******************************************************************
- * SLADE - It's a Map Editor
+ * SLADE - It's a Doom Editor
  * Copyright (C) 2008 Simon Judd
  * 
  * Email:       veilofsorrow@gmail.com

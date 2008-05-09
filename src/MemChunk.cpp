@@ -1,6 +1,6 @@
 
 /*******************************************************************
- * SLADE - It's a Map Editor
+ * SLADE - It's a Doom Editor
  * Copyright (C) 2008 Simon Judd
  * 
  * Email:       veilofsorrow@gmail.com
@@ -30,6 +30,7 @@
  *******************************************************************/
 #include "Main.h"
 #include "MemChunk.h"
+#include <wx/log.h>
 
 
 /* MemChunk::MemChunk
@@ -93,7 +94,10 @@ bool MemChunk::reSize(DWORD new_size, bool preserve_data)
 {
 	// Check for invalid new size
 	if (new_size == 0)
+	{
+		wxLogMessage(_T("MemChunk::reSize: new_size cannot be 0"));
 		return false;
+	}
 
 	// Allocate new chunk
 	BYTE* new_data = new BYTE[new_size];
@@ -131,7 +135,10 @@ bool MemChunk::loadFile(string filename, DWORD offset, DWORD len)
 
 	// Return false if file open failed
 	if (!fp)
+	{
+		wxLogMessage(_T("MemChunk::loadFile: Unable to open file %s"), filename);
 		return false;
+	}
 
 	// Clear current data if it exists
 	clear();
@@ -167,7 +174,10 @@ bool MemChunk::loadMem(BYTE* start, DWORD len)
 {
 	// Check that length & data to be loaded are valid
 	if (len == 0 || !start)
+	{
+		wxLogMessage(_T("MemChunk::loadMem: Invalid data and/or length"));
 		return false;
+	}
 
 	// Clear current data if it exists
 	clear();

@@ -18,6 +18,7 @@ public:
 	~Wad();
 
 	virtual bool	openFile(string filename_);
+	virtual bool	loadLump(Lump* lump);
 };
 
 

@@ -1,6 +1,6 @@
 
 /*******************************************************************
- * SLADE - It's a Map Editor
+ * SLADE - It's a Doom Editor
  * Copyright (C) 2008 Simon Judd
  * 
  * Email:       veilofsorrow@gmail.com
@@ -29,6 +29,7 @@
  *******************************************************************/
 #include "Main.h"
 #include "Tokenizer.h"
+#include <wx/log.h>
 
 
 /* Tokenizer::Tokenizer
@@ -62,7 +63,10 @@ bool Tokenizer::openFile(string filename, DWORD offset, DWORD length)
 	FILE *fp = fopen(chr(filename), "rb");
 
 	if (!fp)
+	{
+		wxLogMessage(_T("Tokenizer::openFile: Unable to open file %s"), filename);
 		return false;
+	}
 
 	// Get file length
 	DWORD flen = 0;
@@ -93,7 +97,7 @@ bool Tokenizer::openFile(string filename, DWORD offset, DWORD length)
  *******************************************************************/
 bool Tokenizer::openString(string text, DWORD offset, DWORD length)
 {
-	// If length isn't specified or exceeds the string length,
+	// If length isn't specified or exceeds the string's length,
 	// only copy to the end of the string
 	if (offset + length > (DWORD)text.length() || length == 0)
 		length = (DWORD)text.length() - offset;
@@ -116,7 +120,10 @@ bool Tokenizer::openMem(char* mem, DWORD length)
 {
 	// Length must be specified
 	if (length == 0)
+	{
+		wxLogMessage(_T("Tokenizer::openMem: length not specified"));
 		return false;
+	}
 
 	// Setup variables & allocate memory
 	size = length;

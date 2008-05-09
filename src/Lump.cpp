@@ -1,6 +1,6 @@
 
 /*******************************************************************
- * SLADE - It's a Map Editor
+ * SLADE - It's a Doom Editor
  * Copyright (C) 2008 Simon Judd
  * 
  * Email:       veilofsorrow@gmail.com
@@ -28,6 +28,7 @@
  * INCLUDES
  *******************************************************************/
 #include "Main.h"
+#include "Wad.h"
 #include "Lump.h"
 
 /* Lump::Lump
@@ -38,6 +39,10 @@ Lump::Lump(Wad* parent_)
 	// Init variables
 	name = _T("");
 	parent = parent_;
+	data = NULL;
+	size = 0;
+	offset = 0;
+	data_loaded = false;
 }
 
 /* Lump::~Lump
@@ -47,7 +52,18 @@ Lump::~Lump()
 {
 }
 
+/* Lump::getData
+ * Returns a pointer to the lump data. If no lump data exists and
+ * allow_load is true, lump data will be loaded from it's
+ * parent wadfile (if it exists)
+ *******************************************************************/
+BYTE* Lump::getData(bool allow_load)
+{
+	if (allow_load && parent && !data_loaded)
+		parent->loadLump(this);
 
+	return data;
+}
 
 /* Lump::hasExProp
  * Checks if the lump has the specified extra property value
