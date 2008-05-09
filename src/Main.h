@@ -7,9 +7,10 @@
 typedef wxString string;
 #define s_fmt wxString::Format
 
-// the temp object was destroyed before it was used when this was a function
+// macro to convert a wxString to a c string
 #define chr(s) ((const char*)(s).ToAscii())
 
+// Vectors
 #include <vector>
 using std::vector;
 
@@ -24,5 +25,8 @@ typedef unsigned long DWORD;
 typedef uint32_t DWORD;
 #endif
 #endif
+
+// Global internal includes
+#include "MemChunk.h"
 
 #endif //__MAIN_H__

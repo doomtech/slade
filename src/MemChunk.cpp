@@ -6,8 +6,8 @@
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
  * Filename:    MemChunk.cpp
- * Description: MemChunk class, data structure for storing/handling
- *              arbitrary sized chunks of memory.
+ * Description: MemChunk class, a simple data structure for
+ *              storing/handling arbitrary sized chunks of memory.
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -30,6 +30,7 @@
  *******************************************************************/
 #include "Main.h"
 #include "MemChunk.h"
+
 
 /* MemChunk::MemChunk
  * MemChunk class constructor
@@ -65,22 +66,6 @@ bool MemChunk::hasData()
 		return true;
 	else
 		return false;
-}
-
-/* MemChunk::getData
- * Returns a pointer to the start of the memory chunk
- *******************************************************************/
-BYTE* MemChunk::getData()
-{
-	return data;
-}
-
-/* MemChunk::getSize
- * Returns the size of the memory chunk
- *******************************************************************/
-DWORD MemChunk::getSize()
-{
-	return size;
 }
 
 /* MemChunk::clear
@@ -153,15 +138,9 @@ bool MemChunk::loadFile(string filename, DWORD offset, DWORD len)
 
 	// Get file length
 	DWORD flen = 0;
-	while (1)
-	{
-		getc(fp);
-
-		if (feof(fp))
-			break;
-		else
-			flen++;
-	}
+	fseek(fp, 0, SEEK_END);
+	flen = (DWORD)ftell(fp);
+	fseek(fp, 0, SEEK_SET);
 
 	// If length isn't specified or exceeds the file length,
 	// only read to the end of the file

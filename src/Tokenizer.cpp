@@ -66,15 +66,9 @@ bool Tokenizer::openFile(string filename, DWORD offset, DWORD length)
 
 	// Get file length
 	DWORD flen = 0;
-	while (1)
-	{
-		getc(fp);
-
-		if (feof(fp))
-			break;
-		else
-			flen++;
-	}
+	fseek(fp, 0, SEEK_END);
+	flen = (DWORD)ftell(fp);
+	fseek(fp, 0, SEEK_SET);
 
 	// If length isn't specified or exceeds the file length,
 	// only read to the end of the file
