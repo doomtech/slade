@@ -36,6 +36,7 @@
  *******************************************************************/
 Tokenizer::Tokenizer(bool c_comments, bool h_comments)
 {
+	// Initialize variables
 	current = NULL;
 	start = NULL;
 	size = 0;
@@ -48,6 +49,7 @@ Tokenizer::Tokenizer(bool c_comments, bool h_comments)
  *******************************************************************/
 Tokenizer::~Tokenizer()
 {
+	// Free memory if used
 	if (start) free(start);
 }
 
@@ -56,28 +58,35 @@ Tokenizer::~Tokenizer()
  *******************************************************************/
 bool Tokenizer::openFile(string filename, DWORD offset, DWORD length)
 {
+	// Open the file
 	FILE *fp = fopen(chr(filename), "rb");
 
 	if (!fp)
 		return false;
 
-	if (length == 0)
+	// Get file length
+	DWORD flen = 0;
+	while (1)
 	{
-		while (1)
-		{
-			getc(fp);
+		getc(fp);
 
-			if (feof(fp))
-				break;
-			else
-				length++;
-		}
+		if (feof(fp))
+			break;
+		else
+			flen++;
 	}
 
+	// If length isn't specified or exceeds the file length,
+	// only read to the end of the file
+	if (offset + length > flen || length == 0)
+		length = flen - offset;
+
+	// Setup variables & allocate memory
 	size = length;
 	position = 0;
 	start = current = (char *)malloc(size);
 
+	// Read the file portion
 	fseek(fp, offset, SEEK_SET);
 	fread(start, 1, size, fp);
 	fclose(fp);
@@ -90,13 +99,18 @@ bool Tokenizer::openFile(string filename, DWORD offset, DWORD length)
  *******************************************************************/
 bool Tokenizer::openString(string text, DWORD offset, DWORD length)
 {
-	if (length == 0)
-		length = (DWORD)text.length();
+	// If length isn't specified or exceeds the string length,
+	// only copy to the end of the string
+	if (offset + length > (DWORD)text.length() || length == 0)
+		length = (DWORD)text.length() - offset;
 
+	// Setup variables & allocate memory
 	size = length;
 	position = 0;
 	start = current = (char *)malloc(size);
-	memcpy(start, text.c_str(), size);
+
+	// Copy the string portion
+	memcpy(start, text.c_str() + offset, size);
 
 	return true;
 }
@@ -106,12 +120,16 @@ bool Tokenizer::openString(string text, DWORD offset, DWORD length)
  *******************************************************************/
 bool Tokenizer::openMem(char* mem, DWORD length)
 {
-	if (length <= 0)
+	// Length must be specified
+	if (length == 0)
 		return false;
 
+	// Setup variables & allocate memory
 	size = length;
 	position = 0;
 	start = current = (char*)malloc(size);
+
+	// Copy the data
 	memcpy(start, mem, size);
 
 	return true;
@@ -122,6 +140,7 @@ bool Tokenizer::openMem(char* mem, DWORD length)
  *******************************************************************/
 bool Tokenizer::isWhitespace(char p)
 {
+	// Whitespace is either a newline, tab character or space
 	if (p == '\n' || p == 13 || p == ' ' || p == '\t')
 		return true;
 	else
@@ -135,11 +154,13 @@ bool Tokenizer::incrementCurrent()
 {
 	if (position >= size - 1)
 	{
+		// At end of text, return false
 		position = size;
 		return false;
 	}
 	else
 	{
+		// Increment position & current pointer
 		position++;
 		current++;
 		return true;
@@ -151,12 +172,14 @@ bool Tokenizer::incrementCurrent()
  *******************************************************************/
 void Tokenizer::skipLineComment()
 {
+	// Increment position until a newline or end is found
 	while (current[0] != '\n' && current[0] != 13)
 	{
 		if (!incrementCurrent())
 			return;
 	}
 
+	// Skip the newline character also
 	incrementCurrent();
 }
 
@@ -165,6 +188,7 @@ void Tokenizer::skipLineComment()
  *******************************************************************/
 void Tokenizer::skipMultilineComment()
 {
+	// Increment position until '*/' or end is found
 	while (!(current[0] == '*' && current[1] == '/'))
 	{
 		if (!incrementCurrent())
@@ -177,7 +201,8 @@ void Tokenizer::skipMultilineComment()
 }
 
 /* Tokenizer::getToken
- * Gets the next 'token' from the text & moves past it
+ * Gets the next 'token' from the text & moves past it, returns
+ * a blank string if we're at the end of the text
  *******************************************************************/
 string Tokenizer::getToken()
 {
@@ -192,11 +217,9 @@ string Tokenizer::getToken()
 		// Increment pointer until non-whitespace is found
 		while (isWhitespace(current[0]))
 		{
+			// Return if end of text found
 			if (!incrementCurrent())
-			{
-				ret_str = _T("!END");
 				return ret_str;
-			}
 		}
 
 		// Skip C-style comments
@@ -229,14 +252,11 @@ string Tokenizer::getToken()
 
 		// Check for end of text
 		if (position == size)
-		{
-			ret_str = _T("!END");
 			return ret_str;
-		}
 	}
 
-	// Check for literal string (enclosed with "")
-	if (current[0] == '\"')
+	// Now read the token	
+	if (current[0] == '\"') // If we have a literal string (enclosed with "")
 	{
 		// Skip opening "
 		incrementCurrent();
@@ -258,13 +278,16 @@ string Tokenizer::getToken()
 		// Read token (don't include whitespace)
 		while (!isWhitespace(current[0]))
 		{
+			// Add current character to the token
 			ret_str += current[0];
 
+			// Return if end of text found
 			if (!incrementCurrent())
 				return ret_str;
 		}
 	}
 
+	// Return the token
 	return ret_str;
 }
 
@@ -273,16 +296,18 @@ string Tokenizer::getToken()
  *******************************************************************/
 string Tokenizer::peekToken()
 {
-	string token;
-
+	// Backup current position
 	char* c = current;
 	DWORD p = position;
 
-	token = getToken();
+	// Read the next token
+	string token = getToken();
 
+	// Go back to original position
 	current = c;
 	position = p;
 
+	// Return the token
 	return token;
 }
 
@@ -291,7 +316,7 @@ string Tokenizer::peekToken()
  *******************************************************************/
 bool Tokenizer::checkToken(string check)
 {
-	return getToken() == check;
+	return !!(getToken().CompareTo(check));
 }
 
 /* Tokenizer::getInteger
@@ -299,8 +324,10 @@ bool Tokenizer::checkToken(string check)
  *******************************************************************/
 int Tokenizer::getInteger()
 {
+	// Get token
 	string token = getToken();
 
+	// Return integer value
 	return atoi(chr(token));
 }
 
@@ -309,31 +336,39 @@ int Tokenizer::getInteger()
  *******************************************************************/
 float Tokenizer::getFloat()
 {
+	// Get token
 	string token = getToken();
 
+	// Return float value
 	return (float)atof(chr(token));
 }
 
 /* Tokenizer::getDouble
- * Reads a token and returns it's double-precision
- * floating point value
+ * Reads a token and returns it's double-precision floating point
+ * value
  *******************************************************************/
 double Tokenizer::getDouble()
 {
+	// Get token
 	string token = getToken();
 
+	// Return double value
 	return atof(chr(token));
 }
 
 /* Tokenizer::getBool
- * Reads a token and returns it's boolean value
+ * Reads a token and returns it's boolean value, anything except
+ * "0", "no", or "false" will return true
  *******************************************************************/
 bool Tokenizer::getBool()
 {
+	// Get token
 	string token = getToken();
 
+	// If the token is a string "no" or "false", the value is false
 	if (!stricmp(chr(token), "no") || !stricmp(chr(token), "false"))
 		return false;
 
+	// Returns true ("1") or false ("0")
 	return !!atoi(chr(token));
 }
