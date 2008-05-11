@@ -17,7 +17,7 @@ public:
 	Wad();
 	~Wad();
 
-	virtual bool	openFile(string filename_);
+	virtual bool	openFile(string filename);
 	virtual bool	loadLump(Lump* lump);
 };
 
@@ -30,7 +30,7 @@ public:
 	ZipWad();
 	~ZipWad();
 
-	bool	openFile(string filename_);
+	bool	openFile(string filename);
 };
 
 #endif //__WAD_H__

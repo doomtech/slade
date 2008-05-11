@@ -49,7 +49,7 @@ ZipWad::~ZipWad()
  * Reads a zip/pk3 from disk
  * Returns true if successful, false otherwise
  *******************************************************************/
-bool ZipWad::openFile(string filename_)
+bool ZipWad::openFile(string filename)
 {
 	return true;
 }

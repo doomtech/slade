@@ -9,7 +9,7 @@ private:
 	DWORD	size;
 
 public:
-	MemChunk(DWORD size_ = 0);
+	MemChunk(DWORD size = 0);
 	~MemChunk();
 
 	// Accessors

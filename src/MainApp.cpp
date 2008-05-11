@@ -30,8 +30,7 @@
 #include "Main.h"
 #include "WxStuff.h"
 #include "MainApp.h"
-#include "WxStuff.h"
-#include "MainWindow.h"
+#include "WadEditorWindow.h"
 
 IMPLEMENT_APP(MainApp)
 
@@ -43,8 +42,8 @@ bool MainApp::OnInit()
 	// Init logfile
 	initLogFile();
 
-	// Create a MainWindow and show it
-	MainWindow *heh = new MainWindow();
+	// Create a WadEditorWindow and show it
+	WadEditorWindow *heh = new WadEditorWindow();
 	heh->Show(true);
 
 	return true;

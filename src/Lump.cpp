@@ -38,7 +38,7 @@ Lump::Lump(Wad* parent_)
 {
 	// Init variables
 	name = _T("");
-	parent = parent_;
+	this->parent = parent;
 	data = NULL;
 	size = 0;
 	offset = 0;

@@ -187,18 +187,10 @@
 			<Filter
 				Name="Header Files"
 				>
-				<File
-					RelativePath=".\src\MainWindow.h"
-					>
-				</File>
 			</Filter>
 			<Filter
 				Name="Source Files"
 				>
-				<File
-					RelativePath=".\src\MainWindow.cpp"
-					>
-				</File>
 			</Filter>
 		</Filter>
 		<Filter
@@ -215,6 +207,10 @@
 				</File>
 				<File
 					RelativePath=".\src\MainApp.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\MemChunk.h"
 					>
 				</File>
 				<File
@@ -236,7 +232,79 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\MemChunk.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\Tokenizer.cpp"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="Wad"
+			>
+			<Filter
+				Name="Header Files"
+				>
+				<File
+					RelativePath=".\src\Lump.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Wad.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				>
+				<File
+					RelativePath=".\src\Lump.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Wad.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ZipWad.cpp"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="Wad Editor"
+			>
+			<Filter
+				Name="Header Files"
+				>
+				<File
+					RelativePath=".\src\LumpListPanel.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\WadEditorWindow.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\WadManager.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				>
+				<File
+					RelativePath=".\src\LumpListPanel.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\WadEditorWindow.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\WadManager.cpp"
 					>
 				</File>
 			</Filter>

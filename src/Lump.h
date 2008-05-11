@@ -20,7 +20,7 @@ private:
 	PropertyList	ex_props;
 
 public:
-	Lump(Wad* parent_ = NULL);
+	Lump(Wad* parent = NULL);
 	~Lump();
 
 	// Accessors

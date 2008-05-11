@@ -51,15 +51,15 @@ Wad::~Wad()
  * Reads a wadfile from disk
  * Returns true if successful, false otherwise
  *******************************************************************/
-bool Wad::openFile(string filename_)
+bool Wad::openFile(string filename)
 {
 	// Try to open the file
-	FILE *fp = fopen(chr(filename_), "rb");
+	FILE *fp = fopen(chr(filename), "rb");
 
 	// Check if opening the file failed
 	if (!fp)
 	{
-		wxLogMessage(_T("Wad::openFile: Failed to open wadfile %s"), filename_);
+		wxLogMessage(_T("Wad::openFile: Failed to open wadfile %s"), filename);
 		return false;
 	}
 
@@ -84,7 +84,7 @@ bool Wad::openFile(string filename_)
 	// Check the header
 	if (type[1] != 'W' || type[2] != 'A' || type[3] != 'D')
 	{
-		wxLogMessage(_T("Wad::openFile: File %s has invalid header"), filename_);
+		wxLogMessage(_T("Wad::openFile: File %s has invalid header"), filename);
 		return false;
 	}
 
@@ -110,7 +110,7 @@ bool Wad::openFile(string filename_)
 		// the wadfile is invalid
 		if (offset + size > (DWORD)filesize)
 		{
-			wxLogMessage(_T("Wad::openFile: File %s is invalid or corrupt"), filename_);
+			wxLogMessage(_T("Wad::openFile: File %s is invalid or corrupt"), filename);
 			return false;
 		}
 
@@ -124,7 +124,7 @@ bool Wad::openFile(string filename_)
 	// Close the file
 	fclose(fp);
 
-	filename = filename_;
+	this->filename = filename;
 
 	return true;
 }

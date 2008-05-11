@@ -36,10 +36,10 @@
 /* MemChunk::MemChunk
  * MemChunk class constructor
  *******************************************************************/
-MemChunk::MemChunk(DWORD size_)
+MemChunk::MemChunk(DWORD size)
 {
 	// Init variables
-	size = size_;
+	this->size = size;
 
 	// If a size is specified, allocate that much memory
 	if (size)
