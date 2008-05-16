@@ -5,8 +5,10 @@
  * 
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
- * Filename:    MainApp.cpp
- * Description: MainApp class functions.
+ * Filename:    WadPanel.cpp
+ * Description: WadPanel class. The base wxWidgets panel for wadfile
+ *              editing. One of these is opened in a tab for each
+ *              open wadfile.
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -29,48 +31,21 @@
  *******************************************************************/
 #include "Main.h"
 #include "WxStuff.h"
-#include "MainApp.h"
-#include "MainWindow.h"
-#include <wx/image.h>
+#include "WadPanel.h"
+#include "Wad.h"
+#include "Lump.h"
 
-IMPLEMENT_APP(MainApp)
-
-/* MainApp::OnInit
- * Application initialization, run when program is started
+/* WadPanel::WadPanel
+ * WadPanel class constructor
  *******************************************************************/
-bool MainApp::OnInit()
+WadPanel::WadPanel(wxWindow *parent)
+: wxPanel(parent, -1)
 {
-	// Init logfile
-	initLogFile();
-
-	// Load image handlers
-	wxImage::AddHandler(new wxPNGHandler);
-
-	// Create a WadEditorWindow and show it
-	MainWindow *heh = new MainWindow();
-	heh->Show(true);
-
-	return true;
 }
 
-/* MainApp::OnExit
- * Application shutdown, run when program is closed
+/* WadPanel::~WadPanel
+ * WadPanel class destructor
  *******************************************************************/
-int MainApp::OnExit()
+WadPanel::~WadPanel()
 {
-	return 0;
-}
-
-/* MainApp::initLogFile
- * Sets up the SLADE log file
- *******************************************************************/
-void MainApp::initLogFile()
-{
-	// Set wxLog target
-	wxLog::SetActiveTarget(new wxLogStderr(fopen("slade.log", "wt")));
-
-	// Write logfile header
-	wxLogMessage(_T("SLADE - It's a Doom Editor"));
-	wxLogMessage(_T("Written by Simon Judd, 2008"));
-	wxLogMessage(_T("---------------------------"));
 }

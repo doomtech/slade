@@ -5,8 +5,8 @@
  * 
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
- * Filename:    MainApp.cpp
- * Description: MainApp class functions.
+ * Filename:    LumpListPanel.cpp
+ * Description: LumpListPanel class (and related classes).
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -29,48 +29,42 @@
  *******************************************************************/
 #include "Main.h"
 #include "WxStuff.h"
-#include "MainApp.h"
-#include "MainWindow.h"
-#include <wx/image.h>
+#include "Wad.h"
+#include "LumpListPanel.h"
 
-IMPLEMENT_APP(MainApp)
 
-/* MainApp::OnInit
- * Application initialization, run when program is started
+/* LumpList::LumpList
+ * LumpList class constructor
  *******************************************************************/
-bool MainApp::OnInit()
+LumpList::LumpList(LumpListPanel *parent, int id)
+:	wxListCtrl(parent, id, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxLC_VRULES|wxLC_HRULES/*|wxLC_EDIT_LABELS*/)
 {
-	// Init logfile
-	initLogFile();
-
-	// Load image handlers
-	wxImage::AddHandler(new wxPNGHandler);
-
-	// Create a WadEditorWindow and show it
-	MainWindow *heh = new MainWindow();
-	heh->Show(true);
-
-	return true;
+	this->parent = parent;
 }
 
-/* MainApp::OnExit
- * Application shutdown, run when program is closed
+/* LumpList::~LumpList
+ * LumpList class destructor
  *******************************************************************/
-int MainApp::OnExit()
+LumpList::~LumpList()
 {
-	return 0;
 }
 
-/* MainApp::initLogFile
- * Sets up the SLADE log file
- *******************************************************************/
-void MainApp::initLogFile()
-{
-	// Set wxLog target
-	wxLog::SetActiveTarget(new wxLogStderr(fopen("slade.log", "wt")));
 
-	// Write logfile header
-	wxLogMessage(_T("SLADE - It's a Doom Editor"));
-	wxLogMessage(_T("Written by Simon Judd, 2008"));
-	wxLogMessage(_T("---------------------------"));
+
+
+/* LumpListPanel::LumpListPanel
+ * LumpListPanel class constructor
+ *******************************************************************/
+LumpListPanel::LumpListPanel(wxWindow *parent, int id, Wad* wad)
+:	wxPanel(parent, id)
+{
+	this->wad = wad;
+	lump_list = new LumpList(this, -1);
+}
+
+/* LumpListPanel::~LumpListPanel
+ * LumpListPanel class destructor
+ *******************************************************************/
+LumpListPanel::~LumpListPanel()
+{
 }

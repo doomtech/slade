@@ -5,8 +5,10 @@
  * 
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
- * Filename:    MainApp.cpp
- * Description: MainApp class functions.
+ * Filename:    WadPanel.cpp
+ * Description: WadManagerPanel class. Basically the UI for the
+ *              WadManager stuff, has a tree of all open wads and
+ *              basic wad management controls.
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -29,48 +31,30 @@
  *******************************************************************/
 #include "Main.h"
 #include "WxStuff.h"
-#include "MainApp.h"
-#include "MainWindow.h"
-#include <wx/image.h>
+#include "WadManagerPanel.h"
+#include "Wad.h"
+#include "Lump.h"
 
-IMPLEMENT_APP(MainApp)
-
-/* MainApp::OnInit
- * Application initialization, run when program is started
+/* WadManagerPanel::WadManagerPanel
+ * WadManagerPanel class constructor
  *******************************************************************/
-bool MainApp::OnInit()
+WadManagerPanel::WadManagerPanel(wxWindow *parent)
+: wxPanel(parent, -1)
 {
-	// Init logfile
-	initLogFile();
+	// Create main sizer
+	wxBoxSizer *vbox = new wxBoxSizer(wxVERTICAL);
+	SetSizer(vbox);
 
-	// Load image handlers
-	wxImage::AddHandler(new wxPNGHandler);
+	// Create/setup wad tree
+	tree_wadlist = new wxTreeCtrl(this, -1, wxDefaultPosition, wxDefaultSize);
+	vbox->Add(tree_wadlist, 1, wxEXPAND|wxALL, 4);
 
-	// Create a WadEditorWindow and show it
-	MainWindow *heh = new MainWindow();
-	heh->Show(true);
-
-	return true;
+	tree_wadlist->AddRoot(_T("Wads"));
 }
 
-/* MainApp::OnExit
- * Application shutdown, run when program is closed
+/* WadManagerPanel::~WadManagerPanel
+ * WadManagerPanel class destructor
  *******************************************************************/
-int MainApp::OnExit()
+WadManagerPanel::~WadManagerPanel()
 {
-	return 0;
-}
-
-/* MainApp::initLogFile
- * Sets up the SLADE log file
- *******************************************************************/
-void MainApp::initLogFile()
-{
-	// Set wxLog target
-	wxLog::SetActiveTarget(new wxLogStderr(fopen("slade.log", "wt")));
-
-	// Write logfile header
-	wxLogMessage(_T("SLADE - It's a Doom Editor"));
-	wxLogMessage(_T("Written by Simon Judd, 2008"));
-	wxLogMessage(_T("---------------------------"));
 }

@@ -6,7 +6,7 @@
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
  * Filename:    MainWindow.cpp
- * Description: MainWindow class functions.
+ * Description: MainWindow class, ie the main SLADE window
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -31,6 +31,7 @@
 #include "WxStuff.h"
 #include "MainWindow.h"
 #include <wx/aui/aui.h>
+#include <wx/html/htmlwin.h>
 
 
 /* MainWindow::MainWindow
@@ -40,6 +41,7 @@ MainWindow::MainWindow()
     : wxFrame((wxFrame *) NULL, -1, _T("SLADE"), wxPoint(0, 0), wxSize(800, 600))
 {
 	//setMockLayout();
+	setupLayout();
 }
 
 /* MainWindow::~MainWindow
@@ -49,12 +51,68 @@ MainWindow::~MainWindow()
 {
 }
 
+/* MainWindow::setupLayout
+ * Sets up the wxWidgets window layout
+ *******************************************************************/
+void MainWindow::setupLayout()
+{
+	// Create the wxAUI manager & related things
+	wxAuiManager *m_mgr = new wxAuiManager(this);
+	wxAuiPaneInfo p_inf;
+
+
+	// -- Menu bar --
+	wxMenuBar *menu = new wxMenuBar();
+
+	// File menu
+	wxMenu* fileMenu = new wxMenu(_T(""));
+    fileMenu->Append(-1, _("&Quit\tAlt-F4"), _("Quit SLADE"));
+    menu->Append(fileMenu, _("&File"));
+
+	// Set the menu
+	SetMenuBar(menu);
+
+
+	// -- Wad Manager Panel --
+	panel_wadmanager = new WadManagerPanel(this);
+
+	// Setup panel info & add panel
+	p_inf.DefaultPane();
+	p_inf.Left();
+	p_inf.BottomDockable(false);
+	p_inf.TopDockable(false);
+	p_inf.BestSize(192, 480);
+	p_inf.Caption(_T("Wad Manager"));
+	m_mgr->AddPane(panel_wadmanager, p_inf);
+
+
+	// -- Editor Area --
+	notebook_tabs = new wxNotebook(this, -1, wxDefaultPosition, wxDefaultSize, wxNB_TOP);
+
+	// Setup panel info & add panel
+	p_inf.CenterPane();
+	m_mgr->AddPane(notebook_tabs, p_inf);
+
+	// Create Start Page (temporary)
+	wxHtmlWindow *html_startpage = new wxHtmlWindow(notebook_tabs, -1);
+	notebook_tabs->AddPage(html_startpage, _T("Start Page"));
+	html_startpage->SetPage(_T("<HTML><BODY><CENTER><H1>SLADE</H1><BR>It's A Doom Editor<BR><BR><BR>(Stuff will go here eventually)</CENTER></BODY></HTML>"));
+
+
+	// -- Status Bar --
+	CreateStatusBar();
+
+
+	// Finalize
+	m_mgr->Update();
+	Layout();
+}
+
 /* MainWindow::setMockLayout
  * wxAUI testing stuff
  *******************************************************************/
 void MainWindow::setMockLayout()
 {
-	/*
 	wxAuiManager *m_mgr = new wxAuiManager(this);
 
 
@@ -92,8 +150,8 @@ void MainWindow::setMockLayout()
 	p_inf.CenterPane();
 	p_inf.Row(0);
 
-	wxGLCanvas *gl = new wxGLCanvas(this, -1, wxDefaultPosition);
-	m_mgr->AddPane(gl, p_inf);
+	wxPanel *canvas = new wxPanel(this, -1);
+	m_mgr->AddPane(canvas, p_inf);
 
 
 	// Info Bar
@@ -105,5 +163,4 @@ void MainWindow::setMockLayout()
 	m_mgr->AddPane(infobar, p_inf);
 
 	m_mgr->Update();
-	*/
 }

@@ -33,6 +33,11 @@
 #include "Wad.h"
 #include "Lump.h"
 
+/*******************************************************************
+ * VARIABLES
+ *******************************************************************/
+WadManager wad_manager;	// The Wad Manager itself!
+
 /* WadManager::WadManager
  * WadManager class constructor
  *******************************************************************/
