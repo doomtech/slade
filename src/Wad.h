@@ -17,6 +17,9 @@ public:
 	Wad();
 	~Wad();
 
+	string		getFileName();
+	bool		isIWAD();
+
 	virtual bool	openFile(string filename);
 	virtual bool	loadLump(Lump* lump);
 };

@@ -47,6 +47,22 @@ Wad::~Wad()
 {
 }
 
+/* Wad::getFileName
+ * Returns the wad's filename
+ *******************************************************************/
+string Wad::getFileName()
+{
+	return filename;
+}
+
+/* Wad::isIWAD
+ * Returns true if the wad is an IWAD
+ *******************************************************************/
+bool Wad::isIWAD()
+{
+	return iwad;
+}
+
 /* Wad::openFile
  * Reads a wadfile from disk
  * Returns true if successful, false otherwise

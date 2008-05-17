@@ -12,6 +12,14 @@ private:
 public:
 	WadManager();
 	~WadManager();
+
+	bool	addWad(Wad* wad);
+	Wad*	getWad(int index);
+	Wad*	getWad(string filename);
+	bool	openWad(string filename);
+	bool	closeWad(int index);
+	bool	closeWad(string filename);
+	bool	closeWad(Wad* wad);
 };
 
 #endif //__WADMANAGER_H__

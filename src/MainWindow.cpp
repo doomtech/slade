@@ -34,6 +34,12 @@
 #include <wx/html/htmlwin.h>
 
 
+/*******************************************************************
+ * VARIABLES
+ *******************************************************************/
+string	aui_perspective = _T("");
+
+
 /* MainWindow::MainWindow
  * MainWindow class constructor
  *******************************************************************/
@@ -49,6 +55,7 @@ MainWindow::MainWindow()
  *******************************************************************/
 MainWindow::~MainWindow()
 {
+	aui_perspective = wxAuiManager::GetManager(this)->SavePerspective();
 }
 
 /* MainWindow::setupLayout
