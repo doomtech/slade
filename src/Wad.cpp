@@ -135,6 +135,8 @@ bool Wad::openFile(string filename)
 		nlump->setName(wxString::FromAscii(name));
 		nlump->setOffset(offset);
 		nlump->setSize(size);
+
+		wxLogMessage(_T("%s"), nlump->getName());
 	}
 
 	// Close the file

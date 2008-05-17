@@ -100,23 +100,26 @@ Wad* WadManager::getWad(string filename)
 }
 
 /* WadManager::openWad
- * Opens and adds a wadfile to the list, returns true if the wad
- * was opened successfully (and added), otherwise false
+ * Opens and adds a wadfile to the list, returns a pointer to the
+ * newly opened and added wad, or NULL if an error occurred
  *******************************************************************/
-bool WadManager::openWad(string filename)
+Wad* WadManager::openWad(string filename)
 {
 	// Create and open the wadfile
 	Wad *new_wad = new Wad();
-	bool opened = new_wad->openFile(filename);
 
-	// If it opened successfully, add it to the list,
-	// Otherwise, delete it
-	if (opened)
+	// If it opened successfully, add it to the list & return it,
+	// Otherwise, delete it and return NULL
+	if (new_wad->openFile(filename))
+	{
 		open_wads.push_back(new_wad);
+		return new_wad;
+	}
 	else
+	{
 		delete new_wad;
-
-	return opened;
+		return NULL;
+	}
 }
 
 /* WadManager::closeWad

@@ -32,8 +32,16 @@
 #include "Main.h"
 #include "WxStuff.h"
 #include "WadManagerPanel.h"
+#include "WadManager.h"
 #include "Wad.h"
 #include "Lump.h"
+
+
+/*******************************************************************
+ * EXTERNAL VARIABLES
+ *******************************************************************/
+extern WadManager wad_manager;
+
 
 /* WadManagerPanel::WadManagerPanel
  * WadManagerPanel class constructor
@@ -45,9 +53,19 @@ WadManagerPanel::WadManagerPanel(wxWindow *parent)
 	wxBoxSizer *vbox = new wxBoxSizer(wxVERTICAL);
 	SetSizer(vbox);
 
+	// Create/setup tabs
+	notebook_tabs = new wxNotebook(this, -1);
+	vbox->Add(notebook_tabs, 1, wxEXPAND|wxALL, 4);
+
 	// Create/setup wad tree
-	tree_wadlist = new wxTreeCtrl(this, -1, wxDefaultPosition, wxDefaultSize);
-	vbox->Add(tree_wadlist, 1, wxEXPAND|wxALL, 4);
+	tree_wadlist = new wxTreeCtrl(notebook_tabs, -1, wxDefaultPosition, wxDefaultSize);
+	notebook_tabs->AddPage(tree_wadlist, _("Open Wads"), true);
+	//vbox->Add(tree_wadlist, 1, wxEXPAND|wxALL, 4);
+
+	// Create/setup file browser
+	file_browser = new wxGenericDirCtrl(notebook_tabs, -1, wxDirDialogDefaultFolderStr, wxDefaultPosition, wxDefaultSize, wxDIRCTRL_SHOW_FILTERS,
+										_T("Any Supported Wad File (*.wad; *.zip; *.pk3)|*.wad;*.zip;*.pk3|Doom Wad files (*.wad)|*.wad|Zip files (*.zip)|*.zip|Pk3 (zip) files (*.pk3)|*.pk3|All Files (*.*)|*.*"));
+	notebook_tabs->AddPage(file_browser, _("File Browser"));
 
 	tree_wadlist->AddRoot(_T("Wads"));
 }
@@ -57,4 +75,21 @@ WadManagerPanel::WadManagerPanel(wxWindow *parent)
  *******************************************************************/
 WadManagerPanel::~WadManagerPanel()
 {
+}
+
+/* WadManagerPanel::openFiles
+ * Opens each file in the supplied array of filenames
+ *******************************************************************/
+void WadManagerPanel::openFiles(wxArrayString& files)
+{
+	// Go through each filename in the array
+	for (int a = 0; a < files.size(); a++)
+	{
+		// Open the file in the wad manager
+		Wad* new_wad = wad_manager.openWad(files[a]);
+
+		// If it opened correctly, add it to the tree
+		if (new_wad)
+			tree_wadlist->AppendItem(tree_wadlist->GetRootItem(), files[a]);
+	}
 }

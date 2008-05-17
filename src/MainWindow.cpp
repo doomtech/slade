@@ -55,7 +55,6 @@ MainWindow::MainWindow()
  *******************************************************************/
 MainWindow::~MainWindow()
 {
-	aui_perspective = wxAuiManager::GetManager(this)->SavePerspective();
 }
 
 /* MainWindow::setupLayout
@@ -72,9 +71,19 @@ void MainWindow::setupLayout()
 	wxMenuBar *menu = new wxMenuBar();
 
 	// File menu
-	wxMenu* fileMenu = new wxMenu(_T(""));
-    fileMenu->Append(-1, _("&Quit\tAlt-F4"), _("Quit SLADE"));
+	wxMenu* fileMenu = new wxMenu(_(""));
+    fileMenu->Append(MENU_FILE_OPEN,	_("&Open Wad"),		_("Open a Wad file"));
+    fileMenu->Append(MENU_FILE_QUIT,	_("&Quit"),			_("Quit SLADE"));
     menu->Append(fileMenu, _("&File"));
+
+	// Edit menu
+	wxMenu* editMenu = new wxMenu(_T(""));
+	menu->Append(editMenu, _("&Edit"));
+
+	// View menu
+	wxMenu* viewMenu = new wxMenu(_T(""));
+	viewMenu->Append(MENU_VIEW_WADMANAGER,	_("&Wad Manager"),	_T("Show the wad manager"));
+	menu->Append(viewMenu, _("&View"));
 
 	// Set the menu
 	SetMenuBar(menu);
@@ -89,7 +98,7 @@ void MainWindow::setupLayout()
 	p_inf.BottomDockable(false);
 	p_inf.TopDockable(false);
 	p_inf.BestSize(192, 480);
-	p_inf.Caption(_T("Wad Manager"));
+	p_inf.Caption(_("Wad Manager"));
 	m_mgr->AddPane(panel_wadmanager, p_inf);
 
 
@@ -102,8 +111,8 @@ void MainWindow::setupLayout()
 
 	// Create Start Page (temporary)
 	wxHtmlWindow *html_startpage = new wxHtmlWindow(notebook_tabs, -1);
-	notebook_tabs->AddPage(html_startpage, _T("Start Page"));
-	html_startpage->SetPage(_T("<HTML><BODY><CENTER><H1>SLADE</H1><BR>It's A Doom Editor<BR><BR><BR>(Stuff will go here eventually)</CENTER></BODY></HTML>"));
+	notebook_tabs->AddPage(html_startpage, _("Start Page"));
+	html_startpage->SetPage(_("<HTML><BODY><CENTER><H1>SLADE</H1><BR>It's A Doom Editor<BR><BR><BR>(Stuff will go here eventually)</CENTER></BODY></HTML>"));
 
 
 	// -- Status Bar --
@@ -120,13 +129,17 @@ void MainWindow::setupLayout()
  *******************************************************************/
 void MainWindow::setMockLayout()
 {
+	/*
 	wxAuiManager *m_mgr = new wxAuiManager(this);
 
 
 	// Menu bar
 	wxMenuBar *menu = new wxMenuBar();
+
+	// File menu
 	wxMenu* fileMenu = new wxMenu(_T(""));
-    fileMenu->Append(-1, _("&Quit\tAlt-F4"), _("Quit SLADE"));
+	fileMenu->Append(MENU_FILE_OPEN,	_("&Open Wad"),		_("Opens a Wad file"));
+    fileMenu->Append(MENU_FILE_QUIT,	_("&Quit"),			_("Quit SLADE"));
     menu->Append(fileMenu, _("&File"));
 	SetMenuBar(menu);
 
@@ -169,5 +182,69 @@ void MainWindow::setMockLayout()
 	wxPanel *infobar = new wxPanel(this, -1);
 	m_mgr->AddPane(infobar, p_inf);
 
+	m_mgr->Update();
+	*/
+}
+
+/*******************************************************************
+ * WXWIDGETS EVENTS & HANDLERS
+ *******************************************************************/
+BEGIN_EVENT_TABLE(MainWindow, wxFrame)
+	// MENU
+
+	// File Menu
+	//EVT_MENU(MENU_FILE_NEW, MainWindow::onFileNew)
+	//EVT_MENU(MENU_FILE_NEWZIP, MainWindow::onFileNewZip)
+	EVT_MENU(MENU_FILE_OPEN, MainWindow::onFileOpen)
+	//EVT_MENU(MENU_FILE_SAVEALL, MainWindow::onFileSaveAll)
+	//EVT_MENU(MENU_FILE_CLOSEALL, MainWindow::onFileCloseAll)
+	//EVT_MENU(MENU_FILE_OPTIONS, MainWindow::onFileOptions)
+	EVT_MENU(MENU_FILE_QUIT, MainWindow::onFileQuit)
+	//EVT_MENU_RANGE(MENU_FILE_RECENT, MENU_FILE_RECENT + 200, MainWindow::onFileRecent)
+
+	// Edit Menu
+
+	// View Menu
+	EVT_MENU(MENU_VIEW_WADMANAGER, MainWindow::onViewWadManager)
+END_EVENT_TABLE()
+
+/* MainWindow::onFileOpen
+ * File->Open menu item event handler.
+ *******************************************************************/
+void MainWindow::onFileOpen(wxCommandEvent &e)
+{
+	// Open a file browser dialog that allows multiple selection
+	// and filters by wad, zip and pk3 file extensions
+	wxFileDialog *dialog_open = new wxFileDialog(this, _T("Choose file(s) to open"), wxEmptyString, wxEmptyString, 
+		_T("Any Supported File (*.wad; *.zip; *.pk3)|*.wad;*.zip;*.pk3|Doom Wad files (*.wad)|*.wad|Zip files (*.zip)|*.zip|Pk3 (zip) files (*.pk3)|*.pk3"),
+		wxOPEN|wxMULTIPLE|wxFILE_MUST_EXIST, wxDefaultPosition);
+
+	// Run the dialog & check that the user didn't cancel
+	if (dialog_open->ShowModal() == wxID_OK)
+	{
+		// Get an array of selected filenames
+		wxArrayString files;
+		dialog_open->GetPaths(files);
+
+		// Send it to the Wad Manager Panel
+		panel_wadmanager->openFiles(files);
+	}
+}
+
+/* MainWindow::onFileQuit
+ * File->Quit menu item event handler.
+ *******************************************************************/
+void MainWindow::onFileQuit(wxCommandEvent &e)
+{
+	wxTheApp->ExitMainLoop();
+}
+
+/* MainWindow::onViewWadManager
+ * View->Wad Manager menu item event handler.
+ *******************************************************************/
+void MainWindow::onViewWadManager(wxCommandEvent &e)
+{
+	wxAuiManager *m_mgr = wxAuiManager::GetManager(panel_wadmanager);
+	m_mgr->GetPane(panel_wadmanager).Show(true);
 	m_mgr->Update();
 }
