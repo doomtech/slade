@@ -63,11 +63,30 @@ bool Wad::isIWAD()
 	return iwad;
 }
 
+/* Wad::numLumps
+ * Returns the number of lumps in the wad
+ *******************************************************************/
+int Wad::numLumps()
+{
+	return (int)lumps.size();
+}
+
+/* Wad::lumpAt
+ * Returns the lump at index, NULL if index is invalid
+ *******************************************************************/
+Lump* Wad::lumpAt(int index)
+{
+	if (index < 0 || index >= (int)lumps.size())
+		return NULL;
+
+	return lumps[index];
+}
+
 /* Wad::openFile
  * Reads a wadfile from disk
  * Returns true if successful, false otherwise
  *******************************************************************/
-bool Wad::openFile(string filename)
+bool Wad::openFile(string filename, string &error)
 {
 	// Try to open the file
 	FILE *fp = fopen(chr(filename), "rb");
@@ -76,6 +95,7 @@ bool Wad::openFile(string filename)
 	if (!fp)
 	{
 		wxLogMessage(_T("Wad::openFile: Failed to open wadfile %s"), filename);
+		error = _T("Unable to open file");
 		return false;
 	}
 
@@ -101,6 +121,7 @@ bool Wad::openFile(string filename)
 	if (type[1] != 'W' || type[2] != 'A' || type[3] != 'D')
 	{
 		wxLogMessage(_T("Wad::openFile: File %s has invalid header"), filename);
+		error = _T("Invalid wad header");
 		return false;
 	}
 
@@ -127,6 +148,7 @@ bool Wad::openFile(string filename)
 		if (offset + size > (DWORD)filesize)
 		{
 			wxLogMessage(_T("Wad::openFile: File %s is invalid or corrupt"), filename);
+			error = _T("File is invalid and/or corrupt");
 			return false;
 		}
 
@@ -136,6 +158,7 @@ bool Wad::openFile(string filename)
 		nlump->setOffset(offset);
 		nlump->setSize(size);
 
+		lumps.push_back(nlump);
 		wxLogMessage(_T("%s"), nlump->getName());
 	}
 

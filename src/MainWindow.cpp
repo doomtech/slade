@@ -89,19 +89,6 @@ void MainWindow::setupLayout()
 	SetMenuBar(menu);
 
 
-	// -- Wad Manager Panel --
-	panel_wadmanager = new WadManagerPanel(this);
-
-	// Setup panel info & add panel
-	p_inf.DefaultPane();
-	p_inf.Left();
-	p_inf.BottomDockable(false);
-	p_inf.TopDockable(false);
-	p_inf.BestSize(192, 480);
-	p_inf.Caption(_("Wad Manager"));
-	m_mgr->AddPane(panel_wadmanager, p_inf);
-
-
 	// -- Editor Area --
 	notebook_tabs = new wxNotebook(this, -1, wxDefaultPosition, wxDefaultSize, wxNB_TOP);
 
@@ -112,7 +99,20 @@ void MainWindow::setupLayout()
 	// Create Start Page (temporary)
 	wxHtmlWindow *html_startpage = new wxHtmlWindow(notebook_tabs, -1);
 	notebook_tabs->AddPage(html_startpage, _("Start Page"));
-	html_startpage->SetPage(_("<HTML><BODY><CENTER><H1>SLADE</H1><BR>It's A Doom Editor<BR><BR><BR>(Stuff will go here eventually)</CENTER></BODY></HTML>"));
+	html_startpage->SetPage(_("<HTML><BODY><CENTER><H1>SLADE<FONT SIZE=-4>3</FONT></H1><BR>It's A Doom Editor<BR><BR><BR>(Stuff will go here eventually)</CENTER></BODY></HTML>"));
+
+
+	// -- Wad Manager Panel --
+	panel_wadmanager = new WadManagerPanel(this, notebook_tabs);
+
+	// Setup panel info & add panel
+	p_inf.DefaultPane();
+	p_inf.Left();
+	p_inf.BottomDockable(false);
+	p_inf.TopDockable(false);
+	p_inf.BestSize(192, 480);
+	p_inf.Caption(_("Wad Manager"));
+	m_mgr->AddPane(panel_wadmanager, p_inf);
 
 
 	// -- Status Bar --

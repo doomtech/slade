@@ -32,15 +32,28 @@
 #include "Main.h"
 #include "WxStuff.h"
 #include "WadPanel.h"
-#include "Wad.h"
 #include "Lump.h"
 
 /* WadPanel::WadPanel
  * WadPanel class constructor
  *******************************************************************/
-WadPanel::WadPanel(wxWindow *parent)
+WadPanel::WadPanel(wxWindow* parent, Wad* wad)
 : wxPanel(parent, -1)
 {
+	this->wad = wad;
+
+	// Create & set sizer
+	wxBoxSizer *m_hbox = new wxBoxSizer(wxHORIZONTAL);
+	SetSizer(m_hbox);
+
+	// Lump list panel
+	lump_list = new LumpListPanel(this, -1, wad);
+	m_hbox->Add(lump_list, 0, wxEXPAND);
+
+	lump_list->populateLumpList();
+
+	// Lump area
+	m_hbox->AddStretchSpacer();
 }
 
 /* WadPanel::~WadPanel

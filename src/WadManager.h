@@ -16,7 +16,7 @@ public:
 	bool	addWad(Wad* wad);
 	Wad*	getWad(int index);
 	Wad*	getWad(string filename);
-	Wad*	openWad(string filename);
+	Wad*	openWad(string filename, string &error = string());
 	bool	closeWad(int index);
 	bool	closeWad(string filename);
 	bool	closeWad(Wad* wad);

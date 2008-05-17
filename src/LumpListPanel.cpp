@@ -31,6 +31,7 @@
 #include "WxStuff.h"
 #include "Wad.h"
 #include "LumpListPanel.h"
+#include "Lump.h"
 
 
 /* LumpList::LumpList
@@ -49,6 +50,34 @@ LumpList::~LumpList()
 {
 }
 
+/* LumpList::updateEntry
+ * Updates the list entry at index with it's associated lump's
+ * information (name/size/type).
+ * Returns false on invalid index or missing lump, true otherwise
+ *******************************************************************/
+bool LumpList::updateEntry(int index)
+{
+	// Check that index is valid
+	if (index < 0 || index >= this->GetItemCount())
+		return false;
+
+	// Get the lump associated with entry index
+	Lump* lump = (Lump*)GetItemData(index);
+
+	// Check that it exists
+	if (!lump)
+		return false;
+
+	// Setup entry
+	wxListItem li;
+	li.SetId(index);
+	li.SetText(lump->getName());
+	SetItem(li);
+
+	return true;
+}
+
+
 
 
 
@@ -58,8 +87,16 @@ LumpList::~LumpList()
 LumpListPanel::LumpListPanel(wxWindow *parent, int id, Wad* wad)
 :	wxPanel(parent, id)
 {
+	// Init variables
 	this->wad = wad;
+
+	// Create & set sizer & border
+	wxStaticBox *frame = new wxStaticBox(this, -1, _T("Lumps"));
+	wxStaticBoxSizer *framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
+	SetSizer(framesizer);
+
 	lump_list = new LumpList(this, -1);
+	framesizer->Add(lump_list, 1, wxEXPAND|wxALL, 4);
 }
 
 /* LumpListPanel::~LumpListPanel
@@ -67,4 +104,28 @@ LumpListPanel::LumpListPanel(wxWindow *parent, int id, Wad* wad)
  *******************************************************************/
 LumpListPanel::~LumpListPanel()
 {
+}
+
+/* LumpListPanel::populateLumpList
+ * Clears & populates the lump list with all the lumps in the wadfile
+ *******************************************************************/
+void LumpListPanel::populateLumpList()
+{
+	// Clear the list
+	lump_list->ClearAll();
+
+	// Create the "Name" column
+	lump_list->InsertColumn(0, _T("Name"));
+
+	// Go through all lumps and add them to the list
+	for (int a = 0; a < wad->numLumps(); a++)
+	{
+		// Setup new entry
+		wxListItem li;
+		li.SetId(a);
+		li.SetData(wad->lumpAt(a));
+
+		lump_list->InsertItem(li);
+		lump_list->updateEntry(a);
+	}
 }

@@ -16,8 +16,9 @@ public:
 	LumpList(LumpListPanel *parent, int id);
 	~LumpList();
 
+	bool updateEntry(int index);
+
 	/*
-	void updateEntry(int index);
 
 	// Events
 	void onKeyDown(wxKeyEvent &event);
@@ -38,6 +39,8 @@ private:
 public:
 	LumpListPanel(wxWindow *parent, int id, Wad* wad);
 	~LumpListPanel();
+
+	void	populateLumpList();
 };
 
 #endif //__LUMPLISTPANEL_H__

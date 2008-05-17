@@ -103,14 +103,14 @@ Wad* WadManager::getWad(string filename)
  * Opens and adds a wadfile to the list, returns a pointer to the
  * newly opened and added wad, or NULL if an error occurred
  *******************************************************************/
-Wad* WadManager::openWad(string filename)
+Wad* WadManager::openWad(string filename, string &error)
 {
 	// Create and open the wadfile
 	Wad *new_wad = new Wad();
 
 	// If it opened successfully, add it to the list & return it,
 	// Otherwise, delete it and return NULL
-	if (new_wad->openFile(filename))
+	if (new_wad->openFile(filename, error))
 	{
 		open_wads.push_back(new_wad);
 		return new_wad;

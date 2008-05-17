@@ -19,8 +19,10 @@ public:
 
 	string		getFileName();
 	bool		isIWAD();
+	int			numLumps();
+	Lump*		lumpAt(int index);
 
-	virtual bool	openFile(string filename);
+	virtual bool	openFile(string filename, string &error = string());
 	virtual bool	loadLump(Lump* lump);
 };
 
@@ -33,7 +35,7 @@ public:
 	ZipWad();
 	~ZipWad();
 
-	bool	openFile(string filename);
+	bool	openFile(string filename, string &error = string());
 };
 
 #endif //__WAD_H__

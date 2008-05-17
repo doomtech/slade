@@ -3,14 +3,16 @@
 #define __WADPANEL_H__
 
 #include "LumpListPanel.h"
+#include "Wad.h"
 
 class WadPanel : public wxPanel
 {
 private:
-	LumpListPanel	*lump_list;
+	Wad*			wad;
+	LumpListPanel*	lump_list;
 
 public:
-	WadPanel(wxWindow *parent);
+	WadPanel(wxWindow *parent, Wad* wad);
 	~WadPanel();
 };
 
