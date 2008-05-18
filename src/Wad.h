@@ -22,7 +22,7 @@ public:
 	int			numLumps();
 	Lump*		lumpAt(int index);
 
-	virtual bool	openFile(string filename, string &error = string());
+	virtual bool	openFile(string filename, string &error);
 	virtual bool	loadLump(Lump* lump);
 };
 
@@ -35,7 +35,7 @@ public:
 	ZipWad();
 	~ZipWad();
 
-	bool	openFile(string filename, string &error = string());
+	bool	openFile(string filename, string &error);
 };
 
 #endif //__WAD_H__
