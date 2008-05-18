@@ -98,7 +98,7 @@ void WadManagerPanel::openFile(string filename)
 		notebook_wads->AddPage(wp, filename, true);
 	}
 	else // If wad didn't open ok, show error message
-		wxMessageBox(s_fmt(_T("Error opening %s:\n%s"), chr(filename), chr(error)), _T("Error"));
+		wxMessageBox(s_fmt(_T("Error opening %s:\n%s"), filename.c_str(), error.c_str()), _T("Error"));
 }
 
 /* WadManagerPanel::openFiles

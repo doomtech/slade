@@ -5,7 +5,7 @@
 class Wad;
 
 #include <wx/hashmap.h>
-WX_DECLARE_STRING_HASH_MAP(string, PropertyList);
+WX_DECLARE_STRING_HASH_MAP(wxString, PropertyList);
 
 class Lump
 {

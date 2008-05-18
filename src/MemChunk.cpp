@@ -136,7 +136,7 @@ bool MemChunk::loadFile(string filename, DWORD offset, DWORD len)
 	// Return false if file open failed
 	if (!fp)
 	{
-		wxLogMessage(_T("MemChunk::loadFile: Unable to open file %s"), chr(filename));
+		wxLogMessage(_T("MemChunk::loadFile: Unable to open file %s"), filename.c_str());
 		return false;
 	}
 

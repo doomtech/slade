@@ -132,7 +132,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="winmm.lib rpcrt4.lib kernel32.lib user32.lib gdi32.lib ole32.lib oleaut32.lib comctl32.lib comdlg32.lib uuid.lib advapi32.lib shell32.lib wxbase28u.lib wxmsw28u_core.lib wxmsw28u_gl.lib wxmsw28u_aui.lib wxzlib.lib wxpng.lib opengl32.lib glu32.lib"
+				AdditionalDependencies="winmm.lib rpcrt4.lib kernel32.lib user32.lib gdi32.lib ole32.lib oleaut32.lib comctl32.lib comdlg32.lib uuid.lib advapi32.lib shell32.lib wxbase28u.lib wxmsw28u_core.lib wxmsw28u_gl.lib wxmsw28u_aui.lib wxmsw28u_html.lib wxzlib.lib wxpng.lib opengl32.lib glu32.lib"
 				LinkIncremental="1"
 				GenerateManifest="true"
 				EnableUAC="false"
@@ -171,18 +171,6 @@
 	<Files>
 		<Filter
 			Name="Map Editor"
-			>
-			<Filter
-				Name="Header Files"
-				>
-			</Filter>
-			<Filter
-				Name="Source Files"
-				>
-			</Filter>
-		</Filter>
-		<Filter
-			Name="UI"
 			>
 			<Filter
 				Name="Header Files"
@@ -255,6 +243,10 @@
 					RelativePath=".\src\Wad.h"
 					>
 				</File>
+				<File
+					RelativePath=".\src\WadManager.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="Source Files"
@@ -265,6 +257,10 @@
 				</File>
 				<File
 					RelativePath=".\src\Wad.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\WadManager.cpp"
 					>
 				</File>
 				<File
@@ -284,11 +280,15 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\WadEditorWindow.h"
+					RelativePath=".\src\MainWindow.h"
 					>
 				</File>
 				<File
-					RelativePath=".\src\WadManager.h"
+					RelativePath=".\src\WadManagerPanel.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\WadPanel.h"
 					>
 				</File>
 			</Filter>
@@ -300,11 +300,15 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\WadEditorWindow.cpp"
+					RelativePath=".\src\MainWindow.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\WadManager.cpp"
+					RelativePath=".\src\WadManagerPanel.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\WadPanel.cpp"
 					>
 				</File>
 			</Filter>
