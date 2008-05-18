@@ -2,22 +2,22 @@
 /*******************************************************************
  * SLADE - It's a Doom Editor
  * Copyright (C) 2008 Simon Judd
- * 
+ *
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
  * Filename:    Wad.cpp
  * Description: Wad file handling class functions
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -94,7 +94,7 @@ bool Wad::openFile(string filename, string &error)
 	// Check if opening the file failed
 	if (!fp)
 	{
-		wxLogMessage(_T("Wad::openFile: Failed to open wadfile %s"), filename);
+		wxLogMessage(_T("Wad::openFile: Failed to open wadfile %s"), chr(filename));
 		error = _T("Unable to open file");
 		return false;
 	}
@@ -120,7 +120,7 @@ bool Wad::openFile(string filename, string &error)
 	// Check the header
 	if (type[1] != 'W' || type[2] != 'A' || type[3] != 'D')
 	{
-		wxLogMessage(_T("Wad::openFile: File %s has invalid header"), filename);
+		wxLogMessage(_T("Wad::openFile: File %s has invalid header"), chr(filename));
 		error = _T("Invalid wad header");
 		return false;
 	}
@@ -147,7 +147,7 @@ bool Wad::openFile(string filename, string &error)
 		// the wadfile is invalid
 		if (offset + size > (DWORD)filesize)
 		{
-			wxLogMessage(_T("Wad::openFile: File %s is invalid or corrupt"), filename);
+			wxLogMessage(_T("Wad::openFile: File %s is invalid or corrupt"), chr(filename));
 			error = _T("File is invalid and/or corrupt");
 			return false;
 		}
@@ -159,7 +159,7 @@ bool Wad::openFile(string filename, string &error)
 		nlump->setSize(size);
 
 		lumps.push_back(nlump);
-		wxLogMessage(_T("%s"), nlump->getName());
+		wxLogMessage(_T("%s"), chr(nlump->getName()));
 	}
 
 	// Close the file
@@ -179,7 +179,7 @@ bool Wad::loadLump(Lump* lump)
 	// Check that the lump belongs to this wadfile
 	if (lump->getParent() != this)
 	{
-		wxLogMessage(_T("Wad::LoadLump: Lump %s attempting to load data from wrong parent!"), lump->getName());
+		wxLogMessage(_T("Wad::LoadLump: Lump %s attempting to load data from wrong parent!"), chr(lump->getName()));
 		return false;
 	}
 
@@ -189,7 +189,7 @@ bool Wad::loadLump(Lump* lump)
 	// Check if opening the file failed
 	if (!fp)
 	{
-		wxLogMessage(_T("Wad::LoadLump: Failed to open wadfile %s"), filename);
+		wxLogMessage(_T("Wad::LoadLump: Failed to open wadfile %s"), chr(filename));
 		return false;
 	}
 

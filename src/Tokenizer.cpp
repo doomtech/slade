@@ -64,7 +64,7 @@ bool Tokenizer::openFile(string filename, DWORD offset, DWORD length)
 
 	if (!fp)
 	{
-		wxLogMessage(_T("Tokenizer::openFile: Unable to open file %s"), filename);
+		wxLogMessage(_T("Tokenizer::openFile: Unable to open file %s"), chr(filename));
 		return false;
 	}
 

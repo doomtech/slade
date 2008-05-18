@@ -7,7 +7,7 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="../../../../slade_svn/bin/Debug" prefix_auto="1" extension_auto="1" />
+				<Option output="../../../../slade_svn/bin/Debug/SLADE" prefix_auto="1" extension_auto="1" />
 				<Option object_output="../../../../slade_svn/obj/Debug" />
 				<Option type="0" />
 				<Option compiler="gcc" />
@@ -21,14 +21,14 @@
 				</Linker>
 			</Target>
 			<Target title="Release">
-				<Option output="../../../../slade_svn/bin/Release" prefix_auto="1" extension_auto="1" />
+				<Option output="../../../../slade_svn/bin/Release/SLADE" prefix_auto="1" extension_auto="1" />
 				<Option object_output="../../../../slade_svn/obj/Release" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
 					<Add option="-O2" />
-					<Add option="`wx-config  --static=no --unicode=yes --debug=no --cflags`" />
+					<Add option="`wx-config --static=no --unicode=yes --debug=no --cflags`" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
