@@ -5,10 +5,8 @@
  * 
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
- * Filename:    WadPanel.cpp
- * Description: WadPanel class. The base wxWidgets panel for wadfile
- *              editing. One of these is opened in a tab for each
- *              open wadfile.
+ * Filename:    LumpListPanel.cpp
+ * Description: LumpListPanel class (and related classes).
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -31,34 +29,23 @@
  *******************************************************************/
 #include "Main.h"
 #include "WxStuff.h"
-#include "WadPanel.h"
+#include "LumpArea.h"
 
-/* WadPanel::WadPanel
- * WadPanel class constructor
+/* LumpArea::LumpArea
+ * LumpArea class constructor
  *******************************************************************/
-WadPanel::WadPanel(wxWindow* parent, Wad* wad)
-: wxPanel(parent, -1)
+LumpArea::LumpArea(wxWindow* parent)
+:	wxPanel(parent, -1)
 {
-	this->wad = wad;
-
-	// Create & set sizer
-	wxBoxSizer *m_hbox = new wxBoxSizer(wxHORIZONTAL);
-	SetSizer(m_hbox);
-
-	// Lump list panel
-	lump_list = new LumpListPanel(this, -1, wad);
-	m_hbox->Add(lump_list, 0, wxEXPAND|wxALL, 4);
-
-	lump_list->populateLumpList();
-
-	// Lump area
-	lump_area = new LumpArea(this);
-	m_hbox->Add(lump_area, 1, wxEXPAND|wxALL, 4);
+	// Create & set sizer & border
+	wxStaticBox *frame = new wxStaticBox(this, -1, _T("Lump Contents"));
+	wxStaticBoxSizer *framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
+	SetSizer(framesizer);
 }
 
-/* WadPanel::~WadPanel
- * WadPanel class destructor
+/* LumpArea::~LumpArea
+ * LumpArea class destructor
  *******************************************************************/
-WadPanel::~WadPanel()
+LumpArea::~LumpArea()
 {
 }

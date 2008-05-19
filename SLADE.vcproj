@@ -276,6 +276,10 @@
 				Name="Header Files"
 				>
 				<File
+					RelativePath=".\src\LumpArea.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\LumpListPanel.h"
 					>
 				</File>
@@ -295,6 +299,10 @@
 			<Filter
 				Name="Source Files"
 				>
+				<File
+					RelativePath=".\src\LumpArea.cpp"
+					>
+				</File>
 				<File
 					RelativePath=".\src\LumpListPanel.cpp"
 					>
