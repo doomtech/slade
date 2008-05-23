@@ -41,6 +41,8 @@
 		</Compiler>
 		<Unit filename="../src/Lump.cpp" />
 		<Unit filename="../src/Lump.h" />
+		<Unit filename="../src/LumpArea.cpp" />
+		<Unit filename="../src/LumpArea.h" />
 		<Unit filename="../src/LumpListPanel.cpp" />
 		<Unit filename="../src/LumpListPanel.h" />
 		<Unit filename="../src/Main.h" />
