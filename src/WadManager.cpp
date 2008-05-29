@@ -110,7 +110,7 @@ Wad* WadManager::openWad(string filename, string &error)
 
 	// If it opened successfully, add it to the list & return it,
 	// Otherwise, delete it and return NULL
-	if (new_wad->openFile(filename, error))
+	if (new_wad->openWadFile(filename, error))
 	{
 		open_wads.push_back(new_wad);
 		return new_wad;

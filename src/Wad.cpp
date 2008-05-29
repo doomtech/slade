@@ -35,9 +35,11 @@
 /* Wad::Wad
  * Wad class constructor
  *******************************************************************/
-Wad::Wad()
+Wad::Wad(BYTE format)
 {
+	// Init variables
 	filename = _T("");
+	this->format = format;
 }
 
 /* Wad::~Wad
@@ -82,11 +84,11 @@ Lump* Wad::lumpAt(int index)
 	return lumps[index];
 }
 
-/* Wad::openFile
- * Reads a wadfile from disk
+/* Wad::openWadFile
+ * Reads a wad format file from disk
  * Returns true if successful, false otherwise
  *******************************************************************/
-bool Wad::openFile(string filename, string &error)
+bool Wad::openWadFile(string filename, string &error)
 {
 	// Try to open the file
 	FILE *fp = fopen(filename.ToAscii(), "rb");
@@ -165,9 +167,22 @@ bool Wad::openFile(string filename, string &error)
 	// Close the file
 	fclose(fp);
 
+	// Setup variables
 	this->filename = filename;
+	format = FORMAT_WAD;
 
 	return true;
+}
+
+/* Wad::openZipFile
+ * Reads a zip/pk3 format file from disk
+ * Returns true if successful, false otherwise
+ *******************************************************************/
+bool Wad::openZipFile(string filename, string &error)
+{
+	// Not yet implemented
+	error = _T("Not Implemented");
+	return false;
 }
 
 /* Wad::loadLump
@@ -207,4 +222,11 @@ bool Wad::loadLump(Lump* lump)
 	fclose(fp);
 
 	return true;
+}
+
+/* Wad::detectMaps
+ * Searches for any maps in the wad and adds them to the map list
+ *******************************************************************/
+void Wad::detectMaps()
+{
 }

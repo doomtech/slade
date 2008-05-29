@@ -263,10 +263,6 @@
 					RelativePath=".\src\WadManager.cpp"
 					>
 				</File>
-				<File
-					RelativePath=".\src\ZipWad.cpp"
-					>
-				</File>
 			</Filter>
 		</Filter>
 		<Filter
