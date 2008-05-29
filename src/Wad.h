@@ -16,28 +16,47 @@ protected:
 	{
 		string	name;
 		Lump*	head;
+		Lump*	end;
 		BYTE	format;	// 0=doom 1=hexen 2=udmf
 	};
 
-	BYTE				format;
 	string				filename;
 	vector<Lump*>		lumps;
 	bool				iwad;
 	vector<mapdesc_t>	maps;
 
 public:
-	Wad(BYTE format = FORMAT_WAD);
+	Wad();
 	~Wad();
 
-	string		getFileName();
-	bool		isIWAD();
-	bool		isFormat(BYTE format) { return this->format == format; }
-	int			numLumps();
+	// General info
+	string			getFileName();
+	bool			isIWAD();
+	int				numLumps();
+	virtual BYTE	format() { return FORMAT_WAD; }
+
+	// Lump accessors
 	Lump*		lumpAt(int index);
+	int			lumpIndex(Lump* lump);
 
-	bool	openWadFile(string filename, string &error);
-	bool	openZipFile(string filename, string &error);
+	// File operations
+	virtual bool	openFile(string filename, string &error);
+	virtual bool	loadLump(Lump* lump);
 
+	// Misc
+	virtual void	detectMaps();
+};
+
+class ZipWad : public Wad
+{
+private:
+
+public:
+	ZipWad();
+	~ZipWad();
+
+	BYTE	format() { return FORMAT_ZIP; }
+	bool	openFile(string filename, string &error);
 	bool	loadLump(Lump* lump);
 	void	detectMaps();
 };

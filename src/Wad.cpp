@@ -32,14 +32,35 @@
 #include "Lump.h"
 #include <wx/log.h>
 
+
+/*******************************************************************
+ * VARIABLES
+ *******************************************************************/
+// Used for map detection
+string map_lumps[12] =
+{
+	_T("THINGS"),
+	_T("VERTEXES"),
+	_T("LINEDEFS"),
+	_T("SIDEDEFS"),
+	_T("SECTORS"),
+	_T("SEGS"),
+	_T("SSECTORS"),
+	_T("NODES"),
+	_T("BLOCKMAP"),
+	_T("REJECT"),
+	_T("SCRIPTS"),
+	_T("BEHAVIOR")
+};
+
+
 /* Wad::Wad
  * Wad class constructor
  *******************************************************************/
-Wad::Wad(BYTE format)
+Wad::Wad()
 {
 	// Init variables
 	filename = _T("");
-	this->format = format;
 }
 
 /* Wad::~Wad
@@ -84,11 +105,33 @@ Lump* Wad::lumpAt(int index)
 	return lumps[index];
 }
 
+/* Wad::lumpIndex
+ * Returns the directory index of the specified lump,
+ * if the lump doesn't exist in the wad returns -1
+ *******************************************************************/
+int Wad::lumpIndex(Lump* lump)
+{
+	// Check lump's parent
+	if (lump->getParent() != this)
+		return -1;
+
+	// Go through all lumps
+	for (int a = 0; a < numLumps(); a++)
+	{
+		// If lump matches return the current index
+		if (lumps[a] == lump)
+			return a;
+	}
+
+	// Lump not found, return -1 (shouldn't ever happen)
+	return -1;
+}
+
 /* Wad::openWadFile
  * Reads a wad format file from disk
  * Returns true if successful, false otherwise
  *******************************************************************/
-bool Wad::openWadFile(string filename, string &error)
+bool Wad::openFile(string filename, string &error)
 {
 	// Try to open the file
 	FILE *fp = fopen(filename.ToAscii(), "rb");
@@ -169,20 +212,8 @@ bool Wad::openWadFile(string filename, string &error)
 
 	// Setup variables
 	this->filename = filename;
-	format = FORMAT_WAD;
 
 	return true;
-}
-
-/* Wad::openZipFile
- * Reads a zip/pk3 format file from disk
- * Returns true if successful, false otherwise
- *******************************************************************/
-bool Wad::openZipFile(string filename, string &error)
-{
-	// Not yet implemented
-	error = _T("Not Implemented");
-	return false;
 }
 
 /* Wad::loadLump
@@ -229,4 +260,48 @@ bool Wad::loadLump(Lump* lump)
  *******************************************************************/
 void Wad::detectMaps()
 {
+	// Clear maps list
+	maps.clear();
+
+	// Go through all lumps
+	int i = 0;
+	while (i < numLumps())
+	{
+		// Check for UDMF format map (TEXTMAP lump)
+		if (lumps[i]->getName() == _T("TEXTMAP") && i > 0)
+		{
+			// Get map info
+			mapdesc_t md;
+			md.head = lumps[i-1];				// Header lump
+			md.name = lumps[i-1]->getName();	// Map title
+			md.format = 2;						// Format = 2 (UDMF)
+
+			// Skip lumps until we find the ENDMAP marker
+			bool done = false;
+			while (!done)
+			{
+				// If we've somehow reached the end of the wad without finding ENDMAP,
+				// print an error and return
+				if (i == numLumps())
+				{
+					wxLogMessage(_T("UDMF Map with no ENDMAP marker in %s"), filename.c_str());
+					return;
+				}
+
+				// If ENDMAP marker is here, exit the loop, otherwise skip to next lump
+				if (lumps[i]->getName() == _T("ENDMAP"))
+					done = true;
+				else
+					i++;
+			}
+
+			// Set end lump
+			md.end = lumps[i];
+
+			// Add to map list
+			maps.push_back(md);
+		}
+
+		i++;
+	}
 }

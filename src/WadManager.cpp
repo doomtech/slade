@@ -32,6 +32,7 @@
 #include "WadManager.h"
 #include "Wad.h"
 #include "Lump.h"
+#include <wx/filename.h>
 
 /*******************************************************************
  * VARIABLES
@@ -105,12 +106,19 @@ Wad* WadManager::getWad(string filename)
  *******************************************************************/
 Wad* WadManager::openWad(string filename, string &error)
 {
-	// Create and open the wadfile
-	Wad *new_wad = new Wad();
+	Wad* new_wad = NULL;
+
+	// Create either a wad or zip file, depending on filename extension
+	wxFileName fn(filename);
+	bool opened = false;
+	if (!fn.GetExt().CmpNoCase(_T("wad"))) // Wad File
+		new_wad = new Wad();
+	else if (!fn.GetExt().CmpNoCase(_T("zip")) || !fn.GetExt().CmpNoCase(_T("pk3"))) // Zip/Pk3 file
+		new_wad = new ZipWad();
 
 	// If it opened successfully, add it to the list & return it,
 	// Otherwise, delete it and return NULL
-	if (new_wad->openWadFile(filename, error))
+	if (new_wad->openFile(filename, error))
 	{
 		open_wads.push_back(new_wad);
 		return new_wad;
