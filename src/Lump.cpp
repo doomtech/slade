@@ -42,7 +42,7 @@ Lump::Lump(Wad* parent_)
 	data = NULL;
 	size = 0;
 	offset = 0;
-	data_loaded = false;
+	data_loaded = true;
 }
 
 /* Lump::~Lump

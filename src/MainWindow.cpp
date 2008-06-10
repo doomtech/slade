@@ -46,8 +46,8 @@ string	aui_perspective = _T("");
 MainWindow::MainWindow()
     : wxFrame((wxFrame *) NULL, -1, _T("SLADE"), wxPoint(0, 0), wxSize(800, 600))
 {
-	//setMockLayout();
 	setupLayout();
+	Maximize();
 }
 
 /* MainWindow::~MainWindow

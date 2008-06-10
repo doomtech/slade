@@ -12,6 +12,12 @@ class Wad
 private:
 
 protected:
+	string				filename;
+	vector<Lump*>		lumps;
+	bool				iwad;
+	//vector<mapdesc_t>	maps;
+
+public:
 	struct mapdesc_t
 	{
 		string	name;
@@ -20,31 +26,25 @@ protected:
 		BYTE	format;	// 0=doom 1=hexen 2=udmf
 	};
 
-	string				filename;
-	vector<Lump*>		lumps;
-	bool				iwad;
-	vector<mapdesc_t>	maps;
-
-public:
 	Wad();
 	~Wad();
 
 	// General info
-	string			getFileName();
+	string			getFileName(bool fullpath = true);
 	bool			isIWAD();
 	int				numLumps();
 	virtual BYTE	format() { return FORMAT_WAD; }
 
 	// Lump accessors
-	Lump*		lumpAt(int index);
-	int			lumpIndex(Lump* lump);
+	Lump*	lumpAt(int index);
+	int		lumpIndex(Lump* lump);
 
 	// File operations
 	virtual bool	openFile(string filename, string &error);
 	virtual bool	loadLump(Lump* lump);
 
 	// Misc
-	virtual void	detectMaps();
+	virtual vector<mapdesc_t>	detectMaps();
 };
 
 class ZipWad : public Wad
@@ -58,7 +58,8 @@ public:
 	BYTE	format() { return FORMAT_ZIP; }
 	bool	openFile(string filename, string &error);
 	bool	loadLump(Lump* lump);
-	void	detectMaps();
+
+	vector<mapdesc_t>	detectMaps();
 };
 
 #endif //__WAD_H__

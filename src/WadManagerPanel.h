@@ -2,23 +2,26 @@
 #ifndef __WADMANAGERPANEL_H__
 #define __WADMANAGERPANEL_H__
 
-#include <wx/treectrl.h>
+#include <wx/listctrl.h>
 #include <wx/notebook.h>
 #include <wx/dirctrl.h>
+#include <wx/listbox.h>
 
 class WadManagerPanel : public wxPanel
 {
 private:
 	wxNotebook*			notebook_tabs;
 	wxNotebook*			notebook_wads;
-	wxTreeCtrl*			tree_wadlist;
+	wxListBox*			list_openwads;
+	wxListCtrl*			list_maps;
 	wxGenericDirCtrl*	file_browser;
 
 public:
 	// wxWidgets ID table
 	enum
 	{
-		TREE_WADLIST,
+		LIST_OPENWADS,
+		LIST_MAPS,
 		TREE_BROWSER,
 	};
 
@@ -29,6 +32,10 @@ public:
 	void	openFiles(wxArrayString& files);
 
 	// Event handlers
+	void	onListWadsChanged(wxCommandEvent &e);
+	void	onListWadsActivated(wxCommandEvent &e);
+	void	onListMapsChanged(wxListEvent &e);
+	void	onListMapsActivated(wxListEvent &e);
 	void	onBrowserItemActivated(wxTreeEvent &e);
 
 	DECLARE_EVENT_TABLE()

@@ -71,6 +71,8 @@ bool ZipWad::loadLump(Lump* lump)
 /* ZipWad::detectMaps
  * Searches for any maps in the wad and adds them to the map list
  *******************************************************************/
-void ZipWad::detectMaps()
+vector<Wad::mapdesc_t> ZipWad::detectMaps()
 {
+	vector<mapdesc_t> maps;
+	return maps;
 }

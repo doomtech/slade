@@ -31,6 +31,7 @@
 #include "Wad.h"
 #include "Lump.h"
 #include <wx/log.h>
+#include <wx/filename.h>
 
 
 /*******************************************************************
@@ -73,9 +74,15 @@ Wad::~Wad()
 /* Wad::getFileName
  * Returns the wad's filename
  *******************************************************************/
-string Wad::getFileName()
+string Wad::getFileName(bool fullpath)
 {
-	return filename;
+	if (fullpath)
+		return filename;
+	else
+	{
+		wxFileName fn(filename);
+		return fn.GetName() + _T(".") + fn.GetExt();
+	}
 }
 
 /* Wad::isIWAD
@@ -202,6 +209,7 @@ bool Wad::openFile(string filename, string &error)
 		nlump->setName(wxString::FromAscii(name));
 		nlump->setOffset(offset);
 		nlump->setSize(size);
+		nlump->setLoaded(false);
 
 		lumps.push_back(nlump);
 		wxLogMessage(_T("%s"), nlump->getName().c_str());
@@ -229,6 +237,14 @@ bool Wad::loadLump(Lump* lump)
 		return false;
 	}
 
+	// Do nothing if the lump's size is zero,
+	// or if it has already been loaded
+	if (lump->getSize() == 0 || lump->isLoaded())
+	{
+		lump->setLoaded();
+		return true;
+	}
+
 	// Open wadfile
 	FILE *fp = fopen(filename.ToAscii(), "rb");
 
@@ -252,16 +268,18 @@ bool Wad::loadLump(Lump* lump)
 	// Close file
 	fclose(fp);
 
+	// Set the lump to loaded
+	lump->setLoaded();
+
 	return true;
 }
 
 /* Wad::detectMaps
  * Searches for any maps in the wad and adds them to the map list
  *******************************************************************/
-void Wad::detectMaps()
+vector<Wad::mapdesc_t> Wad::detectMaps()
 {
-	// Clear maps list
-	maps.clear();
+	vector<mapdesc_t> maps;
 
 	// Go through all lumps
 	int i = 0;
@@ -281,11 +299,11 @@ void Wad::detectMaps()
 			while (!done)
 			{
 				// If we've somehow reached the end of the wad without finding ENDMAP,
-				// print an error and return
+				// log an error and return
 				if (i == numLumps())
 				{
 					wxLogMessage(_T("UDMF Map with no ENDMAP marker in %s"), filename.c_str());
-					return;
+					return maps;
 				}
 
 				// If ENDMAP marker is here, exit the loop, otherwise skip to next lump
@@ -304,4 +322,6 @@ void Wad::detectMaps()
 
 		i++;
 	}
+
+	return maps;
 }

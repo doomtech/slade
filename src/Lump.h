@@ -12,9 +12,12 @@ class Lump
 private:
 	Wad*			parent;
 	string			name;
-	DWORD			offset;
+	DWORD			offset; // In a zip/pk3 file, this will be the entry index
 	BYTE*			data;
 	DWORD			size;
+
+	// This should only ever be false if the lump
+	// has been opened along with a wad or zip file
 	bool			data_loaded;
 
 	PropertyList	ex_props;
@@ -29,6 +32,7 @@ public:
 	DWORD		getOffset() { return offset; }
 	DWORD		getSize() { return size; }
 	BYTE*		getData(bool allow_load = true);
+	bool		isLoaded() { return data_loaded; }
 
 	// Modifiers
 	void		setParent(Wad* parent_) { parent = parent_; }
@@ -36,7 +40,7 @@ public:
 	void		setOffset(DWORD offset_) { offset = offset_; }
 	void		setSize(DWORD size_) { size = size_; }
 	void		setData(BYTE* data_) { data = data_; }
-
+	void		setLoaded(bool loaded = true) { data_loaded = loaded; }
 
 	// Extra properties stuff
 	bool	hasExProp(string key);

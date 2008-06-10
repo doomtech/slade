@@ -321,6 +321,42 @@
 				</File>
 			</Filter>
 		</Filter>
+		<Filter
+			Name="Map"
+			>
+			<Filter
+				Name="Header Files"
+				>
+				<File
+					RelativePath=".\src\MapLine.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\MapSector.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\MapSide.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\MapThing.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\MapVertex.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\SLADEMap.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				>
+			</Filter>
+		</Filter>
 	</Files>
 	<Globals>
 	</Globals>
