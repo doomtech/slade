@@ -15,6 +15,7 @@ private:
 	wxListBox*			list_openwads;
 	wxListCtrl*			list_maps;
 	wxGenericDirCtrl*	file_browser;
+	wxButton*			btn_browser_open;
 
 public:
 	// wxWidgets ID table
@@ -23,6 +24,7 @@ public:
 		LIST_OPENWADS,
 		LIST_MAPS,
 		TREE_BROWSER,
+		BTN_BROWSER_OPEN,
 	};
 
 	WadManagerPanel(wxWindow *parent, wxNotebook* nb_wads);

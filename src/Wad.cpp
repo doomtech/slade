@@ -72,7 +72,7 @@ Wad::~Wad()
 }
 
 /* Wad::getFileName
- * Returns the wad's filename
+ * Returns the wad's filename, including the path if specified
  *******************************************************************/
 string Wad::getFileName(bool fullpath)
 {
@@ -80,6 +80,7 @@ string Wad::getFileName(bool fullpath)
 		return filename;
 	else
 	{
+		// Get the filename without the path
 		wxFileName fn(filename);
 		return fn.GetName() + _T(".") + fn.GetExt();
 	}
@@ -106,6 +107,7 @@ int Wad::numLumps()
  *******************************************************************/
 Lump* Wad::lumpAt(int index)
 {
+	// Check for invalid index
 	if (index < 0 || index >= (int)lumps.size())
 		return NULL;
 
@@ -389,7 +391,7 @@ vector<Wad::mapdesc_t> Wad::detectMaps()
 				md.end = lumps[i-1];						// End lump
 
 				// If BEHAVIOR lump exists, it's a hexen format map, otherwise it's doom format
-				if (existing_map_lumps[12])
+				if (existing_map_lumps[11])
 					md.format = 1;
 				else
 					md.format = 0;

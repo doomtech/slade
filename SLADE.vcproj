@@ -175,10 +175,18 @@
 			<Filter
 				Name="Header Files"
 				>
+				<File
+					RelativePath=".\src\MapEditorWindow.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="Source Files"
 				>
+				<File
+					RelativePath=".\src\MapEditorWindow.cpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter

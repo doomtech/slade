@@ -75,10 +75,9 @@ WadManagerPanel::WadManagerPanel(wxWindow *parent, wxNotebook* nb_wads)
 	box_wm->Add(list_maps, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
 	// Create/setup file browser
-	//file_browser = new wxGenericDirCtrl(notebook_tabs, -1, wxDirDialogDefaultFolderStr, wxDefaultPosition, wxDefaultSize, wxDIRCTRL_SHOW_FILTERS,
-	//									_T("Any Supported Wad File (*.wad; *.zip; *.pk3)|*.wad;*.zip;*.pk3|Doom Wad files (*.wad)|*.wad|Zip files (*.zip)|*.zip|Pk3 (zip) files (*.pk3)|*.pk3|All Files (*.*)|*.*"));
-	//file_browser->GetTreeCtrl()->SetId(TREE_BROWSER);
-	//notebook_tabs->AddPage(file_browser, _("File Browser"));
+	file_browser = new wxGenericDirCtrl(notebook_tabs, -1, wxDirDialogDefaultFolderStr, wxDefaultPosition, wxDefaultSize, wxDIRCTRL_SHOW_FILTERS,
+										_T("Any Supported Wad File (*.wad; *.zip; *.pk3)|*.wad;*.zip;*.pk3|Doom Wad files (*.wad)|*.wad|Zip files (*.zip)|*.zip|Pk3 (zip) files (*.pk3)|*.pk3|All Files (*.*)|*.*"));
+	notebook_tabs->AddPage(file_browser, _("File Browser"));
 }
 
 /* WadManagerPanel::~WadManagerPanel
@@ -129,7 +128,7 @@ void WadManagerPanel::openFiles(wxArrayString& files)
  *******************************************************************/
 BEGIN_EVENT_TABLE(WadManagerPanel, wxPanel)
 	EVT_LISTBOX(LIST_OPENWADS, WadManagerPanel::onListWadsChanged)
-	EVT_TREE_ITEM_ACTIVATED(TREE_BROWSER, WadManagerPanel::onBrowserItemActivated)
+	//EVT_TREE_ITEM_ACTIVATED(TREE_BROWSER, WadManagerPanel::onBrowserItemActivated)
 END_EVENT_TABLE()
 
 /* WadManagerPanel::onListWadsChanged
@@ -162,7 +161,7 @@ void WadManagerPanel::onListWadsChanged(wxCommandEvent &e)
 
 		// Add map name to string
 		name += maps[a].name;
-		
+
 		// Add the list item
 		wxListItem li;
 		li.SetText(name);
