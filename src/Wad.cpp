@@ -285,7 +285,9 @@ vector<Wad::mapdesc_t> Wad::detectMaps()
 	int i = 0;
 	while (i < numLumps())
 	{
-		// Check for UDMF format map (TEXTMAP lump)
+		// UDMF format map check ********************************************************
+
+		// Check for UDMF format map lump (TEXTMAP lump)
 		if (lumps[i]->getName() == _T("TEXTMAP") && i > 0)
 		{
 			// Get map info
@@ -318,8 +320,95 @@ vector<Wad::mapdesc_t> Wad::detectMaps()
 
 			// Add to map list
 			maps.push_back(md);
+
+			// Current index is ENDMAP, we don't want to check for a doom/hexen format
+			// map so just go to the next index and continue the loop
+			i++;
+			continue;
 		}
 
+
+
+		// Doom/Hexen format map check **************************************************
+
+		// Array to keep track of what doom/hexen map lumps have been found
+		BYTE existing_map_lumps[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+		// Check if the current lump is a doom/hexen map lump
+		bool maplump_found = false;
+		for (int a = 0; a < 5; a++)
+		{
+			// Compare with all base map lump names
+			if (lumps[i]->getName() == map_lumps[a])
+			{
+				maplump_found = true;
+				existing_map_lumps[a] = 1;
+				break;
+			}
+		}
+
+		// If we've found what might be a map
+		if (maplump_found)
+		{
+			// Save position of map header lump
+			int header_index = i-1;
+
+			// Check off map lumps until we find a non-map lump
+			bool done = false;
+			while (!done)
+			{
+				// Loop will end if no map lump is found
+				done = true;
+
+				// Compare with all map lump names
+				for (int a = 0; a < 12; a++)
+				{
+					// Compare with all base map lump names
+					if (lumps[i]->getName() == map_lumps[a])
+					{
+						existing_map_lumps[a] = 1;
+						done = false;
+						break;
+					}
+				}
+
+				// Go to next lump
+				i++;
+			}
+
+			// Go back to the lump just after the last map lump found
+			i--;
+
+			// Check that we have all the required map lumps: VERTEXES, LINEDEFS, SIDEDEFS, THINGS & SECTORS
+			if (!memchr(existing_map_lumps, 0, 5))
+			{
+				// Get map info
+				mapdesc_t md;
+				md.head = lumps[header_index];				// Header lump
+				md.name = lumps[header_index]->getName();	// Map title
+				md.end = lumps[i-1];						// End lump
+
+				// If BEHAVIOR lump exists, it's a hexen format map, otherwise it's doom format
+				if (existing_map_lumps[12])
+					md.format = 1;
+				else
+					md.format = 0;
+
+				// Add map info to the maps list
+				maps.push_back(md);
+			}
+			else
+			{
+				// If we found a non-map lump before all needed map lumps were found,
+				// it's an invalid map, so just continue the loop
+				continue;
+			}
+		}
+
+
+
+
+		// Not a UDMF or Doom/Hexen map lump, go to next lump
 		i++;
 	}
 

@@ -128,6 +128,7 @@ void WadManagerPanel::openFiles(wxArrayString& files)
  * WXWIDGETS EVENTS & HANDLERS
  *******************************************************************/
 BEGIN_EVENT_TABLE(WadManagerPanel, wxPanel)
+	EVT_LISTBOX(LIST_OPENWADS, WadManagerPanel::onListWadsChanged)
 	EVT_TREE_ITEM_ACTIVATED(TREE_BROWSER, WadManagerPanel::onBrowserItemActivated)
 END_EVENT_TABLE()
 
@@ -138,9 +139,39 @@ END_EVENT_TABLE()
  *******************************************************************/
 void WadManagerPanel::onListWadsChanged(wxCommandEvent &e)
 {
-	//list_maps->ClearAll();
-	//int selection = list_openwads->GetSelection();
-	//wad_manager.getWad(selection)->detectMaps();
+	// Clear current maps list
+	list_maps->ClearAll();
+
+	// Get a list of maps in the selected wad (if any)
+	int selection = list_openwads->GetSelection();
+	vector<Wad::mapdesc_t> maps = wad_manager.getWad(selection)->detectMaps();
+
+	// Go through the list and add maps
+	for (int a = 0; a < (int)maps.size(); a++)
+	{
+		// Setup map name string
+		string name;
+
+		// Add map format to name string
+		if (maps[a].format == 0)
+			name = _T("(D) ");
+		if (maps[a].format == 1)
+			name = _T("(H) ");
+		if (maps[a].format == 2)
+			name = _T("(U) ");
+
+		// Add map name to string
+		name += maps[a].name;
+		
+		// Add the list item
+		wxListItem li;
+		li.SetText(name);
+		li.SetId(a);
+		list_maps->InsertItem(li);
+	}
+
+	// Set minimum column size
+	list_maps->SetColumnWidth(0, wxLIST_AUTOSIZE);
 }
 
 /* WadManagerPanel::onListWadsChanged
