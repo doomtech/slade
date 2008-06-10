@@ -362,6 +362,13 @@ vector<Wad::mapdesc_t> Wad::detectMaps()
 				// Loop will end if no map lump is found
 				done = true;
 
+				// If we're at the end of the wad, exit the loop
+				if (i == numLumps())
+				{
+				    i--;
+                    break;
+				}
+
 				// Compare with all map lump names
 				for (int a = 0; a < 12; a++)
 				{

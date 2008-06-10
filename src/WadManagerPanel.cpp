@@ -170,7 +170,7 @@ void WadManagerPanel::onListWadsChanged(wxCommandEvent &e)
 	}
 
 	// Set minimum column size
-	list_maps->SetColumnWidth(0, wxLIST_AUTOSIZE);
+	//list_maps->SetColumnWidth(0, wxLIST_AUTOSIZE);
 }
 
 /* WadManagerPanel::onListWadsChanged

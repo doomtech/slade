@@ -7,8 +7,8 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="../../../../slade_svn/bin/Debug/SLADE" prefix_auto="1" extension_auto="1" />
-				<Option object_output="../../../../slade_svn/obj/Debug" />
+				<Option output="../bin/Debug/SLADE" prefix_auto="1" extension_auto="1" />
+				<Option object_output="../obj/Debug" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
@@ -21,8 +21,8 @@
 				</Linker>
 			</Target>
 			<Target title="Release">
-				<Option output="../../../../slade_svn/bin/Release/SLADE" prefix_auto="1" extension_auto="1" />
-				<Option object_output="../../../../slade_svn/obj/Release" />
+				<Option output="../bin/Release/SLADE" prefix_auto="1" extension_auto="1" />
+				<Option object_output="../obj/Release" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
@@ -50,8 +50,16 @@
 		<Unit filename="../src/MainApp.h" />
 		<Unit filename="../src/MainWindow.cpp" />
 		<Unit filename="../src/MainWindow.h" />
+		<Unit filename="../src/MapEditorWindow.cpp" />
+		<Unit filename="../src/MapEditorWindow.h" />
+		<Unit filename="../src/MapLine.h" />
+		<Unit filename="../src/MapSector.h" />
+		<Unit filename="../src/MapSide.h" />
+		<Unit filename="../src/MapThing.h" />
+		<Unit filename="../src/MapVertex.h" />
 		<Unit filename="../src/MemChunk.cpp" />
 		<Unit filename="../src/MemChunk.h" />
+		<Unit filename="../src/SLADEMap.h" />
 		<Unit filename="../src/Tokenizer.cpp" />
 		<Unit filename="../src/Tokenizer.h" />
 		<Unit filename="../src/Wad.cpp" />

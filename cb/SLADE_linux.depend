@@ -3759,12 +3759,12 @@
 1206042055 /usr/include/wx-2.8/wx/gtk/filedlg.h
 	"wx/generic/filedlgg.h"
 
-1211088626 /home/simon/dev/svn/slade/trunk/src/Wad.h
+1213102426 /home/simon/dev/svn/slade/trunk/src/Wad.h
 
 1211087828 /home/simon/dev/svn/slade/trunk/src/LumpListPanel.h
 	<wx/listctrl.h>
 
-1211097316 /home/simon/dev/svn/slade/trunk/src/Lump.h
+1213102426 /home/simon/dev/svn/slade/trunk/src/Lump.h
 	<wx/hashmap.h>
 
 1211087828 source:/home/simon/dev/svn/slade/trunk/src/MainApp.cpp
@@ -3780,10 +3780,11 @@
 	"WadManagerPanel.h"
 	<wx/notebook.h>
 
-1211087828 /home/simon/dev/svn/slade/trunk/src/WadManagerPanel.h
-	<wx/treectrl.h>
+1213102426 /home/simon/dev/svn/slade/trunk/src/WadManagerPanel.h
+	<wx/listctrl.h>
 	<wx/notebook.h>
 	<wx/dirctrl.h>
+	<wx/listbox.h>
 
 1206042055 /usr/include/wx-2.8/wx/treectrl.h
 	"wx/defs.h"
@@ -3860,7 +3861,7 @@
 	"wx/list.h"
 	"wx/icon.h"
 
-1211087828 source:/home/simon/dev/svn/slade/trunk/src/MainWindow.cpp
+1213102426 source:/home/simon/dev/svn/slade/trunk/src/MainWindow.cpp
 	"Main.h"
 	"WxStuff.h"
 	"MainWindow.h"
@@ -4031,30 +4032,32 @@
 	"wx/defs.h"
 	"wx/filesys.h"
 
-1211087828 source:/home/simon/dev/svn/slade/trunk/src/WadManager.cpp
+1212302798 source:/home/simon/dev/svn/slade/trunk/src/WadManager.cpp
 	"Main.h"
 	"WadManager.h"
 	"Wad.h"
 	"Lump.h"
+	<wx/filename.h>
 
 1211088754 /home/simon/dev/svn/slade/trunk/src/WadManager.h
 
-1211087828 source:/home/simon/dev/svn/slade/trunk/src/WadPanel.cpp
+1211548244 source:/home/simon/dev/svn/slade/trunk/src/WadPanel.cpp
 	"Main.h"
 	"WxStuff.h"
 	"WadPanel.h"
-	"Lump.h"
 
-1211087828 /home/simon/dev/svn/slade/trunk/src/WadPanel.h
+1211548244 /home/simon/dev/svn/slade/trunk/src/WadPanel.h
 	"LumpListPanel.h"
 	"Wad.h"
+	"LumpArea.h"
 
-1211087828 source:/home/simon/dev/svn/slade/trunk/src/ZipWad.cpp
+1213102426 source:/home/simon/dev/svn/slade/trunk/src/ZipWad.cpp
 	"Main.h"
 	"Wad.h"
 	"Lump.h"
+	<wx/log.h>
 
-1211097316 source:/home/simon/dev/svn/slade/trunk/src/Lump.cpp
+1213102426 source:/home/simon/dev/svn/slade/trunk/src/Lump.cpp
 	"Main.h"
 	"Wad.h"
 	"Lump.h"
@@ -4071,16 +4074,35 @@
 
 1211087828 /home/simon/dev/svn/slade/trunk/src/Tokenizer.h
 
-1211097316 source:/home/simon/dev/svn/slade/trunk/src/Wad.cpp
+1213103214 source:/home/simon/dev/svn/slade/trunk/src/Wad.cpp
 	"Main.h"
 	"Wad.h"
 	"Lump.h"
 	<wx/log.h>
+	<wx/filename.h>
 
-1211097316 source:/home/simon/dev/svn/slade/trunk/src/WadManagerPanel.cpp
+1213102426 source:/home/simon/dev/svn/slade/trunk/src/WadManagerPanel.cpp
 	"Main.h"
 	"WxStuff.h"
 	"WadManagerPanel.h"
 	"WadManager.h"
 	"WadPanel.h"
+
+1206038416 /usr/lib/wx/include/gtk2-unicode-debug-2.8/wx/setup.h
+
+1211548244 source:/home/simon/dev/svn/slade/trunk/src/LumpArea.cpp
+	"Main.h"
+	"WxStuff.h"
+	"LumpArea.h"
+
+1211548244 /home/simon/dev/svn/slade/trunk/src/LumpArea.h
+	"Lump.h"
+
+1213102426 source:/home/simon/dev/svn/slade/trunk/src/MapEditorWindow.cpp
+	"Main.h"
+	"WxStuff.h"
+	"MapEditorWindow.h"
+	<wx/aui/aui.h>
+
+1213102426 /home/simon/dev/svn/slade/trunk/src/MapEditorWindow.h
 
