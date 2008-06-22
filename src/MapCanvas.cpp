@@ -5,8 +5,9 @@
  * 
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
- * Filename:    MapEditorWindow.cpp
- * Description: MapEditorWindow class, it's a map editor window.
+ * Filename:    MapCanvas.cpp
+ * Description: MapCanvas class, the OpenGL canvas widget that the
+ *              2d map view is drawn on
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -29,39 +30,28 @@
  *******************************************************************/
 #include "Main.h"
 #include "WxStuff.h"
-#include "MapEditorWindow.h"
-#include <wx/aui/aui.h>
+#include "MapCanvas.h"
 
 
 /*******************************************************************
  * VARIABLES
  *******************************************************************/
+wxGLContext *gl_context;
 
 
-/* MapEditorWindow::MapEditorWindow
- * MapEditorWindow class constructor
+/* MapCanvas::MapCanvas
+ * MapCanvas class constructor
  *******************************************************************/
-MapEditorWindow::MapEditorWindow()
-    : wxFrame((wxFrame *) NULL, -1, _T("SLADE"), wxPoint(0, 0), wxSize(800, 600))
+MapCanvas::MapCanvas(wxWindow *parent, int id)
+: wxGLCanvas(parent, id, 0)
 {
-	Maximize();
+	// Set GL context
+	SetCurrent(*gl_context);
 }
 
-/* MapEditorWindow::~MapEditorWindow
- * MapEditorWindow class destructor
+/* MapCanvas::~MapCanvas
+ * MapCanvas class destructor
  *******************************************************************/
-MapEditorWindow::~MapEditorWindow()
+MapCanvas::~MapCanvas()
 {
-}
-
-/* MapEditorWindow::setupLayout
- * Sets up the basic map editor window layout
- *******************************************************************/
-void MapEditorWindow::setupLayout()
-{
-	// Create the wxAUI manager & related things
-	wxAuiManager *m_mgr = new wxAuiManager(this);
-	wxAuiPaneInfo p_inf;
-
-
 }

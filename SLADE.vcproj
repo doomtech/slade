@@ -176,6 +176,10 @@
 				Name="Header Files"
 				>
 				<File
+					RelativePath=".\src\MapCanvas.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\MapEditorWindow.h"
 					>
 				</File>
@@ -183,6 +187,10 @@
 			<Filter
 				Name="Source Files"
 				>
+				<File
+					RelativePath=".\src\MapCanvas.cpp"
+					>
+				</File>
 				<File
 					RelativePath=".\src\MapEditorWindow.cpp"
 					>

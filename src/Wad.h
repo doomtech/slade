@@ -15,7 +15,6 @@ protected:
 	string				filename;
 	vector<Lump*>		lumps;
 	bool				iwad;
-	//vector<mapdesc_t>	maps;
 
 public:
 	struct mapdesc_t

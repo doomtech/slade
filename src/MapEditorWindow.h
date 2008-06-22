@@ -9,6 +9,8 @@ private:
 public:
 	MapEditorWindow();
 	~MapEditorWindow();
+
+	void	setupLayout();
 };
 
 #endif //__MAPEDITORWINDOW_H__
