@@ -45,7 +45,7 @@ extern WadManager wad_manager;
 /* WadManagerPanel::WadManagerPanel
  * WadManagerPanel class constructor
  *******************************************************************/
-WadManagerPanel::WadManagerPanel(wxWindow *parent, wxNotebook* nb_wads)
+WadManagerPanel::WadManagerPanel(wxWindow *parent, wxAuiNotebook* nb_wads)
 : wxPanel(parent, -1)
 {
 	notebook_wads = nb_wads;
@@ -55,7 +55,7 @@ WadManagerPanel::WadManagerPanel(wxWindow *parent, wxNotebook* nb_wads)
 	SetSizer(vbox);
 
 	// Create/setup tabs
-	notebook_tabs = new wxNotebook(this, -1, wxDefaultPosition, wxDefaultSize);
+	notebook_tabs = new wxAuiNotebook(this, -1, wxDefaultPosition, wxDefaultSize,  wxAUI_NB_TOP|wxAUI_NB_TAB_SPLIT|wxAUI_NB_TAB_MOVE|wxAUI_NB_SCROLL_BUTTONS);
 	vbox->Add(notebook_tabs, 1, wxEXPAND|wxALL, 4);
 
 	// Open wads & maps list

@@ -3,15 +3,15 @@
 #define __WADMANAGERPANEL_H__
 
 #include <wx/listctrl.h>
-#include <wx/notebook.h>
+#include <wx/aui/auibook.h>
 #include <wx/dirctrl.h>
 #include <wx/listbox.h>
 
 class WadManagerPanel : public wxPanel
 {
 private:
-	wxNotebook*			notebook_tabs;
-	wxNotebook*			notebook_wads;
+	wxAuiNotebook*		notebook_tabs;
+	wxAuiNotebook*		notebook_wads;
 	wxListBox*			list_openwads;
 	wxListCtrl*			list_maps;
 	wxGenericDirCtrl*	file_browser;
@@ -27,7 +27,7 @@ public:
 		BTN_BROWSER_OPEN,
 	};
 
-	WadManagerPanel(wxWindow *parent, wxNotebook* nb_wads);
+	WadManagerPanel(wxWindow *parent, wxAuiNotebook* nb_wads);
 	~WadManagerPanel();
 
 	void	openFile(string filename);

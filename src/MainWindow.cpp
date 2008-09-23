@@ -90,7 +90,7 @@ void MainWindow::setupLayout()
 
 
 	// -- Editor Area --
-	notebook_tabs = new wxNotebook(this, -1, wxDefaultPosition, wxDefaultSize, wxNB_TOP);
+	notebook_tabs = new wxAuiNotebook(this, -1, wxDefaultPosition, wxDefaultSize);
 
 	// Setup panel info & add panel
 	p_inf.CenterPane();

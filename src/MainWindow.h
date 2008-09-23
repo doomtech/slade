@@ -3,13 +3,13 @@
 #define __MAINWINDOW_H__
 
 #include "WadManagerPanel.h"
-#include <wx/notebook.h>
+#include <wx/aui/auibook.h>
 
 class MainWindow : public wxFrame
 {
 private:
 	WadManagerPanel*		panel_wadmanager;
-	wxNotebook*				notebook_tabs;
+	wxAuiNotebook*			notebook_tabs;
 
 public:
 	// wxWidgets ID table
