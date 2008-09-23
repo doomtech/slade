@@ -31,7 +31,6 @@
 #include "WxStuff.h"
 #include "MainWindow.h"
 #include <wx/aui/aui.h>
-#include <wx/html/htmlwin.h>
 
 
 /*******************************************************************
@@ -97,9 +96,10 @@ void MainWindow::setupLayout()
 	m_mgr->AddPane(notebook_tabs, p_inf);
 
 	// Create Start Page (temporary)
-	wxHtmlWindow *html_startpage = new wxHtmlWindow(notebook_tabs, -1);
+	html_startpage = new wxHtmlWindow(notebook_tabs, HTML_WINDOW);
 	notebook_tabs->AddPage(html_startpage, _("Start Page"));
-	html_startpage->SetPage(_("<HTML><BODY><CENTER><H1>SLADE<FONT SIZE=-4>3</FONT></H1><BR>It's A Doom Editor<BR><BR><BR>(Stuff will go here eventually)</CENTER></BODY></HTML>"));
+	//html_startpage->SetPage(_("<HTML><BODY><CENTER><H1>SLADE<FONT SIZE=-4>3</FONT></H1><BR>It's A Doom Editor<BR><BR><BR>(Stuff will go here eventually)</CENTER></BODY></HTML>"));
+	html_startpage->SetPage(_("<HTML><BODY><CENTER><H1>SLADE<FONT SIZE=-4>3</FONT></H1><BR>It's A Doom Editor<BR><BR><BR><A HREF=http://slade.mancubus.net>http://slade.mancubus.net</A></CENTER></BODY></HTML>"));
 
 
 	// -- Wad Manager Panel --
@@ -206,6 +206,8 @@ BEGIN_EVENT_TABLE(MainWindow, wxFrame)
 
 	// View Menu
 	EVT_MENU(MENU_VIEW_WADMANAGER, MainWindow::onViewWadManager)
+
+	EVT_HTML_LINK_CLICKED(HTML_WINDOW, MainWindow::onHTMLLinkClicked)
 END_EVENT_TABLE()
 
 /* MainWindow::onFileOpen
@@ -247,4 +249,16 @@ void MainWindow::onViewWadManager(wxCommandEvent &e)
 	wxAuiManager *m_mgr = wxAuiManager::GetManager(panel_wadmanager);
 	m_mgr->GetPane(panel_wadmanager).Show(true);
 	m_mgr->Update();
+}
+
+/* MainWindow::onHTMLLinkClicked
+ * Called when a link is clicked on the HTML Window, so that
+ * external (http) links are opened in the default browser
+ *******************************************************************/
+void MainWindow::onHTMLLinkClicked(wxHtmlLinkEvent &e)
+{
+	if (e.GetLinkInfo().GetHref().StartsWith(_T("http://")))
+		wxLaunchDefaultBrowser(e.GetLinkInfo().GetHref());
+	else
+		html_startpage->OnLinkClicked(e.GetLinkInfo());
 }

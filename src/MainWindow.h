@@ -4,12 +4,14 @@
 
 #include "WadManagerPanel.h"
 #include <wx/aui/auibook.h>
+#include <wx/html/htmlwin.h>
 
 class MainWindow : public wxFrame
 {
 private:
 	WadManagerPanel*		panel_wadmanager;
 	wxAuiNotebook*			notebook_tabs;
+	wxHtmlWindow*			html_startpage;
 
 public:
 	// wxWidgets ID table
@@ -28,6 +30,8 @@ public:
 		MENU_WAD_SAVE,
 		MENU_WAD_SAVEAS,
 		MENU_WAD_CLOSE,
+
+		HTML_WINDOW,
 	};
 
 	MainWindow();
@@ -41,6 +45,8 @@ public:
 	void	onFileQuit(wxCommandEvent &e);
 
 	void	onViewWadManager(wxCommandEvent &e);
+
+	void	onHTMLLinkClicked(wxHtmlLinkEvent &e);
 
 	DECLARE_EVENT_TABLE()
 };
