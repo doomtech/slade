@@ -98,7 +98,6 @@ void MainWindow::setupLayout()
 	// Create Start Page (temporary)
 	html_startpage = new wxHtmlWindow(notebook_tabs, HTML_WINDOW);
 	notebook_tabs->AddPage(html_startpage, _("Start Page"));
-	//html_startpage->SetPage(_("<HTML><BODY><CENTER><H1>SLADE<FONT SIZE=-4>3</FONT></H1><BR>It's A Doom Editor<BR><BR><BR>(Stuff will go here eventually)</CENTER></BODY></HTML>"));
 	html_startpage->SetPage(_("<HTML><BODY><CENTER><H1>SLADE<FONT SIZE=-4>3</FONT></H1><BR>It's A Doom Editor<BR><BR><BR><A HREF=http://slade.mancubus.net>http://slade.mancubus.net</A></CENTER></BODY></HTML>"));
 
 
@@ -190,24 +189,16 @@ void MainWindow::setMockLayout()
  * WXWIDGETS EVENTS & HANDLERS
  *******************************************************************/
 BEGIN_EVENT_TABLE(MainWindow, wxFrame)
+	EVT_HTML_LINK_CLICKED(HTML_WINDOW, MainWindow::onHTMLLinkClicked)
+
 	// MENU
 
 	// File Menu
-	//EVT_MENU(MENU_FILE_NEW, MainWindow::onFileNew)
-	//EVT_MENU(MENU_FILE_NEWZIP, MainWindow::onFileNewZip)
 	EVT_MENU(MENU_FILE_OPEN, MainWindow::onFileOpen)
-	//EVT_MENU(MENU_FILE_SAVEALL, MainWindow::onFileSaveAll)
-	//EVT_MENU(MENU_FILE_CLOSEALL, MainWindow::onFileCloseAll)
-	//EVT_MENU(MENU_FILE_OPTIONS, MainWindow::onFileOptions)
 	EVT_MENU(MENU_FILE_QUIT, MainWindow::onFileQuit)
-	//EVT_MENU_RANGE(MENU_FILE_RECENT, MENU_FILE_RECENT + 200, MainWindow::onFileRecent)
-
-	// Edit Menu
 
 	// View Menu
 	EVT_MENU(MENU_VIEW_WADMANAGER, MainWindow::onViewWadManager)
-
-	EVT_HTML_LINK_CLICKED(HTML_WINDOW, MainWindow::onHTMLLinkClicked)
 END_EVENT_TABLE()
 
 /* MainWindow::onFileOpen

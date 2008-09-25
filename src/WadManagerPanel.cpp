@@ -34,6 +34,7 @@
 #include "WadManagerPanel.h"
 #include "WadManager.h"
 #include "WadPanel.h"
+#include "MapEditorWindow.h"
 
 
 /*******************************************************************
@@ -128,6 +129,9 @@ void WadManagerPanel::openFiles(wxArrayString& files)
  *******************************************************************/
 BEGIN_EVENT_TABLE(WadManagerPanel, wxPanel)
 	EVT_LISTBOX(LIST_OPENWADS, WadManagerPanel::onListWadsChanged)
+	EVT_LISTBOX_DCLICK(LIST_MAPS, WadManagerPanel::onListWadsActivated)
+	EVT_LISTBOX(LIST_OPENWADS, WadManagerPanel::onListMapsChanged)
+	EVT_LISTBOX_DCLICK(LIST_MAPS, WadManagerPanel::onListMapsActivated)
 	//EVT_TREE_ITEM_ACTIVATED(TREE_BROWSER, WadManagerPanel::onBrowserItemActivated)
 END_EVENT_TABLE()
 
@@ -141,9 +145,15 @@ void WadManagerPanel::onListWadsChanged(wxCommandEvent &e)
 	// Clear current maps list
 	list_maps->ClearAll();
 
-	// Get a list of maps in the selected wad (if any)
-	int selection = list_openwads->GetSelection();
-	vector<Wad::mapdesc_t> maps = wad_manager.getWad(selection)->detectMaps();
+	// Get the selected wad
+	Wad* selected_wad = wad_manager.getWad(list_openwads->GetSelection());
+
+	// Return if selection doesn't exist
+	if (!selected_wad)
+		return;
+
+	// Get the list of maps in the selected wad
+	vector<Wad::mapdesc_t> maps = selected_wad->detectMaps();
 
 	// Go through the list and add maps
 	for (int a = 0; a < (int)maps.size(); a++)
@@ -185,7 +195,7 @@ void WadManagerPanel::onListWadsActivated(wxCommandEvent &e)
 /* WadManagerPanel::onListMapsChanged
  * Event handler for when the user selects a map in the maps list.
  *******************************************************************/
-void WadManagerPanel::onListMapsChanged(wxListEvent &e)
+void WadManagerPanel::onListMapsChanged(wxCommandEvent &e)
 {
 }
 
@@ -193,8 +203,10 @@ void WadManagerPanel::onListMapsChanged(wxListEvent &e)
  * Event handler for when the user activates a map in the maps list.
  * Opens the map in a new map editor window
  *******************************************************************/
-void WadManagerPanel::onListMapsActivated(wxListEvent &e)
+void WadManagerPanel::onListMapsActivated(wxCommandEvent &e)
 {
+	wxMessageBox(_T("heh"));
+	new MapEditorWindow();
 }
 
 /* WadManagerPanel::onBrowserItemActivated

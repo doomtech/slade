@@ -36,8 +36,8 @@ public:
 	// Event handlers
 	void	onListWadsChanged(wxCommandEvent &e);
 	void	onListWadsActivated(wxCommandEvent &e);
-	void	onListMapsChanged(wxListEvent &e);
-	void	onListMapsActivated(wxListEvent &e);
+	void	onListMapsChanged(wxCommandEvent &e);
+	void	onListMapsActivated(wxCommandEvent &e);
 	void	onBrowserItemActivated(wxTreeEvent &e);
 
 	DECLARE_EVENT_TABLE()
