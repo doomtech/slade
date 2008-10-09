@@ -7,6 +7,21 @@
 #include <wx/dirctrl.h>
 #include <wx/listbox.h>
 
+class WadManagerPanel;
+
+class WMFileBrowser : public wxGenericDirCtrl
+{
+private:
+
+public:
+	WadManagerPanel*	parent;
+
+	WMFileBrowser(wxWindow* parent, WadManagerPanel* wm, int id);
+	~WMFileBrowser();
+
+	void onItemActivated(wxTreeEvent &e);
+};
+
 class WadManagerPanel : public wxPanel
 {
 private:
@@ -14,7 +29,7 @@ private:
 	wxAuiNotebook*		notebook_wads;
 	wxListBox*			list_openwads;
 	wxListCtrl*			list_maps;
-	wxGenericDirCtrl*	file_browser;
+	WMFileBrowser*		file_browser;
 	wxButton*			btn_browser_open;
 
 public:
@@ -37,7 +52,7 @@ public:
 	void	onListWadsChanged(wxCommandEvent &e);
 	void	onListWadsActivated(wxCommandEvent &e);
 	void	onListMapsChanged(wxCommandEvent &e);
-	void	onListMapsActivated(wxCommandEvent &e);
+	void	onListMapsActivated(wxListEvent &e);
 	void	onBrowserItemActivated(wxTreeEvent &e);
 
 	DECLARE_EVENT_TABLE()

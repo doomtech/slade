@@ -16,6 +16,8 @@ private:
 public:
 	WadPanel(wxWindow *parent, Wad* wad);
 	~WadPanel();
+
+	Wad*	getWad() { return wad; }
 };
 
 #endif //__WADPANEL_H__
