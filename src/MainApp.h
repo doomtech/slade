@@ -4,6 +4,8 @@
 
 class MainApp : public wxApp
 {
+private:
+
 public:
 	virtual bool OnInit();
 	virtual int OnExit();

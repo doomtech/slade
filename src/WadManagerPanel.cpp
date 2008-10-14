@@ -50,7 +50,10 @@ WMFileBrowser::WMFileBrowser(wxWindow* parent, WadManagerPanel* wm, int id)
 : wxGenericDirCtrl(parent, id, wxDirDialogDefaultFolderStr, wxDefaultPosition, wxDefaultSize, wxDIRCTRL_SHOW_FILTERS,
 					_T("Any Supported Wad File (*.wad; *.zip; *.pk3)|*.wad;*.zip;*.pk3|Doom Wad files (*.wad)|*.wad|Zip files (*.zip)|*.zip|Pk3 (zip) files (*.pk3)|*.pk3|All Files (*.*)|*.*"))
 {
+	// Set the parent
 	this->parent = wm;
+	
+	// Connect a custom event for when an item in the file tree is activated
 	GetTreeCtrl()->Connect(GetTreeCtrl()->GetId(), wxEVT_COMMAND_TREE_ITEM_ACTIVATED, wxTreeEventHandler(WMFileBrowser::onItemActivated));
 }
 
@@ -62,10 +65,9 @@ WMFileBrowser::~WMFileBrowser()
 }
 
 /* WMFileBrowser::onItemActivated
- * Event called when an item in the tree is activated
- * Doesn't appear to work no matter how I do things, seems I'll
- * have to write my own file browser. wxGenericDirCtrl sucks.
- *******************************************************************/
+ * Event called when an item in the tree is activated. Opens a wadfile
+ * if one is selected.
+  *******************************************************************/
 void WMFileBrowser::onItemActivated(wxTreeEvent &e)
 {
 	// Get related objects
