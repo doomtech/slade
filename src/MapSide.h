@@ -10,8 +10,8 @@ private:
 	MapSector*	sector;
 
 public:
-	MapSide();
-	~MapSide();
+	MapSide(){}
+	~MapSide(){}
 };
 
 #endif //__MAPSIDE_H__

@@ -13,8 +13,8 @@ private:
 	vector<MapLine*>	connected_lines;
 
 public:
-	MapVertex();
-	~MapVertex();
+	MapVertex(){}
+	~MapVertex(){}
 };
 
 #endif //__MAPVERTEX_H__

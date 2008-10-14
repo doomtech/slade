@@ -14,4 +14,13 @@ public:
 	~LumpArea();
 };
 
+class TextLumpArea : public LumpArea
+{
+private:
+
+public:
+	TextLumpArea(wxWindow* parent);
+	~TextLumpArea();
+};
+
 #endif //__LUMPAREA_H__

@@ -10,8 +10,8 @@ private:
 	vector<MapSide*>	connected_sides;
 
 public:
-	MapSector();
-	~MapSector();
+	MapSector(){}
+	~MapSector(){}
 };
 
 #endif //__MAPSECTOR_H__

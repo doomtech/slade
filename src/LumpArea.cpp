@@ -5,8 +5,9 @@
  * 
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
- * Filename:    LumpListPanel.cpp
- * Description: LumpListPanel class (and related classes).
+ * Filename:    LumpArea.cpp
+ * Description: LumpArea class. Different UI panels for editing
+ *              different lump types extend from this class.
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License

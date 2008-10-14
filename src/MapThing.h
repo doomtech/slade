@@ -9,8 +9,8 @@ private:
 	double y;
 
 public:
-	MapThing();
-	~MapThing();
+	MapThing(){}
+	~MapThing(){}
 };
 
 #endif //__MAPTHING_H__

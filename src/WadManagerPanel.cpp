@@ -51,7 +51,7 @@ WMFileBrowser::WMFileBrowser(wxWindow* parent, WadManagerPanel* wm, int id)
 					_T("Any Supported Wad File (*.wad; *.zip; *.pk3)|*.wad;*.zip;*.pk3|Doom Wad files (*.wad)|*.wad|Zip files (*.zip)|*.zip|Pk3 (zip) files (*.pk3)|*.pk3|All Files (*.*)|*.*"))
 {
 	this->parent = wm;
-	//GetTreeCtrl()->Connect(GetTreeCtrl()->GetId(), wxEVT_COMMAND_TREE_ITEM_ACTIVATED, wxTreeEventHandler(WMFileBrowser::onItemActivated), this);
+	GetTreeCtrl()->Connect(GetTreeCtrl()->GetId(), wxEVT_COMMAND_TREE_ITEM_ACTIVATED, wxTreeEventHandler(WMFileBrowser::onItemActivated));
 }
 
 /* WMFileBrowser::~WMFileBrowser
@@ -69,14 +69,17 @@ WMFileBrowser::~WMFileBrowser()
 void WMFileBrowser::onItemActivated(wxTreeEvent &e)
 {
 	// Get related objects
-	WMFileBrowser* browser = (WMFileBrowser*)e.GetClientData();
 	wxTreeCtrl* tree = (wxTreeCtrl*)e.GetEventObject();
+	WMFileBrowser* browser = (WMFileBrowser*)tree->GetParent();
 
 	// If the selected item has no children (ie it's a file), open it
 	// as a wad file in the wad manager
 	if (!tree->ItemHasChildren(e.GetItem()))
 		browser->parent->openFile(browser->GetPath());
 }
+
+
+
 
 /* WadManagerPanel::WadManagerPanel
  * WadManagerPanel class constructor
@@ -166,7 +169,6 @@ BEGIN_EVENT_TABLE(WadManagerPanel, wxPanel)
 	EVT_LISTBOX_DCLICK(LIST_OPENWADS, WadManagerPanel::onListWadsActivated)
 	EVT_LISTBOX(LIST_MAPS, WadManagerPanel::onListMapsChanged)
 	EVT_LIST_ITEM_ACTIVATED(LIST_MAPS, WadManagerPanel::onListMapsActivated)
-	//EVT_TREE_ITEM_ACTIVATED(TREE_BROWSER, WadManagerPanel::onBrowserItemActivated) // Can't get it to work properly, disabled for now
 END_EVENT_TABLE()
 
 /* WadManagerPanel::onListWadsChanged

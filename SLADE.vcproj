@@ -60,6 +60,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="winmm.lib rpcrt4.lib kernel32.lib user32.lib gdi32.lib ole32.lib oleaut32.lib comctl32.lib comdlg32.lib uuid.lib advapi32.lib shell32.lib wxbase28ud.lib wxmsw28ud_core.lib wxmsw28ud_gl.lib wxmsw28ud_aui.lib wxmsw28ud_html.lib wxzlibd.lib wxpngd.lib opengl32.lib glu32.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -292,10 +293,6 @@
 				Name="Header Files"
 				>
 				<File
-					RelativePath=".\src\LumpArea.h"
-					>
-				</File>
-				<File
 					RelativePath=".\src\LumpListPanel.h"
 					>
 				</File>
@@ -316,10 +313,6 @@
 				Name="Source Files"
 				>
 				<File
-					RelativePath=".\src\LumpArea.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\src\LumpListPanel.cpp"
 					>
 				</File>
@@ -335,6 +328,30 @@
 					RelativePath=".\src\WadPanel.cpp"
 					>
 				</File>
+			</Filter>
+			<Filter
+				Name="LumpArea"
+				>
+				<Filter
+					Name="Header Files"
+					>
+					<File
+						RelativePath=".\src\LumpArea.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="Source Files"
+					>
+					<File
+						RelativePath=".\src\LumpArea.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\TextLumpArea.cpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter
@@ -371,6 +388,10 @@
 			<Filter
 				Name="Source Files"
 				>
+				<File
+					RelativePath=".\src\SLADEMap.cpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 	</Files>

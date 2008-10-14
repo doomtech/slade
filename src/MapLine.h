@@ -14,8 +14,8 @@ private:
 	MapSide*	side2;
 
 public:
-	MapLine();
-	~MapLine();
+	MapLine(){}
+	~MapLine(){}
 };
 
 #endif //__MAPLINE_H__
