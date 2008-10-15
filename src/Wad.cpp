@@ -94,6 +94,14 @@ bool Wad::isIWAD()
 	return iwad;
 }
 
+/* Wad::checkLumpIndex
+ * Checks if a lump index is valid
+ *******************************************************************/
+bool Wad::checkLumpIndex(int index)
+{
+	return (index < 0 || index >= (int)lumps.size());
+}
+
 /* Wad::numLumps
  * Returns the number of lumps in the wad
  *******************************************************************/
@@ -108,7 +116,7 @@ int Wad::numLumps()
 Lump* Wad::lumpAt(int index)
 {
 	// Check for invalid index
-	if (index < 0 || index >= (int)lumps.size())
+	if (!checkLumpIndex(index))
 		return NULL;
 
 	return lumps[index];
@@ -422,4 +430,93 @@ vector<Wad::mapdesc_t> Wad::detectMaps()
 	}
 
 	return maps;
+}
+
+/* Wad::addLump
+ * Adds the specified lump to the list before the specified index.
+ * Returns false if the index is invalid or lump is NULL, true otherwise.
+ *******************************************************************/
+bool Wad::addLump(Lump* lump, int index)
+{
+	// Check for invalid index
+	if (!checkLumpIndex(index))
+		return false;
+
+	// Set the lump's parent
+	lump->setParent(this);
+	
+	// Add the lump to the list before index
+	lumps.insert(lumps.begin() + index, lump);
+
+	return true;
+}
+
+/* Wad::addLumpEnd
+ * Adds the specified lump to the end of the list.
+ * Returns false if lump is NULL, true otherwise.
+ *******************************************************************/
+bool Wad::addLumpEnd(Lump* lump)
+{
+	// Check for null lump
+	if (!lump)
+		return false;
+
+	// Set the lump's parent
+	lump->setParent(this);
+
+	// Add the lump to the end of the list
+	lumps.push_back(lump);
+
+	return true;
+}
+
+/* Wad::removeLump
+ * Removes the lump at index from the lump list, but doesn't delete
+ * the lump itself. Returns false if index is invalid, true otherwise
+ *******************************************************************/
+bool Wad::removeLump(int index)
+{
+	// Check for invalid index
+	if (!checkLumpIndex(index))
+		return false;
+
+	// De-parent the lump
+	lumps[index]->setParent(NULL);
+
+	// Remove the lump from the list
+	lumps.erase(lumps.begin() + index);
+
+	return true;
+}
+
+/* Wad::removeLump
+ * Removes the lump specified from the lump list, but doesn't delete
+ * the lump itself. Returns false if the lump does not exist in the
+ * wad.
+ *******************************************************************/
+bool Wad::removeLump(Lump* lump)
+{
+	// Check for null lump
+	if (!lump)
+		return false;
+
+	// Check the lump's parent
+	if (lump->getParent() != this)
+		return false;
+
+	// Get the index of the lump
+	int index = lumpIndex(lump);
+
+	// If the index is valid (not -1), remove the lump from the list
+	if (index >= 0)
+	{
+		// De-parent the lump
+		lump->setParent(NULL);
+
+		// Remove
+		lumps.erase(lumps.begin() + index);
+		return true;
+	}
+	else
+		return false;
 }

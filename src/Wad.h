@@ -38,11 +38,18 @@ public:
 	Lump*	lumpAt(int index);
 	int		lumpIndex(Lump* lump);
 
+	// Lump management
+	bool	addLump(Lump* lump, int index);
+	bool	addLumpEnd(Lump* lump);
+	bool	removeLump(int index);
+	bool	removeLump(Lump* lump);
+
 	// File operations
 	virtual bool	openFile(string filename, string &error);
 	virtual bool	loadLump(Lump* lump);
 
 	// Misc
+	bool	checkLumpIndex(int index);
 	virtual vector<mapdesc_t>	detectMaps();
 };
 

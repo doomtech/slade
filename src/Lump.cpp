@@ -50,6 +50,8 @@ Lump::Lump(Wad* parent_)
  *******************************************************************/
 Lump::~Lump()
 {
+	if (parent)
+		parent->removeLump(this);
 }
 
 /* Lump::getData
