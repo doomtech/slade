@@ -214,6 +214,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\ListenerAnnouncer.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\Main.h"
 					>
 				</File>
@@ -241,6 +245,10 @@
 				>
 				<File
 					RelativePath=".\src\Console.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ListenerAnnouncer.cpp"
 					>
 				</File>
 				<File
@@ -401,6 +409,26 @@
 				>
 				<File
 					RelativePath=".\src\SLADEMap.cpp"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="Misc UI Elements"
+			>
+			<Filter
+				Name="Header Files"
+				>
+				<File
+					RelativePath=".\src\ConsolePanel.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				>
+				<File
+					RelativePath=".\src\ConsolePanel.cpp"
 					>
 				</File>
 			</Filter>

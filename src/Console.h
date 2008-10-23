@@ -2,6 +2,8 @@
 #ifndef	__CONSOLE_H__
 #define	__CONSOLE_H__
 
+#include "ListenerAnnouncer.h"
+
 class ConsoleCommand
 {
 private:
@@ -16,10 +18,13 @@ public:
 	void	execute(vector<string> args) { commandFunc(args); }
 };
 
-class Console
+class Console : public Announcer
 {
 private:
 	vector<ConsoleCommand>	commands;
+
+	vector<string>	log;
+	vector<string>	cmd_log;
 
 public:
 	Console();
@@ -27,6 +32,7 @@ public:
 
 	void	addCommand(ConsoleCommand &c);
 	void	execute(string command);
+	void	logMessage(string message);
 };
 
 // Define for neat console command definitions

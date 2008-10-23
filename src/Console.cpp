@@ -30,23 +30,51 @@
 #include "Main.h"
 #include "Console.h"
 #include "Tokenizer.h"
+#include <wx/log.h>
 
+
+/*******************************************************************
+ * VARIABLES
+ *******************************************************************/
 Console console;
 
+
+/* Console::Console
+ * Console class constructor
+ *******************************************************************/
 Console::Console()
 {
 }
 
+/* Console::!Console
+ * Console class destructor
+ *******************************************************************/
 Console::~Console()
 {
 }
 
+/* Console::addCommand
+ * Adds a ConsoleCommand to the Console
+ *******************************************************************/
 void Console::addCommand(ConsoleCommand &c)
 {
+	// Add the command to the list
+	commands.push_back(c);
 }
 
+/* Console::execute
+ * Attempts to execute the command line given
+ *******************************************************************/
 void Console::execute(string command)
 {
+	wxLogMessage(command);
+
+	// Add the command to the log
+	cmd_log.push_back(command);
+
+	// Announce that a command has been executed
+	announce(_T("console_execute"), MemChunk());
+
 	// Tokenize the command string
 	Tokenizer tz;
 	tz.openString(command);
@@ -78,6 +106,25 @@ void Console::execute(string command)
 	return;
 }
 
+/* Console::logMessage
+ * Prints a message to the console log
+ *******************************************************************/
+void Console::logMessage(string message)
+{
+	// Log the message
+	log.push_back(message);
+
+	// Announce that a new message has been logged
+	announce(_T("console_logmessage"), MemChunk());
+
+	wxLogMessage(s_fmt(_T("Console: %s"), message.c_str()));
+}
+
+
+
+/* ConsoleCommand::ConsoleCommand
+ * ConsoleCommand class constructor
+ *******************************************************************/
 ConsoleCommand::ConsoleCommand(string name, void(*commandFunc)(vector<string>))
 {
 	this->name = name;
@@ -85,10 +132,13 @@ ConsoleCommand::ConsoleCommand(string name, void(*commandFunc)(vector<string>))
 	console.addCommand(*this);
 }
 
-CONSOLE_COMMAND(test1,
+
+
+/* Console Command - "echo"
+ * A simple command to print the first given argument to the console.
+ * Subsequent arguments are ignored.
+ *******************************************************************/
+CONSOLE_COMMAND(echo,
 {
-	int a = 0;
-	int b = 5;
-	a = a + b;
-	return;
+	console.logMessage(args[0]);
 })
