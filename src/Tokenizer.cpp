@@ -108,7 +108,7 @@ bool Tokenizer::openString(string text, DWORD offset, DWORD length)
 	start = current = (char *)malloc(size);
 
 	// Copy the string portion
-	memcpy(start, text.c_str() + offset, size);
+	memcpy(start, ((char*)text.char_str()) + offset, size);
 
 	return true;
 }

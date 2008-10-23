@@ -210,7 +210,7 @@ void MainWindow::onFileOpen(wxCommandEvent &e)
 	// and filters by wad, zip and pk3 file extensions
 	wxFileDialog *dialog_open = new wxFileDialog(this, _T("Choose file(s) to open"), wxEmptyString, wxEmptyString, 
 		_T("Any Supported File (*.wad; *.zip; *.pk3)|*.wad;*.zip;*.pk3|Doom Wad files (*.wad)|*.wad|Zip files (*.zip)|*.zip|Pk3 (zip) files (*.pk3)|*.pk3"),
-		wxOPEN|wxMULTIPLE|wxFILE_MUST_EXIST, wxDefaultPosition);
+		wxFD_OPEN|wxFD_MULTIPLE|wxFD_FILE_MUST_EXIST, wxDefaultPosition);
 
 	// Run the dialog & check that the user didn't cancel
 	if (dialog_open->ShowModal() == wxID_OK)

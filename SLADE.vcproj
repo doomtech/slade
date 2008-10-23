@@ -115,7 +115,10 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
+				WholeProgramOptimization="false"
+				PreprocessorDefinitions="WIN32;__WXMSW__;_WINDOWS;NOPCH"
+				GeneratePreprocessedFile="0"
+				StringPooling="true"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
@@ -133,7 +136,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="winmm.lib rpcrt4.lib kernel32.lib user32.lib gdi32.lib ole32.lib oleaut32.lib comctl32.lib comdlg32.lib uuid.lib advapi32.lib shell32.lib wxbase28u.lib wxmsw28u_core.lib wxmsw28u_gl.lib wxmsw28u_aui.lib wxmsw28u_html.lib wxzlib.lib wxpng.lib opengl32.lib glu32.lib"
+				AdditionalDependencies="wxmsw28u_core.lib wxbase28u.lib wxmsw28u_aui.lib wxmsw28u_gl.lib wxmsw28u_html.lib wxtiff.lib wxjpeg.lib wxpng.lib wxzlib.lib wxregexu.lib wxexpat.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib"
 				LinkIncremental="1"
 				GenerateManifest="true"
 				EnableUAC="false"
@@ -236,6 +239,10 @@
 				Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 				UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 				>
+				<File
+					RelativePath=".\src\Console.cpp"
+					>
+				</File>
 				<File
 					RelativePath=".\src\MainApp.cpp"
 					>
