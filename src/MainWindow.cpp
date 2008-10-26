@@ -30,6 +30,7 @@
 #include "Main.h"
 #include "WxStuff.h"
 #include "MainWindow.h"
+#include "ConsolePanel.h"
 #include <wx/aui/aui.h>
 
 
@@ -82,6 +83,7 @@ void MainWindow::setupLayout()
 	// View menu
 	wxMenu* viewMenu = new wxMenu(_T(""));
 	viewMenu->Append(MENU_VIEW_WADMANAGER,	_("&Wad Manager"),	_T("Show the wad manager"));
+	viewMenu->Append(MENU_VIEW_CONSOLE,		_("&Console"),		_T("Show the console"));
 	menu->Append(viewMenu, _("&View"));
 
 	// Set the menu
@@ -111,7 +113,22 @@ void MainWindow::setupLayout()
 	p_inf.TopDockable(false);
 	p_inf.BestSize(192, 480);
 	p_inf.Caption(_("Wad Manager"));
+	p_inf.Name(_T("wad_manager"));
 	m_mgr->AddPane(panel_wadmanager, p_inf);
+
+
+
+	// -- Console Panel --
+	ConsolePanel *panel_console = new ConsolePanel(this, -1);
+
+	// Setup panel info & add panel
+	p_inf.DefaultPane();
+	p_inf.Float();
+	p_inf.FloatingSize(600, 400);
+	p_inf.Show(false);
+	p_inf.Caption(_("Console"));
+	p_inf.Name(_T("console"));
+	m_mgr->AddPane(panel_console, p_inf);
 
 
 	// -- Status Bar --
@@ -199,6 +216,7 @@ BEGIN_EVENT_TABLE(MainWindow, wxFrame)
 
 	// View Menu
 	EVT_MENU(MENU_VIEW_WADMANAGER, MainWindow::onViewWadManager)
+	EVT_MENU(MENU_VIEW_CONSOLE, MainWindow::onViewConsole)
 END_EVENT_TABLE()
 
 /* MainWindow::onFileOpen
@@ -238,7 +256,17 @@ void MainWindow::onFileQuit(wxCommandEvent &e)
 void MainWindow::onViewWadManager(wxCommandEvent &e)
 {
 	wxAuiManager *m_mgr = wxAuiManager::GetManager(panel_wadmanager);
-	m_mgr->GetPane(panel_wadmanager).Show(true);
+	m_mgr->GetPane(_T("wad_manager")).Show(true);
+	m_mgr->Update();
+}
+
+/* MainWindow::onViewConsole
+ * View->Console menu item event handler.
+ *******************************************************************/
+void MainWindow::onViewConsole(wxCommandEvent &e)
+{
+	wxAuiManager *m_mgr = wxAuiManager::GetManager(panel_wadmanager);
+	m_mgr->GetPane(_T("console")).Show(true);
 	m_mgr->Update();
 }
 

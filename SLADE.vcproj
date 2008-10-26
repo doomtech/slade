@@ -144,6 +144,7 @@
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				LinkTimeCodeGeneration="0"
 				TargetMachine="1"
 				AllowIsolation="true"
 			/>
@@ -346,6 +347,14 @@
 				<File
 					RelativePath=".\src\WadPanel.cpp"
 					>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							StringPooling="false"
+						/>
+					</FileConfiguration>
 				</File>
 			</Filter>
 			<Filter

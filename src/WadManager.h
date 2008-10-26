@@ -20,6 +20,7 @@ public:
 	bool	closeWad(int index);
 	bool	closeWad(string filename);
 	bool	closeWad(Wad* wad);
+	int		numWads() { return (int)open_wads.size(); }
 };
 
 #endif //__WADMANAGER_H__

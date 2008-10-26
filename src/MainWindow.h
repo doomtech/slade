@@ -26,6 +26,7 @@ public:
 		MENU_FILE_QUIT,
 
 		MENU_VIEW_WADMANAGER,
+		MENU_VIEW_CONSOLE,
 
 		MENU_WAD_SAVE,
 		MENU_WAD_SAVEAS,
@@ -45,6 +46,7 @@ public:
 	void	onFileQuit(wxCommandEvent &e);
 
 	void	onViewWadManager(wxCommandEvent &e);
+	void	onViewConsole(wxCommandEvent &e);
 
 	void	onHTMLLinkClicked(wxHtmlLinkEvent &e);
 

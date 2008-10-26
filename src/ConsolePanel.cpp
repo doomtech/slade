@@ -74,10 +74,23 @@ void ConsolePanel::initLayout()
 	vbox->Add(text_command, 0, wxEXPAND|wxBOTTOM|wxLEFT|wxRIGHT, 4);
 
 	Layout();
+
+	// Set console font (doesn't work for some reason)
+	wxFont console_font(14, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
+	text_log->SetDefaultStyle(wxTextAttr(wxNullColour, wxNullColour, console_font));
+	text_command->SetDefaultStyle(wxTextAttr(wxNullColour, wxNullColour, console_font));
 }
 
+/* ConsolePanel::onAnnouncement
+ * Handles any announcement events
+ *******************************************************************/
 void ConsolePanel::onAnnouncement(string event_name, MemChunk& event_data)
 {
+	// New console log message added
+	if (event_name == _T("console_logmessage"))
+	{
+		text_log->AppendText(console.lastLogLine());
+	}
 }
 
 /*******************************************************************
@@ -89,5 +102,6 @@ END_EVENT_TABLE()
 
 void ConsolePanel::onCommandEnter(wxCommandEvent &e)
 {
+	console.execute(e.GetString());
 	text_command->Clear();
 }
