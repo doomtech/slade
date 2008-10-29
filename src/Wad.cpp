@@ -99,7 +99,7 @@ bool Wad::isIWAD()
  *******************************************************************/
 bool Wad::checkLumpIndex(int index)
 {
-	return (index < 0 || index >= (int)lumps.size());
+	return (index >= 0 && index < (int)lumps.size());
 }
 
 /* Wad::numLumps

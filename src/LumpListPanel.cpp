@@ -66,7 +66,10 @@ bool LumpList::updateEntry(int index)
 
 	// Check that it exists
 	if (!lump)
+	{
+		wxLogMessage(_T("LumpList entry at index %d has no associated lump!"), index);
 		return false;
+	}
 
 	// Setup entry
 	wxListItem li;
