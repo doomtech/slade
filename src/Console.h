@@ -34,6 +34,12 @@ public:
 	Console();
 	~Console();
 
+	static Console& getInstance()
+	{
+		static Console instance;
+		return instance;
+	}
+
 	int				numCommands() { return (int)commands.size(); }
 	ConsoleCommand&	command(int index);
 

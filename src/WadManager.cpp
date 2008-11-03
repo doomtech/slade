@@ -39,13 +39,11 @@
 /*******************************************************************
  * VARIABLES
  *******************************************************************/
-WadManager wad_manager;	// The Wad Manager itself!
 
 
 /*******************************************************************
  * EXTERNAL VARIABLES
  *******************************************************************/
-extern Console console;
 
 
 /* WadManager::WadManager
@@ -201,11 +199,11 @@ bool WadManager::closeWad(Wad* wad)
  *******************************************************************/
 CONSOLE_COMMAND(list_wads, 0,
 {
-	console.logMessage(s_fmt(_T("%d Open Wads:"), wad_manager.numWads()));
+	Console::getInstance().logMessage(s_fmt(_T("%d Open Wads:"), WadManager::getInstance().numWads()));
 
-	for (int a = 0; a < wad_manager.numWads(); a++)
+	for (int a = 0; a < WadManager::getInstance().numWads(); a++)
 	{
-		Wad* wad = wad_manager.getWad(a);
-		console.logMessage(s_fmt(_T("%d: \"%s\""), a+1, wad->getFileName().c_str()));
+		Wad* wad = WadManager::getInstance().getWad(a);
+		Console::getInstance().logMessage(s_fmt(_T("%d: \"%s\""), a+1, wad->getFileName().c_str()));
 	}
 })

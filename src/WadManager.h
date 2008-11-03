@@ -7,11 +7,17 @@ class Wad;
 class WadManager
 {
 private:
-	vector<Wad*>	open_wads;
+	vector<Wad*>		open_wads;
 
 public:
 	WadManager();
 	~WadManager();
+
+	static WadManager&	getInstance()
+	{
+		static WadManager instance;
+		return instance;
+	}
 
 	bool	addWad(Wad* wad);
 	Wad*	getWad(int index);

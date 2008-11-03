@@ -37,7 +37,6 @@
 /*******************************************************************
  * VARIABLES
  *******************************************************************/
-Console console;
 
 
 /* Console::Console
@@ -168,7 +167,7 @@ ConsoleCommand::ConsoleCommand(string name, void(*commandFunc)(vector<string>), 
 	this->min_args = min_args;
 
 	// Add this command to the console
-	console.addCommand(*this);
+	Console::getInstance().addCommand(*this);
 }
 
 /* ConsoleCommand::execute
@@ -180,7 +179,7 @@ void ConsoleCommand::execute(vector<string> args)
 	if (args.size() >= min_args)
 		commandFunc(args);
 	else
-		console.logMessage(_T("Missing command arguments"));
+		Console::getInstance().logMessage(_T("Missing command arguments"));
 }
 
 
@@ -192,7 +191,7 @@ void ConsoleCommand::execute(vector<string> args)
  *******************************************************************/
 CONSOLE_COMMAND(echo, 1, 
 {
-	console.logMessage(args[0]);
+	Console::getInstance().logMessage(args[0]);
 })
 
 /* Console Command - "cmdlist"
@@ -200,8 +199,8 @@ CONSOLE_COMMAND(echo, 1,
  *******************************************************************/
 CONSOLE_COMMAND(cmdlist, 0,
 {
-	console.logMessage(s_fmt(_T("%d Valid Commands:"), console.numCommands()));
+	Console::getInstance().logMessage(s_fmt(_T("%d Valid Commands:"), Console::getInstance().numCommands()));
 
-	for (size_t a = 0; a < console.numCommands(); a++)
-		console.logMessage(s_fmt(_T("\"%s\""), console.command(a).getName().c_str()));
+	for (size_t a = 0; a < Console::getInstance().numCommands(); a++)
+		Console::getInstance().logMessage(s_fmt(_T("\"%s\""), Console::getInstance().command(a).getName().c_str()));
 })

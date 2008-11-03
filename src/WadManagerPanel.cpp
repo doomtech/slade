@@ -40,7 +40,6 @@
 /*******************************************************************
  * EXTERNAL VARIABLES
  *******************************************************************/
-extern WadManager wad_manager;
 
 
 /* WMFileBrowser::WMFileBrowser
@@ -134,7 +133,7 @@ void WadManagerPanel::openFile(string filename)
 {
 	// Open the file in the wad manager
 	string error;
-	Wad* new_wad = wad_manager.openWad(filename, error);
+	Wad* new_wad = WadManager::getInstance().openWad(filename, error);
 
 	// Check that the wad opened ok
 	if (new_wad)
@@ -184,7 +183,7 @@ void WadManagerPanel::onListWadsChanged(wxCommandEvent &e)
 	list_maps->ClearAll();
 
 	// Get the selected wad
-	Wad* selected_wad = wad_manager.getWad(list_openwads->GetSelection());
+	Wad* selected_wad = WadManager::getInstance().getWad(list_openwads->GetSelection());
 
 	// Return if selection doesn't exist
 	if (!selected_wad)
@@ -228,7 +227,7 @@ void WadManagerPanel::onListWadsChanged(wxCommandEvent &e)
 void WadManagerPanel::onListWadsActivated(wxCommandEvent &e)
 {
 	// Get the selected wad
-	Wad* selected_wad = wad_manager.getWad(list_openwads->GetSelection());
+	Wad* selected_wad = WadManager::getInstance().getWad(list_openwads->GetSelection());
 
 	// Go through all tabs
 	for (size_t a = 0; a < notebook_wads->GetPageCount(); a++)

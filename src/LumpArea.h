@@ -3,6 +3,7 @@
 #define __LUMPAREA_H__
 
 #include "Lump.h"
+//#include <wx/stc/stc.h>
 
 class LumpArea : public wxPanel
 {

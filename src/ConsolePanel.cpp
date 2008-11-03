@@ -36,7 +36,6 @@
 /*******************************************************************
  * EXTERNAL VARIABLES
  *******************************************************************/
-extern Console console;
 
 
 /* ConsolePanel::ConsolePanel
@@ -46,7 +45,7 @@ ConsolePanel::ConsolePanel(wxWindow *parent, int id)
 :	wxPanel(parent, id)
 {
 	initLayout();
-	listenTo(&console);
+	listenTo(&Console::getInstance());
 }
 
 /* ConsolePanel::~ConsolePanel
@@ -89,7 +88,7 @@ void ConsolePanel::onAnnouncement(string event_name, MemChunk& event_data)
 	// New console log message added
 	if (event_name == _T("console_logmessage"))
 	{
-		text_log->AppendText(console.lastLogLine());
+		text_log->AppendText(Console::getInstance().lastLogLine());
 	}
 }
 
@@ -102,6 +101,6 @@ END_EVENT_TABLE()
 
 void ConsolePanel::onCommandEnter(wxCommandEvent &e)
 {
-	console.execute(e.GetString());
+	Console::getInstance().execute(e.GetString());
 	text_command->Clear();
 }

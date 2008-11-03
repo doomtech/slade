@@ -444,7 +444,7 @@ bool Wad::addLump(Lump* lump, int index)
 
 	// Set the lump's parent
 	lump->setParent(this);
-	
+
 	// Add the lump to the list before index
 	lumps.insert(lumps.begin() + index, lump);
 
