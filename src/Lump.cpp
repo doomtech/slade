@@ -41,7 +41,7 @@ Lump::Lump(Wad* parent_)
 	this->parent = parent;
 	data = NULL;
 	size = 0;
-	offset = 0;
+	offset = -1;
 	data_loaded = true;
 }
 
@@ -100,4 +100,123 @@ bool Lump::setExProp(string key, string value)
 	bool exists = hasExProp(key);
 	ex_props[key] = value;
 	return exists;
+}
+
+/* Lump::clearData
+ * Clears lump data and resets it's size to zero
+ *******************************************************************/
+void Lump::clearData()
+{
+	// Delete the data
+	if (data)
+		delete data;
+
+	// Reset attributes
+	size = 0;
+	offset = -1;
+}
+
+/* Lump::importMem
+ * Imports a chunk of memory into the lump, resizing it and clearing
+ * any currently existing data.
+ * Returns false if data pointer is invalid or size is negative,
+ * or true otherwise.
+ *******************************************************************/
+bool Lump::importMem(void* data, DWORD size)
+{
+	// Check parameters
+	if (!data || size < 0)
+		return false;
+
+	// Clear any current data
+	clearData();
+
+	// Copy data into the lump
+	this->data = new BYTE[size];
+	memcpy(this->data, data, size);
+
+	// Update attributes
+	this->size = size;
+
+	return true;
+}
+
+/* Lump::importMemChunk
+ * Imports data from a MemChunk object into the lump, resizing it
+ * and clearing any currently existing data.
+ * Returns false if the MemChunk has no data, or true otherwise.
+ *******************************************************************/
+bool Lump::importMemChunk(MemChunk& mc)
+{
+	// Check that the given MemChunk has data
+	if (mc.hasData())
+	{
+		// Copy the data from the MemChunk into the lump
+		importMem(mc.getData(), mc.getSize());
+		return true;
+	}
+	else
+		return false;
+}
+
+/* Lump::importFile
+ * Loads a portion of a file into the lump, overwriting any existing
+ * data currently in the lump. A size of -1 means load from the
+ * offset to the end of the file.
+ * Returns false if the file does not exist or the given offset/size
+ * are out of bounds, otherwise returns true.
+ *******************************************************************/
+bool Lump::importFile(string filename, DWORD offset = 0, DWORD size = -1)
+{
+	// Open the file
+	FILE* fp = fopen(filename.ToAscii(), "rb");
+
+	// Check that it opened ok
+	if (!fp)
+		return false;
+
+	// Get the file's size
+	fseek(fp, 0, SEEK_END);
+	DWORD fsize = ftell(fp);
+
+	// Get the size to read, if negative
+	if (size < 0)
+		size = fsize - offset;
+
+	// Check offset/size bounds
+	if (offset + size > fsize || offset < 0)
+	{
+		fclose(fp);
+		return false;
+	}
+
+	// Create temporary buffer and load file contents
+	BYTE* temp_buf = new BYTE[size];
+	fseek(fp, offset, SEEK_SET);
+	fread(temp_buf, size, 1, fp);
+
+	// Import data into lump
+	importMem(temp_buf, size);
+
+	// Delete temp buffer
+	delete temp_buf;
+
+	return true;
+}
+
+/* Lump::importLump
+ * Imports data from another lump into this lump, resizing it
+ * and clearing any currently existing data.
+ * Returns false if the MemChunk has no data, or true otherwise.
+ *******************************************************************/
+bool Lump::importLump(Lump* lump)
+{
+	// Check parameters
+	if (!lump)
+		return false;
+
+	// Copy lump data
+	importMem(lump->getData(), lump->getSize());
+
+	return true;
 }

@@ -12,7 +12,7 @@ class Lump
 private:
 	Wad*			parent;
 	string			name;
-	DWORD			offset; // In a zip/pk3 file, this will be the entry index
+	DWORD			offset; // In a zip/pk3 file, this will be the entry index. -1 means undefined
 	BYTE*			data;
 	DWORD			size;
 
@@ -41,6 +41,15 @@ public:
 	void		setSize(DWORD size_) { size = size_; }
 	void		setData(BYTE* data_) { data = data_; }
 	void		setLoaded(bool loaded = true) { data_loaded = loaded; }
+
+	// Data modification
+	void	clearData();
+
+	// Data import
+	bool	importMem(void* data, DWORD size);
+	bool	importMemChunk(MemChunk& mc);
+	bool	importFile(string filename, DWORD offset, DWORD size);
+	bool	importLump(Lump* lump);
 
 	// Extra properties stuff
 	bool	hasExProp(string key);
