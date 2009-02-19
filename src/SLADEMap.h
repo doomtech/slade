@@ -9,6 +9,7 @@
 #include "MapThing.h"
 #include "Wad.h"
 
+
 class SLADEMap
 {
 private:
