@@ -2,7 +2,6 @@
 #ifndef __MAPVERTEX_H__
 #define __MAPVERTEX_H__
 
-
 class MapLine;
 
 class MapVertex
