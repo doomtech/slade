@@ -197,7 +197,8 @@ bool WadManager::closeWad(Wad* wad)
 /* Console Command - "list_wads"
  * Lists the filenames of all open wads
  *******************************************************************/
-CONSOLE_COMMAND(list_wads, 0,
+//CONSOLE_COMMAND(list_wads, 0,
+void c_list_wads(vector<string> args)
 {
 	Console::getInstance().logMessage(s_fmt(_T("%d Open Wads:"), WadManager::getInstance().numWads()));
 
@@ -206,4 +207,6 @@ CONSOLE_COMMAND(list_wads, 0,
 		Wad* wad = WadManager::getInstance().getWad(a);
 		Console::getInstance().logMessage(s_fmt(_T("%d: \"%s\""), a+1, wad->getFileName().c_str()));
 	}
-})
+}
+ConsoleCommand list_wads(_T("list_wads"), &c_list_wads, 0);
+//})

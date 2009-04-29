@@ -18,8 +18,8 @@ public:
 	string	getName() { return name; }
 	void	execute(vector<string> args);
 
-	bool operator<(ConsoleCommand c) { return name < c.getName(); }
-	bool operator>(ConsoleCommand c) { return name > c.getName(); }
+	inline bool operator< (ConsoleCommand c) const { return name < c.getName(); }
+	inline bool operator> (ConsoleCommand c) const { return name > c.getName(); }
 };
 
 class Console : public Announcer

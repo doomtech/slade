@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="51">
+  <logicalFolder name="root" displayName="root" projectFiles="true">
+    <logicalFolder name="HeaderFiles"
+                   displayName="Header Files"
+                   projectFiles="true">
+      <itemPath>src/Console.h</itemPath>
+      <itemPath>src/ConsolePanel.h</itemPath>
+      <itemPath>src/ListenerAnnouncer.h</itemPath>
+      <itemPath>src/Lump.h</itemPath>
+      <itemPath>src/LumpArea.h</itemPath>
+      <itemPath>src/LumpListPanel.h</itemPath>
+      <itemPath>src/Main.h</itemPath>
+      <itemPath>src/MainApp.h</itemPath>
+      <itemPath>src/MainWindow.h</itemPath>
+      <itemPath>src/MapCanvas.h</itemPath>
+      <itemPath>src/MapEditorWindow.h</itemPath>
+      <itemPath>src/MapLine.h</itemPath>
+      <itemPath>src/MapSector.h</itemPath>
+      <itemPath>src/MapSide.h</itemPath>
+      <itemPath>src/MapThing.h</itemPath>
+      <itemPath>src/MapVertex.h</itemPath>
+      <itemPath>src/MemChunk.h</itemPath>
+      <itemPath>src/SLADEMap.h</itemPath>
+      <itemPath>src/Tokenizer.h</itemPath>
+      <itemPath>src/Wad.h</itemPath>
+      <itemPath>src/WadManager.h</itemPath>
+      <itemPath>src/WadManagerPanel.h</itemPath>
+      <itemPath>src/WadPanel.h</itemPath>
+      <itemPath>src/WxStuff.h</itemPath>
+    </logicalFolder>
+    <logicalFolder name="ResourceFiles"
+                   displayName="Resource Files"
+                   projectFiles="true">
+    </logicalFolder>
+    <logicalFolder name="SourceFiles"
+                   displayName="Source Files"
+                   projectFiles="true">
+      <itemPath>src/Console.cpp</itemPath>
+      <itemPath>src/ConsolePanel.cpp</itemPath>
+      <itemPath>src/ListenerAnnouncer.cpp</itemPath>
+      <itemPath>src/Lump.cpp</itemPath>
+      <itemPath>src/LumpArea.cpp</itemPath>
+      <itemPath>src/LumpListPanel.cpp</itemPath>
+      <itemPath>src/MainApp.cpp</itemPath>
+      <itemPath>src/MainWindow.cpp</itemPath>
+      <itemPath>src/MapCanvas.cpp</itemPath>
+      <itemPath>src/MapEditorWindow.cpp</itemPath>
+      <itemPath>src/MemChunk.cpp</itemPath>
+      <itemPath>src/SLADEMap.cpp</itemPath>
+      <itemPath>src/TextLumpArea.cpp</itemPath>
+      <itemPath>src/Tokenizer.cpp</itemPath>
+      <itemPath>src/Wad.cpp</itemPath>
+      <itemPath>src/WadManager.cpp</itemPath>
+      <itemPath>src/WadManagerPanel.cpp</itemPath>
+      <itemPath>src/WadPanel.cpp</itemPath>
+      <itemPath>src/ZipWad.cpp</itemPath>
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="Unix_Debug" type="1">
+      <toolsSet>
+        <developmentServer>localhost</developmentServer>
+        <compilerSet>GNU|GNU</compilerSet>
+        <platform>2</platform>
+      </toolsSet>
+      <compileType>
+        <ccCompilerTool>
+          <commandLine>`wx-config --cxxflags std,gl`</commandLine>
+        </ccCompilerTool>
+        <linkerTool>
+          <output>dist/SLADE</output>
+          <linkerLibItems>
+          </linkerLibItems>
+          <commandLine>`wx-config --libs std,gl`</commandLine>
+        </linkerTool>
+      </compileType>
+      <item path="src/Console.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/Console.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/ConsolePanel.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/ConsolePanel.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/ListenerAnnouncer.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/ListenerAnnouncer.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/Lump.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/Lump.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/LumpArea.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/LumpArea.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/LumpListPanel.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/LumpListPanel.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/Main.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/MainApp.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/MainApp.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/MainWindow.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/MainWindow.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/MapCanvas.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/MapCanvas.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/MapEditorWindow.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/MapEditorWindow.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/MapLine.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/MapSector.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/MapSide.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/MapThing.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/MapVertex.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/MemChunk.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/MemChunk.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/SLADEMap.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/SLADEMap.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/TextLumpArea.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/Tokenizer.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/Tokenizer.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/Wad.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/Wad.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/WadManager.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/WadManager.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/WadManagerPanel.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/WadManagerPanel.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/WadPanel.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/WadPanel.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/WxStuff.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/ZipWad.cpp">
+        <itemTool>1</itemTool>
+      </item>
+    </conf>
+    <conf name="Unix_Release" type="1">
+      <toolsSet>
+        <developmentServer>localhost</developmentServer>
+        <compilerSet>GNU|GNU</compilerSet>
+        <platform>2</platform>
+      </toolsSet>
+      <compileType>
+        <cCompilerTool>
+          <developmentMode>5</developmentMode>
+        </cCompilerTool>
+        <ccCompilerTool>
+          <developmentMode>5</developmentMode>
+          <commandLine>`wx-config --cxxflags std,gl`</commandLine>
+        </ccCompilerTool>
+        <fortranCompilerTool>
+          <developmentMode>5</developmentMode>
+        </fortranCompilerTool>
+        <linkerTool>
+          <output>dist/SLADE</output>
+          <linkerLibItems>
+          </linkerLibItems>
+          <commandLine>`wx-config --libs std,gl`</commandLine>
+        </linkerTool>
+      </compileType>
+      <item path="src/Console.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/Console.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/ConsolePanel.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/ConsolePanel.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/ListenerAnnouncer.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/ListenerAnnouncer.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/Lump.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/Lump.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/LumpArea.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/LumpArea.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/LumpListPanel.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/LumpListPanel.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/Main.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/MainApp.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/MainApp.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/MainWindow.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/MainWindow.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/MapCanvas.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/MapCanvas.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/MapEditorWindow.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/MapEditorWindow.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/MapLine.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/MapSector.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/MapSide.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/MapThing.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/MapVertex.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/MemChunk.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/MemChunk.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/SLADEMap.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/SLADEMap.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/TextLumpArea.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/Tokenizer.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/Tokenizer.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/Wad.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/Wad.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/WadManager.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/WadManager.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/WadManagerPanel.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/WadManagerPanel.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/WadPanel.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/WadPanel.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/WxStuff.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/ZipWad.cpp">
+        <itemTool>1</itemTool>
+      </item>
+    </conf>
+  </confs>
+</configurationDescriptor>

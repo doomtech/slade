@@ -76,7 +76,8 @@ void Console::execute(string command)
 	cmd_log.push_back(command);
 
 	// Announce that a command has been executed
-	announce(_T("console_execute"), MemChunk());
+	MemChunk mc;
+	announce(_T("console_execute"), mc);
 
 	// Tokenize the command string
 	Tokenizer tz;
@@ -106,7 +107,7 @@ void Console::execute(string command)
 	}
 
 	// Command not found
-	logMessage(s_fmt(_T("Unknown command: \"%s\""), cmd_name));
+	logMessage(s_fmt(_T("Unknown command: \"%s\""), cmd_name.c_str()));
 	return;
 }
 
@@ -123,7 +124,8 @@ void Console::logMessage(string message)
 	log.push_back(message);
 
 	// Announce that a new message has been logged
-	announce(_T("console_logmessage"), MemChunk());
+	MemChunk mc;
+	announce(_T("console_logmessage"), mc);
 
 	wxLogMessage(s_fmt(_T("Console: %s"), message.c_str()));
 }
@@ -189,18 +191,24 @@ void ConsoleCommand::execute(vector<string> args)
  * A simple command to print the first given argument to the console.
  * Subsequent arguments are ignored.
  *******************************************************************/
-CONSOLE_COMMAND(echo, 1, 
+//CONSOLE_COMMAND(echo, 1,
+void c_echo(vector<string> args)
 {
 	Console::getInstance().logMessage(args[0]);
-})
+}
+ConsoleCommand echo(_T("echo"), &c_echo, 1);
+//})
 
 /* Console Command - "cmdlist"
  * Lists all valid console commands
  *******************************************************************/
-CONSOLE_COMMAND(cmdlist, 0,
+//CONSOLE_COMMAND(cmdlist, 0,
+void c_cmdlist(vector<string> args)
 {
 	Console::getInstance().logMessage(s_fmt(_T("%d Valid Commands:"), Console::getInstance().numCommands()));
 
 	for (size_t a = 0; a < Console::getInstance().numCommands(); a++)
 		Console::getInstance().logMessage(s_fmt(_T("\"%s\""), Console::getInstance().command(a).getName().c_str()));
-})
+}
+ConsoleCommand cmdlist(_T("cmdlist"), &c_cmdlist, 0);
+//})
