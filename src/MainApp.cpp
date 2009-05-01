@@ -52,6 +52,9 @@ IMPLEMENT_APP(MainApp)
  *******************************************************************/
 bool MainApp::OnInit()
 {
+	// Init global variables
+	Global::error = _T("");
+
 	// Init logfile
 	initLogFile();
 

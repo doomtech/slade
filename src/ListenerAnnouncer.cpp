@@ -41,7 +41,7 @@ Listener::Listener()
 {
 }
 
-/* Listener::!Listener
+/* Listener::~Listener
  * Listener class destructor
  *******************************************************************/
 Listener::~Listener()
@@ -77,7 +77,7 @@ Announcer::Announcer()
 {
 }
 
-/* Announcer::!Announcer
+/* Announcer::~Announcer
  * Announcer class destructor
  *******************************************************************/
 Announcer::~Announcer()

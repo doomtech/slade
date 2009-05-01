@@ -29,4 +29,9 @@ typedef uint32_t DWORD;
 // Global internal includes
 #include "MemChunk.h"
 
+// Class to hold global variables
+namespace Global {
+	static string error;
+};
+
 #endif //__MAIN_H__

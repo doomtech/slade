@@ -33,6 +33,16 @@
                    displayName="Resource Files"
                    projectFiles="true">
     </logicalFolder>
+    <logicalFolder name="f1" displayName="Resources" projectFiles="true">
+      <logicalFolder name="f1" displayName="Archive" projectFiles="true">
+        <itemPath>src/Archive.cpp</itemPath>
+        <itemPath>src/Archive.h</itemPath>
+        <itemPath>src/ArchiveEntry.cpp</itemPath>
+        <itemPath>src/ArchiveEntry.h</itemPath>
+        <itemPath>src/WadArchive.cpp</itemPath>
+        <itemPath>src/WadArchive.h</itemPath>
+      </logicalFolder>
+    </logicalFolder>
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
@@ -81,6 +91,18 @@
           <commandLine>`wx-config --libs std,gl`</commandLine>
         </linkerTool>
       </compileType>
+      <item path="src/Archive.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/Archive.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/ArchiveEntry.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/ArchiveEntry.h">
+        <itemTool>3</itemTool>
+      </item>
       <item path="src/Console.cpp">
         <itemTool>1</itemTool>
       </item>
@@ -184,6 +206,12 @@
         <itemTool>1</itemTool>
       </item>
       <item path="src/Wad.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/WadArchive.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/WadArchive.h">
         <itemTool>3</itemTool>
       </item>
       <item path="src/WadManager.cpp">
@@ -235,6 +263,18 @@
           <commandLine>`wx-config --libs std,gl`</commandLine>
         </linkerTool>
       </compileType>
+      <item path="src/Archive.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/Archive.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/ArchiveEntry.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/ArchiveEntry.h">
+        <itemTool>3</itemTool>
+      </item>
       <item path="src/Console.cpp">
         <itemTool>1</itemTool>
       </item>
@@ -338,6 +378,12 @@
         <itemTool>1</itemTool>
       </item>
       <item path="src/Wad.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/WadArchive.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/WadArchive.h">
         <itemTool>3</itemTool>
       </item>
       <item path="src/WadManager.cpp">
