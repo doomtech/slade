@@ -132,8 +132,7 @@ WadManagerPanel::~WadManagerPanel()
 void WadManagerPanel::openFile(string filename)
 {
 	// Open the file in the wad manager
-	string error;
-	Wad* new_wad = WadManager::getInstance().openWad(filename, error);
+	Archive* new_wad = WadManager::getInstance().openWad(filename);
 
 	// Check that the wad opened ok
 	if (new_wad)
@@ -146,7 +145,7 @@ void WadManagerPanel::openFile(string filename)
 		notebook_wads->AddPage(wp, new_wad->getFileName(false), true);
 	}
 	else // If wad didn't open ok, show error message
-		wxMessageBox(s_fmt(_T("Error opening %s:\n%s"), filename.c_str(), error.c_str()), _T("Error"));
+		wxMessageBox(s_fmt(_T("Error opening %s:\n%s"), filename.c_str(), Global::error.c_str()), _T("Error"));
 }
 
 /* WadManagerPanel::openFiles
@@ -183,14 +182,14 @@ void WadManagerPanel::onListWadsChanged(wxCommandEvent &e)
 	list_maps->ClearAll();
 
 	// Get the selected wad
-	Wad* selected_wad = WadManager::getInstance().getWad(list_openwads->GetSelection());
+	Archive* selected_wad = WadManager::getInstance().getWad(list_openwads->GetSelection());
 
 	// Return if selection doesn't exist
 	if (!selected_wad)
 		return;
 
 	// Get the list of maps in the selected wad
-	vector<Wad::mapdesc_t> maps = selected_wad->detectMaps();
+	vector<Archive::mapdesc_t> maps = selected_wad->detectMaps();
 
 	// Go through the list and add maps
 	for (int a = 0; a < (int)maps.size(); a++)
@@ -227,7 +226,7 @@ void WadManagerPanel::onListWadsChanged(wxCommandEvent &e)
 void WadManagerPanel::onListWadsActivated(wxCommandEvent &e)
 {
 	// Get the selected wad
-	Wad* selected_wad = WadManager::getInstance().getWad(list_openwads->GetSelection());
+	Archive* selected_wad = WadManager::getInstance().getWad(list_openwads->GetSelection());
 
 	// Go through all tabs
 	for (size_t a = 0; a < notebook_wads->GetPageCount(); a++)

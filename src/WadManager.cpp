@@ -30,8 +30,7 @@
  *******************************************************************/
 #include "Main.h"
 #include "WadManager.h"
-#include "Wad.h"
-#include "Lump.h"
+#include "WadArchive.h"
 #include "Console.h"
 #include <wx/filename.h>
 
@@ -63,7 +62,7 @@ WadManager::~WadManager()
 /* WadManager::addWad
  * Adds a wad to the wad list
  *******************************************************************/
-bool WadManager::addWad(Wad* wad)
+bool WadManager::addWad(Archive* wad)
 {
 	// Only add if wad is a valid pointer
 	if (wad)
@@ -79,7 +78,7 @@ bool WadManager::addWad(Wad* wad)
  * Returns the wadfile at the index specified
  * (NULL if it doesn't exist)
  *******************************************************************/
-Wad* WadManager::getWad(int index)
+Archive* WadManager::getWad(int index)
 {
 	// Check that index is valid
 	if (index < 0 || index >= (int)open_wads.size())
@@ -92,7 +91,7 @@ Wad* WadManager::getWad(int index)
  * Returns the wadfile with the specified filename
  * (NULL if it doesn't exist)
  *******************************************************************/
-Wad* WadManager::getWad(string filename)
+Archive* WadManager::getWad(string filename)
 {
 	// Go through all open wads
 	for (int a = 0; a < (int)open_wads.size(); a++)
@@ -110,21 +109,21 @@ Wad* WadManager::getWad(string filename)
  * Opens and adds a wadfile to the list, returns a pointer to the
  * newly opened and added wad, or NULL if an error occurred
  *******************************************************************/
-Wad* WadManager::openWad(string filename, string &error)
+Archive* WadManager::openWad(string filename)
 {
-	Wad* new_wad = NULL;
+	Archive* new_wad = NULL;
 
 	// Create either a wad or zip file, depending on filename extension
 	wxFileName fn(filename);
 
 	if (!fn.GetExt().CmpNoCase(_T("wad"))) // Wad File
-		new_wad = new Wad();
-	else if (!fn.GetExt().CmpNoCase(_T("zip")) || !fn.GetExt().CmpNoCase(_T("pk3"))) // Zip/Pk3 file
-		new_wad = new ZipWad();
+		new_wad = new WadArchive();
+	//else if (!fn.GetExt().CmpNoCase(_T("zip")) || !fn.GetExt().CmpNoCase(_T("pk3"))) // Zip/Pk3 file
+	//	new_wad = new ZipWad();
 
 	// If it opened successfully, add it to the list & return it,
 	// Otherwise, delete it and return NULL
-	if (new_wad->openFile(filename, error))
+	if (new_wad->openFile(filename))
 	{
 		open_wads.push_back(new_wad);
 		return new_wad;
@@ -178,7 +177,7 @@ bool WadManager::closeWad(string filename)
  * Closes the specified wadfile and removes it from the list, if it
  * exists in the list. Returns false if it doesn't exist, else true
  *******************************************************************/
-bool WadManager::closeWad(Wad* wad)
+bool WadManager::closeWad(Archive* wad)
 {
 	// Go through all open wads
 	for (int a = 0; a < (int)open_wads.size(); a++)
@@ -204,7 +203,7 @@ void c_list_wads(vector<string> args)
 
 	for (int a = 0; a < WadManager::getInstance().numWads(); a++)
 	{
-		Wad* wad = WadManager::getInstance().getWad(a);
+		Archive* wad = WadManager::getInstance().getWad(a);
 		Console::getInstance().logMessage(s_fmt(_T("%d: \"%s\""), a+1, wad->getFileName().c_str()));
 	}
 }

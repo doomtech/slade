@@ -10,6 +10,14 @@ protected:
 	vector<ArchiveEntry*>	entries;
 
 public:
+	struct mapdesc_t
+	{
+		string			name;
+		ArchiveEntry*	head;
+		ArchiveEntry*	end;
+		BYTE			format;	// 0=doom 1=hexen 2=udmf
+	};
+
 	Archive();
 	virtual ~Archive();
 
@@ -19,6 +27,9 @@ public:
 
 	virtual bool	openFile(string filename);
 	virtual bool	loadEntryData(ArchiveEntry* entry);
+	virtual DWORD	numEntries();
+
+	virtual vector<mapdesc_t>	detectMaps();
 };
 
 #endif //__ARCHIVE_H__

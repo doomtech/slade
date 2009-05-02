@@ -5,7 +5,7 @@
 #include <wx/listctrl.h>
 
 class LumpListPanel;
-class Wad;
+class Archive;
 
 class LumpList : public wxListCtrl
 {
@@ -33,11 +33,11 @@ public:
 class LumpListPanel : public wxPanel
 {
 private:
-	Wad*		wad;
+	Archive*	wad;
 	LumpList*	lump_list;
 
 public:
-	LumpListPanel(wxWindow *parent, int id, Wad* wad);
+	LumpListPanel(wxWindow *parent, int id, Archive* wad);
 	~LumpListPanel();
 
 	void	populateLumpList();

@@ -2,12 +2,12 @@
 #ifndef __WADMANAGER_H__
 #define __WADMANAGER_H__
 
-class Wad;
+class Archive;
 
 class WadManager
 {
 private:
-	vector<Wad*>		open_wads;
+	vector<Archive*>		open_wads;
 
 public:
 	WadManager();
@@ -19,14 +19,14 @@ public:
 		return instance;
 	}
 
-	bool	addWad(Wad* wad);
-	Wad*	getWad(int index);
-	Wad*	getWad(string filename);
-	Wad*	openWad(string filename, string &error);
-	bool	closeWad(int index);
-	bool	closeWad(string filename);
-	bool	closeWad(Wad* wad);
-	int		numWads() { return (int)open_wads.size(); }
+	bool		addWad(Archive* wad);
+	Archive*	getWad(int index);
+	Archive*	getWad(string filename);
+	Archive*	openWad(string filename);
+	bool		closeWad(int index);
+	bool		closeWad(string filename);
+	bool		closeWad(Archive* wad);
+	int			numWads() { return (int)open_wads.size(); }
 };
 
 #endif //__WADMANAGER_H__

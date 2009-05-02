@@ -7,7 +7,6 @@
       <itemPath>src/Console.h</itemPath>
       <itemPath>src/ConsolePanel.h</itemPath>
       <itemPath>src/ListenerAnnouncer.h</itemPath>
-      <itemPath>src/Lump.h</itemPath>
       <itemPath>src/LumpArea.h</itemPath>
       <itemPath>src/LumpListPanel.h</itemPath>
       <itemPath>src/Main.h</itemPath>
@@ -23,7 +22,6 @@
       <itemPath>src/MemChunk.h</itemPath>
       <itemPath>src/SLADEMap.h</itemPath>
       <itemPath>src/Tokenizer.h</itemPath>
-      <itemPath>src/Wad.h</itemPath>
       <itemPath>src/WadManager.h</itemPath>
       <itemPath>src/WadManagerPanel.h</itemPath>
       <itemPath>src/WadPanel.h</itemPath>
@@ -49,7 +47,6 @@
       <itemPath>src/Console.cpp</itemPath>
       <itemPath>src/ConsolePanel.cpp</itemPath>
       <itemPath>src/ListenerAnnouncer.cpp</itemPath>
-      <itemPath>src/Lump.cpp</itemPath>
       <itemPath>src/LumpArea.cpp</itemPath>
       <itemPath>src/LumpListPanel.cpp</itemPath>
       <itemPath>src/MainApp.cpp</itemPath>
@@ -60,11 +57,11 @@
       <itemPath>src/SLADEMap.cpp</itemPath>
       <itemPath>src/TextLumpArea.cpp</itemPath>
       <itemPath>src/Tokenizer.cpp</itemPath>
-      <itemPath>src/Wad.cpp</itemPath>
       <itemPath>src/WadManager.cpp</itemPath>
       <itemPath>src/WadManagerPanel.cpp</itemPath>
       <itemPath>src/WadPanel.cpp</itemPath>
-      <itemPath>src/ZipWad.cpp</itemPath>
+    </logicalFolder>
+    <logicalFolder name="f2" displayName="UI" projectFiles="true">
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -121,12 +118,6 @@
       <item path="src/ListenerAnnouncer.h">
         <itemTool>3</itemTool>
       </item>
-      <item path="src/Lump.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/Lump.h">
-        <itemTool>3</itemTool>
-      </item>
       <item path="src/LumpArea.cpp">
         <itemTool>1</itemTool>
       </item>
@@ -202,12 +193,6 @@
       <item path="src/Tokenizer.h">
         <itemTool>3</itemTool>
       </item>
-      <item path="src/Wad.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/Wad.h">
-        <itemTool>3</itemTool>
-      </item>
       <item path="src/WadArchive.cpp">
         <itemTool>1</itemTool>
       </item>
@@ -234,9 +219,6 @@
       </item>
       <item path="src/WxStuff.h">
         <itemTool>3</itemTool>
-      </item>
-      <item path="src/ZipWad.cpp">
-        <itemTool>1</itemTool>
       </item>
     </conf>
     <conf name="Unix_Release" type="1">
@@ -293,12 +275,6 @@
       <item path="src/ListenerAnnouncer.h">
         <itemTool>3</itemTool>
       </item>
-      <item path="src/Lump.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/Lump.h">
-        <itemTool>3</itemTool>
-      </item>
       <item path="src/LumpArea.cpp">
         <itemTool>1</itemTool>
       </item>
@@ -374,12 +350,6 @@
       <item path="src/Tokenizer.h">
         <itemTool>3</itemTool>
       </item>
-      <item path="src/Wad.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/Wad.h">
-        <itemTool>3</itemTool>
-      </item>
       <item path="src/WadArchive.cpp">
         <itemTool>1</itemTool>
       </item>
@@ -406,9 +376,6 @@
       </item>
       <item path="src/WxStuff.h">
         <itemTool>3</itemTool>
-      </item>
-      <item path="src/ZipWad.cpp">
-        <itemTool>1</itemTool>
       </item>
     </conf>
   </confs>

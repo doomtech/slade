@@ -2,13 +2,13 @@
 #ifndef __LUMPAREA_H__
 #define __LUMPAREA_H__
 
-#include "Lump.h"
+#include "ArchiveEntry.h"
 //#include <wx/stc/stc.h>
 
 class LumpArea : public wxPanel
 {
 protected:
-	Lump*	lump;
+	ArchiveEntry*	lump;
 
 public:
 	LumpArea(wxWindow* parent);

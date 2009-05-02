@@ -15,6 +15,8 @@ public:
 
 	DWORD	getEntryOffset(ArchiveEntry* entry);
 	bool	loadEntryData(ArchiveEntry* entry);
+
+	vector<mapdesc_t>	detectMaps();
 };
 
 #endif	/* _WADARCHIVE_H */

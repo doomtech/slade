@@ -29,9 +29,9 @@
  *******************************************************************/
 #include "Main.h"
 #include "WxStuff.h"
-#include "Wad.h"
+#include "Archive.h"
 #include "LumpListPanel.h"
-#include "Lump.h"
+#include "ArchiveEntry.h"
 
 
 /* LumpList::LumpList
@@ -62,7 +62,7 @@ bool LumpList::updateEntry(int index)
 		return false;
 
 	// Get the lump associated with entry index
-	Lump* lump = (Lump*)GetItemData(index);
+	ArchiveEntry* lump = (ArchiveEntry*)GetItemData(index);
 
 	// Check that it exists
 	if (!lump)
@@ -87,7 +87,7 @@ bool LumpList::updateEntry(int index)
 /* LumpListPanel::LumpListPanel
  * LumpListPanel class constructor
  *******************************************************************/
-LumpListPanel::LumpListPanel(wxWindow *parent, int id, Wad* wad)
+LumpListPanel::LumpListPanel(wxWindow *parent, int id, Archive* wad)
 :	wxPanel(parent, id)
 {
 	// Init variables
@@ -121,12 +121,12 @@ void LumpListPanel::populateLumpList()
 	lump_list->InsertColumn(0, _T("Name"));
 
 	// Go through all lumps and add them to the list
-	for (int a = 0; a < wad->numLumps(); a++)
+	for (int a = 0; a < wad->numEntries(); a++)
 	{
 		// Setup new entry
 		wxListItem li;
 		li.SetId(a);
-		li.SetData(wad->lumpAt(a));
+		li.SetData(wad->getEntry(a));
 
 		lump_list->InsertItem(li);
 		lump_list->updateEntry(a);

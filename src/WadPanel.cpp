@@ -36,7 +36,7 @@
 /* WadPanel::WadPanel
  * WadPanel class constructor
  *******************************************************************/
-WadPanel::WadPanel(wxWindow* parent, Wad* wad)
+WadPanel::WadPanel(wxWindow* parent, Archive* wad)
 : wxPanel(parent, -1)
 {
 	this->wad = wad;
