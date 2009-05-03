@@ -79,13 +79,13 @@
       </toolsSet>
       <compileType>
         <ccCompilerTool>
-          <commandLine>`wx-config --cxxflags std,gl`</commandLine>
+          <commandLine>`wx-config --cxxflags std,gl,stc`</commandLine>
         </ccCompilerTool>
         <linkerTool>
           <output>dist/SLADE</output>
           <linkerLibItems>
           </linkerLibItems>
-          <commandLine>`wx-config --libs std,gl`</commandLine>
+          <commandLine>`wx-config --libs std,gl,stc`</commandLine>
         </linkerTool>
       </compileType>
       <item path="src/Archive.cpp">
@@ -239,7 +239,7 @@
         </cCompilerTool>
         <ccCompilerTool>
           <developmentMode>5</developmentMode>
-          <commandLine>`wx-config --cxxflags std,gl`</commandLine>
+          <commandLine>`wx-config --cxxflags std,gl,stc`</commandLine>
         </ccCompilerTool>
         <fortranCompilerTool>
           <developmentMode>5</developmentMode>
@@ -248,7 +248,7 @@
           <output>dist/SLADE</output>
           <linkerLibItems>
           </linkerLibItems>
-          <commandLine>`wx-config --libs std,gl`</commandLine>
+          <commandLine>`wx-config --libs std,gl,stc`</commandLine>
         </linkerTool>
       </compileType>
       <item path="src/Archive.cpp">

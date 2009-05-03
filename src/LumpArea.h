@@ -3,7 +3,7 @@
 #define __LUMPAREA_H__
 
 #include "ArchiveEntry.h"
-//#include <wx/stc/stc.h>
+#include <wx/stc/stc.h>
 
 class LumpArea : public wxPanel
 {
@@ -18,6 +18,7 @@ public:
 class TextLumpArea : public LumpArea
 {
 private:
+	wxStyledTextCtrl*	text_area;
 
 public:
 	TextLumpArea(wxWindow* parent);
