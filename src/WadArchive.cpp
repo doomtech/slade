@@ -30,7 +30,6 @@
  *******************************************************************/
 #include "Main.h"
 #include "WadArchive.h"
-#include "WadEntry.h"
 #include <wx/log.h>
 
 
@@ -60,6 +59,7 @@ string map_lumps[12] =
  *******************************************************************/
 WadArchive::WadArchive()
 : Archive() {
+	type = ARCHIVE_WAD;
 }
 
 /* WadArchive::~WadArchive

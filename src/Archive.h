@@ -4,10 +4,15 @@
 
 #include "ArchiveEntry.h"
 
+// Define archive types
+#define ARCHIVE_WAD	1
+#define ARCHIVE_ZIP	2
+
 class Archive {
 protected:
 	string					filename;
 	vector<ArchiveEntry*>	entries;
+	BYTE					type;
 
 public:
 	struct mapdesc_t
@@ -21,6 +26,7 @@ public:
 	Archive();
 	virtual ~Archive();
 
+	BYTE					getType() { return type; }
 	string					getFileName(bool fullpath = true);
 	virtual ArchiveEntry*	getEntry(DWORD index);
 	virtual ArchiveEntry*	getEntry(string name);

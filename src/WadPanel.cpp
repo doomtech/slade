@@ -46,10 +46,10 @@ WadPanel::WadPanel(wxWindow* parent, Archive* wad)
 	SetSizer(m_hbox);
 
 	// Lump list panel
-	lump_list = new LumpListPanel(this, -1, wad);
+	lump_list = new EntryListPanel(this, -1, wad);
 	m_hbox->Add(lump_list, 0, wxEXPAND|wxALL, 4);
 
-	lump_list->populateLumpList();
+	lump_list->populateEntryList();
 
 	// Lump area
 	lump_area = new LumpArea(this);

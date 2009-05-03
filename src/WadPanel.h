@@ -2,7 +2,7 @@
 #ifndef __WADPANEL_H__
 #define __WADPANEL_H__
 
-#include "LumpListPanel.h"
+#include "EntryListPanel.h"
 #include "Archive.h"
 #include "LumpArea.h"
 
@@ -10,7 +10,7 @@ class WadPanel : public wxPanel
 {
 private:
 	Archive*		wad;
-	LumpListPanel*	lump_list;
+	EntryListPanel*	lump_list;
 	LumpArea*		lump_area;
 
 public:

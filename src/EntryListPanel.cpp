@@ -30,7 +30,7 @@
 #include "Main.h"
 #include "WxStuff.h"
 #include "Archive.h"
-#include "LumpListPanel.h"
+#include "EntryListPanel.h"
 #include "ArchiveEntry.h"
 
 
@@ -39,28 +39,28 @@
  *******************************************************************/
 
 
-/* LumpList::LumpList
- * LumpList class constructor
+/* EntryList::EntryList
+ * EntryList class constructor
  *******************************************************************/
-LumpList::LumpList(LumpListPanel *parent, int id)
+EntryList::EntryList(EntryListPanel *parent, int id)
 :	wxListCtrl(parent, id, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxLC_VRULES|wxLC_HRULES/*|wxLC_EDIT_LABELS*/)
 {
 	this->parent = parent;
 }
 
-/* LumpList::~LumpList
- * LumpList class destructor
+/* EntryList::~EntryList
+ * EntryList class destructor
  *******************************************************************/
-LumpList::~LumpList()
+EntryList::~EntryList()
 {
 }
 
-/* LumpList::updateEntry
- * Updates the list entry at index with it's associated lump's
- * information (name/size/type).
- * Returns false on invalid index or missing lump, true otherwise
+/* EntryList::updateEntry
+ * Updates the list entry at index with it's associated archive
+ * entry's information (name/size/type).
+ * Returns false on invalid index or missing entry, true otherwise
  *******************************************************************/
-bool LumpList::updateEntry(int index)
+bool EntryList::updateEntry(int index)
 {
 	// Check that index is valid
 	if (index < 0 || index >= this->GetItemCount())
@@ -72,7 +72,7 @@ bool LumpList::updateEntry(int index)
 	// Check that it exists
 	if (!lump)
 	{
-		wxLogMessage(_T("LumpList entry at index %d has no associated lump!"), index);
+		wxLogMessage(_T("EntryList entry at index %d has no associated archive entry!"), index);
 		return false;
 	}
 
@@ -93,7 +93,7 @@ bool LumpList::updateEntry(int index)
 	return true;
 }
 
-int LumpList::getWidth()
+int EntryList::getWidth()
 {
 	// For the moment. Kinda annoying I have to do this actually, it should be automatic >_<
 	return GetColumnWidth(0) + GetColumnWidth(1) + wxSystemSettings::GetMetric(wxSYS_VSCROLL_X, this);
@@ -102,58 +102,60 @@ int LumpList::getWidth()
 
 
 
-/* LumpListPanel::LumpListPanel
- * LumpListPanel class constructor
+/* EntryListPanel::EntryListPanel
+ * EntryListPanel class constructor
  *******************************************************************/
-LumpListPanel::LumpListPanel(wxWindow *parent, int id, Archive* wad)
+EntryListPanel::EntryListPanel(wxWindow *parent, int id, Archive* archive)
 :	wxPanel(parent, id)
 {
 	// Init variables
-	this->wad = wad;
+	this->archive = archive;
 
 	// Create & set sizer & border
 	wxStaticBox *frame = new wxStaticBox(this, -1, _T("Lumps"));
 	wxStaticBoxSizer *framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
 	SetSizer(framesizer);
 
-	lump_list = new LumpList(this, -1);
-	framesizer->Add(lump_list, 1, wxEXPAND|wxALL, 4);
+	entry_list = new EntryList(this, -1);
+	framesizer->Add(entry_list, 1, wxEXPAND|wxALL, 4);
 
 	Layout();
 }
 
-/* LumpListPanel::~LumpListPanel
- * LumpListPanel class destructor
+/* EntryListPanel::~EntryListPanel
+ * EntryListPanel class destructor
  *******************************************************************/
-LumpListPanel::~LumpListPanel()
+EntryListPanel::~EntryListPanel()
 {
 }
 
-/* LumpListPanel::populateLumpList
- * Clears & populates the lump list with all the lumps in the wadfile
+/* EntryListPanel::populateEntryList
+ * Clears & populates the entry list with all the entries in
+ * the archive
  *******************************************************************/
-void LumpListPanel::populateLumpList()
+void EntryListPanel::populateEntryList()
 {
 	// Clear the list
-	lump_list->ClearAll();
+	entry_list->ClearAll();
 
 	// Create the "Name" column
-	lump_list->InsertColumn(0, _T("Name"));
+	entry_list->InsertColumn(0, _T("Name"));
 
 	// Create the "Size" column
-	lump_list->InsertColumn(1, _T("Size"));
+	entry_list->InsertColumn(1, _T("Size"));
 
 	// Go through all lumps and add them to the list
-	for (int a = 0; a < wad->numEntries(); a++)
+	for (int a = 0; a < archive->numEntries(); a++)
 	{
 		// Setup new entry
 		wxListItem li;
 		li.SetId(a);
-		li.SetData(wad->getEntry(a));
+		li.SetData(archive->getEntry(a));
 
-		lump_list->InsertItem(li);
-		lump_list->updateEntry(a);
+		entry_list->InsertItem(li);
+		entry_list->updateEntry(a);
 	}
 
-	lump_list->SetMinSize(wxSize(lump_list->getWidth(), -1));
+	// Setup size
+	entry_list->SetMinSize(wxSize(entry_list->getWidth(), -1));
 }

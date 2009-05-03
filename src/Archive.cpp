@@ -36,6 +36,7 @@
  * Archive class constructor
  *******************************************************************/
 Archive::Archive() {
+	type = 0;
 }
 
 /* Archive::~Archive
