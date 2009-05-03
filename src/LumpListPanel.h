@@ -16,7 +16,8 @@ public:
 	LumpList(LumpListPanel *parent, int id);
 	~LumpList();
 
-	bool updateEntry(int index);
+	bool	updateEntry(int index);
+	int		getWidth();
 
 	/*
 

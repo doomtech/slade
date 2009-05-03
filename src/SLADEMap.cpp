@@ -38,7 +38,7 @@ SLADEMap::~SLADEMap()
 {
 }
 
-bool SLADEMap::readMap(Wad map_lumps)
+bool SLADEMap::readMap(Archive map_lumps)
 {
 	return true;
 }

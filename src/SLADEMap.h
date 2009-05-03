@@ -7,7 +7,7 @@
 #include "MapSector.h"
 #include "MapVertex.h"
 #include "MapThing.h"
-#include "Wad.h"
+#include "Archive.h"
 
 
 class SLADEMap
@@ -23,7 +23,7 @@ public:
 	SLADEMap();
 	~SLADEMap();
 
-	bool	readMap(Wad map_lumps);
+	bool	readMap(Archive map_lumps);
 };
 
 #endif //__SLADEMAP_H__

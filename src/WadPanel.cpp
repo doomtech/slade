@@ -54,6 +54,8 @@ WadPanel::WadPanel(wxWindow* parent, Archive* wad)
 	// Lump area
 	lump_area = new LumpArea(this);
 	m_hbox->Add(lump_area, 1, wxEXPAND|wxALL, 4);
+
+	Layout();
 }
 
 /* WadPanel::~WadPanel

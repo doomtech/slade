@@ -34,6 +34,11 @@
 #include "ArchiveEntry.h"
 
 
+/*******************************************************************
+ * VARIABLES
+ *******************************************************************/
+
+
 /* LumpList::LumpList
  * LumpList class constructor
  *******************************************************************/
@@ -71,15 +76,28 @@ bool LumpList::updateEntry(int index)
 		return false;
 	}
 
-	// Setup entry
+	// -- Setup entry --
+	// Name
 	wxListItem li;
 	li.SetId(index);
 	li.SetText(lump->getName());
 	SetItem(li);
+	SetColumnWidth(0, wxLIST_AUTOSIZE);
+
+	// Size
+	li.SetText(s_fmt(_T("%d"), lump->getSize()));
+	li.SetColumn(1);
+	SetItem(li);
+	SetColumnWidth(1, wxLIST_AUTOSIZE);
 
 	return true;
 }
 
+int LumpList::getWidth()
+{
+	// For the moment. Kinda annoying I have to do this actually, it should be automatic >_<
+	return GetColumnWidth(0) + GetColumnWidth(1) + wxSystemSettings::GetMetric(wxSYS_VSCROLL_X, this);
+}
 
 
 
@@ -100,6 +118,8 @@ LumpListPanel::LumpListPanel(wxWindow *parent, int id, Archive* wad)
 
 	lump_list = new LumpList(this, -1);
 	framesizer->Add(lump_list, 1, wxEXPAND|wxALL, 4);
+
+	Layout();
 }
 
 /* LumpListPanel::~LumpListPanel
@@ -120,6 +140,9 @@ void LumpListPanel::populateLumpList()
 	// Create the "Name" column
 	lump_list->InsertColumn(0, _T("Name"));
 
+	// Create the "Size" column
+	lump_list->InsertColumn(1, _T("Size"));
+
 	// Go through all lumps and add them to the list
 	for (int a = 0; a < wad->numEntries(); a++)
 	{
@@ -131,4 +154,6 @@ void LumpListPanel::populateLumpList()
 		lump_list->InsertItem(li);
 		lump_list->updateEntry(a);
 	}
+
+	lump_list->SetMinSize(wxSize(lump_list->getWidth(), -1));
 }
