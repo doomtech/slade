@@ -46,7 +46,7 @@ WadPanel::WadPanel(wxWindow* parent, Archive* wad)
 	SetSizer(m_hbox);
 
 	// Lump list panel
-	lump_list = new EntryListPanel(this, -1, wad);
+	lump_list = new EntryListPanel(this, ENTRY_LIST_PANEL, wad);
 	m_hbox->Add(lump_list, 0, wxEXPAND|wxALL, 4);
 
 	lump_list->populateEntryList();
@@ -63,4 +63,19 @@ WadPanel::WadPanel(wxWindow* parent, Archive* wad)
  *******************************************************************/
 WadPanel::~WadPanel()
 {
+}
+
+
+BEGIN_EVENT_TABLE(WadPanel, wxPanel)
+	EVT_LIST_ITEM_FOCUSED(WadPanel::ENTRY_LIST_PANEL, WadPanel::onEntryListChange)
+END_EVENT_TABLE()
+
+/* WadPanel::onEntryListChange
+ * Called when the current focus on the list control in the
+ * entry list panel is changed (ie when the user selects an entry
+ * in the list)
+ *******************************************************************/
+void WadPanel::onEntryListChange(wxListEvent& event)
+{
+	
 }

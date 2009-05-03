@@ -116,7 +116,7 @@ EntryListPanel::EntryListPanel(wxWindow *parent, int id, Archive* archive)
 	wxStaticBoxSizer *framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
 	SetSizer(framesizer);
 
-	entry_list = new EntryList(this, -1);
+	entry_list = new EntryList(this, ENTRY_LIST);
 	framesizer->Add(entry_list, 1, wxEXPAND|wxALL, 4);
 
 	Layout();
@@ -158,4 +158,24 @@ void EntryListPanel::populateEntryList()
 
 	// Setup size
 	entry_list->SetMinSize(wxSize(entry_list->getWidth(), -1));
+}
+
+ArchiveEntry* EntryListPanel::getSelectedEntry()
+{
+}
+
+
+
+BEGIN_EVENT_TABLE(EntryListPanel, wxPanel)
+	EVT_LIST_ITEM_FOCUSED(EntryListPanel::ENTRY_LIST, EntryListPanel::onEntryListChange)
+END_EVENT_TABLE()
+
+/* EntryListPanel::onEntryListChange
+ * Called when the current focus on the entry list control is changed
+ *******************************************************************/
+void EntryListPanel::onEntryListChange(wxListEvent& event)
+{
+	// Pass the event up to the parent window, as the wad panel should deal with it,
+	// not this panel.
+	event.Skip();
 }

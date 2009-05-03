@@ -41,6 +41,11 @@ TextLumpArea::TextLumpArea(wxWindow* parent)
 	wxStaticBox *frame = new wxStaticBox(this, -1, _T("Lump Contents"));
 	wxStaticBoxSizer *framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
 	SetSizer(framesizer);
+
+	text_area = new wxStyledTextCtrl(this, -1);
+	framesizer->Add(text_area, 1, wxEXPAND|wxALL, 4);
+
+	Layout();
 }
 
 /* LumpArea::~LumpArea

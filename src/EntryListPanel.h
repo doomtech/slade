@@ -28,10 +28,20 @@ private:
 	EntryList*	entry_list;
 
 public:
+	enum {
+		ENTRY_LIST,
+	};
+
 	EntryListPanel(wxWindow *parent, int id, Archive* archive);
 	~EntryListPanel();
 
-	void	populateEntryList();
+	void			populateEntryList();
+	ArchiveEntry*	getSelectedEntry();
+
+	// Events
+	void	onEntryListChange(wxListEvent &event);
+
+	DECLARE_EVENT_TABLE()
 };
 
 #endif //__ENTRYLISTPANEL_H__
