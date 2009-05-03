@@ -31,6 +31,7 @@
 #include "Main.h"
 #include "WadManager.h"
 #include "WadArchive.h"
+#include "ZipArchive.h"
 #include "Console.h"
 #include <wx/filename.h>
 
@@ -118,8 +119,8 @@ Archive* WadManager::openWad(string filename)
 
 	if (!fn.GetExt().CmpNoCase(_T("wad"))) // Wad File
 		new_wad = new WadArchive();
-	//else if (!fn.GetExt().CmpNoCase(_T("zip")) || !fn.GetExt().CmpNoCase(_T("pk3"))) // Zip/Pk3 file
-	//	new_wad = new ZipWad();
+	else if (!fn.GetExt().CmpNoCase(_T("zip")) || !fn.GetExt().CmpNoCase(_T("pk3"))) // Zip/Pk3 file
+		new_wad = new ZipArchive();
 
 	// If it opened successfully, add it to the list & return it,
 	// Otherwise, delete it and return NULL

@@ -135,12 +135,12 @@ bool WadArchive::openFile(string filename) {
 		}
 
 		// Create & setup lump
-		ArchiveEntry* nlump = new ArchiveEntry(_T(""), this);
-		nlump->setName(wxString::FromAscii(name));
+		ArchiveEntry* nlump = new ArchiveEntry(wxString::FromAscii(name), this);
 		nlump->setSize(size);
 		nlump->setLoaded(false);
 		nlump->setExProp(_T("offset"), s_fmt(_T("%d"), offset));
 
+		// Add to entry list
 		entries.push_back(nlump);
 		wxLogMessage(_T("%s"), nlump->getName().c_str());
 	}
