@@ -35,6 +35,9 @@ public:
 	virtual bool	loadEntryData(ArchiveEntry* entry);
 	virtual DWORD	numEntries();
 
+	virtual ArchiveEntry*	addNewEntry(string name = _T(""), DWORD position = 0);
+	virtual ArchiveEntry*	addExistingEntry(ArchiveEntry* entry, DWORD position = 0, bool copy = false);
+
 	virtual vector<mapdesc_t>	detectMaps();
 };
 

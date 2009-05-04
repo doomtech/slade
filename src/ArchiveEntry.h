@@ -69,6 +69,7 @@ private:
 
 public:
 	ArchiveEntry(string name = _T(""), Archive* parent = NULL);
+	ArchiveEntry(ArchiveEntry& copy);
 	virtual ~ArchiveEntry();
 
 	// Accessors

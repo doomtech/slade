@@ -29,6 +29,7 @@
  *******************************************************************/
 #include "Main.h"
 #include "Archive.h"
+#include <wx/log.h>
 
 
 /* ArchiveEntry::ArchiveEntry
@@ -41,6 +42,33 @@ ArchiveEntry::ArchiveEntry(string name, Archive* parent) {
 	this->data = NULL;
 	this->size = 0;
 	this->data_loaded = false;
+}
+
+/* ArchiveEntry::ArchiveEntry
+ * ArchiveEntry class copy constructor
+ *******************************************************************/
+ArchiveEntry::ArchiveEntry(ArchiveEntry& copy) {
+	// Copy attributes
+	parent = copy.getParent();
+	name = copy.getName();
+	size = copy.getSize();
+	data_loaded = true;
+
+	// Get the data to copy
+	BYTE* copy_data = copy.getData(true);
+
+	if (copy_data) {
+		// Allocate memory and copy the data
+		data = new BYTE[size];
+		memcpy(data, copy_data, size);
+	}
+	else {
+		// If we didn't get any data to copy for some reason, print an error
+		// message and set the entry's size to 0
+		wxLogMessage(s_fmt(_T("Unable to copy data from entry %s"), copy.getName().c_str()));
+		data = NULL;
+		size = 0;
+	}
 }
 
 /* ArchiveEntry::~ArchiveEntry
@@ -203,7 +231,7 @@ bool ArchiveEntry::importFile(string filename, DWORD offset = 0, DWORD size = -1
 	return true;
 }
 
-/* ArchiveEntry::importLump
+/* ArchiveEntry::importEntry
  * Imports data from another entry into this entry, resizing it
  * and clearing any currently existing data.
  * Returns false if the entry is null, true otherwise
@@ -220,6 +248,9 @@ bool ArchiveEntry::importEntry(ArchiveEntry* entry)
 	return true;
 }
 
+/* ArchiveEntry::detectType
+ * Attempts to detect what type of data the entry holds
+ *******************************************************************/
 void ArchiveEntry::detectType(bool force)
 {
 	// If the type is already known and we're not forcing a detect, don't bother
@@ -234,6 +265,9 @@ void ArchiveEntry::detectType(bool force)
 	}
 }
 
+/* ArchiveEntry::getTypeString
+ * Returns a string representation of the entry's type
+ *******************************************************************/
 string ArchiveEntry::getTypeString()
 {
 	// Check for a custom type string

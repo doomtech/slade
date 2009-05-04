@@ -108,11 +108,58 @@ DWORD Archive::numEntries() {
 	return entries.size();
 }
 
-/* Archive::openFile
+/* Archive::detectMaps
  * Function to detect any maps in the archive, does nothing here,
  * to be overridden by any subclass of Archive
  *******************************************************************/
 vector<Archive::mapdesc_t> Archive::detectMaps() {
 	vector<mapdesc_t> maps;
 	return maps;
+}
+
+/* Archive::addNewEntry
+ * Creates a new ArchiveEntry and adds it to the archive before the
+ * position specified. Returns the created entry
+ *******************************************************************/
+ArchiveEntry* Archive::addNewEntry(string name, DWORD position) {
+	// Check the position, if it's out of range, change it
+	if (position < 0)
+		position = 0;
+	if (position >= entries.size())
+		position = entries.size() - 1;
+
+	// Create the new entry
+	ArchiveEntry* new_entry = new ArchiveEntry(name);
+
+	// Add it to the entry list
+	entries.insert(entries.begin() + position, new_entry);
+
+	// Return the newly created entry
+	return new_entry;
+}
+
+/* Archive::addExistingEntry
+ * Adds an existing ArchiveEntry to the archive before the position
+ * specified. Returns the added archive entry
+ *******************************************************************/
+ArchiveEntry* Archive::addExistingEntry(ArchiveEntry* entry, DWORD position, bool copy) {
+	// Check the given entry exists
+	if (!entry)
+		return false;
+
+	// Check the position, if it's out of range, change it
+	if (position < 0)
+		position = 0;
+	if (position >= entries.size())
+		position = entries.size() - 1;
+
+	// Make a copy of the entry to add if needed
+	if (copy)
+		entry = new ArchiveEntry(*entry);
+
+	// Add the entry to the list
+	entries.insert(entries.begin() + position, entry);
+
+	// Return the added entry
+	return entry;
 }
