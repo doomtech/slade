@@ -26,6 +26,7 @@ class EntryListPanel : public wxPanel
 private:
 	Archive*	archive;
 	EntryList*	entry_list;
+	long		focus_index;
 
 public:
 	enum {
@@ -36,7 +37,7 @@ public:
 	~EntryListPanel();
 
 	void			populateEntryList();
-	ArchiveEntry*	getSelectedEntry();
+	ArchiveEntry*	getFocusedEntry();
 
 	// Events
 	void	onEntryListChange(wxListEvent &event);

@@ -124,6 +124,8 @@ bool ZipArchive::openFile(string filename)
  *******************************************************************/
 bool ZipArchive::loadEntryData(ArchiveEntry* entry)
 {
+	wxLogMessage(_T("Load entry ") + entry->getName());
+	
 	// Check that the lump belongs to this wadfile
 	if (entry->getParent() != this)
 	{
@@ -177,7 +179,7 @@ bool ZipArchive::loadEntryData(ArchiveEntry* entry)
 	// Set the lump to loaded
 	entry->setLoaded();
 
-	return false;
+	return true;
 }
 
 /* ZipArchive::detectMaps

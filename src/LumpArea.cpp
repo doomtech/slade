@@ -42,11 +42,20 @@ LumpArea::LumpArea(wxWindow* parent)
 	wxStaticBox *frame = new wxStaticBox(this, -1, _T("Lump Contents"));
 	wxStaticBoxSizer *framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
 	SetSizer(framesizer);
+	Show(false);
 }
 
 /* LumpArea::~LumpArea
  * LumpArea class destructor
  *******************************************************************/
 LumpArea::~LumpArea()
+{
+}
+
+/* LumpArea::loadEntry
+ * Loads an entry into the lump area (does nothing here, to be
+ * overridden by child classes)
+ *******************************************************************/
+void LumpArea::loadEntry(ArchiveEntry* entry)
 {
 }

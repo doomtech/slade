@@ -110,6 +110,7 @@ EntryListPanel::EntryListPanel(wxWindow *parent, int id, Archive* archive)
 {
 	// Init variables
 	this->archive = archive;
+	this->focus_index = -1;
 
 	// Create & set sizer & border
 	wxStaticBox *frame = new wxStaticBox(this, -1, _T("Lumps"));
@@ -160,8 +161,18 @@ void EntryListPanel::populateEntryList()
 	entry_list->SetMinSize(wxSize(entry_list->getWidth(), -1));
 }
 
-ArchiveEntry* EntryListPanel::getSelectedEntry()
+/* EntryListPanel::getFocusedEntry
+ * Gets the archive entry associated with the currently focused list
+ * entry. Returns NULL if nothing is focused
+ *******************************************************************/
+ArchiveEntry* EntryListPanel::getFocusedEntry()
 {
+	// Check that the focus index is invalid
+	if (focus_index < 0 || focus_index > entry_list->GetItemCount())
+		return NULL;
+
+	// Return the focused archive entry
+	return (ArchiveEntry*)(entry_list->GetItemData(focus_index));
 }
 
 
@@ -175,6 +186,9 @@ END_EVENT_TABLE()
  *******************************************************************/
 void EntryListPanel::onEntryListChange(wxListEvent& event)
 {
+	// Set the currently focused item index
+	focus_index = event.GetIndex();
+
 	// Pass the event up to the parent window, as the wad panel should deal with it,
 	// not this panel.
 	event.Skip();

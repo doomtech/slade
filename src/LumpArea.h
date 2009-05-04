@@ -13,6 +13,8 @@ protected:
 public:
 	LumpArea(wxWindow* parent);
 	~LumpArea();
+
+	virtual void loadEntry(ArchiveEntry* entry);
 };
 
 class TextLumpArea : public LumpArea
@@ -23,6 +25,8 @@ private:
 public:
 	TextLumpArea(wxWindow* parent);
 	~TextLumpArea();
+
+	void loadEntry(ArchiveEntry* entry);
 };
 
 #endif //__LUMPAREA_H__

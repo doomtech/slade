@@ -33,6 +33,7 @@
 #include "WxStuff.h"
 #include "WadPanel.h"
 
+
 /* WadPanel::WadPanel
  * WadPanel class constructor
  *******************************************************************/
@@ -51,9 +52,14 @@ WadPanel::WadPanel(wxWindow* parent, Archive* wad)
 
 	lump_list->populateEntryList();
 
-	// Lump area
+	// Create lump areas
 	lump_area = new LumpArea(this);
-	m_hbox->Add(lump_area, 1, wxEXPAND|wxALL, 4);
+	text_area = new TextLumpArea(this);
+
+	// Add default lump area to the panel
+	cur_area = lump_area;
+	m_hbox->Add(cur_area, 1, wxEXPAND|wxALL, 4);
+	cur_area->Show(true);
 
 	Layout();
 }
@@ -77,5 +83,14 @@ END_EVENT_TABLE()
  *******************************************************************/
 void WadPanel::onEntryListChange(wxListEvent& event)
 {
-	
+	// Get the panel sizer
+	wxSizer* sizer = GetSizer();
+
+	// Hide the current lump area, replace it with the new
+	// lump area, and show that
+	cur_area->Show(false);
+	sizer->Replace(cur_area, text_area);
+	cur_area = text_area;
+	cur_area->loadEntry(lump_list->getFocusedEntry());
+	cur_area->Show(true);
 }

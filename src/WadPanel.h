@@ -11,7 +11,11 @@ class WadPanel : public wxPanel
 private:
 	Archive*		wad;
 	EntryListPanel*	lump_list;
+
+	// Lump areas
+	LumpArea*		cur_area;
 	LumpArea*		lump_area;
+	TextLumpArea*	text_area;
 
 public:
 	enum {

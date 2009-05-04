@@ -42,15 +42,34 @@ TextLumpArea::TextLumpArea(wxWindow* parent)
 	wxStaticBoxSizer *framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
 	SetSizer(framesizer);
 
+	// Create the text area
 	text_area = new wxStyledTextCtrl(this, -1);
 	framesizer->Add(text_area, 1, wxEXPAND|wxALL, 4);
 
 	Layout();
 }
 
-/* LumpArea::~LumpArea
- * LumpArea class destructor
+/* TextLumpArea::~TextLumpArea
+ * TextLumpArea class destructor
  *******************************************************************/
 TextLumpArea::~TextLumpArea()
 {
+}
+
+/* TextLumpArea::loadEntry
+ * Loads an entry into the lump area as text
+ *******************************************************************/
+void TextLumpArea::loadEntry(ArchiveEntry* entry)
+{
+	// Check that the entry exists
+	if (!entry)
+		return;
+
+	// Read entry as a text string
+	this->lump = entry;
+	string istr = wxString::FromAscii((char*)entry->getData());
+	istr.Truncate(entry->getSize());
+
+	// Add text to the text area
+	text_area->SetText(istr);
 }
