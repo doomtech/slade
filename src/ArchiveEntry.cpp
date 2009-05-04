@@ -219,3 +219,68 @@ bool ArchiveEntry::importEntry(ArchiveEntry* entry)
 
 	return true;
 }
+
+void ArchiveEntry::detectType(bool force)
+{
+	// If the type is already known and we're not forcing a detect, don't bother
+	if (!force && type != ETYPE_UNKNOWN)
+		return;
+
+	// Marker
+	if (size == 0 && type != ETYPE_MAP)
+	{
+		type = ETYPE_MARKER;
+		return;
+	}
+}
+
+string ArchiveEntry::getTypeString()
+{
+	// Check for a custom type string
+	if (hasExProp(_T("entry_type")))
+		return getExProp(_T("entry_type"));
+
+	if (type == ETYPE_MARKER) return _T("Marker");
+	if (type == ETYPE_TEXT) return _T("Text");
+
+	if (type == ETYPE_PATCH) return _T("Patch");
+	if (type == ETYPE_SPRITE) return _T("Sprite");
+	if (type == ETYPE_FLAT) return _T("Flat");
+	if (type == ETYPE_GFX) return _T("Graphic");
+	if (type == ETYPE_GFX2) return _T("Graphic");
+	if (type == ETYPE_PNG) return _T("PNG");
+	if (type == ETYPE_IMAGE) return _T("Image");
+
+	if (type == ETYPE_SOUND) return _T("Sound");
+	if (type == ETYPE_WAV) return _T("WAV Sound");
+	if (type == ETYPE_MP3) return _T("MP3 Audio");
+	if (type == ETYPE_FLAC) return _T("FLAC Audio");
+	if (type == ETYPE_MUS) return _T("Music (MUS)");
+	if (type == ETYPE_MIDI) return _T("Music (MIDI)");
+	if (type == ETYPE_MOD) return _T("Music (Module)");
+
+	if (type == ETYPE_TEXTURES) return _T("TEXTUREx");
+	if (type == ETYPE_PNAMES) return _T("PNames");
+
+	if (type == ETYPE_MAP) return _T("Map");
+	if (type == ETYPE_LINEDEFS) return _T("Map Linedefs");
+	if (type == ETYPE_SIDEDEFS) return _T("Map Sidedefs");
+	if (type == ETYPE_VERTEXES) return _T("Map Vertices");
+	if (type == ETYPE_SECTORS) return _T("Map Sectors");
+	if (type == ETYPE_THINGS) return _T("Map Things");
+	if (type == ETYPE_NODES) return _T("Map Nodes");
+	if (type == ETYPE_SEGS) return _T("Map Segs");
+	if (type == ETYPE_SSECTS) return _T("Map Ssectors");
+	if (type == ETYPE_REJECT) return _T("Reject Table");
+	if (type == ETYPE_BLOCKMAP) return _T("Blockmap");
+	if (type == ETYPE_BEHAVIOR) return _T("Compiled ACS");
+
+	if (type == ETYPE_PLAYPAL) return _T("Palette");
+	if (type == ETYPE_COLORMAP) return _T("Colormap");
+
+	if (type == ETYPE_WAD) return _T("Wad File");
+
+	if (type == ETYPE_FOLDER) return _T("Dir");
+
+	return _T("Unknown");
+}
