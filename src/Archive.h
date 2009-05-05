@@ -32,6 +32,7 @@ public:
 	virtual ArchiveEntry*	getEntry(string name);
 
 	virtual bool	openFile(string filename);
+	virtual bool	save(string filename = _T(""));
 	virtual bool	loadEntryData(ArchiveEntry* entry);
 	virtual DWORD	numEntries();
 

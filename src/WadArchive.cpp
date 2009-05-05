@@ -31,6 +31,7 @@
 #include "Main.h"
 #include "WadArchive.h"
 #include <wx/log.h>
+#include <wx/filename.h>
 
 
 /*******************************************************************
@@ -90,10 +91,9 @@ bool WadArchive::openFile(string filename) {
 	fseek(fp, 0, SEEK_SET);
 
 	// Read wad header
-	char type[4] = "";
 	DWORD num_lumps = 0;
 	DWORD dir_offset = 0;
-	fread(&type, 1, 4, fp);			// Wad type
+	fread(&wad_type, 1, 4, fp);		// Wad type
 	fread(&num_lumps, 4, 1, fp);	// No. of lumps in wad
 	fread(&dir_offset, 4, 1, fp);	// Offset to directory
 
@@ -102,7 +102,7 @@ bool WadArchive::openFile(string filename) {
 	dir_offset = wxINT32_SWAP_ON_BE(dir_offset);
 
 	// Check the header
-	if (type[1] != 'W' || type[2] != 'A' || type[3] != 'D') {
+	if (wad_type[1] != 'W' || wad_type[2] != 'A' || wad_type[3] != 'D') {
 		wxLogMessage(_T("WadArchive::openFile: File %s has invalid header"), filename.c_str());
 		Global::error = _T("Invalid wad header");
 		return false;
@@ -154,6 +154,74 @@ bool WadArchive::openFile(string filename) {
 	return true;
 }
 
+bool WadArchive::save(string filename) {
+	// If no filename specified, just use the current filename
+	if (filename == _T(""))
+		filename = this->filename;
+
+	// Create a backup copy if needed
+	if (wxFileName::FileExists(filename))
+	{
+		string bakfile = filename + _T(".bak");
+
+		// Remove old backup file
+		remove(chr(bakfile));
+
+		// Copy current file contents to new backup file
+		wxCopyFile(this->filename, bakfile);
+	}
+
+	// Determine directory offset & individual lump offsets
+	long dir_offset = 12;
+	for (DWORD l = 0; l < numEntries(); l++)
+	{
+		setEntryOffset(entries[l], dir_offset);
+		dir_offset += entries[l]->getSize();
+	}
+
+	// Open wadfile for writing
+	FILE *fp = NULL;
+	if (!fp)
+	{
+		Global::error = _T("Unable to open file for saving. Make sure it isn't in use by another program.");
+		return false;
+	}
+
+	// Write the header
+	long num_lumps = numEntries();
+	fwrite(wad_type, 1, 4, fp);
+	fwrite(&num_lumps, 4, 1, fp);
+	fwrite(&dir_offset, 4, 1, fp);
+
+	// Write the lumps
+	for (DWORD l = 0; l < num_lumps; l++)
+		fwrite(entries[l]->getData(), entries[l]->getSize(), 1, fp);
+
+	// Write the directory
+	for (DWORD l = 0; l < num_lumps; l++)
+	{
+		char name[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+		long offset = getEntryOffset(entries[l]);
+		long size = entries[l]->getSize();
+
+		for (int c = 0; c < entries[l]->getName().length(); c++)
+			name[c] = entries[l]->getName()[c];
+
+		fwrite(&offset, 4, 1, fp);
+		fwrite(&size, 4, 1, fp);
+		fwrite(name, 1, 8, fp);
+
+		//directory[l]->setChanged(0);
+	}
+
+	// Close the file
+	fclose(fp);
+	
+	// Set variables and return success
+	this->filename = filename;
+	return true;
+}
+
 /* WadArchive::getEntryOffset
  * Gets a lump entry's offset
  * Returns the lump entry's offset, or zero if it doesn't exist
@@ -164,6 +232,13 @@ DWORD WadArchive::getEntryOffset(ArchiveEntry* entry) {
 	}
 	else
 		return 0;
+}
+
+/* WadArchive::setEntryOffset
+ * Sets a lump entry's offset
+ *******************************************************************/
+void WadArchive::setEntryOffset(ArchiveEntry* entry, DWORD offset) {
+	entry->setExProp(_T("offset"), s_fmt(_T("%d"), offset));
 }
 
 /* WadArchive::loadEntryData

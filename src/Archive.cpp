@@ -93,7 +93,15 @@ bool Archive::openFile(string filename) {
 	return false;
 }
 
-/* Archive::openFile
+/* Archive::save
+ * Function to save to a file, does nothing here, to be overridden by
+ * any subclass of Archive
+ *******************************************************************/
+bool Archive::save(string filename) {
+	return false;
+}
+
+/* Archive::loadEntryData
  * Function to load in an entry's data, does nothing here,
  * to be overridden by any subclass of Archive
  *******************************************************************/
