@@ -4,49 +4,47 @@
 
 #include "ListenerAnnouncer.h"
 
-class ConsoleCommand
-{
+class ConsoleCommand {
 private:
-	string	name;
-	void	(*commandFunc)(vector<string>);
-	int		min_args;
+	string name;
+	void (*commandFunc)(vector<string>);
+	int min_args;
 
 public:
 	ConsoleCommand(string name, void(*commandFunc)(vector<string>), int min_args);
-	~ConsoleCommand(){}
 
-	string	getName() { return name; }
-	void	execute(vector<string> args);
+	~ConsoleCommand() {}
 
-	inline bool operator< (ConsoleCommand c) const { return name < c.getName(); }
-	inline bool operator> (ConsoleCommand c) const { return name > c.getName(); }
+	string getName() { return name; }
+	void execute(vector<string> args);
+
+	inline bool operator<(ConsoleCommand c) const { return name < c.getName(); }
+	inline bool operator>(ConsoleCommand c) const { return name > c.getName(); }
 };
 
-class Console : public Announcer
-{
+class Console : public Announcer {
 private:
-	vector<ConsoleCommand>	commands;
+	vector<ConsoleCommand> commands;
 
-	vector<string>	log;
-	vector<string>	cmd_log;
+	vector<string> log;
+	vector<string> cmd_log;
 
 public:
 	Console();
 	~Console();
 
-	static Console& getInstance()
-	{
+	static Console& getInstance() {
 		static Console instance;
 		return instance;
 	}
 
-	int				numCommands() { return (int)commands.size(); }
-	ConsoleCommand&	command(int index);
+	int numCommands() { return (int) commands.size(); }
+	ConsoleCommand& command(int index);
 
-	void	addCommand(ConsoleCommand &c);
-	void	execute(string command);
-	void	logMessage(string message);
-	string	lastLogLine();
+	void addCommand(ConsoleCommand &c);
+	void execute(string command);
+	void logMessage(string message);
+	string lastLogLine();
 };
 
 // Define for neat console command definitions

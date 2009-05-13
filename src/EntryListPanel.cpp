@@ -38,21 +38,18 @@
  * VARIABLES
  *******************************************************************/
 
-
 /* EntryList::EntryList
  * EntryList class constructor
  *******************************************************************/
 EntryList::EntryList(EntryListPanel *parent, int id)
-:	wxListCtrl(parent, id, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxLC_VRULES|wxLC_HRULES/*|wxLC_EDIT_LABELS*/)
-{
+: wxListCtrl(parent, id, wxDefaultPosition, wxDefaultSize, wxLC_REPORT | wxLC_VRULES | wxLC_HRULES/*|wxLC_EDIT_LABELS*/) {
 	this->parent = parent;
 }
 
 /* EntryList::~EntryList
  * EntryList class destructor
  *******************************************************************/
-EntryList::~EntryList()
-{
+EntryList::~EntryList() {
 }
 
 /* EntryList::updateEntry
@@ -60,18 +57,16 @@ EntryList::~EntryList()
  * entry's information (name/size/type).
  * Returns false on invalid index or missing entry, true otherwise
  *******************************************************************/
-bool EntryList::updateEntry(int index)
-{
+bool EntryList::updateEntry(int index) {
 	// Check that index is valid
 	if (index < 0 || index >= this->GetItemCount())
 		return false;
 
 	// Get the lump associated with entry index
-	ArchiveEntry* lump = (ArchiveEntry*)GetItemData(index);
+	ArchiveEntry* lump = (ArchiveEntry*) GetItemData(index);
 
 	// Check that it exists
-	if (!lump)
-	{
+	if (!lump) {
 		wxLogMessage(_T("EntryList entry at index %d has no associated archive entry!"), index);
 		return false;
 	}
@@ -93,21 +88,16 @@ bool EntryList::updateEntry(int index)
 	return true;
 }
 
-int EntryList::getWidth()
-{
+int EntryList::getWidth() {
 	// For the moment. Kinda annoying I have to do this actually, it should be automatic >_<
 	return GetColumnWidth(0) + GetColumnWidth(1) + wxSystemSettings::GetMetric(wxSYS_VSCROLL_X, this);
 }
-
-
-
 
 /* EntryListPanel::EntryListPanel
  * EntryListPanel class constructor
  *******************************************************************/
 EntryListPanel::EntryListPanel(wxWindow *parent, int id, Archive* archive)
-:	wxPanel(parent, id)
-{
+: wxPanel(parent, id) {
 	// Init variables
 	this->archive = archive;
 	this->focus_index = -1;
@@ -118,7 +108,7 @@ EntryListPanel::EntryListPanel(wxWindow *parent, int id, Archive* archive)
 	SetSizer(framesizer);
 
 	entry_list = new EntryList(this, ENTRY_LIST);
-	framesizer->Add(entry_list, 1, wxEXPAND|wxALL, 4);
+	framesizer->Add(entry_list, 1, wxEXPAND | wxALL, 4);
 
 	Layout();
 }
@@ -126,16 +116,14 @@ EntryListPanel::EntryListPanel(wxWindow *parent, int id, Archive* archive)
 /* EntryListPanel::~EntryListPanel
  * EntryListPanel class destructor
  *******************************************************************/
-EntryListPanel::~EntryListPanel()
-{
+EntryListPanel::~EntryListPanel() {
 }
 
 /* EntryListPanel::populateEntryList
  * Clears & populates the entry list with all the entries in
  * the archive
  *******************************************************************/
-void EntryListPanel::populateEntryList()
-{
+void EntryListPanel::populateEntryList() {
 	// Clear the list
 	entry_list->ClearAll();
 
@@ -146,8 +134,7 @@ void EntryListPanel::populateEntryList()
 	entry_list->InsertColumn(1, _T("Size"));
 
 	// Go through all lumps and add them to the list
-	for (int a = 0; a < archive->numEntries(); a++)
-	{
+	for (int a = 0; a < archive->numEntries(); a++) {
 		// Setup new entry
 		wxListItem li;
 		li.SetId(a);
@@ -165,27 +152,23 @@ void EntryListPanel::populateEntryList()
  * Gets the archive entry associated with the currently focused list
  * entry. Returns NULL if nothing is focused
  *******************************************************************/
-ArchiveEntry* EntryListPanel::getFocusedEntry()
-{
+ArchiveEntry* EntryListPanel::getFocusedEntry() {
 	// Check that the focus index is invalid
 	if (focus_index < 0 || focus_index > entry_list->GetItemCount())
 		return NULL;
 
 	// Return the focused archive entry
-	return (ArchiveEntry*)(entry_list->GetItemData(focus_index));
+	return (ArchiveEntry*) (entry_list->GetItemData(focus_index));
 }
 
-
-
 BEGIN_EVENT_TABLE(EntryListPanel, wxPanel)
-	EVT_LIST_ITEM_FOCUSED(EntryListPanel::ENTRY_LIST, EntryListPanel::onEntryListChange)
+EVT_LIST_ITEM_FOCUSED(EntryListPanel::ENTRY_LIST, EntryListPanel::onEntryListChange)
 END_EVENT_TABLE()
 
 /* EntryListPanel::onEntryListChange
  * Called when the current focus on the entry list control is changed
  *******************************************************************/
-void EntryListPanel::onEntryListChange(wxListEvent& event)
-{
+void EntryListPanel::onEntryListChange(wxListEvent& event) {
 	// Set the currently focused item index
 	focus_index = event.GetIndex();
 

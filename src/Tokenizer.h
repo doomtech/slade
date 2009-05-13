@@ -2,8 +2,7 @@
 #ifndef __TOKENIZER_H__
 #define __TOKENIZER_H__
 
-class Tokenizer
-{
+class Tokenizer {
 private:
 	char*	current;	// Current position
 	char*	start;		// Start of text

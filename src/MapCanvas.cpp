@@ -43,8 +43,7 @@ wxGLContext *gl_context;
  * MapCanvas class constructor
  *******************************************************************/
 MapCanvas::MapCanvas(wxWindow *parent, int id)
-: wxGLCanvas(parent, id, 0)
-{
+: wxGLCanvas(parent, id, 0) {
 	// Set GL context
 	SetCurrent(*gl_context);
 }
@@ -52,6 +51,5 @@ MapCanvas::MapCanvas(wxWindow *parent, int id)
 /* MapCanvas::~MapCanvas
  * MapCanvas class destructor
  *******************************************************************/
-MapCanvas::~MapCanvas()
-{
+MapCanvas::~MapCanvas() {
 }

@@ -5,8 +5,7 @@
 class MapVertex;
 class MapSide;
 
-class MapLine
-{
+class MapLine {
 private:
 	MapVertex*	vertex1;
 	MapVertex*	vertex2;

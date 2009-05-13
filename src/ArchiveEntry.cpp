@@ -61,8 +61,7 @@ ArchiveEntry::ArchiveEntry(ArchiveEntry& copy) {
 		// Allocate memory and copy the data
 		data = new BYTE[size];
 		memcpy(data, copy_data, size);
-	}
-	else {
+	} else {
 		// If we didn't get any data to copy for some reason, print an error
 		// message and set the entry's size to 0
 		wxLogMessage(s_fmt(_T("Unable to copy data from entry %s"), copy.getName().c_str()));
@@ -98,8 +97,7 @@ BYTE* ArchiveEntry::getData(bool allow_load) {
 /* ArchiveEntry::hasExProp
  * Checks if the entry has the specified extra property value
  *******************************************************************/
-bool ArchiveEntry::hasExProp(string key)
-{
+bool ArchiveEntry::hasExProp(string key) {
 	// Try to find specified key
 	if (ex_props.find(key) == ex_props.end())
 		return false;
@@ -111,8 +109,7 @@ bool ArchiveEntry::hasExProp(string key)
  * Gets an extra property value, if it doesn't exist returns
  * an empty string
  *******************************************************************/
-string ArchiveEntry::getExProp(string key)
-{
+string ArchiveEntry::getExProp(string key) {
 	if (hasExProp(key))
 		return ex_props[key];
 	else
@@ -123,8 +120,7 @@ string ArchiveEntry::getExProp(string key)
  * Sets an extra property value, returns true if key already
  * existed and was overwritten
  *******************************************************************/
-bool ArchiveEntry::setExProp(string key, string value)
-{
+bool ArchiveEntry::setExProp(string key, string value) {
 	bool exists = hasExProp(key);
 	ex_props[key] = value;
 	return exists;
@@ -133,8 +129,7 @@ bool ArchiveEntry::setExProp(string key, string value)
 /* ArchiveEntry::clearData
  * Clears entry data and resets it's size to zero
  *******************************************************************/
-void ArchiveEntry::clearData()
-{
+void ArchiveEntry::clearData() {
 	// Delete the data
 	if (data)
 		delete data;
@@ -149,8 +144,7 @@ void ArchiveEntry::clearData()
  * any currently existing data.
  * Returns false if data pointer is invalid, true otherwise
  *******************************************************************/
-bool ArchiveEntry::importMem(void* data, DWORD size)
-{
+bool ArchiveEntry::importMem(void* data, DWORD size) {
 	// Check parameters
 	if (!data)
 		return false;
@@ -173,16 +167,13 @@ bool ArchiveEntry::importMem(void* data, DWORD size)
  * and clearing any currently existing data.
  * Returns false if the MemChunk has no data, or true otherwise.
  *******************************************************************/
-bool ArchiveEntry::importMemChunk(MemChunk& mc)
-{
+bool ArchiveEntry::importMemChunk(MemChunk& mc) {
 	// Check that the given MemChunk has data
-	if (mc.hasData())
-	{
+	if (mc.hasData()) {
 		// Copy the data from the MemChunk into the lump
 		importMem(mc.getData(), mc.getSize());
 		return true;
-	}
-	else
+	} else
 		return false;
 }
 
@@ -193,8 +184,7 @@ bool ArchiveEntry::importMemChunk(MemChunk& mc)
  * Returns false if the file does not exist or the given offset/size
  * are out of bounds, otherwise returns true.
  *******************************************************************/
-bool ArchiveEntry::importFile(string filename, DWORD offset = 0, DWORD size = -1)
-{
+bool ArchiveEntry::importFile(string filename, DWORD offset = 0, DWORD size = -1) {
 	// Open the file
 	FILE* fp = fopen(filename.ToAscii(), "rb");
 
@@ -211,8 +201,7 @@ bool ArchiveEntry::importFile(string filename, DWORD offset = 0, DWORD size = -1
 		size = fsize - offset;
 
 	// Check offset/size bounds
-	if (offset + size > fsize || offset < 0)
-	{
+	if (offset + size > fsize || offset < 0) {
 		fclose(fp);
 		return false;
 	}
@@ -236,8 +225,7 @@ bool ArchiveEntry::importFile(string filename, DWORD offset = 0, DWORD size = -1
  * and clearing any currently existing data.
  * Returns false if the entry is null, true otherwise
  *******************************************************************/
-bool ArchiveEntry::importEntry(ArchiveEntry* entry)
-{
+bool ArchiveEntry::importEntry(ArchiveEntry* entry) {
 	// Check parameters
 	if (!entry)
 		return false;
@@ -251,15 +239,13 @@ bool ArchiveEntry::importEntry(ArchiveEntry* entry)
 /* ArchiveEntry::detectType
  * Attempts to detect what type of data the entry holds
  *******************************************************************/
-void ArchiveEntry::detectType(bool force)
-{
+void ArchiveEntry::detectType(bool force) {
 	// If the type is already known and we're not forcing a detect, don't bother
 	if (!force && type != ETYPE_UNKNOWN)
 		return;
 
 	// Marker
-	if (size == 0 && type != ETYPE_MAP)
-	{
+	if (size == 0 && type != ETYPE_MAP) {
 		type = ETYPE_MARKER;
 		return;
 	}
@@ -268,8 +254,7 @@ void ArchiveEntry::detectType(bool force)
 /* ArchiveEntry::getTypeString
  * Returns a string representation of the entry's type
  *******************************************************************/
-string ArchiveEntry::getTypeString()
-{
+string ArchiveEntry::getTypeString() {
 	// Check for a custom type string
 	if (hasExProp(_T("entry_type")))
 		return getExProp(_T("entry_type"));

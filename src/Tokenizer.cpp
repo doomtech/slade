@@ -35,8 +35,7 @@
 /* Tokenizer::Tokenizer
  * Tokenizer class constructor
  *******************************************************************/
-Tokenizer::Tokenizer(bool c_comments, bool h_comments)
-{
+Tokenizer::Tokenizer(bool c_comments, bool h_comments) {
 	// Initialize variables
 	current = NULL;
 	start = NULL;
@@ -48,8 +47,7 @@ Tokenizer::Tokenizer(bool c_comments, bool h_comments)
 /* Tokenizer::~Tokenizer
  * Tokenizer class destructor
  *******************************************************************/
-Tokenizer::~Tokenizer()
-{
+Tokenizer::~Tokenizer() {
 	// Free memory if used
 	if (start) free(start);
 }
@@ -57,13 +55,11 @@ Tokenizer::~Tokenizer()
 /* Tokenizer::openFile
  * Reads a portion of a file to the Tokenizer
  *******************************************************************/
-bool Tokenizer::openFile(string filename, DWORD offset, DWORD length)
-{
+bool Tokenizer::openFile(string filename, DWORD offset, DWORD length) {
 	// Open the file
 	FILE *fp = fopen(chr(filename), "rb");
 
-	if (!fp)
-	{
+	if (!fp) {
 		wxLogMessage(_T("Tokenizer::openFile: Unable to open file %s"), filename.c_str());
 		return false;
 	}
@@ -71,7 +67,7 @@ bool Tokenizer::openFile(string filename, DWORD offset, DWORD length)
 	// Get file length
 	DWORD flen = 0;
 	fseek(fp, 0, SEEK_END);
-	flen = (DWORD)ftell(fp);
+	flen = (DWORD) ftell(fp);
 	fseek(fp, 0, SEEK_SET);
 
 	// If length isn't specified or exceeds the file length,
@@ -82,7 +78,7 @@ bool Tokenizer::openFile(string filename, DWORD offset, DWORD length)
 	// Setup variables & allocate memory
 	size = length;
 	position = 0;
-	start = current = (char *)malloc(size);
+	start = current = (char *) malloc(size);
 
 	// Read the file portion
 	fseek(fp, offset, SEEK_SET);
@@ -95,20 +91,19 @@ bool Tokenizer::openFile(string filename, DWORD offset, DWORD length)
 /* Tokenizer::openString
  * Reads a portion of a string to the Tokenizer
  *******************************************************************/
-bool Tokenizer::openString(string text, DWORD offset, DWORD length)
-{
+bool Tokenizer::openString(string text, DWORD offset, DWORD length) {
 	// If length isn't specified or exceeds the string's length,
 	// only copy to the end of the string
-	if (offset + length > (DWORD)text.length() || length == 0)
-		length = (DWORD)text.length() - offset;
+	if (offset + length > (DWORD) text.length() || length == 0)
+		length = (DWORD) text.length() - offset;
 
 	// Setup variables & allocate memory
 	size = length;
 	position = 0;
-	start = current = (char *)malloc(size);
+	start = current = (char *) malloc(size);
 
 	// Copy the string portion
-	memcpy(start, ((char*)text.char_str()) + offset, size);
+	memcpy(start, ((char*) text.char_str()) + offset, size);
 
 	return true;
 }
@@ -116,11 +111,9 @@ bool Tokenizer::openString(string text, DWORD offset, DWORD length)
 /* Tokenizer::openMem
  * Reads a chunk of memory to the Tokenizer
  *******************************************************************/
-bool Tokenizer::openMem(char* mem, DWORD length)
-{
+bool Tokenizer::openMem(char* mem, DWORD length) {
 	// Length must be specified
-	if (length == 0)
-	{
+	if (length == 0) {
 		wxLogMessage(_T("Tokenizer::openMem: length not specified"));
 		return false;
 	}
@@ -128,7 +121,7 @@ bool Tokenizer::openMem(char* mem, DWORD length)
 	// Setup variables & allocate memory
 	size = length;
 	position = 0;
-	start = current = (char*)malloc(size);
+	start = current = (char*) malloc(size);
 
 	// Copy the data
 	memcpy(start, mem, size);
@@ -139,8 +132,7 @@ bool Tokenizer::openMem(char* mem, DWORD length)
 /* Tokenizer::isWhitespace
  * Checks if a character is 'whitespace'
  *******************************************************************/
-bool Tokenizer::isWhitespace(char p)
-{
+bool Tokenizer::isWhitespace(char p) {
 	// Whitespace is either a newline, tab character or space
 	if (p == '\n' || p == 13 || p == ' ' || p == '\t')
 		return true;
@@ -151,16 +143,12 @@ bool Tokenizer::isWhitespace(char p)
 /* Tokenizer::incrementCurrent
  * Increments the position pointer, returns false on end of block
  *******************************************************************/
-bool Tokenizer::incrementCurrent()
-{
-	if (position >= size - 1)
-	{
+bool Tokenizer::incrementCurrent() {
+	if (position >= size - 1) {
 		// At end of text, return false
 		position = size;
 		return false;
-	}
-	else
-	{
+	} else {
 		// Increment position & current pointer
 		position++;
 		current++;
@@ -171,11 +159,9 @@ bool Tokenizer::incrementCurrent()
 /* Tokenizer::skipLineComment
  * Skips a '//' comment
  *******************************************************************/
-void Tokenizer::skipLineComment()
-{
+void Tokenizer::skipLineComment() {
 	// Increment position until a newline or end is found
-	while (current[0] != '\n' && current[0] != 13)
-	{
+	while (current[0] != '\n' && current[0] != 13) {
 		if (!incrementCurrent())
 			return;
 	}
@@ -187,11 +173,9 @@ void Tokenizer::skipLineComment()
 /* Tokenizer::skipMultilineComment
  * Skips a multiline comment (like this one :P)
  *******************************************************************/
-void Tokenizer::skipMultilineComment()
-{
+void Tokenizer::skipMultilineComment() {
 	// Increment position until '*/' or end is found
-	while (!(current[0] == '*' && current[1] == '/'))
-	{
+	while (!(current[0] == '*' && current[1] == '/')) {
 		if (!incrementCurrent())
 			return;
 	}
@@ -205,48 +189,40 @@ void Tokenizer::skipMultilineComment()
  * Gets the next 'token' from the text & moves past it, returns
  * a blank string if we're at the end of the text
  *******************************************************************/
-string Tokenizer::getToken()
-{
+string Tokenizer::getToken() {
 	string ret_str = _T("");
 	bool ready = false;
 
 	// Increment pointer to next token
-	while (!ready)
-	{
+	while (!ready) {
 		ready = true;
 
 		// Increment pointer until non-whitespace is found
-		while (isWhitespace(current[0]))
-		{
+		while (isWhitespace(current[0])) {
 			// Return if end of text found
 			if (!incrementCurrent())
 				return ret_str;
 		}
 
 		// Skip C-style comments
-		if (ccomments)
-		{
+		if (ccomments) {
 			// Check if we have a line comment
-			if (current[0] == '/' && current[1] == '/' && current[2] != '$')
-			{
-				skipLineComment();	// Skip it
+			if (current[0] == '/' && current[1] == '/' && current[2] != '$') {
+				skipLineComment(); // Skip it
 				ready = false;
 			}
 
 			// Check if we have a multiline comment
-			if (current[0] == '/' && current[1] == '*')
-			{
-				skipMultilineComment();	// Skip it
+			if (current[0] == '/' && current[1] == '*') {
+				skipMultilineComment(); // Skip it
 				ready = false;
 			}
 		}
 
 		// Skip '##' comments
-		if (hcomments)
-		{
-			if (current[0] == '#' && current[1] == '#')
-			{
-				skipLineComment();	// Skip it
+		if (hcomments) {
+			if (current[0] == '#' && current[1] == '#') {
+				skipLineComment(); // Skip it
 				ready = false;
 			}
 		}
@@ -263,8 +239,7 @@ string Tokenizer::getToken()
 		incrementCurrent();
 
 		// Read literal string (include whitespace)
-		while (current[0] != '\"')
-		{
+		while (current[0] != '\"') {
 			ret_str += current[0];
 
 			if (!incrementCurrent())
@@ -273,12 +248,9 @@ string Tokenizer::getToken()
 
 		// Skip closing "
 		incrementCurrent();
-	}
-	else
-	{
+	} else {
 		// Read token (don't include whitespace)
-		while (!isWhitespace(current[0]))
-		{
+		while (!isWhitespace(current[0])) {
 			// Add current character to the token
 			ret_str += current[0];
 
@@ -295,8 +267,7 @@ string Tokenizer::getToken()
 /* Tokenizer::peekToken
  * Returns the next token without actually moving past it
  *******************************************************************/
-string Tokenizer::peekToken()
-{
+string Tokenizer::peekToken() {
 	// Backup current position
 	char* c = current;
 	DWORD p = position;
@@ -315,16 +286,14 @@ string Tokenizer::peekToken()
 /* Tokenizer::checkToken
  * Compares the current token with a string (unused)
  *******************************************************************/
-bool Tokenizer::checkToken(string check)
-{
+bool Tokenizer::checkToken(string check) {
 	return !!(getToken().CompareTo(check));
 }
 
 /* Tokenizer::getInteger
  * Reads a token and returns it's integer value
  *******************************************************************/
-int Tokenizer::getInteger()
-{
+int Tokenizer::getInteger() {
 	// Get token
 	string token = getToken();
 
@@ -335,21 +304,19 @@ int Tokenizer::getInteger()
 /* Tokenizer::getFloat
  * Reads a token and returns it's floating point value
  *******************************************************************/
-float Tokenizer::getFloat()
-{
+float Tokenizer::getFloat() {
 	// Get token
 	string token = getToken();
 
 	// Return float value
-	return (float)atof(chr(token));
+	return (float) atof(chr(token));
 }
 
 /* Tokenizer::getDouble
  * Reads a token and returns it's double-precision floating point
  * value
  *******************************************************************/
-double Tokenizer::getDouble()
-{
+double Tokenizer::getDouble() {
 	// Get token
 	string token = getToken();
 
@@ -361,8 +328,7 @@ double Tokenizer::getDouble()
  * Reads a token and returns it's boolean value, anything except
  * "0", "no", or "false" will return true
  *******************************************************************/
-bool Tokenizer::getBool()
-{
+bool Tokenizer::getBool() {
 	// Get token
 	string token = getToken();
 

@@ -36,8 +36,7 @@
  * LumpArea class constructor
  *******************************************************************/
 LumpArea::LumpArea(wxWindow* parent)
-:	wxPanel(parent, -1)
-{
+: wxPanel(parent, -1) {
 	// Create & set sizer & border
 	wxStaticBox *frame = new wxStaticBox(this, -1, _T("Lump Contents"));
 	wxStaticBoxSizer *framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
@@ -48,14 +47,12 @@ LumpArea::LumpArea(wxWindow* parent)
 /* LumpArea::~LumpArea
  * LumpArea class destructor
  *******************************************************************/
-LumpArea::~LumpArea()
-{
+LumpArea::~LumpArea() {
 }
 
 /* LumpArea::loadEntry
  * Loads an entry into the lump area (does nothing here, to be
  * overridden by child classes)
  *******************************************************************/
-void LumpArea::loadEntry(ArchiveEntry* entry)
-{
+void LumpArea::loadEntry(ArchiveEntry* entry) {
 }

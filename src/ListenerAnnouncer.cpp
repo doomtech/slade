@@ -37,15 +37,13 @@
 /* Listener::Listener
  * Listener class constructor
  *******************************************************************/
-Listener::Listener()
-{
+Listener::Listener() {
 }
 
 /* Listener::~Listener
  * Listener class destructor
  *******************************************************************/
-Listener::~Listener()
-{
+Listener::~Listener() {
 	for (size_t a = 0; a < announcers.size(); a++)
 		announcers[a]->removeListener(this);
 }
@@ -53,8 +51,7 @@ Listener::~Listener()
 /* Listener::listenTo
  * Subscribes this listener to an announcer
  *******************************************************************/
-void Listener::listenTo(Announcer* a)
-{
+void Listener::listenTo(Announcer* a) {
 	a->addListener(this);
 	announcers.push_back(a);
 }
@@ -64,43 +61,34 @@ void Listener::listenTo(Announcer* a)
  * announces an event. Does nothing by default, is to be overridden
  * by whatever class inherits from Listener
  *******************************************************************/
-void Listener::onAnnouncement(string event_name, MemChunk& event_data)
-{
+void Listener::onAnnouncement(string event_name, MemChunk& event_data) {
 }
-
-
 
 /* Announcer::Announcer
  * Announcer class constructor
  *******************************************************************/
-Announcer::Announcer()
-{
+Announcer::Announcer() {
 }
 
 /* Announcer::~Announcer
  * Announcer class destructor
  *******************************************************************/
-Announcer::~Announcer()
-{
+Announcer::~Announcer() {
 }
 
 /* Announcer::addListener
  * Adds a listener to the list
  *******************************************************************/
-void Announcer::addListener(Listener* l)
-{
+void Announcer::addListener(Listener* l) {
 	listeners.push_back(l);
 }
 
 /* Announcer::removeListener
  * Removes a listener from the list
  *******************************************************************/
-void Announcer::removeListener(Listener* l)
-{
-	for (size_t a = 0; a < listeners.size(); a++)
-	{
-		if (listeners[a] == l)
-		{
+void Announcer::removeListener(Listener* l) {
+	for (size_t a = 0; a < listeners.size(); a++) {
+		if (listeners[a] == l) {
 			listeners.erase(listeners.begin() + a);
 			return;
 		}
@@ -111,8 +99,7 @@ void Announcer::removeListener(Listener* l)
  * 'Announces' an event to all listeners currently in the listeners
  * list, ie all Listeners that are 'listening' to this announcer.
  *******************************************************************/
-void Announcer::announce(string event_name, MemChunk& event_data)
-{
+void Announcer::announce(string event_name, MemChunk& event_data) {
 	for (size_t a = 0; a < listeners.size(); a++)
 		listeners[a]->onAnnouncement(event_name, event_data);
 }

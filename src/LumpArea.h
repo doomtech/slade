@@ -5,8 +5,7 @@
 #include "ArchiveEntry.h"
 #include <wx/stc/stc.h>
 
-class LumpArea : public wxPanel
-{
+class LumpArea : public wxPanel {
 protected:
 	ArchiveEntry*	lump;
 
@@ -17,8 +16,7 @@ public:
 	virtual void loadEntry(ArchiveEntry* entry);
 };
 
-class TextLumpArea : public LumpArea
-{
+class TextLumpArea : public LumpArea {
 private:
 	wxStyledTextCtrl*	text_area;
 

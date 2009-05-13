@@ -37,15 +37,14 @@
 /*******************************************************************
  * VARIABLES
  *******************************************************************/
-string	aui_perspective = _T("");
+string aui_perspective = _T("");
 
 
 /* MainWindow::MainWindow
  * MainWindow class constructor
  *******************************************************************/
 MainWindow::MainWindow()
-    : wxFrame((wxFrame *) NULL, -1, _T("SLADE"), wxPoint(0, 0), wxSize(800, 600))
-{
+: wxFrame((wxFrame *) NULL, -1, _T("SLADE"), wxPoint(0, 0), wxSize(800, 600)) {
 	setupLayout();
 	Maximize();
 }
@@ -53,15 +52,13 @@ MainWindow::MainWindow()
 /* MainWindow::~MainWindow
  * MainWindow class destructor
  *******************************************************************/
-MainWindow::~MainWindow()
-{
+MainWindow::~MainWindow() {
 }
 
 /* MainWindow::setupLayout
  * Sets up the wxWidgets window layout
  *******************************************************************/
-void MainWindow::setupLayout()
-{
+void MainWindow::setupLayout() {
 	// Create the wxAUI manager & related things
 	wxAuiManager *m_mgr = new wxAuiManager(this);
 	wxAuiPaneInfo p_inf;
@@ -74,7 +71,13 @@ void MainWindow::setupLayout()
 	wxMenu* fileMenu = new wxMenu(_(""));
     fileMenu->Append(MENU_FILE_OPEN,	_("&Open Wad"),		_("Open a Wad file"));
     fileMenu->Append(MENU_FILE_QUIT,	_("&Quit"),			_("Quit SLADE"));
-    menu->Append(fileMenu, _("&File"));
+	menu->Append(fileMenu, _("&File"));
+
+	// Wad menu
+	menu_wad = new wxMenu(_(""));
+	menu_wad->Append(MENU_WAD_SAVE,		_("Save Wad"),		_("Save the Wad file"));
+	menu_wad->Append(MENU_WAD_SAVEAS,	_("Save Wad As"),	_("Save the Wad to a new file"));
+	menu->Append(menu_wad, _("&Wad"));
 
 	// Edit menu
 	wxMenu* editMenu = new wxMenu(_T(""));
@@ -143,8 +146,7 @@ void MainWindow::setupLayout()
 /* MainWindow::setMockLayout
  * wxAUI testing stuff
  *******************************************************************/
-void MainWindow::setMockLayout()
-{
+void MainWindow::setMockLayout() {
 	/*
 	wxAuiManager *m_mgr = new wxAuiManager(this);
 
@@ -152,11 +154,11 @@ void MainWindow::setMockLayout()
 	// Menu bar
 	wxMenuBar *menu = new wxMenuBar();
 
-	// File menu
+	// File menuGets the player's strafe vector
 	wxMenu* fileMenu = new wxMenu(_T(""));
 	fileMenu->Append(MENU_FILE_OPEN,	_("&Open Wad"),		_("Opens a Wad file"));
-    fileMenu->Append(MENU_FILE_QUIT,	_("&Quit"),			_("Quit SLADE"));
-    menu->Append(fileMenu, _("&File"));
+	fileMenu->Append(MENU_FILE_QUIT,	_("&Quit"),			_("Quit SLADE"));
+	menu->Append(fileMenu, _("&File"));
 	SetMenuBar(menu);
 
 
@@ -199,40 +201,42 @@ void MainWindow::setMockLayout()
 	m_mgr->AddPane(infobar, p_inf);
 
 	m_mgr->Update();
-	*/
+	 */
 }
 
 /*******************************************************************
  * WXWIDGETS EVENTS & HANDLERS
  *******************************************************************/
 BEGIN_EVENT_TABLE(MainWindow, wxFrame)
-	EVT_HTML_LINK_CLICKED(HTML_WINDOW, MainWindow::onHTMLLinkClicked)
+EVT_HTML_LINK_CLICKED(HTML_WINDOW, MainWindow::onHTMLLinkClicked)
 
-	// MENU
+// MENU
 
-	// File Menu
-	EVT_MENU(MENU_FILE_OPEN, MainWindow::onFileOpen)
-	EVT_MENU(MENU_FILE_QUIT, MainWindow::onFileQuit)
+// File Menu
+EVT_MENU(MENU_FILE_OPEN, MainWindow::onFileOpen)
+EVT_MENU(MENU_FILE_QUIT, MainWindow::onFileQuit)
 
-	// View Menu
-	EVT_MENU(MENU_VIEW_WADMANAGER, MainWindow::onViewWadManager)
-	EVT_MENU(MENU_VIEW_CONSOLE, MainWindow::onViewConsole)
+// Wad Menu
+EVT_MENU(MENU_WAD_SAVE, MainWindow::onWadSave)
+EVT_MENU(MENU_WAD_SAVEAS, MainWindow::onWadSaveAs)
+
+// View Menu
+EVT_MENU(MENU_VIEW_WADMANAGER, MainWindow::onViewWadManager)
+EVT_MENU(MENU_VIEW_CONSOLE, MainWindow::onViewConsole)
 END_EVENT_TABLE()
 
 /* MainWindow::onFileOpen
  * File->Open menu item event handler.
  *******************************************************************/
-void MainWindow::onFileOpen(wxCommandEvent &e)
-{
+void MainWindow::onFileOpen(wxCommandEvent &e) {
 	// Open a file browser dialog that allows multiple selection
 	// and filters by wad, zip and pk3 file extensions
-	wxFileDialog *dialog_open = new wxFileDialog(this, _T("Choose file(s) to open"), wxEmptyString, wxEmptyString, 
-		_T("Any Supported File (*.wad; *.zip; *.pk3)|*.wad;*.zip;*.pk3|Doom Wad files (*.wad)|*.wad|Zip files (*.zip)|*.zip|Pk3 (zip) files (*.pk3)|*.pk3"),
-		wxFD_OPEN|wxFD_MULTIPLE|wxFD_FILE_MUST_EXIST, wxDefaultPosition);
+	wxFileDialog *dialog_open = new wxFileDialog(this, _T("Choose file(s) to open"), wxEmptyString, wxEmptyString,
+			_T("Any Supported File (*.wad; *.zip; *.pk3)|*.wad;*.zip;*.pk3|Doom Wad files (*.wad)|*.wad|Zip files (*.zip)|*.zip|Pk3 (zip) files (*.pk3)|*.pk3"),
+			wxFD_OPEN | wxFD_MULTIPLE | wxFD_FILE_MUST_EXIST, wxDefaultPosition);
 
 	// Run the dialog & check that the user didn't cancel
-	if (dialog_open->ShowModal() == wxID_OK)
-	{
+	if (dialog_open->ShowModal() == wxID_OK) {
 		// Get an array of selected filenames
 		wxArrayString files;
 		dialog_open->GetPaths(files);
@@ -245,16 +249,22 @@ void MainWindow::onFileOpen(wxCommandEvent &e)
 /* MainWindow::onFileQuit
  * File->Quit menu item event handler.
  *******************************************************************/
-void MainWindow::onFileQuit(wxCommandEvent &e)
-{
+void MainWindow::onFileQuit(wxCommandEvent &e) {
 	wxTheApp->ExitMainLoop();
+}
+
+void MainWindow::onWadSave(wxCommandEvent& e) {
+
+}
+
+void MainWindow::onWadSaveAs(wxCommandEvent& e) {
+	panel_wadmanager->saveSelectionAs();
 }
 
 /* MainWindow::onViewWadManager
  * View->Wad Manager menu item event handler.
  *******************************************************************/
-void MainWindow::onViewWadManager(wxCommandEvent &e)
-{
+void MainWindow::onViewWadManager(wxCommandEvent &e) {
 	wxAuiManager *m_mgr = wxAuiManager::GetManager(panel_wadmanager);
 	m_mgr->GetPane(_T("wad_manager")).Show(true);
 	m_mgr->Update();
@@ -263,8 +273,7 @@ void MainWindow::onViewWadManager(wxCommandEvent &e)
 /* MainWindow::onViewConsole
  * View->Console menu item event handler.
  *******************************************************************/
-void MainWindow::onViewConsole(wxCommandEvent &e)
-{
+void MainWindow::onViewConsole(wxCommandEvent &e) {
 	wxAuiManager *m_mgr = wxAuiManager::GetManager(panel_wadmanager);
 	m_mgr->GetPane(_T("console")).Show(true);
 	m_mgr->Update();
@@ -274,8 +283,7 @@ void MainWindow::onViewConsole(wxCommandEvent &e)
  * Called when a link is clicked on the HTML Window, so that
  * external (http) links are opened in the default browser
  *******************************************************************/
-void MainWindow::onHTMLLinkClicked(wxHtmlLinkEvent &e)
-{
+void MainWindow::onHTMLLinkClicked(wxHtmlLinkEvent &e) {
 	if (e.GetLinkInfo().GetHref().StartsWith(_T("http://")))
 		wxLaunchDefaultBrowser(e.GetLinkInfo().GetHref());
 	else

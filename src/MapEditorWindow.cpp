@@ -42,8 +42,7 @@
  * MapEditorWindow class constructor
  *******************************************************************/
 MapEditorWindow::MapEditorWindow()
-    : wxFrame((wxFrame *) NULL, -1, _T("SLADE"), wxPoint(0, 0), wxSize(800, 600))
-{
+: wxFrame((wxFrame *) NULL, -1, _T("SLADE"), wxPoint(0, 0), wxSize(800, 600)) {
 	Maximize();
 	Show();
 }
@@ -51,18 +50,20 @@ MapEditorWindow::MapEditorWindow()
 /* MapEditorWindow::~MapEditorWindow
  * MapEditorWindow class destructor
  *******************************************************************/
-MapEditorWindow::~MapEditorWindow()
-{
+MapEditorWindow::~MapEditorWindow() {
 }
 
 /* MapEditorWindow::setupLayout
  * Sets up the basic map editor window layout
  *******************************************************************/
-void MapEditorWindow::setupLayout()
-{
+void MapEditorWindow::setupLayout() {
 	// Create the wxAUI manager & related things
 	wxAuiManager *m_mgr = new wxAuiManager(this);
 	wxAuiPaneInfo p_inf;
 
+	CreateToolBar();
+	CreateStatusBar();
 
+	m_mgr->Update();
+	Layout();
 }

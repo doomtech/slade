@@ -4,8 +4,7 @@
 
 #include <wx/glcanvas.h>
 
-class MapCanvas : public wxGLCanvas
-{
+class MapCanvas : public wxGLCanvas {
 private:
 
 public:

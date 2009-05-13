@@ -7,8 +7,7 @@
 class Archive;
 class EntryListPanel;
 
-class EntryList : public wxListCtrl
-{
+class EntryList : public wxListCtrl {
 private:
 	EntryListPanel*	parent;
 
@@ -21,8 +20,7 @@ public:
 	int		getWidth();
 };
 
-class EntryListPanel : public wxPanel
-{
+class EntryListPanel : public wxPanel {
 private:
 	Archive*	archive;
 	EntryList*	entry_list;

@@ -36,8 +36,7 @@
 /* MemChunk::MemChunk
  * MemChunk class constructor
  *******************************************************************/
-MemChunk::MemChunk(DWORD size)
-{
+MemChunk::MemChunk(DWORD size) {
 	// Init variables
 	this->size = size;
 
@@ -51,8 +50,7 @@ MemChunk::MemChunk(DWORD size)
 /* MemChunk::~MemChunk
  * MemChunk class destructor
  *******************************************************************/
-MemChunk::~MemChunk()
-{
+MemChunk::~MemChunk() {
 	// Free memory
 	if (data)
 		delete[] data;
@@ -61,8 +59,7 @@ MemChunk::~MemChunk()
 /* MemChunk::hasData
  * Returns true if the chunk contains data
  *******************************************************************/
-bool MemChunk::hasData()
-{
+bool MemChunk::hasData() {
 	if (size > 0 && data)
 		return true;
 	else
@@ -73,10 +70,8 @@ bool MemChunk::hasData()
  * Deletes the memory chunk.
  * Returns false if no data exists, true otherwise.
  *******************************************************************/
-bool MemChunk::clear()
-{
-	if (hasData())
-	{
+bool MemChunk::clear() {
+	if (hasData()) {
 		delete[] data;
 		data = NULL;
 		size = 0;
@@ -90,11 +85,9 @@ bool MemChunk::clear()
  * Resizes the memory chunk, preserving existing data if specified
  * Returns false if new size is invalid, true otherwise
  *******************************************************************/
-bool MemChunk::reSize(DWORD new_size, bool preserve_data)
-{
+bool MemChunk::reSize(DWORD new_size, bool preserve_data) {
 	// Check for invalid new size
-	if (new_size == 0)
-	{
+	if (new_size == 0) {
 		wxLogMessage(_T("MemChunk::reSize: new_size cannot be 0"));
 		return false;
 	}
@@ -103,8 +96,7 @@ bool MemChunk::reSize(DWORD new_size, bool preserve_data)
 	BYTE* new_data = new BYTE[new_size];
 
 	// Copy existing data to new chunk if needed & current data exists
-	if (preserve_data && hasData())
-	{
+	if (preserve_data && hasData()) {
 		// Determine size of data to copy
 		DWORD copy_size = new_size;
 		if (copy_size > size)
@@ -128,14 +120,12 @@ bool MemChunk::reSize(DWORD new_size, bool preserve_data)
  * Loads a file (or part of it) into the MemChunk
  * Returns false if file couldn't be opened, true otherwise
  *******************************************************************/
-bool MemChunk::loadFile(string filename, DWORD offset, DWORD len)
-{
+bool MemChunk::loadFile(string filename, DWORD offset, DWORD len) {
 	// Open the file
 	FILE *fp = fopen(chr(filename), "rb");
 
 	// Return false if file open failed
-	if (!fp)
-	{
+	if (!fp) {
 		wxLogMessage(_T("MemChunk::loadFile: Unable to open file %s"), filename.c_str());
 		return false;
 	}
@@ -146,7 +136,7 @@ bool MemChunk::loadFile(string filename, DWORD offset, DWORD len)
 	// Get file length
 	DWORD flen = 0;
 	fseek(fp, 0, SEEK_END);
-	flen = (DWORD)ftell(fp);
+	flen = (DWORD) ftell(fp);
 	fseek(fp, 0, SEEK_SET);
 
 	// If length isn't specified or exceeds the file length,
@@ -170,11 +160,9 @@ bool MemChunk::loadFile(string filename, DWORD offset, DWORD len)
  * Loads a chunk of memory into the MemChunk
  * Returns false if size or data pointer is invalid, true otherwise
  *******************************************************************/
-bool MemChunk::loadMem(BYTE* start, DWORD len)
-{
+bool MemChunk::loadMem(BYTE* start, DWORD len) {
 	// Check that length & data to be loaded are valid
-	if (len == 0 || !start)
-	{
+	if (len == 0 || !start) {
 		wxLogMessage(_T("MemChunk::loadMem: Invalid data and/or length"));
 		return false;
 	}

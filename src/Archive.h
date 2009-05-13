@@ -15,8 +15,7 @@ protected:
 	BYTE					type;
 
 public:
-	struct mapdesc_t
-	{
+	struct mapdesc_t {
 		string			name;
 		ArchiveEntry*	head;
 		ArchiveEntry*	end;

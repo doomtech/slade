@@ -41,17 +41,15 @@
  * EXTERNAL VARIABLES
  *******************************************************************/
 
-
 /* WMFileBrowser::WMFileBrowser
  * WMFileBrowser class constructor
  *******************************************************************/
 WMFileBrowser::WMFileBrowser(wxWindow* parent, WadManagerPanel* wm, int id)
 : wxGenericDirCtrl(parent, id, wxDirDialogDefaultFolderStr, wxDefaultPosition, wxDefaultSize, wxDIRCTRL_SHOW_FILTERS,
-					_T("Any Supported Wad File (*.wad; *.zip; *.pk3)|*.wad;*.zip;*.pk3|Doom Wad files (*.wad)|*.wad|Zip files (*.zip)|*.zip|Pk3 (zip) files (*.pk3)|*.pk3|All Files (*.*)|*.*"))
-{
+					_T("Any Supported Wad File (*.wad; *.zip; *.pk3)|*.wad;*.zip;*.pk3|Doom Wad files (*.wad)|*.wad|Zip files (*.zip)|*.zip|Pk3 (zip) files (*.pk3)|*.pk3|All Files (*.*)|*.*")) {
 	// Set the parent
 	this->parent = wm;
-	
+
 	// Connect a custom event for when an item in the file tree is activated
 	GetTreeCtrl()->Connect(GetTreeCtrl()->GetId(), wxEVT_COMMAND_TREE_ITEM_ACTIVATED, wxTreeEventHandler(WMFileBrowser::onItemActivated));
 }
@@ -59,19 +57,17 @@ WMFileBrowser::WMFileBrowser(wxWindow* parent, WadManagerPanel* wm, int id)
 /* WMFileBrowser::~WMFileBrowser
  * WMFileBrowser class destructor
  *******************************************************************/
-WMFileBrowser::~WMFileBrowser()
-{
+WMFileBrowser::~WMFileBrowser() {
 }
 
 /* WMFileBrowser::onItemActivated
  * Event called when an item in the tree is activated. Opens a wadfile
  * if one is selected.
-  *******************************************************************/
-void WMFileBrowser::onItemActivated(wxTreeEvent &e)
-{
+ *******************************************************************/
+void WMFileBrowser::onItemActivated(wxTreeEvent &e) {
 	// Get related objects
-	wxTreeCtrl* tree = (wxTreeCtrl*)e.GetEventObject();
-	WMFileBrowser* browser = (WMFileBrowser*)tree->GetParent();
+	wxTreeCtrl* tree = (wxTreeCtrl*) e.GetEventObject();
+	WMFileBrowser* browser = (WMFileBrowser*) tree->GetParent();
 
 	// If the selected item has no children (ie it's a file), open it
 	// as a wad file in the wad manager
@@ -79,15 +75,11 @@ void WMFileBrowser::onItemActivated(wxTreeEvent &e)
 		browser->parent->openFile(browser->GetPath());
 }
 
-
-
-
 /* WadManagerPanel::WadManagerPanel
  * WadManagerPanel class constructor
  *******************************************************************/
 WadManagerPanel::WadManagerPanel(wxWindow *parent, wxAuiNotebook* nb_wads)
-: wxPanel(parent, -1)
-{
+: wxPanel(parent, -1) {
 	notebook_wads = nb_wads;
 
 	// Create main sizer
@@ -95,8 +87,8 @@ WadManagerPanel::WadManagerPanel(wxWindow *parent, wxAuiNotebook* nb_wads)
 	SetSizer(vbox);
 
 	// Create/setup tabs
-	notebook_tabs = new wxAuiNotebook(this, -1, wxDefaultPosition, wxDefaultSize,  wxAUI_NB_TOP|wxAUI_NB_TAB_SPLIT|wxAUI_NB_TAB_MOVE|wxAUI_NB_SCROLL_BUTTONS);
-	vbox->Add(notebook_tabs, 1, wxEXPAND|wxALL, 4);
+	notebook_tabs = new wxAuiNotebook(this, -1, wxDefaultPosition, wxDefaultSize, wxAUI_NB_TOP | wxAUI_NB_TAB_SPLIT | wxAUI_NB_TAB_MOVE | wxAUI_NB_SCROLL_BUTTONS);
+	vbox->Add(notebook_tabs, 1, wxEXPAND | wxALL, 4);
 
 	// Open wads & maps list
 	wxPanel *panel_wm = new wxPanel(notebook_tabs);
@@ -105,14 +97,14 @@ WadManagerPanel::WadManagerPanel(wxWindow *parent, wxAuiNotebook* nb_wads)
 	// Create/setup wad list
 	wxBoxSizer *box_wm = new wxBoxSizer(wxVERTICAL);
 	panel_wm->SetSizer(box_wm);
-	box_wm->Add(new wxStaticText(panel_wm, -1, _T("Open Wads:")), 0, wxEXPAND|wxALL, 4);
+	box_wm->Add(new wxStaticText(panel_wm, -1, _T("Open Wads:")), 0, wxEXPAND | wxALL, 4);
 	list_openwads = new wxListBox(panel_wm, LIST_OPENWADS, wxDefaultPosition, wxDefaultSize, 0, 0, wxLB_SINGLE);
-	box_wm->Add(list_openwads, 1, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+	box_wm->Add(list_openwads, 1, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, 4);
 
 	// Create/setup map list
-	box_wm->Add(new wxStaticText(panel_wm, -1, _T("Maps:")), 0, wxEXPAND|wxALL, 4);
-	list_maps = new wxListCtrl(panel_wm, LIST_MAPS, wxDefaultPosition, wxSize(-1, 128), wxLC_LIST|wxLC_SINGLE_SEL);
-	box_wm->Add(list_maps, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+	box_wm->Add(new wxStaticText(panel_wm, -1, _T("Maps:")), 0, wxEXPAND | wxALL, 4);
+	list_maps = new wxListCtrl(panel_wm, LIST_MAPS, wxDefaultPosition, wxSize(-1, 128), wxLC_LIST | wxLC_SINGLE_SEL);
+	box_wm->Add(list_maps, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, 4);
 
 	// Create/setup file browser
 	file_browser = new WMFileBrowser(notebook_tabs, this, TREE_BROWSER);
@@ -122,42 +114,64 @@ WadManagerPanel::WadManagerPanel(wxWindow *parent, wxAuiNotebook* nb_wads)
 /* WadManagerPanel::~WadManagerPanel
  * WadManagerPanel class destructor
  *******************************************************************/
-WadManagerPanel::~WadManagerPanel()
-{
+WadManagerPanel::~WadManagerPanel() {
 }
 
 /* WadManagerPanel::openFile
  * Opens a wad file and initialises the UI for it
  *******************************************************************/
-void WadManagerPanel::openFile(string filename)
-{
+void WadManagerPanel::openFile(string filename) {
 	// Open the file in the wad manager
 	Archive* new_wad = WadManager::getInstance().openWad(filename);
 
 	// Check that the wad opened ok
-	if (new_wad)
-	{
+	if (new_wad) {
 		// Add wad to the list
 		list_openwads->Append(filename);
 
 		// Open a new wad panel tab
 		WadPanel *wp = new WadPanel(notebook_wads, new_wad);
 		notebook_wads->AddPage(wp, new_wad->getFileName(false), true);
-	}
-	else // If wad didn't open ok, show error message
-		wxMessageBox(s_fmt(_T("Error opening %s:\n%s"), filename.c_str(), Global::error.c_str()), _T("Error"));
+	} else // If wad didn't open ok, show error message
+		wxMessageBox(s_fmt(_T("Error opening %s:\n%s"), filename.c_str(), Global::error.c_str()), _T("Error"), wxICON_ERROR);
 }
 
 /* WadManagerPanel::openFiles
  * Opens each file in a supplied array of filenames
  *******************************************************************/
-void WadManagerPanel::openFiles(wxArrayString& files)
-{
+void WadManagerPanel::openFiles(wxArrayString& files) {
 	// Go through each filename in the array
-	for (int a = 0; a < (int)files.size(); a++)
-	{
+	for (int a = 0; a < (int) files.size(); a++) {
 		// Open the wadfile
 		openFile(files[a]);
+	}
+}
+
+void WadManagerPanel::saveSelection() {
+	Archive* wad = WadManager::getInstance().getWad(list_openwads->GetSelection());
+
+	if (!wad)
+		return;
+
+	if (!wad->save()) {
+		wxMessageBox(s_fmt(_T("Error: %s"), Global::error.c_str()), _T("Error"), wxICON_ERROR);
+	}
+}
+
+void WadManagerPanel::saveSelectionAs() {
+	Archive* wad = WadManager::getInstance().getWad(list_openwads->GetSelection());
+
+	if (!wad)
+		return;
+
+	string formats = _T("Doom Wad File (*.wad)|*.wad");
+	string deftype = _T("*.wad");
+	string filename = wxFileSelector(_T("Save Wad"), _T(""), _T(""), deftype, formats, wxSAVE | wxOVERWRITE_PROMPT);
+
+	if (!filename.empty()) {
+		if (!wad->save(filename)) {
+			wxMessageBox(s_fmt(_T("Error: %s"), Global::error.c_str()), _T("Error"), wxICON_ERROR);
+		}
 	}
 }
 
@@ -165,10 +179,10 @@ void WadManagerPanel::openFiles(wxArrayString& files)
  * WXWIDGETS EVENTS & HANDLERS
  *******************************************************************/
 BEGIN_EVENT_TABLE(WadManagerPanel, wxPanel)
-	EVT_LISTBOX(LIST_OPENWADS, WadManagerPanel::onListWadsChanged)
-	EVT_LISTBOX_DCLICK(LIST_OPENWADS, WadManagerPanel::onListWadsActivated)
-	EVT_LISTBOX(LIST_MAPS, WadManagerPanel::onListMapsChanged)
-	EVT_LIST_ITEM_ACTIVATED(LIST_MAPS, WadManagerPanel::onListMapsActivated)
+EVT_LISTBOX(LIST_OPENWADS, WadManagerPanel::onListWadsChanged)
+EVT_LISTBOX_DCLICK(LIST_OPENWADS, WadManagerPanel::onListWadsActivated)
+EVT_LISTBOX(LIST_MAPS, WadManagerPanel::onListMapsChanged)
+EVT_LIST_ITEM_ACTIVATED(LIST_MAPS, WadManagerPanel::onListMapsActivated)
 END_EVENT_TABLE()
 
 /* WadManagerPanel::onListWadsChanged
@@ -176,8 +190,7 @@ END_EVENT_TABLE()
  * wads list. Updates the maps list with any maps found within the
  * selected wadfile.
  *******************************************************************/
-void WadManagerPanel::onListWadsChanged(wxCommandEvent &e)
-{
+void WadManagerPanel::onListWadsChanged(wxCommandEvent &e) {
 	// Clear current maps list
 	list_maps->ClearAll();
 
@@ -192,8 +205,7 @@ void WadManagerPanel::onListWadsChanged(wxCommandEvent &e)
 	vector<Archive::mapdesc_t> maps = selected_wad->detectMaps();
 
 	// Go through the list and add maps
-	for (int a = 0; a < (int)maps.size(); a++)
-	{
+	for (int a = 0; a < (int) maps.size(); a++) {
 		// Setup map name string
 		string name;
 
@@ -223,16 +235,14 @@ void WadManagerPanel::onListWadsChanged(wxCommandEvent &e)
  * Event handler for when the user activates a wad in the wad list.
  * Opens the wad in a new tab, if it isn't already open.
  *******************************************************************/
-void WadManagerPanel::onListWadsActivated(wxCommandEvent &e)
-{
+void WadManagerPanel::onListWadsActivated(wxCommandEvent &e) {
 	// Get the selected wad
 	Archive* selected_wad = WadManager::getInstance().getWad(list_openwads->GetSelection());
 
 	// Go through all tabs
-	for (size_t a = 0; a < notebook_wads->GetPageCount(); a++)
-	{
+	for (size_t a = 0; a < notebook_wads->GetPageCount(); a++) {
 		// Check for a match
-		if (((WadPanel*)notebook_wads->GetPage(a))->getWad() == selected_wad)
+		if (((WadPanel*) notebook_wads->GetPage(a))->getWad() == selected_wad)
 			return; // Selected wad is already open in a tab, so return
 	}
 
@@ -244,16 +254,14 @@ void WadManagerPanel::onListWadsActivated(wxCommandEvent &e)
 /* WadManagerPanel::onListMapsChanged
  * Event handler for when the user selects a map in the maps list.
  *******************************************************************/
-void WadManagerPanel::onListMapsChanged(wxCommandEvent &e)
-{
+void WadManagerPanel::onListMapsChanged(wxCommandEvent &e) {
 }
 
 /* WadManagerPanel::onListMapsActivated
  * Event handler for when the user activates a map in the maps list.
  * Opens the map in a new map editor window
  *******************************************************************/
-void WadManagerPanel::onListMapsActivated(wxListEvent &e)
-{
+void WadManagerPanel::onListMapsActivated(wxListEvent &e) {
 	wxMessageBox(_T("heh"));
 	new MapEditorWindow();
 }
@@ -263,8 +271,7 @@ void WadManagerPanel::onListMapsActivated(wxListEvent &e)
  * browser list. This makes it act funny, but I can't find another
  * way to get this event to work :/
  *******************************************************************/
-void WadManagerPanel::onBrowserItemActivated(wxTreeEvent &e)
-{
+void WadManagerPanel::onBrowserItemActivated(wxTreeEvent &e) {
 	// Get the tree control
 	wxTreeCtrl* tree = file_browser->GetTreeCtrl();
 

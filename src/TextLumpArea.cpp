@@ -31,12 +31,12 @@
 #include "WxStuff.h"
 #include "LumpArea.h"
 
+
 /* TextLumpArea::TextLumpArea
  * TextLumpArea class constructor
  *******************************************************************/
 TextLumpArea::TextLumpArea(wxWindow* parent)
-:	LumpArea(parent)
-{
+: LumpArea(parent) {
 	// Create & set sizer & border
 	wxStaticBox *frame = new wxStaticBox(this, -1, _T("Lump Contents"));
 	wxStaticBoxSizer *framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
@@ -44,7 +44,7 @@ TextLumpArea::TextLumpArea(wxWindow* parent)
 
 	// Create the text area
 	text_area = new wxStyledTextCtrl(this, -1);
-	framesizer->Add(text_area, 1, wxEXPAND|wxALL, 4);
+	framesizer->Add(text_area, 1, wxEXPAND | wxALL, 4);
 
 	Layout();
 }
@@ -52,22 +52,20 @@ TextLumpArea::TextLumpArea(wxWindow* parent)
 /* TextLumpArea::~TextLumpArea
  * TextLumpArea class destructor
  *******************************************************************/
-TextLumpArea::~TextLumpArea()
-{
+TextLumpArea::~TextLumpArea() {
 }
 
 /* TextLumpArea::loadEntry
  * Loads an entry into the lump area as text
  *******************************************************************/
-void TextLumpArea::loadEntry(ArchiveEntry* entry)
-{
+void TextLumpArea::loadEntry(ArchiveEntry* entry) {
 	// Check that the entry exists
 	if (!entry)
 		return;
 
 	// Read entry as a text string
 	this->lump = entry;
-	string istr = wxString::FromAscii((char*)entry->getData());
+	string istr = wxString::FromAscii((char*) entry->getData());
 	istr.Truncate(entry->getSize());
 
 	// Add text to the text area

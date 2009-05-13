@@ -4,8 +4,7 @@
 
 class MapSector;
 
-class MapSide
-{
+class MapSide {
 private:
 	MapSector*	sector;
 

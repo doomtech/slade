@@ -2,8 +2,7 @@
 #ifndef __MAPEDITORWINDOW_H__
 #define __MAPEDITORWINDOW_H__
 
-class MapEditorWindow : public wxFrame
-{
+class MapEditorWindow : public wxFrame {
 private:
 
 public:

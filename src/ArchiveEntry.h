@@ -8,8 +8,7 @@ class Archive;
 WX_DECLARE_STRING_HASH_MAP(wxString, PropertyList);
 
 // Entry types enum
-enum
-{
+enum {
 	ETYPE_UNKNOWN = 0,
 	ETYPE_MARKER,
 	ETYPE_TEXT,

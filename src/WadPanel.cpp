@@ -38,8 +38,7 @@
  * WadPanel class constructor
  *******************************************************************/
 WadPanel::WadPanel(wxWindow* parent, Archive* wad)
-: wxPanel(parent, -1)
-{
+: wxPanel(parent, -1) {
 	this->wad = wad;
 
 	// Create & set sizer
@@ -48,7 +47,7 @@ WadPanel::WadPanel(wxWindow* parent, Archive* wad)
 
 	// Lump list panel
 	lump_list = new EntryListPanel(this, ENTRY_LIST_PANEL, wad);
-	m_hbox->Add(lump_list, 0, wxEXPAND|wxALL, 4);
+	m_hbox->Add(lump_list, 0, wxEXPAND | wxALL, 4);
 
 	lump_list->populateEntryList();
 
@@ -58,7 +57,7 @@ WadPanel::WadPanel(wxWindow* parent, Archive* wad)
 
 	// Add default lump area to the panel
 	cur_area = lump_area;
-	m_hbox->Add(cur_area, 1, wxEXPAND|wxALL, 4);
+	m_hbox->Add(cur_area, 1, wxEXPAND | wxALL, 4);
 	cur_area->Show(true);
 
 	Layout();
@@ -67,13 +66,11 @@ WadPanel::WadPanel(wxWindow* parent, Archive* wad)
 /* WadPanel::~WadPanel
  * WadPanel class destructor
  *******************************************************************/
-WadPanel::~WadPanel()
-{
+WadPanel::~WadPanel() {
 }
 
-
 BEGIN_EVENT_TABLE(WadPanel, wxPanel)
-	EVT_LIST_ITEM_FOCUSED(WadPanel::ENTRY_LIST_PANEL, WadPanel::onEntryListChange)
+EVT_LIST_ITEM_FOCUSED(WadPanel::ENTRY_LIST_PANEL, WadPanel::onEntryListChange)
 END_EVENT_TABLE()
 
 /* WadPanel::onEntryListChange
@@ -81,8 +78,7 @@ END_EVENT_TABLE()
  * entry list panel is changed (ie when the user selects an entry
  * in the list)
  *******************************************************************/
-void WadPanel::onEntryListChange(wxListEvent& event)
-{
+void WadPanel::onEntryListChange(wxListEvent& event) {
 	// Get the panel sizer
 	wxSizer* sizer = GetSizer();
 

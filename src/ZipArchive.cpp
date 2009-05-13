@@ -46,38 +46,33 @@
  * ZipArchive class constructor
  *******************************************************************/
 ZipArchive::ZipArchive()
-: Archive()
-{
+: Archive() {
 	type = ARCHIVE_ZIP;
 }
 
 /* ZipArchive::~ZipArchive
  * ZipArchive class destructor
  *******************************************************************/
-ZipArchive::~ZipArchive()
-{
+ZipArchive::~ZipArchive() {
 }
 
 /* ZipArchive::openFile
  * Reads a zip format file from disk
  * Returns true if successful, false otherwise
  *******************************************************************/
-bool ZipArchive::openFile(string filename)
-{
+bool ZipArchive::openFile(string filename) {
 	wxZipEntry* entry;
 
 	// Open the file
 	wxFFileInputStream in(filename);
-	if (!in.IsOk())
-	{
+	if (!in.IsOk()) {
 		Global::error = _T("Unable to open file");
 		return false;
 	}
 
 	// Create zip stream
 	wxZipInputStream zip(in);
-	if (!zip.IsOk())
-	{
+	if (!zip.IsOk()) {
 		Global::error = _T("Invalid zip file");
 		return false;
 	}
@@ -85,10 +80,8 @@ bool ZipArchive::openFile(string filename)
 	// Go through all zip entries
 	int entry_index = 0;
 	entry = zip.GetNextEntry();
-	while (entry)
-	{
-		if (!entry->IsDir())
-		{
+	while (entry) {
+		if (!entry->IsDir()) {
 			// Get the entry name as a wxFileName (so we can break it up)
 			wxFileName fn(entry->GetName(wxPATH_UNIX), wxPATH_UNIX);
 
@@ -122,13 +115,11 @@ bool ZipArchive::openFile(string filename)
  * Loads an entry's data from the zipfile
  * Returns true if successful, false otherwise
  *******************************************************************/
-bool ZipArchive::loadEntryData(ArchiveEntry* entry)
-{
+bool ZipArchive::loadEntryData(ArchiveEntry* entry) {
 	wxLogMessage(_T("Load entry ") + entry->getName());
-	
+
 	// Check that the lump belongs to this wadfile
-	if (entry->getParent() != this)
-	{
+	if (entry->getParent() != this) {
 		wxLogMessage(_T("ZipArchive::loadEntryData: Entry %s attempting to load data from wrong parent!"), entry->getName().c_str());
 		return false;
 	}
@@ -144,24 +135,21 @@ bool ZipArchive::loadEntryData(ArchiveEntry* entry)
 	int zip_index = 0;
 	if (entry->hasExProp(_T("zip_index")))
 		zip_index = atoi(chr(entry->getExProp(_T("zip_index"))));
-	else
-	{
+	else {
 		wxLogMessage(_T("ZipArchive::loadEntryData: Entry %s has no zip entry index!"), entry->getName().c_str());
 		return false;
 	}
 
 	// Open the file
 	wxFFileInputStream in(filename);
-	if (!in.IsOk())
-	{
+	if (!in.IsOk()) {
 		wxLogMessage(_T("ZipArchive::loadEntryData: Unable to open zip file \"%s\"!"), filename.c_str());
 		return false;
 	}
 
 	// Create zip stream
 	wxZipInputStream zip(in);
-	if (!zip.IsOk())
-	{
+	if (!zip.IsOk()) {
 		wxLogMessage(_T("ZipArchive::loadEntryData: Invalid zip file \"%s\"!"), filename.c_str());
 		return false;
 	}
@@ -185,8 +173,7 @@ bool ZipArchive::loadEntryData(ArchiveEntry* entry)
 /* ZipArchive::detectMaps
  * Searches for any maps in the wad and adds them to the map list
  *******************************************************************/
-vector<Archive::mapdesc_t> ZipArchive::detectMaps()
-{
+vector<Archive::mapdesc_t> ZipArchive::detectMaps() {
 	vector<mapdesc_t> maps;
 
 	return maps;

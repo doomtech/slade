@@ -31,7 +31,7 @@ typedef uint32_t DWORD;
 
 // Class to hold global variables
 namespace Global {
-	static string error;
+	extern string error;
 };
 
 #endif //__MAIN_H__

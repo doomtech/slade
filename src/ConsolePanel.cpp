@@ -42,8 +42,7 @@
  * ConsolePanel class constructor
  *******************************************************************/
 ConsolePanel::ConsolePanel(wxWindow *parent, int id)
-:	wxPanel(parent, id)
-{
+: wxPanel(parent, id) {
 	initLayout();
 	listenTo(&Console::getInstance());
 }
@@ -51,26 +50,24 @@ ConsolePanel::ConsolePanel(wxWindow *parent, int id)
 /* ConsolePanel::~ConsolePanel
  * ConsolePanel class destructor
  *******************************************************************/
-ConsolePanel::~ConsolePanel()
-{
+ConsolePanel::~ConsolePanel() {
 }
 
 /* ConsolePanel::initLayout
  * Sets up the panel layout
  *******************************************************************/
-void ConsolePanel::initLayout()
-{
+void ConsolePanel::initLayout() {
 	// Create and set the sizer for the panel
 	wxBoxSizer *vbox = new wxBoxSizer(wxVERTICAL);
 	SetSizer(vbox);
 
 	// Create and add the message log textbox
-	text_log = new wxTextCtrl(this, -1, _T(""), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY);
-	vbox->Add(text_log, 1, wxEXPAND|wxALL, 4);
+	text_log = new wxTextCtrl(this, -1, _T(""), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE | wxTE_READONLY);
+	vbox->Add(text_log, 1, wxEXPAND | wxALL, 4);
 
 	// Create and add the command entry textbox
 	text_command = new wxTextCtrl(this, CP_TEXT_COMMAND, _T(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
-	vbox->Add(text_command, 0, wxEXPAND|wxBOTTOM|wxLEFT|wxRIGHT, 4);
+	vbox->Add(text_command, 0, wxEXPAND | wxBOTTOM | wxLEFT | wxRIGHT, 4);
 
 	Layout();
 
@@ -83,11 +80,9 @@ void ConsolePanel::initLayout()
 /* ConsolePanel::onAnnouncement
  * Handles any announcement events
  *******************************************************************/
-void ConsolePanel::onAnnouncement(string event_name, MemChunk& event_data)
-{
+void ConsolePanel::onAnnouncement(string event_name, MemChunk& event_data) {
 	// New console log message added
-	if (event_name == _T("console_logmessage"))
-	{
+	if (event_name == _T("console_logmessage")) {
 		text_log->AppendText(Console::getInstance().lastLogLine());
 	}
 }
@@ -96,11 +91,10 @@ void ConsolePanel::onAnnouncement(string event_name, MemChunk& event_data)
  * WXWIDGETS EVENTS & HANDLERS
  *******************************************************************/
 BEGIN_EVENT_TABLE(ConsolePanel, wxPanel)
-	EVT_TEXT_ENTER(CP_TEXT_COMMAND, ConsolePanel::onCommandEnter)
+EVT_TEXT_ENTER(CP_TEXT_COMMAND, ConsolePanel::onCommandEnter)
 END_EVENT_TABLE()
 
-void ConsolePanel::onCommandEnter(wxCommandEvent &e)
-{
+void ConsolePanel::onCommandEnter(wxCommandEvent &e) {
 	Console::getInstance().execute(e.GetString());
 	text_command->Clear();
 }

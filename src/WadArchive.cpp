@@ -38,8 +38,7 @@
  * VARIABLES
  *******************************************************************/
 // Used for map detection
-string map_lumps[12] =
-{
+string map_lumps[12] = {
 	_T("THINGS"),
 	_T("VERTEXES"),
 	_T("LINEDEFS"),
@@ -127,8 +126,7 @@ bool WadArchive::openFile(string filename) {
 
 		// If the lump data goes past the end of the file,
 		// the wadfile is invalid
-		if (offset + size > (DWORD)filesize)
-		{
+		if (offset + size > (DWORD)filesize) {
 			wxLogMessage(_T("WadArchive::openFile: File %s is invalid or corrupt"), filename.c_str());
 			Global::error = _T("File is invalid and/or corrupt");
 			return false;
@@ -160,8 +158,7 @@ bool WadArchive::save(string filename) {
 		filename = this->filename;
 
 	// Create a backup copy if needed
-	if (wxFileName::FileExists(filename))
-	{
+	if (wxFileName::FileExists(filename)) {
 		string bakfile = filename + _T(".bak");
 
 		// Remove old backup file
@@ -173,16 +170,14 @@ bool WadArchive::save(string filename) {
 
 	// Determine directory offset & individual lump offsets
 	long dir_offset = 12;
-	for (DWORD l = 0; l < numEntries(); l++)
-	{
+	for (DWORD l = 0; l < numEntries(); l++) {
 		setEntryOffset(entries[l], dir_offset);
 		dir_offset += entries[l]->getSize();
 	}
 
 	// Open wadfile for writing
-	FILE *fp = NULL;
-	if (!fp)
-	{
+	FILE *fp = fopen(filename.ToAscii(), "wb");
+	if (!fp) {
 		Global::error = _T("Unable to open file for saving. Make sure it isn't in use by another program.");
 		return false;
 	}
@@ -198,8 +193,7 @@ bool WadArchive::save(string filename) {
 		fwrite(entries[l]->getData(), entries[l]->getSize(), 1, fp);
 
 	// Write the directory
-	for (DWORD l = 0; l < num_lumps; l++)
-	{
+	for (DWORD l = 0; l < num_lumps; l++) {
 		char name[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 		long offset = getEntryOffset(entries[l]);
 		long size = entries[l]->getSize();
@@ -286,37 +280,31 @@ bool WadArchive::loadEntryData(ArchiveEntry* entry) {
 
 	return true;
 }
-
 /* WadArchive::detectMaps
  * Searches for any maps in the wad and adds them to the map list
  *******************************************************************/
-vector<Archive::mapdesc_t> WadArchive::detectMaps()
-{
+vector<Archive::mapdesc_t> WadArchive::detectMaps() {
 	vector<mapdesc_t> maps;
 
 	// Go through all lumps
 	int i = 0;
-	while (i < numEntries())
-	{
+	while (i < numEntries()) {
 		// UDMF format map check ********************************************************
 
 		// Check for UDMF format map lump (TEXTMAP lump)
-		if (entries[i]->getName() == _T("TEXTMAP") && i > 0)
-		{
+		if (entries[i]->getName() == _T("TEXTMAP") && i > 0) {
 			// Get map info
 			mapdesc_t md;
-			md.head = entries[i-1];				// Header lump
-			md.name = entries[i-1]->getName();	// Map title
-			md.format = 2;						// Format = 2 (UDMF)
+			md.head = entries[i - 1]; // Header lump
+			md.name = entries[i - 1]->getName(); // Map title
+			md.format = 2; // Format = 2 (UDMF)
 
 			// Skip lumps until we find the ENDMAP marker
 			bool done = false;
-			while (!done)
-			{
+			while (!done) {
 				// If we've somehow reached the end of the wad without finding ENDMAP,
 				// log an error and return
-				if (i == numEntries())
-				{
+				if (i == numEntries()) {
 					wxLogMessage(_T("UDMF Map with no ENDMAP marker in %s"), filename.c_str());
 					return maps;
 				}
@@ -345,15 +333,13 @@ vector<Archive::mapdesc_t> WadArchive::detectMaps()
 		// Doom/Hexen format map check **************************************************
 
 		// Array to keep track of what doom/hexen map lumps have been found
-		BYTE existing_map_lumps[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+		BYTE existing_map_lumps[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 		// Check if the current lump is a doom/hexen map lump
 		bool maplump_found = false;
-		for (int a = 0; a < 5; a++)
-		{
+		for (int a = 0; a < 5; a++) {
 			// Compare with all base map lump names
-			if (entries[i]->getName() == map_lumps[a])
-			{
+			if (entries[i]->getName() == map_lumps[a]) {
 				maplump_found = true;
 				existing_map_lumps[a] = 1;
 				break;
@@ -361,31 +347,26 @@ vector<Archive::mapdesc_t> WadArchive::detectMaps()
 		}
 
 		// If we've found what might be a map
-		if (maplump_found)
-		{
+		if (maplump_found) {
 			// Save position of map header lump
-			int header_index = i-1;
+			int header_index = i - 1;
 
 			// Check off map lumps until we find a non-map lump
 			bool done = false;
-			while (!done)
-			{
+			while (!done) {
 				// Loop will end if no map lump is found
 				done = true;
 
 				// If we're at the end of the wad, exit the loop
-				if (i == numEntries())
-				{
-				    i--;
-                    break;
+				if (i == numEntries()) {
+					i--;
+					break;
 				}
 
 				// Compare with all map lump names
-				for (int a = 0; a < 12; a++)
-				{
+				for (int a = 0; a < 12; a++) {
 					// Compare with all base map lump names
-					if (entries[i]->getName() == map_lumps[a])
-					{
+					if (entries[i]->getName() == map_lumps[a]) {
 						existing_map_lumps[a] = 1;
 						done = false;
 						break;
@@ -400,13 +381,12 @@ vector<Archive::mapdesc_t> WadArchive::detectMaps()
 			i--;
 
 			// Check that we have all the required map lumps: VERTEXES, LINEDEFS, SIDEDEFS, THINGS & SECTORS
-			if (!memchr(existing_map_lumps, 0, 5))
-			{
+			if (!memchr(existing_map_lumps, 0, 5)) {
 				// Get map info
 				mapdesc_t md;
-				md.head = entries[header_index];			// Header lump
-				md.name = entries[header_index]->getName();	// Map title
-				md.end = entries[i-1];						// End lump
+				md.head = entries[header_index]; // Header lump
+				md.name = entries[header_index]->getName(); // Map title
+				md.end = entries[i - 1]; // End lump
 
 				// If BEHAVIOR lump exists, it's a hexen format map, otherwise it's doom format
 				if (existing_map_lumps[11])
@@ -416,9 +396,7 @@ vector<Archive::mapdesc_t> WadArchive::detectMaps()
 
 				// Add map info to the maps list
 				maps.push_back(md);
-			}
-			else
-			{
+			} else {
 				// If we found a non-map lump before all needed map lumps were found,
 				// it's an invalid map, so just continue the loop
 				continue;

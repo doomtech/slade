@@ -38,6 +38,9 @@
 /*******************************************************************
  * VARIABLES
  *******************************************************************/
+namespace Global {
+	string error = _("");
+}
 
 
 /*******************************************************************
@@ -50,8 +53,7 @@ IMPLEMENT_APP(MainApp)
 /* MainApp::OnInit
  * Application initialization, run when program is started
  *******************************************************************/
-bool MainApp::OnInit()
-{
+bool MainApp::OnInit() {
 	// Init global variables
 	Global::error = _T("");
 
@@ -71,16 +73,14 @@ bool MainApp::OnInit()
 /* MainApp::OnExit
  * Application shutdown, run when program is closed
  *******************************************************************/
-int MainApp::OnExit()
-{
+int MainApp::OnExit() {
 	return 0;
 }
 
 /* MainApp::initLogFile
  * Sets up the SLADE log file
  *******************************************************************/
-void MainApp::initLogFile()
-{
+void MainApp::initLogFile() {
 	// Set wxLog target
 	wxLog::SetActiveTarget(new wxLogStderr(fopen("slade.log", "wt")));
 
@@ -93,8 +93,7 @@ void MainApp::initLogFile()
 /* MainApp::initLogFile
  * Creates & initialises the program GL context
  *******************************************************************/
-void MainApp::initOpenGL()
-{
+void MainApp::initOpenGL() {
 	// Create a temporary wxGLCanvas, it's needed for the wxGLContext constructor
 	wxGLCanvas *temp_canvas = new wxGLCanvas(NULL, wxID_ANY, 0);
 

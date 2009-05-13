@@ -30,15 +30,12 @@
 #include "Main.h"
 #include "SLADEMap.h"
 
-SLADEMap::SLADEMap()
-{
+SLADEMap::SLADEMap() {
 }
 
-SLADEMap::~SLADEMap()
-{
+SLADEMap::~SLADEMap() {
 }
 
-bool SLADEMap::readMap(Archive map_lumps)
-{
+bool SLADEMap::readMap(Archive map_lumps) {
 	return true;
 }

@@ -4,8 +4,7 @@
 
 class MapLine;
 
-class MapVertex
-{
+class MapVertex {
 private:
 	double	x;
 	double	y;

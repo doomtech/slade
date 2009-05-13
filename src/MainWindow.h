@@ -6,17 +6,16 @@
 #include <wx/aui/auibook.h>
 #include <wx/html/htmlwin.h>
 
-class MainWindow : public wxFrame
-{
+class MainWindow : public wxFrame {
 private:
 	WadManagerPanel*		panel_wadmanager;
 	wxAuiNotebook*			notebook_tabs;
 	wxHtmlWindow*			html_startpage;
+	wxMenu*					menu_wad;
 
 public:
 	// wxWidgets ID table
-	enum
-	{
+	enum {
 		MENU_FILE_NEW,
 		MENU_FILE_NEWZIP,
 		MENU_FILE_OPEN,
@@ -44,6 +43,9 @@ public:
 	// Event handlers
 	void	onFileOpen(wxCommandEvent &e);
 	void	onFileQuit(wxCommandEvent &e);
+
+	void	onWadSave(wxCommandEvent &e);
+	void	onWadSaveAs(wxCommandEvent &e);
 
 	void	onViewWadManager(wxCommandEvent &e);
 	void	onViewConsole(wxCommandEvent &e);

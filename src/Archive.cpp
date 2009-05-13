@@ -52,8 +52,7 @@ string Archive::getFileName(bool fullpath)
 {
 	if (fullpath)
 		return filename;
-	else
-	{
+	else {
 		// Get the filename without the path
 		wxFileName fn(filename);
 		return fn.GetName() + _T(".") + fn.GetExt();
@@ -90,6 +89,7 @@ ArchiveEntry* Archive::getEntry(string name) {
  * any subclass of Archive
  *******************************************************************/
 bool Archive::openFile(string filename) {
+	Global::error = _T("Action not implemented for this Archive type");
 	return false;
 }
 
@@ -98,6 +98,7 @@ bool Archive::openFile(string filename) {
  * any subclass of Archive
  *******************************************************************/
 bool Archive::save(string filename) {
+	Global::error = _T("Action not implemented for this Archive type");
 	return false;
 }
 
@@ -106,6 +107,7 @@ bool Archive::save(string filename) {
  * to be overridden by any subclass of Archive
  *******************************************************************/
 bool Archive::loadEntryData(ArchiveEntry* entry) {
+	Global::error = _T("Action not implemented for this Archive type");
 	return false;
 }
 

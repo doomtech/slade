@@ -38,26 +38,22 @@
  * VARIABLES
  *******************************************************************/
 
-
 /* Console::Console
  * Console class constructor
  *******************************************************************/
-Console::Console()
-{
+Console::Console() {
 }
 
 /* Console::!Console
  * Console class destructor
  *******************************************************************/
-Console::~Console()
-{
+Console::~Console() {
 }
 
 /* Console::addCommand
  * Adds a ConsoleCommand to the Console
  *******************************************************************/
-void Console::addCommand(ConsoleCommand &c)
-{
+void Console::addCommand(ConsoleCommand &c) {
 	// Add the command to the list
 	commands.push_back(c);
 
@@ -68,8 +64,7 @@ void Console::addCommand(ConsoleCommand &c)
 /* Console::execute
  * Attempts to execute the command line given
  *******************************************************************/
-void Console::execute(string command)
-{
+void Console::execute(string command) {
 	wxLogMessage(command);
 
 	// Add the command to the log
@@ -89,18 +84,15 @@ void Console::execute(string command)
 	// Get all args
 	string arg = tz.getToken();
 	vector<string> args;
-	while (arg != _T(""))
-	{
+	while (arg != _T("")) {
 		args.push_back(arg);
 		arg = tz.getToken();
 	}
 
 	// Check that it is a valid command
-	for (size_t a = 0; a < commands.size(); a++)
-	{
+	for (size_t a = 0; a < commands.size(); a++) {
 		// Found it, execute and return
-		if (commands[a].getName() == cmd_name)
-		{
+		if (commands[a].getName() == cmd_name) {
 			commands[a].execute(args);
 			return;
 		}
@@ -114,8 +106,7 @@ void Console::execute(string command)
 /* Console::logMessage
  * Prints a message to the console log
  *******************************************************************/
-void Console::logMessage(string message)
-{
+void Console::logMessage(string message) {
 	// Add a newline to the end of the message if there isn't one
 	if (message.Last() != '\n')
 		message.Append(_T("\n"));
@@ -133,14 +124,13 @@ void Console::logMessage(string message)
 /* Console::lastLogLine
  * Returns the last line added to the console log
  *******************************************************************/
-string Console::lastLogLine()
-{
+string Console::lastLogLine() {
 	// Init blank string
 	string lastLine = _T("");
 
 	// Get last line if any exist
 	if (log.size() > 0)
-		lastLine = log.at(log.size()-1);
+		lastLine = log.at(log.size() - 1);
 
 	return lastLine;
 }
@@ -148,21 +138,17 @@ string Console::lastLogLine()
 /* Console::command
  * Returns the ConsoleCommand at the specified index
  *******************************************************************/
-ConsoleCommand&	Console::command(int index)
-{
+ConsoleCommand& Console::command(int index) {
 	if (index >= 0 && index < commands.size())
 		return commands[index];
 	else
 		return commands[0]; // Return first console command on invalid index
 }
 
-
-
 /* ConsoleCommand::ConsoleCommand
  * ConsoleCommand class constructor
  *******************************************************************/
-ConsoleCommand::ConsoleCommand(string name, void(*commandFunc)(vector<string>), int min_args = 0)
-{
+ConsoleCommand::ConsoleCommand(string name, void(*commandFunc)(vector<string>), int min_args = 0) {
 	// Init variables
 	this->name = name;
 	this->commandFunc = commandFunc;
@@ -175,8 +161,7 @@ ConsoleCommand::ConsoleCommand(string name, void(*commandFunc)(vector<string>), 
 /* ConsoleCommand::execute
  * Executes the console command
  *******************************************************************/
-void ConsoleCommand::execute(vector<string> args)
-{
+void ConsoleCommand::execute(vector<string> args) {
 	// Only execute if we have the minimum args specified
 	if (args.size() >= min_args)
 		commandFunc(args);
@@ -192,8 +177,8 @@ void ConsoleCommand::execute(vector<string> args)
  * Subsequent arguments are ignored.
  *******************************************************************/
 //CONSOLE_COMMAND(echo, 1,
-void c_echo(vector<string> args)
-{
+
+void c_echo(vector<string> args) {
 	Console::getInstance().logMessage(args[0]);
 }
 ConsoleCommand echo(_T("echo"), &c_echo, 1);
@@ -203,8 +188,8 @@ ConsoleCommand echo(_T("echo"), &c_echo, 1);
  * Lists all valid console commands
  *******************************************************************/
 //CONSOLE_COMMAND(cmdlist, 0,
-void c_cmdlist(vector<string> args)
-{
+
+void c_cmdlist(vector<string> args) {
 	Console::getInstance().logMessage(s_fmt(_T("%d Valid Commands:"), Console::getInstance().numCommands()));
 
 	for (size_t a = 0; a < Console::getInstance().numCommands(); a++)

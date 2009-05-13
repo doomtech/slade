@@ -4,8 +4,7 @@
 
 class MapSide;
 
-class MapSector
-{
+class MapSector {
 private:
 	vector<MapSide*>	connected_sides;
 

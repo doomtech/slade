@@ -6,8 +6,7 @@
 #include "EntryListPanel.h"
 #include "LumpArea.h"
 
-class WadPanel : public wxPanel
-{
+class WadPanel : public wxPanel {
 private:
 	Archive*		wad;
 	EntryListPanel*	lump_list;

@@ -5,16 +5,14 @@
 #include "ListenerAnnouncer.h"
 #include <wx/textctrl.h>
 
-class ConsolePanel : public wxPanel, Listener
-{
+class ConsolePanel : public wxPanel, Listener {
 private:
 	wxTextCtrl	*text_log;
 	wxTextCtrl	*text_command;
 
 public:
 	// wxWidgets ID table
-	enum
-	{
+	enum {
 		CP_TEXT_COMMAND,
 	};
 

@@ -4,8 +4,7 @@
 
 class Archive;
 
-class WadManager
-{
+class WadManager {
 private:
 	vector<Archive*>		open_wads;
 
@@ -13,8 +12,7 @@ public:
 	WadManager();
 	~WadManager();
 
-	static WadManager&	getInstance()
-	{
+	static WadManager&	getInstance() {
 		static WadManager instance;
 		return instance;
 	}

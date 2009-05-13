@@ -9,8 +9,7 @@
 
 class WadManagerPanel;
 
-class WMFileBrowser : public wxGenericDirCtrl
-{
+class WMFileBrowser : public wxGenericDirCtrl {
 private:
 
 public:
@@ -22,8 +21,7 @@ public:
 	void onItemActivated(wxTreeEvent &e);
 };
 
-class WadManagerPanel : public wxPanel
-{
+class WadManagerPanel : public wxPanel {
 private:
 	wxAuiNotebook*		notebook_tabs;
 	wxAuiNotebook*		notebook_wads;
@@ -34,8 +32,7 @@ private:
 
 public:
 	// wxWidgets ID table
-	enum
-	{
+	enum {
 		LIST_OPENWADS,
 		LIST_MAPS,
 		TREE_BROWSER,
@@ -47,6 +44,9 @@ public:
 
 	void	openFile(string filename);
 	void	openFiles(wxArrayString& files);
+
+	void	saveSelection();
+	void	saveSelectionAs();
 
 	// Event handlers
 	void	onListWadsChanged(wxCommandEvent &e);

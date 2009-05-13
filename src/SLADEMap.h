@@ -10,8 +10,7 @@
 #include "Archive.h"
 
 
-class SLADEMap
-{
+class SLADEMap {
 private:
 	vector<MapLine*>	lines;
 	vector<MapSide*>	sides;

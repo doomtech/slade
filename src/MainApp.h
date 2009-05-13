@@ -2,8 +2,7 @@
 #ifndef __MAINAPP_H__
 #define __MAINAPP_H__
 
-class MainApp : public wxApp
-{
+class MainApp : public wxApp {
 private:
 
 public:
