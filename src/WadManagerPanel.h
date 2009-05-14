@@ -25,10 +25,11 @@ class WadManagerPanel : public wxPanel {
 private:
 	wxAuiNotebook*		notebook_tabs;
 	wxAuiNotebook*		notebook_wads;
-	wxListBox*			list_openwads;
+	wxListCtrl*			list_openwads;
 	wxListCtrl*			list_maps;
 	WMFileBrowser*		file_browser;
 	wxButton*			btn_browser_open;
+	wxMenu*				menu_wadcontext;
 
 public:
 	// wxWidgets ID table
@@ -37,6 +38,9 @@ public:
 		LIST_MAPS,
 		TREE_BROWSER,
 		BTN_BROWSER_OPEN,
+
+		MENU_SAVE,
+		MENU_SAVEAS,
 	};
 
 	WadManagerPanel(wxWindow *parent, wxAuiNotebook* nb_wads);
@@ -50,12 +54,17 @@ public:
 	void	saveCurrent();
 	void	saveCurrentAs();
 
+	vector<int>	getSelectedWads();
+
 	// Event handlers
-	void	onListWadsChanged(wxCommandEvent &e);
-	void	onListWadsActivated(wxCommandEvent &e);
+	void	onListWadsChanged(wxListEvent &e);
+	void	onListWadsActivated(wxListEvent &e);
 	void	onListMapsChanged(wxCommandEvent &e);
 	void	onListMapsActivated(wxListEvent &e);
 	void	onBrowserItemActivated(wxTreeEvent &e);
+	void	onListWadsRightClick(wxListEvent &e);
+	void	onMenuSave(wxCommandEvent &e);
+	void	onMenuSaveAs(wxCommandEvent &e);
 
 	DECLARE_EVENT_TABLE()
 };

@@ -95,7 +95,7 @@ void WadPanel::saveAs() {
 	// Setup file filters (temporary, should go through all archive types somehow)
 	string formats = _T("Doom Wad File (*.wad)|*.wad");
 	string deftype = _T("*.wad");
-	string filename = wxFileSelector(_T("Save Wad"), _T(""), _T(""), deftype, formats, wxSAVE | wxOVERWRITE_PROMPT);
+	string filename = wxFileSelector(_T("Save Wad ") + wad->getFileName(false) + _T(" As"), _T(""), _T(""), deftype, formats, wxSAVE | wxOVERWRITE_PROMPT);
 
 	// Check a filename was selected
 	if (!filename.empty()) {

@@ -209,21 +209,21 @@ void MainWindow::setMockLayout() {
  * WXWIDGETS EVENTS & HANDLERS
  *******************************************************************/
 BEGIN_EVENT_TABLE(MainWindow, wxFrame)
-EVT_HTML_LINK_CLICKED(HTML_WINDOW, MainWindow::onHTMLLinkClicked)
+	EVT_HTML_LINK_CLICKED(HTML_WINDOW, MainWindow::onHTMLLinkClicked)
 
-// MENU
+	// MENU
 
-// File Menu
-EVT_MENU(MENU_FILE_OPEN, MainWindow::onFileOpen)
-EVT_MENU(MENU_FILE_QUIT, MainWindow::onFileQuit)
+	// File Menu
+	EVT_MENU(MENU_FILE_OPEN, MainWindow::onFileOpen)
+	EVT_MENU(MENU_FILE_QUIT, MainWindow::onFileQuit)
 
-// Wad Menu
-EVT_MENU(MENU_WAD_SAVE, MainWindow::onWadSave)
-EVT_MENU(MENU_WAD_SAVEAS, MainWindow::onWadSaveAs)
+	// Wad Menu
+	EVT_MENU(MENU_WAD_SAVE, MainWindow::onWadSave)
+	EVT_MENU(MENU_WAD_SAVEAS, MainWindow::onWadSaveAs)
 
-// View Menu
-EVT_MENU(MENU_VIEW_WADMANAGER, MainWindow::onViewWadManager)
-EVT_MENU(MENU_VIEW_CONSOLE, MainWindow::onViewConsole)
+	// View Menu
+	EVT_MENU(MENU_VIEW_WADMANAGER, MainWindow::onViewWadManager)
+	EVT_MENU(MENU_VIEW_CONSOLE, MainWindow::onViewConsole)
 END_EVENT_TABLE()
 
 /* MainWindow::onFileOpen
