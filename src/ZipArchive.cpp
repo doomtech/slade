@@ -93,6 +93,7 @@ bool ZipArchive::openFile(string filename) {
 			nlump->setLoaded(false);
 			nlump->setExProp(_T("zip_index"), s_fmt(_T("%d"), entry_index));
 			nlump->setExProp(_T("directory"), fn.GetPath(true, wxPATH_UNIX));
+			nlump->setState(0);
 
 			wxLogMessage(_T("Entry: ") + nlump->getExProp(_T("directory")) + nlump->getName());
 
@@ -107,6 +108,7 @@ bool ZipArchive::openFile(string filename) {
 
 	// Setup variables
 	this->filename = filename;
+	modified = false;
 
 	return true;
 }

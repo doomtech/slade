@@ -137,6 +137,7 @@ bool WadArchive::openFile(string filename) {
 		nlump->setSize(size);
 		nlump->setLoaded(false);
 		nlump->setExProp(_T("offset"), s_fmt(_T("%d"), offset));
+		nlump->setState(0);
 
 		// Add to entry list
 		entries.push_back(nlump);
@@ -148,6 +149,7 @@ bool WadArchive::openFile(string filename) {
 
 	// Setup variables
 	this->filename = filename;
+	modified = false;
 	announce(_T("opened"));
 
 	return true;
@@ -206,7 +208,7 @@ bool WadArchive::save(string filename) {
 		fwrite(&size, 4, 1, fp);
 		fwrite(name, 1, 8, fp);
 
-		//directory[l]->setChanged(0);
+		entries[l]->setState(0);
 	}
 
 	// Close the file
@@ -214,6 +216,7 @@ bool WadArchive::save(string filename) {
 
 	// Set variables and return success
 	this->filename = filename;
+	modified = false;
 	announce(_T("saved"));
 	return true;
 }

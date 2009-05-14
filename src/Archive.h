@@ -14,6 +14,7 @@ protected:
 	string					filename;
 	vector<ArchiveEntry*>	entries;
 	BYTE					type;
+	bool					modified;
 
 public:
 	struct mapdesc_t {
@@ -28,6 +29,7 @@ public:
 
 	BYTE					getType() { return type; }
 	string					getFileName(bool fullpath = true);
+	bool					isModified() { return modified; }
 	virtual ArchiveEntry*	getEntry(DWORD index);
 	virtual ArchiveEntry*	getEntry(string name);
 

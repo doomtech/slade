@@ -37,6 +37,7 @@
  *******************************************************************/
 Archive::Archive() {
 	type = 0;
+	modified = true;
 }
 
 /* Archive::~Archive
@@ -144,6 +145,10 @@ ArchiveEntry* Archive::addNewEntry(string name, DWORD position) {
 	// Add it to the entry list
 	entries.insert(entries.begin() + position, new_entry);
 
+	// Update variables etc
+	modified = true;
+	announce(_T("entry_added"));
+
 	// Return the newly created entry
 	return new_entry;
 }
@@ -169,6 +174,10 @@ ArchiveEntry* Archive::addExistingEntry(ArchiveEntry* entry, DWORD position, boo
 
 	// Add the entry to the list
 	entries.insert(entries.begin() + position, entry);
+
+	// Update variables etc
+	modified = true;
+	announce(_T("entry_added"));
 
 	// Return the added entry
 	return entry;

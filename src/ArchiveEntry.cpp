@@ -42,6 +42,7 @@ ArchiveEntry::ArchiveEntry(string name, Archive* parent) {
 	this->data = NULL;
 	this->size = 0;
 	this->data_loaded = false;
+	this->state = 2;
 }
 
 /* ArchiveEntry::ArchiveEntry
@@ -68,6 +69,9 @@ ArchiveEntry::ArchiveEntry(ArchiveEntry& copy) {
 		data = NULL;
 		size = 0;
 	}
+
+	// Set entry state
+	state = 2;
 }
 
 /* ArchiveEntry::~ArchiveEntry
@@ -126,6 +130,19 @@ bool ArchiveEntry::setExProp(string key, string value) {
 	return exists;
 }
 
+/* ArchiveEntry::setState
+ * Sets the entry's state. If the state is already 'new' and we try
+ * to set it to 'modified' then don't change the state
+ *******************************************************************/
+void ArchiveEntry::setState(BYTE state) {
+	if (state == 0)
+		this->state = 0;
+	else {
+		if (state > this->state)
+			this->state = state;
+	}
+}
+
 /* ArchiveEntry::clearData
  * Clears entry data and resets it's size to zero
  *******************************************************************/
@@ -137,6 +154,7 @@ void ArchiveEntry::clearData() {
 	// Reset attributes
 	size = 0;
 	data_loaded = false;
+	setState(1);
 }
 
 /* ArchiveEntry::importMem
@@ -158,6 +176,7 @@ bool ArchiveEntry::importMem(void* data, DWORD size) {
 
 	// Update attributes
 	this->size = size;
+	setState(1);
 
 	return true;
 }

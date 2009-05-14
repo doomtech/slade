@@ -64,6 +64,7 @@ private:
 	DWORD			size;
 	bool			data_loaded;
 	BYTE			type;
+	BYTE			state;		// 0 = unmodified, 1 = modified, 2 = newly created
 	PropertyList	ex_props;
 
 public:
@@ -78,6 +79,7 @@ public:
 	BYTE*		getData(bool allow_load = true);
 	bool		isLoaded() { return data_loaded; }
 	BYTE		getType() { return type; }
+	BYTE		getState() { return state; }
 
 	// Modifiers
 	void		setParent(Archive* parent) { this->parent = parent; }
@@ -86,6 +88,7 @@ public:
 	void		setSize(DWORD size) { this->size = size; }
 	void		setData(BYTE* data) { this->data = data; }
 	void		setType(BYTE type) { this->type = type; }
+	void		setState(BYTE state);
 
 	// Data modification
 	void	clearData();
