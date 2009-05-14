@@ -25,6 +25,8 @@ public:
 	~WadPanel();
 
 	Archive*	getWad() { return wad; }
+	void		save();
+	void		saveAs();
 
 	// Events
 	void	onEntryListChange(wxListEvent &event);

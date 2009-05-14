@@ -128,6 +128,7 @@ void MainWindow::setupLayout() {
 	p_inf.DefaultPane();
 	p_inf.Float();
 	p_inf.FloatingSize(600, 400);
+	p_inf.FloatingPosition(100, 100);
 	p_inf.Show(false);
 	p_inf.Caption(_("Console"));
 	p_inf.Name(_T("console"));
@@ -258,7 +259,8 @@ void MainWindow::onWadSave(wxCommandEvent& e) {
 }
 
 void MainWindow::onWadSaveAs(wxCommandEvent& e) {
-	panel_wadmanager->saveSelectionAs();
+	//panel_wadmanager->saveSelectionAs();
+	panel_wadmanager->saveCurrentAs();
 }
 
 /* MainWindow::onViewWadManager

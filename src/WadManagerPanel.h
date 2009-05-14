@@ -47,6 +47,8 @@ public:
 
 	void	saveSelection();
 	void	saveSelectionAs();
+	void	saveCurrent();
+	void	saveCurrentAs();
 
 	// Event handlers
 	void	onListWadsChanged(wxCommandEvent &e);

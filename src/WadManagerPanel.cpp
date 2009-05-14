@@ -147,33 +147,73 @@ void WadManagerPanel::openFiles(wxArrayString& files) {
 	}
 }
 
+/* WadManagerPanel::saveSelection
+ * Saves the currently selected wad file in the list
+ *******************************************************************/
 void WadManagerPanel::saveSelection() {
+	// Get the selected wad
 	Archive* wad = WadManager::getInstance().getWad(list_openwads->GetSelection());
 
+	// Check it exists
 	if (!wad)
 		return;
 
+	// Save the wad
 	if (!wad->save()) {
+		// If there was an error pop up a message box
 		wxMessageBox(s_fmt(_T("Error: %s"), Global::error.c_str()), _T("Error"), wxICON_ERROR);
 	}
 }
 
+/* WadManagerPanel::saveSelectionAs
+ * Saves the currently selected wad file in the list as a new file
+ *******************************************************************/
 void WadManagerPanel::saveSelectionAs() {
+	// Get the selected wad
 	Archive* wad = WadManager::getInstance().getWad(list_openwads->GetSelection());
 
+	// Check it exists
 	if (!wad)
 		return;
 
+	// Setup file filters (temporary, should go through all archive types somehow)
 	string formats = _T("Doom Wad File (*.wad)|*.wad");
 	string deftype = _T("*.wad");
 	string filename = wxFileSelector(_T("Save Wad"), _T(""), _T(""), deftype, formats, wxSAVE | wxOVERWRITE_PROMPT);
 
+	// Check a filename was selected
 	if (!filename.empty()) {
+		// Save the wad
 		if (!wad->save(filename)) {
+			// If there was an error pop up a message box
 			wxMessageBox(s_fmt(_T("Error: %s"), Global::error.c_str()), _T("Error"), wxICON_ERROR);
 		}
 	}
 }
+
+/* WadManagerPanel::saveCurrent
+ * Saves the currently opened wad file (the currently opened tab)
+ *******************************************************************/
+void WadManagerPanel::saveCurrent() {
+	int selection = notebook_wads->GetSelection();
+	if (notebook_wads->GetPageText(selection).compare(_T("Start Page")))
+		return;
+
+	((WadPanel*) notebook_wads->GetPage(selection))->save();
+}
+
+/* WadManagerPanel::saveCurrent
+ * Saves the currently opened wad file as a new file (the currently
+ * opened tab)
+ *******************************************************************/
+void WadManagerPanel::saveCurrentAs() {
+	int selection = notebook_wads->GetSelection();
+	if (!notebook_wads->GetPageText(selection).compare(_T("Start Page")))
+		return;
+
+	((WadPanel*) notebook_wads->GetPage(notebook_wads->GetSelection()))->saveAs();
+}
+
 
 /*******************************************************************
  * WXWIDGETS EVENTS & HANDLERS

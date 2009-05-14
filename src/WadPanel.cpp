@@ -69,6 +69,45 @@ WadPanel::WadPanel(wxWindow* parent, Archive* wad)
 WadPanel::~WadPanel() {
 }
 
+/* WadPanel::save
+ * Saves the wad file
+ *******************************************************************/
+void WadPanel::save() {
+	// Check the wad exists
+	if (!wad)
+		return;
+
+	// Save the wad
+	if (!wad->save()) {
+		// If there was an error pop up a message box
+		wxMessageBox(s_fmt(_T("Error: %s"), Global::error.c_str()), _T("Error"), wxICON_ERROR);
+	}
+}
+
+/* WadPanel::saveAs
+ * Saves the wad file to a new file
+ *******************************************************************/
+void WadPanel::saveAs() {
+	// Check the wad exists
+	if (!wad)
+		return;
+
+	// Setup file filters (temporary, should go through all archive types somehow)
+	string formats = _T("Doom Wad File (*.wad)|*.wad");
+	string deftype = _T("*.wad");
+	string filename = wxFileSelector(_T("Save Wad"), _T(""), _T(""), deftype, formats, wxSAVE | wxOVERWRITE_PROMPT);
+
+	// Check a filename was selected
+	if (!filename.empty()) {
+		// Save the wad
+		if (!wad->save(filename)) {
+			// If there was an error pop up a message box
+			wxMessageBox(s_fmt(_T("Error: %s"), Global::error.c_str()), _T("Error"), wxICON_ERROR);
+		}
+	}
+}
+
+
 BEGIN_EVENT_TABLE(WadPanel, wxPanel)
 EVT_LIST_ITEM_FOCUSED(WadPanel::ENTRY_LIST_PANEL, WadPanel::onEntryListChange)
 END_EVENT_TABLE()
