@@ -128,4 +128,6 @@ void WadPanel::onEntryListChange(wxListEvent& event) {
 	cur_area = text_area;
 	cur_area->loadEntry(lump_list->getFocusedEntry());
 	cur_area->Show(true);
+
+	Layout();
 }
