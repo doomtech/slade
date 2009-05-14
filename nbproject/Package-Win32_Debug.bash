@@ -6,8 +6,8 @@
 
 # Macros
 TOP=`pwd`
-PLATFORM=
-TMPDIR=build/Unix_Debug/${PLATFORM}/tmp-packaging
+PLATFORM=MinGW-Windows
+TMPDIR=build/Win32_Debug/${PLATFORM}/tmp-packaging
 TMPDIRNAME=tmp-packaging
 OUTPUT_PATH=dist/SLADE
 OUTPUT_BASENAME=SLADE
@@ -50,7 +50,7 @@ function copyFileToTmpDir
 
 # Setup
 cd "${TOP}"
-mkdir -p dist/Unix_Debug/${PLATFORM}/package
+mkdir -p dist/Win32_Release/${PLATFORM}/package
 rm -rf ${TMPDIR}
 mkdir -p ${TMPDIR}
 
@@ -62,9 +62,9 @@ copyFileToTmpDir "${OUTPUT_PATH}.exe" "${TMPDIR}/${PACKAGE_TOP_DIR}bin/${OUTPUT_
 
 # Generate tar file
 cd "${TOP}"
-rm -f dist/Unix_Debug/${PLATFORM}/package/trunk.tar
+rm -f dist/Win32_Release/${PLATFORM}/package/trunk.tar
 cd ${TMPDIR}
-tar -vcf ../../../../dist/Unix_Debug/${PLATFORM}/package/trunk.tar *
+tar -vcf ../../../../dist/Win32_Release/${PLATFORM}/package/trunk.tar *
 checkReturnCode
 
 # Cleanup

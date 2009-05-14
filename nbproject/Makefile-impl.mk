@@ -31,7 +31,7 @@ DEFAULTCONF=Unix_Debug
 CONF=${DEFAULTCONF}
 
 # All Configurations
-ALLCONFS=Unix_Debug Unix_Release 
+ALLCONFS=Unix_Debug Unix_Release Win32_Release Win32_Debug 
 
 
 # build

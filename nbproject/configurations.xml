@@ -392,5 +392,379 @@
         <itemTool>3</itemTool>
       </item>
     </conf>
+    <conf name="Win32_Release" type="1">
+      <toolsSet>
+        <developmentServer>localhost</developmentServer>
+        <compilerSet>MinGW|MinGW</compilerSet>
+        <platform>3</platform>
+      </toolsSet>
+      <compileType>
+        <cCompilerTool>
+          <developmentMode>5</developmentMode>
+        </cCompilerTool>
+        <ccCompilerTool>
+          <developmentMode>5</developmentMode>
+        </ccCompilerTool>
+        <fortranCompilerTool>
+          <developmentMode>5</developmentMode>
+        </fortranCompilerTool>
+        <linkerTool>
+          <output>dist/SLADE</output>
+          <stripSymbols>true</stripSymbols>
+          <linkerLibItems>
+            <linkerLibLibItem>wx_mswu_aui-2.8</linkerLibLibItem>
+            <linkerLibLibItem>wx_mswu_html-2.8</linkerLibLibItem>
+            <linkerLibLibItem>wx_mswu_stc-2.8</linkerLibLibItem>
+            <linkerLibLibItem>wx_mswu_core-2.8</linkerLibLibItem>
+            <linkerLibLibItem>wx_baseu-2.8</linkerLibLibItem>
+            <linkerLibLibItem>wx_mswu_gl-2.8</linkerLibLibItem>
+            <linkerLibLibItem>wxzlib-2.8</linkerLibLibItem>
+            <linkerLibLibItem>wxregexu-2.8</linkerLibLibItem>
+            <linkerLibLibItem>wxexpat-2.8</linkerLibLibItem>
+            <linkerLibLibItem>wxtiff-2.8</linkerLibLibItem>
+            <linkerLibLibItem>wxpng-2.8</linkerLibLibItem>
+            <linkerLibLibItem>wxjpeg-2.8</linkerLibLibItem>
+            <linkerLibLibItem>winmm</linkerLibLibItem>
+            <linkerLibLibItem>comctl32</linkerLibLibItem>
+            <linkerLibLibItem>rpcrt4</linkerLibLibItem>
+            <linkerLibLibItem>wsock32</linkerLibLibItem>
+            <linkerLibLibItem>glu32</linkerLibLibItem>
+            <linkerLibLibItem>opengl32</linkerLibLibItem>
+            <linkerLibLibItem>kernel32</linkerLibLibItem>
+            <linkerLibLibItem>user32</linkerLibLibItem>
+            <linkerLibLibItem>gdi32</linkerLibLibItem>
+            <linkerLibLibItem>winspool</linkerLibLibItem>
+            <linkerLibLibItem>comdlg32</linkerLibLibItem>
+            <linkerLibLibItem>advapi32</linkerLibLibItem>
+            <linkerLibLibItem>shell32</linkerLibLibItem>
+            <linkerLibLibItem>ole32</linkerLibLibItem>
+            <linkerLibLibItem>oleaut32</linkerLibLibItem>
+            <linkerLibLibItem>uuid</linkerLibLibItem>
+            <linkerLibLibItem>odbc32</linkerLibLibItem>
+            <linkerLibLibItem>odbccp32</linkerLibLibItem>
+          </linkerLibItems>
+        </linkerTool>
+      </compileType>
+      <item path="src/Archive.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/Archive.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/ArchiveEntry.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/ArchiveEntry.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/Console.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/Console.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/ConsolePanel.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/ConsolePanel.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/EntryListPanel.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/EntryListPanel.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/ListenerAnnouncer.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/ListenerAnnouncer.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/LumpArea.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/LumpArea.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/Main.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/MainApp.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/MainApp.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/MainWindow.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/MainWindow.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/MapCanvas.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/MapCanvas.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/MapEditorWindow.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/MapEditorWindow.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/MapLine.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/MapSector.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/MapSide.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/MapThing.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/MapVertex.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/MemChunk.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/MemChunk.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/SLADEMap.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/SLADEMap.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/TextLumpArea.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/Tokenizer.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/Tokenizer.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/WadArchive.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/WadArchive.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/WadManager.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/WadManager.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/WadManagerPanel.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/WadManagerPanel.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/WadPanel.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/WadPanel.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/WxStuff.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/ZipArchive.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/ZipArchive.h">
+        <itemTool>3</itemTool>
+      </item>
+    </conf>
+    <conf name="Win32_Debug" type="1">
+      <toolsSet>
+        <developmentServer>localhost</developmentServer>
+        <compilerSet>MinGW|MinGW</compilerSet>
+        <platform>3</platform>
+      </toolsSet>
+      <compileType>
+        <linkerTool>
+          <output>dist/SLADE</output>
+          <linkerLibItems>
+            <linkerLibLibItem>wx_mswu_aui-2.8</linkerLibLibItem>
+            <linkerLibLibItem>wx_mswu_html-2.8</linkerLibLibItem>
+            <linkerLibLibItem>wx_mswu_stc-2.8</linkerLibLibItem>
+            <linkerLibLibItem>wx_mswu_core-2.8</linkerLibLibItem>
+            <linkerLibLibItem>wx_baseu-2.8</linkerLibLibItem>
+            <linkerLibLibItem>wx_mswu_gl-2.8</linkerLibLibItem>
+            <linkerLibLibItem>wxzlib-2.8</linkerLibLibItem>
+            <linkerLibLibItem>wxregexu-2.8</linkerLibLibItem>
+            <linkerLibLibItem>wxexpat-2.8</linkerLibLibItem>
+            <linkerLibLibItem>wxtiff-2.8</linkerLibLibItem>
+            <linkerLibLibItem>wxpng-2.8</linkerLibLibItem>
+            <linkerLibLibItem>wxjpeg-2.8</linkerLibLibItem>
+            <linkerLibLibItem>winmm</linkerLibLibItem>
+            <linkerLibLibItem>comctl32</linkerLibLibItem>
+            <linkerLibLibItem>rpcrt4</linkerLibLibItem>
+            <linkerLibLibItem>wsock32</linkerLibLibItem>
+            <linkerLibLibItem>glu32</linkerLibLibItem>
+            <linkerLibLibItem>opengl32</linkerLibLibItem>
+            <linkerLibLibItem>kernel32</linkerLibLibItem>
+            <linkerLibLibItem>user32</linkerLibLibItem>
+            <linkerLibLibItem>gdi32</linkerLibLibItem>
+            <linkerLibLibItem>winspool</linkerLibLibItem>
+            <linkerLibLibItem>comdlg32</linkerLibLibItem>
+            <linkerLibLibItem>advapi32</linkerLibLibItem>
+            <linkerLibLibItem>shell32</linkerLibLibItem>
+            <linkerLibLibItem>ole32</linkerLibLibItem>
+            <linkerLibLibItem>oleaut32</linkerLibLibItem>
+            <linkerLibLibItem>uuid</linkerLibLibItem>
+            <linkerLibLibItem>odbc32</linkerLibLibItem>
+            <linkerLibLibItem>odbccp32</linkerLibLibItem>
+          </linkerLibItems>
+        </linkerTool>
+      </compileType>
+      <item path="src/Archive.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/Archive.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/ArchiveEntry.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/ArchiveEntry.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/Console.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/Console.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/ConsolePanel.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/ConsolePanel.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/EntryListPanel.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/EntryListPanel.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/ListenerAnnouncer.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/ListenerAnnouncer.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/LumpArea.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/LumpArea.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/Main.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/MainApp.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/MainApp.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/MainWindow.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/MainWindow.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/MapCanvas.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/MapCanvas.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/MapEditorWindow.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/MapEditorWindow.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/MapLine.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/MapSector.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/MapSide.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/MapThing.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/MapVertex.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/MemChunk.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/MemChunk.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/SLADEMap.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/SLADEMap.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/TextLumpArea.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/Tokenizer.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/Tokenizer.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/WadArchive.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/WadArchive.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/WadManager.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/WadManager.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/WadManagerPanel.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/WadManagerPanel.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/WadPanel.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/WadPanel.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/WxStuff.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/ZipArchive.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/ZipArchive.h">
+        <itemTool>3</itemTool>
+      </item>
+    </conf>
   </confs>
 </configurationDescriptor>
