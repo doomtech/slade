@@ -80,7 +80,7 @@ void ConsolePanel::initLayout() {
 /* ConsolePanel::onAnnouncement
  * Handles any announcement events
  *******************************************************************/
-void ConsolePanel::onAnnouncement(string event_name, MemChunk& event_data) {
+void ConsolePanel::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
 	// New console log message added
 	if (event_name == _T("console_logmessage")) {
 		text_log->AppendText(Console::getInstance().lastLogLine());

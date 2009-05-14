@@ -13,7 +13,7 @@ public:
 	~Listener();
 
 	void listenTo(Announcer* a);
-	virtual void onAnnouncement(string event_name, MemChunk& event_data);
+	virtual void onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 };
 
 class Announcer {
@@ -27,6 +27,7 @@ public:
 	void addListener(Listener* l);
 	void removeListener(Listener* l);
 	void announce(string event_name, MemChunk& event_data);
+	void announce(string event_name);
 };
 
 #endif //__LISTENERANNOUNCER_H__

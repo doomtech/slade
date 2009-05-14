@@ -61,7 +61,7 @@ void Listener::listenTo(Announcer* a) {
  * announces an event. Does nothing by default, is to be overridden
  * by whatever class inherits from Listener
  *******************************************************************/
-void Listener::onAnnouncement(string event_name, MemChunk& event_data) {
+void Listener::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
 }
 
 /* Announcer::Announcer
@@ -101,5 +101,15 @@ void Announcer::removeListener(Listener* l) {
  *******************************************************************/
 void Announcer::announce(string event_name, MemChunk& event_data) {
 	for (size_t a = 0; a < listeners.size(); a++)
-		listeners[a]->onAnnouncement(event_name, event_data);
+		listeners[a]->onAnnouncement(this, event_name, event_data);
+}
+
+/* Announcer::announce
+ * 'Announces' an event to all listeners currently in the listeners
+ * list, ie all Listeners that are 'listening' to this announcer.
+ * For announcements that don't require any extra data
+ *******************************************************************/
+void Announcer::announce(string event_name) {
+	MemChunk mc;
+	announce(event_name, mc);
 }

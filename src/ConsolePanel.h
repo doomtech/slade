@@ -25,7 +25,7 @@ public:
 	void onCommandEnter(wxCommandEvent &e);
 
 	// Listener stuff
-	void onAnnouncement(string event_name, MemChunk& event_data);
+	void onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 
 	DECLARE_EVENT_TABLE()
 };

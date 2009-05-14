@@ -5,8 +5,9 @@
 #include "Archive.h"
 #include "EntryListPanel.h"
 #include "LumpArea.h"
+#include "ListenerAnnouncer.h"
 
-class WadPanel : public wxPanel {
+class WadPanel : public wxPanel, Listener {
 private:
 	Archive*		wad;
 	EntryListPanel*	lump_list;
@@ -27,6 +28,8 @@ public:
 	Archive*	getWad() { return wad; }
 	void		save();
 	void		saveAs();
+
+	void onAnnouncement(string event_name, MemChunk& event_data);
 
 	// Events
 	void	onEntryListChange(wxListEvent &event);

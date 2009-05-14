@@ -40,6 +40,7 @@
 WadPanel::WadPanel(wxWindow* parent, Archive* wad)
 : wxPanel(parent, -1) {
 	this->wad = wad;
+	listenTo(wad);
 
 	// Create & set sizer
 	wxBoxSizer *m_hbox = new wxBoxSizer(wxHORIZONTAL);
@@ -107,9 +108,11 @@ void WadPanel::saveAs() {
 	}
 }
 
+void WadPanel::onAnnouncement(string event_name, MemChunk& event_data) {
+}
 
 BEGIN_EVENT_TABLE(WadPanel, wxPanel)
-EVT_LIST_ITEM_FOCUSED(WadPanel::ENTRY_LIST_PANEL, WadPanel::onEntryListChange)
+	EVT_LIST_ITEM_FOCUSED(WadPanel::ENTRY_LIST_PANEL, WadPanel::onEntryListChange)
 END_EVENT_TABLE()
 
 /* WadPanel::onEntryListChange

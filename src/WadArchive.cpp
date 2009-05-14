@@ -148,6 +148,7 @@ bool WadArchive::openFile(string filename) {
 
 	// Setup variables
 	this->filename = filename;
+	announce(_T("opened"));
 
 	return true;
 }
@@ -210,9 +211,10 @@ bool WadArchive::save(string filename) {
 
 	// Close the file
 	fclose(fp);
-	
+
 	// Set variables and return success
 	this->filename = filename;
+	announce(_T("saved"));
 	return true;
 }
 
@@ -280,6 +282,7 @@ bool WadArchive::loadEntryData(ArchiveEntry* entry) {
 
 	return true;
 }
+
 /* WadArchive::detectMaps
  * Searches for any maps in the wad and adds them to the map list
  *******************************************************************/

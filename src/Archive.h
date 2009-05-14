@@ -3,12 +3,13 @@
 #define	__ARCHIVE_H__
 
 #include "ArchiveEntry.h"
+#include "ListenerAnnouncer.h"
 
 // Define archive types
 #define ARCHIVE_WAD	1
 #define ARCHIVE_ZIP	2
 
-class Archive {
+class Archive : public Announcer {
 protected:
 	string					filename;
 	vector<ArchiveEntry*>	entries;
