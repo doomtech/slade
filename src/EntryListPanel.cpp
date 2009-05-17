@@ -5,8 +5,8 @@
  * 
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
- * Filename:    LumpListPanel.cpp
- * Description: LumpListPanel class (and related classes).
+ * Filename:    EntryListPanel.cpp
+ * Description: EntryListPanel class (and related classes).
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -90,7 +90,7 @@ bool EntryList::updateEntry(int index) {
 
 int EntryList::getWidth() {
 	// For the moment. Kinda annoying I have to do this actually, it should be automatic >_<
-	return GetColumnWidth(0) + GetColumnWidth(1) + wxSystemSettings::GetMetric(wxSYS_VSCROLL_X, this);
+	return GetColumnWidth(0) + GetColumnWidth(1) + wxSystemSettings::GetMetric(wxSYS_VSCROLL_X, this) + 4;
 }
 
 /* EntryListPanel::EntryListPanel
@@ -175,4 +175,8 @@ void EntryListPanel::onEntryListChange(wxListEvent& event) {
 	// Pass the event up to the parent window, as the wad panel should deal with it,
 	// not this panel.
 	event.Skip();
+}
+
+void EntryListPanel::onEntryListActivated(wxListEvent& event) {
+
 }

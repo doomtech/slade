@@ -32,6 +32,7 @@
 #include "Main.h"
 #include "WxStuff.h"
 #include "WadPanel.h"
+#include <wx/aui/auibook.h>
 
 
 /* WadPanel::WadPanel
@@ -108,7 +109,20 @@ void WadPanel::saveAs() {
 	}
 }
 
-void WadPanel::onAnnouncement(string event_name, MemChunk& event_data) {
+/* WadPanel::onAnnouncement
+ * Called when an announcement is recieved from the archive the
+ * WadPanel is managing
+ *******************************************************************/
+void WadPanel::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
+	// If the wad was closed
+	if (event_name == _T("close")) {
+		// Remove the wad panel from the parent notebook
+		wxAuiNotebook* parent = (wxAuiNotebook*)GetParent();
+		parent->RemovePage(parent->GetPageIndex(this));
+
+		// Destroy the wad panel
+		this->Destroy();
+	}
 }
 
 BEGIN_EVENT_TABLE(WadPanel, wxPanel)

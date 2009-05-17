@@ -112,14 +112,28 @@ WadManagerPanel::WadManagerPanel(wxWindow *parent, wxAuiNotebook* nb_wads)
 
 	// Create/setup Wad context menu
 	menu_wadcontext = new wxMenu();
-	menu_wadcontext->Append(MENU_SAVE,		_("Save"),		_("Save the selected Wad file"));
-	menu_wadcontext->Append(MENU_SAVEAS,	_("Save As"),	_("Save the selected Wad to a new file"));
+	menu_wadcontext->Append(MENU_SAVE,		_("Save"),		_("Save the selected Wad file(s)"));
+	menu_wadcontext->Append(MENU_SAVEAS,	_("Save As"),	_("Save the selected Wad(s) to a new file(s)"));
+	menu_wadcontext->Append(MENU_CLOSE,		_T("Close"),	_("Close the selected Wad(s)"));
+
+	// Listen to the WadManager
+	listenTo(&(WadManager::getInstance()));
 }
 
 /* WadManagerPanel::~WadManagerPanel
  * WadManagerPanel class destructor
  *******************************************************************/
 WadManagerPanel::~WadManagerPanel() {
+}
+
+void WadManagerPanel::refreshWadList() {
+	// Clear the list
+	list_openwads->ClearAll();
+
+	// Add each wad that is opened in the WadManager
+	WadManager& wm = WadManager::getInstance();
+	for (int a = 0; a < wm.numWads(); a++)
+		list_openwads->InsertItem(list_openwads->GetItemCount(), wm.getWad(a)->getFileName(true));
 }
 
 /* WadManagerPanel::openFile
@@ -131,10 +145,6 @@ void WadManagerPanel::openFile(string filename) {
 
 	// Check that the wad opened ok
 	if (new_wad) {
-		// Add wad to the list
-		list_openwads->InsertItem(list_openwads->GetItemCount(), filename);
-		//list_openwads->Append(filename);
-
 		// Open a new wad panel tab
 		WadPanel *wp = new WadPanel(notebook_wads, new_wad);
 		notebook_wads->AddPage(wp, new_wad->getFileName(false), true);
@@ -177,8 +187,21 @@ vector<int> WadManagerPanel::getSelectedWads() {
 	return ret;
 }
 
+/* WadManagerPanel::onAnnouncement
+ * Called when an announcement is recieved from the Wad Manager
+ *******************************************************************/
+void WadManagerPanel::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
+	// If a wad was opened
+	if (event_name == _T("wad_opened"))
+		refreshWadList();
+
+	// If a wad was closed
+	if (event_name == _T("wad_closed"))
+		refreshWadList();
+}
+
 /* WadManagerPanel::saveSelection
- * Saves the currently selected wad file in the list
+ * Saves the currently selected wad file(s) in the list
  *******************************************************************/
 void WadManagerPanel::saveSelection() {
 	// Get the list of selected wads
@@ -199,7 +222,7 @@ void WadManagerPanel::saveSelection() {
 }
 
 /* WadManagerPanel::saveSelectionAs
- * Saves the currently selected wad file in the list as a new file
+ * Saves the currently selected wad file(s) in the list as a new file
  *******************************************************************/
 void WadManagerPanel::saveSelectionAs() {
 	// Get the list of selected wads
@@ -232,6 +255,27 @@ void WadManagerPanel::saveSelectionAs() {
 	}
 }
 
+/* WadManagerPanel::closeSelection
+ * Closes the currently selected wad file(s) in the list
+ *******************************************************************/
+void WadManagerPanel::closeSelection() {
+	// Get the list of selected wads (indices)
+	vector<int> selection = getSelectedWads();
+
+	// Don't continue if there are no selected items
+	if (selection.size() == 0)
+		return;
+
+	// Get the list of selected wads (Archive pointers)
+	vector<Archive*> selected_wads;
+	for (size_t a = 0; a < selection.size(); a++)
+		selected_wads.push_back(WadManager::getInstance().getWad(selection[a]));
+
+	// Close all selected wads
+	for (size_t a = 0; a < selected_wads.size(); a++)
+		WadManager::getInstance().closeWad(selected_wads[a]);
+}
+
 /* WadManagerPanel::saveCurrent
  * Saves the currently opened wad file (the currently opened tab)
  *******************************************************************/
@@ -243,7 +287,7 @@ void WadManagerPanel::saveCurrent() {
 	((WadPanel*) notebook_wads->GetPage(selection))->save();
 }
 
-/* WadManagerPanel::saveCurrent
+/* WadManagerPanel::saveCurrentAs
  * Saves the currently opened wad file as a new file (the currently
  * opened tab)
  *******************************************************************/
@@ -253,6 +297,18 @@ void WadManagerPanel::saveCurrentAs() {
 		return;
 
 	((WadPanel*) notebook_wads->GetPage(notebook_wads->GetSelection()))->saveAs();
+}
+
+/* WadManagerPanel::closeCurrent
+ * Closes the currently opened wad file (the currently opened tab)
+ *******************************************************************/
+void WadManagerPanel::closeCurrent() {
+	int selection = notebook_wads->GetSelection();
+	if (!notebook_wads->GetPageText(selection).compare(_T("Start Page")))
+		return;
+
+	Archive* wad = ((WadPanel*) notebook_wads->GetPage(notebook_wads->GetSelection()))->getWad();
+	WadManager::getInstance().closeWad(wad);
 }
 
 
@@ -269,6 +325,7 @@ BEGIN_EVENT_TABLE(WadManagerPanel, wxPanel)
 	// Context Menu
 	EVT_MENU(MENU_SAVE, WadManagerPanel::onMenuSave)
 	EVT_MENU(MENU_SAVEAS, WadManagerPanel::onMenuSaveAs)
+	EVT_MENU(MENU_CLOSE, WadManagerPanel::onMenuClose)
 END_EVENT_TABLE()
 
 /* WadManagerPanel::onListWadsChanged
@@ -332,8 +389,11 @@ void WadManagerPanel::onListWadsActivated(wxListEvent &e) {
 	// Go through all tabs
 	for (size_t a = 0; a < notebook_wads->GetPageCount(); a++) {
 		// Check for a match
-		if (((WadPanel*) notebook_wads->GetPage(a))->getWad() == selected_wad)
-			return; // Selected wad is already open in a tab, so return
+		if (((WadPanel*) notebook_wads->GetPage(a))->getWad() == selected_wad) {
+			// Selected wad is already open in a tab, so switch to this tab
+			notebook_wads->SetSelection(a);
+			return;
+		}
 	}
 
 	// Open the selected wad in a new tab
@@ -395,4 +455,8 @@ void WadManagerPanel::onMenuSave(wxCommandEvent &e) {
  *******************************************************************/
 void WadManagerPanel::onMenuSaveAs(wxCommandEvent &e) {
 	saveSelectionAs();
+}
+
+void WadManagerPanel::onMenuClose(wxCommandEvent& e) {
+	closeSelection();
 }

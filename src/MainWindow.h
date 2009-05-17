@@ -46,6 +46,7 @@ public:
 
 	void	onWadSave(wxCommandEvent &e);
 	void	onWadSaveAs(wxCommandEvent &e);
+	void	onWadClose(wxCommandEvent &e);
 
 	void	onViewWadManager(wxCommandEvent &e);
 	void	onViewConsole(wxCommandEvent &e);

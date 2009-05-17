@@ -77,6 +77,7 @@ void MainWindow::setupLayout() {
 	menu_wad = new wxMenu(_(""));
 	menu_wad->Append(MENU_WAD_SAVE,		_("Save Wad"),		_("Save the Wad file"));
 	menu_wad->Append(MENU_WAD_SAVEAS,	_("Save Wad As"),	_("Save the Wad to a new file"));
+	menu_wad->Append(MENU_WAD_CLOSE,	_("Close Wad"),		_("Close the Wad"));
 	menu->Append(menu_wad, _("&Wad"));
 
 	// Edit menu
@@ -220,6 +221,7 @@ BEGIN_EVENT_TABLE(MainWindow, wxFrame)
 	// Wad Menu
 	EVT_MENU(MENU_WAD_SAVE, MainWindow::onWadSave)
 	EVT_MENU(MENU_WAD_SAVEAS, MainWindow::onWadSaveAs)
+	EVT_MENU(MENU_WAD_CLOSE, MainWindow::onWadClose)
 
 	// View Menu
 	EVT_MENU(MENU_VIEW_WADMANAGER, MainWindow::onViewWadManager)
@@ -254,13 +256,25 @@ void MainWindow::onFileQuit(wxCommandEvent &e) {
 	wxTheApp->ExitMainLoop();
 }
 
+/* MainWindow::onWadSave
+ * Wad->Save menu item event handler.
+ *******************************************************************/
 void MainWindow::onWadSave(wxCommandEvent& e) {
-
+	panel_wadmanager->saveCurrent();
 }
 
+/* MainWindow::onWadSaveAs
+ * Wad->Save As menu item event handler.
+ *******************************************************************/
 void MainWindow::onWadSaveAs(wxCommandEvent& e) {
-	//panel_wadmanager->saveSelectionAs();
 	panel_wadmanager->saveCurrentAs();
+}
+
+/* MainWindow::onWadClose
+ * Wad->Close menu item event handler.
+ *******************************************************************/
+void MainWindow::onWadClose(wxCommandEvent& e) {
+	panel_wadmanager->closeCurrent();
 }
 
 /* MainWindow::onViewWadManager

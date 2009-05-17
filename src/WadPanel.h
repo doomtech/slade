@@ -29,7 +29,7 @@ public:
 	void		save();
 	void		saveAs();
 
-	void onAnnouncement(string event_name, MemChunk& event_data);
+	void onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 
 	// Events
 	void	onEntryListChange(wxListEvent &event);

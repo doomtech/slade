@@ -6,6 +6,7 @@
 #include <wx/aui/auibook.h>
 #include <wx/dirctrl.h>
 #include <wx/listbox.h>
+#include "ListenerAnnouncer.h"
 
 class WadManagerPanel;
 
@@ -21,7 +22,7 @@ public:
 	void onItemActivated(wxTreeEvent &e);
 };
 
-class WadManagerPanel : public wxPanel {
+class WadManagerPanel : public wxPanel, Listener {
 private:
 	wxAuiNotebook*		notebook_tabs;
 	wxAuiNotebook*		notebook_wads;
@@ -41,20 +42,27 @@ public:
 
 		MENU_SAVE,
 		MENU_SAVEAS,
+		MENU_CLOSE,
 	};
 
 	WadManagerPanel(wxWindow *parent, wxAuiNotebook* nb_wads);
 	~WadManagerPanel();
+
+	void	refreshWadList();
 
 	void	openFile(string filename);
 	void	openFiles(wxArrayString& files);
 
 	void	saveSelection();
 	void	saveSelectionAs();
+	void	closeSelection();
 	void	saveCurrent();
 	void	saveCurrentAs();
+	void	closeCurrent();
 
 	vector<int>	getSelectedWads();
+
+	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 
 	// Event handlers
 	void	onListWadsChanged(wxListEvent &e);
@@ -65,6 +73,7 @@ public:
 	void	onListWadsRightClick(wxListEvent &e);
 	void	onMenuSave(wxCommandEvent &e);
 	void	onMenuSaveAs(wxCommandEvent &e);
+	void	onMenuClose(wxCommandEvent &e);
 
 	DECLARE_EVENT_TABLE()
 };

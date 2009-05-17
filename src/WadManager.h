@@ -2,9 +2,11 @@
 #ifndef __WADMANAGER_H__
 #define __WADMANAGER_H__
 
+#include "ListenerAnnouncer.h"
+
 class Archive;
 
-class WadManager {
+class WadManager : public Announcer {
 private:
 	vector<Archive*>		open_wads;
 

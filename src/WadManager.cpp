@@ -117,6 +117,7 @@ Archive* WadManager::openWad(string filename) {
 	// Otherwise, delete it and return NULL
 	if (new_wad->openFile(filename)) {
 		open_wads.push_back(new_wad);
+		announce(_T("wad_opened"));
 		return new_wad;
 	} else {
 		delete new_wad;
@@ -133,11 +134,17 @@ bool WadManager::closeWad(int index) {
 	if (index < 0 || index >= (int) open_wads.size())
 		return false;
 
+	// Close the wad
+	open_wads[index]->close();
+
 	// Delete the wad object
 	delete open_wads[index];
 
 	// Remove the wad at index from the list
 	open_wads.erase(open_wads.begin() + index);
+
+	// Announce it
+	announce(_T("wad_closed"));
 
 	return true;
 }

@@ -119,6 +119,10 @@ DWORD Archive::numEntries() {
 	return entries.size();
 }
 
+void Archive::close() {
+	announce(_T("close"));
+}
+
 /* Archive::detectMaps
  * Function to detect any maps in the archive, does nothing here,
  * to be overridden by any subclass of Archive
