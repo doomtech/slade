@@ -19,7 +19,10 @@ public:
 		MENU_FILE_NEW,
 		MENU_FILE_NEWZIP,
 		MENU_FILE_OPEN,
+		MENU_FILE_SAVE,
+		MENU_FILE_SAVEAS,
 		MENU_FILE_SAVEALL,
+		MENU_FILE_CLOSE,
 		MENU_FILE_CLOSEALL,
 		MENU_FILE_OPTIONS,
 		MENU_FILE_QUIT,
@@ -27,9 +30,9 @@ public:
 		MENU_VIEW_WADMANAGER,
 		MENU_VIEW_CONSOLE,
 
-		MENU_WAD_SAVE,
-		MENU_WAD_SAVEAS,
-		MENU_WAD_CLOSE,
+		//MENU_WAD_SAVE,
+		//MENU_WAD_SAVEAS,
+		//MENU_WAD_CLOSE,
 
 		HTML_WINDOW,
 	};
@@ -43,10 +46,9 @@ public:
 	// Event handlers
 	void	onFileOpen(wxCommandEvent &e);
 	void	onFileQuit(wxCommandEvent &e);
-
-	void	onWadSave(wxCommandEvent &e);
-	void	onWadSaveAs(wxCommandEvent &e);
-	void	onWadClose(wxCommandEvent &e);
+	void	onFileSave(wxCommandEvent &e);
+	void	onFileSaveAs(wxCommandEvent &e);
+	void	onFileClose(wxCommandEvent &e);
 
 	void	onViewWadManager(wxCommandEvent &e);
 	void	onViewConsole(wxCommandEvent &e);

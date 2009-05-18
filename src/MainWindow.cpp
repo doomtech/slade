@@ -69,25 +69,28 @@ void MainWindow::setupLayout() {
 
 	// File menu
 	wxMenu* fileMenu = new wxMenu(_(""));
-    fileMenu->Append(MENU_FILE_OPEN,	_("&Open Wad"),		_("Open a Wad file"));
-    fileMenu->Append(MENU_FILE_QUIT,	_("&Quit"),			_("Quit SLADE"));
+	fileMenu->Append(MENU_FILE_NEW,			_("&New\tCtrl+N"),		_("Create a new Wad file"));
+	fileMenu->AppendSeparator();
+    fileMenu->Append(MENU_FILE_OPEN,		_("&Open\tCtrl+O"),		_("Open a Wad file"));
+	fileMenu->AppendSeparator();
+	fileMenu->Append(MENU_FILE_SAVE,		_("&Save\tCtrl+S"),		_("Save the Wad file"));
+	fileMenu->Append(MENU_FILE_SAVEAS,		_("Save &As..."),		_("Save the Wad to a new file"));
+	fileMenu->Append(MENU_FILE_SAVEALL,		_("Save All"),			_("Save all open Wad files"));
+	fileMenu->AppendSeparator();
+	fileMenu->Append(MENU_FILE_CLOSE,		_("&Close"),			_("Close the Wad file"));
+	fileMenu->Append(MENU_FILE_CLOSEALL,	_("Close All"),			_("Close all open Wad files"));
+	fileMenu->AppendSeparator();
+    fileMenu->Append(MENU_FILE_QUIT,		_("&Quit\tCtrl+X"),		_("Quit SLADE"));
 	menu->Append(fileMenu, _("&File"));
 
-	// Wad menu
-	menu_wad = new wxMenu(_(""));
-	menu_wad->Append(MENU_WAD_SAVE,		_("Save Wad"),		_("Save the Wad file"));
-	menu_wad->Append(MENU_WAD_SAVEAS,	_("Save Wad As"),	_("Save the Wad to a new file"));
-	menu_wad->Append(MENU_WAD_CLOSE,	_("Close Wad"),		_("Close the Wad"));
-	menu->Append(menu_wad, _("&Wad"));
-
-	// Edit menu
-	wxMenu* editMenu = new wxMenu(_T(""));
-	menu->Append(editMenu, _("&Edit"));
+	// Entry menu
+	wxMenu* lumpMenu = new wxMenu(_T(""));
+	menu->Append(lumpMenu, _("&Entry"));
 
 	// View menu
 	wxMenu* viewMenu = new wxMenu(_T(""));
-	viewMenu->Append(MENU_VIEW_WADMANAGER,	_("&Wad Manager"),	_T("Show the wad manager"));
-	viewMenu->Append(MENU_VIEW_CONSOLE,		_("&Console"),		_T("Show the console"));
+	viewMenu->Append(MENU_VIEW_WADMANAGER,	_("&Wad Manager\tCtrl+1"),	_T("Toggle the wad manager"));
+	viewMenu->Append(MENU_VIEW_CONSOLE,		_("&Console\tCtrl+2"),		_T("Toggle the console"));
 	menu->Append(viewMenu, _("&View"));
 
 	// Set the menu
@@ -217,11 +220,9 @@ BEGIN_EVENT_TABLE(MainWindow, wxFrame)
 	// File Menu
 	EVT_MENU(MENU_FILE_OPEN, MainWindow::onFileOpen)
 	EVT_MENU(MENU_FILE_QUIT, MainWindow::onFileQuit)
-
-	// Wad Menu
-	EVT_MENU(MENU_WAD_SAVE, MainWindow::onWadSave)
-	EVT_MENU(MENU_WAD_SAVEAS, MainWindow::onWadSaveAs)
-	EVT_MENU(MENU_WAD_CLOSE, MainWindow::onWadClose)
+	EVT_MENU(MENU_FILE_SAVE, MainWindow::onFileSave)
+	EVT_MENU(MENU_FILE_SAVEAS, MainWindow::onFileSaveAs)
+	EVT_MENU(MENU_FILE_CLOSE, MainWindow::onFileClose)
 
 	// View Menu
 	EVT_MENU(MENU_VIEW_WADMANAGER, MainWindow::onViewWadManager)
@@ -259,21 +260,21 @@ void MainWindow::onFileQuit(wxCommandEvent &e) {
 /* MainWindow::onWadSave
  * Wad->Save menu item event handler.
  *******************************************************************/
-void MainWindow::onWadSave(wxCommandEvent& e) {
+void MainWindow::onFileSave(wxCommandEvent& e) {
 	panel_wadmanager->saveCurrent();
 }
 
 /* MainWindow::onWadSaveAs
  * Wad->Save As menu item event handler.
  *******************************************************************/
-void MainWindow::onWadSaveAs(wxCommandEvent& e) {
+void MainWindow::onFileSaveAs(wxCommandEvent& e) {
 	panel_wadmanager->saveCurrentAs();
 }
 
 /* MainWindow::onWadClose
  * Wad->Close menu item event handler.
  *******************************************************************/
-void MainWindow::onWadClose(wxCommandEvent& e) {
+void MainWindow::onFileClose(wxCommandEvent& e) {
 	panel_wadmanager->closeCurrent();
 }
 
@@ -282,7 +283,8 @@ void MainWindow::onWadClose(wxCommandEvent& e) {
  *******************************************************************/
 void MainWindow::onViewWadManager(wxCommandEvent &e) {
 	wxAuiManager *m_mgr = wxAuiManager::GetManager(panel_wadmanager);
-	m_mgr->GetPane(_T("wad_manager")).Show(true);
+	wxAuiPaneInfo& p_inf = m_mgr->GetPane(_T("wad_manager"));
+	p_inf.Show(!p_inf.IsShown());
 	m_mgr->Update();
 }
 
@@ -291,7 +293,8 @@ void MainWindow::onViewWadManager(wxCommandEvent &e) {
  *******************************************************************/
 void MainWindow::onViewConsole(wxCommandEvent &e) {
 	wxAuiManager *m_mgr = wxAuiManager::GetManager(panel_wadmanager);
-	m_mgr->GetPane(_T("console")).Show(true);
+	wxAuiPaneInfo& p_inf = m_mgr->GetPane(_T("console"));
+	p_inf.Show(!p_inf.IsShown());
 	m_mgr->Update();
 }
 
