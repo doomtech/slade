@@ -84,8 +84,20 @@ void MainWindow::setupLayout() {
 	menu->Append(fileMenu, _("&File"));
 
 	// Entry menu
-	wxMenu* lumpMenu = new wxMenu(_T(""));
-	menu->Append(lumpMenu, _("&Entry"));
+	wxMenu* entryMenu = new wxMenu(_T(""));
+	entryMenu->Append(MENU_ENTRY_NEW,				_("New"),					_("Create a new empty lump entry"));
+	entryMenu->Append(MENU_ENTRY_NEWFROMFILE,		_("New from File"),			_("Create a new lump entry with data from a file"));
+	entryMenu->AppendSeparator();
+	entryMenu->Append(MENU_UNIMPLEMENTED,			_("Delete"),				_("Delete the selected entries"));
+	entryMenu->Append(MENU_UNIMPLEMENTED,			_("Rename"),				_("Rename the selected entries"));
+	entryMenu->AppendSeparator();
+	entryMenu->Append(MENU_UNIMPLEMENTED,			_("Import"),				_("Import a file to the selected entry"));
+	entryMenu->Append(MENU_UNIMPLEMENTED,			_("Export"),				_("Export the selected entries to files"));
+	entryMenu->Append(MENU_UNIMPLEMENTED,			_("Export as Wad"),			_("Export the selected entries to a new Wad Archive"));
+	entryMenu->AppendSeparator();
+	entryMenu->Append(MENU_ENTRY_MOVEUP,			_("Move Up\tCtrl+U"),		_("Move the selected entries up"));
+	entryMenu->Append(MENU_ENTRY_MOVEDOWN,			_("Move Down\tCtrl+D"),		_("Move the selected entries down"));
+	menu->Append(entryMenu, _("&Entry"));
 
 	// View menu
 	wxMenu* viewMenu = new wxMenu(_T(""));
@@ -224,6 +236,10 @@ BEGIN_EVENT_TABLE(MainWindow, wxFrame)
 	EVT_MENU(MENU_FILE_SAVEAS, MainWindow::onFileSaveAs)
 	EVT_MENU(MENU_FILE_CLOSE, MainWindow::onFileClose)
 
+	// Entry menu
+	EVT_MENU(MENU_ENTRY_MOVEUP, MainWindow::onEntryMoveUp)
+	EVT_MENU(MENU_ENTRY_MOVEDOWN, MainWindow::onEntryMoveDown)
+
 	// View Menu
 	EVT_MENU(MENU_VIEW_WADMANAGER, MainWindow::onViewWadManager)
 	EVT_MENU(MENU_VIEW_CONSOLE, MainWindow::onViewConsole)
@@ -257,25 +273,39 @@ void MainWindow::onFileQuit(wxCommandEvent &e) {
 	wxTheApp->ExitMainLoop();
 }
 
-/* MainWindow::onWadSave
- * Wad->Save menu item event handler.
+/* MainWindow::onFileSave
+ * File->Save menu item event handler.
  *******************************************************************/
 void MainWindow::onFileSave(wxCommandEvent& e) {
 	panel_wadmanager->saveCurrent();
 }
 
-/* MainWindow::onWadSaveAs
- * Wad->Save As menu item event handler.
+/* MainWindow::onFileSaveAs
+ * File->Save As menu item event handler.
  *******************************************************************/
 void MainWindow::onFileSaveAs(wxCommandEvent& e) {
 	panel_wadmanager->saveCurrentAs();
 }
 
-/* MainWindow::onWadClose
- * Wad->Close menu item event handler.
+/* MainWindow::onFileClose
+ * File->Close menu item event handler.
  *******************************************************************/
 void MainWindow::onFileClose(wxCommandEvent& e) {
 	panel_wadmanager->closeCurrent();
+}
+
+/* MainWindow::onEntryMoveUp
+ * Entry->Move Up menu item event handler.
+ *******************************************************************/
+void MainWindow::onEntryMoveUp(wxCommandEvent& e) {
+	panel_wadmanager->moveUp();
+}
+
+/* MainWindow::onEntryMoveDown
+ * Entry->Move Down menu item event handler.
+ *******************************************************************/
+void MainWindow::onEntryMoveDown(wxCommandEvent& e) {
+	panel_wadmanager->moveDown();
 }
 
 /* MainWindow::onViewWadManager

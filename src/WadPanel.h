@@ -26,8 +26,14 @@ public:
 	~WadPanel();
 
 	Archive*	getWad() { return wad; }
+
+	// Archive manipulationfunctions
 	void		save();
 	void		saveAs();
+
+	// Entry manipulation functions
+	bool	moveUp();
+	bool	moveDown();
 
 	void onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 

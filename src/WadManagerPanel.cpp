@@ -296,7 +296,7 @@ void WadManagerPanel::saveCurrentAs() {
 	if (!notebook_wads->GetPageText(selection).compare(_T("Start Page")))
 		return;
 
-	((WadPanel*) notebook_wads->GetPage(notebook_wads->GetSelection()))->saveAs();
+	((WadPanel*) notebook_wads->GetPage(selection))->saveAs();
 }
 
 /* WadManagerPanel::closeCurrent
@@ -307,8 +307,32 @@ void WadManagerPanel::closeCurrent() {
 	if (!notebook_wads->GetPageText(selection).compare(_T("Start Page")))
 		return;
 
-	Archive* wad = ((WadPanel*) notebook_wads->GetPage(notebook_wads->GetSelection()))->getWad();
+	Archive* wad = ((WadPanel*) notebook_wads->GetPage(selection))->getWad();
 	WadManager::getInstance().closeWad(wad);
+}
+
+/* WadManagerPanel::moveUp
+ * Signals the currently opened wad panel tab to move selected
+ * entries up
+ *******************************************************************/
+void WadManagerPanel::moveUp() {
+	int selection = notebook_wads->GetSelection();
+	if (!notebook_wads->GetPageText(selection).compare(_T("Start Page")))
+		return;
+
+	((WadPanel*) notebook_wads->GetPage(selection))->moveUp();
+}
+
+/* WadManagerPanel::moveDown
+ * Signals the currently opened wad panel tab to move selected
+ * entries down
+ *******************************************************************/
+void WadManagerPanel::moveDown() {
+	int selection = notebook_wads->GetSelection();
+	if (!notebook_wads->GetPageText(selection).compare(_T("Start Page")))
+		return;
+
+	((WadPanel*) notebook_wads->GetPage(selection))->moveDown();
 }
 
 

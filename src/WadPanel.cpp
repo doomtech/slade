@@ -32,6 +32,7 @@
 #include "Main.h"
 #include "WxStuff.h"
 #include "WadPanel.h"
+#include "EntryListPanel.h"
 #include <wx/aui/auibook.h>
 
 
@@ -107,6 +108,22 @@ void WadPanel::saveAs() {
 			wxMessageBox(s_fmt(_T("Error: %s"), Global::error.c_str()), _T("Error"), wxICON_ERROR);
 		}
 	}
+}
+
+/* WadPanel::moveUp
+ * Moves selected entries up
+ *******************************************************************/
+bool WadPanel::moveUp() {
+	// Get the entry list class to handle it
+	return lump_list->moveUp();
+}
+
+/* WadPanel::moveDown
+ * Moves selected entries down
+ *******************************************************************/
+bool WadPanel::moveDown() {
+	// Get the entry list class to handle it
+	return lump_list->moveDown();
 }
 
 /* WadPanel::onAnnouncement

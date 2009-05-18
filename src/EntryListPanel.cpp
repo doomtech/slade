@@ -161,6 +161,157 @@ ArchiveEntry* EntryListPanel::getFocusedEntry() {
 	return (ArchiveEntry*) (entry_list->GetItemData(focus_index));
 }
 
+/* EntryListPanel::getSelectedEntries
+ * Returns a vector of all selected archive entries
+ *******************************************************************/
+vector<ArchiveEntry*> EntryListPanel::getSelectedEntries() {
+	// Init vector
+	vector<ArchiveEntry*> ret;
+
+	// Go through all entries
+	long item = -1;
+	while (true) {
+		// Get the next item in the list that is selected
+		item = entry_list->GetNextItem(item, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+
+		// If -1 then none were selected
+		if (item == -1)
+			break;
+
+		// Otherwise add the selected entry to the vector
+		ret.push_back((ArchiveEntry*)(entry_list->GetItemData(item)));
+	}
+
+	return ret;
+}
+
+/* EntryListPanel::getSelection
+ * Returns a vector of all selected list item indices
+ *******************************************************************/
+vector<int> EntryListPanel::getSelection() {
+	// Init vector
+	vector<int> ret;
+
+	// Go through all entries
+	long item = -1;
+	while (true) {
+		// Get the next item in the list that is selected
+		item = entry_list->GetNextItem(item, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+
+		// If -1 then none were selected
+		if (item == -1)
+			break;
+
+		// Otherwise add the selected index to the vector
+		ret.push_back(item);
+	}
+
+	return ret;
+}
+
+/* EntryListPanel::swapItems
+ * Swaps two list items (including their focused/selected states)
+ *******************************************************************/
+bool EntryListPanel::swapItems(int item1, int item2) {
+	// Check item 1
+	if (item1 < 0 || item1 > entry_list->GetItemCount())
+		return false;
+
+	// Check item 2
+	if (item2 < 0 || item2 > entry_list->GetItemCount())
+		return false;
+
+	// Get item 1 info
+	wxListItem i1;
+	i1.SetId(item1);
+	i1.SetMask(0xFFFF);
+	entry_list->GetItem(i1);
+	long state1 = entry_list->GetItemState(item1, wxLIST_STATE_SELECTED|wxLIST_STATE_FOCUSED); // Not sure why I have to get/set states separately :/
+
+	// Get item 2 info
+	wxListItem i2;
+	i2.SetId(item2);
+	i2.SetMask(0xFFFF);
+	entry_list->GetItem(i2);
+	long state2 = entry_list->GetItemState(item2, wxLIST_STATE_SELECTED|wxLIST_STATE_FOCUSED);
+
+	// Swap the items
+	i1.SetId(item2);
+	i2.SetId(item1);
+	entry_list->SetItem(i1);
+	entry_list->SetItem(i2);
+	entry_list->SetItemState(item1, state2, wxLIST_STATE_SELECTED|wxLIST_STATE_FOCUSED);
+	entry_list->SetItemState(item2, state1, wxLIST_STATE_SELECTED|wxLIST_STATE_FOCUSED);
+
+	// Update the items
+	entry_list->updateEntry(item1);
+	entry_list->updateEntry(item2);
+
+	return true;
+}
+
+/* EntryListPanel::moveUp
+ * Moves all selected entries up.
+ * Returns false if the first selected item was at the top of the
+ * list, true otherwise
+ *******************************************************************/
+bool EntryListPanel::moveUp() {
+	// Get selection
+	vector<int> selection = getSelection();
+
+	// If the first selected item is at the top of the list
+	// then don't move anything up
+	if (selection[0] == 0)
+		return false;
+
+	// Move each one up by swapping it with the entry above it
+	for (size_t a = 0; a < selection.size(); a++) {
+		// Get the entries to swap
+		ArchiveEntry* entry = (ArchiveEntry*)(entry_list->GetItemData(selection[a]));
+		ArchiveEntry* above = (ArchiveEntry*)(entry_list->GetItemData(selection[a]-1));
+
+		// Swap them in the archive
+		archive->swapEntries(entry, above);
+
+		// Swap them in the list
+		swapItems(selection[a], selection[a]-1);
+	}
+
+	// Return success
+	return true;
+}
+
+/* EntryListPanel::moveDown
+ * Moves all selected entries down.
+ * Returns false if the last selected item was at the end of the
+ * list, true otherwise
+ *******************************************************************/
+bool EntryListPanel::moveDown() {
+	// Get selection
+	vector<int> selection = getSelection();
+
+	// If the last selected item is at the end of the list
+	// then don't move anything down
+	if (selection.back() == entry_list->GetItemCount()-1)
+		return false;
+
+	// Move each one down by swapping it with the entry below it
+	for (int a = selection.size()-1; a >= 0; a--) {
+		// Get the entries to swap
+		ArchiveEntry* entry = (ArchiveEntry*)(entry_list->GetItemData(selection[a]));
+		ArchiveEntry* below = (ArchiveEntry*)(entry_list->GetItemData(selection[a]+1));
+
+		// Swap them in the archive
+		archive->swapEntries(entry, below);
+
+		// Swap them in the list
+		swapItems(selection[a], selection[a]+1);
+	}
+
+	// Return success
+	return true;
+}
+
 BEGIN_EVENT_TABLE(EntryListPanel, wxPanel)
 EVT_LIST_ITEM_FOCUSED(EntryListPanel::ENTRY_LIST, EntryListPanel::onEntryListChange)
 END_EVENT_TABLE()

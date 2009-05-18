@@ -34,8 +34,14 @@ public:
 	EntryListPanel(wxWindow *parent, int id, Archive* archive);
 	~EntryListPanel();
 
-	void			populateEntryList();
-	ArchiveEntry*	getFocusedEntry();
+	void					populateEntryList();
+	ArchiveEntry*			getFocusedEntry();
+	vector<ArchiveEntry*>	getSelectedEntries();
+	vector<int>				getSelection();
+	bool					swapItems(int item1, int item2);
+
+	bool	moveUp();
+	bool	moveDown();
 
 	// Events
 	void	onEntryListChange(wxListEvent &event);

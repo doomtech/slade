@@ -30,9 +30,14 @@ public:
 		MENU_VIEW_WADMANAGER,
 		MENU_VIEW_CONSOLE,
 
-		//MENU_WAD_SAVE,
-		//MENU_WAD_SAVEAS,
-		//MENU_WAD_CLOSE,
+		MENU_ENTRY_NEW,
+		MENU_ENTRY_NEWFROMFILE,
+		MENU_ENTRY_IMPORT,
+		MENU_ENTRY_EXPORT,
+		MENU_ENTRY_MOVEUP,
+		MENU_ENTRY_MOVEDOWN,
+
+		MENU_UNIMPLEMENTED,
 
 		HTML_WINDOW,
 	};
@@ -49,6 +54,9 @@ public:
 	void	onFileSave(wxCommandEvent &e);
 	void	onFileSaveAs(wxCommandEvent &e);
 	void	onFileClose(wxCommandEvent &e);
+
+	void	onEntryMoveUp(wxCommandEvent &e);
+	void	onEntryMoveDown(wxCommandEvent &e);
 
 	void	onViewWadManager(wxCommandEvent &e);
 	void	onViewConsole(wxCommandEvent &e);

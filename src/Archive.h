@@ -30,6 +30,7 @@ public:
 	BYTE					getType() { return type; }
 	string					getFileName(bool fullpath = true);
 	bool					isModified() { return modified; }
+	int						entryIndex(ArchiveEntry* entry);
 	virtual ArchiveEntry*	getEntry(DWORD index);
 	virtual ArchiveEntry*	getEntry(string name);
 
@@ -41,6 +42,7 @@ public:
 
 	virtual ArchiveEntry*	addNewEntry(string name = _T(""), DWORD position = 0);
 	virtual ArchiveEntry*	addExistingEntry(ArchiveEntry* entry, DWORD position = 0, bool copy = false);
+	virtual bool			swapEntries(ArchiveEntry* entry1, ArchiveEntry* entry2);
 
 	virtual vector<mapdesc_t>	detectMaps();
 };

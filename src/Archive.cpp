@@ -46,6 +46,19 @@ Archive::Archive() {
 Archive::~Archive() {
 }
 
+/* Archive::entryIndex
+ * Returns the given entry's index in the Archive entry list.
+ * Returns -1 if the entry doesn't exist in the Archive.
+ *******************************************************************/
+int Archive::entryIndex(ArchiveEntry* entry) {
+	for (size_t a = 0; a < entries.size(); a++) {
+		if (entries[a] == entry)
+			return a;
+	}
+
+	return -1;
+}
+
 /* Archive::getFileName
  * Returns the archive's filename, including the path if specified
  *******************************************************************/
@@ -119,6 +132,9 @@ DWORD Archive::numEntries() {
 	return entries.size();
 }
 
+/* Archive::close
+ * 'Closes' the archive
+ *******************************************************************/
 void Archive::close() {
 	announce(_T("close"));
 }
@@ -185,4 +201,25 @@ ArchiveEntry* Archive::addExistingEntry(ArchiveEntry* entry, DWORD position, boo
 
 	// Return the added entry
 	return entry;
+}
+
+/* Archive::swapEntries
+ * Swaps the specified entries. Returns false if either entry is
+ * invalid or not part of this Archive, true otherwise.
+ *******************************************************************/
+bool Archive::swapEntries(ArchiveEntry* entry1, ArchiveEntry* entry2) {
+	// Get entry indices
+	int i1 = entryIndex(entry1);
+	int i2 = entryIndex(entry2);
+
+	// Check indices
+	if (i1 == -1 || i2 == -1)
+		return false;
+
+	// Swap the entries in the list
+	entries[i1] = entry2;
+	entries[i2] = entry1;
+
+	// Return success
+	return true;
 }

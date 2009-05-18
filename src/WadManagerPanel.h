@@ -53,12 +53,17 @@ public:
 	void	openFile(string filename);
 	void	openFiles(wxArrayString& files);
 
+	// Selected archives in the list
 	void	saveSelection();
 	void	saveSelectionAs();
 	void	closeSelection();
+
+	// Currently opened tab
 	void	saveCurrent();
 	void	saveCurrentAs();
 	void	closeCurrent();
+	void	moveUp();
+	void	moveDown();
 
 	vector<int>	getSelectedWads();
 
