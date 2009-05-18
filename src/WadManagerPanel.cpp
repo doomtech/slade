@@ -412,7 +412,6 @@ void WadManagerPanel::onListMapsChanged(wxCommandEvent &e) {
  * Opens the map in a new map editor window
  *******************************************************************/
 void WadManagerPanel::onListMapsActivated(wxListEvent &e) {
-	wxMessageBox(_T("heh"));
 	new MapEditorWindow();
 }
 

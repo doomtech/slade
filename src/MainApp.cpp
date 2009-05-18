@@ -60,6 +60,9 @@ bool MainApp::OnInit() {
 	// Init logfile
 	initLogFile();
 
+	// Init OpenGL
+	initOpenGL();
+
 	// Load image handlers
 	wxImage::AddHandler(new wxPNGHandler);
 
@@ -95,7 +98,7 @@ void MainApp::initLogFile() {
  *******************************************************************/
 void MainApp::initOpenGL() {
 	// Create a temporary wxGLCanvas, it's needed for the wxGLContext constructor
-	wxGLCanvas *temp_canvas = new wxGLCanvas(NULL, wxID_ANY, 0);
+	wxGLCanvas *temp_canvas = new wxGLCanvas(NULL, -1, NULL);
 
 	// Create GL Context
 	gl_context = new wxGLContext(temp_canvas);

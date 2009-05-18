@@ -43,8 +43,10 @@
  *******************************************************************/
 MapEditorWindow::MapEditorWindow()
 : wxFrame((wxFrame *) NULL, -1, _T("SLADE"), wxPoint(0, 0), wxSize(800, 600)) {
-	Maximize();
+	setupLayout();
 	Show();
+	//map_canvas->init();
+	Maximize();
 }
 
 /* MapEditorWindow::~MapEditorWindow
@@ -62,6 +64,13 @@ void MapEditorWindow::setupLayout() {
 	wxAuiPaneInfo p_inf;
 
 	CreateToolBar();
+
+	// Map canvas
+	map_canvas = new MapCanvas(this, -1);
+	p_inf.CenterPane();
+	//m_mgr->AddPane(new wxTextCtrl(this, -1), p_inf);
+	m_mgr->AddPane(map_canvas, p_inf);
+
 	CreateStatusBar();
 
 	m_mgr->Update();
