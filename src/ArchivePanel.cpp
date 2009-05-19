@@ -5,10 +5,10 @@
  * 
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
- * Filename:    WadPanel.cpp
- * Description: WadPanel class. The base wxWidgets panel for wadfile
- *              editing. One of these is opened in a tab for each
- *              open wadfile.
+ * Filename:    ArchivePanel.cpp
+ * Description: ArchivePanel class. The base wxWidgets panel for
+ *              archive content editing. One of these is opened in
+ *              a tab for each open archive.
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -31,32 +31,32 @@
  *******************************************************************/
 #include "Main.h"
 #include "WxStuff.h"
-#include "WadPanel.h"
+#include "ArchivePanel.h"
 #include "EntryListPanel.h"
 #include <wx/aui/auibook.h>
 
 
-/* WadPanel::WadPanel
- * WadPanel class constructor
+/* ArchivePanel::ArchivePanel
+ * ArchivePanel class constructor
  *******************************************************************/
-WadPanel::WadPanel(wxWindow* parent, Archive* wad)
+ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 : wxPanel(parent, -1) {
-	this->wad = wad;
-	listenTo(wad);
+	this->archive = archive;
+	listenTo(archive);
 
 	// Create & set sizer
 	wxBoxSizer *m_hbox = new wxBoxSizer(wxHORIZONTAL);
 	SetSizer(m_hbox);
 
 	// Lump list panel
-	lump_list = new EntryListPanel(this, ENTRY_LIST_PANEL, wad);
+	lump_list = new EntryListPanel(this, ENTRY_LIST_PANEL, archive);
 	m_hbox->Add(lump_list, 0, wxEXPAND | wxALL, 4);
 
 	lump_list->populateEntryList();
 
 	// Create lump areas
-	lump_area = new LumpArea(this);
-	text_area = new TextLumpArea(this);
+	lump_area = new EntryPanel(this);
+	text_area = new TextEntryPanel(this);
 
 	// Add default lump area to the panel
 	cur_area = lump_area;
@@ -66,80 +66,80 @@ WadPanel::WadPanel(wxWindow* parent, Archive* wad)
 	Layout();
 }
 
-/* WadPanel::~WadPanel
- * WadPanel class destructor
+/* ArchivePanel::~ArchivePanel
+ * ArchivePanel class destructor
  *******************************************************************/
-WadPanel::~WadPanel() {
+ArchivePanel::~ArchivePanel() {
 }
 
-/* WadPanel::save
- * Saves the wad file
+/* ArchivePanel::save
+ * Saves the archive
  *******************************************************************/
-void WadPanel::save() {
-	// Check the wad exists
-	if (!wad)
+void ArchivePanel::save() {
+	// Check the archive exists
+	if (!archive)
 		return;
 
-	// Save the wad
-	if (!wad->save()) {
+	// Save the archive
+	if (!archive->save()) {
 		// If there was an error pop up a message box
 		wxMessageBox(s_fmt(_T("Error: %s"), Global::error.c_str()), _T("Error"), wxICON_ERROR);
 	}
 }
 
-/* WadPanel::saveAs
- * Saves the wad file to a new file
+/* ArchivePanel::saveAs
+ * Saves the archive to a new file
  *******************************************************************/
-void WadPanel::saveAs() {
-	// Check the wad exists
-	if (!wad)
+void ArchivePanel::saveAs() {
+	// Check the archive exists
+	if (!archive)
 		return;
 
 	// Setup file filters (temporary, should go through all archive types somehow)
 	string formats = _T("Doom Wad File (*.wad)|*.wad");
 	string deftype = _T("*.wad");
-	string filename = wxFileSelector(_T("Save Wad ") + wad->getFileName(false) + _T(" As"), _T(""), _T(""), deftype, formats, wxSAVE | wxOVERWRITE_PROMPT);
+	string filename = wxFileSelector(_T("Save Wad ") + archive->getFileName(false) + _T(" As"), _T(""), _T(""), deftype, formats, wxSAVE | wxOVERWRITE_PROMPT);
 
 	// Check a filename was selected
 	if (!filename.empty()) {
-		// Save the wad
-		if (!wad->save(filename)) {
+		// Save the archive
+		if (!archive->save(filename)) {
 			// If there was an error pop up a message box
 			wxMessageBox(s_fmt(_T("Error: %s"), Global::error.c_str()), _T("Error"), wxICON_ERROR);
 		}
 	}
 }
 
-/* WadPanel::moveUp
+/* ArchivePanel::moveUp
  * Moves selected entries up
  *******************************************************************/
-bool WadPanel::moveUp() {
+bool ArchivePanel::moveUp() {
 	// Get the entry list class to handle it
 	return lump_list->moveUp();
 }
 
-/* WadPanel::moveDown
+/* ArchivePanel::moveDown
  * Moves selected entries down
  *******************************************************************/
-bool WadPanel::moveDown() {
+bool ArchivePanel::moveDown() {
 	// Get the entry list class to handle it
 	return lump_list->moveDown();
 }
 
-/* WadPanel::onAnnouncement
- * Called when an announcement is recieved from the archive the
- * WadPanel is managing
+/* ArchivePanel::onAnnouncement
+ * Called when an announcement is recieved from the archive that
+ * this ArchivePanel is managing
  *******************************************************************/
-void WadPanel::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
+void ArchivePanel::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
 	event_data.seek(0, SEEK_SET);
 
-	// If the wad was closed
+	// If the archive was closed
 	if (event_name == _T("close")) {
-		// Remove the wad panel from the parent notebook
+		// Remove the archive panel from the parent notebook
 		wxAuiNotebook* parent = (wxAuiNotebook*)GetParent();
 		parent->RemovePage(parent->GetPageIndex(this));
 
-		// Destroy the wad panel
+		// Destroy the archive panel
 		this->Destroy();
 	}
 
@@ -151,16 +151,16 @@ void WadPanel::onAnnouncement(Announcer* announcer, string event_name, MemChunk&
 	}
 }
 
-BEGIN_EVENT_TABLE(WadPanel, wxPanel)
-	EVT_LIST_ITEM_FOCUSED(WadPanel::ENTRY_LIST_PANEL, WadPanel::onEntryListChange)
+BEGIN_EVENT_TABLE(ArchivePanel, wxPanel)
+	EVT_LIST_ITEM_FOCUSED(ArchivePanel::ENTRY_LIST_PANEL, ArchivePanel::onEntryListChange)
 END_EVENT_TABLE()
 
-/* WadPanel::onEntryListChange
+/* ArchivePanel::onEntryListChange
  * Called when the current focus on the list control in the
  * entry list panel is changed (ie when the user selects an entry
  * in the list)
  *******************************************************************/
-void WadPanel::onEntryListChange(wxListEvent& event) {
+void ArchivePanel::onEntryListChange(wxListEvent& event) {
 	// Get the panel sizer
 	wxSizer* sizer = GetSizer();
 

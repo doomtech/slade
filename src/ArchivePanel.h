@@ -1,31 +1,31 @@
 
-#ifndef __WADPANEL_H__
-#define __WADPANEL_H__
+#ifndef __ARCHIVEPANEL_H__
+#define __ARCHIVEPANEL_H__
 
 #include "Archive.h"
 #include "EntryListPanel.h"
-#include "LumpArea.h"
+#include "EntryPanel.h"
 #include "ListenerAnnouncer.h"
 
-class WadPanel : public wxPanel, Listener {
+class ArchivePanel : public wxPanel, Listener {
 private:
-	Archive*		wad;
+	Archive*		archive;
 	EntryListPanel*	lump_list;
 
 	// Lump areas
-	LumpArea*		cur_area;
-	LumpArea*		lump_area;
-	TextLumpArea*	text_area;
+	EntryPanel*		cur_area;
+	EntryPanel*		lump_area;
+	TextEntryPanel*	text_area;
 
 public:
 	enum {
 		ENTRY_LIST_PANEL,
 	};
 
-	WadPanel(wxWindow *parent, Archive* wad);
-	~WadPanel();
+	ArchivePanel(wxWindow *parent, Archive* archive);
+	~ArchivePanel();
 
-	Archive*	getWad() { return wad; }
+	Archive*	getArchive() { return archive; }
 
 	// Archive manipulationfunctions
 	void		save();
@@ -43,4 +43,4 @@ public:
 	DECLARE_EVENT_TABLE()
 };
 
-#endif //__WADPANEL_H__
+#endif //__ARCHIVEPANEL_H__

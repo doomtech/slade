@@ -53,7 +53,7 @@ EntryList::~EntryList() {
 }
 
 /* EntryList::updateEntry
- * Updates the list entry at index with it's associated archive
+ * Updates the list item at index with it's associated archive
  * entry's information (name/size/type).
  * Returns false on invalid index or missing entry, true otherwise
  *******************************************************************/
@@ -150,7 +150,7 @@ void EntryListPanel::populateEntryList() {
 
 /* EntryListPanel::getFocusedEntry
  * Gets the archive entry associated with the currently focused list
- * entry. Returns NULL if nothing is focused
+ * item. Returns NULL if nothing is focused
  *******************************************************************/
 ArchiveEntry* EntryListPanel::getFocusedEntry() {
 	// Check that the focus index is invalid

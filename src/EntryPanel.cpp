@@ -5,8 +5,9 @@
  * 
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
- * Filename:    TextLumpArea.cpp
- * Description: TextLumpArea class. The UI for editing text lumps.
+ * Filename:    EntryPanel.cpp
+ * Description: EntryPanel class. Different UI panels for editing
+ *              different entry types extend from this class.
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -29,45 +30,29 @@
  *******************************************************************/
 #include "Main.h"
 #include "WxStuff.h"
-#include "LumpArea.h"
+#include "EntryPanel.h"
 
-
-/* TextLumpArea::TextLumpArea
- * TextLumpArea class constructor
+/* EntryPanel::EntryPanel
+ * EntryPanel class constructor
  *******************************************************************/
-TextLumpArea::TextLumpArea(wxWindow* parent)
-: LumpArea(parent) {
+EntryPanel::EntryPanel(wxWindow* parent)
+: wxPanel(parent, -1) {
 	// Create & set sizer & border
 	wxStaticBox *frame = new wxStaticBox(this, -1, _T("Lump Contents"));
 	wxStaticBoxSizer *framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
 	SetSizer(framesizer);
-
-	// Create the text area
-	text_area = new wxStyledTextCtrl(this, -1);
-	framesizer->Add(text_area, 1, wxEXPAND | wxALL, 4);
-
-	Layout();
+	Show(false);
 }
 
-/* TextLumpArea::~TextLumpArea
- * TextLumpArea class destructor
+/* EntryPanel::~EntryPanel
+ * EntryPanel class destructor
  *******************************************************************/
-TextLumpArea::~TextLumpArea() {
+EntryPanel::~EntryPanel() {
 }
 
-/* TextLumpArea::loadEntry
- * Loads an entry into the lump area as text
+/* EntryPanel::loadEntry
+ * Loads an entry into the entry panel (does nothing here, to be
+ * overridden by child classes)
  *******************************************************************/
-void TextLumpArea::loadEntry(ArchiveEntry* entry) {
-	// Check that the entry exists
-	if (!entry)
-		return;
-
-	// Read entry as a text string
-	this->lump = entry;
-	string istr = wxString::FromAscii((char*) entry->getData());
-	istr.Truncate(entry->getSize());
-
-	// Add text to the text area
-	text_area->SetText(istr);
+void EntryPanel::loadEntry(ArchiveEntry* entry) {
 }

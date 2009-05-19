@@ -5,24 +5,24 @@
 #include "ArchiveEntry.h"
 #include <wx/stc/stc.h>
 
-class LumpArea : public wxPanel {
+class EntryPanel : public wxPanel {
 protected:
-	ArchiveEntry*	lump;
+	ArchiveEntry*	entry;
 
 public:
-	LumpArea(wxWindow* parent);
-	~LumpArea();
+	EntryPanel(wxWindow* parent);
+	~EntryPanel();
 
 	virtual void loadEntry(ArchiveEntry* entry);
 };
 
-class TextLumpArea : public LumpArea {
+class TextEntryPanel : public EntryPanel {
 private:
 	wxStyledTextCtrl*	text_area;
 
 public:
-	TextLumpArea(wxWindow* parent);
-	~TextLumpArea();
+	TextEntryPanel(wxWindow* parent);
+	~TextEntryPanel();
 
 	void loadEntry(ArchiveEntry* entry);
 };

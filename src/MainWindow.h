@@ -2,13 +2,13 @@
 #ifndef __MAINWINDOW_H__
 #define __MAINWINDOW_H__
 
-#include "WadManagerPanel.h"
+#include "ArchiveManagerPanel.h"
 #include <wx/aui/auibook.h>
 #include <wx/html/htmlwin.h>
 
 class MainWindow : public wxFrame {
 private:
-	WadManagerPanel*		panel_wadmanager;
+	ArchiveManagerPanel*		panel_archivemanager;
 	wxAuiNotebook*			notebook_tabs;
 	wxHtmlWindow*			html_startpage;
 	wxMenu*					menu_wad;
@@ -27,7 +27,7 @@ public:
 		MENU_FILE_OPTIONS,
 		MENU_FILE_QUIT,
 
-		MENU_VIEW_WADMANAGER,
+		MENU_VIEW_MANAGER,
 		MENU_VIEW_CONSOLE,
 
 		MENU_ENTRY_NEW,
@@ -58,7 +58,7 @@ public:
 	void	onEntryMoveUp(wxCommandEvent &e);
 	void	onEntryMoveDown(wxCommandEvent &e);
 
-	void	onViewWadManager(wxCommandEvent &e);
+	void	onViewArchiveManager(wxCommandEvent &e);
 	void	onViewConsole(wxCommandEvent &e);
 
 	void	onHTMLLinkClicked(wxHtmlLinkEvent &e);

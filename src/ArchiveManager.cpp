@@ -5,8 +5,8 @@
  *
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
- * Filename:    WadManager.cpp
- * Description: WadManager class. Manages all open Wadfiles and
+ * Filename:    ArchiveManager.cpp
+ * Description: ArchiveManager class. Manages all open archives and
  *              the interactions between them.
  *
  * This program is free software; you can redistribute it and/or
@@ -29,7 +29,7 @@
  * INCLUDES
  *******************************************************************/
 #include "Main.h"
-#include "WadManager.h"
+#include "ArchiveManager.h"
 #include "WadArchive.h"
 #include "ZipArchive.h"
 #include "Console.h"
@@ -46,67 +46,67 @@
  *******************************************************************/
 
 
-/* WadManager::WadManager
- * WadManager class constructor
+/* ArchiveManager::ArchiveManager
+ * ArchiveManager class constructor
  *******************************************************************/
-WadManager::WadManager() {
+ArchiveManager::ArchiveManager() {
 }
 
-/* WadManager::~WadManager
- * WadManager class destructor
+/* ArchiveManager::~ArchiveManager
+ * ArchiveManager class destructor
  *******************************************************************/
-WadManager::~WadManager() {
+ArchiveManager::~ArchiveManager() {
 }
 
-/* WadManager::addWad
- * Adds a wad to the wad list
+/* ArchiveManager::addArchive
+ * Adds an archive to the archive list
  *******************************************************************/
-bool WadManager::addWad(Archive* wad) {
-	// Only add if wad is a valid pointer
-	if (wad) {
-		open_wads.push_back(wad);
+bool ArchiveManager::addArchive(Archive* archive) {
+	// Only add if archive is a valid pointer
+	if (archive) {
+		open_archives.push_back(archive);
 		return true;
 	} else
 		return false;
 }
 
-/* WadManager::getWad
- * Returns the wadfile at the index specified
+/* ArchiveManager::getArchive
+ * Returns the archive at the index specified
  * (NULL if it doesn't exist)
  *******************************************************************/
-Archive* WadManager::getWad(int index) {
+Archive* ArchiveManager::getArchive(int index) {
 	// Check that index is valid
-	if (index < 0 || index >= (int) open_wads.size())
+	if (index < 0 || index >= (int) open_archives.size())
 		return NULL;
 	else
-		return open_wads[index];
+		return open_archives[index];
 }
 
-/* WadManager::getWad
- * Returns the wadfile with the specified filename
+/* ArchiveManager::getArchive
+ * Returns the archive with the specified filename
  * (NULL if it doesn't exist)
  *******************************************************************/
-Archive* WadManager::getWad(string filename) {
-	// Go through all open wads
-	for (int a = 0; a < (int) open_wads.size(); a++) {
+Archive* ArchiveManager::getArchive(string filename) {
+	// Go through all open archives
+	for (int a = 0; a < (int) open_archives.size(); a++) {
 		// If the filename matches, return it
-		if (open_wads[a]->getFileName().compare(filename) == 0)
-			return open_wads[a];
+		if (open_archives[a]->getFileName().compare(filename) == 0)
+			return open_archives[a];
 	}
 
-	// If no wad is found with a matching filename, return NULL
+	// If no archive is found with a matching filename, return NULL
 	return NULL;
 }
 
-/* WadManager::openWad
- * Opens and adds a wadfile to the list, returns a pointer to the
- * newly opened and added wad, or NULL if an error occurred
+/* ArchiveManager::openArchive
+ * Opens and adds a archive to the list, returns a pointer to the
+ * newly opened and added archive, or NULL if an error occurred
  *******************************************************************/
-Archive* WadManager::openWad(string filename) {
-	Archive* new_wad = NULL;
+Archive* ArchiveManager::openArchive(string filename) {
+	Archive* new_archive = NULL;
 
 	// Check that the file isn't already open
-	if (getWad(filename)) {
+	if (getArchive(filename)) {
 		Global::error = _T("Archive is already open");
 		return NULL;
 	}
@@ -115,73 +115,73 @@ Archive* WadManager::openWad(string filename) {
 	wxFileName fn(filename);
 
 	if (!fn.GetExt().CmpNoCase(_T("wad"))) // Wad File
-		new_wad = new WadArchive();
+		new_archive = new WadArchive();
 	else if (!fn.GetExt().CmpNoCase(_T("zip")) || !fn.GetExt().CmpNoCase(_T("pk3"))) // Zip/Pk3 file
-		new_wad = new ZipArchive();
+		new_archive = new ZipArchive();
 
 	// If it opened successfully, add it to the list & return it,
 	// Otherwise, delete it and return NULL
-	if (new_wad->openFile(filename)) {
-		open_wads.push_back(new_wad);
-		announce(_T("wad_opened"));
-		return new_wad;
+	if (new_archive->openFile(filename)) {
+		open_archives.push_back(new_archive);
+		announce(_T("archive_opened"));
+		return new_archive;
 	} else {
-		delete new_wad;
+		delete new_archive;
 		return NULL;
 	}
 }
 
-/* WadManager::closeWad
- * Closes the wad at index, and removes it from the list if the
+/* ArchiveManager::closeArchive
+ * Closes the archive at index, and removes it from the list if the
  * index is valid. Returns false on invalid index, true otherwise
  *******************************************************************/
-bool WadManager::closeWad(int index) {
+bool ArchiveManager::closeArchive(int index) {
 	// Check for invalid index
-	if (index < 0 || index >= (int) open_wads.size())
+	if (index < 0 || index >= (int) open_archives.size())
 		return false;
 
-	// Close the wad
-	open_wads[index]->close();
+	// Close the archive
+	open_archives[index]->close();
 
-	// Delete the wad object
-	delete open_wads[index];
+	// Delete the archive object
+	delete open_archives[index];
 
-	// Remove the wad at index from the list
-	open_wads.erase(open_wads.begin() + index);
+	// Remove the archive at index from the list
+	open_archives.erase(open_archives.begin() + index);
 
 	// Announce it
-	announce(_T("wad_closed"));
+	announce(_T("archive_closed"));
 
 	return true;
 }
 
-/* WadManager::closeWad
- * Finds the wadfile with a matching filename, deletes it and removes
- * it from the list. Returns false if wad doesn't exist or can't be
+/* ArchiveManager::closeArchive
+ * Finds the archive with a matching filename, deletes it and removes
+ * it from the list. Returns false if it doesn't exist or can't be
  * removed, true otherwise
  *******************************************************************/
-bool WadManager::closeWad(string filename) {
-	// Go through all open wads
-	for (int a = 0; a < (int) open_wads.size(); a++) {
+bool ArchiveManager::closeArchive(string filename) {
+	// Go through all open archives
+	for (int a = 0; a < (int) open_archives.size(); a++) {
 		// If the filename matches, remove it
-		if (open_wads[a]->getFileName().compare(filename) == 0)
-			return closeWad(a);
+		if (open_archives[a]->getFileName().compare(filename) == 0)
+			return closeArchive(a);
 	}
 
 	// If no wad is found with a matching filename, return false
 	return false;
 }
 
-/* WadManager::closeWad
- * Closes the specified wadfile and removes it from the list, if it
+/* ArchiveManager::closeArchive
+ * Closes the specified archive and removes it from the list, if it
  * exists in the list. Returns false if it doesn't exist, else true
  *******************************************************************/
-bool WadManager::closeWad(Archive* wad) {
+bool ArchiveManager::closeArchive(Archive* archive) {
 	// Go through all open wads
-	for (int a = 0; a < (int) open_wads.size(); a++) {
+	for (int a = 0; a < (int) open_archives.size(); a++) {
 		// If the wad exists in the list, remove it
-		if (open_wads[a] == wad)
-			return closeWad(a);
+		if (open_archives[a] == archive)
+			return closeArchive(a);
 	}
 
 	// If the wad isn't in the list, return false
@@ -190,18 +190,18 @@ bool WadManager::closeWad(Archive* wad) {
 
 
 
-/* Console Command - "list_wads"
- * Lists the filenames of all open wads
+/* Console Command - "list_archives"
+ * Lists the filenames of all open archives
  *******************************************************************/
 //CONSOLE_COMMAND(list_wads, 0,
 
-void c_list_wads(vector<string> args) {
-	Console::getInstance().logMessage(s_fmt(_T("%d Open Wads:"), WadManager::getInstance().numWads()));
+void c_list_archives(vector<string> args) {
+	Console::getInstance().logMessage(s_fmt(_T("%d Open Archives:"), ArchiveManager::getInstance().numArchives()));
 
-	for (int a = 0; a < WadManager::getInstance().numWads(); a++) {
-		Archive* wad = WadManager::getInstance().getWad(a);
-		Console::getInstance().logMessage(s_fmt(_T("%d: \"%s\""), a + 1, wad->getFileName().c_str()));
+	for (int a = 0; a < ArchiveManager::getInstance().numArchives(); a++) {
+		Archive* archive = ArchiveManager::getInstance().getArchive(a);
+		Console::getInstance().logMessage(s_fmt(_T("%d: \"%s\""), a + 1, archive->getFileName().c_str()));
 	}
 }
-ConsoleCommand list_wads(_T("list_wads"), &c_list_wads, 0);
+ConsoleCommand list_archives(_T("list_archives"), &c_list_archives, 0);
 //})

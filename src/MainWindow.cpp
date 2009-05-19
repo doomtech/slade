@@ -69,16 +69,16 @@ void MainWindow::setupLayout() {
 
 	// File menu
 	wxMenu* fileMenu = new wxMenu(_(""));
-	fileMenu->Append(MENU_FILE_NEW,			_("&New\tCtrl+N"),		_("Create a new Wad file"));
+	fileMenu->Append(MENU_FILE_NEW,			_("&New\tCtrl+N"),		_("Create a new Archive"));
 	fileMenu->AppendSeparator();
-    fileMenu->Append(MENU_FILE_OPEN,		_("&Open\tCtrl+O"),		_("Open a Wad file"));
+    fileMenu->Append(MENU_FILE_OPEN,		_("&Open\tCtrl+O"),		_("Open an existing Archive"));
 	fileMenu->AppendSeparator();
-	fileMenu->Append(MENU_FILE_SAVE,		_("&Save\tCtrl+S"),		_("Save the Wad file"));
-	fileMenu->Append(MENU_FILE_SAVEAS,		_("Save &As..."),		_("Save the Wad to a new file"));
-	fileMenu->Append(MENU_FILE_SAVEALL,		_("Save All"),			_("Save all open Wad files"));
+	fileMenu->Append(MENU_FILE_SAVE,		_("&Save\tCtrl+S"),		_("Save the currently open Archive"));
+	fileMenu->Append(MENU_FILE_SAVEAS,		_("Save &As..."),		_("Save the currently open Archive to a new file"));
+	fileMenu->Append(MENU_FILE_SAVEALL,		_("Save All"),			_("Save all open Archives"));
 	fileMenu->AppendSeparator();
-	fileMenu->Append(MENU_FILE_CLOSE,		_("&Close"),			_("Close the Wad file"));
-	fileMenu->Append(MENU_FILE_CLOSEALL,	_("Close All"),			_("Close all open Wad files"));
+	fileMenu->Append(MENU_FILE_CLOSE,		_("&Close"),			_("Close the currently open Archive"));
+	fileMenu->Append(MENU_FILE_CLOSEALL,	_("Close All"),			_("Close all open Archives"));
 	fileMenu->AppendSeparator();
     fileMenu->Append(MENU_FILE_QUIT,		_("&Quit\tCtrl+X"),		_("Quit SLADE"));
 	menu->Append(fileMenu, _("&File"));
@@ -101,8 +101,8 @@ void MainWindow::setupLayout() {
 
 	// View menu
 	wxMenu* viewMenu = new wxMenu(_T(""));
-	viewMenu->Append(MENU_VIEW_WADMANAGER,	_("&Wad Manager\tCtrl+1"),	_T("Toggle the wad manager"));
-	viewMenu->Append(MENU_VIEW_CONSOLE,		_("&Console\tCtrl+2"),		_T("Toggle the console"));
+	viewMenu->Append(MENU_VIEW_MANAGER,		_("&Archive Manager\tCtrl+1"),	_T("Toggle the archive manager"));
+	viewMenu->Append(MENU_VIEW_CONSOLE,		_("&Console\tCtrl+2"),			_T("Toggle the console"));
 	menu->Append(viewMenu, _("&View"));
 
 	// Set the menu
@@ -122,8 +122,8 @@ void MainWindow::setupLayout() {
 	html_startpage->SetPage(_("<HTML><BODY><CENTER><H1>SLADE<FONT SIZE=-4>3</FONT></H1><BR>It's A Doom Editor<BR><BR><BR><A HREF=http://slade.mancubus.net>http://slade.mancubus.net</A></CENTER></BODY></HTML>"));
 
 
-	// -- Wad Manager Panel --
-	panel_wadmanager = new WadManagerPanel(this, notebook_tabs);
+	// -- Archive Manager Panel --
+	panel_archivemanager = new ArchiveManagerPanel(this, notebook_tabs);
 
 	// Setup panel info & add panel
 	p_inf.DefaultPane();
@@ -131,9 +131,9 @@ void MainWindow::setupLayout() {
 	p_inf.BottomDockable(false);
 	p_inf.TopDockable(false);
 	p_inf.BestSize(192, 480);
-	p_inf.Caption(_("Wad Manager"));
-	p_inf.Name(_T("wad_manager"));
-	m_mgr->AddPane(panel_wadmanager, p_inf);
+	p_inf.Caption(_("Archive Manager"));
+	p_inf.Name(_T("archive_manager"));
+	m_mgr->AddPane(panel_archivemanager, p_inf);
 
 
 
@@ -241,7 +241,7 @@ BEGIN_EVENT_TABLE(MainWindow, wxFrame)
 	EVT_MENU(MENU_ENTRY_MOVEDOWN, MainWindow::onEntryMoveDown)
 
 	// View Menu
-	EVT_MENU(MENU_VIEW_WADMANAGER, MainWindow::onViewWadManager)
+	EVT_MENU(MENU_VIEW_MANAGER, MainWindow::onViewArchiveManager)
 	EVT_MENU(MENU_VIEW_CONSOLE, MainWindow::onViewConsole)
 END_EVENT_TABLE()
 
@@ -262,7 +262,7 @@ void MainWindow::onFileOpen(wxCommandEvent &e) {
 		dialog_open->GetPaths(files);
 
 		// Send it to the Wad Manager Panel
-		panel_wadmanager->openFiles(files);
+		panel_archivemanager->openFiles(files);
 	}
 }
 
@@ -277,43 +277,43 @@ void MainWindow::onFileQuit(wxCommandEvent &e) {
  * File->Save menu item event handler.
  *******************************************************************/
 void MainWindow::onFileSave(wxCommandEvent& e) {
-	panel_wadmanager->saveCurrent();
+	panel_archivemanager->saveCurrent();
 }
 
 /* MainWindow::onFileSaveAs
  * File->Save As menu item event handler.
  *******************************************************************/
 void MainWindow::onFileSaveAs(wxCommandEvent& e) {
-	panel_wadmanager->saveCurrentAs();
+	panel_archivemanager->saveCurrentAs();
 }
 
 /* MainWindow::onFileClose
  * File->Close menu item event handler.
  *******************************************************************/
 void MainWindow::onFileClose(wxCommandEvent& e) {
-	panel_wadmanager->closeCurrent();
+	panel_archivemanager->closeCurrent();
 }
 
 /* MainWindow::onEntryMoveUp
  * Entry->Move Up menu item event handler.
  *******************************************************************/
 void MainWindow::onEntryMoveUp(wxCommandEvent& e) {
-	panel_wadmanager->moveUp();
+	panel_archivemanager->moveUp();
 }
 
 /* MainWindow::onEntryMoveDown
  * Entry->Move Down menu item event handler.
  *******************************************************************/
 void MainWindow::onEntryMoveDown(wxCommandEvent& e) {
-	panel_wadmanager->moveDown();
+	panel_archivemanager->moveDown();
 }
 
-/* MainWindow::onViewWadManager
- * View->Wad Manager menu item event handler.
+/* MainWindow::onViewArchiveManager
+ * View->Archive Manager menu item event handler.
  *******************************************************************/
-void MainWindow::onViewWadManager(wxCommandEvent &e) {
-	wxAuiManager *m_mgr = wxAuiManager::GetManager(panel_wadmanager);
-	wxAuiPaneInfo& p_inf = m_mgr->GetPane(_T("wad_manager"));
+void MainWindow::onViewArchiveManager(wxCommandEvent &e) {
+	wxAuiManager *m_mgr = wxAuiManager::GetManager(panel_archivemanager);
+	wxAuiPaneInfo& p_inf = m_mgr->GetPane(_T("archive_manager"));
 	p_inf.Show(!p_inf.IsShown());
 	m_mgr->Update();
 }
@@ -322,7 +322,7 @@ void MainWindow::onViewWadManager(wxCommandEvent &e) {
  * View->Console menu item event handler.
  *******************************************************************/
 void MainWindow::onViewConsole(wxCommandEvent &e) {
-	wxAuiManager *m_mgr = wxAuiManager::GetManager(panel_wadmanager);
+	wxAuiManager *m_mgr = wxAuiManager::GetManager(panel_archivemanager);
 	wxAuiPaneInfo& p_inf = m_mgr->GetPane(_T("console"));
 	p_inf.Show(!p_inf.IsShown());
 	m_mgr->Update();

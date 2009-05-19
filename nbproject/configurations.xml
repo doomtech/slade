@@ -38,8 +38,8 @@
         <itemPath>src/ZipArchive.cpp</itemPath>
         <itemPath>src/ZipArchive.h</itemPath>
       </logicalFolder>
-      <itemPath>src/WadManager.cpp</itemPath>
-      <itemPath>src/WadManager.h</itemPath>
+      <itemPath>src/ArchiveManager.cpp</itemPath>
+      <itemPath>src/ArchiveManager.h</itemPath>
     </logicalFolder>
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
@@ -51,19 +51,19 @@
       <itemPath>src/Tokenizer.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="f2" displayName="UI" projectFiles="true">
+      <itemPath>src/ArchiveManagerPanel.cpp</itemPath>
+      <itemPath>src/ArchiveManagerPanel.h</itemPath>
+      <itemPath>src/ArchivePanel.cpp</itemPath>
+      <itemPath>src/ArchivePanel.h</itemPath>
       <itemPath>src/ConsolePanel.cpp</itemPath>
       <itemPath>src/ConsolePanel.h</itemPath>
       <itemPath>src/EntryListPanel.cpp</itemPath>
       <itemPath>src/EntryListPanel.h</itemPath>
-      <itemPath>src/LumpArea.cpp</itemPath>
-      <itemPath>src/LumpArea.h</itemPath>
+      <itemPath>src/EntryPanel.cpp</itemPath>
+      <itemPath>src/EntryPanel.h</itemPath>
       <itemPath>src/MainWindow.cpp</itemPath>
       <itemPath>src/MainWindow.h</itemPath>
-      <itemPath>src/TextLumpArea.cpp</itemPath>
-      <itemPath>src/WadManagerPanel.cpp</itemPath>
-      <itemPath>src/WadManagerPanel.h</itemPath>
-      <itemPath>src/WadPanel.cpp</itemPath>
-      <itemPath>src/WadPanel.h</itemPath>
+      <itemPath>src/TextEntryPanel.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -102,6 +102,24 @@
       <item path="src/ArchiveEntry.h">
         <itemTool>3</itemTool>
       </item>
+      <item path="src/ArchiveManager.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/ArchiveManager.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/ArchiveManagerPanel.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/ArchiveManagerPanel.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/ArchivePanel.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/ArchivePanel.h">
+        <itemTool>3</itemTool>
+      </item>
       <item path="src/Console.cpp">
         <itemTool>1</itemTool>
       </item>
@@ -120,16 +138,16 @@
       <item path="src/EntryListPanel.h">
         <itemTool>3</itemTool>
       </item>
+      <item path="src/EntryPanel.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/EntryPanel.h">
+        <itemTool>3</itemTool>
+      </item>
       <item path="src/ListenerAnnouncer.cpp">
         <itemTool>1</itemTool>
       </item>
       <item path="src/ListenerAnnouncer.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/LumpArea.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/LumpArea.h">
         <itemTool>3</itemTool>
       </item>
       <item path="src/Main.h">
@@ -186,7 +204,7 @@
       <item path="src/SLADEMap.h">
         <itemTool>3</itemTool>
       </item>
-      <item path="src/TextLumpArea.cpp">
+      <item path="src/TextEntryPanel.cpp">
         <itemTool>1</itemTool>
       </item>
       <item path="src/Tokenizer.cpp">
@@ -199,24 +217,6 @@
         <itemTool>1</itemTool>
       </item>
       <item path="src/WadArchive.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/WadManager.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/WadManager.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/WadManagerPanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/WadManagerPanel.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/WadPanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/WadPanel.h">
         <itemTool>3</itemTool>
       </item>
       <item path="src/WxStuff.h">
@@ -265,6 +265,24 @@
       <item path="src/ArchiveEntry.h">
         <itemTool>3</itemTool>
       </item>
+      <item path="src/ArchiveManager.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/ArchiveManager.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/ArchiveManagerPanel.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/ArchiveManagerPanel.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/ArchivePanel.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/ArchivePanel.h">
+        <itemTool>3</itemTool>
+      </item>
       <item path="src/Console.cpp">
         <itemTool>1</itemTool>
       </item>
@@ -283,16 +301,16 @@
       <item path="src/EntryListPanel.h">
         <itemTool>3</itemTool>
       </item>
+      <item path="src/EntryPanel.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/EntryPanel.h">
+        <itemTool>3</itemTool>
+      </item>
       <item path="src/ListenerAnnouncer.cpp">
         <itemTool>1</itemTool>
       </item>
       <item path="src/ListenerAnnouncer.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/LumpArea.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/LumpArea.h">
         <itemTool>3</itemTool>
       </item>
       <item path="src/Main.h">
@@ -349,7 +367,7 @@
       <item path="src/SLADEMap.h">
         <itemTool>3</itemTool>
       </item>
-      <item path="src/TextLumpArea.cpp">
+      <item path="src/TextEntryPanel.cpp">
         <itemTool>1</itemTool>
       </item>
       <item path="src/Tokenizer.cpp">
@@ -362,24 +380,6 @@
         <itemTool>1</itemTool>
       </item>
       <item path="src/WadArchive.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/WadManager.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/WadManager.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/WadManagerPanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/WadManagerPanel.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/WadPanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/WadPanel.h">
         <itemTool>3</itemTool>
       </item>
       <item path="src/WxStuff.h">
@@ -404,6 +404,7 @@
         </cCompilerTool>
         <ccCompilerTool>
           <developmentMode>5</developmentMode>
+          <stripSymbols>true</stripSymbols>
         </ccCompilerTool>
         <fortranCompilerTool>
           <developmentMode>5</developmentMode>
@@ -443,6 +444,7 @@
             <linkerLibLibItem>odbc32</linkerLibLibItem>
             <linkerLibLibItem>odbccp32</linkerLibLibItem>
           </linkerLibItems>
+          <commandLine>-Wl,-subsystem,windows</commandLine>
         </linkerTool>
       </compileType>
       <item path="src/Archive.cpp">
@@ -455,6 +457,24 @@
         <itemTool>1</itemTool>
       </item>
       <item path="src/ArchiveEntry.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/ArchiveManager.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/ArchiveManager.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/ArchiveManagerPanel.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/ArchiveManagerPanel.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/ArchivePanel.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/ArchivePanel.h">
         <itemTool>3</itemTool>
       </item>
       <item path="src/Console.cpp">
@@ -475,16 +495,16 @@
       <item path="src/EntryListPanel.h">
         <itemTool>3</itemTool>
       </item>
+      <item path="src/EntryPanel.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/EntryPanel.h">
+        <itemTool>3</itemTool>
+      </item>
       <item path="src/ListenerAnnouncer.cpp">
         <itemTool>1</itemTool>
       </item>
       <item path="src/ListenerAnnouncer.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/LumpArea.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/LumpArea.h">
         <itemTool>3</itemTool>
       </item>
       <item path="src/Main.h">
@@ -541,7 +561,7 @@
       <item path="src/SLADEMap.h">
         <itemTool>3</itemTool>
       </item>
-      <item path="src/TextLumpArea.cpp">
+      <item path="src/TextEntryPanel.cpp">
         <itemTool>1</itemTool>
       </item>
       <item path="src/Tokenizer.cpp">
@@ -554,24 +574,6 @@
         <itemTool>1</itemTool>
       </item>
       <item path="src/WadArchive.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/WadManager.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/WadManager.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/WadManagerPanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/WadManagerPanel.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/WadPanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/WadPanel.h">
         <itemTool>3</itemTool>
       </item>
       <item path="src/WxStuff.h">
@@ -639,6 +641,24 @@
       <item path="src/ArchiveEntry.h">
         <itemTool>3</itemTool>
       </item>
+      <item path="src/ArchiveManager.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/ArchiveManager.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/ArchiveManagerPanel.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/ArchiveManagerPanel.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/ArchivePanel.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/ArchivePanel.h">
+        <itemTool>3</itemTool>
+      </item>
       <item path="src/Console.cpp">
         <itemTool>1</itemTool>
       </item>
@@ -657,16 +677,16 @@
       <item path="src/EntryListPanel.h">
         <itemTool>3</itemTool>
       </item>
+      <item path="src/EntryPanel.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/EntryPanel.h">
+        <itemTool>3</itemTool>
+      </item>
       <item path="src/ListenerAnnouncer.cpp">
         <itemTool>1</itemTool>
       </item>
       <item path="src/ListenerAnnouncer.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/LumpArea.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/LumpArea.h">
         <itemTool>3</itemTool>
       </item>
       <item path="src/Main.h">
@@ -723,7 +743,7 @@
       <item path="src/SLADEMap.h">
         <itemTool>3</itemTool>
       </item>
-      <item path="src/TextLumpArea.cpp">
+      <item path="src/TextEntryPanel.cpp">
         <itemTool>1</itemTool>
       </item>
       <item path="src/Tokenizer.cpp">
@@ -736,24 +756,6 @@
         <itemTool>1</itemTool>
       </item>
       <item path="src/WadArchive.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/WadManager.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/WadManager.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/WadManagerPanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/WadManagerPanel.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/WadPanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/WadPanel.h">
         <itemTool>3</itemTool>
       </item>
       <item path="src/WxStuff.h">

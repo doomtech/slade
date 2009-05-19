@@ -1,6 +1,6 @@
 
-#ifndef __WADMANAGERPANEL_H__
-#define __WADMANAGERPANEL_H__
+#ifndef __ARCHIVEMANAGERPANEL_H__
+#define __ARCHIVEMANAGERPANEL_H__
 
 #include <wx/listctrl.h>
 #include <wx/aui/auibook.h>
@@ -8,34 +8,34 @@
 #include <wx/listbox.h>
 #include "ListenerAnnouncer.h"
 
-class WadManagerPanel;
+class ArchiveManagerPanel;
 
 class WMFileBrowser : public wxGenericDirCtrl {
 private:
 
 public:
-	WadManagerPanel*	parent;
+	ArchiveManagerPanel*	parent;
 
-	WMFileBrowser(wxWindow* parent, WadManagerPanel* wm, int id);
+	WMFileBrowser(wxWindow* parent, ArchiveManagerPanel* wm, int id);
 	~WMFileBrowser();
 
 	void onItemActivated(wxTreeEvent &e);
 };
 
-class WadManagerPanel : public wxPanel, Listener {
+class ArchiveManagerPanel : public wxPanel, Listener {
 private:
 	wxAuiNotebook*		notebook_tabs;
-	wxAuiNotebook*		notebook_wads;
-	wxListCtrl*			list_openwads;
+	wxAuiNotebook*		notebook_archives;
+	wxListCtrl*			list_archives;
 	wxListCtrl*			list_maps;
 	WMFileBrowser*		file_browser;
 	wxButton*			btn_browser_open;
-	wxMenu*				menu_wadcontext;
+	wxMenu*				menu_context;
 
 public:
 	// wxWidgets ID table
 	enum {
-		LIST_OPENWADS,
+		LIST_OPENARCHIVES,
 		LIST_MAPS,
 		TREE_BROWSER,
 		BTN_BROWSER_OPEN,
@@ -45,10 +45,10 @@ public:
 		MENU_CLOSE,
 	};
 
-	WadManagerPanel(wxWindow *parent, wxAuiNotebook* nb_wads);
-	~WadManagerPanel();
+	ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_archives);
+	~ArchiveManagerPanel();
 
-	void	refreshWadList();
+	void	refreshArchiveList();
 
 	void	openFile(string filename);
 	void	openFiles(wxArrayString& files);
@@ -65,17 +65,17 @@ public:
 	void	moveUp();
 	void	moveDown();
 
-	vector<int>	getSelectedWads();
+	vector<int>	getSelectedArchives();
 
 	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 
 	// Event handlers
-	void	onListWadsChanged(wxListEvent &e);
-	void	onListWadsActivated(wxListEvent &e);
+	void	onListArchivesChanged(wxListEvent &e);
+	void	onListArchivesActivated(wxListEvent &e);
 	void	onListMapsChanged(wxCommandEvent &e);
 	void	onListMapsActivated(wxListEvent &e);
 	void	onBrowserItemActivated(wxTreeEvent &e);
-	void	onListWadsRightClick(wxListEvent &e);
+	void	onListArchivesRightClick(wxListEvent &e);
 	void	onMenuSave(wxCommandEvent &e);
 	void	onMenuSaveAs(wxCommandEvent &e);
 	void	onMenuClose(wxCommandEvent &e);
@@ -83,4 +83,4 @@ public:
 	DECLARE_EVENT_TABLE()
 };
 
-#endif //__WADMANAGERPANEL_H__
+#endif //__ARCHIVEMANAGERPANEL_H__
