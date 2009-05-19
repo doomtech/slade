@@ -272,9 +272,6 @@ bool EntryListPanel::moveUp() {
 
 		// Swap them in the archive
 		archive->swapEntries(entry, above);
-
-		// Swap them in the list
-		swapItems(selection[a], selection[a]-1);
 	}
 
 	// Return success
@@ -303,9 +300,6 @@ bool EntryListPanel::moveDown() {
 
 		// Swap them in the archive
 		archive->swapEntries(entry, below);
-
-		// Swap them in the list
-		swapItems(selection[a], selection[a]+1);
 	}
 
 	// Return success

@@ -39,6 +39,7 @@
 MemChunk::MemChunk(DWORD size) {
 	// Init variables
 	this->size = size;
+	this->cur_ptr = 0;
 
 	// If a size is specified, allocate that much memory
 	if (size)
@@ -176,6 +177,45 @@ bool MemChunk::loadMem(BYTE* start, DWORD len) {
 
 	// Read the memory
 	memcpy(data, start, size);
+
+	return true;
+}
+
+bool MemChunk::write(void* data, DWORD size) {
+	if (cur_ptr + size > this->size)
+		reSize(cur_ptr + size, true);
+	memcpy(this->data + cur_ptr, data, size);
+	cur_ptr += size;
+	return true;
+}
+
+bool MemChunk::read(void* buf, DWORD size) {
+	if (cur_ptr + size > this->size)
+		return false;
+
+	memcpy(buf, this->data + cur_ptr, size);
+	cur_ptr += size;
+
+	return true;
+}
+
+bool MemChunk::seek(DWORD offset, DWORD start) {
+	if (start == SEEK_CUR) {
+		cur_ptr += offset;
+		if (cur_ptr > size)
+			cur_ptr = size;
+	}
+	else if (start == SEEK_SET) {
+		cur_ptr = offset;
+		if (cur_ptr > size)
+			cur_ptr = size;
+	}
+	else if (start == SEEK_END) {
+		if (offset > size)
+			cur_ptr = 0;
+		else
+			cur_ptr = size - offset;
+	}
 
 	return true;
 }

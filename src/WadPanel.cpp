@@ -131,6 +131,8 @@ bool WadPanel::moveDown() {
  * WadPanel is managing
  *******************************************************************/
 void WadPanel::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
+	event_data.seek(0, SEEK_SET);
+
 	// If the wad was closed
 	if (event_name == _T("close")) {
 		// Remove the wad panel from the parent notebook
@@ -139,6 +141,13 @@ void WadPanel::onAnnouncement(Announcer* announcer, string event_name, MemChunk&
 
 		// Destroy the wad panel
 		this->Destroy();
+	}
+
+	// Archive entries were swapped
+	if (event_name == _T("entries_swapped")) {
+		int e1, e2;
+		if (event_data.read(&e1, sizeof(int)) && event_data.read(&e2, sizeof(int)))
+			lump_list->swapItems(e1, e2);
 	}
 }
 

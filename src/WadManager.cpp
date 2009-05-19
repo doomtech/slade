@@ -105,6 +105,12 @@ Archive* WadManager::getWad(string filename) {
 Archive* WadManager::openWad(string filename) {
 	Archive* new_wad = NULL;
 
+	// Check that the file isn't already open
+	if (getWad(filename)) {
+		Global::error = _T("Archive is already open");
+		return NULL;
+	}
+
 	// Create either a wad or zip file, depending on filename extension
 	wxFileName fn(filename);
 

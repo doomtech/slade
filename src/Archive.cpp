@@ -167,7 +167,9 @@ ArchiveEntry* Archive::addNewEntry(string name, DWORD position) {
 
 	// Update variables etc
 	modified = true;
-	announce(_T("entry_added"));
+	MemChunk mc;
+	mc.write(new_entry, sizeof(ArchiveEntry*));
+	announce(_T("entry_added"), mc);
 
 	// Return the newly created entry
 	return new_entry;
@@ -197,7 +199,9 @@ ArchiveEntry* Archive::addExistingEntry(ArchiveEntry* entry, DWORD position, boo
 
 	// Update variables etc
 	modified = true;
-	announce(_T("entry_added"));
+	MemChunk mc;
+	mc.write(entry, sizeof(ArchiveEntry*));
+	announce(_T("entry_added"), mc);
 
 	// Return the added entry
 	return entry;
@@ -219,6 +223,12 @@ bool Archive::swapEntries(ArchiveEntry* entry1, ArchiveEntry* entry2) {
 	// Swap the entries in the list
 	entries[i1] = entry2;
 	entries[i2] = entry1;
+
+	// Announce the swap
+	MemChunk mc;
+	mc.write(&i1, sizeof(int));
+	mc.write(&i2, sizeof(int));
+	announce(_T("entries_swapped"), mc);
 
 	// Return success
 	return true;
