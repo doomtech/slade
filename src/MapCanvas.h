@@ -14,6 +14,7 @@ public:
 
 	void init();
 	void draw();
+	bool setContext();
 
 	void paint(wxPaintEvent &event);
 	void resize(wxSizeEvent& event);

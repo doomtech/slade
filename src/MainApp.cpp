@@ -41,12 +41,12 @@
 namespace Global {
 	string error = _("");
 }
+wxGLContext *gl_context = NULL;
 
 
 /*******************************************************************
  * EXTERNAL VARIABLES
  *******************************************************************/
-extern wxGLContext *gl_context;
 
 IMPLEMENT_APP(MainApp)
 
@@ -59,9 +59,6 @@ bool MainApp::OnInit() {
 
 	// Init logfile
 	initLogFile();
-
-	// Init OpenGL
-	initOpenGL();
 
 	// Load image handlers
 	wxImage::AddHandler(new wxPNGHandler);
@@ -91,18 +88,4 @@ void MainApp::initLogFile() {
 	wxLogMessage(_T("SLADE - It's a Doom Editor"));
 	wxLogMessage(_T("Written by Simon Judd, 2008"));
 	wxLogMessage(_T("---------------------------"));
-}
-
-/* MainApp::initLogFile
- * Creates & initialises the program GL context
- *******************************************************************/
-void MainApp::initOpenGL() {
-	// Create a temporary wxGLCanvas, it's needed for the wxGLContext constructor
-	wxGLCanvas *temp_canvas = new wxGLCanvas(NULL, -1, NULL);
-
-	// Create GL Context
-	gl_context = new wxGLContext(temp_canvas);
-
-	// Delete the temporary wxGLCanvas
-	delete temp_canvas;
 }

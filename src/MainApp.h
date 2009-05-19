@@ -10,7 +10,6 @@ public:
 	virtual int OnExit();
 
 	void initLogFile();
-	void initOpenGL();
 };
 
 #endif //__MAINAPP_H__

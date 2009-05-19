@@ -35,9 +35,9 @@
 
 
 /*******************************************************************
- * VARIABLES
+ * EXTERNAL VARIABLES
  *******************************************************************/
-wxGLContext *gl_context;
+extern wxGLContext *gl_context;
 
 
 /* MapCanvas::MapCanvas
@@ -54,12 +54,13 @@ MapCanvas::MapCanvas(wxWindow *parent, int id)
 MapCanvas::~MapCanvas() {
 }
 
+/* MapCanvas::init
+ * Initialises OpenGL settings for the map canvas
+ *******************************************************************/
 void MapCanvas::init()
 {
-	if (!IsShown())
+	if (!setContext())
 		return;
-
-	SetCurrent(*gl_context);
 
 	glViewport(0, 0, GetSize().x, GetSize().y);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -84,12 +85,16 @@ void MapCanvas::init()
 	init_done = true;
 }
 
+/* MapCanvas::draw
+ * Draw the 2d map on the map gl canvas
+ *******************************************************************/
 void MapCanvas::draw() {
 	if (!init_done)
 		init();
 
 	// Set the GL context to point to this window
-	SetCurrent(*gl_context);
+	if (!setContext())
+		return;
 
 	// Setup the viewport
 	glViewport(0, 0, GetSize().x, GetSize().y);
@@ -112,21 +117,46 @@ void MapCanvas::draw() {
 	SwapBuffers();
 }
 
+/* MapCanvas::setContext
+ * Sets the program GL context to draw to the map canvas, creates
+ * the context if it doesn't yet exist
+ *******************************************************************/
+bool MapCanvas::setContext() {
+	if (!gl_context) {
+		if (IsShown())
+			gl_context = new wxGLContext(this);
+	}
+
+	if (gl_context) {
+		gl_context->SetCurrent(*this);
+		return true;
+	}
+	else
+		return false;
+}
+
 BEGIN_EVENT_TABLE(MapCanvas, wxGLCanvas)
 	EVT_PAINT(MapCanvas::paint)
 	//EVT_SIZE(MapCanvas::resize)
 END_EVENT_TABLE()
 
+/* MapCanvas::paint
+ * Called when the map canvas has to be redrawn
+ *******************************************************************/
 void MapCanvas::paint(wxPaintEvent& event) {
 	//wxLogMessage(_T("MapCanvas paint"));
 	wxPaintDC(this);
 	draw();
 }
 
+/* MapCanvas::resize
+ * Called when the map canvas is resized
+ *******************************************************************/
 void MapCanvas::resize(wxSizeEvent& event)
 {
 	// Set the GL context to point to this window
-	SetCurrent(*gl_context);
+	if (!setContext())
+		return;
 
 	// Setup the viewport
 	glViewport(0, 0, GetSize().x, GetSize().y);
