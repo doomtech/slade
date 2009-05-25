@@ -162,6 +162,11 @@ bool WadArchive::openFile(string filename) {
 	return true;
 }
 
+/* WadArchive::save
+ * Saves the wad archive to the specified file, if no filename is
+ * given, saves to the current archive filename.
+ * Returns false if the file couldn't be written to, true otherwise
+ *******************************************************************/
 bool WadArchive::save(string filename) {
 	// If no filename specified, just use the current filename
 	if (filename == _T(""))

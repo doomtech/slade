@@ -85,6 +85,15 @@ bool EntryList::updateEntry(int index) {
 	SetItem(li);
 	SetColumnWidth(1, wxLIST_AUTOSIZE);
 
+	// Set default text colour
+	SetItemTextColour(index, wxSystemSettings::GetColour(wxSYS_COLOUR_LISTBOXTEXT));
+
+	// Set entry status text colour if needed
+	if (lump->getState() == 2)
+		SetItemTextColour(index, wxColour(0, 150, 0));
+	else if (lump->getState() == 1)
+		SetItemTextColour(index, wxColour(0, 0, 180));
+
 	return true;
 }
 

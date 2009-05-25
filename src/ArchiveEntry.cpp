@@ -140,11 +140,11 @@ void ArchiveEntry::setState(BYTE state) {
 	else {
 		if (state > this->state)
 			this->state = state;
-
-		// Notify parent archive this entry has been modified
-		if (parent)
-			parent->entryModified(this);
 	}
+
+	// Notify parent archive this entry has been modified
+	if (parent)
+		parent->entryModified(this);
 }
 
 /* ArchiveEntry::rename
