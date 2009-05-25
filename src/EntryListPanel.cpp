@@ -92,7 +92,7 @@ bool EntryList::updateEntry(int index) {
 	if (lump->getState() == 2)
 		SetItemTextColour(index, wxColour(0, 150, 0));
 	else if (lump->getState() == 1)
-		SetItemTextColour(index, wxColour(0, 0, 180));
+		SetItemTextColour(index, wxColour(0, 80, 180));
 
 	return true;
 }
