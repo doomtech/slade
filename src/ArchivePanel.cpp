@@ -35,7 +35,7 @@
 #include "EntryListPanel.h"
 #include "WadArchive.h"
 #include <wx/aui/auibook.h>
-#include <wx\filename.h>
+#include <wx/filename.h>
 
 
 /* ArchivePanel::ArchivePanel
