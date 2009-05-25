@@ -139,6 +139,24 @@ void ArchiveManagerPanel::refreshArchiveList() {
 		list_archives->InsertItem(list_archives->GetItemCount(), wm.getArchive(a)->getFileName(true));
 }
 
+/* ArchiveManagerPanel::isArchivePanel
+ * Checks if the currently selected tab is an ArchivePanel
+ * Returns true if it is, false if not
+ *******************************************************************/
+bool ArchiveManagerPanel::isArchivePanel(int tab_index) {
+	// Check that tab index is in range
+	if (tab_index < 0 || tab_index >= notebook_archives->GetPageCount())
+		return false;
+
+	// Check that it isn't the start page
+	if (!(notebook_archives->GetPageText(tab_index).compare(_T("Start Page"))))
+		return false;
+
+	// Currently can't be anything other than the start page or an archive panel,
+	// so it's valid
+	return true;
+}
+
 /* ArchiveManagerPanel::openFile
  * Opens an archive and initialises the UI for it
  *******************************************************************/
@@ -283,10 +301,8 @@ void ArchiveManagerPanel::closeSelection() {
  *******************************************************************/
 void ArchiveManagerPanel::saveCurrent() {
 	int selection = notebook_archives->GetSelection();
-	if (notebook_archives->GetPageText(selection).compare(_T("Start Page")))
-		return;
-
-	((ArchivePanel*) notebook_archives->GetPage(selection))->save();
+	if (isArchivePanel(selection))
+		((ArchivePanel*) notebook_archives->GetPage(selection))->save();
 }
 
 /* ArchiveManagerPanel::saveCurrentAs
@@ -295,10 +311,8 @@ void ArchiveManagerPanel::saveCurrent() {
  *******************************************************************/
 void ArchiveManagerPanel::saveCurrentAs() {
 	int selection = notebook_archives->GetSelection();
-	if (!notebook_archives->GetPageText(selection).compare(_T("Start Page")))
-		return;
-
-	((ArchivePanel*) notebook_archives->GetPage(selection))->saveAs();
+	if (isArchivePanel(selection))
+		((ArchivePanel*) notebook_archives->GetPage(selection))->saveAs();
 }
 
 /* ArchiveManagerPanel::closeCurrent
@@ -306,11 +320,51 @@ void ArchiveManagerPanel::saveCurrentAs() {
  *******************************************************************/
 void ArchiveManagerPanel::closeCurrent() {
 	int selection = notebook_archives->GetSelection();
-	if (!notebook_archives->GetPageText(selection).compare(_T("Start Page")))
-		return;
+	if (isArchivePanel(selection)) {
+		Archive* wad = ((ArchivePanel*) notebook_archives->GetPage(selection))->getArchive();
+		ArchiveManager::getInstance().closeArchive(wad);
+	}
+}
 
-	Archive* wad = ((ArchivePanel*) notebook_archives->GetPage(selection))->getArchive();
-	ArchiveManager::getInstance().closeArchive(wad);
+/* ArchiveManagerPanel::newEntry
+ * Signals the currently opened archive panel tab to create a new
+ * entry
+ *******************************************************************/
+void ArchiveManagerPanel::newEntry() {
+	// Send to current archive panel
+	int selection = notebook_archives->GetSelection();
+	if (isArchivePanel(selection))
+		((ArchivePanel*) notebook_archives->GetPage(selection))->newEntry();
+}
+
+/* ArchiveManagerPanel::newEntryFromFile
+ * Signals the currently opened archive panel tab to create a new
+ * entry from a file
+ *******************************************************************/
+void ArchiveManagerPanel::newEntryFromFile() {
+	// Send to current archive panel
+	int selection = notebook_archives->GetSelection();
+	if (isArchivePanel(selection))
+		((ArchivePanel*) notebook_archives->GetPage(selection))->newEntryFromFile();
+}
+
+/* ArchiveManagerPanel::renameEntry
+ * Signals the currently opened archive panel tab to rename any
+ * selected entries
+ *******************************************************************/
+void ArchiveManagerPanel::renameEntry() {
+	// Send to current archive panel
+	int selection = notebook_archives->GetSelection();
+	if (isArchivePanel(selection))
+		((ArchivePanel*) notebook_archives->GetPage(selection))->renameEntry();
+}
+
+/* ArchiveManagerPanel::deleteEntry
+ * Signals the currently opened archive panel tab to delete any
+ * selected entries
+ *******************************************************************/
+void ArchiveManagerPanel::deleteEntry() {
+
 }
 
 /* ArchiveManagerPanel::moveUp
@@ -319,10 +373,8 @@ void ArchiveManagerPanel::closeCurrent() {
  *******************************************************************/
 void ArchiveManagerPanel::moveUp() {
 	int selection = notebook_archives->GetSelection();
-	if (!notebook_archives->GetPageText(selection).compare(_T("Start Page")))
-		return;
-
-	((ArchivePanel*) notebook_archives->GetPage(selection))->moveUp();
+	if (isArchivePanel(selection))
+		((ArchivePanel*) notebook_archives->GetPage(selection))->moveUp();
 }
 
 /* ArchiveManagerPanel::moveDown
@@ -331,10 +383,8 @@ void ArchiveManagerPanel::moveUp() {
  *******************************************************************/
 void ArchiveManagerPanel::moveDown() {
 	int selection = notebook_archives->GetSelection();
-	if (!notebook_archives->GetPageText(selection).compare(_T("Start Page")))
-		return;
-
-	((ArchivePanel*) notebook_archives->GetPage(selection))->moveDown();
+	if (isArchivePanel(selection))
+		((ArchivePanel*) notebook_archives->GetPage(selection))->moveDown();
 }
 
 /*******************************************************************

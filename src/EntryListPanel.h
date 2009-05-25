@@ -24,7 +24,6 @@ class EntryListPanel : public wxPanel {
 private:
 	Archive*	archive;
 	EntryList*	entry_list;
-	long		focus_index;
 
 public:
 	enum {
@@ -36,9 +35,12 @@ public:
 
 	void					populateEntryList();
 	ArchiveEntry*			getFocusedEntry();
+	int						getFocus();
 	vector<ArchiveEntry*>	getSelectedEntries();
 	vector<int>				getSelection();
 	bool					swapItems(int item1, int item2);
+	bool					addEntry(DWORD archive_index);
+	bool					updateEntry(DWORD archive_index);
 
 	bool	moveUp();
 	bool	moveDown();

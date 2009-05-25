@@ -1,31 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configurationDescriptor version="51">
   <logicalFolder name="root" displayName="root" projectFiles="true">
-    <logicalFolder name="HeaderFiles"
-                   displayName="Header Files"
-                   projectFiles="true">
+    <logicalFolder name="f4" displayName="General" projectFiles="true">
+      <itemPath>src/Console.cpp</itemPath>
       <itemPath>src/Console.h</itemPath>
+      <itemPath>src/ListenerAnnouncer.cpp</itemPath>
       <itemPath>src/ListenerAnnouncer.h</itemPath>
       <itemPath>src/Main.h</itemPath>
+      <itemPath>src/MainApp.cpp</itemPath>
       <itemPath>src/MainApp.h</itemPath>
+      <itemPath>src/MemChunk.cpp</itemPath>
       <itemPath>src/MemChunk.h</itemPath>
+      <itemPath>src/Tokenizer.cpp</itemPath>
       <itemPath>src/Tokenizer.h</itemPath>
       <itemPath>src/WxStuff.h</itemPath>
     </logicalFolder>
+    <logicalFolder name="f2" displayName="Main Editor" projectFiles="true">
+      <logicalFolder name="f1" displayName="UI Panels" projectFiles="true">
+        <itemPath>src/ArchiveManagerPanel.cpp</itemPath>
+        <itemPath>src/ArchiveManagerPanel.h</itemPath>
+        <itemPath>src/ArchivePanel.cpp</itemPath>
+        <itemPath>src/ArchivePanel.h</itemPath>
+        <itemPath>src/ConsolePanel.cpp</itemPath>
+        <itemPath>src/ConsolePanel.h</itemPath>
+        <itemPath>src/EntryListPanel.cpp</itemPath>
+        <itemPath>src/EntryListPanel.h</itemPath>
+        <itemPath>src/EntryPanel.cpp</itemPath>
+        <itemPath>src/EntryPanel.h</itemPath>
+        <itemPath>src/TextEntryPanel.cpp</itemPath>
+      </logicalFolder>
+      <itemPath>src/MainWindow.cpp</itemPath>
+      <itemPath>src/MainWindow.h</itemPath>
+    </logicalFolder>
     <logicalFolder name="f3" displayName="Map Editor" projectFiles="true">
-      <logicalFolder name="f1" displayName="UI" projectFiles="true">
+      <logicalFolder name="f2" displayName="SLADEMap" projectFiles="true">
+        <itemPath>src/MapLine.h</itemPath>
+        <itemPath>src/MapSector.h</itemPath>
+        <itemPath>src/MapSide.h</itemPath>
+        <itemPath>src/MapThing.h</itemPath>
+        <itemPath>src/MapVertex.h</itemPath>
+        <itemPath>src/SLADEMap.cpp</itemPath>
+        <itemPath>src/SLADEMap.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f1" displayName="UI Panels" projectFiles="true">
         <itemPath>src/MapCanvas.cpp</itemPath>
         <itemPath>src/MapCanvas.h</itemPath>
-        <itemPath>src/MapEditorWindow.cpp</itemPath>
-        <itemPath>src/MapEditorWindow.h</itemPath>
       </logicalFolder>
-      <itemPath>src/MapLine.h</itemPath>
-      <itemPath>src/MapSector.h</itemPath>
-      <itemPath>src/MapSide.h</itemPath>
-      <itemPath>src/MapThing.h</itemPath>
-      <itemPath>src/MapVertex.h</itemPath>
-      <itemPath>src/SLADEMap.cpp</itemPath>
-      <itemPath>src/SLADEMap.h</itemPath>
+      <itemPath>src/MapEditorWindow.cpp</itemPath>
+      <itemPath>src/MapEditorWindow.h</itemPath>
     </logicalFolder>
     <logicalFolder name="f1" displayName="Resources" projectFiles="true">
       <logicalFolder name="f1" displayName="Archive" projectFiles="true">
@@ -40,30 +62,6 @@
       </logicalFolder>
       <itemPath>src/ArchiveManager.cpp</itemPath>
       <itemPath>src/ArchiveManager.h</itemPath>
-    </logicalFolder>
-    <logicalFolder name="SourceFiles"
-                   displayName="Source Files"
-                   projectFiles="true">
-      <itemPath>src/Console.cpp</itemPath>
-      <itemPath>src/ListenerAnnouncer.cpp</itemPath>
-      <itemPath>src/MainApp.cpp</itemPath>
-      <itemPath>src/MemChunk.cpp</itemPath>
-      <itemPath>src/Tokenizer.cpp</itemPath>
-    </logicalFolder>
-    <logicalFolder name="f2" displayName="UI" projectFiles="true">
-      <itemPath>src/ArchiveManagerPanel.cpp</itemPath>
-      <itemPath>src/ArchiveManagerPanel.h</itemPath>
-      <itemPath>src/ArchivePanel.cpp</itemPath>
-      <itemPath>src/ArchivePanel.h</itemPath>
-      <itemPath>src/ConsolePanel.cpp</itemPath>
-      <itemPath>src/ConsolePanel.h</itemPath>
-      <itemPath>src/EntryListPanel.cpp</itemPath>
-      <itemPath>src/EntryListPanel.h</itemPath>
-      <itemPath>src/EntryPanel.cpp</itemPath>
-      <itemPath>src/EntryPanel.h</itemPath>
-      <itemPath>src/MainWindow.cpp</itemPath>
-      <itemPath>src/MainWindow.h</itemPath>
-      <itemPath>src/TextEntryPanel.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

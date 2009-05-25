@@ -100,7 +100,6 @@ EntryListPanel::EntryListPanel(wxWindow *parent, int id, Archive* archive)
 : wxPanel(parent, id) {
 	// Init variables
 	this->archive = archive;
-	this->focus_index = -1;
 
 	// Create & set sizer & border
 	wxStaticBox *frame = new wxStaticBox(this, -1, _T("Lumps"));
@@ -153,12 +152,23 @@ void EntryListPanel::populateEntryList() {
  * item. Returns NULL if nothing is focused
  *******************************************************************/
 ArchiveEntry* EntryListPanel::getFocusedEntry() {
+	// Get the focus index
+	int focus = getFocus();
+
 	// Check that the focus index is invalid
-	if (focus_index < 0 || focus_index > entry_list->GetItemCount())
+	if (focus < 0 || focus > entry_list->GetItemCount())
 		return NULL;
 
 	// Return the focused archive entry
-	return (ArchiveEntry*) (entry_list->GetItemData(focus_index));
+	return (ArchiveEntry*) (entry_list->GetItemData(focus));
+}
+
+/* EntryListPanel::getFocusedEntry
+ * Gets the list index of the currently focused list item
+ *******************************************************************/
+int EntryListPanel::getFocus() {
+	// Get the item in the list that is focused
+	return entry_list->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_FOCUSED);
 }
 
 /* EntryListPanel::getSelectedEntries
@@ -250,6 +260,38 @@ bool EntryListPanel::swapItems(int item1, int item2) {
 	return true;
 }
 
+/* EntryListPanel::addEntry
+ * Adds an entry to the list
+ *******************************************************************/
+bool EntryListPanel::addEntry(DWORD archive_index) {
+	// Get the entry to add
+	ArchiveEntry* entry = archive->getEntry(archive_index);
+
+	// Check it
+	if (!entry)
+		return false;
+
+	// Setup new entry
+	wxListItem li;
+	li.SetId(archive_index);
+	li.SetData(entry);
+
+	// Add it to the list
+	entry_list->InsertItem(li);
+	entry_list->updateEntry(archive_index);
+
+	return true;
+}
+
+/* EntryListPanel::addEntry
+ * Updates an entry in the list
+ *******************************************************************/
+bool EntryListPanel::updateEntry(DWORD archive_index) {
+	// Just update the list item corresponding with the entry index
+	// (it's 1-1 in a normal EntryListPanel, will be different for zip archives)
+	entry_list->updateEntry(archive_index);
+}
+
 /* EntryListPanel::moveUp
  * Moves all selected entries up.
  * Returns false if the first selected item was at the top of the
@@ -315,7 +357,7 @@ END_EVENT_TABLE()
  *******************************************************************/
 void EntryListPanel::onEntryListChange(wxListEvent& event) {
 	// Set the currently focused item index
-	focus_index = event.GetIndex();
+	//focus_index = event.GetIndex();
 
 	// Pass the event up to the parent window, as the wad panel should deal with it,
 	// not this panel.

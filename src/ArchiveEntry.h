@@ -7,6 +7,8 @@ class Archive;
 #include <wx/hashmap.h>
 WX_DECLARE_STRING_HASH_MAP(wxString, PropertyList);
 
+#include "ListenerAnnouncer.h"
+
 // Entry types enum
 enum {
 	ETYPE_UNKNOWN = 0,
@@ -56,7 +58,7 @@ enum {
 	ETYPE_COUNT,
 };
 
-class ArchiveEntry {
+class ArchiveEntry : public Announcer {
 private:
 	Archive*		parent;
 	string			name;
@@ -81,7 +83,7 @@ public:
 	BYTE		getType() { return type; }
 	BYTE		getState() { return state; }
 
-	// Modifiers
+	// Modifiers (won't change entry state)
 	void		setParent(Archive* parent) { this->parent = parent; }
 	void		setName(string name) { this->name = name; }
 	void		setLoaded(bool loaded = true) { data_loaded = loaded; }
@@ -90,13 +92,16 @@ public:
 	void		setType(BYTE type) { this->type = type; }
 	void		setState(BYTE state);
 
+	// Entry modification (will change entry state)
+	void	rename(string new_name);
+
 	// Data modification
 	void	clearData();
 
 	// Data import
 	bool	importMem(void* data, DWORD size);
 	bool	importMemChunk(MemChunk& mc);
-	bool	importFile(string filename, DWORD offset, DWORD size);
+	bool	importFile(string filename, DWORD offset = 0, DWORD size = 0);
 	bool	importEntry(ArchiveEntry* entry);
 
 	// Type detection

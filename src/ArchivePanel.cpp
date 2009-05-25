@@ -34,6 +34,7 @@
 #include "ArchivePanel.h"
 #include "EntryListPanel.h"
 #include <wx/aui/auibook.h>
+#include <wx\filename.h>
 
 
 /* ArchivePanel::ArchivePanel
@@ -49,17 +50,17 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 	SetSizer(m_hbox);
 
 	// Lump list panel
-	lump_list = new EntryListPanel(this, ENTRY_LIST_PANEL, archive);
-	m_hbox->Add(lump_list, 0, wxEXPAND | wxALL, 4);
+	entry_list = new EntryListPanel(this, ENTRY_LIST_PANEL, archive);
+	m_hbox->Add(entry_list, 0, wxEXPAND | wxALL, 4);
 
-	lump_list->populateEntryList();
+	entry_list->populateEntryList();
 
 	// Create lump areas
-	lump_area = new EntryPanel(this);
+	entry_area = new EntryPanel(this);
 	text_area = new TextEntryPanel(this);
 
 	// Add default lump area to the panel
-	cur_area = lump_area;
+	cur_area = entry_area;
 	m_hbox->Add(cur_area, 1, wxEXPAND | wxALL, 4);
 	cur_area->Show(true);
 
@@ -110,12 +111,98 @@ void ArchivePanel::saveAs() {
 	}
 }
 
+/* ArchivePanel::newEntry
+ * Creates a new entry, asks for a name and adds it before the
+ * currently focused entry
+ *******************************************************************/
+bool ArchivePanel::newEntry() {
+	// Get the currently focused entry index
+	int index = archive->entryIndex(entry_list->getFocusedEntry());
+
+	// Prompt for new entry name
+	string name = wxGetTextFromUser(_T("Enter new entry name:"), _T("New Entry"));
+
+	// Add the entry to the archive
+	ArchiveEntry* new_entry = archive->addNewEntry(name, index);
+
+	// Return success if entry was created
+	if (new_entry)
+		return true;
+	else
+		return false;
+}
+
+/* ArchivePanel::newEntryFromFile
+ * Creates a new entry, imports a file into it and adds it before the
+ * currently focused entry
+ *******************************************************************/
+bool ArchivePanel::newEntryFromFile() {
+	// Get the currently focused entry index
+	int index = archive->entryIndex(entry_list->getFocusedEntry());
+
+	// Create open file dialog
+	wxFileDialog *dialog_open = new wxFileDialog(this, _T("Choose file to open"), wxEmptyString, wxEmptyString,
+			_T("Any File (*.*)|*.*"), wxFD_OPEN | /*wxFD_MULTIPLE |*/ wxFD_FILE_MUST_EXIST, wxDefaultPosition);
+
+	// Run the dialog & check that the user didn't cancel
+	if (dialog_open->ShowModal() == wxID_OK) {
+		wxFileName fn(dialog_open->GetPath());
+		string filename = fn.GetFullName();
+
+		// Prompt for new entry name
+		string name = wxGetTextFromUser(_T("Enter new entry name:"), _T("New Entry"), filename);
+
+		// Add the entry to the archive
+		ArchiveEntry* new_entry = archive->addNewEntry(name, index);
+
+		// Load entry data from selected file
+		new_entry->importFile(fn.GetFullPath());
+
+		// Return success if entry was created
+		if (new_entry)
+			return true;
+		else
+			return false;
+	}
+	else // If user canceled return false
+		return false;
+}
+
+/* ArchivePanel::renameEntry
+ * Renames the selected entries
+ *******************************************************************/
+bool ArchivePanel::renameEntry() {
+	// Get a list of selected entries
+	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
+
+	// Go through the list
+	for (size_t a = 0; a < selection.size(); a++) {
+		// Get the current entry's name
+		ArchiveEntry* entry = selection[a];
+		string old_name = entry->getName();
+
+		// Prompt for a new name
+		string new_name = wxGetTextFromUser(_T("Enter new entry name:"), _T("New Entry"), old_name);
+
+		// Rename the entry if a different name was specified
+		if (new_name.Cmp(wxEmptyString) && new_name.Cmp(old_name))
+			archive->renameEntry(entry, new_name);
+	}
+}
+
+/* ArchivePanel::deleteEntry
+ * Deletes the selected entries
+ *******************************************************************/
+bool ArchivePanel::deleteEntry() {
+
+}
+
 /* ArchivePanel::moveUp
  * Moves selected entries up
  *******************************************************************/
 bool ArchivePanel::moveUp() {
 	// Get the entry list class to handle it
-	return lump_list->moveUp();
+	return entry_list->moveUp();
 }
 
 /* ArchivePanel::moveDown
@@ -123,7 +210,7 @@ bool ArchivePanel::moveUp() {
  *******************************************************************/
 bool ArchivePanel::moveDown() {
 	// Get the entry list class to handle it
-	return lump_list->moveDown();
+	return entry_list->moveDown();
 }
 
 /* ArchivePanel::onAnnouncement
@@ -131,10 +218,11 @@ bool ArchivePanel::moveDown() {
  * this ArchivePanel is managing
  *******************************************************************/
 void ArchivePanel::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
+	// Reset event data for reading
 	event_data.seek(0, SEEK_SET);
 
 	// If the archive was closed
-	if (event_name == _T("close")) {
+	if (announcer == archive && event_name == _T("close")) {
 		// Remove the archive panel from the parent notebook
 		wxAuiNotebook* parent = (wxAuiNotebook*)GetParent();
 		parent->RemovePage(parent->GetPageIndex(this));
@@ -144,10 +232,24 @@ void ArchivePanel::onAnnouncement(Announcer* announcer, string event_name, MemCh
 	}
 
 	// Archive entries were swapped
-	if (event_name == _T("entries_swapped")) {
+	if (announcer == archive && event_name == _T("entries_swapped")) {
 		int e1, e2;
 		if (event_data.read(&e1, sizeof(int)) && event_data.read(&e2, sizeof(int)))
-			lump_list->swapItems(e1, e2);
+			entry_list->swapItems(e1, e2);
+	}
+
+	// An entry was added to the archive
+	if (announcer == archive && event_name == _T("entry_added")) {
+		DWORD index = 0;
+		if (event_data.read(&index, sizeof(DWORD)))
+			entry_list->addEntry(index);
+	}
+
+	// An entry in the archive was modified
+	if (announcer == archive && event_name == _T("entry_modified")) {
+		DWORD index = 0;
+		if (event_data.read(&index, sizeof(DWORD)))
+			entry_list->updateEntry(index);
 	}
 }
 
@@ -169,7 +271,7 @@ void ArchivePanel::onEntryListChange(wxListEvent& event) {
 	cur_area->Show(false);
 	sizer->Replace(cur_area, text_area);
 	cur_area = text_area;
-	cur_area->loadEntry(lump_list->getFocusedEntry());
+	cur_area->loadEntry(entry_list->getFocusedEntry());
 	cur_area->Show(true);
 
 	Layout();

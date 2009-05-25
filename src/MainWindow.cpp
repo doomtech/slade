@@ -85,11 +85,11 @@ void MainWindow::setupLayout() {
 
 	// Entry menu
 	wxMenu* entryMenu = new wxMenu(_T(""));
-	entryMenu->Append(MENU_ENTRY_NEW,				_("New"),					_("Create a new empty lump entry"));
-	entryMenu->Append(MENU_ENTRY_NEWFROMFILE,		_("New from File"),			_("Create a new lump entry with data from a file"));
+	entryMenu->Append(MENU_ENTRY_NEW,				_("New"),					_("Create a new empty entry"));
+	entryMenu->Append(MENU_ENTRY_NEWFROMFILE,		_("New from File"),			_("Create a new entry with data from a file"));
 	entryMenu->AppendSeparator();
-	entryMenu->Append(MENU_UNIMPLEMENTED,			_("Delete"),				_("Delete the selected entries"));
-	entryMenu->Append(MENU_UNIMPLEMENTED,			_("Rename"),				_("Rename the selected entries"));
+	entryMenu->Append(MENU_ENTRY_RENAME,			_("Rename"),				_("Rename the selected entries"));
+	entryMenu->Append(MENU_ENTRY_DELETE,			_("Delete"),				_("Delete the selected entries"));
 	entryMenu->AppendSeparator();
 	entryMenu->Append(MENU_UNIMPLEMENTED,			_("Import"),				_("Import a file to the selected entry"));
 	entryMenu->Append(MENU_UNIMPLEMENTED,			_("Export"),				_("Export the selected entries to files"));
@@ -237,6 +237,10 @@ BEGIN_EVENT_TABLE(MainWindow, wxFrame)
 	EVT_MENU(MENU_FILE_CLOSE, MainWindow::onFileClose)
 
 	// Entry menu
+	EVT_MENU(MENU_ENTRY_NEW, MainWindow::onEntryNew)
+	EVT_MENU(MENU_ENTRY_NEWFROMFILE, MainWindow::onEntryNewFromFile)
+	EVT_MENU(MENU_ENTRY_RENAME, MainWindow::onEntryRename)
+	EVT_MENU(MENU_ENTRY_DELETE, MainWindow::onEntryDelete)
 	EVT_MENU(MENU_ENTRY_MOVEUP, MainWindow::onEntryMoveUp)
 	EVT_MENU(MENU_ENTRY_MOVEDOWN, MainWindow::onEntryMoveDown)
 
@@ -292,6 +296,34 @@ void MainWindow::onFileSaveAs(wxCommandEvent& e) {
  *******************************************************************/
 void MainWindow::onFileClose(wxCommandEvent& e) {
 	panel_archivemanager->closeCurrent();
+}
+
+/* MainWindow::onEntryNew
+ * Entry->New menu item event handler.
+ *******************************************************************/
+void MainWindow::onEntryNew(wxCommandEvent& e) {
+	panel_archivemanager->newEntry();
+}
+
+/* MainWindow::onEntryNewFromFile
+ * Entry->New from File menu item event handler.
+ *******************************************************************/
+void MainWindow::onEntryNewFromFile(wxCommandEvent& e) {
+	panel_archivemanager->newEntryFromFile();
+}
+
+/* MainWindow::onEntryRename
+ * Entry->Rename menu item event handler.
+ *******************************************************************/
+void MainWindow::onEntryRename(wxCommandEvent& e) {
+	panel_archivemanager->renameEntry();
+}
+
+/* MainWindow::onEntryDelete
+ * Entry->Delete menu item event handler.
+ *******************************************************************/
+void MainWindow::onEntryDelete(wxCommandEvent& e) {
+	panel_archivemanager->deleteEntry();
 }
 
 /* MainWindow::onEntryMoveUp

@@ -10,11 +10,11 @@
 class ArchivePanel : public wxPanel, Listener {
 private:
 	Archive*		archive;
-	EntryListPanel*	lump_list;
+	EntryListPanel*	entry_list;
 
 	// Lump areas
 	EntryPanel*		cur_area;
-	EntryPanel*		lump_area;
+	EntryPanel*		entry_area;
 	TextEntryPanel*	text_area;
 
 public:
@@ -32,6 +32,10 @@ public:
 	void		saveAs();
 
 	// Entry manipulation functions
+	bool	newEntry();
+	bool	newEntryFromFile();
+	bool	renameEntry();
+	bool	deleteEntry();
 	bool	moveUp();
 	bool	moveDown();
 

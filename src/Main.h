@@ -14,6 +14,9 @@ typedef wxString string;
 #include <vector>
 using std::vector;
 
+// Logfile
+#include <wx/log.h>
+
 // Define some variable types
 #ifndef _VAR_TYPES
 typedef unsigned char BYTE;

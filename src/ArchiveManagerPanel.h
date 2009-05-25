@@ -49,6 +49,7 @@ public:
 	~ArchiveManagerPanel();
 
 	void	refreshArchiveList();
+	bool	isArchivePanel(int tab_index);
 
 	void	openFile(string filename);
 	void	openFiles(wxArrayString& files);
@@ -62,6 +63,10 @@ public:
 	void	saveCurrent();
 	void	saveCurrentAs();
 	void	closeCurrent();
+	void	newEntry();
+	void	newEntryFromFile();
+	void	renameEntry();
+	void	deleteEntry();
 	void	moveUp();
 	void	moveDown();
 

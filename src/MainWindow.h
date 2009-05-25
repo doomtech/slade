@@ -32,6 +32,8 @@ public:
 
 		MENU_ENTRY_NEW,
 		MENU_ENTRY_NEWFROMFILE,
+		MENU_ENTRY_RENAME,
+		MENU_ENTRY_DELETE,
 		MENU_ENTRY_IMPORT,
 		MENU_ENTRY_EXPORT,
 		MENU_ENTRY_MOVEUP,
@@ -55,6 +57,10 @@ public:
 	void	onFileSaveAs(wxCommandEvent &e);
 	void	onFileClose(wxCommandEvent &e);
 
+	void	onEntryNew(wxCommandEvent &e);
+	void	onEntryNewFromFile(wxCommandEvent &e);
+	void	onEntryRename(wxCommandEvent &e);
+	void	onEntryDelete(wxCommandEvent &e);
 	void	onEntryMoveUp(wxCommandEvent &e);
 	void	onEntryMoveDown(wxCommandEvent &e);
 

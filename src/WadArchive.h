@@ -19,6 +19,9 @@ public:
 	void	setEntryOffset(ArchiveEntry* entry, DWORD offset);
 	bool	loadEntryData(ArchiveEntry* entry);
 
+	bool	addEntry(ArchiveEntry* entry, DWORD position = 0);
+	bool	renameEntry(ArchiveEntry* entry, string new_name);
+
 	vector<mapdesc_t>	detectMaps();
 };
 

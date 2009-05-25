@@ -41,7 +41,7 @@ ArchiveEntry::ArchiveEntry(string name, Archive* parent) {
 	this->name = name;
 	this->data = NULL;
 	this->size = 0;
-	this->data_loaded = false;
+	this->data_loaded = true;
 	this->state = 2;
 }
 
@@ -140,7 +140,19 @@ void ArchiveEntry::setState(BYTE state) {
 	else {
 		if (state > this->state)
 			this->state = state;
+
+		// Notify parent archive this entry has been modified
+		if (parent)
+			parent->entryModified(this);
 	}
+}
+
+/* ArchiveEntry::rename
+ * Renames the entry
+ *******************************************************************/
+void ArchiveEntry::rename(string new_name) {
+	setName(new_name);
+	setState(1);
 }
 
 /* ArchiveEntry::clearData
@@ -177,6 +189,7 @@ bool ArchiveEntry::importMem(void* data, DWORD size) {
 	// Update attributes
 	this->size = size;
 	setState(1);
+	setLoaded();
 
 	return true;
 }
@@ -198,25 +211,27 @@ bool ArchiveEntry::importMemChunk(MemChunk& mc) {
 
 /* ArchiveEntry::importFile
  * Loads a portion of a file into the entry, overwriting any existing
- * data currently in the entry. A size of -1 means load from the
+ * data currently in the entry. A size of 0 means load from the
  * offset to the end of the file.
  * Returns false if the file does not exist or the given offset/size
  * are out of bounds, otherwise returns true.
  *******************************************************************/
-bool ArchiveEntry::importFile(string filename, DWORD offset = 0, DWORD size = -1) {
+bool ArchiveEntry::importFile(string filename, DWORD offset, DWORD size) {
 	// Open the file
 	FILE* fp = fopen(filename.ToAscii(), "rb");
 
 	// Check that it opened ok
-	if (!fp)
+	if (!fp) {
+		wxLogMessage(s_fmt(_T("Error opening file %s"), filename.c_str()));
 		return false;
+	}
 
 	// Get the file's size
 	fseek(fp, 0, SEEK_END);
 	DWORD fsize = ftell(fp);
 
-	// Get the size to read, if negative
-	if (size < 0)
+	// Get the size to read, if zero
+	if (size == 0)
 		size = fsize - offset;
 
 	// Check offset/size bounds
@@ -227,14 +242,18 @@ bool ArchiveEntry::importFile(string filename, DWORD offset = 0, DWORD size = -1
 
 	// Create temporary buffer and load file contents
 	BYTE* temp_buf = new BYTE[size];
-	fseek(fp, offset, SEEK_SET);
-	fread(temp_buf, size, 1, fp);
+	fseek(fp, 0, SEEK_SET);
+	fseek(fp, offset, SEEK_CUR);
+	fread(temp_buf, 1, size, fp);
+
+	// Close the file
+	fclose(fp);
 
 	// Import data into lump
 	importMem(temp_buf, size);
 
 	// Delete temp buffer
-	delete temp_buf;
+	delete[] temp_buf;
 
 	return true;
 }

@@ -51,6 +51,9 @@ Archive::~Archive() {
  * Returns -1 if the entry doesn't exist in the Archive.
  *******************************************************************/
 int Archive::entryIndex(ArchiveEntry* entry) {
+	if (!entry)
+		return -1;
+
 	for (size_t a = 0; a < entries.size(); a++) {
 		if (entries[a] == entry)
 			return a;
@@ -148,28 +151,46 @@ vector<Archive::mapdesc_t> Archive::detectMaps() {
 	return maps;
 }
 
+bool Archive::addEntry(ArchiveEntry* entry, DWORD position) {
+	// Check valid entry
+	if (!entry)
+		return false;
+
+	// Check the position, if it's out of range, change it
+	if (position < 0)
+		position = 0;
+	if (position > entries.size())
+		position = entries.size();
+
+	// Add it to the entry list
+	if (position < entries.size())
+		entries.insert(entries.begin() + position, entry);
+	else
+		entries.push_back(entry);
+
+	// Update variables etc
+	modified = true;
+	entry->setParent(this);
+	entry->setState(2);
+
+	// Announce
+	MemChunk mc;
+	mc.write(&position, sizeof(DWORD));
+	announce(_T("entry_added"), mc);
+
+	return true;
+}
+
 /* Archive::addNewEntry
  * Creates a new ArchiveEntry and adds it to the archive before the
  * position specified. Returns the created entry
  *******************************************************************/
 ArchiveEntry* Archive::addNewEntry(string name, DWORD position) {
-	// Check the position, if it's out of range, change it
-	if (position < 0)
-		position = 0;
-	if (position >= entries.size())
-		position = entries.size() - 1;
-
 	// Create the new entry
 	ArchiveEntry* new_entry = new ArchiveEntry(name);
 
-	// Add it to the entry list
-	entries.insert(entries.begin() + position, new_entry);
-
-	// Update variables etc
-	modified = true;
-	MemChunk mc;
-	mc.write(new_entry, sizeof(ArchiveEntry*));
-	announce(_T("entry_added"), mc);
+	// Add it to the entry list at position
+	addEntry(new_entry, position);
 
 	// Return the newly created entry
 	return new_entry;
@@ -180,28 +201,12 @@ ArchiveEntry* Archive::addNewEntry(string name, DWORD position) {
  * specified. Returns the added archive entry
  *******************************************************************/
 ArchiveEntry* Archive::addExistingEntry(ArchiveEntry* entry, DWORD position, bool copy) {
-	// Check the given entry exists
-	if (!entry)
-		return false;
-
-	// Check the position, if it's out of range, change it
-	if (position < 0)
-		position = 0;
-	if (position >= entries.size())
-		position = entries.size() - 1;
-
 	// Make a copy of the entry to add if needed
 	if (copy)
 		entry = new ArchiveEntry(*entry);
 
 	// Add the entry to the list
-	entries.insert(entries.begin() + position, entry);
-
-	// Update variables etc
-	modified = true;
-	MemChunk mc;
-	mc.write(entry, sizeof(ArchiveEntry*));
-	announce(_T("entry_added"), mc);
+	addEntry(entry, position);
 
 	// Return the added entry
 	return entry;
@@ -232,4 +237,29 @@ bool Archive::swapEntries(ArchiveEntry* entry1, ArchiveEntry* entry2) {
 
 	// Return success
 	return true;
+}
+
+bool Archive::renameEntry(ArchiveEntry* entry, string new_name) {
+	// Check entry is valid
+	if (!entry)
+		return false;
+
+	// Check entry is part of this archive
+	if (entry->getParent() != this)
+		return false;
+
+	// Rename the entry
+	entry->rename(new_name);
+}
+
+void Archive::entryModified(ArchiveEntry* entry) {
+	// Check the entry belongs to this archive (should always)
+	if (entry->getParent() != this)
+		return;
+
+	// Get the entry index and announce the change
+	DWORD index = entryIndex(entry);
+	MemChunk mc;
+	mc.write(&index, sizeof(DWORD));
+	announce(_T("entry_modified"), mc);
 }

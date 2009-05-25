@@ -104,6 +104,7 @@ bool WadArchive::openFile(string filename) {
 	if (wad_type[1] != 'W' || wad_type[2] != 'A' || wad_type[3] != 'D') {
 		wxLogMessage(_T("WadArchive::openFile: File %s has invalid header"), filename.c_str());
 		Global::error = _T("Invalid wad header");
+		fclose(fp);
 		return false;
 	}
 
@@ -129,6 +130,7 @@ bool WadArchive::openFile(string filename) {
 		if (offset + size > (DWORD)filesize) {
 			wxLogMessage(_T("WadArchive::openFile: File %s is invalid or corrupt"), filename.c_str());
 			Global::error = _T("File is invalid and/or corrupt");
+			fclose(fp);
 			return false;
 		}
 
@@ -141,7 +143,6 @@ bool WadArchive::openFile(string filename) {
 
 		// Add to entry list
 		entries.push_back(nlump);
-		wxLogMessage(_T("%s"), nlump->getName().c_str());
 	}
 
 	// Close the file
@@ -417,4 +418,35 @@ vector<Archive::mapdesc_t> WadArchive::detectMaps() {
 	}
 
 	return maps;
+}
+
+/* WadArchive::addEntry
+ * Override of ArchiveEntry::addEntry to also truncate the given
+ * name to 8 characters, and also stores the original full name as
+ * an extra property of the entry
+ *******************************************************************/
+bool WadArchive::addEntry(ArchiveEntry* entry, DWORD position) {
+	// Truncate name to 8 characters if needed
+	string name = entry->getName();
+	if (name.size() > 8) {
+		entry->setExProp(_T("full_name"), name); // Add full name as extra property in case it's needed later
+		name.Truncate(8);
+		entry->setName(name);
+	}
+
+	// Now we can add it
+	return Archive::addEntry(entry, position);
+}
+
+/* WadArchive::renameEntry
+ * Override of ArchiveEntry::renameEntry to also truncate the given
+ * name to 8 characters
+ *******************************************************************/
+bool WadArchive::renameEntry(ArchiveEntry* entry, string new_name) {
+	// Truncate name to 8 characters if needed
+	if (new_name.size() > 8)
+		new_name.Truncate(8);
+
+	// Now we can rename it
+	return Archive::renameEntry(entry, new_name);
 }
