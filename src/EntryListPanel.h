@@ -41,6 +41,7 @@ public:
 	bool					swapItems(int item1, int item2);
 	bool					addEntry(DWORD archive_index);
 	bool					updateEntry(DWORD archive_index);
+	bool					removeEntry(DWORD archive_index);
 
 	bool	moveUp();
 	bool	moveDown();

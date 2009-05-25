@@ -212,6 +212,30 @@ ArchiveEntry* Archive::addExistingEntry(ArchiveEntry* entry, DWORD position, boo
 	return entry;
 }
 
+bool Archive::removeEntry(ArchiveEntry* entry, bool delete_entry) {
+	// Check the entry exists in this archive
+	int index = entryIndex(entry);
+	if (index == -1)
+		return false;
+
+	// Announce
+	MemChunk mc;
+	mc.write(&index, sizeof(int));
+	announce(_T("entry_removed"), mc);
+
+	// Remove it from the entry list
+	entries.erase(entries.begin() + index);
+
+	// Delete the entry if needed
+	if (delete_entry)
+		delete entry;
+
+	// Update variables etc
+	modified = true;
+
+	return true;
+}
+
 /* Archive::swapEntries
  * Swaps the specified entries. Returns false if either entry is
  * invalid or not part of this Archive, true otherwise.

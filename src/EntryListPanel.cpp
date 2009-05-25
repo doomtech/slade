@@ -283,13 +283,19 @@ bool EntryListPanel::addEntry(DWORD archive_index) {
 	return true;
 }
 
-/* EntryListPanel::addEntry
+/* EntryListPanel::updateEntry
  * Updates an entry in the list
  *******************************************************************/
 bool EntryListPanel::updateEntry(DWORD archive_index) {
 	// Just update the list item corresponding with the entry index
 	// (it's 1-1 in a normal EntryListPanel, will be different for zip archives)
 	entry_list->updateEntry(archive_index);
+}
+
+bool EntryListPanel::removeEntry(DWORD archive_index) {
+	// Just delete the list item corresponding with the entry index
+	// (it's 1-1 in a normal EntryListPanel, will be different for zip archives)
+	entry_list->DeleteItem(archive_index);
 }
 
 /* EntryListPanel::moveUp

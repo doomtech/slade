@@ -194,7 +194,14 @@ bool ArchivePanel::renameEntry() {
  * Deletes the selected entries
  *******************************************************************/
 bool ArchivePanel::deleteEntry() {
+	// Get a list of selected entries
+	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
 
+	// Go through the list
+	for (size_t a = 0; a < selection.size(); a++) {
+		// Remove the current selected entry
+		archive->removeEntry(selection[a]);
+	}
 }
 
 /* ArchivePanel::moveUp
@@ -250,6 +257,13 @@ void ArchivePanel::onAnnouncement(Announcer* announcer, string event_name, MemCh
 		DWORD index = 0;
 		if (event_data.read(&index, sizeof(DWORD)))
 			entry_list->updateEntry(index);
+	}
+
+	// An entry in the archive was removed
+	if (announcer == archive && event_name == _T("entry_removed")) {
+		DWORD index = 0;
+		if (event_data.read(&index, sizeof(DWORD)))
+			entry_list->removeEntry(index);
 	}
 }
 

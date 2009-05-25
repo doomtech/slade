@@ -43,6 +43,7 @@ public:
 	virtual bool			addEntry(ArchiveEntry* entry, DWORD position = 0);
 	virtual ArchiveEntry*	addNewEntry(string name = _T(""), DWORD position = 0);
 	virtual ArchiveEntry*	addExistingEntry(ArchiveEntry* entry, DWORD position = 0, bool copy = false);
+	virtual bool			removeEntry(ArchiveEntry* entry, bool delete_entry = true);
 
 	// Entry moving
 	virtual bool			swapEntries(ArchiveEntry* entry1, ArchiveEntry* entry2);
