@@ -300,6 +300,7 @@ void ArchiveManagerPanel::closeSelection() {
  * Saves the currently opened archive (the currently opened tab)
  *******************************************************************/
 void ArchiveManagerPanel::saveCurrent() {
+	// Send to current archive panel
 	int selection = notebook_archives->GetSelection();
 	if (isArchivePanel(selection))
 		((ArchivePanel*) notebook_archives->GetPage(selection))->save();
@@ -310,6 +311,7 @@ void ArchiveManagerPanel::saveCurrent() {
  * opened tab)
  *******************************************************************/
 void ArchiveManagerPanel::saveCurrentAs() {
+	// Send to current archive panel
 	int selection = notebook_archives->GetSelection();
 	if (isArchivePanel(selection))
 		((ArchivePanel*) notebook_archives->GetPage(selection))->saveAs();
@@ -368,6 +370,27 @@ void ArchiveManagerPanel::deleteEntry() {
 	int selection = notebook_archives->GetSelection();
 	if (isArchivePanel(selection))
 		((ArchivePanel*) notebook_archives->GetPage(selection))->deleteEntry();
+}
+
+void ArchiveManagerPanel::importEntry() {
+	// Send to current archive panel
+	int selection = notebook_archives->GetSelection();
+	if (isArchivePanel(selection))
+		((ArchivePanel*) notebook_archives->GetPage(selection))->importEntry();
+}
+
+void ArchiveManagerPanel::exportEntry() {
+	// Send to current archive panel
+	int selection = notebook_archives->GetSelection();
+	if (isArchivePanel(selection))
+		((ArchivePanel*) notebook_archives->GetPage(selection))->exportEntry();
+}
+
+void ArchiveManagerPanel::exportEntryWad() {
+	// Send to current archive panel
+	int selection = notebook_archives->GetSelection();
+	if (isArchivePanel(selection))
+		((ArchivePanel*) notebook_archives->GetPage(selection))->exportEntryWad();
 }
 
 /* ArchiveManagerPanel::moveUp

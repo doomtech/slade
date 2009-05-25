@@ -36,6 +36,9 @@ public:
 	bool	newEntryFromFile();
 	bool	renameEntry();
 	bool	deleteEntry();
+	bool	importEntry();
+	bool	exportEntry();
+	bool	exportEntryWad();
 	bool	moveUp();
 	bool	moveDown();
 

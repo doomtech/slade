@@ -104,6 +104,9 @@ public:
 	bool	importFile(string filename, DWORD offset = 0, DWORD size = 0);
 	bool	importEntry(ArchiveEntry* entry);
 
+	// Data export
+	bool	exportFile(string filename);
+
 	// Type detection
 	void	detectType(bool force = false);
 	string	getTypeString();

@@ -13,6 +13,7 @@ public:
 	EntryPanel(wxWindow* parent);
 	~EntryPanel();
 
+	ArchiveEntry* getEntry() { return entry; }
 	virtual void loadEntry(ArchiveEntry* entry);
 };
 

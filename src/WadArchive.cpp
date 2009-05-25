@@ -60,6 +60,12 @@ string map_lumps[12] = {
 WadArchive::WadArchive()
 : Archive() {
 	type = ARCHIVE_WAD;
+
+	// Default wad type
+	wad_type[0] = 'P';
+	wad_type[1] = 'W';
+	wad_type[2] = 'A';
+	wad_type[3] = 'D';
 }
 
 /* WadArchive::~WadArchive

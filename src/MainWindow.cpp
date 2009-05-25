@@ -88,12 +88,12 @@ void MainWindow::setupLayout() {
 	entryMenu->Append(MENU_ENTRY_NEW,				_("New"),					_("Create a new empty entry"));
 	entryMenu->Append(MENU_ENTRY_NEWFROMFILE,		_("New from File"),			_("Create a new entry with data from a file"));
 	entryMenu->AppendSeparator();
-	entryMenu->Append(MENU_ENTRY_RENAME,			_("Rename"),				_("Rename the selected entries"));
-	entryMenu->Append(MENU_ENTRY_DELETE,			_("Delete"),				_("Delete the selected entries"));
+	entryMenu->Append(MENU_ENTRY_RENAME,			_("Rename\tCtrl+R"),		_("Rename the selected entries"));
+	entryMenu->Append(MENU_ENTRY_DELETE,			_("Delete\tDelete"),		_("Delete the selected entries"));
 	entryMenu->AppendSeparator();
-	entryMenu->Append(MENU_UNIMPLEMENTED,			_("Import"),				_("Import a file to the selected entry"));
-	entryMenu->Append(MENU_UNIMPLEMENTED,			_("Export"),				_("Export the selected entries to files"));
-	entryMenu->Append(MENU_UNIMPLEMENTED,			_("Export as Wad"),			_("Export the selected entries to a new Wad Archive"));
+	entryMenu->Append(MENU_ENTRY_IMPORT,			_("Import\tCtrl+I"),		_("Import a file to the selected entry"));
+	entryMenu->Append(MENU_ENTRY_EXPORT,			_("Export\tCtrl+E"),		_("Export the selected entries to files"));
+	entryMenu->Append(MENU_ENTRY_EXPORTWAD,			_("Export as Wad\tCtrl+W"),	_("Export the selected entries to a new Wad Archive"));
 	entryMenu->AppendSeparator();
 	entryMenu->Append(MENU_ENTRY_MOVEUP,			_("Move Up\tCtrl+U"),		_("Move the selected entries up"));
 	entryMenu->Append(MENU_ENTRY_MOVEDOWN,			_("Move Down\tCtrl+D"),		_("Move the selected entries down"));
@@ -241,6 +241,9 @@ BEGIN_EVENT_TABLE(MainWindow, wxFrame)
 	EVT_MENU(MENU_ENTRY_NEWFROMFILE, MainWindow::onEntryNewFromFile)
 	EVT_MENU(MENU_ENTRY_RENAME, MainWindow::onEntryRename)
 	EVT_MENU(MENU_ENTRY_DELETE, MainWindow::onEntryDelete)
+	EVT_MENU(MENU_ENTRY_IMPORT, MainWindow::onEntryImport)
+	EVT_MENU(MENU_ENTRY_EXPORT, MainWindow::onEntryExport)
+	EVT_MENU(MENU_ENTRY_EXPORTWAD, MainWindow::onEntryExportWad)
 	EVT_MENU(MENU_ENTRY_MOVEUP, MainWindow::onEntryMoveUp)
 	EVT_MENU(MENU_ENTRY_MOVEDOWN, MainWindow::onEntryMoveDown)
 
@@ -324,6 +327,27 @@ void MainWindow::onEntryRename(wxCommandEvent& e) {
  *******************************************************************/
 void MainWindow::onEntryDelete(wxCommandEvent& e) {
 	panel_archivemanager->deleteEntry();
+}
+
+/* MainWindow::onEntryImport
+ * Entry->Import menu item event handler.
+ *******************************************************************/
+void MainWindow::onEntryImport(wxCommandEvent& e) {
+	panel_archivemanager->importEntry();
+}
+
+/* MainWindow::onEntryExport
+ * Entry->Export menu item event handler.
+ *******************************************************************/
+void MainWindow::onEntryExport(wxCommandEvent& e) {
+	panel_archivemanager->exportEntry();
+}
+
+/* MainWindow::onEntryExportWad
+ * Entry->Export As Wad menu item event handler.
+ *******************************************************************/
+void MainWindow::onEntryExportWad(wxCommandEvent& e) {
+	panel_archivemanager->exportEntryWad();
 }
 
 /* MainWindow::onEntryMoveUp

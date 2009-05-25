@@ -222,7 +222,7 @@ bool ArchiveEntry::importFile(string filename, DWORD offset, DWORD size) {
 
 	// Check that it opened ok
 	if (!fp) {
-		wxLogMessage(s_fmt(_T("Error opening file %s"), filename.c_str()));
+		Global::error = _T("Unable to open file for reading");
 		return false;
 	}
 
@@ -270,6 +270,29 @@ bool ArchiveEntry::importEntry(ArchiveEntry* entry) {
 
 	// Copy lump data
 	importMem(entry->getData(), entry->getSize());
+
+	return true;
+}
+
+/* ArchiveEntry::exportFile
+ * Exports entry data to a file.
+ * Returns false if file cannot be written, true otherwise
+ *******************************************************************/
+bool ArchiveEntry::exportFile(string filename) {
+	// Attempt to open file
+	FILE* fp = fopen(filename.ToAscii(), "wb");
+
+	// Check it opened ok
+	if (!fp) {
+		Global::error = _T("Unable to open file for writing");
+		return false;
+	}
+
+	// Write entry data to the file
+	fwrite(getData(), 1, this->size, fp);
+
+	// Close the file
+	fclose(fp);
 
 	return true;
 }

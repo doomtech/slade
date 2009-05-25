@@ -67,6 +67,9 @@ public:
 	void	newEntryFromFile();
 	void	renameEntry();
 	void	deleteEntry();
+	void	importEntry();
+	void	exportEntry();
+	void	exportEntryWad();
 	void	moveUp();
 	void	moveDown();
 

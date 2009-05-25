@@ -33,6 +33,7 @@
 #include "WxStuff.h"
 #include "ArchivePanel.h"
 #include "EntryListPanel.h"
+#include "WadArchive.h"
 #include <wx/aui/auibook.h>
 #include <wx\filename.h>
 
@@ -202,6 +203,85 @@ bool ArchivePanel::deleteEntry() {
 		// Remove the current selected entry
 		archive->removeEntry(selection[a]);
 	}
+}
+
+/* ArchivePanel::importEntry
+ * Imports files to the selected entries
+ *******************************************************************/
+bool ArchivePanel::importEntry() {
+	// Get a list of selected entries
+	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
+
+	// Go through the list
+	for (size_t a = 0; a < selection.size(); a++) {
+		// Create open file dialog
+		wxFileDialog *dialog_open = new wxFileDialog(this, s_fmt(_T("Import Entry \"%s\""), selection[a]->getName().c_str()),
+											wxEmptyString, wxEmptyString, _T("Any File (*.*)|*.*"), wxFD_OPEN | wxFD_FILE_MUST_EXIST, wxDefaultPosition);
+
+		// Run the dialog & check that the user didn't cancel
+		if (dialog_open->ShowModal() == wxID_OK) {
+			// If a file was selected, import it
+			selection[a]->importFile(dialog_open->GetPath());
+
+			// If the entry is currently open, refresh the entry panel
+			if (cur_area->getEntry() == selection[a])
+				cur_area->loadEntry(selection[a]);
+		}
+	}
+}
+
+/* ArchivePanel::exportEntry
+ * Exports the selected entries to files
+ *******************************************************************/
+bool ArchivePanel::exportEntry() {
+	// Get a list of selected entries
+	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
+
+	// Go through the list
+	for (size_t a = 0; a < selection.size(); a++) {
+		// Setup filename
+		wxFileName fn(selection[a]->getName());
+
+		// Add .lmp extension if needed
+		fn.SetExt(_T("lmp"));
+
+		// Create save file dialog
+		wxFileDialog *dialog_save = new wxFileDialog(this, s_fmt(_T("Export Entry \"%s\""), selection[a]->getName().c_str()),
+											wxEmptyString, fn.GetFullName(), _T("Any File (*.*)|*.*"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT, wxDefaultPosition);
+
+		// Run the dialog & check that the user didn't cancel
+		if (dialog_save->ShowModal() == wxID_OK) {
+			// If a filename was selected, export it
+			selection[a]->exportFile(dialog_save->GetPath());
+		}
+	}
+}
+
+bool ArchivePanel::exportEntryWad() {
+	// Get a list of selected entries
+	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
+
+	// Init wad archive to save
+	WadArchive* wad = new WadArchive();
+
+	// Go through the list
+	for (size_t a = 0; a < selection.size(); a++) {
+		// Add each entry to the wad archive
+		wad->addExistingEntry(selection[a], selection.size(), true);
+	}
+
+	// Create save file dialog
+	wxFileDialog *dialog_save = new wxFileDialog(this, _T(""), wxEmptyString, wxEmptyString,
+										_T("Doom Wad File (*.wad)|*.wad"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT, wxDefaultPosition);
+
+	// Run the dialog & check that the user didn't cancel
+	if (dialog_save->ShowModal() == wxID_OK) {
+		// If a filename was selected, save the wad archive
+		wad->save(dialog_save->GetPath());
+	}
+
+	// Delete the wad archive
+	delete wad;
 }
 
 /* ArchivePanel::moveUp
