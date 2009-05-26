@@ -47,8 +47,8 @@ public:
 	bool	moveDown();
 
 	// Events
-	void	onEntryListChange(wxListEvent &event);
-	void	onEntryListActivated(wxListEvent &event);
+	virtual void	onEntryListChange(wxListEvent &event);
+	virtual void	onEntryListActivated(wxListEvent &event);
 
 	DECLARE_EVENT_TABLE()
 };
@@ -60,6 +60,11 @@ private:
 public:
 	ZipEntryListPanel(wxWindow *parent, int id, Archive* archive);
 	~ZipEntryListPanel();
+
+	void	populateEntryList();
+
+	// Events
+	void	onEntryListActivated(wxListEvent &event);
 };
 
 #endif //__ENTRYLISTPANEL_H__

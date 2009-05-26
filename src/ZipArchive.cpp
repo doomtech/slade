@@ -304,6 +304,22 @@ int ZipArchive::getEntryZipIndex(ArchiveEntry* entry) {
 		return atoi(entry->getExProp(_T("zip_index")).ToAscii());
 }
 
+vector<ArchiveEntry*> ZipArchive::getDirectory(string dir) {
+	// Init entry list
+	vector<ArchiveEntry*> ret;
+
+	// Go through all entries
+	for (size_t a = 0; a < entries.size(); a++) {
+		// If the entry is in the directory specified, add it
+		// to the return list
+		if (!entries[a]->getExProp(_T("directory")).Cmp(dir))
+			ret.push_back(entries[a]);
+	}
+
+	// Return the list
+	return ret;
+}
+
 /* ZipArchive::detectMaps
  * Searches for any maps in the wad and adds them to the map list
  *******************************************************************/

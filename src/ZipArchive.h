@@ -17,7 +17,7 @@ public:
 	bool	save(string filename);
 	bool	loadEntryData(ArchiveEntry* entry);
 
-	// Entry drectory stuff
+	// Entry directory stuff
 	void	setEntryDirectory(ArchiveEntry* entry, string dir);
 	string	getEntryDirectory(ArchiveEntry* entry);
 	string	getEntryFullPath(ArchiveEntry* entry);
@@ -25,6 +25,9 @@ public:
 	// Entry zip index stuff
 	void	setEntryZipIndex(ArchiveEntry* entry, int index);
 	int		getEntryZipIndex(ArchiveEntry* entry);
+
+	// Directory manipulation/retrieval
+	vector<ArchiveEntry*>	getDirectory(string dir);
 
 	vector<mapdesc_t>	detectMaps();
 };

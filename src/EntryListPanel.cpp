@@ -30,6 +30,7 @@
 #include "Main.h"
 #include "WxStuff.h"
 #include "Archive.h"
+#include "ZipArchive.h"
 #include "EntryListPanel.h"
 #include "ArchiveEntry.h"
 
@@ -150,7 +151,7 @@ void EntryListPanel::populateEntryList() {
 	// Create the "Type" column
 	entry_list->InsertColumn(2, _T("Type"));
 
-	// Go through all lumps and add them to the list
+	// Go through all entries and add them to the list
 	for (int a = 0; a < archive->numEntries(); a++) {
 		// Setup new entry
 		wxListItem li;
@@ -373,7 +374,8 @@ bool EntryListPanel::moveDown() {
 }
 
 BEGIN_EVENT_TABLE(EntryListPanel, wxPanel)
-EVT_LIST_ITEM_FOCUSED(EntryListPanel::ENTRY_LIST, EntryListPanel::onEntryListChange)
+	EVT_LIST_ITEM_FOCUSED(ENTRY_LIST, EntryListPanel::onEntryListChange)
+	EVT_LIST_ITEM_ACTIVATED(ENTRY_LIST, EntryListPanel::onEntryListActivated)
 END_EVENT_TABLE()
 
 /* EntryListPanel::onEntryListChange
@@ -389,7 +391,6 @@ void EntryListPanel::onEntryListChange(wxListEvent& event) {
 }
 
 void EntryListPanel::onEntryListActivated(wxListEvent& event) {
-
 }
 
 
@@ -402,7 +403,50 @@ ZipEntryListPanel::ZipEntryListPanel(wxWindow* parent, int id, Archive* archive)
 		wxMessageBox(_T("Error: Attempt to open a non-zip archive with a zip entry list, this shouldn't happen"), _T("Error"));
 		archive = NULL;
 	}
+
+	// Initial directory is root
+	cur_directory = _T("");
 }
 
 ZipEntryListPanel::~ZipEntryListPanel() {
+}
+
+void ZipEntryListPanel::populateEntryList() {
+	// Clear the list
+	entry_list->ClearAll();
+
+	// Create the "Name" column
+	entry_list->InsertColumn(0, _T("Name"));
+
+	// Create the "Size" column
+	entry_list->InsertColumn(1, _T("Size"));
+
+	// Create the "Type" column
+	entry_list->InsertColumn(2, _T("Type"));
+
+	// Get all entries in the current directory
+	vector<ArchiveEntry*> dir_entries = ((ZipArchive*)archive)->getDirectory(cur_directory);
+
+	// Go through all entries in the directory
+	for (size_t a = 0; a < dir_entries.size(); a++) {
+		// Setup new entry
+		wxListItem li;
+		li.SetId(a);
+		li.SetData(dir_entries[a]);
+
+		// Add it to the list
+		entry_list->InsertItem(li);
+		entry_list->updateEntry(a);
+	}
+
+	// Setup size
+	entry_list->SetMinSize(wxSize(entry_list->getWidth(), -1));
+}
+
+void ZipEntryListPanel::onEntryListActivated(wxListEvent& event) {
+	// Check for folder
+	// etc
+
+	// Otherwise do default activate action
+	EntryListPanel::onEntryListActivated(event);
 }

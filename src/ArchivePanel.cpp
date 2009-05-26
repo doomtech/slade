@@ -50,8 +50,11 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 	wxBoxSizer *m_hbox = new wxBoxSizer(wxHORIZONTAL);
 	SetSizer(m_hbox);
 
-	// Lump list panel
-	entry_list = new EntryListPanel(this, ENTRY_LIST_PANEL, archive);
+	// Entry list panel (depends on archive type)
+	if (archive->getType() == ARCHIVE_WAD)
+		entry_list = new EntryListPanel(this, ENTRY_LIST_PANEL, archive);
+	else
+		entry_list = new ZipEntryListPanel(this, ENTRY_LIST_PANEL, archive);
 	m_hbox->Add(entry_list, 0, wxEXPAND | wxALL, 4);
 
 	entry_list->populateEntryList();
