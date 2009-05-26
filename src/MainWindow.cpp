@@ -259,7 +259,7 @@ void MainWindow::onFileOpen(wxCommandEvent &e) {
 	// Open a file browser dialog that allows multiple selection
 	// and filters by wad, zip and pk3 file extensions
 	wxFileDialog *dialog_open = new wxFileDialog(this, _T("Choose file(s) to open"), wxEmptyString, wxEmptyString,
-			_T("Any Supported File (*.wad; *.zip; *.pk3)|*.wad;*.zip;*.pk3|Doom Wad files (*.wad)|*.wad|Zip files (*.zip)|*.zip|Pk3 (zip) files (*.pk3)|*.pk3"),
+			_T("Any Supported File (*.wad; *.zip; *.pk3; *.jdf)|*.wad;*.zip;*.pk3;*.jdf|Doom Wad files (*.wad)|*.wad|Zip files (*.zip)|*.zip|Pk3 (zip) files (*.pk3)|*.pk3|JDF (zip) files (*.jdf)|*.jdf"),
 			wxFD_OPEN | wxFD_MULTIPLE | wxFD_FILE_MUST_EXIST, wxDefaultPosition);
 
 	// Run the dialog & check that the user didn't cancel

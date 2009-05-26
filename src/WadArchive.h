@@ -12,6 +12,8 @@ public:
 	WadArchive();
 	~WadArchive();
 
+	string	getFileExtensionString();
+
 	bool	openFile(string filename);
 	bool	save(string filename = _T(""));
 

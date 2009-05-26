@@ -74,6 +74,13 @@ WadArchive::WadArchive()
 WadArchive::~WadArchive() {
 }
 
+/* WadArchive::getFileExtensionString
+ * Gets the wxWidgets file dialog filter string for the archive type
+ *******************************************************************/
+string WadArchive::getFileExtensionString() {
+	return _T("Wad Files (*.wad)|*.wad");
+}
+
 /* WadArchive::openFile
  * Reads a wad format file from disk
  * Returns true if successful, false otherwise

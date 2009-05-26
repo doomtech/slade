@@ -56,6 +56,13 @@ ZipArchive::ZipArchive()
 ZipArchive::~ZipArchive() {
 }
 
+/* ZipArchive::getFileExtensionString
+ * Gets the wxWidgets file dialog filter string for the archive type
+ *******************************************************************/
+string ZipArchive::getFileExtensionString() {
+	return _T("Any Zip Format File (*.zip;*.pk3;*.jdf)|*.zip;*.pk3;*.jdf|Zip File (*.zip)|*.zip|Pk3 File (*.pk3)|*.pk3|JDF File (*.jdf)|*.jdf");
+}
+
 /* ZipArchive::openFile
  * Reads a zip format file from disk
  * Returns true if successful, false otherwise
@@ -91,8 +98,10 @@ bool ZipArchive::openFile(string filename) {
 			// Setup entry info
 			nlump->setSize(entry->GetSize());
 			nlump->setLoaded(false);
-			nlump->setExProp(_T("zip_index"), s_fmt(_T("%d"), entry_index));
-			nlump->setExProp(_T("directory"), fn.GetPath(true, wxPATH_UNIX));
+			//nlump->setExProp(_T("zip_index"), s_fmt(_T("%d"), entry_index));
+			//nlump->setExProp(_T("directory"), fn.GetPath(true, wxPATH_UNIX));'
+			setEntryDirectory(nlump, fn.GetPath(true, wxPATH_UNIX));
+			setEntryZipIndex(nlump, entry_index);
 			nlump->setState(0);
 
 			wxLogMessage(_T("Entry: ") + nlump->getExProp(_T("directory")) + nlump->getName());
@@ -109,6 +118,69 @@ bool ZipArchive::openFile(string filename) {
 	// Setup variables
 	this->filename = filename;
 	modified = false;
+
+	return true;
+}
+
+bool ZipArchive::save(string filename) {
+	// If no filename specified, just use the current filename
+	if (filename == _T(""))
+		filename = this->filename;
+
+	// Create a backup copy if needed
+	string bakfile = filename + _T(".bak");
+	if (wxFileName::FileExists(filename)) {
+		// Remove old backup file
+		remove(chr(bakfile));
+
+		// Copy current file contents to new backup file
+		wxCopyFile(this->filename, bakfile);
+	}
+	else
+		bakfile = this->filename;
+
+	// Open the file
+	wxFFileOutputStream out(filename);
+	if (!out.IsOk()) {
+		Global::error = _T("Unable to open file for saving. Make sure it isn't in use by another program.");
+		return false;
+	}
+
+	// Open as a zip to save
+	wxZipOutputStream zip(out, 9);
+	if (!zip.IsOk()) {
+		Global::error = _T("Unable to create zip");
+		return false;
+	}
+
+	// Open old zip for copying, if it exists
+	wxFFileInputStream in(bakfile);
+	wxZipInputStream inzip(in);
+
+	// Get a list of all entries in the old zip
+	wxZipEntry **c_entries = new wxZipEntry*[inzip.GetTotalEntries()];
+	for (int a = 0; a < inzip.GetTotalEntries(); a++)
+		c_entries[a] = inzip.GetNextEntry();
+
+	for (size_t a = 0; a < entries.size(); a++) {
+		if (!inzip.IsOk() || entries[a]->getState() > 0 || getEntryZipIndex(entries[a]) == -1) {
+			wxZipEntry* zipentry = new wxZipEntry(getEntryFullPath(entries[a]));
+			zip.PutNextEntry(zipentry);
+			zip.Write(entries[a]->getData(), entries[a]->getSize());
+		}
+		else {
+			zip.CopyEntry(c_entries[getEntryZipIndex(entries[a])], inzip);
+			inzip.Reset();
+		}
+
+		entries[a]->setState(0);
+		setEntryZipIndex(entries[a], a);
+	}
+
+	delete[] c_entries;
+
+	zip.Close();
+	this->filename = filename;
 
 	return true;
 }
@@ -170,6 +242,34 @@ bool ZipArchive::loadEntryData(ArchiveEntry* entry) {
 	entry->setLoaded();
 
 	return true;
+}
+
+void ZipArchive::setEntryDirectory(ArchiveEntry* entry, string dir) {
+	if (entry->getParent() == this)
+		entry->setExProp(_T("directory"), dir);
+}
+
+string ZipArchive::getEntryDirectory(ArchiveEntry* entry) {
+	if (entry->getParent() != this)
+		return _T("");
+	else
+		return entry->getExProp(_T("directory"));
+}
+
+string ZipArchive::getEntryFullPath(ArchiveEntry* entry) {
+	return getEntryDirectory(entry) + entry->getName();
+}
+
+void ZipArchive::setEntryZipIndex(ArchiveEntry* entry, int index) {
+	if (entry->getParent() == this)
+		entry->setExProp(_T("zip_index"), s_fmt(_T("%d"), index));
+}
+
+int ZipArchive::getEntryZipIndex(ArchiveEntry* entry) {
+	if (entry->getParent() != this)
+		return -1;
+	else
+		return atoi(entry->getExProp(_T("zip_index")).ToAscii());
 }
 
 /* ZipArchive::detectMaps

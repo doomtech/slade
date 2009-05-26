@@ -253,8 +253,8 @@ void ArchiveManagerPanel::saveSelectionAs() {
 		return;
 
 	// Setup file filters (temporary, should go through all archive types somehow)
-	string formats = _T("Doom Wad File (*.wad)|*.wad");
-	string deftype = _T("*.wad");
+	//string formats = _T("Doom Wad File (*.wad)|*.wad");
+	//string deftype = _T("*.wad");
 
 	// Go through the selection
 	for (size_t a = 0; a < selection.size(); a++) {
@@ -262,7 +262,8 @@ void ArchiveManagerPanel::saveSelectionAs() {
 		Archive* archive = ArchiveManager::getInstance().getArchive(selection[a]);
 
 		// Popup file save dialog
-		string filename = wxFileSelector(_T("Save Wad ") + archive->getFileName(false) + _T(" As"), _T(""), _T(""), deftype, formats, wxSAVE | wxOVERWRITE_PROMPT);
+		string formats = archive->getFileExtensionString();
+		string filename = wxFileSelector(_T("Save Archive ") + archive->getFileName(false) + _T(" As"), _T(""), _T(""), wxEmptyString, formats, wxSAVE | wxOVERWRITE_PROMPT);
 
 		// Check a filename was selected
 		if (!filename.empty()) {

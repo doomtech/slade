@@ -32,6 +32,7 @@ public:
 	int						entryIndex(ArchiveEntry* entry);
 	virtual ArchiveEntry*	getEntry(DWORD index);
 	virtual ArchiveEntry*	getEntry(string name);
+	virtual string			getFileExtensionString();
 
 	virtual bool	openFile(string filename);
 	virtual bool	save(string filename = _T(""));

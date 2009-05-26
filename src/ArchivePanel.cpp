@@ -82,6 +82,10 @@ void ArchivePanel::save() {
 	if (!archive)
 		return;
 
+	// Check the archive has been previously saved
+	if (!archive->getFileName().Cmp(_T("")))
+		saveAs();
+
 	// Save the archive
 	if (!archive->save()) {
 		// If there was an error pop up a message box
@@ -98,9 +102,9 @@ void ArchivePanel::saveAs() {
 		return;
 
 	// Setup file filters (temporary, should go through all archive types somehow)
-	string formats = _T("Doom Wad File (*.wad)|*.wad");
-	string deftype = _T("*.wad");
-	string filename = wxFileSelector(_T("Save Wad ") + archive->getFileName(false) + _T(" As"), _T(""), _T(""), deftype, formats, wxSAVE | wxOVERWRITE_PROMPT);
+	string formats = archive->getFileExtensionString();
+	//string deftype = _T("*.wad");
+	string filename = wxFileSelector(_T("Save Archive ") + archive->getFileName(false) + _T(" As"), _T(""), _T(""), wxEmptyString, formats, wxSAVE | wxOVERWRITE_PROMPT);
 
 	// Check a filename was selected
 	if (!filename.empty()) {

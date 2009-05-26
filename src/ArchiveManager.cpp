@@ -116,8 +116,10 @@ Archive* ArchiveManager::openArchive(string filename) {
 
 	if (!fn.GetExt().CmpNoCase(_T("wad"))) // Wad File
 		new_archive = new WadArchive();
-	else if (!fn.GetExt().CmpNoCase(_T("zip")) || !fn.GetExt().CmpNoCase(_T("pk3"))) // Zip/Pk3 file
+	else if (!fn.GetExt().CmpNoCase(_T("zip")) || !fn.GetExt().CmpNoCase(_T("pk3"))|| !fn.GetExt().CmpNoCase(_T("jdf"))) // Zip/Pk3/JDF file
 		new_archive = new ZipArchive();
+	else
+		return NULL; // Unsupported format
 
 	// If it opened successfully, add it to the list & return it,
 	// Otherwise, delete it and return NULL

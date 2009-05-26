@@ -101,6 +101,13 @@ ArchiveEntry* Archive::getEntry(string name) {
 	return NULL;
 }
 
+/* Archive::getFileExtensionString
+ * Gets the wxWidgets file dialog filter string for the archive type
+ *******************************************************************/
+string Archive::getFileExtensionString() {
+	return _T("All Files (*.*)|*.*");
+}
+
 /* Archive::openFile
  * Function to open a file, does nothing here, to be overridden by
  * any subclass of Archive
