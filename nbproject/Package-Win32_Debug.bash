@@ -6,7 +6,7 @@
 
 # Macros
 TOP=`pwd`
-PLATFORM=MinGW-Windows
+PLATFORM=
 TMPDIR=build/Win32_Debug/${PLATFORM}/tmp-packaging
 TMPDIRNAME=tmp-packaging
 OUTPUT_PATH=dist/SLADE
@@ -50,21 +50,21 @@ function copyFileToTmpDir
 
 # Setup
 cd "${TOP}"
-mkdir -p dist/Win32_Release/${PLATFORM}/package
+mkdir -p dist/Win32_Debug/${PLATFORM}/package
 rm -rf ${TMPDIR}
 mkdir -p ${TMPDIR}
 
 # Copy files and create directories and links
 cd "${TOP}"
 makeDirectory ${TMPDIR}/trunk/bin
-copyFileToTmpDir "${OUTPUT_PATH}.exe" "${TMPDIR}/${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}.exe" 0755
+copyFileToTmpDir "${OUTPUT_PATH}" "${TMPDIR}/${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}" 0755
 
 
 # Generate tar file
 cd "${TOP}"
-rm -f dist/Win32_Release/${PLATFORM}/package/trunk.tar
+rm -f dist/Win32_Debug/${PLATFORM}/package/trunk.tar
 cd ${TMPDIR}
-tar -vcf ../../../../dist/Win32_Release/${PLATFORM}/package/trunk.tar *
+tar -vcf ../../../../dist/Win32_Debug/${PLATFORM}/package/trunk.tar *
 checkReturnCode
 
 # Cleanup
