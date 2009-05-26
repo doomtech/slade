@@ -98,13 +98,11 @@ bool ZipArchive::openFile(string filename) {
 			// Setup entry info
 			nlump->setSize(entry->GetSize());
 			nlump->setLoaded(false);
-			//nlump->setExProp(_T("zip_index"), s_fmt(_T("%d"), entry_index));
-			//nlump->setExProp(_T("directory"), fn.GetPath(true, wxPATH_UNIX));'
 			setEntryDirectory(nlump, fn.GetPath(true, wxPATH_UNIX));
 			setEntryZipIndex(nlump, entry_index);
 			nlump->setState(0);
 
-			wxLogMessage(_T("Entry: ") + nlump->getExProp(_T("directory")) + nlump->getName());
+			//wxLogMessage(_T("Entry: ") + nlump->getExProp(_T("directory")) + nlump->getName());
 
 			// Add to entry list
 			entries.push_back(nlump);
@@ -122,6 +120,11 @@ bool ZipArchive::openFile(string filename) {
 	return true;
 }
 
+/* ZipArchive::save
+ * Saves the archive as a zip format file, if no filename is given,
+ * the archive's current filename is used.
+ * Returns true if successful, false otherwise
+ *******************************************************************/
 bool ZipArchive::save(string filename) {
 	// If no filename specified, just use the current filename
 	if (filename == _T(""))
@@ -153,7 +156,9 @@ bool ZipArchive::save(string filename) {
 		return false;
 	}
 
-	// Open old zip for copying, if it exists
+	// Open old zip for copying, if it exists. This is used to copy any entries
+	// that have been previously saved/compressed and are unmodified, to greatly
+	// speed up zip file saving (especially for large zips)
 	wxFFileInputStream in(bakfile);
 	wxZipInputStream inzip(in);
 
@@ -162,23 +167,28 @@ bool ZipArchive::save(string filename) {
 	for (int a = 0; a < inzip.GetTotalEntries(); a++)
 		c_entries[a] = inzip.GetNextEntry();
 
+	// Go through all archive entries
 	for (size_t a = 0; a < entries.size(); a++) {
 		if (!inzip.IsOk() || entries[a]->getState() > 0 || getEntryZipIndex(entries[a]) == -1) {
+			// If the current entry has been changed, or doesn't exist in the old zip,
+			// (re)compress it's data and write it to the zip
 			wxZipEntry* zipentry = new wxZipEntry(getEntryFullPath(entries[a]));
 			zip.PutNextEntry(zipentry);
 			zip.Write(entries[a]->getData(), entries[a]->getSize());
 		}
 		else {
+			// If the entry is unmodified and was already compressed in the old zip, just copy it over
 			zip.CopyEntry(c_entries[getEntryZipIndex(entries[a])], inzip);
 			inzip.Reset();
 		}
 
+		// Update entry info
 		entries[a]->setState(0);
 		setEntryZipIndex(entries[a], a);
 	}
 
+	// Clean up and update variables
 	delete[] c_entries;
-
 	zip.Close();
 	this->filename = filename;
 
@@ -190,8 +200,6 @@ bool ZipArchive::save(string filename) {
  * Returns true if successful, false otherwise
  *******************************************************************/
 bool ZipArchive::loadEntryData(ArchiveEntry* entry) {
-	wxLogMessage(_T("Load entry ") + entry->getName());
-
 	// Check that the lump belongs to this wadfile
 	if (entry->getParent() != this) {
 		wxLogMessage(_T("ZipArchive::loadEntryData: Entry %s attempting to load data from wrong parent!"), entry->getName().c_str());
@@ -244,11 +252,19 @@ bool ZipArchive::loadEntryData(ArchiveEntry* entry) {
 	return true;
 }
 
+/* ZipArchive::setEntryDirectory
+ * Sets the specified entry's directory, if it is part of this
+ * archive
+ *******************************************************************/
 void ZipArchive::setEntryDirectory(ArchiveEntry* entry, string dir) {
 	if (entry->getParent() == this)
 		entry->setExProp(_T("directory"), dir);
 }
 
+/* ZipArchive::getEntryDirectory
+ * Gets the specified entry's directory, returns an empty string if
+ * the entry isn't part of this archive
+ *******************************************************************/
 string ZipArchive::getEntryDirectory(ArchiveEntry* entry) {
 	if (entry->getParent() != this)
 		return _T("");
@@ -256,15 +272,31 @@ string ZipArchive::getEntryDirectory(ArchiveEntry* entry) {
 		return entry->getExProp(_T("directory"));
 }
 
+/* ZipArchive::getEntryFullPath
+ * Gets the specified entry's full path (directory+name+extension),
+ * returns an empty string if the entry isn't part of this archive
+ *******************************************************************/
 string ZipArchive::getEntryFullPath(ArchiveEntry* entry) {
-	return getEntryDirectory(entry) + entry->getName();
+	if (entry->getParent() != this)
+		return _T("");
+	else
+		return getEntryDirectory(entry) + entry->getName();
 }
 
+/* ZipArchive::setEntryZipIndex
+ * Sets the entry's zip index. This is the index of the entry in the
+ * currently saved zip file, used to copy the compressed entry data
+ * when saving if the entry data hasn't changed.
+ *******************************************************************/
 void ZipArchive::setEntryZipIndex(ArchiveEntry* entry, int index) {
 	if (entry->getParent() == this)
 		entry->setExProp(_T("zip_index"), s_fmt(_T("%d"), index));
 }
 
+/* ZipArchive::getEntryZipIndex
+ * Gets the entry's zip index. Returns -1 if the entry is not part
+ * of this archive
+ *******************************************************************/
 int ZipArchive::getEntryZipIndex(ArchiveEntry* entry) {
 	if (entry->getParent() != this)
 		return -1;

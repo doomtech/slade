@@ -58,16 +58,33 @@ TextEntryPanel::~TextEntryPanel() {
 /* TextEntryPanel::loadEntry
  * Loads an entry into the panel as text
  *******************************************************************/
-void TextEntryPanel::loadEntry(ArchiveEntry* entry) {
+bool TextEntryPanel::loadEntry(ArchiveEntry* entry) {
 	// Check that the entry exists
-	if (!entry)
-		return;
+	if (!entry) {
+		Global::error = _T("Invalid archive entry given");
+		return false;
+	}
 
-	// Read entry as a text string
-	this->entry = entry;
-	string istr = wxString::FromAscii((char*) entry->getData());
+	// Check that the entry has any data, if not do nothing
+	if (entry->getSize() == 0)
+		return true;
+
+	// Get character entry data
+	char* data = (char*)entry->getData();
+	if (!data) {
+		Global::error = _T("Cannot read entry data (see logfile for info)");
+		return false;
+	}
+
+	// Load it into the text area
+	string istr = wxString::FromAscii(data);
 	istr.Truncate(entry->getSize());
 
 	// Add text to the text area
 	text_area->SetText(istr);
+	
+	// Update variables
+	this->entry = entry;
+
+	return true;
 }

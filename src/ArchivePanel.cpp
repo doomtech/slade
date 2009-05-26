@@ -89,7 +89,7 @@ void ArchivePanel::save() {
 	// Save the archive
 	if (!archive->save()) {
 		// If there was an error pop up a message box
-		wxMessageBox(s_fmt(_T("Error: %s"), Global::error.c_str()), _T("Error"), wxICON_ERROR);
+		wxMessageBox(s_fmt(_T("Error:\n%s"), Global::error.c_str()), _T("Error"), wxICON_ERROR);
 	}
 }
 
@@ -111,7 +111,7 @@ void ArchivePanel::saveAs() {
 		// Save the archive
 		if (!archive->save(filename)) {
 			// If there was an error pop up a message box
-			wxMessageBox(s_fmt(_T("Error: %s"), Global::error.c_str()), _T("Error"), wxICON_ERROR);
+			wxMessageBox(s_fmt(_T("Error:\n%s"), Global::error.c_str()), _T("Error"), wxICON_ERROR);
 		}
 	}
 }
@@ -369,7 +369,9 @@ void ArchivePanel::onEntryListChange(wxListEvent& event) {
 	cur_area->Show(false);
 	sizer->Replace(cur_area, text_area);
 	cur_area = text_area;
-	cur_area->loadEntry(entry_list->getFocusedEntry());
+	if (!cur_area->loadEntry(entry_list->getFocusedEntry())) {
+		wxMessageBox(s_fmt(_T("Error loading entry:\n%s"), Global::error.c_str()), _T("Error"), wxICON_ERROR);
+	}
 	cur_area->Show(true);
 
 	Layout();

@@ -54,5 +54,7 @@ EntryPanel::~EntryPanel() {
  * Loads an entry into the entry panel (does nothing here, to be
  * overridden by child classes)
  *******************************************************************/
-void EntryPanel::loadEntry(ArchiveEntry* entry) {
+bool EntryPanel::loadEntry(ArchiveEntry* entry) {
+	Global::error = _T("Cannot open an entry with the base EntryPanel class");
+	return false;
 }

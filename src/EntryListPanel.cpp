@@ -85,6 +85,12 @@ bool EntryList::updateEntry(int index) {
 	SetItem(li);
 	SetColumnWidth(1, wxLIST_AUTOSIZE);
 
+	// Type
+	li.SetText(lump->getTypeString());
+	li.SetColumn(2);
+	SetItem(li);
+	SetColumnWidth(2, wxLIST_AUTOSIZE);
+
 	// Set default text colour
 	SetItemTextColour(index, wxSystemSettings::GetColour(wxSYS_COLOUR_LISTBOXTEXT));
 
@@ -99,7 +105,7 @@ bool EntryList::updateEntry(int index) {
 
 int EntryList::getWidth() {
 	// For the moment. Kinda annoying I have to do this actually, it should be automatic >_<
-	return GetColumnWidth(0) + GetColumnWidth(1) + wxSystemSettings::GetMetric(wxSYS_VSCROLL_X, this) + 4;
+	return GetColumnWidth(0) + GetColumnWidth(1) + GetColumnWidth(2) + wxSystemSettings::GetMetric(wxSYS_VSCROLL_X, this) + 4;
 }
 
 /* EntryListPanel::EntryListPanel
@@ -140,6 +146,9 @@ void EntryListPanel::populateEntryList() {
 
 	// Create the "Size" column
 	entry_list->InsertColumn(1, _T("Size"));
+
+	// Create the "Type" column
+	entry_list->InsertColumn(2, _T("Type"));
 
 	// Go through all lumps and add them to the list
 	for (int a = 0; a < archive->numEntries(); a++) {
@@ -381,4 +390,19 @@ void EntryListPanel::onEntryListChange(wxListEvent& event) {
 
 void EntryListPanel::onEntryListActivated(wxListEvent& event) {
 
+}
+
+
+
+
+ZipEntryListPanel::ZipEntryListPanel(wxWindow* parent, int id, Archive* archive)
+: EntryListPanel(parent, id, archive) {
+	// Check the archive type
+	if (archive->getType() != ARCHIVE_ZIP) {
+		wxMessageBox(_T("Error: Attempt to open a non-zip archive with a zip entry list, this shouldn't happen"), _T("Error"));
+		archive = NULL;
+	}
+}
+
+ZipEntryListPanel::~ZipEntryListPanel() {
 }

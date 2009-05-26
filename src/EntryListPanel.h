@@ -21,7 +21,7 @@ public:
 };
 
 class EntryListPanel : public wxPanel {
-private:
+protected:
 	Archive*	archive;
 	EntryList*	entry_list;
 
@@ -31,9 +31,9 @@ public:
 	};
 
 	EntryListPanel(wxWindow *parent, int id, Archive* archive);
-	~EntryListPanel();
+	virtual ~EntryListPanel();
 
-	void					populateEntryList();
+	virtual void			populateEntryList();
 	ArchiveEntry*			getFocusedEntry();
 	int						getFocus();
 	vector<ArchiveEntry*>	getSelectedEntries();
@@ -51,6 +51,15 @@ public:
 	void	onEntryListActivated(wxListEvent &event);
 
 	DECLARE_EVENT_TABLE()
+};
+
+class ZipEntryListPanel : public EntryListPanel {
+private:
+	string	cur_directory;
+
+public:
+	ZipEntryListPanel(wxWindow *parent, int id, Archive* archive);
+	~ZipEntryListPanel();
 };
 
 #endif //__ENTRYLISTPANEL_H__

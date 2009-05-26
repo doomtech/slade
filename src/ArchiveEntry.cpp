@@ -43,6 +43,7 @@ ArchiveEntry::ArchiveEntry(string name, Archive* parent) {
 	this->size = 0;
 	this->data_loaded = true;
 	this->state = 2;
+	this->type = ETYPE_UNKNOWN;
 }
 
 /* ArchiveEntry::ArchiveEntry

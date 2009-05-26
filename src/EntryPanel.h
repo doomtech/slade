@@ -14,7 +14,7 @@ public:
 	~EntryPanel();
 
 	ArchiveEntry* getEntry() { return entry; }
-	virtual void loadEntry(ArchiveEntry* entry);
+	virtual bool loadEntry(ArchiveEntry* entry);
 };
 
 class TextEntryPanel : public EntryPanel {
@@ -25,7 +25,7 @@ public:
 	TextEntryPanel(wxWindow* parent);
 	~TextEntryPanel();
 
-	void loadEntry(ArchiveEntry* entry);
+	bool loadEntry(ArchiveEntry* entry);
 };
 
 #endif //__LUMPAREA_H__
