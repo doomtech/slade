@@ -35,6 +35,7 @@
 #include <wx/zipstrm.h>
 #include <wx/ptr_scpd.h>
 #include <wx/filename.h>
+#include <algorithm>
 
 
 /*******************************************************************
@@ -328,10 +329,18 @@ vector<string> ZipArchive::getSubDirs(string dir) {
 	int dir_depth = fn.GetDirCount();
 
 	for (size_t a = 0; a < entries.size(); a++) {
+		// Get the current entry's directory as a wxFileName
 		wxFileName edir(getEntryDirectory(entries[a]));
+
+		// Skip if it isn't 'deeper' than the current directory
 		if (edir.GetDirCount() <= dir_depth)
 			continue;
-		string sdir = edir.GetDirs()[dir_depth];
+
+		// Skip it if it isn't in the current directory
+		if (!getEntryDirectory(entries[a]).StartsWith(dir))
+			continue;
+
+		string sdir = edir.GetDirs()[dir_depth] + _T("/");
 		if (std::find(ret.begin(), ret.end(), sdir) == ret.end())
 			ret.push_back(sdir);
 	}

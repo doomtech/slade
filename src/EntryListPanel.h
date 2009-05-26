@@ -55,7 +55,8 @@ public:
 
 class ZipEntryListPanel : public EntryListPanel {
 private:
-	string	cur_directory;
+	string			cur_directory;
+	ArchiveEntry*	dummy_folder_entry;
 
 public:
 	ZipEntryListPanel(wxWindow *parent, int id, Archive* archive);

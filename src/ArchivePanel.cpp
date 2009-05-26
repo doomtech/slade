@@ -372,9 +372,14 @@ void ArchivePanel::onEntryListChange(wxListEvent& event) {
 	cur_area->Show(false);
 	sizer->Replace(cur_area, text_area);
 	cur_area = text_area;
-	if (!cur_area->loadEntry(entry_list->getFocusedEntry())) {
-		wxMessageBox(s_fmt(_T("Error loading entry:\n%s"), Global::error.c_str()), _T("Error"), wxICON_ERROR);
+
+	ArchiveEntry* entry = entry_list->getFocusedEntry();
+	if (entry) {
+		if (!cur_area->loadEntry(entry)) {
+			wxMessageBox(s_fmt(_T("Error loading entry:\n%s"), Global::error.c_str()), _T("Error"), wxICON_ERROR);
+		}
 	}
+
 	cur_area->Show(true);
 
 	Layout();

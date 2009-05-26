@@ -406,9 +406,15 @@ ZipEntryListPanel::ZipEntryListPanel(wxWindow* parent, int id, Archive* archive)
 
 	// Initial directory is root
 	cur_directory = _T("");
+
+	// Create dummy folder entry (all folder list items will point to this entry)
+	dummy_folder_entry = new ArchiveEntry();
+	dummy_folder_entry->setType(ETYPE_FOLDER);
+	dummy_folder_entry->setSize(0);
 }
 
 ZipEntryListPanel::~ZipEntryListPanel() {
+	delete dummy_folder_entry;
 }
 
 void ZipEntryListPanel::populateEntryList() {
@@ -429,7 +435,7 @@ void ZipEntryListPanel::populateEntryList() {
 
 	// Go through all entries in the directory
 	for (size_t a = 0; a < dir_entries.size(); a++) {
-		// Setup new entry
+		// Setup entry item
 		wxListItem li;
 		li.SetId(a);
 		li.SetData(dir_entries[a]);
@@ -444,9 +450,10 @@ void ZipEntryListPanel::populateEntryList() {
 
 	// Go through all subdirectories (if any)
 	for (size_t a = 0; a < subdirs.size(); a++) {
-		// Setup new entry
+		// Setup subdirectory item
 		wxListItem li;
 		li.SetId(0);
+		li.SetData(dummy_folder_entry);
 		li.SetText(subdirs[a]);
 
 		// Add it to the list
@@ -458,9 +465,18 @@ void ZipEntryListPanel::populateEntryList() {
 }
 
 void ZipEntryListPanel::onEntryListActivated(wxListEvent& event) {
-	// Check for folder
-	// etc
+	ArchiveEntry* entry = (ArchiveEntry*)(entry_list->GetItemData(event.GetIndex()));
+	if (!entry)
+		return;
 
-	// Otherwise do default activate action
-	EntryListPanel::onEntryListActivated(event);
+	// Check for folder
+	if (entry->getType() == ETYPE_FOLDER) {
+		// If a folder was activated, open it
+		cur_directory += entry_list->GetItemText(event.GetIndex());
+		populateEntryList();
+	}
+	else {
+		// Otherwise do default activate action
+		EntryListPanel::onEntryListActivated(event);
+	}
 }
