@@ -439,6 +439,20 @@ void ZipEntryListPanel::populateEntryList() {
 		entry_list->updateEntry(a);
 	}
 
+	// Get all subdirectories in the current directory
+	vector<string> subdirs = ((ZipArchive*)archive)->getSubDirs(cur_directory);
+
+	// Go through all subdirectories (if any)
+	for (size_t a = 0; a < subdirs.size(); a++) {
+		// Setup new entry
+		wxListItem li;
+		li.SetId(0);
+		li.SetText(subdirs[a]);
+
+		// Add it to the list
+		entry_list->InsertItem(li);
+	}
+
 	// Setup size
 	entry_list->SetMinSize(wxSize(entry_list->getWidth(), -1));
 }

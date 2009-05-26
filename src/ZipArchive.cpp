@@ -320,6 +320,26 @@ vector<ArchiveEntry*> ZipArchive::getDirectory(string dir) {
 	return ret;
 }
 
+vector<string> ZipArchive::getSubDirs(string dir) {
+	// Init list
+	vector<string> ret;
+
+	wxFileName fn(dir);
+	int dir_depth = fn.GetDirCount();
+
+	for (size_t a = 0; a < entries.size(); a++) {
+		wxFileName edir(getEntryDirectory(entries[a]));
+		if (edir.GetDirCount() <= dir_depth)
+			continue;
+		string sdir = edir.GetDirs()[dir_depth];
+		if (std::find(ret.begin(), ret.end(), sdir) == ret.end())
+			ret.push_back(sdir);
+	}
+
+	// Return the list
+	return ret;
+}
+
 /* ZipArchive::detectMaps
  * Searches for any maps in the wad and adds them to the map list
  *******************************************************************/

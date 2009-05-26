@@ -28,6 +28,7 @@ public:
 
 	// Directory manipulation/retrieval
 	vector<ArchiveEntry*>	getDirectory(string dir);
+	vector<string>			getSubDirs(string dir);
 
 	vector<mapdesc_t>	detectMaps();
 };
