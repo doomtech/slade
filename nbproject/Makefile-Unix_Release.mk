@@ -30,6 +30,7 @@ OBJECTDIR=build/Unix_Release/${PLATFORM}
 OBJECTFILES= \
 	${OBJECTDIR}/src/MainWindow.o \
 	${OBJECTDIR}/src/ArchiveManager.o \
+	${OBJECTDIR}/src/DefaultEntryPanel.o \
 	${OBJECTDIR}/src/Archive.o \
 	${OBJECTDIR}/src/MemChunk.o \
 	${OBJECTDIR}/src/ListenerAnnouncer.o \
@@ -79,6 +80,11 @@ ${OBJECTDIR}/src/ArchiveManager.o: src/ArchiveManager.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
 	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/ArchiveManager.o src/ArchiveManager.cpp
+
+${OBJECTDIR}/src/DefaultEntryPanel.o: src/DefaultEntryPanel.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/DefaultEntryPanel.o src/DefaultEntryPanel.cpp
 
 ${OBJECTDIR}/src/Archive.o: src/Archive.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
