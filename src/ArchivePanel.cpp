@@ -265,6 +265,9 @@ bool ArchivePanel::exportEntry() {
 	}
 }
 
+/* ArchivePanel::exportEntryWad
+ * Exports the selected entries to a Wad archive
+ *******************************************************************/
 bool ArchivePanel::exportEntryWad() {
 	// Get a list of selected entries
 	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
@@ -354,6 +357,16 @@ void ArchivePanel::onAnnouncement(Announcer* announcer, string event_name, MemCh
 			entry_list->removeEntry(index);
 	}
 }
+
+/*
+void ArchivePanel::onDEPBtnEditText(wxCommandEvent& event) {
+	// Swap to text area
+	wxSizer* sizer = GetSizer();
+	sizer->Replace(cur_area, text_area);
+	text_area->loadEntry(cur_area->getEntry());
+	cur_area = text_area;
+}
+*/
 
 BEGIN_EVENT_TABLE(ArchivePanel, wxPanel)
 	EVT_LIST_ITEM_FOCUSED(ArchivePanel::ENTRY_LIST_PANEL, ArchivePanel::onEntryListChange)

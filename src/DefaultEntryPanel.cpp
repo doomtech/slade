@@ -48,7 +48,7 @@ DefaultEntryPanel::DefaultEntryPanel(wxWindow* parent)
 	// Create labels & button
 	label_type = new wxStaticText(this, -1, _T("Entry Type:"));
 	label_size = new wxStaticText(this, -1, _T("Entry Size:"));
-	btn_edit_text = new wxButton(this, -1, _T("Edit as Text"));
+	btn_edit_text = new wxButton(this, BTN_EDITTEXT, _T("Edit as Text"));
 
 	// Add them to the panel
 	framesizer->AddStretchSpacer();

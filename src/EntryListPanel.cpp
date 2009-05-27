@@ -313,6 +313,9 @@ bool EntryListPanel::updateEntry(DWORD archive_index) {
 	entry_list->updateEntry(archive_index);
 }
 
+/* EntryListPanel::removeEntry
+ * Removes an entry from the list
+ *******************************************************************/
 bool EntryListPanel::removeEntry(DWORD archive_index) {
 	// Just delete the list item corresponding with the entry index
 	// (it's 1-1 in a normal EntryListPanel, will be different for zip archives)
@@ -394,7 +397,9 @@ void EntryListPanel::onEntryListActivated(wxListEvent& event) {
 
 
 
-
+/* ZipEntryListPanel::ZipEntryListPanel
+ * ZipEntryListPanel class constructor
+ *******************************************************************/
 ZipEntryListPanel::ZipEntryListPanel(wxWindow* parent, int id, Archive* archive)
 : EntryListPanel(parent, id, archive) {
 	// Check the archive type
@@ -413,10 +418,18 @@ ZipEntryListPanel::ZipEntryListPanel(wxWindow* parent, int id, Archive* archive)
 	dummy_folder_entry->setState(0);
 }
 
+/* ZipEntryListPanel::~ZipEntryListPanel
+ * ZipEntryListPanel class destructor
+ *******************************************************************/
 ZipEntryListPanel::~ZipEntryListPanel() {
 	delete dummy_folder_entry;
 }
 
+/* ZipEntryListPanel::populateEntryList
+ * Clears & populates the entry list with all the entries in
+ * the current directory, all subdirectories, and a '..' entry if
+ * it is needed
+ *******************************************************************/
 void ZipEntryListPanel::populateEntryList() {
 	wxLogMessage(_T("Populate list with directory ") + cur_directory);
 	// Clear the list
@@ -480,8 +493,16 @@ void ZipEntryListPanel::populateEntryList() {
 	entry_list->SetMinSize(wxSize(entry_list->getWidth(), -1));
 }
 
+/* ZipEntryListPanel::onEntryListActivated
+ * Called when an item in the list is activated (double clicked or
+ * pressed enter). Changes to that difectory if it is a directory
+ * entry.
+ *******************************************************************/
 void ZipEntryListPanel::onEntryListActivated(wxListEvent& event) {
+	// Get the entry that was activated
 	ArchiveEntry* entry = (ArchiveEntry*)(entry_list->GetItemData(event.GetIndex()));
+
+	// If it doesn't exist, return
 	if (!entry)
 		return;
 
@@ -491,10 +512,13 @@ void ZipEntryListPanel::onEntryListActivated(wxListEvent& event) {
 		if (entry_list->GetItemText(event.GetIndex()).Cmp(_T("..")))
 			cur_directory += entry_list->GetItemText(event.GetIndex());
 		else {
+			// '..' item, go up 1 directory
 			wxFileName fn(cur_directory);
 			fn.RemoveLastDir();
 			cur_directory = fn.GetFullPath(wxPATH_UNIX);
 		}
+
+		// Refresh the list
 		populateEntryList();
 		GetParent()->Layout();
 	}

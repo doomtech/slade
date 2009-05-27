@@ -109,6 +109,50 @@ void MainWindow::setupLayout() {
 	SetMenuBar(menu);
 
 
+
+	// -- Toolbars --
+
+	// Create File toolbar
+	wxAuiToolBar* tb_file = new wxAuiToolBar(this, -1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
+	tb_file->AddTool(MENU_FILE_NEW, _T("New"), wxNullBitmap, _T("New Archive"));
+	tb_file->AddSeparator();
+	tb_file->AddTool(MENU_FILE_OPEN, _T("Open"), wxNullBitmap, _T("Open"));
+	tb_file->AddSeparator();
+	tb_file->AddTool(MENU_FILE_SAVE, _T("Save"), wxNullBitmap, _T("Save"));
+	tb_file->AddTool(MENU_FILE_SAVEAS, _T("Save As"), wxNullBitmap, _T("Save As"));
+	tb_file->AddTool(MENU_FILE_SAVEALL, _T("Save All"), wxNullBitmap, _T("Save All"));
+	tb_file->AddSeparator();
+	tb_file->AddTool(MENU_FILE_CLOSE, _T("Close"), wxNullBitmap, _T("Close"));
+	tb_file->AddTool(MENU_FILE_CLOSEALL, _T("Close All"), wxNullBitmap, _T("Close All"));
+	tb_file->Realize();
+
+	// Create Entry toolbar
+	wxAuiToolBar* tb_entry = new wxAuiToolBar(this, -1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
+	tb_entry->AddTool(MENU_ENTRY_NEW, _T("New"), wxNullBitmap, _T("New Entry"));
+	tb_entry->AddSeparator();
+	tb_entry->AddTool(MENU_ENTRY_RENAME, _T("Rename"), wxNullBitmap, _T("Rename"));
+	tb_entry->AddTool(MENU_ENTRY_DELETE, _T("Delete"), wxNullBitmap, _T("Delete"));
+	tb_entry->AddSeparator();
+	tb_entry->AddTool(MENU_ENTRY_IMPORT, _T("Import"), wxNullBitmap, _T("Import"));
+	tb_entry->AddTool(MENU_ENTRY_EXPORT, _T("Export"), wxNullBitmap, _T("Export"));
+	tb_entry->AddSeparator();
+	tb_entry->AddTool(MENU_ENTRY_MOVEUP, _T("Move Up"), wxNullBitmap, _T("Move Up"));
+	tb_entry->AddTool(MENU_ENTRY_MOVEDOWN, _T("Move Down"), wxNullBitmap, _T("Move Down"));
+	tb_entry->Realize();
+
+	// Setup panel info & add toolbar panels
+	// File toolbar
+	p_inf.ToolbarPane();
+	p_inf.Top();
+	m_mgr->AddPane(tb_file, p_inf);
+
+	// Entry toolbar
+	p_inf.ToolbarPane();
+	p_inf.Top();
+	p_inf.Position(1);
+	m_mgr->AddPane(tb_entry, p_inf);
+
+
 	// -- Editor Area --
 	notebook_tabs = new wxAuiNotebook(this, -1, wxDefaultPosition, wxDefaultSize);
 

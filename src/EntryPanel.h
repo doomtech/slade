@@ -24,6 +24,10 @@ private:
 	wxButton*		btn_edit_text;
 
 public:
+	enum {
+		BTN_EDITTEXT,
+	};
+
 	DefaultEntryPanel(wxWindow* parent);
 	~DefaultEntryPanel();
 
