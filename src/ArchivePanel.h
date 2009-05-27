@@ -15,6 +15,7 @@ private:
 	// Entry panels
 	EntryPanel*		cur_area;
 	EntryPanel*		entry_area;
+	EntryPanel*		default_area;
 	TextEntryPanel*	text_area;
 
 public:

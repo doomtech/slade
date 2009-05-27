@@ -61,6 +61,7 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 
 	// Create entry panels
 	entry_area = new EntryPanel(this);
+	default_area = new DefaultEntryPanel(this);
 	text_area = new TextEntryPanel(this);
 
 	// Add default entry panel to the panel
@@ -376,20 +377,35 @@ void ArchivePanel::onEntryListChange(wxListEvent& event) {
 		return;
 	}
 
-	// Hide the current entry panel, replace it with the new
-	// entry panel, and show that
-	cur_area->Show(false);
-	sizer->Replace(cur_area, text_area);
-	cur_area = text_area;
-
+	// Get the focused entry
 	ArchiveEntry* entry = entry_list->getFocusedEntry();
-	if (entry) {
-		if (!cur_area->loadEntry(entry)) {
-			wxMessageBox(s_fmt(_T("Error loading entry:\n%s"), Global::error.c_str()), _T("Error"), wxICON_ERROR);
-		}
+
+	// Null entry, do nothing
+	if (!entry) {
+		wxLogMessage(_T("Warning: NULL entry focused in the list"));
+		return;
 	}
 
-	cur_area->Show(true);
+	// Get the appropriate entry panel for the entry's type
+	EntryPanel* new_area = default_area;
+	switch (entry->getType()) {
+		case ETYPE_TEXT:
+			new_area = text_area;
+			break;
+	}
+
+	// If the new panel is different than the current, swap them
+	if (new_area != cur_area) {
+		cur_area->Show(false);				// Hide current
+		sizer->Replace(cur_area, new_area);	// Swap the panels
+		cur_area = new_area;				// Set the new panel to current
+		cur_area->Show(true);				// Show current
+	}
+
+	// Load the entry into the panel
+	if (!cur_area->loadEntry(entry)) {
+		wxMessageBox(s_fmt(_T("Error loading entry:\n%s"), Global::error.c_str()), _T("Error"), wxICON_ERROR);
+	}
 
 	Layout();
 }

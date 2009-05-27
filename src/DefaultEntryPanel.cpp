@@ -45,6 +45,19 @@ DefaultEntryPanel::DefaultEntryPanel(wxWindow* parent)
 	wxStaticBoxSizer *framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
 	SetSizer(framesizer);
 
+	// Create labels & button
+	label_type = new wxStaticText(this, -1, _T("Entry Type:"));
+	label_size = new wxStaticText(this, -1, _T("Entry Size:"));
+	btn_edit_text = new wxButton(this, -1, _T("Edit as Text"));
+
+	// Add them to the panel
+	framesizer->AddStretchSpacer();
+	framesizer->Add(label_type, 0, wxALIGN_CENTER|wxALL, 4);
+	framesizer->Add(label_size, 0, wxALIGN_CENTER|wxALL, 4);
+	framesizer->AddSpacer(8);
+	framesizer->Add(btn_edit_text, 0, wxALIGN_CENTER|wxALL, 4);
+	framesizer->AddStretchSpacer();
+
 	Layout();
 }
 
@@ -64,8 +77,18 @@ bool DefaultEntryPanel::loadEntry(ArchiveEntry* entry) {
 		return false;
 	}
 
+	// Hide Edit as Text button if necessary
+	btn_edit_text->Show(true);
+	if (entry->getType() == ETYPE_FOLDER)
+		btn_edit_text->Show(false);
+
+	// Set labels
+	label_type->SetLabel(s_fmt(_T("Entry Type: %s"), entry->getTypeString().c_str()));
+	label_size->SetLabel(s_fmt(_T("Entry Size: %d bytes"), entry->getSize()));
+
 	// Update variables
 	this->entry = entry;
 
+	Layout();
 	return true;
 }

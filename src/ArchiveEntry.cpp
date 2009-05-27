@@ -361,7 +361,7 @@ string ArchiveEntry::getTypeString() {
 
 	if (type == ETYPE_WAD) return _T("Wad File");
 
-	if (type == ETYPE_FOLDER) return _T("Dir");
+	if (type == ETYPE_FOLDER) return _T("Directory");
 
 	return _T("Unknown");
 }

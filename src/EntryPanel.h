@@ -19,6 +19,9 @@ public:
 
 class DefaultEntryPanel : public EntryPanel {
 private:
+	wxStaticText*	label_type;
+	wxStaticText*	label_size;
+	wxButton*		btn_edit_text;
 
 public:
 	DefaultEntryPanel(wxWindow* parent);
