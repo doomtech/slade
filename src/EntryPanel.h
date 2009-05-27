@@ -1,6 +1,6 @@
 
-#ifndef __LUMPAREA_H__
-#define __LUMPAREA_H__
+#ifndef __ENTRYPANEL_H__
+#define __ENTRYPANEL_H__
 
 #include "ArchiveEntry.h"
 #include <wx/stc/stc.h>
@@ -17,6 +17,16 @@ public:
 	virtual bool loadEntry(ArchiveEntry* entry);
 };
 
+class DefaultEntryPanel : public EntryPanel {
+private:
+
+public:
+	DefaultEntryPanel(wxWindow* parent);
+	~DefaultEntryPanel();
+
+	bool loadEntry(ArchiveEntry* entry);
+};
+
 class TextEntryPanel : public EntryPanel {
 private:
 	wxStyledTextCtrl*	text_area;
@@ -28,4 +38,4 @@ public:
 	bool loadEntry(ArchiveEntry* entry);
 };
 
-#endif //__LUMPAREA_H__
+#endif //__ENTRYPANEL_H__

@@ -12,7 +12,7 @@ private:
 	Archive*		archive;
 	EntryListPanel*	entry_list;
 
-	// Lump areas
+	// Entry panels
 	EntryPanel*		cur_area;
 	EntryPanel*		entry_area;
 	TextEntryPanel*	text_area;

@@ -90,7 +90,7 @@ ArchiveEntry* Archive::getEntry(DWORD index) {
 
 /* Archive::getEntry
  * Returns the first entry with the specified name,
- * or NULL if no lump exists with that name
+ * or NULL if no entry exists with that name
  *******************************************************************/
 ArchiveEntry* Archive::getEntry(string name) {
 	for (size_t a = 0; a < entries.size(); a++) {
@@ -135,7 +135,7 @@ bool Archive::loadEntryData(ArchiveEntry* entry) {
 	return false;
 }
 
-/* Archive::numLumps
+/* Archive::numEntries
  * Returns the number of entries in the archive
  *******************************************************************/
 DWORD Archive::numEntries() {

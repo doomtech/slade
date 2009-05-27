@@ -268,7 +268,7 @@ void MainWindow::onFileOpen(wxCommandEvent &e) {
 		wxArrayString files;
 		dialog_open->GetPaths(files);
 
-		// Send it to the Wad Manager Panel
+		// Send it to the Archive Manager Panel
 		panel_archivemanager->openFiles(files);
 	}
 }

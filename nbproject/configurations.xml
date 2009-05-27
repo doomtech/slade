@@ -23,6 +23,7 @@
         <itemPath>src/ArchivePanel.h</itemPath>
         <itemPath>src/ConsolePanel.cpp</itemPath>
         <itemPath>src/ConsolePanel.h</itemPath>
+        <itemPath>src/DefaultEntryPanel.cpp</itemPath>
         <itemPath>src/EntryListPanel.cpp</itemPath>
         <itemPath>src/EntryListPanel.h</itemPath>
         <itemPath>src/EntryPanel.cpp</itemPath>
@@ -129,6 +130,9 @@
       </item>
       <item path="src/ConsolePanel.h">
         <itemTool>3</itemTool>
+      </item>
+      <item path="src/DefaultEntryPanel.cpp">
+        <itemTool>1</itemTool>
       </item>
       <item path="src/EntryListPanel.cpp">
         <itemTool>1</itemTool>
@@ -292,6 +296,9 @@
       </item>
       <item path="src/ConsolePanel.h">
         <itemTool>3</itemTool>
+      </item>
+      <item path="src/DefaultEntryPanel.cpp">
+        <itemTool>1</itemTool>
       </item>
       <item path="src/EntryListPanel.cpp">
         <itemTool>1</itemTool>
@@ -487,6 +494,9 @@
       <item path="src/ConsolePanel.h">
         <itemTool>3</itemTool>
       </item>
+      <item path="src/DefaultEntryPanel.cpp">
+        <itemTool>1</itemTool>
+      </item>
       <item path="src/EntryListPanel.cpp">
         <itemTool>1</itemTool>
       </item>
@@ -668,6 +678,9 @@
       </item>
       <item path="src/ConsolePanel.h">
         <itemTool>3</itemTool>
+      </item>
+      <item path="src/DefaultEntryPanel.cpp">
+        <itemTool>1</itemTool>
       </item>
       <item path="src/EntryListPanel.cpp">
         <itemTool>1</itemTool>

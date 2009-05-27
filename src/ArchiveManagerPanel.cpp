@@ -46,7 +46,7 @@
  *******************************************************************/
 WMFileBrowser::WMFileBrowser(wxWindow* parent, ArchiveManagerPanel* wm, int id)
 : wxGenericDirCtrl(parent, id, wxDirDialogDefaultFolderStr, wxDefaultPosition, wxDefaultSize, wxDIRCTRL_SHOW_FILTERS,
-_T("Any Supported Wad File (*.wad; *.zip; *.pk3)|*.wad;*.zip;*.pk3|Doom Wad files (*.wad)|*.wad|Zip files (*.zip)|*.zip|Pk3 (zip) files (*.pk3)|*.pk3|All Files (*.*)|*.*")) {
+_T("Any Supported Archive File (*.wad; *.zip; *.pk3)|*.wad;*.zip;*.pk3|Doom Wad files (*.wad)|*.wad|Zip files (*.zip)|*.zip|Pk3 (zip) files (*.pk3)|*.pk3|All Files (*.*)|*.*")) {
 	// Set the parent
 	this->parent = wm;
 
@@ -94,7 +94,7 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
 	wxPanel *panel_am = new wxPanel(notebook_tabs);
 	notebook_tabs->AddPage(panel_am, _T("Archives"), true);
 
-	// Create/setup wad list
+	// Create/setup archive list
 	wxBoxSizer *box_am = new wxBoxSizer(wxVERTICAL);
 	panel_am->SetSizer(box_am);
 	box_am->Add(new wxStaticText(panel_am, -1, _T("Open Archives:")), 0, wxEXPAND | wxALL, 4);
@@ -110,13 +110,13 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
 	file_browser = new WMFileBrowser(notebook_tabs, this, TREE_BROWSER);
 	notebook_tabs->AddPage(file_browser, _("File Browser"));
 
-	// Create/setup Wad context menu
+	// Create/setup Archive context menu
 	menu_context = new wxMenu();
 	menu_context->Append(MENU_SAVE, _("Save"), _("Save the selected Archive(s)"));
 	menu_context->Append(MENU_SAVEAS, _("Save As"), _("Save the selected Archive(s) to a new file(s)"));
 	menu_context->Append(MENU_CLOSE, _T("Close"), _("Close the selected Archive(s)"));
 
-	// Listen to the WadManager
+	// Listen to the ArchiveManager
 	listenTo(&(ArchiveManager::getInstance()));
 }
 
@@ -133,7 +133,7 @@ void ArchiveManagerPanel::refreshArchiveList() {
 	// Clear the list
 	list_archives->ClearAll();
 
-	// Add each wad that is opened in the WadManager
+	// Add each archive that is opened in the ArchiveManager
 	ArchiveManager& wm = ArchiveManager::getInstance();
 	for (int a = 0; a < wm.numArchives(); a++)
 		list_archives->InsertItem(list_archives->GetItemCount(), wm.getArchive(a)->getFileName(true));
@@ -161,15 +161,15 @@ bool ArchiveManagerPanel::isArchivePanel(int tab_index) {
  * Opens an archive and initialises the UI for it
  *******************************************************************/
 void ArchiveManagerPanel::openFile(string filename) {
-	// Open the file in the wad manager
-	Archive* new_wad = ArchiveManager::getInstance().openArchive(filename);
+	// Open the file in the archive manager
+	Archive* new_archive = ArchiveManager::getInstance().openArchive(filename);
 
-	// Check that the wad opened ok
-	if (new_wad) {
-		// Open a new wad panel tab
-		ArchivePanel *wp = new ArchivePanel(notebook_archives, new_wad);
-		notebook_archives->AddPage(wp, new_wad->getFileName(false), true);
-	} else // If wad didn't open ok, show error message
+	// Check that the archive opened ok
+	if (new_archive) {
+		// Open a new archive panel tab
+		ArchivePanel *wp = new ArchivePanel(notebook_archives, new_archive);
+		notebook_archives->AddPage(wp, new_archive->getFileName(false), true);
+	} else // If archive didn't open ok, show error message
 		wxMessageBox(s_fmt(_T("Error opening %s:\n%s"), filename.c_str(), Global::error.c_str()), _T("Error"), wxICON_ERROR);
 }
 
@@ -324,8 +324,8 @@ void ArchiveManagerPanel::saveCurrentAs() {
 void ArchiveManagerPanel::closeCurrent() {
 	int selection = notebook_archives->GetSelection();
 	if (isArchivePanel(selection)) {
-		Archive* wad = ((ArchivePanel*) notebook_archives->GetPage(selection))->getArchive();
-		ArchiveManager::getInstance().closeArchive(wad);
+		Archive* archive = ((ArchivePanel*) notebook_archives->GetPage(selection))->getArchive();
+		ArchiveManager::getInstance().closeArchive(archive);
 	}
 }
 

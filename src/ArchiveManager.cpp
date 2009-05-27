@@ -170,7 +170,7 @@ bool ArchiveManager::closeArchive(string filename) {
 			return closeArchive(a);
 	}
 
-	// If no wad is found with a matching filename, return false
+	// If no archive is found with a matching filename, return false
 	return false;
 }
 
@@ -179,14 +179,14 @@ bool ArchiveManager::closeArchive(string filename) {
  * exists in the list. Returns false if it doesn't exist, else true
  *******************************************************************/
 bool ArchiveManager::closeArchive(Archive* archive) {
-	// Go through all open wads
+	// Go through all open archives
 	for (int a = 0; a < (int) open_archives.size(); a++) {
-		// If the wad exists in the list, remove it
+		// If the archive exists in the list, remove it
 		if (open_archives[a] == archive)
 			return closeArchive(a);
 	}
 
-	// If the wad isn't in the list, return false
+	// If the archive isn't in the list, return false
 	return false;
 }
 

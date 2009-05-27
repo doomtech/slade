@@ -183,7 +183,7 @@ bool ArchiveEntry::importMem(void* data, DWORD size) {
 	// Clear any current data
 	clearData();
 
-	// Copy data into the lump
+	// Copy data into the entry
 	this->data = new BYTE[size];
 	memcpy(this->data, data, size);
 
@@ -203,7 +203,7 @@ bool ArchiveEntry::importMem(void* data, DWORD size) {
 bool ArchiveEntry::importMemChunk(MemChunk& mc) {
 	// Check that the given MemChunk has data
 	if (mc.hasData()) {
-		// Copy the data from the MemChunk into the lump
+		// Copy the data from the MemChunk into the entry
 		importMem(mc.getData(), mc.getSize());
 		return true;
 	} else
@@ -250,7 +250,7 @@ bool ArchiveEntry::importFile(string filename, DWORD offset, DWORD size) {
 	// Close the file
 	fclose(fp);
 
-	// Import data into lump
+	// Import data into entry
 	importMem(temp_buf, size);
 
 	// Delete temp buffer
@@ -269,7 +269,7 @@ bool ArchiveEntry::importEntry(ArchiveEntry* entry) {
 	if (!entry)
 		return false;
 
-	// Copy lump data
+	// Copy entry data
 	importMem(entry->getData(), entry->getSize());
 
 	return true;

@@ -63,7 +63,7 @@ bool MainApp::OnInit() {
 	// Load image handlers
 	wxImage::AddHandler(new wxPNGHandler);
 
-	// Create a WadEditorWindow and show it
+	// Create a MainWindow and show it
 	MainWindow *heh = new MainWindow();
 	heh->Show(true);
 

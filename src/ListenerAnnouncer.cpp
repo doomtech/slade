@@ -7,7 +7,7 @@
  * Web:         http://slade.mancubus.net
  * Filename:    ListenerAnnouncer.cpp
  * Description: Listener/Announcer system classes. Mainly used for
- *              communication between underlying classes (wads, etc)
+ *              communication between underlying classes (archives, etc)
  *              and UI elements, without needing to know about
  *              eachother.
  * 

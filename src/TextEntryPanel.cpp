@@ -6,7 +6,7 @@
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
  * Filename:    TextEntryPanel.cpp
- * Description: TextEntryPanel class. The UI for editing text lumps.
+ * Description: TextEntryPanel class. The UI for editing text entries.
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -38,7 +38,7 @@
 TextEntryPanel::TextEntryPanel(wxWindow* parent)
 : EntryPanel(parent) {
 	// Create & set sizer & border
-	wxStaticBox *frame = new wxStaticBox(this, -1, _T("Lump Contents"));
+	wxStaticBox *frame = new wxStaticBox(this, -1, _T("Entry Contents"));
 	wxStaticBoxSizer *framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
 	SetSizer(framesizer);
 

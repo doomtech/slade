@@ -59,11 +59,11 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 
 	entry_list->populateEntryList();
 
-	// Create lump areas
+	// Create entry panels
 	entry_area = new EntryPanel(this);
 	text_area = new TextEntryPanel(this);
 
-	// Add default lump area to the panel
+	// Add default entry panel to the panel
 	cur_area = entry_area;
 	m_hbox->Add(cur_area, 1, wxEXPAND | wxALL, 4);
 	cur_area->Show(true);
@@ -376,8 +376,8 @@ void ArchivePanel::onEntryListChange(wxListEvent& event) {
 		return;
 	}
 
-	// Hide the current lump area, replace it with the new
-	// lump area, and show that
+	// Hide the current entry panel, replace it with the new
+	// entry panel, and show that
 	cur_area->Show(false);
 	sizer->Replace(cur_area, text_area);
 	cur_area = text_area;

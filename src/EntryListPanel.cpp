@@ -65,11 +65,11 @@ bool EntryList::updateEntry(int index) {
 	if (index < 0 || index >= this->GetItemCount())
 		return false;
 
-	// Get the lump associated with entry index
-	ArchiveEntry* lump = (ArchiveEntry*) GetItemData(index);
+	// Get the Entry associated with entry index
+	ArchiveEntry* entry = (ArchiveEntry*) GetItemData(index);
 
 	// Check that it exists
-	if (!lump) {
+	if (!entry) {
 		wxLogMessage(_T("EntryList entry at index %d has no associated archive entry!"), index);
 		return false;
 	}
@@ -78,18 +78,18 @@ bool EntryList::updateEntry(int index) {
 	// Name
 	wxListItem li;
 	li.SetId(index);
-	li.SetText(lump->getName());
+	li.SetText(entry->getName());
 	SetItem(li);
 	SetColumnWidth(0, wxLIST_AUTOSIZE);
 
 	// Size
-	li.SetText(s_fmt(_T("%d"), lump->getSize()));
+	li.SetText(s_fmt(_T("%d"), entry->getSize()));
 	li.SetColumn(1);
 	SetItem(li);
 	SetColumnWidth(1, wxLIST_AUTOSIZE);
 
 	// Type
-	li.SetText(lump->getTypeString());
+	li.SetText(entry->getTypeString());
 	li.SetColumn(2);
 	SetItem(li);
 	SetColumnWidth(2, wxLIST_AUTOSIZE);
@@ -98,9 +98,9 @@ bool EntryList::updateEntry(int index) {
 	SetItemTextColour(index, wxSystemSettings::GetColour(wxSYS_COLOUR_LISTBOXTEXT));
 
 	// Set entry status text colour if needed
-	if (lump->getState() == 2)
+	if (entry->getState() == 2)
 		SetItemTextColour(index, wxColour(0, 150, 0));
-	else if (lump->getState() == 1)
+	else if (entry->getState() == 1)
 		SetItemTextColour(index, wxColour(0, 80, 180));
 
 	return true;
@@ -120,7 +120,7 @@ EntryListPanel::EntryListPanel(wxWindow *parent, int id, Archive* archive)
 	this->archive = archive;
 
 	// Create & set sizer & border
-	wxStaticBox *frame = new wxStaticBox(this, -1, _T("Lumps"));
+	wxStaticBox *frame = new wxStaticBox(this, -1, _T("Entries"));
 	wxStaticBoxSizer *framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
 	SetSizer(framesizer);
 
@@ -384,7 +384,7 @@ END_EVENT_TABLE()
  * Called when the current focus on the entry list control is changed
  *******************************************************************/
 void EntryListPanel::onEntryListChange(wxListEvent& event) {
-	// Pass the event up to the parent window, as the wad panel should deal with it,
+	// Pass the event up to the parent window, as the archive panel should deal with it,
 	// not this panel.
 	event.Skip();
 }
@@ -410,6 +410,7 @@ ZipEntryListPanel::ZipEntryListPanel(wxWindow* parent, int id, Archive* archive)
 	dummy_folder_entry = new ArchiveEntry();
 	dummy_folder_entry->setType(ETYPE_FOLDER);
 	dummy_folder_entry->setSize(0);
+	dummy_folder_entry->setState(0);
 }
 
 ZipEntryListPanel::~ZipEntryListPanel() {
@@ -454,10 +455,14 @@ void ZipEntryListPanel::populateEntryList() {
 		wxListItem li;
 		li.SetId(0);
 		li.SetData(dummy_folder_entry);
-		li.SetText(subdirs[a]);
 
 		// Add it to the list
 		entry_list->InsertItem(li);
+		entry_list->updateEntry(0);
+
+		// Set name manually
+		li.SetText(subdirs[a]);
+		entry_list->SetItem(li);
 	}
 
 	// If we aren't in the root directory add a ".." item
@@ -465,8 +470,10 @@ void ZipEntryListPanel::populateEntryList() {
 		wxListItem li;
 		li.SetId(0);
 		li.SetData(dummy_folder_entry);
-		li.SetText(_T(".."));
 		entry_list->InsertItem(li);
+		entry_list->updateEntry(0);
+		li.SetText(_T(".."));
+		entry_list->SetItem(li);
 	}
 
 	// Setup size
@@ -489,7 +496,7 @@ void ZipEntryListPanel::onEntryListActivated(wxListEvent& event) {
 			cur_directory = fn.GetFullPath(wxPATH_UNIX);
 		}
 		populateEntryList();
-		Layout();
+		GetParent()->Layout();
 	}
 	else {
 		// Otherwise do default activate action

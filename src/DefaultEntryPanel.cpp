@@ -5,9 +5,11 @@
  * 
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
- * Filename:    EntryPanel.cpp
- * Description: EntryPanel class. Different UI panels for editing
- *              different entry types extend from this class.
+ * Filename:    DefaultEntryPanel.cpp
+ * Description: DefaultEntryPanel class. Used for entries that don't
+ *              have their own specific editor, or entries of an
+ *              unknown type. Has the option to open/edit the entry
+ *              as text.
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -32,29 +34,38 @@
 #include "WxStuff.h"
 #include "EntryPanel.h"
 
-/* EntryPanel::EntryPanel
- * EntryPanel class constructor
+
+/* DefaultEntryPanel::DefaultEntryPanel
+ * DefaultEntryPanel class constructor
  *******************************************************************/
-EntryPanel::EntryPanel(wxWindow* parent)
-: wxPanel(parent, -1) {
+DefaultEntryPanel::DefaultEntryPanel(wxWindow* parent)
+: EntryPanel(parent) {
 	// Create & set sizer & border
 	wxStaticBox *frame = new wxStaticBox(this, -1, _T("Entry Contents"));
 	wxStaticBoxSizer *framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
 	SetSizer(framesizer);
-	Show(false);
+
+	Layout();
 }
 
-/* EntryPanel::~EntryPanel
- * EntryPanel class destructor
+/* DefaultEntryPanel::~DefaultEntryPanel
+ * DefaultEntryPanel class destructor
  *******************************************************************/
-EntryPanel::~EntryPanel() {
+DefaultEntryPanel::~DefaultEntryPanel() {
 }
 
-/* EntryPanel::loadEntry
- * Loads an entry into the entry panel (does nothing here, to be
- * overridden by child classes)
+/* DefaultEntryPanel::loadEntry
+ * Loads entry info into the panel
  *******************************************************************/
-bool EntryPanel::loadEntry(ArchiveEntry* entry) {
-	Global::error = _T("Cannot open an entry with the base EntryPanel class");
-	return false;
+bool DefaultEntryPanel::loadEntry(ArchiveEntry* entry) {
+	// Check that the entry exists
+	if (!entry) {
+		Global::error = _T("Invalid archive entry given");
+		return false;
+	}
+
+	// Update variables
+	this->entry = entry;
+
+	return true;
 }

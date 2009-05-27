@@ -94,19 +94,19 @@ bool ZipArchive::openFile(string filename) {
 			wxFileName fn(entry->GetName(wxPATH_UNIX), wxPATH_UNIX);
 
 			// Create entry
-			ArchiveEntry *nlump = new ArchiveEntry(fn.GetName() + _T(".") + fn.GetExt(), this);
+			ArchiveEntry *new_entry = new ArchiveEntry(fn.GetName() + _T(".") + fn.GetExt(), this);
 
 			// Setup entry info
-			nlump->setSize(entry->GetSize());
-			nlump->setLoaded(false);
-			setEntryDirectory(nlump, fn.GetPath(true, wxPATH_UNIX));
-			setEntryZipIndex(nlump, entry_index);
-			nlump->setState(0);
+			new_entry->setSize(entry->GetSize());
+			new_entry->setLoaded(false);
+			setEntryDirectory(new_entry, fn.GetPath(true, wxPATH_UNIX));
+			setEntryZipIndex(new_entry, entry_index);
+			new_entry->setState(0);
 
 			//wxLogMessage(_T("Entry: ") + nlump->getExProp(_T("directory")) + nlump->getName());
 
 			// Add to entry list
-			entries.push_back(nlump);
+			entries.push_back(new_entry);
 		}
 
 		// Go to next entry in the zip file
@@ -201,13 +201,13 @@ bool ZipArchive::save(string filename) {
  * Returns true if successful, false otherwise
  *******************************************************************/
 bool ZipArchive::loadEntryData(ArchiveEntry* entry) {
-	// Check that the lump belongs to this wadfile
+	// Check that the entry belongs to this archive
 	if (entry->getParent() != this) {
 		wxLogMessage(_T("ZipArchive::loadEntryData: Entry %s attempting to load data from wrong parent!"), entry->getName().c_str());
 		return false;
 	}
 
-	// Do nothing if the lump's size is zero,
+	// Do nothing if the entry's size is zero,
 	// or if it has already been loaded
 	if (entry->getSize() == 0 || entry->isLoaded()) {
 		entry->setLoaded();
@@ -247,7 +247,7 @@ bool ZipArchive::loadEntryData(ArchiveEntry* entry) {
 	zip.Read(data, zentry->GetSize());
 	entry->setData(data);
 
-	// Set the lump to loaded
+	// Set the entry to loaded
 	entry->setLoaded();
 
 	return true;
@@ -350,7 +350,7 @@ vector<string> ZipArchive::getSubDirs(string dir) {
 }
 
 /* ZipArchive::detectMaps
- * Searches for any maps in the wad and adds them to the map list
+ * Searches for any maps in the archive and adds them to the map list
  *******************************************************************/
 vector<Archive::mapdesc_t> ZipArchive::detectMaps() {
 	vector<mapdesc_t> maps;
