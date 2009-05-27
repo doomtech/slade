@@ -27,6 +27,8 @@
 /*******************************************************************
  * INCLUDES
  *******************************************************************/
+#include <wx\filename.h>
+
 #include "Main.h"
 #include "WxStuff.h"
 #include "Archive.h"
@@ -382,9 +384,6 @@ END_EVENT_TABLE()
  * Called when the current focus on the entry list control is changed
  *******************************************************************/
 void EntryListPanel::onEntryListChange(wxListEvent& event) {
-	// Set the currently focused item index
-	//focus_index = event.GetIndex();
-
 	// Pass the event up to the parent window, as the wad panel should deal with it,
 	// not this panel.
 	event.Skip();
@@ -418,6 +417,7 @@ ZipEntryListPanel::~ZipEntryListPanel() {
 }
 
 void ZipEntryListPanel::populateEntryList() {
+	wxLogMessage(_T("Populate list with directory ") + cur_directory);
 	// Clear the list
 	entry_list->ClearAll();
 
@@ -449,7 +449,7 @@ void ZipEntryListPanel::populateEntryList() {
 	vector<string> subdirs = ((ZipArchive*)archive)->getSubDirs(cur_directory);
 
 	// Go through all subdirectories (if any)
-	for (size_t a = 0; a < subdirs.size(); a++) {
+	for (int a = subdirs.size() - 1; a >= 0; a--) {
 		// Setup subdirectory item
 		wxListItem li;
 		li.SetId(0);
@@ -457,6 +457,15 @@ void ZipEntryListPanel::populateEntryList() {
 		li.SetText(subdirs[a]);
 
 		// Add it to the list
+		entry_list->InsertItem(li);
+	}
+
+	// If we aren't in the root directory add a ".." item
+	if (cur_directory.Cmp(_T(""))) {
+		wxListItem li;
+		li.SetId(0);
+		li.SetData(dummy_folder_entry);
+		li.SetText(_T(".."));
 		entry_list->InsertItem(li);
 	}
 
@@ -472,8 +481,15 @@ void ZipEntryListPanel::onEntryListActivated(wxListEvent& event) {
 	// Check for folder
 	if (entry->getType() == ETYPE_FOLDER) {
 		// If a folder was activated, open it
-		cur_directory += entry_list->GetItemText(event.GetIndex());
+		if (entry_list->GetItemText(event.GetIndex()).Cmp(_T("..")))
+			cur_directory += entry_list->GetItemText(event.GetIndex());
+		else {
+			wxFileName fn(cur_directory);
+			fn.RemoveLastDir();
+			cur_directory = fn.GetFullPath(wxPATH_UNIX);
+		}
 		populateEntryList();
+		Layout();
 	}
 	else {
 		// Otherwise do default activate action

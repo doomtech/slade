@@ -367,6 +367,15 @@ void ArchivePanel::onEntryListChange(wxListEvent& event) {
 	// Get the panel sizer
 	wxSizer* sizer = GetSizer();
 
+	// If nothing was selected, show blank entry area
+	if (event.GetIndex() == -1) {
+		cur_area->Show(false);
+		sizer->Replace(cur_area, entry_area);
+		cur_area = entry_area;
+		cur_area->Show(true);
+		return;
+	}
+
 	// Hide the current lump area, replace it with the new
 	// lump area, and show that
 	cur_area->Show(false);
