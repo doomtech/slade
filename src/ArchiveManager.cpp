@@ -50,6 +50,8 @@
  * ArchiveManager class constructor
  *******************************************************************/
 ArchiveManager::ArchiveManager() {
+	resource_archive = new ZipArchive();
+	resource_archive->openFile(_T("SLADE.pk3"));
 }
 
 /* ArchiveManager::~ArchiveManager

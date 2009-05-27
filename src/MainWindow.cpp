@@ -31,6 +31,8 @@
 #include "WxStuff.h"
 #include "MainWindow.h"
 #include "ConsolePanel.h"
+#include "ArchiveManager.h"
+#include "Archive.h"
 #include <wx/aui/aui.h>
 
 
@@ -53,6 +55,30 @@ MainWindow::MainWindow()
  * MainWindow class destructor
  *******************************************************************/
 MainWindow::~MainWindow() {
+}
+
+wxImage get_toolbar_icon(string name, int type) {
+	// Init
+	wxImage image;
+
+	// Get the needed entry from the SLADE resource pk3
+	Archive* resource_pk3 = ArchiveManager::getInstance().resourceArchive();
+	string entry_path = _T("toolbar_icons/") + name;
+	ArchiveEntry* entry = resource_pk3->getEntry(entry_path);
+
+	if (entry) {
+		// Export entry data to a temporary file
+		entry->exportFile(_T("sladetemp"));
+
+		// Load the data to a wxImage
+		image.LoadFile(_T("sladetemp"), type);
+
+		// Delete the temporary file
+		wxRemoveFile(_T("sladetemp"));
+	}
+
+	// Return the image, loaded or not
+	return image;
 }
 
 /* MainWindow::setupLayout
@@ -114,30 +140,24 @@ void MainWindow::setupLayout() {
 
 	// Create File toolbar
 	wxAuiToolBar* tb_file = new wxAuiToolBar(this, -1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
-	tb_file->AddTool(MENU_FILE_NEW, _T("New"), wxNullBitmap, _T("New Archive"));
-	tb_file->AddSeparator();
-	tb_file->AddTool(MENU_FILE_OPEN, _T("Open"), wxNullBitmap, _T("Open"));
-	tb_file->AddSeparator();
-	tb_file->AddTool(MENU_FILE_SAVE, _T("Save"), wxNullBitmap, _T("Save"));
-	tb_file->AddTool(MENU_FILE_SAVEAS, _T("Save As"), wxNullBitmap, _T("Save As"));
-	tb_file->AddTool(MENU_FILE_SAVEALL, _T("Save All"), wxNullBitmap, _T("Save All"));
-	tb_file->AddSeparator();
-	tb_file->AddTool(MENU_FILE_CLOSE, _T("Close"), wxNullBitmap, _T("Close"));
-	tb_file->AddTool(MENU_FILE_CLOSEALL, _T("Close All"), wxNullBitmap, _T("Close All"));
+	tb_file->AddTool(MENU_FILE_NEW, _T("New"), wxBitmap(get_toolbar_icon(_T("newarchive.png"), wxBITMAP_TYPE_PNG)), _T("New Archive"));
+	tb_file->AddTool(MENU_FILE_OPEN, _T("Open"), wxBitmap(get_toolbar_icon(_T("open.png"), wxBITMAP_TYPE_PNG)), _T("Open"));
+	tb_file->AddTool(MENU_FILE_SAVE, _T("Save"), wxBitmap(get_toolbar_icon(_T("save.png"), wxBITMAP_TYPE_PNG)), _T("Save"));
+	tb_file->AddTool(MENU_FILE_SAVEAS, _T("Save As"), wxBitmap(get_toolbar_icon(_T("saveas.png"), wxBITMAP_TYPE_PNG)), _T("Save As"));
+	tb_file->AddTool(MENU_FILE_SAVEALL, _T("Save All"), wxBitmap(get_toolbar_icon(_T("saveall.png"), wxBITMAP_TYPE_PNG)), _T("Save All"));
+	tb_file->AddTool(MENU_FILE_CLOSE, _T("Close"), wxBitmap(get_toolbar_icon(_T("close.png"), wxBITMAP_TYPE_PNG)), _T("Close"));
+	tb_file->AddTool(MENU_FILE_CLOSEALL, _T("Close All"), wxBitmap(get_toolbar_icon(_T("closeall.png"), wxBITMAP_TYPE_PNG)), _T("Close All"));
 	tb_file->Realize();
 
 	// Create Entry toolbar
 	wxAuiToolBar* tb_entry = new wxAuiToolBar(this, -1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
-	tb_entry->AddTool(MENU_ENTRY_NEW, _T("New"), wxNullBitmap, _T("New Entry"));
-	tb_entry->AddSeparator();
-	tb_entry->AddTool(MENU_ENTRY_RENAME, _T("Rename"), wxNullBitmap, _T("Rename"));
-	tb_entry->AddTool(MENU_ENTRY_DELETE, _T("Delete"), wxNullBitmap, _T("Delete"));
-	tb_entry->AddSeparator();
-	tb_entry->AddTool(MENU_ENTRY_IMPORT, _T("Import"), wxNullBitmap, _T("Import"));
-	tb_entry->AddTool(MENU_ENTRY_EXPORT, _T("Export"), wxNullBitmap, _T("Export"));
-	tb_entry->AddSeparator();
-	tb_entry->AddTool(MENU_ENTRY_MOVEUP, _T("Move Up"), wxNullBitmap, _T("Move Up"));
-	tb_entry->AddTool(MENU_ENTRY_MOVEDOWN, _T("Move Down"), wxNullBitmap, _T("Move Down"));
+	tb_entry->AddTool(MENU_ENTRY_NEW, _T("New"), wxBitmap(get_toolbar_icon(_T("newentry.png"), wxBITMAP_TYPE_PNG)), _T("New Entry"));
+	tb_entry->AddTool(MENU_ENTRY_RENAME, _T("Rename"), wxBitmap(get_toolbar_icon(_T("temp.png"), wxBITMAP_TYPE_PNG)), _T("Rename"));
+	tb_entry->AddTool(MENU_ENTRY_DELETE, _T("Delete"), wxBitmap(get_toolbar_icon(_T("temp.png"), wxBITMAP_TYPE_PNG)), _T("Delete"));
+	tb_entry->AddTool(MENU_ENTRY_IMPORT, _T("Import"), wxBitmap(get_toolbar_icon(_T("temp.png"), wxBITMAP_TYPE_PNG)), _T("Import"));
+	tb_entry->AddTool(MENU_ENTRY_EXPORT, _T("Export"), wxBitmap(get_toolbar_icon(_T("temp.png"), wxBITMAP_TYPE_PNG)), _T("Export"));
+	tb_entry->AddTool(MENU_ENTRY_MOVEUP, _T("Move Up"), wxBitmap(get_toolbar_icon(_T("up.png"), wxBITMAP_TYPE_PNG)), _T("Move Up"));
+	tb_entry->AddTool(MENU_ENTRY_MOVEDOWN, _T("Move Down"), wxBitmap(get_toolbar_icon(_T("down.png"), wxBITMAP_TYPE_PNG)), _T("Move Down"));
 	tb_entry->Realize();
 
 	// Setup panel info & add toolbar panels

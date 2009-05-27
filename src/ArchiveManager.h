@@ -8,7 +8,8 @@ class Archive;
 
 class ArchiveManager : public Announcer {
 private:
-	vector<Archive*>		open_archives;
+	vector<Archive*>	open_archives;
+	Archive*			resource_archive;
 
 public:
 	ArchiveManager();
@@ -27,6 +28,7 @@ public:
 	bool		closeArchive(string filename);
 	bool		closeArchive(Archive* archive);
 	int			numArchives() { return (int)open_archives.size(); }
+	Archive*	resourceArchive() { return resource_archive; }
 };
 
 #endif //__ARCHIVEMANAGER_H__

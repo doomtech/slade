@@ -253,6 +253,19 @@ bool ZipArchive::loadEntryData(ArchiveEntry* entry) {
 	return true;
 }
 
+/* ZipArchive::getEntry
+ * Override of Archive::getEntry to find an entry matching the name
+ * AND path given. Returns NULL if no matching entry found
+ *******************************************************************/
+ArchiveEntry* ZipArchive::getEntry(string name) {
+	for (size_t a = 0; a < entries.size(); a++) {
+		if (name == getEntryFullPath(entries[a]))
+			return entries[a];
+	}
+
+	return NULL;
+}
+
 /* ZipArchive::setEntryDirectory
  * Sets the specified entry's directory, if it is part of this
  * archive
@@ -305,6 +318,9 @@ int ZipArchive::getEntryZipIndex(ArchiveEntry* entry) {
 		return atoi(entry->getExProp(_T("zip_index")).ToAscii());
 }
 
+/* ZipArchive::getDirectory
+ * Returns a list of all entries within the specified directory
+ *******************************************************************/
 vector<ArchiveEntry*> ZipArchive::getDirectory(string dir) {
 	// Init entry list
 	vector<ArchiveEntry*> ret;
@@ -321,6 +337,10 @@ vector<ArchiveEntry*> ZipArchive::getDirectory(string dir) {
 	return ret;
 }
 
+/* ZipArchive::getSubDirs
+ * Gets a list of all the subdirectories within the specified
+ * directory
+ *******************************************************************/
 vector<string> ZipArchive::getSubDirs(string dir) {
 	// Init list
 	vector<string> ret;

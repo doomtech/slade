@@ -17,6 +17,8 @@ public:
 	bool	save(string filename);
 	bool	loadEntryData(ArchiveEntry* entry);
 
+	ArchiveEntry*	getEntry(string name);
+
 	// Entry directory stuff
 	void	setEntryDirectory(ArchiveEntry* entry, string dir);
 	string	getEntryDirectory(ArchiveEntry* entry);
