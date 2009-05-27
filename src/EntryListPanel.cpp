@@ -27,14 +27,13 @@
 /*******************************************************************
  * INCLUDES
  *******************************************************************/
-#include <wx\filename.h>
-
 #include "Main.h"
 #include "WxStuff.h"
 #include "Archive.h"
 #include "ZipArchive.h"
 #include "EntryListPanel.h"
 #include "ArchiveEntry.h"
+#include <wx/filename.h>
 
 
 /*******************************************************************
