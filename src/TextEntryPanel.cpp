@@ -29,7 +29,7 @@
  *******************************************************************/
 #include "Main.h"
 #include "WxStuff.h"
-#include "EntryPanel.h"
+#include "TextEntryPanel.h"
 
 
 /* TextEntryPanel::TextEntryPanel
@@ -59,32 +59,6 @@ TextEntryPanel::~TextEntryPanel() {
  * Loads an entry into the panel as text
  *******************************************************************/
 bool TextEntryPanel::loadEntry(ArchiveEntry* entry) {
-	/*
-	// Check that the entry exists
-	if (!entry) {
-		Global::error = _T("Invalid archive entry given");
-		return false;
-	}
-
-	// Check that the entry has any data, if not do nothing
-	if (entry->getSize() == 0)
-		return true;
-
-	// Get character entry data
-	char* data = (char*)entry->getData();
-	if (!data) {
-		Global::error = _T("Cannot read entry data (see logfile for info)");
-		return false;
-	}
-
-	// Load it into the text area
-	string istr = wxString::FromAscii(data);
-	istr.Truncate(entry->getSize());
-
-	// Add text to the text area
-	text_area->SetText(istr);
-	 **/
-
 	// Load entry into the text editor
 	if (!text_area->loadEntry(entry))
 		return false;

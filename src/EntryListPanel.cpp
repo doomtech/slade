@@ -430,7 +430,6 @@ ZipEntryListPanel::~ZipEntryListPanel() {
  * it is needed
  *******************************************************************/
 void ZipEntryListPanel::populateEntryList() {
-	wxLogMessage(_T("Populate list with directory ") + cur_directory);
 	// Clear the list
 	entry_list->ClearAll();
 

@@ -32,7 +32,7 @@
  *******************************************************************/
 #include "Main.h"
 #include "WxStuff.h"
-#include "EntryPanel.h"
+#include "DefaultEntryPanel.h"
 
 
 /* DefaultEntryPanel::DefaultEntryPanel
@@ -62,11 +62,10 @@ DefaultEntryPanel::DefaultEntryPanel(wxWindow* parent)
 DefaultEntryPanel::~DefaultEntryPanel() {
 }
 
+/* DefaultEntryPanel::showEntryInfo
+ * Shows entry info stuff on the panel
+ *******************************************************************/
 void DefaultEntryPanel::showEntryInfo(bool show_btn_edittext) {
-	// If it's already showing entry info stuff then don't continue
-	//if (!view_text)
-	//	return;
-
 	// Hide the text editor
 	text_area->Show(false);
 
@@ -93,11 +92,10 @@ void DefaultEntryPanel::showEntryInfo(bool show_btn_edittext) {
 	Layout();
 }
 
+/* DefaultEntryPanel::showTextEditor
+ * Shows the text editor on the panel
+ *******************************************************************/
 void DefaultEntryPanel::showTextEditor() {
-	// If it's already showing the text editor then do nothing
-	//if (view_text)
-	//	return;
-
 	// Hide entry info stuff
 	label_type->Show(false);
 	label_size->Show(false);
@@ -149,11 +147,17 @@ bool DefaultEntryPanel::loadEntry(ArchiveEntry* entry) {
 }
 
 BEGIN_EVENT_TABLE(DefaultEntryPanel, wxPanel)
-EVT_BUTTON(BTN_EDITTEXT, DefaultEntryPanel::onEditTextClicked)
+	EVT_BUTTON(BTN_EDITTEXT, DefaultEntryPanel::onEditTextClicked)
 END_EVENT_TABLE()
 
+/* DefaultEntryPanel::onEditTextClicked
+ * Called when the 'Edit as Text' button is clicked. Shows the text
+ * editor on the panel and loads entry contents into it
+ *******************************************************************/
 void DefaultEntryPanel::onEditTextClicked(wxCommandEvent& event) {
 	// Show the text editor
 	showTextEditor();
+
+	// Load entry data into the text editor
 	text_area->loadEntry(entry);
 }

@@ -16,7 +16,7 @@ private:
 	EntryPanel*		cur_area;
 	EntryPanel*		entry_area;
 	EntryPanel*		default_area;
-	TextEntryPanel*	text_area;
+	EntryPanel*		text_area;
 
 public:
 	enum {

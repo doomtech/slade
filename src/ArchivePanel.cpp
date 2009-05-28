@@ -34,6 +34,8 @@
 #include "ArchivePanel.h"
 #include "EntryListPanel.h"
 #include "WadArchive.h"
+#include "TextEntryPanel.h"
+#include "DefaultEntryPanel.h"
 #include <wx/aui/auibook.h>
 #include <wx/filename.h>
 
