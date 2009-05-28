@@ -28,6 +28,8 @@
         <itemPath>src/EntryListPanel.h</itemPath>
         <itemPath>src/EntryPanel.cpp</itemPath>
         <itemPath>src/EntryPanel.h</itemPath>
+        <itemPath>src/TextEditor.cpp</itemPath>
+        <itemPath>src/TextEditor.h</itemPath>
         <itemPath>src/TextEntryPanel.cpp</itemPath>
       </logicalFolder>
       <itemPath>src/MainWindow.cpp</itemPath>
@@ -206,6 +208,12 @@
       <item path="src/SLADEMap.h">
         <itemTool>3</itemTool>
       </item>
+      <item path="src/TextEditor.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/TextEditor.h">
+        <itemTool>3</itemTool>
+      </item>
       <item path="src/TextEntryPanel.cpp">
         <itemTool>1</itemTool>
       </item>
@@ -370,6 +378,12 @@
         <itemTool>1</itemTool>
       </item>
       <item path="src/SLADEMap.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/TextEditor.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/TextEditor.h">
         <itemTool>3</itemTool>
       </item>
       <item path="src/TextEntryPanel.cpp">
@@ -569,6 +583,12 @@
       <item path="src/SLADEMap.h">
         <itemTool>3</itemTool>
       </item>
+      <item path="src/TextEditor.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/TextEditor.h">
+        <itemTool>3</itemTool>
+      </item>
       <item path="src/TextEntryPanel.cpp">
         <itemTool>1</itemTool>
       </item>
@@ -752,6 +772,12 @@
         <itemTool>1</itemTool>
       </item>
       <item path="src/SLADEMap.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/TextEditor.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/TextEditor.h">
         <itemTool>3</itemTool>
       </item>
       <item path="src/TextEntryPanel.cpp">

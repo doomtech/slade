@@ -93,9 +93,14 @@ void MainWindow::setupLayout() {
 	// -- Menu bar --
 	wxMenuBar *menu = new wxMenuBar();
 
+	// File->New Submenu
+	wxMenu* fileNewMenu = new wxMenu(_(""));
+	fileNewMenu->Append(MENU_FILE_NEW,		_("&Wad Archive\tCtrl+Shift+W"),	_("Create a new Doom Wad Archive"));
+	fileNewMenu->Append(MENU_FILE_NEWZIP,	_("&Zip Archive\tCtrl+Shift+Z"),	_("Create a new Zip Archive (zip/pk3/jdf)"));
+
 	// File menu
 	wxMenu* fileMenu = new wxMenu(_(""));
-	fileMenu->Append(MENU_FILE_NEW,			_("&New\tCtrl+N"),		_("Create a new Archive"));
+	fileMenu->AppendSubMenu(fileNewMenu,	_("&New"),				_("Create a new Archive"));
 	fileMenu->AppendSeparator();
     fileMenu->Append(MENU_FILE_OPEN,		_("&Open\tCtrl+O"),		_("Open an existing Archive"));
 	fileMenu->AppendSeparator();
@@ -111,7 +116,7 @@ void MainWindow::setupLayout() {
 
 	// Entry menu
 	wxMenu* entryMenu = new wxMenu(_T(""));
-	entryMenu->Append(MENU_ENTRY_NEW,				_("New"),					_("Create a new empty entry"));
+	entryMenu->Append(MENU_ENTRY_NEW,				_("New\tCtrl+N"),			_("Create a new empty entry"));
 	entryMenu->Append(MENU_ENTRY_NEWFROMFILE,		_("New from File"),			_("Create a new entry with data from a file"));
 	entryMenu->AppendSeparator();
 	entryMenu->Append(MENU_ENTRY_RENAME,			_("Rename\tCtrl+R"),		_("Rename the selected entries"));

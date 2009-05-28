@@ -54,6 +54,8 @@ public:
 	void	openFile(string filename);
 	void	openFiles(wxArrayString& files);
 
+	void	createNewArchive(BYTE type);
+
 	// Selected archives in the list
 	void	saveSelection();
 	void	saveSelectionAs();

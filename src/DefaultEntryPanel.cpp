@@ -45,12 +45,41 @@ DefaultEntryPanel::DefaultEntryPanel(wxWindow* parent)
 	wxStaticBoxSizer *framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
 	SetSizer(framesizer);
 
-	// Create labels & button
+	// Create widgets
 	label_type = new wxStaticText(this, -1, _T("Entry Type:"));
 	label_size = new wxStaticText(this, -1, _T("Entry Size:"));
 	btn_edit_text = new wxButton(this, BTN_EDITTEXT, _T("Edit as Text"));
+	text_area = new TextEditor(this, -1);
 
-	// Add them to the panel
+	// Show entry info stuff
+	view_text = true;
+	showEntryInfo(true);
+}
+
+/* DefaultEntryPanel::~DefaultEntryPanel
+ * DefaultEntryPanel class destructor
+ *******************************************************************/
+DefaultEntryPanel::~DefaultEntryPanel() {
+}
+
+void DefaultEntryPanel::showEntryInfo(bool show_btn_edittext) {
+	// If it's already showing entry info stuff then don't continue
+	//if (!view_text)
+	//	return;
+
+	// Hide the text editor
+	text_area->Show(false);
+
+	// Clear the sizer
+	wxSizer* framesizer = GetSizer();
+	framesizer->Clear(false);
+
+	// Show entry info stuff
+	label_type->Show(true);
+	label_size->Show(true);
+	btn_edit_text->Show(show_btn_edittext);
+
+	// Add entry info stuff to the panel sizer
 	framesizer->AddStretchSpacer();
 	framesizer->Add(label_type, 0, wxALIGN_CENTER|wxALL, 4);
 	framesizer->Add(label_size, 0, wxALIGN_CENTER|wxALL, 4);
@@ -58,13 +87,37 @@ DefaultEntryPanel::DefaultEntryPanel(wxWindow* parent)
 	framesizer->Add(btn_edit_text, 0, wxALIGN_CENTER|wxALL, 4);
 	framesizer->AddStretchSpacer();
 
+	// Update variables etc
+	view_text = false;
+
 	Layout();
 }
 
-/* DefaultEntryPanel::~DefaultEntryPanel
- * DefaultEntryPanel class destructor
- *******************************************************************/
-DefaultEntryPanel::~DefaultEntryPanel() {
+void DefaultEntryPanel::showTextEditor() {
+	// If it's already showing the text editor then do nothing
+	//if (view_text)
+	//	return;
+
+	// Hide entry info stuff
+	label_type->Show(false);
+	label_size->Show(false);
+	btn_edit_text->Show(false);
+
+	// Clear the sizer
+	wxSizer* framesizer = GetSizer();
+	framesizer->Clear(false);
+
+	// Show text editor
+	text_area->Show(true);
+
+	// Add text editor to the panel sizer
+	framesizer->Add(text_area, 1, wxEXPAND|wxALL, 4);
+
+	// Update variables etc
+	view_text = true;
+
+	Layout();
+
 }
 
 /* DefaultEntryPanel::loadEntry
@@ -77,11 +130,6 @@ bool DefaultEntryPanel::loadEntry(ArchiveEntry* entry) {
 		return false;
 	}
 
-	// Hide Edit as Text button if necessary
-	btn_edit_text->Show(true);
-	if (entry->getType() == ETYPE_FOLDER)
-		btn_edit_text->Show(false);
-
 	// Set labels
 	label_type->SetLabel(s_fmt(_T("Entry Type: %s"), entry->getTypeString().c_str()));
 	label_size->SetLabel(s_fmt(_T("Entry Size: %d bytes"), entry->getSize()));
@@ -89,6 +137,23 @@ bool DefaultEntryPanel::loadEntry(ArchiveEntry* entry) {
 	// Update variables
 	this->entry = entry;
 
-	Layout();
+	// Check whether to show the 'edit as text' button
+	bool show_btn_edittext = true;
+	if (entry->getType() == ETYPE_FOLDER)
+		show_btn_edittext = false;
+
+	// Show entry info stuff
+	showEntryInfo(show_btn_edittext);
+
 	return true;
+}
+
+BEGIN_EVENT_TABLE(DefaultEntryPanel, wxPanel)
+EVT_BUTTON(BTN_EDITTEXT, DefaultEntryPanel::onEditTextClicked)
+END_EVENT_TABLE()
+
+void DefaultEntryPanel::onEditTextClicked(wxCommandEvent& event) {
+	// Show the text editor
+	showTextEditor();
+	text_area->loadEntry(entry);
 }

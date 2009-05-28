@@ -3,7 +3,7 @@
 #define __ENTRYPANEL_H__
 
 #include "ArchiveEntry.h"
-#include <wx/stc/stc.h>
+#include "TextEditor.h"
 
 class EntryPanel : public wxPanel {
 protected:
@@ -22,6 +22,8 @@ private:
 	wxStaticText*	label_type;
 	wxStaticText*	label_size;
 	wxButton*		btn_edit_text;
+	TextEditor*		text_area;
+	bool			view_text;
 
 public:
 	enum {
@@ -32,11 +34,17 @@ public:
 	~DefaultEntryPanel();
 
 	bool loadEntry(ArchiveEntry* entry);
+	void showTextEditor();
+	void showEntryInfo(bool show_btn_edittext = false);
+
+	void onEditTextClicked(wxCommandEvent &event);
+
+	DECLARE_EVENT_TABLE()
 };
 
 class TextEntryPanel : public EntryPanel {
 private:
-	wxStyledTextCtrl*	text_area;
+	TextEditor*	text_area;
 
 public:
 	TextEntryPanel(wxWindow* parent);

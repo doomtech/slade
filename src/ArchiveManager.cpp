@@ -135,6 +135,22 @@ Archive* ArchiveManager::openArchive(string filename) {
 	}
 }
 
+Archive* ArchiveManager::newArchive(BYTE type) {
+	Archive* new_archive = NULL;
+	switch (type) {
+		case ARCHIVE_WAD:
+			new_archive = new WadArchive();
+			break;
+		case ARCHIVE_ZIP:
+			new_archive = new ZipArchive();
+			break;
+	}
+
+	addArchive(new_archive);
+
+	return new_archive;
+}
+
 /* ArchiveManager::closeArchive
  * Closes the archive at index, and removes it from the list if the
  * index is valid. Returns false on invalid index, true otherwise

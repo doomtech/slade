@@ -43,7 +43,7 @@ TextEntryPanel::TextEntryPanel(wxWindow* parent)
 	SetSizer(framesizer);
 
 	// Create the text area
-	text_area = new wxStyledTextCtrl(this, -1);
+	text_area = new TextEditor(this, -1);
 	framesizer->Add(text_area, 1, wxEXPAND | wxALL, 4);
 
 	Layout();
@@ -59,6 +59,7 @@ TextEntryPanel::~TextEntryPanel() {
  * Loads an entry into the panel as text
  *******************************************************************/
 bool TextEntryPanel::loadEntry(ArchiveEntry* entry) {
+	/*
 	// Check that the entry exists
 	if (!entry) {
 		Global::error = _T("Invalid archive entry given");
@@ -82,7 +83,12 @@ bool TextEntryPanel::loadEntry(ArchiveEntry* entry) {
 
 	// Add text to the text area
 	text_area->SetText(istr);
-	
+	 **/
+
+	// Load entry into the text editor
+	if (!text_area->loadEntry(entry))
+		return false;
+
 	// Update variables
 	this->entry = entry;
 

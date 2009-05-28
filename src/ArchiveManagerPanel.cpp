@@ -35,6 +35,7 @@
 #include "ArchiveManager.h"
 #include "ArchivePanel.h"
 #include "MapEditorWindow.h"
+#include "ZipArchive.h"
 
 
 /*******************************************************************
@@ -181,6 +182,15 @@ void ArchiveManagerPanel::openFiles(wxArrayString& files) {
 	for (int a = 0; a < (int) files.size(); a++) {
 		// Open the archive
 		openFile(files[a]);
+	}
+}
+
+void ArchiveManagerPanel::createNewArchive(BYTE type) {
+	Archive* new_archive = ArchiveManager::getInstance().newArchive(type);
+
+	if (new_archive) {
+		ArchivePanel *wp = new ArchivePanel(notebook_archives, new_archive);
+		notebook_archives->AddPage(wp, _T("UNSAVED"), true);
 	}
 }
 
