@@ -70,12 +70,17 @@ wxImage get_entry_icon(string name, int type) {
 	return image;
 }
 
+#ifdef _WIN32
+#define ENTRYLIST_FLAGS wxLC_REPORT|wxLC_VRULES|wxLC_HRULES
+#else
+#define ENTRYLIST_FLAGS wxLC_REPORT|wxLC_VRULES|wxLC_HRULES|wxLC_EDIT_LABELS
+#endif
 
 /* EntryList::EntryList
  * EntryList class constructor
  *******************************************************************/
 EntryList::EntryList(EntryListPanel *parent, int id)
-: wxListCtrl(parent, id, wxDefaultPosition, wxDefaultSize, wxLC_REPORT | wxLC_VRULES | wxLC_HRULES | wxLC_EDIT_LABELS) {
+: wxListCtrl(parent, id, wxDefaultPosition, wxDefaultSize, ENTRYLIST_FLAGS) {
 	this->parent = parent;
 }
 
@@ -651,4 +656,12 @@ bool ZipEntryListPanel::swapItems(int item1, int item2) {
 
 	// Do nothing if they aren't both found, for now
 	return false;
+}
+
+void ZipEntryListPanel::onEntryListEditLabel(wxListEvent& event) {
+	// TODO: Check if renamed entry is a folder and rename it in the archive accordingly
+	ArchiveEntry* entry = getFocusedEntry();
+	if (entry && !event.IsEditCancelled()) {
+		archive->renameEntry(entry, event.GetLabel());
+	}
 }

@@ -68,6 +68,7 @@ public:
 
 	// Events
 	void	onEntryListActivated(wxListEvent &event);
+	void	onEntryListEditLabel(wxListEvent &event);
 };
 
 #endif //__ENTRYLISTPANEL_H__
