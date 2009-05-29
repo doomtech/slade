@@ -94,7 +94,7 @@ bool ZipArchive::openFile(string filename) {
 			wxFileName fn(entry->GetName(wxPATH_UNIX), wxPATH_UNIX);
 
 			// Create entry
-			ArchiveEntry *new_entry = new ArchiveEntry(fn.GetName() + _T(".") + fn.GetExt(), this);
+			ArchiveEntry *new_entry = new ArchiveEntry(fn.GetFullName(), this);
 
 			// Setup entry info
 			new_entry->setSize(entry->GetSize());
@@ -102,8 +102,6 @@ bool ZipArchive::openFile(string filename) {
 			setEntryDirectory(new_entry, fn.GetPath(true, wxPATH_UNIX));
 			setEntryZipIndex(new_entry, entry_index);
 			new_entry->setState(0);
-
-			//wxLogMessage(_T("Entry: ") + nlump->getExProp(_T("directory")) + nlump->getName());
 
 			// Add to entry list
 			entries.push_back(new_entry);
