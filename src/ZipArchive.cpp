@@ -192,6 +192,7 @@ bool ZipArchive::save(string filename) {
 	zip.Close();
 	this->filename = filename;
 	on_disk = true;
+	announce(_T("saved"));
 
 	return true;
 }

@@ -239,6 +239,7 @@ bool WadArchive::save(string filename) {
 	modified = false;
 	on_disk = true;
 	announce(_T("saved"));
+
 	return true;
 }
 
