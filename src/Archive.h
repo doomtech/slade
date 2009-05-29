@@ -56,8 +56,7 @@ public:
 
 	// Entry modification
 	virtual bool			renameEntry(ArchiveEntry* entry, string new_name);
-
-	virtual void	entryModified(ArchiveEntry* entry);
+	virtual void			entryModified(ArchiveEntry* entry);
 
 	virtual vector<mapdesc_t>	detectMaps();
 };

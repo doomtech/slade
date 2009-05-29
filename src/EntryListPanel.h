@@ -38,7 +38,7 @@ public:
 	int						getFocus();
 	vector<ArchiveEntry*>	getSelectedEntries();
 	vector<int>				getSelection();
-	bool					swapItems(int item1, int item2);
+	virtual bool			swapItems(int item1, int item2);
 	bool					addEntry(DWORD archive_index);
 	bool					updateEntry(DWORD archive_index);
 	bool					removeEntry(DWORD archive_index);
@@ -63,6 +63,7 @@ public:
 	~ZipEntryListPanel();
 
 	void	populateEntryList();
+	bool	swapItems(int item1, int item2);
 
 	// Events
 	void	onEntryListActivated(wxListEvent &event);

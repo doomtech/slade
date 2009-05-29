@@ -363,6 +363,10 @@ bool EntryListPanel::moveUp() {
 	// Get selection
 	vector<int> selection = getSelection();
 
+	// If nothing is selected, do nothing
+	if (selection.size() == 0)
+		return false;
+
 	// If the first selected item is at the top of the list
 	// then don't move anything up
 	if (selection[0] == 0)
@@ -390,6 +394,10 @@ bool EntryListPanel::moveUp() {
 bool EntryListPanel::moveDown() {
 	// Get selection
 	vector<int> selection = getSelection();
+
+	// If nothing is selected, do nothing
+	if (selection.size() == 0)
+		return false;
 
 	// If the last selected item is at the end of the list
 	// then don't move anything down
@@ -557,4 +565,32 @@ void ZipEntryListPanel::onEntryListActivated(wxListEvent& event) {
 		// Otherwise do default activate action
 		EntryListPanel::onEntryListActivated(event);
 	}
+}
+
+/* EntryListPanel::swapItems
+ * Swaps two list items (including their focused/selected states)
+ * Override to work correctly with zip directories (as the entry list
+ * won't be a 1-1 match index-wise with the archive)
+ *******************************************************************/
+bool ZipEntryListPanel::swapItems(int item1, int item2) {
+	// Get the actual entries we are swapping
+	ArchiveEntry* entry1 = archive->getEntry(item1);
+	ArchiveEntry* entry2 = archive->getEntry(item2);
+
+	// Find where they are in the current list
+	int index1 = -1;
+	int index2 = -1;
+	for (int a = 0; a < entry_list->GetItemCount(); a++) {
+		if (((ArchiveEntry*)(entry_list->GetItemData(a))) == entry1)
+			index1 = a;
+		if (((ArchiveEntry*)(entry_list->GetItemData(a))) == entry2)
+			index2 = a;
+	}
+
+	// If both were found, swap them the normal way
+	if (index1 >= 0 && index2 >= 0)
+		return EntryListPanel::swapItems(index1, index2);
+
+	// Do nothing if they aren't both found, for now
+	return false;
 }

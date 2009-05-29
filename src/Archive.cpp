@@ -271,6 +271,9 @@ bool Archive::swapEntries(ArchiveEntry* entry1, ArchiveEntry* entry2) {
 	return true;
 }
 
+/* Archive::renameEntry
+ * Renames the specified entry to the name given
+ *******************************************************************/
 bool Archive::renameEntry(ArchiveEntry* entry, string new_name) {
 	// Check entry is valid
 	if (!entry)
@@ -284,10 +287,17 @@ bool Archive::renameEntry(ArchiveEntry* entry, string new_name) {
 	entry->rename(new_name);
 }
 
+/* Archive::entryModified
+ * Called when an entry in the archive is modified
+ *******************************************************************/
 void Archive::entryModified(ArchiveEntry* entry) {
-	// Check the entry belongs to this archive (should always)
+	// Check the entry belongs to this archive
+	// (should always, as it's only ever called via the entry's parent pointer)
 	if (entry->getParent() != this)
 		return;
+
+	// Set the archive state to modified
+	modified = true;
 
 	// Get the entry index and announce the change
 	DWORD index = entryIndex(entry);
