@@ -73,7 +73,7 @@ string Archive::getFileName(bool fullpath)
 	else {
 		// Get the filename without the path
 		wxFileName fn(filename);
-		return fn.GetName() + _T(".") + fn.GetExt();
+		return fn.GetFullName();
 	}
 }
 
@@ -220,6 +220,11 @@ ArchiveEntry* Archive::addExistingEntry(ArchiveEntry* entry, DWORD position, boo
 	return entry;
 }
 
+/* Archive::removeEntry
+ * Removes an entry from the archive, and deletes it if delete_entry
+ * is true. Returns false if the given entry doesn't exist in the
+ * archive, true otherwise
+ *******************************************************************/
 bool Archive::removeEntry(ArchiveEntry* entry, bool delete_entry) {
 	// Check the entry exists in this archive
 	int index = entryIndex(entry);

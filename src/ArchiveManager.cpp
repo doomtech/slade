@@ -136,22 +136,35 @@ Archive* ArchiveManager::openArchive(string filename) {
 	}
 }
 
+/* ArchiveManager::newArchive
+ * Creates a new archive of the specified format and adds it to the
+ * list of open archives. Returns the created archive, or NULL if an
+ * invalid archive type was given
+ *******************************************************************/
 Archive* ArchiveManager::newArchive(BYTE type) {
+	// Init variables
 	Archive* new_archive = NULL;
+	string format_str = _T("");
+
+	// Create a new archive depending on the type specified
 	switch (type) {
 		case ARCHIVE_WAD:
 			new_archive = new WadArchive();
+			format_str = _T("wad");
 			break;
 		case ARCHIVE_ZIP:
 			new_archive = new ZipArchive();
+			format_str = _T("zip");
 			break;
 	}
 
+	// If the archive was created, set it's filename and add it to the list
 	if (new_archive) {
-		new_archive->setFileName(_T("UNSAVED"));
+		new_archive->setFileName(s_fmt(_T("UNSAVED (%s)"), format_str.c_str()));
 		addArchive(new_archive);
 	}
 
+	// Return the created archive, if any
 	return new_archive;
 }
 

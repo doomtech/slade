@@ -176,6 +176,9 @@ void EntryListPanel::populateEntryList() {
 	// Clear the list
 	entry_list->ClearAll();
 
+	// Hide the list
+	entry_list->Show(false);
+
 	// Create the "Name" column
 	entry_list->InsertColumn(0, _T("Name"));
 
@@ -188,16 +191,38 @@ void EntryListPanel::populateEntryList() {
 	// Go through all entries and add them to the list
 	for (int a = 0; a < archive->numEntries(); a++) {
 		// Setup new entry
+		ArchiveEntry* entry = archive->getEntry(a);
 		wxListItem li;
 		li.SetId(a);
-		li.SetData(archive->getEntry(a));
-
+		li.SetData(entry);
 		entry_list->InsertItem(li);
-		entry_list->updateEntry(a);
+
+		// Name
+		li.SetId(a);
+		li.SetText(entry->getName());
+		entry_list->SetItem(li);
+
+		// Size
+		li.SetText(s_fmt(_T("%d"), entry->getSize()));
+		li.SetColumn(1);
+		entry_list->SetItem(li);
+
+		// Type
+		li.SetText(entry->getTypeString());
+		li.SetColumn(2);
+		entry_list->SetItem(li);
 	}
+
+	// Setup column widths
+	entry_list->SetColumnWidth(0, wxLIST_AUTOSIZE);
+	entry_list->SetColumnWidth(1, wxLIST_AUTOSIZE);
+	entry_list->SetColumnWidth(2, wxLIST_AUTOSIZE);
 
 	// Setup size
 	entry_list->SetMinSize(wxSize(entry_list->getWidth(), -1));
+
+	// Show the list
+	entry_list->Show();
 }
 
 /* EntryListPanel::getFocusedEntry
@@ -474,6 +499,9 @@ void ZipEntryListPanel::populateEntryList() {
 	// Clear the list
 	entry_list->ClearAll();
 
+	// Hide the list
+	entry_list->Show(false);
+
 	// Create the "Name" column
 	entry_list->InsertColumn(0, _T("Name"));
 
@@ -488,14 +516,27 @@ void ZipEntryListPanel::populateEntryList() {
 
 	// Go through all entries in the directory
 	for (size_t a = 0; a < dir_entries.size(); a++) {
-		// Setup entry item
+		// Setup new entry
+		ArchiveEntry* entry = dir_entries[a];
 		wxListItem li;
 		li.SetId(a);
-		li.SetData(dir_entries[a]);
-
-		// Add it to the list
+		li.SetData(entry);
 		entry_list->InsertItem(li);
-		entry_list->updateEntry(a);
+
+		// Name
+		li.SetId(a);
+		li.SetText(entry->getName());
+		entry_list->SetItem(li);
+
+		// Size
+		li.SetText(s_fmt(_T("%d"), entry->getSize()));
+		li.SetColumn(1);
+		entry_list->SetItem(li);
+
+		// Type
+		li.SetText(entry->getTypeString());
+		li.SetColumn(2);
+		entry_list->SetItem(li);
 	}
 
 	// Get all subdirectories in the current directory
@@ -528,8 +569,16 @@ void ZipEntryListPanel::populateEntryList() {
 		entry_list->SetItem(li);
 	}
 
+	// Setup column widths
+	entry_list->SetColumnWidth(0, wxLIST_AUTOSIZE);
+	entry_list->SetColumnWidth(1, wxLIST_AUTOSIZE);
+	entry_list->SetColumnWidth(2, wxLIST_AUTOSIZE);
+
 	// Setup size
 	entry_list->SetMinSize(wxSize(entry_list->getWidth(), -1));
+
+	// Show the list
+	entry_list->Show(true);
 }
 
 /* ZipEntryListPanel::onEntryListActivated
