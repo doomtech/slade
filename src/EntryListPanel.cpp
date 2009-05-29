@@ -133,7 +133,8 @@ bool EntryList::updateEntry(int index) {
 	else if (entry->getState() == 1)
 		SetItemTextColour(index, wxColour(0, 80, 180));
 
-	Layout();
+	// Setup size
+	SetMinSize(wxSize(getWidth(), -1));
 
 	return true;
 }
