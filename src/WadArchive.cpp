@@ -164,6 +164,7 @@ bool WadArchive::openFile(string filename) {
 	// Setup variables
 	this->filename = filename;
 	modified = false;
+	on_disk = true;
 	announce(_T("opened"));
 
 	return true;
@@ -236,6 +237,7 @@ bool WadArchive::save(string filename) {
 	// Set variables and return success
 	this->filename = filename;
 	modified = false;
+	on_disk = true;
 	announce(_T("saved"));
 	return true;
 }

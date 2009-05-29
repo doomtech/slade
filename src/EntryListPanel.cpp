@@ -34,11 +34,42 @@
 #include "EntryListPanel.h"
 #include "ArchiveEntry.h"
 #include <wx/filename.h>
+#include "ArchiveManager.h"
 
 
 /*******************************************************************
  * VARIABLES
  *******************************************************************/
+
+
+/* get_entry_icon
+ * Gets an entry icon image from the SLADE resource pk3 and returns
+ * it as a wxImage (will be empty if the specified icon isn't found)
+ *******************************************************************/
+wxImage get_entry_icon(string name, int type) {
+	// Init
+	wxImage image;
+
+	// Get the needed entry from the SLADE resource pk3
+	Archive* resource_pk3 = ArchiveManager::getInstance().resourceArchive();
+	string entry_path = _T("entry_icons/") + name;
+	ArchiveEntry* entry = resource_pk3->getEntry(entry_path);
+
+	if (entry) {
+		// Export entry data to a temporary file
+		entry->exportFile(_T("sladetemp"));
+
+		// Load the data to a wxImage
+		image.LoadFile(_T("sladetemp"), type);
+
+		// Delete the temporary file
+		wxRemoveFile(_T("sladetemp"));
+	}
+
+	// Return the image, loaded or not
+	return image;
+}
+
 
 /* EntryList::EntryList
  * EntryList class constructor
@@ -101,6 +132,8 @@ bool EntryList::updateEntry(int index) {
 		SetItemTextColour(index, wxColour(0, 150, 0));
 	else if (entry->getState() == 1)
 		SetItemTextColour(index, wxColour(0, 80, 180));
+
+	Layout();
 
 	return true;
 }

@@ -52,6 +52,8 @@ public:
 	void	setMockLayout();
 
 	// Event handlers
+	void	onFileNewWad(wxCommandEvent &e);
+	void	onFileNewZip(wxCommandEvent &e);
 	void	onFileOpen(wxCommandEvent &e);
 	void	onFileQuit(wxCommandEvent &e);
 	void	onFileSave(wxCommandEvent &e);

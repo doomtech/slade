@@ -14,6 +14,9 @@ protected:
 	vector<ArchiveEntry*>	entries;
 	BYTE					type;
 	bool					modified;
+	
+	// Specifies whether the archive exists on disk (as opposed to being newly created)
+	bool					on_disk;
 
 public:
 	struct mapdesc_t {
@@ -29,10 +32,12 @@ public:
 	BYTE					getType() { return type; }
 	string					getFileName(bool fullpath = true);
 	bool					isModified() { return modified; }
+	bool					isOnDisk() { return on_disk; }
 	int						entryIndex(ArchiveEntry* entry);
 	virtual ArchiveEntry*	getEntry(DWORD index);
 	virtual ArchiveEntry*	getEntry(string name);
 	virtual string			getFileExtensionString();
+	void					setFileName(string fn) { filename = fn; }
 
 	virtual bool	openFile(string filename);
 	virtual bool	save(string filename = _T(""));

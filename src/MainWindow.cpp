@@ -42,21 +42,10 @@
 string aui_perspective = _T("");
 
 
-/* MainWindow::MainWindow
- * MainWindow class constructor
+/* get_toolbar_icon
+ * Gets a toolbar image from the SLADE resource pk3 and returns it
+ * as a wxImage (will be empty if the specified icon isn't found)
  *******************************************************************/
-MainWindow::MainWindow()
-: wxFrame((wxFrame *) NULL, -1, _T("SLADE"), wxPoint(0, 0), wxSize(800, 600)) {
-	setupLayout();
-	Maximize();
-}
-
-/* MainWindow::~MainWindow
- * MainWindow class destructor
- *******************************************************************/
-MainWindow::~MainWindow() {
-}
-
 wxImage get_toolbar_icon(string name, int type) {
 	// Init
 	wxImage image;
@@ -79,6 +68,22 @@ wxImage get_toolbar_icon(string name, int type) {
 
 	// Return the image, loaded or not
 	return image;
+}
+
+
+/* MainWindow::MainWindow
+ * MainWindow class constructor
+ *******************************************************************/
+MainWindow::MainWindow()
+: wxFrame((wxFrame *) NULL, -1, _T("SLADE"), wxPoint(0, 0), wxSize(800, 600)) {
+	setupLayout();
+	Maximize();
+}
+
+/* MainWindow::~MainWindow
+ * MainWindow class destructor
+ *******************************************************************/
+MainWindow::~MainWindow() {
 }
 
 /* MainWindow::setupLayout
@@ -299,6 +304,8 @@ BEGIN_EVENT_TABLE(MainWindow, wxFrame)
 	// MENU
 
 	// File Menu
+	EVT_MENU(MENU_FILE_NEW, MainWindow::onFileNewWad)
+	EVT_MENU(MENU_FILE_NEWZIP, MainWindow::onFileNewZip)
 	EVT_MENU(MENU_FILE_OPEN, MainWindow::onFileOpen)
 	EVT_MENU(MENU_FILE_QUIT, MainWindow::onFileQuit)
 	EVT_MENU(MENU_FILE_SAVE, MainWindow::onFileSave)
@@ -320,6 +327,14 @@ BEGIN_EVENT_TABLE(MainWindow, wxFrame)
 	EVT_MENU(MENU_VIEW_MANAGER, MainWindow::onViewArchiveManager)
 	EVT_MENU(MENU_VIEW_CONSOLE, MainWindow::onViewConsole)
 END_EVENT_TABLE()
+
+void MainWindow::onFileNewWad(wxCommandEvent& e) {
+	panel_archivemanager->createNewArchive(ARCHIVE_WAD);
+}
+
+void MainWindow::onFileNewZip(wxCommandEvent& e) {
+	panel_archivemanager->createNewArchive(ARCHIVE_ZIP);
+}
 
 /* MainWindow::onFileOpen
  * File->Open menu item event handler.

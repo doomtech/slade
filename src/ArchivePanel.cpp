@@ -89,7 +89,7 @@ void ArchivePanel::save() {
 		return;
 
 	// Check the archive has been previously saved
-	if (!archive->getFileName().Cmp(_T("")))
+	if (!archive->isOnDisk())
 		saveAs();
 
 	// Save the archive
@@ -329,6 +329,13 @@ void ArchivePanel::onAnnouncement(Announcer* announcer, string event_name, MemCh
 
 		// Destroy the archive panel
 		this->Destroy();
+	}
+
+	// If the archive was saved
+	if (announcer == archive && event_name == _T("saved")) {
+		// Update this tab's name in the parent notebook (if filename was changed)
+		wxAuiNotebook* parent = (wxAuiNotebook*)GetParent();
+		parent->SetPageText(parent->GetPageIndex(this), archive->getFileName(false));
 	}
 
 	// Archive entries were swapped

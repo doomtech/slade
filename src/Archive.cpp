@@ -38,6 +38,7 @@
 Archive::Archive() {
 	type = 0;
 	modified = true;
+	on_disk = false;
 }
 
 /* Archive::~Archive

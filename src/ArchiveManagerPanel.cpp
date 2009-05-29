@@ -190,7 +190,7 @@ void ArchiveManagerPanel::createNewArchive(BYTE type) {
 
 	if (new_archive) {
 		ArchivePanel *wp = new ArchivePanel(notebook_archives, new_archive);
-		notebook_archives->AddPage(wp, _T("UNSAVED"), true);
+		notebook_archives->AddPage(wp, new_archive->getFileName(false), true);
 	}
 }
 
@@ -228,6 +228,10 @@ void ArchiveManagerPanel::onAnnouncement(Announcer* announcer, string event_name
 	// If an archive was closed
 	if (event_name == _T("archive_closed"))
 		refreshArchiveList();
+
+	// If an archive was added
+	if (event_name == _T("archive_added"))
+		refreshArchiveList();
 }
 
 /* ArchiveManagerPanel::saveSelection
@@ -243,12 +247,35 @@ void ArchiveManagerPanel::saveSelection() {
 
 	// Go through the selection
 	for (size_t a = 0; a < selection.size(); a++) {
-		// Save the archive
-		if (!ArchiveManager::getInstance().getArchive(selection[a])->save()) {
-			// If there was an error pop up a message box
-			wxMessageBox(s_fmt(_T("Error: %s"), Global::error.c_str()), _T("Error"), wxICON_ERROR);
+		// Get the archive to be saved
+		Archive* archive = ArchiveManager::getInstance().getArchive(selection[a]);
+
+		if (archive->isOnDisk()) {
+			// Save the archive if possible
+			if (!ArchiveManager::getInstance().getArchive(selection[a])->save()) {
+				// If there was an error pop up a message box
+				wxMessageBox(s_fmt(_T("Error: %s"), Global::error.c_str()), _T("Error"), wxICON_ERROR);
+			}
+		}
+		else {
+			// If the archive is newly created, do Save As instead
+
+			// Popup file save dialog
+			string formats = archive->getFileExtensionString();
+			string filename = wxFileSelector(_T("Save Archive ") + archive->getFileName(false) + _T(" As"), _T(""), _T(""), wxEmptyString, formats, wxSAVE | wxOVERWRITE_PROMPT);
+
+			// Check a filename was selected
+			if (!filename.empty()) {
+				// Save the archive
+				if (!archive->save(filename)) {
+					// If there was an error pop up a message box
+					wxMessageBox(s_fmt(_T("Error: %s"), Global::error.c_str()), _T("Error"), wxICON_ERROR);
+				}
+			}
 		}
 	}
+
+	refreshArchiveList();
 }
 
 /* ArchiveManagerPanel::saveSelectionAs
@@ -284,6 +311,8 @@ void ArchiveManagerPanel::saveSelectionAs() {
 			}
 		}
 	}
+
+	refreshArchiveList();
 }
 
 /* ArchiveManagerPanel::closeSelection
@@ -315,6 +344,8 @@ void ArchiveManagerPanel::saveCurrent() {
 	int selection = notebook_archives->GetSelection();
 	if (isArchivePanel(selection))
 		((ArchivePanel*) notebook_archives->GetPage(selection))->save();
+
+	refreshArchiveList();
 }
 
 /* ArchiveManagerPanel::saveCurrentAs
@@ -326,6 +357,8 @@ void ArchiveManagerPanel::saveCurrentAs() {
 	int selection = notebook_archives->GetSelection();
 	if (isArchivePanel(selection))
 		((ArchivePanel*) notebook_archives->GetPage(selection))->saveAs();
+
+	refreshArchiveList();
 }
 
 /* ArchiveManagerPanel::closeCurrent

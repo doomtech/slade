@@ -67,6 +67,7 @@ bool ArchiveManager::addArchive(Archive* archive) {
 	// Only add if archive is a valid pointer
 	if (archive) {
 		open_archives.push_back(archive);
+		announce(_T("archive_added"));
 		return true;
 	} else
 		return false;
@@ -146,7 +147,10 @@ Archive* ArchiveManager::newArchive(BYTE type) {
 			break;
 	}
 
-	addArchive(new_archive);
+	if (new_archive) {
+		new_archive->setFileName(_T("UNSAVED"));
+		addArchive(new_archive);
+	}
 
 	return new_archive;
 }
