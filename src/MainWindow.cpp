@@ -162,10 +162,10 @@ void MainWindow::setupLayout() {
 	// Create Entry toolbar
 	wxAuiToolBar* tb_entry = new wxAuiToolBar(this, -1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
 	tb_entry->AddTool(MENU_ENTRY_NEW, _T("New"), wxBitmap(get_toolbar_icon(_T("newentry.png"), wxBITMAP_TYPE_PNG)), _T("New Entry"));
-	tb_entry->AddTool(MENU_ENTRY_RENAME, _T("Rename"), wxBitmap(get_toolbar_icon(_T("temp.png"), wxBITMAP_TYPE_PNG)), _T("Rename"));
-	tb_entry->AddTool(MENU_ENTRY_DELETE, _T("Delete"), wxBitmap(get_toolbar_icon(_T("temp.png"), wxBITMAP_TYPE_PNG)), _T("Delete"));
-	tb_entry->AddTool(MENU_ENTRY_IMPORT, _T("Import"), wxBitmap(get_toolbar_icon(_T("temp.png"), wxBITMAP_TYPE_PNG)), _T("Import"));
-	tb_entry->AddTool(MENU_ENTRY_EXPORT, _T("Export"), wxBitmap(get_toolbar_icon(_T("temp.png"), wxBITMAP_TYPE_PNG)), _T("Export"));
+	tb_entry->AddTool(MENU_ENTRY_RENAME, _T("Rename"), wxBitmap(get_toolbar_icon(_T("rename.png"), wxBITMAP_TYPE_PNG)), _T("Rename"));
+	tb_entry->AddTool(MENU_ENTRY_DELETE, _T("Delete"), wxBitmap(get_toolbar_icon(_T("delete.png"), wxBITMAP_TYPE_PNG)), _T("Delete"));
+	tb_entry->AddTool(MENU_ENTRY_IMPORT, _T("Import"), wxBitmap(get_toolbar_icon(_T("import.png"), wxBITMAP_TYPE_PNG)), _T("Import"));
+	tb_entry->AddTool(MENU_ENTRY_EXPORT, _T("Export"), wxBitmap(get_toolbar_icon(_T("export.png"), wxBITMAP_TYPE_PNG)), _T("Export"));
 	tb_entry->AddTool(MENU_ENTRY_MOVEUP, _T("Move Up"), wxBitmap(get_toolbar_icon(_T("up.png"), wxBITMAP_TYPE_PNG)), _T("Move Up"));
 	tb_entry->AddTool(MENU_ENTRY_MOVEDOWN, _T("Move Down"), wxBitmap(get_toolbar_icon(_T("down.png"), wxBITMAP_TYPE_PNG)), _T("Move Down"));
 	tb_entry->Realize();
