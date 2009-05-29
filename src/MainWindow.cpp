@@ -348,12 +348,16 @@ void MainWindow::onFileOpen(wxCommandEvent &e) {
 
 	// Run the dialog & check that the user didn't cancel
 	if (dialog_open->ShowModal() == wxID_OK) {
+		wxBeginBusyCursor();
+
 		// Get an array of selected filenames
 		wxArrayString files;
 		dialog_open->GetPaths(files);
 
 		// Send it to the Archive Manager Panel
 		panel_archivemanager->openFiles(files);
+
+		wxEndBusyCursor();
 	}
 }
 
@@ -368,14 +372,18 @@ void MainWindow::onFileQuit(wxCommandEvent &e) {
  * File->Save menu item event handler.
  *******************************************************************/
 void MainWindow::onFileSave(wxCommandEvent& e) {
+	wxBeginBusyCursor();
 	panel_archivemanager->saveCurrent();
+	wxEndBusyCursor();
 }
 
 /* MainWindow::onFileSaveAs
  * File->Save As menu item event handler.
  *******************************************************************/
 void MainWindow::onFileSaveAs(wxCommandEvent& e) {
+	wxBeginBusyCursor();
 	panel_archivemanager->saveCurrentAs();
+	wxEndBusyCursor();
 }
 
 /* MainWindow::onFileClose
@@ -417,21 +425,27 @@ void MainWindow::onEntryDelete(wxCommandEvent& e) {
  * Entry->Import menu item event handler.
  *******************************************************************/
 void MainWindow::onEntryImport(wxCommandEvent& e) {
+	wxBeginBusyCursor();
 	panel_archivemanager->importEntry();
+	wxEndBusyCursor();
 }
 
 /* MainWindow::onEntryExport
  * Entry->Export menu item event handler.
  *******************************************************************/
 void MainWindow::onEntryExport(wxCommandEvent& e) {
+	wxBeginBusyCursor();
 	panel_archivemanager->exportEntry();
+	wxEndBusyCursor();
 }
 
 /* MainWindow::onEntryExportWad
  * Entry->Export As Wad menu item event handler.
  *******************************************************************/
 void MainWindow::onEntryExportWad(wxCommandEvent& e) {
+	wxBeginBusyCursor();
 	panel_archivemanager->exportEntryWad();
+	wxEndBusyCursor();
 }
 
 /* MainWindow::onEntryMoveUp

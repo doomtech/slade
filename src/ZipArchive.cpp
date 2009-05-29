@@ -117,6 +117,7 @@ bool ZipArchive::openFile(string filename) {
 	// Setup variables
 	this->filename = filename;
 	modified = false;
+	on_disk = true;
 
 	return true;
 }
@@ -192,6 +193,7 @@ bool ZipArchive::save(string filename) {
 	delete[] c_entries;
 	zip.Close();
 	this->filename = filename;
+	on_disk = true;
 
 	return true;
 }

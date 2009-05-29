@@ -89,8 +89,10 @@ void ArchivePanel::save() {
 		return;
 
 	// Check the archive has been previously saved
-	if (!archive->isOnDisk())
+	if (!archive->isOnDisk()) {
 		saveAs();
+		return;
+	}
 
 	// Save the archive
 	if (!archive->save()) {
