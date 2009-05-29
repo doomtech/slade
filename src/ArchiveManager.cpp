@@ -67,6 +67,7 @@ bool ArchiveManager::addArchive(Archive* archive) {
 	// Only add if archive is a valid pointer
 	if (archive) {
 		open_archives.push_back(archive);
+		listenTo(archive);
 		announce(_T("archive_added"));
 		return true;
 	} else
@@ -127,8 +128,7 @@ Archive* ArchiveManager::openArchive(string filename) {
 	// If it opened successfully, add it to the list & return it,
 	// Otherwise, delete it and return NULL
 	if (new_archive->openFile(filename)) {
-		open_archives.push_back(new_archive);
-		announce(_T("archive_opened"));
+		addArchive(new_archive);
 		return new_archive;
 	} else {
 		delete new_archive;
@@ -174,7 +174,9 @@ bool ArchiveManager::closeArchive(int index) {
 	open_archives.erase(open_archives.begin() + index);
 
 	// Announce it
-	announce(_T("archive_closed"));
+	MemChunk mc;
+	mc.write(&index, sizeof(int));
+	announce(_T("archive_closed"), mc);
 
 	return true;
 }
@@ -210,6 +212,42 @@ bool ArchiveManager::closeArchive(Archive* archive) {
 
 	// If the archive isn't in the list, return false
 	return false;
+}
+
+/* ArchiveManager::archiveIndex
+ * Returns the index in the list of the given archive, or -1 if the
+ * archive doesn't exist in the list
+ *******************************************************************/
+int ArchiveManager::archiveIndex(Archive* archive) {
+	// Go through all open archives
+	for (size_t a = 0; a < open_archives.size(); a++) {
+		// If the archive we're looking for is this one, return the index
+		if (open_archives[a] == archive)
+			return (int)a;
+	}
+
+	// If we get to here the archive wasn't found, so return -1
+	return -1;
+}
+
+/* ArchivePanel::onAnnouncement
+ * Called when an announcement is recieved from one of the archives
+ * in the list
+ *******************************************************************/
+void ArchiveManager::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
+	// Reset event data for reading
+	event_data.seek(0, SEEK_SET);
+
+	// Check that the announcement came from an archive in the list
+	int index = archiveIndex((Archive*)announcer);
+	if (index >= 0) {
+		// If the archive was saved
+		if (event_name == _T("saved")) {
+			MemChunk mc;
+			mc.write(&index, sizeof(int));
+			announce(_T("archive_saved"), mc);
+		}
+	}
 }
 
 

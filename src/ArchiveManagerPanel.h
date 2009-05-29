@@ -49,6 +49,7 @@ public:
 	~ArchiveManagerPanel();
 
 	void	refreshArchiveList();
+	void	updateListItem(int index);
 	bool	isArchivePanel(int tab_index);
 
 	void	openFile(string filename);

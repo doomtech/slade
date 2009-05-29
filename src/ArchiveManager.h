@@ -6,7 +6,7 @@
 
 class Archive;
 
-class ArchiveManager : public Announcer {
+class ArchiveManager : public Announcer, Listener {
 private:
 	vector<Archive*>	open_archives;
 	Archive*			resource_archive;
@@ -29,7 +29,10 @@ public:
 	bool		closeArchive(string filename);
 	bool		closeArchive(Archive* archive);
 	int			numArchives() { return (int)open_archives.size(); }
+	int			archiveIndex(Archive* archive);
 	Archive*	resourceArchive() { return resource_archive; }
+
+	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 };
 
 #endif //__ARCHIVEMANAGER_H__

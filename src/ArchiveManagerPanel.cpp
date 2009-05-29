@@ -140,6 +140,10 @@ void ArchiveManagerPanel::refreshArchiveList() {
 		list_archives->InsertItem(list_archives->GetItemCount(), wm.getArchive(a)->getFileName(true));
 }
 
+void ArchiveManagerPanel::updateListItem(int index) {
+	list_archives->SetItemText(index, ArchiveManager::getInstance().getArchive(index)->getFileName(true));
+}
+
 /* ArchiveManagerPanel::isArchivePanel
  * Checks if the currently selected tab is an ArchivePanel
  * Returns true if it is, false if not
@@ -221,17 +225,28 @@ vector<int> ArchiveManagerPanel::getSelectedArchives() {
  * Called when an announcement is recieved from the Archive Manager
  *******************************************************************/
 void ArchiveManagerPanel::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
-	// If an archive was opened
-	if (event_name == _T("archive_opened"))
-		refreshArchiveList();
+	// Reset event data for reading
+	event_data.seek(0, SEEK_SET);
 
 	// If an archive was closed
-	if (event_name == _T("archive_closed"))
-		refreshArchiveList();
+	if (event_name == _T("archive_closed")) {
+		int index = -1;
+		event_data.read(&index, sizeof(int));
+		list_archives->DeleteItem(index);
+	}
 
 	// If an archive was added
-	if (event_name == _T("archive_added"))
-		refreshArchiveList();
+	if (event_name == _T("archive_added")) {
+		ArchiveManager& wm = ArchiveManager::getInstance();
+		list_archives->InsertItem(wm.numArchives(), wm.getArchive(wm.numArchives()-1)->getFileName(true));
+	}
+
+	// If an archive was saved
+	if (event_name == _T("archive_saved")) {
+		int index = -1;
+		event_data.read(&index, sizeof(int));
+		updateListItem(index);
+	}
 }
 
 /* ArchiveManagerPanel::saveSelection
@@ -274,8 +289,6 @@ void ArchiveManagerPanel::saveSelection() {
 			}
 		}
 	}
-
-	refreshArchiveList();
 }
 
 /* ArchiveManagerPanel::saveSelectionAs
