@@ -49,6 +49,7 @@ public:
 	// Events
 	virtual void	onEntryListChange(wxListEvent &event);
 	virtual void	onEntryListActivated(wxListEvent &event);
+	virtual void	onEntryListEditLabel(wxListEvent &event);
 
 	DECLARE_EVENT_TABLE()
 };

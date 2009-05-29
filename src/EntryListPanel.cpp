@@ -75,7 +75,7 @@ wxImage get_entry_icon(string name, int type) {
  * EntryList class constructor
  *******************************************************************/
 EntryList::EntryList(EntryListPanel *parent, int id)
-: wxListCtrl(parent, id, wxDefaultPosition, wxDefaultSize, wxLC_REPORT | wxLC_VRULES | wxLC_HRULES/*|wxLC_EDIT_LABELS*/) {
+: wxListCtrl(parent, id, wxDefaultPosition, wxDefaultSize, wxLC_REPORT | wxLC_VRULES | wxLC_HRULES | wxLC_EDIT_LABELS) {
 	this->parent = parent;
 }
 
@@ -447,6 +447,7 @@ bool EntryListPanel::moveDown() {
 BEGIN_EVENT_TABLE(EntryListPanel, wxPanel)
 	EVT_LIST_ITEM_FOCUSED(ENTRY_LIST, EntryListPanel::onEntryListChange)
 	EVT_LIST_ITEM_ACTIVATED(ENTRY_LIST, EntryListPanel::onEntryListActivated)
+	EVT_LIST_END_LABEL_EDIT(ENTRY_LIST, EntryListPanel::onEntryListEditLabel)
 END_EVENT_TABLE()
 
 /* EntryListPanel::onEntryListChange
@@ -461,6 +462,13 @@ void EntryListPanel::onEntryListChange(wxListEvent& event) {
 void EntryListPanel::onEntryListActivated(wxListEvent& event) {
 }
 
+void EntryListPanel::onEntryListEditLabel(wxListEvent& event) {
+	ArchiveEntry* entry = getFocusedEntry();
+
+	if (entry && !event.IsEditCancelled()) {
+		archive->renameEntry(entry, event.GetLabel());
+	}
+}
 
 
 /* ZipEntryListPanel::ZipEntryListPanel
