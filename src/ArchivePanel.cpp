@@ -129,14 +129,26 @@ void ArchivePanel::saveAs() {
  * currently focused entry
  *******************************************************************/
 bool ArchivePanel::newEntry() {
-	// Get the currently focused entry index
-	int index = archive->entryIndex(entry_list->getFocusedEntry());
+	/*
+	// Get the entry index of the last selected list item
+	int index = archive->entryIndex(entry_list->getLastSelectedEntry());
+
+	// If something was selected, add 1 to the index so we add the new entry after the last selected
+	if (index >= 0)
+		index++;
 
 	// Prompt for new entry name
 	string name = wxGetTextFromUser(_T("Enter new entry name:"), _T("New Entry"));
 
 	// Add the entry to the archive
 	ArchiveEntry* new_entry = archive->addNewEntry(name, index);
+	 **/
+
+	// Prompt for new entry name
+	string name = wxGetTextFromUser(_T("Enter new entry name:"), _T("New Entry"));
+
+	// Get the list panel to handle creation of the entry (as it depends on the archive format)
+	ArchiveEntry* new_entry = entry_list->newEntry(name);
 
 	// Return success if entry was created
 	if (new_entry)
@@ -150,9 +162,6 @@ bool ArchivePanel::newEntry() {
  * currently focused entry
  *******************************************************************/
 bool ArchivePanel::newEntryFromFile() {
-	// Get the currently focused entry index
-	int index = archive->entryIndex(entry_list->getFocusedEntry());
-
 	// Create open file dialog
 	wxFileDialog *dialog_open = new wxFileDialog(this, _T("Choose file to open"), wxEmptyString, wxEmptyString,
 			_T("Any File (*.*)|*.*"), wxFD_OPEN | /*wxFD_MULTIPLE |*/ wxFD_FILE_MUST_EXIST, wxDefaultPosition);
@@ -165,11 +174,8 @@ bool ArchivePanel::newEntryFromFile() {
 		// Prompt for new entry name
 		string name = wxGetTextFromUser(_T("Enter new entry name:"), _T("New Entry"), filename);
 
-		// Add the entry to the archive
-		ArchiveEntry* new_entry = archive->addNewEntry(name, index);
-
-		// Load entry data from selected file
-		new_entry->importFile(fn.GetFullPath());
+		// Get the list panel to handle creation of the entry (as it depends on the archive format)
+		ArchiveEntry* new_entry = entry_list->newEntryFromFile(name, fn.GetFullPath());
 
 		// Return success if entry was created
 		if (new_entry)

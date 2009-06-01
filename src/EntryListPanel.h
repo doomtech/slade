@@ -38,13 +38,18 @@ public:
 	int						getFocus();
 	vector<ArchiveEntry*>	getSelectedEntries();
 	vector<int>				getSelection();
+	int						getLastSelected();
+	ArchiveEntry*			getLastSelectedEntry();
 	virtual bool			swapItems(int item1, int item2);
-	bool					addEntry(DWORD archive_index);
-	bool					updateEntry(DWORD archive_index);
-	bool					removeEntry(DWORD archive_index);
+	virtual bool			addEntry(DWORD archive_index);
+	virtual bool			updateEntry(DWORD archive_index);
+	virtual bool			removeEntry(DWORD archive_index);
+	int						getEntryListItem(ArchiveEntry* entry);
 
-	bool	moveUp();
-	bool	moveDown();
+	virtual ArchiveEntry*	newEntry(string name);
+	virtual ArchiveEntry*	newEntryFromFile(string name, string filename);
+	bool					moveUp();
+	bool					moveDown();
 
 	// Events
 	virtual void	onEntryListChange(wxListEvent &event);
@@ -65,6 +70,12 @@ public:
 
 	void	populateEntryList();
 	bool	swapItems(int item1, int item2);
+	bool	addEntry(DWORD archive_index);
+	bool	updateEntry(DWORD archive_index);
+	bool	removeEntry(DWORD archive_index);
+
+	ArchiveEntry*	newEntry(string name);
+	ArchiveEntry*	newEntryFromFile(string name, string filename);
 
 	// Events
 	void	onEntryListActivated(wxListEvent &event);

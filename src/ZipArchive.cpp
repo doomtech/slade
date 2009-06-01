@@ -99,7 +99,7 @@ bool ZipArchive::openFile(string filename) {
 			// Setup entry info
 			new_entry->setSize(entry->GetSize());
 			new_entry->setLoaded(false);
-			setEntryDirectory(new_entry, fn.GetPath(true, wxPATH_UNIX));
+			new_entry->setExProp(_T("directory"), fn.GetPath(true, wxPATH_UNIX));
 			setEntryZipIndex(new_entry, entry_index);
 			new_entry->setState(0);
 
@@ -272,8 +272,10 @@ ArchiveEntry* ZipArchive::getEntry(string name) {
  * archive
  *******************************************************************/
 void ZipArchive::setEntryDirectory(ArchiveEntry* entry, string dir) {
-	if (entry->getParent() == this)
+	if (entry->getParent() == this) {
 		entry->setExProp(_T("directory"), dir);
+		entry->setState(1);
+	}
 }
 
 /* ZipArchive::getEntryDirectory

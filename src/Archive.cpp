@@ -159,16 +159,22 @@ vector<Archive::mapdesc_t> Archive::detectMaps() {
 	return maps;
 }
 
+/* Archive::addEntry
+ * Adds an entry to the entry list before position. If position is
+ * invalid the entry will be added at the end of the list. Returns
+ * false if the given entry was invalid, true otherwise
+ *******************************************************************/
 bool Archive::addEntry(ArchiveEntry* entry, DWORD position) {
+	wxLogMessage(s_fmt(_T("Add entry at %d"), position));
 	// Check valid entry
 	if (!entry)
 		return false;
 
-	// Check the position, if it's out of range, change it
-	if (position < 0)
-		position = 0;
-	if (position > entries.size())
+	// Check the position is valid
+	if (position < 0 || position > entries.size()) {
+		// If it isn't valid, we'll add the entry to the end of the list
 		position = entries.size();
+	}
 
 	// Add it to the entry list
 	if (position < entries.size())
