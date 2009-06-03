@@ -1,0 +1,71 @@
+Feature Requests (from SLumpEd and SLADE):
+- mass export to format (XWE)
+- mass rename (XWE)
+- lump name search
+- find/replace in text editor
+- improved TEXTUREx editor (DeepSea)
+
+
+
+
+
+
+
+
+TODO.txt from SLumpEd:
+
+IDEAS:
+ - 'Animation viewer' (select a bunch of sprites to test an animation or whatever)
+ - User configurable lump type specs
+
+MAYBE:
+ - Rewrite lump list to use seperate class (either list or tree view)
+ - Tree view option for lump list
+
+TODO:
+ - (optional) use opengl for gfx viewer
+ - Redo lump area stuff (common controls like save changes, restore, etc)
+ - clean up for linux/unicode
+ - Improve map viewer
+ - View more lump types:
+   * VERTEXES, LINEDEFS, SIDEDEFS, SECTORS, THINGS, PLAYPAL, DEMO* ...
+ - ZDoom fonts handling
+ - Hex dump
+ - Wad merging
+ - statusbar, midscreen and crosshair lines on weapon offset view
+ - search/replace in text editor
+ - more music/sound format support
+ - 'Remove unused textures' feature (or maybe just a 'clean wad' feature in general)
+ - Tall sprites/doomgfx support
+ - Gfx conversion transparency options
+ - Move resources to pk3
+ - Figure out better way to handle lump type detection (images especially)
+ - Option not to show save dialog on export (or show only once)
+ - Rework lump type handling (define all lump type info in one place)
+ - Data area stuff
+ - Lump search
+ - More I'm sure...
+
+
+DONE:
+ - Speed up zip/pk3 saving (don't recompress unmodified lumps)
+ - Colour coded lumps (unmodified/modified/new)
+ - Add menu option to select hilighting for text lumps
+ - IWAD select dialog on startup if none is already selected
+ - More info in lump list (multi-column widget, ugh)
+ - Right click context menu for lumps
+ - ACS compiler
+ - Recent files list
+ - Zip/pk3 file handling:
+   * if a wad is opened from within the zip open it in another tab
+ - Auto-align sprites
+ - Align multiple sprites at once
+ - Auto save changes
+ - Sound/music lump previews
+ - TEXTUREx lump editing
+ - Conversion between gfx/flat/PNG
+ - shortcut keys for lump list
+ - add to pnames/texturex
+ - Disallow export to wad to the same wad it's being exported from
+ - disable slumped.log
+ - option to turn of asking whether to open zip-embedded wad or not

@@ -8,7 +8,7 @@
 
 class MainWindow : public wxFrame {
 private:
-	ArchiveManagerPanel*		panel_archivemanager;
+	ArchiveManagerPanel*	panel_archivemanager;
 	wxAuiNotebook*			notebook_tabs;
 	wxHtmlWindow*			html_startpage;
 	wxMenu*					menu_archive;
@@ -32,6 +32,7 @@ public:
 
 		MENU_ENTRY_NEW,
 		MENU_ENTRY_NEWFROMFILE,
+		MENU_ENTRY_NEWFOLDER,
 		MENU_ENTRY_RENAME,
 		MENU_ENTRY_DELETE,
 		MENU_ENTRY_IMPORT,
@@ -62,6 +63,7 @@ public:
 
 	void	onEntryNew(wxCommandEvent &e);
 	void	onEntryNewFromFile(wxCommandEvent &e);
+	void	onEntryNewFolder(wxCommandEvent &e);
 	void	onEntryRename(wxCommandEvent &e);
 	void	onEntryDelete(wxCommandEvent &e);
 	void	onEntryImport(wxCommandEvent &e);

@@ -123,6 +123,7 @@ void MainWindow::setupLayout() {
 	wxMenu* entryMenu = new wxMenu(_T(""));
 	entryMenu->Append(MENU_ENTRY_NEW,				_("New\tCtrl+N"),			_("Create a new empty entry"));
 	entryMenu->Append(MENU_ENTRY_NEWFROMFILE,		_("New from File"),			_("Create a new entry with data from a file"));
+	entryMenu->Append(MENU_ENTRY_NEWFOLDER,			_("New Folder"),			_("Create a new empty folder"));
 	entryMenu->AppendSeparator();
 	entryMenu->Append(MENU_ENTRY_RENAME,			_("Rename\tCtrl+R"),		_("Rename the selected entries"));
 	entryMenu->Append(MENU_ENTRY_DELETE,			_("Delete\tDelete"),		_("Delete the selected entries"));
@@ -162,6 +163,7 @@ void MainWindow::setupLayout() {
 	// Create Entry toolbar
 	wxAuiToolBar* tb_entry = new wxAuiToolBar(this, -1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
 	tb_entry->AddTool(MENU_ENTRY_NEW, _T("New"), wxBitmap(get_toolbar_icon(_T("newentry.png"), wxBITMAP_TYPE_PNG)), _T("New Entry"));
+	tb_entry->AddTool(MENU_ENTRY_NEWFOLDER, _T("New Folder"), wxBitmap(get_toolbar_icon(_T("newfolder.png"), wxBITMAP_TYPE_PNG)), _T("New Folder"));
 	tb_entry->AddTool(MENU_ENTRY_RENAME, _T("Rename"), wxBitmap(get_toolbar_icon(_T("rename.png"), wxBITMAP_TYPE_PNG)), _T("Rename"));
 	tb_entry->AddTool(MENU_ENTRY_DELETE, _T("Delete"), wxBitmap(get_toolbar_icon(_T("delete.png"), wxBITMAP_TYPE_PNG)), _T("Delete"));
 	tb_entry->AddTool(MENU_ENTRY_IMPORT, _T("Import"), wxBitmap(get_toolbar_icon(_T("import.png"), wxBITMAP_TYPE_PNG)), _T("Import"));
@@ -315,6 +317,7 @@ BEGIN_EVENT_TABLE(MainWindow, wxFrame)
 	// Entry menu
 	EVT_MENU(MENU_ENTRY_NEW, MainWindow::onEntryNew)
 	EVT_MENU(MENU_ENTRY_NEWFROMFILE, MainWindow::onEntryNewFromFile)
+	EVT_MENU(MENU_ENTRY_NEWFOLDER, MainWindow::onEntryNewFolder)
 	EVT_MENU(MENU_ENTRY_RENAME, MainWindow::onEntryRename)
 	EVT_MENU(MENU_ENTRY_DELETE, MainWindow::onEntryDelete)
 	EVT_MENU(MENU_ENTRY_IMPORT, MainWindow::onEntryImport)
@@ -405,6 +408,13 @@ void MainWindow::onEntryNew(wxCommandEvent& e) {
  *******************************************************************/
 void MainWindow::onEntryNewFromFile(wxCommandEvent& e) {
 	panel_archivemanager->newEntryFromFile();
+}
+
+/* MainWindow::onEntryNewFolder
+ * Entry->New Folder menu item event handler.
+ *******************************************************************/
+void MainWindow::onEntryNewFolder(wxCommandEvent& e) {
+	panel_archivemanager->newEntry();
 }
 
 /* MainWindow::onEntryRename

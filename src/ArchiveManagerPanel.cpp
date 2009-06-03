@@ -190,12 +190,10 @@ void ArchiveManagerPanel::openFile(string filename) {
 	Archive* new_archive = theArchiveManager.openArchive(filename);
 
 	// Check that the archive opened ok
-	if (new_archive) {
-		// Open a new archive panel tab
-		ArchivePanel *wp = new ArchivePanel(notebook_archives, new_archive);
-		notebook_archives->AddPage(wp, new_archive->getFileName(false), true);
-	} else // If archive didn't open ok, show error message
+	if (!new_archive) {
+		// If archive didn't open ok, show error message
 		wxMessageBox(s_fmt(_T("Error opening %s:\n%s"), filename.c_str(), Global::error.c_str()), _T("Error"), wxICON_ERROR);
+	}
 }
 
 /* ArchiveManagerPanel::openFiles

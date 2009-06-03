@@ -5,70 +5,23 @@
 #include "Archive.h"
 
 struct zipdir_t {
-	string					name;
+	ArchiveEntry*			entry;
 	vector<zipdir_t*>		subdirectories;
 	vector<ArchiveEntry*>	entries;
 	zipdir_t*				parent_dir;
 
-	bool entryExists(ArchiveEntry* entry) {
-		if (!entry)
-			return false;
+	zipdir_t();
 
-		for (size_t a = 0; a < entries.size(); a++) {
-			if (entries[a] == entry)
-				return true;
-		}
+	string	getName() { return entry->getName(); }
+	void	setName(string name) { entry->setName(name); }
 
-		return false;
-	}
-
-	ArchiveEntry* getEntry(string name) {
-		for (size_t a = 0; a < entries.size(); a++) {
-			if (!entries[a]->getName().Cmp(name))
-				return entries[a];
-		}
-
-		return NULL;
-	}
-
-	int entryIndex(ArchiveEntry* entry) {
-		if (!entry)
-			return -1;
-
-		for (size_t a = 0; a < entries.size(); a++) {
-			if (entries[a] == entry)
-				return a;
-		}
-
-		return -1;
-	}
-
-	zipdir_t* getSubDir(string name) {
-		for (size_t a = 0; a < subdirectories.size(); a++) {
-			if (!subdirectories[a]->name.Cmp(name))
-				return subdirectories[a];
-		}
-
-		return NULL;
-	}
-
-	string getFullPath() {
-		if (parent_dir)
-			return parent_dir->getFullPath() + name;
-		else
-			return name;
-	}
-
-	DWORD numEntries(bool include_subdirs = false) {
-		DWORD num = entries.size();
-
-		if (include_subdirs) {
-			for (size_t a = 0; a < subdirectories.size(); a++)
-				num += subdirectories[a]->numEntries(true);
-		}
-
-		return num;
-	}
+	bool			entryExists(ArchiveEntry* entry, bool include_subdirs = false);
+	ArchiveEntry*	getEntry(string name);
+	int				entryIndex(ArchiveEntry* entry);
+	zipdir_t*		getSubDir(string name);
+	string			getFullPath();
+	DWORD			numEntries(bool include_subdirs = false);
+	DWORD			numSubDirs(bool include_subdirs = false);
 };
 
 class ZipArchive : public Archive {
@@ -106,10 +59,13 @@ public:
 
 	// ---- Zip-specific ----
 	zipdir_t*	getEntryDirectory(ArchiveEntry* entry, zipdir_t* dir = NULL);
+	string		getEntryFullPath(ArchiveEntry* entry);
 	zipdir_t*	getDirectory(string name, zipdir_t* dir = NULL);
 	zipdir_t*	addDirectory(string name, zipdir_t* dir = NULL);
+	void		deleteDirectory(zipdir_t* dir = NULL);
 	zipdir_t*	getRootDirectory() { return directory; }
 	void		dumpDirectoryTree(zipdir_t* start = NULL);
+	void		getTreeAsList(vector<ArchiveEntry*>& list, zipdir_t* start = NULL);
 };
 
 #endif//__ZIPARCHIVE_H__

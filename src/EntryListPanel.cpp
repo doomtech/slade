@@ -97,7 +97,7 @@ EntryList::~EntryList() {
  * entry's information (name/size/type).
  * Returns false on invalid index or missing entry, true otherwise
  *******************************************************************/
-bool EntryList::updateEntry(int index) {
+bool EntryList::updateEntry(int index, bool update_colsize) {
 	// Check that index is valid
 	if (index < 0 || index >= this->GetItemCount())
 		return false;
@@ -117,19 +117,19 @@ bool EntryList::updateEntry(int index) {
 	li.SetId(index);
 	li.SetText(entry->getName());
 	SetItem(li);
-	SetColumnWidth(0, wxLIST_AUTOSIZE);
+	if (update_colsize) SetColumnWidth(0, wxLIST_AUTOSIZE);
 
 	// Size
 	li.SetText(s_fmt(_T("%d"), entry->getSize()));
 	li.SetColumn(1);
 	SetItem(li);
-	SetColumnWidth(1, wxLIST_AUTOSIZE);
+	if (update_colsize) SetColumnWidth(1, wxLIST_AUTOSIZE);
 
 	// Type
 	li.SetText(entry->getTypeString());
 	li.SetColumn(2);
 	SetItem(li);
-	SetColumnWidth(2, wxLIST_AUTOSIZE);
+	if (update_colsize) SetColumnWidth(2, wxLIST_AUTOSIZE);
 
 	// Set default text colour
 	SetItemTextColour(index, wxSystemSettings::GetColour(wxSYS_COLOUR_LISTBOXTEXT));
@@ -141,7 +141,7 @@ bool EntryList::updateEntry(int index) {
 		SetItemTextColour(index, col_modified);
 
 	// Setup size
-	SetMinSize(wxSize(getWidth(), -1));
+	if (update_colsize) SetMinSize(wxSize(getWidth(), -1));
 
 	return true;
 }
@@ -168,6 +168,9 @@ EntryListPanel::EntryListPanel(wxWindow *parent, int id, Archive* archive)
 	framesizer->Add(entry_list, 1, wxEXPAND | wxALL, 4);
 
 	Layout();
+
+	// Listen to the archive
+	listenTo(archive);
 }
 
 /* EntryListPanel::~EntryListPanel
@@ -343,7 +346,7 @@ ArchiveEntry* EntryListPanel::getLastSelectedEntry() {
 /* EntryListPanel::swapItems
  * Swaps two list items (including their focused/selected states)
  *******************************************************************/
-bool EntryListPanel::swapItems(int item1, int item2) {
+bool EntryListPanel::swapItems(int item1, int item2, ArchiveEntry* e1, ArchiveEntry* e2) {
 	// Check item 1
 	if (item1 < 0 || item1 > entry_list->GetItemCount())
 		return false;
@@ -374,9 +377,9 @@ bool EntryListPanel::swapItems(int item1, int item2) {
 	entry_list->SetItemState(item1, state2, wxLIST_STATE_SELECTED|wxLIST_STATE_FOCUSED);
 	entry_list->SetItemState(item2, state1, wxLIST_STATE_SELECTED|wxLIST_STATE_FOCUSED);
 
-	// Update the items
-	entry_list->updateEntry(item1);
-	entry_list->updateEntry(item2);
+	// Update items
+	entry_list->updateEntry(item1, false);
+	entry_list->updateEntry(item2, false);
 
 	return true;
 }
@@ -384,7 +387,7 @@ bool EntryListPanel::swapItems(int item1, int item2) {
 /* EntryListPanel::addEntry
  * Adds an entry to the list
  *******************************************************************/
-bool EntryListPanel::addEntry(DWORD archive_index) {
+bool EntryListPanel::addEntry(DWORD archive_index, ArchiveEntry* e) {
 	// Get the entry to add
 	ArchiveEntry* entry = archive->getEntry(archive_index);
 
@@ -407,7 +410,7 @@ bool EntryListPanel::addEntry(DWORD archive_index) {
 /* EntryListPanel::updateEntry
  * Updates an entry in the list
  *******************************************************************/
-bool EntryListPanel::updateEntry(DWORD archive_index) {
+bool EntryListPanel::updateEntry(DWORD archive_index, ArchiveEntry* e) {
 	// Just update the list item corresponding with the entry index
 	// (it's 1-1 in a normal EntryListPanel, will be different for zip archives)
 	entry_list->updateEntry(archive_index);
@@ -416,7 +419,7 @@ bool EntryListPanel::updateEntry(DWORD archive_index) {
 /* EntryListPanel::removeEntry
  * Removes an entry from the list
  *******************************************************************/
-bool EntryListPanel::removeEntry(DWORD archive_index) {
+bool EntryListPanel::removeEntry(DWORD archive_index, ArchiveEntry* e) {
 	// Just delete the list item corresponding with the entry index
 	// (it's 1-1 in a normal EntryListPanel, will be different for zip archives)
 	entry_list->DeleteItem(archive_index);
@@ -516,6 +519,8 @@ ArchiveEntry* EntryListPanel::newEntry(string name) {
 	// If something was selected, add 1 to the index so we add the new entry after the last selected
 	if (index >= 0)
 		index++;
+	else
+		index = entry_list->GetItemCount(); // If not add to the end of the list
 
 	// Add the entry to the archive
 	ArchiveEntry* new_entry = archive->addNewEntry(name, index);
@@ -586,6 +591,9 @@ ZipEntryListPanel::ZipEntryListPanel(wxWindow* parent, int id, Archive* archive)
 	dummy_folder_entry->setType(ETYPE_FOLDER);
 	dummy_folder_entry->setSize(0);
 	dummy_folder_entry->setState(0);
+
+	// Init beginning index of entries
+	entries_begin = 0;
 }
 
 /* ZipEntryListPanel::~ZipEntryListPanel
@@ -627,25 +635,26 @@ void ZipEntryListPanel::populateEntryList() {
 		// Setup subdirectory item
 		wxListItem li;
 		li.SetId(index);
-		li.SetData(dummy_folder_entry);
+		li.SetData(subdir->entry);
 
 		// Add it to the list
 		entry_list->InsertItem(li);
 		entry_list->updateEntry(index);
 
 		// Set name manually
-		li.SetText(subdir->name);
+		li.SetText(subdir->getName());
 		entry_list->SetItem(li);
 
 		// Set size manually
 		li.SetColumn(1);
-		li.SetText(s_fmt(_T("%d Entries"), subdir->numEntries(false)));
+		li.SetText(s_fmt(_T("%d Entries"), subdir->numEntries(false) + subdir->numSubDirs(false)));
 		entry_list->SetItem(li);
 
 		index++;
 	}
 
 	// Go through and add all entries in the current directory
+	entries_begin = index;
 	for (size_t a = 0; a < dir->entries.size(); a++) {
 		// Setup new item
 		ArchiveEntry* entry = dir->entries[a];
@@ -670,9 +679,9 @@ void ZipEntryListPanel::populateEntryList() {
 
 		// Set entry status text colour if needed
 		if (entry->getState() == 2)
-			entry_list->SetItemTextColour(a, col_new);
+			entry_list->SetItemTextColour(index, col_new);
 		else if (entry->getState() == 1)
-			entry_list->SetItemTextColour(a, col_modified);
+			entry_list->SetItemTextColour(index, col_modified);
 
 		index++;
 	}
@@ -691,6 +700,14 @@ void ZipEntryListPanel::populateEntryList() {
 		// Set name manually
 		li.SetText(_T(".."));
 		entry_list->SetItem(li);
+
+		// Set size manually
+		li.SetColumn(1);
+		li.SetText(s_fmt(_T("%d Entries"), dir->parent_dir->numEntries(false) + dir->parent_dir->numSubDirs(false)));
+		entry_list->SetItem(li);
+
+		// The entry items begin 1 further down
+		entries_begin++;
 	}
 
 	// Setup column widths
@@ -745,8 +762,15 @@ void ZipEntryListPanel::onEntryListActivated(wxListEvent& event) {
  * Override to work correctly with zip directories (as the entry list
  * won't be a 1-1 match index-wise with the archive)
  *******************************************************************/
-bool ZipEntryListPanel::swapItems(int item1, int item2) {
-	return false;
+bool ZipEntryListPanel::swapItems(int item1, int item2, ArchiveEntry* e1, ArchiveEntry* e2) {
+	// Check that both entries are in the current directory
+	// (shouldn't ever really happen that two entries in different directories are swapped)
+	zipdir_t* dir = (zipdir_t*)cur_directory;
+	if (!dir->entryExists(e1) || !dir->entryExists(e2))
+		return false;
+
+	// Do default entry swap, keeping in mind the offset to the beginning of the entries
+	return EntryListPanel::swapItems(entries_begin + item1, entries_begin + item2, e1, e2);
 }
 
 /* ZipEntryListPanel::addEntry
@@ -755,22 +779,153 @@ bool ZipEntryListPanel::swapItems(int item1, int item2) {
  * entry is in a *new* subdirectory of the current directory then
  * a new subdirectory entry is added, otherwise it does nothing
  *******************************************************************/
-bool ZipEntryListPanel::addEntry(DWORD archive_index) {
-	return false;
+bool ZipEntryListPanel::addEntry(DWORD archive_index, ArchiveEntry* e) {
+	// Get the current directory
+	zipdir_t* cdir = (zipdir_t*)cur_directory;
+
+	// Check if the added entry was in this directory or any of it's subdirectories
+	if (!cdir->entryExists(e, true))
+		return true;
+
+	// Get the directory the entry was added to
+	zipdir_t* dir = ((ZipArchive*)archive)->getEntryDirectory(e, cdir);
+
+	// If that directory is the current just add the entry to the list at the right index
+	if (dir == cdir) {
+		// Setup new entry
+		wxListItem li;
+		li.SetId(entries_begin + archive_index);
+		li.SetData(e);
+
+		// Add it to the list
+		entry_list->InsertItem(li);
+		entry_list->updateEntry(entries_begin + archive_index);
+
+		return true;
+	}
+
+	// No need for the below now, ZipArchive sends a directory_added announcement
+	/*
+	// Otherwise add the appropriate subdirectory if needed
+
+	// Trace back from the entry directory until we get to the one after the current
+	zipdir_t* subdir = dir;
+	while (true) {
+		if (subdir->parent_dir == cdir)
+			break;
+		subdir = subdir->parent_dir;
+	}
+
+	// Check if the subdirectory exists in the list already
+	for (int a = 0; a < entry_list->GetItemCount(); a++) {
+		if (((ArchiveEntry*)entry_list->GetItemData(a))->getType() != ETYPE_FOLDER)
+			break;
+		if (!entry_list->GetItemText(a).Cmp(subdir->getName()))
+			return true;
+	}
+
+	// Setup subdirectory item
+	wxListItem li;
+	li.SetId(entries_begin);
+	li.SetData(subdir->entry);
+
+	// Add it to the list
+	entry_list->InsertItem(li);
+	entry_list->updateEntry(entries_begin);
+
+	// Set name manually
+	li.SetText(subdir->getName());
+	entry_list->SetItem(li);
+
+	// Set size manually
+	li.SetColumn(1);
+	li.SetText(s_fmt(_T("%d Entries"), subdir->numEntries(false) + subdir->numSubDirs(false)));
+	entry_list->SetItem(li);
+	 */
+
+	return true;
 }
 
 /* ZipEntryListPanel::updateEntry
  * Updates an entry in the list, if it is in the current directory
  *******************************************************************/
-bool ZipEntryListPanel::updateEntry(DWORD archive_index) {
-	return false;
+bool ZipEntryListPanel::updateEntry(DWORD archive_index, ArchiveEntry* e) {
+	// Get the current directory
+	zipdir_t* cdir = (zipdir_t*)cur_directory;
+
+	// Check if the updated entry was in this directory
+	if (!cdir->entryExists(e, false))
+		return true;
+
+	// Update the entry
+	entry_list->updateEntry(entries_begin + archive_index, true);
+
+	return true;
 }
 
 /* ZipEntryListPanel::removeEntry
  * Removes an entry from the list if it is in the current directory
  *******************************************************************/
-bool ZipEntryListPanel::removeEntry(DWORD archive_index) {
-	return false;
+bool ZipEntryListPanel::removeEntry(DWORD archive_index, ArchiveEntry* e) {
+	// Get the current directory
+	zipdir_t* cdir = (zipdir_t*)cur_directory;
+
+	// Check if the removed entry was in this directory
+	if (!cdir->entryExists(e, false))
+		return true;
+
+	// If it was, remove it from the list
+	entry_list->DeleteItem(entries_begin + archive_index);
+
+	return true;
+}
+
+/* ZipEntryListPanel::addDirectory
+ * Adds a subdirectory to the list if it is a direct subdirectory of
+ * the current directory
+ *******************************************************************/
+bool ZipEntryListPanel::addDirectory(wxUIntPtr zipdir_ptr) {
+	// Get added directory
+	zipdir_t* dir = (zipdir_t*)wxUIntToPtr(zipdir_ptr);
+
+	// Get current directory
+	zipdir_t* cdir = (zipdir_t*)cur_directory;
+
+	// Check directories
+	if (!cdir || !dir)
+		return false;
+
+	// Check if the added directory was a direct subdirectory of the current directory
+	for (size_t a = 0; a < cdir->subdirectories.size(); a++) {
+		if (cdir->subdirectories[a] == dir) {
+			// It is a direct subdirectory, so add it the the entry list
+
+			// Setup subdirectory item
+			wxListItem li;
+			li.SetId(entries_begin);
+			li.SetData(dir->entry);
+
+			// Add it to the list
+			entry_list->InsertItem(li);
+			entry_list->updateEntry(entries_begin);
+
+			// Set name manually
+			li.SetText(dir->getName());
+			entry_list->SetItem(li);
+
+			// Set size manually
+			li.SetColumn(1);
+			li.SetText(s_fmt(_T("%d Entries"), dir->numEntries(false) + dir->numSubDirs(false)));
+			entry_list->SetItem(li);
+
+			// Entries begin 1 entry down
+			entries_begin++;
+
+			return true;
+		}
+	}
+
+	return true;
 }
 
 /* ZipEntryListPanel::newEntry
@@ -780,7 +935,15 @@ bool ZipEntryListPanel::removeEntry(DWORD archive_index) {
  * value.
  *******************************************************************/
 ArchiveEntry* ZipEntryListPanel::newEntry(string name) {
-	return NULL;
+	// Get current directory string
+	zipdir_t* dir = (zipdir_t*)cur_directory;
+
+	// If an absolute path wasn't given, add the current directory before the name
+	if (!name.StartsWith(_T("/")))
+		name = dir->getFullPath() + name;
+
+	// Now do default EntryListPanel::newEntry
+	return EntryListPanel::newEntry(name);
 }
 
 /* ZipEntryListPanel::newEntryFromFile
@@ -796,6 +959,80 @@ ArchiveEntry* ZipEntryListPanel::newEntryFromFile(string name, string filename) 
 
 	// Return the created entry
 	return new_entry;
+}
+
+/* ZipEntryListPanel::moveUp
+ * Override of EntryListPanel::moveUp to take subdirectories into
+ * account (can't move them)
+ *******************************************************************/
+bool ZipEntryListPanel::moveUp() {
+	// Get selection
+	vector<int> selection = getSelection();
+
+	// If nothing is selected, do nothing
+	if (selection.size() == 0)
+		return false;
+
+	// If the first selected item is at the top of the list
+	// then don't move anything up
+	if (selection[0] <= entries_begin)
+		return false;
+
+	// Move each one up by swapping it with the entry above it
+	for (size_t a = 0; a < selection.size(); a++) {
+		// Get the entries to swap
+		ArchiveEntry* entry = (ArchiveEntry*)(entry_list->GetItemData(selection[a]));
+		ArchiveEntry* above = (ArchiveEntry*)(entry_list->GetItemData(selection[a]-1));
+
+		// Swap them in the archive
+		archive->swapEntries(entry, above);
+	}
+
+	// Return success
+	return true;
+}
+
+/* ZipEntryListPanel::moveDown
+ * Override of EntryListPanel::moveDown to take subdirectories into
+ * account (can't move them)
+ *******************************************************************/
+bool ZipEntryListPanel::moveDown() {
+	// Get selection
+	vector<int> selection = getSelection();
+
+	// If nothing is selected, do nothing
+	if (selection.size() == 0)
+		return false;
+
+	// If the last selected item is at the end of the list
+	// then don't move anything down
+	if (selection.back() == entry_list->GetItemCount()-1 || selection[0] < entries_begin)
+		return false;
+
+	// Move each one down by swapping it with the entry below it
+	for (int a = selection.size()-1; a >= 0; a--) {
+		// Get the entries to swap
+		ArchiveEntry* entry = (ArchiveEntry*)(entry_list->GetItemData(selection[a]));
+		ArchiveEntry* below = (ArchiveEntry*)(entry_list->GetItemData(selection[a]+1));
+
+		// Swap them in the archive
+		archive->swapEntries(entry, below);
+	}
+
+	// Return success
+	return true;
+}
+
+void ZipEntryListPanel::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
+	// Reset event data for reading
+	event_data.seek(0, SEEK_SET);
+
+	// If a directory was added to the archive
+	if (announcer == archive && !event_name.Cmp(_T("directory_added"))) {
+		wxUIntPtr ptr;
+		if (event_data.read(&ptr, sizeof(wxUIntPtr)))
+			addDirectory(ptr);
+	}
 }
 
 void ZipEntryListPanel::onEntryListEditLabel(wxListEvent& event) {

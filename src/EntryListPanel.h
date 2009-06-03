@@ -3,6 +3,7 @@
 #define __ENTRYLISTPANEL_H__
 
 #include <wx/listctrl.h>
+#include "ListenerAnnouncer.h"
 
 class Archive;
 class EntryListPanel;
@@ -12,15 +13,14 @@ private:
 	EntryListPanel*	parent;
 
 public:
-
 	EntryList(EntryListPanel *parent, int id);
 	~EntryList();
 
-	bool	updateEntry(int index);
+	bool	updateEntry(int index, bool update_colsize = true);
 	int		getWidth();
 };
 
-class EntryListPanel : public wxPanel {
+class EntryListPanel : public wxPanel, Listener {
 protected:
 	Archive*	archive;
 	EntryList*	entry_list;
@@ -40,16 +40,18 @@ public:
 	vector<int>				getSelection();
 	int						getLastSelected();
 	ArchiveEntry*			getLastSelectedEntry();
-	virtual bool			swapItems(int item1, int item2);
-	virtual bool			addEntry(DWORD archive_index);
-	virtual bool			updateEntry(DWORD archive_index);
-	virtual bool			removeEntry(DWORD archive_index);
+	virtual bool			swapItems(int item1, int item2, ArchiveEntry* e1 = NULL, ArchiveEntry* e2 = NULL);
+	virtual bool			addEntry(DWORD archive_index, ArchiveEntry* e = NULL);
+	virtual bool			updateEntry(DWORD archive_index, ArchiveEntry* e = NULL);
+	virtual bool			removeEntry(DWORD archive_index, ArchiveEntry* e = NULL);
 	int						getEntryListItem(ArchiveEntry* entry);
 
 	virtual ArchiveEntry*	newEntry(string name);
 	virtual ArchiveEntry*	newEntryFromFile(string name, string filename);
-	bool					moveUp();
-	bool					moveDown();
+	virtual bool			moveUp();
+	virtual bool			moveDown();
+	
+	virtual void onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {}
 
 	// Events
 	virtual void	onEntryListChange(wxListEvent &event);
@@ -63,19 +65,25 @@ class ZipEntryListPanel : public EntryListPanel {
 private:
 	void*			cur_directory;
 	ArchiveEntry*	dummy_folder_entry;
+	int				entries_begin;
 
 public:
 	ZipEntryListPanel(wxWindow *parent, int id, Archive* archive);
 	~ZipEntryListPanel();
 
 	void	populateEntryList();
-	bool	swapItems(int item1, int item2);
-	bool	addEntry(DWORD archive_index);
-	bool	updateEntry(DWORD archive_index);
-	bool	removeEntry(DWORD archive_index);
+	bool	swapItems(int item1, int item2, ArchiveEntry* e1 = NULL, ArchiveEntry* e2 = NULL);
+	bool	addEntry(DWORD archive_index, ArchiveEntry* e = NULL);
+	bool	updateEntry(DWORD archive_index, ArchiveEntry* e = NULL);
+	bool	removeEntry(DWORD archive_index, ArchiveEntry* e = NULL);
+	bool	addDirectory(wxUIntPtr zipdir_ptr);
 
 	ArchiveEntry*	newEntry(string name);
 	ArchiveEntry*	newEntryFromFile(string name, string filename);
+	bool			moveUp();
+	bool			moveDown();
+
+	void onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 
 	// Events
 	void	onEntryListActivated(wxListEvent &event);

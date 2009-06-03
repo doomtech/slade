@@ -24,6 +24,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *******************************************************************/
 
+#include <wx\filename.h>
+
+
 
 /*******************************************************************
  * INCLUDES
@@ -57,6 +60,93 @@
  * [subdir 2/1 entries]
  * etc...
  */
+
+
+zipdir_t::zipdir_t() {
+	entry = new ArchiveEntry();
+	entry->setType(ETYPE_FOLDER);
+	entry->setState(0);
+}
+
+bool zipdir_t::entryExists(ArchiveEntry* entry, bool include_subdirs) {
+	if (!entry)
+		return false;
+
+	for (size_t a = 0; a < entries.size(); a++) {
+		if (entries[a] == entry)
+			return true;
+	}
+
+	if (include_subdirs) {
+		for (size_t a = 0; a < subdirectories.size(); a++) {
+			if (subdirectories[a]->entryExists(entry, true))
+				return true;
+		}
+	}
+
+	return false;
+}
+
+ArchiveEntry* zipdir_t::getEntry(string name) {
+	for (size_t a = 0; a < entries.size(); a++) {
+		if (!entries[a]->getName().Cmp(name))
+			return entries[a];
+	}
+
+	return NULL;
+}
+
+int zipdir_t::entryIndex(ArchiveEntry* entry) {
+	if (!entry)
+		return -1;
+
+	for (size_t a = 0; a < entries.size(); a++) {
+		if (entries[a] == entry)
+			return a;
+	}
+
+	return -1;
+}
+
+zipdir_t* zipdir_t::getSubDir(string name) {
+	for (size_t a = 0; a < subdirectories.size(); a++) {
+		if (!subdirectories[a]->getName().Cmp(name))
+			return subdirectories[a];
+	}
+
+	return NULL;
+}
+
+string zipdir_t::getFullPath() {
+	if (parent_dir)
+		return parent_dir->getFullPath() + getName();
+	else
+		return getName();
+}
+
+DWORD zipdir_t::numEntries(bool include_subdirs) {
+	DWORD num = entries.size();
+
+	if (include_subdirs) {
+		for (size_t a = 0; a < subdirectories.size(); a++)
+			num += subdirectories[a]->numEntries(true);
+	}
+
+	return num;
+}
+
+DWORD zipdir_t::numSubDirs(bool include_subdirs) {
+	DWORD num = subdirectories.size();
+
+	if (include_subdirs) {
+		for (size_t a = 0; a < subdirectories.size(); a++)
+			num += subdirectories[a]->numSubDirs(true);
+	}
+
+	return num;
+}
+
+
 
 
 ZipArchive::ZipArchive()
@@ -131,7 +221,7 @@ bool ZipArchive::openFile(string filename) {
 	// Create 'root' directory
 	directory = new zipdir_t;
 	directory->parent_dir = NULL;
-	directory->name = _T("");
+	directory->setName(_T(""));
 
 	// Go through all zip entries
 	int entry_index = 0;
@@ -154,19 +244,21 @@ bool ZipArchive::openFile(string filename) {
 			// Add entry and directory to directory tree
 			zipdir_t* ndir = addDirectory(fn.GetPath(true, wxPATH_UNIX));
 			ndir->entries.push_back(new_entry);
+			ndir->entry->setState(0);
 		}
 		else {
 			// Zip entry is a directory, add it to the directory tree
 			wxFileName fn(entry->GetName(wxPATH_UNIX), wxPATH_UNIX);
-			addDirectory(fn.GetPath(true, wxPATH_UNIX));
+			zipdir_t* ndir = addDirectory(fn.GetPath(true, wxPATH_UNIX));
+			ndir->entry->setState(0);
 		}
 
 		// Go to next entry in the zip file
 		entry = zip.GetNextEntry();
 		entry_index++;
 	}
-	
-	dumpDirectoryTree();
+
+	//dumpDirectoryTree();
 
 	// Setup variables
 	this->filename = filename;
@@ -177,7 +269,90 @@ bool ZipArchive::openFile(string filename) {
 }
 
 bool ZipArchive::save(string filename) {
-	return false;
+	// If no filename was specified, just use the current filename
+	if (filename.IsEmpty())
+		filename = this->filename;
+
+	// Create backup copy if needed
+	string bakfile = filename + _T(".bak");
+	if (wxFileName::FileExists(filename)) {
+		// Remove old backup file
+		wxRemoveFile(bakfile);
+
+		// Copy current file contents to backup file
+		wxCopyFile(this->filename, bakfile);
+	}
+	else {
+		// If no backup needed, set bakfile anyway as it's needed for copying zip entries
+		bakfile = this->filename;
+	}
+
+	// Open the file
+	wxFFileOutputStream out(filename);
+	if (!out.IsOk()) {
+		Global::error = _T("Unable to open file for saving. Make sure it isn't in use by another program.");
+		return false;
+	}
+
+	// Open as zip for writing
+	wxZipOutputStream zip(out, 9);
+	if (!zip.IsOk()) {
+		Global::error = _T("Unable to create zip for saving");
+		return false;
+	}
+
+	// Open old zip for copying, if it exists. This is used to copy any entries
+	// that have been previously saved/compressed and are unmodified, to greatly
+	// speed up zip file saving by not having to recompress unchanged entries
+	wxFFileInputStream in(bakfile);
+	wxZipInputStream inzip(in);
+
+	// Get a list of all entries in the old zip
+	wxZipEntry** c_entries = new wxZipEntry*[inzip.GetTotalEntries()];
+	for (int a = 0; a < inzip.GetTotalEntries(); a++)
+		c_entries[a] = inzip.GetNextEntry();
+
+	// Get a linear list of all entries in the archive
+	vector<ArchiveEntry*> entries;
+	getTreeAsList(entries);
+
+	// Go through all entries
+	for (size_t a = 0; a < entries.size(); a++) {
+		if (entries[a]->getType() == ETYPE_FOLDER) {
+			// If the current entry is a folder, just write a directory entry and continue
+			zip.PutNextDirEntry(entries[a]->getExProp(_T("directory")) + entries[a]->getName());
+			entries[a]->setState(0);
+			continue;
+		}
+
+		if (!inzip.IsOk() || entries[a]->getState() > 0 || !entries[a]->hasExProp(_T("zip_index"))) {
+			// If the current entry has been changed, or doesn't exist in the old zip,
+			// (re)compress it's data and write it to the zip
+			wxZipEntry* zipentry = new wxZipEntry(getEntryFullPath(entries[a]));
+			zip.PutNextEntry(zipentry);
+			zip.Write(entries[a]->getData(), entries[a]->getSize());
+		}
+		else {
+			// If the entry is unmodified and exists in the old zip, just copy it over
+			int index = atoi(entries[a]->getExProp(_T("zip_index")).ToAscii());
+			//c_entries[index]->SetName(getEntryFullPath(entries[a]));
+			zip.CopyEntry(c_entries[index], inzip);
+			inzip.Reset();
+		}
+
+		// Update entry info
+		entries[a]->setState(0);
+		entries[a]->setExProp(_T("zip_index"), s_fmt(_T("%d"), a));
+	}
+
+	// Clean up and update variables
+	delete[] c_entries;
+	zip.Close();
+	this->filename = filename;
+	on_disk = true;
+	announce(_T("saved"));
+
+	return true;
 }
 
 bool ZipArchive::loadEntryData(ArchiveEntry* entry) {
@@ -241,6 +416,9 @@ DWORD ZipArchive::numEntries() {
 }
 
 void ZipArchive::close() {
+	// Delete all directories and entries
+	deleteDirectory();
+
 	// Announce
 	announce(_T("close"));
 }
@@ -248,12 +426,55 @@ void ZipArchive::close() {
 // The entry to be added needs a 'directory' extra property to be
 // added to any non-root directory (will be added at position in the directory, not archive)
 bool ZipArchive::addEntry(ArchiveEntry* entry, DWORD position) {
+	// Check valid entry
+	if (!entry)
+		return false;
+
+	// Get directory to add to, adding it if necessary
+	zipdir_t* dir = addDirectory(entry->getExProp(_T("directory")));
+
+	// Add the entry to the directory
+	if (position >= dir->numEntries()) {
+		dir->entries.push_back(entry);
+		position = dir->entries.size() - 1;
+	}
+	else
+		dir->entries.insert(dir->entries.begin() + position, entry);
+
+	// Update variables etc
+	modified = true;
+	entry->setParent(this);
+	entry->setState(2);
+
+	// Announce
+	MemChunk mc;
+	wxUIntPtr ptr = wxPtrToUInt(entry);
+	mc.write(&position, sizeof(DWORD));
+	mc.write(&ptr, sizeof(wxUIntPtr));
+	announce(_T("entry_added"), mc);
+
 	return false;
 }
 
 ArchiveEntry* ZipArchive::addNewEntry(string name, DWORD position) {
-	// See addEntry
-	return NULL;
+	// Convert name to wxFileName for processing
+	wxFileName fn(name);
+
+	// If the entry name is empty do nothing
+	if (fn.GetFullName().IsEmpty())
+		return NULL;
+
+	// Create the entry to add
+	ArchiveEntry* new_entry = new ArchiveEntry(fn.GetFullName());
+
+	// Setup entry directory
+	new_entry->setExProp(_T("directory"), fn.GetPath(true, wxPATH_UNIX));
+
+	// Add it to the archive
+	addEntry(new_entry, position);
+
+	// Return the new entry
+	return new_entry;
 }
 
 ArchiveEntry* ZipArchive::addExistingEntry(ArchiveEntry* entry, DWORD position, bool copy) {
@@ -277,16 +498,16 @@ bool ZipArchive::removeEntry(ArchiveEntry* entry, bool delete_entry) {
 	if (!dir)
 		return false;
 
-	// Remove it from the directory
-	DWORD index = (DWORD)dir->entryIndex(entry);
-	dir->entries.erase(dir->entries.begin() + index);
-
 	// Announce
 	MemChunk mc;
+	DWORD index = (DWORD)dir->entryIndex(entry);
 	wxUIntPtr ptr = wxPtrToUInt(entry);
 	mc.write(&index, sizeof(DWORD));
 	mc.write(&ptr, sizeof(wxUIntPtr));
 	announce(_T("entry_removed"), mc);
+
+	// Remove it from the directory
+	dir->entries.erase(dir->entries.begin() + index);
 
 	// Delete the entry if specified
 	if (delete_entry)
@@ -344,6 +565,10 @@ bool ZipArchive::renameEntry(ArchiveEntry* entry, string new_name) {
 	if (entry->getParent() != this)
 		return false;
 
+	// Check a new name was given
+	if (new_name.IsEmpty() || !new_name.Cmp(entry->getName()))
+		return false;
+
 	// Check if we're dealing with an absolute directory (if new_name starts with a /)
 	bool absolute = false;
 	if (new_name.StartsWith(_T("/"))) {
@@ -355,10 +580,14 @@ bool ZipArchive::renameEntry(ArchiveEntry* entry, string new_name) {
 	// Convert given name to wxFileName for processing
 	wxFileName fn(new_name);
 
+	// Load entry data if it hasn't been already (this prevents problems with saving the entry)
+	entry->getData();
+
 	// Check for directories in the new name
 	if (fn.GetDirCount() == 0 && !absolute) {
 		// If no directory was given, just rename the entry
 		entry->rename(new_name);
+		return true;
 	}
 	else {
 		// Otherwise create the directory first if needed
@@ -379,10 +608,16 @@ bool ZipArchive::renameEntry(ArchiveEntry* entry, string new_name) {
 		zipdir_t* ndir = addDirectory(new_dir);
 
 		// Remove the entry from it's current directory
-		cdir->entries.erase(cdir->entries.begin() + cdir->entryIndex(entry));
+		removeEntry(entry, false);
 
 		// Add it to the new directory
-		ndir->entries.push_back(entry);
+		entry->setExProp(_T("directory"), ndir->getFullPath());
+		addEntry(entry, 999999);
+
+		// Rename it
+		entry->rename(fn.GetFullName());
+
+		return true;
 	}
 }
 
@@ -424,6 +659,25 @@ zipdir_t* ZipArchive::getEntryDirectory(ArchiveEntry* entry, zipdir_t* dir) {
 	return NULL;
 }
 
+string ZipArchive::getEntryFullPath(ArchiveEntry* entry) {
+	// Check valid entry
+	if (!entry)
+		return _T("");
+
+	// Check entry is part of the archive
+	if (entry->getParent() != this)
+		return _T("");
+
+	// Get the entry directory
+	zipdir_t* dir = getEntryDirectory(entry);
+
+	// Return the entry path + name
+	if (dir)
+		return dir->getFullPath() + entry->getName();
+	else
+		return entry->getName();
+}
+
 zipdir_t* ZipArchive::getDirectory(string name, zipdir_t* dir) {
 	// Check if root directory exists
 	if (!directory)
@@ -444,7 +698,7 @@ zipdir_t* ZipArchive::getDirectory(string name, zipdir_t* dir) {
 	// a subdirectory of the current directory
 	string first = fn.GetDirs()[0] + _T("/");
 	for (size_t a = 0; a < dir->subdirectories.size(); a++) {
-		if (!dir->subdirectories[a]->name.Cmp(first)) {
+		if (!dir->subdirectories[a]->getName().Cmp(first)) {
 			// The subdirectory exists within the current directory
 			// Remove the first directory from the dirname
 			fn.RemoveDir(0);
@@ -477,7 +731,7 @@ zipdir_t* ZipArchive::addDirectory(string name, zipdir_t* dir) {
 	// Check the first dir doesn't already exist
 	zipdir_t* dir_add = NULL;
 	for (size_t a = 0; a < dir->subdirectories.size(); a++) {
-		if (!dir->subdirectories[a]->name.Cmp(first))
+		if (!dir->subdirectories[a]->getName().Cmp(first))
 			dir_add = dir->subdirectories[a];
 	}
 
@@ -485,17 +739,50 @@ zipdir_t* ZipArchive::addDirectory(string name, zipdir_t* dir) {
 	if (!dir_add) {
 		// Create and setup new directory
 		dir_add = new zipdir_t;
-		dir_add->name = first;
+		dir_add->setName(first);
 		dir_add->parent_dir = dir;
+		dir_add->entry->setState(2);
 
 		// Add it to the current directory
 		dir->subdirectories.push_back(dir_add);
+
+		// Announce
+		MemChunk mc;
+		wxUIntPtr ptr = wxPtrToUInt(dir_add);
+		mc.write(&ptr, sizeof(wxUIntPtr));
+		announce(_T("directory_added"), mc);
 	}
 
 	// If it did exist, remove the first directory from the dirname and
 	// continue adding subsequent subdirectories
 	fn.RemoveDir(0);
 	return addDirectory(fn.GetPath(true, wxPATH_UNIX), dir_add);
+}
+
+void ZipArchive::deleteDirectory(zipdir_t* dir) {
+	// If no current directory was specified, set it to the root directory
+	if (!dir)
+		dir = directory;
+
+	// Delete directory entry
+	delete dir->entry;
+
+	// Delete any entries in the directory
+	for (size_t a = 0; a < dir->entries.size(); a++) {
+		delete dir->entries[a];
+	}
+
+	// Delete any subdirectories in the directory
+	for (size_t a = 0; a < dir->subdirectories.size(); a++) {
+		deleteDirectory(dir->subdirectories[a]);
+	}
+
+	// Clear vectors
+	dir->entries.clear();
+	dir->subdirectories.clear();
+
+	// Delete the directory itself
+	delete dir;
 }
 
 void ZipArchive::dumpDirectoryTree(zipdir_t* dir) {
@@ -512,5 +799,31 @@ void ZipArchive::dumpDirectoryTree(zipdir_t* dir) {
 
 	for (size_t a = 0; a < dir->subdirectories.size(); a++) {
 		dumpDirectoryTree(dir->subdirectories[a]);
+	}
+}
+
+void ZipArchive::getTreeAsList(vector<ArchiveEntry*>& list, zipdir_t* start) {
+	// If no starting directory was specified, set it to the root directory
+	if (!start)
+		start = directory;
+
+	// Add the current directory entry to the list if it isn't the root directory
+	if (start != directory) {
+		// Update directory entry information
+		wxFileName fn(start->getFullPath());
+		fn.RemoveLastDir();
+		start->entry->setExProp(_T("directory"), fn.GetPath(true, wxPATH_UNIX));
+
+		// Add it
+		list.push_back(start->entry);
+	}
+
+	// Add all entries in the current directory to the list
+	for (size_t a = 0; a < start->entries.size(); a++)
+		list.push_back(start->entries[a]);
+
+	// Lastly go through all subdirectories and add them to the list
+	for (size_t a = 0; a < start->subdirectories.size(); a++) {
+		getTreeAsList(list, start->subdirectories[a]);
 	}
 }

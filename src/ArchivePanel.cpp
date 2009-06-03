@@ -129,21 +129,6 @@ void ArchivePanel::saveAs() {
  * currently focused entry
  *******************************************************************/
 bool ArchivePanel::newEntry() {
-	/*
-	// Get the entry index of the last selected list item
-	int index = archive->entryIndex(entry_list->getLastSelectedEntry());
-
-	// If something was selected, add 1 to the index so we add the new entry after the last selected
-	if (index >= 0)
-		index++;
-
-	// Prompt for new entry name
-	string name = wxGetTextFromUser(_T("Enter new entry name:"), _T("New Entry"));
-
-	// Add the entry to the archive
-	ArchiveEntry* new_entry = archive->addNewEntry(name, index);
-	 **/
-
 	// Prompt for new entry name
 	string name = wxGetTextFromUser(_T("Enter new entry name:"), _T("New Entry"));
 
@@ -348,30 +333,55 @@ void ArchivePanel::onAnnouncement(Announcer* announcer, string event_name, MemCh
 
 	// Archive entries were swapped
 	if (announcer == archive && event_name == _T("entries_swapped")) {
-		int e1, e2;
-		if (event_data.read(&e1, sizeof(int)) && event_data.read(&e2, sizeof(int)))
-			entry_list->swapItems(e1, e2);
+		int i1, i2;
+		wxUIntPtr e1, e2;
+
+		// Check all event data is there
+		if (!event_data.read(&i1, sizeof(int)) || !event_data.read(&i2, sizeof(int)) ||
+			!event_data.read(&e1, sizeof(wxUIntPtr)) || !event_data.read(&e2, sizeof(wxUIntPtr)))
+			return;
+
+		// Send to entry list to handle
+		entry_list->swapItems(i1, i2, (ArchiveEntry*)wxUIntToPtr(e1), (ArchiveEntry*)wxUIntToPtr(e2));
 	}
 
 	// An entry was added to the archive
 	if (announcer == archive && event_name == _T("entry_added")) {
 		DWORD index = 0;
-		if (event_data.read(&index, sizeof(DWORD)))
-			entry_list->addEntry(index);
+		wxUIntPtr e = 0;
+
+		// Check all event data is there
+		if (!event_data.read(&index, sizeof(DWORD)) || !event_data.read(&e, sizeof(wxUIntPtr)))
+			return;
+
+		// Send to entry list to handle
+		entry_list->addEntry(index, (ArchiveEntry*)wxUIntToPtr(e));
 	}
 
 	// An entry in the archive was modified
 	if (announcer == archive && event_name == _T("entry_modified")) {
 		DWORD index = 0;
-		if (event_data.read(&index, sizeof(DWORD)))
-			entry_list->updateEntry(index);
+		wxUIntPtr e = 0;
+
+		// Check all event data is there
+		if (!event_data.read(&index, sizeof(DWORD)) || !event_data.read(&e, sizeof(wxUIntPtr)))
+			return;
+
+		// Send to entry list to handle
+		entry_list->updateEntry(index, (ArchiveEntry*)wxUIntToPtr(e));
 	}
 
 	// An entry in the archive was removed
 	if (announcer == archive && event_name == _T("entry_removed")) {
 		DWORD index = 0;
-		if (event_data.read(&index, sizeof(DWORD)))
-			entry_list->removeEntry(index);
+		wxUIntPtr e = 0;
+
+		// Check all event data is there
+		if (!event_data.read(&index, sizeof(DWORD)) || !event_data.read(&e, sizeof(wxUIntPtr)))
+			return;
+
+		// Send to entry list to handle
+		entry_list->removeEntry(index, (ArchiveEntry*)wxUIntToPtr(e));
 	}
 }
 
