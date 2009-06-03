@@ -22,7 +22,7 @@ public:
 	SLADEMap();
 	~SLADEMap();
 
-	bool	readMap(Archive map_entries);
+	bool	readMap(Archive* map_entries);
 };
 
 #endif //__SLADEMAP_H__

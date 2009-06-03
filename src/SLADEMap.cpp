@@ -36,6 +36,6 @@ SLADEMap::SLADEMap() {
 SLADEMap::~SLADEMap() {
 }
 
-bool SLADEMap::readMap(Archive map_entries) {
+bool SLADEMap::readMap(Archive* map_entries) {
 	return true;
 }
