@@ -58,6 +58,7 @@ ArchiveManager::ArchiveManager() {
  * ArchiveManager class destructor
  *******************************************************************/
 ArchiveManager::~ArchiveManager() {
+	clearAnnouncers();
 }
 
 /* ArchiveManager::addArchive

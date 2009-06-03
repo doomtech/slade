@@ -10,9 +10,10 @@ private:
 
 public:
 	Listener();
-	~Listener();
+	virtual ~Listener();
 
 	void listenTo(Announcer* a);
+	void clearAnnouncers() { announcers.clear(); }
 	virtual void onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 };
 
