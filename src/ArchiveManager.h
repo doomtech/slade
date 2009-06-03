@@ -35,4 +35,7 @@ public:
 	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 };
 
+// Define for less cumbersome ArchiveManager::getInstance()
+#define theArchiveManager ArchiveManager::getInstance()
+
 #endif //__ARCHIVEMANAGER_H__

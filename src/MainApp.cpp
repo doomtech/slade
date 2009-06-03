@@ -31,6 +31,7 @@
 #include "WxStuff.h"
 #include "MainApp.h"
 #include "MainWindow.h"
+#include "ArchiveManager.h"
 #include <wx/image.h>
 #include <wx/glcanvas.h>
 
@@ -66,6 +67,12 @@ bool MainApp::OnInit() {
 	// Create a MainWindow and show it
 	MainWindow *heh = new MainWindow();
 	heh->Show(true);
+
+	// Open any archives on the command line
+	for (int a = 0; a < argc; a++) {
+		string arg = argv[a];
+		theArchiveManager.openArchive(arg);
+	}
 
 	return true;
 }

@@ -66,9 +66,15 @@ ArchiveManager::~ArchiveManager() {
 bool ArchiveManager::addArchive(Archive* archive) {
 	// Only add if archive is a valid pointer
 	if (archive) {
+		// Add to the list
 		open_archives.push_back(archive);
+
+		// Listen to the archive
 		listenTo(archive);
+
+		// Announce the addition
 		announce(_T("archive_added"));
+
 		return true;
 	} else
 		return false;
@@ -271,10 +277,10 @@ void ArchiveManager::onAnnouncement(Announcer* announcer, string event_name, Mem
 //CONSOLE_COMMAND(list_wads, 0,
 
 void c_list_archives(vector<string> args) {
-	Console::getInstance().logMessage(s_fmt(_T("%d Open Archives:"), ArchiveManager::getInstance().numArchives()));
+	Console::getInstance().logMessage(s_fmt(_T("%d Open Archives:"), theArchiveManager.numArchives()));
 
-	for (int a = 0; a < ArchiveManager::getInstance().numArchives(); a++) {
-		Archive* archive = ArchiveManager::getInstance().getArchive(a);
+	for (int a = 0; a < theArchiveManager.numArchives(); a++) {
+		Archive* archive = theArchiveManager.getArchive(a);
 		Console::getInstance().logMessage(s_fmt(_T("%d: \"%s\""), a + 1, archive->getFileName().c_str()));
 	}
 }

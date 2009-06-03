@@ -118,7 +118,7 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
 	menu_context->Append(MENU_CLOSE, _T("Close"), _("Close the selected Archive(s)"));
 
 	// Listen to the ArchiveManager
-	listenTo(&(ArchiveManager::getInstance()));
+	listenTo(&(theArchiveManager));
 }
 
 /* ArchiveManagerPanel::~ArchiveManagerPanel
@@ -135,13 +135,13 @@ void ArchiveManagerPanel::refreshArchiveList() {
 	list_archives->ClearAll();
 
 	// Add each archive that is opened in the ArchiveManager
-	ArchiveManager& wm = ArchiveManager::getInstance();
+	ArchiveManager& wm = theArchiveManager;
 	for (int a = 0; a < wm.numArchives(); a++)
 		list_archives->InsertItem(list_archives->GetItemCount(), wm.getArchive(a)->getFileName(true));
 }
 
 void ArchiveManagerPanel::updateListItem(int index) {
-	list_archives->SetItemText(index, ArchiveManager::getInstance().getArchive(index)->getFileName(true));
+	list_archives->SetItemText(index, theArchiveManager.getArchive(index)->getFileName(true));
 }
 
 /* ArchiveManagerPanel::isArchivePanel
@@ -162,12 +162,32 @@ bool ArchiveManagerPanel::isArchivePanel(int tab_index) {
 	return true;
 }
 
+void ArchiveManagerPanel::openTab(int archive_index) {
+	Archive* archive = theArchiveManager.getArchive(archive_index);
+
+	if (archive) {
+		// Go through all tabs
+		for (size_t a = 0; a < notebook_archives->GetPageCount(); a++) {
+			// Check for a match
+			if (((ArchivePanel*) notebook_archives->GetPage(a))->getArchive() == archive) {
+				// Selected archive is already open in a tab, so switch to this tab
+				notebook_archives->SetSelection(a);
+				return;
+			}
+		}
+
+		// If tab isn't already open, open a new one
+		ArchivePanel *wp = new ArchivePanel(notebook_archives, archive);
+		notebook_archives->AddPage(wp, archive->getFileName(false), true);
+	}
+}
+
 /* ArchiveManagerPanel::openFile
  * Opens an archive and initialises the UI for it
  *******************************************************************/
 void ArchiveManagerPanel::openFile(string filename) {
 	// Open the file in the archive manager
-	Archive* new_archive = ArchiveManager::getInstance().openArchive(filename);
+	Archive* new_archive = theArchiveManager.openArchive(filename);
 
 	// Check that the archive opened ok
 	if (new_archive) {
@@ -190,7 +210,7 @@ void ArchiveManagerPanel::openFiles(wxArrayString& files) {
 }
 
 void ArchiveManagerPanel::createNewArchive(BYTE type) {
-	Archive* new_archive = ArchiveManager::getInstance().newArchive(type);
+	Archive* new_archive = theArchiveManager.newArchive(type);
 
 	if (new_archive) {
 		ArchivePanel *wp = new ArchivePanel(notebook_archives, new_archive);
@@ -237,8 +257,9 @@ void ArchiveManagerPanel::onAnnouncement(Announcer* announcer, string event_name
 
 	// If an archive was added
 	if (event_name == _T("archive_added")) {
-		ArchiveManager& wm = ArchiveManager::getInstance();
+		ArchiveManager& wm = theArchiveManager;
 		list_archives->InsertItem(wm.numArchives(), wm.getArchive(wm.numArchives()-1)->getFileName(true));
+		openTab(wm.numArchives()-1);
 	}
 
 	// If an archive was saved
@@ -263,11 +284,11 @@ void ArchiveManagerPanel::saveSelection() {
 	// Go through the selection
 	for (size_t a = 0; a < selection.size(); a++) {
 		// Get the archive to be saved
-		Archive* archive = ArchiveManager::getInstance().getArchive(selection[a]);
+		Archive* archive = theArchiveManager.getArchive(selection[a]);
 
 		if (archive->isOnDisk()) {
 			// Save the archive if possible
-			if (!ArchiveManager::getInstance().getArchive(selection[a])->save()) {
+			if (!theArchiveManager.getArchive(selection[a])->save()) {
 				// If there was an error pop up a message box
 				wxMessageBox(s_fmt(_T("Error: %s"), Global::error.c_str()), _T("Error"), wxICON_ERROR);
 			}
@@ -309,7 +330,7 @@ void ArchiveManagerPanel::saveSelectionAs() {
 	// Go through the selection
 	for (size_t a = 0; a < selection.size(); a++) {
 		// Get the archive
-		Archive* archive = ArchiveManager::getInstance().getArchive(selection[a]);
+		Archive* archive = theArchiveManager.getArchive(selection[a]);
 
 		// Popup file save dialog
 		string formats = archive->getFileExtensionString();
@@ -342,11 +363,11 @@ void ArchiveManagerPanel::closeSelection() {
 	// Get the list of selected archives
 	vector<Archive*> selected_archives;
 	for (size_t a = 0; a < selection.size(); a++)
-		selected_archives.push_back(ArchiveManager::getInstance().getArchive(selection[a]));
+		selected_archives.push_back(theArchiveManager.getArchive(selection[a]));
 
 	// Close all selected archives
 	for (size_t a = 0; a < selected_archives.size(); a++)
-		ArchiveManager::getInstance().closeArchive(selected_archives[a]);
+		theArchiveManager.closeArchive(selected_archives[a]);
 }
 
 /* ArchiveManagerPanel::saveCurrent
@@ -381,7 +402,7 @@ void ArchiveManagerPanel::closeCurrent() {
 	int selection = notebook_archives->GetSelection();
 	if (isArchivePanel(selection)) {
 		Archive* archive = ((ArchivePanel*) notebook_archives->GetPage(selection))->getArchive();
-		ArchiveManager::getInstance().closeArchive(archive);
+		theArchiveManager.closeArchive(archive);
 	}
 }
 
@@ -496,7 +517,7 @@ void ArchiveManagerPanel::onListArchivesChanged(wxListEvent &e) {
 	list_maps->ClearAll();
 
 	// Get the selected archive
-	Archive* selected_archive = ArchiveManager::getInstance().getArchive(e.GetIndex());
+	Archive* selected_archive = theArchiveManager.getArchive(e.GetIndex());
 
 	// Return if selection doesn't exist
 	if (!selected_archive)
@@ -534,26 +555,8 @@ void ArchiveManagerPanel::onListArchivesChanged(wxListEvent &e) {
  * Opens the archive in a new tab, if it isn't already open.
  *******************************************************************/
 void ArchiveManagerPanel::onListArchivesActivated(wxListEvent &e) {
-	// Get the selected archive
-	Archive* selected_archive = ArchiveManager::getInstance().getArchive(e.GetIndex());
-
-	// Check selected archive exists
-	if (!selected_archive)
-		return;
-
-	// Go through all tabs
-	for (size_t a = 0; a < notebook_archives->GetPageCount(); a++) {
-		// Check for a match
-		if (((ArchivePanel*) notebook_archives->GetPage(a))->getArchive() == selected_archive) {
-			// Selected archive is already open in a tab, so switch to this tab
-			notebook_archives->SetSelection(a);
-			return;
-		}
-	}
-
-	// Open the selected archive in a new tab
-	ArchivePanel *wp = new ArchivePanel(notebook_archives, selected_archive);
-	notebook_archives->AddPage(wp, selected_archive->getFileName(false), true);
+	// Open the archive tab, or create a new tab if it isn't already
+	openTab(e.GetIndex());
 }
 
 /* ArchiveManagerPanel::onListMapsChanged

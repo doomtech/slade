@@ -52,6 +52,7 @@ public:
 	void	updateListItem(int index);
 	bool	isArchivePanel(int tab_index);
 
+	void	openTab(int archive_index);
 	void	openFile(string filename);
 	void	openFiles(wxArrayString& files);
 

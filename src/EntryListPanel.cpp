@@ -53,7 +53,7 @@ wxImage get_entry_icon(string name, int type) {
 	wxImage image;
 
 	// Get the needed entry from the SLADE resource pk3
-	Archive* resource_pk3 = ArchiveManager::getInstance().resourceArchive();
+	Archive* resource_pk3 = theArchiveManager.resourceArchive();
 	string entry_path = _T("entry_icons/") + name;
 	ArchiveEntry* entry = resource_pk3->getEntry(entry_path);
 
