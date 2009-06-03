@@ -61,7 +61,7 @@ public:
 
 class ZipEntryListPanel : public EntryListPanel {
 private:
-	string			cur_directory;
+	void*			cur_directory;
 	ArchiveEntry*	dummy_folder_entry;
 
 public:

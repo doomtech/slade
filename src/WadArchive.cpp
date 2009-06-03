@@ -74,6 +74,47 @@ WadArchive::WadArchive()
 WadArchive::~WadArchive() {
 }
 
+/* WadArchive::entryIndex
+ * Returns the given entry's index in the Archive entry list.
+ * Returns -1 if the entry doesn't exist in the Archive.
+ *******************************************************************/
+int WadArchive::entryIndex(ArchiveEntry* entry) {
+	if (!entry)
+		return -1;
+
+	for (size_t a = 0; a < entries.size(); a++) {
+		if (entries[a] == entry)
+			return a;
+	}
+
+	return -1;
+}
+
+/* WadArchive::getEntry
+ * Returns the entry at the index specified,
+ * or NULL if the index is invalid
+ *******************************************************************/
+ArchiveEntry* WadArchive::getEntry(DWORD index) {
+	// Check index
+	if (index >= entries.size())
+		return NULL;
+
+	return entries[index];
+}
+
+/* WadArchive::getEntry
+ * Returns the first entry with the specified name,
+ * or NULL if no entry exists with that name
+ *******************************************************************/
+ArchiveEntry* WadArchive::getEntry(string name) {
+	for (size_t a = 0; a < entries.size(); a++) {
+		if (getEntry(a)->getName() == name)
+			return getEntry(a);
+	}
+
+	return NULL;
+}
+
 /* WadArchive::getFileExtensionString
  * Gets the wxWidgets file dialog filter string for the archive type
  *******************************************************************/
@@ -243,6 +284,20 @@ bool WadArchive::save(string filename) {
 	return true;
 }
 
+/* WadArchive::close
+ * 'Closes' the archive
+ *******************************************************************/
+void WadArchive::close() {
+	// Delete all entries
+	while (entries.size() > 0) {
+		delete entries[0];
+		entries.erase(entries.begin());
+	}
+
+	// Announce
+	announce(_T("close"));
+}
+
 /* WadArchive::getEntryOffset
  * Gets a lump entry's offset
  * Returns the lump entry's offset, or zero if it doesn't exist
@@ -306,6 +361,13 @@ bool WadArchive::loadEntryData(ArchiveEntry* entry) {
 	entry->setLoaded();
 
 	return true;
+}
+
+/* WadArchive::numEntries
+ * Returns the number of entries in the archive
+ *******************************************************************/
+DWORD WadArchive::numEntries() {
+	return entries.size();
 }
 
 /* WadArchive::detectMaps
@@ -442,11 +504,17 @@ vector<Archive::mapdesc_t> WadArchive::detectMaps() {
 }
 
 /* WadArchive::addEntry
- * Override of ArchiveEntry::addEntry to also truncate the given
- * name to 8 characters, and also stores the original full name as
- * an extra property of the entry
+ * Adds an entry to the entry list before position. If position is
+ * invalid the entry will be added at the end of the list. Truncates
+ * the given name to 8 characters, and also stores the original full
+ * name as an extra property of the entry. Returns false if the given
+ * entry was invalid, true otherwise
  *******************************************************************/
 bool WadArchive::addEntry(ArchiveEntry* entry, DWORD position) {
+	// Check valid entry
+	if (!entry)
+		return false;
+
 	// Truncate name to 8 characters if needed
 	string name = entry->getName();
 	if (name.size() > 8) {
@@ -455,8 +523,124 @@ bool WadArchive::addEntry(ArchiveEntry* entry, DWORD position) {
 		entry->setName(name);
 	}
 
-	// Now we can add it
-	return Archive::addEntry(entry, position);
+	// Check the position is valid
+	if (position < 0 || position > entries.size()) {
+		// If it isn't valid, we'll add the entry to the end of the list
+		position = entries.size();
+	}
+
+	// Add it to the entry list
+	if (position < entries.size())
+		entries.insert(entries.begin() + position, entry);
+	else
+		entries.push_back(entry);
+
+	// Update variables etc
+	modified = true;
+	entry->setParent(this);
+	entry->setState(2);
+
+	// Announce
+	MemChunk mc;
+	wxUIntPtr ptr = wxPtrToUInt(entry);
+	mc.write(&position, sizeof(DWORD));
+	mc.write(&ptr, sizeof(wxUIntPtr));
+	announce(_T("entry_added"), mc);
+
+	return true;
+}
+
+/* WadArchive::addNewEntry
+ * Creates a new ArchiveEntry and adds it to the archive before the
+ * position specified. Returns the created entry
+ *******************************************************************/
+ArchiveEntry* WadArchive::addNewEntry(string name, DWORD position) {
+	// Create the new entry
+	ArchiveEntry* new_entry = new ArchiveEntry(name);
+
+	// Add it to the entry list at position
+	addEntry(new_entry, position);
+
+	// Return the newly created entry
+	return new_entry;
+}
+
+/* WadArchive::addExistingEntry
+ * Adds an existing ArchiveEntry to the archive before the position
+ * specified. Returns the added archive entry
+ *******************************************************************/
+ArchiveEntry* WadArchive::addExistingEntry(ArchiveEntry* entry, DWORD position, bool copy) {
+	// Make a copy of the entry to add if needed
+	if (copy)
+		entry = new ArchiveEntry(*entry);
+
+	// Add the entry to the list
+	addEntry(entry, position);
+
+	// Return the added entry
+	return entry;
+}
+
+/* WadArchive::removeEntry
+ * Removes an entry from the archive, and deletes it if delete_entry
+ * is true. Returns false if the given entry doesn't exist in the
+ * archive, true otherwise
+ *******************************************************************/
+bool WadArchive::removeEntry(ArchiveEntry* entry, bool delete_entry) {
+	// Check the entry exists in this archive
+	int index = entryIndex(entry);
+	if (index == -1)
+		return false;
+
+	// Announce (before actually removing in case entry is still needed)
+	MemChunk mc;
+	wxUIntPtr ptr = wxPtrToUInt(entry);
+	mc.write(&index, sizeof(int));
+	mc.write(&ptr, sizeof(wxUIntPtr));
+	announce(_T("entry_removed"), mc);
+
+	// Remove it from the entry list
+	entries.erase(entries.begin() + index);
+
+	// Delete the entry if needed
+	if (delete_entry)
+		delete entry;
+
+	// Update variables etc
+	modified = true;
+
+	return true;
+}
+
+/* WadArchive::swapEntries
+ * Swaps the specified entries. Returns false if either entry is
+ * invalid or not part of this Archive, true otherwise.
+ *******************************************************************/
+bool WadArchive::swapEntries(ArchiveEntry* entry1, ArchiveEntry* entry2) {
+	// Get entry indices
+	int i1 = entryIndex(entry1);
+	int i2 = entryIndex(entry2);
+
+	// Check indices
+	if (i1 == -1 || i2 == -1)
+		return false;
+
+	// Swap the entries in the list
+	entries[i1] = entry2;
+	entries[i2] = entry1;
+
+	// Announce the swap
+	MemChunk mc;
+	wxUIntPtr ptr1 = wxPtrToUInt(entry1);
+	wxUIntPtr ptr2 = wxPtrToUInt(entry2);
+	mc.write(&i1, sizeof(int));
+	mc.write(&i2, sizeof(int));
+	mc.write(&ptr1, sizeof(wxUIntPtr));
+	mc.write(&ptr2, sizeof(wxUIntPtr));
+	announce(_T("entries_swapped"), mc);
+
+	// Return success
+	return true;
 }
 
 /* WadArchive::renameEntry
@@ -464,10 +648,18 @@ bool WadArchive::addEntry(ArchiveEntry* entry, DWORD position) {
  * name to 8 characters
  *******************************************************************/
 bool WadArchive::renameEntry(ArchiveEntry* entry, string new_name) {
+	// Check entry is valid
+	if (!entry)
+		return false;
+
+	// Check entry is part of this archive
+	if (entry->getParent() != this)
+		return false;
+
 	// Truncate name to 8 characters if needed
 	if (new_name.size() > 8)
 		new_name.Truncate(8);
 
-	// Now we can rename it
-	return Archive::renameEntry(entry, new_name);
+	// Rename the entry
+	entry->rename(new_name);
 }

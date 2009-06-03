@@ -6,7 +6,7 @@
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
  * Filename:    Archive.cpp
- * Description: Archive, the 'base' archive class.
+ * Description: Archive, the 'base' archive class (Abstract)
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -51,6 +51,7 @@ Archive::~Archive() {
  * Returns the given entry's index in the Archive entry list.
  * Returns -1 if the entry doesn't exist in the Archive.
  *******************************************************************/
+/*
 int Archive::entryIndex(ArchiveEntry* entry) {
 	if (!entry)
 		return -1;
@@ -62,6 +63,7 @@ int Archive::entryIndex(ArchiveEntry* entry) {
 
 	return -1;
 }
+ */
 
 /* Archive::getFileName
  * Returns the archive's filename, including the path if specified
@@ -81,6 +83,7 @@ string Archive::getFileName(bool fullpath)
  * Returns the entry at the index specified,
  * or NULL if the index is invalid
  *******************************************************************/
+/*
 ArchiveEntry* Archive::getEntry(DWORD index) {
 	// Check index
 	if (index >= entries.size())
@@ -88,82 +91,100 @@ ArchiveEntry* Archive::getEntry(DWORD index) {
 
 	return entries[index];
 }
+*/
 
 /* Archive::getEntry
  * Returns the first entry with the specified name,
  * or NULL if no entry exists with that name
  *******************************************************************/
+/*
 ArchiveEntry* Archive::getEntry(string name) {
 	for (size_t a = 0; a < entries.size(); a++) {
-		if (entries[a]->getName() == name)
-			return entries[a];
+		if (getEntry(a)->getName() == name)
+			return getEntry(a);
 	}
 
 	return NULL;
 }
+ */
 
 /* Archive::getFileExtensionString
  * Gets the wxWidgets file dialog filter string for the archive type
  *******************************************************************/
+/*
 string Archive::getFileExtensionString() {
 	return _T("All Files (*.*)|*.*");
 }
+ */
 
 /* Archive::openFile
  * Function to open a file, does nothing here, to be overridden by
  * any subclass of Archive
  *******************************************************************/
+/*
 bool Archive::openFile(string filename) {
 	Global::error = _T("Action not implemented for this Archive type");
 	return false;
-}
+
+ */
 
 /* Archive::save
  * Function to save to a file, does nothing here, to be overridden by
  * any subclass of Archive
  *******************************************************************/
+/*
 bool Archive::save(string filename) {
 	Global::error = _T("Action not implemented for this Archive type");
 	return false;
 }
+ */
 
 /* Archive::loadEntryData
  * Function to load in an entry's data, does nothing here,
  * to be overridden by any subclass of Archive
  *******************************************************************/
+/*
 bool Archive::loadEntryData(ArchiveEntry* entry) {
 	Global::error = _T("Action not implemented for this Archive type");
 	return false;
 }
+ */
 
 /* Archive::numEntries
  * Returns the number of entries in the archive
  *******************************************************************/
+/*
 DWORD Archive::numEntries() {
 	return entries.size();
 }
+ */
 
 /* Archive::close
  * 'Closes' the archive
  *******************************************************************/
+/*
 void Archive::close() {
 	announce(_T("close"));
 }
+ */
 
 /* Archive::detectMaps
  * Function to detect any maps in the archive, does nothing here,
  * to be overridden by any subclass of Archive
  *******************************************************************/
+/*
 vector<Archive::mapdesc_t> Archive::detectMaps() {
 	vector<mapdesc_t> maps;
 	return maps;
 }
+ */
 
 /* Archive::addEntry
  * Adds an entry to the entry list before position. If position is
  * invalid the entry will be added at the end of the list. Returns
  * false if the given entry was invalid, true otherwise
  *******************************************************************/
+/*
 bool Archive::addEntry(ArchiveEntry* entry, DWORD position) {
 	wxLogMessage(s_fmt(_T("Add entry at %d"), position));
 	// Check valid entry
@@ -194,11 +215,13 @@ bool Archive::addEntry(ArchiveEntry* entry, DWORD position) {
 
 	return true;
 }
+ */
 
 /* Archive::addNewEntry
  * Creates a new ArchiveEntry and adds it to the archive before the
  * position specified. Returns the created entry
  *******************************************************************/
+/*
 ArchiveEntry* Archive::addNewEntry(string name, DWORD position) {
 	// Create the new entry
 	ArchiveEntry* new_entry = new ArchiveEntry(name);
@@ -209,11 +232,13 @@ ArchiveEntry* Archive::addNewEntry(string name, DWORD position) {
 	// Return the newly created entry
 	return new_entry;
 }
+ */
 
 /* Archive::addExistingEntry
  * Adds an existing ArchiveEntry to the archive before the position
  * specified. Returns the added archive entry
  *******************************************************************/
+/*
 ArchiveEntry* Archive::addExistingEntry(ArchiveEntry* entry, DWORD position, bool copy) {
 	// Make a copy of the entry to add if needed
 	if (copy)
@@ -225,12 +250,14 @@ ArchiveEntry* Archive::addExistingEntry(ArchiveEntry* entry, DWORD position, boo
 	// Return the added entry
 	return entry;
 }
+ */
 
 /* Archive::removeEntry
  * Removes an entry from the archive, and deletes it if delete_entry
  * is true. Returns false if the given entry doesn't exist in the
  * archive, true otherwise
  *******************************************************************/
+/*
 bool Archive::removeEntry(ArchiveEntry* entry, bool delete_entry) {
 	// Check the entry exists in this archive
 	int index = entryIndex(entry);
@@ -254,11 +281,13 @@ bool Archive::removeEntry(ArchiveEntry* entry, bool delete_entry) {
 
 	return true;
 }
+ */
 
 /* Archive::swapEntries
  * Swaps the specified entries. Returns false if either entry is
  * invalid or not part of this Archive, true otherwise.
  *******************************************************************/
+/*
 bool Archive::swapEntries(ArchiveEntry* entry1, ArchiveEntry* entry2) {
 	// Get entry indices
 	int i1 = entryIndex(entry1);
@@ -281,10 +310,12 @@ bool Archive::swapEntries(ArchiveEntry* entry1, ArchiveEntry* entry2) {
 	// Return success
 	return true;
 }
+ */
 
 /* Archive::renameEntry
  * Renames the specified entry to the name given
  *******************************************************************/
+/*
 bool Archive::renameEntry(ArchiveEntry* entry, string new_name) {
 	// Check entry is valid
 	if (!entry)
@@ -297,6 +328,7 @@ bool Archive::renameEntry(ArchiveEntry* entry, string new_name) {
 	// Rename the entry
 	entry->rename(new_name);
 }
+ */
 
 /* Archive::entryModified
  * Called when an entry in the archive is modified
@@ -311,8 +343,10 @@ void Archive::entryModified(ArchiveEntry* entry) {
 	modified = true;
 
 	// Get the entry index and announce the change
-	DWORD index = entryIndex(entry);
 	MemChunk mc;
+	wxUIntPtr ptr = wxPtrToUInt(entry);
+	DWORD index = entryIndex(entry);
 	mc.write(&index, sizeof(DWORD));
+	mc.write(&ptr, sizeof(wxUIntPtr));
 	announce(_T("entry_modified"), mc);
 }
