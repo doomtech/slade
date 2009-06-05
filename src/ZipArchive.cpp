@@ -48,23 +48,31 @@
  * [root entries]
  * [subdir 1]
  * [subdir 1 entries]
- * [subdir 1/1]
- * [subdir 1/1 entries]
- * [subdir 1/2]
- * [subdir 1/2 entries]
+ * [subdir 1/subdir 1.1]
+ * [subdir 1/subdir 1.1 entries]
+ * [subdir 1/subdir 1.2]
+ * [subdir 1/subdir 1.2 entries]
  * [subdir 2] (has no entries)
- * [subdir 2/1]
- * [subdir 2/1 entries]
+ * [subdir 2/subdir 2.1]
+ * [subdir 2/subdir 2.1 entries]
  * etc...
  */
 
 
+/* zipdir_t::zipdir_t
+ * zipdir_t struct constructor
+ *******************************************************************/
 zipdir_t::zipdir_t() {
 	entry = new ArchiveEntry();
 	entry->setType(ETYPE_FOLDER);
 	entry->setState(0);
 }
 
+/* zipdir_t::entryExists
+ * Checks if the given entry is in this zipdir. If include_subdirs is
+ * true, also recursively checks any subdirectories in the zipdir.
+ * Returns true if entry is found, false otherwise
+ *******************************************************************/
 bool zipdir_t::entryExists(ArchiveEntry* entry, bool include_subdirs) {
 	if (!entry)
 		return false;
@@ -84,6 +92,10 @@ bool zipdir_t::entryExists(ArchiveEntry* entry, bool include_subdirs) {
 	return false;
 }
 
+/* zipdir_t::getEntry
+ * Gets the entry within this zipdir that matches the given name.
+ * Returns the matching entry, or NULL if none matched
+ *******************************************************************/
 ArchiveEntry* zipdir_t::getEntry(string name) {
 	for (size_t a = 0; a < entries.size(); a++) {
 		if (!entries[a]->getName().Cmp(name))
@@ -93,6 +105,10 @@ ArchiveEntry* zipdir_t::getEntry(string name) {
 	return NULL;
 }
 
+/* zipdir_t::entryIndex
+ * Returns the entry index of the given entry within the zipdir, or
+ * -1 if the entry doesn't exist in the directory
+ *******************************************************************/
 int zipdir_t::entryIndex(ArchiveEntry* entry) {
 	if (!entry)
 		return -1;
@@ -105,6 +121,10 @@ int zipdir_t::entryIndex(ArchiveEntry* entry) {
 	return -1;
 }
 
+/* zipdir_t::getSubDir
+ * Returns the subdirectory of this zipdir matching the given name,
+ * or NULL if none matched
+ *******************************************************************/
 zipdir_t* zipdir_t::getSubDir(string name) {
 	for (size_t a = 0; a < subdirectories.size(); a++) {
 		if (!subdirectories[a]->getName().Cmp(name))
@@ -114,6 +134,9 @@ zipdir_t* zipdir_t::getSubDir(string name) {
 	return NULL;
 }
 
+/* zipdir_t::getFullPath
+ * Gets the full path of this zipdir (includes parent directories)
+ *******************************************************************/
 string zipdir_t::getFullPath() {
 	if (parent_dir)
 		return parent_dir->getFullPath() + getName();
@@ -121,6 +144,11 @@ string zipdir_t::getFullPath() {
 		return getName();
 }
 
+/* zipdir_t::numEntries
+ * Returns the number of entries in the zipdir, or if include_subdirs
+ * is true, the number of entries in the zipdir and all it's
+ * subdirectories
+ *******************************************************************/
 DWORD zipdir_t::numEntries(bool include_subdirs) {
 	DWORD num = entries.size();
 
@@ -132,6 +160,11 @@ DWORD zipdir_t::numEntries(bool include_subdirs) {
 	return num;
 }
 
+/* zipdir_t::numSubDirs
+ * Returns the number of subdirectories in the zipdir, or if
+ * include_subdirs is true, the number of subdirectories in the
+ * zipdir and all it's subdirectories
+ *******************************************************************/
 DWORD zipdir_t::numSubDirs(bool include_subdirs) {
 	DWORD num = subdirectories.size();
 
@@ -146,15 +179,28 @@ DWORD zipdir_t::numSubDirs(bool include_subdirs) {
 
 
 
+/* ZipArchive::ZipArchive
+ * ZipArchive class constructor
+ *******************************************************************/
 ZipArchive::ZipArchive()
 : Archive() {
 	type = ARCHIVE_ZIP;
+	directory = new zipdir_t;
+	directory->parent_dir = NULL;
+	directory->setName(_T(""));
 }
 
+/* ZipArchive::~ZipArchive
+ * ZipArchive class destructor
+ *******************************************************************/
 ZipArchive::~ZipArchive() {
 }
 
-// Return the entry index of the given entry within it's directory, not within the whole archive
+/* ZipArchive::entryIndex
+ * Returns the entry index of the given entry relative to it's
+ * directory, rather than to the whole archive.
+ * Returns the index or -1 if the entry is invalid/not in the archive
+ *******************************************************************/
 int ZipArchive::entryIndex(ArchiveEntry* entry) {
 	// Check valid entry
 	if (!entry)
@@ -175,7 +221,10 @@ int ZipArchive::entryIndex(ArchiveEntry* entry) {
 	return -1;
 }
 
-// Get the entry with the given name AND directory (must match both)
+/* ZipArchive::getEntry
+ * Get the entry with the given name AND directory (must match both)
+ * Returns NULL if the entry is not found or invalid
+ *******************************************************************/
 ArchiveEntry* ZipArchive::getEntry(string name) {
 	// Convert to wxFileName for processing
 	wxFileName fn(name);
@@ -191,15 +240,27 @@ ArchiveEntry* ZipArchive::getEntry(string name) {
 	return dir->getEntry(fn.GetFullName());
 }
 
-// Not implemented for zip archives, use zip-specific instead if needed
+/* ZipArchive::getEntry
+ * Getting entry by index is not implemented for ZipArchive, just
+ * prints a warning to the logfile and returns NULL
+ *******************************************************************/
 ArchiveEntry* ZipArchive::getEntry(DWORD index) {
+	wxLogMessage(_T("Warning: Attempt to access ZipArchive entry by index"));
 	return NULL;
 }
 
+/* ZipArchive::getFileExtensionString
+ * Gets the wxWidgets file dialog filter string for the archive type
+ *******************************************************************/
 string ZipArchive::getFileExtensionString() {
 	return _T("Any Zip Format File (*.zip;*.pk3;*.jdf)|*.zip;*.pk3;*.jdf|Zip File (*.zip)|*.zip|Pk3 File (*.pk3)|*.pk3|JDF File (*.jdf)|*.jdf");
 }
 
+/* ZipArchive::openFile
+ * Opens the given file and loads it into the archive.
+ * Returns false if file wasn't found or zip was invalid,
+ * true otherwise
+ *******************************************************************/
 bool ZipArchive::openFile(string filename) {
 	// Open the file
 	wxFFileInputStream in(filename);
@@ -216,6 +277,8 @@ bool ZipArchive::openFile(string filename) {
 	}
 
 	// Create 'root' directory
+	if (directory)
+		deleteDirectory(directory);
 	directory = new zipdir_t;
 	directory->parent_dir = NULL;
 	directory->setName(_T(""));
@@ -265,6 +328,11 @@ bool ZipArchive::openFile(string filename) {
 	return true;
 }
 
+/* ZipArchive::save
+ * Saves the archive to the given filename, or the current archive
+ * filename if none given. Makes a backup of the file if it already
+ * exists. Returns false if file could not be written, true otherwise
+ *******************************************************************/
 bool ZipArchive::save(string filename) {
 	// If no filename was specified, just use the current filename
 	if (filename.IsEmpty())
@@ -347,11 +415,17 @@ bool ZipArchive::save(string filename) {
 	zip.Close();
 	this->filename = filename;
 	on_disk = true;
+	modified = false;
 	announce(_T("saved"));
 
 	return true;
 }
 
+/* ZipArchive::loadEntryData
+ * Loads an entry's data from the saved copy of the archive if any.
+ * Returns false if the entry is invalid, doesn't belong to the
+ * archive or doesn't exist in the saved copy, true otherwise.
+ *******************************************************************/
 bool ZipArchive::loadEntryData(ArchiveEntry* entry) {
 	// Check that the entry belongs to this archive
 	if (entry->getParent() != this) {
@@ -405,6 +479,9 @@ bool ZipArchive::loadEntryData(ArchiveEntry* entry) {
 	return true;
 }
 
+/* ZipArchive::numEntries
+ * Returns the total number of entries in the archive
+ *******************************************************************/
 DWORD ZipArchive::numEntries() {
 	if (directory)
 		return directory->numEntries(true);
@@ -412,6 +489,9 @@ DWORD ZipArchive::numEntries() {
 		return 0;
 }
 
+/* ZipArchive::close
+ * 'Closes' the archive, deletes all enries.
+ *******************************************************************/
 void ZipArchive::close() {
 	// Delete all directories and entries
 	deleteDirectory();
@@ -420,8 +500,15 @@ void ZipArchive::close() {
 	announce(_T("close"));
 }
 
-// The entry to be added needs a 'directory' extra property to be
-// added to any non-root directory (will be added at position in the directory, not archive)
+/* ZipArchive::addEntry
+ * Adds an entry to the archive, at the directory given in the
+ * entry's 'directory' extra property. If the extra property doesn't
+ * exist the entry is added to the root directory. If the given
+ * directory doesn't exist it will be created.
+ * The position is relative to the *directory* it will be added to,
+ * rather than relative to the beginning of the archive.
+ * Returns false if the entry is invalid, false otherwise.
+ *******************************************************************/
 bool ZipArchive::addEntry(ArchiveEntry* entry, DWORD position) {
 	// Check valid entry
 	if (!entry)
@@ -453,6 +540,13 @@ bool ZipArchive::addEntry(ArchiveEntry* entry, DWORD position) {
 	return false;
 }
 
+/* ZipArchive::addNewEntry
+ * Creates an entry with the given name and adds it to the archive.
+ * If the name contains an absolute or relative directory then the
+ * entry will be created in that directory. The position is relative
+ * to the directory rather than the beginning of the archive.
+ * Returns the created entry, or NULL if no name was given.
+ *******************************************************************/
 ArchiveEntry* ZipArchive::addNewEntry(string name, DWORD position) {
 	// Convert name to wxFileName for processing
 	wxFileName fn(name);
@@ -474,11 +568,19 @@ ArchiveEntry* ZipArchive::addNewEntry(string name, DWORD position) {
 	return new_entry;
 }
 
+/* ZipArchive::addExistingEntry
+ * Adds an existing entry to the archive, copying it if specified.
+ *******************************************************************/
 ArchiveEntry* ZipArchive::addExistingEntry(ArchiveEntry* entry, DWORD position, bool copy) {
 	// See addEntry
 	return NULL;
 }
 
+/* ZipArchive::removeEntry
+ * Removes the given entry from the archive, and deletes the entry
+ * object if specified. Returns false if the entry is invalid or
+ * doesn't exist in the archive, true otherwise.
+ *******************************************************************/
 bool ZipArchive::removeEntry(ArchiveEntry* entry, bool delete_entry) {
 	// Check valid entry
 	if (!entry)
@@ -510,10 +612,17 @@ bool ZipArchive::removeEntry(ArchiveEntry* entry, bool delete_entry) {
 	if (delete_entry)
 		delete entry;
 
+	// Update variables etc
+	modified = true;
+
 	// Return success
 	return true;
 }
 
+/* ZipArchive::swapEntries
+ * Swaps two entries in the archive. Returns false if either entry is
+ * invalid or doesn't exist in the archive, true otherwise.
+ *******************************************************************/
 bool ZipArchive::swapEntries(ArchiveEntry* entry1, ArchiveEntry* entry2) {
 	// Check valid entries
 	if (!entry1 || !entry2)
@@ -548,11 +657,20 @@ bool ZipArchive::swapEntries(ArchiveEntry* entry1, ArchiveEntry* entry2) {
 	mc.write(&ptr2, sizeof(wxUIntPtr));
 	announce(_T("entries_swapped"), mc);
 
+	// Update variables etc
+	modified = true;
+
 	// Return success
 	return true;
 }
 
 // Have to check for directory structure in the given name
+/* ZipArchive::renameEntry
+ * Renames the specified entry. If a directory is given in the new
+ * name, the entry will be moved to that directory.
+ * Returns false if the entry is invalid or doesn't exist in the
+ * archive, true otherwise.
+ *******************************************************************/
 bool ZipArchive::renameEntry(ArchiveEntry* entry, string new_name) {
 	// Check valid entry
 	if (!entry)
@@ -618,12 +736,21 @@ bool ZipArchive::renameEntry(ArchiveEntry* entry, string new_name) {
 	}
 }
 
+/* ZipArchive::detectMaps
+ * Detects all the maps in the archive and returns a vector of
+ * information about them.
+ *******************************************************************/
 vector<Archive::mapdesc_t> ZipArchive::detectMaps() {
 	return vector<mapdesc_t>();
 }
 
 
-
+/* ZipArchive::getEntryDirectory
+ * Recursively searches subdirectories of [dir] for the given
+ * entry. Returns the directory the entry is in, or NULL if the entry
+ * is invalid or doesn't exist in any of the subdirectories. If no
+ * dir is specified the root directory is searched.
+ *******************************************************************/
 zipdir_t* ZipArchive::getEntryDirectory(ArchiveEntry* entry, zipdir_t* dir) {
 	// Check valid entry
 	if (!entry)
@@ -656,6 +783,11 @@ zipdir_t* ZipArchive::getEntryDirectory(ArchiveEntry* entry, zipdir_t* dir) {
 	return NULL;
 }
 
+/* ZipArchive::getEntryFullPath
+ * Returns the full path of the given entry (folder+name+extension),
+ * or an empty string if the entry is invalid or doesn't exist in
+ * the archive.
+ *******************************************************************/
 string ZipArchive::getEntryFullPath(ArchiveEntry* entry) {
 	// Check valid entry
 	if (!entry)
@@ -675,6 +807,12 @@ string ZipArchive::getEntryFullPath(ArchiveEntry* entry) {
 		return entry->getName();
 }
 
+/* ZipArchive::getDirectory
+ * Recursive function to find a subdirectory of [dir] that matches
+ * the given name (relative to [dir]). If [dir] isn't specified, the
+ * root directory is searched. Returns the matching directory or NULL
+ * if no matches are found.
+ *******************************************************************/
 zipdir_t* ZipArchive::getDirectory(string name, zipdir_t* dir) {
 	// Check if root directory exists
 	if (!directory)
@@ -710,6 +848,41 @@ zipdir_t* ZipArchive::getDirectory(string name, zipdir_t* dir) {
 	return NULL;
 }
 
+/* ZipArchive::getDirectory
+ * Same as above, except searches via a directory entry rather than
+ * a name.
+ *******************************************************************/
+zipdir_t* ZipArchive::getDirectory(ArchiveEntry* dir_entry, zipdir_t* dir) {
+	// If no current directory was specified, set it to the root directory
+	if (!dir)
+		dir = directory;
+	
+	// Check if the given entry is a directory entry
+	if (dir_entry->getType() != ETYPE_FOLDER)
+		return NULL;
+
+	// Check if the given entry is the current directory's entry
+	if (dir_entry == dir->entry)
+		return dir;
+
+	// Go through subdirectories and recursively check if the given entry is
+	// any of their directory entries
+	for (size_t a = 0; a < dir->subdirectories.size(); a++) {
+		zipdir_t* sdir = getDirectory(dir_entry, dir->subdirectories[a]);
+		if (sdir) return sdir;
+	}
+
+	// The given entry wasn't the current directory or any of its subdirectories'
+	// archive entry, so return NULL
+	return NULL;
+}
+
+/* ZipArchive::addDirectory
+ * Recursive function that adds the given subdirectory to [dir],
+ * including any extra subdirectories needed on the way. If [dir] is
+ * not specified, adds to the root directory. Returns the created
+ * subdirectory, or if it already existed returns that.
+ *******************************************************************/
 zipdir_t* ZipArchive::addDirectory(string name, zipdir_t* dir) {
 	// If no current directory was specified, set it to the root directory
 	if (!dir)
@@ -743,6 +916,9 @@ zipdir_t* ZipArchive::addDirectory(string name, zipdir_t* dir) {
 		// Add it to the current directory
 		dir->subdirectories.push_back(dir_add);
 
+		// Update variables etc
+		modified = true;
+
 		// Announce
 		MemChunk mc;
 		wxUIntPtr ptr = wxPtrToUInt(dir_add);
@@ -756,6 +932,11 @@ zipdir_t* ZipArchive::addDirectory(string name, zipdir_t* dir) {
 	return addDirectory(fn.GetPath(true, wxPATH_UNIX), dir_add);
 }
 
+/* ZipArchive::deleteDirectory
+ * Deletes all entries from the given directory, and recursively
+ * deletes all subdirectories and their entries from [dir]. If [dir]
+ * is not specified, the root directory is deleted.
+ *******************************************************************/
 void ZipArchive::deleteDirectory(zipdir_t* dir) {
 	// If no current directory was specified, set it to the root directory
 	if (!dir)
@@ -780,8 +961,25 @@ void ZipArchive::deleteDirectory(zipdir_t* dir) {
 
 	// Delete the directory itself
 	delete dir;
+
+	// Update variables etc
+	modified = true;
 }
 
+bool ZipArchive::renameDirectory(zipdir_t* dir, string newname) {
+	// Check valid directory
+	if (!dir)
+		return false;
+
+	// Rename the directory
+	dir->entry->setName(newname);
+
+	return true;
+}
+
+/* ZipArchive::dumpDirectoryTree
+ * Dumps the directory structure to the logfile starting from [dir]
+ *******************************************************************/
 void ZipArchive::dumpDirectoryTree(zipdir_t* dir) {
 	if (!dir)
 		dir = directory;
@@ -799,28 +997,32 @@ void ZipArchive::dumpDirectoryTree(zipdir_t* dir) {
 	}
 }
 
-void ZipArchive::getTreeAsList(vector<ArchiveEntry*>& list, zipdir_t* start) {
+/* ZipArchive::getTreeAsList
+ * Adds all entries and directory/subdirectory entries to a vector,
+ * starting from [dir]. Used for saving the archive.
+ *******************************************************************/
+void ZipArchive::getTreeAsList(vector<ArchiveEntry*>& list, zipdir_t* dir) {
 	// If no starting directory was specified, set it to the root directory
-	if (!start)
-		start = directory;
+	if (!dir)
+		dir = directory;
 
 	// Add the current directory entry to the list if it isn't the root directory
-	if (start != directory) {
+	if (dir != directory) {
 		// Update directory entry information
-		wxFileName fn(start->getFullPath());
+		wxFileName fn(dir->getFullPath());
 		fn.RemoveLastDir();
-		start->entry->setExProp(_T("directory"), fn.GetPath(true, wxPATH_UNIX));
+		dir->entry->setExProp(_T("directory"), fn.GetPath(true, wxPATH_UNIX));
 
 		// Add it
-		list.push_back(start->entry);
+		list.push_back(dir->entry);
 	}
 
 	// Add all entries in the current directory to the list
-	for (size_t a = 0; a < start->entries.size(); a++)
-		list.push_back(start->entries[a]);
+	for (size_t a = 0; a < dir->entries.size(); a++)
+		list.push_back(dir->entries[a]);
 
 	// Lastly go through all subdirectories and add them to the list
-	for (size_t a = 0; a < start->subdirectories.size(); a++) {
-		getTreeAsList(list, start->subdirectories[a]);
+	for (size_t a = 0; a < dir->subdirectories.size(); a++) {
+		getTreeAsList(list, dir->subdirectories[a]);
 	}
 }

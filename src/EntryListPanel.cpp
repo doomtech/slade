@@ -146,6 +146,9 @@ bool EntryList::updateEntry(int index, bool update_colsize) {
 	return true;
 }
 
+/* EntryList::getWidth
+ * Gets the current minimum width of the entry list
+ *******************************************************************/
 int EntryList::getWidth() {
 	// For the moment. Kinda annoying I have to do this actually, it should be automatic >_<
 	return GetColumnWidth(0) + GetColumnWidth(1) + GetColumnWidth(2) + wxSystemSettings::GetMetric(wxSYS_VSCROLL_X, this) + 4;
@@ -560,9 +563,16 @@ void EntryListPanel::onEntryListChange(wxListEvent& event) {
 	event.Skip();
 }
 
+/* EntryListPanel::onEntryListActivated
+ * Called when an item on the list is 'activated' (double-click or
+ * enter)
+ *******************************************************************/
 void EntryListPanel::onEntryListActivated(wxListEvent& event) {
 }
 
+/* EntryListPanel::onEntryListEditLabel
+ * Called when an 'edit label' operation finishes on a list entry
+ *******************************************************************/
 void EntryListPanel::onEntryListEditLabel(wxListEvent& event) {
 	ArchiveEntry* entry = getFocusedEntry();
 
@@ -722,42 +732,7 @@ void ZipEntryListPanel::populateEntryList() {
 	entry_list->Show(true);
 }
 
-/* ZipEntryListPanel::onEntryListActivated
- * Called when an item in the list is activated (double clicked or
- * pressed enter). Changes to that difectory if it is a directory
- * entry.
- *******************************************************************/
-void ZipEntryListPanel::onEntryListActivated(wxListEvent& event) {
-	// Get the entry that was activated
-	ArchiveEntry* entry = (ArchiveEntry*)(entry_list->GetItemData(event.GetIndex()));
-
-	// If it doesn't exist, return
-	if (!entry)
-		return;
-
-	// Check for folder
-	if (entry->getType() == ETYPE_FOLDER) {
-		// If a folder was activated, open it
-		if (entry_list->GetItemText(event.GetIndex()).Cmp(_T(".."))) {
-			cur_directory = ((zipdir_t*)cur_directory)->getSubDir(event.GetText());
-		}
-		else {
-			// '..' item, go up 1 directory
-			if (((zipdir_t*)cur_directory)->parent_dir)
-				cur_directory = ((zipdir_t*)cur_directory)->parent_dir;
-		}
-
-		// Refresh the list
-		populateEntryList();
-		GetParent()->Layout();
-	}
-	else {
-		// Otherwise do default activate action
-		EntryListPanel::onEntryListActivated(event);
-	}
-}
-
-/* EntryListPanel::swapItems
+/* ZipEntryListPanel::swapItems
  * Swaps two list items (including their focused/selected states)
  * Override to work correctly with zip directories (as the entry list
  * won't be a 1-1 match index-wise with the archive)
@@ -803,45 +778,6 @@ bool ZipEntryListPanel::addEntry(DWORD archive_index, ArchiveEntry* e) {
 
 		return true;
 	}
-
-	// No need for the below now, ZipArchive sends a directory_added announcement
-	/*
-	// Otherwise add the appropriate subdirectory if needed
-
-	// Trace back from the entry directory until we get to the one after the current
-	zipdir_t* subdir = dir;
-	while (true) {
-		if (subdir->parent_dir == cdir)
-			break;
-		subdir = subdir->parent_dir;
-	}
-
-	// Check if the subdirectory exists in the list already
-	for (int a = 0; a < entry_list->GetItemCount(); a++) {
-		if (((ArchiveEntry*)entry_list->GetItemData(a))->getType() != ETYPE_FOLDER)
-			break;
-		if (!entry_list->GetItemText(a).Cmp(subdir->getName()))
-			return true;
-	}
-
-	// Setup subdirectory item
-	wxListItem li;
-	li.SetId(entries_begin);
-	li.SetData(subdir->entry);
-
-	// Add it to the list
-	entry_list->InsertItem(li);
-	entry_list->updateEntry(entries_begin);
-
-	// Set name manually
-	li.SetText(subdir->getName());
-	entry_list->SetItem(li);
-
-	// Set size manually
-	li.SetColumn(1);
-	li.SetText(s_fmt(_T("%d Entries"), subdir->numEntries(false) + subdir->numSubDirs(false)));
-	entry_list->SetItem(li);
-	 */
 
 	return true;
 }
@@ -1023,6 +959,10 @@ bool ZipEntryListPanel::moveDown() {
 	return true;
 }
 
+/* ArchivePanel::onAnnouncement
+ * Called when an announcement is recieved from the archive that
+ * this ZipEntryListPanel is representing
+ *******************************************************************/
 void ZipEntryListPanel::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
 	// Reset event data for reading
 	event_data.seek(0, SEEK_SET);
@@ -1035,6 +975,46 @@ void ZipEntryListPanel::onAnnouncement(Announcer* announcer, string event_name, 
 	}
 }
 
+
+
+/* ZipEntryListPanel::onEntryListActivated
+ * Called when an item in the list is activated (double clicked or
+ * pressed enter). Changes to that difectory if it is a directory
+ * entry.
+ *******************************************************************/
+void ZipEntryListPanel::onEntryListActivated(wxListEvent& event) {
+	// Get the entry that was activated
+	ArchiveEntry* entry = (ArchiveEntry*)(entry_list->GetItemData(event.GetIndex()));
+
+	// If it doesn't exist, return
+	if (!entry)
+		return;
+
+	// Check for folder
+	if (entry->getType() == ETYPE_FOLDER) {
+		// If a folder was activated, open it
+		if (entry_list->GetItemText(event.GetIndex()).Cmp(_T(".."))) {
+			cur_directory = ((zipdir_t*)cur_directory)->getSubDir(event.GetText());
+		}
+		else {
+			// '..' item, go up 1 directory
+			if (((zipdir_t*)cur_directory)->parent_dir)
+				cur_directory = ((zipdir_t*)cur_directory)->parent_dir;
+		}
+
+		// Refresh the list
+		populateEntryList();
+		GetParent()->Layout();
+	}
+	else {
+		// Otherwise do default activate action
+		EntryListPanel::onEntryListActivated(event);
+	}
+}
+
+/* ZipEntryListPanel::onEntryListEditLabel
+ * Called when an 'edit label' operation finishes on a list entry
+ *******************************************************************/
 void ZipEntryListPanel::onEntryListEditLabel(wxListEvent& event) {
 	// TODO: Check if renamed entry is a folder and rename it in the archive accordingly
 	ArchiveEntry* entry = getFocusedEntry();

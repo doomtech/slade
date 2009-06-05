@@ -207,12 +207,14 @@ void ArchiveManagerPanel::openFiles(wxArrayString& files) {
 	}
 }
 
+/* ArchiveManagerPanel::createNewArchive
+ * Creates a new archive of the given type and opens it in a tab
+ *******************************************************************/
 void ArchiveManagerPanel::createNewArchive(BYTE type) {
 	Archive* new_archive = theArchiveManager.newArchive(type);
 
 	if (new_archive) {
-		ArchivePanel *wp = new ArchivePanel(notebook_archives, new_archive);
-		notebook_archives->AddPage(wp, new_archive->getFileName(false), true);
+		openTab(theArchiveManager.archiveIndex(new_archive));
 	}
 }
 

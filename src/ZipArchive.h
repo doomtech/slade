@@ -61,7 +61,9 @@ public:
 	zipdir_t*	getEntryDirectory(ArchiveEntry* entry, zipdir_t* dir = NULL);
 	string		getEntryFullPath(ArchiveEntry* entry);
 	zipdir_t*	getDirectory(string name, zipdir_t* dir = NULL);
+	zipdir_t*	getDirectory(ArchiveEntry* dir_entry, zipdir_t* dir = NULL);
 	zipdir_t*	addDirectory(string name, zipdir_t* dir = NULL);
+	bool		renameDirectory(zipdir_t* dir, string newname);
 	void		deleteDirectory(zipdir_t* dir = NULL);
 	zipdir_t*	getRootDirectory() { return directory; }
 	void		dumpDirectoryTree(zipdir_t* start = NULL);
