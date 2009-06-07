@@ -17,16 +17,24 @@
     </logicalFolder>
     <logicalFolder name="f2" displayName="Main Editor" projectFiles="true">
       <logicalFolder name="f1" displayName="UI Panels" projectFiles="true">
+        <logicalFolder name="f1" displayName="ArchivePanel" projectFiles="true">
+          <itemPath>src/ArchivePanel.cpp</itemPath>
+          <itemPath>src/ArchivePanel.h</itemPath>
+          <itemPath>src/EntryListPanel.cpp</itemPath>
+          <itemPath>src/EntryListPanel.h</itemPath>
+        </logicalFolder>
+        <logicalFolder name="f2" displayName="ZipArchivePanel" projectFiles="true">
+          <itemPath>src/ZipArchivePanel.cpp</itemPath>
+          <itemPath>src/ZipArchivePanel.h</itemPath>
+          <itemPath>src/ZipEntryListPanel.cpp</itemPath>
+          <itemPath>src/ZipEntryListPanel.h</itemPath>
+        </logicalFolder>
         <itemPath>src/ArchiveManagerPanel.cpp</itemPath>
         <itemPath>src/ArchiveManagerPanel.h</itemPath>
-        <itemPath>src/ArchivePanel.cpp</itemPath>
-        <itemPath>src/ArchivePanel.h</itemPath>
         <itemPath>src/ConsolePanel.cpp</itemPath>
         <itemPath>src/ConsolePanel.h</itemPath>
         <itemPath>src/DefaultEntryPanel.cpp</itemPath>
         <itemPath>src/DefaultEntryPanel.h</itemPath>
-        <itemPath>src/EntryListPanel.cpp</itemPath>
-        <itemPath>src/EntryListPanel.h</itemPath>
         <itemPath>src/EntryPanel.cpp</itemPath>
         <itemPath>src/EntryPanel.h</itemPath>
         <itemPath>src/TextEditor.cpp</itemPath>
@@ -246,6 +254,18 @@
       <item path="src/ZipArchive.h">
         <itemTool>3</itemTool>
       </item>
+      <item path="src/ZipArchivePanel.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/ZipArchivePanel.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/ZipEntryListPanel.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/ZipEntryListPanel.h">
+        <itemTool>3</itemTool>
+      </item>
     </conf>
     <conf name="Unix_Release" type="1">
       <toolsSet>
@@ -422,6 +442,18 @@
         <itemTool>1</itemTool>
       </item>
       <item path="src/ZipArchive.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/ZipArchivePanel.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/ZipArchivePanel.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/ZipEntryListPanel.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/ZipEntryListPanel.h">
         <itemTool>3</itemTool>
       </item>
     </conf>
@@ -633,6 +665,18 @@
       <item path="src/ZipArchive.h">
         <itemTool>3</itemTool>
       </item>
+      <item path="src/ZipArchivePanel.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/ZipArchivePanel.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/ZipEntryListPanel.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/ZipEntryListPanel.h">
+        <itemTool>3</itemTool>
+      </item>
     </conf>
     <conf name="Win32_Debug" type="1">
       <toolsSet>
@@ -828,6 +872,18 @@
         <itemTool>1</itemTool>
       </item>
       <item path="src/ZipArchive.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/ZipArchivePanel.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/ZipArchivePanel.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/ZipEntryListPanel.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/ZipEntryListPanel.h">
         <itemTool>3</itemTool>
       </item>
     </conf>

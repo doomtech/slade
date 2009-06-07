@@ -48,23 +48,32 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 	this->archive = archive;
 	listenTo(archive);
 
-	// Create & set sizer
-	wxBoxSizer *m_hbox = new wxBoxSizer(wxHORIZONTAL);
-	SetSizer(m_hbox);
-
-	// Entry list panel (depends on archive type)
-	if (archive->getType() == ARCHIVE_WAD)
-		entry_list = new EntryListPanel(this, ENTRY_LIST_PANEL, archive);
-	else
-		entry_list = new ZipEntryListPanel(this, ENTRY_LIST_PANEL, archive);
-	m_hbox->Add(entry_list, 0, wxEXPAND | wxALL, 4);
-
-	entry_list->populateEntryList();
-
 	// Create entry panels
 	entry_area = new EntryPanel(this);
 	default_area = new DefaultEntryPanel(this);
 	text_area = new TextEntryPanel(this);
+}
+
+/* ArchivePanel::~ArchivePanel
+ * ArchivePanel class destructor
+ *******************************************************************/
+ArchivePanel::~ArchivePanel() {
+}
+
+/* ArchivePanel::init
+ * Initialises the panel layout (has to be called separately from the
+ * constructor, otherwise ZipArchivePanel won't create a
+ * ZipEntryListPanel for whatever reason)
+ *******************************************************************/
+void ArchivePanel::init() {
+	// Create & set sizer
+	wxBoxSizer *m_hbox = new wxBoxSizer(wxHORIZONTAL);
+	SetSizer(m_hbox);
+
+	// Entry list panel
+	entry_list = new EntryListPanel(this, ENTRY_LIST_PANEL, archive);
+	m_hbox->Add(entry_list, 0, wxEXPAND | wxALL, 4);
+	entry_list->populateEntryList();
 
 	// Add default entry panel to the panel
 	cur_area = entry_area;
@@ -72,12 +81,6 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 	cur_area->Show(true);
 
 	Layout();
-}
-
-/* ArchivePanel::~ArchivePanel
- * ArchivePanel class destructor
- *******************************************************************/
-ArchivePanel::~ArchivePanel() {
 }
 
 /* ArchivePanel::save
@@ -366,16 +369,6 @@ void ArchivePanel::onAnnouncement(Announcer* announcer, string event_name, MemCh
 		entry_list->removeEntry(index, (ArchiveEntry*)wxUIntToPtr(e));
 	}
 }
-
-/*
-void ArchivePanel::onDEPBtnEditText(wxCommandEvent& event) {
-	// Swap to text area
-	wxSizer* sizer = GetSizer();
-	sizer->Replace(cur_area, text_area);
-	text_area->loadEntry(cur_area->getEntry());
-	cur_area = text_area;
-}
-*/
 
 BEGIN_EVENT_TABLE(ArchivePanel, wxPanel)
 	EVT_LIST_ITEM_FOCUSED(ArchivePanel::ENTRY_LIST_PANEL, ArchivePanel::onEntryListChange)

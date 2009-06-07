@@ -121,6 +121,22 @@ int zipdir_t::entryIndex(ArchiveEntry* entry) {
 	return -1;
 }
 
+/* zipdir_t::dirIndex
+ * Returns the index of the given subdirectory within the zipdir, or
+ * -1 if the subdirectory doesn't exist in the zipdir
+ *******************************************************************/
+int zipdir_t::dirIndex(zipdir_t* dir) {
+	if (!dir)
+		return -1;
+
+	for (size_t a = 0; a < subdirectories.size(); a++) {
+		if (subdirectories[a] == dir)
+			return a;
+	}
+
+	return -1;
+}
+
 /* zipdir_t::getSubDir
  * Returns the subdirectory of this zipdir matching the given name,
  * or NULL if none matched
@@ -941,9 +957,19 @@ void ZipArchive::deleteDirectory(zipdir_t* dir) {
 	// If no current directory was specified, set it to the root directory
 	if (!dir)
 		dir = directory;
+	
+	// Remove this directory from it's parent's subdirectory list
+	if (dir->parent_dir) {
+		int p_index = dir->parent_dir->dirIndex(dir);
+		if (p_index >= 0)
+			dir->parent_dir->subdirectories.erase(dir->parent_dir->subdirectories.begin() + p_index);
+	}
 
-	// Delete directory entry
-	delete dir->entry;
+	// Announce
+	MemChunk mc;
+	wxUIntPtr ptr = wxPtrToUInt(dir);
+	mc.write(&ptr, sizeof(wxUIntPtr));
+	announce(_T("directory_removed"), mc);
 
 	// Delete any entries in the directory
 	for (size_t a = 0; a < dir->entries.size(); a++) {
@@ -958,6 +984,9 @@ void ZipArchive::deleteDirectory(zipdir_t* dir) {
 	// Clear vectors
 	dir->entries.clear();
 	dir->subdirectories.clear();
+
+	// Delete directory entry
+	delete dir->entry;
 
 	// Delete the directory itself
 	delete dir;

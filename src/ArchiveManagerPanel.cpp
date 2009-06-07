@@ -35,6 +35,7 @@
 #include "ArchiveManager.h"
 #include "ArchivePanel.h"
 #include "MapEditorWindow.h"
+#include "ZipArchivePanel.h"
 #include "ZipArchive.h"
 
 
@@ -177,7 +178,13 @@ void ArchiveManagerPanel::openTab(int archive_index) {
 		}
 
 		// If tab isn't already open, open a new one
-		ArchivePanel *wp = new ArchivePanel(notebook_archives, archive);
+		ArchivePanel *wp = NULL;
+		if (archive->getType() == ARCHIVE_WAD)
+			wp = new ArchivePanel(notebook_archives, archive);
+		else if (archive->getType() == ARCHIVE_ZIP)
+			wp = new ZipArchivePanel(notebook_archives, archive);
+
+		wp->init();
 		notebook_archives->AddPage(wp, archive->getFileName(false), true);
 	}
 }

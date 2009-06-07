@@ -19,6 +19,7 @@ struct zipdir_t {
 	ArchiveEntry*	getEntry(string name);
 	int				entryIndex(ArchiveEntry* entry);
 	zipdir_t*		getSubDir(string name);
+	int				dirIndex(zipdir_t* dir);
 	string			getFullPath();
 	DWORD			numEntries(bool include_subdirs = false);
 	DWORD			numSubDirs(bool include_subdirs = false);

@@ -8,7 +8,7 @@
 #include "ListenerAnnouncer.h"
 
 class ArchivePanel : public wxPanel, Listener {
-private:
+protected:
 	Archive*		archive;
 	EntryListPanel*	entry_list;
 
@@ -24,11 +24,12 @@ public:
 	};
 
 	ArchivePanel(wxWindow *parent, Archive* archive);
-	~ArchivePanel();
+	virtual ~ArchivePanel();
 
-	Archive*	getArchive() { return archive; }
+	virtual void	init();
+	Archive*		getArchive() { return archive; }
 
-	// Archive manipulationfunctions
+	// Archive manipulation functions
 	void		save();
 	void		saveAs();
 
