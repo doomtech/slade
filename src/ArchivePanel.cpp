@@ -129,11 +129,8 @@ void ArchivePanel::saveAs() {
  * currently focused entry
  *******************************************************************/
 bool ArchivePanel::newEntry() {
-	// Prompt for new entry name
-	string name = wxGetTextFromUser(_T("Enter new entry name:"), _T("New Entry"));
-
 	// Get the list panel to handle creation of the entry (as it depends on the archive format)
-	ArchiveEntry* new_entry = entry_list->newEntry(name);
+	ArchiveEntry* new_entry = entry_list->newEntry();
 
 	// Return success if entry was created
 	if (new_entry)
@@ -147,28 +144,13 @@ bool ArchivePanel::newEntry() {
  * currently focused entry
  *******************************************************************/
 bool ArchivePanel::newEntryFromFile() {
-	// Create open file dialog
-	wxFileDialog *dialog_open = new wxFileDialog(this, _T("Choose file to open"), wxEmptyString, wxEmptyString,
-			_T("Any File (*.*)|*.*"), wxFD_OPEN | /*wxFD_MULTIPLE |*/ wxFD_FILE_MUST_EXIST, wxDefaultPosition);
+	// Get the list panel to handle creation of the entry (as it depends on the archive format)
+	ArchiveEntry* new_entry = entry_list->newEntryFromFile();
 
-	// Run the dialog & check that the user didn't cancel
-	if (dialog_open->ShowModal() == wxID_OK) {
-		wxFileName fn(dialog_open->GetPath());
-		string filename = fn.GetFullName();
-
-		// Prompt for new entry name
-		string name = wxGetTextFromUser(_T("Enter new entry name:"), _T("New Entry"), filename);
-
-		// Get the list panel to handle creation of the entry (as it depends on the archive format)
-		ArchiveEntry* new_entry = entry_list->newEntryFromFile(name, fn.GetFullPath());
-
-		// Return success if entry was created
-		if (new_entry)
-			return true;
-		else
-			return false;
-	}
-	else // If user canceled return false
+	// Return success if entry was created
+	if (new_entry)
+		return true;
+	else
 		return false;
 }
 

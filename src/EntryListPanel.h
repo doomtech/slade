@@ -46,11 +46,11 @@ public:
 	virtual bool			removeEntry(DWORD archive_index, ArchiveEntry* e = NULL);
 	int						getEntryListItem(ArchiveEntry* entry);
 
-	virtual ArchiveEntry*	newEntry(string name);
-	virtual ArchiveEntry*	newEntryFromFile(string name, string filename);
+	virtual ArchiveEntry*	newEntry();
+	virtual ArchiveEntry*	newEntryFromFile();
 	virtual bool			moveUp();
 	virtual bool			moveDown();
-	
+
 	virtual void onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {}
 
 	// Events
@@ -78,8 +78,8 @@ public:
 	bool	removeEntry(DWORD archive_index, ArchiveEntry* e = NULL);
 	bool	addDirectory(wxUIntPtr zipdir_ptr);
 
-	ArchiveEntry*	newEntry(string name);
-	ArchiveEntry*	newEntryFromFile(string name, string filename);
+	ArchiveEntry*	newEntry();
+	ArchiveEntry*	newEntryFromFile();
 	bool			moveUp();
 	bool			moveDown();
 

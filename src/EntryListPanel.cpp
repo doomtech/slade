@@ -23,6 +23,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *******************************************************************/
 
+#include <wx\dialog.h>
+
+
 
 /*******************************************************************
  * INCLUDES
@@ -71,6 +74,60 @@ wxImage get_entry_icon(string name, int type) {
 	// Return the image, loaded or not
 	return image;
 }
+
+class NewEntryDialog : public wxDialog {
+private:
+	wxTextCtrl* text_entryname;
+	wxRadioBox*	rb_entrytype;
+	
+public:
+	NewEntryDialog() : wxDialog(NULL, -1, _T("New Entry"), wxDefaultPosition) {
+		// Setup main sizer
+		wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+		wxSizerFlags sizer_flags;
+		sizer_flags.DoubleBorder();
+		sizer_flags.Expand();
+
+		// Add entry type radio options
+		string types[] = { _T("Entry"), _T("Folder") };
+		rb_entrytype = new wxRadioBox(this, -1, _T("Entry Type:"), wxDefaultPosition, wxDefaultSize, 2, types, 2);
+		sizer->Add(rb_entrytype, sizer_flags);
+
+		// Add entry name textbox
+		sizer->Add(CreateTextSizer(_T("Entry Name:")), wxSizerFlags().Expand().DoubleBorder(wxLEFT|wxRIGHT));
+		text_entryname = new wxTextCtrl(this, -1, _T(""), wxDefaultPosition, wxSize(300, -1));
+		sizer->Add(text_entryname, sizer_flags);
+
+		// Add OK/Cancel buttons
+		sizer->Add(CreateSeparatedButtonSizer(wxOK|wxCANCEL), sizer_flags);
+
+		// Layout dialog
+		SetAutoLayout(true);
+		SetSizer(sizer);
+		sizer->SetSizeHints(this);
+		sizer->Fit(this);
+		
+		// Set focus to the text entry
+		text_entryname->SetFocus();
+	}
+
+	~NewEntryDialog() {}
+
+	string getName() {
+		if (text_entryname)
+			return text_entryname->GetLabel();
+		else
+			return _T("");
+	}
+
+	int getType() {
+		if (rb_entrytype)
+			return rb_entrytype->GetSelection();
+		else
+			return 0;
+	}
+};
+
 
 #ifdef _WIN32
 #define ENTRYLIST_FLAGS wxLC_REPORT|wxLC_VRULES|wxLC_HRULES // No wxLC_EDIT_LABELS on win32 as it doesn't work in wxMSW :(
@@ -515,7 +572,10 @@ bool EntryListPanel::moveDown() {
  * list. Returns the newly created entry, or NULL if creation failed
  * (shouldn't ever)
  *******************************************************************/
-ArchiveEntry* EntryListPanel::newEntry(string name) {
+ArchiveEntry* EntryListPanel::newEntry() {
+	// Prompt for new entry name
+	string name = wxGetTextFromUser(_T("Enter new entry name:"), _T("New Entry"));
+
 	// Get the entry index of the last selected list item
 	int index = archive->entryIndex(getLastSelectedEntry());
 
@@ -536,16 +596,36 @@ ArchiveEntry* EntryListPanel::newEntry(string name) {
  * Same as newEntry, but imports the specified file into the new
  * entry
  *******************************************************************/
-ArchiveEntry* EntryListPanel::newEntryFromFile(string name, string filename) {
-	// Create the new entry
-	ArchiveEntry* new_entry = newEntry(name);
+ArchiveEntry* EntryListPanel::newEntryFromFile() {
+	// Create open file dialog
+	wxFileDialog *dialog_open = new wxFileDialog(this, _T("Choose file to open"), wxEmptyString, wxEmptyString,
+			_T("Any File (*.*)|*.*"), wxFD_OPEN | /*wxFD_MULTIPLE |*/ wxFD_FILE_MUST_EXIST, wxDefaultPosition);
 
-	// If it was created, import the given file into it
-	if (new_entry)
-		new_entry->importFile(filename);
+	// Run the dialog & check that the user didn't cancel
+	if (dialog_open->ShowModal() == wxID_OK) {
+		wxFileName fn(dialog_open->GetPath());
+		string filename = fn.GetFullName();
 
-	// Return the created entry
-	return new_entry;
+		// Prompt for new entry name
+		string name = wxGetTextFromUser(_T("Enter new entry name:"), _T("New Entry"), filename);
+
+		// Get the entry index of the last selected list item
+		int index = archive->entryIndex(getLastSelectedEntry());
+
+		// If something was selected, add 1 to the index so we add the new entry after the last selected
+		if (index >= 0)
+			index++;
+		else
+			index = entry_list->GetItemCount(); // If not add to the end of the list
+
+		// Add the entry to the archive
+		ArchiveEntry* new_entry = archive->addNewEntry(name, index);
+
+		// Return newly created entry
+		return new_entry;
+	}
+	else // If user canceled return NULL
+		return NULL;
 }
 
 BEGIN_EVENT_TABLE(EntryListPanel, wxPanel)
@@ -778,6 +858,9 @@ bool ZipEntryListPanel::addEntry(DWORD archive_index, ArchiveEntry* e) {
 
 		return true;
 	}
+	
+	// Otherwise, update that subdirectory's list item to refresh the number of entries within it
+	//entry_list->updateEntry(index);
 
 	return true;
 }
@@ -870,7 +953,50 @@ bool ZipEntryListPanel::addDirectory(wxUIntPtr zipdir_ptr) {
  * directory, the entry is created with the appropriate directory
  * value.
  *******************************************************************/
-ArchiveEntry* ZipEntryListPanel::newEntry(string name) {
+ArchiveEntry* ZipEntryListPanel::newEntry() {
+	NewEntryDialog ned;
+	
+	if (ned.ShowModal() == wxID_OK) {
+		// Get the entry name that was entered
+		string name = ned.getName();
+
+		// Get current directory string
+		zipdir_t* dir = (zipdir_t*)cur_directory;
+
+		// If an absolute path wasn't given, add the current directory before the name
+		if (!name.StartsWith(_T("/")))
+			name = dir->getFullPath() + name;
+
+		// Check if the user selected to create an entry
+		if (ned.getType() == 0) {
+			// Get the entry index of the last selected list item
+			int index = archive->entryIndex(getLastSelectedEntry());
+
+			// If something was selected, add 1 to the index so we add the new entry after the last selected
+			if (index >= 0)
+				index++;
+			else
+				index = entry_list->GetItemCount(); // If not add to the end of the list
+
+			// Add the entry to the archive
+			return archive->addNewEntry(name, index);
+		}
+		
+		// Otherwise if the user selected to create a folder
+		else if (ned.getType() == 1) {
+			// Add an ending / if one wasn't entered
+			if (!name.EndsWith(_T("/")))
+				name += _T("/");
+
+			// Add the directory to the archive
+			((ZipArchive*)archive)->addDirectory(name);
+
+			// No entry was added so return NULL
+			return NULL;
+		}
+	}
+
+	/*
 	// Get current directory string
 	zipdir_t* dir = (zipdir_t*)cur_directory;
 
@@ -879,22 +1005,52 @@ ArchiveEntry* ZipEntryListPanel::newEntry(string name) {
 		name = dir->getFullPath() + name;
 
 	// Now do default EntryListPanel::newEntry
-	return EntryListPanel::newEntry(name);
+	return EntryListPanel::newEntry();
+	 */
+
+	return NULL;
 }
 
 /* ZipEntryListPanel::newEntryFromFile
  * Same as newEntry, but imports a file into the created entry
  *******************************************************************/
-ArchiveEntry* ZipEntryListPanel::newEntryFromFile(string name, string filename) {
-	// Create the new entry
-	ArchiveEntry* new_entry = newEntry(name);
+ArchiveEntry* ZipEntryListPanel::newEntryFromFile() {
+	// Create open file dialog
+	wxFileDialog *dialog_open = new wxFileDialog(this, _T("Choose file to open"), wxEmptyString, wxEmptyString,
+			_T("Any File (*.*)|*.*"), wxFD_OPEN | /*wxFD_MULTIPLE |*/ wxFD_FILE_MUST_EXIST, wxDefaultPosition);
 
-	// If it was created, import the given file into it
-	if (new_entry)
-		new_entry->importFile(filename);
+	// Run the dialog & check that the user didn't cancel
+	if (dialog_open->ShowModal() == wxID_OK) {
+		wxFileName fn(dialog_open->GetPath());
+		string filename = fn.GetFullName();
 
-	// Return the created entry
-	return new_entry;
+		// Prompt for new entry name
+		string name = wxGetTextFromUser(_T("Enter new entry name:"), _T("New Entry"), filename);
+
+		// Get current directory string
+		zipdir_t* dir = (zipdir_t*)cur_directory;
+
+		// If an absolute path wasn't given, add the current directory before the name
+		if (!name.StartsWith(_T("/")))
+			name = dir->getFullPath() + name;
+
+		// Get the entry index of the last selected list item
+		int index = archive->entryIndex(getLastSelectedEntry());
+
+		// If something was selected, add 1 to the index so we add the new entry after the last selected
+		if (index >= 0)
+			index++;
+		else
+			index = entry_list->GetItemCount(); // If not add to the end of the list
+
+		// Add the entry to the archive
+		ArchiveEntry* new_entry = archive->addNewEntry(name, index);
+
+		// Return newly created entry
+		return new_entry;
+	}
+	else // If user canceled return NULL
+		return NULL;
 }
 
 /* ZipEntryListPanel::moveUp
