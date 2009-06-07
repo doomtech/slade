@@ -40,14 +40,15 @@ public:
 	vector<int>				getSelection();
 	int						getLastSelected();
 	ArchiveEntry*			getLastSelectedEntry();
+	int						getListSize();
 	virtual bool			swapItems(int item1, int item2, ArchiveEntry* e1 = NULL, ArchiveEntry* e2 = NULL);
 	virtual bool			addEntry(DWORD archive_index, ArchiveEntry* e = NULL);
 	virtual bool			updateEntry(DWORD archive_index, ArchiveEntry* e = NULL);
 	virtual bool			removeEntry(DWORD archive_index, ArchiveEntry* e = NULL);
 	int						getEntryListItem(ArchiveEntry* entry);
 
-	virtual ArchiveEntry*	newEntry();
-	virtual ArchiveEntry*	newEntryFromFile();
+	//virtual ArchiveEntry*	newEntry();
+	//virtual ArchiveEntry*	newEntryFromFile();
 	virtual bool			moveUp();
 	virtual bool			moveDown();
 

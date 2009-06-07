@@ -345,6 +345,13 @@ ArchiveEntry* EntryListPanel::getLastSelectedEntry() {
 		return NULL;
 }
 
+/* EntryListPanel::getListSize
+ * Returns the number of items currently in the list
+ *******************************************************************/
+int EntryListPanel::getListSize() {
+	return entry_list->GetItemCount();
+}
+
 /* EntryListPanel::swapItems
  * Swaps two list items (including their focused/selected states)
  *******************************************************************/
@@ -506,68 +513,6 @@ bool EntryListPanel::moveDown() {
 
 	// Return success
 	return true;
-}
-
-/* EntryListPanel::newEntry
- * Adds a new entry to the archive after the last selected entry in
- * the list. If nothing is selected it is added at the end of the
- * list. Returns the newly created entry, or NULL if creation failed
- * (shouldn't ever)
- *******************************************************************/
-ArchiveEntry* EntryListPanel::newEntry() {
-	// Prompt for new entry name
-	string name = wxGetTextFromUser(_T("Enter new entry name:"), _T("New Entry"));
-
-	// Get the entry index of the last selected list item
-	int index = archive->entryIndex(getLastSelectedEntry());
-
-	// If something was selected, add 1 to the index so we add the new entry after the last selected
-	if (index >= 0)
-		index++;
-	else
-		index = entry_list->GetItemCount(); // If not add to the end of the list
-
-	// Add the entry to the archive
-	ArchiveEntry* new_entry = archive->addNewEntry(name, index);
-
-	// Return the newly created entry
-	return new_entry;
-}
-
-/* EntryListPanel::newEntryFromFile
- * Same as newEntry, but imports the specified file into the new
- * entry
- *******************************************************************/
-ArchiveEntry* EntryListPanel::newEntryFromFile() {
-	// Create open file dialog
-	wxFileDialog *dialog_open = new wxFileDialog(this, _T("Choose file to open"), wxEmptyString, wxEmptyString,
-			_T("Any File (*.*)|*.*"), wxFD_OPEN | /*wxFD_MULTIPLE |*/ wxFD_FILE_MUST_EXIST, wxDefaultPosition);
-
-	// Run the dialog & check that the user didn't cancel
-	if (dialog_open->ShowModal() == wxID_OK) {
-		wxFileName fn(dialog_open->GetPath());
-		string filename = fn.GetFullName();
-
-		// Prompt for new entry name
-		string name = wxGetTextFromUser(_T("Enter new entry name:"), _T("New Entry"), filename);
-
-		// Get the entry index of the last selected list item
-		int index = archive->entryIndex(getLastSelectedEntry());
-
-		// If something was selected, add 1 to the index so we add the new entry after the last selected
-		if (index >= 0)
-			index++;
-		else
-			index = entry_list->GetItemCount(); // If not add to the end of the list
-
-		// Add the entry to the archive
-		ArchiveEntry* new_entry = archive->addNewEntry(name, index);
-
-		// Return newly created entry
-		return new_entry;
-	}
-	else // If user canceled return NULL
-		return NULL;
 }
 
 BEGIN_EVENT_TABLE(EntryListPanel, wxPanel)

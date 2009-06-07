@@ -12,6 +12,9 @@ public:
 	~ZipArchivePanel();
 
 	void			init();
+
+	bool	newEntry();
+	bool	newEntryFromFile();
 };
 
 #endif //__ZIPARCHIVEPANEL_H__

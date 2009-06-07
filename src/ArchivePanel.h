@@ -34,8 +34,8 @@ public:
 	void		saveAs();
 
 	// Entry manipulation functions
-	bool	newEntry();
-	bool	newEntryFromFile();
+	virtual bool	newEntry();
+	virtual bool	newEntryFromFile();
 	bool	renameEntry();
 	bool	deleteEntry();
 	bool	importEntry();
