@@ -1005,6 +1005,12 @@ bool ZipArchive::renameDirectory(zipdir_t* dir, string newname) {
 	// Rename the directory
 	dir->entry->setName(newname);
 
+	// Announce
+	MemChunk mc;
+	wxUIntPtr ptr = wxPtrToUInt(dir);
+	mc.write(&ptr, sizeof(wxUIntPtr));
+	announce(_T("directory_renamed"), mc);
+
 	return true;
 }
 
