@@ -36,7 +36,7 @@ public:
 	// Entry manipulation functions
 	virtual bool	newEntry();
 	virtual bool	newEntryFromFile();
-	bool	renameEntry();
+	virtual bool	renameEntry();
 	bool	deleteEntry();
 	bool	importEntry();
 	bool	exportEntry();

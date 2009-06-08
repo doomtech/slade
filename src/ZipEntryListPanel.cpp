@@ -75,6 +75,55 @@ ZipEntryListPanel::~ZipEntryListPanel() {
 	delete dummy_folder_entry;
 }
 
+void ZipEntryListPanel::updateDirectoryEntry(int index) {
+	// Check the given index is a directory
+	if (index >= entriesBegin())
+		return;
+
+	// Update the entry
+	entry_list->updateEntry(index, true);
+
+	// Get the associated zipdir
+	zipdir_t* dir = getCurrentDir()->parent_dir;
+	if (dir && index > 0)
+		dir = getCurrentDir()->subdirectories[index - 1];
+	else if (!dir)
+		dir = getCurrentDir()->subdirectories[index];
+
+	// Set it's size column manually
+	wxListItem li;
+	li.SetId(index);
+	li.SetColumn(1);
+	li.SetText(s_fmt(_T("%d Entries"), dir->numEntries(false) + dir->numSubDirs(false)));
+	entry_list->SetItem(li);
+}
+
+vector<zipdir_t*> ZipEntryListPanel::getSelectedDirectories() {
+	vector<zipdir_t*> ret;
+	vector<int> selection = getSelection();
+
+	for (size_t a = 0; a < selection.size(); a++) {
+		int sel_index = selection[a];
+		if (sel_index < entriesBegin()) {
+			if (getCurrentDir()->parent_dir)
+				sel_index--;
+
+			ret.push_back(getCurrentDir()->subdirectories[sel_index]);
+		}
+	}
+
+	return ret;
+}
+
+int ZipEntryListPanel::entriesBegin() {
+	int begin = 0;
+
+	if (getCurrentDir()->parent_dir)
+		begin++;
+
+	return begin + (int)getCurrentDir()->subdirectories.size();
+}
+
 /* ZipEntryListPanel::populateEntryList
  * Clears & populates the entry list with all the entries in
  * the current directory, all subdirectories, and a '..' entry if
@@ -111,16 +160,15 @@ void ZipEntryListPanel::populateEntryList() {
 
 		// Add it to the list
 		entry_list->InsertItem(li);
-		entry_list->updateEntry(index);
+		//entry_list->updateEntry(index);
+		updateDirectoryEntry(index);
 
-		// Set name manually
-		li.SetText(subdir->getName());
-		entry_list->SetItem(li);
-
+		/*
 		// Set size manually
 		li.SetColumn(1);
 		li.SetText(s_fmt(_T("%d Entries"), subdir->numEntries(false) + subdir->numSubDirs(false)));
 		entry_list->SetItem(li);
+		 */
 
 		index++;
 	}
@@ -167,19 +215,11 @@ void ZipEntryListPanel::populateEntryList() {
 
 		// Add it to the list
 		entry_list->InsertItem(li);
-		entry_list->updateEntry(0);
+		updateDirectoryEntry(0);
 
 		// Set name manually
 		li.SetText(_T(".."));
 		entry_list->SetItem(li);
-
-		// Set size manually
-		li.SetColumn(1);
-		li.SetText(s_fmt(_T("%d Entries"), dir->parent_dir->numEntries(false) + dir->parent_dir->numSubDirs(false)));
-		entry_list->SetItem(li);
-
-		// The entry items begin 1 further down
-		entries_begin++;
 	}
 
 	// Setup column widths
@@ -207,7 +247,7 @@ bool ZipEntryListPanel::swapItems(int item1, int item2, ArchiveEntry* e1, Archiv
 		return false;
 
 	// Do default entry swap, keeping in mind the offset to the beginning of the entries
-	return EntryListPanel::swapItems(entries_begin + item1, entries_begin + item2, e1, e2);
+	return EntryListPanel::swapItems(entriesBegin() + item1, entriesBegin() + item2, e1, e2);
 }
 
 /* ZipEntryListPanel::addEntry
@@ -231,18 +271,27 @@ bool ZipEntryListPanel::addEntry(DWORD archive_index, ArchiveEntry* e) {
 	if (dir == cdir) {
 		// Setup new entry
 		wxListItem li;
-		li.SetId(entries_begin + archive_index);
+		li.SetId(entriesBegin() + archive_index);
 		li.SetData(e);
 
 		// Add it to the list
 		entry_list->InsertItem(li);
-		entry_list->updateEntry(entries_begin + archive_index);
+		entry_list->updateEntry(entriesBegin() + archive_index);
 
 		return true;
 	}
 
 	// Otherwise, update that subdirectory's list item to refresh the number of entries within it
-	//entry_list->updateEntry(index);
+	for (size_t a = 0; a < cdir->subdirectories.size(); a++) {
+		if (cdir->subdirectories[a]->entryExists(e, true))
+		{
+			if (cdir->parent_dir)
+				updateDirectoryEntry(a-1);
+			else
+				updateDirectoryEntry(a);
+			break;
+		}
+	}
 
 	return true;
 }
@@ -259,7 +308,7 @@ bool ZipEntryListPanel::updateEntry(DWORD archive_index, ArchiveEntry* e) {
 		return true;
 
 	// Update the entry
-	entry_list->updateEntry(entries_begin + archive_index, true);
+	entry_list->updateEntry(entriesBegin() + archive_index, true);
 
 	return true;
 }
@@ -276,7 +325,7 @@ bool ZipEntryListPanel::removeEntry(DWORD archive_index, ArchiveEntry* e) {
 		return true;
 
 	// If it was, remove it from the list
-	entry_list->DeleteItem(entries_begin + archive_index);
+	entry_list->DeleteItem(entriesBegin() + archive_index);
 
 	return true;
 }
@@ -303,12 +352,12 @@ bool ZipEntryListPanel::addDirectory(wxUIntPtr zipdir_ptr) {
 
 			// Setup subdirectory item
 			wxListItem li;
-			li.SetId(entries_begin);
+			li.SetId(entriesBegin());
 			li.SetData(dir->entry);
 
 			// Add it to the list
 			entry_list->InsertItem(li);
-			entry_list->updateEntry(entries_begin);
+			entry_list->updateEntry(entriesBegin());
 
 			// Set name manually
 			li.SetText(dir->getName());
@@ -318,9 +367,6 @@ bool ZipEntryListPanel::addDirectory(wxUIntPtr zipdir_ptr) {
 			li.SetColumn(1);
 			li.SetText(s_fmt(_T("%d Entries"), dir->numEntries(false) + dir->numSubDirs(false)));
 			entry_list->SetItem(li);
-
-			// Entries begin 1 entry down
-			entries_begin++;
 
 			return true;
 		}
@@ -359,6 +405,33 @@ bool ZipEntryListPanel::removeDirectory(wxUIntPtr zipdir_ptr) {
 	return true;
 }
 
+bool ZipEntryListPanel::renameDirectory(wxUIntPtr zipdir_ptr) {
+	// Get the renamed directory
+	zipdir_t* dir = (zipdir_t*)wxUIntToPtr(zipdir_ptr);
+
+	// If the renamed directory was the current, do nothing
+	if (cur_directory == dir)
+		return true;
+
+	// Get current directory
+	zipdir_t* cdir = (zipdir_t*)cur_directory;
+
+	// If the directory that was renamed is a subdirectory of the current
+	// directory, update it in the list
+	int index = cdir->dirIndex(dir);
+	if (index >= 0) {
+		// If the current directory has a parent directory, increment index
+		// to skip the '..' list item
+		if (cdir->parent_dir)
+			index++;
+
+		// Update the directory in the list
+		updateDirectoryEntry(index);
+	}
+
+	return true;
+}
+
 /* ZipEntryListPanel::moveUp
  * Override of EntryListPanel::moveUp to take subdirectories into
  * account (can't move them)
@@ -373,7 +446,7 @@ bool ZipEntryListPanel::moveUp() {
 
 	// If the first selected item is at the top of the list
 	// then don't move anything up
-	if (selection[0] <= entries_begin)
+	if (selection[0] <= entriesBegin())
 		return false;
 
 	// Move each one up by swapping it with the entry above it
@@ -404,7 +477,7 @@ bool ZipEntryListPanel::moveDown() {
 
 	// If the last selected item is at the end of the list
 	// then don't move anything down
-	if (selection.back() == entry_list->GetItemCount()-1 || selection[0] < entries_begin)
+	if (selection.back() == entry_list->GetItemCount()-1 || selection[0] < entriesBegin())
 		return false;
 
 	// Move each one down by swapping it with the entry below it
@@ -440,12 +513,12 @@ void ZipEntryListPanel::onEntryListActivated(wxListEvent& event) {
 	if (entry->getType() == ETYPE_FOLDER) {
 		// If a folder was activated, open it
 		if (entry_list->GetItemText(event.GetIndex()).Cmp(_T(".."))) {
-			cur_directory = ((zipdir_t*)cur_directory)->getSubDir(event.GetText());
+			cur_directory = getCurrentDir()->getSubDir(event.GetText());
 		}
 		else {
 			// '..' item, go up 1 directory
 			if (((zipdir_t*)cur_directory)->parent_dir)
-				cur_directory = ((zipdir_t*)cur_directory)->parent_dir;
+				cur_directory = getCurrentDir()->parent_dir;
 		}
 
 		// Refresh the list

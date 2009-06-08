@@ -15,7 +15,10 @@ public:
 	ZipEntryListPanel(wxWindow *parent, int id, Archive* archive);
 	~ZipEntryListPanel();
 
-	zipdir_t*	getCurrentDir() { return cur_directory; }
+	zipdir_t*			getCurrentDir() { return cur_directory; }
+	vector<zipdir_t*>	getSelectedDirectories();
+	void				updateDirectoryEntry(int index);
+	int					entriesBegin();
 
 	void	populateEntryList();
 	bool	swapItems(int item1, int item2, ArchiveEntry* e1 = NULL, ArchiveEntry* e2 = NULL);
@@ -24,9 +27,10 @@ public:
 	bool	removeEntry(DWORD archive_index, ArchiveEntry* e = NULL);
 	bool	addDirectory(wxUIntPtr zipdir_ptr);
 	bool	removeDirectory(wxUIntPtr zipdir_ptr);
+	bool	renameDirectory(wxUIntPtr zipdir_ptr);
 
-	bool			moveUp();
-	bool			moveDown();
+	bool	moveUp();
+	bool	moveDown();
 
 	// Events
 	void	onEntryListActivated(wxListEvent &event);

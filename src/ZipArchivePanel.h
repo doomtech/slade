@@ -15,6 +15,7 @@ public:
 
 	bool	newEntry();
 	bool	newEntryFromFile();
+	bool	renameEntry();
 
 	void onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 };

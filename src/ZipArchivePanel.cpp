@@ -237,6 +237,58 @@ bool ZipArchivePanel::newEntryFromFile() {
 		return false;
 }
 
+bool ZipArchivePanel::renameEntry() {
+	// Get a list of selected entries
+	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
+
+	// Go through the list
+	for (size_t a = 0; a < selection.size(); a++) {
+		// Get the current entry's name
+		ArchiveEntry* entry = selection[a];
+		string old_name = entry->getName();
+
+		// If the entry is a folder then skip it
+		if (entry->getType() == ETYPE_FOLDER)
+			continue;
+
+		// Prompt for a new name
+		string new_name = wxGetTextFromUser(_T("Enter new entry name:"), s_fmt(_T("Rename Entry %s"), old_name.c_str()), old_name);
+
+		// Rename the entry if a different name was specified
+		if (new_name.Cmp(wxEmptyString) && new_name.Cmp(old_name))
+			archive->renameEntry(entry, new_name);
+	}
+
+	// Get a list of selected folders
+	vector<zipdir_t*> selected_folders = ((ZipEntryListPanel*)entry_list)->getSelectedDirectories();
+
+	// Go through the list
+	for (size_t a = 0; a < selected_folders.size(); a++) {
+		// Get the current folder's name
+		string old_name = selected_folders[a]->getName();
+
+		// Prompt for a new name
+		string new_name = wxGetTextFromUser(_T("Enter new directory name:"), s_fmt(_T("Rename Directory %s"), old_name.c_str()), old_name);
+
+		// Do nothing if no name was entered
+		if (!new_name.Cmp(_T("")))
+			continue;
+
+		// Add trailing '/' to new name if one wasn't entered
+		if (!new_name.EndsWith(_T("/")))
+			new_name += _T("/");
+
+		// If the entered name is a path with more than one directory, just use the first (for now)
+		wxFileName fn(new_name);
+		if (fn.GetDirCount() > 1)
+			new_name = fn.GetDirs()[0] + _T("/");
+
+		// Rename the directory if the new entered name is different from the original
+		if (new_name.Cmp(old_name))
+			((ZipArchive*)archive)->renameDirectory(selected_folders[a], new_name);
+	}
+}
+
 /* ZipArchivePanel::onAnnouncement
  * Called when an announcement is recieved from the archive that
  * this ZipArchivePanel is managing
@@ -257,5 +309,12 @@ void ZipArchivePanel::onAnnouncement(Announcer* announcer, string event_name, Me
 		wxUIntPtr ptr;
 		if (event_data.read(&ptr, sizeof(wxUIntPtr)))
 			((ZipEntryListPanel*)entry_list)->removeDirectory(ptr);
+	}
+
+	// If a directory was renamed in the archive
+	if (announcer == archive && !event_name.Cmp(_T("directory_renamed"))) {
+		wxUIntPtr ptr;
+		if (event_data.read(&ptr, sizeof(wxUIntPtr)))
+			((ZipEntryListPanel*)entry_list)->renameDirectory(ptr);
 	}
 }
