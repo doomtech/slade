@@ -553,7 +553,7 @@ bool ZipArchive::addEntry(ArchiveEntry* entry, DWORD position) {
 	mc.write(&ptr, sizeof(wxUIntPtr));
 	announce(_T("entry_added"), mc);
 
-	return false;
+	return true;
 }
 
 /* ZipArchive::addNewEntry
@@ -568,8 +568,10 @@ ArchiveEntry* ZipArchive::addNewEntry(string name, DWORD position) {
 	wxFileName fn(name);
 
 	// If the entry name is empty do nothing
-	if (fn.GetFullName().IsEmpty())
+	if (fn.GetFullName().IsEmpty()) {
+		wxLogMessage(_T("Cannot create entry with no name"));
 		return NULL;
+	}
 
 	// Create the entry to add
 	ArchiveEntry* new_entry = new ArchiveEntry(fn.GetFullName());

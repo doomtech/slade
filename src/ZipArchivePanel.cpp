@@ -83,7 +83,7 @@ public:
 
 	string getName() {
 		if (text_entryname)
-			return text_entryname->GetLabel();
+			return text_entryname->GetValue();
 		else
 			return _T("");
 	}
@@ -167,7 +167,7 @@ bool ZipArchivePanel::newEntry() {
 				index = entry_list->getListSize(); // If not add to the end of the list
 
 			// Add the entry to the archive
-			return archive->addNewEntry(name, index);
+			return !!(archive->addNewEntry(name, index));
 		}
 
 		// Otherwise if the user selected to create a folder
