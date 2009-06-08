@@ -3,7 +3,6 @@
 #define __ENTRYLISTPANEL_H__
 
 #include <wx/listctrl.h>
-#include "ListenerAnnouncer.h"
 
 class Archive;
 class EntryListPanel;
@@ -20,7 +19,7 @@ public:
 	int		getWidth();
 };
 
-class EntryListPanel : public wxPanel, Listener {
+class EntryListPanel : public wxPanel {
 protected:
 	Archive*	archive;
 	EntryList*	entry_list;
@@ -47,12 +46,8 @@ public:
 	virtual bool			removeEntry(DWORD archive_index, ArchiveEntry* e = NULL);
 	int						getEntryListItem(ArchiveEntry* entry);
 
-	//virtual ArchiveEntry*	newEntry();
-	//virtual ArchiveEntry*	newEntryFromFile();
 	virtual bool			moveUp();
 	virtual bool			moveDown();
-
-	virtual void onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {}
 
 	// Events
 	virtual void	onEntryListChange(wxListEvent &event);

@@ -15,6 +15,8 @@ public:
 
 	bool	newEntry();
 	bool	newEntryFromFile();
+
+	void onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 };
 
 #endif //__ZIPARCHIVEPANEL_H__

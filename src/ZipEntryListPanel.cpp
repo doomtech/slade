@@ -421,29 +421,6 @@ bool ZipEntryListPanel::moveDown() {
 	return true;
 }
 
-/* ArchivePanel::onAnnouncement
- * Called when an announcement is recieved from the archive that
- * this ZipEntryListPanel is representing
- *******************************************************************/
-void ZipEntryListPanel::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
-	// Reset event data for reading
-	event_data.seek(0, SEEK_SET);
-
-	// If a directory was added to the archive
-	if (announcer == archive && !event_name.Cmp(_T("directory_added"))) {
-		wxUIntPtr ptr;
-		if (event_data.read(&ptr, sizeof(wxUIntPtr)))
-			addDirectory(ptr);
-	}
-
-	// If a directory was removed from the archive
-	if (announcer == archive && !event_name.Cmp(_T("directory_removed"))) {
-		wxUIntPtr ptr;
-		if (event_data.read(&ptr, sizeof(wxUIntPtr)))
-			removeDirectory(ptr);
-	}
-}
-
 
 
 /* ZipEntryListPanel::onEntryListActivated

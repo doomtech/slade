@@ -44,7 +44,7 @@ public:
 	bool	moveUp();
 	bool	moveDown();
 
-	void onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
+	virtual void onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 
 	// Events
 	void	onEntryListChange(wxListEvent &event);

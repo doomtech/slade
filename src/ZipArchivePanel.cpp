@@ -142,6 +142,7 @@ void ZipArchivePanel::init() {
  * value.
  *******************************************************************/
 bool ZipArchivePanel::newEntry() {
+	// Let's call him ned
 	NewEntryDialog ned;
 
 	if (ned.ShowModal() == wxID_OK) {
@@ -234,4 +235,27 @@ bool ZipArchivePanel::newEntryFromFile() {
 	}
 	else // If user canceled return false
 		return false;
+}
+
+/* ZipArchivePanel::onAnnouncement
+ * Called when an announcement is recieved from the archive that
+ * this ZipArchivePanel is managing
+ *******************************************************************/
+void ZipArchivePanel::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
+	// Do default announcement handling
+	ArchivePanel::onAnnouncement(announcer, event_name, event_data);
+
+	// If a directory was added to the archive
+	if (announcer == archive && !event_name.Cmp(_T("directory_added"))) {
+		wxUIntPtr ptr;
+		if (event_data.read(&ptr, sizeof(wxUIntPtr)))
+			((ZipEntryListPanel*)entry_list)->addDirectory(ptr);
+	}
+
+	// If a directory was removed from the archive
+	if (announcer == archive && !event_name.Cmp(_T("directory_removed"))) {
+		wxUIntPtr ptr;
+		if (event_data.read(&ptr, sizeof(wxUIntPtr)))
+			((ZipEntryListPanel*)entry_list)->removeDirectory(ptr);
+	}
 }

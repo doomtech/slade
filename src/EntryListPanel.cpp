@@ -170,9 +170,6 @@ EntryListPanel::EntryListPanel(wxWindow *parent, int id, Archive* archive)
 	framesizer->Add(entry_list, 1, wxEXPAND | wxALL, 4);
 
 	Layout();
-
-	// Listen to the archive
-	listenTo(archive);
 }
 
 /* EntryListPanel::~EntryListPanel

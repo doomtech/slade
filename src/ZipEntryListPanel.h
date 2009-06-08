@@ -25,12 +25,8 @@ public:
 	bool	addDirectory(wxUIntPtr zipdir_ptr);
 	bool	removeDirectory(wxUIntPtr zipdir_ptr);
 
-	//ArchiveEntry*	newEntry();
-	//ArchiveEntry*	newEntryFromFile();
 	bool			moveUp();
 	bool			moveDown();
-
-	void onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 
 	// Events
 	void	onEntryListActivated(wxListEvent &event);
