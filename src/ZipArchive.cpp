@@ -416,7 +416,7 @@ bool ZipArchive::save(string filename) {
 		else {
 			// If the entry is unmodified and exists in the old zip, just copy it over
 			int index = atoi(entries[a]->getExProp(_T("zip_index")).ToAscii());
-			//c_entries[index]->SetName(getEntryFullPath(entries[a]));
+			c_entries[index]->SetName(getEntryFullPath(entries[a]));
 			zip.CopyEntry(c_entries[index], inzip);
 			inzip.Reset();
 		}
@@ -1007,7 +1007,7 @@ bool ZipArchive::renameDirectory(zipdir_t* dir, string newname) {
 		return false;
 
 	// Rename the directory
-	dir->entry->setName(newname);
+	dir->entry->rename(newname);
 
 	// Announce
 	MemChunk mc;
