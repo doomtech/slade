@@ -959,19 +959,19 @@ void ZipArchive::deleteDirectory(zipdir_t* dir) {
 	// If no current directory was specified, set it to the root directory
 	if (!dir)
 		dir = directory;
-	
-	// Remove this directory from it's parent's subdirectory list
-	if (dir->parent_dir) {
-		int p_index = dir->parent_dir->dirIndex(dir);
-		if (p_index >= 0)
-			dir->parent_dir->subdirectories.erase(dir->parent_dir->subdirectories.begin() + p_index);
-	}
 
 	// Announce
 	MemChunk mc;
 	wxUIntPtr ptr = wxPtrToUInt(dir);
 	mc.write(&ptr, sizeof(wxUIntPtr));
 	announce(_T("directory_removed"), mc);
+
+	// Remove this directory from it's parent's subdirectory list
+	if (dir->parent_dir) {
+		int p_index = dir->parent_dir->dirIndex(dir);
+		if (p_index >= 0)
+			dir->parent_dir->subdirectories.erase(dir->parent_dir->subdirectories.begin() + p_index);
+	}
 
 	// Delete any entries in the directory
 	for (size_t a = 0; a < dir->entries.size(); a++) {
@@ -997,6 +997,10 @@ void ZipArchive::deleteDirectory(zipdir_t* dir) {
 	modified = true;
 }
 
+/* ZipArchive::renameDirectory
+ * Renames [dir] with the new name. Returns false if [dir] is invalid,
+ * true otherwise
+ *******************************************************************/
 bool ZipArchive::renameDirectory(zipdir_t* dir, string newname) {
 	// Check valid directory
 	if (!dir)
@@ -1009,7 +1013,7 @@ bool ZipArchive::renameDirectory(zipdir_t* dir, string newname) {
 	MemChunk mc;
 	wxUIntPtr ptr = wxPtrToUInt(dir);
 	mc.write(&ptr, sizeof(wxUIntPtr));
-	announce(_T("directory_renamed"), mc);
+	announce(_T("directory_modified"), mc);
 
 	return true;
 }

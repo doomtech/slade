@@ -75,6 +75,9 @@ ZipEntryListPanel::~ZipEntryListPanel() {
 	delete dummy_folder_entry;
 }
 
+/* ZipEntryListPanel::updateDirectoryEntry
+ * Updates the directory entry at [index]
+ *******************************************************************/
 void ZipEntryListPanel::updateDirectoryEntry(int index) {
 	// Check the given index is a directory
 	if (index >= entriesBegin())
@@ -98,6 +101,9 @@ void ZipEntryListPanel::updateDirectoryEntry(int index) {
 	entry_list->SetItem(li);
 }
 
+/* ZipEntryListPanel::getSelectedDirectories
+ * Gets a vector of any selected directories in the entry list
+ *******************************************************************/
 vector<zipdir_t*> ZipEntryListPanel::getSelectedDirectories() {
 	vector<zipdir_t*> ret;
 	vector<int> selection = getSelection();
@@ -115,6 +121,9 @@ vector<zipdir_t*> ZipEntryListPanel::getSelectedDirectories() {
 	return ret;
 }
 
+/* ZipEntryListPanel::entriesBegin
+ * Gets the index of the first entry in the entry list
+ *******************************************************************/
 int ZipEntryListPanel::entriesBegin() {
 	int begin = 0;
 
@@ -345,38 +354,32 @@ bool ZipEntryListPanel::addDirectory(wxUIntPtr zipdir_ptr) {
 	if (!cdir || !dir)
 		return false;
 
-	// Check if the added directory was a direct subdirectory of the current directory
-	for (size_t a = 0; a < cdir->subdirectories.size(); a++) {
-		if (cdir->subdirectories[a] == dir) {
-			// It is a direct subdirectory, so add it the the entry list
+	// Check if the added directory was a direct subdirectory of the current directory,
+	// and if it is, add it to the list
+	int index = getCurrentDir()->dirIndex(dir);
+	if (index >= 0) {
+		// Setup subdirectory item
+		wxListItem li;
+		li.SetId(entriesBegin() - 1);
+		li.SetData(dir->entry);
 
-			// Setup subdirectory item
-			wxListItem li;
-			li.SetId(entriesBegin());
-			li.SetData(dir->entry);
+		// Add it to the list
+		entry_list->InsertItem(li);
+		updateDirectoryEntry(entriesBegin() - 1);
 
-			// Add it to the list
-			entry_list->InsertItem(li);
-			entry_list->updateEntry(entriesBegin());
-
-			// Set name manually
-			li.SetText(dir->getName());
-			entry_list->SetItem(li);
-
-			// Set size manually
-			li.SetColumn(1);
-			li.SetText(s_fmt(_T("%d Entries"), dir->numEntries(false) + dir->numSubDirs(false)));
-			entry_list->SetItem(li);
-
-			return true;
-		}
+		return true;
 	}
 
 	return true;
 }
 
+/* ZipEntryListPanel::addDirectory
+ * Removed a subdirectory from the list if it is a direct
+ * subdirectory of the current directory, or moves to the root
+ * directory if the current directory was deleted.
+ *******************************************************************/
 bool ZipEntryListPanel::removeDirectory(wxUIntPtr zipdir_ptr) {
-	// Get added directory
+	// Get removed directory
 	zipdir_t* dir = (zipdir_t*)wxUIntToPtr(zipdir_ptr);
 
 	// If the directory that was removed was this one, go to root directory
@@ -386,16 +389,13 @@ bool ZipEntryListPanel::removeDirectory(wxUIntPtr zipdir_ptr) {
 		return true;
 	}
 
-	// Get current directory
-	zipdir_t* cdir = (zipdir_t*)cur_directory;
-
 	// If the directory that was removed was a subdirectory of the current
 	// directory, remove it from the list
-	int index = cdir->dirIndex(dir);
+	int index = getCurrentDir()->dirIndex(dir);
 	if (index >= 0) {
 		// If the current directory has a parent directory, increment index
 		// to skip the '..' list item
-		if (cdir->parent_dir)
+		if (getCurrentDir()->parent_dir)
 			index++;
 
 		// Remove the directory from the list
@@ -405,18 +405,21 @@ bool ZipEntryListPanel::removeDirectory(wxUIntPtr zipdir_ptr) {
 	return true;
 }
 
-bool ZipEntryListPanel::renameDirectory(wxUIntPtr zipdir_ptr) {
-	// Get the renamed directory
+/* ZipEntryListPanel::updateDirectory
+ * Updates the entry item for the given directory
+ *******************************************************************/
+bool ZipEntryListPanel::updateDirectory(wxUIntPtr zipdir_ptr) {
+	// Get the updated directory
 	zipdir_t* dir = (zipdir_t*)wxUIntToPtr(zipdir_ptr);
 
-	// If the renamed directory was the current, do nothing
+	// If the updated directory was the current, do nothing
 	if (cur_directory == dir)
 		return true;
 
 	// Get current directory
 	zipdir_t* cdir = (zipdir_t*)cur_directory;
 
-	// If the directory that was renamed is a subdirectory of the current
+	// If the directory that was updated is a subdirectory of the current
 	// directory, update it in the list
 	int index = cdir->dirIndex(dir);
 	if (index >= 0) {

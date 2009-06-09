@@ -13,9 +13,13 @@ public:
 
 	void			init();
 
+	void	save();
+	void	saveAs();
+
 	bool	newEntry();
 	bool	newEntryFromFile();
 	bool	renameEntry();
+	bool	deleteEntry();
 
 	void onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 };

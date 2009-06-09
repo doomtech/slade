@@ -30,14 +30,14 @@ public:
 	Archive*		getArchive() { return archive; }
 
 	// Archive manipulation functions
-	void		save();
-	void		saveAs();
+	virtual void	save();
+	virtual void	saveAs();
 
 	// Entry manipulation functions
 	virtual bool	newEntry();
 	virtual bool	newEntryFromFile();
 	virtual bool	renameEntry();
-	bool	deleteEntry();
+	virtual bool	deleteEntry();
 	bool	importEntry();
 	bool	exportEntry();
 	bool	exportEntryWad();

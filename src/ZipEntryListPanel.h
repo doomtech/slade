@@ -27,7 +27,7 @@ public:
 	bool	removeEntry(DWORD archive_index, ArchiveEntry* e = NULL);
 	bool	addDirectory(wxUIntPtr zipdir_ptr);
 	bool	removeDirectory(wxUIntPtr zipdir_ptr);
-	bool	renameDirectory(wxUIntPtr zipdir_ptr);
+	bool	updateDirectory(wxUIntPtr zipdir_ptr);
 
 	bool	moveUp();
 	bool	moveDown();

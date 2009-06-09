@@ -135,6 +135,32 @@ void ZipArchivePanel::init() {
 	Layout();
 }
 
+/* ZipArchivePanel::save
+ * Override of ArchivePanel::save to also update any directories in
+ * the entry list
+ *******************************************************************/
+void ZipArchivePanel::save() {
+	// Do default save
+	ArchivePanel::save();
+
+	// Update all directories
+	for (int a = 0; a < ((ZipEntryListPanel*)entry_list)->entriesBegin(); a++)
+		((ZipEntryListPanel*)entry_list)->updateDirectoryEntry(a);
+}
+
+/* ZipArchivePanel::saveAs
+ * Override of ArchivePanel::saveAs to also update any directories in
+ * the entry list
+ *******************************************************************/
+void ZipArchivePanel::saveAs() {
+	// Do default save as
+	ArchivePanel::saveAs();
+
+	// Update all directories
+	for (int a = 0; a < ((ZipEntryListPanel*)entry_list)->entriesBegin(); a++)
+		((ZipEntryListPanel*)entry_list)->updateDirectoryEntry(a);
+}
+
 /* ZipArchivePanel::newEntry
  * The same as ArchivePanel::newEntry, but more advanced to deal
  * with directories. If the given name is a relative or absolute
@@ -237,6 +263,9 @@ bool ZipArchivePanel::newEntryFromFile() {
 		return false;
 }
 
+/* ZipArchivePanel::renameEntry
+ * Renames the selected entries/directories
+ *******************************************************************/
 bool ZipArchivePanel::renameEntry() {
 	// Get a list of selected entries
 	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
@@ -259,13 +288,13 @@ bool ZipArchivePanel::renameEntry() {
 			archive->renameEntry(entry, new_name);
 	}
 
-	// Get a list of selected folders
-	vector<zipdir_t*> selected_folders = ((ZipEntryListPanel*)entry_list)->getSelectedDirectories();
+	// Get a list of selected directories
+	vector<zipdir_t*> selected_dirs = ((ZipEntryListPanel*)entry_list)->getSelectedDirectories();
 
 	// Go through the list
-	for (size_t a = 0; a < selected_folders.size(); a++) {
-		// Get the current folder's name
-		string old_name = selected_folders[a]->getName();
+	for (size_t a = 0; a < selected_dirs.size(); a++) {
+		// Get the current directory's name
+		string old_name = selected_dirs[a]->getName();
 
 		// Prompt for a new name
 		string new_name = wxGetTextFromUser(_T("Enter new directory name:"), s_fmt(_T("Rename Directory %s"), old_name.c_str()), old_name);
@@ -285,7 +314,31 @@ bool ZipArchivePanel::renameEntry() {
 
 		// Rename the directory if the new entered name is different from the original
 		if (new_name.Cmp(old_name))
-			((ZipArchive*)archive)->renameDirectory(selected_folders[a], new_name);
+			((ZipArchive*)archive)->renameDirectory(selected_dirs[a], new_name);
+	}
+}
+
+/* ZipArchivePanel::deleteEntry
+ * Deletes the selected entries/directories
+ *******************************************************************/
+bool ZipArchivePanel::deleteEntry() {
+	// Get a list of selected entries
+	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
+
+	// Go through the list
+	for (size_t a = 0; a < selection.size(); a++) {
+		// Remove the current selected entry if it isn't a directory
+		if (selection[a]->getType() != ETYPE_FOLDER)
+			archive->removeEntry(selection[a]);
+	}
+
+	// Get a list of selected directories
+	vector<zipdir_t*> selected_dirs = ((ZipEntryListPanel*)entry_list)->getSelectedDirectories();
+
+	// Go through the list
+	for (size_t a = 0; a < selected_dirs.size(); a++) {
+		// Remove the selected directory from the archive
+		((ZipArchive*)archive)->deleteDirectory(selected_dirs[a]);
 	}
 }
 
@@ -312,9 +365,9 @@ void ZipArchivePanel::onAnnouncement(Announcer* announcer, string event_name, Me
 	}
 
 	// If a directory was renamed in the archive
-	if (announcer == archive && !event_name.Cmp(_T("directory_renamed"))) {
+	if (announcer == archive && !event_name.Cmp(_T("directory_modified"))) {
 		wxUIntPtr ptr;
 		if (event_data.read(&ptr, sizeof(wxUIntPtr)))
-			((ZipEntryListPanel*)entry_list)->renameDirectory(ptr);
+			((ZipEntryListPanel*)entry_list)->updateDirectory(ptr);
 	}
 }
