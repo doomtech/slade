@@ -303,6 +303,11 @@ bool ZipArchive::openFile(string filename) {
 	int entry_index = 0;
 	wxZipEntry* entry = zip.GetNextEntry();
 	while (entry) {
+		if (entry->GetMethod() != wxZIP_METHOD_DEFLATE && entry->GetMethod() != wxZIP_METHOD_STORE) {
+			Global::error = _T("Unsupported zip compression method");
+			return false;
+		}
+
 		if (!entry->IsDir()) {
 			// Get the entry name as a wxFileName (so we can break it up)
 			wxFileName fn(entry->GetName(wxPATH_UNIX), wxPATH_UNIX);
@@ -313,7 +318,6 @@ bool ZipArchive::openFile(string filename) {
 			// Setup entry info
 			new_entry->setSize(entry->GetSize());
 			new_entry->setLoaded(false);
-			//setEntryZipIndex(new_entry, entry_index);
 			new_entry->setExProp(_T("zip_index"), s_fmt(_T("%d"), entry_index));
 			new_entry->setState(0);
 
@@ -333,8 +337,6 @@ bool ZipArchive::openFile(string filename) {
 		entry = zip.GetNextEntry();
 		entry_index++;
 	}
-
-	//dumpDirectoryTree();
 
 	// Setup variables
 	this->filename = filename;

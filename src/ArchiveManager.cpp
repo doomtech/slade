@@ -138,6 +138,7 @@ Archive* ArchiveManager::openArchive(string filename) {
 		addArchive(new_archive);
 		return new_archive;
 	} else {
+		wxLogMessage(_T("Error: ") + Global::error);
 		delete new_archive;
 		return NULL;
 	}
