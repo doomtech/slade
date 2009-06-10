@@ -30,6 +30,19 @@
 #include "Main.h"
 #include "Archive.h"
 #include <wx/log.h>
+#include <wx\hash.h>
+
+
+/*******************************************************************
+ * STRUCTS
+ *******************************************************************/
+struct patch_header_t
+{
+	short	width;
+	short	height;
+	short	left;
+	short	top;
+};
 
 
 /* ArchiveEntry::ArchiveEntry
@@ -122,13 +135,28 @@ string ArchiveEntry::getExProp(string key) {
 }
 
 /* ArchiveEntry::setExProp
- * Sets an extra property value, returns true if key already
+ * Sets an extra property value, returns true if [key] already
  * existed and was overwritten
  *******************************************************************/
 bool ArchiveEntry::setExProp(string key, string value) {
 	bool exists = hasExProp(key);
 	ex_props[key] = value;
 	return exists;
+}
+
+/* ArchiveEntry::removeExProp
+ * Removes an extra property value, returns true if [key] was removed
+ * or false if key didn't exist
+ *******************************************************************/
+bool ArchiveEntry::removeExProp(string key) {
+	PropertyList::iterator i = ex_props.find(key);
+
+	if (i != ex_props.end()) {
+		ex_props.erase(i);
+		return true;
+	}
+	else
+		return false;
 }
 
 /* ArchiveEntry::setState
@@ -146,6 +174,22 @@ void ArchiveEntry::setState(BYTE state) {
 	// Notify parent archive this entry has been modified
 	if (parent)
 		parent->entryModified(this);
+}
+
+void ArchiveEntry::unloadData() {
+	// Check there is any data to be 'unloaded'
+	if (!data || !data_loaded)
+		return;
+
+	// Only unload if the data wasn't modified
+	if (getState() > 0)
+		return;
+
+	// Delete any data
+	delete[] data;
+
+	// Update variables etc
+	setLoaded(false);
 }
 
 /* ArchiveEntry::rename
@@ -301,16 +345,192 @@ bool ArchiveEntry::exportFile(string filename) {
 /* ArchiveEntry::detectType
  * Attempts to detect what type of data the entry holds
  *******************************************************************/
-void ArchiveEntry::detectType(bool force) {
+void ArchiveEntry::detectType(bool data_check, bool force) {
 	// If the type is already known and we're not forcing a detect, don't bother
 	if (!force && type != ETYPE_UNKNOWN)
 		return;
+
+	// Remove any current type property
+	removeExProp(_T("EntryType"));
+	removeExProp(_T("TextFormat"));
+
+	// If the entry has a parent archive attempt to detect type based on it's position in the archive
+	if (parent)
+		parent->detectEntryType(this);
 
 	// Marker
 	if (size == 0 && type != ETYPE_MAP) {
 		type = ETYPE_MARKER;
 		return;
 	}
+
+	// If [data_check] is false we don't want to check the entry's data for type info
+	if (!data_check)
+		return;
+
+	// Check if the entry's data is currently loaded, if it is we won't unload it
+	// after data checks are done
+	bool no_unload = data_loaded;
+
+	// Load data if needed
+	getData(true);
+
+	// PNG
+	if (size > 8) {
+		if (data[0] == 137 && data[1] == 80 &&
+			data[2] == 78 && data[3] == 71 &&
+			data[4] == 13 && data[5] == 10 &&
+			data[6] == 26 && data[7] == 10) {
+			type = ETYPE_PNG;
+			return;
+		}
+	}
+
+	// BMP
+	if (size > 14) {
+		if (data[0] == 'B' && data[1] == 'M' &&
+			data[6] == 0 && data[7] == 0 && data[8] == 0 && data[9] == 0) {
+			type = ETYPE_IMAGE;
+			setExProp(_T("EntryType"), _T("BMP Image"));
+		}
+	}
+
+	// JPEG
+	if (size > 128) {
+		if ((data[6] == 'J' && data[7] == 'F' && data[8] == 'I' && data[9] == 'F') ||
+			(data[6] == 'E' && data[7] == 'x' && data[8] == 'i' && data[9] == 'f')) {
+			if (data[0] == 255 && data[1] == 216 && data[2] == 255) {
+				type = ETYPE_IMAGE;
+				setExProp(_T("EntryType"), _T("JPEG Image"));
+				//gfx_checked = true;
+			}
+		}
+	}
+
+	// WAD
+	if (size >= 12 && type == ETYPE_UNKNOWN)
+	{
+		if (data[1] == 'W' && data[2] == 'A' && data[3] == 'D' &&
+			(data[0] == 'P' || data[0] == 'I')) {
+			type = ETYPE_WAD;
+			return;
+		}
+	}
+
+	// MUS
+	if (size > 16)
+	{
+		if (data[0] == 'M' && data[1] == 'U' && data[2] == 'S' && data[3] == 0x1A) {
+			type = ETYPE_MUS;
+			return;
+		}
+	}
+
+	// MIDI
+	if (size > 16)
+	{
+		if (data[0] == 'M' && data[1] == 'T' && data[2] == 'h' && data[3] == 'd') {
+			type = ETYPE_MIDI;
+			return;
+		}
+	}
+
+	// IT Module
+	if (size > 32)
+	{
+		if (data[0] == 'I' && data[1] == 'M' && data[2] == 'P' && data[3] == 'M') {
+			type = ETYPE_MOD;
+			setExProp(_T("LumpType"), _T("Music (IT Module)"));
+			return;
+		}
+	}
+
+	// XM Module
+	if (size > 80)
+	{
+		char temp[17] = "";
+		memcpy(temp, data, 17);
+
+		if (strnicmp(temp, "Extended module: ", 17) == 0) {
+			if (data[37] == 0x1a) {
+				type = ETYPE_MOD;
+				setExProp(_T("LumpType"), _T("Music (XM Module)"));
+				return;
+			}
+		}
+	}
+
+	// S3M Module
+	if (size > 60)
+	{
+		if (data[44] == 'S' && data[45] == 'C' && data[46] == 'R' && data[47] == 'M') {
+			type = ETYPE_MOD;
+			setExProp(_T("LumpType"), _T("Music (S3M Module)"));
+			return;
+		}
+	}
+
+	// MOD Module
+	if (size > 1084)
+	{
+		if (data[950] >= 1 && data[950] <= 128 && data[951] == 127) {
+			if ((data[1080] == 'M' && data[1081] == '.' && data[1082] == 'K' && data[1083] == '.') ||
+				(data[1080] == 'M' && data[1081] == '!' && data[1082] == 'K' && data[1083] == '!') ||
+				(data[1080] == 'F' && data[1081] == 'L' && data[1082] == 'T' && data[1083] == '4') ||
+				(data[1080] == 'F' && data[1081] == 'L' && data[1082] == 'T' && data[1083] == '8') ||
+				(data[1081] == 'C' && data[1082] == 'H' && data[1083] == 'N')) {
+				type = ETYPE_MOD;
+				setExProp(_T("LumpType"), _T("Music (MOD Module)"));
+			}
+		}
+	}
+
+	// Doom Sound
+	if (size > 8) {
+		if ((WORD)data[0] == 3 && (WORD)data[6] == 0 && (WORD)data[4] <= size - 8) {
+			type = ETYPE_SOUND;
+
+			if (name.Left(2) == _T("DS"))
+				return;
+		}
+	}
+
+	// WAV Sound
+	if (size > 8) {
+		if (data[0] == 'R' && data[1] == 'I' && data[2] == 'F' && data[3] == 'F') {
+			type = ETYPE_WAV;
+		}
+	}
+
+	// Detect doom patch format
+	if (size > sizeof(patch_header_t) && (type == ETYPE_UNKNOWN || type == ETYPE_SOUND)) {
+		patch_header_t *header = (patch_header_t *)data;
+
+		if (header->height > 0 && header->height < 4096 &&
+			header->width > 0 && header->width < 4096 &&
+			header->top > -2000 && header->top < 2000 &&
+			header->left > -2000 && header->left < 2000) {
+			long *col_offsets = (long *)((BYTE *)data + sizeof(patch_header_t));
+
+			if (size < sizeof(patch_header_t) + (header->width * sizeof(long))) {
+				//wxLogMessage("lump %s not a patch, col_offsets error 1", lump->Name().c_str());
+				return;
+			}
+
+			for (int a = 0; a < header->width; a++) {
+				if (col_offsets[a] > size || col_offsets[a] < 0) {
+					//wxLogMessage("lump %s not a patch, col_offsets error 2", lump->Name().c_str());
+					return;
+				}
+			}
+
+			type = ETYPE_GFX;
+		}
+	}
+
+	// Unload entry data if it wasn't loaded before checking the type
+	if (!no_unload)
+		unloadData();
 }
 
 /* ArchiveEntry::getTypeString
@@ -318,8 +538,8 @@ void ArchiveEntry::detectType(bool force) {
  *******************************************************************/
 string ArchiveEntry::getTypeString() {
 	// Check for a custom type string
-	if (hasExProp(_T("entry_type")))
-		return getExProp(_T("entry_type"));
+	if (hasExProp(_T("EntryType")))
+		return getExProp(_T("EntryType"));
 
 	if (type == ETYPE_MARKER) return _T("Marker");
 	if (type == ETYPE_TEXT) return _T("Text");
@@ -329,7 +549,7 @@ string ArchiveEntry::getTypeString() {
 	if (type == ETYPE_FLAT) return _T("Flat");
 	if (type == ETYPE_GFX) return _T("Graphic");
 	if (type == ETYPE_GFX2) return _T("Graphic");
-	if (type == ETYPE_PNG) return _T("PNG");
+	if (type == ETYPE_PNG) return _T("PNG Image");
 	if (type == ETYPE_IMAGE) return _T("Image");
 
 	if (type == ETYPE_SOUND) return _T("Sound");

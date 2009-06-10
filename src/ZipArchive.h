@@ -57,6 +57,7 @@ public:
 	bool	renameEntry(ArchiveEntry* entry, string new_name);
 
 	vector<mapdesc_t>	detectMaps();
+	bool				detectEntryType(ArchiveEntry* entry);
 
 	// ---- Zip-specific ----
 	zipdir_t*	getEntryDirectory(ArchiveEntry* entry, zipdir_t* dir = NULL);

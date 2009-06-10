@@ -192,7 +192,7 @@ bool WadArchive::openFile(string filename) {
 		ArchiveEntry* nlump = new ArchiveEntry(wxString::FromAscii(name), this);
 		nlump->setSize(size);
 		nlump->setLoaded(false);
-		nlump->setExProp(_T("offset"), s_fmt(_T("%d"), offset));
+		nlump->setExProp(_T("Offset"), s_fmt(_T("%d"), offset));
 		nlump->setState(0);
 
 		// Add to entry list
@@ -270,6 +270,7 @@ bool WadArchive::save(string filename) {
 		fwrite(name, 1, 8, fp);
 
 		entries[l]->setState(0);
+		entries[l]->setExProp(_T("Offset"), s_fmt(_T("%d"), l));
 	}
 
 	// Close the file
@@ -303,8 +304,8 @@ void WadArchive::close() {
  * Returns the lump entry's offset, or zero if it doesn't exist
  *******************************************************************/
 DWORD WadArchive::getEntryOffset(ArchiveEntry* entry) {
-	if (entry->hasExProp(_T("offset"))) {
-		return (DWORD)atoi(chr(entry->getExProp(_T("offset"))));
+	if (entry->hasExProp(_T("Offset"))) {
+		return (DWORD)atoi(chr(entry->getExProp(_T("Offset"))));
 	}
 	else
 		return 0;
@@ -314,7 +315,7 @@ DWORD WadArchive::getEntryOffset(ArchiveEntry* entry) {
  * Sets a lump entry's offset
  *******************************************************************/
 void WadArchive::setEntryOffset(ArchiveEntry* entry, DWORD offset) {
-	entry->setExProp(_T("offset"), s_fmt(_T("%d"), offset));
+	entry->setExProp(_T("Offset"), s_fmt(_T("%d"), offset));
 }
 
 /* WadArchive::loadEntryData
@@ -662,4 +663,8 @@ bool WadArchive::renameEntry(ArchiveEntry* entry, string new_name) {
 
 	// Rename the entry
 	entry->rename(new_name);
+}
+
+bool WadArchive::detectEntryType(ArchiveEntry* entry) {
+	return true;
 }

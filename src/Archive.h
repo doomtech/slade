@@ -58,7 +58,9 @@ public:
 	virtual bool	renameEntry(ArchiveEntry* entry, string new_name) = 0;
 	void			entryModified(ArchiveEntry* entry);
 
+	// Detection
 	virtual vector<mapdesc_t>	detectMaps() = 0;
+	virtual bool				detectEntryType(ArchiveEntry* entry) = 0;
 };
 
 #endif //__ARCHIVE_H__

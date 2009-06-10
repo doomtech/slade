@@ -91,6 +91,7 @@ public:
 	void		setData(BYTE* data) { this->data = data; }
 	void		setType(BYTE type) { this->type = type; }
 	void		setState(BYTE state);
+	void		unloadData();
 
 	// Entry modification (will change entry state)
 	void	rename(string new_name);
@@ -108,13 +109,14 @@ public:
 	bool	exportFile(string filename);
 
 	// Type detection
-	void	detectType(bool force = false);
+	void	detectType(bool data_check, bool force = false);
 	string	getTypeString();
 
 	// Extra properties stuff
 	bool	hasExProp(string key);
 	string	getExProp(string key);
 	bool	setExProp(string key, string value);
+	bool	removeExProp(string key);
 };
 
 
