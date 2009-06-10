@@ -111,7 +111,7 @@ bool EntryList::updateEntry(int index, bool update_colsize) {
 	}
 
 	// Detect type
-	entry->detectType(true, true);
+	entry->detectType(true, false);
 
 	// -- Setup entry --
 	// Name
