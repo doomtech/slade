@@ -28,6 +28,7 @@
  * INCLUDES
  *******************************************************************/
 #include "Main.h"
+#include <wx/imaglist.h>
 #include "WxStuff.h"
 #include "Archive.h"
 #include "EntryListPanel.h"
@@ -163,7 +164,13 @@ bool EntryList::updateEntry(int index, bool update_colsize) {
 	li.SetId(index);
 	li.SetText(entry->getName());
 	SetItem(li);
-	if (update_colsize) SetColumnWidth(0, wxLIST_AUTOSIZE);
+	if (update_colsize) {
+		SetColumnWidth(0, wxLIST_AUTOSIZE);
+		// Add extra width in linux as wxLIST_AUTOSIZE seems to ignore listitem images on wxGTK
+		#ifndef _WIN32
+		SetColumnWidth(0, GetColumnWidth(0) + 20);
+		#endif
+	}
 
 	// Size
 	li.SetText(s_fmt(_T("%d"), entry->getSize()));
@@ -271,6 +278,11 @@ void EntryListPanel::populateEntryList() {
 	entry_list->SetColumnWidth(0, wxLIST_AUTOSIZE);
 	entry_list->SetColumnWidth(1, wxLIST_AUTOSIZE);
 	entry_list->SetColumnWidth(2, wxLIST_AUTOSIZE);
+
+	// Add extra width to the name column in linux as wxLIST_AUTOSIZE seems to ignore listitem images on wxGTK
+	#ifndef _WIN32
+	entry_list->SetColumnWidth(0, entry_list->GetColumnWidth(0) + 20);
+	#endif
 
 	// Setup size
 	entry_list->SetMinSize(wxSize(entry_list->getWidth(), -1));

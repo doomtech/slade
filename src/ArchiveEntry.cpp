@@ -30,7 +30,7 @@
 #include "Main.h"
 #include "Archive.h"
 #include <wx/log.h>
-#include <wx\hash.h>
+#include <wx/hash.h>
 
 
 /*******************************************************************
@@ -577,7 +577,8 @@ void ArchiveEntry::detectType(bool data_check, bool force) {
 		char temp[17] = "";
 		memcpy(temp, data, 17);
 
-		if (strnicmp(temp, "Extended module: ", 17) == 0) {
+		//if (strnicmp(temp, "Extended module: ", 17) == 0) {
+		if (!wxString::FromAscii(temp).Cmp(_T("Extended module: "))) {
 			if (data[37] == 0x1a) {
 				type = ETYPE_MOD;
 				setExProp(_T("LumpType"), _T("Music (XM Module)"));
