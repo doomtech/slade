@@ -37,7 +37,7 @@ public:
 	ArchiveEntry*			getFocusedEntry();
 	int						getFocus();
 	vector<ArchiveEntry*>	getSelectedEntries();
-	vector<int>				getSelection();
+	virtual vector<int>		getSelection();
 	int						getLastSelected();
 	ArchiveEntry*			getLastSelectedEntry();
 	int						getListSize();

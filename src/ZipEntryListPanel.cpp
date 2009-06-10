@@ -75,6 +75,23 @@ ZipEntryListPanel::~ZipEntryListPanel() {
 	delete dummy_folder_entry;
 }
 
+/* ZipEntryListPanel::getSelection
+ * Override of EntryListPanel::getSelection to remove the '..' list
+ * item from the selection
+ *******************************************************************/
+vector<int> ZipEntryListPanel::getSelection() {
+	// Get normal selection
+	vector<int> ret = EntryListPanel::getSelection();
+
+	// If the current directory is not the root directory and item 0
+	// is selected (ie the '..' item), remove it from the list
+	if (getCurrentDir()->parent_dir && ret[0] == 0)
+		ret.erase(ret.begin());
+
+	// Return the selection
+	return ret;
+}
+
 /* ZipEntryListPanel::updateDirectoryEntry
  * Updates the directory entry at [index]
  *******************************************************************/
@@ -114,15 +131,23 @@ void ZipEntryListPanel::updateDirectoryEntry(int index) {
  *******************************************************************/
 vector<zipdir_t*> ZipEntryListPanel::getSelectedDirectories() {
 	vector<zipdir_t*> ret;
+
+	// Get all selected items
 	vector<int> selection = getSelection();
 
+	// Go through the selection
 	for (size_t a = 0; a < selection.size(); a++) {
 		int sel_index = selection[a];
-		if (sel_index < entriesBegin()) {
-			if (getCurrentDir()->parent_dir)
-				sel_index--;
 
-			ret.push_back(getCurrentDir()->subdirectories[sel_index]);
+		// Check that the selected item is a directory
+		if (sel_index < entriesBegin()) {
+			// If we aren't in the root directory, offset due to the '..' item
+			if (getCurrentDir()->parent_dir)
+					sel_index--;
+
+			// Add the selected subdirectory to the list
+			if (sel_index > 0)
+				ret.push_back(getCurrentDir()->subdirectories[sel_index]);
 		}
 	}
 
@@ -135,9 +160,11 @@ vector<zipdir_t*> ZipEntryListPanel::getSelectedDirectories() {
 int ZipEntryListPanel::entriesBegin() {
 	int begin = 0;
 
+	// Offset to account for '..' item
 	if (getCurrentDir()->parent_dir)
 		begin++;
 
+	// Return the offset + the number of subdirectories in the current directory
 	return begin + (int)getCurrentDir()->subdirectories.size();
 }
 
@@ -363,8 +390,8 @@ bool ZipEntryListPanel::addDirectory(wxUIntPtr zipdir_ptr) {
 	return true;
 }
 
-/* ZipEntryListPanel::addDirectory
- * Removed a subdirectory from the list if it is a direct
+/* ZipEntryListPanel::removeDirectory
+ * Removes a subdirectory from the list if it is a direct
  * subdirectory of the current directory, or moves to the root
  * directory if the current directory was deleted.
  *******************************************************************/
@@ -530,7 +557,9 @@ void ZipEntryListPanel::onEntryListActivated(wxListEvent& event) {
 void ZipEntryListPanel::onEntryListEditLabel(wxListEvent& event) {
 	// TODO: Check if renamed entry is a folder and rename it in the archive accordingly
 	ArchiveEntry* entry = getFocusedEntry();
-	if (entry && !event.IsEditCancelled()) {
+	if (entry && !event.IsEditCancelled() && entry != dummy_folder_entry) {
 		archive->renameEntry(entry, event.GetLabel());
 	}
+	else
+		event.Veto();
 }

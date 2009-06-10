@@ -15,6 +15,8 @@ public:
 	ZipEntryListPanel(wxWindow *parent, int id, Archive* archive);
 	~ZipEntryListPanel();
 
+	vector<int>	getSelection();
+
 	zipdir_t*			getCurrentDir() { return cur_directory; }
 	vector<zipdir_t*>	getSelectedDirectories();
 	void				updateDirectoryEntry(int index);

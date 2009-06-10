@@ -248,15 +248,6 @@ void EntryListPanel::populateEntryList() {
 	// Create the "Name" column
 	entry_list->InsertColumn(0, _T("Name"));
 
-	// Set name column's font to same as default ui but monospace
-	/*
-	wxListItem li;
-	entry_list->GetColumn(0, li);
-	wxFont f = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
-	li.SetFont(wxFont(f.GetPointSize(), wxFONTFAMILY_MODERN, f.GetStyle(), f.GetWeight()));
-	entry_list->SetColumn(0, li);
-	 */
-
 	// Create the "Size" column
 	entry_list->InsertColumn(1, _T("Size"));
 
@@ -322,19 +313,12 @@ vector<ArchiveEntry*> EntryListPanel::getSelectedEntries() {
 	// Init vector
 	vector<ArchiveEntry*> ret;
 
-	// Go through all items
-	long item = -1;
-	while (true) {
-		// Get the next item in the list that is selected
-		item = entry_list->GetNextItem(item, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+	// Get selection
+	vector<int> selection = getSelection();
 
-		// If -1 then none were selected
-		if (item == -1)
-			break;
-
-		// Otherwise add the selected entry to the vector
-		ret.push_back((ArchiveEntry*)(entry_list->GetItemData(item)));
-	}
+	// Go through selection and add associated entries to the return vector
+	for (size_t a = 0; a < selection.size(); a++)
+		ret.push_back((ArchiveEntry*)(entry_list->GetItemData(selection[a])));
 
 	return ret;
 }
