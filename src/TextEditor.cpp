@@ -34,6 +34,9 @@
 
 TextEditor::TextEditor(wxWindow* parent, int id)
 : wxStyledTextCtrl(parent, id) {
+	wxFont f(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
+	StyleSetFont(wxSTC_STYLE_DEFAULT, f);
+	SetTabWidth(4);
 }
 
 TextEditor::~TextEditor() {

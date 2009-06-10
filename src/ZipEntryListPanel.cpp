@@ -87,17 +87,25 @@ void ZipEntryListPanel::updateDirectoryEntry(int index) {
 	entry_list->updateEntry(index, true);
 
 	// Get the associated zipdir
-	zipdir_t* dir = getCurrentDir()->parent_dir;
-	if (dir && index > 0)
-		dir = getCurrentDir()->subdirectories[index - 1];
-	else if (!dir)
+	zipdir_t* dir = NULL;
+	if (getCurrentDir()->parent_dir) {
+		if (index == 0)
+			dir = getCurrentDir()->parent_dir;
+		else
+			dir = getCurrentDir()->subdirectories[index-1];
+	}
+	else
 		dir = getCurrentDir()->subdirectories[index];
 
 	// Set it's size column manually
 	wxListItem li;
 	li.SetId(index);
 	li.SetColumn(1);
-	li.SetText(s_fmt(_T("%d Entries"), dir->numEntries(false) + dir->numSubDirs(false)));
+	int entry_count = dir->numEntries(false) + dir->numSubDirs(false);
+	if (entry_count == 1)
+		li.SetText(_T("1 Entry"));
+	else
+		li.SetText(s_fmt(_T("%d Entries"), entry_count));
 	entry_list->SetItem(li);
 }
 
@@ -154,11 +162,29 @@ void ZipEntryListPanel::populateEntryList() {
 	// Create the "Type" column
 	entry_list->InsertColumn(2, _T("Type"));
 
-	// Typecast directory
-	zipdir_t* dir = (zipdir_t*)cur_directory;
+	// Get current directory
+	zipdir_t* dir = getCurrentDir();
+
+	// If we're not in the root directory, add a '..' item
+	int index = 0;
+	if (cur_directory != ((ZipArchive*)archive)->getRootDirectory()) {
+		// Setup item
+		wxListItem li;
+		li.SetId(0);
+		li.SetData(dummy_folder_entry);
+
+		// Add it to the list
+		entry_list->InsertItem(li);
+		updateDirectoryEntry(0);
+
+		// Set name manually
+		li.SetText(_T(".."));
+		entry_list->SetItem(li);
+
+		index++;
+	}
 
 	// Go through and add all subdirectories in the current directory
-	int index = 0;
 	for (size_t a = 0; a < dir->subdirectories.size(); a++) {
 		zipdir_t* subdir = dir->subdirectories[a];
 
@@ -169,15 +195,7 @@ void ZipEntryListPanel::populateEntryList() {
 
 		// Add it to the list
 		entry_list->InsertItem(li);
-		//entry_list->updateEntry(index);
 		updateDirectoryEntry(index);
-
-		/*
-		// Set size manually
-		li.SetColumn(1);
-		li.SetText(s_fmt(_T("%d Entries"), subdir->numEntries(false) + subdir->numSubDirs(false)));
-		entry_list->SetItem(li);
-		 */
 
 		index++;
 	}
@@ -192,43 +210,10 @@ void ZipEntryListPanel::populateEntryList() {
 		li.SetData(entry);
 		entry_list->InsertItem(li);
 
-		// Name
-		li.SetText(entry->getName());
-		entry_list->SetItem(li);
-
-		// Size
-		li.SetText(s_fmt(_T("%d"), entry->getSize()));
-		li.SetColumn(1);
-		entry_list->SetItem(li);
-
-		// Type
-		li.SetText(entry->getTypeString());
-		li.SetColumn(2);
-		entry_list->SetItem(li);
-
-		// Set entry status text colour if needed
-		if (entry->getState() == 2)
-			entry_list->SetItemTextColour(index, col_new);
-		else if (entry->getState() == 1)
-			entry_list->SetItemTextColour(index, col_modified);
+		// Set new item details
+		entry_list->updateEntry(index, false);
 
 		index++;
-	}
-
-	// If we're not in the root directory, add a '..' item
-	if (cur_directory != ((ZipArchive*)archive)->getRootDirectory()) {
-		// Setup item
-		wxListItem li;
-		li.SetId(0);
-		li.SetData(dummy_folder_entry);
-
-		// Add it to the list
-		entry_list->InsertItem(li);
-		updateDirectoryEntry(0);
-
-		// Set name manually
-		li.SetText(_T(".."));
-		entry_list->SetItem(li);
 	}
 
 	// Setup column widths

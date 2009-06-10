@@ -9,7 +9,8 @@ class EntryListPanel;
 
 class EntryList : public wxListCtrl {
 private:
-	EntryListPanel*	parent;
+	EntryListPanel*		parent;
+	wxImageList*		image_list;
 
 public:
 	EntryList(EntryListPanel *parent, int id);

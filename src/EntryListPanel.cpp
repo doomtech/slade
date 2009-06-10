@@ -83,6 +83,50 @@ wxImage get_entry_icon(string name, int type) {
 EntryList::EntryList(EntryListPanel *parent, int id)
 : wxListCtrl(parent, id, wxDefaultPosition, wxDefaultSize, ENTRYLIST_FLAGS) {
 	this->parent = parent;
+
+	// Set font to monospace
+	wxFont f = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
+	SetFont(wxFont(f.GetPointSize(), wxFONTFAMILY_MODERN, f.GetStyle(), f.GetWeight()));
+
+	// Setup entry icons
+	image_list = new wxImageList(16, 16, false, 0);
+	image_list->Add(wxBitmap(get_entry_icon(_T("unknown.png"), wxBITMAP_TYPE_PNG)));
+	image_list->Add(wxBitmap(get_entry_icon(_T("marker.png"), wxBITMAP_TYPE_PNG)));
+	image_list->Add(wxBitmap(get_entry_icon(_T("text.png"), wxBITMAP_TYPE_PNG)));
+	image_list->Add(wxBitmap(get_entry_icon(_T("patch.png"), wxBITMAP_TYPE_PNG)));
+	image_list->Add(wxBitmap(get_entry_icon(_T("sprite.png"), wxBITMAP_TYPE_PNG)));
+	image_list->Add(wxBitmap(get_entry_icon(_T("flat.png"), wxBITMAP_TYPE_PNG)));
+	image_list->Add(wxBitmap(get_entry_icon(_T("gfx.png"), wxBITMAP_TYPE_PNG)));
+	image_list->Add(wxBitmap(get_entry_icon(_T("gfx.png"), wxBITMAP_TYPE_PNG)));
+	image_list->Add(wxBitmap(get_entry_icon(_T("png.png"), wxBITMAP_TYPE_PNG)));
+	image_list->Add(wxBitmap(get_entry_icon(_T("gfx.png"), wxBITMAP_TYPE_PNG))); // image
+	image_list->Add(wxBitmap(get_entry_icon(_T("sound.png"), wxBITMAP_TYPE_PNG)));
+	image_list->Add(wxBitmap(get_entry_icon(_T("sound.png"), wxBITMAP_TYPE_PNG))); // wav
+	image_list->Add(wxBitmap(get_entry_icon(_T("sound.png"), wxBITMAP_TYPE_PNG))); // mp3
+	image_list->Add(wxBitmap(get_entry_icon(_T("sound.png"), wxBITMAP_TYPE_PNG))); // flac
+	image_list->Add(wxBitmap(get_entry_icon(_T("music.png"), wxBITMAP_TYPE_PNG)));
+	image_list->Add(wxBitmap(get_entry_icon(_T("music.png"), wxBITMAP_TYPE_PNG)));
+	image_list->Add(wxBitmap(get_entry_icon(_T("music.png"), wxBITMAP_TYPE_PNG)));
+	image_list->Add(wxBitmap(get_entry_icon(_T("texturex.png"), wxBITMAP_TYPE_PNG)));
+	image_list->Add(wxBitmap(get_entry_icon(_T("pnames.png"), wxBITMAP_TYPE_PNG)));
+	image_list->Add(wxBitmap(get_entry_icon(_T("map.png"), wxBITMAP_TYPE_PNG)));
+	image_list->Add(wxBitmap(get_entry_icon(_T("map_data.png"), wxBITMAP_TYPE_PNG)));
+	image_list->Add(wxBitmap(get_entry_icon(_T("map_data.png"), wxBITMAP_TYPE_PNG)));
+	image_list->Add(wxBitmap(get_entry_icon(_T("map_data.png"), wxBITMAP_TYPE_PNG)));
+	image_list->Add(wxBitmap(get_entry_icon(_T("map_data.png"), wxBITMAP_TYPE_PNG)));
+	image_list->Add(wxBitmap(get_entry_icon(_T("map_data.png"), wxBITMAP_TYPE_PNG)));
+	image_list->Add(wxBitmap(get_entry_icon(_T("map_data.png"), wxBITMAP_TYPE_PNG)));
+	image_list->Add(wxBitmap(get_entry_icon(_T("map_data.png"), wxBITMAP_TYPE_PNG)));
+	image_list->Add(wxBitmap(get_entry_icon(_T("map_data.png"), wxBITMAP_TYPE_PNG)));
+	image_list->Add(wxBitmap(get_entry_icon(_T("map_data.png"), wxBITMAP_TYPE_PNG)));
+	image_list->Add(wxBitmap(get_entry_icon(_T("map_data.png"), wxBITMAP_TYPE_PNG)));
+	image_list->Add(wxBitmap(get_entry_icon(_T("map_data.png"), wxBITMAP_TYPE_PNG)));
+	image_list->Add(wxBitmap(get_entry_icon(_T("default.png"), wxBITMAP_TYPE_PNG)));
+	image_list->Add(wxBitmap(get_entry_icon(_T("default.png"), wxBITMAP_TYPE_PNG)));
+	image_list->Add(wxBitmap(get_entry_icon(_T("wad.png"), wxBITMAP_TYPE_PNG)));
+	image_list->Add(wxBitmap(get_entry_icon(_T("folder.png"), wxBITMAP_TYPE_PNG)));
+	image_list->Add(wxBitmap(get_entry_icon(_T("up_folder.png"), wxBITMAP_TYPE_PNG)));
+	SetImageList(image_list, wxIMAGE_LIST_SMALL);
 }
 
 /* EntryList::~EntryList
@@ -145,6 +189,8 @@ bool EntryList::updateEntry(int index, bool update_colsize) {
 	// Setup size
 	if (update_colsize) SetMinSize(wxSize(getWidth(), -1));
 
+	SetItemImage(index, entry->getType());
+
 	return true;
 }
 
@@ -194,6 +240,15 @@ void EntryListPanel::populateEntryList() {
 
 	// Create the "Name" column
 	entry_list->InsertColumn(0, _T("Name"));
+
+	// Set name column's font to same as default ui but monospace
+	/*
+	wxListItem li;
+	entry_list->GetColumn(0, li);
+	wxFont f = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
+	li.SetFont(wxFont(f.GetPointSize(), wxFONTFAMILY_MODERN, f.GetStyle(), f.GetWeight()));
+	entry_list->SetColumn(0, li);
+	 */
 
 	// Create the "Size" column
 	entry_list->InsertColumn(1, _T("Size"));
