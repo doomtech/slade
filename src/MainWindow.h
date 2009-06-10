@@ -11,7 +11,6 @@ private:
 	ArchiveManagerPanel*	panel_archivemanager;
 	wxAuiNotebook*			notebook_tabs;
 	wxHtmlWindow*			html_startpage;
-	wxMenu*					menu_archive;
 
 public:
 	// wxWidgets ID table

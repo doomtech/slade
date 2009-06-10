@@ -11,6 +11,7 @@ class ArchivePanel : public wxPanel, Listener {
 protected:
 	Archive*		archive;
 	EntryListPanel*	entry_list;
+	wxMenu*			menu_entry;
 
 	// Entry panels
 	EntryPanel*		cur_area;
@@ -21,6 +22,16 @@ protected:
 public:
 	enum {
 		ENTRY_LIST_PANEL,
+
+		MENU_ENTRY_RENAME,
+		MENU_ENTRY_DELETE,
+		MENU_ENTRY_IMPORT,
+		MENU_ENTRY_EXPORT,
+		MENU_ENTRY_EXPORTWAD,
+		MENU_ENTRY_MOVEUP,
+		MENU_ENTRY_MOVEDOWN,
+
+		MENU_ENTRY_END,
 	};
 
 	ArchivePanel(wxWindow *parent, Archive* archive);
@@ -48,6 +59,8 @@ public:
 
 	// Events
 	void	onEntryListChange(wxListEvent &event);
+	void	onEntryListRightClick(wxListEvent &event);
+	void	onEntryMenuClick(wxCommandEvent &event);
 
 	DECLARE_EVENT_TABLE()
 };

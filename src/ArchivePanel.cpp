@@ -52,6 +52,18 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 	entry_area = new EntryPanel(this);
 	default_area = new DefaultEntryPanel(this);
 	text_area = new TextEntryPanel(this);
+
+	// Create entry menu
+	menu_entry = new wxMenu(_T(""));
+	menu_entry->Append(MENU_ENTRY_RENAME, _T("Rename"));
+	menu_entry->Append(MENU_ENTRY_DELETE, _T("Delete"));
+	menu_entry->AppendSeparator();
+	menu_entry->Append(MENU_ENTRY_IMPORT, _T("Import"));
+	menu_entry->Append(MENU_ENTRY_EXPORT, _T("Export"));
+	menu_entry->Append(MENU_ENTRY_EXPORTWAD, _T("Export as Wad"));
+	menu_entry->AppendSeparator();
+	menu_entry->Append(MENU_ENTRY_MOVEUP, _T("Move Up"));
+	menu_entry->Append(MENU_ENTRY_MOVEDOWN, _T("Move Down"));
 }
 
 /* ArchivePanel::~ArchivePanel
@@ -414,6 +426,8 @@ void ArchivePanel::onAnnouncement(Announcer* announcer, string event_name, MemCh
 
 BEGIN_EVENT_TABLE(ArchivePanel, wxPanel)
 	EVT_LIST_ITEM_FOCUSED(ArchivePanel::ENTRY_LIST_PANEL, ArchivePanel::onEntryListChange)
+	EVT_LIST_ITEM_RIGHT_CLICK(ArchivePanel::ENTRY_LIST_PANEL, ArchivePanel::onEntryListRightClick)
+	EVT_MENU_RANGE(MENU_ENTRY_RENAME, MENU_ENTRY_END, ArchivePanel::onEntryMenuClick)
 END_EVENT_TABLE()
 
 /* ArchivePanel::onEntryListChange
@@ -465,4 +479,34 @@ void ArchivePanel::onEntryListChange(wxListEvent& event) {
 	}
 
 	Layout();
+}
+
+void ArchivePanel::onEntryListRightClick(wxListEvent& event) {
+	PopupMenu(menu_entry);
+}
+
+void ArchivePanel::onEntryMenuClick(wxCommandEvent& event) {
+	switch (event.GetId()) {
+		case MENU_ENTRY_RENAME:
+			renameEntry();
+			break;
+		case MENU_ENTRY_DELETE:
+			deleteEntry();
+			break;
+		case MENU_ENTRY_IMPORT:
+			importEntry();
+			break;
+		case MENU_ENTRY_EXPORT:
+			exportEntry();
+			break;
+		case MENU_ENTRY_EXPORTWAD:
+			exportEntryWad();
+			break;
+		case MENU_ENTRY_MOVEUP:
+			moveUp();
+			break;
+		case MENU_ENTRY_MOVEDOWN:
+			moveDown();
+			break;
+	}
 }
