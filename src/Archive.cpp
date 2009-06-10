@@ -61,13 +61,28 @@ string Archive::getFileName(bool fullpath)
 	}
 }
 
+/* Archive::checkEntry
+ * Checks that the given entry is valid and part of this archive
+ *******************************************************************/
+bool Archive::checkEntry(ArchiveEntry* entry) {
+	// Check entry is valid
+	if (!entry)
+		return false;
+
+	// Check entry is part of this archive
+	if (entry->getParent() != this)
+		return false;
+
+	// Entry is ok
+	return true;
+}
+
 /* Archive::entryModified
  * Called when an entry in the archive is modified
  *******************************************************************/
 void Archive::entryModified(ArchiveEntry* entry) {
-	// Check the entry belongs to this archive
-	// (should always, as it's only ever called via the entry's parent pointer)
-	if (entry->getParent() != this)
+	// Check the entry is valid and part of this archive
+	if (!checkEntry(entry))
 		return;
 
 	// Set the archive state to modified

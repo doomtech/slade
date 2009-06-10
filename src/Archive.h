@@ -38,6 +38,7 @@ public:
 	virtual ArchiveEntry*	getEntry(DWORD index) = 0;
 	virtual ArchiveEntry*	getEntry(string name) = 0;
 	virtual string			getFileExtensionString() = 0;
+	bool					checkEntry(ArchiveEntry* entry);
 
 	virtual bool	openFile(string filename) = 0;
 	virtual bool	save(string filename = _T("")) = 0;

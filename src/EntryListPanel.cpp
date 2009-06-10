@@ -110,6 +110,9 @@ bool EntryList::updateEntry(int index, bool update_colsize) {
 		return false;
 	}
 
+	// Detect type
+	entry->detectType(true, true);
+
 	// -- Setup entry --
 	// Name
 	wxListItem li;
@@ -206,21 +209,7 @@ void EntryListPanel::populateEntryList() {
 		li.SetId(a);
 		li.SetData(entry);
 		entry_list->InsertItem(li);
-
-		// Name
-		li.SetId(a);
-		li.SetText(entry->getName());
-		entry_list->SetItem(li);
-
-		// Size
-		li.SetText(s_fmt(_T("%d"), entry->getSize()));
-		li.SetColumn(1);
-		entry_list->SetItem(li);
-
-		// Type
-		li.SetText(entry->getTypeString());
-		li.SetColumn(2);
-		entry_list->SetItem(li);
+		entry_list->updateEntry(a, false);
 	}
 
 	// Setup column widths

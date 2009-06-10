@@ -79,7 +79,8 @@ WadArchive::~WadArchive() {
  * Returns -1 if the entry doesn't exist in the Archive.
  *******************************************************************/
 int WadArchive::entryIndex(ArchiveEntry* entry) {
-	if (!entry)
+	// Check the entry is valid and part of this archive
+	if (!checkEntry(entry))
 		return -1;
 
 	for (size_t a = 0; a < entries.size(); a++) {
@@ -195,9 +196,65 @@ bool WadArchive::openFile(string filename) {
 		nlump->setExProp(_T("Offset"), s_fmt(_T("%d"), offset));
 		nlump->setState(0);
 
+		// Check for markers
+		if (!nlump->getName().Cmp(_T("P_START")))
+			patches[0] = d;
+		if (!nlump->getName().Cmp(_T("PP_START")))
+			patches[0] = d;
+		if (!nlump->getName().Cmp(_T("P_END")))
+			patches[1] = d;
+		if (!nlump->getName().Cmp(_T("PP_END")))
+			patches[1] = d;
+		if (!nlump->getName().Cmp(_T("F_START")))
+			flats[0] = d;
+		if (!nlump->getName().Cmp(_T("FF_START")))
+			flats[0] = d;
+		if (!nlump->getName().Cmp(_T("F_END")))
+			flats[1] = d;
+		if (!nlump->getName().Cmp(_T("FF_END")))
+			flats[1] = d;
+		if (!nlump->getName().Cmp(_T("S_START")))
+			sprites[0] = d;
+		if (!nlump->getName().Cmp(_T("SS_START")))
+			sprites[0] = d;
+		if (!nlump->getName().Cmp(_T("S_END")))
+			sprites[1] = d;
+		if (!nlump->getName().Cmp(_T("SS_END")))
+			sprites[1] = d;
+		if (!nlump->getName().Cmp(_T("TX_START")))
+			tx[0] = d;
+		if (!nlump->getName().Cmp(_T("TX_END")))
+			tx[1] = d;
+
 		// Add to entry list
 		entries.push_back(nlump);
 	}
+
+	// Detect all entry types (but unload entry data when done)
+	for (size_t a = 0; a < entries.size(); a++) {
+		ArchiveEntry* entry = entries[a];
+
+		// Read entry data if it isn't zero-sized
+		if (entry->getSize() > 0) {
+			// Seek to entry data
+			fseek(fp, getEntryOffset(entry), SEEK_SET);
+
+			// Read it in to the entry
+			BYTE* data = new BYTE[entry->getSize()];
+			fread(data, entry->getSize(), 1, fp);
+			entry->setData(data);
+			entry->setLoaded(true);
+		}
+
+		// Detect entry type
+		entry->detectType(true, true);
+
+		// Unload entry data
+		entry->unloadData();
+	}
+
+	// Detect maps (will detect map entry types)
+	detectMaps();
 
 	// Close the file
 	fclose(fp);
@@ -323,11 +380,9 @@ void WadArchive::setEntryOffset(ArchiveEntry* entry, DWORD offset) {
  * Returns true if successful, false otherwise
  *******************************************************************/
 bool WadArchive::loadEntryData(ArchiveEntry* entry) {
-	// Check that the lump belongs to this wadfile
-	if (entry->getParent() != this) {
-		wxLogMessage(_T("WadArchive::loadEntryData: Entry %s attempting to load data from wrong parent!"), entry->getName().c_str());
+	// Check the entry is valid and part of this archive
+	if (!checkEntry(entry))
 		return false;
-	}
 
 	// Do nothing if the lump's size is zero,
 	// or if it has already been loaded
@@ -501,6 +556,10 @@ vector<Archive::mapdesc_t> WadArchive::detectMaps() {
 		i++;
 	}
 
+	// Set all map header entries to ETYPE_MAP type
+	for (size_t a = 0; a < maps.size(); a++)
+		maps[a].head->setType(ETYPE_MAP);
+
 	return maps;
 }
 
@@ -649,12 +708,8 @@ bool WadArchive::swapEntries(ArchiveEntry* entry1, ArchiveEntry* entry2) {
  * name to 8 characters
  *******************************************************************/
 bool WadArchive::renameEntry(ArchiveEntry* entry, string new_name) {
-	// Check entry is valid
-	if (!entry)
-		return false;
-
-	// Check entry is part of this archive
-	if (entry->getParent() != this)
+	// Check the entry is valid and part of this archive
+	if (!checkEntry(entry))
 		return false;
 
 	// Truncate name to 8 characters if needed
@@ -666,5 +721,30 @@ bool WadArchive::renameEntry(ArchiveEntry* entry, string new_name) {
 }
 
 bool WadArchive::detectEntryType(ArchiveEntry* entry) {
+	// Check the entry is valid and part of this archive
+	if (!checkEntry(entry))
+		return false;
+
+	// Check if entry is within any markers
+	int index = entryIndex(entry);
+
+	// Patches
+	if (index > patches[0] && index < patches[1]) {
+		entry->setType(ETYPE_PATCH);
+		return true;
+	}
+
+	// Flats
+	if (index > flats[0] && index < flats[1]) {
+		entry->setType(ETYPE_FLAT);
+		return true;
+	}
+
+	// Sprites
+	if (index > sprites[0] && index < sprites[1]) {
+		entry->setType(ETYPE_SPRITE);
+		return true;
+	}
+
 	return true;
 }

@@ -8,6 +8,10 @@ class WadArchive : public Archive {
 private:
 	vector<ArchiveEntry*>	entries;
 	char					wad_type[4];
+	int						patches[2];
+	int						sprites[2];
+	int						flats[2];
+	int						tx[2];
 
 public:
 	WadArchive();
