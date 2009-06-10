@@ -233,8 +233,9 @@ bool ArchiveEntry::importMem(void* data, DWORD size) {
 
 	// Update attributes
 	this->size = size;
-	setState(1);
 	setLoaded();
+	setType(ETYPE_UNKNOWN);
+	setState(1);
 
 	return true;
 }
