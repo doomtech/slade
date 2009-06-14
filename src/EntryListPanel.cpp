@@ -28,13 +28,13 @@
  * INCLUDES
  *******************************************************************/
 #include "Main.h"
-#include <wx/imaglist.h>
 #include "WxStuff.h"
 #include "Archive.h"
 #include "EntryListPanel.h"
 #include "ArchiveEntry.h"
-#include <wx/filename.h>
 #include "ArchiveManager.h"
+#include <wx/imaglist.h>
+#include <wx/filename.h>
 
 
 /*******************************************************************
@@ -42,6 +42,8 @@
  *******************************************************************/
 wxColor col_new(0, 150, 0);
 wxColor col_modified(0, 80, 180);
+bool	col_size = true;
+bool	col_type = true;
 
 
 /* get_entry_icon
@@ -126,7 +128,7 @@ EntryList::EntryList(EntryListPanel *parent, int id)
 	image_list->Add(wxBitmap(get_entry_icon(_T("default.png"), wxBITMAP_TYPE_PNG)));
 	image_list->Add(wxBitmap(get_entry_icon(_T("wad.png"), wxBITMAP_TYPE_PNG)));
 	image_list->Add(wxBitmap(get_entry_icon(_T("folder.png"), wxBITMAP_TYPE_PNG)));
-	image_list->Add(wxBitmap(get_entry_icon(_T("up_folder.png"), wxBITMAP_TYPE_PNG)));
+	image_list->Add(wxBitmap(get_entry_icon(_T("upfolder.png"), wxBITMAP_TYPE_PNG)));
 	SetImageList(image_list, wxIMAGE_LIST_SMALL);
 }
 
@@ -173,16 +175,21 @@ bool EntryList::updateEntry(int index, bool update_colsize) {
 	}
 
 	// Size
-	li.SetText(s_fmt(_T("%d"), entry->getSize()));
-	li.SetColumn(1);
-	SetItem(li);
-	if (update_colsize) SetColumnWidth(1, wxLIST_AUTOSIZE);
+	if (col_size) {
+		//li.SetText(s_fmt(_T("%d"), entry->getSize()));
+		li.SetText(entry->getSizeString());
+		li.SetColumn(1);
+		SetItem(li);
+		if (update_colsize) SetColumnWidth(1, wxLIST_AUTOSIZE);
+	}
 
 	// Type
-	li.SetText(entry->getTypeString());
-	li.SetColumn(2);
-	SetItem(li);
-	if (update_colsize) SetColumnWidth(2, wxLIST_AUTOSIZE);
+	if (col_type) {
+		li.SetText(entry->getTypeString());
+		li.SetColumn(2);
+		SetItem(li);
+		if (update_colsize) SetColumnWidth(2, wxLIST_AUTOSIZE);
+	}
 
 	// Set default text colour
 	SetItemTextColour(index, wxSystemSettings::GetColour(wxSYS_COLOUR_LISTBOXTEXT));
@@ -249,10 +256,10 @@ void EntryListPanel::populateEntryList() {
 	entry_list->InsertColumn(0, _T("Name"));
 
 	// Create the "Size" column
-	entry_list->InsertColumn(1, _T("Size"));
+	if (col_size) entry_list->InsertColumn(1, _T("Size"));
 
 	// Create the "Type" column
-	entry_list->InsertColumn(2, _T("Type"));
+	if (col_type) entry_list->InsertColumn(2, _T("Type"));
 
 	// Go through all entries and add them to the list
 	for (int a = 0; a < archive->numEntries(); a++) {
@@ -267,8 +274,8 @@ void EntryListPanel::populateEntryList() {
 
 	// Setup column widths
 	entry_list->SetColumnWidth(0, wxLIST_AUTOSIZE);
-	entry_list->SetColumnWidth(1, wxLIST_AUTOSIZE);
-	entry_list->SetColumnWidth(2, wxLIST_AUTOSIZE);
+	if (col_size) entry_list->SetColumnWidth(1, wxLIST_AUTOSIZE);
+	if (col_type) entry_list->SetColumnWidth(2, wxLIST_AUTOSIZE);
 
 	// Add extra width to the name column in linux as wxLIST_AUTOSIZE seems to ignore listitem images on wxGTK
 	#ifndef _WIN32

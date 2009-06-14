@@ -712,3 +712,20 @@ string ArchiveEntry::getTypeString() {
 
 	return _T("Unknown");
 }
+
+string ArchiveEntry::getSizeString() {
+	if (size < 1024) {
+		// Bytes
+		return s_fmt(_T("%d"), size);
+	}
+	else if (size < 1024*1024) {
+		double kb = (double)size / 1024;
+		return s_fmt(_T("%1.2fkb"), kb);
+	}
+	else {
+		double mb = (double)size / (1024*1024);
+		return s_fmt(_T("%1.2fmb"), mb);
+	}
+
+	return _T("");
+}

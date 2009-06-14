@@ -42,6 +42,8 @@
  *******************************************************************/
 extern wxColor col_new;
 extern wxColor col_modified;
+extern bool col_size;
+extern bool col_type;
 
 
 /* ZipEntryListPanel::ZipEntryListPanel
@@ -114,16 +116,23 @@ void ZipEntryListPanel::updateDirectoryEntry(int index) {
 	else
 		dir = getCurrentDir()->subdirectories[index];
 
+	// If the entry is the 'up directory' entry, set it's icon to
+	// the 'up directory' icon
+	if (dir == getCurrentDir()->parent_dir)
+		entry_list->SetItemImage(index, ETYPE_FOLDER + 1);
+
 	// Set it's size column manually
-	wxListItem li;
-	li.SetId(index);
-	li.SetColumn(1);
-	int entry_count = dir->numEntries(false) + dir->numSubDirs(false);
-	if (entry_count == 1)
-		li.SetText(_T("1 Entry"));
-	else
-		li.SetText(s_fmt(_T("%d Entries"), entry_count));
-	entry_list->SetItem(li);
+	if (col_size) {
+		wxListItem li;
+		li.SetId(index);
+		li.SetColumn(1);
+		int entry_count = dir->numEntries(false) + dir->numSubDirs(false);
+		if (entry_count == 1)
+			li.SetText(_T("1 Entry"));
+		else
+			li.SetText(s_fmt(_T("%d Entries"), entry_count));
+		entry_list->SetItem(li);
+	}
 }
 
 /* ZipEntryListPanel::getSelectedDirectories
@@ -184,10 +193,10 @@ void ZipEntryListPanel::populateEntryList() {
 	entry_list->InsertColumn(0, _T("Name"));
 
 	// Create the "Size" column
-	entry_list->InsertColumn(1, _T("Size"));
+	if (col_size) entry_list->InsertColumn(1, _T("Size"));
 
 	// Create the "Type" column
-	entry_list->InsertColumn(2, _T("Type"));
+	if (col_type) entry_list->InsertColumn(2, _T("Type"));
 
 	// Get current directory
 	zipdir_t* dir = getCurrentDir();
@@ -245,8 +254,8 @@ void ZipEntryListPanel::populateEntryList() {
 
 	// Setup column widths
 	entry_list->SetColumnWidth(0, wxLIST_AUTOSIZE);
-	entry_list->SetColumnWidth(1, wxLIST_AUTOSIZE);
-	entry_list->SetColumnWidth(2, wxLIST_AUTOSIZE);
+	if (col_size) entry_list->SetColumnWidth(1, wxLIST_AUTOSIZE);
+	if (col_type) entry_list->SetColumnWidth(2, wxLIST_AUTOSIZE);
 
 	// Add extra width to the name column in linux as wxLIST_AUTOSIZE seems to ignore listitem images on wxGTK
 	#ifndef _WIN32

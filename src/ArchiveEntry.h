@@ -112,6 +112,9 @@ public:
 	void	detectType(bool data_check, bool force = false);
 	string	getTypeString();
 
+	// Misc
+	string	getSizeString();
+
 	// Extra properties stuff
 	bool	hasExProp(string key);
 	string	getExProp(string key);
