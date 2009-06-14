@@ -91,8 +91,8 @@ void Archive::entryModified(ArchiveEntry* entry) {
 	// Get the entry index and announce the change
 	MemChunk mc;
 	wxUIntPtr ptr = wxPtrToUInt(entry);
-	DWORD index = entryIndex(entry);
-	mc.write(&index, sizeof(DWORD));
+	uint32_t index = entryIndex(entry);
+	mc.write(&index, sizeof(uint32_t));
 	mc.write(&ptr, sizeof(wxUIntPtr));
 	announce(_T("entry_modified"), mc);
 }

@@ -149,7 +149,7 @@ Archive* ArchiveManager::openArchive(string filename) {
  * list of open archives. Returns the created archive, or NULL if an
  * invalid archive type was given
  *******************************************************************/
-Archive* ArchiveManager::newArchive(BYTE type) {
+Archive* ArchiveManager::newArchive(uint8_t type) {
 	// Init variables
 	Archive* new_archive = NULL;
 	string format_str = _T("");

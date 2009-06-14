@@ -62,11 +62,11 @@ class ArchiveEntry : public Announcer {
 private:
 	Archive*		parent;
 	string			name;
-	BYTE*			data;
-	DWORD			size;
+	uint8_t*		data;
+	uint32_t		size;
 	bool			data_loaded;
-	BYTE			type;
-	BYTE			state;		// 0 = unmodified, 1 = modified, 2 = newly created
+	uint8_t			type;
+	uint8_t			state;		// 0 = unmodified, 1 = modified, 2 = newly created
 	PropertyList	ex_props;
 
 public:
@@ -77,20 +77,20 @@ public:
 	// Accessors
 	Archive*	getParent() { return parent; }
 	string		getName() { return name; }
-	DWORD		getSize() { return size; }
-	BYTE*		getData(bool allow_load = true);
+	uint32_t	getSize() { return size; }
+	uint8_t*	getData(bool allow_load = true);
 	bool		isLoaded() { return data_loaded; }
-	BYTE		getType() { return type; }
-	BYTE		getState() { return state; }
+	uint8_t		getType() { return type; }
+	uint8_t		getState() { return state; }
 
 	// Modifiers (won't change entry state)
 	void		setParent(Archive* parent) { this->parent = parent; }
 	void		setName(string name) { this->name = name; }
 	void		setLoaded(bool loaded = true) { data_loaded = loaded; }
-	void		setSize(DWORD size) { this->size = size; }
-	void		setData(BYTE* data) { this->data = data; }
-	void		setType(BYTE type) { this->type = type; }
-	void		setState(BYTE state);
+	void		setSize(uint32_t size) { this->size = size; }
+	void		setData(uint8_t* data) { this->data = data; }
+	void		setType(uint8_t type) { this->type = type; }
+	void		setState(uint8_t state);
 	void		unloadData();
 
 	// Entry modification (will change entry state)
@@ -100,9 +100,9 @@ public:
 	void	clearData();
 
 	// Data import
-	bool	importMem(void* data, DWORD size);
+	bool	importMem(void* data, uint32_t size);
 	bool	importMemChunk(MemChunk& mc);
-	bool	importFile(string filename, DWORD offset = 0, DWORD size = 0);
+	bool	importFile(string filename, uint32_t offset = 0, uint32_t size = 0);
 	bool	importEntry(ArchiveEntry* entry);
 
 	// Data export

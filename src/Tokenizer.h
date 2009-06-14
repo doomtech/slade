@@ -4,20 +4,20 @@
 
 class Tokenizer {
 private:
-	char*	current;	// Current position
-	char*	start;		// Start of text
-	DWORD	size;		// Size of text
-	DWORD	position;	// Current position
-	bool	ccomments;	// If true C comments are skipped (// and /* */)
-	bool	hcomments;	// If true hash comments are skipped (##)
+	char*		current;	// Current position
+	char*		start;		// Start of text
+	uint32_t	size;		// Size of text
+	uint32_t	position;	// Current position
+	bool		ccomments;	// If true C comments are skipped (// and /* */)
+	bool		hcomments;	// If true hash comments are skipped (##)
 
 public:
 	Tokenizer(bool c_comments = true, bool h_comments = true);
 	~Tokenizer();
 
-	bool openFile(string filename, DWORD offset = 0, DWORD length = 0);
-	bool openString(string text, DWORD offset = 0, DWORD length = 0);
-	bool openMem(char* mem, DWORD length);
+	bool openFile(string filename, uint32_t offset = 0, uint32_t length = 0);
+	bool openString(string text, uint32_t offset = 0, uint32_t length = 0);
+	bool openMem(char* mem, uint32_t length);
 	bool isWhitespace(char p);
 	bool incrementCurrent();
 	void skipLineComment();

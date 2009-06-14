@@ -18,7 +18,7 @@ public:
 	~WadArchive();
 
 	int				entryIndex(ArchiveEntry* entry);
-	ArchiveEntry*	getEntry(DWORD index);
+	ArchiveEntry*	getEntry(uint32_t index);
 	ArchiveEntry*	getEntry(string name);
 	string			getFileExtensionString();
 
@@ -26,14 +26,14 @@ public:
 	bool	save(string filename = _T(""));
 	void	close();
 
-	DWORD	getEntryOffset(ArchiveEntry* entry);
-	void	setEntryOffset(ArchiveEntry* entry, DWORD offset);
-	bool	loadEntryData(ArchiveEntry* entry);
-	DWORD	numEntries();
+	uint32_t	getEntryOffset(ArchiveEntry* entry);
+	void		setEntryOffset(ArchiveEntry* entry, uint32_t offset);
+	bool		loadEntryData(ArchiveEntry* entry);
+	uint32_t	numEntries();
 
-	bool			addEntry(ArchiveEntry* entry, DWORD position = 0);
-	ArchiveEntry*	addNewEntry(string name = _T(""), DWORD position = 0);
-	ArchiveEntry*	addExistingEntry(ArchiveEntry* entry, DWORD position = 0, bool copy = false);
+	bool			addEntry(ArchiveEntry* entry, uint32_t position = 0);
+	ArchiveEntry*	addNewEntry(string name = _T(""), uint32_t position = 0);
+	ArchiveEntry*	addExistingEntry(ArchiveEntry* entry, uint32_t position = 0, bool copy = false);
 	bool			removeEntry(ArchiveEntry* entry, bool delete_entry = true);
 
 	bool	swapEntries(ArchiveEntry* entry1, ArchiveEntry* entry2);

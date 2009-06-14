@@ -2,9 +2,9 @@
 #include "Main.h"
 #include "SImage.h"
 
-#undef DWORD
-#undef WORD
-#undef BYTE
+#undef uint32_t
+#undef uint16_t
+#undef uint8_t
 #include "FreeImage.h"
 
 SImage::SImage() {

@@ -21,8 +21,8 @@ struct zipdir_t {
 	zipdir_t*		getSubDir(string name);
 	int				dirIndex(zipdir_t* dir);
 	string			getFullPath();
-	DWORD			numEntries(bool include_subdirs = false);
-	DWORD			numSubDirs(bool include_subdirs = false);
+	uint32_t		numEntries(bool include_subdirs = false);
+	uint32_t		numSubDirs(bool include_subdirs = false);
 };
 
 class ZipArchive : public Archive {
@@ -34,20 +34,20 @@ public:
 	~ZipArchive();
 
 	int				entryIndex(ArchiveEntry* entry);
-	ArchiveEntry*	getEntry(DWORD index);
+	ArchiveEntry*	getEntry(uint32_t index);
 	ArchiveEntry*	getEntry(string name);
 	string			getFileExtensionString();
 
-	bool	openFile(string filename);
-	bool	save(string filename = _T(""));
-	bool	loadEntryData(ArchiveEntry* entry);
-	DWORD	numEntries();
-	void	close();
+	bool		openFile(string filename);
+	bool		save(string filename = _T(""));
+	bool		loadEntryData(ArchiveEntry* entry);
+	uint32_t	numEntries();
+	void		close();
 
 	// Entry addition/removal
-	bool			addEntry(ArchiveEntry* entry, DWORD position = 0);
-	ArchiveEntry*	addNewEntry(string name = _T(""), DWORD position = 0);
-	ArchiveEntry*	addExistingEntry(ArchiveEntry* entry, DWORD position = 0, bool copy = false);
+	bool			addEntry(ArchiveEntry* entry, uint32_t position = 0);
+	ArchiveEntry*	addNewEntry(string name = _T(""), uint32_t position = 0);
+	ArchiveEntry*	addExistingEntry(ArchiveEntry* entry, uint32_t position = 0, bool copy = false);
 	bool			removeEntry(ArchiveEntry* entry, bool delete_entry = true);
 
 	// Entry moving

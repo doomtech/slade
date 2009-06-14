@@ -55,7 +55,7 @@ Tokenizer::~Tokenizer() {
 /* Tokenizer::openFile
  * Reads a portion of a file to the Tokenizer
  *******************************************************************/
-bool Tokenizer::openFile(string filename, DWORD offset, DWORD length) {
+bool Tokenizer::openFile(string filename, uint32_t offset, uint32_t length) {
 	// Open the file
 	FILE *fp = fopen(chr(filename), "rb");
 
@@ -65,9 +65,9 @@ bool Tokenizer::openFile(string filename, DWORD offset, DWORD length) {
 	}
 
 	// Get file length
-	DWORD flen = 0;
+	uint32_t flen = 0;
 	fseek(fp, 0, SEEK_END);
-	flen = (DWORD) ftell(fp);
+	flen = (uint32_t) ftell(fp);
 	fseek(fp, 0, SEEK_SET);
 
 	// If length isn't specified or exceeds the file length,
@@ -91,11 +91,11 @@ bool Tokenizer::openFile(string filename, DWORD offset, DWORD length) {
 /* Tokenizer::openString
  * Reads a portion of a string to the Tokenizer
  *******************************************************************/
-bool Tokenizer::openString(string text, DWORD offset, DWORD length) {
+bool Tokenizer::openString(string text, uint32_t offset, uint32_t length) {
 	// If length isn't specified or exceeds the string's length,
 	// only copy to the end of the string
-	if (offset + length > (DWORD) text.length() || length == 0)
-		length = (DWORD) text.length() - offset;
+	if (offset + length > (uint32_t) text.length() || length == 0)
+		length = (uint32_t) text.length() - offset;
 
 	// Setup variables & allocate memory
 	size = length;
@@ -111,7 +111,7 @@ bool Tokenizer::openString(string text, DWORD offset, DWORD length) {
 /* Tokenizer::openMem
  * Reads a chunk of memory to the Tokenizer
  *******************************************************************/
-bool Tokenizer::openMem(char* mem, DWORD length) {
+bool Tokenizer::openMem(char* mem, uint32_t length) {
 	// Length must be specified
 	if (length == 0) {
 		wxLogMessage(_T("Tokenizer::openMem: length not specified"));
@@ -270,7 +270,7 @@ string Tokenizer::getToken() {
 string Tokenizer::peekToken() {
 	// Backup current position
 	char* c = current;
-	DWORD p = position;
+	uint32_t p = position;
 
 	// Read the next token
 	string token = getToken();

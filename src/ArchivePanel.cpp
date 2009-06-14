@@ -388,11 +388,11 @@ void ArchivePanel::onAnnouncement(Announcer* announcer, string event_name, MemCh
 
 	// An entry was added to the archive
 	if (announcer == archive && event_name == _T("entry_added")) {
-		DWORD index = 0;
+		uint32_t index = 0;
 		wxUIntPtr e = 0;
 
 		// Check all event data is there
-		if (!event_data.read(&index, sizeof(DWORD)) || !event_data.read(&e, sizeof(wxUIntPtr)))
+		if (!event_data.read(&index, sizeof(uint32_t)) || !event_data.read(&e, sizeof(wxUIntPtr)))
 			return;
 
 		// Send to entry list to handle
@@ -401,11 +401,11 @@ void ArchivePanel::onAnnouncement(Announcer* announcer, string event_name, MemCh
 
 	// An entry in the archive was modified
 	if (announcer == archive && event_name == _T("entry_modified")) {
-		DWORD index = 0;
+		uint32_t index = 0;
 		wxUIntPtr e = 0;
 
 		// Check all event data is there
-		if (!event_data.read(&index, sizeof(DWORD)) || !event_data.read(&e, sizeof(wxUIntPtr)))
+		if (!event_data.read(&index, sizeof(uint32_t)) || !event_data.read(&e, sizeof(wxUIntPtr)))
 			return;
 
 		// Send to entry list to handle
@@ -414,11 +414,11 @@ void ArchivePanel::onAnnouncement(Announcer* announcer, string event_name, MemCh
 
 	// An entry in the archive was removed
 	if (announcer == archive && event_name == _T("entry_removed")) {
-		DWORD index = 0;
+		uint32_t index = 0;
 		wxUIntPtr e = 0;
 
 		// Check all event data is there
-		if (!event_data.read(&index, sizeof(DWORD)) || !event_data.read(&e, sizeof(wxUIntPtr)))
+		if (!event_data.read(&index, sizeof(uint32_t)) || !event_data.read(&e, sizeof(wxUIntPtr)))
 			return;
 
 		// Send to entry list to handle

@@ -4,9 +4,6 @@
 
 #undef min
 #undef max
-#undef DWORD
-#undef WORD
-#undef BYTE
 
 #include "wx/wxprec.h"
 

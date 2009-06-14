@@ -17,11 +17,6 @@ using std::vector;
 // Logfile
 #include <wx/log.h>
 
-// Define some variable types
-#define DWORD unsigned long
-#define WORD unsigned short
-#define BYTE unsigned char
-
 // Global internal includes
 #include "MemChunk.h"
 

@@ -36,14 +36,14 @@
 /* MemChunk::MemChunk
  * MemChunk class constructor
  *******************************************************************/
-MemChunk::MemChunk(DWORD size) {
+MemChunk::MemChunk(uint32_t size) {
 	// Init variables
 	this->size = size;
 	this->cur_ptr = 0;
 
 	// If a size is specified, allocate that much memory
 	if (size)
-		data = new BYTE[size];
+		data = new uint8_t[size];
 	else
 		data = NULL;
 }
@@ -86,7 +86,7 @@ bool MemChunk::clear() {
  * Resizes the memory chunk, preserving existing data if specified
  * Returns false if new size is invalid, true otherwise
  *******************************************************************/
-bool MemChunk::reSize(DWORD new_size, bool preserve_data) {
+bool MemChunk::reSize(uint32_t new_size, bool preserve_data) {
 	// Check for invalid new size
 	if (new_size == 0) {
 		wxLogMessage(_T("MemChunk::reSize: new_size cannot be 0"));
@@ -94,12 +94,12 @@ bool MemChunk::reSize(DWORD new_size, bool preserve_data) {
 	}
 
 	// Allocate new chunk
-	BYTE* new_data = new BYTE[new_size];
+	uint8_t* new_data = new uint8_t[new_size];
 
 	// Copy existing data to new chunk if needed & current data exists
 	if (preserve_data && hasData()) {
 		// Determine size of data to copy
-		DWORD copy_size = new_size;
+		uint32_t copy_size = new_size;
 		if (copy_size > size)
 			copy_size = size;
 
@@ -121,7 +121,7 @@ bool MemChunk::reSize(DWORD new_size, bool preserve_data) {
  * Loads a file (or part of it) into the MemChunk
  * Returns false if file couldn't be opened, true otherwise
  *******************************************************************/
-bool MemChunk::loadFile(string filename, DWORD offset, DWORD len) {
+bool MemChunk::loadFile(string filename, uint32_t offset, uint32_t len) {
 	// Open the file
 	FILE *fp = fopen(chr(filename), "rb");
 
@@ -135,9 +135,9 @@ bool MemChunk::loadFile(string filename, DWORD offset, DWORD len) {
 	clear();
 
 	// Get file length
-	DWORD flen = 0;
+	uint32_t flen = 0;
 	fseek(fp, 0, SEEK_END);
-	flen = (DWORD) ftell(fp);
+	flen = (uint32_t) ftell(fp);
 	fseek(fp, 0, SEEK_SET);
 
 	// If length isn't specified or exceeds the file length,
@@ -147,7 +147,7 @@ bool MemChunk::loadFile(string filename, DWORD offset, DWORD len) {
 
 	// Setup variables & allocate memory
 	size = len;
-	data = new BYTE[size];
+	data = new uint8_t[size];
 
 	// Read the file
 	fseek(fp, offset, SEEK_SET);
@@ -161,7 +161,7 @@ bool MemChunk::loadFile(string filename, DWORD offset, DWORD len) {
  * Loads a chunk of memory into the MemChunk
  * Returns false if size or data pointer is invalid, true otherwise
  *******************************************************************/
-bool MemChunk::loadMem(BYTE* start, DWORD len) {
+bool MemChunk::loadMem(uint8_t* start, uint32_t len) {
 	// Check that length & data to be loaded are valid
 	if (len == 0 || !start) {
 		wxLogMessage(_T("MemChunk::loadMem: Invalid data and/or length"));
@@ -173,7 +173,7 @@ bool MemChunk::loadMem(BYTE* start, DWORD len) {
 
 	// Setup variables & allocate memory
 	size = len;
-	data = new BYTE[size];
+	data = new uint8_t[size];
 
 	// Read the memory
 	memcpy(data, start, size);
@@ -181,7 +181,7 @@ bool MemChunk::loadMem(BYTE* start, DWORD len) {
 	return true;
 }
 
-bool MemChunk::write(void* data, DWORD size) {
+bool MemChunk::write(void* data, uint32_t size) {
 	if (cur_ptr + size > this->size)
 		reSize(cur_ptr + size, true);
 	memcpy(this->data + cur_ptr, data, size);
@@ -189,7 +189,7 @@ bool MemChunk::write(void* data, DWORD size) {
 	return true;
 }
 
-bool MemChunk::read(void* buf, DWORD size) {
+bool MemChunk::read(void* buf, uint32_t size) {
 	if (cur_ptr + size > this->size)
 		return false;
 
@@ -199,7 +199,7 @@ bool MemChunk::read(void* buf, DWORD size) {
 	return true;
 }
 
-bool MemChunk::seek(DWORD offset, DWORD start) {
+bool MemChunk::seek(uint32_t offset, uint32_t start) {
 	if (start == SEEK_CUR) {
 		cur_ptr += offset;
 		if (cur_ptr > size)

@@ -70,11 +70,11 @@ ArchiveEntry::ArchiveEntry(ArchiveEntry& copy) {
 	data_loaded = true;
 
 	// Get the data to copy
-	BYTE* copy_data = copy.getData(true);
+	uint8_t* copy_data = copy.getData(true);
 
 	if (copy_data) {
 		// Allocate memory and copy the data
-		data = new BYTE[size];
+		data = new uint8_t[size];
 		memcpy(data, copy_data, size);
 	} else {
 		// If we didn't get any data to copy for some reason, print an error
@@ -102,7 +102,7 @@ ArchiveEntry::~ArchiveEntry() {
  * allow_load is true, entry data will be loaded from it's parent
  * archive (if it exists)
  *******************************************************************/
-BYTE* ArchiveEntry::getData(bool allow_load) {
+uint8_t* ArchiveEntry::getData(bool allow_load) {
 	// Load the data if needed (and possible)
 	if (allow_load && !isLoaded() && parent) {
 		data_loaded = parent->loadEntryData(this);
@@ -163,7 +163,7 @@ bool ArchiveEntry::removeExProp(string key) {
  * Sets the entry's state. If the state is already 'new' and we try
  * to set it to 'modified' then don't change the state
  *******************************************************************/
-void ArchiveEntry::setState(BYTE state) {
+void ArchiveEntry::setState(uint8_t state) {
 	if (state == 0)
 		this->state = 0;
 	else {
@@ -219,7 +219,7 @@ void ArchiveEntry::clearData() {
  * any currently existing data.
  * Returns false if data pointer is invalid, true otherwise
  *******************************************************************/
-bool ArchiveEntry::importMem(void* data, DWORD size) {
+bool ArchiveEntry::importMem(void* data, uint32_t size) {
 	// Check parameters
 	if (!data)
 		return false;
@@ -228,7 +228,7 @@ bool ArchiveEntry::importMem(void* data, DWORD size) {
 	clearData();
 
 	// Copy data into the entry
-	this->data = new BYTE[size];
+	this->data = new uint8_t[size];
 	memcpy(this->data, data, size);
 
 	// Update attributes
@@ -262,7 +262,7 @@ bool ArchiveEntry::importMemChunk(MemChunk& mc) {
  * Returns false if the file does not exist or the given offset/size
  * are out of bounds, otherwise returns true.
  *******************************************************************/
-bool ArchiveEntry::importFile(string filename, DWORD offset, DWORD size) {
+bool ArchiveEntry::importFile(string filename, uint32_t offset, uint32_t size) {
 	// Open the file
 	FILE* fp = fopen(filename.ToAscii(), "rb");
 
@@ -274,7 +274,7 @@ bool ArchiveEntry::importFile(string filename, DWORD offset, DWORD size) {
 
 	// Get the file's size
 	fseek(fp, 0, SEEK_END);
-	DWORD fsize = ftell(fp);
+	uint32_t fsize = ftell(fp);
 
 	// Get the size to read, if zero
 	if (size == 0)
@@ -287,7 +287,7 @@ bool ArchiveEntry::importFile(string filename, DWORD offset, DWORD size) {
 	}
 
 	// Create temporary buffer and load file contents
-	BYTE* temp_buf = new BYTE[size];
+	uint8_t* temp_buf = new uint8_t[size];
 	fseek(fp, 0, SEEK_SET);
 	fseek(fp, offset, SEEK_CUR);
 	fread(temp_buf, 1, size, fp);
@@ -614,7 +614,7 @@ void ArchiveEntry::detectType(bool data_check, bool force) {
 
 	// Doom Sound
 	if (size > 8) {
-		if ((WORD)data[0] == 3 && (WORD)data[6] == 0 && (WORD)data[4] <= size - 8) {
+		if ((uint16_t)data[0] == 3 && (uint16_t)data[6] == 0 && (uint16_t)data[4] <= size - 8) {
 			type = ETYPE_SOUND;
 
 			if (name.Left(2) == _T("DS"))
@@ -637,7 +637,7 @@ void ArchiveEntry::detectType(bool data_check, bool force) {
 			header->width > 0 && header->width < 4096 &&
 			header->top > -2000 && header->top < 2000 &&
 			header->left > -2000 && header->left < 2000) {
-			long *col_offsets = (long *)((BYTE *)data + sizeof(patch_header_t));
+			long *col_offsets = (long *)((uint8_t *)data + sizeof(patch_header_t));
 
 			if (size < sizeof(patch_header_t) + (header->width * sizeof(long))) {
 				//wxLogMessage("lump %s not a patch, col_offsets error 1", lump->Name().c_str());
@@ -715,7 +715,7 @@ string ArchiveEntry::getTypeString() {
 
 string ArchiveEntry::getSizeString() {
 	if (size < 1024) {
-		// Bytes
+		// uint8_ts
 		return s_fmt(_T("%d"), size);
 	}
 	else if (size < 1024*1024) {

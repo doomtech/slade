@@ -4,9 +4,9 @@
 
 class SImage {
 private:
-	int		width;
-	int		height;
-	BYTE*	data;
+	int			width;
+	int			height;
+	uint8_t*	data;
 
 public:
 	SImage();

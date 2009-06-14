@@ -95,7 +95,7 @@ int WadArchive::entryIndex(ArchiveEntry* entry) {
  * Returns the entry at the index specified,
  * or NULL if the index is invalid
  *******************************************************************/
-ArchiveEntry* WadArchive::getEntry(DWORD index) {
+ArchiveEntry* WadArchive::getEntry(uint32_t index) {
 	// Check index
 	if (index >= entries.size())
 		return NULL;
@@ -145,13 +145,13 @@ bool WadArchive::openFile(string filename) {
 	fseek(fp, 0, SEEK_SET);
 
 	// Read wad header
-	DWORD num_lumps = 0;
-	DWORD dir_offset = 0;
+	uint32_t num_lumps = 0;
+	uint32_t dir_offset = 0;
 	fread(&wad_type, 1, 4, fp);		// Wad type
 	fread(&num_lumps, 4, 1, fp);	// No. of lumps in wad
 	fread(&dir_offset, 4, 1, fp);	// Offset to directory
 
-	// Byteswap values for big endian if needed
+	// uint8_tswap values for big endian if needed
 	num_lumps = wxINT32_SWAP_ON_BE(num_lumps);
 	dir_offset = wxINT32_SWAP_ON_BE(dir_offset);
 
@@ -165,24 +165,24 @@ bool WadArchive::openFile(string filename) {
 
 	// Read the directory
 	fseek(fp, dir_offset, SEEK_SET);
-	for (DWORD d = 0; d < num_lumps; d++) {
+	for (uint32_t d = 0; d < num_lumps; d++) {
 		// Read lump info
 		char name[9] = "";
-		DWORD offset = 0;
-		DWORD size = 0;
+		uint32_t offset = 0;
+		uint32_t size = 0;
 
 		fread(&offset, 4, 1, fp);	// Offset
 		fread(&size, 4, 1, fp);		// Size
 		fread(name, 1, 8, fp);		// Name
 		name[8] = '\0';
 
-		// Byteswap values for big endian if needed
+		// uint8_tswap values for big endian if needed
 		offset = wxINT32_SWAP_ON_BE(offset);
 		size = wxINT32_SWAP_ON_BE(size);
 
 		// If the lump data goes past the end of the file,
 		// the wadfile is invalid
-		if (offset + size > (DWORD)filesize) {
+		if (offset + size > (uint32_t)filesize) {
 			wxLogMessage(_T("WadArchive::openFile: File %s is invalid or corrupt"), filename.c_str());
 			Global::error = _T("File is invalid and/or corrupt");
 			fclose(fp);
@@ -240,7 +240,7 @@ bool WadArchive::openFile(string filename) {
 			fseek(fp, getEntryOffset(entry), SEEK_SET);
 
 			// Read it in to the entry
-			BYTE* data = new BYTE[entry->getSize()];
+			uint8_t* data = new uint8_t[entry->getSize()];
 			fread(data, entry->getSize(), 1, fp);
 			entry->setData(data);
 			entry->setLoaded(true);
@@ -291,7 +291,7 @@ bool WadArchive::save(string filename) {
 
 	// Determine directory offset & individual lump offsets
 	long dir_offset = 12;
-	for (DWORD l = 0; l < numEntries(); l++) {
+	for (uint32_t l = 0; l < numEntries(); l++) {
 		setEntryOffset(entries[l], dir_offset);
 		dir_offset += entries[l]->getSize();
 	}
@@ -310,11 +310,11 @@ bool WadArchive::save(string filename) {
 	fwrite(&dir_offset, 4, 1, fp);
 
 	// Write the lumps
-	for (DWORD l = 0; l < num_lumps; l++)
+	for (uint32_t l = 0; l < num_lumps; l++)
 		fwrite(entries[l]->getData(), entries[l]->getSize(), 1, fp);
 
 	// Write the directory
-	for (DWORD l = 0; l < num_lumps; l++) {
+	for (uint32_t l = 0; l < num_lumps; l++) {
 		char name[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 		long offset = getEntryOffset(entries[l]);
 		long size = entries[l]->getSize();
@@ -360,9 +360,9 @@ void WadArchive::close() {
  * Gets a lump entry's offset
  * Returns the lump entry's offset, or zero if it doesn't exist
  *******************************************************************/
-DWORD WadArchive::getEntryOffset(ArchiveEntry* entry) {
+uint32_t WadArchive::getEntryOffset(ArchiveEntry* entry) {
 	if (entry->hasExProp(_T("Offset"))) {
-		return (DWORD)atoi(chr(entry->getExProp(_T("Offset"))));
+		return (uint32_t)atoi(chr(entry->getExProp(_T("Offset"))));
 	}
 	else
 		return 0;
@@ -371,7 +371,7 @@ DWORD WadArchive::getEntryOffset(ArchiveEntry* entry) {
 /* WadArchive::setEntryOffset
  * Sets a lump entry's offset
  *******************************************************************/
-void WadArchive::setEntryOffset(ArchiveEntry* entry, DWORD offset) {
+void WadArchive::setEntryOffset(ArchiveEntry* entry, uint32_t offset) {
 	entry->setExProp(_T("Offset"), s_fmt(_T("%d"), offset));
 }
 
@@ -401,7 +401,7 @@ bool WadArchive::loadEntryData(ArchiveEntry* entry) {
 	}
 
 	// Allocate memory for lump data
-	BYTE* data = new BYTE[entry->getSize()];
+	uint8_t* data = new uint8_t[entry->getSize()];
 
 	// Seek to lump offset in file and read it in
 	fseek(fp, getEntryOffset(entry), SEEK_SET);
@@ -422,7 +422,7 @@ bool WadArchive::loadEntryData(ArchiveEntry* entry) {
 /* WadArchive::numEntries
  * Returns the number of entries in the archive
  *******************************************************************/
-DWORD WadArchive::numEntries() {
+uint32_t WadArchive::numEntries() {
 	return entries.size();
 }
 
@@ -479,7 +479,7 @@ vector<Archive::mapdesc_t> WadArchive::detectMaps() {
 		// Doom/Hexen format map check **************************************************
 
 		// Array to keep track of what doom/hexen map lumps have been found
-		BYTE existing_map_lumps[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		uint8_t existing_map_lumps[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 		// Check if the current lump is a doom/hexen map lump
 		bool maplump_found = false;
@@ -570,7 +570,7 @@ vector<Archive::mapdesc_t> WadArchive::detectMaps() {
  * name as an extra property of the entry. Returns false if the given
  * entry was invalid, true otherwise
  *******************************************************************/
-bool WadArchive::addEntry(ArchiveEntry* entry, DWORD position) {
+bool WadArchive::addEntry(ArchiveEntry* entry, uint32_t position) {
 	// Check valid entry
 	if (!entry)
 		return false;
@@ -603,7 +603,7 @@ bool WadArchive::addEntry(ArchiveEntry* entry, DWORD position) {
 	// Announce
 	MemChunk mc;
 	wxUIntPtr ptr = wxPtrToUInt(entry);
-	mc.write(&position, sizeof(DWORD));
+	mc.write(&position, sizeof(uint32_t));
 	mc.write(&ptr, sizeof(wxUIntPtr));
 	announce(_T("entry_added"), mc);
 
@@ -614,7 +614,7 @@ bool WadArchive::addEntry(ArchiveEntry* entry, DWORD position) {
  * Creates a new ArchiveEntry and adds it to the archive before the
  * position specified. Returns the created entry
  *******************************************************************/
-ArchiveEntry* WadArchive::addNewEntry(string name, DWORD position) {
+ArchiveEntry* WadArchive::addNewEntry(string name, uint32_t position) {
 	// Create the new entry
 	ArchiveEntry* new_entry = new ArchiveEntry(name);
 
@@ -629,7 +629,7 @@ ArchiveEntry* WadArchive::addNewEntry(string name, DWORD position) {
  * Adds an existing ArchiveEntry to the archive before the position
  * specified. Returns the added archive entry
  *******************************************************************/
-ArchiveEntry* WadArchive::addExistingEntry(ArchiveEntry* entry, DWORD position, bool copy) {
+ArchiveEntry* WadArchive::addExistingEntry(ArchiveEntry* entry, uint32_t position, bool copy) {
 	// Make a copy of the entry to add if needed
 	if (copy)
 		entry = new ArchiveEntry(*entry);

@@ -291,7 +291,7 @@ bool ZipEntryListPanel::swapItems(int item1, int item2, ArchiveEntry* e1, Archiv
  * entry is in a *new* subdirectory of the current directory then
  * a new subdirectory entry is added, otherwise it does nothing
  *******************************************************************/
-bool ZipEntryListPanel::addEntry(DWORD archive_index, ArchiveEntry* e) {
+bool ZipEntryListPanel::addEntry(uint32_t archive_index, ArchiveEntry* e) {
 	// Get the current directory
 	zipdir_t* cdir = (zipdir_t*)cur_directory;
 
@@ -334,7 +334,7 @@ bool ZipEntryListPanel::addEntry(DWORD archive_index, ArchiveEntry* e) {
 /* ZipEntryListPanel::updateEntry
  * Updates an entry in the list, if it is in the current directory
  *******************************************************************/
-bool ZipEntryListPanel::updateEntry(DWORD archive_index, ArchiveEntry* e) {
+bool ZipEntryListPanel::updateEntry(uint32_t archive_index, ArchiveEntry* e) {
 	// Get the current directory
 	zipdir_t* cdir = (zipdir_t*)cur_directory;
 
@@ -351,7 +351,7 @@ bool ZipEntryListPanel::updateEntry(DWORD archive_index, ArchiveEntry* e) {
 /* ZipEntryListPanel::removeEntry
  * Removes an entry from the list if it is in the current directory
  *******************************************************************/
-bool ZipEntryListPanel::removeEntry(DWORD archive_index, ArchiveEntry* e) {
+bool ZipEntryListPanel::removeEntry(uint32_t archive_index, ArchiveEntry* e) {
 	// Get the current directory
 	zipdir_t* cdir = (zipdir_t*)cur_directory;
 

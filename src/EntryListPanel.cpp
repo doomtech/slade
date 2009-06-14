@@ -440,7 +440,7 @@ bool EntryListPanel::swapItems(int item1, int item2, ArchiveEntry* e1, ArchiveEn
 /* EntryListPanel::addEntry
  * Adds an entry to the list
  *******************************************************************/
-bool EntryListPanel::addEntry(DWORD archive_index, ArchiveEntry* e) {
+bool EntryListPanel::addEntry(uint32_t archive_index, ArchiveEntry* e) {
 	// Get the entry to add
 	ArchiveEntry* entry = archive->getEntry(archive_index);
 
@@ -463,7 +463,7 @@ bool EntryListPanel::addEntry(DWORD archive_index, ArchiveEntry* e) {
 /* EntryListPanel::updateEntry
  * Updates an entry in the list
  *******************************************************************/
-bool EntryListPanel::updateEntry(DWORD archive_index, ArchiveEntry* e) {
+bool EntryListPanel::updateEntry(uint32_t archive_index, ArchiveEntry* e) {
 	// Just update the list item corresponding with the entry index
 	// (it's 1-1 in a normal EntryListPanel, will be different for zip archives)
 	entry_list->updateEntry(archive_index);
@@ -472,7 +472,7 @@ bool EntryListPanel::updateEntry(DWORD archive_index, ArchiveEntry* e) {
 /* EntryListPanel::removeEntry
  * Removes an entry from the list
  *******************************************************************/
-bool EntryListPanel::removeEntry(DWORD archive_index, ArchiveEntry* e) {
+bool EntryListPanel::removeEntry(uint32_t archive_index, ArchiveEntry* e) {
 	// Just delete the list item corresponding with the entry index
 	// (it's 1-1 in a normal EntryListPanel, will be different for zip archives)
 	entry_list->DeleteItem(archive_index);

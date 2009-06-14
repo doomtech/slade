@@ -24,7 +24,7 @@ public:
 	Archive*	getArchive(int index);
 	Archive*	getArchive(string filename);
 	Archive*	openArchive(string filename);
-	Archive*	newArchive(BYTE type);
+	Archive*	newArchive(uint8_t type);
 	bool		closeArchive(int index);
 	bool		closeArchive(string filename);
 	bool		closeArchive(Archive* archive);

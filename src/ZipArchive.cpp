@@ -165,8 +165,8 @@ string zipdir_t::getFullPath() {
  * is true, the number of entries in the zipdir and all it's
  * subdirectories
  *******************************************************************/
-DWORD zipdir_t::numEntries(bool include_subdirs) {
-	DWORD num = entries.size();
+uint32_t zipdir_t::numEntries(bool include_subdirs) {
+	uint32_t num = entries.size();
 
 	if (include_subdirs) {
 		for (size_t a = 0; a < subdirectories.size(); a++)
@@ -181,8 +181,8 @@ DWORD zipdir_t::numEntries(bool include_subdirs) {
  * include_subdirs is true, the number of subdirectories in the
  * zipdir and all it's subdirectories
  *******************************************************************/
-DWORD zipdir_t::numSubDirs(bool include_subdirs) {
-	DWORD num = subdirectories.size();
+uint32_t zipdir_t::numSubDirs(bool include_subdirs) {
+	uint32_t num = subdirectories.size();
 
 	if (include_subdirs) {
 		for (size_t a = 0; a < subdirectories.size(); a++)
@@ -260,7 +260,7 @@ ArchiveEntry* ZipArchive::getEntry(string name) {
  * Getting entry by index is not implemented for ZipArchive, just
  * prints a warning to the logfile and returns NULL
  *******************************************************************/
-ArchiveEntry* ZipArchive::getEntry(DWORD index) {
+ArchiveEntry* ZipArchive::getEntry(uint32_t index) {
 	wxLogMessage(_T("Warning: Attempt to access ZipArchive entry by index"));
 	return NULL;
 }
@@ -327,7 +327,7 @@ bool ZipArchive::openFile(string filename) {
 			ndir->entry->setState(0);
 
 			// Read the data
-			BYTE* data = new BYTE[entry->GetSize()];
+			uint8_t* data = new uint8_t[entry->GetSize()];
 			zip.Read(data, entry->GetSize());
 			new_entry->setData(data);
 			new_entry->setLoaded(true);
@@ -499,7 +499,7 @@ bool ZipArchive::loadEntryData(ArchiveEntry* entry) {
 		zentry = zip.GetNextEntry();
 
 	// Read the data
-	BYTE* data = new BYTE[zentry->GetSize()];
+	uint8_t* data = new uint8_t[zentry->GetSize()];
 	zip.Read(data, zentry->GetSize());
 	entry->setData(data);
 
@@ -512,7 +512,7 @@ bool ZipArchive::loadEntryData(ArchiveEntry* entry) {
 /* ZipArchive::numEntries
  * Returns the total number of entries in the archive
  *******************************************************************/
-DWORD ZipArchive::numEntries() {
+uint32_t ZipArchive::numEntries() {
 	if (directory)
 		return directory->numEntries(true);
 	else
@@ -539,7 +539,7 @@ void ZipArchive::close() {
  * rather than relative to the beginning of the archive.
  * Returns false if the entry is invalid, false otherwise.
  *******************************************************************/
-bool ZipArchive::addEntry(ArchiveEntry* entry, DWORD position) {
+bool ZipArchive::addEntry(ArchiveEntry* entry, uint32_t position) {
 	// Check valid entry
 	if (!entry)
 		return false;
@@ -563,7 +563,7 @@ bool ZipArchive::addEntry(ArchiveEntry* entry, DWORD position) {
 	// Announce
 	MemChunk mc;
 	wxUIntPtr ptr = wxPtrToUInt(entry);
-	mc.write(&position, sizeof(DWORD));
+	mc.write(&position, sizeof(uint32_t));
 	mc.write(&ptr, sizeof(wxUIntPtr));
 	announce(_T("entry_added"), mc);
 
@@ -577,7 +577,7 @@ bool ZipArchive::addEntry(ArchiveEntry* entry, DWORD position) {
  * to the directory rather than the beginning of the archive.
  * Returns the created entry, or NULL if no name was given.
  *******************************************************************/
-ArchiveEntry* ZipArchive::addNewEntry(string name, DWORD position) {
+ArchiveEntry* ZipArchive::addNewEntry(string name, uint32_t position) {
 	// Convert name to wxFileName for processing
 	wxFileName fn(name);
 
@@ -603,7 +603,7 @@ ArchiveEntry* ZipArchive::addNewEntry(string name, DWORD position) {
 /* ZipArchive::addExistingEntry
  * Adds an existing entry to the archive, copying it if specified.
  *******************************************************************/
-ArchiveEntry* ZipArchive::addExistingEntry(ArchiveEntry* entry, DWORD position, bool copy) {
+ArchiveEntry* ZipArchive::addExistingEntry(ArchiveEntry* entry, uint32_t position, bool copy) {
 	// Make a copy of the entry to add if needed
 	if (copy)
 		entry = new ArchiveEntry(*entry);
@@ -638,9 +638,9 @@ bool ZipArchive::removeEntry(ArchiveEntry* entry, bool delete_entry) {
 
 	// Announce
 	MemChunk mc;
-	DWORD index = (DWORD)dir->entryIndex(entry);
+	uint32_t index = (uint32_t)dir->entryIndex(entry);
 	wxUIntPtr ptr = wxPtrToUInt(entry);
-	mc.write(&index, sizeof(DWORD));
+	mc.write(&index, sizeof(uint32_t));
 	mc.write(&ptr, sizeof(wxUIntPtr));
 	announce(_T("entry_removed"), mc);
 

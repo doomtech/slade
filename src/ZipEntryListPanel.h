@@ -24,9 +24,9 @@ public:
 
 	void	populateEntryList();
 	bool	swapItems(int item1, int item2, ArchiveEntry* e1 = NULL, ArchiveEntry* e2 = NULL);
-	bool	addEntry(DWORD archive_index, ArchiveEntry* e = NULL);
-	bool	updateEntry(DWORD archive_index, ArchiveEntry* e = NULL);
-	bool	removeEntry(DWORD archive_index, ArchiveEntry* e = NULL);
+	bool	addEntry(uint32_t archive_index, ArchiveEntry* e = NULL);
+	bool	updateEntry(uint32_t archive_index, ArchiveEntry* e = NULL);
+	bool	removeEntry(uint32_t archive_index, ArchiveEntry* e = NULL);
 	bool	addDirectory(wxUIntPtr zipdir_ptr);
 	bool	removeDirectory(wxUIntPtr zipdir_ptr);
 	bool	updateDirectory(wxUIntPtr zipdir_ptr);
