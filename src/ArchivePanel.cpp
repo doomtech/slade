@@ -87,7 +87,6 @@ void ArchivePanel::init() {
 	// Entry list panel
 	entry_list = new EntryListPanel(this, ENTRY_LIST_PANEL, archive);
 	m_hbox->Add(entry_list, 0, wxEXPAND | wxALL, 4);
-	entry_list->populateEntryList();
 
 	// Add default entry panel to the panel
 	cur_area = entry_area;
@@ -95,6 +94,7 @@ void ArchivePanel::init() {
 	cur_area->Show(true);
 
 	Layout();
+	entry_list->populateEntryList();
 }
 
 /* ArchivePanel::save

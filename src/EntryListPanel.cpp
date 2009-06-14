@@ -42,8 +42,9 @@
  *******************************************************************/
 wxColor col_new(0, 150, 0);
 wxColor col_modified(0, 80, 180);
-bool	col_size = true;
-bool	col_type = true;
+CVAR(Bool, col_size, true, CVAR_SAVE);
+CVAR(Bool, col_type, true, CVAR_SAVE);
+CVAR(Bool, entry_list_monospace, true, CVAR_SAVE);
 
 
 /* get_entry_icon
@@ -87,9 +88,11 @@ EntryList::EntryList(EntryListPanel *parent, int id)
 : wxListCtrl(parent, id, wxDefaultPosition, wxDefaultSize, ENTRYLIST_FLAGS) {
 	this->parent = parent;
 
-	// Set font to monospace
-	wxFont f = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
-	SetFont(wxFont(f.GetPointSize(), wxFONTFAMILY_MODERN, f.GetStyle(), f.GetWeight()));
+	// Set font to monospace if cvar set
+	if (entry_list_monospace) {
+		wxFont f = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
+		SetFont(wxFont(f.GetPointSize(), wxFONTFAMILY_MODERN, f.GetStyle(), f.GetWeight()));
+	}
 
 	// Setup entry icons
 	image_list = new wxImageList(16, 16, false, 0);
@@ -175,20 +178,22 @@ bool EntryList::updateEntry(int index, bool update_colsize) {
 	}
 
 	// Size
+	int col = 1;
 	if (col_size) {
 		//li.SetText(s_fmt(_T("%d"), entry->getSize()));
 		li.SetText(entry->getSizeString());
-		li.SetColumn(1);
+		li.SetColumn(col);
 		SetItem(li);
-		if (update_colsize) SetColumnWidth(1, wxLIST_AUTOSIZE);
+		if (update_colsize) SetColumnWidth(col, wxLIST_AUTOSIZE);
+		col++;
 	}
 
 	// Type
 	if (col_type) {
 		li.SetText(entry->getTypeString());
-		li.SetColumn(2);
+		li.SetColumn(col);
 		SetItem(li);
-		if (update_colsize) SetColumnWidth(2, wxLIST_AUTOSIZE);
+		if (update_colsize) SetColumnWidth(col, wxLIST_AUTOSIZE);
 	}
 
 	// Set default text colour
@@ -213,8 +218,15 @@ bool EntryList::updateEntry(int index, bool update_colsize) {
  *******************************************************************/
 int EntryList::getWidth() {
 	// For the moment. Kinda annoying I have to do this actually, it should be automatic >_<
-	return GetColumnWidth(0) + GetColumnWidth(1) + GetColumnWidth(2) + wxSystemSettings::GetMetric(wxSYS_VSCROLL_X, this) + 4;
+	int width = GetColumnWidth(0) + GetColumnWidth(1) + GetColumnWidth(2);
+
+	if (this->GetViewRect().height > this->GetSize().y)
+		width += wxSystemSettings::GetMetric(wxSYS_VSCROLL_X, this);
+
+	return width + 4;
 }
+
+
 
 /* EntryListPanel::EntryListPanel
  * EntryListPanel class constructor
@@ -256,10 +268,14 @@ void EntryListPanel::populateEntryList() {
 	entry_list->InsertColumn(0, _T("Name"));
 
 	// Create the "Size" column
-	if (col_size) entry_list->InsertColumn(1, _T("Size"));
+	int col = 1;
+	if (col_size) {
+		entry_list->InsertColumn(1, _T("Size"));
+		col++;
+	}
 
 	// Create the "Type" column
-	if (col_type) entry_list->InsertColumn(2, _T("Type"));
+	if (col_type) entry_list->InsertColumn(col, _T("Type"));
 
 	// Go through all entries and add them to the list
 	for (int a = 0; a < archive->numEntries(); a++) {
@@ -274,19 +290,24 @@ void EntryListPanel::populateEntryList() {
 
 	// Setup column widths
 	entry_list->SetColumnWidth(0, wxLIST_AUTOSIZE);
-	if (col_size) entry_list->SetColumnWidth(1, wxLIST_AUTOSIZE);
-	if (col_type) entry_list->SetColumnWidth(2, wxLIST_AUTOSIZE);
+	entry_list->SetColumnWidth(1, wxLIST_AUTOSIZE);
+	entry_list->SetColumnWidth(2, wxLIST_AUTOSIZE);
 
 	// Add extra width to the name column in linux as wxLIST_AUTOSIZE seems to ignore listitem images on wxGTK
 	#ifndef _WIN32
 	entry_list->SetColumnWidth(0, entry_list->GetColumnWidth(0) + 20);
 	#endif
 
-	// Setup size
-	entry_list->SetMinSize(wxSize(entry_list->getWidth(), -1));
-
 	// Show the list
 	entry_list->Show();
+
+	// Update list control width
+	updateListWidth();
+}
+
+void EntryListPanel::updateListWidth() {
+	entry_list->SetMinSize(wxSize(entry_list->getWidth(), -1));
+	GetParent()->Layout();
 }
 
 /* EntryListPanel::getFocusedEntry
@@ -591,5 +612,3 @@ void EntryListPanel::onEntryListEditLabel(wxListEvent& event) {
 		archive->renameEntry(entry, event.GetLabel());
 	}
 }
-
-

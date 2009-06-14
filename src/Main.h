@@ -19,6 +19,7 @@ using std::vector;
 
 // Global internal includes
 #include "MemChunk.h"
+#include "CVar.h"
 
 // Class to hold global variables
 namespace Global {

@@ -34,6 +34,8 @@ public:
 	virtual ~EntryListPanel();
 
 	virtual void			populateEntryList();
+	void					updateListWidth();
+
 	ArchiveEntry*			getFocusedEntry();
 	int						getFocus();
 	vector<ArchiveEntry*>	getSelectedEntries();

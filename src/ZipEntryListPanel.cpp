@@ -42,8 +42,8 @@
  *******************************************************************/
 extern wxColor col_new;
 extern wxColor col_modified;
-extern bool col_size;
-extern bool col_type;
+EXTERN_CVAR(Bool, col_size);
+EXTERN_CVAR(Bool, col_type);
 
 
 /* ZipEntryListPanel::ZipEntryListPanel
@@ -193,10 +193,14 @@ void ZipEntryListPanel::populateEntryList() {
 	entry_list->InsertColumn(0, _T("Name"));
 
 	// Create the "Size" column
-	if (col_size) entry_list->InsertColumn(1, _T("Size"));
+	int col = 1;
+	if (col_size) {
+		entry_list->InsertColumn(1, _T("Size"));
+		col++;
+	}
 
 	// Create the "Type" column
-	if (col_type) entry_list->InsertColumn(2, _T("Type"));
+	if (col_type) entry_list->InsertColumn(col, _T("Type"));
 
 	// Get current directory
 	zipdir_t* dir = getCurrentDir();
@@ -254,19 +258,19 @@ void ZipEntryListPanel::populateEntryList() {
 
 	// Setup column widths
 	entry_list->SetColumnWidth(0, wxLIST_AUTOSIZE);
-	if (col_size) entry_list->SetColumnWidth(1, wxLIST_AUTOSIZE);
-	if (col_type) entry_list->SetColumnWidth(2, wxLIST_AUTOSIZE);
+	entry_list->SetColumnWidth(1, wxLIST_AUTOSIZE);
+	entry_list->SetColumnWidth(2, wxLIST_AUTOSIZE);
 
 	// Add extra width to the name column in linux as wxLIST_AUTOSIZE seems to ignore listitem images on wxGTK
 	#ifndef _WIN32
 	entry_list->SetColumnWidth(0, entry_list->GetColumnWidth(0) + 20);
 	#endif
 
-	// Setup size
-	entry_list->SetMinSize(wxSize(entry_list->getWidth(), -1));
-
 	// Show the list
 	entry_list->Show(true);
+
+	// Update list control width
+	updateListWidth();
 }
 
 /* ZipEntryListPanel::swapItems

@@ -9,7 +9,9 @@ public:
 	virtual bool OnInit();
 	virtual int OnExit();
 
-	void initLogFile();
+	void	initLogFile();
+	void	readConfigFile();
+	void	saveConfigFile();
 };
 
 #endif //__MAINAPP_H__

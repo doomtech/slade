@@ -32,6 +32,7 @@
 #include "MainApp.h"
 #include "MainWindow.h"
 #include "ArchiveManager.h"
+#include "Tokenizer.h"
 #include <wx/image.h>
 #include <wx/glcanvas.h>
 
@@ -42,7 +43,8 @@
 namespace Global {
 	string error = _("");
 }
-wxGLContext *gl_context = NULL;
+wxGLContext*	gl_context = NULL;
+MainWindow*		main_window = NULL;
 
 
 /*******************************************************************
@@ -64,9 +66,12 @@ bool MainApp::OnInit() {
 	// Load image handlers
 	wxImage::AddHandler(new wxPNGHandler);
 
+	// Load configuration file
+	readConfigFile();
+
 	// Create a MainWindow and show it
-	MainWindow *heh = new MainWindow();
-	heh->Show(true);
+	main_window = new MainWindow();
+	main_window->Show(true);
 
 	// Open any archives on the command line
 	for (int a = 0; a < argc; a++) {
@@ -81,6 +86,7 @@ bool MainApp::OnInit() {
  * Application shutdown, run when program is closed
  *******************************************************************/
 int MainApp::OnExit() {
+	saveConfigFile();
 	return 0;
 }
 
@@ -95,4 +101,54 @@ void MainApp::initLogFile() {
 	wxLogMessage(_T("SLADE - It's a Doom Editor"));
 	wxLogMessage(_T("Written by Simon Judd, 2008"));
 	wxLogMessage(_T("---------------------------"));
+}
+
+void MainApp::readConfigFile() {
+	// Open SLADE.cfg
+	Tokenizer tz;
+	if (!tz.openFile(_T("SLADE.cfg")))
+		return;
+
+	// Go through the file with the tokenizer
+	string token = tz.getToken();
+	while (token.Cmp(_T(""))) {
+		// If we come across a 'cvars' token, read in the cvars section
+		if (!token.Cmp(_T("cvars"))) {
+			token = tz.getToken();	// Skip '{'
+
+			// Keep reading name/value pairs until we hit the ending '}'
+			string cvar_name = tz.getToken();
+			wxLogMessage(cvar_name);
+			while (cvar_name.Cmp(_T("}"))) {
+				string cvar_val = tz.getToken();
+				read_cvar(cvar_name, cvar_val);
+				cvar_name = tz.getToken();
+			}
+		}
+
+		// Get next token
+		token = tz.getToken();
+	}
+}
+
+void MainApp::saveConfigFile() {
+	// Open SLADE.cfg for writing text
+	FILE* fp = fopen("SLADE.cfg", "wt");
+
+	// Do nothing if it didn't open correctly
+	if (!fp)
+		return;
+
+	// Write cfg header
+	fprintf(fp, "/*****************************************************\n");
+	fprintf(fp, " * SLADE Configuration File\n");
+	fprintf(fp, " * Don't edit this unless you know what you're doing\n");
+	fprintf(fp, " *****************************************************/\n\n");
+
+	// Write cvars
+	save_cvars(fp);
+
+	// Close configuration file
+	fprintf(fp, "\n// End Configuration File");
+	fclose(fp);
 }
