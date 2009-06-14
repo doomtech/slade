@@ -36,6 +36,7 @@
 #include "WadArchive.h"
 #include "TextEntryPanel.h"
 #include "DefaultEntryPanel.h"
+#include "GfxEntryPanel.h"
 #include <wx/aui/auibook.h>
 #include <wx/filename.h>
 
@@ -52,6 +53,7 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 	entry_area = new EntryPanel(this);
 	default_area = new DefaultEntryPanel(this);
 	text_area = new TextEntryPanel(this);
+	gfx_area = new GfxEntryPanel(this);
 
 	// Create entry menu
 	menu_entry = new wxMenu(_T(""));
@@ -462,6 +464,27 @@ void ArchivePanel::onEntryListChange(wxListEvent& event) {
 	switch (entry->getType()) {
 		case ETYPE_TEXT:
 			new_area = text_area;
+			break;
+		case ETYPE_PATCH:
+			new_area = gfx_area;
+			break;
+		case ETYPE_SPRITE:
+			new_area = gfx_area;
+			break;
+		case ETYPE_FLAT:
+			new_area = gfx_area;
+			break;
+		case ETYPE_GFX:
+			new_area = gfx_area;
+			break;
+		case ETYPE_GFX2:
+			new_area = gfx_area;
+			break;
+		case ETYPE_PNG:
+			new_area = gfx_area;
+			break;
+		case ETYPE_IMAGE:
+			new_area = gfx_area;
 			break;
 	}
 

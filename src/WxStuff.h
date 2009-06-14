@@ -2,10 +2,13 @@
 #ifndef __WXSTUFF_H__
 #define __WXSTUFF_H__
 
-#include "wx/wxprec.h"
-
 #undef min
 #undef max
+#undef DWORD
+#undef WORD
+#undef BYTE
+
+#include "wx/wxprec.h"
 
 #ifndef WX_PRECOMP
     #include "wx/wx.h"

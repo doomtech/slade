@@ -23,6 +23,16 @@
           <itemPath>src/EntryListPanel.cpp</itemPath>
           <itemPath>src/EntryListPanel.h</itemPath>
         </logicalFolder>
+        <logicalFolder name="f3" displayName="EntryPanel" projectFiles="true">
+          <itemPath>src/DefaultEntryPanel.cpp</itemPath>
+          <itemPath>src/DefaultEntryPanel.h</itemPath>
+          <itemPath>src/EntryPanel.cpp</itemPath>
+          <itemPath>src/EntryPanel.h</itemPath>
+          <itemPath>src/GfxEntryPanel.cpp</itemPath>
+          <itemPath>src/GfxEntryPanel.h</itemPath>
+          <itemPath>src/TextEntryPanel.cpp</itemPath>
+          <itemPath>src/TextEntryPanel.h</itemPath>
+        </logicalFolder>
         <logicalFolder name="f2" displayName="ZipArchivePanel" projectFiles="true">
           <itemPath>src/ZipArchivePanel.cpp</itemPath>
           <itemPath>src/ZipArchivePanel.h</itemPath>
@@ -33,14 +43,8 @@
         <itemPath>src/ArchiveManagerPanel.h</itemPath>
         <itemPath>src/ConsolePanel.cpp</itemPath>
         <itemPath>src/ConsolePanel.h</itemPath>
-        <itemPath>src/DefaultEntryPanel.cpp</itemPath>
-        <itemPath>src/DefaultEntryPanel.h</itemPath>
-        <itemPath>src/EntryPanel.cpp</itemPath>
-        <itemPath>src/EntryPanel.h</itemPath>
         <itemPath>src/TextEditor.cpp</itemPath>
         <itemPath>src/TextEditor.h</itemPath>
-        <itemPath>src/TextEntryPanel.cpp</itemPath>
-        <itemPath>src/TextEntryPanel.h</itemPath>
       </logicalFolder>
       <itemPath>src/MainWindow.cpp</itemPath>
       <itemPath>src/MainWindow.h</itemPath>
@@ -72,6 +76,10 @@
         <itemPath>src/WadArchive.h</itemPath>
         <itemPath>src/ZipArchive.cpp</itemPath>
         <itemPath>src/ZipArchive.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f2" displayName="Image" projectFiles="true">
+        <itemPath>src/SImage.cpp</itemPath>
+        <itemPath>src/SImage.h</itemPath>
       </logicalFolder>
       <itemPath>src/ArchiveManager.cpp</itemPath>
       <itemPath>src/ArchiveManager.h</itemPath>
@@ -161,6 +169,12 @@
       <item path="src/EntryPanel.h">
         <itemTool>3</itemTool>
       </item>
+      <item path="src/GfxEntryPanel.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/GfxEntryPanel.h">
+        <itemTool>3</itemTool>
+      </item>
       <item path="src/ListenerAnnouncer.cpp">
         <itemTool>1</itemTool>
       </item>
@@ -213,6 +227,12 @@
         <itemTool>1</itemTool>
       </item>
       <item path="src/MemChunk.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/SImage.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/SImage.h">
         <itemTool>3</itemTool>
       </item>
       <item path="src/SLADEMap.cpp">
@@ -351,6 +371,12 @@
       <item path="src/EntryPanel.h">
         <itemTool>3</itemTool>
       </item>
+      <item path="src/GfxEntryPanel.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/GfxEntryPanel.h">
+        <itemTool>3</itemTool>
+      </item>
       <item path="src/ListenerAnnouncer.cpp">
         <itemTool>1</itemTool>
       </item>
@@ -403,6 +429,12 @@
         <itemTool>1</itemTool>
       </item>
       <item path="src/MemChunk.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/SImage.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/SImage.h">
         <itemTool>3</itemTool>
       </item>
       <item path="src/SLADEMap.cpp">
@@ -572,6 +604,12 @@
       <item path="src/EntryPanel.h">
         <itemTool>3</itemTool>
       </item>
+      <item path="src/GfxEntryPanel.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/GfxEntryPanel.h">
+        <itemTool>3</itemTool>
+      </item>
       <item path="src/ListenerAnnouncer.cpp">
         <itemTool>1</itemTool>
       </item>
@@ -624,6 +662,12 @@
         <itemTool>1</itemTool>
       </item>
       <item path="src/MemChunk.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/SImage.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/SImage.h">
         <itemTool>3</itemTool>
       </item>
       <item path="src/SLADEMap.cpp">
@@ -781,6 +825,12 @@
       <item path="src/EntryPanel.h">
         <itemTool>3</itemTool>
       </item>
+      <item path="src/GfxEntryPanel.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/GfxEntryPanel.h">
+        <itemTool>3</itemTool>
+      </item>
       <item path="src/ListenerAnnouncer.cpp">
         <itemTool>1</itemTool>
       </item>
@@ -833,6 +883,12 @@
         <itemTool>1</itemTool>
       </item>
       <item path="src/MemChunk.h">
+        <itemTool>3</itemTool>
+      </item>
+      <item path="src/SImage.cpp">
+        <itemTool>1</itemTool>
+      </item>
+      <item path="src/SImage.h">
         <itemTool>3</itemTool>
       </item>
       <item path="src/SLADEMap.cpp">

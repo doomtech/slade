@@ -604,8 +604,15 @@ ArchiveEntry* ZipArchive::addNewEntry(string name, DWORD position) {
  * Adds an existing entry to the archive, copying it if specified.
  *******************************************************************/
 ArchiveEntry* ZipArchive::addExistingEntry(ArchiveEntry* entry, DWORD position, bool copy) {
-	// See addEntry
-	return NULL;
+	// Make a copy of the entry to add if needed
+	if (copy)
+		entry = new ArchiveEntry(*entry);
+
+	// Add the entry to the list
+	addEntry(entry, position);
+
+	// Return the added entry
+	return entry;
 }
 
 /* ZipArchive::removeEntry
@@ -773,7 +780,14 @@ bool ZipArchive::renameEntry(ArchiveEntry* entry, string new_name) {
  * information about them.
  *******************************************************************/
 vector<Archive::mapdesc_t> ZipArchive::detectMaps() {
-	return vector<mapdesc_t>();
+	vector<mapdesc_t> ret;
+
+	// Get the maps directory
+	zipdir_t* mapdir = getDirectory(_T("maps"));
+	if (!mapdir)
+		return ret;
+
+	return ret;
 }
 
 bool ZipArchive::detectEntryType(ArchiveEntry* entry) {

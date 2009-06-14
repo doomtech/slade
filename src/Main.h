@@ -18,16 +18,9 @@ using std::vector;
 #include <wx/log.h>
 
 // Define some variable types
-#ifndef _VAR_TYPES
-typedef unsigned char BYTE;
-typedef unsigned short WORD;
-typedef   signed short SWORD;
-#ifdef _WIN32
-typedef unsigned long DWORD;
-#else
-typedef uint32_t DWORD;
-#endif
-#endif
+#define DWORD unsigned long
+#define WORD unsigned short
+#define BYTE unsigned char
 
 // Global internal includes
 #include "MemChunk.h"
