@@ -720,6 +720,11 @@ bool WadArchive::renameEntry(ArchiveEntry* entry, string new_name) {
 	entry->rename(new_name);
 }
 
+/* WadArchive::detectEntryType
+ * Performs preliminary entry type checking based on it's position
+ * in the wad archive (will be overridden if the entry's data later
+ * proves it to be another format)
+ *******************************************************************/
 bool WadArchive::detectEntryType(ArchiveEntry* entry) {
 	// Check the entry is valid and part of this archive
 	if (!checkEntry(entry))

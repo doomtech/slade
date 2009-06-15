@@ -790,27 +790,32 @@ vector<Archive::mapdesc_t> ZipArchive::detectMaps() {
 	return ret;
 }
 
+/* ZipArchive::detectEntryType
+ * Performs preliminary entry type checking based on it's position
+ * in the zip and it's name/extension (will be overridden if the
+ * entry's data later proves it to be another format)
+ *******************************************************************/
 bool ZipArchive::detectEntryType(ArchiveEntry* entry) {
-	// Check the entry is valid
-	if (!entry)
-		return false;
-	
-	// Check the entry belongs to this archive
-	if (entry->getParent() != this)
+	// Check the entry is valid and belongs to this archive
+	if (!checkEntry(entry))
 		return false;
 
 	// Get the entry name as a wxFileName for processing
 	wxFileName fn(entry->getName());
 
+	// .txt extension, treat the entry as text (unless it's data proves otherwise)
 	if (fn.GetExt().CmpNoCase(_T("txt")) == 0)
 		entry->setType(ETYPE_TEXT);
 
+	/* Below types really need to be detected via data rather than extension
 	if (fn.GetExt().CmpNoCase(_T("png")) == 0)
 		entry->setType(ETYPE_PNG);
 
 	if (fn.GetExt().CmpNoCase(_T("wad")) == 0)
 		entry->setType(ETYPE_WAD);
+	 */
 
+	// .acs extension - usually an acs script in text format
 	if (fn.GetExt().CmpNoCase(_T("acs")) == 0) {
 		entry->setType(ETYPE_TEXT);
 		entry->setExProp(_T("TextFormat"), _T("SCRIPTS"));

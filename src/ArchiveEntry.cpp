@@ -374,122 +374,102 @@ void ArchiveEntry::detectType(bool data_check, bool force) {
 	}
 
 	// THINGS
-	if (name == _T("THINGS"))
-	{
-		if (size % 10 == 0)
-		{
+	if (name == _T("THINGS")) {
+		if (size % 10 == 0) {
 			type = ETYPE_THINGS;
 			return;
 		}
 	}
 
 	// LINEDEFS
-	if (name == _T("LINEDEFS"))
-	{
-		if (size % 14 == 0 || size % 16 == 0)
-		{
+	if (name == _T("LINEDEFS")) {
+		if (size % 14 == 0 || size % 16 == 0) {
 			type = ETYPE_LINEDEFS;
 			return;
 		}
 	}
 
 	// SIDEDEFS
-	if (name == _T("SIDEDEFS"))
-	{
-		if (size % 30 == 0)
-		{
+	if (name == _T("SIDEDEFS")) {
+		if (size % 30 == 0) {
 			type = ETYPE_SIDEDEFS;
 			return;
 		}
 	}
 
 	// SECTORS
-	if (name == _T("SECTORS"))
-	{
-		if (size % 26 == 0)
-		{
+	if (name == _T("SECTORS")) {
+		if (size % 26 == 0) {
 			type = ETYPE_SECTORS;
 			return;
 		}
 	}
 
 	// VERTEXES
-	if (name == _T("VERTEXES"))
-	{
-		if (size % 4 == 0)
-		{
+	if (name == _T("VERTEXES")) {
+		if (size % 4 == 0) {
 			type = ETYPE_VERTEXES;
 			return;
 		}
 	}
 
 	// NODES
-	if (name == _T("NODES"))
-	{
+	if (name == _T("NODES")) {
 		type = ETYPE_NODES;
 		return;
 	}
 
 	// SSECTORS
-	if (name == _T("SSECTORS"))
-	{
+	if (name == _T("SSECTORS")) {
 		type = ETYPE_SSECTS;
 		return;
 	}
 
 	// SEGS
-	if (name == _T("SEGS"))
-	{
+	if (name == _T("SEGS")) {
 		type = ETYPE_SEGS;
 		return;
 	}
 
 	// REJECT
-	if (name == _T("REJECT"))
-	{
+	if (name == _T("REJECT")) {
 		type = ETYPE_REJECT;
 		return;
 	}
 
 	// BLOCKMAP
-	if (name == _T("BLOCKMAP"))
-	{
+	if (name == _T("BLOCKMAP")) {
 		type = ETYPE_BLOCKMAP;
 		return;
 	}
 
 	// BEHAVIOR
-	if (name == _T("BEHAVIOR"))
-	{
+	if (name == _T("BEHAVIOR")) {
 		type = ETYPE_BEHAVIOR;
 		return;
 	}
 
 
 	// PLAYPAL
-	if (name.StartsWith(_T("PLAYPAL")))
-	{
+	if (name.StartsWith(_T("PLAYPAL"))) {
 		type = ETYPE_PLAYPAL;
 		return;
 	}
 
 	// COLORMAP
-	if (name.StartsWith(_T("COLORMAP")))
-	{
+	if (name.StartsWith(_T("COLORMAP"))) {
 		type = ETYPE_COLORMAP;
 		return;
 	}
 
 	// TEXTUREx
-	if (name.StartsWith(_T("TEXTURE1")) || name.StartsWith(_T("TEXTURE2")))
-	{
+	if (name.StartsWith(_T("TEXTURE1")) || name.StartsWith(_T("TEXTURE2"))) {
 		type = ETYPE_TEXTURES;
 		return;
 	}
 
 	// PNames
-	if (name.StartsWith(_T("PNAMES")))
-	{
+	if (name.StartsWith(_T("PNAMES"))) {
 		type = ETYPE_PNAMES;
 		return;
 	}
