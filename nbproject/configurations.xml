@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configurationDescriptor version="51">
+<configurationDescriptor version="62">
   <logicalFolder name="root" displayName="root" projectFiles="true">
     <logicalFolder name="f4" displayName="General" projectFiles="true">
-      <itemPath>src/Console.cpp</itemPath>
-      <itemPath>src/Console.h</itemPath>
       <itemPath>src/CVar.cpp</itemPath>
       <itemPath>src/CVar.h</itemPath>
+      <itemPath>src/Console.cpp</itemPath>
+      <itemPath>src/Console.h</itemPath>
       <itemPath>src/ListenerAnnouncer.cpp</itemPath>
       <itemPath>src/ListenerAnnouncer.h</itemPath>
       <itemPath>src/Main.h</itemPath>
@@ -101,9 +101,9 @@
         <platform>2</platform>
       </toolsSet>
       <compileType>
-        <ccCompilerTool>
+        <ccTool>
           <commandLine>`wx-config --cxxflags std,gl,stc`</commandLine>
-        </ccCompilerTool>
+        </ccTool>
         <linkerTool>
           <output>dist/SLADE</output>
           <linkerLibItems>
@@ -111,189 +111,6 @@
           <commandLine>`wx-config --libs std,gl,stc`</commandLine>
         </linkerTool>
       </compileType>
-      <item path="src/Archive.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/Archive.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/ArchiveEntry.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/ArchiveEntry.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/ArchiveManager.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/ArchiveManager.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/ArchiveManagerPanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/ArchiveManagerPanel.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/ArchivePanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/ArchivePanel.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/CVar.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/CVar.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/Console.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/Console.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/ConsolePanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/ConsolePanel.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/DefaultEntryPanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/DefaultEntryPanel.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/EntryListPanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/EntryListPanel.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/EntryPanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/EntryPanel.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/GfxEntryPanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/GfxEntryPanel.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/ListenerAnnouncer.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/ListenerAnnouncer.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/Main.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/MainApp.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/MainApp.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/MainWindow.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/MainWindow.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/MapCanvas.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/MapCanvas.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/MapEditorWindow.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/MapEditorWindow.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/MapLine.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/MapSector.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/MapSide.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/MapThing.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/MapVertex.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/MemChunk.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/MemChunk.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/SImage.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/SImage.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/SLADEMap.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/SLADEMap.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/TextEditor.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/TextEditor.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/TextEntryPanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/TextEntryPanel.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/Tokenizer.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/Tokenizer.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/WadArchive.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/WadArchive.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/WxStuff.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/ZipArchive.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/ZipArchive.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/ZipArchivePanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/ZipArchivePanel.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/ZipEntryListPanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/ZipEntryListPanel.h">
-        <itemTool>3</itemTool>
-      </item>
     </conf>
     <conf name="Unix_Release" type="1">
       <toolsSet>
@@ -302,13 +119,13 @@
         <platform>2</platform>
       </toolsSet>
       <compileType>
-        <cCompilerTool>
+        <cTool>
           <developmentMode>5</developmentMode>
-        </cCompilerTool>
-        <ccCompilerTool>
+        </cTool>
+        <ccTool>
           <developmentMode>5</developmentMode>
           <commandLine>`wx-config --cxxflags std,gl,stc`</commandLine>
-        </ccCompilerTool>
+        </ccTool>
         <fortranCompilerTool>
           <developmentMode>5</developmentMode>
         </fortranCompilerTool>
@@ -319,204 +136,21 @@
           <commandLine>`wx-config --libs std,gl,stc`</commandLine>
         </linkerTool>
       </compileType>
-      <item path="src/Archive.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/Archive.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/ArchiveEntry.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/ArchiveEntry.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/ArchiveManager.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/ArchiveManager.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/ArchiveManagerPanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/ArchiveManagerPanel.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/ArchivePanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/ArchivePanel.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/CVar.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/CVar.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/Console.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/Console.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/ConsolePanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/ConsolePanel.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/DefaultEntryPanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/DefaultEntryPanel.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/EntryListPanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/EntryListPanel.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/EntryPanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/EntryPanel.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/GfxEntryPanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/GfxEntryPanel.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/ListenerAnnouncer.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/ListenerAnnouncer.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/Main.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/MainApp.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/MainApp.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/MainWindow.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/MainWindow.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/MapCanvas.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/MapCanvas.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/MapEditorWindow.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/MapEditorWindow.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/MapLine.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/MapSector.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/MapSide.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/MapThing.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/MapVertex.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/MemChunk.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/MemChunk.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/SImage.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/SImage.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/SLADEMap.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/SLADEMap.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/TextEditor.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/TextEditor.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/TextEntryPanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/TextEntryPanel.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/Tokenizer.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/Tokenizer.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/WadArchive.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/WadArchive.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/WxStuff.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/ZipArchive.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/ZipArchive.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/ZipArchivePanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/ZipArchivePanel.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/ZipEntryListPanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/ZipEntryListPanel.h">
-        <itemTool>3</itemTool>
-      </item>
     </conf>
     <conf name="Win32_Release" type="1">
       <toolsSet>
         <developmentServer>localhost</developmentServer>
         <compilerSet>MinGW|MinGW</compilerSet>
-        <platform>3</platform>
+        <platform>2</platform>
       </toolsSet>
       <compileType>
-        <cCompilerTool>
+        <cTool>
           <developmentMode>5</developmentMode>
-        </cCompilerTool>
-        <ccCompilerTool>
+        </cTool>
+        <ccTool>
           <developmentMode>5</developmentMode>
           <stripSymbols>true</stripSymbols>
-        </ccCompilerTool>
+        </ccTool>
         <fortranCompilerTool>
           <developmentMode>5</developmentMode>
         </fortranCompilerTool>
@@ -558,195 +192,12 @@
           <commandLine>-Wl,-subsystem,windows</commandLine>
         </linkerTool>
       </compileType>
-      <item path="src/Archive.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/Archive.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/ArchiveEntry.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/ArchiveEntry.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/ArchiveManager.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/ArchiveManager.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/ArchiveManagerPanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/ArchiveManagerPanel.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/ArchivePanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/ArchivePanel.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/CVar.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/CVar.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/Console.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/Console.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/ConsolePanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/ConsolePanel.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/DefaultEntryPanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/DefaultEntryPanel.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/EntryListPanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/EntryListPanel.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/EntryPanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/EntryPanel.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/GfxEntryPanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/GfxEntryPanel.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/ListenerAnnouncer.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/ListenerAnnouncer.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/Main.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/MainApp.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/MainApp.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/MainWindow.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/MainWindow.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/MapCanvas.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/MapCanvas.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/MapEditorWindow.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/MapEditorWindow.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/MapLine.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/MapSector.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/MapSide.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/MapThing.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/MapVertex.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/MemChunk.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/MemChunk.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/SImage.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/SImage.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/SLADEMap.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/SLADEMap.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/TextEditor.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/TextEditor.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/TextEntryPanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/TextEntryPanel.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/Tokenizer.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/Tokenizer.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/WadArchive.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/WadArchive.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/WxStuff.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/ZipArchive.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/ZipArchive.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/ZipArchivePanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/ZipArchivePanel.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/ZipEntryListPanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/ZipEntryListPanel.h">
-        <itemTool>3</itemTool>
-      </item>
     </conf>
     <conf name="Win32_Debug" type="1">
       <toolsSet>
         <developmentServer>localhost</developmentServer>
         <compilerSet>MinGW|MinGW</compilerSet>
-        <platform>3</platform>
+        <platform>2</platform>
       </toolsSet>
       <compileType>
         <linkerTool>
@@ -785,189 +236,6 @@
           </linkerLibItems>
         </linkerTool>
       </compileType>
-      <item path="src/Archive.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/Archive.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/ArchiveEntry.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/ArchiveEntry.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/ArchiveManager.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/ArchiveManager.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/ArchiveManagerPanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/ArchiveManagerPanel.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/ArchivePanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/ArchivePanel.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/CVar.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/CVar.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/Console.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/Console.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/ConsolePanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/ConsolePanel.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/DefaultEntryPanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/DefaultEntryPanel.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/EntryListPanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/EntryListPanel.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/EntryPanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/EntryPanel.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/GfxEntryPanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/GfxEntryPanel.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/ListenerAnnouncer.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/ListenerAnnouncer.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/Main.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/MainApp.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/MainApp.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/MainWindow.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/MainWindow.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/MapCanvas.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/MapCanvas.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/MapEditorWindow.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/MapEditorWindow.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/MapLine.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/MapSector.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/MapSide.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/MapThing.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/MapVertex.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/MemChunk.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/MemChunk.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/SImage.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/SImage.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/SLADEMap.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/SLADEMap.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/TextEditor.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/TextEditor.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/TextEntryPanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/TextEntryPanel.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/Tokenizer.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/Tokenizer.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/WadArchive.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/WadArchive.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/WxStuff.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/ZipArchive.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/ZipArchive.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/ZipArchivePanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/ZipArchivePanel.h">
-        <itemTool>3</itemTool>
-      </item>
-      <item path="src/ZipEntryListPanel.cpp">
-        <itemTool>1</itemTool>
-      </item>
-      <item path="src/ZipEntryListPanel.h">
-        <itemTool>3</itemTool>
-      </item>
     </conf>
   </confs>
 </configurationDescriptor>

@@ -300,194 +300,151 @@ void MainWindow::setMockLayout() {
  *******************************************************************/
 BEGIN_EVENT_TABLE(MainWindow, wxFrame)
 	EVT_HTML_LINK_CLICKED(HTML_WINDOW, MainWindow::onHTMLLinkClicked)
-
-	// MENU
-
-	// File Menu
-	EVT_MENU(MENU_FILE_NEW, MainWindow::onFileNewWad)
-	EVT_MENU(MENU_FILE_NEWZIP, MainWindow::onFileNewZip)
-	EVT_MENU(MENU_FILE_OPEN, MainWindow::onFileOpen)
-	EVT_MENU(MENU_FILE_QUIT, MainWindow::onFileQuit)
-	EVT_MENU(MENU_FILE_SAVE, MainWindow::onFileSave)
-	EVT_MENU(MENU_FILE_SAVEAS, MainWindow::onFileSaveAs)
-	EVT_MENU(MENU_FILE_CLOSE, MainWindow::onFileClose)
-
-	// Entry menu
-	EVT_MENU(MENU_ENTRY_NEW, MainWindow::onEntryNew)
-	EVT_MENU(MENU_ENTRY_NEWFROMFILE, MainWindow::onEntryNewFromFile)
-	EVT_MENU(MENU_ENTRY_NEWFOLDER, MainWindow::onEntryNewFolder)
-	EVT_MENU(MENU_ENTRY_RENAME, MainWindow::onEntryRename)
-	EVT_MENU(MENU_ENTRY_DELETE, MainWindow::onEntryDelete)
-	EVT_MENU(MENU_ENTRY_IMPORT, MainWindow::onEntryImport)
-	EVT_MENU(MENU_ENTRY_EXPORT, MainWindow::onEntryExport)
-	EVT_MENU(MENU_ENTRY_EXPORTWAD, MainWindow::onEntryExportWad)
-	EVT_MENU(MENU_ENTRY_MOVEUP, MainWindow::onEntryMoveUp)
-	EVT_MENU(MENU_ENTRY_MOVEDOWN, MainWindow::onEntryMoveDown)
-
-	// View Menu
-	EVT_MENU(MENU_VIEW_MANAGER, MainWindow::onViewArchiveManager)
-	EVT_MENU(MENU_VIEW_CONSOLE, MainWindow::onViewConsole)
+	EVT_MENU_RANGE(MENU_START, MENU_END, MainWindow::onMenuItemClicked)
 END_EVENT_TABLE()
 
-void MainWindow::onFileNewWad(wxCommandEvent& e) {
-	panel_archivemanager->createNewArchive(ARCHIVE_WAD);
-}
-
-void MainWindow::onFileNewZip(wxCommandEvent& e) {
-	panel_archivemanager->createNewArchive(ARCHIVE_ZIP);
-}
-
-/* MainWindow::onFileOpen
- * File->Open menu item event handler.
+/* MainWindow::onMenuItemClicked
+ * Called when a menu or toolbar item is clicked
  *******************************************************************/
-void MainWindow::onFileOpen(wxCommandEvent &e) {
-	// Open a file browser dialog that allows multiple selection
-	// and filters by wad, zip and pk3 file extensions
-	wxFileDialog *dialog_open = new wxFileDialog(this, _T("Choose file(s) to open"), wxEmptyString, wxEmptyString,
-			_T("Any Supported File (*.wad; *.zip; *.pk3; *.jdf)|*.wad;*.zip;*.pk3;*.jdf|Doom Wad files (*.wad)|*.wad|Zip files (*.zip)|*.zip|Pk3 (zip) files (*.pk3)|*.pk3|JDF (zip) files (*.jdf)|*.jdf"),
-			wxFD_OPEN | wxFD_MULTIPLE | wxFD_FILE_MUST_EXIST, wxDefaultPosition);
+void MainWindow::onMenuItemClicked(wxCommandEvent& e) {
+	// *******************************************************
+	// FILE MENU
+	// *******************************************************
 
-	// Run the dialog & check that the user didn't cancel
-	if (dialog_open->ShowModal() == wxID_OK) {
+	// File->New->Wad Archive
+	if (e.GetId() == MENU_FILE_NEW)
+		panel_archivemanager->createNewArchive(ARCHIVE_WAD);
+
+	// File->New->Zip Archive
+	else if (e.GetId() == MENU_FILE_NEWZIP)
+		panel_archivemanager->createNewArchive(ARCHIVE_ZIP);
+
+	// File->Open
+	else if (e.GetId() == MENU_FILE_OPEN) {
+		// Open a file browser dialog that allows multiple selection
+		// and filters by wad, zip and pk3 file extensions
+		wxFileDialog *dialog_open = new wxFileDialog(this, _T("Choose file(s) to open"), wxEmptyString, wxEmptyString,
+				_T("Any Supported File (*.wad; *.zip; *.pk3; *.jdf)|*.wad;*.zip;*.pk3;*.jdf|Doom Wad files (*.wad)|*.wad|Zip files (*.zip)|*.zip|Pk3 (zip) files (*.pk3)|*.pk3|JDF (zip) files (*.jdf)|*.jdf"),
+				wxFD_OPEN | wxFD_MULTIPLE | wxFD_FILE_MUST_EXIST, wxDefaultPosition);
+
+		// Run the dialog & check that the user didn't cancel
+		if (dialog_open->ShowModal() == wxID_OK) {
+			wxBeginBusyCursor();
+
+			// Get an array of selected filenames
+			wxArrayString files;
+			dialog_open->GetPaths(files);
+
+			// Send it to the Archive Manager Panel
+			panel_archivemanager->openFiles(files);
+
+			wxEndBusyCursor();
+		}
+	}
+
+	// File->Save
+	else if (e.GetId() == MENU_FILE_SAVE) {
 		wxBeginBusyCursor();
-
-		// Get an array of selected filenames
-		wxArrayString files;
-		dialog_open->GetPaths(files);
-
-		// Send it to the Archive Manager Panel
-		panel_archivemanager->openFiles(files);
-
+		panel_archivemanager->saveCurrent();
 		wxEndBusyCursor();
 	}
-}
 
-/* MainWindow::onFileQuit
- * File->Quit menu item event handler.
- *******************************************************************/
-void MainWindow::onFileQuit(wxCommandEvent &e) {
-	wxTheApp->ExitMainLoop();
-}
+	// File->Save As
+	else if (e.GetId() == MENU_FILE_SAVEAS) {
+		wxBeginBusyCursor();
+		panel_archivemanager->saveCurrentAs();
+		wxEndBusyCursor();
+	}
 
-/* MainWindow::onFileSave
- * File->Save menu item event handler.
- *******************************************************************/
-void MainWindow::onFileSave(wxCommandEvent& e) {
-	wxBeginBusyCursor();
-	panel_archivemanager->saveCurrent();
-	wxEndBusyCursor();
-}
+	// TODO: File->Save All
+	else if (e.GetId() == MENU_FILE_SAVEALL) {
+		wxBeginBusyCursor();
+		//panel_archivemanager->saveAll();
+		wxEndBusyCursor();
+	}
 
-/* MainWindow::onFileSaveAs
- * File->Save As menu item event handler.
- *******************************************************************/
-void MainWindow::onFileSaveAs(wxCommandEvent& e) {
-	wxBeginBusyCursor();
-	panel_archivemanager->saveCurrentAs();
-	wxEndBusyCursor();
-}
+	// File->Close
+	else if (e.GetId() == MENU_FILE_CLOSE)
+		panel_archivemanager->closeCurrent();
 
-/* MainWindow::onFileClose
- * File->Close menu item event handler.
- *******************************************************************/
-void MainWindow::onFileClose(wxCommandEvent& e) {
-	panel_archivemanager->closeCurrent();
-}
+	// TODO: File->Close All
+	//else if (e.GetId() == MENU_FILE_CLOSEALL)
+	//panel_archivemanager->closeAll();
 
-/* MainWindow::onEntryNew
- * Entry->New menu item event handler.
- *******************************************************************/
-void MainWindow::onEntryNew(wxCommandEvent& e) {
-	panel_archivemanager->newEntry();
-}
+	// File->Quit
+	else if (e.GetId() == MENU_FILE_QUIT)
+		wxTheApp->ExitMainLoop();
 
-/* MainWindow::onEntryNewFromFile
- * Entry->New from File menu item event handler.
- *******************************************************************/
-void MainWindow::onEntryNewFromFile(wxCommandEvent& e) {
-	panel_archivemanager->newEntryFromFile();
-}
 
-/* MainWindow::onEntryNewFolder
- * Entry->New Folder menu item event handler.
- *******************************************************************/
-void MainWindow::onEntryNewFolder(wxCommandEvent& e) {
-	panel_archivemanager->newEntry();
-}
+	// *******************************************************
+	// ENTRY MENU
+	// *******************************************************
 
-/* MainWindow::onEntryRename
- * Entry->Rename menu item event handler.
- *******************************************************************/
-void MainWindow::onEntryRename(wxCommandEvent& e) {
-	panel_archivemanager->renameEntry();
-}
+	// Entry->New
+	else if (e.GetId() == MENU_ENTRY_NEW)
+		panel_archivemanager->newEntry();
 
-/* MainWindow::onEntryDelete
- * Entry->Delete menu item event handler.
- *******************************************************************/
-void MainWindow::onEntryDelete(wxCommandEvent& e) {
-	panel_archivemanager->deleteEntry();
-}
+	// Entry->New From File
+	else if (e.GetId() == MENU_ENTRY_NEWFROMFILE)
+		panel_archivemanager->newEntryFromFile();
 
-/* MainWindow::onEntryImport
- * Entry->Import menu item event handler.
- *******************************************************************/
-void MainWindow::onEntryImport(wxCommandEvent& e) {
-	wxBeginBusyCursor();
-	panel_archivemanager->importEntry();
-	wxEndBusyCursor();
-}
+	// Entry->Rename
+	else if (e.GetId() == MENU_ENTRY_RENAME)
+		panel_archivemanager->renameEntry();
 
-/* MainWindow::onEntryExport
- * Entry->Export menu item event handler.
- *******************************************************************/
-void MainWindow::onEntryExport(wxCommandEvent& e) {
-	wxBeginBusyCursor();
-	panel_archivemanager->exportEntry();
-	wxEndBusyCursor();
-}
+	// Entry->Delete
+	else if (e.GetId() == MENU_ENTRY_DELETE)
+		panel_archivemanager->deleteEntry();
 
-/* MainWindow::onEntryExportWad
- * Entry->Export As Wad menu item event handler.
- *******************************************************************/
-void MainWindow::onEntryExportWad(wxCommandEvent& e) {
-	wxBeginBusyCursor();
-	panel_archivemanager->exportEntryWad();
-	wxEndBusyCursor();
-}
+	// Entry->Import
+	else if (e.GetId() == MENU_ENTRY_IMPORT) {
+		wxBeginBusyCursor();
+		panel_archivemanager->importEntry();
+		wxEndBusyCursor();
+	}
 
-/* MainWindow::onEntryMoveUp
- * Entry->Move Up menu item event handler.
- *******************************************************************/
-void MainWindow::onEntryMoveUp(wxCommandEvent& e) {
-	panel_archivemanager->moveUp();
-}
+	// Entry->Export
+	else if (e.GetId() == MENU_ENTRY_EXPORT) {
+		wxBeginBusyCursor();
+		panel_archivemanager->exportEntry();
+		wxEndBusyCursor();
+	}
 
-/* MainWindow::onEntryMoveDown
- * Entry->Move Down menu item event handler.
- *******************************************************************/
-void MainWindow::onEntryMoveDown(wxCommandEvent& e) {
-	panel_archivemanager->moveDown();
-}
+	// Entry->Export as Wad
+	else if (e.GetId() == MENU_ENTRY_EXPORTWAD) {
+		wxBeginBusyCursor();
+		panel_archivemanager->exportEntryWad();
+		wxEndBusyCursor();
+	}
 
-/* MainWindow::onViewArchiveManager
- * View->Archive Manager menu item event handler.
- *******************************************************************/
-void MainWindow::onViewArchiveManager(wxCommandEvent &e) {
-	wxAuiManager *m_mgr = wxAuiManager::GetManager(panel_archivemanager);
-	wxAuiPaneInfo& p_inf = m_mgr->GetPane(_T("archive_manager"));
-	p_inf.Show(!p_inf.IsShown());
-	m_mgr->Update();
-}
+	// Entry->Move Up
+	else if (e.GetId() == MENU_ENTRY_MOVEUP)
+		panel_archivemanager->moveUp();
 
-/* MainWindow::onViewConsole
- * View->Console menu item event handler.
- *******************************************************************/
-void MainWindow::onViewConsole(wxCommandEvent &e) {
-	wxAuiManager *m_mgr = wxAuiManager::GetManager(panel_archivemanager);
-	wxAuiPaneInfo& p_inf = m_mgr->GetPane(_T("console"));
-	p_inf.Show(!p_inf.IsShown());
-	m_mgr->Update();
+	// Entry->Move Down
+	else if (e.GetId() == MENU_ENTRY_MOVEDOWN)
+		panel_archivemanager->moveDown();
+
+
+	// *******************************************************
+	// VIEW MENU
+	// *******************************************************
+
+	// View->Archive Manager
+	else if (e.GetId() == MENU_VIEW_MANAGER) {
+		wxAuiManager *m_mgr = wxAuiManager::GetManager(panel_archivemanager);
+		wxAuiPaneInfo& p_inf = m_mgr->GetPane(_T("archive_manager"));
+		p_inf.Show(!p_inf.IsShown());
+		m_mgr->Update();
+	}
+
+	// View->Console
+	else if (e.GetId() == MENU_VIEW_CONSOLE) {
+		wxAuiManager *m_mgr = wxAuiManager::GetManager(panel_archivemanager);
+		wxAuiPaneInfo& p_inf = m_mgr->GetPane(_T("console"));
+		p_inf.Show(!p_inf.IsShown());
+		m_mgr->Update();
+	}
 }
 
 /* MainWindow::onHTMLLinkClicked

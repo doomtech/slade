@@ -15,6 +15,9 @@ private:
 public:
 	// wxWidgets ID table
 	enum {
+		// Menu item IDs
+		MENU_START,
+
 		MENU_FILE_NEW,
 		MENU_FILE_NEWZIP,
 		MENU_FILE_OPEN,
@@ -42,6 +45,9 @@ public:
 
 		MENU_UNIMPLEMENTED,
 
+		MENU_END,
+
+		// Widget IDs
 		HTML_WINDOW,
 	};
 
@@ -52,28 +58,7 @@ public:
 	void	setMockLayout();
 
 	// Event handlers
-	void	onFileNewWad(wxCommandEvent &e);
-	void	onFileNewZip(wxCommandEvent &e);
-	void	onFileOpen(wxCommandEvent &e);
-	void	onFileQuit(wxCommandEvent &e);
-	void	onFileSave(wxCommandEvent &e);
-	void	onFileSaveAs(wxCommandEvent &e);
-	void	onFileClose(wxCommandEvent &e);
-
-	void	onEntryNew(wxCommandEvent &e);
-	void	onEntryNewFromFile(wxCommandEvent &e);
-	void	onEntryNewFolder(wxCommandEvent &e);
-	void	onEntryRename(wxCommandEvent &e);
-	void	onEntryDelete(wxCommandEvent &e);
-	void	onEntryImport(wxCommandEvent &e);
-	void	onEntryExport(wxCommandEvent &e);
-	void	onEntryExportWad(wxCommandEvent &e);
-	void	onEntryMoveUp(wxCommandEvent &e);
-	void	onEntryMoveDown(wxCommandEvent &e);
-
-	void	onViewArchiveManager(wxCommandEvent &e);
-	void	onViewConsole(wxCommandEvent &e);
-
+	void	onMenuItemClicked(wxCommandEvent &e);
 	void	onHTMLLinkClicked(wxHtmlLinkEvent &e);
 
 	DECLARE_EVENT_TABLE()

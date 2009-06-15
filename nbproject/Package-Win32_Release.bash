@@ -6,8 +6,10 @@
 
 # Macros
 TOP=`pwd`
-PLATFORM=MinGW-Windows
-TMPDIR=build/Win32_Release/${PLATFORM}/tmp-packaging
+CND_PLATFORM=
+CND_CONF=Win32_Release
+CND_DISTDIR=dist
+TMPDIR=build/${CND_CONF}/${CND_PLATFORM}/tmp-packaging
 TMPDIRNAME=tmp-packaging
 OUTPUT_PATH=dist/SLADE
 OUTPUT_BASENAME=SLADE
@@ -50,21 +52,21 @@ function copyFileToTmpDir
 
 # Setup
 cd "${TOP}"
-mkdir -p dist/Win32_Release/${PLATFORM}/package
+mkdir -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/package
 rm -rf ${TMPDIR}
 mkdir -p ${TMPDIR}
 
 # Copy files and create directories and links
 cd "${TOP}"
 makeDirectory ${TMPDIR}/trunk/bin
-copyFileToTmpDir "${OUTPUT_PATH}.exe" "${TMPDIR}/${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}.exe" 0755
+copyFileToTmpDir "${OUTPUT_PATH}" "${TMPDIR}/${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}" 0755
 
 
 # Generate tar file
 cd "${TOP}"
-rm -f dist/Win32_Release/${PLATFORM}/package/trunk.tar
+rm -f ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/package/trunk.tar
 cd ${TMPDIR}
-tar -vcf ../../../../dist/Win32_Release/${PLATFORM}/package/trunk.tar *
+tar -vcf ../../../../${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/package/trunk.tar *
 checkReturnCode
 
 # Cleanup

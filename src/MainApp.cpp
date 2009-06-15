@@ -103,6 +103,9 @@ void MainApp::initLogFile() {
 	wxLogMessage(_T("---------------------------"));
 }
 
+/* MainApp::readConfigFile
+ * Reads and parses the SLADE configuration file
+ *******************************************************************/
 void MainApp::readConfigFile() {
 	// Open SLADE.cfg
 	Tokenizer tz;
@@ -118,7 +121,6 @@ void MainApp::readConfigFile() {
 
 			// Keep reading name/value pairs until we hit the ending '}'
 			string cvar_name = tz.getToken();
-			wxLogMessage(cvar_name);
 			while (cvar_name.Cmp(_T("}"))) {
 				string cvar_val = tz.getToken();
 				read_cvar(cvar_name, cvar_val);
@@ -131,6 +133,9 @@ void MainApp::readConfigFile() {
 	}
 }
 
+/* MainApp::saveConfigFile
+ * Saves the SLADE configuration file
+ *******************************************************************/
 void MainApp::saveConfigFile() {
 	// Open SLADE.cfg for writing text
 	FILE* fp = fopen("SLADE.cfg", "wt");
