@@ -356,10 +356,10 @@ void MainWindow::onMenuItemClicked(wxCommandEvent& e) {
 		wxEndBusyCursor();
 	}
 
-	// TODO: File->Save All
+	// File->Save All
 	else if (e.GetId() == MENU_FILE_SAVEALL) {
 		wxBeginBusyCursor();
-		//panel_archivemanager->saveAll();
+		panel_archivemanager->saveAll();
 		wxEndBusyCursor();
 	}
 
@@ -367,9 +367,9 @@ void MainWindow::onMenuItemClicked(wxCommandEvent& e) {
 	else if (e.GetId() == MENU_FILE_CLOSE)
 		panel_archivemanager->closeCurrent();
 
-	// TODO: File->Close All
-	//else if (e.GetId() == MENU_FILE_CLOSEALL)
-	//panel_archivemanager->closeAll();
+	// File->Close All
+	else if (e.GetId() == MENU_FILE_CLOSEALL)
+		panel_archivemanager->closeAll();
 
 	// File->Quit
 	else if (e.GetId() == MENU_FILE_QUIT)

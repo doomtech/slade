@@ -176,6 +176,9 @@ void ArchiveEntry::setState(uint8_t state) {
 		parent->entryModified(this);
 }
 
+/* ArchiveEntry::unloadData
+ * 'Unloads' entry data from memory
+ *******************************************************************/
 void ArchiveEntry::unloadData() {
 	// Check there is any data to be 'unloaded'
 	if (!data || !data_loaded)
@@ -190,6 +193,7 @@ void ArchiveEntry::unloadData() {
 
 	// Update variables etc
 	setLoaded(false);
+	data = NULL;
 }
 
 /* ArchiveEntry::rename

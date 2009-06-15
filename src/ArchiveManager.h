@@ -28,6 +28,7 @@ public:
 	bool		closeArchive(int index);
 	bool		closeArchive(string filename);
 	bool		closeArchive(Archive* archive);
+	void		closeAll();
 	int			numArchives() { return (int)open_archives.size(); }
 	int			archiveIndex(Archive* archive);
 	Archive*	resourceArchive() { return resource_archive; }

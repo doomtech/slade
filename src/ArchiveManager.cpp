@@ -235,6 +235,15 @@ bool ArchiveManager::closeArchive(Archive* archive) {
 	return false;
 }
 
+/* ArchiveManager::closeAll
+ * Closes all opened archives
+ *******************************************************************/
+void ArchiveManager::closeAll() {
+	// Close the first archive in the list until no archives are open
+	while (open_archives.size() > 0)
+		closeArchive(0);
+}
+
 /* ArchiveManager::archiveIndex
  * Returns the index in the list of the given archive, or -1 if the
  * archive doesn't exist in the list

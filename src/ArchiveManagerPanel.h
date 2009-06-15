@@ -57,6 +57,8 @@ public:
 	void	openFiles(wxArrayString& files);
 
 	void	createNewArchive(uint8_t type);
+	void	closeAll();
+	void	saveAll();
 
 	// Selected archives in the list
 	void	saveSelection();

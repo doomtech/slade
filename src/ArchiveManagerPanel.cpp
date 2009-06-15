@@ -215,6 +215,48 @@ void ArchiveManagerPanel::openFiles(wxArrayString& files) {
 	}
 }
 
+/* ArchiveManagerPanel::closeAll
+ * Closes all currently open archives
+ *******************************************************************/
+void ArchiveManagerPanel::closeAll() {
+	theArchiveManager.closeAll();
+}
+
+/* ArchiveManagerPanel::saveAll
+ * Saves all currently open archives
+ *******************************************************************/
+void ArchiveManagerPanel::saveAll() {
+	// Go through all open archives
+	for (int a = 0; a < theArchiveManager.numArchives(); a++) {
+		// Get the archive to be saved
+		Archive* archive = theArchiveManager.getArchive(a);
+
+		if (archive->isOnDisk()) {
+			// Save the archive if possible
+			if (!archive->save()) {
+				// If there was an error pop up a message box
+				wxMessageBox(s_fmt(_T("Error: %s"), Global::error.c_str()), _T("Error"), wxICON_ERROR);
+			}
+		}
+		else {
+			// If the archive is newly created, do Save As instead
+
+			// Popup file save dialog
+			string formats = archive->getFileExtensionString();
+			string filename = wxFileSelector(_T("Save Archive ") + archive->getFileName(false) + _T(" As"), _T(""), _T(""), wxEmptyString, formats, wxSAVE | wxOVERWRITE_PROMPT);
+
+			// Check a filename was selected
+			if (!filename.empty()) {
+				// Save the archive
+				if (!archive->save(filename)) {
+					// If there was an error pop up a message box
+					wxMessageBox(s_fmt(_T("Error: %s"), Global::error.c_str()), _T("Error"), wxICON_ERROR);
+				}
+			}
+		}
+	}
+}
+
 /* ArchiveManagerPanel::createNewArchive
  * Creates a new archive of the given type and opens it in a tab
  *******************************************************************/
