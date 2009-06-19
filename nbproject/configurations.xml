@@ -13,6 +13,7 @@
       <itemPath>src/MainApp.h</itemPath>
       <itemPath>src/MemChunk.cpp</itemPath>
       <itemPath>src/MemChunk.h</itemPath>
+      <itemPath>src/Structs.h</itemPath>
       <itemPath>src/Tokenizer.cpp</itemPath>
       <itemPath>src/Tokenizer.h</itemPath>
       <itemPath>src/WxStuff.h</itemPath>
@@ -98,7 +99,7 @@
       <toolsSet>
         <developmentServer>localhost</developmentServer>
         <compilerSet>GNU|GNU</compilerSet>
-        <platform>3</platform>
+        <platform>2</platform>
       </toolsSet>
       <compileType>
         <ccTool>
@@ -116,7 +117,7 @@
       <toolsSet>
         <developmentServer>localhost</developmentServer>
         <compilerSet>GNU|GNU</compilerSet>
-        <platform>3</platform>
+        <platform>2</platform>
       </toolsSet>
       <compileType>
         <cTool>

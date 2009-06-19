@@ -7,7 +7,7 @@
 typedef wxString string;
 #define s_fmt wxString::Format
 
-// macro to convert a wxString to a c string
+// Macro to convert a wxString to a c string
 #define chr(s) ((const char*)(s).ToAscii())
 
 // Vectors
@@ -17,9 +17,13 @@ using std::vector;
 // Logfile
 #include <wx/log.h>
 
+// Opengl
+#include <GL/gl.h>
+
 // Global internal includes
 #include "MemChunk.h"
 #include "CVar.h"
+#include "Structs.h"
 
 // Class to hold global variables
 namespace Global {

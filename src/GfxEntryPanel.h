@@ -13,9 +13,12 @@ public:
 	GfxCanvas(wxWindow* parent, int id);
 	~GfxCanvas();
 
-	bool setContext();
+	bool	setContext();
+	void	draw();
+	void	drawChequeredBackground();
 
-	void paint(wxPaintEvent &e);
+	void	paint(wxPaintEvent &e);
+	void	resize(wxSizeEvent &e);
 
 	DECLARE_EVENT_TABLE()
 };
