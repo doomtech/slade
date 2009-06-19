@@ -69,6 +69,14 @@ bool GfxCanvas::setContext() {
  * Draws the image/background/etc
  *******************************************************************/
 void GfxCanvas::draw() {
+	// Setup the screen projection
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0.0f, GetSize().x, GetSize().y, 0.0f, -1.0f, 1.0f);
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -124,24 +132,15 @@ void GfxCanvas::paint(wxPaintEvent& e) {
  * Called when the gfx canvas is resized
  *******************************************************************/
 void GfxCanvas::resize(wxSizeEvent& e) {
-	if (!context) {
-		OnSize(e);
+	OnSize(e);
+
+	if (!context)
 		return;
-	}
 
 	// Setup the viewport
 	glViewport(0, 0, GetSize().x, GetSize().y);
 
-	// Setup the screen projection
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0.0f, GetSize().x, GetSize().y, 0.0f, -1.0f, 1.0f);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-	draw();
-	OnSize(e);
+	//Refresh();
 }
 
 
