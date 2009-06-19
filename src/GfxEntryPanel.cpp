@@ -70,6 +70,9 @@ bool GfxCanvas::setContext() {
  * Draws the image/background/etc
  *******************************************************************/
 void GfxCanvas::draw() {
+	// Setup the viewport
+	glViewport(0, 0, GetSize().x, GetSize().y);
+
 	// Setup the screen projection
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -134,7 +137,7 @@ void GfxCanvas::drawImage() {
 	glPushMatrix();
 
 	// Zoom
-	glScaled(4, 4, 1);
+	glScaled(1, 1, 1);
 
 	for (int x = 0; x < image->getWidth(); x++) {
 		for (int y = 0; y < image->getHeight(); y++) {

@@ -37,6 +37,8 @@
 /*******************************************************************
  * VARIABLES
  *******************************************************************/
+CVAR(Bool, archive_load_data, false, CVAR_SAVE)
+
 // Used for map detection
 string map_lumps[12] = {
 	_T("THINGS"),
@@ -230,7 +232,7 @@ bool WadArchive::openFile(string filename) {
 		entries.push_back(nlump);
 	}
 
-	// Detect all entry types (but unload entry data when done)
+	// Detect all entry types
 	for (size_t a = 0; a < entries.size(); a++) {
 		ArchiveEntry* entry = entries[a];
 
@@ -249,8 +251,9 @@ bool WadArchive::openFile(string filename) {
 		// Detect entry type
 		entry->detectType(true, true);
 
-		// Unload entry data
-		entry->unloadData();
+		// Unload entry data if needed
+		if (!archive_load_data)
+			entry->unloadData();
 	}
 
 	// Detect maps (will detect map entry types)

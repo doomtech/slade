@@ -39,8 +39,9 @@
 
 
 /*******************************************************************
- * VARIABLES
+ * EXTERNAL VARIABLES
  *******************************************************************/
+EXTERN_CVAR(Bool, archive_load_data)
 
 
 /* Zip Directory Layout:
@@ -335,8 +336,9 @@ bool ZipArchive::openFile(string filename) {
 			// Determine it's type
 			new_entry->detectType(true, true);
 
-			// Unload data
-			new_entry->unloadData();
+			// Unload data if needed
+			if (!archive_load_data)
+				new_entry->unloadData();
 		}
 		else {
 			// Zip entry is a directory, add it to the directory tree
