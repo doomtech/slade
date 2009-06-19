@@ -3,19 +3,24 @@
 #define	__GFXENTRYPANEL_H__
 
 #include "EntryPanel.h"
+#include "SImage.h"
 #include <wx/glcanvas.h>
 
 class GfxCanvas : public wxGLCanvas {
 private:
 	wxGLContext*	context;
+	SImage*			image;
 
 public:
 	GfxCanvas(wxWindow* parent, int id);
 	~GfxCanvas();
 
+	SImage*	getImage() { return image; }
+
 	bool	setContext();
 	void	draw();
 	void	drawChequeredBackground();
+	void	drawImage();
 
 	void	paint(wxPaintEvent &e);
 	void	resize(wxSizeEvent &e);

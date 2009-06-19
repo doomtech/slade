@@ -38,6 +38,7 @@
 GfxCanvas::GfxCanvas(wxWindow* parent, int id)
 : wxGLCanvas(parent, id, NULL, wxDefaultPosition, wxDefaultSize, wxBORDER_SUNKEN) {
 	context = NULL;
+	image = new SImage();
 }
 
 /* GfxCanvas::~GfxCanvas
@@ -77,11 +78,15 @@ void GfxCanvas::draw() {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_BLEND);
 
+	// Draw the background
 	drawChequeredBackground();
 
+	// Draw the image
+	drawImage();
+
+	// Swap buffers (ie show what was drawn)
 	SwapBuffers();
 }
 
@@ -90,26 +95,69 @@ void GfxCanvas::draw() {
  * 'background' - to indicate transparency)
  *******************************************************************/
 void GfxCanvas::drawChequeredBackground() {
-	int cols = int((double)GetSize().x / 16.0) + 1;
-	int rows = int((double)GetSize().y / 16.0) + 1;
+	// Save current matrix
+	glPushMatrix();
 
+	// Determine the number of rows and columns
+	double s_size = 8.0;
+	int cols = int((double)GetSize().x / s_size) + 1;
+	int rows = int((double)GetSize().y / s_size) + 1;
+
+	// Scale to square size
+	glScaled(s_size, s_size, 1.0f);
+
+	// Draw a grid of squares
 	for (int x = 0; x < cols; x++) {
 		for (int y = 0; y < rows; y++) {
+			// Set square colour
 			rgba_t col(128, 128, 144, 255);
 			if (x%2 != y%2)
 				col.set(160, 160, 176, 255);
-
 			col.set_gl();
 
+			// Draw the square
 			glBegin(GL_QUADS);
-			glVertex2d(x*16, y*16);
-			glVertex2d(x*16, (y+1)*16);
-			glVertex2d((x+1)*16, (y+1)*16);
-			glVertex2d((x+1)*16, y*16);
+			glVertex2d(x, y);
+			glVertex2d(x, y+1);
+			glVertex2d(x+1, y+1);
+			glVertex2d(x+1, y);
 			glEnd();
 		}
 	}
+
+	// Restore previous matrix
+	glPopMatrix();
 }
+
+void GfxCanvas::drawImage() {
+	// Save current matrix
+	glPushMatrix();
+
+	// Zoom
+	glScaled(4, 4, 1);
+
+	for (int x = 0; x < image->getWidth(); x++) {
+		for (int y = 0; y < image->getHeight(); y++) {
+			int a = (y*image->getWidth() + x) * 4;
+			uint8_t* data = image->getRGBAData();
+
+			rgba_t col(data[a], data[a+1], data[a+2], data[a+3], 0);
+			col.set_gl();
+
+			// Draw the pixel
+			glBegin(GL_QUADS);
+			glVertex2d(x, y);
+			glVertex2d(x, y+1);
+			glVertex2d(x+1, y+1);
+			glVertex2d(x+1, y);
+			glEnd();
+		}
+	}
+
+	// Restore previous matrix
+	glPopMatrix();
+}
+
 
 BEGIN_EVENT_TABLE(GfxCanvas, wxGLCanvas)
 	EVT_PAINT(GfxCanvas::paint)
@@ -139,8 +187,6 @@ void GfxCanvas::resize(wxSizeEvent& e) {
 
 	// Setup the viewport
 	glViewport(0, 0, GetSize().x, GetSize().y);
-
-	//Refresh();
 }
 
 
@@ -150,12 +196,14 @@ void GfxCanvas::resize(wxSizeEvent& e) {
  *******************************************************************/
 GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 : EntryPanel(parent) {
-	wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
-	SetSizer(vbox);
+	// Create & set sizer & border
+	wxStaticBox *frame = new wxStaticBox(this, -1, _T("Entry Contents"));
+	wxStaticBoxSizer *framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
+	SetSizer(framesizer);
 
 	// Add gfx canvas
 	gfx_canvas = new GfxCanvas(this, -1);
-	vbox->Add(gfx_canvas, 1, wxEXPAND|wxALL, 4);
+	framesizer->Add(gfx_canvas, 1, wxEXPAND|wxALL, 4);
 
 	Layout();
 }
@@ -170,5 +218,10 @@ GfxEntryPanel::~GfxEntryPanel() {
  * Loads an entry into the entry panel if it is a valid image format
  *******************************************************************/
 bool GfxEntryPanel::loadEntry(ArchiveEntry* entry) {
+	if (entry->getType() == ETYPE_PNG)
+		gfx_canvas->getImage()->loadPNG(entry->getData(true), entry->getSize());
+
+	Refresh();
+
 	return true;
 }
