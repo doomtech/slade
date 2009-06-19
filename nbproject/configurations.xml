@@ -108,6 +108,7 @@
         <linkerTool>
           <output>dist/SLADE</output>
           <linkerLibItems>
+            <linkerOptionItem>-lfreeimage</linkerOptionItem>
           </linkerLibItems>
           <commandLine>`wx-config --libs std,gl,stc`</commandLine>
         </linkerTool>
@@ -133,6 +134,7 @@
         <linkerTool>
           <output>dist/SLADE</output>
           <linkerLibItems>
+            <linkerOptionItem>-lfreeimage</linkerOptionItem>
           </linkerLibItems>
           <commandLine>`wx-config --libs std,gl,stc`</commandLine>
         </linkerTool>
@@ -142,7 +144,7 @@
       <toolsSet>
         <developmentServer>localhost</developmentServer>
         <compilerSet>MinGW|MinGW</compilerSet>
-        <platform>3</platform>
+        <platform>2</platform>
       </toolsSet>
       <compileType>
         <cTool>
@@ -198,7 +200,7 @@
       <toolsSet>
         <developmentServer>localhost</developmentServer>
         <compilerSet>MinGW|MinGW</compilerSet>
-        <platform>3</platform>
+        <platform>2</platform>
       </toolsSet>
       <compileType>
         <linkerTool>
