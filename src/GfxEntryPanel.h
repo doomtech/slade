@@ -3,10 +3,26 @@
 #define	__GFXENTRYPANEL_H__
 
 #include "EntryPanel.h"
+#include <wx/glcanvas.h>
 
-class GfxEntryPanel : public EntryPanel
-{
+class GfxCanvas : public wxGLCanvas {
 private:
+	wxGLContext*	context;
+
+public:
+	GfxCanvas(wxWindow* parent, int id);
+	~GfxCanvas();
+
+	bool setContext();
+
+	void paint(wxPaintEvent &e);
+
+	DECLARE_EVENT_TABLE()
+};
+
+class GfxEntryPanel : public EntryPanel {
+private:
+	GfxCanvas*	gfx_canvas;
 
 public:
 	GfxEntryPanel(wxWindow* parent);

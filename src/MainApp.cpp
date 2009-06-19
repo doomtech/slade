@@ -34,7 +34,6 @@
 #include "ArchiveManager.h"
 #include "Tokenizer.h"
 #include <wx/image.h>
-#include <wx/glcanvas.h>
 
 
 /*******************************************************************
@@ -43,7 +42,6 @@
 namespace Global {
 	string error = _("");
 }
-wxGLContext*	gl_context = NULL;
 MainWindow*		main_window = NULL;
 
 

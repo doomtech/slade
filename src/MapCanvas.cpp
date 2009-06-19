@@ -35,9 +35,9 @@
 
 
 /*******************************************************************
- * EXTERNAL VARIABLES
+ * VARIABLES
  *******************************************************************/
-extern wxGLContext *gl_context;
+wxGLContext *glcontext_map;
 
 
 /* MapCanvas::MapCanvas
@@ -122,13 +122,13 @@ void MapCanvas::draw() {
  * the context if it doesn't yet exist
  *******************************************************************/
 bool MapCanvas::setContext() {
-	if (!gl_context) {
+	if (!glcontext_map) {
 		if (IsShown())
-			gl_context = new wxGLContext(this);
+			glcontext_map = new wxGLContext(this);
 	}
 
-	if (gl_context) {
-		gl_context->SetCurrent(*this);
+	if (glcontext_map) {
+		glcontext_map->SetCurrent(*this);
 		return true;
 	}
 	else

@@ -32,9 +32,69 @@
 #include "GfxEntryPanel.h"
 
 
+GfxCanvas::GfxCanvas(wxWindow* parent, int id)
+: wxGLCanvas(parent, id, NULL, wxDefaultPosition, wxDefaultSize, wxBORDER_SUNKEN) {
+}
+
+GfxCanvas::~GfxCanvas() {
+}
+
+/* GfxCanvas::setContext
+ * Sets the current gl context to the canvas' context, and creates
+ * it if it doesn't exist. Returns true if the context is valid,
+ * false otherwise
+ *******************************************************************/
+bool GfxCanvas::setContext() {
+	if (!context) {
+		if (IsShown())
+			context = new wxGLContext(this);
+	}
+
+	if (context) {
+		context->SetCurrent(*this);
+		return true;
+	}
+	else
+		return false;
+}
+
+BEGIN_EVENT_TABLE(GfxCanvas, wxGLCanvas)
+	EVT_PAINT(GfxCanvas::paint)
+END_EVENT_TABLE()
+
+void GfxCanvas::paint(wxPaintEvent& e) {
+	wxPaintDC(this);
+
+	if (!setContext())
+		return;
+
+	// Setup the viewport
+	glViewport(0, 0, GetSize().x, GetSize().y);
+
+	// Setup the screen projection
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0.0f, GetSize().x, GetSize().y, 0.0f, -1.0f, 1.0f);
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+	glClearColor(0.0f, 1.0f, 1.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	SwapBuffers();
+}
+
+
 GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 : EntryPanel(parent) {
+	wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
+	SetSizer(vbox);
+	
+	gfx_canvas = new GfxCanvas(this, -1);
+	vbox->Add(gfx_canvas, 1, wxEXPAND|wxALL, 4);
 
+	Layout();
 }
 
 GfxEntryPanel::~GfxEntryPanel() {
