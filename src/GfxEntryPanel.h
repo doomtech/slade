@@ -10,6 +10,7 @@ class GfxCanvas : public wxGLCanvas {
 private:
 	wxGLContext*	context;
 	SImage*			image;
+	bool			init_done;
 
 public:
 	GfxCanvas(wxWindow* parent, int id);
@@ -18,12 +19,13 @@ public:
 	SImage*	getImage() { return image; }
 
 	bool	setContext();
+	void	init();
 	void	draw();
 	void	drawChequeredBackground();
 	void	drawImage();
 
 	void	paint(wxPaintEvent &e);
-	void	resize(wxSizeEvent &e);
+	void	onEraseBackground(wxEraseEvent &e);
 
 	DECLARE_EVENT_TABLE()
 };
