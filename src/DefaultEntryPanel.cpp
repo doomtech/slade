@@ -40,11 +40,6 @@
  *******************************************************************/
 DefaultEntryPanel::DefaultEntryPanel(wxWindow* parent)
 : EntryPanel(parent) {
-	// Create & set sizer & border
-	wxStaticBox *frame = new wxStaticBox(this, -1, _T("Entry Contents"));
-	wxStaticBoxSizer *framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
-	SetSizer(framesizer);
-
 	// Create widgets
 	label_type = new wxStaticText(this, -1, _T("Entry Type:"));
 	label_size = new wxStaticText(this, -1, _T("Entry Size:"));

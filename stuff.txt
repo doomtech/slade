@@ -5,7 +5,8 @@ Feature Requests (from SLumpEd and SLADE):
 - find/replace in text editor
 - improved TEXTUREx editor (DeepSea)
 
-
+Lower Priority:
+- LZMA/Bzip2 support
 
 
 

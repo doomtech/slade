@@ -512,4 +512,14 @@ struct plane_t {
 };
 
 
+// patch_header_t: The header of a doom-format gfx image
+struct patch_header_t
+{
+	short	width;
+	short	height;
+	short	left;
+	short	top;
+};
+
+
 #endif //__STRUCTS_H__

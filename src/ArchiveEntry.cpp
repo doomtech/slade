@@ -33,18 +33,6 @@
 #include <wx/hash.h>
 
 
-/*******************************************************************
- * STRUCTS
- *******************************************************************/
-struct patch_header_t
-{
-	short	width;
-	short	height;
-	short	left;
-	short	top;
-};
-
-
 /* ArchiveEntry::ArchiveEntry
  * ArchiveEntry class constructor
  *******************************************************************/

@@ -234,14 +234,12 @@ void GfxCanvas::onEraseBackground(wxEraseEvent& e) {
  *******************************************************************/
 GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 : EntryPanel(parent) {
-	// Create & set sizer & border
-	wxStaticBox *frame = new wxStaticBox(this, -1, _T("Entry Contents"));
-	wxStaticBoxSizer *framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
-	SetSizer(framesizer);
+	// Get the sizer
+	wxSizer* sizer = GetSizer();
 
 	// Add gfx canvas
 	gfx_canvas = new GfxCanvas(this, -1);
-	framesizer->Add(gfx_canvas, 1, wxEXPAND|wxALL, 4);
+	sizer->Add(gfx_canvas, 1, wxEXPAND|wxALL, 4);
 
 	Layout();
 }
@@ -258,6 +256,10 @@ GfxEntryPanel::~GfxEntryPanel() {
 bool GfxEntryPanel::loadEntry(ArchiveEntry* entry) {
 	if (entry->getType() == ETYPE_PNG)
 		gfx_canvas->getImage()->loadPNG(entry->getData(true), entry->getSize());
+	else if (entry->getType() == ETYPE_SPRITE || // TODO: Really should change this stuff (merge all these types into a single 'ETYPE_DOOMGFX' type, or something)
+			entry->getType() == ETYPE_PATCH ||
+			entry->getType() == ETYPE_GFX)
+		gfx_canvas->getImage()->loadDoomGfx(entry->getData(true), entry->getSize());
 
 	gfx_canvas->Refresh();
 

@@ -7,6 +7,7 @@
 #include <wx/dirctrl.h>
 #include <wx/listbox.h>
 #include "ListenerAnnouncer.h"
+#include "Archive.h"
 
 class ArchiveManagerPanel;
 
@@ -49,6 +50,7 @@ public:
 	~ArchiveManagerPanel();
 
 	void	refreshArchiveList();
+	void	populateMapList(Archive* archive);
 	void	updateListItem(int index);
 	bool	isArchivePanel(int tab_index);
 

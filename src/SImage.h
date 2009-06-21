@@ -17,6 +17,7 @@ public:
 	int			getHeight() { return height; }
 
 	bool	loadPNG(uint8_t* data, int size);
+	bool	loadDoomGfx(uint8_t* data, int size);
 };
 
 #endif //__SIMAGE_H__

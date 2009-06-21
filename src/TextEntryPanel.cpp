@@ -37,14 +37,12 @@
  *******************************************************************/
 TextEntryPanel::TextEntryPanel(wxWindow* parent)
 : EntryPanel(parent) {
-	// Create & set sizer & border
-	wxStaticBox *frame = new wxStaticBox(this, -1, _T("Entry Contents"));
-	wxStaticBoxSizer *framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
-	SetSizer(framesizer);
+	// Get the sizer
+	wxSizer* sizer = GetSizer();
 
 	// Create the text area
 	text_area = new TextEditor(this, -1);
-	framesizer->Add(text_area, 1, wxEXPAND | wxALL, 4);
+	sizer->Add(text_area, 1, wxEXPAND | wxALL, 4);
 
 	Layout();
 }

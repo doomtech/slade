@@ -141,6 +141,41 @@ void ArchiveManagerPanel::refreshArchiveList() {
 		list_archives->InsertItem(list_archives->GetItemCount(), wm.getArchive(a)->getFileName(true));
 }
 
+void ArchiveManagerPanel::populateMapList(Archive* archive) {
+	// Clear current maps list
+	list_maps->ClearAll();
+
+	// Do nothing if no archive was given
+	if (!archive)
+		return;
+
+	// Get the list of maps in the selected archive
+	vector<Archive::mapdesc_t> maps = archive->detectMaps();
+
+	// Go through the list and add maps
+	for (int a = 0; a < (int) maps.size(); a++) {
+		// Setup map name string
+		string name;
+
+		// Add map format to name string
+		if (maps[a].format == 0)
+			name = _T("(D) ");
+		if (maps[a].format == 1)
+			name = _T("(H) ");
+		if (maps[a].format == 2)
+			name = _T("(U) ");
+
+		// Add map name to string
+		name += maps[a].name;
+
+		// Add the list item
+		wxListItem li;
+		li.SetText(name);
+		li.SetId(a);
+		list_maps->InsertItem(li);
+	}
+}
+
 void ArchiveManagerPanel::updateListItem(int index) {
 	list_archives->SetItemText(index, theArchiveManager.getArchive(index)->getFileName(true));
 }
@@ -303,6 +338,7 @@ void ArchiveManagerPanel::onAnnouncement(Announcer* announcer, string event_name
 		int index = -1;
 		event_data.read(&index, sizeof(int));
 		list_archives->DeleteItem(index);
+		populateMapList(NULL);
 	}
 
 	// If an archive was added
@@ -563,9 +599,6 @@ END_EVENT_TABLE()
  * selected archive.
  *******************************************************************/
 void ArchiveManagerPanel::onListArchivesChanged(wxListEvent &e) {
-	// Clear current maps list
-	list_maps->ClearAll();
-
 	// Get the selected archive
 	Archive* selected_archive = theArchiveManager.getArchive(e.GetIndex());
 
@@ -573,31 +606,7 @@ void ArchiveManagerPanel::onListArchivesChanged(wxListEvent &e) {
 	if (!selected_archive)
 		return;
 
-	// Get the list of maps in the selected archive
-	vector<Archive::mapdesc_t> maps = selected_archive->detectMaps();
-
-	// Go through the list and add maps
-	for (int a = 0; a < (int) maps.size(); a++) {
-		// Setup map name string
-		string name;
-
-		// Add map format to name string
-		if (maps[a].format == 0)
-			name = _T("(D) ");
-		if (maps[a].format == 1)
-			name = _T("(H) ");
-		if (maps[a].format == 2)
-			name = _T("(U) ");
-
-		// Add map name to string
-		name += maps[a].name;
-
-		// Add the list item
-		wxListItem li;
-		li.SetText(name);
-		li.SetId(a);
-		list_maps->InsertItem(li);
-	}
+	populateMapList(selected_archive);
 }
 
 /* ArchiveManagerPanel::onListArchivesActivated
