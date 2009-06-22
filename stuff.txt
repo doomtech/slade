@@ -4,6 +4,12 @@ Feature Requests (from SLumpEd and SLADE):
 - lump name search
 - find/replace in text editor
 - improved TEXTUREx editor (DeepSea)
+- Visual TEXTURES (zdoom format) editor (with the possibility to still edit as text)
+- A right-click -> set lump type or equivalent to force it to read lumps correctly when it failed to identify them automatically (happens a lot to very small sprites)
+- When converting a picture to PNG, having the choice between indexed colors + alpha or full colors + alpha.
+- In the image viewer, a drop-down list for display method: automatic (let the program determine), world sprite (with the crossed axes), hud sprite (in the box), graphics (without axes nor box). The automatic selection, based on offset values, isn't always accurate.
+- Still in the image viewer, another drop-down list which lets you select which palette to use, from a list of named palettes that you can create elsewhere. (I imagine a res/palette folder in which we could just export PLAYPAL lumps, giving them names like "Doom.pal", "Heretic.pal", "Simplicity.pal" etc.) With of course a default to use the PLAYPAL from the current file, if any, or that of the selected main iwad. But we'd get to change it if so we want.
+- Palette conversion
 
 Lower Priority:
 - LZMA/Bzip2 support
