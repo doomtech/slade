@@ -255,11 +255,13 @@ GfxEntryPanel::~GfxEntryPanel() {
  *******************************************************************/
 bool GfxEntryPanel::loadEntry(ArchiveEntry* entry) {
 	if (entry->getType() == ETYPE_PNG)
-		gfx_canvas->getImage()->loadPNG(entry->getData(true), entry->getSize());
+		gfx_canvas->getImage()->loadImage(entry->getData(true), entry->getSize());
 	else if (entry->getType() == ETYPE_SPRITE || // TODO: Really should change this stuff (merge all these types into a single 'ETYPE_DOOMGFX' type, or something)
 			entry->getType() == ETYPE_PATCH ||
 			entry->getType() == ETYPE_GFX)
 		gfx_canvas->getImage()->loadDoomGfx(entry->getData(true), entry->getSize());
+	else if (entry->getType() == ETYPE_FLAT)
+		gfx_canvas->getImage()->loadDoomFlat(entry->getData(true), entry->getSize());
 
 	gfx_canvas->Refresh();
 
