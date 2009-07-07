@@ -33,13 +33,12 @@
 #include "ConsolePanel.h"
 #include "ArchiveManager.h"
 #include "Archive.h"
-#include <wx/aui/aui.h>
 
 
 /*******************************************************************
  * VARIABLES
  *******************************************************************/
-string aui_perspective = _T("");
+string main_window_layout = _T("");
 
 
 /* get_toolbar_icon
@@ -91,7 +90,7 @@ MainWindow::~MainWindow() {
  *******************************************************************/
 void MainWindow::setupLayout() {
 	// Create the wxAUI manager & related things
-	wxAuiManager *m_mgr = new wxAuiManager(this);
+	m_mgr = new wxAuiManager(this);
 	wxAuiPaneInfo p_inf;
 
 
@@ -174,12 +173,14 @@ void MainWindow::setupLayout() {
 	// File toolbar
 	p_inf.ToolbarPane();
 	p_inf.Top();
+	p_inf.Name(_T("tb_file"));
 	m_mgr->AddPane(tb_file, p_inf);
 
 	// Entry toolbar
 	p_inf.ToolbarPane();
 	p_inf.Top();
 	p_inf.Position(1);
+	p_inf.Name(_T("tb_entry"));
 	m_mgr->AddPane(tb_entry, p_inf);
 
 
@@ -188,6 +189,7 @@ void MainWindow::setupLayout() {
 
 	// Setup panel info & add panel
 	p_inf.CenterPane();
+	p_inf.Name(_T("editor_area"));
 	m_mgr->AddPane(notebook_tabs, p_inf);
 
 	// Create Start Page (temporary)
@@ -229,71 +231,14 @@ void MainWindow::setupLayout() {
 	CreateStatusBar();
 
 
+	// Load previously saved perspective string
+	m_mgr->LoadPerspective(main_window_layout);
+
 	// Finalize
 	m_mgr->Update();
 	Layout();
 }
 
-/* MainWindow::setMockLayout
- * wxAUI testing stuff
- *******************************************************************/
-void MainWindow::setMockLayout() {
-	/*
-	wxAuiManager *m_mgr = new wxAuiManager(this);
-
-
-	// Menu bar
-	wxMenuBar *menu = new wxMenuBar();
-
-	// File menuGets the player's strafe vector
-	wxMenu* fileMenu = new wxMenu(_T(""));
-	fileMenu->Append(MENU_FILE_OPEN,	_("&Open Wad"),		_("Opens a Wad file"));
-	fileMenu->Append(MENU_FILE_QUIT,	_("&Quit"),			_("Quit SLADE"));
-	menu->Append(fileMenu, _("&File"));
-	SetMenuBar(menu);
-
-
-	// Toolbars
-	wxAuiPaneInfo p_inf;
-	p_inf.ToolbarPane();
-	p_inf.Top();
-
-	wxToolBar *tb1 = new wxToolBar(this, -1);
-	tb1->AddTool(-1, _("1"), wxBitmap(16, 16));
-	tb1->AddTool(-1, _("2"), wxBitmap(16, 16));
-	tb1->AddTool(-1, _("3"), wxBitmap(16, 16));
-	tb1->Realize();
-	m_mgr->AddPane(tb1, p_inf);
-
-	p_inf.Position(1);
-
-	wxToolBar *tb2 = new wxToolBar(this, -1);
-	tb2->AddTool(-1, _("1"), wxBitmap(16, 16));
-	tb2->AddTool(-1, _("2"), wxBitmap(16, 16));
-	tb2->AddTool(-1, _("3"), wxBitmap(16, 16));
-	tb2->Realize();
-	m_mgr->AddPane(tb2, p_inf);
-
-
-	// Map canvas
-	p_inf.CenterPane();
-	p_inf.Row(0);
-
-	wxPanel *canvas = new wxPanel(this, -1);
-	m_mgr->AddPane(canvas, p_inf);
-
-
-	// Info Bar
-	p_inf.Bottom();
-	p_inf.DefaultPane();
-	p_inf.BestSize(160, 160);
-
-	wxPanel *infobar = new wxPanel(this, -1);
-	m_mgr->AddPane(infobar, p_inf);
-
-	m_mgr->Update();
-	 */
-}
 
 /*******************************************************************
  * WXWIDGETS EVENTS & HANDLERS
@@ -301,6 +246,7 @@ void MainWindow::setMockLayout() {
 BEGIN_EVENT_TABLE(MainWindow, wxFrame)
 	EVT_HTML_LINK_CLICKED(HTML_WINDOW, MainWindow::onHTMLLinkClicked)
 	EVT_MENU_RANGE(MENU_START, MENU_END, MainWindow::onMenuItemClicked)
+	EVT_CLOSE(MainWindow::onClose)
 END_EVENT_TABLE()
 
 /* MainWindow::onMenuItemClicked
@@ -373,7 +319,8 @@ void MainWindow::onMenuItemClicked(wxCommandEvent& e) {
 
 	// File->Quit
 	else if (e.GetId() == MENU_FILE_QUIT)
-		wxTheApp->ExitMainLoop();
+		this->Close(true);
+		//wxTheApp->ExitMainLoop();
 
 
 	// *******************************************************
@@ -456,4 +403,12 @@ void MainWindow::onHTMLLinkClicked(wxHtmlLinkEvent &e) {
 		wxLaunchDefaultBrowser(e.GetLinkInfo().GetHref());
 	else
 		html_startpage->OnLinkClicked(e.GetLinkInfo());
+}
+
+/* MainWindow::onClose
+ * Called when the window is closed
+ *******************************************************************/
+void MainWindow::onClose(wxCloseEvent& e) {
+	main_window_layout = m_mgr->SavePerspective();
+	e.Skip();
 }

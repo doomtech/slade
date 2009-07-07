@@ -5,12 +5,14 @@
 #include "ArchiveManagerPanel.h"
 #include <wx/aui/auibook.h>
 #include <wx/html/htmlwin.h>
+#include <wx/aui/aui.h>
 
 class MainWindow : public wxFrame {
 private:
 	ArchiveManagerPanel*	panel_archivemanager;
 	wxAuiNotebook*			notebook_tabs;
 	wxHtmlWindow*			html_startpage;
+	wxAuiManager*			m_mgr;
 
 public:
 	// wxWidgets ID table
@@ -55,11 +57,11 @@ public:
 	~MainWindow();
 
 	void	setupLayout();
-	void	setMockLayout();
 
 	// Event handlers
 	void	onMenuItemClicked(wxCommandEvent &e);
 	void	onHTMLLinkClicked(wxHtmlLinkEvent &e);
+	void	onClose(wxCloseEvent &e);
 
 	DECLARE_EVENT_TABLE()
 };

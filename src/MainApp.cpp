@@ -48,6 +48,7 @@ MainWindow*		main_window = NULL;
 /*******************************************************************
  * EXTERNAL VARIABLES
  *******************************************************************/
+extern string main_window_layout;
 
 IMPLEMENT_APP(MainApp)
 
@@ -67,15 +68,15 @@ bool MainApp::OnInit() {
 	// Load configuration file
 	readConfigFile();
 
-	// Create a MainWindow and show it
-	main_window = new MainWindow();
-	main_window->Show(true);
-
 	// Open any archives on the command line
 	for (int a = 0; a < argc; a++) {
 		string arg = argv[a];
 		theArchiveManager.openArchive(arg);
 	}
+
+	// Create and show the main window
+	main_window = new MainWindow();
+	main_window->Show(true);
 
 	return true;
 }
@@ -126,6 +127,11 @@ void MainApp::readConfigFile() {
 			}
 		}
 
+		// Read saved main window AUI layout
+		if (!token.Cmp(_T("main_window_layout"))) {
+			main_window_layout = tz.getToken();
+		}
+
 		// Get next token
 		token = tz.getToken();
 	}
@@ -151,7 +157,10 @@ void MainApp::saveConfigFile() {
 	// Write cvars
 	save_cvars(fp);
 
+	// Write main window AUI layout
+	fprintf(fp, "main_window_layout \"%s\"\n", chr(main_window_layout));
+
 	// Close configuration file
-	fprintf(fp, "\n// End Configuration File");
+	fprintf(fp, "\n// End Configuration File\n\n");
 	fclose(fp);
 }
