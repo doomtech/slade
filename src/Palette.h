@@ -1,21 +1,21 @@
 
-#ifndef __PALETTES_H__
-#define	__PALETTES_H__
+#ifndef __PALETTE_H__
+#define	__PALETTE_H__
 
 #include "Archive.h"
 
-class Palette {
+class Palette8bit {
 private:
 	rgba_t	colours[255];
 	short	index_trans;
 
 public:
-	Palette();
-	~Palette();
+	Palette8bit();
+	~Palette8bit();
 
 	// Define static 'global' palette
-	static Palette& globalPalette() {
-		static Palette global;
+	static Palette8bit& globalPalette() {
+		static Palette8bit global;
 		return global;
 	}
 
@@ -25,8 +25,8 @@ public:
 	void	setColour(uint8_t index, rgba_t col) { colours[index] = col; }
 	void	setTransIndex(short index) { index_trans = index; }
 
-	void	copyPalette(Palette& copy);
+	void	copyPalette(Palette8bit& copy);
 	bool	loadFromArchive(Archive* archive);
 };
 
-#endif //__PALETTES_H__
+#endif //__PALETTE_H__

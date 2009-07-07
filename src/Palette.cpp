@@ -5,9 +5,9 @@
  *
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
- * Filename:    Palette.cpp
- * Description: Palette class, handles a palette and performs various
- *              colour transformations etc
+ * Filename:    Palette8bit.cpp
+ * Description: Palette8bit class, handles a 256-colour palette and
+ *              performs various colour transformations etc
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -32,10 +32,10 @@
 #include "Palette.h"
 
 
-/* Palette::Palette
- * Palette class constructor
+/* Palette8bit::Palette8bit
+ * Palette8bit class constructor
  *******************************************************************/
-Palette::Palette() {
+Palette8bit::Palette8bit() {
 	index_trans = -1;
 
 	// Init palette (to greyscale)
@@ -43,27 +43,27 @@ Palette::Palette() {
 		colours[a].set(a, a, a, 255);
 }
 
-/* Palette::~Palette
- * Palette class destructor
+/* Palette8bit::~Palette8bit
+ * Palette8bit class destructor
  *******************************************************************/
-Palette::~Palette() {
+Palette8bit::~Palette8bit() {
 }
 
-/* Palette::copyPalette
+/* Palette8bit::copyPalette8bit
  * Copies the given palette into this one
  *******************************************************************/
-void Palette::copyPalette(Palette& copy) {
+void Palette8bit::copyPalette(Palette8bit& copy) {
 	for (int a = 0; a < 256; a++)
 		setColour(a, copy.colour(a));
 	index_trans = copy.transIndex();
 }
 
-/* Palette::loadFromArchive
+/* Palette8bit::loadFromArchive
  * Loads colour information from an existing palette in the given
  * archive. Returns false if the archive didn't contain a palette,
  * true otherwise
  *******************************************************************/
-bool Palette::loadFromArchive(Archive* archive) {
+bool Palette8bit::loadFromArchive(Archive* archive) {
 	ArchiveEntry* playpal = archive->getEntry(_T("PLAYPAL"));
 
 	if (!playpal)
@@ -79,7 +79,6 @@ bool Palette::loadFromArchive(Archive* archive) {
 		uint8_t g = playpal_dat[c++];
 		uint8_t b = playpal_dat[c++];
 		colours[a].set(r, g, b, 255);
-		//colours[a].set(playpal_dat[c++], playpal_dat[c++], playpal_dat[c++], 255);
 	}
 
 	return true;
