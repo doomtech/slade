@@ -43,9 +43,7 @@ SImage::SImage() {
 	data = NULL;
 	offset_x = 0;
 	offset_y = 0;
-
-	for (int a = 0; a < 256; a++)
-		palette.colours[a].set(a, a, a, 255);
+	has_palette = false;
 }
 
 /* SImage::~SImage
@@ -88,12 +86,12 @@ bool SImage::loadImage(uint8_t* img_data, int size) {
 	// Get image palette if it exists
 	RGBQUAD* bm_pal = FreeImage_GetPalette(bm);
 	if (bm_pal) {
-		palette.valid = true;
+		has_palette = true;
 		for (int a = 0; a < 256; a++)
-			palette.colours[a] = rgba_t(bm_pal[a].rgbRed, bm_pal[a].rgbGreen, bm_pal[a].rgbBlue, 255);
+			palette.setColour(a, rgba_t(bm_pal[a].rgbRed, bm_pal[a].rgbGreen, bm_pal[a].rgbBlue, 255));
 	}
 	else
-		palette.valid = false;
+		has_palette = false;
 
 	// Get width & height
 	width = FreeImage_GetWidth(bm);
@@ -174,7 +172,7 @@ bool SImage::loadDoomGfx(uint8_t* gfx_data, int size) {
 	height = header->height;
 	offset_x = header->left;
 	offset_y = header->top;
-	palette.valid = true;
+	has_palette = true;
 
 	// Clear current data if it exists
 	if (data)
@@ -204,7 +202,7 @@ bool SImage::loadDoomGfx(uint8_t* gfx_data, int size) {
 			for (BYTE p = 0; p < n_pix; p++) {
 				bits++;
 				int pos = ((row + p)*width + c) * 4;
-				rgba_t col = palette.colours[*bits];
+				rgba_t col = palette.colour(*bits);
 				data[pos] = col.r;
 				data[pos+1] = col.g;
 				data[pos+2] = col.b;
@@ -234,7 +232,7 @@ bool SImage::loadDoomFlat(uint8_t* gfx_data, int size) {
 	// Setup variables
 	width = 64;
 	height = 64;
-	palette.valid = true;
+	has_palette = true;
 
 	// Clear current data if it exists
 	if (data)
@@ -244,7 +242,7 @@ bool SImage::loadDoomFlat(uint8_t* gfx_data, int size) {
 	data = new uint8_t[64*64*4];
 	int c = 0;
 	for (int a = 0; a < 64*64; a ++) {
-		rgba_t col = palette.colours[gfx_data[a]];
+		rgba_t col = palette.colour(gfx_data[a]);
 		data[c++] = col.r;	// Red
 		data[c++] = col.g;	// Green
 		data[c++] = col.b;	// Blue

@@ -568,7 +568,6 @@ void ZipEntryListPanel::onEntryListActivated(wxListEvent& event) {
  * Called when an 'edit label' operation finishes on a list entry
  *******************************************************************/
 void ZipEntryListPanel::onEntryListEditLabel(wxListEvent& event) {
-	// TODO: Check if renamed entry is a folder and rename it in the archive accordingly
 	ArchiveEntry* entry = getFocusedEntry();
 	if (entry && !event.IsEditCancelled() && entry != dummy_folder_entry) {
 		archive->renameEntry(entry, event.GetLabel());

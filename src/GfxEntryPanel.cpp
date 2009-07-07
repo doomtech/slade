@@ -30,6 +30,7 @@
 #include "Main.h"
 #include "WxStuff.h"
 #include "GfxEntryPanel.h"
+#include "Palette.h"
 
 
 /* GfxCanvas::GfxCanvas
@@ -254,6 +255,9 @@ GfxEntryPanel::~GfxEntryPanel() {
  * Loads an entry into the entry panel if it is a valid image format
  *******************************************************************/
 bool GfxEntryPanel::loadEntry(ArchiveEntry* entry) {
+	if (entry->getParent())
+		gfx_canvas->getImage()->getPalette().loadFromArchive(entry->getParent());
+
 	if (entry->getType() == ETYPE_PNG)
 		gfx_canvas->getImage()->loadImage(entry->getData(true), entry->getSize());
 	else if (entry->getType() == ETYPE_SPRITE || // TODO: Really should change this stuff (merge all these types into a single 'ETYPE_DOOMGFX' type, or something)
