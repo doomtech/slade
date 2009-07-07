@@ -68,14 +68,16 @@ bool MainApp::OnInit() {
 	// Load configuration file
 	readConfigFile();
 
+	// Create the main window
+	main_window = new MainWindow();
+
 	// Open any archives on the command line
 	for (int a = 0; a < argc; a++) {
 		string arg = argv[a];
 		theArchiveManager.openArchive(arg);
 	}
 
-	// Create and show the main window
-	main_window = new MainWindow();
+	// Show the main window
 	main_window->Show(true);
 
 	return true;
