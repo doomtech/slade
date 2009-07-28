@@ -58,6 +58,7 @@
         <itemPath>src/MapSector.h</itemPath>
         <itemPath>src/MapSide.h</itemPath>
         <itemPath>src/MapThing.h</itemPath>
+        <itemPath>src/MapVertex.cpp</itemPath>
         <itemPath>src/MapVertex.h</itemPath>
         <itemPath>src/SLADEMap.cpp</itemPath>
         <itemPath>src/SLADEMap.h</itemPath>
@@ -120,7 +121,7 @@
       <toolsSet>
         <developmentServer>localhost</developmentServer>
         <compilerSet>GNU|GNU</compilerSet>
-        <platform>3</platform>
+        <platform>2</platform>
       </toolsSet>
       <compileType>
         <cTool>

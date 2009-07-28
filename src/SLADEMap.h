@@ -22,7 +22,10 @@ public:
 	SLADEMap();
 	~SLADEMap();
 
-	bool	readMap(Archive* map_entries);
+	bool	readMap(Archive* map_entries, uint8_t format);
+	bool	readDoomMap(Archive* map_entries);
+	bool	readHexenMap(Archive* map_entries);
+	bool	readUDMFMap(ArchiveEntry* map_data);
 };
 
 #endif //__SLADEMAP_H__
