@@ -7,6 +7,10 @@
 typedef wxString string;
 #define s_fmt wxString::Format
 
+// Property list (string:string)
+#include <wx/hashmap.h>
+WX_DECLARE_STRING_HASH_MAP(wxString, PropertyList);
+
 // Macro to convert a wxString to a c string
 #define chr(s) ((const char*)(s).ToAscii())
 

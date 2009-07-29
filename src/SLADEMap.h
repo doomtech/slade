@@ -17,6 +17,7 @@ private:
 	vector<MapSector*>	sectors;
 	vector<MapVertex*>	vertices;
 	vector<MapThing*>	things;
+	PropertyList		udmf_props;
 
 public:
 	SLADEMap();

@@ -19,6 +19,8 @@ private:
 
 	vector<MapLine*>	connected_lines;
 
+	PropertyList	udmf_props;
+
 public:
 	MapVertex(){}
 	MapVertex(doomvertex_t v);

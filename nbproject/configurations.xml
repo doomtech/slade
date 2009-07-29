@@ -54,9 +54,13 @@
     </logicalFolder>
     <logicalFolder name="f3" displayName="Map Editor" projectFiles="true">
       <logicalFolder name="f2" displayName="SLADEMap" projectFiles="true">
+        <itemPath>src/MapLine.cpp</itemPath>
         <itemPath>src/MapLine.h</itemPath>
+        <itemPath>src/MapSector.cpp</itemPath>
         <itemPath>src/MapSector.h</itemPath>
+        <itemPath>src/MapSide.cpp</itemPath>
         <itemPath>src/MapSide.h</itemPath>
+        <itemPath>src/MapThing.cpp</itemPath>
         <itemPath>src/MapThing.h</itemPath>
         <itemPath>src/MapVertex.cpp</itemPath>
         <itemPath>src/MapVertex.h</itemPath>
@@ -121,7 +125,7 @@
       <toolsSet>
         <developmentServer>localhost</developmentServer>
         <compilerSet>GNU|GNU</compilerSet>
-        <platform>2</platform>
+        <platform>3</platform>
       </toolsSet>
       <compileType>
         <cTool>

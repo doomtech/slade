@@ -2,6 +2,8 @@
 #ifndef __MAPSIDE_H__
 #define __MAPSIDE_H__
 
+#include "Tokenizer.h"
+
 class MapSector;
 
 struct doomside_t
@@ -18,9 +20,14 @@ class MapSide {
 private:
 	MapSector*	sector;
 
+	PropertyList	udmf_props;
+
 public:
 	MapSide(){}
+	MapSide(doomside_t s);
 	~MapSide(){}
+
+	bool parseUDMF(Tokenizer& tz);
 };
 
 #endif //__MAPSIDE_H__

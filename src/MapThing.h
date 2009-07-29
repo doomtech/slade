@@ -2,6 +2,8 @@
 #ifndef __MAPTHING_H__
 #define __MAPTHING_H__
 
+#include "Tokenizer.h"
+
 struct doomthing_t
 {
 	short	x;
@@ -29,9 +31,15 @@ private:
 	double x;
 	double y;
 
+	PropertyList	udmf_props;
+
 public:
 	MapThing(){}
+	MapThing(doomthing_t t);
+	MapThing(hexenthing_t t);
 	~MapThing(){}
+
+	bool	parseUDMF(Tokenizer& tz);
 };
 
 #endif //__MAPTHING_H__

@@ -41,6 +41,7 @@ GfxCanvas::GfxCanvas(wxWindow* parent, int id)
 	context = NULL;
 	image = new SImage();
 	init_done = false;
+	offset_type = 1;
 }
 
 /* GfxCanvas::~GfxCanvas
@@ -121,11 +122,37 @@ void GfxCanvas::draw() {
 	// Draw the background
 	drawChequeredBackground();
 
+	// Pan if offsets
+	if (offset_type > 0) {
+		int mid_x = GetSize().x / 2;
+		int mid_y = GetSize().y / 2;
+		glTranslated(mid_x, mid_y, 0);
+	}
+
+	// Draw offset lines
+	drawOffsetLines();
+
 	// Draw the image
 	drawImage();
 
 	// Swap buffers (ie show what was drawn)
 	SwapBuffers();
+}
+
+void GfxCanvas::drawOffsetLines() {
+	if (offset_type == 1) {
+		COL_BLACK.set_gl();
+
+		glBegin(GL_LINES);
+		glVertex2d(-9999, 0);
+		glVertex2d(9999, 0);
+		glEnd();
+
+		glBegin(GL_LINES);
+		glVertex2d(0, -9999);
+		glVertex2d(0, 9999);
+		glEnd();
+	}
 }
 
 /* GfxCanvas::drawChequeredBackground
@@ -177,6 +204,10 @@ void GfxCanvas::drawImage() {
 
 	// Zoom
 	glScaled(2, 2, 1);
+
+	// Pan (offsets)
+	if (offset_type > 0)
+		glTranslated(image->offset().x, image->offset().y, 0);
 
 	for (int x = 0; x < image->getWidth(); x++) {
 		for (int y = 0; y < image->getHeight(); y++) {

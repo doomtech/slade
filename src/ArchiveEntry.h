@@ -4,9 +4,6 @@
 
 class Archive;
 
-#include <wx/hashmap.h>
-WX_DECLARE_STRING_HASH_MAP(wxString, PropertyList);
-
 #include "ListenerAnnouncer.h"
 
 // Entry types enum

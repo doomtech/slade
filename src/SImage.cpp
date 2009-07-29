@@ -71,6 +71,10 @@ bool SImage::loadImage(uint8_t* img_data, int size) {
 		return false;
 	}
 
+	// Reset offsets
+	offset_x = 0;
+	offset_y = 0;
+
 	// Create FreeImage bitmap from entry data
 	FIMEMORY* mem = FreeImage_OpenMemory(img_data, size);
 	FREE_IMAGE_FORMAT fif = FreeImage_GetFileTypeFromMemory(mem, 0);

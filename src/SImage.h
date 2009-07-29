@@ -23,6 +23,7 @@ public:
 	int				getHeight() { return height; }
 	Palette8bit&	getPalette() { return palette; }
 	bool			hasPalette() { return has_palette; }
+	point2_t		offset() { return point2_t(offset_x, offset_y); }
 
 	bool	loadImage(uint8_t* data, int size);
 	bool	loadDoomGfx(uint8_t* data, int size);

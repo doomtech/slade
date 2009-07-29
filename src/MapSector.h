@@ -2,6 +2,8 @@
 #ifndef __MAPSECTOR_H__
 #define __MAPSECTOR_H__
 
+#include "Tokenizer.h"
+
 class MapSide;
 
 struct doomsector_t
@@ -19,9 +21,14 @@ class MapSector {
 private:
 	vector<MapSide*>	connected_sides;
 
+	PropertyList	udmf_props;
+
 public:
 	MapSector(){}
+	MapSector(doomsector_t s);
 	~MapSector(){}
+
+	bool parseUDMF(Tokenizer& tz);
 };
 
 #endif //__MAPSECTOR_H__
