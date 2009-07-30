@@ -87,40 +87,39 @@ bool SLADEMap::readUDMFMap(ArchiveEntry* map_data) {
 	Tokenizer udmf_data;
 	udmf_data.openMem((char*)map_data->getData(true), map_data->getSize());
 
-	/*
 	string token = udmf_data.getToken();
-	while (token != "") {
+	while (token != _T("")) {
 		// Vertex definition
-		if (token == "vertex") {
-			Vertex* new_vertex = new Vertex();
-			if (new_vertex->parseDefinition(udmf_data))
+		if (token == _T("vertex")) {
+			MapVertex* new_vertex = new MapVertex();
+			if (new_vertex->parseUDMF(udmf_data))
 				vertices.push_back(new_vertex);
 			else
 				delete new_vertex;
 		}
 
 		// Line definition
-		if (token == "linedef") {
-			Line* new_line = new Line();
-			if (new_line->parseDefinition(udmf_data))
+		if (token == _T("linedef")) {
+			MapLine* new_line = new MapLine();
+			if (new_line->parseUDMF(udmf_data))
 				lines.push_back(new_line);
 			else
 				delete new_line;
 		}
 
 		// Side definition
-		if (token == "sidedef") {
-			Side* new_side = new Side();
-			if (new_side->parseDefinition(udmf_data))
+		if (token == _T("sidedef")) {
+			MapSide* new_side = new MapSide();
+			if (new_side->parseUDMF(udmf_data))
 				sides.push_back(new_side);
 			else
 				delete new_side;
 		}
 
 		// Sector definition
-		if (token == "sector") {
-			Sector* new_sector = new Sector();
-			if (new_sector->parseDefinition(udmf_data))
+		if (token == _T("sector")) {
+			MapSector* new_sector = new MapSector();
+			if (new_sector->parseUDMF(udmf_data))
 				sectors.push_back(new_sector);
 			else
 				delete new_sector;
@@ -128,7 +127,6 @@ bool SLADEMap::readUDMFMap(ArchiveEntry* map_data) {
 
 		token = udmf_data.getToken();
 	}
-	 */
 
 	return true;
 }

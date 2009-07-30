@@ -129,8 +129,8 @@ bool SImage::loadImage(uint8_t* img_data, int size) {
 			// Check for 'grAb' header
 			if (img_data[a] == 'g' && img_data[a + 1] == 'r' &&
 				img_data[a + 2] == 'A' && img_data[a + 3] == 'b') {
-				memcpy(&xoff, data + a + 4, 4);
-				memcpy(&yoff, data + a + 8, 4);
+				memcpy(&xoff, img_data + a + 4, 4);
+				memcpy(&yoff, img_data + a + 8, 4);
 				xoff = wxINT32_SWAP_ON_LE(xoff);
 				yoff = wxINT32_SWAP_ON_LE(yoff);
 				break;
