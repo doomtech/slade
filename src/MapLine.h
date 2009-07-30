@@ -44,6 +44,11 @@ public:
 	MapLine(hexenline_t l);
 	~MapLine(){}
 
+	MapVertex*	v1() { return vertex1; }
+	MapVertex*	v2() { return vertex2; }
+	MapSide*	s1() { return side1; }
+	MapSide*	s2() { return side2; }
+
 	bool parseUDMF(Tokenizer& tz);
 };
 

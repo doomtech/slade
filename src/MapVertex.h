@@ -26,6 +26,9 @@ public:
 	MapVertex(doomvertex_t v);
 	~MapVertex(){}
 
+	double	xPos() { return x; }
+	double	yPos() { return y; }
+
 	bool	parseUDMF(Tokenizer& tz);
 };
 

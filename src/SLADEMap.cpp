@@ -130,3 +130,28 @@ bool SLADEMap::readUDMFMap(ArchiveEntry* map_data) {
 
 	return true;
 }
+
+
+void SLADEMap::drawVertices() {
+	glPointSize(4.0f);
+	rgba_t(0, 255, 0, 255, 1).set_gl();
+
+	glBegin(GL_POINTS);
+	for (size_t a = 0; a < vertices.size(); a++)
+		glVertex2d(vertices[a]->xPos(), vertices[a]->yPos());
+	glEnd();
+}
+
+void SLADEMap::drawLines() {
+	COL_WHITE.set_gl();
+
+	for (size_t a = 0; a < lines.size(); a++) {
+		MapVertex* v1 = lines[a]->v1();
+		MapVertex* v2 = lines[a]->v2();
+
+		glBegin(GL_LINES);
+		glVertex2d(v1->xPos(), v1->yPos());
+		glVertex2d(v2->xPos(), v2->yPos());
+		glEnd();
+	}
+}

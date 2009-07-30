@@ -35,10 +35,12 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/MainWindow.o \
 	${OBJECTDIR}/src/DefaultEntryPanel.o \
 	${OBJECTDIR}/src/TextEditor.o \
+	${OBJECTDIR}/src/Palette.o \
 	${OBJECTDIR}/src/ZipArchive.o \
 	${OBJECTDIR}/src/ArchiveEntry.o \
 	${OBJECTDIR}/src/TextEntryPanel.o \
 	${OBJECTDIR}/src/WadArchive.o \
+	${OBJECTDIR}/src/MapLine.o \
 	${OBJECTDIR}/src/SLADEMap.o \
 	${OBJECTDIR}/src/Tokenizer.o \
 	${OBJECTDIR}/src/ConsolePanel.o \
@@ -47,15 +49,19 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/Archive.o \
 	${OBJECTDIR}/src/MemChunk.o \
 	${OBJECTDIR}/src/GfxEntryPanel.o \
+	${OBJECTDIR}/src/MapThing.o \
 	${OBJECTDIR}/src/ListenerAnnouncer.o \
+	${OBJECTDIR}/src/MapSector.o \
 	${OBJECTDIR}/src/Console.o \
 	${OBJECTDIR}/src/ArchivePanel.o \
+	${OBJECTDIR}/src/MapSide.o \
 	${OBJECTDIR}/src/SImage.o \
 	${OBJECTDIR}/src/MapEditorWindow.o \
 	${OBJECTDIR}/src/MainApp.o \
 	${OBJECTDIR}/src/MapCanvas.o \
 	${OBJECTDIR}/src/EntryListPanel.o \
 	${OBJECTDIR}/src/EntryPanel.o \
+	${OBJECTDIR}/src/MapVertex.o \
 	${OBJECTDIR}/src/ZipArchivePanel.o \
 	${OBJECTDIR}/src/CVar.o
 
@@ -103,6 +109,11 @@ ${OBJECTDIR}/src/TextEditor.o: nbproject/Makefile-${CND_CONF}.mk src/TextEditor.
 	${RM} $@.d
 	$(COMPILE.cc) -g -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/TextEditor.o src/TextEditor.cpp
 
+${OBJECTDIR}/src/Palette.o: nbproject/Makefile-${CND_CONF}.mk src/Palette.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -g -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/Palette.o src/Palette.cpp
+
 ${OBJECTDIR}/src/ZipArchive.o: nbproject/Makefile-${CND_CONF}.mk src/ZipArchive.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
@@ -122,6 +133,11 @@ ${OBJECTDIR}/src/WadArchive.o: nbproject/Makefile-${CND_CONF}.mk src/WadArchive.
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
 	$(COMPILE.cc) -g -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/WadArchive.o src/WadArchive.cpp
+
+${OBJECTDIR}/src/MapLine.o: nbproject/Makefile-${CND_CONF}.mk src/MapLine.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -g -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/MapLine.o src/MapLine.cpp
 
 ${OBJECTDIR}/src/SLADEMap.o: nbproject/Makefile-${CND_CONF}.mk src/SLADEMap.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
@@ -163,10 +179,20 @@ ${OBJECTDIR}/src/GfxEntryPanel.o: nbproject/Makefile-${CND_CONF}.mk src/GfxEntry
 	${RM} $@.d
 	$(COMPILE.cc) -g -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/GfxEntryPanel.o src/GfxEntryPanel.cpp
 
+${OBJECTDIR}/src/MapThing.o: nbproject/Makefile-${CND_CONF}.mk src/MapThing.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -g -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/MapThing.o src/MapThing.cpp
+
 ${OBJECTDIR}/src/ListenerAnnouncer.o: nbproject/Makefile-${CND_CONF}.mk src/ListenerAnnouncer.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
 	$(COMPILE.cc) -g -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/ListenerAnnouncer.o src/ListenerAnnouncer.cpp
+
+${OBJECTDIR}/src/MapSector.o: nbproject/Makefile-${CND_CONF}.mk src/MapSector.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -g -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/MapSector.o src/MapSector.cpp
 
 ${OBJECTDIR}/src/Console.o: nbproject/Makefile-${CND_CONF}.mk src/Console.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
@@ -177,6 +203,11 @@ ${OBJECTDIR}/src/ArchivePanel.o: nbproject/Makefile-${CND_CONF}.mk src/ArchivePa
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
 	$(COMPILE.cc) -g -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/ArchivePanel.o src/ArchivePanel.cpp
+
+${OBJECTDIR}/src/MapSide.o: nbproject/Makefile-${CND_CONF}.mk src/MapSide.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -g -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/MapSide.o src/MapSide.cpp
 
 ${OBJECTDIR}/src/SImage.o: nbproject/Makefile-${CND_CONF}.mk src/SImage.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
@@ -207,6 +238,11 @@ ${OBJECTDIR}/src/EntryPanel.o: nbproject/Makefile-${CND_CONF}.mk src/EntryPanel.
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
 	$(COMPILE.cc) -g -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/EntryPanel.o src/EntryPanel.cpp
+
+${OBJECTDIR}/src/MapVertex.o: nbproject/Makefile-${CND_CONF}.mk src/MapVertex.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -g -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/MapVertex.o src/MapVertex.cpp
 
 ${OBJECTDIR}/src/ZipArchivePanel.o: nbproject/Makefile-${CND_CONF}.mk src/ZipArchivePanel.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src

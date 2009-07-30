@@ -31,6 +31,7 @@
 #include "Main.h"
 #include "WxStuff.h"
 #include "MapCanvas.h"
+#include "SLADEMap.h"
 #include <wx/log.h>
 
 
@@ -43,9 +44,10 @@ wxGLContext *glcontext_map;
 /* MapCanvas::MapCanvas
  * MapCanvas class constructor
  *******************************************************************/
-MapCanvas::MapCanvas(wxWindow *parent, int id)
+MapCanvas::MapCanvas(wxWindow *parent, int id, SLADEMap* map)
 : wxGLCanvas(parent, id, NULL) {
 	init_done = false;
+	this->map = map;
 }
 
 /* MapCanvas::~MapCanvas
@@ -113,6 +115,9 @@ void MapCanvas::draw() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glLoadIdentity();
+
+	map->drawLines();
+	map->drawVertices();
 
 	SwapBuffers();
 }

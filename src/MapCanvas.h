@@ -3,13 +3,15 @@
 #define __MAPCANVAS_H__
 
 #include <wx/glcanvas.h>
+#include "SLADEMap.h"
 
 class MapCanvas : public wxGLCanvas {
 private:
-	bool	init_done;
+	bool		init_done;
+	SLADEMap*	map;
 
 public:
-	MapCanvas(wxWindow *parent, int id);
+	MapCanvas(wxWindow *parent, int id, SLADEMap* map);
 	~MapCanvas();
 
 	void init();

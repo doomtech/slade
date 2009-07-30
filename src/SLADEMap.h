@@ -27,6 +27,9 @@ public:
 	bool	readDoomMap(Archive* map_entries);
 	bool	readHexenMap(Archive* map_entries);
 	bool	readUDMFMap(ArchiveEntry* map_data);
+
+	void	drawVertices();
+	void	drawLines();
 };
 
 #endif //__SLADEMAP_H__
