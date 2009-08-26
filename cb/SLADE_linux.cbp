@@ -38,7 +38,17 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
+			<Add option="`wx-config --cflags std,gl`" />
 		</Compiler>
+		<Linker>
+			<Add option="`wx-config --libs std,gl`" />
+		</Linker>
+		<Unit filename="../src/Console.cpp" />
+		<Unit filename="../src/Console.h" />
+		<Unit filename="../src/ConsolePanel.cpp" />
+		<Unit filename="../src/ConsolePanel.h" />
+		<Unit filename="../src/ListenerAnnouncer.cpp" />
+		<Unit filename="../src/ListenerAnnouncer.h" />
 		<Unit filename="../src/Lump.cpp" />
 		<Unit filename="../src/Lump.h" />
 		<Unit filename="../src/LumpArea.cpp" />
@@ -50,6 +60,8 @@
 		<Unit filename="../src/MainApp.h" />
 		<Unit filename="../src/MainWindow.cpp" />
 		<Unit filename="../src/MainWindow.h" />
+		<Unit filename="../src/MapCanvas.cpp" />
+		<Unit filename="../src/MapCanvas.h" />
 		<Unit filename="../src/MapEditorWindow.cpp" />
 		<Unit filename="../src/MapEditorWindow.h" />
 		<Unit filename="../src/MapLine.h" />
@@ -59,7 +71,9 @@
 		<Unit filename="../src/MapVertex.h" />
 		<Unit filename="../src/MemChunk.cpp" />
 		<Unit filename="../src/MemChunk.h" />
+		<Unit filename="../src/SLADEMap.cpp" />
 		<Unit filename="../src/SLADEMap.h" />
+		<Unit filename="../src/TextLumpArea.cpp" />
 		<Unit filename="../src/Tokenizer.cpp" />
 		<Unit filename="../src/Tokenizer.h" />
 		<Unit filename="../src/Wad.cpp" />
@@ -75,6 +89,7 @@
 		<Extensions>
 			<code_completion />
 			<debugger />
+			<envvars />
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>
