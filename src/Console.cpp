@@ -5,8 +5,8 @@
  * 
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
- * Filename:    MainApp.cpp
- * Description: MainApp class functions.
+ * Filename:    Console.cpp
+ * Description: The SLADE Console implementation
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -30,6 +30,8 @@
 #include "Main.h"
 #include "Console.h"
 #include "Tokenizer.h"
+#include "ArchiveManager.h"
+#include "Archive.h"
 #include <wx/log.h>
 #include <algorithm>
 
@@ -187,19 +189,14 @@ void ConsoleCommand::execute(vector<string> args) {
  * A simple command to print the first given argument to the console.
  * Subsequent arguments are ignored.
  *******************************************************************/
-//CONSOLE_COMMAND(echo, 1,
-
 void c_echo(vector<string> args) {
 	Console::getInstance().logMessage(args[0]);
 }
 ConsoleCommand echo(_T("echo"), &c_echo, 1);
-//})
 
 /* Console Command - "cmdlist"
  * Lists all valid console commands
  *******************************************************************/
-//CONSOLE_COMMAND(cmdlist, 0,
-
 void c_cmdlist(vector<string> args) {
 	Console::getInstance().logMessage(s_fmt(_T("%d Valid Commands:"), Console::getInstance().numCommands()));
 
@@ -207,4 +204,16 @@ void c_cmdlist(vector<string> args) {
 		Console::getInstance().logMessage(s_fmt(_T("\"%s\""), Console::getInstance().command(a).getName().c_str()));
 }
 ConsoleCommand cmdlist(_T("cmdlist"), &c_cmdlist, 0);
-//})
+
+/* Console Command - "list_archives"
+ * Lists the filenames of all open archives
+ *******************************************************************/
+void c_list_archives(vector<string> args) {
+	Console::getInstance().logMessage(s_fmt(_T("%d Open Archives:"), theArchiveManager.numArchives()));
+
+	for (int a = 0; a < theArchiveManager.numArchives(); a++) {
+		Archive* archive = theArchiveManager.getArchive(a);
+		Console::getInstance().logMessage(s_fmt(_T("%d: \"%s\""), a + 1, archive->getFileName().c_str()));
+	}
+}
+ConsoleCommand list_archives(_T("list_archives"), &c_list_archives, 0);

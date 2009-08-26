@@ -77,10 +77,11 @@ void ConsolePanel::initLayout() {
 
 	Layout();
 
-	// Set console font (doesn't work for some reason)
-	wxFont console_font(14, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
-	text_log->SetDefaultStyle(wxTextAttr(wxNullColour, wxNullColour, console_font));
-	text_command->SetDefaultStyle(wxTextAttr(wxNullColour, wxNullColour, console_font));
+	// Set console font to default+monospace
+	wxFont f = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
+	wxFont console_font(f.GetPointSize(), wxFONTFAMILY_MODERN, f.GetStyle(), f.GetWeight());
+	text_log->SetFont(console_font);
+	text_command->SetFont(console_font);
 }
 
 /* ConsolePanel::onAnnouncement

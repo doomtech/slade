@@ -64,14 +64,18 @@ void Palette8bit::copyPalette(Palette8bit& copy) {
  * true otherwise
  *******************************************************************/
 bool Palette8bit::loadFromArchive(Archive* archive) {
+	// Find PLAYPAL entry
 	ArchiveEntry* playpal = archive->getEntry(_T("PLAYPAL"));
 
+	// Check it was found
 	if (!playpal)
 		return false;
 
+	// Check it is the correct size
 	if (playpal->getSize() < 256*3)
 		return false;
 
+	// Read palette colours
 	uint8_t* playpal_dat = playpal->getData(true);
 	int c = 0;
 	for (int a = 0; a < 256; a++) {

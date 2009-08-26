@@ -279,21 +279,3 @@ void ArchiveManager::onAnnouncement(Announcer* announcer, string event_name, Mem
 		}
 	}
 }
-
-
-
-/* Console Command - "list_archives"
- * Lists the filenames of all open archives
- *******************************************************************/
-//CONSOLE_COMMAND(list_wads, 0,
-
-void c_list_archives(vector<string> args) {
-	Console::getInstance().logMessage(s_fmt(_T("%d Open Archives:"), theArchiveManager.numArchives()));
-
-	for (int a = 0; a < theArchiveManager.numArchives(); a++) {
-		Archive* archive = theArchiveManager.getArchive(a);
-		Console::getInstance().logMessage(s_fmt(_T("%d: \"%s\""), a + 1, archive->getFileName().c_str()));
-	}
-}
-ConsoleCommand list_archives(_T("list_archives"), &c_list_archives, 0);
-//})
