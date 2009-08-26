@@ -255,3 +255,40 @@ bool SImage::loadDoomFlat(uint8_t* gfx_data, int size) {
 
 	return true;
 }
+
+/* SImage::toPNG
+ * Writes the image as PNG data to <out>, keeping palette information
+ * if it exists. Returns true on success
+ *******************************************************************/
+bool SImage::toPNG(MemChunk& out) {
+	return false;
+}
+
+/* SImage::toDoomGfx
+ * Writes the image as Doom Gfx data to <out>. Returns false if the
+ * image is not paletted, true otherwise
+ *******************************************************************/
+bool SImage::toDoomGfx(MemChunk& out) {
+	// Check if data is paletted
+	if (!has_palette) {
+		wxLogMessage(_T("Cannot convert truecolour image to doom gfx format - convert to 256-colour first."));
+		return false;
+	}
+
+	return false;
+}
+
+/* SImage::toDoomFlat
+ * Writes the image as Doom Flat data to <out>. Returns false if the
+ * image is not paletted or the image is not a valid size (64x64,
+ * 64x128, 128x128, 256x256), true otherwise
+ *******************************************************************/
+bool SImage::toDoomFlat(MemChunk& out) {
+	// Check if data is paletted
+	if (!has_palette) {
+		wxLogMessage(_T("Cannot convert truecolour image to doom flat format - convert to 256-colour first."));
+		return false;
+	}
+
+	return false;
+}

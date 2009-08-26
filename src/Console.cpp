@@ -117,8 +117,6 @@ void Console::logMessage(string message) {
 	// Announce that a new message has been logged
 	MemChunk mc;
 	announce(_T("console_logmessage"), mc);
-
-	wxLogMessage(s_fmt(_T("Console: %s"), message.c_str()));
 }
 
 /* Console::lastLogLine
@@ -133,6 +131,19 @@ string Console::lastLogLine() {
 		lastLine = log.at(log.size() - 1);
 
 	return lastLine;
+}
+
+/* Console::dumpLog
+ * Returns the entire console log as one string, each message
+ * separated by a newline
+ *******************************************************************/
+string Console::dumpLog() {
+	string ret = _T("");
+
+	for (int a = 0; a < log.size(); a++)
+		ret += log.at(a);
+
+	return ret;
 }
 
 /* Console::command

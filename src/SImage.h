@@ -28,6 +28,10 @@ public:
 	bool	loadImage(uint8_t* data, int size);
 	bool	loadDoomGfx(uint8_t* data, int size);
 	bool	loadDoomFlat(uint8_t* data, int size);
+
+	bool	toPNG(MemChunk& out);
+	bool	toDoomGfx(MemChunk& out);
+	bool	toDoomFlat(MemChunk& out);
 };
 
 #endif //__SIMAGE_H__

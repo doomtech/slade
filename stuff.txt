@@ -1,3 +1,13 @@
+'Shit to do before first release' list (in this order):
+- Gfx types conversion (including palette stuff)
+- Finish gfx panel (zoom, offset editing)
+- TEXTUREx editor
+- Text editor (syntax highlighting, script compilation, find/replace)
+- Media panel
+- Copy/Cut/Paste entries
+- Entry search
+- Archive merge
+
 Feature Requests (from SLumpEd and SLADE):
 - mass export to format (XWE)
 - mass rename (XWE)

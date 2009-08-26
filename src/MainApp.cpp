@@ -33,6 +33,7 @@
 #include "MainWindow.h"
 #include "ArchiveManager.h"
 #include "Tokenizer.h"
+#include "Console.h"
 #include <wx/image.h>
 
 
@@ -49,6 +50,10 @@ MainWindow*		main_window = NULL;
  * EXTERNAL VARIABLES
  *******************************************************************/
 extern string main_window_layout;
+
+void SLADELog::DoLog(wxLogLevel level, const wxChar* str, time_t t) {
+	Console::getInstance().logMessage(wxString(str));
+}
 
 IMPLEMENT_APP(MainApp)
 
@@ -95,8 +100,10 @@ int MainApp::OnExit() {
  * Sets up the SLADE log file
  *******************************************************************/
 void MainApp::initLogFile() {
-	// Set wxLog target
-	wxLog::SetActiveTarget(new wxLogStderr(fopen("slade.log", "wt")));
+	// Set wxLog target(s)
+	//new wxLogChain(new SLADELog());
+	wxLog::SetActiveTarget(new SLADELog());
+	new wxLogChain(new wxLogStderr(fopen("slade.log", "wt")));
 
 	// Write logfile header
 	wxLogMessage(_T("SLADE - It's a Doom Editor"));

@@ -15,6 +15,8 @@ public:
 	~MapEditorWindow();
 
 	void	setupLayout();
+
+	bool	openMap(Archive* map_data, uint8_t format);
 };
 
 #endif //__MAPEDITORWINDOW_H__

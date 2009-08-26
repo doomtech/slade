@@ -43,8 +43,14 @@
  *******************************************************************/
 ConsolePanel::ConsolePanel(wxWindow *parent, int id)
 : wxPanel(parent, id) {
+	// Setup layout
 	initLayout();
+
+	// Listen to the console
 	listenTo(&Console::getInstance());
+
+	// Load the current contents of the console log
+	text_log->AppendText(Console::getInstance().dumpLog());
 }
 
 /* ConsolePanel::~ConsolePanel

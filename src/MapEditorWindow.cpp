@@ -76,3 +76,7 @@ void MapEditorWindow::setupLayout() {
 	m_mgr->Update();
 	Layout();
 }
+
+bool MapEditorWindow::openMap(Archive* map_data, uint8_t format) {
+	return map->readMap(map_data, format);
+}
