@@ -209,10 +209,11 @@ void GfxCanvas::drawImage() {
 	if (offset_type > 0)
 		glTranslated(-image->offset().x, -image->offset().y, 0);
 
+	uint8_t* data = image->getRGBAData();
+
 	for (int x = 0; x < image->getWidth(); x++) {
 		for (int y = 0; y < image->getHeight(); y++) {
 			int a = (y*image->getWidth() + x) * 4;
-			uint8_t* data = image->getRGBAData();
 
 			rgba_t col(data[a], data[a+1], data[a+2], data[a+3], 0);
 			col.set_gl();
@@ -226,6 +227,8 @@ void GfxCanvas::drawImage() {
 			glEnd();
 		}
 	}
+
+	delete[] data;
 
 	// Restore previous matrix
 	glPopMatrix();

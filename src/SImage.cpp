@@ -41,9 +41,11 @@ SImage::SImage() {
 	width = 0;
 	height = 0;
 	data = NULL;
+	mask = NULL;
 	offset_x = 0;
 	offset_y = 0;
 	has_palette = false;
+	format = RGBA;
 }
 
 /* SImage::~SImage
@@ -52,6 +54,59 @@ SImage::SImage() {
 SImage::~SImage() {
 	if (data)
 		delete[] data;
+}
+
+/* SImage::getRGBAData
+ * Returns a copy of the image as raw RGBA data
+ *******************************************************************/
+uint8_t* SImage::getRGBAData() {
+	// If the image is empty, return NULL
+	if (width == 0 || height == 0 || data == NULL)
+		return NULL;
+
+	// Init rgba data
+	uint8_t* rgba_data = new uint8_t[width * height * 4];
+
+	// If data is already in RGBA format just return a copy
+	if (format == RGBA) {
+		memcpy(rgba_data, data, width * height * 4);
+		return rgba_data;
+	}
+
+	// Otherwise convert
+	if (format == PALMASK) {
+		uint32_t c = 0;
+		for (uint32_t a = 0; a < width * height; a ++) {
+			rgba_data[c++] = palette.colour(data[a]).r;	// Red
+			rgba_data[c++] = palette.colour(data[a]).g;	// Green
+			rgba_data[c++] = palette.colour(data[a]).b;	// Blue
+			
+			// Alpha
+			if (mask)
+				rgba_data[c++] = mask[a];
+			else
+				rgba_data[c++] = 255;
+		}
+
+		return rgba_data;
+	}
+}
+
+/* SImage::clearData
+ * Deletes/clears any existing image data
+ *******************************************************************/
+void SImage::clearData() {
+	// Delete data if it exists
+	if (data) {
+		delete[] data;
+		data = NULL;
+	}
+
+	// Delete mask if it exists
+	if (mask) {
+		delete[] mask;
+		mask = NULL;
+	}
 }
 
 /* SImage::loadImage
@@ -101,13 +156,15 @@ bool SImage::loadImage(uint8_t* img_data, int size) {
 	width = FreeImage_GetWidth(bm);
 	height = FreeImage_GetHeight(bm);
 
+	// Set format
+	format = RGBA;
+
 	// Convert to 32bpp & flip vertically
 	FIBITMAP *rgb = FreeImage_ConvertTo32Bits(bm);
 	FreeImage_FlipVertical(rgb);
 
 	// Clear current data if it exists
-	if (data)
-		delete[] data;
+	clearData();
 
 	// Load raw RGBA data
 	data = new uint8_t[width * height * 4];
@@ -177,14 +234,16 @@ bool SImage::loadDoomGfx(uint8_t* gfx_data, int size) {
 	offset_x = header->left;
 	offset_y = header->top;
 	has_palette = true;
+	format = PALMASK;
 
 	// Clear current data if it exists
-	if (data)
-		delete[] data;
+	clearData();
 
 	// Load data
-	data = new uint8_t[width * height * 4];
-	memset(data, 0, width * height * 4);	// Set image to black/transparent by default
+	data = new uint8_t[width * height];
+	memset(data, 0, width * height);	// Set colour to palette index 0
+	mask = new uint8_t[width * height];
+	memset(mask, 0, width * height);	// Set mask to fully transparent
 	for (int c = 0; c < width; c++) {
 		// Go to start of column
 		uint8_t* bits = gfx_data;
@@ -205,12 +264,14 @@ bool SImage::loadDoomGfx(uint8_t* gfx_data, int size) {
 			bits++; // Skip buffer
 			for (BYTE p = 0; p < n_pix; p++) {
 				bits++;
-				int pos = ((row + p)*width + c) * 4;
-				rgba_t col = palette.colour(*bits);
-				data[pos] = col.r;
-				data[pos+1] = col.g;
-				data[pos+2] = col.b;
-				data[pos+3] = 255;
+				int pos = ((row + p)*width + c);
+				data[pos] = *bits;
+				mask[pos] = 255;
+				//rgba_t col = palette.colour(*bits);
+				//data[pos] = col.r;
+				//data[pos+1] = col.g;
+				//data[pos+2] = col.b;
+				//data[pos+3] = 255;
 			}
 			bits += 2; // Skip buffer & go to next row offset
 		}
@@ -237,21 +298,14 @@ bool SImage::loadDoomFlat(uint8_t* gfx_data, int size) {
 	width = 64;
 	height = 64;
 	has_palette = true;
+	format = PALMASK;
 
 	// Clear current data if it exists
-	if (data)
-		delete[] data;
+	clearData();
 
 	// Read raw pixel data
-	data = new uint8_t[64*64*4];
-	int c = 0;
-	for (int a = 0; a < 64*64; a ++) {
-		rgba_t col = palette.colour(gfx_data[a]);
-		data[c++] = col.r;	// Red
-		data[c++] = col.g;	// Green
-		data[c++] = col.b;	// Blue
-		data[c++] = 255;	// Alpha
-	}
+	data = new uint8_t[64*64];
+	memcpy(data, gfx_data, 64 * 64);
 
 	return true;
 }
@@ -270,7 +324,7 @@ bool SImage::toPNG(MemChunk& out) {
  *******************************************************************/
 bool SImage::toDoomGfx(MemChunk& out) {
 	// Check if data is paletted
-	if (!has_palette) {
+	if (format != PALMASK) {
 		wxLogMessage(_T("Cannot convert truecolour image to doom gfx format - convert to 256-colour first."));
 		return false;
 	}
@@ -285,7 +339,7 @@ bool SImage::toDoomGfx(MemChunk& out) {
  *******************************************************************/
 bool SImage::toDoomFlat(MemChunk& out) {
 	// Check if data is paletted
-	if (!has_palette) {
+	if (format != PALMASK) {
 		wxLogMessage(_T("Cannot convert truecolour image to doom flat format - convert to 256-colour first."));
 		return false;
 	}
