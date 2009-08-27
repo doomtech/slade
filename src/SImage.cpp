@@ -6,9 +6,9 @@
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
  * Filename:    SImage.cpp
- * Description: SImage class: Encapsulates a 32bit image, handles
- *              loading/saving different formats, palette conversions,
- *              offsets, and a bunch of other stuff
+ * Description: SImage class - Encapsulates a paletted or32bit image,
+ *              handles loading/saving different formats,
+ *              palette conversions, offsets, and a bunch of other stuff
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -267,11 +267,6 @@ bool SImage::loadDoomGfx(uint8_t* gfx_data, int size) {
 				int pos = ((row + p)*width + c);
 				data[pos] = *bits;
 				mask[pos] = 255;
-				//rgba_t col = palette.colour(*bits);
-				//data[pos] = col.r;
-				//data[pos+1] = col.g;
-				//data[pos+2] = col.b;
-				//data[pos+3] = 255;
 			}
 			bits += 2; // Skip buffer & go to next row offset
 		}
@@ -318,6 +313,17 @@ bool SImage::toPNG(MemChunk& out) {
 	return false;
 }
 
+// Doom Gfx format structs
+
+struct post_t {
+	uint8_t			row_off;
+	vector<uint8_t>	pixels;
+};
+
+struct column_t {
+	vector<post_t> posts;
+};
+
 /* SImage::toDoomGfx
  * Writes the image as Doom Gfx data to <out>. Returns false if the
  * image is not paletted, true otherwise
@@ -329,7 +335,108 @@ bool SImage::toDoomGfx(MemChunk& out) {
 		return false;
 	}
 
-	return false;
+	// Convert image to column/post structure
+	vector<column_t> columns;
+
+	// Go through columns
+	uint32_t offset = 0;
+	for (int c = 0; c < width; c++) {
+		column_t col;
+		post_t post;
+		bool ispost = false;
+
+		offset = c * width;
+		for (int r = 0; r < height; r++) {
+			// If the current pixel is not transparent, add it to the current post
+			if (mask[offset] > 0) {
+				// If we're not currently building a post, begin one and set it's offset
+				if (!ispost) {
+					post.row_off = r;
+					ispost = true;
+				}
+
+				// Add the pixel to the post
+				post.pixels.push_back(data[offset]);
+			}
+			else if (ispost) {
+				// If the current pixel is transparent and we are currently building
+				// a post, add the current post to the list and clear it
+				col.posts.push_back(post);
+				post.pixels.clear();
+				ispost = false;
+			}
+
+			// Go to next row
+			offset += width;
+		}
+
+		// If the column ended with a post, add it
+		if (post.pixels.size() > 0)
+			col.posts.push_back(post);
+
+		// Add the column data
+		columns.push_back(col);
+
+		// Go to next column
+		offset++;
+	}
+
+	// Write doom gfx data to output
+	out.clear();
+	out.seek(0, 0);
+
+	// Setup header
+	patch_header_t header;
+	header.top = offset_y;
+	header.left = offset_x;
+	header.width = getWidth();
+	header.height = getHeight();
+
+	// Write it
+	out.write(&header.width, 2);
+	out.write(&header.height, 2);
+	out.write(&header.left, 2);
+	out.write(&header.top, 2);
+
+	// Write dummy column offsets for now
+	long *col_offsets = new long[columns.size()];
+	out.write(col_offsets, columns.size() * 4);
+
+	// Write posts
+	for (int c = 0; c < columns.size(); c++) {
+		// Record column offset
+		col_offsets[c] = out.currentPos();
+
+		for (int p = 0; p < columns[c].posts.size(); p++) {
+			// Write row offset
+			out.write(&columns[c].posts[p].row_off, 1);
+
+			// Write no. of pixels
+			uint8_t npix = columns[c].posts[p].pixels.size();
+			out.write(&npix, 1);
+
+			// Write unused byte
+			uint8_t temp = 0;
+			out.write(&temp, 1);
+
+			// Write pixels
+			for (int a = 0; a < columns[c].posts[p].pixels.size(); a++)
+				out.write(&columns[c].posts[p].pixels[a], 1);
+
+			// Write unused byte
+			out.write(&temp, 1);
+		}
+
+		// Write '255' row to signal end of column
+		uint8_t temp = 255;
+		out.write(&temp, 1);
+	}
+
+	// Now we write column offsets
+	out.seek(8, SEEK_SET);
+	out.write(col_offsets, columns.size() * 4);
+
+	return true;
 }
 
 /* SImage::toDoomFlat
@@ -343,6 +450,18 @@ bool SImage::toDoomFlat(MemChunk& out) {
 		wxLogMessage(_T("Cannot convert truecolour image to doom flat format - convert to 256-colour first."));
 		return false;
 	}
+	
+	// Check image size
+	if (!(width == 64 && height == 64 ||
+			width == 64 && height == 128 ||
+			width == 128 && height == 128 ||
+			width == 320 && height == 200)) {
+		wxLogMessage(_T("Cannot convert to doom flat format, invalid size (must be either 64x64, 64x128, 128x128 or 320x200)"));
+		return false;
+	}
 
-	return false;
+	// If it's paletted simply write out the data straight
+	out.write(data, width * height);
+
+	return true;
 }

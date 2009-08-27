@@ -21,13 +21,16 @@ public:
 	bool clear();
 	bool reSize(uint32_t new_size, bool preserve_data = true);
 
+	// Data import
 	bool loadFile(string filename, uint32_t offset = 0, uint32_t len = 0);
 	bool loadFileStream(FILE* fp, uint32_t len = 0);
 	bool loadMem(uint8_t* start, uint32_t len);
 
-	bool write(void* data, uint32_t size);
-	bool read(void* buf, uint32_t size);
-	bool seek(uint32_t offset, uint32_t start);
+	// C-style reading/writing
+	bool		write(void* data, uint32_t size);
+	bool		read(void* buf, uint32_t size);
+	bool		seek(uint32_t offset, uint32_t start);
+	uint32_t	currentPos() { return cur_ptr; }
 };
 
 #endif //__MEMCHUNK_H__
