@@ -42,6 +42,7 @@ GfxCanvas::GfxCanvas(wxWindow* parent, int id)
 	image = new SImage();
 	init_done = false;
 	offset_type = 1;
+	scale = 1;
 }
 
 /* GfxCanvas::~GfxCanvas

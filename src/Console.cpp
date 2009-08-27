@@ -67,7 +67,7 @@ void Console::addCommand(ConsoleCommand &c) {
  * Attempts to execute the command line given
  *******************************************************************/
 void Console::execute(string command) {
-	wxLogMessage(command);
+	wxLogMessage(s_fmt(_T("> %s"), command.c_str()));
 
 	// Add the command to the log
 	cmd_log.push_back(command);
@@ -217,3 +217,12 @@ void c_list_archives(vector<string> args) {
 	}
 }
 ConsoleCommand list_archives(_T("list_archives"), &c_list_archives, 0);
+
+/* Console Command - "open"
+ * Attempts to open each given argument (filenames)
+ *******************************************************************/
+void c_open(vector<string> args) {
+	for (int a = 0; a < args.size(); a++)
+		theArchiveManager.openArchive(args[a]);
+}
+ConsoleCommand open(_T("open"), &c_open, 1);
