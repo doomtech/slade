@@ -55,6 +55,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/Console.o \
 	${OBJECTDIR}/src/ArchivePanel.o \
 	${OBJECTDIR}/src/MapSide.o \
+	${OBJECTDIR}/src/GfxCanvas.o \
 	${OBJECTDIR}/src/SImage.o \
 	${OBJECTDIR}/src/MapEditorWindow.o \
 	${OBJECTDIR}/src/MainApp.o \
@@ -208,6 +209,11 @@ ${OBJECTDIR}/src/MapSide.o: nbproject/Makefile-${CND_CONF}.mk src/MapSide.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
 	$(COMPILE.cc) -g -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/MapSide.o src/MapSide.cpp
+
+${OBJECTDIR}/src/GfxCanvas.o: nbproject/Makefile-${CND_CONF}.mk src/GfxCanvas.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -g -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/GfxCanvas.o src/GfxCanvas.cpp
 
 ${OBJECTDIR}/src/SImage.o: nbproject/Makefile-${CND_CONF}.mk src/SImage.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
