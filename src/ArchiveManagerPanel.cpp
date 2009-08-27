@@ -629,7 +629,8 @@ void ArchiveManagerPanel::onListMapsChanged(wxCommandEvent &e) {
  * Opens the map in a new map editor window
  *******************************************************************/
 void ArchiveManagerPanel::onListMapsActivated(wxListEvent &e) {
-	new MapEditorWindow();
+	//new MapEditorWindow();
+	wxMessageBox(_T("Map Editor is not implemented yet."));
 }
 
 /* ArchiveManagerPanel::onBrowserItemActivated

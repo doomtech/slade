@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configurationDescriptor version="62">
   <logicalFolder name="root" displayName="root" projectFiles="true">
+    <logicalFolder name="f5" displayName="Dialogs" projectFiles="true">
+      <itemPath>src/GfxConvDialog.h</itemPath>
+    </logicalFolder>
     <logicalFolder name="f4" displayName="General" projectFiles="true">
       <itemPath>src/CVar.cpp</itemPath>
       <itemPath>src/CVar.h</itemPath>
@@ -19,7 +22,7 @@
       <itemPath>src/WxStuff.h</itemPath>
     </logicalFolder>
     <logicalFolder name="f2" displayName="Main Editor" projectFiles="true">
-      <logicalFolder name="f1" displayName="UI Panels" projectFiles="true">
+      <logicalFolder name="f1" displayName="UI Elements" projectFiles="true">
         <logicalFolder name="f1" displayName="ArchivePanel" projectFiles="true">
           <itemPath>src/ArchivePanel.cpp</itemPath>
           <itemPath>src/ArchivePanel.h</itemPath>
@@ -67,7 +70,7 @@
         <itemPath>src/SLADEMap.cpp</itemPath>
         <itemPath>src/SLADEMap.h</itemPath>
       </logicalFolder>
-      <logicalFolder name="f1" displayName="UI Panels" projectFiles="true">
+      <logicalFolder name="f1" displayName="UI Elements" projectFiles="true">
         <itemPath>src/MapCanvas.cpp</itemPath>
         <itemPath>src/MapCanvas.h</itemPath>
       </logicalFolder>
@@ -93,6 +96,10 @@
       <itemPath>src/ArchiveManager.h</itemPath>
       <itemPath>src/Palette.cpp</itemPath>
       <itemPath>src/Palette.h</itemPath>
+    </logicalFolder>
+    <logicalFolder name="f6" displayName="UI Elements" projectFiles="true">
+      <itemPath>src/GfxCanvas.cpp</itemPath>
+      <itemPath>src/GfxCanvas.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
