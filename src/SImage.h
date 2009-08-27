@@ -32,14 +32,16 @@ public:
 	bool			hasPalette() { return has_palette; }
 	point2_t		offset() { return point2_t(offset_x, offset_y); }
 
-	void	clearData();
+	void	clearData(bool clear_mask = true);
+
+	void	applyPalette(Palette8bit& pal);
 
 	bool	loadImage(uint8_t* data, int size);
 	bool	loadDoomGfx(uint8_t* data, int size);
 	bool	loadDoomFlat(uint8_t* data, int size);
 
 	bool	toPNG(MemChunk& out);
-	bool	toDoomGfx(MemChunk& out);
+	bool	toDoomGfx(MemChunk& out, uint8_t alpha_threshold = 0);
 	bool	toDoomFlat(MemChunk& out);
 };
 

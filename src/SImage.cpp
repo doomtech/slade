@@ -95,7 +95,7 @@ uint8_t* SImage::getRGBAData() {
 /* SImage::clearData
  * Deletes/clears any existing image data
  *******************************************************************/
-void SImage::clearData() {
+void SImage::clearData(bool clear_mask) {
 	// Delete data if it exists
 	if (data) {
 		delete[] data;
@@ -103,10 +103,56 @@ void SImage::clearData() {
 	}
 
 	// Delete mask if it exists
-	if (mask) {
+	if (mask && clear_mask) {
 		delete[] mask;
 		mask = NULL;
 	}
+}
+
+/* SImage::applyPalette
+ * Converts the image to the given palette (using nearest-colour
+ * matching)
+ *******************************************************************/
+void SImage::applyPalette(Palette8bit& pal) {
+	// Get image data as RGBA
+	uint8_t* rgba_data = getRGBAData();
+
+	// Build FIBITMAP from it
+	FIBITMAP* bm = FreeImage_ConvertFromRawBits(rgba_data, width, height, width * 4, 8, 0xFF000000, 0x00FF0000, 0x0000FF00, true);
+
+	// Create FreeImage palette
+	RGBQUAD fi_pal[256];
+	for (int a = 0; a < 256; a++) {
+		fi_pal[a].rgbRed = pal.colour(a).r;
+		fi_pal[a].rgbGreen = pal.colour(a).g;
+		fi_pal[a].rgbBlue = pal.colour(a).b;
+	}
+
+	// Convert image to palette
+	bm = FreeImage_ColorQuantizeEx(bm, FIQ_NNQUANT, 256, 256, fi_pal);
+
+	// Load given palette
+	palette.copyPalette(pal);
+
+	// Clear current image data
+	clearData();
+
+	// Load pixel data from the FIBITMAP
+	data = new uint8_t[width * height];
+	memcpy(data, FreeImage_GetBits(bm), width * height);
+
+	// Generate new mask from original alpha/mask data
+	mask = new uint8_t[width * height];
+	uint32_t c = 0;
+	for (int a = 3; a < width * height * 4; a += 4)
+		mask[c++] = rgba_data[a];
+
+	// Update variables
+	format = PALMASK;
+
+	// Clean up
+	delete bm;
+	delete rgba_data;
 }
 
 /* SImage::loadImage
@@ -328,7 +374,7 @@ struct column_t {
  * Writes the image as Doom Gfx data to <out>. Returns false if the
  * image is not paletted, true otherwise
  *******************************************************************/
-bool SImage::toDoomGfx(MemChunk& out) {
+bool SImage::toDoomGfx(MemChunk& out, uint8_t alpha_threshold) {
 	// Check if data is paletted
 	if (format != PALMASK) {
 		wxLogMessage(_T("Cannot convert truecolour image to doom gfx format - convert to 256-colour first."));
@@ -348,7 +394,7 @@ bool SImage::toDoomGfx(MemChunk& out) {
 		offset = c * width;
 		for (int r = 0; r < height; r++) {
 			// If the current pixel is not transparent, add it to the current post
-			if (mask[offset] > 0) {
+			if (mask[offset] > alpha_threshold) {
 				// If we're not currently building a post, begin one and set it's offset
 				if (!ispost) {
 					post.row_off = r;
