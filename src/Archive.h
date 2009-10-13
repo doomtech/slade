@@ -61,6 +61,10 @@ public:
 	// Detection
 	virtual vector<mapdesc_t>	detectMaps() = 0;
 	virtual bool				detectEntryType(ArchiveEntry* entry) = 0;
+
+	// Search
+	virtual ArchiveEntry*			findEntry(string search) = 0;
+	virtual vector<ArchiveEntry*>	findEntries(string search) = 0;
 };
 
 #endif //__ARCHIVE_H__

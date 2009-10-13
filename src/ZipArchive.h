@@ -59,6 +59,9 @@ public:
 	vector<mapdesc_t>	detectMaps();
 	bool				detectEntryType(ArchiveEntry* entry);
 
+	ArchiveEntry*			findEntry(string search);
+	vector<ArchiveEntry*>	findEntries(string search);
+
 	// ---- Zip-specific ----
 	zipdir_t*	getEntryDirectory(ArchiveEntry* entry, zipdir_t* dir = NULL);
 	string		getEntryFullPath(ArchiveEntry* entry);

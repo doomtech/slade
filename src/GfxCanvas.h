@@ -10,7 +10,7 @@ private:
 	wxGLContext*	context;
 	SImage*			image;
 	bool			init_done;
-	uint8_t			offset_type;	// 0=none, 1=sprite, 2=hud
+	int				view_type;	// 0=default, 1=centered, 2=sprite offsets, 3=hud offsets
 	double			scale;
 
 public:
@@ -19,6 +19,8 @@ public:
 
 	SImage*	getImage() { return image; }
 
+	void	setViewType(int type) { view_type = type; }
+
 	bool	setContext();
 	void	init();
 	void	draw();
@@ -26,7 +28,7 @@ public:
 	void	drawImage();
 	void	drawOffsetLines();
 
-	void	zoomToFit();
+	void	zoomToFit(bool mag = true);
 
 	void	paint(wxPaintEvent &e);
 	void	onEraseBackground(wxEraseEvent &e);

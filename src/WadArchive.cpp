@@ -756,3 +756,12 @@ bool WadArchive::detectEntryType(ArchiveEntry* entry) {
 
 	return true;
 }
+
+ArchiveEntry* WadArchive::findEntry(string search) {
+	return NULL;
+}
+
+vector<ArchiveEntry*> WadArchive::findEntries(string search) {
+	vector<ArchiveEntry*> ret;
+	return ret;
+}

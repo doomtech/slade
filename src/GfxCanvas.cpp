@@ -41,7 +41,7 @@ GfxCanvas::GfxCanvas(wxWindow* parent, int id)
 	context = NULL;
 	image = new SImage();
 	init_done = false;
-	offset_type = 1;
+	view_type = 1;
 	scale = 1;
 }
 
@@ -124,14 +124,15 @@ void GfxCanvas::draw() {
 	drawChequeredBackground();
 
 	// Pan if offsets
-	if (offset_type > 0) {
+	if (view_type > 0) {
 		int mid_x = GetSize().x / 2;
 		int mid_y = GetSize().y / 2;
 		glTranslated(mid_x, mid_y, 0);
 	}
 
 	// Draw offset lines
-	drawOffsetLines();
+	if (view_type > 1)
+		drawOffsetLines();
 
 	// Draw the image
 	drawImage();
@@ -140,8 +141,11 @@ void GfxCanvas::draw() {
 	SwapBuffers();
 }
 
+/* GfxCanvas::drawOffsetLines
+ * Draws the offset center lines
+ *******************************************************************/
 void GfxCanvas::drawOffsetLines() {
-	if (offset_type == 1) {
+	if (view_type == 1) {
 		COL_BLACK.set_gl();
 
 		glBegin(GL_LINES);
@@ -205,13 +209,15 @@ void GfxCanvas::drawImage() {
 
 	// Zoom
 	glScaled(scale, scale, 1);
+	
+	// Pan
+	if (view_type == 1)
+		glTranslated(-(image->getWidth() * 0.5), -(image->getHeight() * 0.5), 0);	// Pan to center image
+	else if (view_type > 1)
+		glTranslated(-image->offset().x, -image->offset().y, 0); // Pan by offsets
 
-	// Pan (offsets)
-	if (offset_type > 0)
-		glTranslated(-image->offset().x, -image->offset().y, 0);
-
+	// Draw the image
 	uint8_t* data = image->getRGBAData();
-
 	for (int x = 0; x < image->getWidth(); x++) {
 		for (int y = 0; y < image->getHeight(); y++) {
 			int a = (y*image->getWidth() + x) * 4;
@@ -235,8 +241,17 @@ void GfxCanvas::drawImage() {
 	glPopMatrix();
 }
 
-void GfxCanvas::zoomToFit() {
+/* GfxCanvas::zoomToFit
+ * Scales the image to fit within the gfx canvas. If mag is false,
+ * the image will not be stretched to fit the canvas (only shrunk
+ * if needed)
+ *******************************************************************/
+void GfxCanvas::zoomToFit(bool mag) {
 	if (image->getWidth() > image->getHeight()) {
+		// Don't scale if we are magnifying but mag is false
+		if (!mag && GetSize().x > image->getWidth())
+			return;
+
 		// Get maximum dimension
 		double x_dim = image->getWidth();
 
@@ -247,6 +262,10 @@ void GfxCanvas::zoomToFit() {
 		scale = (double)GetSize().x / x_dim;
 	}
 	else {
+		// Don't scale if we are magnifying but mag is false
+		if (!mag && GetSize().x > image->getWidth())
+			return;
+
 		// Get maximum dimension
 		double y_dim = image->getHeight();
 

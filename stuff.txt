@@ -25,6 +25,9 @@ Lower Priority:
 - LZMA/Bzip2 support
 
 
+Ideas:
+- Abiity to perform all archive/entry management functions via the console (possibly allow scripts too?)
+
 
 
 

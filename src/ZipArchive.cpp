@@ -839,6 +839,16 @@ bool ZipArchive::detectEntryType(ArchiveEntry* entry) {
 	return true;
 }
 
+ArchiveEntry* ZipArchive::findEntry(string search) {
+	return NULL;
+}
+
+vector<ArchiveEntry*> ZipArchive::findEntries(string search) {
+	vector<ArchiveEntry*> ret;
+	return ret;
+}
+
+
 
 /* ZipArchive::getEntryDirectory
  * Recursively searches subdirectories of [dir] for the given
@@ -859,7 +869,7 @@ zipdir_t* ZipArchive::getEntryDirectory(ArchiveEntry* entry, zipdir_t* dir) {
 	if (!dir)
 		dir = directory;
 
-	// If the entry exists in the current directory, return it
+	// If the entry exissrc/ZipArchive.cpp:842: error: ‘WadArchive’ has not been declaredts in the current directory, return it
 	if (dir->entryExists(entry))
 		return dir;
 

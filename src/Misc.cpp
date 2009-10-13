@@ -5,8 +5,9 @@
  *
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
- * Filename:    GfxEntryPanel.cpp
- * Description: GfxEntryPanel class. The UI for editing gfx entries.
+ * Filename:    Misc.cpp
+ * Description: Misc functions that don't necessarily belong
+ *              anywhere else
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -28,43 +29,29 @@
  * INCLUDES
  *******************************************************************/
 #include "Main.h"
-#include "WxStuff.h"
-#include "GfxEntryPanel.h"
-#include "Palette.h"
 #include "Misc.h"
 
 
-/* GfxEntryPanel::GfxEntryPanel
- * GfxEntryPanel class constructor
- *******************************************************************/
-GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
-: EntryPanel(parent) {
-	// Get the sizer
-	wxSizer* sizer = GetSizer();
+bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry) {
+	switch (entry->getType()) {
+		// General image formats
+		case ETYPE_PNG:
+			return image->loadImage(entry->getData(true), entry->getSize());
+		// Doom gfx format
+		case ETYPE_GFX:
+			return image->loadDoomGfx(entry->getData(true), entry->getSize());
+		case ETYPE_PATCH:
+			return image->loadDoomGfx(entry->getData(true), entry->getSize());
+		case ETYPE_SPRITE:
+			return image->loadDoomGfx(entry->getData(true), entry->getSize());
+		// Doom flat format
+		case ETYPE_FLAT:
+			return image->loadDoomFlat(entry->getData(true), entry->getSize());
+		case ETYPE_GFX2:
+			return image->loadDoomFlat(entry->getData(true), entry->getSize());
+	}
 
-	// Add gfx canvas
-	gfx_canvas = new GfxCanvas(this, -1);
-	sizer->Add(gfx_canvas, 1, wxEXPAND|wxALL, 4);
-
-	Layout();
-}
-
-/* GfxEntryPanel::~GfxEntryPanel
- * GfxEntryPanel class destructor
- *******************************************************************/
-GfxEntryPanel::~GfxEntryPanel() {
-}
-
-/* GfxEntryPanel::loadEntry
- * Loads an entry into the entry panel if it is a valid image format
- *******************************************************************/
-bool GfxEntryPanel::loadEntry(ArchiveEntry* entry) {
-	if (entry->getParent())
-		gfx_canvas->getImage()->getPalette().loadFromArchive(entry->getParent());
-
-	Misc::loadImageFromEntry(gfx_canvas->getImage(), entry);
-
-	gfx_canvas->Refresh();
-
-	return true;
+	// Unknown image type
+	Global::error = _T("Entry is not a known image format");
+	return false;
 }

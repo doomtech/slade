@@ -2,6 +2,7 @@
 <configurationDescriptor version="62">
   <logicalFolder name="root" displayName="root" projectFiles="true">
     <logicalFolder name="f5" displayName="Dialogs" projectFiles="true">
+      <itemPath>src/GfxConvDialog.cpp</itemPath>
       <itemPath>src/GfxConvDialog.h</itemPath>
     </logicalFolder>
     <logicalFolder name="f4" displayName="General" projectFiles="true">
@@ -16,6 +17,8 @@
       <itemPath>src/MainApp.h</itemPath>
       <itemPath>src/MemChunk.cpp</itemPath>
       <itemPath>src/MemChunk.h</itemPath>
+      <itemPath>src/Misc.cpp</itemPath>
+      <itemPath>src/Misc.h</itemPath>
       <itemPath>src/Structs.h</itemPath>
       <itemPath>src/Tokenizer.cpp</itemPath>
       <itemPath>src/Tokenizer.h</itemPath>

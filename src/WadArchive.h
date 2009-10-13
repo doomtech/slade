@@ -42,6 +42,9 @@ public:
 
 	vector<mapdesc_t>	detectMaps();
 	bool				detectEntryType(ArchiveEntry* entry);
+
+	ArchiveEntry*			findEntry(string search);
+	vector<ArchiveEntry*>	findEntries(string search);
 };
 
 #endif	/* _WADARCHIVE_H */
