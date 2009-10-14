@@ -103,7 +103,7 @@ void MainApp::initLogFile() {
 	// Set wxLog target(s)
 	//new wxLogChain(new SLADELog());
 	wxLog::SetActiveTarget(new SLADELog());
-	new wxLogChain(new wxLogStderr(fopen("slade.log", "wt")));
+	new wxLogChain(new wxLogStderr(fopen("slade3.log", "wt")));
 
 	// Write logfile header
 	wxLogMessage(_T("SLADE - It's a Doom Editor"));
@@ -117,7 +117,7 @@ void MainApp::initLogFile() {
 void MainApp::readConfigFile() {
 	// Open SLADE.cfg
 	Tokenizer tz;
-	if (!tz.openFile(_T("SLADE.cfg")))
+	if (!tz.openFile(_T("SLADE3.cfg")))
 		return;
 
 	// Go through the file with the tokenizer
@@ -151,7 +151,7 @@ void MainApp::readConfigFile() {
  *******************************************************************/
 void MainApp::saveConfigFile() {
 	// Open SLADE.cfg for writing text
-	FILE* fp = fopen("SLADE.cfg", "wt");
+	FILE* fp = fopen("SLADE3.cfg", "wt");
 
 	// Do nothing if it didn't open correctly
 	if (!fp)
