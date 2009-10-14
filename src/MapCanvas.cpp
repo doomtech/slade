@@ -175,5 +175,5 @@ void MapCanvas::resize(wxSizeEvent& event)
 	glLoadIdentity();
 
 	draw();
-	OnSize(event);
+	//OnSize(event);
 }

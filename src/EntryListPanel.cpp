@@ -51,7 +51,7 @@ CVAR(Bool, entry_list_monospace, true, CVAR_SAVE);
  * Gets an entry icon image from the SLADE resource pk3 and returns
  * it as a wxImage (will be empty if the specified icon isn't found)
  *******************************************************************/
-wxImage get_entry_icon(string name, int type) {
+wxImage get_entry_icon(string name, wxBitmapType type) {
 	// Init
 	wxImage image;
 

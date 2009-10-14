@@ -45,7 +45,7 @@ string main_window_layout = _T("");
  * Gets a toolbar image from the SLADE resource pk3 and returns it
  * as a wxImage (will be empty if the specified icon isn't found)
  *******************************************************************/
-wxImage get_toolbar_icon(string name, int type) {
+wxImage get_toolbar_icon(string name, wxBitmapType type) {
 	// Init
 	wxImage image;
 

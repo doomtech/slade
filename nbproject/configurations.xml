@@ -116,18 +116,18 @@
       <toolsSet>
         <developmentServer>localhost</developmentServer>
         <compilerSet>GNU|GNU</compilerSet>
-        <platform>3</platform>
+        <platform>2</platform>
       </toolsSet>
       <compileType>
         <ccTool>
-          <commandLine>`wx-config --cxxflags std,gl,stc`</commandLine>
+          <commandLine>`wx-config --cxxflags std,gl,stc,aui`</commandLine>
         </ccTool>
         <linkerTool>
           <output>dist/SLADE</output>
           <linkerLibItems>
             <linkerOptionItem>-lfreeimage</linkerOptionItem>
           </linkerLibItems>
-          <commandLine>`wx-config --libs std,gl,stc`</commandLine>
+          <commandLine>`wx-config --libs std,gl,stc,aui`</commandLine>
         </linkerTool>
       </compileType>
     </conf>
@@ -135,7 +135,7 @@
       <toolsSet>
         <developmentServer>localhost</developmentServer>
         <compilerSet>GNU|GNU</compilerSet>
-        <platform>3</platform>
+        <platform>2</platform>
       </toolsSet>
       <compileType>
         <cTool>
@@ -143,7 +143,7 @@
         </cTool>
         <ccTool>
           <developmentMode>5</developmentMode>
-          <commandLine>`wx-config --cxxflags std,gl,stc`</commandLine>
+          <commandLine>`wx-config --cxxflags std,gl,stc,aui`</commandLine>
         </ccTool>
         <fortranCompilerTool>
           <developmentMode>5</developmentMode>
@@ -153,7 +153,7 @@
           <linkerLibItems>
             <linkerOptionItem>-lfreeimage</linkerOptionItem>
           </linkerLibItems>
-          <commandLine>`wx-config --libs std,gl,stc`</commandLine>
+          <commandLine>`wx-config --libs std,gl,stc,aui`</commandLine>
         </linkerTool>
       </compileType>
     </conf>
@@ -161,7 +161,7 @@
       <toolsSet>
         <developmentServer>localhost</developmentServer>
         <compilerSet>MinGW|MinGW</compilerSet>
-        <platform>3</platform>
+        <platform>2</platform>
       </toolsSet>
       <compileType>
         <cTool>
@@ -218,7 +218,7 @@
       <toolsSet>
         <developmentServer>localhost</developmentServer>
         <compilerSet>MinGW|MinGW</compilerSet>
-        <platform>3</platform>
+        <platform>2</platform>
       </toolsSet>
       <compileType>
         <linkerTool>

@@ -66,16 +66,16 @@ void dump_cvars() {
 	for (uint16_t c = 0; c < n_cvars; c++) {
 		if (!(cvars[c]->flags & CVAR_SECRET)) {
 			if (cvars[c]->type == CVAR_INTEGER)
-				printf("%s %d\n", cvars[c]->name.c_str(), cvars[c]->GetValue().Int);
+				printf("%s %d\n", chr(cvars[c]->name), cvars[c]->GetValue().Int);
 
 			if (cvars[c]->type == CVAR_BOOLEAN)
-				printf("%s %d\n", cvars[c]->name.c_str(), cvars[c]->GetValue().Bool);
+				printf("%s %d\n", chr(cvars[c]->name), cvars[c]->GetValue().Bool);
 
 			if (cvars[c]->type == CVAR_FLOAT)
-				printf("%s %1.2f\n", cvars[c]->name.c_str(), cvars[c]->GetValue().Float);
+				printf("%s %1.2f\n", chr(cvars[c]->name), cvars[c]->GetValue().Float);
 
 			if (cvars[c]->type == CVAR_STRING)
-				printf("%s \"%s\"\n", cvars[c]->name.c_str(), ((CStringCVar *)cvars[c])->value.c_str());
+				printf("%s \"%s\"\n", chr(cvars[c]->name), chr(((CStringCVar *)cvars[c])->value));
 		}
 	}
 }
@@ -137,13 +137,13 @@ void read_cvar(string name, string value) {
 	for (uint16_t c = 0; c < n_cvars; c++) {
 		if (name == cvars[c]->name) {
 			if (cvars[c]->type == CVAR_INTEGER)
-				*((CIntCVar *) cvars[c]) = atoi((char*)value.c_str());
+				*((CIntCVar *) cvars[c]) = atoi(chr(value));
 
 			if (cvars[c]->type == CVAR_BOOLEAN)
-				*((CBoolCVar *) cvars[c]) = !!(atoi((char*)value.c_str()));
+				*((CBoolCVar *) cvars[c]) = !!(atoi(chr(value)));
 
 			if (cvars[c]->type == CVAR_FLOAT)
-				*((CFloatCVar *) cvars[c]) = (float) atof((char*)value.c_str());
+				*((CFloatCVar *) cvars[c]) = (float) atof(chr(value));
 
 			if (cvars[c]->type == CVAR_STRING)
 				*((CStringCVar *) cvars[c]) = value;
