@@ -4,6 +4,8 @@
 
 #undef min
 #undef max
+#undef WXWIN_COMPATIBILITY_2_6
+#undef WXWIN_COMPATIBILITY_2_4
 
 #include "wx/wxprec.h"
 

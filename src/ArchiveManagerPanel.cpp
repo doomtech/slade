@@ -278,7 +278,7 @@ void ArchiveManagerPanel::saveAll() {
 
 			// Popup file save dialog
 			string formats = archive->getFileExtensionString();
-			string filename = wxFileSelector(_T("Save Archive ") + archive->getFileName(false) + _T(" As"), _T(""), _T(""), wxEmptyString, formats, wxSAVE | wxOVERWRITE_PROMPT);
+			string filename = wxFileSelector(_T("Save Archive ") + archive->getFileName(false) + _T(" As"), _T(""), _T(""), wxEmptyString, formats, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 
 			// Check a filename was selected
 			if (!filename.empty()) {
@@ -384,7 +384,7 @@ void ArchiveManagerPanel::saveSelection() {
 
 			// Popup file save dialog
 			string formats = archive->getFileExtensionString();
-			string filename = wxFileSelector(_T("Save Archive ") + archive->getFileName(false) + _T(" As"), _T(""), _T(""), wxEmptyString, formats, wxSAVE | wxOVERWRITE_PROMPT);
+			string filename = wxFileSelector(_T("Save Archive ") + archive->getFileName(false) + _T(" As"), _T(""), _T(""), wxEmptyString, formats, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 
 			// Check a filename was selected
 			if (!filename.empty()) {
@@ -420,7 +420,7 @@ void ArchiveManagerPanel::saveSelectionAs() {
 
 		// Popup file save dialog
 		string formats = archive->getFileExtensionString();
-		string filename = wxFileSelector(_T("Save Archive ") + archive->getFileName(false) + _T(" As"), _T(""), _T(""), wxEmptyString, formats, wxSAVE | wxOVERWRITE_PROMPT);
+		string filename = wxFileSelector(_T("Save Archive ") + archive->getFileName(false) + _T(" As"), _T(""), _T(""), wxEmptyString, formats, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 
 		// Check a filename was selected
 		if (!filename.empty()) {
