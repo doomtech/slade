@@ -209,6 +209,15 @@ struct rgba_t {
 	float fb() { return (float)b / 255.0f; }
 	float fa() { return (float)a / 255.0f; }
 
+	bool equals(rgba_t rhs, bool alpha = false) {
+		bool col_equal = (r == rhs.r && g == rhs.g && b == rhs.b);
+
+		if (alpha)
+			return col_equal && (a == rhs.a);
+		else
+			return col_equal;
+	}
+
 	void set_gl() {
 		// Colour
 		glColor4f(fr(), fg(), fb(), fa());

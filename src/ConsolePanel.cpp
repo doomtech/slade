@@ -98,7 +98,7 @@ void ConsolePanel::onAnnouncement(Announcer* announcer, string event_name, MemCh
  * WXWIDGETS EVENTS & HANDLERS
  *******************************************************************/
 BEGIN_EVENT_TABLE(ConsolePanel, wxPanel)
-EVT_TEXT_ENTER(CP_TEXT_COMMAND, ConsolePanel::onCommandEnter)
+	EVT_TEXT_ENTER(CP_TEXT_COMMAND, ConsolePanel::onCommandEnter)
 END_EVENT_TABLE()
 
 void ConsolePanel::onCommandEnter(wxCommandEvent &e) {

@@ -45,6 +45,7 @@ public:
 	void execute(string command);
 	void logMessage(string message);
 	string lastLogLine();
+	string lastCommand();
 	string dumpLog();
 };
 

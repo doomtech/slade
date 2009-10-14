@@ -25,7 +25,10 @@ public:
 	SImage();
 	virtual ~SImage();
 
+	bool			isValid() { return (width > 0 && height > 0 && data); }
+
 	uint8_t*		getRGBAData();
+	uint8_t*		getRGBData();
 	int				getWidth() { return width; }
 	int				getHeight() { return height; }
 	Palette8bit&	getPalette() { return palette; }
@@ -36,13 +39,19 @@ public:
 
 	void	applyPalette(Palette8bit& pal);
 
+	// Image format reading
 	bool	loadImage(uint8_t* data, int size);
 	bool	loadDoomGfx(uint8_t* data, int size);
 	bool	loadDoomFlat(uint8_t* data, int size);
 
+	// Image format writing
 	bool	toPNG(MemChunk& out);
 	bool	toDoomGfx(MemChunk& out, uint8_t alpha_threshold = 0);
 	bool	toDoomFlat(MemChunk& out);
+
+	// Convertion stuff
+	bool	convertRGBA();
+	bool	convertPaletted(Palette8bit& pal, uint8_t alpha_threshold = 0, bool keep_trans = true, rgba_t col_trans = COL_CYAN);
 };
 
 #endif //__SIMAGE_H__

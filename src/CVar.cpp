@@ -137,13 +137,13 @@ void read_cvar(string name, string value) {
 	for (uint16_t c = 0; c < n_cvars; c++) {
 		if (name == cvars[c]->name) {
 			if (cvars[c]->type == CVAR_INTEGER)
-				*((CIntCVar *) cvars[c]) = atoi((char*) value.c_str());
+				*((CIntCVar *) cvars[c]) = atoi((char*)value.c_str());
 
 			if (cvars[c]->type == CVAR_BOOLEAN)
-				*((CBoolCVar *) cvars[c]) = !!(atoi((char*) value.c_str()));
+				*((CBoolCVar *) cvars[c]) = !!(atoi((char*)value.c_str()));
 
 			if (cvars[c]->type == CVAR_FLOAT)
-				*((CFloatCVar *) cvars[c]) = (float) atof((char*) value.c_str());
+				*((CFloatCVar *) cvars[c]) = (float) atof((char*)value.c_str());
 
 			if (cvars[c]->type == CVAR_STRING)
 				*((CStringCVar *) cvars[c]) = value;

@@ -40,7 +40,7 @@
  * GfxConvDialog class constructor
  *******************************************************************/
 GfxConvDialog::GfxConvDialog()
-: wxDialog(NULL, -1, _T("Graphic Format Conversion")) {
+: wxDialog(NULL, -1, _T("Graphic Format Conversion"), wxPoint(-1, -1)) {
 	current_entry = 0;
 	setupLayout();
 }
@@ -77,22 +77,22 @@ void GfxConvDialog::setupLayout() {
 	m_vbox->Add(framesizer, 1, wxEXPAND|wxALL, 4);
 
 	wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
-	framesizer->Add(vbox, 0.5, wxEXPAND|wxALL, 0);
+	framesizer->Add(vbox, 0, wxEXPAND|wxALL, 0);
 
 	vbox->Add(new wxStaticText(this, -1, _T("Current Graphic")));
 
 	gfx_current = new GfxCanvas(this, -1);
-	gfx_current->SetBestFittingSize(wxSize(192, 192));
+	gfx_current->SetInitialSize(wxSize(192, 192));
 	vbox->Add(gfx_current, 1, wxEXPAND|wxALL, 4);
 
 
 	vbox = new wxBoxSizer(wxVERTICAL);
-	framesizer->Add(vbox, 0.5, wxEXPAND|wxALL, 0);
+	framesizer->Add(vbox, 0, wxEXPAND|wxALL, 0);
 
 	vbox->Add(new wxStaticText(this, -1, _T("Converted Graphic")));
 
 	gfx_target = new GfxCanvas(this, -1);
-	gfx_target->SetBestFittingSize(wxSize(192, 192));
+	gfx_target->SetInitialSize(wxSize(192, 192));
 	vbox->Add(gfx_target, 1, wxEXPAND|wxALL, 4);
 
 
@@ -112,7 +112,7 @@ void GfxConvDialog::setupLayout() {
 	hbox->Add(btn_skip_all, 0, wxEXPAND, 0);
 
 
-	SetBestFittingSize(wxSize(-1, -1));
+	SetInitialSize(wxSize(-1, -1));
 }
 
 /* GfxConvDialog::openEntries
@@ -153,10 +153,15 @@ void GfxConvDialog::updatePreviewGfx() {
 
 	// Apply image conversion to target preview
 	doConvert();
+
+	// Refresh
+	gfx_target->Refresh();
 }
 
 bool GfxConvDialog::doConvert() {
-	return false;
+	Palette8bit& palette = gfx_target->getImage()->getPalette();
+	gfx_target->getImage()->convertPaletted(palette);
+	return true;
 }
 
 

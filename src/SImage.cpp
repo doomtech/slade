@@ -60,8 +60,8 @@ SImage::~SImage() {
  * Returns a copy of the image as raw RGBA data
  *******************************************************************/
 uint8_t* SImage::getRGBAData() {
-	// If the image is empty, return NULL
-	if (width == 0 || height == 0 || data == NULL)
+	// If the image is invalid, return NULL
+	if (!isValid())
 		return NULL;
 
 	// Init rgba data
@@ -92,6 +92,41 @@ uint8_t* SImage::getRGBAData() {
 	}
 }
 
+/* SImage::getRGBData
+ * Returns a copy of the image as raw RGB data
+ *******************************************************************/
+uint8_t* SImage::getRGBData() {
+	// If the image is invalid, return NULL
+	if (!isValid())
+		return NULL;
+
+	// Init rgb data
+	uint8_t* rgb_data = new uint8_t[width * height * 3];
+
+	if (format == RGBA) {
+		// RGBA format, remove alpha information
+		uint32_t c = 0;
+		for (uint32_t a = 0; a < width * height * 4; a += 4) {
+			rgb_data[c++] = data[a];	// Red
+			rgb_data[c++] = data[a+1];	// Green
+			rgb_data[c++] = data[a+2];	// Blue
+		}
+
+		return rgb_data;
+	}
+	if (format == PALMASK) {
+		// Paletted, convert to RGB
+		uint32_t c = 0;
+		for (uint32_t a = 0; a < width * height; a ++) {
+			rgb_data[c++] = palette.colour(data[a]).r;	// Red
+			rgb_data[c++] = palette.colour(data[a]).g;	// Green
+			rgb_data[c++] = palette.colour(data[a]).b;	// Blue
+		}
+
+		return rgb_data;
+	}
+}
+
 /* SImage::clearData
  * Deletes/clears any existing image data
  *******************************************************************/
@@ -114,11 +149,22 @@ void SImage::clearData(bool clear_mask) {
  * matching)
  *******************************************************************/
 void SImage::applyPalette(Palette8bit& pal) {
-	// Get image data as RGBA
-	uint8_t* rgba_data = getRGBAData();
+	// Check image is valid
+	if (!isValid())
+		return;
+
+	// Get image data as RGB
+	uint8_t* rgb_data = getRGBData();
+
+	// Swap red and blue colour information because FreeImage is retarded
+	for (int a = 0; a < width * height * 3; a += 3) {
+		uint8_t red = rgb_data[a];
+		rgb_data[a] = rgb_data[a+2];
+		rgb_data[a+2] = red;
+	}
 
 	// Build FIBITMAP from it
-	FIBITMAP* bm = FreeImage_ConvertFromRawBits(rgba_data, width, height, width * 4, 8, 0xFF000000, 0x00FF0000, 0x0000FF00, true);
+	FIBITMAP* bm = FreeImage_ConvertFromRawBits(rgb_data, width, height, width * 3, 24, 0, 0, 0, false);
 
 	// Create FreeImage palette
 	RGBQUAD fi_pal[256];
@@ -129,30 +175,26 @@ void SImage::applyPalette(Palette8bit& pal) {
 	}
 
 	// Convert image to palette
-	bm = FreeImage_ColorQuantizeEx(bm, FIQ_NNQUANT, 256, 256, fi_pal);
+	FIBITMAP* pbm = FreeImage_ColorQuantizeEx(bm, FIQ_NNQUANT, 256, 256, fi_pal);
 
 	// Load given palette
 	palette.copyPalette(pal);
 
-	// Clear current image data
-	clearData();
+	// Clear current image data (but not mask)
+	clearData(false);
 
 	// Load pixel data from the FIBITMAP
 	data = new uint8_t[width * height];
-	memcpy(data, FreeImage_GetBits(bm), width * height);
-
-	// Generate new mask from original alpha/mask data
-	mask = new uint8_t[width * height];
-	uint32_t c = 0;
-	for (int a = 3; a < width * height * 4; a += 4)
-		mask[c++] = rgba_data[a];
+	for (int a = 0; a < height; a++)
+		memcpy(data + a * width, FreeImage_GetScanLine(pbm, a), width);
 
 	// Update variables
 	format = PALMASK;
 
 	// Clean up
-	delete bm;
-	delete rgba_data;
+	FreeImage_Unload(bm);
+	FreeImage_Unload(pbm);
+	delete rgb_data;
 }
 
 /* SImage::loadImage
@@ -218,8 +260,8 @@ bool SImage::loadImage(uint8_t* img_data, int size) {
 	int c = 0;
 	for (int a = 0; a < width * height; a++) {
 		data[c++] = bits_rgb[a * 4 + 2];	// Red
-		data[c++] = bits_rgb[a * 4 + 1];	// Blue
-		data[c++] = bits_rgb[a * 4];		// Green
+		data[c++] = bits_rgb[a * 4 + 1];	// Green
+		data[c++] = bits_rgb[a * 4];		// Blue
 		data[c++] = bits_rgb[a * 4 + 3];	// Alpha
 	}
 
@@ -510,4 +552,53 @@ bool SImage::toDoomFlat(MemChunk& out) {
 	out.write(data, width * height);
 
 	return true;
+}
+
+/* SImage::convertRGBA
+ * Converts the image to 32bpp (RGBA). Returns false if the image was
+ * already 32bpp, true otherwise.
+ *******************************************************************/
+bool SImage::convertRGBA() {
+	// If it's already 32bpp do nothing
+	if (format == RGBA)
+		return false;
+
+	// Set new format
+	format = RGBA;
+
+	// Clear current data
+	clearData(true);
+
+	// Get 32bit data
+	data = getRGBAData();
+
+	// Done
+	return true;
+}
+
+bool SImage::convertPaletted(Palette8bit& pal, uint8_t alpha_threshold, bool keep_trans, rgba_t col_trans) {
+	// Apply the palette
+	applyPalette(pal);
+
+	if (keep_trans) {
+		// If we are keeping the existing transparency info, apply the
+		// alpha threshold given (anything above is completely opaque,
+		// anything equal or below is completely transparent)
+		for (int a = 0; a < width * height; a++) {
+			if (mask[a] > alpha_threshold)
+				mask[a] = 255;
+			else
+				mask[a] = 0;
+		}
+	}
+	else {
+		// If we aren't keeping the existing transparency info, set all
+		// pixels to opaque except for pixels of the given transparent colour
+		for (int a = 0; a < width * height; a++) {
+			if (pal.colour(data[a]).equals(col_trans))
+				mask[a] = 0;
+			else
+				mask[a] = 255;
+		}
+	}
 }

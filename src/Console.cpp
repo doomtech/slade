@@ -130,9 +130,20 @@ string Console::lastLogLine() {
 
 	// Get last line if any exist
 	if (log.size() > 0)
-		lastLine = log.at(log.size() - 1);
+		lastLine = log.back();
 
 	return lastLine;
+}
+
+string Console::lastCommand() {
+	// Init blank string
+	string lastCmd = _T("");
+
+	// Get last command if any exist
+	if (cmd_log.size() > 0)
+		lastCmd = cmd_log.back();
+
+	return lastCmd;
 }
 
 /* Console::dumpLog
