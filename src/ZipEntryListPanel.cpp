@@ -87,7 +87,7 @@ vector<int> ZipEntryListPanel::getSelection() {
 
 	// If the current directory is not the root directory and item 0
 	// is selected (ie the '..' item), remove it from the list
-	if (getCurrentDir()->parent_dir && ret[0] == 0)
+	if (ret.size() > 0 && getCurrentDir()->parent_dir && ret[0] == 0)
 		ret.erase(ret.begin());
 
 	// Return the selection
