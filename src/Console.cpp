@@ -30,8 +30,6 @@
 #include "Main.h"
 #include "Console.h"
 #include "Tokenizer.h"
-#include "ArchiveManager.h"
-#include "Archive.h"
 #include <wx/log.h>
 #include <algorithm>
 
@@ -39,6 +37,8 @@
 /*******************************************************************
  * VARIABLES
  *******************************************************************/
+Console* Console::instance = NULL;
+
 
 /* Console::Console
  * Console class constructor
@@ -179,7 +179,7 @@ ConsoleCommand::ConsoleCommand(string name, void(*commandFunc)(vector<string>), 
 	this->min_args = min_args;
 
 	// Add this command to the console
-	Console::getInstance().addCommand(*this);
+	theConsole->addCommand(*this);
 }
 
 /* ConsoleCommand::execute
@@ -190,7 +190,7 @@ void ConsoleCommand::execute(vector<string> args) {
 	if (args.size() >= min_args)
 		commandFunc(args);
 	else
-		Console::getInstance().logMessage(_T("Missing command arguments"));
+		theConsole->logMessage(_T("Missing command arguments"));
 }
 
 
@@ -201,39 +201,17 @@ void ConsoleCommand::execute(vector<string> args) {
  * Subsequent arguments are ignored.
  *******************************************************************/
 void c_echo(vector<string> args) {
-	Console::getInstance().logMessage(args[0]);
+	theConsole->logMessage(args[0]);
 }
-ConsoleCommand echo(_T("echo"), &c_echo, 1);
+ConsoleCommand con_echo(_T("echo"), &c_echo, 1);
 
 /* Console Command - "cmdlist"
  * Lists all valid console commands
  *******************************************************************/
 void c_cmdlist(vector<string> args) {
-	Console::getInstance().logMessage(s_fmt(_T("%d Valid Commands:"), Console::getInstance().numCommands()));
+	theConsole->logMessage(s_fmt(_T("%d Valid Commands:"), theConsole->numCommands()));
 
-	for (size_t a = 0; a < Console::getInstance().numCommands(); a++)
-		Console::getInstance().logMessage(s_fmt(_T("\"%s\""), Console::getInstance().command(a).getName().c_str()));
+	for (size_t a = 0; a < theConsole->numCommands(); a++)
+		theConsole->logMessage(s_fmt(_T("\"%s\""), theConsole->command(a).getName().c_str()));
 }
-ConsoleCommand cmdlist(_T("cmdlist"), &c_cmdlist, 0);
-
-/* Console Command - "list_archives"
- * Lists the filenames of all open archives
- *******************************************************************/
-void c_list_archives(vector<string> args) {
-	Console::getInstance().logMessage(s_fmt(_T("%d Open Archives:"), theArchiveManager.numArchives()));
-
-	for (int a = 0; a < theArchiveManager.numArchives(); a++) {
-		Archive* archive = theArchiveManager.getArchive(a);
-		Console::getInstance().logMessage(s_fmt(_T("%d: \"%s\""), a + 1, archive->getFileName().c_str()));
-	}
-}
-ConsoleCommand list_archives(_T("list_archives"), &c_list_archives, 0);
-
-/* Console Command - "open"
- * Attempts to open each given argument (filenames)
- *******************************************************************/
-void c_open(vector<string> args) {
-	for (int a = 0; a < args.size(); a++)
-		theArchiveManager.openArchive(args[a]);
-}
-ConsoleCommand open(_T("open"), &c_open, 1);
+ConsoleCommand con_cmdlist(_T("cmdlist"), &c_cmdlist, 0);

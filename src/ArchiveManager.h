@@ -11,12 +11,16 @@ private:
 	vector<Archive*>	open_archives;
 	Archive*			resource_archive;
 
+	static ArchiveManager*	instance;
+
 public:
 	ArchiveManager();
 	~ArchiveManager();
 
-	static ArchiveManager&	getInstance() {
-		static ArchiveManager instance;
+	static ArchiveManager*	getInstance() {
+		if (!instance)
+			instance = new ArchiveManager();
+
 		return instance;
 	}
 

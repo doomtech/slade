@@ -47,10 +47,10 @@ ConsolePanel::ConsolePanel(wxWindow *parent, int id)
 	initLayout();
 
 	// Listen to the console
-	listenTo(&Console::getInstance());
+	listenTo(theConsole);
 
 	// Load the current contents of the console log
-	text_log->AppendText(Console::getInstance().dumpLog());
+	text_log->AppendText(theConsole->dumpLog());
 }
 
 /* ConsolePanel::~ConsolePanel
@@ -90,7 +90,7 @@ void ConsolePanel::initLayout() {
 void ConsolePanel::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
 	// New console log message added
 	if (event_name == _T("console_logmessage")) {
-		text_log->AppendText(Console::getInstance().lastLogLine());
+		text_log->AppendText(theConsole->lastLogLine());
 	}
 }
 
@@ -102,6 +102,6 @@ BEGIN_EVENT_TABLE(ConsolePanel, wxPanel)
 END_EVENT_TABLE()
 
 void ConsolePanel::onCommandEnter(wxCommandEvent &e) {
-	Console::getInstance().execute(e.GetString());
+	theConsole->execute(e.GetString());
 	text_command->Clear();
 }

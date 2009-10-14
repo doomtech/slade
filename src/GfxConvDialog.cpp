@@ -196,10 +196,10 @@ void GfxConvDialog::btnSkipAllClicked(wxCommandEvent& e) {
 void c_test_gcd(vector<string> args) {
 	GfxConvDialog gcd;
 
-	if (theArchiveManager.numArchives() > 0) {
+	if (theArchiveManager->numArchives() > 0) {
 		vector<ArchiveEntry*> entries;
 		for (int a = 0; a < args.size(); a++) {
-			ArchiveEntry* entry = theArchiveManager.getArchive(0)->getEntry(args[a]);
+			ArchiveEntry* entry = theArchiveManager->getArchive(0)->getEntry(args[a]);
 			if (entry)
 				entries.push_back(entry);
 			else

@@ -52,7 +52,7 @@ MainWindow*		main_window = NULL;
 extern string main_window_layout;
 
 void SLADELog::DoLog(wxLogLevel level, const wxChar* str, time_t t) {
-	Console::getInstance().logMessage(wxString(str));
+	theConsole->logMessage(wxString(str));
 }
 
 IMPLEMENT_APP(MainApp)
@@ -79,7 +79,7 @@ bool MainApp::OnInit() {
 	// Open any archives on the command line
 	for (int a = 0; a < argc; a++) {
 		string arg = argv[a];
-		theArchiveManager.openArchive(arg);
+		theArchiveManager->openArchive(arg);
 	}
 
 	// Show the main window

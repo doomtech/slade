@@ -29,12 +29,16 @@ private:
 	vector<string> log;
 	vector<string> cmd_log;
 
+	static Console* instance;
+
 public:
 	Console();
 	~Console();
 
-	static Console& getInstance() {
-		static Console instance;
+	static Console* getInstance() {
+		if (!instance)
+			instance = new Console();
+
 		return instance;
 	}
 
@@ -48,6 +52,9 @@ public:
 	string lastCommand();
 	string dumpLog();
 };
+
+// Define for less cumbersome Console::getInstance()
+#define theConsole Console::getInstance()
 
 // Define for neat console command definitions
 #define CONSOLE_COMMAND(name, min_args, func) \

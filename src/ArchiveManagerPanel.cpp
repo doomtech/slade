@@ -119,7 +119,7 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
 	menu_context->Append(MENU_CLOSE, _T("Close"), _("Close the selected Archive(s)"));
 
 	// Listen to the ArchiveManager
-	listenTo(&(theArchiveManager));
+	listenTo(theArchiveManager);
 }
 
 /* ArchiveManagerPanel::~ArchiveManagerPanel
@@ -136,9 +136,8 @@ void ArchiveManagerPanel::refreshArchiveList() {
 	list_archives->ClearAll();
 
 	// Add each archive that is opened in the ArchiveManager
-	ArchiveManager& wm = theArchiveManager;
-	for (int a = 0; a < wm.numArchives(); a++)
-		list_archives->InsertItem(list_archives->GetItemCount(), wm.getArchive(a)->getFileName(true));
+	for (int a = 0; a < theArchiveManager->numArchives(); a++)
+		list_archives->InsertItem(list_archives->GetItemCount(), theArchiveManager->getArchive(a)->getFileName(true));
 }
 
 void ArchiveManagerPanel::populateMapList(Archive* archive) {
@@ -177,7 +176,7 @@ void ArchiveManagerPanel::populateMapList(Archive* archive) {
 }
 
 void ArchiveManagerPanel::updateListItem(int index) {
-	list_archives->SetItemText(index, theArchiveManager.getArchive(index)->getFileName(true));
+	list_archives->SetItemText(index, theArchiveManager->getArchive(index)->getFileName(true));
 }
 
 /* ArchiveManagerPanel::isArchivePanel
@@ -199,7 +198,7 @@ bool ArchiveManagerPanel::isArchivePanel(int tab_index) {
 }
 
 void ArchiveManagerPanel::openTab(int archive_index) {
-	Archive* archive = theArchiveManager.getArchive(archive_index);
+	Archive* archive = theArchiveManager->getArchive(archive_index);
 
 	if (archive) {
 		// Go through all tabs
@@ -230,7 +229,7 @@ void ArchiveManagerPanel::openTab(int archive_index) {
  *******************************************************************/
 void ArchiveManagerPanel::openFile(string filename) {
 	// Open the file in the archive manager
-	Archive* new_archive = theArchiveManager.openArchive(filename);
+	Archive* new_archive = theArchiveManager->openArchive(filename);
 
 	// Check that the archive opened ok
 	if (!new_archive) {
@@ -254,7 +253,7 @@ void ArchiveManagerPanel::openFiles(wxArrayString& files) {
  * Closes all currently open archives
  *******************************************************************/
 void ArchiveManagerPanel::closeAll() {
-	theArchiveManager.closeAll();
+	theArchiveManager->closeAll();
 }
 
 /* ArchiveManagerPanel::saveAll
@@ -262,9 +261,9 @@ void ArchiveManagerPanel::closeAll() {
  *******************************************************************/
 void ArchiveManagerPanel::saveAll() {
 	// Go through all open archives
-	for (int a = 0; a < theArchiveManager.numArchives(); a++) {
+	for (int a = 0; a < theArchiveManager->numArchives(); a++) {
 		// Get the archive to be saved
-		Archive* archive = theArchiveManager.getArchive(a);
+		Archive* archive = theArchiveManager->getArchive(a);
 
 		if (archive->isOnDisk()) {
 			// Save the archive if possible
@@ -296,10 +295,10 @@ void ArchiveManagerPanel::saveAll() {
  * Creates a new archive of the given type and opens it in a tab
  *******************************************************************/
 void ArchiveManagerPanel::createNewArchive(uint8_t type) {
-	Archive* new_archive = theArchiveManager.newArchive(type);
+	Archive* new_archive = theArchiveManager->newArchive(type);
 
 	if (new_archive) {
-		openTab(theArchiveManager.archiveIndex(new_archive));
+		openTab(theArchiveManager->archiveIndex(new_archive));
 	}
 }
 
@@ -343,9 +342,8 @@ void ArchiveManagerPanel::onAnnouncement(Announcer* announcer, string event_name
 
 	// If an archive was added
 	if (event_name == _T("archive_added")) {
-		ArchiveManager& wm = theArchiveManager;
-		list_archives->InsertItem(wm.numArchives(), wm.getArchive(wm.numArchives()-1)->getFileName(true));
-		openTab(wm.numArchives()-1);
+		list_archives->InsertItem(theArchiveManager->numArchives(), theArchiveManager->getArchive(theArchiveManager->numArchives()-1)->getFileName(true));
+		openTab(theArchiveManager->numArchives()-1);
 	}
 
 	// If an archive was saved
@@ -370,11 +368,11 @@ void ArchiveManagerPanel::saveSelection() {
 	// Go through the selection
 	for (size_t a = 0; a < selection.size(); a++) {
 		// Get the archive to be saved
-		Archive* archive = theArchiveManager.getArchive(selection[a]);
+		Archive* archive = theArchiveManager->getArchive(selection[a]);
 
 		if (archive->isOnDisk()) {
 			// Save the archive if possible
-			if (!theArchiveManager.getArchive(selection[a])->save()) {
+			if (!theArchiveManager->getArchive(selection[a])->save()) {
 				// If there was an error pop up a message box
 				wxMessageBox(s_fmt(_T("Error: %s"), Global::error.c_str()), _T("Error"), wxICON_ERROR);
 			}
@@ -416,7 +414,7 @@ void ArchiveManagerPanel::saveSelectionAs() {
 	// Go through the selection
 	for (size_t a = 0; a < selection.size(); a++) {
 		// Get the archive
-		Archive* archive = theArchiveManager.getArchive(selection[a]);
+		Archive* archive = theArchiveManager->getArchive(selection[a]);
 
 		// Popup file save dialog
 		string formats = archive->getFileExtensionString();
@@ -449,11 +447,11 @@ void ArchiveManagerPanel::closeSelection() {
 	// Get the list of selected archives
 	vector<Archive*> selected_archives;
 	for (size_t a = 0; a < selection.size(); a++)
-		selected_archives.push_back(theArchiveManager.getArchive(selection[a]));
+		selected_archives.push_back(theArchiveManager->getArchive(selection[a]));
 
 	// Close all selected archives
 	for (size_t a = 0; a < selected_archives.size(); a++)
-		theArchiveManager.closeArchive(selected_archives[a]);
+		theArchiveManager->closeArchive(selected_archives[a]);
 }
 
 /* ArchiveManagerPanel::saveCurrent
@@ -488,7 +486,7 @@ void ArchiveManagerPanel::closeCurrent() {
 	int selection = notebook_archives->GetSelection();
 	if (isArchivePanel(selection)) {
 		Archive* archive = ((ArchivePanel*) notebook_archives->GetPage(selection))->getArchive();
-		theArchiveManager.closeArchive(archive);
+		theArchiveManager->closeArchive(archive);
 	}
 }
 
@@ -600,7 +598,7 @@ END_EVENT_TABLE()
  *******************************************************************/
 void ArchiveManagerPanel::onListArchivesChanged(wxListEvent &e) {
 	// Get the selected archive
-	Archive* selected_archive = theArchiveManager.getArchive(e.GetIndex());
+	Archive* selected_archive = theArchiveManager->getArchive(e.GetIndex());
 
 	// Return if selection doesn't exist
 	if (!selected_archive)

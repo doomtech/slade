@@ -39,6 +39,7 @@
 /*******************************************************************
  * VARIABLES
  *******************************************************************/
+ArchiveManager* ArchiveManager::instance = NULL;
 
 
 /*******************************************************************
@@ -59,6 +60,8 @@ ArchiveManager::ArchiveManager() {
  *******************************************************************/
 ArchiveManager::~ArchiveManager() {
 	clearAnnouncers();
+	if (instance)
+		delete instance;
 }
 
 /* ArchiveManager::addArchive
@@ -279,3 +282,27 @@ void ArchiveManager::onAnnouncement(Announcer* announcer, string event_name, Mem
 		}
 	}
 }
+
+
+
+/* Console Command - "list_archives"
+ * Lists the filenames of all open archives
+ *******************************************************************/
+void c_list_archives(vector<string> args) {
+	wxLogMessage(s_fmt(_T("%d Open Archives:"), theArchiveManager->numArchives()));
+
+	for (int a = 0; a < theArchiveManager->numArchives(); a++) {
+		Archive* archive = theArchiveManager->getArchive(a);
+		wxLogMessage(s_fmt(_T("%d: \"%s\""), a + 1, archive->getFileName().c_str()));
+	}
+}
+ConsoleCommand am_list_archives(_T("list_archives"), &c_list_archives, 0);
+
+/* Console Command - "open"
+ * Attempts to open each given argument (filenames)
+ *******************************************************************/
+void c_open(vector<string> args) {
+	for (int a = 0; a < args.size(); a++)
+		theArchiveManager->openArchive(args[a]);
+}
+ConsoleCommand am_open(_T("open"), &c_open, 1);
