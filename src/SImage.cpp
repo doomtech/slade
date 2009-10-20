@@ -57,73 +57,79 @@ SImage::~SImage() {
 }
 
 /* SImage::getRGBAData
- * Returns a copy of the image as raw RGBA data
+ * Loads the image as RGBA data into <mc>. Returns false if image is
+ * invalid, true otherwise
  *******************************************************************/
-uint8_t* SImage::getRGBAData() {
-	// If the image is invalid, return NULL
+bool SImage::getRGBAData(MemChunk& mc) {
+	// Check the image is valid
 	if (!isValid())
-		return NULL;
+		return false;
 
 	// Init rgba data
-	uint8_t* rgba_data = new uint8_t[width * height * 4];
+	mc.reSize(width * height * 4, false);
 
 	// If data is already in RGBA format just return a copy
 	if (format == RGBA) {
-		memcpy(rgba_data, data, width * height * 4);
-		return rgba_data;
+		mc.loadMem(data, width * height * 4);
+		return true;
 	}
 
 	// Otherwise convert
 	if (format == PALMASK) {
-		uint32_t c = 0;
+		//uint32_t c = 0;
 		for (uint32_t a = 0; a < width * height; a ++) {
-			rgba_data[c++] = palette.colour(data[a]).r;	// Red
-			rgba_data[c++] = palette.colour(data[a]).g;	// Green
-			rgba_data[c++] = palette.colour(data[a]).b;	// Blue
-			
-			// Alpha
+			// Get colour
+			rgba_t col = palette.colour(data[a]);
+
+			// Set alpha
 			if (mask)
-				rgba_data[c++] = mask[a];
+				col.a = mask[a];
 			else
-				rgba_data[c++] = 255;
+				col.a = 255;
+
+			mc.write(&col.r, 1);	// Red
+			mc.write(&col.g, 1);	// Green
+			mc.write(&col.b, 1);	// Blue
+			mc.write(&col.a, 1);	// Alpha
 		}
 
-		return rgba_data;
+		return true;
 	}
 }
 
 /* SImage::getRGBData
- * Returns a copy of the image as raw RGB data
+ * Loads the image as RGB data into <mc>. Returns false if image is
+ * invalid, true otherwise
  *******************************************************************/
-uint8_t* SImage::getRGBData() {
-	// If the image is invalid, return NULL
+bool SImage::getRGBData(MemChunk& mc) {
+	// Check the image is valid
 	if (!isValid())
-		return NULL;
+		return false;
 
 	// Init rgb data
-	uint8_t* rgb_data = new uint8_t[width * height * 3];
+	mc.reSize(width * height * 3, false);
+	//uint8_t* rgb_data = new uint8_t[width * height * 3];
 
 	if (format == RGBA) {
 		// RGBA format, remove alpha information
-		uint32_t c = 0;
-		for (uint32_t a = 0; a < width * height * 4; a += 4) {
-			rgb_data[c++] = data[a];	// Red
-			rgb_data[c++] = data[a+1];	// Green
-			rgb_data[c++] = data[a+2];	// Blue
-		}
+		for (uint32_t a = 0; a < width * height * 4; a += 4)
+			mc.write(&data[a], 3);
 
-		return rgb_data;
+		return true;
+		//return rgb_data;
 	}
 	if (format == PALMASK) {
 		// Paletted, convert to RGB
 		uint32_t c = 0;
 		for (uint32_t a = 0; a < width * height; a ++) {
-			rgb_data[c++] = palette.colour(data[a]).r;	// Red
-			rgb_data[c++] = palette.colour(data[a]).g;	// Green
-			rgb_data[c++] = palette.colour(data[a]).b;	// Blue
+			rgba_t col = palette.colour(data[a]);
+			mc.write(&col.r, 1);
+			mc.write(&col.g, 1);
+			mc.write(&col.b, 1);
 		}
 
-		return rgb_data;
+		return true;
+		//return rgb_data;
 	}
 }
 
@@ -154,7 +160,9 @@ void SImage::applyPalette(Palette8bit& pal) {
 		return;
 
 	// Get image data as RGBA
-	uint8_t* rgba_data = getRGBAData();
+	MemChunk rgba_data;
+	getRGBAData(rgba_data);
+	//uint8_t* rgba_data = getRGBAData();
 
 	// Swap red and blue colour information because FreeImage is retarded
 	for (int a = 0; a < width * height * 4; a += 4) {
@@ -164,7 +172,7 @@ void SImage::applyPalette(Palette8bit& pal) {
 	}
 
 	// Build FIBITMAP from it
-	FIBITMAP* bm32 = FreeImage_ConvertFromRawBits(rgba_data, width, height, width * 4, 32, 0, 0, 0, false);
+	FIBITMAP* bm32 = FreeImage_ConvertFromRawBits(rgba_data.getData(), width, height, width * 4, 32, 0, 0, 0, false);
 	FIBITMAP* bm = FreeImage_ConvertTo24Bits(bm32);
 
 	// Create FreeImage palette
@@ -211,7 +219,7 @@ void SImage::applyPalette(Palette8bit& pal) {
 	FreeImage_Unload(bm32);
 	FreeImage_Unload(bm);
 	FreeImage_Unload(pbm);
-	delete[] rgba_data;
+	//delete[] rgba_data;
 }
 
 /* SImage::loadImage
@@ -587,12 +595,27 @@ bool SImage::convertRGBA() {
 	clearData(true);
 
 	// Get 32bit data
-	data = getRGBAData();
+	MemChunk rgba_data;
+	getRGBAData(rgba_data);
+
+	// Copy it
+	data = new uint8_t[width * height * 4];
+	memcpy(data, rgba_data.getData(), width * height * 4);
 
 	// Done
 	return true;
 }
 
+/* SImage::convertPaletted
+ * Converts the image to paletted + mask. Parameters:
+ * <pal>: The palette to apply to the image
+ * <alpha_threshold>: Specifies what alpha level is the cutoff for
+ * the mask (equal or less is completely transparent, greater is
+ * completely opaque)
+ * <keep_trans>: If true, existing transparency information is kept
+ * <col_trans>: If <keep_trans> is false, this colour will be
+ * completely transparent, and everything else completely opaque
+ *******************************************************************/
 bool SImage::convertPaletted(Palette8bit& pal, uint8_t alpha_threshold, bool keep_trans, rgba_t col_trans) {
 	// Apply the palette
 	applyPalette(pal);
@@ -618,4 +641,7 @@ bool SImage::convertPaletted(Palette8bit& pal, uint8_t alpha_threshold, bool kee
 				mask[a] = 255;
 		}
 	}
+
+	// Success
+	return true;
 }

@@ -12,6 +12,8 @@ public:
 	MemChunk(uint32_t size = 0);
 	~MemChunk();
 
+	uint8_t& operator[](int a) { return data[a]; }
+
 	// Accessors
 	uint8_t* getData() { return data; }
 	uint32_t getSize() { return size; }

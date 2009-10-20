@@ -217,12 +217,14 @@ void GfxCanvas::drawImage() {
 		glTranslated(-image->offset().x, -image->offset().y, 0); // Pan by offsets
 
 	// Draw the image
-	uint8_t* data = image->getRGBAData();
+	MemChunk mc;
+	image->getRGBAData(mc);
+	//uint8_t* data = image->getRGBAData();
 	for (int x = 0; x < image->getWidth(); x++) {
 		for (int y = 0; y < image->getHeight(); y++) {
 			int a = (y*image->getWidth() + x) * 4;
 
-			rgba_t col(data[a], data[a+1], data[a+2], data[a+3], 0);
+			rgba_t col(mc[a], mc[a+1], mc[a+2], mc[a+3], 0);
 			col.set_gl();
 
 			// Draw the pixel
@@ -235,7 +237,7 @@ void GfxCanvas::drawImage() {
 		}
 	}
 
-	delete[] data;
+	//delete[] data;
 
 	// Restore previous matrix
 	glPopMatrix();

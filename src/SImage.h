@@ -27,8 +27,8 @@ public:
 
 	bool			isValid() { return (width > 0 && height > 0 && data); }
 
-	uint8_t*		getRGBAData();
-	uint8_t*		getRGBData();
+	bool			getRGBAData(MemChunk& mc);
+	bool			getRGBData(MemChunk& mc);
 	int				getWidth() { return width; }
 	int				getHeight() { return height; }
 	Palette8bit&	getPalette() { return palette; }
