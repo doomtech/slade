@@ -153,18 +153,19 @@ void SImage::applyPalette(Palette8bit& pal) {
 	if (!isValid())
 		return;
 
-	// Get image data as RGB
-	uint8_t* rgb_data = getRGBData();
+	// Get image data as RGBA
+	uint8_t* rgba_data = getRGBAData();
 
 	// Swap red and blue colour information because FreeImage is retarded
-	for (int a = 0; a < width * height * 3; a += 3) {
-		uint8_t red = rgb_data[a];
-		rgb_data[a] = rgb_data[a+2];
-		rgb_data[a+2] = red;
+	for (int a = 0; a < width * height * 4; a += 4) {
+		uint8_t red = rgba_data[a];
+		rgba_data[a] = rgba_data[a+2];
+		rgba_data[a+2] = red;
 	}
 
 	// Build FIBITMAP from it
-	FIBITMAP* bm = FreeImage_ConvertFromRawBits(rgb_data, width, height, width * 3, 24, 0, 0, 0, false);
+	FIBITMAP* bm32 = FreeImage_ConvertFromRawBits(rgba_data, width, height, width * 4, 32, 0, 0, 0, false);
+	FIBITMAP* bm = FreeImage_ConvertTo24Bits(bm32);
 
 	// Create FreeImage palette
 	RGBQUAD fi_pal[256];
@@ -188,13 +189,29 @@ void SImage::applyPalette(Palette8bit& pal) {
 	for (int a = 0; a < height; a++)
 		memcpy(data + a * width, FreeImage_GetScanLine(pbm, a), width);
 
+	// Create mask from alpha info (if converting from RGBA)
+	if (format == RGBA) {
+		// Clear current mask
+		if (mask)
+			delete[] mask;
+
+		// Init mask
+		mask = new uint8_t[width * height];
+
+		// Get values from alpha channel
+		int c = 0;
+		for (int a = 3; a < width * height * 4; a += 4)
+			mask[c++] = rgba_data[a];
+	}
+
 	// Update variables
 	format = PALMASK;
 
 	// Clean up
+	FreeImage_Unload(bm32);
 	FreeImage_Unload(bm);
 	FreeImage_Unload(pbm);
-	delete rgb_data;
+	delete[] rgba_data;
 }
 
 /* SImage::loadImage
