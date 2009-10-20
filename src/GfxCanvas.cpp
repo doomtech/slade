@@ -246,9 +246,10 @@ void GfxCanvas::drawImage() {
 /* GfxCanvas::zoomToFit
  * Scales the image to fit within the gfx canvas. If mag is false,
  * the image will not be stretched to fit the canvas (only shrunk
- * if needed)
+ * if needed). Leaves a border around the image if <padding> is
+ * specified (0.0f = no border, 1.0f = border 100% of canvas size)
  *******************************************************************/
-void GfxCanvas::zoomToFit(bool mag) {
+void GfxCanvas::zoomToFit(bool mag, float padding) {
 	if (image->getWidth() > image->getHeight()) {
 		// Don't scale if we are magnifying but mag is false
 		if (!mag && GetSize().x > image->getWidth())
@@ -257,8 +258,8 @@ void GfxCanvas::zoomToFit(bool mag) {
 		// Get maximum dimension
 		double x_dim = image->getWidth();
 
-		// Increase a bit to add a border
-		x_dim += (x_dim * 0.1);
+		// Add border padding
+		x_dim += (x_dim * padding);
 
 		// Set scale accordingly
 		scale = (double)GetSize().x / x_dim;
@@ -271,8 +272,8 @@ void GfxCanvas::zoomToFit(bool mag) {
 		// Get maximum dimension
 		double y_dim = image->getHeight();
 
-		// Increase a bit to add a border
-		y_dim += (y_dim * 0.1);
+		// Add border padding
+		y_dim += (y_dim * padding);
 
 		// Set scale accordingly
 		scale = (double)GetSize().y / y_dim;

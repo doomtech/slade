@@ -7,7 +7,8 @@
  * Web:         http://slade.mancubus.net
  * Filename:    Misc.cpp
  * Description: Misc functions that don't necessarily belong
- *              anywhere else
+ *              anywhere else (generally stuff that involves multiple
+ *              unrelated classes)
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -54,4 +55,33 @@ bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry) {
 	// Unknown image type
 	Global::error = _T("Entry is not a known image format");
 	return false;
+}
+
+bool Misc::loadPaletteFromArchive(Palette8bit* pal, Archive* archive) {
+	// Check parameters
+	if (!pal || !archive)
+		return false;
+
+	// Find PLAYPAL entry
+	ArchiveEntry* playpal = archive->getEntry(_T("PLAYPAL"));
+
+	// Check it was found
+	if (!playpal)
+		return false;
+
+	// Check it is the correct size
+	if (playpal->getSize() < 256*3)
+		return false;
+
+	// Read palette colours
+	uint8_t* playpal_dat = playpal->getData(true);
+	int c = 0;
+	for (int a = 0; a < 256; a++) {
+		uint8_t r = playpal_dat[c++];
+		uint8_t g = playpal_dat[c++];
+		uint8_t b = playpal_dat[c++];
+		pal->setColour(a, rgba_t(r, g,  b, 255));
+	}
+
+	return true;
 }

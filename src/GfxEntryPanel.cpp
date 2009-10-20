@@ -59,9 +59,7 @@ GfxEntryPanel::~GfxEntryPanel() {
  * Loads an entry into the entry panel if it is a valid image format
  *******************************************************************/
 bool GfxEntryPanel::loadEntry(ArchiveEntry* entry) {
-	if (entry->getParent())
-		gfx_canvas->getImage()->getPalette().loadFromArchive(entry->getParent());
-
+	Misc::loadPaletteFromArchive(&(gfx_canvas->getImage()->getPalette()), entry->getParent());
 	Misc::loadImageFromEntry(gfx_canvas->getImage(), entry);
 
 	gfx_canvas->Refresh();

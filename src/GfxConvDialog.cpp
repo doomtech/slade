@@ -137,8 +137,8 @@ void GfxConvDialog::updatePreviewGfx() {
 
 	// Load entry palette to each image if needed
 	if (entry->getParent()) {
-		gfx_current->getImage()->getPalette().loadFromArchive(entry->getParent());
-		gfx_target->getImage()->getPalette().loadFromArchive(entry->getParent());
+		Misc::loadPaletteFromArchive(&(gfx_current->getImage()->getPalette()), entry->getParent());
+		Misc::loadPaletteFromArchive(&(gfx_target->getImage()->getPalette()), entry->getParent());
 	}
 
 	// Load the image to both gfx canvases
@@ -147,9 +147,9 @@ void GfxConvDialog::updatePreviewGfx() {
 
 	// Set gfx canvas views
 	gfx_current->setViewType(1);
-	gfx_current->zoomToFit(true);
+	gfx_current->zoomToFit(true, 0.1f);
 	gfx_target->setViewType(1);
-	gfx_target->zoomToFit(true);
+	gfx_target->zoomToFit(true, 0.1f);
 
 	// Apply image conversion to target preview
 	doConvert();

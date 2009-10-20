@@ -63,6 +63,7 @@ void Palette8bit::copyPalette(Palette8bit& copy) {
  * archive. Returns false if the archive didn't contain a palette,
  * true otherwise
  *******************************************************************/
+/*
 bool Palette8bit::loadFromArchive(Archive* archive) {
 	// Find PLAYPAL entry
 	ArchiveEntry* playpal = archive->getEntry(_T("PLAYPAL"));
@@ -87,3 +88,4 @@ bool Palette8bit::loadFromArchive(Archive* archive) {
 
 	return true;
 }
+*/

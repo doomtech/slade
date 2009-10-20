@@ -181,41 +181,65 @@ bool MemChunk::loadMem(uint8_t* start, uint32_t len) {
 	return true;
 }
 
+/* MemChunk::write
+ * Writes the given data at the current position. Expands the memory
+ * chunk if necessary.
+ *******************************************************************/
 bool MemChunk::write(void* data, uint32_t size) {
+	// If we're trying to write past the end of the memory chunk,
+	// resize it so we can write at this point
 	if (cur_ptr + size > this->size)
 		reSize(cur_ptr + size, true);
+
+	// Write the data and move to the byte after what was written
 	memcpy(this->data + cur_ptr, data, size);
 	cur_ptr += size;
+
+	// Success
 	return true;
 }
 
+/* MemChunk::read
+ * Reads data from the current position into <buf>. Returns false if
+ * attempting to read data outside of the chunk, true otherwise
+ *******************************************************************/
 bool MemChunk::read(void* buf, uint32_t size) {
+	// If we're trying to read past teh end
+	// of the memory chunk, return failure
 	if (cur_ptr + size > this->size)
 		return false;
 
+	// Read the data and move to the byte after what was read
 	memcpy(buf, this->data + cur_ptr, size);
 	cur_ptr += size;
 
 	return true;
 }
 
+/* MemChunk::seek
+ * Moves the current position, works the same as fseek() etc.
+ *******************************************************************/
 bool MemChunk::seek(uint32_t offset, uint32_t start) {
 	if (start == SEEK_CUR) {
+		// Move forward from the current position
 		cur_ptr += offset;
 		if (cur_ptr > size)
 			cur_ptr = size;
 	}
 	else if (start == SEEK_SET) {
+		// Move to the specified offset
 		cur_ptr = offset;
 		if (cur_ptr > size)
 			cur_ptr = size;
 	}
 	else if (start == SEEK_END) {
+		// Move to <offset> bytes before the end of the chunk
 		if (offset > size)
 			cur_ptr = 0;
 		else
 			cur_ptr = size - offset;
 	}
 
+	// Success
 	return true;
 }

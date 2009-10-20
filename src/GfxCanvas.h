@@ -28,7 +28,7 @@ public:
 	void	drawImage();
 	void	drawOffsetLines();
 
-	void	zoomToFit(bool mag = true);
+	void	zoomToFit(bool mag = true, float padding = 0.0f);
 
 	void	paint(wxPaintEvent &e);
 	void	onEraseBackground(wxEraseEvent &e);
