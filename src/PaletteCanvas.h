@@ -15,7 +15,8 @@ public:
 
 	Palette8bit& getPalette() { return palette; }
 
-	void draw();
+	bool	setContext();
+	void	draw();
 };
 
 #endif //__PALETTECANVAS_H__

@@ -53,6 +53,26 @@ MapCanvas::MapCanvas(wxWindow *parent, int id, SLADEMap* map)
 MapCanvas::~MapCanvas() {
 }
 
+/* MapCanvas::setContext
+ * Sets the current gl context to the canvas' context, and creates
+ * it if it doesn't exist. Returns true if the context is valid,
+ * false otherwise
+ *******************************************************************/
+bool MapCanvas::setContext() {
+	if (!context) {
+		if (IsShown())
+			context = new wxGLContext(this);
+	}
+
+	if (context) {
+		context->SetCurrent(*this);
+		SetCurrent(*context);
+		return true;
+	}
+	else
+		return false;
+}
+
 /* MapCanvas::draw
  * Draw the 2d map on the map gl canvas
  *******************************************************************/

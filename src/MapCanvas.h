@@ -13,7 +13,8 @@ public:
 	MapCanvas(wxWindow *parent, int id, SLADEMap* map);
 	~MapCanvas();
 
-	void draw();
+	bool	setContext();
+	void	draw();
 };
 
 #endif //__MAPCANVAS_H__

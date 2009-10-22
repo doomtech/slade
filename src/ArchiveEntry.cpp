@@ -550,7 +550,7 @@ void ArchiveEntry::detectType(bool data_check, bool force) {
 		memcpy(temp, data, 17);
 
 		//if (strnicmp(temp, "Extended module: ", 17) == 0) {
-		if (!wxString(temp).Cmp(_T("Extended module: "))) {
+		if (!s_fmt(_T("%s"), temp).Cmp(_T("Extended module: "))) {
 			if (data[37] == 0x1a) {
 				type = ETYPE_MOD;
 				setExProp(_T("LumpType"), _T("Music (XM Module)"));

@@ -13,7 +13,7 @@ public:
 	OGLCanvas(wxWindow* parent, int id);
 	~OGLCanvas();
 
-	bool			setContext();
+	virtual bool	setContext() = 0;
 	void			init();
 	virtual void	draw() = 0;
 

@@ -15,6 +15,8 @@ public:
 	GfxCanvas(wxWindow* parent, int id);
 	~GfxCanvas();
 
+	bool	setContext();
+
 	SImage*	getImage() { return image; }
 
 	void	setViewType(int type) { view_type = type; }

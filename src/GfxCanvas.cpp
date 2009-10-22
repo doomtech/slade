@@ -50,6 +50,26 @@ GfxCanvas::GfxCanvas(wxWindow* parent, int id)
 GfxCanvas::~GfxCanvas() {
 }
 
+/* GfxCanvas::setContext
+ * Sets the current gl context to the canvas' context, and creates
+ * it if it doesn't exist. Returns true if the context is valid,
+ * false otherwise
+ *******************************************************************/
+bool GfxCanvas::setContext() {
+	if (!context) {
+		if (IsShown())
+			context = new wxGLContext(this);
+	}
+
+	if (context) {
+		context->SetCurrent(*this);
+		SetCurrent(*context);
+		return true;
+	}
+	else
+		return false;
+}
+
 /* GfxCanvas::draw
  * Draws the image/background/etc
  *******************************************************************/
