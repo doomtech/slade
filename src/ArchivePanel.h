@@ -19,6 +19,7 @@ protected:
 	EntryPanel*		default_area;
 	EntryPanel*		text_area;
 	EntryPanel*		gfx_area;
+	EntryPanel*		pal_area;
 
 public:
 	enum {

@@ -37,6 +37,7 @@
 #include "TextEntryPanel.h"
 #include "DefaultEntryPanel.h"
 #include "GfxEntryPanel.h"
+#include "PaletteEntryPanel.h"
 #include <wx/aui/auibook.h>
 #include <wx/filename.h>
 
@@ -53,6 +54,7 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 	entry_area = new EntryPanel(this);
 	default_area = new DefaultEntryPanel(this);
 	text_area = new TextEntryPanel(this);
+	pal_area = new PaletteEntryPanel(this);
 	gfx_area = new GfxEntryPanel(this);
 
 	// Create entry menu
@@ -485,6 +487,9 @@ void ArchivePanel::onEntryListChange(wxListEvent& event) {
 			break;
 		case ETYPE_IMAGE:
 			new_area = gfx_area;
+			break;
+		case ETYPE_PLAYPAL:
+			new_area = pal_area;
 			break;
 	}
 

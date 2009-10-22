@@ -37,6 +37,7 @@ private:
 	wxButton*		btn_convert_all;
 	wxButton*		btn_skip;
 	wxButton*		btn_skip_all;
+	wxComboBox*		combo_target_format;
 
 	// Conversion options
 	uint8_t			target_format;		// 0=dgfx, 1=dflat, 2=png32, 3=png8

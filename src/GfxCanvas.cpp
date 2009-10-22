@@ -6,7 +6,7 @@
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
  * Filename:    GfxCanvas.cpp
- * Description: GfxCanvas class. A wxWidgets GL canvas that displays
+ * Description: GfxCanvas class. An OpenGL canvas that displays
  *              an image and can take offsets into account etc
  *
  * This program is free software; you can redistribute it and/or
@@ -37,10 +37,9 @@
  * GfxCanvas class constructor
  *******************************************************************/
 GfxCanvas::GfxCanvas(wxWindow* parent, int id)
-: wxGLCanvas(parent, id, NULL, wxDefaultPosition, wxDefaultSize, wxBORDER_SUNKEN) {
-	context = NULL;
+: OGLCanvas(parent, id) {
+//: wxGLCanvas(parent, id, NULL, wxDefaultPosition, wxDefaultSize, wxBORDER_SUNKEN) {
 	image = new SImage();
-	init_done = false;
 	view_type = 1;
 	scale = 1;
 }
@@ -49,56 +48,6 @@ GfxCanvas::GfxCanvas(wxWindow* parent, int id)
  * GfxCanvas class destructor
  *******************************************************************/
 GfxCanvas::~GfxCanvas() {
-}
-
-/* GfxCanvas::setContext
- * Sets the current gl context to the canvas' context, and creates
- * it if it doesn't exist. Returns true if the context is valid,
- * false otherwise
- *******************************************************************/
-bool GfxCanvas::setContext() {
-	if (!context) {
-		if (IsShown())
-			context = new wxGLContext(this);
-	}
-
-	if (context) {
-		context->SetCurrent(*this);
-		return true;
-	}
-	else
-		return false;
-}
-
-/* GfxCanvas::init
- * Initialises OpenGL settings for the gfx canvas
- *******************************************************************/
-void GfxCanvas::init()
-{
-	if (!setContext())
-		return;
-
-	glViewport(0, 0, GetClientSize().x, GetClientSize().y);
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	glClearDepth(1.0);
-	glShadeModel(GL_SMOOTH);
-	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glCullFace(GL_NONE);
-	glDisable(GL_CULL_FACE);
-	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_FOG);
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-
-	glOrtho(0, GetSize().x, GetSize().y, 0, -1, 1);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-	init_done = true;
 }
 
 /* GfxCanvas::draw
@@ -278,32 +227,4 @@ void GfxCanvas::zoomToFit(bool mag, float padding) {
 		// Set scale accordingly
 		scale = (double)GetSize().y / y_dim;
 	}
-}
-
-BEGIN_EVENT_TABLE(GfxCanvas, wxGLCanvas)
-	EVT_PAINT(GfxCanvas::paint)
-	EVT_ERASE_BACKGROUND(GfxCanvas::onEraseBackground)
-END_EVENT_TABLE()
-
-/* GfxCanvas::paint
- * Called when the gfx canvas has to be redrawn
- *******************************************************************/
-void GfxCanvas::paint(wxPaintEvent& e) {
-	wxPaintDC(this);
-
-	if (!init_done)
-		init();
-
-	if (!setContext())
-		return;
-
-	draw();
-}
-
-/* GfxCanvas::onEraseBackground
- * Called when the gfx canvas background is to be erased (need to
- * override this to do nothing or the canvas will flicker in wxMSW)
- *******************************************************************/
-void GfxCanvas::onEraseBackground(wxEraseEvent& e) {
-	// Do nothing
 }

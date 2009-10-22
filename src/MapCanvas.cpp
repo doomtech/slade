@@ -31,8 +31,6 @@
 #include "Main.h"
 #include "WxStuff.h"
 #include "MapCanvas.h"
-#include "SLADEMap.h"
-#include <wx/log.h>
 
 
 /*******************************************************************
@@ -45,8 +43,7 @@ wxGLContext *glcontext_map;
  * MapCanvas class constructor
  *******************************************************************/
 MapCanvas::MapCanvas(wxWindow *parent, int id, SLADEMap* map)
-: wxGLCanvas(parent, id, NULL) {
-	init_done = false;
+: OGLCanvas(parent, id) {
 	this->map = map;
 }
 
@@ -56,44 +53,10 @@ MapCanvas::MapCanvas(wxWindow *parent, int id, SLADEMap* map)
 MapCanvas::~MapCanvas() {
 }
 
-/* MapCanvas::init
- * Initialises OpenGL settings for the map canvas
- *******************************************************************/
-void MapCanvas::init()
-{
-	if (!setContext())
-		return;
-
-	glViewport(0, 0, GetSize().x, GetSize().y);
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	glClearDepth(1.0);
-	glShadeModel(GL_SMOOTH);
-	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glCullFace(GL_NONE);
-	glDisable(GL_CULL_FACE);
-	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_FOG);
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-
-	glOrtho(0.0f, GetSize().x, GetSize().y, 0.0f, -1.0f, 1.0f);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-	init_done = true;
-}
-
 /* MapCanvas::draw
  * Draw the 2d map on the map gl canvas
  *******************************************************************/
 void MapCanvas::draw() {
-	if (!init_done)
-		init();
-
 	// Set the GL context to point to this window
 	if (!setContext())
 		return;
@@ -120,60 +83,4 @@ void MapCanvas::draw() {
 	map->drawVertices();
 
 	SwapBuffers();
-}
-
-/* MapCanvas::setContext
- * Sets the program GL context to draw to the map canvas, creates
- * the context if it doesn't yet exist
- *******************************************************************/
-bool MapCanvas::setContext() {
-	if (!glcontext_map) {
-		if (IsShown())
-			glcontext_map = new wxGLContext(this);
-	}
-
-	if (glcontext_map) {
-		glcontext_map->SetCurrent(*this);
-		return true;
-	}
-	else
-		return false;
-}
-
-BEGIN_EVENT_TABLE(MapCanvas, wxGLCanvas)
-	EVT_PAINT(MapCanvas::paint)
-	//EVT_SIZE(MapCanvas::resize)
-END_EVENT_TABLE()
-
-/* MapCanvas::paint
- * Called when the map canvas has to be redrawn
- *******************************************************************/
-void MapCanvas::paint(wxPaintEvent& event) {
-	//wxLogMessage(_T("MapCanvas paint"));
-	wxPaintDC(this);
-	draw();
-}
-
-/* MapCanvas::resize
- * Called when the map canvas is resized
- *******************************************************************/
-void MapCanvas::resize(wxSizeEvent& event)
-{
-	// Set the GL context to point to this window
-	if (!setContext())
-		return;
-
-	// Setup the viewport
-	glViewport(0, 0, GetSize().x, GetSize().y);
-
-	// Setup the screen projection
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0.0f, GetSize().x, GetSize().y, 0.0f, -1.0f, 1.0f);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-	draw();
-	//OnSize(event);
 }

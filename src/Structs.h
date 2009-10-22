@@ -266,6 +266,15 @@ struct rgba_t {
 
 		return rgba_t((uint8_t)nr, (uint8_t)ng, (uint8_t)nb, (uint8_t)na, blend);
 	}
+
+	void write(uint8_t* ptr) {
+		if (ptr) {
+			ptr[0] = r;
+			ptr[1] = g;
+			ptr[2] = b;
+			ptr[3] = a;
+		}
+	}
 };
 
 // Some basic colours

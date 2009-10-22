@@ -39,6 +39,8 @@
           <itemPath>src/EntryPanel.h</itemPath>
           <itemPath>src/GfxEntryPanel.cpp</itemPath>
           <itemPath>src/GfxEntryPanel.h</itemPath>
+          <itemPath>src/PaletteEntryPanel.cpp</itemPath>
+          <itemPath>src/PaletteEntryPanel.h</itemPath>
           <itemPath>src/TextEntryPanel.cpp</itemPath>
           <itemPath>src/TextEntryPanel.h</itemPath>
         </logicalFolder>
@@ -103,6 +105,10 @@
     <logicalFolder name="f6" displayName="UI Elements" projectFiles="true">
       <itemPath>src/GfxCanvas.cpp</itemPath>
       <itemPath>src/GfxCanvas.h</itemPath>
+      <itemPath>src/OGLCanvas.cpp</itemPath>
+      <itemPath>src/OGLCanvas.h</itemPath>
+      <itemPath>src/PaletteCanvas.cpp</itemPath>
+      <itemPath>src/PaletteCanvas.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

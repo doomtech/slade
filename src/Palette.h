@@ -14,6 +14,8 @@ public:
 	rgba_t	colour(uint8_t index) { return colours[index]; }
 	short	transIndex() { return index_trans; }
 
+	bool	loadMem(MemChunk& mc);
+
 	void	setColour(uint8_t index, rgba_t col) { colours[index] = col; }
 	void	setTransIndex(short index) { index_trans = index; }
 

@@ -155,6 +155,7 @@ void GfxConvDialog::updatePreviewGfx() {
 	doConvert();
 
 	// Refresh
+	gfx_current->Refresh();
 	gfx_target->Refresh();
 }
 

@@ -5,9 +5,9 @@
  *
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
- * Filename:    Palette8bit.cpp
- * Description: Palette8bit class, handles a 256-colour palette and
- *              performs various colour transformations etc
+ * Filename:    PaletteEntryPanel.cpp
+ * Description: PaletteEntryPanel class. The UI for editing
+ *              palette (PLAYPAL) entries
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -29,54 +29,38 @@
  * INCLUDES
  *******************************************************************/
 #include "Main.h"
-#include "Palette.h"
+#include "WxStuff.h"
+#include "PaletteEntryPanel.h"
 
 
-/* Palette8bit::Palette8bit
- * Palette8bit class constructor
+/* PaletteEntryPanel::PaletteEntryPanel
+ * PaletteEntryPanel class constructor
  *******************************************************************/
-Palette8bit::Palette8bit() {
-	index_trans = -1;
+PaletteEntryPanel::PaletteEntryPanel(wxWindow* parent)
+: EntryPanel(parent) {
+	// Get the sizer
+	wxSizer* sizer = GetSizer();
 
-	// Init palette (to greyscale)
-	for (int a = 0; a < 256; a++)
-		colours[a].set(a, a, a, 255);
+	// Add palette canvas
+	pal_canvas = new PaletteCanvas(this, -1);
+	sizer->Add(pal_canvas, 1, wxEXPAND|wxALL, 4);
+
+	Layout();
 }
 
-/* Palette8bit::~Palette8bit
- * Palette8bit class destructor
+/* DefaultEntryPanel::~DefaultEntryPanel
+ * DefaultEntryPanel class destructor
  *******************************************************************/
-Palette8bit::~Palette8bit() {
+PaletteEntryPanel::~PaletteEntryPanel() {
 }
 
-bool Palette8bit::loadMem(MemChunk& mc) {
-	// Check that the given data has at least 1 colour (3 bytes)
-	if (mc.getSize() < 3)
-		return false;
-
-	// Read in colours
-	int c = 0;
-	for (int a = 0; a < mc.getSize(); a += 3) {
-		// Read RGB value
-		uint8_t rgb[3];
-		mc.read(rgb, 3);
-
-		// Set colour in palette
-		colours[c++].set(rgb[0], rgb[1], rgb[2], 255);
-
-		// If we have read 256 colours, finish
-		if (c == 256)
-			break;
-	}
+/* PaletteEntryPanel::loadEntry
+ * Loads an entry into the entry panel if it is a valid image format
+ *******************************************************************/
+bool PaletteEntryPanel::loadEntry(ArchiveEntry* entry) {
+	MemChunk mc;
+	mc.loadMem(entry->getData(true), entry->getSize());
+	pal_canvas->getPalette().loadMem(mc);
 
 	return true;
-}
-
-/* Palette8bit::copyPalette8bit
- * Copies the given palette into this one
- *******************************************************************/
-void Palette8bit::copyPalette(Palette8bit& copy) {
-	for (int a = 0; a < 256; a++)
-		setColour(a, copy.colour(a));
-	index_trans = copy.transIndex();
 }

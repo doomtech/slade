@@ -76,7 +76,7 @@ bool SImage::getRGBAData(MemChunk& mc) {
 
 	// Otherwise convert
 	if (format == PALMASK) {
-		//uint32_t c = 0;
+		uint8_t rgba[4];
 		for (uint32_t a = 0; a < width * height; a ++) {
 			// Get colour
 			rgba_t col = palette.colour(data[a]);
@@ -87,10 +87,8 @@ bool SImage::getRGBAData(MemChunk& mc) {
 			else
 				col.a = 255;
 
-			mc.write(&col.r, 1);	// Red
-			mc.write(&col.g, 1);	// Green
-			mc.write(&col.b, 1);	// Blue
-			mc.write(&col.a, 1);	// Alpha
+			col.write(rgba);
+			mc.write(rgba, 4);
 		}
 
 		return true;
@@ -108,7 +106,6 @@ bool SImage::getRGBData(MemChunk& mc) {
 
 	// Init rgb data
 	mc.reSize(width * height * 3, false);
-	//uint8_t* rgb_data = new uint8_t[width * height * 3];
 
 	if (format == RGBA) {
 		// RGBA format, remove alpha information
@@ -120,16 +117,13 @@ bool SImage::getRGBData(MemChunk& mc) {
 	}
 	if (format == PALMASK) {
 		// Paletted, convert to RGB
-		uint32_t c = 0;
+		uint8_t rgba[4];
 		for (uint32_t a = 0; a < width * height; a ++) {
-			rgba_t col = palette.colour(data[a]);
-			mc.write(&col.r, 1);
-			mc.write(&col.g, 1);
-			mc.write(&col.b, 1);
+			palette.colour(data[a]).write(rgba);
+			mc.write(rgba, 3);
 		}
 
 		return true;
-		//return rgb_data;
 	}
 }
 
@@ -162,7 +156,6 @@ void SImage::applyPalette(Palette8bit& pal) {
 	// Get image data as RGBA
 	MemChunk rgba_data;
 	getRGBAData(rgba_data);
-	//uint8_t* rgba_data = getRGBAData();
 
 	// Swap red and blue colour information because FreeImage is retarded
 	for (int a = 0; a < width * height * 4; a += 4) {
@@ -219,7 +212,6 @@ void SImage::applyPalette(Palette8bit& pal) {
 	FreeImage_Unload(bm32);
 	FreeImage_Unload(bm);
 	FreeImage_Unload(pbm);
-	//delete[] rgba_data;
 }
 
 /* SImage::loadImage
