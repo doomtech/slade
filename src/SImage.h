@@ -37,7 +37,7 @@ public:
 
 	void	clearData(bool clear_mask = true);
 
-	void	applyPalette(Palette8bit& pal);
+	void	applyPalette(Palette8bit& pal, int quant_type = 0);
 
 	// Image format reading
 	bool	loadImage(uint8_t* data, int size);
@@ -51,7 +51,7 @@ public:
 
 	// Convertion stuff
 	bool	convertRGBA();
-	bool	convertPaletted(Palette8bit& pal, uint8_t alpha_threshold = 0, bool keep_trans = true, rgba_t col_trans = COL_CYAN);
+	bool	convertPaletted(Palette8bit& pal, uint8_t alpha_threshold = 0, bool keep_trans = true, rgba_t col_trans = COL_CYAN, int quant_type = 0);
 };
 
 #endif //__SIMAGE_H__

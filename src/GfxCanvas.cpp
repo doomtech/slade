@@ -38,10 +38,10 @@
  *******************************************************************/
 GfxCanvas::GfxCanvas(wxWindow* parent, int id)
 : OGLCanvas(parent, id) {
-//: wxGLCanvas(parent, id, NULL, wxDefaultPosition, wxDefaultSize, wxBORDER_SUNKEN) {
 	image = new SImage();
 	view_type = 1;
 	scale = 1;
+	gl_id = 999999999;	// Arbitrarily large texture id number :P
 }
 
 /* GfxCanvas::~GfxCanvas
@@ -149,8 +149,8 @@ void GfxCanvas::drawChequeredBackground() {
 }
 
 /* GfxCanvas::drawImage
- * Draws the image (as a quad per pixel for now, will change this to
- * use textures later, probably)
+ * Draws the image (reloads the image as a texture each time, will
+ * change this later...)
  *******************************************************************/
 void GfxCanvas::drawImage() {
 	// Save current matrix
@@ -165,28 +165,32 @@ void GfxCanvas::drawImage() {
 	else if (view_type > 1)
 		glTranslated(-image->offset().x, -image->offset().y, 0); // Pan by offsets
 
-	// Draw the image
+	// Generate/Build GL texture
 	MemChunk mc;
 	image->getRGBAData(mc);
-	//uint8_t* data = image->getRGBAData();
-	for (int x = 0; x < image->getWidth(); x++) {
-		for (int y = 0; y < image->getHeight(); y++) {
-			int a = (y*image->getWidth() + x) * 4;
 
-			rgba_t col(mc[a], mc[a+1], mc[a+2], mc[a+3], 0);
-			col.set_gl();
+	glEnable(GL_TEXTURE_2D);
+	if (gl_id < 999999999)
+		glDeleteTextures(1, &gl_id);
 
-			// Draw the pixel
-			glBegin(GL_QUADS);
-			glVertex2d(x, y);
-			glVertex2d(x, y+1);
-			glVertex2d(x+1, y+1);
-			glVertex2d(x+1, y);
-			glEnd();
-		}
-	}
+	glGenTextures(1, &gl_id);
+	glBindTexture(GL_TEXTURE_2D, gl_id);
 
-	//delete[] data;
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D, 0, 4, image->getWidth(), image->getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, mc.getData());
+
+	// Draw the image
+	glColor3f(1.0f, 1.0f, 1.0f);
+	glBegin(GL_QUADS);
+	glTexCoord2f(0.0f, 0.0f);	glVertex2d(0, 0);
+	glTexCoord2f(0.0f, 1.0f);	glVertex2d(0, image->getHeight());
+	glTexCoord2f(1.0f, 1.0f);	glVertex2d(image->getWidth(), image->getHeight());
+	glTexCoord2f(1.0f, 0.0f);	glVertex2d(image->getWidth(), 0);
+	glEnd();
+
+	// Disable textures
+	glDisable(GL_TEXTURE_2D);
 
 	// Restore previous matrix
 	glPopMatrix();

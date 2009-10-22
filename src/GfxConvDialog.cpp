@@ -40,7 +40,7 @@
  * GfxConvDialog class constructor
  *******************************************************************/
 GfxConvDialog::GfxConvDialog()
-: wxDialog(NULL, -1, _T("Graphic Format Conversion"), wxPoint(-1, -1)) {
+: wxDialog(NULL, -1, _T("Graphic Format Conversion"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER) {
 	current_entry = 0;
 	setupLayout();
 }
@@ -72,14 +72,25 @@ void GfxConvDialog::setupLayout() {
 	wxBoxSizer* m_vbox = new wxBoxSizer(wxVERTICAL);
 	SetSizer(m_vbox);
 
+	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
+	m_vbox->Add(hbox, 0, wxEXPAND|wxTOP|wxLEFT|wxRIGHT, 4);
+
+	// Add 'Convert To' combo box
+	hbox->Add(new wxStaticText(this, -1, _T("Convert to:")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+
+	wxString s_formats[] = { _T("Doom Flat Format"), _T("Doom Graphic Format"), _T("PNG Format (8bit Paletted)"), _T("PNG Format (32bit Truecolour)") };
+	combo_target_format = new wxComboBox(this, COMBO_TARGET_FORMAT, s_formats[0], wxDefaultPosition, wxDefaultSize, 4, s_formats, wxCB_READONLY);
+	hbox->Add(combo_target_format, 1, wxEXPAND|wxALL, 4);
+
+	// Add Gfx previews
 	wxStaticBox *frame = new wxStaticBox(this, -1, _T("Graphic"));
 	wxStaticBoxSizer *framesizer = new wxStaticBoxSizer(frame, wxHORIZONTAL);
 	m_vbox->Add(framesizer, 1, wxEXPAND|wxALL, 4);
 
 	wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
-	framesizer->Add(vbox, 0, wxEXPAND|wxALL, 0);
+	framesizer->Add(vbox, 1, wxEXPAND|wxALL, 0);
 
-	vbox->Add(new wxStaticText(this, -1, _T("Current Graphic")));
+	vbox->Add(new wxStaticText(this, -1, _T("Current Graphic")), 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
 
 	gfx_current = new GfxCanvas(this, -1);
 	gfx_current->SetInitialSize(wxSize(192, 192));
@@ -87,9 +98,9 @@ void GfxConvDialog::setupLayout() {
 
 
 	vbox = new wxBoxSizer(wxVERTICAL);
-	framesizer->Add(vbox, 0, wxEXPAND|wxALL, 0);
+	framesizer->Add(vbox, 1, wxEXPAND|wxALL, 0);
 
-	vbox->Add(new wxStaticText(this, -1, _T("Converted Graphic")));
+	vbox->Add(new wxStaticText(this, -1, _T("Converted Graphic")), 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
 
 	gfx_target = new GfxCanvas(this, -1);
 	gfx_target->SetInitialSize(wxSize(192, 192));
@@ -97,7 +108,7 @@ void GfxConvDialog::setupLayout() {
 
 
 	// Buttons
-	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
+	hbox = new wxBoxSizer(wxHORIZONTAL);
 	m_vbox->Add(hbox, 0, wxEXPAND|wxALL, 4);
 
 	btn_convert = new wxButton(this, BTN_CONVERT, _T("Convert"));
@@ -160,19 +171,34 @@ void GfxConvDialog::updatePreviewGfx() {
 }
 
 bool GfxConvDialog::doConvert() {
-	Palette8bit& palette = gfx_target->getImage()->getPalette();
-	gfx_target->getImage()->convertPaletted(palette);
+	if (combo_target_format->GetCurrentSelection() <= 2) {
+		Palette8bit& palette = gfx_target->getImage()->getPalette();
+		gfx_target->getImage()->convertPaletted(palette);
+	}
+	else {
+		gfx_target->getImage()->convertRGBA();
+	}
+
 	return true;
 }
 
 
 
 BEGIN_EVENT_TABLE(GfxConvDialog, wxDialog)
+	EVT_SIZE(GfxConvDialog::resize)
 	EVT_BUTTON(BTN_CONVERT, GfxConvDialog::btnConvertClicked)
 	EVT_BUTTON(BTN_CONVERT_ALL, GfxConvDialog::btnConvertAllClicked)
 	EVT_BUTTON(BTN_SKIP, GfxConvDialog::btnSkipClicked)
 	EVT_BUTTON(BTN_SKIP_ALL, GfxConvDialog::btnSkipAllClicked)
+	EVT_COMBOBOX(COMBO_TARGET_FORMAT, GfxConvDialog::comboTargetFormatChanged)
 END_EVENT_TABLE()
+
+void GfxConvDialog::resize(wxSizeEvent& e) {
+	gfx_current->zoomToFit(true, 0.1f);
+	gfx_target->zoomToFit(true, 0.1f);
+
+	e.Skip();
+}
 
 void GfxConvDialog::btnConvertClicked(wxCommandEvent& e) {
 	nextEntry();
@@ -190,6 +216,10 @@ void GfxConvDialog::btnSkipClicked(wxCommandEvent& e) {
 void GfxConvDialog::btnSkipAllClicked(wxCommandEvent& e) {
 	for (int a = current_entry; a < entries.size(); a++)
 		nextEntry();
+}
+
+void GfxConvDialog::comboTargetFormatChanged(wxCommandEvent& e) {
+	updatePreviewGfx();
 }
 
 

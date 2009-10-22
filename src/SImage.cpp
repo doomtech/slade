@@ -148,7 +148,7 @@ void SImage::clearData(bool clear_mask) {
  * Converts the image to the given palette (using nearest-colour
  * matching)
  *******************************************************************/
-void SImage::applyPalette(Palette8bit& pal) {
+void SImage::applyPalette(Palette8bit& pal, int quant_type) {
 	// Check image is valid
 	if (!isValid())
 		return;
@@ -177,7 +177,11 @@ void SImage::applyPalette(Palette8bit& pal) {
 	}
 
 	// Convert image to palette
-	FIBITMAP* pbm = FreeImage_ColorQuantizeEx(bm, FIQ_NNQUANT, 256, 256, fi_pal);
+	FIBITMAP* pbm = NULL;
+	if (quant_type == 0)
+		pbm = FreeImage_ColorQuantizeEx(bm, FIQ_WUQUANT, 256, 256, fi_pal);
+	else
+		pbm = FreeImage_ColorQuantizeEx(bm, FIQ_NNQUANT, 256, 256, fi_pal);
 
 	// Load given palette
 	palette.copyPalette(pal);
@@ -607,10 +611,12 @@ bool SImage::convertRGBA() {
  * <keep_trans>: If true, existing transparency information is kept
  * <col_trans>: If <keep_trans> is false, this colour will be
  * completely transparent, and everything else completely opaque
+ * <quant_type>: Type of colour quantization (0 for Xiaolin Wu, 1
+ * for NeuQuant)
  *******************************************************************/
-bool SImage::convertPaletted(Palette8bit& pal, uint8_t alpha_threshold, bool keep_trans, rgba_t col_trans) {
+bool SImage::convertPaletted(Palette8bit& pal, uint8_t alpha_threshold, bool keep_trans, rgba_t col_trans, int quant_type) {
 	// Apply the palette
-	applyPalette(pal);
+	applyPalette(pal, quant_type);
 
 	if (keep_trans) {
 		// If we are keeping the existing transparency info, apply the

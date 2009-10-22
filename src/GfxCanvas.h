@@ -10,6 +10,7 @@ private:
 	SImage*			image;
 	int				view_type;	// 0=default, 1=centered, 2=sprite offsets, 3=hud offsets
 	double			scale;
+	GLuint			gl_id;
 
 public:
 	GfxCanvas(wxWindow* parent, int id);

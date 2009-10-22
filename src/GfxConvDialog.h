@@ -55,6 +55,7 @@ public:
 		BTN_CONVERT_ALL,
 		BTN_SKIP,
 		BTN_SKIP_ALL,
+		COMBO_TARGET_FORMAT,
 	};
 
 	GfxConvDialog();
@@ -67,10 +68,12 @@ public:
 	bool	doConvert();
 
 	// Events
+	void	resize(wxSizeEvent &e);
 	void	btnConvertClicked(wxCommandEvent &e);
 	void	btnConvertAllClicked(wxCommandEvent &e);
 	void	btnSkipClicked(wxCommandEvent &e);
 	void	btnSkipAllClicked(wxCommandEvent &e);
+	void	comboTargetFormatChanged(wxCommandEvent &e);
 
 	DECLARE_EVENT_TABLE()
 };
