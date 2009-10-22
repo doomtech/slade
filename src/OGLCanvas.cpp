@@ -50,6 +50,25 @@ OGLCanvas::~OGLCanvas() {
 		delete context;
 }
 
+/* OGLCanvas::setContext
+ * Sets the current gl context to the canvas' context, and creates
+ * it if it doesn't exist. Returns true if the context is valid,
+ * false otherwise
+ *******************************************************************/
+bool OGLCanvas::setContext() {
+	if (!context) {
+		if (IsShown())
+			context = new wxGLContext(this);
+	}
+
+	if (context) {
+		context->SetCurrent(*this);
+		return true;
+	}
+	else
+		return false;
+}
+
 /* OGLCanvas::init
  * Initialises OpenGL settings for the GL canvas
  *******************************************************************/
