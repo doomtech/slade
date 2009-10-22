@@ -158,9 +158,9 @@ void GfxConvDialog::updatePreviewGfx() {
 
 	// Set gfx canvas views
 	gfx_current->setViewType(1);
-	gfx_current->zoomToFit(true, 0.1f);
+	gfx_current->zoomToFit(true, 0.02f);
 	gfx_target->setViewType(1);
-	gfx_target->zoomToFit(true, 0.1f);
+	gfx_target->zoomToFit(true, 0.02f);
 
 	// Apply image conversion to target preview
 	doConvert();
@@ -171,9 +171,16 @@ void GfxConvDialog::updatePreviewGfx() {
 }
 
 bool GfxConvDialog::doConvert() {
-	if (combo_target_format->GetCurrentSelection() <= 2) {
+	int format = combo_target_format->GetCurrentSelection();
+	if (format <= 2) {
+		// Convert to selected palette
 		Palette8bit& palette = gfx_target->getImage()->getPalette();
 		gfx_target->getImage()->convertPaletted(palette);
+
+		if (format == 0) {
+			// Doom flat selected
+			gfx_target->getImage()->fillAlpha(255);	// No transparency
+		}
 	}
 	else {
 		gfx_target->getImage()->convertRGBA();
@@ -194,8 +201,8 @@ BEGIN_EVENT_TABLE(GfxConvDialog, wxDialog)
 END_EVENT_TABLE()
 
 void GfxConvDialog::resize(wxSizeEvent& e) {
-	gfx_current->zoomToFit(true, 0.1f);
-	gfx_target->zoomToFit(true, 0.1f);
+	gfx_current->zoomToFit(true, 0.02f);
+	gfx_target->zoomToFit(true, 0.02f);
 
 	e.Skip();
 }

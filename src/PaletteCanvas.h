@@ -7,7 +7,8 @@
 
 class PaletteCanvas : public OGLCanvas {
 private:
-	Palette8bit* palette;
+	Palette8bit*	palette;
+	int				selected;
 
 public:
 	PaletteCanvas(wxWindow* parent, int id);
@@ -16,6 +17,11 @@ public:
 	Palette8bit& getPalette() { return *palette; }
 
 	void	draw();
+
+	// Events
+	void	leftClick(wxMouseEvent &e);
+
+	DECLARE_EVENT_TABLE()
 };
 
 #endif //__PALETTECANVAS_H__

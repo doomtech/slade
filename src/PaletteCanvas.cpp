@@ -39,6 +39,7 @@
 PaletteCanvas::PaletteCanvas(wxWindow* parent, int id)
 : OGLCanvas(parent, id) {
 	palette = new Palette8bit();
+	selected = -1;
 }
 
 /* PaletteCanvas::~PaletteCanvas
@@ -89,6 +90,59 @@ void PaletteCanvas::draw() {
 		}
 	}
 
+	// Draw selection rectangle if this is selected
+	if (selected >= 0) {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+		// Determine x and y coordinates of selected colour
+		int x = selected % 16;
+		int y = selected / 16;
+
+		// Draw outline (thick black outline underneath thin white outline)
+		glLineWidth(2.0f);
+		glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
+		glBegin(GL_QUADS);
+		glVertex2d(x, y);
+		glVertex2d(x, y + 1);
+		glVertex2d(x + 1, y + 1);
+		glVertex2d(x + 1, y);
+		glEnd();
+		glLineWidth(1.0f);
+		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+		glBegin(GL_QUADS);
+		glVertex2d(x, y);
+		glVertex2d(x, y + 1);
+		glVertex2d(x + 1, y + 1);
+		glVertex2d(x + 1, y);
+		glEnd();
+
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	}
+
 	// Swap buffers (ie show what was drawn)
 	SwapBuffers();
+}
+
+
+BEGIN_EVENT_TABLE(PaletteCanvas, OGLCanvas)
+	EVT_LEFT_DOWN(PaletteCanvas::leftClick)
+END_EVENT_TABLE()
+
+void PaletteCanvas::leftClick(wxMouseEvent& e) {
+	// Figure out what 'grid' position was clicked
+	float size = float(min(GetSize().x, GetSize().y)) / 16.0f;
+	int x = int((float)e.GetX() / size);
+	int y = int((float)e.GetY() / size);
+
+	// If it was within the palette box, select the cell
+	if (x >= 0 && x < 16 && y >= 0 && y < 16)
+		selected = y * 16 + x;
+	else
+		selected = -1;
+
+	// Redraw
+	Refresh();
+
+	// Do normal left click stuff
+	e.Skip();
 }

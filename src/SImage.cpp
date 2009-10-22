@@ -77,7 +77,7 @@ bool SImage::getRGBAData(MemChunk& mc) {
 	// Otherwise convert
 	if (format == PALMASK) {
 		uint8_t rgba[4];
-		for (uint32_t a = 0; a < width * height; a ++) {
+		for (uint32_t a = 0; a < width * height; a++) {
 			// Get colour
 			rgba_t col = palette.colour(data[a]);
 
@@ -87,8 +87,8 @@ bool SImage::getRGBAData(MemChunk& mc) {
 			else
 				col.a = 255;
 
-			col.write(rgba);
-			mc.write(rgba, 4);
+			col.write(rgba);	// Write colour to array
+			mc.write(rgba, 4);	// Write array to MemChunk
 		}
 
 		return true;
@@ -144,6 +144,28 @@ void SImage::clearData(bool clear_mask) {
 	}
 }
 
+/* SImage::fillAlpha
+ * 'Fills' the alpha channel or mask with the given <alpha> value
+ *******************************************************************/
+void SImage::fillAlpha(uint8_t alpha) {
+	// Check image is valid
+	if (!isValid())
+		return;
+
+	if (format == RGBA) {
+		// RGBA format, set alpha values to given one
+		for (int a = 3; a < width * height * 4; a += 4)
+			data[a] = alpha;
+	}
+	else if (format == PALMASK) {
+		// Paletted masked format, fill mask with alpha value
+		if (!mask)
+			mask = new uint8_t[width * height];
+
+		memset(mask, alpha, width * height);
+	}
+}
+
 /* SImage::applyPalette
  * Converts the image to the given palette (using nearest-colour
  * matching)
@@ -179,9 +201,9 @@ void SImage::applyPalette(Palette8bit& pal, int quant_type) {
 	// Convert image to palette
 	FIBITMAP* pbm = NULL;
 	if (quant_type == 0)
-		pbm = FreeImage_ColorQuantizeEx(bm, FIQ_WUQUANT, 256, 256, fi_pal);
-	else
 		pbm = FreeImage_ColorQuantizeEx(bm, FIQ_NNQUANT, 256, 256, fi_pal);
+	else
+		pbm = FreeImage_ColorQuantizeEx(bm, FIQ_WUQUANT, 256, 256, fi_pal);
 
 	// Load given palette
 	palette.copyPalette(pal);
@@ -584,19 +606,19 @@ bool SImage::convertRGBA() {
 	if (format == RGBA)
 		return false;
 
-	// Set new format
-	format = RGBA;
-
-	// Clear current data
-	clearData(true);
-
 	// Get 32bit data
 	MemChunk rgba_data;
 	getRGBAData(rgba_data);
 
+	// Clear current data
+	clearData(true);
+
 	// Copy it
 	data = new uint8_t[width * height * 4];
 	memcpy(data, rgba_data.getData(), width * height * 4);
+
+	// Set new format
+	format = RGBA;
 
 	// Done
 	return true;

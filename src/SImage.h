@@ -37,6 +37,8 @@ public:
 
 	void	clearData(bool clear_mask = true);
 
+	void	fillAlpha(uint8_t alpha = 0);
+
 	void	applyPalette(Palette8bit& pal, int quant_type = 0);
 
 	// Image format reading
