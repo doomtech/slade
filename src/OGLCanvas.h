@@ -5,7 +5,7 @@
 #include <wx/glcanvas.h>
 
 class OGLCanvas : public wxGLCanvas {
-private:
+protected:
 	wxGLContext*	context;
 	bool			init_done;
 
@@ -18,7 +18,6 @@ public:
 	virtual void	draw() = 0;
 
 	void	paint(wxPaintEvent &e);
-	void	resize(wxSizeEvent &e);
 	void	onEraseBackground(wxEraseEvent &e);
 
 	DECLARE_EVENT_TABLE()

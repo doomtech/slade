@@ -54,8 +54,9 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 	entry_area = new EntryPanel(this);
 	default_area = new DefaultEntryPanel(this);
 	text_area = new TextEntryPanel(this);
-	pal_area = new PaletteEntryPanel(this);
+	//pal_area = new PaletteEntryPanel(this);
 	gfx_area = new GfxEntryPanel(this);
+	pal_area = new PaletteEntryPanel(this);
 
 	// Create entry menu
 	menu_entry = new wxMenu(_T(""));
@@ -488,9 +489,9 @@ void ArchivePanel::onEntryListChange(wxListEvent& event) {
 		case ETYPE_IMAGE:
 			new_area = gfx_area;
 			break;
-		case ETYPE_PLAYPAL:
-			new_area = pal_area;
-			break;
+		//case ETYPE_PLAYPAL:
+		//	new_area = pal_area;
+		//	break;
 	}
 
 	// If the new panel is different than the current, swap them

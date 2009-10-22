@@ -46,6 +46,8 @@ OGLCanvas::OGLCanvas(wxWindow* parent, int id)
  * OGLCanvas class constructor
  *******************************************************************/
 OGLCanvas::~OGLCanvas() {
+	if (context)
+		delete context;
 }
 
 /* OGLCanvas::setContext
@@ -70,8 +72,7 @@ bool OGLCanvas::setContext() {
 /* OGLCanvas::init
  * Initialises OpenGL settings for the GL canvas
  *******************************************************************/
-void OGLCanvas::init()
-{
+void OGLCanvas::init() {
 	if (!setContext())
 		return;
 
@@ -101,7 +102,6 @@ void OGLCanvas::init()
 
 BEGIN_EVENT_TABLE(OGLCanvas, wxGLCanvas)
 	EVT_PAINT(OGLCanvas::paint)
-	//EVT_SIZE(OGLCanvas::resize)
 	EVT_ERASE_BACKGROUND(OGLCanvas::onEraseBackground)
 END_EVENT_TABLE()
 
@@ -119,30 +119,6 @@ void OGLCanvas::paint(wxPaintEvent& e) {
 
 	draw();
 }
-
-/* OGLCanvas::resize
- * Called when the map canvas is resized
- *******************************************************************/
-void OGLCanvas::resize(wxSizeEvent& e)
-{
-	// Set the GL context to point to this window
-	if (!setContext())
-		return;
-
-	// Setup the viewport
-	glViewport(0, 0, GetClientSize().x, GetClientSize().y);
-
-	// Setup the screen projection
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0.0f, GetSize().x, GetSize().y, 0.0f, -1.0f, 1.0f);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-	draw();
-}
-
 
 /* OGLCanvas::onEraseBackground
  * Called when the gfx canvas background is to be erased (need to

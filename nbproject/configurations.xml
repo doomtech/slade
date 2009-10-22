@@ -122,18 +122,21 @@
       <toolsSet>
         <developmentServer>localhost</developmentServer>
         <compilerSet>GNU|GNU</compilerSet>
-        <platform>3</platform>
+        <platform>2</platform>
       </toolsSet>
       <compileType>
         <ccTool>
-          <commandLine>`wx-config --cxxflags std,gl,stc,aui`</commandLine>
+          <commandLine>`wx-config --debug --cxxflags std,gl,stc,aui`</commandLine>
+          <preprocessorList>
+            <Elem>__WXDEBUG__</Elem>
+          </preprocessorList>
         </ccTool>
         <linkerTool>
           <output>dist/SLADE</output>
           <linkerLibItems>
             <linkerOptionItem>-lfreeimage</linkerOptionItem>
           </linkerLibItems>
-          <commandLine>`wx-config --libs std,gl,stc,aui`</commandLine>
+          <commandLine>`wx-config --debug --libs std,gl,stc,aui`</commandLine>
         </linkerTool>
       </compileType>
     </conf>
@@ -141,7 +144,7 @@
       <toolsSet>
         <developmentServer>localhost</developmentServer>
         <compilerSet>GNU|GNU</compilerSet>
-        <platform>3</platform>
+        <platform>2</platform>
       </toolsSet>
       <compileType>
         <cTool>
@@ -167,7 +170,7 @@
       <toolsSet>
         <developmentServer>localhost</developmentServer>
         <compilerSet>MinGW|MinGW</compilerSet>
-        <platform>3</platform>
+        <platform>2</platform>
       </toolsSet>
       <compileType>
         <cTool>
@@ -222,7 +225,7 @@
       <toolsSet>
         <developmentServer>localhost</developmentServer>
         <compilerSet>MinGW|MinGW</compilerSet>
-        <platform>3</platform>
+        <platform>2</platform>
       </toolsSet>
       <compileType>
         <linkerTool>
