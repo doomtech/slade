@@ -203,32 +203,21 @@ void GfxCanvas::drawImage() {
  * specified (0.0f = no border, 1.0f = border 100% of canvas size)
  *******************************************************************/
 void GfxCanvas::zoomToFit(bool mag, float padding) {
-	if (image->getWidth() > image->getHeight()) {
-		// Don't scale if we are magnifying but mag is false
-		if (!mag && GetSize().x > image->getWidth())
-			return;
+	// Determine padding
+	double pad = (double)min(GetSize().x, GetSize().y) * padding;
 
-		// Get maximum dimension
-		double x_dim = image->getWidth();
+	// Get image dimensions
+	double x_dim = (double)image->getWidth();
+	double y_dim = (double)image->getHeight();
 
-		// Add border padding
-		x_dim += (x_dim * padding);
+	// Get max scale for x and y (including padding)
+	double x_scale = ((double)GetSize().x - pad) / x_dim;
+	double y_scale = ((double)GetSize().y - pad) / y_dim;
 
-		// Set scale accordingly
-		scale = (double)GetSize().x / x_dim;
-	}
-	else {
-		// Don't scale if we are magnifying but mag is false
-		if (!mag && GetSize().x > image->getWidth())
-			return;
+	// Set scale to smallest of the 2 (so that none of the image will be clipped)
+	scale = min(x_scale, y_scale);
 
-		// Get maximum dimension
-		double y_dim = image->getHeight();
-
-		// Add border padding
-		y_dim += (y_dim * padding);
-
-		// Set scale accordingly
-		scale = (double)GetSize().y / y_dim;
-	}
+	// If we don't want to magnify the image, clamp scale to a max of 1.0
+	if (!mag && scale > 1)
+		scale = 1;
 }

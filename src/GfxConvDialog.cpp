@@ -79,7 +79,7 @@ void GfxConvDialog::setupLayout() {
 	hbox->Add(new wxStaticText(this, -1, _T("Convert to:")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
 
 	wxString s_formats[] = { _T("Doom Flat Format"), _T("Doom Graphic Format"), _T("PNG Format (8bit Paletted)"), _T("PNG Format (32bit Truecolour)") };
-	combo_target_format = new wxComboBox(this, COMBO_TARGET_FORMAT, s_formats[0], wxDefaultPosition, wxDefaultSize, 4, s_formats, wxCB_READONLY);
+	combo_target_format = new wxComboBox(this, COMBO_TARGET_FORMAT, s_formats[1], wxDefaultPosition, wxDefaultSize, 4, s_formats, wxCB_READONLY);
 	hbox->Add(combo_target_format, 1, wxEXPAND|wxALL, 4);
 
 	// Add Gfx previews
@@ -94,6 +94,7 @@ void GfxConvDialog::setupLayout() {
 
 	gfx_current = new GfxCanvas(this, -1);
 	gfx_current->SetInitialSize(wxSize(192, 192));
+	gfx_current->setViewType(1);
 	vbox->Add(gfx_current, 1, wxEXPAND|wxALL, 4);
 
 
@@ -104,6 +105,7 @@ void GfxConvDialog::setupLayout() {
 
 	gfx_target = new GfxCanvas(this, -1);
 	gfx_target->SetInitialSize(wxSize(192, 192));
+	gfx_target->setViewType(1);
 	vbox->Add(gfx_target, 1, wxEXPAND|wxALL, 4);
 
 
@@ -123,7 +125,9 @@ void GfxConvDialog::setupLayout() {
 	hbox->Add(btn_skip_all, 0, wxEXPAND, 0);
 
 
+	// Autosize to fit contents (and set this as the minimum size)
 	SetInitialSize(wxSize(-1, -1));
+	SetMinSize(GetSize());
 }
 
 /* GfxConvDialog::openEntries
@@ -157,10 +161,8 @@ void GfxConvDialog::updatePreviewGfx() {
 	Misc::loadImageFromEntry(gfx_target->getImage(), entry);
 
 	// Set gfx canvas views
-	gfx_current->setViewType(1);
-	gfx_current->zoomToFit(true, 0.02f);
-	gfx_target->setViewType(1);
-	gfx_target->zoomToFit(true, 0.02f);
+	gfx_current->zoomToFit(true, 0.05f);
+	gfx_target->zoomToFit(true, 0.05f);
 
 	// Apply image conversion to target preview
 	doConvert();
@@ -201,8 +203,8 @@ BEGIN_EVENT_TABLE(GfxConvDialog, wxDialog)
 END_EVENT_TABLE()
 
 void GfxConvDialog::resize(wxSizeEvent& e) {
-	gfx_current->zoomToFit(true, 0.02f);
-	gfx_target->zoomToFit(true, 0.02f);
+	gfx_current->zoomToFit(true, 0.05f);
+	gfx_target->zoomToFit(true, 0.05f);
 
 	e.Skip();
 }
