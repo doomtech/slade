@@ -311,8 +311,8 @@ bool SImage::loadImage(uint8_t* img_data, int size) {
 	// If the image was a PNG
 	if (fif == FIF_PNG) {
 		// Find offsets if present
-		long xoff = 0;
-		long yoff = 0;
+		uint32_t xoff = 0;
+		uint32_t yoff = 0;
 		for (int a = 0; a < size; a++) {
 			// Check for 'grAb' header
 			if (img_data[a] == 'g' && img_data[a + 1] == 'r' &&
@@ -357,7 +357,7 @@ bool SImage::loadDoomGfx(uint8_t* gfx_data, int size) {
 
 	// Get header & offsets
 	patch_header_t* header = (patch_header_t*)gfx_data;
-	long* col_offsets = (long*)((uint8_t*)gfx_data + sizeof(patch_header_t));
+	uint32_t* col_offsets = (uint32_t*)((uint8_t*)gfx_data + sizeof(patch_header_t));
 
 	// Setup variables
 	width = header->width;
@@ -530,7 +530,7 @@ bool SImage::toDoomGfx(MemChunk& out, uint8_t alpha_threshold) {
 	out.write(&header.top, 2);
 
 	// Write dummy column offsets for now
-	long *col_offsets = new long[columns.size()];
+	uint32_t *col_offsets = new uint32_t[columns.size()];
 	out.write(col_offsets, columns.size() * 4);
 
 	// Write posts

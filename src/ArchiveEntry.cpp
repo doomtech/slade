@@ -609,9 +609,9 @@ void ArchiveEntry::detectType(bool data_check, bool force) {
 			header->width > 0 && header->width < 4096 &&
 			header->top > -2000 && header->top < 2000 &&
 			header->left > -2000 && header->left < 2000) {
-			long *col_offsets = (long *)((uint8_t *)data + sizeof(patch_header_t));
+			uint32_t *col_offsets = (uint32_t *)((uint8_t *)data + sizeof(patch_header_t));
 
-			if (size < sizeof(patch_header_t) + (header->width * sizeof(long))) {
+			if (size < sizeof(patch_header_t) + (header->width * sizeof(uint32_t))) {
 				//wxLogMessage("lump %s not a patch, col_offsets error 1", lump->Name().c_str());
 				return;
 			}

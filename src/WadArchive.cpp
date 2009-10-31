@@ -141,7 +141,7 @@ bool WadArchive::openFile(string filename) {
 	}
 
 	// Get file size
-	long filesize = 0;
+	uint32_t filesize = 0;
 	fseek(fp, 0, SEEK_END);
 	filesize = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
@@ -293,7 +293,7 @@ bool WadArchive::save(string filename) {
 	}
 
 	// Determine directory offset & individual lump offsets
-	long dir_offset = 12;
+	uint32_t dir_offset = 12;
 	for (uint32_t l = 0; l < numEntries(); l++) {
 		setEntryOffset(entries[l], dir_offset);
 		dir_offset += entries[l]->getSize();
@@ -307,7 +307,7 @@ bool WadArchive::save(string filename) {
 	}
 
 	// Write the header
-	long num_lumps = numEntries();
+	uint32_t num_lumps = numEntries();
 	fwrite(wad_type, 1, 4, fp);
 	fwrite(&num_lumps, 4, 1, fp);
 	fwrite(&dir_offset, 4, 1, fp);
