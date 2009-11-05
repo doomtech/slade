@@ -136,6 +136,7 @@ bool MainApp::OnInit() {
 
 	// Load image handlers
 	wxImage::AddHandler(new wxPNGHandler);
+	wxImage::AddHandler(new wxICOHandler);
 
 	// Load configuration file
 	readConfigFile();
