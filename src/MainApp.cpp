@@ -68,16 +68,23 @@ void SLADELog::DoLog(wxLogLevel level, const wxChar* str, time_t t) {
  * DIR_TEMP: Temporary files directory
  *******************************************************************/
 string appPath(string filename, int dir) {
+	// Setup separator character
+#ifdef WIN32
+	string sep = _T("\\");
+#else
+	string sep = _T("/");
+#endif
+
 	if (dir == DIR_DATA)
-		return wxStandardPaths::Get().GetDataDir().Append(_T("/")).Append(filename);
+		return wxStandardPaths::Get().GetDataDir().Append(sep).Append(filename);
 	else if (dir == DIR_USER)
-		return wxStandardPaths::Get().GetUserDataDir().Append(_T("/")).Append(filename);
+		return wxStandardPaths::Get().GetUserDataDir().Append(sep).Append(filename);
 	else if (dir == DIR_APP) {
 		wxFileName fn(wxStandardPaths::Get().GetExecutablePath());
-		return fn.GetPath(true, wxPATH_UNIX).Append(filename);
+		return fn.GetPath().Append(sep).Append(filename);
 	}
 	else if (dir == DIR_TEMP)
-		return wxStandardPaths::Get().GetTempDir().Append(_T("/")).Append(filename);
+		return wxStandardPaths::Get().GetTempDir().Append(sep).Append(filename);
 	else
 		return filename;
 }
@@ -169,12 +176,6 @@ void MainApp::initLogFile() {
 	wxLogMessage(_T("SLADE - It's a Doom Editor"));
 	wxLogMessage(_T("Written by Simon Judd, 2008"));
 	wxLogMessage(_T("---------------------------"));
-
-	// testo
-	wxLogMessage(appPath(_T("slade.pk3"), DIR_DATA));
-	wxLogMessage(appPath(_T("slade3.cfg"), DIR_USER));
-	wxLogMessage(appPath(_T("slade.exe"), DIR_APP));
-	wxLogMessage(appPath(_T("tempfile"), DIR_TEMP));
 }
 
 /* MainApp::readConfigFile
