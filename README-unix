@@ -1,0 +1,47 @@
+SLADE3 SVN UNIX COMPILATION INSTRUCTIONS
+----------------------------------------
+1)
+Download the required libraries:
+-wxWidgets *2.9+* from http://wxwidgets.org (or use synaptic/apt-get on debian/ubuntu)
+-FreeImage from http://freeimage.sourceforge.net (or use synaptic/apt-get on debian/ubuntu)
+
+2)
+Compile/install the required libraries if needed.
+
+a) wxWidgets:
+-Extract the wxWidgets tar
+-Follow the instructions in docs/gtk/install.txt ('the simplest case'), but add '--with-opengl' to the ../configure line
+
+b) FreeImage:
+-Extract the FreeImage tar
+-Follow the instructions in README.linux (to install normal FreeImage, not FreeImagePlus)
+
+3)
+To compile SLADE3, there are two ways to go about it, either install NetBeans IDE and use that (reccommended), or build it straight from the project Makefiles
+
+a) IDE Compilation
+-Download NetBeans IDE (6.7+) from http://netbeans.org (the C++ version)
+-Run the installer (the .sh installer will need to be changed to executable, and you may have to install Java too if you haven't already)
+-Run NetBeans
+-Select File->Open Project and select the 'trunk' directory of the SLADE SVN
+-Right click the SLADE project, select Properties, and press Apply, then OK. This will regenerate the project makefiles if needed.
+-Select Unix_Release configuration from the drop-down box on the toolbar if it isn't already selected
+-Click the 'Build Project' button on the toolbar
+
+b) Makefile Compilation*
+-Run 'make CONF=Unix_Release' from the trunk directory.
+*This method may or may not work depending on whether the makefiles on the SVN are up-to-date or not. If compilation via this method fails, try the IDE Compilation method instead.
+
+
+
+RUNNING SLADE3 SVN
+------------------
+Before running the compiled executable, the SLADE.pk3 file must be put into the correct place (and if it is ever updated on the SVN, you will need to re-copy it)
+
+-Open the 'trunk/dist' folder
+-Copy SLADE.pk3 to /usr/local/share/SLADE3/ (you will need root access privileges)
+ Via terminal: 'sudo cp SLADE.pk3 /usr/local.share/SLADE3/SLADE3.pk3'
+
+And that should be it. If you are having problems I can be contacted via email:
+sirjuddington@gmail.com
+

@@ -34,8 +34,10 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/ZipEntryListPanel.o \
 	${OBJECTDIR}/src/MainWindow.o \
 	${OBJECTDIR}/src/DefaultEntryPanel.o \
+	${OBJECTDIR}/src/OGLCanvas.o \
 	${OBJECTDIR}/src/TextEditor.o \
 	${OBJECTDIR}/src/Palette.o \
+	${OBJECTDIR}/src/PaletteEntryPanel.o \
 	${OBJECTDIR}/src/ZipArchive.o \
 	${OBJECTDIR}/src/ArchiveEntry.o \
 	${OBJECTDIR}/src/TextEntryPanel.o \
@@ -56,11 +58,14 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/ArchivePanel.o \
 	${OBJECTDIR}/src/MapSide.o \
 	${OBJECTDIR}/src/GfxCanvas.o \
+	${OBJECTDIR}/src/PaletteCanvas.o \
 	${OBJECTDIR}/src/SImage.o \
 	${OBJECTDIR}/src/MapEditorWindow.o \
 	${OBJECTDIR}/src/MainApp.o \
+	${OBJECTDIR}/src/GfxConvDialog.o \
 	${OBJECTDIR}/src/MapCanvas.o \
 	${OBJECTDIR}/src/EntryListPanel.o \
+	${OBJECTDIR}/src/Misc.o \
 	${OBJECTDIR}/src/EntryPanel.o \
 	${OBJECTDIR}/src/MapVertex.o \
 	${OBJECTDIR}/src/ZipArchivePanel.o \
@@ -70,8 +75,8 @@ OBJECTFILES= \
 CFLAGS=
 
 # CC Compiler Flags
-CCFLAGS=`wx-config --cxxflags std,gl,stc` 
-CXXFLAGS=`wx-config --cxxflags std,gl,stc` 
+CCFLAGS=`wx-config --cxxflags std,gl,stc,aui` 
+CXXFLAGS=`wx-config --cxxflags std,gl,stc,aui` 
 
 # Fortran Compiler Flags
 FFLAGS=
@@ -88,7 +93,7 @@ LDLIBSOPTIONS=-lfreeimage
 
 dist/SLADE: ${OBJECTFILES}
 	${MKDIR} -p dist
-	${LINK.cc} `wx-config --libs std,gl,stc` -o dist/SLADE  ${OBJECTFILES} ${LDLIBSOPTIONS} 
+	${LINK.cc} `wx-config --libs std,gl,stc,aui` -o dist/SLADE  ${OBJECTFILES} ${LDLIBSOPTIONS} 
 
 ${OBJECTDIR}/src/ZipEntryListPanel.o: nbproject/Makefile-${CND_CONF}.mk src/ZipEntryListPanel.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
@@ -105,6 +110,11 @@ ${OBJECTDIR}/src/DefaultEntryPanel.o: nbproject/Makefile-${CND_CONF}.mk src/Defa
 	${RM} $@.d
 	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/DefaultEntryPanel.o src/DefaultEntryPanel.cpp
 
+${OBJECTDIR}/src/OGLCanvas.o: nbproject/Makefile-${CND_CONF}.mk src/OGLCanvas.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/OGLCanvas.o src/OGLCanvas.cpp
+
 ${OBJECTDIR}/src/TextEditor.o: nbproject/Makefile-${CND_CONF}.mk src/TextEditor.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
@@ -114,6 +124,11 @@ ${OBJECTDIR}/src/Palette.o: nbproject/Makefile-${CND_CONF}.mk src/Palette.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
 	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/Palette.o src/Palette.cpp
+
+${OBJECTDIR}/src/PaletteEntryPanel.o: nbproject/Makefile-${CND_CONF}.mk src/PaletteEntryPanel.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/PaletteEntryPanel.o src/PaletteEntryPanel.cpp
 
 ${OBJECTDIR}/src/ZipArchive.o: nbproject/Makefile-${CND_CONF}.mk src/ZipArchive.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
@@ -215,6 +230,11 @@ ${OBJECTDIR}/src/GfxCanvas.o: nbproject/Makefile-${CND_CONF}.mk src/GfxCanvas.cp
 	${RM} $@.d
 	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/GfxCanvas.o src/GfxCanvas.cpp
 
+${OBJECTDIR}/src/PaletteCanvas.o: nbproject/Makefile-${CND_CONF}.mk src/PaletteCanvas.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/PaletteCanvas.o src/PaletteCanvas.cpp
+
 ${OBJECTDIR}/src/SImage.o: nbproject/Makefile-${CND_CONF}.mk src/SImage.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
@@ -230,6 +250,11 @@ ${OBJECTDIR}/src/MainApp.o: nbproject/Makefile-${CND_CONF}.mk src/MainApp.cpp
 	${RM} $@.d
 	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/MainApp.o src/MainApp.cpp
 
+${OBJECTDIR}/src/GfxConvDialog.o: nbproject/Makefile-${CND_CONF}.mk src/GfxConvDialog.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/GfxConvDialog.o src/GfxConvDialog.cpp
+
 ${OBJECTDIR}/src/MapCanvas.o: nbproject/Makefile-${CND_CONF}.mk src/MapCanvas.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
@@ -239,6 +264,11 @@ ${OBJECTDIR}/src/EntryListPanel.o: nbproject/Makefile-${CND_CONF}.mk src/EntryLi
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
 	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/EntryListPanel.o src/EntryListPanel.cpp
+
+${OBJECTDIR}/src/Misc.o: nbproject/Makefile-${CND_CONF}.mk src/Misc.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/Misc.o src/Misc.cpp
 
 ${OBJECTDIR}/src/EntryPanel.o: nbproject/Makefile-${CND_CONF}.mk src/EntryPanel.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
