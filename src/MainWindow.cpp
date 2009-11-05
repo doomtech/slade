@@ -93,6 +93,12 @@ void MainWindow::setupLayout() {
 	m_mgr = new wxAuiManager(this);
 	wxAuiPaneInfo p_inf;
 
+	// Set icon
+	string icon_filename = appPath(_T("slade.ico"), DIR_TEMP);
+	theArchiveManager->resourceArchive()->getEntry(_T("slade.ico"))->exportFile(icon_filename);
+	SetIcon(wxIcon(icon_filename, wxBITMAP_TYPE_ICO));
+	wxRemoveFile(icon_filename);
+
 
 	// -- Menu bar --
 	wxMenuBar *menu = new wxMenuBar();
