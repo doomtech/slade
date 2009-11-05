@@ -35,6 +35,8 @@
 #include "Tokenizer.h"
 #include "Console.h"
 #include <wx/image.h>
+#include <wx/stdpaths.h>
+#include <wx/ffile.h>
 
 
 /*******************************************************************
@@ -42,6 +44,8 @@
  *******************************************************************/
 namespace Global {
 	string error = _("");
+	string dir_user = _T("");
+	string dir_data = _T("");
 }
 MainWindow*		main_window = NULL;
 
@@ -55,7 +59,56 @@ void SLADELog::DoLog(wxLogLevel level, const wxChar* str, time_t t) {
 	theConsole->logMessage(wxString(str));
 }
 
+
+/* appPath
+ * Prepends an application-related path to a filename,
+ * DIR_DATA: SLADE application data directory (for SLADE.pk3)
+ * DIR_USER: User configuration and resources directory
+ * DIR_APP: Directory of the SLADE executable
+ * DIR_TEMP: Temporary files directory
+ *******************************************************************/
+string appPath(string filename, int dir) {
+	if (dir == DIR_DATA)
+		return wxStandardPaths::Get().GetDataDir().Append(_T("/")).Append(filename);
+	else if (dir == DIR_USER)
+		return wxStandardPaths::Get().GetUserDataDir().Append(_T("/")).Append(filename);
+	else if (dir == DIR_APP) {
+		wxFileName fn(wxStandardPaths::Get().GetExecutablePath());
+		return fn.GetPath(true, wxPATH_UNIX).Append(filename);
+	}
+	else if (dir == DIR_TEMP)
+		return wxStandardPaths::Get().GetTempDir().Append(_T("/")).Append(filename);
+	else
+		return filename;
+}
+
+
 IMPLEMENT_APP(MainApp)
+
+/* MainApp::initDirectories
+ * Checks for and creates necessary application directories. Returns
+ * true if all directories existed and were created successfully if
+ * needed, false otherwise
+ *******************************************************************/
+bool MainApp::initDirectories() {
+	// Create user directory if necessary
+	string dir_user = wxStandardPaths::Get().GetUserDataDir();
+	if (!wxDirExists(dir_user)) {
+		if (!wxMkdir(dir_user)) {
+			wxMessageBox(s_fmt(_T("Unable to create user directory \"%s\""), dir_user.c_str()), _T("Error"), wxICON_ERROR);
+			return false;
+		}
+	}
+
+	// Check the data directory exists
+	string dir_data = wxStandardPaths::Get().GetDataDir();
+	if (!wxDirExists(dir_data)) {
+		wxMessageBox(s_fmt(_T("SLADE data directory \"%s\" does not exist. Is SLADE installed correctly?"), dir_data.c_str()), _T("Error"), wxICON_ERROR);
+		return false;
+	}
+
+	return true;
+}
 
 /* MainApp::OnInit
  * Application initialization, run when program is started
@@ -63,6 +116,13 @@ IMPLEMENT_APP(MainApp)
 bool MainApp::OnInit() {
 	// Init global variables
 	Global::error = _T("");
+
+	// Set application name (for wx directory stuff)
+	wxApp::SetAppName(_T("SLADE3"));
+
+	// Init application directories
+	if (!initDirectories())
+		return false;
 
 	// Init logfile
 	initLogFile();
@@ -101,14 +161,20 @@ int MainApp::OnExit() {
  *******************************************************************/
 void MainApp::initLogFile() {
 	// Set wxLog target(s)
-	//new wxLogChain(new SLADELog());
 	wxLog::SetActiveTarget(new SLADELog());
-	new wxLogChain(new wxLogStderr(fopen("slade3.log", "wt")));
+	FILE* log_file = fopen(chr(appPath(_T("slade3.log"), DIR_USER)), "wt");
+	new wxLogChain(new wxLogStderr(log_file));
 
 	// Write logfile header
 	wxLogMessage(_T("SLADE - It's a Doom Editor"));
 	wxLogMessage(_T("Written by Simon Judd, 2008"));
 	wxLogMessage(_T("---------------------------"));
+
+	// testo
+	wxLogMessage(appPath(_T("slade.pk3"), DIR_DATA));
+	wxLogMessage(appPath(_T("slade3.cfg"), DIR_USER));
+	wxLogMessage(appPath(_T("slade.exe"), DIR_APP));
+	wxLogMessage(appPath(_T("tempfile"), DIR_TEMP));
 }
 
 /* MainApp::readConfigFile
@@ -117,7 +183,7 @@ void MainApp::initLogFile() {
 void MainApp::readConfigFile() {
 	// Open SLADE.cfg
 	Tokenizer tz;
-	if (!tz.openFile(_T("SLADE3.cfg")))
+	if (!tz.openFile(appPath(_T("slade3.cfg"), DIR_USER)))
 		return;
 
 	// Go through the file with the tokenizer
@@ -151,7 +217,7 @@ void MainApp::readConfigFile() {
  *******************************************************************/
 void MainApp::saveConfigFile() {
 	// Open SLADE.cfg for writing text
-	FILE* fp = fopen("SLADE3.cfg", "wt");
+	FILE* fp = fopen(chr(appPath(_T("slade3.cfg"), DIR_USER)), "wt");
 
 	// Do nothing if it didn't open correctly
 	if (!fp)

@@ -21,6 +21,7 @@ public:
 	virtual bool OnInit();
 	virtual int OnExit();
 
+	bool	initDirectories();
 	void	initLogFile();
 	void	readConfigFile();
 	void	saveConfigFile();

@@ -16,7 +16,7 @@ WX_DECLARE_STRING_HASH_MAP(wxString, PropertyList);
 
 // Vectors
 #include <vector>
-using std::vector;
+#define vector std::vector
 
 // Logfile
 #include <wx/log.h>
@@ -33,5 +33,8 @@ using std::vector;
 namespace Global {
 	extern string error;
 };
+
+enum { DIR_USER, DIR_DATA, DIR_APP, DIR_TEMP };
+string appPath(string filename, int dir);
 
 #endif //__MAIN_H__

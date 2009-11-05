@@ -52,7 +52,9 @@ ArchiveManager* ArchiveManager::instance = NULL;
  *******************************************************************/
 ArchiveManager::ArchiveManager() {
 	resource_archive = new ZipArchive();
-	resource_archive->openFile(_T("SLADE.pk3"));
+	
+	if (!resource_archive->openFile(appPath(_T("SLADE.pk3"), DIR_DATA)))
+		wxLogMessage(s_fmt(_T("Unable to find SLADE.pk3! Make sure it exists within the directory \"%s\""), appPath(_T(""), DIR_DATA)));
 }
 
 /* ArchiveManager::~ArchiveManager
