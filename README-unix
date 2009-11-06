@@ -40,7 +40,8 @@ Before running the compiled executable, the SLADE.pk3 file must be put into the 
 
 -Open the 'trunk/dist' folder
 -Copy SLADE.pk3 to /usr/local/share/SLADE3/ (you will need root access privileges)
- Via terminal: 'sudo cp SLADE.pk3 /usr/local.share/SLADE3/SLADE3.pk3'
+ Via terminal:	'sudo mkdir /usr/local/share/SLADE3'
+ 				'sudo cp SLADE.pk3 /usr/local/share/SLADE3/SLADE.pk3'
 
 And that should be it. If you are having problems I can be contacted via email:
 sirjuddington@gmail.com
