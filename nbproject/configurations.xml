@@ -101,6 +101,8 @@
       <itemPath>src/ArchiveManager.h</itemPath>
       <itemPath>src/Palette.cpp</itemPath>
       <itemPath>src/Palette.h</itemPath>
+      <itemPath>src/PaletteManager.cpp</itemPath>
+      <itemPath>src/PaletteManager.h</itemPath>
     </logicalFolder>
     <logicalFolder name="f6" displayName="UI Elements" projectFiles="true">
       <itemPath>src/GfxCanvas.cpp</itemPath>

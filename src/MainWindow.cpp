@@ -121,7 +121,7 @@ void MainWindow::setupLayout() {
 	fileMenu->Append(MENU_FILE_CLOSE,		_("&Close"),			_("Close the currently open Archive"));
 	fileMenu->Append(MENU_FILE_CLOSEALL,	_("Close All"),			_("Close all open Archives"));
 	fileMenu->AppendSeparator();
-    fileMenu->Append(MENU_FILE_QUIT,		_("&Quit\tCtrl+X"),		_("Quit SLADE"));
+    fileMenu->Append(MENU_FILE_QUIT,		_("&Quit"),				_("Quit SLADE"));
 	menu->Append(fileMenu, _("&File"));
 
 	// Entry menu
@@ -130,7 +130,7 @@ void MainWindow::setupLayout() {
 	entryMenu->Append(MENU_ENTRY_NEWFROMFILE,		_("New from File"),			_("Create a new entry with data from a file"));
 	entryMenu->AppendSeparator();
 	entryMenu->Append(MENU_ENTRY_RENAME,			_("Rename\tCtrl+R"),		_("Rename the selected entries"));
-	entryMenu->Append(MENU_ENTRY_DELETE,			_("Delete\tDelete"),		_("Delete the selected entries"));
+	entryMenu->Append(MENU_ENTRY_DELETE,			_("Delete\tCtrl+D"),		_("Delete the selected entries"));
 	entryMenu->AppendSeparator();
 	entryMenu->Append(MENU_ENTRY_IMPORT,			_("Import\tCtrl+I"),		_("Import a file to the selected entry"));
 	entryMenu->Append(MENU_ENTRY_EXPORT,			_("Export\tCtrl+E"),		_("Export the selected entries to files"));

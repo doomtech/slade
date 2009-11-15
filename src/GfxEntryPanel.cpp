@@ -45,6 +45,7 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 	// Add gfx canvas
 	gfx_canvas = new GfxCanvas(this, -1);
 	sizer->Add(gfx_canvas, 1, wxEXPAND|wxALL, 4);
+	gfx_canvas->setViewType(2);
 
 	Layout();
 }

@@ -10,6 +10,7 @@ private:
 
 public:
 	MemChunk(uint32_t size = 0);
+	MemChunk(uint8_t* data, uint32_t size);
 	~MemChunk();
 
 	uint8_t& operator[](int a) { return data[a]; }

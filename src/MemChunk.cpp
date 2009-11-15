@@ -48,6 +48,14 @@ MemChunk::MemChunk(uint32_t size) {
 		data = NULL;
 }
 
+MemChunk::MemChunk(uint8_t* data, uint32_t size) {
+	// Init variables
+	this->cur_ptr = 0;
+
+	// Load given data
+	loadMem(data, size);
+}
+
 /* MemChunk::~MemChunk
  * MemChunk class destructor
  *******************************************************************/

@@ -46,6 +46,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/SLADEMap.o \
 	${OBJECTDIR}/src/Tokenizer.o \
 	${OBJECTDIR}/src/ConsolePanel.o \
+	${OBJECTDIR}/src/PaletteManager.o \
 	${OBJECTDIR}/src/ArchiveManagerPanel.o \
 	${OBJECTDIR}/src/ArchiveManager.o \
 	${OBJECTDIR}/src/Archive.o \
@@ -169,6 +170,11 @@ ${OBJECTDIR}/src/ConsolePanel.o: nbproject/Makefile-${CND_CONF}.mk src/ConsolePa
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
 	$(COMPILE.cc) -g -D__WXDEBUG__ -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/ConsolePanel.o src/ConsolePanel.cpp
+
+${OBJECTDIR}/src/PaletteManager.o: nbproject/Makefile-${CND_CONF}.mk src/PaletteManager.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -g -D__WXDEBUG__ -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/PaletteManager.o src/PaletteManager.cpp
 
 ${OBJECTDIR}/src/ArchiveManagerPanel.o: nbproject/Makefile-${CND_CONF}.mk src/ArchiveManagerPanel.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src

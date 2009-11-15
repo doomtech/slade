@@ -64,6 +64,7 @@ private:
 	bool			data_loaded;
 	uint8_t			type;
 	uint8_t			state;		// 0 = unmodified, 1 = modified, 2 = newly created
+	bool			locked;
 	PropertyList	ex_props;
 
 public:
@@ -79,6 +80,7 @@ public:
 	bool		isLoaded() { return data_loaded; }
 	uint8_t		getType() { return type; }
 	uint8_t		getState() { return state; }
+	bool		isLocked() { return locked; }
 
 	// Modifiers (won't change entry state)
 	void		setParent(Archive* parent) { this->parent = parent; }
@@ -89,6 +91,8 @@ public:
 	void		setType(uint8_t type) { this->type = type; }
 	void		setState(uint8_t state);
 	void		unloadData();
+	void		lock() { locked = true; }
+	void		unlock() { locked = false; }
 
 	// Entry modification (will change entry state)
 	void	rename(string new_name);

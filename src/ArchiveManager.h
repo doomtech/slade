@@ -10,6 +10,7 @@ class ArchiveManager : public Announcer, Listener {
 private:
 	vector<Archive*>	open_archives;
 	Archive*			resource_archive;
+	bool				res_archive_open;
 
 	static ArchiveManager*	instance;
 
@@ -24,6 +25,7 @@ public:
 		return instance;
 	}
 
+	bool		resArchiveOK() { return res_archive_open; }
 	bool		addArchive(Archive* archive);
 	Archive*	getArchive(int index);
 	Archive*	getArchive(string filename);
