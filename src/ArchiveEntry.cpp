@@ -31,6 +31,7 @@
 #include "Archive.h"
 #include <wx/log.h>
 #include <wx/hash.h>
+#include <wx/filename.h>
 
 
 /* ArchiveEntry::ArchiveEntry
@@ -83,6 +84,19 @@ ArchiveEntry::~ArchiveEntry() {
 	// Delete any entry data if it exists
 	if (data)
 		delete[] data;
+}
+
+/* ArchiveEntry::getName
+ * Returns the entry name. If [cut_ext] is true, the file extension
+ * will be cut from the returned name (if any exist)
+ *******************************************************************/
+string ArchiveEntry::getName(bool cut_ext) {
+	// If we want the full name (with extension) just return it
+	if (!cut_ext)
+		return name;
+
+	wxFileName fn(name);
+	return fn.GetName();
 }
 
 /* ArchiveEntry::getData

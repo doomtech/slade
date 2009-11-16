@@ -927,6 +927,10 @@ zipdir_t* ZipArchive::getDirectory(string name, zipdir_t* dir) {
 	if (!dir)
 		dir = directory;
 
+	// Append trailing / if none given
+	if (!name.EndsWith(_T("/")))
+		name += _T("/");
+
 	// Convert the given dirname to a wxFileName for processing
 	wxFileName fn(name);
 

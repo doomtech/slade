@@ -111,6 +111,8 @@
       <itemPath>src/OGLCanvas.h</itemPath>
       <itemPath>src/PaletteCanvas.cpp</itemPath>
       <itemPath>src/PaletteCanvas.h</itemPath>
+      <itemPath>src/PaletteChooser.cpp</itemPath>
+      <itemPath>src/PaletteChooser.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

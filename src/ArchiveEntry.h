@@ -74,7 +74,7 @@ public:
 
 	// Accessors
 	Archive*	getParent() { return parent; }
-	string		getName() { return name; }
+	string		getName(bool cut_ext = false);
 	uint32_t	getSize() { return size; }
 	uint8_t*	getData(bool allow_load = true);
 	bool		isLoaded() { return data_loaded; }

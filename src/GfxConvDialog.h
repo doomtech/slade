@@ -5,6 +5,7 @@
 #include <wx/dialog.h>
 #include "GfxCanvas.h"
 #include "ArchiveEntry.h"
+#include "PaletteChooser.h"
 
 /* Convert from anything to:
  * Doom Gfx
@@ -38,6 +39,8 @@ private:
 	wxButton*		btn_skip;
 	wxButton*		btn_skip_all;
 	wxComboBox*		combo_target_format;
+	PaletteChooser*	pal_chooser_current;
+	PaletteChooser*	pal_chooser_target;
 
 	// Conversion options
 	uint8_t			target_format;		// 0=dgfx, 1=dflat, 2=png32, 3=png8
@@ -56,6 +59,8 @@ public:
 		BTN_SKIP,
 		BTN_SKIP_ALL,
 		COMBO_TARGET_FORMAT,
+		PALETTE_CURRENT,
+		PALETTE_TARGET,
 	};
 
 	GfxConvDialog();
@@ -74,6 +79,8 @@ public:
 	void	btnSkipClicked(wxCommandEvent &e);
 	void	btnSkipAllClicked(wxCommandEvent &e);
 	void	comboTargetFormatChanged(wxCommandEvent &e);
+	void	paletteCurrentChanged(wxCommandEvent &e);
+	void	paletteTargetChanged(wxCommandEvent &e);
 
 	DECLARE_EVENT_TABLE()
 };

@@ -47,11 +47,46 @@ PaletteManager::PaletteManager() {
 
 	// Load custom palettes (from <user directory>/palettes)
 	loadCustomPalettes();
+
+	// Init other stuff
+	pal_default = new Palette8bit();
 }
 
 PaletteManager::~PaletteManager() {
 	for (int a = 0; a < palettes.size(); a++)
 		delete[] palettes[a];
+}
+
+Palette8bit* PaletteManager::getPalette(int index) {
+	if (index < 0 || index >= numPalettes())
+		return pal_default;
+	else
+		return palettes[index];
+}
+
+Palette8bit* PaletteManager::getPalette(string name) {
+	for (uint32_t a = 0; a < pal_names.size(); a++) {
+		if (pal_names[a].Cmp(name) == 0)
+			return palettes[a];
+	}
+
+	return pal_default;
+}
+
+string PaletteManager::getPalName(int index) {
+	if (index < 0 || index >= numPalettes())
+		return _T("");
+	else
+		return pal_names[index];
+}
+
+string PaletteManager::getPalName(Palette8bit* pal) {
+	for (uint32_t a = 0; a < palettes.size(); a++) {
+		if (palettes[a] == pal)
+			return pal_names[a];
+	}
+
+	return _T("");
 }
 
 bool PaletteManager::loadResourcePalettes() {
@@ -68,7 +103,7 @@ bool PaletteManager::loadResourcePalettes() {
 
 		// Add the palette
 		palettes.push_back(pal);
-		pal_names.push_back(dir_palettes->entries[a]->getName());
+		pal_names.push_back(dir_palettes->entries[a]->getName(true));
 	}
 }
 

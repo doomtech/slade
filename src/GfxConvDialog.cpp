@@ -95,7 +95,10 @@ void GfxConvDialog::setupLayout() {
 	gfx_current = new GfxCanvas(this, -1);
 	gfx_current->SetInitialSize(wxSize(192, 192));
 	gfx_current->setViewType(1);
-	vbox->Add(gfx_current, 1, wxEXPAND|wxALL, 4);
+	vbox->Add(gfx_current, 1, wxEXPAND|wxTOP|wxLEFT|wxRIGHT, 4);
+
+	pal_chooser_current = new PaletteChooser(this, PALETTE_CURRENT);
+	vbox->Add(pal_chooser_current, 0, wxEXPAND|wxALL, 4);
 
 
 	vbox = new wxBoxSizer(wxVERTICAL);
@@ -106,7 +109,10 @@ void GfxConvDialog::setupLayout() {
 	gfx_target = new GfxCanvas(this, -1);
 	gfx_target->SetInitialSize(wxSize(192, 192));
 	gfx_target->setViewType(1);
-	vbox->Add(gfx_target, 1, wxEXPAND|wxALL, 4);
+	vbox->Add(gfx_target, 1, wxEXPAND|wxTOP|wxLEFT|wxRIGHT, 4);
+
+	pal_chooser_target = new PaletteChooser(this, PALETTE_TARGET);
+	vbox->Add(pal_chooser_target, 0, wxEXPAND|wxALL, 4);
 
 
 	// Buttons
@@ -150,10 +156,20 @@ void GfxConvDialog::updatePreviewGfx() {
 
 	ArchiveEntry* entry = entries[current_entry];
 
+	// Disable/enable current gfx palette as needed
+	if (entry->getType() == ETYPE_FLAT ||
+		entry->getType() == ETYPE_GFX ||
+		entry->getType() == ETYPE_GFX2)
+		pal_chooser_current->Enable(true);
+	else
+		pal_chooser_current->Enable(false);
+
 	// Load entry palette to each image if needed
 	if (entry->getParent()) {
-		Misc::loadPaletteFromArchive(&(gfx_current->getImage()->getPalette()), entry->getParent());
-		Misc::loadPaletteFromArchive(&(gfx_target->getImage()->getPalette()), entry->getParent());
+		gfx_current->getImage()->getPalette().copyPalette(*(pal_chooser_current->getSelectedPalette()));
+		gfx_target->getImage()->getPalette().copyPalette(*(pal_chooser_target->getSelectedPalette()));
+		//Misc::loadPaletteFromArchive(&(gfx_current->getImage()->getPalette()), entry->getParent());
+		//Misc::loadPaletteFromArchive(&(gfx_target->getImage()->getPalette()), entry->getParent());
 	}
 
 	// Load the image to both gfx canvases
@@ -200,6 +216,8 @@ BEGIN_EVENT_TABLE(GfxConvDialog, wxDialog)
 	EVT_BUTTON(BTN_SKIP, GfxConvDialog::btnSkipClicked)
 	EVT_BUTTON(BTN_SKIP_ALL, GfxConvDialog::btnSkipAllClicked)
 	EVT_COMBOBOX(COMBO_TARGET_FORMAT, GfxConvDialog::comboTargetFormatChanged)
+	EVT_COMBOBOX(PALETTE_CURRENT, GfxConvDialog::paletteCurrentChanged)
+	EVT_COMBOBOX(PALETTE_TARGET, GfxConvDialog::paletteTargetChanged)
 END_EVENT_TABLE()
 
 void GfxConvDialog::resize(wxSizeEvent& e) {
@@ -228,6 +246,14 @@ void GfxConvDialog::btnSkipAllClicked(wxCommandEvent& e) {
 }
 
 void GfxConvDialog::comboTargetFormatChanged(wxCommandEvent& e) {
+	updatePreviewGfx();
+}
+
+void GfxConvDialog::paletteCurrentChanged(wxCommandEvent& e) {
+	updatePreviewGfx();
+}
+
+void GfxConvDialog::paletteTargetChanged(wxCommandEvent& e) {
 	updatePreviewGfx();
 }
 

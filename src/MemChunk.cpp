@@ -51,6 +51,8 @@ MemChunk::MemChunk(uint32_t size) {
 MemChunk::MemChunk(uint8_t* data, uint32_t size) {
 	// Init variables
 	this->cur_ptr = 0;
+	this->data = NULL;
+	this->size = size;
 
 	// Load given data
 	loadMem(data, size);

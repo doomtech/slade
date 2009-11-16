@@ -59,6 +59,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/ArchivePanel.o \
 	${OBJECTDIR}/src/MapSide.o \
 	${OBJECTDIR}/src/GfxCanvas.o \
+	${OBJECTDIR}/src/PaletteChooser.o \
 	${OBJECTDIR}/src/PaletteCanvas.o \
 	${OBJECTDIR}/src/SImage.o \
 	${OBJECTDIR}/src/MapEditorWindow.o \
@@ -235,6 +236,11 @@ ${OBJECTDIR}/src/GfxCanvas.o: nbproject/Makefile-${CND_CONF}.mk src/GfxCanvas.cp
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
 	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/GfxCanvas.o src/GfxCanvas.cpp
+
+${OBJECTDIR}/src/PaletteChooser.o: nbproject/Makefile-${CND_CONF}.mk src/PaletteChooser.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/PaletteChooser.o src/PaletteChooser.cpp
 
 ${OBJECTDIR}/src/PaletteCanvas.o: nbproject/Makefile-${CND_CONF}.mk src/PaletteCanvas.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
