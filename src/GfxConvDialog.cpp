@@ -34,6 +34,7 @@
 #include "Console.h"
 #include "ArchiveManager.h"
 #include "Misc.h"
+#include "PaletteManager.h"
 
 
 /* GfxConvDialog::GfxConvDialog
@@ -159,17 +160,33 @@ void GfxConvDialog::updatePreviewGfx() {
 	// Disable/enable current gfx palette as needed
 	if (entry->getType() == ETYPE_FLAT ||
 		entry->getType() == ETYPE_GFX ||
-		entry->getType() == ETYPE_GFX2)
+		entry->getType() == ETYPE_GFX2 ||
+		entry->getType() == ETYPE_SPRITE)
 		pal_chooser_current->Enable(true);
 	else
 		pal_chooser_current->Enable(false);
 
+	// Disable/enable target gfx palette as needed
+	if (combo_target_format->GetSelection() == 3)
+		pal_chooser_target->Enable(false);
+	else
+		pal_chooser_target->Enable(true);
+
 	// Load entry palette to each image if needed
-	if (entry->getParent()) {
+	Palette8bit* pal_archive = new Palette8bit();
+	pal_archive->copyPalette(*(thePaletteManager->globalPalette()));	// If no palette is found in the entry's parent archive, set the palette to the global palette
+
+	if (entry->getParent())
+		Misc::loadPaletteFromArchive(pal_archive, entry->getParent());
+
+	// Set both image palette depending on what is selected for the 'current' palette
+	if (pal_chooser_current->globalSelected()) {
+		gfx_current->getImage()->getPalette().copyPalette(*(pal_archive));
+		gfx_target->getImage()->getPalette().copyPalette(*(pal_archive));
+	}
+	else {
 		gfx_current->getImage()->getPalette().copyPalette(*(pal_chooser_current->getSelectedPalette()));
-		gfx_target->getImage()->getPalette().copyPalette(*(pal_chooser_target->getSelectedPalette()));
-		//Misc::loadPaletteFromArchive(&(gfx_current->getImage()->getPalette()), entry->getParent());
-		//Misc::loadPaletteFromArchive(&(gfx_target->getImage()->getPalette()), entry->getParent());
+		gfx_target->getImage()->getPalette().copyPalette(*(pal_chooser_current->getSelectedPalette()));
 	}
 
 	// Load the image to both gfx canvases
@@ -188,12 +205,18 @@ void GfxConvDialog::updatePreviewGfx() {
 	gfx_target->Refresh();
 }
 
+/* GfxConvDialog::doConvert
+ * Performs the image conversion
+ *******************************************************************/
 bool GfxConvDialog::doConvert() {
 	int format = combo_target_format->GetCurrentSelection();
 	if (format <= 2) {
 		// Convert to selected palette
-		Palette8bit& palette = gfx_target->getImage()->getPalette();
-		gfx_target->getImage()->convertPaletted(palette);
+		//Palette8bit* palette = pal_chooser_target->getSelectedPalette();
+		if (pal_chooser_target->globalSelected())
+			gfx_target->getImage()->convertPaletted(gfx_target->getImage()->getPalette());
+		else
+			gfx_target->getImage()->convertPaletted(*(pal_chooser_target->getSelectedPalette()));
 
 		if (format == 0) {
 			// Doom flat selected
@@ -220,6 +243,9 @@ BEGIN_EVENT_TABLE(GfxConvDialog, wxDialog)
 	EVT_COMBOBOX(PALETTE_TARGET, GfxConvDialog::paletteTargetChanged)
 END_EVENT_TABLE()
 
+/* GfxConvDialog::resize
+ * Called when the dialog is resized
+ *******************************************************************/
 void GfxConvDialog::resize(wxSizeEvent& e) {
 	gfx_current->zoomToFit(true, 0.05f);
 	gfx_target->zoomToFit(true, 0.05f);
@@ -227,32 +253,53 @@ void GfxConvDialog::resize(wxSizeEvent& e) {
 	e.Skip();
 }
 
+/* GfxConvDialog::btnConvertClicked
+ * Called when the 'Convert' button is clicked
+ *******************************************************************/
 void GfxConvDialog::btnConvertClicked(wxCommandEvent& e) {
 	nextEntry();
 }
 
+/* GfxConvDialog::btnConvertAllClicked
+ * Called when the 'Convert All' button is clicked
+ *******************************************************************/
 void GfxConvDialog::btnConvertAllClicked(wxCommandEvent& e) {
 	for (int a = current_entry; a < entries.size(); a++)
 		nextEntry();
 }
 
+/* GfxConvDialog::btnSkipClicked
+ * Called when the 'Skip' button is clicked
+ *******************************************************************/
 void GfxConvDialog::btnSkipClicked(wxCommandEvent& e) {
 	nextEntry();
 }
 
+/* GfxConvDialog::btnSkipAllClicked
+ * Called when the 'Skip All' button is clicked
+ *******************************************************************/
 void GfxConvDialog::btnSkipAllClicked(wxCommandEvent& e) {
 	for (int a = current_entry; a < entries.size(); a++)
 		nextEntry();
 }
 
+/* GfxConvDialog::comboTargetFormatChanged
+ * Called when the 'Convert To' combo box is changed
+ *******************************************************************/
 void GfxConvDialog::comboTargetFormatChanged(wxCommandEvent& e) {
 	updatePreviewGfx();
 }
 
+/* GfxConvDialog::paletteCurrentChanged
+ * Called when the current image palette chooser is changed
+ *******************************************************************/
 void GfxConvDialog::paletteCurrentChanged(wxCommandEvent& e) {
 	updatePreviewGfx();
 }
 
+/* GfxConvDialog::paletteTargetChanged
+ * Called when the target image palette chooser is changed
+ *******************************************************************/
 void GfxConvDialog::paletteTargetChanged(wxCommandEvent& e) {
 	updatePreviewGfx();
 }

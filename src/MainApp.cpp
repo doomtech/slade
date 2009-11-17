@@ -134,6 +134,10 @@ bool MainApp::OnInit() {
 	// Init logfile
 	initLogFile();
 
+	// Check that SLADE.pk3 can be found
+	if (!theArchiveManager->resArchiveOK())
+		return false;
+
 	// Load image handlers
 	wxImage::AddHandler(new wxPNGHandler);
 	wxImage::AddHandler(new wxICOHandler);

@@ -51,10 +51,15 @@ ArchiveManager* ArchiveManager::instance = NULL;
  * ArchiveManager class constructor
  *******************************************************************/
 ArchiveManager::ArchiveManager() {
+	// Init variables
+	res_archive_open = true;
+
+	// Open SLADE.pk3
 	resource_archive = new ZipArchive();
-	
-	if (!resource_archive->openFile(appPath(_T("SLADE.pk3"), DIR_DATA)))
-		wxLogMessage(s_fmt(_T("Unable to find SLADE.pk3! Make sure it exists within the directory \"%s\""), appPath(_T(""), DIR_DATA)));
+	if (!resource_archive->openFile(appPath(_T("SLADE.pk3"), DIR_DATA))) {
+		wxLogMessage(s_fmt(_T("Unable to find SLADE.pk3! Make sure it exists within the directory \"%s\""), appPath(_T(""), DIR_DATA).c_str()));
+		res_archive_open = false;
+	}
 }
 
 /* ArchiveManager::~ArchiveManager

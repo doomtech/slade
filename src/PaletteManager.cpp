@@ -33,6 +33,7 @@
 #include "ArchiveManager.h"
 #include "ZipArchive.h"
 #include <wx/dir.h>
+#include <wx/filename.h>
 
 
 /*******************************************************************
@@ -41,6 +42,10 @@
 PaletteManager* PaletteManager::instance = NULL;
 
 
+
+/* PaletteManager::PaletteManager
+ * PaletteManager class constructor
+ *******************************************************************/
 PaletteManager::PaletteManager() {
 	// Load palettes from SLADE.pk3
 	loadResourcePalettes();
@@ -50,13 +55,21 @@ PaletteManager::PaletteManager() {
 
 	// Init other stuff
 	pal_default = new Palette8bit();
+	pal_global = new Palette8bit();
 }
 
+/* PaletteManager::~PaletteManager
+ * PaletteManager class destructor
+ *******************************************************************/
 PaletteManager::~PaletteManager() {
 	for (int a = 0; a < palettes.size(); a++)
 		delete[] palettes[a];
 }
 
+/* PaletteManager::getPalette
+ * Returns the palette at [index]. or the default palette (greyscale)
+ * if index is out of bounds
+ *******************************************************************/
 Palette8bit* PaletteManager::getPalette(int index) {
 	if (index < 0 || index >= numPalettes())
 		return pal_default;
@@ -64,6 +77,10 @@ Palette8bit* PaletteManager::getPalette(int index) {
 		return palettes[index];
 }
 
+/* PaletteManager::getPalette
+ * Returns the palette matching the given name, or the default
+ * palette (greyscale) if no matching palette found
+ *******************************************************************/
 Palette8bit* PaletteManager::getPalette(string name) {
 	for (uint32_t a = 0; a < pal_names.size(); a++) {
 		if (pal_names[a].Cmp(name) == 0)
@@ -73,6 +90,10 @@ Palette8bit* PaletteManager::getPalette(string name) {
 	return pal_default;
 }
 
+/* PaletteManager::getPalName
+ * Returns the name of the palette at [index], or an empty string if
+ * index is out of bounds
+ *******************************************************************/
 string PaletteManager::getPalName(int index) {
 	if (index < 0 || index >= numPalettes())
 		return _T("");
@@ -80,6 +101,10 @@ string PaletteManager::getPalName(int index) {
 		return pal_names[index];
 }
 
+/* PaletteManager::getPalName
+ * Returns the name of the given palette, or an empty string if the
+ * palette isn't managed by the PaletteManager
+ *******************************************************************/
 string PaletteManager::getPalName(Palette8bit* pal) {
 	for (uint32_t a = 0; a < palettes.size(); a++) {
 		if (palettes[a] == pal)
@@ -89,10 +114,18 @@ string PaletteManager::getPalName(Palette8bit* pal) {
 	return _T("");
 }
 
+/* PaletteManager::loadResourcePalettes
+ * Loads any entries in the 'palettes' directory of SLADE.pk3 as
+ * palettes, with names from the entries (minus the entry extension)
+ *******************************************************************/
 bool PaletteManager::loadResourcePalettes() {
 	// Get the 'palettes' directory of SLADE.pk3
 	ZipArchive* res_archive = (ZipArchive*)(theArchiveManager->resourceArchive());
 	zipdir_t* dir_palettes = res_archive->getDirectory(_T("palettes"));
+
+	// Check it exists
+	if (!dir_palettes)
+		return false;
 
 	// Go through all entries in the directory
 	for (int a = 0; a < dir_palettes->entries.size(); a++) {
@@ -107,6 +140,10 @@ bool PaletteManager::loadResourcePalettes() {
 	}
 }
 
+/* PaletteManager::loadCustomPalettes
+ * Loads any files in the '<userdir>/palettes' directory as palettes,
+ * with names from the files (minus the file extension)
+ *******************************************************************/
 bool PaletteManager::loadCustomPalettes() {
 	// Open the custom palettes directory
 	wxDir res_dir;
@@ -124,7 +161,7 @@ bool PaletteManager::loadCustomPalettes() {
 
 		// Add the palette
 		palettes.push_back(pal);
-		pal_names.push_back(filename);
+		pal_names.push_back(wxFileName(filename).GetName());
 
 		// Next file
 		files = res_dir.GetNext(&filename);

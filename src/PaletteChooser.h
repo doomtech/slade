@@ -12,6 +12,7 @@ public:
 	~PaletteChooser();
 
 	Palette8bit*	getSelectedPalette();
+	bool			globalSelected();
 };
 
 #endif//__PALETTECHOOSER_H__
