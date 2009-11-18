@@ -145,6 +145,10 @@ bool PaletteManager::loadResourcePalettes() {
  * with names from the files (minus the file extension)
  *******************************************************************/
 bool PaletteManager::loadCustomPalettes() {
+	// If the directory doesn't exist create it
+	if (!wxDirExists(appPath(_T("palettes"), DIR_USER)))
+		wxMkdir(appPath(_T("palettes"), DIR_USER));
+
 	// Open the custom palettes directory
 	wxDir res_dir;
 	res_dir.Open(appPath(_T("palettes"), DIR_USER));
