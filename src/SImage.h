@@ -36,9 +36,12 @@ public:
 	bool			hasPalette() { return has_palette; }
 	point2_t		offset() { return point2_t(offset_x, offset_y); }
 
+	// Misc
 	void	clearData(bool clear_mask = true);
 	void	fillAlpha(uint8_t alpha = 0);
 	short	findUnusedColour();
+	bool	trim(int width, int height);
+	bool	validFlatSize();
 
 	// Image format reading
 	bool	loadImage(uint8_t* data, int size);

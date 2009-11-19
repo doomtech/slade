@@ -64,6 +64,15 @@ void GfxConvDialog::nextEntry() {
 	}
 
 	updatePreviewGfx();
+
+	// Check image size if doom flat format is selected
+	if (combo_target_format->GetCurrentSelection() == 0) {
+		if (!gfx_current->getImage()->validFlatSize()) {
+			wxMessageBox(_T("Doom Flat format only supports images of size 64x64, 64x128, 128x128 or 320x200"), _T("Invalid Image Size"), wxOK|wxICON_ERROR);
+			combo_target_format->SetSelection(1);
+			updatePreviewGfx();
+		}
+	}
 }
 
 /* GfxConvDialog::writeToEntry
@@ -288,7 +297,7 @@ void GfxConvDialog::updateControls() {
 		pal_chooser_current->Enable(false);
 
 	// Disable/enable target gfx palette as needed
-	if (combo_target_format->GetSelection() == 3)
+	if (combo_target_format->GetCurrentSelection() == 3)
 		pal_chooser_target->Enable(false);
 	else
 		pal_chooser_target->Enable(true);
@@ -429,6 +438,14 @@ void GfxConvDialog::btnSkipAllClicked(wxCommandEvent& e) {
  * Called when the 'Convert To' combo box is changed
  *******************************************************************/
 void GfxConvDialog::comboTargetFormatChanged(wxCommandEvent& e) {
+	// Check image size if doom flat format is selected
+	if (combo_target_format->GetCurrentSelection() == 0) {
+		if (!gfx_current->getImage()->validFlatSize()) {
+			wxMessageBox(_T("Doom Flat format only supports images of size 64x64, 64x128, 128x128 or 320x200"), _T("Invalid Image Size"), wxOK|wxICON_ERROR);
+			combo_target_format->SetSelection(1);
+		}
+	}
+
 	updatePreviewGfx();
 }
 

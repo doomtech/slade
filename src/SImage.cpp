@@ -194,6 +194,65 @@ short SImage::findUnusedColour() {
 	return -1;
 }
 
+bool SImage::trim(int width, int height) {
+	// Check new width/height are smaller than current
+	if (width > this->width || height > this->height)
+		return false;
+
+	if (format == RGBA) {
+		// Write image portion to new data
+		uint8_t* new_data = new uint8_t[width * height * 4];
+		uint32_t c = 0;
+		for (int row = 0; row < height; row++) {
+			memcpy(new_data + c, data + c, width * 4);
+			c += this->width * 4;
+		}
+
+		// Update variables
+		clearData(true);
+		data = new_data;
+		this->width = width;
+		this->height = height;
+
+		return true;
+	}
+	else if (format == PALMASK) {
+		// Write image portion to new data
+		uint8_t* new_data = new uint8_t[width * height];
+		uint32_t c = 0;
+		for (int row = 0; row < height; row++) {
+			memcpy(new_data + c, data + c, width);
+			c += this->width;
+		}
+
+		// Write mask portion to new mask
+		uint8_t* new_mask = new uint8_t[width * height];
+		c = 0;
+		for (int row = 0; row < height; row++) {
+			memcpy(new_mask + c, mask + c, width);
+			c += this->width;
+		}
+
+		// Update variables
+		clearData(true);
+		data = new_data;
+		mask = new_mask;
+		this->width = width;
+		this->height = height;
+
+		return true;
+	}
+
+	return false;
+}
+
+bool SImage::validFlatSize() {
+	return (width == 64 && height == 64 ||
+			width == 64 && height == 128 ||
+			width == 128 && height == 128 ||
+			width == 320 && height == 200);
+}
+
 /* SImage::loadImage
  * Loads an image (if it's format is supported by FreeImage)
  * Returns false if the given image data was invalid, true otherwise
@@ -370,13 +429,27 @@ bool SImage::loadDoomFlat(uint8_t* gfx_data, int size) {
 	if (!gfx_data)
 		return false;
 
-	// Check size
-	if (size != 64*64)
+	// Check/setup size
+	if (size == 64*64) {
+		width = 64;
+		height = 64;
+	}
+	else if (size == 64*128) {
+		width = 64;
+		height = 128;
+	}
+	else if (size == 128*128) {
+		width = 128;
+		height = 128;
+	}
+	else if (size == 320*200) {
+		width = 320;
+		height = 200;
+	}
+	else
 		return false;
 
 	// Setup variables
-	width = 64;
-	height = 64;
 	has_palette = true;
 	format = PALMASK;
 
@@ -384,8 +457,12 @@ bool SImage::loadDoomFlat(uint8_t* gfx_data, int size) {
 	clearData();
 
 	// Read raw pixel data
-	data = new uint8_t[64*64];
-	memcpy(data, gfx_data, 64 * 64);
+	data = new uint8_t[width*height];
+	memcpy(data, gfx_data, width * height);
+
+	// Create mask (all opaque)
+	mask = new uint8_t[width*height];
+	memset(mask, 255, width*height);
 
 	return true;
 }
@@ -600,7 +677,7 @@ bool SImage::toDoomFlat(MemChunk& out) {
 		wxLogMessage(_T("Cannot convert truecolour image to doom flat format - convert to 256-colour first."));
 		return false;
 	}
-	
+
 	// Check image size
 	if (!(width == 64 && height == 64 ||
 			width == 64 && height == 128 ||
