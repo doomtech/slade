@@ -75,8 +75,8 @@ bool Palette8bit::loadMem(MemChunk& mc) {
 /* Palette8bit::copyPalette8bit
  * Copies the given palette into this one
  *******************************************************************/
-void Palette8bit::copyPalette(Palette8bit& copy) {
+void Palette8bit::copyPalette(Palette8bit* copy) {
 	for (int a = 0; a < 256; a++)
-		setColour(a, copy.colour(a));
-	index_trans = copy.transIndex();
+		setColour(a, copy->colour(a));
+	index_trans = copy->transIndex();
 }

@@ -83,6 +83,7 @@ public:
 	void	updatePreviewGfx();
 	void	updateControls();
 	bool	doConvert();
+	bool	writeToEntry();
 
 	// Events
 	void	resize(wxSizeEvent &e);

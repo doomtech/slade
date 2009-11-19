@@ -66,6 +66,37 @@ void GfxConvDialog::nextEntry() {
 	updatePreviewGfx();
 }
 
+/* GfxConvDialog::writeToEntry
+ * Writes the converted image data to the entry
+ *******************************************************************/
+bool GfxConvDialog::writeToEntry() {
+	// Get current entry
+	ArchiveEntry* entry = entries[current_entry];
+
+	// MemChunk to store image data
+	MemChunk mc;
+
+	// Write target image to selected type
+	int format = combo_target_format->GetCurrentSelection();
+	if (format == 0) {
+		wxLogMessage(_T("Doom flat"));
+		gfx_target->getImage()->toDoomFlat(mc);
+	}
+	else if (format == 1) {
+		wxLogMessage(_T("Doom gfx"));
+		gfx_target->getImage()->toDoomGfx(mc);
+	}
+	else if (format > 1) {
+		wxLogMessage(_T("PNG"));
+		gfx_target->getImage()->toPNG(mc);
+	}
+
+	wxLogMessage(s_fmt(_T("%d"), mc.getSize()));
+
+	// Write data to the entry
+	entry->importMemChunk(mc);
+}
+
 /* GfxConvDialog::setupLayout
  * Sets up the dialog UI layout
  *******************************************************************/
@@ -81,6 +112,7 @@ void GfxConvDialog::setupLayout() {
 
 	wxString s_formats[] = { _T("Doom Flat Format"), _T("Doom Graphic Format"), _T("PNG Format (8bit Paletted)"), _T("PNG Format (32bit Truecolour)") };
 	combo_target_format = new wxComboBox(this, COMBO_TARGET_FORMAT, s_formats[1], wxDefaultPosition, wxDefaultSize, 4, s_formats, wxCB_READONLY);
+	combo_target_format->Select(1);
 	hbox->Add(combo_target_format, 1, wxEXPAND|wxALL, 4);
 
 
@@ -201,19 +233,19 @@ void GfxConvDialog::updatePreviewGfx() {
 
 	// Load entry palette to each image if needed
 	Palette8bit* pal_archive = new Palette8bit();
-	pal_archive->copyPalette(*(thePaletteManager->globalPalette()));	// If no palette is found in the entry's parent archive, set the palette to the global palette
+	pal_archive->copyPalette(thePaletteManager->globalPalette());	// If no palette is found in the entry's parent archive, set the palette to the global palette
 
 	if (entry->getParent())
 		Misc::loadPaletteFromArchive(pal_archive, entry->getParent());
 
 	// Set both image palette depending on what is selected for the 'current' palette
 	if (pal_chooser_current->globalSelected()) {
-		gfx_current->getImage()->getPalette().copyPalette(*(pal_archive));
-		gfx_target->getImage()->getPalette().copyPalette(*(pal_archive));
+		gfx_current->getImage()->getPalette()->copyPalette(pal_archive);
+		gfx_target->getImage()->getPalette()->copyPalette(pal_archive);
 	}
 	else {
-		gfx_current->getImage()->getPalette().copyPalette(*(pal_chooser_current->getSelectedPalette()));
-		gfx_target->getImage()->getPalette().copyPalette(*(pal_chooser_current->getSelectedPalette()));
+		gfx_current->getImage()->getPalette()->copyPalette(pal_chooser_current->getSelectedPalette());
+		gfx_target->getImage()->getPalette()->copyPalette(pal_chooser_current->getSelectedPalette());
 	}
 
 	// Load the image to both gfx canvases
@@ -263,13 +295,10 @@ void GfxConvDialog::updateControls() {
 
 	// Set colourbox palette if source image has one
 	if (gfx_current->getImage()->getFormat() == PALMASK) {
-		colbox_transparent->setPalette(&(gfx_current->getImage()->getPalette()));
-		//colbox_transparent->setColour(gfx_current->getImage()->getPalette().colour(0));
+		colbox_transparent->setPalette(gfx_current->getImage()->getPalette());
 	}
-	else {
+	else
 		colbox_transparent->setPalette(NULL);
-		colbox_transparent->setColour(rgba_t(0, 255, 255, 255));
-	}
 
 	// Disable/enable transparency options depending on transparency checkbox
 	if (cb_enable_transparency->GetValue()) {
@@ -302,7 +331,7 @@ bool GfxConvDialog::doConvert() {
 	if (pal_chooser_target->globalSelected())
 		target_pal.copyPalette(gfx_target->getImage()->getPalette());
 	else
-		target_pal.copyPalette(*(pal_chooser_target->getSelectedPalette()));
+		target_pal.copyPalette(pal_chooser_target->getSelectedPalette());
 
 	// Transparency info
 	if (transparency) {
@@ -312,16 +341,11 @@ bool GfxConvDialog::doConvert() {
 			colour_trans = colbox_transparent->getColour();
 	}
 
-	if (keep_trans)
-		wxLogMessage(_T("Keep Trans"));
-	else
-		wxLogMessage(_T("Don't keep trans"));
-
 	// Do the conversion
 	int format = combo_target_format->GetCurrentSelection();
 	if (format <= 2) {
 		// Convert to selected palette
-		gfx_target->getImage()->convertPaletted(target_pal, alpha_threshold, keep_trans, colour_trans);
+		gfx_target->getImage()->convertPaletted(&target_pal, alpha_threshold, keep_trans, colour_trans);
 	}
 	else {
 		// Convert to RGBA (32bit)
@@ -368,6 +392,7 @@ void GfxConvDialog::resize(wxSizeEvent& e) {
  * Called when the 'Convert' button is clicked
  *******************************************************************/
 void GfxConvDialog::btnConvertClicked(wxCommandEvent& e) {
+	writeToEntry();
 	nextEntry();
 }
 
@@ -375,8 +400,10 @@ void GfxConvDialog::btnConvertClicked(wxCommandEvent& e) {
  * Called when the 'Convert All' button is clicked
  *******************************************************************/
 void GfxConvDialog::btnConvertAllClicked(wxCommandEvent& e) {
-	for (int a = current_entry; a < entries.size(); a++)
+	for (int a = current_entry; a < entries.size(); a++) {
+		writeToEntry();
 		nextEntry();
+	}
 }
 
 /* GfxConvDialog::btnSkipClicked

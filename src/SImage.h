@@ -32,15 +32,12 @@ public:
 	bool			getRGBData(MemChunk& mc);
 	int				getWidth() { return width; }
 	int				getHeight() { return height; }
-	Palette8bit&	getPalette() { return palette; }
+	Palette8bit*	getPalette() { return &palette; }
 	bool			hasPalette() { return has_palette; }
 	point2_t		offset() { return point2_t(offset_x, offset_y); }
 
 	void	clearData(bool clear_mask = true);
-
 	void	fillAlpha(uint8_t alpha = 0);
-
-	void	applyPalette(Palette8bit& pal, int quant_type = 0);
 
 	// Image format reading
 	bool	loadImage(uint8_t* data, int size);
@@ -52,9 +49,11 @@ public:
 	bool	toDoomGfx(MemChunk& out, uint8_t alpha_threshold = 0);
 	bool	toDoomFlat(MemChunk& out);
 
-	// Convertion stuff
+	// Conversion stuff
 	bool	convertRGBA();
-	bool	convertPaletted(Palette8bit& pal, uint8_t alpha_threshold = 0, bool keep_trans = true, rgba_t col_trans = COL_CYAN, int quant_type = 0);
+	bool	convertPaletted(Palette8bit* pal, uint8_t alpha_threshold = 0, bool keep_trans = true, rgba_t col_trans = COL_CYAN, int quant_type = 0);
+	bool	maskFromColour(rgba_t colour, bool force_mask = false);
+	bool	cutoffMask(uint8_t threshold, bool force_mask = false);
 };
 
 #endif //__SIMAGE_H__

@@ -113,7 +113,6 @@ bool SImage::getRGBData(MemChunk& mc) {
 			mc.write(&data[a], 3);
 
 		return true;
-		//return rgb_data;
 	}
 	if (format == PALMASK) {
 		// Paletted, convert to RGB
@@ -164,80 +163,6 @@ void SImage::fillAlpha(uint8_t alpha) {
 
 		memset(mask, alpha, width * height);
 	}
-}
-
-/* SImage::applyPalette
- * Converts the image to the given palette (using nearest-colour
- * matching)
- *******************************************************************/
-void SImage::applyPalette(Palette8bit& pal, int quant_type) {
-	// Check image is valid
-	if (!isValid())
-		return;
-
-	// Get image data as RGBA
-	MemChunk rgba_data;
-	getRGBAData(rgba_data);
-
-	// Swap red and blue colour information because FreeImage is retarded
-	for (int a = 0; a < width * height * 4; a += 4) {
-		uint8_t red = rgba_data[a];
-		rgba_data[a] = rgba_data[a+2];
-		rgba_data[a+2] = red;
-	}
-
-	// Build FIBITMAP from it
-	FIBITMAP* bm32 = FreeImage_ConvertFromRawBits(rgba_data.getData(), width, height, width * 4, 32, 0, 0, 0, false);
-	FIBITMAP* bm = FreeImage_ConvertTo24Bits(bm32);
-
-	// Create FreeImage palette
-	RGBQUAD fi_pal[256];
-	for (int a = 0; a < 256; a++) {
-		fi_pal[a].rgbRed = pal.colour(a).r;
-		fi_pal[a].rgbGreen = pal.colour(a).g;
-		fi_pal[a].rgbBlue = pal.colour(a).b;
-	}
-
-	// Convert image to palette
-	FIBITMAP* pbm = NULL;
-	if (quant_type == 0)
-		pbm = FreeImage_ColorQuantizeEx(bm, FIQ_NNQUANT, 256, 256, fi_pal);
-	else
-		pbm = FreeImage_ColorQuantizeEx(bm, FIQ_WUQUANT, 256, 256, fi_pal);
-
-	// Load given palette
-	palette.copyPalette(pal);
-
-	// Clear current image data (but not mask)
-	clearData(false);
-
-	// Load pixel data from the FIBITMAP
-	data = new uint8_t[width * height];
-	for (int a = 0; a < height; a++)
-		memcpy(data + a * width, FreeImage_GetScanLine(pbm, a), width);
-
-	// Create mask from alpha info (if converting from RGBA)
-	if (format == RGBA) {
-		// Clear current mask
-		if (mask)
-			delete[] mask;
-
-		// Init mask
-		mask = new uint8_t[width * height];
-
-		// Get values from alpha channel
-		int c = 0;
-		for (int a = 3; a < width * height * 4; a += 4)
-			mask[c++] = rgba_data[a];
-	}
-
-	// Update variables
-	format = PALMASK;
-
-	// Clean up
-	FreeImage_Unload(bm32);
-	FreeImage_Unload(bm);
-	FreeImage_Unload(pbm);
 }
 
 /* SImage::loadImage
@@ -442,10 +367,17 @@ bool SImage::loadDoomFlat(uint8_t* gfx_data, int size) {
  *******************************************************************/
 bool SImage::toPNG(MemChunk& out) {
 	return false;
+
+	FIBITMAP* bm;
+
+	if (format == RGBA) {
+		bm = FreeImage_Allocate(width, height, 32, 0x000000FF, 0x0000FF00, 0x00FF0000);
+	}
+
+	//FreeImage_Save(FIF_PNG, bm, appPath(_T("temp.png"), DIR_TEMP));
 }
 
 // Doom Gfx format structs
-
 struct post_t {
 	uint8_t			row_off;
 	vector<uint8_t>	pixels;
@@ -476,7 +408,7 @@ bool SImage::toDoomGfx(MemChunk& out, uint8_t alpha_threshold) {
 		post_t post;
 		bool ispost = false;
 
-		offset = c * width;
+		offset = c;
 		for (int r = 0; r < height; r++) {
 			// If the current pixel is not transparent, add it to the current post
 			if (mask[offset] > alpha_threshold) {
@@ -514,7 +446,7 @@ bool SImage::toDoomGfx(MemChunk& out, uint8_t alpha_threshold) {
 
 	// Write doom gfx data to output
 	out.clear();
-	out.seek(0, 0);
+	out.seek(0, SEEK_SET);
 
 	// Setup header
 	patch_header_t header;
@@ -636,32 +568,167 @@ bool SImage::convertRGBA() {
  * <quant_type>: Type of colour quantization (0 for Xiaolin Wu, 1
  * for NeuQuant)
  *******************************************************************/
-bool SImage::convertPaletted(Palette8bit& pal, uint8_t alpha_threshold, bool keep_trans, rgba_t col_trans, int quant_type) {
-	// Apply the palette
-	applyPalette(pal, quant_type);
+bool SImage::convertPaletted(Palette8bit* pal, uint8_t alpha_threshold, bool keep_trans, rgba_t col_trans, int quant_type) {
+	// Check image is valid
+	if (!isValid())
+		return false;
 
-	if (keep_trans) {
-		// If we are keeping the existing transparency info, apply the
-		// alpha threshold given (anything above is completely opaque,
-		// anything equal or below is completely transparent)
-		for (int a = 0; a < width * height; a++) {
-			if (mask[a] > alpha_threshold)
-				mask[a] = 255;
-			else
-				mask[a] = 0;
-		}
+	// Get image data as RGBA
+	MemChunk rgba_data;
+	getRGBAData(rgba_data);
+
+	// Swap red and blue colour information because FreeImage is retarded
+	for (int a = 0; a < width * height * 4; a += 4) {
+		uint8_t red = rgba_data[a];
+		rgba_data[a] = rgba_data[a+2];
+		rgba_data[a+2] = red;
 	}
+
+	// Build FIBITMAP from it
+	FIBITMAP* bm32 = FreeImage_ConvertFromRawBits(rgba_data.getData(), width, height, width * 4, 32, 0, 0, 0, false);
+	FIBITMAP* bm = FreeImage_ConvertTo24Bits(bm32);
+
+	// Create mask from alpha info (if converting from RGBA)
+	if (format == RGBA) {
+		// Clear current mask
+		if (mask)
+			delete[] mask;
+
+		// Init mask
+		mask = new uint8_t[width * height];
+
+		// Get values from alpha channel
+		int c = 0;
+		for (int a = 3; a < width * height * 4; a += 4)
+			mask[c++] = rgba_data[a];
+	}
+
+	// If we are keeping the existing transparency, just apply the alpha threshold
+	if (keep_trans)
+		cutoffMask(alpha_threshold, true);
 	else {
-		// If we aren't keeping the existing transparency info, set all
-		// pixels to opaque except for pixels of the given transparent colour
-		for (int a = 0; a < width * height; a++) {
-			if (pal.colour(data[a]).equals(col_trans))
-				mask[a] = 0;
-			else
-				mask[a] = 255;
-		}
+		// If we aren't keeping the existing transparency, apply the given transparency colour to the mask
+		maskFromColour(col_trans, true);
 	}
+
+	// Create FreeImage palette
+	RGBQUAD fi_pal[256];
+	for (int a = 0; a < 256; a++) {
+		fi_pal[a].rgbRed = pal->colour(a).r;
+		fi_pal[a].rgbGreen = pal->colour(a).g;
+		fi_pal[a].rgbBlue = pal->colour(a).b;
+	}
+
+	// Convert image to palette
+	FIBITMAP* pbm = NULL;
+	if (quant_type == 0)
+		pbm = FreeImage_ColorQuantizeEx(bm, FIQ_NNQUANT, 256, 256, fi_pal);
+	else
+		pbm = FreeImage_ColorQuantizeEx(bm, FIQ_WUQUANT, 256, 256, fi_pal);
+
+	// Load given palette
+	palette.copyPalette(pal);
+
+	// Clear current image data (but not mask)
+	clearData(false);
+
+	// Load pixel data from the FIBITMAP
+	data = new uint8_t[width * height];
+	for (int a = 0; a < height; a++)
+		memcpy(data + a * width, FreeImage_GetScanLine(pbm, a), width);
+
+	// Update variables
+	format = PALMASK;
+
+	// Clean up
+	FreeImage_Unload(bm32);
+	FreeImage_Unload(bm);
+	FreeImage_Unload(pbm);
 
 	// Success
+	return true;
+}
+
+/* SImage::maskFromColour
+ * Changes the mask/alpha channel so that pixels that match [colour]
+ * are fully transparent, and all other pixels fully opaque. If
+ * [force_mask] is true, a mask will be generated even if the image
+ * is in RGBA format
+ *******************************************************************/
+bool SImage::maskFromColour(rgba_t colour, bool force_mask) {
+	if (format == PALMASK) {
+		// Palette+Mask format, go through the mask
+		for (int a = 0; a < width * height; a++) {
+			if (palette.colour(data[a]).equals(colour))
+				mask[a] = 0;
+			else
+				mask[a] = 255;
+		}
+	}
+	else if (format == RGBA) {
+		// If we're forcing generation of mask data, create it if it doesn't exist
+		if (force_mask && !mask)
+			mask = new uint8_t[width * height];
+
+		// RGBA format, go through alpha channel
+		uint32_t c = 0;
+		for (int a = 0; a < width * height; a++) {
+			rgba_t pix_col(data[c], data[c + 1], data[c + 2], 255);
+
+			if (pix_col.equals(colour))
+				data[c + 3] = 0;
+			else
+				data[c + 3] = 255;
+
+			// Write the alpha value to the mask also if we're forcing generation of a mask
+			if (force_mask)
+				mask[a] = data[c + 3];
+
+			// Skip to next pixel
+			c += 4;
+		}
+	}
+	else
+		return false;
+
+	return true;
+}
+
+/* SImage::cutoffMask
+ * Changes the mask/alpha channel so that any pixel alpha level
+ * currently greater than [threshold] is fully opaque, and all
+ * other pixels fully transparent. If [force_mask] is true, a mask
+ * will be generated even if the image is in RGBA format
+ *******************************************************************/
+bool SImage::cutoffMask(uint8_t threshold, bool force_mask) {
+	if (format == PALMASK) {
+		for (int a = 0; a < width * height; a++) {
+			if (mask[a] > threshold)
+				mask[a] = 255;
+			else
+				mask[a] = 0;
+		}
+	}
+	else if (format == RGBA) {
+		// If we're forcing generation of mask data, create it if it doesn't exist
+		if (force_mask && !mask)
+			mask = new uint8_t[width * height];
+
+		// RGBA format, go through alpha channel
+		uint32_t c = 0;
+		for (int a = 3; a < width * height * 4; a += 4) {
+			if (data[a] > threshold)
+				data[a] = 255;
+			else
+				data[a] = 0;
+
+			// Write the alpha value to the mask also if we're forcing generation of a mask
+			if (force_mask)
+				mask[c++] = data[a];
+		}
+	}
+	else
+		return false;
+
 	return true;
 }

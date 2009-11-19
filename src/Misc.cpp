@@ -38,6 +38,8 @@ bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry) {
 		// General image formats
 		case ETYPE_PNG:
 			return image->loadImage(entry->getData(true), entry->getSize());
+		case ETYPE_IMAGE:
+			return image->loadImage(entry->getData(true), entry->getSize());
 		// Doom gfx format
 		case ETYPE_GFX:
 			return image->loadDoomGfx(entry->getData(true), entry->getSize());

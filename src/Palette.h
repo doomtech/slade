@@ -19,7 +19,7 @@ public:
 	void	setColour(uint8_t index, rgba_t col) { colours[index] = col; }
 	void	setTransIndex(short index) { index_trans = index; }
 
-	void	copyPalette(Palette8bit& copy);
+	void	copyPalette(Palette8bit* copy);
 };
 
 #endif //__PALETTE_H__

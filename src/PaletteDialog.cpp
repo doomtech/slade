@@ -43,7 +43,7 @@ PaletteDialog::PaletteDialog(Palette8bit* palette)
 	SetSizer(m_vbox);
 
 	pal_canvas = new PaletteCanvas(this, -1);
-	pal_canvas->getPalette().copyPalette(*palette);
+	pal_canvas->getPalette().copyPalette(palette);
 	pal_canvas->SetInitialSize(wxSize(400, 400));
 	m_vbox->Add(pal_canvas, 1, wxEXPAND|wxALL, 4);
 
