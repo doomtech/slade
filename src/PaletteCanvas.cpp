@@ -123,11 +123,26 @@ void PaletteCanvas::draw() {
 	SwapBuffers();
 }
 
+/* PaletteCanvas::getSelectedColour
+ * Returns the currently selected colour, or a completely black +
+ * transparent colour if nothing is selected
+ *******************************************************************/
+rgba_t PaletteCanvas::getSelectedColour() {
+	if (selected >= 0)
+		return palette->colour(selected);
+	else
+		return rgba_t(0, 0, 0, 0);
+}
+
+
 
 BEGIN_EVENT_TABLE(PaletteCanvas, OGLCanvas)
 	EVT_LEFT_DOWN(PaletteCanvas::leftClick)
 END_EVENT_TABLE()
 
+/* PaletteCanvas::leftClick
+ * Called when the palette canvas is left clicked
+ *******************************************************************/
 void PaletteCanvas::leftClick(wxMouseEvent& e) {
 	// Figure out what 'grid' position was clicked
 	float size = float(min(GetSize().x, GetSize().y)) / 16.0f;

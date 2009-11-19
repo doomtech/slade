@@ -17,6 +17,7 @@ public:
 	Palette8bit& getPalette() { return *palette; }
 
 	void	draw();
+	rgba_t	getSelectedColour();
 
 	// Events
 	void	leftClick(wxMouseEvent &e);

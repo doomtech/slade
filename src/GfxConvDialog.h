@@ -6,6 +6,7 @@
 #include "GfxCanvas.h"
 #include "ArchiveEntry.h"
 #include "PaletteChooser.h"
+#include "ColourBox.h"
 
 /* Convert from anything to:
  * Doom Gfx
@@ -42,8 +43,13 @@ private:
 	PaletteChooser*	pal_chooser_current;
 	PaletteChooser*	pal_chooser_target;
 
+	wxCheckBox*		cb_enable_transparency;
+	wxRadioButton*	rb_transparency_existing;
+	wxRadioButton*	rb_transparency_colour;
+	wxSlider*		slider_alpha_threshold;
+	ColourBox*		colbox_transparent;
+
 	// Conversion options
-	uint8_t			target_format;		// 0=dgfx, 1=dflat, 2=png32, 3=png8
 	Palette8bit		target_pal;
 	uint8_t			pal_convert_type;	// 0=nearest colour, 1=keep indices
 	uint8_t			alpha_threshold;
@@ -61,6 +67,11 @@ public:
 		COMBO_TARGET_FORMAT,
 		PALETTE_CURRENT,
 		PALETTE_TARGET,
+		SLIDER_ALPHA_THRESHOLD,
+		CB_ENABLE_TRANSPARENCY,
+		RB_TRANS_EXISTING,
+		RB_TRANS_COLOUR,
+		COLOURBOX_TRANS,
 	};
 
 	GfxConvDialog();
@@ -70,6 +81,7 @@ public:
 
 	bool	openEntries(vector<ArchiveEntry*> entries);
 	void	updatePreviewGfx();
+	void	updateControls();
 	bool	doConvert();
 
 	// Events
@@ -81,6 +93,10 @@ public:
 	void	comboTargetFormatChanged(wxCommandEvent &e);
 	void	paletteCurrentChanged(wxCommandEvent &e);
 	void	paletteTargetChanged(wxCommandEvent &e);
+	void	sliderAlphaThresholdChanged(wxScrollEvent &e);
+	void	cbEnableTransparencyChanged(wxCommandEvent &e);
+	void	transTypeChanged(wxCommandEvent &e);
+	void	transColourChanged(wxCommandEvent &e);
 
 	DECLARE_EVENT_TABLE()
 };

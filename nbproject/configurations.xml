@@ -4,6 +4,8 @@
     <logicalFolder name="f5" displayName="Dialogs" projectFiles="true">
       <itemPath>src/GfxConvDialog.cpp</itemPath>
       <itemPath>src/GfxConvDialog.h</itemPath>
+      <itemPath>src/PaletteDialog.cpp</itemPath>
+      <itemPath>src/PaletteDialog.h</itemPath>
     </logicalFolder>
     <logicalFolder name="f4" displayName="General" projectFiles="true">
       <itemPath>src/CVar.cpp</itemPath>
@@ -105,6 +107,8 @@
       <itemPath>src/PaletteManager.h</itemPath>
     </logicalFolder>
     <logicalFolder name="f6" displayName="UI Elements" projectFiles="true">
+      <itemPath>src/ColourBox.cpp</itemPath>
+      <itemPath>src/ColourBox.h</itemPath>
       <itemPath>src/GfxCanvas.cpp</itemPath>
       <itemPath>src/GfxCanvas.h</itemPath>
       <itemPath>src/OGLCanvas.cpp</itemPath>

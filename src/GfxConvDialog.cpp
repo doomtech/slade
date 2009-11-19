@@ -83,6 +83,7 @@ void GfxConvDialog::setupLayout() {
 	combo_target_format = new wxComboBox(this, COMBO_TARGET_FORMAT, s_formats[1], wxDefaultPosition, wxDefaultSize, 4, s_formats, wxCB_READONLY);
 	hbox->Add(combo_target_format, 1, wxEXPAND|wxALL, 4);
 
+
 	// Add Gfx previews
 	wxStaticBox *frame = new wxStaticBox(this, -1, _T("Graphic"));
 	wxStaticBoxSizer *framesizer = new wxStaticBoxSizer(frame, wxHORIZONTAL);
@@ -114,6 +115,45 @@ void GfxConvDialog::setupLayout() {
 
 	pal_chooser_target = new PaletteChooser(this, PALETTE_TARGET);
 	vbox->Add(pal_chooser_target, 0, wxEXPAND|wxALL, 4);
+
+
+	// 'Enable transparency' checkbox
+	cb_enable_transparency = new wxCheckBox(this, CB_ENABLE_TRANSPARENCY, _T("Enable Transparency"));
+	cb_enable_transparency->SetValue(true);
+	cb_enable_transparency->SetToolTip(_T("Uncheck this to remove any existing transparency from the graphic"));
+	m_vbox->AddSpacer(4);
+	m_vbox->Add(cb_enable_transparency, 0, wxEXPAND|wxALL, 4);
+
+	// Add transparency options
+	frame = new wxStaticBox(this, -1, _T("Transparency Options"));
+	framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
+	m_vbox->Add(framesizer, 0, wxEXPAND|wxALL, 4);
+
+	wxBoxSizer* vbox_ttypes = new wxBoxSizer(wxVERTICAL);
+	framesizer->Add(vbox_ttypes, 1, wxEXPAND|wxALL, 0);
+
+	// Keep existing transparency
+	hbox = new wxBoxSizer(wxHORIZONTAL);
+	vbox_ttypes->Add(hbox, 0, wxEXPAND|wxALL, 0);
+	rb_transparency_existing = new wxRadioButton(this, RB_TRANS_EXISTING, _T("Existing w/Threshold"));
+	hbox->Add(rb_transparency_existing, 0, wxEXPAND|wxALL, 4);
+
+	// Alpha threshold
+	slider_alpha_threshold = new wxSlider(this, SLIDER_ALPHA_THRESHOLD, 0, 0, 255, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_LABELS|wxSL_AUTOTICKS|wxSL_BOTTOM);
+	slider_alpha_threshold->SetToolTip(_T("Specifies the 'cutoff' transparency level, anything above this will be fully opaque, anything equal or below will be completely transparent"));
+	//hbox->Add(new wxStaticText(this, -1, _T("Alpha Threshold:")), 0, wxALL, 4);
+	hbox->Add(slider_alpha_threshold, 1, wxEXPAND|wxALL, 4);
+
+
+	// Transparent colour
+	hbox = new wxBoxSizer(wxHORIZONTAL);
+	vbox_ttypes->Add(hbox, 0, wxEXPAND|wxALL, 0);
+	rb_transparency_colour = new wxRadioButton(this, RB_TRANS_EXISTING, _T("Transparent Colour"));
+	hbox->Add(rb_transparency_colour, 0, wxEXPAND|wxALL, 4);
+
+	colbox_transparent = new ColourBox(this, COLOURBOX_TRANS, false);
+	colbox_transparent->setColour(rgba_t(0, 255, 255, 255));
+	hbox->Add(colbox_transparent, 0, wxEXPAND|wxALL, 4);
 
 
 	// Buttons
@@ -152,25 +192,12 @@ bool GfxConvDialog::openEntries(vector<ArchiveEntry*> entries) {
  * Updates the current and target preview windows
  *******************************************************************/
 void GfxConvDialog::updatePreviewGfx() {
+	// Check a valid entry is open
 	if (entries.size() <= current_entry)
 		return;
 
+	// Get the current entry
 	ArchiveEntry* entry = entries[current_entry];
-
-	// Disable/enable current gfx palette as needed
-	if (entry->getType() == ETYPE_FLAT ||
-		entry->getType() == ETYPE_GFX ||
-		entry->getType() == ETYPE_GFX2 ||
-		entry->getType() == ETYPE_SPRITE)
-		pal_chooser_current->Enable(true);
-	else
-		pal_chooser_current->Enable(false);
-
-	// Disable/enable target gfx palette as needed
-	if (combo_target_format->GetSelection() == 3)
-		pal_chooser_target->Enable(false);
-	else
-		pal_chooser_target->Enable(true);
 
 	// Load entry palette to each image if needed
 	Palette8bit* pal_archive = new Palette8bit();
@@ -197,6 +224,9 @@ void GfxConvDialog::updatePreviewGfx() {
 	gfx_current->zoomToFit(true, 0.05f);
 	gfx_target->zoomToFit(true, 0.05f);
 
+	// Update controls
+	updateControls();
+
 	// Apply image conversion to target preview
 	doConvert();
 
@@ -205,27 +235,103 @@ void GfxConvDialog::updatePreviewGfx() {
 	gfx_target->Refresh();
 }
 
+/* GfxConvDialog::updateControls
+ * Disables/enables controls based on what is currently selected
+ *******************************************************************/
+void GfxConvDialog::updateControls() {
+	// Check a valid entry is open
+	if (entries.size() <= current_entry)
+		return;
+
+	// Get the current entry
+	ArchiveEntry* entry = entries[current_entry];
+
+	// Disable/enable current gfx palette as needed
+	if (entry->getType() == ETYPE_FLAT ||
+		entry->getType() == ETYPE_GFX ||
+		entry->getType() == ETYPE_GFX2 ||
+		entry->getType() == ETYPE_SPRITE)
+		pal_chooser_current->Enable(true);
+	else
+		pal_chooser_current->Enable(false);
+
+	// Disable/enable target gfx palette as needed
+	if (combo_target_format->GetSelection() == 3)
+		pal_chooser_target->Enable(false);
+	else
+		pal_chooser_target->Enable(true);
+
+	// Set colourbox palette if source image has one
+	if (gfx_current->getImage()->getFormat() == PALMASK) {
+		colbox_transparent->setPalette(&(gfx_current->getImage()->getPalette()));
+		//colbox_transparent->setColour(gfx_current->getImage()->getPalette().colour(0));
+	}
+	else {
+		colbox_transparent->setPalette(NULL);
+		colbox_transparent->setColour(rgba_t(0, 255, 255, 255));
+	}
+
+	// Disable/enable transparency options depending on transparency checkbox
+	if (cb_enable_transparency->GetValue()) {
+		// Disable/enable alpha threshold slider as needed
+		if (gfx_current->getImage()->getFormat() == RGBA)
+			slider_alpha_threshold->Enable(true);
+		else
+			slider_alpha_threshold->Enable(false);
+
+		rb_transparency_colour->Enable(true);
+		rb_transparency_existing->Enable(true);
+	}
+	else {
+		rb_transparency_colour->Enable(false);
+		rb_transparency_existing->Enable(false);
+		slider_alpha_threshold->Enable(false);
+	}
+}
+
 /* GfxConvDialog::doConvert
  * Performs the image conversion
  *******************************************************************/
 bool GfxConvDialog::doConvert() {
+	// Gather conversion information
+	bool transparency = cb_enable_transparency->GetValue();
+	keep_trans = rb_transparency_existing->GetValue();
+	alpha_threshold = 0;
+
+	// Palette info
+	if (pal_chooser_target->globalSelected())
+		target_pal.copyPalette(gfx_target->getImage()->getPalette());
+	else
+		target_pal.copyPalette(*(pal_chooser_target->getSelectedPalette()));
+
+	// Transparency info
+	if (transparency) {
+		if (keep_trans)
+			alpha_threshold = slider_alpha_threshold->GetValue();
+		else
+			colour_trans = colbox_transparent->getColour();
+	}
+
+	if (keep_trans)
+		wxLogMessage(_T("Keep Trans"));
+	else
+		wxLogMessage(_T("Don't keep trans"));
+
+	// Do the conversion
 	int format = combo_target_format->GetCurrentSelection();
 	if (format <= 2) {
 		// Convert to selected palette
-		//Palette8bit* palette = pal_chooser_target->getSelectedPalette();
-		if (pal_chooser_target->globalSelected())
-			gfx_target->getImage()->convertPaletted(gfx_target->getImage()->getPalette());
-		else
-			gfx_target->getImage()->convertPaletted(*(pal_chooser_target->getSelectedPalette()));
-
-		if (format == 0) {
-			// Doom flat selected
-			gfx_target->getImage()->fillAlpha(255);	// No transparency
-		}
+		gfx_target->getImage()->convertPaletted(target_pal, alpha_threshold, keep_trans, colour_trans);
 	}
 	else {
+		// Convert to RGBA (32bit)
 		gfx_target->getImage()->convertRGBA();
 	}
+
+
+	// If doom flat or no transparency is selected, remove any transparency
+	if (format == 0 || !transparency)
+		gfx_target->getImage()->fillAlpha(255);	// No transparency
 
 	return true;
 }
@@ -241,6 +347,11 @@ BEGIN_EVENT_TABLE(GfxConvDialog, wxDialog)
 	EVT_COMBOBOX(COMBO_TARGET_FORMAT, GfxConvDialog::comboTargetFormatChanged)
 	EVT_COMBOBOX(PALETTE_CURRENT, GfxConvDialog::paletteCurrentChanged)
 	EVT_COMBOBOX(PALETTE_TARGET, GfxConvDialog::paletteTargetChanged)
+	EVT_COMMAND_SCROLL(SLIDER_ALPHA_THRESHOLD, GfxConvDialog::sliderAlphaThresholdChanged)
+	EVT_CHECKBOX(CB_ENABLE_TRANSPARENCY, GfxConvDialog::cbEnableTransparencyChanged)
+	EVT_RADIOBUTTON(RB_TRANS_COLOUR, GfxConvDialog::transTypeChanged)
+	EVT_RADIOBUTTON(RB_TRANS_EXISTING, GfxConvDialog::transTypeChanged)
+	EVT_COMMAND(COLOURBOX_TRANS, wxEVT_COLOURBOX_CHANGED, GfxConvDialog::transColourChanged)
 END_EVENT_TABLE()
 
 /* GfxConvDialog::resize
@@ -301,6 +412,40 @@ void GfxConvDialog::paletteCurrentChanged(wxCommandEvent& e) {
  * Called when the target image palette chooser is changed
  *******************************************************************/
 void GfxConvDialog::paletteTargetChanged(wxCommandEvent& e) {
+	updatePreviewGfx();
+}
+
+/* GfxConvDialog::sliderAlphaThresholdChanged
+ * Called when the alpha threshold slider is changed
+ *******************************************************************/
+void GfxConvDialog::sliderAlphaThresholdChanged(wxScrollEvent& e) {
+	// Ignore while slider is being dragged
+	if (e.GetEventType() == wxEVT_SCROLL_THUMBTRACK) {
+		e.Skip();
+		return;
+	}
+
+	updatePreviewGfx();
+}
+
+/* GfxConvDialog::cbEnableTransparencyChanged
+ * Called when the 'enable transparency' checkbox is changed
+ *******************************************************************/
+void GfxConvDialog::cbEnableTransparencyChanged(wxCommandEvent& e) {
+	updatePreviewGfx();
+}
+
+/* GfxConvDialog::transTypeChanged
+ * Called when the 'existing' and 'colour' radio buttons are toggled
+ *******************************************************************/
+void GfxConvDialog::transTypeChanged(wxCommandEvent& e) {
+	updatePreviewGfx();
+}
+
+/* GfxConvDialog::transColourChanged
+ * Called when the transparent colour box is changed
+ *******************************************************************/
+void GfxConvDialog::transColourChanged(wxCommandEvent& e) {
 	updatePreviewGfx();
 }
 

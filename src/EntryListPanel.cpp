@@ -220,7 +220,7 @@ int EntryList::getWidth() {
 	// For the moment. Kinda annoying I have to do this actually, it should be automatic >_<
 	int width = GetColumnWidth(0) + GetColumnWidth(1) + GetColumnWidth(2);
 
-	if (this->GetViewRect().height > this->GetSize().y)
+	// Always leave room for the scrollbar (wxWidgets is silly)
 		width += wxSystemSettings::GetMetric(wxSYS_VSCROLL_X, this);
 
 	return width + 4;

@@ -27,6 +27,7 @@ public:
 
 	bool			isValid() { return (width > 0 && height > 0 && data); }
 
+	SIFormat		getFormat() { return format; }
 	bool			getRGBAData(MemChunk& mc);
 	bool			getRGBData(MemChunk& mc);
 	int				getWidth() { return width; }
