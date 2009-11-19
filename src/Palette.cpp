@@ -80,3 +80,16 @@ void Palette8bit::copyPalette(Palette8bit* copy) {
 		setColour(a, copy->colour(a));
 	index_trans = copy->transIndex();
 }
+
+/* Palette8bit::findColour
+ * Returns the index of the colour in the palette matching [colour],
+ * or -1 if no match is found
+ *******************************************************************/
+short Palette8bit::findColour(rgba_t colour) {
+	for (int a = 0; a < 256; a++) {
+		if (colours[a].equals(colour))
+			return a;
+	}
+
+	return -1;
+}

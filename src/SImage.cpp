@@ -29,6 +29,8 @@
 /*******************************************************************
  * INCLUDES
  *******************************************************************/
+#include <wx/filefn.h>
+
 #include "Main.h"
 #include "SImage.h"
 #include "FreeImage.h"
@@ -163,6 +165,33 @@ void SImage::fillAlpha(uint8_t alpha) {
 
 		memset(mask, alpha, width * height);
 	}
+}
+
+/* SImage::findUnusedColour
+ * Returns the first unused palette index, or -1 if the image is not
+ * paletted or uses all 256 colours
+ *******************************************************************/
+short SImage::findUnusedColour() {
+	// Only for paletted images
+	if (format != PALMASK)
+		return -1;
+
+	// Init used colours list
+	uint8_t used[256];
+	memset(used, 0, 256);
+
+	// Go through image data and mark used colours
+	for (int a = 0; a < width * height; a++)
+		used[data[a]] = 1;
+
+	// Find first unused
+	for (int a = 0; a < 256; a++) {
+		if (!used[a])
+			return a;
+	}
+
+	// No unused colours found
+	return -1;
 }
 
 /* SImage::loadImage
@@ -366,15 +395,73 @@ bool SImage::loadDoomFlat(uint8_t* gfx_data, int size) {
  * if it exists. Returns true on success
  *******************************************************************/
 bool SImage::toPNG(MemChunk& out) {
-	return false;
-
 	FIBITMAP* bm;
 
 	if (format == RGBA) {
-		bm = FreeImage_Allocate(width, height, 32, 0x000000FF, 0x0000FF00, 0x00FF0000);
-	}
+		// Init 32bpp FIBITMAP
+		bm = FreeImage_Allocate(width, height, 32, 0x0000FF00, 0x00FF0000, 0x000000FF);
 
-	//FreeImage_Save(FIF_PNG, bm, appPath(_T("temp.png"), DIR_TEMP));
+		// Write image data
+		uint8_t* bits = FreeImage_GetBits(bm);
+		uint32_t c = 0;
+		for (int a = 0; a < width * height * 4; a += 4) {
+			bits[c++] = data[a+2];
+			bits[c++] = data[a+1];
+			bits[c++] = data[a];
+			bits[c++] = data[a+3];
+		}
+	}
+	else if (format == PALMASK) {
+		// Init 8bpp FIBITMAP
+		bm = FreeImage_Allocate(width, height, 8);
+
+		// Set palette
+		RGBQUAD* bm_pal = FreeImage_GetPalette(bm);
+		for (int a = 0; a < 256; a++) {
+			bm_pal[a].rgbRed = palette.colour(a).r;
+			bm_pal[a].rgbGreen = palette.colour(a).g;
+			bm_pal[a].rgbBlue = palette.colour(a).b;
+		}
+
+		// Find unused colour (for transparency)
+		short unused = findUnusedColour();
+
+		// Set any transparent pixels to this colour (if we found an unused colour
+		if (unused >= 0) {
+			for (int a = 0; a < width * height; a++) {
+				if (mask[a] == 0)
+					data[a] = unused;
+			}
+
+			// Set palette transparency
+			palette.setTransIndex(unused);
+		}
+
+		// Set freeimage palette transparency if needed
+		if (palette.transIndex() >= 0)
+			FreeImage_SetTransparentIndex(bm, palette.transIndex());
+
+		// Write image data
+		for (int row = 0; row < height; row++) {
+			uint8_t* scanline = FreeImage_GetScanLine(bm, row);
+			memcpy(scanline, data + (row * width), width);
+		}
+	}
+	else
+		return false;
+
+	// Flip the image
+	FreeImage_FlipVertical(bm);
+
+	// Write the image to a temp file
+	FreeImage_Save(FIF_PNG, bm, chr(appPath(_T("temp.png"), DIR_TEMP)));
+
+	// Load it into the memchunk
+	out.loadFile(appPath(_T("temp.png"), DIR_TEMP));
+	wxRemoveFile(appPath(_T("temp.png"), DIR_TEMP));
+
+	// Success
+	return true;
 }
 
 // Doom Gfx format structs
@@ -639,6 +726,7 @@ bool SImage::convertPaletted(Palette8bit* pal, uint8_t alpha_threshold, bool kee
 
 	// Update variables
 	format = PALMASK;
+	has_palette = true;
 
 	// Clean up
 	FreeImage_Unload(bm32);

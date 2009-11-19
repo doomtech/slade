@@ -20,6 +20,7 @@ public:
 	void	setTransIndex(short index) { index_trans = index; }
 
 	void	copyPalette(Palette8bit* copy);
+	short	findColour(rgba_t colour);
 };
 
 #endif //__PALETTE_H__

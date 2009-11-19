@@ -350,6 +350,10 @@ bool GfxConvDialog::doConvert() {
 	else {
 		// Convert to RGBA (32bit)
 		gfx_target->getImage()->convertRGBA();
+
+		// Set transparent colour if selected
+		if (!keep_trans)
+			gfx_target->getImage()->maskFromColour(colour_trans);
 	}
 
 

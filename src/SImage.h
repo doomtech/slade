@@ -38,6 +38,7 @@ public:
 
 	void	clearData(bool clear_mask = true);
 	void	fillAlpha(uint8_t alpha = 0);
+	short	findUnusedColour();
 
 	// Image format reading
 	bool	loadImage(uint8_t* data, int size);
