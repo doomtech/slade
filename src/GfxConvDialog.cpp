@@ -177,10 +177,11 @@ void GfxConvDialog::setupLayout() {
 	hbox = new wxBoxSizer(wxHORIZONTAL);
 	vbox_ttypes->Add(hbox, 0, wxEXPAND|wxALL, 0);
 	rb_transparency_existing = new wxRadioButton(this, RB_TRANS_EXISTING, _T("Existing w/Threshold"));
+	rb_transparency_existing->SetValue(true);
 	hbox->Add(rb_transparency_existing, 0, wxEXPAND|wxALL, 4);
 
 	// Alpha threshold
-	slider_alpha_threshold = new wxSlider(this, SLIDER_ALPHA_THRESHOLD, 0, 0, 255, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_LABELS|wxSL_AUTOTICKS|wxSL_BOTTOM);
+	slider_alpha_threshold = new wxSlider(this, SLIDER_ALPHA_THRESHOLD, 0, 0, 255, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_LABELS|wxSL_BOTTOM);
 	slider_alpha_threshold->SetToolTip(_T("Specifies the 'cutoff' transparency level, anything above this will be fully opaque, anything equal or below will be completely transparent"));
 	//hbox->Add(new wxStaticText(this, -1, _T("Alpha Threshold:")), 0, wxALL, 4);
 	hbox->Add(slider_alpha_threshold, 1, wxEXPAND|wxALL, 4);
