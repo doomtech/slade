@@ -443,6 +443,12 @@ void ArchivePanel::onEntryListChange(wxListEvent& event) {
 	// Get the panel sizer
 	wxSizer* sizer = GetSizer();
 
+	// If the current entry area has unsaved changes, ask the user if they wish to save the changes
+	if (cur_area->unsavedChanges() && cur_area->getEntry()) {
+		if (wxMessageBox(s_fmt(_T("Save changes to entry \"%s\"?"), cur_area->getEntry()->getName().c_str()), _T("Unsaved Changes"), wxYES_NO|wxICON_QUESTION) == wxID_YES)
+			cur_area->saveEntry();	// Save changes to the entry if yes clicked
+	}
+
 	// If nothing was selected, show blank entry area
 	if (event.GetIndex() == -1) {
 		cur_area->Show(false);

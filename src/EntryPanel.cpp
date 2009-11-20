@@ -42,6 +42,8 @@ EntryPanel::EntryPanel(wxWindow* parent)
 	wxStaticBoxSizer *framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
 	SetSizer(framesizer);
 	Show(false);
+
+	changed = false;
 }
 
 /* EntryPanel::~EntryPanel
@@ -56,5 +58,14 @@ EntryPanel::~EntryPanel() {
  *******************************************************************/
 bool EntryPanel::loadEntry(ArchiveEntry* entry) {
 	Global::error = _T("Cannot open an entry with the base EntryPanel class");
+	return false;
+}
+
+/* EntryPanel::saveEntry
+ * Saves the entrypanel content to the entry (does nothing here, to
+ * be overridden by child classes)
+ *******************************************************************/
+bool EntryPanel::saveEntry() {
+	Global::error = _T("Cannot save an entry with the base EntryPanel class");
 	return false;
 }

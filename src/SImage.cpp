@@ -143,6 +143,28 @@ void SImage::setPalette(Palette8bit* pal) {
 	announce(_T("image_changed"));
 }
 
+/* SImage::setPalette
+ * Changes the image X offset
+ *******************************************************************/
+void SImage::setXOffset(int offset) {
+	// Change the X offset
+	offset_x = offset;
+
+	// Announce change
+	announce(_T("offsets_changed"));
+}
+
+/* SImage::setPalette
+ * Changes the image Y offset
+ *******************************************************************/
+void SImage::setYOffset(int offset) {
+	// Change the Y offset
+	offset_y = offset;
+
+	// Announce change
+	announce(_T("offsets_changed"));
+}
+
 /* SImage::clearData
  * Deletes/clears any existing image data
  *******************************************************************/

@@ -37,9 +37,12 @@ public:
 	int				getWidth() { return width; }
 	int				getHeight() { return height; }
 	Palette8bit*	getPalette() { return &palette; }
-	void			setPalette(Palette8bit* pal);
 	bool			hasPalette() { return has_palette; }
 	point2_t		offset() { return point2_t(offset_x, offset_y); }
+
+	void			setPalette(Palette8bit* pal);
+	void			setXOffset(int offset);
+	void			setYOffset(int offset);
 
 	// Misc
 	void	fillAlpha(uint8_t alpha = 0);
