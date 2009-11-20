@@ -19,6 +19,7 @@ public:
 	SImage*	getImage() { return image; }
 
 	void	setViewType(int type) { view_type = type; }
+	void	setScale(double scale) { this->scale = scale; }
 
 	void	draw();
 	void	drawChequeredBackground();
