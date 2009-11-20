@@ -5,12 +5,13 @@
 #include "OGLCanvas.h"
 #include "SImage.h"
 
-class GfxCanvas : public OGLCanvas {
+class GfxCanvas : public OGLCanvas, Listener {
 private:
 	SImage*			image;
 	int				view_type;	// 0=default, 1=centered, 2=sprite offsets, 3=hud offsets
 	double			scale;
 	GLuint			gl_id;
+	bool			update_texture;
 
 public:
 	GfxCanvas(wxWindow* parent, int id);
@@ -25,8 +26,11 @@ public:
 	void	drawChequeredBackground();
 	void	drawImage();
 	void	drawOffsetLines();
+	void	updateImageTexture();
 
 	void	zoomToFit(bool mag = true, float padding = 0.0f);
+
+	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 };
 
 #endif //__GFXCANVAS_H__

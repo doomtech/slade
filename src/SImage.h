@@ -3,13 +3,14 @@
 #define	__SIMAGE_H__
 
 #include "Palette.h"
+#include "ListenerAnnouncer.h"
 
 enum SIFormat {
 	PALMASK,	// 2 bytes per pixel: palette index and alpha value
 	RGBA,		// 4 bytes per pixel: RGBA
 };
 
-class SImage {
+class SImage : public Announcer {
 private:
 	int			width;
 	int			height;
@@ -20,6 +21,9 @@ private:
 	bool		has_palette;
 	int			offset_x;
 	int			offset_y;
+
+	// Internal functions
+	void	clearData(bool clear_mask = true);
 
 public:
 	SImage();
@@ -33,11 +37,11 @@ public:
 	int				getWidth() { return width; }
 	int				getHeight() { return height; }
 	Palette8bit*	getPalette() { return &palette; }
+	void			setPalette(Palette8bit* pal);
 	bool			hasPalette() { return has_palette; }
 	point2_t		offset() { return point2_t(offset_x, offset_y); }
 
 	// Misc
-	void	clearData(bool clear_mask = true);
 	void	fillAlpha(uint8_t alpha = 0);
 	short	findUnusedColour();
 	bool	trim(int width, int height);

@@ -31,4 +31,3 @@ public:
 };
 
 #endif //__DEFAULTENTRYPANEL_H__
-

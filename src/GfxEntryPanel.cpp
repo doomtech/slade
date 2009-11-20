@@ -104,14 +104,20 @@ bool GfxEntryPanel::loadEntry(ArchiveEntry* entry) {
  * palette chooser
  *******************************************************************/
 void GfxEntryPanel::updateImagePalette() {
-	// Get the image palette
-	Palette8bit* pal = gfx_canvas->getImage()->getPalette();
+	// Init new palette
+	Palette8bit* pal = new Palette8bit();
 
-	// Update it to whatever is selected on the palette chooser
+	// Set it to whatever is selected in the palette chooser
 	if (combo_palette->globalSelected())
 		Misc::loadPaletteFromArchive(pal, entry->getParent());
 	else
 		pal->copyPalette(combo_palette->getSelectedPalette());
+
+	// Set the image's palette
+	gfx_canvas->getImage()->setPalette(pal);
+
+	// Clean up
+	delete pal;
 }
 
 BEGIN_EVENT_TABLE(GfxEntryPanel, EntryPanel)

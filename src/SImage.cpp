@@ -128,6 +128,21 @@ bool SImage::getRGBData(MemChunk& mc) {
 	}
 }
 
+/* SImage::setPalette
+ * Copies the given palette to the image palette
+ *******************************************************************/
+void SImage::setPalette(Palette8bit* pal) {
+	// Check palette
+	if (!pal)
+		return;
+
+	// Copy the palette
+	palette.copyPalette(pal);
+
+	// Announce change
+	announce(_T("image_changed"));
+}
+
 /* SImage::clearData
  * Deletes/clears any existing image data
  *******************************************************************/
@@ -165,6 +180,9 @@ void SImage::fillAlpha(uint8_t alpha) {
 
 		memset(mask, alpha, width * height);
 	}
+
+	// Announce change
+	announce(_T("image_changed"));
 }
 
 /* SImage::findUnusedColour
@@ -242,6 +260,9 @@ bool SImage::trim(int width, int height) {
 
 		return true;
 	}
+
+	// Announce change
+	announce(_T("image_changed"));
 
 	return false;
 }
@@ -351,6 +372,9 @@ bool SImage::loadImage(uint8_t* img_data, int size) {
 	FreeImage_Unload(rgb);
 	FreeImage_Unload(bm);
 
+	// Announce change
+	announce(_T("image_changed"));
+
 	// Return success
 	return true;
 }
@@ -416,6 +440,9 @@ bool SImage::loadDoomGfx(uint8_t* gfx_data, int size) {
 		}
 	}
 
+	// Announce change
+	announce(_T("image_changed"));
+
 	// Return success
 	return true;
 }
@@ -463,6 +490,9 @@ bool SImage::loadDoomFlat(uint8_t* gfx_data, int size) {
 	// Create mask (all opaque)
 	mask = new uint8_t[width*height];
 	memset(mask, 255, width*height);
+
+	// Announce change
+	announce(_T("image_changed"));
 
 	return true;
 }
@@ -716,6 +746,9 @@ bool SImage::convertRGBA() {
 	// Set new format
 	format = RGBA;
 
+	// Announce change
+	announce(_T("image_changed"));
+
 	// Done
 	return true;
 }
@@ -810,6 +843,9 @@ bool SImage::convertPaletted(Palette8bit* pal, uint8_t alpha_threshold, bool kee
 	FreeImage_Unload(bm);
 	FreeImage_Unload(pbm);
 
+	// Announce change
+	announce(_T("image_changed"));
+
 	// Success
 	return true;
 }
@@ -856,6 +892,9 @@ bool SImage::maskFromColour(rgba_t colour, bool force_mask) {
 	else
 		return false;
 
+	// Announce change
+	announce(_T("image_changed"));
+
 	return true;
 }
 
@@ -894,6 +933,9 @@ bool SImage::cutoffMask(uint8_t threshold, bool force_mask) {
 	}
 	else
 		return false;
+
+	// Announce change
+	announce(_T("image_changed"));
 
 	return true;
 }

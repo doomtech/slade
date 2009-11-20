@@ -42,6 +42,10 @@ GfxCanvas::GfxCanvas(wxWindow* parent, int id)
 	view_type = 1;
 	scale = 1;
 	gl_id = 999999999;	// Arbitrarily large texture id number :P
+	update_texture = false;
+
+	// Listen to the image for changes
+	listenTo(image);
 }
 
 /* GfxCanvas::~GfxCanvas
@@ -94,7 +98,7 @@ void GfxCanvas::draw() {
  * Draws the offset center lines
  *******************************************************************/
 void GfxCanvas::drawOffsetLines() {
-	if (view_type == 1) {
+	if (view_type == 2) {
 		COL_BLACK.set_gl();
 
 		glBegin(GL_LINES);
@@ -165,20 +169,17 @@ void GfxCanvas::drawImage() {
 	else if (view_type > 1)
 		glTranslated(-image->offset().x, -image->offset().y, 0); // Pan by offsets
 
-	// Generate/Build GL texture
-	MemChunk mc;
-	image->getRGBAData(mc);
-
+	// Enable textures
 	glEnable(GL_TEXTURE_2D);
-	if (gl_id < 999999999)
-		glDeleteTextures(1, &gl_id);
 
-	glGenTextures(1, &gl_id);
+	// Update texture if needed
+	if (update_texture) {
+		updateImageTexture();
+		update_texture = false;
+	}
+
+	// Bind texture
 	glBindTexture(GL_TEXTURE_2D, gl_id);
-
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D, 0, 4, image->getWidth(), image->getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, mc.getData());
 
 	// Draw the image
 	glColor3f(1.0f, 1.0f, 1.0f);
@@ -194,6 +195,32 @@ void GfxCanvas::drawImage() {
 
 	// Restore previous matrix
 	glPopMatrix();
+}
+
+/* GfxCanvas::updateImageTexture
+ * (Re)Generates the image texture from image data
+ *******************************************************************/
+void GfxCanvas::updateImageTexture() {
+	// Delete current texture if it exists
+	if (gl_id < 999999999)
+		glDeleteTextures(1, &gl_id);
+
+	// Stop here if the image is invalid
+	if (!image->isValid())
+		return;
+
+	// Get image RGBA data
+	MemChunk mc;
+	image->getRGBAData(mc);
+
+	// Generate the texture id
+	glGenTextures(1, &gl_id);
+	glBindTexture(GL_TEXTURE_2D, gl_id);
+
+	// Generate the texture
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D, 0, 4, image->getWidth(), image->getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, mc.getData());
 }
 
 /* GfxCanvas::zoomToFit
@@ -220,4 +247,13 @@ void GfxCanvas::zoomToFit(bool mag, float padding) {
 	// If we don't want to magnify the image, clamp scale to a max of 1.0
 	if (!mag && scale > 1)
 		scale = 1;
+}
+
+/* GfxCanvas::onAnnouncement
+ * Called when an announcement is recieved from the image that this
+ * GfxCanvas is displaying
+ *******************************************************************/
+void GfxCanvas::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
+	if (announcer == image && event_name.Cmp(_T("image_changed")) == 0)
+		update_texture = true;
 }

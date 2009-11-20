@@ -49,6 +49,9 @@ Palette8bit::Palette8bit() {
 Palette8bit::~Palette8bit() {
 }
 
+/* Palette8bit::loadMem
+ * Reads colour information from raw data
+ *******************************************************************/
 bool Palette8bit::loadMem(MemChunk& mc) {
 	// Check that the given data has at least 1 colour (3 bytes)
 	if (mc.getSize() < 3)
@@ -76,8 +79,12 @@ bool Palette8bit::loadMem(MemChunk& mc) {
  * Copies the given palette into this one
  *******************************************************************/
 void Palette8bit::copyPalette(Palette8bit* copy) {
+	if (!copy)
+		return;
+
 	for (int a = 0; a < 256; a++)
 		setColour(a, copy->colour(a));
+
 	index_trans = copy->transIndex();
 }
 
