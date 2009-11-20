@@ -38,6 +38,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/TextEditor.o \
 	${OBJECTDIR}/src/Palette.o \
 	${OBJECTDIR}/src/PaletteEntryPanel.o \
+	${OBJECTDIR}/src/ColourBox.o \
 	${OBJECTDIR}/src/ZipArchive.o \
 	${OBJECTDIR}/src/ArchiveEntry.o \
 	${OBJECTDIR}/src/TextEntryPanel.o \
@@ -58,6 +59,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/Console.o \
 	${OBJECTDIR}/src/ArchivePanel.o \
 	${OBJECTDIR}/src/MapSide.o \
+	${OBJECTDIR}/src/PaletteDialog.o \
 	${OBJECTDIR}/src/GfxCanvas.o \
 	${OBJECTDIR}/src/PaletteChooser.o \
 	${OBJECTDIR}/src/PaletteCanvas.o \
@@ -131,6 +133,11 @@ ${OBJECTDIR}/src/PaletteEntryPanel.o: nbproject/Makefile-${CND_CONF}.mk src/Pale
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
 	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/PaletteEntryPanel.o src/PaletteEntryPanel.cpp
+
+${OBJECTDIR}/src/ColourBox.o: nbproject/Makefile-${CND_CONF}.mk src/ColourBox.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/ColourBox.o src/ColourBox.cpp
 
 ${OBJECTDIR}/src/ZipArchive.o: nbproject/Makefile-${CND_CONF}.mk src/ZipArchive.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
@@ -231,6 +238,11 @@ ${OBJECTDIR}/src/MapSide.o: nbproject/Makefile-${CND_CONF}.mk src/MapSide.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
 	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/MapSide.o src/MapSide.cpp
+
+${OBJECTDIR}/src/PaletteDialog.o: nbproject/Makefile-${CND_CONF}.mk src/PaletteDialog.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/PaletteDialog.o src/PaletteDialog.cpp
 
 ${OBJECTDIR}/src/GfxCanvas.o: nbproject/Makefile-${CND_CONF}.mk src/GfxCanvas.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
