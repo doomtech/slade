@@ -45,6 +45,18 @@ public:
 
 	ArchiveEntry*			findEntry(string search);
 	vector<ArchiveEntry*>	findEntries(string search);
+
+	static bool exportEntriesAsWad(string filename, vector<ArchiveEntry*> entries) {
+		WadArchive wad;
+
+		// Add entries to wad archive
+		for (size_t a = 0; a < entries.size(); a++) {
+			// Add each entry to the wad archive
+			wad.addExistingEntry(entries[a], entries.size(), true);
+		}
+
+		return wad.save(filename);
+	}
 };
 
 #endif	/* _WADARCHIVE_H */

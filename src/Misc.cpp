@@ -87,3 +87,19 @@ bool Misc::loadPaletteFromArchive(Palette8bit* pal, Archive* archive) {
 
 	return true;
 }
+
+string Misc::sizeAsString(uint32_t size) {
+	if (size < 1024) {
+		return s_fmt(_T("%d"), size);
+	}
+	else if (size < 1024*1024) {
+		double kb = (double)size / 1024;
+		return s_fmt(_T("%1.2fkb"), kb);
+	}
+	else {
+		double mb = (double)size / (1024*1024);
+		return s_fmt(_T("%1.2fmb"), mb);
+	}
+
+	return _T("");
+}

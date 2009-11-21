@@ -58,6 +58,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/MapSector.o \
 	${OBJECTDIR}/src/Console.o \
 	${OBJECTDIR}/src/ArchivePanel.o \
+	${OBJECTDIR}/src/MultiEntryPanel.o \
 	${OBJECTDIR}/src/MapSide.o \
 	${OBJECTDIR}/src/PaletteDialog.o \
 	${OBJECTDIR}/src/GfxCanvas.o \
@@ -233,6 +234,11 @@ ${OBJECTDIR}/src/ArchivePanel.o: nbproject/Makefile-${CND_CONF}.mk src/ArchivePa
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
 	$(COMPILE.cc) -g -D__WXDEBUG__ -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/ArchivePanel.o src/ArchivePanel.cpp
+
+${OBJECTDIR}/src/MultiEntryPanel.o: nbproject/Makefile-${CND_CONF}.mk src/MultiEntryPanel.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -g -D__WXDEBUG__ -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/MultiEntryPanel.o src/MultiEntryPanel.cpp
 
 ${OBJECTDIR}/src/MapSide.o: nbproject/Makefile-${CND_CONF}.mk src/MapSide.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src

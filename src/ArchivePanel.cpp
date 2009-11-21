@@ -38,6 +38,7 @@
 #include "DefaultEntryPanel.h"
 #include "GfxEntryPanel.h"
 #include "PaletteEntryPanel.h"
+#include "MultiEntryPanel.h"
 #include <wx/aui/auibook.h>
 #include <wx/filename.h>
 
@@ -56,6 +57,7 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 	text_area = new TextEntryPanel(this);
 	gfx_area = new GfxEntryPanel(this);
 	pal_area = new PaletteEntryPanel(this);
+	multi_area = new MultiEntryPanel(this);
 
 	// Create entry menu
 	menu_entry = new wxMenu(_T(""));
@@ -307,30 +309,15 @@ bool ArchivePanel::exportEntry() {
  * Exports the selected entries to a Wad archive
  *******************************************************************/
 bool ArchivePanel::exportEntryWad() {
-	// Get a list of selected entries
-	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
-
-	// Init wad archive to save
-	WadArchive* wad = new WadArchive();
-
-	// Go through the list
-	for (size_t a = 0; a < selection.size(); a++) {
-		// Add each entry to the wad archive
-		wad->addExistingEntry(selection[a], selection.size(), true);
-	}
-
 	// Create save file dialog
-	wxFileDialog *dialog_save = new wxFileDialog(this, _T(""), wxEmptyString, wxEmptyString,
-										_T("Doom Wad File (*.wad)|*.wad"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT, wxDefaultPosition);
+	wxFileDialog dialog_save(this, _T(""), wxEmptyString, wxEmptyString,
+								_T("Doom Wad File (*.wad)|*.wad"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT, wxDefaultPosition);
 
 	// Run the dialog & check that the user didn't cancel
-	if (dialog_save->ShowModal() == wxID_OK) {
-		// If a filename was selected, save the wad archive
-		wad->save(dialog_save->GetPath());
+	if (dialog_save.ShowModal() == wxID_OK) {
+		// If a filename was selected, export the selected entries to a wad archive
+		WadArchive::exportEntriesAsWad(dialog_save.GetPath(), entry_list->getSelectedEntries());
 	}
-
-	// Delete the wad archive
-	delete wad;
 }
 
 /* ArchivePanel::moveUp
@@ -428,44 +415,16 @@ void ArchivePanel::onAnnouncement(Announcer* announcer, string event_name, MemCh
 	}
 }
 
-BEGIN_EVENT_TABLE(ArchivePanel, wxPanel)
-	EVT_LIST_ITEM_FOCUSED(ArchivePanel::ENTRY_LIST_PANEL, ArchivePanel::onEntryListChange)
-	EVT_LIST_ITEM_RIGHT_CLICK(ArchivePanel::ENTRY_LIST_PANEL, ArchivePanel::onEntryListRightClick)
-	EVT_MENU_RANGE(MENU_ENTRY_RENAME, MENU_ENTRY_END, ArchivePanel::onEntryMenuClick)
-END_EVENT_TABLE()
-
-/* ArchivePanel::onEntryListChange
- * Called when the current focus on the list control in the
- * entry list panel is changed (ie when the user selects an entry
- * in the list)
- *******************************************************************/
-void ArchivePanel::onEntryListChange(wxListEvent& event) {
-	// Get the panel sizer
-	wxSizer* sizer = GetSizer();
-
-	// If the current entry area has unsaved changes, ask the user if they wish to save the changes
-	if (cur_area->unsavedChanges() && cur_area->getEntry()) {
-		if (wxMessageBox(s_fmt(_T("Save changes to entry \"%s\"?"), cur_area->getEntry()->getName().c_str()), _T("Unsaved Changes"), wxYES_NO|wxICON_QUESTION) == wxID_YES)
-			cur_area->saveEntry();	// Save changes to the entry if yes clicked
-	}
-
-	// If nothing was selected, show blank entry area
-	if (event.GetIndex() == -1) {
-		cur_area->Show(false);
-		sizer->Replace(cur_area, entry_area);
-		cur_area = entry_area;
-		cur_area->Show(true);
-		return;
-	}
-
-	// Get the focused entry
-	ArchiveEntry* entry = entry_list->getFocusedEntry();
-
+bool ArchivePanel::openEntry(ArchiveEntry* entry) {
 	// Null entry, do nothing
 	if (!entry) {
 		wxLogMessage(_T("Warning: NULL entry focused in the list"));
-		return;
+		return false;
 	}
+
+	// Do nothing if the entry is already open
+	if (cur_area->getEntry() == entry)
+		return false;
 
 	// Get the appropriate entry panel for the entry's type
 	EntryPanel* new_area = default_area;
@@ -499,6 +458,9 @@ void ArchivePanel::onEntryListChange(wxListEvent& event) {
 			break;
 	}
 
+	// Get the panel sizer
+	wxSizer* sizer = GetSizer();
+
 	// If the new panel is different than the current, swap them
 	if (new_area != cur_area) {
 		cur_area->Show(false);				// Hide current
@@ -513,6 +475,64 @@ void ArchivePanel::onEntryListChange(wxListEvent& event) {
 	}
 
 	Layout();
+
+	return true;
+}
+
+BEGIN_EVENT_TABLE(ArchivePanel, wxPanel)
+	//EVT_LIST_ITEM_FOCUSED(ArchivePanel::ENTRY_LIST_PANEL, ArchivePanel::onEntryListChange)
+	EVT_LIST_ITEM_SELECTED(ArchivePanel::ENTRY_LIST_PANEL, ArchivePanel::onEntryListChange)
+	EVT_LIST_ITEM_DESELECTED(ArchivePanel::ENTRY_LIST_PANEL, ArchivePanel::onEntryListChange)
+	EVT_LIST_ITEM_RIGHT_CLICK(ArchivePanel::ENTRY_LIST_PANEL, ArchivePanel::onEntryListRightClick)
+	EVT_MENU_RANGE(MENU_ENTRY_RENAME, MENU_ENTRY_END, ArchivePanel::onEntryMenuClick)
+END_EVENT_TABLE()
+
+/* ArchivePanel::onEntryListChange
+ * Called when the current focus on the list control in the
+ * entry list panel is changed (ie when the user selects an entry
+ * in the list)
+ *******************************************************************/
+void ArchivePanel::onEntryListChange(wxListEvent& event) {
+	// Get the panel sizer
+	wxSizer* sizer = GetSizer();
+	
+	// If the current entry area has unsaved changes, ask the user if they wish to save the changes
+	if (cur_area->unsavedChanges() && cur_area->getEntry()) {
+		if (wxMessageBox(s_fmt(_T("Save changes to entry \"%s\"?"), cur_area->getEntry()->getName().c_str()), _T("Unsaved Changes"), wxYES_NO|wxICON_QUESTION) == wxID_YES)
+			cur_area->saveEntry();	// Save changes to the entry if yes clicked
+	}
+
+	// Get selected entries
+	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
+
+	// If multiple entries are selected, show the multi entry area
+	if (selection.size() > 1) {
+		if (cur_area != multi_area) {
+			cur_area->Show(false);
+			sizer->Replace(cur_area, multi_area);
+			cur_area = multi_area;
+			cur_area->Show(true);
+		}
+
+		((MultiEntryPanel*)multi_area)->loadEntries(selection);
+
+		Layout();
+		return;
+	}
+
+	/*
+	// If nothing was selected, show blank entry area
+	if (event.GetIndex() == -1) {
+		cur_area->Show(false);
+		sizer->Replace(cur_area, entry_area);
+		cur_area = entry_area;
+		cur_area->Show(true);
+		return;
+	 }
+	 */
+
+	// Open the focused entry
+	openEntry(entry_list->getFocusedEntry());
 }
 
 void ArchivePanel::onEntryListRightClick(wxListEvent& event) {

@@ -14,12 +14,13 @@ protected:
 	wxMenu*			menu_entry;
 
 	// Entry panels
-	EntryPanel*		cur_area;
-	EntryPanel*		entry_area;
-	EntryPanel*		default_area;
-	EntryPanel*		text_area;
-	EntryPanel*		gfx_area;
-	EntryPanel*		pal_area;
+	EntryPanel*	cur_area;
+	EntryPanel*	entry_area;
+	EntryPanel*	default_area;
+	EntryPanel*	text_area;
+	EntryPanel*	gfx_area;
+	EntryPanel*	pal_area;
+	EntryPanel*	multi_area;
 
 public:
 	enum {
@@ -56,6 +57,9 @@ public:
 	bool	exportEntryWad();
 	bool	moveUp();
 	bool	moveDown();
+
+	// UI related
+	bool	openEntry(ArchiveEntry* entry);
 
 	virtual void onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 

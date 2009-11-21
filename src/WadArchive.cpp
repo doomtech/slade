@@ -68,6 +68,16 @@ WadArchive::WadArchive()
 	wad_type[1] = 'W';
 	wad_type[2] = 'A';
 	wad_type[3] = 'D';
+
+	// Init entry type ranges
+	patches[0] = -1;
+	patches[1] = -1;
+	flats[0] = -1;
+	flats[1] = -1;
+	sprites[0] = -1;
+	sprites[1] = -1;
+	tx[0] = -1;
+	tx[1] = -1;
 }
 
 /* WadArchive::~WadArchive

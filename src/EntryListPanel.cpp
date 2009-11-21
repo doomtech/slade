@@ -75,11 +75,12 @@ wxImage get_entry_icon(string name, wxBitmapType type) {
 	return image;
 }
 
-#ifdef _WIN32
+// No edit labels for now, causes too many problems
+//#ifdef _WIN32
 #define ENTRYLIST_FLAGS wxLC_REPORT|wxLC_VRULES|wxLC_HRULES // No wxLC_EDIT_LABELS on win32 as it doesn't work in wxMSW :(
-#else
-#define ENTRYLIST_FLAGS wxLC_REPORT|wxLC_VRULES|wxLC_HRULES|wxLC_EDIT_LABELS
-#endif
+//#else
+//#define ENTRYLIST_FLAGS wxLC_REPORT|wxLC_VRULES|wxLC_HRULES|wxLC_EDIT_LABELS
+//#endif
 
 /* EntryList::EntryList
  * EntryList class constructor

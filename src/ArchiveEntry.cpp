@@ -29,6 +29,7 @@
  *******************************************************************/
 #include "Main.h"
 #include "Archive.h"
+#include "Misc.h"
 #include <wx/log.h>
 #include <wx/hash.h>
 #include <wx/filename.h>
@@ -700,18 +701,5 @@ string ArchiveEntry::getTypeString() {
 }
 
 string ArchiveEntry::getSizeString() {
-	if (size < 1024) {
-		// uint8_ts
-		return s_fmt(_T("%d"), size);
-	}
-	else if (size < 1024*1024) {
-		double kb = (double)size / 1024;
-		return s_fmt(_T("%1.2fkb"), kb);
-	}
-	else {
-		double mb = (double)size / (1024*1024);
-		return s_fmt(_T("%1.2fmb"), mb);
-	}
-
-	return _T("");
+	return Misc::sizeAsString(size);
 }

@@ -41,6 +41,8 @@
           <itemPath>src/EntryPanel.h</itemPath>
           <itemPath>src/GfxEntryPanel.cpp</itemPath>
           <itemPath>src/GfxEntryPanel.h</itemPath>
+          <itemPath>src/MultiEntryPanel.cpp</itemPath>
+          <itemPath>src/MultiEntryPanel.h</itemPath>
           <itemPath>src/PaletteEntryPanel.cpp</itemPath>
           <itemPath>src/PaletteEntryPanel.h</itemPath>
           <itemPath>src/TextEntryPanel.cpp</itemPath>
