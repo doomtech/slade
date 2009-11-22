@@ -317,6 +317,10 @@ void EntryListPanel::populateEntryList() {
 	updateListWidth();
 }
 
+/* EntryListPanel::updateListWidth
+ * Updates the entrylist width and updates the layout to accommodate
+ * it
+ *******************************************************************/
 void EntryListPanel::updateListWidth() {
 	entry_list->SetMinSize(wxSize(entry_list->getWidth(), -1));
 	GetParent()->Layout();
@@ -635,6 +639,9 @@ void EntryListPanel::onEntryListColResize(wxListEvent& event) {
 	updateListWidth();
 }
 
+/* EntryListPanel::onEntryListColRightClick
+ * Called when an entrylist column header is right clicked
+ *******************************************************************/
 void EntryListPanel::onEntryListColRightClick(wxListEvent& event) {
 	wxMenu* popup = new wxMenu();
 	popup->AppendCheckItem(MENU_COLUMNS_SIZE, _T("Size"), _T("Show the size column"));
@@ -645,17 +652,18 @@ void EntryListPanel::onEntryListColRightClick(wxListEvent& event) {
 	PopupMenu(popup);
 }
 
+/* EntryListPanel::onMenu
+ * Called when a menu item is selected
+ *******************************************************************/
 void EntryListPanel::onMenu(wxCommandEvent& event) {
 	switch (event.GetId()) {
 		case MENU_COLUMNS_SIZE:
 			col_size = !col_size;
 			populateEntryList();
-			wxLogMessage(_T("size"));
 			break;
 		case MENU_COLUMNS_TYPE:
 			col_type = !col_type;
 			populateEntryList();
-			wxLogMessage(_T("type"));
 			break;
 	}
 
