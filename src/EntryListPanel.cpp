@@ -298,7 +298,7 @@ void EntryListPanel::populateEntryList() {
 
 	// Setup column widths
 	for (int a = 0; a < entry_list->GetColumnCount(); a++) {
-		entry_list->SetColumnWidth(a, wxLIST_AUTOSIZE_USEHEADER);
+		entry_list->SetColumnWidth(a, wxLIST_AUTOSIZE);
 
 		// Minimum size of 32 for each column
 		if (entry_list->GetColumnWidth(a) < 32)
@@ -597,6 +597,8 @@ BEGIN_EVENT_TABLE(EntryListPanel, wxPanel)
 	EVT_LIST_ITEM_ACTIVATED(ENTRY_LIST, EntryListPanel::onEntryListActivated)
 	EVT_LIST_END_LABEL_EDIT(ENTRY_LIST, EntryListPanel::onEntryListEditLabel)
 	EVT_LIST_COL_END_DRAG(ENTRY_LIST, EntryListPanel::onEntryListColResize)
+	EVT_LIST_COL_RIGHT_CLICK(ENTRY_LIST, EntryListPanel::onEntryListColRightClick)
+	EVT_MENU_RANGE(MENU_COLUMNS_SIZE, MENU_COLUMNS_TYPE, EntryListPanel::onMenu)
 END_EVENT_TABLE()
 
 /* EntryListPanel::onEntryListChange
@@ -631,4 +633,31 @@ void EntryListPanel::onEntryListEditLabel(wxListEvent& event) {
  *******************************************************************/
 void EntryListPanel::onEntryListColResize(wxListEvent& event) {
 	updateListWidth();
+}
+
+void EntryListPanel::onEntryListColRightClick(wxListEvent& event) {
+	wxMenu* popup = new wxMenu();
+	popup->AppendCheckItem(MENU_COLUMNS_SIZE, _T("Size"), _T("Show the size column"));
+	popup->AppendCheckItem(MENU_COLUMNS_TYPE, _T("Type"), _T("Show the type column"));
+	popup->Check(MENU_COLUMNS_SIZE, col_size);
+	popup->Check(MENU_COLUMNS_TYPE, col_type);
+
+	PopupMenu(popup);
+}
+
+void EntryListPanel::onMenu(wxCommandEvent& event) {
+	switch (event.GetId()) {
+		case MENU_COLUMNS_SIZE:
+			col_size = !col_size;
+			populateEntryList();
+			wxLogMessage(_T("size"));
+			break;
+		case MENU_COLUMNS_TYPE:
+			col_type = !col_type;
+			populateEntryList();
+			wxLogMessage(_T("type"));
+			break;
+	}
+
+	event.Skip();
 }

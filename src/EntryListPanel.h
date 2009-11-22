@@ -28,6 +28,8 @@ protected:
 public:
 	enum {
 		ENTRY_LIST,
+		MENU_COLUMNS_SIZE,
+		MENU_COLUMNS_TYPE,
 	};
 
 	EntryListPanel(wxWindow *parent, int id, Archive* archive);
@@ -57,6 +59,8 @@ public:
 	virtual void	onEntryListActivated(wxListEvent &event);
 	virtual void	onEntryListEditLabel(wxListEvent &event);
 	virtual void	onEntryListColResize(wxListEvent &event);
+	virtual void	onEntryListColRightClick(wxListEvent &event);
+	virtual void	onMenu(wxCommandEvent &event);
 
 	DECLARE_EVENT_TABLE()
 };
