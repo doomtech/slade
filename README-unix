@@ -33,16 +33,6 @@ b) Makefile Compilation*
 *This method may or may not work depending on whether the makefiles on the SVN are up-to-date or not. If compilation via this method fails, try the IDE Compilation method instead.
 
 
-
-RUNNING SLADE3 SVN
-------------------
-Before running the compiled executable, the SLADE.pk3 file must be put into the correct place (and if it is ever updated on the SVN, you will need to re-copy it)
-
--Open the 'trunk/dist' folder
--Copy SLADE.pk3 to /usr/local/share/SLADE3/ (you will need root access privileges)
- Via terminal:	'sudo mkdir /usr/local/share/SLADE3'
- 				'sudo cp SLADE.pk3 /usr/local/share/SLADE3/SLADE.pk3'
-
 And that should be it. If you are having problems I can be contacted via email:
 sirjuddington@gmail.com
 
