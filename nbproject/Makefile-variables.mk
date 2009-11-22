@@ -9,16 +9,16 @@ CND_DISTDIR=dist
 # Unix_Debug configuration
 CND_PLATFORM_Unix_Debug=GNU-Linux-x86
 CND_ARTIFACT_DIR_Unix_Debug=dist
-CND_ARTIFACT_NAME_Unix_Debug=SLADE
-CND_ARTIFACT_PATH_Unix_Debug=dist/SLADE
+CND_ARTIFACT_NAME_Unix_Debug=slade-dbg
+CND_ARTIFACT_PATH_Unix_Debug=dist/slade-dbg
 CND_PACKAGE_DIR_Unix_Debug=dist/Unix_Debug/GNU-Linux-x86/package
 CND_PACKAGE_NAME_Unix_Debug=trunk.tar
 CND_PACKAGE_PATH_Unix_Debug=dist/Unix_Debug/GNU-Linux-x86/package/trunk.tar
 # Unix_Release configuration
 CND_PLATFORM_Unix_Release=GNU-Linux-x86
 CND_ARTIFACT_DIR_Unix_Release=dist
-CND_ARTIFACT_NAME_Unix_Release=SLADE
-CND_ARTIFACT_PATH_Unix_Release=dist/SLADE
+CND_ARTIFACT_NAME_Unix_Release=slade
+CND_ARTIFACT_PATH_Unix_Release=dist/slade
 CND_PACKAGE_DIR_Unix_Release=dist/Unix_Release/GNU-Linux-x86/package
 CND_PACKAGE_NAME_Unix_Release=trunk.tar
 CND_PACKAGE_PATH_Unix_Release=dist/Unix_Release/GNU-Linux-x86/package/trunk.tar

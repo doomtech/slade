@@ -48,6 +48,9 @@ namespace Global {
 	string dir_data = _T("");
 }
 MainWindow*		main_window = NULL;
+string	dir_data = _T("");
+string	dir_user = _T("");
+string	dir_app = _T("");
 
 
 /*******************************************************************
@@ -76,13 +79,11 @@ string appPath(string filename, int dir) {
 #endif
 
 	if (dir == DIR_DATA)
-		return wxStandardPaths::Get().GetDataDir().Append(sep).Append(filename);
+		return dir_data + sep + filename;
 	else if (dir == DIR_USER)
-		return wxStandardPaths::Get().GetUserDataDir().Append(sep).Append(filename);
-	else if (dir == DIR_APP) {
-		wxFileName fn(wxStandardPaths::Get().GetExecutablePath());
-		return fn.GetPath().Append(sep).Append(filename);
-	}
+		return dir_user + sep + filename;
+	else if (dir == DIR_APP)
+		return dir_app + sep + filename;
 	else if (dir == DIR_TEMP)
 		return wxStandardPaths::Get().GetTempDir().Append(sep).Append(filename);
 	else
@@ -98,8 +99,8 @@ IMPLEMENT_APP(MainApp)
  * needed, false otherwise
  *******************************************************************/
 bool MainApp::initDirectories() {
-	// Create user directory if necessary
-	string dir_user = wxStandardPaths::Get().GetUserDataDir();
+	// Setup or create user directory if necessary
+	dir_user = wxStandardPaths::Get().GetUserDataDir();
 	if (!wxDirExists(dir_user)) {
 		if (!wxMkdir(dir_user)) {
 			wxMessageBox(s_fmt(_T("Unable to create user directory \"%s\""), dir_user.c_str()), _T("Error"), wxICON_ERROR);
@@ -107,12 +108,13 @@ bool MainApp::initDirectories() {
 		}
 	}
 
-	// Check the data directory exists
-	string dir_data = wxStandardPaths::Get().GetDataDir();
-	if (!wxDirExists(dir_data)) {
-		wxMessageBox(s_fmt(_T("SLADE data directory \"%s\" does not exist. Is SLADE installed correctly?"), dir_data.c_str()), _T("Error"), wxICON_ERROR);
-		return false;
-	}
+	// Setup app dir
+	dir_app = wxFileName(wxStandardPaths::Get().GetExecutablePath()).GetPath();
+
+	// Setup data dir
+	dir_data = wxStandardPaths::Get().GetDataDir();
+	if (!wxDirExists(dir_data))
+		dir_data = dir_app;	// Use app dir if data dir doesn't exist
 
 	return true;
 }
@@ -125,7 +127,7 @@ bool MainApp::OnInit() {
 	Global::error = _T("");
 
 	// Set application name (for wx directory stuff)
-	wxApp::SetAppName(_T("SLADE3"));
+	wxApp::SetAppName(_T("slade3"));
 
 	// Init application directories
 	if (!initDirectories())
@@ -156,6 +158,10 @@ bool MainApp::OnInit() {
 
 	// Show the main window
 	main_window->Show(true);
+
+	wxLogMessage(dir_data);
+	wxLogMessage(dir_app);
+	wxLogMessage(dir_user);
 
 	return true;
 }

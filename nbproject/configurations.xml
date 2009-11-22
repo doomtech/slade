@@ -142,7 +142,7 @@
           </preprocessorList>
         </ccTool>
         <linkerTool>
-          <output>dist/SLADE</output>
+          <output>dist/slade-dbg</output>
           <linkerLibItems>
             <linkerOptionItem>-lfreeimage</linkerOptionItem>
           </linkerLibItems>
@@ -168,7 +168,7 @@
           <developmentMode>5</developmentMode>
         </fortranCompilerTool>
         <linkerTool>
-          <output>dist/SLADE</output>
+          <output>dist/slade</output>
           <linkerLibItems>
             <linkerOptionItem>-lfreeimage</linkerOptionItem>
           </linkerLibItems>

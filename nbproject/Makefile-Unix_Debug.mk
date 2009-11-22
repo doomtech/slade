@@ -94,11 +94,11 @@ LDLIBSOPTIONS=-lfreeimage
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
-	${MAKE}  -f nbproject/Makefile-Unix_Debug.mk dist/SLADE
+	${MAKE}  -f nbproject/Makefile-Unix_Debug.mk dist/slade-dbg
 
-dist/SLADE: ${OBJECTFILES}
+dist/slade-dbg: ${OBJECTFILES}
 	${MKDIR} -p dist
-	${LINK.cc} `wx-config --debug --libs std,gl,stc,aui` -o dist/SLADE  ${OBJECTFILES} ${LDLIBSOPTIONS} 
+	${LINK.cc} `wx-config --debug --libs std,gl,stc,aui` -o dist/slade-dbg  ${OBJECTFILES} ${LDLIBSOPTIONS} 
 
 ${OBJECTDIR}/src/ZipEntryListPanel.o: nbproject/Makefile-${CND_CONF}.mk src/ZipEntryListPanel.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
@@ -326,7 +326,7 @@ ${OBJECTDIR}/src/CVar.o: nbproject/Makefile-${CND_CONF}.mk src/CVar.cpp
 # Clean Targets
 .clean-conf:
 	${RM} -r build/Unix_Debug
-	${RM} dist/SLADE
+	${RM} dist/slade-dbg
 
 # Subprojects
 .clean-subprojects:

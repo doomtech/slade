@@ -54,10 +54,19 @@ ArchiveManager::ArchiveManager() {
 	// Init variables
 	res_archive_open = true;
 
-	// Open SLADE.pk3
+	// Find slade3.pk3 directory
+	string dir_slade_pk3 = appPath(_T("slade.pk3"), DIR_DATA);
+	if (!wxFileExists(dir_slade_pk3))
+		dir_slade_pk3 = appPath(_T("slade.pk3"), DIR_APP);
+	if (!wxFileExists(dir_slade_pk3))
+		dir_slade_pk3 = appPath(_T("slade.pk3"), DIR_USER);
+	if (!wxFileExists(dir_slade_pk3))
+		dir_slade_pk3 = _T("slade.pk3");
+
+	// Open slade.pk3
 	resource_archive = new ZipArchive();
-	if (!resource_archive->openFile(appPath(_T("SLADE.pk3"), DIR_DATA))) {
-		wxLogMessage(s_fmt(_T("Unable to find SLADE.pk3! Make sure it exists within the directory \"%s\""), appPath(_T(""), DIR_DATA).c_str()));
+	if (!resource_archive->openFile(dir_slade_pk3)) {
+		wxLogMessage(_T("Unable to find slade.pk3!"));
 		res_archive_open = false;
 	}
 }

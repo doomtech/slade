@@ -11,8 +11,8 @@ CND_CONF=Unix_Debug
 CND_DISTDIR=dist
 TMPDIR=build/${CND_CONF}/${CND_PLATFORM}/tmp-packaging
 TMPDIRNAME=tmp-packaging
-OUTPUT_PATH=dist/SLADE
-OUTPUT_BASENAME=SLADE
+OUTPUT_PATH=dist/slade-dbg
+OUTPUT_BASENAME=slade-dbg
 PACKAGE_TOP_DIR=trunk/
 
 # Functions
