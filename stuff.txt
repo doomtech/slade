@@ -1,5 +1,4 @@
 'Shit to do before first release' list (in this order):
-- Gfx types conversion (including palette stuff)
 - Finish gfx panel (zoom, offset editing)
 - TEXTUREx editor
 - Text editor (syntax highlighting, script compilation, find/replace)
@@ -16,76 +15,46 @@ Feature Requests (from SLumpEd and SLADE):
 - improved TEXTUREx editor (DeepSea)
 - Visual TEXTURES (zdoom format) editor (with the possibility to still edit as text)
 - A right-click -> set lump type or equivalent to force it to read lumps correctly when it failed to identify them automatically (happens a lot to very small sprites)
-- When converting a picture to PNG, having the choice between indexed colors + alpha or full colors + alpha.
 - In the image viewer, a drop-down list for display method: automatic (let the program determine), world sprite (with the crossed axes), hud sprite (in the box), graphics (without axes nor box). The automatic selection, based on offset values, isn't always accurate.
-- Still in the image viewer, another drop-down list which lets you select which palette to use, from a list of named palettes that you can create elsewhere. (I imagine a res/palette folder in which we could just export PLAYPAL lumps, giving them names like "Doom.pal", "Heretic.pal", "Simplicity.pal" etc.) With of course a default to use the PLAYPAL from the current file, if any, or that of the selected main iwad. But we'd get to change it if so we want.
-- Palette conversion
+TEXTUREx editor:
+- ability to 'search' for patches or textures by clicking in the list and typing the first few letters of the name, like you can in the lumps list
+- an option to automatically delete any patches from the wad that aren't used in any defined textures (maybe with option to back them up)
+- ability to double-click the name of a patch in an existing texture and type in another name, so that you can swap out one patch for another one
+- ability to move a patch forwards or backwards (i.e. to put it in front of or behind other patches)
+- list textures and patches in alphabetical order (with non-iwad ones at the bottom of the list)
+- ability to copy/paste textures (with patches), including between different TEXTUREx entries
+- find/replace for patches
+
 
 Lower Priority:
 - LZMA/Bzip2 support
 
 
+ToDo List:
+- Map preview
+- Generic entry data view (for VERTEXES, LINEDEFS, SIDEDEFS, SECTORS, THINGS, PLAYPAL, DEMO* ...)
+- ZDoom fonts handling
+- Cleanup menu (unused patches, textures, flats, unneeded entries...)
+- Tall sprites/doomgfx support
+- Option not to show save dialog on export (or show only once)
+- ACS/script compiler
+- Recent files list
+- If a wad is opened from within a zip open it in another tab
+- Auto save changes
+
+
+
+Improvements/Features:
+- Better entry type system (ideally user-configurable, and with some kind of subtypes/groups system for entries of different formats but handled in the same way, like gfx etc)
+- Tree view option for entry list
+
+
 Ideas:
 - Abiity to perform all archive/entry management functions via the console (possibly allow scripts too?)
+- 'Animation viewer' (select a bunch of sprites to test an animation or whatever)
 
 
-
-
-
-TODO.txt from SLumpEd:
-
-IDEAS:
- - 'Animation viewer' (select a bunch of sprites to test an animation or whatever)
- - User configurable lump type specs
-
-MAYBE:
- - Rewrite lump list to use seperate class (either list or tree view)
- - Tree view option for lump list
-
-TODO:
- - (optional) use opengl for gfx viewer
- - Redo lump area stuff (common controls like save changes, restore, etc)
- - clean up for linux/unicode
- - Improve map viewer
- - View more lump types:
-   * VERTEXES, LINEDEFS, SIDEDEFS, SECTORS, THINGS, PLAYPAL, DEMO* ...
- - ZDoom fonts handling
- - Hex dump
- - Wad merging
- - statusbar, midscreen and crosshair lines on weapon offset view
- - search/replace in text editor
- - more music/sound format support
- - 'Remove unused textures' feature (or maybe just a 'clean wad' feature in general)
- - Tall sprites/doomgfx support
- - Gfx conversion transparency options
- - Move resources to pk3
- - Figure out better way to handle lump type detection (images especially)
- - Option not to show save dialog on export (or show only once)
- - Rework lump type handling (define all lump type info in one place)
- - Data area stuff
- - Lump search
- - More I'm sure...
-
-
-DONE:
- - Speed up zip/pk3 saving (don't recompress unmodified lumps)
- - Colour coded lumps (unmodified/modified/new)
- - Add menu option to select hilighting for text lumps
- - IWAD select dialog on startup if none is already selected
- - More info in lump list (multi-column widget, ugh)
- - Right click context menu for lumps
- - ACS compiler
- - Recent files list
- - Zip/pk3 file handling:
-   * if a wad is opened from within the zip open it in another tab
- - Auto-align sprites
- - Align multiple sprites at once
- - Auto save changes
- - Sound/music lump previews
- - TEXTUREx lump editing
- - Conversion between gfx/flat/PNG
- - shortcut keys for lump list
- - add to pnames/texturex
- - Disallow export to wad to the same wad it's being exported from
- - disable slumped.log
- - option to turn of asking whether to open zip-embedded wad or not
+Completed Features/Requests
+- Still in the image viewer, another drop-down list which lets you select which palette to use, from a list of named palettes that you can create elsewhere. (I imagine a res/palette folder in which we could just export PLAYPAL lumps, giving them names like "Doom.pal", "Heretic.pal", "Simplicity.pal" etc.) With of course a default to use the PLAYPAL from the current file, if any, or that of the selected main iwad. But we'd get to change it if so we want.
+- Palette conversion
+- When converting a picture to PNG, having the choice between indexed colors + alpha or full colors + alpha.
