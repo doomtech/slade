@@ -173,19 +173,20 @@ bool EntryList::updateEntry(int index, bool update_colsize) {
 	if (update_colsize) {
 		SetColumnWidth(0, wxLIST_AUTOSIZE);
 		// Add extra width in linux as wxLIST_AUTOSIZE seems to ignore listitem images on wxGTK
-		#ifndef _WIN32
+		#ifdef __WXGTK__
 		SetColumnWidth(0, GetColumnWidth(0) + 20);
 		#endif
+		if (GetColumnWidth(0) < 32) SetColumnWidth(0, 32);
 	}
 
 	// Size
 	int col = 1;
 	if (col_size) {
-		//li.SetText(s_fmt(_T("%d"), entry->getSize()));
 		li.SetText(entry->getSizeString());
 		li.SetColumn(col);
 		SetItem(li);
 		if (update_colsize) SetColumnWidth(col, wxLIST_AUTOSIZE);
+		if (GetColumnWidth(col) < 32) SetColumnWidth(col, 32);
 		col++;
 	}
 
@@ -195,6 +196,7 @@ bool EntryList::updateEntry(int index, bool update_colsize) {
 		li.SetColumn(col);
 		SetItem(li);
 		if (update_colsize) SetColumnWidth(col, wxLIST_AUTOSIZE);
+		if (GetColumnWidth(col) < 32) SetColumnWidth(col, 32);
 	}
 
 	// Set default text colour
@@ -206,10 +208,13 @@ bool EntryList::updateEntry(int index, bool update_colsize) {
 	else if (entry->getState() == 1)
 		SetItemTextColour(index, col_modified);
 
-	// Setup size
-	if (update_colsize) SetMinSize(wxSize(getWidth(), -1));
-
 	SetItemImage(index, entry->getType());
+
+	// Setup size
+	if (update_colsize) {
+		SetMinSize(wxSize(getWidth(), -1));
+		wxTheApp->GetTopWindow()->Layout();
+	}
 
 	return true;
 }
@@ -219,10 +224,12 @@ bool EntryList::updateEntry(int index, bool update_colsize) {
  *******************************************************************/
 int EntryList::getWidth() {
 	// For the moment. Kinda annoying I have to do this actually, it should be automatic >_<
-	int width = GetColumnWidth(0) + GetColumnWidth(1) + GetColumnWidth(2);
+	int width = 0;
+	for (int a = 0; a < GetColumnCount(); a++)
+		width += GetColumnWidth(a);
 
 	// Always leave room for the scrollbar (wxWidgets is silly)
-		width += wxSystemSettings::GetMetric(wxSYS_VSCROLL_X, this);
+	width += wxSystemSettings::GetMetric(wxSYS_VSCROLL_X, this);
 
 	return width + 4;
 }
@@ -290,12 +297,16 @@ void EntryListPanel::populateEntryList() {
 	}
 
 	// Setup column widths
-	entry_list->SetColumnWidth(0, wxLIST_AUTOSIZE);
-	entry_list->SetColumnWidth(1, wxLIST_AUTOSIZE);
-	entry_list->SetColumnWidth(2, wxLIST_AUTOSIZE);
+	for (int a = 0; a < entry_list->GetColumnCount(); a++) {
+		entry_list->SetColumnWidth(a, wxLIST_AUTOSIZE_USEHEADER);
+
+		// Minimum size of 32 for each column
+		if (entry_list->GetColumnWidth(a) < 32)
+			entry_list->SetColumnWidth(a, 32);
+	}
 
 	// Add extra width to the name column in linux as wxLIST_AUTOSIZE seems to ignore listitem images on wxGTK
-	#ifndef _WIN32
+	#ifdef __WXGTK__
 	entry_list->SetColumnWidth(0, entry_list->GetColumnWidth(0) + 20);
 	#endif
 
@@ -585,6 +596,7 @@ BEGIN_EVENT_TABLE(EntryListPanel, wxPanel)
 	EVT_LIST_ITEM_FOCUSED(ENTRY_LIST, EntryListPanel::onEntryListChange)
 	EVT_LIST_ITEM_ACTIVATED(ENTRY_LIST, EntryListPanel::onEntryListActivated)
 	EVT_LIST_END_LABEL_EDIT(ENTRY_LIST, EntryListPanel::onEntryListEditLabel)
+	EVT_LIST_COL_END_DRAG(ENTRY_LIST, EntryListPanel::onEntryListColResize)
 END_EVENT_TABLE()
 
 /* EntryListPanel::onEntryListChange
@@ -612,4 +624,11 @@ void EntryListPanel::onEntryListEditLabel(wxListEvent& event) {
 	if (entry && !event.IsEditCancelled()) {
 		archive->renameEntry(entry, event.GetLabel());
 	}
+}
+
+/* EntryListPanel::onEntryListColResize
+ * Called when a column on the entry list is resized
+ *******************************************************************/
+void EntryListPanel::onEntryListColResize(wxListEvent& event) {
+	updateListWidth();
 }

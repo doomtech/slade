@@ -159,10 +159,6 @@ bool MainApp::OnInit() {
 	// Show the main window
 	main_window->Show(true);
 
-	wxLogMessage(dir_data);
-	wxLogMessage(dir_app);
-	wxLogMessage(dir_user);
-
 	return true;
 }
 

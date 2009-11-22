@@ -257,12 +257,16 @@ void ZipEntryListPanel::populateEntryList() {
 	}
 
 	// Setup column widths
-	entry_list->SetColumnWidth(0, wxLIST_AUTOSIZE);
-	entry_list->SetColumnWidth(1, wxLIST_AUTOSIZE);
-	entry_list->SetColumnWidth(2, wxLIST_AUTOSIZE);
+	for (int a = 0; a < entry_list->GetColumnCount(); a++) {
+		entry_list->SetColumnWidth(a, wxLIST_AUTOSIZE);
+
+		// Minimum size of 32 for each column
+		if (entry_list->GetColumnWidth(a) < 32)
+			entry_list->SetColumnWidth(a, 32);
+	}
 
 	// Add extra width to the name column in linux as wxLIST_AUTOSIZE seems to ignore listitem images on wxGTK
-	#ifndef _WIN32
+	#ifdef __WXGTK__
 	entry_list->SetColumnWidth(0, entry_list->GetColumnWidth(0) + 20);
 	#endif
 
