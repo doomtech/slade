@@ -40,6 +40,8 @@
 #include "PaletteEntryPanel.h"
 #include "MultiEntryPanel.h"
 #include "GfxConvDialog.h"
+#include "ModifyOffsetsDialog.h"
+#include "EntryOperations.h"
 #include <wx/aui/auibook.h>
 #include <wx/filename.h>
 
@@ -325,6 +327,9 @@ bool ArchivePanel::moveDown() {
 	return entry_list->moveDown();
 }
 
+/* ArchivePanel::gfxConvert
+ * Runs the Gfx Conversion Dialog on all selected entries
+ *******************************************************************/
 bool ArchivePanel::gfxConvert() {
 	// Create gfx conversion dialog
 	GfxConvDialog gcd;
@@ -338,7 +343,22 @@ bool ArchivePanel::gfxConvert() {
 	return true;
 }
 
+/* ArchivePanel::gfxModifyOffsets
+ * Runs the Modify Offsets Dialog and applies the selected offset
+ * settings to all selected entries
+ *******************************************************************/
 bool ArchivePanel::gfxModifyOffsets() {
+	// Create modify offsets dialog
+	ModifyOffsetsDialog mod;
+
+	// Run the dialog
+	mod.ShowModal();
+
+	// Go through selected entries
+	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
+	for (uint32_t a = 0; a < selection.size(); a++)
+		EntryOperations::modifyGfxOffsets(selection[a], mod.getAlignType(), mod.getOffset(), mod.xOffChange(), mod.yOffChange(), mod.relativeOffset());
+
 	return true;
 }
 
@@ -563,8 +583,6 @@ void ArchivePanel::onEntryListDeselect(wxListEvent& event) {
  * Called when the entry list is right clicked
  *******************************************************************/
 void ArchivePanel::onEntryListRightClick(wxListEvent& event) {
-	//PopupMenu(menu_entry);
-
 	// Generate context menu
 	wxMenu* context = new wxMenu();
 	context->Append(MENU_ENTRY_RENAME, _T("Rename"));

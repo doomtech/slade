@@ -67,4 +67,8 @@ public:
 	bool	cutoffMask(uint8_t threshold, bool force_mask = false);
 };
 
+
+// CRC function needed for writing PNG grAb chunk
+uint32_t crc(uint8_t *buf, uint32_t len);
+
 #endif //__SIMAGE_H__

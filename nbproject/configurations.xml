@@ -4,6 +4,8 @@
     <logicalFolder name="f5" displayName="Dialogs" projectFiles="true">
       <itemPath>src/GfxConvDialog.cpp</itemPath>
       <itemPath>src/GfxConvDialog.h</itemPath>
+      <itemPath>src/ModifyOffsetsDialog.cpp</itemPath>
+      <itemPath>src/ModifyOffsetsDialog.h</itemPath>
       <itemPath>src/PaletteDialog.cpp</itemPath>
       <itemPath>src/PaletteDialog.h</itemPath>
     </logicalFolder>
@@ -61,6 +63,8 @@
         <itemPath>src/TextEditor.cpp</itemPath>
         <itemPath>src/TextEditor.h</itemPath>
       </logicalFolder>
+      <itemPath>src/EntryOperations.cpp</itemPath>
+      <itemPath>src/EntryOperations.h</itemPath>
       <itemPath>src/MainWindow.cpp</itemPath>
       <itemPath>src/MainWindow.h</itemPath>
     </logicalFolder>

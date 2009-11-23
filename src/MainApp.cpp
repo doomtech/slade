@@ -44,9 +44,8 @@
  * VARIABLES
  *******************************************************************/
 namespace Global {
-	string error = _("");
-	string dir_user = _T("");
-	string dir_data = _T("");
+	string error = _T("");
+	string version = _T("3.0 alpha");
 }
 MainWindow*		main_window = NULL;
 string	dir_data = _T("");

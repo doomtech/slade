@@ -191,6 +191,24 @@ bool MemChunk::loadMem(uint8_t* start, uint32_t len) {
 	return true;
 }
 
+/* MemChunk::saveFile
+ * Writes the MemChunk data to a new file of [filename]
+ *******************************************************************/
+bool MemChunk::saveFile(string filename) {
+	// Open file for writing
+	FILE* fp = fopen(chr(filename), "wb");
+	if (!fp) {
+		wxLogMessage(s_fmt(_T("Unable to write to file %s"), filename.c_str()));
+		return false;
+	}
+
+	// Write the data
+	fwrite(data, 1, size, fp);
+
+	// Close the file
+	fclose(fp);
+}
+
 /* MemChunk::write
  * Writes the given data at the current position. Expands the memory
  * chunk if necessary.
@@ -214,7 +232,7 @@ bool MemChunk::write(void* data, uint32_t size) {
  * attempting to read data outside of the chunk, true otherwise
  *******************************************************************/
 bool MemChunk::read(void* buf, uint32_t size) {
-	// If we're trying to read past teh end
+	// If we're trying to read past the end
 	// of the memory chunk, return failure
 	if (cur_ptr + size > this->size)
 		return false;

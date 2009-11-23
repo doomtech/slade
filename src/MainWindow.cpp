@@ -34,6 +34,7 @@
 #include "ArchiveManager.h"
 #include "Archive.h"
 #include "Icons.h"
+#include <wx/aboutdlg.h>
 
 
 /*******************************************************************
@@ -76,47 +77,52 @@ void MainWindow::setupLayout() {
 	wxMenuBar *menu = new wxMenuBar();
 
 	// File->New Submenu
-	wxMenu* fileNewMenu = new wxMenu(_(""));
-	fileNewMenu->Append(MENU_FILE_NEW,		_("&Wad Archive\tCtrl+Shift+W"),	_("Create a new Doom Wad Archive"));
-	fileNewMenu->Append(MENU_FILE_NEWZIP,	_("&Zip Archive\tCtrl+Shift+Z"),	_("Create a new Zip Archive (zip/pk3/jdf)"));
+	wxMenu* fileNewMenu = new wxMenu(_T(""));
+	fileNewMenu->Append(MENU_FILE_NEW,		_T("&Wad Archive\tCtrl+Shift+W"),	_T("Create a new Doom Wad Archive"));
+	fileNewMenu->Append(MENU_FILE_NEWZIP,	_T("&Zip Archive\tCtrl+Shift+Z"),	_T("Create a new Zip Archive (zip/pk3/jdf)"));
 
 	// File menu
 	wxMenu* fileMenu = new wxMenu(_(""));
-	fileMenu->AppendSubMenu(fileNewMenu,	_("&New"),				_("Create a new Archive"));
+	fileMenu->AppendSubMenu(fileNewMenu,	_T("&New"),					_T("Create a new Archive"));
 	fileMenu->AppendSeparator();
-    fileMenu->Append(MENU_FILE_OPEN,		_("&Open\tCtrl+O"),		_("Open an existing Archive"));
+    fileMenu->Append(MENU_FILE_OPEN,		_T("&Open\tCtrl+O"),		_T("Open an existing Archive"));
 	fileMenu->AppendSeparator();
-	fileMenu->Append(MENU_FILE_SAVE,		_("&Save\tCtrl+S"),		_("Save the currently open Archive"));
-	fileMenu->Append(MENU_FILE_SAVEAS,		_("Save &As..."),		_("Save the currently open Archive to a new file"));
-	fileMenu->Append(MENU_FILE_SAVEALL,		_("Save All"),			_("Save all open Archives"));
+	fileMenu->Append(MENU_FILE_SAVE,		_T("&Save\tCtrl+S"),		_T("Save the currently open Archive"));
+	fileMenu->Append(MENU_FILE_SAVEAS,		_T("Save &As..."),			_T("Save the currently open Archive to a new file"));
+	fileMenu->Append(MENU_FILE_SAVEALL,		_T("Save All"),				_T("Save all open Archives"));
 	fileMenu->AppendSeparator();
-	fileMenu->Append(MENU_FILE_CLOSE,		_("&Close"),			_("Close the currently open Archive"));
-	fileMenu->Append(MENU_FILE_CLOSEALL,	_("Close All"),			_("Close all open Archives"));
+	fileMenu->Append(MENU_FILE_CLOSE,		_T("&Close"),				_T("Close the currently open Archive"));
+	fileMenu->Append(MENU_FILE_CLOSEALL,	_T("Close All"),			_T("Close all open Archives"));
 	fileMenu->AppendSeparator();
-    fileMenu->Append(MENU_FILE_QUIT,		_("&Quit"),				_("Quit SLADE"));
-	menu->Append(fileMenu, _("&File"));
+    fileMenu->Append(MENU_FILE_QUIT,		_T("&Quit"),				_T("Quit SLADE"));
+	menu->Append(fileMenu, _T("&File"));
 
 	// Entry menu
 	wxMenu* entryMenu = new wxMenu(_T(""));
-	entryMenu->Append(MENU_ENTRY_NEW,				_("New\tCtrl+N"),			_("Create a new empty entry"));
-	entryMenu->Append(MENU_ENTRY_NEWFROMFILE,		_("New from File"),			_("Create a new entry with data from a file"));
+	entryMenu->Append(MENU_ENTRY_NEW,				_T("New\tCtrl+N"),				_T("Create a new empty entry"));
+	entryMenu->Append(MENU_ENTRY_NEWFROMFILE,		_T("New from File"),			_T("Create a new entry with data from a file"));
 	entryMenu->AppendSeparator();
-	entryMenu->Append(MENU_ENTRY_RENAME,			_("Rename\tCtrl+R"),		_("Rename the selected entries"));
-	entryMenu->Append(MENU_ENTRY_DELETE,			_("Delete\tCtrl+D"),		_("Delete the selected entries"));
+	entryMenu->Append(MENU_ENTRY_RENAME,			_T("Rename\tCtrl+R"),			_T("Rename the selected entries"));
+	entryMenu->Append(MENU_ENTRY_DELETE,			_T("Delete\tCtrl+D"),			_T("Delete the selected entries"));
 	entryMenu->AppendSeparator();
-	entryMenu->Append(MENU_ENTRY_IMPORT,			_("Import\tCtrl+I"),		_("Import a file to the selected entry"));
-	entryMenu->Append(MENU_ENTRY_EXPORT,			_("Export\tCtrl+E"),		_("Export the selected entries to files"));
-	entryMenu->Append(MENU_ENTRY_EXPORTWAD,			_("Export as Wad\tCtrl+W"),	_("Export the selected entries to a new Wad Archive"));
+	entryMenu->Append(MENU_ENTRY_IMPORT,			_T("Import\tCtrl+I"),			_T("Import a file to the selected entry"));
+	entryMenu->Append(MENU_ENTRY_EXPORT,			_T("Export\tCtrl+E"),			_T("Export the selected entries to files"));
+	entryMenu->Append(MENU_ENTRY_EXPORTWAD,			_T("Export as Wad\tCtrl+W"),	_T("Export the selected entries to a new Wad Archive"));
 	entryMenu->AppendSeparator();
-	entryMenu->Append(MENU_ENTRY_MOVEUP,			_("Move Up\tCtrl+U"),		_("Move the selected entries up"));
-	entryMenu->Append(MENU_ENTRY_MOVEDOWN,			_("Move Down\tCtrl+D"),		_("Move the selected entries down"));
-	menu->Append(entryMenu, _("&Entry"));
+	entryMenu->Append(MENU_ENTRY_MOVEUP,			_T("Move Up\tCtrl+U"),			_T("Move the selected entries up"));
+	entryMenu->Append(MENU_ENTRY_MOVEDOWN,			_T("Move Down\tCtrl+D"),		_T("Move the selected entries down"));
+	menu->Append(entryMenu, _T("&Entry"));
 
 	// View menu
 	wxMenu* viewMenu = new wxMenu(_T(""));
-	viewMenu->Append(MENU_VIEW_MANAGER,		_("&Archive Manager\tCtrl+1"),	_T("Toggle the archive manager"));
-	viewMenu->Append(MENU_VIEW_CONSOLE,		_("&Console\tCtrl+2"),			_T("Toggle the console"));
-	menu->Append(viewMenu, _("&View"));
+	viewMenu->Append(MENU_VIEW_MANAGER,		_T("&Archive Manager\tCtrl+1"),	_T("Toggle the archive manager"));
+	viewMenu->Append(MENU_VIEW_CONSOLE,		_T("&Console\tCtrl+2"),			_T("Toggle the console"));
+	menu->Append(viewMenu, _T("&View"));
+
+	// Help menu
+	wxMenu* helpMenu = new wxMenu(_T(""));
+	helpMenu->Append(MENU_HELP_ABOUT,	_T("&About"),	_T("Information about SLADE"));
+	menu->Append(helpMenu, _T("&Help"));
 
 	// Set the menu
 	SetMenuBar(menu);
@@ -369,6 +375,29 @@ void MainWindow::onMenuItemClicked(wxCommandEvent& e) {
 		wxAuiPaneInfo& p_inf = m_mgr->GetPane(_T("console"));
 		p_inf.Show(!p_inf.IsShown());
 		m_mgr->Update();
+	}
+
+	// *******************************************************
+	// HELP MENU
+	// *******************************************************
+
+	// Help->About
+	else if (e.GetId() == MENU_HELP_ABOUT) {
+		wxAboutDialogInfo info;
+		info.SetName(_T("SLADE"));
+		info.SetVersion(Global::version);
+		info.SetWebSite(_T("http://slade.mancubus.net"));
+		info.SetDescription(_T("It's a Doom Editor"));
+
+		ArchiveEntry* license = theArchiveManager->resourceArchive()->getEntry(_T("gpl-2.0.txt"));
+		string lic_str = wxString::From8BitData((const char*)license->getData());
+		lic_str.Truncate(license->getSize());
+		info.SetLicence(lic_str);
+
+		string year = wxNow().Right(4);
+		info.SetCopyright(s_fmt(_T("(C) 2008-%s Simon Judd <sirjuddington@gmail.com>"), year.c_str()));
+
+		wxAboutBox(info);
 	}
 }
 

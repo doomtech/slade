@@ -29,6 +29,9 @@ public:
 	bool loadFileStream(FILE* fp, uint32_t len = 0);
 	bool loadMem(uint8_t* start, uint32_t len);
 
+	// Data export
+	bool saveFile(string filename);
+
 	// C-style reading/writing
 	bool		write(void* data, uint32_t size);
 	bool		read(void* buf, uint32_t size);

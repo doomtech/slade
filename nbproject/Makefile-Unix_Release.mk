@@ -31,51 +31,53 @@ OBJECTDIR=build/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
-	${OBJECTDIR}/src/ZipEntryListPanel.o \
-	${OBJECTDIR}/src/MainWindow.o \
 	${OBJECTDIR}/src/DefaultEntryPanel.o \
 	${OBJECTDIR}/src/OGLCanvas.o \
-	${OBJECTDIR}/src/TextEditor.o \
-	${OBJECTDIR}/src/Palette.o \
 	${OBJECTDIR}/src/PaletteEntryPanel.o \
-	${OBJECTDIR}/src/ColourBox.o \
 	${OBJECTDIR}/src/ZipArchive.o \
-	${OBJECTDIR}/src/ArchiveEntry.o \
 	${OBJECTDIR}/src/TextEntryPanel.o \
 	${OBJECTDIR}/src/WadArchive.o \
-	${OBJECTDIR}/src/MapLine.o \
-	${OBJECTDIR}/src/SLADEMap.o \
-	${OBJECTDIR}/src/Tokenizer.o \
 	${OBJECTDIR}/src/ConsolePanel.o \
-	${OBJECTDIR}/src/PaletteManager.o \
 	${OBJECTDIR}/src/ArchiveManagerPanel.o \
 	${OBJECTDIR}/src/ArchiveManager.o \
-	${OBJECTDIR}/src/Archive.o \
-	${OBJECTDIR}/src/MemChunk.o \
-	${OBJECTDIR}/src/GfxEntryPanel.o \
 	${OBJECTDIR}/src/MapThing.o \
 	${OBJECTDIR}/src/ListenerAnnouncer.o \
 	${OBJECTDIR}/src/MapSector.o \
 	${OBJECTDIR}/src/Console.o \
 	${OBJECTDIR}/src/ArchivePanel.o \
 	${OBJECTDIR}/src/MultiEntryPanel.o \
-	${OBJECTDIR}/src/MapSide.o \
-	${OBJECTDIR}/src/PaletteDialog.o \
 	${OBJECTDIR}/src/GfxCanvas.o \
 	${OBJECTDIR}/src/PaletteChooser.o \
-	${OBJECTDIR}/src/Icons.o \
-	${OBJECTDIR}/src/PaletteCanvas.o \
 	${OBJECTDIR}/src/SImage.o \
-	${OBJECTDIR}/src/MapEditorWindow.o \
+	${OBJECTDIR}/src/PaletteCanvas.o \
 	${OBJECTDIR}/src/MainApp.o \
+	${OBJECTDIR}/src/EntryListPanel.o \
+	${OBJECTDIR}/src/EntryPanel.o \
+	${OBJECTDIR}/src/CVar.o \
+	${OBJECTDIR}/src/MainWindow.o \
+	${OBJECTDIR}/src/ZipEntryListPanel.o \
+	${OBJECTDIR}/src/TextEditor.o \
+	${OBJECTDIR}/src/EntryOperations.o \
+	${OBJECTDIR}/src/Palette.o \
+	${OBJECTDIR}/src/ModifyOffsetsDialog.o \
+	${OBJECTDIR}/src/ColourBox.o \
+	${OBJECTDIR}/src/ArchiveEntry.o \
+	${OBJECTDIR}/src/MapLine.o \
+	${OBJECTDIR}/src/SLADEMap.o \
+	${OBJECTDIR}/src/Tokenizer.o \
+	${OBJECTDIR}/src/PaletteManager.o \
+	${OBJECTDIR}/src/MemChunk.o \
+	${OBJECTDIR}/src/Archive.o \
+	${OBJECTDIR}/src/GfxEntryPanel.o \
+	${OBJECTDIR}/src/MapSide.o \
+	${OBJECTDIR}/src/PaletteDialog.o \
+	${OBJECTDIR}/src/Icons.o \
+	${OBJECTDIR}/src/MapEditorWindow.o \
 	${OBJECTDIR}/src/GfxConvDialog.o \
 	${OBJECTDIR}/src/MapCanvas.o \
-	${OBJECTDIR}/src/EntryListPanel.o \
 	${OBJECTDIR}/src/Misc.o \
-	${OBJECTDIR}/src/EntryPanel.o \
 	${OBJECTDIR}/src/MapVertex.o \
-	${OBJECTDIR}/src/ZipArchivePanel.o \
-	${OBJECTDIR}/src/CVar.o
+	${OBJECTDIR}/src/ZipArchivePanel.o
 
 # C Compiler Flags
 CFLAGS=
@@ -101,16 +103,6 @@ dist/slade: ${OBJECTFILES}
 	${MKDIR} -p dist
 	${LINK.cc} `wx-config --libs std,gl,stc,aui` -o dist/slade  ${OBJECTFILES} ${LDLIBSOPTIONS} 
 
-${OBJECTDIR}/src/ZipEntryListPanel.o: nbproject/Makefile-${CND_CONF}.mk src/ZipEntryListPanel.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} $@.d
-	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/ZipEntryListPanel.o src/ZipEntryListPanel.cpp
-
-${OBJECTDIR}/src/MainWindow.o: nbproject/Makefile-${CND_CONF}.mk src/MainWindow.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} $@.d
-	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/MainWindow.o src/MainWindow.cpp
-
 ${OBJECTDIR}/src/DefaultEntryPanel.o: nbproject/Makefile-${CND_CONF}.mk src/DefaultEntryPanel.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
@@ -121,35 +113,15 @@ ${OBJECTDIR}/src/OGLCanvas.o: nbproject/Makefile-${CND_CONF}.mk src/OGLCanvas.cp
 	${RM} $@.d
 	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/OGLCanvas.o src/OGLCanvas.cpp
 
-${OBJECTDIR}/src/TextEditor.o: nbproject/Makefile-${CND_CONF}.mk src/TextEditor.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} $@.d
-	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/TextEditor.o src/TextEditor.cpp
-
-${OBJECTDIR}/src/Palette.o: nbproject/Makefile-${CND_CONF}.mk src/Palette.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} $@.d
-	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/Palette.o src/Palette.cpp
-
 ${OBJECTDIR}/src/PaletteEntryPanel.o: nbproject/Makefile-${CND_CONF}.mk src/PaletteEntryPanel.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
 	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/PaletteEntryPanel.o src/PaletteEntryPanel.cpp
 
-${OBJECTDIR}/src/ColourBox.o: nbproject/Makefile-${CND_CONF}.mk src/ColourBox.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} $@.d
-	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/ColourBox.o src/ColourBox.cpp
-
 ${OBJECTDIR}/src/ZipArchive.o: nbproject/Makefile-${CND_CONF}.mk src/ZipArchive.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
 	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/ZipArchive.o src/ZipArchive.cpp
-
-${OBJECTDIR}/src/ArchiveEntry.o: nbproject/Makefile-${CND_CONF}.mk src/ArchiveEntry.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} $@.d
-	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/ArchiveEntry.o src/ArchiveEntry.cpp
 
 ${OBJECTDIR}/src/TextEntryPanel.o: nbproject/Makefile-${CND_CONF}.mk src/TextEntryPanel.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
@@ -161,30 +133,10 @@ ${OBJECTDIR}/src/WadArchive.o: nbproject/Makefile-${CND_CONF}.mk src/WadArchive.
 	${RM} $@.d
 	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/WadArchive.o src/WadArchive.cpp
 
-${OBJECTDIR}/src/MapLine.o: nbproject/Makefile-${CND_CONF}.mk src/MapLine.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} $@.d
-	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/MapLine.o src/MapLine.cpp
-
-${OBJECTDIR}/src/SLADEMap.o: nbproject/Makefile-${CND_CONF}.mk src/SLADEMap.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} $@.d
-	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/SLADEMap.o src/SLADEMap.cpp
-
-${OBJECTDIR}/src/Tokenizer.o: nbproject/Makefile-${CND_CONF}.mk src/Tokenizer.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} $@.d
-	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/Tokenizer.o src/Tokenizer.cpp
-
 ${OBJECTDIR}/src/ConsolePanel.o: nbproject/Makefile-${CND_CONF}.mk src/ConsolePanel.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
 	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/ConsolePanel.o src/ConsolePanel.cpp
-
-${OBJECTDIR}/src/PaletteManager.o: nbproject/Makefile-${CND_CONF}.mk src/PaletteManager.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} $@.d
-	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/PaletteManager.o src/PaletteManager.cpp
 
 ${OBJECTDIR}/src/ArchiveManagerPanel.o: nbproject/Makefile-${CND_CONF}.mk src/ArchiveManagerPanel.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
@@ -195,21 +147,6 @@ ${OBJECTDIR}/src/ArchiveManager.o: nbproject/Makefile-${CND_CONF}.mk src/Archive
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
 	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/ArchiveManager.o src/ArchiveManager.cpp
-
-${OBJECTDIR}/src/Archive.o: nbproject/Makefile-${CND_CONF}.mk src/Archive.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} $@.d
-	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/Archive.o src/Archive.cpp
-
-${OBJECTDIR}/src/MemChunk.o: nbproject/Makefile-${CND_CONF}.mk src/MemChunk.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} $@.d
-	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/MemChunk.o src/MemChunk.cpp
-
-${OBJECTDIR}/src/GfxEntryPanel.o: nbproject/Makefile-${CND_CONF}.mk src/GfxEntryPanel.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} $@.d
-	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/GfxEntryPanel.o src/GfxEntryPanel.cpp
 
 ${OBJECTDIR}/src/MapThing.o: nbproject/Makefile-${CND_CONF}.mk src/MapThing.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
@@ -241,16 +178,6 @@ ${OBJECTDIR}/src/MultiEntryPanel.o: nbproject/Makefile-${CND_CONF}.mk src/MultiE
 	${RM} $@.d
 	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/MultiEntryPanel.o src/MultiEntryPanel.cpp
 
-${OBJECTDIR}/src/MapSide.o: nbproject/Makefile-${CND_CONF}.mk src/MapSide.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} $@.d
-	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/MapSide.o src/MapSide.cpp
-
-${OBJECTDIR}/src/PaletteDialog.o: nbproject/Makefile-${CND_CONF}.mk src/PaletteDialog.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} $@.d
-	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/PaletteDialog.o src/PaletteDialog.cpp
-
 ${OBJECTDIR}/src/GfxCanvas.o: nbproject/Makefile-${CND_CONF}.mk src/GfxCanvas.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
@@ -261,30 +188,130 @@ ${OBJECTDIR}/src/PaletteChooser.o: nbproject/Makefile-${CND_CONF}.mk src/Palette
 	${RM} $@.d
 	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/PaletteChooser.o src/PaletteChooser.cpp
 
-${OBJECTDIR}/src/Icons.o: nbproject/Makefile-${CND_CONF}.mk src/Icons.cpp 
+${OBJECTDIR}/src/SImage.o: nbproject/Makefile-${CND_CONF}.mk src/SImage.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
-	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/Icons.o src/Icons.cpp
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/SImage.o src/SImage.cpp
 
 ${OBJECTDIR}/src/PaletteCanvas.o: nbproject/Makefile-${CND_CONF}.mk src/PaletteCanvas.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
 	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/PaletteCanvas.o src/PaletteCanvas.cpp
 
-${OBJECTDIR}/src/SImage.o: nbproject/Makefile-${CND_CONF}.mk src/SImage.cpp 
+${OBJECTDIR}/src/MainApp.o: nbproject/Makefile-${CND_CONF}.mk src/MainApp.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
-	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/SImage.o src/SImage.cpp
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/MainApp.o src/MainApp.cpp
+
+${OBJECTDIR}/src/EntryListPanel.o: nbproject/Makefile-${CND_CONF}.mk src/EntryListPanel.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/EntryListPanel.o src/EntryListPanel.cpp
+
+${OBJECTDIR}/src/EntryPanel.o: nbproject/Makefile-${CND_CONF}.mk src/EntryPanel.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/EntryPanel.o src/EntryPanel.cpp
+
+${OBJECTDIR}/src/CVar.o: nbproject/Makefile-${CND_CONF}.mk src/CVar.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/CVar.o src/CVar.cpp
+
+${OBJECTDIR}/src/MainWindow.o: nbproject/Makefile-${CND_CONF}.mk src/MainWindow.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/MainWindow.o src/MainWindow.cpp
+
+${OBJECTDIR}/src/ZipEntryListPanel.o: nbproject/Makefile-${CND_CONF}.mk src/ZipEntryListPanel.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/ZipEntryListPanel.o src/ZipEntryListPanel.cpp
+
+${OBJECTDIR}/src/TextEditor.o: nbproject/Makefile-${CND_CONF}.mk src/TextEditor.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/TextEditor.o src/TextEditor.cpp
+
+${OBJECTDIR}/src/EntryOperations.o: nbproject/Makefile-${CND_CONF}.mk src/EntryOperations.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/EntryOperations.o src/EntryOperations.cpp
+
+${OBJECTDIR}/src/Palette.o: nbproject/Makefile-${CND_CONF}.mk src/Palette.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/Palette.o src/Palette.cpp
+
+${OBJECTDIR}/src/ModifyOffsetsDialog.o: nbproject/Makefile-${CND_CONF}.mk src/ModifyOffsetsDialog.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/ModifyOffsetsDialog.o src/ModifyOffsetsDialog.cpp
+
+${OBJECTDIR}/src/ColourBox.o: nbproject/Makefile-${CND_CONF}.mk src/ColourBox.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/ColourBox.o src/ColourBox.cpp
+
+${OBJECTDIR}/src/ArchiveEntry.o: nbproject/Makefile-${CND_CONF}.mk src/ArchiveEntry.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/ArchiveEntry.o src/ArchiveEntry.cpp
+
+${OBJECTDIR}/src/MapLine.o: nbproject/Makefile-${CND_CONF}.mk src/MapLine.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/MapLine.o src/MapLine.cpp
+
+${OBJECTDIR}/src/SLADEMap.o: nbproject/Makefile-${CND_CONF}.mk src/SLADEMap.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/SLADEMap.o src/SLADEMap.cpp
+
+${OBJECTDIR}/src/Tokenizer.o: nbproject/Makefile-${CND_CONF}.mk src/Tokenizer.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/Tokenizer.o src/Tokenizer.cpp
+
+${OBJECTDIR}/src/PaletteManager.o: nbproject/Makefile-${CND_CONF}.mk src/PaletteManager.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/PaletteManager.o src/PaletteManager.cpp
+
+${OBJECTDIR}/src/MemChunk.o: nbproject/Makefile-${CND_CONF}.mk src/MemChunk.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/MemChunk.o src/MemChunk.cpp
+
+${OBJECTDIR}/src/Archive.o: nbproject/Makefile-${CND_CONF}.mk src/Archive.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/Archive.o src/Archive.cpp
+
+${OBJECTDIR}/src/GfxEntryPanel.o: nbproject/Makefile-${CND_CONF}.mk src/GfxEntryPanel.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/GfxEntryPanel.o src/GfxEntryPanel.cpp
+
+${OBJECTDIR}/src/MapSide.o: nbproject/Makefile-${CND_CONF}.mk src/MapSide.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/MapSide.o src/MapSide.cpp
+
+${OBJECTDIR}/src/PaletteDialog.o: nbproject/Makefile-${CND_CONF}.mk src/PaletteDialog.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/PaletteDialog.o src/PaletteDialog.cpp
+
+${OBJECTDIR}/src/Icons.o: nbproject/Makefile-${CND_CONF}.mk src/Icons.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/Icons.o src/Icons.cpp
 
 ${OBJECTDIR}/src/MapEditorWindow.o: nbproject/Makefile-${CND_CONF}.mk src/MapEditorWindow.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
 	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/MapEditorWindow.o src/MapEditorWindow.cpp
-
-${OBJECTDIR}/src/MainApp.o: nbproject/Makefile-${CND_CONF}.mk src/MainApp.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} $@.d
-	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/MainApp.o src/MainApp.cpp
 
 ${OBJECTDIR}/src/GfxConvDialog.o: nbproject/Makefile-${CND_CONF}.mk src/GfxConvDialog.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
@@ -296,20 +323,10 @@ ${OBJECTDIR}/src/MapCanvas.o: nbproject/Makefile-${CND_CONF}.mk src/MapCanvas.cp
 	${RM} $@.d
 	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/MapCanvas.o src/MapCanvas.cpp
 
-${OBJECTDIR}/src/EntryListPanel.o: nbproject/Makefile-${CND_CONF}.mk src/EntryListPanel.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} $@.d
-	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/EntryListPanel.o src/EntryListPanel.cpp
-
 ${OBJECTDIR}/src/Misc.o: nbproject/Makefile-${CND_CONF}.mk src/Misc.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
 	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/Misc.o src/Misc.cpp
-
-${OBJECTDIR}/src/EntryPanel.o: nbproject/Makefile-${CND_CONF}.mk src/EntryPanel.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} $@.d
-	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/EntryPanel.o src/EntryPanel.cpp
 
 ${OBJECTDIR}/src/MapVertex.o: nbproject/Makefile-${CND_CONF}.mk src/MapVertex.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
@@ -320,11 +337,6 @@ ${OBJECTDIR}/src/ZipArchivePanel.o: nbproject/Makefile-${CND_CONF}.mk src/ZipArc
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
 	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/ZipArchivePanel.o src/ZipArchivePanel.cpp
-
-${OBJECTDIR}/src/CVar.o: nbproject/Makefile-${CND_CONF}.mk src/CVar.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} $@.d
-	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/CVar.o src/CVar.cpp
 
 # Subprojects
 .build-subprojects:

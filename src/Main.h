@@ -32,6 +32,7 @@ WX_DECLARE_STRING_HASH_MAP(wxString, PropertyList);
 // Class to hold global variables
 namespace Global {
 	extern string error;
+	extern string version;
 };
 
 enum { DIR_USER, DIR_DATA, DIR_APP, DIR_TEMP };

@@ -87,20 +87,12 @@ bool GfxConvDialog::writeToEntry() {
 
 	// Write target image to selected type
 	int format = combo_target_format->GetCurrentSelection();
-	if (format == 0) {
-		wxLogMessage(_T("Doom flat"));
+	if (format == 0)
 		gfx_target->getImage()->toDoomFlat(mc);
-	}
-	else if (format == 1) {
-		wxLogMessage(_T("Doom gfx"));
+	else if (format == 1)
 		gfx_target->getImage()->toDoomGfx(mc);
-	}
-	else if (format > 1) {
-		wxLogMessage(_T("PNG"));
+	else if (format > 1)
 		gfx_target->getImage()->toPNG(mc);
-	}
-
-	wxLogMessage(s_fmt(_T("%d"), mc.getSize()));
 
 	// Write data to the entry
 	entry->importMemChunk(mc);
