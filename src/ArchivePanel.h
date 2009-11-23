@@ -11,7 +11,6 @@ class ArchivePanel : public wxPanel, Listener {
 protected:
 	Archive*		archive;
 	EntryListPanel*	entry_list;
-	wxMenu*			menu_entry;
 
 	// Entry panels
 	EntryPanel*	cur_area;
@@ -33,6 +32,8 @@ public:
 		MENU_ENTRY_EXPORTWAD,
 		MENU_ENTRY_MOVEUP,
 		MENU_ENTRY_MOVEDOWN,
+		MENU_ENTRY_GFX_CONVERT,
+		MENU_ENTRY_GFX_OFFSETS,
 
 		MENU_ENTRY_END,
 	};
@@ -57,6 +58,8 @@ public:
 	bool	exportEntryWad();
 	bool	moveUp();
 	bool	moveDown();
+	bool	gfxConvert();
+	bool	gfxModifyOffsets();
 
 	// UI related
 	bool	openEntry(ArchiveEntry* entry);

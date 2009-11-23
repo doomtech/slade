@@ -34,6 +34,7 @@
 #include "ArchiveManager.h"
 #include "Tokenizer.h"
 #include "Console.h"
+#include "Icons.h"
 #include <wx/image.h>
 #include <wx/stdpaths.h>
 #include <wx/ffile.h>
@@ -146,6 +147,9 @@ bool MainApp::OnInit() {
 
 	// Load configuration file
 	readConfigFile();
+
+	// Load program icons
+	loadIcons();
 
 	// Create the main window
 	main_window = new MainWindow();

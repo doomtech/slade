@@ -33,6 +33,7 @@
 #include "EntryListPanel.h"
 #include "ArchiveEntry.h"
 #include "ArchiveManager.h"
+#include "Icons.h"
 #include <wx/imaglist.h>
 #include <wx/filename.h>
 
@@ -46,34 +47,6 @@ CVAR(Bool, col_size, true, CVAR_SAVE);
 CVAR(Bool, col_type, true, CVAR_SAVE);
 CVAR(Bool, entry_list_monospace, true, CVAR_SAVE);
 
-
-/* get_entry_icon
- * Gets an entry icon image from the SLADE resource pk3 and returns
- * it as a wxImage (will be empty if the specified icon isn't found)
- *******************************************************************/
-wxImage get_entry_icon(string name, wxBitmapType type) {
-	// Init
-	wxImage image;
-
-	// Get the needed entry from the SLADE resource pk3
-	Archive* resource_pk3 = theArchiveManager->resourceArchive();
-	string entry_path = _T("entry_icons/") + name;
-	ArchiveEntry* entry = resource_pk3->getEntry(entry_path);
-
-	if (entry) {
-		// Export entry data to a temporary file
-		entry->exportFile(_T("sladetemp"));
-
-		// Load the data to a wxImage
-		image.LoadFile(_T("sladetemp"), type);
-
-		// Delete the temporary file
-		wxRemoveFile(_T("sladetemp"));
-	}
-
-	// Return the image, loaded or not
-	return image;
-}
 
 // No edit labels for now, causes too many problems
 //#ifdef _WIN32
@@ -97,42 +70,42 @@ EntryList::EntryList(EntryListPanel *parent, int id)
 
 	// Setup entry icons
 	image_list = new wxImageList(16, 16, false, 0);
-	image_list->Add(wxBitmap(get_entry_icon(_T("unknown.png"), wxBITMAP_TYPE_PNG)));
-	image_list->Add(wxBitmap(get_entry_icon(_T("marker.png"), wxBITMAP_TYPE_PNG)));
-	image_list->Add(wxBitmap(get_entry_icon(_T("text.png"), wxBITMAP_TYPE_PNG)));
-	image_list->Add(wxBitmap(get_entry_icon(_T("patch.png"), wxBITMAP_TYPE_PNG)));
-	image_list->Add(wxBitmap(get_entry_icon(_T("sprite.png"), wxBITMAP_TYPE_PNG)));
-	image_list->Add(wxBitmap(get_entry_icon(_T("flat.png"), wxBITMAP_TYPE_PNG)));
-	image_list->Add(wxBitmap(get_entry_icon(_T("gfx.png"), wxBITMAP_TYPE_PNG)));
-	image_list->Add(wxBitmap(get_entry_icon(_T("gfx.png"), wxBITMAP_TYPE_PNG)));
-	image_list->Add(wxBitmap(get_entry_icon(_T("png.png"), wxBITMAP_TYPE_PNG)));
-	image_list->Add(wxBitmap(get_entry_icon(_T("gfx.png"), wxBITMAP_TYPE_PNG))); // image
-	image_list->Add(wxBitmap(get_entry_icon(_T("sound.png"), wxBITMAP_TYPE_PNG)));
-	image_list->Add(wxBitmap(get_entry_icon(_T("sound.png"), wxBITMAP_TYPE_PNG))); // wav
-	image_list->Add(wxBitmap(get_entry_icon(_T("sound.png"), wxBITMAP_TYPE_PNG))); // mp3
-	image_list->Add(wxBitmap(get_entry_icon(_T("sound.png"), wxBITMAP_TYPE_PNG))); // flac
-	image_list->Add(wxBitmap(get_entry_icon(_T("music.png"), wxBITMAP_TYPE_PNG)));
-	image_list->Add(wxBitmap(get_entry_icon(_T("music.png"), wxBITMAP_TYPE_PNG)));
-	image_list->Add(wxBitmap(get_entry_icon(_T("music.png"), wxBITMAP_TYPE_PNG)));
-	image_list->Add(wxBitmap(get_entry_icon(_T("texturex.png"), wxBITMAP_TYPE_PNG)));
-	image_list->Add(wxBitmap(get_entry_icon(_T("pnames.png"), wxBITMAP_TYPE_PNG)));
-	image_list->Add(wxBitmap(get_entry_icon(_T("map.png"), wxBITMAP_TYPE_PNG)));
-	image_list->Add(wxBitmap(get_entry_icon(_T("map_data.png"), wxBITMAP_TYPE_PNG)));
-	image_list->Add(wxBitmap(get_entry_icon(_T("map_data.png"), wxBITMAP_TYPE_PNG)));
-	image_list->Add(wxBitmap(get_entry_icon(_T("map_data.png"), wxBITMAP_TYPE_PNG)));
-	image_list->Add(wxBitmap(get_entry_icon(_T("map_data.png"), wxBITMAP_TYPE_PNG)));
-	image_list->Add(wxBitmap(get_entry_icon(_T("map_data.png"), wxBITMAP_TYPE_PNG)));
-	image_list->Add(wxBitmap(get_entry_icon(_T("map_data.png"), wxBITMAP_TYPE_PNG)));
-	image_list->Add(wxBitmap(get_entry_icon(_T("map_data.png"), wxBITMAP_TYPE_PNG)));
-	image_list->Add(wxBitmap(get_entry_icon(_T("map_data.png"), wxBITMAP_TYPE_PNG)));
-	image_list->Add(wxBitmap(get_entry_icon(_T("map_data.png"), wxBITMAP_TYPE_PNG)));
-	image_list->Add(wxBitmap(get_entry_icon(_T("map_data.png"), wxBITMAP_TYPE_PNG)));
-	image_list->Add(wxBitmap(get_entry_icon(_T("map_data.png"), wxBITMAP_TYPE_PNG)));
-	image_list->Add(wxBitmap(get_entry_icon(_T("default.png"), wxBITMAP_TYPE_PNG)));
-	image_list->Add(wxBitmap(get_entry_icon(_T("default.png"), wxBITMAP_TYPE_PNG)));
-	image_list->Add(wxBitmap(get_entry_icon(_T("wad.png"), wxBITMAP_TYPE_PNG)));
-	image_list->Add(wxBitmap(get_entry_icon(_T("folder.png"), wxBITMAP_TYPE_PNG)));
-	image_list->Add(wxBitmap(get_entry_icon(_T("upfolder.png"), wxBITMAP_TYPE_PNG)));
+	image_list->Add(getIcon(_T("e_unknown")));
+	image_list->Add(getIcon(_T("e_marker")));
+	image_list->Add(getIcon(_T("e_text")));
+	image_list->Add(getIcon(_T("e_patch")));
+	image_list->Add(getIcon(_T("e_sprite")));
+	image_list->Add(getIcon(_T("e_flat")));
+	image_list->Add(getIcon(_T("e_gfx")));
+	image_list->Add(getIcon(_T("e_gfx")));
+	image_list->Add(getIcon(_T("e_png")));
+	image_list->Add(getIcon(_T("e_gfx")));		// image
+	image_list->Add(getIcon(_T("e_sound")));
+	image_list->Add(getIcon(_T("e_sound")));	// wav
+	image_list->Add(getIcon(_T("e_sound")));	// mp3
+	image_list->Add(getIcon(_T("e_sound")));	// flac
+	image_list->Add(getIcon(_T("e_music")));
+	image_list->Add(getIcon(_T("e_music")));
+	image_list->Add(getIcon(_T("e_music")));
+	image_list->Add(getIcon(_T("e_texturex")));
+	image_list->Add(getIcon(_T("e_pnames")));
+	image_list->Add(getIcon(_T("e_map")));
+	image_list->Add(getIcon(_T("e_map_data")));
+	image_list->Add(getIcon(_T("e_map_data")));
+	image_list->Add(getIcon(_T("e_map_data")));
+	image_list->Add(getIcon(_T("e_map_data")));
+	image_list->Add(getIcon(_T("e_map_data")));
+	image_list->Add(getIcon(_T("e_map_data")));
+	image_list->Add(getIcon(_T("e_map_data")));
+	image_list->Add(getIcon(_T("e_map_data")));
+	image_list->Add(getIcon(_T("e_map_data")));
+	image_list->Add(getIcon(_T("e_map_data")));
+	image_list->Add(getIcon(_T("e_map_data")));
+	image_list->Add(getIcon(_T("e_default")));
+	image_list->Add(getIcon(_T("e_default")));
+	image_list->Add(getIcon(_T("e_wad")));
+	image_list->Add(getIcon(_T("e_folder")));
+	image_list->Add(getIcon(_T("e_upfolder")));
 	SetImageList(image_list, wxIMAGE_LIST_SMALL);
 }
 

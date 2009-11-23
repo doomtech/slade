@@ -39,6 +39,7 @@
 #include "GfxEntryPanel.h"
 #include "PaletteEntryPanel.h"
 #include "MultiEntryPanel.h"
+#include "GfxConvDialog.h"
 #include <wx/aui/auibook.h>
 #include <wx/filename.h>
 
@@ -58,18 +59,6 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 	gfx_area = new GfxEntryPanel(this);
 	pal_area = new PaletteEntryPanel(this);
 	multi_area = new MultiEntryPanel(this);
-
-	// Create entry menu
-	menu_entry = new wxMenu(_T(""));
-	menu_entry->Append(MENU_ENTRY_RENAME, _T("Rename"));
-	menu_entry->Append(MENU_ENTRY_DELETE, _T("Delete"));
-	menu_entry->AppendSeparator();
-	menu_entry->Append(MENU_ENTRY_IMPORT, _T("Import"));
-	menu_entry->Append(MENU_ENTRY_EXPORT, _T("Export"));
-	menu_entry->Append(MENU_ENTRY_EXPORTWAD, _T("Export as Wad"));
-	menu_entry->AppendSeparator();
-	menu_entry->Append(MENU_ENTRY_MOVEUP, _T("Move Up"));
-	menu_entry->Append(MENU_ENTRY_MOVEDOWN, _T("Move Down"));
 }
 
 /* ArchivePanel::~ArchivePanel
@@ -336,6 +325,23 @@ bool ArchivePanel::moveDown() {
 	return entry_list->moveDown();
 }
 
+bool ArchivePanel::gfxConvert() {
+	// Create gfx conversion dialog
+	GfxConvDialog gcd;
+
+	// Send entries to the gcd
+	gcd.openEntries(entry_list->getSelectedEntries());
+
+	// Run the gcd
+	gcd.ShowModal();
+
+	return true;
+}
+
+bool ArchivePanel::gfxModifyOffsets() {
+	return true;
+}
+
 /* ArchivePanel::onAnnouncement
  * Called when an announcement is recieved from the archive that
  * this ArchivePanel is managing
@@ -557,7 +563,46 @@ void ArchivePanel::onEntryListDeselect(wxListEvent& event) {
  * Called when the entry list is right clicked
  *******************************************************************/
 void ArchivePanel::onEntryListRightClick(wxListEvent& event) {
-	PopupMenu(menu_entry);
+	//PopupMenu(menu_entry);
+
+	// Generate context menu
+	wxMenu* context = new wxMenu();
+	context->Append(MENU_ENTRY_RENAME, _T("Rename"));
+	context->Append(MENU_ENTRY_DELETE, _T("Delete"));
+	context->AppendSeparator();
+	context->Append(MENU_ENTRY_IMPORT, _T("Import"));
+	context->Append(MENU_ENTRY_EXPORT, _T("Export"));
+	context->Append(MENU_ENTRY_EXPORTWAD, _T("Export as Wad"));
+	context->AppendSeparator();
+	context->Append(MENU_ENTRY_MOVEUP, _T("Move Up"));
+	context->Append(MENU_ENTRY_MOVEDOWN, _T("Move Down"));
+
+	// Get selected entries
+	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
+
+	// Check what types exist in the selection
+	bool gfx_selected = false;
+	for (size_t a = 0; a < selection.size(); a++) {
+		// Check for gfx entry
+		if (!gfx_selected) {
+			uint8_t entry_type = selection[a]->getType();
+			if (entry_type == ETYPE_GFX || entry_type == ETYPE_GFX2 ||
+				entry_type == ETYPE_FLAT || entry_type == ETYPE_SPRITE ||
+				entry_type == ETYPE_PATCH || entry_type == ETYPE_PNG ||
+				entry_type == ETYPE_IMAGE)
+				gfx_selected = true;
+		}
+	}
+
+	// Add gfx-related menu items if gfx are selected
+	if (gfx_selected) {
+		context->AppendSeparator();
+		context->Append(MENU_ENTRY_GFX_CONVERT, _T("Convert Gfx to..."));
+		context->Append(MENU_ENTRY_GFX_OFFSETS, _T("Modify Gfx Offsets"));
+	}
+
+	// Popup the context menu
+	PopupMenu(context);
 }
 
 /* ArchivePanel::onEntryMenuClick
@@ -585,6 +630,12 @@ void ArchivePanel::onEntryMenuClick(wxCommandEvent& event) {
 			break;
 		case MENU_ENTRY_MOVEDOWN:
 			moveDown();
+			break;
+		case MENU_ENTRY_GFX_CONVERT:
+			gfxConvert();
+			break;
+		case MENU_ENTRY_GFX_OFFSETS:
+			gfxModifyOffsets();
 			break;
 	}
 }

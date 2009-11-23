@@ -103,6 +103,8 @@
       </logicalFolder>
       <itemPath>src/ArchiveManager.cpp</itemPath>
       <itemPath>src/ArchiveManager.h</itemPath>
+      <itemPath>src/Icons.cpp</itemPath>
+      <itemPath>src/Icons.h</itemPath>
       <itemPath>src/Palette.cpp</itemPath>
       <itemPath>src/Palette.h</itemPath>
       <itemPath>src/PaletteManager.cpp</itemPath>
