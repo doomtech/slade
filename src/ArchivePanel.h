@@ -60,13 +60,15 @@ public:
 
 	// UI related
 	bool	openEntry(ArchiveEntry* entry);
+	bool	showEntryPanel(EntryPanel* new_area, bool ask_save = true);
 
 	virtual void onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 
 	// Events
-	void	onEntryListChange(wxListEvent &event);
-	void	onEntryListRightClick(wxListEvent &event);
-	void	onEntryMenuClick(wxCommandEvent &event);
+	void	onEntryListSelect(wxListEvent& event);
+	void	onEntryListDeselect(wxListEvent& event);
+	void	onEntryListRightClick(wxListEvent& event);
+	void	onEntryMenuClick(wxCommandEvent& event);
 
 	DECLARE_EVENT_TABLE()
 };

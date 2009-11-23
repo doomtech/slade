@@ -79,11 +79,11 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 	m_vbox->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
 
 	// Offsets
-	text_xoffset = new wxTextCtrl(this, TEXT_XOFFSET, _T("0"), wxDefaultPosition, wxDefaultSize, wxTE_RIGHT|wxTE_PROCESS_ENTER);
-	text_yoffset = new wxTextCtrl(this, TEXT_YOFFSET, _T("0"), wxDefaultPosition, wxDefaultSize, wxTE_RIGHT|wxTE_PROCESS_ENTER);
+	spin_xoffset = new wxSpinCtrl(this, SPIN_XOFFSET, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, SHRT_MIN, SHRT_MAX, 0);
+	spin_yoffset = new wxSpinCtrl(this, SPIN_YOFFSET, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, SHRT_MIN, SHRT_MAX, 0);
 	hbox->Add(new wxStaticText(this, -1, _T("Offsets:")), 0, wxALIGN_CENTER_VERTICAL, 0);
-	hbox->Add(text_xoffset, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
-	hbox->Add(text_yoffset, 0, wxEXPAND, 0);
+	hbox->Add(spin_xoffset, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
+	hbox->Add(spin_yoffset, 0, wxEXPAND, 0);
 
 	// Apply layout
 	Layout();
@@ -110,8 +110,8 @@ bool GfxEntryPanel::loadEntry(ArchiveEntry* entry) {
 	Misc::loadImageFromEntry(gfx_canvas->getImage(), this->entry);
 
 	// Set offset text boxes
-	text_xoffset->SetValue(s_fmt(_T("%d"), gfx_canvas->getImage()->offset().x));
-	text_yoffset->SetValue(s_fmt(_T("%d"), gfx_canvas->getImage()->offset().y));
+	spin_xoffset->SetValue(gfx_canvas->getImage()->offset().x);
+	spin_yoffset->SetValue(gfx_canvas->getImage()->offset().y);
 
 	// Refresh the canvas
 	gfx_canvas->Refresh();
@@ -150,8 +150,8 @@ void GfxEntryPanel::updateImagePalette() {
 BEGIN_EVENT_TABLE(GfxEntryPanel, EntryPanel)
 	EVT_COMMAND_SCROLL(SLIDER_ZOOM, GfxEntryPanel::sliderZoomChanged)
 	EVT_COMBOBOX(COMBO_PALETTE, GfxEntryPanel::paletteChanged)
-	EVT_TEXT_ENTER(TEXT_XOFFSET, GfxEntryPanel::textXOffsetChanged)
-	EVT_TEXT_ENTER(TEXT_YOFFSET, GfxEntryPanel::textYOffsetChanged)
+	EVT_SPINCTRL(SPIN_XOFFSET, GfxEntryPanel::spinXOffsetChanged)
+	EVT_SPINCTRL(SPIN_YOFFSET, GfxEntryPanel::spinYOffsetChanged)
 END_EVENT_TABLE()
 
 /* GfxEntryPanel::sliderZoomChanged
@@ -184,13 +184,9 @@ void GfxEntryPanel::paletteChanged(wxCommandEvent& e) {
 /* GfxEntryPanel::textXOffsetChanged
  * Called when enter is pressed within the x offset text entry
  *******************************************************************/
-void GfxEntryPanel::textXOffsetChanged(wxCommandEvent& e) {
-	// Convert x offset text to 0 if empty
-	if (text_xoffset->GetValue().IsEmpty())
-		text_xoffset->SetValue(_T("0"));
-
+void GfxEntryPanel::spinXOffsetChanged(wxSpinEvent& e) {
 	// Change the image x-offset
-	int offset = atoi(chr(text_xoffset->GetValue()));
+	int offset = spin_xoffset->GetValue();
 	gfx_canvas->getImage()->setXOffset(offset);
 
 	// Update variables
@@ -203,13 +199,9 @@ void GfxEntryPanel::textXOffsetChanged(wxCommandEvent& e) {
 /* GfxEntryPanel::textYOffsetChanged
  * Called when enter is pressed within the y offset text entry
  *******************************************************************/
-void GfxEntryPanel::textYOffsetChanged(wxCommandEvent& e) {
-	// Convert y offset text to 0 if empty
-	if (text_yoffset->GetValue().IsEmpty())
-		text_yoffset->SetValue(_T("0"));
-
+void GfxEntryPanel::spinYOffsetChanged(wxSpinEvent& e) {
 	// Change image y-offset
-	int offset = atoi(chr(text_yoffset->GetValue()));
+	int offset = spin_yoffset->GetValue();
 	gfx_canvas->getImage()->setYOffset(offset);
 
 	// Update variables

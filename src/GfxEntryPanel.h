@@ -5,6 +5,7 @@
 #include "EntryPanel.h"
 #include "GfxCanvas.h"
 #include "PaletteChooser.h"
+#include <wx/spinctrl.h>
 
 class GfxEntryPanel : public EntryPanel {
 private:
@@ -12,15 +13,15 @@ private:
 	wxSlider*		slider_zoom;
 	wxStaticText*	label_current_zoom;
 	PaletteChooser*	combo_palette;
-	wxTextCtrl*		text_xoffset;
-	wxTextCtrl*		text_yoffset;
+	wxSpinCtrl*		spin_xoffset;
+	wxSpinCtrl*		spin_yoffset;
 
 public:
 	enum {
 		SLIDER_ZOOM,
 		COMBO_PALETTE,
-		TEXT_XOFFSET,
-		TEXT_YOFFSET,
+		SPIN_XOFFSET,
+		SPIN_YOFFSET,
 	};
 
 	GfxEntryPanel(wxWindow* parent);
@@ -32,8 +33,8 @@ public:
 
 	void	sliderZoomChanged(wxScrollEvent& e);
 	void	paletteChanged(wxCommandEvent& e);
-	void	textXOffsetChanged(wxCommandEvent& e);
-	void	textYOffsetChanged(wxCommandEvent& e);
+	void	spinXOffsetChanged(wxSpinEvent& e);
+	void	spinYOffsetChanged(wxSpinEvent& e);
 
 	DECLARE_EVENT_TABLE()
 };
