@@ -233,6 +233,11 @@ BEGIN_EVENT_TABLE(MainWindow, wxFrame)
 	EVT_CLOSE(MainWindow::onClose)
 END_EVENT_TABLE()
 
+string ext_wad = _T("*.wad;*.WAD;*.Wad");
+string ext_zip = _T("*.zip;*.ZIP;*.Zip");
+string ext_pk3 = _T("*.pk3;*.PK3;*.Pk3");
+string ext_jdf = _T("*.jdf;*.JDF;*.Jdf");
+
 /* MainWindow::onMenuItemClicked
  * Called when a menu or toolbar item is clicked
  *******************************************************************/
@@ -251,11 +256,16 @@ void MainWindow::onMenuItemClicked(wxCommandEvent& e) {
 
 	// File->Open
 	else if (e.GetId() == MENU_FILE_OPEN) {
+		// Create extensions string
+		string extensions = s_fmt(_T("Any Supported File (*.wad; *.zip; *.pk3; *.jdf)|%s%s%s%s"), ext_wad.c_str(), ext_zip.c_str(), ext_pk3.c_str(), ext_jdf.c_str());
+		extensions += s_fmt(_T("|Doom Wad files (*.wad)|%s"), ext_wad.c_str());
+		extensions += s_fmt(_T("|Zip files (*.zip)|%s"), ext_zip.c_str());
+		extensions += s_fmt(_T("|Pk3 (zip) files (*.pk3)|%s"), ext_pk3.c_str());
+		extensions += s_fmt(_T("|JDF (zip) files (*.jdf)|%s"), ext_jdf.c_str());
+
 		// Open a file browser dialog that allows multiple selection
 		// and filters by wad, zip and pk3 file extensions
-		wxFileDialog *dialog_open = new wxFileDialog(this, _T("Choose file(s) to open"), wxEmptyString, wxEmptyString,
-				_T("Any Supported File (*.wad; *.zip; *.pk3; *.jdf)|*.wad;*.zip;*.pk3;*.jdf|Doom Wad files (*.wad)|*.wad|Zip files (*.zip)|*.zip|Pk3 (zip) files (*.pk3)|*.pk3|JDF (zip) files (*.jdf)|*.jdf"),
-				wxFD_OPEN | wxFD_MULTIPLE | wxFD_FILE_MUST_EXIST, wxDefaultPosition);
+		wxFileDialog *dialog_open = new wxFileDialog(this, _T("Choose file(s) to open"), wxEmptyString, wxEmptyString, extensions, wxFD_OPEN|wxFD_MULTIPLE|wxFD_FILE_MUST_EXIST, wxDefaultPosition);
 
 		// Run the dialog & check that the user didn't cancel
 		if (dialog_open->ShowModal() == wxID_OK) {
