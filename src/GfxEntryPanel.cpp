@@ -68,6 +68,13 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 	hbox->Add(new wxStaticText(this, -1, _T("Palette:")), 0, wxALIGN_CENTER_VERTICAL, 0);
 	hbox->Add(combo_palette, 0, wxEXPAND, 0);
 
+	// Gfx (offset) type
+	string offset_types[] = { _T("Auto"), _T("Graphic"), _T("Sprite"), _T("HUD") };
+	combo_offset_type = new wxComboBox(this, COMBO_OFFSET_TYPE, offset_types[0], wxDefaultPosition, wxDefaultSize, 4, offset_types, wxCB_READONLY);
+	hbox->AddSpacer(8);
+	hbox->Add(new wxStaticText(this, -1, _T("Type:")), 0, wxALIGN_CENTER_VERTICAL, 0);
+	hbox->Add(combo_offset_type, 0, wxEXPAND, 0);
+
 
 	// Add gfx canvas
 	gfx_canvas = new GfxCanvas(this, -1);
@@ -114,6 +121,9 @@ bool GfxEntryPanel::loadEntry(ArchiveEntry* entry) {
 	spin_xoffset->SetValue(gfx_canvas->getImage()->offset().x);
 	spin_yoffset->SetValue(gfx_canvas->getImage()->offset().y);
 
+	// Apply offset view type
+	applyViewType();
+
 	// Refresh the canvas
 	gfx_canvas->Refresh();
 
@@ -149,11 +159,64 @@ void GfxEntryPanel::updateImagePalette() {
 	delete pal;
 }
 
+/* GfxEntryPanel::detectOffsetType
+ * Detects the offset view type of the current entry
+ *******************************************************************/
+int GfxEntryPanel::detectOffsetType() {
+	if (!entry)
+		return 0;
+
+	// Check entry type
+	int type = entry->getType();
+
+	if (type == ETYPE_PATCH || type == ETYPE_FLAT ||
+		type == ETYPE_GFX || type == ETYPE_GFX2)
+		return 0;
+
+	else if (type == ETYPE_SPRITE) {
+		return 2;
+	}
+
+	else if (type == ETYPE_PNG || type == ETYPE_IMAGE) {
+		if (gfx_canvas->getImage()->offset().x == 0 &&
+			gfx_canvas->getImage()->offset().y == 0)
+			return 0;
+		else
+			return 2;
+	}
+}
+
+/* GfxEntryPanel::applyViewType
+ * Sets the view type of the gfx canvas depending on what is selected
+ * in the offset type combo box
+ *******************************************************************/
+void GfxEntryPanel::applyViewType() {
+	int sel = combo_offset_type->GetSelection();
+
+	switch (sel) {
+		case 0:
+			gfx_canvas->setViewType(detectOffsetType());
+			break;
+		case 1:
+			gfx_canvas->setViewType(0);
+			break;
+		case 2:
+			gfx_canvas->setViewType(2);
+			break;
+		case 3:
+			gfx_canvas->setViewType(3);
+			break;
+	}
+
+	gfx_canvas->Refresh();
+}
+
 BEGIN_EVENT_TABLE(GfxEntryPanel, EntryPanel)
 	EVT_COMMAND_SCROLL(SLIDER_ZOOM, GfxEntryPanel::sliderZoomChanged)
 	EVT_COMBOBOX(COMBO_PALETTE, GfxEntryPanel::paletteChanged)
 	EVT_SPINCTRL(SPIN_XOFFSET, GfxEntryPanel::spinXOffsetChanged)
 	EVT_SPINCTRL(SPIN_YOFFSET, GfxEntryPanel::spinYOffsetChanged)
+	EVT_COMBOBOX(COMBO_OFFSET_TYPE, GfxEntryPanel::comboOffsetTypeChanged)
 END_EVENT_TABLE()
 
 /* GfxEntryPanel::sliderZoomChanged
@@ -211,4 +274,11 @@ void GfxEntryPanel::spinYOffsetChanged(wxSpinEvent& e) {
 
 	// Refresh canvas
 	gfx_canvas->Refresh();
+}
+
+/* GfxEntryPanel::comboOffsetTypeChanged
+ * Called when the 'type' combo box selection is changed
+ *******************************************************************/
+void GfxEntryPanel::comboOffsetTypeChanged(wxCommandEvent& e) {
+	applyViewType();
 }
