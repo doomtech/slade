@@ -389,11 +389,6 @@ void MainWindow::onMenuItemClicked(wxCommandEvent& e) {
 		info.SetWebSite(_T("http://slade.mancubus.net"));
 		info.SetDescription(_T("It's a Doom Editor"));
 
-		ArchiveEntry* license = theArchiveManager->resourceArchive()->getEntry(_T("gpl-2.0.txt"));
-		string lic_str = wxString::From8BitData((const char*)license->getData());
-		lic_str.Truncate(license->getSize());
-		info.SetLicence(lic_str);
-
 		string year = wxNow().Right(4);
 		info.SetCopyright(s_fmt(_T("(C) 2008-%s Simon Judd <sirjuddington@gmail.com>"), year.c_str()));
 

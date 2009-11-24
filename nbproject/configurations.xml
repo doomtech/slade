@@ -138,7 +138,7 @@
       <toolsSet>
         <developmentServer>localhost</developmentServer>
         <compilerSet>GNU|GNU</compilerSet>
-        <platform>2</platform>
+        <platform>3</platform>
       </toolsSet>
       <compileType>
         <ccTool>
@@ -160,7 +160,7 @@
       <toolsSet>
         <developmentServer>localhost</developmentServer>
         <compilerSet>GNU|GNU</compilerSet>
-        <platform>2</platform>
+        <platform>3</platform>
       </toolsSet>
       <compileType>
         <cTool>
@@ -186,7 +186,7 @@
       <toolsSet>
         <developmentServer>localhost</developmentServer>
         <compilerSet>MinGW|MinGW</compilerSet>
-        <platform>2</platform>
+        <platform>3</platform>
       </toolsSet>
       <compileType>
         <cTool>
@@ -204,6 +204,7 @@
           <stripSymbols>true</stripSymbols>
           <linkerLibItems>
             <linkerLibLibItem>FreeImage</linkerLibLibItem>
+            <linkerLibLibItem>wx_mswu_adv-2.8</linkerLibLibItem>
             <linkerLibLibItem>wx_mswu_aui-2.8</linkerLibLibItem>
             <linkerLibLibItem>wx_mswu_html-2.8</linkerLibLibItem>
             <linkerLibLibItem>wx_mswu_stc-2.8</linkerLibLibItem>
@@ -243,13 +244,14 @@
       <toolsSet>
         <developmentServer>localhost</developmentServer>
         <compilerSet>MinGW|MinGW</compilerSet>
-        <platform>2</platform>
+        <platform>3</platform>
       </toolsSet>
       <compileType>
         <linkerTool>
           <output>dist/SLADE</output>
           <linkerLibItems>
             <linkerLibLibItem>FreeImage</linkerLibLibItem>
+            <linkerLibLibItem>wx_mswu_adv-2.8</linkerLibLibItem>
             <linkerLibLibItem>wx_mswu_aui-2.8</linkerLibLibItem>
             <linkerLibLibItem>wx_mswu_html-2.8</linkerLibLibItem>
             <linkerLibLibItem>wx_mswu_stc-2.8</linkerLibLibItem>
