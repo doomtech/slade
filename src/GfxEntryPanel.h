@@ -7,6 +7,13 @@
 #include "PaletteChooser.h"
 #include <wx/spinctrl.h>
 
+/* TODO:
+ * - HUD offsets view type (view & detection)
+ * - Drag image to change offsets
+ * - 'Save Changes' button
+ * - 'Tile' checkbox
+ */
+
 class GfxEntryPanel : public EntryPanel {
 private:
 	GfxCanvas*		gfx_canvas;

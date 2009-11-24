@@ -352,7 +352,8 @@ bool ArchivePanel::gfxModifyOffsets() {
 	ModifyOffsetsDialog mod;
 
 	// Run the dialog
-	mod.ShowModal();
+	if (mod.ShowModal() == wxID_CANCEL)
+		return false;
 
 	// Go through selected entries
 	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();

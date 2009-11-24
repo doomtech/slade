@@ -187,7 +187,7 @@ void MultiEntryPanel::btnConvertGfxClicked(wxCommandEvent& e) {
 void MultiEntryPanel::btnModifyOffsetsClicked(wxCommandEvent& e) {
 	// Create and run modify offsets dialog
 	ModifyOffsetsDialog mod;
-	if (mod.ShowModal() == wxCANCEL)
+	if (mod.ShowModal() == wxID_CANCEL)
 		return;
 
 	// Apply offsets to selected entries
