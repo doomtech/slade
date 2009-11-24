@@ -29,11 +29,21 @@
 /*******************************************************************
  * INCLUDES
  *******************************************************************/
-#include <wx/filefn.h>
-
 #include "Main.h"
 #include "SImage.h"
 #include "FreeImage.h"
+#include <wx/filefn.h>
+
+
+/*******************************************************************
+ * VARIABLES
+ *******************************************************************/
+// Define grAb chunk struct
+struct grab_chunk_t {
+	char name[4];
+	int32_t xoff;
+	int32_t yoff;
+};
 
 
 /* SImage::SImage
@@ -585,8 +595,30 @@ bool SImage::toPNG(MemChunk& out) {
 	// Write the image to a temp file
 	FreeImage_Save(FIF_PNG, bm, chr(appPath(_T("temp.png"), DIR_TEMP)));
 
-	// Load it into the memchunk
-	out.loadFile(appPath(_T("temp.png"), DIR_TEMP));
+	// Load it into a memchunk
+	MemChunk png;
+	png.loadFile(appPath(_T("temp.png"), DIR_TEMP));
+	uint8_t* png_data = png.getData();
+
+	// Write PNG header and IHDR
+	out.write(png_data, 33);
+
+	// Create grAb chunk with offsets
+	int32_t xoff = offset_x;
+	int32_t yoff = offset_y;
+	uint32_t csize = wxUINT32_SWAP_ON_LE(8);
+	grab_chunk_t gc = { 'g', 'r', 'A', 'b', wxINT32_SWAP_ON_LE(xoff), wxINT32_SWAP_ON_LE(yoff) };
+	uint32_t dcrc = wxUINT32_SWAP_ON_LE(crc((uint8_t*)&gc, 12));
+
+	// Write grAb chunk
+	out.write(&csize, 4);
+	out.write(&gc, 12);
+	out.write(&dcrc, 4);
+
+	// Write remaining PNG data
+	out.write(png_data + 33, png.getSize() - 33);
+
+	// Clean up
 	wxRemoveFile(appPath(_T("temp.png"), DIR_TEMP));
 
 	// Success

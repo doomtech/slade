@@ -33,6 +33,7 @@
 #include "Palette.h"
 #include "Misc.h"
 #include "PaletteManager.h"
+#include "EntryOperations.h"
 
 
 /* GfxEntryPanel::GfxEntryPanel
@@ -123,7 +124,8 @@ bool GfxEntryPanel::loadEntry(ArchiveEntry* entry) {
  * Saves any changes to the entry
  *******************************************************************/
 bool GfxEntryPanel::saveEntry() {
-	return true;
+	// Set gfx entry offsets
+	return EntryOperations::modifyGfxOffsets(entry, -1, point2_t(spin_xoffset->GetValue(), spin_yoffset->GetValue()), true, true, false);
 }
 
 /* GfxEntryPanel::updateImagePalette

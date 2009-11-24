@@ -34,6 +34,25 @@
 #include "ArchiveManager.h"
 
 
+/*******************************************************************
+ * VARIABLES
+ *******************************************************************/
+
+// Define some png chunk structures
+struct ihdr_t {
+	uint32_t id;
+	uint32_t width;
+	uint32_t height;
+	uint8_t cinfo[5];
+};
+
+struct grab_chunk_t {
+	char name[4];
+	int32_t xoff;
+	int32_t yoff;
+};
+
+
 /* EntryOperations::modifyGfxOffsets
  * Changes the offsets of the given gfx entry. Returns false if the
  * entry is invalid or not an offset-supported format, true otherwise
@@ -94,16 +113,32 @@ bool EntryOperations::modifyGfxOffsets(ArchiveEntry* entry, int auto_type, point
 
 	// PNG format
 	else if (type == ETYPE_PNG) {
-		// Load PNG to an SImage
-		// todo: read offset & height info straight from data
-		SImage img;
-		Misc::loadImageFromEntry(&img, entry);
+		// Read width and height from IHDR chunk
+		uint8_t* data = entry->getData(true);
+		ihdr_t* ihdr = (ihdr_t*)(data + 12);
+		uint32_t w = wxINT32_SWAP_ON_LE(ihdr->width);
+		uint32_t h = wxINT32_SWAP_ON_LE(ihdr->height);
 
-		// Get image information
-		int w = img.getWidth();
-		int h = img.getHeight();
-		int32_t xoff = img.offset().x;
-		int32_t yoff = img.offset().y;
+		// Find existing grAb chunk
+		uint32_t grab_start = 0;
+		int32_t xoff = 0;
+		int32_t yoff = 0;
+		for (uint32_t a = 0; a < entry->getSize(); a++) {
+			// Check for 'grAb' header
+			if (data[a] == 'g' && data[a + 1] == 'r' &&
+				data[a + 2] == 'A' && data[a + 3] == 'b') {
+				grab_start = a - 4;
+				grab_chunk_t* grab = (grab_chunk_t*)(data + a);
+				xoff = wxINT32_SWAP_ON_LE(grab->xoff);
+				yoff = wxINT32_SWAP_ON_LE(grab->yoff);
+				break;
+			}
+
+			// Stop when we get to the 'IDAT' chunk
+			if (data[a] == 'I' && data[a + 1] == 'D' &&
+				data[a + 2] == 'A' && data[a + 3] == 'T')
+				break;
+		}
 
 		// Apply new offsets
 		if (auto_type >= 0) {
@@ -136,31 +171,9 @@ bool EntryOperations::modifyGfxOffsets(ArchiveEntry* entry, int auto_type, point
 		}
 
 		// Create new grAb chunk
-		struct grab_chunk_t {
-			char name[4];
-			int32_t xoff;
-			int32_t yoff;
-		};
 		uint32_t csize = wxUINT32_SWAP_ON_LE(8);
 		grab_chunk_t gc = { 'g', 'r', 'A', 'b', wxINT32_SWAP_ON_LE(xoff), wxINT32_SWAP_ON_LE(yoff) };
 		uint32_t dcrc = wxUINT32_SWAP_ON_LE(crc((uint8_t*)&gc, 12));
-
-		// Find existing grAb chunk
-		uint32_t grab_start = 0;
-		uint8_t* data = entry->getData();
-		for (uint32_t a = 0; a < entry->getSize(); a++) {
-			// Check for 'grAb' header
-			if (data[a] == 'g' && data[a + 1] == 'r' &&
-				data[a + 2] == 'A' && data[a + 3] == 'b') {
-				grab_start = a - 4;
-				break;
-			}
-
-			// Stop when we get to the 'IDAT' chunk
-			if (data[a] == 'I' && data[a + 1] == 'D' &&
-				data[a + 2] == 'A' && data[a + 3] == 'T')
-				break;
-		}
 
 		// Build new PNG from the original w/ the new grAb chunk
 		MemChunk npng;

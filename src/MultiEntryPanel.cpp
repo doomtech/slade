@@ -1,11 +1,48 @@
 
+/*******************************************************************
+ * SLADE - It's a Doom Editor
+ * Copyright (C) 2008 Simon Judd
+ *
+ * Email:       veilofsorrow@gmail.com
+ * Web:         http://slade.mancubus.net
+ * Filename:    MultiEntryPanel.cpp
+ * Description: This UI panel is shown if multiple entries are
+ *              selected in the entry list. Shows the selection size,
+ *              and some batch 'actions' that can be performed on the
+ *              selected entries.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *******************************************************************/
+
+
+/*******************************************************************
+ * INCLUDES
+ *******************************************************************/
 #include "Main.h"
 #include "WxStuff.h"
 #include "MultiEntryPanel.h"
 #include "Misc.h"
 #include "WadArchive.h"
 #include "GfxConvDialog.h"
+#include "ModifyOffsetsDialog.h"
+#include "EntryOperations.h"
 
+
+/* MultiEntryPanel::MultiEntryPanel
+ * MultiEntryPanel class constructor
+ *******************************************************************/
 MultiEntryPanel::MultiEntryPanel(wxWindow* parent)
 : EntryPanel(parent) {
 	// Init variables
@@ -21,9 +58,15 @@ MultiEntryPanel::MultiEntryPanel(wxWindow* parent)
 	updateLayout();
 }
 
+/* MultiEntryPanel::~MultiEntryPanel
+ * MultiEntryPanel class destructor
+ *******************************************************************/
 MultiEntryPanel::~MultiEntryPanel() {
 }
 
+/* MultiEntryPanel::loadEntries
+ * Loads the given entries into the panel
+ *******************************************************************/
 bool MultiEntryPanel::loadEntries(vector<ArchiveEntry*>& list) {
 	uint32_t total_size = 0;
 	gfx_selected = false;
@@ -57,6 +100,10 @@ bool MultiEntryPanel::loadEntries(vector<ArchiveEntry*>& list) {
 	updateLayout();
 }
 
+/* MultiEntryPanel::updateLayout
+ * Updates the panel layout, including hiding/showing different
+ * action buttons depending on what is selected
+ *******************************************************************/
 void MultiEntryPanel::updateLayout() {
 	// Get panel sizer
 	wxSizer* sizer = GetSizer();
@@ -105,6 +152,9 @@ BEGIN_EVENT_TABLE(MultiEntryPanel, EntryPanel)
 	EVT_BUTTON(BTN_MODIFY_OFFSETS, MultiEntryPanel::btnModifyOffsetsClicked)
 END_EVENT_TABLE()
 
+/* MultiEntryPanel::btnExportArchiveClicked
+ * Called when the 'Export as Wad' button is clicked
+ *******************************************************************/
 void MultiEntryPanel::btnExportArchiveClicked(wxCommandEvent& e) {
 	// Create save file dialog
 	wxFileDialog dialog_save(this, _T(""), wxEmptyString, wxEmptyString,
@@ -117,6 +167,9 @@ void MultiEntryPanel::btnExportArchiveClicked(wxCommandEvent& e) {
 	}
 }
 
+/* MultiEntryPanel::btnConvertGfxClicked
+ * Called when the 'Convert Gfx to...' button is clicked
+ *******************************************************************/
 void MultiEntryPanel::btnConvertGfxClicked(wxCommandEvent& e) {
 	// Create gfx conversion dialog
 	GfxConvDialog gcd;
@@ -128,6 +181,16 @@ void MultiEntryPanel::btnConvertGfxClicked(wxCommandEvent& e) {
 	gcd.ShowModal();
 }
 
+/* MultiEntryPanel::btnModifyOffsetsClicked
+ * Called when the 'Modify Gfx Offsets' button is clicked
+ *******************************************************************/
 void MultiEntryPanel::btnModifyOffsetsClicked(wxCommandEvent& e) {
-	wxLogMessage(_T("Modify offsets function not implemented"));
+	// Create and run modify offsets dialog
+	ModifyOffsetsDialog mod;
+	if (mod.ShowModal() == wxCANCEL)
+		return;
+
+	// Apply offsets to selected entries
+	for (uint32_t a = 0; a < entries.size(); a++)
+		EntryOperations::modifyGfxOffsets(entries[a], mod.getAlignType(), mod.getOffset(), mod.xOffChange(), mod.yOffChange(), mod.relativeOffset());
 }
