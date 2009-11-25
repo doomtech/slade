@@ -41,7 +41,7 @@
 PaletteChooser::PaletteChooser(wxWindow* parent, int id)
 : wxComboBox(parent, id, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY|wxCB_DROPDOWN) {
 	// Add first 'existing' item
-	Append(_T("Archive/Global Palette"));
+	Append(_T("Existing/Global"));
 
 	// Add palette names from palette manager
 	for (int a = 0; a < thePaletteManager->numPalettes(); a++)

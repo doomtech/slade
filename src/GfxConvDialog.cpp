@@ -129,7 +129,7 @@ void GfxConvDialog::setupLayout() {
 
 	gfx_current = new GfxCanvas(this, -1);
 	gfx_current->SetInitialSize(wxSize(192, 192));
-	gfx_current->setViewType(1);
+	gfx_current->setViewType(GFXVIEW_CENTERED);
 	vbox->Add(gfx_current, 1, wxEXPAND|wxTOP|wxLEFT|wxRIGHT, 4);
 
 	pal_chooser_current = new PaletteChooser(this, PALETTE_CURRENT);

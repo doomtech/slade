@@ -63,23 +63,28 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 
 	hbox->AddStretchSpacer();
 
+	// Tile checkbox
+	cb_tile = new wxCheckBox(this, CB_TILE, _T("Tile"));
+	hbox->Add(cb_tile, 0, wxEXPAND, 0);
+	hbox->AddSpacer(8);
+
+	// Gfx (offset) type
+	string offset_types[] = { _T("Auto"), _T("Graphic"), _T("Sprite"), _T("HUD") };
+	combo_offset_type = new wxComboBox(this, COMBO_OFFSET_TYPE, offset_types[0], wxDefaultPosition, wxDefaultSize, 4, offset_types, wxCB_READONLY);
+	hbox->Add(new wxStaticText(this, -1, _T("Type:")), 0, wxALIGN_CENTER_VERTICAL, 0);
+	hbox->Add(combo_offset_type, 0, wxEXPAND, 0);
+	hbox->AddSpacer(8);
+
 	// Palette chooser
 	combo_palette = new PaletteChooser(this, COMBO_PALETTE);
 	hbox->Add(new wxStaticText(this, -1, _T("Palette:")), 0, wxALIGN_CENTER_VERTICAL, 0);
 	hbox->Add(combo_palette, 0, wxEXPAND, 0);
 
-	// Gfx (offset) type
-	string offset_types[] = { _T("Auto"), _T("Graphic"), _T("Sprite"), _T("HUD") };
-	combo_offset_type = new wxComboBox(this, COMBO_OFFSET_TYPE, offset_types[0], wxDefaultPosition, wxDefaultSize, 4, offset_types, wxCB_READONLY);
-	hbox->AddSpacer(8);
-	hbox->Add(new wxStaticText(this, -1, _T("Type:")), 0, wxALIGN_CENTER_VERTICAL, 0);
-	hbox->Add(combo_offset_type, 0, wxEXPAND, 0);
-
 
 	// Add gfx canvas
 	gfx_canvas = new GfxCanvas(this, -1);
 	m_vbox->Add(gfx_canvas, 1, wxEXPAND|wxALL, 4);
-	gfx_canvas->setViewType(2);
+	gfx_canvas->setViewType(GFXVIEW_DEFAULT);
 
 
 	// Add editing controls
@@ -170,25 +175,44 @@ void GfxEntryPanel::updateImagePalette() {
  *******************************************************************/
 int GfxEntryPanel::detectOffsetType() {
 	if (!entry)
-		return 0;
+		return GFXVIEW_DEFAULT;
 
 	// Check entry type
 	int type = entry->getType();
 
 	if (type == ETYPE_PATCH || type == ETYPE_FLAT ||
 		type == ETYPE_GFX || type == ETYPE_GFX2)
-		return 0;
+		return GFXVIEW_DEFAULT;
 
 	else if (type == ETYPE_SPRITE) {
-		return 2;
+		SImage* img = gfx_canvas->getImage();
+		int left = -img->offset().x;
+		int right = -img->offset().x + img->getWidth();
+		int top = -img->offset().y;
+		int bottom = -img->offset().y + img->getHeight();
+
+		if (top >= 0 && bottom <= 216 && left >= 0 && right <= 336)
+			return GFXVIEW_HUD;
+		else
+			return GFXVIEW_SPRITE;
 	}
 
 	else if (type == ETYPE_PNG || type == ETYPE_IMAGE) {
 		if (gfx_canvas->getImage()->offset().x == 0 &&
 			gfx_canvas->getImage()->offset().y == 0)
-			return 0;
-		else
-			return 2;
+			return GFXVIEW_DEFAULT;
+		else {
+			SImage* img = gfx_canvas->getImage();
+			int left = -img->offset().x;
+			int right = -img->offset().x + img->getWidth();
+			int top = -img->offset().y;
+			int bottom = -img->offset().y + img->getHeight();
+
+			if (top >= 0 && bottom <= 216 && left >= 0 && right <= 336)
+				return GFXVIEW_HUD;
+			else
+				return GFXVIEW_SPRITE;
+		}
 	}
 }
 
@@ -197,23 +221,29 @@ int GfxEntryPanel::detectOffsetType() {
  * in the offset type combo box
  *******************************************************************/
 void GfxEntryPanel::applyViewType() {
-	int sel = combo_offset_type->GetSelection();
-
-	switch (sel) {
-		case 0:
-			gfx_canvas->setViewType(detectOffsetType());
-			break;
-		case 1:
-			gfx_canvas->setViewType(0);
-			break;
-		case 2:
-			gfx_canvas->setViewType(2);
-			break;
-		case 3:
-			gfx_canvas->setViewType(3);
-			break;
+	// Tile checkbox overrides offset type selection
+	if (cb_tile->IsChecked())
+		gfx_canvas->setViewType(GFXVIEW_TILED);
+	else {
+		// Set gfx canvas view type depending on the offset combobox selection
+		int sel = combo_offset_type->GetSelection();
+		switch (sel) {
+			case 0:
+				gfx_canvas->setViewType(detectOffsetType());
+				break;
+			case 1:
+				gfx_canvas->setViewType(GFXVIEW_DEFAULT);
+				break;
+			case 2:
+				gfx_canvas->setViewType(GFXVIEW_SPRITE);
+				break;
+			case 3:
+				gfx_canvas->setViewType(GFXVIEW_HUD);
+				break;
+		}
 	}
 
+	// Refresh
 	gfx_canvas->Refresh();
 }
 
@@ -224,6 +254,7 @@ BEGIN_EVENT_TABLE(GfxEntryPanel, EntryPanel)
 	EVT_SPINCTRL(SPIN_YOFFSET, GfxEntryPanel::spinYOffsetChanged)
 	EVT_COMBOBOX(COMBO_OFFSET_TYPE, GfxEntryPanel::comboOffsetTypeChanged)
 	EVT_BUTTON(BTN_SAVE, GfxEntryPanel::btnSaveClicked)
+	EVT_CHECKBOX(CB_TILE, GfxEntryPanel::cbTileChecked)
 END_EVENT_TABLE()
 
 /* GfxEntryPanel::sliderZoomChanged
@@ -298,4 +329,9 @@ void GfxEntryPanel::btnSaveClicked(wxCommandEvent& e) {
 		if (saveEntry())
 			changed = false;
 	}
+}
+
+void GfxEntryPanel::cbTileChecked(wxCommandEvent& e) {
+	combo_offset_type->Enable(!cb_tile->IsChecked());
+	applyViewType();
 }

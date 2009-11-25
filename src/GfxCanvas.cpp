@@ -39,7 +39,7 @@
 GfxCanvas::GfxCanvas(wxWindow* parent, int id)
 : OGLCanvas(parent, id) {
 	image = new SImage();
-	view_type = 1;
+	view_type = GFXVIEW_DEFAULT;
 	scale = 1;
 	gl_id = 999999999;	// Arbitrarily large texture id number :P
 	update_texture = false;
@@ -77,14 +77,14 @@ void GfxCanvas::draw() {
 	drawChequeredBackground();
 
 	// Pan if offsets
-	if (view_type > 0) {
+	if (view_type == GFXVIEW_CENTERED || view_type == GFXVIEW_SPRITE || view_type == GFXVIEW_HUD) {
 		int mid_x = GetSize().x / 2;
 		int mid_y = GetSize().y / 2;
 		glTranslated(mid_x, mid_y, 0);
 	}
 
 	// Draw offset lines
-	if (view_type > 1)
+	if (view_type == GFXVIEW_SPRITE || view_type == GFXVIEW_HUD)
 		drawOffsetLines();
 
 	// Draw the image
@@ -98,17 +98,43 @@ void GfxCanvas::draw() {
  * Draws the offset center lines
  *******************************************************************/
 void GfxCanvas::drawOffsetLines() {
-	if (view_type == 2) {
+	if (view_type == GFXVIEW_SPRITE) {
 		COL_BLACK.set_gl();
 
 		glBegin(GL_LINES);
 		glVertex2d(-9999, 0);
 		glVertex2d(9999, 0);
-		glEnd();
-
-		glBegin(GL_LINES);
 		glVertex2d(0, -9999);
 		glVertex2d(0, 9999);
+		glEnd();
+	}
+	else if (view_type == GFXVIEW_HUD) {
+		COL_BLACK.set_gl();
+		double l = -160 * scale;
+		double r = 160 * scale;
+		double t = -100 * scale;
+		double b = 100 * scale;
+		double sb = 68 * scale;
+
+		glBegin(GL_LINES);
+		// Left
+		glVertex2d(l, t);
+		glVertex2d(l, b);
+		// Bottom
+		glVertex2d(l, b);
+		glVertex2d(r, b);
+		// Right
+		glVertex2d(r, b);
+		glVertex2d(r, t);
+		// Top
+		glVertex2d(r, t);
+		glVertex2d(l, t);
+		// Statusbar
+		glVertex2d(l, sb);
+		glVertex2d(r, sb);
+		// Middle
+		glVertex2d(0, t);
+		glVertex2d(0, b);
 		glEnd();
 	}
 }
@@ -164,10 +190,14 @@ void GfxCanvas::drawImage() {
 	glScaled(scale, scale, 1);
 	
 	// Pan
-	if (view_type == 1)
+	if (view_type == GFXVIEW_CENTERED)
 		glTranslated(-(image->getWidth() * 0.5), -(image->getHeight() * 0.5), 0);	// Pan to center image
-	else if (view_type > 1)
+	else if (view_type == GFXVIEW_SPRITE)
 		glTranslated(-image->offset().x, -image->offset().y, 0); // Pan by offsets
+	else if (view_type == GFXVIEW_HUD) {
+		glTranslated(-160, -100, 0);								// Pan to hud 'top left'
+		glTranslated(-image->offset().x, -image->offset().y, 0);	// Pan by offsets
+	}
 
 	// Enable textures
 	glEnable(GL_TEXTURE_2D);
@@ -181,13 +211,26 @@ void GfxCanvas::drawImage() {
 	// Bind texture
 	glBindTexture(GL_TEXTURE_2D, gl_id);
 
+	// Determine (texture)coordinates
+	double x = (double)image->getWidth();
+	double y = (double)image->getHeight();
+	double tex_x = 1;
+	double tex_y = 1;
+
+	if (view_type == GFXVIEW_TILED) {
+		tex_x = (double)GetSize().x / x;
+		tex_y = (double)GetSize().y / y;
+		x = (double)GetSize().x;
+		y = (double)GetSize().y;
+	}
+
 	// Draw the image
 	glColor3f(1.0f, 1.0f, 1.0f);
 	glBegin(GL_QUADS);
-	glTexCoord2f(0.0f, 0.0f);	glVertex2d(0, 0);
-	glTexCoord2f(0.0f, 1.0f);	glVertex2d(0, image->getHeight());
-	glTexCoord2f(1.0f, 1.0f);	glVertex2d(image->getWidth(), image->getHeight());
-	glTexCoord2f(1.0f, 0.0f);	glVertex2d(image->getWidth(), 0);
+	glTexCoord2d(0, 0);			glVertex2d(0, 0);
+	glTexCoord2d(0, tex_y);		glVertex2d(0, y);
+	glTexCoord2d(tex_x, tex_y);	glVertex2d(x, y);
+	glTexCoord2d(tex_x, 0);		glVertex2d(x, 0);
 	glEnd();
 
 	// Disable textures

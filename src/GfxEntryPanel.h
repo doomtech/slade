@@ -8,7 +8,6 @@
 #include <wx/spinctrl.h>
 
 /* TODO:
- * - HUD offsets view type (view & detection)
  * - Drag image to change offsets
  * - 'Save Changes' button
  * - 'Tile' checkbox
@@ -23,6 +22,7 @@ private:
 	wxSpinCtrl*		spin_xoffset;
 	wxSpinCtrl*		spin_yoffset;
 	wxButton*		btn_save;
+	wxCheckBox*		cb_tile;
 
 public:
 	enum {
@@ -32,6 +32,7 @@ public:
 		SPIN_XOFFSET,
 		SPIN_YOFFSET,
 		BTN_SAVE,
+		CB_TILE,
 	};
 
 	GfxEntryPanel(wxWindow* parent);
@@ -49,6 +50,7 @@ public:
 	void	spinYOffsetChanged(wxSpinEvent& e);
 	void	comboOffsetTypeChanged(wxCommandEvent& e);
 	void	btnSaveClicked(wxCommandEvent& e);
+	void	cbTileChecked(wxCommandEvent& e);
 
 	DECLARE_EVENT_TABLE()
 };

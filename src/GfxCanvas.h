@@ -9,6 +9,16 @@
  * - Tile graphic viewtype
  * - HUD offset viewtype
  */
+
+// Enumeration for view types
+enum {
+	GFXVIEW_DEFAULT,
+	GFXVIEW_CENTERED,
+	GFXVIEW_SPRITE,
+	GFXVIEW_HUD,
+	GFXVIEW_TILED,
+};
+
 class GfxCanvas : public OGLCanvas, Listener {
 private:
 	SImage*			image;
