@@ -35,6 +35,13 @@
 #include <wx/filename.h>
 
 
+/*******************************************************************
+ * EXTERNAL VARIABLES
+ *******************************************************************/
+extern uint32_t valid_flat_size[][2];
+extern uint32_t n_valid_flat_sizes;
+
+
 /* ArchiveEntry::ArchiveEntry
  * ArchiveEntry class constructor
  *******************************************************************/
@@ -369,6 +376,12 @@ void ArchiveEntry::detectType(bool data_check, bool force) {
 	// If the entry has a parent archive attempt to detect type based on it's position in the archive
 	if (parent)
 		parent->detectEntryType(this);
+
+	// Doom flat
+	for (int a = 0; a < n_valid_flat_sizes; a++) {
+		if (size == valid_flat_size[a][0] * valid_flat_size[a][1])
+			type = ETYPE_FLAT;
+	}
 
 	// Marker
 	if (size == 0 && type != ETYPE_MAP) {

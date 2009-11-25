@@ -45,6 +45,16 @@ struct grab_chunk_t {
 	int32_t yoff;
 };
 
+// Define valid flat sizes
+uint32_t valid_flat_size[][2] = {
+	{ 64, 64 },
+	{ 128, 128 },
+	{ 256, 256 },
+	{ 512, 512 },
+	{ 320, 200 },
+};
+int	n_valid_flat_sizes = 5;
+
 
 /* SImage::SImage
  * SImage class constructor
@@ -300,10 +310,13 @@ bool SImage::trim(int width, int height) {
 }
 
 bool SImage::validFlatSize() {
-	return (width == 64 && height == 64 ||
-			width == 64 && height == 128 ||
-			width == 128 && height == 128 ||
-			width == 320 && height == 200);
+	for (int a = 0; a < n_valid_flat_sizes; a++) {
+		if (width == valid_flat_size[a][0] &&
+			height == valid_flat_size[a][1])
+			return true;
+	}
+
+	return false;
 }
 
 /* SImage::loadImage
@@ -489,23 +502,21 @@ bool SImage::loadDoomFlat(uint8_t* gfx_data, int size) {
 		return false;
 
 	// Check/setup size
-	if (size == 64*64) {
-		width = 64;
-		height = 64;
+	bool valid_size = false;
+	for (int a = 0; a < n_valid_flat_sizes; a++) {
+		uint32_t w = valid_flat_size[a][0];
+		uint32_t h = valid_flat_size[a][1];
+
+		if (size == w * h) {
+			width = w;
+			height = h;
+			valid_size = true;
+			break;
+		}
 	}
-	else if (size == 64*128) {
-		width = 64;
-		height = 128;
-	}
-	else if (size == 128*128) {
-		width = 128;
-		height = 128;
-	}
-	else if (size == 320*200) {
-		width = 320;
-		height = 200;
-	}
-	else
+
+	// Check valid size
+	if (!valid_size)
 		return false;
 
 	// Setup variables
