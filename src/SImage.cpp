@@ -463,21 +463,28 @@ bool SImage::loadDoomGfx(uint8_t* gfx_data, int size) {
 		bits += col_offsets[c];
 
 		// Read posts
+		int top = -1;
 		while (1) {
 			// Get row offset
 			uint8_t row = *bits;
 
-			if (row == 255) // End of column?
+			if (row == 0xFF) // End of column?
 				break;
+
+			// Tall patches support
+			if (row <= top)
+				top += row;
+			else
+				top = row;
 
 			// Get no. of pixels
 			bits++;
-			BYTE n_pix = *bits;
+			uint8_t n_pix = *bits;
 
 			bits++; // Skip buffer
-			for (BYTE p = 0; p < n_pix; p++) {
+			for (uint8_t p = 0; p < n_pix; p++) {
 				bits++;
-				int pos = ((row + p)*width + c);
+				int pos = ((top + p)*width + c);
 				data[pos] = *bits;
 				mask[pos] = 255;
 			}
@@ -668,12 +675,28 @@ bool SImage::toDoomGfx(MemChunk& out, uint8_t alpha_threshold) {
 		bool ispost = false;
 
 		offset = c;
+		uint8_t row_off = 0;
 		for (int r = 0; r < height; r++) {
+			// If we're at row 254 (or a multiple), create a dummy post for tall doom gfx support
+			if (row_off == 254) {
+				// Finish current post if any
+				if (ispost) {
+					col.posts.push_back(post);
+					post.pixels.clear();
+					ispost = false;
+				}
+
+				// Create dummy post
+				post.row_off = 254;
+				col.posts.push_back(post);
+				row_off = 0;
+			}
+
 			// If the current pixel is not transparent, add it to the current post
 			if (mask[offset] > alpha_threshold) {
 				// If we're not currently building a post, begin one and set it's offset
 				if (!ispost) {
-					post.row_off = r;
+					post.row_off = row_off;
 					ispost = true;
 				}
 
@@ -690,6 +713,7 @@ bool SImage::toDoomGfx(MemChunk& out, uint8_t alpha_threshold) {
 
 			// Go to next row
 			offset += width;
+			row_off++;
 		}
 
 		// If the column ended with a post, add it
