@@ -5,10 +5,14 @@
 #include "OGLCanvas.h"
 #include "SImage.h"
 
+/* TODO:
+ * - Tile graphic viewtype
+ * - HUD offset viewtype
+ */
 class GfxCanvas : public OGLCanvas, Listener {
 private:
 	SImage*			image;
-	int				view_type;	// 0=default, 1=centered, 2=sprite offsets, 3=hud offsets
+	int				view_type;	// 0=default, 1=centered, 2=sprite offsets, 3=hud offsets, 4=tiled
 	double			scale;
 	GLuint			gl_id;
 	bool			update_texture;

@@ -13,7 +13,6 @@
  * - 'Save Changes' button
  * - 'Tile' checkbox
  */
-
 class GfxEntryPanel : public EntryPanel {
 private:
 	GfxCanvas*		gfx_canvas;
@@ -23,6 +22,7 @@ private:
 	wxComboBox*		combo_offset_type;
 	wxSpinCtrl*		spin_xoffset;
 	wxSpinCtrl*		spin_yoffset;
+	wxButton*		btn_save;
 
 public:
 	enum {
@@ -31,6 +31,7 @@ public:
 		COMBO_OFFSET_TYPE,
 		SPIN_XOFFSET,
 		SPIN_YOFFSET,
+		BTN_SAVE,
 	};
 
 	GfxEntryPanel(wxWindow* parent);
@@ -47,6 +48,7 @@ public:
 	void	spinXOffsetChanged(wxSpinEvent& e);
 	void	spinYOffsetChanged(wxSpinEvent& e);
 	void	comboOffsetTypeChanged(wxCommandEvent& e);
+	void	btnSaveClicked(wxCommandEvent& e);
 
 	DECLARE_EVENT_TABLE()
 };

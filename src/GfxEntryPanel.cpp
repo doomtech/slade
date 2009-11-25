@@ -61,7 +61,7 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 	hbox->Add(slider_zoom, 1, wxEXPAND, 0);
 	hbox->Add(label_current_zoom, 0, wxALIGN_CENTER_VERTICAL, 0);
 
-	hbox->AddStretchSpacer(1);
+	hbox->AddStretchSpacer();
 
 	// Palette chooser
 	combo_palette = new PaletteChooser(this, COMBO_PALETTE);
@@ -92,6 +92,12 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 	hbox->Add(new wxStaticText(this, -1, _T("Offsets:")), 0, wxALIGN_CENTER_VERTICAL, 0);
 	hbox->Add(spin_xoffset, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
 	hbox->Add(spin_yoffset, 0, wxEXPAND, 0);
+
+	hbox->AddStretchSpacer();
+
+	// 'Save Changes' button
+	btn_save = new wxButton(this, BTN_SAVE, _T("Save Changes"));
+	hbox->Add(btn_save, 0, wxEXPAND, 0);
 
 	// Apply layout
 	Layout();
@@ -217,6 +223,7 @@ BEGIN_EVENT_TABLE(GfxEntryPanel, EntryPanel)
 	EVT_SPINCTRL(SPIN_XOFFSET, GfxEntryPanel::spinXOffsetChanged)
 	EVT_SPINCTRL(SPIN_YOFFSET, GfxEntryPanel::spinYOffsetChanged)
 	EVT_COMBOBOX(COMBO_OFFSET_TYPE, GfxEntryPanel::comboOffsetTypeChanged)
+	EVT_BUTTON(BTN_SAVE, GfxEntryPanel::btnSaveClicked)
 END_EVENT_TABLE()
 
 /* GfxEntryPanel::sliderZoomChanged
@@ -281,4 +288,14 @@ void GfxEntryPanel::spinYOffsetChanged(wxSpinEvent& e) {
  *******************************************************************/
 void GfxEntryPanel::comboOffsetTypeChanged(wxCommandEvent& e) {
 	applyViewType();
+}
+
+/* GfxEntryPanel::btnSaveClicked
+ * Called when the 'Save Changes' button is clicked
+ *******************************************************************/
+void GfxEntryPanel::btnSaveClicked(wxCommandEvent& e) {
+	if (changed) {
+		if (saveEntry())
+			changed = false;
+	}
 }

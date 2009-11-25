@@ -7,6 +7,9 @@
 class Archive;
 class EntryListPanel;
 
+/* TODO:
+ * - Implement my own automatic resize (current way is too slow)
+ */
 class EntryList : public wxListCtrl {
 private:
 	EntryListPanel*		parent;
