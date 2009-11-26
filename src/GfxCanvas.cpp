@@ -33,6 +33,12 @@
 #include "GfxCanvas.h"
 
 
+/*******************************************************************
+ * VARIABLES
+ *******************************************************************/
+DEFINE_EVENT_TYPE(wxEVT_GFXCANVAS_OFFSET_CHANGED)
+
+
 /* GfxCanvas::GfxCanvas
  * GfxCanvas class constructor
  *******************************************************************/
@@ -43,6 +49,10 @@ GfxCanvas::GfxCanvas(wxWindow* parent, int id)
 	scale = 1;
 	gl_id = 999999999;	// Arbitrarily large texture id number :P
 	update_texture = false;
+	image_hilight = false;
+	drag_pos.set(0, 0);
+	drag_origin.set(-1, -1);
+	allow_drag = false;
 
 	// Listen to the image for changes
 	listenTo(image);
@@ -224,14 +234,55 @@ void GfxCanvas::drawImage() {
 		y = (double)GetSize().y;
 	}
 
-	// Draw the image
-	glColor3f(1.0f, 1.0f, 1.0f);
-	glBegin(GL_QUADS);
-	glTexCoord2d(0, 0);			glVertex2d(0, 0);
-	glTexCoord2d(0, tex_y);		glVertex2d(0, y);
-	glTexCoord2d(tex_x, tex_y);	glVertex2d(x, y);
-	glTexCoord2d(tex_x, 0);		glVertex2d(x, 0);
-	glEnd();
+	// If not dragging
+	if (drag_origin.x < 0) {
+		// Draw the image
+		rgba_t(255, 255, 255, 255, 0).set_gl();
+		glBegin(GL_QUADS);
+		glTexCoord2d(0, 0);			glVertex2d(0, 0);
+		glTexCoord2d(0, tex_y);		glVertex2d(0, y);
+		glTexCoord2d(tex_x, tex_y);	glVertex2d(x, y);
+		glTexCoord2d(tex_x, 0);		glVertex2d(x, 0);
+		glEnd();
+
+		// Draw hilight
+		if (image_hilight) {
+			rgba_t(255, 255, 255, 80, 1).set_gl();
+			glBegin(GL_QUADS);
+			glTexCoord2d(0, 0);			glVertex2d(0, 0);
+			glTexCoord2d(0, tex_y);		glVertex2d(0, y);
+			glTexCoord2d(tex_x, tex_y);	glVertex2d(x, y);
+			glTexCoord2d(tex_x, 0);		glVertex2d(x, 0);
+			glEnd();
+
+			// Reset colour
+			rgba_t(255, 255, 255, 255, 0).set_gl();
+		}
+	}
+	else {
+		// Dragging
+
+		// Draw the original
+		rgba_t(0, 0, 0, 180, 0).set_gl();
+		glBegin(GL_QUADS);
+		glTexCoord2d(0, 0);			glVertex2d(0, 0);
+		glTexCoord2d(0, tex_y);		glVertex2d(0, y);
+		glTexCoord2d(tex_x, tex_y);	glVertex2d(x, y);
+		glTexCoord2d(tex_x, 0);		glVertex2d(x, 0);
+		glEnd();
+
+		// Draw the dragged image
+		int off_x = (drag_pos.x - drag_origin.x) / scale;
+		int off_y = (drag_pos.y - drag_origin.y) / scale;
+		glTranslated(off_x, off_y, 0);
+		rgba_t(255, 255, 255, 255, 0).set_gl();
+		glBegin(GL_QUADS);
+		glTexCoord2d(0, 0);			glVertex2d(0, 0);
+		glTexCoord2d(0, tex_y);		glVertex2d(0, y);
+		glTexCoord2d(tex_x, tex_y);	glVertex2d(x, y);
+		glTexCoord2d(tex_x, 0);		glVertex2d(x, 0);
+		glEnd();
+	}
 
 	// Disable textures
 	glDisable(GL_TEXTURE_2D);
@@ -292,6 +343,61 @@ void GfxCanvas::zoomToFit(bool mag, float padding) {
 		scale = 1;
 }
 
+/* GfxCanvas::onImage
+ * Returns true if the given coordinates are 'on' top of the image
+ *******************************************************************/
+bool GfxCanvas::onImage(int x, int y) {
+	if (view_type == GFXVIEW_DEFAULT || view_type == GFXVIEW_TILED)
+		return false;
+
+	int left = GetSize().x * 0.5;
+	int top = GetSize().y * 0.5;
+
+	if (view_type == GFXVIEW_CENTERED) {
+		left -= (double)image->getWidth() * 0.5 * scale;
+		top -= (double)image->getHeight() * 0.5 * scale;
+	}
+	else if (view_type == GFXVIEW_SPRITE) {
+		left -= image->offset().x * scale;
+		top -= image->offset().y * scale;
+	}
+	else if (view_type == GFXVIEW_HUD) {
+		left -= 160 * scale;
+		top -= 100 * scale;
+		left -= image->offset().x * scale;
+		top -= image->offset().y * scale;
+	}
+
+	int right = left + image->getWidth() * scale;
+	int bottom = top + image->getHeight() * scale;
+
+	return (x >= left && x <= right && y >= top && y <= bottom);
+}
+
+/* GfxCanvas::endOffsetDrag
+ * Finishes an offset drag
+ *******************************************************************/
+void GfxCanvas::endOffsetDrag() {
+	// Get offset
+	int x = (drag_pos.x - drag_origin.x) / scale;
+	int y = (drag_pos.y - drag_origin.y) / scale;
+
+	// If there was a change
+	if (x != 0 || y != 0) {
+		// Set image offsets
+		image->setXOffset(image->offset().x - x);
+		image->setYOffset(image->offset().y - y);
+		
+		// Generate event
+		wxNotifyEvent e(wxEVT_GFXCANVAS_OFFSET_CHANGED, GetId());
+		e.SetEventObject(this);
+		GetEventHandler()->ProcessEvent(e);
+	}
+
+	// Stop drag
+	drag_origin.set(-1, -1);
+}
+
 /* GfxCanvas::onAnnouncement
  * Called when an announcement is recieved from the image that this
  * GfxCanvas is displaying
@@ -299,4 +405,67 @@ void GfxCanvas::zoomToFit(bool mag, float padding) {
 void GfxCanvas::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
 	if (announcer == image && event_name.Cmp(_T("image_changed")) == 0)
 		update_texture = true;
+}
+
+
+
+BEGIN_EVENT_TABLE(GfxCanvas, OGLCanvas)
+	EVT_LEFT_DOWN(GfxCanvas::mouseLeftDown)
+	EVT_LEFT_UP(GfxCanvas::mouseLeftUp)
+	EVT_MOTION(GfxCanvas::mouseMove)
+END_EVENT_TABLE()
+
+/* GfxCanvas::mouseLeftDown
+ * Called when the left button is pressed within the canvas
+ *******************************************************************/
+void GfxCanvas::mouseLeftDown(wxMouseEvent& e) {
+	int x = e.GetPosition().x;
+	int y = e.GetPosition().y;
+	bool on_image = onImage(x, y);
+
+	// Left mouse down
+	if (e.LeftDown()) {
+		// Begin drag if mouse is over image and dragging allowed
+		if (on_image && allow_drag) {
+			drag_origin.set(x, y);
+			drag_pos.set(x, y);
+			Refresh();
+		}
+	}
+
+	e.Skip();
+}
+
+/* GfxCanvas::mouseLeftUp
+ * Called when the left button is released within the canvas
+ *******************************************************************/
+void GfxCanvas::mouseLeftUp(wxMouseEvent& e) {
+	// Stop dragging
+	if (drag_origin.x >= 0) {
+		endOffsetDrag();
+		Refresh();
+	}
+}
+
+/* GfxCanvas::mouseMove
+ * Called when the mouse pointer is moved within the canvas
+ *******************************************************************/
+void GfxCanvas::mouseMove(wxMouseEvent& e) {
+	bool refresh = false;
+
+	// Check if the mouse is over the image
+	bool on_image = onImage(e.GetPosition().x, e.GetPosition().y);
+	if (on_image != image_hilight) {
+		image_hilight = on_image;
+		refresh = true;
+	}
+
+	// Drag
+	if (e.LeftIsDown()) {
+		drag_pos.set(e.GetPosition().x, e.GetPosition().y);
+		refresh = true;
+	}
+
+	if (refresh)
+		Refresh();
 }

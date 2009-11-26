@@ -5,11 +5,6 @@
 #include "OGLCanvas.h"
 #include "SImage.h"
 
-/* TODO:
- * - Tile graphic viewtype
- * - HUD offset viewtype
- */
-
 // Enumeration for view types
 enum {
 	GFXVIEW_DEFAULT,
@@ -26,6 +21,10 @@ private:
 	double			scale;
 	GLuint			gl_id;
 	bool			update_texture;
+	bool			image_hilight;
+	bool			allow_drag;
+	point2_t		drag_pos;
+	point2_t		drag_origin;
 
 public:
 	GfxCanvas(wxWindow* parent, int id);
@@ -35,16 +34,28 @@ public:
 
 	void	setViewType(int type) { view_type = type; }
 	void	setScale(double scale) { this->scale = scale; }
+	bool	allowDrag() { return allow_drag; }
+	bool	allowDrag(bool allow) { allow_drag = allow; }
 
 	void	draw();
 	void	drawChequeredBackground();
 	void	drawImage();
 	void	drawOffsetLines();
 	void	updateImageTexture();
+	void	endOffsetDrag();
 
 	void	zoomToFit(bool mag = true, float padding = 0.0f);
+	bool	onImage(int x, int y);
 
 	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
+
+	void	mouseLeftDown(wxMouseEvent& e);
+	void	mouseLeftUp(wxMouseEvent& e);
+	void	mouseMove(wxMouseEvent& e);
+
+	DECLARE_EVENT_TABLE()
 };
+
+DECLARE_EVENT_TYPE(wxEVT_GFXCANVAS_OFFSET_CHANGED, -1)
 
 #endif //__GFXCANVAS_H__

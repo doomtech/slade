@@ -7,9 +7,6 @@
 #include "PaletteChooser.h"
 #include <wx/spinctrl.h>
 
-/* TODO:
- * - Drag image to change offsets
- */
 class GfxEntryPanel : public EntryPanel {
 private:
 	GfxCanvas*		gfx_canvas;
@@ -31,6 +28,7 @@ public:
 		SPIN_YOFFSET,
 		BTN_SAVE,
 		CB_TILE,
+		GFX_CANVAS,
 	};
 
 	GfxEntryPanel(wxWindow* parent);
@@ -49,6 +47,7 @@ public:
 	void	comboOffsetTypeChanged(wxCommandEvent& e);
 	void	btnSaveClicked(wxCommandEvent& e);
 	void	cbTileChecked(wxCommandEvent& e);
+	void	gfxOffsetChanged(wxNotifyEvent& e);
 
 	DECLARE_EVENT_TABLE()
 };

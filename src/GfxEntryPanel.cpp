@@ -82,9 +82,10 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 
 
 	// Add gfx canvas
-	gfx_canvas = new GfxCanvas(this, -1);
+	gfx_canvas = new GfxCanvas(this, GFX_CANVAS);
 	m_vbox->Add(gfx_canvas, 1, wxEXPAND|wxALL, 4);
 	gfx_canvas->setViewType(GFXVIEW_DEFAULT);
+	gfx_canvas->allowDrag(true);
 
 
 	// Add editing controls
@@ -255,6 +256,7 @@ BEGIN_EVENT_TABLE(GfxEntryPanel, EntryPanel)
 	EVT_COMBOBOX(COMBO_OFFSET_TYPE, GfxEntryPanel::comboOffsetTypeChanged)
 	EVT_BUTTON(BTN_SAVE, GfxEntryPanel::btnSaveClicked)
 	EVT_CHECKBOX(CB_TILE, GfxEntryPanel::cbTileChecked)
+	EVT_NOTIFY(wxEVT_GFXCANVAS_OFFSET_CHANGED, GFX_CANVAS, GfxEntryPanel::gfxOffsetChanged)
 END_EVENT_TABLE()
 
 /* GfxEntryPanel::sliderZoomChanged
@@ -331,7 +333,22 @@ void GfxEntryPanel::btnSaveClicked(wxCommandEvent& e) {
 	}
 }
 
+/* GfxEntryPanel::cbTileChecked
+ * Called when the 'Tile' checkbox is checked/unchecked
+ *******************************************************************/
 void GfxEntryPanel::cbTileChecked(wxCommandEvent& e) {
 	combo_offset_type->Enable(!cb_tile->IsChecked());
 	applyViewType();
+}
+
+/* GfxEntryPanel::gfxOffsetChanged
+ * Called when the gfx canvas image offsets are changed
+ *******************************************************************/
+void GfxEntryPanel::gfxOffsetChanged(wxNotifyEvent& e) {
+	// Update spin controls
+	spin_xoffset->SetValue(gfx_canvas->getImage()->offset().x);
+	spin_yoffset->SetValue(gfx_canvas->getImage()->offset().y);
+
+	// Set changed
+	changed = true;
 }

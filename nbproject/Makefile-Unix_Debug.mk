@@ -54,8 +54,8 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/EntryListPanel.o \
 	${OBJECTDIR}/src/EntryPanel.o \
 	${OBJECTDIR}/src/CVar.o \
-	${OBJECTDIR}/src/MainWindow.o \
 	${OBJECTDIR}/src/ZipEntryListPanel.o \
+	${OBJECTDIR}/src/MainWindow.o \
 	${OBJECTDIR}/src/TextEditor.o \
 	${OBJECTDIR}/src/EntryOperations.o \
 	${OBJECTDIR}/src/Palette.o \
@@ -218,15 +218,15 @@ ${OBJECTDIR}/src/CVar.o: nbproject/Makefile-${CND_CONF}.mk src/CVar.cpp
 	${RM} $@.d
 	$(COMPILE.cc) -g -D__WXDEBUG__ -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/CVar.o src/CVar.cpp
 
-${OBJECTDIR}/src/MainWindow.o: nbproject/Makefile-${CND_CONF}.mk src/MainWindow.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} $@.d
-	$(COMPILE.cc) -g -D__WXDEBUG__ -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/MainWindow.o src/MainWindow.cpp
-
 ${OBJECTDIR}/src/ZipEntryListPanel.o: nbproject/Makefile-${CND_CONF}.mk src/ZipEntryListPanel.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
 	$(COMPILE.cc) -g -D__WXDEBUG__ -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/ZipEntryListPanel.o src/ZipEntryListPanel.cpp
+
+${OBJECTDIR}/src/MainWindow.o: nbproject/Makefile-${CND_CONF}.mk src/MainWindow.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -g -D__WXDEBUG__ -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/MainWindow.o src/MainWindow.cpp
 
 ${OBJECTDIR}/src/TextEditor.o: nbproject/Makefile-${CND_CONF}.mk src/TextEditor.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
