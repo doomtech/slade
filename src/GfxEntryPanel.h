@@ -9,8 +9,6 @@
 
 /* TODO:
  * - Drag image to change offsets
- * - 'Save Changes' button
- * - 'Tile' checkbox
  */
 class GfxEntryPanel : public EntryPanel {
 private:

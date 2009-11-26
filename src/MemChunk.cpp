@@ -48,6 +48,9 @@ MemChunk::MemChunk(uint32_t size) {
 		data = NULL;
 }
 
+/* MemChunk::MemChunk
+ * MemChunk class constructor taking initial data
+ *******************************************************************/
 MemChunk::MemChunk(uint8_t* data, uint32_t size) {
 	// Init variables
 	this->cur_ptr = 0;
@@ -103,26 +106,20 @@ bool MemChunk::reSize(uint32_t new_size, bool preserve_data) {
 		return false;
 	}
 
-	// Allocate new chunk
-	uint8_t* new_data = new uint8_t[new_size];
-
-	// Copy existing data to new chunk if needed & current data exists
-	if (preserve_data && hasData()) {
-		// Determine size of data to copy
-		uint32_t copy_size = new_size;
-		if (copy_size > size)
-			copy_size = size;
-
-		// Copy the data
-		memcpy(new_data, data, copy_size);
+	// Resize data
+	if (preserve_data)
+		data = (uint8_t*)realloc(data, new_size);
+	else {
+		clear();
+		data = new uint8_t[new_size];
 	}
 
-	// Clear current chunk if it exists
-	clear();
-
-	// Set data & size to new data & size
-	data = new_data;
+	// Update variables
 	size = new_size;
+
+	// Check position
+	if (cur_ptr > size)
+		cur_ptr = size;
 
 	return true;
 }

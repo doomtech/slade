@@ -483,8 +483,15 @@ bool SImage::loadDoomGfx(uint8_t* gfx_data, int size) {
 
 			bits++; // Skip buffer
 			for (uint8_t p = 0; p < n_pix; p++) {
+				// Get pixel position
 				bits++;
 				int pos = ((top + p)*width + c);
+
+				// Stop if we're outside the image
+				if (pos > width*height)
+					break;
+
+				// Write pixel data
 				data[pos] = *bits;
 				mask[pos] = 255;
 			}
@@ -672,12 +679,14 @@ bool SImage::toDoomGfx(MemChunk& out, uint8_t alpha_threshold) {
 	for (int c = 0; c < width; c++) {
 		column_t col;
 		post_t post;
+		post.row_off = 0;
 		bool ispost = false;
+		bool first_254 = true;	// First 254 pixels should use absolute offsets
 
 		offset = c;
 		uint8_t row_off = 0;
 		for (int r = 0; r < height; r++) {
-			// If we're at row 254 (or a multiple), create a dummy post for tall doom gfx support
+			// If we're at offset 254, create a dummy post for tall doom gfx support
 			if (row_off == 254) {
 				// Finish current post if any
 				if (ispost) {
@@ -686,17 +695,30 @@ bool SImage::toDoomGfx(MemChunk& out, uint8_t alpha_threshold) {
 					ispost = false;
 				}
 
+				// Begin relative offsets
+				first_254 = false;
+
 				// Create dummy post
 				post.row_off = 254;
 				col.posts.push_back(post);
+
+				// Clear post
 				row_off = 0;
+				ispost = false;
 			}
 
 			// If the current pixel is not transparent, add it to the current post
 			if (mask[offset] > alpha_threshold) {
 				// If we're not currently building a post, begin one and set it's offset
 				if (!ispost) {
+					// Set offset
 					post.row_off = row_off;
+					
+					// Reset offset if we're in relative offsets mode
+					if (!first_254)
+						row_off = 0;
+
+					// Start post
 					ispost = true;
 				}
 
@@ -717,7 +739,7 @@ bool SImage::toDoomGfx(MemChunk& out, uint8_t alpha_threshold) {
 		}
 
 		// If the column ended with a post, add it
-		if (post.pixels.size() > 0)
+		if (ispost)
 			col.posts.push_back(post);
 
 		// Add the column data
@@ -748,11 +770,20 @@ bool SImage::toDoomGfx(MemChunk& out, uint8_t alpha_threshold) {
 	uint32_t *col_offsets = new uint32_t[columns.size()];
 	out.write(col_offsets, columns.size() * 4);
 
-	// Write posts
+	// Write columns
 	for (int c = 0; c < columns.size(); c++) {
 		// Record column offset
 		col_offsets[c] = out.currentPos();
 
+		// Determine column size (in bytes)
+		uint32_t col_size = 0;
+		for (int p = 0; p < columns[c].posts.size(); p++)
+			col_size += columns[c].posts[p].pixels.size() + 4;
+
+		// Allocate memory to write the column data
+		out.reSize(out.getSize() + col_size, true);
+
+		// Write column posts
 		for (int p = 0; p < columns[c].posts.size(); p++) {
 			// Write row offset
 			out.write(&columns[c].posts[p].row_off, 1);

@@ -179,6 +179,12 @@ bool EntryOperations::modifyGfxOffsets(ArchiveEntry* entry, int auto_type, point
 		MemChunk npng;
 		uint32_t rest_start = 33;
 
+		// Init new png data size
+		if (grab_start == 0)
+			npng.reSize(entry->getSize() + 20);
+		else
+			npng.reSize(entry->getSize());
+
 		// Write PNG header and IHDR chunk
 		npng.write(data, 33);
 
