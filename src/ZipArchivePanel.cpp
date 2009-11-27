@@ -131,6 +131,9 @@ void ZipArchivePanel::init() {
 	m_hbox->Add(cur_area, 1, wxEXPAND | wxALL, 4);
 	cur_area->Show(true);
 
+	// Setup events
+	entry_list->Bind(wxEVT_KEY_DOWN, &ArchivePanel::onEntryListKeyDown, this);
+
 	Layout();
 	entry_list->populateEntryList();
 }

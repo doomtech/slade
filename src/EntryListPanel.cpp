@@ -569,6 +569,11 @@ bool EntryListPanel::moveDown() {
 	return true;
 }
 
+void EntryListPanel::selectAll() {
+	for (int a = 0; a < entry_list->GetItemCount(); a++)
+		entry_list->SetItemState(a, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+}
+
 BEGIN_EVENT_TABLE(EntryListPanel, wxPanel)
 	EVT_LIST_ITEM_FOCUSED(ENTRY_LIST, EntryListPanel::onEntryListChange)
 	EVT_LIST_ITEM_ACTIVATED(ENTRY_LIST, EntryListPanel::onEntryListActivated)
@@ -576,6 +581,7 @@ BEGIN_EVENT_TABLE(EntryListPanel, wxPanel)
 	EVT_LIST_COL_END_DRAG(ENTRY_LIST, EntryListPanel::onEntryListColResize)
 	EVT_LIST_COL_RIGHT_CLICK(ENTRY_LIST, EntryListPanel::onEntryListColRightClick)
 	EVT_MENU_RANGE(MENU_COLUMNS_SIZE, MENU_COLUMNS_TYPE, EntryListPanel::onMenu)
+	EVT_KEY_DOWN(EntryListPanel::onKeyDown)
 END_EVENT_TABLE()
 
 /* EntryListPanel::onEntryListChange
@@ -640,5 +646,10 @@ void EntryListPanel::onMenu(wxCommandEvent& event) {
 			break;
 	}
 
+	event.Skip();
+}
+
+void EntryListPanel::onKeyDown(wxKeyEvent& event) {
+	event.SetId(this->GetId());
 	event.Skip();
 }

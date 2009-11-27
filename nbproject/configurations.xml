@@ -12,6 +12,8 @@
     <logicalFolder name="f4" displayName="General" projectFiles="true">
       <itemPath>src/CVar.cpp</itemPath>
       <itemPath>src/CVar.h</itemPath>
+      <itemPath>src/Clipboard.cpp</itemPath>
+      <itemPath>src/Clipboard.h</itemPath>
       <itemPath>src/Console.cpp</itemPath>
       <itemPath>src/Console.h</itemPath>
       <itemPath>src/ListenerAnnouncer.cpp</itemPath>

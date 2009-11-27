@@ -43,13 +43,23 @@
 string main_window_layout = _T("");
 
 
+wxMenuItem* createMenuItem(wxMenu* menu, int id, string label, string help, string icon = _T("")) {
+	wxMenuItem* item = new wxMenuItem(menu, id, label, help);
+
+	#ifdef __WXGTK__
+	item->SetBitmap(getIcon(icon));
+	#endif
+
+	return item;
+}
+
 /* MainWindow::MainWindow
  * MainWindow class constructor
  *******************************************************************/
 MainWindow::MainWindow()
 : wxFrame((wxFrame *) NULL, -1, _T("SLADE"), wxPoint(0, 0), wxSize(800, 600)) {
-	setupLayout();
 	Maximize();
+	setupLayout();
 }
 
 /* MainWindow::~MainWindow
@@ -78,39 +88,39 @@ void MainWindow::setupLayout() {
 
 	// File->New Submenu
 	wxMenu* fileNewMenu = new wxMenu(_T(""));
-	fileNewMenu->Append(MENU_FILE_NEW,		_T("&Wad Archive\tCtrl+Shift+W"),	_T("Create a new Doom Wad Archive"));
-	fileNewMenu->Append(MENU_FILE_NEWZIP,	_T("&Zip Archive\tCtrl+Shift+Z"),	_T("Create a new Zip Archive (zip/pk3/jdf)"));
+	fileNewMenu->Append(createMenuItem(fileNewMenu, MENU_FILE_NEW,		_T("&Wad Archive\tCtrl+Shift+W"),	_T("Create a new Doom Wad Archive"),			_T("t_newarchive")));
+	fileNewMenu->Append(createMenuItem(fileNewMenu, MENU_FILE_NEWZIP,	_T("&Zip Archive\tCtrl+Shift+Z"),	_T("Create a new Zip Archive (zip/pk3/jdf)"),	_T("t_newzip")));
 
 	// File menu
 	wxMenu* fileMenu = new wxMenu(_(""));
-	fileMenu->AppendSubMenu(fileNewMenu,	_T("&New"),					_T("Create a new Archive"));
+	fileMenu->AppendSubMenu(fileNewMenu,	_T("&New"),				_T("Create a new Archive"));
 	fileMenu->AppendSeparator();
-    fileMenu->Append(MENU_FILE_OPEN,		_T("&Open\tCtrl+O"),		_T("Open an existing Archive"));
+    fileMenu->Append(createMenuItem(fileMenu, MENU_FILE_OPEN,		_T("&Open\tCtrl+O"),		_T("Open an existing Archive"),							_T("t_open")));
 	fileMenu->AppendSeparator();
-	fileMenu->Append(MENU_FILE_SAVE,		_T("&Save\tCtrl+S"),		_T("Save the currently open Archive"));
-	fileMenu->Append(MENU_FILE_SAVEAS,		_T("Save &As..."),			_T("Save the currently open Archive to a new file"));
-	fileMenu->Append(MENU_FILE_SAVEALL,		_T("Save All"),				_T("Save all open Archives"));
+	fileMenu->Append(createMenuItem(fileMenu, MENU_FILE_SAVE,		_T("&Save\tCtrl+S"),		_T("Save the currently open Archive"),					_T("t_save")));
+	fileMenu->Append(createMenuItem(fileMenu, MENU_FILE_SAVEAS,		_T("Save &As..."),			_T("Save the currently open Archive to a new file"),	_T("t_saveas")));
+	fileMenu->Append(createMenuItem(fileMenu, MENU_FILE_SAVEALL,	_T("Save All"),				_T("Save all open Archives"),							_T("t_saveall")));
 	fileMenu->AppendSeparator();
-	fileMenu->Append(MENU_FILE_CLOSE,		_T("&Close"),				_T("Close the currently open Archive"));
-	fileMenu->Append(MENU_FILE_CLOSEALL,	_T("Close All"),			_T("Close all open Archives"));
+	fileMenu->Append(createMenuItem(fileMenu, MENU_FILE_CLOSE,		_T("&Close"),				_T("Close the currently open Archive"),					_T("t_close")));
+	fileMenu->Append(createMenuItem(fileMenu, MENU_FILE_CLOSEALL,	_T("Close All"),			_T("Close all open Archives"),							_T("t_closeall")));
 	fileMenu->AppendSeparator();
-    fileMenu->Append(MENU_FILE_QUIT,		_T("&Quit"),				_T("Quit SLADE"));
+    fileMenu->Append(createMenuItem(fileMenu, MENU_FILE_QUIT,		_T("&Quit"),				_T("Quit SLADE")));
 	menu->Append(fileMenu, _T("&File"));
 
 	// Entry menu
 	wxMenu* entryMenu = new wxMenu(_T(""));
-	entryMenu->Append(MENU_ENTRY_NEW,				_T("New\tCtrl+N"),				_T("Create a new empty entry"));
-	entryMenu->Append(MENU_ENTRY_NEWFROMFILE,		_T("New from File"),			_T("Create a new entry with data from a file"));
+	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_NEW,			_T("New"),				_T("Create a new empty entry"),								_T("t_newentry")));
+	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_NEWFROMFILE,	_T("New from File"),	_T("Create a new entry with data from a file")));
 	entryMenu->AppendSeparator();
-	entryMenu->Append(MENU_ENTRY_RENAME,			_T("Rename\tCtrl+R"),			_T("Rename the selected entries"));
-	entryMenu->Append(MENU_ENTRY_DELETE,			_T("Delete\tCtrl+D"),			_T("Delete the selected entries"));
+	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_RENAME,		_T("Rename"),			_T("Rename the selected entries"),							_T("t_rename")));
+	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_DELETE,		_T("Delete"),			_T("Delete the selected entries"),							_T("t_delete")));
 	entryMenu->AppendSeparator();
-	entryMenu->Append(MENU_ENTRY_IMPORT,			_T("Import\tCtrl+I"),			_T("Import a file to the selected entry"));
-	entryMenu->Append(MENU_ENTRY_EXPORT,			_T("Export\tCtrl+E"),			_T("Export the selected entries to files"));
-	entryMenu->Append(MENU_ENTRY_EXPORTWAD,			_T("Export as Wad\tCtrl+W"),	_T("Export the selected entries to a new Wad Archive"));
+	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_IMPORT,		_T("Import"),			_T("Import a file to the selected entry"),					_T("t_import")));
+	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_EXPORT,		_T("Export"),			_T("Export the selected entries to files"),					_T("t_export")));
+	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_EXPORTWAD,	_T("Export as Wad"),	_T("Export the selected entries to a new Wad Archive")));
 	entryMenu->AppendSeparator();
-	entryMenu->Append(MENU_ENTRY_MOVEUP,			_T("Move Up\tCtrl+U"),			_T("Move the selected entries up"));
-	entryMenu->Append(MENU_ENTRY_MOVEDOWN,			_T("Move Down\tCtrl+D"),		_T("Move the selected entries down"));
+	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_MOVEUP,		_T("Move Up"),			_T("Move the selected entries up"),							_T("t_up")));
+	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_MOVEDOWN,	_T("Move Down"),		_T("Move the selected entries down"),						_T("t_down")));
 	menu->Append(entryMenu, _T("&Entry"));
 
 	// View menu
@@ -133,7 +143,8 @@ void MainWindow::setupLayout() {
 
 	// Create File toolbar
 	wxAuiToolBar* tb_file = new wxAuiToolBar(this, -1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
-	tb_file->AddTool(MENU_FILE_NEW, _T("New"), getIcon(_T("t_newarchive")), _T("New Archive"));
+	tb_file->AddTool(MENU_FILE_NEW, _T("New Wad"), getIcon(_T("t_newarchive")), _T("New Wad Archive"));
+	tb_file->AddTool(MENU_FILE_NEWZIP, _T("New Zip"), getIcon(_T("t_newzip")), _T("New Zip Archive"));
 	tb_file->AddTool(MENU_FILE_OPEN, _T("Open"), getIcon(_T("t_open")), _T("Open"));
 	tb_file->AddTool(MENU_FILE_SAVE, _T("Save"), getIcon(_T("t_save")), _T("Save"));
 	tb_file->AddTool(MENU_FILE_SAVEAS, _T("Save As"), getIcon(_T("t_saveas")), _T("Save As"));
@@ -169,11 +180,12 @@ void MainWindow::setupLayout() {
 
 
 	// -- Editor Area --
-	notebook_tabs = new wxAuiNotebook(this, -1, wxDefaultPosition, wxDefaultSize);
+	notebook_tabs = new wxAuiNotebook(this, -1, wxDefaultPosition, wxDefaultSize, wxAUI_NB_DEFAULT_STYLE|wxNO_BORDER);
 
 	// Setup panel info & add panel
 	p_inf.CenterPane();
 	p_inf.Name(_T("editor_area"));
+	p_inf.PaneBorder(false);
 	m_mgr->AddPane(notebook_tabs, p_inf);
 
 	// Create Start Page (temporary)
@@ -257,7 +269,7 @@ void MainWindow::onMenuItemClicked(wxCommandEvent& e) {
 	// File->Open
 	else if (e.GetId() == MENU_FILE_OPEN) {
 		// Create extensions string
-		string extensions = s_fmt(_T("Any Supported File (*.wad; *.zip; *.pk3; *.jdf)|%s%s%s%s"), ext_wad.c_str(), ext_zip.c_str(), ext_pk3.c_str(), ext_jdf.c_str());
+		string extensions = s_fmt(_T("Any Supported File (*.wad; *.zip; *.pk3; *.jdf)|%s;%s;%s;%s"), ext_wad.c_str(), ext_zip.c_str(), ext_pk3.c_str(), ext_jdf.c_str());
 		extensions += s_fmt(_T("|Doom Wad files (*.wad)|%s"), ext_wad.c_str());
 		extensions += s_fmt(_T("|Zip files (*.zip)|%s"), ext_zip.c_str());
 		extensions += s_fmt(_T("|Pk3 (zip) files (*.pk3)|%s"), ext_pk3.c_str());

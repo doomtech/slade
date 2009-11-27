@@ -54,6 +54,7 @@ public:
 	virtual bool			removeEntry(uint32_t archive_index, ArchiveEntry* e = NULL);
 	int						getEntryListItem(ArchiveEntry* entry);
 
+	void					selectAll();
 	virtual bool			moveUp();
 	virtual bool			moveDown();
 
@@ -64,6 +65,7 @@ public:
 	virtual void	onEntryListColResize(wxListEvent &event);
 	virtual void	onEntryListColRightClick(wxListEvent &event);
 	virtual void	onMenu(wxCommandEvent &event);
+	void			onKeyDown(wxKeyEvent &event);
 
 	DECLARE_EVENT_TABLE()
 };

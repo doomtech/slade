@@ -88,6 +88,9 @@ void ArchivePanel::init() {
 	m_hbox->Add(cur_area, 1, wxEXPAND | wxALL, 4);
 	cur_area->Show(true);
 
+	// Setup events
+	entry_list->Bind(wxEVT_KEY_DOWN, &ArchivePanel::onEntryListKeyDown, this);
+
 	Layout();
 	entry_list->populateEntryList();
 }
@@ -657,4 +660,43 @@ void ArchivePanel::onEntryMenuClick(wxCommandEvent& event) {
 			gfxModifyOffsets();
 			break;
 	}
+}
+
+/* ArchivePanel::onEntryListKeyDown
+ * Called when a key is pressed on the entry list
+ *******************************************************************/
+void ArchivePanel::onEntryListKeyDown(wxKeyEvent& event) {
+	// Rename entry (Ctrl+R or F2)
+	if ((event.GetKeyCode() == 'R' && event.ControlDown()) || event.GetKeyCode() == WXK_F2)
+		renameEntry();
+
+	// Delete entry (Delete)
+	if (event.GetKeyCode() == WXK_DELETE)
+		deleteEntry();
+
+	// Import to entry (Ctrl+I)
+	if (event.GetKeyCode() == 'I' && event.ControlDown())
+		importEntry();
+
+	// Export entry (Ctrl+E)
+	if (event.GetKeyCode() == 'E' && event.ControlDown())
+		exportEntry();
+
+	// Export entry to wad (Shift+Ctrl+E)
+	if (event.GetKeyCode() == 'E' && event.ShiftDown() && event.ControlDown())
+		exportEntryWad();
+
+	// Move entry up (Ctrl+U or Ctrl+Up Arrow)
+	if (event.ControlDown() && (event.GetKeyCode() == 'U' || event.GetKeyCode() == WXK_UP))
+		moveUp();
+
+	// Move entry down (Ctrl+D or Ctrl+Down Arrow)
+	if (event.ControlDown() && (event.GetKeyCode() == 'D' || event.GetKeyCode() == WXK_DOWN))
+		moveDown();
+
+	// Select all entries
+	if (event.GetKeyCode() == 'A' && event.ControlDown())
+		entry_list->selectAll();
+
+	event.Skip();
 }

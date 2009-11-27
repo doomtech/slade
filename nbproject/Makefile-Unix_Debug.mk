@@ -19,7 +19,7 @@ FC=
 AS=as
 
 # Macros
-CND_PLATFORM=GNU-Linux-x86
+CND_PLATFORM=GNU-Windows
 CND_CONF=Unix_Debug
 CND_DISTDIR=dist
 
@@ -52,6 +52,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/PaletteCanvas.o \
 	${OBJECTDIR}/src/MainApp.o \
 	${OBJECTDIR}/src/EntryListPanel.o \
+	${OBJECTDIR}/src/Clipboard.o \
 	${OBJECTDIR}/src/EntryPanel.o \
 	${OBJECTDIR}/src/CVar.o \
 	${OBJECTDIR}/src/ZipEntryListPanel.o \
@@ -97,9 +98,9 @@ LDLIBSOPTIONS=-lfreeimage
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
-	${MAKE}  -f nbproject/Makefile-Unix_Debug.mk dist/slade-dbg
+	${MAKE}  -f nbproject/Makefile-Unix_Debug.mk dist/slade-dbg.exe
 
-dist/slade-dbg: ${OBJECTFILES}
+dist/slade-dbg.exe: ${OBJECTFILES}
 	${MKDIR} -p dist
 	${LINK.cc} `wx-config --debug --libs std,gl,stc,aui` -o dist/slade-dbg  ${OBJECTFILES} ${LDLIBSOPTIONS} 
 
@@ -207,6 +208,11 @@ ${OBJECTDIR}/src/EntryListPanel.o: nbproject/Makefile-${CND_CONF}.mk src/EntryLi
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
 	$(COMPILE.cc) -g -D__WXDEBUG__ -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/EntryListPanel.o src/EntryListPanel.cpp
+
+${OBJECTDIR}/src/Clipboard.o: nbproject/Makefile-${CND_CONF}.mk src/Clipboard.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -g -D__WXDEBUG__ -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/Clipboard.o src/Clipboard.cpp
 
 ${OBJECTDIR}/src/EntryPanel.o: nbproject/Makefile-${CND_CONF}.mk src/EntryPanel.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
@@ -344,7 +350,7 @@ ${OBJECTDIR}/src/ZipArchivePanel.o: nbproject/Makefile-${CND_CONF}.mk src/ZipArc
 # Clean Targets
 .clean-conf:
 	${RM} -r build/Unix_Debug
-	${RM} dist/slade-dbg
+	${RM} dist/slade-dbg.exe
 
 # Subprojects
 .clean-subprojects:

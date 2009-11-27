@@ -72,6 +72,7 @@ public:
 	void	onEntryListDeselect(wxListEvent& event);
 	void	onEntryListRightClick(wxListEvent& event);
 	void	onEntryMenuClick(wxCommandEvent& event);
+	void	onEntryListKeyDown(wxKeyEvent& event);
 
 	DECLARE_EVENT_TABLE()
 };

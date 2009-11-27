@@ -6,7 +6,7 @@
 # Clean Targets
 .clean-conf:
 	${RM} -r build/Win32_Release
-	${RM} dist/SLADE
+	${RM} dist/SLADE.exe
 
 # Subprojects
 .clean-subprojects:
