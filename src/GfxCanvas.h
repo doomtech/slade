@@ -49,11 +49,10 @@ public:
 
 	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 
-	void	mouseLeftDown(wxMouseEvent& e);
-	void	mouseLeftUp(wxMouseEvent& e);
-	void	mouseMove(wxMouseEvent& e);
-
-	DECLARE_EVENT_TABLE()
+	// Events
+	void	onMouseLeftDown(wxMouseEvent& e);
+	void	onMouseLeftUp(wxMouseEvent& e);
+	void	onMouseMovement(wxMouseEvent& e);
 };
 
 DECLARE_EVENT_TYPE(wxEVT_GFXCANVAS_OFFSET_CHANGED, -1)

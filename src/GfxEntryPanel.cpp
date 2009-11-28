@@ -36,6 +36,10 @@
 #include "EntryOperations.h"
 
 
+/*******************************************************************
+ * GFXENTRYPANEL CLASS FUNCTIONS
+ *******************************************************************/
+
 /* GfxEntryPanel::GfxEntryPanel
  * GfxEntryPanel class constructor
  *******************************************************************/
@@ -53,7 +57,7 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 	m_vbox->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
 
 	// Zoom slider
-	slider_zoom = new wxSlider(this, SLIDER_ZOOM, 100, 20, 800);
+	slider_zoom = new wxSlider(this, -1, 100, 20, 800);
 	slider_zoom->SetLineSize(10);
 	slider_zoom->SetPageSize(100);
 	label_current_zoom = new wxStaticText(this, -1, _T("100%"));
@@ -64,25 +68,25 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 	hbox->AddStretchSpacer();
 
 	// Tile checkbox
-	cb_tile = new wxCheckBox(this, CB_TILE, _T("Tile"));
+	cb_tile = new wxCheckBox(this, -1, _T("Tile"));
 	hbox->Add(cb_tile, 0, wxEXPAND, 0);
 	hbox->AddSpacer(8);
 
 	// Gfx (offset) type
 	string offset_types[] = { _T("Auto"), _T("Graphic"), _T("Sprite"), _T("HUD") };
-	combo_offset_type = new wxComboBox(this, COMBO_OFFSET_TYPE, offset_types[0], wxDefaultPosition, wxDefaultSize, 4, offset_types, wxCB_READONLY);
+	combo_offset_type = new wxComboBox(this, -1, offset_types[0], wxDefaultPosition, wxDefaultSize, 4, offset_types, wxCB_READONLY);
 	hbox->Add(new wxStaticText(this, -1, _T("Type:")), 0, wxALIGN_CENTER_VERTICAL, 0);
 	hbox->Add(combo_offset_type, 0, wxEXPAND, 0);
 	hbox->AddSpacer(8);
 
 	// Palette chooser
-	combo_palette = new PaletteChooser(this, COMBO_PALETTE);
+	combo_palette = new PaletteChooser(this, -1);
 	hbox->Add(new wxStaticText(this, -1, _T("Palette:")), 0, wxALIGN_CENTER_VERTICAL, 0);
 	hbox->Add(combo_palette, 0, wxEXPAND, 0);
 
 
 	// Add gfx canvas
-	gfx_canvas = new GfxCanvas(this, GFX_CANVAS);
+	gfx_canvas = new GfxCanvas(this, -1);
 	m_vbox->Add(gfx_canvas, 1, wxEXPAND|wxALL, 4);
 	gfx_canvas->setViewType(GFXVIEW_DEFAULT);
 	gfx_canvas->allowDrag(true);
@@ -93,8 +97,8 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 	m_vbox->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
 
 	// Offsets
-	spin_xoffset = new wxSpinCtrl(this, SPIN_XOFFSET, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, SHRT_MIN, SHRT_MAX, 0);
-	spin_yoffset = new wxSpinCtrl(this, SPIN_YOFFSET, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, SHRT_MIN, SHRT_MAX, 0);
+	spin_xoffset = new wxSpinCtrl(this, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, SHRT_MIN, SHRT_MAX, 0);
+	spin_yoffset = new wxSpinCtrl(this, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, SHRT_MIN, SHRT_MAX, 0);
 	hbox->Add(new wxStaticText(this, -1, _T("Offsets:")), 0, wxALIGN_CENTER_VERTICAL, 0);
 	hbox->Add(spin_xoffset, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
 	hbox->Add(spin_yoffset, 0, wxEXPAND, 0);
@@ -102,8 +106,19 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 	hbox->AddStretchSpacer();
 
 	// 'Save Changes' button
-	btn_save = new wxButton(this, BTN_SAVE, _T("Save Changes"));
+	btn_save = new wxButton(this, -1, _T("Save Changes"));
 	hbox->Add(btn_save, 0, wxEXPAND, 0);
+
+
+	// Bind Events
+	slider_zoom->Bind(wxEVT_COMMAND_SLIDER_UPDATED, &GfxEntryPanel::onZoomChanged, this);
+	combo_palette->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &GfxEntryPanel::onPaletteChanged, this);
+	spin_xoffset->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &GfxEntryPanel::onXOffsetChanged, this);
+	spin_yoffset->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &GfxEntryPanel::onYOffsetChanged, this);
+	combo_offset_type->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &GfxEntryPanel::onOffsetTypeChanged, this);
+	btn_save->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &GfxEntryPanel::onBtnSave, this);
+	cb_tile->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &GfxEntryPanel::onTileChanged, this);
+	Bind(wxEVT_GFXCANVAS_OFFSET_CHANGED, &GfxEntryPanel::onGfxOffsetChanged, this, gfx_canvas->GetId());
 
 	// Apply layout
 	Layout();
@@ -248,21 +263,15 @@ void GfxEntryPanel::applyViewType() {
 	gfx_canvas->Refresh();
 }
 
-BEGIN_EVENT_TABLE(GfxEntryPanel, EntryPanel)
-	EVT_COMMAND_SCROLL(SLIDER_ZOOM, GfxEntryPanel::sliderZoomChanged)
-	EVT_COMBOBOX(COMBO_PALETTE, GfxEntryPanel::paletteChanged)
-	EVT_SPINCTRL(SPIN_XOFFSET, GfxEntryPanel::spinXOffsetChanged)
-	EVT_SPINCTRL(SPIN_YOFFSET, GfxEntryPanel::spinYOffsetChanged)
-	EVT_COMBOBOX(COMBO_OFFSET_TYPE, GfxEntryPanel::comboOffsetTypeChanged)
-	EVT_BUTTON(BTN_SAVE, GfxEntryPanel::btnSaveClicked)
-	EVT_CHECKBOX(CB_TILE, GfxEntryPanel::cbTileChecked)
-	EVT_NOTIFY(wxEVT_GFXCANVAS_OFFSET_CHANGED, GFX_CANVAS, GfxEntryPanel::gfxOffsetChanged)
-END_EVENT_TABLE()
+
+/*******************************************************************
+ * GFXENTRYPANEL EVENTS
+ *******************************************************************/
 
 /* GfxEntryPanel::sliderZoomChanged
  * Called when the zoom slider is changed
  *******************************************************************/
-void GfxEntryPanel::sliderZoomChanged(wxScrollEvent& e) {
+void GfxEntryPanel::onZoomChanged(wxCommandEvent& e) {
 	// Get zoom value
 	int zoom_percent = slider_zoom->GetValue();
 
@@ -281,7 +290,7 @@ void GfxEntryPanel::sliderZoomChanged(wxScrollEvent& e) {
 /* GfxEntryPanel::paletteChanged
  * Called when the palette chooser selection changes
  *******************************************************************/
-void GfxEntryPanel::paletteChanged(wxCommandEvent& e) {
+void GfxEntryPanel::onPaletteChanged(wxCommandEvent& e) {
 	updateImagePalette();
 	gfx_canvas->Refresh();
 }
@@ -289,7 +298,7 @@ void GfxEntryPanel::paletteChanged(wxCommandEvent& e) {
 /* GfxEntryPanel::textXOffsetChanged
  * Called when enter is pressed within the x offset text entry
  *******************************************************************/
-void GfxEntryPanel::spinXOffsetChanged(wxSpinEvent& e) {
+void GfxEntryPanel::onXOffsetChanged(wxSpinEvent& e) {
 	// Change the image x-offset
 	int offset = spin_xoffset->GetValue();
 	gfx_canvas->getImage()->setXOffset(offset);
@@ -304,7 +313,7 @@ void GfxEntryPanel::spinXOffsetChanged(wxSpinEvent& e) {
 /* GfxEntryPanel::textYOffsetChanged
  * Called when enter is pressed within the y offset text entry
  *******************************************************************/
-void GfxEntryPanel::spinYOffsetChanged(wxSpinEvent& e) {
+void GfxEntryPanel::onYOffsetChanged(wxSpinEvent& e) {
 	// Change image y-offset
 	int offset = spin_yoffset->GetValue();
 	gfx_canvas->getImage()->setYOffset(offset);
@@ -319,14 +328,14 @@ void GfxEntryPanel::spinYOffsetChanged(wxSpinEvent& e) {
 /* GfxEntryPanel::comboOffsetTypeChanged
  * Called when the 'type' combo box selection is changed
  *******************************************************************/
-void GfxEntryPanel::comboOffsetTypeChanged(wxCommandEvent& e) {
+void GfxEntryPanel::onOffsetTypeChanged(wxCommandEvent& e) {
 	applyViewType();
 }
 
 /* GfxEntryPanel::btnSaveClicked
  * Called when the 'Save Changes' button is clicked
  *******************************************************************/
-void GfxEntryPanel::btnSaveClicked(wxCommandEvent& e) {
+void GfxEntryPanel::onBtnSave(wxCommandEvent& e) {
 	if (changed) {
 		if (saveEntry())
 			changed = false;
@@ -336,7 +345,7 @@ void GfxEntryPanel::btnSaveClicked(wxCommandEvent& e) {
 /* GfxEntryPanel::cbTileChecked
  * Called when the 'Tile' checkbox is checked/unchecked
  *******************************************************************/
-void GfxEntryPanel::cbTileChecked(wxCommandEvent& e) {
+void GfxEntryPanel::onTileChanged(wxCommandEvent& e) {
 	combo_offset_type->Enable(!cb_tile->IsChecked());
 	applyViewType();
 }
@@ -344,7 +353,7 @@ void GfxEntryPanel::cbTileChecked(wxCommandEvent& e) {
 /* GfxEntryPanel::gfxOffsetChanged
  * Called when the gfx canvas image offsets are changed
  *******************************************************************/
-void GfxEntryPanel::gfxOffsetChanged(wxNotifyEvent& e) {
+void GfxEntryPanel::onGfxOffsetChanged(wxEvent& e) {
 	// Update spin controls
 	spin_xoffset->SetValue(gfx_canvas->getImage()->offset().x);
 	spin_yoffset->SetValue(gfx_canvas->getImage()->offset().y);

@@ -37,6 +37,10 @@
 #include "PaletteManager.h"
 
 
+/*******************************************************************
+ * GFXCONVDIALOG CLASS FUNCTINOS
+ *******************************************************************/
+
 /* GfxConvDialog::GfxConvDialog
  * GfxConvDialog class constructor
  *******************************************************************/
@@ -112,7 +116,7 @@ void GfxConvDialog::setupLayout() {
 	hbox->Add(new wxStaticText(this, -1, _T("Convert to:")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
 
 	wxString s_formats[] = { _T("Doom Flat Format"), _T("Doom Graphic Format"), _T("PNG Format (8bit Paletted)"), _T("PNG Format (32bit Truecolour)") };
-	combo_target_format = new wxComboBox(this, COMBO_TARGET_FORMAT, s_formats[1], wxDefaultPosition, wxDefaultSize, 4, s_formats, wxCB_READONLY);
+	combo_target_format = new wxComboBox(this, -1, s_formats[1], wxDefaultPosition, wxDefaultSize, 4, s_formats, wxCB_READONLY);
 	combo_target_format->Select(1);
 	hbox->Add(combo_target_format, 1, wxEXPAND|wxALL, 4);
 
@@ -132,7 +136,7 @@ void GfxConvDialog::setupLayout() {
 	gfx_current->setViewType(GFXVIEW_CENTERED);
 	vbox->Add(gfx_current, 1, wxEXPAND|wxTOP|wxLEFT|wxRIGHT, 4);
 
-	pal_chooser_current = new PaletteChooser(this, PALETTE_CURRENT);
+	pal_chooser_current = new PaletteChooser(this, -1);
 	vbox->Add(pal_chooser_current, 0, wxEXPAND|wxALL, 4);
 
 
@@ -146,12 +150,12 @@ void GfxConvDialog::setupLayout() {
 	gfx_target->setViewType(1);
 	vbox->Add(gfx_target, 1, wxEXPAND|wxTOP|wxLEFT|wxRIGHT, 4);
 
-	pal_chooser_target = new PaletteChooser(this, PALETTE_TARGET);
+	pal_chooser_target = new PaletteChooser(this, -1);
 	vbox->Add(pal_chooser_target, 0, wxEXPAND|wxALL, 4);
 
 
 	// 'Enable transparency' checkbox
-	cb_enable_transparency = new wxCheckBox(this, CB_ENABLE_TRANSPARENCY, _T("Enable Transparency"));
+	cb_enable_transparency = new wxCheckBox(this, -1, _T("Enable Transparency"));
 	cb_enable_transparency->SetValue(true);
 	cb_enable_transparency->SetToolTip(_T("Uncheck this to remove any existing transparency from the graphic"));
 	m_vbox->AddSpacer(4);
@@ -168,12 +172,12 @@ void GfxConvDialog::setupLayout() {
 	// Keep existing transparency
 	hbox = new wxBoxSizer(wxHORIZONTAL);
 	vbox_ttypes->Add(hbox, 0, wxEXPAND|wxALL, 0);
-	rb_transparency_existing = new wxRadioButton(this, RB_TRANS_EXISTING, _T("Existing w/Threshold:"));
+	rb_transparency_existing = new wxRadioButton(this, -1, _T("Existing w/Threshold:"));
 	rb_transparency_existing->SetValue(true);
 	hbox->Add(rb_transparency_existing, 0, wxEXPAND|wxALL, 4);
 
 	// Alpha threshold
-	slider_alpha_threshold = new wxSlider(this, SLIDER_ALPHA_THRESHOLD, 0, 0, 255, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_LABELS|wxSL_BOTTOM);
+	slider_alpha_threshold = new wxSlider(this, -1, 0, 0, 255, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_LABELS|wxSL_BOTTOM);
 	slider_alpha_threshold->SetToolTip(_T("Specifies the 'cutoff' transparency level, anything above this will be fully opaque, anything equal or below will be completely transparent"));
 	hbox->Add(slider_alpha_threshold, 1, wxEXPAND|wxALL, 4);
 
@@ -181,11 +185,11 @@ void GfxConvDialog::setupLayout() {
 	// Transparent colour
 	hbox = new wxBoxSizer(wxHORIZONTAL);
 	vbox_ttypes->Add(hbox, 0, wxEXPAND|wxALL, 0);
-	rb_transparency_colour = new wxRadioButton(this, RB_TRANS_EXISTING, _T("Transparent Colour:"));
+	rb_transparency_colour = new wxRadioButton(this, -1, _T("Transparent Colour:"), wxDefaultPosition, wxDefaultSize, 0);
 	rb_transparency_colour->SetValue(false);
 	hbox->Add(rb_transparency_colour, 0, wxEXPAND|wxALL, 4);
 
-	colbox_transparent = new ColourBox(this, COLOURBOX_TRANS, false);
+	colbox_transparent = new ColourBox(this, -1, false);
 	colbox_transparent->setColour(rgba_t(0, 255, 255, 255));
 	hbox->Add(colbox_transparent, 0, wxEXPAND|wxALL, 4);
 
@@ -194,16 +198,32 @@ void GfxConvDialog::setupLayout() {
 	hbox = new wxBoxSizer(wxHORIZONTAL);
 	m_vbox->Add(hbox, 0, wxEXPAND|wxALL, 4);
 
-	btn_convert = new wxButton(this, BTN_CONVERT, _T("Convert"));
-	btn_convert_all = new wxButton(this, BTN_CONVERT_ALL, _T("Convert All"));
-	btn_skip = new wxButton(this, BTN_SKIP, _T("Skip"));
-	btn_skip_all = new wxButton(this, BTN_SKIP_ALL, _T("Skip All"));
+	btn_convert = new wxButton(this, -1, _T("Convert"));
+	btn_convert_all = new wxButton(this, -1, _T("Convert All"));
+	btn_skip = new wxButton(this, -1, _T("Skip"));
+	btn_skip_all = new wxButton(this, -1, _T("Skip All"));
 
 	hbox->AddStretchSpacer(1);
 	hbox->Add(btn_convert, 0, wxEXPAND|wxRIGHT, 4);
 	hbox->Add(btn_convert_all, 0, wxEXPAND|wxRIGHT, 4);
 	hbox->Add(btn_skip, 0, wxEXPAND|wxRIGHT, 4);
 	hbox->Add(btn_skip_all, 0, wxEXPAND, 0);
+
+
+	// Bind events
+	Bind(wxEVT_SIZE, &GfxConvDialog::onResize, this);
+	btn_convert->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &GfxConvDialog::onBtnConvert, this);
+	btn_convert_all->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &GfxConvDialog::onBtnConvertAll, this);
+	btn_skip->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &GfxConvDialog::onBtnSkip, this);
+	btn_skip_all->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &GfxConvDialog::onBtnSkipAll, this);
+	combo_target_format->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &GfxConvDialog::onTargetFormatChanged, this);
+	pal_chooser_current->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &GfxConvDialog::onCurrentPaletteChanged, this);
+	pal_chooser_target->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &GfxConvDialog::onTargetPaletteChanged, this);
+	slider_alpha_threshold->Bind(wxEVT_COMMAND_SLIDER_UPDATED, &GfxConvDialog::onAlphaThresholdChanged, this);
+	cb_enable_transparency->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &GfxConvDialog::onEnableTransparencyChanged, this);
+	rb_transparency_colour->Bind(wxEVT_COMMAND_RADIOBUTTON_SELECTED, &GfxConvDialog::onTransTypeChanged, this);
+	rb_transparency_existing->Bind(wxEVT_COMMAND_RADIOBUTTON_SELECTED, &GfxConvDialog::onTransTypeChanged, this);
+	Bind(wxEVT_COLOURBOX_CHANGED, &GfxConvDialog::onTransColourChanged, this, colbox_transparent->GetId());
 
 
 	// Autosize to fit contents (and set this as the minimum size)
@@ -367,27 +387,14 @@ bool GfxConvDialog::doConvert() {
 }
 
 
-
-BEGIN_EVENT_TABLE(GfxConvDialog, wxDialog)
-	EVT_SIZE(GfxConvDialog::resize)
-	EVT_BUTTON(BTN_CONVERT, GfxConvDialog::btnConvertClicked)
-	EVT_BUTTON(BTN_CONVERT_ALL, GfxConvDialog::btnConvertAllClicked)
-	EVT_BUTTON(BTN_SKIP, GfxConvDialog::btnSkipClicked)
-	EVT_BUTTON(BTN_SKIP_ALL, GfxConvDialog::btnSkipAllClicked)
-	EVT_COMBOBOX(COMBO_TARGET_FORMAT, GfxConvDialog::comboTargetFormatChanged)
-	EVT_COMBOBOX(PALETTE_CURRENT, GfxConvDialog::paletteCurrentChanged)
-	EVT_COMBOBOX(PALETTE_TARGET, GfxConvDialog::paletteTargetChanged)
-	EVT_COMMAND_SCROLL(SLIDER_ALPHA_THRESHOLD, GfxConvDialog::sliderAlphaThresholdChanged)
-	EVT_CHECKBOX(CB_ENABLE_TRANSPARENCY, GfxConvDialog::cbEnableTransparencyChanged)
-	EVT_RADIOBUTTON(RB_TRANS_COLOUR, GfxConvDialog::transTypeChanged)
-	EVT_RADIOBUTTON(RB_TRANS_EXISTING, GfxConvDialog::transTypeChanged)
-	EVT_COMMAND(COLOURBOX_TRANS, wxEVT_COLOURBOX_CHANGED, GfxConvDialog::transColourChanged)
-END_EVENT_TABLE()
+/*******************************************************************
+ * GFXCONVDIALOG EVENTS
+ *******************************************************************/
 
 /* GfxConvDialog::resize
  * Called when the dialog is resized
  *******************************************************************/
-void GfxConvDialog::resize(wxSizeEvent& e) {
+void GfxConvDialog::onResize(wxSizeEvent& e) {
 	wxDialog::OnSize(e);
 
 	gfx_current->zoomToFit(true, 0.05f);
@@ -399,7 +406,7 @@ void GfxConvDialog::resize(wxSizeEvent& e) {
 /* GfxConvDialog::btnConvertClicked
  * Called when the 'Convert' button is clicked
  *******************************************************************/
-void GfxConvDialog::btnConvertClicked(wxCommandEvent& e) {
+void GfxConvDialog::onBtnConvert(wxCommandEvent& e) {
 	writeToEntry();
 	nextEntry();
 }
@@ -407,7 +414,7 @@ void GfxConvDialog::btnConvertClicked(wxCommandEvent& e) {
 /* GfxConvDialog::btnConvertAllClicked
  * Called when the 'Convert All' button is clicked
  *******************************************************************/
-void GfxConvDialog::btnConvertAllClicked(wxCommandEvent& e) {
+void GfxConvDialog::onBtnConvertAll(wxCommandEvent& e) {
 	for (int a = current_entry; a < entries.size(); a++) {
 		writeToEntry();
 		nextEntry();
@@ -417,14 +424,14 @@ void GfxConvDialog::btnConvertAllClicked(wxCommandEvent& e) {
 /* GfxConvDialog::btnSkipClicked
  * Called when the 'Skip' button is clicked
  *******************************************************************/
-void GfxConvDialog::btnSkipClicked(wxCommandEvent& e) {
+void GfxConvDialog::onBtnSkip(wxCommandEvent& e) {
 	nextEntry();
 }
 
 /* GfxConvDialog::btnSkipAllClicked
  * Called when the 'Skip All' button is clicked
  *******************************************************************/
-void GfxConvDialog::btnSkipAllClicked(wxCommandEvent& e) {
+void GfxConvDialog::onBtnSkipAll(wxCommandEvent& e) {
 	for (int a = current_entry; a < entries.size(); a++)
 		nextEntry();
 }
@@ -432,7 +439,7 @@ void GfxConvDialog::btnSkipAllClicked(wxCommandEvent& e) {
 /* GfxConvDialog::comboTargetFormatChanged
  * Called when the 'Convert To' combo box is changed
  *******************************************************************/
-void GfxConvDialog::comboTargetFormatChanged(wxCommandEvent& e) {
+void GfxConvDialog::onTargetFormatChanged(wxCommandEvent& e) {
 	// Check image size if doom flat format is selected
 	if (combo_target_format->GetCurrentSelection() == 0) {
 		if (!gfx_current->getImage()->validFlatSize()) {
@@ -447,21 +454,21 @@ void GfxConvDialog::comboTargetFormatChanged(wxCommandEvent& e) {
 /* GfxConvDialog::paletteCurrentChanged
  * Called when the current image palette chooser is changed
  *******************************************************************/
-void GfxConvDialog::paletteCurrentChanged(wxCommandEvent& e) {
+void GfxConvDialog::onCurrentPaletteChanged(wxCommandEvent& e) {
 	updatePreviewGfx();
 }
 
 /* GfxConvDialog::paletteTargetChanged
  * Called when the target image palette chooser is changed
  *******************************************************************/
-void GfxConvDialog::paletteTargetChanged(wxCommandEvent& e) {
+void GfxConvDialog::onTargetPaletteChanged(wxCommandEvent& e) {
 	updatePreviewGfx();
 }
 
 /* GfxConvDialog::sliderAlphaThresholdChanged
  * Called when the alpha threshold slider is changed
  *******************************************************************/
-void GfxConvDialog::sliderAlphaThresholdChanged(wxScrollEvent& e) {
+void GfxConvDialog::onAlphaThresholdChanged(wxCommandEvent& e) {
 	// Ignore while slider is being dragged
 	if (e.GetEventType() == wxEVT_SCROLL_THUMBTRACK) {
 		e.Skip();
@@ -474,25 +481,28 @@ void GfxConvDialog::sliderAlphaThresholdChanged(wxScrollEvent& e) {
 /* GfxConvDialog::cbEnableTransparencyChanged
  * Called when the 'enable transparency' checkbox is changed
  *******************************************************************/
-void GfxConvDialog::cbEnableTransparencyChanged(wxCommandEvent& e) {
+void GfxConvDialog::onEnableTransparencyChanged(wxCommandEvent& e) {
 	updatePreviewGfx();
 }
 
 /* GfxConvDialog::transTypeChanged
  * Called when the 'existing' and 'colour' radio buttons are toggled
  *******************************************************************/
-void GfxConvDialog::transTypeChanged(wxCommandEvent& e) {
+void GfxConvDialog::onTransTypeChanged(wxCommandEvent& e) {
 	updatePreviewGfx();
 }
 
 /* GfxConvDialog::transColourChanged
  * Called when the transparent colour box is changed
  *******************************************************************/
-void GfxConvDialog::transColourChanged(wxCommandEvent& e) {
+void GfxConvDialog::onTransColourChanged(wxEvent& e) {
 	updatePreviewGfx();
 }
 
 
+/*******************************************************************
+ * CONSOLE COMMANDS
+ *******************************************************************/
 
 void c_test_gcd(vector<string> args) {
 	GfxConvDialog gcd;

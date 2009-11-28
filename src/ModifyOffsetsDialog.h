@@ -19,11 +19,6 @@ public:
 	ModifyOffsetsDialog();
 	~ModifyOffsetsDialog();
 
-	enum {
-		MOD_OPT_SET,
-		MOD_OPT_AUTO,
-	};
-
 	point2_t	getOffset();
 	int			getAlignType();
 	bool		autoOffset();
@@ -31,10 +26,9 @@ public:
 	bool		xOffChange();
 	bool		yOffChange();
 
-	void		onOptSet(wxCommandEvent &event);
-	void		onOptAuto(wxCommandEvent &event);
-
-	DECLARE_EVENT_TABLE()
+	// Events
+	void		onOptSet(wxCommandEvent& e);
+	void		onOptAuto(wxCommandEvent& e);
 };
 
 #endif//__MODIFYOFFSETSDIALOG_H__

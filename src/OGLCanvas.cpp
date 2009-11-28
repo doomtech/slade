@@ -33,6 +33,10 @@
 #include "OGLCanvas.h"
 
 
+/*******************************************************************
+ * OGLCANVAS CLASS FUNCTIONS
+ *******************************************************************/
+
 /* OGLCanvas::OGLCanvas
  * OGLCanvas class constructor
  *******************************************************************/
@@ -40,6 +44,10 @@ OGLCanvas::OGLCanvas(wxWindow* parent, int id)
 : wxGLCanvas(parent, id, NULL, wxDefaultPosition, wxDefaultSize, wxBORDER_SIMPLE) {
 	context = NULL;
 	init_done = false;
+
+	// Bind events
+	Bind(wxEVT_PAINT, &OGLCanvas::onPaint, this);
+	Bind(wxEVT_ERASE_BACKGROUND, &OGLCanvas::onEraseBackground, this);
 }
 
 /* OGLCanvas::OGLCanvas
@@ -100,15 +108,14 @@ void OGLCanvas::init() {
 }
 
 
-BEGIN_EVENT_TABLE(OGLCanvas, wxGLCanvas)
-	EVT_PAINT(OGLCanvas::paint)
-	EVT_ERASE_BACKGROUND(OGLCanvas::onEraseBackground)
-END_EVENT_TABLE()
+/*******************************************************************
+ * OGLCANVAS EVENTS
+ *******************************************************************/
 
 /* OGLCanvas::paint
  * Called when the gfx canvas has to be redrawn
  *******************************************************************/
-void OGLCanvas::paint(wxPaintEvent& e) {
+void OGLCanvas::onPaint(wxPaintEvent& e) {
 	wxPaintDC(this);
 
 	if (!init_done)

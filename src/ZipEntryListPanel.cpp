@@ -46,6 +46,10 @@ EXTERN_CVAR(Bool, col_size);
 EXTERN_CVAR(Bool, col_type);
 
 
+/*******************************************************************
+ * ZIPENTRYLISTPANEL CLASS FUNCTIONS
+ *******************************************************************/
+
 /* ZipEntryListPanel::ZipEntryListPanel
  * ZipEntryListPanel class constructor
  *******************************************************************/
@@ -532,15 +536,18 @@ bool ZipEntryListPanel::moveDown() {
 }
 
 
+/*******************************************************************
+ * ZIPENTRYLISTPANEL EVENTS
+ *******************************************************************/
 
 /* ZipEntryListPanel::onEntryListActivated
  * Called when an item in the list is activated (double clicked or
- * pressed enter). Changes to that difectory if it is a directory
+ * pressed enter). Changes to that directory if it is a directory
  * entry.
  *******************************************************************/
-void ZipEntryListPanel::onEntryListActivated(wxListEvent& event) {
+void ZipEntryListPanel::onEntryListActivated(wxListEvent& e) {
 	// Get the entry that was activated
-	ArchiveEntry* entry = (ArchiveEntry*)(entry_list->GetItemData(event.GetIndex()));
+	ArchiveEntry* entry = (ArchiveEntry*)(entry_list->GetItemData(e.GetIndex()));
 
 	// If it doesn't exist, return
 	if (!entry)
@@ -549,8 +556,8 @@ void ZipEntryListPanel::onEntryListActivated(wxListEvent& event) {
 	// Check for folder
 	if (entry->getType() == ETYPE_FOLDER) {
 		// If a folder was activated, open it
-		if (entry_list->GetItemText(event.GetIndex()).Cmp(_T(".."))) {
-			cur_directory = getCurrentDir()->getSubDir(event.GetText());
+		if (entry_list->GetItemText(e.GetIndex()).Cmp(_T(".."))) {
+			cur_directory = getCurrentDir()->getSubDir(e.GetText());
 		}
 		else {
 			// '..' item, go up 1 directory
@@ -564,13 +571,14 @@ void ZipEntryListPanel::onEntryListActivated(wxListEvent& event) {
 	}
 	else {
 		// Otherwise do default activate action
-		EntryListPanel::onEntryListActivated(event);
+		EntryListPanel::onEntryListActivated(e);
 	}
 }
 
 /* ZipEntryListPanel::onEntryListEditLabel
  * Called when an 'edit label' operation finishes on a list entry
  *******************************************************************/
+/*
 void ZipEntryListPanel::onEntryListEditLabel(wxListEvent& event) {
 	ArchiveEntry* entry = getFocusedEntry();
 	if (entry && !event.IsEditCancelled() && entry != dummy_folder_entry) {
@@ -579,3 +587,4 @@ void ZipEntryListPanel::onEntryListEditLabel(wxListEvent& event) {
 	else
 		event.Veto();
 }
+*/

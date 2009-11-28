@@ -36,14 +36,11 @@ private:
 public:
 	// wxWidgets ID table
 	enum {
-		LIST_OPENARCHIVES,
-		LIST_MAPS,
-		TREE_BROWSER,
-		BTN_BROWSER_OPEN,
-
 		MENU_SAVE,
 		MENU_SAVEAS,
 		MENU_CLOSE,
+
+		MENU_END,
 	};
 
 	ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_archives);
@@ -86,17 +83,12 @@ public:
 	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 
 	// Event handlers
-	void	onListArchivesChanged(wxListEvent &e);
-	void	onListArchivesActivated(wxListEvent &e);
-	void	onListMapsChanged(wxCommandEvent &e);
-	void	onListMapsActivated(wxListEvent &e);
-	void	onBrowserItemActivated(wxTreeEvent &e);
-	void	onListArchivesRightClick(wxListEvent &e);
-	void	onMenuSave(wxCommandEvent &e);
-	void	onMenuSaveAs(wxCommandEvent &e);
-	void	onMenuClose(wxCommandEvent &e);
-
-	DECLARE_EVENT_TABLE()
+	void	onListArchivesChanged(wxListEvent& e);
+	void	onListArchivesActivated(wxListEvent& e);
+	void	onListMapsChanged(wxCommandEvent& e);
+	void	onListMapsActivated(wxListEvent& e);
+	void	onListArchivesRightClick(wxListEvent& e);
+	void	onMenu(wxCommandEvent& e);
 };
 
 #endif //__ARCHIVEMANAGERPANEL_H__

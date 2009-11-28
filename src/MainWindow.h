@@ -15,7 +15,6 @@ private:
 	wxAuiManager*			m_mgr;
 
 public:
-	// wxWidgets ID table
 	enum {
 		// Menu item IDs
 		MENU_START,
@@ -50,9 +49,6 @@ public:
 		MENU_UNIMPLEMENTED,
 
 		MENU_END,
-
-		// Widget IDs
-		HTML_WINDOW,
 	};
 
 	MainWindow();
@@ -60,12 +56,10 @@ public:
 
 	void	setupLayout();
 
-	// Event handlers
+	// Events
 	void	onMenuItemClicked(wxCommandEvent &e);
 	void	onHTMLLinkClicked(wxHtmlLinkEvent &e);
 	void	onClose(wxCloseEvent &e);
-
-	DECLARE_EVENT_TABLE()
 };
 
 #endif //__MAINWINDOW_H__

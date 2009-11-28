@@ -59,15 +59,10 @@ public:
 	virtual bool			moveDown();
 
 	// Events
-	virtual void	onEntryListChange(wxListEvent &event);
-	virtual void	onEntryListActivated(wxListEvent &event);
-	virtual void	onEntryListEditLabel(wxListEvent &event);
-	virtual void	onEntryListColResize(wxListEvent &event);
-	virtual void	onEntryListColRightClick(wxListEvent &event);
-	virtual void	onMenu(wxCommandEvent &event);
-	void			onKeyDown(wxKeyEvent &event);
-
-	DECLARE_EVENT_TABLE()
+	virtual void	onEntryListActivated(wxListEvent& e);
+	virtual void	onEntryListColResize(wxListEvent& e);
+	virtual void	onEntryListColRightClick(wxListEvent& e);
+	virtual void	onMenu(wxCommandEvent& e);
 };
 
 #endif //__ENTRYLISTPANEL_H__

@@ -59,21 +59,6 @@ private:
 	void nextEntry();
 
 public:
-	enum {
-		BTN_CONVERT,
-		BTN_CONVERT_ALL,
-		BTN_SKIP,
-		BTN_SKIP_ALL,
-		COMBO_TARGET_FORMAT,
-		PALETTE_CURRENT,
-		PALETTE_TARGET,
-		SLIDER_ALPHA_THRESHOLD,
-		CB_ENABLE_TRANSPARENCY,
-		RB_TRANS_EXISTING,
-		RB_TRANS_COLOUR,
-		COLOURBOX_TRANS,
-	};
-
 	GfxConvDialog();
 	~GfxConvDialog();
 
@@ -86,20 +71,18 @@ public:
 	bool	writeToEntry();
 
 	// Events
-	void	resize(wxSizeEvent &e);
-	void	btnConvertClicked(wxCommandEvent &e);
-	void	btnConvertAllClicked(wxCommandEvent &e);
-	void	btnSkipClicked(wxCommandEvent &e);
-	void	btnSkipAllClicked(wxCommandEvent &e);
-	void	comboTargetFormatChanged(wxCommandEvent &e);
-	void	paletteCurrentChanged(wxCommandEvent &e);
-	void	paletteTargetChanged(wxCommandEvent &e);
-	void	sliderAlphaThresholdChanged(wxScrollEvent &e);
-	void	cbEnableTransparencyChanged(wxCommandEvent &e);
-	void	transTypeChanged(wxCommandEvent &e);
-	void	transColourChanged(wxCommandEvent &e);
-
-	DECLARE_EVENT_TABLE()
+	void	onResize(wxSizeEvent& e);
+	void	onBtnConvert(wxCommandEvent& e);
+	void	onBtnConvertAll(wxCommandEvent& e);
+	void	onBtnSkip(wxCommandEvent& e);
+	void	onBtnSkipAll(wxCommandEvent& e);
+	void	onTargetFormatChanged(wxCommandEvent& e);
+	void	onCurrentPaletteChanged(wxCommandEvent& e);
+	void	onTargetPaletteChanged(wxCommandEvent& e);
+	void	onAlphaThresholdChanged(wxCommandEvent& e);
+	void	onEnableTransparencyChanged(wxCommandEvent& e);
+	void	onTransTypeChanged(wxCommandEvent& e);
+	void	onTransColourChanged(wxEvent& e);
 };
 
 #endif //__GFXCONVDIALOG_H__

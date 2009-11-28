@@ -32,6 +32,14 @@
 #include "WxStuff.h"
 #include "TextEditor.h"
 
+
+/*******************************************************************
+ * TEXTEDITOR CLASS FUNCTIONS
+ *******************************************************************/
+
+/* TextEditor::TextEditor
+ * TextEditor class constructor
+ *******************************************************************/
 TextEditor::TextEditor(wxWindow* parent, int id)
 : wxStyledTextCtrl(parent, id) {
 	wxFont f(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
@@ -39,10 +47,20 @@ TextEditor::TextEditor(wxWindow* parent, int id)
 	SetTabWidth(4);
 }
 
+/* TextEditor::~TextEditor
+ * TextEditor class destructor
+ *******************************************************************/
 TextEditor::~TextEditor() {
 }
 
+/* TextEditor::loadEntry
+ * Reads the contents of <entry> into the text area, returns false
+ * if the given entry is invalid
+ *******************************************************************/
 bool TextEditor::loadEntry(ArchiveEntry* entry) {
+	// Clear current text
+	SetText(wxEmptyString);
+
 	// Check that the entry exists
 	if (!entry) {
 		Global::error = _T("Invalid archive entry given");

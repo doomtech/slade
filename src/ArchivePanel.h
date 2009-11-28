@@ -53,13 +53,13 @@ public:
 	virtual bool	newEntryFromFile();
 	virtual bool	renameEntry();
 	virtual bool	deleteEntry();
-	bool	importEntry();
-	bool	exportEntry();
-	bool	exportEntryWad();
-	bool	moveUp();
-	bool	moveDown();
-	bool	gfxConvert();
-	bool	gfxModifyOffsets();
+	bool			importEntry();
+	bool			exportEntry();
+	bool			exportEntryWad();
+	bool			moveUp();
+	bool			moveDown();
+	bool			gfxConvert();
+	bool			gfxModifyOffsets();
 
 	// UI related
 	bool	openEntry(ArchiveEntry* entry);
@@ -68,13 +68,11 @@ public:
 	virtual void onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 
 	// Events
-	void	onEntryListSelect(wxListEvent& event);
-	void	onEntryListDeselect(wxListEvent& event);
-	void	onEntryListRightClick(wxListEvent& event);
-	void	onEntryMenuClick(wxCommandEvent& event);
-	void	onEntryListKeyDown(wxKeyEvent& event);
-
-	DECLARE_EVENT_TABLE()
+	void	onEntryListSelect(wxListEvent& e);
+	void	onEntryListDeselect(wxListEvent& e);
+	void	onEntryListRightClick(wxListEvent& e);
+	void	onEntryMenuClick(wxCommandEvent& e);
+	void	onEntryListKeyDown(wxKeyEvent& e);
 };
 
 #endif //__ARCHIVEPANEL_H__

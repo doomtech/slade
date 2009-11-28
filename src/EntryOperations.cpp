@@ -53,6 +53,10 @@ struct grab_chunk_t {
 };
 
 
+/*******************************************************************
+ * FUNCTIONS
+ *******************************************************************/
+
 /* EntryOperations::modifyGfxOffsets
  * Changes the offsets of the given gfx entry. Returns false if the
  * entry is invalid or not an offset-supported format, true otherwise
@@ -227,8 +231,9 @@ bool EntryOperations::openExternal(ArchiveEntry* entry) {
 }
 
 
-
-
+/*******************************************************************
+ * CONSOLE COMMANDS
+ *******************************************************************/
 
 void c_test_ee(vector<string> args) {
 	if (theArchiveManager->numArchives() > 0) {
@@ -241,4 +246,4 @@ void c_test_ee(vector<string> args) {
 		}
 	}
 }
-ConsoleCommand test_ee(_T("test_ee"), &c_test_ee, 0);
+ConsoleCommand test_ee(_T("test_ee"), &c_test_ee, 1);

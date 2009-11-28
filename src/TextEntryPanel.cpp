@@ -32,6 +32,10 @@
 #include "TextEntryPanel.h"
 
 
+/*******************************************************************
+ * TEXTENTRYPANEL CLASS FUNCTIONS
+ *******************************************************************/
+
 /* TextEntryPanel::TextEntryPanel
  * TextEntryPanel class constructor
  *******************************************************************/

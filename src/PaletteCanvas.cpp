@@ -33,6 +33,10 @@
 #include "PaletteCanvas.h"
 
 
+/*******************************************************************
+ * PALETTECANVAS CLASS FUNCTIONS
+ *******************************************************************/
+
 /* PaletteCanvas::PaletteCanvas
  * PaletteCanvas class constructor
  *******************************************************************/
@@ -40,6 +44,9 @@ PaletteCanvas::PaletteCanvas(wxWindow* parent, int id)
 : OGLCanvas(parent, id) {
 	palette = new Palette8bit();
 	selected = -1;
+
+	// Bind events
+	Bind(wxEVT_LEFT_DOWN, &PaletteCanvas::onMouseLeftDown, this);
 }
 
 /* PaletteCanvas::~PaletteCanvas
@@ -135,15 +142,14 @@ rgba_t PaletteCanvas::getSelectedColour() {
 }
 
 
-
-BEGIN_EVENT_TABLE(PaletteCanvas, OGLCanvas)
-	EVT_LEFT_DOWN(PaletteCanvas::leftClick)
-END_EVENT_TABLE()
+/*******************************************************************
+ * PALETTECANVAS EVENTS
+ *******************************************************************/
 
 /* PaletteCanvas::leftClick
  * Called when the palette canvas is left clicked
  *******************************************************************/
-void PaletteCanvas::leftClick(wxMouseEvent& e) {
+void PaletteCanvas::onMouseLeftDown(wxMouseEvent& e) {
 	// Figure out what 'grid' position was clicked
 	float size = float(min(GetSize().x, GetSize().y)) / 16.0f;
 	int x = int((float)e.GetX() / size);

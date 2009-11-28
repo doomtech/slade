@@ -35,8 +35,7 @@ public:
 	bool	moveDown();
 
 	// Events
-	void	onEntryListActivated(wxListEvent &event);
-	void	onEntryListEditLabel(wxListEvent &event);
+	void	onEntryListActivated(wxListEvent& e);
 };
 
 #endif //__ZIPENTRYLISTPANEL_H__

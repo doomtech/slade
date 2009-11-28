@@ -34,6 +34,10 @@
 #include "PaletteDialog.h"
 
 
+/*******************************************************************
+ * PALETTEDIALOG CLASS FUNCTIONS
+ *******************************************************************/
+
 /* PaletteDialog::PaletteDialog
  * PaletteDialog class constructor
  *******************************************************************/
@@ -48,6 +52,9 @@ PaletteDialog::PaletteDialog(Palette8bit* palette)
 	m_vbox->Add(pal_canvas, 1, wxEXPAND|wxALL, 4);
 
 	m_vbox->Add(CreateStdDialogButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND|wxALL, 4);
+
+	// Bind events
+	pal_canvas->Bind(wxEVT_LEFT_DCLICK, &PaletteDialog::onLeftDoubleClick, this);
 
 	// Autosize to fit contents (and set this as the minimum size)
 	SetInitialSize(wxSize(-1, -1));
@@ -65,4 +72,16 @@ PaletteDialog::~PaletteDialog() {
  *******************************************************************/
 rgba_t PaletteDialog::getSelectedColour() {
 	return pal_canvas->getSelectedColour();
+}
+
+
+/*******************************************************************
+ * PALETTEDIALOG EVENTS
+ *******************************************************************/
+
+/* PaletteDialog::onLeftDoubleClick
+ * Called when the palette canvas is double clicked
+ *******************************************************************/
+void PaletteDialog::onLeftDoubleClick(wxMouseEvent& e) {
+	EndModal(wxID_OK);
 }

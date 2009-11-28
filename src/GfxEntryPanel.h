@@ -20,17 +20,6 @@ private:
 	wxCheckBox*		cb_tile;
 
 public:
-	enum {
-		SLIDER_ZOOM,
-		COMBO_PALETTE,
-		COMBO_OFFSET_TYPE,
-		SPIN_XOFFSET,
-		SPIN_YOFFSET,
-		BTN_SAVE,
-		CB_TILE,
-		GFX_CANVAS,
-	};
-
 	GfxEntryPanel(wxWindow* parent);
 	~GfxEntryPanel();
 
@@ -40,16 +29,14 @@ public:
 	int		detectOffsetType();
 	void	applyViewType();
 
-	void	sliderZoomChanged(wxScrollEvent& e);
-	void	paletteChanged(wxCommandEvent& e);
-	void	spinXOffsetChanged(wxSpinEvent& e);
-	void	spinYOffsetChanged(wxSpinEvent& e);
-	void	comboOffsetTypeChanged(wxCommandEvent& e);
-	void	btnSaveClicked(wxCommandEvent& e);
-	void	cbTileChecked(wxCommandEvent& e);
-	void	gfxOffsetChanged(wxNotifyEvent& e);
-
-	DECLARE_EVENT_TABLE()
+	void	onZoomChanged(wxCommandEvent& e);
+	void	onPaletteChanged(wxCommandEvent& e);
+	void	onXOffsetChanged(wxSpinEvent& e);
+	void	onYOffsetChanged(wxSpinEvent& e);
+	void	onOffsetTypeChanged(wxCommandEvent& e);
+	void	onBtnSave(wxCommandEvent& e);
+	void	onTileChanged(wxCommandEvent& e);
+	void	onGfxOffsetChanged(wxEvent& e);
 };
 
 #endif //__GFXENTRYPANEL_H__

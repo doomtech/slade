@@ -43,15 +43,9 @@
 string main_window_layout = _T("");
 
 
-wxMenuItem* createMenuItem(wxMenu* menu, int id, string label, string help, string icon = _T("")) {
-	wxMenuItem* item = new wxMenuItem(menu, id, label, help);
-
-	#ifdef __WXGTK__
-	item->SetBitmap(getIcon(icon));
-	#endif
-
-	return item;
-}
+/*******************************************************************
+ * MAINWINDOW CLASS FUNCTIONS
+ *******************************************************************/
 
 /* MainWindow::MainWindow
  * MainWindow class constructor
@@ -189,7 +183,7 @@ void MainWindow::setupLayout() {
 	m_mgr->AddPane(notebook_tabs, p_inf);
 
 	// Create Start Page (temporary)
-	html_startpage = new wxHtmlWindow(notebook_tabs, HTML_WINDOW);
+	html_startpage = new wxHtmlWindow(notebook_tabs, -1);
 	notebook_tabs->AddPage(html_startpage, _("Start Page"));
 	html_startpage->SetPage(_("<HTML><BODY><CENTER><H1>SLADE<FONT SIZE=-4>3</FONT></H1><BR>It's A Doom Editor<BR><BR><BR><A HREF=http://slade.mancubus.net>http://slade.mancubus.net</A></CENTER></BODY></HTML>"));
 
@@ -233,27 +227,27 @@ void MainWindow::setupLayout() {
 	// Finalize
 	m_mgr->Update();
 	Layout();
+
+	// Bind events
+	html_startpage->Bind(wxEVT_COMMAND_HTML_LINK_CLICKED, &MainWindow::onHTMLLinkClicked, this);
+	Bind(wxEVT_COMMAND_MENU_SELECTED, &MainWindow::onMenuItemClicked, this, MENU_START, MENU_END);
+	Bind(wxEVT_CLOSE_WINDOW, &MainWindow::onClose, this);
 }
 
 
 /*******************************************************************
- * WXWIDGETS EVENTS & HANDLERS
+ * MAINWINDOW EVENTS
  *******************************************************************/
-BEGIN_EVENT_TABLE(MainWindow, wxFrame)
-	EVT_HTML_LINK_CLICKED(HTML_WINDOW, MainWindow::onHTMLLinkClicked)
-	EVT_MENU_RANGE(MENU_START, MENU_END, MainWindow::onMenuItemClicked)
-	EVT_CLOSE(MainWindow::onClose)
-END_EVENT_TABLE()
-
-string ext_wad = _T("*.wad;*.WAD;*.Wad");
-string ext_zip = _T("*.zip;*.ZIP;*.Zip");
-string ext_pk3 = _T("*.pk3;*.PK3;*.Pk3");
-string ext_jdf = _T("*.jdf;*.JDF;*.Jdf");
 
 /* MainWindow::onMenuItemClicked
  * Called when a menu or toolbar item is clicked
  *******************************************************************/
 void MainWindow::onMenuItemClicked(wxCommandEvent& e) {
+	string ext_wad = _T("*.wad;*.WAD;*.Wad");
+	string ext_zip = _T("*.zip;*.ZIP;*.Zip");
+	string ext_pk3 = _T("*.pk3;*.PK3;*.Pk3");
+	string ext_jdf = _T("*.jdf;*.JDF;*.Jdf");
+
 	// *******************************************************
 	// FILE MENU
 	// *******************************************************

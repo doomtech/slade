@@ -60,6 +60,10 @@ EXTERN_CVAR(Bool, archive_load_data)
  */
 
 
+/*******************************************************************
+ * ZIPDIR_T STRUCT FUNCTIONS
+ *******************************************************************/
+
 /* zipdir_t::zipdir_t
  * zipdir_t struct constructor
  *******************************************************************/
@@ -194,7 +198,9 @@ uint32_t zipdir_t::numSubDirs(bool include_subdirs) {
 }
 
 
-
+/*******************************************************************
+ * ZIPARCHIVE CLASS FUNCTIONS
+ *******************************************************************/
 
 /* ZipArchive::ZipArchive
  * ZipArchive class constructor

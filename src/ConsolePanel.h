@@ -11,23 +11,16 @@ private:
 	wxTextCtrl	*text_command;
 
 public:
-	// wxWidgets ID table
-	enum {
-		CP_TEXT_COMMAND,
-	};
-
 	ConsolePanel(wxWindow *parent, int id);
 	~ConsolePanel();
 
 	void initLayout();
 
-	// wxWidgets event handlers
-	void onCommandEnter(wxCommandEvent &e);
-
 	// Listener stuff
 	void onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 
-	DECLARE_EVENT_TABLE()
+	// Events
+	void onCommandEnter(wxCommandEvent& e);
 };
 
 #endif//__CONSOLEPANEL_H__

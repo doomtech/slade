@@ -35,6 +35,10 @@
 #include "DefaultEntryPanel.h"
 
 
+/*******************************************************************
+ * DEFAULTENTRYPANEL CLASS FUNCTIONS
+ *******************************************************************/
+
 /* DefaultEntryPanel::DefaultEntryPanel
  * DefaultEntryPanel class constructor
  *******************************************************************/
@@ -43,8 +47,11 @@ DefaultEntryPanel::DefaultEntryPanel(wxWindow* parent)
 	// Create widgets
 	label_type = new wxStaticText(this, -1, _T("Entry Type:"));
 	label_size = new wxStaticText(this, -1, _T("Entry Size:"));
-	btn_edit_text = new wxButton(this, BTN_EDITTEXT, _T("Edit as Text"));
+	btn_edit_text = new wxButton(this, -1, _T("Edit as Text"));
 	text_area = new TextEditor(this, -1);
+
+	// Bind Events
+	btn_edit_text->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &DefaultEntryPanel::onEditTextClicked, this);
 
 	// Show entry info stuff
 	view_text = true;
@@ -141,9 +148,10 @@ bool DefaultEntryPanel::loadEntry(ArchiveEntry* entry) {
 	return true;
 }
 
-BEGIN_EVENT_TABLE(DefaultEntryPanel, wxPanel)
-	EVT_BUTTON(BTN_EDITTEXT, DefaultEntryPanel::onEditTextClicked)
-END_EVENT_TABLE()
+
+/*******************************************************************
+ * DEFAULTENTRYPANEL CLASS EVENTS
+ *******************************************************************/
 
 /* DefaultEntryPanel::onEditTextClicked
  * Called when the 'Edit as Text' button is clicked. Shows the text

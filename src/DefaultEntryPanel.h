@@ -14,10 +14,6 @@ private:
 	bool			view_text;
 
 public:
-	enum {
-		BTN_EDITTEXT,
-	};
-
 	DefaultEntryPanel(wxWindow* parent);
 	~DefaultEntryPanel();
 
@@ -26,8 +22,6 @@ public:
 	void showEntryInfo(bool show_btn_edittext = false);
 
 	void onEditTextClicked(wxCommandEvent &event);
-
-	DECLARE_EVENT_TABLE()
 };
 
 #endif //__DEFAULTENTRYPANEL_H__

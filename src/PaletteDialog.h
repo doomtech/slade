@@ -13,6 +13,9 @@ public:
 	~PaletteDialog();
 
 	rgba_t	getSelectedColour();
+
+	// Events
+	void	onLeftDoubleClick(wxMouseEvent& e);
 };
 
 #endif//__PALETTEDIALOG_H__

@@ -34,6 +34,10 @@
 #include "Console.h"
 
 
+/*******************************************************************
+ * MODIFYOFFSETSDIALOG CLASS FUNCTIONS
+ *******************************************************************/
+
 /* ModifyOffsetsDialog::ModifyOffsetsDialog
  * ModifyOffsetsDialog class constructor
  *******************************************************************/
@@ -48,7 +52,7 @@ ModifyOffsetsDialog::ModifyOffsetsDialog()
 	m_vbox->Add(hbox, 0, wxEXPAND|wxALL, 4);
 
 	// 'Set Offsets'
-	opt_set = new wxRadioButton(this, MOD_OPT_SET, _T("Set Offsets"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+	opt_set = new wxRadioButton(this, -1, _T("Set Offsets"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
 	hbox->Add(opt_set, 1, wxEXPAND|wxALL, 4);
 
 	entry_xoff = new wxTextCtrl(this, -1, _T(""), wxDefaultPosition, wxSize(40, -1));
@@ -62,7 +66,7 @@ ModifyOffsetsDialog::ModifyOffsetsDialog()
 	m_vbox->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
 	// 'Auto Offsets'
-	opt_auto = new wxRadioButton(this, MOD_OPT_AUTO, _T("Automatic Offsets"));
+	opt_auto = new wxRadioButton(this, -1, _T("Automatic Offsets"));
 	hbox->Add(opt_auto, 1, wxEXPAND|wxALL, 4);
 
 	string offtypes[] = {
@@ -79,6 +83,13 @@ ModifyOffsetsDialog::ModifyOffsetsDialog()
 	// Add default dialog buttons
 	m_vbox->Add(CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND|wxALL, 4);
 
+
+	// Bind events
+	opt_auto->Bind(wxEVT_COMMAND_RADIOBUTTON_SELECTED, &ModifyOffsetsDialog::onOptAuto, this);
+	opt_set->Bind(wxEVT_COMMAND_RADIOBUTTON_SELECTED, &ModifyOffsetsDialog::onOptSet, this);
+
+
+	// Apply layout and size
 	Layout();
 	SetInitialSize(wxDefaultSize);
 }
@@ -150,15 +161,14 @@ bool ModifyOffsetsDialog::yOffChange() {
 }
 
 
-BEGIN_EVENT_TABLE(ModifyOffsetsDialog, wxDialog)
-	EVT_RADIOBUTTON(MOD_OPT_SET, ModifyOffsetsDialog::onOptSet)
-	EVT_RADIOBUTTON(MOD_OPT_AUTO, ModifyOffsetsDialog::onOptAuto)
-END_EVENT_TABLE()
+/*******************************************************************
+ * MODIFYOFFSETSDIALOG EVENTS
+ *******************************************************************/
 
 /* ModifyOffsetsDialog::onOptSet
  * Called when the 'Set Offsets' radio button is selected
  *******************************************************************/
-void ModifyOffsetsDialog::onOptSet(wxCommandEvent &event) {
+void ModifyOffsetsDialog::onOptSet(wxCommandEvent& e) {
 	entry_xoff->Enable(true);
 	entry_yoff->Enable(true);
 	cbox_relative->Enable(true);
@@ -168,7 +178,7 @@ void ModifyOffsetsDialog::onOptSet(wxCommandEvent &event) {
 /* ModifyOffsetsDialog::ModifyOffsetsDialog
  * Called when the 'Automatic Offsets' radio button is selected
  *******************************************************************/
-void ModifyOffsetsDialog::onOptAuto(wxCommandEvent &event) {
+void ModifyOffsetsDialog::onOptAuto(wxCommandEvent& e) {
 	entry_xoff->Enable(false);
 	entry_yoff->Enable(false);
 	cbox_relative->Enable(false);
@@ -176,27 +186,12 @@ void ModifyOffsetsDialog::onOptAuto(wxCommandEvent &event) {
 }
 
 
-
-
+/*******************************************************************
+ * CONSOLE COMMANDS
+ *******************************************************************/
 
 void c_test_mod(vector<string> args) {
 	ModifyOffsetsDialog mod;
-
-	/*
-	if (theArchiveManager->numArchives() > 0) {
-		vector<ArchiveEntry*> entries;
-		for (int a = 0; a < args.size(); a++) {
-			ArchiveEntry* entry = theArchiveManager->getArchive(0)->getEntry(args[a]);
-			if (entry)
-				entries.push_back(entry);
-			else
-				wxLogMessage(s_fmt(_T("Entry %s not found"), args[a].c_str()));
-		}
-
-		gcd.openEntries(entries);
-	}
-	 */
-
 	mod.ShowModal();
 }
 ConsoleCommand test_mod(_T("test_mod"), &c_test_mod, 0);

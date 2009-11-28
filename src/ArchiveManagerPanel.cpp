@@ -40,7 +40,7 @@
 
 
 /*******************************************************************
- * EXTERNAL VARIABLES
+ * WMFILEBROWSER CLASS FUNCTIONS
  *******************************************************************/
 
 /* WMFileBrowser::WMFileBrowser
@@ -77,6 +77,11 @@ void WMFileBrowser::onItemActivated(wxTreeEvent &e) {
 		browser->parent->openFile(browser->GetPath());
 }
 
+
+/*******************************************************************
+ * ARCHIVEMANAGERPANEL CLASS FUNCTIONS
+ *******************************************************************/
+
 /* ArchiveManagerPanel::ArchiveManagerPanel
  * ArchiveManagerPanel class constructor
  *******************************************************************/
@@ -100,16 +105,16 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
 	wxBoxSizer *box_am = new wxBoxSizer(wxVERTICAL);
 	panel_am->SetSizer(box_am);
 	box_am->Add(new wxStaticText(panel_am, -1, _T("Open Archives:")), 0, wxEXPAND | wxALL, 4);
-	list_archives = new wxListCtrl(panel_am, LIST_OPENARCHIVES, wxDefaultPosition, wxDefaultSize, wxLC_LIST);
+	list_archives = new wxListCtrl(panel_am, -1, wxDefaultPosition, wxDefaultSize, wxLC_LIST);
 	box_am->Add(list_archives, 1, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, 4);
 
 	// Create/setup map list
 	box_am->Add(new wxStaticText(panel_am, -1, _T("Maps:")), 0, wxEXPAND | wxALL, 4);
-	list_maps = new wxListCtrl(panel_am, LIST_MAPS, wxDefaultPosition, wxSize(-1, 128), wxLC_LIST | wxLC_SINGLE_SEL);
+	list_maps = new wxListCtrl(panel_am, -1, wxDefaultPosition, wxSize(-1, 128), wxLC_LIST | wxLC_SINGLE_SEL);
 	box_am->Add(list_maps, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, 4);
 
 	// Create/setup file browser
-	file_browser = new WMFileBrowser(notebook_tabs, this, TREE_BROWSER);
+	file_browser = new WMFileBrowser(notebook_tabs, this, -1);
 	notebook_tabs->AddPage(file_browser, _("File Browser"));
 
 	// Create/setup Archive context menu
@@ -118,9 +123,31 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
 	menu_context->Append(MENU_SAVEAS, _("Save As"), _("Save the selected Archive(s) to a new file(s)"));
 	menu_context->Append(MENU_CLOSE, _T("Close"), _("Close the selected Archive(s)"));
 
+	// Bind events
+	list_archives->Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &ArchiveManagerPanel::onListArchivesChanged, this);
+	list_archives->Bind(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, &ArchiveManagerPanel::onListArchivesActivated, this);
+	list_archives->Bind(wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK, &ArchiveManagerPanel::onListArchivesRightClick, this);
+	list_maps->Bind(wxEVT_COMMAND_LISTBOX_SELECTED, &ArchiveManagerPanel::onListMapsChanged, this);
+	list_maps->Bind(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, &ArchiveManagerPanel::onListMapsActivated, this);
+	Bind(wxEVT_COMMAND_MENU_SELECTED, &ArchiveManagerPanel::onMenu, this, MENU_SAVE, MENU_END);
+
 	// Listen to the ArchiveManager
 	listenTo(theArchiveManager);
 }
+/*
+BEGIN_EVENT_TABLE(ArchiveManagerPanel, wxPanel)
+	EVT_LIST_ITEM_SELECTED(LIST_OPENARCHIVES, ArchiveManagerPanel::onListArchivesChanged)
+	EVT_LIST_ITEM_ACTIVATED(LIST_OPENARCHIVES, ArchiveManagerPanel::onListArchivesActivated)
+	EVT_LISTBOX(LIST_MAPS, ArchiveManagerPanel::onListMapsChanged)
+	EVT_LIST_ITEM_ACTIVATED(LIST_MAPS, ArchiveManagerPanel::onListMapsActivated)
+	EVT_LIST_ITEM_RIGHT_CLICK(LIST_OPENARCHIVES, ArchiveManagerPanel::onListArchivesRightClick)
+
+	// Context Menu
+	EVT_MENU(MENU_SAVE, ArchiveManagerPanel::onMenuSave)
+	EVT_MENU(MENU_SAVEAS, ArchiveManagerPanel::onMenuSaveAs)
+	EVT_MENU(MENU_CLOSE, ArchiveManagerPanel::onMenuClose)
+END_EVENT_TABLE()
+*/
 
 /* ArchiveManagerPanel::~ArchiveManagerPanel
  * ArchiveManagerPanel class destructor
@@ -140,6 +167,9 @@ void ArchiveManagerPanel::refreshArchiveList() {
 		list_archives->InsertItem(list_archives->GetItemCount(), theArchiveManager->getArchive(a)->getFileName(true));
 }
 
+/* ArchiveManagerPanel::populateMapList
+ * Adds all maps in <archive> to the maps list widget
+ *******************************************************************/
 void ArchiveManagerPanel::populateMapList(Archive* archive) {
 	// Clear current maps list
 	list_maps->ClearAll();
@@ -175,6 +205,9 @@ void ArchiveManagerPanel::populateMapList(Archive* archive) {
 	}
 }
 
+/* ArchiveManagerPanel::updateListItem
+ * Updates the archive list item at <index>
+ *******************************************************************/
 void ArchiveManagerPanel::updateListItem(int index) {
 	list_archives->SetItemText(index, theArchiveManager->getArchive(index)->getFileName(true));
 }
@@ -197,6 +230,10 @@ bool ArchiveManagerPanel::isArchivePanel(int tab_index) {
 	return true;
 }
 
+/* ArchiveManagerPanel::openTab
+ * Opens a new tab for the archive at <archive_index> in the archive
+ * manager
+ *******************************************************************/
 void ArchiveManagerPanel::openTab(int archive_index) {
 	Archive* archive = theArchiveManager->getArchive(archive_index);
 
@@ -534,6 +571,10 @@ void ArchiveManagerPanel::deleteEntry() {
 		((ArchivePanel*) notebook_archives->GetPage(selection))->deleteEntry();
 }
 
+/* ArchiveManagerPanel::deleteEntry
+ * Signals the currently opened archive panel tab to import files to
+ * any selected entries
+ *******************************************************************/
 void ArchiveManagerPanel::importEntry() {
 	// Send to current archive panel
 	int selection = notebook_archives->GetSelection();
@@ -541,6 +582,10 @@ void ArchiveManagerPanel::importEntry() {
 		((ArchivePanel*) notebook_archives->GetPage(selection))->importEntry();
 }
 
+/* ArchiveManagerPanel::deleteEntry
+ * Signals the currently opened archive panel tab to export any
+ * selected entries to files
+ *******************************************************************/
 void ArchiveManagerPanel::exportEntry() {
 	// Send to current archive panel
 	int selection = notebook_archives->GetSelection();
@@ -548,6 +593,10 @@ void ArchiveManagerPanel::exportEntry() {
 		((ArchivePanel*) notebook_archives->GetPage(selection))->exportEntry();
 }
 
+/* ArchiveManagerPanel::deleteEntry
+ * Signals the currently opened archive panel tab to export any
+ * selected entries to a new wad archive
+ *******************************************************************/
 void ArchiveManagerPanel::exportEntryWad() {
 	// Send to current archive panel
 	int selection = notebook_archives->GetSelection();
@@ -575,28 +624,17 @@ void ArchiveManagerPanel::moveDown() {
 		((ArchivePanel*) notebook_archives->GetPage(selection))->moveDown();
 }
 
-/*******************************************************************
- * WXWIDGETS EVENTS & HANDLERS
- *******************************************************************/
-BEGIN_EVENT_TABLE(ArchiveManagerPanel, wxPanel)
-	EVT_LIST_ITEM_SELECTED(LIST_OPENARCHIVES, ArchiveManagerPanel::onListArchivesChanged)
-	EVT_LIST_ITEM_ACTIVATED(LIST_OPENARCHIVES, ArchiveManagerPanel::onListArchivesActivated)
-	EVT_LISTBOX(LIST_MAPS, ArchiveManagerPanel::onListMapsChanged)
-	EVT_LIST_ITEM_ACTIVATED(LIST_MAPS, ArchiveManagerPanel::onListMapsActivated)
-	EVT_LIST_ITEM_RIGHT_CLICK(LIST_OPENARCHIVES, ArchiveManagerPanel::onListArchivesRightClick)
 
-	// Context Menu
-	EVT_MENU(MENU_SAVE, ArchiveManagerPanel::onMenuSave)
-	EVT_MENU(MENU_SAVEAS, ArchiveManagerPanel::onMenuSaveAs)
-	EVT_MENU(MENU_CLOSE, ArchiveManagerPanel::onMenuClose)
-END_EVENT_TABLE()
+/*******************************************************************
+ * ARCHIVEMANAGERPANEL EVENTS
+ *******************************************************************/
 
 /* ArchiveManagerPanel::onListArchivesChanged
- * Event handler for when the user selects an archive in the open
- * files list. Updates the maps list with any maps found within the
- * selected archive.
+ * Called when the user selects an archive in the open files list.
+ * Updates the maps list with any maps found within the selected
+ * archive
  *******************************************************************/
-void ArchiveManagerPanel::onListArchivesChanged(wxListEvent &e) {
+void ArchiveManagerPanel::onListArchivesChanged(wxListEvent& e) {
 	// Get the selected archive
 	Archive* selected_archive = theArchiveManager->getArchive(e.GetIndex());
 
@@ -608,74 +646,50 @@ void ArchiveManagerPanel::onListArchivesChanged(wxListEvent &e) {
 }
 
 /* ArchiveManagerPanel::onListArchivesActivated
- * Event handler for when the user activates an archive in the list.
+ * Called when the user activates an archive in the list.
  * Opens the archive in a new tab, if it isn't already open.
  *******************************************************************/
-void ArchiveManagerPanel::onListArchivesActivated(wxListEvent &e) {
+void ArchiveManagerPanel::onListArchivesActivated(wxListEvent& e) {
 	// Open the archive tab, or create a new tab if it isn't already
 	openTab(e.GetIndex());
 }
 
 /* ArchiveManagerPanel::onListMapsChanged
- * Event handler for when the user selects a map in the maps list.
+ * Called when the user selects a map in the maps list.
  *******************************************************************/
-void ArchiveManagerPanel::onListMapsChanged(wxCommandEvent &e) {
+void ArchiveManagerPanel::onListMapsChanged(wxCommandEvent& e) {
 }
 
 /* ArchiveManagerPanel::onListMapsActivated
- * Event handler for when the user activates a map in the maps list.
+ * Called when the user activates a map in the maps list.
  * Opens the map in a new map editor window
  *******************************************************************/
-void ArchiveManagerPanel::onListMapsActivated(wxListEvent &e) {
+void ArchiveManagerPanel::onListMapsActivated(wxListEvent& e) {
 	//new MapEditorWindow();
 	wxMessageBox(_T("Map Editor is not implemented yet."));
 }
 
-/* ArchiveManagerPanel::onBrowserItemActivated
- * Event handler for when the user activates an item on the file
- * browser list. This makes it act funny, but I can't find another
- * way to get this event to work :/
- *******************************************************************/
-void ArchiveManagerPanel::onBrowserItemActivated(wxTreeEvent &e) {
-	// Get the tree control
-	wxTreeCtrl* tree = file_browser->GetTreeCtrl();
-
-	// If the selected item has children, expand it,
-	// otherwise attempt to open the file selected
-	if (tree->ItemHasChildren(e.GetItem()))
-		file_browser->OnExpandItem(e);
-	else
-		openFile(file_browser->GetPath());
-}
-
 /* ArchiveManagerPanel::onListArchivesRightClick
- * Event handler for when the user right clicks an item on the
- * archive list - pops up a context menu
+ * Called when the user right clicks an item on the archive list,
+ * pops up a context menu
  *******************************************************************/
 void ArchiveManagerPanel::onListArchivesRightClick(wxListEvent& e) {
 	PopupMenu(menu_context);
 }
 
-/* ArchiveManagerPanel::onMenuSave
- * Event handler for when the 'Save' menu item is clicked on the
- * archive list context menu
+/* ArchiveManagerPanel::onMenu
+ * Called when an item on the archive list context menu is selected
  *******************************************************************/
-void ArchiveManagerPanel::onMenuSave(wxCommandEvent &e) {
-	saveSelection();
-}
+void ArchiveManagerPanel::onMenu(wxCommandEvent& e) {
+	// Save
+	if (e.GetId() == MENU_SAVE)
+		saveSelection();
 
-/* ArchiveManagerPanel::onMenuSaveAs
- * Event handler for when the 'Save As' menu item is clicked on the
- * archive list context menu
- *******************************************************************/
-void ArchiveManagerPanel::onMenuSaveAs(wxCommandEvent &e) {
-	saveSelectionAs();
-}
+	// Save As
+	else if (e.GetId() == MENU_SAVEAS)
+		saveSelectionAs();
 
-/* ArchiveManagerPanel::onMenuClose
- * Event handler for when the 'Close' menu item is clicked on the
- * archive list context menu
- *******************************************************************/
-void ArchiveManagerPanel::onMenuClose(wxCommandEvent& e) {
-	closeSelection();
+	// Close
+	else if (e.GetId() == MENU_CLOSE)
+		closeSelection();
 }

@@ -28,6 +28,7 @@
       <itemPath>src/Structs.h</itemPath>
       <itemPath>src/Tokenizer.cpp</itemPath>
       <itemPath>src/Tokenizer.h</itemPath>
+      <itemPath>src/WxStuff.cpp</itemPath>
       <itemPath>src/WxStuff.h</itemPath>
     </logicalFolder>
     <logicalFolder name="f2" displayName="Main Editor" projectFiles="true">
@@ -162,7 +163,7 @@
       <toolsSet>
         <developmentServer>localhost</developmentServer>
         <compilerSet>GNU|GNU</compilerSet>
-        <platform>3</platform>
+        <platform>2</platform>
       </toolsSet>
       <compileType>
         <cTool>

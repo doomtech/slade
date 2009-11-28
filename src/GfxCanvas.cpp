@@ -39,11 +39,16 @@
 DEFINE_EVENT_TYPE(wxEVT_GFXCANVAS_OFFSET_CHANGED)
 
 
+/*******************************************************************
+ * GFXCANVAS CLASS FUNCTIONS
+ *******************************************************************/
+
 /* GfxCanvas::GfxCanvas
  * GfxCanvas class constructor
  *******************************************************************/
 GfxCanvas::GfxCanvas(wxWindow* parent, int id)
 : OGLCanvas(parent, id) {
+	// Init variables
 	image = new SImage();
 	view_type = GFXVIEW_DEFAULT;
 	scale = 1;
@@ -56,6 +61,11 @@ GfxCanvas::GfxCanvas(wxWindow* parent, int id)
 
 	// Listen to the image for changes
 	listenTo(image);
+
+	// Bind events
+	Bind(wxEVT_LEFT_DOWN, &GfxCanvas::onMouseLeftDown, this);
+	Bind(wxEVT_LEFT_UP, &GfxCanvas::onMouseLeftUp, this);
+	Bind(wxEVT_MOTION, &GfxCanvas::onMouseMovement, this);
 }
 
 /* GfxCanvas::~GfxCanvas
@@ -408,17 +418,14 @@ void GfxCanvas::onAnnouncement(Announcer* announcer, string event_name, MemChunk
 }
 
 
-
-BEGIN_EVENT_TABLE(GfxCanvas, OGLCanvas)
-	EVT_LEFT_DOWN(GfxCanvas::mouseLeftDown)
-	EVT_LEFT_UP(GfxCanvas::mouseLeftUp)
-	EVT_MOTION(GfxCanvas::mouseMove)
-END_EVENT_TABLE()
+/*******************************************************************
+ * GFXCANVAS EVENTS
+ *******************************************************************/
 
 /* GfxCanvas::mouseLeftDown
  * Called when the left button is pressed within the canvas
  *******************************************************************/
-void GfxCanvas::mouseLeftDown(wxMouseEvent& e) {
+void GfxCanvas::onMouseLeftDown(wxMouseEvent& e) {
 	int x = e.GetPosition().x;
 	int y = e.GetPosition().y;
 	bool on_image = onImage(x, y);
@@ -439,7 +446,7 @@ void GfxCanvas::mouseLeftDown(wxMouseEvent& e) {
 /* GfxCanvas::mouseLeftUp
  * Called when the left button is released within the canvas
  *******************************************************************/
-void GfxCanvas::mouseLeftUp(wxMouseEvent& e) {
+void GfxCanvas::onMouseLeftUp(wxMouseEvent& e) {
 	// Stop dragging
 	if (drag_origin.x >= 0) {
 		endOffsetDrag();
@@ -450,7 +457,7 @@ void GfxCanvas::mouseLeftUp(wxMouseEvent& e) {
 /* GfxCanvas::mouseMove
  * Called when the mouse pointer is moved within the canvas
  *******************************************************************/
-void GfxCanvas::mouseMove(wxMouseEvent& e) {
+void GfxCanvas::onMouseMovement(wxMouseEvent& e) {
 	bool refresh = false;
 
 	// Check if the mouse is over the image

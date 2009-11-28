@@ -40,6 +40,16 @@
 #include <wx/colordlg.h>
 
 
+/*******************************************************************
+ * VARIABLES
+ *******************************************************************/
+DEFINE_EVENT_TYPE(wxEVT_COLOURBOX_CHANGED)
+
+
+/*******************************************************************
+ * COLOURBOX CLASS FUNCTIONS
+ *******************************************************************/
+
 /* ColourBox::ColourBox
  * ColourBox class constructor
  *******************************************************************/
@@ -48,6 +58,11 @@ ColourBox::ColourBox(wxWindow* parent, int id, bool enable_alpha)
 	alpha = enable_alpha;
 	palette = NULL;
 	colour = COL_BLACK;
+
+	// Bind events
+	Bind(wxEVT_PAINT, &ColourBox::onPaint, this);
+	Bind(wxEVT_LEFT_DOWN, &ColourBox::onMouseLeftDown, this);
+	Bind(wxEVT_RIGHT_DOWN, &ColourBox::onMouseRightDown, this);
 }
 
 /* ColourBox::~ColourBox
@@ -66,19 +81,14 @@ void ColourBox::sendChangeEvent() {
 }
 
 
+/*******************************************************************
+ * COLOURBOX EVENTS
+ *******************************************************************/
 
-DEFINE_EVENT_TYPE(wxEVT_COLOURBOX_CHANGED)
-
-BEGIN_EVENT_TABLE(ColourBox, wxPanel)
-	EVT_PAINT(ColourBox::paint)
-	EVT_LEFT_DOWN(ColourBox::leftClick)
-	EVT_RIGHT_DOWN(ColourBox::rightClick)
-END_EVENT_TABLE()
-
-/* ColourBox::paint
+/* ColourBox::onPaint
  * Called when the colour box needs to be (re)drawn
  *******************************************************************/
-void ColourBox::paint(wxPaintEvent &event) {
+void ColourBox::onPaint(wxPaintEvent& e) {
 	wxPaintDC dc(this);
 
 	dc.SetBrush(wxBrush(wxColour(colour.r, colour.g, colour.b)));
@@ -96,12 +106,12 @@ void ColourBox::paint(wxPaintEvent &event) {
 	}
 }
 
-/* ColourBox::leftClick
+/* ColourBox::onMouseLeftDown
  * Called when the colour box is left clicked. Pops up either a
  * colour selection dialog, or a palette dialog if a palette has been
  * given to the colour box
  *******************************************************************/
-void ColourBox::leftClick(wxMouseEvent &event) {
+void ColourBox::onMouseLeftDown(wxMouseEvent& e) {
 	if (!palette) {
 		wxColour col = wxGetColourFromUser(GetParent(), wxColour(colour.r, colour.g, colour.b));
 
@@ -126,12 +136,12 @@ void ColourBox::leftClick(wxMouseEvent &event) {
 	}
 }
 
-/* ColourBox::rightClick
+/* ColourBox::onMouseRightDown
  * Called when the colour box is right clicked. Pops up a simple
  * dialog with a slider control to select the colour alpha value,
  * if alpha is enabled
  *******************************************************************/
-void ColourBox::rightClick(wxMouseEvent &event) {
+void ColourBox::onMouseRightDown(wxMouseEvent& e) {
 	// Do nothing if alpha disabled
 	if (!alpha)
 		return;

@@ -34,6 +34,10 @@
 #include "ListenerAnnouncer.h"
 
 
+/*******************************************************************
+ * LISTENER CLASS FUNCTIONS
+ *******************************************************************/
+
 /* Listener::Listener
  * Listener class constructor
  *******************************************************************/
@@ -63,6 +67,11 @@ void Listener::listenTo(Announcer* a) {
  *******************************************************************/
 void Listener::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
 }
+
+
+/*******************************************************************
+ * ANNOUNCER CLASS FUNCTIONS
+ *******************************************************************/
 
 /* Announcer::Announcer
  * Announcer class constructor

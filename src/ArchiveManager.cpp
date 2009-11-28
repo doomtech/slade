@@ -43,9 +43,8 @@ ArchiveManager* ArchiveManager::instance = NULL;
 
 
 /*******************************************************************
- * EXTERNAL VARIABLES
+ * ARCHIVEMANAGER CLASS FUNCTIONS
  *******************************************************************/
-
 
 /* ArchiveManager::ArchiveManager
  * ArchiveManager class constructor

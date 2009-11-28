@@ -34,6 +34,9 @@
 #include "PaletteManager.h"
 
 
+/*******************************************************************
+ * PALETTECHOOSER CLASS FUNCTIONS
+ *******************************************************************/
 
 /* PaletteChooser::PaletteChooser
  * PaletteChooser class constructor

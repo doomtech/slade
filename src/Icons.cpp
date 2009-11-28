@@ -1,10 +1,43 @@
 
+/*******************************************************************
+ * SLADE - It's a Doom Editor
+ * Copyright (C) 2008 Simon Judd
+ *
+ * Email:       veilofsorrow@gmail.com
+ * Web:         http://slade.mancubus.net
+ * Filename:    Icons.cpp
+ * Description: Functions to do with loading program icons from
+ *              slade.pk3
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *******************************************************************/
+
+
+/*******************************************************************
+ * INCLUDES
+ *******************************************************************/
 #include "Main.h"
 #include "WxStuff.h"
 #include "Icons.h"
 #include "ArchiveManager.h"
 #include "ZipArchive.h"
 
+
+/*******************************************************************
+ * VARIABLES
+ *******************************************************************/
 struct icon_t {
 	wxImage	image;
 	string	name;
@@ -13,6 +46,13 @@ vector<icon_t>	icons;
 wxBitmap icon_empty;
 
 
+/*******************************************************************
+ * FUNCTIONS
+ *******************************************************************/
+
+/* loadIcons
+ * Loads all icons from slade.pk3 (in the icons/ dir)
+ *******************************************************************/
 bool loadIcons() {
 	string tempfile = appPath(_T("sladetemp"), DIR_TEMP);
 
@@ -46,6 +86,10 @@ bool loadIcons() {
 	}
 }
 
+/* getIcon
+ * Returns the icon matching <name> as a wxBitmap (for toolbars etc),
+ * or an empty bitmap if no icon matching <name> was found
+ *******************************************************************/
 wxBitmap getIcon(string name) {
 	for (int a = 0; a < icons.size(); a++) {
 		if (icons[a].name.Cmp(name) == 0)

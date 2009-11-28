@@ -16,12 +16,6 @@ private:
 	wxButton*		btn_modify_offsets;
 
 public:
-	enum {
-		BTN_EXPORT_ARCHIVE,
-		BTN_CONVERT_GFX,
-		BTN_MODIFY_OFFSETS,
-	};
-
 	MultiEntryPanel(wxWindow* parent);
 	~MultiEntryPanel();
 
@@ -29,11 +23,9 @@ public:
 	void	updateLayout();
 
 	// Events
-	void	btnExportArchiveClicked(wxCommandEvent& e);
-	void	btnConvertGfxClicked(wxCommandEvent& e);
-	void	btnModifyOffsetsClicked(wxCommandEvent& e);
-
-	DECLARE_EVENT_TABLE()
+	void	onBtnExportArchive(wxCommandEvent& e);
+	void	onBtnConvertGfx(wxCommandEvent& e);
+	void	onBtnModifyOffsets(wxCommandEvent& e);
 };
 
 #endif //__MULTIENTRYPANEL_H__

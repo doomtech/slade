@@ -97,7 +97,9 @@ public:
 };
 
 
-
+/*******************************************************************
+ * ZIPARCHIVEPANEL CLASS FUNCTIONS
+ *******************************************************************/
 
 /* ZipArchivePanel::ZipArchivePanel
  * ZipArchivePanel class constructor

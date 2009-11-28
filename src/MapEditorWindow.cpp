@@ -34,9 +34,8 @@
 
 
 /*******************************************************************
- * VARIABLES
+ * MAPEDITORWINDOW CLASS FUNCTIONS
  *******************************************************************/
-
 
 /* MapEditorWindow::MapEditorWindow
  * MapEditorWindow class constructor

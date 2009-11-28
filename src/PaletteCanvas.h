@@ -20,9 +20,7 @@ public:
 	rgba_t	getSelectedColour();
 
 	// Events
-	void	leftClick(wxMouseEvent &e);
-
-	DECLARE_EVENT_TABLE()
+	void	onMouseLeftDown(wxMouseEvent &e);
 };
 
 #endif //__PALETTECANVAS_H__

@@ -32,6 +32,11 @@
 #include "WxStuff.h"
 #include "EntryPanel.h"
 
+
+/*******************************************************************
+ * ENTRYPANEL CLASS FUNCTIONS
+ *******************************************************************/
+
 /* EntryPanel::EntryPanel
  * EntryPanel class constructor
  *******************************************************************/

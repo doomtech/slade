@@ -5,9 +5,9 @@
  *
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
- * Filename:    PaletteEntryPanel.cpp
- * Description: PaletteEntryPanel class. The UI for editing
- *              palette (PLAYPAL) entries
+ * Filename:    WxStuff.cpp
+ * Description: Some miscellaneous wxWidgets-related functions for
+ *              general/global use in SLADE
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -30,41 +30,19 @@
  *******************************************************************/
 #include "Main.h"
 #include "WxStuff.h"
-#include "PaletteEntryPanel.h"
+#include "Icons.h"
 
-
-/*******************************************************************
- * PALETTEENTRYPANEL CLASS FUNCTIONS
+/* createMenuItem
+ * Creates a wxMenuItem from the given parameters, including giving
+ * it an icon from slade.pk3 if specified
  *******************************************************************/
+wxMenuItem* createMenuItem(wxMenu* menu, int id, string label, string help, string icon) {
+	wxMenuItem* item = new wxMenuItem(menu, id, label, help);
 
-/* PaletteEntryPanel::PaletteEntryPanel
- * PaletteEntryPanel class constructor
- *******************************************************************/
-PaletteEntryPanel::PaletteEntryPanel(wxWindow* parent)
-: EntryPanel(parent) {
-	// Get the sizer
-	wxSizer* sizer = GetSizer();
+	#ifdef __WXGTK__
+	if (!icon.IsEmpty())
+		item->SetBitmap(getIcon(icon));
+	#endif
 
-	// Add palette canvas
-	pal_canvas = new PaletteCanvas(this, -1);
-	sizer->Add(pal_canvas, 1, wxEXPAND|wxALL, 4);
-
-	Layout();
-}
-
-/* DefaultEntryPanel::~DefaultEntryPanel
- * DefaultEntryPanel class destructor
- *******************************************************************/
-PaletteEntryPanel::~PaletteEntryPanel() {
-}
-
-/* PaletteEntryPanel::loadEntry
- * Loads an entry into the entry panel if it is a valid image format
- *******************************************************************/
-bool PaletteEntryPanel::loadEntry(ArchiveEntry* entry) {
-	MemChunk mc;
-	mc.loadMem(entry->getData(true), entry->getSize());
-	pal_canvas->getPalette().loadMem(mc);
-
-	return true;
+	return item;
 }

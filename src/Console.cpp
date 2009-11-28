@@ -40,6 +40,10 @@
 Console* Console::instance = NULL;
 
 
+/*******************************************************************
+ * CONSOLE CLASS FUNCTIONS
+ *******************************************************************/
+
 /* Console::Console
  * Console class constructor
  *******************************************************************/
@@ -194,7 +198,9 @@ void ConsoleCommand::execute(vector<string> args) {
 }
 
 
-
+/*******************************************************************
+ * CONSOLE COMMANDS
+ *******************************************************************/
 
 /* Console Command - "echo"
  * A simple command to print the first given argument to the console.

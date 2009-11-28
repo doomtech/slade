@@ -33,6 +33,14 @@
 #include "Misc.h"
 
 
+/*******************************************************************
+ * FUNCTIONS
+ *******************************************************************/
+
+/* Misc::loadImageFromEntry
+ * Loads an image from <entry> into <image>. Returns false if the
+ * given entry wasn't a valid image, true otherwise
+ *******************************************************************/
 bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry) {
 	switch (entry->getType()) {
 		// General image formats
@@ -59,6 +67,11 @@ bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry) {
 	return false;
 }
 
+/* Misc::loadPaletteFromArchive
+ * Writes palette information from the PLAYPAL entry in <archive> to
+ * <pal>. Returns false if PLAYPAL entry was missing or invalid,
+ * true otherwise
+ *******************************************************************/
 bool Misc::loadPaletteFromArchive(Palette8bit* pal, Archive* archive) {
 	// Check parameters
 	if (!pal || !archive)
@@ -88,6 +101,10 @@ bool Misc::loadPaletteFromArchive(Palette8bit* pal, Archive* archive) {
 	return true;
 }
 
+/* Misc::sizeAsString
+ * Converts <size> to a string representing it as a 'bytes' size, ie
+ * "1.24kb", "4.00mb". Sizes under 1kb aren't given an appendage
+ *******************************************************************/
 string Misc::sizeAsString(uint32_t size) {
 	if (size < 1024) {
 		return s_fmt(_T("%d"), size);

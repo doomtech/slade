@@ -46,6 +46,10 @@
 #include <wx/filename.h>
 
 
+/*******************************************************************
+ * ARCHIVEPANEL CLASS FUNCTIONS
+ *******************************************************************/
+
 /* ArchivePanel::ArchivePanel
  * ArchivePanel class constructor
  *******************************************************************/
@@ -61,6 +65,12 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 	gfx_area = new GfxEntryPanel(this);
 	pal_area = new PaletteEntryPanel(this);
 	multi_area = new MultiEntryPanel(this);
+
+	// Bind events
+	Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &ArchivePanel::onEntryListSelect, this, ENTRY_LIST_PANEL);
+	Bind(wxEVT_COMMAND_LIST_ITEM_DESELECTED, &ArchivePanel::onEntryListDeselect, this, ENTRY_LIST_PANEL);
+	Bind(wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK, &ArchivePanel::onEntryListRightClick, this, ENTRY_LIST_PANEL);
+	Bind(wxEVT_COMMAND_MENU_SELECTED, &ArchivePanel::onEntryMenuClick, this, MENU_ENTRY_RENAME, MENU_ENTRY_END);
 }
 
 /* ArchivePanel::~ArchivePanel
@@ -530,17 +540,15 @@ bool ArchivePanel::showEntryPanel(EntryPanel* new_area, bool ask_save) {
 	return true;
 }
 
-BEGIN_EVENT_TABLE(ArchivePanel, wxPanel)
-	EVT_LIST_ITEM_SELECTED(ArchivePanel::ENTRY_LIST_PANEL, ArchivePanel::onEntryListSelect)
-	EVT_LIST_ITEM_DESELECTED(ArchivePanel::ENTRY_LIST_PANEL, ArchivePanel::onEntryListDeselect)
-	EVT_LIST_ITEM_RIGHT_CLICK(ArchivePanel::ENTRY_LIST_PANEL, ArchivePanel::onEntryListRightClick)
-	EVT_MENU_RANGE(MENU_ENTRY_RENAME, MENU_ENTRY_END, ArchivePanel::onEntryMenuClick)
-END_EVENT_TABLE()
+
+/*******************************************************************
+ * ARCHIVEPANEL EVENTS
+ *******************************************************************/
 
 /* ArchivePanel::onEntryListSelect
  * Called when an entry list item is selected
  *******************************************************************/
-void ArchivePanel::onEntryListSelect(wxListEvent& event) {
+void ArchivePanel::onEntryListSelect(wxListEvent& e) {
 	// Get selected entries
 	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
 
@@ -563,7 +571,7 @@ void ArchivePanel::onEntryListSelect(wxListEvent& event) {
 /* ArchivePanel::onEntryListDeselect
  * Called when an entry list item is deselected
  *******************************************************************/
-void ArchivePanel::onEntryListDeselect(wxListEvent& event) {
+void ArchivePanel::onEntryListDeselect(wxListEvent& e) {
 	// Get selected entries
 	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
 
@@ -586,7 +594,7 @@ void ArchivePanel::onEntryListDeselect(wxListEvent& event) {
 /* ArchivePanel::onEntryListRightClick
  * Called when the entry list is right clicked
  *******************************************************************/
-void ArchivePanel::onEntryListRightClick(wxListEvent& event) {
+void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 	// Generate context menu
 	wxMenu* context = new wxMenu();
 	context->Append(MENU_ENTRY_RENAME, _T("Rename"));
@@ -630,8 +638,8 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& event) {
 /* ArchivePanel::onEntryMenuClick
  * Called when an entry menu item is selected
  *******************************************************************/
-void ArchivePanel::onEntryMenuClick(wxCommandEvent& event) {
-	switch (event.GetId()) {
+void ArchivePanel::onEntryMenuClick(wxCommandEvent& e) {
+	switch (e.GetId()) {
 		case MENU_ENTRY_RENAME:
 			renameEntry();
 			break;
@@ -665,38 +673,38 @@ void ArchivePanel::onEntryMenuClick(wxCommandEvent& event) {
 /* ArchivePanel::onEntryListKeyDown
  * Called when a key is pressed on the entry list
  *******************************************************************/
-void ArchivePanel::onEntryListKeyDown(wxKeyEvent& event) {
+void ArchivePanel::onEntryListKeyDown(wxKeyEvent& e) {
 	// Rename entry (Ctrl+R or F2)
-	if ((event.GetKeyCode() == 'R' && event.ControlDown()) || event.GetKeyCode() == WXK_F2)
+	if ((e.GetKeyCode() == 'R' && e.ControlDown()) || e.GetKeyCode() == WXK_F2)
 		renameEntry();
 
 	// Delete entry (Delete)
-	if (event.GetKeyCode() == WXK_DELETE)
+	if (e.GetKeyCode() == WXK_DELETE)
 		deleteEntry();
 
 	// Import to entry (Ctrl+I)
-	if (event.GetKeyCode() == 'I' && event.ControlDown())
+	if (e.GetKeyCode() == 'I' && e.ControlDown())
 		importEntry();
 
 	// Export entry (Ctrl+E)
-	if (event.GetKeyCode() == 'E' && event.ControlDown())
+	if (e.GetKeyCode() == 'E' && e.ControlDown())
 		exportEntry();
 
 	// Export entry to wad (Shift+Ctrl+E)
-	if (event.GetKeyCode() == 'E' && event.ShiftDown() && event.ControlDown())
+	if (e.GetKeyCode() == 'E' && e.ShiftDown() && e.ControlDown())
 		exportEntryWad();
 
 	// Move entry up (Ctrl+U or Ctrl+Up Arrow)
-	if (event.ControlDown() && (event.GetKeyCode() == 'U' || event.GetKeyCode() == WXK_UP))
+	if (e.ControlDown() && (e.GetKeyCode() == 'U' || e.GetKeyCode() == WXK_UP))
 		moveUp();
 
 	// Move entry down (Ctrl+D or Ctrl+Down Arrow)
-	if (event.ControlDown() && (event.GetKeyCode() == 'D' || event.GetKeyCode() == WXK_DOWN))
+	if (e.ControlDown() && (e.GetKeyCode() == 'D' || e.GetKeyCode() == WXK_DOWN))
 		moveDown();
 
 	// Select all entries
-	if (event.GetKeyCode() == 'A' && event.ControlDown())
+	if (e.GetKeyCode() == 'A' && e.ControlDown())
 		entry_list->selectAll();
 
-	event.Skip();
+	e.Skip();
 }

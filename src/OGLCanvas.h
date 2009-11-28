@@ -17,10 +17,8 @@ public:
 	void			init();
 	virtual void	draw() = 0;
 
-	void	paint(wxPaintEvent &e);
+	void	onPaint(wxPaintEvent &e);
 	void	onEraseBackground(wxEraseEvent &e);
-
-	DECLARE_EVENT_TABLE()
 };
 
 #endif //__OGLCANVAS_H__

@@ -20,13 +20,11 @@ public:
 	void	setColour(rgba_t col)			{ colour = col; }
 
 	// Events
-	void	paint(wxPaintEvent& e);
-	void	leftClick(wxMouseEvent& e);
-	void	rightClick(wxMouseEvent& e);
+	void	onPaint(wxPaintEvent& e);
+	void	onMouseLeftDown(wxMouseEvent& e);
+	void	onMouseRightDown(wxMouseEvent& e);
 
 	void	sendChangeEvent();
-
-	DECLARE_EVENT_TABLE()
 };
 
 DECLARE_EVENT_TYPE(wxEVT_COLOURBOX_CHANGED, -1)

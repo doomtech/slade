@@ -34,9 +34,8 @@
 
 
 /*******************************************************************
- * EXTERNAL VARIABLES
+ * CONSOLEPANEL CLASS FUNCTIONS
  *******************************************************************/
-
 
 /* ConsolePanel::ConsolePanel
  * ConsolePanel class constructor
@@ -48,6 +47,9 @@ ConsolePanel::ConsolePanel(wxWindow *parent, int id)
 
 	// Listen to the console
 	listenTo(theConsole);
+
+	// Bind events
+	text_command->Bind(wxEVT_COMMAND_TEXT_ENTER, &ConsolePanel::onCommandEnter, this);
 
 	// Load the current contents of the console log
 	text_log->AppendText(theConsole->dumpLog());
@@ -72,7 +74,7 @@ void ConsolePanel::initLayout() {
 	vbox->Add(text_log, 1, wxEXPAND | wxALL, 4);
 
 	// Create and add the command entry textbox
-	text_command = new wxTextCtrl(this, CP_TEXT_COMMAND, _T(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
+	text_command = new wxTextCtrl(this, -1, _T(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
 	vbox->Add(text_command, 0, wxEXPAND | wxBOTTOM | wxLEFT | wxRIGHT, 4);
 
 	Layout();
@@ -94,14 +96,15 @@ void ConsolePanel::onAnnouncement(Announcer* announcer, string event_name, MemCh
 	}
 }
 
-/*******************************************************************
- * WXWIDGETS EVENTS & HANDLERS
- *******************************************************************/
-BEGIN_EVENT_TABLE(ConsolePanel, wxPanel)
-	EVT_TEXT_ENTER(CP_TEXT_COMMAND, ConsolePanel::onCommandEnter)
-END_EVENT_TABLE()
 
-void ConsolePanel::onCommandEnter(wxCommandEvent &e) {
+/*******************************************************************
+ * CONSOLEPANEL EVENTS
+ *******************************************************************/
+
+/* ConsolePanel::onCommandEnter
+ * Called when the enter key is pressed in the command text box
+ *******************************************************************/
+void ConsolePanel::onCommandEnter(wxCommandEvent& e) {
 	theConsole->execute(e.GetString());
 	text_command->Clear();
 }

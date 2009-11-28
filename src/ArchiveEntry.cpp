@@ -42,6 +42,10 @@ extern uint32_t valid_flat_size[][2];
 extern uint32_t n_valid_flat_sizes;
 
 
+/*******************************************************************
+ * ARCHIVEENTRY CLASS FUNCTIONS
+ *******************************************************************/
+
 /* ArchiveEntry::ArchiveEntry
  * ArchiveEntry class constructor
  *******************************************************************/

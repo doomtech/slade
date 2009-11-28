@@ -40,6 +40,10 @@
 #include "EntryOperations.h"
 
 
+/*******************************************************************
+ * MULTIENTRYPANEL CLASS FUNCTIONS
+ *******************************************************************/
+
 /* MultiEntryPanel::MultiEntryPanel
  * MultiEntryPanel class constructor
  *******************************************************************/
@@ -51,10 +55,16 @@ MultiEntryPanel::MultiEntryPanel(wxWindow* parent)
 	// Init widgets
 	label_entries = new wxStaticText(this, -1, _T("0 selected entries"));
 	label_size = new wxStaticText(this, -1, _T("Total size: 0"));
-	btn_export_archive = new wxButton(this, BTN_EXPORT_ARCHIVE, _T("Export as Wad"));
-	btn_convert_gfx = new wxButton(this, BTN_CONVERT_GFX, _T("Convert Gfx to..."));
-	btn_modify_offsets = new wxButton(this, BTN_MODIFY_OFFSETS, _T("Modify Gfx Offsets"));
+	btn_export_archive = new wxButton(this, -1, _T("Export as Wad"));
+	btn_convert_gfx = new wxButton(this, -1, _T("Convert Gfx to..."));
+	btn_modify_offsets = new wxButton(this, -1, _T("Modify Gfx Offsets"));
 
+	// Bind Events
+	btn_export_archive->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MultiEntryPanel::onBtnExportArchive, this);
+	btn_convert_gfx->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MultiEntryPanel::onBtnConvertGfx, this);
+	btn_modify_offsets->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MultiEntryPanel::onBtnModifyOffsets, this);
+
+	// Update panel layout
 	updateLayout();
 }
 
@@ -146,16 +156,14 @@ void MultiEntryPanel::updateLayout() {
 }
 
 
-BEGIN_EVENT_TABLE(MultiEntryPanel, EntryPanel)
-	EVT_BUTTON(BTN_EXPORT_ARCHIVE, MultiEntryPanel::btnExportArchiveClicked)
-	EVT_BUTTON(BTN_CONVERT_GFX, MultiEntryPanel::btnConvertGfxClicked)
-	EVT_BUTTON(BTN_MODIFY_OFFSETS, MultiEntryPanel::btnModifyOffsetsClicked)
-END_EVENT_TABLE()
+/*******************************************************************
+ * MULTIENTRYPANEL EVENTS
+ *******************************************************************/
 
 /* MultiEntryPanel::btnExportArchiveClicked
  * Called when the 'Export as Wad' button is clicked
  *******************************************************************/
-void MultiEntryPanel::btnExportArchiveClicked(wxCommandEvent& e) {
+void MultiEntryPanel::onBtnExportArchive(wxCommandEvent& e) {
 	// Create save file dialog
 	wxFileDialog dialog_save(this, _T(""), wxEmptyString, wxEmptyString,
 								_T("Doom Wad File (*.wad)|*.wad"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT, wxDefaultPosition);
@@ -170,7 +178,7 @@ void MultiEntryPanel::btnExportArchiveClicked(wxCommandEvent& e) {
 /* MultiEntryPanel::btnConvertGfxClicked
  * Called when the 'Convert Gfx to...' button is clicked
  *******************************************************************/
-void MultiEntryPanel::btnConvertGfxClicked(wxCommandEvent& e) {
+void MultiEntryPanel::onBtnConvertGfx(wxCommandEvent& e) {
 	// Create gfx conversion dialog
 	GfxConvDialog gcd;
 	
@@ -184,7 +192,7 @@ void MultiEntryPanel::btnConvertGfxClicked(wxCommandEvent& e) {
 /* MultiEntryPanel::btnModifyOffsetsClicked
  * Called when the 'Modify Gfx Offsets' button is clicked
  *******************************************************************/
-void MultiEntryPanel::btnModifyOffsetsClicked(wxCommandEvent& e) {
+void MultiEntryPanel::onBtnModifyOffsets(wxCommandEvent& e) {
 	// Create and run modify offsets dialog
 	ModifyOffsetsDialog mod;
 	if (mod.ShowModal() == wxID_CANCEL)

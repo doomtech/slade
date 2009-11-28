@@ -58,10 +58,10 @@ string	dir_app = _T("");
  *******************************************************************/
 extern string main_window_layout;
 
-void SLADELog::DoLog(wxLogLevel level, const wxChar* str, time_t t) {
-	theConsole->logMessage(wxString(str));
-}
 
+/*******************************************************************
+ * FUNCTIONS
+ *******************************************************************/
 
 /* appPath
  * Prepends an application-related path to a filename,
@@ -91,6 +91,18 @@ string appPath(string filename, int dir) {
 }
 
 
+/*******************************************************************
+ * SLADELOG CLASS FUNCTIONS
+ *******************************************************************/
+
+void SLADELog::DoLog(wxLogLevel level, const wxChar* str, time_t t) {
+	theConsole->logMessage(wxString(str));
+}
+
+
+/*******************************************************************
+ * MAINAPP CLASS FUNCTIONS
+ *******************************************************************/
 IMPLEMENT_APP(MainApp)
 
 /* MainApp::initDirectories

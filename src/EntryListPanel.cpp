@@ -47,13 +47,13 @@ CVAR(Bool, col_size, true, CVAR_SAVE);
 CVAR(Bool, col_type, true, CVAR_SAVE);
 CVAR(Bool, entry_list_monospace, true, CVAR_SAVE);
 
-
 // No edit labels for now, causes too many problems
-//#ifdef _WIN32
-#define ENTRYLIST_FLAGS wxLC_REPORT|wxLC_VRULES|wxLC_HRULES // No wxLC_EDIT_LABELS on win32 as it doesn't work in wxMSW :(
-//#else
-//#define ENTRYLIST_FLAGS wxLC_REPORT|wxLC_VRULES|wxLC_HRULES|wxLC_EDIT_LABELS
-//#endif
+#define ENTRYLIST_FLAGS wxLC_REPORT|wxLC_VRULES|wxLC_HRULES
+
+
+/*******************************************************************
+ * ENTRYLIST CLASS FUNCTIONS
+ *******************************************************************/
 
 /* EntryList::EntryList
  * EntryList class constructor
@@ -208,6 +208,9 @@ int EntryList::getWidth() {
 }
 
 
+/*******************************************************************
+ * ENTRYLISTPANEL CLASS FUNCTIONS
+ *******************************************************************/
 
 /* EntryListPanel::EntryListPanel
  * EntryListPanel class constructor
@@ -224,6 +227,13 @@ EntryListPanel::EntryListPanel(wxWindow *parent, int id, Archive* archive)
 
 	entry_list = new EntryList(this, ENTRY_LIST);
 	framesizer->Add(entry_list, 1, wxEXPAND | wxALL, 4);
+
+
+	// Bind Events
+	entry_list->Bind(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, &EntryListPanel::onEntryListActivated, this);
+	entry_list->Bind(wxEVT_COMMAND_LIST_COL_END_DRAG, &EntryListPanel::onEntryListColResize, this);
+	entry_list->Bind(wxEVT_COMMAND_LIST_COL_RIGHT_CLICK, &EntryListPanel::onEntryListColRightClick, this);
+	Bind(wxEVT_COMMAND_MENU_SELECTED, &EntryListPanel::onMenu, this, MENU_COLUMNS_SIZE, MENU_COLUMNS_TYPE);
 
 	Layout();
 }
@@ -569,40 +579,30 @@ bool EntryListPanel::moveDown() {
 	return true;
 }
 
+/* EntryListPanel::selectAll
+ * Selects all items in the entry list
+ *******************************************************************/
 void EntryListPanel::selectAll() {
 	for (int a = 0; a < entry_list->GetItemCount(); a++)
 		entry_list->SetItemState(a, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 }
 
-BEGIN_EVENT_TABLE(EntryListPanel, wxPanel)
-	EVT_LIST_ITEM_FOCUSED(ENTRY_LIST, EntryListPanel::onEntryListChange)
-	EVT_LIST_ITEM_ACTIVATED(ENTRY_LIST, EntryListPanel::onEntryListActivated)
-	EVT_LIST_END_LABEL_EDIT(ENTRY_LIST, EntryListPanel::onEntryListEditLabel)
-	EVT_LIST_COL_END_DRAG(ENTRY_LIST, EntryListPanel::onEntryListColResize)
-	EVT_LIST_COL_RIGHT_CLICK(ENTRY_LIST, EntryListPanel::onEntryListColRightClick)
-	EVT_MENU_RANGE(MENU_COLUMNS_SIZE, MENU_COLUMNS_TYPE, EntryListPanel::onMenu)
-	EVT_KEY_DOWN(EntryListPanel::onKeyDown)
-END_EVENT_TABLE()
 
-/* EntryListPanel::onEntryListChange
- * Called when the current focus on the entry list control is changed
+/*******************************************************************
+ * ENTRYLISTPANEL EVENTS
  *******************************************************************/
-void EntryListPanel::onEntryListChange(wxListEvent& event) {
-	// Pass the event up to the parent window, as the archive panel should deal with it,
-	// not this panel.
-	event.Skip();
-}
 
 /* EntryListPanel::onEntryListActivated
  * Called when an item on the list is 'activated' (double-click or
  * enter)
  *******************************************************************/
-void EntryListPanel::onEntryListActivated(wxListEvent& event) {
+void EntryListPanel::onEntryListActivated(wxListEvent& e) {
 }
 
 /* EntryListPanel::onEntryListEditLabel
  * Called when an 'edit label' operation finishes on a list entry
  *******************************************************************/
+/*
 void EntryListPanel::onEntryListEditLabel(wxListEvent& event) {
 	ArchiveEntry* entry = getFocusedEntry();
 
@@ -610,18 +610,19 @@ void EntryListPanel::onEntryListEditLabel(wxListEvent& event) {
 		archive->renameEntry(entry, event.GetLabel());
 	}
 }
+*/
 
 /* EntryListPanel::onEntryListColResize
  * Called when a column on the entry list is resized
  *******************************************************************/
-void EntryListPanel::onEntryListColResize(wxListEvent& event) {
+void EntryListPanel::onEntryListColResize(wxListEvent& e) {
 	updateListWidth();
 }
 
 /* EntryListPanel::onEntryListColRightClick
  * Called when an entrylist column header is right clicked
  *******************************************************************/
-void EntryListPanel::onEntryListColRightClick(wxListEvent& event) {
+void EntryListPanel::onEntryListColRightClick(wxListEvent& e) {
 	wxMenu* popup = new wxMenu();
 	popup->AppendCheckItem(MENU_COLUMNS_SIZE, _T("Size"), _T("Show the size column"));
 	popup->AppendCheckItem(MENU_COLUMNS_TYPE, _T("Type"), _T("Show the type column"));
@@ -634,8 +635,8 @@ void EntryListPanel::onEntryListColRightClick(wxListEvent& event) {
 /* EntryListPanel::onMenu
  * Called when a menu item is selected
  *******************************************************************/
-void EntryListPanel::onMenu(wxCommandEvent& event) {
-	switch (event.GetId()) {
+void EntryListPanel::onMenu(wxCommandEvent& e) {
+	switch (e.GetId()) {
 		case MENU_COLUMNS_SIZE:
 			col_size = !col_size;
 			populateEntryList();
@@ -646,10 +647,5 @@ void EntryListPanel::onMenu(wxCommandEvent& event) {
 			break;
 	}
 
-	event.Skip();
-}
-
-void EntryListPanel::onKeyDown(wxKeyEvent& event) {
-	event.SetId(this->GetId());
-	event.Skip();
+	e.Skip();
 }

@@ -42,6 +42,9 @@
 PaletteManager* PaletteManager::instance = NULL;
 
 
+/*******************************************************************
+ * PALETTEMANAGER CLASS FUNCTIONS
+ *******************************************************************/
 
 /* PaletteManager::PaletteManager
  * PaletteManager class constructor
