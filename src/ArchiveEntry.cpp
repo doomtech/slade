@@ -69,6 +69,7 @@ ArchiveEntry::ArchiveEntry(ArchiveEntry& copy) {
 	name = copy.getName();
 	size = copy.getSize();
 	data_loaded = true;
+	type = copy.type;
 
 	// Get the data to copy
 	uint8_t* copy_data = copy.getData(true);
@@ -83,6 +84,13 @@ ArchiveEntry::ArchiveEntry(ArchiveEntry& copy) {
 		wxLogMessage(s_fmt(_T("Unable to copy data from entry %s"), copy.getName().c_str()));
 		data = NULL;
 		size = 0;
+	}
+
+	// Copy extra properties
+	PropertyList::iterator i = ex_props.begin();
+	while (i != ex_props.end()) {
+		setExProp(i->first, i->second);
+		i++;
 	}
 
 	// Set entry state

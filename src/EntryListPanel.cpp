@@ -219,6 +219,7 @@ EntryListPanel::EntryListPanel(wxWindow *parent, int id, Archive* archive)
 : wxPanel(parent, id) {
 	// Init variables
 	this->archive = archive;
+	this->col_update = true;
 
 	// Create & set sizer & border
 	wxStaticBox *frame = new wxStaticBox(this, -1, _T("Entries"));
@@ -475,7 +476,7 @@ bool EntryListPanel::addEntry(uint32_t archive_index, ArchiveEntry* e) {
 
 	// Add it to the list
 	entry_list->InsertItem(li);
-	entry_list->updateEntry(archive_index);
+	entry_list->updateEntry(archive_index, col_update);
 
 	return true;
 }
@@ -486,7 +487,7 @@ bool EntryListPanel::addEntry(uint32_t archive_index, ArchiveEntry* e) {
 bool EntryListPanel::updateEntry(uint32_t archive_index, ArchiveEntry* e) {
 	// Just update the list item corresponding with the entry index
 	// (it's 1-1 in a normal EntryListPanel, will be different for zip archives)
-	entry_list->updateEntry(archive_index);
+	entry_list->updateEntry(archive_index, col_update);
 }
 
 /* EntryListPanel::removeEntry

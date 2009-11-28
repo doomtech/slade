@@ -29,6 +29,7 @@
  *******************************************************************/
 #include "Main.h"
 #include "Clipboard.h"
+#include "ZipArchive.h"
 
 
 /*******************************************************************
@@ -81,8 +82,13 @@ bool Clipboard::addItem(int type, MemChunk& data) {
  * Clears all clipboard items
  *******************************************************************/
 void Clipboard::clear() {
-	for (uint32_t a = 0; a < items.size(); a++)
+	for (uint32_t a = 0; a < items.size(); a++) {
+		if (items[a]->type == CLIPBOARD_ZIPDIR) {
+			zipdir_t* dir = (zipdir_t*)items[a]->data.getData();
+			dir->clear(true);
+		}
 		delete items[a];
+	}
 
 	items.clear();
 }

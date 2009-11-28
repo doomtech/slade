@@ -20,6 +20,8 @@ public:
 	bool	newEntryFromFile();
 	bool	renameEntry();
 	bool	deleteEntry();
+	bool	copyEntry();
+	bool	pasteEntry();
 
 	void onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 };

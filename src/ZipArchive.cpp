@@ -197,6 +197,71 @@ uint32_t zipdir_t::numSubDirs(bool include_subdirs) {
 	return num;
 }
 
+/* zipdir_t::copy
+ * Returns a copy of the zipdir. The copy includes copies of all
+ * entries, and if <include_subdirs> is true, all subdirectories are
+ * also recursively copied
+ *******************************************************************/
+zipdir_t* zipdir_t::copy(bool include_subdirs) {
+	// Init copied directory
+	zipdir_t* copy_dir = new zipdir_t;
+	copy_dir->parent_dir = NULL;
+
+	// Copy dir entry
+	copy_dir->entry = new ArchiveEntry(*entry);
+
+	// Copy entries
+	for (size_t a = 0; a < entries.size(); a++)
+		copy_dir->entries.push_back(new ArchiveEntry(*entries[a]));
+
+	// Copy subdirectories if needed
+	if (include_subdirs) {
+		for (size_t a = 0; a < subdirectories.size(); a++) {
+			copy_dir->subdirectories.push_back(subdirectories[a]->copy(true));
+			copy_dir->subdirectories[a]->parent_dir = copy_dir;
+		}
+	}
+
+	// Return copied zipdir
+	return copy_dir;
+}
+
+void zipdir_t::clear(bool delete_entries) {
+	// Delete dir entry
+	if (entry)
+		delete entry;
+
+	// Delete entries
+	if (delete_entries) {
+		for (size_t a = 0; a < entries.size(); a++)
+			delete entries[a];
+	}
+	entries.clear();
+
+	// Delete subdirectories
+	for (size_t a = 0; a < subdirectories.size(); a++)
+		subdirectories[a]->clear(delete_entries);
+	subdirectories.clear();
+}
+
+void zipdir_t::addToList(vector<ArchiveEntry*>& list) {
+	// Add the directory entry to the list
+	wxFileName fn(getFullPath());
+	fn.RemoveLastDir();
+	entry->setExProp(_T("Directory"), fn.GetPath(true, wxPATH_UNIX));
+	list.push_back(entry);
+
+	// Add all entries in the directory to the list
+	for (size_t a = 0; a < entries.size(); a++) {
+		entries[a]->setExProp(_T("Directory"), getFullPath());
+		list.push_back(entries[a]);
+	}
+
+	// Lastly go through all subdirectories and add them to the list
+	for (size_t a = 0; a < subdirectories.size(); a++)
+		subdirectories[a]->addToList(list);
+}
+
 
 /*******************************************************************
  * ZIPARCHIVE CLASS FUNCTIONS

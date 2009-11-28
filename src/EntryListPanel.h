@@ -27,6 +27,7 @@ class EntryListPanel : public wxPanel {
 protected:
 	Archive*	archive;
 	EntryList*	entry_list;
+	bool		col_update;
 
 public:
 	enum {
@@ -40,6 +41,8 @@ public:
 
 	virtual void			populateEntryList();
 	void					updateListWidth();
+	bool					columnsUpdate() { return col_update; }
+	void					columnsUpdate(bool update) { col_update = update; }
 
 	ArchiveEntry*			getFocusedEntry();
 	int						getFocus();

@@ -23,6 +23,9 @@ struct zipdir_t {
 	string			getFullPath();
 	uint32_t		numEntries(bool include_subdirs = false);
 	uint32_t		numSubDirs(bool include_subdirs = false);
+	zipdir_t*		copy(bool include_subdirs = true);
+	void			clear(bool delete_entries);
+	void			addToList(vector<ArchiveEntry*>& list);
 };
 
 class ZipArchive : public Archive {

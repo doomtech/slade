@@ -42,6 +42,7 @@
 #include "GfxConvDialog.h"
 #include "ModifyOffsetsDialog.h"
 #include "EntryOperations.h"
+#include "Clipboard.h"
 #include <wx/aui/auibook.h>
 #include <wx/filename.h>
 
@@ -254,6 +255,73 @@ bool ArchivePanel::deleteEntry() {
 	for (size_t a = 0; a < selection.size(); a++) {
 		// Remove the current selected entry
 		archive->removeEntry(selection[a]);
+	}
+}
+
+/* ArchivePanel::copyEntry
+ * Copies the selected entries
+ *******************************************************************/
+bool ArchivePanel::copyEntry() {
+	// Get a list of selected entries
+	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
+
+	// If something is selected, clear the clipboard
+	if (selection.size() > 0)
+		theClipboard->clear();
+	else
+		return false;
+
+	// Go through the list
+	for (size_t a = 0; a < selection.size(); a++) {
+		// Copy the current selected entry
+		ArchiveEntry* copied_entry = new ArchiveEntry(*selection[a]);
+		MemChunk mc;
+		mc.loadMem((uint8_t*)copied_entry, sizeof(ArchiveEntry));
+		theClipboard->addItem(CLIPBOARD_ENTRY, mc);
+	}
+
+	return true;
+}
+
+/* ArchivePanel::cutEntry
+ * Cuts the selected entries (copy+delete)
+ *******************************************************************/
+bool ArchivePanel::cutEntry() {
+	if (copyEntry())
+		return deleteEntry();
+	else
+		return false;
+}
+
+/* ArchivePanel::pasteEntry
+ * Pastes any entries on the clipboard either after the last selected
+ * entry or at the end of the entry list if nothing is selected
+ *******************************************************************/
+bool ArchivePanel::pasteEntry() {
+	// Get the entry index of the last selected list item
+	int index = archive->entryIndex(entry_list->getLastSelectedEntry());
+
+	// If something was selected, add 1 to the index so we add the new entry after the last selected
+	if (index >= 0)
+		index++;
+	else
+		index = entry_list->getListSize(); // If not add to the end of the list
+
+	entry_list->columnsUpdate(false);
+
+	// Go through all items on the clipboard
+	for (uint32_t a = 0; a < theClipboard->nItems(); a++) {
+		if (a == theClipboard->nItems() - 1)
+			entry_list->columnsUpdate(true);
+
+		// Get clipboard item
+		cb_item_t* item = theClipboard->getItem(a);
+
+		// If the item is an entry, add a copy to the archive at the current index
+		if (item->type == CLIPBOARD_ENTRY) {
+			archive->addExistingEntry((ArchiveEntry*)item->data.getData(), index, true);
+			index++;
+		}
 	}
 }
 
@@ -600,6 +668,10 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 	context->Append(MENU_ENTRY_RENAME, _T("Rename"));
 	context->Append(MENU_ENTRY_DELETE, _T("Delete"));
 	context->AppendSeparator();
+	context->Append(MENU_ENTRY_COPY, _T("Copy"));
+	context->Append(MENU_ENTRY_CUT, _T("Cut"));
+	context->Append(MENU_ENTRY_PASTE, _T("Paste"));
+	context->AppendSeparator();
 	context->Append(MENU_ENTRY_IMPORT, _T("Import"));
 	context->Append(MENU_ENTRY_EXPORT, _T("Export"));
 	context->Append(MENU_ENTRY_EXPORTWAD, _T("Export as Wad"));
@@ -646,6 +718,15 @@ void ArchivePanel::onEntryMenuClick(wxCommandEvent& e) {
 		case MENU_ENTRY_DELETE:
 			deleteEntry();
 			break;
+		case MENU_ENTRY_COPY:
+			copyEntry();
+			break;
+		case MENU_ENTRY_CUT:
+			cutEntry();
+			break;
+		case MENU_ENTRY_PASTE:
+			pasteEntry();
+			break;
 		case MENU_ENTRY_IMPORT:
 			importEntry();
 			break;
@@ -681,6 +762,18 @@ void ArchivePanel::onEntryListKeyDown(wxKeyEvent& e) {
 	// Delete entry (Delete)
 	if (e.GetKeyCode() == WXK_DELETE)
 		deleteEntry();
+
+	// Copy entry (Ctrl+C)
+	if (e.GetKeyCode() == 'C' && e.ControlDown())
+		copyEntry();
+
+	// Cut entry (Ctrl+X)
+	if (e.GetKeyCode() == 'X' && e.ControlDown())
+		cutEntry();
+
+	// Paste entry (Ctrl+V)
+	if (e.GetKeyCode() == 'V' && e.ControlDown())
+		pasteEntry();
 
 	// Import to entry (Ctrl+I)
 	if (e.GetKeyCode() == 'I' && e.ControlDown())

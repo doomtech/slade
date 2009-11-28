@@ -27,6 +27,9 @@ public:
 
 		MENU_ENTRY_RENAME,
 		MENU_ENTRY_DELETE,
+		MENU_ENTRY_COPY,
+		MENU_ENTRY_CUT,
+		MENU_ENTRY_PASTE,
 		MENU_ENTRY_IMPORT,
 		MENU_ENTRY_EXPORT,
 		MENU_ENTRY_EXPORTWAD,
@@ -53,6 +56,9 @@ public:
 	virtual bool	newEntryFromFile();
 	virtual bool	renameEntry();
 	virtual bool	deleteEntry();
+	virtual bool	copyEntry();
+	bool			cutEntry();
+	virtual bool	pasteEntry();
 	bool			importEntry();
 	bool			exportEntry();
 	bool			exportEntryWad();
