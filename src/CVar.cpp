@@ -98,19 +98,16 @@ void get_cvar_list(vector<string>& list) {
  * Saves cvars to a config file
  *******************************************************************/
 void save_cvars(FILE* fp) {
-	int max_size = 0;
-	for (uint32_t c = 0; c < n_cvars; c++)
-	{
+	uint32_t max_size = 0;
+	for (uint32_t c = 0; c < n_cvars; c++) {
 		if (cvars[c]->name.size() > max_size)
 			max_size = cvars[c]->name.size();
 	}
 
 	fprintf(fp, "cvars\n{\n");
 
-	for (uint32_t c = 0; c < n_cvars; c++)
-	{
-		if (cvars[c]->flags & CVAR_SAVE)
-		{
+	for (uint32_t c = 0; c < n_cvars; c++) {
+		if (cvars[c]->flags & CVAR_SAVE) {
 			fprintf(fp, "\t%s ", chr(cvars[c]->name));
 
 			int spaces = max_size - cvars[c]->name.size();

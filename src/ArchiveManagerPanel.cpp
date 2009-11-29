@@ -75,6 +75,8 @@ void WMFileBrowser::onItemActivated(wxTreeEvent &e) {
 	// open it in the archive manager
 	if (!tree->ItemHasChildren(e.GetItem()))
 		browser->parent->openFile(browser->GetPath());
+
+	e.Skip();
 }
 
 

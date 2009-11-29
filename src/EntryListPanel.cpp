@@ -270,7 +270,7 @@ void EntryListPanel::populateEntryList() {
 	if (col_type) entry_list->InsertColumn(col, _T("Type"));
 
 	// Go through all entries and add them to the list
-	for (int a = 0; a < archive->numEntries(); a++) {
+	for (uint32_t a = 0; a < archive->numEntries(); a++) {
 		// Setup new entry
 		ArchiveEntry* entry = archive->getEntry(a);
 		wxListItem li;
@@ -487,7 +487,7 @@ bool EntryListPanel::addEntry(uint32_t archive_index, ArchiveEntry* e) {
 bool EntryListPanel::updateEntry(uint32_t archive_index, ArchiveEntry* e) {
 	// Just update the list item corresponding with the entry index
 	// (it's 1-1 in a normal EntryListPanel, will be different for zip archives)
-	entry_list->updateEntry(archive_index, col_update);
+	return entry_list->updateEntry(archive_index, col_update);
 }
 
 /* EntryListPanel::removeEntry
@@ -496,7 +496,7 @@ bool EntryListPanel::updateEntry(uint32_t archive_index, ArchiveEntry* e) {
 bool EntryListPanel::removeEntry(uint32_t archive_index, ArchiveEntry* e) {
 	// Just delete the list item corresponding with the entry index
 	// (it's 1-1 in a normal EntryListPanel, will be different for zip archives)
-	entry_list->DeleteItem(archive_index);
+	return entry_list->DeleteItem(archive_index);
 }
 
 /* EntryListPanel::getEntryListItem

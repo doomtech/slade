@@ -108,6 +108,8 @@ bool MultiEntryPanel::loadEntries(vector<ArchiveEntry*>& list) {
 
 	// Update panel layout
 	updateLayout();
+
+	return true;
 }
 
 /* MultiEntryPanel::updateLayout

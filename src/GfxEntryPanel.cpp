@@ -230,6 +230,8 @@ int GfxEntryPanel::detectOffsetType() {
 				return GFXVIEW_SPRITE;
 		}
 	}
+
+	return GFXVIEW_DEFAULT;
 }
 
 /* GfxEntryPanel::applyViewType

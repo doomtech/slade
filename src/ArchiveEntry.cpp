@@ -402,7 +402,7 @@ void ArchiveEntry::detectType(bool data_check, bool force) {
 		parent->detectEntryType(this);
 
 	// Doom flat
-	for (int a = 0; a < n_valid_flat_sizes; a++) {
+	for (size_t a = 0; a < n_valid_flat_sizes; a++) {
 		if (size == valid_flat_size[a][0] * valid_flat_size[a][1])
 			type = ETYPE_FLAT;
 	}

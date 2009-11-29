@@ -35,7 +35,7 @@ public:
 	void	setViewType(int type) { view_type = type; }
 	void	setScale(double scale) { this->scale = scale; }
 	bool	allowDrag() { return allow_drag; }
-	bool	allowDrag(bool allow) { allow_drag = allow; }
+	void	allowDrag(bool allow) { allow_drag = allow; }
 
 	void	draw();
 	void	drawChequeredBackground();

@@ -63,7 +63,7 @@ bool Palette8bit::loadMem(MemChunk& mc) {
 
 	// Read in colours
 	int c = 0;
-	for (int a = 0; a < mc.getSize(); a += 3) {
+	for (size_t a = 0; a < mc.getSize(); a += 3) {
 		// Read RGB value
 		uint8_t rgb[3];
 		mc.read(rgb, 3);

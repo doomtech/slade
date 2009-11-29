@@ -322,6 +322,8 @@ bool ZipArchivePanel::renameEntry() {
 		if (new_name.Cmp(old_name))
 			((ZipArchive*)archive)->renameDirectory(selected_dirs[a], new_name);
 	}
+
+	return true;
 }
 
 /* ZipArchivePanel::deleteEntry
@@ -346,6 +348,8 @@ bool ZipArchivePanel::deleteEntry() {
 		// Remove the selected directory from the archive
 		((ZipArchive*)archive)->deleteDirectory(selected_dirs[a]);
 	}
+
+	return true;
 }
 
 /* ZipArchivePanel::copyEntry

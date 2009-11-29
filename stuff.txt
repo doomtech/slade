@@ -2,7 +2,6 @@
 - TEXTUREx editor
 - Text editor (syntax highlighting, script compilation, find/replace)
 - Media panel
-- Copy/Cut/Paste entries
 - Entry search
 - Archive merge
 
@@ -57,4 +56,4 @@ Completed Features/Requests
 - Still in the image viewer, another drop-down list which lets you select which palette to use, from a list of named palettes that you can create elsewhere. (I imagine a res/palette folder in which we could just export PLAYPAL lumps, giving them names like "Doom.pal", "Heretic.pal", "Simplicity.pal" etc.) With of course a default to use the PLAYPAL from the current file, if any, or that of the selected main iwad. But we'd get to change it if so we want.
 - Palette conversion
 - When converting a picture to PNG, having the choice between indexed colors + alpha or full colors + alpha.- Finish gfx panel (zoom, offset editing)
-
+- Copy/Cut/Paste entries

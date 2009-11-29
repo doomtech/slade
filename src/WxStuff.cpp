@@ -39,10 +39,8 @@
 wxMenuItem* createMenuItem(wxMenu* menu, int id, string label, string help, string icon) {
 	wxMenuItem* item = new wxMenuItem(menu, id, label, help);
 
-	#ifdef __WXGTK__
 	if (!icon.IsEmpty())
 		item->SetBitmap(getIcon(icon));
-	#endif
 
 	return item;
 }

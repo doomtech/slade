@@ -336,7 +336,7 @@ bool WadArchive::save(string filename) {
 		long offset = getEntryOffset(entries[l]);
 		long size = entries[l]->getSize();
 
-		for (int c = 0; c < entries[l]->getName().length(); c++)
+		for (size_t c = 0; c < entries[l]->getName().length(); c++)
 			name[c] = entries[l]->getName()[c];
 
 		fwrite(&offset, 4, 1, fp);
@@ -450,7 +450,7 @@ vector<Archive::mapdesc_t> WadArchive::detectMaps() {
 	vector<mapdesc_t> maps;
 
 	// Go through all lumps
-	int i = 0;
+	size_t i = 0;
 	while (i < numEntries()) {
 		// UDMF format map check ********************************************************
 
@@ -735,6 +735,8 @@ bool WadArchive::renameEntry(ArchiveEntry* entry, string new_name) {
 
 	// Rename the entry
 	entry->rename(new_name);
+
+	return true;
 }
 
 /* WadArchive::detectEntryType

@@ -67,7 +67,7 @@ bool loadIcons() {
 	zipdir_t* dir_icons = res_archive->getDirectory(_T("icons"));
 
 	// Go through each entry in the directory
-	for (int a = 0; a < dir_icons->numEntries(false); a++) {
+	for (size_t a = 0; a < dir_icons->numEntries(false); a++) {
 		ArchiveEntry* entry = dir_icons->entries[a];
 
 		// Export entry data to a temporary file
@@ -84,6 +84,8 @@ bool loadIcons() {
 		// Delete the temporary file
 		wxRemoveFile(tempfile);
 	}
+
+	return true;
 }
 
 /* getIcon
@@ -91,7 +93,7 @@ bool loadIcons() {
  * or an empty bitmap if no icon matching <name> was found
  *******************************************************************/
 wxBitmap getIcon(string name) {
-	for (int a = 0; a < icons.size(); a++) {
+	for (size_t a = 0; a < icons.size(); a++) {
 		if (icons[a].name.Cmp(name) == 0)
 			return wxBitmap(icons[a].image);
 	}

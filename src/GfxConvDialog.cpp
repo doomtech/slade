@@ -100,6 +100,8 @@ bool GfxConvDialog::writeToEntry() {
 
 	// Write data to the entry
 	entry->importMemChunk(mc);
+
+	return true;
 }
 
 /* GfxConvDialog::setupLayout
@@ -415,7 +417,7 @@ void GfxConvDialog::onBtnConvert(wxCommandEvent& e) {
  * Called when the 'Convert All' button is clicked
  *******************************************************************/
 void GfxConvDialog::onBtnConvertAll(wxCommandEvent& e) {
-	for (int a = current_entry; a < entries.size(); a++) {
+	for (size_t a = current_entry; a < entries.size(); a++) {
 		writeToEntry();
 		nextEntry();
 	}
@@ -432,7 +434,7 @@ void GfxConvDialog::onBtnSkip(wxCommandEvent& e) {
  * Called when the 'Skip All' button is clicked
  *******************************************************************/
 void GfxConvDialog::onBtnSkipAll(wxCommandEvent& e) {
-	for (int a = current_entry; a < entries.size(); a++)
+	for (size_t a = current_entry; a < entries.size(); a++)
 		nextEntry();
 }
 
@@ -509,7 +511,7 @@ void c_test_gcd(vector<string> args) {
 
 	if (theArchiveManager->numArchives() > 0) {
 		vector<ArchiveEntry*> entries;
-		for (int a = 0; a < args.size(); a++) {
+		for (size_t a = 0; a < args.size(); a++) {
 			ArchiveEntry* entry = theArchiveManager->getArchive(0)->getEntry(args[a]);
 			if (entry)
 				entries.push_back(entry);

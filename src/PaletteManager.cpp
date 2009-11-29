@@ -65,7 +65,7 @@ PaletteManager::PaletteManager() {
  * PaletteManager class destructor
  *******************************************************************/
 PaletteManager::~PaletteManager() {
-	for (int a = 0; a < palettes.size(); a++)
+	for (size_t a = 0; a < palettes.size(); a++)
 		delete[] palettes[a];
 }
 
@@ -131,7 +131,7 @@ bool PaletteManager::loadResourcePalettes() {
 		return false;
 
 	// Go through all entries in the directory
-	for (int a = 0; a < dir_palettes->entries.size(); a++) {
+	for (size_t a = 0; a < dir_palettes->entries.size(); a++) {
 		// Load palette data
 		Palette8bit* pal = new Palette8bit();
 		MemChunk mc(dir_palettes->entries[a]->getData(true), dir_palettes->entries[a]->getSize());
@@ -141,6 +141,8 @@ bool PaletteManager::loadResourcePalettes() {
 		palettes.push_back(pal);
 		pal_names.push_back(dir_palettes->entries[a]->getName(true));
 	}
+
+	return true;
 }
 
 /* PaletteManager::loadCustomPalettes
@@ -173,4 +175,6 @@ bool PaletteManager::loadCustomPalettes() {
 		// Next file
 		files = res_dir.GetNext(&filename);
 	}
+
+	return true;
 }

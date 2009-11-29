@@ -242,6 +242,8 @@ bool ArchivePanel::renameEntry() {
 		if (new_name.Cmp(wxEmptyString) && new_name.Cmp(old_name))
 			archive->renameEntry(entry, new_name);
 	}
+
+	return true;
 }
 
 /* ArchivePanel::deleteEntry
@@ -256,6 +258,8 @@ bool ArchivePanel::deleteEntry() {
 		// Remove the current selected entry
 		archive->removeEntry(selection[a]);
 	}
+
+	return true;
 }
 
 /* ArchivePanel::copyEntry
@@ -322,6 +326,8 @@ bool ArchivePanel::pasteEntry() {
 	entry_list->columnsUpdate(true);
 	entry_list->updateEntry(0, NULL);
 	Layout();
+
+	return true;
 }
 
 /* ArchivePanel::importEntry
@@ -347,6 +353,8 @@ bool ArchivePanel::importEntry() {
 				cur_area->loadEntry(selection[a]);
 		}
 	}
+
+	return true;
 }
 
 /* ArchivePanel::exportEntry
@@ -374,6 +382,8 @@ bool ArchivePanel::exportEntry() {
 			selection[a]->exportFile(dialog_save->GetPath());
 		}
 	}
+
+	return true;
 }
 
 /* ArchivePanel::exportEntryWad
@@ -389,6 +399,8 @@ bool ArchivePanel::exportEntryWad() {
 		// If a filename was selected, export the selected entries to a wad archive
 		WadArchive::exportEntriesAsWad(dialog_save.GetPath(), entry_list->getSelectedEntries());
 	}
+
+	return true;
 }
 
 /* ArchivePanel::moveUp

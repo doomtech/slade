@@ -157,7 +157,7 @@ string Console::lastCommand() {
 string Console::dumpLog() {
 	string ret = _T("");
 
-	for (int a = 0; a < log.size(); a++)
+	for (size_t a = 0; a < log.size(); a++)
 		ret += log.at(a);
 
 	return ret;
@@ -217,7 +217,7 @@ ConsoleCommand con_echo(_T("echo"), &c_echo, 1);
 void c_cmdlist(vector<string> args) {
 	theConsole->logMessage(s_fmt(_T("%d Valid Commands:"), theConsole->numCommands()));
 
-	for (size_t a = 0; a < theConsole->numCommands(); a++)
+	for (int a = 0; a < theConsole->numCommands(); a++)
 		theConsole->logMessage(s_fmt(_T("\"%s\""), theConsole->command(a).getName().c_str()));
 }
 ConsoleCommand con_cmdlist(_T("cmdlist"), &c_cmdlist, 0);

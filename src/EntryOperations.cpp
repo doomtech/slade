@@ -237,7 +237,7 @@ bool EntryOperations::openExternal(ArchiveEntry* entry) {
 
 void c_test_ee(vector<string> args) {
 	if (theArchiveManager->numArchives() > 0) {
-		for (int a = 0; a < args.size(); a++) {
+		for (size_t a = 0; a < args.size(); a++) {
 			ArchiveEntry* entry = theArchiveManager->getArchive(0)->getEntry(args[a]);
 			if (entry)
 				EntryOperations::openExternal(entry);

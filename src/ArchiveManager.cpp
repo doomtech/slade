@@ -317,7 +317,7 @@ ConsoleCommand am_list_archives(_T("list_archives"), &c_list_archives, 0);
  * Attempts to open each given argument (filenames)
  *******************************************************************/
 void c_open(vector<string> args) {
-	for (int a = 0; a < args.size(); a++)
+	for (size_t a = 0; a < args.size(); a++)
 		theArchiveManager->openArchive(args[a]);
 }
 ConsoleCommand am_open(_T("open"), &c_open, 1);

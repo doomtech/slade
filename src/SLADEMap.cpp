@@ -45,6 +45,8 @@ bool SLADEMap::readMap(Archive* map_entries, uint8_t format) {
 		ArchiveEntry* entry = map_entries->getEntry(_T("TEXTMAP"));
 		return readUDMFMap(entry);
 	}
+
+	return false;
 }
 
 bool SLADEMap::readDoomMap(Archive* map_entries) {
@@ -57,7 +59,7 @@ bool SLADEMap::readDoomMap(Archive* map_entries) {
 	}
 
 	doomvertex_t* vert_data = (doomvertex_t*)entry->getData(true);
-	for (int a = 0; a < entry->getSize() / 4; a++) {
+	for (size_t a = 0; a < entry->getSize() / 4; a++) {
 		MapVertex* nv = new MapVertex(vert_data[a]);
 		vertices.push_back(nv);
 	}
@@ -75,7 +77,7 @@ bool SLADEMap::readHexenMap(Archive* map_entries) {
 	}
 
 	doomvertex_t* vert_data = (doomvertex_t*)entry->getData(true);
-	for (int a = 0; a < entry->getSize() / 4; a++) {
+	for (size_t a = 0; a < entry->getSize() / 4; a++) {
 		MapVertex* nv = new MapVertex(vert_data[a]);
 		vertices.push_back(nv);
 	}

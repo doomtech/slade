@@ -53,7 +53,7 @@ uint32_t valid_flat_size[][2] = {
 	{ 512, 512 },
 	{ 320, 200 },
 };
-int	n_valid_flat_sizes = 5;
+uint32_t	n_valid_flat_sizes = 5;
 
 
 /*******************************************************************
@@ -101,9 +101,9 @@ bool SImage::getRGBAData(MemChunk& mc) {
 	}
 
 	// Otherwise convert
-	if (format == PALMASK) {
+	else if (format == PALMASK) {
 		uint8_t rgba[4];
-		for (uint32_t a = 0; a < width * height; a++) {
+		for (int a = 0; a < width * height; a++) {
 			// Get colour
 			rgba_t col = palette.colour(data[a]);
 
@@ -119,6 +119,8 @@ bool SImage::getRGBAData(MemChunk& mc) {
 
 		return true;
 	}
+
+	return false;	// Invalid image type
 }
 
 /* SImage::getRGBData
@@ -135,21 +137,23 @@ bool SImage::getRGBData(MemChunk& mc) {
 
 	if (format == RGBA) {
 		// RGBA format, remove alpha information
-		for (uint32_t a = 0; a < width * height * 4; a += 4)
+		for (int a = 0; a < width * height * 4; a += 4)
 			mc.write(&data[a], 3);
 
 		return true;
 	}
-	if (format == PALMASK) {
+	else if (format == PALMASK) {
 		// Paletted, convert to RGB
 		uint8_t rgba[4];
-		for (uint32_t a = 0; a < width * height; a ++) {
+		for (int a = 0; a < width * height; a ++) {
 			palette.colour(data[a]).write(rgba);
 			mc.write(rgba, 3);
 		}
 
 		return true;
 	}
+
+	return false;	// Invalid image type
 }
 
 /* SImage::setPalette
@@ -314,7 +318,7 @@ bool SImage::trim(int width, int height) {
 }
 
 bool SImage::validFlatSize() {
-	for (int a = 0; a < n_valid_flat_sizes; a++) {
+	for (uint32_t a = 0; a < n_valid_flat_sizes; a++) {
 		if (width == valid_flat_size[a][0] &&
 			height == valid_flat_size[a][1])
 			return true;
@@ -521,7 +525,7 @@ bool SImage::loadDoomFlat(uint8_t* gfx_data, int size) {
 
 	// Check/setup size
 	bool valid_size = false;
-	for (int a = 0; a < n_valid_flat_sizes; a++) {
+	for (uint32_t a = 0; a < n_valid_flat_sizes; a++) {
 		uint32_t w = valid_flat_size[a][0];
 		uint32_t h = valid_flat_size[a][1];
 
@@ -775,20 +779,20 @@ bool SImage::toDoomGfx(MemChunk& out, uint8_t alpha_threshold) {
 	out.write(col_offsets, columns.size() * 4);
 
 	// Write columns
-	for (int c = 0; c < columns.size(); c++) {
+	for (size_t c = 0; c < columns.size(); c++) {
 		// Record column offset
 		col_offsets[c] = out.currentPos();
 
 		// Determine column size (in bytes)
 		uint32_t col_size = 0;
-		for (int p = 0; p < columns[c].posts.size(); p++)
+		for (size_t p = 0; p < columns[c].posts.size(); p++)
 			col_size += columns[c].posts[p].pixels.size() + 4;
 
 		// Allocate memory to write the column data
 		out.reSize(out.getSize() + col_size, true);
 
 		// Write column posts
-		for (int p = 0; p < columns[c].posts.size(); p++) {
+		for (size_t p = 0; p < columns[c].posts.size(); p++) {
 			// Write row offset
 			out.write(&columns[c].posts[p].row_off, 1);
 
@@ -801,7 +805,7 @@ bool SImage::toDoomGfx(MemChunk& out, uint8_t alpha_threshold) {
 			out.write(&temp, 1);
 
 			// Write pixels
-			for (int a = 0; a < columns[c].posts[p].pixels.size(); a++)
+			for (size_t a = 0; a < columns[c].posts[p].pixels.size(); a++)
 				out.write(&columns[c].posts[p].pixels[a], 1);
 
 			// Write unused byte
@@ -1101,13 +1105,12 @@ should be initialized to all 1's, and the transmitted value
 is the 1's complement of the final running CRC (see the
 crc() routine below)). */
 uint32_t update_crc(uint32_t crc, uint8_t *buf, uint32_t len) {
-	unsigned long c = crc;
-	int n;
+	uint32_t c = crc;
 
 	if (!crc_table_computed)
 		make_crc_table();
 
-	for (n = 0; n < len; n++)
+	for (uint32_t n = 0; n < len; n++)
 		c = crc_table[(c ^ buf[n]) & 0xff] ^ (c >> 8);
 
 	return c;

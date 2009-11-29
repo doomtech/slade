@@ -208,6 +208,8 @@ bool MemChunk::saveFile(string filename) {
 
 	// Close the file
 	fclose(fp);
+
+	return true;
 }
 
 /* MemChunk::write
