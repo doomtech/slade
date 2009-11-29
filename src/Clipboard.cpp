@@ -39,6 +39,65 @@ Clipboard* Clipboard::instance = NULL;
 
 
 /*******************************************************************
+ * CLIPBOARDITEM CLASS FUNCTIONS
+ *******************************************************************/
+
+ClipboardItem::ClipboardItem(int type) {
+	this->type = type;
+}
+
+ClipboardItem::~ClipboardItem() {
+}
+
+
+/*******************************************************************
+ * ENTRYCLIPBOARDITEM CLASS FUNCTIONS
+ *******************************************************************/
+
+EntryClipboardItem::EntryClipboardItem(ArchiveEntry* entry)
+: ClipboardItem(CLIPBOARD_ENTRY) {
+	if (entry)
+		this->entry = new ArchiveEntry(*entry);
+	else
+		this->entry = NULL;
+}
+
+EntryClipboardItem::~EntryClipboardItem() {
+	if (entry)
+		delete entry;
+}
+
+
+/*******************************************************************
+ * ZIPDIRCLIPBOARDITEM CLASS FUNCTIONS
+ *******************************************************************/
+
+ZipDirClipboardItem::ZipDirClipboardItem()
+: ClipboardItem(CLIPBOARD_ZIPDIR) {
+}
+
+ZipDirClipboardItem::~ZipDirClipboardItem() {
+	for (size_t a = 0; a < entries.size(); a++)
+		delete entries[a];
+}
+
+bool ZipDirClipboardItem::addEntry(ArchiveEntry* entry) {
+	if (!entry)
+		return false;
+
+	entries.push_back(new ArchiveEntry(*entry));
+	return true;
+}
+
+ArchiveEntry* ZipDirClipboardItem::getEntry(uint32_t index) {
+	if (index >= entries.size())
+		return NULL;
+	else
+		return entries[index];
+}
+
+
+/*******************************************************************
  * CLIPBOARD CLASS FUNCTIONS
  *******************************************************************/
 
@@ -59,36 +118,30 @@ Clipboard::~Clipboard() {
 /* Clipboard::getItem
  * Returns the item at index or NULL if index is out of bounds
  *******************************************************************/
-cb_item_t* Clipboard::getItem(uint32_t index) {
+ClipboardItem* Clipboard::getItem(uint32_t index) {
 	if (index >= items.size())
 		return NULL;
 	else
 		return items[index];
 }
 
-/* Clipboard::addItem
- * Adds an item to the clipboard with the given type and data
- *******************************************************************/
-bool Clipboard::addItem(int type, MemChunk& data) {
-	cb_item_t* new_item = new cb_item_t;
-
-	new_item->type = type;
-	new_item->data.loadMem(data.getData(), data.getSize());
-
-	items.push_back(new_item);
-}
-
 /* Clipboard::clear
  * Clears all clipboard items
  *******************************************************************/
 void Clipboard::clear() {
-	for (uint32_t a = 0; a < items.size(); a++) {
-		if (items[a]->type == CLIPBOARD_ZIPDIR) {
-			zipdir_t* dir = (zipdir_t*)items[a]->data.getData();
-			dir->clear(true);
-		}
+	for (uint32_t a = 0; a < items.size(); a++)
 		delete items[a];
-	}
 
 	items.clear();
+}
+
+/* Clipboard::addItem
+ * Adds an item to the clipboard. Returns false if item is invalid
+ *******************************************************************/
+bool Clipboard::addItem(ClipboardItem* item) {
+	if (!item)
+		return false;
+
+	items.push_back(item);
+	return true;
 }

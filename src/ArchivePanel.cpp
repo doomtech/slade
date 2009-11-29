@@ -271,14 +271,9 @@ bool ArchivePanel::copyEntry() {
 	else
 		return false;
 
-	// Go through the list
-	for (size_t a = 0; a < selection.size(); a++) {
-		// Copy the current selected entry
-		ArchiveEntry* copied_entry = new ArchiveEntry(*selection[a]);
-		MemChunk mc;
-		mc.loadMem((uint8_t*)copied_entry, sizeof(ArchiveEntry));
-		theClipboard->addItem(CLIPBOARD_ENTRY, mc);
-	}
+	// Copy all selected entries to the clipboard
+	for (size_t a = 0; a < selection.size(); a++)
+		theClipboard->addItem(new EntryClipboardItem(selection[a]));
 
 	return true;
 }
@@ -311,18 +306,22 @@ bool ArchivePanel::pasteEntry() {
 
 	// Go through all items on the clipboard
 	for (uint32_t a = 0; a < theClipboard->nItems(); a++) {
-		if (a == theClipboard->nItems() - 1)
-			entry_list->columnsUpdate(true);
+		// Get the item
+		EntryClipboardItem* item = (EntryClipboardItem*)theClipboard->getItem(a);
 
-		// Get clipboard item
-		cb_item_t* item = theClipboard->getItem(a);
+		// Check it is of the correct type
+		if (item->getType() != CLIPBOARD_ENTRY)
+			continue;
 
-		// If the item is an entry, add a copy to the archive at the current index
-		if (item->type == CLIPBOARD_ENTRY) {
-			archive->addExistingEntry((ArchiveEntry*)item->data.getData(), index, true);
-			index++;
-		}
+		// Add a copy of the entry to the archive
+		archive->addExistingEntry(item->getEntry(), index, true);
+		index++;
 	}
+
+	// Force entrylist width update
+	entry_list->columnsUpdate(true);
+	entry_list->updateEntry(0, NULL);
+	Layout();
 }
 
 /* ArchivePanel::importEntry

@@ -2,23 +2,56 @@
 #ifndef __CLIPBOARD_H__
 #define	__CLIPBOARD_H__
 
+#include "ArchiveEntry.h"
+
 enum {
 	CLIPBOARD_ENTRY,
 	CLIPBOARD_ZIPDIR,
 	CLIPBOARD_COMPOSITE_TEXTURE,
 	CLIPBOARD_PATCH,
+
+	CLIPBOARD_UNKNOWN,
 };
 
-struct cb_item_t {
+class ClipboardItem {
+private:
 	int			type;
-	MemChunk	data;
+
+public:
+	ClipboardItem(int type = CLIPBOARD_UNKNOWN);
+	~ClipboardItem();
+
+	int	getType() { return type; }
+};
+
+class EntryClipboardItem : public ClipboardItem {
+private:
+	ArchiveEntry*	entry;
+
+public:
+	EntryClipboardItem(ArchiveEntry* entry);
+	~EntryClipboardItem();
+
+	ArchiveEntry*	getEntry() { return entry; }
+};
+
+class ZipDirClipboardItem : public ClipboardItem {
+private:
+	vector<ArchiveEntry*>	entries;
+
+public:
+	ZipDirClipboardItem();
+	~ZipDirClipboardItem();
+
+	uint32_t		nEntries() { return entries.size(); }
+	bool			addEntry(ArchiveEntry* entry);
+	ArchiveEntry*	getEntry(uint32_t index);
 };
 
 class Clipboard {
 private:
-	vector<cb_item_t*>	items;
-	
-	static Clipboard*	instance;
+	vector<ClipboardItem*>	items;
+	static Clipboard*		instance;
 
 public:
 	Clipboard();
@@ -32,9 +65,9 @@ public:
 		return instance;
 	}
 
-	uint32_t	nItems() { return items.size(); }
-	cb_item_t*	getItem(uint32_t index);
-	bool		addItem(int type, MemChunk& data);
+	uint32_t		nItems() { return items.size(); }
+	ClipboardItem*	getItem(uint32_t index);
+	bool			addItem(ClipboardItem* item);
 
 	void	clear();
 };

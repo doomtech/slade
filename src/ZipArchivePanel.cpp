@@ -348,8 +348,10 @@ bool ZipArchivePanel::deleteEntry() {
 	}
 }
 
+/* ZipArchivePanel::copyEntry
+ * Copies the selected entries and directories
+ *******************************************************************/
 bool ZipArchivePanel::copyEntry() {
-	/*
 	// Get a list of selected entries
 	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
 
@@ -362,12 +364,8 @@ bool ZipArchivePanel::copyEntry() {
 	// Go through the list
 	for (size_t a = 0; a < selection.size(); a++) {
 		// Copy the current selected entry if it isn't a directory
-		if (selection[a]->getType() != ETYPE_FOLDER) {
-			ArchiveEntry* copied_entry = new ArchiveEntry(*selection[a]);
-			MemChunk mc;
-			mc.loadMem((uint8_t*)copied_entry, sizeof(ArchiveEntry));
-			theClipboard->addItem(CLIPBOARD_ENTRY, mc);
-		}
+		if (selection[a]->getType() != ETYPE_FOLDER)
+			theClipboard->addItem(new EntryClipboardItem(selection[a]));
 	}
 
 	// Get a list of selected directories
@@ -375,18 +373,30 @@ bool ZipArchivePanel::copyEntry() {
 
 	// Go through the list
 	for (size_t a = 0; a < selected_dirs.size(); a++) {
-		// Copy the selected directory
-		zipdir_t* dir_copy = selected_dirs[a]->copy(true);
-		MemChunk mc;
-		mc.loadMem((uint8_t*)dir_copy, sizeof(zipdir_t));
-		theClipboard->addItem(CLIPBOARD_ZIPDIR, mc);
+		// Get all entries within the selected dir and it's subdirs
+		vector<ArchiveEntry*> entries;
+		selected_dirs[a]->addToList(entries);
+
+		// Create clipboard item from non-directory entries
+		ZipDirClipboardItem* item = new ZipDirClipboardItem();
+		for (size_t a = 0; a < entries.size(); a++) {
+			if (entries[a]->getType() != ETYPE_FOLDER)
+				item->addEntry(entries[a]);
+		}
+
+		// Add it to the clipboard
+		theClipboard->addItem(item);
 	}
-	 */
+
 	return true;
 }
 
+/* ZipArchivePanel::pasteEntry
+ * Pastes any entries on the clipboard either after the last selected
+ * entry or at the end of the entry list if nothing is selected. All
+ * entries/directories are pasted to the current directory
+ *******************************************************************/
 bool ZipArchivePanel::pasteEntry() {
-	/*
 	// Get the entry index of the last selected list item
 	int index = archive->entryIndex(entry_list->getLastSelectedEntry());
 
@@ -396,47 +406,42 @@ bool ZipArchivePanel::pasteEntry() {
 	else
 		index = entry_list->getListSize(); // If not add to the end of the list
 
-	entry_list->columnsUpdate(false);
-
 	// Get the current directory
 	zipdir_t* cur_dir = ((ZipEntryListPanel*)entry_list)->getCurrentDir();
 
+	entry_list->columnsUpdate(false);
+
 	// Go through all items on the clipboard
 	for (uint32_t a = 0; a < theClipboard->nItems(); a++) {
-		// Get clipboard item
-		cb_item_t* item = theClipboard->getItem(a);
-
-		// If the item is an entry, add a copy to the archive at the current index
-		if (item->type == CLIPBOARD_ENTRY) {
-			ArchiveEntry* entry = (ArchiveEntry*)item->data.getData();
-			entry->setExProp(_T("Directory"), cur_dir->getFullPath());
-
-			archive->addExistingEntry(entry, index, true);
+		// If the item is an entry
+		if (theClipboard->getItem(a)->getType() == CLIPBOARD_ENTRY) {
+			EntryClipboardItem* item = (EntryClipboardItem*)theClipboard->getItem(a);
+			ArchiveEntry* copied_entry = new ArchiveEntry(*(item->getEntry()));
+			copied_entry->setExProp(_T("Directory"), cur_dir->getFullPath());
+			archive->addEntry(copied_entry, index);
 			index++;
 		}
 
-		// If the item is a directory, add a copy to the current directory (including all it's subdirectories etc)
-		if (item->type == CLIPBOARD_ZIPDIR) {
-			// Get directory and it's subdirectories as a list of ArchiveEntrys
-			zipdir_t* copy_dir = ((zipdir_t*)item->data.getData())->copy(true);
-			vector<ArchiveEntry*> entries;
-			copy_dir->addToList(entries);
+		// If the item is a directory
+		else if (theClipboard->getItem(a)->getType() == CLIPBOARD_ZIPDIR) {
+			ZipDirClipboardItem* item = (ZipDirClipboardItem*)theClipboard->getItem(a);
 
-			// Add them to the archive
-			for (size_t a = 0; a < entries.size(); a++) {
-				ArchiveEntry* entry = entries[a];
-				if (entry->getType() != ETYPE_FOLDER) {
-					string dir = entry->getExProp(_T("Directory"));
-					entry->setExProp(_T("Directory"), cur_dir->getFullPath() + dir);
-					wxLogMessage(entry->getExProp(_T("Directory")) + entry->getName());
-					archive->addEntry(entry, UINT_MAX);
-				}
+			// Go through all entries in the directory
+			for (uint32_t e = 0; e < item->nEntries(); e++) {
+				ArchiveEntry* copied_entry = new ArchiveEntry(*(item->getEntry(e)));
+				string dir = copied_entry->getExProp(_T("Directory"));
+				copied_entry->setExProp(_T("Directory"), cur_dir->getFullPath() + dir);
+				archive->addEntry(copied_entry, index);
+				index++;
 			}
 		}
 	}
 
+	// Force entrylist width update
 	entry_list->columnsUpdate(true);
-	 */
+	entry_list->updateEntry(0, NULL);
+	Layout();
+
 	return true;
 }
 

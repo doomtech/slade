@@ -121,6 +121,7 @@ public:
 	string	getExProp(string key);
 	bool	setExProp(string key, string value);
 	bool	removeExProp(string key);
+	void	allExProps(vector<string>& keys, vector<string>& values);
 };
 
 

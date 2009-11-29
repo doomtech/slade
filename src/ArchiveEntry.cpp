@@ -87,11 +87,11 @@ ArchiveEntry::ArchiveEntry(ArchiveEntry& copy) {
 	}
 
 	// Copy extra properties
-	PropertyList::iterator i = ex_props.begin();
-	while (i != ex_props.end()) {
-		setExProp(i->first, i->second);
-		i++;
-	}
+	vector<string> keys;
+	vector<string> values;
+	copy.allExProps(keys, values);
+	for (size_t a = 0; a < keys.size(); a++)
+		setExProp(keys[a], values[a]);
 
 	// Set entry state
 	state = 2;
@@ -179,6 +179,18 @@ bool ArchiveEntry::removeExProp(string key) {
 	}
 	else
 		return false;
+}
+
+void ArchiveEntry::allExProps(vector<string>& keys, vector<string>& values) {
+	keys.clear();
+	values.clear();
+
+	PropertyList::iterator i = ex_props.begin();
+	while (i != ex_props.end()) {
+		keys.push_back(i->first);
+		values.push_back(i->second);
+		i++;
+	}
 }
 
 /* ArchiveEntry::setState

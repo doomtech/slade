@@ -333,7 +333,7 @@ bool ZipEntryListPanel::addEntry(uint32_t archive_index, ArchiveEntry* e) {
 		if (cdir->subdirectories[a]->entryExists(e, true))
 		{
 			if (cdir->parent_dir)
-				updateDirectoryEntry(a-1);
+				updateDirectoryEntry(a+1);
 			else
 				updateDirectoryEntry(a);
 			break;
@@ -355,7 +355,7 @@ bool ZipEntryListPanel::updateEntry(uint32_t archive_index, ArchiveEntry* e) {
 		return true;
 
 	// Update the entry
-	entry_list->updateEntry(entriesBegin() + archive_index, true);
+	entry_list->updateEntry(entriesBegin() + archive_index, col_update);
 
 	return true;
 }
@@ -417,6 +417,7 @@ bool ZipEntryListPanel::addDirectory(wxUIntPtr zipdir_ptr) {
  * directory if the current directory was deleted.
  *******************************************************************/
 bool ZipEntryListPanel::removeDirectory(wxUIntPtr zipdir_ptr) {
+	wxLogMessage(_T("remove dir"));
 	// Get removed directory
 	zipdir_t* dir = (zipdir_t*)wxUIntToPtr(zipdir_ptr);
 
