@@ -131,25 +131,12 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
 	list_archives->Bind(wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK, &ArchiveManagerPanel::onListArchivesRightClick, this);
 	list_maps->Bind(wxEVT_COMMAND_LISTBOX_SELECTED, &ArchiveManagerPanel::onListMapsChanged, this);
 	list_maps->Bind(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, &ArchiveManagerPanel::onListMapsActivated, this);
+	notebook_archives->Bind(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED, &ArchiveManagerPanel::onTabChanged, this);
 	Bind(wxEVT_COMMAND_MENU_SELECTED, &ArchiveManagerPanel::onMenu, this, MENU_SAVE, MENU_END);
 
 	// Listen to the ArchiveManager
 	listenTo(theArchiveManager);
 }
-/*
-BEGIN_EVENT_TABLE(ArchiveManagerPanel, wxPanel)
-	EVT_LIST_ITEM_SELECTED(LIST_OPENARCHIVES, ArchiveManagerPanel::onListArchivesChanged)
-	EVT_LIST_ITEM_ACTIVATED(LIST_OPENARCHIVES, ArchiveManagerPanel::onListArchivesActivated)
-	EVT_LISTBOX(LIST_MAPS, ArchiveManagerPanel::onListMapsChanged)
-	EVT_LIST_ITEM_ACTIVATED(LIST_MAPS, ArchiveManagerPanel::onListMapsActivated)
-	EVT_LIST_ITEM_RIGHT_CLICK(LIST_OPENARCHIVES, ArchiveManagerPanel::onListArchivesRightClick)
-
-	// Context Menu
-	EVT_MENU(MENU_SAVE, ArchiveManagerPanel::onMenuSave)
-	EVT_MENU(MENU_SAVEAS, ArchiveManagerPanel::onMenuSaveAs)
-	EVT_MENU(MENU_CLOSE, ArchiveManagerPanel::onMenuClose)
-END_EVENT_TABLE()
-*/
 
 /* ArchiveManagerPanel::~ArchiveManagerPanel
  * ArchiveManagerPanel class destructor
@@ -694,4 +681,18 @@ void ArchiveManagerPanel::onMenu(wxCommandEvent& e) {
 	// Close
 	else if (e.GetId() == MENU_CLOSE)
 		closeSelection();
+}
+
+/* ArchiveManagerPanel::onTabChanged
+ * Called when the user switches between archive tabs
+ *******************************************************************/
+void ArchiveManagerPanel::onTabChanged(wxAuiNotebookEvent& e) {
+	// If an archive tab is selected, set the frame title accordingly
+	int selection = notebook_archives->GetSelection();
+	if (isArchivePanel(selection)) {
+		Archive* archive = ((ArchivePanel*)notebook_archives->GetPage(selection))->getArchive();
+		((wxFrame*)GetParent())->SetTitle(s_fmt(_T("SLADE - %s"), archive->getFileName(false)));
+	}
+	else
+		((wxFrame*)GetParent())->SetTitle(_T("SLADE"));
 }

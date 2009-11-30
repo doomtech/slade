@@ -24,6 +24,12 @@ TEXTUREx editor:
 - find/replace for patches
 
 
+Resources system:
+- opened archives are either used as resources or not
+- when searching for patches etc, resource archives are searched - IWAD archives are searched first
+- archive list on archive manager panel could have 'resource' checkboxes for each list item
+
+
 Lower Priority:
 - LZMA/Bzip2 support
 

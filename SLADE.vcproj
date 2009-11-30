@@ -530,22 +530,6 @@
 				RelativePath=".\src\Icons.h"
 				>
 			</File>
-			<File
-				RelativePath=".\src\Palette.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\Palette.h"
-				>
-			</File>
-			<File
-				RelativePath=".\src\PaletteManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\PaletteManager.h"
-				>
-			</File>
 			<Filter
 				Name="Archive"
 				>
@@ -591,6 +575,38 @@
 				</File>
 				<File
 					RelativePath=".\src\SImage.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Texture"
+				>
+				<File
+					RelativePath=".\src\CompositeTexture.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\CompositeTexture.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Palette"
+				>
+				<File
+					RelativePath=".\src\Palette.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Palette.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\PaletteManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\PaletteManager.h"
 					>
 				</File>
 			</Filter>
