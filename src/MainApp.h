@@ -20,6 +20,7 @@ private:
 public:
 	virtual bool OnInit();
 	virtual int OnExit();
+	virtual void OnFatalException();
 
 	bool	initDirectories();
 	void	initLogFile();

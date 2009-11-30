@@ -38,6 +38,7 @@
 #include <wx/image.h>
 #include <wx/stdpaths.h>
 #include <wx/ffile.h>
+#include <wx/stackwalk.h>
 
 
 /*******************************************************************
@@ -57,6 +58,79 @@ string	dir_app = _T("");
  * EXTERNAL VARIABLES
  *******************************************************************/
 extern string main_window_layout;
+
+
+class SLADEStackTrace : public wxStackWalker {
+private:
+	string	stack_trace;
+	
+public:
+	SLADEStackTrace() {
+		stack_trace = _T("Stack Trace:\n");
+	}
+
+	~SLADEStackTrace() {
+	}
+
+	string getTraceString() {
+		return stack_trace;
+	}
+
+	void OnStackFrame(const wxStackFrame& frame) {
+		string location = wxEmptyString;
+		if (frame.HasSourceLocation())
+			location = s_fmt(_T("(%s:%d) "), frame.GetFileName().c_str(), frame.GetLine());
+
+		string parameters = wxEmptyString;
+		/*
+		for (size_t a = 0; a < frame.GetParamCount(); a++) {
+			string type = wxEmptyString;
+			string name = wxEmptyString;
+			string value = wxEmptyString;
+			frame.GetParam(a, &type, &name, &value);
+
+			parameters.Append(s_fmt(_T("%s %s = %s"), type.c_str(), name.c_str(), value.c_str()));
+
+			if (a < frame.GetParamCount() - 1)
+				parameters.Append(_T(", "));
+		}
+		*/
+
+		stack_trace.Append(s_fmt(_T("%d: %s%s(%s)\n"), frame.GetLevel(), location.c_str(), frame.GetName().c_str(), parameters.c_str()));
+	}
+};
+
+class SLADECrashDialog : public wxDialog {
+private:
+	wxTextCtrl*	text_stack;
+
+public:
+	SLADECrashDialog(SLADEStackTrace& st) : wxDialog(wxTheApp->GetTopWindow(), -1, _T("SLADE3 Application Crash")) {
+		// Setup sizer
+		wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+		SetSizer(sizer);
+
+		// Add general crash method
+		string message = _T("SLADE3 has crashed unexpectedly. To help fix the problem that caused this crash,\nplease copy+paste the information from the window below to a text file, and email\nit to <sirjuddington@gmail.com>. Sorry for the inconvenience.");
+		sizer->Add(new wxStaticText(this, -1, message), 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 4);
+
+		// Add stack trace text area
+		text_stack = new wxTextCtrl(this, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxHSCROLL);
+		text_stack->SetValue(st.getTraceString());
+		text_stack->SetFont(wxFont(8, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
+		sizer->Add(text_stack, 1, wxEXPAND|wxALL, 4);
+
+		// Add standard 'OK' button
+		sizer->Add(CreateStdDialogButtonSizer(wxOK), 0, wxEXPAND|wxALL, 4);
+
+		// Setup layout
+		Layout();
+		SetInitialSize(wxSize(500, 500));
+	}
+
+	~SLADECrashDialog() {
+	}
+};
 
 
 /*******************************************************************
@@ -141,6 +215,9 @@ bool MainApp::OnInit() {
 	// Set application name (for wx directory stuff)
 	wxApp::SetAppName(_T("slade3"));
 
+	// Handle exceptions using wxDebug stuff
+	wxHandleFatalExceptions(true);
+
 	// Init application directories
 	if (!initDirectories())
 		return false;
@@ -183,6 +260,13 @@ bool MainApp::OnInit() {
 int MainApp::OnExit() {
 	saveConfigFile();
 	return 0;
+}
+
+void MainApp::OnFatalException() {
+	SLADEStackTrace st;
+	st.WalkFromException();
+	SLADECrashDialog sd(st);
+	sd.ShowModal();
 }
 
 /* MainApp::initLogFile
@@ -262,3 +346,11 @@ void MainApp::saveConfigFile() {
 	fprintf(fp, "\n// End Configuration File\n\n");
 	fclose(fp);
 }
+
+
+
+void c_crash(vector<string> args) {
+	uint8_t* test = NULL;
+	test[123] = 5;
+}
+ConsoleCommand crash(_T("crash"), &c_crash, 0);

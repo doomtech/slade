@@ -404,6 +404,14 @@
 						RelativePath=".\src\TextEntryPanel.h"
 						>
 					</File>
+					<File
+						RelativePath=".\src\TextureXEntryPanel.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\TextureXEntryPanel.h"
+						>
+					</File>
 				</Filter>
 				<Filter
 					Name="ZipArchivePanel"
