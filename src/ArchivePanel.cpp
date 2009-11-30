@@ -100,7 +100,7 @@ void ArchivePanel::init() {
 	cur_area->Show(true);
 
 	// Setup events
-	entry_list->Bind(wxEVT_KEY_DOWN, &ArchivePanel::onEntryListKeyDown, this);
+	entry_list->getEntryListCtrl()->Bind(wxEVT_KEY_DOWN, &ArchivePanel::onEntryListKeyDown, this);
 
 	Layout();
 	entry_list->populateEntryList();

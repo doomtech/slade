@@ -60,6 +60,15 @@ string	dir_app = _T("");
 extern string main_window_layout;
 
 
+/*******************************************************************
+ * CLASSES
+ *******************************************************************/
+
+/* SLADEStackTrace class
+ * Extension of the wxStackWalker class that formats stack trace
+ * information to a multi-line string, that can be retrieved via
+ * getTraceString()
+ *******************************************************************/
 class SLADEStackTrace : public wxStackWalker {
 private:
 	string	stack_trace;
@@ -100,6 +109,11 @@ public:
 	}
 };
 
+
+/* SLADECrashDialog class
+ * A simple dialog that displays a crash message and a scrollable,
+ * multi-line textbox with a stack trace
+ *******************************************************************/
 class SLADECrashDialog : public wxDialog {
 private:
 	wxTextCtrl*	text_stack;

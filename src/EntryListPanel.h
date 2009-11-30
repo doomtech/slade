@@ -44,6 +44,7 @@ public:
 	bool					columnsUpdate() { return col_update; }
 	void					columnsUpdate(bool update) { col_update = update; }
 
+	EntryList*				getEntryListCtrl() { return entry_list; }
 	ArchiveEntry*			getFocusedEntry();
 	int						getFocus();
 	vector<ArchiveEntry*>	getSelectedEntries();
