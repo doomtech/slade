@@ -159,8 +159,7 @@ vector<zipdir_t*> ZipEntryListPanel::getSelectedDirectories() {
 					sel_index--;
 
 			// Add the selected subdirectory to the list
-			if (sel_index > 0)
-				ret.push_back(getCurrentDir()->subdirectories[sel_index]);
+			ret.push_back(getCurrentDir()->subdirectories[sel_index]);
 		}
 	}
 
@@ -417,7 +416,6 @@ bool ZipEntryListPanel::addDirectory(wxUIntPtr zipdir_ptr) {
  * directory if the current directory was deleted.
  *******************************************************************/
 bool ZipEntryListPanel::removeDirectory(wxUIntPtr zipdir_ptr) {
-	wxLogMessage(_T("remove dir"));
 	// Get removed directory
 	zipdir_t* dir = (zipdir_t*)wxUIntToPtr(zipdir_ptr);
 
