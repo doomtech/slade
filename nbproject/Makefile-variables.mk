@@ -7,21 +7,21 @@ CND_BASEDIR=`pwd`
 CND_BUILDDIR=build
 CND_DISTDIR=dist
 # Unix_Debug configuration
-CND_PLATFORM_Unix_Debug=GNU-Windows
+CND_PLATFORM_Unix_Debug=GNU-Linux-x86
 CND_ARTIFACT_DIR_Unix_Debug=dist
 CND_ARTIFACT_NAME_Unix_Debug=slade-dbg
 CND_ARTIFACT_PATH_Unix_Debug=dist/slade-dbg
-CND_PACKAGE_DIR_Unix_Debug=dist/Unix_Debug/GNU-Windows/package
+CND_PACKAGE_DIR_Unix_Debug=dist/Unix_Debug/GNU-Linux-x86/package
 CND_PACKAGE_NAME_Unix_Debug=trunk.tar
-CND_PACKAGE_PATH_Unix_Debug=dist/Unix_Debug/GNU-Windows/package/trunk.tar
+CND_PACKAGE_PATH_Unix_Debug=dist/Unix_Debug/GNU-Linux-x86/package/trunk.tar
 # Unix_Release configuration
-CND_PLATFORM_Unix_Release=GNU-Windows
+CND_PLATFORM_Unix_Release=GNU-Linux-x86
 CND_ARTIFACT_DIR_Unix_Release=dist
 CND_ARTIFACT_NAME_Unix_Release=slade
 CND_ARTIFACT_PATH_Unix_Release=dist/slade
-CND_PACKAGE_DIR_Unix_Release=dist/Unix_Release/GNU-Windows/package
+CND_PACKAGE_DIR_Unix_Release=dist/Unix_Release/GNU-Linux-x86/package
 CND_PACKAGE_NAME_Unix_Release=trunk.tar
-CND_PACKAGE_PATH_Unix_Release=dist/Unix_Release/GNU-Windows/package/trunk.tar
+CND_PACKAGE_PATH_Unix_Release=dist/Unix_Release/GNU-Linux-x86/package/trunk.tar
 # Win32_Release configuration
 CND_PLATFORM_Win32_Release=
 CND_ARTIFACT_DIR_Win32_Release=dist

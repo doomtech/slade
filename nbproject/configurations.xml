@@ -52,6 +52,8 @@
           <itemPath>src/PaletteEntryPanel.h</itemPath>
           <itemPath>src/TextEntryPanel.cpp</itemPath>
           <itemPath>src/TextEntryPanel.h</itemPath>
+          <itemPath>src/TextureXEntryPanel.cpp</itemPath>
+          <itemPath>src/TextureXEntryPanel.h</itemPath>
         </logicalFolder>
         <logicalFolder name="f2" displayName="ZipArchivePanel" projectFiles="true">
           <itemPath>src/ZipArchivePanel.cpp</itemPath>
@@ -108,14 +110,20 @@
         <itemPath>src/SImage.cpp</itemPath>
         <itemPath>src/SImage.h</itemPath>
       </logicalFolder>
+      <logicalFolder name="f3" displayName="Palette" projectFiles="true">
+        <itemPath>src/Palette.cpp</itemPath>
+        <itemPath>src/Palette.h</itemPath>
+        <itemPath>src/PaletteManager.cpp</itemPath>
+        <itemPath>src/PaletteManager.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f4" displayName="Texture" projectFiles="true">
+        <itemPath>src/CompositeTexture.cpp</itemPath>
+        <itemPath>src/CompositeTexture.h</itemPath>
+      </logicalFolder>
       <itemPath>src/ArchiveManager.cpp</itemPath>
       <itemPath>src/ArchiveManager.h</itemPath>
       <itemPath>src/Icons.cpp</itemPath>
       <itemPath>src/Icons.h</itemPath>
-      <itemPath>src/Palette.cpp</itemPath>
-      <itemPath>src/Palette.h</itemPath>
-      <itemPath>src/PaletteManager.cpp</itemPath>
-      <itemPath>src/PaletteManager.h</itemPath>
     </logicalFolder>
     <logicalFolder name="f6" displayName="UI Elements" projectFiles="true">
       <itemPath>src/ColourBox.cpp</itemPath>
@@ -141,7 +149,7 @@
       <toolsSet>
         <developmentServer>localhost</developmentServer>
         <compilerSet>GNU|GNU</compilerSet>
-        <platform>3</platform>
+        <platform>2</platform>
       </toolsSet>
       <compileType>
         <ccTool>
@@ -189,7 +197,7 @@
       <toolsSet>
         <developmentServer>localhost</developmentServer>
         <compilerSet>MinGW|MinGW</compilerSet>
-        <platform>3</platform>
+        <platform>2</platform>
       </toolsSet>
       <compileType>
         <cTool>
@@ -247,7 +255,7 @@
       <toolsSet>
         <developmentServer>localhost</developmentServer>
         <compilerSet>MinGW|MinGW</compilerSet>
-        <platform>3</platform>
+        <platform>2</platform>
       </toolsSet>
       <compileType>
         <linkerTool>

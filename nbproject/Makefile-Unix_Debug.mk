@@ -19,7 +19,7 @@ FC=
 AS=as
 
 # Macros
-CND_PLATFORM=GNU-Windows
+CND_PLATFORM=GNU-Linux-x86
 CND_CONF=Unix_Debug
 CND_DISTDIR=dist
 
@@ -41,6 +41,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/ArchiveManagerPanel.o \
 	${OBJECTDIR}/src/ArchiveManager.o \
 	${OBJECTDIR}/src/MapThing.o \
+	${OBJECTDIR}/src/CompositeTexture.o \
 	${OBJECTDIR}/src/ListenerAnnouncer.o \
 	${OBJECTDIR}/src/MapSector.o \
 	${OBJECTDIR}/src/Console.o \
@@ -63,7 +64,9 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/ModifyOffsetsDialog.o \
 	${OBJECTDIR}/src/ColourBox.o \
 	${OBJECTDIR}/src/ArchiveEntry.o \
+	${OBJECTDIR}/src/TextureXEntryPanel.o \
 	${OBJECTDIR}/src/MapLine.o \
+	${OBJECTDIR}/src/WxStuff.o \
 	${OBJECTDIR}/src/SLADEMap.o \
 	${OBJECTDIR}/src/Tokenizer.o \
 	${OBJECTDIR}/src/PaletteManager.o \
@@ -98,9 +101,9 @@ LDLIBSOPTIONS=-lfreeimage
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
-	${MAKE}  -f nbproject/Makefile-Unix_Debug.mk dist/slade-dbg.exe
+	${MAKE}  -f nbproject/Makefile-Unix_Debug.mk dist/slade-dbg
 
-dist/slade-dbg.exe: ${OBJECTFILES}
+dist/slade-dbg: ${OBJECTFILES}
 	${MKDIR} -p dist
 	${LINK.cc} `wx-config --debug --libs std,gl,stc,aui` -o dist/slade-dbg  ${OBJECTFILES} ${LDLIBSOPTIONS} 
 
@@ -153,6 +156,11 @@ ${OBJECTDIR}/src/MapThing.o: nbproject/Makefile-${CND_CONF}.mk src/MapThing.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
 	$(COMPILE.cc) -g -D__WXDEBUG__ -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/MapThing.o src/MapThing.cpp
+
+${OBJECTDIR}/src/CompositeTexture.o: nbproject/Makefile-${CND_CONF}.mk src/CompositeTexture.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -g -D__WXDEBUG__ -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/CompositeTexture.o src/CompositeTexture.cpp
 
 ${OBJECTDIR}/src/ListenerAnnouncer.o: nbproject/Makefile-${CND_CONF}.mk src/ListenerAnnouncer.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
@@ -264,10 +272,20 @@ ${OBJECTDIR}/src/ArchiveEntry.o: nbproject/Makefile-${CND_CONF}.mk src/ArchiveEn
 	${RM} $@.d
 	$(COMPILE.cc) -g -D__WXDEBUG__ -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/ArchiveEntry.o src/ArchiveEntry.cpp
 
+${OBJECTDIR}/src/TextureXEntryPanel.o: nbproject/Makefile-${CND_CONF}.mk src/TextureXEntryPanel.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -g -D__WXDEBUG__ -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/TextureXEntryPanel.o src/TextureXEntryPanel.cpp
+
 ${OBJECTDIR}/src/MapLine.o: nbproject/Makefile-${CND_CONF}.mk src/MapLine.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
 	$(COMPILE.cc) -g -D__WXDEBUG__ -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/MapLine.o src/MapLine.cpp
+
+${OBJECTDIR}/src/WxStuff.o: nbproject/Makefile-${CND_CONF}.mk src/WxStuff.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -g -D__WXDEBUG__ -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/WxStuff.o src/WxStuff.cpp
 
 ${OBJECTDIR}/src/SLADEMap.o: nbproject/Makefile-${CND_CONF}.mk src/SLADEMap.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
@@ -350,7 +368,7 @@ ${OBJECTDIR}/src/ZipArchivePanel.o: nbproject/Makefile-${CND_CONF}.mk src/ZipArc
 # Clean Targets
 .clean-conf:
 	${RM} -r build/Unix_Debug
-	${RM} dist/slade-dbg.exe
+	${RM} dist/slade-dbg
 
 # Subprojects
 .clean-subprojects:
