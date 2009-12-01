@@ -3,22 +3,21 @@
 #define __MEMCHUNK_H__
 
 class MemChunk {
-private:
+protected:
 	uint8_t* data;
 	uint32_t cur_ptr;
 	uint32_t size;
 
 public:
 	MemChunk(uint32_t size = 0);
-	MemChunk(uint8_t* data, uint32_t size);
-	MemChunk(const uint8_t* data, uint32_t size) { MemChunk((uint8_t*)data, size); }
+	MemChunk(const uint8_t* data, uint32_t size);
 	~MemChunk();
 
 	uint8_t& operator[](int a) { return data[a]; }
 
 	// Accessors
-	uint8_t* getData() { return data; }
-	uint32_t getSize() { return size; }
+	const uint8_t*	getData() { return data; }
+	uint32_t		getSize() { return size; }
 
 	bool hasData();
 
@@ -26,16 +25,15 @@ public:
 	bool reSize(uint32_t new_size, bool preserve_data = true);
 
 	// Data import
-	bool loadFile(string filename, uint32_t offset = 0, uint32_t len = 0);
-	bool loadFileStream(FILE* fp, uint32_t len = 0);
-	bool loadMem(uint8_t* start, uint32_t len);
-	bool loadMem(const uint8_t* start, uint32_t len) { return loadMem((uint8_t*)start, len); }
+	bool	importFile(string filename, uint32_t offset = 0, uint32_t len = 0);
+	bool	importFileStream(FILE* fp, uint32_t len = 0);
+	bool	importMem(const uint8_t* start, uint32_t len);
 
 	// Data export
-	bool saveFile(string filename);
+	bool exportFile(string filename);
 
 	// C-style reading/writing
-	bool		write(void* data, uint32_t size);
+	bool		write(const void* data, uint32_t size);
 	bool		read(void* buf, uint32_t size);
 	bool		seek(uint32_t offset, uint32_t start);
 	uint32_t	currentPos() { return cur_ptr; }

@@ -89,7 +89,7 @@ bool Misc::loadPaletteFromArchive(Palette8bit* pal, Archive* archive) {
 		return false;
 
 	// Read palette colours
-	uint8_t* playpal_dat = playpal->getData(true);
+	const uint8_t* playpal_dat = playpal->getData(true);
 	int c = 0;
 	for (int a = 0; a < 256; a++) {
 		uint8_t r = playpal_dat[c++];

@@ -63,7 +63,7 @@ PaletteEntryPanel::~PaletteEntryPanel() {
  *******************************************************************/
 bool PaletteEntryPanel::loadEntry(ArchiveEntry* entry) {
 	MemChunk mc;
-	mc.loadMem(entry->getData(true), entry->getSize());
+	mc.importMem(entry->getData(true), entry->getSize());
 	pal_canvas->getPalette().loadMem(mc);
 
 	return true;

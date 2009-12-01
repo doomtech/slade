@@ -51,9 +51,9 @@ public:
 	bool	validFlatSize();
 
 	// Image format reading
-	bool	loadImage(uint8_t* data, int size);
-	bool	loadDoomGfx(uint8_t* data, int size);
-	bool	loadDoomFlat(uint8_t* data, int size);
+	bool	loadImage(const uint8_t* data, int size);
+	bool	loadDoomGfx(const uint8_t* data, int size);
+	bool	loadDoomFlat(const uint8_t* data, int size);
 
 	// Image format writing
 	bool	toPNG(MemChunk& out);

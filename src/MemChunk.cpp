@@ -55,14 +55,14 @@ MemChunk::MemChunk(uint32_t size) {
 /* MemChunk::MemChunk
  * MemChunk class constructor taking initial data
  *******************************************************************/
-MemChunk::MemChunk(uint8_t* data, uint32_t size) {
+MemChunk::MemChunk(const uint8_t* data, uint32_t size) {
 	// Init variables
 	this->cur_ptr = 0;
 	this->data = NULL;
 	this->size = size;
 
 	// Load given data
-	loadMem(data, size);
+	importMem(data, size);
 }
 
 /* MemChunk::~MemChunk
@@ -132,7 +132,7 @@ bool MemChunk::reSize(uint32_t new_size, bool preserve_data) {
  * Loads a file (or part of it) into the MemChunk
  * Returns false if file couldn't be opened, true otherwise
  *******************************************************************/
-bool MemChunk::loadFile(string filename, uint32_t offset, uint32_t len) {
+bool MemChunk::importFile(string filename, uint32_t offset, uint32_t len) {
 	// Open the file
 	FILE *fp = fopen(chr(filename), "rb");
 
@@ -168,16 +168,46 @@ bool MemChunk::loadFile(string filename, uint32_t offset, uint32_t len) {
 	return true;
 }
 
+bool MemChunk::importFileStream(FILE* fp, uint32_t len) {
+	// Check file
+	if (!fp)
+		return false;
+
+	// Clear current data if it exists
+	clear();
+
+	// Get current file position
+	uint32_t offset = ftell(fp);
+
+	// Get file length
+	uint32_t flen = 0;
+	fseek(fp, 0, SEEK_END);
+	flen = (uint32_t) ftell(fp);
+	fseek(fp, offset, SEEK_SET);
+
+	// If length isn't specified or exceeds the file length,
+	// only read to the end of the file
+	if (offset + len > flen || len == 0)
+		len = flen - offset;
+
+	// Setup variables & allocate memory
+	size = len;
+	data = new uint8_t[size];
+
+	// Read the file
+	fread(data, 1, size, fp);
+
+	return true;
+}
+
 /* MemChunk::loadMem
  * Loads a chunk of memory into the MemChunk
  * Returns false if size or data pointer is invalid, true otherwise
  *******************************************************************/
-bool MemChunk::loadMem(uint8_t* start, uint32_t len) {
+bool MemChunk::importMem(const uint8_t* start, uint32_t len) {
 	// Check that length & data to be loaded are valid
-	if (len == 0 || !start) {
-		wxLogMessage(_T("MemChunk::loadMem: Invalid data and/or length"));
+	if (!start)
 		return false;
-	}
 
 	// Clear current data if it exists
 	clear();
@@ -195,7 +225,7 @@ bool MemChunk::loadMem(uint8_t* start, uint32_t len) {
 /* MemChunk::saveFile
  * Writes the MemChunk data to a new file of [filename]
  *******************************************************************/
-bool MemChunk::saveFile(string filename) {
+bool MemChunk::exportFile(string filename) {
 	// Open file for writing
 	FILE* fp = fopen(chr(filename), "wb");
 	if (!fp) {
@@ -216,7 +246,7 @@ bool MemChunk::saveFile(string filename) {
  * Writes the given data at the current position. Expands the memory
  * chunk if necessary.
  *******************************************************************/
-bool MemChunk::write(void* data, uint32_t size) {
+bool MemChunk::write(const void* data, uint32_t size) {
 	// If we're trying to write past the end of the memory chunk,
 	// resize it so we can write at this point
 	if (cur_ptr + size > this->size)

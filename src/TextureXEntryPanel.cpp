@@ -67,7 +67,7 @@ bool TextureXEntryPanel::loadEntry(ArchiveEntry* entry) {
 		return false;
 
 	MemChunk mc;
-	mc.loadMem(pnames->getData(), pnames->getSize());
+	mc.importMem(pnames->getData(), pnames->getSize());
 
 	// Read number of pnames
 	uint32_t n_pnames = 0;
@@ -88,7 +88,7 @@ bool TextureXEntryPanel::loadEntry(ArchiveEntry* entry) {
 	// Load entry data to MemChunk
 	mc.clear();
 	mc.seek(0, SEEK_SET);
-	mc.loadMem(entry->getData(), entry->getSize());
+	mc.importMem(entry->getData(), entry->getSize());
 
 	// Read header
 	int32_t		n_tex = 0;

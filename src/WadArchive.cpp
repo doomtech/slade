@@ -214,15 +214,10 @@ bool WadArchive::openFile(string filename) {
 		}
 
 		// Create & setup lump
-		ArchiveEntry* nlump = new ArchiveEntry(wxString::FromAscii(name), this);
-		nlump->setSize(size);
+		ArchiveEntry* nlump = new ArchiveEntry(wxString::FromAscii(name), size, this);
 		nlump->setLoaded(false);
 		nlump->setExProp(_T("Offset"), s_fmt(_T("%d"), offset));
 		nlump->setState(0);
-
-		// Lock lump if IWAD
-		if (wad_type[0] == 'I')
-			nlump->lock();
 
 		// Check for markers
 		if (!nlump->getName().Cmp(_T("P_START")))
@@ -268,10 +263,7 @@ bool WadArchive::openFile(string filename) {
 			fseek(fp, getEntryOffset(entry), SEEK_SET);
 
 			// Read it in to the entry
-			uint8_t* data = new uint8_t[entry->getSize()];
-			fread(data, entry->getSize(), 1, fp);
-			entry->setData(data);
-			entry->setLoaded(true);
+			entry->importFileStream(fp, entry->getSize());
 		}
 
 		// Detect entry type
@@ -280,6 +272,13 @@ bool WadArchive::openFile(string filename) {
 		// Unload entry data if needed
 		if (!archive_load_data)
 			entry->unloadData();
+
+		// Lock entry if IWAD
+		if (wad_type[0] == 'I')
+			entry->lock();
+
+		// Set entry to unchanged
+		entry->setState(0);
 	}
 
 	// Detect maps (will detect map entry types)
@@ -429,15 +428,10 @@ bool WadArchive::loadEntryData(ArchiveEntry* entry) {
 		return false;
 	}
 
-	// Allocate memory for lump data
-	uint8_t* data = new uint8_t[entry->getSize()];
-
 	// Seek to lump offset in file and read it in
 	fseek(fp, getEntryOffset(entry), SEEK_SET);
-	fread(data, entry->getSize(), 1, fp);
-
-	// Set lump data to newly allocated memory
-	entry->setData(data);
+	entry->importFileStream(fp, entry->getSize());
+	//fread(data, entry->getSize(), 1, fp);
 
 	// Close file
 	fclose(fp);

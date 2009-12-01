@@ -76,50 +76,53 @@ bool EntryOperations::modifyGfxOffsets(ArchiveEntry* entry, int auto_type, point
 	// Doom gfx format
 	if (type == ETYPE_GFX || type == ETYPE_PATCH || type == ETYPE_SPRITE) {
 		// Get patch header
-		patch_header_t* header = (patch_header_t*)entry->getData(true);
+		patch_header_t header;
+		entry->read(&header, 8);
+		//patch_header_t* header = (patch_header_t*)entry->getData(true);
 
 		// Apply new offsets
 		if (auto_type >= 0) {
 			// Auto Offsets selected
-			int w = header->width;
-			int h = header->height;
+			int w = header.width;
+			int h = header.height;
 
 			if (auto_type == 0) {			// Monster
-				header->left = w * 0.5;
-				header->top = h - 4;
+				header.left = w * 0.5;
+				header.top = h - 4;
 			}
 			else if (auto_type == 1) {		// Projectile
-				header->left = w * 0.5;
-				header->top = h * 0.5;
+				header.left = w * 0.5;
+				header.top = h * 0.5;
 			}
 			else if (auto_type == 2) {		// Weapon
-				header->left = -160 + (w * 0.5);
-				header->top = -200 + h;
+				header.left = -160 + (w * 0.5);
+				header.top = -200 + h;
 			}
 		}
 		else {
 			// Set Offsets selected
 			if (relative) {
-				offsets.x += header->left;
-				offsets.y += header->top;
+				offsets.x += header.left;
+				offsets.y += header.top;
 			}
 
 			if (xc)
-				header->left = offsets.x;
+				header.left = offsets.x;
 
 			if (yc)
-				header->top = offsets.y;
+				header.top = offsets.y;
 		}
 
-		// Set entry state to modified
-		entry->setState(1);
+		// Write new header to entry
+		entry->seek(0, SEEK_SET);
+		entry->write(&header, 8);
 	}
 
 	// PNG format
 	else if (type == ETYPE_PNG) {
 		// Read width and height from IHDR chunk
-		uint8_t* data = entry->getData(true);
-		ihdr_t* ihdr = (ihdr_t*)(data + 12);
+		const uint8_t* data = entry->getData(true);
+		const ihdr_t* ihdr = (ihdr_t*)(data + 12);
 		uint32_t w = wxINT32_SWAP_ON_LE(ihdr->width);
 		uint32_t h = wxINT32_SWAP_ON_LE(ihdr->height);
 

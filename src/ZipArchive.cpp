@@ -384,10 +384,9 @@ bool ZipArchive::openFile(string filename) {
 			wxFileName fn(entry->GetName(wxPATH_UNIX), wxPATH_UNIX);
 
 			// Create entry
-			ArchiveEntry *new_entry = new ArchiveEntry(fn.GetFullName(), this);
+			ArchiveEntry *new_entry = new ArchiveEntry(fn.GetFullName(), entry->GetSize(), this);
 
 			// Setup entry info
-			new_entry->setSize(entry->GetSize());
 			new_entry->setLoaded(false);
 			new_entry->setExProp(_T("ZipIndex"), s_fmt(_T("%d"), entry_index));
 			new_entry->setState(0);
@@ -400,7 +399,7 @@ bool ZipArchive::openFile(string filename) {
 			// Read the data
 			uint8_t* data = new uint8_t[entry->GetSize()];
 			zip.Read(data, entry->GetSize());
-			new_entry->setData(data);
+			new_entry->importMem(data, entry->GetSize());
 			new_entry->setLoaded(true);
 
 			// Determine it's type
@@ -409,6 +408,9 @@ bool ZipArchive::openFile(string filename) {
 			// Unload data if needed
 			if (!archive_load_data)
 				new_entry->unloadData();
+
+			// Clean up
+			delete[] data;
 		}
 		else {
 			// Zip entry is a directory, add it to the directory tree
@@ -573,7 +575,7 @@ bool ZipArchive::loadEntryData(ArchiveEntry* entry) {
 	// Read the data
 	uint8_t* data = new uint8_t[zentry->GetSize()];
 	zip.Read(data, zentry->GetSize());
-	entry->setData(data);
+	entry->importMem(data, zentry->GetSize());
 
 	// Set the entry to loaded
 	entry->setLoaded();

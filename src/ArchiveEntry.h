@@ -5,6 +5,7 @@
 class Archive;
 
 #include "ListenerAnnouncer.h"
+#include "MemChunk.h"
 
 // Entry types enum
 enum {
@@ -59,7 +60,7 @@ class ArchiveEntry : public Announcer {
 private:
 	Archive*		parent;
 	string			name;
-	uint8_t*		data;
+	MemChunk		data;
 	uint32_t		size;
 	bool			data_loaded;
 	uint8_t			type;
@@ -68,26 +69,24 @@ private:
 	PropertyList	ex_props;
 
 public:
-	ArchiveEntry(string name = _T(""), Archive* parent = NULL);
+	ArchiveEntry(string name = _T(""), uint32_t size = 0, Archive* parent = NULL);
 	ArchiveEntry(ArchiveEntry& copy);
 	virtual ~ArchiveEntry();
 
 	// Accessors
-	Archive*	getParent() { return parent; }
-	string		getName(bool cut_ext = false);
-	uint32_t	getSize() { return size; }
-	bool		isLoaded() { return data_loaded; }
-	uint8_t		getType() { return type; }
-	uint8_t		getState() { return state; }
-	bool		isLocked() { return locked; }
-	uint8_t*	getData(bool allow_load = true);
+	Archive*		getParent() { return parent; }
+	string			getName(bool cut_ext = false);
+	uint32_t		getSize() { return size; }
+	bool			isLoaded() { return data_loaded; }
+	uint8_t			getType() { return type; }
+	uint8_t			getState() { return state; }
+	bool			isLocked() { return locked; }
+	const uint8_t*	getData(bool allow_load = true);
 
 	// Modifiers (won't change entry state)
 	void		setParent(Archive* parent) { this->parent = parent; }
 	void		setName(string name) { this->name = name; }
 	void		setLoaded(bool loaded = true) { data_loaded = loaded; }
-	void		setSize(uint32_t size) { this->size = size; }
-	void		setData(uint8_t* data) { this->data = data; }
 	void		setType(uint8_t type) { this->type = type; }
 	void		setState(uint8_t state);
 	void		unloadData();
@@ -95,15 +94,17 @@ public:
 	void		unlock() { locked = false; }
 
 	// Entry modification (will change entry state)
-	void	rename(string new_name);
+	bool	rename(string new_name);
+	bool	resize(uint32_t new_size, bool preserve_data);
 
 	// Data modification
 	void	clearData();
 
 	// Data import
-	bool	importMem(void* data, uint32_t size);
+	bool	importMem(const void* data, uint32_t size);
 	bool	importMemChunk(MemChunk& mc);
 	bool	importFile(string filename, uint32_t offset = 0, uint32_t size = 0);
+	bool	importFileStream(FILE* fp, uint32_t len = 0);
 	bool	importEntry(ArchiveEntry* entry);
 
 	// Data export
@@ -115,6 +116,12 @@ public:
 
 	// Misc
 	string	getSizeString();
+
+	// Data access
+	bool		write(const void* data, uint32_t size);
+	bool		read(void* buf, uint32_t size);
+	bool		seek(uint32_t offset, uint32_t start) { return data.seek(offset, start); }
+	uint32_t	currentPos() { return data.currentPos(); }
 
 	// Extra properties stuff
 	bool	hasExProp(string key);

@@ -49,15 +49,16 @@ extern uint32_t n_valid_flat_sizes;
 /* ArchiveEntry::ArchiveEntry
  * ArchiveEntry class constructor
  *******************************************************************/
-ArchiveEntry::ArchiveEntry(string name, Archive* parent) {
+ArchiveEntry::ArchiveEntry(string name, uint32_t size, Archive* parent) {
 	// Initialise attributes
 	this->parent = parent;
 	this->name = name;
 	this->data = NULL;
-	this->size = 0;
+	this->size = size;
 	this->data_loaded = true;
 	this->state = 2;
 	this->type = ETYPE_UNKNOWN;
+	this->locked = false;
 }
 
 /* ArchiveEntry::ArchiveEntry
@@ -71,20 +72,8 @@ ArchiveEntry::ArchiveEntry(ArchiveEntry& copy) {
 	data_loaded = true;
 	type = copy.type;
 
-	// Get the data to copy
-	const uint8_t* copy_data = copy.getData(true);
-
-	if (copy_data) {
-		// Allocate memory and copy the data
-		data = new uint8_t[size];
-		memcpy(data, copy_data, size);
-	} else {
-		// If we didn't get any data to copy for some reason, print an error
-		// message and set the entry's size to 0
-		wxLogMessage(s_fmt(_T("Unable to copy data from entry %s"), copy.getName().c_str()));
-		data = NULL;
-		size = 0;
-	}
+	// Copy data
+	data.importMem(copy.getData(true), copy.getSize());
 
 	// Copy extra properties
 	vector<string> keys;
@@ -101,9 +90,6 @@ ArchiveEntry::ArchiveEntry(ArchiveEntry& copy) {
  * ArchiveEntry class destructor
  *******************************************************************/
 ArchiveEntry::~ArchiveEntry() {
-	// Delete any entry data if it exists
-	if (data)
-		delete[] data;
 }
 
 /* ArchiveEntry::getName
@@ -124,14 +110,14 @@ string ArchiveEntry::getName(bool cut_ext) {
  * allow_load is true, entry data will be loaded from it's parent
  * archive (if it exists)
  *******************************************************************/
-uint8_t* ArchiveEntry::getData(bool allow_load) {
+const uint8_t* ArchiveEntry::getData(bool allow_load) {
 	// Load the data if needed (and possible)
 	if (allow_load && !isLoaded() && parent) {
 		data_loaded = parent->loadEntryData(this);
 	}
 
 	// Return entry data
-	return data;
+	return data.getData();
 }
 
 /* ArchiveEntry::hasExProp
@@ -215,7 +201,7 @@ void ArchiveEntry::setState(uint8_t state) {
  *******************************************************************/
 void ArchiveEntry::unloadData() {
 	// Check there is any data to be 'unloaded'
-	if (!data || !data_loaded)
+	if (!data.hasData() || !data_loaded)
 		return;
 
 	// Only unload if the data wasn't modified
@@ -223,21 +209,36 @@ void ArchiveEntry::unloadData() {
 		return;
 
 	// Delete any data
-	delete[] data;
+	data.clear();
 
 	// Update variables etc
 	setLoaded(false);
-	data = NULL;
 }
 
 /* ArchiveEntry::rename
  * Renames the entry
  *******************************************************************/
-void ArchiveEntry::rename(string new_name) {
-	if (!locked) {
-		setName(new_name);
-		setState(1);
-	}
+bool ArchiveEntry::rename(string new_name) {
+	// Check if locked
+	if (locked)
+		return false;
+
+	// Update attributes
+	setName(new_name);
+	setState(1);
+
+	return true;
+}
+
+bool ArchiveEntry::resize(uint32_t new_size, bool preserve_data) {
+	// Check if locked
+	if (locked)
+		return false;
+
+	// Update attributes
+	setState(1);
+
+	return data.reSize(new_size, preserve_data);
 }
 
 /* ArchiveEntry::clearData
@@ -249,8 +250,7 @@ void ArchiveEntry::clearData() {
 		return;
 
 	// Delete the data
-	if (data)
-		delete data;
+	data.clear();
 
 	// Reset attributes
 	size = 0;
@@ -263,7 +263,7 @@ void ArchiveEntry::clearData() {
  * any currently existing data.
  * Returns false if data pointer is invalid, true otherwise
  *******************************************************************/
-bool ArchiveEntry::importMem(void* data, uint32_t size) {
+bool ArchiveEntry::importMem(const void* data, uint32_t size) {
 	// Check parameters
 	if (!data)
 		return false;
@@ -276,8 +276,7 @@ bool ArchiveEntry::importMem(void* data, uint32_t size) {
 	clearData();
 
 	// Copy data into the entry
-	this->data = new uint8_t[size];
-	memcpy(this->data, data, size);
+	this->data.importMem((const uint8_t*)data, size);
 
 	// Update attributes
 	this->size = size;
@@ -353,6 +352,21 @@ bool ArchiveEntry::importFile(string filename, uint32_t offset, uint32_t size) {
 	delete[] temp_buf;
 
 	return true;
+}
+
+bool ArchiveEntry::importFileStream(FILE* fp, uint32_t len) {
+	// Check if locked
+	if (locked)
+		return false;
+
+	// Import data from the file stream
+	if (data.importFileStream(fp, len)) {
+		// Update attributes
+		this->size = data.getSize();
+		setLoaded();
+		setType(ETYPE_UNKNOWN);
+		setState(1);
+	}
 }
 
 /* ArchiveEntry::importEntry
@@ -540,7 +554,10 @@ void ArchiveEntry::detectType(bool data_check, bool force) {
 	bool no_unload = data_loaded;
 
 	// Load data if needed
-	getData(true);
+	const uint8_t* data = getData(true);
+
+	//if (!data)
+	//	return;
 
 	// PNG
 	if (size > 8) {
@@ -672,13 +689,13 @@ void ArchiveEntry::detectType(bool data_check, bool force) {
 
 	// Detect doom patch format
 	if (size > sizeof(patch_header_t) && (type == ETYPE_UNKNOWN || type == ETYPE_SOUND)) {
-		patch_header_t *header = (patch_header_t *)data;
+		const patch_header_t *header = (const patch_header_t *)data;
 
 		if (header->height > 0 && header->height < 4096 &&
 			header->width > 0 && header->width < 4096 &&
 			header->top > -2000 && header->top < 2000 &&
 			header->left > -2000 && header->left < 2000) {
-			uint32_t *col_offsets = (uint32_t *)((uint8_t *)data + sizeof(patch_header_t));
+			uint32_t *col_offsets = (uint32_t *)((const uint8_t *)data + sizeof(patch_header_t));
 
 			if (size < sizeof(patch_header_t) + (header->width * sizeof(uint32_t))) {
 				//wxLogMessage("lump %s not a patch, col_offsets error 1", lump->Name().c_str());
@@ -756,4 +773,29 @@ string ArchiveEntry::getTypeString() {
 
 string ArchiveEntry::getSizeString() {
 	return Misc::sizeAsString(size);
+}
+
+bool ArchiveEntry::write(const void* data, uint32_t size) {
+	// Check if entry is locked
+	if (locked)
+		return false;
+
+	// Load data if it isn't already
+	if (isLoaded())
+		getData(true);
+
+	// Perform the write
+	if (this->data.write(data, size)) {
+		// Update attributes
+		this->size = this->data.getSize();
+		setState(1);
+	}
+}
+
+bool ArchiveEntry::read(void* buf, uint32_t size) {
+	// Load data if it isn't already
+	if (isLoaded())
+		getData(true);
+
+	return data.read(buf, size);
 }

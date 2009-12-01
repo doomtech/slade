@@ -165,7 +165,7 @@ bool PaletteManager::loadCustomPalettes() {
 		// Load palette data
 		Palette8bit* pal = new Palette8bit();
 		MemChunk mc;
-		mc.loadFile(filename);
+		mc.importFile(filename);
 		pal->loadMem(mc);
 
 		// Add the palette

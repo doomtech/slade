@@ -96,7 +96,7 @@ bool SImage::getRGBAData(MemChunk& mc) {
 
 	// If data is already in RGBA format just return a copy
 	if (format == RGBA) {
-		mc.loadMem(data, width * height * 4);
+		mc.importMem(data, width * height * 4);
 		return true;
 	}
 
@@ -331,7 +331,7 @@ bool SImage::validFlatSize() {
  * Loads an image (if it's format is supported by FreeImage)
  * Returns false if the given image data was invalid, true otherwise
  *******************************************************************/
-bool SImage::loadImage(uint8_t* img_data, int size) {
+bool SImage::loadImage(const uint8_t* img_data, int size) {
 	// Check data
 	if (!img_data) {
 		Global::error = _T("Invalid data given");
@@ -349,7 +349,7 @@ bool SImage::loadImage(uint8_t* img_data, int size) {
 	offset_y = 0;
 
 	// Create FreeImage bitmap from entry data
-	FIMEMORY* mem = FreeImage_OpenMemory(img_data, size);
+	FIMEMORY* mem = FreeImage_OpenMemory((BYTE*)img_data, size);
 	FREE_IMAGE_FORMAT fif = FreeImage_GetFileTypeFromMemory(mem, 0);
 	FIBITMAP *bm = FreeImage_LoadFromMemory(fif, mem, 0);
 	FreeImage_CloseMemory(mem);
@@ -436,7 +436,7 @@ bool SImage::loadImage(uint8_t* img_data, int size) {
  * Loads a Doom Gfx format image, using the given palette.
  * Returns false if the image data was invalid, true otherwise
  *******************************************************************/
-bool SImage::loadDoomGfx(uint8_t* gfx_data, int size) {
+bool SImage::loadDoomGfx(const uint8_t* gfx_data, int size) {
 	// Check data
 	if (!gfx_data)
 		return false;
@@ -467,7 +467,7 @@ bool SImage::loadDoomGfx(uint8_t* gfx_data, int size) {
 	memset(mask, 0, width * height);	// Set mask to fully transparent
 	for (int c = 0; c < width; c++) {
 		// Go to start of column
-		uint8_t* bits = gfx_data;
+		const uint8_t* bits = gfx_data;
 		bits += col_offsets[c];
 
 		// Read posts
@@ -518,7 +518,7 @@ bool SImage::loadDoomGfx(uint8_t* gfx_data, int size) {
  * Loads a Doom Flat format image, using the given palette.
  * Returns false if the image data was invalid, true otherwise
  *******************************************************************/
-bool SImage::loadDoomFlat(uint8_t* gfx_data, int size) {
+bool SImage::loadDoomFlat(const uint8_t* gfx_data, int size) {
 	// Check data
 	if (!gfx_data)
 		return false;
@@ -630,8 +630,8 @@ bool SImage::toPNG(MemChunk& out) {
 
 	// Load it into a memchunk
 	MemChunk png;
-	png.loadFile(appPath(_T("temp.png"), DIR_TEMP));
-	uint8_t* png_data = png.getData();
+	png.importFile(appPath(_T("temp.png"), DIR_TEMP));
+	const uint8_t* png_data = png.getData();
 
 	// Write PNG header and IHDR
 	out.write(png_data, 33);
@@ -910,7 +910,7 @@ bool SImage::convertPaletted(Palette8bit* pal, uint8_t alpha_threshold, bool kee
 	}
 
 	// Build FIBITMAP from it
-	FIBITMAP* bm32 = FreeImage_ConvertFromRawBits(rgba_data.getData(), width, height, width * 4, 32, 0, 0, 0, false);
+	FIBITMAP* bm32 = FreeImage_ConvertFromRawBits((uint8_t*)rgba_data.getData(), width, height, width * 4, 32, 0, 0, 0, false);
 	FIBITMAP* bm = FreeImage_ConvertTo24Bits(bm32);
 
 	// Create mask from alpha info (if converting from RGBA)

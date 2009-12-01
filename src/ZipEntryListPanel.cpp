@@ -67,7 +67,6 @@ ZipEntryListPanel::ZipEntryListPanel(wxWindow* parent, int id, Archive* archive)
 	// Create dummy folder entry (all folder list items will point to this entry)
 	dummy_folder_entry = new ArchiveEntry();
 	dummy_folder_entry->setType(ETYPE_FOLDER);
-	dummy_folder_entry->setSize(0);
 	dummy_folder_entry->setState(0);
 
 	// Init beginning index of entries
