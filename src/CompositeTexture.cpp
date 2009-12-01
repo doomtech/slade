@@ -30,6 +30,7 @@
  *******************************************************************/
 #include "Main.h"
 #include "CompositeTexture.h"
+#include "Misc.h"
 
 
 /*******************************************************************
@@ -49,6 +50,10 @@ CTPatch::CTPatch() {
  * CTPatch class destructor
  *******************************************************************/
 CTPatch::~CTPatch() {
+}
+
+bool CTPatch::loadImage(ArchiveEntry *gfx_entry) {
+	return Misc::loadImageFromEntry(&image, gfx_entry);
 }
 
 
@@ -74,4 +79,13 @@ CompositeTexture::~CompositeTexture() {
 	// Cleanup patches
 	for (size_t a = 0; a < patches.size(); a++)
 		delete patches[a];
+}
+
+bool CompositeTexture::addPatch(CTPatch* patch) {
+	if (!patch)
+		return false;
+
+	patches.push_back(patch);
+
+	return true;
 }

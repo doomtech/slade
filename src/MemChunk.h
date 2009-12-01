@@ -11,6 +11,7 @@ private:
 public:
 	MemChunk(uint32_t size = 0);
 	MemChunk(uint8_t* data, uint32_t size);
+	MemChunk(const uint8_t* data, uint32_t size) { MemChunk((uint8_t*)data, size); }
 	~MemChunk();
 
 	uint8_t& operator[](int a) { return data[a]; }
@@ -28,6 +29,7 @@ public:
 	bool loadFile(string filename, uint32_t offset = 0, uint32_t len = 0);
 	bool loadFileStream(FILE* fp, uint32_t len = 0);
 	bool loadMem(uint8_t* start, uint32_t len);
+	bool loadMem(const uint8_t* start, uint32_t len) { return loadMem((uint8_t*)start, len); }
 
 	// Data export
 	bool saveFile(string filename);

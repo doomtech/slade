@@ -5,15 +5,18 @@
 #include "ArchiveEntry.h"
 
 // Define archive types
-#define ARCHIVE_WAD	1
-#define ARCHIVE_ZIP	2
+#define ARCHIVE_INVALID	0
+#define ARCHIVE_WAD		1
+#define ARCHIVE_ZIP		2
 
 class Archive : public Announcer {
+private:
+	bool	modified;
+	uint8_t	type;
+
 protected:
 	string	filename;
-	uint8_t	type;
-	bool	modified;
-	
+
 	// Specifies whether the archive exists on disk (as opposed to being newly created)
 	bool	on_disk;
 
@@ -25,7 +28,7 @@ public:
 		uint8_t			format;	// 0=doom 1=hexen 2=udmf
 	};
 
-	Archive();
+	Archive(uint8_t type = ARCHIVE_INVALID);
 	virtual ~Archive();
 
 	uint8_t					getType() { return type; }
@@ -38,6 +41,7 @@ public:
 	virtual ArchiveEntry*	getEntry(string name) = 0;
 	virtual string			getFileExtensionString() = 0;
 	bool					checkEntry(ArchiveEntry* entry);
+	void					setModified(bool mod);
 
 	virtual bool		openFile(string filename) = 0;
 	virtual bool		save(string filename = _T("")) = 0;

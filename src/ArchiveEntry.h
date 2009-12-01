@@ -76,11 +76,11 @@ public:
 	Archive*	getParent() { return parent; }
 	string		getName(bool cut_ext = false);
 	uint32_t	getSize() { return size; }
-	uint8_t*	getData(bool allow_load = true);
 	bool		isLoaded() { return data_loaded; }
 	uint8_t		getType() { return type; }
 	uint8_t		getState() { return state; }
 	bool		isLocked() { return locked; }
+	uint8_t*	getData(bool allow_load = true);
 
 	// Modifiers (won't change entry state)
 	void		setParent(Archive* parent) { this->parent = parent; }

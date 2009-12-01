@@ -64,9 +64,7 @@ string map_lumps[12] = {
  * WadArchive class constructor
  *******************************************************************/
 WadArchive::WadArchive()
-: Archive() {
-	type = ARCHIVE_WAD;
-
+: Archive(ARCHIVE_WAD) {
 	// Default wad type
 	wad_type[0] = 'P';
 	wad_type[1] = 'W';
@@ -88,6 +86,16 @@ WadArchive::WadArchive()
  * WadArchive class destructor
  *******************************************************************/
 WadArchive::~WadArchive() {
+}
+
+/* WadArchive::isIWAD
+ * Returns true if the wad is an IWAD, false otherwise
+ *******************************************************************/
+bool WadArchive::isIWAD() {
+	if (wad_type[0] == 'I')
+		return true;
+	else
+		return false;
 }
 
 /* WadArchive::entryIndex
@@ -212,6 +220,10 @@ bool WadArchive::openFile(string filename) {
 		nlump->setExProp(_T("Offset"), s_fmt(_T("%d"), offset));
 		nlump->setState(0);
 
+		// Lock lump if IWAD
+		if (wad_type[0] == 'I')
+			nlump->lock();
+
 		// Check for markers
 		if (!nlump->getName().Cmp(_T("P_START")))
 			patches[0] = d;
@@ -278,7 +290,7 @@ bool WadArchive::openFile(string filename) {
 
 	// Setup variables
 	this->filename = filename;
-	modified = false;
+	setModified(false);
 	on_disk = true;
 	announce(_T("opened"));
 
@@ -352,7 +364,7 @@ bool WadArchive::save(string filename) {
 
 	// Set variables and return success
 	this->filename = filename;
-	modified = false;
+	setModified(false);
 	on_disk = true;
 	announce(_T("saved"));
 
@@ -592,6 +604,10 @@ bool WadArchive::addEntry(ArchiveEntry* entry, uint32_t position) {
 	if (!entry)
 		return false;
 
+	// Check for IWAD
+	if (isIWAD())
+		return false;
+
 	// Truncate name to 8 characters if needed
 	string name = entry->getName();
 	if (name.size() > 8) {
@@ -613,7 +629,7 @@ bool WadArchive::addEntry(ArchiveEntry* entry, uint32_t position) {
 		entries.push_back(entry);
 
 	// Update variables etc
-	modified = true;
+	setModified(true);
 	entry->setParent(this);
 	entry->setState(2);
 
@@ -632,6 +648,10 @@ bool WadArchive::addEntry(ArchiveEntry* entry, uint32_t position) {
  * position specified. Returns the created entry
  *******************************************************************/
 ArchiveEntry* WadArchive::addNewEntry(string name, uint32_t position) {
+	// Check for IWAD
+	if (isIWAD())
+		return NULL;
+
 	// Create the new entry
 	ArchiveEntry* new_entry = new ArchiveEntry(name);
 
@@ -647,6 +667,10 @@ ArchiveEntry* WadArchive::addNewEntry(string name, uint32_t position) {
  * specified. Returns the added archive entry
  *******************************************************************/
 ArchiveEntry* WadArchive::addExistingEntry(ArchiveEntry* entry, uint32_t position, bool copy) {
+	// Check for IWAD
+	if (isIWAD())
+		return NULL;
+
 	// Make a copy of the entry to add if needed
 	if (copy)
 		entry = new ArchiveEntry(*entry);
@@ -664,6 +688,14 @@ ArchiveEntry* WadArchive::addExistingEntry(ArchiveEntry* entry, uint32_t positio
  * archive, true otherwise
  *******************************************************************/
 bool WadArchive::removeEntry(ArchiveEntry* entry, bool delete_entry) {
+	// Check for IWAD
+	if (isIWAD())
+		return false;
+
+	// Check if the entry is locked
+	if (entry->isLocked())
+		return false;
+
 	// Check the entry exists in this archive
 	int index = entryIndex(entry);
 	if (index == -1)
@@ -684,7 +716,7 @@ bool WadArchive::removeEntry(ArchiveEntry* entry, bool delete_entry) {
 		delete entry;
 
 	// Update variables etc
-	modified = true;
+	setModified(true);
 
 	return true;
 }
@@ -694,6 +726,14 @@ bool WadArchive::removeEntry(ArchiveEntry* entry, bool delete_entry) {
  * invalid or not part of this Archive, true otherwise.
  *******************************************************************/
 bool WadArchive::swapEntries(ArchiveEntry* entry1, ArchiveEntry* entry2) {
+	// Check for IWAD
+	if (isIWAD())
+		return false;
+
+	// Check if either entry is locked
+	if (entry1->isLocked() || entry2->isLocked())
+		return false;
+
 	// Get entry indices
 	int i1 = entryIndex(entry1);
 	int i2 = entryIndex(entry2);
@@ -725,6 +765,14 @@ bool WadArchive::swapEntries(ArchiveEntry* entry1, ArchiveEntry* entry2) {
  * name to 8 characters
  *******************************************************************/
 bool WadArchive::renameEntry(ArchiveEntry* entry, string new_name) {
+	// Check for IWAD
+	if (isIWAD())
+		return false;
+
+	// Check if entry is locked
+	if (entry->isLocked())
+		return false;
+
 	// Check the entry is valid and part of this archive
 	if (!checkEntry(entry))
 		return false;

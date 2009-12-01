@@ -17,6 +17,8 @@ public:
 	WadArchive();
 	~WadArchive();
 
+	bool	isIWAD();
+
 	int				entryIndex(ArchiveEntry* entry);
 	ArchiveEntry*	getEntry(uint32_t index);
 	ArchiveEntry*	getEntry(string name);

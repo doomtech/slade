@@ -40,6 +40,13 @@
 
 
 /*******************************************************************
+ * EXTERNAL VARIABLES
+ *******************************************************************/
+extern wxColor col_new;
+extern wxColor col_modified;
+
+
+/*******************************************************************
  * WMFILEBROWSER CLASS FUNCTIONS
  *******************************************************************/
 
@@ -198,7 +205,15 @@ void ArchiveManagerPanel::populateMapList(Archive* archive) {
  * Updates the archive list item at <index>
  *******************************************************************/
 void ArchiveManagerPanel::updateListItem(int index) {
-	list_archives->SetItemText(index, theArchiveManager->getArchive(index)->getFileName(true));
+	Archive* archive = theArchiveManager->getArchive(index);
+
+	if (!archive)
+		return;
+
+	if (archive->isModified())
+		list_archives->SetItemText(index, s_fmt(_T("* %s"), archive->getFileName().c_str()));
+	else
+		list_archives->SetItemText(index, archive->getFileName().c_str());
 }
 
 /* ArchiveManagerPanel::isArchivePanel
@@ -360,8 +375,8 @@ void ArchiveManagerPanel::onAnnouncement(Announcer* announcer, string event_name
 
 	// If an archive was closed
 	if (event_name == _T("archive_closed")) {
-		int index = -1;
-		event_data.read(&index, sizeof(int));
+		int32_t index = -1;
+		event_data.read(&index, 4);
 		list_archives->DeleteItem(index);
 		populateMapList(NULL);
 	}
@@ -374,8 +389,15 @@ void ArchiveManagerPanel::onAnnouncement(Announcer* announcer, string event_name
 
 	// If an archive was saved
 	if (event_name == _T("archive_saved")) {
-		int index = -1;
-		event_data.read(&index, sizeof(int));
+		int32_t index = -1;
+		event_data.read(&index, 4);
+		updateListItem(index);
+	}
+
+	// If an archive was modified
+	if (event_name == _T("archive_modified")) {
+		int32_t index = -1;
+		event_data.read(&index, 4);
 		updateListItem(index);
 	}
 }

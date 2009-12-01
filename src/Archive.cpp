@@ -39,8 +39,8 @@
 /* Archive::Archive
  * Archive class constructor
  *******************************************************************/
-Archive::Archive() {
-	type = 0;
+Archive::Archive(uint8_t type) {
+	this->type = type;
 	modified = true;
 	on_disk = false;
 }
@@ -90,7 +90,7 @@ void Archive::entryModified(ArchiveEntry* entry) {
 		return;
 
 	// Set the archive state to modified
-	modified = true;
+	setModified(true);
 
 	// Get the entry index and announce the change
 	MemChunk mc;
@@ -99,4 +99,12 @@ void Archive::entryModified(ArchiveEntry* entry) {
 	mc.write(&index, sizeof(uint32_t));
 	mc.write(&ptr, sizeof(wxUIntPtr));
 	announce(_T("entry_modified"), mc);
+}
+
+void Archive::setModified(bool mod) {
+	// Set modified
+	modified = mod;
+
+	// Announce
+	announce(_T("modified"));
 }

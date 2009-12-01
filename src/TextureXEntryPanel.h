@@ -3,9 +3,11 @@
 #define __TEXTUREXENTRYPANEL_H__
 
 #include "EntryPanel.h"
+#include "CompositeTexture.h"
 
 class TextureXEntryPanel : public EntryPanel {
 private:
+	vector<CompositeTexture*>	textures;
 
 public:
 	TextureXEntryPanel(wxWindow* parent);

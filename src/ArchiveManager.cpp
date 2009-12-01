@@ -287,13 +287,20 @@ void ArchiveManager::onAnnouncement(Announcer* announcer, string event_name, Mem
 	event_data.seek(0, SEEK_SET);
 
 	// Check that the announcement came from an archive in the list
-	int index = archiveIndex((Archive*)announcer);
+	int32_t index = archiveIndex((Archive*)announcer);
 	if (index >= 0) {
 		// If the archive was saved
 		if (event_name == _T("saved")) {
 			MemChunk mc;
-			mc.write(&index, sizeof(int));
+			mc.write(&index, 4);
 			announce(_T("archive_saved"), mc);
+		}
+
+		// If the archive was modified
+		if (event_name == _T("modified") || event_name == _T("entry_modified")) {
+			MemChunk mc;
+			mc.write(&index, 4);
+			announce(_T("archive_modified"), mc);
 		}
 	}
 }

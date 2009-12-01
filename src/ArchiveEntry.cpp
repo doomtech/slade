@@ -72,7 +72,7 @@ ArchiveEntry::ArchiveEntry(ArchiveEntry& copy) {
 	type = copy.type;
 
 	// Get the data to copy
-	uint8_t* copy_data = copy.getData(true);
+	const uint8_t* copy_data = copy.getData(true);
 
 	if (copy_data) {
 		// Allocate memory and copy the data
@@ -234,14 +234,20 @@ void ArchiveEntry::unloadData() {
  * Renames the entry
  *******************************************************************/
 void ArchiveEntry::rename(string new_name) {
-	setName(new_name);
-	setState(1);
+	if (!locked) {
+		setName(new_name);
+		setState(1);
+	}
 }
 
 /* ArchiveEntry::clearData
  * Clears entry data and resets it's size to zero
  *******************************************************************/
 void ArchiveEntry::clearData() {
+	// Check if locked
+	if (locked)
+		return;
+
 	// Delete the data
 	if (data)
 		delete data;
@@ -260,6 +266,10 @@ void ArchiveEntry::clearData() {
 bool ArchiveEntry::importMem(void* data, uint32_t size) {
 	// Check parameters
 	if (!data)
+		return false;
+
+	// Check if locked
+	if (locked)
 		return false;
 
 	// Clear any current data
@@ -287,8 +297,7 @@ bool ArchiveEntry::importMemChunk(MemChunk& mc) {
 	// Check that the given MemChunk has data
 	if (mc.hasData()) {
 		// Copy the data from the MemChunk into the entry
-		importMem(mc.getData(), mc.getSize());
-		return true;
+		return importMem(mc.getData(), mc.getSize());
 	} else
 		return false;
 }
@@ -301,6 +310,10 @@ bool ArchiveEntry::importMemChunk(MemChunk& mc) {
  * are out of bounds, otherwise returns true.
  *******************************************************************/
 bool ArchiveEntry::importFile(string filename, uint32_t offset, uint32_t size) {
+	// Check if locked
+	if (locked)
+		return false;
+
 	// Open the file
 	FILE* fp = fopen(filename.ToAscii(), "rb");
 
@@ -348,6 +361,10 @@ bool ArchiveEntry::importFile(string filename, uint32_t offset, uint32_t size) {
  * Returns false if the entry is null, true otherwise
  *******************************************************************/
 bool ArchiveEntry::importEntry(ArchiveEntry* entry) {
+	// Check if locked
+	if (locked)
+		return false;
+
 	// Check parameters
 	if (!entry)
 		return false;

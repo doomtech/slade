@@ -3,8 +3,7 @@
 #define __ARCHIVEMANAGER_H__
 
 #include "ListenerAnnouncer.h"
-
-class Archive;
+#include "Archive.h"
 
 class ArchiveManager : public Announcer, Listener {
 private:

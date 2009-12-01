@@ -271,8 +271,7 @@ void zipdir_t::addToList(vector<ArchiveEntry*>& list) {
  * ZipArchive class constructor
  *******************************************************************/
 ZipArchive::ZipArchive()
-: Archive() {
-	type = ARCHIVE_ZIP;
+: Archive(ARCHIVE_ZIP) {
 	directory = new zipdir_t;
 	directory->parent_dir = NULL;
 	directory->setName(_T(""));
@@ -425,7 +424,7 @@ bool ZipArchive::openFile(string filename) {
 
 	// Setup variables
 	this->filename = filename;
-	modified = false;
+	setModified(false);
 	on_disk = true;
 
 	return true;
@@ -518,7 +517,7 @@ bool ZipArchive::save(string filename) {
 	zip.Close();
 	this->filename = filename;
 	on_disk = true;
-	modified = false;
+	setModified(false);
 	announce(_T("saved"));
 
 	return true;
@@ -629,7 +628,7 @@ bool ZipArchive::addEntry(ArchiveEntry* entry, uint32_t position) {
 		dir->entries.insert(dir->entries.begin() + position, entry);
 
 	// Update variables etc
-	modified = true;
+	setModified(true);
 	entry->setParent(this);
 	entry->setState(2);
 
@@ -698,6 +697,10 @@ bool ZipArchive::removeEntry(ArchiveEntry* entry, bool delete_entry) {
 	if (!entry)
 		return false;
 
+	// Check if entry is locked
+	if (entry->isLocked())
+		return false;
+
 	// Check entry is part of this archive
 	if (entry->getParent() != this)
 		return false;
@@ -725,7 +728,7 @@ bool ZipArchive::removeEntry(ArchiveEntry* entry, bool delete_entry) {
 		delete entry;
 
 	// Update variables etc
-	modified = true;
+	setModified(true);
 
 	// Return success
 	return true;
@@ -738,6 +741,10 @@ bool ZipArchive::removeEntry(ArchiveEntry* entry, bool delete_entry) {
 bool ZipArchive::swapEntries(ArchiveEntry* entry1, ArchiveEntry* entry2) {
 	// Check valid entries
 	if (!entry1 || !entry2)
+		return false;
+
+	// Check entries are both unlocked
+	if (entry1->isLocked() || entry2->isLocked())
 		return false;
 
 	// Check entries are both part of the archive
@@ -770,7 +777,7 @@ bool ZipArchive::swapEntries(ArchiveEntry* entry1, ArchiveEntry* entry2) {
 	announce(_T("entries_swapped"), mc);
 
 	// Update variables etc
-	modified = true;
+	setModified(true);
 
 	// Return success
 	return true;
@@ -786,6 +793,10 @@ bool ZipArchive::swapEntries(ArchiveEntry* entry1, ArchiveEntry* entry2) {
 bool ZipArchive::renameEntry(ArchiveEntry* entry, string new_name) {
 	// Check valid entry
 	if (!entry)
+		return false;
+
+	// Check if entry is locked
+	if (entry->isLocked())
 		return false;
 
 	// Check entry is part of the archive
@@ -905,7 +916,7 @@ bool ZipArchive::detectEntryType(ArchiveEntry* entry) {
 		entry->setExProp(_T("TextFormat"), _T("DECORATE"));
 
 	if (fn.GetName().CmpNoCase(_T("language")) == 0)
-		type = ETYPE_TEXT;
+		entry->setType(ETYPE_TEXT);
 
 	return true;
 }
@@ -1097,7 +1108,7 @@ zipdir_t* ZipArchive::addDirectory(string name, zipdir_t* dir) {
 		dir->subdirectories.push_back(dir_add);
 
 		// Update variables etc
-		modified = true;
+		setModified(true);
 
 		// Announce
 		MemChunk mc;
@@ -1156,7 +1167,7 @@ void ZipArchive::deleteDirectory(zipdir_t* dir) {
 	delete dir;
 
 	// Update variables etc
-	modified = true;
+	setModified(true);
 }
 
 /* ZipArchive::renameDirectory
