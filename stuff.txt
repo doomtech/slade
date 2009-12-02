@@ -47,6 +47,10 @@ ToDo List:
 - Auto save changes
 
 
+Programming-wise:
+- Should probably change all memory pointers that are meant to be read-only to const pointers
+
+
 
 Improvements/Features:
 - Better entry type system (ideally user-configurable, and with some kind of subtypes/groups system for entries of different formats but handled in the same way, like gfx etc)

@@ -40,13 +40,6 @@
 
 
 /*******************************************************************
- * EXTERNAL VARIABLES
- *******************************************************************/
-extern wxColor col_new;
-extern wxColor col_modified;
-
-
-/*******************************************************************
  * WMFILEBROWSER CLASS FUNCTIONS
  *******************************************************************/
 
@@ -114,8 +107,9 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
 	wxBoxSizer *box_am = new wxBoxSizer(wxVERTICAL);
 	panel_am->SetSizer(box_am);
 	box_am->Add(new wxStaticText(panel_am, -1, _T("Open Archives:")), 0, wxEXPAND | wxALL, 4);
-	list_archives = new wxListCtrl(panel_am, -1, wxDefaultPosition, wxDefaultSize, wxLC_LIST);
+	list_archives = new ListView(panel_am, -1);
 	box_am->Add(list_archives, 1, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, 4);
+	refreshArchiveList();
 
 	// Create/setup map list
 	box_am->Add(new wxStaticText(panel_am, -1, _T("Maps:")), 0, wxEXPAND | wxALL, 4);
@@ -158,9 +152,19 @@ void ArchiveManagerPanel::refreshArchiveList() {
 	// Clear the list
 	list_archives->ClearAll();
 
+	// Add columns
+	list_archives->InsertColumn(0, _T("Path"));
+
 	// Add each archive that is opened in the ArchiveManager
-	for (int a = 0; a < theArchiveManager->numArchives(); a++)
-		list_archives->InsertItem(list_archives->GetItemCount(), theArchiveManager->getArchive(a)->getFileName(true));
+	list_archives->enableSizeUpdate(false);
+	for (int a = 0; a < theArchiveManager->numArchives(); a++) {
+		list_archives->addItem(a, wxEmptyString);
+		updateListItem(a);
+	}
+
+	// Update size
+	list_archives->enableSizeUpdate(true);
+	list_archives->updateSize();
 }
 
 /* ArchiveManagerPanel::populateMapList
@@ -210,10 +214,18 @@ void ArchiveManagerPanel::updateListItem(int index) {
 	if (!archive)
 		return;
 
-	if (archive->isModified())
-		list_archives->SetItemText(index, s_fmt(_T("* %s"), archive->getFileName().c_str()));
+	// Set item name
+	list_archives->setItemText(index, 0, archive->getFileName());
+
+	// Set item status colour
+	if (archive->isOnDisk()) {
+		if (archive->isModified())
+			list_archives->setItemStatus(index, LV_STATUS_MODIFIED);
+		else
+			list_archives->setItemStatus(index, LV_STATUS_NORMAL);
+	}
 	else
-		list_archives->SetItemText(index, archive->getFileName().c_str());
+		list_archives->setItemStatus(index, LV_STATUS_NEW);
 }
 
 /* ArchiveManagerPanel::isArchivePanel
@@ -383,7 +395,8 @@ void ArchiveManagerPanel::onAnnouncement(Announcer* announcer, string event_name
 
 	// If an archive was added
 	if (event_name == _T("archive_added")) {
-		list_archives->InsertItem(theArchiveManager->numArchives(), theArchiveManager->getArchive(theArchiveManager->numArchives()-1)->getFileName(true));
+		int index = theArchiveManager->numArchives();
+		list_archives->addItem(index, theArchiveManager->getArchive(theArchiveManager->numArchives()-1)->getFileName(true));
 		openTab(theArchiveManager->numArchives()-1);
 	}
 

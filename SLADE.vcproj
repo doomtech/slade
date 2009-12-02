@@ -623,11 +623,27 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\CompositeTextureCanvas.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\CompositeTextureCanvas.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\GfxCanvas.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\src\GfxCanvas.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\ListView.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\ListView.h"
 				>
 			</File>
 			<File

@@ -42,6 +42,9 @@
  * given entry wasn't a valid image, true otherwise
  *******************************************************************/
 bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry) {
+	if (!entry)
+		return false;
+
 	switch (entry->getType()) {
 		// General image formats
 		case ETYPE_PNG:

@@ -39,6 +39,7 @@
 #include "GfxEntryPanel.h"
 #include "PaletteEntryPanel.h"
 #include "MultiEntryPanel.h"
+#include "TextureXEntryPanel.h"
 #include "GfxConvDialog.h"
 #include "ModifyOffsetsDialog.h"
 #include "EntryOperations.h"
@@ -66,6 +67,7 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 	gfx_area = new GfxEntryPanel(this);
 	pal_area = new PaletteEntryPanel(this);
 	multi_area = new MultiEntryPanel(this);
+	texturex_area = new TextureXEntryPanel(this);
 
 	// Bind events
 	Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &ArchivePanel::onEntryListSelect, this, ENTRY_LIST_PANEL);
@@ -324,7 +326,7 @@ bool ArchivePanel::pasteEntry() {
 
 	// Force entrylist width update
 	entry_list->columnsUpdate(true);
-	entry_list->updateEntry(0, NULL);
+	entry_list->updateListWidth();
 	Layout();
 
 	return true;
@@ -577,6 +579,9 @@ bool ArchivePanel::openEntry(ArchiveEntry* entry) {
 			break;
 		case ETYPE_PLAYPAL:
 			new_area = pal_area;
+			break;
+		case ETYPE_TEXTURES:
+			new_area = texturex_area;
 			break;
 	}
 

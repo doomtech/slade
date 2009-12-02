@@ -366,7 +366,11 @@ bool ArchiveEntry::importFileStream(FILE* fp, uint32_t len) {
 		setLoaded();
 		setType(ETYPE_UNKNOWN);
 		setState(1);
+
+		return true;
 	}
+
+	return false;
 }
 
 /* ArchiveEntry::importEntry
@@ -789,7 +793,11 @@ bool ArchiveEntry::write(const void* data, uint32_t size) {
 		// Update attributes
 		this->size = this->data.getSize();
 		setState(1);
+
+		return true;
 	}
+
+	return false;
 }
 
 bool ArchiveEntry::read(void* buf, uint32_t size) {

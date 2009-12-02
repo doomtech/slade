@@ -8,6 +8,7 @@
 #include <wx/listbox.h>
 #include "ListenerAnnouncer.h"
 #include "Archive.h"
+#include "ListView.h"
 
 class ArchiveManagerPanel;
 
@@ -27,7 +28,7 @@ class ArchiveManagerPanel : public wxPanel, Listener {
 private:
 	wxAuiNotebook*		notebook_tabs;
 	wxAuiNotebook*		notebook_archives;
-	wxListCtrl*			list_archives;
+	ListView*			list_archives;
 	wxListCtrl*			list_maps;
 	WMFileBrowser*		file_browser;
 	wxButton*			btn_browser_open;

@@ -33,6 +33,12 @@ public:
 	CompositeTexture(string name, uint32_t width = 0, uint32_t height = 0);
 	~CompositeTexture();
 
+	string		getName() { return name; }
+	uint32_t	getWidth() { return width; }
+	uint32_t	getHeight() { return height; }
+	fpoint2_t	getScale() { return scale; }
+	uint32_t	nPatches() { return patches.size(); }
+
 	bool	addPatch(CTPatch* patch);
 };
 

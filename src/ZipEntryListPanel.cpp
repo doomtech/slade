@@ -106,7 +106,7 @@ void ZipEntryListPanel::updateDirectoryEntry(int index) {
 		return;
 
 	// Update the entry
-	entry_list->updateEntry(index, true);
+	entry_list->updateEntry(index);
 
 	// Get the associated zipdir
 	zipdir_t* dir = NULL;
@@ -253,7 +253,7 @@ void ZipEntryListPanel::populateEntryList() {
 		entry_list->InsertItem(li);
 
 		// Set new item details
-		entry_list->updateEntry(index, false);
+		entry_list->updateEntry(index);
 
 		index++;
 	}
@@ -353,7 +353,7 @@ bool ZipEntryListPanel::updateEntry(uint32_t archive_index, ArchiveEntry* e) {
 		return true;
 
 	// Update the entry
-	entry_list->updateEntry(entriesBegin() + archive_index, col_update);
+	entry_list->updateEntry(entriesBegin() + archive_index);
 
 	return true;
 }

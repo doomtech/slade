@@ -2,7 +2,7 @@
 #ifndef __ENTRYLISTPANEL_H__
 #define __ENTRYLISTPANEL_H__
 
-#include <wx/listctrl.h>
+#include "ListView.h"
 
 class Archive;
 class EntryListPanel;
@@ -10,7 +10,7 @@ class EntryListPanel;
 /* TODO:
  * - Implement my own automatic resize (current way is too slow)
  */
-class EntryList : public wxListCtrl {
+class EntryList : public ListView {
 private:
 	EntryListPanel*		parent;
 	wxImageList*		image_list;
@@ -19,15 +19,13 @@ public:
 	EntryList(EntryListPanel *parent, int id);
 	~EntryList();
 
-	bool	updateEntry(int index, bool update_colsize = true);
-	int		getWidth();
+	bool	updateEntry(int index);
 };
 
 class EntryListPanel : public wxPanel {
 protected:
 	Archive*	archive;
 	EntryList*	entry_list;
-	bool		col_update;
 
 public:
 	enum {
@@ -41,8 +39,7 @@ public:
 
 	virtual void			populateEntryList();
 	void					updateListWidth();
-	bool					columnsUpdate() { return col_update; }
-	void					columnsUpdate(bool update) { col_update = update; }
+	void					columnsUpdate(bool update) { entry_list->enableSizeUpdate(update); }
 
 	EntryList*				getEntryListCtrl() { return entry_list; }
 	ArchiveEntry*			getFocusedEntry();

@@ -20,6 +20,7 @@ protected:
 	EntryPanel*	gfx_area;
 	EntryPanel*	pal_area;
 	EntryPanel*	multi_area;
+	EntryPanel* texturex_area;
 
 public:
 	enum {

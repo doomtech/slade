@@ -41,14 +41,12 @@
 /*******************************************************************
  * VARIABLES
  *******************************************************************/
-wxColor col_new(0, 150, 0);
-wxColor col_modified(0, 80, 180);
 CVAR(Bool, col_size, true, CVAR_SAVE);
 CVAR(Bool, col_type, true, CVAR_SAVE);
 CVAR(Bool, entry_list_monospace, true, CVAR_SAVE);
 
 // No edit labels for now, causes too many problems
-#define ENTRYLIST_FLAGS wxLC_REPORT|wxLC_VRULES|wxLC_HRULES
+//#define ENTRYLIST_FLAGS wxLC_REPORT|wxLC_VRULES|wxLC_HRULES
 
 
 /*******************************************************************
@@ -59,7 +57,7 @@ CVAR(Bool, entry_list_monospace, true, CVAR_SAVE);
  * EntryList class constructor
  *******************************************************************/
 EntryList::EntryList(EntryListPanel *parent, int id)
-: wxListCtrl(parent, id, wxDefaultPosition, wxDefaultSize, ENTRYLIST_FLAGS) {
+: ListView(parent, id) {
 	this->parent = parent;
 
 	// Set font to monospace if cvar set
@@ -120,7 +118,7 @@ EntryList::~EntryList() {
  * entry's information (name/size/type).
  * Returns false on invalid index or missing entry, true otherwise
  *******************************************************************/
-bool EntryList::updateEntry(int index, bool update_colsize) {
+bool EntryList::updateEntry(int index) {
 	// Check that index is valid
 	if (index < 0 || index >= this->GetItemCount())
 		return false;
@@ -137,74 +135,33 @@ bool EntryList::updateEntry(int index, bool update_colsize) {
 	// Detect type
 	entry->detectType(true, false);
 
+	// Disable size update
+	bool update = enableSizeUpdate();
+	enableSizeUpdate(false);
+
 	// -- Setup entry --
-	// Name
-	wxListItem li;
-	li.SetId(index);
-	li.SetText(entry->getName());
-	SetItem(li);
-	if (update_colsize) {
-		SetColumnWidth(0, wxLIST_AUTOSIZE);
-		// Add extra width in linux as wxLIST_AUTOSIZE seems to ignore listitem images on wxGTK
-		#ifdef __WXGTK__
-		SetColumnWidth(0, GetColumnWidth(0) + 20);
-		#endif
-		if (GetColumnWidth(0) < 32) SetColumnWidth(0, 32);
-	}
+	setItemText(index, 0, entry->getName());
+	setItemText(index, 1, entry->getSizeString());
+	setItemText(index, 2, entry->getTypeString());
 
-	// Size
-	int col = 1;
-	if (col_size) {
-		li.SetText(entry->getSizeString());
-		li.SetColumn(col);
-		SetItem(li);
-		if (update_colsize) SetColumnWidth(col, wxLIST_AUTOSIZE);
-		if (GetColumnWidth(col) < 32) SetColumnWidth(col, 32);
-		col++;
-	}
-
-	// Type
-	if (col_type) {
-		li.SetText(entry->getTypeString());
-		li.SetColumn(col);
-		SetItem(li);
-		if (update_colsize) SetColumnWidth(col, wxLIST_AUTOSIZE);
-		if (GetColumnWidth(col) < 32) SetColumnWidth(col, 32);
-	}
-
-	// Set default text colour
-	SetItemTextColour(index, wxSystemSettings::GetColour(wxSYS_COLOUR_LISTBOXTEXT));
-
-	// Set entry status text colour if needed
-	if (entry->getState() == 2)
-		SetItemTextColour(index, col_new);
+	// Set entry status text colour
+	if (entry->isLocked())
+		setItemStatus(index, LV_STATUS_LOCKED);
+	else if (entry->getState() == 0)
+		setItemStatus(index, LV_STATUS_NORMAL);
 	else if (entry->getState() == 1)
-		SetItemTextColour(index, col_modified);
+		setItemStatus(index, LV_STATUS_MODIFIED);
+	else if (entry->getState() == 2)
+		setItemStatus(index, LV_STATUS_NEW);
 
+	// Set item icon
 	SetItemImage(index, entry->getType());
 
-	// Setup size
-	if (update_colsize) {
-		SetMinSize(wxSize(getWidth(), -1));
-		wxTheApp->GetTopWindow()->Layout();
-	}
+	// Set size
+	enableSizeUpdate(update);
+	updateSize();
 
 	return true;
-}
-
-/* EntryList::getWidth
- * Gets the current minimum width of the entry list
- *******************************************************************/
-int EntryList::getWidth() {
-	// For the moment. Kinda annoying I have to do this actually, it should be automatic >_<
-	int width = 0;
-	for (int a = 0; a < GetColumnCount(); a++)
-		width += GetColumnWidth(a);
-
-	// Always leave room for the scrollbar (wxWidgets is silly)
-	width += wxSystemSettings::GetMetric(wxSYS_VSCROLL_X, this);
-
-	return width + 4;
 }
 
 
@@ -219,7 +176,6 @@ EntryListPanel::EntryListPanel(wxWindow *parent, int id, Archive* archive)
 : wxPanel(parent, id) {
 	// Init variables
 	this->archive = archive;
-	this->col_update = true;
 
 	// Create & set sizer & border
 	wxStaticBox *frame = new wxStaticBox(this, -1, _T("Entries"));
@@ -270,6 +226,7 @@ void EntryListPanel::populateEntryList() {
 	if (col_type) entry_list->InsertColumn(col, _T("Type"));
 
 	// Go through all entries and add them to the list
+	entry_list->enableSizeUpdate(false);
 	for (uint32_t a = 0; a < archive->numEntries(); a++) {
 		// Setup new entry
 		ArchiveEntry* entry = archive->getEntry(a);
@@ -277,27 +234,14 @@ void EntryListPanel::populateEntryList() {
 		li.SetId(a);
 		li.SetData(entry);
 		entry_list->InsertItem(li);
-		entry_list->updateEntry(a, false);
+		entry_list->updateEntry(a);
 	}
-
-	// Setup column widths
-	for (int a = 0; a < entry_list->GetColumnCount(); a++) {
-		entry_list->SetColumnWidth(a, wxLIST_AUTOSIZE);
-
-		// Minimum size of 32 for each column
-		if (entry_list->GetColumnWidth(a) < 32)
-			entry_list->SetColumnWidth(a, 32);
-	}
-
-	// Add extra width to the name column in linux as wxLIST_AUTOSIZE seems to ignore listitem images on wxGTK
-	#ifdef __WXGTK__
-	entry_list->SetColumnWidth(0, entry_list->GetColumnWidth(0) + 20);
-	#endif
 
 	// Show the list
 	entry_list->Show();
 
 	// Update list control width
+	entry_list->enableSizeUpdate(true);
 	updateListWidth();
 }
 
@@ -306,7 +250,7 @@ void EntryListPanel::populateEntryList() {
  * it
  *******************************************************************/
 void EntryListPanel::updateListWidth() {
-	entry_list->SetMinSize(wxSize(entry_list->getWidth(), -1));
+	entry_list->updateSize();
 	GetParent()->Layout();
 }
 
@@ -452,8 +396,8 @@ bool EntryListPanel::swapItems(int item1, int item2, ArchiveEntry* e1, ArchiveEn
 	entry_list->SetItemState(item2, state1, wxLIST_STATE_SELECTED|wxLIST_STATE_FOCUSED);
 
 	// Update items
-	entry_list->updateEntry(item1, false);
-	entry_list->updateEntry(item2, false);
+	entry_list->updateEntry(item1);
+	entry_list->updateEntry(item2);
 
 	return true;
 }
@@ -476,7 +420,7 @@ bool EntryListPanel::addEntry(uint32_t archive_index, ArchiveEntry* e) {
 
 	// Add it to the list
 	entry_list->InsertItem(li);
-	entry_list->updateEntry(archive_index, col_update);
+	entry_list->updateEntry(archive_index);
 
 	return true;
 }
@@ -487,7 +431,7 @@ bool EntryListPanel::addEntry(uint32_t archive_index, ArchiveEntry* e) {
 bool EntryListPanel::updateEntry(uint32_t archive_index, ArchiveEntry* e) {
 	// Just update the list item corresponding with the entry index
 	// (it's 1-1 in a normal EntryListPanel, will be different for zip archives)
-	return entry_list->updateEntry(archive_index, col_update);
+	return entry_list->updateEntry(archive_index);
 }
 
 /* EntryListPanel::removeEntry
