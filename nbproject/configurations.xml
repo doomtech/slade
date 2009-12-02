@@ -128,8 +128,12 @@
     <logicalFolder name="f6" displayName="UI Elements" projectFiles="true">
       <itemPath>src/ColourBox.cpp</itemPath>
       <itemPath>src/ColourBox.h</itemPath>
+      <itemPath>src/CompositeTextureCanvas.cpp</itemPath>
+      <itemPath>src/CompositeTextureCanvas.h</itemPath>
       <itemPath>src/GfxCanvas.cpp</itemPath>
       <itemPath>src/GfxCanvas.h</itemPath>
+      <itemPath>src/ListView.cpp</itemPath>
+      <itemPath>src/ListView.h</itemPath>
       <itemPath>src/OGLCanvas.cpp</itemPath>
       <itemPath>src/OGLCanvas.h</itemPath>
       <itemPath>src/PaletteCanvas.cpp</itemPath>

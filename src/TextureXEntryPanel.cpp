@@ -46,7 +46,7 @@ TextureXEntryPanel::TextureXEntryPanel(wxWindow* parent)
 : EntryPanel(parent) {
 	// Setup panel sizer
 	wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
-	SetSizer(sizer);
+	GetSizer()->Add(sizer, 1, wxEXPAND, 0);
 
 	// Add textures list
 	wxStaticBox* frame = new wxStaticBox(this, -1, _T("Textures"));
@@ -59,6 +59,14 @@ TextureXEntryPanel::TextureXEntryPanel(wxWindow* parent)
 	// Add texture canvas
 	tex_canvas = new CompositeTextureCanvas(this, -1);
 	sizer->Add(tex_canvas, 1, wxEXPAND|wxALL, 4);
+
+	// Add patches list
+	frame = new wxStaticBox(this, -1, _T("Patches"));
+	framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
+	list_patches = new ListView(this, -1);
+	list_patches->showIcons(false);
+	framesizer->Add(list_patches, 1, wxEXPAND|wxALL, 4);
+	sizer->Add(framesizer, 0, wxEXPAND|wxALL, 4);
 
 	Layout();
 }
@@ -100,6 +108,15 @@ bool TextureXEntryPanel::loadEntry(ArchiveEntry* entry) {
 		pnames->read(&pname, 8);
 		patch_names.push_back(wxString(pname).Upper());
 	}
+
+	// Populate patches list
+	list_patches->ClearAll();
+	list_patches->InsertColumn(0, _T("Name"));
+	list_patches->enableSizeUpdate(false);
+	for (size_t a = 0; a < patch_names.size(); a++)
+		list_patches->addItem(a, patch_names[a]);
+	list_patches->enableSizeUpdate(true);
+	list_patches->updateSize();
 
 
 	// Read TEXTUREx entry

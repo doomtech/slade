@@ -35,6 +35,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/OGLCanvas.o \
 	${OBJECTDIR}/src/PaletteEntryPanel.o \
 	${OBJECTDIR}/src/ZipArchive.o \
+	${OBJECTDIR}/src/ListView.o \
 	${OBJECTDIR}/src/TextEntryPanel.o \
 	${OBJECTDIR}/src/WadArchive.o \
 	${OBJECTDIR}/src/ConsolePanel.o \
@@ -49,8 +50,8 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/MultiEntryPanel.o \
 	${OBJECTDIR}/src/GfxCanvas.o \
 	${OBJECTDIR}/src/PaletteChooser.o \
-	${OBJECTDIR}/src/SImage.o \
 	${OBJECTDIR}/src/PaletteCanvas.o \
+	${OBJECTDIR}/src/SImage.o \
 	${OBJECTDIR}/src/MainApp.o \
 	${OBJECTDIR}/src/EntryListPanel.o \
 	${OBJECTDIR}/src/Clipboard.o \
@@ -59,6 +60,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/ZipEntryListPanel.o \
 	${OBJECTDIR}/src/MainWindow.o \
 	${OBJECTDIR}/src/TextEditor.o \
+	${OBJECTDIR}/src/CompositeTextureCanvas.o \
 	${OBJECTDIR}/src/EntryOperations.o \
 	${OBJECTDIR}/src/Palette.o \
 	${OBJECTDIR}/src/ModifyOffsetsDialog.o \
@@ -126,6 +128,11 @@ ${OBJECTDIR}/src/ZipArchive.o: nbproject/Makefile-${CND_CONF}.mk src/ZipArchive.
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
 	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/ZipArchive.o src/ZipArchive.cpp
+
+${OBJECTDIR}/src/ListView.o: nbproject/Makefile-${CND_CONF}.mk src/ListView.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/ListView.o src/ListView.cpp
 
 ${OBJECTDIR}/src/TextEntryPanel.o: nbproject/Makefile-${CND_CONF}.mk src/TextEntryPanel.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
@@ -197,15 +204,15 @@ ${OBJECTDIR}/src/PaletteChooser.o: nbproject/Makefile-${CND_CONF}.mk src/Palette
 	${RM} $@.d
 	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/PaletteChooser.o src/PaletteChooser.cpp
 
-${OBJECTDIR}/src/SImage.o: nbproject/Makefile-${CND_CONF}.mk src/SImage.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} $@.d
-	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/SImage.o src/SImage.cpp
-
 ${OBJECTDIR}/src/PaletteCanvas.o: nbproject/Makefile-${CND_CONF}.mk src/PaletteCanvas.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
 	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/PaletteCanvas.o src/PaletteCanvas.cpp
+
+${OBJECTDIR}/src/SImage.o: nbproject/Makefile-${CND_CONF}.mk src/SImage.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/SImage.o src/SImage.cpp
 
 ${OBJECTDIR}/src/MainApp.o: nbproject/Makefile-${CND_CONF}.mk src/MainApp.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
@@ -246,6 +253,11 @@ ${OBJECTDIR}/src/TextEditor.o: nbproject/Makefile-${CND_CONF}.mk src/TextEditor.
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
 	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/TextEditor.o src/TextEditor.cpp
+
+${OBJECTDIR}/src/CompositeTextureCanvas.o: nbproject/Makefile-${CND_CONF}.mk src/CompositeTextureCanvas.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/CompositeTextureCanvas.o src/CompositeTextureCanvas.cpp
 
 ${OBJECTDIR}/src/EntryOperations.o: nbproject/Makefile-${CND_CONF}.mk src/EntryOperations.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
