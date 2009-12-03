@@ -15,6 +15,10 @@ public:
 	CTPatch();
 	~CTPatch();
 
+	SImage*	getImage() { return &image; }
+	int		xOffset() { return offsets.x; }
+	int		yOffset() { return offsets.y; }
+
 	bool	loadImage(ArchiveEntry* gfx_entry);
 	void	setOffsets(int x, int y) { offsets.set(x, y); }
 	void	setScale(double x, double y) { scale.set(x, y); }
@@ -38,6 +42,7 @@ public:
 	uint32_t	getHeight() { return height; }
 	fpoint2_t	getScale() { return scale; }
 	uint32_t	nPatches() { return patches.size(); }
+	CTPatch*	getPatch(size_t index);
 
 	bool	addPatch(CTPatch* patch);
 };

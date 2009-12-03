@@ -89,3 +89,10 @@ bool CompositeTexture::addPatch(CTPatch* patch) {
 
 	return true;
 }
+
+CTPatch* CompositeTexture::getPatch(size_t index) {
+	if (index >= patches.size())
+		return NULL;
+	else
+		return patches[index];
+}

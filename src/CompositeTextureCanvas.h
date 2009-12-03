@@ -8,6 +8,7 @@
 class CompositeTextureCanvas : public OGLCanvas {
 private:
 	CompositeTexture*	texture;
+	vector<GLuint>		patch_gl_id;
 
 public:
 	CompositeTextureCanvas(wxWindow* parent, int id);
@@ -18,6 +19,8 @@ public:
 	bool	openTexture(CompositeTexture* tex);
 	void	draw();
 	void	drawChequeredBackground();
+	void	drawTexture();
+	void	drawPatch(int num);
 };
 
 #endif//__COMPOSITETEXTURECANVAS_H__

@@ -68,6 +68,10 @@ TextureXEntryPanel::TextureXEntryPanel(wxWindow* parent)
 	framesizer->Add(list_patches, 1, wxEXPAND|wxALL, 4);
 	sizer->Add(framesizer, 0, wxEXPAND|wxALL, 4);
 
+
+	// Bind events
+	list_textures->Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &TextureXEntryPanel::onTextureListSelect, this);
+
 	Layout();
 }
 
@@ -217,6 +221,9 @@ bool TextureXEntryPanel::saveEntry() {
 	return false;
 }
 
+/* TextureXEntryPanel::populateTextureList
+ * Clears and adds all textures to the texture list
+ *******************************************************************/
 void TextureXEntryPanel::populateTextureList() {
 	// Clear current list
 	list_textures->ClearAll();
@@ -235,4 +242,14 @@ void TextureXEntryPanel::populateTextureList() {
 	// Update list width
 	list_textures->enableSizeUpdate(true);
 	list_textures->updateSize();
+}
+
+
+
+void TextureXEntryPanel::onTextureListSelect(wxListEvent& e) {
+	if (e.GetIndex() < 0 || e.GetIndex() >= textures.size())
+		return;
+
+	CompositeTexture* tex = textures[e.GetIndex()];
+	tex_canvas->openTexture(tex);
 }

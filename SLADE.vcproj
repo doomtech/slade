@@ -515,14 +515,6 @@
 			Name="Resources"
 			>
 			<File
-				RelativePath=".\src\ArchiveManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\ArchiveManager.h"
-				>
-			</File>
-			<File
 				RelativePath=".\src\Icons.cpp"
 				>
 			</File>
@@ -547,6 +539,14 @@
 				</File>
 				<File
 					RelativePath=".\src\ArchiveEntry.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ArchiveManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ArchiveManager.h"
 					>
 				</File>
 				<File

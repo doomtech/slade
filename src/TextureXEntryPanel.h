@@ -22,6 +22,9 @@ public:
 	bool	saveEntry();
 
 	void	populateTextureList();
+
+	// Events
+	void	onTextureListSelect(wxListEvent& e);
 };
 
 #endif//__TEXTUREXENTRYPANEL_H__
