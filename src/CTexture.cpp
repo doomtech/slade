@@ -6,8 +6,8 @@
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
  * Filename:    CompositeTexture.cpp
- * Description: The composite texture system (ie Doom's TEXTUREx
- *              defined textures)
+ * Description: C(omposite)Texture class, represents a composite
+ *              texture as described in TEXTUREx entries
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -29,7 +29,7 @@
  * INCLUDES
  *******************************************************************/
 #include "Main.h"
-#include "CompositeTexture.h"
+#include "CTexture.h"
 #include "Misc.h"
 
 
@@ -58,13 +58,13 @@ bool CTPatch::loadImage(ArchiveEntry *gfx_entry) {
 
 
 /*******************************************************************
- * COMPOSITETEXTURE CLASS FUNCTIONS
+ * CTEXTURE CLASS FUNCTIONS
  *******************************************************************/
 
-/* CompositeTexture::CompositeTexture
- * CompositeTexture class constructor
+/* CTexture::CTexture
+ * CTexture class constructor
  *******************************************************************/
-CompositeTexture::CompositeTexture(string name, uint32_t width, uint32_t height) {
+CTexture::CTexture(string name, uint32_t width, uint32_t height) {
 	// Init variables
 	this->name = name;
 	this->width = width;
@@ -72,16 +72,16 @@ CompositeTexture::CompositeTexture(string name, uint32_t width, uint32_t height)
 	scale.set(1, 1);
 }
 
-/* CompositeTexture::~CompositeTexture
- * CompositeTexture class destructor
+/* CTexture::~CTexture
+ * CTexture class destructor
  *******************************************************************/
-CompositeTexture::~CompositeTexture() {
+CTexture::~CTexture() {
 	// Cleanup patches
 	for (size_t a = 0; a < patches.size(); a++)
 		delete patches[a];
 }
 
-bool CompositeTexture::addPatch(CTPatch* patch) {
+bool CTexture::addPatch(CTPatch* patch) {
 	if (!patch)
 		return false;
 
@@ -90,7 +90,7 @@ bool CompositeTexture::addPatch(CTPatch* patch) {
 	return true;
 }
 
-CTPatch* CompositeTexture::getPatch(size_t index) {
+CTPatch* CTexture::getPatch(size_t index) {
 	if (index >= patches.size())
 		return NULL;
 	else

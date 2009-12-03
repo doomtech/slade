@@ -1,6 +1,6 @@
 
-#ifndef __COMPOSITETEXTURE_H__
-#define __COMPOSITETEXTURE_H__
+#ifndef __CTEXTURE_H__
+#define __CTEXTURE_H__
 
 #include "SImage.h"
 #include "ArchiveEntry.h"
@@ -25,7 +25,7 @@ public:
 };
 
 
-class CompositeTexture {
+class CTexture {
 private:
 	string				name;
 	vector<CTPatch*>	patches;
@@ -34,8 +34,8 @@ private:
 	fpoint2_t			scale;
 
 public:
-	CompositeTexture(string name, uint32_t width = 0, uint32_t height = 0);
-	~CompositeTexture();
+	CTexture(string name, uint32_t width = 0, uint32_t height = 0);
+	~CTexture();
 
 	string		getName() { return name; }
 	uint32_t	getWidth() { return width; }
@@ -47,4 +47,4 @@ public:
 	bool	addPatch(CTPatch* patch);
 };
 
-#endif//__COMPOSITETEXTURE_H__
+#endif//__CTEXTURE_H__

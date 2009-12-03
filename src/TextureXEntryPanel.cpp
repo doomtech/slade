@@ -57,7 +57,7 @@ TextureXEntryPanel::TextureXEntryPanel(wxWindow* parent)
 	sizer->Add(framesizer, 0, wxEXPAND|wxALL, 4);
 
 	// Add texture canvas
-	tex_canvas = new CompositeTextureCanvas(this, -1);
+	tex_canvas = new CTextureCanvas(this, -1);
 	sizer->Add(tex_canvas, 1, wxEXPAND|wxALL, 4);
 
 	// Add patches list
@@ -163,7 +163,7 @@ bool TextureXEntryPanel::loadEntry(ArchiveEntry* entry) {
 		entry->seek(4, SEEK_CUR);
 
 		// Create texture
-		CompositeTexture* tex = new CompositeTexture(name, width, height);
+		CTexture* tex = new CTexture(name, width, height);
 
 		// Read patches
 		uint16_t n_patches = 0;
@@ -250,6 +250,6 @@ void TextureXEntryPanel::onTextureListSelect(wxListEvent& e) {
 	if (e.GetIndex() < 0 || e.GetIndex() >= textures.size())
 		return;
 
-	CompositeTexture* tex = textures[e.GetIndex()];
+	CTexture* tex = textures[e.GetIndex()];
 	tex_canvas->openTexture(tex);
 }

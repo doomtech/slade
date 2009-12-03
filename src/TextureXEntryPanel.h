@@ -3,16 +3,16 @@
 #define __TEXTUREXENTRYPANEL_H__
 
 #include "EntryPanel.h"
-#include "CompositeTextureCanvas.h"
+#include "CTextureCanvas.h"
 #include "ListView.h"
 
 class TextureXEntryPanel : public EntryPanel {
 private:
-	vector<CompositeTexture*>	textures;
+	vector<CTexture*>	textures;
 
 	ListView*				list_textures;
 	ListView*				list_patches;
-	CompositeTextureCanvas*	tex_canvas;
+	CTextureCanvas*	tex_canvas;
 
 public:
 	TextureXEntryPanel(wxWindow* parent);

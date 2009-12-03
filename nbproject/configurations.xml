@@ -101,6 +101,8 @@
         <itemPath>src/Archive.h</itemPath>
         <itemPath>src/ArchiveEntry.cpp</itemPath>
         <itemPath>src/ArchiveEntry.h</itemPath>
+        <itemPath>src/ArchiveManager.cpp</itemPath>
+        <itemPath>src/ArchiveManager.h</itemPath>
         <itemPath>src/WadArchive.cpp</itemPath>
         <itemPath>src/WadArchive.h</itemPath>
         <itemPath>src/ZipArchive.cpp</itemPath>
@@ -117,19 +119,17 @@
         <itemPath>src/PaletteManager.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f4" displayName="Texture" projectFiles="true">
-        <itemPath>src/CompositeTexture.cpp</itemPath>
-        <itemPath>src/CompositeTexture.h</itemPath>
+        <itemPath>src/CTexture.cpp</itemPath>
+        <itemPath>src/CTexture.h</itemPath>
       </logicalFolder>
-      <itemPath>src/ArchiveManager.cpp</itemPath>
-      <itemPath>src/ArchiveManager.h</itemPath>
       <itemPath>src/Icons.cpp</itemPath>
       <itemPath>src/Icons.h</itemPath>
     </logicalFolder>
     <logicalFolder name="f6" displayName="UI Elements" projectFiles="true">
+      <itemPath>src/CTextureCanvas.cpp</itemPath>
+      <itemPath>src/CTextureCanvas.h</itemPath>
       <itemPath>src/ColourBox.cpp</itemPath>
       <itemPath>src/ColourBox.h</itemPath>
-      <itemPath>src/CompositeTextureCanvas.cpp</itemPath>
-      <itemPath>src/CompositeTextureCanvas.h</itemPath>
       <itemPath>src/GfxCanvas.cpp</itemPath>
       <itemPath>src/GfxCanvas.h</itemPath>
       <itemPath>src/ListView.cpp</itemPath>
