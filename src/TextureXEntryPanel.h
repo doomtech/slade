@@ -5,13 +5,15 @@
 #include "EntryPanel.h"
 #include "CTextureCanvas.h"
 #include "ListView.h"
+#include "TextureXList.h"
 
 class TextureXEntryPanel : public EntryPanel {
 private:
-	vector<CTexture*>	textures;
+	//vector<CTexture*>	textures;
+	TextureXList	texturex;
 
-	ListView*				list_textures;
-	ListView*				list_patches;
+	ListView*		list_textures;
+	ListView*		list_patches;
 	CTextureCanvas*	tex_canvas;
 
 public:

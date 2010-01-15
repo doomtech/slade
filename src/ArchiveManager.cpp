@@ -86,7 +86,10 @@ bool ArchiveManager::addArchive(Archive* archive) {
 	// Only add if archive is a valid pointer
 	if (archive) {
 		// Add to the list
-		open_archives.push_back(archive);
+		archive_t n_archive;
+		n_archive.archive = archive;
+		n_archive.resource = false;
+		open_archives.push_back(n_archive);
 
 		// Listen to the archive
 		listenTo(archive);
@@ -108,7 +111,7 @@ Archive* ArchiveManager::getArchive(int index) {
 	if (index < 0 || index >= (int) open_archives.size())
 		return NULL;
 	else
-		return open_archives[index];
+		return open_archives[index].archive;
 }
 
 /* ArchiveManager::getArchive
@@ -119,8 +122,8 @@ Archive* ArchiveManager::getArchive(string filename) {
 	// Go through all open archives
 	for (int a = 0; a < (int) open_archives.size(); a++) {
 		// If the filename matches, return it
-		if (open_archives[a]->getFileName().compare(filename) == 0)
-			return open_archives[a];
+		if (open_archives[a].archive->getFileName().compare(filename) == 0)
+			return open_archives[a].archive;
 	}
 
 	// If no archive is found with a matching filename, return NULL
@@ -204,10 +207,10 @@ bool ArchiveManager::closeArchive(int index) {
 		return false;
 
 	// Close the archive
-	open_archives[index]->close();
+	open_archives[index].archive->close();
 
 	// Delete the archive object
-	delete open_archives[index];
+	delete open_archives[index].archive;
 
 	// Remove the archive at index from the list
 	open_archives.erase(open_archives.begin() + index);
@@ -229,7 +232,7 @@ bool ArchiveManager::closeArchive(string filename) {
 	// Go through all open archives
 	for (int a = 0; a < (int) open_archives.size(); a++) {
 		// If the filename matches, remove it
-		if (open_archives[a]->getFileName().compare(filename) == 0)
+		if (open_archives[a].archive->getFileName().compare(filename) == 0)
 			return closeArchive(a);
 	}
 
@@ -245,7 +248,7 @@ bool ArchiveManager::closeArchive(Archive* archive) {
 	// Go through all open archives
 	for (int a = 0; a < (int) open_archives.size(); a++) {
 		// If the archive exists in the list, remove it
-		if (open_archives[a] == archive)
+		if (open_archives[a].archive == archive)
 			return closeArchive(a);
 	}
 
@@ -270,12 +273,25 @@ int ArchiveManager::archiveIndex(Archive* archive) {
 	// Go through all open archives
 	for (size_t a = 0; a < open_archives.size(); a++) {
 		// If the archive we're looking for is this one, return the index
-		if (open_archives[a] == archive)
+		if (open_archives[a].archive == archive)
 			return (int)a;
 	}
 
 	// If we get to here the archive wasn't found, so return -1
 	return -1;
+}
+
+ArchiveEntry* ArchiveManager::getResourceEntry(string name) {
+	for (size_t a = 0; a < open_archives.size(); a++) {
+		if (!open_archives[a].resource)
+			continue;
+
+		ArchiveEntry* entry = open_archives[a].archive->getEntry(name);
+		if (entry)
+			return entry;
+	}
+
+	return NULL;
 }
 
 /* ArchivePanel::onAnnouncement
@@ -304,7 +320,6 @@ void ArchiveManager::onAnnouncement(Announcer* announcer, string event_name, Mem
 		}
 	}
 }
-
 
 
 /* Console Command - "list_archives"

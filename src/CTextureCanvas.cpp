@@ -195,7 +195,7 @@ void CTextureCanvas::drawPatch(int num) {
 	glBindTexture(GL_TEXTURE_2D, patch_gl_id[num]);
 
 	// Draw the patch
-	glTranslated(-patch->xOffset(), -patch->yOffset(), 0);
+	glTranslated(patch->xOffset(), patch->yOffset(), 0);
 	glBegin(GL_QUADS);
 	glTexCoord2d(0, 0);		glVertex2d(0, 0);
 	glTexCoord2d(0, 1);		glVertex2d(0, patch->getImage()->getHeight());

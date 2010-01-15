@@ -7,7 +7,12 @@
 
 class ArchiveManager : public Announcer, Listener {
 private:
-	vector<Archive*>	open_archives;
+	struct archive_t {
+		Archive*	archive;
+		bool		resource;
+	};
+
+	vector<archive_t>	open_archives;
 	Archive*			resource_archive;
 	bool				res_archive_open;
 
@@ -37,6 +42,8 @@ public:
 	int			numArchives() { return (int)open_archives.size(); }
 	int			archiveIndex(Archive* archive);
 	Archive*	resourceArchive() { return resource_archive; }
+
+	ArchiveEntry*	getResourceEntry(string name);
 
 	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 };

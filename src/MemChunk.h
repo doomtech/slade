@@ -4,9 +4,10 @@
 
 class MemChunk {
 protected:
-	uint8_t* data;
-	uint32_t cur_ptr;
-	uint32_t size;
+	uint8_t*	data;
+	uint32_t	cur_ptr;
+	uint32_t	size;
+	bool		allow_write;
 
 public:
 	MemChunk(uint32_t size = 0);
@@ -18,6 +19,8 @@ public:
 	// Accessors
 	const uint8_t*	getData() { return data; }
 	uint32_t		getSize() { return size; }
+	bool			writeAllowed() { return allow_write; }
+	void			writeAllowed(bool allow) { allow_write = allow; }
 
 	bool hasData();
 
