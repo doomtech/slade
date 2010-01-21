@@ -179,7 +179,7 @@ bool EntryOperations::modifyGfxOffsets(ArchiveEntry* entry, int auto_type, point
 
 		// Create new grAb chunk
 		uint32_t csize = wxUINT32_SWAP_ON_LE(8);
-		grab_chunk_t gc = { 'g', 'r', 'A', 'b', wxINT32_SWAP_ON_LE(xoff), wxINT32_SWAP_ON_LE(yoff) };
+		grab_chunk_t gc = { { 'g', 'r', 'A', 'b' }, wxINT32_SWAP_ON_LE(xoff), wxINT32_SWAP_ON_LE(yoff) };
 		uint32_t dcrc = wxUINT32_SWAP_ON_LE(crc((uint8_t*)&gc, 12));
 
 		// Build new PNG from the original w/ the new grAb chunk

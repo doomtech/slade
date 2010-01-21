@@ -640,7 +640,7 @@ bool SImage::toPNG(MemChunk& out) {
 	int32_t xoff = offset_x;
 	int32_t yoff = offset_y;
 	uint32_t csize = wxUINT32_SWAP_ON_LE(8);
-	grab_chunk_t gc = { 'g', 'r', 'A', 'b', wxINT32_SWAP_ON_LE(xoff), wxINT32_SWAP_ON_LE(yoff) };
+	grab_chunk_t gc = { { 'g', 'r', 'A', 'b' }, wxINT32_SWAP_ON_LE(xoff), wxINT32_SWAP_ON_LE(yoff) };
 	uint32_t dcrc = wxUINT32_SWAP_ON_LE(crc((uint8_t*)&gc, 12));
 
 	// Write grAb chunk
@@ -721,7 +721,7 @@ bool SImage::toDoomGfx(MemChunk& out, uint8_t alpha_threshold) {
 				if (!ispost) {
 					// Set offset
 					post.row_off = row_off;
-					
+
 					// Reset offset if we're in relative offsets mode
 					if (!first_254)
 						row_off = 0;
@@ -837,10 +837,10 @@ bool SImage::toDoomFlat(MemChunk& out) {
 	}
 
 	// Check image size
-	if (!(width == 64 && height == 64 ||
-			width == 64 && height == 128 ||
-			width == 128 && height == 128 ||
-			width == 320 && height == 200)) {
+	if (!((width == 64 && height == 64) ||
+			(width == 64 && height == 128) ||
+			(width == 128 && height == 128) ||
+			(width == 320 && height == 200))) {
 		wxLogMessage(_T("Cannot convert to doom flat format, invalid size (must be either 64x64, 64x128, 128x128 or 320x200)"));
 		return false;
 	}

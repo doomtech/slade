@@ -121,6 +121,8 @@
       <logicalFolder name="f4" displayName="Texture" projectFiles="true">
         <itemPath>src/CTexture.cpp</itemPath>
         <itemPath>src/CTexture.h</itemPath>
+        <itemPath>src/TextureXList.cpp</itemPath>
+        <itemPath>src/TextureXList.h</itemPath>
       </logicalFolder>
       <itemPath>src/Icons.cpp</itemPath>
       <itemPath>src/Icons.h</itemPath>

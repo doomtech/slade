@@ -22,7 +22,7 @@ void TextureXList::clear() {
 }
 
 bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, ArchiveEntry* pnames) {
-	Archive* parent_archvie = texturex->getParent();
+	Archive* parent_archive = texturex->getParent();
 
 	// Read PNAMES
 

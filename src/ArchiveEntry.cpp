@@ -73,7 +73,6 @@ ArchiveEntry::ArchiveEntry(ArchiveEntry& copy) {
 	type = copy.type;
 
 	// Copy data
-	data.writeAllowed(true);
 	data.importMem(copy.getData(true), copy.getSize());
 
 	// Copy extra properties
@@ -112,14 +111,23 @@ string ArchiveEntry::getName(bool cut_ext) {
  * archive (if it exists)
  *******************************************************************/
 const uint8_t* ArchiveEntry::getData(bool allow_load) {
+	// Return entry data
+	return getMCData(allow_load).getData();
+}
+
+/* ArchiveEntry::getMCData
+ * Returns the entry data MemChunk. If no entry data exists and
+ * allow_load is true, entry data will be loaded from it's parent
+ * archive (if it exists)
+ *******************************************************************/
+MemChunk& ArchiveEntry::getMCData(bool allow_load) {
 	// Load the data if needed (and possible)
 	if (allow_load && !isLoaded() && parent) {
-		data.writeAllowed(true);
 		data_loaded = parent->loadEntryData(this);
+		setState(0);
 	}
 
-	// Return entry data
-	return data.getData();
+	return data;
 }
 
 /* ArchiveEntry::hasExProp
@@ -211,7 +219,6 @@ void ArchiveEntry::unloadData() {
 		return;
 
 	// Delete any data
-	data.writeAllowed(true);
 	data.clear();
 
 	// Update variables etc
@@ -241,7 +248,6 @@ bool ArchiveEntry::resize(uint32_t new_size, bool preserve_data) {
 	// Update attributes
 	setState(1);
 
-	data.writeAllowed(true);
 	return data.reSize(new_size, preserve_data);
 }
 
@@ -254,7 +260,6 @@ void ArchiveEntry::clearData() {
 		return;
 
 	// Delete the data
-	data.writeAllowed(true);
 	data.clear();
 
 	// Reset attributes
@@ -278,7 +283,6 @@ bool ArchiveEntry::importMem(const void* data, uint32_t size) {
 		return false;
 
 	// Clear any current data
-	this->data.writeAllowed(true);
 	clearData();
 
 	// Copy data into the entry
@@ -366,7 +370,6 @@ bool ArchiveEntry::importFileStream(FILE* fp, uint32_t len) {
 		return false;
 
 	// Import data from the file stream
-	data.writeAllowed(true);
 	if (data.importFileStream(fp, len)) {
 		// Update attributes
 		this->size = data.getSize();
@@ -796,7 +799,6 @@ bool ArchiveEntry::write(const void* data, uint32_t size) {
 		getData(true);
 
 	// Perform the write
-	this->data.writeAllowed(true);
 	if (this->data.write(data, size)) {
 		// Update attributes
 		this->size = this->data.getSize();

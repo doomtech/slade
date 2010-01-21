@@ -42,6 +42,7 @@
  * Listener class constructor
  *******************************************************************/
 Listener::Listener() {
+	deaf = false;
 }
 
 /* Listener::~Listener
@@ -77,6 +78,7 @@ void Listener::onAnnouncement(Announcer* announcer, string event_name, MemChunk&
  * Announcer class constructor
  *******************************************************************/
 Announcer::Announcer() {
+	muted = false;
 }
 
 /* Announcer::~Announcer
@@ -109,8 +111,13 @@ void Announcer::removeListener(Listener* l) {
  * list, ie all Listeners that are 'listening' to this announcer.
  *******************************************************************/
 void Announcer::announce(string event_name, MemChunk& event_data) {
-	for (size_t a = 0; a < listeners.size(); a++)
-		listeners[a]->onAnnouncement(this, event_name, event_data);
+	if (isMuted())
+		return;
+
+	for (size_t a = 0; a < listeners.size(); a++) {
+		if (!listeners[a]->isDeaf())
+			listeners[a]->onAnnouncement(this, event_name, event_data);
+	}
 }
 
 /* Announcer::announce

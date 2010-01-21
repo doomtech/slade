@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Debug" />
-	<File name="../src/Lump.h" open="1" top="0" tabpos="3">
-		<Cursor position="553" topLine="0" />
+	<ActiveTarget name="Release" />
+	<File name="../src/GfxConvDialog.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="3496" topLine="78" />
 	</File>
-	<File name="../src/Main.h" open="1" top="0" tabpos="2">
-		<Cursor position="602" topLine="0" />
+	<File name="../src/MainApp.cpp" open="1" top="1" tabpos="5">
+		<Cursor position="8052" topLine="220" />
 	</File>
-	<File name="../src/MainWindow.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="2968" topLine="66" />
+	<File name="../src/SImage.cpp" open="1" top="0" tabpos="4">
+		<Cursor position="21623" topLine="1037" />
 	</File>
-	<File name="../src/Wad.cpp" open="1" top="0" tabpos="4">
-		<Cursor position="9667" topLine="370" />
+	<File name="../src/TextureXEntryPanel.cpp" open="1" top="0" tabpos="3">
+		<Cursor position="6182" topLine="205" />
 	</File>
-	<File name="../src/WadManagerPanel.cpp" open="1" top="1" tabpos="5">
-		<Cursor position="6168" topLine="191" />
+	<File name="../src/TextureXEntryPanel.h" open="1" top="0" tabpos="2">
+		<Cursor position="441" topLine="0" />
 	</File>
 </CodeBlocks_layout_file>

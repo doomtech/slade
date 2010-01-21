@@ -187,6 +187,9 @@ bool WadArchive::openFile(string filename) {
 		return false;
 	}
 
+	// Stop announcements (don't want to be announcing modification due to entries being added etc)
+	setMuted(true);
+
 	// Read the directory
 	fseek(fp, dir_offset, SEEK_SET);
 	for (uint32_t d = 0; d < num_lumps; d++) {
@@ -210,6 +213,7 @@ bool WadArchive::openFile(string filename) {
 			wxLogMessage(_T("WadArchive::openFile: File %s is invalid or corrupt"), filename.c_str());
 			Global::error = _T("File is invalid and/or corrupt");
 			fclose(fp);
+			setMuted(false);
 			return false;
 		}
 
@@ -288,6 +292,7 @@ bool WadArchive::openFile(string filename) {
 	fclose(fp);
 
 	// Setup variables
+	setMuted(false);
 	this->filename = filename;
 	setModified(false);
 	on_disk = true;

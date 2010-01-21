@@ -107,4 +107,5 @@ void Archive::setModified(bool mod) {
 
 	// Announce
 	announce(_T("modified"));
+	wxLogMessage(s_fmt(_T("%s modified %d"), filename.c_str(), (int)mod));
 }

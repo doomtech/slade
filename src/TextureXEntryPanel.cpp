@@ -80,8 +80,6 @@ TextureXEntryPanel::TextureXEntryPanel(wxWindow* parent)
  * TextureXEntryPanel class destructor
  *******************************************************************/
 TextureXEntryPanel::~TextureXEntryPanel() {
-	for (size_t a = 0; a < textures.size(); a++)
-		delete textures[a];
 }
 
 /* TextureXEntryPanel::loadEntry
@@ -137,12 +135,14 @@ void TextureXEntryPanel::populateTextureList() {
 	list_textures->InsertColumn(0, _T("Name"));
 	list_textures->InsertColumn(1, _T("Size"));
 
+	/*
 	// Add each texture to the list
 	list_textures->enableSizeUpdate(false);
 	for (size_t a = 0; a < textures.size(); a++) {
 		string cols[] = { textures[a]->getName(), s_fmt(_T("%dx%d"), textures[a]->getWidth(), textures[a]->getHeight()) };
 		list_textures->addItem(a, wxArrayString(2, cols));
 	}
+	 */
 
 	// Update list width
 	list_textures->enableSizeUpdate(true);
@@ -152,9 +152,11 @@ void TextureXEntryPanel::populateTextureList() {
 
 
 void TextureXEntryPanel::onTextureListSelect(wxListEvent& e) {
+	/*
 	if (e.GetIndex() < 0 || e.GetIndex() >= textures.size())
 		return;
 
 	CTexture* tex = textures[e.GetIndex()];
 	tex_canvas->openTexture(tex);
+	 */
 }

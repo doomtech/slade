@@ -82,7 +82,7 @@ public:
 	uint8_t			getState() { return state; }
 	bool			isLocked() { return locked; }
 	const uint8_t*	getData(bool allow_load = true);
-	MemChunk&		getMCData() { data.writeAllowed(false); return data; }
+	MemChunk&		getMCData(bool allow_load = true);
 
 	// Modifiers (won't change entry state)
 	void		setParent(Archive* parent) { this->parent = parent; }

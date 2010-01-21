@@ -363,6 +363,9 @@ bool ZipArchive::openFile(string filename) {
 		return false;
 	}
 
+	// Stop announcements (don't want to be announcing modification due to entries being added etc)
+	setMuted(true);
+
 	// Create 'root' directory
 	if (directory)
 		deleteDirectory(directory);
@@ -376,6 +379,7 @@ bool ZipArchive::openFile(string filename) {
 	while (entry) {
 		if (entry->GetMethod() != wxZIP_METHOD_DEFLATE && entry->GetMethod() != wxZIP_METHOD_STORE) {
 			Global::error = _T("Unsupported zip compression method");
+			setMuted(false);
 			return false;
 		}
 
@@ -394,13 +398,13 @@ bool ZipArchive::openFile(string filename) {
 			// Add entry and directory to directory tree
 			zipdir_t* ndir = addDirectory(fn.GetPath(true, wxPATH_UNIX));
 			ndir->entries.push_back(new_entry);
-			ndir->entry->setState(0);
 
 			// Read the data
 			uint8_t* data = new uint8_t[entry->GetSize()];
 			zip.Read(data, entry->GetSize());
 			new_entry->importMem(data, entry->GetSize());
 			new_entry->setLoaded(true);
+			new_entry->setState(0);
 
 			// Determine it's type
 			new_entry->detectType(true, true);
@@ -423,6 +427,9 @@ bool ZipArchive::openFile(string filename) {
 		entry = zip.GetNextEntry();
 		entry_index++;
 	}
+
+	// Enable announcements
+	setMuted(false);
 
 	// Setup variables
 	this->filename = filename;
