@@ -42,11 +42,11 @@
 TextEntryPanel::TextEntryPanel(wxWindow* parent)
 : EntryPanel(parent) {
 	// Get the sizer
-	wxSizer* sizer = GetSizer();
+	//wxSizer* sizer = GetSizer();
 
 	// Create the text area
 	text_area = new TextEditor(this, -1);
-	sizer->Add(text_area, 1, wxEXPAND | wxALL, 4);
+	sizer_main->Add(text_area, 1, wxEXPAND | wxALL, 4);
 
 	Layout();
 }
@@ -64,6 +64,10 @@ bool TextEntryPanel::loadEntry(ArchiveEntry* entry) {
 	// Load entry into the text editor
 	if (!text_area->loadEntry(entry))
 		return false;
+
+	// Copy current entry content
+	entry_data.clear();
+	entry_data.importMem(entry->getData(true), entry->getSize());
 
 	// Update variables
 	this->entry = entry;

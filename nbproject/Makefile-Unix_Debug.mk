@@ -39,8 +39,8 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/TextEntryPanel.o \
 	${OBJECTDIR}/src/WadArchive.o \
 	${OBJECTDIR}/src/ConsolePanel.o \
-	${OBJECTDIR}/src/TextureXList.o \
 	${OBJECTDIR}/src/ArchiveManagerPanel.o \
+	${OBJECTDIR}/src/TextureXList.o \
 	${OBJECTDIR}/src/ArchiveManager.o \
 	${OBJECTDIR}/src/MapThing.o \
 	${OBJECTDIR}/src/ListenerAnnouncer.o \
@@ -63,8 +63,8 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/EntryOperations.o \
 	${OBJECTDIR}/src/Palette.o \
 	${OBJECTDIR}/src/ModifyOffsetsDialog.o \
-	${OBJECTDIR}/src/CTexture.o \
 	${OBJECTDIR}/src/ColourBox.o \
+	${OBJECTDIR}/src/CTexture.o \
 	${OBJECTDIR}/src/ArchiveEntry.o \
 	${OBJECTDIR}/src/TextureXEntryPanel.o \
 	${OBJECTDIR}/src/MapLine.o \
@@ -150,15 +150,15 @@ ${OBJECTDIR}/src/ConsolePanel.o: nbproject/Makefile-${CND_CONF}.mk src/ConsolePa
 	${RM} $@.d
 	$(COMPILE.cc) -g -D__WXDEBUG__ -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/ConsolePanel.o src/ConsolePanel.cpp
 
-${OBJECTDIR}/src/TextureXList.o: nbproject/Makefile-${CND_CONF}.mk src/TextureXList.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} $@.d
-	$(COMPILE.cc) -g -D__WXDEBUG__ -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/TextureXList.o src/TextureXList.cpp
-
 ${OBJECTDIR}/src/ArchiveManagerPanel.o: nbproject/Makefile-${CND_CONF}.mk src/ArchiveManagerPanel.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
 	$(COMPILE.cc) -g -D__WXDEBUG__ -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/ArchiveManagerPanel.o src/ArchiveManagerPanel.cpp
+
+${OBJECTDIR}/src/TextureXList.o: nbproject/Makefile-${CND_CONF}.mk src/TextureXList.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -g -D__WXDEBUG__ -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/TextureXList.o src/TextureXList.cpp
 
 ${OBJECTDIR}/src/ArchiveManager.o: nbproject/Makefile-${CND_CONF}.mk src/ArchiveManager.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
@@ -270,15 +270,15 @@ ${OBJECTDIR}/src/ModifyOffsetsDialog.o: nbproject/Makefile-${CND_CONF}.mk src/Mo
 	${RM} $@.d
 	$(COMPILE.cc) -g -D__WXDEBUG__ -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/ModifyOffsetsDialog.o src/ModifyOffsetsDialog.cpp
 
-${OBJECTDIR}/src/CTexture.o: nbproject/Makefile-${CND_CONF}.mk src/CTexture.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} $@.d
-	$(COMPILE.cc) -g -D__WXDEBUG__ -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/CTexture.o src/CTexture.cpp
-
 ${OBJECTDIR}/src/ColourBox.o: nbproject/Makefile-${CND_CONF}.mk src/ColourBox.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} $@.d
 	$(COMPILE.cc) -g -D__WXDEBUG__ -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/ColourBox.o src/ColourBox.cpp
+
+${OBJECTDIR}/src/CTexture.o: nbproject/Makefile-${CND_CONF}.mk src/CTexture.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} $@.d
+	$(COMPILE.cc) -g -D__WXDEBUG__ -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/CTexture.o src/CTexture.cpp
 
 ${OBJECTDIR}/src/ArchiveEntry.o: nbproject/Makefile-${CND_CONF}.mk src/ArchiveEntry.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src

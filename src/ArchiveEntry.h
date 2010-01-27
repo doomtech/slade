@@ -66,6 +66,7 @@ private:
 	uint8_t			type;
 	uint8_t			state;		// 0 = unmodified, 1 = modified, 2 = newly created
 	bool			locked;
+	bool			state_locked;	// If true entry state cannot be changed (for initial loading etc)
 	PropertyList	ex_props;
 
 public:
@@ -93,6 +94,8 @@ public:
 	void		unloadData();
 	void		lock() { locked = true; }
 	void		unlock() { locked = false; }
+	void		lockState() { state_locked = true; }
+	void		unlockState() { state_locked = false; }
 
 	// Entry modification (will change entry state)
 	bool	rename(string new_name);

@@ -43,11 +43,11 @@
 PaletteEntryPanel::PaletteEntryPanel(wxWindow* parent)
 : EntryPanel(parent) {
 	// Get the sizer
-	wxSizer* sizer = GetSizer();
+	//wxSizer* sizer = GetSizer();
 
 	// Add palette canvas
 	pal_canvas = new PaletteCanvas(this, -1);
-	sizer->Add(pal_canvas, 1, wxEXPAND|wxALL, 4);
+	sizer_main->Add(pal_canvas, 1, wxEXPAND|wxALL, 4);
 
 	Layout();
 }
@@ -62,6 +62,10 @@ PaletteEntryPanel::~PaletteEntryPanel() {
  * Loads an entry into the entry panel if it is a valid image format
  *******************************************************************/
 bool PaletteEntryPanel::loadEntry(ArchiveEntry* entry) {
+	// Copy current entry content
+	entry_data.clear();
+	entry_data.importMem(entry->getData(true), entry->getSize());
+
 	MemChunk mc;
 	mc.importMem(entry->getData(true), entry->getSize());
 	pal_canvas->getPalette().loadMem(mc);

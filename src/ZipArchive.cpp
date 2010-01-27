@@ -393,7 +393,6 @@ bool ZipArchive::openFile(string filename) {
 			// Setup entry info
 			new_entry->setLoaded(false);
 			new_entry->setExProp(_T("ZipIndex"), s_fmt(_T("%d"), entry_index));
-			new_entry->setState(0);
 
 			// Add entry and directory to directory tree
 			zipdir_t* ndir = addDirectory(fn.GetPath(true, wxPATH_UNIX));
@@ -574,6 +573,9 @@ bool ZipArchive::loadEntryData(ArchiveEntry* entry) {
 		return false;
 	}
 
+	// Lock entry state
+	entry->lockState();
+
 	// Skip to correct entry in zip
 	wxZipEntry* zentry = zip.GetNextEntry();
 	for (long a = 0; a < zip_index; a++)
@@ -586,6 +588,10 @@ bool ZipArchive::loadEntryData(ArchiveEntry* entry) {
 
 	// Set the entry to loaded
 	entry->setLoaded();
+	entry->unlockState();
+
+	// Clean up
+	delete[] data;
 
 	return true;
 }

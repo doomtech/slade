@@ -48,7 +48,33 @@ EntryPanel::EntryPanel(wxWindow* parent)
 	SetSizer(framesizer);
 	Show(false);
 
+	sizer_main = new wxBoxSizer(wxVERTICAL);
+	framesizer->Add(sizer_main, 1, wxEXPAND|wxALL, 4);
+
+	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
+	framesizer->Add(hbox, 0, wxEXPAND, 0);
+
+	sizer_bottom = new wxBoxSizer(wxHORIZONTAL);
+	hbox->Add(sizer_bottom, 1, wxEXPAND|wxALL, 0);
+
 	changed = false;
+
+	// Create generic EntryPanel buttons
+	btn_save = new wxButton(this, -1, _T("Save Changes"));
+	btn_revert = new wxButton(this, -1, _T("Revert Changes"));
+	btn_edit_ext = new wxButton(this, -1, _T("Edit Externally"));
+
+	hbox->Add(btn_edit_ext, 0, wxEXPAND|wxALL, 4);
+	hbox->Add(btn_revert, 0, wxEXPAND|wxALL, 4);
+	hbox->Add(btn_save, 0, wxEXPAND|wxALL, 4);
+
+	// Bind button events
+	btn_save->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &EntryPanel::onBtnSave, this);
+	btn_revert->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &EntryPanel::onBtnRevert, this);
+	btn_edit_ext->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &EntryPanel::onBtnEditExt, this);
+
+	// Disable unimplemented buttons
+	btn_edit_ext->Enable(false);
 }
 
 /* EntryPanel::~EntryPanel
@@ -73,4 +99,39 @@ bool EntryPanel::loadEntry(ArchiveEntry* entry) {
 bool EntryPanel::saveEntry() {
 	Global::error = _T("Cannot save an entry with the base EntryPanel class");
 	return false;
+}
+
+/* EntryPanel::revertEntry
+ * Reverts any changes made to the entry since it was loaded into
+ * the EntryPanel. Returns false if no changes have been made or
+ * if the entry data wasn't saved
+ *******************************************************************/
+bool EntryPanel::revertEntry() {
+	if (changed) {
+		if (entry_data.hasData()) {
+			entry->importMemChunk(entry_data);
+			entry->detectType(true, true);
+			loadEntry(entry);
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+void EntryPanel::onBtnSave(wxCommandEvent& e) {
+	if (changed) {
+		if (saveEntry())
+			changed = false;
+	}
+}
+
+void EntryPanel::onBtnRevert(wxCommandEvent& e) {
+	revertEntry();
+}
+
+void EntryPanel::onBtnEditExt(wxCommandEvent& e) {
+	wxLogMessage(_T("External edit not implemented"));
 }

@@ -47,7 +47,7 @@ TextureXEntryPanel::TextureXEntryPanel(wxWindow* parent)
 : EntryPanel(parent) {
 	// Setup panel sizer
 	wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
-	GetSizer()->Add(sizer, 1, wxEXPAND, 0);
+	sizer_main->Add(sizer, 1, wxEXPAND, 0);
 
 	// Add textures list
 	wxStaticBox* frame = new wxStaticBox(this, -1, _T("Textures"));
@@ -103,6 +103,10 @@ bool TextureXEntryPanel::loadEntry(ArchiveEntry* entry) {
 		Global::error = _T("Could not find PNAMES entry");
 		return false;
 	}
+
+	// Copy current entry content
+	entry_data.clear();
+	entry_data.importMem(entry->getData(true), entry->getSize());
 
 	// Read TEXTUREx entry into texturexlist
 	texturex.readTEXTUREXData(entry, pnames);

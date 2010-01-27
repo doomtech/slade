@@ -64,12 +64,13 @@ bool Palette8bit::loadMem(MemChunk& mc) {
 	// Read in colours
 	int c = 0;
 	for (size_t a = 0; a < mc.getSize(); a += 3) {
+		uint8_t rgb[3] = {0, 0, 0};
+		
 		// Read RGB value
-		uint8_t rgb[3];
-		mc.read(rgb, 3);
-
-		// Set colour in palette
-		colours[c++].set(rgb[0], rgb[1], rgb[2], 255);
+		if (mc.read(rgb, 3)) {
+			// Set colour in palette
+			colours[c++].set(rgb[0], rgb[1], rgb[2], 255);
+		}
 
 		// If we have read 256 colours, finish
 		if (c == 256)

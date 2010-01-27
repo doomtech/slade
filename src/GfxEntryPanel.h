@@ -16,7 +16,6 @@ private:
 	wxComboBox*		combo_offset_type;
 	wxSpinCtrl*		spin_xoffset;
 	wxSpinCtrl*		spin_yoffset;
-	wxButton*		btn_save;
 	wxCheckBox*		cb_tile;
 
 public:
@@ -34,7 +33,6 @@ public:
 	void	onXOffsetChanged(wxSpinEvent& e);
 	void	onYOffsetChanged(wxSpinEvent& e);
 	void	onOffsetTypeChanged(wxCommandEvent& e);
-	void	onBtnSave(wxCommandEvent& e);
 	void	onTileChanged(wxCommandEvent& e);
 	void	onGfxOffsetChanged(wxEvent& e);
 };

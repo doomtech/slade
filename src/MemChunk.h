@@ -7,7 +7,6 @@ protected:
 	uint8_t*	data;
 	uint32_t	cur_ptr;
 	uint32_t	size;
-	bool		allow_write;
 
 public:
 	MemChunk(uint32_t size = 0);

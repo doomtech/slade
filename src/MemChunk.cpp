@@ -44,7 +44,6 @@ MemChunk::MemChunk(uint32_t size) {
 	// Init variables
 	this->size = size;
 	this->cur_ptr = 0;
-	this->allow_write = true;
 
 	// If a size is specified, allocate that much memory
 	if (size)
@@ -90,7 +89,7 @@ bool MemChunk::hasData() {
  * Returns false if no data exists, true otherwise.
  *******************************************************************/
 bool MemChunk::clear() {
-	if (!allow_write)
+	if (!data)
 		return false;
 
 	if (hasData()) {
@@ -108,9 +107,6 @@ bool MemChunk::clear() {
  * Returns false if new size is invalid, true otherwise
  *******************************************************************/
 bool MemChunk::reSize(uint32_t new_size, bool preserve_data) {
-	if (!allow_write)
-		return false;
-
 	// Check for invalid new size
 	if (new_size == 0) {
 		wxLogMessage(_T("MemChunk::reSize: new_size cannot be 0"));
@@ -135,14 +131,11 @@ bool MemChunk::reSize(uint32_t new_size, bool preserve_data) {
 	return true;
 }
 
-/* MemChunk::loadFile
+/* MemChunk::importFile
  * Loads a file (or part of it) into the MemChunk
  * Returns false if file couldn't be opened, true otherwise
  *******************************************************************/
 bool MemChunk::importFile(string filename, uint32_t offset, uint32_t len) {
-	if (!allow_write)
-		return false;
-
 	// Open the file
 	FILE *fp = fopen(chr(filename), "rb");
 
@@ -178,10 +171,12 @@ bool MemChunk::importFile(string filename, uint32_t offset, uint32_t len) {
 	return true;
 }
 
+/* MemChunk::importFileStream
+ * Loads a file (or part of it) from a currently open file stream
+ * into the MemChunk
+ * Returns false if file couldn't be opened, true otherwise
+ *******************************************************************/
 bool MemChunk::importFileStream(FILE* fp, uint32_t len) {
-	if (!allow_write)
-		return false;
-
 	// Check file
 	if (!fp)
 		return false;
@@ -213,14 +208,11 @@ bool MemChunk::importFileStream(FILE* fp, uint32_t len) {
 	return true;
 }
 
-/* MemChunk::loadMem
+/* MemChunk::importMem
  * Loads a chunk of memory into the MemChunk
  * Returns false if size or data pointer is invalid, true otherwise
  *******************************************************************/
 bool MemChunk::importMem(const uint8_t* start, uint32_t len) {
-	if (!allow_write)
-		return false;
-
 	// Check that length & data to be loaded are valid
 	if (!start)
 		return false;
@@ -263,7 +255,8 @@ bool MemChunk::exportFile(string filename) {
  * chunk if necessary.
  *******************************************************************/
 bool MemChunk::write(const void* data, uint32_t size) {
-	if (!allow_write)
+	// Check pointers
+	if (!this->data || !data)
 		return false;
 
 	// If we're trying to write past the end of the memory chunk,
@@ -284,6 +277,10 @@ bool MemChunk::write(const void* data, uint32_t size) {
  * attempting to read data outside of the chunk, true otherwise
  *******************************************************************/
 bool MemChunk::read(void* buf, uint32_t size) {
+	// Check pointers
+	if (!this->data || !buf)
+		return false;
+
 	// If we're trying to read past the end
 	// of the memory chunk, return failure
 	if (cur_ptr + size > this->size)

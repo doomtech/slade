@@ -59,6 +59,7 @@ ArchiveEntry::ArchiveEntry(string name, uint32_t size, Archive* parent) {
 	this->state = 2;
 	this->type = ETYPE_UNKNOWN;
 	this->locked = false;
+	this->state_locked = false;
 }
 
 /* ArchiveEntry::ArchiveEntry
@@ -84,6 +85,7 @@ ArchiveEntry::ArchiveEntry(ArchiveEntry& copy) {
 
 	// Set entry state
 	state = 2;
+	state_locked = false;
 }
 
 /* ArchiveEntry::~ArchiveEntry
@@ -194,6 +196,9 @@ void ArchiveEntry::allExProps(vector<string>& keys, vector<string>& values) {
  * to set it to 'modified' then don't change the state
  *******************************************************************/
 void ArchiveEntry::setState(uint8_t state) {
+	if (state_locked)
+		return;
+
 	if (state == 0)
 		this->state = 0;
 	else {
@@ -202,7 +207,7 @@ void ArchiveEntry::setState(uint8_t state) {
 	}
 
 	// Notify parent archive this entry has been modified
-	if (parent)
+	if (parent && state == 1)
 		parent->entryModified(this);
 }
 

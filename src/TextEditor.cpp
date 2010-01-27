@@ -72,7 +72,7 @@ bool TextEditor::loadEntry(ArchiveEntry* entry) {
 		return true;
 
 	// Get character entry data
-	char* data = (char*)entry->getData();
+	const char* data = (const char*)entry->getData();
 	if (!data) {
 		Global::error = _T("Cannot read entry data (see logfile for info)");
 		return false;

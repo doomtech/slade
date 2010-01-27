@@ -72,8 +72,8 @@ void DefaultEntryPanel::showEntryInfo(bool show_btn_edittext) {
 	text_area->Show(false);
 
 	// Clear the sizer
-	wxSizer* framesizer = GetSizer();
-	framesizer->Clear(false);
+	//wxSizer* framesizer = GetSizer();
+	sizer_main->Clear(false);
 
 	// Show entry info stuff
 	label_type->Show(true);
@@ -81,12 +81,12 @@ void DefaultEntryPanel::showEntryInfo(bool show_btn_edittext) {
 	btn_edit_text->Show(show_btn_edittext);
 
 	// Add entry info stuff to the panel sizer
-	framesizer->AddStretchSpacer();
-	framesizer->Add(label_type, 0, wxALIGN_CENTER|wxALL, 4);
-	framesizer->Add(label_size, 0, wxALIGN_CENTER|wxALL, 4);
-	framesizer->AddSpacer(8);
-	framesizer->Add(btn_edit_text, 0, wxALIGN_CENTER|wxALL, 4);
-	framesizer->AddStretchSpacer();
+	sizer_main->AddStretchSpacer();
+	sizer_main->Add(label_type, 0, wxALIGN_CENTER|wxALL, 4);
+	sizer_main->Add(label_size, 0, wxALIGN_CENTER|wxALL, 4);
+	sizer_main->AddSpacer(8);
+	sizer_main->Add(btn_edit_text, 0, wxALIGN_CENTER|wxALL, 4);
+	sizer_main->AddStretchSpacer();
 
 	// Update variables etc
 	view_text = false;
@@ -104,14 +104,14 @@ void DefaultEntryPanel::showTextEditor() {
 	btn_edit_text->Show(false);
 
 	// Clear the sizer
-	wxSizer* framesizer = GetSizer();
-	framesizer->Clear(false);
+	//wxSizer* framesizer = GetSizer();
+	sizer_main->Clear(false);
 
 	// Show text editor
 	text_area->Show(true);
 
 	// Add text editor to the panel sizer
-	framesizer->Add(text_area, 1, wxEXPAND|wxALL, 4);
+	sizer_main->Add(text_area, 1, wxEXPAND|wxALL, 4);
 
 	// Update variables etc
 	view_text = true;
@@ -129,6 +129,10 @@ bool DefaultEntryPanel::loadEntry(ArchiveEntry* entry) {
 		Global::error = _T("Invalid archive entry given");
 		return false;
 	}
+
+	// Copy current entry content
+	entry_data.clear();
+	entry_data.importMem(entry->getData(true), entry->getSize());
 
 	// Set labels
 	label_type->SetLabel(s_fmt(_T("Entry Type: %s"), entry->getTypeString().c_str()));

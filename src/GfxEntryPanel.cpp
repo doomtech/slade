@@ -46,11 +46,11 @@
 GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 : EntryPanel(parent) {
 	// Get the sizer
-	wxSizer* sizer = GetSizer();
+	//wxSizer* sizer = GetSizer();
 
 	// Create sizer for this panel
 	wxBoxSizer* m_vbox = new wxBoxSizer(wxVERTICAL);
-	sizer->Add(m_vbox, 1, wxEXPAND);
+	sizer_main->Add(m_vbox, 1, wxEXPAND);
 
 	// Add view controls
 	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
@@ -94,7 +94,7 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 
 	// Add editing controls
 	hbox = new wxBoxSizer(wxHORIZONTAL);
-	m_vbox->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
+	sizer_bottom->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
 
 	// Offsets
 	spin_xoffset = new wxSpinCtrl(this, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, SHRT_MIN, SHRT_MAX, 0);
@@ -103,12 +103,6 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 	hbox->Add(spin_xoffset, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
 	hbox->Add(spin_yoffset, 0, wxEXPAND, 0);
 
-	hbox->AddStretchSpacer();
-
-	// 'Save Changes' button
-	btn_save = new wxButton(this, -1, _T("Save Changes"));
-	hbox->Add(btn_save, 0, wxEXPAND, 0);
-
 
 	// Bind Events
 	slider_zoom->Bind(wxEVT_COMMAND_SLIDER_UPDATED, &GfxEntryPanel::onZoomChanged, this);
@@ -116,7 +110,6 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 	spin_xoffset->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &GfxEntryPanel::onXOffsetChanged, this);
 	spin_yoffset->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &GfxEntryPanel::onYOffsetChanged, this);
 	combo_offset_type->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &GfxEntryPanel::onOffsetTypeChanged, this);
-	btn_save->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &GfxEntryPanel::onBtnSave, this);
 	cb_tile->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &GfxEntryPanel::onTileChanged, this);
 	Bind(wxEVT_GFXCANVAS_OFFSET_CHANGED, &GfxEntryPanel::onGfxOffsetChanged, this, gfx_canvas->GetId());
 
@@ -141,8 +134,13 @@ bool GfxEntryPanel::loadEntry(ArchiveEntry* entry) {
 	// Setup palette
 	updateImagePalette();
 
-	// Load the image
-	Misc::loadImageFromEntry(gfx_canvas->getImage(), this->entry);
+	// Attempt to load the image
+	if (!Misc::loadImageFromEntry(gfx_canvas->getImage(), this->entry))
+		return false;
+
+	// Copy current entry content
+	entry_data.clear();
+	entry_data.importMem(entry->getData(true), entry->getSize());
 
 	// Set offset text boxes
 	spin_xoffset->SetValue(gfx_canvas->getImage()->offset().x);
@@ -332,16 +330,6 @@ void GfxEntryPanel::onYOffsetChanged(wxSpinEvent& e) {
  *******************************************************************/
 void GfxEntryPanel::onOffsetTypeChanged(wxCommandEvent& e) {
 	applyViewType();
-}
-
-/* GfxEntryPanel::btnSaveClicked
- * Called when the 'Save Changes' button is clicked
- *******************************************************************/
-void GfxEntryPanel::onBtnSave(wxCommandEvent& e) {
-	if (changed) {
-		if (saveEntry())
-			changed = false;
-	}
 }
 
 /* GfxEntryPanel::cbTileChecked

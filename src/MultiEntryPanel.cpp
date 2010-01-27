@@ -66,6 +66,11 @@ MultiEntryPanel::MultiEntryPanel(wxWindow* parent)
 
 	// Update panel layout
 	updateLayout();
+
+	// Disable default entry buttons
+	btn_save->Enable(false);
+	btn_revert->Enable(false);
+	btn_edit_ext->Enable(false);
 }
 
 /* MultiEntryPanel::~MultiEntryPanel
@@ -118,19 +123,19 @@ bool MultiEntryPanel::loadEntries(vector<ArchiveEntry*>& list) {
  *******************************************************************/
 void MultiEntryPanel::updateLayout() {
 	// Get panel sizer
-	wxSizer* sizer = GetSizer();
+	//wxSizer* sizer = GetSizer();
 
 	// Clear current layout
-	sizer->Clear();
+	sizer_main->Clear();
 
 
 	// Setup layout
-	sizer->AddStretchSpacer();
+	sizer_main->AddStretchSpacer();
 
 	// Count/size labels
-	sizer->Add(label_entries, 0, wxALIGN_CENTER|wxALL, 4);
-	sizer->Add(label_size, 0, wxALIGN_CENTER|wxALL, 4);
-	sizer->AddSpacer(8);
+	sizer_main->Add(label_entries, 0, wxALIGN_CENTER|wxALL, 4);
+	sizer_main->Add(label_size, 0, wxALIGN_CENTER|wxALL, 4);
+	sizer_main->AddSpacer(8);
 
 	// Actions frame
 	wxStaticBox* frame_actions = new wxStaticBox(this, -1, _T("Actions"));
@@ -148,9 +153,9 @@ void MultiEntryPanel::updateLayout() {
 		btn_modify_offsets->Show(false);
 	}
 
-	sizer->Add(frame_sizer, 0, wxALIGN_CENTER|wxALL, 4);
+	sizer_main->Add(frame_sizer, 0, wxALIGN_CENTER|wxALL, 4);
 
-	sizer->AddStretchSpacer();
+	sizer_main->AddStretchSpacer();
 
 
 	// Apply layout

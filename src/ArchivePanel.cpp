@@ -550,6 +550,10 @@ bool ArchivePanel::openEntry(ArchiveEntry* entry) {
 	if (cur_area->getEntry() == entry)
 		return false;
 
+	// Detect entry type if it hasn't been already
+	if (entry->getType() == ETYPE_UNKNOWN)
+		entry->detectType(true);
+
 	// Get the appropriate entry panel for the entry's type
 	EntryPanel* new_area = default_area;
 	switch (entry->getType()) {
@@ -580,9 +584,9 @@ bool ArchivePanel::openEntry(ArchiveEntry* entry) {
 		case ETYPE_PLAYPAL:
 			new_area = pal_area;
 			break;
-		case ETYPE_TEXTURES:
-			new_area = texturex_area;
-			break;
+		//case ETYPE_TEXTURES:
+		//	new_area = texturex_area;
+		//	break;
 	}
 
 	// Show the new entry panel
