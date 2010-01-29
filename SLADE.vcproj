@@ -589,6 +589,14 @@
 					RelativePath=".\src\CTexture.h"
 					>
 				</File>
+				<File
+					RelativePath=".\src\TextureXList.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\TextureXList.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="Palette"
