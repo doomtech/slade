@@ -18,10 +18,12 @@ public:
 	~DefaultEntryPanel();
 
 	bool loadEntry(ArchiveEntry* entry);
+	bool saveEntry();
 	void showTextEditor();
 	void showEntryInfo(bool show_btn_edittext = false);
 
-	void onEditTextClicked(wxCommandEvent &event);
+	void onEditTextClicked(wxCommandEvent& e);
+	void onTextModified(wxStyledTextEvent& e);
 };
 
 #endif //__DEFAULTENTRYPANEL_H__

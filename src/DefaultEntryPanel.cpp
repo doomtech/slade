@@ -52,6 +52,7 @@ DefaultEntryPanel::DefaultEntryPanel(wxWindow* parent)
 
 	// Bind Events
 	btn_edit_text->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &DefaultEntryPanel::onEditTextClicked, this);
+	text_area->Bind(wxEVT_STC_MODIFIED, &DefaultEntryPanel::onTextModified, this);
 
 	// Show entry info stuff
 	view_text = true;
@@ -152,6 +153,22 @@ bool DefaultEntryPanel::loadEntry(ArchiveEntry* entry) {
 	return true;
 }
 
+/* DefaultEntryPanel::saveEntry
+ * Saves any changes to the entry
+ *******************************************************************/
+bool DefaultEntryPanel::saveEntry() {
+	// Write raw text to the entry
+	MemChunk raw_text;
+	text_area->getRawText(raw_text);
+	entry->importMemChunk(raw_text);
+
+	// Set entry type to text
+	entry->setType(ETYPE_TEXT);
+	entry->setState(1);
+
+	return true;
+}
+
 
 /*******************************************************************
  * DEFAULTENTRYPANEL CLASS EVENTS
@@ -167,4 +184,12 @@ void DefaultEntryPanel::onEditTextClicked(wxCommandEvent& event) {
 
 	// Load entry data into the text editor
 	text_area->loadEntry(entry);
+	changed = false;
+}
+
+/* DefaultEntryPanel::onTextModified
+ * Called when the text in the TextEditor is modified
+ *******************************************************************/
+void DefaultEntryPanel::onTextModified(wxStyledTextEvent& e) {
+	changed = true;
 }

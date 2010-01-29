@@ -45,6 +45,8 @@ TextEditor::TextEditor(wxWindow* parent, int id)
 	wxFont f(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 	StyleSetFont(wxSTC_STYLE_DEFAULT, f);
 	SetTabWidth(4);
+
+	Bind(wxEVT_STC_MODIFIED, &TextEditor::onModified, this);
 }
 
 /* TextEditor::~TextEditor
@@ -86,4 +88,16 @@ bool TextEditor::loadEntry(ArchiveEntry* entry) {
 	SetText(istr);
 
 	return true;
+}
+
+/* TextEditor::getRawText
+ * Writes the raw ASCII text to <mc>
+ *******************************************************************/
+void TextEditor::getRawText(MemChunk& mc) {
+	mc.clear();
+	mc.importMem((const uint8_t*)(chr(GetText())), GetText().size());
+}
+
+void TextEditor::onModified(wxStyledTextEvent& e) {
+	e.Skip();
 }

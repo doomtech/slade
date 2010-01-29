@@ -13,7 +13,11 @@ public:
 	TextEntryPanel(wxWindow* parent);
 	~TextEntryPanel();
 
-	bool loadEntry(ArchiveEntry* entry);
+	bool	loadEntry(ArchiveEntry* entry);
+	bool	saveEntry();
+
+	// Events
+	void	onTextModified(wxStyledTextEvent& e);
 };
 
 

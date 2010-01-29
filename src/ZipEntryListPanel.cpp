@@ -208,6 +208,7 @@ void ZipEntryListPanel::populateEntryList() {
 	zipdir_t* dir = getCurrentDir();
 
 	// If we're not in the root directory, add a '..' item
+	entry_list->enableSizeUpdate(false);
 	int index = 0;
 	if (cur_directory != ((ZipArchive*)archive)->getRootDirectory()) {
 		// Setup item
@@ -276,6 +277,7 @@ void ZipEntryListPanel::populateEntryList() {
 	entry_list->Show(true);
 
 	// Update list control width
+	entry_list->enableSizeUpdate(true);
 	updateListWidth();
 }
 

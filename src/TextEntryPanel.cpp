@@ -48,6 +48,9 @@ TextEntryPanel::TextEntryPanel(wxWindow* parent)
 	text_area = new TextEditor(this, -1);
 	sizer_main->Add(text_area, 1, wxEXPAND | wxALL, 4);
 
+	// Bind events
+	text_area->Bind(wxEVT_STC_MODIFIED, &TextEntryPanel::onTextModified, this);
+
 	Layout();
 }
 
@@ -71,6 +74,31 @@ bool TextEntryPanel::loadEntry(ArchiveEntry* entry) {
 
 	// Update variables
 	this->entry = entry;
+	changed = false;
 
 	return true;
+}
+
+/* TextEntryPanel::saveEntry
+ * Saves any changes to the entry
+ *******************************************************************/
+bool TextEntryPanel::saveEntry() {
+	// Write raw text to the entry
+	MemChunk raw_text;
+	text_area->getRawText(raw_text);
+	entry->importMemChunk(raw_text);
+
+	return true;
+}
+
+
+/*******************************************************************
+ * TEXTENTRYPANEL CLASS EVENTS
+ *******************************************************************/
+
+/* TextEntryPanel::onTextModified
+ * Called when the text in the TextEditor is modified
+ *******************************************************************/
+void TextEntryPanel::onTextModified(wxStyledTextEvent& e) {
+	changed = true;
 }

@@ -256,7 +256,7 @@ bool MemChunk::exportFile(string filename) {
  *******************************************************************/
 bool MemChunk::write(const void* data, uint32_t size) {
 	// Check pointers
-	if (!this->data || !data)
+	if (!data)
 		return false;
 
 	// If we're trying to write past the end of the memory chunk,
