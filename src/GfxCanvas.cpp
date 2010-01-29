@@ -66,6 +66,7 @@ GfxCanvas::GfxCanvas(wxWindow* parent, int id)
 	Bind(wxEVT_LEFT_DOWN, &GfxCanvas::onMouseLeftDown, this);
 	Bind(wxEVT_LEFT_UP, &GfxCanvas::onMouseLeftUp, this);
 	Bind(wxEVT_MOTION, &GfxCanvas::onMouseMovement, this);
+	Bind(wxEVT_LEAVE_WINDOW, &GfxCanvas::onMouseLeaving, this);
 }
 
 /* GfxCanvas::~GfxCanvas
@@ -422,7 +423,7 @@ void GfxCanvas::onAnnouncement(Announcer* announcer, string event_name, MemChunk
  * GFXCANVAS EVENTS
  *******************************************************************/
 
-/* GfxCanvas::mouseLeftDown
+/* GfxCanvas::onMouseLeftDown
  * Called when the left button is pressed within the canvas
  *******************************************************************/
 void GfxCanvas::onMouseLeftDown(wxMouseEvent& e) {
@@ -443,7 +444,7 @@ void GfxCanvas::onMouseLeftDown(wxMouseEvent& e) {
 	e.Skip();
 }
 
-/* GfxCanvas::mouseLeftUp
+/* GfxCanvas::onMouseLeftUp
  * Called when the left button is released within the canvas
  *******************************************************************/
 void GfxCanvas::onMouseLeftUp(wxMouseEvent& e) {
@@ -454,7 +455,7 @@ void GfxCanvas::onMouseLeftUp(wxMouseEvent& e) {
 	}
 }
 
-/* GfxCanvas::mouseMove
+/* GfxCanvas::onMouseMovement
  * Called when the mouse pointer is moved within the canvas
  *******************************************************************/
 void GfxCanvas::onMouseMovement(wxMouseEvent& e) {
@@ -475,4 +476,12 @@ void GfxCanvas::onMouseMovement(wxMouseEvent& e) {
 
 	if (refresh)
 		Refresh();
+}
+
+/* GfxCanvas::onMouseLeaving
+ * Called when the mouse pointer leaves the gfx canvas
+ *******************************************************************/
+void GfxCanvas::onMouseLeaving(wxMouseEvent& e) {
+	image_hilight = false;
+	Refresh();
 }

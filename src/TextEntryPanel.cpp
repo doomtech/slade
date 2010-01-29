@@ -41,9 +41,6 @@
  *******************************************************************/
 TextEntryPanel::TextEntryPanel(wxWindow* parent)
 : EntryPanel(parent) {
-	// Get the sizer
-	//wxSizer* sizer = GetSizer();
-
 	// Create the text area
 	text_area = new TextEditor(this, -1);
 	sizer_main->Add(text_area, 1, wxEXPAND | wxALL, 4);

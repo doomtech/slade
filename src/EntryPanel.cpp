@@ -74,7 +74,7 @@ EntryPanel::EntryPanel(wxWindow* parent)
 	btn_edit_ext->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &EntryPanel::onBtnEditExt, this);
 
 	// Disable unimplemented buttons
-	btn_edit_ext->Enable(false);
+	btn_edit_ext->Show(false);
 }
 
 /* EntryPanel::~EntryPanel

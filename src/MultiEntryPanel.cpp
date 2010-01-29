@@ -122,12 +122,8 @@ bool MultiEntryPanel::loadEntries(vector<ArchiveEntry*>& list) {
  * action buttons depending on what is selected
  *******************************************************************/
 void MultiEntryPanel::updateLayout() {
-	// Get panel sizer
-	//wxSizer* sizer = GetSizer();
-
 	// Clear current layout
 	sizer_main->Clear();
-
 
 	// Setup layout
 	sizer_main->AddStretchSpacer();
@@ -142,6 +138,7 @@ void MultiEntryPanel::updateLayout() {
 	wxStaticBoxSizer* frame_sizer = new wxStaticBoxSizer(frame_actions, wxVERTICAL);
 	frame_sizer->Add(btn_export_archive, 0, wxEXPAND|wxALL, 4);
 
+	// Check if any gfx entries are selected
 	if (gfx_selected) {
 		btn_convert_gfx->Show(true);
 		btn_modify_offsets->Show(true);

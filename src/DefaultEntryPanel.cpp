@@ -105,7 +105,6 @@ void DefaultEntryPanel::showTextEditor() {
 	btn_edit_text->Show(false);
 
 	// Clear the sizer
-	//wxSizer* framesizer = GetSizer();
 	sizer_main->Clear(false);
 
 	// Show text editor

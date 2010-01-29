@@ -42,12 +42,14 @@
  *******************************************************************/
 PaletteEntryPanel::PaletteEntryPanel(wxWindow* parent)
 : EntryPanel(parent) {
-	// Get the sizer
-	//wxSizer* sizer = GetSizer();
-
 	// Add palette canvas
 	pal_canvas = new PaletteCanvas(this, -1);
 	sizer_main->Add(pal_canvas, 1, wxEXPAND|wxALL, 4);
+
+	// Disable default entry buttons
+	btn_save->Enable(false);
+	btn_revert->Enable(false);
+	btn_edit_ext->Enable(false);
 
 	Layout();
 }

@@ -53,6 +53,7 @@ public:
 	void	onMouseLeftDown(wxMouseEvent& e);
 	void	onMouseLeftUp(wxMouseEvent& e);
 	void	onMouseMovement(wxMouseEvent& e);
+	void	onMouseLeaving(wxMouseEvent& e);
 };
 
 DECLARE_EVENT_TYPE(wxEVT_GFXCANVAS_OFFSET_CHANGED, -1)

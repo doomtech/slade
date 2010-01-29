@@ -45,9 +45,6 @@
  *******************************************************************/
 GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 : EntryPanel(parent) {
-	// Get the sizer
-	//wxSizer* sizer = GetSizer();
-
 	// Create sizer for this panel
 	wxBoxSizer* m_vbox = new wxBoxSizer(wxVERTICAL);
 	sizer_main->Add(m_vbox, 1, wxEXPAND);
