@@ -5,10 +5,12 @@
 #include "ArchiveEntry.h"
 
 class EntryPanel : public wxPanel {
+private:
+	bool			modified;
+
 protected:
 	ArchiveEntry*	entry;
 	MemChunk		entry_data;
-	bool			changed;
 
 	wxSizer*		sizer_main;
 	wxSizer*		sizer_bottom;
@@ -16,12 +18,14 @@ protected:
 	wxButton*		btn_revert;
 	wxButton*		btn_edit_ext;
 
+	void	setModified(bool c = true);
+
 public:
 	EntryPanel(wxWindow* parent);
 	~EntryPanel();
 
 	ArchiveEntry*	getEntry() { return entry; }
-	bool			unsavedChanges() { return changed; }
+	bool			isModified() { return modified; }
 
 	virtual bool	loadEntry(ArchiveEntry* entry);
 	virtual bool	saveEntry();

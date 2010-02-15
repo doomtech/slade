@@ -113,6 +113,7 @@ bool TextureXEntryPanel::loadEntry(ArchiveEntry* entry) {
 
 	// Update variables
 	this->entry = entry;
+	setModified(false);
 
 	// Refresh controls
 	populateTextureList();
@@ -139,14 +140,13 @@ void TextureXEntryPanel::populateTextureList() {
 	list_textures->InsertColumn(0, _T("Name"));
 	list_textures->InsertColumn(1, _T("Size"));
 
-	/*
 	// Add each texture to the list
 	list_textures->enableSizeUpdate(false);
-	for (size_t a = 0; a < textures.size(); a++) {
-		string cols[] = { textures[a]->getName(), s_fmt(_T("%dx%d"), textures[a]->getWidth(), textures[a]->getHeight()) };
+	for (uint32_t a = 0; a < texturex.nTextures(); a++) {
+		CTexture* tex = texturex.getTexture(a);
+		string cols[] = { tex->getName(), s_fmt(_T("%dx%d"), tex->getWidth(), tex->getHeight()) };
 		list_textures->addItem(a, wxArrayString(2, cols));
 	}
-	 */
 
 	// Update list width
 	list_textures->enableSizeUpdate(true);
@@ -156,11 +156,10 @@ void TextureXEntryPanel::populateTextureList() {
 
 
 void TextureXEntryPanel::onTextureListSelect(wxListEvent& e) {
-	/*
-	if (e.GetIndex() < 0 || e.GetIndex() >= textures.size())
-		return;
+	// Get the selected texture
+	CTexture* tex = texturex.getTexture(e.GetIndex());
 
-	CTexture* tex = textures[e.GetIndex()];
-	tex_canvas->openTexture(tex);
-	 */
+	// Open it if valid index (should be)
+	if (tex)
+		tex_canvas->openTexture(tex);
 }

@@ -42,6 +42,10 @@
  *******************************************************************/
 EntryPanel::EntryPanel(wxWindow* parent)
 : wxPanel(parent, -1) {
+	// Init variables
+	modified = false;
+	entry = NULL;
+
 	// Create & set sizer & border
 	wxStaticBox *frame = new wxStaticBox(this, -1, _T("Entry Contents"));
 	wxStaticBoxSizer *framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
@@ -56,8 +60,6 @@ EntryPanel::EntryPanel(wxWindow* parent)
 
 	sizer_bottom = new wxBoxSizer(wxHORIZONTAL);
 	hbox->Add(sizer_bottom, 1, wxEXPAND|wxALL, 0);
-
-	changed = false;
 
 	// Create generic EntryPanel buttons
 	btn_save = new wxButton(this, -1, _T("Save Changes"));
@@ -81,6 +83,21 @@ EntryPanel::EntryPanel(wxWindow* parent)
  * EntryPanel class destructor
  *******************************************************************/
 EntryPanel::~EntryPanel() {
+}
+
+/* EntryPanel::setModified
+ * Sets the modified flag. If the entry is locked modified will
+ * always be false
+ *******************************************************************/
+void EntryPanel::setModified(bool c) {
+	if (!entry)
+		modified = c;
+	else {
+		if (entry->isLocked())
+			modified = false;
+		else
+			modified = c;
+	}
 }
 
 /* EntryPanel::loadEntry
@@ -107,7 +124,7 @@ bool EntryPanel::saveEntry() {
  * if the entry data wasn't saved
  *******************************************************************/
 bool EntryPanel::revertEntry() {
-	if (changed) {
+	if (modified) {
 		if (entry_data.hasData()) {
 			entry->importMemChunk(entry_data);
 			entry->detectType(true, true);
@@ -122,9 +139,9 @@ bool EntryPanel::revertEntry() {
 
 
 void EntryPanel::onBtnSave(wxCommandEvent& e) {
-	if (changed) {
+	if (modified) {
 		if (saveEntry())
-			changed = false;
+			modified = false;
 	}
 }
 

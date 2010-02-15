@@ -140,6 +140,7 @@ bool DefaultEntryPanel::loadEntry(ArchiveEntry* entry) {
 
 	// Update variables
 	this->entry = entry;
+	setModified(false);
 
 	// Check whether to show the 'edit as text' button
 	bool show_btn_edittext = true;
@@ -148,6 +149,12 @@ bool DefaultEntryPanel::loadEntry(ArchiveEntry* entry) {
 
 	// Show entry info stuff
 	showEntryInfo(show_btn_edittext);
+
+	// Enable save changes button depending on if the entry is locked
+	if (entry->isLocked())
+		btn_save->Enable(false);
+	else
+		btn_save->Enable(true);
 
 	return true;
 }
@@ -183,12 +190,12 @@ void DefaultEntryPanel::onEditTextClicked(wxCommandEvent& event) {
 
 	// Load entry data into the text editor
 	text_area->loadEntry(entry);
-	changed = false;
+	setModified();
 }
 
 /* DefaultEntryPanel::onTextModified
  * Called when the text in the TextEditor is modified
  *******************************************************************/
 void DefaultEntryPanel::onTextModified(wxStyledTextEvent& e) {
-	changed = true;
+	setModified();
 }

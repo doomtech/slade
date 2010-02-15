@@ -9,6 +9,42 @@ TextureXList::TextureXList() {
 TextureXList::~TextureXList() {
 }
 
+CTexture* TextureXList::getTexture(int index) {
+	// Check index range
+	if (index < 0 || index > nTextures())
+		return NULL;
+
+	return textures[index];
+}
+
+CTexture* TextureXList::getTexture(string name) {
+	for (size_t a = 0; a < nTextures(); a++) {
+		if (textures[a]->getName().CmpNoCase(name) == 0)
+			return textures[a];
+	}
+
+	// No match found
+	return NULL;
+}
+
+ArchiveEntry* TextureXList::getPatch(int index) {
+	// Check index range
+	if (index < 0 || index > nPatches())
+		return NULL;
+
+	return patches[index];
+}
+
+ArchiveEntry* TextureXList::getPatch(string name) {
+	for (size_t a = 0; a < nPatches(); a++) {
+		if (patches[a]->getName().CmpNoCase(name) == 0)
+			return patches[a];
+	}
+
+	// No match found
+	return NULL;
+}
+
 void TextureXList::clear() {
 	// Clear textures
 	for (size_t a = 0; a < textures.size(); a++)

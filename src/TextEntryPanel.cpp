@@ -69,9 +69,15 @@ bool TextEntryPanel::loadEntry(ArchiveEntry* entry) {
 	entry_data.clear();
 	entry_data.importMem(entry->getData(true), entry->getSize());
 
+	// Enable save changes button depending on if the entry is locked
+	if (entry->isLocked())
+		btn_save->Enable(false);
+	else
+		btn_save->Enable(true);
+
 	// Update variables
 	this->entry = entry;
-	changed = false;
+	setModified(false);
 
 	return true;
 }
@@ -97,5 +103,5 @@ bool TextEntryPanel::saveEntry() {
  * Called when the text in the TextEditor is modified
  *******************************************************************/
 void TextEntryPanel::onTextModified(wxStyledTextEvent& e) {
-	changed = true;
+	setModified();
 }

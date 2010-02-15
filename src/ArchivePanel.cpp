@@ -584,9 +584,9 @@ bool ArchivePanel::openEntry(ArchiveEntry* entry) {
 		case ETYPE_PLAYPAL:
 			new_area = pal_area;
 			break;
-		//case ETYPE_TEXTURES:
-		//	new_area = texturex_area;
-		//	break;
+		case ETYPE_TEXTURES:
+			new_area = texturex_area;
+			break;
 	}
 
 	// Show the new entry panel
@@ -603,7 +603,7 @@ bool ArchivePanel::openEntry(ArchiveEntry* entry) {
 
 bool ArchivePanel::showEntryPanel(EntryPanel* new_area, bool ask_save) {
 	// If the current entry area has unsaved changes, ask the user if they wish to save the changes
-	if (cur_area->unsavedChanges() && cur_area->getEntry() && ask_save) {
+	if (cur_area->isModified() && cur_area->getEntry() && ask_save) {
 		int result = wxMessageBox(s_fmt(_T("Save changes to entry \"%s\"?"), cur_area->getEntry()->getName().c_str()),
 									_T("Unsaved Changes"), wxYES_NO|wxICON_QUESTION);
 

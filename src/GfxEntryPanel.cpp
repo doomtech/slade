@@ -126,7 +126,7 @@ GfxEntryPanel::~GfxEntryPanel() {
 bool GfxEntryPanel::loadEntry(ArchiveEntry* entry) {
 	// Update variables
 	this->entry = entry;
-	changed = false;
+	setModified(false);
 
 	// Setup palette
 	updateImagePalette();
@@ -145,6 +145,12 @@ bool GfxEntryPanel::loadEntry(ArchiveEntry* entry) {
 
 	// Apply offset view type
 	applyViewType();
+
+	// Enable save changes button depending on if the entry is locked
+	if (entry->isLocked())
+		btn_save->Enable(false);
+	else
+		btn_save->Enable(true);
 
 	// Refresh the canvas
 	gfx_canvas->Refresh();
@@ -301,7 +307,7 @@ void GfxEntryPanel::onXOffsetChanged(wxSpinEvent& e) {
 	gfx_canvas->getImage()->setXOffset(offset);
 
 	// Update variables
-	changed = true;
+	setModified();
 
 	// Refresh canvas
 	gfx_canvas->Refresh();
@@ -316,7 +322,7 @@ void GfxEntryPanel::onYOffsetChanged(wxSpinEvent& e) {
 	gfx_canvas->getImage()->setYOffset(offset);
 
 	// Update variables
-	changed = true;
+	setModified();
 
 	// Refresh canvas
 	gfx_canvas->Refresh();
@@ -346,5 +352,5 @@ void GfxEntryPanel::onGfxOffsetChanged(wxEvent& e) {
 	spin_yoffset->SetValue(gfx_canvas->getImage()->offset().y);
 
 	// Set changed
-	changed = true;
+	setModified();
 }

@@ -235,8 +235,10 @@ void ArchiveEntry::unloadData() {
  *******************************************************************/
 bool ArchiveEntry::rename(string new_name) {
 	// Check if locked
-	if (locked)
+	if (locked) {
+		Global::error = _T("Entry is locked");
 		return false;
+	}
 
 	// Update attributes
 	setName(new_name);
@@ -247,8 +249,10 @@ bool ArchiveEntry::rename(string new_name) {
 
 bool ArchiveEntry::resize(uint32_t new_size, bool preserve_data) {
 	// Check if locked
-	if (locked)
+	if (locked) {
+		Global::error = _T("Entry is locked");
 		return false;
+	}
 
 	// Update attributes
 	setState(1);
@@ -261,8 +265,10 @@ bool ArchiveEntry::resize(uint32_t new_size, bool preserve_data) {
  *******************************************************************/
 void ArchiveEntry::clearData() {
 	// Check if locked
-	if (locked)
+	if (locked) {
+		Global::error = _T("Entry is locked");
 		return;
+	}
 
 	// Delete the data
 	data.clear();
@@ -284,8 +290,10 @@ bool ArchiveEntry::importMem(const void* data, uint32_t size) {
 		return false;
 
 	// Check if locked
-	if (locked)
+	if (locked) {
+		Global::error = _T("Entry is locked");
 		return false;
+	}
 
 	// Clear any current data
 	clearData();
@@ -325,8 +333,10 @@ bool ArchiveEntry::importMemChunk(MemChunk& mc) {
  *******************************************************************/
 bool ArchiveEntry::importFile(string filename, uint32_t offset, uint32_t size) {
 	// Check if locked
-	if (locked)
+	if (locked) {
+		Global::error = _T("Entry is locked");
 		return false;
+	}
 
 	// Open the file
 	FILE* fp = fopen(filename.ToAscii(), "rb");
@@ -371,8 +381,10 @@ bool ArchiveEntry::importFile(string filename, uint32_t offset, uint32_t size) {
 
 bool ArchiveEntry::importFileStream(FILE* fp, uint32_t len) {
 	// Check if locked
-	if (locked)
+	if (locked) {
+		Global::error = _T("Entry is locked");
 		return false;
+	}
 
 	// Import data from the file stream
 	if (data.importFileStream(fp, len)) {
@@ -395,8 +407,10 @@ bool ArchiveEntry::importFileStream(FILE* fp, uint32_t len) {
  *******************************************************************/
 bool ArchiveEntry::importEntry(ArchiveEntry* entry) {
 	// Check if locked
-	if (locked)
+	if (locked) {
+		Global::error = _T("Entry is locked");
 		return false;
+	}
 
 	// Check parameters
 	if (!entry)
@@ -795,9 +809,11 @@ string ArchiveEntry::getSizeString() {
 }
 
 bool ArchiveEntry::write(const void* data, uint32_t size) {
-	// Check if entry is locked
-	if (locked)
+	// Check if locked
+	if (locked) {
+		Global::error = _T("Entry is locked");
 		return false;
+	}
 
 	// Load data if it isn't already
 	if (isLoaded())
