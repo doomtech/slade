@@ -21,6 +21,7 @@ public:
 	void	drawChequeredBackground();
 	void	drawTexture();
 	void	drawPatch(int num);
+	void	drawTextureBorder();
 };
 
 #endif//__CTEXTURECANVAS_H__

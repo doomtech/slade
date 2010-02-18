@@ -118,6 +118,41 @@ bool ListView::setItemText(int item, int column, string text) {
 	return true;
 }
 
+void ListView::clearSelection() {
+	for (int a = 0; a < GetItemCount(); a++)
+		SetItemState(a, 0xFFFF, wxLIST_STATE_SELECTED|wxLIST_STATE_FOCUSED);
+}
+
+bool ListView::selectItem(int item, bool focus) {
+	// Check item id is in range
+	if (item >= GetItemCount())
+		return false;
+
+	// If negative item given, select all items
+	if (item < 0) {
+		for (int a = 0; a < GetItemCount(); a++)
+			SetItemState(a, 0xFFFF, wxLIST_STATE_SELECTED);
+
+		return true;
+	}
+
+	// Select the item (and focus if needed)
+	if (focus)
+		SetItemState(item, 0xFFFF, wxLIST_STATE_SELECTED|wxLIST_STATE_FOCUSED);
+	else
+		SetItemState(item, 0xFFFF, wxLIST_STATE_SELECTED);
+
+	return true;
+}
+
+bool ListView::showItem(int item) {
+	// Check item id is in range
+	if (item < 0 || item >= GetItemCount())
+		return false;
+
+	EnsureVisible(item);
+}
+
 bool ListView::updateSize() {
 	// Update column widths if enabled
 	if (update_width) {

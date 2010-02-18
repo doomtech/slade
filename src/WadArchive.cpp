@@ -799,6 +799,7 @@ bool WadArchive::detectEntryType(ArchiveEntry* entry) {
 	// Check if entry is within any markers
 	int index = entryIndex(entry);
 
+	/*
 	// Patches
 	if (index > patches[0] && index < patches[1]) {
 		entry->setType(ETYPE_PATCH);
@@ -816,6 +817,7 @@ bool WadArchive::detectEntryType(ArchiveEntry* entry) {
 		entry->setType(ETYPE_SPRITE);
 		return true;
 	}
+	 */
 
 	return true;
 }

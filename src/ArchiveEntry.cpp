@@ -207,7 +207,7 @@ void ArchiveEntry::setState(uint8_t state) {
 	}
 
 	// Notify parent archive this entry has been modified
-	if (parent && state == 1)
+	if (parent)
 		parent->entryModified(this);
 }
 
@@ -579,8 +579,8 @@ void ArchiveEntry::detectType(bool data_check, bool force) {
 	}
 
 	// If [data_check] is false we don't want to check the entry's data for type info
-	if (!data_check)
-		return;
+	//if (!data_check)
+	//	return;
 
 	// Check if the entry's data is currently loaded, if it is we won't unload it
 	// after data checks are done
@@ -724,22 +724,21 @@ void ArchiveEntry::detectType(bool data_check, bool force) {
 	if (size > sizeof(patch_header_t) && (type == ETYPE_UNKNOWN || type == ETYPE_SOUND)) {
 		const patch_header_t *header = (const patch_header_t *)data;
 
+		// Check header values are 'sane'
 		if (header->height > 0 && header->height < 4096 &&
 			header->width > 0 && header->width < 4096 &&
 			header->top > -2000 && header->top < 2000 &&
 			header->left > -2000 && header->left < 2000) {
 			uint32_t *col_offsets = (uint32_t *)((const uint8_t *)data + sizeof(patch_header_t));
 
-			if (size < sizeof(patch_header_t) + (header->width * sizeof(uint32_t))) {
-				//wxLogMessage("lump %s not a patch, col_offsets error 1", lump->Name().c_str());
+			// Check there is room for needed column pointers
+			if (size < sizeof(patch_header_t) + (header->width * sizeof(uint32_t)))
 				return;
-			}
 
+			// Check column pointers are within range
 			for (int a = 0; a < header->width; a++) {
-				if (col_offsets[a] > size || col_offsets[a] < 0) {
-					//wxLogMessage("lump %s not a patch, col_offsets error 2", lump->Name().c_str());
+				if (col_offsets[a] > size || col_offsets[a] < sizeof(patch_header_t))
 					return;
-				}
 			}
 
 			type = ETYPE_GFX;

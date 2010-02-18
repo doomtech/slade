@@ -96,6 +96,7 @@ void CTextureCanvas::draw() {
 	// Draw texture
 	if (texture) {
 		drawTexture();
+		drawTextureBorder();
 	}
 
 	// Swap buffers (ie show what was drawn)
@@ -207,5 +208,32 @@ void CTextureCanvas::drawPatch(int num) {
 	glDisable(GL_TEXTURE_2D);
 
 	// Pop gl matrix
+	glPopMatrix();
+}
+
+void CTextureCanvas::drawTextureBorder() {
+	// Push matrix
+	glPushMatrix();
+
+	// Translate to middle of the canvas
+	glTranslated(GetSize().x * 0.5, GetSize().y * 0.5, 0);
+
+	// Translate to top-left of texture
+	glTranslated(texture->getWidth() * -0.5, texture->getHeight() * -0.5, 0);
+
+	// Draw border
+	COL_BLACK.set_gl();
+	glBegin(GL_LINES);
+	glVertex2d(0, 0);
+	glVertex2d(texture->getWidth(), 0);
+	glVertex2d(texture->getWidth(), 0);
+	glVertex2d(texture->getWidth(), texture->getHeight());
+	glVertex2d(texture->getWidth(), texture->getHeight());
+	glVertex2d(0, texture->getHeight());
+	glVertex2d(0, texture->getHeight());
+	glVertex2d(0, 0);
+	glEnd();
+
+	// Pop matrix
 	glPopMatrix();
 }

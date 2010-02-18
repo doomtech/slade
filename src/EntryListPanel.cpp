@@ -422,6 +422,11 @@ bool EntryListPanel::addEntry(uint32_t archive_index, ArchiveEntry* e) {
 	entry_list->InsertItem(li);
 	entry_list->updateEntry(archive_index);
 
+	// Select & show it
+	entry_list->clearSelection();
+	entry_list->selectItem(li.GetId());
+	entry_list->EnsureVisible(li.GetId());
+
 	return true;
 }
 

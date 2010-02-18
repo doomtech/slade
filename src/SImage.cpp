@@ -442,7 +442,7 @@ bool SImage::loadDoomGfx(const uint8_t* gfx_data, int size) {
 		return false;
 
 	// Check size
-	if (size < sizeof(patch_header_t))
+	if (size < sizeof(patch_header_t) + (width * 4))
 		return false;
 
 	// Get header & offsets
@@ -466,6 +466,12 @@ bool SImage::loadDoomGfx(const uint8_t* gfx_data, int size) {
 	mask = new uint8_t[width * height];
 	memset(mask, 0, width * height);	// Set mask to fully transparent
 	for (int c = 0; c < width; c++) {
+		// Check column offset is valid
+		if (col_offsets[c] >= size) {
+			clearData();
+			return false;
+		}
+
 		// Go to start of column
 		const uint8_t* bits = gfx_data;
 		bits += col_offsets[c];
@@ -497,6 +503,10 @@ bool SImage::loadDoomGfx(const uint8_t* gfx_data, int size) {
 
 				// Stop if we're outside the image
 				if (pos > width*height)
+					break;
+
+				// Stop if for some reason we're outside the gfx data
+				if (bits > gfx_data + size)
 					break;
 
 				// Write pixel data

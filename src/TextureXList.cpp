@@ -123,11 +123,11 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, ArchiveEntry* pnames
 		texturex->read(&n_patches, 2);
 		for (uint16_t p = 0; p < n_patches; p++) {
 			// Read left offset
-			uint16_t left = 0;
+			int16_t left = 0;
 			texturex->read(&left, 2);
 
 			// Read top offset
-			uint16_t top = 0;
+			int16_t top = 0;
 			texturex->read(&top, 2);
 
 			// Read patch id

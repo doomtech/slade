@@ -31,6 +31,11 @@ public:
 	bool	setItemStatus(int item, int status);
 	bool	setItemText(int item, int column, string text);
 
+	void	clearSelection();
+	bool	selectItem(int item, bool focus = true);
+
+	bool	showItem(int item);
+
 	bool	updateSize();
 };
 
