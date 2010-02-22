@@ -442,7 +442,7 @@ bool SImage::loadDoomGfx(const uint8_t* gfx_data, int size) {
 		return false;
 
 	// Check size
-	if (size < sizeof(patch_header_t) + (width * 4))
+	if (size < sizeof(patch_header_t))
 		return false;
 
 	// Get header & offsets

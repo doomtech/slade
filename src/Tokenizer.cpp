@@ -33,6 +33,12 @@
 
 
 /*******************************************************************
+ * VARIABLES
+ *******************************************************************/
+char special_tokens[] = { ';', ',', ':', '|', '=' };
+int n_special_tokens = 5;
+
+/*******************************************************************
  * TOKENIZER CLASS FUNCTIONS
  *******************************************************************/
 
@@ -46,6 +52,7 @@ Tokenizer::Tokenizer(bool c_comments, bool h_comments) {
 	size = 0;
 	ccomments = c_comments;
 	hcomments = h_comments;
+	debug = false;
 }
 
 /* Tokenizer::~Tokenizer
@@ -144,6 +151,20 @@ bool Tokenizer::isWhitespace(char p) {
 		return false;
 }
 
+/* Tokenizer::isSpecialCharacter
+ * Checks if a character is a 'special' character, ie a character
+ * that should always be it's own token (;, =, | etc)
+ *******************************************************************/
+bool Tokenizer::isSpecialCharacter(char p) {
+	// Check though special_tokens array
+	for (int a = 0; a < n_special_tokens; a++) {
+		if (p == special_tokens[a])
+			return true;
+	}
+
+	return false;
+}
+
 /* Tokenizer::incrementCurrent
  * Increments the position pointer, returns false on end of block
  *******************************************************************/
@@ -236,9 +257,15 @@ string Tokenizer::getToken() {
 			return ret_str;
 	}
 
+	// If we're at a special character, it's our token
+	if (isSpecialCharacter(current[0])) {
+		ret_str += current[0];
+		incrementCurrent();
+		return ret_str;
+	}
+
 	// Now read the token
-	if (current[0] == '\"') // If we have a literal string (enclosed with "")
-	{
+	if (current[0] == '\"') { // If we have a literal string (enclosed with "")
 		// Skip opening "
 		incrementCurrent();
 
@@ -255,6 +282,10 @@ string Tokenizer::getToken() {
 	} else {
 		// Read token (don't include whitespace)
 		while (!isWhitespace(current[0])) {
+			// Return if special character found
+			if (isSpecialCharacter(current[0]))
+				return ret_str;
+
 			// Add current character to the token
 			ret_str += current[0];
 
@@ -263,6 +294,10 @@ string Tokenizer::getToken() {
 				return ret_str;
 		}
 	}
+
+	// Write token to log if debug mode enabled
+	if (debug)
+		wxLogMessage(ret_str);
 
 	// Return the token
 	return ret_str;
@@ -291,7 +326,7 @@ string Tokenizer::peekToken() {
  * Compares the current token with a string (unused)
  *******************************************************************/
 bool Tokenizer::checkToken(string check) {
-	return !!(getToken().CompareTo(check));
+	return !(getToken().Cmp(check));
 }
 
 /* Tokenizer::getInteger

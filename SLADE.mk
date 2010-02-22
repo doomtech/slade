@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Simon
-Date                   :=22/02/10
+Date                   :=23/02/10
 CodeLitePath           :="/home/simon/.codelite"
 LinkerName             :=g++
 ArchiveTool            :=ar rcus
@@ -46,9 +46,9 @@ LibPath                := "$(LibraryPathSwitch)."
 Objects=src/$(IntermediateDirectory)/GfxConvDialog$(ObjectSuffix) src/$(IntermediateDirectory)/ModifyOffsetsDialog$(ObjectSuffix) src/$(IntermediateDirectory)/PaletteDialog$(ObjectSuffix) src/$(IntermediateDirectory)/Clipboard$(ObjectSuffix) src/$(IntermediateDirectory)/Console$(ObjectSuffix) src/$(IntermediateDirectory)/CVar$(ObjectSuffix) src/$(IntermediateDirectory)/ListenerAnnouncer$(ObjectSuffix) src/$(IntermediateDirectory)/MainApp$(ObjectSuffix) src/$(IntermediateDirectory)/MemChunk$(ObjectSuffix) src/$(IntermediateDirectory)/Misc$(ObjectSuffix) \
 	src/$(IntermediateDirectory)/Tokenizer$(ObjectSuffix) src/$(IntermediateDirectory)/WxStuff$(ObjectSuffix) src/$(IntermediateDirectory)/ArchivePanel$(ObjectSuffix) src/$(IntermediateDirectory)/EntryListPanel$(ObjectSuffix) src/$(IntermediateDirectory)/DefaultEntryPanel$(ObjectSuffix) src/$(IntermediateDirectory)/EntryPanel$(ObjectSuffix) src/$(IntermediateDirectory)/GfxEntryPanel$(ObjectSuffix) src/$(IntermediateDirectory)/MultiEntryPanel$(ObjectSuffix) src/$(IntermediateDirectory)/PaletteEntryPanel$(ObjectSuffix) src/$(IntermediateDirectory)/TextEntryPanel$(ObjectSuffix) \
 	src/$(IntermediateDirectory)/TextureXEntryPanel$(ObjectSuffix) src/$(IntermediateDirectory)/ZipArchivePanel$(ObjectSuffix) src/$(IntermediateDirectory)/ZipEntryListPanel$(ObjectSuffix) src/$(IntermediateDirectory)/ArchiveManagerPanel$(ObjectSuffix) src/$(IntermediateDirectory)/MainWindow$(ObjectSuffix) src/$(IntermediateDirectory)/EntryOperations$(ObjectSuffix) src/$(IntermediateDirectory)/MapLine$(ObjectSuffix) src/$(IntermediateDirectory)/MapSector$(ObjectSuffix) src/$(IntermediateDirectory)/MapSide$(ObjectSuffix) src/$(IntermediateDirectory)/MapThing$(ObjectSuffix) \
-	src/$(IntermediateDirectory)/MapVertex$(ObjectSuffix) src/$(IntermediateDirectory)/SLADEMap$(ObjectSuffix) src/$(IntermediateDirectory)/MapCanvas$(ObjectSuffix) src/$(IntermediateDirectory)/MapEditorWindow$(ObjectSuffix) src/$(IntermediateDirectory)/Archive$(ObjectSuffix) src/$(IntermediateDirectory)/ArchiveEntry$(ObjectSuffix) src/$(IntermediateDirectory)/ArchiveManager$(ObjectSuffix) src/$(IntermediateDirectory)/WadArchive$(ObjectSuffix) src/$(IntermediateDirectory)/ZipArchive$(ObjectSuffix) src/$(IntermediateDirectory)/SImage$(ObjectSuffix) \
-	src/$(IntermediateDirectory)/Palette$(ObjectSuffix) src/$(IntermediateDirectory)/PaletteManager$(ObjectSuffix) src/$(IntermediateDirectory)/CTexture$(ObjectSuffix) src/$(IntermediateDirectory)/TextureXList$(ObjectSuffix) src/$(IntermediateDirectory)/Icons$(ObjectSuffix) src/$(IntermediateDirectory)/GLTexture$(ObjectSuffix) src/$(IntermediateDirectory)/ColourBox$(ObjectSuffix) src/$(IntermediateDirectory)/CTextureCanvas$(ObjectSuffix) src/$(IntermediateDirectory)/GfxCanvas$(ObjectSuffix) src/$(IntermediateDirectory)/ListView$(ObjectSuffix) \
-	src/$(IntermediateDirectory)/OGLCanvas$(ObjectSuffix) src/$(IntermediateDirectory)/PaletteCanvas$(ObjectSuffix) src/$(IntermediateDirectory)/PaletteChooser$(ObjectSuffix) src/$(IntermediateDirectory)/TextEditor$(ObjectSuffix) src/$(IntermediateDirectory)/ConsolePanel$(ObjectSuffix) 
+	src/$(IntermediateDirectory)/MapVertex$(ObjectSuffix) src/$(IntermediateDirectory)/SLADEMap$(ObjectSuffix) src/$(IntermediateDirectory)/MapCanvas$(ObjectSuffix) src/$(IntermediateDirectory)/MapEditorWindow$(ObjectSuffix) src/$(IntermediateDirectory)/Archive$(ObjectSuffix) src/$(IntermediateDirectory)/ArchiveEntry$(ObjectSuffix) src/$(IntermediateDirectory)/ArchiveManager$(ObjectSuffix) src/$(IntermediateDirectory)/WadArchive$(ObjectSuffix) src/$(IntermediateDirectory)/ZipArchive$(ObjectSuffix) src/$(IntermediateDirectory)/EntryType$(ObjectSuffix) \
+	src/$(IntermediateDirectory)/SImage$(ObjectSuffix) src/$(IntermediateDirectory)/Palette$(ObjectSuffix) src/$(IntermediateDirectory)/PaletteManager$(ObjectSuffix) src/$(IntermediateDirectory)/CTexture$(ObjectSuffix) src/$(IntermediateDirectory)/TextureXList$(ObjectSuffix) src/$(IntermediateDirectory)/Icons$(ObjectSuffix) src/$(IntermediateDirectory)/GLTexture$(ObjectSuffix) src/$(IntermediateDirectory)/ColourBox$(ObjectSuffix) src/$(IntermediateDirectory)/CTextureCanvas$(ObjectSuffix) src/$(IntermediateDirectory)/GfxCanvas$(ObjectSuffix) \
+	src/$(IntermediateDirectory)/ListView$(ObjectSuffix) src/$(IntermediateDirectory)/OGLCanvas$(ObjectSuffix) src/$(IntermediateDirectory)/PaletteCanvas$(ObjectSuffix) src/$(IntermediateDirectory)/PaletteChooser$(ObjectSuffix) src/$(IntermediateDirectory)/TextEditor$(ObjectSuffix) src/$(IntermediateDirectory)/ConsolePanel$(ObjectSuffix) 
 
 ##
 ## Main Build Targets 
@@ -341,6 +341,13 @@ src/$(IntermediateDirectory)/ZipArchive$(DependSuffix): src/ZipArchive.cpp
 	@test -d src/Debug || mkdir -p src/Debug
 	@$(CompilerName) $(CmpOptions) $(IncludePath) -MTsrc/$(IntermediateDirectory)/ZipArchive$(ObjectSuffix) -MFsrc/$(IntermediateDirectory)/ZipArchive$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/ZipArchive.cpp"
 
+src/$(IntermediateDirectory)/EntryType$(ObjectSuffix): src/EntryType.cpp src/$(IntermediateDirectory)/EntryType$(DependSuffix)
+	@test -d src/Debug || mkdir -p src/Debug
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/EntryType.cpp" $(CmpOptions) $(ObjectSwitch)src/$(IntermediateDirectory)/EntryType$(ObjectSuffix) $(IncludePath)
+src/$(IntermediateDirectory)/EntryType$(DependSuffix): src/EntryType.cpp
+	@test -d src/Debug || mkdir -p src/Debug
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MTsrc/$(IntermediateDirectory)/EntryType$(ObjectSuffix) -MFsrc/$(IntermediateDirectory)/EntryType$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/EntryType.cpp"
+
 src/$(IntermediateDirectory)/SImage$(ObjectSuffix): src/SImage.cpp src/$(IntermediateDirectory)/SImage$(DependSuffix)
 	@test -d src/Debug || mkdir -p src/Debug
 	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/SImage.cpp" $(CmpOptions) $(ObjectSwitch)src/$(IntermediateDirectory)/SImage$(ObjectSuffix) $(IncludePath)
@@ -576,6 +583,9 @@ clean:
 	$(RM) src/$(IntermediateDirectory)/ZipArchive$(ObjectSuffix)
 	$(RM) src/$(IntermediateDirectory)/ZipArchive$(DependSuffix)
 	$(RM) src/$(IntermediateDirectory)/ZipArchive$(PreprocessSuffix)
+	$(RM) src/$(IntermediateDirectory)/EntryType$(ObjectSuffix)
+	$(RM) src/$(IntermediateDirectory)/EntryType$(DependSuffix)
+	$(RM) src/$(IntermediateDirectory)/EntryType$(PreprocessSuffix)
 	$(RM) src/$(IntermediateDirectory)/SImage$(ObjectSuffix)
 	$(RM) src/$(IntermediateDirectory)/SImage$(DependSuffix)
 	$(RM) src/$(IntermediateDirectory)/SImage$(PreprocessSuffix)

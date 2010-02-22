@@ -1,14 +1,57 @@
+/*******************************************************************
+ * SLADE - It's a Doom Editor
+ * Copyright (C) 2008 Simon Judd
+ *
+ * Email:       veilofsorrow@gmail.com
+ * Web:         http://slade.mancubus.net
+ * Filename:    TextureXList.cpp
+ * Description: Handles a collection of Composite Textures (ie,
+ *              encapsulates a TEXTUREx entry)
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *******************************************************************/
 
+
+/*******************************************************************
+ * INCLUDES
+ *******************************************************************/
 #include "Main.h"
 #include "TextureXList.h"
 #include "Archive.h"
 
+
+/*******************************************************************
+ * TEXTUREXLIST CLASS FUNCTIONS
+ *******************************************************************/
+
+/* TextureXList::TextureXList
+ * TextureXList class constructor
+ *******************************************************************/
 TextureXList::TextureXList() {
 }
 
+/* TextureXList::~TextureXList
+ * TextureXList class destructor
+ *******************************************************************/
 TextureXList::~TextureXList() {
 }
 
+/* TextureXList::getTexture
+ * Returns the CTexture at [index], or NULL if [index] is out of
+ * range
+ *******************************************************************/
 CTexture* TextureXList::getTexture(int index) {
 	// Check index range
 	if (index < 0 || index > nTextures())
@@ -17,6 +60,9 @@ CTexture* TextureXList::getTexture(int index) {
 	return textures[index];
 }
 
+/* TextureXList::getTexture
+ * Returns a CTexture matching [name], or NULL if no match found
+ *******************************************************************/
 CTexture* TextureXList::getTexture(string name) {
 	for (size_t a = 0; a < nTextures(); a++) {
 		if (textures[a]->getName().CmpNoCase(name) == 0)
@@ -27,6 +73,10 @@ CTexture* TextureXList::getTexture(string name) {
 	return NULL;
 }
 
+/* TextureXList::getPatch
+ * Returns the patch entry at [index], or NULL if [index] is out of
+ * range
+ *******************************************************************/
 ArchiveEntry* TextureXList::getPatch(int index) {
 	// Check index range
 	if (index < 0 || index > nPatches())
@@ -35,6 +85,9 @@ ArchiveEntry* TextureXList::getPatch(int index) {
 	return patches[index];
 }
 
+/* TextureXList::getPatch
+ * Returns the patch entry matching [name], or NULL if no match found
+ *******************************************************************/
 ArchiveEntry* TextureXList::getPatch(string name) {
 	for (size_t a = 0; a < nPatches(); a++) {
 		if (patches[a]->getName().CmpNoCase(name) == 0)
@@ -45,6 +98,9 @@ ArchiveEntry* TextureXList::getPatch(string name) {
 	return NULL;
 }
 
+/* TextureXList::clear
+ * Clears all textures and patches
+ *******************************************************************/
 void TextureXList::clear() {
 	// Clear textures
 	for (size_t a = 0; a < textures.size(); a++)
@@ -57,7 +113,16 @@ void TextureXList::clear() {
 	patches.clear();
 }
 
+/* TextureXList::readTEXTUREXData
+ * Reads in a doom-format TEXTUREx entry. Returns true on success,
+ * false otherwise
+ *******************************************************************/
 bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, ArchiveEntry* pnames) {
+	// Check entries were actually given
+	if (!texturex || !pnames)
+		return false;
+
+	// Get parent archive
 	Archive* parent_archive = texturex->getParent();
 
 	// Read PNAMES
@@ -157,9 +222,13 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, ArchiveEntry* pnames
 	// Clean up
 	delete[] offsets;
 
-	return false;
+	return true;
 }
 
+/* TextureXList::readTEXTURESData
+ * Reads in a zdoom-format TEXTURES entry. Returns true on success,
+ * false otherwise
+ *******************************************************************/
 bool TextureXList::readTEXTURESData(ArchiveEntry* textures) {
 	return false;
 }

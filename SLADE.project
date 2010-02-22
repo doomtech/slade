@@ -178,6 +178,8 @@
       <File Name="src/WadArchive.h"/>
       <File Name="src/ZipArchive.cpp"/>
       <File Name="src/ZipArchive.h"/>
+      <File Name="src/EntryType.h"/>
+      <File Name="src/EntryType.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Image">
       <File Name="src/SImage.cpp"/>
@@ -220,5 +222,6 @@
     <File Name="src/ConsolePanel.cpp"/>
     <File Name="src/ConsolePanel.h"/>
   </VirtualDirectory>
+  <Dependencies Name="Release"/>
   <Dependencies Name="Debug"/>
 </CodeLite_Project>
