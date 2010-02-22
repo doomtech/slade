@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CodeLite_Project Name="SLADE" InternalType="Console">
+  <Plugins>
+    <Plugin Name="qmake">
+      <![CDATA[00020001N0005Debug0000000000000001N0007Release000000000000]]>
+    </Plugin>
+  </Plugins>
+  <Description/>
+  <Dependencies/>
+  <VirtualDirectory Name="src"/>
+  <Settings Type="Executable">
+    <Configuration Name="Debug" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="-g;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=yes)" Required="yes" PreCompiledHeader="">
+        <Preprocessor Value="__WX__"/>
+      </Compiler>
+      <Linker Options="$(shell wx-config --debug=yes --libs std,gl,stc,aui --unicode=yes)" Required="yes"/>
+      <ResourceCompiler Options="$(shell wx-config --rcflags)" Required="no"/>
+      <General OutputFile="./dist/slade-dbg" IntermediateDirectory="./Debug" Command="./slade-dbg" CommandArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
+        <PostConnectCommands/>
+        <StartupCommands/>
+      </Debugger>
+      <PreBuild/>
+      <PostBuild/>
+      <CustomBuild Enabled="no">
+        <RebuildCommand/>
+        <CleanCommand/>
+        <BuildCommand/>
+        <PreprocessFileCommand/>
+        <SingleFileCommand/>
+        <MakefileGenerationCommand/>
+        <ThirdPartyToolName>None</ThirdPartyToolName>
+        <WorkingDirectory/>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild/>
+        <CustomPreBuild/>
+      </AdditionalRules>
+    </Configuration>
+    <Configuration Name="Release" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="-O2;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no)" Required="yes" PreCompiledHeader="">
+        <Preprocessor Value="__WX__"/>
+      </Compiler>
+      <Linker Options="-s;$(shell wx-config --debug=no --libs std,gl,stc,aui --unicode=yes)" Required="yes"/>
+      <ResourceCompiler Options="$(shell wx-config --rcflags)" Required="no"/>
+      <General OutputFile="./dist/slade" IntermediateDirectory="./Release" Command="./slade" CommandArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
+        <PostConnectCommands/>
+        <StartupCommands/>
+      </Debugger>
+      <PreBuild/>
+      <PostBuild/>
+      <CustomBuild Enabled="no">
+        <RebuildCommand/>
+        <CleanCommand/>
+        <BuildCommand/>
+        <PreprocessFileCommand/>
+        <SingleFileCommand/>
+        <MakefileGenerationCommand/>
+        <ThirdPartyToolName>None</ThirdPartyToolName>
+        <WorkingDirectory/>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild/>
+        <CustomPreBuild/>
+      </AdditionalRules>
+    </Configuration>
+    <GlobalSettings>
+      <Compiler Options="">
+        <IncludePath Value="."/>
+      </Compiler>
+      <Linker Options="">
+        <LibraryPath Value="."/>
+        <Library Value="freeimage"/>
+      </Linker>
+      <ResourceCompiler Options=""/>
+    </GlobalSettings>
+  </Settings>
+  <VirtualDirectory Name="Dialogs">
+    <File Name="src/GfxConvDialog.cpp"/>
+    <File Name="src/GfxConvDialog.h"/>
+    <File Name="src/ModifyOffsetsDialog.cpp"/>
+    <File Name="src/ModifyOffsetsDialog.h"/>
+    <File Name="src/PaletteDialog.cpp"/>
+    <File Name="src/PaletteDialog.h"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="General">
+    <File Name="src/Clipboard.cpp"/>
+    <File Name="src/Clipboard.h"/>
+    <File Name="src/Console.cpp"/>
+    <File Name="src/Console.h"/>
+    <File Name="src/CVar.cpp"/>
+    <File Name="src/CVar.h"/>
+    <File Name="src/ListenerAnnouncer.cpp"/>
+    <File Name="src/ListenerAnnouncer.h"/>
+    <File Name="src/Main.h"/>
+    <File Name="src/MainApp.cpp"/>
+    <File Name="src/MainApp.h"/>
+    <File Name="src/MemChunk.cpp"/>
+    <File Name="src/MemChunk.h"/>
+    <File Name="src/Misc.cpp"/>
+    <File Name="src/Misc.h"/>
+    <File Name="src/Structs.h"/>
+    <File Name="src/Tokenizer.cpp"/>
+    <File Name="src/Tokenizer.h"/>
+    <File Name="src/WxStuff.cpp"/>
+    <File Name="src/WxStuff.h"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="Main Editor">
+    <VirtualDirectory Name="UI Elements">
+      <VirtualDirectory Name="ArchivePanel">
+        <File Name="src/ArchivePanel.cpp"/>
+        <File Name="src/ArchivePanel.h"/>
+        <File Name="src/EntryListPanel.cpp"/>
+        <File Name="src/EntryListPanel.h"/>
+      </VirtualDirectory>
+      <VirtualDirectory Name="EntryPanel">
+        <File Name="src/DefaultEntryPanel.cpp"/>
+        <File Name="src/DefaultEntryPanel.h"/>
+        <File Name="src/EntryPanel.cpp"/>
+        <File Name="src/EntryPanel.h"/>
+        <File Name="src/GfxEntryPanel.cpp"/>
+        <File Name="src/GfxEntryPanel.h"/>
+        <File Name="src/MultiEntryPanel.cpp"/>
+        <File Name="src/MultiEntryPanel.h"/>
+        <File Name="src/PaletteEntryPanel.cpp"/>
+        <File Name="src/PaletteEntryPanel.h"/>
+        <File Name="src/TextEntryPanel.cpp"/>
+        <File Name="src/TextEntryPanel.h"/>
+        <File Name="src/TextureXEntryPanel.cpp"/>
+        <File Name="src/TextureXEntryPanel.h"/>
+      </VirtualDirectory>
+      <VirtualDirectory Name="ZipArchivePanel">
+        <File Name="src/ZipArchivePanel.cpp"/>
+        <File Name="src/ZipArchivePanel.h"/>
+        <File Name="src/ZipEntryListPanel.cpp"/>
+        <File Name="src/ZipEntryListPanel.h"/>
+      </VirtualDirectory>
+      <File Name="src/ArchiveManagerPanel.cpp"/>
+      <File Name="src/ArchiveManagerPanel.h"/>
+    </VirtualDirectory>
+    <File Name="src/MainWindow.cpp"/>
+    <File Name="src/MainWindow.h"/>
+    <File Name="src/EntryOperations.cpp"/>
+    <File Name="src/EntryOperations.h"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="Map Editor">
+    <VirtualDirectory Name="SLADEMap">
+      <File Name="src/MapLine.cpp"/>
+      <File Name="src/MapLine.h"/>
+      <File Name="src/MapSector.cpp"/>
+      <File Name="src/MapSector.h"/>
+      <File Name="src/MapSide.cpp"/>
+      <File Name="src/MapSide.h"/>
+      <File Name="src/MapThing.cpp"/>
+      <File Name="src/MapThing.h"/>
+      <File Name="src/MapVertex.cpp"/>
+      <File Name="src/MapVertex.h"/>
+      <File Name="src/SLADEMap.cpp"/>
+      <File Name="src/SLADEMap.h"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="UI Elements">
+      <File Name="src/MapCanvas.cpp"/>
+      <File Name="src/MapCanvas.h"/>
+    </VirtualDirectory>
+    <File Name="src/MapEditorWindow.cpp"/>
+    <File Name="src/MapEditorWindow.h"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="Resources">
+    <VirtualDirectory Name="Archive">
+      <File Name="src/Archive.cpp"/>
+      <File Name="src/Archive.h"/>
+      <File Name="src/ArchiveEntry.cpp"/>
+      <File Name="src/ArchiveEntry.h"/>
+      <File Name="src/ArchiveManager.cpp"/>
+      <File Name="src/ArchiveManager.h"/>
+      <File Name="src/WadArchive.cpp"/>
+      <File Name="src/WadArchive.h"/>
+      <File Name="src/ZipArchive.cpp"/>
+      <File Name="src/ZipArchive.h"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="Image">
+      <File Name="src/SImage.cpp"/>
+      <File Name="src/SImage.h"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="Palette">
+      <File Name="src/Palette.cpp"/>
+      <File Name="src/Palette.h"/>
+      <File Name="src/PaletteManager.cpp"/>
+      <File Name="src/PaletteManager.h"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="Composite Texture">
+      <File Name="src/CTexture.cpp"/>
+      <File Name="src/CTexture.h"/>
+      <File Name="src/TextureXList.cpp"/>
+      <File Name="src/TextureXList.h"/>
+    </VirtualDirectory>
+    <File Name="src/Icons.cpp"/>
+    <File Name="src/Icons.h"/>
+    <File Name="src/GLTexture.h"/>
+    <File Name="src/GLTexture.cpp"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="UI Elements">
+    <File Name="src/ColourBox.cpp"/>
+    <File Name="src/ColourBox.h"/>
+    <File Name="src/CTextureCanvas.cpp"/>
+    <File Name="src/CTextureCanvas.h"/>
+    <File Name="src/GfxCanvas.cpp"/>
+    <File Name="src/GfxCanvas.h"/>
+    <File Name="src/ListView.cpp"/>
+    <File Name="src/ListView.h"/>
+    <File Name="src/OGLCanvas.cpp"/>
+    <File Name="src/OGLCanvas.h"/>
+    <File Name="src/PaletteCanvas.cpp"/>
+    <File Name="src/PaletteCanvas.h"/>
+    <File Name="src/PaletteChooser.cpp"/>
+    <File Name="src/PaletteChooser.h"/>
+    <File Name="src/TextEditor.cpp"/>
+    <File Name="src/TextEditor.h"/>
+    <File Name="src/ConsolePanel.cpp"/>
+    <File Name="src/ConsolePanel.h"/>
+  </VirtualDirectory>
+  <Dependencies Name="Debug"/>
+</CodeLite_Project>
