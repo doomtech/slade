@@ -120,7 +120,7 @@ bool ListView::setItemText(int item, int column, string text) {
 
 void ListView::clearSelection() {
 	for (int a = 0; a < GetItemCount(); a++)
-		SetItemState(a, 0xFFFF, wxLIST_STATE_SELECTED|wxLIST_STATE_FOCUSED);
+		SetItemState(a, 0x0000, wxLIST_STATE_SELECTED|wxLIST_STATE_FOCUSED);
 }
 
 bool ListView::selectItem(int item, bool focus) {

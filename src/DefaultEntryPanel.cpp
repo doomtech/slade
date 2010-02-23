@@ -190,7 +190,7 @@ void DefaultEntryPanel::onEditTextClicked(wxCommandEvent& event) {
 
 	// Load entry data into the text editor
 	text_area->loadEntry(entry);
-	setModified();
+	setModified(false);
 }
 
 /* DefaultEntryPanel::onTextModified

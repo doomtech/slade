@@ -68,6 +68,7 @@ ZipEntryListPanel::ZipEntryListPanel(wxWindow* parent, int id, Archive* archive)
 	dummy_folder_entry = new ArchiveEntry();
 	dummy_folder_entry->setType(ETYPE_FOLDER);
 	dummy_folder_entry->setState(0);
+	dummy_folder_entry->setName(_T(".."));
 
 	// Init beginning index of entries
 	entries_begin = 0;
@@ -561,7 +562,7 @@ void ZipEntryListPanel::onEntryListActivated(wxListEvent& e) {
 	// Check for folder
 	if (entry->getType() == ETYPE_FOLDER) {
 		// If a folder was activated, open it
-		if (entry_list->GetItemText(e.GetIndex()).Cmp(_T(".."))) {
+		if (entry != dummy_folder_entry) {
 			cur_directory = getCurrentDir()->getSubDir(e.GetText());
 		}
 		else {

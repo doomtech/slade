@@ -54,8 +54,7 @@ Archive::~Archive() {
 /* Archive::getFileName
  * Returns the archive's filename, including the path if specified
  *******************************************************************/
-string Archive::getFileName(bool fullpath)
-{
+string Archive::getFileName(bool fullpath) {
 	if (fullpath)
 		return filename;
 	else {
@@ -89,9 +88,6 @@ void Archive::entryModified(ArchiveEntry* entry) {
 	if (!checkEntry(entry))
 		return;
 
-	// Set the archive state to modified
-	setModified(true);
-
 	// Get the entry index and announce the change
 	MemChunk mc;
 	wxUIntPtr ptr = wxPtrToUInt(entry);
@@ -99,6 +95,14 @@ void Archive::entryModified(ArchiveEntry* entry) {
 	mc.write(&index, sizeof(uint32_t));
 	mc.write(&ptr, sizeof(wxUIntPtr));
 	announce(_T("entry_modified"), mc);
+
+	// If entry was set to unmodified, don't set the archive to modified
+	// (should really rename this stuff to 'state changed' rather than 'modified')
+	if (entry->getState() == 0)
+		return;
+
+	// Set the archive state to modified
+	setModified(true);
 }
 
 void Archive::setModified(bool mod) {

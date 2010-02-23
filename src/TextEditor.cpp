@@ -80,12 +80,8 @@ bool TextEditor::loadEntry(ArchiveEntry* entry) {
 		return false;
 	}
 
-	// Load it into the text area
-	string istr = wxString::FromAscii(data);
-	istr.Truncate(entry->getSize());
-
-	// Add text to the text area
-	SetText(istr);
+	// Load text into editor
+	AddTextRaw(data);
 
 	return true;
 }
