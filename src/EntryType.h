@@ -22,6 +22,32 @@ enum {
 	EDF_UNKNOWN,
 };
 
+// Quick'n'dirty for now
+class EntryDataFormat {
+private:
+
+public:
+	EntryDataFormat(){}
+	~EntryDataFormat(){}
+
+	static uint16_t detectFormat(MemChunk& mc);
+
+	static bool detectPng(MemChunk& mc);
+	static bool detectBmp(MemChunk& mc);
+	static bool detectJpeg(MemChunk& mc);
+	static bool detectDoomGfx(MemChunk& mc);
+	static bool detectDoomFlat(MemChunk& mc);
+	static bool detectWad(MemChunk& mc);
+	static bool detectMus(MemChunk& mc);
+	static bool detectMidi(MemChunk& mc);
+	static bool detectModIt(MemChunk& mc);
+	static bool detectModXm(MemChunk& mc);
+	static bool detectModS3m(MemChunk& mc);
+	static bool detectModMod(MemChunk& mc);
+	static bool detectSndDoom(MemChunk& mc);
+	static bool detectSndWav(MemChunk& mc);
+};
+
 class EntryType {
 private:
 	// Type info
@@ -70,6 +96,7 @@ public:
 	void	dump();
 
 	// Static functions
+	static bool readEntryTypeDefinition(MemChunk& mc);
 	static bool loadEntryTypes();
 };
 

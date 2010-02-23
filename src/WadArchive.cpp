@@ -175,7 +175,7 @@ bool WadArchive::openFile(string filename) {
 	fread(&num_lumps, 4, 1, fp);	// No. of lumps in wad
 	fread(&dir_offset, 4, 1, fp);	// Offset to directory
 
-	// uint8_tswap values for big endian if needed
+	// Byteswap values for big endian if needed
 	num_lumps = wxINT32_SWAP_ON_BE(num_lumps);
 	dir_offset = wxINT32_SWAP_ON_BE(dir_offset);
 
@@ -203,7 +203,7 @@ bool WadArchive::openFile(string filename) {
 		fread(name, 1, 8, fp);		// Name
 		name[8] = '\0';
 
-		// uint8_tswap values for big endian if needed
+		// Byteswap values for big endian if needed
 		offset = wxINT32_SWAP_ON_BE(offset);
 		size = wxINT32_SWAP_ON_BE(size);
 

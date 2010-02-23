@@ -122,7 +122,7 @@ bool Tokenizer::openString(string text, uint32_t offset, uint32_t length) {
 /* Tokenizer::openMem
  * Reads a chunk of memory to the Tokenizer
  *******************************************************************/
-bool Tokenizer::openMem(char* mem, uint32_t length) {
+bool Tokenizer::openMem(const char* mem, uint32_t length) {
 	// Length must be specified
 	if (length == 0) {
 		wxLogMessage(_T("Tokenizer::openMem: length not specified"));

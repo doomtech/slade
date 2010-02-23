@@ -450,10 +450,10 @@ bool SImage::loadDoomGfx(const uint8_t* gfx_data, int size) {
 	uint32_t* col_offsets = (uint32_t*)((uint8_t*)gfx_data + sizeof(patch_header_t));
 
 	// Setup variables
-	width = header->width;
-	height = header->height;
-	offset_x = header->left;
-	offset_y = header->top;
+	width = wxINT16_SWAP_ON_BE(header->width);
+	height = wxINT16_SWAP_ON_BE(header->height);
+	offset_x = wxINT16_SWAP_ON_BE(header->left);
+	offset_y = wxINT16_SWAP_ON_BE(header->top);
 	has_palette = true;
 	format = PALMASK;
 
@@ -466,15 +466,18 @@ bool SImage::loadDoomGfx(const uint8_t* gfx_data, int size) {
 	mask = new uint8_t[width * height];
 	memset(mask, 0, width * height);	// Set mask to fully transparent
 	for (int c = 0; c < width; c++) {
+		// Get current column offset (byteswap if needed)
+		uint32_t col_offset = wxUINT32_SWAP_ON_BE(col_offsets[c]);
+
 		// Check column offset is valid
-		if (col_offsets[c] >= size) {
+		if (col_offset >= size) {
 			clearData();
 			return false;
 		}
 
 		// Go to start of column
 		const uint8_t* bits = gfx_data;
-		bits += col_offsets[c];
+		bits += col_offset;
 
 		// Read posts
 		int top = -1;
@@ -777,6 +780,12 @@ bool SImage::toDoomGfx(MemChunk& out, uint8_t alpha_threshold) {
 	header.left = offset_x;
 	header.width = getWidth();
 	header.height = getHeight();
+	
+	// Byteswap header values if needed
+	header.top = wxINT16_SWAP_ON_BE(header.top);
+	header.left = wxINT16_SWAP_ON_BE(header.left);
+	header.width = wxINT16_SWAP_ON_BE(header.width);
+	header.height = wxINT16_SWAP_ON_BE(header.height);
 
 	// Write it
 	out.write(&header.width, 2);
@@ -791,7 +800,7 @@ bool SImage::toDoomGfx(MemChunk& out, uint8_t alpha_threshold) {
 	// Write columns
 	for (size_t c = 0; c < columns.size(); c++) {
 		// Record column offset
-		col_offsets[c] = out.currentPos();
+		col_offsets[c] = wxUINT32_SWAP_ON_BE(out.currentPos());
 
 		// Determine column size (in bytes)
 		uint32_t col_size = 0;

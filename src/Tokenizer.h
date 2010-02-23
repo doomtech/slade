@@ -20,7 +20,7 @@ public:
 
 	bool openFile(string filename, uint32_t offset = 0, uint32_t length = 0);
 	bool openString(string text, uint32_t offset = 0, uint32_t length = 0);
-	bool openMem(char* mem, uint32_t length);
+	bool openMem(const char* mem, uint32_t length);
 	bool isWhitespace(char p);
 	bool isSpecialCharacter(char p);
 	bool incrementCurrent();
