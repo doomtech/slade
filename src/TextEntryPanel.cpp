@@ -87,9 +87,8 @@ bool TextEntryPanel::loadEntry(ArchiveEntry* entry) {
  *******************************************************************/
 bool TextEntryPanel::saveEntry() {
 	// Write raw text to the entry
-	MemChunk raw_text;
-	text_area->getRawText(raw_text);
-	entry->importMemChunk(raw_text);
+	wxCharBuffer text_raw = text_area->GetTextRaw();
+	entry->importMem(text_raw, text_raw.length());
 
 	return true;
 }

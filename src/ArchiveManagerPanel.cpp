@@ -257,9 +257,11 @@ void ArchiveManagerPanel::openTab(int archive_index) {
 		// Go through all tabs
 		for (size_t a = 0; a < notebook_archives->GetPageCount(); a++) {
 			// Check for a match
-			if (((ArchivePanel*) notebook_archives->GetPage(a))->getArchive() == archive) {
+			ArchivePanel* ap = (ArchivePanel*)notebook_archives->GetPage(a);
+			if (ap->getArchive() == archive) {
 				// Selected archive is already open in a tab, so switch to this tab
 				notebook_archives->SetSelection(a);
+				ap->focusEntryList();
 				return;
 			}
 		}
@@ -274,6 +276,8 @@ void ArchiveManagerPanel::openTab(int archive_index) {
 		notebook_archives->AddPage(wp, archive->getFileName(false), true);
 		wp->Show(true);
 		wp->init();
+		wp->SetFocus();
+		wp->focusEntryList();
 	}
 }
 

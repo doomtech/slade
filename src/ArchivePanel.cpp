@@ -800,7 +800,7 @@ void ArchivePanel::onEntryListKeyDown(wxKeyEvent& e) {
 		importEntry();
 
 	// Export entry (Ctrl+E)
-	if (e.GetKeyCode() == 'E' && e.ControlDown())
+	if (e.GetKeyCode() == 'E' && e.ControlDown() && !e.ShiftDown())
 		exportEntry();
 
 	// Export entry to wad (Shift+Ctrl+E)
@@ -815,9 +815,15 @@ void ArchivePanel::onEntryListKeyDown(wxKeyEvent& e) {
 	if (e.ControlDown() && (e.GetKeyCode() == 'D' || e.GetKeyCode() == WXK_DOWN))
 		moveDown();
 
-	// Select all entries
+	// Select all entries (Ctrl+A)
 	if (e.GetKeyCode() == 'A' && e.ControlDown())
 		entry_list->selectAll();
 
-	e.Skip();
+	// New entry (Ctrl+N)
+	if (e.GetKeyCode() == 'N' && e.ControlDown() && !e.ShiftDown())
+		newEntry();
+	
+	// New entry from file (Shift+Ctrl+N)
+	if (e.GetKeyCode() == 'N' && e.ControlDown() && e.ShiftDown())
+		newEntryFromFile();
 }

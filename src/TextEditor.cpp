@@ -61,7 +61,7 @@ TextEditor::~TextEditor() {
  *******************************************************************/
 bool TextEditor::loadEntry(ArchiveEntry* entry) {
 	// Clear current text
-	SetText(wxEmptyString);
+	ClearAll();
 
 	// Check that the entry exists
 	if (!entry) {
@@ -81,7 +81,7 @@ bool TextEditor::loadEntry(ArchiveEntry* entry) {
 	}
 
 	// Load text into editor
-	AddTextRaw(data);
+	SetTextRaw((const char*)entry->getData());
 
 	return true;
 }
@@ -91,7 +91,9 @@ bool TextEditor::loadEntry(ArchiveEntry* entry) {
  *******************************************************************/
 void TextEditor::getRawText(MemChunk& mc) {
 	mc.clear();
-	mc.importMem((const uint8_t*)(chr(GetText())), GetText().size());
+	const char* raw_text = GetTextRaw();
+	mc.importMem((const uint8_t*)raw_text, GetTextLength());
+	//mc.importMem((const uint8_t*)(chr(GetText())), GetText().size());
 }
 
 void TextEditor::onModified(wxStyledTextEvent& e) {

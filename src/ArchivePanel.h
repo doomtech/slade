@@ -71,6 +71,7 @@ public:
 	// UI related
 	bool	openEntry(ArchiveEntry* entry);
 	bool	showEntryPanel(EntryPanel* new_area, bool ask_save = true);
+	void	focusEntryList() { entry_list->SetFocus(); }
 
 	virtual void onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 

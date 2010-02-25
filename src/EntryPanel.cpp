@@ -59,16 +59,16 @@ EntryPanel::EntryPanel(wxWindow* parent)
 	framesizer->Add(hbox, 0, wxEXPAND, 0);
 
 	sizer_bottom = new wxBoxSizer(wxHORIZONTAL);
-	hbox->Add(sizer_bottom, 1, wxEXPAND|wxALL, 0);
+	hbox->Add(sizer_bottom, 1, wxEXPAND|wxBOTTOM, 4);
 
 	// Create generic EntryPanel buttons
 	btn_save = new wxButton(this, -1, _T("Save Changes"));
 	btn_revert = new wxButton(this, -1, _T("Revert Changes"));
 	btn_edit_ext = new wxButton(this, -1, _T("Edit Externally"));
 
-	hbox->Add(btn_edit_ext, 0, wxEXPAND|wxALL, 4);
-	hbox->Add(btn_revert, 0, wxEXPAND|wxALL, 4);
-	hbox->Add(btn_save, 0, wxEXPAND|wxALL, 4);
+	hbox->Add(btn_edit_ext, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
+	hbox->Add(btn_revert, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
+	hbox->Add(btn_save, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
 
 	// Bind button events
 	btn_save->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &EntryPanel::onBtnSave, this);
