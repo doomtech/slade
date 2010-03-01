@@ -594,7 +594,7 @@ bool ArchivePanel::openEntry(ArchiveEntry* entry) {
 		return false;
 
 	// Load the entry into the panel
-	if (!cur_area->loadEntry(entry)) {
+	if (!cur_area->openEntry(entry)) {
 		wxMessageBox(s_fmt(_T("Error loading entry:\n%s"), Global::error.c_str()), _T("Error"), wxICON_ERROR);
 	}
 
@@ -780,50 +780,54 @@ void ArchivePanel::onEntryListKeyDown(wxKeyEvent& e) {
 		renameEntry();
 
 	// Delete entry (Delete)
-	if (e.GetKeyCode() == WXK_DELETE)
+	else if (e.GetKeyCode() == WXK_DELETE)
 		deleteEntry();
 
 	// Copy entry (Ctrl+C)
-	if (e.GetKeyCode() == 'C' && e.ControlDown())
+	else if (e.GetKeyCode() == 'C' && e.ControlDown())
 		copyEntry();
 
 	// Cut entry (Ctrl+X)
-	if (e.GetKeyCode() == 'X' && e.ControlDown())
+	else if (e.GetKeyCode() == 'X' && e.ControlDown())
 		cutEntry();
 
 	// Paste entry (Ctrl+V)
-	if (e.GetKeyCode() == 'V' && e.ControlDown())
+	else if (e.GetKeyCode() == 'V' && e.ControlDown())
 		pasteEntry();
 
 	// Import to entry (Ctrl+I)
-	if (e.GetKeyCode() == 'I' && e.ControlDown())
+	else if (e.GetKeyCode() == 'I' && e.ControlDown())
 		importEntry();
 
 	// Export entry (Ctrl+E)
-	if (e.GetKeyCode() == 'E' && e.ControlDown() && !e.ShiftDown())
+	else if (e.GetKeyCode() == 'E' && e.ControlDown() && !e.ShiftDown())
 		exportEntry();
 
 	// Export entry to wad (Shift+Ctrl+E)
-	if (e.GetKeyCode() == 'E' && e.ShiftDown() && e.ControlDown())
+	else if (e.GetKeyCode() == 'E' && e.ShiftDown() && e.ControlDown())
 		exportEntryWad();
 
 	// Move entry up (Ctrl+U or Ctrl+Up Arrow)
-	if (e.ControlDown() && (e.GetKeyCode() == 'U' || e.GetKeyCode() == WXK_UP))
+	else if (e.ControlDown() && (e.GetKeyCode() == 'U' || e.GetKeyCode() == WXK_UP))
 		moveUp();
-
+				
 	// Move entry down (Ctrl+D or Ctrl+Down Arrow)
-	if (e.ControlDown() && (e.GetKeyCode() == 'D' || e.GetKeyCode() == WXK_DOWN))
+	else if (e.ControlDown() && (e.GetKeyCode() == 'D' || e.GetKeyCode() == WXK_DOWN))
 		moveDown();
 
 	// Select all entries (Ctrl+A)
-	if (e.GetKeyCode() == 'A' && e.ControlDown())
+	else if (e.GetKeyCode() == 'A' && e.ControlDown())
 		entry_list->selectAll();
 
 	// New entry (Ctrl+N)
-	if (e.GetKeyCode() == 'N' && e.ControlDown() && !e.ShiftDown())
+	else if (e.GetKeyCode() == 'N' && e.ControlDown() && !e.ShiftDown())
 		newEntry();
 	
 	// New entry from file (Shift+Ctrl+N)
-	if (e.GetKeyCode() == 'N' && e.ControlDown() && e.ShiftDown())
+	else if (e.GetKeyCode() == 'N' && e.ControlDown() && e.ShiftDown())
 		newEntryFromFile();
+
+	// Not handled here, send off to be handled by a parent window
+	else
+		e.Skip();
 }

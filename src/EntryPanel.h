@@ -7,6 +7,7 @@
 class EntryPanel : public wxPanel {
 private:
 	bool			modified;
+	wxStaticBox*	frame;
 
 protected:
 	ArchiveEntry*	entry;
@@ -27,6 +28,7 @@ public:
 	ArchiveEntry*	getEntry() { return entry; }
 	bool			isModified() { return modified; }
 
+	bool			openEntry(ArchiveEntry* entry);
 	virtual bool	loadEntry(ArchiveEntry* entry);
 	virtual bool	saveEntry();
 	virtual bool	revertEntry();

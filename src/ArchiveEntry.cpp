@@ -589,8 +589,8 @@ void ArchiveEntry::detectType(bool data_check, bool force) {
 	// Load data if needed
 	const uint8_t* data = getData(true);
 
-	//if (!data)
-	//	return;
+	if (!data)
+		return;
 
 	// PNG
 	if (size > 8) {

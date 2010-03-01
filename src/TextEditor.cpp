@@ -70,18 +70,19 @@ bool TextEditor::loadEntry(ArchiveEntry* entry) {
 	}
 
 	// Check that the entry has any data, if not do nothing
-	if (entry->getSize() == 0)
+	if (entry->getSize() == 0 || !entry->getData())
 		return true;
 
 	// Get character entry data
-	const char* data = (const char*)entry->getData();
-	if (!data) {
-		Global::error = _T("Cannot read entry data (see logfile for info)");
-		return false;
-	}
+	char* data = new char[entry->getSize() + 1];
+	memcpy(data, entry->getData(), entry->getSize());
+	data[entry->getSize()] = 0;
 
 	// Load text into editor
-	SetTextRaw((const char*)entry->getData());
+	SetTextRaw(data);
+
+	// Clean up
+	delete[] data;
 
 	return true;
 }

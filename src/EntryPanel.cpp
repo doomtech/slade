@@ -47,7 +47,7 @@ EntryPanel::EntryPanel(wxWindow* parent)
 	entry = NULL;
 
 	// Create & set sizer & border
-	wxStaticBox *frame = new wxStaticBox(this, -1, _T("Entry Contents"));
+	frame = new wxStaticBox(this, -1, _T("Entry Contents"));
 	wxStaticBoxSizer *framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
 	SetSizer(framesizer);
 	Show(false);
@@ -90,14 +90,37 @@ EntryPanel::~EntryPanel() {
  * always be false
  *******************************************************************/
 void EntryPanel::setModified(bool c) {
-	if (!entry)
+	if (!entry) {
 		modified = c;
+		return;
+	}
 	else {
 		if (entry->isLocked())
 			modified = false;
 		else
 			modified = c;
 	}
+
+	// Set frame label
+	if (modified)
+		frame->SetLabel(s_fmt(_T("Entry Contents (%s, unsaved changes)"), entry->getName().c_str()));
+	else
+		frame->SetLabel(s_fmt(_T("Entry Contents (%s)"), entry->getName().c_str()));
+}
+
+/* EntryPanel::openEntry
+ * 'Opens' the given entry (sets the frame label then loads it)
+ *******************************************************************/
+bool EntryPanel::openEntry(ArchiveEntry* entry) {
+	// Check entry was given
+	if (!entry)
+		return false;
+
+	// Set frame label
+	frame->SetLabel(s_fmt(_T("Entry Contents (%s)"), entry->getName().c_str()));
+
+	// Load the entry
+	return loadEntry(entry);
 }
 
 /* EntryPanel::loadEntry

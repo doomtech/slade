@@ -456,6 +456,9 @@ bool ZipArchive::save(string filename) {
 
 		// Copy current file contents to backup file
 		wxCopyFile(this->filename, bakfile);
+		
+		// Temporarily set filename to the backup file (in case reading is done during the save)
+		this->filename = bakfile;
 	}
 	else {
 		// If no backup needed, set bakfile anyway as it's needed for copying zip entries
@@ -475,6 +478,9 @@ bool ZipArchive::save(string filename) {
 		Global::error = _T("Unable to create zip for saving");
 		return false;
 	}
+
+	// Don't announce anything while saving
+	//setMuted(true);
 
 	// Open old zip for copying, if it exists. This is used to copy any entries
 	// that have been previously saved/compressed and are unmodified, to greatly
@@ -525,6 +531,7 @@ bool ZipArchive::save(string filename) {
 	zip.Close();
 	this->filename = filename;
 	on_disk = true;
+	setMuted(false);
 	setModified(false);
 	announce(_T("saved"));
 
@@ -580,6 +587,12 @@ bool ZipArchive::loadEntryData(ArchiveEntry* entry) {
 	wxZipEntry* zentry = zip.GetNextEntry();
 	for (long a = 0; a < zip_index; a++)
 		zentry = zip.GetNextEntry();
+	
+	// Abort if entry doesn't exist in zip (some kind of error)
+	if (!zentry) {
+		wxLogMessage(_T("Error: ZipEntry for entry \"%s\" does not exist in zip"), entry->getName().c_str());
+		return false;
+	}
 
 	// Read the data
 	uint8_t* data = new uint8_t[zentry->GetSize()];
@@ -905,14 +918,6 @@ bool ZipArchive::detectEntryType(ArchiveEntry* entry) {
 	// .txt extension, treat the entry as text (unless it's data proves otherwise)
 	if (fn.GetExt().CmpNoCase(_T("txt")) == 0)
 		entry->setType(ETYPE_TEXT);
-
-	/* Below types really need to be detected via data rather than extension
-	if (fn.GetExt().CmpNoCase(_T("png")) == 0)
-		entry->setType(ETYPE_PNG);
-
-	if (fn.GetExt().CmpNoCase(_T("wad")) == 0)
-		entry->setType(ETYPE_WAD);
-	 */
 
 	// .acs extension - usually an acs script in text format
 	if (fn.GetExt().CmpNoCase(_T("acs")) == 0) {

@@ -1,4 +1,3 @@
-
 /*******************************************************************
  * SLADE - It's a Doom Editor
  * Copyright (C) 2008 Simon Judd
@@ -33,6 +32,7 @@
 #include "Console.h"
 #include "ArchiveManager.h"
 #include "ZipArchive.h"
+#include <wx/filename.h>
 
 
 /*******************************************************************
@@ -108,7 +108,7 @@ uint16_t EntryDataFormat::detectFormat(MemChunk& mc) {
 	// WAV Sound
 	if (detectSndWav(mc))
 		return EDF_SND_WAV;
-		
+
 	// XM Module
 	if (detectModXm(mc))
 		return EDF_MOD_XM;
@@ -353,6 +353,7 @@ EntryType::EntryType(string id) {
 	name = _T("Unknown");
 	format = EDF_ANY;
 	extension = _T("dat");
+	icon = _T("e_default");
 	size_limit[0] = -1;
 	size_limit[1] = -1;
 }
@@ -390,6 +391,90 @@ void EntryType::dump() {
 		wxLogMessage(s_fmt(_T("Size Multiple: %d"), size_multiple[a]));
 
 	wxLogMessage(_T("---"));
+}
+
+bool EntryType::isThisType(ArchiveEntry* entry) {
+	// Check entry was given
+	if (!entry)
+		return false;
+
+	// Get full entry name as filename
+	wxFileName fn(entry->getName());
+
+	// Check min size
+	if (size_limit[0] >= 0 && entry->getSize() < size_limit[0])
+		return false;
+
+	// Check max size
+	if (size_limit[1] >= 0 && entry->getSize() > size_limit[1])
+		return false;
+
+	// Check for size match if needed
+	if (match_size.size() > 0) {
+		bool match = false;
+		for (size_t a = 0; a < match_size.size(); a++) {
+			if (entry->getSize() == match_size[a]) {
+				match = true;
+				break;
+			}
+		}
+
+		if (!match)
+			return false;
+	}
+
+	// Check for name match if needed
+	if (match_name.size() > 0) {
+		bool match = false;
+		for (size_t a = 0; a < match_name.size(); a++) {
+			if (!fn.GetName().CmpNoCase(match_name[a])) {
+				match = true;
+				break;
+			}
+		}
+
+		if (!match)
+			return false;
+	}
+
+	// Check for extension match if needed
+	if (match_extension.size() > 0) {
+		bool match = false;
+		for (size_t a = 0; a < match_extension.size(); a++) {
+			if (!fn.GetExt().CmpNoCase(match_extension[a])) {
+				match = true;
+				break;
+			}
+		}
+
+		if (!match)
+			return false;
+	}
+
+	// Check for size multiple match if needed
+	if (size_multiple.size() > 0) {
+		bool match = false;
+		for (size_t a = 0; a < size_multiple.size(); a++) {
+			if (entry->getSize() % size_multiple[a] == 0) {
+				match = true;
+				break;
+			}
+		}
+
+		if (!match)
+			return false;
+	}
+
+	// Check for data format match if needed
+	if (format != EDF_ANY) {
+		uint16_t data_format = EntryDataFormat::detectFormat(entry->getMCData());
+
+		if (data_format != format)
+			return false;
+	}
+
+	// Passed all checks, so we have a match
+	return true;
 }
 
 /* EntryType::readEntryTypeDefinition
@@ -472,6 +557,19 @@ bool EntryType::readEntryTypeDefinition(MemChunk& mc) {
 						if (!format.Cmp(formats[a].id))
 							ntype->setFormat(formats[a].format);
 					}
+				}
+
+				// Icon field
+				if (!token.Cmp(_T("icon"))) {
+					if (!tz.checkToken(_T("=")))	// Check for =
+						return false;
+
+					string icon = tz.getToken();	// Get format value
+
+					if (!tz.checkToken(_T(";")))	// Check for ;
+						return false;
+
+					ntype->setIcon(icon);			// Set type icon
 				}
 
 				// MatchExtension field
@@ -614,6 +712,25 @@ bool EntryType::loadEntryTypes() {
 	return readEntryTypeDefinition(et_entry->getMCData());
 }
 
+/* EntryType::detectEntryType
+ * Attempts to detect the given entry's type
+ *******************************************************************/
+bool EntryType::detectEntryType(ArchiveEntry* entry) {
+	bool detected = false;
+	// Go through all registered types
+	for (size_t a = 0; a < entry_types.size(); a++) {
+		if (entry_types[a]->isThisType(entry)) {
+			wxLogMessage(_T("Entry %s detected as %s"), entry->getName(), entry_types[a]->getName());
+			detected = true;
+		}
+	}
+
+	if (!detected)
+		wxLogMessage(_T("Entry %s unknown"), entry->getName());
+
+	return false;
+}
+
 
 /* Console Command - "test_entry_types"
  * Testingggg
@@ -622,3 +739,16 @@ void c_test_entry_types(vector<string> args) {
 	EntryType::loadEntryTypes();
 }
 ConsoleCommand et_test_entry_types(_T("test_entry_types"), &c_test_entry_types, 0);
+
+
+/* Console Command - "test_entry_type_detection"
+ * Testingggg moar
+ *******************************************************************/
+void c_test_entry_type_detection(vector<string> args) {
+	Archive* archive = theArchiveManager->getArchive(0);
+
+	for (uint32_t a = 0; a < archive->numEntries(); a++) {
+		EntryType::detectEntryType(archive->getEntry(a));
+	}
+}
+ConsoleCommand et_test_entry_type_detection(_T("test_entry_type_detection"), &c_test_entry_type_detection, 0);

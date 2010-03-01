@@ -2,6 +2,8 @@
 #ifndef __ENTRYTYPE_H__
 #define __ENTRYTYPE_H__
 
+#include "ArchiveEntry.h"
+
 enum {
 	EDF_ANY = 0,
 	EDF_PNG,
@@ -53,7 +55,8 @@ private:
 	// Type info
 	string		id;
 	string		name;
-	string		extension;			// File extension to use when exporting entries of this type
+	string		extension;	// File extension to use when exporting entries of this type
+	string		icon;		// Icon to use in entry list
 
 	// Type matching criteria
 	uint16_t		format;				// To be of this type, the entry data must match the specified format
@@ -70,6 +73,7 @@ public:
 	// Setters
 	void setName(string name)			{ this->name = name; }
 	void setExtension(string extension)	{ this->extension = extension; }
+	void setIcon(string icon)			{ this->icon = icon; }
 	void setFormat(uint16_t format)		{ this->format = format; }
 	void addMatchExtension(string ext) 	{ this->match_extension.push_back(ext); }
 	void addMatchName(string name) 		{ this->match_name.push_back(name); }
@@ -83,21 +87,18 @@ public:
 	string		getName()		{ return name; }
 	string		getExtension()	{ return extension; }
 	uint16_t	getFormat()		{ return format; }
-	/*
-	string		getMatchExtension()	{ return match_extension; }
-	string		getMatchName()		{ return match_name; }
-	int			getMinSize()		{ return size_limit[0]; }
-	int			getMaxSize()		{ return size_limit[1]; }
-	int			getSizeMultiple()	{ return size_multiple; }
-	*/
 
 	// Misc
 	void	addToList();
 	void	dump();
 
+	// Magic goes here
+	bool	isThisType(ArchiveEntry* entry);
+
 	// Static functions
 	static bool readEntryTypeDefinition(MemChunk& mc);
 	static bool loadEntryTypes();
+	static bool detectEntryType(ArchiveEntry* entry);
 };
 
 #endif//__ENTRYTYPE_H__
