@@ -271,7 +271,7 @@ bool WadArchive::openFile(string filename) {
 		}
 
 		// Detect entry type
-		entry->detectType(true, true);
+		EntryType::detectEntryType(entry);
 
 		// Unload entry data if needed
 		if (!archive_load_data)
@@ -586,7 +586,7 @@ vector<Archive::mapdesc_t> WadArchive::detectMaps() {
 
 	// Set all map header entries to ETYPE_MAP type
 	for (size_t a = 0; a < maps.size(); a++)
-		maps[a].head->setType(ETYPE_MAP);
+		maps[a].head->setType(EntryType::getType(_T("map")));
 
 	return maps;
 }
@@ -791,6 +791,7 @@ bool WadArchive::renameEntry(ArchiveEntry* entry, string new_name) {
  * in the wad archive (will be overridden if the entry's data later
  * proves it to be another format)
  *******************************************************************/
+/*
 bool WadArchive::detectEntryType(ArchiveEntry* entry) {
 	// Check the entry is valid and part of this archive
 	if (!checkEntry(entry))
@@ -799,7 +800,6 @@ bool WadArchive::detectEntryType(ArchiveEntry* entry) {
 	// Check if entry is within any markers
 	int index = entryIndex(entry);
 
-	/*
 	// Patches
 	if (index > patches[0] && index < patches[1]) {
 		entry->setType(ETYPE_PATCH);
@@ -817,9 +817,32 @@ bool WadArchive::detectEntryType(ArchiveEntry* entry) {
 		entry->setType(ETYPE_SPRITE);
 		return true;
 	}
-	 */
 
 	return true;
+}
+ */
+
+string WadArchive::detectEntrySection(ArchiveEntry* entry) {
+	// Check the entry is valid and part of this archive
+	if (!checkEntry(entry))
+		return _T("none");
+
+	// Check if entry is within any markers
+	int index = entryIndex(entry);
+
+	// Patches
+	if (index > patches[0] && index < patches[1])
+		return _T("patches");
+
+	// Flats
+	if (index > flats[0] && index < flats[1])
+		return _T("flats");
+
+	// Sprites
+	if (index > sprites[0] && index < sprites[1])
+		return _T("sprites");
+
+	return _T("none");
 }
 
 ArchiveEntry* WadArchive::findEntry(string search) {

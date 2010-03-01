@@ -45,23 +45,15 @@ bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry) {
 	if (!entry)
 		return false;
 
-	switch (entry->getType()) {
+	switch (entry->getType()->getFormat()) {
 		// General image formats
-		case ETYPE_PNG:
-			return image->loadImage(entry->getData(true), entry->getSize());
-		case ETYPE_IMAGE:
+		case EDF_PNG:
 			return image->loadImage(entry->getData(true), entry->getSize());
 		// Doom gfx format
-		case ETYPE_GFX:
-			return image->loadDoomGfx(entry->getData(true), entry->getSize());
-		case ETYPE_PATCH:
-			return image->loadDoomGfx(entry->getData(true), entry->getSize());
-		case ETYPE_SPRITE:
+		case EDF_GFX_DOOM:
 			return image->loadDoomGfx(entry->getData(true), entry->getSize());
 		// Doom flat format
-		case ETYPE_FLAT:
-			return image->loadDoomFlat(entry->getData(true), entry->getSize());
-		case ETYPE_GFX2:
+		case EDF_GFX_FLAT:
 			return image->loadDoomFlat(entry->getData(true), entry->getSize());
 	}
 

@@ -41,7 +41,7 @@
  * PaletteEntryPanel class constructor
  *******************************************************************/
 PaletteEntryPanel::PaletteEntryPanel(wxWindow* parent)
-: EntryPanel(parent) {
+: EntryPanel(parent, _T("palette")) {
 	// Add palette canvas
 	pal_canvas = new PaletteCanvas(this, -1);
 	sizer_main->Add(pal_canvas, 1, wxEXPAND|wxALL, 4);

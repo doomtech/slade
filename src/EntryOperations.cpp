@@ -66,15 +66,14 @@ bool EntryOperations::modifyGfxOffsets(ArchiveEntry* entry, int auto_type, point
 		return false;
 
 	// Check entry type
-	int type = entry->getType();
-	if (!(type == ETYPE_GFX || type == ETYPE_PATCH ||
-		type == ETYPE_SPRITE || type == ETYPE_PNG)) {
+	EntryType* type = entry->getType();
+	if (!(type->getFormat() == EDF_GFX_DOOM || type->getFormat() == EDF_PNG)) {
 		wxLogMessage(s_fmt(_T("Entry \"%s\" is of type \"%s\" which does not support offsets"), entry->getName().c_str(), entry->getTypeString().c_str()));
 		return false;
 	}
 
 	// Doom gfx format
-	if (type == ETYPE_GFX || type == ETYPE_PATCH || type == ETYPE_SPRITE) {
+	if (type->getFormat() == EDF_GFX_DOOM) {
 		// Get patch header
 		patch_header_t header;
 		entry->read(&header, 8);
@@ -119,7 +118,7 @@ bool EntryOperations::modifyGfxOffsets(ArchiveEntry* entry, int auto_type, point
 	}
 
 	// PNG format
-	else if (type == ETYPE_PNG) {
+	else if (type->getFormat() == EDF_PNG) {
 		// Read width and height from IHDR chunk
 		const uint8_t* data = entry->getData(true);
 		const ihdr_t* ihdr = (ihdr_t*)(data + 12);

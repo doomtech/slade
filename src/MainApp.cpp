@@ -253,6 +253,9 @@ bool MainApp::OnInit() {
 	// Load program icons
 	loadIcons();
 
+	// Load entry types
+	EntryType::loadEntryTypes();
+
 	// Create the main window
 	main_window = new MainWindow();
 

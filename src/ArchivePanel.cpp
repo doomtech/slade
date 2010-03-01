@@ -61,7 +61,7 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 	listenTo(archive);
 
 	// Create entry panels
-	entry_area = new EntryPanel(this);
+	entry_area = new EntryPanel(this, _T("nil"));
 	default_area = new DefaultEntryPanel(this);
 	text_area = new TextEntryPanel(this);
 	gfx_area = new GfxEntryPanel(this);
@@ -551,43 +551,48 @@ bool ArchivePanel::openEntry(ArchiveEntry* entry) {
 		return false;
 
 	// Detect entry type if it hasn't been already
-	if (entry->getType() == ETYPE_UNKNOWN)
-		entry->detectType(true);
+	if (entry->getType() == EntryType::unknownType())
+		EntryType::detectEntryType(entry);
+		//entry->detectType(true);
 
 	// Get the appropriate entry panel for the entry's type
 	EntryPanel* new_area = default_area;
-	switch (entry->getType()) {
-		case ETYPE_TEXT:
+	if (!entry->getType()->getEditor().Cmp(_T("gfx")))
+		new_area = gfx_area;
+	else if (!entry->getType()->getEditor().Cmp(_T("palette")))
+		new_area = pal_area;
+	else if (!entry->getType()->getEditor().Cmp(_T("text")))
+		new_area = text_area;
+	else if (!entry->getType()->getEditor().Cmp(_T("texturex")))
+		new_area = texturex_area;
+	/*
+	switch (entry->getType()->getFormat()) {
+		case EDF_TEXT:
 			new_area = text_area;
 			break;
-		case ETYPE_PATCH:
+		case EDF_GFX_DOOM:
 			new_area = gfx_area;
 			break;
-		case ETYPE_SPRITE:
+		case EDF_GFX_FLAT:
 			new_area = gfx_area;
 			break;
-		case ETYPE_FLAT:
+		case EDF_BMP:
 			new_area = gfx_area;
 			break;
-		case ETYPE_GFX:
+		case EDF_PNG:
 			new_area = gfx_area;
 			break;
-		case ETYPE_GFX2:
+		case EDF_JPEG:
 			new_area = gfx_area;
 			break;
-		case ETYPE_PNG:
-			new_area = gfx_area;
-			break;
-		case ETYPE_IMAGE:
-			new_area = gfx_area;
-			break;
-		case ETYPE_PLAYPAL:
+		case EDF_PA:
 			new_area = pal_area;
 			break;
-		case ETYPE_TEXTURES:
+		case EDF_TEXTU:
 			new_area = texturex_area;
 			break;
 	}
+	 */
 
 	// Show the new entry panel
 	if (!showEntryPanel(new_area))
@@ -707,11 +712,7 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 	for (size_t a = 0; a < selection.size(); a++) {
 		// Check for gfx entry
 		if (!gfx_selected) {
-			uint8_t entry_type = selection[a]->getType();
-			if (entry_type == ETYPE_GFX || entry_type == ETYPE_GFX2 ||
-				entry_type == ETYPE_FLAT || entry_type == ETYPE_SPRITE ||
-				entry_type == ETYPE_PATCH || entry_type == ETYPE_PNG ||
-				entry_type == ETYPE_IMAGE)
+			if (!selection[a]->getType()->getEditor().Cmp(_T("gfx")))
 				gfx_selected = true;
 		}
 	}

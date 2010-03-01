@@ -8,6 +8,7 @@ class EntryPanel : public wxPanel {
 private:
 	bool			modified;
 	wxStaticBox*	frame;
+	string			id;
 
 protected:
 	ArchiveEntry*	entry;
@@ -22,7 +23,7 @@ protected:
 	void	setModified(bool c = true);
 
 public:
-	EntryPanel(wxWindow* parent);
+	EntryPanel(wxWindow* parent, string id);
 	~EntryPanel();
 
 	ArchiveEntry*	getEntry() { return entry; }

@@ -69,7 +69,7 @@ EXTERN_CVAR(Bool, archive_load_data)
  *******************************************************************/
 zipdir_t::zipdir_t() {
 	entry = new ArchiveEntry();
-	entry->setType(ETYPE_FOLDER);
+	entry->setType(EntryType::folderType());
 	entry->setState(0);
 }
 
@@ -271,7 +271,7 @@ void zipdir_t::addToList(vector<ArchiveEntry*>& list) {
  * ZipArchive class constructor
  *******************************************************************/
 ZipArchive::ZipArchive()
-: Archive(ARCHIVE_ZIP) {
+		: Archive(ARCHIVE_ZIP) {
 	directory = new zipdir_t;
 	directory->parent_dir = NULL;
 	directory->setName(_T(""));
@@ -406,7 +406,7 @@ bool ZipArchive::openFile(string filename) {
 			new_entry->setState(0);
 
 			// Determine it's type
-			new_entry->detectType(true, true);
+			EntryType::detectEntryType(new_entry);
 
 			// Unload data if needed
 			if (!archive_load_data)
@@ -414,8 +414,7 @@ bool ZipArchive::openFile(string filename) {
 
 			// Clean up
 			delete[] data;
-		}
-		else {
+		} else {
 			// Zip entry is a directory, add it to the directory tree
 			wxFileName fn(entry->GetName(wxPATH_UNIX), wxPATH_UNIX);
 			zipdir_t* ndir = addDirectory(fn.GetPath(true, wxPATH_UNIX));
@@ -456,11 +455,10 @@ bool ZipArchive::save(string filename) {
 
 		// Copy current file contents to backup file
 		wxCopyFile(this->filename, bakfile);
-		
+
 		// Temporarily set filename to the backup file (in case reading is done during the save)
 		this->filename = bakfile;
-	}
-	else {
+	} else {
 		// If no backup needed, set bakfile anyway as it's needed for copying zip entries
 		bakfile = this->filename;
 	}
@@ -499,7 +497,7 @@ bool ZipArchive::save(string filename) {
 
 	// Go through all entries
 	for (size_t a = 0; a < entries.size(); a++) {
-		if (entries[a]->getType() == ETYPE_FOLDER) {
+		if (entries[a]->getType() == EntryType::folderType()) {
 			// If the current entry is a folder, just write a directory entry and continue
 			zip.PutNextDirEntry(entries[a]->getExProp(_T("Directory")) + entries[a]->getName());
 			entries[a]->setState(0);
@@ -512,8 +510,7 @@ bool ZipArchive::save(string filename) {
 			wxZipEntry* zipentry = new wxZipEntry(getEntryFullPath(entries[a]));
 			zip.PutNextEntry(zipentry);
 			zip.Write(entries[a]->getData(), entries[a]->getSize());
-		}
-		else {
+		} else {
 			// If the entry is unmodified and exists in the old zip, just copy it over
 			int index = atoi(entries[a]->getExProp(_T("ZipIndex")).ToAscii());
 			c_entries[index]->SetName(getEntryFullPath(entries[a]));
@@ -587,7 +584,7 @@ bool ZipArchive::loadEntryData(ArchiveEntry* entry) {
 	wxZipEntry* zentry = zip.GetNextEntry();
 	for (long a = 0; a < zip_index; a++)
 		zentry = zip.GetNextEntry();
-	
+
 	// Abort if entry doesn't exist in zip (some kind of error)
 	if (!zentry) {
 		wxLogMessage(_T("Error: ZipEntry for entry \"%s\" does not exist in zip"), entry->getName().c_str());
@@ -651,8 +648,7 @@ bool ZipArchive::addEntry(ArchiveEntry* entry, uint32_t position) {
 	if (position >= dir->numEntries()) {
 		dir->entries.push_back(entry);
 		position = dir->entries.size() - 1;
-	}
-	else
+	} else
 		dir->entries.insert(dir->entries.begin() + position, entry);
 
 	// Update variables etc
@@ -854,8 +850,7 @@ bool ZipArchive::renameEntry(ArchiveEntry* entry, string new_name) {
 		// If no directory was given, just rename the entry
 		entry->rename(new_name);
 		return true;
-	}
-	else {
+	} else {
 		// Otherwise create the directory first if needed
 		string new_dir;
 		zipdir_t* cdir = getEntryDirectory(entry);
@@ -864,8 +859,7 @@ bool ZipArchive::renameEntry(ArchiveEntry* entry, string new_name) {
 		if (!absolute) {
 			// If it wasn't, add the given directory to the entry's current directory path
 			new_dir = cdir->getFullPath() + fn.GetPath(true, wxPATH_UNIX);
-		}
-		else {
+		} else {
 			// If it was absolute, set the directory to what was given
 			new_dir = fn.GetPath(true, wxPATH_UNIX);
 		}
@@ -907,6 +901,7 @@ vector<Archive::mapdesc_t> ZipArchive::detectMaps() {
  * in the zip and it's name/extension (will be overridden if the
  * entry's data later proves it to be another format)
  *******************************************************************/
+/*
 bool ZipArchive::detectEntryType(ArchiveEntry* entry) {
 	// Check the entry is valid and belongs to this archive
 	if (!checkEntry(entry))
@@ -940,6 +935,36 @@ bool ZipArchive::detectEntryType(ArchiveEntry* entry) {
 
 	return true;
 }
+*/
+
+string ZipArchive::detectEntrySection(ArchiveEntry* entry) {
+	// Check the entry is valid and belongs to this archive
+	if (!checkEntry(entry))
+		return _T("none");
+
+	// Get the entry's first directory
+	zipdir_t* dir = getEntryDirectory(entry);
+	while (dir->parent_dir != directory)
+		dir = dir->parent_dir;
+
+	// Patches
+	if (dir->getName() == _T("patches"))
+		return _T("patches");
+
+	// Sprites
+	if (dir->getName() == _T("sprites"))
+		return _T("sprites");
+
+	// Flats
+	if (dir->getName() == _T("flats"))
+		return _T("flats");
+
+	// Textures
+	if (dir->getName() == _T("textures"))
+		return _T("textures");
+	
+	return _T("none");
+}
 
 ArchiveEntry* ZipArchive::findEntry(string search) {
 	return NULL;
@@ -971,7 +996,7 @@ zipdir_t* ZipArchive::getEntryDirectory(ArchiveEntry* entry, zipdir_t* dir) {
 	if (!dir)
 		dir = directory;
 
-	// If the entry exissrc/ZipArchive.cpp:842: error: ‘WadArchive’ has not been declaredts in the current directory, return it
+	// If the entry exists in the current directory, return it
 	if (dir->entryExists(entry))
 		return dir;
 
@@ -1067,9 +1092,9 @@ zipdir_t* ZipArchive::getDirectory(ArchiveEntry* dir_entry, zipdir_t* dir) {
 	// If no current directory was specified, set it to the root directory
 	if (!dir)
 		dir = directory;
-	
+
 	// Check if the given entry is a directory entry
-	if (dir_entry->getType() != ETYPE_FOLDER)
+	if (dir_entry->getType() != EntryType::folderType())
 		return NULL;
 
 	// Check if the given entry is the current directory's entry

@@ -57,7 +57,7 @@ ArchiveEntry::ArchiveEntry(string name, uint32_t size, Archive* parent) {
 	this->size = size;
 	this->data_loaded = true;
 	this->state = 2;
-	this->type = ETYPE_UNKNOWN;
+	this->type = EntryType::unknownType();
 	this->locked = false;
 	this->state_locked = false;
 }
@@ -304,7 +304,7 @@ bool ArchiveEntry::importMem(const void* data, uint32_t size) {
 	// Update attributes
 	this->size = size;
 	setLoaded();
-	setType(ETYPE_UNKNOWN);
+	setType(EntryType::unknownType());
 	setState(1);
 
 	return true;
@@ -391,7 +391,7 @@ bool ArchiveEntry::importFileStream(FILE* fp, uint32_t len) {
 		// Update attributes
 		this->size = data.getSize();
 		setLoaded();
-		setType(ETYPE_UNKNOWN);
+		setType(EntryType::unknownType());
 		setState(1);
 
 		return true;
@@ -448,6 +448,7 @@ bool ArchiveEntry::exportFile(string filename) {
 /* ArchiveEntry::detectType
  * Attempts to detect what type of data the entry holds
  *******************************************************************/
+/*
 void ArchiveEntry::detectType(bool data_check, bool force) {
 	// If the type is already known and we're not forcing a detect, don't bother
 	if (!force && type != ETYPE_UNKNOWN)
@@ -749,11 +750,13 @@ void ArchiveEntry::detectType(bool data_check, bool force) {
 	if (!no_unload)
 		unloadData();
 }
+ */
 
 /* ArchiveEntry::getTypeString
  * Returns a string representation of the entry's type
  *******************************************************************/
 string ArchiveEntry::getTypeString() {
+	/*
 	// Check for a custom type string
 	if (hasExProp(_T("EntryType")))
 		return getExProp(_T("EntryType"));
@@ -801,6 +804,9 @@ string ArchiveEntry::getTypeString() {
 	if (type == ETYPE_FOLDER) return _T("Directory");
 
 	return _T("Unknown");
+	 */
+
+	return type->getName();
 }
 
 string ArchiveEntry::getSizeString() {

@@ -66,7 +66,7 @@ ZipEntryListPanel::ZipEntryListPanel(wxWindow* parent, int id, Archive* archive)
 
 	// Create dummy folder entry (all folder list items will point to this entry)
 	dummy_folder_entry = new ArchiveEntry();
-	dummy_folder_entry->setType(ETYPE_FOLDER);
+	dummy_folder_entry->setType(EntryType::folderType());
 	dummy_folder_entry->setState(0);
 	dummy_folder_entry->setName(_T(".."));
 
@@ -122,8 +122,8 @@ void ZipEntryListPanel::updateDirectoryEntry(int index) {
 
 	// If the entry is the 'up directory' entry, set it's icon to
 	// the 'up directory' icon
-	if (dir == getCurrentDir()->parent_dir)
-		entry_list->SetItemImage(index, ETYPE_FOLDER + 1);
+	//if (dir == getCurrentDir()->parent_dir)
+	//	entry_list->SetItemImage(index, ETYPE_FOLDER + 1);
 
 	// Set it's size column manually
 	if (col_size) {
@@ -560,7 +560,7 @@ void ZipEntryListPanel::onEntryListActivated(wxListEvent& e) {
 		return;
 
 	// Check for folder
-	if (entry->getType() == ETYPE_FOLDER) {
+	if (entry->getType() == EntryType::folderType()) {
 		// If a folder was activated, open it
 		if (entry != dummy_folder_entry) {
 			cur_directory = getCurrentDir()->getSubDir(e.GetText());

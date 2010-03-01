@@ -133,7 +133,7 @@ bool EntryList::updateEntry(int index) {
 	}
 
 	// Detect type
-	entry->detectType(true, false);
+	EntryType::detectEntryType(entry);
 
 	// Disable size update
 	bool update = enableSizeUpdate();
@@ -155,7 +155,7 @@ bool EntryList::updateEntry(int index) {
 		setItemStatus(index, LV_STATUS_NEW);
 
 	// Set item icon
-	SetItemImage(index, entry->getType());
+	//SetItemImage(index, entry->getType());
 
 	// Set size
 	enableSizeUpdate(update);

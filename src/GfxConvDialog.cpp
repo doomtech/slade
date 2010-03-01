@@ -303,10 +303,7 @@ void GfxConvDialog::updateControls() {
 	ArchiveEntry* entry = entries[current_entry];
 
 	// Disable/enable current gfx palette as needed
-	if (entry->getType() == ETYPE_FLAT ||
-		entry->getType() == ETYPE_GFX ||
-		entry->getType() == ETYPE_GFX2 ||
-		entry->getType() == ETYPE_SPRITE)
+	if (entry->getType()->getFormat() == EDF_GFX_DOOM || entry->getType()->getFormat() == EDF_GFX_FLAT)
 		pal_chooser_current->Enable(true);
 	else
 		pal_chooser_current->Enable(false);

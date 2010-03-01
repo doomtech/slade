@@ -2,7 +2,7 @@
 #ifndef __ENTRYTYPE_H__
 #define __ENTRYTYPE_H__
 
-#include "ArchiveEntry.h"
+class ArchiveEntry;
 
 enum {
 	EDF_ANY = 0,
@@ -20,6 +20,7 @@ enum {
 	EDF_MOD_MOD,
 	EDF_SND_DOOM,
 	EDF_SND_WAV,
+	EDF_TEXT,
 
 	EDF_UNKNOWN,
 };
@@ -57,6 +58,7 @@ private:
 	string		name;
 	string		extension;	// File extension to use when exporting entries of this type
 	string		icon;		// Icon to use in entry list
+	string		editor;		// The in-program editor to use (hardcoded ids, see *EntryPanel constructors)
 
 	// Type matching criteria
 	uint16_t		format;				// To be of this type, the entry data must match the specified format
@@ -75,6 +77,7 @@ public:
 	void setExtension(string extension)	{ this->extension = extension; }
 	void setIcon(string icon)			{ this->icon = icon; }
 	void setFormat(uint16_t format)		{ this->format = format; }
+	void setEditor(string editor)		{ this->editor = editor; }
 	void addMatchExtension(string ext) 	{ this->match_extension.push_back(ext); }
 	void addMatchName(string name) 		{ this->match_name.push_back(name); }
 	void setMinSize(int size) 			{ this->size_limit[0] = size; }
@@ -87,6 +90,8 @@ public:
 	string		getName()		{ return name; }
 	string		getExtension()	{ return extension; }
 	uint16_t	getFormat()		{ return format; }
+	string		getEditor()		{ return editor; }
+	string		getIcon()		{ return icon; }
 
 	// Misc
 	void	addToList();
@@ -96,9 +101,12 @@ public:
 	bool	isThisType(ArchiveEntry* entry);
 
 	// Static functions
-	static bool readEntryTypeDefinition(MemChunk& mc);
-	static bool loadEntryTypes();
-	static bool detectEntryType(ArchiveEntry* entry);
+	static bool 		readEntryTypeDefinition(MemChunk& mc);
+	static bool 		loadEntryTypes();
+	static bool 		detectEntryType(ArchiveEntry* entry);
+	static EntryType*	getType(string id);
+	static EntryType*	unknownType();
+	static EntryType*	folderType();
 };
 
 #endif//__ENTRYTYPE_H__

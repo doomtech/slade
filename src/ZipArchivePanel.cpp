@@ -283,7 +283,7 @@ bool ZipArchivePanel::renameEntry() {
 		string old_name = entry->getName();
 
 		// If the entry is a folder then skip it
-		if (entry->getType() == ETYPE_FOLDER)
+		if (entry->getType() == EntryType::folderType())
 			continue;
 
 		// Prompt for a new name
@@ -336,7 +336,7 @@ bool ZipArchivePanel::deleteEntry() {
 	// Go through the list
 	for (size_t a = 0; a < selection.size(); a++) {
 		// Remove the current selected entry if it isn't a directory
-		if (selection[a]->getType() != ETYPE_FOLDER)
+		if (selection[a]->getType() != EntryType::folderType())
 			archive->removeEntry(selection[a]);
 	}
 
@@ -368,7 +368,7 @@ bool ZipArchivePanel::copyEntry() {
 	// Go through the list
 	for (size_t a = 0; a < selection.size(); a++) {
 		// Copy the current selected entry if it isn't a directory
-		if (selection[a]->getType() != ETYPE_FOLDER)
+		if (selection[a]->getType() != EntryType::folderType())
 			theClipboard->addItem(new EntryClipboardItem(selection[a]));
 	}
 
@@ -384,7 +384,7 @@ bool ZipArchivePanel::copyEntry() {
 		// Create clipboard item from non-directory entries
 		ZipDirClipboardItem* item = new ZipDirClipboardItem();
 		for (size_t a = 0; a < entries.size(); a++) {
-			if (entries[a]->getType() != ETYPE_FOLDER)
+			if (entries[a]->getType() != EntryType::folderType())
 				item->addEntry(entries[a]);
 		}
 

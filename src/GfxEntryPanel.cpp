@@ -44,7 +44,7 @@
  * GfxEntryPanel class constructor
  *******************************************************************/
 GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
-: EntryPanel(parent) {
+: EntryPanel(parent, _T("gfx")) {
 	// Create sizer for this panel
 	wxBoxSizer* m_vbox = new wxBoxSizer(wxVERTICAL);
 	sizer_main->Add(m_vbox, 1, wxEXPAND);
@@ -193,15 +193,14 @@ void GfxEntryPanel::updateImagePalette() {
 int GfxEntryPanel::detectOffsetType() {
 	if (!entry)
 		return GFXVIEW_DEFAULT;
-
-	// Check entry type
-	int type = entry->getType();
-
-	if (type == ETYPE_PATCH || type == ETYPE_FLAT ||
-		type == ETYPE_GFX || type == ETYPE_GFX2)
+	
+	if (!entry->getParent())
 		return GFXVIEW_DEFAULT;
 
-	else if (type == ETYPE_SPRITE) {
+	// Check what section of the archive the entry is in
+	string section = entry->getParent()->detectEntrySection(entry);
+
+	if (section == _T("sprites")) {
 		SImage* img = gfx_canvas->getImage();
 		int left = -img->offset().x;
 		int right = -img->offset().x + img->getWidth();
@@ -214,7 +213,8 @@ int GfxEntryPanel::detectOffsetType() {
 			return GFXVIEW_SPRITE;
 	}
 
-	else if (type == ETYPE_PNG || type == ETYPE_IMAGE) {
+	// Check for png image
+	if (entry->getType()->getFormat() == EDF_PNG) {
 		if (gfx_canvas->getImage()->offset().x == 0 &&
 			gfx_canvas->getImage()->offset().y == 0)
 			return GFXVIEW_DEFAULT;

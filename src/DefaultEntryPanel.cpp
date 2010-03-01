@@ -43,7 +43,7 @@
  * DefaultEntryPanel class constructor
  *******************************************************************/
 DefaultEntryPanel::DefaultEntryPanel(wxWindow* parent)
-: EntryPanel(parent) {
+: EntryPanel(parent, _T("default")) {
 	// Create widgets
 	label_type = new wxStaticText(this, -1, _T("Entry Type:"));
 	label_size = new wxStaticText(this, -1, _T("Entry Size:"));
@@ -144,7 +144,7 @@ bool DefaultEntryPanel::loadEntry(ArchiveEntry* entry) {
 
 	// Check whether to show the 'edit as text' button
 	bool show_btn_edittext = true;
-	if (entry->getType() == ETYPE_FOLDER)
+	if (entry->getType() == EntryType::folderType())
 		show_btn_edittext = false;
 
 	// Show entry info stuff
@@ -168,7 +168,7 @@ bool DefaultEntryPanel::saveEntry() {
 	entry->importMem(text_raw, text_raw.length());
 
 	// Set entry type to text
-	entry->setType(ETYPE_TEXT);
+	//entry->setType(ETYPE_TEXT);
 	entry->setState(1);
 
 	return true;

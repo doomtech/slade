@@ -44,7 +44,7 @@
  * TextureXEntryPanel class constructor
  *******************************************************************/
 TextureXEntryPanel::TextureXEntryPanel(wxWindow* parent)
-: EntryPanel(parent) {
+: EntryPanel(parent, _T("texturex")) {
 	// Setup panel sizer
 	wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
 	sizer_main->Add(sizer, 1, wxEXPAND, 0);

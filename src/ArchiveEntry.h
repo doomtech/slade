@@ -6,8 +6,10 @@ class Archive;
 
 #include "ListenerAnnouncer.h"
 #include "MemChunk.h"
+#include "EntryType.h"
 
 // Entry types enum
+/*
 enum {
 	ETYPE_UNKNOWN = 0,
 	ETYPE_MARKER,
@@ -55,6 +57,7 @@ enum {
 
 	ETYPE_COUNT,
 };
+*/
 
 class ArchiveEntry : public Announcer {
 private:
@@ -63,8 +66,9 @@ private:
 	MemChunk		data;
 	uint32_t		size;
 	bool			data_loaded;
-	uint8_t			type;
-	uint8_t			state;		// 0 = unmodified, 1 = modified, 2 = newly created
+	//uint8_t		type;
+	EntryType*		type;
+	uint8_t			state;			// 0 = unmodified, 1 = modified, 2 = newly created
 	bool			locked;
 	bool			state_locked;	// If true entry state cannot be changed (for initial loading etc)
 	PropertyList	ex_props;
@@ -79,7 +83,7 @@ public:
 	string			getName(bool cut_ext = false);
 	uint32_t		getSize() { return size; }
 	bool			isLoaded() { return data_loaded; }
-	uint8_t			getType() { return type; }
+	EntryType*		getType() { return type; }
 	uint8_t			getState() { return state; }
 	bool			isLocked() { return locked; }
 	const uint8_t*	getData(bool allow_load = true);
@@ -89,7 +93,7 @@ public:
 	void		setParent(Archive* parent) { this->parent = parent; }
 	void		setName(string name) { this->name = name; }
 	void		setLoaded(bool loaded = true) { data_loaded = loaded; }
-	void		setType(uint8_t type) { this->type = type; }
+	void		setType(EntryType* type) { this->type = type; }
 	void		setState(uint8_t state);
 	void		unloadData();
 	void		lock() { locked = true; }
@@ -115,7 +119,7 @@ public:
 	bool	exportFile(string filename);
 
 	// Type detection
-	void	detectType(bool data_check, bool force = false);
+	//void	detectType(bool data_check, bool force = false);
 	string	getTypeString();
 
 	// Misc

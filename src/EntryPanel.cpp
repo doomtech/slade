@@ -40,11 +40,12 @@
 /* EntryPanel::EntryPanel
  * EntryPanel class constructor
  *******************************************************************/
-EntryPanel::EntryPanel(wxWindow* parent)
+EntryPanel::EntryPanel(wxWindow* parent, string id)
 : wxPanel(parent, -1) {
 	// Init variables
 	modified = false;
 	entry = NULL;
+	this->id = id;
 
 	// Create & set sizer & border
 	frame = new wxStaticBox(this, -1, _T("Entry Contents"));
@@ -150,7 +151,7 @@ bool EntryPanel::revertEntry() {
 	if (modified) {
 		if (entry_data.hasData()) {
 			entry->importMemChunk(entry_data);
-			entry->detectType(true, true);
+			EntryType::detectEntryType(entry);
 			loadEntry(entry);
 
 			return true;

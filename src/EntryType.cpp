@@ -60,10 +60,14 @@ id_format_t formats[] = {
 	{ "mod_mod", EDF_MOD_MOD },
 	{ "snd_doom", EDF_SND_DOOM },
 	{ "snd_wav", EDF_SND_WAV },
+	{ "text", EDF_TEXT },
 };
 
 vector<EntryType*>	entry_types;	// The big list of all entry types
+
+// Special entry types
 EntryType			etype_unknown;	// The default, 'unknown' entry type
+EntryType			etype_folder;	// Folder entry type
 
 
 /*******************************************************************
@@ -101,10 +105,6 @@ uint16_t EntryDataFormat::detectFormat(MemChunk& mc) {
 	if (detectModS3m(mc))
 		return EDF_MOD_S3M;
 
-	// Doom Sound
-	if (detectSndDoom(mc))
-		return EDF_SND_DOOM;
-
 	// WAV Sound
 	if (detectSndWav(mc))
 		return EDF_SND_WAV;
@@ -121,9 +121,17 @@ uint16_t EntryDataFormat::detectFormat(MemChunk& mc) {
 	if (detectDoomGfx(mc))
 		return EDF_GFX_DOOM;
 
+	// Doom Sound
+	if (detectSndDoom(mc))
+		return EDF_SND_DOOM;
+
 	// Detect doom wad
 	if (detectWad(mc))
 		return EDF_WAD;
+
+	// Detect doom flat format
+	if (detectDoomFlat(mc))
+		return EDF_GFX_FLAT;
 
 	return type;
 }
@@ -201,10 +209,19 @@ bool EntryDataFormat::detectDoomGfx(MemChunk& mc) {
 }
 
 bool EntryDataFormat::detectDoomFlat(MemChunk& mc) {
-	// Not too sure how I should go about detecting this - just checking size
-	// seems too cheap, but checking both size and position in the archive could
-	// make things confusing for the user. Blah. No doom flat for now!
-	return false;
+	// Not too sure how I should go about detecting this - just checking size as
+	// it is now seems too cheap, but checking both size and position in the
+	// archive could make things confusing for the user. Blah.
+	uint32_t size = mc.getSize();
+
+	if (size == 4096 ||
+		size == 8192 ||
+		size == 16384 ||
+		size == 65536 ||
+		size == 64000)
+		return true;
+	else
+		return false;
 }
 
 bool EntryDataFormat::detectWad(MemChunk& mc) {
@@ -356,6 +373,7 @@ EntryType::EntryType(string id) {
 	icon = _T("e_default");
 	size_limit[0] = -1;
 	size_limit[1] = -1;
+	editor = _T("default");
 }
 
 /* EntryType::~EntryType
@@ -393,6 +411,10 @@ void EntryType::dump() {
 	wxLogMessage(_T("---"));
 }
 
+/* EntryType::isThisType
+ * Returns true if [entry] matches the EntryType's criteria, false
+ * otherwise
+ *******************************************************************/
 bool EntryType::isThisType(ArchiveEntry* entry) {
 	// Check entry was given
 	if (!entry)
@@ -466,7 +488,13 @@ bool EntryType::isThisType(ArchiveEntry* entry) {
 	}
 
 	// Check for data format match if needed
-	if (format != EDF_ANY) {
+	if (format == EDF_TEXT) {
+		// Text is a special case, as other data formats can sometimes be detected as 'text',
+		// we'll only check for it if text data is specified in the entry type
+		if (memchr(entry->getData(), 0, entry->getSize()-1) != NULL)
+			return false;
+	}
+	else if (format != EDF_ANY) {
 		uint16_t data_format = EntryDataFormat::detectFormat(entry->getMCData());
 
 		if (data_format != format)
@@ -570,6 +598,19 @@ bool EntryType::readEntryTypeDefinition(MemChunk& mc) {
 						return false;
 
 					ntype->setIcon(icon);			// Set type icon
+				}
+
+				// Editor field
+				if (!token.Cmp(_T("editor"))) {
+					if (!tz.checkToken(_T("=")))	// Check for =
+						return false;
+
+					string editor = tz.getToken();	// Get name value
+
+					if (!tz.checkToken(_T(";")))	// Check for ;
+						return false;
+
+					ntype->setEditor(editor);		// Set type editor
 				}
 
 				// MatchExtension field
@@ -677,7 +718,6 @@ bool EntryType::readEntryTypeDefinition(MemChunk& mc) {
 				token = tz.getToken();
 			}
 
-			//ntype->dump();
 			ntype->addToList();
 			token = tz.getToken();
 		}
@@ -690,6 +730,13 @@ bool EntryType::readEntryTypeDefinition(MemChunk& mc) {
  * Loads all built-in and custom user entry types
  *******************************************************************/
 bool EntryType::loadEntryTypes() {
+	// Init unknown type
+	etype_unknown.setIcon(_T("e_unknown"));
+	
+	// Init folder type
+	etype_folder.setIcon(_T("e_folder"));
+	etype_folder.setName(_T("Folder"));
+
 	// Get builtin entry types from resource archive
 	Archive* res_archive = theArchiveManager->resourceArchive();
 
@@ -716,19 +763,49 @@ bool EntryType::loadEntryTypes() {
  * Attempts to detect the given entry's type
  *******************************************************************/
 bool EntryType::detectEntryType(ArchiveEntry* entry) {
-	bool detected = false;
+	// Do nothing if the entry is a folder
+	if (entry->getType() == &etype_folder)
+		return false;
+
 	// Go through all registered types
 	for (size_t a = 0; a < entry_types.size(); a++) {
 		if (entry_types[a]->isThisType(entry)) {
-			wxLogMessage(_T("Entry %s detected as %s"), entry->getName(), entry_types[a]->getName());
-			detected = true;
+			entry->setType(entry_types[a]);
+			return true;
 		}
 	}
 
-	if (!detected)
-		wxLogMessage(_T("Entry %s unknown"), entry->getName());
+	// No matching type found, set to unknown
+	entry->setType(&etype_unknown);
 
 	return false;
+}
+
+/* EntryType::getType
+ * Returns the entry type with the given id, or etype_unknown if no
+ * id match is found
+ *******************************************************************/
+EntryType* EntryType::getType(string id) {
+	for (size_t a = 0; a < entry_types.size(); a++) {
+		if (entry_types[a]->getId() == id)
+			return entry_types[a];
+	}
+
+	return &etype_unknown;
+}
+
+/* EntryType::unknownType
+ * Returns the global 'unknown' entry type
+ *******************************************************************/
+EntryType* EntryType::unknownType() {
+	return &etype_unknown;
+}
+
+/* EntryType::folderType
+ * Returns the global 'folder' entry type
+ *******************************************************************/
+EntryType* EntryType::folderType() {
+	return &etype_folder;
 }
 
 

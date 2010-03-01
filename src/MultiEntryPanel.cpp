@@ -48,7 +48,7 @@
  * MultiEntryPanel class constructor
  *******************************************************************/
 MultiEntryPanel::MultiEntryPanel(wxWindow* parent)
-: EntryPanel(parent) {
+: EntryPanel(parent, _T("multi")) {
 	// Init variables
 	gfx_selected = false;
 
@@ -98,11 +98,7 @@ bool MultiEntryPanel::loadEntries(vector<ArchiveEntry*>& list) {
 
 		// Check for gfx entry
 		if (!gfx_selected) {
-			uint8_t entry_type = list[a]->getType();
-			if (entry_type == ETYPE_GFX || entry_type == ETYPE_GFX2 ||
-				entry_type == ETYPE_FLAT || entry_type == ETYPE_SPRITE ||
-				entry_type == ETYPE_PATCH || entry_type == ETYPE_PNG ||
-				entry_type == ETYPE_IMAGE)
+			if (list[a]->getType()->getEditor() == _T("gfx"))
 				gfx_selected = true;
 		}
 	}
