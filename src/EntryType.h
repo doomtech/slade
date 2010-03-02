@@ -104,6 +104,7 @@ public:
 	// Misc
 	void	addToList();
 	void	dump();
+	void	copyToType(EntryType* target);
 
 	// Magic goes here
 	bool	isThisType(ArchiveEntry* entry);

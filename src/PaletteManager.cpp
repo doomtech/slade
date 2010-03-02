@@ -165,12 +165,12 @@ bool PaletteManager::loadCustomPalettes() {
 		// Load palette data
 		Palette8bit* pal = new Palette8bit();
 		MemChunk mc;
-		mc.importFile(filename);
+		mc.importFile(res_dir.GetName() + _T("/") + filename);
 		pal->loadMem(mc);
 
 		// Add the palette
 		palettes.push_back(pal);
-		pal_names.push_back(wxFileName(filename).GetName());
+		pal_names.push_back(filename);
 
 		// Next file
 		files = res_dir.GetNext(&filename);

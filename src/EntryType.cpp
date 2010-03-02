@@ -32,6 +32,7 @@
 #include "Console.h"
 #include "ArchiveManager.h"
 #include "ZipArchive.h"
+#include <wx/dir.h>
 #include <wx/filename.h>
 
 
@@ -275,7 +276,7 @@ bool EntryDataFormat::detectWad(MemChunk& mc) {
 	// Get number of lumps and directory offset
 	uint32_t num_lumps = 0;
 	uint32_t dir_offset = 0;
-	mc.seek(3, SEEK_SET);
+	mc.seek(4, SEEK_SET);
 	mc.read(&num_lumps, 4);
 	mc.read(&dir_offset, 4);
 
@@ -377,7 +378,13 @@ bool EntryDataFormat::detectSndDoom(MemChunk& mc) {
 	// Check size
 	if (mc.getSize() > 8) {
 		// Check header
-		if ((uint16_t)mc[0] == 3 && (uint16_t)mc[6] == 0 && (uint16_t)mc[4] <= mc.getSize() - 8)
+		uint16_t head, samplerate, samples, tail;
+		mc.read(&head, 2);
+		mc.read(&samplerate, 2);
+		mc.read(&samples, 2);
+		mc.read(&tail, 2);
+
+		if (head == 3 && tail == 0 && samples == mc.getSize() - 8)
 			return true;
 	}
 
@@ -450,6 +457,36 @@ void EntryType::dump() {
 		wxLogMessage(s_fmt(_T("Size Multiple: %d"), size_multiple[a]));
 
 	wxLogMessage(_T("---"));
+}
+
+void EntryType::copyToType(EntryType* target) {
+	// Copy type attributes
+	target->setEditor(editor);
+	target->setExtension(extension);
+	target->setIcon(icon);
+	target->setName(name);
+
+	// Copy type match criteria
+	target->setFormat(format);
+	target->setMaxSize(size_limit[1]);
+	target->setMinSize(size_limit[0]);
+	target->setSection(section);
+
+	// Copy match names
+	for (size_t a = 0; a < match_name.size(); a++)
+		target->addMatchName(match_name[a]);
+
+	// Copy match extensions
+	for (size_t a = 0; a < match_extension.size(); a++)
+		target->addMatchExtension(match_extension[a]);
+
+	// Copy match sizes
+	for (size_t a = 0; a < match_size.size(); a++)
+		target->addMatchSize(match_size[a]);
+
+	// Copy size multiples
+	for (size_t a = 0; a < size_multiple.size(); a++)
+		target->addSizeMultiple(size_multiple[a]);
 }
 
 /* EntryType::isThisType
@@ -589,6 +626,16 @@ bool EntryType::readEntryTypeDefinition(MemChunk& mc) {
 			if (!token.Cmp(_T("")))
 				return false;
 
+			// Check for inherited type
+			string inherit = _T("");
+			if (tz.peekToken() == _T(":")) {
+				// Skip :
+				tz.getToken();
+
+				// Read inherited type id
+				inherit = tz.getToken();
+			}
+
 			// Check for opening brace
 			if (!tz.checkToken(_T("{")))
 				return false;
@@ -596,6 +643,14 @@ bool EntryType::readEntryTypeDefinition(MemChunk& mc) {
 			// Begin parsing entry type
 			EntryType* ntype = new EntryType(token);
 			token = tz.getToken();
+
+			// Copy from existing type if inherited
+			if (!inherit.IsEmpty()) {
+				EntryType* parent_type = EntryType::getType(inherit);
+
+				if (parent_type != EntryType::unknownType())
+					parent_type->copyToType(ntype);
+			}
 
 			// Read all fields until we get to the closing brace
 			while (token.Cmp(_T("}"))) {
@@ -610,6 +665,19 @@ bool EntryType::readEntryTypeDefinition(MemChunk& mc) {
 						return false;
 
 					ntype->setName(name);			// Set type name
+				}
+
+				// Detectable field
+				if (!token.Cmp(_T("detectable"))) {
+					if (!tz.checkToken(_T("=")))	// Check for =
+						return false;
+
+					bool detect = tz.getBool();		// Get detectable value
+
+					if (!tz.checkToken(_T(";")))	// Check for ;
+						return false;
+
+					ntype->setDetectable(detect);	// Set detectable
 				}
 
 				// Extension field
@@ -786,6 +854,10 @@ bool EntryType::readEntryTypeDefinition(MemChunk& mc) {
 				token = tz.getToken();
 			}
 
+			//if (!inherit.IsEmpty())
+			//	wxLogMessage(_T("EntryType %s inherit from type %s"), ntype->getName().c_str(), inherit.c_str());
+
+			//ntype->dump();
 			ntype->addToList();
 			token = tz.getToken();
 		}
@@ -815,6 +887,8 @@ bool EntryType::loadEntryTypes() {
 	etype_map.setDetectable(false);
 	etype_map.addToList();
 
+	// -------- READ BUILT-IN TYPES ---------
+
 	// Get builtin entry types from resource archive
 	Archive* res_archive = theArchiveManager->resourceArchive();
 
@@ -834,7 +908,35 @@ bool EntryType::loadEntryTypes() {
 	}
 
 	// Read in entry types definition
-	return readEntryTypeDefinition(et_entry->getMCData());
+	if (!readEntryTypeDefinition(et_entry->getMCData()))
+		return false;
+
+	// -------- READ CUSTOM TYPES ---------
+
+	// If the directory doesn't exist create it
+	if (!wxDirExists(appPath(_T("entry_types"), DIR_USER)))
+		wxMkdir(appPath(_T("entry_types"), DIR_USER));
+
+	// Open the custom palettes directory
+	wxDir res_dir;
+	res_dir.Open(appPath(_T("entry_types"), DIR_USER));
+
+	// Go through each file in the directory
+	string filename = wxEmptyString;
+	bool files = res_dir.GetFirst(&filename, wxEmptyString, wxDIR_FILES);
+	while (files) {
+		// Load file data
+		MemChunk mc;
+		mc.importFile(res_dir.GetName() + _T("/") + filename);
+
+		// Parse file
+		readEntryTypeDefinition(mc);
+
+		// Next file
+		files = res_dir.GetNext(&filename);
+	}
+
+	return true;
 }
 
 /* EntryType::detectEntryType
