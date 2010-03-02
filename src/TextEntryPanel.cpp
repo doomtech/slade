@@ -65,10 +65,6 @@ bool TextEntryPanel::loadEntry(ArchiveEntry* entry) {
 	if (!text_area->loadEntry(entry))
 		return false;
 
-	// Copy current entry content
-	entry_data.clear();
-	entry_data.importMem(entry->getData(true), entry->getSize());
-
 	// Enable save changes button depending on if the entry is locked
 	if (entry->isLocked())
 		btn_save->Enable(false);

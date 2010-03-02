@@ -103,10 +103,10 @@ void EntryPanel::setModified(bool c) {
 	}
 
 	// Set frame label
-	if (modified)
-		frame->SetLabel(s_fmt(_T("Entry Contents (%s, unsaved changes)"), entry->getName().c_str()));
-	else
-		frame->SetLabel(s_fmt(_T("Entry Contents (%s)"), entry->getName().c_str()));
+	//if (modified)
+	//	frame->SetLabel(s_fmt(_T("Entry Contents (%s, unsaved changes)"), entry->getName().c_str()));
+	//else
+	//	frame->SetLabel(s_fmt(_T("Entry Contents (%s)"), entry->getName().c_str()));
 }
 
 /* EntryPanel::openEntry
@@ -118,7 +118,11 @@ bool EntryPanel::openEntry(ArchiveEntry* entry) {
 		return false;
 
 	// Set frame label
-	frame->SetLabel(s_fmt(_T("Entry Contents (%s)"), entry->getName().c_str()));
+	//frame->SetLabel(s_fmt(_T("Entry Contents (%s)"), entry->getName().c_str()));
+
+	// Copy current entry content
+	entry_data.clear();
+	entry_data.importMem(entry->getData(true), entry->getSize());
 
 	// Load the entry
 	return loadEntry(entry);

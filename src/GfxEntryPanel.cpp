@@ -135,10 +135,6 @@ bool GfxEntryPanel::loadEntry(ArchiveEntry* entry) {
 	if (!Misc::loadImageFromEntry(gfx_canvas->getImage(), this->entry))
 		return false;
 
-	// Copy current entry content
-	entry_data.clear();
-	entry_data.importMem(entry->getData(true), entry->getSize());
-
 	// Set offset text boxes
 	spin_xoffset->SetValue(gfx_canvas->getImage()->offset().x);
 	spin_yoffset->SetValue(gfx_canvas->getImage()->offset().y);

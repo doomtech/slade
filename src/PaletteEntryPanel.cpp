@@ -64,10 +64,6 @@ PaletteEntryPanel::~PaletteEntryPanel() {
  * Loads an entry into the entry panel if it is a valid image format
  *******************************************************************/
 bool PaletteEntryPanel::loadEntry(ArchiveEntry* entry) {
-	// Copy current entry content
-	entry_data.clear();
-	entry_data.importMem(entry->getData(true), entry->getSize());
-
 	MemChunk mc;
 	mc.importMem(entry->getData(true), entry->getSize());
 	pal_canvas->getPalette().loadMem(mc);

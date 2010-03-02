@@ -104,10 +104,6 @@ bool TextureXEntryPanel::loadEntry(ArchiveEntry* entry) {
 		return false;
 	}
 
-	// Copy current entry content
-	entry_data.clear();
-	entry_data.importMem(entry->getData(true), entry->getSize());
-
 	// Read TEXTUREx entry into texturexlist
 	texturex.readTEXTUREXData(entry, pnames);
 

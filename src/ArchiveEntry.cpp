@@ -124,7 +124,7 @@ const uint8_t* ArchiveEntry::getData(bool allow_load) {
  *******************************************************************/
 MemChunk& ArchiveEntry::getMCData(bool allow_load) {
 	// Load the data if needed (and possible)
-	if (allow_load && !isLoaded() && parent) {
+	if (allow_load && !isLoaded() && parent && size > 0) {
 		data_loaded = parent->loadEntryData(this);
 		setState(0);
 	}

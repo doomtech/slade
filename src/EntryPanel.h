@@ -9,10 +9,10 @@ private:
 	bool			modified;
 	wxStaticBox*	frame;
 	string			id;
+	MemChunk		entry_data;
 
 protected:
 	ArchiveEntry*	entry;
-	MemChunk		entry_data;
 
 	wxSizer*		sizer_main;
 	wxSizer*		sizer_bottom;

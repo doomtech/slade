@@ -151,6 +151,8 @@ bool ListView::showItem(int item) {
 		return false;
 
 	EnsureVisible(item);
+
+	return true;
 }
 
 bool ListView::updateSize() {

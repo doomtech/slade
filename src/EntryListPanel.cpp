@@ -70,8 +70,10 @@ EntryList::EntryList(EntryListPanel *parent, int id)
 	image_list = new wxImageList(16, 16, false, 0);
 
 	wxArrayString et_icon_list = EntryType::getIconList();
-	for (size_t a = 0; a < et_icon_list.size(); a++)
-		image_list->Add(getIcon(et_icon_list[a]));
+	for (size_t a = 0; a < et_icon_list.size(); a++) {
+		if (image_list->Add(getIcon(et_icon_list[a])) < 0)
+			image_list->Add(getIcon(_T("e_default")));
+	}
 
 	SetImageList(image_list, wxIMAGE_LIST_SMALL);
 }

@@ -89,9 +89,6 @@ bool MemChunk::hasData() {
  * Returns false if no data exists, true otherwise.
  *******************************************************************/
 bool MemChunk::clear() {
-	if (!data)
-		return false;
-
 	if (hasData()) {
 		delete[] data;
 		data = NULL;
@@ -159,14 +156,18 @@ bool MemChunk::importFile(string filename, uint32_t offset, uint32_t len) {
 	if (offset + len > flen || len == 0)
 		len = flen - offset;
 
-	// Setup variables & allocate memory
+	// Setup variables
 	size = len;
-	data = new uint8_t[size];
 
 	// Read the file
-	fseek(fp, offset, SEEK_SET);
-	fread(data, 1, size, fp);
-	fclose(fp);
+	if (size > 0) {
+		data = new uint8_t[size];
+
+		// Read the file
+		fseek(fp, offset, SEEK_SET);
+		fread(data, 1, size, fp);
+		fclose(fp);
+	}
 
 	return true;
 }
@@ -198,12 +199,15 @@ bool MemChunk::importFileStream(FILE* fp, uint32_t len) {
 	if (offset + len > flen || len == 0)
 		len = flen - offset;
 
-	// Setup variables & allocate memory
+
+	// Setup variables
 	size = len;
-	data = new uint8_t[size];
 
 	// Read the file
-	fread(data, 1, size, fp);
+	if (size > 0) {
+		data = new uint8_t[size];
+		fread(data, 1, size, fp);
+	}
 
 	return true;
 }
@@ -220,12 +224,14 @@ bool MemChunk::importMem(const uint8_t* start, uint32_t len) {
 	// Clear current data if it exists
 	clear();
 
-	// Setup variables & allocate memory
+	// Setup variables
 	size = len;
-	data = new uint8_t[size];
 
-	// Read the memory
-	memcpy(data, start, size);
+	// Load new data
+	if (size > 0) {
+		data = new uint8_t[size];
+		memcpy(data, start, size);
+	}
 
 	return true;
 }

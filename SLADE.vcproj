@@ -515,6 +515,14 @@
 			Name="Resources"
 			>
 			<File
+				RelativePath=".\src\GLTexture.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\GLTexture.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\Icons.cpp"
 				>
 			</File>
@@ -550,6 +558,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\EntryType.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\EntryType.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\WadArchive.cpp"
 					>
 				</File>
@@ -579,7 +595,7 @@
 				</File>
 			</Filter>
 			<Filter
-				Name="Texture"
+				Name="Composite Texture"
 				>
 				<File
 					RelativePath=".\src\CTexture.cpp"

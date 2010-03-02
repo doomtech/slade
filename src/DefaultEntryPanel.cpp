@@ -130,10 +130,6 @@ bool DefaultEntryPanel::loadEntry(ArchiveEntry* entry) {
 		return false;
 	}
 
-	// Copy current entry content
-	entry_data.clear();
-	entry_data.importMem(entry->getData(true), entry->getSize());
-
 	// Set labels
 	label_type->SetLabel(s_fmt(_T("Entry Type: %s"), entry->getTypeString().c_str()));
 	label_size->SetLabel(s_fmt(_T("Entry Size: %d bytes"), entry->getSize()));
@@ -168,7 +164,7 @@ bool DefaultEntryPanel::saveEntry() {
 	entry->importMem(text_raw, text_raw.length());
 
 	// Set entry type to text
-	//entry->setType(ETYPE_TEXT);
+	entry->setType(EntryType::getType(_T("text")));
 	entry->setState(1);
 
 	return true;

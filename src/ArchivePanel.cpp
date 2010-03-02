@@ -553,7 +553,6 @@ bool ArchivePanel::openEntry(ArchiveEntry* entry) {
 	// Detect entry type if it hasn't been already
 	if (entry->getType() == EntryType::unknownType())
 		EntryType::detectEntryType(entry);
-		//entry->detectType(true);
 
 	// Get the appropriate entry panel for the entry's type
 	EntryPanel* new_area = default_area;
@@ -565,34 +564,10 @@ bool ArchivePanel::openEntry(ArchiveEntry* entry) {
 		new_area = text_area;
 	else if (!entry->getType()->getEditor().Cmp(_T("texturex")))
 		new_area = texturex_area;
-	/*
-	switch (entry->getType()->getFormat()) {
-		case EDF_TEXT:
-			new_area = text_area;
-			break;
-		case EDF_GFX_DOOM:
-			new_area = gfx_area;
-			break;
-		case EDF_GFX_FLAT:
-			new_area = gfx_area;
-			break;
-		case EDF_BMP:
-			new_area = gfx_area;
-			break;
-		case EDF_PNG:
-			new_area = gfx_area;
-			break;
-		case EDF_JPEG:
-			new_area = gfx_area;
-			break;
-		case EDF_PA:
-			new_area = pal_area;
-			break;
-		case EDF_TEXTU:
-			new_area = texturex_area;
-			break;
-	}
-	 */
+	else if (!entry->getType()->getEditor().Cmp(_T("default")))
+		new_area = default_area;
+	else
+		wxLogMessage(_T("Entry editor %s does not exist, using default editor"), entry->getType()->getEditor().c_str());
 
 	// Show the new entry panel
 	if (!showEntryPanel(new_area))

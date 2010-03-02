@@ -98,5 +98,6 @@ wxBitmap getIcon(string name) {
 			return wxBitmap(icons[a].image);
 	}
 
+	wxLogMessage(_T("Icon \"%s\" does not exist"), name.c_str());
 	return wxNullBitmap;
 }
