@@ -52,7 +52,7 @@ public:
 
 	// Image format reading
 	bool	loadImage(const uint8_t* data, int size);
-	bool	loadDoomGfx(const uint8_t* data, int size);
+	bool	loadDoomGfx(const uint8_t* data, int size, uint8_t version = 0);
 	bool	loadDoomFlat(const uint8_t* data, int size);
 
 	// Image format writing

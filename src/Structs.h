@@ -539,5 +539,13 @@ struct patch_header_t
 	short	top;
 };
 
+// oldpatch_header_t: The header of an alpha/beta doom-format gfx image
+struct oldpatch_header_t {
+	uint8_t width;
+	uint8_t height;
+	int8_t left;
+	int8_t top;
+};
+
 
 #endif //__STRUCTS_H__

@@ -49,6 +49,12 @@ bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry) {
 		// Doom gfx format
 		case EDF_GFX_DOOM:
 			return image->loadDoomGfx(entry->getData(true), entry->getSize());
+		// Alpha Doom gfx format
+		case EDF_GFX_DOOM_ALPHA:
+			return image->loadDoomGfx(entry->getData(true), entry->getSize(), 2);
+		// Beta Doom gfx format
+		case EDF_GFX_DOOM_BETA:
+			return image->loadDoomGfx(entry->getData(true), entry->getSize(), 1);
 		// Doom flat format
 		case EDF_GFX_FLAT:
 			return image->loadDoomFlat(entry->getData(true), entry->getSize());

@@ -10,6 +10,8 @@ enum {
 	EDF_BMP,
 	EDF_JPEG,
 	EDF_GFX_DOOM,
+	EDF_GFX_DOOM_ALPHA,
+	EDF_GFX_DOOM_BETA,
 	EDF_GFX_FLAT,
 	EDF_WAD,
 	EDF_MUS,
@@ -40,6 +42,8 @@ public:
 	static bool detectBmp(MemChunk& mc);
 	static bool detectJpeg(MemChunk& mc);
 	static bool detectDoomGfx(MemChunk& mc);
+	static bool detectDoomGfxAlpha(MemChunk& mc);
+	static bool detectDoomGfxBeta(MemChunk& mc);
 	static bool detectDoomFlat(MemChunk& mc);
 	static bool detectWad(MemChunk& mc);
 	static bool detectMus(MemChunk& mc);

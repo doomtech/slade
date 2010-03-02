@@ -433,10 +433,11 @@ bool SImage::loadImage(const uint8_t* img_data, int size) {
 }
 
 /* SImage::loadDoomGfx
- * Loads a Doom Gfx format image, using the given palette.
+ * Loads a Doom Gfx format image, using the image palette. [version]
+ * is the gfx 'version' to load as (0=normal, 1=press beta, 2=alpha).
  * Returns false if the image data was invalid, true otherwise
  *******************************************************************/
-bool SImage::loadDoomGfx(const uint8_t* gfx_data, int size) {
+bool SImage::loadDoomGfx(const uint8_t* gfx_data, int size, uint8_t version) {
 	// Check data
 	if (!gfx_data)
 		return false;
@@ -445,9 +446,46 @@ bool SImage::loadDoomGfx(const uint8_t* gfx_data, int size) {
 	if (size < sizeof(patch_header_t))
 		return false;
 
+	// Init variables
+	uint32_t* col_offsets = NULL;
+	has_palette = true;
+	format = PALMASK;
+
+	// Read header
+	uint8_t hdr_size = 0;
+	if (version > 1) {
+		width = gfx_data[0];
+		height = gfx_data[1];
+		offset_x = (int8_t)gfx_data[2];
+		offset_y = (int8_t)gfx_data[3];
+		hdr_size = 4;
+	}
+	else {
+		patch_header_t* header = (patch_header_t*)gfx_data;
+		width = wxINT16_SWAP_ON_BE(header->width);
+		height = wxINT16_SWAP_ON_BE(header->height);
+		offset_x = wxINT16_SWAP_ON_BE(header->left);
+		offset_y = wxINT16_SWAP_ON_BE(header->top);
+		hdr_size = 8;
+	}
+
+	// Read column offsets
+	col_offsets = new uint32_t[width];
+	if (version > 0) {
+		uint16_t* c_ofs = (uint16_t*)((uint8_t*)gfx_data + hdr_size);
+		for (int a = 0; a < width; a++)
+			col_offsets[a] = wxUINT16_SWAP_ON_BE(c_ofs[a]);
+	}
+	else {
+		uint32_t* c_ofs = (uint32_t*)((uint8_t*)gfx_data + hdr_size);
+		for (int a = 0; a < width; a++)
+			col_offsets[a] = wxUINT32_SWAP_ON_BE(c_ofs[a]);
+	}
+
+	/*
 	// Get header & offsets
 	patch_header_t* header = (patch_header_t*)gfx_data;
-	uint32_t* col_offsets = (uint32_t*)((uint8_t*)gfx_data + sizeof(patch_header_t));
+	col_offsets = (uint32_t*)((uint8_t*)gfx_data + sizeof(patch_header_t));
 
 	// Setup variables
 	width = wxINT16_SWAP_ON_BE(header->width);
@@ -456,6 +494,7 @@ bool SImage::loadDoomGfx(const uint8_t* gfx_data, int size) {
 	offset_y = wxINT16_SWAP_ON_BE(header->top);
 	has_palette = true;
 	format = PALMASK;
+	 */
 
 	// Clear current data if it exists
 	clearData();
@@ -467,7 +506,7 @@ bool SImage::loadDoomGfx(const uint8_t* gfx_data, int size) {
 	memset(mask, 0, width * height);	// Set mask to fully transparent
 	for (int c = 0; c < width; c++) {
 		// Get current column offset (byteswap if needed)
-		uint32_t col_offset = wxUINT32_SWAP_ON_BE(col_offsets[c]);
+		uint32_t col_offset = col_offsets[c];//wxUINT32_SWAP_ON_BE(col_offsets[c]);
 
 		// Check column offset is valid
 		if (col_offset >= size) {
@@ -489,7 +528,7 @@ bool SImage::loadDoomGfx(const uint8_t* gfx_data, int size) {
 				break;
 
 			// Tall patches support
-			if (row <= top)
+			if (row <= top && version == 0)
 				top += row;
 			else
 				top = row;
@@ -498,7 +537,7 @@ bool SImage::loadDoomGfx(const uint8_t* gfx_data, int size) {
 			bits++;
 			uint8_t n_pix = *bits;
 
-			bits++; // Skip buffer
+			if (version == 0) bits++; // Skip buffer
 			for (uint8_t p = 0; p < n_pix; p++) {
 				// Get pixel position
 				bits++;
@@ -516,7 +555,8 @@ bool SImage::loadDoomGfx(const uint8_t* gfx_data, int size) {
 				data[pos] = *bits;
 				mask[pos] = 255;
 			}
-			bits += 2; // Skip buffer & go to next row offset
+			if (version == 0) bits++; // Skip buffer
+			bits++; // Go to next row offset
 		}
 	}
 
@@ -574,6 +614,97 @@ bool SImage::loadDoomFlat(const uint8_t* gfx_data, int size) {
 
 	return true;
 }
+
+/* SImage::loadDoomGfxOld
+ * Loads an Alpha/Beta Doom Gfx format image, using the given palette.
+ * Returns false if the image data was invalid, true otherwise
+ *******************************************************************/
+ /*
+bool SImage::loadDoomGfxOld(const uint8_t* gfx_data, int size) {
+	// Check data
+	if (!gfx_data)
+		return false;
+
+	// Check size
+	if (size < 4)
+		return false;
+
+	// Get header & offsets
+	patch_header_t* header = (patch_header_t*)gfx_data;
+	uint16_t* col_offsets = (uint16_t*)((uint8_t*)gfx_data + 8);
+
+	// Setup variables
+	width = header->width;
+	height = header->height;
+	offset_x = header->left;
+	offset_y = header->top;
+	has_palette = true;
+	format = PALMASK;
+
+	// Clear current data if it exists
+	clearData();
+
+	// Load data
+	data = new uint8_t[width * height];
+	memset(data, 0, width * height);	// Set colour to palette index 0
+	mask = new uint8_t[width * height];
+	memset(mask, 0, width * height);	// Set mask to fully transparent
+	for (int c = 0; c < width; c++) {
+		// Get current column offset (byteswap if needed)
+		uint32_t col_offset = wxUINT16_SWAP_ON_BE(col_offsets[c]);
+
+		// Check column offset is valid
+		if (col_offset >= size) {
+			clearData();
+			return false;
+		}
+
+		// Go to start of column
+		const uint8_t* bits = gfx_data;
+		bits += col_offset;
+
+		// Read posts
+		while (1) {
+			// Get row offset
+			uint8_t row = *bits;
+
+			if (row == 0xFF) // End of column?
+				break;
+
+			// Get no. of pixels
+			bits++;
+			uint8_t n_pix = *bits;
+
+			//bits++; // Skip buffer
+			for (uint8_t p = 0; p < n_pix; p++) {
+				// Get pixel position
+				bits++;
+				int pos = ((row + p)*width + c);
+
+				// Stop if we're outside the image
+				if (pos > width*height)
+					break;
+
+				// Stop if for some reason we're outside the gfx data
+				if (bits > gfx_data + size)
+					break;
+
+				// Write pixel data
+				data[pos] = *bits;
+				mask[pos] = 255;
+			}
+			bits++;
+			//bits += 2; // Skip buffer & go to next row offset
+		}
+	}
+
+	// Announce change
+	announce(_T("image_changed"));
+
+	// Return success
+	return true;
+}
+ */
 
 /* SImage::toPNG
  * Writes the image as PNG data to <out>, keeping palette information

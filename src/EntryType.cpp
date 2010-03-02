@@ -52,6 +52,8 @@ id_format_t formats[] = {
 	{ "jpeg", EDF_JPEG },
 	{ "gfx_doom", EDF_GFX_DOOM },
 	{ "gfx_flat", EDF_GFX_FLAT },
+	{ "gfx_doom_alpha", EDF_GFX_DOOM_ALPHA },
+	{ "gfx_doom_beta", EDF_GFX_DOOM_BETA },
 	{ "wad", EDF_WAD },
 	{ "mus", EDF_MUS },
 	{ "midi", EDF_MIDI },
@@ -144,6 +146,10 @@ bool EntryDataFormat::isFormat(MemChunk& mc, uint16_t format) {
 		return detectBmp(mc);
 	case EDF_GFX_DOOM:
 		return detectDoomGfx(mc);
+	case EDF_GFX_DOOM_ALPHA:
+		return detectDoomGfxAlpha(mc);
+	case EDF_GFX_DOOM_BETA:
+		return detectDoomGfxBeta(mc);
 	case EDF_GFX_FLAT:
 		return detectDoomFlat(mc);
 	case EDF_JPEG:
@@ -231,6 +237,71 @@ bool EntryDataFormat::detectDoomGfx(MemChunk& mc) {
 
 			// Check there is room for needed column pointers
 			if (mc.getSize() < sizeof(patch_header_t) + (header->width * sizeof(uint32_t)))
+				return false;
+
+			// Check column pointers are within range
+			for (int a = 0; a < header->width; a++) {
+				if (col_offsets[a] > mc.getSize() || col_offsets[a] < sizeof(patch_header_t))
+					return false;
+			}
+
+			// Passed all checks, so probably is doom gfx
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool EntryDataFormat::detectDoomGfxAlpha(MemChunk& mc) {
+	// Disabled for now since it's too easy for non-gfx entries to be
+	// detected as this format
+	return false;
+	
+	const uint8_t* data = mc.getData();
+
+	// Check size
+	if (mc.getSize() > sizeof(oldpatch_header_t)) {
+		const oldpatch_header_t *header = (const oldpatch_header_t *)data;
+
+		// Check header values are 'sane'
+		if (true/*header->width > 0 && header->height > 0*/) {
+			uint16_t *col_offsets = (uint16_t *)((const uint8_t *)data + sizeof(oldpatch_header_t));
+
+			// Check there is room for needed column pointers
+			if (mc.getSize() < sizeof(oldpatch_header_t) + (header->width * sizeof(uint16_t)))
+				return false;
+
+			// Check column pointers are within range
+			for (int a = 0; a < header->width; a++) {
+				if (col_offsets[a] > mc.getSize() || col_offsets[a] < sizeof(oldpatch_header_t))
+					return false;
+			}
+
+			// Passed all checks, so probably is doom gfx
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool EntryDataFormat::detectDoomGfxBeta(MemChunk& mc) {
+	const uint8_t* data = mc.getData();
+
+	// Check size
+	if (mc.getSize() > sizeof(patch_header_t)) {
+		const patch_header_t *header = (const patch_header_t *)data;
+
+		// Check header values are 'sane'
+		if (header->height > 0 && header->height < 4096 &&
+		        header->width > 0 && header->width < 4096 &&
+		        header->top > -2000 && header->top < 2000 &&
+		        header->left > -2000 && header->left < 2000) {
+			uint16_t *col_offsets = (uint16_t *)((const uint8_t *)data + sizeof(patch_header_t));
+
+			// Check there is room for needed column pointers
+			if (mc.getSize() < sizeof(patch_header_t) + (header->width * sizeof(uint16_t)))
 				return false;
 
 			// Check column pointers are within range
@@ -704,10 +775,16 @@ bool EntryType::readEntryTypeDefinition(MemChunk& mc) {
 						return false;
 
 					// Get format type matching format string
+					bool fmt_exists = false;
 					for (int a = 0; a < EDF_UNKNOWN; a++) {
-						if (!format.Cmp(formats[a].id))
+						if (!format.Cmp(formats[a].id)) {
 							ntype->setFormat(formats[a].format);
+							fmt_exists = true;
+						}
 					}
+					
+					if (!fmt_exists)
+						ntype->setFormat(EDF_UNKNOWN);
 				}
 
 				// Icon field
