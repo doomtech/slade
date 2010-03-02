@@ -371,8 +371,8 @@ bool ArchivePanel::exportEntry() {
 		// Setup filename
 		wxFileName fn(selection[a]->getName());
 
-		// Add .lmp extension if needed
-		fn.SetExt(_T("lmp"));
+		// Add appropriate extension if needed
+		fn.SetExt(selection[a]->getType()->getExtension());
 
 		// Create save file dialog
 		wxFileDialog *dialog_save = new wxFileDialog(this, s_fmt(_T("Export Entry \"%s\""), selection[a]->getName().c_str()),

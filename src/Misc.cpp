@@ -46,15 +46,20 @@ bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry) {
 		return false;
 
 	switch (entry->getType()->getFormat()) {
-		// General image formats
-		case EDF_PNG:
-			return image->loadImage(entry->getData(true), entry->getSize());
 		// Doom gfx format
 		case EDF_GFX_DOOM:
 			return image->loadDoomGfx(entry->getData(true), entry->getSize());
 		// Doom flat format
 		case EDF_GFX_FLAT:
 			return image->loadDoomFlat(entry->getData(true), entry->getSize());
+		// General image formats (that FreeImage supports at least)
+		default:
+			if (!image->loadImage(entry->getData(true), entry->getSize())) {
+				Global::error = _T("Image format not supported by FreeImage");
+				return false;
+			}
+			else
+				return true;
 	}
 
 	// Unknown image type
