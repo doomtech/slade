@@ -586,7 +586,7 @@ vector<Archive::mapdesc_t> WadArchive::detectMaps() {
 
 	// Set all map header entries to ETYPE_MAP type
 	for (size_t a = 0; a < maps.size(); a++)
-		maps[a].head->setType(EntryType::getType(_T("map")));
+		maps[a].head->setType(EntryType::mapMarkerType());
 
 	return maps;
 }

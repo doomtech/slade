@@ -403,7 +403,6 @@ bool ZipArchive::openFile(string filename) {
 			zip.Read(data, entry->GetSize());
 			new_entry->importMem(data, entry->GetSize());
 			new_entry->setLoaded(true);
-			new_entry->setState(0);
 
 			// Determine it's type
 			EntryType::detectEntryType(new_entry);
@@ -418,13 +417,18 @@ bool ZipArchive::openFile(string filename) {
 			// Zip entry is a directory, add it to the directory tree
 			wxFileName fn(entry->GetName(wxPATH_UNIX), wxPATH_UNIX);
 			zipdir_t* ndir = addDirectory(fn.GetPath(true, wxPATH_UNIX));
-			ndir->entry->setState(0);
 		}
 
 		// Go to next entry in the zip file
 		entry = zip.GetNextEntry();
 		entry_index++;
 	}
+
+	// Set all entries/directories to unmodified
+	vector<ArchiveEntry*> entry_list;
+	getTreeAsList(entry_list);
+	for (size_t a = 0; a < entry_list.size(); a++)
+		entry_list[a]->setState(0);
 
 	// Enable announcements
 	setMuted(false);
@@ -944,7 +948,7 @@ string ZipArchive::detectEntrySection(ArchiveEntry* entry) {
 
 	// Get the entry's first directory
 	zipdir_t* dir = getEntryDirectory(entry);
-	while (dir->parent_dir != directory)
+	while (dir->parent_dir != directory && dir != directory)
 		dir = dir->parent_dir;
 
 	// Patches

@@ -68,42 +68,11 @@ EntryList::EntryList(EntryListPanel *parent, int id)
 
 	// Setup entry icons
 	image_list = new wxImageList(16, 16, false, 0);
-	image_list->Add(getIcon(_T("e_unknown")));
-	image_list->Add(getIcon(_T("e_marker")));
-	image_list->Add(getIcon(_T("e_text")));
-	image_list->Add(getIcon(_T("e_patch")));
-	image_list->Add(getIcon(_T("e_sprite")));
-	image_list->Add(getIcon(_T("e_flat")));
-	image_list->Add(getIcon(_T("e_gfx")));
-	image_list->Add(getIcon(_T("e_gfx")));
-	image_list->Add(getIcon(_T("e_png")));
-	image_list->Add(getIcon(_T("e_gfx")));		// image
-	image_list->Add(getIcon(_T("e_sound")));
-	image_list->Add(getIcon(_T("e_sound")));	// wav
-	image_list->Add(getIcon(_T("e_sound")));	// mp3
-	image_list->Add(getIcon(_T("e_sound")));	// flac
-	image_list->Add(getIcon(_T("e_music")));
-	image_list->Add(getIcon(_T("e_music")));
-	image_list->Add(getIcon(_T("e_music")));
-	image_list->Add(getIcon(_T("e_texturex")));
-	image_list->Add(getIcon(_T("e_pnames")));
-	image_list->Add(getIcon(_T("e_map")));
-	image_list->Add(getIcon(_T("e_map_data")));
-	image_list->Add(getIcon(_T("e_map_data")));
-	image_list->Add(getIcon(_T("e_map_data")));
-	image_list->Add(getIcon(_T("e_map_data")));
-	image_list->Add(getIcon(_T("e_map_data")));
-	image_list->Add(getIcon(_T("e_map_data")));
-	image_list->Add(getIcon(_T("e_map_data")));
-	image_list->Add(getIcon(_T("e_map_data")));
-	image_list->Add(getIcon(_T("e_map_data")));
-	image_list->Add(getIcon(_T("e_map_data")));
-	image_list->Add(getIcon(_T("e_map_data")));
-	image_list->Add(getIcon(_T("e_default")));
-	image_list->Add(getIcon(_T("e_default")));
-	image_list->Add(getIcon(_T("e_wad")));
-	image_list->Add(getIcon(_T("e_folder")));
-	image_list->Add(getIcon(_T("e_upfolder")));
+
+	wxArrayString et_icon_list = EntryType::getIconList();
+	for (size_t a = 0; a < et_icon_list.size(); a++)
+		image_list->Add(getIcon(et_icon_list[a]));
+
 	SetImageList(image_list, wxIMAGE_LIST_SMALL);
 }
 
@@ -133,7 +102,8 @@ bool EntryList::updateEntry(int index) {
 	}
 
 	// Detect type
-	EntryType::detectEntryType(entry);
+	if (entry->getType() == EntryType::unknownType())
+		EntryType::detectEntryType(entry);
 
 	// Disable size update
 	bool update = enableSizeUpdate();
@@ -155,7 +125,7 @@ bool EntryList::updateEntry(int index) {
 		setItemStatus(index, LV_STATUS_NEW);
 
 	// Set item icon
-	//SetItemImage(index, entry->getType());
+	SetItemImage(index, entry->getType()->getIndex());
 
 	// Set size
 	enableSizeUpdate(update);

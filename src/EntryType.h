@@ -34,6 +34,7 @@ public:
 	~EntryDataFormat(){}
 
 	static uint16_t detectFormat(MemChunk& mc);
+	static bool isFormat(MemChunk& mc, uint16_t format);
 
 	static bool detectPng(MemChunk& mc);
 	static bool detectBmp(MemChunk& mc);
@@ -59,6 +60,8 @@ private:
 	string		extension;	// File extension to use when exporting entries of this type
 	string		icon;		// Icon to use in entry list
 	string		editor;		// The in-program editor to use (hardcoded ids, see *EntryPanel constructors)
+	int			index;
+	bool		detectable;	// False only for special types that should be set not detected
 
 	// Type matching criteria
 	uint16_t		format;				// To be of this type, the entry data must match the specified format
@@ -67,6 +70,8 @@ private:
 	vector<int>		match_size;
 	int				size_limit[2];		// Minimum/maximum size
 	vector<int>		size_multiple;		// Entry size must be a multiple of this
+	string			section;			// The 'section' of the archive the entry is in, eg "sprites" for entries
+										// between SS_START/SS_END in a wad, or the 'sprites' folder in a zip
 
 public:
 	EntryType(string id = _T("Unknown"));
@@ -84,6 +89,8 @@ public:
 	void setMaxSize(int size)			{ this->size_limit[1] = size; }
 	void addSizeMultiple(int size) 		{ this->size_multiple.push_back(size); }
 	void addMatchSize(int size)			{ this->match_size.push_back(size); }
+	void setDetectable(bool detect)		{ this->detectable = detect; }
+	void setSection(string section)		{ this->section = section; }
 
 	// Getters
 	string		getId()			{ return id; }
@@ -92,6 +99,7 @@ public:
 	uint16_t	getFormat()		{ return format; }
 	string		getEditor()		{ return editor; }
 	string		getIcon()		{ return icon; }
+	int			getIndex()		{ return index; }
 
 	// Misc
 	void	addToList();
@@ -101,12 +109,14 @@ public:
 	bool	isThisType(ArchiveEntry* entry);
 
 	// Static functions
-	static bool 		readEntryTypeDefinition(MemChunk& mc);
-	static bool 		loadEntryTypes();
-	static bool 		detectEntryType(ArchiveEntry* entry);
-	static EntryType*	getType(string id);
-	static EntryType*	unknownType();
-	static EntryType*	folderType();
+	static bool 			readEntryTypeDefinition(MemChunk& mc);
+	static bool 			loadEntryTypes();
+	static bool 			detectEntryType(ArchiveEntry* entry);
+	static EntryType*		getType(string id);
+	static EntryType*		unknownType();
+	static EntryType*		folderType();
+	static EntryType*		mapMarkerType();
+	static wxArrayString	getIconList();
 };
 
 #endif//__ENTRYTYPE_H__

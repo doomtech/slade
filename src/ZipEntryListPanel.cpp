@@ -122,8 +122,8 @@ void ZipEntryListPanel::updateDirectoryEntry(int index) {
 
 	// If the entry is the 'up directory' entry, set it's icon to
 	// the 'up directory' icon
-	//if (dir == getCurrentDir()->parent_dir)
-	//	entry_list->SetItemImage(index, ETYPE_FOLDER + 1);
+	if (dir == getCurrentDir()->parent_dir)
+		entry_list->SetItemImage(index, EntryType::folderType()->getIndex());
 
 	// Set it's size column manually
 	if (col_size) {

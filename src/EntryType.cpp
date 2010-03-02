@@ -68,6 +68,7 @@ vector<EntryType*>	entry_types;	// The big list of all entry types
 // Special entry types
 EntryType			etype_unknown;	// The default, 'unknown' entry type
 EntryType			etype_folder;	// Folder entry type
+EntryType			etype_map;		// Map marker type
 
 
 /*******************************************************************
@@ -134,6 +135,43 @@ uint16_t EntryDataFormat::detectFormat(MemChunk& mc) {
 		return EDF_GFX_FLAT;
 
 	return type;
+}
+
+bool EntryDataFormat::isFormat(MemChunk& mc, uint16_t format) {
+	switch (format) {
+	case EDF_BMP:
+		return detectBmp(mc);
+	case EDF_GFX_DOOM:
+		return detectDoomGfx(mc);
+	case EDF_GFX_FLAT:
+		return detectDoomFlat(mc);
+	case EDF_JPEG:
+		return detectJpeg(mc);
+	case EDF_MIDI:
+		return detectMidi(mc);
+	case EDF_MOD_IT:
+		return detectModIt(mc);
+	case EDF_MOD_MOD:
+		return detectModMod(mc);
+	case EDF_MOD_S3M:
+		return detectModS3m(mc);
+	case EDF_MOD_XM:
+		return detectModXm(mc);
+	case EDF_MUS:
+		return detectMus(mc);
+	case EDF_PNG:
+		return detectPng(mc);
+	case EDF_SND_DOOM:
+		return detectSndDoom(mc);
+	case EDF_SND_WAV:
+		return detectSndWav(mc);
+	case EDF_WAD:
+		return detectWad(mc);
+	default:
+		return false;
+	}
+	
+	return false;
 }
 
 bool EntryDataFormat::detectPng(MemChunk& mc) {
@@ -374,6 +412,8 @@ EntryType::EntryType(string id) {
 	size_limit[0] = -1;
 	size_limit[1] = -1;
 	editor = _T("default");
+	detectable = true;
+	section = _T("none");
 }
 
 /* EntryType::~EntryType
@@ -387,6 +427,7 @@ EntryType::~EntryType() {
  *******************************************************************/
 void EntryType::addToList() {
 	entry_types.push_back(this);
+	index = entry_types.size() - 1;
 }
 
 /* EntryType::dump
@@ -418,6 +459,10 @@ void EntryType::dump() {
 bool EntryType::isThisType(ArchiveEntry* entry) {
 	// Check entry was given
 	if (!entry)
+		return false;
+
+	// Check type is detectable
+	if (!detectable)
 		return false;
 
 	// Get full entry name as filename
@@ -487,6 +532,18 @@ bool EntryType::isThisType(ArchiveEntry* entry) {
 			return false;
 	}
 
+	// Check for entry section match if needed
+	if (section != _T("none")) {
+		// Check entry is part of an archive (if not it can't be in a section)
+		if (!entry->getParent())
+			return false;
+
+		string e_section = entry->getParent()->detectEntrySection(entry);
+
+		if (e_section != section)
+			return false;
+	}
+
 	// Check for data format match if needed
 	if (format == EDF_TEXT) {
 		// Text is a special case, as other data formats can sometimes be detected as 'text',
@@ -495,9 +552,7 @@ bool EntryType::isThisType(ArchiveEntry* entry) {
 			return false;
 	}
 	else if (format != EDF_ANY) {
-		uint16_t data_format = EntryDataFormat::detectFormat(entry->getMCData());
-
-		if (data_format != format)
+		if (!EntryDataFormat::isFormat(entry->getMCData(), format))
 			return false;
 	}
 
@@ -611,6 +666,19 @@ bool EntryType::readEntryTypeDefinition(MemChunk& mc) {
 						return false;
 
 					ntype->setEditor(editor);		// Set type editor
+				}
+
+				// Section field
+				if (!token.Cmp(_T("section"))) {
+					if (!tz.checkToken(_T("=")))	// Check for =
+						return false;
+
+					string section = tz.getToken();	// Get name value
+
+					if (!tz.checkToken(_T(";")))	// Check for ;
+						return false;
+
+					ntype->setSection(section);		// Set type section
 				}
 
 				// MatchExtension field
@@ -730,12 +798,22 @@ bool EntryType::readEntryTypeDefinition(MemChunk& mc) {
  * Loads all built-in and custom user entry types
  *******************************************************************/
 bool EntryType::loadEntryTypes() {
-	// Init unknown type
+	// Setup unknown type
 	etype_unknown.setIcon(_T("e_unknown"));
+	etype_unknown.setDetectable(false);
+	etype_unknown.addToList();
 	
-	// Init folder type
+	// Setup folder type
 	etype_folder.setIcon(_T("e_folder"));
 	etype_folder.setName(_T("Folder"));
+	etype_folder.setDetectable(false);
+	etype_folder.addToList();
+	
+	// Setup map marker type
+	etype_map.setIcon(_T("e_map"));
+	etype_map.setName(_T("Map Marker"));
+	etype_map.setDetectable(false);
+	etype_map.addToList();
 
 	// Get builtin entry types from resource archive
 	Archive* res_archive = theArchiveManager->resourceArchive();
@@ -763,8 +841,8 @@ bool EntryType::loadEntryTypes() {
  * Attempts to detect the given entry's type
  *******************************************************************/
 bool EntryType::detectEntryType(ArchiveEntry* entry) {
-	// Do nothing if the entry is a folder
-	if (entry->getType() == &etype_folder)
+	// Do nothing if the entry is a folder or a map marker
+	if (entry->getType() == &etype_folder || entry->getType() == &etype_map)
 		return false;
 
 	// Go through all registered types
@@ -806,6 +884,22 @@ EntryType* EntryType::unknownType() {
  *******************************************************************/
 EntryType* EntryType::folderType() {
 	return &etype_folder;
+}
+
+/* EntryType::mapMarkerType
+ * Returns the global 'map marker' entry type
+ *******************************************************************/
+EntryType* EntryType::mapMarkerType() {
+	return &etype_map;
+}
+
+wxArrayString EntryType::getIconList() {
+	wxArrayString list;
+
+	for (size_t a = 0; a < entry_types.size(); a++)
+		list.Add(entry_types[a]->getIcon());
+
+	return list;
 }
 
 
