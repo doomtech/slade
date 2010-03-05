@@ -54,7 +54,7 @@ Palette8bit::~Palette8bit() {
 }
 
 /* Palette8bit::loadMem
- * Reads colour information from raw data
+ * Reads colour information from raw data (MemChunk)
  *******************************************************************/
 bool Palette8bit::loadMem(MemChunk& mc) {
 	// Check that the given data has at least 1 colour (3 bytes)
@@ -71,6 +71,28 @@ bool Palette8bit::loadMem(MemChunk& mc) {
 			// Set colour in palette
 			colours[c++].set(rgb[0], rgb[1], rgb[2], 255);
 		}
+
+		// If we have read 256 colours, finish
+		if (c == 256)
+			break;
+	}
+
+	return true;
+}
+
+/* Palette8bit::loadMem
+ * Reads colour information from raw data
+ *******************************************************************/
+bool Palette8bit::loadMem(const uint8_t* data, uint32_t size) {
+	// Check that the given data has at least 1 colour (3 bytes)
+	if (size < 3)
+		return false;
+
+	// Read in colours
+	int c = 0;
+	for (size_t a = 0; a < size; a += 3) {
+		// Set colour in palette
+		colours[c++].set(data[a], data[a+1], data[a+2], 255);
 
 		// If we have read 256 colours, finish
 		if (c == 256)

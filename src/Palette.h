@@ -15,6 +15,7 @@ public:
 	short	transIndex() { return index_trans; }
 
 	bool	loadMem(MemChunk& mc);
+	bool	loadMem(const uint8_t* data, uint32_t size);
 
 	void	setColour(uint8_t index, rgba_t col) { colours[index] = col; }
 	void	setTransIndex(short index) { index_trans = index; }

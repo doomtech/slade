@@ -6,19 +6,30 @@
 #include "PaletteCanvas.h"
 
 /* TODO:
- * - Ability to scroll through multiple palettes (if the entry contains more than 1)
  * - Ability to export to custom palettes directory
  * - Ability to edit the palette (though might make a full-fledged PLAYPAL/COLORMAP editor)
  */
 class PaletteEntryPanel : public EntryPanel {
 private:
-	PaletteCanvas*	pal_canvas;
+	PaletteCanvas*			pal_canvas;
+	vector<Palette8bit*>	palettes;
+	uint32_t				cur_palette;
+	
+	wxButton*				btn_nextpal;
+	wxButton*				btn_prevpal;
+	wxStaticText*			text_curpal;
 
 public:
 	PaletteEntryPanel(wxWindow* parent);
 	~PaletteEntryPanel();
 
 	bool loadEntry(ArchiveEntry* entry);
+	
+	bool	showPalette(uint32_t index);
+	
+	// Events
+	void	onBtnNextPal(wxCommandEvent& e);
+	void	onBtnPrevPal(wxCommandEvent& e);
 };
 
 #endif //__PALETTEENTRYPANEL_H__

@@ -125,7 +125,12 @@ bool EntryPanel::openEntry(ArchiveEntry* entry) {
 	entry_data.importMem(entry->getData(true), entry->getSize());
 
 	// Load the entry
-	return loadEntry(entry);
+	if (loadEntry(entry)) {
+		this->entry = entry;
+		return true;
+	}
+	else
+		return false;
 }
 
 /* EntryPanel::loadEntry
