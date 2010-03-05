@@ -113,6 +113,21 @@ void TextureXList::clear() {
 	patches.clear();
 }
 
+// Some structs for reading TEXTUREx data
+struct tdef_t {
+	char		name[8];
+	uint16_t	flags;
+	uint8_t		scale[2];
+	int16_t		width;
+	int16_t		height;
+};
+
+struct pdef_t {
+	int16_t	left;
+	int16_t	top;
+	int16_t	patch;
+};
+
 /* TextureXList::readTEXTUREXData
  * Reads in a doom-format TEXTUREx entry. Returns true on success,
  * false otherwise
@@ -125,19 +140,36 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, ArchiveEntry* pnames
 	// Get parent archive
 	Archive* parent_archive = texturex->getParent();
 
+	// Check if this is a strife-format TEXTUREx entry
+	bool strife = false;
+	if (parent_archive) {
+		if (parent_archive->getFileName(false).CmpNoCase(_T("strife1.wad")) == 0)
+			strife = true;
+	}
+
 	// Read PNAMES
 
 	// Read number of pnames
 	vector<string> patch_names;
 	uint32_t n_pnames = 0;
 	pnames->seek(0, SEEK_SET);
-	pnames->read(&n_pnames, 4);
+	if (!pnames->read(&n_pnames, 4)) {
+		wxLogMessage(_T("Error: PNAMES entry is corrupt"));
+		return false;
+	}
 
 	// Read pnames content
 	for (uint32_t a = 0; a < n_pnames; a++) {
 		char pname[9] = "";
 		pname[8] = 0;
-		pnames->read(&pname, 8);
+
+		// Try to read pname
+		if (!pnames->read(&pname, 8)) {
+			wxLogMessage(_T("Error: PNAMES entry is corrupt"));
+			return false;
+		}
+
+		// Add pname
 		patch_names.push_back(wxString(pname).Upper());
 	}
 
@@ -150,69 +182,84 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, ArchiveEntry* pnames
 	int32_t*	offsets = NULL;
 
 	// Number of textures
-	texturex->read(&n_tex, 4);
+	if (!texturex->read(&n_tex, 4)) {
+		wxLogMessage(_T("Error: TEXTUREx entry is corrupt"));
+		return false;
+	}
 
 	// Texture definition offsets
 	offsets = new int32_t[n_tex];
-	texturex->read(offsets, n_tex * 4);
+	if (!texturex->read(offsets, n_tex * 4)) {
+		wxLogMessage(_T("Error: TEXTUREx entry is corrupt"));
+		return false;
+	}
 
 	// Read all texture definitions
 	for (int32_t a = 0; a < n_tex; a++) {
-		// Read name
-		char name[9] = "";
-		name[8] = 0;
-		texturex->read(name, 8);
-
-		// Read flags
-		uint16_t flags;
-		texturex->read(&flags, 2);
-
-		// Read scale
-		uint8_t scale[2];
-		texturex->read(&scale, 2);
-
-		// Read dimensions
-		uint16_t width = 0;
-		uint16_t height = 0;
-		texturex->read(&width, 2);
-		texturex->read(&height, 2);
+		// Skip to texture definition
+		if (!texturex->seek(offsets[a], SEEK_SET)) {
+			wxLogMessage(_T("Error: TEXTUREx entry is corrupt"));
+			return false;
+		}
+		
+		// Read definition
+		tdef_t tdef;
+		if (!texturex->read(&tdef, 16)) {
+			wxLogMessage(_T("Error: TEXTUREx entry is corrupt"));
+			return false;
+		}
 
 		// Skip unused
-		texturex->seek(4, SEEK_CUR);
+		if (!strife) {
+			if (!texturex->seek(4, SEEK_CUR)) {
+				wxLogMessage(_T("Error: TEXTUREx entry is corrupt"));
+				return false;
+			}
+		}
 
 		// Create texture
-		CTexture* tex = new CTexture(name, width, height);
+		CTexture* tex = new CTexture(wxString::From8BitData(tdef.name, 8), tdef.width, tdef.height);
 
 		// Read patches
-		uint16_t n_patches = 0;
-		texturex->read(&n_patches, 2);
+		int16_t n_patches = 0;
+		if (!texturex->read(&n_patches, 2)) {
+			wxLogMessage(_T("Error: TEXTUREx entry is corrupt"));
+			return false;
+		}
+
 		for (uint16_t p = 0; p < n_patches; p++) {
-			// Read left offset
-			int16_t left = 0;
-			texturex->read(&left, 2);
+			// Read patch definition
+			pdef_t pdef;
+			if (!texturex->read(&pdef, 6)) {
+				wxLogMessage(_T("Error: TEXTUREx entry is corrupt"));
+				return false;
+			}
 
-			// Read top offset
-			int16_t top = 0;
-			texturex->read(&top, 2);
+			// Skip unused
+			if (!strife) {
+				if (!texturex->seek(4, SEEK_CUR)) {
+					wxLogMessage(_T("Error: TEXTUREx entry is corrupt"));
+					return false;
+				}
+			}
 
-			// Read patch id
-			uint16_t patch = 0;
-			texturex->read(&patch, 2);
+			// Check patch id
+			if (pdef.patch >= patch_names.size() || pdef.patch < 0) {
+				wxLogMessage(_T("Texture %s contains non-existant patch id %d"), tex->getName().c_str(), pdef.patch);
+				continue;
+			}
 
 			// Create patch
 			CTPatch* ctp = new CTPatch();
-			ctp->setOffsets(left, top);
+			ctp->setOffsets(pdef.left, pdef.top);
 
 			// Find patch image entry
-			ArchiveEntry* img = texturex->getParent()->getEntry(patch_names[patch]);
-			if (!img) wxLogMessage(s_fmt(_T("Couldn't find patch %s"), patch_names[patch].c_str()));
+			ArchiveEntry* img = texturex->getParent()->getEntry(patch_names[pdef.patch]);
+			if (!img) wxLogMessage(s_fmt(_T("Couldn't find patch %s"), patch_names[pdef.patch].c_str()));
 			ctp->loadImage(img);
 
 			// Add it to the texture
 			tex->addPatch(ctp);
-
-			// Skip unused
-			texturex->seek(4, SEEK_CUR);
 		}
 
 		// Add texture to list
