@@ -267,6 +267,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\OpenGL.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\OpenGL.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\Structs.h"
 				>
 			</File>
@@ -692,6 +700,14 @@
 			</File>
 			<File
 				RelativePath=".\src\PaletteChooser.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\SplashWindow.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\SplashWindow.h"
 				>
 			</File>
 		</Filter>

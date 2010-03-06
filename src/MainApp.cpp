@@ -237,6 +237,10 @@ bool MainApp::OnInit() {
 	if (!initDirectories())
 		return false;
 
+	// Load image handlers
+	wxImage::AddHandler(new wxPNGHandler);
+	wxImage::AddHandler(new wxICOHandler);
+
 	// Init logfile
 	initLogFile();
 
@@ -247,21 +251,17 @@ bool MainApp::OnInit() {
 	// Show splash screen
 	theSplashWindow->showSplash(_T("Starting Up..."));
 
-	// Load image handlers
-	wxImage::AddHandler(new wxPNGHandler);
-	wxImage::AddHandler(new wxICOHandler);
-
 	// Load configuration file
 	readConfigFile();
 
 	// Load program icons
 	loadIcons();
 
-	// Load entry types
-	EntryType::loadEntryTypes();
-
 	// Create the main window
 	main_window = new MainWindow();
+
+	// Load entry types
+	EntryType::loadEntryTypes();
 
 	// Open any archives on the command line
 	for (int a = 0; a < argc; a++) {
@@ -273,7 +273,7 @@ bool MainApp::OnInit() {
 	main_window->Show(true);
 
 	// Hide splash screen
-	theSplashWindow->Show(false);
+	theSplashWindow->hide();
 
 	return true;
 }

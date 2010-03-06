@@ -2,11 +2,11 @@
 #ifndef __OGLCANVAS_H__
 #define	__OGLCANVAS_H__
 
-#include <wx/glcanvas.h>
+#include "OpenGL.h"
 
 class OGLCanvas : public wxGLCanvas {
 protected:
-	wxGLContext*	context;
+	//wxGLContext*	context;
 	bool			init_done;
 
 public:

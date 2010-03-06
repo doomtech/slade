@@ -2,37 +2,26 @@
 #ifndef __SPLASHWINDOW_H__
 #define __SPLASHWINDOW_H__
 
-#include "GfxCanvas.h"
 #include <wx/minifram.h>
-
-class SplashCanvas : public OGLCanvas {
-private:
-	
-public:
-	SplashCanvas(wxWindow* parent);
-	~SplashCanvas();
-	
-	void draw();
-};
 
 class SplashWindow : public wxMiniFrame {
 private:
-	SplashCanvas*	gl_splash;
 
 	static SplashWindow*	instance;
 
 public:
-	SplashWindow();
+	SplashWindow(wxWindow* parent);
 	~SplashWindow();
 
-	static SplashWindow* getInstance() {
+	static SplashWindow* getInstance(wxWindow* parent = NULL) {
 		if (!instance)
-			instance = new SplashWindow();
+			instance = new SplashWindow(parent);
 
 		return instance;
 	}
 
 	void	showSplash(string message);
+	void	hide();
 };
 
 // Define for less cumbersome SplashWindow::getInstance()

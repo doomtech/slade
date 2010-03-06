@@ -42,7 +42,6 @@
  *******************************************************************/
 OGLCanvas::OGLCanvas(wxWindow* parent, int id)
 : wxGLCanvas(parent, id, NULL, wxDefaultPosition, wxDefaultSize, wxBORDER_SIMPLE) {
-	context = NULL;
 	init_done = false;
 
 	// Bind events
@@ -54,8 +53,6 @@ OGLCanvas::OGLCanvas(wxWindow* parent, int id)
  * OGLCanvas class constructor
  *******************************************************************/
 OGLCanvas::~OGLCanvas() {
-	if (context)
-		delete context;
 }
 
 /* OGLCanvas::setContext
@@ -64,10 +61,7 @@ OGLCanvas::~OGLCanvas() {
  * false otherwise
  *******************************************************************/
 bool OGLCanvas::setContext() {
-	if (!context) {
-		if (IsShown())
-			context = new wxGLContext(this);
-	}
+	wxGLContext* context = OpenGL::getContext(this);
 
 	if (context) {
 		context->SetCurrent(*this);
