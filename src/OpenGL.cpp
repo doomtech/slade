@@ -2,8 +2,10 @@
 #include "Main.h"
 #include "OpenGL.h"
 
-wxGLContext*	OpenGL::context = NULL;
-double			OpenGL::version = 0;
+namespace OpenGL {
+	wxGLContext*	context = NULL;
+	double			version = 0;
+}
 
 
 wxGLContext* OpenGL::getContext(wxGLCanvas* canvas) {
