@@ -13,7 +13,7 @@ wxGLContext* OpenGL::getContext(wxGLCanvas* canvas) {
 	if (!context) {
 		if (canvas->IsShown()) {
 			context = new wxGLContext(canvas);
-			context->SetCurrent(canvas);
+			context->SetCurrent(*canvas);
 			init();
 		}
 		else

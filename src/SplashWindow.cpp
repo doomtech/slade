@@ -33,7 +33,7 @@ SplashWindow::~SplashWindow() {
 
 void SplashWindow::showSplash(string message) {
 	// Show & init window
-	SetInitialSize();
+	SetInitialSize(wxSize(300, 200));
 	Layout();
 	Centre();
 	ShowWithEffect(wxSHOW_EFFECT_BLEND);

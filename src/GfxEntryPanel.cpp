@@ -89,7 +89,7 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 	gfx_canvas->allowDrag(true);
 
 
-	// Add editing controls
+	// Add editing/info controls
 	hbox = new wxBoxSizer(wxHORIZONTAL);
 	sizer_bottom->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
 
@@ -98,7 +98,11 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 	spin_yoffset = new wxSpinCtrl(this, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, SHRT_MIN, SHRT_MAX, 0);
 	hbox->Add(new wxStaticText(this, -1, _T("Offsets:")), 0, wxALIGN_CENTER_VERTICAL, 0);
 	hbox->Add(spin_xoffset, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
-	hbox->Add(spin_yoffset, 0, wxEXPAND, 0);
+	hbox->Add(spin_yoffset, 0, wxEXPAND|wxRIGHT, 4);
+
+	// Size
+	label_dimensions = new wxStaticText(this, -1, _T("Size: N/A"));
+	hbox->Add(label_dimensions, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT, 4);
 
 
 	// Bind Events
@@ -138,6 +142,9 @@ bool GfxEntryPanel::loadEntry(ArchiveEntry* entry) {
 	// Set offset text boxes
 	spin_xoffset->SetValue(gfx_canvas->getImage()->offset().x);
 	spin_yoffset->SetValue(gfx_canvas->getImage()->offset().y);
+
+	// Set size label
+	label_dimensions->SetLabel(s_fmt(_T("Size: %d x %d"), gfx_canvas->getImage()->getWidth(), gfx_canvas->getImage()->getHeight()));
 
 	// Apply offset view type
 	applyViewType();

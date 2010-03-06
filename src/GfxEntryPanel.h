@@ -12,6 +12,7 @@ private:
 	GfxCanvas*		gfx_canvas;
 	wxSlider*		slider_zoom;
 	wxStaticText*	label_current_zoom;
+	wxStaticText*	label_dimensions;
 	PaletteChooser*	combo_palette;
 	wxComboBox*		combo_offset_type;
 	wxSpinCtrl*		spin_xoffset;
