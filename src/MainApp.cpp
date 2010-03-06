@@ -35,6 +35,7 @@
 #include "Tokenizer.h"
 #include "Console.h"
 #include "Icons.h"
+#include "SplashWindow.h"
 #include <wx/image.h>
 #include <wx/stdpaths.h>
 #include <wx/ffile.h>
@@ -243,6 +244,9 @@ bool MainApp::OnInit() {
 	if (!theArchiveManager->resArchiveOK())
 		return false;
 
+	// Show splash screen
+	theSplashWindow->showSplash(_T("Starting Up..."));
+
 	// Load image handlers
 	wxImage::AddHandler(new wxPNGHandler);
 	wxImage::AddHandler(new wxICOHandler);
@@ -267,6 +271,9 @@ bool MainApp::OnInit() {
 
 	// Show the main window
 	main_window->Show(true);
+
+	// Hide splash screen
+	theSplashWindow->Show(false);
 
 	return true;
 }

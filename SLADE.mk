@@ -52,7 +52,7 @@ Objects=src/$(IntermediateDirectory)/GfxConvDialog$(ObjectSuffix) src/$(Intermed
 	src/$(IntermediateDirectory)/TextureXEntryPanel$(ObjectSuffix) src/$(IntermediateDirectory)/ZipArchivePanel$(ObjectSuffix) src/$(IntermediateDirectory)/ZipEntryListPanel$(ObjectSuffix) src/$(IntermediateDirectory)/ArchiveManagerPanel$(ObjectSuffix) src/$(IntermediateDirectory)/MainWindow$(ObjectSuffix) src/$(IntermediateDirectory)/EntryOperations$(ObjectSuffix) src/$(IntermediateDirectory)/MapLine$(ObjectSuffix) src/$(IntermediateDirectory)/MapSector$(ObjectSuffix) src/$(IntermediateDirectory)/MapSide$(ObjectSuffix) src/$(IntermediateDirectory)/MapThing$(ObjectSuffix) \
 	src/$(IntermediateDirectory)/MapVertex$(ObjectSuffix) src/$(IntermediateDirectory)/SLADEMap$(ObjectSuffix) src/$(IntermediateDirectory)/MapCanvas$(ObjectSuffix) src/$(IntermediateDirectory)/MapEditorWindow$(ObjectSuffix) src/$(IntermediateDirectory)/Archive$(ObjectSuffix) src/$(IntermediateDirectory)/ArchiveEntry$(ObjectSuffix) src/$(IntermediateDirectory)/ArchiveManager$(ObjectSuffix) src/$(IntermediateDirectory)/WadArchive$(ObjectSuffix) src/$(IntermediateDirectory)/ZipArchive$(ObjectSuffix) src/$(IntermediateDirectory)/EntryType$(ObjectSuffix) \
 	src/$(IntermediateDirectory)/SImage$(ObjectSuffix) src/$(IntermediateDirectory)/Palette$(ObjectSuffix) src/$(IntermediateDirectory)/PaletteManager$(ObjectSuffix) src/$(IntermediateDirectory)/CTexture$(ObjectSuffix) src/$(IntermediateDirectory)/TextureXList$(ObjectSuffix) src/$(IntermediateDirectory)/Icons$(ObjectSuffix) src/$(IntermediateDirectory)/GLTexture$(ObjectSuffix) src/$(IntermediateDirectory)/ColourBox$(ObjectSuffix) src/$(IntermediateDirectory)/CTextureCanvas$(ObjectSuffix) src/$(IntermediateDirectory)/GfxCanvas$(ObjectSuffix) \
-	src/$(IntermediateDirectory)/ListView$(ObjectSuffix) src/$(IntermediateDirectory)/OGLCanvas$(ObjectSuffix) src/$(IntermediateDirectory)/PaletteCanvas$(ObjectSuffix) src/$(IntermediateDirectory)/PaletteChooser$(ObjectSuffix) src/$(IntermediateDirectory)/TextEditor$(ObjectSuffix) src/$(IntermediateDirectory)/ConsolePanel$(ObjectSuffix) 
+	src/$(IntermediateDirectory)/ListView$(ObjectSuffix) src/$(IntermediateDirectory)/OGLCanvas$(ObjectSuffix) src/$(IntermediateDirectory)/PaletteCanvas$(ObjectSuffix) src/$(IntermediateDirectory)/PaletteChooser$(ObjectSuffix) src/$(IntermediateDirectory)/TextEditor$(ObjectSuffix) src/$(IntermediateDirectory)/ConsolePanel$(ObjectSuffix) src/$(IntermediateDirectory)/SplashWindow$(ObjectSuffix) 
 
 ##
 ## Main Build Targets 
@@ -464,6 +464,13 @@ src/$(IntermediateDirectory)/ConsolePanel$(DependSuffix): src/ConsolePanel.cpp
 	@test -d src/Release || $(MakeDirCommand) src/Release
 	@$(CompilerName) $(CmpOptions) $(IncludePath) -MTsrc/$(IntermediateDirectory)/ConsolePanel$(ObjectSuffix) -MFsrc/$(IntermediateDirectory)/ConsolePanel$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/ConsolePanel.cpp"
 
+src/$(IntermediateDirectory)/SplashWindow$(ObjectSuffix): src/SplashWindow.cpp src/$(IntermediateDirectory)/SplashWindow$(DependSuffix)
+	@test -d src/Release || $(MakeDirCommand) src/Release
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/SplashWindow.cpp" $(CmpOptions) $(ObjectSwitch)src/$(IntermediateDirectory)/SplashWindow$(ObjectSuffix) $(IncludePath)
+src/$(IntermediateDirectory)/SplashWindow$(DependSuffix): src/SplashWindow.cpp
+	@test -d src/Release || $(MakeDirCommand) src/Release
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MTsrc/$(IntermediateDirectory)/SplashWindow$(ObjectSuffix) -MFsrc/$(IntermediateDirectory)/SplashWindow$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/SplashWindow.cpp"
+
 
 -include src/$(IntermediateDirectory)/*$(DependSuffix)
 ##
@@ -638,6 +645,9 @@ clean:
 	$(RM) src/$(IntermediateDirectory)/ConsolePanel$(ObjectSuffix)
 	$(RM) src/$(IntermediateDirectory)/ConsolePanel$(DependSuffix)
 	$(RM) src/$(IntermediateDirectory)/ConsolePanel$(PreprocessSuffix)
+	$(RM) src/$(IntermediateDirectory)/SplashWindow$(ObjectSuffix)
+	$(RM) src/$(IntermediateDirectory)/SplashWindow$(DependSuffix)
+	$(RM) src/$(IntermediateDirectory)/SplashWindow$(PreprocessSuffix)
 	$(RM) $(OutputFile)
 
 

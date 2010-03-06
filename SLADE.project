@@ -36,6 +36,8 @@
     <File Name="src/Tokenizer.h"/>
     <File Name="src/WxStuff.cpp"/>
     <File Name="src/WxStuff.h"/>
+    <File Name="src/OpenGL.cpp"/>
+    <File Name="src/OpenGL.h"/>
   </VirtualDirectory>
   <VirtualDirectory Name="Main Editor">
     <VirtualDirectory Name="UI Elements">
@@ -152,6 +154,8 @@
     <File Name="src/TextEditor.h"/>
     <File Name="src/ConsolePanel.cpp"/>
     <File Name="src/ConsolePanel.h"/>
+    <File Name="src/SplashWindow.h"/>
+    <File Name="src/SplashWindow.cpp"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <Configuration Name="Debug" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
