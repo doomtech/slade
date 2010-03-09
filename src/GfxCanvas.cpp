@@ -52,7 +52,8 @@ GfxCanvas::GfxCanvas(wxWindow* parent, int id)
 	image = new SImage();
 	view_type = GFXVIEW_DEFAULT;
 	scale = 1;
-	gl_id = 999999999;	// Arbitrarily large texture id number :P
+	tex_image = new GLTexture();
+	tex_background = new GLTexture();
 	update_texture = false;
 	image_hilight = false;
 	drag_pos.set(0, 0);
@@ -168,6 +169,29 @@ void GfxCanvas::drawChequeredBackground() {
 	// Save current matrix
 	glPushMatrix();
 
+	// Generate background texture if needed
+	if (!tex_background->isLoaded())
+		tex_background->genChequeredTexture(8, rgba_t(64, 64, 80, 255), rgba_t(80, 80, 96, 255));
+
+	// Enable textures
+	glEnable(GL_TEXTURE_2D);
+
+	// Bind background texture
+	tex_background->bind();
+
+	// Draw background
+	frect_t rect(0, 0, GetSize().x, GetSize().y);
+	glBegin(GL_QUADS);
+	glTexCoord2d(rect.x1()*0.0625, rect.y1()*0.0625);	glVertex2d(rect.x1(), rect.y1());
+	glTexCoord2d(rect.x1()*0.0625, rect.y2()*0.0625);	glVertex2d(rect.x1(), rect.y2());
+	glTexCoord2d(rect.x2()*0.0625, rect.y2()*0.0625);	glVertex2d(rect.x2(), rect.y2());
+	glTexCoord2d(rect.x2()*0.0625, rect.y1()*0.0625);	glVertex2d(rect.x2(), rect.y1());
+	glEnd();
+
+	// Disable textures
+	glDisable(GL_TEXTURE_2D);
+
+	/*
 	// Determine the number of rows and columns
 	double s_size = 8.0;
 	int cols = int((double)GetSize().x / s_size) + 1;
@@ -194,6 +218,7 @@ void GfxCanvas::drawChequeredBackground() {
 			glEnd();
 		}
 	}
+	*/
 
 	// Restore previous matrix
 	glPopMatrix();
@@ -225,12 +250,12 @@ void GfxCanvas::drawImage() {
 
 	// Update texture if needed
 	if (update_texture) {
-		updateImageTexture();
+		tex_image->loadImage(image);
 		update_texture = false;
 	}
 
 	// Bind texture
-	glBindTexture(GL_TEXTURE_2D, gl_id);
+	tex_image->bind();
 
 	// Determine (texture)coordinates
 	double x = (double)image->getWidth();
@@ -306,6 +331,7 @@ void GfxCanvas::drawImage() {
  * (Re)Generates the image texture from image data
  *******************************************************************/
 void GfxCanvas::updateImageTexture() {
+	/*
 	// Delete current texture if it exists
 	if (gl_id < 999999999)
 		glDeleteTextures(1, &gl_id);
@@ -326,6 +352,7 @@ void GfxCanvas::updateImageTexture() {
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexImage2D(GL_TEXTURE_2D, 0, 4, image->getWidth(), image->getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, mc.getData());
+	 */
 }
 
 /* GfxCanvas::zoomToFit

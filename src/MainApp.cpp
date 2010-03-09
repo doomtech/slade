@@ -245,6 +245,7 @@ bool MainApp::OnInit() {
 	initLogFile();
 
 	// Check that SLADE.pk3 can be found
+	wxLogMessage(_T("Loading slade.pk3"));
 	if (!theArchiveManager->resArchiveOK())
 		return false;
 
@@ -252,15 +253,18 @@ bool MainApp::OnInit() {
 	theSplashWindow->showSplash(_T("Starting Up..."));
 
 	// Load configuration file
+	wxLogMessage(_T("Loading configuration"));
 	readConfigFile();
 
 	// Load program icons
+	wxLogMessage(_T("Loading icons"));
 	loadIcons();
 
 	// Create the main window
 	main_window = new MainWindow();
 
 	// Load entry types
+	wxLogMessage(_T("Loading entry types"));
 	EntryType::loadEntryTypes();
 
 	// Open any archives on the command line
@@ -274,6 +278,8 @@ bool MainApp::OnInit() {
 
 	// Hide splash screen
 	theSplashWindow->hide();
+
+	wxLogMessage(_T("SLADE Initialisation OK"));
 
 	return true;
 }
@@ -303,9 +309,11 @@ void MainApp::initLogFile() {
 	new wxLogChain(new wxLogStderr(log_file));
 
 	// Write logfile header
+	string year = wxNow().Right(4);
 	wxLogMessage(_T("SLADE - It's a Doom Editor"));
-	wxLogMessage(_T("Written by Simon Judd, 2008"));
-	wxLogMessage(_T("---------------------------"));
+	wxLogMessage(_T("Version %s"), Global::version.c_str());
+	wxLogMessage(_T("Written by Simon Judd, 2008-%s"), year.c_str());
+	wxLogMessage(_T("--------------------------------"));
 }
 
 /* MainApp::readConfigFile

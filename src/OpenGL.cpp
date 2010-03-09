@@ -38,6 +38,7 @@
 namespace OpenGL {
 	wxGLContext*	context = NULL;
 	double			version = 0;
+	int				max_tex_size = 128;
 }
 
 
@@ -66,11 +67,17 @@ wxGLContext* OpenGL::getContext(wxGLCanvas* canvas) {
  * Initialises general OpenGL variables and settings
  *******************************************************************/
 bool OpenGL::init() {
+	wxLogMessage(_T("Initialising OpenGL..."));
+
 	// Get OpenGL version
-	string glvers = wxString::From8BitData((const char*)glGetString(GL_VERSION));
-	glvers.Truncate(3);
-	glvers.ToDouble(&version);
-	wxLogMessage(_T("GL Version: %s (%1.2f)"), glvers.c_str(), version);
+	string temp = wxString::From8BitData((const char*)glGetString(GL_VERSION));
+	temp.Truncate(3);
+	temp.ToDouble(&version);
+	wxLogMessage(_T("OpenGL Version: %1.1f"), version);
+
+	// Get max texture size
+	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_tex_size);
+	wxLogMessage(_T("Max Texture Size: %dx%d"), max_tex_size, max_tex_size);
 
 	return true;
 }

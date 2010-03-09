@@ -4,6 +4,7 @@
 
 #include "OGLCanvas.h"
 #include "SImage.h"
+#include "GLTexture.h"
 
 // Enumeration for view types
 enum {
@@ -19,7 +20,8 @@ private:
 	SImage*			image;
 	int				view_type;	// 0=default, 1=centered, 2=sprite offsets, 3=hud offsets, 4=tiled
 	double			scale;
-	GLuint			gl_id;
+	GLTexture*		tex_image;
+	GLTexture*		tex_background;
 	bool			update_texture;
 	bool			image_hilight;
 	bool			allow_drag;
