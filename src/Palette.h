@@ -4,7 +4,7 @@
 
 class Palette8bit {
 private:
-	rgba_t	colours[255];
+	rgba_t	colours[256];
 	short	index_trans;
 
 public:
