@@ -174,7 +174,7 @@ void GfxConvDialog::setupLayout() {
 	// Keep existing transparency
 	hbox = new wxBoxSizer(wxHORIZONTAL);
 	vbox_ttypes->Add(hbox, 0, wxEXPAND|wxALL, 0);
-	rb_transparency_existing = new wxRadioButton(this, -1, _T("Existing w/Threshold:"));
+	rb_transparency_existing = new wxRadioButton(this, 100, _T("Existing w/Threshold:"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
 	rb_transparency_existing->SetValue(true);
 	hbox->Add(rb_transparency_existing, 0, wxEXPAND|wxALL, 4);
 
@@ -187,7 +187,7 @@ void GfxConvDialog::setupLayout() {
 	// Transparent colour
 	hbox = new wxBoxSizer(wxHORIZONTAL);
 	vbox_ttypes->Add(hbox, 0, wxEXPAND|wxALL, 0);
-	rb_transparency_colour = new wxRadioButton(this, -1, _T("Transparent Colour:"), wxDefaultPosition, wxDefaultSize, 0);
+	rb_transparency_colour = new wxRadioButton(this, 101, _T("Transparent Colour:"), wxDefaultPosition, wxDefaultSize, 0);
 	rb_transparency_colour->SetValue(false);
 	hbox->Add(rb_transparency_colour, 0, wxEXPAND|wxALL, 4);
 
