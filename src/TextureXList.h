@@ -5,10 +5,17 @@
 #include "CTexture.h"
 #include "ArchiveEntry.h"
 
+enum {
+	TXF_NORMAL,
+	TXF_STRIFE11,
+	TXF_NAMELESS,
+};
+
 class TextureXList {
 private:
 	vector<CTexture*>		textures;
 	vector<ArchiveEntry*>	patches;
+	uint8_t					txformat;
 
 public:
 	TextureXList();

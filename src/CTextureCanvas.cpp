@@ -53,7 +53,7 @@ CTextureCanvas::~CTextureCanvas() {
 /* CTextureCanvas::openTexture
  * Loads a composite texture to be displayed
  *******************************************************************/
-bool CTextureCanvas::openTexture(CTexture* tex) {
+bool CTextureCanvas::openTexture(CTexture* tex, Palette8bit * pal) {
 	if (!tex)
 		return false;
 
@@ -63,7 +63,11 @@ bool CTextureCanvas::openTexture(CTexture* tex) {
 	// Init patch opengl texture id stuff
 	patch_gl_id.clear();
 	for (uint32_t a = 0; a < tex->nPatches(); a++)
+	{
 		patch_gl_id.push_back(UINT_MAX);
+		if (pal && getTexture() && getTexture()->getPatch(a) && getTexture()->getPatch(a)->getImage())
+			getTexture()->getPatch(a)->getImage()->setPalette(pal);
+	}
 
 	// Redraw
 	Refresh();
@@ -173,6 +177,7 @@ void CTextureCanvas::drawPatch(int num) {
 
 	// Load the patch as an opengl texture if it isn't already
 	if (patch_gl_id[num] == UINT_MAX) {
+		rgba_t(255, 255, 255, 255, 0).set_gl();
 		if (patch) {
 			// Get image RGBA data
 			MemChunk mc;

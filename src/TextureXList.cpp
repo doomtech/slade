@@ -114,12 +114,32 @@ void TextureXList::clear() {
 }
 
 // Some structs for reading TEXTUREx data
-struct tdef_t {
+struct tdef_t
+{ // The normal version with just the relevant data
 	char		name[8];
 	uint16_t	flags;
 	uint8_t		scale[2];
 	int16_t		width;
 	int16_t		height;
+};
+
+struct nltdef_t
+{ // The nameless version used by Doom Alpha 0.4
+	uint16_t	flags;
+	uint8_t		scale[2];
+	int16_t		width;
+	int16_t		height;
+};
+
+struct ftdef_t
+{ // The full version with some useless data
+	char		name[8];
+	uint16_t	flags;
+	uint8_t		scale[2];
+	int16_t		width;
+	int16_t		height;
+	int16_t		columndir[2];
+	int16_t		patchcount;
 };
 
 struct pdef_t {
@@ -139,13 +159,6 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, ArchiveEntry* pnames
 
 	// Get parent archive
 	Archive* parent_archive = texturex->getParent();
-
-	// Check if this is a strife-format TEXTUREx entry
-	bool strife = false;
-	if (parent_archive) {
-		if (parent_archive->getFileName(false).CmpNoCase(_T("strife1.wad")) == 0)
-			strife = true;
-	}
 
 	// Read PNAMES
 
@@ -193,6 +206,47 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, ArchiveEntry* pnames
 		wxLogMessage(_T("Error: TEXTUREx entry is corrupt"));
 		return false;
 	}
+	
+	// Read the first texture definition to try to identify the format
+	if (!texturex->seek(offsets[0], SEEK_SET)) {
+		wxLogMessage(_T("Error: TEXTUREx entry is corrupt"));
+		return false;
+	}
+	// Look at the name field. Is it present or not?
+	char tempname[8];
+	if (!texturex->read(&tempname, 8)) {
+		wxLogMessage(_T("Error: TEXTUREx entry is corrupt"));
+		return false;
+	}
+	// Let's pretend it is and see what happens.
+	txformat = TXF_NORMAL;
+
+	// Only the characters A-Z (uppercase), 0-9, and [ ] - _ should be used in texture names.
+	for (uint8_t a = 0; a < 8; ++a) {
+		if (a > 0 && tempname[a] == 0)
+			// We found a null-terminator for the string, so we can assume it's okay.
+			break;
+		if (!((tempname[a] >= 'A' && tempname[a] <= '[') ||
+			  (tempname[a] >= '0' && tempname[a] <= '9') ||
+			   tempname[a] == ']' || tempname[a] == '-' || tempname[a] == '_'))
+			// We're out of character range, so this is probably not a texture name.
+			txformat = TXF_NAMELESS;
+	}
+
+	// Now let's see if it is the abridged Strife format or not.
+	if (txformat == TXF_NORMAL) {
+		// No need to test this again since it was already tested before.
+		texturex->seek(offsets[0], SEEK_SET);
+		ftdef_t temp;
+		if (!texturex->read(&temp, 22)) {
+			wxLogMessage(_T("Error: TEXTUREx entry is corrupt"));
+			return false;
+		}
+		// Test condition adapted from ZDoom; apparently the first two bytes of columndir
+		// may be set to garbage values by some editors and are therefore unreliable.
+		if (wxINT16_SWAP_ON_BE(temp.patchcount <= 0) || (temp.columndir[1] != 0))
+			txformat = TXF_STRIFE11;
+	}
 
 	// Read all texture definitions
 	for (int32_t a = 0; a < n_tex; a++) {
@@ -204,13 +258,32 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, ArchiveEntry* pnames
 		
 		// Read definition
 		tdef_t tdef;
-		if (!texturex->read(&tdef, 16)) {
+		if (txformat == TXF_NAMELESS) {
+			nltdef_t nameless;
+			// Auto-naming mechanism taken from DeuTex
+			if (a > 99999) {
+				wxLogMessage(_T("Error: More than 100000 nameless textures"));
+				return false;
+			}
+			sprintf (tdef.name, "TEX%05d", a);
+			if (!texturex->read(&nameless, 8)) {
+				wxLogMessage(_T("Error: TEXTUREx entry is corrupt"));
+				return false;
+			}
+			// Copy data to permanent structure
+			tdef.flags = nameless.flags;
+			tdef.scale[0] = nameless.scale[0];
+			tdef.scale[1] = nameless.scale[1];
+			tdef.width = nameless.width;
+			tdef.height = nameless.height;
+		}
+		else if (!texturex->read(&tdef, 16)) {
 			wxLogMessage(_T("Error: TEXTUREx entry is corrupt"));
 			return false;
 		}
 
 		// Skip unused
-		if (!strife) {
+		if (txformat != TXF_STRIFE11) {
 			if (!texturex->seek(4, SEEK_CUR)) {
 				wxLogMessage(_T("Error: TEXTUREx entry is corrupt"));
 				return false;
@@ -236,7 +309,7 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, ArchiveEntry* pnames
 			}
 
 			// Skip unused
-			if (!strife) {
+			if (txformat != TXF_STRIFE11) {
 				if (!texturex->seek(4, SEEK_CUR)) {
 					wxLogMessage(_T("Error: TEXTUREx entry is corrupt"));
 					return false;

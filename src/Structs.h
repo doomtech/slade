@@ -547,5 +547,15 @@ struct oldpatch_header_t {
 	int8_t top;
 };
 
+// imgz_header: The header of a ZDoom imgz image
+struct imgz_header_t {
+	uint8_t  magic[4];
+	uint16_t width;
+	uint16_t height;
+	int16_t  left;
+	int16_t  top;
+	uint8_t  compression;
+	uint8_t  reserved[11];
+};
 
 #endif //__STRUCTS_H__

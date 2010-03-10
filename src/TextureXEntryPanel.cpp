@@ -33,6 +33,7 @@
 #include "TextureXEntryPanel.h"
 #include "Archive.h"
 #include "ArchiveManager.h"
+#include "Misc.h"
 #include <wx/listctrl.h>
 
 
@@ -48,6 +49,15 @@ TextureXEntryPanel::TextureXEntryPanel(wxWindow* parent)
 	// Setup panel sizer
 	wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
 	sizer_main->Add(sizer, 1, wxEXPAND, 0);
+	
+	// Add editing controls
+	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
+	sizer_bottom->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
+ 
+	// Palette chooser
+	combo_palette = new PaletteChooser(this, -1);
+	hbox->Add(new wxStaticText(this, -1, _T("Palette:")), 0, wxALIGN_CENTER_VERTICAL, 0);
+	hbox->Add(combo_palette, 0, wxEXPAND, 0);
 
 	// Add textures list
 	wxStaticBox* frame = new wxStaticBox(this, -1, _T("Textures"));
@@ -72,6 +82,7 @@ TextureXEntryPanel::TextureXEntryPanel(wxWindow* parent)
 
 	// Bind events
 	list_textures->Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &TextureXEntryPanel::onTextureListSelect, this);
+	combo_palette->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &TextureXEntryPanel::onPaletteChanged, this);
 
 	Layout();
 }
@@ -149,13 +160,49 @@ void TextureXEntryPanel::populateTextureList() {
 	list_textures->updateSize();
 }
 
+/* TextureXEntryPanel::updateImagePalette
+ * Sets the tex canvas' image's palette to what is selected in the
+ * palette chooser
+ *******************************************************************/
+void TextureXEntryPanel::updateImagePalette() {
+	// Init new palette
+	Palette8bit* pal = new Palette8bit();
+
+	// Set it to whatever is selected in the palette chooser
+	if (combo_palette->globalSelected())
+		Misc::loadPaletteFromArchive(pal, entry->getParent());
+	else
+		pal->copyPalette(combo_palette->getSelectedPalette());
+
+	if (tex_canvas->getTexture() != NULL)
+		tex_canvas->openTexture(tex_canvas->getTexture(), pal);
+
+	// Clean up
+	delete pal;
+}
+
 
 
 void TextureXEntryPanel::onTextureListSelect(wxListEvent& e) {
 	// Get the selected texture
 	CTexture* tex = texturex.getTexture(e.GetIndex());
 
+	// Set it's palette to whatever is selected in the palette chooser
+	Palette8bit pal;
+	if (combo_palette->globalSelected())
+		Misc::loadPaletteFromArchive(&pal, entry->getParent());
+	else
+		pal.copyPalette(combo_palette->getSelectedPalette());
+
 	// Open it if valid index (should be)
 	if (tex)
-		tex_canvas->openTexture(tex);
+		tex_canvas->openTexture(tex, &pal);
+}
+
+/* TextureXEntryPanel::paletteChanged
+ * Called when the palette chooser selection changes
+ *******************************************************************/
+void TextureXEntryPanel::onPaletteChanged(wxCommandEvent& e) {
+	updateImagePalette();
+	tex_canvas->Refresh();
 }

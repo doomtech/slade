@@ -10,9 +10,17 @@ enum {
 	EDF_BMP,
 	EDF_JPEG,
 	EDF_GFX_DOOM,
+	EDF_GFX_DOOM_ARAH,
 	EDF_GFX_DOOM_ALPHA,
 	EDF_GFX_DOOM_BETA,
+	EDF_GFX_DOOM_SNEA,
+	EDF_GFX_DOOM_GNUM,
 	EDF_GFX_FLAT,
+	EDF_GFX_FULLSCREEN,
+	EDF_GFX_AUTOPAGE,
+	EDF_GFX_STRIFESU,
+	EDF_GFX_PLANAR,
+	EDF_GFX_IMGZ,
 	EDF_WAD,
 	EDF_MUS,
 	EDF_MIDI,
@@ -44,7 +52,14 @@ public:
 	static bool detectDoomGfx(MemChunk& mc);
 	static bool detectDoomGfxAlpha(MemChunk& mc);
 	static bool detectDoomGfxBeta(MemChunk& mc);
+	static bool detectDoomGfxArah(MemChunk& mc);
+	static bool detectDoomGfxSnea(MemChunk& mc);
+	static bool detectDoomGfxGnum(MemChunk& mc);
 	static bool detectDoomFlat(MemChunk& mc);
+	static bool detectAutopage(MemChunk& mc);
+	static bool detectStrifeStartup(MemChunk& mc);
+	static bool detectPlanar(MemChunk& mc);
+	static bool detectImgz(MemChunk& mc);
 	static bool detectWad(MemChunk& mc);
 	static bool detectMus(MemChunk& mc);
 	static bool detectMidi(MemChunk& mc);

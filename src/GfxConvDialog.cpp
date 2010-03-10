@@ -260,7 +260,7 @@ void GfxConvDialog::updatePreviewGfx() {
 	pal_archive->copyPalette(thePaletteManager->globalPalette());	// If no palette is found in the entry's parent archive, set the palette to the global palette
 
 	if (entry->getParent())
-		Misc::loadPaletteFromArchive(pal_archive, entry->getParent());
+		Misc::loadPaletteFromArchive(pal_archive, entry->getParent(), entry);
 
 	// Set both image palette depending on what is selected for the 'current' palette
 	if (pal_chooser_current->globalSelected()) {
@@ -303,7 +303,11 @@ void GfxConvDialog::updateControls() {
 	ArchiveEntry* entry = entries[current_entry];
 
 	// Disable/enable current gfx palette as needed
-	if (entry->getType()->getFormat() == EDF_GFX_DOOM || entry->getType()->getFormat() == EDF_GFX_FLAT)
+	uint16_t entryformat = entry->getType()->getFormat();
+	if (entryformat == EDF_GFX_DOOM || entryformat == EDF_GFX_DOOM_ALPHA || entryformat == EDF_GFX_DOOM_BETA || 
+		entryformat == EDF_GFX_FLAT || entryformat == EDF_GFX_DOOM_GNUM  || entryformat == EDF_GFX_DOOM_SNEA ||
+		entryformat == EDF_GFX_FULLSCREEN || entryformat == EDF_GFX_DOOM_ARAH || entryformat == EDF_GFX_IMGZ ||
+		entryformat == EDF_GFX_STRIFESU || entryformat == EDF_GFX_AUTOPAGE)
 		pal_chooser_current->Enable(true);
 	else
 		pal_chooser_current->Enable(false);

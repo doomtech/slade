@@ -52,6 +52,22 @@ struct grab_chunk_t {
 	int32_t yoff;
 };
 
+struct alph_chunk_t {
+	char name[4];
+};
+
+struct trns_chunk_t {
+	char name[4];
+	uint8_t entries[256];
+};
+
+struct trans_chunk_t {
+	char name[5];
+};
+
+struct chunk_size_t {
+	uint32_t size;
+};
 
 /*******************************************************************
  * FUNCTIONS
@@ -62,18 +78,22 @@ struct grab_chunk_t {
  * entry is invalid or not an offset-supported format, true otherwise
  *******************************************************************/
 bool EntryOperations::modifyGfxOffsets(ArchiveEntry* entry, int auto_type, point2_t offsets, bool xc, bool yc, bool relative) {
-	if (!entry)
+	if (entry == NULL || entry->getType() == NULL)
 		return false;
 
 	// Check entry type
 	EntryType* type = entry->getType();
-	if (!(type->getFormat() == EDF_GFX_DOOM || type->getFormat() == EDF_PNG)) {
+	uint16_t entryformat = type->getFormat(); 
+	if (!(entryformat == EDF_GFX_DOOM || entryformat == EDF_GFX_DOOM_ARAH || 
+		entryformat == EDF_GFX_DOOM_ALPHA || EDF_GFX_DOOM_BETA || entryformat == EDF_PNG)) {
 		wxLogMessage(s_fmt(_T("Entry \"%s\" is of type \"%s\" which does not support offsets"), entry->getName().c_str(), entry->getTypeString().c_str()));
 		return false;
 	}
 
-	// Doom gfx format
-	if (type->getFormat() == EDF_GFX_DOOM) {
+	// Doom gfx format, normal and beta version.
+	// Also arah format from alpha 0.2 because it uses the same header format.
+	if (entryformat == EDF_GFX_DOOM || entryformat == EDF_GFX_DOOM_BETA || entryformat == EDF_GFX_DOOM_ARAH)
+	{
 		// Get patch header
 		patch_header_t header;
 		entry->read(&header, 8);
@@ -117,8 +137,52 @@ bool EntryOperations::modifyGfxOffsets(ArchiveEntry* entry, int auto_type, point
 		entry->write(&header, 8);
 	}
 
+	// Doom alpha gfx format
+	if (entryformat == EDF_GFX_DOOM_ALPHA) {
+		// Get patch header
+		oldpatch_header_t header;
+		entry->read(&header, 4);
+
+		// Apply new offsets
+		if (auto_type >= 0) {
+			// Auto Offsets selected
+			int w = header.width;
+			int h = header.height;
+
+			if (auto_type == 0) {			// Monster
+				header.left = w * 0.5;
+				header.top = h - 4;
+			}
+			else if (auto_type == 1) {		// Projectile
+				header.left = w * 0.5;
+				header.top = h * 0.5;
+			}
+			else if (auto_type == 2) {		// Weapon
+				header.left = -160 + (w * 0.5);
+				header.top = -200 + h;
+			}
+		}
+		else {
+			// Set Offsets selected
+			if (relative) {
+				offsets.x += header.left;
+				offsets.y += header.top;
+			}
+
+			if (xc)
+				header.left = offsets.x;
+
+			if (yc)
+				header.top = offsets.y;
+		}
+
+		// Write new header to entry
+		entry->seek(0, SEEK_SET);
+		entry->write(&header, 4);
+	}
+
 	// PNG format
-	else if (type->getFormat() == EDF_PNG) {
+	else if (entryformat == EDF_PNG) {
 		// Read width and height from IHDR chunk
 		const uint8_t* data = entry->getData(true);
 		const ihdr_t* ihdr = (ihdr_t*)(data + 12);
@@ -232,6 +296,293 @@ bool EntryOperations::openExternal(ArchiveEntry* entry) {
 	return true;
 }
 
+/* EntryOperations::modifyalPhChunk
+ * Add or remove the alPh chunk from a PNG entry
+ *******************************************************************/
+bool EntryOperations::modifyalPhChunk(ArchiveEntry* entry, bool value) {
+	if (!entry || !entry->getType())
+		return false;
+
+	// Don't bother if the entry is locked.
+	if (entry->isLocked())
+		return false;
+
+	// Check entry type
+	if (!(entry->getType()->getFormat() == EDF_PNG)) {
+		wxLogMessage(s_fmt(_T("Entry \"%s\" is of type \"%s\" rather than PNG"), entry->getName().c_str(), entry->getTypeString().c_str()));
+		return false;
+	}
+
+	// Read width and height from IHDR chunk
+	const uint8_t* data = entry->getData(true);
+	const ihdr_t* ihdr = (ihdr_t*)(data + 12);
+	uint32_t w = wxINT32_SWAP_ON_LE(ihdr->width);
+	uint32_t h = wxINT32_SWAP_ON_LE(ihdr->height);
+
+	// Find existing alPh chunk
+	uint32_t alph_start = 0;
+	for (uint32_t a = 0; a < entry->getSize(); a++) {
+		// Check for 'alPh' header
+		if (data[a] == 'a' && data[a + 1] == 'l' &&
+			data[a + 2] == 'P' && data[a + 3] == 'h') {
+			alph_start = a - 4;
+			break;
+		}
+
+		// Stop when we get to the 'IDAT' chunk
+		if (data[a] == 'I' && data[a + 1] == 'D' &&
+			data[a + 2] == 'A' && data[a + 3] == 'T')
+			break;
+	}
+
+	// We want to set alPh, and it is already there: nothing to do.
+	if (value && alph_start > 0)
+		return false;
+
+	// We want to unset alPh, and it is already not there: nothing to do either.
+	else if (!value && alph_start == 0)
+		return false;
+
+	// We want to set alPh, which is missing: create it.
+	else if (value && alph_start == 0)
+	{
+		// Build new PNG from the original w/ the new alPh chunk
+		MemChunk npng;
+
+		// Init new png data size
+		npng.reSize(entry->getSize() + 12);
+
+		// Write PNG header and IHDR chunk
+		npng.write(data, 33);
+
+		// Create new alPh chunk
+		uint32_t csize = wxUINT32_SWAP_ON_LE(0);
+		alph_chunk_t gc = { 'a', 'l', 'P', 'h' };
+		uint32_t dcrc = wxUINT32_SWAP_ON_LE(crc((uint8_t*)&gc, 4));
+
+		// Create alPh chunk
+		npng.write(&csize, 4);
+		npng.write(&gc, 4);
+		npng.write(&dcrc, 4);
+
+		// Write the rest of the PNG data
+		uint32_t to_write = entry->getSize() - 33;
+		npng.write(data + 33, to_write);
+
+		// Load new png data to the entry
+		entry->importMemChunk(npng);
+	}
+
+	// We want to unset alPh, which is present: delete it.
+	else if (!value && alph_start > 0)
+	{
+		// Build new PNG from the original without the alPh chunk
+		MemChunk npng;
+		uint32_t rest_start = alph_start + 12;
+
+		// Init new png data size
+		npng.reSize(entry->getSize() - 12);
+
+		// Write PNG info before alPh chunk
+		npng.write(data, alph_start);
+
+		// Write the rest of the PNG data
+		uint32_t to_write = entry->getSize() - rest_start;
+		npng.write(data + rest_start, to_write);
+
+		// Load new png data to the entry
+		entry->importMemChunk(npng);
+	}
+
+	// We don't know what we want, but it can't be good, so we do nothing.
+	else
+		return false;
+
+	return true;
+}
+
+/* EntryOperations::modifytRNSChunk
+ * Add or remove the tRNS chunk from a PNG entry
+ * Returns true if the entry was altered
+ *******************************************************************/
+bool EntryOperations::modifytRNSChunk(ArchiveEntry* entry, bool value) {
+	// Avoid NULL pointers, they're annoying.
+	if (!entry || !entry->getType())
+		return false;
+
+	// Don't bother if the entry is locked.
+	if (entry->isLocked())
+		return false;
+
+	// Check entry type
+	if (!(entry->getType()->getFormat() == EDF_PNG)) {
+		wxLogMessage(s_fmt(_T("Entry \"%s\" is of type \"%s\" rather than PNG"), entry->getName().c_str(), entry->getTypeString().c_str()));
+		return false;
+	}
+
+	// Read width and height from IHDR chunk
+	const uint8_t* data = entry->getData(true);
+	const ihdr_t* ihdr = (ihdr_t*)(data + 12);
+	uint32_t w = wxINT32_SWAP_ON_LE(ihdr->width);
+	uint32_t h = wxINT32_SWAP_ON_LE(ihdr->height);
+
+	// tRNS chunks are only valid for paletted PNGs, and must be before the first IDAT.
+	// Specs say they must be after PLTE chunk as well, so to play it safe, we'll insert
+	// them just before the first IDAT.
+	uint32_t trns_start = 0;
+	uint8_t  trns_size	= 0;
+	uint32_t idat_start = 0;
+	for (uint32_t a = 0; a < entry->getSize(); a++) {
+
+		// Check for 'tRNS' header 
+		if (data[a] == 't' && data[a + 1] == 'R' &&
+			data[a + 2] == 'N' && data[a + 3] == 'S') {
+			trns_start = a - 4;
+			trans_chunk_t* trns = (trans_chunk_t*)(data + a);
+			trns_size = 12 + (uint8_t)data[a-1];
+		}
+
+		// Stop when we get to the 'IDAT' chunk
+		if (data[a] == 'I' && data[a + 1] == 'D' &&
+			data[a + 2] == 'A' && data[a + 3] == 'T')
+		{
+			idat_start = a - 4;
+			break;
+		}
+	}
+
+	// The IDAT chunk starts before the header is finished, this doesn't make sense, abort.
+	if (idat_start < 33)
+		return false;
+
+	// We want to set tRNS, and it is already there: nothing to do.
+	if (value && trns_start > 0)
+		return false;
+
+	// We want to unset tRNS, and it is already not there: nothing to do either.
+	else if (!value && trns_start == 0)
+		return false;
+
+	// We want to set tRNS, which is missing: create it. We're just going to set index 0 to 0, 
+	// and leave the rest of the palette indices alone.
+	else if (value && trns_start == 0)
+	{
+		// Build new PNG from the original w/ the new tRNS chunk
+		MemChunk npng;
+
+		// Init new png data size
+		npng.reSize(entry->getSize() + 13);
+
+		// Write PNG header stuff up to the first IDAT chunk
+		npng.write(data, idat_start);
+
+		// Create new tRNS chunk
+		uint32_t csize = wxUINT32_SWAP_ON_LE(1);
+		trans_chunk_t gc = { 't', 'R', 'N', 'S', '\0' };
+		uint32_t dcrc = wxUINT32_SWAP_ON_LE(crc((uint8_t*)&gc, 5));
+
+		// Write tRNS chunk
+		npng.write(&csize, 4);
+		npng.write(&gc, 5);
+		npng.write(&dcrc, 4);
+
+		// Write the rest of the PNG data
+		uint32_t to_write = entry->getSize() - idat_start;
+		npng.write(data + idat_start, to_write);
+
+		// Load new png data to the entry
+		entry->importMemChunk(npng);
+	}
+
+	// We want to unset tRNS, which is present: delete it.
+	else if (!value && trns_start > 0)
+	{
+		// Build new PNG from the original without the tRNS chunk
+		MemChunk npng;
+		uint32_t rest_start = trns_start + trns_size;
+
+		// Init new png data size
+		npng.reSize(entry->getSize() - trns_size);
+
+		// Write PNG header and stuff up to tRNS start
+		npng.write(data, trns_start);
+
+		// Write the rest of the PNG data
+		uint32_t to_write = entry->getSize() - rest_start;
+		npng.write(data + rest_start, to_write);
+
+		// Load new png data to the entry
+		entry->importMemChunk(npng);
+	}
+
+	// We don't know what we want, but it can't be good, so we do nothing.
+	else
+		return false;
+
+	return true;
+}
+
+/* EntryOperations::getalPhChunk
+ * Tell whether a PNG entry has an alPh chunk or not
+ *******************************************************************/
+bool EntryOperations::getalPhChunk(ArchiveEntry* entry) {
+	if (!entry || !entry->getType())
+		return false;
+
+	// Check entry type
+	if (entry->getType()->getFormat() != EDF_PNG) {
+		wxLogMessage(s_fmt(_T("Entry \"%s\" is of type \"%s\" rather than PNG"), entry->getName().c_str(), entry->getTypeString().c_str()));
+		return false;
+	}
+
+	// Find existing alPh chunk
+	const uint8_t* data = entry->getData(true);
+	for (uint32_t a = 0; a < entry->getSize(); a++) {
+		// Check for 'alPh' header
+		if (data[a] == 'a' && data[a + 1] == 'l' &&
+			data[a + 2] == 'P' && data[a + 3] == 'h') {
+			return true;
+		}
+
+		// Stop when we get to the 'IDAT' chunk
+		if (data[a] == 'I' && data[a + 1] == 'D' &&
+			data[a + 2] == 'A' && data[a + 3] == 'T')
+			break;
+	}
+	return false;
+}
+
+/* EntryOperations::gettRNSChunk
+ * Add or remove the tRNS chunk from a PNG entry
+ *******************************************************************/
+bool EntryOperations::gettRNSChunk(ArchiveEntry* entry) {
+	if (!entry || !entry->getType())
+		return false;
+
+	// Check entry type
+	if (entry->getType()->getFormat() != EDF_PNG) {
+		wxLogMessage(s_fmt(_T("Entry \"%s\" is of type \"%s\" rather than PNG"), entry->getName().c_str(), entry->getTypeString().c_str()));
+		return false;
+	}
+
+	// tRNS chunks are only valid for paletted PNGs, and the chunk must before the first IDAT.
+	// Specs say it should be after a PLTE chunk, but that's not always the case (e.g., sgrna7a3.png).
+	const uint8_t* data = entry->getData(true);
+	for (uint32_t a = 0; a < entry->getSize(); a++) {
+
+		// Check for 'tRNS' header
+		if (data[a] == 't' && data[a + 1] == 'R' &&
+			data[a + 2] == 'N' && data[a + 3] == 'S') {
+			return true;
+		}
+
+		// Stop when we get to the 'IDAT' chunk
+		if (data[a] == 'I' && data[a + 1] == 'D' &&
+			data[a + 2] == 'A' && data[a + 3] == 'T')
+			break;
+	}
+	return false;
+}
 
 /*******************************************************************
  * CONSOLE COMMANDS

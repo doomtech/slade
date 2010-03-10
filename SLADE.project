@@ -157,7 +157,6 @@
     <File Name="src/SplashWindow.h"/>
     <File Name="src/SplashWindow.cpp"/>
   </VirtualDirectory>
-  <Dependencies Name="Debug"/>
   <Settings Type="Executable">
     <GlobalSettings>
       <Compiler Options="">
@@ -227,4 +226,5 @@
     </Configuration>
   </Settings>
   <Dependencies Name="Release"/>
+  <Dependencies Name="Debug"/>
 </CodeLite_Project>

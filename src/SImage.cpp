@@ -47,13 +47,18 @@ struct grab_chunk_t {
 
 // Define valid flat sizes
 uint32_t valid_flat_size[][2] = {
-	{ 64, 64 },
-	{ 128, 128 },
-	{ 256, 256 },
-	{ 512, 512 },
-	{ 320, 200 },
+	{  10,  12 },	// gnum format
+	{  16,  16 },	// \ 
+	{  32,  64 },	// Strife startup sprite
+	{  48,  48 },	// /
+	{  64,  64 },	// standard flat size
+	{ 128, 128 },	// \ 
+	{ 256, 256 },	// hires flat size
+	{ 512, 512 },	// /
+	{ 320, 158 },	// default autopage format
+	{ 320, 200 },	// full screen format
 };
-uint32_t	n_valid_flat_sizes = 5;
+uint32_t	n_valid_flat_sizes = 10;
 
 
 /*******************************************************************
@@ -397,19 +402,34 @@ bool SImage::loadImage(const uint8_t* img_data, int size) {
 
 	// If the image was a PNG
 	if (fif == FIF_PNG) {
+		bool alPh_chunk = false;
+		bool grAb_chunk = false;
+
 		// Find offsets if present
 		int32_t xoff = 0;
 		int32_t yoff = 0;
 		for (int a = 0; a < size; a++) {
 			// Check for 'grAb' header
-			if (img_data[a] == 'g' && img_data[a + 1] == 'r' &&
+			if (!grAb_chunk &&
+				img_data[a] == 'g' && img_data[a + 1] == 'r' &&
 				img_data[a + 2] == 'A' && img_data[a + 3] == 'b') {
 				memcpy(&xoff, img_data + a + 4, 4);
 				memcpy(&yoff, img_data + a + 8, 4);
 				xoff = wxINT32_SWAP_ON_LE(xoff);
 				yoff = wxINT32_SWAP_ON_LE(yoff);
-				break;
+				grAb_chunk = true;
 			}
+
+			// Check for 'alPh' header
+			if (!alPh_chunk &&
+				img_data[a] == 'a' && img_data[a + 1] == 'l' &&
+				img_data[a + 2] == 'P' && img_data[a + 3] == 'h') {
+				alPh_chunk = true;
+			}
+
+			// Found both lumps so no need to search further
+			if (grAb_chunk && alPh_chunk)
+				break;
 
 			// Stop when we get to the 'IDAT' chunk
 			if (img_data[a] == 'I' && img_data[a + 1] == 'D' &&
@@ -419,6 +439,12 @@ bool SImage::loadImage(const uint8_t* img_data, int size) {
 
 		offset_x = xoff;
 		offset_y = yoff;
+
+		// If the picture is nothing more than a ZDoom-style alpha map
+		if (alPh_chunk) {
+			for (int a = 0; a < width * height; a++)
+				data[a * 4 + 3] = (data[a * 4 + 2] | data[a * 4 + 1] | data[a * 4]);
+		}
 	}
 
 	// Free memory
@@ -443,7 +469,7 @@ bool SImage::loadDoomGfx(const uint8_t* gfx_data, int size, uint8_t version) {
 		return false;
 
 	// Check size
-	if (size < sizeof(patch_header_t))
+	if (size < (version > 1 ? sizeof(oldpatch_header_t) : sizeof(patch_header_t)))
 		return false;
 
 	// Init variables
@@ -481,20 +507,6 @@ bool SImage::loadDoomGfx(const uint8_t* gfx_data, int size, uint8_t version) {
 		for (int a = 0; a < width; a++)
 			col_offsets[a] = wxUINT32_SWAP_ON_BE(c_ofs[a]);
 	}
-
-	/*
-	// Get header & offsets
-	patch_header_t* header = (patch_header_t*)gfx_data;
-	col_offsets = (uint32_t*)((uint8_t*)gfx_data + sizeof(patch_header_t));
-
-	// Setup variables
-	width = wxINT16_SWAP_ON_BE(header->width);
-	height = wxINT16_SWAP_ON_BE(header->height);
-	offset_x = wxINT16_SWAP_ON_BE(header->left);
-	offset_y = wxINT16_SWAP_ON_BE(header->top);
-	has_palette = true;
-	format = PALMASK;
-	 */
 
 	// Clear current data if it exists
 	clearData();
@@ -569,7 +581,9 @@ bool SImage::loadDoomGfx(const uint8_t* gfx_data, int size, uint8_t version) {
 
 /* SImage::loadDoomFlat
  * Loads a Doom Flat format image, using the given palette.
- * Returns false if the image data was invalid, true otherwise
+ * Also loads about any raw image format that's the same as flats,
+ * but with a different dimension.
+ * Returns false if the image data was invalid, true otherwise.
  *******************************************************************/
 bool SImage::loadDoomFlat(const uint8_t* gfx_data, int size) {
 	// Check data
@@ -592,7 +606,10 @@ bool SImage::loadDoomFlat(const uint8_t* gfx_data, int size) {
 
 	// Check valid size
 	if (!valid_size)
-		return false;
+	{
+		if (size % 320)		// This should handle any custom AUTOPAGE
+			return false;
+	}
 
 	// Setup variables
 	has_palette = true;
@@ -615,96 +632,239 @@ bool SImage::loadDoomFlat(const uint8_t* gfx_data, int size) {
 	return true;
 }
 
-/* SImage::loadDoomGfxOld
- * Loads an Alpha/Beta Doom Gfx format image, using the given palette.
- * Returns false if the image data was invalid, true otherwise
+
+/* SImage::loadDoomArah
+ * Loads a Doom Alpha Raw And Header image.
+ * Returns false if the image data was invalid, true otherwise.
+ * It seems index 255 is treated as transparent in this format.
  *******************************************************************/
- /*
-bool SImage::loadDoomGfxOld(const uint8_t* gfx_data, int size) {
+bool SImage::loadDoomArah(const uint8_t* gfx_data, int size) {
 	// Check data
 	if (!gfx_data)
 		return false;
 
-	// Check size
-	if (size < 4)
-		return false;
-
-	// Get header & offsets
-	patch_header_t* header = (patch_header_t*)gfx_data;
-	uint16_t* col_offsets = (uint16_t*)((uint8_t*)gfx_data + 8);
-
 	// Setup variables
-	width = header->width;
-	height = header->height;
-	offset_x = header->left;
-	offset_y = header->top;
+	patch_header_t* header = (patch_header_t*)gfx_data;
+	width = wxINT16_SWAP_ON_BE(header->width);
+	height = wxINT16_SWAP_ON_BE(header->height);
+	offset_x = wxINT16_SWAP_ON_BE(header->left);
+	offset_y = wxINT16_SWAP_ON_BE(header->top);
 	has_palette = true;
 	format = PALMASK;
 
 	// Clear current data if it exists
 	clearData();
 
-	// Load data
-	data = new uint8_t[width * height];
-	memset(data, 0, width * height);	// Set colour to palette index 0
-	mask = new uint8_t[width * height];
-	memset(mask, 0, width * height);	// Set mask to fully transparent
-	for (int c = 0; c < width; c++) {
-		// Get current column offset (byteswap if needed)
-		uint32_t col_offset = wxUINT16_SWAP_ON_BE(col_offsets[c]);
+	// Read raw pixel data
+	data = new uint8_t[width*height];
+	memcpy(data, gfx_data+8, width * height);
 
-		// Check column offset is valid
-		if (col_offset >= size) {
-			clearData();
-			return false;
-		}
+	// Create mask (all opaque)
+	mask = new uint8_t[width*height];
+	memset(mask, 255, width*height);
 
-		// Go to start of column
-		const uint8_t* bits = gfx_data;
-		bits += col_offset;
-
-		// Read posts
-		while (1) {
-			// Get row offset
-			uint8_t row = *bits;
-
-			if (row == 0xFF) // End of column?
-				break;
-
-			// Get no. of pixels
-			bits++;
-			uint8_t n_pix = *bits;
-
-			//bits++; // Skip buffer
-			for (uint8_t p = 0; p < n_pix; p++) {
-				// Get pixel position
-				bits++;
-				int pos = ((row + p)*width + c);
-
-				// Stop if we're outside the image
-				if (pos > width*height)
-					break;
-
-				// Stop if for some reason we're outside the gfx data
-				if (bits > gfx_data + size)
-					break;
-
-				// Write pixel data
-				data[pos] = *bits;
-				mask[pos] = 255;
-			}
-			bits++;
-			//bits += 2; // Skip buffer & go to next row offset
-		}
-	}
+	// Mark as transparent all pixels that are set to FF
+	for (size_t  i = 0; i < width*height; ++i)
+		if (data[i] == 255) mask[i] = 0;
 
 	// Announce change
 	announce(_T("image_changed"));
 
-	// Return success
 	return true;
 }
- */
+
+/* SImage::loadDoomSnea
+ * Loads a Doom alpha "snea" format image, using the given palette.
+ * I have no idea if "snea" if the official name of the format, or
+ * even what it is supposed to mean, but that's how DeuTex calls 
+ * them, and it's the only available tool that can read them as far 
+ * as I know, so this name will do.
+ * Returns false if the image data was invalid, true otherwise.
+ *******************************************************************/
+bool SImage::loadDoomSnea(const uint8_t* gfx_data, int size) {
+	// Check data
+	if (!gfx_data)
+		return false;
+
+	// Check/setup size
+	uint8_t qwidth = gfx_data[0];
+	width = qwidth * 4;
+	height = gfx_data[1];
+/*	if (size != 2 + width * height)
+		return false;
+*/
+	// Setup variables
+	has_palette = true;
+	format = PALMASK;
+
+	// Clear current data if it exists
+	clearData();
+
+	// Read raw pixel data
+	data = new uint8_t[width*height];
+
+	// Since gfx_data is a const pointer, we can't work on it.
+	uint8_t * tempdata = new uint8_t[size];
+	memcpy(tempdata, gfx_data, size);
+
+	uint8_t* entryend = tempdata + size;
+	uint8_t* dataend = data + size - 2;
+	uint8_t* pixel = tempdata + 2;
+	uint8_t* brush = data;
+
+	// Algorithm taken from DeuTex.
+	// I do not pretend to understand it, 
+	// but my own attempt didn't work.
+	while (pixel < entryend)
+	{
+		*brush = *pixel++;
+		brush += 4;
+		if (brush >= dataend)
+			brush -= size - 3;
+	}
+
+	delete[] tempdata;
+
+	// Create mask (all opaque)
+	mask = new uint8_t[width*height];
+	memset(mask, 255, width*height);
+
+	// Announce change
+	announce(_T("image_changed"));
+
+	return true;
+}
+
+/* SImage::loadPlanar
+ * Loads a planar graphic such as those used by Hexen's startup screen.
+ * This was a convenient format back then as it could be sent directly
+ * to the VGA memory; however this is now both obscure and obsolete.
+ * The code is taken from ZDoom.
+ * Returns false if the image data was invalid, true otherwise.
+ *******************************************************************/
+bool SImage::loadPlanar(const uint8_t* gfx_data, int size) {
+	// Check data
+	if (!gfx_data)
+		return false;
+
+	// Check size
+	if (size != 153648)
+		return false;
+
+	// Init some variables
+	width = 640;
+	height = 480;
+	format = RGBA;	// Technically, no; but we'll load it as one so that it uses its own palette.
+	has_palette = false;
+
+	union
+	{
+		RGBQUAD		color;
+		uint32_t	quad;
+	};
+	color.rgbReserved = 0;
+	rgba_t colour(0, 0, 0, 0, -1);
+
+	Palette8bit palette;
+	// Initialize the bitmap palette.
+	for (int i = 0; i < 16; ++i)
+	{
+		color.rgbRed   = gfx_data[i*3+0]; 
+		color.rgbGreen = gfx_data[i*3+1];
+		color.rgbBlue  = gfx_data[i*3+2];
+		// Convert from 6-bit per component to 8-bit per component.
+		quad = (quad << 2) | ((quad >> 4) & 0x03030303);
+		colour.r = color.rgbRed;
+		colour.g = color.rgbGreen;
+		colour.b = color.rgbBlue;
+		palette.setColour(i, colour);
+	}
+
+	clearData();
+	data = new uint8_t[width*height];
+
+	uint8_t table[640*480];
+	uint8_t * dest = table;
+	int y, x;
+	const uint8_t *src1, *src2, *src3, *src4;
+	size_t plane_size = width / 8 * height;
+
+	src1 = gfx_data + 48;		// 80: 10000000	08: 00001000
+	src2 = src1 + plane_size;	// 40: 01000000 04: 00000100
+	src3 = src2 + plane_size;	// 20: 00100000 02: 00000010
+	src4 = src3 + plane_size;	// 10: 00010000 01: 00000001
+
+	for (y = height; y > 0; --y)
+	{
+		for (x = width; x > 0; x -= 8)
+		{
+			dest[0] = ((*src4 & 0x80) >> 4)	| ((*src3 & 0x80) >> 5) | ((*src2 & 0x80) >> 6) | ((*src1 & 0x80) >> 7);
+			dest[1] = ((*src4 & 0x40) >> 3) | ((*src3 & 0x40) >> 4) | ((*src2 & 0x40) >> 5) | ((*src1 & 0x40) >> 6);
+			dest[2] = ((*src4 & 0x20) >> 2) | ((*src3 & 0x20) >> 3) | ((*src2 & 0x20) >> 4) | ((*src1 & 0x20) >> 5);
+			dest[3] = ((*src4 & 0x10) >> 1) | ((*src3 & 0x10) >> 2) | ((*src2 & 0x10) >> 3) | ((*src1 & 0x10) >> 4);
+			dest[4] = ((*src4 & 0x08)     ) | ((*src3 & 0x08) >> 1) | ((*src2 & 0x08) >> 2) | ((*src1 & 0x08) >> 3);
+			dest[5] = ((*src4 & 0x04) << 1) | ((*src3 & 0x04)     ) | ((*src2 & 0x04) >> 1) | ((*src1 & 0x04) >> 2);
+			dest[6] = ((*src4 & 0x02) << 2) | ((*src3 & 0x02) << 1) | ((*src2 & 0x02)     ) | ((*src1 & 0x02) >> 1);
+			dest[7] = ((*src4 & 0x01) << 3) | ((*src3 & 0x01) << 2) | ((*src2 & 0x01) << 1) | ((*src1 & 0x01)     );
+			dest += 8;
+			src1 += 1;
+			src2 += 1;
+			src3 += 1;
+			src4 += 1;
+		}
+	}
+
+	// Conversion to chunky format finished. Now let's just turn that into RGBA.
+	data = new uint8_t[width*height*4];
+
+	for (size_t i = 0; i < width*height; ++i)
+	{
+		data[i*4+0] = palette.colour(table[i]).r;
+		data[i*4+1] = palette.colour(table[i]).g;
+		data[i*4+2] = palette.colour(table[i]).b;
+		data[i*4+3] = 0xFF;	// Everything is opaque.
+	}
+	
+	// Success
+	return true;
+}
+
+/* SImage::loadImgz
+ * Loads a picture in ZDoom's imgz format, using code adapted from it.
+ * This format is special in that the info given is only for the alpha
+ * channel, there is no color information at all.
+ * Returns false if the image data was invalid, true otherwise.
+ *******************************************************************/
+bool SImage::loadImgz(const uint8_t* gfx_data, int size) {
+	if (size < sizeof(imgz_header_t))
+		return false;
+
+	// Setup variables
+	imgz_header_t *header = (imgz_header_t *)gfx_data;
+	width = wxINT16_SWAP_ON_BE(header->width);
+	height = wxINT16_SWAP_ON_BE(header->height);
+	offset_x = wxINT16_SWAP_ON_BE(header->left);
+	offset_y = wxINT16_SWAP_ON_BE(header->top);
+	has_palette = true;
+	format = PALMASK;
+
+	// Create mask (all transparent)
+	clearData();
+	data = new uint8_t[width*height];
+	mask = new uint8_t[width*height];
+	memset(mask, 0xFF, width*height);
+
+	if (!header->compression)
+	{
+		memcpy(mask, gfx_data + sizeof(imgz_header_t), size - sizeof(imgz_header_t));
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+	return true;
+};
 
 /* SImage::toPNG
  * Writes the image as PNG data to <out>, keeping palette information

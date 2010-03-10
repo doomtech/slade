@@ -53,7 +53,11 @@ public:
 	// Image format reading
 	bool	loadImage(const uint8_t* data, int size);
 	bool	loadDoomGfx(const uint8_t* data, int size, uint8_t version = 0);
+	bool	loadDoomSnea(const uint8_t* data, int size);
 	bool	loadDoomFlat(const uint8_t* data, int size);
+	bool	loadDoomArah(const uint8_t* gfx_data, int size);
+	bool	loadPlanar(const uint8_t* gfx_data, int size);
+	bool	loadImgz(const uint8_t* gfx_data, int size);
 
 	// Image format writing
 	bool	toPNG(MemChunk& out);

@@ -18,6 +18,8 @@ private:
 	wxSpinCtrl*		spin_xoffset;
 	wxSpinCtrl*		spin_yoffset;
 	wxCheckBox*		cb_tile;
+	wxCheckBox*		cb_alph_chunk;
+	wxCheckBox*		cb_trns_chunk;
 
 public:
 	GfxEntryPanel(wxWindow* parent);
@@ -35,6 +37,8 @@ public:
 	void	onYOffsetChanged(wxSpinEvent& e);
 	void	onOffsetTypeChanged(wxCommandEvent& e);
 	void	onTileChanged(wxCommandEvent& e);
+	void	onalPhChanged(wxCommandEvent& e);
+	void	ontRNSChanged(wxCommandEvent& e);
 	void	onGfxOffsetChanged(wxEvent& e);
 };
 

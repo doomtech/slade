@@ -52,12 +52,28 @@ bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry) {
 		// Alpha Doom gfx format
 		case EDF_GFX_DOOM_ALPHA:
 			return image->loadDoomGfx(entry->getData(true), entry->getSize(), 2);
+		// Alpha Doom Raw and Header format
+		case EDF_GFX_DOOM_ARAH:
+			return image->loadDoomArah(entry->getData(true), entry->getSize());
 		// Beta Doom gfx format
 		case EDF_GFX_DOOM_BETA:
 			return image->loadDoomGfx(entry->getData(true), entry->getSize(), 1);
-		// Doom flat format
+		// Doom flat format and other raw images
 		case EDF_GFX_FLAT:
+		case EDF_GFX_FULLSCREEN:// 320x200
+		case EDF_GFX_AUTOPAGE:	// 320x?
+		case EDF_GFX_STRIFESU:	// 16x16, 32x64 or 48x48
+		case EDF_GFX_DOOM_GNUM:	// 10x12
 			return image->loadDoomFlat(entry->getData(true), entry->getSize());
+		// Alpha Doom snea format
+		case EDF_GFX_DOOM_SNEA:
+			return image->loadDoomSnea(entry->getData(true), entry->getSize());
+		// Hexen planar graphic
+		case EDF_GFX_PLANAR:
+			return image->loadPlanar(entry->getData(true), entry->getSize());
+		// ZDoom IMGZ graphic
+		case EDF_GFX_IMGZ:
+			return image->loadImgz(entry->getData(true), entry->getSize());
 		// General image formats (that FreeImage supports at least)
 		default:
 			if (!image->loadImage(entry->getData(true), entry->getSize())) {
@@ -73,21 +89,47 @@ bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry) {
 	return false;
 }
 
+/* Misc::detectPaletteHack
+ * Detects the few known cases where a picture does not use PLAYPAL
+ * as its default palette.
+ *******************************************************************/
+int	Misc::detectPaletteHack(ArchiveEntry* entry)
+{
+	if (entry == NULL || entry->getType() == NULL)
+		return PAL_NOHACK;
+	else if (entry->getType()->getFormat() == EDF_GFX_DOOM_ARAH		&& entry->getName() == "TITLEPIC")
+		return PAL_ALPHAHACK;	// Doom Alpha 0.2
+	else if (entry->getType()->getFormat() == EDF_GFX_DOOM_SNEA		&& entry->getName() == "TITLEPIC")
+		return PAL_ALPHAHACK;	// Doom Alpha 0.4 and 0.5
+	else if (entry->getType()->getFormat() == EDF_GFX_FULLSCREEN	&& entry->getName() == "E2END")
+		return PAL_HERETICHACK;	// Heretic
+
+	// Default:
+	return PAL_NOHACK;
+}
+
+
 /* Misc::loadPaletteFromArchive
  * Writes palette information from the PLAYPAL entry in <archive> to
  * <pal>. Returns false if PLAYPAL entry was missing or invalid,
  * true otherwise
  *******************************************************************/
-bool Misc::loadPaletteFromArchive(Palette8bit* pal, Archive* archive) {
+bool Misc::loadPaletteFromArchive(Palette8bit* pal, Archive* archive, ArchiveEntry* entry) {
 	// Check parameters
 	if (!pal || !archive)
 		return false;
 
 	// Find PLAYPAL entry
-	ArchiveEntry* playpal = archive->getEntry(_T("PLAYPAL"));
+	ArchiveEntry* playpal;
+	switch (Misc::detectPaletteHack(entry))
+	{
+	case PAL_NOHACK:		playpal = archive->getEntry(_T("PLAYPAL"));		break;
+	case PAL_ALPHAHACK:		playpal = archive->getEntry(_T("TITLEPAL"));	break;
+	case PAL_HERETICHACK:	playpal = archive->getEntry(_T("E2PAL"));		break;
+	}
 
-	// Check it was found
-	if (!playpal)
+	// Check it was found, try again in case a hack was attempted unsuccessfully.
+	if (!playpal && !(playpal = archive->getEntry(_T("PLAYPAL"))))
 		return false;
 
 	// Check it is the correct size

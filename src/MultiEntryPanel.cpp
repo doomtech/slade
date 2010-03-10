@@ -58,11 +58,13 @@ MultiEntryPanel::MultiEntryPanel(wxWindow* parent)
 	btn_export_archive = new wxButton(this, -1, _T("Export as Wad"));
 	btn_convert_gfx = new wxButton(this, -1, _T("Convert Gfx to..."));
 	btn_modify_offsets = new wxButton(this, -1, _T("Modify Gfx Offsets"));
+	btn_add_trns_chunk = new wxButton(this, -1, _T("Add tRNS chunks to PNG images"));
 
 	// Bind Events
 	btn_export_archive->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MultiEntryPanel::onBtnExportArchive, this);
 	btn_convert_gfx->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MultiEntryPanel::onBtnConvertGfx, this);
 	btn_modify_offsets->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MultiEntryPanel::onBtnModifyOffsets, this);
+	btn_add_trns_chunk->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MultiEntryPanel::onBtnAddtRNSChunks, this);
 
 	// Update panel layout
 	updateLayout();
@@ -100,6 +102,11 @@ bool MultiEntryPanel::loadEntries(vector<ArchiveEntry*>& list) {
 		if (!gfx_selected) {
 			if (list[a]->getType()->getEditor() == _T("gfx"))
 				gfx_selected = true;
+		}
+		// Check for png entry
+		if (!png_selected) {
+			if (list[a]->getType()->getFormat() == EDF_PNG)
+				png_selected = true;
 		}
 	}
 
@@ -146,6 +153,14 @@ void MultiEntryPanel::updateLayout() {
 		btn_modify_offsets->Show(false);
 	}
 
+	// Check if any png entries are selected
+	if (png_selected) {
+		btn_add_trns_chunk->Show(true);
+		frame_sizer->Add(btn_add_trns_chunk, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+	}
+	else 
+		btn_add_trns_chunk->Show(false);
+
 	sizer_main->Add(frame_sizer, 0, wxALIGN_CENTER|wxALL, 4);
 
 	sizer_main->AddStretchSpacer();
@@ -187,6 +202,16 @@ void MultiEntryPanel::onBtnConvertGfx(wxCommandEvent& e) {
 
 	// Run the gcd
 	gcd.ShowModal();
+}
+
+/* MultiEntryPanel::btnAddtRNSChunksClicked
+ * Called when the 'Add tRNS chunks to PNG images' button is clicked
+ *******************************************************************/
+void MultiEntryPanel::onBtnAddtRNSChunks(wxCommandEvent& e) {
+	for (size_t a = 0; a < entries.size(); a++) {
+		if (EntryOperations::modifytRNSChunk(entries[a], true))
+			entries[a]->setState(1);
+	}
 }
 
 /* MultiEntryPanel::btnModifyOffsetsClicked

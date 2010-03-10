@@ -786,42 +786,6 @@ bool WadArchive::renameEntry(ArchiveEntry* entry, string new_name) {
 	return true;
 }
 
-/* WadArchive::detectEntryType
- * Performs preliminary entry type checking based on it's position
- * in the wad archive (will be overridden if the entry's data later
- * proves it to be another format)
- *******************************************************************/
-/*
-bool WadArchive::detectEntryType(ArchiveEntry* entry) {
-	// Check the entry is valid and part of this archive
-	if (!checkEntry(entry))
-		return false;
-
-	// Check if entry is within any markers
-	int index = entryIndex(entry);
-
-	// Patches
-	if (index > patches[0] && index < patches[1]) {
-		entry->setType(ETYPE_PATCH);
-		return true;
-	}
-
-	// Flats
-	if (index > flats[0] && index < flats[1]) {
-		entry->setType(ETYPE_FLAT);
-		return true;
-	}
-
-	// Sprites
-	if (index > sprites[0] && index < sprites[1]) {
-		entry->setType(ETYPE_SPRITE);
-		return true;
-	}
-
-	return true;
-}
- */
-
 string WadArchive::detectEntrySection(ArchiveEntry* entry) {
 	// Check the entry is valid and part of this archive
 	if (!checkEntry(entry))

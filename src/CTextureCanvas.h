@@ -4,6 +4,7 @@
 
 #include "OGLCanvas.h"
 #include "CTexture.h"
+#include "Palette.h"
 
 class CTextureCanvas : public OGLCanvas {
 private:
@@ -16,7 +17,7 @@ public:
 
 	CTexture*	getTexture() { return texture; }
 
-	bool	openTexture(CTexture* tex);
+	bool	openTexture(CTexture* tex, Palette8bit* pal = NULL);
 	void	draw();
 	void	drawChequeredBackground();
 	void	drawTexture();

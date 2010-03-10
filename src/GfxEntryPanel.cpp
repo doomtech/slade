@@ -81,13 +81,11 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 	hbox->Add(new wxStaticText(this, -1, _T("Palette:")), 0, wxALIGN_CENTER_VERTICAL, 0);
 	hbox->Add(combo_palette, 0, wxEXPAND, 0);
 
-
 	// Add gfx canvas
 	gfx_canvas = new GfxCanvas(this, -1);
 	m_vbox->Add(gfx_canvas, 1, wxEXPAND|wxALL, 4);
 	gfx_canvas->setViewType(GFXVIEW_DEFAULT);
 	gfx_canvas->allowDrag(true);
-
 
 	// Add editing/info controls
 	hbox = new wxBoxSizer(wxHORIZONTAL);
@@ -104,6 +102,14 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 	label_dimensions = new wxStaticText(this, -1, _T("Size: N/A"));
 	hbox->Add(label_dimensions, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT, 4);
 
+	// PNG stuff
+	cb_alph_chunk = new wxCheckBox(this, -1, _T("alPh"));
+	cb_alph_chunk->Enable(false);
+	hbox->Add(cb_alph_chunk, 0, wxEXPAND, 0);
+	cb_trns_chunk = new wxCheckBox(this, -1, _T("tRNS"));
+	cb_trns_chunk->Enable(false);
+	hbox->Add(cb_trns_chunk, 0, wxEXPAND, 0);
+	hbox->AddSpacer(8);
 
 	// Bind Events
 	slider_zoom->Bind(wxEVT_COMMAND_SLIDER_UPDATED, &GfxEntryPanel::onZoomChanged, this);
@@ -112,6 +118,8 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 	spin_yoffset->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &GfxEntryPanel::onYOffsetChanged, this);
 	combo_offset_type->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &GfxEntryPanel::onOffsetTypeChanged, this);
 	cb_tile->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &GfxEntryPanel::onTileChanged, this);
+	cb_alph_chunk->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &GfxEntryPanel::onalPhChanged, this);
+	cb_trns_chunk->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &GfxEntryPanel::ontRNSChanged, this);
 	Bind(wxEVT_GFXCANVAS_OFFSET_CHANGED, &GfxEntryPanel::onGfxOffsetChanged, this, gfx_canvas->GetId());
 
 	// Apply layout
@@ -128,6 +136,10 @@ GfxEntryPanel::~GfxEntryPanel() {
  * Loads an entry into the entry panel if it is a valid image format
  *******************************************************************/
 bool GfxEntryPanel::loadEntry(ArchiveEntry* entry) {
+
+	if (entry == NULL)
+		return false;
+
 	// Update variables
 	this->entry = entry;
 	setModified(false);
@@ -142,6 +154,22 @@ bool GfxEntryPanel::loadEntry(ArchiveEntry* entry) {
 	// Set offset text boxes
 	spin_xoffset->SetValue(gfx_canvas->getImage()->offset().x);
 	spin_yoffset->SetValue(gfx_canvas->getImage()->offset().y);
+
+	// Set PNG check boxes
+	if (this->entry->getType() != NULL && this->entry->getType()->getFormat() == EDF_PNG)
+	{
+		cb_alph_chunk->Enable(true);
+		cb_alph_chunk->SetValue(EntryOperations::getalPhChunk(this->entry));
+		cb_trns_chunk->Enable(true);
+		cb_trns_chunk->SetValue(EntryOperations::gettRNSChunk(this->entry));
+	}
+	else
+	{
+		cb_alph_chunk->Enable(false);
+		cb_alph_chunk->SetValue(false);
+		cb_trns_chunk->Enable(false);
+		cb_trns_chunk->SetValue(false);
+	}
 
 	// Set size label
 	label_dimensions->SetLabel(s_fmt(_T("Size: %d x %d"), gfx_canvas->getImage()->getWidth(), gfx_canvas->getImage()->getHeight()));
@@ -177,17 +205,20 @@ void GfxEntryPanel::updateImagePalette() {
 	// Init new palette
 	Palette8bit* pal = new Palette8bit();
 
-	// Set it to whatever is selected in the palette chooser
-	if (combo_palette->globalSelected())
-		Misc::loadPaletteFromArchive(pal, entry->getParent());
-	else
-		pal->copyPalette(combo_palette->getSelectedPalette());
+	if (pal)
+	{
+		// Set it to whatever is selected in the palette chooser
+		if (combo_palette->globalSelected())
+			Misc::loadPaletteFromArchive(pal, entry->getParent(), entry);
+		else
+			pal->copyPalette(combo_palette->getSelectedPalette());
 
-	// Set the image's palette
-	gfx_canvas->getImage()->setPalette(pal);
+		// Set the image's palette
+		gfx_canvas->getImage()->setPalette(pal);
 
-	// Clean up
-	delete pal;
+		// Clean up
+		delete pal;
+	}
 }
 
 /* GfxEntryPanel::detectOffsetType
@@ -344,6 +375,38 @@ void GfxEntryPanel::onOffsetTypeChanged(wxCommandEvent& e) {
 void GfxEntryPanel::onTileChanged(wxCommandEvent& e) {
 	combo_offset_type->Enable(!cb_tile->IsChecked());
 	applyViewType();
+}
+
+/* GfxEntryPanel::cbalPhChecked
+ * Called when the 'alPh chunk' checkbox is checked/unchecked
+ *******************************************************************/
+void GfxEntryPanel::onalPhChanged(wxCommandEvent& e) {
+	if (EntryOperations::modifyalPhChunk(entry, cb_alph_chunk->IsChecked()))
+	{
+		// Set changed
+		setModified();
+
+		// Refresh canvas
+		Misc::loadImageFromEntry(gfx_canvas->getImage(), this->entry);
+		gfx_canvas->Refresh();
+	}
+	cb_alph_chunk->SetValue(EntryOperations::getalPhChunk(this->entry));
+}
+
+/* GfxEntryPanel::cbtRNSChecked
+ * Called when the 'tRNS chunk' checkbox is checked/unchecked
+ *******************************************************************/
+void GfxEntryPanel::ontRNSChanged(wxCommandEvent& e) {
+	if (EntryOperations::modifytRNSChunk(entry, cb_trns_chunk->IsChecked()))
+	{
+		// Set changed
+		setModified();
+
+		// Refresh canvas
+		Misc::loadImageFromEntry(gfx_canvas->getImage(), this->entry);
+		gfx_canvas->Refresh();
+	}
+	cb_trns_chunk->SetValue(EntryOperations::gettRNSChunk(this->entry));
 }
 
 /* GfxEntryPanel::gfxOffsetChanged

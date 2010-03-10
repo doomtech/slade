@@ -46,24 +46,32 @@ struct id_format_t {
 	uint16_t	format;
 };
 id_format_t formats[] = {
-	{ "any", EDF_ANY },
-	{ "png", EDF_PNG },
-	{ "bmp", EDF_BMP },
-	{ "jpeg", EDF_JPEG },
-	{ "gfx_doom", EDF_GFX_DOOM },
-	{ "gfx_flat", EDF_GFX_FLAT },
-	{ "gfx_doom_alpha", EDF_GFX_DOOM_ALPHA },
-	{ "gfx_doom_beta", EDF_GFX_DOOM_BETA },
-	{ "wad", EDF_WAD },
-	{ "mus", EDF_MUS },
-	{ "midi", EDF_MIDI },
-	{ "mod_it", EDF_MOD_IT },
-	{ "mod_xm", EDF_MOD_XM },
-	{ "mod_s3m", EDF_MOD_S3M },
-	{ "mod_mod", EDF_MOD_MOD },
-	{ "snd_doom", EDF_SND_DOOM },
-	{ "snd_wav", EDF_SND_WAV },
-	{ "text", EDF_TEXT },
+	{ "any",			EDF_ANY },
+	{ "png",			EDF_PNG },
+	{ "bmp",			EDF_BMP },
+	{ "jpeg",			EDF_JPEG },
+	{ "gfx_doom",		EDF_GFX_DOOM },
+	{ "gfx_flat",		EDF_GFX_FLAT },
+	{ "autopage",		EDF_GFX_AUTOPAGE },
+	{ "fullscreen",		EDF_GFX_FULLSCREEN },
+	{ "strifestart",	EDF_GFX_STRIFESU },
+	{ "planar",			EDF_GFX_PLANAR },
+	{ "gfx_doom_alpha",	EDF_GFX_DOOM_ALPHA },
+	{ "gfx_doom_arah",	EDF_GFX_DOOM_ARAH },
+	{ "gfx_doom_beta",	EDF_GFX_DOOM_BETA },
+	{ "gfx_doom_snea",	EDF_GFX_DOOM_SNEA },
+	{ "gfx_doom_gnum",	EDF_GFX_DOOM_GNUM },
+	{ "gfx_imgz",		EDF_GFX_IMGZ },
+	{ "wad",			EDF_WAD },
+	{ "mus",			EDF_MUS },
+	{ "midi",			EDF_MIDI },
+	{ "mod_it",			EDF_MOD_IT },
+	{ "mod_xm",			EDF_MOD_XM },
+	{ "mod_s3m",		EDF_MOD_S3M },
+	{ "mod_mod",		EDF_MOD_MOD },
+	{ "snd_doom",		EDF_SND_DOOM },
+	{ "snd_wav",		EDF_SND_WAV },
+	{ "text",			EDF_TEXT },
 };
 
 vector<EntryType*>	entry_types;	// The big list of all entry types
@@ -150,8 +158,23 @@ bool EntryDataFormat::isFormat(MemChunk& mc, uint16_t format) {
 		return detectDoomGfxAlpha(mc);
 	case EDF_GFX_DOOM_BETA:
 		return detectDoomGfxBeta(mc);
+	case EDF_GFX_DOOM_ARAH:
+		return detectDoomGfxArah(mc);
+	case EDF_GFX_DOOM_SNEA:
+		return detectDoomGfxSnea(mc);
+	case EDF_GFX_DOOM_GNUM:
+		return detectDoomGfxGnum(mc);
+	case EDF_GFX_FULLSCREEN:
 	case EDF_GFX_FLAT:
 		return detectDoomFlat(mc);
+	case EDF_GFX_AUTOPAGE:
+		return detectAutopage(mc);
+	case EDF_GFX_STRIFESU:
+		return detectStrifeStartup(mc);
+	case EDF_GFX_PLANAR:
+		return detectPlanar(mc);
+	case EDF_GFX_IMGZ:
+		return detectImgz(mc);
 	case EDF_JPEG:
 		return detectJpeg(mc);
 	case EDF_MIDI:
@@ -254,19 +277,25 @@ bool EntryDataFormat::detectDoomGfx(MemChunk& mc) {
 }
 
 bool EntryDataFormat::detectDoomGfxAlpha(MemChunk& mc) {
-	// Disabled for now since it's too easy for non-gfx entries to be
-	// detected as this format
-	return false;
-	
+	// Get entry data
 	const uint8_t* data = mc.getData();
+	
+	// Check that it ends on a FF byte
+	if (mc[mc.getSize() -1] != 0xFF)
+		return false;
 
 	// Check size
 	if (mc.getSize() > sizeof(oldpatch_header_t)) {
 		const oldpatch_header_t *header = (const oldpatch_header_t *)data;
 
 		// Check header values are 'sane'
-		if (true/*header->width > 0 && header->height > 0*/) {
-			uint16_t *col_offsets = (uint16_t *)((const uint8_t *)data + sizeof(oldpatch_header_t));
+		if (header->width > 0 && header->height > 0) {
+			uint16_t col_offsets[255]; // Old format headers do not allow dimensions greater than 255.
+			for (uint8_t a = 0; a < header->width; a++) {
+				const uint8_t * offsetpos = data + sizeof(oldpatch_header_t) + a * sizeof(uint16_t);
+				const uint16_t * colofsa = (uint16_t *)(offsetpos);
+				col_offsets[a] = wxUINT16_SWAP_ON_BE(*colofsa);
+			}
 
 			// Check there is room for needed column pointers
 			if (mc.getSize() < sizeof(oldpatch_header_t) + (header->width * sizeof(uint16_t)))
@@ -288,6 +317,19 @@ bool EntryDataFormat::detectDoomGfxAlpha(MemChunk& mc) {
 
 bool EntryDataFormat::detectDoomGfxBeta(MemChunk& mc) {
 	const uint8_t* data = mc.getData();
+	
+	// Check that it ends on a FF byte.
+	if (mc[mc.getSize() -1] != 0xFF) {
+		// The lumps in the beta have sometimes up to three garbage 00 bytes; probably a question of byte alignment.
+		for (uint8_t i = 1; i < 4; i++) {
+			if (mc[mc.getSize() - i] == 0xFF)
+				// Cool, we found the ending byte so it's okay.
+				break;
+			else if (mc[mc.getSize() - i] != 0x00)
+				// It's not 00 and it's not FF, so it's a wrong byte.
+				return false;
+		}
+	}
 
 	// Check size
 	if (mc.getSize() > sizeof(patch_header_t)) {
@@ -317,6 +359,127 @@ bool EntryDataFormat::detectDoomGfxBeta(MemChunk& mc) {
 
 	return false;
 }
+
+/* The following is the documentation about sneas from
+ * the DeuTex source:
+ *	The snea format was used for certain graphics in Doom
+ *	alpha 0.4 and 0.5. It consists in a 2-byte header
+ *	followed by an interleaved bitmap. The first byte, W, is
+ *	the quarter of the width. The second byte, H is the
+ *	height. The bitmap is made of 4xWxH bytes. The first WxH
+ *	bytes contain the bitmap for columns 0, 4, 8, etc. The
+ *	next WxH bytes contain the bitmap for columns 1, 5, 9,
+ *	etc., and so on. No transparency.
+ */ 
+bool EntryDataFormat::detectDoomGfxSnea(MemChunk& mc) {
+	const uint8_t* data = mc.getData();
+	uint8_t qwidth = data[0]; // quarter of width
+	uint8_t height = data[1];
+	if (mc.getSize() != (2 + (4 * qwidth * height)))
+		return false;
+	return true;
+}
+
+/* This format is used in Doom alpha 0.4 for the GNUM0 to 
+ * GNUM9 lumps. They are 120 bytes long, and apparently
+ * correspond to a 10x12 graphic, presumably raw format
+ * and without transparency. DeuTex does nothing with
+ * them, but they were mentioned in the TODO.
+ */
+bool EntryDataFormat::detectDoomGfxGnum(MemChunk& mc) {
+	if (mc.getSize() != 120)
+		return false;
+	return true;
+}
+
+/* This format is used in Doom alpha 0.2. DeuTex doesn't know it,
+ * but it seems a really simple format, basically a eight-byte
+ * header for size and offsets followed by a raw format dump.
+ * Therefore I christened it the ARAH format: Alpha Raw And Header.
+ * The header has the same format as the final patch format.
+ * To be honest, I'm not actually sure there are offset fields
+ * since those values always seem to be set to 0, but hey.
+ */
+bool EntryDataFormat::detectDoomGfxArah(MemChunk& mc) {
+	if (mc.getSize() < sizeof(patch_header_t))
+		return false;
+
+	const uint8_t* data = mc.getData();
+	const patch_header_t *header = (const patch_header_t *)data;
+
+	// Check header values are 'sane'
+	if (!(header->height > 0 && header->height < 4096 &&
+		header->width > 0 && header->width < 4096 &&
+		header->top > -2000 && header->top < 2000 &&
+		header->left > -2000 && header->left < 2000))
+		return false;
+
+	// Check the size matches
+	if (mc.getSize() != (sizeof(patch_header_t) + (header->width * header->height)))
+		return false;
+
+	return true;
+}
+
+bool EntryDataFormat::detectAutopage(MemChunk& mc) {
+	// The lumps in Heretic.wad and Hexen.wad are 320x158 (50560 bytes),
+	// but any size that's a multiple of 320 will be accepted by ZDoom.
+	uint32_t size = mc.getSize();
+
+	if ((size % 320) == 0)
+		return true;
+	else
+		return false;
+}
+
+bool EntryDataFormat::detectPlanar(MemChunk& mc) {
+	// 640x480 4-bit graphic with 48-bit, 16-color palette.
+	if (mc.getSize() != 153648)
+		return false;
+	return true;
+}
+
+bool EntryDataFormat::detectImgz(MemChunk& mc) {
+	// A format created by Randy Heit and used by some crosshairs in ZDoom.
+	uint32_t size = mc.getSize();
+
+	if (size < sizeof(imgz_header_t))
+		return false;
+	
+	const uint8_t* data = mc.getData();
+	const imgz_header_t *header = (const imgz_header_t *)data;
+
+	// Check signature
+	if (header->magic[0] != 'I' || header->magic[1] != 'M' ||
+		header->magic[2] != 'G' || header->magic[3] != 'Z')
+		return false;
+
+	// Check that values are sane
+	if (header->width == 0xFFFF || !(header->width | header->height))
+		return false;
+
+	// The reserved values should all be null
+	for (uint8_t i = 0; i < 11 ; ++i)
+		if (header->reserved[i]) return false;
+
+	// Compressed IMGZ are not supported yet
+	if (header->compression) 
+		return false;
+
+	// This is probably a genuine IMGZ
+	return true;
+}
+
+bool EntryDataFormat::detectStrifeStartup(MemChunk& mc) {
+	// The little sprites shown during the Strife startup screen.
+	uint32_t size = mc.getSize();
+
+	if (size == 256 || size == 2048 || size == 2304)
+		return true;
+	else
+		return false;
+}
+
 
 bool EntryDataFormat::detectDoomFlat(MemChunk& mc) {
 	// Not too sure how I should go about detecting this - just checking size as

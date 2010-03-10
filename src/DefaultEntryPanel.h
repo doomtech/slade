@@ -10,6 +10,7 @@ private:
 	wxStaticText*	label_type;
 	wxStaticText*	label_size;
 	wxButton*		btn_edit_text;
+	wxButton*		btn_view_hex;
 	TextEditor*		text_area;
 	bool			view_text;
 
@@ -23,6 +24,7 @@ public:
 	void showEntryInfo(bool show_btn_edittext = false);
 
 	void onEditTextClicked(wxCommandEvent& e);
+	void onViewHexClicked(wxCommandEvent& e);
 	void onTextModified(wxStyledTextEvent& e);
 };
 

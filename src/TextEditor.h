@@ -13,6 +13,7 @@ public:
 	~TextEditor();
 
 	bool	loadEntry(ArchiveEntry* entry);
+	bool	loadHexEntry(ArchiveEntry* entry);
 	void	getRawText(MemChunk& mc);
 
 	void	onModified(wxStyledTextEvent& e);
