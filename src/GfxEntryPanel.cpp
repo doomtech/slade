@@ -205,8 +205,7 @@ void GfxEntryPanel::updateImagePalette() {
 	// Init new palette
 	Palette8bit* pal = new Palette8bit();
 
-	if (pal)
-	{
+	if (pal) {
 		// Set it to whatever is selected in the palette chooser
 		if (combo_palette->globalSelected())
 			Misc::loadPaletteFromArchive(pal, entry->getParent(), entry);

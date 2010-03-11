@@ -618,7 +618,7 @@ bool EntryDataFormat::detectSndDoom(MemChunk& mc) {
 		mc.read(&samples, 2);
 		mc.read(&tail, 2);
 
-		if (head == 3 && tail == 0 && samples == mc.getSize() - 8)
+		if (head == 3 && tail == 0 && samples <= mc.getSize() - 8 && samples > 4 && mc.getSize() <= 65543)
 			return true;
 	}
 
@@ -763,9 +763,10 @@ bool EntryType::isThisType(ArchiveEntry* entry) {
 
 	// Check for name match if needed
 	if (match_name.size() > 0) {
+		string name = fn.GetName().Lower();
 		bool match = false;
 		for (size_t a = 0; a < match_name.size(); a++) {
-			if (!fn.GetName().CmpNoCase(match_name[a])) {
+			if (name.Matches(match_name[a].Lower())) {
 				match = true;
 				break;
 			}

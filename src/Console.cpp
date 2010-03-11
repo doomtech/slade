@@ -221,3 +221,12 @@ void c_cmdlist(vector<string> args) {
 		theConsole->logMessage(s_fmt(_T("\"%s\""), theConsole->command(a).getName().c_str()));
 }
 ConsoleCommand con_cmdlist(_T("cmdlist"), &c_cmdlist, 0);
+
+void c_testmatch(vector<string> args) {
+	bool match = args[0].Matches(args[1]);
+	if (match)
+		theConsole->logMessage(_T("Match"));
+	else
+		theConsole->logMessage(_T("No Match"));
+}
+ConsoleCommand con_testmatch(_T("testmatch"), &c_testmatch, 2);
