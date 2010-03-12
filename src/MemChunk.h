@@ -18,8 +18,6 @@ public:
 	// Accessors
 	const uint8_t*	getData() { return data; }
 	uint32_t		getSize() { return size; }
-	//bool			writeAllowed() { return allow_write; }
-	//void			writeAllowed(bool allow) { allow_write = allow; }
 
 	bool hasData();
 
@@ -39,6 +37,9 @@ public:
 	bool		read(void* buf, uint32_t size);
 	bool		seek(uint32_t offset, uint32_t start);
 	uint32_t	currentPos() { return cur_ptr; }
+
+	// Misc
+	bool	fillData(uint8_t val);
 };
 
 #endif //__MEMCHUNK_H__

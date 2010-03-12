@@ -105,7 +105,7 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 	// PNG stuff
 	cb_alph_chunk = new wxCheckBox(this, -1, _T("alPh"));
 	cb_alph_chunk->Enable(false);
-	hbox->Add(cb_alph_chunk, 0, wxEXPAND, 0);
+	hbox->Add(cb_alph_chunk, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
 	cb_trns_chunk = new wxCheckBox(this, -1, _T("tRNS"));
 	cb_trns_chunk->Enable(false);
 	hbox->Add(cb_trns_chunk, 0, wxEXPAND, 0);
@@ -156,15 +156,13 @@ bool GfxEntryPanel::loadEntry(ArchiveEntry* entry) {
 	spin_yoffset->SetValue(gfx_canvas->getImage()->offset().y);
 
 	// Set PNG check boxes
-	if (this->entry->getType() != NULL && this->entry->getType()->getFormat() == EDF_PNG)
-	{
+	if (this->entry->getType() != NULL && this->entry->getType()->getFormat() == EDF_PNG) {
 		cb_alph_chunk->Enable(true);
 		cb_alph_chunk->SetValue(EntryOperations::getalPhChunk(this->entry));
 		cb_trns_chunk->Enable(true);
 		cb_trns_chunk->SetValue(EntryOperations::gettRNSChunk(this->entry));
 	}
-	else
-	{
+	else {
 		cb_alph_chunk->Enable(false);
 		cb_alph_chunk->SetValue(false);
 		cb_trns_chunk->Enable(false);
@@ -203,21 +201,16 @@ bool GfxEntryPanel::saveEntry() {
  *******************************************************************/
 void GfxEntryPanel::updateImagePalette() {
 	// Init new palette
-	Palette8bit* pal = new Palette8bit();
+	Palette8bit pal;
 
-	if (pal) {
-		// Set it to whatever is selected in the palette chooser
-		if (combo_palette->globalSelected())
-			Misc::loadPaletteFromArchive(pal, entry->getParent(), entry);
-		else
-			pal->copyPalette(combo_palette->getSelectedPalette());
+	// Set it to whatever is selected in the palette chooser
+	if (combo_palette->globalSelected())
+		Misc::loadPaletteFromArchive(&pal, entry->getParent(), entry);
+	else
+		pal.copyPalette(combo_palette->getSelectedPalette());
 
-		// Set the image's palette
-		gfx_canvas->getImage()->setPalette(pal);
-
-		// Clean up
-		delete pal;
-	}
+	// Set the image's palette
+	gfx_canvas->getImage()->setPalette(&pal);
 }
 
 /* GfxEntryPanel::detectOffsetType

@@ -223,6 +223,7 @@ void GfxCanvas::drawImage() {
 	// Update texture if needed
 	if (update_texture) {
 		tex_image->loadImage(image);
+		//tex_image->loadImagePortion(image, rect_t(0, 0, 16, 16)); // test
 		update_texture = false;
 	}
 
@@ -294,6 +295,15 @@ void GfxCanvas::drawImage() {
 
 	// Disable textures
 	glDisable(GL_TEXTURE_2D);
+
+	// Draw outline
+	rgba_t(0, 0, 0, 64).set_gl();
+	glBegin(GL_LINES);
+	glVertex2d(0, 0); glVertex2d(0, y);
+	glVertex2d(0, y); glVertex2d(x, y);
+	glVertex2d(x, y); glVertex2d(x, 0);
+	glVertex2d(x, 0); glVertex2d(0, 0);
+	glEnd();
 
 	// Restore previous matrix
 	glPopMatrix();

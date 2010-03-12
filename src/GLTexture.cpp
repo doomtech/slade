@@ -49,6 +49,32 @@ GLTexture::GLTexture() {
 GLTexture::~GLTexture() {
 }
 
+bool GLTexture::loadData(const uint8_t* data, uint32_t width, uint32_t height) {
+	// Check data was given
+	if (!data)
+		return false;
+
+	// Delete current texture if it exists
+	if (loaded)
+		glDeleteTextures(1, &id);
+
+	// Generate the texture id
+	glGenTextures(1, &id);
+	glBindTexture(GL_TEXTURE_2D, id);
+
+	// Generate the texture
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D, 0, 4, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+	// Update variables
+	loaded = true;
+	this->width = width;
+	this->height = height;
+
+	return true;
+}
+
 bool GLTexture::loadImage(SImage* image) {
 	// Check image was given
 	if (!image)
@@ -56,6 +82,27 @@ bool GLTexture::loadImage(SImage* image) {
 
 	// Check image is valid
 	if (!image->isValid())
+		return false;
+
+	// Get RGBA image data
+	MemChunk rgba;
+	image->getRGBAData(rgba);
+
+	// Generate GL texture from rgba data
+	return loadData(rgba.getData(), image->getWidth(), image->getHeight());
+}
+
+bool GLTexture::loadImagePortion(SImage* image, rect_t rect) {
+	// Check image was given
+	if (!image)
+		return false;
+
+	// Check image is valid
+	if (!image->isValid())
+		return false;
+
+	// Check portion rect is valid
+	if (rect.width() <= 0 || rect.height() <= 0)
 		return false;
 
 	// Delete current texture if it exists
@@ -66,21 +113,55 @@ bool GLTexture::loadImage(SImage* image) {
 	MemChunk rgba;
 	image->getRGBAData(rgba);
 
-	// Generate the texture id
-	glGenTextures(1, &id);
-	glBindTexture(GL_TEXTURE_2D, id);
+	// Init texture data
+	MemChunk portion;
+	portion.reSize(rect.width() * rect.height() * 4, false);
+	portion.fillData(0);
 
-	// Generate the texture
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D, 0, 4, image->getWidth(), image->getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, rgba.getData());
+	// Read portion of image if rect isn't completely outside the image
+	if (!(rect.left() >= image->getWidth() || rect.right() < 0 || rect.top() >= image->getHeight() || rect.bottom() < 0)) {
+		// Determine start of each row to read
+		uint32_t row_start = 0;
+		if (rect.left() > 0)
+			row_start = rect.left();
 
-	// Update variables
-	loaded = true;
-	width = image->getWidth();
-	height = image->getHeight();
+		// Determine width of each row to read
+		uint32_t row_width = rect.right() - row_start;
+		if (rect.right() >= image->getWidth())
+			row_width = image->getWidth() - row_start;
 
-	return true;
+		// Determine difference between the left of the portion and the left of the image
+		uint32_t skip = 0;
+		if (rect.left() < 0)
+			skip = (0 - rect.left()) * 4;
+
+		// Create temp row buffer
+		uint8_t* buf = new uint8_t[rect.width() * 4];
+
+		// Go through each row
+		for (int32_t row = rect.top(); row < rect.bottom(); row++) {
+			// Clear row buffer
+			memset(buf, 0, rect.width() * 4);
+
+			// Check that the current row is within the image
+			if (row >= 0 && row < image->getHeight()) {
+				// Seek to current row in image data
+				rgba.seek((row * image->getWidth() + row_start) * 4, SEEK_SET);
+
+				// Copy the row data
+				rgba.read(buf + skip, row_width * 4);
+			}
+
+			// Write the row
+			portion.write(buf, rect.width() * 4);
+		}
+
+		// Free buffer
+		delete[] buf;
+	}
+
+	// Generate texture from rgba data
+	return loadData(portion.getData(), rect.width(), rect.height());
 }
 
 bool GLTexture::genChequeredTexture(uint8_t block_size, rgba_t col1, rgba_t col2) {
@@ -125,23 +206,8 @@ bool GLTexture::genChequeredTexture(uint8_t block_size, rgba_t col1, rgba_t col2
 		}
 	}
 
-	// Delete current texture if it exists
-	if (loaded)
-		glDeleteTextures(1, &id);
-
-	// Generate the texture id
-	glGenTextures(1, &id);
-	glBindTexture(GL_TEXTURE_2D, id);
-
-	// Generate the texture
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D, 0, 4, block_size*2, block_size*2, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-
-	// Update variables
-	width = block_size*2;
-	height = block_size*2;
-	loaded = true;
+	// Generate texture from rgba data
+	loadData(data, block_size*2, block_size*2);
 
 	// Clean up
 	delete[] data;

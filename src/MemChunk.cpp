@@ -326,3 +326,19 @@ bool MemChunk::seek(uint32_t offset, uint32_t start) {
 	// Success
 	return true;
 }
+
+/* MemChunk::fillData
+ * Overwrites all data bytes with [val] (basically is memset).
+ * Returns false if no data exists, true otherwise
+ *******************************************************************/
+bool MemChunk::fillData(uint8_t val) {
+	// Check data exists
+	if (!hasData())
+		return false;
+
+	// Fill data with value
+	memset(data, val, size);
+
+	// Success
+	return true;
+}
