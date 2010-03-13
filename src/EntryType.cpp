@@ -72,6 +72,8 @@ id_format_t formats[] = {
 	{ "snd_doom",		EDF_SND_DOOM },
 	{ "snd_wav",		EDF_SND_WAV },
 	{ "text",			EDF_TEXT },
+
+	{ "",				EDF_ANY }, // Dummy type to mark end of list
 };
 
 vector<EntryType*>	entry_types;	// The big list of all entry types
@@ -941,12 +943,15 @@ bool EntryType::readEntryTypeDefinition(MemChunk& mc) {
 					// Get format type matching format string
 					bool fmt_exists = false;
 					for (int a = 0; a < EDF_UNKNOWN; a++) {
+						if (formats[a].id.IsEmpty())
+							break;
+
 						if (!format.Cmp(formats[a].id)) {
 							ntype->setFormat(formats[a].format);
 							fmt_exists = true;
 						}
 					}
-					
+
 					if (!fmt_exists)
 						ntype->setFormat(EDF_UNKNOWN);
 				}

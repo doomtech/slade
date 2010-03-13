@@ -42,12 +42,23 @@
 CTextureCanvas::CTextureCanvas(wxWindow* parent, int id)
 : OGLCanvas(parent, id) {
 	texture = NULL;
+	tex_background = new GLTexture();
 }
 
 /* CTextureCanvas::~CTextureCanvas
  * CTextureCanvas class destructor
  *******************************************************************/
 CTextureCanvas::~CTextureCanvas() {
+	clearPatchTextures();
+}
+
+/* CTextureCanvas::clearPatchTextures
+ * Clears the patch textures list
+ *******************************************************************/
+void CTextureCanvas::clearPatchTextures() {
+	for (size_t a = 0; a < patch_textures.size(); a++)
+		delete patch_textures[a];
+	patch_textures.clear();
 }
 
 /* CTextureCanvas::openTexture
@@ -61,10 +72,12 @@ bool CTextureCanvas::openTexture(CTexture* tex, Palette8bit * pal) {
 	texture = tex;
 
 	// Init patch opengl texture id stuff
-	patch_gl_id.clear();
-	for (uint32_t a = 0; a < tex->nPatches(); a++)
-	{
-		patch_gl_id.push_back(UINT_MAX);
+	clearPatchTextures();
+	for (uint32_t a = 0; a < tex->nPatches(); a++) {
+		// Create GL texture
+		patch_textures.push_back(new GLTexture());
+
+		// Load palette
 		if (pal && getTexture() && getTexture()->getPatch(a) && getTexture()->getPatch(a)->getImage())
 			getTexture()->getPatch(a)->getImage()->setPalette(pal);
 	}
@@ -115,37 +128,36 @@ void CTextureCanvas::drawChequeredBackground() {
 	// Save current matrix
 	glPushMatrix();
 
-	// Determine the number of rows and columns
-	double s_size = 8.0;
-	int cols = int((double)GetSize().x / s_size) + 1;
-	int rows = int((double)GetSize().y / s_size) + 1;
+	// Generate background texture if needed
+	if (!tex_background->isLoaded())
+		tex_background->genChequeredTexture(8, rgba_t(64, 64, 80, 255), rgba_t(80, 80, 96, 255));
 
-	// Scale to square size
-	glScaled(s_size, s_size, 1);
+	// Enable textures
+	glEnable(GL_TEXTURE_2D);
 
-	// Draw a grid of squares
-	for (int x = 0; x < cols; x++) {
-		for (int y = 0; y < rows; y++) {
-			// Set square colour
-			rgba_t col(64, 64, 80, 255);
-			if (x%2 != y%2)
-				col.set(80, 80, 96, 255);
-			col.set_gl();
+	// Bind background texture
+	tex_background->bind();
 
-			// Draw the square
-			glBegin(GL_QUADS);
-			glVertex2d(x, y);
-			glVertex2d(x, y+1);
-			glVertex2d(x+1, y+1);
-			glVertex2d(x+1, y);
-			glEnd();
-		}
-	}
+	// Draw background
+	frect_t rect(0, 0, GetSize().x, GetSize().y);
+	COL_WHITE.set_gl();
+	glBegin(GL_QUADS);
+	glTexCoord2d(rect.x1()*0.0625, rect.y1()*0.0625);	glVertex2d(rect.x1(), rect.y1());
+	glTexCoord2d(rect.x1()*0.0625, rect.y2()*0.0625);	glVertex2d(rect.x1(), rect.y2());
+	glTexCoord2d(rect.x2()*0.0625, rect.y2()*0.0625);	glVertex2d(rect.x2(), rect.y2());
+	glTexCoord2d(rect.x2()*0.0625, rect.y1()*0.0625);	glVertex2d(rect.x2(), rect.y1());
+	glEnd();
+
+	// Disable textures
+	glDisable(GL_TEXTURE_2D);
 
 	// Restore previous matrix
 	glPopMatrix();
 }
 
+/* CTextureCanvas::drawTexture
+ * Draws the currently opened composite texture
+ *******************************************************************/
 void CTextureCanvas::drawTexture() {
 	// Push matrix
 	glPushMatrix();
@@ -157,6 +169,7 @@ void CTextureCanvas::drawTexture() {
 	glTranslated(texture->getWidth() * -0.5, texture->getHeight() * -0.5, 0);
 
 	// Draw patches in order
+	COL_WHITE.set_gl();
 	for (uint32_t a = 0; a < texture->nPatches(); a++)
 		drawPatch(a);
 
@@ -164,6 +177,9 @@ void CTextureCanvas::drawTexture() {
 	glPopMatrix();
 }
 
+/* CTextureCanvas::drawPatch
+ * Draws the patch at index [num] in the composite texture
+ *******************************************************************/
 void CTextureCanvas::drawPatch(int num) {
 	// Get patch to draw
 	CTPatch* patch = texture->getPatch(num);
@@ -172,50 +188,25 @@ void CTextureCanvas::drawPatch(int num) {
 	if (!patch)
 		return;
 
-	// Pust gl matrix
-	glPushMatrix();
-
 	// Load the patch as an opengl texture if it isn't already
-	if (patch_gl_id[num] == UINT_MAX) {
-		rgba_t(255, 255, 255, 255, 0).set_gl();
-		if (patch) {
-			// Get image RGBA data
-			MemChunk mc;
-			patch->getImage()->getRGBAData(mc);
-
-			// Generate the texture id
-			glGenTextures(1, &(patch_gl_id[num]));
-			glBindTexture(GL_TEXTURE_2D, patch_gl_id[num]);
-
-			// Generate the texture
-			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-			glTexImage2D(GL_TEXTURE_2D, 0, 4, patch->getImage()->getWidth(), patch->getImage()->getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, mc.getData());
-		}
+	if (!patch_textures[num]->isLoaded()) {
+		if (patch)
+			patch_textures[num]->loadImage(patch->getImage());
 	}
 
 	// Enable textures
 	glEnable(GL_TEXTURE_2D);
 
-	// Bind the texture
-	glBindTexture(GL_TEXTURE_2D, patch_gl_id[num]);
-
 	// Draw the patch
-	glTranslated(patch->xOffset(), patch->yOffset(), 0);
-	glBegin(GL_QUADS);
-	glTexCoord2d(0, 0);		glVertex2d(0, 0);
-	glTexCoord2d(0, 1);		glVertex2d(0, patch->getImage()->getHeight());
-	glTexCoord2d(1, 1);		glVertex2d(patch->getImage()->getWidth(), patch->getImage()->getHeight());
-	glTexCoord2d(1, 0);		glVertex2d(patch->getImage()->getWidth(), 0);
-	glEnd();
+	patch_textures[num]->draw2d(patch->xOffset(), patch->yOffset());
 
 	// Disable textures
 	glDisable(GL_TEXTURE_2D);
-
-	// Pop gl matrix
-	glPopMatrix();
 }
 
+/* CTextureCanvas::drawTextureBorder
+ * Draws a black border around the texture
+ *******************************************************************/
 void CTextureCanvas::drawTextureBorder() {
 	// Push matrix
 	glPushMatrix();

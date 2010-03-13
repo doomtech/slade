@@ -5,11 +5,13 @@
 #include "OGLCanvas.h"
 #include "CTexture.h"
 #include "Palette.h"
+#include "GLTexture.h"
 
 class CTextureCanvas : public OGLCanvas {
 private:
-	CTexture*	texture;
-	vector<GLuint>		patch_gl_id;
+	CTexture*			texture;
+	vector<GLTexture*>	patch_textures;
+	GLTexture*			tex_background;
 
 public:
 	CTextureCanvas(wxWindow* parent, int id);
@@ -17,6 +19,7 @@ public:
 
 	CTexture*	getTexture() { return texture; }
 
+	void	clearPatchTextures();
 	bool	openTexture(CTexture* tex, Palette8bit* pal = NULL);
 	void	draw();
 	void	drawChequeredBackground();

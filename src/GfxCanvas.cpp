@@ -223,12 +223,8 @@ void GfxCanvas::drawImage() {
 	// Update texture if needed
 	if (update_texture) {
 		tex_image->loadImage(image);
-		//tex_image->loadImagePortion(image, rect_t(0, 0, 16, 16)); // test
 		update_texture = false;
 	}
-
-	// Bind texture
-	tex_image->bind();
 
 	// Determine (texture)coordinates
 	double x = (double)image->getWidth();
@@ -236,61 +232,46 @@ void GfxCanvas::drawImage() {
 	double tex_x = 1;
 	double tex_y = 1;
 
+	/*
 	if (view_type == GFXVIEW_TILED) {
 		tex_x = (double)GetSize().x / x;
 		tex_y = (double)GetSize().y / y;
 		x = (double)GetSize().x;
 		y = (double)GetSize().y;
 	}
+	*/
 
-	// If not dragging
-	if (drag_origin.x < 0) {
+	// If tiled view
+	if (view_type == GFXVIEW_TILED) {
+		// Draw tiled image
+		rgba_t(255, 255, 255, 255, 0).set_gl();
+		tex_image->draw2dTiled(GetSize().x / scale, GetSize().y / scale);
+	}
+	else if (drag_origin.x < 0) {	// If not dragging
 		// Draw the image
 		rgba_t(255, 255, 255, 255, 0).set_gl();
-		glBegin(GL_QUADS);
-		glTexCoord2d(0, 0);			glVertex2d(0, 0);
-		glTexCoord2d(0, tex_y);		glVertex2d(0, y);
-		glTexCoord2d(tex_x, tex_y);	glVertex2d(x, y);
-		glTexCoord2d(tex_x, 0);		glVertex2d(x, 0);
-		glEnd();
+		tex_image->draw2d();
 
 		// Draw hilight
 		if (image_hilight) {
 			rgba_t(255, 255, 255, 80, 1).set_gl();
-			glBegin(GL_QUADS);
-			glTexCoord2d(0, 0);			glVertex2d(0, 0);
-			glTexCoord2d(0, tex_y);		glVertex2d(0, y);
-			glTexCoord2d(tex_x, tex_y);	glVertex2d(x, y);
-			glTexCoord2d(tex_x, 0);		glVertex2d(x, 0);
-			glEnd();
+			tex_image->draw2d();
 
 			// Reset colour
 			rgba_t(255, 255, 255, 255, 0).set_gl();
 		}
 	}
-	else {
-		// Dragging
-
+	else {	// Dragging
 		// Draw the original
 		rgba_t(0, 0, 0, 180, 0).set_gl();
-		glBegin(GL_QUADS);
-		glTexCoord2d(0, 0);			glVertex2d(0, 0);
-		glTexCoord2d(0, tex_y);		glVertex2d(0, y);
-		glTexCoord2d(tex_x, tex_y);	glVertex2d(x, y);
-		glTexCoord2d(tex_x, 0);		glVertex2d(x, 0);
-		glEnd();
+		tex_image->draw2d();
 
 		// Draw the dragged image
 		int off_x = (drag_pos.x - drag_origin.x) / scale;
 		int off_y = (drag_pos.y - drag_origin.y) / scale;
 		glTranslated(off_x, off_y, 0);
 		rgba_t(255, 255, 255, 255, 0).set_gl();
-		glBegin(GL_QUADS);
-		glTexCoord2d(0, 0);			glVertex2d(0, 0);
-		glTexCoord2d(0, tex_y);		glVertex2d(0, y);
-		glTexCoord2d(tex_x, tex_y);	glVertex2d(x, y);
-		glTexCoord2d(tex_x, 0);		glVertex2d(x, 0);
-		glEnd();
+		tex_image->draw2d();
 	}
 
 	// Disable textures
@@ -313,28 +294,6 @@ void GfxCanvas::drawImage() {
  * (Re)Generates the image texture from image data
  *******************************************************************/
 void GfxCanvas::updateImageTexture() {
-	/*
-	// Delete current texture if it exists
-	if (gl_id < 999999999)
-		glDeleteTextures(1, &gl_id);
-
-	// Stop here if the image is invalid
-	if (!image->isValid())
-		return;
-
-	// Get image RGBA data
-	MemChunk mc;
-	image->getRGBAData(mc);
-
-	// Generate the texture id
-	glGenTextures(1, &gl_id);
-	glBindTexture(GL_TEXTURE_2D, gl_id);
-
-	// Generate the texture
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D, 0, 4, image->getWidth(), image->getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, mc.getData());
-	 */
 }
 
 /* GfxCanvas::zoomToFit

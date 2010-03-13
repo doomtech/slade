@@ -17,16 +17,17 @@ enum {
 
 class GfxCanvas : public OGLCanvas, Listener {
 private:
-	SImage*			image;
-	int				view_type;	// 0=default, 1=centered, 2=sprite offsets, 3=hud offsets, 4=tiled
-	double			scale;
-	GLTexture*		tex_image;
-	GLTexture*		tex_background;
-	bool			update_texture;
-	bool			image_hilight;
-	bool			allow_drag;
-	point2_t		drag_pos;
-	point2_t		drag_origin;
+	SImage*		image;
+	int			view_type;	// 0=default, 1=centered, 2=sprite offsets, 3=hud offsets, 4=tiled
+	double		scale;
+	GLTexture*	tex_image;
+	GLTexture*	tex_background;
+	bool		update_texture;
+	bool		image_hilight;
+	bool		image_split;
+	bool		allow_drag;
+	point2_t	drag_pos;
+	point2_t	drag_origin;
 
 public:
 	GfxCanvas(wxWindow* parent, int id);

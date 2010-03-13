@@ -89,3 +89,7 @@ bool OpenGL::init() {
 bool OpenGL::np2TexSupport() {
 	return version >= 2;
 }
+
+bool OpenGL::validTexDimension(uint32_t dim) {
+	return (dim <= max_tex_size);
+}
