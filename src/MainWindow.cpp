@@ -158,6 +158,11 @@ void MainWindow::setupLayout() {
 	tb_entry->AddTool(MENU_ENTRY_MOVEDOWN, _T("Move Down"), getIcon(_T("t_down")), _T("Move Down"));
 	tb_entry->Realize();
 
+	wxAuiToolBar* tb_resource = new wxAuiToolBar(this, -1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
+	string test[] = { _T("test1"), _T("test2"), _T("test3") };
+	tb_resource->AddControl(new wxChoice(tb_resource, -1, wxDefaultPosition, wxDefaultSize, 3, test), _T("Base Resource"));
+	tb_resource->Realize();
+
 	// Setup panel info & add toolbar panels
 	// File toolbar
 	p_inf.ToolbarPane();
@@ -171,6 +176,13 @@ void MainWindow::setupLayout() {
 	p_inf.Position(1);
 	p_inf.Name(_T("tb_entry"));
 	m_mgr->AddPane(tb_entry, p_inf);
+
+	// Resource toolbar
+	p_inf.ToolbarPane();
+	p_inf.Top();
+	p_inf.Position(2);
+	p_inf.Name(_T("tb_resource"));
+	m_mgr->AddPane(tb_resource, p_inf);
 
 
 	// -- Editor Area --
@@ -222,7 +234,10 @@ void MainWindow::setupLayout() {
 
 
 	// Load previously saved perspective string
-	m_mgr->LoadPerspective(main_window_layout);
+	long vers = 0;
+	main_window_layout.Left(3).ToLong(&vers);
+	if (vers == MW_LAYOUT_VERS)
+		m_mgr->LoadPerspective(main_window_layout.Right(main_window_layout.Length() - 3));
 
 	// Finalize
 	m_mgr->Update();

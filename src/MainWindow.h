@@ -7,6 +7,12 @@
 #include <wx/html/htmlwin.h>
 #include <wx/aui/aui.h>
 
+// The below is needed because, if I add a toolbar or dockable window to the main window,
+// then load a previously saved perspective, the new item won't show up at all. So when
+// saving the perspective, add this number to the start of the string, and check against
+// it when loading. In other words, wxAUI is silly.
+#define MW_LAYOUT_VERS 001
+
 class MainWindow : public wxFrame {
 private:
 	ArchiveManagerPanel*	panel_archivemanager;

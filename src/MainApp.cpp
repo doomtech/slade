@@ -372,7 +372,8 @@ void MainApp::saveConfigFile() {
 	save_cvars(fp);
 
 	// Write main window AUI layout
-	fprintf(fp, "main_window_layout \"%s\"\n", chr(main_window_layout));
+	string layout = s_fmt(_T("%3d%s"), MW_LAYOUT_VERS, main_window_layout.c_str());
+	fprintf(fp, "main_window_layout \"%s\"\n", chr(layout));
 
 	// Close configuration file
 	fprintf(fp, "\n// End Configuration File\n\n");
