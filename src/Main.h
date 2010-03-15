@@ -40,6 +40,9 @@ WX_DECLARE_STRING_HASH_MAP(wxString, PropertyList);
 // Opengl
 #include <GL/gl.h>
 
+// File handling
+#include <wx/file.h>
+
 // Global internal includes
 #include "MemChunk.h"
 #include "CVar.h"

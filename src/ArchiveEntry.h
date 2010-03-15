@@ -112,7 +112,7 @@ public:
 	bool	importMem(const void* data, uint32_t size);
 	bool	importMemChunk(MemChunk& mc);
 	bool	importFile(string filename, uint32_t offset = 0, uint32_t size = 0);
-	bool	importFileStream(FILE* fp, uint32_t len = 0);
+	bool	importFileStream(wxFile& file, uint32_t len = 0);
 	bool	importEntry(ArchiveEntry* entry);
 
 	// Data export

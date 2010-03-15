@@ -326,21 +326,21 @@ bool WadArchive::save(string filename) {
 	}
 
 	// Open wadfile for writing
-	FILE *fp = fopen(filename.ToAscii(), "wb");
-	if (!fp) {
+	wxFile file(filename, wxFile::write);
+	if (!file.IsOpened()) {
 		Global::error = _T("Unable to open file for saving. Make sure it isn't in use by another program.");
 		return false;
 	}
 
 	// Write the header
 	uint32_t num_lumps = numEntries();
-	fwrite(wad_type, 1, 4, fp);
-	fwrite(&num_lumps, 4, 1, fp);
-	fwrite(&dir_offset, 4, 1, fp);
+	file.Write(wad_type, 4);
+	file.Write(&num_lumps, 4);
+	file.Write(&dir_offset, 4);
 
 	// Write the lumps
 	for (uint32_t l = 0; l < num_lumps; l++)
-		fwrite(entries[l]->getData(), entries[l]->getSize(), 1, fp);
+		file.Write(entries[l]->getData(), entries[l]->getSize());
 
 	// Write the directory
 	for (uint32_t l = 0; l < num_lumps; l++) {
@@ -351,16 +351,13 @@ bool WadArchive::save(string filename) {
 		for (size_t c = 0; c < entries[l]->getName().length(); c++)
 			name[c] = entries[l]->getName()[c];
 
-		fwrite(&offset, 4, 1, fp);
-		fwrite(&size, 4, 1, fp);
-		fwrite(name, 1, 8, fp);
+		file.Write(&offset, 4);
+		file.Write(&size, 4);
+		file.Write(name, 8);
 
 		entries[l]->setState(0);
 		entries[l]->setExProp(_T("Offset"), s_fmt(_T("%d"), l));
 	}
-
-	// Close the file
-	fclose(fp);
 
 	// Set variables and return success
 	this->filename = filename;
@@ -421,21 +418,17 @@ bool WadArchive::loadEntryData(ArchiveEntry* entry) {
 	}
 
 	// Open wadfile
-	FILE *fp = fopen(filename.ToAscii(), "rb");
+	wxFile file(filename);
 
 	// Check if opening the file failed
-	if (!fp) {
+	if (!file.IsOpened()) {
 		wxLogMessage(_T("WadArchive::loadEntryData: Failed to open wadfile %s"), filename.c_str());
 		return false;
 	}
 
 	// Seek to lump offset in file and read it in
-	fseek(fp, getEntryOffset(entry), SEEK_SET);
-	entry->importFileStream(fp, entry->getSize());
-	//fread(data, entry->getSize(), 1, fp);
-
-	// Close file
-	fclose(fp);
+	file.Seek(getEntryOffset(entry), wxFromStart);
+	entry->importFileStream(file, entry->getSize());
 
 	// Set the lump to loaded
 	entry->setLoaded();

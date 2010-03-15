@@ -339,36 +339,26 @@ bool ArchiveEntry::importFile(string filename, uint32_t offset, uint32_t size) {
 	}
 
 	// Open the file
-	FILE* fp = fopen(filename.ToAscii(), "rb");
+	wxFile file(filename);
 
 	// Check that it opened ok
-	if (!fp) {
+	if (!file.IsOpened()) {
 		Global::error = _T("Unable to open file for reading");
 		return false;
 	}
 
-	// Get the file's size
-	fseek(fp, 0, SEEK_END);
-	uint32_t fsize = ftell(fp);
-
 	// Get the size to read, if zero
 	if (size == 0)
-		size = fsize - offset;
+		size = file.Length() - offset;
 
 	// Check offset/size bounds
-	if (offset + size > fsize || offset < 0) {
-		fclose(fp);
+	if (offset + size > file.Length() || offset < 0)
 		return false;
-	}
 
 	// Create temporary buffer and load file contents
 	uint8_t* temp_buf = new uint8_t[size];
-	fseek(fp, 0, SEEK_SET);
-	fseek(fp, offset, SEEK_CUR);
-	fread(temp_buf, 1, size, fp);
-
-	// Close the file
-	fclose(fp);
+	file.Seek(offset, wxFromStart);
+	file.Read(temp_buf, size);
 
 	// Import data into entry
 	importMem(temp_buf, size);
@@ -379,7 +369,7 @@ bool ArchiveEntry::importFile(string filename, uint32_t offset, uint32_t size) {
 	return true;
 }
 
-bool ArchiveEntry::importFileStream(FILE* fp, uint32_t len) {
+bool ArchiveEntry::importFileStream(wxFile& file, uint32_t len) {
 	// Check if locked
 	if (locked) {
 		Global::error = _T("Entry is locked");
@@ -387,7 +377,7 @@ bool ArchiveEntry::importFileStream(FILE* fp, uint32_t len) {
 	}
 
 	// Import data from the file stream
-	if (data.importFileStream(fp, len)) {
+	if (data.importFileStream(file, len)) {
 		// Update attributes
 		this->size = data.getSize();
 		setLoaded();
@@ -428,19 +418,16 @@ bool ArchiveEntry::importEntry(ArchiveEntry* entry) {
  *******************************************************************/
 bool ArchiveEntry::exportFile(string filename) {
 	// Attempt to open file
-	FILE* fp = fopen(filename.ToAscii(), "wb");
+	wxFile file(filename, wxFile::write);
 
 	// Check it opened ok
-	if (!fp) {
+	if (!file.IsOpened()) {
 		Global::error = _T("Unable to open file for writing");
 		return false;
 	}
 
 	// Write entry data to the file
-	fwrite(getData(), 1, this->size, fp);
-
-	// Close the file
-	fclose(fp);
+	file.Write(getData(), this->size);
 
 	return true;
 }

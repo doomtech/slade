@@ -305,8 +305,8 @@ void MainApp::OnFatalException() {
 void MainApp::initLogFile() {
 	// Set wxLog target(s)
 	wxLog::SetActiveTarget(new SLADELog());
-	FILE* log_file = fopen(chr(appPath(_T("slade3.log"), DIR_USER)), "wt");
-	new wxLogChain(new wxLogStderr(log_file));
+	wxFFile log_file(appPath(_T("slade3.log"), DIR_USER), _T("wt"));
+	new wxLogChain(new wxLogStderr(log_file.fp()));
 
 	// Write logfile header
 	string year = wxNow().Right(4);
@@ -356,28 +356,27 @@ void MainApp::readConfigFile() {
  *******************************************************************/
 void MainApp::saveConfigFile() {
 	// Open SLADE.cfg for writing text
-	FILE* fp = fopen(chr(appPath(_T("slade3.cfg"), DIR_USER)), "wt");
+	wxFile file(appPath(_T("slade3.cfg"), DIR_USER), wxFile::write);
 
 	// Do nothing if it didn't open correctly
-	if (!fp)
+	if (!file.IsOpened())
 		return;
 
 	// Write cfg header
-	fprintf(fp, "/*****************************************************\n");
-	fprintf(fp, " * SLADE Configuration File\n");
-	fprintf(fp, " * Don't edit this unless you know what you're doing\n");
-	fprintf(fp, " *****************************************************/\n\n");
+	file.Write(_T("/*****************************************************\n"));
+	file.Write(_T(" * SLADE Configuration File\n"));
+	file.Write(_T(" * Don't edit this unless you know what you're doing\n"));
+	file.Write(_T(" *****************************************************/\n\n"));
 
 	// Write cvars
-	save_cvars(fp);
+	save_cvars(file);
 
 	// Write main window AUI layout
 	string layout = s_fmt(_T("%3d%s"), MW_LAYOUT_VERS, main_window_layout.c_str());
-	fprintf(fp, "main_window_layout \"%s\"\n", chr(layout));
+	file.Write(s_fmt(_T("main_window_layout \"%s\"\n"), chr(layout)));
 
 	// Close configuration file
-	fprintf(fp, "\n// End Configuration File\n\n");
-	fclose(fp);
+	file.Write(_T("\n// End Configuration File\n\n"));
 }
 
 

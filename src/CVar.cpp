@@ -97,37 +97,37 @@ void get_cvar_list(vector<string>& list) {
 /* save_cvars
  * Saves cvars to a config file
  *******************************************************************/
-void save_cvars(FILE* fp) {
+void save_cvars(wxFile& file) {
 	uint32_t max_size = 0;
 	for (uint32_t c = 0; c < n_cvars; c++) {
 		if (cvars[c]->name.size() > max_size)
 			max_size = cvars[c]->name.size();
 	}
 
-	fprintf(fp, "cvars\n{\n");
+	file.Write(_T("cvars\n{\n"));
 
 	for (uint32_t c = 0; c < n_cvars; c++) {
 		if (cvars[c]->flags & CVAR_SAVE) {
-			fprintf(fp, "\t%s ", chr(cvars[c]->name));
+			file.Write(s_fmt(_T("\t%s "), chr(cvars[c]->name)));
 
 			int spaces = max_size - cvars[c]->name.size();
-			for (int a = 0; a < spaces; a++) fprintf(fp, " ");
+			for (int a = 0; a < spaces; a++) file.Write(_T(" "));
 
 			if (cvars[c]->type == CVAR_INTEGER)
-				fprintf(fp, "%d\n", cvars[c]->GetValue().Int);
+				file.Write(s_fmt(_T("%d\n"), cvars[c]->GetValue().Int));
 
 			if (cvars[c]->type == CVAR_BOOLEAN)
-				fprintf(fp, "%d\n", cvars[c]->GetValue().Bool);
+				file.Write(s_fmt(_T("%d\n"), cvars[c]->GetValue().Bool));
 
 			if (cvars[c]->type == CVAR_FLOAT)
-				fprintf(fp, "%1.2f\n", cvars[c]->GetValue().Float);
+				file.Write(s_fmt(_T("%1.2f\n"), cvars[c]->GetValue().Float));
 
 			if (cvars[c]->type == CVAR_STRING)
-				fprintf(fp, "\"%s\"\n", chr(((CStringCVar *)cvars[c])->value));
+				file.Write(s_fmt(_T("\"%s\"\n"), chr(((CStringCVar *)cvars[c])->value)));
 		}
 	}
 
-	fprintf(fp, "}\n\n");
+	file.Write(_T("}\n\n"));
 }
 
 /* read_cvar

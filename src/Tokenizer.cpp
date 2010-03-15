@@ -68,23 +68,18 @@ Tokenizer::~Tokenizer() {
  *******************************************************************/
 bool Tokenizer::openFile(string filename, uint32_t offset, uint32_t length) {
 	// Open the file
-	FILE *fp = fopen(chr(filename), "rb");
+	wxFile file(filename);
 
-	if (!fp) {
+	// Check file opened
+	if (!file.IsOpened()) {
 		wxLogMessage(_T("Tokenizer::openFile: Unable to open file %s"), filename.c_str());
 		return false;
 	}
 
-	// Get file length
-	uint32_t flen = 0;
-	fseek(fp, 0, SEEK_END);
-	flen = (uint32_t) ftell(fp);
-	fseek(fp, 0, SEEK_SET);
-
 	// If length isn't specified or exceeds the file length,
 	// only read to the end of the file
-	if (offset + length > flen || length == 0)
-		length = flen - offset;
+	if (offset + length > file.Length() || length == 0)
+		length = file.Length() - offset;
 
 	// Setup variables & allocate memory
 	size = length;
@@ -92,9 +87,8 @@ bool Tokenizer::openFile(string filename, uint32_t offset, uint32_t length) {
 	start = current = (char *) malloc(size);
 
 	// Read the file portion
-	fseek(fp, offset, SEEK_SET);
-	fread(start, 1, size, fp);
-	fclose(fp);
+	file.Seek(offset, wxFromStart);
+	file.Read(start, size);
 
 	return true;
 }

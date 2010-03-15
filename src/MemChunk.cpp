@@ -135,10 +135,10 @@ bool MemChunk::reSize(uint32_t new_size, bool preserve_data) {
  *******************************************************************/
 bool MemChunk::importFile(string filename, uint32_t offset, uint32_t len) {
 	// Open the file
-	FILE *fp = fopen(chr(filename), "rb");
+	wxFile file(filename);
 
 	// Return false if file open failed
-	if (!fp) {
+	if (!file.IsOpened()) {
 		wxLogMessage(_T("MemChunk::loadFile: Unable to open file %s"), filename.c_str());
 		Global::error = s_fmt(_T("Unable to open file %s"), filename.c_str());
 		return false;
@@ -147,16 +147,10 @@ bool MemChunk::importFile(string filename, uint32_t offset, uint32_t len) {
 	// Clear current data if it exists
 	clear();
 
-	// Get file length
-	uint32_t flen = 0;
-	fseek(fp, 0, SEEK_END);
-	flen = (uint32_t) ftell(fp);
-	fseek(fp, 0, SEEK_SET);
-
 	// If length isn't specified or exceeds the file length,
 	// only read to the end of the file
-	if (offset + len > flen || len == 0)
-		len = flen - offset;
+	if (offset + len > file.Length() || len == 0)
+		len = file.Length() - offset;
 
 	// Setup variables
 	size = len;
@@ -166,9 +160,8 @@ bool MemChunk::importFile(string filename, uint32_t offset, uint32_t len) {
 		data = new uint8_t[size];
 
 		// Read the file
-		fseek(fp, offset, SEEK_SET);
-		fread(data, 1, size, fp);
-		fclose(fp);
+		file.Seek(offset, wxFromStart);
+		file.Read(data, size);
 	}
 
 	return true;
@@ -179,28 +172,21 @@ bool MemChunk::importFile(string filename, uint32_t offset, uint32_t len) {
  * into the MemChunk
  * Returns false if file couldn't be opened, true otherwise
  *******************************************************************/
-bool MemChunk::importFileStream(FILE* fp, uint32_t len) {
+bool MemChunk::importFileStream(wxFile& file, uint32_t len) {
 	// Check file
-	if (!fp)
+	if (!file.IsOpened())
 		return false;
 
 	// Clear current data if it exists
 	clear();
 
 	// Get current file position
-	uint32_t offset = ftell(fp);
-
-	// Get file length
-	uint32_t flen = 0;
-	fseek(fp, 0, SEEK_END);
-	flen = (uint32_t) ftell(fp);
-	fseek(fp, offset, SEEK_SET);
+	uint32_t offset = file.Tell();
 
 	// If length isn't specified or exceeds the file length,
 	// only read to the end of the file
-	if (offset + len > flen || len == 0)
-		len = flen - offset;
-
+	if (offset + len > file.Length() || len == 0)
+		len = file.Length() - offset;
 
 	// Setup variables
 	size = len;
@@ -208,7 +194,7 @@ bool MemChunk::importFileStream(FILE* fp, uint32_t len) {
 	// Read the file
 	if (size > 0) {
 		data = new uint8_t[size];
-		fread(data, 1, size, fp);
+		file.Read(data, size);
 	}
 
 	return true;
@@ -257,17 +243,14 @@ bool MemChunk::exportFile(string filename, uint32_t start, uint32_t size) {
 		size = this->size - start;
 
 	// Open file for writing
-	FILE* fp = fopen(chr(filename), "wb");
-	if (!fp) {
+	wxFile file(filename, wxFile::write);
+	if (!file.IsOpened()) {
 		wxLogMessage(s_fmt(_T("Unable to write to file %s"), filename.c_str()));
 		return false;
 	}
 
 	// Write the data
-	fwrite(data+start, 1, size, fp);
-
-	// Close the file
-	fclose(fp);
+	file.Write(data+start, size);
 
 	return true;
 }

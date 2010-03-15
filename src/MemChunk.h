@@ -26,7 +26,7 @@ public:
 
 	// Data import
 	bool	importFile(string filename, uint32_t offset = 0, uint32_t len = 0);
-	bool	importFileStream(FILE* fp, uint32_t len = 0);
+	bool	importFileStream(wxFile& file, uint32_t len = 0);
 	bool	importMem(const uint8_t* start, uint32_t len);
 
 	// Data export
