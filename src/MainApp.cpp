@@ -200,6 +200,15 @@ IMPLEMENT_APP(MainApp)
  * needed, false otherwise
  *******************************************************************/
 bool MainApp::initDirectories() {
+	// Setup app dir
+	dir_app = wxFileName(wxStandardPaths::Get().GetExecutablePath()).GetPath();
+
+	// Check for portable install
+	if (wxFileExists(appPath(_T("portable"), DIR_APP))) {
+		dir_user = dir_data = dir_app;
+		return true;
+	}
+
 	// Setup or create user directory if necessary
 	dir_user = wxStandardPaths::Get().GetUserDataDir();
 	if (!wxDirExists(dir_user)) {
@@ -208,9 +217,6 @@ bool MainApp::initDirectories() {
 			return false;
 		}
 	}
-
-	// Setup app dir
-	dir_app = wxFileName(wxStandardPaths::Get().GetExecutablePath()).GetPath();
 
 	// Setup data dir
 	dir_data = wxStandardPaths::Get().GetDataDir();
