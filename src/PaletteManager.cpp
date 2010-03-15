@@ -123,7 +123,7 @@ string PaletteManager::getPalName(Palette8bit* pal) {
  *******************************************************************/
 bool PaletteManager::loadResourcePalettes() {
 	// Get the 'palettes' directory of SLADE.pk3
-	ZipArchive* res_archive = (ZipArchive*)(theArchiveManager->resourceArchive());
+	ZipArchive* res_archive = (ZipArchive*)(theArchiveManager->programResourceArchive());
 	zipdir_t* dir_palettes = res_archive->getDirectory(_T("palettes"));
 
 	// Check it exists

@@ -13,7 +13,8 @@ private:
 	};
 
 	vector<archive_t>	open_archives;
-	Archive*			resource_archive;
+	Archive*			program_resource_archive;
+	Archive*			base_resource_archive;
 	bool				res_archive_open;
 
 	static ArchiveManager*	instance;
@@ -41,7 +42,9 @@ public:
 	void		closeAll();
 	int			numArchives() { return (int)open_archives.size(); }
 	int			archiveIndex(Archive* archive);
-	Archive*	resourceArchive() { return resource_archive; }
+	Archive*	programResourceArchive() { return program_resource_archive; }
+	Archive*	baseResourceArchive() { return base_resource_archive; }
+	bool		openBaseResource(string filename);
 
 	ArchiveEntry*	getResourceEntry(string name);
 

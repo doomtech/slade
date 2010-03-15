@@ -30,6 +30,7 @@
  *******************************************************************/
 #include "Main.h"
 #include "MemChunk.h"
+#include "Misc.h"
 #include <wx/log.h>
 
 
@@ -139,6 +140,7 @@ bool MemChunk::importFile(string filename, uint32_t offset, uint32_t len) {
 	// Return false if file open failed
 	if (!fp) {
 		wxLogMessage(_T("MemChunk::loadFile: Unable to open file %s"), filename.c_str());
+		Global::error = s_fmt(_T("Unable to open file %s"), filename.c_str());
 		return false;
 	}
 
@@ -236,10 +238,24 @@ bool MemChunk::importMem(const uint8_t* start, uint32_t len) {
 	return true;
 }
 
-/* MemChunk::saveFile
- * Writes the MemChunk data to a new file of [filename]
+/* MemChunk::exportFile
+ * Writes the MemChunk data to a new file of [filename], starting
+ * from [start] to [start+size]. If [size] is 0, writes from [start]
+ * to the end of the data
  *******************************************************************/
-bool MemChunk::exportFile(string filename) {
+bool MemChunk::exportFile(string filename, uint32_t start, uint32_t size) {
+	// Check data exists
+	if (!hasData())
+		return false;
+
+	// Check parameters
+	if (start >= this->size || start + size >= this->size)
+		return false;
+
+	// Check size
+	if (size == 0)
+		size = this->size - start;
+
 	// Open file for writing
 	FILE* fp = fopen(chr(filename), "wb");
 	if (!fp) {
@@ -248,12 +264,35 @@ bool MemChunk::exportFile(string filename) {
 	}
 
 	// Write the data
-	fwrite(data, 1, size, fp);
+	fwrite(data+start, 1, size, fp);
 
 	// Close the file
 	fclose(fp);
 
 	return true;
+}
+
+/* MemChunk::exportMemChunk
+ * Writes the MemChunk data to another MemChunk, starting from
+ * [start] to [start+size]. If [size] is 0, writes from [start] to
+ * the end of the data
+ *******************************************************************/
+bool MemChunk::exportMemChunk(MemChunk& mc, uint32_t start, uint32_t size) {
+	// Check data exists
+	if (!hasData())
+		return false;
+
+	// Check parameters
+	if (start >= this->size || start + size >= this->size)
+		return false;
+
+	// Check size
+	if (size == 0)
+		size = this->size - start;
+	
+	// Write data to MemChunk
+	mc.reSize(size, false);
+	return mc.importMem(data+start, size);
 }
 
 /* MemChunk::write
@@ -341,4 +380,15 @@ bool MemChunk::fillData(uint8_t val) {
 
 	// Success
 	return true;
+}
+
+/* MemChunk::crc
+ * Calculates the 32bit CRC value of the data. Returns the CRC or 0
+ * if no data is present
+ *******************************************************************/
+uint32_t MemChunk::crc() {
+	if (hasData())
+		return Misc::crc(data, size);
+	else
+		return false;
 }

@@ -24,6 +24,7 @@ public:
 	ArchiveEntry*	getEntry(string name);
 	string			getFileExtensionString();
 
+	bool	open(MemChunk& mc);
 	bool	openFile(string filename);
 	bool	save(string filename = _T(""));
 	void	close();
@@ -59,6 +60,9 @@ public:
 
 		return wad.save(filename);
 	}
+	
+	static bool isWadArchive(MemChunk& mc);
+	static bool isWadArchive(string filename);
 };
 
 #endif	/* _WADARCHIVE_H */

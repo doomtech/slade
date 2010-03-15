@@ -43,6 +43,7 @@ public:
 	bool					checkEntry(ArchiveEntry* entry);
 	void					setModified(bool mod);
 
+	virtual bool		open(MemChunk& mc) = 0;
 	virtual bool		openFile(string filename) = 0;
 	virtual bool		save(string filename = _T("")) = 0;
 	virtual bool		loadEntryData(ArchiveEntry* entry) = 0;

@@ -57,7 +57,7 @@ bool loadIcons() {
 	string tempfile = appPath(_T("sladetemp"), DIR_TEMP);
 
 	// Get slade.pk3
-	ZipArchive* res_archive = (ZipArchive*)theArchiveManager->resourceArchive();
+	ZipArchive* res_archive = (ZipArchive*)theArchiveManager->programResourceArchive();
 
 	// Do nothing if it doesn't exist
 	if (!res_archive)

@@ -22,6 +22,7 @@ enum {
 	EDF_GFX_PLANAR,
 	EDF_GFX_IMGZ,
 	EDF_WAD,
+	EDF_ZIP,
 	EDF_MUS,
 	EDF_MIDI,
 	EDF_MOD_IT,
@@ -61,6 +62,7 @@ public:
 	static bool detectPlanar(MemChunk& mc);
 	static bool detectImgz(MemChunk& mc);
 	static bool detectWad(MemChunk& mc);
+	static bool detectZip(MemChunk& mc);
 	static bool detectMus(MemChunk& mc);
 	static bool detectMidi(MemChunk& mc);
 	static bool detectModIt(MemChunk& mc);

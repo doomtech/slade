@@ -147,43 +147,27 @@ string WadArchive::getFileExtensionString() {
 	return _T("Wad Files (*.wad)|*.wad");
 }
 
-/* WadArchive::openFile
- * Reads a wad format file from disk
- * Returns true if successful, false otherwise
- *******************************************************************/
-bool WadArchive::openFile(string filename) {
-	// Try to open the file
-	FILE *fp = fopen(filename.ToAscii(), "rb");
-
-	// Check if opening the file failed
-	if (!fp) {
-		wxLogMessage(_T("WadArchive::openFile: Failed to open wadfile %s"), filename.c_str());
-		Global::error = _T("Unable to open file");
+bool WadArchive::open(MemChunk& mc) {
+	// Check data was given
+	if (!mc.hasData())
 		return false;
-	}
-
-	// Get file size
-	uint32_t filesize = 0;
-	fseek(fp, 0, SEEK_END);
-	filesize = ftell(fp);
-	fseek(fp, 0, SEEK_SET);
-
+	
 	// Read wad header
 	uint32_t num_lumps = 0;
 	uint32_t dir_offset = 0;
-	fread(&wad_type, 1, 4, fp);		// Wad type
-	fread(&num_lumps, 4, 1, fp);	// No. of lumps in wad
-	fread(&dir_offset, 4, 1, fp);	// Offset to directory
-
+	mc.seek(0, SEEK_SET);
+	mc.read(&wad_type, 4);		// Wad type
+	mc.read(&num_lumps, 4);		// No. of lumps in wad
+	mc.read(&dir_offset, 4);	// Offset to directory
+	
 	// Byteswap values for big endian if needed
 	num_lumps = wxINT32_SWAP_ON_BE(num_lumps);
 	dir_offset = wxINT32_SWAP_ON_BE(dir_offset);
-
+	
 	// Check the header
 	if (wad_type[1] != 'W' || wad_type[2] != 'A' || wad_type[3] != 'D') {
 		wxLogMessage(_T("WadArchive::openFile: File %s has invalid header"), filename.c_str());
 		Global::error = _T("Invalid wad header");
-		fclose(fp);
 		return false;
 	}
 
@@ -191,16 +175,16 @@ bool WadArchive::openFile(string filename) {
 	setMuted(true);
 
 	// Read the directory
-	fseek(fp, dir_offset, SEEK_SET);
+	mc.seek(dir_offset, SEEK_SET);
 	for (uint32_t d = 0; d < num_lumps; d++) {
 		// Read lump info
 		char name[9] = "";
 		uint32_t offset = 0;
 		uint32_t size = 0;
 
-		fread(&offset, 4, 1, fp);	// Offset
-		fread(&size, 4, 1, fp);		// Size
-		fread(name, 1, 8, fp);		// Name
+		mc.read(&offset, 4);	// Offset
+		mc.read(&size, 4);		// Size
+		mc.read(name, 8);		// Name
 		name[8] = '\0';
 
 		// Byteswap values for big endian if needed
@@ -209,10 +193,9 @@ bool WadArchive::openFile(string filename) {
 
 		// If the lump data goes past the end of the file,
 		// the wadfile is invalid
-		if (offset + size > (uint32_t)filesize) {
-			wxLogMessage(_T("WadArchive::openFile: File %s is invalid or corrupt"), filename.c_str());
-			Global::error = _T("File is invalid and/or corrupt");
-			fclose(fp);
+		if (offset + size > mc.getSize()) {
+			wxLogMessage(_T("WadArchive::open: Wad archive is invalid or corrupt"));
+			Global::error = _T("Archive is invalid and/or corrupt");
 			setMuted(false);
 			return false;
 		}
@@ -258,16 +241,15 @@ bool WadArchive::openFile(string filename) {
 	}
 
 	// Detect all entry types
+	MemChunk edata;
 	for (size_t a = 0; a < entries.size(); a++) {
 		ArchiveEntry* entry = entries[a];
 
 		// Read entry data if it isn't zero-sized
 		if (entry->getSize() > 0) {
-			// Seek to entry data
-			fseek(fp, getEntryOffset(entry), SEEK_SET);
-
-			// Read it in to the entry
-			entry->importFileStream(fp, entry->getSize());
+			// Read the entry data
+			mc.exportMemChunk(edata, getEntryOffset(entry), entry->getSize());
+			entry->importMemChunk(edata);
 		}
 
 		// Detect entry type
@@ -288,17 +270,31 @@ bool WadArchive::openFile(string filename) {
 	// Detect maps (will detect map entry types)
 	detectMaps();
 
-	// Close the file
-	fclose(fp);
-
 	// Setup variables
 	setMuted(false);
-	this->filename = filename;
 	setModified(false);
-	on_disk = true;
 	announce(_T("opened"));
 
 	return true;
+}
+
+/* WadArchive::openFile
+ * Reads a wad format file from disk
+ * Returns true if successful, false otherwise
+ *******************************************************************/
+bool WadArchive::openFile(string filename) {
+	// Open file
+	MemChunk mc;
+	mc.importFile(filename);
+	if (open(mc)) {
+		// Setup variables
+		this->filename = filename;
+		on_disk = true;
+
+		return true;
+	}
+	else
+		return false;
 }
 
 /* WadArchive::save
@@ -816,4 +812,74 @@ ArchiveEntry* WadArchive::findEntry(string search) {
 vector<ArchiveEntry*> WadArchive::findEntries(string search) {
 	vector<ArchiveEntry*> ret;
 	return ret;
+}
+
+
+bool WadArchive::isWadArchive(MemChunk& mc) {
+	// Check size
+	if (mc.getSize() < 12)
+		return false;
+
+	// Check for IWAD/PWAD header
+	if (!(mc[1] == 'W' && mc[2] == 'A' && mc[3] == 'D' &&
+	        (mc[0] == 'P' || mc[0] == 'I')))
+		return false;
+
+	// Get number of lumps and directory offset
+	uint32_t num_lumps = 0;
+	uint32_t dir_offset = 0;
+	mc.seek(4, SEEK_SET);
+	mc.read(&num_lumps, 4);
+	mc.read(&dir_offset, 4);
+
+	// Reset MemChunk (just in case)
+	mc.seek(0, SEEK_SET);
+
+	// Byteswap values for big endian if needed
+	num_lumps = wxINT32_SWAP_ON_BE(num_lumps);
+	dir_offset = wxINT32_SWAP_ON_BE(dir_offset);
+
+	// Check directory offset is decent
+	if ((dir_offset + (num_lumps * 16)) > mc.getSize() ||
+	        dir_offset < 12)
+		return false;
+
+	// If it's passed to here it's probably a wad file
+	return true;
+}
+
+bool WadArchive::isWadArchive(string filename) {
+	// Open file for reading
+	wxFile file(filename);
+	
+	// Check it opened ok
+	if (!file.IsOpened())
+		return false;
+	
+	// Read header
+	char header[4];
+	file.Read(header, 4);
+	
+	// Check for IWAD/PWAD header
+	if (!(header[1] == 'W' && header[2] == 'A' && header[3] == 'D' &&
+	        (header[0] == 'P' || header[0] == 'I')))
+		return false;
+	
+	// Get number of lumps and directory offset
+	uint32_t num_lumps = 0;
+	uint32_t dir_offset = 0;
+	file.Read(&num_lumps, 4);
+	file.Read(&dir_offset, 4);
+	
+	// Byteswap values for big endian if needed
+	num_lumps = wxINT32_SWAP_ON_BE(num_lumps);
+	dir_offset = wxINT32_SWAP_ON_BE(dir_offset);
+
+	// Check directory offset is decent
+	if ((dir_offset + (num_lumps * 16)) > file.Length() ||
+	        dir_offset < 12)
+		return false;
+
+	// If it's passed to here it's probably a wad file
+	return true;
 }

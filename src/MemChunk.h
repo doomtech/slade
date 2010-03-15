@@ -30,7 +30,8 @@ public:
 	bool	importMem(const uint8_t* start, uint32_t len);
 
 	// Data export
-	bool exportFile(string filename);
+	bool	exportFile(string filename, uint32_t start = 0, uint32_t size = 0);
+	bool	exportMemChunk(MemChunk& mc, uint32_t start = 0, uint32_t size = 0);
 
 	// C-style reading/writing
 	bool		write(const void* data, uint32_t size);
@@ -39,7 +40,8 @@ public:
 	uint32_t	currentPos() { return cur_ptr; }
 
 	// Misc
-	bool	fillData(uint8_t val);
+	bool		fillData(uint8_t val);
+	uint32_t	crc();
 };
 
 #endif //__MEMCHUNK_H__

@@ -32,6 +32,7 @@
 #include "Console.h"
 #include "ArchiveManager.h"
 #include "ZipArchive.h"
+#include "WadArchive.h"
 #include <wx/dir.h>
 #include <wx/filename.h>
 
@@ -500,36 +501,11 @@ bool EntryDataFormat::detectDoomFlat(MemChunk& mc) {
 }
 
 bool EntryDataFormat::detectWad(MemChunk& mc) {
-	// Check size
-	if (mc.getSize() < 12)
-		return false;
+	return WadArchive::isWadArchive(mc);
+}
 
-	// Check for IWAD/PWAD header
-	if (!(mc[1] == 'W' && mc[2] == 'A' && mc[3] == 'D' &&
-	        (mc[0] == 'P' || mc[0] == 'I')))
-		return false;
-
-	// Get number of lumps and directory offset
-	uint32_t num_lumps = 0;
-	uint32_t dir_offset = 0;
-	mc.seek(4, SEEK_SET);
-	mc.read(&num_lumps, 4);
-	mc.read(&dir_offset, 4);
-
-	// Reset MemChunk (just in case)
-	mc.seek(0, SEEK_SET);
-
-	// Byteswap values for big endian if needed
-	num_lumps = wxINT32_SWAP_ON_BE(num_lumps);
-	dir_offset = wxINT32_SWAP_ON_BE(dir_offset);
-
-	// Check directory offset is decent
-	if ((dir_offset + (num_lumps * 16)) > mc.getSize() ||
-	        dir_offset < 12)
-		return false;
-
-	// If it's passed to here it's probably a wad file
-	return true;
+bool EntryDataFormat::detectZip(MemChunk& mc) {
+	return ZipArchive::isZipArchive(mc);
 }
 
 bool EntryDataFormat::detectMus(MemChunk& mc) {
@@ -1136,7 +1112,7 @@ bool EntryType::loadEntryTypes() {
 	// -------- READ BUILT-IN TYPES ---------
 
 	// Get builtin entry types from resource archive
-	Archive* res_archive = theArchiveManager->resourceArchive();
+	Archive* res_archive = theArchiveManager->programResourceArchive();
 
 	// Check resource archive exists
 	if (!res_archive) {

@@ -52,6 +52,7 @@ ArchiveManager* ArchiveManager::instance = NULL;
 ArchiveManager::ArchiveManager() {
 	// Init variables
 	res_archive_open = true;
+	base_resource_archive = NULL;
 
 	// Find slade3.pk3 directory
 	string dir_slade_pk3 = appPath(_T("slade.pk3"), DIR_DATA);
@@ -63,8 +64,8 @@ ArchiveManager::ArchiveManager() {
 		dir_slade_pk3 = _T("slade.pk3");
 
 	// Open slade.pk3
-	resource_archive = new ZipArchive();
-	if (!resource_archive->openFile(dir_slade_pk3)) {
+	program_resource_archive = new ZipArchive();
+	if (!program_resource_archive->openFile(dir_slade_pk3)) {
 		wxLogMessage(_T("Unable to find slade.pk3!"));
 		res_archive_open = false;
 	}
@@ -143,15 +144,13 @@ Archive* ArchiveManager::openArchive(string filename) {
 		return NULL;
 	}
 
-	// Create either a wad or zip file, depending on filename extension
-	wxFileName fn(filename);
-
-	if (!fn.GetExt().CmpNoCase(_T("wad"))) // Wad File
+	// Determine file format
+	if (WadArchive::isWadArchive(filename))
 		new_archive = new WadArchive();
-	else if (!fn.GetExt().CmpNoCase(_T("zip")) || !fn.GetExt().CmpNoCase(_T("pk3"))|| !fn.GetExt().CmpNoCase(_T("jdf"))) // Zip/Pk3/JDF file
+	else if (ZipArchive::isZipArchive(filename))
 		new_archive = new ZipArchive();
 	else
-		return NULL; // Unsupported format
+		return NULL;	// Unsupported format
 
 	// If it opened successfully, add it to the list & return it,
 	// Otherwise, delete it and return NULL
@@ -279,6 +278,10 @@ int ArchiveManager::archiveIndex(Archive* archive) {
 
 	// If we get to here the archive wasn't found, so return -1
 	return -1;
+}
+
+bool ArchiveManager::openBaseResource(string filename) {
+	return false;
 }
 
 ArchiveEntry* ArchiveManager::getResourceEntry(string name) {

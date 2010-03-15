@@ -243,7 +243,7 @@ bool EntryOperations::modifyGfxOffsets(ArchiveEntry* entry, int auto_type, point
 		// Create new grAb chunk
 		uint32_t csize = wxUINT32_SWAP_ON_LE(8);
 		grab_chunk_t gc = { { 'g', 'r', 'A', 'b' }, wxINT32_SWAP_ON_LE(xoff), wxINT32_SWAP_ON_LE(yoff) };
-		uint32_t dcrc = wxUINT32_SWAP_ON_LE(crc((uint8_t*)&gc, 12));
+		uint32_t dcrc = wxUINT32_SWAP_ON_LE(Misc::crc((uint8_t*)&gc, 12));
 
 		// Build new PNG from the original w/ the new grAb chunk
 		MemChunk npng;
@@ -358,7 +358,7 @@ bool EntryOperations::modifyalPhChunk(ArchiveEntry* entry, bool value) {
 		// Create new alPh chunk
 		uint32_t csize = wxUINT32_SWAP_ON_LE(0);
 		alph_chunk_t gc = { 'a', 'l', 'P', 'h' };
-		uint32_t dcrc = wxUINT32_SWAP_ON_LE(crc((uint8_t*)&gc, 4));
+		uint32_t dcrc = wxUINT32_SWAP_ON_LE(Misc::crc((uint8_t*)&gc, 4));
 
 		// Create alPh chunk
 		npng.write(&csize, 4);
@@ -479,7 +479,7 @@ bool EntryOperations::modifytRNSChunk(ArchiveEntry* entry, bool value) {
 		// Create new tRNS chunk
 		uint32_t csize = wxUINT32_SWAP_ON_LE(1);
 		trans_chunk_t gc = { 't', 'R', 'N', 'S', '\0' };
-		uint32_t dcrc = wxUINT32_SWAP_ON_LE(crc((uint8_t*)&gc, 5));
+		uint32_t dcrc = wxUINT32_SWAP_ON_LE(Misc::crc((uint8_t*)&gc, 5));
 
 		// Write tRNS chunk
 		npng.write(&csize, 4);

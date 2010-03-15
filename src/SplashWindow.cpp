@@ -16,7 +16,7 @@ SplashWindow::SplashWindow(wxWindow* parent)
 	// Add logo image
 	wxBitmap bm;
 	string tempfile = appPath(_T("temp.png"), DIR_TEMP);
-	ArchiveEntry* logo = theArchiveManager->resourceArchive()->getEntry(_T("logo.png"));
+	ArchiveEntry* logo = theArchiveManager->programResourceArchive()->getEntry(_T("logo.png"));
 	if (logo) {
 		logo->exportFile(tempfile);
 		bm.LoadFile(tempfile, wxBITMAP_TYPE_PNG);

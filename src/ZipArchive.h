@@ -41,6 +41,7 @@ public:
 	ArchiveEntry*	getEntry(string name);
 	string			getFileExtensionString();
 
+	bool		open(MemChunk& mc);
 	bool		openFile(string filename);
 	bool		save(string filename = _T(""));
 	bool		loadEntryData(ArchiveEntry* entry);
@@ -76,6 +77,9 @@ public:
 	zipdir_t*	getRootDirectory() { return directory; }
 	void		dumpDirectoryTree(zipdir_t* start = NULL);
 	void		getTreeAsList(vector<ArchiveEntry*>& list, zipdir_t* start = NULL);
+	
+	static bool	isZipArchive(MemChunk& mc);
+	static bool isZipArchive(string filename);
 };
 
 #endif//__ZIPARCHIVE_H__

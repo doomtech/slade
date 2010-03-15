@@ -343,6 +343,10 @@ string ZipArchive::getFileExtensionString() {
 	return _T("Any Zip Format File (*.zip;*.pk3;*.jdf)|*.zip;*.pk3;*.jdf|Zip File (*.zip)|*.zip|Pk3 File (*.pk3)|*.pk3|JDF File (*.jdf)|*.jdf");
 }
 
+bool ZipArchive::open(MemChunk& mc) {
+	return false;
+}
+
 /* ZipArchive::openFile
  * Opens the given file and loads it into the archive.
  * Returns false if file wasn't found or zip was invalid,
@@ -1288,4 +1292,57 @@ void ZipArchive::getTreeAsList(vector<ArchiveEntry*>& list, zipdir_t* dir) {
 	for (size_t a = 0; a < dir->subdirectories.size(); a++) {
 		getTreeAsList(list, dir->subdirectories[a]);
 	}
+}
+
+
+struct zip_file_header_t {
+	uint32_t	sig;
+	uint16_t	version;
+	uint16_t	flag;
+	uint16_t	compression;
+	uint16_t	mod_time;
+	uint16_t	mod_date;
+	uint32_t	crc;
+	uint32_t	size_comp;
+	uint32_t	size_orig;
+	uint16_t	len_fn;
+	uint16_t	len_extra;
+};
+
+bool ZipArchive::isZipArchive(MemChunk& mc) {
+	// Check size
+	if (mc.getSize() < sizeof(zip_file_header_t))
+		return false;
+
+	// Read first file header
+	zip_file_header_t header;
+	mc.seek(0, SEEK_SET);
+	mc.read(&header, sizeof(zip_file_header_t));
+
+	// Check header signature
+	if (header.sig != 0x04034b50)
+		return false;
+
+	// The zip format is horrendous, so this will do for checking
+	return true;
+}
+
+bool ZipArchive::isZipArchive(string filename) {
+	// Open the file for reading
+	wxFile file(filename);
+
+	// Check it opened
+	if (!file.IsOpened())
+		return false;
+
+	// Read first file header
+	zip_file_header_t header;
+	file.Read(&header, sizeof(zip_file_header_t));
+
+	// Check header signature
+	if (header.sig != 0x04034b50)
+		return false;
+
+	// The zip format is horrendous, so this will do for checking
+	return true;
 }
