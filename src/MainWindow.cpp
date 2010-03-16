@@ -159,8 +159,14 @@ void MainWindow::setupLayout() {
 	tb_entry->Realize();
 
 	wxAuiToolBar* tb_resource = new wxAuiToolBar(this, -1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
-	string test[] = { _T("test1"), _T("test2"), _T("test3") };
-	tb_resource->AddControl(new wxChoice(tb_resource, -1, wxDefaultPosition, wxDefaultSize, 3, test), _T("Base Resource"));
+	wxArrayString list;
+	list.Add(_T("<none>"));
+	for (size_t a = 0; a < theArchiveManager->baseResourceListLength(); a++)
+		list.Add(theArchiveManager->baseResourcePath(a));
+	choice_base_resource = new wxChoice(tb_resource, -1, wxDefaultPosition, wxDefaultSize, list);
+	choice_base_resource->Select(0);
+	//tb_resource->AddLabel(0, _T("Base Resource: "));
+	tb_resource->AddControl(choice_base_resource, _T("Base Resource"));
 	tb_resource->Realize();
 
 	// Setup panel info & add toolbar panels

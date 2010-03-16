@@ -281,7 +281,38 @@ int ArchiveManager::archiveIndex(Archive* archive) {
 }
 
 bool ArchiveManager::openBaseResource(string filename) {
-	return false;
+	// Close/delete current base resource archive
+	if (base_resource_archive) {
+		delete base_resource_archive;
+		base_resource_archive = NULL;
+	}
+
+	// Check filename was given
+	if (filename.IsEmpty())
+		return false;
+
+	// Create archive based on file type
+	if (WadArchive::isWadArchive(filename))
+		base_resource_archive = new WadArchive();
+	else if (ZipArchive::isZipArchive(filename))
+		base_resource_archive = new ZipArchive();
+
+	// Attempt to open the file
+	if (base_resource_archive->openFile(filename))
+		return true;
+	else {
+		delete base_resource_archive;
+		base_resource_archive = NULL;
+		return false;
+	}
+}
+
+string ArchiveManager::baseResourcePath(uint32_t index) {
+	// Check index
+	if (index >= base_resource_list.size())
+		return _T("");
+
+	return base_resource_list[index];
 }
 
 ArchiveEntry* ArchiveManager::getResourceEntry(string name) {

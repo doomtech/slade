@@ -16,6 +16,7 @@ private:
 	Archive*			program_resource_archive;
 	Archive*			base_resource_archive;
 	bool				res_archive_open;
+	wxArrayString		base_resource_list;
 
 	static ArchiveManager*	instance;
 
@@ -43,8 +44,13 @@ public:
 	int			numArchives() { return (int)open_archives.size(); }
 	int			archiveIndex(Archive* archive);
 	Archive*	programResourceArchive() { return program_resource_archive; }
+
+	// Base resource archive stuff
 	Archive*	baseResourceArchive() { return base_resource_archive; }
 	bool		openBaseResource(string filename);
+	string		baseResourcePath(uint32_t index);
+	void		addBaseResourcePath(string path) { base_resource_list.Add(path); }
+	size_t		baseResourceListLength() { return base_resource_list.size(); }
 
 	ArchiveEntry*	getResourceEntry(string name);
 
