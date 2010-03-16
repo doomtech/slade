@@ -311,8 +311,9 @@ void MainApp::OnFatalException() {
 void MainApp::initLogFile() {
 	// Set wxLog target(s)
 	wxLog::SetActiveTarget(new SLADELog());
-	wxFFile log_file(appPath(_T("slade3.log"), DIR_USER), _T("wt"));
-	new wxLogChain(new wxLogStderr(log_file.fp()));
+	//wxFFile log_file(appPath(_T("slade3.log"), DIR_USER), _T("wt"));
+	FILE* log_file = fopen(chr(appPath(_T("slade3.log"), DIR_USER)), "wt");
+	new wxLogChain(new wxLogStderr(log_file));
 
 	// Write logfile header
 	string year = wxNow().Right(4);

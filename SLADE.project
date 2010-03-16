@@ -156,6 +156,10 @@
     <File Name="src/ConsolePanel.h"/>
     <File Name="src/SplashWindow.h"/>
     <File Name="src/SplashWindow.cpp"/>
+    <VirtualDirectory Name="Options">
+      <File Name="src/BaseResourceArchivesPanel.h"/>
+      <File Name="src/BaseResourceArchivesPanel.cpp"/>
+    </VirtualDirectory>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
@@ -225,6 +229,6 @@
       </AdditionalRules>
     </Configuration>
   </Settings>
-  <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>
+  <Dependencies Name="Debug"/>
 </CodeLite_Project>

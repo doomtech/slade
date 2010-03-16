@@ -33,6 +33,8 @@ private:
 	WMFileBrowser*		file_browser;
 	wxButton*			btn_browser_open;
 	wxMenu*				menu_context;
+	wxChoice*			choice_base_resource;
+	wxButton*			btn_edit_base_resources;
 
 public:
 	// wxWidgets ID table

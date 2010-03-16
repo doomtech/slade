@@ -120,6 +120,21 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
 	file_browser = new WMFileBrowser(notebook_tabs, this, -1);
 	notebook_tabs->AddPage(file_browser, _("File Browser"));
 
+	// Create/setup base resource dropdown list & button
+	wxArrayString list(1, _T("<none>"));
+	for (size_t a = 0; a < theArchiveManager->baseResourceListLength(); a++)
+		list.Add(theArchiveManager->baseResourcePath(a));
+	choice_base_resource = new wxChoice(this, -1, wxDefaultPosition, wxDefaultSize, list);
+	choice_base_resource->Select(0);
+	
+	btn_edit_base_resources = new wxButton(this, -1, _T("..."), wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT);
+
+	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
+	hbox->Add(new wxStaticText(this, -1, _T("Base Resource:")), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
+	hbox->Add(choice_base_resource, 1, wxEXPAND|wxRIGHT, 4);
+	hbox->Add(btn_edit_base_resources, 0, wxEXPAND, 0);
+	vbox->Add(hbox, 0, wxEXPAND|wxALL, 4);
+
 	// Create/setup Archive context menu
 	menu_context = new wxMenu();
 	menu_context->Append(MENU_SAVE, _("Save"), _("Save the selected Archive(s)"));
@@ -137,6 +152,9 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
 
 	// Listen to the ArchiveManager
 	listenTo(theArchiveManager);
+	
+	// Init layout
+	Layout();
 }
 
 /* ArchiveManagerPanel::~ArchiveManagerPanel
