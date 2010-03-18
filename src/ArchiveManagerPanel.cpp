@@ -37,6 +37,7 @@
 #include "MapEditorWindow.h"
 #include "ZipArchivePanel.h"
 #include "ZipArchive.h"
+#include "BaseResourceArchivesPanel.h"
 
 
 /*******************************************************************
@@ -149,6 +150,7 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
 	list_maps->Bind(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, &ArchiveManagerPanel::onListMapsActivated, this);
 	notebook_archives->Bind(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED, &ArchiveManagerPanel::onTabChanged, this);
 	Bind(wxEVT_COMMAND_MENU_SELECTED, &ArchiveManagerPanel::onMenu, this, MENU_SAVE, MENU_END);
+	btn_edit_base_resources->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &ArchiveManagerPanel::onBtnEditBaseResources, this);
 
 	// Listen to the ArchiveManager
 	listenTo(theArchiveManager);
@@ -752,4 +754,16 @@ void ArchiveManagerPanel::onTabChanged(wxAuiNotebookEvent& e) {
 	}
 	else
 		((wxFrame*)GetParent())->SetTitle(_T("SLADE"));
+}
+
+void ArchiveManagerPanel::onBtnEditBaseResources(wxCommandEvent& e) {
+	wxDialog dialog_ebr(this, -1, _T("Edit Base Resource Archives"));
+
+	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+	sizer->Add(new BaseResourceArchivesPanel(&dialog_ebr), 1, wxEXPAND|wxALL, 4);
+
+	dialog_ebr.SetSizer(sizer);
+	dialog_ebr.Layout();
+	dialog_ebr.SetInitialSize(wxDefaultSize);
+	dialog_ebr.ShowModal();
 }

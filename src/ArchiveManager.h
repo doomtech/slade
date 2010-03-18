@@ -49,7 +49,7 @@ public:
 	Archive*	baseResourceArchive() { return base_resource_archive; }
 	bool		openBaseResource(string filename);
 	string		baseResourcePath(uint32_t index);
-	void		addBaseResourcePath(string path) { base_resource_list.Add(path); }
+	void		addBaseResourcePath(string path);
 	size_t		baseResourceListLength() { return base_resource_list.size(); }
 
 	ArchiveEntry*	getResourceEntry(string name);

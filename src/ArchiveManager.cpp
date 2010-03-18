@@ -315,6 +315,14 @@ string ArchiveManager::baseResourcePath(uint32_t index) {
 	return base_resource_list[index];
 }
 
+void ArchiveManager::addBaseResourcePath(string path) {
+	// Add the path
+	base_resource_list.Add(path);
+	
+	// Announce
+	announce(_T("base_resource_path_added"));
+}
+
 ArchiveEntry* ArchiveManager::getResourceEntry(string name) {
 	for (size_t a = 0; a < open_archives.size(); a++) {
 		if (!open_archives[a].resource)
