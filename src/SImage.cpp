@@ -53,13 +53,14 @@ uint32_t valid_flat_size[][2] = {
 	{  32,  64 },	// Strife startup sprite
 	{  48,  48 },	// /
 	{  64,  64 },	// standard flat size
+	{  64, 128 },	// Hexen flat size variant
 	{ 128, 128 },	// \ 
 	{ 256, 256 },	// hires flat size
 	{ 512, 512 },	// /
 	{ 320, 158 },	// default autopage format
 	{ 320, 200 },	// full screen format
 };
-uint32_t	n_valid_flat_sizes = 10;
+uint32_t	n_valid_flat_sizes = 11;
 
 
 /*******************************************************************
@@ -77,6 +78,7 @@ SImage::SImage() {
 	offset_x = 0;
 	offset_y = 0;
 	has_palette = false;
+	has_builtinpal = false;
 	format = RGBA;
 }
 
@@ -177,7 +179,7 @@ void SImage::setPalette(Palette8bit* pal) {
 	announce(_T("image_changed"));
 }
 
-/* SImage::setPalette
+/* SImage::setXOffset
  * Changes the image X offset
  *******************************************************************/
 void SImage::setXOffset(int offset) {
@@ -188,7 +190,7 @@ void SImage::setXOffset(int offset) {
 	announce(_T("offsets_changed"));
 }
 
-/* SImage::setPalette
+/* SImage::setYOffset
  * Changes the image Y offset
  *******************************************************************/
 void SImage::setYOffset(int offset) {
@@ -334,7 +336,7 @@ bool SImage::validFlatSize() {
 }
 
 /* SImage::loadImage
- * Loads an image (if it's format is supported by FreeImage)
+ * Loads an image (if its format is supported by FreeImage)
  * Returns false if the given image data was invalid, true otherwise
  *******************************************************************/
 bool SImage::loadImage(const uint8_t* img_data, int size) {
@@ -370,8 +372,9 @@ bool SImage::loadImage(const uint8_t* img_data, int size) {
 	RGBQUAD* bm_pal = FreeImage_GetPalette(bm);
 	if (bm_pal) {
 		has_palette = true;
+		has_builtinpal = true;
 		for (int a = 0; a < 256; a++)
-			palette.setColour(a, rgba_t(bm_pal[a].rgbRed, bm_pal[a].rgbGreen, bm_pal[a].rgbBlue, 255));
+			builtinpal.setColour(a, rgba_t(bm_pal[a].rgbRed, bm_pal[a].rgbGreen, bm_pal[a].rgbBlue, 255));
 	}
 	else
 		has_palette = false;
@@ -597,7 +600,7 @@ bool SImage::loadDoomFlat(const uint8_t* gfx_data, int size) {
 		uint32_t w = valid_flat_size[a][0];
 		uint32_t h = valid_flat_size[a][1];
 
-		if (size == w * h) {
+		if (size == w * h || size - 4 == w * h) {
 			width = w;
 			height = h;
 			valid_size = true;
@@ -691,9 +694,15 @@ bool SImage::loadDoomSnea(const uint8_t* gfx_data, int size) {
 	uint8_t qwidth = gfx_data[0];
 	width = qwidth * 4;
 	height = gfx_data[1];
-/*	if (size != 2 + width * height)
+
+	// The TITLEPIC in the Doom Press-Release Beta has 
+	// two extraneous null bytes at the end for padding.
+	if (size == 64004 && qwidth == 80 && height == 200)
+		size = 64002;
+
+	if (size != 2 + width * height)
 		return false;
-*/
+
 	// Setup variables
 	has_palette = true;
 	format = PALMASK;
@@ -755,8 +764,9 @@ bool SImage::loadPlanar(const uint8_t* gfx_data, int size) {
 	// Init some variables
 	width = 640;
 	height = 480;
-	format = RGBA;	// Technically, no; but we'll load it as one so that it uses its own palette.
-	has_palette = false;
+	format = PALMASK;
+	has_palette = true;
+	has_builtinpal = true;
 
 	union
 	{
@@ -766,7 +776,6 @@ bool SImage::loadPlanar(const uint8_t* gfx_data, int size) {
 	color.rgbReserved = 0;
 	rgba_t colour(0, 0, 0, 0, -1);
 
-	Palette8bit palette;
 	// Initialize the bitmap palette.
 	for (int i = 0; i < 16; ++i)
 	{
@@ -778,14 +787,22 @@ bool SImage::loadPlanar(const uint8_t* gfx_data, int size) {
 		colour.r = color.rgbRed;
 		colour.g = color.rgbGreen;
 		colour.b = color.rgbBlue;
-		palette.setColour(i, colour);
+		builtinpal.setColour(i, colour);
 	}
+	// Fill the rest of the palette with clones of index 0
+	for (int i = 16; i<256; ++i) {
+		builtinpal.setColour(i, palette.colour(0));
+	}
+	// Copy built-in palette to current one:
+	palette.copyPalette(&builtinpal);
 
+	// Prepare data and mask (opaque)
 	clearData();
 	data = new uint8_t[width*height];
+	mask = new uint8_t[width*height];
+	memset(mask, 0xFF, width*height);
 
-	uint8_t table[640*480];
-	uint8_t * dest = table;
+	uint8_t * dest = data;
 	int y, x;
 	const uint8_t *src1, *src2, *src3, *src4;
 	size_t plane_size = width / 8 * height;
@@ -815,17 +832,6 @@ bool SImage::loadPlanar(const uint8_t* gfx_data, int size) {
 		}
 	}
 
-	// Conversion to chunky format finished. Now let's just turn that into RGBA.
-	data = new uint8_t[width*height*4];
-
-	for (size_t i = 0; i < width*height; ++i)
-	{
-		data[i*4+0] = palette.colour(table[i]).r;
-		data[i*4+1] = palette.colour(table[i]).g;
-		data[i*4+2] = palette.colour(table[i]).b;
-		data[i*4+3] = 0xFF;	// Everything is opaque.
-	}
-	
 	// Success
 	return true;
 }
@@ -849,11 +855,11 @@ bool SImage::loadImgz(const uint8_t* gfx_data, int size) {
 	has_palette = true;
 	format = PALMASK;
 
-	// Create mask (all transparent)
+	// Create data (all white) and mask
 	clearData();
 	data = new uint8_t[width*height];
 	mask = new uint8_t[width*height];
-	memset(mask, 0xFF, width*height);
+	memset(data, 0xFF, width*height);
 
 	if (!header->compression)
 	{
@@ -862,10 +868,320 @@ bool SImage::loadImgz(const uint8_t* gfx_data, int size) {
 	}
 	else
 	{
-		return false;
+		// Since gfx_data is a const pointer, we can't work on it.
+		uint8_t * tempdata = new uint8_t[size]; 
+		memcpy(tempdata, gfx_data, size);
+
+		// We'll use wandering pointers. The original pointer is kept for cleanup.
+		uint8_t * read = tempdata + sizeof(imgz_header_t);
+		uint8_t * readend = read + size - 1;
+		uint8_t * dest  = mask;
+		uint8_t * destend = dest + width*height;
+
+		uint8_t code = 0; size_t length = 0;
+
+		while (read < readend && dest < destend)
+		{
+			code = *read++;
+			if (code < 0x80)
+			{
+				length = code + 1;
+				memcpy(dest, read, length);
+				dest+=length; 
+				read+=length;
+			}
+			else if (code > 0x80)
+			{
+				length = 0x101 - code;
+				code = *read++;
+				memset(dest, code, length);
+				dest+=length;
+			}
+		}
+		delete[] tempdata;
 	}
 	return true;
 };
+
+/* SImage::loadFont1
+ * Loads a ZDoom FON1 lump and displays it as a picture.
+ * Graphically-speaking, a FON1 lump is a column of 256 characters,
+ * each width*height as indicated by the header. Of course,
+ * it would be better to convert that into a 16x16 grid, which
+ * would be a lot more legible...
+ * Returns false if the image data was invalid, true otherwise.
+ *******************************************************************/
+bool SImage::loadFont1(const uint8_t* gfx_data, int size) {
+	// Check data
+	if (!gfx_data)
+		return false;
+
+	// Check/setup size
+	size_t charwidth = gfx_data[4]+256*gfx_data[5];
+	width = charwidth;
+	size_t charheight = gfx_data[6]+256*gfx_data[7];
+	height = charheight<<8;
+	size_t charsize = charwidth * charheight;
+	offset_x = offset_y = 0;
+
+	// Setup variables
+	offset_x = offset_y = 0;
+	has_palette = true;
+	format = PALMASK;
+
+	// Clear current data if it exists
+	clearData();
+
+	// Read raw pixel data
+	data = new uint8_t[width*height];
+	mask = new uint8_t[width*height];
+	memset(mask, 0xFF, width*height);
+
+	// Since gfx_data is a const pointer, we can't work on it.
+	uint8_t * tempdata = new uint8_t[size];
+	memcpy(tempdata, gfx_data, size);
+
+
+	// We'll use wandering pointers. The original pointer is kept for cleanup.
+	uint8_t * read = tempdata + 8;
+	uint8_t * readend = tempdata + size - 1;
+	uint8_t * dest  = data;
+	uint8_t * destend = dest + width*height;
+
+	uint8_t code = 0; size_t length = 0;
+
+	// This uses the same RLE algorithm as compressed IMGZ.
+	while (read < readend && dest < destend)
+	{
+		code = *read++;
+		if (code < 0x80)
+		{
+			length = code + 1;
+			memcpy(dest, read, length);
+			dest+=length; 
+			read+=length;
+		}
+		else if (code > 0x80)
+		{
+			length = 0x101 - code;
+			code = *read++;
+			memset(dest, code, length);
+			dest+=length;
+		}
+	}
+	delete[] tempdata;
+	// Add transparency to mask
+	for (size_t i = 0; i < width*height; ++i)
+		if (data[i] == 0)
+			mask[i] = 0x00;
+
+	// Announce change
+	announce(_T("image_changed"));
+
+	return true;
+}
+
+/* SImage::loadFont2
+ * Loads a ZDoom FON2 lump and displays it as a picture.
+ * Returns false if the image data was invalid, true otherwise.
+ *******************************************************************/
+//#include <wx/msgdlg.h>
+struct Font2Char {
+	uint16_t width;
+	uint8_t * data;
+	Font2Char() { width = 0; data = NULL; }
+};
+struct Font2Header {
+	uint8_t headr[4];
+	uint16_t charheight;
+	uint8_t firstc;
+	uint8_t lastc;
+	uint8_t constantw;
+	uint8_t shading;
+	uint8_t palsize;
+	uint8_t kerning;	// Theoretically a flag field, but with only one flag...
+};
+bool SImage::loadFont2(const uint8_t* gfx_data, int size) {
+	// Clear current data if it exists
+	clearData();
+
+	// Initializes some stuff
+	offset_x = offset_y = 0;
+	has_palette = true;
+	has_builtinpal = true;
+	format = PALMASK;
+
+	if (size < sizeof(Font2Header))
+		return false;
+
+	const Font2Header * header = (Font2Header *) gfx_data;
+	width = 0;
+	height = wxUINT16_SWAP_ON_BE(header->charheight);
+
+	// We can't deal with a null height, of course
+	if (height == 0)
+		return false;
+
+	const uint8_t * p = gfx_data + sizeof(Font2Header);
+
+	// Skip kerning information which do not concern us.
+	if (header->kerning)
+		p+=2;
+
+	// Start building the character table.
+	size_t numchars = wxUINT16_SWAP_ON_BE(header->lastc) - wxUINT16_SWAP_ON_BE(header->firstc) +1;
+	Font2Char * chars = new Font2Char[numchars];
+	for (size_t i = 0; i < numchars; ++i) {
+		chars[i].width = wxUINT16_SWAP_ON_BE(*(uint16_t *)p);
+		// Let's increase the total width
+		width+=chars[i].width;
+		// The width information is enumerated for each character only if they are
+		// not constant width. Regardless, move the read pointer away after the last.
+		if (!(header->constantw) || (i == numchars - 1))
+			p+=2;
+	}
+
+	// Let's build the built-in pal now. 
+	for (size_t i = 0; i < header->palsize + 1; ++i) {
+		rgba_t color;
+		color.r = *p++;
+		color.g = *p++;
+		color.b = *p++;
+		builtinpal.setColour(i, color);
+	}
+
+	// 0 is transparent, last is border color, the rest of the palette entries should
+	// be increasingly bright
+	builtinpal.setTransIndex(0);
+	palette.copyPalette(&builtinpal);
+
+	// Clear current data if it exists
+	clearData();
+
+	// The picture data follows, using the same RLE as FON1 and IMGZ.
+	for (size_t i = 0; i < numchars; ++i) {
+		// A big font is not necessarily continuous; several characters
+		// may be skipped; they are given a width of 0.
+		if (chars[i].width) {
+			size_t numpixels = chars[i].width * height;
+			chars[i].data = new uint8_t[numpixels];
+			uint8_t * d = chars[i].data;
+			uint8_t code = 0; size_t length = 0;
+
+			while (numpixels)
+			{
+				code = *p++;
+				if (code < 0x80)
+				{
+					length = code + 1;
+					// Overflows shouldn't happen
+					if (length > numpixels) {
+						return false;
+					}
+					memcpy(d, p, length);
+					d+=length; 
+					p+=length;
+					numpixels -= length;
+				}
+				else if (code > 0x80)
+				{
+					length = 0x101 - code;
+					// Overflows shouldn't happen
+					if (length > numpixels) {
+						return false;
+					}
+					code = *p++;
+					memset(d, code, length);
+					d+=length;
+					numpixels -= length;
+				}
+			}
+		}
+	}
+
+	// Now let's assemble all characters together in a single picture.
+	if (!width)
+		return false;
+
+	// Clear current data if it exists
+	clearData();
+
+	data = new uint8_t[width*height];
+	uint8_t * d = data;
+	for (size_t i = 0; i < height; ++i) {
+		for (size_t j = 0; j < numchars; ++j) {
+			if (chars[j].width) {
+				memcpy(d, chars[j].data+(i*chars[j].width), chars[j].width);
+				d+=chars[j].width;
+			}
+		}
+	}
+
+	// Clean up the characters once the big picture is finished
+	for (size_t i = 0; i < numchars; ++i) {
+		if (chars[i].data)
+			delete[] chars[i].data;
+	}
+	delete[] chars;
+
+	// Now transparency for the mask
+	mask = new uint8_t[width*height];
+	memset(mask, 0xFF, width*height);
+	for (size_t i = 0; i < width*height; ++i)
+		if (data[i] == 0)
+			mask[i] = 0;
+
+	// Yay!
+	return true;
+}
+
+/* SImage::loadBMF
+ * Loads a byte map font lump and displays it as a picture.
+ * Specs for the format are here: http://bmf.wz.cz/bmf-format.htm
+ * Returns false if the image data was invalid, true otherwise.
+ *******************************************************************/
+bool SImage::loadBMF(const uint8_t* gfx_data, int size) {
+	// Not implemented yet
+	return false;
+}
+
+/* SImage::loadFontM
+ * Loads a monochrome, monospaced font and displays it as a picture.
+ * Returns false if the image data was invalid, true otherwise.
+ *******************************************************************/
+bool SImage::loadFontM(const uint8_t* gfx_data, int size) {
+	// Check data
+	if (!gfx_data || size % 256)
+		return false;
+
+	// Setup variables
+	offset_x = offset_y = 0;
+	has_palette = true;
+	format = PALMASK;
+
+	size_t charwidth = 8;
+	size_t charheight = size>>8;
+	width = charwidth;
+	height = charheight << 8;
+
+	if (width * height != size * 8)
+		return false;
+
+	// reset data
+	clearData();
+	data = new uint8_t[width*height];
+	memset(data, 0xFF, width*height);
+	mask = new uint8_t[width*height];
+	memset(mask, 0x00, width*height);
+
+	//Each pixel is described as a single bit, either on or off
+	for (size_t i = 0; i < size; ++i) {
+		for (size_t p = 0; p < 8; ++p)
+			mask[(i*8)+p] = ((gfx_data[i]>>(7-p)) & 1) * 255;
+	}
+	return true;
+}
+
 
 /* SImage::toPNG
  * Writes the image as PNG data to <out>, keeping palette information
@@ -1296,7 +1612,7 @@ bool SImage::convertPaletted(Palette8bit* pal, uint8_t alpha_threshold, bool kee
  * is in RGBA format
  *******************************************************************/
 bool SImage::maskFromColour(rgba_t colour, bool force_mask) {
-	if (format == PALMASK) {
+	if (format == PALMASK && mask != NULL) {
 		// Palette+Mask format, go through the mask
 		for (int a = 0; a < width * height; a++) {
 			if (palette.colour(data[a]).equals(colour))
@@ -1344,7 +1660,7 @@ bool SImage::maskFromColour(rgba_t colour, bool force_mask) {
  * will be generated even if the image is in RGBA format
  *******************************************************************/
 bool SImage::cutoffMask(uint8_t threshold, bool force_mask) {
-	if (format == PALMASK) {
+	if (format == PALMASK && mask != NULL) {
 		for (int a = 0; a < width * height; a++) {
 			if (mask[a] > threshold)
 				mask[a] = 255;

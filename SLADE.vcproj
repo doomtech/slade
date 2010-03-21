@@ -365,6 +365,14 @@
 					Name="EntryPanel"
 					>
 					<File
+						RelativePath=".\src\AnimatedEntryPanel.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\AnimatedEntryPanel.h"
+						>
+					</File>
+					<File
 						RelativePath=".\src\DefaultEntryPanel.cpp"
 						>
 					</File>
@@ -402,6 +410,14 @@
 					</File>
 					<File
 						RelativePath=".\src\PaletteEntryPanel.h"
+						>
+					</File>
+					<File
+						RelativePath=".\src\SwitchesEntryPanel.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\SwitchesEntryPanel.h"
 						>
 					</File>
 					<File
@@ -587,6 +603,30 @@
 				</File>
 				<File
 					RelativePath=".\src\ZipArchive.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Binary Control Lumps"
+				>
+				<File
+					RelativePath=".\src\AnimastedList.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\AnimastedList.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\BinaryControlLumps.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\SwitchesList.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\SwitchesList.h"
 					>
 				</File>
 			</Filter>

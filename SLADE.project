@@ -48,6 +48,8 @@
         <File Name="src/EntryListPanel.h"/>
       </VirtualDirectory>
       <VirtualDirectory Name="EntryPanel">
+        <File Name="src/AnimatedEntryPanel.cpp"/>
+        <File Name="src/AnimatedEntryPanel.h"/>
         <File Name="src/DefaultEntryPanel.cpp"/>
         <File Name="src/DefaultEntryPanel.h"/>
         <File Name="src/EntryPanel.cpp"/>
@@ -58,6 +60,8 @@
         <File Name="src/MultiEntryPanel.h"/>
         <File Name="src/PaletteEntryPanel.cpp"/>
         <File Name="src/PaletteEntryPanel.h"/>
+        <File Name="src/SwitchesEntryPanel.cpp"/>
+        <File Name="src/SwitchesEntryPanel.h"/>
         <File Name="src/TextEntryPanel.cpp"/>
         <File Name="src/TextEntryPanel.h"/>
         <File Name="src/TextureXEntryPanel.cpp"/>
@@ -114,7 +118,14 @@
       <File Name="src/EntryType.h"/>
       <File Name="src/EntryType.cpp"/>
     </VirtualDirectory>
-    <VirtualDirectory Name="Image">
+    <VirtualDirectory Name="Binary Control Lumps">
+      <File Name="src/AnimatedList.cpp"/>
+      <File Name="src/AnimatedList.h"/>
+      <File Name="src/BiinaryControlLump.h"/>
+      <File Name="src/SwitchesList.cpp"/>
+      <File Name="src/SwitchesList.h"/>
+    </VirtualDirectory>
+   <VirtualDirectory Name="Image">
       <File Name="src/SImage.cpp"/>
       <File Name="src/SImage.h"/>
     </VirtualDirectory>

@@ -18,7 +18,9 @@ private:
 	uint8_t*	mask;
 	SIFormat	format;
 	Palette8bit	palette;
+	Palette8bit builtinpal;
 	bool		has_palette;
+	bool		has_builtinpal;
 	int			offset_x;
 	int			offset_y;
 
@@ -37,7 +39,9 @@ public:
 	int				getWidth() { return width; }
 	int				getHeight() { return height; }
 	Palette8bit*	getPalette() { return &palette; }
+	Palette8bit*	getBuiltInPalette() { return &builtinpal; }
 	bool			hasPalette() { return has_palette; }
+	bool			hasBuiltInPalette() { return has_builtinpal; }
 	point2_t		offset() { return point2_t(offset_x, offset_y); }
 
 	void			setPalette(Palette8bit* pal);
@@ -58,6 +62,10 @@ public:
 	bool	loadDoomArah(const uint8_t* gfx_data, int size);
 	bool	loadPlanar(const uint8_t* gfx_data, int size);
 	bool	loadImgz(const uint8_t* gfx_data, int size);
+	bool	loadFont1(const uint8_t* gfx_data, int size);
+	bool	loadFont2(const uint8_t* gfx_data, int size);
+	bool	loadFontM(const uint8_t* gfx_data, int size);
+	bool	loadBMF(const uint8_t* gfx_data, int size);
 
 	// Image format writing
 	bool	toPNG(MemChunk& out);

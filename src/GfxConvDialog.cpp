@@ -257,7 +257,10 @@ void GfxConvDialog::updatePreviewGfx() {
 
 	// Load entry palette to each image if needed
 	Palette8bit* pal_archive = new Palette8bit();
-	pal_archive->copyPalette(thePaletteManager->globalPalette());	// If no palette is found in the entry's parent archive, set the palette to the global palette
+	if (gfx_current->getImage()->hasPalette() && gfx_current->getImage()->hasBuiltInPalette())
+		pal_archive->copyPalette(gfx_current->getImage()->getBuiltInPalette());
+	else // If no palette is found in the entry's parent archive, set the palette to the global palette
+		pal_archive->copyPalette(thePaletteManager->globalPalette());
 
 	if (entry->getParent())
 		Misc::loadPaletteFromArchive(pal_archive, entry->getParent(), entry);

@@ -74,6 +74,19 @@ bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry) {
 		// ZDoom IMGZ graphic
 		case EDF_GFX_IMGZ:
 			return image->loadImgz(entry->getData(true), entry->getSize());
+		// ZDoom console fonts (FON1)
+		case EDF_FON1:
+			return image->loadFont1(entry->getData(true), entry->getSize());
+		// ZDoom big fonts (FON2)
+		case EDF_FON2:
+			return image->loadFont2(entry->getData(true), entry->getSize());
+		// Byte Map Fonts (BMF)
+		case EDF_BMF:
+			return image->loadBMF(entry->getData(true), entry->getSize());
+		// Monochrome, monospaced font (fnt)
+		case EDF_MONOFONT:
+			return image->loadFontM(entry->getData(true), entry->getSize());
+
 		// General image formats (that FreeImage supports at least)
 		default:
 			if (!image->loadImage(entry->getData(true), entry->getSize())) {

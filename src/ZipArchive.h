@@ -16,7 +16,7 @@ struct zipdir_t {
 	void	setName(string name) { entry->setName(name); }
 
 	bool			entryExists(ArchiveEntry* entry, bool include_subdirs = false);
-	ArchiveEntry*	getEntry(string name);
+	ArchiveEntry*	getEntry(string name, bool include_subdirs = true);
 	int				entryIndex(ArchiveEntry* entry);
 	zipdir_t*		getSubDir(string name);
 	int				dirIndex(zipdir_t* dir);

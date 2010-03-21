@@ -21,6 +21,13 @@ enum {
 	EDF_GFX_STRIFESU,
 	EDF_GFX_PLANAR,
 	EDF_GFX_IMGZ,
+	EDF_PALETTE,
+	EDF_COLORMAP,
+	EDF_FON1,
+	EDF_FON2,
+	EDF_BMF,
+	EDF_MONOFONT,
+	EDF_ANSI,
 	EDF_WAD,
 	EDF_ZIP,
 	EDF_MUS,
@@ -30,7 +37,12 @@ enum {
 	EDF_MOD_S3M,
 	EDF_MOD_MOD,
 	EDF_SND_DOOM,
+	EDF_SND_SPEAKER,
 	EDF_SND_WAV,
+	EDF_PNAMES,
+	EDF_TEXTUREX,
+	EDF_ANIMATED,
+	EDF_SWITCHES,
 	EDF_TEXT,
 
 	EDF_UNKNOWN,
@@ -61,6 +73,7 @@ public:
 	static bool detectStrifeStartup(MemChunk& mc);
 	static bool detectPlanar(MemChunk& mc);
 	static bool detectImgz(MemChunk& mc);
+	static bool detectPalette(MemChunk& mc);
 	static bool detectWad(MemChunk& mc);
 	static bool detectZip(MemChunk& mc);
 	static bool detectMus(MemChunk& mc);
@@ -71,6 +84,15 @@ public:
 	static bool detectModMod(MemChunk& mc);
 	static bool detectSndDoom(MemChunk& mc);
 	static bool detectSndWav(MemChunk& mc);
+	static bool detectSndSpeaker(MemChunk& mc);
+	static bool detectTextureX(MemChunk& mc);
+	static bool detectAnimated(MemChunk& mc);
+	static bool detectSwitches(MemChunk& mc);
+	static bool detectFontM(MemChunk& mc);
+	static bool detectFont1(MemChunk& mc);
+	static bool detectFont2(MemChunk& mc);
+	static bool detectBMF(MemChunk& mc);
+	static bool detectAnsi(MemChunk& mc);
 };
 
 class EntryType {

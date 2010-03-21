@@ -101,12 +101,28 @@ bool zipdir_t::entryExists(ArchiveEntry* entry, bool include_subdirs) {
  * Gets the entry within this zipdir that matches the given name.
  * Returns the matching entry, or NULL if none matched
  *******************************************************************/
-ArchiveEntry* zipdir_t::getEntry(string name) {
+ArchiveEntry* zipdir_t::getEntry(string name, bool include_subdirs) {
 	for (size_t a = 0; a < entries.size(); a++) {
 		if (!entries[a]->getName().Cmp(name))
 			return entries[a];
+		// What if, for example, PNAMES is called pnames.lmp?
+		// Try again without the extension.
+		if (!entries[a]->getName(true).CmpNoCase(name))
+			return entries[a];
 	}
 
+	// FIXME: This is horribly unoptimized! Just a quick hack to make
+	// the TEXTUREx viewer work with PK3 files. A better approach would
+	// be to have namespace support to look just within the relevant
+	// subdirectories (recursively if needed), and between the relevant
+	// markers for wad files.
+	if (include_subdirs) {
+		ArchiveEntry* test = NULL;
+		for (size_t a = 0; a < subdirectories.size(); a++) {
+			test = subdirectories[a]->getEntry(name, true);
+			if (test) return test;
+		}
+	}
 	return NULL;
 }
 
@@ -514,7 +530,7 @@ bool ZipArchive::save(string filename) {
 
 		if (!inzip.IsOk() || entries[a]->getState() > 0 || !entries[a]->hasExProp(_T("ZipIndex"))) {
 			// If the current entry has been changed, or doesn't exist in the old zip,
-			// (re)compress it's data and write it to the zip
+			// (re)compress its data and write it to the zip
 			wxZipEntry* zipentry = new wxZipEntry(getEntryFullPath(entries[a]));
 			zip.PutNextEntry(zipentry);
 			zip.Write(entries[a]->getData(), entries[a]->getSize());

@@ -33,6 +33,7 @@
 #include "ArchiveManager.h"
 #include "ZipArchive.h"
 #include "WadArchive.h"
+#include "BinaryControlLump.h"
 #include <wx/dir.h>
 #include <wx/filename.h>
 
@@ -63,6 +64,13 @@ id_format_t formats[] = {
 	{ "gfx_doom_snea",	EDF_GFX_DOOM_SNEA },
 	{ "gfx_doom_gnum",	EDF_GFX_DOOM_GNUM },
 	{ "gfx_imgz",		EDF_GFX_IMGZ },
+	{ "palette",		EDF_PALETTE },
+	{ "texturex",		EDF_TEXTUREX },
+	{ "fon1",			EDF_FON1 },
+	{ "fon2",			EDF_FON2 },
+	{ "bmf",			EDF_BMF },
+	{ "monofont",		EDF_MONOFONT },
+	{ "ansi",			EDF_ANSI },
 	{ "wad",			EDF_WAD },
 	{ "mus",			EDF_MUS },
 	{ "midi",			EDF_MIDI },
@@ -72,6 +80,9 @@ id_format_t formats[] = {
 	{ "mod_mod",		EDF_MOD_MOD },
 	{ "snd_doom",		EDF_SND_DOOM },
 	{ "snd_wav",		EDF_SND_WAV },
+	{ "snd_speaker",	EDF_SND_SPEAKER },
+	{ "animated",		EDF_ANIMATED },
+	{ "switches",		EDF_SWITCHES },
 	{ "text",			EDF_TEXT },
 
 	{ "",				EDF_ANY }, // Dummy type to mark end of list
@@ -178,6 +189,18 @@ bool EntryDataFormat::isFormat(MemChunk& mc, uint16_t format) {
 		return detectPlanar(mc);
 	case EDF_GFX_IMGZ:
 		return detectImgz(mc);
+	case EDF_PALETTE:
+		return detectPalette(mc);
+	case EDF_FON1:
+		return detectFont1(mc);
+	case EDF_FON2:
+		return detectFont2(mc);
+	case EDF_MONOFONT:
+		return detectFontM(mc);
+	case EDF_BMF:
+		return detectBMF(mc);
+	case EDF_TEXTUREX:
+		return detectTextureX(mc);
 	case EDF_JPEG:
 		return detectJpeg(mc);
 	case EDF_MIDI:
@@ -194,12 +217,20 @@ bool EntryDataFormat::isFormat(MemChunk& mc, uint16_t format) {
 		return detectMus(mc);
 	case EDF_PNG:
 		return detectPng(mc);
+	case EDF_ANSI:
+		return detectAnsi(mc);
 	case EDF_SND_DOOM:
 		return detectSndDoom(mc);
 	case EDF_SND_WAV:
 		return detectSndWav(mc);
+	case EDF_SND_SPEAKER:
+		return detectSndSpeaker(mc);
 	case EDF_WAD:
 		return detectWad(mc);
+	case EDF_ANIMATED:
+		return detectAnimated(mc);
+	case EDF_SWITCHES:
+		return detectSwitches(mc);
 	default:
 		return false;
 	}
@@ -215,6 +246,15 @@ bool EntryDataFormat::detectPng(MemChunk& mc) {
 		        mc[2] == 78 && mc[3] == 71 &&
 		        mc[4] == 13 && mc[5] == 10 &&
 		        mc[6] == 26 && mc[7] == 10)
+			return true;
+	}
+
+	return false;
+}
+
+bool EntryDataFormat::detectAnsi(MemChunk& mc) {
+	// Check size: 25 lines of 80 characters coded on 2 bytes
+	if (mc.getSize() == 4000) {
 			return true;
 	}
 
@@ -378,7 +418,10 @@ bool EntryDataFormat::detectDoomGfxSnea(MemChunk& mc) {
 	const uint8_t* data = mc.getData();
 	uint8_t qwidth = data[0]; // quarter of width
 	uint8_t height = data[1];
-	if (mc.getSize() != (2 + (4 * qwidth * height)))
+	if (mc.getSize() != (2 + (4 * qwidth * height)) &&
+		// The TITLEPIC in the Doom Press-Release Beta has 
+		// two extraneous null bytes at the end.
+		(qwidth != 80 || height != 200 || mc.getSize() != 64004))
 		return false;
 	return true;
 }
@@ -465,10 +508,6 @@ bool EntryDataFormat::detectImgz(MemChunk& mc) {
 	for (uint8_t i = 0; i < 11 ; ++i)
 		if (header->reserved[i]) return false;
 
-	// Compressed IMGZ are not supported yet
-	if (header->compression) 
-		return false;
-
 	// This is probably a genuine IMGZ
 	return true;
 }
@@ -498,6 +537,15 @@ bool EntryDataFormat::detectDoomFlat(MemChunk& mc) {
 		return true;
 	else
 		return false;
+}
+
+bool EntryDataFormat::detectPalette(MemChunk& mc) {
+	// Some palettes have crap added to them which make them
+	// not a clean multiple. However, the minimum size
+	// should still be 768!
+	if (mc.getSize() < 768)
+		return false;
+	return true;
 }
 
 bool EntryDataFormat::detectWad(MemChunk& mc) {
@@ -603,6 +651,21 @@ bool EntryDataFormat::detectSndDoom(MemChunk& mc) {
 	return false;
 }
 
+bool EntryDataFormat::detectSndSpeaker(MemChunk& mc) {
+	// Check size
+	if (mc.getSize() > 4) {
+		// Check header: the first two bytes must always be null
+		if (mc[0] | mc[1])
+			return false;
+		// Next is the number of samples (LE uint16_t), and
+		// each sample is a single byte, so the size can be
+		// checked easily.
+		if (mc.getSize() == 4 + (mc[2]+(mc[3]<<8)))
+			return true;
+	}
+	return false;
+}
+
 bool EntryDataFormat::detectSndWav(MemChunk& mc) {
 	// Check size
 	if (mc.getSize() > 8) {
@@ -614,6 +677,85 @@ bool EntryDataFormat::detectSndWav(MemChunk& mc) {
 	return false;
 }
 
+bool EntryDataFormat::detectTextureX(MemChunk& mc) {
+	// Not the best test in the world. But a text-based texture lump ought
+	// to fail it every time; as it would be interpreted as too high a number.
+	const uint8_t * data = mc.getData();
+	uint32_t ntex = data[0] + (data[1]<<8) + (data[2]<<16) + (data[3]<<24);
+	if ((int32_t) ntex < 0)
+		return false;
+	if (mc.getSize() < (ntex * 24))
+		return false;
+	return true;
+}
+
+bool EntryDataFormat::detectAnimated(MemChunk& mc) {
+	if (mc.getSize() > sizeof(animated_t)) {
+		size_t numentries = mc.getSize()/sizeof(animated_t);
+		// The last entry can be incomplete, as it may stop right 
+		// after the declaration of its type. So if the size is not
+		// a perfect multiple, then the last entry is incomplete.
+		size_t lastentry = (mc.getSize()%numentries ? numentries : numentries - 1);
+
+		// Check that the last entry ends on an ANIM_STOP type
+		if (mc[lastentry*sizeof(animated_t)] == ANIM_STOP)
+			return true;
+	}
+	return false;
+}
+
+bool EntryDataFormat::detectSwitches(MemChunk& mc) {
+	if (mc.getSize() > sizeof(switches_t)) {
+		size_t numentries = mc.getSize()/sizeof(switches_t);
+
+		// Check that the last entry ends on a SWCH_STOP type
+		if (((mc[numentries*sizeof(switches_t) -1]<<8)
+			+ mc[numentries*sizeof(switches_t) -2]) == SWCH_STOP)
+			return true;
+	}
+	return false;
+}
+
+bool EntryDataFormat::detectFontM(MemChunk& mc) {
+	// Monochrome, monospaced bitmap font.
+	// Each character is one-byte wide, and there are 256 of them,
+	// so the height can be obtained from the total size
+	if (mc.getSize() % 256)
+		return false;
+	if (mc.getSize() / 256 < 6 || mc.getSize() / 256 > 36)
+		return false;
+	return true;
+}
+
+bool EntryDataFormat::detectFont1(MemChunk& mc) {
+	// Check size
+	if (mc.getSize() > 4) {
+		// Check for FON1 header
+		if (mc[0] == 'F' && mc[1] == 'O' && mc[2] == 'N' && mc[3] == '1')
+			return true;
+	}
+	return false;
+}
+
+bool EntryDataFormat::detectFont2(MemChunk& mc) {
+	// Check size
+	if (mc.getSize() > 4) {
+		// Check for FON2 header
+		if (mc[0] == 'F' && mc[1] == 'O' && mc[2] == 'N' && mc[3] == '2')
+			return true;
+	}
+	return false;
+}
+
+bool EntryDataFormat::detectBMF(MemChunk& mc) {
+	// Check size
+	if (mc.getSize() > 4) {
+		// Check for BMF header
+		if (mc[0] == 0xE1 && mc[1] == 0xE6 && mc[2] == 0xD5 && mc[3] == 0x1A)
+			return true;
+	}
+	return false;
+}
 
 /*******************************************************************
  * ENTRYTYPE CLASS FUNCTIONS
