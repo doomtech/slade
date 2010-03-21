@@ -610,15 +610,15 @@
 				Name="Binary Control Lumps"
 				>
 				<File
-					RelativePath=".\src\AnimastedList.cpp"
+					RelativePath=".\src\AnimatedList.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\AnimastedList.h"
+					RelativePath=".\src\AnimatedList.h"
 					>
 				</File>
 				<File
-					RelativePath=".\src\BinaryControlLumps.h"
+					RelativePath=".\src\BinaryControlLump.h"
 					>
 				</File>
 				<File
@@ -750,6 +750,18 @@
 				RelativePath=".\src\SplashWindow.h"
 				>
 			</File>
+			<Filter
+				Name="Options"
+				>
+				<File
+					RelativePath=".\src\BaseResourceArchivesPanel.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\BaseResourceArchivesPanel.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<File
 			RelativePath=".\resource.h"
