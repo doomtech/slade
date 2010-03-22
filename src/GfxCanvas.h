@@ -50,6 +50,7 @@ public:
 	void	endOffsetDrag();
 
 	void	zoomToFit(bool mag = true, float padding = 0.0f);
+	void	resetOffsets() { offset.x = offset.y = 0; }
 	bool	onImage(int x, int y);
 
 	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
