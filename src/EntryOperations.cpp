@@ -96,14 +96,15 @@ bool EntryOperations::modifyGfxOffsets(ArchiveEntry* entry, int auto_type, point
 	{
 		// Get patch header
 		patch_header_t header;
+		entry->seek(0, SEEK_SET);
 		entry->read(&header, 8);
 		//patch_header_t* header = (patch_header_t*)entry->getData(true);
 
 		// Apply new offsets
 		if (auto_type >= 0) {
 			// Auto Offsets selected
-			int w = header.width;
-			int h = header.height;
+			int w = wxINT16_SWAP_ON_BE(header.width);
+			int h = wxINT16_SWAP_ON_BE(header.height);
 
 			if (auto_type == 0) {			// Monster
 				header.left = w * 0.5;
@@ -126,10 +127,10 @@ bool EntryOperations::modifyGfxOffsets(ArchiveEntry* entry, int auto_type, point
 			}
 
 			if (xc)
-				header.left = offsets.x;
+				header.left = wxINT16_SWAP_ON_BE((int16_t) offsets.x);
 
 			if (yc)
-				header.top = offsets.y;
+				header.top = wxINT16_SWAP_ON_BE((int16_t) offsets.y);
 		}
 
 		// Write new header to entry
@@ -140,6 +141,7 @@ bool EntryOperations::modifyGfxOffsets(ArchiveEntry* entry, int auto_type, point
 	// Doom alpha gfx format
 	if (entryformat == EDF_GFX_DOOM_ALPHA) {
 		// Get patch header
+		entry->seek(0, SEEK_SET);
 		oldpatch_header_t header;
 		entry->read(&header, 4);
 
@@ -170,10 +172,10 @@ bool EntryOperations::modifyGfxOffsets(ArchiveEntry* entry, int auto_type, point
 			}
 
 			if (xc)
-				header.left = offsets.x;
+				header.left = (int8_t) offsets.x;
 
 			if (yc)
-				header.top = offsets.y;
+				header.top = (int8_t) offsets.y;
 		}
 
 		// Write new header to entry
