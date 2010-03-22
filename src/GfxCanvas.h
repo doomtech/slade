@@ -38,6 +38,7 @@ public:
 	SImage*	getImage() { return image; }
 
 	void	setViewType(int type) { view_type = type; }
+	int		getViewType(){ return view_type; }
 	void	setScale(double scale) { this->scale = scale; }
 	bool	allowDrag() { return allow_drag; }
 	void	allowDrag(bool allow) { allow_drag = allow; }

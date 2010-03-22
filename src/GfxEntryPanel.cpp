@@ -180,8 +180,9 @@ bool GfxEntryPanel::loadEntry(ArchiveEntry* entry) {
 	else
 		btn_save->Enable(true);
 
-	// Reset display offsets
-	gfx_canvas->resetOffsets();
+	// Reset display offsets in graphics mode
+	if (gfx_canvas->getViewType() != GFXVIEW_SPRITE)
+		gfx_canvas->resetOffsets();
 
 	// Refresh the canvas
 	gfx_canvas->Refresh();
