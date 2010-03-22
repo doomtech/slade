@@ -9,6 +9,7 @@ enum {
 	LV_STATUS_MODIFIED,
 	LV_STATUS_NEW,
 	LV_STATUS_LOCKED,
+	LV_STATUS_ERROR,
 };
 
 class ListView : public wxListCtrl {

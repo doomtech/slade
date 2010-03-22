@@ -11,10 +11,17 @@ enum {
 	TXF_NAMELESS,
 };
 
+struct pnames_entry_t {
+	string			name;
+	ArchiveEntry*	entry;
+
+	pnames_entry_t() { entry = NULL; }
+};
+
 class TextureXList {
 private:
 	vector<CTexture*>		textures;
-	vector<ArchiveEntry*>	patches;
+	vector<pnames_entry_t>	patches;
 	uint8_t					txformat;
 
 public:
@@ -26,8 +33,8 @@ public:
 
 	CTexture*		getTexture(int index);
 	CTexture*		getTexture(string name);
-	ArchiveEntry*	getPatch(int index);
-	ArchiveEntry*	getPatch(string name);
+	string			getPatchName(int index);
+	ArchiveEntry*	getPatchEntry(int index);
 
 	void	clear();
 

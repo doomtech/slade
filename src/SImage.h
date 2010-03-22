@@ -49,6 +49,7 @@ public:
 	void			setYOffset(int offset);
 
 	// Misc
+	void	clear();
 	void	fillAlpha(uint8_t alpha = 0);
 	short	findUnusedColour();
 	bool	trim(int width, int height);

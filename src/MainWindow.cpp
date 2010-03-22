@@ -34,6 +34,7 @@
 #include "ArchiveManager.h"
 #include "Archive.h"
 #include "Icons.h"
+#include "BaseResourceArchivesPanel.h"
 #include <wx/aboutdlg.h>
 
 
@@ -100,6 +101,12 @@ void MainWindow::setupLayout() {
 	fileMenu->AppendSeparator();
     fileMenu->Append(createMenuItem(fileMenu, MENU_FILE_QUIT,		_T("&Quit"),				_T("Quit SLADE")));
 	menu->Append(fileMenu, _T("&File"));
+
+	// Editor menu
+	wxMenu* editorMenu = new wxMenu(_T(""));
+	editorMenu->Append(createMenuItem(editorMenu, MENU_EDITOR_SET_BASE_RESOURCE,	_T("Set &Base Resource Archive"),	_T("Set the base resource archive, to act as the 'program IWAD'")));
+	editorMenu->Append(createMenuItem(editorMenu, MENU_EDITOR_PREFERENCES,			_T("&Preferences..."),				_T("Setup SLADE options and preferences")));
+	menu->Append(editorMenu, _T("E&ditor"));
 
 	// Entry menu
 	wxMenu* entryMenu = new wxMenu(_T(""));
@@ -347,6 +354,23 @@ void MainWindow::onMenuItemClicked(wxCommandEvent& e) {
 		this->Close(true);
 		//wxTheApp->ExitMainLoop();
 
+
+	// *******************************************************
+	// EDITOR MENU
+	// *******************************************************
+
+	// Editor->Set Base Resource Archive
+	else if (e.GetId() == MENU_EDITOR_SET_BASE_RESOURCE) {
+		wxDialog dialog_ebr(this, -1, _T("Edit Base Resource Archives"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
+
+		wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+		sizer->Add(new BaseResourceArchivesPanel(&dialog_ebr), 1, wxEXPAND|wxALL, 4);
+
+		dialog_ebr.SetSizer(sizer);
+		dialog_ebr.Layout();
+		dialog_ebr.SetInitialSize(wxSize(400, 240));
+		dialog_ebr.ShowModal();
+	}
 
 	// *******************************************************
 	// ENTRY MENU

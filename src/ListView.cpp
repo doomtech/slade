@@ -7,6 +7,7 @@
 wxColor col_new(0, 150, 0);
 wxColor col_modified(0, 80, 180);
 wxColor col_locked(180, 50, 0);
+wxColor col_error(230, 30, 0);
 
 
 ListView::ListView(wxWindow* parent, int id)
@@ -83,6 +84,8 @@ bool ListView::setItemStatus(int item, int status) {
 		case LV_STATUS_LOCKED:
 			SetItemTextColour(item, col_locked);
 			break;
+		case LV_STATUS_ERROR:
+			SetItemTextColour(item, col_error);
 	}
 
 	return true;

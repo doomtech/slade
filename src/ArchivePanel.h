@@ -21,6 +21,7 @@ protected:
 	EntryPanel*	pal_area;
 	EntryPanel*	multi_area;
 	EntryPanel* texturex_area;
+	EntryPanel* animated_area;
 
 public:
 	enum {

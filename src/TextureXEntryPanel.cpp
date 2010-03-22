@@ -72,16 +72,23 @@ TextureXEntryPanel::TextureXEntryPanel(wxWindow* parent)
 	sizer->Add(tex_canvas, 1, wxEXPAND|wxALL, 4);
 
 	// Add patches list
-	frame = new wxStaticBox(this, -1, _T("Patches"));
+	frame = new wxStaticBox(this, -1, _T("Available Patches"));
 	framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
 	list_patches = new ListView(this, -1);
 	list_patches->showIcons(false);
 	framesizer->Add(list_patches, 1, wxEXPAND|wxALL, 4);
 	sizer->Add(framesizer, 0, wxEXPAND|wxALL, 4);
 
+	// Add patch preview
+	gfx_patch_preview = new GfxCanvas(this, -1);
+	gfx_patch_preview->SetSizeHints(wxSize(128, 128));
+	gfx_patch_preview->setViewType(GFXVIEW_CENTERED);
+	framesizer->Add(gfx_patch_preview, 0, wxEXPAND|wxALL, 4);
+
 
 	// Bind events
 	list_textures->Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &TextureXEntryPanel::onTextureListSelect, this);
+	list_patches->Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &TextureXEntryPanel::onPatchesListSelect, this);
 	combo_palette->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &TextureXEntryPanel::onPaletteChanged, this);
 
 	Layout();
@@ -100,6 +107,9 @@ bool TextureXEntryPanel::loadEntry(ArchiveEntry* entry) {
 	// Do nothing if entry is already open
 	if (this->entry == entry)
 		return true;
+
+	// Hide while loading
+	Show(false);
 
 	// Get PNAMES entry
 	ArchiveEntry* pnames = NULL;
@@ -124,6 +134,8 @@ bool TextureXEntryPanel::loadEntry(ArchiveEntry* entry) {
 
 	// Refresh controls
 	populateTextureList();
+	populatePatchesList();
+	Show(true);
 	Layout();
 
 	return true;
@@ -142,6 +154,7 @@ bool TextureXEntryPanel::saveEntry() {
 void TextureXEntryPanel::populateTextureList() {
 	// Clear current list
 	list_textures->ClearAll();
+	list_textures->Show(false);
 
 	// Add columns
 	list_textures->InsertColumn(0, _T("Name"));
@@ -156,8 +169,33 @@ void TextureXEntryPanel::populateTextureList() {
 	}
 
 	// Update list width
+	list_textures->Show(true);
 	list_textures->enableSizeUpdate(true);
 	list_textures->updateSize();
+}
+
+void TextureXEntryPanel::populatePatchesList() {
+	// Clear current list
+	list_patches->ClearAll();
+	list_patches->Show(false);
+
+	// Add columns
+	list_patches->InsertColumn(0, _T("Name"));
+
+	// Add each patch to the list
+	for (uint32_t a = 0; a < texturex.nPatches(); a++)
+		list_patches->addItem(a, texturex.getPatchName(a));
+
+	// Colour any invalid patches
+	for (uint32_t a = 0; a < texturex.nPatches(); a++) {
+		if (!texturex.getPatchEntry(a))
+			list_patches->setItemStatus(a, LV_STATUS_ERROR);
+	}
+
+	// Update list width
+	list_patches->Show(true);
+	list_patches->enableSizeUpdate(true);
+	list_patches->updateSize();
 }
 
 /* TextureXEntryPanel::updateImagePalette
@@ -176,6 +214,10 @@ void TextureXEntryPanel::updateImagePalette() {
 
 	if (tex_canvas->getTexture() != NULL)
 		tex_canvas->openTexture(tex_canvas->getTexture(), pal);
+	if (gfx_patch_preview->getImage()) {
+		gfx_patch_preview->getImage()->setPalette(pal);
+		gfx_patch_preview->Refresh();
+	}
 
 	// Clean up
 	delete pal;
@@ -197,6 +239,18 @@ void TextureXEntryPanel::onTextureListSelect(wxListEvent& e) {
 	// Open it if valid index (should be)
 	if (tex)
 		tex_canvas->openTexture(tex, &pal);
+}
+
+void TextureXEntryPanel::onPatchesListSelect(wxListEvent& e) {
+	// Get the selected patch entry
+	ArchiveEntry* entry = texturex.getPatchEntry(e.GetIndex());
+
+	// Load the image
+	gfx_patch_preview->getImage()->clear();
+	Misc::loadImageFromEntry(gfx_patch_preview->getImage(), entry);
+
+	gfx_patch_preview->zoomToFit(false);
+	gfx_patch_preview->Refresh();
 }
 
 /* TextureXEntryPanel::paletteChanged

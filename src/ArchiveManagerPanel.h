@@ -33,8 +33,8 @@ private:
 	WMFileBrowser*		file_browser;
 	wxButton*			btn_browser_open;
 	wxMenu*				menu_context;
-	wxChoice*			choice_base_resource;
-	wxButton*			btn_edit_base_resources;
+	//wxComboBox*		choice_base_resource;
+	//wxButton*			btn_edit_base_resources;
 
 public:
 	// wxWidgets ID table
@@ -93,7 +93,7 @@ public:
 	void	onListArchivesRightClick(wxListEvent& e);
 	void	onMenu(wxCommandEvent& e);
 	void	onTabChanged(wxAuiNotebookEvent& e);
-	void	onBtnEditBaseResources(wxCommandEvent& e);
+	//void	onBtnEditBaseResources(wxCommandEvent& e);
 };
 
 #endif //__ARCHIVEMANAGERPANEL_H__

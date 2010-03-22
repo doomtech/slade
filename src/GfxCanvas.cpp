@@ -59,6 +59,7 @@ GfxCanvas::GfxCanvas(wxWindow* parent, int id)
 	drag_pos.set(0, 0);
 	drag_origin.set(-1, -1);
 	allow_drag = false;
+	allow_scroll = false;
 
 	// Listen to the image for changes
 	listenTo(image);
@@ -100,7 +101,8 @@ void GfxCanvas::draw() {
 	drawChequeredBackground();
 
 	// Pan by view offset
-	glTranslated(offset.x, offset.y, 0);
+	if (allow_scroll)
+		glTranslated(offset.x, offset.y, 0);
 
 	// Pan if offsets
 	if (view_type == GFXVIEW_CENTERED || view_type == GFXVIEW_SPRITE || view_type == GFXVIEW_HUD) {
@@ -205,12 +207,16 @@ void GfxCanvas::drawChequeredBackground() {
  * change this later...)
  *******************************************************************/
 void GfxCanvas::drawImage() {
+	// Check image is valid
+	if (!image->isValid())
+		return;
+
 	// Save current matrix
 	glPushMatrix();
 
 	// Zoom
 	glScaled(scale, scale, 1);
-	
+
 	// Pan
 	if (view_type == GFXVIEW_CENTERED)
 		glTranslated(-(image->getWidth() * 0.5), -(image->getHeight() * 0.5), 0);	// Pan to center image

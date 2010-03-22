@@ -353,6 +353,19 @@ void MainApp::readConfigFile() {
 			main_window_layout = tz.getToken();
 		}
 
+		// Read base resource archive paths
+		if (!token.Cmp(_T("base_resource_paths"))) {
+			// Skip {
+			token = tz.getToken();
+
+			// Read paths until closing brace found
+			token = tz.getToken();
+			while (token.Cmp(_T("}"))) {
+				theArchiveManager->addBaseResourcePath(token);
+				token = tz.getToken();
+			}
+		}
+
 		// Get next token
 		token = tz.getToken();
 	}
@@ -382,6 +395,12 @@ void MainApp::saveConfigFile() {
 	string layout = s_fmt(_T("%3d%s"), MW_LAYOUT_VERS, main_window_layout.c_str());
 	file.Write(s_fmt(_T("main_window_layout \"%s\"\n"), chr(layout)));
 
+	// Write base resource archive paths
+	file.Write(_T("\nbase_resource_paths\n{\n"));
+	for (size_t a = 0; a < theArchiveManager->baseResourceListLength(); a++)
+		file.Write(s_fmt(_T("\t\"%s\"\n"), theArchiveManager->baseResourcePath(a)));
+	file.Write(_T("}\n"));
+
 	// Close configuration file
 	file.Write(_T("\n// End Configuration File\n\n"));
 }
@@ -389,7 +408,9 @@ void MainApp::saveConfigFile() {
 
 
 void c_crash(vector<string> args) {
-	uint8_t* test = NULL;
-	test[123] = 5;
+	if (wxMessageBox(_T("Yes, this command does actually exist and *will* crash the program. Do you really want it to crash?"), _T("...Really?"), wxYES_NO|wxCENTRE) == wxYES) {
+		uint8_t* test = NULL;
+		test[123] = 5;
+	}
 }
 ConsoleCommand crash(_T("crash"), &c_crash, 0);

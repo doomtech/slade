@@ -218,6 +218,20 @@ void SImage::clearData(bool clear_mask) {
 	}
 }
 
+void SImage::clear() {
+	// Clear image data
+	clearData(true);
+
+	// Reset variables
+	width = 0;
+	height = 0;
+	offset_x = 0;
+	offset_y = 0;
+
+	// Announce change
+	announce(_T("image_changed"));
+}
+
 /* SImage::fillAlpha
  * 'Fills' the alpha channel or mask with the given <alpha> value
  *******************************************************************/

@@ -40,6 +40,7 @@
  * VARIABLES
  *******************************************************************/
 ArchiveManager* ArchiveManager::instance = NULL;
+CVAR(String, base_resource_path, "", CVAR_SAVE)
 
 
 /*******************************************************************
@@ -69,6 +70,9 @@ ArchiveManager::ArchiveManager() {
 		wxLogMessage(_T("Unable to find slade.pk3!"));
 		res_archive_open = false;
 	}
+
+	// Open base resource archive (if any)
+	openBaseResource(base_resource_path);
 }
 
 /* ArchiveManager::~ArchiveManager

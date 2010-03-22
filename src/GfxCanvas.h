@@ -27,6 +27,7 @@ private:
 	bool		image_hilight;
 	bool		image_split;
 	bool		allow_drag;
+	bool		allow_scroll;
 	point2_t	drag_pos;
 	point2_t	drag_origin;
 	point2_t	mouse_prev;
@@ -42,6 +43,8 @@ public:
 	void	setScale(double scale) { this->scale = scale; }
 	bool	allowDrag() { return allow_drag; }
 	void	allowDrag(bool allow) { allow_drag = allow; }
+	bool	allowScroll() { return allow_scroll; }
+	void	allowScroll(bool allow) { allow_scroll = allow; }
 
 	void	draw();
 	void	drawChequeredBackground();

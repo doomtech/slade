@@ -7,6 +7,7 @@
 #include "ListView.h"
 #include "TextureXList.h"
 #include "PaletteChooser.h"
+#include "GfxCanvas.h"
 
 class TextureXEntryPanel : public EntryPanel {
 private:
@@ -17,6 +18,7 @@ private:
 	ListView*		list_patches;
 	CTextureCanvas*	tex_canvas;
 	PaletteChooser*	combo_palette;
+	GfxCanvas*		gfx_patch_preview;
 
 public:
 	TextureXEntryPanel(wxWindow* parent);
@@ -26,10 +28,12 @@ public:
 	bool	saveEntry();
 
 	void	populateTextureList();
+	void	populatePatchesList();
 	void	updateImagePalette();
 
 	// Events
 	void	onTextureListSelect(wxListEvent& e);
+	void	onPatchesListSelect(wxListEvent& e);
 	void	onPaletteChanged(wxCommandEvent& e);
 };
 

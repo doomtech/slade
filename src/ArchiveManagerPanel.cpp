@@ -122,12 +122,13 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
 	notebook_tabs->AddPage(file_browser, _("File Browser"));
 
 	// Create/setup base resource dropdown list & button
+	/*
 	wxArrayString list(1, _T("<none>"));
 	for (size_t a = 0; a < theArchiveManager->baseResourceListLength(); a++)
 		list.Add(theArchiveManager->baseResourcePath(a));
-	choice_base_resource = new wxChoice(this, -1, wxDefaultPosition, wxDefaultSize, list);
+	choice_base_resource = new wxComboBox(this, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, list, wxCB_READONLY);
 	choice_base_resource->Select(0);
-	
+
 	btn_edit_base_resources = new wxButton(this, -1, _T("..."), wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT);
 
 	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
@@ -135,6 +136,7 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
 	hbox->Add(choice_base_resource, 1, wxEXPAND|wxRIGHT, 4);
 	hbox->Add(btn_edit_base_resources, 0, wxEXPAND, 0);
 	vbox->Add(hbox, 0, wxEXPAND|wxALL, 4);
+	*/
 
 	// Create/setup Archive context menu
 	menu_context = new wxMenu();
@@ -150,11 +152,11 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
 	list_maps->Bind(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, &ArchiveManagerPanel::onListMapsActivated, this);
 	notebook_archives->Bind(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED, &ArchiveManagerPanel::onTabChanged, this);
 	Bind(wxEVT_COMMAND_MENU_SELECTED, &ArchiveManagerPanel::onMenu, this, MENU_SAVE, MENU_END);
-	btn_edit_base_resources->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &ArchiveManagerPanel::onBtnEditBaseResources, this);
+	//btn_edit_base_resources->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &ArchiveManagerPanel::onBtnEditBaseResources, this);
 
 	// Listen to the ArchiveManager
 	listenTo(theArchiveManager);
-	
+
 	// Init layout
 	Layout();
 }
@@ -756,8 +758,9 @@ void ArchiveManagerPanel::onTabChanged(wxAuiNotebookEvent& e) {
 		((wxFrame*)GetParent())->SetTitle(_T("SLADE"));
 }
 
+/*
 void ArchiveManagerPanel::onBtnEditBaseResources(wxCommandEvent& e) {
-	wxDialog dialog_ebr(this, -1, _T("Edit Base Resource Archives"));
+	wxDialog dialog_ebr(this, -1, _T("Edit Base Resource Archives"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
 
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 	sizer->Add(new BaseResourceArchivesPanel(&dialog_ebr), 1, wxEXPAND|wxALL, 4);
@@ -767,3 +770,4 @@ void ArchiveManagerPanel::onBtnEditBaseResources(wxCommandEvent& e) {
 	dialog_ebr.SetInitialSize(wxDefaultSize);
 	dialog_ebr.ShowModal();
 }
+*/

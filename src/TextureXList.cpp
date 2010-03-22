@@ -73,29 +73,28 @@ CTexture* TextureXList::getTexture(string name) {
 	return NULL;
 }
 
-/* TextureXList::getPatch
- * Returns the patch entry at [index], or NULL if [index] is out of
+/* TextureXList::getPatchName
+ * Returns the patch name at [index], or empty if [index] is out of
  * range
  *******************************************************************/
-ArchiveEntry* TextureXList::getPatch(int index) {
+string TextureXList::getPatchName(int index) {
+	// Check index range
+	if (index < 0 || index > nPatches())
+		return _T("");
+
+	return patches[index].name;
+}
+
+/* TextureXList::getPatchEntry
+ * Returns the patch name at [index], or NULL if [index] is out of
+ * range
+ *******************************************************************/
+ArchiveEntry* TextureXList::getPatchEntry(int index) {
 	// Check index range
 	if (index < 0 || index > nPatches())
 		return NULL;
 
-	return patches[index];
-}
-
-/* TextureXList::getPatch
- * Returns the patch entry matching [name], or NULL if no match found
- *******************************************************************/
-ArchiveEntry* TextureXList::getPatch(string name) {
-	for (size_t a = 0; a < nPatches(); a++) {
-		if (patches[a]->getName().CmpNoCase(name) == 0)
-			return patches[a];
-	}
-
-	// No match found
-	return NULL;
+	return patches[index].entry;
 }
 
 /* TextureXList::clear
@@ -108,8 +107,6 @@ void TextureXList::clear() {
 	textures.clear();
 
 	// Clear patches
-	for (size_t a = 0; a < patches.size(); a++)
-		delete patches[a];
 	patches.clear();
 }
 
@@ -163,7 +160,7 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, ArchiveEntry* pnames
 	// Read PNAMES
 
 	// Read number of pnames
-	vector<string> patch_names;
+	//vector<string> patch_names;
 	uint32_t n_pnames = 0;
 	pnames->seek(0, SEEK_SET);
 	if (!pnames->read(&n_pnames, 4)) {
@@ -182,8 +179,19 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, ArchiveEntry* pnames
 			return false;
 		}
 
-		// Add pname
-		patch_names.push_back(wxString(pname).Upper());
+		// Create patch info
+		pnames_entry_t patch;
+		patch.name = wxString(pname).Upper();
+
+		// Attempt to find patch entry
+		ArchiveEntry* entry = pnames->getParent()->getEntry(patch.name);
+		if (entry)
+			patch.entry = entry;
+		else
+			wxLogMessage(_T("Patch \"%s\" not found"), pname);
+
+		// Add patch to list
+		patches.push_back(patch);
 	}
 
 
@@ -317,7 +325,7 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, ArchiveEntry* pnames
 			}
 
 			// Check patch id
-			if (pdef.patch >= patch_names.size() || pdef.patch < 0) {
+			if (pdef.patch >= patches.size() || pdef.patch < 0) {
 				wxLogMessage(_T("Texture %s contains non-existant patch id %d"), tex->getName().c_str(), pdef.patch);
 				continue;
 			}
@@ -326,10 +334,8 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, ArchiveEntry* pnames
 			CTPatch* ctp = new CTPatch();
 			ctp->setOffsets(pdef.left, pdef.top);
 
-			// Find patch image entry
-			ArchiveEntry* img = texturex->getParent()->getEntry(patch_names[pdef.patch]);
-			if (!img) wxLogMessage(s_fmt(_T("Couldn't find patch %s"), patch_names[pdef.patch].c_str()));
-			ctp->loadImage(img);
+			// Load patch image entry
+			ctp->loadImage(patches[pdef.patch].entry);
 
 			// Add it to the texture
 			tex->addPatch(ctp);
