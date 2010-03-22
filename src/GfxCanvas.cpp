@@ -68,6 +68,7 @@ GfxCanvas::GfxCanvas(wxWindow* parent, int id)
 	Bind(wxEVT_LEFT_UP, &GfxCanvas::onMouseLeftUp, this);
 	Bind(wxEVT_MOTION, &GfxCanvas::onMouseMovement, this);
 	Bind(wxEVT_LEAVE_WINDOW, &GfxCanvas::onMouseLeaving, this);
+	Bind(wxEVT_KEY_DOWN, &GfxCanvas::onKeyDown, this);
 }
 
 /* GfxCanvas::~GfxCanvas
@@ -97,6 +98,9 @@ void GfxCanvas::draw() {
 
 	// Draw the background
 	drawChequeredBackground();
+
+	// Pan by view offset
+	glTranslated(offset.x, offset.y, 0);
 
 	// Pan if offsets
 	if (view_type == GFXVIEW_CENTERED || view_type == GFXVIEW_SPRITE || view_type == GFXVIEW_HUD) {
@@ -441,9 +445,15 @@ void GfxCanvas::onMouseMovement(wxMouseEvent& e) {
 		drag_pos.set(e.GetPosition().x, e.GetPosition().y);
 		refresh = true;
 	}
+	else if (e.RightIsDown()) {
+		offset = offset + point2_t(e.GetPosition().x - mouse_prev.x, e.GetPosition().y - mouse_prev.y);
+		refresh = true;
+	}
 
 	if (refresh)
 		Refresh();
+
+	mouse_prev.set(e.GetPosition().x, e.GetPosition().y);
 }
 
 /* GfxCanvas::onMouseLeaving
@@ -452,4 +462,32 @@ void GfxCanvas::onMouseMovement(wxMouseEvent& e) {
 void GfxCanvas::onMouseLeaving(wxMouseEvent& e) {
 	image_hilight = false;
 	Refresh();
+}
+
+/* GfxCanvas::onKeyDown
+ * Called when a key is pressed while the canvas has focus
+ *******************************************************************/
+void GfxCanvas::onKeyDown(wxKeyEvent& e) {
+	if (e.GetKeyCode() == WXK_UP) {
+		offset.y += 8;
+		Refresh();
+	}
+
+	else if (e.GetKeyCode() == WXK_DOWN) {
+		offset.y -= 8;
+		Refresh();
+	}
+
+	else if (e.GetKeyCode() == WXK_LEFT) {
+		offset.x += 8;
+		Refresh();
+	}
+
+	else if (e.GetKeyCode() == WXK_RIGHT) {
+		offset.x -= 8;
+		Refresh();
+	}
+
+	else
+		e.Skip();
 }

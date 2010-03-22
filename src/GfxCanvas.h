@@ -20,6 +20,7 @@ private:
 	SImage*		image;
 	int			view_type;	// 0=default, 1=centered, 2=sprite offsets, 3=hud offsets, 4=tiled
 	double		scale;
+	fpoint2_t	offset;
 	GLTexture*	tex_image;
 	GLTexture*	tex_background;
 	bool		update_texture;
@@ -28,6 +29,7 @@ private:
 	bool		allow_drag;
 	point2_t	drag_pos;
 	point2_t	drag_origin;
+	point2_t	mouse_prev;
 
 public:
 	GfxCanvas(wxWindow* parent, int id);
@@ -57,6 +59,7 @@ public:
 	void	onMouseLeftUp(wxMouseEvent& e);
 	void	onMouseMovement(wxMouseEvent& e);
 	void	onMouseLeaving(wxMouseEvent& e);
+	void	onKeyDown(wxKeyEvent& e);
 };
 
 DECLARE_EVENT_TYPE(wxEVT_GFXCANVAS_OFFSET_CHANGED, -1)
