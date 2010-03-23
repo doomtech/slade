@@ -65,6 +65,8 @@ PaletteDialog::PaletteDialog(Palette8bit* palette)
  * PaletteDialog class destructor
  *******************************************************************/
 PaletteDialog::~PaletteDialog() {
+	if (pal_canvas)
+		delete pal_canvas;
 }
 
 /* PaletteDialog::getSelectedColour

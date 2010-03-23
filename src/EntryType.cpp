@@ -662,7 +662,7 @@ bool EntryDataFormat::detectFont0(MemChunk& mc) {
 	// character does start at offset 0x302.
 	// The offsets are themselves between 
 	// offsets 0x102 and 0x302. Halved for int16_t.
-	for (size_t i = 81; i < 181; ++i)
+	for (size_t i = 0x81; i < 0x181; ++i)
 		if (gfx_data[i] == wxINT16_SWAP_ON_BE(0x302))
 			return true;
 
@@ -724,6 +724,10 @@ EntryType::EntryType(string id) {
  * EntryType class constructor
  *******************************************************************/
 EntryType::~EntryType() {
+	match_extension.clear();
+	match_name.clear();
+	match_size.clear();
+	size_multiple.clear();
 }
 
 /* EntryType::addToList

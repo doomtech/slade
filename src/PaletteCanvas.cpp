@@ -53,6 +53,8 @@ PaletteCanvas::PaletteCanvas(wxWindow* parent, int id)
  * PaletteCanvas class destructor
  *******************************************************************/
 PaletteCanvas::~PaletteCanvas() {
+	if (palette)
+		delete palette;
 }
 
 /* PaletteCanvas::draw

@@ -171,6 +171,7 @@ EntryListPanel::EntryListPanel(wxWindow *parent, int id, Archive* archive)
  * EntryListPanel class destructor
  *******************************************************************/
 EntryListPanel::~EntryListPanel() {
+	entry_list->ClearAll();
 }
 
 /* EntryListPanel::populateEntryList

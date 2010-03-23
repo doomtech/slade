@@ -64,6 +64,7 @@ SwitchesList::SwitchesList() {
  * SwitchesList class destructor
  *******************************************************************/
 SwitchesList::~SwitchesList() {
+	entries.clear();
 }
 
 /* SwitchesList::getEntry

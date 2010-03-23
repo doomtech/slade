@@ -66,6 +66,7 @@ AnimatedList::AnimatedList() {
  * AnimatedList class destructor
  *******************************************************************/
 AnimatedList::~AnimatedList() {
+	clear();
 }
 
 /* AnimatedList::getEntry
