@@ -74,6 +74,9 @@ bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry) {
 		// ZDoom IMGZ graphic
 		case EDF_GFX_IMGZ:
 			return image->loadImgz(entry->getData(true), entry->getSize());
+		// Alpha font format (huf)
+		case EDF_FON0:
+			return image->loadFont0(entry->getData(true), entry->getSize());
 		// ZDoom console fonts (FON1)
 		case EDF_FON1:
 			return image->loadFont1(entry->getData(true), entry->getSize());

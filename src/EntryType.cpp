@@ -66,6 +66,7 @@ id_format_t formats[] = {
 	{ "gfx_imgz",		EDF_GFX_IMGZ },
 	{ "palette",		EDF_PALETTE },
 	{ "texturex",		EDF_TEXTUREX },
+	{ "hufont",			EDF_FON0 },
 	{ "fon1",			EDF_FON1 },
 	{ "fon2",			EDF_FON2 },
 	{ "bmf",			EDF_BMF },
@@ -191,6 +192,8 @@ bool EntryDataFormat::isFormat(MemChunk& mc, uint16_t format) {
 		return detectImgz(mc);
 	case EDF_PALETTE:
 		return detectPalette(mc);
+	case EDF_FON0:
+		return detectFont0(mc);
 	case EDF_FON1:
 		return detectFont1(mc);
 	case EDF_FON2:
@@ -725,6 +728,30 @@ bool EntryDataFormat::detectFontM(MemChunk& mc) {
 	if (mc.getSize() / 256 < 6 || mc.getSize() / 256 > 36)
 		return false;
 	return true;
+}
+
+bool EntryDataFormat::detectFont0(MemChunk& mc) {
+	if (mc.getSize() <= 0x302)
+		return false;
+
+	const uint16_t * gfx_data = (const uint16_t *) mc.getData();
+
+	size_t height = wxINT16_SWAP_ON_BE(gfx_data[0]);
+
+	size_t datasize = mc.getSize() - 0x302;
+	if (datasize % height)
+		return false;
+
+	// It seems okay so far. Check that one
+	// character does start at offset 0x302.
+	// The offsets are themselves between 
+	// offsets 0x102 and 0x302. Halved for int16_t.
+	for (size_t i = 81; i < 181; ++i)
+		if (gfx_data[i] == wxINT16_SWAP_ON_BE(0x302))
+			return true;
+
+	// Doesn't seem to be such a file after all.
+	return false;
 }
 
 bool EntryDataFormat::detectFont1(MemChunk& mc) {

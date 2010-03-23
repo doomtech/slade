@@ -63,6 +63,7 @@ public:
 	bool	loadDoomArah(const uint8_t* gfx_data, int size);
 	bool	loadPlanar(const uint8_t* gfx_data, int size);
 	bool	loadImgz(const uint8_t* gfx_data, int size);
+	bool	loadFont0(const uint8_t* gfx_data, int size);
 	bool	loadFont1(const uint8_t* gfx_data, int size);
 	bool	loadFont2(const uint8_t* gfx_data, int size);
 	bool	loadFontM(const uint8_t* gfx_data, int size);

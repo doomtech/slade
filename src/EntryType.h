@@ -23,6 +23,7 @@ enum {
 	EDF_GFX_IMGZ,
 	EDF_PALETTE,
 	EDF_COLORMAP,
+	EDF_FON0,
 	EDF_FON1,
 	EDF_FON2,
 	EDF_BMF,
@@ -89,6 +90,7 @@ public:
 	static bool detectAnimated(MemChunk& mc);
 	static bool detectSwitches(MemChunk& mc);
 	static bool detectFontM(MemChunk& mc);
+	static bool detectFont0(MemChunk& mc);
 	static bool detectFont1(MemChunk& mc);
 	static bool detectFont2(MemChunk& mc);
 	static bool detectBMF(MemChunk& mc);

@@ -705,6 +705,7 @@ bool SImage::loadDoomSnea(const uint8_t* gfx_data, int size) {
 		return false;
 
 	// Check/setup size
+	offset_x = offset_y = 0;
 	uint8_t qwidth = gfx_data[0];
 	width = qwidth * 4;
 	height = gfx_data[1];
@@ -916,6 +917,67 @@ bool SImage::loadImgz(const uint8_t* gfx_data, int size) {
 	}
 	return true;
 };
+
+/* SImage::loadFont0
+ * Loads a Doom alpha HUFONT lump and displays it as a picture.
+ * Why "font0" when it has no FON0 header? Because alpha. ;)
+ * The format used is simple: 
+ * Offset | Length | Type | Name
+ *  0x000 |      2 | ui16 | image height (one value for all chars)
+ *  0x002 |  256*1 | ui08 | characterwidth (one value per char)
+ *  0x102 |  256*2 | ui16 | characteroffset (one value per char)
+ *  0x302 |    x*1 | ui08 | pixel color index (one value per pixel)
+ * So, total size - 302 % value @ 0x00 must be null.
+ * Returns false if the image data was invalid, true otherwise.
+ *******************************************************************/
+bool SImage::loadFont0(const uint8_t* gfx_data, int size) {
+	// Check data
+	if (!gfx_data)
+		return false;
+
+	if (size <= 0x302)
+		return false;
+
+	offset_x = offset_y = 0;
+	height = gfx_data[0] + (gfx_data[1]<<8);
+
+	size_t datasize = size - 0x302;
+	if (datasize % height)
+		return false;
+
+	width = datasize / height;
+
+	clearData();
+	has_palette = true;
+	has_builtinpal = false;
+	format = PALMASK;
+
+	// Create new picture and mask
+	const uint8_t* r = gfx_data + 0x302;
+	data = new uint8_t[datasize];
+	mask = new uint8_t[datasize];
+	memset(mask, 0xFF, datasize);
+
+	// Data is in column-major format, convert to row-major
+	size_t p = 0;
+	for (size_t i = 0; i < datasize; ++i) {
+		data[p] = r[i];
+
+		// Index 0 is transparent
+		if (data[p] == 0)
+			mask[p] = 0;
+
+		// Move to next column
+		p+=width;
+
+		// Move to next row
+		if (p >= datasize) {
+			p -= datasize;
+			++p;
+		}
+	}
+	return true;
+}
 
 /* SImage::loadFont1
  * Loads a ZDoom FON1 lump and displays it as a picture.
