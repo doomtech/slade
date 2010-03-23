@@ -133,6 +133,8 @@ bool TextureXEntryPanel::loadEntry(ArchiveEntry* entry) {
 	setModified(false);
 
 	// Refresh controls
+	tex_canvas->clearTexture();
+	gfx_patch_preview->getImage()->clear();
 	populateTextureList();
 	populatePatchesList();
 	Show(true);

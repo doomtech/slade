@@ -19,6 +19,7 @@ public:
 
 	CTexture*	getTexture() { return texture; }
 
+	void	clearTexture();
 	void	clearPatchTextures();
 	bool	openTexture(CTexture* tex, Palette8bit* pal = NULL);
 	void	draw();

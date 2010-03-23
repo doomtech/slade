@@ -154,6 +154,9 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, ArchiveEntry* pnames
 	if (!texturex || !pnames)
 		return false;
 
+	// Clear current textures/patches
+	clear();
+
 	// Get parent archive
 	Archive* parent_archive = texturex->getParent();
 

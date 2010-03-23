@@ -121,11 +121,11 @@
     <VirtualDirectory Name="Binary Control Lumps">
       <File Name="src/AnimatedList.cpp"/>
       <File Name="src/AnimatedList.h"/>
-      <File Name="src/BiinaryControlLump.h"/>
       <File Name="src/SwitchesList.cpp"/>
       <File Name="src/SwitchesList.h"/>
+      <File Name="src/BinaryControlLump.h"/>
     </VirtualDirectory>
-   <VirtualDirectory Name="Image">
+    <VirtualDirectory Name="Image">
       <File Name="src/SImage.cpp"/>
       <File Name="src/SImage.h"/>
     </VirtualDirectory>

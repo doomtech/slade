@@ -52,6 +52,17 @@ CTextureCanvas::~CTextureCanvas() {
 	clearPatchTextures();
 }
 
+/* CTextureCanvas::clearTexture
+ * Clears the current texture and the patch textures list
+ *******************************************************************/
+void CTextureCanvas::clearTexture() {
+	// Clear texture
+	texture = NULL;
+
+	// Clear patch textures
+	clearPatchTextures();
+}
+
 /* CTextureCanvas::clearPatchTextures
  * Clears the patch textures list
  *******************************************************************/
@@ -65,6 +76,10 @@ void CTextureCanvas::clearPatchTextures() {
  * Loads a composite texture to be displayed
  *******************************************************************/
 bool CTextureCanvas::openTexture(CTexture* tex, Palette8bit * pal) {
+	// Clear the current texture
+	clearTexture();
+
+	// Check a texture was given
 	if (!tex)
 		return false;
 
