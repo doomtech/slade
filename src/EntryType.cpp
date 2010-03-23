@@ -48,43 +48,12 @@ struct id_format_t {
 	uint16_t	format;
 };
 id_format_t formats[] = {
-	{ "any",			EDF_ANY },
-	{ "png",			EDF_PNG },
-	{ "bmp",			EDF_BMP },
-	{ "jpeg",			EDF_JPEG },
-	{ "gfx_doom",		EDF_GFX_DOOM },
-	{ "gfx_flat",		EDF_GFX_FLAT },
-	{ "autopage",		EDF_GFX_AUTOPAGE },
-	{ "fullscreen",		EDF_GFX_FULLSCREEN },
-	{ "strifestart",	EDF_GFX_STRIFESU },
-	{ "planar",			EDF_GFX_PLANAR },
-	{ "gfx_doom_alpha",	EDF_GFX_DOOM_ALPHA },
-	{ "gfx_doom_arah",	EDF_GFX_DOOM_ARAH },
-	{ "gfx_doom_beta",	EDF_GFX_DOOM_BETA },
-	{ "gfx_doom_snea",	EDF_GFX_DOOM_SNEA },
-	{ "gfx_doom_gnum",	EDF_GFX_DOOM_GNUM },
-	{ "gfx_imgz",		EDF_GFX_IMGZ },
-	{ "palette",		EDF_PALETTE },
-	{ "texturex",		EDF_TEXTUREX },
-	{ "hufont",			EDF_FON0 },
-	{ "fon1",			EDF_FON1 },
-	{ "fon2",			EDF_FON2 },
-	{ "bmf",			EDF_BMF },
-	{ "monofont",		EDF_MONOFONT },
-	{ "ansi",			EDF_ANSI },
-	{ "wad",			EDF_WAD },
-	{ "mus",			EDF_MUS },
-	{ "midi",			EDF_MIDI },
-	{ "mod_it",			EDF_MOD_IT },
-	{ "mod_xm",			EDF_MOD_XM },
-	{ "mod_s3m",		EDF_MOD_S3M },
-	{ "mod_mod",		EDF_MOD_MOD },
-	{ "snd_doom",		EDF_SND_DOOM },
-	{ "snd_wav",		EDF_SND_WAV },
-	{ "snd_speaker",	EDF_SND_SPEAKER },
-	{ "animated",		EDF_ANIMATED },
-	{ "switches",		EDF_SWITCHES },
-	{ "text",			EDF_TEXT },
+#define xa(id, name, val)			{ name,	id },
+#define xb(id, name)				{ name,	id },
+#define xx(id, name, func)			{ name,	id },
+#define xy(id, name, func, load)	{ name,	id },
+#define xz(id, name)				{ name,	id },
+#include "EntryTypeList.h"
 
 	{ "",				EDF_ANY }, // Dummy type to mark end of list
 };
@@ -165,75 +134,11 @@ uint16_t EntryDataFormat::detectFormat(MemChunk& mc) {
 
 bool EntryDataFormat::isFormat(MemChunk& mc, uint16_t format) {
 	switch (format) {
-	case EDF_BMP:
-		return detectBmp(mc);
-	case EDF_GFX_DOOM:
-		return detectDoomGfx(mc);
-	case EDF_GFX_DOOM_ALPHA:
-		return detectDoomGfxAlpha(mc);
-	case EDF_GFX_DOOM_BETA:
-		return detectDoomGfxBeta(mc);
-	case EDF_GFX_DOOM_ARAH:
-		return detectDoomGfxArah(mc);
-	case EDF_GFX_DOOM_SNEA:
-		return detectDoomGfxSnea(mc);
-	case EDF_GFX_DOOM_GNUM:
-		return detectDoomGfxGnum(mc);
-	case EDF_GFX_FULLSCREEN:
-	case EDF_GFX_FLAT:
-		return detectDoomFlat(mc);
-	case EDF_GFX_AUTOPAGE:
-		return detectAutopage(mc);
-	case EDF_GFX_STRIFESU:
-		return detectStrifeStartup(mc);
-	case EDF_GFX_PLANAR:
-		return detectPlanar(mc);
-	case EDF_GFX_IMGZ:
-		return detectImgz(mc);
-	case EDF_PALETTE:
-		return detectPalette(mc);
-	case EDF_FON0:
-		return detectFont0(mc);
-	case EDF_FON1:
-		return detectFont1(mc);
-	case EDF_FON2:
-		return detectFont2(mc);
-	case EDF_MONOFONT:
-		return detectFontM(mc);
-	case EDF_BMF:
-		return detectBMF(mc);
-	case EDF_TEXTUREX:
-		return detectTextureX(mc);
-	case EDF_JPEG:
-		return detectJpeg(mc);
-	case EDF_MIDI:
-		return detectMidi(mc);
-	case EDF_MOD_IT:
-		return detectModIt(mc);
-	case EDF_MOD_MOD:
-		return detectModMod(mc);
-	case EDF_MOD_S3M:
-		return detectModS3m(mc);
-	case EDF_MOD_XM:
-		return detectModXm(mc);
-	case EDF_MUS:
-		return detectMus(mc);
-	case EDF_PNG:
-		return detectPng(mc);
-	case EDF_ANSI:
-		return detectAnsi(mc);
-	case EDF_SND_DOOM:
-		return detectSndDoom(mc);
-	case EDF_SND_WAV:
-		return detectSndWav(mc);
-	case EDF_SND_SPEAKER:
-		return detectSndSpeaker(mc);
-	case EDF_WAD:
-		return detectWad(mc);
-	case EDF_ANIMATED:
-		return detectAnimated(mc);
-	case EDF_SWITCHES:
-		return detectSwitches(mc);
+#define xa(id, name, val)
+#define xb(id, name)
+#define xx(id, name, func)			case id: return func(mc);
+#define xy(id, name, func, load)	case id: return func(mc);
+#include "EntryTypeList.h"
 	default:
 		return false;
 	}
@@ -688,6 +593,17 @@ bool EntryDataFormat::detectTextureX(MemChunk& mc) {
 	if ((int32_t) ntex < 0)
 		return false;
 	if (mc.getSize() < (ntex * 24))
+		return false;
+	return true;
+}
+
+bool EntryDataFormat::detectPnames(MemChunk& mc) {
+	// It's a pretty simple format alright
+	const uint8_t * data = mc.getData();
+	uint32_t number = data[0] + (data[1]<<8) + (data[2]<<16) + (data[3]<<24);
+	if ((int32_t) number < 0)
+		return false;
+	if (mc.getSize() != (4 + number * 8))
 		return false;
 	return true;
 }

@@ -41,7 +41,7 @@
  * TEXTENTRYPANEL CLASS FUNCTIONS
  *******************************************************************/
 
-/* SwitchesEntryPanel::TextureXEntryPanel
+/* SwitchesEntryPanel::SwitchesEntryPanel
  * SwitchesEntryPanel class constructor
  *******************************************************************/
 SwitchesEntryPanel::SwitchesEntryPanel(wxWindow* parent)
@@ -79,7 +79,7 @@ bool SwitchesEntryPanel::loadEntry(ArchiveEntry* entry) {
 	if (this->entry == entry)
 		return true;
 
-	// Read SWITCHES entry into texturexlist
+	// Read SWITCHES entry into list
 	switches.readSWITCHESData(entry);
 
 	// Update variables

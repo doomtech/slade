@@ -58,6 +58,8 @@ public:
 	// Image format reading
 	bool	loadImage(const uint8_t* data, int size);
 	bool	loadDoomGfx(const uint8_t* data, int size, uint8_t version = 0);
+	bool	loadDoomGfxA(const uint8_t* data, int size) {return loadDoomGfx(data, size, 2);}
+	bool	loadDoomGfxB(const uint8_t* data, int size) {return loadDoomGfx(data, size, 1);}
 	bool	loadDoomSnea(const uint8_t* data, int size);
 	bool	loadDoomFlat(const uint8_t* data, int size);
 	bool	loadDoomArah(const uint8_t* gfx_data, int size);

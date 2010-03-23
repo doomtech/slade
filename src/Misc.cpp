@@ -46,49 +46,12 @@ bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry) {
 		return false;
 
 	switch (entry->getType()->getFormat()) {
-		// Doom gfx format
-		case EDF_GFX_DOOM:
-			return image->loadDoomGfx(entry->getData(true), entry->getSize());
-		// Alpha Doom gfx format
-		case EDF_GFX_DOOM_ALPHA:
-			return image->loadDoomGfx(entry->getData(true), entry->getSize(), 2);
-		// Alpha Doom Raw and Header format
-		case EDF_GFX_DOOM_ARAH:
-			return image->loadDoomArah(entry->getData(true), entry->getSize());
-		// Beta Doom gfx format
-		case EDF_GFX_DOOM_BETA:
-			return image->loadDoomGfx(entry->getData(true), entry->getSize(), 1);
-		// Doom flat format and other raw images
-		case EDF_GFX_FLAT:
-		case EDF_GFX_FULLSCREEN:// 320x200
-		case EDF_GFX_AUTOPAGE:	// 320x?
-		case EDF_GFX_STRIFESU:	// 16x16, 32x64 or 48x48
-		case EDF_GFX_DOOM_GNUM:	// 10x12
-			return image->loadDoomFlat(entry->getData(true), entry->getSize());
-		// Alpha Doom snea format
-		case EDF_GFX_DOOM_SNEA:
-			return image->loadDoomSnea(entry->getData(true), entry->getSize());
-		// Hexen planar graphic
-		case EDF_GFX_PLANAR:
-			return image->loadPlanar(entry->getData(true), entry->getSize());
-		// ZDoom IMGZ graphic
-		case EDF_GFX_IMGZ:
-			return image->loadImgz(entry->getData(true), entry->getSize());
-		// Alpha font format (huf)
-		case EDF_FON0:
-			return image->loadFont0(entry->getData(true), entry->getSize());
-		// ZDoom console fonts (FON1)
-		case EDF_FON1:
-			return image->loadFont1(entry->getData(true), entry->getSize());
-		// ZDoom big fonts (FON2)
-		case EDF_FON2:
-			return image->loadFont2(entry->getData(true), entry->getSize());
-		// Byte Map Fonts (BMF)
-		case EDF_BMF:
-			return image->loadBMF(entry->getData(true), entry->getSize());
-		// Monochrome, monospaced font (fnt)
-		case EDF_MONOFONT:
-			return image->loadFontM(entry->getData(true), entry->getSize());
+#define xa(id, name, val)
+#define xb(id, name)
+#define xx(id, name, func)
+#define xy(id, name, func, load)	case id: return image->load(entry->getData(true), entry->getSize());
+#define xz(id, name)
+#include "EntryTypeList.h"
 
 		// General image formats (that FreeImage supports at least)
 		default:

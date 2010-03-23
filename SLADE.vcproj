@@ -590,6 +590,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\EntryTypeList.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\WadArchive.cpp"
 					>
 				</File>

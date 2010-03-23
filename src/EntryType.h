@@ -5,47 +5,11 @@
 class ArchiveEntry;
 
 enum {
-	EDF_ANY = 0,
-	EDF_PNG,
-	EDF_BMP,
-	EDF_JPEG,
-	EDF_GFX_DOOM,
-	EDF_GFX_DOOM_ARAH,
-	EDF_GFX_DOOM_ALPHA,
-	EDF_GFX_DOOM_BETA,
-	EDF_GFX_DOOM_SNEA,
-	EDF_GFX_DOOM_GNUM,
-	EDF_GFX_FLAT,
-	EDF_GFX_FULLSCREEN,
-	EDF_GFX_AUTOPAGE,
-	EDF_GFX_STRIFESU,
-	EDF_GFX_PLANAR,
-	EDF_GFX_IMGZ,
-	EDF_PALETTE,
-	EDF_COLORMAP,
-	EDF_FON0,
-	EDF_FON1,
-	EDF_FON2,
-	EDF_BMF,
-	EDF_MONOFONT,
-	EDF_ANSI,
-	EDF_WAD,
-	EDF_ZIP,
-	EDF_MUS,
-	EDF_MIDI,
-	EDF_MOD_IT,
-	EDF_MOD_XM,
-	EDF_MOD_S3M,
-	EDF_MOD_MOD,
-	EDF_SND_DOOM,
-	EDF_SND_SPEAKER,
-	EDF_SND_WAV,
-	EDF_PNAMES,
-	EDF_TEXTUREX,
-	EDF_ANIMATED,
-	EDF_SWITCHES,
-	EDF_TEXT,
-
+#define xa(id, name, val)			id = val,
+#define xb(id, name)				id,
+#define xx(id, name, func)			id,
+#define xy(id, name, func, load)	id,
+#include "EntryTypeList.h"
 	EDF_UNKNOWN,
 };
 
@@ -87,6 +51,7 @@ public:
 	static bool detectSndWav(MemChunk& mc);
 	static bool detectSndSpeaker(MemChunk& mc);
 	static bool detectTextureX(MemChunk& mc);
+	static bool detectPnames(MemChunk& mc);
 	static bool detectAnimated(MemChunk& mc);
 	static bool detectSwitches(MemChunk& mc);
 	static bool detectFontM(MemChunk& mc);
