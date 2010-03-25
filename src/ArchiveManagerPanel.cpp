@@ -256,7 +256,7 @@ void ArchiveManagerPanel::updateListItem(int index) {
  *******************************************************************/
 bool ArchiveManagerPanel::isArchivePanel(int tab_index) {
 	// Check that tab index is in range
-	if (tab_index < 0 || tab_index >= notebook_archives->GetPageCount())
+	if ((unsigned)tab_index >= notebook_archives->GetPageCount())
 		return false;
 
 	// Check that it isn't the start page

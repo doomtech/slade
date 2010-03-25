@@ -31,7 +31,7 @@
 class GfxConvDialog : public wxDialog {
 private:
 	vector<ArchiveEntry*>	entries;
-	int						current_entry;
+	size_t					current_entry;
 
 	GfxCanvas*		gfx_current;
 	GfxCanvas*		gfx_target;

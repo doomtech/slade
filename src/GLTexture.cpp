@@ -303,9 +303,9 @@ bool GLTexture::draw2d(int32_t x, int32_t y) {
 		glTranslated(x, y, 0);
 
 		size_t tex_index = 0;
-		int top = 0;
+		size_t top = 0;
 		while (top < height) {
-			int left = 0;
+			size_t left = 0;
 			while (left < width) {
 				// Bind the texture
 				glBindTexture(GL_TEXTURE_2D, tex[tex_index].id);

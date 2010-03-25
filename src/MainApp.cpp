@@ -184,7 +184,7 @@ string appPath(string filename, int dir) {
  * SLADELOG CLASS FUNCTIONS
  *******************************************************************/
 
-void SLADELog::DoLog(wxLogLevel level, const wxChar* str, time_t t) {
+void SLADELog::PerformLog(wxLogLevel level, const wxChar* str, time_t t) {
 	theConsole->logMessage(wxString(str));
 }
 

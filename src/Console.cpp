@@ -166,8 +166,8 @@ string Console::dumpLog() {
 /* Console::command
  * Returns the ConsoleCommand at the specified index
  *******************************************************************/
-ConsoleCommand& Console::command(int index) {
-	if (index >= 0 && index < commands.size())
+ConsoleCommand& Console::command(size_t index) {
+	if (index < commands.size())
 		return commands[index];
 	else
 		return commands[0]; // Return first console command on invalid index

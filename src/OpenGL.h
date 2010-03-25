@@ -8,7 +8,7 @@ namespace OpenGL {
 	wxGLContext*	getContext(wxGLCanvas* canvas);
 	bool			init();
 	bool			np2TexSupport();
-	bool			validTexDimension(uint32_t dim);
+	bool			validTexDimension(GLint dim);
 }
 
 #endif//__OPENGL_H__

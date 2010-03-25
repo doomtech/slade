@@ -38,7 +38,7 @@
 namespace OpenGL {
 	wxGLContext*	context = NULL;
 	double			version = 0;
-	int				max_tex_size = 128;
+	GLint			max_tex_size = 128;
 }
 
 
@@ -90,6 +90,6 @@ bool OpenGL::np2TexSupport() {
 	return version >= 2;
 }
 
-bool OpenGL::validTexDimension(uint32_t dim) {
+bool OpenGL::validTexDimension(GLint dim) {
 	return (dim <= max_tex_size);
 }

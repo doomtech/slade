@@ -487,7 +487,7 @@ bool SImage::loadDoomGfx(const uint8_t* gfx_data, int size, uint8_t version) {
 		return false;
 
 	// Check size
-	if (size < (version > 1 ? sizeof(oldpatch_header_t) : sizeof(patch_header_t)))
+	if ((unsigned)size < (version > 1 ? sizeof(oldpatch_header_t) : sizeof(patch_header_t)))
 		return false;
 
 	// Init variables
@@ -539,7 +539,7 @@ bool SImage::loadDoomGfx(const uint8_t* gfx_data, int size, uint8_t version) {
 		uint32_t col_offset = col_offsets[c];//wxUINT32_SWAP_ON_BE(col_offsets[c]);
 
 		// Check column offset is valid
-		if (col_offset >= size) {
+		if (col_offset >= (unsigned)size) {
 			clearData();
 			return false;
 		}
@@ -682,7 +682,7 @@ bool SImage::loadDoomArah(const uint8_t* gfx_data, int size) {
 	memset(mask, 255, width*height);
 
 	// Mark as transparent all pixels that are set to FF
-	for (size_t  i = 0; i < width*height; ++i)
+	for (size_t  i = 0; i < (unsigned)(width*height); ++i)
 		if (data[i] == 255) mask[i] = 0;
 
 	// Announce change
@@ -1047,7 +1047,7 @@ bool SImage::loadFont1(const uint8_t* gfx_data, int size) {
 	}
 	delete[] tempdata;
 	// Add transparency to mask
-	for (size_t i = 0; i < width*height; ++i)
+	for (size_t i = 0; i < (unsigned)(width*height); ++i)
 		if (data[i] == 0)
 			mask[i] = 0x00;
 
@@ -1118,7 +1118,7 @@ bool SImage::loadFont2(const uint8_t* gfx_data, int size) {
 	}
 
 	// Let's build the built-in pal now. 
-	for (size_t i = 0; i < header->palsize + 1; ++i) {
+	for (size_t i = 0; i < header->palsize + 1u; ++i) {
 		rgba_t color;
 		color.r = *p++;
 		color.g = *p++;
@@ -1184,7 +1184,7 @@ bool SImage::loadFont2(const uint8_t* gfx_data, int size) {
 
 	data = new uint8_t[width*height];
 	uint8_t * d = data;
-	for (size_t i = 0; i < height; ++i) {
+	for (size_t i = 0; i < (unsigned)height; ++i) {
 		for (size_t j = 0; j < numchars; ++j) {
 			if (chars[j].width) {
 				memcpy(d, chars[j].data+(i*chars[j].width), chars[j].width);
@@ -1203,7 +1203,7 @@ bool SImage::loadFont2(const uint8_t* gfx_data, int size) {
 	// Now transparency for the mask
 	mask = new uint8_t[width*height];
 	memset(mask, 0xFF, width*height);
-	for (size_t i = 0; i < width*height; ++i)
+	for (size_t i = 0; i < (unsigned)(width*height); ++i)
 		if (data[i] == 0)
 			mask[i] = 0;
 
@@ -1251,7 +1251,7 @@ bool SImage::loadFontM(const uint8_t* gfx_data, int size) {
 	memset(mask, 0x00, width*height);
 
 	//Each pixel is described as a single bit, either on or off
-	for (size_t i = 0; i < size; ++i) {
+	for (size_t i = 0; i < (unsigned)size; ++i) {
 		for (size_t p = 0; p < 8; ++p)
 			mask[(i*8)+p] = ((gfx_data[i]>>(7-p)) & 1) * 255;
 	}

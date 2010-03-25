@@ -8,7 +8,7 @@ class ConsoleCommand {
 private:
 	string name;
 	void (*commandFunc)(vector<string>);
-	int min_args;
+	size_t min_args;
 
 public:
 	ConsoleCommand(string name, void(*commandFunc)(vector<string>), int min_args);
@@ -43,7 +43,7 @@ public:
 	}
 
 	int numCommands() { return (int) commands.size(); }
-	ConsoleCommand& command(int index);
+	ConsoleCommand& command(size_t index);
 
 	void addCommand(ConsoleCommand &c);
 	void execute(string command);

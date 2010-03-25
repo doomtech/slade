@@ -807,11 +807,11 @@ bool EntryType::isThisType(ArchiveEntry* entry) {
 	wxFileName fn(entry->getName());
 
 	// Check min size
-	if (size_limit[0] >= 0 && entry->getSize() < size_limit[0])
+	if (size_limit[0] >= 0 && entry->getSize() < (unsigned)size_limit[0])
 		return false;
 
 	// Check max size
-	if (size_limit[1] >= 0 && entry->getSize() > size_limit[1])
+	if (size_limit[1] >= 0 && entry->getSize() > (unsigned)size_limit[1])
 		return false;
 
 	// Check for size match if needed

@@ -31,10 +31,10 @@ public:
 	uint32_t	nTextures() { return textures.size(); }
 	uint32_t	nPatches() { return patches.size(); }
 
-	CTexture*		getTexture(int index);
+	CTexture*		getTexture(size_t index);
 	CTexture*		getTexture(string name);
-	string			getPatchName(int index);
-	ArchiveEntry*	getPatchEntry(int index);
+	string			getPatchName(size_t index);
+	ArchiveEntry*	getPatchEntry(size_t index);
 
 	void	clear();
 

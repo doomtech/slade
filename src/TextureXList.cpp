@@ -52,9 +52,9 @@ TextureXList::~TextureXList() {
  * Returns the CTexture at [index], or NULL if [index] is out of
  * range
  *******************************************************************/
-CTexture* TextureXList::getTexture(int index) {
+CTexture* TextureXList::getTexture(size_t index) {
 	// Check index range
-	if (index < 0 || index > nTextures())
+	if (index >= nTextures())
 		return NULL;
 
 	return textures[index];
@@ -77,9 +77,9 @@ CTexture* TextureXList::getTexture(string name) {
  * Returns the patch name at [index], or empty if [index] is out of
  * range
  *******************************************************************/
-string TextureXList::getPatchName(int index) {
+string TextureXList::getPatchName(size_t index) {
 	// Check index range
-	if (index < 0 || index > nPatches())
+	if (index >= nPatches())
 		return _T("");
 
 	return patches[index].name;
@@ -89,9 +89,9 @@ string TextureXList::getPatchName(int index) {
  * Returns the patch name at [index], or NULL if [index] is out of
  * range
  *******************************************************************/
-ArchiveEntry* TextureXList::getPatchEntry(int index) {
+ArchiveEntry* TextureXList::getPatchEntry(size_t index) {
 	// Check index range
-	if (index < 0 || index > nPatches())
+	if (index >= nPatches())
 		return NULL;
 
 	return patches[index].entry;
@@ -140,9 +140,9 @@ struct ftdef_t
 };
 
 struct pdef_t {
-	int16_t	left;
-	int16_t	top;
-	int16_t	patch;
+	int16_t		left;
+	int16_t		top;
+	uint16_t	patch;
 };
 
 /* TextureXList::readTEXTUREXData
@@ -328,7 +328,7 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, ArchiveEntry* pnames
 			}
 
 			// Check patch id
-			if (pdef.patch >= patches.size() || pdef.patch < 0) {
+			if (pdef.patch >= patches.size()) {
 				wxLogMessage(_T("Texture %s contains non-existant patch id %d"), tex->getName().c_str(), pdef.patch);
 				continue;
 			}
