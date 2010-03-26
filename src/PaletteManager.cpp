@@ -32,6 +32,7 @@
 #include "PaletteManager.h"
 #include "ArchiveManager.h"
 #include "ZipArchive.h"
+#include "Misc.h"
 #include <wx/dir.h>
 #include <wx/filename.h>
 
@@ -67,6 +68,16 @@ PaletteManager::PaletteManager() {
 PaletteManager::~PaletteManager() {
 	for (size_t a = 0; a < palettes.size(); a++)
 		delete[] palettes[a];
+}
+
+Palette8bit* PaletteManager::globalPalette() {
+	// Check if a base resource archive is open
+	if (!theArchiveManager->baseResourceArchive())
+		return pal_default;
+
+	// Return the palette contained in the base resource archive
+	Misc::loadPaletteFromArchive(pal_global, theArchiveManager->baseResourceArchive());
+	return pal_global;
 }
 
 /* PaletteManager::getPalette

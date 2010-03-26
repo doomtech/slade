@@ -275,11 +275,6 @@ void MainWindow::setupLayout() {
  * Called when a menu or toolbar item is clicked
  *******************************************************************/
 void MainWindow::onMenuItemClicked(wxCommandEvent& e) {
-	string ext_wad = _T("*.wad;*.WAD;*.Wad");
-	string ext_zip = _T("*.zip;*.ZIP;*.Zip");
-	string ext_pk3 = _T("*.pk3;*.PK3;*.Pk3");
-	string ext_jdf = _T("*.jdf;*.JDF;*.Jdf");
-
 	// *******************************************************
 	// FILE MENU
 	// *******************************************************
@@ -295,11 +290,7 @@ void MainWindow::onMenuItemClicked(wxCommandEvent& e) {
 	// File->Open
 	else if (e.GetId() == MENU_FILE_OPEN) {
 		// Create extensions string
-		string extensions = s_fmt(_T("Any Supported File (*.wad; *.zip; *.pk3; *.jdf)|%s;%s;%s;%s"), ext_wad.c_str(), ext_zip.c_str(), ext_pk3.c_str(), ext_jdf.c_str());
-		extensions += s_fmt(_T("|Doom Wad files (*.wad)|%s"), ext_wad.c_str());
-		extensions += s_fmt(_T("|Zip files (*.zip)|%s"), ext_zip.c_str());
-		extensions += s_fmt(_T("|Pk3 (zip) files (*.pk3)|%s"), ext_pk3.c_str());
-		extensions += s_fmt(_T("|JDF (zip) files (*.jdf)|%s"), ext_jdf.c_str());
+		string extensions = theArchiveManager->getArchiveExtensionsString();
 
 		// Open a file browser dialog that allows multiple selection
 		// and filters by wad, zip and pk3 file extensions
@@ -362,14 +353,18 @@ void MainWindow::onMenuItemClicked(wxCommandEvent& e) {
 	// Editor->Set Base Resource Archive
 	else if (e.GetId() == MENU_EDITOR_SET_BASE_RESOURCE) {
 		wxDialog dialog_ebr(this, -1, _T("Edit Base Resource Archives"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
+		BaseResourceArchivesPanel brap(&dialog_ebr);
 
 		wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
-		sizer->Add(new BaseResourceArchivesPanel(&dialog_ebr), 1, wxEXPAND|wxALL, 4);
+		sizer->Add(&brap, 1, wxEXPAND|wxALL, 4);
+		
+		sizer->Add(dialog_ebr.CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND|wxLEFT|wxRIGHT|wxDOWN, 4);
 
 		dialog_ebr.SetSizer(sizer);
 		dialog_ebr.Layout();
 		dialog_ebr.SetInitialSize(wxSize(400, 240));
-		dialog_ebr.ShowModal();
+		if (dialog_ebr.ShowModal() == wxID_OK)
+			theArchiveManager->openBaseResource(brap.getSelectedPath());
 	}
 
 	// *******************************************************

@@ -117,6 +117,7 @@
       <File Name="src/ZipArchive.h"/>
       <File Name="src/EntryType.h"/>
       <File Name="src/EntryType.cpp"/>
+      <File Name="src/EntryTypeList.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Binary Control Lumps">
       <File Name="src/AnimatedList.cpp"/>

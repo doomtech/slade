@@ -9,7 +9,7 @@ private:
 	vector<Palette8bit*>	palettes;
 	vector<string>			pal_names;
 	Palette8bit*			pal_default;	// A greyscale palette
-	Palette8bit*			pal_global;		// Global palette (used for archives without a PLAYPAL entry)
+	Palette8bit*			pal_global;		// The global palette (read from the base resource archive)
 
 	static PaletteManager*	instance;
 
@@ -26,7 +26,7 @@ public:
 
 	int				numPalettes() { return (int)palettes.size(); }
 	Palette8bit*	defaultPalette() { return pal_default; }
-	Palette8bit*	globalPalette() { return pal_global; }
+	Palette8bit*	globalPalette();
 	Palette8bit*	getPalette(int index);
 	Palette8bit*	getPalette(string name);
 	string			getPalName(int index);

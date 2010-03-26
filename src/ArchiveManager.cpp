@@ -284,6 +284,22 @@ int ArchiveManager::archiveIndex(Archive* archive) {
 	return -1;
 }
 
+string ArchiveManager::getArchiveExtensionsString(bool wad, bool zip, bool pk3, bool jdf) {
+	string ext_wad = _T("*.wad;*.WAD;*.Wad");
+	string ext_zip = _T("*.zip;*.ZIP;*.Zip");
+	string ext_pk3 = _T("*.pk3;*.PK3;*.Pk3");
+	string ext_jdf = _T("*.jdf;*.JDF;*.Jdf");
+	
+	// Create extensions string
+	string extensions = s_fmt(_T("Any Supported File (*.wad; *.zip; *.pk3; *.jdf)|%s;%s;%s;%s"), ext_wad.c_str(), ext_zip.c_str(), ext_pk3.c_str(), ext_jdf.c_str());
+	extensions += s_fmt(_T("|Doom Wad files (*.wad)|%s"), ext_wad.c_str());
+	extensions += s_fmt(_T("|Zip files (*.zip)|%s"), ext_zip.c_str());
+	extensions += s_fmt(_T("|Pk3 (zip) files (*.pk3)|%s"), ext_pk3.c_str());
+	extensions += s_fmt(_T("|JDF (zip) files (*.jdf)|%s"), ext_jdf.c_str());
+	
+	return extensions;
+}
+
 bool ArchiveManager::openBaseResource(string filename) {
 	// Close/delete current base resource archive
 	if (base_resource_archive) {
@@ -302,8 +318,10 @@ bool ArchiveManager::openBaseResource(string filename) {
 		base_resource_archive = new ZipArchive();
 
 	// Attempt to open the file
-	if (base_resource_archive->openFile(filename))
+	if (base_resource_archive->openFile(filename)) {
+		base_resource_path = filename;
 		return true;
+	}
 	else {
 		delete base_resource_archive;
 		base_resource_archive = NULL;

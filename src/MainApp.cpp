@@ -249,6 +249,10 @@ bool MainApp::OnInit() {
 
 	// Init logfile
 	initLogFile();
+	
+	// Load configuration file
+	wxLogMessage(_T("Loading configuration"));
+	readConfigFile();
 
 	// Check that SLADE.pk3 can be found
 	wxLogMessage(_T("Loading slade.pk3"));
@@ -257,10 +261,6 @@ bool MainApp::OnInit() {
 
 	// Show splash screen
 	theSplashWindow->showSplash(_T("Starting Up..."));
-
-	// Load configuration file
-	wxLogMessage(_T("Loading configuration"));
-	readConfigFile();
 
 	// Load program icons
 	wxLogMessage(_T("Loading icons"));

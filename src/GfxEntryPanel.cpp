@@ -211,8 +211,10 @@ void GfxEntryPanel::updateImagePalette() {
 	if (combo_palette->globalSelected()) {
 		if (gfx_canvas->getImage()->hasBuiltInPalette())
 			pal.copyPalette(gfx_canvas->getImage()->getBuiltInPalette());
-		else
-			Misc::loadPaletteFromArchive(&pal, entry->getParent(), entry);
+		else {
+			if (!Misc::loadPaletteFromArchive(&pal, entry->getParent(), entry))
+				pal.copyPalette(thePaletteManager->globalPalette());
+		}
 	}
 	else
 		pal.copyPalette(combo_palette->getSelectedPalette());

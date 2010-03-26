@@ -70,7 +70,7 @@ Palette8bit* PaletteChooser::getSelectedPalette() {
 	if (GetSelection() > 0)
 		return thePaletteManager->getPalette(GetSelection() - 1);
 	else
-		return thePaletteManager->defaultPalette();
+		return thePaletteManager->globalPalette();
 }
 
 /* PaletteChooser::globalSelected

@@ -7,15 +7,15 @@ private:
 	wxListBox*	list_base_archive_paths;
 	wxButton*	btn_add;
 	wxButton*	btn_remove;
-	wxButton*	btn_edit;
 
 public:
 	BaseResourceArchivesPanel(wxWindow* parent);
 	~BaseResourceArchivesPanel();
+	
+	string	getSelectedPath();
 
 	void	onBtnAdd(wxCommandEvent& e);
 	void	onBtnRemove(wxCommandEvent& e);
-	void	onBtnEdit(wxCommandEvent& e);
 };
 
 #endif//__BASERESOURCEARCHIVESPANEL__

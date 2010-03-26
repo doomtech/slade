@@ -30,13 +30,15 @@ BaseResourceArchivesPanel::BaseResourceArchivesPanel(wxWindow* parent)
 	// Setup buttons
 	btn_add = new wxButton(this, -1, _T("Add Archive"));
 	btn_remove = new wxButton(this, -1, _T("Remove Archive"));
-	btn_edit = new wxButton(this, -1, _T("Edit Path"));
 
 	wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
 	vbox->Add(btn_add, 0, wxEXPAND|wxBOTTOM, 4);
 	vbox->Add(btn_remove, 0, wxEXPAND|wxBOTTOM, 4);
-	vbox->Add(btn_edit, 0, wxEXPAND, 0);
 	hbox->Add(vbox, 0, wxEXPAND|wxALL, 4);
+	
+	// Bind events
+	btn_add->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &BaseResourceArchivesPanel::onBtnAdd, this);
+	btn_remove->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &BaseResourceArchivesPanel::onBtnRemove, this);
 
 	// Init layout
 	Layout();
@@ -45,11 +47,33 @@ BaseResourceArchivesPanel::BaseResourceArchivesPanel(wxWindow* parent)
 BaseResourceArchivesPanel::~BaseResourceArchivesPanel() {
 }
 
+string BaseResourceArchivesPanel::getSelectedPath() {
+	return list_base_archive_paths->GetStringSelection();
+}
+
 void BaseResourceArchivesPanel::onBtnAdd(wxCommandEvent& e) {
+	// Create extensions string
+	string extensions = theArchiveManager->getArchiveExtensionsString();
+
+	// Open a file browser dialog that allows multiple selection
+	wxFileDialog dialog_open(this, _T("Choose file(s) to open"), wxEmptyString, wxEmptyString, extensions, wxFD_OPEN|wxFD_MULTIPLE|wxFD_FILE_MUST_EXIST, wxDefaultPosition);
+
+	// Run the dialog & check that the user didn't cancel
+	if (dialog_open.ShowModal() == wxID_OK) {
+		// Get an array of selected filenames
+		wxArrayString files;
+		dialog_open.GetPaths(files);
+
+		// Add each to the paths list
+		for (size_t a = 0; a < files.size(); a++) {
+			theArchiveManager->addBaseResourcePath(files[a]);
+			list_base_archive_paths->Append(files);
+		}
+	}
 }
 
 void BaseResourceArchivesPanel::onBtnRemove(wxCommandEvent& e) {
-}
-
-void BaseResourceArchivesPanel::onBtnEdit(wxCommandEvent& e) {
+	// Get the selected item index and remove it
+	int index = list_base_archive_paths->GetSelection();
+	list_base_archive_paths->Delete(index);
 }
