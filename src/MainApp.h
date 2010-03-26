@@ -11,7 +11,7 @@ public:
 	SLADELog() {}
 	~SLADELog() {}
 
-	void PerformLog(wxLogLevel level, const wxChar* str, time_t t);
+	void DoLogString(const wxString& msg, time_t t);
 };
 
 class MainApp : public wxApp {
