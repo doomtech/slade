@@ -10,6 +10,7 @@ enum SIFormat {
 	RGBA,		// 4 bytes per pixel: RGBA
 };
 
+// TODO: Fix up how palettes are handled (really should only need builtinpal)
 class SImage : public Announcer {
 private:
 	int			width;
