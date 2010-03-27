@@ -1002,7 +1002,6 @@ bool SImage::loadFont1(const uint8_t* gfx_data, int size) {
 	width = charwidth;
 	size_t charheight = gfx_data[6]+256*gfx_data[7];
 	height = charheight<<8;
-	size_t charsize = charwidth * charheight;
 	offset_x = offset_y = 0;
 
 	// Setup variables

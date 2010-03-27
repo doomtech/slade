@@ -294,6 +294,7 @@ void ArchiveManagerPanel::openTab(int archive_index) {
 			wp = new ArchivePanel(notebook_archives, archive);
 		else if (archive->getType() == ARCHIVE_ZIP)
 			wp = new ZipArchivePanel(notebook_archives, archive);
+		else return;
 
 		notebook_archives->AddPage(wp, archive->getFileName(false), true);
 		wp->Show(true);

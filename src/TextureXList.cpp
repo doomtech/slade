@@ -157,9 +157,6 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, ArchiveEntry* pnames
 	// Clear current textures/patches
 	clear();
 
-	// Get parent archive
-	Archive* parent_archive = texturex->getParent();
-
 	// Read PNAMES
 
 	// Read number of pnames

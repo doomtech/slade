@@ -52,6 +52,7 @@ MapEditorWindow::MapEditorWindow()
  * MapEditorWindow class destructor
  *******************************************************************/
 MapEditorWindow::~MapEditorWindow() {
+	delete map;
 }
 
 /* MapEditorWindow::setupLayout

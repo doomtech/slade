@@ -73,6 +73,13 @@ zipdir_t::zipdir_t() {
 	entry->setState(0);
 }
 
+/* zipdir_t::~zipdir_t
+ * zipdir_t struct destructor
+ *******************************************************************/
+zipdir_t::~zipdir_t() {
+	delete entry;
+}
+
 /* zipdir_t::entryExists
  * Checks if the given entry is in this zipdir. If include_subdirs is
  * true, also recursively checks any subdirectories in the zipdir.
@@ -297,6 +304,7 @@ ZipArchive::ZipArchive()
  * ZipArchive class destructor
  *******************************************************************/
 ZipArchive::~ZipArchive() {
+	delete directory;
 }
 
 /* ZipArchive::entryIndex
@@ -436,7 +444,7 @@ bool ZipArchive::openFile(string filename) {
 		} else {
 			// Zip entry is a directory, add it to the directory tree
 			wxFileName fn(entry->GetName(wxPATH_UNIX), wxPATH_UNIX);
-			zipdir_t* ndir = addDirectory(fn.GetPath(true, wxPATH_UNIX));
+			addDirectory(fn.GetPath(true, wxPATH_UNIX));
 		}
 
 		// Go to next entry in the zip file

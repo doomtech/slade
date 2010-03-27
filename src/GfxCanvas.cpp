@@ -76,6 +76,9 @@ GfxCanvas::GfxCanvas(wxWindow* parent, int id)
  * GfxCanvas class destructor
  *******************************************************************/
 GfxCanvas::~GfxCanvas() {
+	delete image;
+	delete tex_image;
+	delete tex_background;
 }
 
 /* GfxCanvas::draw
@@ -239,17 +242,6 @@ void GfxCanvas::drawImage() {
 	// Determine (texture)coordinates
 	double x = (double)image->getWidth();
 	double y = (double)image->getHeight();
-	double tex_x = 1;
-	double tex_y = 1;
-
-	/*
-	if (view_type == GFXVIEW_TILED) {
-		tex_x = (double)GetSize().x / x;
-		tex_y = (double)GetSize().y / y;
-		x = (double)GetSize().x;
-		y = (double)GetSize().y;
-	}
-	*/
 
 	// If tiled view
 	if (view_type == GFXVIEW_TILED) {

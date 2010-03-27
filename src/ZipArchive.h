@@ -11,6 +11,7 @@ struct zipdir_t {
 	zipdir_t*				parent_dir;
 
 	zipdir_t();
+	~zipdir_t();
 
 	string	getName() { return entry->getName(); }
 	void	setName(string name) { entry->setName(name); }

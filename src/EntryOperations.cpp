@@ -318,8 +318,6 @@ bool EntryOperations::modifyalPhChunk(ArchiveEntry* entry, bool value) {
 	// Read width and height from IHDR chunk
 	const uint8_t* data = entry->getData(true);
 	const ihdr_t* ihdr = (ihdr_t*)(data + 12);
-	uint32_t w = wxINT32_SWAP_ON_LE(ihdr->width);
-	uint32_t h = wxINT32_SWAP_ON_LE(ihdr->height);
 
 	// Find existing alPh chunk
 	uint32_t alph_start = 0;
@@ -425,8 +423,6 @@ bool EntryOperations::modifytRNSChunk(ArchiveEntry* entry, bool value) {
 	// Read width and height from IHDR chunk
 	const uint8_t* data = entry->getData(true);
 	const ihdr_t* ihdr = (ihdr_t*)(data + 12);
-	uint32_t w = wxINT32_SWAP_ON_LE(ihdr->width);
-	uint32_t h = wxINT32_SWAP_ON_LE(ihdr->height);
 
 	// tRNS chunks are only valid for paletted PNGs, and must be before the first IDAT.
 	// Specs say they must be after PLTE chunk as well, so to play it safe, we'll insert

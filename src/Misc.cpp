@@ -144,8 +144,6 @@ string Misc::sizeAsString(uint32_t size) {
 		double mb = (double)size / (1024*1024);
 		return s_fmt(_T("%1.2fmb"), mb);
 	}
-
-	return _T("");
 }
 
 

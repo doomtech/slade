@@ -142,8 +142,6 @@ bool EntryDataFormat::isFormat(MemChunk& mc, uint16_t format) {
 	default:
 		return false;
 	}
-	
-	return false;
 }
 
 bool EntryDataFormat::detectPng(MemChunk& mc) {

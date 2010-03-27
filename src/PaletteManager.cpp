@@ -68,6 +68,9 @@ PaletteManager::PaletteManager() {
 PaletteManager::~PaletteManager() {
 	for (size_t a = 0; a < palettes.size(); a++)
 		delete[] palettes[a];
+
+	delete pal_default;
+	delete pal_global;
 }
 
 Palette8bit* PaletteManager::globalPalette() {

@@ -50,6 +50,7 @@ CTextureCanvas::CTextureCanvas(wxWindow* parent, int id)
  *******************************************************************/
 CTextureCanvas::~CTextureCanvas() {
 	clearPatchTextures();
+	delete tex_background;
 }
 
 /* CTextureCanvas::clearTexture
