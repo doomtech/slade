@@ -22,7 +22,6 @@
     <File Name="src/Console.h"/>
     <File Name="src/CVar.cpp"/>
     <File Name="src/CVar.h"/>
-    <File Name="src/ListenerAnnouncer.cpp"/>
     <File Name="src/ListenerAnnouncer.h"/>
     <File Name="src/Main.h"/>
     <File Name="src/MainApp.cpp"/>
@@ -38,6 +37,7 @@
     <File Name="src/WxStuff.h"/>
     <File Name="src/OpenGL.cpp"/>
     <File Name="src/OpenGL.h"/>
+    <File Name="src/ListenerAnnouncer.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="Main Editor">
     <VirtualDirectory Name="UI Elements">
@@ -66,6 +66,7 @@
         <File Name="src/TextEntryPanel.h"/>
         <File Name="src/TextureXEntryPanel.cpp"/>
         <File Name="src/TextureXEntryPanel.h"/>
+        <File Name="src/ArchiveManagerPanel.cpp"/>
       </VirtualDirectory>
       <VirtualDirectory Name="ZipArchivePanel">
         <File Name="src/ZipArchivePanel.cpp"/>
@@ -73,7 +74,6 @@
         <File Name="src/ZipEntryListPanel.cpp"/>
         <File Name="src/ZipEntryListPanel.h"/>
       </VirtualDirectory>
-      <File Name="src/ArchiveManagerPanel.cpp"/>
       <File Name="src/ArchiveManagerPanel.h"/>
     </VirtualDirectory>
     <File Name="src/MainWindow.cpp"/>
@@ -241,6 +241,6 @@
       </AdditionalRules>
     </Configuration>
   </Settings>
-  <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>
+  <Dependencies Name="Debug"/>
 </CodeLite_Project>

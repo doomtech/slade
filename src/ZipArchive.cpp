@@ -1237,9 +1237,6 @@ void ZipArchive::deleteDirectory(zipdir_t* dir) {
 	dir->entries.clear();
 	dir->subdirectories.clear();
 
-	// Delete directory entry
-	delete dir->entry;
-
 	// Delete the directory itself
 	delete dir;
 

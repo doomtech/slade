@@ -61,6 +61,18 @@ void Listener::listenTo(Announcer* a) {
 	announcers.push_back(a);
 }
 
+/* Listener::stopListening
+ * 'Unsubscribes' this listener from an announcer
+ *******************************************************************/
+void Listener::stopListening(Announcer* a) {
+	for (size_t i = 0; i < announcers.size(); i++) {
+		if (announcers[i] == a) {
+			announcers.erase(announcers.begin() + i);
+			return;
+		}
+	}
+}
+
 /* Listener::onAnnouncement
  * Called when an announcer that this listener is listening to
  * announces an event. Does nothing by default, is to be overridden
@@ -85,6 +97,8 @@ Announcer::Announcer() {
  * Announcer class destructor
  *******************************************************************/
 Announcer::~Announcer() {
+	for (size_t a = 0; a < listeners.size(); a++)
+		listeners[a]->stopListening(this);
 }
 
 /* Announcer::addListener
