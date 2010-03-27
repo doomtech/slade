@@ -127,3 +127,26 @@ short Palette8bit::findColour(rgba_t colour) {
 
 	return -1;
 }
+
+/* Palette8bit::countColours
+ * Returns the number of unique colors in a palette
+ *******************************************************************/
+size_t Palette8bit::countColours() {
+	rgba_t * usedcolours = new rgba_t[256];
+	memset(usedcolours, 0, 256*sizeof(rgba_t));
+	size_t used = 0;
+
+	for (int a = 0; a < 256; a++) {
+		bool found = false;
+		for (size_t b = 0; b < used; b++) {
+			if (colours[a].equals(usedcolours[b])) {
+				found = true;
+				break;
+			}
+		}
+		if (!found)
+			usedcolours[used++].set(colours[a]);
+	}
+	delete[] usedcolours;
+	return used;
+}

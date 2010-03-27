@@ -11,7 +11,7 @@
  * BOOM'S ANIMATED LUMP
  *******************************************************************/
 
-enum
+enum AnimatedType
 {
 	ANIM_FLAT = 0,
 	ANIM_TEXTURE = 1,
@@ -33,7 +33,7 @@ struct animated_t
  * BOOM'S SWITCHES LUMP
  *******************************************************************/
 
-enum
+enum SwitchesType
 {
 	SWCH_STOP = 0,
 	SWCH_DEMO = 1,

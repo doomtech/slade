@@ -5,7 +5,7 @@
 #include "CTexture.h"
 #include "ArchiveEntry.h"
 
-enum {
+enum TextureXFormat {
 	TXF_NORMAL,
 	TXF_STRIFE11,
 	TXF_NAMELESS,

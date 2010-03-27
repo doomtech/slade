@@ -26,6 +26,7 @@ public:
 
 	void	copyPalette(Palette8bit* copy);
 	short	findColour(rgba_t colour);
+	size_t	countColours();
 };
 
 #endif //__PALETTE_H__

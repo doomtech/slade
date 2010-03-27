@@ -54,7 +54,7 @@ namespace Global {
 	extern string version;
 };
 
-enum { DIR_USER, DIR_DATA, DIR_APP, DIR_TEMP };
+enum Directory { DIR_USER, DIR_DATA, DIR_APP, DIR_TEMP };
 string appPath(string filename, int dir);
 
 #endif //__MAIN_H__

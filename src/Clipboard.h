@@ -4,7 +4,7 @@
 
 #include "ArchiveEntry.h"
 
-enum {
+enum ClipboardType {
 	CLIPBOARD_ENTRY,
 	CLIPBOARD_ZIPDIR,
 	CLIPBOARD_COMPOSITE_TEXTURE,

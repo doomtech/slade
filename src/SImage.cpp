@@ -385,13 +385,12 @@ bool SImage::loadImage(const uint8_t* img_data, int size) {
 	// Get image palette if it exists
 	RGBQUAD* bm_pal = FreeImage_GetPalette(bm);
 	if (bm_pal) {
-		has_palette = true;
 		has_builtinpal = true;
 		for (int a = 0; a < 256; a++)
 			builtinpal.setColour(a, rgba_t(bm_pal[a].rgbRed, bm_pal[a].rgbGreen, bm_pal[a].rgbBlue, 255));
+	} else {
+		has_builtinpal = false;
 	}
-	else
-		has_palette = false;
 
 	// Get width & height
 	width = FreeImage_GetWidth(bm);
@@ -399,6 +398,7 @@ bool SImage::loadImage(const uint8_t* img_data, int size) {
 
 	// Set format
 	format = RGBA;
+	has_palette = has_builtinpal;
 
 	// Convert to 32bpp & flip vertically
 	FIBITMAP *rgb = FreeImage_ConvertTo32Bits(bm);
@@ -493,6 +493,7 @@ bool SImage::loadDoomGfx(const uint8_t* gfx_data, int size, uint8_t version) {
 	// Init variables
 	uint32_t* col_offsets = NULL;
 	has_palette = true;
+	has_builtinpal = false;
 	format = PALMASK;
 
 	// Read header
@@ -631,6 +632,7 @@ bool SImage::loadDoomFlat(const uint8_t* gfx_data, int size) {
 
 	// Setup variables
 	has_palette = true;
+	has_builtinpal = false;
 	format = PALMASK;
 
 	// Clear current data if it exists
@@ -668,6 +670,7 @@ bool SImage::loadDoomArah(const uint8_t* gfx_data, int size) {
 	offset_x = wxINT16_SWAP_ON_BE(header->left);
 	offset_y = wxINT16_SWAP_ON_BE(header->top);
 	has_palette = true;
+	has_builtinpal = false;
 	format = PALMASK;
 
 	// Clear current data if it exists
@@ -720,6 +723,7 @@ bool SImage::loadDoomSnea(const uint8_t* gfx_data, int size) {
 
 	// Setup variables
 	has_palette = true;
+	has_builtinpal = false;
 	format = PALMASK;
 
 	// Clear current data if it exists
@@ -868,6 +872,7 @@ bool SImage::loadImgz(const uint8_t* gfx_data, int size) {
 	offset_x = wxINT16_SWAP_ON_BE(header->left);
 	offset_y = wxINT16_SWAP_ON_BE(header->top);
 	has_palette = true;
+	has_builtinpal = false;
 	format = PALMASK;
 
 	// Create data (all white) and mask
@@ -1003,6 +1008,7 @@ bool SImage::loadFont1(const uint8_t* gfx_data, int size) {
 	// Setup variables
 	offset_x = offset_y = 0;
 	has_palette = true;
+	has_builtinpal = false;
 	format = PALMASK;
 
 	// Clear current data if it exists
@@ -1233,6 +1239,7 @@ bool SImage::loadFontM(const uint8_t* gfx_data, int size) {
 	// Setup variables
 	offset_x = offset_y = 0;
 	has_palette = true;
+	has_builtinpal = false;
 	format = PALMASK;
 
 	size_t charwidth = 8;
@@ -1258,6 +1265,76 @@ bool SImage::loadFontM(const uint8_t* gfx_data, int size) {
 	return true;
 }
 
+
+/* SImage::countColours
+ * Returns the number of unique colors in a paletted image
+ *******************************************************************/
+size_t SImage::countColours() {
+	// If the picture is not paletted, return 0.
+	if (format != PALMASK)
+		return 0;
+
+	bool * usedcolours = new bool[256];
+	memset(usedcolours, 0, 256);
+	size_t used = 0;
+
+	for (int a = 0; a < width*height; ++a) {
+		usedcolours[data[a]] = true;
+	}
+	for (size_t b = 0; b < 256; ++b) {
+		if (usedcolours[b])
+			++used;
+	}
+
+	delete[] usedcolours;
+	return used;
+}
+
+/* SImage::shrinkPalette
+ * Shifts all the used colours to the beginning of the palette
+ *******************************************************************/
+void SImage::shrinkPalette() {
+	// If the picture is not paletted, stop.
+	if (format != PALMASK)
+		return;
+
+	// Copy the palette if needed
+	if (!has_builtinpal) {
+		builtinpal = palette;
+		has_builtinpal = true;
+	}
+
+	Palette8bit newpal;
+
+	bool * usedcolours = new bool[256];
+	int * remap = new int[256];
+	memset(usedcolours, 0, 256);
+	size_t used = 0;
+
+	// Count all color indices actually used on the picture
+	for (int a = 0; a < width*height; ++a) {
+		usedcolours[data[a]] = true;
+	}
+
+	// Create palette remapping information
+	for (size_t b = 0; b < 256; ++b) {
+		if (usedcolours[b]) {
+			newpal.setColour(used, builtinpal.colour(b));
+			remap[b] = used;
+			++used;
+		}
+	}
+
+	// Remap image to new palette indices
+	for (int c = 0; c < width*height; ++c) {
+		data[c] = remap[data[c]];
+	}
+	builtinpal.copyPalette(&newpal);
+
+	// Cleanup
+	delete[] usedcolours;
+	delete[] remap;
+}
 
 /* SImage::toPNG
  * Writes the image as PNG data to <out>, keeping palette information
@@ -1540,10 +1617,7 @@ bool SImage::toDoomFlat(MemChunk& out) {
 	}
 
 	// Check image size
-	if (!((width == 64 && height == 64) ||
-			(width == 64 && height == 128) ||
-			(width == 128 && height == 128) ||
-			(width == 320 && height == 200))) {
+	if (!validFlatSize()) {
 		wxLogMessage(_T("Cannot convert to doom flat format, invalid size (must be either 64x64, 64x128, 128x128 or 320x200)"));
 		return false;
 	}
@@ -1551,6 +1625,80 @@ bool SImage::toDoomFlat(MemChunk& out) {
 	// If it's paletted simply write out the data straight
 	out.write(data, width * height);
 
+	return true;
+}
+
+/* SImage::toPlanar
+ * Writes the image as planar data to <out>. Returns false if the
+ * image is not a valid candidate (16 colors max, 640x480 dimension),
+ * true otherwise
+ *******************************************************************/
+bool SImage::toPlanar(MemChunk& out) {
+	// Check if data is paletted
+	if (format != PALMASK) {
+		wxLogMessage(_T("Cannot convert truecolour image to planar format - convert to 16-colour first."));
+		return false;
+	}
+
+	if (countColours() > 16) {
+		wxLogMessage(s_fmt(_T("Cannot convert to planar format, too many colors (%d)"), countColours()));
+		return false;
+	}
+
+	// Check image size
+	if (!(width == 640 && height == 480)) {
+		wxLogMessage(_T("Cannot convert to planar format, invalid size (must be 640x480)"));
+		return false;
+	}
+
+	// Make sure all uses colors are in the first 16 entries of the palette
+	shrinkPalette();
+
+	// Create planar palette
+	uint8_t * mycolors = new uint8_t[3];
+	for (size_t i = 0; i < 16; ++i) {
+		mycolors[0] = builtinpal.colour(i).r>>2;
+		mycolors[1] = builtinpal.colour(i).g>>2;
+		mycolors[2] = builtinpal.colour(i).b>>2;
+		out.write(mycolors, 3);
+	}
+	delete[] mycolors;
+
+	// Create bitplanes
+	uint8_t * planes = new uint8_t[153600];
+
+	uint8_t *pln1, *pln2, *pln3, *pln4, *read;
+	size_t plane_size = 153600/4;
+
+	read = data;
+	pln1 = planes;				// 80: 10000000	08: 00001000
+	pln2 = pln1 + plane_size;	// 40: 01000000 04: 00000100
+	pln3 = pln2 + plane_size;	// 20: 00100000 02: 00000010
+	pln4 = pln3 + plane_size;	// 10: 00010000 01: 00000001
+
+	for (int y = height; y > 0; --y)
+	{
+		for (int x = width; x > 0; x -= 8)
+		{
+			*pln1 = ((read[0] & 0x01) << 7 | (read[1] & 0x01) << 6 | (read[2] & 0x01) << 5 | (read[3] & 0x01) << 4
+					|(read[4] & 0x01) << 3 | (read[5] & 0x01) << 2 | (read[6] & 0x01) << 1 | (read[7] & 0x01)     );
+			*pln2 = ((read[0] & 0x02) << 6 | (read[1] & 0x02) << 5 | (read[2] & 0x02) << 4 | (read[3] & 0x02) << 3
+					|(read[4] & 0x02) << 2 | (read[5] & 0x02) << 1 | (read[6] & 0x02)      | (read[7] & 0x02) >> 1);
+			*pln3 = ((read[0] & 0x04) << 5 | (read[1] & 0x04) << 4 | (read[2] & 0x04) << 3 | (read[3] & 0x04) << 2
+					|(read[4] & 0x04) << 1 | (read[5] & 0x04)      | (read[6] & 0x04) >> 1 | (read[7] & 0x04) >> 2);
+			*pln4 = ((read[0] & 0x08) << 4 | (read[1] & 0x08) << 3 | (read[2] & 0x08) << 2 | (read[3] & 0x08) << 1
+					|(read[4] & 0x08)      | (read[5] & 0x08) >> 1 | (read[6] & 0x08) >> 2 | (read[7] & 0x08) >> 3);
+			read += 8;
+			pln1 += 1;
+			pln2 += 1;
+			pln3 += 1;
+			pln4 += 1;
+		}
+	}
+
+	// Write image and cleanup
+	out.write(planes, 153600);
+	delete[] planes;
 	return true;
 }
 

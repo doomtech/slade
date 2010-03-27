@@ -28,6 +28,18 @@
  *			- Select transparency colour (to 32bit - select colour, to paletted - select from target palette)
  */
 
+enum ConversionFormat {
+	// Paletted first, then 32-bit formats.
+	// GfxConvDialog::doConvert() expects PNG8BIT to be the last of the paletted formats
+	CONV_DOOMFLAT = 0,
+	CONV_DOOMGFX,
+	CONV_PLANAR,
+	CONV_PNG8BIT,
+	CONV_PNG32BIT,
+
+	NUMCONVS
+};
+
 class GfxConvDialog : public wxDialog {
 private:
 	vector<ArchiveEntry*>	entries;

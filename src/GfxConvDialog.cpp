@@ -91,11 +91,13 @@ bool GfxConvDialog::writeToEntry() {
 
 	// Write target image to selected type
 	int format = combo_target_format->GetCurrentSelection();
-	if (format == 0)
+	if (format == CONV_DOOMFLAT)
 		gfx_target->getImage()->toDoomFlat(mc);
-	else if (format == 1)
+	else if (format == CONV_DOOMGFX)
 		gfx_target->getImage()->toDoomGfx(mc);
-	else if (format > 1)
+	else if (format == CONV_PLANAR)
+		gfx_target->getImage()->toPlanar(mc);
+	else if (format == CONV_PNG8BIT || format == CONV_PNG32BIT)
 		gfx_target->getImage()->toPNG(mc);
 
 	// Write data to the entry
@@ -115,10 +117,16 @@ void GfxConvDialog::setupLayout() {
 	m_vbox->Add(hbox, 0, wxEXPAND|wxTOP|wxLEFT|wxRIGHT, 4);
 
 	// Add 'Convert To' combo box
-	hbox->Add(new wxStaticText(this, -1, _T("Convert to:")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
+	hbox->Add(new wxStaticText(this, -1, _T("Convert to:")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
 
-	wxString s_formats[] = { _T("Doom Flat Format"), _T("Doom Graphic Format"), _T("PNG Format (8bit Paletted)"), _T("PNG Format (32bit Truecolour)") };
-	combo_target_format = new wxComboBox(this, -1, s_formats[1], wxDefaultPosition, wxDefaultSize, 4, s_formats, wxCB_READONLY);
+	// This must remain in sync with the ConversionFormat enum in the header
+	wxString s_formats[] = { 
+		_T("Doom Flat Format"), 
+		_T("Doom Graphic Format"), 
+		_T("Hexen Planar Format"), 
+		_T("PNG Format (8bit Paletted)"), 
+		_T("PNG Format (32bit Truecolour)") };
+	combo_target_format = new wxComboBox(this, -1, s_formats[CONV_DOOMGFX], wxDefaultPosition, wxDefaultSize, NUMCONVS, s_formats, wxCB_READONLY);
 	combo_target_format->Select(1);
 	hbox->Add(combo_target_format, 1, wxEXPAND|wxALL, 4);
 
@@ -257,13 +265,14 @@ void GfxConvDialog::updatePreviewGfx() {
 
 	// Load entry palette to each image if needed
 	Palette8bit* pal_archive = new Palette8bit();
-	if (gfx_current->getImage()->hasPalette() && gfx_current->getImage()->hasBuiltInPalette())
+
+	if (gfx_current->getImage()->hasBuiltInPalette())
 		pal_archive->copyPalette(gfx_current->getImage()->getBuiltInPalette());
+	else if (entry->getParent())
+		Misc::loadPaletteFromArchive(pal_archive, entry->getParent(), entry);
 	else // If no palette is found in the entry's parent archive, set the palette to the global palette
 		pal_archive->copyPalette(thePaletteManager->globalPalette());
 
-	if (entry->getParent())
-		Misc::loadPaletteFromArchive(pal_archive, entry->getParent(), entry);
 
 	// Set both image palette depending on what is selected for the 'current' palette
 	if (pal_chooser_current->globalSelected()) {
@@ -316,7 +325,7 @@ void GfxConvDialog::updateControls() {
 		pal_chooser_current->Enable(false);
 
 	// Disable/enable target gfx palette as needed
-	if (combo_target_format->GetCurrentSelection() == 3)
+	if (combo_target_format->GetCurrentSelection() == CONV_PNG32BIT)
 		pal_chooser_target->Enable(false);
 	else
 		pal_chooser_target->Enable(true);
@@ -371,7 +380,7 @@ bool GfxConvDialog::doConvert() {
 
 	// Do the conversion
 	int format = combo_target_format->GetCurrentSelection();
-	if (format <= 2) {
+	if (format <= CONV_PNG8BIT) {
 		// Convert to selected palette
 		gfx_target->getImage()->convertPaletted(&target_pal, alpha_threshold, keep_trans, colour_trans);
 	}
@@ -385,8 +394,8 @@ bool GfxConvDialog::doConvert() {
 	}
 
 
-	// If doom flat or no transparency is selected, remove any transparency
-	if (format == 0 || !transparency)
+	// If doom flat, planar or no transparency is selected, remove any transparency
+	if (format == CONV_DOOMFLAT || format == CONV_PLANAR || !transparency)
 		gfx_target->getImage()->fillAlpha(255);	// No transparency
 
 	return true;
@@ -447,10 +456,20 @@ void GfxConvDialog::onBtnSkipAll(wxCommandEvent& e) {
  *******************************************************************/
 void GfxConvDialog::onTargetFormatChanged(wxCommandEvent& e) {
 	// Check image size if doom flat format is selected
-	if (combo_target_format->GetCurrentSelection() == 0) {
+	if (combo_target_format->GetCurrentSelection() == CONV_DOOMFLAT) {
 		if (!gfx_current->getImage()->validFlatSize()) {
 			wxMessageBox(_T("Doom Flat format only supports images of size 64x64, 64x128, 128x128 or 320x200"), _T("Invalid Image Size"), wxOK|wxICON_ERROR);
-			combo_target_format->SetSelection(1);
+			combo_target_format->SetSelection(CONV_DOOMGFX);
+		}
+	}
+	else if (combo_target_format->GetCurrentSelection() == CONV_PLANAR) {
+		if (gfx_current->getImage()->getWidth() != 640 || gfx_current->getImage()->getHeight() != 480) {
+			wxMessageBox(_T("Hexen planar format only supports images of size 640x480"), _T("Invalid Image Size"), wxOK|wxICON_ERROR);
+			combo_target_format->SetSelection(CONV_DOOMGFX);
+		}
+		else if (gfx_current->getImage()->countColours() > 16) {
+			wxMessageBox(_T("Hexen planar format only supports images with 16 colors or less"), _T("Invalid Palette Size"), wxOK|wxICON_ERROR);
+			combo_target_format->SetSelection(CONV_DOOMGFX);
 		}
 	}
 

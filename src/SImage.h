@@ -55,6 +55,8 @@ public:
 	short	findUnusedColour();
 	bool	trim(int width, int height);
 	bool	validFlatSize();
+	size_t	countColours();
+	void	shrinkPalette();
 
 	// Image format reading
 	bool	loadImage(const uint8_t* data, int size);
@@ -76,6 +78,7 @@ public:
 	bool	toPNG(MemChunk& out);
 	bool	toDoomGfx(MemChunk& out, uint8_t alpha_threshold = 0);
 	bool	toDoomFlat(MemChunk& out);
+	bool	toPlanar(MemChunk& out);
 
 	// Conversion stuff
 	bool	convertRGBA();

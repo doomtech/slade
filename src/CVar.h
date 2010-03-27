@@ -18,7 +18,7 @@ union CVarValue {
 	const char* String;
 };
 
-enum {
+enum CVarProperty {
 	CVAR_SAVE	= 1,	// set if cvar is saved to config file
 	CVAR_SECRET	= 2,	// set if cvar is not listed when cvarlist command called
 	CVAR_LOCKED = 4,	// set if cvar cannot be changed by the user during runtime
