@@ -178,6 +178,64 @@ bool EntryDataFormat::detectBmp(MemChunk& mc) {
 	return false;
 }
 
+bool EntryDataFormat::detectPcx(MemChunk& mc) {
+	// Check size
+	if (mc.getSize() < 129)
+		return false;
+	// Manufacturer and encoding fields: must always be 10 and 1 respectively
+	if (mc[0] != 0x0A || mc[2] != 0x01)
+		return false;
+	// Version field: only 0, 2, 3, 4 and 5 exist
+	if (mc[1] > 5 || mc[1] == 1)
+		return false;
+	// Bit depth and color plane fields are used in combination
+	switch (mc[3]) {
+		case 1: // Monochrome, EGA or VGA
+			if (mc[65] != 1 && mc[65] != 3 && mc[65] != 4)	return false;	break;
+		case 2: // CGA
+			if (mc[65] != 1)								return false;	break;
+		case 4: // EGA or VGA
+			if (mc[65] != 1 && mc[65] != 2)					return false;	break;
+		case 8: // VGA, SVGA or SVGA with alpha
+			if (mc[65] != 1 && mc[65] != 3 && mc[65] != 4)	return false;	break;
+		default: // Not a valid bit depth
+			return false;
+	}
+	// In 256-color mode, the palette, if any, is contained at the end
+	// of the file and preceded by a 0x0C. Only version 5 is concerned.
+	if (mc[1] == 5 && ((mc[3] == 8 && mc[65] == 1) || (mc[3] == 4 && mc[65] == 2))) {
+		size_t filesize = mc.getSize();
+		if (filesize < 900 || mc[filesize-769] != 12)
+			return false;
+	}
+	// Reserved value; theoretically values other than 0 can be valid
+	// if the image was created by some old version of Paintbrush, but
+	// it's unlikely such pictures would be manipulated by SLADE3, so
+	// instead we use it to cull false positives.
+	if (mc[64] != 0)
+		return false;
+	// Padding filler bits; theoretically they might be set to garbage
+	// values but again it's better to use them to cull false positives.
+	for (size_t i = 74; i < 128; ++i)
+		if (mc[i] != 0)
+			return false;
+	// Min/Max fields
+	int16_t offsx, offsy, limx, limy, width, height;
+	offsx = (int16_t) (mc[ 4] + (mc[ 5]<<8));
+	offsy = (int16_t) (mc[ 6] + (mc[ 7]<<8));
+	limx  = (int16_t) (mc[ 8] + (mc[ 9]<<8));
+	limy  = (int16_t) (mc[10] + (mc[11]<<8));
+	width = 1 + limx - offsx; height = 1 + limy - offsy;
+	// Compute number of bytes needed per scanline, and account for possible padding
+	int16_t bnpsl = (width * mc[3]) / 8; if (bnpsl % 2) bnpsl++;
+	// Bytes per scanline field is always an even number and should correspond to guessed value
+	int16_t bpsl = (int16_t) (mc[66] + (mc[67]<<8));
+	if (bpsl%2 || bpsl != bnpsl)
+		return false;
+	// Passed all tests, so this seems to be a valid PCX
+	return true;
+}
+
 bool EntryDataFormat::detectJpeg(MemChunk& mc) {
 	// Check size
 	if (mc.getSize() > 128) {

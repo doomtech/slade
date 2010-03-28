@@ -48,4 +48,6 @@ struct switches_t
 	uint16_t	type;
 };
 
+// Can restore default packing now
+#pragma pack()
 #endif //BINARYCONTROLLUMPS_H
