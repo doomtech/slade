@@ -57,10 +57,9 @@ uint32_t valid_flat_size[][2] = {
 	{ 128, 128 },	// \ 
 	{ 256, 256 },	// hires flat size
 	{ 512, 512 },	// /
-	{ 320, 158 },	// default autopage format
 	{ 320, 200 },	// full screen format
 };
-uint32_t	n_valid_flat_sizes = 11;
+uint32_t	n_valid_flat_sizes = 10;
 
 
 /*******************************************************************
@@ -345,8 +344,7 @@ bool SImage::validFlatSize() {
 			height == valid_flat_size[a][1])
 			return true;
 	}
-
-	return false;
+	return (width == 320);
 }
 
 /* SImage::loadImage
@@ -626,8 +624,12 @@ bool SImage::loadDoomFlat(const uint8_t* gfx_data, int size) {
 	// Check valid size
 	if (!valid_size)
 	{
-		if (size % 320)		// This should handle any custom AUTOPAGE
+		if (size % 320)	{	// This should handle any custom AUTOPAGE
 			return false;
+		} else {
+			width = 320;
+			height = size/320;
+		}
 	}
 
 	// Setup variables
