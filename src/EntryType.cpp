@@ -332,18 +332,6 @@ bool EntryDataFormat::detectDoomGfxSnea(MemChunk& mc) {
 	return true;
 }
 
-/* This format is used in Doom alpha 0.4 for the GNUM0 to 
- * GNUM9 lumps. They are 120 bytes long, and apparently
- * correspond to a 10x12 graphic, presumably raw format
- * and without transparency. DeuTex does nothing with
- * them, but they were mentioned in the TODO.
- */
-bool EntryDataFormat::detectDoomGfxGnum(MemChunk& mc) {
-	if (mc.getSize() != 120)
-		return false;
-	return true;
-}
-
 /* This format is used in Doom alpha 0.2. DeuTex doesn't know it,
  * but it seems a really simple format, basically a eight-byte
  * header for size and offsets followed by a raw format dump.
@@ -373,20 +361,15 @@ bool EntryDataFormat::detectDoomGfxArah(MemChunk& mc) {
 	return true;
 }
 
-bool EntryDataFormat::detectAutopage(MemChunk& mc) {
-	// The lumps in Heretic.wad and Hexen.wad are 320x158 (50560 bytes),
-	// but any size that's a multiple of 320 will be accepted by ZDoom.
-	uint32_t size = mc.getSize();
-
-	if ((size % 320) == 0)
-		return true;
-	else
-		return false;
-}
-
 bool EntryDataFormat::detectPlanar(MemChunk& mc) {
 	// 640x480 4-bit graphic with 48-bit, 16-color palette.
 	if (mc.getSize() != 153648)
+		return false;
+	return true;
+}
+
+bool EntryDataFormat::detect4bitChunk(MemChunk& mc) {
+	if (mc.getSize() != 32 && mc.getSize() != 184)
 		return false;
 	return true;
 }
@@ -418,16 +401,8 @@ bool EntryDataFormat::detectImgz(MemChunk& mc) {
 	return true;
 }
 
-bool EntryDataFormat::detectStrifeStartup(MemChunk& mc) {
-	// The little sprites shown during the Strife startup screen.
-	uint32_t size = mc.getSize();
-
-	if (size == 256 || size == 2048 || size == 2304)
-		return true;
-	else
-		return false;
-}
-
+extern uint32_t	n_valid_flat_sizes;
+extern uint32_t valid_flat_size[][2];
 
 bool EntryDataFormat::detectDoomFlat(MemChunk& mc) {
 	// Not too sure how I should go about detecting this - just checking size as
@@ -435,14 +410,11 @@ bool EntryDataFormat::detectDoomFlat(MemChunk& mc) {
 	// archive could make things confusing for the user. Blah.
 	uint32_t size = mc.getSize();
 
-	if (size == 4096 ||
-		size == 8192 ||
-		size == 16384 ||
-		size == 65536 ||
-		size == 64000)
-		return true;
-	else
-		return false;
+	for (size_t i = 0; i < n_valid_flat_sizes; ++i) {
+		if (size == valid_flat_size[i][0]*valid_flat_size[i][1])
+			return true;
+	}
+	return !(size < 320 || size % 320);
 }
 
 bool EntryDataFormat::detectPalette(MemChunk& mc) {

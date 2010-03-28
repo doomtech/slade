@@ -34,6 +34,7 @@ enum ConversionFormat {
 	CONV_DOOMFLAT = 0,
 	CONV_DOOMGFX,
 	CONV_PLANAR,
+	CONV_4BITCHUNKY,
 	CONV_PNG8BIT,
 	CONV_PNG32BIT,
 
@@ -79,6 +80,7 @@ public:
 	bool	openEntries(vector<ArchiveEntry*> entries);
 	void	updatePreviewGfx();
 	void	updateControls();
+	void	validateTargetFormat();
 	bool	doConvert();
 	bool	writeToEntry();
 

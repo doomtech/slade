@@ -855,6 +855,38 @@ bool SImage::loadPlanar(const uint8_t* gfx_data, int size) {
 	return true;
 }
 
+/* SImage::load4bitChunk
+ * Loads a 4bit graphic such as those used by Hexen's startup screen.
+ * Returns false if the image data was invalid, true otherwise.
+ *******************************************************************/
+bool SImage::load4bitChunk(const uint8_t* gfx_data, int size) {
+	// Check data
+	if (!gfx_data)
+		return false;
+
+	// Check size
+	if (size == 32) {
+		width = 4;
+		height = 16;
+	} else if (size == 184) {
+		width = 16;
+		height = 23;
+	} else return false;
+
+	format = PALMASK;
+	has_palette = true;
+	has_builtinpal = false;
+	clearData();
+	data = new uint8_t[width*height];
+	mask = new uint8_t[width*height];
+	memset(mask, 0xFF, width*height);
+
+	for (int i = 0; i < size; ++i) {
+		data[i*2  ] = ((gfx_data[i] & 0xF0)>>4);
+		data[i*2+1] =  (gfx_data[i] & 0x0F);
+	}
+	return true;
+}
 /* SImage::loadImgz
  * Loads a picture in ZDoom's imgz format, using code adapted from it.
  * This format is special in that the info given is only for the alpha
@@ -1650,7 +1682,7 @@ bool SImage::toPlanar(MemChunk& out) {
 		return false;
 	}
 
-	// Make sure all uses colors are in the first 16 entries of the palette
+	// Make sure all used colors are in the first 16 entries of the palette
 	shrinkPalette();
 
 	// Create planar palette
@@ -1698,6 +1730,44 @@ bool SImage::toPlanar(MemChunk& out) {
 	// Write image and cleanup
 	out.write(planes, 153600);
 	delete[] planes;
+	return true;
+}
+
+/* SImage::to4bitChunk
+ * Writes the image as 4-bit chunky data to <out>. Returns false if the
+ * image is not a valid candidate, true otherwise
+ *******************************************************************/
+bool SImage::to4bitChunk(MemChunk& out) {
+	// Check if data is paletted
+	if (format != PALMASK) {
+		wxLogMessage(_T("Cannot convert truecolour image to 4-bit format - convert to 16-colour first."));
+		return false;
+	}
+
+	if (countColours() > 16) {
+		wxLogMessage(s_fmt(_T("Cannot convert to 4-bit format, too many colors (%d)"), countColours()));
+		return false;
+	}
+
+	// Check image size
+	if (!((width == 4 && height == 16) || (width == 16 && height == 23))) {
+		wxLogMessage(_T("No point in converting to 4-bit format, image isn't a valid Hexen size (4x16 or 16x23)"));
+		return false;
+	}
+
+	// Make sure all used colors are in the first 16 entries of the palette
+	shrinkPalette();
+
+	size_t filesize = width * height / 2;
+	uint8_t * temp = new uint8_t[filesize];
+
+	for (int i = 0; i < width * height; i+=2) {
+		temp[i/2] = data[i]<<4 | data[i+1];
+	}
+
+	// Write image and cleanup
+	out.write(temp, filesize);
+	delete[] temp;
 	return true;
 }
 

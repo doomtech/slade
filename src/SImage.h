@@ -67,6 +67,7 @@ public:
 	bool	loadDoomFlat(const uint8_t* data, int size);
 	bool	loadDoomArah(const uint8_t* gfx_data, int size);
 	bool	loadPlanar(const uint8_t* gfx_data, int size);
+	bool	load4bitChunk(const uint8_t* gfx_data, int size);
 	bool	loadImgz(const uint8_t* gfx_data, int size);
 	bool	loadFont0(const uint8_t* gfx_data, int size);
 	bool	loadFont1(const uint8_t* gfx_data, int size);
@@ -79,6 +80,7 @@ public:
 	bool	toDoomGfx(MemChunk& out, uint8_t alpha_threshold = 0);
 	bool	toDoomFlat(MemChunk& out);
 	bool	toPlanar(MemChunk& out);
+	bool	to4bitChunk(MemChunk& out);
 
 	// Conversion stuff
 	bool	convertRGBA();

@@ -30,13 +30,15 @@ xy(EDF_GFX_DOOM,		"gfx_doom",			detectDoomGfx,			loadDoomGfx)
 // Doom flat format and other raw images: 64x64, 64x128, 128x128, 256x256
 xy(EDF_GFX_FLAT,		"gfx_flat",			detectDoomFlat,			loadDoomFlat)
 // 320x?
-xy(EDF_GFX_AUTOPAGE,	"autopage",			detectAutopage,			loadDoomFlat)
+xy(EDF_GFX_AUTOPAGE,	"autopage",			detectDoomFlat,			loadDoomFlat)
 // 320x200
 xy(EDF_GFX_FULLSCREEN,	"fullscreen",		detectDoomFlat,			loadDoomFlat)
 // 16x16, 32x64 or 48x48
-xy(EDF_GFX_STRIFESU,	"strifestart",		detectStrifeStartup,	loadDoomFlat)
+xy(EDF_GFX_STRIFESU,	"strifestart",		detectDoomFlat,			loadDoomFlat)
 // Hexen planar graphic
 xy(EDF_GFX_PLANAR,		"planar",			detectPlanar,			loadPlanar)
+// ZDoom Hexen notches
+xy(EDF_GFX_4BITCHUNK,	"4bitchunk",		detect4bitChunk,		load4bitChunk)
 // Alpha Doom gfx format
 xy(EDF_GFX_DOOM_ALPHA,	"gfx_doom_alpha",	detectDoomGfxAlpha,		loadDoomGfxA)
 // Alpha Doom Raw and Header format
@@ -46,7 +48,7 @@ xy(EDF_GFX_DOOM_BETA,	"gfx_doom_beta",	detectDoomGfxBeta,		loadDoomGfxB)
 // Alpha Doom snea format
 xy(EDF_GFX_DOOM_SNEA,	"gfx_doom_snea",	detectDoomGfxSnea,		loadDoomSnea)
 // 10x12
-xy(EDF_GFX_DOOM_GNUM,	"gfx_doom_gnum",	detectDoomGfxGnum,		loadDoomFlat)
+xy(EDF_GFX_DOOM_GNUM,	"gfx_doom_gnum",	detectDoomFlat,			loadDoomFlat)
 // ZDoom IMGZ graphic
 xy(EDF_GFX_IMGZ,		"gfx_imgz",			detectImgz,				loadImgz)
 // Alpha font format (huf)

@@ -145,12 +145,12 @@ bool GfxEntryPanel::loadEntry(ArchiveEntry* entry) {
 	this->entry = entry;
 	setModified(false);
 
-	// Setup palette
-	updateImagePalette();
-
 	// Attempt to load the image
 	if (!Misc::loadImageFromEntry(gfx_canvas->getImage(), this->entry))
 		return false;
+
+	// Setup palette
+	updateImagePalette();
 
 	// Set offset text boxes
 	spin_xoffset->SetValue(gfx_canvas->getImage()->offset().x);

@@ -68,15 +68,7 @@ void GfxConvDialog::nextEntry() {
 	}
 
 	updatePreviewGfx();
-
-	// Check image size if doom flat format is selected
-	if (combo_target_format->GetCurrentSelection() == 0) {
-		if (!gfx_current->getImage()->validFlatSize()) {
-			wxMessageBox(_T("Doom Flat format only supports images of size 64x64, 64x128, 128x128 or 320x200"), _T("Invalid Image Size"), wxOK|wxICON_ERROR);
-			combo_target_format->SetSelection(1);
-			updatePreviewGfx();
-		}
-	}
+	validateTargetFormat();
 }
 
 /* GfxConvDialog::writeToEntry
@@ -97,6 +89,8 @@ bool GfxConvDialog::writeToEntry() {
 		gfx_target->getImage()->toDoomGfx(mc);
 	else if (format == CONV_PLANAR)
 		gfx_target->getImage()->toPlanar(mc);
+	else if (format == CONV_4BITCHUNKY)
+		gfx_target->getImage()->to4bitChunk(mc);
 	else if (format == CONV_PNG8BIT || format == CONV_PNG32BIT)
 		gfx_target->getImage()->toPNG(mc);
 
@@ -124,6 +118,7 @@ void GfxConvDialog::setupLayout() {
 		_T("Doom Flat Format"), 
 		_T("Doom Graphic Format"), 
 		_T("Hexen Planar Format"), 
+		_T("Hexen 4-bit Chunky Format"), 
 		_T("PNG Format (8bit Paletted)"), 
 		_T("PNG Format (32bit Truecolour)") };
 	combo_target_format = new wxComboBox(this, -1, s_formats[CONV_DOOMGFX], wxDefaultPosition, wxDefaultSize, NUMCONVS, s_formats, wxCB_READONLY);
@@ -395,7 +390,7 @@ bool GfxConvDialog::doConvert() {
 
 
 	// If doom flat, planar or no transparency is selected, remove any transparency
-	if (format == CONV_DOOMFLAT || format == CONV_PLANAR || !transparency)
+	if (format == CONV_DOOMFLAT || format == CONV_PLANAR || format == CONV_4BITCHUNKY || !transparency)
 		gfx_target->getImage()->fillAlpha(255);	// No transparency
 
 	return true;
@@ -455,14 +450,27 @@ void GfxConvDialog::onBtnSkipAll(wxCommandEvent& e) {
  * Called when the 'Convert To' combo box is changed
  *******************************************************************/
 void GfxConvDialog::onTargetFormatChanged(wxCommandEvent& e) {
-	// Check image size if doom flat format is selected
+	validateTargetFormat();
+	updatePreviewGfx();
+}
+
+/* GfxConvDialog::validateTargetFormat
+ * Prevents from selecting invalid target formats if images have
+ * incompatible dimensions or color depth.
+ *******************************************************************/
+void GfxConvDialog::validateTargetFormat() {
 	if (combo_target_format->GetCurrentSelection() == CONV_DOOMFLAT) {
 		if (!gfx_current->getImage()->validFlatSize()) {
-			wxMessageBox(_T("Doom Flat format only supports images of size 64x64, 64x128, 128x128 or 320x200"), _T("Invalid Image Size"), wxOK|wxICON_ERROR);
+			wxMessageBox(_T("Raw graphics only support the following formats:\n")
+				_T("64x64 or 64x128 (Doom and Hexen flats)\n")
+				_T("128x128, 256x256 or 512x512 (ZDoom Hires flats)\n")
+				_T("320x200 (fullscreen graphics)\n")
+				_T("320xSomething (Heretic or Hexen Autopage)\n")
+				_T("10x12, 16x16, 32x64 or 48x48 (Alpha GNUM and Strife startup sprites)"),
+				_T("Invalid Image Size"), wxOK|wxICON_ERROR);
 			combo_target_format->SetSelection(CONV_DOOMGFX);
 		}
-	}
-	else if (combo_target_format->GetCurrentSelection() == CONV_PLANAR) {
+	} else if (combo_target_format->GetCurrentSelection() == CONV_PLANAR) {
 		if (gfx_current->getImage()->getWidth() != 640 || gfx_current->getImage()->getHeight() != 480) {
 			wxMessageBox(_T("Hexen planar format only supports images of size 640x480"), _T("Invalid Image Size"), wxOK|wxICON_ERROR);
 			combo_target_format->SetSelection(CONV_DOOMGFX);
@@ -471,9 +479,12 @@ void GfxConvDialog::onTargetFormatChanged(wxCommandEvent& e) {
 			wxMessageBox(_T("Hexen planar format only supports images with 16 colors or less"), _T("Invalid Palette Size"), wxOK|wxICON_ERROR);
 			combo_target_format->SetSelection(CONV_DOOMGFX);
 		}
+	} else if (combo_target_format->GetCurrentSelection() == CONV_4BITCHUNKY) {
+		if (gfx_current->getImage()->countColours() > 16) {
+			wxMessageBox(_T("4-bit formats only supports images with 16 colors or less"), _T("Invalid Palette Size"), wxOK|wxICON_ERROR);
+			combo_target_format->SetSelection(CONV_DOOMGFX);
+		}
 	}
-
-	updatePreviewGfx();
 }
 
 /* GfxConvDialog::paletteCurrentChanged

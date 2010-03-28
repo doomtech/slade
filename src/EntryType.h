@@ -32,11 +32,9 @@ public:
 	static bool detectDoomGfxBeta(MemChunk& mc);
 	static bool detectDoomGfxArah(MemChunk& mc);
 	static bool detectDoomGfxSnea(MemChunk& mc);
-	static bool detectDoomGfxGnum(MemChunk& mc);
 	static bool detectDoomFlat(MemChunk& mc);
-	static bool detectAutopage(MemChunk& mc);
-	static bool detectStrifeStartup(MemChunk& mc);
 	static bool detectPlanar(MemChunk& mc);
+	static bool detect4bitChunk(MemChunk& mc);
 	static bool detectImgz(MemChunk& mc);
 	static bool detectPalette(MemChunk& mc);
 	static bool detectWad(MemChunk& mc);
