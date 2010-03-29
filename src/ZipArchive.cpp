@@ -251,8 +251,10 @@ zipdir_t* zipdir_t::copy(bool include_subdirs) {
 
 void zipdir_t::clear(bool delete_entries) {
 	// Delete dir entry
-	if (entry)
+	if (entry) {
 		delete entry;
+		entry = NULL;
+	}
 
 	// Delete entries
 	if (delete_entries) {
@@ -304,7 +306,7 @@ ZipArchive::ZipArchive()
  * ZipArchive class destructor
  *******************************************************************/
 ZipArchive::~ZipArchive() {
-	delete directory;
+	if (directory) delete directory;
 }
 
 /* ZipArchive::entryIndex
@@ -367,16 +369,11 @@ string ZipArchive::getFileExtensionString() {
 	return _T("Any Zip Format File (*.zip;*.pk3;*.jdf)|*.zip;*.pk3;*.jdf|Zip File (*.zip)|*.zip|Pk3 File (*.pk3)|*.pk3|JDF File (*.jdf)|*.jdf");
 }
 
-bool ZipArchive::open(MemChunk& mc) {
-	return false;
-}
-
-/* ZipArchive::openFile
- * Opens the given file and loads it into the archive.
- * Returns false if file wasn't found or zip was invalid,
- * true otherwise
+/* ZipArchive::open
+ * Reads zip data from a file
+ * Returns true if successful, false otherwise
  *******************************************************************/
-bool ZipArchive::openFile(string filename) {
+bool ZipArchive::open(string filename) {
 	// Open the file
 	wxFFileInputStream in(filename);
 	if (!in.IsOk()) {
@@ -469,30 +466,69 @@ bool ZipArchive::openFile(string filename) {
 	return true;
 }
 
-/* ZipArchive::save
- * Saves the archive to the given filename, or the current archive
- * filename if none given. Makes a backup of the file if it already
- * exists. Returns false if file could not be written, true otherwise
+/* ZipArchive::open
+ * Reads zip format data from an ArchiveEntry
+ * Returns true if successful, false otherwise
  *******************************************************************/
-bool ZipArchive::save(string filename) {
-	// If no filename was specified, just use the current filename
-	if (filename.IsEmpty())
-		filename = this->filename;
+bool ZipArchive::open(ArchiveEntry* entry) {
+	// Load from entry's data
+	if (entry && open(entry->getMCData())) {
+		// Update variables and return success
+		parent = entry;
+		return true;
+	}
+	else
+		return false;
+}
 
-	// Create backup copy if needed
-	string bakfile = filename + _T(".bak");
-	if (wxFileName::FileExists(filename)) {
-		// Remove old backup file
-		wxRemoveFile(bakfile);
+/* ZipArchive::open
+ * Reads zip format data from a MemChunk
+ * Returns true if successful, false otherwise
+ *******************************************************************/
+bool ZipArchive::open(MemChunk& mc) {
+	// Write the MemChunk to a temp file
+	string tempfile = appPath(_T("slade-temp.zip"), DIR_TEMP);
+	mc.exportFile(tempfile);
 
-		// Copy current file contents to backup file
-		wxCopyFile(this->filename, bakfile);
+	// Load the file
+	bool success = open(tempfile);
 
-		// Temporarily set filename to the backup file (in case reading is done during the save)
-		this->filename = bakfile;
-	} else {
-		// If no backup needed, set bakfile anyway as it's needed for copying zip entries
-		bakfile = this->filename;
+	// Clean up
+	wxRemoveFile(tempfile);
+
+	return success;
+}
+
+/* ZipArchive::write
+ * Writes the zip archive to a MemChunk
+ * Returns true if successful, false otherwise
+ *******************************************************************/
+bool ZipArchive::write(MemChunk& mc, bool update) {
+	bool success = false;
+
+	// Write to a temporary file
+	string tempfile = appPath(_T("slade-temp.zip"), DIR_TEMP);
+	if (write(tempfile, true)) {
+		// Load file into MemChunk
+		success = mc.importFile(tempfile);
+	}
+
+	// Clean up
+	wxRemoveFile(tempfile);
+
+	return success;
+}
+
+/* ZipArchive::write
+ * Writes the zip archive to a file
+ * Returns true if successful, false otherwise
+ *******************************************************************/
+bool ZipArchive::write(string filename, bool update) {
+	// If we're overwriting the current file, rename it so that it can still be read while writing the 'new' file
+	string current = this->filename;
+	if (!filename.CmpNoCase(this->filename)) {
+		current = appPath(_T("slade-temp.zip"), DIR_TEMP);
+		wxRenameFile(this->filename, current);
 	}
 
 	// Open the file
@@ -515,7 +551,7 @@ bool ZipArchive::save(string filename) {
 	// Open old zip for copying, if it exists. This is used to copy any entries
 	// that have been previously saved/compressed and are unmodified, to greatly
 	// speed up zip file saving by not having to recompress unchanged entries
-	wxFFileInputStream in(bakfile);
+	wxFFileInputStream in(current);
 	wxZipInputStream inzip(in);
 
 	// Get a list of all entries in the old zip
@@ -532,7 +568,7 @@ bool ZipArchive::save(string filename) {
 		if (entries[a]->getType() == EntryType::folderType()) {
 			// If the current entry is a folder, just write a directory entry and continue
 			zip.PutNextDirEntry(entries[a]->getExProp(_T("Directory")) + entries[a]->getName());
-			entries[a]->setState(0);
+			if (update) entries[a]->setState(0);
 			continue;
 		}
 
@@ -551,18 +587,18 @@ bool ZipArchive::save(string filename) {
 		}
 
 		// Update entry info
-		entries[a]->setState(0);
-		entries[a]->setExProp(_T("ZipIndex"), s_fmt(_T("%d"), a));
+		if (update) {
+			entries[a]->setState(0);
+			entries[a]->setExProp(_T("ZipIndex"), s_fmt(_T("%d"), a));
+		}
 	}
 
-	// Clean up and update variables
+	// Clean up
 	delete[] c_entries;
 	zip.Close();
-	this->filename = filename;
-	on_disk = true;
-	setMuted(false);
-	setModified(false);
-	announce(_T("saved"));
+
+	if (this->filename.Cmp(current))
+		wxRemoveFile(current);
 
 	return true;
 }
@@ -653,9 +689,12 @@ uint32_t ZipArchive::numEntries() {
  *******************************************************************/
 void ZipArchive::close() {
 	// Delete all directories and entries
+	setMuted(true);
 	deleteDirectory();
+	directory = NULL;
 
 	// Announce
+	setMuted(false);
 	announce(_T("close"));
 }
 

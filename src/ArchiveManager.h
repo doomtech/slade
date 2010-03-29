@@ -8,8 +8,9 @@
 class ArchiveManager : public Announcer, Listener {
 private:
 	struct archive_t {
-		Archive*	archive;
-		bool		resource;
+		Archive*			archive;
+		vector<Archive*>	open_children;	// A list of currently open archives that are within this archive
+		bool				resource;
 	};
 
 	vector<archive_t>	open_archives;
@@ -36,6 +37,7 @@ public:
 	Archive*	getArchive(int index);
 	Archive*	getArchive(string filename);
 	Archive*	openArchive(string filename);
+	Archive*	openArchive(ArchiveEntry* entry);
 	Archive*	newArchive(uint8_t type);
 	bool		closeArchive(int index);
 	bool		closeArchive(string filename);

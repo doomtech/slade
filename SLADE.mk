@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Simon
-Date                   :=28/03/10
+Date                   :=30/03/10
 CodeLitePath           :="/home/simon/.codelite"
 LinkerName             :=g++
 ArchiveTool            :=ar rcus
@@ -49,7 +49,7 @@ LibPath                := "$(LibraryPathSwitch)."
 ##
 Objects=src/$(IntermediateDirectory)/GfxConvDialog$(ObjectSuffix) src/$(IntermediateDirectory)/ModifyOffsetsDialog$(ObjectSuffix) src/$(IntermediateDirectory)/PaletteDialog$(ObjectSuffix) src/$(IntermediateDirectory)/Clipboard$(ObjectSuffix) src/$(IntermediateDirectory)/Console$(ObjectSuffix) src/$(IntermediateDirectory)/CVar$(ObjectSuffix) src/$(IntermediateDirectory)/MainApp$(ObjectSuffix) src/$(IntermediateDirectory)/MemChunk$(ObjectSuffix) src/$(IntermediateDirectory)/Misc$(ObjectSuffix) src/$(IntermediateDirectory)/Tokenizer$(ObjectSuffix) \
 	src/$(IntermediateDirectory)/WxStuff$(ObjectSuffix) src/$(IntermediateDirectory)/OpenGL$(ObjectSuffix) src/$(IntermediateDirectory)/ListenerAnnouncer$(ObjectSuffix) src/$(IntermediateDirectory)/ArchivePanel$(ObjectSuffix) src/$(IntermediateDirectory)/EntryListPanel$(ObjectSuffix) src/$(IntermediateDirectory)/AnimatedEntryPanel$(ObjectSuffix) src/$(IntermediateDirectory)/DefaultEntryPanel$(ObjectSuffix) src/$(IntermediateDirectory)/EntryPanel$(ObjectSuffix) src/$(IntermediateDirectory)/GfxEntryPanel$(ObjectSuffix) src/$(IntermediateDirectory)/MultiEntryPanel$(ObjectSuffix) \
-	src/$(IntermediateDirectory)/PaletteEntryPanel$(ObjectSuffix) src/$(IntermediateDirectory)/SwitchesEntryPanel$(ObjectSuffix) src/$(IntermediateDirectory)/TextEntryPanel$(ObjectSuffix) src/$(IntermediateDirectory)/TextureXEntryPanel$(ObjectSuffix) src/$(IntermediateDirectory)/ArchiveManagerPanel$(ObjectSuffix) src/$(IntermediateDirectory)/ZipArchivePanel$(ObjectSuffix) src/$(IntermediateDirectory)/ZipEntryListPanel$(ObjectSuffix) src/$(IntermediateDirectory)/MainWindow$(ObjectSuffix) src/$(IntermediateDirectory)/EntryOperations$(ObjectSuffix) src/$(IntermediateDirectory)/MapLine$(ObjectSuffix) \
+	src/$(IntermediateDirectory)/PaletteEntryPanel$(ObjectSuffix) src/$(IntermediateDirectory)/SwitchesEntryPanel$(ObjectSuffix) src/$(IntermediateDirectory)/TextEntryPanel$(ObjectSuffix) src/$(IntermediateDirectory)/TextureXEntryPanel$(ObjectSuffix) src/$(IntermediateDirectory)/ZipArchivePanel$(ObjectSuffix) src/$(IntermediateDirectory)/ZipEntryListPanel$(ObjectSuffix) src/$(IntermediateDirectory)/ArchiveManagerPanel$(ObjectSuffix) src/$(IntermediateDirectory)/MainWindow$(ObjectSuffix) src/$(IntermediateDirectory)/EntryOperations$(ObjectSuffix) src/$(IntermediateDirectory)/MapLine$(ObjectSuffix) \
 	src/$(IntermediateDirectory)/MapSector$(ObjectSuffix) src/$(IntermediateDirectory)/MapSide$(ObjectSuffix) src/$(IntermediateDirectory)/MapThing$(ObjectSuffix) src/$(IntermediateDirectory)/MapVertex$(ObjectSuffix) src/$(IntermediateDirectory)/SLADEMap$(ObjectSuffix) src/$(IntermediateDirectory)/MapCanvas$(ObjectSuffix) src/$(IntermediateDirectory)/MapEditorWindow$(ObjectSuffix) src/$(IntermediateDirectory)/Archive$(ObjectSuffix) src/$(IntermediateDirectory)/ArchiveEntry$(ObjectSuffix) src/$(IntermediateDirectory)/ArchiveManager$(ObjectSuffix) \
 	src/$(IntermediateDirectory)/WadArchive$(ObjectSuffix) src/$(IntermediateDirectory)/ZipArchive$(ObjectSuffix) src/$(IntermediateDirectory)/EntryType$(ObjectSuffix) src/$(IntermediateDirectory)/AnimatedList$(ObjectSuffix) src/$(IntermediateDirectory)/SwitchesList$(ObjectSuffix) src/$(IntermediateDirectory)/SImage$(ObjectSuffix) src/$(IntermediateDirectory)/Palette$(ObjectSuffix) src/$(IntermediateDirectory)/PaletteManager$(ObjectSuffix) src/$(IntermediateDirectory)/CTexture$(ObjectSuffix) src/$(IntermediateDirectory)/TextureXList$(ObjectSuffix) \
 	src/$(IntermediateDirectory)/Icons$(ObjectSuffix) src/$(IntermediateDirectory)/GLTexture$(ObjectSuffix) src/$(IntermediateDirectory)/ColourBox$(ObjectSuffix) src/$(IntermediateDirectory)/CTextureCanvas$(ObjectSuffix) src/$(IntermediateDirectory)/GfxCanvas$(ObjectSuffix) src/$(IntermediateDirectory)/ListView$(ObjectSuffix) src/$(IntermediateDirectory)/OGLCanvas$(ObjectSuffix) src/$(IntermediateDirectory)/PaletteCanvas$(ObjectSuffix) src/$(IntermediateDirectory)/PaletteChooser$(ObjectSuffix) src/$(IntermediateDirectory)/TextEditor$(ObjectSuffix) \
@@ -241,13 +241,6 @@ src/$(IntermediateDirectory)/TextureXEntryPanel$(DependSuffix): src/TextureXEntr
 	@test -d src/Debug || $(MakeDirCommand) src/Debug
 	@$(CompilerName) $(CmpOptions) $(IncludePath) -MTsrc/$(IntermediateDirectory)/TextureXEntryPanel$(ObjectSuffix) -MFsrc/$(IntermediateDirectory)/TextureXEntryPanel$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/TextureXEntryPanel.cpp"
 
-src/$(IntermediateDirectory)/ArchiveManagerPanel$(ObjectSuffix): src/ArchiveManagerPanel.cpp src/$(IntermediateDirectory)/ArchiveManagerPanel$(DependSuffix)
-	@test -d src/Debug || $(MakeDirCommand) src/Debug
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/ArchiveManagerPanel.cpp" $(CmpOptions) $(ObjectSwitch)src/$(IntermediateDirectory)/ArchiveManagerPanel$(ObjectSuffix) $(IncludePath)
-src/$(IntermediateDirectory)/ArchiveManagerPanel$(DependSuffix): src/ArchiveManagerPanel.cpp
-	@test -d src/Debug || $(MakeDirCommand) src/Debug
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MTsrc/$(IntermediateDirectory)/ArchiveManagerPanel$(ObjectSuffix) -MFsrc/$(IntermediateDirectory)/ArchiveManagerPanel$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/ArchiveManagerPanel.cpp"
-
 src/$(IntermediateDirectory)/ZipArchivePanel$(ObjectSuffix): src/ZipArchivePanel.cpp src/$(IntermediateDirectory)/ZipArchivePanel$(DependSuffix)
 	@test -d src/Debug || $(MakeDirCommand) src/Debug
 	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/ZipArchivePanel.cpp" $(CmpOptions) $(ObjectSwitch)src/$(IntermediateDirectory)/ZipArchivePanel$(ObjectSuffix) $(IncludePath)
@@ -261,6 +254,13 @@ src/$(IntermediateDirectory)/ZipEntryListPanel$(ObjectSuffix): src/ZipEntryListP
 src/$(IntermediateDirectory)/ZipEntryListPanel$(DependSuffix): src/ZipEntryListPanel.cpp
 	@test -d src/Debug || $(MakeDirCommand) src/Debug
 	@$(CompilerName) $(CmpOptions) $(IncludePath) -MTsrc/$(IntermediateDirectory)/ZipEntryListPanel$(ObjectSuffix) -MFsrc/$(IntermediateDirectory)/ZipEntryListPanel$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/ZipEntryListPanel.cpp"
+
+src/$(IntermediateDirectory)/ArchiveManagerPanel$(ObjectSuffix): src/ArchiveManagerPanel.cpp src/$(IntermediateDirectory)/ArchiveManagerPanel$(DependSuffix)
+	@test -d src/Debug || $(MakeDirCommand) src/Debug
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/ArchiveManagerPanel.cpp" $(CmpOptions) $(ObjectSwitch)src/$(IntermediateDirectory)/ArchiveManagerPanel$(ObjectSuffix) $(IncludePath)
+src/$(IntermediateDirectory)/ArchiveManagerPanel$(DependSuffix): src/ArchiveManagerPanel.cpp
+	@test -d src/Debug || $(MakeDirCommand) src/Debug
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MTsrc/$(IntermediateDirectory)/ArchiveManagerPanel$(ObjectSuffix) -MFsrc/$(IntermediateDirectory)/ArchiveManagerPanel$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/ArchiveManagerPanel.cpp"
 
 src/$(IntermediateDirectory)/MainWindow$(ObjectSuffix): src/MainWindow.cpp src/$(IntermediateDirectory)/MainWindow$(DependSuffix)
 	@test -d src/Debug || $(MakeDirCommand) src/Debug
@@ -592,15 +592,15 @@ clean:
 	$(RM) src/$(IntermediateDirectory)/TextureXEntryPanel$(ObjectSuffix)
 	$(RM) src/$(IntermediateDirectory)/TextureXEntryPanel$(DependSuffix)
 	$(RM) src/$(IntermediateDirectory)/TextureXEntryPanel$(PreprocessSuffix)
-	$(RM) src/$(IntermediateDirectory)/ArchiveManagerPanel$(ObjectSuffix)
-	$(RM) src/$(IntermediateDirectory)/ArchiveManagerPanel$(DependSuffix)
-	$(RM) src/$(IntermediateDirectory)/ArchiveManagerPanel$(PreprocessSuffix)
 	$(RM) src/$(IntermediateDirectory)/ZipArchivePanel$(ObjectSuffix)
 	$(RM) src/$(IntermediateDirectory)/ZipArchivePanel$(DependSuffix)
 	$(RM) src/$(IntermediateDirectory)/ZipArchivePanel$(PreprocessSuffix)
 	$(RM) src/$(IntermediateDirectory)/ZipEntryListPanel$(ObjectSuffix)
 	$(RM) src/$(IntermediateDirectory)/ZipEntryListPanel$(DependSuffix)
 	$(RM) src/$(IntermediateDirectory)/ZipEntryListPanel$(PreprocessSuffix)
+	$(RM) src/$(IntermediateDirectory)/ArchiveManagerPanel$(ObjectSuffix)
+	$(RM) src/$(IntermediateDirectory)/ArchiveManagerPanel$(DependSuffix)
+	$(RM) src/$(IntermediateDirectory)/ArchiveManagerPanel$(PreprocessSuffix)
 	$(RM) src/$(IntermediateDirectory)/MainWindow$(ObjectSuffix)
 	$(RM) src/$(IntermediateDirectory)/MainWindow$(DependSuffix)
 	$(RM) src/$(IntermediateDirectory)/MainWindow$(PreprocessSuffix)

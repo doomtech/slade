@@ -171,7 +171,7 @@ EntryListPanel::EntryListPanel(wxWindow *parent, int id, Archive* archive)
  * EntryListPanel class destructor
  *******************************************************************/
 EntryListPanel::~EntryListPanel() {
-	entry_list->ClearAll();
+	//entry_list->ClearAll();
 }
 
 /* EntryListPanel::populateEntryList
@@ -520,6 +520,13 @@ void EntryListPanel::selectAll() {
  * enter)
  *******************************************************************/
 void EntryListPanel::onEntryListActivated(wxListEvent& e) {
+	ArchiveEntry* entry = getFocusedEntry();
+	
+	if (!entry)
+		return;
+	
+	if (entry->getType()->getFormat() == EDF_WAD)
+		theArchiveManager->openArchive(entry);
 }
 
 /* EntryListPanel::onEntryListEditLabel

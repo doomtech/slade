@@ -43,6 +43,7 @@ Archive::Archive(uint8_t type) {
 	this->type = type;
 	modified = true;
 	on_disk = false;
+	parent = NULL;
 }
 
 /* Archive::~Archive
@@ -55,6 +56,15 @@ Archive::~Archive() {
  * Returns the archive's filename, including the path if specified
  *******************************************************************/
 string Archive::getFileName(bool fullpath) {
+	// If the archive is within another archive, return "<parent archive>/<entry name>"
+	if (parent) {
+		string parent_archive = _T("");
+		if (parent->getParent())
+			parent_archive = parent->getParent()->getFileName(false) + _T("/");
+
+		return parent_archive + parent->getName(false);
+	}
+
 	if (fullpath)
 		return filename;
 	else {
@@ -111,4 +121,59 @@ void Archive::setModified(bool mod) {
 
 	// Announce
 	announce(_T("modified"));
+}
+
+/* Archive::save
+ * This is the general, all-purpose 'save archive' function. Takes
+ * into account whether the archive is contained within another,
+ * is already on the disk, etc etc. Does a 'save as' if [filename]
+ * is specified, unless the archive is contained within another.
+ * Returns false if saving was unsuccessful, true otherwise
+ *******************************************************************/
+bool Archive::save(string filename) {
+	bool success = false;
+
+	// If the archive has a parent ArchiveEntry, just write it to that
+	if (parent)
+		success = write(parent->getMCData());
+	else {
+		// Otherwise, file stuff
+		if (!filename.IsEmpty()) {
+			// New filename is given (ie 'save as'), write to new file and change archive filename accordingly
+			success = write(filename);
+			if (success) this->filename = filename;
+
+			// Update variables
+			this->on_disk = true;
+		}
+		else if (!this->filename.IsEmpty()) {
+			// No filename is given, but the archive has a filename, so overwrite it (and make a backup)
+
+			// Create backup
+			if (wxFileName::FileExists(this->filename)) {
+				string bakfile = this->filename + _T(".bak");
+
+				// Remove old backup file
+				wxRemoveFile(bakfile);
+
+				// Copy current file contents to new backup file
+				wxLogMessage(_T("Creating backup %s"), bakfile.c_str());
+				wxCopyFile(this->filename, bakfile);
+			}
+
+			// Write it to the file
+			success = write(this->filename);
+
+			// Update variables
+			this->on_disk = true;
+		}
+	}
+
+	// If saving was successful, update variables and announce save
+	if (success) {
+		setModified(false);
+		announce(_T("saved"));
+	}
+
+	return success;
 }

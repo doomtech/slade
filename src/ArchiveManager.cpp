@@ -66,7 +66,7 @@ ArchiveManager::ArchiveManager() {
 
 	// Open slade.pk3
 	program_resource_archive = new ZipArchive();
-	if (!program_resource_archive->openFile(dir_slade_pk3)) {
+	if (!program_resource_archive->open(dir_slade_pk3)) {
 		wxLogMessage(_T("Unable to find slade.pk3!"));
 		res_archive_open = false;
 	}
@@ -159,7 +159,45 @@ Archive* ArchiveManager::openArchive(string filename) {
 
 	// If it opened successfully, add it to the list & return it,
 	// Otherwise, delete it and return NULL
-	if (new_archive->openFile(filename)) {
+	if (new_archive->open(filename)) {
+		addArchive(new_archive);
+		return new_archive;
+	} else {
+		wxLogMessage(_T("Error: ") + Global::error);
+		delete new_archive;
+		return NULL;
+	}
+}
+
+/* ArchiveManager::openArchive
+ * Same as the above function, except it opens from an ArchiveEntry
+ *******************************************************************/
+Archive* ArchiveManager::openArchive(ArchiveEntry* entry) {
+	Archive* new_archive = NULL;
+
+	// Check entry was given
+	if (!entry)
+		return NULL;
+
+	// Check entry type
+	if (WadArchive::isWadArchive(entry->getMCData()))
+		new_archive = new WadArchive();
+	else if (ZipArchive::isZipArchive(entry->getMCData()))
+		new_archive = new ZipArchive();
+	else
+		return NULL;	// Unsupported format
+
+	// If it opened successfully, add it to the list & return it,
+	// Otherwise, delete it and return NULL
+	if (new_archive->open(entry)) {
+		// Add to parent's child list if parent is open in the manager (it should be)
+		int index_parent = -1;
+		if (entry->getParent())
+			index_parent = archiveIndex(entry->getParent());
+		if (index_parent >= 0)
+			open_archives[index_parent].open_children.push_back(new_archive);
+
+		// Add the new archive and return it
 		addArchive(new_archive);
 		return new_archive;
 	} else {
@@ -209,6 +247,13 @@ bool ArchiveManager::closeArchive(int index) {
 	// Check for invalid index
 	if (index < 0 || index >= (int) open_archives.size())
 		return false;
+
+	// Close any open child archives
+	for (size_t a = 0; a < open_archives[index].open_children.size(); a++) {
+		int ci = archiveIndex(open_archives[index].open_children[a]);
+		if (ci >= 0)
+			closeArchive(ci);
+	}
 
 	// Close the archive
 	open_archives[index].archive->close();
@@ -319,7 +364,7 @@ bool ArchiveManager::openBaseResource(string filename) {
 		base_resource_archive = new ZipArchive();
 
 	// Attempt to open the file
-	if (base_resource_archive->openFile(filename)) {
+	if (base_resource_archive->open(filename)) {
 		base_resource_path = filename;
 		return true;
 	}

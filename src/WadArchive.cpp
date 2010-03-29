@@ -147,6 +147,49 @@ string WadArchive::getFileExtensionString() {
 	return _T("Wad Files (*.wad)|*.wad");
 }
 
+/* WadArchive::open
+ * Reads a wad format file from disk
+ * Returns true if successful, false otherwise
+ *******************************************************************/
+bool WadArchive::open(string filename) {
+	// Read the file into a MemChunk
+	MemChunk mc;
+	if (!mc.importFile(filename)) {
+		Global::error = _T("Unable to open file. Make sure it isn't in use by another program.");
+		return false;
+	}
+
+	// Load from MemChunk
+	if (open(mc)) {
+		// Update variables
+		this->filename = filename;
+		this->on_disk = true;
+		
+		return true;
+	}
+	else
+		return false;
+}
+
+/* WadArchive::open
+ * Reads wad format data from an ArchiveEntry
+ * Returns true if successful, false otherwise
+ *******************************************************************/
+bool WadArchive::open(ArchiveEntry* entry) {
+	// Load from entry's data
+	if (entry && open(entry->getMCData())) {
+		// Update variables and return success
+		parent = entry;
+		return true;
+	}
+	else
+		return false;
+}
+
+/* WadArchive::open
+ * Reads wad format data from a MemChunk
+ * Returns true if successful, false otherwise
+ *******************************************************************/
 bool WadArchive::open(MemChunk& mc) {
 	// Check data was given
 	if (!mc.hasData())
@@ -278,46 +321,24 @@ bool WadArchive::open(MemChunk& mc) {
 	return true;
 }
 
-/* WadArchive::openFile
- * Reads a wad format file from disk
+/* WadArchive::write
+ * Writes the wad archive to a file
  * Returns true if successful, false otherwise
  *******************************************************************/
-bool WadArchive::openFile(string filename) {
-	// Open file
+bool WadArchive::write(string filename, bool update) {
+	// Write to a MemChunk, then export it to a file
 	MemChunk mc;
-	mc.importFile(filename);
-	if (open(mc)) {
-		// Setup variables
-		this->filename = filename;
-		on_disk = true;
-
-		return true;
-	}
+	if (write(mc, true))
+		return mc.exportFile(filename);
 	else
 		return false;
 }
 
-/* WadArchive::save
- * Saves the wad archive to the specified file, if no filename is
- * given, saves to the current archive filename.
- * Returns false if the file couldn't be written to, true otherwise
+/* WadArchive::write
+ * Writes the wad archive to a MemChunk
+ * Returns true if successful, false otherwise
  *******************************************************************/
-bool WadArchive::save(string filename) {
-	// If no filename specified, just use the current filename
-	if (filename == _T(""))
-		filename = this->filename;
-
-	// Create a backup copy if needed
-	if (wxFileName::FileExists(filename)) {
-		string bakfile = filename + _T(".bak");
-
-		// Remove old backup file
-		remove(chr(bakfile));
-
-		// Copy current file contents to new backup file
-		wxCopyFile(this->filename, bakfile);
-	}
-
+bool WadArchive::write(MemChunk& mc, bool update) {
 	// Determine directory offset & individual lump offsets
 	uint32_t dir_offset = 12;
 	for (uint32_t l = 0; l < numEntries(); l++) {
@@ -325,22 +346,20 @@ bool WadArchive::save(string filename) {
 		dir_offset += entries[l]->getSize();
 	}
 
-	// Open wadfile for writing
-	wxFile file(filename, wxFile::write);
-	if (!file.IsOpened()) {
-		Global::error = _T("Unable to open file for saving. Make sure it isn't in use by another program.");
-		return false;
-	}
+	// Clear/init MemChunk
+	mc.clear();
+	mc.seek(0, SEEK_SET);
+	mc.reSize(dir_offset + numEntries() * 16);
 
 	// Write the header
 	uint32_t num_lumps = numEntries();
-	file.Write(wad_type, 4);
-	file.Write(&num_lumps, 4);
-	file.Write(&dir_offset, 4);
+	mc.write(wad_type, 4);
+	mc.write(&num_lumps, 4);
+	mc.write(&dir_offset, 4);
 
 	// Write the lumps
 	for (uint32_t l = 0; l < num_lumps; l++)
-		file.Write(entries[l]->getData(), entries[l]->getSize());
+		mc.write(entries[l]->getData(), entries[l]->getSize());
 
 	// Write the directory
 	for (uint32_t l = 0; l < num_lumps; l++) {
@@ -351,19 +370,15 @@ bool WadArchive::save(string filename) {
 		for (size_t c = 0; c < entries[l]->getName().length(); c++)
 			name[c] = entries[l]->getName()[c];
 
-		file.Write(&offset, 4);
-		file.Write(&size, 4);
-		file.Write(name, 8);
+		mc.write(&offset, 4);
+		mc.write(&size, 4);
+		mc.write(name, 8);
 
-		entries[l]->setState(0);
-		entries[l]->setExProp(_T("Offset"), s_fmt(_T("%d"), l));
+		if (update) {
+			entries[l]->setState(0);
+			entries[l]->setExProp(_T("Offset"), s_fmt(_T("%d"), l));
+		}
 	}
-
-	// Set variables and return success
-	this->filename = filename;
-	setModified(false);
-	on_disk = true;
-	announce(_T("saved"));
 
 	return true;
 }

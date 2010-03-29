@@ -24,9 +24,13 @@ public:
 	ArchiveEntry*	getEntry(string name);
 	string			getFileExtensionString();
 
+	bool	open(string filename);
+	bool	open(ArchiveEntry* entry);
 	bool	open(MemChunk& mc);
-	bool	openFile(string filename);
-	bool	save(string filename = _T(""));
+
+	bool	write(MemChunk& mc, bool update = true);
+	bool	write(string filename, bool update = true);
+
 	void	close();
 
 	uint32_t	getEntryOffset(ArchiveEntry* entry);

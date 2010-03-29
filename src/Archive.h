@@ -15,7 +15,8 @@ private:
 	uint8_t	type;
 
 protected:
-	string	filename;
+	string			filename;
+	ArchiveEntry*	parent;
 
 	// Specifies whether the archive exists on disk (as opposed to being newly created)
 	bool	on_disk;
@@ -43,9 +44,15 @@ public:
 	bool					checkEntry(ArchiveEntry* entry);
 	void					setModified(bool mod);
 
-	virtual bool		open(MemChunk& mc) = 0;
-	virtual bool		openFile(string filename) = 0;
-	virtual bool		save(string filename = _T("")) = 0;
+
+	virtual bool	open(string filename) = 0;
+	virtual bool	open(ArchiveEntry* entry) = 0;
+	virtual bool	open(MemChunk& mc) = 0;
+
+	virtual bool	write(MemChunk& mc, bool update = true) = 0;
+	virtual bool	write(string filename, bool update = true) = 0;
+	virtual bool	save(string filename = _T(""));
+
 	virtual bool		loadEntryData(ArchiveEntry* entry) = 0;
 	virtual uint32_t	numEntries() = 0;
 	virtual void		close() = 0;

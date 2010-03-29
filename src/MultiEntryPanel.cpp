@@ -87,6 +87,7 @@ MultiEntryPanel::~MultiEntryPanel() {
 bool MultiEntryPanel::loadEntries(vector<ArchiveEntry*>& list) {
 	uint32_t total_size = 0;
 	gfx_selected = false;
+	png_selected = false;
 
 	// Clear current list of entries
 	entries.clear();

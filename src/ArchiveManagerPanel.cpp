@@ -549,7 +549,7 @@ void ArchiveManagerPanel::saveCurrent() {
 	// Send to current archive panel
 	int selection = notebook_archives->GetSelection();
 	if (isArchivePanel(selection))
-		((ArchivePanel*) notebook_archives->GetPage(selection))->save();
+		((ArchivePanel*)notebook_archives->GetPage(selection))->save();
 
 	refreshArchiveList();
 }
