@@ -230,6 +230,24 @@ void ArchiveEntry::unloadData() {
 	setLoaded(false);
 }
 
+void ArchiveEntry::lock() {
+	// Lock the entry
+	locked = true;
+	
+	// Inform parent
+	if (parent)
+		parent->entryModified(this);
+}
+
+void ArchiveEntry::unlock() {
+	// Unlock the entry
+	locked = false;
+	
+	// Inform parent
+	if (parent)
+		parent->entryModified(this);
+}
+
 /* ArchiveEntry::rename
  * Renames the entry
  *******************************************************************/

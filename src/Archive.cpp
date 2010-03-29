@@ -134,8 +134,10 @@ bool Archive::save(string filename) {
 	bool success = false;
 
 	// If the archive has a parent ArchiveEntry, just write it to that
-	if (parent)
+	if (parent) {
 		success = write(parent->getMCData());
+		parent->setState(1);
+	}
 	else {
 		// Otherwise, file stuff
 		if (!filename.IsEmpty()) {

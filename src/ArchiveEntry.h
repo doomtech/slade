@@ -45,8 +45,8 @@ public:
 	void		setType(EntryType* type) { this->type = type; }
 	void		setState(uint8_t state);
 	void		unloadData();
-	void		lock() { locked = true; }
-	void		unlock() { locked = false; }
+	void		lock();
+	void		unlock();
 	void		lockState() { state_locked = true; }
 	void		unlockState() { state_locked = false; }
 

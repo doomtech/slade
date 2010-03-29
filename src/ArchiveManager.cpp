@@ -179,6 +179,12 @@ Archive* ArchiveManager::openArchive(ArchiveEntry* entry) {
 	if (!entry)
 		return NULL;
 
+	// Check if the entry is already opened
+	for (size_t a = 0; a < open_archives.size(); a++) {
+		if (open_archives[a].archive->getParent() == entry)
+			return open_archives[a].archive;
+	}
+
 	// Check entry type
 	if (WadArchive::isWadArchive(entry->getMCData()))
 		new_archive = new WadArchive();

@@ -475,6 +475,7 @@ bool ZipArchive::open(ArchiveEntry* entry) {
 	if (entry && open(entry->getMCData())) {
 		// Update variables and return success
 		parent = entry;
+		parent->lock();
 		return true;
 	}
 	else
@@ -692,6 +693,10 @@ void ZipArchive::close() {
 	setMuted(true);
 	deleteDirectory();
 	directory = NULL;
+
+	// Unlock parent entry if it exists
+	if (parent)
+		parent->unlock();
 
 	// Announce
 	setMuted(false);

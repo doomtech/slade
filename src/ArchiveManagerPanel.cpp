@@ -345,7 +345,7 @@ void ArchiveManagerPanel::saveAll() {
 		// Get the archive to be saved
 		Archive* archive = theArchiveManager->getArchive(a);
 
-		if (archive->isOnDisk()) {
+		if (archive->canSave()) {
 			// Save the archive if possible
 			if (!archive->save()) {
 				// If there was an error pop up a message box

@@ -180,6 +180,7 @@ bool WadArchive::open(ArchiveEntry* entry) {
 	if (entry && open(entry->getMCData())) {
 		// Update variables and return success
 		parent = entry;
+		parent->lock();
 		return true;
 	}
 	else
@@ -392,6 +393,10 @@ void WadArchive::close() {
 		delete entries[0];
 		entries.erase(entries.begin());
 	}
+
+	// Unlock parent entry if it exists
+	if (parent)
+		parent->unlock();
 
 	// Announce
 	announce(_T("close"));

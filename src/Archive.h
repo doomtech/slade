@@ -34,6 +34,7 @@ public:
 
 	uint8_t					getType() { return type; }
 	string					getFileName(bool fullpath = true);
+	ArchiveEntry*			getParent() { return parent; }
 	bool					isModified() { return modified; }
 	bool					isOnDisk() { return on_disk; }
 	void					setFileName(string fn) { filename = fn; }
@@ -43,6 +44,7 @@ public:
 	virtual string			getFileExtensionString() = 0;
 	bool					checkEntry(ArchiveEntry* entry);
 	void					setModified(bool mod);
+	bool					canSave() { return parent || on_disk; }
 
 
 	virtual bool	open(string filename) = 0;
