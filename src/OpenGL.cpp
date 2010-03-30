@@ -41,6 +41,8 @@ namespace OpenGL {
 	wxGLContext*	context = NULL;
 	double			version = 0;
 	GLint			max_tex_size = 128;
+	uint32_t		pow_two[] = { 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768 };
+	uint8_t			n_pow_two = 16;
 }
 
 
@@ -92,6 +94,21 @@ bool OpenGL::np2TexSupport() {
 	return version >= 2 && gl_tex_enable_np2;
 }
 
+/* OpenGL::validTexDimension
+ * Returns true if [dim] is a valid texture dimension on the system
+ * OpenGL version
+ *******************************************************************/
 bool OpenGL::validTexDimension(GLint dim) {
-	return (dim <= max_tex_size);
+	if (dim > max_tex_size)
+		return false;
+	else if (!np2TexSupport()) {
+		for (uint8_t a = 0; a < n_pow_two; a++) {
+			if (dim == pow_two[a])
+				return true;
+		}
+
+		return false;
+	}
+	else
+		return true;
 }
