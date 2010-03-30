@@ -282,20 +282,20 @@ bool EntryDataFormat::detectTiff(MemChunk& mc) {
 	// The value of 42 (0x2A) is present in the next two bytes,
 	// in the given endianness
 	if (42 != (littleendian ?
-		wxUINT16_SWAP_ON_BE((const uint16_t)((const uint16_t *)(mc)[2])) :
-		wxUINT16_SWAP_ON_LE((const uint16_t)((const uint16_t *)(mc)[2]))))
+		wxUINT16_SWAP_ON_BE((const uint16_t)(mc[2])) :
+		wxUINT16_SWAP_ON_LE((const uint16_t)(mc[2]))))
 		return false;
 	// First offset must be on a word boundary (therefore, %2 == 0) and
 	// somewhere within the file, but not in the header of course.
 	size_t offset = (littleendian ?
-		wxUINT32_SWAP_ON_BE((const uint32_t)((const uint32_t *)(mc)[4])) :
-		wxUINT32_SWAP_ON_LE((const uint32_t)((const uint32_t *)(mc)[4])));
+		wxUINT32_SWAP_ON_BE((const uint32_t)(mc[4])) :
+		wxUINT32_SWAP_ON_LE((const uint32_t)(mc[4])));
 	if (offset < 8 || offset >= size || offset %2)
 		return false;
 	// Check the first IFD for validity
 	uint16_t numentries = (littleendian ?
-		wxUINT16_SWAP_ON_BE((const uint16_t)((const uint16_t *)(mc)[offset])) :
-		wxUINT16_SWAP_ON_LE((const uint16_t)((const uint16_t *)(mc)[offset])));
+		wxUINT16_SWAP_ON_BE((const uint16_t)(mc[offset])) :
+		wxUINT16_SWAP_ON_LE((const uint16_t)(mc[offset])));
 	if (offset + 6 + (numentries * 12) > size)
 		return false;
 	// Okay, it seems valid so far

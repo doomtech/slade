@@ -66,6 +66,8 @@
         <File Name="src/TextEntryPanel.h"/>
         <File Name="src/TextureXEntryPanel.cpp"/>
         <File Name="src/TextureXEntryPanel.h"/>
+        <File Name="src/PnamesEntryPanel.cpp"/>
+        <File Name="src/PnamesEntryPanel.h"/>
       </VirtualDirectory>
       <VirtualDirectory Name="ZipArchivePanel">
         <File Name="src/ZipArchivePanel.cpp"/>
@@ -125,6 +127,8 @@
       <File Name="src/SwitchesList.cpp"/>
       <File Name="src/SwitchesList.h"/>
       <File Name="src/BinaryControlLump.h"/>
+      <File Name="src/PnamesList.cpp"/>
+      <File Name="src/PnamesList.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Image">
       <File Name="src/SImage.cpp"/>
@@ -241,6 +245,6 @@
       </AdditionalRules>
     </Configuration>
   </Settings>
-  <Dependencies Name="Release"/>
   <Dependencies Name="Debug"/>
+  <Dependencies Name="Release"/>
 </CodeLite_Project>
