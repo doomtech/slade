@@ -25,6 +25,8 @@ xb(EDF_TEXT,			"text")
 xx(EDF_PNG,				"png",				detectPng)
 xx(EDF_BMP,				"bmp",				detectBmp)
 xx(EDF_PCX,				"pcx",				detectPcx)
+xx(EDF_TGA,				"tga",				detectTga)
+xx(EDF_TIFF,			"tiff",				detectTiff)
 xx(EDF_JPEG,			"jpeg",				detectJpeg)
 // Doom gfx format		
 xy(EDF_GFX_DOOM,		"gfx_doom",			detectDoomGfx,			loadDoomGfx)

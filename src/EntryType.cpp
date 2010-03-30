@@ -236,6 +236,72 @@ bool EntryDataFormat::detectPcx(MemChunk& mc) {
 	return true;
 }
 
+bool EntryDataFormat::detectTga(MemChunk& mc) {
+	// Size check for the header
+	if (mc.getSize() < 18)
+		return false;
+
+	// Check dimensions, both ZDoom and Vavoom refuse to load TGA
+	// with image sizes greater than 2048 so let's use that as well
+	uint16_t width  = mc[12] + (mc[13]<<8);
+	uint16_t height = mc[14] + (mc[15]<<8);
+	if (width > 2048 || height > 2048)
+		return false;
+
+	// Check image type, must be a value between 1 and 3 or 9 and 11
+	if (mc[2] == 0 || mc[2] > 11 || (mc[2] > 3 && mc[2] < 9))
+		return false;
+
+	// The colormap bool must be 0 or 1
+	if (mc[1] != 0 && mc[1] != 1)
+		return false;
+
+	// Bits per pixel can be 8, 15, 16, 24 or 32
+	if (mc[16] != 8 && mc[16] != 15 && mc[16] != 16 && mc[16] !=24 && mc[16] !=32)
+		return false;
+
+	// ZDoom and Vavoom both refuse exotic directions in the descriptor, so same
+	if ((mc[17] & 16) != 0)
+		return false;
+
+	return true;
+}
+
+bool EntryDataFormat::detectTiff(MemChunk& mc) {
+	// Check size, minimum size is 26 if I'm not mistaken:
+	// 8 for the image header, +2 for at least one image
+	// file directory, +12 for at least one directory entry,
+	// +4 for a NULL offset for the next IFD
+	size_t size = mc.getSize();
+	if (size < 26)
+		return false;
+	// First two bytes must be identical, and either II or MM
+	if (mc[0] != mc[1] || (mc[0] != 0x49 && mc[0] != 0x4D))
+		return false;
+	bool littleendian = (mc[0] == 'I');
+	// The value of 42 (0x2A) is present in the next two bytes,
+	// in the given endianness
+	if (42 != (littleendian ?
+		wxUINT16_SWAP_ON_BE((const uint16_t)((const uint16_t *)(mc)[2])) :
+		wxUINT16_SWAP_ON_LE((const uint16_t)((const uint16_t *)(mc)[2]))))
+		return false;
+	// First offset must be on a word boundary (therefore, %2 == 0) and
+	// somewhere within the file, but not in the header of course.
+	size_t offset = (littleendian ?
+		wxUINT32_SWAP_ON_BE((const uint32_t)((const uint32_t *)(mc)[4])) :
+		wxUINT32_SWAP_ON_LE((const uint32_t)((const uint32_t *)(mc)[4])));
+	if (offset < 8 || offset >= size || offset %2)
+		return false;
+	// Check the first IFD for validity
+	uint16_t numentries = (littleendian ?
+		wxUINT16_SWAP_ON_BE((const uint16_t)((const uint16_t *)(mc)[offset])) :
+		wxUINT16_SWAP_ON_LE((const uint16_t)((const uint16_t *)(mc)[offset])));
+	if (offset + 6 + (numentries * 12) > size)
+		return false;
+	// Okay, it seems valid so far
+	return true;
+}
+
 bool EntryDataFormat::detectJpeg(MemChunk& mc) {
 	// Check size
 	if (mc.getSize() > 128) {
@@ -472,7 +538,29 @@ bool EntryDataFormat::detectDoomFlat(MemChunk& mc) {
 		if (size == valid_flat_size[i][0]*valid_flat_size[i][1])
 			return true;
 	}
+	if (detectTranslationTable(mc)) return true;
 	return !(size < 320 || size % 320);
+}
+
+bool EntryDataFormat::detectTranslationTable (MemChunk& mc) {
+	// Translation tables and colormaps are essentially the same thing.
+	// Can't rely on size because Inkworks adds a signature at the end:
+	// "This lump was created by The Cookie Monsters InkWorks for DOOM (ver x.y)"
+	uint32_t size = mc.getSize();
+	if (size > 8704) {
+		if (size < 8776)
+			return false;
+		bool inkworks = true;
+		char * compare = "This lump was created by The Cookie Monsters InkWorks for DOOM";
+		for (size_t i = 0; i < 62; ++i) {
+			if (mc[8704+i] != compare[i]) {
+				inkworks = false;
+				break;
+			}
+		}
+		return inkworks;
+	}
+	return !(size < 256 || size % 256);
 }
 
 bool EntryDataFormat::detectPalette(MemChunk& mc) {

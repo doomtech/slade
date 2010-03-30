@@ -27,6 +27,8 @@ public:
 	static bool detectPng(MemChunk& mc);
 	static bool detectBmp(MemChunk& mc);
 	static bool detectPcx(MemChunk& mc);
+	static bool detectTga(MemChunk& mc);
+	static bool detectTiff(MemChunk& mc);
 	static bool detectJpeg(MemChunk& mc);
 	static bool detectDoomGfx(MemChunk& mc);
 	static bool detectDoomGfxAlpha(MemChunk& mc);
@@ -38,6 +40,7 @@ public:
 	static bool detect4bitChunk(MemChunk& mc);
 	static bool detectImgz(MemChunk& mc);
 	static bool detectPalette(MemChunk& mc);
+	static bool detectTranslationTable(MemChunk& mc);
 	static bool detectWad(MemChunk& mc);
 	static bool detectZip(MemChunk& mc);
 	static bool detectMus(MemChunk& mc);
