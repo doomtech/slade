@@ -240,7 +240,7 @@ void ArchiveManagerPanel::updateListItem(int index) {
 	list_archives->setItemText(index, 0, archive->getFileName());
 
 	// Set item status colour
-	if (archive->isOnDisk()) {
+	if (archive->canSave()) {
 		if (archive->isModified())
 			list_archives->setItemStatus(index, LV_STATUS_MODIFIED);
 		else
