@@ -22,6 +22,8 @@ protected:
 	EntryPanel*	multi_area;
 	EntryPanel* texturex_area;
 	EntryPanel* animated_area;
+	EntryPanel* switches_area;
+	EntryPanel* pnames_area;
 
 public:
 	enum {
@@ -39,6 +41,7 @@ public:
 		MENU_ENTRY_MOVEDOWN,
 		MENU_ENTRY_GFX_CONVERT,
 		MENU_ENTRY_GFX_OFFSETS,
+		MENU_ENTRY_BAS_CONVERT,
 
 		MENU_ENTRY_END,
 	};
@@ -68,6 +71,7 @@ public:
 	bool			moveDown();
 	bool			gfxConvert();
 	bool			gfxModifyOffsets();
+	bool			basConvert();
 
 	// UI related
 	bool	openEntry(ArchiveEntry* entry);

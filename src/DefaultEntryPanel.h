@@ -22,6 +22,7 @@ public:
 	bool saveEntry();
 	void showTextEditor();
 	void showEntryInfo(bool show_btn_edittext = false);
+	void openTextEntry(ArchiveEntry * text_entry);
 
 	void onEditTextClicked(wxCommandEvent& e);
 	void onViewHexClicked(wxCommandEvent& e);

@@ -171,3 +171,32 @@ bool AnimatedList::writeANIMATEDData(ArchiveEntry* animated) {
 	delete[] data;
 	return true;
 }
+
+bool Misc::convertAnimated(ArchiveEntry* entry, MemChunk * animdata)
+{
+	const uint8_t * cursor = entry->getData(true);
+	const uint8_t * eodata = cursor + entry->getSize();
+	const animated_t * animation;
+	string conversion;
+
+	while (cursor < eodata && *cursor != ANIM_STOP) {
+		// reads an entry
+		if (cursor + sizeof(animated_t) > eodata) {
+			wxLogMessage(_T("Error: ANIMATED entry is corrupt"));
+			return false;
+		}
+		animation = (animated_t *) cursor;
+		cursor += sizeof(animated_t);
+
+		// Create animation string
+		conversion = s_fmt(_T("%s\tOptional\t%-8s\tRange\t%-8s\tTics %i%s"), 
+			(animation->type ? "Texture" : "Flat"),
+			animation->first, animation->last, animation->speed,
+			(animation->type == ANIM_DECALS ? " AllowDecals\n" : "\n"));
+
+		// Write string to animdata
+		animdata->reSize(animdata->getSize() + conversion.length(), true);
+		animdata->write(conversion.To8BitData().data(), conversion.length());
+	}
+	return true;
+}

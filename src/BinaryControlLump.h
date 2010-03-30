@@ -16,7 +16,7 @@ enum AnimatedType
 	ANIM_FLAT = 0,
 	ANIM_TEXTURE = 1,
 	ANIM_MASK = 1,
-	ANIM_DECALS = 2, // ZDoom uses bit 1 to flag whether decals are allowed.
+	ANIM_DECALS = 3, // ZDoom uses bit 1 to flag whether decals are allowed.
 	ANIM_STOP = 255,
 };
 

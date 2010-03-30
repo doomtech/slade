@@ -115,10 +115,10 @@ void GfxConvDialog::setupLayout() {
 
 	// This must remain in sync with the ConversionFormat enum in the header
 	wxString s_formats[] = { 
-		_T("Doom Flat Format"), 
-		_T("Doom Graphic Format"), 
-		_T("Hexen Planar Format"), 
 		_T("Hexen 4-bit Chunky Format"), 
+		_T("Hexen Planar Format"), 
+		_T("Raw Format (Flat, Colormap, etc.)"), 
+		_T("Doom Graphic Format"), 
 		_T("PNG Format (8bit Paletted)"), 
 		_T("PNG Format (32bit Truecolour)") };
 	combo_target_format = new wxComboBox(this, -1, s_formats[CONV_DOOMGFX], wxDefaultPosition, wxDefaultSize, NUMCONVS, s_formats, wxCB_READONLY);

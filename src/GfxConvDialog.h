@@ -31,10 +31,10 @@
 enum ConversionFormat {
 	// Paletted first, then 32-bit formats.
 	// GfxConvDialog::doConvert() expects PNG8BIT to be the last of the paletted formats
-	CONV_DOOMFLAT = 0,
-	CONV_DOOMGFX,
-	CONV_PLANAR,
 	CONV_4BITCHUNKY,
+	CONV_PLANAR,
+	CONV_DOOMFLAT,
+	CONV_DOOMGFX,
 	CONV_PNG8BIT,
 	CONV_PNG32BIT,
 

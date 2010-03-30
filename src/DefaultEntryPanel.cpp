@@ -48,10 +48,12 @@ DefaultEntryPanel::DefaultEntryPanel(wxWindow* parent)
 	label_type = new wxStaticText(this, -1, _T("Entry Type:"));
 	label_size = new wxStaticText(this, -1, _T("Entry Size:"));
 	btn_edit_text = new wxButton(this, -1, _T("Edit as Text"));
+	btn_view_hex = new wxButton(this, -1, _T("View as Hex"));
 	text_area = new TextEditor(this, -1);
 
 	// Bind Events
 	btn_edit_text->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &DefaultEntryPanel::onEditTextClicked, this);
+	btn_view_hex->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &DefaultEntryPanel::onViewHexClicked, this);
 	text_area->Bind(wxEVT_STC_MODIFIED, &DefaultEntryPanel::onTextModified, this);
 
 	// Show entry info stuff
@@ -80,6 +82,7 @@ void DefaultEntryPanel::showEntryInfo(bool show_btn_edittext) {
 	label_type->Show(true);
 	label_size->Show(true);
 	btn_edit_text->Show(show_btn_edittext);
+	btn_view_hex->Show(true);
 
 	// Add entry info stuff to the panel sizer
 	sizer_main->AddStretchSpacer();
@@ -87,12 +90,22 @@ void DefaultEntryPanel::showEntryInfo(bool show_btn_edittext) {
 	sizer_main->Add(label_size, 0, wxALIGN_CENTER|wxALL, 4);
 	sizer_main->AddSpacer(8);
 	sizer_main->Add(btn_edit_text, 0, wxALIGN_CENTER|wxALL, 4);
+	sizer_main->Add(btn_view_hex, 0, wxALIGN_CENTER|wxALL, 4);
 	sizer_main->AddStretchSpacer();
 
 	// Update variables etc
 	view_text = false;
 
 	Layout();
+}
+
+/* DefaultEntryPanel::openTextEntry
+ * Open an entry and show it on the text editor panel
+ *******************************************************************/
+void DefaultEntryPanel::openTextEntry(ArchiveEntry * text_entry) {
+	showTextEditor();
+	text_area->loadEntry(text_entry);
+	setModified(false);
 }
 
 /* DefaultEntryPanel::showTextEditor
@@ -103,6 +116,7 @@ void DefaultEntryPanel::showTextEditor() {
 	label_type->Show(false);
 	label_size->Show(false);
 	btn_edit_text->Show(false);
+	btn_view_hex->Show(false);
 
 	// Clear the sizer
 	sizer_main->Clear(false);
@@ -193,4 +207,13 @@ void DefaultEntryPanel::onEditTextClicked(wxCommandEvent& event) {
  *******************************************************************/
 void DefaultEntryPanel::onTextModified(wxStyledTextEvent& e) {
 	setModified();
+}
+
+void DefaultEntryPanel::onViewHexClicked(wxCommandEvent& event) {
+	// Show the text editor
+	showTextEditor();
+
+	// Load entry data into the text editor
+	text_area->loadHexEntry(entry);
+	setModified(false);
 }
