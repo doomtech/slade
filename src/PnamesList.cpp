@@ -108,7 +108,7 @@ bool PnamesList::readPNAMESData(ArchiveEntry* pnames) {
 	if (!pnames || pnames->getSize() == 0)
 		return false;
 
-	size_t pnamesize = 
+	size_t pnamesize = 0;
 
 	return true;
 }
@@ -117,4 +117,5 @@ bool PnamesList::readPNAMESData(ArchiveEntry* pnames) {
  * Write in a PNAMES entry. Returns true on success, false otherwise
  *******************************************************************/
 bool PnamesList::writePNAMESData(ArchiveEntry* animated) {
+	return false;
 }

@@ -35,6 +35,8 @@
 /*******************************************************************
  * VARIABLES
  *******************************************************************/
+CVAR(Bool, gl_tex_enable_np2, true, CVAR_SAVE)
+
 namespace OpenGL {
 	wxGLContext*	context = NULL;
 	double			version = 0;
@@ -87,7 +89,7 @@ bool OpenGL::init() {
  * of-two textures, false otherwise
  *******************************************************************/
 bool OpenGL::np2TexSupport() {
-	return version >= 2;
+	return version >= 2 && gl_tex_enable_np2;
 }
 
 bool OpenGL::validTexDimension(GLint dim) {
