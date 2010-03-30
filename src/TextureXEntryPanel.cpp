@@ -245,7 +245,7 @@ void TextureXEntryPanel::onPatchesListSelect(wxListEvent& e) {
 
 	// Get the currently selected palette
 	Palette8bit pal;
-	if (combo_palette->globalSelected())
+	if (combo_palette->globalSelected() && entry)
 		Misc::loadPaletteFromArchive(&pal, entry->getParent());
 	else
 		pal.copyPalette(combo_palette->getSelectedPalette());
