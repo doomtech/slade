@@ -196,7 +196,7 @@ void ArchiveEntry::allExProps(vector<string>& keys, vector<string>& values) {
  * to set it to 'modified' then don't change the state
  *******************************************************************/
 void ArchiveEntry::setState(uint8_t state) {
-	if (state_locked)
+	if (state_locked || state == this->state)
 		return;
 
 	if (state == 0)

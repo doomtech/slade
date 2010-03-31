@@ -289,8 +289,10 @@ bool MemChunk::write(const void* data, uint32_t size) {
 
 	// If we're trying to write past the end of the memory chunk,
 	// resize it so we can write at this point
-	if (cur_ptr + size > this->size)
+	if (cur_ptr + size > this->size) {
+		//wxLogMessage(_T("MC::write resize %d > %d"), cur_ptr+size, this->size);
 		reSize(cur_ptr + size, true);
+	}
 
 	// Write the data and move to the byte after what was written
 	memcpy(this->data + cur_ptr, data, size);

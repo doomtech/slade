@@ -99,12 +99,15 @@ void Archive::entryModified(ArchiveEntry* entry) {
 		return;
 
 	// Get the entry index and announce the change
-	MemChunk mc;
-	wxUIntPtr ptr = wxPtrToUInt(entry);
-	uint32_t index = entryIndex(entry);
-	mc.write(&index, sizeof(uint32_t));
-	mc.write(&ptr, sizeof(wxUIntPtr));
-	announce(_T("entry_modified"), mc);
+	if (!isMuted()) {
+		MemChunk mc;
+		mc.reSize(8, false);
+		wxUIntPtr ptr = wxPtrToUInt(entry);
+		uint32_t index = entryIndex(entry);
+		mc.write(&index, sizeof(uint32_t));
+		mc.write(&ptr, sizeof(wxUIntPtr));
+		announce(_T("entry_modified"), mc);
+	}
 
 	// If entry was set to unmodified, don't set the archive to modified
 	// (should really rename this stuff to 'state changed' rather than 'modified')
