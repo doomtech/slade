@@ -344,7 +344,7 @@ bool SImage::validFlatSize() {
 			height == valid_flat_size[a][1])
 			return true;
 	}
-	return (width == 320);
+	return (width == 320 || width == 256);
 }
 
 /* SImage::loadImage
@@ -621,14 +621,20 @@ bool SImage::loadDoomFlat(const uint8_t* gfx_data, int size) {
 		}
 	}
 
+	if (size == 8776) { // Inkworks and its signature at the end of COLORMAPS
+		size = 8704;
+	}
 	// Check valid size
 	if (!valid_size)
 	{
-		if (size % 320)	{	// This should handle any custom AUTOPAGE
-			return false;
-		} else {
+		if (size % 320 == 0)	{	// This should handle any custom AUTOPAGE
 			width = 320;
 			height = size/320;
+		} else if (size % 256 == 0) { // This allows display of COLORMAPS
+			width = 256;
+			height = size/256;
+		} else {
+			return false;
 		}
 	}
 
@@ -1100,7 +1106,6 @@ bool SImage::loadFont1(const uint8_t* gfx_data, int size) {
  * Loads a ZDoom FON2 lump and displays it as a picture.
  * Returns false if the image data was invalid, true otherwise.
  *******************************************************************/
-//#include <wx/msgdlg.h>
 struct Font2Char {
 	uint16_t width;
 	uint8_t * data;
@@ -1255,9 +1260,139 @@ bool SImage::loadFont2(const uint8_t* gfx_data, int size) {
  * Specs for the format are here: http://bmf.wz.cz/bmf-format.htm
  * Returns false if the image data was invalid, true otherwise.
  *******************************************************************/
+struct BMFChar {
+	uint8_t which; // 0
+	uint8_t width; // 1
+	uint8_t height;// 2
+	uint8_t offsx; // 3
+	uint8_t offsy; // 4
+	uint8_t shift; // 5
+	// Rest is not part of the header proper
+	const uint8_t * cdata;
+	BMFChar() { which = width = height = offsx = offsy = shift = 0; cdata = NULL; }
+};
+struct BMFFont {
+	uint8_t headr[4];	//  0
+	uint8_t version;	//  4
+	uint8_t lineheight;	//  5
+	 int8_t size_over;	//  6
+	 int8_t size_under;	//  7
+	 int8_t add_space;	//  8
+	 int8_t size_inner;	//  9
+	uint8_t num_colors;	// 10
+	uint8_t top_color;	// 11
+	uint8_t reserved[4];// 12
+	uint8_t pal_size;	// 16
+	// Rest is not part of the header proper
+	uint8_t info_size;
+	uint16_t num_chars;
+	const char * info;
+	BMFChar * chars;
+	BMFFont() {
+		lineheight = size_over = size_under = add_space = size_inner =
+			num_colors = top_color = pal_size = info_size = num_chars = 0;
+		info = NULL; chars = NULL;
+	}
+	BMFFont(BMFFont * other) {
+		lineheight = other->lineheight;
+		size_over = other->size_over;
+		size_under = other->size_under;
+		add_space = other->add_space;
+		size_inner = other->size_inner;
+		num_colors = other->num_colors;
+		top_color = other->top_color;
+		pal_size = other->pal_size;
+		info_size = other->info_size;
+		num_chars = other->num_chars;
+		info = NULL; chars = NULL;
+	}
+	~BMFFont() { if (chars) delete[] chars; }
+};
 bool SImage::loadBMF(const uint8_t* gfx_data, int size) {
-	// Not implemented yet
-	return false;
+	if (!gfx_data || size < 24)
+		return false;
+
+	// Check for invalid data
+	BMFFont mf((BMFFont *)gfx_data);
+	if (mf.pal_size == 0 || mf.num_chars == 0 || mf.num_colors == 0)
+		return false;
+
+	// Clean up old data and set up variables
+	clearData();
+	format = PALMASK;
+	has_palette = true;
+	has_builtinpal = true;
+
+	const uint8_t * ofs = gfx_data+17;
+
+	// Setup palette -- it's a 6-bit palette (63 max) so we have to convert it to 8-bit.
+	// Palette index 0 is used as the transparent color and not described at all.
+	builtinpal.setColour(0, rgba_t(0, 0, 0, 0));
+	for (size_t i = 0; i < mf.pal_size; ++i) {
+		builtinpal.setColour(i+1, rgba_t((ofs[(i*3)]<<2)+(ofs[(i*3)]>>4), 
+			(ofs[(i*3)+1]<<2)+(ofs[(i*3)]>>4), (ofs[(i*3)+2]<<2)+(ofs[(i*3)+2]>>4), 255));
+	}
+
+	// Move to after the palette and get amount of characters
+	ofs += mf.pal_size*3;
+	mf.info_size = ofs[0];
+	if (mf.info_size > 0) {
+		mf.info = (char *) ofs+1;
+	}
+	ofs+=mf.info_size+1;
+	mf.num_chars = ofs[0] + (ofs[1]<<8);
+
+	// Now we are at the beginning of character data
+	ofs+=2;
+	mf.chars = new BMFChar[mf.num_chars];
+	for (size_t i = 0; i < mf.num_chars; ++i) {
+		mf.chars[i].which = ofs[0];
+		mf.chars[i].width = ofs[1];
+		mf.chars[i].height= ofs[2];
+		mf.chars[i].offsx = ofs[3];
+		mf.chars[i].offsy = ofs[4];
+		mf.chars[i].shift = ofs[5];
+		mf.chars[i].cdata = ofs+6;
+		ofs+=(6+ (mf.chars[i].width * mf.chars[i].height));
+	}
+
+	// Let's find the total height and width of the font
+	int miny = mf.chars[0].offsy, maxy = mf.chars[0].height;
+	width = mf.chars[0].shift + abs(mf.chars[0].offsx);
+	for (size_t i = 1; i < mf.num_chars; ++i) {
+		width += mf.add_space;
+		if (width < 0 - mf.chars[i].offsx)
+			width = 0 - mf.chars[i].offsx;
+		width += mf.chars[i].shift;
+		if (miny > mf.chars[i].offsy)
+			miny = mf.chars[i].offsy;
+		if (maxy < mf.chars[i].height)
+			maxy = mf.chars[i].height;
+	}
+	height = maxy - miny;
+
+	// Create new fully transparent image
+	data = new uint8_t[width * height];
+	mask = new uint8_t[width * height];
+	memset(data, 0x00, width * height);
+	memset(mask, 0x00, width * height);
+
+	// Start processing each character, painting it on the empty canvas
+	int startx = (mf.chars[0].offsy < 0 ? 0 : mf.chars[0].offsy);
+	int starty = (miny < 0 ? 0 - miny : 0);
+	for (int i = 0; i < mf.num_chars; ++i) {
+		BMFChar * mc = &mf.chars[i];
+		if (mc->width && mc->height) {
+			for (int v = 0; v < mc->height; ++v)
+				for (int u = 0; u < mc->width; ++u)
+					if (mc->cdata[v*mc->width + u]) {
+						data[(starty+v+mc->offsy)*width+startx+u+mc->offsx] = mc->cdata[v*mc->width + u];
+						mask[(starty+v+mc->offsy)*width+startx+u+mc->offsx] = 0xFF;
+					}
+		}
+		startx+=(mf.add_space + mc->shift);
+	}
+	return true;
 }
 
 /* SImage::loadFontM

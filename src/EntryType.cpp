@@ -69,69 +69,6 @@ EntryType			etype_map;		// Map marker type
 /*******************************************************************
  * ENTRYDATAFORMAT CLASS FUNCTIONS
  *******************************************************************/
-uint16_t EntryDataFormat::detectFormat(MemChunk& mc) {
-	// Default to unknown
-	uint16_t type = EDF_UNKNOWN;
-
-	// Detect PNG
-	if (detectPng(mc))
-		return EDF_PNG;
-
-	// Detect BMP
-	if (detectBmp(mc))
-		return EDF_BMP;
-
-	// JPEG
-	if (detectJpeg(mc))
-		return EDF_JPEG;
-
-	// MUS
-	if (detectMus(mc))
-		return EDF_MUS;
-
-	// MIDI
-	if (detectMidi(mc))
-		return EDF_MIDI;
-
-	// IT Module
-	if (detectModIt(mc))
-		return EDF_MOD_IT;
-
-	// S3M Module
-	if (detectModS3m(mc))
-		return EDF_MOD_S3M;
-
-	// WAV Sound
-	if (detectSndWav(mc))
-		return EDF_SND_WAV;
-
-	// XM Module
-	if (detectModXm(mc))
-		return EDF_MOD_XM;
-
-	// MOD Module
-	if (detectModMod(mc))
-		return EDF_MOD_MOD;
-
-	// Detect doom patch format
-	if (detectDoomGfx(mc))
-		return EDF_GFX_DOOM;
-
-	// Doom Sound
-	if (detectSndDoom(mc))
-		return EDF_SND_DOOM;
-
-	// Detect doom wad
-	if (detectWad(mc))
-		return EDF_WAD;
-
-	// Detect doom flat format
-	if (detectDoomFlat(mc))
-		return EDF_GFX_FLAT;
-
-	return type;
-}
-
 bool EntryDataFormat::isFormat(MemChunk& mc, uint16_t format) {
 	switch (format) {
 #define xa(id, name, val)

@@ -21,7 +21,6 @@ public:
 	EntryDataFormat(){}
 	~EntryDataFormat(){}
 
-	static uint16_t detectFormat(MemChunk& mc);
 	static bool isFormat(MemChunk& mc, uint16_t format);
 
 	static bool detectPng(MemChunk& mc);
