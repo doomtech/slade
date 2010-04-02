@@ -398,14 +398,21 @@ void ArchiveManager::addBaseResourcePath(string path) {
 }
 
 ArchiveEntry* ArchiveManager::getResourceEntry(string name) {
+	// Go through all open archives
 	for (size_t a = 0; a < open_archives.size(); a++) {
+		// If it isn't a resource archive, skip it
 		if (!open_archives[a].resource)
 			continue;
 
+		// Try to find the entry in the archive
 		ArchiveEntry* entry = open_archives[a].archive->getEntry(name);
 		if (entry)
 			return entry;
 	}
+
+	// If entry isn't found yet, search the base resource archive
+	if (base_resource_archive)
+		return base_resource_archive->getEntry(name);
 
 	return NULL;
 }

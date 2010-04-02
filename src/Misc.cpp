@@ -45,6 +45,10 @@ bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry) {
 	if (!entry)
 		return false;
 
+	// Detect entry type if it isn't already
+	if (entry->getType() == EntryType::unknownType())
+		EntryType::detectEntryType(entry);
+
 	switch (entry->getType()->getFormat()) {
 #define xa(id, name, val)
 #define xb(id, name)

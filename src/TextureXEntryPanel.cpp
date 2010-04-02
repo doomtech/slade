@@ -34,6 +34,7 @@
 #include "Archive.h"
 #include "ArchiveManager.h"
 #include "Misc.h"
+#include "PaletteManager.h"
 #include <wx/listctrl.h>
 
 
@@ -205,11 +206,14 @@ void TextureXEntryPanel::populatePatchesList() {
  * palette chooser
  *******************************************************************/
 void TextureXEntryPanel::updateImagePalette() {
+	// Init new palette
 	Palette8bit pal;
 
-	// Set palette to whatever is selected in the palette chooser
-	if (combo_palette->globalSelected())
-		Misc::loadPaletteFromArchive(&pal, entry->getParent());
+	// Set it to whatever is selected in the palette chooser
+	if (combo_palette->globalSelected()) {
+		if (!Misc::loadPaletteFromArchive(&pal, entry->getParent(), entry))
+			pal.copyPalette(thePaletteManager->globalPalette());
+	}
 	else
 		pal.copyPalette(combo_palette->getSelectedPalette());
 
@@ -229,8 +233,10 @@ void TextureXEntryPanel::onTextureListSelect(wxListEvent& e) {
 
 	// Set it's palette to whatever is selected in the palette chooser
 	Palette8bit pal;
-	if (combo_palette->globalSelected())
-		Misc::loadPaletteFromArchive(&pal, entry->getParent());
+	if (combo_palette->globalSelected()) {
+		if (!Misc::loadPaletteFromArchive(&pal, entry->getParent(), entry))
+			pal.copyPalette(thePaletteManager->globalPalette());
+	}
 	else
 		pal.copyPalette(combo_palette->getSelectedPalette());
 

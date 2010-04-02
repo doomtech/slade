@@ -30,6 +30,7 @@
 #include "Main.h"
 #include "TextureXList.h"
 #include "Archive.h"
+#include "ArchiveManager.h"
 
 
 /*******************************************************************
@@ -184,7 +185,10 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, ArchiveEntry* pnames
 		patch.name = wxString(pname).Upper();
 
 		// Attempt to find patch entry
-		ArchiveEntry* entry = pnames->getParent()->getEntry(patch.name);
+		ArchiveEntry* entry = pnames->getParent()->getEntry(patch.name);	// Search parent archive first
+		if (!entry)
+			entry = theArchiveManager->getResourceEntry(patch.name);		// Next search open resource archives + base resource archive
+
 		if (entry)
 			patch.entry = entry;
 		else
