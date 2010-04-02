@@ -1264,8 +1264,8 @@ struct BMFChar {
 	uint8_t which; // 0
 	uint8_t width; // 1
 	uint8_t height;// 2
-	uint8_t offsx; // 3
-	uint8_t offsy; // 4
+	 int8_t offsx; // 3
+	 int8_t offsy; // 4
 	uint8_t shift; // 5
 	// Rest is not part of the header proper
 	const uint8_t * cdata;
@@ -1356,7 +1356,10 @@ bool SImage::loadBMF(const uint8_t* gfx_data, int size) {
 		wxLogMessage(_T("BMF aborted: no data after char size"));
 		return false;
 	}
+	// Let's create each character's data and compute the total size
 	mf.chars = new BMFChar[mf.num_chars];
+	int miny = ofs[4], maxy = ofs[2];
+	width = ofs[5] + abs(ofs[3]);
 	for (size_t i = 0; i < mf.num_chars; ++i) {
 		mf.chars[i].which = ofs[0];
 		mf.chars[i].width = ofs[1];
@@ -1369,28 +1372,20 @@ bool SImage::loadBMF(const uint8_t* gfx_data, int size) {
 		// Sanity check, some supposedly-valid fonts do not have all the
 		// characters they pretend to have (e.g., 274.bmf). Being truncated
 		// does not prevent them from being considered valid, so cut them off
-		if (ofs >= eod && !(ofs == eod && (i+1) == mf.num_chars)) {
+		if (ofs >= eod && (i+1) < mf.num_chars) {
 			mf.num_chars = i;
 		}
-		// Zap empty characters
+		// Zap empty characters, no need to waste space displaying their void.
 		if (mf.chars[i].width == 0 && mf.chars[i].height == 0) {
 			--i;
 			--mf.num_chars;
+		} else {
+			if (miny > mf.chars[i].offsy)
+				miny = mf.chars[i].offsy;
+			if (maxy < mf.chars[i].height)
+				maxy = mf.chars[i].height;
+			width += mf.add_space + mf.chars[i].shift;
 		}
-	}
-
-	// Let's find the total height and width of the font
-	int miny = mf.chars[0].offsy, maxy = mf.chars[0].height;
-	width = mf.chars[0].shift + abs(mf.chars[0].offsx);
-	for (size_t i = 1; i < mf.num_chars; ++i) {
-		width += mf.add_space;
-		if (width < 0 - mf.chars[i].offsx)
-			width = 0 - mf.chars[i].offsx;
-		width += mf.chars[i].shift;
-		if (miny > mf.chars[i].offsy)
-			miny = mf.chars[i].offsy;
-		if (maxy < mf.chars[i].height)
-			maxy = mf.chars[i].height;
 	}
 	height = maxy - miny;
 
@@ -1407,7 +1402,7 @@ bool SImage::loadBMF(const uint8_t* gfx_data, int size) {
 	for (int i = 0; i < mf.num_chars; ++i) {
 		BMFChar * mc = &mf.chars[i];
 		if (mc->width && mc->height) {
-			for (int v = 0; v < mc->height; ++v)
+			for (int v = 0; v < mc->height; ++v) {
 				for (int u = 0; u < mc->width; ++u) {
 					// Source pixel
 					pixela = v*mc->width + u;
@@ -1420,8 +1415,9 @@ bool SImage::loadBMF(const uint8_t* gfx_data, int size) {
 						mask[pixelb] = 0xFF;
 					}
 				}
+			}
+			startx+=(mf.add_space + mc->shift);
 		}
-		startx+=(mf.add_space + mc->shift);
 	}
 	return true;
 }
