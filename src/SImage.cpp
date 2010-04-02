@@ -1311,10 +1311,12 @@ struct BMFFont {
 bool SImage::loadBMF(const uint8_t* gfx_data, int size) {
 	if (!gfx_data || size < 24)
 		return false;
+	const uint8_t * eod = gfx_data + size;
 
-	// Check for invalid data
 	BMFFont mf((BMFFont *)gfx_data);
-	if (mf.pal_size == 0 || mf.num_chars == 0 || mf.num_colors == 0)
+
+	// Check for invalid data, we need at least one visible color
+	if (mf.pal_size == 0)
 		return false;
 
 	// Clean up old data and set up variables
@@ -1335,15 +1337,25 @@ bool SImage::loadBMF(const uint8_t* gfx_data, int size) {
 
 	// Move to after the palette and get amount of characters
 	ofs += mf.pal_size*3;
+	if (ofs >= eod) {
+		wxLogMessage(_T("BMF aborted: no data after palette"));
+		return false;
+	}
 	mf.info_size = ofs[0];
 	if (mf.info_size > 0) {
 		mf.info = (char *) ofs+1;
 	}
 	ofs+=mf.info_size+1;
 	mf.num_chars = ofs[0] + (ofs[1]<<8);
+	if (mf.num_chars == 0)
+		return false;
 
 	// Now we are at the beginning of character data
 	ofs+=2;
+	if (ofs >= eod) {
+		wxLogMessage(_T("BMF aborted: no data after char size"));
+		return false;
+	}
 	mf.chars = new BMFChar[mf.num_chars];
 	for (size_t i = 0; i < mf.num_chars; ++i) {
 		mf.chars[i].which = ofs[0];
@@ -1354,6 +1366,17 @@ bool SImage::loadBMF(const uint8_t* gfx_data, int size) {
 		mf.chars[i].shift = ofs[5];
 		mf.chars[i].cdata = ofs+6;
 		ofs+=(6+ (mf.chars[i].width * mf.chars[i].height));
+		// Sanity check, some supposedly-valid fonts do not have all the
+		// characters they pretend to have (e.g., 274.bmf). Being truncated
+		// does not prevent them from being considered valid, so cut them off
+		if (ofs >= eod && !(ofs == eod && (i+1) == mf.num_chars)) {
+			mf.num_chars = i;
+		}
+		// Zap empty characters
+		if (mf.chars[i].width == 0 && mf.chars[i].height == 0) {
+			--i;
+			--mf.num_chars;
+		}
 	}
 
 	// Let's find the total height and width of the font
@@ -1372,10 +1395,11 @@ bool SImage::loadBMF(const uint8_t* gfx_data, int size) {
 	height = maxy - miny;
 
 	// Create new fully transparent image
-	data = new uint8_t[width * height];
-	mask = new uint8_t[width * height];
-	memset(data, 0x00, width * height);
-	memset(mask, 0x00, width * height);
+	size_t pixela = 0, pixelb = 0, pixels = width * height;
+	data = new uint8_t[pixels];
+	mask = new uint8_t[pixels];
+	memset(data, 0x00, pixels);
+	memset(mask, 0x00, pixels);
 
 	// Start processing each character, painting it on the empty canvas
 	int startx = (mf.chars[0].offsy < 0 ? 0 : mf.chars[0].offsy);
@@ -1384,11 +1408,18 @@ bool SImage::loadBMF(const uint8_t* gfx_data, int size) {
 		BMFChar * mc = &mf.chars[i];
 		if (mc->width && mc->height) {
 			for (int v = 0; v < mc->height; ++v)
-				for (int u = 0; u < mc->width; ++u)
-					if (mc->cdata[v*mc->width + u]) {
-						data[(starty+v+mc->offsy)*width+startx+u+mc->offsx] = mc->cdata[v*mc->width + u];
-						mask[(starty+v+mc->offsy)*width+startx+u+mc->offsx] = 0xFF;
+				for (int u = 0; u < mc->width; ++u) {
+					// Source pixel
+					pixela = v*mc->width + u;
+					// Destination pixel
+					pixelb = (starty+v+mc->offsy)*width+startx+u+mc->offsx;
+					// Only paint if appropriate
+					if ((mc->cdata + pixela < eod) && (mc->cdata + pixela < mf.chars[i+1].cdata - 6) &&
+						mc->cdata[pixela] && pixelb < pixels) {
+						data[pixelb] = mc->cdata[pixela];
+						mask[pixelb] = 0xFF;
 					}
+				}
 		}
 		startx+=(mf.add_space + mc->shift);
 	}
