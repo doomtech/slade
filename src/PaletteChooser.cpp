@@ -32,6 +32,7 @@
 #include "WxStuff.h"
 #include "PaletteChooser.h"
 #include "PaletteManager.h"
+#include "Misc.h"
 
 
 /*******************************************************************
@@ -43,6 +44,9 @@
  *******************************************************************/
 PaletteChooser::PaletteChooser(wxWindow* parent, int id)
 : wxComboBox(parent, id, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY|wxCB_DROPDOWN) {
+	// Init variables
+	pal_global.copyPalette(thePaletteManager->globalPalette());
+
 	// Add first 'existing' item
 	Append(_T("Existing/Global"));
 
@@ -63,6 +67,16 @@ PaletteChooser::PaletteChooser(wxWindow* parent, int id)
 PaletteChooser::~PaletteChooser() {
 }
 
+/* PaletteChooser::setGlobalFromArchive
+ * Sets the chooser's 'global' palette to the palette contained in
+ * [archive], or if it doesn't exist, the PaletteManager's global
+ * palette
+ *******************************************************************/
+void PaletteChooser::setGlobalFromArchive(Archive* archive) {
+	if (!Misc::loadPaletteFromArchive(&pal_global, archive))
+		pal_global.copyPalette(thePaletteManager->globalPalette());
+}
+
 /* PaletteChooser::getSelectedPalette
  * Returns the selected palette (from the PaletteManager)
  *******************************************************************/
@@ -70,7 +84,7 @@ Palette8bit* PaletteChooser::getSelectedPalette() {
 	if (GetSelection() > 0)
 		return thePaletteManager->getPalette(GetSelection() - 1);
 	else
-		return thePaletteManager->globalPalette();
+		return &pal_global;
 }
 
 /* PaletteChooser::globalSelected

@@ -21,7 +21,7 @@ public:
 
 	void	clearTexture();
 	void	clearPatchTextures();
-	bool	openTexture(CTexture* tex, Palette8bit* pal = NULL);
+	bool	openTexture(CTexture* tex);
 	void	draw();
 	void	drawChequeredBackground();
 	void	drawTexture();

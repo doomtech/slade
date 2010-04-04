@@ -27,8 +27,8 @@ public:
 	uint32_t	getHeight() { return height; }
 
 	bool	loadData(const uint8_t* data, uint32_t width, uint32_t height, bool add = false);
-	bool	loadImage(SImage* image);
-	bool	loadImagePortion(SImage* image, rect_t rect, bool add = false);
+	bool	loadImage(SImage* image, Palette8bit* pal = NULL);
+	bool	loadImagePortion(SImage* image, rect_t rect, Palette8bit* pal = NULL, bool add = false);
 
 	bool	clear();
 	bool	genChequeredTexture(uint8_t block_size, rgba_t col1, rgba_t col2);

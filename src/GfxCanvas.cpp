@@ -235,7 +235,7 @@ void GfxCanvas::drawImage() {
 
 	// Update texture if needed
 	if (update_texture) {
-		tex_image->loadImage(image);
+		tex_image->loadImage(image, &palette);
 		update_texture = false;
 	}
 
@@ -293,9 +293,11 @@ void GfxCanvas::drawImage() {
 }
 
 /* GfxCanvas::updateImageTexture
- * (Re)Generates the image texture from image data
+ * Forces (Re)Generation of the image texture
  *******************************************************************/
 void GfxCanvas::updateImageTexture() {
+	update_texture = true;
+	Refresh();
 }
 
 /* GfxCanvas::zoomToFit

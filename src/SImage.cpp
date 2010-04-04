@@ -6,9 +6,9 @@
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
  * Filename:    SImage.cpp
- * Description: SImage class - Encapsulates a paletted or32bit image,
- *              handles loading/saving different formats,
- *              palette conversions, offsets, and a bunch of other stuff
+ * Description: SImage class - Encapsulates a paletted or 32bit image.
+ *              Handles loading/saving different formats, palette
+ *              conversions, offsets, and a bunch of other stuff
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -76,8 +76,8 @@ SImage::SImage() {
 	mask = NULL;
 	offset_x = 0;
 	offset_y = 0;
-	has_palette = false;
-	has_builtinpal = false;
+	//has_palette = false;
+	//has_builtinpal = false;
 	format = RGBA;
 }
 
@@ -93,7 +93,7 @@ SImage::~SImage() {
  * Loads the image as RGBA data into <mc>. Returns false if image is
  * invalid, true otherwise
  *******************************************************************/
-bool SImage::getRGBAData(MemChunk& mc) {
+bool SImage::getRGBAData(MemChunk& mc, Palette8bit* pal) {
 	// Check the image is valid
 	if (!isValid())
 		return false;
@@ -109,10 +109,17 @@ bool SImage::getRGBAData(MemChunk& mc) {
 
 	// Otherwise convert
 	else if (format == PALMASK) {
+		// Get palette to use
+		Palette8bit usepal;
+		if (has_palette)
+			usepal.copyPalette(&palette);
+		else if (pal)
+			usepal.copyPalette(pal);
+
 		uint8_t rgba[4];
 		for (int a = 0; a < width * height; a++) {
 			// Get colour
-			rgba_t col = palette.colour(data[a]);
+			rgba_t col = usepal.colour(data[a]);
 
 			// Set alpha
 			if (mask)
@@ -134,7 +141,7 @@ bool SImage::getRGBAData(MemChunk& mc) {
  * Loads the image as RGB data into <mc>. Returns false if image is
  * invalid, true otherwise
  *******************************************************************/
-bool SImage::getRGBData(MemChunk& mc) {
+bool SImage::getRGBData(MemChunk& mc, Palette8bit* pal) {
 	// Check the image is valid
 	if (!isValid())
 		return false;
@@ -151,9 +158,18 @@ bool SImage::getRGBData(MemChunk& mc) {
 	}
 	else if (format == PALMASK) {
 		// Paletted, convert to RGB
+
+		// Get palette to use
+		Palette8bit usepal;
+		if (has_palette)
+			usepal.copyPalette(&palette);
+		else if (pal)
+			usepal.copyPalette(pal);
+
+		// Build RGB data
 		uint8_t rgba[4];
 		for (int a = 0; a < width * height; a ++) {
-			palette.colour(data[a]).write(rgba);
+			usepal.colour(data[a]).write(rgba);
 			mc.write(rgba, 3);
 		}
 
@@ -166,6 +182,7 @@ bool SImage::getRGBData(MemChunk& mc) {
 /* SImage::setPalette
  * Copies the given palette to the image palette
  *******************************************************************/
+/*
 void SImage::setPalette(Palette8bit* pal) {
 	// Check palette
 	if (!pal)
@@ -177,6 +194,7 @@ void SImage::setPalette(Palette8bit* pal) {
 	// Announce change
 	announce(_T("image_changed"));
 }
+*/
 
 /* SImage::setXOffset
  * Changes the image X offset
@@ -383,12 +401,12 @@ bool SImage::loadImage(const uint8_t* img_data, int size) {
 	// Get image palette if it exists
 	RGBQUAD* bm_pal = FreeImage_GetPalette(bm);
 	if (bm_pal) {
-		has_builtinpal = true;
+		has_palette = true;
 		for (int a = 0; a < 256; a++)
-			builtinpal.setColour(a, rgba_t(bm_pal[a].rgbRed, bm_pal[a].rgbGreen, bm_pal[a].rgbBlue, 255));
-	} else {
-		has_builtinpal = false;
+			palette.setColour(a, rgba_t(bm_pal[a].rgbRed, bm_pal[a].rgbGreen, bm_pal[a].rgbBlue, 255));
 	}
+	else
+		has_palette = false;
 
 	// Get width & height
 	width = FreeImage_GetWidth(bm);
@@ -396,7 +414,6 @@ bool SImage::loadImage(const uint8_t* img_data, int size) {
 
 	// Set format
 	format = RGBA;
-	has_palette = has_builtinpal;
 
 	// Convert to 32bpp & flip vertically
 	FIBITMAP *rgb = FreeImage_ConvertTo32Bits(bm);
@@ -490,9 +507,8 @@ bool SImage::loadDoomGfx(const uint8_t* gfx_data, int size, uint8_t version) {
 
 	// Init variables
 	uint32_t* col_offsets = NULL;
-	has_palette = true;
-	has_builtinpal = false;
 	format = PALMASK;
+	has_palette = false;
 
 	// Read header
 	uint8_t hdr_size = 0;
@@ -639,9 +655,8 @@ bool SImage::loadDoomFlat(const uint8_t* gfx_data, int size) {
 	}
 
 	// Setup variables
-	has_palette = true;
-	has_builtinpal = false;
 	format = PALMASK;
+	has_palette = false;
 
 	// Clear current data if it exists
 	clearData();
@@ -677,9 +692,8 @@ bool SImage::loadDoomArah(const uint8_t* gfx_data, int size) {
 	height = wxINT16_SWAP_ON_BE(header->height);
 	offset_x = wxINT16_SWAP_ON_BE(header->left);
 	offset_y = wxINT16_SWAP_ON_BE(header->top);
-	has_palette = true;
-	has_builtinpal = false;
 	format = PALMASK;
+	has_palette = false;
 
 	// Clear current data if it exists
 	clearData();
@@ -730,9 +744,8 @@ bool SImage::loadDoomSnea(const uint8_t* gfx_data, int size) {
 		return false;
 
 	// Setup variables
-	has_palette = true;
-	has_builtinpal = false;
 	format = PALMASK;
+	has_palette = false;
 
 	// Clear current data if it exists
 	clearData();
@@ -752,8 +765,7 @@ bool SImage::loadDoomSnea(const uint8_t* gfx_data, int size) {
 	// Algorithm taken from DeuTex.
 	// I do not pretend to understand it, 
 	// but my own attempt didn't work.
-	while (pixel < entryend)
-	{
+	while (pixel < entryend) {
 		*brush = *pixel++;
 		brush += 4;
 		if (brush >= dataend)
@@ -793,10 +805,8 @@ bool SImage::loadPlanar(const uint8_t* gfx_data, int size) {
 	height = 480;
 	format = PALMASK;
 	has_palette = true;
-	has_builtinpal = true;
 
-	union
-	{
+	union {
 		RGBQUAD		color;
 		uint32_t	quad;
 	};
@@ -804,8 +814,7 @@ bool SImage::loadPlanar(const uint8_t* gfx_data, int size) {
 	rgba_t colour(0, 0, 0, 0, -1);
 
 	// Initialize the bitmap palette.
-	for (int i = 0; i < 16; ++i)
-	{
+	for (int i = 0; i < 16; ++i) {
 		color.rgbRed   = gfx_data[i*3+0]; 
 		color.rgbGreen = gfx_data[i*3+1];
 		color.rgbBlue  = gfx_data[i*3+2];
@@ -814,14 +823,12 @@ bool SImage::loadPlanar(const uint8_t* gfx_data, int size) {
 		colour.r = color.rgbRed;
 		colour.g = color.rgbGreen;
 		colour.b = color.rgbBlue;
-		builtinpal.setColour(i, colour);
+		palette.setColour(i, colour);
 	}
 	// Fill the rest of the palette with clones of index 0
 	for (int i = 16; i<256; ++i) {
-		builtinpal.setColour(i, palette.colour(0));
+		palette.setColour(i, palette.colour(0));
 	}
-	// Copy built-in palette to current one:
-	palette.copyPalette(&builtinpal);
 
 	// Prepare data and mask (opaque)
 	clearData();
@@ -839,10 +846,8 @@ bool SImage::loadPlanar(const uint8_t* gfx_data, int size) {
 	src3 = src2 + plane_size;	// 20: 00100000 02: 00000010
 	src4 = src3 + plane_size;	// 10: 00010000 01: 00000001
 
-	for (y = height; y > 0; --y)
-	{
-		for (x = width; x > 0; x -= 8)
-		{
+	for (y = height; y > 0; --y) {
+		for (x = width; x > 0; x -= 8) {
 			dest[0] = ((*src4 & 0x80) >> 4)	| ((*src3 & 0x80) >> 5) | ((*src2 & 0x80) >> 6) | ((*src1 & 0x80) >> 7);
 			dest[1] = ((*src4 & 0x40) >> 3) | ((*src3 & 0x40) >> 4) | ((*src2 & 0x40) >> 5) | ((*src1 & 0x40) >> 6);
 			dest[2] = ((*src4 & 0x20) >> 2) | ((*src3 & 0x20) >> 3) | ((*src2 & 0x20) >> 4) | ((*src1 & 0x20) >> 5);
@@ -882,8 +887,7 @@ bool SImage::load4bitChunk(const uint8_t* gfx_data, int size) {
 	} else return false;
 
 	format = PALMASK;
-	has_palette = true;
-	has_builtinpal = false;
+	has_palette = false;
 	clearData();
 	data = new uint8_t[width*height];
 	mask = new uint8_t[width*height];
@@ -911,8 +915,7 @@ bool SImage::loadImgz(const uint8_t* gfx_data, int size) {
 	height = wxINT16_SWAP_ON_BE(header->height);
 	offset_x = wxINT16_SWAP_ON_BE(header->left);
 	offset_y = wxINT16_SWAP_ON_BE(header->top);
-	has_palette = true;
-	has_builtinpal = false;
+	has_palette = false;
 	format = PALMASK;
 
 	// Create data (all white) and mask
@@ -921,13 +924,11 @@ bool SImage::loadImgz(const uint8_t* gfx_data, int size) {
 	mask = new uint8_t[width*height];
 	memset(data, 0xFF, width*height);
 
-	if (!header->compression)
-	{
+	if (!header->compression) {
 		memcpy(mask, gfx_data + sizeof(imgz_header_t), size - sizeof(imgz_header_t));
 		return true;
 	}
-	else
-	{
+	else {
 		// Since gfx_data is a const pointer, we can't work on it.
 		uint8_t * tempdata = new uint8_t[size]; 
 		memcpy(tempdata, gfx_data, size);
@@ -940,18 +941,15 @@ bool SImage::loadImgz(const uint8_t* gfx_data, int size) {
 
 		uint8_t code = 0; size_t length = 0;
 
-		while (read < readend && dest < destend)
-		{
+		while (read < readend && dest < destend) {
 			code = *read++;
-			if (code < 0x80)
-			{
+			if (code < 0x80) {
 				length = code + 1;
 				memcpy(dest, read, length);
 				dest+=length; 
 				read+=length;
 			}
-			else if (code > 0x80)
-			{
+			else if (code > 0x80) {
 				length = 0x101 - code;
 				code = *read++;
 				memset(dest, code, length);
@@ -960,6 +958,7 @@ bool SImage::loadImgz(const uint8_t* gfx_data, int size) {
 		}
 		delete[] tempdata;
 	}
+
 	return true;
 };
 
@@ -993,8 +992,7 @@ bool SImage::loadFont0(const uint8_t* gfx_data, int size) {
 	width = datasize / height;
 
 	clearData();
-	has_palette = true;
-	has_builtinpal = false;
+	has_palette = false;
 	format = PALMASK;
 
 	// Create new picture and mask
@@ -1046,8 +1044,7 @@ bool SImage::loadFont1(const uint8_t* gfx_data, int size) {
 
 	// Setup variables
 	offset_x = offset_y = 0;
-	has_palette = true;
-	has_builtinpal = false;
+	has_palette = false;
 	format = PALMASK;
 
 	// Clear current data if it exists
@@ -1072,18 +1069,15 @@ bool SImage::loadFont1(const uint8_t* gfx_data, int size) {
 	uint8_t code = 0; size_t length = 0;
 
 	// This uses the same RLE algorithm as compressed IMGZ.
-	while (read < readend && dest < destend)
-	{
+	while (read < readend && dest < destend) {
 		code = *read++;
-		if (code < 0x80)
-		{
+		if (code < 0x80) {
 			length = code + 1;
 			memcpy(dest, read, length);
 			dest+=length; 
 			read+=length;
 		}
-		else if (code > 0x80)
-		{
+		else if (code > 0x80) {
 			length = 0x101 - code;
 			code = *read++;
 			memset(dest, code, length);
@@ -1128,7 +1122,6 @@ bool SImage::loadFont2(const uint8_t* gfx_data, int size) {
 	// Initializes some stuff
 	offset_x = offset_y = 0;
 	has_palette = true;
-	has_builtinpal = true;
 	format = PALMASK;
 
 	if (size < sizeof(Font2Header))
@@ -1161,19 +1154,18 @@ bool SImage::loadFont2(const uint8_t* gfx_data, int size) {
 			p+=2;
 	}
 
-	// Let's build the built-in pal now. 
+	// Let's build the palette now. 
 	for (size_t i = 0; i < header->palsize + 1u; ++i) {
 		rgba_t color;
 		color.r = *p++;
 		color.g = *p++;
 		color.b = *p++;
-		builtinpal.setColour(i, color);
+		palette.setColour(i, color);
 	}
 
 	// 0 is transparent, last is border color, the rest of the palette entries should
 	// be increasingly bright
-	builtinpal.setTransIndex(0);
-	palette.copyPalette(&builtinpal);
+	palette.setTransIndex(0);
 
 	// Clear current data if it exists
 	clearData();
@@ -1188,11 +1180,9 @@ bool SImage::loadFont2(const uint8_t* gfx_data, int size) {
 			uint8_t * d = chars[i].data;
 			uint8_t code = 0; size_t length = 0;
 
-			while (numpixels)
-			{
+			while (numpixels) {
 				code = *p++;
-				if (code < 0x80)
-				{
+				if (code < 0x80) {
 					length = code + 1;
 					// Overflows shouldn't happen
 					if (length > numpixels) {
@@ -1203,8 +1193,7 @@ bool SImage::loadFont2(const uint8_t* gfx_data, int size) {
 					p+=length;
 					numpixels -= length;
 				}
-				else if (code > 0x80)
-				{
+				else if (code > 0x80) {
 					length = 0x101 - code;
 					// Overflows shouldn't happen
 					if (length > numpixels) {
@@ -1323,15 +1312,14 @@ bool SImage::loadBMF(const uint8_t* gfx_data, int size) {
 	clearData();
 	format = PALMASK;
 	has_palette = true;
-	has_builtinpal = true;
 
 	const uint8_t * ofs = gfx_data+17;
 
 	// Setup palette -- it's a 6-bit palette (63 max) so we have to convert it to 8-bit.
 	// Palette index 0 is used as the transparent color and not described at all.
-	builtinpal.setColour(0, rgba_t(0, 0, 0, 0));
+	palette.setColour(0, rgba_t(0, 0, 0, 0));
 	for (size_t i = 0; i < mf.pal_size; ++i) {
-		builtinpal.setColour(i+1, rgba_t((ofs[(i*3)]<<2)+(ofs[(i*3)]>>4), 
+		palette.setColour(i+1, rgba_t((ofs[(i*3)]<<2)+(ofs[(i*3)]>>4), 
 			(ofs[(i*3)+1]<<2)+(ofs[(i*3)]>>4), (ofs[(i*3)+2]<<2)+(ofs[(i*3)+2]>>4), 255));
 	}
 
@@ -1433,8 +1421,7 @@ bool SImage::loadFontM(const uint8_t* gfx_data, int size) {
 
 	// Setup variables
 	offset_x = offset_y = 0;
-	has_palette = true;
-	has_builtinpal = false;
+	has_palette = false;
 	format = PALMASK;
 
 	size_t charwidth = 8;
@@ -1488,19 +1475,17 @@ size_t SImage::countColours() {
 /* SImage::shrinkPalette
  * Shifts all the used colours to the beginning of the palette
  *******************************************************************/
-void SImage::shrinkPalette() {
+void SImage::shrinkPalette(Palette8bit* pal) {
 	// If the picture is not paletted, stop.
 	if (format != PALMASK)
 		return;
 
-	// Copy the palette if needed
-	if (!has_builtinpal) {
-		builtinpal = palette;
-		has_builtinpal = true;
-	}
+	// Check if a palette was given (if not, process the image's palette)
+	if (!pal)
+		pal = &palette;
 
+	// Init variables
 	Palette8bit newpal;
-
 	bool * usedcolours = new bool[256];
 	int * remap = new int[256];
 	memset(usedcolours, 0, 256);
@@ -1514,7 +1499,7 @@ void SImage::shrinkPalette() {
 	// Create palette remapping information
 	for (size_t b = 0; b < 256; ++b) {
 		if (usedcolours[b]) {
-			newpal.setColour(used, builtinpal.colour(b));
+			newpal.setColour(used, pal->colour(b));
 			remap[b] = used;
 			++used;
 		}
@@ -1524,7 +1509,7 @@ void SImage::shrinkPalette() {
 	for (int c = 0; c < width*height; ++c) {
 		data[c] = remap[data[c]];
 	}
-	builtinpal.copyPalette(&newpal);
+	pal->copyPalette(&newpal);
 
 	// Cleanup
 	delete[] usedcolours;
@@ -1535,7 +1520,7 @@ void SImage::shrinkPalette() {
  * Writes the image as PNG data to <out>, keeping palette information
  * if it exists. Returns true on success
  *******************************************************************/
-bool SImage::toPNG(MemChunk& out) {
+bool SImage::toPNG(MemChunk& out, Palette8bit* pal) {
 	FIBITMAP* bm;
 
 	if (format == RGBA) {
@@ -1556,6 +1541,13 @@ bool SImage::toPNG(MemChunk& out) {
 		// Init 8bpp FIBITMAP
 		bm = FreeImage_Allocate(width, height, 8);
 
+		// Get palette to use
+		Palette8bit usepal;
+		if (has_palette)
+			usepal.copyPalette(&palette);
+		else if (pal)
+			usepal.copyPalette(pal);
+
 		// Set palette
 		RGBQUAD* bm_pal = FreeImage_GetPalette(bm);
 		for (int a = 0; a < 256; a++) {
@@ -1567,7 +1559,7 @@ bool SImage::toPNG(MemChunk& out) {
 		// Find unused colour (for transparency)
 		short unused = findUnusedColour();
 
-		// Set any transparent pixels to this colour (if we found an unused colour
+		// Set any transparent pixels to this colour (if we found an unused colour)
 		if (unused >= 0) {
 			for (int a = 0; a < width * height; a++) {
 				if (mask[a] == 0)
@@ -1575,12 +1567,12 @@ bool SImage::toPNG(MemChunk& out) {
 			}
 
 			// Set palette transparency
-			palette.setTransIndex(unused);
+			usepal.setTransIndex(unused);
 		}
 
 		// Set freeimage palette transparency if needed
-		if (palette.transIndex() >= 0)
-			FreeImage_SetTransparentIndex(bm, palette.transIndex());
+		if (usepal.transIndex() >= 0)
+			FreeImage_SetTransparentIndex(bm, usepal.transIndex());
 
 		// Write image data
 		for (int row = 0; row < height; row++) {
@@ -1828,7 +1820,7 @@ bool SImage::toDoomFlat(MemChunk& out) {
  * image is not a valid candidate (16 colors max, 640x480 dimension),
  * true otherwise
  *******************************************************************/
-bool SImage::toPlanar(MemChunk& out) {
+bool SImage::toPlanar(MemChunk& out, Palette8bit* pal) {
 	// Check if data is paletted
 	if (format != PALMASK) {
 		wxLogMessage(_T("Cannot convert truecolour image to planar format - convert to 16-colour first."));
@@ -1846,15 +1838,26 @@ bool SImage::toPlanar(MemChunk& out) {
 		return false;
 	}
 
+	// Get palette to use
+	Palette8bit usepal;
+	if (has_palette)
+		usepal.copyPalette(&palette);
+	else if (pal)
+		usepal.copyPalette(pal);
+
+	// Backup current image data (since shrinpPalette remaps the image colours)
+	MemChunk backup(width*height);
+	backup.write(data, width*height);
+
 	// Make sure all used colors are in the first 16 entries of the palette
-	shrinkPalette();
+	shrinkPalette(&usepal);
 
 	// Create planar palette
 	uint8_t * mycolors = new uint8_t[3];
 	for (size_t i = 0; i < 16; ++i) {
-		mycolors[0] = builtinpal.colour(i).r>>2;
-		mycolors[1] = builtinpal.colour(i).g>>2;
-		mycolors[2] = builtinpal.colour(i).b>>2;
+		mycolors[0] = usepal.colour(i).r>>2;
+		mycolors[1] = usepal.colour(i).g>>2;
+		mycolors[2] = usepal.colour(i).b>>2;
 		out.write(mycolors, 3);
 	}
 	delete[] mycolors;
@@ -1871,10 +1874,8 @@ bool SImage::toPlanar(MemChunk& out) {
 	pln3 = pln2 + plane_size;	// 20: 00100000 02: 00000010
 	pln4 = pln3 + plane_size;	// 10: 00010000 01: 00000001
 
-	for (int y = height; y > 0; --y)
-	{
-		for (int x = width; x > 0; x -= 8)
-		{
+	for (int y = height; y > 0; --y) {
+		for (int x = width; x > 0; x -= 8) {
 			*pln1 = ((read[0] & 0x01) << 7 | (read[1] & 0x01) << 6 | (read[2] & 0x01) << 5 | (read[3] & 0x01) << 4
 					|(read[4] & 0x01) << 3 | (read[5] & 0x01) << 2 | (read[6] & 0x01) << 1 | (read[7] & 0x01)     );
 			*pln2 = ((read[0] & 0x02) << 6 | (read[1] & 0x02) << 5 | (read[2] & 0x02) << 4 | (read[3] & 0x02) << 3
@@ -1894,6 +1895,9 @@ bool SImage::toPlanar(MemChunk& out) {
 	// Write image and cleanup
 	out.write(planes, 153600);
 	delete[] planes;
+	backup.seek(0, SEEK_SET);
+	backup.read(data, width*height);
+
 	return true;
 }
 
@@ -1901,7 +1905,7 @@ bool SImage::toPlanar(MemChunk& out) {
  * Writes the image as 4-bit chunky data to <out>. Returns false if the
  * image is not a valid candidate, true otherwise
  *******************************************************************/
-bool SImage::to4bitChunk(MemChunk& out) {
+bool SImage::to4bitChunk(MemChunk& out, Palette8bit* pal) {
 	// Check if data is paletted
 	if (format != PALMASK) {
 		wxLogMessage(_T("Cannot convert truecolour image to 4-bit format - convert to 16-colour first."));
@@ -1919,6 +1923,17 @@ bool SImage::to4bitChunk(MemChunk& out) {
 		return false;
 	}
 
+	// Get palette to use
+	Palette8bit usepal;
+	if (has_palette)
+		usepal.copyPalette(&palette);
+	else if (pal)
+		usepal.copyPalette(pal);
+
+	// Backup current image data (since shrinpPalette remaps the image colours)
+	MemChunk backup(width*height);
+	backup.write(data, width*height);
+
 	// Make sure all used colors are in the first 16 entries of the palette
 	shrinkPalette();
 
@@ -1932,6 +1947,9 @@ bool SImage::to4bitChunk(MemChunk& out) {
 	// Write image and cleanup
 	out.write(temp, filesize);
 	delete[] temp;
+	backup.seek(0, SEEK_SET);
+	backup.read(data, width*height);
+
 	return true;
 }
 
@@ -1939,14 +1957,14 @@ bool SImage::to4bitChunk(MemChunk& out) {
  * Converts the image to 32bpp (RGBA). Returns false if the image was
  * already 32bpp, true otherwise.
  *******************************************************************/
-bool SImage::convertRGBA() {
+bool SImage::convertRGBA(Palette8bit* pal) {
 	// If it's already 32bpp do nothing
 	if (format == RGBA)
 		return false;
 
 	// Get 32bit data
 	MemChunk rgba_data;
-	getRGBAData(rgba_data);
+	getRGBAData(rgba_data, pal);
 
 	// Clear current data
 	clearData(true);
@@ -1955,13 +1973,94 @@ bool SImage::convertRGBA() {
 	data = new uint8_t[width * height * 4];
 	memcpy(data, rgba_data.getData(), width * height * 4);
 
-	// Set new format
+	// Set new format & update variables
 	format = RGBA;
+	has_palette = false;
 
 	// Announce change
 	announce(_T("image_changed"));
 
 	// Done
+	return true;
+}
+
+/* SImage::convertPaletted
+ * Converts the image to paletted + mask. [pal_target] is the new
+ * palette to convert to (the image's palette will also be set to
+ * this). [pal_current] will be used as the image's current palette
+ * if it doesn't already have one
+ *******************************************************************/
+bool SImage::convertPaletted(Palette8bit* pal_target, Palette8bit* pal_current) {
+	// Check image/parameters are valid
+	if (!isValid() || !pal_target)
+		return false;
+
+	// Get image data as RGBA
+	MemChunk rgba_data;
+	getRGBAData(rgba_data, pal_current);
+
+	// Swap red and blue colour information because FreeImage is retarded
+	for (int a = 0; a < width * height * 4; a += 4) {
+		uint8_t red = rgba_data[a];
+		rgba_data[a] = rgba_data[a+2];
+		rgba_data[a+2] = red;
+	}
+
+	// Build FIBITMAP from it
+	FIBITMAP* bm32 = FreeImage_ConvertFromRawBits((uint8_t*)rgba_data.getData(), width, height, width * 4, 32, 0, 0, 0, false);
+	FIBITMAP* bm = FreeImage_ConvertTo24Bits(bm32);
+
+	// Create mask from alpha info (if converting from RGBA)
+	if (format == RGBA) {
+		// Clear current mask
+		if (mask)
+			delete[] mask;
+
+		// Init mask
+		mask = new uint8_t[width * height];
+
+		// Get values from alpha channel
+		int c = 0;
+		for (int a = 3; a < width * height * 4; a += 4)
+			mask[c++] = rgba_data[a];
+	}
+
+	// Create FreeImage palette
+	RGBQUAD fi_pal[256];
+	for (int a = 0; a < 256; a++) {
+		fi_pal[a].rgbRed = pal_target->colour(a).r;
+		fi_pal[a].rgbGreen = pal_target->colour(a).g;
+		fi_pal[a].rgbBlue = pal_target->colour(a).b;
+	}
+
+	// Convert image to palette
+	FIBITMAP* pbm = NULL;
+	pbm = FreeImage_ColorQuantizeEx(bm, FIQ_NNQUANT, 256, 256, fi_pal);
+
+	// Load given palette
+	palette.copyPalette(pal_target);
+
+	// Clear current image data (but not mask)
+	clearData(false);
+
+	// Load pixel data from the FIBITMAP
+	data = new uint8_t[width * height];
+	for (int a = 0; a < height; a++)
+		memcpy(data + a * width, FreeImage_GetScanLine(pbm, a), width);
+
+	// Update variables
+	format = PALMASK;
+	has_palette = true;
+
+	// Clean up
+	FreeImage_Unload(bm32);
+	FreeImage_Unload(bm);
+	FreeImage_Unload(pbm);
+
+	// Announce change
+	announce(_T("image_changed"));
+
+	// Success
 	return true;
 }
 
@@ -1977,6 +2076,7 @@ bool SImage::convertRGBA() {
  * <quant_type>: Type of colour quantization (0 for Xiaolin Wu, 1
  * for NeuQuant)
  *******************************************************************/
+/*
 bool SImage::convertPaletted(Palette8bit* pal, uint8_t alpha_threshold, bool keep_trans, rgba_t col_trans, int quant_type) {
 	// Check image is valid
 	if (!isValid())
@@ -2068,11 +2168,18 @@ bool SImage::convertPaletted(Palette8bit* pal, uint8_t alpha_threshold, bool kee
  * [force_mask] is true, a mask will be generated even if the image
  * is in RGBA format
  *******************************************************************/
-bool SImage::maskFromColour(rgba_t colour, bool force_mask) {
+bool SImage::maskFromColour(rgba_t colour, Palette8bit* pal, bool force_mask) {
 	if (format == PALMASK && mask != NULL) {
+		// Get palette to use
+		Palette8bit usepal;
+		if (has_palette)
+			usepal.copyPalette(&palette);
+		else if (pal)
+			usepal.copyPalette(pal);
+
 		// Palette+Mask format, go through the mask
 		for (int a = 0; a < width * height; a++) {
-			if (palette.colour(data[a]).equals(colour))
+			if (usepal.colour(data[a]).equals(colour))
 				mask[a] = 0;
 			else
 				mask[a] = 255;

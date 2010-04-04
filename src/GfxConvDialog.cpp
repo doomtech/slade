@@ -258,6 +258,7 @@ void GfxConvDialog::updatePreviewGfx() {
 	// Get the current entry
 	ArchiveEntry* entry = entries[current_entry];
 
+	/*
 	// Load entry palette to each image if needed
 	Palette8bit* pal_archive = new Palette8bit();
 
@@ -278,6 +279,11 @@ void GfxConvDialog::updatePreviewGfx() {
 		gfx_current->getImage()->getPalette()->copyPalette(pal_chooser_current->getSelectedPalette());
 		gfx_target->getImage()->getPalette()->copyPalette(pal_chooser_current->getSelectedPalette());
 	}
+	*/
+
+	// Set palettes
+	gfx_current->setPalette(pal_chooser_current->getSelectedPalette());
+	gfx_target->setPalette(pal_chooser_target->getSelectedPalette());
 
 	// Load the image to both gfx canvases
 	Misc::loadImageFromEntry(gfx_current->getImage(), entry);
@@ -327,7 +333,7 @@ void GfxConvDialog::updateControls() {
 
 	// Set colourbox palette if source image has one
 	if (gfx_current->getImage()->getFormat() == PALMASK) {
-		colbox_transparent->setPalette(gfx_current->getImage()->getPalette());
+		colbox_transparent->setPalette(gfx_current->getPalette());
 	}
 	else
 		colbox_transparent->setPalette(NULL);
@@ -359,13 +365,7 @@ bool GfxConvDialog::doConvert() {
 	keep_trans = rb_transparency_existing->GetValue();
 	alpha_threshold = 0;
 
-	// Palette info
-	if (pal_chooser_target->globalSelected())
-		target_pal.copyPalette(gfx_target->getImage()->getPalette());
-	else
-		target_pal.copyPalette(pal_chooser_target->getSelectedPalette());
-
-	// Transparency info
+	// Setup transparency options
 	if (transparency) {
 		if (keep_trans)
 			alpha_threshold = slider_alpha_threshold->GetValue();
@@ -373,21 +373,24 @@ bool GfxConvDialog::doConvert() {
 			colour_trans = colbox_transparent->getColour();
 	}
 
-	// Do the conversion
+	// Do transparency conversion
+	if (transparency) {
+		if (keep_trans)
+			gfx_target->getImage()->cutoffMask(alpha_threshold, true);
+		else
+			gfx_target->getImage()->maskFromColour(colour_trans, gfx_current->getPalette(), true);
+	}
+
+	// Do colour conversion
 	int format = combo_target_format->GetCurrentSelection();
 	if (format <= CONV_PNG8BIT) {
 		// Convert to selected palette
-		gfx_target->getImage()->convertPaletted(&target_pal, alpha_threshold, keep_trans, colour_trans);
+		gfx_target->getImage()->convertPaletted(gfx_target->getPalette(), gfx_current->getPalette());
 	}
 	else {
 		// Convert to RGBA (32bit)
 		gfx_target->getImage()->convertRGBA();
-
-		// Set transparent colour if selected
-		if (!keep_trans)
-			gfx_target->getImage()->maskFromColour(colour_trans);
 	}
-
 
 	// If doom flat, planar or no transparency is selected, remove any transparency
 	if (format == CONV_DOOMFLAT || format == CONV_PLANAR || format == CONV_4BITCHUNKY || !transparency)

@@ -10,7 +10,6 @@ enum SIFormat {
 	RGBA,		// 4 bytes per pixel: RGBA
 };
 
-// TODO: Fix up how palettes are handled (really should only need builtinpal)
 class SImage : public Announcer {
 private:
 	int			width;
@@ -19,9 +18,7 @@ private:
 	uint8_t*	mask;
 	SIFormat	format;
 	Palette8bit	palette;
-	Palette8bit builtinpal;
 	bool		has_palette;
-	bool		has_builtinpal;
 	int			offset_x;
 	int			offset_y;
 
@@ -35,17 +32,13 @@ public:
 	bool			isValid() { return (width > 0 && height > 0 && data); }
 
 	SIFormat		getFormat() { return format; }
-	bool			getRGBAData(MemChunk& mc);
-	bool			getRGBData(MemChunk& mc);
+	bool			getRGBAData(MemChunk& mc, Palette8bit* pal = NULL);
+	bool			getRGBData(MemChunk& mc, Palette8bit* pal = NULL);
 	int				getWidth() { return width; }
 	int				getHeight() { return height; }
-	Palette8bit*	getPalette() { return &palette; }
-	Palette8bit*	getBuiltInPalette() { return &builtinpal; }
 	bool			hasPalette() { return has_palette; }
-	bool			hasBuiltInPalette() { return has_builtinpal; }
 	point2_t		offset() { return point2_t(offset_x, offset_y); }
 
-	void			setPalette(Palette8bit* pal);
 	void			setXOffset(int offset);
 	void			setYOffset(int offset);
 
@@ -56,7 +49,7 @@ public:
 	bool	trim(int width, int height);
 	bool	validFlatSize();
 	size_t	countColours();
-	void	shrinkPalette();
+	void	shrinkPalette(Palette8bit* pal = NULL);
 
 	// Image format reading
 	bool	loadImage(const uint8_t* data, int size);
@@ -76,16 +69,16 @@ public:
 	bool	loadBMF(const uint8_t* gfx_data, int size);
 
 	// Image format writing
-	bool	toPNG(MemChunk& out);
+	bool	toPNG(MemChunk& out, Palette8bit* pal = NULL);
 	bool	toDoomGfx(MemChunk& out, uint8_t alpha_threshold = 0);
 	bool	toDoomFlat(MemChunk& out);
-	bool	toPlanar(MemChunk& out);
-	bool	to4bitChunk(MemChunk& out);
+	bool	toPlanar(MemChunk& out, Palette8bit* pal = NULL);
+	bool	to4bitChunk(MemChunk& out, Palette8bit* pal = NULL);
 
 	// Conversion stuff
-	bool	convertRGBA();
-	bool	convertPaletted(Palette8bit* pal, uint8_t alpha_threshold = 0, bool keep_trans = true, rgba_t col_trans = COL_CYAN, int quant_type = 0);
-	bool	maskFromColour(rgba_t colour, bool force_mask = false);
+	bool	convertRGBA(Palette8bit* pal = NULL);
+	bool	convertPaletted(Palette8bit* pal_target, Palette8bit* pal_current = NULL);
+	bool	maskFromColour(rgba_t colour, Palette8bit* pal = NULL, bool force_mask = false);
 	bool	cutoffMask(uint8_t threshold, bool force_mask = false);
 };
 

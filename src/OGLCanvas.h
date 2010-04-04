@@ -3,16 +3,19 @@
 #define	__OGLCANVAS_H__
 
 #include "OpenGL.h"
+#include "Palette.h"
 
 class OGLCanvas : public wxGLCanvas {
 protected:
-	//wxGLContext*	context;
-	bool			init_done;
+	bool		init_done;
+	Palette8bit	palette;
 
 public:
 	OGLCanvas(wxWindow* parent, int id);
 	~OGLCanvas();
 
+	Palette8bit*	getPalette() { return &palette; }
+	void			setPalette(Palette8bit* pal) { palette.copyPalette(pal); }
 	bool			setContext();
 	void			init();
 	virtual void	draw() = 0;

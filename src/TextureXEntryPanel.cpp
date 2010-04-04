@@ -134,10 +134,12 @@ bool TextureXEntryPanel::loadEntry(ArchiveEntry* entry) {
 	setModified(false);
 
 	// Refresh controls
+	combo_palette->setGlobalFromArchive(entry->getParent());
 	tex_canvas->clearTexture();
 	gfx_patch_preview->getImage()->clear();
 	populateTextureList();
 	populatePatchesList();
+	updateImagePalette();
 	Show(true);
 	Layout();
 
@@ -206,23 +208,9 @@ void TextureXEntryPanel::populatePatchesList() {
  * palette chooser
  *******************************************************************/
 void TextureXEntryPanel::updateImagePalette() {
-	// Init new palette
-	Palette8bit pal;
-
-	// Set it to whatever is selected in the palette chooser
-	if (combo_palette->globalSelected()) {
-		if (!Misc::loadPaletteFromArchive(&pal, entry->getParent(), entry))
-			pal.copyPalette(thePaletteManager->globalPalette());
-	}
-	else
-		pal.copyPalette(combo_palette->getSelectedPalette());
-
-	if (tex_canvas->getTexture() != NULL)
-		tex_canvas->openTexture(tex_canvas->getTexture(), &pal);
-	if (gfx_patch_preview->getImage()) {
-		gfx_patch_preview->getImage()->setPalette(&pal);
-		gfx_patch_preview->Refresh();
-	}
+	tex_canvas->setPalette(combo_palette->getSelectedPalette());
+	tex_canvas->openTexture(tex_canvas->getTexture());
+	gfx_patch_preview->setPalette(combo_palette->getSelectedPalette());
 }
 
 
@@ -231,35 +219,17 @@ void TextureXEntryPanel::onTextureListSelect(wxListEvent& e) {
 	// Get the selected texture
 	CTexture* tex = texturex.getTexture(e.GetIndex());
 
-	// Set it's palette to whatever is selected in the palette chooser
-	Palette8bit pal;
-	if (combo_palette->globalSelected()) {
-		if (!Misc::loadPaletteFromArchive(&pal, entry->getParent(), entry))
-			pal.copyPalette(thePaletteManager->globalPalette());
-	}
-	else
-		pal.copyPalette(combo_palette->getSelectedPalette());
-
 	// Open it if valid index (should be)
 	if (tex)
-		tex_canvas->openTexture(tex, &pal);
+		tex_canvas->openTexture(tex);
 }
 
 void TextureXEntryPanel::onPatchesListSelect(wxListEvent& e) {
 	// Get the selected patch entry
 	ArchiveEntry* entry = texturex.getPatchEntry(e.GetIndex());
 
-	// Get the currently selected palette
-	Palette8bit pal;
-	if (combo_palette->globalSelected() && entry)
-		if (!Misc::loadPaletteFromArchive(&pal, entry->getParent(), entry))
-			pal.copyPalette(thePaletteManager->globalPalette());
-	else
-		pal.copyPalette(combo_palette->getSelectedPalette());
-
 	// Load the image
 	gfx_patch_preview->getImage()->clear();
-	gfx_patch_preview->getImage()->setPalette(&pal);
 	Misc::loadImageFromEntry(gfx_patch_preview->getImage(), entry);
 
 	// Refresh the preview
@@ -273,4 +243,5 @@ void TextureXEntryPanel::onPatchesListSelect(wxListEvent& e) {
 void TextureXEntryPanel::onPaletteChanged(wxCommandEvent& e) {
 	updateImagePalette();
 	tex_canvas->Refresh();
+	gfx_patch_preview->updateImageTexture();
 }

@@ -76,7 +76,7 @@ void CTextureCanvas::clearPatchTextures() {
 /* CTextureCanvas::openTexture
  * Loads a composite texture to be displayed
  *******************************************************************/
-bool CTextureCanvas::openTexture(CTexture* tex, Palette8bit * pal) {
+bool CTextureCanvas::openTexture(CTexture* tex) {
 	// Clear the current texture
 	clearTexture();
 
@@ -92,10 +92,6 @@ bool CTextureCanvas::openTexture(CTexture* tex, Palette8bit * pal) {
 	for (uint32_t a = 0; a < tex->nPatches(); a++) {
 		// Create GL texture
 		patch_textures.push_back(new GLTexture());
-
-		// Load palette
-		if (pal && getTexture() && getTexture()->getPatch(a) && getTexture()->getPatch(a)->getImage())
-			getTexture()->getPatch(a)->getImage()->setPalette(pal);
 	}
 
 	// Redraw
@@ -207,7 +203,7 @@ void CTextureCanvas::drawPatch(int num) {
 	// Load the patch as an opengl texture if it isn't already
 	if (!patch_textures[num]->isLoaded()) {
 		if (patch)
-			patch_textures[num]->loadImage(patch->getImage());
+			patch_textures[num]->loadImage(patch->getImage(), &palette);
 	}
 
 	// Enable textures

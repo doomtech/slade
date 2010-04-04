@@ -85,7 +85,7 @@ bool GLTexture::loadData(const uint8_t* data, uint32_t width, uint32_t height, b
 	return true;
 }
 
-bool GLTexture::loadImage(SImage* image) {
+bool GLTexture::loadImage(SImage* image, Palette8bit* pal) {
 	// Check image was given
 	if (!image)
 		return false;
@@ -103,7 +103,7 @@ bool GLTexture::loadImage(SImage* image) {
 
 		// Get RGBA image data
 		MemChunk rgba;
-		image->getRGBAData(rgba);
+		image->getRGBAData(rgba, pal);
 
 		// Generate GL texture from rgba data
 		return loadData(rgba.getData(), image->getWidth(), image->getHeight());
@@ -115,7 +115,7 @@ bool GLTexture::loadImage(SImage* image) {
 			int left = 0;
 			while (left < image->getWidth()) {
 				// Load 128x128 portion of image
-				loadImagePortion(image, rect_t(left, top, left + 128, top + 128), true);
+				loadImagePortion(image, rect_t(left, top, left + 128, top + 128), pal, true);
 
 				// Move right 128px
 				left += 128;
@@ -133,7 +133,7 @@ bool GLTexture::loadImage(SImage* image) {
 	}
 }
 
-bool GLTexture::loadImagePortion(SImage* image, rect_t rect, bool add) {
+bool GLTexture::loadImagePortion(SImage* image, rect_t rect, Palette8bit* pal, bool add) {
 	// Check image was given
 	if (!image)
 		return false;
@@ -148,7 +148,7 @@ bool GLTexture::loadImagePortion(SImage* image, rect_t rect, bool add) {
 
 	// Get RGBA image data
 	MemChunk rgba;
-	image->getRGBAData(rgba);
+	image->getRGBAData(rgba, pal);
 
 	// Init texture data
 	MemChunk portion;

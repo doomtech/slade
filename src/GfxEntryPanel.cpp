@@ -137,7 +137,7 @@ GfxEntryPanel::~GfxEntryPanel() {
  * Loads an entry into the entry panel if it is a valid image format
  *******************************************************************/
 bool GfxEntryPanel::loadEntry(ArchiveEntry* entry) {
-
+	// Check entry was given
 	if (entry == NULL)
 		return false;
 
@@ -150,6 +150,7 @@ bool GfxEntryPanel::loadEntry(ArchiveEntry* entry) {
 		return false;
 
 	// Setup palette
+	combo_palette->setGlobalFromArchive(entry->getParent());
 	updateImagePalette();
 
 	// Set offset text boxes
@@ -200,27 +201,12 @@ bool GfxEntryPanel::saveEntry() {
 }
 
 /* GfxEntryPanel::updateImagePalette
- * Sets the gfx canvas' image's palette to what is selected in the
- * palette chooser
+ * Sets the gfx canvas' palette to what is selected in the palette
+ * chooser, and refreshes the gfx canvas
  *******************************************************************/
 void GfxEntryPanel::updateImagePalette() {
-	// Init new palette
-	Palette8bit pal;
-
-	// Set it to whatever is selected in the palette chooser
-	if (combo_palette->globalSelected()) {
-		if (gfx_canvas->getImage()->hasBuiltInPalette())
-			pal.copyPalette(gfx_canvas->getImage()->getBuiltInPalette());
-		else {
-			if (!Misc::loadPaletteFromArchive(&pal, entry->getParent(), entry))
-				pal.copyPalette(thePaletteManager->globalPalette());
-		}
-	}
-	else
-		pal.copyPalette(combo_palette->getSelectedPalette());
-
-	// Set the image's palette
-	gfx_canvas->getImage()->setPalette(&pal);
+	gfx_canvas->setPalette(combo_palette->getSelectedPalette());
+	gfx_canvas->updateImageTexture();
 }
 
 /* GfxEntryPanel::detectOffsetType
