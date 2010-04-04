@@ -646,7 +646,7 @@ bool ArchivePanel::openEntry(ArchiveEntry* entry) {
 
 	// Load the entry into the panel
 	if (!cur_area->openEntry(entry)) {
-		wxMessageBox(s_fmt(_T("Error loading entry:\n%s"), Global::error.c_str()), _T("Error"), wxICON_ERROR);
+		wxMessageBox(s_fmt(_T("Error loading entry:\n%s"), Global::error.c_str()), _T("Error"), wxOK|wxICON_ERROR);
 	}
 
 	return true;

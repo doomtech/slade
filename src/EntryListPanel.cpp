@@ -525,7 +525,8 @@ void EntryListPanel::onEntryListActivated(wxListEvent& e) {
 	if (!entry)
 		return;
 	
-	if (entry->getType()->getFormat() == EDF_WAD)
+	if (entry->getType()->getFormat() == EDF_WAD ||
+		entry->getType()->getFormat() == EDF_ZIP)
 		theArchiveManager->openArchive(entry);
 }
 
