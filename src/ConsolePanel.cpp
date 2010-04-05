@@ -71,6 +71,7 @@ void ConsolePanel::initLayout() {
 
 	// Create and add the message log textbox
 	text_log = new wxTextCtrl(this, -1, _T(""), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE | wxTE_READONLY);
+	text_log->SetSizeHints(wxSize(-1, 0));
 	vbox->Add(text_log, 1, wxEXPAND | wxALL, 4);
 
 	// Create and add the command entry textbox
