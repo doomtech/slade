@@ -266,7 +266,7 @@ bool MemChunk::exportMemChunk(MemChunk& mc, uint32_t start, uint32_t size) {
 		return false;
 
 	// Check parameters
-	if (start >= this->size || start + size >= this->size)
+	if (start >= this->size || start + size > this->size)
 		return false;
 
 	// Check size
