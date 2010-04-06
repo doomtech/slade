@@ -115,6 +115,7 @@ void TextureXList::clear() {
  * Updates all patch entries
  *******************************************************************/
 bool TextureXList::updatePatches(Archive* archive) {
+	bool okay = true;
 	for (size_t a = 0; a < patches.size(); a++) {
 		// Attempt to find patch entry
 		ArchiveEntry* entry = NULL;
@@ -127,9 +128,12 @@ bool TextureXList::updatePatches(Archive* archive) {
 		// Set patch entry
 		patches[a].entry = entry;
 
-		if (!entry)
+		if (!entry) {
 			wxLogMessage(_T("Patch \"%s\" not found"), patches[a].name.c_str());
+			okay = false;
+		}
 	}
+	return okay;
 }
 
 // Some structs for reading TEXTUREx data
