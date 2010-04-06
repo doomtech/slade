@@ -172,8 +172,9 @@ void TextureXEntryPanel::populateTextureList() {
 	// Add each texture to the list
 	list_textures->enableSizeUpdate(false);
 	for (uint32_t a = 0; a < texturex.nTextures(); a++) {
-		CTexture* tex = texturex.getTexture(a);
-		string cols[] = { tex->getName(), s_fmt(_T("%dx%d"), tex->getWidth(), tex->getHeight()) };
+		//CTexture* tex = texturex.getCTexture(a);
+		tx_texture_t tex = texturex.getTexInfo(a);
+		string cols[] = { tex.name, s_fmt(_T("%dx%d"), tex.width, tex.height) };
 		list_textures->addItem(a, wxArrayString(2, cols));
 	}
 
@@ -221,7 +222,7 @@ void TextureXEntryPanel::updateImagePalette() {
 
 void TextureXEntryPanel::onTextureListSelect(wxListEvent& e) {
 	// Get the selected texture
-	CTexture* tex = texturex.getTexture(e.GetIndex());
+	CTexture* tex = texturex.getCTexture(e.GetIndex());
 
 	// Open it if valid index (should be)
 	if (tex)
