@@ -368,6 +368,8 @@ bool ArchiveManager::openBaseResource(string filename) {
 		base_resource_archive = new WadArchive();
 	else if (ZipArchive::isZipArchive(filename))
 		base_resource_archive = new ZipArchive();
+	else
+		return false;
 
 	// Attempt to open the file
 	if (base_resource_archive->open(filename)) {
