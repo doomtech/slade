@@ -37,6 +37,7 @@ public:
 	ArchiveEntry*	getPatchEntry(size_t index);
 
 	void	clear();
+	bool	updatePatches(Archive* archive = NULL);
 
 	bool	readTEXTUREXData(ArchiveEntry* texturex, ArchiveEntry* pnames);
 	bool	readTEXTURESData(ArchiveEntry* textures);

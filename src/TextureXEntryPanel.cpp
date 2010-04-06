@@ -106,8 +106,12 @@ TextureXEntryPanel::~TextureXEntryPanel() {
  *******************************************************************/
 bool TextureXEntryPanel::loadEntry(ArchiveEntry* entry) {
 	// Do nothing if entry is already open
-	if (this->entry == entry)
+	if (this->entry == entry) {
+		texturex.updatePatches(entry->getParent());
+		combo_palette->setGlobalFromArchive(entry->getParent());
+		populatePatchesList();
 		return true;
+	}
 
 	// Hide while loading
 	Show(false);

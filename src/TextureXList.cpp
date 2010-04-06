@@ -111,6 +111,27 @@ void TextureXList::clear() {
 	patches.clear();
 }
 
+/* TextureXList::updatePatches
+ * Updates all patch entries
+ *******************************************************************/
+bool TextureXList::updatePatches(Archive* archive) {
+	for (size_t a = 0; a < patches.size(); a++) {
+		// Attempt to find patch entry
+		ArchiveEntry* entry = NULL;
+
+		if (archive)
+			entry = archive->getEntry(patches[a].name);						// Search given archive first
+		if (!entry)
+			entry = theArchiveManager->getResourceEntry(patches[a].name);	// Next search open resource archives + base resource archive
+
+		// Set patch entry
+		patches[a].entry = entry;
+
+		if (!entry)
+			wxLogMessage(_T("Patch \"%s\" not found"), patches[a].name.c_str());
+	}
+}
+
 // Some structs for reading TEXTUREx data
 struct tdef_t
 { // The normal version with just the relevant data
