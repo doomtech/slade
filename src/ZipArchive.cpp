@@ -354,11 +354,14 @@ ArchiveEntry* ZipArchive::getEntry(string name) {
 }
 
 /* ZipArchive::getEntry
- * Getting entry by index is not implemented for ZipArchive, just
- * prints a warning to the logfile and returns NULL
+ * Implements getting entries by index for ZipArchive if the zipdir_t
+ * directory is properly initialized. Otherwise prints a warning.
  *******************************************************************/
 ArchiveEntry* ZipArchive::getEntry(uint32_t index) {
-	wxLogMessage(_T("Warning: Attempt to access ZipArchive entry by index"));
+	if (directory && index < directory->numEntries(true))
+		return directory->entries[index];
+	else
+		wxLogMessage(_T("Warning: Attempt to access ZipArchive entry by index"));
 	return NULL;
 }
 
