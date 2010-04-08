@@ -47,8 +47,21 @@
  *******************************************************************/
 TextureXEntryPanel::TextureXEntryPanel(wxWindow* parent)
 : EntryPanel(parent, _T("texturex")) {
+	// Init variables
+	entry_texturex = NULL;
+	entry_pnames = NULL;
+
 	// Create tabs
-	tabs = new wxAuiNotebook(this, -1, wxDefaultPosition, wxDefaultSize, wxAUI_NB_DEFAULT_STYLE|wxNO_BORDER);
+	tabs = new wxAuiNotebook(this, -1, wxDefaultPosition, wxDefaultSize, wxAUI_NB_TOP|wxAUI_NB_TAB_SPLIT|wxAUI_NB_TAB_MOVE|wxNO_BORDER);
+
+	// Add editing controls
+	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
+	sizer_bottom->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
+
+	// Palette chooser
+	combo_palette = new PaletteChooser(this, -1);
+	hbox->Add(new wxStaticText(this, -1, _T("Palette:")), 0, wxALIGN_CENTER_VERTICAL, 0);
+	hbox->Add(combo_palette, 0, wxEXPAND, 0);
 
 	// Add TEXTUREx editor tab
 	tabs->AddPage(initTexArea(), _T("Textures"));
@@ -79,15 +92,6 @@ wxPanel* TextureXEntryPanel::initTexArea() {
 	// Setup tx panel sizer
 	wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
 	panel->SetSizer(sizer);
-
-	// Add editing controls
-	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
-	sizer_bottom->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
-
-	// Palette chooser
-	combo_palette = new PaletteChooser(panel, -1);
-	hbox->Add(new wxStaticText(panel, -1, _T("Palette:")), 0, wxALIGN_CENTER_VERTICAL, 0);
-	hbox->Add(combo_palette, 0, wxEXPAND, 0);
 
 	// Add textures list
 	wxStaticBox* frame = new wxStaticBox(panel, -1, _T("Textures"));
@@ -140,32 +144,56 @@ wxPanel* TextureXEntryPanel::initPnamesArea() {
  *******************************************************************/
 bool TextureXEntryPanel::loadEntry(ArchiveEntry* entry) {
 	// Do nothing if entry is already open
-	if (this->entry == entry) {
+	if (entry == entry_texturex || entry == entry_pnames) {
 		texturex.updatePatches(entry->getParent());
 		combo_palette->setGlobalFromArchive(entry->getParent());
 		populatePatchesList();
+		populatePnamesList();
 		return true;
 	}
 
 	// Hide while loading
 	Show(false);
 
-	// Get PNAMES entry
-	ArchiveEntry* pnames = NULL;
-	if (entry->getParent())
-		pnames = entry->getParent()->getEntry(_T("PNAMES"));		// Try to get from entry's parent archive first
+	// Set relevant entry
+	if (entry->getType()->getFormat() == EDF_TEXTUREX)
+		entry_texturex = entry;
+	else if (entry->getType()->getFormat() == EDF_PNAMES)
+		entry_pnames = entry;
 
-	if (!pnames)
-		pnames = theArchiveManager->getResourceEntry(_T("PNAMES"));	// Then try resource archives
+	// Find PNAMES entry if needed
+	if (!entry_pnames) {
+		if (entry->getParent())
+			entry_pnames = entry->getParent()->getEntry(_T("PNAMES"));			// Try to get from entry's parent archive first
 
-	if (!pnames) {
-		// Can't really do anything without pnames
-		Global::error = _T("Could not find PNAMES entry");
-		return false;
+		if (!entry_pnames)
+			entry_pnames = theArchiveManager->getResourceEntry(_T("PNAMES"));	// Then try resource archives
+
+		if (!entry_pnames) {
+			Global::error = _T("Could not find PNAMES entry");
+			return false;
+		}
 	}
 
+	// Find TEXTUREx entry if needed
+	if (!entry_texturex) {
+		if (entry_pnames->getParent()) {
+			for (size_t a = 0; a < entry_pnames->getParent()->numEntries(); a++) {
+				if (entry_pnames->getParent()->getEntry(a)->getType()->getFormat() == EDF_TEXTUREX) {
+					entry_texturex = entry_pnames->getParent()->getEntry(a);
+					break;
+				}
+			}
+		}
+
+		if (!entry_texturex) {
+			Global::error = _T("Could not find TEXTUREx entry");
+			return false;
+		}
+	}	
+
 	// Read TEXTUREx entry into texturexlist
-	texturex.readTEXTUREXData(entry, pnames);
+	texturex.readTEXTUREXData(entry_texturex, entry_pnames);
 
 	// Update variables
 	this->entry = entry;
@@ -177,6 +205,7 @@ bool TextureXEntryPanel::loadEntry(ArchiveEntry* entry) {
 	gfx_patch_preview->getImage()->clear();
 	populateTextureList();
 	populatePatchesList();
+	populatePnamesList();
 	updateImagePalette();
 	Show(true);
 	Layout();
@@ -228,11 +257,11 @@ void TextureXEntryPanel::populatePatchesList() {
 	list_patches->InsertColumn(0, _T("Name"));
 
 	// Add each patch to the list
-	for (uint32_t a = 0; a < texturex.nPatches(); a++)
+	list_patches->enableSizeUpdate(false);
+	for (uint32_t a = 0; a < texturex.nPatches(); a++) {
 		list_patches->addItem(a, texturex.getPatchName(a));
 
-	// Colour any invalid patches
-	for (uint32_t a = 0; a < texturex.nPatches(); a++) {
+		// Colour red if invalid
 		if (!texturex.getPatchEntry(a))
 			list_patches->setItemStatus(a, LV_STATUS_ERROR);
 	}
@@ -242,6 +271,47 @@ void TextureXEntryPanel::populatePatchesList() {
 	list_patches->enableSizeUpdate(true);
 	list_patches->updateSize();
 	list_patches->GetParent()->Layout();
+}
+
+void TextureXEntryPanel::populatePnamesList() {
+	// Clear current list
+	list_pnames->ClearAll();
+	list_pnames->Show(false);
+
+	// Add columns
+	list_pnames->InsertColumn(0, _T("#"));
+	list_pnames->InsertColumn(1, _T("Patch Name"));
+	list_pnames->InsertColumn(2, _T("In Archive"));
+
+	// Add pnames entries to the list
+	list_pnames->enableSizeUpdate(false);
+	for (uint32_t a = 0; a < texturex.nPatches(); a++) {
+		string name = texturex.getPatchName(a);
+		string archive = _T("NOT FOUND");
+
+		// Get parent archive if any
+		ArchiveEntry* entry = texturex.getPatchEntry(a);
+		if (entry)
+			archive = entry->getParent()->getFileName(false);
+
+		string cols[] = { s_fmt(_T("%04d"), a), name, archive };
+		list_pnames->addItem(a, wxArrayString(3, cols));
+
+		// Colour red if patch entry not found
+		if (!entry)
+			list_pnames->setItemStatus(a, LV_STATUS_ERROR);
+	}
+
+	// Colour any invalid patches
+	for (uint32_t a = 0; a < texturex.nPatches(); a++) {
+		
+	}
+
+	// Update list width
+	list_pnames->Show(true);
+	list_pnames->enableSizeUpdate(true);
+	list_pnames->updateSize();
+	list_pnames->GetParent()->Layout();
 }
 
 /* TextureXEntryPanel::updateImagePalette

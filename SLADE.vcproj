@@ -413,14 +413,6 @@
 						>
 					</File>
 					<File
-						RelativePath=".\src\PnamesEntryPanel.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\src\PnamesEntryPanel.h"
-						>
-					</File>
-					<File
 						RelativePath=".\src\SwitchesEntryPanel.cpp"
 						>
 					</File>
@@ -631,14 +623,6 @@
 				</File>
 				<File
 					RelativePath=".\src\BinaryControlLump.h"
-					>
-				</File>
-				<File
-					RelativePath=".\src\PnamesList.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\PnamesList.h"
 					>
 				</File>
 				<File

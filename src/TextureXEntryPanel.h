@@ -16,6 +16,9 @@ private:
 	TextureXList	texturex;
 	wxAuiNotebook*	tabs;
 
+	ArchiveEntry*	entry_texturex;
+	ArchiveEntry*	entry_pnames;
+
 	// TEXTUREx editor
 	ListView*		list_textures;
 	ListView*		list_patches;
@@ -38,6 +41,7 @@ public:
 
 	void	populateTextureList();
 	void	populatePatchesList();
+	void	populatePnamesList();
 	void	updateImagePalette();
 
 	// Events

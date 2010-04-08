@@ -43,7 +43,6 @@
 #include "TextureXEntryPanel.h"
 #include "AnimatedEntryPanel.h"
 #include "SwitchesEntryPanel.h"
-#include "PnamesEntryPanel.h"
 #include "GfxConvDialog.h"
 #include "ModifyOffsetsDialog.h"
 #include "EntryOperations.h"
@@ -74,7 +73,6 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 	texturex_area = new TextureXEntryPanel(this);
 	animated_area = new AnimatedEntryPanel(this);
 	switches_area = new SwitchesEntryPanel(this);
-	pnames_area = new PnamesEntryPanel(this);
 
 	// Bind events
 	Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &ArchivePanel::onEntryListSelect, this, ENTRY_LIST_PANEL);
@@ -629,8 +627,6 @@ bool ArchivePanel::openEntry(ArchiveEntry* entry) {
 		new_area = text_area;
 	else if (!entry->getType()->getEditor().Cmp(_T("texturex")))
 		new_area = texturex_area;
-	else if (!entry->getType()->getEditor().Cmp(_T("pnames")))
-		new_area = pnames_area;
 	else if (!entry->getType()->getEditor().Cmp(_T("animated")))
 		new_area = animated_area;
 	else if (!entry->getType()->getEditor().Cmp(_T("switches")))
