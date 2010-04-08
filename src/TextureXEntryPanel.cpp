@@ -2,23 +2,23 @@
 /*******************************************************************
  * SLADE - It's a Doom Editor
  * Copyright (C) 2008 Simon Judd
- * 
+ *
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
  * Filename:    TextureXEntryPanel.cpp
  * Description: TextureXEntryPanel class. The UI for editing TEXTUREx
  *              entries (and PNAMES)
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -47,45 +47,17 @@
  *******************************************************************/
 TextureXEntryPanel::TextureXEntryPanel(wxWindow* parent)
 : EntryPanel(parent, _T("texturex")) {
-	// Setup panel sizer
-	wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
-	sizer_main->Add(sizer, 1, wxEXPAND, 0);
-	
-	// Add editing controls
-	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
-	sizer_bottom->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
- 
-	// Palette chooser
-	combo_palette = new PaletteChooser(this, -1);
-	hbox->Add(new wxStaticText(this, -1, _T("Palette:")), 0, wxALIGN_CENTER_VERTICAL, 0);
-	hbox->Add(combo_palette, 0, wxEXPAND, 0);
+	// Create tabs
+	tabs = new wxAuiNotebook(this, -1, wxDefaultPosition, wxDefaultSize, wxAUI_NB_DEFAULT_STYLE|wxNO_BORDER);
 
-	// Add textures list
-	wxStaticBox* frame = new wxStaticBox(this, -1, _T("Textures"));
-	wxStaticBoxSizer* framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
-	list_textures = new ListView(this, -1);
-	list_textures->showIcons(false);
-	framesizer->Add(list_textures, 1, wxEXPAND|wxALL, 4);
-	sizer->Add(framesizer, 0, wxEXPAND|wxALL, 4);
+	// Add TEXTUREx editor tab
+	tabs->AddPage(initTexArea(), _T("Textures"));
 
-	// Add texture canvas
-	tex_canvas = new CTextureCanvas(this, -1);
-	sizer->Add(tex_canvas, 1, wxEXPAND|wxALL, 4);
+	// Add PNAMES editor tab
+	tabs->AddPage(initPnamesArea(), _T("Patch Table"));
 
-	// Add patches list
-	frame = new wxStaticBox(this, -1, _T("Available Patches"));
-	framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
-	list_patches = new ListView(this, -1);
-	list_patches->showIcons(false);
-	framesizer->Add(list_patches, 1, wxEXPAND|wxALL, 4);
-	sizer->Add(framesizer, 0, wxEXPAND|wxALL, 4);
-
-	// Add patch preview
-	gfx_patch_preview = new GfxCanvas(this, -1);
-	gfx_patch_preview->SetSizeHints(wxSize(128, 128));
-	gfx_patch_preview->setViewType(GFXVIEW_CENTERED);
-	framesizer->Add(gfx_patch_preview, 0, wxEXPAND|wxALL, 4);
-
+	// Add tabs to sizer
+	sizer_main->Add(tabs, 1, wxEXPAND|wxALL, 4);
 
 	// Bind events
 	list_textures->Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &TextureXEntryPanel::onTextureListSelect, this);
@@ -99,6 +71,68 @@ TextureXEntryPanel::TextureXEntryPanel(wxWindow* parent)
  * TextureXEntryPanel class destructor
  *******************************************************************/
 TextureXEntryPanel::~TextureXEntryPanel() {
+}
+
+wxPanel* TextureXEntryPanel::initTexArea() {
+	wxPanel* panel = new wxPanel(this, -1);
+
+	// Setup tx panel sizer
+	wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
+	panel->SetSizer(sizer);
+
+	// Add editing controls
+	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
+	sizer_bottom->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
+
+	// Palette chooser
+	combo_palette = new PaletteChooser(panel, -1);
+	hbox->Add(new wxStaticText(panel, -1, _T("Palette:")), 0, wxALIGN_CENTER_VERTICAL, 0);
+	hbox->Add(combo_palette, 0, wxEXPAND, 0);
+
+	// Add textures list
+	wxStaticBox* frame = new wxStaticBox(panel, -1, _T("Textures"));
+	wxStaticBoxSizer* framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
+	list_textures = new ListView(panel, -1);
+	list_textures->showIcons(false);
+	framesizer->Add(list_textures, 1, wxEXPAND|wxALL, 4);
+	sizer->Add(framesizer, 0, wxEXPAND|wxALL, 4);
+
+	// Add texture canvas
+	tex_canvas = new CTextureCanvas(panel, -1);
+	sizer->Add(tex_canvas, 1, wxEXPAND|wxALL, 4);
+
+	// Add patches list
+	frame = new wxStaticBox(panel, -1, _T("Available Patches"));
+	framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
+	list_patches = new ListView(panel, -1);
+	list_patches->showIcons(false);
+	framesizer->Add(list_patches, 1, wxEXPAND|wxALL, 4);
+	sizer->Add(framesizer, 0, wxEXPAND|wxALL, 4);
+
+	// Add patch preview
+	gfx_patch_preview = new GfxCanvas(panel, -1);
+	gfx_patch_preview->SetSizeHints(wxSize(128, 128));
+	gfx_patch_preview->setViewType(GFXVIEW_CENTERED);
+	framesizer->Add(gfx_patch_preview, 0, wxEXPAND|wxALL, 4);
+
+	return panel;
+}
+
+wxPanel* TextureXEntryPanel::initPnamesArea() {
+	wxPanel* panel = new wxPanel(this, -1);
+
+	// Setup tx panel sizer
+	wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
+	panel->SetSizer(sizer);
+
+	// Add PNAMES list
+	wxStaticBox* frame = new wxStaticBox(panel, -1, _T("Patches (PNAMES)"));
+	wxStaticBoxSizer* framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
+	sizer->Add(framesizer, 0, wxEXPAND|wxALL, 4);
+	list_pnames = new ListView(panel, -1);
+	framesizer->Add(list_pnames, 1, wxEXPAND|wxALL, 4);
+
+	return panel;
 }
 
 /* TextureXEntryPanel::loadEntry
@@ -182,6 +216,7 @@ void TextureXEntryPanel::populateTextureList() {
 	list_textures->Show(true);
 	list_textures->enableSizeUpdate(true);
 	list_textures->updateSize();
+	list_textures->GetParent()->Layout();
 }
 
 void TextureXEntryPanel::populatePatchesList() {
@@ -206,6 +241,7 @@ void TextureXEntryPanel::populatePatchesList() {
 	list_patches->Show(true);
 	list_patches->enableSizeUpdate(true);
 	list_patches->updateSize();
+	list_patches->GetParent()->Layout();
 }
 
 /* TextureXEntryPanel::updateImagePalette

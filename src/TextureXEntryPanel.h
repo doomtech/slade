@@ -8,21 +8,30 @@
 #include "TextureXList.h"
 #include "PaletteChooser.h"
 #include "GfxCanvas.h"
+#include <wx/aui/auibook.h>
+
 
 class TextureXEntryPanel : public EntryPanel {
 private:
-	//vector<CTexture*>	textures;
 	TextureXList	texturex;
+	wxAuiNotebook*	tabs;
 
+	// TEXTUREx editor
 	ListView*		list_textures;
 	ListView*		list_patches;
 	CTextureCanvas*	tex_canvas;
 	PaletteChooser*	combo_palette;
 	GfxCanvas*		gfx_patch_preview;
 
+	// Patch table (PNAMES) editor
+	ListView*		list_pnames;
+
 public:
 	TextureXEntryPanel(wxWindow* parent);
 	~TextureXEntryPanel();
+
+	wxPanel*	initTexArea();
+	wxPanel*	initPnamesArea();
 
 	bool	loadEntry(ArchiveEntry* entry);
 	bool	saveEntry();

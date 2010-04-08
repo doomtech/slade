@@ -64,10 +64,12 @@
         <File Name="src/SwitchesEntryPanel.h"/>
         <File Name="src/TextEntryPanel.cpp"/>
         <File Name="src/TextEntryPanel.h"/>
-        <File Name="src/TextureXEntryPanel.cpp"/>
-        <File Name="src/TextureXEntryPanel.h"/>
         <File Name="src/PnamesEntryPanel.cpp"/>
         <File Name="src/PnamesEntryPanel.h"/>
+        <VirtualDirectory Name="TextureXEntryPanel">
+          <File Name="src/TextureXEntryPanel.cpp"/>
+          <File Name="src/TextureXEntryPanel.h"/>
+        </VirtualDirectory>
       </VirtualDirectory>
       <VirtualDirectory Name="ZipArchivePanel">
         <File Name="src/ZipArchivePanel.cpp"/>
