@@ -13,6 +13,8 @@ private:
 	vector<GLTexture*>	patch_textures;
 	GLTexture*			tex_background;
 	int					selected_patch;
+	fpoint2_t			offset;
+	point2_t			mouse_prev;
 
 public:
 	CTextureCanvas(wxWindow* parent, int id);
@@ -29,6 +31,8 @@ public:
 	void	drawTexture();
 	void	drawPatch(int num);
 	void	drawTextureBorder();
+	void	resetOffsets() { offset.x = offset.y = 0; }
+	void	onMouseMovement(wxMouseEvent& e);
 };
 
 #endif//__CTEXTURECANVAS_H__

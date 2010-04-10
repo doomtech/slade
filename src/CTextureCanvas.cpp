@@ -43,6 +43,7 @@ CTextureCanvas::CTextureCanvas(wxWindow* parent, int id)
 : OGLCanvas(parent, id) {
 	texture = NULL;
 	tex_background = new GLTexture();
+	Bind(wxEVT_MOTION, &CTextureCanvas::onMouseMovement, this);
 }
 
 /* CTextureCanvas::~CTextureCanvas
@@ -62,6 +63,9 @@ void CTextureCanvas::clearTexture() {
 
 	// Clear patch textures
 	clearPatchTextures();
+
+	// Reset view offset
+	resetOffsets();
 }
 
 /* CTextureCanvas::clearPatchTextures
@@ -121,6 +125,9 @@ void CTextureCanvas::draw() {
 
 	// Draw background
 	drawChequeredBackground();
+
+	 // Pan by view offset
+	glTranslated(offset.x, offset.y, 0);
 
 	// Draw texture
 	if (texture) {
@@ -259,3 +266,21 @@ void CTextureCanvas::drawTextureBorder() {
 	// Pop matrix
 	glPopMatrix();
 }
+
+/* CTextureCanvas::onMouseMovement
+ * Called when the mouse pointer is moved within the canvas
+ *******************************************************************/
+void CTextureCanvas::onMouseMovement(wxMouseEvent& e) {
+	bool refresh = false;
+
+	if (e.RightIsDown()) {
+		offset = offset + point2_t(e.GetPosition().x - mouse_prev.x, e.GetPosition().y - mouse_prev.y);
+		refresh = true;
+	}
+
+	if (refresh)
+		Refresh();
+
+	mouse_prev.set(e.GetPosition().x, e.GetPosition().y);
+}
+
