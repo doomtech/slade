@@ -117,7 +117,7 @@ void CTextureCanvas::draw() {
 
 	// Clear
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
 	// Draw background
 	drawChequeredBackground();
@@ -210,10 +210,24 @@ void CTextureCanvas::drawPatch(int num) {
 	glEnable(GL_TEXTURE_2D);
 
 	// Draw the patch
+	rgba_t(255, 255, 255, 255, 0).set_gl();
 	patch_textures[num]->draw2d(patch->xOffset(), patch->yOffset());
 
 	// Disable textures
 	glDisable(GL_TEXTURE_2D);
+
+	// If the patch is selected, hilight it
+	/*
+	if (selected_patch == num) {
+		rgba_t(70, 210, 220, 60, 1).set_gl();
+		glBegin(GL_QUADS);
+		glVertex2d(patch->xOffset(), patch->yOffset());
+		glVertex2d(patch->xOffset(), patch->yOffset() + patch->getImage()->getHeight());
+		glVertex2d(patch->xOffset() + patch->getImage()->getWidth(), patch->yOffset() + patch->getImage()->getHeight());
+		glVertex2d(patch->xOffset() + patch->getImage()->getWidth(), patch->yOffset());
+		glEnd();
+	}
+	*/
 }
 
 /* CTextureCanvas::drawTextureBorder

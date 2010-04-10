@@ -156,6 +156,8 @@ wxPanel* TextureXEntryPanel::initTexControls(wxWindow* parent) {
 	// Size
 	spin_tex_width = new wxSpinCtrl(panel, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxALIGN_RIGHT, 0, SHRT_MAX);
 	spin_tex_height = new wxSpinCtrl(panel, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxALIGN_RIGHT, 0, SHRT_MAX);
+	spin_tex_width->SetInitialSize(wxSize(65, -1));
+	spin_tex_height->SetInitialSize(wxSize(65, -1));
 	gb_sizer->Add(new wxStaticText(panel, -1, _T("Size:")), wxGBPosition(1, 0), wxDefaultSpan, wxALIGN_CENTER_VERTICAL);
 	gb_sizer->Add(spin_tex_width, wxGBPosition(1, 1), wxDefaultSpan);
 	gb_sizer->Add(spin_tex_height, wxGBPosition(1, 2), wxDefaultSpan);
@@ -163,6 +165,8 @@ wxPanel* TextureXEntryPanel::initTexControls(wxWindow* parent) {
 	// Scale
 	spin_tex_scalex = new wxSpinCtrl(panel, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxALIGN_RIGHT, CHAR_MIN, CHAR_MAX);
 	spin_tex_scaley = new wxSpinCtrl(panel, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxALIGN_RIGHT, CHAR_MIN, CHAR_MAX);
+	spin_tex_scalex->SetInitialSize(wxSize(65, -1));
+	spin_tex_scaley->SetInitialSize(wxSize(65, -1));
 	gb_sizer->Add(new wxStaticText(panel, -1, _T("Scale:")), wxGBPosition(2, 0), wxDefaultSpan, wxALIGN_CENTER_VERTICAL);
 	gb_sizer->Add(spin_tex_scalex, wxGBPosition(2, 1), wxDefaultSpan);
 	gb_sizer->Add(spin_tex_scaley, wxGBPosition(2, 2), wxDefaultSpan);
@@ -181,16 +185,6 @@ wxPanel* TextureXEntryPanel::initTexControls(wxWindow* parent) {
 	gb_sizer = new wxGridBagSizer(4, 4);
 	framesizer->Add(gb_sizer, 1, wxEXPAND|wxALL, 4);
 
-	/*
-	ListView*		list_tex_patches;
-	wxSpinCtrl*		spin_patch_xpos;
-	wxSpinCtrl*		spin_patch_ypos;
-	wxButton*		btn_patch_remove;
-	wxButton*		btn_patch_forward;
-	wxButton*		btn_patch_back;
-	wxButton*		btn_patch_replace;
-	*/
-
 	// Patches list
 	list_tex_patches = new ListView(panel, -1, wxLC_REPORT|wxLC_NO_HEADER);
 	gb_sizer->Add(list_tex_patches, wxGBPosition(0, 0), wxGBSpan(3, 1), wxEXPAND);
@@ -198,6 +192,8 @@ wxPanel* TextureXEntryPanel::initTexControls(wxWindow* parent) {
 	// Patch position
 	spin_patch_xpos = new wxSpinCtrl(panel, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxALIGN_RIGHT, SHRT_MIN, SHRT_MAX);
 	spin_patch_ypos = new wxSpinCtrl(panel, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxALIGN_RIGHT, SHRT_MIN, SHRT_MAX);
+	spin_patch_xpos->SetInitialSize(wxSize(65, -1));
+	spin_patch_ypos->SetInitialSize(wxSize(65, -1));
 	gb_sizer->Add(new wxStaticText(panel, -1, _T("Left:")), wxGBPosition(0, 2), wxDefaultSpan, wxALIGN_CENTER_VERTICAL);
 	gb_sizer->Add(new wxStaticText(panel, -1, _T("Top:")), wxGBPosition(1, 2), wxDefaultSpan, wxALIGN_CENTER_VERTICAL);
 	gb_sizer->Add(spin_patch_xpos, wxGBPosition(0, 3), wxDefaultSpan, wxEXPAND);
@@ -469,6 +465,10 @@ void TextureXEntryPanel::onTexPatchesListSelect(wxListEvent& e) {
 	tx_patch_t patch = tex_current.patches[e.GetIndex()];
 	spin_patch_xpos->SetValue(patch.left);
 	spin_patch_ypos->SetValue(patch.top);
+
+	// Select the patch on the texture canvas
+	tex_canvas->selectPatch(e.GetIndex());
+	tex_canvas->Refresh();
 }
 
 /* TextureXEntryPanel::paletteChanged

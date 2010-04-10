@@ -53,7 +53,7 @@ string main_window_layout = _T("");
  *******************************************************************/
 MainWindow::MainWindow()
 : wxFrame((wxFrame *) NULL, -1, _T("SLADE"), wxPoint(0, 0), wxSize(1024, 768)) {
-	//Maximize();
+	Maximize();
 	setupLayout();
 }
 

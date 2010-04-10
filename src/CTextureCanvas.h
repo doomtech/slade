@@ -12,6 +12,7 @@ private:
 	CTexture*			texture;
 	vector<GLTexture*>	patch_textures;
 	GLTexture*			tex_background;
+	int					selected_patch;
 
 public:
 	CTextureCanvas(wxWindow* parent, int id);
@@ -19,6 +20,7 @@ public:
 
 	CTexture*	getTexture() { return texture; }
 
+	void	selectPatch(int index) { selected_patch = index; }
 	void	clearTexture();
 	void	clearPatchTextures();
 	bool	openTexture(CTexture* tex);
