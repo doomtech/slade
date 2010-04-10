@@ -47,6 +47,11 @@ TextureXList::TextureXList() {
  * TextureXList class destructor
  *******************************************************************/
 TextureXList::~TextureXList() {
+	// Delete any generated textures
+	for (size_t a = 0; a < textures.size(); a++) {
+		if (textures[a].tex)
+			delete textures[a].tex;
+	}
 }
 
 /* TextureXList::getCTexture
@@ -282,7 +287,7 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, ArchiveEntry* pnames
 		wxLogMessage(_T("Error: TEXTUREx entry is corrupt"));
 		return false;
 	}
-	
+
 	// Read the first texture definition to try to identify the format
 	if (!texturex->seek(offsets[0], SEEK_SET)) {
 		wxLogMessage(_T("Error: TEXTUREx entry is corrupt"));
@@ -331,7 +336,7 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, ArchiveEntry* pnames
 			wxLogMessage(_T("Error: TEXTUREx entry is corrupt"));
 			return false;
 		}
-		
+
 		// Read definition
 		tdef_t tdef;
 		if (txformat == TXF_NAMELESS) {

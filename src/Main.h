@@ -23,9 +23,11 @@ typedef unsigned __int32 uint64_t;
 typedef wxString string;
 #define s_fmt wxString::Format
 
-// Property list (string:string)
+// Declare hash map types
 #include <wx/hashmap.h>
-WX_DECLARE_STRING_HASH_MAP(wxString, PropertyList);
+WX_DECLARE_STRING_HASH_MAP(wxString, HMStringString);
+WX_DECLARE_HASH_MAP(int, wxString, wxIntegerHash, wxIntegerEqual, HMIntString);
+typedef HMStringString PropertyList;
 
 // Macro to convert a wxString to a c string
 #define chr(s) ((const char*)(s).ToAscii())

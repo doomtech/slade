@@ -39,7 +39,6 @@ struct tx_texture_t {
 	CTexture*	tex;
 
 	tx_texture_t() { tex = NULL; }
-	~tx_texture_t() { if (tex) delete tex; }
 };
 
 class TextureXList {

@@ -18,9 +18,9 @@ private:
 	bool		update_width;
 
 public:
-	ListView(wxWindow* parent, int id);
-	~ListView();
+	ListView(wxWindow* parent, int id, long style = wxLC_REPORT);
 
+	~ListView();
 	bool	showIcons() { return icons; }
 	void	showIcons(bool show) { icons = show; }
 	bool	enableSizeUpdate() { return update_width; }

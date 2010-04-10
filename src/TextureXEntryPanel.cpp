@@ -35,7 +35,9 @@
 #include "ArchiveManager.h"
 #include "Misc.h"
 #include "PaletteManager.h"
+#include "Icons.h"
 #include <wx/listctrl.h>
+#include <wx/gbsizer.h>
 
 
 /*******************************************************************
@@ -64,10 +66,10 @@ TextureXEntryPanel::TextureXEntryPanel(wxWindow* parent)
 	hbox->Add(combo_palette, 0, wxEXPAND, 0);
 
 	// Add TEXTUREx editor tab
-	tabs->AddPage(initTexArea(), _T("Textures"));
+	tabs->AddPage(initTexArea(this), _T("Textures"));
 
 	// Add PNAMES editor tab
-	tabs->AddPage(initPnamesArea(), _T("Patch Table"));
+	tabs->AddPage(initPnamesArea(this), _T("Patch Table"));
 
 	// Add tabs to sizer
 	sizer_main->Add(tabs, 1, wxEXPAND|wxALL, 4);
@@ -75,6 +77,7 @@ TextureXEntryPanel::TextureXEntryPanel(wxWindow* parent)
 	// Bind events
 	list_textures->Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &TextureXEntryPanel::onTextureListSelect, this);
 	list_patches->Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &TextureXEntryPanel::onPatchesListSelect, this);
+	list_tex_patches->Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &TextureXEntryPanel::onTexPatchesListSelect, this);
 	combo_palette->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &TextureXEntryPanel::onPaletteChanged, this);
 
 	Layout();
@@ -86,8 +89,8 @@ TextureXEntryPanel::TextureXEntryPanel(wxWindow* parent)
 TextureXEntryPanel::~TextureXEntryPanel() {
 }
 
-wxPanel* TextureXEntryPanel::initTexArea() {
-	wxPanel* panel = new wxPanel(this, -1);
+wxPanel* TextureXEntryPanel::initTexArea(wxWindow* parent) {
+	wxPanel* panel = new wxPanel(parent, -1);
 
 	// Setup tx panel sizer
 	wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
@@ -96,34 +99,131 @@ wxPanel* TextureXEntryPanel::initTexArea() {
 	// Add textures list
 	wxStaticBox* frame = new wxStaticBox(panel, -1, _T("Textures"));
 	wxStaticBoxSizer* framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
-	list_textures = new ListView(panel, -1);
+	list_textures = new ListView(panel, -1, wxLC_REPORT|wxLC_NO_HEADER);
 	list_textures->showIcons(false);
 	framesizer->Add(list_textures, 1, wxEXPAND|wxALL, 4);
 	sizer->Add(framesizer, 0, wxEXPAND|wxALL, 4);
 
+	// Middle section (texture canvas+editing controls)
+	wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
+	sizer->Add(vbox, 1, wxEXPAND|wxALL, 4);
+
 	// Add texture canvas
 	tex_canvas = new CTextureCanvas(panel, -1);
-	sizer->Add(tex_canvas, 1, wxEXPAND|wxALL, 4);
+	vbox->Add(tex_canvas, 1, wxEXPAND|wxALL, 4);
+
+	// Add texture editing controls
+	vbox->Add(initTexControls(panel), 0, wxEXPAND, 0);
 
 	// Add patches list
-	frame = new wxStaticBox(panel, -1, _T("Available Patches"));
+	frame = new wxStaticBox(panel, -1, _T("Patches"));
 	framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
-	list_patches = new ListView(panel, -1);
+	list_patches = new ListView(panel, -1, wxLC_REPORT|wxLC_NO_HEADER);
 	list_patches->showIcons(false);
 	framesizer->Add(list_patches, 1, wxEXPAND|wxALL, 4);
 	sizer->Add(framesizer, 0, wxEXPAND|wxALL, 4);
 
 	// Add patch preview
 	gfx_patch_preview = new GfxCanvas(panel, -1);
-	gfx_patch_preview->SetSizeHints(wxSize(128, 128));
+	gfx_patch_preview->SetSizeHints(wxSize(96, 96));
 	gfx_patch_preview->setViewType(GFXVIEW_CENTERED);
 	framesizer->Add(gfx_patch_preview, 0, wxEXPAND|wxALL, 4);
 
 	return panel;
 }
 
-wxPanel* TextureXEntryPanel::initPnamesArea() {
-	wxPanel* panel = new wxPanel(this, -1);
+wxPanel* TextureXEntryPanel::initTexControls(wxWindow* parent) {
+	wxPanel* panel = new wxPanel(parent, -1);
+
+	// Setup tex controls panel sizer
+	wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
+	panel->SetSizer(sizer);
+
+	// --- Texture properties frame ---
+
+	wxStaticBox* frame = new wxStaticBox(panel, -1, _T("Texture Properties"));
+	wxStaticBoxSizer* framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
+	sizer->Add(framesizer, 0, wxEXPAND|wxALL, 4);
+
+	wxGridBagSizer* gb_sizer = new wxGridBagSizer(4, 4);
+	framesizer->Add(gb_sizer, 1, wxEXPAND|wxALL, 4);
+
+	// Name
+	text_tex_name = new wxTextCtrl(panel, -1);
+	gb_sizer->Add(new wxStaticText(panel, -1, _T("Name:")), wxGBPosition(0, 0), wxDefaultSpan, wxALIGN_CENTER_VERTICAL);
+	gb_sizer->Add(text_tex_name, wxGBPosition(0, 1), wxGBSpan(1, 2), wxEXPAND);
+
+	// Size
+	spin_tex_width = new wxSpinCtrl(panel, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxALIGN_RIGHT, 0, SHRT_MAX);
+	spin_tex_height = new wxSpinCtrl(panel, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxALIGN_RIGHT, 0, SHRT_MAX);
+	gb_sizer->Add(new wxStaticText(panel, -1, _T("Size:")), wxGBPosition(1, 0), wxDefaultSpan, wxALIGN_CENTER_VERTICAL);
+	gb_sizer->Add(spin_tex_width, wxGBPosition(1, 1), wxDefaultSpan);
+	gb_sizer->Add(spin_tex_height, wxGBPosition(1, 2), wxDefaultSpan);
+
+	// Scale
+	spin_tex_scalex = new wxSpinCtrl(panel, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxALIGN_RIGHT, CHAR_MIN, CHAR_MAX);
+	spin_tex_scaley = new wxSpinCtrl(panel, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxALIGN_RIGHT, CHAR_MIN, CHAR_MAX);
+	gb_sizer->Add(new wxStaticText(panel, -1, _T("Scale:")), wxGBPosition(2, 0), wxDefaultSpan, wxALIGN_CENTER_VERTICAL);
+	gb_sizer->Add(spin_tex_scalex, wxGBPosition(2, 1), wxDefaultSpan);
+	gb_sizer->Add(spin_tex_scaley, wxGBPosition(2, 2), wxDefaultSpan);
+
+	// Scaled size
+	label_scaled_size = new wxStaticText(panel, -1, _T("Scaled Size: N/A"));
+	gb_sizer->Add(label_scaled_size, wxGBPosition(3, 0), wxGBSpan(1, 3), wxALIGN_CENTER_VERTICAL);
+
+
+	// --- Patches frame ---
+
+	frame = new wxStaticBox(panel, -1, _T("Texture Patches"));
+	framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
+	sizer->Add(framesizer, 0, wxEXPAND|wxALL, 4);
+
+	gb_sizer = new wxGridBagSizer(4, 4);
+	framesizer->Add(gb_sizer, 1, wxEXPAND|wxALL, 4);
+
+	/*
+	ListView*		list_tex_patches;
+	wxSpinCtrl*		spin_patch_xpos;
+	wxSpinCtrl*		spin_patch_ypos;
+	wxButton*		btn_patch_remove;
+	wxButton*		btn_patch_forward;
+	wxButton*		btn_patch_back;
+	wxButton*		btn_patch_replace;
+	*/
+
+	// Patches list
+	list_tex_patches = new ListView(panel, -1, wxLC_REPORT|wxLC_NO_HEADER);
+	gb_sizer->Add(list_tex_patches, wxGBPosition(0, 0), wxGBSpan(3, 1), wxEXPAND);
+
+	// Patch position
+	spin_patch_xpos = new wxSpinCtrl(panel, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxALIGN_RIGHT, SHRT_MIN, SHRT_MAX);
+	spin_patch_ypos = new wxSpinCtrl(panel, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxALIGN_RIGHT, SHRT_MIN, SHRT_MAX);
+	gb_sizer->Add(new wxStaticText(panel, -1, _T("Left:")), wxGBPosition(0, 2), wxDefaultSpan, wxALIGN_CENTER_VERTICAL);
+	gb_sizer->Add(new wxStaticText(panel, -1, _T("Top:")), wxGBPosition(1, 2), wxDefaultSpan, wxALIGN_CENTER_VERTICAL);
+	gb_sizer->Add(spin_patch_xpos, wxGBPosition(0, 3), wxDefaultSpan, wxEXPAND);
+	gb_sizer->Add(spin_patch_ypos, wxGBPosition(1, 3), wxDefaultSpan, wxEXPAND);
+
+	// Remove button
+	btn_patch_remove = new wxBitmapButton(panel, -1, getIcon(_T("t_close")));
+	gb_sizer->Add(btn_patch_remove, wxGBPosition(0, 1), wxDefaultSpan);
+
+	// Back button
+	btn_patch_back = new wxBitmapButton(panel, -1, getIcon(_T("t_up")));
+	gb_sizer->Add(btn_patch_back, wxGBPosition(1, 1), wxDefaultSpan);
+
+	// Forward button
+	btn_patch_forward = new wxBitmapButton(panel, -1, getIcon(_T("t_down")));
+	gb_sizer->Add(btn_patch_forward, wxGBPosition(2, 1), wxDefaultSpan);
+
+	// Replace button
+	//btn_patch_replace = new wxButton(panel, -1, _T("Replace..."), wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT);
+	//gb_sizer->Add(btn_patch_replace, wxGBPosition(2, 2), wxDefaultSpan, wxEXPAND);
+
+	return panel;
+}
+
+wxPanel* TextureXEntryPanel::initPnamesArea(wxWindow* parent) {
+	wxPanel* panel = new wxPanel(parent, -1);
 
 	// Setup tx panel sizer
 	wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
@@ -190,7 +290,7 @@ bool TextureXEntryPanel::loadEntry(ArchiveEntry* entry) {
 			Global::error = _T("Could not find TEXTUREx entry");
 			return false;
 		}
-	}	
+	}
 
 	// Read TEXTUREx entry into texturexlist
 	texturex.readTEXTUREXData(entry_texturex, entry_pnames);
@@ -230,15 +330,16 @@ void TextureXEntryPanel::populateTextureList() {
 
 	// Add columns
 	list_textures->InsertColumn(0, _T("Name"));
-	list_textures->InsertColumn(1, _T("Size"));
+	//list_textures->InsertColumn(1, _T("Size"));
 
 	// Add each texture to the list
 	list_textures->enableSizeUpdate(false);
 	for (uint32_t a = 0; a < texturex.nTextures(); a++) {
 		//CTexture* tex = texturex.getCTexture(a);
 		tx_texture_t tex = texturex.getTexInfo(a);
-		string cols[] = { tex.name, s_fmt(_T("%dx%d"), tex.width, tex.height) };
-		list_textures->addItem(a, wxArrayString(2, cols));
+		list_textures->addItem(a, (tex.name));
+		//string cols[] = { tex.name, s_fmt(_T("%dx%d"), tex.width, tex.height) };
+		//list_textures->addItem(a, wxArrayString(2, cols));
 	}
 
 	// Update list width
@@ -304,7 +405,7 @@ void TextureXEntryPanel::populatePnamesList() {
 
 	// Colour any invalid patches
 	for (uint32_t a = 0; a < texturex.nPatches(); a++) {
-		
+
 	}
 
 	// Update list width
@@ -333,6 +434,21 @@ void TextureXEntryPanel::onTextureListSelect(wxListEvent& e) {
 	// Open it if valid index (should be)
 	if (tex)
 		tex_canvas->openTexture(tex);
+
+	// Set control values
+	tex_current = texturex.getTexInfo(e.GetIndex());
+	text_tex_name->SetValue(tex_current.name);
+	spin_tex_width->SetValue(tex_current.width);
+	spin_tex_height->SetValue(tex_current.height);
+	spin_tex_scalex->SetValue(tex_current.scale_x);
+	spin_tex_scaley->SetValue(tex_current.scale_y);
+
+	// Populate texture patches list
+	list_tex_patches->ClearAll();
+	list_tex_patches->InsertColumn(0, _T("Patch Name"));
+	for (size_t a = 0; a < tex_current.patches.size(); a++)
+		list_tex_patches->addItem(a, texturex.getPatchName(tex_current.patches[a].patch));
+	list_tex_patches->selectItem(0);
 }
 
 void TextureXEntryPanel::onPatchesListSelect(wxListEvent& e) {
@@ -346,6 +462,13 @@ void TextureXEntryPanel::onPatchesListSelect(wxListEvent& e) {
 	// Refresh the preview
 	gfx_patch_preview->zoomToFit(false);
 	gfx_patch_preview->Refresh();
+}
+
+void TextureXEntryPanel::onTexPatchesListSelect(wxListEvent& e) {
+	// Update patch controls
+	tx_patch_t patch = tex_current.patches[e.GetIndex()];
+	spin_patch_xpos->SetValue(patch.left);
+	spin_patch_ypos->SetValue(patch.top);
 }
 
 /* TextureXEntryPanel::paletteChanged

@@ -10,8 +10,8 @@ wxColor col_locked(180, 50, 0);
 wxColor col_error(230, 30, 0);
 
 
-ListView::ListView(wxWindow* parent, int id)
-: wxListCtrl(parent, id, wxDefaultPosition, wxDefaultSize, wxLC_REPORT) {
+ListView::ListView(wxWindow* parent, int id, long style)
+: wxListCtrl(parent, id, wxDefaultPosition, wxDefaultSize, style) {
 	icons = true;
 	update_width = true;
 }
@@ -165,9 +165,9 @@ bool ListView::updateSize() {
 			// Autosize column
 			SetColumnWidth(a, wxLIST_AUTOSIZE);
 
-			// Minimum size of 32
-			if (GetColumnWidth(a) < 32)
-				SetColumnWidth(a, 32);
+			// Minimum size of 24
+			if (GetColumnWidth(a) < 24)
+				SetColumnWidth(a, 24);
 		}
 
 		// Add extra width to the first column in linux as wxLIST_AUTOSIZE seems to ignore listitem images on wxGTK
@@ -179,7 +179,7 @@ bool ListView::updateSize() {
 	}
 
 	// Get total column width
-	int width = 4;
+	int width = 8;
 	for (int a = 0; a < GetColumnCount(); a++)
 		width += GetColumnWidth(a);
 
