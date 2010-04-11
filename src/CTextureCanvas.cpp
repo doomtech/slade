@@ -41,8 +41,12 @@
  *******************************************************************/
 CTextureCanvas::CTextureCanvas(wxWindow* parent, int id)
 : OGLCanvas(parent, id) {
+	// Init variables
 	texture = NULL;
 	tex_background = new GLTexture();
+	scale = 1.0;
+
+	// Bind events
 	Bind(wxEVT_MOTION, &CTextureCanvas::onMouseMovement, this);
 }
 
@@ -109,12 +113,12 @@ bool CTextureCanvas::openTexture(CTexture* tex) {
  *******************************************************************/
 void CTextureCanvas::draw() {
 	// Setup the viewport
-	glViewport(0, 0, GetClientSize().x, GetClientSize().y);
+	glViewport(0, 0, GetSize().x, GetSize().y);
 
 	// Setup the screen projection
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(0, GetClientSize().x, GetClientSize().y, 0, -1, 1);
+	glOrtho(0, GetSize().x, GetSize().y, 0, -1, 1);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -181,16 +185,31 @@ void CTextureCanvas::drawTexture() {
 	// Push matrix
 	glPushMatrix();
 
+	// Calculate top-left position of texture (for glScissor, since it ignores the current translation/scale)
+	double left = offset.x + (GetSize().x * 0.5) - (texture->getWidth() * 0.5 * scale);
+	double top = -offset.y + (GetSize().y * 0.5) - (texture->getHeight() * 0.5 * scale);
+
 	// Translate to middle of the canvas
 	glTranslated(GetSize().x * 0.5, GetSize().y * 0.5, 0);
+
+	// Zoom
+	glScaled(scale, scale, 1);
 
 	// Translate to top-left of texture
 	glTranslated(texture->getWidth() * -0.5, texture->getHeight() * -0.5, 0);
 
-	// Draw patches in order
-	COL_WHITE.set_gl();
+	// First, draw patches semitransparently (for anything outside the texture)
+	for (uint32_t a = 0; a < texture->nPatches(); a++)
+		drawPatch(a, 128);
+
+	// Now, clip to texture boundaries and draw patches fully opaque
+	glEnable(GL_SCISSOR_TEST);
+	glScissor(left, top, texture->getWidth() * scale, texture->getHeight() * scale);
+
 	for (uint32_t a = 0; a < texture->nPatches(); a++)
 		drawPatch(a);
+
+	glDisable(GL_SCISSOR_TEST);
 
 	// Pop matrix
 	glPopMatrix();
@@ -199,7 +218,7 @@ void CTextureCanvas::drawTexture() {
 /* CTextureCanvas::drawPatch
  * Draws the patch at index [num] in the composite texture
  *******************************************************************/
-void CTextureCanvas::drawPatch(int num) {
+void CTextureCanvas::drawPatch(int num, uint8_t alpha) {
 	// Get patch to draw
 	CTPatch* patch = texture->getPatch(num);
 
@@ -217,7 +236,7 @@ void CTextureCanvas::drawPatch(int num) {
 	glEnable(GL_TEXTURE_2D);
 
 	// Draw the patch
-	rgba_t(255, 255, 255, 255, 0).set_gl();
+	rgba_t(255, 255, 255, alpha, 0).set_gl();
 	patch_textures[num]->draw2d(patch->xOffset(), patch->yOffset());
 
 	// Disable textures
@@ -246,6 +265,9 @@ void CTextureCanvas::drawTextureBorder() {
 
 	// Translate to middle of the canvas
 	glTranslated(GetSize().x * 0.5, GetSize().y * 0.5, 0);
+
+	// Zoom
+	glScaled(scale, scale, 1);
 
 	// Translate to top-left of texture
 	glTranslated(texture->getWidth() * -0.5, texture->getHeight() * -0.5, 0);

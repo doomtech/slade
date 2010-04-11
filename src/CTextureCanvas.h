@@ -15,6 +15,7 @@ private:
 	int					selected_patch;
 	fpoint2_t			offset;
 	point2_t			mouse_prev;
+	double				scale;
 
 public:
 	CTextureCanvas(wxWindow* parent, int id);
@@ -29,7 +30,7 @@ public:
 	void	draw();
 	void	drawChequeredBackground();
 	void	drawTexture();
-	void	drawPatch(int num);
+	void	drawPatch(int num, uint8_t alpha = 255);
 	void	drawTextureBorder();
 	void	resetOffsets() { offset.x = offset.y = 0; }
 	void	onMouseMovement(wxMouseEvent& e);

@@ -34,7 +34,7 @@ public:
 	bool	genChequeredTexture(uint8_t block_size, rgba_t col1, rgba_t col2);
 
 	bool	bind();
-	bool	draw2d(int32_t x = 0, int32_t y = 0);
+	bool	draw2d(double x = 0, double y = 0);
 	bool	draw2dTiled(uint32_t width, uint32_t height);
 };
 

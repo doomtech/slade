@@ -277,7 +277,7 @@ bool GLTexture::bind() {
 	return true;
 }
 
-bool GLTexture::draw2d(int32_t x, int32_t y) {
+bool GLTexture::draw2d(double x, double y) {
 	// Can't draw if texture not loaded
 	if (!loaded)
 		return false;
