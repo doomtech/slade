@@ -72,19 +72,20 @@ PaletteChooser::~PaletteChooser() {
  * [archive], or if it doesn't exist, the PaletteManager's global
  * palette
  *******************************************************************/
-void PaletteChooser::setGlobalFromArchive(Archive* archive) {
-	if (!Misc::loadPaletteFromArchive(&pal_global, archive))
+void PaletteChooser::setGlobalFromArchive(Archive* archive, int lump) {
+	if (!Misc::loadPaletteFromArchive(&pal_global, archive, lump))
 		pal_global.copyPalette(thePaletteManager->globalPalette());
 }
 
 /* PaletteChooser::getSelectedPalette
  * Returns the selected palette (from the PaletteManager)
  *******************************************************************/
-Palette8bit* PaletteChooser::getSelectedPalette() {
+Palette8bit* PaletteChooser::getSelectedPalette(ArchiveEntry* entry) {
 	if (GetSelection() > 0)
 		return thePaletteManager->getPalette(GetSelection() - 1);
-	else
-		return &pal_global;
+	else if (entry)
+		Misc::loadPaletteFromArchive(&pal_global, entry->getParent(), Misc::detectPaletteHack(entry));
+	return &pal_global;
 }
 
 /* PaletteChooser::globalSelected

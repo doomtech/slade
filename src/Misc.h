@@ -15,7 +15,7 @@ enum {
 namespace Misc {
 	bool		loadImageFromEntry(SImage* image, ArchiveEntry* entry);
 	int			detectPaletteHack(ArchiveEntry* entry);
-	bool		loadPaletteFromArchive(Palette8bit* pal, Archive* archive, ArchiveEntry* entry = NULL);
+	bool		loadPaletteFromArchive(Palette8bit* pal, Archive* archive, int lump = PAL_NOHACK);
 	bool		convertAnimated(ArchiveEntry* entry, MemChunk * animdata);
 	bool		convertSwitches(ArchiveEntry* entry, MemChunk * animdata);
 	string		sizeAsString(uint32_t size);

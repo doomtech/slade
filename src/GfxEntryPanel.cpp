@@ -150,7 +150,7 @@ bool GfxEntryPanel::loadEntry(ArchiveEntry* entry) {
 		return false;
 
 	// Setup palette
-	combo_palette->setGlobalFromArchive(entry->getParent());
+	combo_palette->setGlobalFromArchive(entry->getParent(), Misc::detectPaletteHack(entry));
 	updateImagePalette();
 
 	// Set offset text boxes

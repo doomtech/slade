@@ -97,22 +97,22 @@ int	Misc::detectPaletteHack(ArchiveEntry* entry)
  * <pal>. Returns false if PLAYPAL entry was missing or invalid,
  * true otherwise
  *******************************************************************/
-bool Misc::loadPaletteFromArchive(Palette8bit* pal, Archive* archive, ArchiveEntry* entry) {
+bool Misc::loadPaletteFromArchive(Palette8bit* pal, Archive* archive, int lump) {
 	// Check parameters
 	if (!pal || !archive)
 		return false;
 
 	// Find PLAYPAL entry
-	ArchiveEntry* playpal;
-	switch (Misc::detectPaletteHack(entry))
-	{
-	case PAL_NOHACK:		playpal = archive->getEntry(_T("PLAYPAL"));		break;
-	case PAL_ALPHAHACK:		playpal = archive->getEntry(_T("TITLEPAL"));	break;
-	case PAL_HERETICHACK:	playpal = archive->getEntry(_T("E2PAL"));		break;
-	}
+	ArchiveEntry* playpal = NULL;
+	if (lump == PAL_ALPHAHACK)
+		playpal = archive->getEntry(_T("TITLEPAL"));
+	else if (lump == PAL_HERETICHACK)
+		playpal = archive->getEntry(_T("E2PAL"));
+	if (!playpal)
+		playpal = archive->getEntry(_T("PLAYPAL"));
 
-	// Check it was found, try again in case a hack was attempted unsuccessfully.
-	if (!playpal && !(playpal = archive->getEntry(_T("PLAYPAL"))))
+	// Check it was found
+	if (!playpal)
 		return false;
 
 	// Check it is the correct size

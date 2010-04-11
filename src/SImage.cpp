@@ -179,23 +179,6 @@ bool SImage::getRGBData(MemChunk& mc, Palette8bit* pal) {
 	return false;	// Invalid image type
 }
 
-/* SImage::setPalette
- * Copies the given palette to the image palette
- *******************************************************************/
-/*
-void SImage::setPalette(Palette8bit* pal) {
-	// Check palette
-	if (!pal)
-		return;
-
-	// Copy the palette
-	palette.copyPalette(pal);
-
-	// Announce change
-	announce(_T("image_changed"));
-}
-*/
-
 /* SImage::setXOffset
  * Changes the image X offset
  *******************************************************************/

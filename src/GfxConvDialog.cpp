@@ -122,7 +122,7 @@ void GfxConvDialog::setupLayout() {
 		_T("PNG Format (8bit Paletted)"), 
 		_T("PNG Format (32bit Truecolour)") };
 	combo_target_format = new wxComboBox(this, -1, s_formats[CONV_DOOMGFX], wxDefaultPosition, wxDefaultSize, NUMCONVS, s_formats, wxCB_READONLY);
-	combo_target_format->Select(1);
+	combo_target_format->Select(CONV_DOOMGFX);
 	hbox->Add(combo_target_format, 1, wxEXPAND|wxALL, 4);
 
 
@@ -259,8 +259,8 @@ void GfxConvDialog::updatePreviewGfx() {
 	ArchiveEntry* entry = entries[current_entry];
 
 	// Set palettes
-	gfx_current->setPalette(pal_chooser_current->getSelectedPalette());
-	gfx_target->setPalette(pal_chooser_target->getSelectedPalette());
+	gfx_current->setPalette(pal_chooser_current->getSelectedPalette(entry));
+	gfx_target->setPalette(pal_chooser_target->getSelectedPalette(entry));
 
 	// Load the image to both gfx canvases
 	Misc::loadImageFromEntry(gfx_current->getImage(), entry);

@@ -4,6 +4,7 @@
 
 #include "Palette.h"
 #include "Archive.h"
+#include "Misc.h"
 
 class PaletteChooser : public wxComboBox {
 private:
@@ -13,8 +14,8 @@ public:
 	PaletteChooser(wxWindow* parent, int id);
 	~PaletteChooser();
 
-	void			setGlobalFromArchive(Archive* archive);
-	Palette8bit*	getSelectedPalette();
+	void			setGlobalFromArchive(Archive* archive, int lump = PAL_NOHACK);
+	Palette8bit*	getSelectedPalette(ArchiveEntry* entry = NULL);
 	bool			globalSelected();
 };
 
