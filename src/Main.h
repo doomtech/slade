@@ -23,18 +23,31 @@ typedef unsigned __int32 uint64_t;
 typedef wxString string;
 #define s_fmt wxString::Format
 
+// Macro to convert a wxString to a c string
+#define chr(s) ((const char*)(s).ToAscii())
+
+
+// Vectors
+#include <vector>
+#include <algorithm>
+#define vector std::vector
+
+// A macro to check if a value exists in a vector
+#define vector_exists(vec, val) find(vec.begin(), vec.end(), val) != vec.end()
+
+// A macro to add a value to a vector if the value doesn't already exist in the vector
+#define vector_add_unique(vec, val) if (!(vector_exists(vec, val))) vec.push_back(val)
+
+// A macro to remove an item with a given value from a vector
+#define vector_remove(vec, val) vec.erase(find(vec.begin(), vec.end(), val))
+
+
 // Declare hash map types
 #include <wx/hashmap.h>
 WX_DECLARE_STRING_HASH_MAP(wxString, HMStringString);
 WX_DECLARE_HASH_MAP(int, wxString, wxIntegerHash, wxIntegerEqual, HMIntString);
 typedef HMStringString PropertyList;
 
-// Macro to convert a wxString to a c string
-#define chr(s) ((const char*)(s).ToAscii())
-
-// Vectors
-#include <vector>
-#define vector std::vector
 
 // Logfile
 #include <wx/log.h>
@@ -50,7 +63,7 @@ typedef HMStringString PropertyList;
 #include "CVar.h"
 #include "Structs.h"
 
-// Class to hold global variables
+// Namespace to hold 'global' variables
 namespace Global {
 	extern string error;
 	extern string version;

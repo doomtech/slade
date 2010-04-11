@@ -26,6 +26,8 @@ private:
 	ListView*		list_patches;
 	CTextureCanvas*	tex_canvas;
 	PaletteChooser*	combo_palette;
+	wxSlider*		slider_zoom;
+	wxStaticText*	label_current_zoom;
 	GfxCanvas*		gfx_patch_preview;
 	wxTextCtrl*		text_tex_name;
 	wxSpinCtrl*		spin_tex_width;
@@ -64,7 +66,9 @@ public:
 	void	onTextureListSelect(wxListEvent& e);
 	void	onPatchesListSelect(wxListEvent& e);
 	void	onTexPatchesListSelect(wxListEvent& e);
+	void	onTexPatchesListDeSelect(wxListEvent& e);
 	void	onPaletteChanged(wxCommandEvent& e);
+	void	onZoomChanged(wxCommandEvent& e);
 };
 
 #endif//__TEXTUREXENTRYPANEL_H__

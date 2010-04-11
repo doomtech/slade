@@ -12,7 +12,7 @@ private:
 	CTexture*			texture;
 	vector<GLTexture*>	patch_textures;
 	GLTexture*			tex_background;
-	int					selected_patch;
+	vector<bool>		selected_patches;
 	fpoint2_t			offset;
 	point2_t			mouse_prev;
 	double				scale;
@@ -22,15 +22,17 @@ public:
 	~CTextureCanvas();
 
 	CTexture*	getTexture() { return texture; }
+	void		setScale(double scale) { this->scale = scale; }
 
-	void	selectPatch(int index) { selected_patch = index; }
+	void	selectPatch(int index);
+	void	deSelectPatch(int index);
 	void	clearTexture();
 	void	clearPatchTextures();
 	bool	openTexture(CTexture* tex);
 	void	draw();
 	void	drawChequeredBackground();
 	void	drawTexture();
-	void	drawPatch(int num, uint8_t alpha = 255);
+	void	drawPatch(int num, rgba_t col = COL_WHITE);
 	void	drawTextureBorder();
 	void	resetOffsets() { offset.x = offset.y = 0; }
 	void	onMouseMovement(wxMouseEvent& e);

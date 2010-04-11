@@ -165,19 +165,6 @@ void MainWindow::setupLayout() {
 	tb_entry->AddTool(MENU_ENTRY_MOVEDOWN, _T("Move Down"), getIcon(_T("t_down")), _T("Move Down"));
 	tb_entry->Realize();
 
-	/*
-	wxAuiToolBar* tb_resource = new wxAuiToolBar(this, -1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
-	wxArrayString list;
-	list.Add(_T("<none>"));
-	for (size_t a = 0; a < theArchiveManager->baseResourceListLength(); a++)
-		list.Add(theArchiveManager->baseResourcePath(a));
-	choice_base_resource = new wxChoice(tb_resource, -1, wxDefaultPosition, wxDefaultSize, list);
-	choice_base_resource->Select(0);
-	//tb_resource->AddLabel(0, _T("Base Resource: "));
-	tb_resource->AddControl(choice_base_resource, _T("Base Resource"));
-	tb_resource->Realize();
-	*/
-
 	// Setup panel info & add toolbar panels
 	// File toolbar
 	p_inf.ToolbarPane();
@@ -192,14 +179,6 @@ void MainWindow::setupLayout() {
 	p_inf.Name(_T("tb_entry"));
 	m_mgr->AddPane(tb_entry, p_inf);
 
-/*
-	// Resource toolbar
-	p_inf.ToolbarPane();
-	p_inf.Top();
-	p_inf.Position(2);
-	p_inf.Name(_T("tb_resource"));
-	m_mgr->AddPane(tb_resource, p_inf);
-	*/
 
 
 	// -- Editor Area --

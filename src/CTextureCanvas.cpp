@@ -58,6 +58,36 @@ CTextureCanvas::~CTextureCanvas() {
 	delete tex_background;
 }
 
+void CTextureCanvas::selectPatch(int index) {
+	// Do nothing if no texture is open
+	if (!texture)
+		return;
+
+	// Check patch index is ok
+	if (index < 0 || index >= texture->nPatches())
+		return;
+
+	// Select the patch
+	selected_patches[index] = true;
+	//vector_add_unique(selected_patches, index);
+}
+
+void CTextureCanvas::deSelectPatch(int index) {
+	// Do nothing if no texture is open
+	if (!texture)
+		return;
+
+	// Check patch index is ok
+	if (index < 0 || index >= texture->nPatches())
+		return;
+
+	// De-Select the patch
+	selected_patches[index] = false;
+
+	//if (vector_exists(selected_patches, index))
+	//	vector_remove(selected_patches, index);
+}
+
 /* CTextureCanvas::clearTexture
  * Clears the current texture and the patch textures list
  *******************************************************************/
@@ -70,6 +100,9 @@ void CTextureCanvas::clearTexture() {
 
 	// Reset view offset
 	resetOffsets();
+
+	// Clear patch selection
+	selected_patches.clear();
 }
 
 /* CTextureCanvas::clearPatchTextures
@@ -95,11 +128,14 @@ bool CTextureCanvas::openTexture(CTexture* tex) {
 	// Update variables
 	texture = tex;
 
-	// Init patch opengl texture id stuff
+	// Init patches
 	clearPatchTextures();
 	for (uint32_t a = 0; a < tex->nPatches(); a++) {
 		// Create GL texture
 		patch_textures.push_back(new GLTexture());
+
+		// Set selection
+		selected_patches.push_back(false);
 	}
 
 	// Redraw
@@ -136,7 +172,7 @@ void CTextureCanvas::draw() {
 	// Draw texture
 	if (texture) {
 		drawTexture();
-		drawTextureBorder();
+		//drawTextureBorder();
 	}
 
 	// Swap buffers (ie show what was drawn)
@@ -200,7 +236,7 @@ void CTextureCanvas::drawTexture() {
 
 	// First, draw patches semitransparently (for anything outside the texture)
 	for (uint32_t a = 0; a < texture->nPatches(); a++)
-		drawPatch(a, 128);
+		drawPatch(a, rgba_t(128, 50, 50, 255, 0));
 
 	// Now, clip to texture boundaries and draw patches fully opaque
 	glEnable(GL_SCISSOR_TEST);
@@ -211,6 +247,36 @@ void CTextureCanvas::drawTexture() {
 
 	glDisable(GL_SCISSOR_TEST);
 
+	// Draw the texture border
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	COL_BLACK.set_gl();
+	glBegin(GL_QUADS);
+	glVertex2d(0, 0);
+	glVertex2d(0, texture->getHeight());
+	glVertex2d(texture->getWidth(), texture->getHeight());
+	glVertex2d(texture->getWidth(), 0);
+	glEnd();
+
+	// Now loop through selected patches and draw selection outlines
+	rgba_t(70, 210, 220, 255, 0).set_gl();
+	for (size_t a = 0; a < selected_patches.size(); a++) {
+		// Skip if not selected
+		if (!selected_patches[a])
+			continue;
+
+		// Get patch
+		CTPatch* patch = texture->getPatch(a);
+
+		// Draw outline
+		glBegin(GL_QUADS);
+		glVertex2d(patch->xOffset(), patch->yOffset());
+		glVertex2d(patch->xOffset(), patch->yOffset() + patch->getImage()->getHeight());
+		glVertex2d(patch->xOffset() + patch->getImage()->getWidth(), patch->yOffset() + patch->getImage()->getHeight());
+		glVertex2d(patch->xOffset() + patch->getImage()->getWidth(), patch->yOffset());
+		glEnd();
+	}
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
 	// Pop matrix
 	glPopMatrix();
 }
@@ -218,7 +284,7 @@ void CTextureCanvas::drawTexture() {
 /* CTextureCanvas::drawPatch
  * Draws the patch at index [num] in the composite texture
  *******************************************************************/
-void CTextureCanvas::drawPatch(int num, uint8_t alpha) {
+void CTextureCanvas::drawPatch(int num, rgba_t col) {
 	// Get patch to draw
 	CTPatch* patch = texture->getPatch(num);
 
@@ -236,24 +302,17 @@ void CTextureCanvas::drawPatch(int num, uint8_t alpha) {
 	glEnable(GL_TEXTURE_2D);
 
 	// Draw the patch
-	rgba_t(255, 255, 255, alpha, 0).set_gl();
+	col.set_gl();
 	patch_textures[num]->draw2d(patch->xOffset(), patch->yOffset());
+
+	// If the patch is selected, hilight it
+	if (selected_patches[num]) {
+		rgba_t(160, 220, 255, 120, 1).set_gl();
+		patch_textures[num]->draw2d(patch->xOffset(), patch->yOffset());
+	}
 
 	// Disable textures
 	glDisable(GL_TEXTURE_2D);
-
-	// If the patch is selected, hilight it
-	/*
-	if (selected_patch == num) {
-		rgba_t(70, 210, 220, 60, 1).set_gl();
-		glBegin(GL_QUADS);
-		glVertex2d(patch->xOffset(), patch->yOffset());
-		glVertex2d(patch->xOffset(), patch->yOffset() + patch->getImage()->getHeight());
-		glVertex2d(patch->xOffset() + patch->getImage()->getWidth(), patch->yOffset() + patch->getImage()->getHeight());
-		glVertex2d(patch->xOffset() + patch->getImage()->getWidth(), patch->yOffset());
-		glEnd();
-	}
-	*/
 }
 
 /* CTextureCanvas::drawTextureBorder

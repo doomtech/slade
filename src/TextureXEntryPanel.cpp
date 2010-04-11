@@ -78,7 +78,9 @@ TextureXEntryPanel::TextureXEntryPanel(wxWindow* parent)
 	list_textures->Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &TextureXEntryPanel::onTextureListSelect, this);
 	list_patches->Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &TextureXEntryPanel::onPatchesListSelect, this);
 	list_tex_patches->Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &TextureXEntryPanel::onTexPatchesListSelect, this);
+	list_tex_patches->Bind(wxEVT_COMMAND_LIST_ITEM_DESELECTED, &TextureXEntryPanel::onTexPatchesListDeSelect, this);
 	combo_palette->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &TextureXEntryPanel::onPaletteChanged, this);
+	slider_zoom->Bind(wxEVT_COMMAND_SLIDER_UPDATED, &TextureXEntryPanel::onZoomChanged, this);
 
 	Layout();
 }
@@ -104,9 +106,24 @@ wxPanel* TextureXEntryPanel::initTexArea(wxWindow* parent) {
 	framesizer->Add(list_textures, 1, wxEXPAND|wxALL, 4);
 	sizer->Add(framesizer, 0, wxEXPAND|wxALL, 4);
 
-	// Middle section (texture canvas+editing controls)
+	// Middle section (view controls+texture canvas+editing controls)
 	wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
 	sizer->Add(vbox, 1, wxEXPAND|wxALL, 4);
+
+	// Add view controls
+	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
+	vbox->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT|wxTOP, 4);
+
+	// Zoom
+	slider_zoom = new wxSlider(panel, -1, 100, 20, 800);
+	slider_zoom->SetLineSize(10);
+	slider_zoom->SetPageSize(100);
+	label_current_zoom = new wxStaticText(panel, -1, _T("100%"));
+	hbox->Add(new wxStaticText(panel, -1, _T("Zoom:")), 0, wxALIGN_CENTER_VERTICAL, 0);
+	hbox->Add(slider_zoom, 1, wxEXPAND, 0);
+	hbox->Add(label_current_zoom, 0, wxALIGN_CENTER_VERTICAL, 0);
+
+	hbox->AddStretchSpacer();
 
 	// Add texture canvas
 	tex_canvas = new CTextureCanvas(panel, -1);
@@ -444,7 +461,7 @@ void TextureXEntryPanel::onTextureListSelect(wxListEvent& e) {
 	list_tex_patches->InsertColumn(0, _T("Patch Name"));
 	for (size_t a = 0; a < tex_current.patches.size(); a++)
 		list_tex_patches->addItem(a, texturex.getPatchName(tex_current.patches[a].patch));
-	list_tex_patches->selectItem(0);
+	//list_tex_patches->selectItem(0);
 }
 
 void TextureXEntryPanel::onPatchesListSelect(wxListEvent& e) {
@@ -471,6 +488,12 @@ void TextureXEntryPanel::onTexPatchesListSelect(wxListEvent& e) {
 	tex_canvas->Refresh();
 }
 
+void TextureXEntryPanel::onTexPatchesListDeSelect(wxListEvent& e) {
+	// Deselect the patch on the texture canvas
+	tex_canvas->deSelectPatch(e.GetIndex());
+	tex_canvas->Refresh();
+}
+
 /* TextureXEntryPanel::paletteChanged
  * Called when the palette chooser selection changes
  *******************************************************************/
@@ -478,4 +501,23 @@ void TextureXEntryPanel::onPaletteChanged(wxCommandEvent& e) {
 	updateImagePalette();
 	tex_canvas->Refresh();
 	gfx_patch_preview->updateImageTexture();
+}
+
+/* TextureXEntryPanel::sliderZoomChanged
+ * Called when the zoom slider is changed
+ *******************************************************************/
+void TextureXEntryPanel::onZoomChanged(wxCommandEvent& e) {
+	// Get zoom value
+	int zoom_percent = slider_zoom->GetValue();
+
+	// Lock to 10% increments
+	int remainder = zoom_percent % 10;
+	zoom_percent -= remainder;
+
+	// Update zoom label
+	label_current_zoom->SetLabel(s_fmt(_T("%d%%"), zoom_percent));
+
+	// Zoom gfx canvas and update
+	tex_canvas->setScale((double)zoom_percent * 0.01);
+	tex_canvas->Refresh();
 }
