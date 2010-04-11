@@ -78,7 +78,7 @@ void OGLCanvas::init() {
 	if (!setContext())
 		return;
 
-	glViewport(0, 0, GetClientSize().x, GetClientSize().y);
+	glViewport(0, 0, GetSize().x, GetSize().y);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClearDepth(1.0);
 	glShadeModel(GL_SMOOTH);
@@ -99,6 +99,23 @@ void OGLCanvas::init() {
 	glLoadIdentity();
 
 	init_done = true;
+}
+
+wxPanel* OGLCanvas::toPanel(wxWindow* parent) {
+	// Create panel
+	wxPanel* panel = new wxPanel(parent, -1);
+
+	// Reparent
+	Reparent(panel);
+
+	// Create sizer
+	wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
+	panel->SetSizer(sizer);
+
+	// Add to sizer
+	sizer->Add(this, 1, wxEXPAND);
+
+	return panel;
 }
 
 

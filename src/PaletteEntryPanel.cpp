@@ -44,7 +44,7 @@ PaletteEntryPanel::PaletteEntryPanel(wxWindow* parent)
 : EntryPanel(parent, _T("palette")) {
 	// Add palette canvas
 	pal_canvas = new PaletteCanvas(this, -1);
-	sizer_main->Add(pal_canvas, 1, wxEXPAND|wxALL, 4);
+	sizer_main->Add(pal_canvas->toPanel(this), 1, wxEXPAND|wxALL, 4);
 
 	// Disable default entry buttons
 	btn_save->Enable(false);

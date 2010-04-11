@@ -4,6 +4,7 @@
 
 #include "OpenGL.h"
 #include "Palette.h"
+#include <wx/panel.h>
 
 class OGLCanvas : public wxGLCanvas {
 protected:
@@ -19,6 +20,7 @@ public:
 	bool			setContext();
 	void			init();
 	virtual void	draw() = 0;
+	wxPanel*		toPanel(wxWindow* parent);
 
 	void	onPaint(wxPaintEvent &e);
 	void	onEraseBackground(wxEraseEvent &e);

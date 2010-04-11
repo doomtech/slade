@@ -127,7 +127,7 @@ wxPanel* TextureXEntryPanel::initTexArea(wxWindow* parent) {
 	gfx_patch_preview = new GfxCanvas(panel, -1);
 	gfx_patch_preview->SetSizeHints(wxSize(96, 96));
 	gfx_patch_preview->setViewType(GFXVIEW_CENTERED);
-	framesizer->Add(gfx_patch_preview, 0, wxEXPAND|wxALL, 4);
+	framesizer->Add(gfx_patch_preview->toPanel(panel), 0, wxEXPAND|wxALL, 4);
 
 	return panel;
 }

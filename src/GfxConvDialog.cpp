@@ -139,7 +139,7 @@ void GfxConvDialog::setupLayout() {
 	gfx_current = new GfxCanvas(this, -1);
 	gfx_current->SetInitialSize(wxSize(192, 192));
 	gfx_current->setViewType(GFXVIEW_CENTERED);
-	vbox->Add(gfx_current, 1, wxEXPAND|wxTOP|wxLEFT|wxRIGHT, 4);
+	vbox->Add(gfx_current->toPanel(this), 1, wxEXPAND|wxTOP|wxLEFT|wxRIGHT, 4);
 
 	pal_chooser_current = new PaletteChooser(this, -1);
 	vbox->Add(pal_chooser_current, 0, wxEXPAND|wxALL, 4);
@@ -153,7 +153,7 @@ void GfxConvDialog::setupLayout() {
 	gfx_target = new GfxCanvas(this, -1);
 	gfx_target->SetInitialSize(wxSize(192, 192));
 	gfx_target->setViewType(1);
-	vbox->Add(gfx_target, 1, wxEXPAND|wxTOP|wxLEFT|wxRIGHT, 4);
+	vbox->Add(gfx_target->toPanel(this), 1, wxEXPAND|wxTOP|wxLEFT|wxRIGHT, 4);
 
 	pal_chooser_target = new PaletteChooser(this, -1);
 	vbox->Add(pal_chooser_target, 0, wxEXPAND|wxALL, 4);
@@ -257,29 +257,6 @@ void GfxConvDialog::updatePreviewGfx() {
 
 	// Get the current entry
 	ArchiveEntry* entry = entries[current_entry];
-
-	/*
-	// Load entry palette to each image if needed
-	Palette8bit* pal_archive = new Palette8bit();
-
-	if (gfx_current->getImage()->hasBuiltInPalette())
-		pal_archive->copyPalette(gfx_current->getImage()->getBuiltInPalette());
-	else if (entry->getParent())
-		Misc::loadPaletteFromArchive(pal_archive, entry->getParent(), entry);
-	else // If no palette is found in the entry's parent archive, set the palette to the global palette
-		pal_archive->copyPalette(thePaletteManager->globalPalette());
-
-
-	// Set both image palette depending on what is selected for the 'current' palette
-	if (pal_chooser_current->globalSelected()) {
-		gfx_current->getImage()->getPalette()->copyPalette(pal_archive);
-		gfx_target->getImage()->getPalette()->copyPalette(pal_archive);
-	}
-	else {
-		gfx_current->getImage()->getPalette()->copyPalette(pal_chooser_current->getSelectedPalette());
-		gfx_target->getImage()->getPalette()->copyPalette(pal_chooser_current->getSelectedPalette());
-	}
-	*/
 
 	// Set palettes
 	gfx_current->setPalette(pal_chooser_current->getSelectedPalette());

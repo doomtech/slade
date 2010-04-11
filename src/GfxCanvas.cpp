@@ -86,12 +86,12 @@ GfxCanvas::~GfxCanvas() {
  *******************************************************************/
 void GfxCanvas::draw() {
 	// Setup the viewport
-	glViewport(0, 0, GetClientSize().x, GetClientSize().y);
+	glViewport(0, 0, GetSize().x, GetSize().y);
 
 	// Setup the screen projection
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(0, GetClientSize().x, GetClientSize().y, 0, -1, 1);
+	glOrtho(0, GetSize().x, GetSize().y, 0, -1, 1);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
