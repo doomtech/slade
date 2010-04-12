@@ -64,7 +64,7 @@ void CTextureCanvas::selectPatch(int index) {
 		return;
 
 	// Check patch index is ok
-	if (index < 0 || index >= texture->nPatches())
+	if (index < 0 || (unsigned) index >= texture->nPatches())
 		return;
 
 	// Select the patch
@@ -78,7 +78,7 @@ void CTextureCanvas::deSelectPatch(int index) {
 		return;
 
 	// Check patch index is ok
-	if (index < 0 || index >= texture->nPatches())
+	if (index < 0 || (unsigned) index >= texture->nPatches())
 		return;
 
 	// De-Select the patch

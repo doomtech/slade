@@ -479,6 +479,19 @@ bool EntryDataFormat::detectDoomFlat(MemChunk& mc) {
 	return !(size < 320 || size % 320);
 }
 
+// A data format found while rifling through some Legacy mods,
+// specifically High Tech Hell 2. It seems to be how it works.
+bool EntryDataFormat::detectDoomLegacy(MemChunk& mc) {
+	uint32_t size = mc.getSize();
+	if (size < 9)
+		return false;
+	uint32_t width  = mc[0] + (mc[1]<<8) + (mc[2]<<16) + (mc[3]<<24);
+	uint32_t height = mc[4] + (mc[5]<<8) + (mc[6]<<16) + (mc[7]<<24);
+	if (size != (8 + width * height))
+		return false;
+	return true;
+}
+
 bool EntryDataFormat::detectTranslationTable (MemChunk& mc) {
 	// Translation tables and colormaps are essentially the same thing.
 	// Can't rely on size because Inkworks adds a signature at the end:
@@ -600,6 +613,7 @@ bool EntryDataFormat::detectSndDoom(MemChunk& mc) {
 	if (mc.getSize() > 8) {
 		// Check header
 		uint16_t head, samplerate, samples, tail;
+		mc.seek(0, SEEK_SET);
 		mc.read(&head, 2);
 		mc.read(&samplerate, 2);
 		mc.read(&samples, 2);
@@ -635,6 +649,28 @@ bool EntryDataFormat::detectSndWav(MemChunk& mc) {
 			return true;
 	}
 
+	return false;
+}
+
+bool EntryDataFormat::detectSndOgg(MemChunk& mc) {
+	// Check size
+	if (mc.getSize() > 4) {
+		// Check for OGG Vorbis header -- a lot more tests could be made
+		// to make sure the data is valid, though.
+		// Maybe later when a mediaplayer is actually implemented...
+		if (mc[0] == 'O' && mc[1] == 'g' && mc[2] == 'g' && mc[3] == 'S')
+			return true;
+	}
+	return false;
+}
+
+bool EntryDataFormat::detectSndFlac(MemChunk& mc) {
+	// Check size
+	if (mc.getSize() > 4) {
+		// Check for FLAC header. Same comment as for detectSndOgg.
+		if (mc[0] == 'f' && mc[1] == 'L' && mc[2] == 'a' && mc[3] == 'C')
+			return true;
+	}
 	return false;
 }
 
@@ -748,6 +784,67 @@ bool EntryDataFormat::detectBMF(MemChunk& mc) {
 	if (mc.getSize() > 4) {
 		// Check for BMF header
 		if (mc[0] == 0xE1 && mc[1] == 0xE6 && mc[2] == 0xD5 && mc[3] == 0x1A)
+			return true;
+	}
+	return false;
+}
+
+bool EntryDataFormat::detectZGLNodes(MemChunk& mc) {
+	// Check size
+	if (mc.getSize() > 4) {
+		// Check for ZGLN header
+		if (mc[0] == 'Z' && mc[1] == 'G' && mc[2] == 'L' && mc[3] == 'N')
+			return true;
+	}
+	return false;
+}
+
+bool EntryDataFormat::detectZGLNodes2(MemChunk& mc) {
+	// Check size
+	if (mc.getSize() > 4) {
+		// Check for ZGL2 header
+		if (mc[0] == 'Z' && mc[1] == 'G' && mc[2] == 'L' && mc[3] == '2')
+			return true;
+	}
+	return false;
+}
+
+// Model formats. More checks could probably be made...
+bool EntryDataFormat::detectDMD(MemChunk& mc) {
+	// Check size
+	if (mc.getSize() > 4) {
+		// Check for DMDM header
+		if (mc[0] == 'D' && mc[1] == 'M' && mc[2] == 'D' && mc[3] == 'M')
+			return true;
+	}
+	return false;
+}
+
+bool EntryDataFormat::detectMDL(MemChunk& mc) {
+	// Check size
+	if (mc.getSize() > 4) {
+		// Check for IDPO header
+		if (mc[0] == 'I' && mc[1] == 'D' && mc[2] == 'P' && mc[3] == 'O')
+			return true;
+	}
+	return false;
+}
+
+bool EntryDataFormat::detectMD2(MemChunk& mc) {
+	// Check size
+	if (mc.getSize() > 4) {
+		// Check for IDP2 header
+		if (mc[0] == 'I' && mc[1] == 'D' && mc[2] == 'P' && mc[3] == '2')
+			return true;
+	}
+	return false;
+}
+
+bool EntryDataFormat::detectMD3(MemChunk& mc) {
+	// Check size
+	if (mc.getSize() > 4) {
+		// Check for IDP3 header
+		if (mc[0] == 'I' && mc[1] == 'D' && mc[2] == 'P' && mc[3] == '3')
 			return true;
 	}
 	return false;

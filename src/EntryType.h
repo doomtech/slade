@@ -35,6 +35,7 @@ public:
 	static bool detectDoomGfxArah(MemChunk& mc);
 	static bool detectDoomGfxSnea(MemChunk& mc);
 	static bool detectDoomFlat(MemChunk& mc);
+	static bool detectDoomLegacy(MemChunk& mc);
 	static bool detectPlanar(MemChunk& mc);
 	static bool detect4bitChunk(MemChunk& mc);
 	static bool detectImgz(MemChunk& mc);
@@ -50,6 +51,8 @@ public:
 	static bool detectModMod(MemChunk& mc);
 	static bool detectSndDoom(MemChunk& mc);
 	static bool detectSndWav(MemChunk& mc);
+	static bool detectSndOgg(MemChunk& mc);
+	static bool detectSndFlac(MemChunk& mc);
 	static bool detectSndSpeaker(MemChunk& mc);
 	static bool detectTextureX(MemChunk& mc);
 	static bool detectPnames(MemChunk& mc);
@@ -61,6 +64,12 @@ public:
 	static bool detectFont2(MemChunk& mc);
 	static bool detectBMF(MemChunk& mc);
 	static bool detectAnsi(MemChunk& mc);
+	static bool detectZGLNodes(MemChunk& mc);
+	static bool detectZGLNodes2(MemChunk& mc);
+	static bool detectDMD(MemChunk& mc);
+	static bool detectMDL(MemChunk& mc);
+	static bool detectMD2(MemChunk& mc);
+	static bool detectMD3(MemChunk& mc);
 };
 
 class EntryType {

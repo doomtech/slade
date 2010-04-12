@@ -658,6 +658,39 @@ bool SImage::loadDoomFlat(const uint8_t* gfx_data, int size) {
 	return true;
 }
 
+/* SImage::loadDoomLegacy
+ * Loads one of those weird Legacy screens with a header.
+ * Returns false if the image data was invalid, true otherwise.
+ *******************************************************************/
+bool SImage::loadDoomLegacy(const uint8_t* gfx_data, int size) {
+	// Check data
+	if (!gfx_data)
+		return false;
+
+	// Setup variables
+	width = wxINT32_SWAP_ON_BE(*(const uint32_t*)(gfx_data));
+	height = wxINT32_SWAP_ON_BE(*(const uint32_t*)(gfx_data+4));
+	offset_x = 0;
+	offset_y = 0;
+	format = PALMASK;
+	has_palette = false;
+
+	// Clear current data if it exists
+	clearData();
+
+	// Read raw pixel data
+	data = new uint8_t[width*height];
+	memcpy(data, gfx_data+8, width * height);
+
+	// Create mask (all opaque)
+	mask = new uint8_t[width*height];
+	memset(mask, 255, width*height);
+
+	// Announce change
+	announce(_T("image_changed"));
+
+	return true;
+}
 
 /* SImage::loadDoomArah
  * Loads a Doom Alpha Raw And Header image.

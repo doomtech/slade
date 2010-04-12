@@ -59,6 +59,7 @@ public:
 	bool	loadDoomSnea(const uint8_t* data, int size);
 	bool	loadDoomFlat(const uint8_t* data, int size);
 	bool	loadDoomArah(const uint8_t* gfx_data, int size);
+	bool	loadDoomLegacy(const uint8_t* gfx_data, int size);
 	bool	loadPlanar(const uint8_t* gfx_data, int size);
 	bool	load4bitChunk(const uint8_t* gfx_data, int size);
 	bool	loadImgz(const uint8_t* gfx_data, int size);
