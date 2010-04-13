@@ -21,7 +21,6 @@
     <File Name="src/Console.cpp"/>
     <File Name="src/Console.h"/>
     <File Name="src/CVar.cpp"/>
-    <File Name="src/CVar.h"/>
     <File Name="src/ListenerAnnouncer.h"/>
     <File Name="src/Main.h"/>
     <File Name="src/MainApp.cpp"/>
@@ -38,6 +37,13 @@
     <File Name="src/OpenGL.cpp"/>
     <File Name="src/OpenGL.h"/>
     <File Name="src/ListenerAnnouncer.cpp"/>
+    <VirtualDirectory Name="PropertyList">
+      <File Name="src/Property.cpp"/>
+      <File Name="src/Property.h"/>
+      <File Name="src/PropertyList.cpp"/>
+      <File Name="src/PropertyList.h"/>
+    </VirtualDirectory>
+    <File Name="src/CVar.h"/>
   </VirtualDirectory>
   <VirtualDirectory Name="Main Editor">
     <VirtualDirectory Name="UI Elements">
@@ -145,6 +151,8 @@
       <File Name="src/CTexture.h"/>
       <File Name="src/TextureXList.cpp"/>
       <File Name="src/TextureXList.h"/>
+      <File Name="src/PatchTable.cpp"/>
+      <File Name="src/PatchTable.h"/>
     </VirtualDirectory>
     <File Name="src/Icons.cpp"/>
     <File Name="src/Icons.h"/>

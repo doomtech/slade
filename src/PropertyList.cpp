@@ -109,7 +109,7 @@ string PropertyList::toString() {
 	while (i != properties.end()) {
 		// Add "key = value;\n" to the return string
 		string key = i->first;
-		string val = (string)i->second;
+		string val = i->second;
 		ret += key + _T(" = ") + val + _T(";\n");
 
 		// Next property

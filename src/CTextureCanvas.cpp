@@ -46,6 +46,7 @@ CTextureCanvas::CTextureCanvas(wxWindow* parent, int id)
 	tex_background = new GLTexture();
 	scale = 1.0;
 	hilight_patch = -1;
+	draw_outside = true;
 
 	// Bind events
 	Bind(wxEVT_MOTION, &CTextureCanvas::onMouseMovement, this);
@@ -218,8 +219,11 @@ void CTextureCanvas::drawTexture() {
 	glTranslated(texture.getWidth() * -0.5, texture.getHeight() * -0.5, 0);
 
 	// First, draw patches semitransparently (for anything outside the texture)
-	for (uint32_t a = 0; a < texture.nPatches(); a++)
-		drawPatch(a, rgba_t(128, 50, 50, 255, 0));
+	// But only if we are drawing stuff outside the texture area
+	if (draw_outside) {
+		for (uint32_t a = 0; a < texture.nPatches(); a++)
+			drawPatch(a, rgba_t(128, 50, 50, 255, 0));
+	}
 
 	// Now, clip to texture boundaries and draw patches fully opaque
 	glEnable(GL_SCISSOR_TEST);

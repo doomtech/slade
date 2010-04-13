@@ -164,7 +164,7 @@ bool WadArchive::open(string filename) {
 		// Update variables
 		this->filename = filename;
 		this->on_disk = true;
-		
+
 		return true;
 	}
 	else
@@ -195,7 +195,7 @@ bool WadArchive::open(MemChunk& mc) {
 	// Check data was given
 	if (!mc.hasData())
 		return false;
-	
+
 	// Read wad header
 	uint32_t num_lumps = 0;
 	uint32_t dir_offset = 0;
@@ -203,11 +203,11 @@ bool WadArchive::open(MemChunk& mc) {
 	mc.read(&wad_type, 4);		// Wad type
 	mc.read(&num_lumps, 4);		// No. of lumps in wad
 	mc.read(&dir_offset, 4);	// Offset to directory
-	
+
 	// Byteswap values for big endian if needed
 	num_lumps = wxINT32_SWAP_ON_BE(num_lumps);
 	dir_offset = wxINT32_SWAP_ON_BE(dir_offset);
-	
+
 	// Check the header
 	if (wad_type[1] != 'W' || wad_type[2] != 'A' || wad_type[3] != 'D') {
 		wxLogMessage(_T("WadArchive::openFile: File %s has invalid header"), filename.c_str());
@@ -378,8 +378,7 @@ bool WadArchive::write(MemChunk& mc, bool update) {
 
 		if (update) {
 			entries[l]->setState(0);
-			//entries[l]->setExProp(_T("Offset"), s_fmt(_T("%d"), l));
-			entries[l]->extraProp(_T("Offset")) = offset;
+			entries[l]->extraProp(_T("Offset")) = (int)offset;
 		}
 	}
 
@@ -871,26 +870,26 @@ bool WadArchive::isWadArchive(MemChunk& mc) {
 bool WadArchive::isWadArchive(string filename) {
 	// Open file for reading
 	wxFile file(filename);
-	
+
 	// Check it opened ok
 	if (!file.IsOpened())
 		return false;
-	
+
 	// Read header
 	char header[4];
 	file.Read(header, 4);
-	
+
 	// Check for IWAD/PWAD header
 	if (!(header[1] == 'W' && header[2] == 'A' && header[3] == 'D' &&
 	        (header[0] == 'P' || header[0] == 'I')))
 		return false;
-	
+
 	// Get number of lumps and directory offset
 	uint32_t num_lumps = 0;
 	uint32_t dir_offset = 0;
 	file.Read(&num_lumps, 4);
 	file.Read(&dir_offset, 4);
-	
+
 	// Byteswap values for big endian if needed
 	num_lumps = wxINT32_SWAP_ON_BE(num_lumps);
 	dir_offset = wxINT32_SWAP_ON_BE(dir_offset);

@@ -17,6 +17,7 @@ private:
 	fpoint2_t			offset;
 	point2_t			mouse_prev;
 	double				scale;
+	bool				draw_outside;
 
 public:
 	CTextureCanvas(wxWindow* parent, int id);
@@ -24,6 +25,7 @@ public:
 
 	CTexture&	getTexture() { return texture; }
 	void		setScale(double scale) { this->scale = scale; }
+	void		drawOutside(bool draw = true) { draw_outside = draw; }
 
 	void	selectPatch(int index);
 	void	deSelectPatch(int index);

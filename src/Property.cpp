@@ -47,19 +47,19 @@ Property::Property(uint8_t type) {
 
 	// Set default value depending on type
 	if (type == PROP_BOOL)
-		value.Bool = true;
+		value.Boolean = true;
 	else if (type == PROP_INT)
-		value.Int = 0;
+		value.Integer = 0;
 	else if (type == PROP_FLOAT)
-		value.Float = 0.0f;
+		value.Floating = 0.0f;
 	else if (type == PROP_STRING)
 		val_string = wxEmptyString;
 	else if (type == PROP_FLAG)
-		value.Bool = true;
+		value.Boolean = true;
 	else {
 		// Invalid type given, default to boolean
 		type = PROP_BOOL;
-		value.Bool = true;
+		value.Boolean = true;
 	}
 }
 
@@ -69,7 +69,7 @@ Property::Property(uint8_t type) {
 Property::Property(bool value) {
 	// Init boolean property
 	this->type = PROP_BOOL;
-	this->value.Bool = value;
+	this->value.Boolean = value;
 }
 
 /* Property::Property
@@ -78,7 +78,7 @@ Property::Property(bool value) {
 Property::Property(int value) {
 	// Init integer property
 	this->type = PROP_INT;
-	this->value.Int = value;
+	this->value.Integer = value;
 }
 
 /* Property::Property
@@ -87,7 +87,7 @@ Property::Property(int value) {
 Property::Property(double value) {
 	// Init float property
 	this->type = PROP_FLOAT;
-	this->value.Float = value;
+	this->value.Floating = value;
 }
 
 /* Property::Property
@@ -121,11 +121,11 @@ bool Property::getBoolValue(bool warn_wrong_type) {
 
 	// Return value (convert if needed)
 	if (type == PROP_BOOL)
-		return value.Bool;
+		return value.Boolean;
 	else if (type == PROP_INT)
-		return !!value.Int;
+		return !!value.Integer;
 	else if (type == PROP_FLOAT)
-		return !!((int)value.Float);
+		return !!((int)value.Floating);
 	else if (type == PROP_STRING) {
 		// Anything except "0", "no" or "false" is considered true
 		if (!val_string.Cmp(_T("0")) || !val_string.CmpNoCase(_T("no")) || !val_string.CmpNoCase(_T("false")))
@@ -154,11 +154,11 @@ int Property::getIntValue(bool warn_wrong_type) {
 
 	// Return value (convert if needed)
 	if (type == PROP_INT)
-		return value.Int;
+		return value.Integer;
 	else if (type == PROP_BOOL)
-		return (int)value.Bool;
+		return (int)value.Boolean;
 	else if (type == PROP_FLOAT)
-		return (int)value.Float;
+		return (int)value.Floating;
 	else if (type == PROP_STRING)
 		return atoi(chr(val_string));
 
@@ -182,11 +182,11 @@ double Property::getFloatValue(bool warn_wrong_type) {
 
 	// Return value (convert if needed)
 	if (type == PROP_FLOAT)
-		return value.Float;
+		return value.Floating;
 	else if (type == PROP_BOOL)
-		return (double)value.Bool;
+		return (double)value.Boolean;
 	else if (type == PROP_INT)
-		return (double)value.Int;
+		return (double)value.Integer;
 	else if (type == PROP_STRING)
 		return (double)atof(chr(val_string));
 
@@ -212,15 +212,15 @@ string Property::getStringValue(bool warn_wrong_type) {
 	if (type == PROP_STRING)
 		return val_string;
 	else if (type == PROP_INT)
-		return s_fmt(_T("%d"), value.Int);
+		return s_fmt(_T("%d"), value.Integer);
 	else if (type == PROP_BOOL) {
-		if (value.Bool)
+		if (value.Boolean)
 			return _T("1");
 		else
 			return _T("0");
 	}
 	else if (type == PROP_FLOAT)
-		return s_fmt(_T("%f"), value.Float);
+		return s_fmt(_T("%f"), value.Floating);
 
 	// Return default string value
 	return wxEmptyString;
@@ -236,7 +236,7 @@ void Property::setValue(bool val) {
 		changeType(PROP_BOOL);
 
 	// Set value
-	value.Bool = val;
+	value.Boolean = val;
 }
 
 /* Property::setValue
@@ -249,7 +249,7 @@ void Property::setValue(int val) {
 		changeType(PROP_INT);
 
 	// Set value
-	value.Int = val;
+	value.Integer = val;
 }
 
 /* Property::setValue
@@ -262,7 +262,7 @@ void Property::setValue(double val) {
 		changeType(PROP_FLOAT);
 
 	// Set value
-	value.Float = val;
+	value.Floating = val;
 }
 
 /* Property::setValue
@@ -295,15 +295,15 @@ void Property::changeType(uint8_t newtype) {
 
 	// Update value
 	if (type == PROP_BOOL)
-		value.Bool = true;
+		value.Boolean = true;
 	else if (type == PROP_INT)
-		value.Int = 0;
+		value.Integer = 0;
 	else if (type == PROP_FLOAT)
-		value.Float = 0.0f;
+		value.Floating = 0.0f;
 	else if (type == PROP_STRING)
 		val_string = wxEmptyString;
 	else if (type == PROP_FLAG)
-		value.Bool = true;
+		value.Boolean = true;
 }
 
 /* Property::typeString

@@ -27,6 +27,7 @@ private:
 	CTextureCanvas*	tex_canvas;
 	PaletteChooser*	combo_palette;
 	wxSlider*		slider_zoom;
+	wxCheckBox*		cb_draw_outside;
 	wxStaticText*	label_current_zoom;
 	GfxCanvas*		gfx_patch_preview;
 	wxTextCtrl*		text_tex_name;
@@ -69,6 +70,7 @@ public:
 	void	onTexPatchesListDeSelect(wxListEvent& e);
 	void	onPaletteChanged(wxCommandEvent& e);
 	void	onZoomChanged(wxCommandEvent& e);
+	void	onDrawOutsideChanged(wxCommandEvent& e);
 	void	onTexCanvasMouseLeftDown(wxMouseEvent& e);
 };
 

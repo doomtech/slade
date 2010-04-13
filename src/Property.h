@@ -10,7 +10,7 @@
 #define PROP_FLAG	4	// The 'flag' property type mimics a boolean property that is always true
 
 // Union for (most) property values
-union prop_value { bool Bool; int Int; double Float; };
+union prop_value { bool Boolean; int Integer; double Floating; };
 
 class Property {
 private:

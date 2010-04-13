@@ -289,7 +289,7 @@ bool EntryDataFormat::detectDoomGfx(MemChunk& mc) {
 bool EntryDataFormat::detectDoomGfxAlpha(MemChunk& mc) {
 	// Get entry data
 	const uint8_t* data = mc.getData();
-	
+
 	// Check that it ends on a FF byte
 	if (mc[mc.getSize() -1] != 0xFF)
 		return false;
@@ -327,7 +327,7 @@ bool EntryDataFormat::detectDoomGfxAlpha(MemChunk& mc) {
 
 bool EntryDataFormat::detectDoomGfxBeta(MemChunk& mc) {
 	const uint8_t* data = mc.getData();
-	
+
 	// Check that it ends on a FF byte.
 	if (mc[mc.getSize() -1] != 0xFF) {
 		// The lumps in the beta have sometimes up to three garbage 00 bytes; probably a question of byte alignment.
@@ -380,13 +380,13 @@ bool EntryDataFormat::detectDoomGfxBeta(MemChunk& mc) {
  *	bytes contain the bitmap for columns 0, 4, 8, etc. The
  *	next WxH bytes contain the bitmap for columns 1, 5, 9,
  *	etc., and so on. No transparency.
- */ 
+ */
 bool EntryDataFormat::detectDoomGfxSnea(MemChunk& mc) {
 	const uint8_t* data = mc.getData();
 	uint8_t qwidth = data[0]; // quarter of width
 	uint8_t height = data[1];
 	if (mc.getSize() != (2 + (4 * qwidth * height)) &&
-		// The TITLEPIC in the Doom Press-Release Beta has 
+		// The TITLEPIC in the Doom Press-Release Beta has
 		// two extraneous null bytes at the end.
 		(qwidth != 80 || height != 200 || mc.getSize() != 64004))
 		return false;
@@ -441,7 +441,7 @@ bool EntryDataFormat::detectImgz(MemChunk& mc) {
 
 	if (size < sizeof(imgz_header_t))
 		return false;
-	
+
 	const uint8_t* data = mc.getData();
 	const imgz_header_t *header = (const imgz_header_t *)data;
 
@@ -501,7 +501,7 @@ bool EntryDataFormat::detectTranslationTable (MemChunk& mc) {
 		if (size < 8776)
 			return false;
 		bool inkworks = true;
-		char * compare = "This lump was created by The Cookie Monsters InkWorks for DOOM";
+		const char* compare = "This lump was created by The Cookie Monsters InkWorks for DOOM";
 		for (size_t i = 0; i < 62; ++i) {
 			if (mc[8704+i] != compare[i]) {
 				inkworks = false;
@@ -700,7 +700,7 @@ bool EntryDataFormat::detectPnames(MemChunk& mc) {
 bool EntryDataFormat::detectAnimated(MemChunk& mc) {
 	if (mc.getSize() > sizeof(animated_t)) {
 		size_t numentries = mc.getSize()/sizeof(animated_t);
-		// The last entry can be incomplete, as it may stop right 
+		// The last entry can be incomplete, as it may stop right
 		// after the declaration of its type. So if the size is not
 		// a perfect multiple, then the last entry is incomplete.
 		size_t lastentry = (mc.getSize()%numentries ? numentries : numentries - 1);
@@ -749,7 +749,7 @@ bool EntryDataFormat::detectFont0(MemChunk& mc) {
 
 	// It seems okay so far. Check that one
 	// character does start at offset 0x302.
-	// The offsets are themselves between 
+	// The offsets are themselves between
 	// offsets 0x102 and 0x302. Halved for int16_t.
 	for (size_t i = 0x81; i < 0x181; ++i)
 		if (gfx_data[i] == wxINT16_SWAP_ON_BE(0x302))
@@ -1335,13 +1335,13 @@ bool EntryType::loadEntryTypes() {
 	etype_unknown.setIcon(_T("e_unknown"));
 	etype_unknown.setDetectable(false);
 	etype_unknown.addToList();
-	
+
 	// Setup folder type
 	etype_folder.setIcon(_T("e_folder"));
 	etype_folder.setName(_T("Folder"));
 	etype_folder.setDetectable(false);
 	etype_folder.addToList();
-	
+
 	// Setup map marker type
 	etype_map.setIcon(_T("e_map"));
 	etype_map.setName(_T("Map Marker"));

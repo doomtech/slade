@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Simon
-Date                   :=12/04/10
+Date                   :=14/04/10
 CodeLitePath           :="/home/simon/.codelite"
 LinkerName             :=g++
 ArchiveTool            :=ar rcus
@@ -49,12 +49,12 @@ LibPath                := "$(LibraryPathSwitch)."
 ##
 CodeLiteDir:=/usr/share/codelite
 Objects=$(IntermediateDirectory)/src_GfxConvDialog$(ObjectSuffix) $(IntermediateDirectory)/src_ModifyOffsetsDialog$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteDialog$(ObjectSuffix) $(IntermediateDirectory)/src_Clipboard$(ObjectSuffix) $(IntermediateDirectory)/src_Console$(ObjectSuffix) $(IntermediateDirectory)/src_CVar$(ObjectSuffix) $(IntermediateDirectory)/src_MainApp$(ObjectSuffix) $(IntermediateDirectory)/src_MemChunk$(ObjectSuffix) $(IntermediateDirectory)/src_Misc$(ObjectSuffix) $(IntermediateDirectory)/src_Tokenizer$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_WxStuff$(ObjectSuffix) $(IntermediateDirectory)/src_OpenGL$(ObjectSuffix) $(IntermediateDirectory)/src_ListenerAnnouncer$(ObjectSuffix) $(IntermediateDirectory)/src_ArchivePanel$(ObjectSuffix) $(IntermediateDirectory)/src_EntryListPanel$(ObjectSuffix) $(IntermediateDirectory)/src_AnimatedEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_DefaultEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_EntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_GfxEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_MultiEntryPanel$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_PaletteEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_SwitchesEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_TextEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_PnamesEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_TextureXEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_ZipArchivePanel$(ObjectSuffix) $(IntermediateDirectory)/src_ZipEntryListPanel$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveManagerPanel$(ObjectSuffix) $(IntermediateDirectory)/src_MainWindow$(ObjectSuffix) $(IntermediateDirectory)/src_EntryOperations$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_MapLine$(ObjectSuffix) $(IntermediateDirectory)/src_MapSector$(ObjectSuffix) $(IntermediateDirectory)/src_MapSide$(ObjectSuffix) $(IntermediateDirectory)/src_MapThing$(ObjectSuffix) $(IntermediateDirectory)/src_MapVertex$(ObjectSuffix) $(IntermediateDirectory)/src_SLADEMap$(ObjectSuffix) $(IntermediateDirectory)/src_MapCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_MapEditorWindow$(ObjectSuffix) $(IntermediateDirectory)/src_Archive$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveEntry$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_ArchiveManager$(ObjectSuffix) $(IntermediateDirectory)/src_WadArchive$(ObjectSuffix) $(IntermediateDirectory)/src_ZipArchive$(ObjectSuffix) $(IntermediateDirectory)/src_EntryType$(ObjectSuffix) $(IntermediateDirectory)/src_AnimatedList$(ObjectSuffix) $(IntermediateDirectory)/src_SwitchesList$(ObjectSuffix) $(IntermediateDirectory)/src_PnamesList$(ObjectSuffix) $(IntermediateDirectory)/src_SImage$(ObjectSuffix) $(IntermediateDirectory)/src_Palette$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteManager$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_CTexture$(ObjectSuffix) $(IntermediateDirectory)/src_TextureXList$(ObjectSuffix) $(IntermediateDirectory)/src_Icons$(ObjectSuffix) $(IntermediateDirectory)/src_GLTexture$(ObjectSuffix) $(IntermediateDirectory)/src_ColourBox$(ObjectSuffix) $(IntermediateDirectory)/src_CTextureCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_GfxCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_ListView$(ObjectSuffix) $(IntermediateDirectory)/src_OGLCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteCanvas$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_PaletteChooser$(ObjectSuffix) $(IntermediateDirectory)/src_TextEditor$(ObjectSuffix) $(IntermediateDirectory)/src_ConsolePanel$(ObjectSuffix) $(IntermediateDirectory)/src_SplashWindow$(ObjectSuffix) $(IntermediateDirectory)/src_BaseResourceArchivesPanel$(ObjectSuffix) 
+	$(IntermediateDirectory)/src_WxStuff$(ObjectSuffix) $(IntermediateDirectory)/src_OpenGL$(ObjectSuffix) $(IntermediateDirectory)/src_ListenerAnnouncer$(ObjectSuffix) $(IntermediateDirectory)/src_Property$(ObjectSuffix) $(IntermediateDirectory)/src_PropertyList$(ObjectSuffix) $(IntermediateDirectory)/src_ArchivePanel$(ObjectSuffix) $(IntermediateDirectory)/src_EntryListPanel$(ObjectSuffix) $(IntermediateDirectory)/src_AnimatedEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_DefaultEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_EntryPanel$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_GfxEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_MultiEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_SwitchesEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_TextEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_PnamesEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_TextureXEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_ZipArchivePanel$(ObjectSuffix) $(IntermediateDirectory)/src_ZipEntryListPanel$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveManagerPanel$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_MainWindow$(ObjectSuffix) $(IntermediateDirectory)/src_EntryOperations$(ObjectSuffix) $(IntermediateDirectory)/src_MapLine$(ObjectSuffix) $(IntermediateDirectory)/src_MapSector$(ObjectSuffix) $(IntermediateDirectory)/src_MapSide$(ObjectSuffix) $(IntermediateDirectory)/src_MapThing$(ObjectSuffix) $(IntermediateDirectory)/src_MapVertex$(ObjectSuffix) $(IntermediateDirectory)/src_SLADEMap$(ObjectSuffix) $(IntermediateDirectory)/src_MapCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_MapEditorWindow$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_Archive$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveEntry$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveManager$(ObjectSuffix) $(IntermediateDirectory)/src_WadArchive$(ObjectSuffix) $(IntermediateDirectory)/src_ZipArchive$(ObjectSuffix) $(IntermediateDirectory)/src_EntryType$(ObjectSuffix) $(IntermediateDirectory)/src_AnimatedList$(ObjectSuffix) $(IntermediateDirectory)/src_SwitchesList$(ObjectSuffix) $(IntermediateDirectory)/src_PnamesList$(ObjectSuffix) $(IntermediateDirectory)/src_SImage$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_Palette$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteManager$(ObjectSuffix) $(IntermediateDirectory)/src_CTexture$(ObjectSuffix) $(IntermediateDirectory)/src_TextureXList$(ObjectSuffix) $(IntermediateDirectory)/src_PatchTable$(ObjectSuffix) $(IntermediateDirectory)/src_Icons$(ObjectSuffix) $(IntermediateDirectory)/src_GLTexture$(ObjectSuffix) $(IntermediateDirectory)/src_ColourBox$(ObjectSuffix) $(IntermediateDirectory)/src_CTextureCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_GfxCanvas$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_ListView$(ObjectSuffix) $(IntermediateDirectory)/src_OGLCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteChooser$(ObjectSuffix) $(IntermediateDirectory)/src_TextEditor$(ObjectSuffix) $(IntermediateDirectory)/src_ConsolePanel$(ObjectSuffix) $(IntermediateDirectory)/src_SplashWindow$(ObjectSuffix) $(IntermediateDirectory)/src_BaseResourceArchivesPanel$(ObjectSuffix) 
 
 ##
 ## Main Build Targets 
@@ -177,6 +177,22 @@ $(IntermediateDirectory)/src_ListenerAnnouncer$(DependSuffix): src/ListenerAnnou
 
 $(IntermediateDirectory)/src_ListenerAnnouncer$(PreprocessSuffix): src/ListenerAnnouncer.cpp
 	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ListenerAnnouncer$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/ListenerAnnouncer.cpp"
+
+$(IntermediateDirectory)/src_Property$(ObjectSuffix): src/Property.cpp $(IntermediateDirectory)/src_Property$(DependSuffix)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/Property.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_Property$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_Property$(DependSuffix): src/Property.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_Property$(ObjectSuffix) -MF$(IntermediateDirectory)/src_Property$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/Property.cpp"
+
+$(IntermediateDirectory)/src_Property$(PreprocessSuffix): src/Property.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_Property$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/Property.cpp"
+
+$(IntermediateDirectory)/src_PropertyList$(ObjectSuffix): src/PropertyList.cpp $(IntermediateDirectory)/src_PropertyList$(DependSuffix)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/PropertyList.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_PropertyList$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_PropertyList$(DependSuffix): src/PropertyList.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_PropertyList$(ObjectSuffix) -MF$(IntermediateDirectory)/src_PropertyList$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/PropertyList.cpp"
+
+$(IntermediateDirectory)/src_PropertyList$(PreprocessSuffix): src/PropertyList.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_PropertyList$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/PropertyList.cpp"
 
 $(IntermediateDirectory)/src_ArchivePanel$(ObjectSuffix): src/ArchivePanel.cpp $(IntermediateDirectory)/src_ArchivePanel$(DependSuffix)
 	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/ArchivePanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ArchivePanel$(ObjectSuffix) $(IncludePath)
@@ -490,6 +506,14 @@ $(IntermediateDirectory)/src_TextureXList$(DependSuffix): src/TextureXList.cpp
 $(IntermediateDirectory)/src_TextureXList$(PreprocessSuffix): src/TextureXList.cpp
 	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_TextureXList$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/TextureXList.cpp"
 
+$(IntermediateDirectory)/src_PatchTable$(ObjectSuffix): src/PatchTable.cpp $(IntermediateDirectory)/src_PatchTable$(DependSuffix)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/PatchTable.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_PatchTable$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_PatchTable$(DependSuffix): src/PatchTable.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_PatchTable$(ObjectSuffix) -MF$(IntermediateDirectory)/src_PatchTable$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/PatchTable.cpp"
+
+$(IntermediateDirectory)/src_PatchTable$(PreprocessSuffix): src/PatchTable.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_PatchTable$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/PatchTable.cpp"
+
 $(IntermediateDirectory)/src_Icons$(ObjectSuffix): src/Icons.cpp $(IntermediateDirectory)/src_Icons$(DependSuffix)
 	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/Icons.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_Icons$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_Icons$(DependSuffix): src/Icons.cpp
@@ -639,6 +663,12 @@ clean:
 	$(RM) $(IntermediateDirectory)/src_ListenerAnnouncer$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/src_ListenerAnnouncer$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/src_ListenerAnnouncer$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/src_Property$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/src_Property$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/src_Property$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/src_PropertyList$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/src_PropertyList$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/src_PropertyList$(PreprocessSuffix)
 	$(RM) $(IntermediateDirectory)/src_ArchivePanel$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/src_ArchivePanel$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/src_ArchivePanel$(PreprocessSuffix)
@@ -756,6 +786,9 @@ clean:
 	$(RM) $(IntermediateDirectory)/src_TextureXList$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/src_TextureXList$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/src_TextureXList$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/src_PatchTable$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/src_PatchTable$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/src_PatchTable$(PreprocessSuffix)
 	$(RM) $(IntermediateDirectory)/src_Icons$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/src_Icons$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/src_Icons$(PreprocessSuffix)

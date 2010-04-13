@@ -573,7 +573,8 @@ bool ZipArchive::write(string filename, bool update) {
 	for (size_t a = 0; a < entries.size(); a++) {
 		if (entries[a]->getType() == EntryType::folderType()) {
 			// If the current entry is a folder, just write a directory entry and continue
-			zip.PutNextDirEntry((string)entries[a]->extraProp(_T("Directory")) + entries[a]->getName());
+			string dir = entries[a]->extraProp(_T("Directory"));
+			zip.PutNextDirEntry(dir + entries[a]->getName());
 			if (update) entries[a]->setState(0);
 			continue;
 		}
@@ -1047,7 +1048,7 @@ string ZipArchive::detectEntrySection(ArchiveEntry* entry) {
 	// Textures
 	if (dir->getName() == _T("textures"))
 		return _T("textures");
-	
+
 	return _T("none");
 }
 

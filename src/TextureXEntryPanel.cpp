@@ -82,6 +82,7 @@ TextureXEntryPanel::TextureXEntryPanel(wxWindow* parent)
 	combo_palette->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &TextureXEntryPanel::onPaletteChanged, this);
 	slider_zoom->Bind(wxEVT_COMMAND_SLIDER_UPDATED, &TextureXEntryPanel::onZoomChanged, this);
 	tex_canvas->Bind(wxEVT_LEFT_DOWN, &TextureXEntryPanel::onTexCanvasMouseLeftDown, this);
+	cb_draw_outside->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &TextureXEntryPanel::onDrawOutsideChanged, this);
 
 	Layout();
 }
@@ -125,6 +126,11 @@ wxPanel* TextureXEntryPanel::initTexArea(wxWindow* parent) {
 	hbox->Add(label_current_zoom, 0, wxALIGN_CENTER_VERTICAL, 0);
 
 	hbox->AddStretchSpacer();
+
+	// 'Show Outside' checkbox
+	cb_draw_outside = new wxCheckBox(panel, -1, _T("Show Outside"));
+	cb_draw_outside->SetValue(true);
+	hbox->Add(cb_draw_outside, 0, wxEXPAND);
 
 	// Add texture canvas
 	tex_canvas = new CTextureCanvas(panel, -1);
@@ -564,4 +570,9 @@ void TextureXEntryPanel::onTexCanvasMouseLeftDown(wxMouseEvent &e) {
 	}
 
 	e.Skip();
+}
+
+void TextureXEntryPanel::onDrawOutsideChanged(wxCommandEvent& e) {
+	tex_canvas->drawOutside(cb_draw_outside->GetValue());
+	tex_canvas->Refresh();
 }
