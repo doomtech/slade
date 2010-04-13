@@ -294,6 +294,26 @@
 				RelativePath=".\src\WxStuff.h"
 				>
 			</File>
+			<Filter
+				Name="PropertyList"
+				>
+				<File
+					RelativePath=".\src\Property.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Property.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\PropertyList.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\PropertyList.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Main Editor"
@@ -655,6 +675,14 @@
 				</File>
 				<File
 					RelativePath=".\src\CTexture.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\PatchTable.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\PatchTable.h"
 					>
 				</File>
 				<File

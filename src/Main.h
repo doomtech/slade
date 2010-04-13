@@ -42,13 +42,6 @@ typedef wxString string;
 #define vector_remove(vec, val) vec.erase(find(vec.begin(), vec.end(), val))
 
 
-// Declare hash map types
-#include <wx/hashmap.h>
-WX_DECLARE_STRING_HASH_MAP(wxString, HMStringString);
-WX_DECLARE_HASH_MAP(int, wxString, wxIntegerHash, wxIntegerEqual, HMIntString);
-typedef HMStringString PropertyList;
-
-
 // Logfile
 #include <wx/log.h>
 

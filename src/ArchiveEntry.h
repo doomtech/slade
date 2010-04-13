@@ -7,6 +7,7 @@ class Archive;
 #include "ListenerAnnouncer.h"
 #include "MemChunk.h"
 #include "EntryType.h"
+#include "PropertyList.h"
 
 class ArchiveEntry : public Announcer {
 private:
@@ -15,7 +16,6 @@ private:
 	MemChunk		data;
 	uint32_t		size;
 	bool			data_loaded;
-	//uint8_t		type;
 	EntryType*		type;
 	uint8_t			state;			// 0 = unmodified, 1 = modified, 2 = newly created
 	bool			locked;
@@ -37,6 +37,8 @@ public:
 	bool			isLocked() { return locked; }
 	const uint8_t*	getData(bool allow_load = true);
 	MemChunk&		getMCData(bool allow_load = true);
+	PropertyList&	extraProps() { return ex_props; }
+	Property&		extraProp(string key) { return ex_props[key]; }
 
 	// Modifiers (won't change entry state)
 	void		setParent(Archive* parent) { this->parent = parent; }
@@ -81,11 +83,13 @@ public:
 	uint32_t	currentPos() { return data.currentPos(); }
 
 	// Extra properties stuff
+	/*
 	bool	hasExProp(string key);
 	string	getExProp(string key);
 	bool	setExProp(string key, string value);
 	bool	removeExProp(string key);
 	void	allExProps(vector<string>& keys, vector<string>& values);
+	*/
 };
 
 

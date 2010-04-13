@@ -148,6 +148,44 @@ bool ListView::selectItem(int item, bool focus) {
 	return true;
 }
 
+bool ListView::deSelectItem(int item) {
+	// Check item id is in range
+	if (item >= GetItemCount())
+		return false;
+
+	// If negative item given, deselect all items
+	if (item < 0) {
+		clearSelection();
+		return true;
+	}
+
+	// DeSelect the item
+	SetItemState(item, 0x0000, wxLIST_STATE_SELECTED);
+
+	return true;
+}
+
+wxArrayInt ListView::selectedItems() {
+	// Init return array
+	wxArrayInt ret;
+
+	// Go through all items
+	long item = -1;
+	while (true) {
+		// Get the next item in the list that is selected
+		item = GetNextItem(item, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+
+		// If -1 then none were selected
+		if (item == -1)
+			break;
+
+		// Otherwise add the selected index to the vector
+		ret.Add(item);
+	}
+
+	return ret;
+}
+
 bool ListView::showItem(int item) {
 	// Check item id is in range
 	if (item < 0 || item >= GetItemCount())

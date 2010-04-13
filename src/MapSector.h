@@ -3,6 +3,7 @@
 #define __MAPSECTOR_H__
 
 #include "Tokenizer.h"
+#include "PropertyList.h"
 
 class MapSide;
 

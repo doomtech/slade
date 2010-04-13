@@ -30,7 +30,6 @@
  *******************************************************************/
 #include "Main.h"
 #include "CTexture.h"
-#include "Misc.h"
 
 
 /*******************************************************************
@@ -41,19 +40,12 @@
  * CTPatch class constructor
  *******************************************************************/
 CTPatch::CTPatch() {
-	// Init variables
-	offsets.set(0, 0);
-	scale.set(1, 1);
 }
 
 /* CTPatch::~CTPatch
  * CTPatch class destructor
  *******************************************************************/
 CTPatch::~CTPatch() {
-}
-
-bool CTPatch::loadImage(ArchiveEntry *gfx_entry) {
-	return Misc::loadImageFromEntry(&image, gfx_entry);
 }
 
 
@@ -64,35 +56,140 @@ bool CTPatch::loadImage(ArchiveEntry *gfx_entry) {
 /* CTexture::CTexture
  * CTexture class constructor
  *******************************************************************/
-CTexture::CTexture(string name, uint32_t width, uint32_t height) {
-	// Init variables
-	this->name = name;
-	this->width = width;
-	this->height = height;
-	scale.set(1, 1);
+CTexture::CTexture() {
 }
 
 /* CTexture::~CTexture
  * CTexture class destructor
  *******************************************************************/
 CTexture::~CTexture() {
-	// Cleanup patches
-	for (size_t a = 0; a < patches.size(); a++)
-		delete patches[a];
 }
 
-bool CTexture::addPatch(CTPatch* patch) {
-	if (!patch)
-		return false;
+/* CTexture::getPatch
+ * Returns the patch at [index], or NULL if [index] is out of bounds
+ *******************************************************************/
+CTPatch* CTexture::getPatch(size_t index) {
+	// Check index
+	if (index >= patches.size())
+		return NULL;
 
-	patches.push_back(patch);
+	// Return patch at index
+	return &patches[index];
+}
 
+/* CTexture::clear
+ * Clears all texture data
+ *******************************************************************/
+void CTexture::clear() {
+	this->name = _T("");
+	this->width = 0;
+	this->height = 0;
+	this->scale_x = 1.0;
+	this->scale_y = 1.0;
+	this->patches.clear();
+	this->ex_props.clear();
+}
+
+/* CTexture::fromTX
+ * Reads in texture information from a TEXTUREx format texture
+ *******************************************************************/
+bool CTexture::fromTX(tx_texture_t& info, PatchTable& ptable) {
+	// Clear any current texture data
+	clear();
+
+	// Setup texture properties
+	name = info.name;
+	width = info.width;
+	height = info.height;
+	scale_x = 1.0;	// TODO: Convert from TEXTUREX scale
+	scale_y = 1.0;
+
+	// Flags
+	if (info.flags & TX_WORLDPANNING)
+		ex_props.addFlag(_T("WorldPanning"));
+		//ex_props[_T("WorldPanning")].changeType(PROP_FLAG);
+
+	// Setup patches
+	for (size_t a = 0; a < info.patches.size(); a++) {
+		// Get patch index
+		uint16_t index = info.patches[a].patch;
+
+		// Check patch index is in range
+		if (index >= ptable.nPatches()) {
+			wxLogMessage(_T("Texture %s contains invalid patch index %d"), name.c_str(), index);
+			continue;
+		}
+
+		// Create patch
+		CTPatch patch;
+		patch.setPatchName(ptable.patchName(index));
+		patch.setPatchEntry(ptable.patchEntry(index));
+		patch.setOffsetX(info.patches[a].left);
+		patch.setOffsetY(info.patches[a].top);
+
+		// Add it to the texture
+		patches.push_back(patch);
+	}
+
+	// Done
 	return true;
 }
 
-CTPatch* CTexture::getPatch(size_t index) {
-	if (index >= patches.size())
-		return NULL;
-	else
-		return patches[index];
+/* CTexture::toTX
+ * Writes texture information to a TEXTUREx format texture
+ *******************************************************************/
+bool CTexture::toTX(tx_texture_t& info, PatchTable& ptable) {
+	// Write texture properties
+	info.name = name;
+	info.width = width;
+	info.height = height;
+	info.scale_x = scale_x;
+	info.scale_y = scale_y;
+
+	// Write flags
+	uint16_t flags = 0;
+	if (ex_props.propertyExists(_T("WorldPanning")))
+		flags |= TX_WORLDPANNING;
+	info.flags = flags;
+
+	// Write patches info
+	info.patches.clear();
+	for (size_t a = 0; a < patches.size(); a++) {
+		// Get patch index
+		int16_t index = ptable.patchIndex(patches[a].getPatchName());
+		if (index < 0)
+			index = ptable.patchIndex(patches[a].getPatchEntry());
+		if (index < 0) {
+			wxLogMessage(_T("Could not find patch %s in patch table"), patches[a].getPatchName().c_str());
+			continue;
+		}
+
+		// Create patch
+		tx_patch_t patch;
+		patch.left = patches[a].xOffset();
+		patch.top = patches[a].yOffset();
+		patch.patch = index;
+
+		// Write patch info
+		info.patches.push_back(patch);
+	}
+
+	// Done
+	return true;
+}
+
+/* CTexture::fromZD
+ * Reads in texture information from a ZDoom TEXTURES format texture
+ *******************************************************************/
+bool CTexture::fromZD(Tokenizer& tz) {
+	// TODO: Implement reading TEXTURES definition
+	return false;
+}
+
+/* CTexture::toZD
+ * Writes texture information to a ZDoom TEXTURES format texture
+ *******************************************************************/
+string CTexture::toZD() {
+	// TODO: Implement writing TEXUTRES definition
+	return wxEmptyString;
 }

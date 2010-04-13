@@ -247,7 +247,8 @@ bool WadArchive::open(MemChunk& mc) {
 		// Create & setup lump
 		ArchiveEntry* nlump = new ArchiveEntry(wxString::FromAscii(name), size, this);
 		nlump->setLoaded(false);
-		nlump->setExProp(_T("Offset"), s_fmt(_T("%d"), offset));
+		//nlump->setExProp(_T("Offset"), s_fmt(_T("%d"), offset));
+		nlump->extraProp(_T("Offset")) = (int)offset;
 		nlump->setState(0);
 
 		// Check for markers
@@ -377,7 +378,8 @@ bool WadArchive::write(MemChunk& mc, bool update) {
 
 		if (update) {
 			entries[l]->setState(0);
-			entries[l]->setExProp(_T("Offset"), s_fmt(_T("%d"), l));
+			//entries[l]->setExProp(_T("Offset"), s_fmt(_T("%d"), l));
+			entries[l]->extraProp(_T("Offset")) = offset;
 		}
 	}
 
@@ -407,18 +409,22 @@ void WadArchive::close() {
  * Returns the lump entry's offset, or zero if it doesn't exist
  *******************************************************************/
 uint32_t WadArchive::getEntryOffset(ArchiveEntry* entry) {
+	/*
 	if (entry->hasExProp(_T("Offset"))) {
 		return (uint32_t)atoi(chr(entry->getExProp(_T("Offset"))));
 	}
 	else
 		return 0;
+	*/
+	return uint32_t((int)entry->extraProp(_T("Offset")));
 }
 
 /* WadArchive::setEntryOffset
  * Sets a lump entry's offset
  *******************************************************************/
 void WadArchive::setEntryOffset(ArchiveEntry* entry, uint32_t offset) {
-	entry->setExProp(_T("Offset"), s_fmt(_T("%d"), offset));
+	//entry->setExProp(_T("Offset"), s_fmt(_T("%d"), offset));
+	entry->extraProp(_T("Offset")) = (int)offset;
 }
 
 /* WadArchive::loadEntryData
@@ -619,7 +625,8 @@ bool WadArchive::addEntry(ArchiveEntry* entry, uint32_t position) {
 	// Truncate name to 8 characters if needed
 	string name = entry->getName();
 	if (name.size() > 8) {
-		entry->setExProp(_T("full_name"), name); // Add full name as extra property in case it's needed later
+		//entry->setExProp(_T("full_name"), name); // Add full name as extra property in case it's needed later
+		entry->extraProp(_T("full_name")) = name;
 		name.Truncate(8);
 		entry->setName(name);
 	}

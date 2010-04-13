@@ -69,6 +69,7 @@ public:
 	void	onTexPatchesListDeSelect(wxListEvent& e);
 	void	onPaletteChanged(wxCommandEvent& e);
 	void	onZoomChanged(wxCommandEvent& e);
+	void	onTexCanvasMouseLeftDown(wxMouseEvent& e);
 };
 
 #endif//__TEXTUREXENTRYPANEL_H__

@@ -367,7 +367,7 @@ bool Tokenizer::getBool() {
 
 	// If the token is a string "no" or "false", the value is false
 	//if (!stricmp(chr(token), "no") || !stricmp(chr(token), "false"))
-	if (!token.compare(_T("no")) || !token.compare(_T("false")))
+	if (!token.CmpNoCase(_T("no")) || !token.CmpNoCase(_T("false")))
 		return false;
 
 	// Returns true ("1") or false ("0")

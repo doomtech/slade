@@ -41,149 +41,52 @@
  * TextureXList class constructor
  *******************************************************************/
 TextureXList::TextureXList() {
+	// Setup 'invalid' texture
+	tex_invalid.name = _T("INVALID_TEXTURE");	// Deliberately set the name to >8 characters
+	tex_invalid.width = -1;
+	tex_invalid.height = -1;
 }
 
 /* TextureXList::~TextureXList
  * TextureXList class destructor
  *******************************************************************/
 TextureXList::~TextureXList() {
-	// Delete any generated textures
-	for (size_t a = 0; a < textures.size(); a++) {
-		if (textures[a].tex)
-			delete textures[a].tex;
-	}
 }
 
-/* TextureXList::getCTexture
- * Returns the CTexture at [index], or NULL if [index] is out of
- * range
+/* TextureXList::getTexture
+ * Returns the texture at [index], or the 'invalid' texture if
+ * [index] is out of range
  *******************************************************************/
-CTexture* TextureXList::getCTexture(size_t index) {
-	// Check index range
-	if (index >= nTextures())
-		return NULL;
+tx_texture_t TextureXList::getTexture(size_t index) {
+	// Check index
+	if (index >= textures.size())
+		return tex_invalid;
 
-	// Delete current composite texture
-	tx_texture_t& td = textures[index];
-	if (td.tex)
-		delete td.tex;
-
-	// Build composite texture
-	CTexture* tex = new CTexture(td.name, td.width, td.height);
-
-	// Add patches
-	for (size_t a = 0; a < td.patches.size(); a++) {
-		tx_patch_t pd = td.patches[a];
-
-		// Create patch
-		CTPatch* ctp = new CTPatch();
-		ctp->setOffsets(pd.left, pd.top);
-
-		// Load patch image entry
-		ctp->loadImage(patches[pd.patch].entry);
-
-		// Add it to the texture
-		tex->addPatch(ctp);
-	}
-
-	// Set tex
-	td.tex = tex;
-
-	return td.tex;
-}
-
-/* TextureXList::getCTexture
- * Returns a CTexture matching [name], or NULL if no match found
- *******************************************************************/
-CTexture* TextureXList::getCTexture(string name) {
-	for (size_t a = 0; a < nTextures(); a++) {
-		if (textures[a].name.CmpNoCase(name) == 0)
-			return getCTexture(a);
-	}
-
-	// No match found
-	return NULL;
-}
-
-tx_texture_t TextureXList::getTexInfo(size_t index) {
-	if (index >= nTextures())
-		return tx_texture_t();
-
+	// Return texture at index
 	return textures[index];
 }
 
-tx_texture_t TextureXList::getTexInfo(string name) {
-	for (size_t a = 0; a < nTextures(); a++) {
+/* TextureXList::getTexture
+ * Returns the texture matching [name], or the 'invalid' texture if
+ * no match is found
+ *******************************************************************/
+tx_texture_t TextureXList::getTexture(string name) {
+	// Search for texture by name
+	for (size_t a = 0; a < textures.size(); a++) {
 		if (textures[a].name.CmpNoCase(name) == 0)
-			return getTexInfo(a);
+			return textures[a];
 	}
 
-	// No match found
-	return tx_texture_t();
-}
-
-/* TextureXList::getPatchName
- * Returns the patch name at [index], or empty if [index] is out of
- * range
- *******************************************************************/
-string TextureXList::getPatchName(size_t index) {
-	// Check index range
-	if (index >= nPatches())
-		return _T("");
-
-	return patches[index].name;
-}
-
-/* TextureXList::getPatchEntry
- * Returns the patch name at [index], or NULL if [index] is out of
- * range
- *******************************************************************/
-ArchiveEntry* TextureXList::getPatchEntry(size_t index) {
-	// Check index range
-	if (index >= nPatches())
-		return NULL;
-
-	return patches[index].entry;
+	// Not found
+	return tex_invalid;
 }
 
 /* TextureXList::clear
- * Clears all textures and patches
+ * Clears all textures
  *******************************************************************/
-void TextureXList::clear() {
-	// Clear textures
-	//for (size_t a = 0; a < textures.size(); a++)
-	//	delete textures[a];
+void TextureXList::clear(bool clear_patches) {
+	// Clear textures list
 	textures.clear();
-
-	// Clear patches
-	patches.clear();
-}
-
-/* TextureXList::updatePatches
- * Updates all patch entries
- *******************************************************************/
-bool TextureXList::updatePatches(Archive* archive) {
-	bool okay = true;
-
-	for (size_t a = 0; a < patches.size(); a++) {
-		// Attempt to find patch entry
-		ArchiveEntry* entry = NULL;
-
-		if (archive)
-			entry = archive->getEntry(patches[a].name);						// Search given archive first
-		if (!entry)
-			entry = theArchiveManager->getResourceEntry(patches[a].name);	// Next search open resource archives + base resource archive
-
-		// Set patch entry
-		patches[a].entry = entry;
-
-		if (!entry) {
-			wxLogMessage(_T("Patch \"%s\" not found"), patches[a].name.c_str());
-			okay = false;
-		}
-	}
-
-	return okay;
 }
 
 // Some structs for reading TEXTUREx data
@@ -225,48 +128,20 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, ArchiveEntry* pnames
 	if (!texturex || !pnames)
 		return false;
 
-	// Clear current textures/patches
+	// Clear current textures
 	clear();
 
 	// Read PNAMES
-
-	// Read number of pnames
-	uint32_t n_pnames = 0;
-	pnames->seek(0, SEEK_SET);
-	if (!pnames->read(&n_pnames, 4)) {
-		wxLogMessage(_T("Error: PNAMES entry is corrupt"));
+	if (!pnames && texturex->getParent())
+		pnames = texturex->getParent()->getEntry(_T("PNAMES"));		// If no pnames entry given, first search TEXTUREx parent archive
+	if (!pnames)
+		pnames = theArchiveManager->getResourceEntry(_T("PNAMES"));	// Next search resource archives
+	if (!pnames) {
+		wxLogMessage(_T("PNAMES entry not found"));
 		return false;
 	}
-
-	// Read pnames content
-	for (uint32_t a = 0; a < n_pnames; a++) {
-		char pname[9] = "";
-		pname[8] = 0;
-
-		// Try to read pname
-		if (!pnames->read(&pname, 8)) {
-			wxLogMessage(_T("Error: PNAMES entry is corrupt"));
-			return false;
-		}
-
-		// Create patch info
-		pnames_entry_t patch;
-		patch.name = wxString(pname).Upper();
-
-		// Attempt to find patch entry
-		ArchiveEntry* entry = pnames->getParent()->getEntry(patch.name);	// Search parent archive first
-		if (!entry)
-			entry = theArchiveManager->getResourceEntry(patch.name);		// Next search open resource archives + base resource archive
-
-		if (entry)
-			patch.entry = entry;
-		else
-			wxLogMessage(_T("Patch \"%s\" not found"), pname);
-
-		// Add patch to list
-		patches.push_back(patch);
-	}
-
+	if (!patches.loadPNAMES(pnames))
+		return false;
 
 	// Read TEXTUREx
 
@@ -379,7 +254,6 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, ArchiveEntry* pnames
 		tex.scale_x = tdef.scale[0];
 		tex.scale_y = tdef.scale[1];
 		tex.flags = tdef.flags;
-		//CTexture* tex = new CTexture(wxString::From8BitData(tdef.name, 8), tdef.width, tdef.height);
 
 		// Read patches
 		int16_t n_patches = 0;
@@ -404,22 +278,8 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, ArchiveEntry* pnames
 				}
 			}
 
-			// Check patch id
-			if (pdef.patch >= patches.size()) {
-				wxLogMessage(_T("Texture %s contains non-existant patch id %d"), tex.name.c_str(), pdef.patch);
-				continue;
-			}
-
-			// Create patch
-			//CTPatch* ctp = new CTPatch();
-			//ctp->setOffsets(pdef.left, pdef.top);
-
-			// Load patch image entry
-			//ctp->loadImage(patches[pdef.patch].entry);
-
 			// Add it to the texture
 			tex.patches.push_back(pdef);
-			//tex->addPatch(ctp);
 		}
 
 		// Add texture to list
@@ -430,12 +290,4 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, ArchiveEntry* pnames
 	delete[] offsets;
 
 	return true;
-}
-
-/* TextureXList::readTEXTURESData
- * Reads in a zdoom-format TEXTURES entry. Returns true on success,
- * false otherwise
- *******************************************************************/
-bool TextureXList::readTEXTURESData(ArchiveEntry* textures) {
-	return false;
 }

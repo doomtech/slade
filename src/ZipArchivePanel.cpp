@@ -421,7 +421,8 @@ bool ZipArchivePanel::pasteEntry() {
 		if (theClipboard->getItem(a)->getType() == CLIPBOARD_ENTRY) {
 			EntryClipboardItem* item = (EntryClipboardItem*)theClipboard->getItem(a);
 			ArchiveEntry* copied_entry = new ArchiveEntry(*(item->getEntry()));
-			copied_entry->setExProp(_T("Directory"), cur_dir->getFullPath());
+			//copied_entry->setExProp(_T("Directory"), cur_dir->getFullPath());
+			copied_entry->extraProp(_T("Directory")) = cur_dir->getFullPath();
 			archive->addEntry(copied_entry, index);
 			index++;
 		}
@@ -433,8 +434,10 @@ bool ZipArchivePanel::pasteEntry() {
 			// Go through all entries in the directory
 			for (uint32_t e = 0; e < item->nEntries(); e++) {
 				ArchiveEntry* copied_entry = new ArchiveEntry(*(item->getEntry(e)));
-				string dir = copied_entry->getExProp(_T("Directory"));
-				copied_entry->setExProp(_T("Directory"), cur_dir->getFullPath() + dir);
+				//string dir = copied_entry->getExProp(_T("Directory"));
+				string dir = copied_entry->extraProp(_T("Directory"));
+				//copied_entry->setExProp(_T("Directory"), cur_dir->getFullPath() + dir);
+				copied_entry->extraProp(_T("Directory")) = cur_dir->getFullPath() + dir;
 				archive->addEntry(copied_entry, index);
 				index++;
 			}

@@ -2,6 +2,66 @@
 #ifndef __TEXTUREXLIST_H__
 #define __TEXTUREXLIST_H__
 
+#include "ArchiveEntry.h"
+#include "PatchTable.h"
+
+// Enum for different texturex formats
+enum TextureXFormat {
+    TXF_NORMAL,
+    TXF_STRIFE11,
+    TXF_NAMELESS,
+};
+
+// Texture flags
+#define TX_WORLDPANNING	0x8000
+
+// TEXTUREx teture patch
+struct tx_patch_t {
+	int16_t		left;
+	int16_t		top;
+	uint16_t	patch;
+};
+
+// TEXTUREx texture definition
+struct tx_texture_t {
+	string		name;
+	uint16_t	flags;
+	uint8_t		scale_x;
+	uint8_t		scale_y;
+	int16_t		width;
+	int16_t		height;
+
+	vector<tx_patch_t>	patches;
+};
+
+class TextureXList {
+private:
+	vector<tx_texture_t>	textures;
+	PatchTable				patches;
+	uint8_t					txformat;
+	tx_texture_t			tex_invalid;
+
+public:
+	TextureXList();
+	~TextureXList();
+
+	PatchTable&	patchTable() { return patches; }
+
+	uint32_t	nTextures() { return textures.size(); }
+	uint32_t	nPatches() { return patches.nPatches(); }
+
+	tx_texture_t	getTexture(size_t index);
+	tx_texture_t	getTexture(string name);
+
+	void	clear(bool clear_patches = false);
+
+	bool	readTEXTUREXData(ArchiveEntry* texturex, ArchiveEntry* pnames = NULL);
+};
+
+
+
+
+/*
 #include "CTexture.h"
 #include "ArchiveEntry.h"
 
@@ -66,6 +126,9 @@ public:
 
 	bool	readTEXTUREXData(ArchiveEntry* texturex, ArchiveEntry* pnames);
 	bool	readTEXTURESData(ArchiveEntry* textures);
+
+	static CTexture*	generateCTexture(tx_texture_t& info);
 };
+*/
 
 #endif//__TEXTUREXLIST_H__

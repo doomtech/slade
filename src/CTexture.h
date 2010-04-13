@@ -2,49 +2,62 @@
 #ifndef __CTEXTURE_H__
 #define __CTEXTURE_H__
 
-#include "SImage.h"
-#include "ArchiveEntry.h"
+#include "TextureXList.h"
+#include "Tokenizer.h"
+#include "PropertyList.h"
 
 class CTPatch {
 private:
-	SImage		image;
-	point2_t	offsets;
-	fpoint2_t	scale;
+	patch_t		patch;
+	int16_t		offset_x;
+	int16_t		offset_y;
+
+	PropertyList	ex_props;
 
 public:
 	CTPatch();
 	~CTPatch();
 
-	SImage*	getImage() { return &image; }
-	int		xOffset() { return offsets.x; }
-	int		yOffset() { return offsets.y; }
+	string			getPatchName() { return patch.name; }
+	ArchiveEntry*	getPatchEntry() { return patch.entry; }
+	int16_t			xOffset() { return offset_x; }
+	int16_t			yOffset() { return offset_y; }
 
-	bool	loadImage(ArchiveEntry* gfx_entry);
-	void	setOffsets(int x, int y) { offsets.set(x, y); }
-	void	setScale(double x, double y) { scale.set(x, y); }
+	void			setPatchName(string name) { patch.name = name; }
+	void			setPatchEntry(ArchiveEntry* entry) { patch.entry = entry; }
+	void			setOffsetX(int16_t offset) { offset_x = offset; }
+	void			setOffsetY(int16_t offset) { offset_y = offset; }
 };
-
 
 class CTexture {
 private:
-	string				name;
-	vector<CTPatch*>	patches;
-	uint32_t			width;
-	uint32_t			height;
-	fpoint2_t			scale;
+	string			name;
+	uint16_t		width;
+	uint16_t		height;
+	double			scale_x;
+	double			scale_y;
+	vector<CTPatch>	patches;
+
+	PropertyList	ex_props;
 
 public:
-	CTexture(string name, uint32_t width = 0, uint32_t height = 0);
+	CTexture();
 	~CTexture();
 
 	string		getName() { return name; }
-	uint32_t	getWidth() { return width; }
-	uint32_t	getHeight() { return height; }
-	fpoint2_t	getScale() { return scale; }
-	uint32_t	nPatches() { return patches.size(); }
+	uint16_t	getWidth() { return width; }
+	uint16_t	getHeight() { return height; }
+	double		getScaleX() { return scale_x; }
+	double		getScaleY() { return scale_y; }
+	size_t		nPatches() { return patches.size(); }
 	CTPatch*	getPatch(size_t index);
 
-	bool	addPatch(CTPatch* patch);
+	void	clear();
+
+	bool	fromTX(tx_texture_t& info, PatchTable& ptable);
+	bool	toTX(tx_texture_t& info, PatchTable& ptable);
+	bool	fromZD(Tokenizer& tz);
+	string	toZD();
 };
 
 #endif//__CTEXTURE_H__

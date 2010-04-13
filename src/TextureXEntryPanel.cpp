@@ -81,6 +81,7 @@ TextureXEntryPanel::TextureXEntryPanel(wxWindow* parent)
 	list_tex_patches->Bind(wxEVT_COMMAND_LIST_ITEM_DESELECTED, &TextureXEntryPanel::onTexPatchesListDeSelect, this);
 	combo_palette->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &TextureXEntryPanel::onPaletteChanged, this);
 	slider_zoom->Bind(wxEVT_COMMAND_SLIDER_UPDATED, &TextureXEntryPanel::onZoomChanged, this);
+	tex_canvas->Bind(wxEVT_LEFT_DOWN, &TextureXEntryPanel::onTexCanvasMouseLeftDown, this);
 
 	Layout();
 }
@@ -258,7 +259,7 @@ wxPanel* TextureXEntryPanel::initPnamesArea(wxWindow* parent) {
 bool TextureXEntryPanel::loadEntry(ArchiveEntry* entry) {
 	// Do nothing if entry is already open
 	if (entry == entry_texturex || entry == entry_pnames) {
-		texturex.updatePatches(entry->getParent());
+		//texturex.updatePatches(entry->getParent());
 		combo_palette->setGlobalFromArchive(entry->getParent());
 		populatePatchesList();
 		populatePnamesList();
@@ -349,7 +350,7 @@ void TextureXEntryPanel::populateTextureList() {
 	list_textures->enableSizeUpdate(false);
 	for (uint32_t a = 0; a < texturex.nTextures(); a++) {
 		//CTexture* tex = texturex.getCTexture(a);
-		tx_texture_t tex = texturex.getTexInfo(a);
+		tx_texture_t tex = texturex.getTexture(a);
 		list_textures->addItem(a, (tex.name));
 		//string cols[] = { tex.name, s_fmt(_T("%dx%d"), tex.width, tex.height) };
 		//list_textures->addItem(a, wxArrayString(2, cols));
@@ -373,10 +374,10 @@ void TextureXEntryPanel::populatePatchesList() {
 	// Add each patch to the list
 	list_patches->enableSizeUpdate(false);
 	for (uint32_t a = 0; a < texturex.nPatches(); a++) {
-		list_patches->addItem(a, texturex.getPatchName(a));
+		list_patches->addItem(a, texturex.patchTable().patchName(a));
 
 		// Colour red if invalid
-		if (!texturex.getPatchEntry(a))
+		if (!texturex.patchTable().patchEntry(a))
 			list_patches->setItemStatus(a, LV_STATUS_ERROR);
 	}
 
@@ -400,11 +401,11 @@ void TextureXEntryPanel::populatePnamesList() {
 	// Add pnames entries to the list
 	list_pnames->enableSizeUpdate(false);
 	for (uint32_t a = 0; a < texturex.nPatches(); a++) {
-		string name = texturex.getPatchName(a);
+		string name = texturex.patchTable().patchName(a);
 		string archive = _T("NOT FOUND");
 
 		// Get parent archive if any
-		ArchiveEntry* entry = texturex.getPatchEntry(a);
+		ArchiveEntry* entry = texturex.patchTable().patchEntry(a);
 		if (entry)
 			archive = entry->getParent()->getFileName(false);
 
@@ -414,11 +415,6 @@ void TextureXEntryPanel::populatePnamesList() {
 		// Colour red if patch entry not found
 		if (!entry)
 			list_pnames->setItemStatus(a, LV_STATUS_ERROR);
-	}
-
-	// Colour any invalid patches
-	for (uint32_t a = 0; a < texturex.nPatches(); a++) {
-
 	}
 
 	// Update list width
@@ -434,39 +430,38 @@ void TextureXEntryPanel::populatePnamesList() {
  *******************************************************************/
 void TextureXEntryPanel::updateImagePalette() {
 	tex_canvas->setPalette(combo_palette->getSelectedPalette());
-	tex_canvas->openTexture(tex_canvas->getTexture());
+	tex_canvas->clearPatchTextures();
 	gfx_patch_preview->setPalette(combo_palette->getSelectedPalette());
 }
 
 
 
 void TextureXEntryPanel::onTextureListSelect(wxListEvent& e) {
-	// Get the selected texture
-	CTexture* tex = texturex.getCTexture(e.GetIndex());
-
-	// Open it if valid index (should be)
-	if (tex)
-		tex_canvas->openTexture(tex);
-
 	// Set control values
-	tex_current = texturex.getTexInfo(e.GetIndex());
+	tex_current = texturex.getTexture(e.GetIndex());
 	text_tex_name->SetValue(tex_current.name);
 	spin_tex_width->SetValue(tex_current.width);
 	spin_tex_height->SetValue(tex_current.height);
 	spin_tex_scalex->SetValue(tex_current.scale_x);
 	spin_tex_scaley->SetValue(tex_current.scale_y);
 
+	// Open texture in canvas
+	tex_canvas->openTexture(tex_current, texturex.patchTable());
+
 	// Populate texture patches list
 	list_tex_patches->ClearAll();
 	list_tex_patches->InsertColumn(0, _T("Patch Name"));
 	for (size_t a = 0; a < tex_current.patches.size(); a++)
-		list_tex_patches->addItem(a, texturex.getPatchName(tex_current.patches[a].patch));
-	//list_tex_patches->selectItem(0);
+		list_tex_patches->addItem(a, texturex.patchTable().patchName(tex_current.patches[a].patch));
+
+	// Disable patch editing controls (no patch selected at first)
+	spin_patch_xpos->Enable(false);
+	spin_patch_ypos->Enable(false);
 }
 
 void TextureXEntryPanel::onPatchesListSelect(wxListEvent& e) {
 	// Get the selected patch entry
-	ArchiveEntry* entry = texturex.getPatchEntry(e.GetIndex());
+	ArchiveEntry* entry = texturex.patchTable().patchEntry(e.GetIndex());
 
 	// Load the image
 	gfx_patch_preview->getImage()->clear();
@@ -478,6 +473,16 @@ void TextureXEntryPanel::onPatchesListSelect(wxListEvent& e) {
 }
 
 void TextureXEntryPanel::onTexPatchesListSelect(wxListEvent& e) {
+	// Disable/enable patch controls depending on selection
+	if (list_tex_patches->selectedItems().size() == 1) {
+		spin_patch_xpos->Enable(true);
+		spin_patch_ypos->Enable(true);
+	}
+	else {
+		spin_patch_xpos->Enable(false);
+		spin_patch_ypos->Enable(false);
+	}
+
 	// Update patch controls
 	tx_patch_t patch = tex_current.patches[e.GetIndex()];
 	spin_patch_xpos->SetValue(patch.left);
@@ -489,6 +494,18 @@ void TextureXEntryPanel::onTexPatchesListSelect(wxListEvent& e) {
 }
 
 void TextureXEntryPanel::onTexPatchesListDeSelect(wxListEvent& e) {
+	e.Skip();
+
+	// Disable/enable patch controls depending on selection
+	if (list_tex_patches->selectedItems().size() == 1) {
+		spin_patch_xpos->Enable(true);
+		spin_patch_ypos->Enable(true);
+	}
+	else {
+		spin_patch_xpos->Enable(false);
+		spin_patch_ypos->Enable(false);
+	}
+
 	// Deselect the patch on the texture canvas
 	tex_canvas->deSelectPatch(e.GetIndex());
 	tex_canvas->Refresh();
@@ -520,4 +537,31 @@ void TextureXEntryPanel::onZoomChanged(wxCommandEvent& e) {
 	// Zoom gfx canvas and update
 	tex_canvas->setScale((double)zoom_percent * 0.01);
 	tex_canvas->Refresh();
+}
+
+void TextureXEntryPanel::onTexCanvasMouseLeftDown(wxMouseEvent &e) {
+	// Get click position relative to texture
+	point2_t pos = tex_canvas->screenToTexPosition(e.GetX(), e.GetY());
+
+	// Get patch that was clicked on (if any)
+	int patch = tex_canvas->patchAt(pos.x, pos.y);
+
+	if (e.ShiftDown()) {
+		// Shift is down, add to selection
+		if (patch >= 0)
+			list_tex_patches->selectItem(patch);
+	}
+	else if (e.ControlDown()) {
+		// Control is down, remove from selection
+		if (patch >= 0)
+			list_tex_patches->deSelectItem(patch);
+	}
+	else {
+		// No modifier down, set selection (de-select all if no patch clicked)
+		list_tex_patches->clearSelection();
+		if (patch >= 0)
+			list_tex_patches->selectItem(patch);
+	}
+
+	e.Skip();
 }

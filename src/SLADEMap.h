@@ -8,6 +8,7 @@
 #include "MapVertex.h"
 #include "MapThing.h"
 #include "Archive.h"
+#include "PropertyList.h"
 
 
 class SLADEMap {

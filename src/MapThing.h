@@ -3,6 +3,7 @@
 #define __MAPTHING_H__
 
 #include "Tokenizer.h"
+#include "PropertyList.h"
 
 struct doomthing_t
 {

@@ -3,6 +3,7 @@
 #define __MAPVERTEX_H__
 
 #include "Tokenizer.h"
+#include "PropertyList.h"
 
 class MapLine;
 

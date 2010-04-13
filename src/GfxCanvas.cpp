@@ -333,8 +333,8 @@ bool GfxCanvas::onImage(int x, int y) {
 	if (view_type == GFXVIEW_DEFAULT || view_type == GFXVIEW_TILED)
 		return false;
 
-	int left = GetSize().x * 0.5;
-	int top = GetSize().y * 0.5;
+	int left = GetSize().x * 0.5 + offset.x;
+	int top = GetSize().y * 0.5 + offset.y;
 
 	if (view_type == GFXVIEW_CENTERED) {
 		left -= (double)image->getWidth() * 0.5 * scale;

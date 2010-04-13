@@ -34,6 +34,9 @@ public:
 
 	void	clearSelection();
 	bool	selectItem(int item, bool focus = true);
+	bool	deSelectItem(int item);
+
+	wxArrayInt	selectedItems();
 
 	bool	showItem(int item);
 

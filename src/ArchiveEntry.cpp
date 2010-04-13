@@ -77,11 +77,7 @@ ArchiveEntry::ArchiveEntry(ArchiveEntry& copy) {
 	data.importMem(copy.getData(true), copy.getSize());
 
 	// Copy extra properties
-	vector<string> keys;
-	vector<string> values;
-	copy.allExProps(keys, values);
-	for (size_t a = 0; a < keys.size(); a++)
-		setExProp(keys[a], values[a]);
+	copy.extraProps().copyTo(ex_props);
 
 	// Set entry state
 	state = 2;
@@ -130,65 +126,6 @@ MemChunk& ArchiveEntry::getMCData(bool allow_load) {
 	}
 
 	return data;
-}
-
-/* ArchiveEntry::hasExProp
- * Checks if the entry has the specified extra property value
- *******************************************************************/
-bool ArchiveEntry::hasExProp(string key) {
-	// Try to find specified key
-	if (ex_props.find(key) == ex_props.end())
-		return false;
-	else
-		return true;
-}
-
-/* ArchiveEntry::getExProp
- * Gets an extra property value, if it doesn't exist returns
- * an empty string
- *******************************************************************/
-string ArchiveEntry::getExProp(string key) {
-	if (hasExProp(key))
-		return ex_props[key];
-	else
-		return _T("");
-}
-
-/* ArchiveEntry::setExProp
- * Sets an extra property value, returns true if [key] already
- * existed and was overwritten
- *******************************************************************/
-bool ArchiveEntry::setExProp(string key, string value) {
-	bool exists = hasExProp(key);
-	ex_props[key] = value;
-	return exists;
-}
-
-/* ArchiveEntry::removeExProp
- * Removes an extra property value, returns true if [key] was removed
- * or false if key didn't exist
- *******************************************************************/
-bool ArchiveEntry::removeExProp(string key) {
-	PropertyList::iterator i = ex_props.find(key);
-
-	if (i != ex_props.end()) {
-		ex_props.erase(i);
-		return true;
-	}
-	else
-		return false;
-}
-
-void ArchiveEntry::allExProps(vector<string>& keys, vector<string>& values) {
-	keys.clear();
-	values.clear();
-
-	PropertyList::iterator i = ex_props.begin();
-	while (i != ex_props.end()) {
-		keys.push_back(i->first);
-		values.push_back(i->second);
-		i++;
-	}
 }
 
 /* ArchiveEntry::setState
