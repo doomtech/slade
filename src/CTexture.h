@@ -52,6 +52,10 @@ public:
 	size_t		nPatches() { return patches.size(); }
 	CTPatch*	getPatch(size_t index);
 
+	void	setName(string name) { this->name = name; }
+	void	setWidth(uint16_t width) { this->width = width; }
+	void	setHeight(uint16_t height) { this->height = height; }
+
 	void	clear();
 
 	bool	fromTX(tx_texture_t& info, PatchTable& ptable);

@@ -257,9 +257,9 @@ void CTextureCanvas::drawTexture() {
 		// Draw outline
 		glBegin(GL_QUADS);
 		glVertex2d(patch->xOffset(), patch->yOffset());
-		glVertex2d(patch->xOffset(), patch->yOffset() + patch_textures[a]->getHeight());
-		glVertex2d(patch->xOffset() + patch_textures[a]->getWidth(), patch->yOffset() + patch_textures[a]->getHeight());
-		glVertex2d(patch->xOffset() + patch_textures[a]->getWidth(), patch->yOffset());
+		glVertex2d(patch->xOffset(), patch->yOffset() + (int)patch_textures[a]->getHeight());
+		glVertex2d(patch->xOffset() + (int)patch_textures[a]->getWidth(), patch->yOffset() + (int)patch_textures[a]->getHeight());
+		glVertex2d(patch->xOffset() + (int)patch_textures[a]->getWidth(), patch->yOffset());
 		glEnd();
 	}
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);

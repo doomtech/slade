@@ -62,6 +62,7 @@ public:
 	void	populatePatchesList();
 	void	populatePnamesList();
 	void	updateImagePalette();
+	void	updateTextureScaleLabel();
 
 	// Events
 	void	onTextureListSelect(wxListEvent& e);
@@ -72,6 +73,12 @@ public:
 	void	onZoomChanged(wxCommandEvent& e);
 	void	onDrawOutsideChanged(wxCommandEvent& e);
 	void	onTexCanvasMouseLeftDown(wxMouseEvent& e);
+	void	onTexWidthChanged(wxSpinEvent& e);
+	void	onTexHeightChanged(wxSpinEvent& e);
+	void	onTexScaleXChanged(wxSpinEvent& e);
+	void	onTexScaleYChanged(wxSpinEvent& e);
+	void	onPatchLeftChanged(wxSpinEvent& e);
+	void	onPatchTopChanged(wxSpinEvent& e);
 };
 
 #endif//__TEXTUREXENTRYPANEL_H__

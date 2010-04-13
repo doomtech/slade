@@ -107,7 +107,6 @@ bool CTexture::fromTX(tx_texture_t& info, PatchTable& ptable) {
 	// Flags
 	if (info.flags & TX_WORLDPANNING)
 		ex_props.addFlag(_T("WorldPanning"));
-		//ex_props[_T("WorldPanning")].changeType(PROP_FLAG);
 
 	// Setup patches
 	for (size_t a = 0; a < info.patches.size(); a++) {
