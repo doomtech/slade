@@ -83,6 +83,8 @@ public:
 	void	onTexScaleYChanged(wxSpinEvent& e);
 	void	onPatchLeftChanged(wxSpinEvent& e);
 	void	onPatchTopChanged(wxSpinEvent& e);
+	void	onBtnPatchForward(wxCommandEvent& e);
+	void	onBtnPatchBack(wxCommandEvent& e);
 };
 
 #endif//__TEXTUREXENTRYPANEL_H__

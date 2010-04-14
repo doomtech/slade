@@ -399,6 +399,29 @@ int CTextureCanvas::patchAt(int x, int y) {
 	return -1;
 }
 
+/* CTextureCanvas::swapPatches
+ * Swaps patches at [p1] and [p2] in the texture. Returns false if
+ * either index is invalid, true otherwise
+ *******************************************************************/
+bool CTextureCanvas::swapPatches(size_t p1, size_t p2) {
+	// Check indices
+	if (p1 >= texture.nPatches() || p2 >= texture.nPatches())
+		return false;
+
+	// Swap patch gl textures
+	GLTexture* temp = patch_textures[p1];
+	patch_textures[p1] = patch_textures[p2];
+	patch_textures[p2] = temp;
+
+	// Swap selection
+	//bool sel = selected_patches[p1];
+	//selected_patches[p1] = selected_patches[p2];
+	//selected_patches[p2] = sel;
+
+	// Swap patches in the texture itself
+	return texture.swapPatches(p1, p2);
+}
+
 /* CTextureCanvas::onMouseEvent
  * Called when and mouse event is generated (movement/clicking/etc)
  *******************************************************************/

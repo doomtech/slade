@@ -196,6 +196,34 @@ bool ListView::showItem(int item) {
 	return true;
 }
 
+bool ListView::swapItems(int item1, int item2) {
+	// Check item id's are in range
+	if (item1 < 0 || item1 >= GetItemCount() || item2 < 0 || item2 >= GetItemCount())
+		return false;
+
+	// Get item 1 info
+	wxListItem i1;
+	i1.SetId(item1);
+	i1.SetMask(0xFFFF);
+	GetItem(i1);
+	long state1 = GetItemState(item1, wxLIST_STATE_SELECTED|wxLIST_STATE_FOCUSED);
+
+	// Get item 2 info
+	wxListItem i2;
+	i2.SetId(item2);
+	i2.SetMask(0xFFFF);
+	GetItem(i2);
+	long state2 = GetItemState(item2, wxLIST_STATE_SELECTED|wxLIST_STATE_FOCUSED);
+
+	// Swap the items
+	i1.SetId(item2);
+	i2.SetId(item1);
+	SetItem(i1);
+	SetItem(i2);
+	SetItemState(item1, state2, wxLIST_STATE_SELECTED|wxLIST_STATE_FOCUSED);
+	SetItemState(item2, state1, wxLIST_STATE_SELECTED|wxLIST_STATE_FOCUSED);
+}
+
 bool ListView::updateSize() {
 	// Update column widths if enabled
 	if (update_width) {

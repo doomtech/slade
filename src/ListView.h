@@ -39,6 +39,7 @@ public:
 	wxArrayInt	selectedItems();
 
 	bool	showItem(int item);
+	bool	swapItems(int item1, int item2);
 
 	bool	updateSize();
 };

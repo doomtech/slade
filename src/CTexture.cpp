@@ -86,8 +86,25 @@ void CTexture::clear() {
 	this->height = 0;
 	this->scale_x = 1.0;
 	this->scale_y = 1.0;
-	this->patches.clear();
 	this->ex_props.clear();
+	this->patches.clear();
+}
+
+/* CTexture::swapPatches
+ * Swaps the patches at [p1] and [p2]. Returns false if either index
+ * is invalid, true otherwise
+ *******************************************************************/
+bool CTexture::swapPatches(size_t p1, size_t p2) {
+	// Check patch indices are correct
+	if (p1 >= patches.size() || p2 >= patches.size())
+		return false;
+
+	// Swap the patches
+	CTPatch temp = patches[p1];
+	patches[p1] = patches[p2];
+	patches[p2] = temp;
+
+	return true;
 }
 
 /* CTexture::fromTX

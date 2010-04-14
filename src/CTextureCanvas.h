@@ -49,6 +49,8 @@ public:
 	point2_t	screenToTexPosition(int x, int y);
 	int			patchAt(int x, int y);
 
+	bool	swapPatches(size_t p1, size_t p2);
+
 	void	onMouseEvent(wxMouseEvent& e);
 };
 

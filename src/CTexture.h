@@ -37,7 +37,6 @@ private:
 	double			scale_x;
 	double			scale_y;
 	vector<CTPatch>	patches;
-
 	PropertyList	ex_props;
 
 public:
@@ -59,6 +58,8 @@ public:
 	void	setScaleY(double scale) { this->scale_y = scale; }
 
 	void	clear();
+
+	bool	swapPatches(size_t p1, size_t p2);
 
 	bool	fromTX(tx_texture_t& info, PatchTable& ptable);
 	bool	toTX(tx_texture_t& info, PatchTable& ptable);

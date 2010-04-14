@@ -88,6 +88,8 @@ TextureXEntryPanel::TextureXEntryPanel(wxWindow* parent)
 	spin_tex_scaley->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &TextureXEntryPanel::onTexScaleYChanged, this);
 	spin_patch_xpos->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &TextureXEntryPanel::onPatchLeftChanged, this);
 	spin_patch_ypos->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &TextureXEntryPanel::onPatchTopChanged, this);
+	btn_patch_back->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureXEntryPanel::onBtnPatchBack, this);
+	btn_patch_forward->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureXEntryPanel::onBtnPatchForward, this);
 
 	tex_canvas->Bind(wxEVT_LEFT_DOWN, &TextureXEntryPanel::onTexCanvasMouseEvent, this);
 	tex_canvas->Bind(wxEVT_LEFT_UP, &TextureXEntryPanel::onTexCanvasMouseEvent, this);
@@ -241,14 +243,17 @@ wxPanel* TextureXEntryPanel::initTexControls(wxWindow* parent) {
 
 	// Remove button
 	btn_patch_remove = new wxBitmapButton(panel, -1, getIcon(_T("t_close")));
+	btn_patch_remove->SetToolTip(_T("Remove"));
 	gb_sizer->Add(btn_patch_remove, wxGBPosition(0, 1), wxDefaultSpan);
 
 	// Back button
 	btn_patch_back = new wxBitmapButton(panel, -1, getIcon(_T("t_up")));
+	btn_patch_back->SetToolTip(_T("Send Back"));
 	gb_sizer->Add(btn_patch_back, wxGBPosition(1, 1), wxDefaultSpan);
 
 	// Forward button
 	btn_patch_forward = new wxBitmapButton(panel, -1, getIcon(_T("t_down")));
+	btn_patch_forward->SetToolTip(_T("Bring Forward"));
 	gb_sizer->Add(btn_patch_forward, wxGBPosition(2, 1), wxDefaultSpan);
 
 	// Replace button
@@ -801,5 +806,47 @@ void TextureXEntryPanel::onPatchTopChanged(wxSpinEvent& e) {
 
 	// Update/refresh texture
 	tex_canvas->getTexture().getPatch(selection[0])->setOffsetY(spin_patch_ypos->GetValue());
+	tex_canvas->Refresh();
+}
+
+void TextureXEntryPanel::onBtnPatchForward(wxCommandEvent &e) {
+	// Get selected patch(es)
+	wxArrayInt selection = list_tex_patches->selectedItems();
+
+	// Do nothing if nothing is selected
+	if (selection.size() == 0)
+		return;
+
+	// Go through selection from bottom up
+	for (int a = selection.size() - 1; a >= 0; a--) {
+		// Swap in list
+		list_tex_patches->swapItems(selection[a], selection[a] + 1);
+
+		// Swap in texture
+		tex_canvas->swapPatches(selection[a], selection[a] + 1);
+	}
+
+	// Refresh texture
+	tex_canvas->Refresh();
+}
+
+void TextureXEntryPanel::onBtnPatchBack(wxCommandEvent &e) {
+	// Get selected patch(es)
+	wxArrayInt selection = list_tex_patches->selectedItems();
+
+	// Do nothing if nothing is selected
+	if (selection.size() == 0)
+		return;
+
+	// Go through selection
+	for (size_t a = 0; a < selection.size(); a++) {
+		// Swap in list
+		list_tex_patches->swapItems(selection[a], selection[a] - 1);
+
+		// Swap in texture
+		tex_canvas->swapPatches(selection[a], selection[a] - 1);
+	}
+
+	// Refresh texture
 	tex_canvas->Refresh();
 }
