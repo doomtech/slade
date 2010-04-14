@@ -101,8 +101,14 @@ bool CTexture::fromTX(tx_texture_t& info, PatchTable& ptable) {
 	name = info.name;
 	width = info.width;
 	height = info.height;
-	scale_x = 1.0;	// TODO: Convert from TEXTUREX scale
+	scale_x = 1.0;
 	scale_y = 1.0;
+
+	// Convert from TEXTUREx scale
+	if (info.scale_x != 0)
+		scale_x = (double)info.scale_x / 8.0;
+	if (info.scale_y != 0)
+		scale_y = (double)info.scale_y / 8.0;
 
 	// Flags
 	if (info.flags & TX_WORLDPANNING)
@@ -142,8 +148,8 @@ bool CTexture::toTX(tx_texture_t& info, PatchTable& ptable) {
 	info.name = name;
 	info.width = width;
 	info.height = height;
-	info.scale_x = scale_x;
-	info.scale_y = scale_y;
+	info.scale_x = uint8_t(scale_x * 8);
+	info.scale_y = uint8_t(scale_y * 8);
 
 	// Write flags
 	uint16_t flags = 0;

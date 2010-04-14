@@ -55,6 +55,8 @@ public:
 	void	setName(string name) { this->name = name; }
 	void	setWidth(uint16_t width) { this->width = width; }
 	void	setHeight(uint16_t height) { this->height = height; }
+	void	setScaleX(double scale) { this->scale_x = scale; }
+	void	setScaleY(double scale) { this->scale_y = scale; }
 
 	void	clear();
 

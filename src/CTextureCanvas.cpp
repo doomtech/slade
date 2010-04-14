@@ -94,7 +94,7 @@ void CTextureCanvas::deSelectPatch(int index) {
 
 bool CTextureCanvas::patchSelected(int index) {
 	// Check index is ok
-	if (index < 0 || index >= texture.nPatches())
+	if (index < 0 || (unsigned)index >= texture.nPatches())
 		return false;
 
 	// Return if patch index is selected
