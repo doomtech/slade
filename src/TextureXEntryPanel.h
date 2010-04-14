@@ -62,6 +62,7 @@ public:
 	void	populatePatchesList();
 	void	populatePnamesList();
 	void	updateImagePalette();
+	void	updateTextureControls();
 	void	updateTextureScaleLabel();
 
 	// Events
@@ -72,7 +73,8 @@ public:
 	void	onPaletteChanged(wxCommandEvent& e);
 	void	onZoomChanged(wxCommandEvent& e);
 	void	onDrawOutsideChanged(wxCommandEvent& e);
-	void	onTexCanvasMouseLeftDown(wxMouseEvent& e);
+	void	onTexCanvasMouseEvent(wxMouseEvent& e);
+	void	onTexCanvasDragEnd(wxCommandEvent& e);
 	void	onTexWidthChanged(wxSpinEvent& e);
 	void	onTexHeightChanged(wxSpinEvent& e);
 	void	onTexScaleXChanged(wxSpinEvent& e);

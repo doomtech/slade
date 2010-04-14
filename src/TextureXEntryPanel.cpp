@@ -81,7 +81,6 @@ TextureXEntryPanel::TextureXEntryPanel(wxWindow* parent)
 	list_tex_patches->Bind(wxEVT_COMMAND_LIST_ITEM_DESELECTED, &TextureXEntryPanel::onTexPatchesListDeSelect, this);
 	combo_palette->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &TextureXEntryPanel::onPaletteChanged, this);
 	slider_zoom->Bind(wxEVT_COMMAND_SLIDER_UPDATED, &TextureXEntryPanel::onZoomChanged, this);
-	tex_canvas->Bind(wxEVT_LEFT_DOWN, &TextureXEntryPanel::onTexCanvasMouseLeftDown, this);
 	cb_draw_outside->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &TextureXEntryPanel::onDrawOutsideChanged, this);
 	spin_tex_width->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &TextureXEntryPanel::onTexWidthChanged, this);
 	spin_tex_height->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &TextureXEntryPanel::onTexHeightChanged, this);
@@ -89,6 +88,11 @@ TextureXEntryPanel::TextureXEntryPanel(wxWindow* parent)
 	spin_tex_scaley->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &TextureXEntryPanel::onTexScaleYChanged, this);
 	spin_patch_xpos->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &TextureXEntryPanel::onPatchLeftChanged, this);
 	spin_patch_ypos->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &TextureXEntryPanel::onPatchTopChanged, this);
+
+	tex_canvas->Bind(wxEVT_LEFT_DOWN, &TextureXEntryPanel::onTexCanvasMouseEvent, this);
+	tex_canvas->Bind(wxEVT_LEFT_UP, &TextureXEntryPanel::onTexCanvasMouseEvent, this);
+	tex_canvas->Bind(wxEVT_MOTION, &TextureXEntryPanel::onTexCanvasMouseEvent, this);
+	tex_canvas->Bind(EVT_DRAG_END, &TextureXEntryPanel::onTexCanvasDragEnd, this);
 
 	Layout();
 }
@@ -99,6 +103,9 @@ TextureXEntryPanel::TextureXEntryPanel(wxWindow* parent)
 TextureXEntryPanel::~TextureXEntryPanel() {
 }
 
+/* TextureXEntryPanel::initTexArea
+ * Creates a wxPanel with controls to view/edit a TEXTUREx list
+ *******************************************************************/
 wxPanel* TextureXEntryPanel::initTexArea(wxWindow* parent) {
 	wxPanel* panel = new wxPanel(parent, -1);
 
@@ -162,6 +169,9 @@ wxPanel* TextureXEntryPanel::initTexArea(wxWindow* parent) {
 	return panel;
 }
 
+/* TextureXEntryPanel::initTexControls
+ * Creates a wxPanel with controls to edit a texture and it's patches
+ *******************************************************************/
 wxPanel* TextureXEntryPanel::initTexControls(wxWindow* parent) {
 	wxPanel* panel = new wxPanel(parent, -1);
 
@@ -248,6 +258,9 @@ wxPanel* TextureXEntryPanel::initTexControls(wxWindow* parent) {
 	return panel;
 }
 
+/* TextureXEntryPanel::initPnamesArea
+ * Creates a wxPanel with controls to view/edit a PNAMES list
+ *******************************************************************/
 wxPanel* TextureXEntryPanel::initPnamesArea(wxWindow* parent) {
 	wxPanel* panel = new wxPanel(parent, -1);
 
@@ -375,6 +388,9 @@ void TextureXEntryPanel::populateTextureList() {
 	list_textures->GetParent()->Layout();
 }
 
+/* TextureXEntryPanel::populatePatchesList
+ * Clears and adds all available patches to the patch list
+ *******************************************************************/
 void TextureXEntryPanel::populatePatchesList() {
 	// Clear current list
 	list_patches->ClearAll();
@@ -400,6 +416,9 @@ void TextureXEntryPanel::populatePatchesList() {
 	list_patches->GetParent()->Layout();
 }
 
+/* TextureXEntryPanel::populatePnamesList
+ * Clears and adds all pnames entries to the pnames list
+ *******************************************************************/
 void TextureXEntryPanel::populatePnamesList() {
 	// Clear current list
 	list_pnames->ClearAll();
@@ -446,6 +465,27 @@ void TextureXEntryPanel::updateImagePalette() {
 	gfx_patch_preview->setPalette(combo_palette->getSelectedPalette());
 }
 
+void TextureXEntryPanel::updateTextureControls() {
+	// Update texture properties
+	text_tex_name->SetValue(tex_current.name);
+	spin_tex_width->SetValue(tex_current.width);
+	spin_tex_height->SetValue(tex_current.height);
+	spin_tex_scalex->SetValue(tex_current.scale_x);
+	spin_tex_scaley->SetValue(tex_current.scale_y);
+	updateTextureScaleLabel();
+
+	// Update selected patch properties if needed
+	if (list_tex_patches->GetSelectedItemCount() == 1) {
+		tx_patch_t patch = tex_current.patches[list_tex_patches->selectedItems()[0]];
+		spin_patch_xpos->SetValue(patch.left);
+		spin_patch_ypos->SetValue(patch.top);
+	}
+}
+
+/* TextureXEntryPanel::updateTextureScaleLabel
+ * Updates the 'Scaled Size' label according to the current texture's
+ * dimensions and scale
+ *******************************************************************/
 void TextureXEntryPanel::updateTextureScaleLabel() {
 	// Determine scaled X value
 	uint32_t scaled_x = tex_current.width;
@@ -463,15 +503,15 @@ void TextureXEntryPanel::updateTextureScaleLabel() {
 
 
 
+
+/* TextureXEntryPanel::onTextureListSelect
+ * Called when a texture is selected in the texture list. Loads the
+ * texture and it's information into the panel controls
+ *******************************************************************/
 void TextureXEntryPanel::onTextureListSelect(wxListEvent& e) {
 	// Set control values
 	tex_current = texturex.getTexture(e.GetIndex());
-	text_tex_name->SetValue(tex_current.name);
-	spin_tex_width->SetValue(tex_current.width);
-	spin_tex_height->SetValue(tex_current.height);
-	spin_tex_scalex->SetValue(tex_current.scale_x);
-	spin_tex_scaley->SetValue(tex_current.scale_y);
-	updateTextureScaleLabel();
+	updateTextureControls();
 
 	// Open texture in canvas
 	tex_canvas->openTexture(tex_current, texturex.patchTable());
@@ -487,6 +527,10 @@ void TextureXEntryPanel::onTextureListSelect(wxListEvent& e) {
 	spin_patch_ypos->Enable(false);
 }
 
+/* TextureXEntryPanel::onPatchesListSelect
+ * Called when a patch is selected on the patches list. Loads the
+ * patch into the preview canvas (if it's valid)
+ *******************************************************************/
 void TextureXEntryPanel::onPatchesListSelect(wxListEvent& e) {
 	// Get the selected patch entry
 	ArchiveEntry* entry = texturex.patchTable().patchEntry(e.GetIndex());
@@ -500,6 +544,10 @@ void TextureXEntryPanel::onPatchesListSelect(wxListEvent& e) {
 	gfx_patch_preview->Refresh();
 }
 
+/* TextureXEntryPanel::onTexPatchesListSelect
+ * Called when a patch is selected on the texture patch list. Updates
+ * relevant controls and selects the patch on the texture canvas
+ *******************************************************************/
 void TextureXEntryPanel::onTexPatchesListSelect(wxListEvent& e) {
 	e.Skip();
 
@@ -523,6 +571,11 @@ void TextureXEntryPanel::onTexPatchesListSelect(wxListEvent& e) {
 	tex_canvas->Refresh();
 }
 
+/* TextureXEntryPanel::onTexPatchesListDeSelect
+ * Called when a patch is deselected on the texture patch list.
+ * Updates relevant controls and deselects the patch on the texture
+ * canvas
+ *******************************************************************/
 void TextureXEntryPanel::onTexPatchesListDeSelect(wxListEvent& e) {
 	e.Skip();
 
@@ -569,6 +622,100 @@ void TextureXEntryPanel::onZoomChanged(wxCommandEvent& e) {
 	tex_canvas->Refresh();
 }
 
+void TextureXEntryPanel::onTexCanvasMouseEvent(wxMouseEvent& e) {
+	// Get mouse position relative to texture
+	point2_t pos = tex_canvas->screenToTexPosition(e.GetX(), e.GetY());
+
+	// Get patch that the mouse is over (if any)
+	int patch = tex_canvas->patchAt(pos.x, pos.y);
+
+	// LEFT MOUSE DOWN
+	if (e.LeftDown()) {
+		// If not dragging
+		if (e.ShiftDown()) {
+			// Shift is down, add to selection
+			if (patch >= 0)
+				list_tex_patches->selectItem(patch);
+		}
+		else if (e.ControlDown()) {
+			// Control is down, remove from selection
+			if (patch >= 0)
+				list_tex_patches->deSelectItem(patch);
+		}
+		else {
+			// Clear selection only if patch clicked was not already selected
+			if (!tex_canvas->patchSelected(patch))
+				list_tex_patches->clearSelection();
+
+			// Select patch
+			if (patch >= 0)
+				list_tex_patches->selectItem(patch);
+		}
+	}
+
+	// LEFT MOUSE UP
+	else if (e.LeftUp()) {
+		// If mouse up over an already-selected patch, and shift/ctrl aren't down,
+		// select only that patch (this mimics 'normal' drag-and-drop/selection behaviour)
+		if (!e.ShiftDown() && !e.ControlDown() && tex_canvas->patchSelected(patch) && !tex_canvas->isDragging()) {
+			list_tex_patches->clearSelection();
+			list_tex_patches->selectItem(patch);
+		}
+	}
+
+	// MOUSE DRAGGING
+	else if (e.Dragging()) {
+		// Drag selected patches if left button is down and any patch is selected
+		if (e.LeftIsDown() && list_tex_patches->GetSelectedItemCount() > 0) {
+			// Get drag amount according to texture
+			point2_t tex_cur = tex_canvas->screenToTexPosition(e.GetX(), e.GetY());
+			point2_t tex_prev = tex_canvas->screenToTexPosition(tex_canvas->getMousePrevPos().x, tex_canvas->getMousePrevPos().y);
+			point2_t diff = tex_cur - tex_prev;
+
+			// Move any selected patches
+			wxArrayInt selected_patches = list_tex_patches->selectedItems();
+			for (size_t a = 0; a < selected_patches.size(); a++) {
+				CTPatch* patch = tex_canvas->getTexture().getPatch(selected_patches[a]);
+				if (!patch) continue;
+				int16_t cx = patch->xOffset();
+				int16_t cy = patch->yOffset();
+				patch->setOffsetX(cx + diff.x);
+				patch->setOffsetY(cy + diff.y);
+			}
+
+			// Refresh texture canvas
+			tex_canvas->Refresh();
+		}
+	}
+
+	e.Skip();
+}
+
+void TextureXEntryPanel::onTexCanvasDragEnd(wxCommandEvent& e) {
+	// If left dragging ended
+	if (e.GetInt() == wxMOUSE_BTN_LEFT) {
+		// Update tex info patches from texture canvas
+		for (size_t a = 0; a < tex_current.patches.size(); a++) {
+			// Get patch
+			CTPatch* patch = tex_canvas->getTexture().getPatch(a);
+			if (!patch) continue;
+
+			// Update offsets
+			tex_current.patches[a].left = patch->xOffset();
+			tex_current.patches[a].top = patch->yOffset();
+		}
+
+		// Update texture/patch controls
+		updateTextureControls();
+	}
+}
+
+/* TextureXEntryPanel::onTexCanvasMouseLeftDown
+ * Called when the zleft mouse button is clicked within the texture
+ * canvas. Selects/deselects patch(es) depending on the position
+ * of the click, and modifier keys
+ *******************************************************************/
+ /*
 void TextureXEntryPanel::onTexCanvasMouseLeftDown(wxMouseEvent &e) {
 	// Get click position relative to texture
 	point2_t pos = tex_canvas->screenToTexPosition(e.GetX(), e.GetY());
@@ -576,6 +723,7 @@ void TextureXEntryPanel::onTexCanvasMouseLeftDown(wxMouseEvent &e) {
 	// Get patch that was clicked on (if any)
 	int patch = tex_canvas->patchAt(pos.x, pos.y);
 
+	// If not dragging
 	if (e.ShiftDown()) {
 		// Shift is down, add to selection
 		if (patch >= 0)
@@ -587,8 +735,11 @@ void TextureXEntryPanel::onTexCanvasMouseLeftDown(wxMouseEvent &e) {
 			list_tex_patches->deSelectItem(patch);
 	}
 	else {
-		// No modifier down, set selection (de-select all if no patch clicked)
-		list_tex_patches->clearSelection();
+		// Clear selection only if patch clicked was not already selected
+		if (!tex_canvas->patchSelected(patch))
+			list_tex_patches->clearSelection();
+
+		// Select patch
 		if (patch >= 0)
 			list_tex_patches->selectItem(patch);
 	}
@@ -596,23 +747,80 @@ void TextureXEntryPanel::onTexCanvasMouseLeftDown(wxMouseEvent &e) {
 	e.Skip();
 }
 
+void TextureXEntryPanel::onTexCanvasMouseLeftUp(wxMouseEvent& e) {
+	// Get click position relative to texture
+	point2_t pos = tex_canvas->screenToTexPosition(e.GetX(), e.GetY());
+
+	// Get patch that was clicked on (if any)
+	int patch = tex_canvas->patchAt(pos.x, pos.y);
+
+	// If mouse up over an already-selected patch, and shift/ctrl aren't down,
+	// select only that patch (this mimics 'normal' drag-and-drop/selection behaviour)
+	if (!e.ShiftDown() && !e.ControlDown() && tex_canvas->patchSelected(patch)) {
+		list_tex_patches->clearSelection();
+		list_tex_patches->selectItem(patch);
+	}
+
+	e.Skip();
+}
+
+void TextureXEntryPanel::onTexCanvasMouseMovement(wxMouseEvent& e) {
+	// Patch dragging (drag alt+left button)
+	if (e.LeftIsDown() && list_tex_patches->GetSelectedItemCount() > 0) {
+		// Get drag amount according to texture
+		point2_t tex_cur = tex_canvas->screenToTexPosition(e.GetX(), e.GetY());
+		point2_t tex_prev = tex_canvas->screenToTexPosition(tex_canvas->getMousePrevPos().x, tex_canvas->getMousePrevPos().y);
+		point2_t diff = tex_cur - tex_prev;
+
+		// Move any selected patches
+		wxArrayInt selected_patches = list_tex_patches->selectedItems();
+		for (size_t a = 0; a < selected_patches.size(); a++) {
+			CTPatch* patch = tex_canvas->getTexture().getPatch(selected_patches[a]);
+			if (!patch) continue;
+			int16_t cx = patch->xOffset();
+			int16_t cy = patch->yOffset();
+			patch->setOffsetX(cx + diff.x);
+			patch->setOffsetY(cy + diff.y);
+		}
+
+		// Refresh texture canvas
+		tex_canvas->Refresh();
+	}
+
+	e.Skip();
+}
+*/
+
+/* TextureXEntryPanel::onDrawOutsideChanged
+ * Called when the 'show outside' checkbox is changed
+ *******************************************************************/
 void TextureXEntryPanel::onDrawOutsideChanged(wxCommandEvent& e) {
+	// Show/hide patches outside the texture accordingly
 	tex_canvas->drawOutside(cb_draw_outside->GetValue());
 	tex_canvas->Refresh();
 }
 
+/* TextureXEntryPanel::onTexScaleXChanged
+ * Called when the texture x scale spin control is changed
+ *******************************************************************/
 void TextureXEntryPanel::onTexScaleXChanged(wxSpinEvent& e) {
 	// Update UI
 	tex_current.scale_x = spin_tex_scalex->GetValue();
 	updateTextureScaleLabel();
 }
 
+/* TextureXEntryPanel::onTexScaleYChanged
+ * Called when the texture y scale spin control is changed
+ *******************************************************************/
 void TextureXEntryPanel::onTexScaleYChanged(wxSpinEvent& e) {
 	// Update UI
 	tex_current.scale_y = spin_tex_scaley->GetValue();
 	updateTextureScaleLabel();
 }
 
+/* TextureXEntryPanel::onTexWidthChanged
+ * Called when the texture width spin control is changed
+ *******************************************************************/
 void TextureXEntryPanel::onTexWidthChanged(wxSpinEvent& e) {
 	// Update UI
 	tex_current.width = spin_tex_width->GetValue();
@@ -623,6 +831,9 @@ void TextureXEntryPanel::onTexWidthChanged(wxSpinEvent& e) {
 	tex_canvas->Refresh();
 }
 
+/* TextureXEntryPanel::onTexHeightChanged
+ * Called when the texture height spin control is changed
+ *******************************************************************/
 void TextureXEntryPanel::onTexHeightChanged(wxSpinEvent& e) {
 	// Update UI
 	tex_current.height = spin_tex_height->GetValue();
@@ -633,6 +844,9 @@ void TextureXEntryPanel::onTexHeightChanged(wxSpinEvent& e) {
 	tex_canvas->Refresh();
 }
 
+/* TextureXEntryPanel::onPatchLeftChanged
+ * Called when the patch left offset spin control is changed
+ *******************************************************************/
 void TextureXEntryPanel::onPatchLeftChanged(wxSpinEvent& e) {
 	// Get selected patch(es)
 	wxArrayInt selection = list_tex_patches->selectedItems();
@@ -649,6 +863,9 @@ void TextureXEntryPanel::onPatchLeftChanged(wxSpinEvent& e) {
 	tex_canvas->Refresh();
 }
 
+/* TextureXEntryPanel::onPatchTopChanged
+ * Called when the patch top offset spin control is changed
+ *******************************************************************/
 void TextureXEntryPanel::onPatchTopChanged(wxSpinEvent& e) {
 	// Get selected patch(es)
 	wxArrayInt selection = list_tex_patches->selectedItems();

@@ -7,6 +7,8 @@
 #include "Palette.h"
 #include "GLTexture.h"
 
+wxDECLARE_EVENT(EVT_DRAG_END, wxCommandEvent);
+
 class CTextureCanvas : public OGLCanvas {
 private:
 	CTexture			texture;
@@ -18,6 +20,7 @@ private:
 	point2_t			mouse_prev;
 	double				scale;
 	bool				draw_outside;
+	bool				dragging;
 
 public:
 	CTextureCanvas(wxWindow* parent, int id);
@@ -26,9 +29,13 @@ public:
 	CTexture&	getTexture() { return texture; }
 	void		setScale(double scale) { this->scale = scale; }
 	void		drawOutside(bool draw = true) { draw_outside = draw; }
+	point2_t	getMousePrevPos() { return mouse_prev; }
+	bool		isDragging() { return dragging; }
 
 	void	selectPatch(int index);
 	void	deSelectPatch(int index);
+	bool	patchSelected(int index);
+
 	void	clearTexture();
 	void	clearPatchTextures();
 	bool	openTexture(tx_texture_t& tex, PatchTable& ptable);
@@ -42,7 +49,7 @@ public:
 	point2_t	screenToTexPosition(int x, int y);
 	int			patchAt(int x, int y);
 
-	void	onMouseMovement(wxMouseEvent& e);
+	void	onMouseEvent(wxMouseEvent& e);
 };
 
 #endif//__CTEXTURECANVAS_H__

@@ -34,6 +34,12 @@
 
 
 /*******************************************************************
+ * VARIABLES
+ *******************************************************************/
+ wxDEFINE_EVENT(EVT_DRAG_END, wxCommandEvent);
+
+
+/*******************************************************************
  * CTEXTURECANVAS CLASS FUNCTIONS
  *******************************************************************/
 
@@ -47,9 +53,11 @@ CTextureCanvas::CTextureCanvas(wxWindow* parent, int id)
 	scale = 1.0;
 	hilight_patch = -1;
 	draw_outside = true;
+	dragging = false;
 
 	// Bind events
-	Bind(wxEVT_MOTION, &CTextureCanvas::onMouseMovement, this);
+	Bind(wxEVT_MOTION, &CTextureCanvas::onMouseEvent, this);
+	Bind(wxEVT_LEFT_UP, &CTextureCanvas::onMouseEvent, this);
 }
 
 /* CTextureCanvas::~CTextureCanvas
@@ -60,6 +68,9 @@ CTextureCanvas::~CTextureCanvas() {
 	delete tex_background;
 }
 
+/* CTextureCanvas::selectPatch
+ * Selects the patch at [index]
+ *******************************************************************/
 void CTextureCanvas::selectPatch(int index) {
 	// Check patch index is ok
 	if (index < 0 || (unsigned) index >= texture.nPatches())
@@ -69,6 +80,9 @@ void CTextureCanvas::selectPatch(int index) {
 	selected_patches[index] = true;
 }
 
+/* CTextureCanvas::deSelectPatch
+ * De-Selects the patch at [index]
+ *******************************************************************/
 void CTextureCanvas::deSelectPatch(int index) {
 	// Check patch index is ok
 	if (index < 0 || (unsigned) index >= texture.nPatches())
@@ -76,6 +90,15 @@ void CTextureCanvas::deSelectPatch(int index) {
 
 	// De-Select the patch
 	selected_patches[index] = false;
+}
+
+bool CTextureCanvas::patchSelected(int index) {
+	// Check index is ok
+	if (index < 0 || index >= texture.nPatches())
+		return false;
+
+	// Return if patch index is selected
+	return selected_patches[index];
 }
 
 /* CTextureCanvas::clearTexture
@@ -343,6 +366,10 @@ void CTextureCanvas::drawTextureBorder() {
 	glPopMatrix();
 }
 
+/* CTextureCanvas::screenToTextPosition
+ * Convert from [x,y] from the top left of the canvas to coordinates
+ * relative to the top left of the texture
+ *******************************************************************/
 point2_t CTextureCanvas::screenToTexPosition(int x, int y) {
 	// Get top-left of texture in screen coordinates (ie relative to the top-left of the canvas)
 	int left = GetSize().x * 0.5 + offset.x;
@@ -353,6 +380,10 @@ point2_t CTextureCanvas::screenToTexPosition(int x, int y) {
 	return point2_t(double(x - left) / scale, double(y - top) / scale);
 }
 
+/* CTextureCanvas::patchAt
+ * Returns the index of the patch at [x,y] on the texture, or -1
+ * if no patch is at that position
+ *******************************************************************/
 int CTextureCanvas::patchAt(int x, int y) {
 	// Go through texture patches backwards (ie from frontmost to back)
 	for (int a = texture.nPatches() - 1; a >= 0; a--) {
@@ -368,24 +399,43 @@ int CTextureCanvas::patchAt(int x, int y) {
 	return -1;
 }
 
-/* CTextureCanvas::onMouseMovement
- * Called when the mouse pointer is moved within the canvas
+/* CTextureCanvas::onMouseEvent
+ * Called when and mouse event is generated (movement/clicking/etc)
  *******************************************************************/
-void CTextureCanvas::onMouseMovement(wxMouseEvent& e) {
+void CTextureCanvas::onMouseEvent(wxMouseEvent& e) {
 	bool refresh = false;
 
-	// Pan if right button is down
-	if (e.RightIsDown()) {
-		offset = offset + point2_t(e.GetPosition().x - mouse_prev.x, e.GetPosition().y - mouse_prev.y);
-		refresh = true;
+	// MOUSE MOVEMENT
+	if (e.Moving() || e.Dragging()) {
+		dragging = false;
+
+		// Pan if right button is down
+		if (e.RightIsDown()) {
+			offset = offset + point2_t(e.GetPosition().x - mouse_prev.x, e.GetPosition().y - mouse_prev.y);
+			refresh = true;
+			dragging = true;
+		}
+		else if (e.LeftIsDown())
+			dragging = true;
+
+		// Check if patch hilight changes
+		point2_t pos = screenToTexPosition(e.GetX(), e.GetY());
+		int patch = patchAt(pos.x, pos.y);
+		if (hilight_patch != patch) {
+			hilight_patch = patch;
+			refresh = true;
+		}
 	}
 
-	// Check if patch hilight changes
-	point2_t pos = screenToTexPosition(e.GetX(), e.GetY());
-	int patch = patchAt(pos.x, pos.y);
-	if (hilight_patch != patch) {
-		hilight_patch = patch;
-		refresh = true;
+	// LEFT BUTTON UP
+	else if (e.LeftUp()) {
+		// If we were dragging, generate end drag event
+		if (dragging) {
+			dragging = false;
+			wxCommandEvent evt(EVT_DRAG_END, GetId());
+			evt.SetInt(wxMOUSE_BTN_LEFT);
+			ProcessWindowEvent(evt);
+		}
 	}
 
 	// Refresh is needed
