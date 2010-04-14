@@ -377,7 +377,7 @@ bool ZipArchivePanel::copyEntry() {
 
 	// Go through the list
 	for (size_t a = 0; a < selected_dirs.size(); a++) {
-		// Get all entries within the selected dir and it's subdirs
+		// Get all entries within the selected dir and its subdirs
 		vector<ArchiveEntry*> entries;
 		selected_dirs[a]->addToList(entries);
 

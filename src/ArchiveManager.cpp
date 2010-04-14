@@ -235,7 +235,7 @@ Archive* ArchiveManager::newArchive(uint8_t type) {
 			break;
 	}
 
-	// If the archive was created, set it's filename and add it to the list
+	// If the archive was created, set its filename and add it to the list
 	if (new_archive) {
 		new_archive->setFileName(s_fmt(_T("UNSAVED (%s)"), format_str.c_str()));
 		addArchive(new_archive);

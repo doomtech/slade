@@ -172,7 +172,7 @@ wxPanel* TextureXEntryPanel::initTexArea(wxWindow* parent) {
 }
 
 /* TextureXEntryPanel::initTexControls
- * Creates a wxPanel with controls to edit a texture and it's patches
+ * Creates a wxPanel with controls to edit a texture and its patches
  *******************************************************************/
 wxPanel* TextureXEntryPanel::initTexControls(wxWindow* parent) {
 	wxPanel* panel = new wxPanel(parent, -1);
@@ -511,7 +511,7 @@ void TextureXEntryPanel::updateTextureScaleLabel() {
 
 /* TextureXEntryPanel::onTextureListSelect
  * Called when a texture is selected in the texture list. Loads the
- * texture and it's information into the panel controls
+ * texture and its information into the panel controls
  *******************************************************************/
 void TextureXEntryPanel::onTextureListSelect(wxListEvent& e) {
 	// Open texture in canvas

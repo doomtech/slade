@@ -222,6 +222,8 @@ bool ListView::swapItems(int item1, int item2) {
 	SetItem(i2);
 	SetItemState(item1, state2, wxLIST_STATE_SELECTED|wxLIST_STATE_FOCUSED);
 	SetItemState(item2, state1, wxLIST_STATE_SELECTED|wxLIST_STATE_FOCUSED);
+
+	return true;
 }
 
 bool ListView::updateSize() {

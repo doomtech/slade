@@ -105,7 +105,7 @@ string ArchiveEntry::getName(bool cut_ext) {
 
 /* ArchiveEntry::getData
  * Returns a pointer to the entry data. If no entry data exists and
- * allow_load is true, entry data will be loaded from it's parent
+ * allow_load is true, entry data will be loaded from its parent
  * archive (if it exists)
  *******************************************************************/
 const uint8_t* ArchiveEntry::getData(bool allow_load) {
@@ -115,7 +115,7 @@ const uint8_t* ArchiveEntry::getData(bool allow_load) {
 
 /* ArchiveEntry::getMCData
  * Returns the entry data MemChunk. If no entry data exists and
- * allow_load is true, entry data will be loaded from it's parent
+ * allow_load is true, entry data will be loaded from its parent
  * archive (if it exists)
  *******************************************************************/
 MemChunk& ArchiveEntry::getMCData(bool allow_load) {
@@ -216,7 +216,7 @@ bool ArchiveEntry::resize(uint32_t new_size, bool preserve_data) {
 }
 
 /* ArchiveEntry::clearData
- * Clears entry data and resets it's size to zero
+ * Clears entry data and resets its size to zero
  *******************************************************************/
 void ArchiveEntry::clearData() {
 	// Check if locked

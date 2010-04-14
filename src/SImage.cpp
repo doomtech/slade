@@ -1694,7 +1694,7 @@ bool SImage::toDoomGfx(MemChunk& out, uint8_t alpha_threshold) {
 
 			// If the current pixel is not transparent, add it to the current post
 			if (mask[offset] > alpha_threshold) {
-				// If we're not currently building a post, begin one and set it's offset
+				// If we're not currently building a post, begin one and set its offset
 				if (!ispost) {
 					// Set offset
 					post.row_off = row_off;

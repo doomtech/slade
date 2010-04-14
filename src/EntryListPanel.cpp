@@ -85,7 +85,7 @@ EntryList::~EntryList() {
 }
 
 /* EntryList::updateEntry
- * Updates the list item at index with it's associated archive
+ * Updates the list item at index with its associated archive
  * entry's information (name/size/type).
  * Returns false on invalid index or missing entry, true otherwise
  *******************************************************************/

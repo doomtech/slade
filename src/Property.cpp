@@ -227,7 +227,7 @@ string Property::getStringValue(bool warn_wrong_type) {
 }
 
 /* Property::setValue
- * Sets the property to [val], and changes it's type to boolean
+ * Sets the property to [val], and changes its type to boolean
  * if necessary
  *******************************************************************/
 void Property::setValue(bool val) {
@@ -240,7 +240,7 @@ void Property::setValue(bool val) {
 }
 
 /* Property::setValue
- * Sets the property to [val], and changes it's type to integer
+ * Sets the property to [val], and changes its type to integer
  * if necessary
  *******************************************************************/
 void Property::setValue(int val) {
@@ -253,7 +253,7 @@ void Property::setValue(int val) {
 }
 
 /* Property::setValue
- * Sets the property to [val], and changes it's type to floating
+ * Sets the property to [val], and changes its type to floating
  * point if necessary
  *******************************************************************/
 void Property::setValue(double val) {
@@ -266,7 +266,7 @@ void Property::setValue(double val) {
 }
 
 /* Property::setValue
- * Sets the property to [val], and changes it's type to string
+ * Sets the property to [val], and changes its type to string
  * if necessary
  *******************************************************************/
 void Property::setValue(string val) {

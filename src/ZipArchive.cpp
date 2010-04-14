@@ -190,7 +190,7 @@ string zipdir_t::getFullPath() {
 
 /* zipdir_t::numEntries
  * Returns the number of entries in the zipdir, or if include_subdirs
- * is true, the number of entries in the zipdir and all it's
+ * is true, the number of entries in the zipdir and all its
  * subdirectories
  *******************************************************************/
 uint32_t zipdir_t::numEntries(bool include_subdirs) {
@@ -312,7 +312,7 @@ ZipArchive::~ZipArchive() {
 }
 
 /* ZipArchive::entryIndex
- * Returns the entry index of the given entry relative to it's
+ * Returns the entry index of the given entry relative to its
  * directory, rather than to the whole archive.
  * Returns the index or -1 if the entry is invalid/not in the archive
  *******************************************************************/
@@ -328,7 +328,7 @@ int ZipArchive::entryIndex(ArchiveEntry* entry) {
 	// Get the directory the entry is in
 	zipdir_t* dir = getEntryDirectory(entry);
 
-	// If it's in a directory return it's index within that directory
+	// If it's in a directory return its index within that directory
 	if (dir)
 		return dir->entryIndex(entry);
 
@@ -434,7 +434,7 @@ bool ZipArchive::open(string filename) {
 			new_entry->importMem(data, entry->GetSize());
 			new_entry->setLoaded(true);
 
-			// Determine it's type
+			// Determine its type
 			EntryType::detectEntryType(new_entry);
 
 			// Unload data if needed
@@ -952,7 +952,7 @@ bool ZipArchive::renameEntry(ArchiveEntry* entry, string new_name) {
 		// Create the directory (or just get it if it already exists)
 		zipdir_t* ndir = addDirectory(new_dir);
 
-		// Remove the entry from it's current directory
+		// Remove the entry from its current directory
 		removeEntry(entry, false);
 
 		// Add it to the new directory
@@ -983,8 +983,8 @@ vector<Archive::mapdesc_t> ZipArchive::detectMaps() {
 }
 
 /* ZipArchive::detectEntryType
- * Performs preliminary entry type checking based on it's position
- * in the zip and it's name/extension (will be overridden if the
+ * Performs preliminary entry type checking based on its position
+ * in the zip and its name/extension (will be overridden if the
  * entry's data later proves it to be another format)
  *******************************************************************/
 /*
@@ -996,7 +996,7 @@ bool ZipArchive::detectEntryType(ArchiveEntry* entry) {
 	// Get the entry name as a wxFileName for processing
 	wxFileName fn(entry->getName());
 
-	// .txt extension, treat the entry as text (unless it's data proves otherwise)
+	// .txt extension, treat the entry as text (unless its data proves otherwise)
 	if (fn.GetExt().CmpNoCase(_T("txt")) == 0)
 		entry->setType(ETYPE_TEXT);
 
@@ -1088,7 +1088,7 @@ zipdir_t* ZipArchive::getEntryDirectory(ArchiveEntry* entry, zipdir_t* dir) {
 
 	// Go through all subirectories in the current directory
 	for (size_t a = 0; a < dir->subdirectories.size(); a++) {
-		// Check if the entry exists in the subdirectory, or any of it's subdirectories
+		// Check if the entry exists in the subdirectory, or any of its subdirectories
 		zipdir_t* rdir = getEntryDirectory(entry, dir->subdirectories[a]);
 
 		// If it does, return it
@@ -1096,7 +1096,7 @@ zipdir_t* ZipArchive::getEntryDirectory(ArchiveEntry* entry, zipdir_t* dir) {
 			return rdir;
 	}
 
-	// Entry wasn't found in the given directory or any of it's subdirectories,
+	// Entry wasn't found in the given directory or any of its subdirectories,
 	// so return NULL
 	return NULL;
 }
@@ -1270,7 +1270,7 @@ void ZipArchive::deleteDirectory(zipdir_t* dir) {
 	mc.write(&ptr, sizeof(wxUIntPtr));
 	announce(_T("directory_removed"), mc);
 
-	// Remove this directory from it's parent's subdirectory list
+	// Remove this directory from its parent's subdirectory list
 	if (dir->parent_dir) {
 		int p_index = dir->parent_dir->dirIndex(dir);
 		if (p_index >= 0)

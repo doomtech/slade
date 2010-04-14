@@ -120,12 +120,12 @@ void ZipEntryListPanel::updateDirectoryEntry(int index) {
 	else
 		dir = getCurrentDir()->subdirectories[index];
 
-	// If the entry is the 'up directory' entry, set it's icon to
+	// If the entry is the 'up directory' entry, set its icon to
 	// the 'up directory' icon
 	if (dir == getCurrentDir()->parent_dir)
 		entry_list->SetItemImage(index, EntryType::folderType()->getIndex());
 
-	// Set it's size column manually
+	// Set its size column manually
 	if (col_size) {
 		wxListItem li;
 		li.SetId(index);
@@ -308,7 +308,7 @@ bool ZipEntryListPanel::addEntry(uint32_t archive_index, ArchiveEntry* e) {
 	// Get the current directory
 	zipdir_t* cdir = (zipdir_t*)cur_directory;
 
-	// Check if the added entry was in this directory or any of it's subdirectories
+	// Check if the added entry was in this directory or any of its subdirectories
 	if (!cdir->entryExists(e, true))
 		return true;
 

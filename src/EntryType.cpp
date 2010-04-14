@@ -514,9 +514,9 @@ bool EntryDataFormat::detectTranslationTable (MemChunk& mc) {
 }
 
 bool EntryDataFormat::detectPalette(MemChunk& mc) {
-	// Some palettes have crap added to them which make them
-	// not a clean multiple. However, the minimum size
-	// should still be 768!
+	// Some palettes have crap added to them which makes them
+	// not a clean multiple. However, the minimum size should
+	// still be 768!
 	if (mc.getSize() < 768)
 		return false;
 	return true;
