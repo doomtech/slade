@@ -515,16 +515,17 @@ void TextureXEntryPanel::updateTextureScaleLabel() {
  *******************************************************************/
 void TextureXEntryPanel::onTextureListSelect(wxListEvent& e) {
 	// Open texture in canvas
-	tex_canvas->openTexture(texturex.getTexture(e.GetIndex()), texturex.patchTable());
-
-	// Set control values
-	updateTextureControls();
+	tx_texture_t tex = texturex.getTexture(e.GetIndex());
+	tex_canvas->openTexture(tex, texturex.patchTable());
 
 	// Populate texture patches list
 	list_tex_patches->ClearAll();
 	list_tex_patches->InsertColumn(0, _T("Patch Name"));
 	for (size_t a = 0; a < tex_canvas->getTexture().nPatches(); a++)
 		list_tex_patches->addItem(a, tex_canvas->getTexture().getPatch(a)->getPatchName());
+
+	// Set control values
+	updateTextureControls();
 
 	// Disable patch editing controls (no patch selected at first)
 	spin_patch_xpos->Enable(false);

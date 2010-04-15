@@ -92,7 +92,7 @@ void TextureXList::clear(bool clear_patches) {
 // Some structs for reading TEXTUREx data
 struct tdef_t
 { // The normal version with just the relevant data
-	char		name[8];
+	char		name[9];
 	uint16_t	flags;
 	uint8_t		scale[2];
 	int16_t		width;
@@ -222,10 +222,13 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, ArchiveEntry* pnames
 				return false;
 			}
 			sprintf (tdef.name, "TEX%05d", a);
+
+			// Read texture info
 			if (!texturex->read(&nameless, 8)) {
 				wxLogMessage(_T("Error: TEXTUREx entry is corrupt"));
 				return false;
 			}
+
 			// Copy data to permanent structure
 			tdef.flags = nameless.flags;
 			tdef.scale[0] = nameless.scale[0];
