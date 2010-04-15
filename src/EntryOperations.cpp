@@ -139,7 +139,7 @@ bool EntryOperations::modifyGfxOffsets(ArchiveEntry* entry, int auto_type, point
 	}
 
 	// Doom alpha gfx format
-	if (entryformat == EDF_GFX_DOOM_ALPHA) {
+	else if (entryformat == EDF_GFX_DOOM_ALPHA) {
 		// Get patch header
 		entry->seek(0, SEEK_SET);
 		oldpatch_header_t header;

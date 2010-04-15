@@ -558,22 +558,6 @@
 		<Filter
 			Name="Resources"
 			>
-			<File
-				RelativePath=".\src\GLTexture.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\GLTexture.h"
-				>
-			</File>
-			<File
-				RelativePath=".\src\Icons.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\Icons.h"
-				>
-			</File>
 			<Filter
 				Name="Archive"
 				>
@@ -655,64 +639,92 @@
 				</File>
 			</Filter>
 			<Filter
-				Name="Image"
+				Name="Graphics"
 				>
 				<File
-					RelativePath=".\src\SImage.cpp"
+					RelativePath=".\src\GLTexture.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\SImage.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="Composite Texture"
-				>
-				<File
-					RelativePath=".\src\CTexture.cpp"
+					RelativePath=".\src\GLTexture.h"
 					>
 				</File>
 				<File
-					RelativePath=".\src\CTexture.h"
+					RelativePath=".\src\Icons.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\PatchTable.cpp"
+					RelativePath=".\src\Icons.h"
 					>
 				</File>
-				<File
-					RelativePath=".\src\PatchTable.h"
+				<Filter
+					Name="Image"
 					>
-				</File>
-				<File
-					RelativePath=".\src\TextureXList.cpp"
+					<File
+						RelativePath=".\src\SImage.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\SImage.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="Palette"
 					>
-				</File>
-				<File
-					RelativePath=".\src\TextureXList.h"
+					<File
+						RelativePath=".\src\Palette.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\Palette.h"
+						>
+					</File>
+					<File
+						RelativePath=".\src\PaletteManager.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\PaletteManager.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="Composite Texture"
 					>
-				</File>
-			</Filter>
-			<Filter
-				Name="Palette"
-				>
-				<File
-					RelativePath=".\src\Palette.cpp"
+					<File
+						RelativePath=".\src\CTexture.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\CTexture.h"
+						>
+					</File>
+					<File
+						RelativePath=".\src\PatchTable.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\PatchTable.h"
+						>
+					</File>
+					<File
+						RelativePath=".\src\TextureXList.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\TextureXList.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="Font"
 					>
-				</File>
-				<File
-					RelativePath=".\src\Palette.h"
-					>
-				</File>
-				<File
-					RelativePath=".\src\PaletteManager.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\PaletteManager.h"
-					>
-				</File>
+					<File
+						RelativePath=".\src\SFont.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter

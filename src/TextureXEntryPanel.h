@@ -11,11 +11,21 @@
 #include <wx/aui/auibook.h>
 #include <wx/spinctrl.h>
 
-
+// TODO/Ideas:
+// - Layout change to accomodate zdoom TEXTURES editing:
+//   - Remove 'available patches' list
+//   - Move texture patch editing controls to where available patches list was
+//     (this will give more room for editing controls, vertically)
+//   - More bitmap buttons for patch operations:
+//     - Add patch - will open a patch browser (similar to SLADE2/DB texture browser) to select the patch
+//       *Having a patch browser allows a nicer way to sort patches when it comes to TEXTURES, since that
+//       can have any existing patch/sprite/texture as a patch, rather than being confined to a PNAMES list entry*
+//     - Replace patch(es) - replace the currently selected patches with browser selection
+//     - Duplicate patch - create duplicate copies of selected patches on top and slightly down+left of each
+// - 'New Texture' button/option - Will give the option of creating a new blank texture, or texture from patch
 class TextureXEntryPanel : public EntryPanel {
 private:
 	TextureXList	texturex;
-	//tx_texture_t	tex_current;
 	wxAuiNotebook*	tabs;
 
 	ArchiveEntry*	entry_texturex;
@@ -30,6 +40,8 @@ private:
 	wxCheckBox*		cb_draw_outside;
 	wxStaticText*	label_current_zoom;
 	GfxCanvas*		gfx_patch_preview;
+	wxStaticText*	label_patch_size;
+	wxButton*		btn_add_patch;
 	// Texture Controls
 	wxTextCtrl*		text_tex_name;
 	wxSpinCtrl*		spin_tex_width;

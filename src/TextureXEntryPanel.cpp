@@ -164,9 +164,17 @@ wxPanel* TextureXEntryPanel::initTexArea(wxWindow* parent) {
 
 	// Add patch preview
 	gfx_patch_preview = new GfxCanvas(panel, -1);
-	gfx_patch_preview->SetSizeHints(wxSize(96, 96));
+	gfx_patch_preview->SetSizeHints(wxSize(104, 104));
 	gfx_patch_preview->setViewType(GFXVIEW_CENTERED);
 	framesizer->Add(gfx_patch_preview->toPanel(panel), 0, wxEXPAND|wxALL, 4);
+
+	// Add patch size label
+	label_patch_size = new wxStaticText(panel, -1, _T(""), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE|wxST_NO_AUTORESIZE);
+	framesizer->Add(label_patch_size, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+	// 'Add Patch' button
+	btn_add_patch = new wxButton(panel, -1, _T("Add To Texture"));
+	framesizer->Add(btn_add_patch, 0, wxEXPAND|wxALL, 4);
 
 	return panel;
 }
@@ -541,12 +549,14 @@ void TextureXEntryPanel::onPatchesListSelect(wxListEvent& e) {
 	ArchiveEntry* entry = texturex.patchTable().patchEntry(e.GetIndex());
 
 	// Load the image
-	gfx_patch_preview->getImage()->clear();
-	Misc::loadImageFromEntry(gfx_patch_preview->getImage(), entry);
+	SImage* img = gfx_patch_preview->getImage();
+	img->clear();
+	Misc::loadImageFromEntry(img, entry);
 
 	// Refresh the preview
 	gfx_patch_preview->zoomToFit(false);
 	gfx_patch_preview->Refresh();
+	label_patch_size->SetLabel(s_fmt(_T("%d x %d"), img->getWidth(), img->getHeight()));
 }
 
 /* TextureXEntryPanel::onTexPatchesListSelect
@@ -705,19 +715,6 @@ void TextureXEntryPanel::onTexCanvasMouseEvent(wxMouseEvent& e) {
 void TextureXEntryPanel::onTexCanvasDragEnd(wxCommandEvent& e) {
 	// If left dragging ended
 	if (e.GetInt() == wxMOUSE_BTN_LEFT) {
-		// Update tex info patches from texture canvas
-		/*
-		for (size_t a = 0; a < tex_current.patches.size(); a++) {
-			// Get patch
-			CTPatch* patch = tex_canvas->getTexture().getPatch(a);
-			if (!patch) continue;
-
-			// Update offsets
-			tex_current.patches[a].left = patch->xOffset();
-			tex_current.patches[a].top = patch->yOffset();
-		}
-		*/
-
 		// Update texture/patch controls
 		updateTextureControls();
 	}

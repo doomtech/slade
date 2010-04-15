@@ -92,7 +92,7 @@ void TextureXList::clear(bool clear_patches) {
 // Some structs for reading TEXTUREx data
 struct tdef_t
 { // The normal version with just the relevant data
-	char		name[9];
+	char		name[8];
 	uint16_t	flags;
 	uint8_t		scale[2];
 	int16_t		width;
@@ -221,7 +221,9 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, ArchiveEntry* pnames
 				wxLogMessage(_T("Error: More than 100000 nameless textures"));
 				return false;
 			}
-			sprintf (tdef.name, "TEX%05d", a);
+			char temp[9] = "";
+			sprintf (temp, "TEX%05d", a);
+			memcpy(tdef.name, temp, 8);
 
 			// Read texture info
 			if (!texturex->read(&nameless, 8)) {

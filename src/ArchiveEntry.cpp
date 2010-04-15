@@ -133,7 +133,7 @@ MemChunk& ArchiveEntry::getMCData(bool allow_load) {
  * to set it to 'modified' then don't change the state
  *******************************************************************/
 void ArchiveEntry::setState(uint8_t state) {
-	if (state_locked || state == this->state)
+	if (state_locked || (state == 0 && this->state == 0))
 		return;
 
 	if (state == 0)
@@ -231,7 +231,7 @@ void ArchiveEntry::clearData() {
 	// Reset attributes
 	size = 0;
 	data_loaded = false;
-	setState(1);
+	//setState(1);
 }
 
 /* ArchiveEntry::importMem
