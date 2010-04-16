@@ -227,10 +227,55 @@ bool ZipArchivePanel::newEntry() {
 bool ZipArchivePanel::newEntryFromFile() {
 	// Create open file dialog
 	wxFileDialog dialog_open(this, _T("Choose file to open"), wxEmptyString, wxEmptyString,
-			_T("Any File (*.*)|*.*"), wxFD_OPEN | wxFD_FILE_MUST_EXIST, wxDefaultPosition);
+			_T("Any File (*.*)|*.*"), wxFD_OPEN|wxFD_FILE_MUST_EXIST|wxFD_MULTIPLE, wxDefaultPosition);
 
 	// Run the dialog & check that the user didn't cancel
 	if (dialog_open.ShowModal() == wxID_OK) {
+		// Get list of selected files
+		wxArrayString files;
+		dialog_open.GetPaths(files);
+
+		// Get the entry index of the last selected list item
+		int index = archive->entryIndex(entry_list->getLastSelectedEntry());
+
+		// If something was selected, add 1 to the index so we add the new entry after the last selected
+		if (index >= 0)
+			index++;
+		else
+			index = entry_list->getListSize(); // If not add to the end of the list
+
+		// Go through the list of files
+		bool ok = false;
+		for (size_t a = 0; a < files.size(); a++) {
+			string name = wxFileName(files[a]).GetFullName();
+
+			// If only 1 file was selected, prompt for an entry name
+			if (files.size() == 1) {
+				name = wxGetTextFromUser(_T("Enter new entry name:"), _T("New Entry"), name);
+
+				// Get the current directory
+				zipdir_t* dir = ((ZipEntryListPanel*)entry_list)->getCurrentDir();
+
+				// If an absolute path wasn't given, add the current directory before the name
+				if (!name.StartsWith(_T("/")))
+					name = dir->getFullPath() + name;
+			}
+
+			// Add the entry to the archive
+			ArchiveEntry* new_entry = archive->addNewEntry(name, index);
+
+			// If the entry was created ok, load the file into it
+			if (new_entry) {
+				new_entry->importFile(files[a]);
+				ok = true;
+			}
+
+			index++;
+		}
+
+		return ok;
+
+		/*
 		wxFileName fn(dialog_open.GetPath());
 		string filename = fn.GetFullName();
 
@@ -264,6 +309,7 @@ bool ZipArchivePanel::newEntryFromFile() {
 		}
 		else
 			return false;
+		*/
 	}
 	else // If user canceled return false
 		return false;

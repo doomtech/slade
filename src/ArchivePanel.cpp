@@ -192,15 +192,13 @@ bool ArchivePanel::newEntry() {
 bool ArchivePanel::newEntryFromFile() {
 	// Create open file dialog
 	wxFileDialog dialog_open(this, _T("Choose file to open"), wxEmptyString, wxEmptyString,
-			_T("Any File (*.*)|*.*"), wxFD_OPEN | /*wxFD_MULTIPLE |*/ wxFD_FILE_MUST_EXIST, wxDefaultPosition);
+			_T("Any File (*.*)|*.*"), wxFD_OPEN|wxFD_MULTIPLE|wxFD_FILE_MUST_EXIST, wxDefaultPosition);
 
 	// Run the dialog & check that the user didn't cancel
 	if (dialog_open.ShowModal() == wxID_OK) {
-		wxFileName fn(dialog_open.GetPath());
-		string filename = fn.GetFullName();
-
-		// Prompt for new entry name
-		string name = wxGetTextFromUser(_T("Enter new entry name:"), _T("New Entry"), filename);
+		// Get file selection
+		wxArrayString files;
+		dialog_open.GetPaths(files);
 
 		// Get the entry index of the last selected list item
 		int index = archive->entryIndex(entry_list->getLastSelectedEntry());
@@ -211,17 +209,27 @@ bool ArchivePanel::newEntryFromFile() {
 		else
 			index = entry_list->getListSize(); // If not add to the end of the list
 
-		// Add the entry to the archive
-		ArchiveEntry* new_entry = archive->addNewEntry(name, index);
+		// Go through the list of files
+		bool ok = false;
+		for (size_t a = 0; a < files.size(); a++) {
+			// If only 1 file was selected, prompt for a name
+			string name = wxFileName(files[a]).GetName().Upper().Truncate(8);
+			if (files.size() == 1)
+				name = wxGetTextFromUser(_T("Enter new entry name:"), _T("New Entry"), name);
 
-		// If the entry was created ok load the file into it and return true
-		// otherwise, return false
-		if (new_entry) {
-			new_entry->importFile(dialog_open.GetPath());
-			return true;
+			// Add the entry to the archive
+			ArchiveEntry* new_entry = archive->addNewEntry(name, index);
+
+			// If the entry was created ok, load the file into it
+			if (new_entry) {
+				new_entry->importFile(files[a]);
+				ok = true;
+			}
+
+			index++;
 		}
-		else
-			return false;
+
+		return ok;
 	}
 	else // If user canceled return false
 		return false;

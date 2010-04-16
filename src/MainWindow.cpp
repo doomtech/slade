@@ -194,7 +194,8 @@ void MainWindow::setupLayout() {
 	html_startpage = new wxHtmlWindow(notebook_tabs, -1);
 	html_startpage->SetName(_T("startpage"));
 	notebook_tabs->AddPage(html_startpage, _("Start Page"));
-	html_startpage->SetPage(_("<HTML><BODY><CENTER><H1>SLADE<FONT SIZE=-4>3</FONT></H1><BR>It's A Doom Editor<BR><BR><BR><A HREF=http://slade.mancubus.net>http://slade.mancubus.net</A></CENTER></BODY></HTML>"));
+	html_startpage->LoadFile(wxFileName(appPath(_T("startpage/startpage.htm"), DIR_APP)));
+	//html_startpage->SetPage(_("<HTML><BODY><CENTER><H1>SLADE<FONT SIZE=-4>3</FONT></H1><BR>It's A Doom Editor<BR><BR><BR><A HREF=http://slade.mancubus.net>http://slade.mancubus.net</A></CENTER></BODY></HTML>"));
 
 
 	// -- Archive Manager Panel --
