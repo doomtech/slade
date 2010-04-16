@@ -428,6 +428,12 @@ void MainWindow::onMenuItemClicked(wxCommandEvent& e) {
 		info.SetWebSite(_T("http://slade.mancubus.net"));
 		info.SetDescription(_T("It's a Doom Editor"));
 
+		// Set icon
+		string icon_filename = appPath(_T("slade.ico"), DIR_TEMP);
+		theArchiveManager->programResourceArchive()->getEntry(_T("slade.ico"))->exportFile(icon_filename);
+		info.SetIcon(wxIcon(icon_filename, wxBITMAP_TYPE_ICO));
+		wxRemoveFile(icon_filename);
+
 		string year = wxNow().Right(4);
 		info.SetCopyright(s_fmt(_T("(C) 2008-%s Simon Judd <sirjuddington@gmail.com>"), year.c_str()));
 
