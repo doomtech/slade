@@ -38,6 +38,7 @@ public:
 
 	void	clearTexture();
 	void	clearPatchTextures();
+	void	updatePatchTextures();
 	bool	openTexture(tx_texture_t& tex, PatchTable& ptable);
 	void	draw();
 	void	drawChequeredBackground();

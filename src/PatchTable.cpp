@@ -41,12 +41,26 @@
  *******************************************************************/
 PatchTable::PatchTable(Archive* parent) {
 	this->parent = parent;
+	patch_invalid.name = _T("INVALID_PATCH");
 }
 
 /* PatchTable::~PatchTable
  * PatchTable class destructor
  *******************************************************************/
 PatchTable::~PatchTable() {
+}
+
+/* PatchTable::patch
+ * Returns the patch at [index], or an 'invalid' patch if [index] is
+ * out of bounds
+ *******************************************************************/
+patch_t& PatchTable::patch(size_t index) {
+	// Check index
+	if (index >= patches.size())
+		return patch_invalid;
+
+	// Return patch at index
+	return patches[index];
 }
 
 /* PatchTable::patchName

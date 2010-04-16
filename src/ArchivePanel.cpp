@@ -40,7 +40,6 @@
 #include "GfxEntryPanel.h"
 #include "PaletteEntryPanel.h"
 #include "MultiEntryPanel.h"
-#include "TextureXEntryPanel.h"
 #include "AnimatedEntryPanel.h"
 #include "SwitchesEntryPanel.h"
 #include "GfxConvDialog.h"
@@ -70,7 +69,6 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 	gfx_area = new GfxEntryPanel(this);
 	pal_area = new PaletteEntryPanel(this);
 	multi_area = new MultiEntryPanel(this);
-	texturex_area = new TextureXEntryPanel(this);
 	animated_area = new AnimatedEntryPanel(this);
 	switches_area = new SwitchesEntryPanel(this);
 
@@ -625,8 +623,6 @@ bool ArchivePanel::openEntry(ArchiveEntry* entry) {
 		new_area = pal_area;
 	else if (!entry->getType()->getEditor().Cmp(_T("text")))
 		new_area = text_area;
-	else if (!entry->getType()->getEditor().Cmp(_T("texturex")))
-		new_area = texturex_area;
 	else if (!entry->getType()->getEditor().Cmp(_T("animated")))
 		new_area = animated_area;
 	else if (!entry->getType()->getEditor().Cmp(_T("switches")))

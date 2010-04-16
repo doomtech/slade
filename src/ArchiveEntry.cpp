@@ -180,7 +180,7 @@ void ArchiveEntry::lock() {
 void ArchiveEntry::unlock() {
 	// Unlock the entry
 	locked = false;
-	
+
 	// Inform parent
 	if (parent)
 		parent->entryModified(this);

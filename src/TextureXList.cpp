@@ -125,7 +125,7 @@ struct ftdef_t
  *******************************************************************/
 bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, ArchiveEntry* pnames) {
 	// Check entries were actually given
-	if (!texturex || !pnames)
+	if (!texturex)
 		return false;
 
 	// Clear current textures

@@ -528,6 +528,9 @@ void EntryListPanel::onEntryListActivated(wxListEvent& e) {
 	if (entry->getType()->getFormat() == EDF_WAD ||
 		entry->getType()->getFormat() == EDF_ZIP)
 		theArchiveManager->openArchive(entry);
+
+	if (entry->getType()->getFormat() == EDF_TEXTUREX)
+		theArchiveManager->openTextureEditor(theArchiveManager->archiveIndex(archive));
 }
 
 /* EntryListPanel::onEntryListEditLabel

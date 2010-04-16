@@ -37,9 +37,21 @@
  *******************************************************************/
 
 /* CTPatch::CTPatch
- * CTPatch class constructor
+ * CTPatch class default constructor
  *******************************************************************/
 CTPatch::CTPatch() {
+	this->offset_x = 0;
+	this->offset_y = 0;
+}
+
+/* CTPatch::CTPatch
+ * CTPatch class constructor w/initial values
+ *******************************************************************/
+CTPatch::CTPatch(patch_t& patch, int16_t offset_x, int16_t offset_y) {
+	this->patch.entry = patch.entry;
+	this->patch.name = patch.name;
+	this->offset_x = offset_x;
+	this->offset_y = offset_y;
 }
 
 /* CTPatch::~CTPatch
@@ -88,6 +100,16 @@ void CTexture::clear() {
 	this->scale_y = 1.0;
 	this->ex_props.clear();
 	this->patches.clear();
+}
+
+/* CTexture::addPatch
+ * Adds a patch to the texture with the given attributes
+ *******************************************************************/
+bool CTexture::addPatch(patch_t& patch, int16_t offset_x, int16_t offset_y) {
+	CTPatch np(patch, offset_x, offset_y);
+	patches.push_back(np);
+
+	return true;
 }
 
 /* CTexture::swapPatches

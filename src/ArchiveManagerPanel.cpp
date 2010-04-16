@@ -38,6 +38,7 @@
 #include "ZipArchivePanel.h"
 #include "ZipArchive.h"
 #include "BaseResourceArchivesPanel.h"
+#include "TextureXEditor.h"
 
 
 /*******************************************************************
@@ -121,23 +122,6 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
 	file_browser = new WMFileBrowser(notebook_tabs, this, -1);
 	notebook_tabs->AddPage(file_browser, _("File Browser"));
 
-	// Create/setup base resource dropdown list & button
-	/*
-	wxArrayString list(1, _T("<none>"));
-	for (size_t a = 0; a < theArchiveManager->baseResourceListLength(); a++)
-		list.Add(theArchiveManager->baseResourcePath(a));
-	choice_base_resource = new wxComboBox(this, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, list, wxCB_READONLY);
-	choice_base_resource->Select(0);
-
-	btn_edit_base_resources = new wxButton(this, -1, _T("..."), wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT);
-
-	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
-	hbox->Add(new wxStaticText(this, -1, _T("Base Resource:")), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
-	hbox->Add(choice_base_resource, 1, wxEXPAND|wxRIGHT, 4);
-	hbox->Add(btn_edit_base_resources, 0, wxEXPAND, 0);
-	vbox->Add(hbox, 0, wxEXPAND|wxALL, 4);
-	*/
-
 	// Create/setup Archive context menu
 	menu_context = new wxMenu();
 	menu_context->Append(MENU_SAVE, _("Save"), _("Save the selected Archive(s)"));
@@ -152,7 +136,6 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
 	list_maps->Bind(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, &ArchiveManagerPanel::onListMapsActivated, this);
 	notebook_archives->Bind(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED, &ArchiveManagerPanel::onTabChanged, this);
 	Bind(wxEVT_COMMAND_MENU_SELECTED, &ArchiveManagerPanel::onMenu, this, MENU_SAVE, MENU_END);
-	//btn_edit_base_resources->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &ArchiveManagerPanel::onBtnEditBaseResources, this);
 
 	// Listen to the ArchiveManager
 	listenTo(theArchiveManager);
@@ -251,7 +234,7 @@ void ArchiveManagerPanel::updateListItem(int index) {
 }
 
 /* ArchiveManagerPanel::isArchivePanel
- * Checks if the currently selected tab is an ArchivePanel
+ * Checks if the currently selected tab is an ArchivePanel.
  * Returns true if it is, false if not
  *******************************************************************/
 bool ArchiveManagerPanel::isArchivePanel(int tab_index) {
@@ -259,13 +242,11 @@ bool ArchiveManagerPanel::isArchivePanel(int tab_index) {
 	if ((unsigned)tab_index >= notebook_archives->GetPageCount())
 		return false;
 
-	// Check that it isn't the start page
-	if (!(notebook_archives->GetPageText(tab_index).compare(_T("Start Page"))))
+	// Check the page's name
+	if (!notebook_archives->GetPage(tab_index)->GetName().CmpNoCase(_T("archive")))
+		return true;
+	else
 		return false;
-
-	// Currently can't be anything other than the start page or an archive panel,
-	// so it's valid
-	return true;
 }
 
 /* ArchiveManagerPanel::openTab
@@ -278,7 +259,11 @@ void ArchiveManagerPanel::openTab(int archive_index) {
 	if (archive) {
 		// Go through all tabs
 		for (size_t a = 0; a < notebook_archives->GetPageCount(); a++) {
-			// Check for a match
+			// Check page type is "archive"
+			if (notebook_archives->GetPage(a)->GetName().CmpNoCase(_T("archive")))
+				continue;
+
+			// Check for archive match
 			ArchivePanel* ap = (ArchivePanel*)notebook_archives->GetPage(a);
 			if (ap->getArchive() == archive) {
 				// Selected archive is already open in a tab, so switch to this tab
@@ -297,10 +282,48 @@ void ArchiveManagerPanel::openTab(int archive_index) {
 		else return;
 
 		notebook_archives->AddPage(wp, archive->getFileName(false), true);
+		wp->SetName(_T("archive"));
 		wp->Show(true);
 		wp->init();
 		wp->SetFocus();
 		wp->focusEntryList();
+	}
+}
+
+/* ArchiveManagerPanel::openTextureTab
+ * Opens a new texture editor tab for the archive at <archive_index>
+ * in the archive manager
+ *******************************************************************/
+void ArchiveManagerPanel::openTextureTab(int archive_index) {
+	Archive* archive = theArchiveManager->getArchive(archive_index);
+
+	if (archive) {
+		// Go through all tabs
+		for (size_t a = 0; a < notebook_archives->GetPageCount(); a++) {
+			// Check page type is "texture"
+			if (notebook_archives->GetPage(a)->GetName().CmpNoCase(_T("texture")))
+				continue;
+
+			// Check for archive match
+			TextureXEditor* txed = (TextureXEditor*)notebook_archives->GetPage(a);
+			if (txed->getArchive() == archive) {
+				// Selected archive already has its texture editor open, so show that tab
+				notebook_archives->SetSelection(a);
+				return;
+			}
+		}
+
+		// If tab isn't already open, open a new one
+		TextureXEditor* txed = new TextureXEditor(notebook_archives);
+		txed->Show(false);
+		if (!txed->openArchive(archive)) {
+			delete txed;
+			return;
+		}
+
+		notebook_archives->AddPage(txed, s_fmt(_T("Texture Editor (%s)"), archive->getFileName(false).c_str()), true);
+		txed->SetName(_T("texture"));
+		txed->Show(true);
 	}
 }
 
@@ -439,6 +462,13 @@ void ArchiveManagerPanel::onAnnouncement(Announcer* announcer, string event_name
 		int32_t index = -1;
 		event_data.read(&index, 4);
 		updateListItem(index);
+	}
+
+	// If a texture editor is to be opened
+	if (event_name == _T("open_tex_editor")) {
+		uint32_t index = 0;
+		event_data.read(&index, 4);
+		openTextureTab(index);
 	}
 }
 

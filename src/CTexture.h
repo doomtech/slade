@@ -16,6 +16,7 @@ private:
 
 public:
 	CTPatch();
+	CTPatch(patch_t& patch, int16_t offset_x = 0, int16_t offset_y = 0);
 	~CTPatch();
 
 	string			getPatchName() { return patch.name; }
@@ -59,6 +60,7 @@ public:
 
 	void	clear();
 
+	bool	addPatch(patch_t& patch, int16_t offset_x = 0, int16_t offset_y = 0);
 	bool	swapPatches(size_t p1, size_t p2);
 
 	bool	fromTX(tx_texture_t& info, PatchTable& ptable);

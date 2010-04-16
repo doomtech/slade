@@ -58,6 +58,7 @@ CTextureCanvas::CTextureCanvas(wxWindow* parent, int id)
 	// Bind events
 	Bind(wxEVT_MOTION, &CTextureCanvas::onMouseEvent, this);
 	Bind(wxEVT_LEFT_UP, &CTextureCanvas::onMouseEvent, this);
+	Bind(wxEVT_LEAVE_WINDOW, &CTextureCanvas::onMouseEvent, this);
 }
 
 /* CTextureCanvas::~CTextureCanvas
@@ -125,6 +126,14 @@ void CTextureCanvas::clearPatchTextures() {
 	for (size_t a = 0; a < patch_textures.size(); a++)
 		delete patch_textures[a];
 	patch_textures.clear();
+}
+
+/* CTextureCanvas::updatePatchTextures
+ * Unloads all patch textures, so they are reloaded on next draw
+ *******************************************************************/
+void CTextureCanvas::updatePatchTextures() {
+	for (size_t a = 0; a < patch_textures.size(); a++)
+		patch_textures[a]->clear();
 }
 
 /* CTextureCanvas::openTexture
@@ -459,6 +468,13 @@ void CTextureCanvas::onMouseEvent(wxMouseEvent& e) {
 			evt.SetInt(wxMOUSE_BTN_LEFT);
 			ProcessWindowEvent(evt);
 		}
+	}
+
+	// LEAVING
+	if (e.Leaving()) {
+		// Set no hilighted patch
+		hilight_patch = -1;
+		refresh = true;
 	}
 
 	// Refresh is needed

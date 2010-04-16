@@ -15,6 +15,7 @@ class PatchTable {
 private:
 	Archive*		parent;
 	vector<patch_t>	patches;
+	patch_t			patch_invalid;
 
 public:
 	PatchTable(Archive* parent = NULL);
@@ -22,6 +23,7 @@ public:
 	
 	size_t	nPatches() { return patches.size(); }
 
+	patch_t&		patch(size_t index);
 	string			patchName(size_t index);
 	ArchiveEntry*	patchEntry(size_t index);
 	ArchiveEntry*	patchEntry(string name);

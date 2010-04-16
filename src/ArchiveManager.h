@@ -57,6 +57,9 @@ public:
 
 	ArchiveEntry*	getResourceEntry(string name);
 
+	// Misc
+	bool		openTextureEditor(uint32_t index);
+
 	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 };
 

@@ -419,6 +419,24 @@ ArchiveEntry* ArchiveManager::getResourceEntry(string name) {
 	return NULL;
 }
 
+/* ArchivePanel::openTextureEditor
+ * Announces that the texture editor for archive [index] should be
+ * opened
+ *******************************************************************/
+bool ArchiveManager::openTextureEditor(uint32_t index) {
+	// Check index
+	if (index >= open_archives.size())
+		return false;
+
+	// Announce
+	MemChunk mc(4);
+	mc.write(&index, 4);
+	announce(_T("open_tex_editor"), mc);
+
+	return true;
+}
+
+
 /* ArchivePanel::onAnnouncement
  * Called when an announcement is recieved from one of the archives
  * in the list
