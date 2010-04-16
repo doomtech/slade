@@ -136,28 +136,33 @@
       <File Name="src/PnamesList.cpp"/>
       <File Name="src/PnamesList.h"/>
     </VirtualDirectory>
-    <VirtualDirectory Name="Image">
-      <File Name="src/SImage.cpp"/>
-      <File Name="src/SImage.h"/>
+    <VirtualDirectory Name="Graphics">
+      <VirtualDirectory Name="Composite Texture">
+        <File Name="src/CTexture.cpp"/>
+        <File Name="src/CTexture.h"/>
+        <File Name="src/PatchTable.cpp"/>
+        <File Name="src/PatchTable.h"/>
+        <File Name="src/TextureXList.cpp"/>
+        <File Name="src/TextureXList.h"/>
+      </VirtualDirectory>
+      <VirtualDirectory Name="Font">
+        <File Name="src/SFont.h"/>
+      </VirtualDirectory>
+      <VirtualDirectory Name="Image">
+        <File Name="src/SImage.cpp"/>
+        <File Name="src/SImage.h"/>
+      </VirtualDirectory>
+      <VirtualDirectory Name="Palette">
+        <File Name="src/Palette.cpp"/>
+        <File Name="src/Palette.h"/>
+        <File Name="src/PaletteManager.cpp"/>
+        <File Name="src/PaletteManager.h"/>
+      </VirtualDirectory>
+      <File Name="src/GLTexture.cpp"/>
+      <File Name="src/GLTexture.h"/>
+      <File Name="src/Icons.cpp"/>
+      <File Name="src/Icons.h"/>
     </VirtualDirectory>
-    <VirtualDirectory Name="Palette">
-      <File Name="src/Palette.cpp"/>
-      <File Name="src/Palette.h"/>
-      <File Name="src/PaletteManager.cpp"/>
-      <File Name="src/PaletteManager.h"/>
-    </VirtualDirectory>
-    <VirtualDirectory Name="Composite Texture">
-      <File Name="src/CTexture.cpp"/>
-      <File Name="src/CTexture.h"/>
-      <File Name="src/TextureXList.cpp"/>
-      <File Name="src/TextureXList.h"/>
-      <File Name="src/PatchTable.cpp"/>
-      <File Name="src/PatchTable.h"/>
-    </VirtualDirectory>
-    <File Name="src/Icons.cpp"/>
-    <File Name="src/Icons.h"/>
-    <File Name="src/GLTexture.h"/>
-    <File Name="src/GLTexture.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="UI Elements">
     <File Name="src/ColourBox.cpp"/>
