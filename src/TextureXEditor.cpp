@@ -134,7 +134,8 @@ void TextureXPanel::setPalette(Palette8bit *pal) {
  * Called when an item on the texture list is selected
  *******************************************************************/
 void TextureXPanel::onTextureListSelect(wxListEvent& e) {
-	texture_editor->openTexture(texturex.getTexture(e.GetIndex()));
+	tx_texture_t tex = texturex.getTexture(e.GetIndex());
+	texture_editor->openTexture(tex);
 }
 
 

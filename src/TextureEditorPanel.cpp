@@ -574,7 +574,8 @@ void TextureEditorPanel::onBtnPatchBack(wxCommandEvent &e) {
 		tex_canvas->swapPatches(selection[a], selection[a] - 1);
 	}
 
-	// Refresh texture
+	// Update UI
+	updatePatchControls();
 	tex_canvas->Refresh();
 }
 
@@ -598,7 +599,8 @@ void TextureEditorPanel::onBtnPatchForward(wxCommandEvent &e) {
 		tex_canvas->swapPatches(selection[a], selection[a] + 1);
 	}
 
-	// Refresh texture
+	// Update UI
+	updatePatchControls();
 	tex_canvas->Refresh();
 }
 
@@ -616,7 +618,7 @@ void TextureEditorPanel::onPatchPositionXChanged(wxSpinEvent& e) {
 
 	// Set patch x offset
 	patch->setOffsetX(spin_patch_left->GetValue());
-	
+
 	// Update UI
 	tex_canvas->Refresh();
 }
@@ -635,7 +637,7 @@ void TextureEditorPanel::onPatchPositionYChanged(wxSpinEvent& e) {
 
 	// Set patch y offset
 	patch->setOffsetY(spin_patch_top->GetValue());
-	
+
 	// Update UI
 	tex_canvas->Refresh();
 }

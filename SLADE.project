@@ -72,8 +72,6 @@
         <File Name="src/TextEntryPanel.h"/>
         <File Name="src/PnamesEntryPanel.cpp"/>
         <File Name="src/PnamesEntryPanel.h"/>
-        <File Name="src/TextureXEntryPanel.cpp"/>
-        <File Name="src/TextureXEntryPanel.h"/>
       </VirtualDirectory>
       <VirtualDirectory Name="ZipArchivePanel">
         <File Name="src/ZipArchivePanel.cpp"/>
@@ -83,6 +81,14 @@
       </VirtualDirectory>
       <File Name="src/ArchiveManagerPanel.h"/>
       <File Name="src/ArchiveManagerPanel.cpp"/>
+      <VirtualDirectory Name="TextureXEditor">
+        <File Name="src/PatchTablePanel.cpp"/>
+        <File Name="src/PatchTablePanel.h"/>
+        <File Name="src/TextureEditorPanel.cpp"/>
+        <File Name="src/TextureEditorPanel.h"/>
+        <File Name="src/TextureXEditor.cpp"/>
+        <File Name="src/TextureXEditor.h"/>
+      </VirtualDirectory>
     </VirtualDirectory>
     <File Name="src/MainWindow.cpp"/>
     <File Name="src/MainWindow.h"/>
