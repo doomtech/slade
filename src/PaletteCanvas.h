@@ -4,6 +4,7 @@
 
 #include "OGLCanvas.h"
 #include "Palette.h"
+#include <wx/colordlg.h>
 
 class PaletteCanvas : public OGLCanvas {
 private:
@@ -21,6 +22,7 @@ public:
 
 	// Events
 	void	onMouseLeftDown(wxMouseEvent &e);
+	void	onMouseRightDown(wxMouseEvent &e);
 };
 
 #endif //__PALETTECANVAS_H__

@@ -194,8 +194,14 @@ void MainWindow::setupLayout() {
 	html_startpage = new wxHtmlWindow(notebook_tabs, -1);
 	html_startpage->SetName(_T("startpage"));
 	notebook_tabs->AddPage(html_startpage, _("Start Page"));
-	html_startpage->LoadFile(wxFileName(appPath(_T("startpage/startpage.htm"), DIR_APP)));
-	//html_startpage->SetPage(_("<HTML><BODY><CENTER><H1>SLADE<FONT SIZE=-4>3</FONT></H1><BR>It's A Doom Editor<BR><BR><BR><A HREF=http://slade.mancubus.net>http://slade.mancubus.net</A></CENTER></BODY></HTML>"));
+	Archive* res_archive = theArchiveManager->programResourceArchive();
+	ArchiveEntry* sp_entry = res_archive->getEntry(_T("html/startpage.htm"));
+	if (sp_entry)
+		html_startpage->SetPage(wxString::From8BitData((const char *)(sp_entry->getData(true))));
+	else { // Fallback
+		wxLogMessage(_T("Warning: html/startpage.htm not found in slade.pk3!"));
+		html_startpage->SetPage(_("<HTML><BODY><CENTER><H1>SLADE<FONT SIZE=-4>3</FONT></H1><BR>It's A Doom Editor<BR><BR><BR><A HREF=http://slade.mancubus.net>http://slade.mancubus.net</A></CENTER></BODY></HTML>"));
+	}
 
 
 	// -- Archive Manager Panel --

@@ -18,6 +18,9 @@ struct zipdir_t {
 
 	bool			entryExists(ArchiveEntry* entry, bool include_subdirs = false);
 	ArchiveEntry*	getEntry(string name, bool include_subdirs = true);
+	ArchiveEntry*	getEntry(int edftype, bool include_subdirs = true);
+	void			getEntries(vector<ArchiveEntry*> &ret, string name, bool include_subdirs = true);
+	void			getEntries(vector<ArchiveEntry*> &ret, int edftype, bool include_subdirs = true);
 	int				entryIndex(ArchiveEntry* entry);
 	zipdir_t*		getSubDir(string name);
 	int				dirIndex(zipdir_t* dir);
@@ -68,8 +71,10 @@ public:
 	vector<mapdesc_t>	detectMaps();
 	string				detectEntrySection(ArchiveEntry* entry);
 
-	ArchiveEntry*			findEntry(string search);
-	vector<ArchiveEntry*>	findEntries(string search);
+	ArchiveEntry*			findEntry(string search, bool incsub = true);
+	ArchiveEntry*			findEntry(int edftype, bool incsub = true);
+	vector<ArchiveEntry*>	findEntries(string search, bool incsub = true);
+	vector<ArchiveEntry*>	findEntries(int edftype, bool incsub = true);
 
 	// ---- Zip-specific ----
 	zipdir_t*	getEntryDirectory(ArchiveEntry* entry, zipdir_t* dir = NULL);

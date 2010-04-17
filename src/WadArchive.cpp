@@ -824,15 +824,39 @@ string WadArchive::detectEntrySection(ArchiveEntry* entry) {
 	return _T("none");
 }
 
-ArchiveEntry* WadArchive::findEntry(string search) {
+ArchiveEntry* WadArchive::findEntry(string search, bool incsub) {
+	for (size_t a = 0; a < numEntries(); a++) {
+		if (!getEntry(a)->getName().Cmp(search))
+			return getEntry(a);
+	}
 	return NULL;
 }
 
-vector<ArchiveEntry*> WadArchive::findEntries(string search) {
+ArchiveEntry* WadArchive::findEntry(int edftype, bool incsub) {
+	for (size_t a = 0; a < numEntries(); a++) {
+		if (getEntry(a)->getType()->getFormat() == edftype)
+			return getEntry(a);
+	}
+	return NULL;
+}
+
+vector<ArchiveEntry*> WadArchive::findEntries(string search, bool incsub) {
 	vector<ArchiveEntry*> ret;
+	for (size_t a = 0; a < numEntries(); a++) {
+		if (!getEntry(a)->getName().Cmp(search))
+			ret.push_back(getEntry(a));
+	}
 	return ret;
 }
 
+vector<ArchiveEntry*> WadArchive::findEntries(int edftype, bool incsub) {
+	vector<ArchiveEntry*> ret;
+	for (size_t a = 0; a < numEntries(); a++) {
+		if (getEntry(a)->getType()->getFormat() == edftype)
+			ret.push_back(getEntry(a));
+	}
+	return ret;
+}
 
 bool WadArchive::isWadArchive(MemChunk& mc) {
 	// Check size

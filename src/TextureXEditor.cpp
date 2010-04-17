@@ -197,19 +197,8 @@ bool TextureXEditor::openArchive(Archive* archive) {
 	pal_chooser->setGlobalFromArchive(archive);
 
 	// Search archive for any texture-related entries
-	vector<ArchiveEntry*>	tx_entries;
-	ArchiveEntry*			entry_pnames = NULL;
-	for (size_t a = 0; a < archive->numEntries(); a++) {
-		ArchiveEntry* entry = archive->getEntry(a);
-
-		// TEXTURE1/2
-		if (entry->getType()->getFormat() == EDF_TEXTUREX)
-			tx_entries.push_back(entry);
-
-		// PNAMES
-		if (!entry_pnames && entry->getType()->getFormat() == EDF_PNAMES)
-			entry_pnames = entry;
-	}
+	vector<ArchiveEntry*>	tx_entries = archive->findEntries(EDF_TEXTUREX, false);
+	ArchiveEntry*			entry_pnames = archive->findEntry(EDF_PNAMES, false);
 
 	// If any TEXTURE1/2 entries were found, setup patch table stuff
 	if (tx_entries.size() > 0) {

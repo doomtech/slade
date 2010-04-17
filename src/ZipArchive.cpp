@@ -133,6 +133,56 @@ ArchiveEntry* zipdir_t::getEntry(string name, bool include_subdirs) {
 	return NULL;
 }
 
+ArchiveEntry* zipdir_t::getEntry(int edftype, bool include_subdirs) {
+	for (size_t a = 0; a < entries.size(); a++) {
+		if (entries[a]->getType()->getFormat() == edftype)
+			return entries[a];
+	}
+
+	// FIXME: This is just as poorly optimized as the string search
+	// version above. Same comment.
+	if (include_subdirs) {
+		ArchiveEntry* test = NULL;
+		for (size_t a = 0; a < subdirectories.size(); a++) {
+			test = subdirectories[a]->getEntry(edftype, true);
+			if (test) return test;
+		}
+	}
+	return NULL;
+}
+
+
+void zipdir_t::getEntries(vector<ArchiveEntry*> &ret, string name, bool include_subdirs) {
+	for (size_t a = 0; a < entries.size(); a++) {
+		if (!entries[a]->getName().Cmp(name))
+			ret.push_back(entries[a]);
+		else if (!entries[a]->getName(true).CmpNoCase(name))
+			ret.push_back(entries[a]);
+	}
+	// FIXME: Blah slow blah not optimized
+	if (include_subdirs) {
+		vector<ArchiveEntry*> test;
+		for (size_t a = 0; a < subdirectories.size(); a++) {
+			subdirectories[a]->getEntries(ret, name, true);
+		}
+	}
+}
+
+void zipdir_t::getEntries(vector<ArchiveEntry*> &ret, int edftype, bool include_subdirs) {
+	for (size_t a = 0; a < numEntries(); a++) {
+		if (entries[a]->getType()->getFormat() == edftype)
+			ret.push_back(entries[a]);
+	}
+	// FIXME: Blah slow blah not optimized
+	if (include_subdirs) {
+		vector<ArchiveEntry*> test;
+		for (size_t a = 0; a < subdirectories.size(); a++) {
+			subdirectories[a]->getEntries(ret, edftype, true);
+		}
+	}
+}
+
+
 /* zipdir_t::entryIndex
  * Returns the entry index of the given entry within the zipdir, or
  * -1 if the entry doesn't exist in the directory
@@ -982,47 +1032,10 @@ vector<Archive::mapdesc_t> ZipArchive::detectMaps() {
 	return ret;
 }
 
-/* ZipArchive::detectEntryType
- * Performs preliminary entry type checking based on its position
- * in the zip and its name/extension (will be overridden if the
- * entry's data later proves it to be another format)
+/* ZipArchive::detectEntrySection
+ * Finds the entry's section (or namespace) based on the directory in
+ * which it is located. Used by GfxEntryPanel to guess offset type.
  *******************************************************************/
-/*
-bool ZipArchive::detectEntryType(ArchiveEntry* entry) {
-	// Check the entry is valid and belongs to this archive
-	if (!checkEntry(entry))
-		return false;
-
-	// Get the entry name as a wxFileName for processing
-	wxFileName fn(entry->getName());
-
-	// .txt extension, treat the entry as text (unless its data proves otherwise)
-	if (fn.GetExt().CmpNoCase(_T("txt")) == 0)
-		entry->setType(ETYPE_TEXT);
-
-	// .acs extension - usually an acs script in text format
-	if (fn.GetExt().CmpNoCase(_T("acs")) == 0) {
-		entry->setType(ETYPE_TEXT);
-		entry->setExProp(_T("TextFormat"), _T("SCRIPTS"));
-		entry->setExProp(_T("EntryType"), _T("ACS Script (Text)"));
-	}
-
-	if (fn.GetName().CmpNoCase(_T("animdefs")) == 0)
-		entry->setExProp(_T("TextFormat"), _T("ANIMDEFS"));
-
-	if (fn.GetName().CmpNoCase(_T("sndinfo")) == 0)
-		entry->setExProp(_T("TextFormat"), _T("SNDINFO"));
-
-	if (fn.GetName().CmpNoCase(_T("decorate")) == 0)
-		entry->setExProp(_T("TextFormat"), _T("DECORATE"));
-
-	if (fn.GetName().CmpNoCase(_T("language")) == 0)
-		entry->setType(ETYPE_TEXT);
-
-	return true;
-}
-*/
-
 string ZipArchive::detectEntrySection(ArchiveEntry* entry) {
 	// Check the entry is valid and belongs to this archive
 	if (!checkEntry(entry))
@@ -1052,15 +1065,25 @@ string ZipArchive::detectEntrySection(ArchiveEntry* entry) {
 	return _T("none");
 }
 
-ArchiveEntry* ZipArchive::findEntry(string search) {
-	return NULL;
+ArchiveEntry* ZipArchive::findEntry(string search, bool include_subdirs) {
+	return directory->getEntry(search, include_subdirs);
 }
 
-vector<ArchiveEntry*> ZipArchive::findEntries(string search) {
+ArchiveEntry* ZipArchive::findEntry(int edftype, bool include_subdirs) {
+	return directory->getEntry(edftype, include_subdirs);
+}
+
+vector<ArchiveEntry*> ZipArchive::findEntries(string search, bool include_subdirs) {
 	vector<ArchiveEntry*> ret;
+	directory->getEntries(ret, search, include_subdirs);
 	return ret;
 }
 
+vector<ArchiveEntry*> ZipArchive::findEntries(int edftype, bool include_subdirs) {
+	vector<ArchiveEntry*> ret;
+	directory->getEntries(ret, edftype, include_subdirs);
+	return ret;
+}
 
 
 /* ZipArchive::getEntryDirectory

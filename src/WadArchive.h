@@ -50,8 +50,10 @@ public:
 	vector<mapdesc_t>	detectMaps();
 	string				detectEntrySection(ArchiveEntry* entry);
 
-	ArchiveEntry*			findEntry(string search);
-	vector<ArchiveEntry*>	findEntries(string search);
+	ArchiveEntry*			findEntry(string search, bool includesubdirs = true);
+	ArchiveEntry*			findEntry(int edftype, bool includesubdirs = true);
+	vector<ArchiveEntry*>	findEntries(string search, bool includesubdirs = true);
+	vector<ArchiveEntry*>	findEntries(int edftype, bool includesubdirs = true);
 
 	static bool exportEntriesAsWad(string filename, vector<ArchiveEntry*> entries) {
 		WadArchive wad;

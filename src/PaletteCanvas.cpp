@@ -46,7 +46,8 @@ PaletteCanvas::PaletteCanvas(wxWindow* parent, int id)
 	selected = -1;
 
 	// Bind events
-	Bind(wxEVT_LEFT_DOWN, &PaletteCanvas::onMouseLeftDown, this);
+	Bind(wxEVT_LEFT_DOWN,  &PaletteCanvas::onMouseLeftDown,  this);
+	Bind(wxEVT_RIGHT_DOWN, &PaletteCanvas::onMouseRightDown, this);
 }
 
 /* PaletteCanvas::~PaletteCanvas
@@ -148,7 +149,7 @@ rgba_t PaletteCanvas::getSelectedColour() {
  * PALETTECANVAS EVENTS
  *******************************************************************/
 
-/* PaletteCanvas::leftClick
+/* PaletteCanvas::onMouseLeftDown
  * Called when the palette canvas is left clicked
  *******************************************************************/
 void PaletteCanvas::onMouseLeftDown(wxMouseEvent& e) {
@@ -167,5 +168,33 @@ void PaletteCanvas::onMouseLeftDown(wxMouseEvent& e) {
 	Refresh();
 
 	// Do normal left click stuff
+	e.Skip();
+}
+
+/* PaletteCanvas::onMouseRightDown
+ * Called when the palette canvas is right clicked
+ *******************************************************************/
+void PaletteCanvas::onMouseRightDown(wxMouseEvent& e) {
+	// Figure out what 'grid' position was clicked
+	float size = float(min(GetSize().x, GetSize().y)) / 16.0f;
+	int x = int((float)e.GetX() / size);
+	int y = int((float)e.GetY() / size);
+
+	// If it was within the palette box, select the cell
+	if (x >= 0 && x < 16 && y >= 0 && y < 16)
+		selected = y * 16 + x;
+	else
+		selected = -1;
+
+	// TODO: Summon a dialog box to select a color or something;
+	// Gotta investigate wxColourDialog. In the meantime: 
+	// no colors anymore I want them to turn black
+	//wxColourDialog coldial;
+	palette->setColour(selected, rgba_t(0, 0, 0, 0));
+
+	// Redraw
+	Refresh();
+
+	// Do normal right click stuff
 	e.Skip();
 }

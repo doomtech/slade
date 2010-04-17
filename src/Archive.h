@@ -77,8 +77,10 @@ public:
 	virtual string				detectEntrySection(ArchiveEntry* entry) { return _T("none"); }
 
 	// Search
-	virtual ArchiveEntry*			findEntry(string search) = 0;
-	virtual vector<ArchiveEntry*>	findEntries(string search) = 0;
+	virtual ArchiveEntry*			findEntry(string search, bool incsub = true) = 0;
+	virtual ArchiveEntry*			findEntry(int edftype, bool incsub = true) = 0;
+	virtual vector<ArchiveEntry*>	findEntries(string search, bool incsub = true) = 0;
+	virtual vector<ArchiveEntry*>	findEntries(int edftype, bool incsub = true) = 0;
 };
 
 #endif //__ARCHIVE_H__

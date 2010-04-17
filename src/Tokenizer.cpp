@@ -45,13 +45,12 @@ int n_special_tokens = 7;
 /* Tokenizer::Tokenizer
  * Tokenizer class constructor
  *******************************************************************/
-Tokenizer::Tokenizer(bool c_comments, bool h_comments) {
+Tokenizer::Tokenizer(bool c_comments, bool h_comments, bool s_comments) {
 	// Initialize variables
 	current = NULL;
 	start = NULL;
 	size = 0;
-	ccomments = c_comments;
-	hcomments = h_comments;
+	comments = 0 | c_comments | h_comments << 1 | s_comments << 2;
 	debug = false;
 }
 
@@ -147,7 +146,7 @@ bool Tokenizer::isWhitespace(char p) {
 
 /* Tokenizer::isSpecialCharacter
  * Checks if a character is a 'special' character, ie a character
- * that should always be it's own token (;, =, | etc)
+ * that should always be its own token (;, =, | etc)
  *******************************************************************/
 bool Tokenizer::isSpecialCharacter(char p) {
 	// Check though special_tokens array
@@ -224,7 +223,7 @@ string Tokenizer::getToken() {
 		}
 
 		// Skip C-style comments
-		if (ccomments) {
+		if (comments & CCOMMENTS) {
 			// Check if we have a line comment
 			if (current[0] == '/' && current[1] == '/' && current[2] != '$') {
 				skipLineComment(); // Skip it
@@ -239,8 +238,16 @@ string Tokenizer::getToken() {
 		}
 
 		// Skip '##' comments
-		if (hcomments) {
+		if (comments & HCOMMENTS) {
 			if (current[0] == '#' && current[1] == '#') {
+				skipLineComment(); // Skip it
+				ready = false;
+			}
+		}
+
+		// Skip ';' comments
+		if (comments & SCOMMENTS) {
+			if (current[0] == ';') {
 				skipLineComment(); // Skip it
 				ready = false;
 			}
@@ -324,7 +331,7 @@ bool Tokenizer::checkToken(string check) {
 }
 
 /* Tokenizer::getInteger
- * Reads a token and returns it's integer value
+ * Reads a token and returns its integer value
  *******************************************************************/
 int Tokenizer::getInteger() {
 	// Get token
@@ -335,7 +342,7 @@ int Tokenizer::getInteger() {
 }
 
 /* Tokenizer::getFloat
- * Reads a token and returns it's floating point value
+ * Reads a token and returns its floating point value
  *******************************************************************/
 float Tokenizer::getFloat() {
 	// Get token
@@ -346,7 +353,7 @@ float Tokenizer::getFloat() {
 }
 
 /* Tokenizer::getDouble
- * Reads a token and returns it's double-precision floating point
+ * Reads a token and returns its double-precision floating point
  * value
  *******************************************************************/
 double Tokenizer::getDouble() {
@@ -358,7 +365,7 @@ double Tokenizer::getDouble() {
 }
 
 /* Tokenizer::getBool
- * Reads a token and returns it's boolean value, anything except
+ * Reads a token and returns its boolean value, anything except
  * "0", "no", or "false" will return true
  *******************************************************************/
 bool Tokenizer::getBool() {
