@@ -1465,6 +1465,11 @@ wxArrayString EntryType::getIconList() {
 	return list;
 }
 
+void EntryType::cleanupEntryTypes() {
+	for (size_t a = 3; a < entry_types.size(); a++)
+		delete entry_types[a];
+}
+
 
 /* Console Command - "test_entry_types"
  * Testingggg

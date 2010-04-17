@@ -148,6 +148,7 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
  * ArchiveManagerPanel class destructor
  *******************************************************************/
 ArchiveManagerPanel::~ArchiveManagerPanel() {
+	if (menu_context) delete menu_context;
 }
 
 /* ArchiveManagerPanel::refreshArchiveList

@@ -42,6 +42,10 @@ public:
 		return instance;
 	}
 
+	static void deleteInstance() {
+		if (instance) delete instance;
+	}
+
 	int numCommands() { return (int) commands.size(); }
 	ConsoleCommand& command(size_t index);
 

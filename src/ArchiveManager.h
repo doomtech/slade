@@ -32,6 +32,10 @@ public:
 		return instance;
 	}
 
+	static void deleteInstance() {
+		if (instance) delete instance;
+	}
+
 	bool		resArchiveOK() { return res_archive_open; }
 	bool		addArchive(Archive* archive);
 	Archive*	getArchive(int index);

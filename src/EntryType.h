@@ -138,6 +138,7 @@ public:
 	static EntryType*		folderType();
 	static EntryType*		mapMarkerType();
 	static wxArrayString	getIconList();
+	static void				cleanupEntryTypes();
 };
 
 #endif//__ENTRYTYPE_H__

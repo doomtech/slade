@@ -86,6 +86,9 @@ WadArchive::WadArchive()
  * WadArchive class destructor
  *******************************************************************/
 WadArchive::~WadArchive() {
+	// Delete entries
+	for (size_t a = 0; a < entries.size(); a++)
+		delete entries[a];
 }
 
 /* WadArchive::isIWAD
@@ -624,7 +627,6 @@ bool WadArchive::addEntry(ArchiveEntry* entry, uint32_t position) {
 	// Truncate name to 8 characters if needed
 	string name = entry->getName();
 	if (name.size() > 8) {
-		//entry->setExProp(_T("full_name"), name); // Add full name as extra property in case it's needed later
 		entry->extraProp(_T("full_name")) = name;
 		name.Truncate(8);
 		entry->setName(name);
@@ -826,7 +828,7 @@ string WadArchive::detectEntrySection(ArchiveEntry* entry) {
 
 ArchiveEntry* WadArchive::findEntry(string search, bool incsub) {
 	for (size_t a = 0; a < numEntries(); a++) {
-		if (!getEntry(a)->getName().Cmp(search))
+		if (getEntry(a)->getName().Lower().Matches(search.Lower()))
 			return getEntry(a);
 	}
 	return NULL;
@@ -843,7 +845,7 @@ ArchiveEntry* WadArchive::findEntry(int edftype, bool incsub) {
 vector<ArchiveEntry*> WadArchive::findEntries(string search, bool incsub) {
 	vector<ArchiveEntry*> ret;
 	for (size_t a = 0; a < numEntries(); a++) {
-		if (!getEntry(a)->getName().Cmp(search))
+		if (getEntry(a)->getName().Lower().Matches(search.Lower()))
 			ret.push_back(getEntry(a));
 	}
 	return ret;

@@ -80,8 +80,7 @@ ArchiveManager::ArchiveManager() {
  *******************************************************************/
 ArchiveManager::~ArchiveManager() {
 	clearAnnouncers();
-	if (instance) delete instance;
-	delete program_resource_archive;
+	if (program_resource_archive) delete program_resource_archive;
 	if (base_resource_archive) delete base_resource_archive;
 }
 

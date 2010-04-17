@@ -358,7 +358,8 @@ ZipArchive::ZipArchive()
  * ZipArchive class destructor
  *******************************************************************/
 ZipArchive::~ZipArchive() {
-	if (directory) delete directory;
+	deleteDirectory();
+	//if (directory) delete directory;
 }
 
 /* ZipArchive::entryIndex
@@ -1306,8 +1307,9 @@ void ZipArchive::deleteDirectory(zipdir_t* dir) {
 	}
 
 	// Delete any subdirectories in the directory
-	for (size_t a = 0; a < dir->subdirectories.size(); a++) {
-		deleteDirectory(dir->subdirectories[a]);
+	vector<zipdir_t*> subdirs = dir->subdirectories;
+	for (size_t a = 0; a < subdirs.size(); a++) {
+		deleteDirectory(subdirs[a]);
 	}
 
 	// Clear vectors
@@ -1376,7 +1378,6 @@ void ZipArchive::getTreeAsList(vector<ArchiveEntry*>& list, zipdir_t* dir) {
 		// Update directory entry information
 		wxFileName fn(dir->getFullPath());
 		fn.RemoveLastDir();
-		//dir->entry->setExProp(_T("Directory"), fn.GetPath(true, wxPATH_UNIX));
 		dir->entry->extraProp(_T("Directory")) = fn.GetPath(true, wxPATH_UNIX);
 
 		// Add it

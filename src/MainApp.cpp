@@ -135,6 +135,11 @@ public:
 		text_stack->SetFont(wxFont(8, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
 		sizer->Add(text_stack, 1, wxEXPAND|wxALL, 4);
 
+		// Dump stack trace to a file (just in case)
+		wxFile file(appPath(_T("slade3_crash.log"), DIR_APP), wxFile::write);
+		file.Write(st.getTraceString());
+		file.Close();
+
 		// Add standard 'OK' button
 		sizer->Add(CreateStdDialogButtonSizer(wxOK), 0, wxEXPAND|wxALL, 4);
 
@@ -294,7 +299,14 @@ bool MainApp::OnInit() {
  * Application shutdown, run when program is closed
  *******************************************************************/
 int MainApp::OnExit() {
+	// Save configuration
 	saveConfigFile();
+
+	// Clean up
+	EntryType::cleanupEntryTypes();
+	ArchiveManager::deleteInstance();
+	Console::deleteInstance();
+
 	return 0;
 }
 
