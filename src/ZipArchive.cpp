@@ -1284,9 +1284,13 @@ zipdir_t* ZipArchive::addDirectory(string name, zipdir_t* dir) {
  * is not specified, the root directory is deleted.
  *******************************************************************/
 void ZipArchive::deleteDirectory(zipdir_t* dir) {
-	// If no current directory was specified, set it to the root directory
-	if (!dir)
+	// If no current directory was specified, set it to the root directory,
+	// but only if there is a root directory to begin with.
+	if (!dir) {
+		if (!directory)
+			return;
 		dir = directory;
+	}
 
 	// Announce
 	MemChunk mc;
