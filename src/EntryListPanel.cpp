@@ -34,6 +34,7 @@
 #include "ArchiveEntry.h"
 #include "ArchiveManager.h"
 #include "Icons.h"
+#include "SplashWindow.h"
 #include <wx/imaglist.h>
 #include <wx/filename.h>
 
@@ -200,7 +201,11 @@ void EntryListPanel::populateEntryList() {
 
 	// Go through all entries and add them to the list
 	entry_list->enableSizeUpdate(false);
+	theSplashWindow->setProgressMessage(_T("Populating entry list"));
 	for (uint32_t a = 0; a < archive->numEntries(); a++) {
+		// Update splash window
+		theSplashWindow->setProgress((float)a / (float)archive->numEntries());
+
 		// Setup new entry
 		ArchiveEntry* entry = archive->getEntry(a);
 		wxListItem li;

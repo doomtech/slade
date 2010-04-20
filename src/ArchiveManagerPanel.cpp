@@ -39,6 +39,7 @@
 #include "ZipArchive.h"
 #include "BaseResourceArchivesPanel.h"
 #include "TextureXEditor.h"
+#include "SplashWindow.h"
 
 
 /*******************************************************************
@@ -332,8 +333,21 @@ void ArchiveManagerPanel::openTextureTab(int archive_index) {
  * Opens an archive and initialises the UI for it
  *******************************************************************/
 void ArchiveManagerPanel::openFile(string filename) {
+	// Show splash screen
+	theSplashWindow->show(_T("Opening Archive..."), true);
+
+	// test
+	wxStopWatch sw;
+	sw.Start();
+
 	// Open the file in the archive manager
 	Archive* new_archive = theArchiveManager->openArchive(filename);
+
+	sw.Pause();
+	wxLogMessage(_T("Opening took %dms"), sw.Time());
+
+	// Hide splash screen
+	theSplashWindow->hide();
 
 	// Check that the archive opened ok
 	if (!new_archive) {

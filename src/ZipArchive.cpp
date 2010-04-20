@@ -30,6 +30,7 @@
  *******************************************************************/
 #include "Main.h"
 #include "ZipArchive.h"
+#include "SplashWindow.h"
 #include <wx/log.h>
 #include <wx/wfstream.h>
 #include <wx/zipstrm.h>
@@ -457,7 +458,9 @@ bool ZipArchive::open(string filename) {
 	// Go through all zip entries
 	int entry_index = 0;
 	wxZipEntry* entry = zip.GetNextEntry();
+	theSplashWindow->setProgressMessage(_T("Reading zip data"));
 	while (entry) {
+		theSplashWindow->setProgress(-1.0f);
 		if (entry->GetMethod() != wxZIP_METHOD_DEFLATE && entry->GetMethod() != wxZIP_METHOD_STORE) {
 			Global::error = _T("Unsupported zip compression method");
 			setMuted(false);
@@ -504,6 +507,7 @@ bool ZipArchive::open(string filename) {
 		entry = zip.GetNextEntry();
 		entry_index++;
 	}
+	theSplashWindow->forceRedraw();
 
 	// Set all entries/directories to unmodified
 	vector<ArchiveEntry*> entry_list;
@@ -518,6 +522,8 @@ bool ZipArchive::open(string filename) {
 	this->filename = filename;
 	setModified(false);
 	on_disk = true;
+
+	theSplashWindow->setProgressMessage(_T(""));
 
 	return true;
 }

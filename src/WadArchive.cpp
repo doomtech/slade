@@ -30,6 +30,7 @@
  *******************************************************************/
 #include "Main.h"
 #include "WadArchive.h"
+#include "SplashWindow.h"
 #include <wx/log.h>
 #include <wx/filename.h>
 
@@ -223,7 +224,11 @@ bool WadArchive::open(MemChunk& mc) {
 
 	// Read the directory
 	mc.seek(dir_offset, SEEK_SET);
+	theSplashWindow->setProgressMessage(_T("Reading wad archive data"));
 	for (uint32_t d = 0; d < num_lumps; d++) {
+		// Update splash window progress
+		theSplashWindow->setProgress(((float)d / (float)num_lumps));
+
 		// Read lump info
 		char name[9] = "";
 		uint32_t offset = 0;
@@ -250,7 +255,6 @@ bool WadArchive::open(MemChunk& mc) {
 		// Create & setup lump
 		ArchiveEntry* nlump = new ArchiveEntry(wxString::FromAscii(name), size, this);
 		nlump->setLoaded(false);
-		//nlump->setExProp(_T("Offset"), s_fmt(_T("%d"), offset));
 		nlump->extraProp(_T("Offset")) = (int)offset;
 		nlump->setState(0);
 
@@ -290,7 +294,12 @@ bool WadArchive::open(MemChunk& mc) {
 
 	// Detect all entry types
 	MemChunk edata;
+	theSplashWindow->setProgressMessage(_T("Detecting entry types"));
 	for (size_t a = 0; a < entries.size(); a++) {
+		// Update splash window progress
+		theSplashWindow->setProgress((((float)a / (float)num_lumps)));
+
+		// Get entry
 		ArchiveEntry* entry = entries[a];
 
 		// Read entry data if it isn't zero-sized
@@ -316,12 +325,15 @@ bool WadArchive::open(MemChunk& mc) {
 	}
 
 	// Detect maps (will detect map entry types)
+	theSplashWindow->setProgressMessage(_T("Detecting maps"));
 	detectMaps();
 
 	// Setup variables
 	setMuted(false);
 	setModified(false);
 	announce(_T("opened"));
+
+	theSplashWindow->setProgressMessage(_T(""));
 
 	return true;
 }
