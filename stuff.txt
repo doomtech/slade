@@ -28,7 +28,7 @@ TODO List ---------------------------------------------------------------
 - ACS script compilation (other languages too)
 
 --- General ---
-- Preferences Menu:
+- Preferences Dialog:
 	- Option not to show save dialog on export (or show only once)
 	- Option to automatically save entry changes
 	- List of entry types, ability to enable/disable detection of certain types

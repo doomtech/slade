@@ -254,7 +254,8 @@ void CTextureCanvas::drawTexture() {
 	// But only if we are drawing stuff outside the texture area
 	if (draw_outside) {
 		for (uint32_t a = 0; a < texture.nPatches(); a++)
-			drawPatch(a, rgba_t(128, 50, 50, 255, 0));
+			drawPatch(a, rgba_t(200, 50, 50, 80, 0));
+			//drawPatch(a, rgba_t(128, 50, 50, 255, 0));
 	}
 
 	// Now, clip to texture boundaries and draw patches fully opaque
