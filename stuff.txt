@@ -1,92 +1,147 @@
-'Shit to do before first release' list (in this order):
-- TEXTUREx editor
-- Text editor (syntax highlighting, script compilation, find/replace)
-- Media panel
-- Entry search
-- Archive merge
-- Convert types on export
-- Fix non-power-of-two textures on cards that don't support it
 
-Feature Requests (from SLumpEd and SLADE):
+--------------------------- SLADE - stuff.txt ---------------------------
+              Big list of unimplemented features, requests,
+            TODOs, ideas, and other general development notes
+-------------------------------------------------------------------------
+
+
+TODO List ---------------------------------------------------------------
+
+--- Before Final 3.0 Release ---
+- TEXTUREx editor
+- Text editor special features
+- Media panel
+- Entry search/filter
+- Archive merging
+- Archive conversion
+- 'Export As' for both entries and archives - does conversion+export
+- Recent files list
+- Proper start page
+
+--- Editor Features ---
+- Map editor (!)
+- Map preview
+- Generic entry data view (for VERTEXES, LINEDEFS, SIDEDEFS, SECTORS, THINGS, DEMO*, TEXTUREX/PNAMES, ...)
+- ANSI screen editor
+- Proper font viewer
+- 'Cleanup' stuff (unused patches, textures, flats, unneeded entries...)
+- ACS script compilation (other languages too)
+
+--- General ---
+- Preferences Menu:
+	- Option not to show save dialog on export (or show only once)
+	- Option to automatically save entry changes
+	- List of entry types, ability to enable/disable detection of certain types
+- *Nicer entry data format (EDF_*) system:
+	- Simple user-definable data formats:
+		- Minimum/maximum size
+		- Byte pattern to look for at a certain offset in the file (ideally allow multiple of these), something like:
+		  pattern = 10, 255, 255, 255, 0; = look for 255,255,255,0 at offset 10 in file
+		- Call inbuilt tests for more complex detection algorithms (wad files, doom gfx, etc)
+	- Handling EntryPanel should be determined by format rather than type as it is now
+- Rearrange menus
+- *Resources system:
+	- opened archives are either used as resources or not
+	- when searching for patches etc, resource archives are searched, then base resource archive
+	- archive list on archive manager panel could have 'resource' checkboxes for each list item
+- Undo/Redo system
+	- Should be general enough to be used by the map editor also
+
+--- Internal / Dev ---
+- Generalised zipdir_t class to replace it and for use elsewhere (ie not just with ArchiveEntries)
+- SFont class
+- Graphical browser
+- Ability to set an archive never to read entry data into memory (read data from the file every time)
+- MemChunk subclass that deals with a file rather than a memory block
+- Rewrite the ListView class with better/advanced features:
+	- Associate with a 'Filter' text control that, when typed into, filters the list by name, eg:
+	  for entries "ENTRY1", "ENTRY2", "ENTRY3", "ENTRY4", "ITEM1", "ITEM5", "TEST2", "TEST3"
+	  filter "ENT" - result "ENTRY1", "ENTRY2", "ENTRY3", "ENTRY4"
+	  filter "*1" - result "ENTRY1", "ITEM1"
+	  filter "*E?T" - result "ENTRY1", "ENTRY2", "ENTRY3", "ENTRY4", "TEST2", "TEST3"
+	  etc...
+	- For the above, a fast method of 'showing/hiding' list items without 'removing' them is needed
+	- Optimise population of list with a large number of items (if possible >_>)
+
+
+
+Unimplemented Feature Requests ------------------------------------------
+
+--- Archive / Entry Management ---
 - mass export to format (XWE)
 - mass rename (XWE)
 - lump name search
-- find/replace in text editor
-- improved TEXTUREx editor (DeepSea)
-- Visual TEXTURES (zdoom format) editor (with the possibility to still edit as text)
-- A right-click -> set lump type or equivalent to force it to read lumps correctly when it failed to identify them automatically (happens a lot to very small sprites)
-TEXTUREx editor:
-  - ability to 'search' for patches or textures by clicking in the list and typing the first few letters of the name, like you can in the lumps list
-  - an option to automatically delete any patches from the wad that aren't used in any defined textures (maybe with option to back them up)
-  - ability to double-click the name of a patch in an existing texture and type in another name, so that you can swap out one patch for another one
-  - ability to move a patch forwards or backwards (i.e. to put it in front of or behind other patches)
-  - list textures and patches in alphabetical order (with non-iwad ones at the bottom of the list)
-  - ability to copy/paste textures (with patches), including between different TEXTUREx entries
-  - find/replace for patches
-- in-editor generation and editing of boom's binary animated/switches lumps. ("generation" in this case just meaning "stick the default one in there as a new lump", with the standard switches and animations from boom's default one, sort of like how a new texture1 lump gets the iwad stuff as a base)
-- 'Edit as Hex' in default entry panel
+
+--- Entry Editing ---
 - SBARINFO viewer/editor
 
+--- Text Editor ---
+- find/replace in text editor
 
-Resources system:
-- opened archives are either used as resources or not
-- when searching for patches etc, resource archives are searched - IWAD archives are searched first
-- archive list on archive manager panel could have 'resource' checkboxes for each list item
+--- TEXTUREx Editor ---
+- ability to 'search' for patches or textures by clicking in the list and typing the first few letters of the name, like you can in the lumps list
+- an option to automatically delete any patches from the wad that aren't used in any defined textures (maybe with option to back them up)
+- ability to double-click the name of a patch in an existing texture and type in another name, so that you can swap out one patch for another one
+- ability to move a patch forwards or backwards (i.e. to put it in front of or behind other patches)
+- list textures and patches in alphabetical order (with non-iwad ones at the bottom of the list)
+- ability to copy/paste textures (with patches), including between different TEXTUREx entries
+- find/replace for patches
+- Visual TEXTURES (zdoom format) editor (with the possibility to still edit as text)
 
-
-Lower Priority:
+--- General ---
+- in-editor generation and editing of boom's binary animated/switches lumps. ("generation" in this case just meaning "stick the default one in there as a new lump", with the standard switches and animations from boom's default one, sort of like how a new texture1 lump gets the iwad stuff as a base)
 - LZMA/Bzip2 support
-- Support for textures larger than video card can handle
-
-
-ToDo List:
-- Map preview
-- Generic entry data view (for VERTEXES, LINEDEFS, SIDEDEFS, SECTORS, THINGS, PLAYPAL, DEMO* ...)
-- ZDoom fonts handling
-- Cleanup menu (unused patches, textures, flats, unneeded entries...)
-- Tall sprites/doomgfx support
-- Option not to show save dialog on export (or show only once)
-- ACS/script compiler
-- Recent files list
-- If a wad is opened from within a zip open it in another tab
-- Auto save changes
-
-
-Programming-wise:
-- Should probably change all memory pointers that are meant to be read-only to const pointers
 
 
 
-Improvements/Features:
-- Better entry type system (ideally user-configurable, and with some kind of subtypes/groups system for entries of different formats but handled in the same way, like gfx etc)
-- Tree view option for entry list
+Ideas / Possible Features -----------------------------------------------
 
-
-Improved Type System:
-- Types differentiated by DATA format rather than arbitrary 'type' (ie Doom Gfx, PNG, JPG, text, etc etc)
-- Define more detailed information via entry exProps perhaps
-- User-defined, separate 'data format' from 'type'
-  - Define data formats by:
-    - Minimum/maximum size
-    - Byte pattern to look for at a certain offset in the file (ideally allow multiple of these)
-      something like:
-      pattern = 10, 255, 255, 255, 0; = look for 255,255,255,0 at offset 10 in file
-    - Some inbuilt tests for more complex things (wad files, doom gfx etc)
-  - Define types by:
-    - Data format (can be 'any' but not a good idea)
-      format = text; (data is text format)
-    - Filename to look for
-      filename = "animdefs", 0; (filename is "animdefs", not case-sensitive)
-    - Extension to look for
-      extension = "acs";
-
-
-Ideas:
+- Tree view for entry list (optional)
 - Ability to perform all archive/entry management functions via the console (possibly allow scripts too?)
 - 'Animation viewer' (select a bunch of sprites to test an animation or whatever)
+- Hex editor
+- Font editor
+- *Project system:
+	- Hide/abstract underlying archive/entry stuff
+	- Will need to specify a 'game' for the project to enable/disable certain features:
+		- Changes the way certain things are handled (ie vanilla will have separate textures/flats where zdoom will have just textures)
+		- Limits resource formats to what is supported (PNG in zdoom but not vanilla)
+	- Work with 'resources' rather than entries
+	- Resources imported from archives
+	- Resource types:
+		- Graphics:
+			- Textures
+			- Flats (for games that don't support mixing of flats/textures only)
+			- Sprites
+		- Maps
+		- Audio:
+			- Sounds
+			- Music
+		- etc...
+		- Data (anything that doesn't fit into the above categories)
+	- Resources can either be internal or external:
+		- Internal means the resource is imported into the project and exported with it
+		- External means the resource exists in an external archive and will not be exported with the project
+		  (for resources in an IWAD, texture pack, etc)
+	- Ability to export project to archive(s):
+		- Can export all resources to a single archive
+		- Can 'split' resources to separate archives (ie one for textures, another for maps, etc)
+- Archive/Entry information database:
+	- Store within the archive or in a separate file (optional)
+	- Keeps information about archive entries:
+		- CRC (will be used to determine if the info is up-to-date)
+		- Extra properties
+		- Entry type
 
 
-Completed Features/Requests
+
+Other / Notes -----------------------------------------------------------
+
+
+
+
+Completed Feature Requests ----------------------------------------------
+
 - In the image viewer, a drop-down list for display method: automatic (let the program determine), world sprite (with the crossed axes), hud sprite (in the box), graphics (without axes nor box). The automatic selection, based on offset values, isn't always accurate.
 - Still in the image viewer, another drop-down list which lets you select which palette to use, from a list of named palettes that you can create elsewhere. (I imagine a res/palette folder in which we could just export PLAYPAL lumps, giving them names like "Doom.pal", "Heretic.pal", "Simplicity.pal" etc.) With of course a default to use the PLAYPAL from the current file, if any, or that of the selected main iwad. But we'd get to change it if so we want.
 - Palette conversion
