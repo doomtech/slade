@@ -111,11 +111,7 @@ bool zipdir_t::entryExists(ArchiveEntry* entry, bool include_subdirs) {
  *******************************************************************/
 ArchiveEntry* zipdir_t::getEntry(string name, bool include_subdirs) {
 	for (size_t a = 0; a < entries.size(); a++) {
-		if (!entries[a]->getName().Cmp(name))
-			return entries[a];
-		// What if, for example, PNAMES is called pnames.lmp?
-		// Try again without the extension.
-		if (!entries[a]->getName(true).CmpNoCase(name))
+		if (entries[a]->getName().Lower().Matches(name.Lower()))
 			return entries[a];
 	}
 
@@ -155,9 +151,7 @@ ArchiveEntry* zipdir_t::getEntry(int edftype, bool include_subdirs) {
 
 void zipdir_t::getEntries(vector<ArchiveEntry*> &ret, string name, bool include_subdirs) {
 	for (size_t a = 0; a < entries.size(); a++) {
-		if (!entries[a]->getName().Cmp(name))
-			ret.push_back(entries[a]);
-		else if (!entries[a]->getName(true).CmpNoCase(name))
+		if (entries[a]->getName().Lower().Matches(name.Lower()))
 			ret.push_back(entries[a]);
 	}
 	// FIXME: Blah slow blah not optimized

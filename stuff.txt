@@ -53,6 +53,7 @@ TODO List ---------------------------------------------------------------
 - Graphical browser
 - Ability to set an archive never to read entry data into memory (read data from the file every time)
 - MemChunk subclass that deals with a file rather than a memory block
+- Some lump (sub)formats can only be identified properly from the presence of other lumps; e.g. GL nodes and THINGS/LINEDEFS
 - Rewrite the ListView class with better/advanced features:
 	- Associate with a 'Filter' text control that, when typed into, filters the list by name, eg:
 	  for entries "ENTRY1", "ENTRY2", "ENTRY3", "ENTRY4", "ITEM1", "ITEM5", "TEST2", "TEST3"
@@ -62,7 +63,7 @@ TODO List ---------------------------------------------------------------
 	  etc...
 	- For the above, a fast method of 'showing/hiding' list items without 'removing' them is needed
 	- Optimise population of list with a large number of items (if possible >_>)
-
+- Fine-tune identification of Doom SFX lumps if possible (most fail the test at the moment)
 
 
 Unimplemented Feature Requests ------------------------------------------
@@ -90,7 +91,7 @@ Unimplemented Feature Requests ------------------------------------------
 
 --- General ---
 - in-editor generation and editing of boom's binary animated/switches lumps. ("generation" in this case just meaning "stick the default one in there as a new lump", with the standard switches and animations from boom's default one, sort of like how a new texture1 lump gets the iwad stuff as a base)
-- LZMA/Bzip2 support
+- Support for LZMA, Bzip2 and zip formats other than store and deflate
 
 
 
@@ -126,13 +127,14 @@ Ideas / Possible Features -----------------------------------------------
 	- Ability to export project to archive(s):
 		- Can export all resources to a single archive
 		- Can 'split' resources to separate archives (ie one for textures, another for maps, etc)
+	- A system of cascading configurations will be needed to handle all the game/port/format combinations
 - Archive/Entry information database:
 	- Store within the archive or in a separate file (optional)
 	- Keeps information about archive entries:
 		- CRC (will be used to determine if the info is up-to-date)
 		- Extra properties
 		- Entry type
-
+- Model viewer?
 
 
 Other / Notes -----------------------------------------------------------

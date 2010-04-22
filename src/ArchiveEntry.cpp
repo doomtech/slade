@@ -72,7 +72,7 @@ ArchiveEntry::ArchiveEntry(ArchiveEntry& copy) {
 	size = copy.getSize();
 	data_loaded = true;
 	type = copy.type;
-	locked = copy.isLocked();
+	locked = false;
 
 	// Copy data
 	data.importMem(copy.getData(true), copy.getSize());
