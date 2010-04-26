@@ -3,6 +3,7 @@
 #define __CTEXTURE_H__
 
 #include "TextureXList.h"
+#include "PatchTable.h"
 #include "Tokenizer.h"
 #include "PropertyList.h"
 

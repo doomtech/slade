@@ -123,25 +123,13 @@ struct ftdef_t
  * Reads in a doom-format TEXTUREx entry. Returns true on success,
  * false otherwise
  *******************************************************************/
-bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, ArchiveEntry* pnames) {
+bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex) {
 	// Check entries were actually given
 	if (!texturex)
 		return false;
 
 	// Clear current textures
 	clear();
-
-	// Read PNAMES
-	if (!pnames && texturex->getParent())
-		pnames = texturex->getParent()->getEntry(_T("PNAMES"));		// If no pnames entry given, first search TEXTUREx parent archive
-	if (!pnames)
-		pnames = theArchiveManager->getResourceEntry(_T("PNAMES"));	// Next search resource archives
-	if (!pnames) {
-		wxLogMessage(_T("PNAMES entry not found"));
-		return false;
-	}
-	if (!patches.loadPNAMES(pnames))
-		return false;
 
 	// Read TEXTUREx
 
