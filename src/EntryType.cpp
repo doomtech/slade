@@ -485,9 +485,15 @@ bool EntryDataFormat::detectDoomLegacy(MemChunk& mc) {
 	uint32_t size = mc.getSize();
 	if (size < 9)
 		return false;
-	uint32_t width  = mc[0] + (mc[1]<<8) + (mc[2]<<16) + (mc[3]<<24);
-	uint32_t height = mc[4] + (mc[5]<<8) + (mc[6]<<16) + (mc[7]<<24);
-	if (size != (8 + width * height))
+	// These three values must all be zeroes
+	if (mc[2] | mc[6] | mc[7])
+		return false;
+	if (mc[3] > 4)
+		return false;
+	uint8_t bpp = (mc[3]?mc[3]:1);
+	uint16_t width  = mc[0] + (mc[1]<<8);
+	uint16_t height = mc[4] + (mc[5]<<8);
+	if (size != (8 + width * height * bpp))
 		return false;
 	return true;
 }

@@ -662,29 +662,75 @@ bool SImage::loadDoomFlat(const uint8_t* gfx_data, int size) {
  * Loads one of those weird Legacy screens with a header.
  * Returns false if the image data was invalid, true otherwise.
  *******************************************************************/
+enum LegacyPicType
+{
+	LEG_PALETTE		= 0,
+	LEG_INTENSITY	= 1,
+	LEG_ALPHA		= 2,
+	LEG_RGB24		= 3,
+	LEG_RGB32		= 4
+};
 bool SImage::loadDoomLegacy(const uint8_t* gfx_data, int size) {
 	// Check data
 	if (!gfx_data)
 		return false;
 
 	// Setup variables
-	width = wxINT32_SWAP_ON_BE(*(const uint32_t*)(gfx_data));
-	height = wxINT32_SWAP_ON_BE(*(const uint32_t*)(gfx_data+4));
+	width = wxINT16_SWAP_ON_BE(*(const uint16_t*)(gfx_data));
+	height = wxINT16_SWAP_ON_BE(*(const uint16_t*)(gfx_data+4));
+	uint8_t mode = gfx_data[3];
 	offset_x = 0;
 	offset_y = 0;
-	format = PALMASK;
-	has_palette = false;
+	if (mode < LEG_RGB24)
+		format = PALMASK;
+	else format = RGBA;
+	if (mode == 0 || mode > LEG_ALPHA)
+		has_palette = false;
+	else {
+		// Picture is an intensity map, so use greyscale palette
+		has_palette = true;
+		for (size_t i = 0; i < 256; ++i) {
+			palette.setColour(i, rgba_t(i, i, i, 255));
+		}
+	}
 
 	// Clear current data if it exists
 	clearData();
 
-	// Read raw pixel data
-	data = new uint8_t[width*height];
-	memcpy(data, gfx_data+8, width * height);
+	if (mode == LEG_PALETTE) {
+		// Read raw pixel data
+		data = new uint8_t[width*height];
+		memcpy(data, gfx_data+8, width * height);
 
-	// Create mask (all opaque)
-	mask = new uint8_t[width*height];
-	memset(mask, 255, width*height);
+		// Create mask (all opaque)
+		mask = new uint8_t[width*height];
+		memset(mask, 255, width*height);
+	} else if (mode == LEG_INTENSITY) {
+		// Read raw pixel data
+		data = mask = new uint8_t[width*height];
+		memcpy(data, gfx_data+8, width * height);
+	} else if (mode == LEG_ALPHA) {
+		// Read raw pixel data
+		data = new uint8_t[width*height];
+		mask = new uint8_t[width*height];
+		for (int i = 0; i < size - 8; i+=2) {
+			data[i/2] = gfx_data[i+8];
+			mask[i/2] = gfx_data[i+9];
+		}
+	} else if (mode == LEG_RGB24) {
+		// Read raw pixel data
+		data = new uint8_t[width*height*4];
+		for (int i = 0; i < size - 8; i+=3) {
+			data[(i/3)*4  ] = gfx_data[i+ 8];
+			data[(i/3)*4+1] = gfx_data[i+ 9];
+			data[(i/3)*4+2] = gfx_data[i+10];
+			data[(i/3)*4+3] = 255;
+		}
+	} else if (mode == LEG_RGB32) {
+		// Read raw pixel data
+		data = new uint8_t[width*height*4];
+		memcpy(data, gfx_data+8, width * height * 4);
+	}
 
 	// Announce change
 	announce(_T("image_changed"));
