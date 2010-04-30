@@ -103,8 +103,12 @@ TextureEditorPanel::TextureEditorPanel(wxWindow* parent, PatchTable* patch_table
 	spin_tex_scaley->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &TextureEditorPanel::onTexScaleYChanged, this);
 	list_patches->Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &TextureEditorPanel::onPatchListSelect, this);
 	list_patches->Bind(wxEVT_COMMAND_LIST_ITEM_DESELECTED, &TextureEditorPanel::onPatchListDeSelect, this);
+	btn_patch_add->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureEditorPanel::onBtnPatchAdd, this);
+	btn_patch_remove->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureEditorPanel::onBtnPatchRemove, this);
 	btn_patch_back->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureEditorPanel::onBtnPatchBack, this);
 	btn_patch_forward->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureEditorPanel::onBtnPatchForward, this);
+	btn_patch_replace->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureEditorPanel::onBtnPatchReplace, this);
+	btn_patch_duplicate->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureEditorPanel::onBtnPatchDuplicate, this);
 	spin_patch_left->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &TextureEditorPanel::onPatchPositionXChanged, this);
 	spin_patch_top->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &TextureEditorPanel::onPatchPositionYChanged, this);
 
@@ -554,6 +558,49 @@ void TextureEditorPanel::onPatchListDeSelect(wxListEvent &e) {
 	updatePatchControls();
 }
 
+/* TextureEditorPanel::onBtnPatchAdd
+ * Called when the 'add patch' button is pressed
+ *******************************************************************/
+void TextureEditorPanel::onBtnPatchAdd(wxCommandEvent& e) {
+	// Get texture
+	CTexture& tex = tex_canvas->getTexture();
+
+	// Add new patch (temporary, testing)
+	tex.addPatch(patch_table->patch(0));
+
+	// Update UI
+	populatePatchList();
+	updatePatchControls();
+}
+
+/* TextureEditorPanel::onBtnPatchRemove
+ * Called when the 'remove patch' button is pressed
+ *******************************************************************/
+void TextureEditorPanel::onBtnPatchRemove(wxCommandEvent& e) {
+	// Get selection
+	wxArrayInt selection = list_patches->selectedItems();
+
+	// Do nothing if no patches are selected
+	if (selection.size() == 0)
+		return;
+
+	// Get texture
+	CTexture& tex = tex_canvas->getTexture();
+
+	// Remove each selected patch
+	for (int a = selection.size()-1; a >= 0; a--) {
+		int index = selection[a];
+		// Remove patch from texture
+		tex.removePatch(index);
+
+		// Remove patch from list
+		list_patches->DeleteItem(index);
+	}
+
+	// Update UI
+	updatePatchControls();
+}
+
 /* TextureEditorPanel::onBtnPatchBack
  * Called when the 'send patch back' button is pressed
  *******************************************************************/
@@ -602,6 +649,69 @@ void TextureEditorPanel::onBtnPatchForward(wxCommandEvent &e) {
 	// Update UI
 	updatePatchControls();
 	tex_canvas->Refresh();
+}
+
+/* TextureEditorPanel::onBtnPatchReplace
+ * Called when the 'replace patch' button is pressed
+ *******************************************************************/
+void TextureEditorPanel::onBtnPatchReplace(wxCommandEvent& e) {
+	// Get selection
+	wxArrayInt selection = list_patches->selectedItems();
+
+	// Do nothing if no patches are selected
+	if (selection.size() == 0)
+		return;
+
+	// Get texture
+	CTexture& tex = tex_canvas->getTexture();
+
+	// Go through selection and replace each patch (temporary, testing)
+	for (size_t a = 0; a < selection.size(); a++)
+		tex.replacePatch(selection[a], patch_table->patch(0));
+
+	// Repopulate patch list
+	populatePatchList();
+
+	// Restore selection
+	for (size_t a = 0; a < selection.size(); a++)
+		list_patches->selectItem(selection[a]);
+
+	// Update UI
+	updatePatchControls();
+}
+
+/* TextureEditorPanel::onBtnPatchDuplicate
+ * Called when the 'duplicate patch' button is pressed
+ *******************************************************************/
+void TextureEditorPanel::onBtnPatchDuplicate(wxCommandEvent& e) {
+	// Get selection
+	wxArrayInt selection = list_patches->selectedItems();
+
+	// Do nothing if no patches are selected
+	if (selection.size() == 0)
+		return;
+
+	// Get texture
+	CTexture& tex = tex_canvas->getTexture();
+
+	// Go through selection backwards
+	for (int a = selection.size()-1; a >= 0; a--) {
+		// Duplicate selected patch
+		tex.duplicatePatch(selection[a]);
+	}
+
+	// Repopulate patch list
+	populatePatchList();
+
+	// Update selection
+	int offset = 1;
+	for (size_t a = 0; a < selection.size(); a++) {
+		list_patches->selectItem(selection[a] + offset);
+		offset++;
+	}
+
+	// Update UI
+	updatePatchControls();
 }
 
 /* TextureEditorPanel::onPatchPositionXChanged

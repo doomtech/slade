@@ -65,8 +65,12 @@ public:
 	void	onTexScaleYChanged(wxSpinEvent& e);
 	void	onPatchListSelect(wxListEvent& e);
 	void	onPatchListDeSelect(wxListEvent& e);
+	void	onBtnPatchAdd(wxCommandEvent& e);
+	void	onBtnPatchRemove(wxCommandEvent& e);
 	void	onBtnPatchBack(wxCommandEvent& e);
 	void	onBtnPatchForward(wxCommandEvent& e);
+	void	onBtnPatchReplace(wxCommandEvent& e);
+	void	onBtnPatchDuplicate(wxCommandEvent& e);
 	void	onPatchPositionXChanged(wxSpinEvent& e);
 	void	onPatchPositionYChanged(wxSpinEvent& e);
 };

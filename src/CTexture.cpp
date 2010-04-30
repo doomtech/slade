@@ -103,11 +103,75 @@ void CTexture::clear() {
 }
 
 /* CTexture::addPatch
- * Adds a patch to the texture with the given attributes
+ * Adds a patch to the texture with the given attributes, at [index].
+ * If [index] is -1, the patch is added to the end of the list
  *******************************************************************/
-bool CTexture::addPatch(patch_t& patch, int16_t offset_x, int16_t offset_y) {
+bool CTexture::addPatch(patch_t& patch, int16_t offset_x, int16_t offset_y, int index) {
+	// Create new patch
 	CTPatch np(patch, offset_x, offset_y);
-	patches.push_back(np);
+
+	// Add it either after [index] or at the end
+	if (index >= 0 && index < patches.size())
+		patches.insert(patches.begin() + index, np);
+	else
+		patches.push_back(np);
+
+	// Announce
+	announce(_T("patches_modified"));
+
+	return true;
+}
+
+/* CTexture::removePatch
+ * Removes the patch at [index]. Returns false if [index] is invalid,
+ * true otherwise
+ *******************************************************************/
+bool CTexture::removePatch(size_t index) {
+	// Check index
+	if (index >= patches.size())
+		return false;
+
+	// Remove the patch
+	patches.erase(patches.begin() + index);
+
+	// Announce
+	announce(_T("patches_modified"));
+
+	return true;
+}
+
+bool CTexture::replacePatch(size_t index, patch_t newpatch) {
+	// Check index
+	if (index >= patches.size())
+		return false;
+
+	// Replace patch at [index] with new
+	patches[index].setPatchName(newpatch.name);
+	patches[index].setPatchEntry(newpatch.entry);
+
+	// Announce
+	announce(_T("patches_modified"));
+
+	return true;
+}
+
+bool CTexture::duplicatePatch(size_t index, int16_t offset_x, int16_t offset_y) {
+	// Check index
+	if (index >= patches.size())
+		return false;
+
+	// Get patch info
+	CTPatch dp = patches[index];
+
+	// Add duplicate patch
+	patches.insert(patches.begin() + index, dp);
+
+	// Offset patch by given amount
+	patches[index+1].setOffsetX(dp.xOffset() + offset_x);
+	patches[index+1].setOffsetY(dp.yOffset() + offset_y);
+
+	// Announce
+	announce(_T("patches_modified"));
 
 	return true;
 }
@@ -125,6 +189,9 @@ bool CTexture::swapPatches(size_t p1, size_t p2) {
 	CTPatch temp = patches[p1];
 	patches[p1] = patches[p2];
 	patches[p2] = temp;
+
+	// Announce
+	announce(_T("patches_modified"));
 
 	return true;
 }

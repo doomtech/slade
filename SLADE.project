@@ -266,4 +266,10 @@
   </Settings>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>
+  <VirtualDirectory Name="zFiles">
+    <File Name="stuff.txt"/>
+    <File Name="udmf11.txt"/>
+    <File Name="udmf_zdoom.txt"/>
+    <File Name="dist/slade.pk3"/>
+  </VirtualDirectory>
 </CodeLite_Project>

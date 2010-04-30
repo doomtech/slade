@@ -6,10 +6,11 @@
 #include "CTexture.h"
 #include "Palette.h"
 #include "GLTexture.h"
+#include "ListenerAnnouncer.h"
 
 wxDECLARE_EVENT(EVT_DRAG_END, wxCommandEvent);
 
-class CTextureCanvas : public OGLCanvas {
+class CTextureCanvas : public OGLCanvas, Listener {
 private:
 	CTexture			texture;
 	vector<GLTexture*>	patch_textures;
@@ -52,6 +53,9 @@ public:
 
 	bool	swapPatches(size_t p1, size_t p2);
 
+	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
+
+	// Events
 	void	onMouseEvent(wxMouseEvent& e);
 };
 

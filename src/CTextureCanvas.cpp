@@ -59,6 +59,9 @@ CTextureCanvas::CTextureCanvas(wxWindow* parent, int id)
 	Bind(wxEVT_MOTION, &CTextureCanvas::onMouseEvent, this);
 	Bind(wxEVT_LEFT_UP, &CTextureCanvas::onMouseEvent, this);
 	Bind(wxEVT_LEAVE_WINDOW, &CTextureCanvas::onMouseEvent, this);
+
+	// Listen to texture
+	listenTo(&texture);
 }
 
 /* CTextureCanvas::~CTextureCanvas
@@ -423,13 +426,34 @@ bool CTextureCanvas::swapPatches(size_t p1, size_t p2) {
 	patch_textures[p1] = patch_textures[p2];
 	patch_textures[p2] = temp;
 
-	// Swap selection
-	//bool sel = selected_patches[p1];
-	//selected_patches[p1] = selected_patches[p2];
-	//selected_patches[p2] = sel;
-
 	// Swap patches in the texture itself
 	return texture.swapPatches(p1, p2);
+}
+
+void CTextureCanvas::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
+	// If the announcer isn't this canvas' texture, ignore it
+	if (announcer != &texture)
+		return;
+
+	// Texture modified
+	if (event_name == _T("modified"))
+		Refresh();
+
+	// Patches modified
+	if (event_name == _T("patches_modified")) {
+		// Reload patches
+		selected_patches.clear();
+		clearPatchTextures();
+		for (uint32_t a = 0; a < texture.nPatches(); a++) {
+			// Create GL texture
+			patch_textures.push_back(new GLTexture());
+
+			// Set selection
+			selected_patches.push_back(false);
+		}
+
+		Refresh();
+	}
 }
 
 /* CTextureCanvas::onMouseEvent

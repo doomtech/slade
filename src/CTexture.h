@@ -6,6 +6,7 @@
 #include "PatchTable.h"
 #include "Tokenizer.h"
 #include "PropertyList.h"
+#include "ListenerAnnouncer.h"
 
 class CTPatch {
 private:
@@ -31,7 +32,7 @@ public:
 	void			setOffsetY(int16_t offset) { offset_y = offset; }
 };
 
-class CTexture {
+class CTexture : public Announcer {
 private:
 	string			name;
 	uint16_t		width;
@@ -53,15 +54,18 @@ public:
 	size_t		nPatches() { return patches.size(); }
 	CTPatch*	getPatch(size_t index);
 
-	void	setName(string name) { this->name = name; }
-	void	setWidth(uint16_t width) { this->width = width; }
-	void	setHeight(uint16_t height) { this->height = height; }
-	void	setScaleX(double scale) { this->scale_x = scale; }
-	void	setScaleY(double scale) { this->scale_y = scale; }
+	void	setName(string name) { this->name = name; announce(_T("modified")); }
+	void	setWidth(uint16_t width) { this->width = width; announce(_T("modified")); }
+	void	setHeight(uint16_t height) { this->height = height; announce(_T("modified")); }
+	void	setScaleX(double scale) { this->scale_x = scale; announce(_T("modified")); }
+	void	setScaleY(double scale) { this->scale_y = scale; announce(_T("modified")); }
 
 	void	clear();
 
-	bool	addPatch(patch_t& patch, int16_t offset_x = 0, int16_t offset_y = 0);
+	bool	addPatch(patch_t& patch, int16_t offset_x = 0, int16_t offset_y = 0, int index = -1);
+	bool	removePatch(size_t index);
+	bool	replacePatch(size_t index, patch_t newpatch);
+	bool	duplicatePatch(size_t index, int16_t offset_x = 8, int16_t offset_y = 8);
 	bool	swapPatches(size_t p1, size_t p2);
 
 	bool	fromTX(tx_texture_t& info, PatchTable& ptable);
