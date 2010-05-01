@@ -14,7 +14,6 @@ class CTextureCanvas : public OGLCanvas, Listener {
 private:
 	CTexture			texture;
 	vector<GLTexture*>	patch_textures;
-	GLTexture*			tex_background;
 	vector<bool>		selected_patches;
 	int					hilight_patch;
 	fpoint2_t			offset;
@@ -42,7 +41,7 @@ public:
 	void	updatePatchTextures();
 	bool	openTexture(tx_texture_t& tex, PatchTable& ptable);
 	void	draw();
-	void	drawChequeredBackground();
+	void	drawCheckeredBackground();
 	void	drawTexture();
 	void	drawPatch(int num, rgba_t col = COL_WHITE);
 	void	drawTextureBorder();

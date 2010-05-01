@@ -49,7 +49,6 @@
 CTextureCanvas::CTextureCanvas(wxWindow* parent, int id)
 : OGLCanvas(parent, id) {
 	// Init variables
-	tex_background = new GLTexture();
 	scale = 1.0;
 	hilight_patch = -1;
 	draw_outside = true;
@@ -69,7 +68,6 @@ CTextureCanvas::CTextureCanvas(wxWindow* parent, int id)
  *******************************************************************/
 CTextureCanvas::~CTextureCanvas() {
 	clearPatchTextures();
-	delete tex_background;
 }
 
 /* CTextureCanvas::selectPatch
@@ -185,7 +183,7 @@ void CTextureCanvas::draw() {
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
 	// Draw background
-	drawChequeredBackground();
+	drawCheckeredBackground();
 
 	 // Pan by view offset
 	glTranslated(offset.x, offset.y, 0);
@@ -198,23 +196,19 @@ void CTextureCanvas::draw() {
 	SwapBuffers();
 }
 
-/* CTextureCanvas::drawChequeredBackground
- * Fills the canvas with a chequered pattern (used as the
+/* CTextureCanvas::drawCheckeredBackground
+ * Fills the canvas with a checkered pattern (used as the
  * 'background' - to indicate transparency)
  *******************************************************************/
-void CTextureCanvas::drawChequeredBackground() {
+void CTextureCanvas::drawCheckeredBackground() {
 	// Save current matrix
 	glPushMatrix();
-
-	// Generate background texture if needed
-	if (!tex_background->isLoaded())
-		tex_background->genChequeredTexture(8, rgba_t(64, 64, 80, 255), rgba_t(80, 80, 96, 255));
 
 	// Enable textures
 	glEnable(GL_TEXTURE_2D);
 
 	// Bind background texture
-	tex_background->bind();
+	GLTexture::bgTex().bind();
 
 	// Draw background
 	frect_t rect(0, 0, GetSize().x, GetSize().y);

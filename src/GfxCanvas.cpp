@@ -53,7 +53,6 @@ GfxCanvas::GfxCanvas(wxWindow* parent, int id)
 	view_type = GFXVIEW_DEFAULT;
 	scale = 1;
 	tex_image = new GLTexture();
-	tex_background = new GLTexture();
 	update_texture = false;
 	image_hilight = false;
 	drag_pos.set(0, 0);
@@ -78,7 +77,6 @@ GfxCanvas::GfxCanvas(wxWindow* parent, int id)
 GfxCanvas::~GfxCanvas() {
 	delete image;
 	delete tex_image;
-	delete tex_background;
 }
 
 /* GfxCanvas::draw
@@ -101,7 +99,7 @@ void GfxCanvas::draw() {
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
 	// Draw the background
-	drawChequeredBackground();
+	drawCheckeredBackground();
 
 	// Pan by view offset
 	if (allow_scroll)
@@ -170,23 +168,19 @@ void GfxCanvas::drawOffsetLines() {
 	}
 }
 
-/* GfxCanvas::drawChequeredBackground
- * Fills the canvas with a chequered pattern (used as the
+/* GfxCanvas::drawCheckeredBackground
+ * Fills the canvas with a checkered pattern (used as the
  * 'background' - to indicate transparency)
  *******************************************************************/
-void GfxCanvas::drawChequeredBackground() {
+void GfxCanvas::drawCheckeredBackground() {
 	// Save current matrix
 	glPushMatrix();
-
-	// Generate background texture if needed
-	if (!tex_background->isLoaded())
-		tex_background->genChequeredTexture(8, rgba_t(64, 64, 80, 255), rgba_t(80, 80, 96, 255));
 
 	// Enable textures
 	glEnable(GL_TEXTURE_2D);
 
 	// Bind background texture
-	tex_background->bind();
+	GLTexture::bgTex().bind();
 
 	// Draw background
 	frect_t rect(0, 0, GetSize().x, GetSize().y);
@@ -370,7 +364,7 @@ void GfxCanvas::endOffsetDrag() {
 		// Set image offsets
 		image->setXOffset(image->offset().x - x);
 		image->setYOffset(image->offset().y - y);
-		
+
 		// Generate event
 		wxNotifyEvent e(wxEVT_GFXCANVAS_OFFSET_CHANGED, GetId());
 		e.SetEventObject(this);

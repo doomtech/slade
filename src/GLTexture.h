@@ -18,6 +18,9 @@ private:
 	bool				loaded;
 	bool				allow_split;
 
+	// Some generic/global textures
+	static GLTexture	tex_background;	// Checkerboard background texture
+
 public:
 	GLTexture(bool allow_split = true);
 	~GLTexture();
@@ -36,6 +39,8 @@ public:
 	bool	bind();
 	bool	draw2d(double x = 0, double y = 0);
 	bool	draw2dTiled(uint32_t width, uint32_t height);
+
+	static GLTexture&	bgTex();
 };
 
 #endif//__GLTEXTURE_H__

@@ -33,6 +33,12 @@
 
 
 /*******************************************************************
+ * VARIABLES
+ *******************************************************************/
+GLTexture GLTexture::tex_background;
+
+
+/*******************************************************************
  * GLTEXTURE CLASS FUNCTIONS
  *******************************************************************/
 
@@ -375,4 +381,11 @@ bool GLTexture::draw2dTiled(uint32_t width, uint32_t height) {
 	}
 
 	return true;
+}
+
+GLTexture& GLTexture::bgTex() {
+	if (!tex_background.isLoaded())
+		tex_background.genChequeredTexture(8, rgba_t(64, 64, 80, 255), rgba_t(80, 80, 96, 255));
+
+	return tex_background;
 }

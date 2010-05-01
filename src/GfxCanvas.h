@@ -22,7 +22,6 @@ private:
 	double		scale;
 	fpoint2_t	offset;
 	GLTexture*	tex_image;
-	GLTexture*	tex_background;
 	bool		update_texture;
 	bool		image_hilight;
 	bool		image_split;
@@ -47,7 +46,7 @@ public:
 	void	allowScroll(bool allow) { allow_scroll = allow; }
 
 	void	draw();
-	void	drawChequeredBackground();
+	void	drawCheckeredBackground();
 	void	drawImage();
 	void	drawOffsetLines();
 	void	updateImageTexture();
