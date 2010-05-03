@@ -88,6 +88,7 @@ Unimplemented Feature Requests ------------------------------------------
 - ability to copy/paste textures (with patches), including between different TEXTUREx entries
 - find/replace for patches
 - Visual TEXTURES (zdoom format) editor (with the possibility to still edit as text)
+- Ability to convert composite texture to single image
 
 --- General ---
 - in-editor generation and editing of boom's binary animated/switches lumps. ("generation" in this case just meaning "stick the default one in there as a new lump", with the standard switches and animations from boom's default one, sort of like how a new texture1 lump gets the iwad stuff as a base)
