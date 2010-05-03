@@ -250,16 +250,15 @@ bool ZipArchivePanel::newEntryFromFile() {
 			string name = wxFileName(files[a]).GetFullName();
 
 			// If only 1 file was selected, prompt for an entry name
-			if (files.size() == 1) {
+			if (files.size() == 1)
 				name = wxGetTextFromUser(_T("Enter new entry name:"), _T("New Entry"), name);
 
-				// Get the current directory
-				zipdir_t* dir = ((ZipEntryListPanel*)entry_list)->getCurrentDir();
+			// Get the current directory
+			zipdir_t* dir = ((ZipEntryListPanel*)entry_list)->getCurrentDir();
 
-				// If an absolute path wasn't given, add the current directory before the name
-				if (!name.StartsWith(_T("/")))
-					name = dir->getFullPath() + name;
-			}
+			// If an absolute path wasn't given, add the current directory before the name
+			if (!name.StartsWith(_T("/")))
+				name = dir->getFullPath() + name;
 
 			// Add the entry to the archive
 			ArchiveEntry* new_entry = archive->addNewEntry(name, index);
