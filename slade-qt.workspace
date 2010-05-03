@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CodeLite_Workspace Name="slade-qt" Database="./slade-qt.tags">
+  <Project Name="slade" Path="slade.project" Active="Yes"/>
+  <BuildMatrix>
+    <WorkspaceConfiguration Name="Win32_Release" Selected="no">
+      <Project Name="slade" ConfigName="Win32_Release"/>
+    </WorkspaceConfiguration>
+    <WorkspaceConfiguration Name="Win32_Debug" Selected="yes">
+      <Project Name="slade" ConfigName="Win32_Debug"/>
+    </WorkspaceConfiguration>
+    <WorkspaceConfiguration Name="Unix_Debug" Selected="no">
+      <Project Name="slade" ConfigName="Unix_Debug"/>
+    </WorkspaceConfiguration>
+    <WorkspaceConfiguration Name="Unix_Release" Selected="no">
+      <Project Name="slade" ConfigName="Unix_Release"/>
+    </WorkspaceConfiguration>
+  </BuildMatrix>
+</CodeLite_Workspace>
