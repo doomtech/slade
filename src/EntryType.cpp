@@ -115,6 +115,18 @@ bool EntryDataFormat::detectBmp(MemChunk& mc) {
 	return false;
 }
 
+bool EntryDataFormat::detectGif(MemChunk& mc) {
+	// Check size
+	if (mc.getSize() > 6) {
+		// Check for GIF header
+		if (mc[0] == 'G' && mc[1] == 'I' && mc[2] == 'F' && mc[3] == '8' && 
+			(mc[4] == '7' || mc[4] =='9') && mc[5] == 'a')
+			return true;
+	}
+
+	return false;
+}
+
 bool EntryDataFormat::detectPcx(MemChunk& mc) {
 	// Check size
 	if (mc.getSize() < 129)

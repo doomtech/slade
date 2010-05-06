@@ -111,7 +111,7 @@ bool CTexture::addPatch(patch_t& patch, int16_t offset_x, int16_t offset_y, int 
 	CTPatch np(patch, offset_x, offset_y);
 
 	// Add it either after [index] or at the end
-	if (index >= 0 && index < patches.size())
+	if (index >= 0 && (unsigned) index < patches.size())
 		patches.insert(patches.begin() + index, np);
 	else
 		patches.push_back(np);

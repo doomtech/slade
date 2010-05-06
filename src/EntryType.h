@@ -25,6 +25,7 @@ public:
 
 	static bool detectPng(MemChunk& mc);
 	static bool detectBmp(MemChunk& mc);
+	static bool detectGif(MemChunk& mc);
 	static bool detectPcx(MemChunk& mc);
 	static bool detectTga(MemChunk& mc);
 	static bool detectTiff(MemChunk& mc);
