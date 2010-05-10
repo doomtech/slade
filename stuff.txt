@@ -63,7 +63,9 @@ TODO List ---------------------------------------------------------------
 	  etc...
 	- For the above, a fast method of 'showing/hiding' list items without 'removing' them is needed
 	- Optimise population of list with a large number of items (if possible >_>)
+	- Really looking like wxListCtrl isn't much suited to this purpose, should look into wxDataViewCtrl
 - Fine-tune identification of Doom SFX lumps if possible (most fail the test at the moment)
+- Should probably merge MultiEntryPanel stuff into DefaultEntryPanel
 
 
 Unimplemented Feature Requests ------------------------------------------
