@@ -211,6 +211,10 @@ void GfxCanvas::drawImage() {
 	// Save current matrix
 	glPushMatrix();
 
+	// For mysterious reasons, the top pixels are cut off if the image isn't panned down first.
+	if (view_type == GFXVIEW_DEFAULT)
+		glTranslated(8, 8, 0);
+
 	// Zoom
 	glScaled(scale, scale, 1);
 
@@ -218,7 +222,7 @@ void GfxCanvas::drawImage() {
 	if (view_type == GFXVIEW_CENTERED)
 		glTranslated(-(image->getWidth() * 0.5), -(image->getHeight() * 0.5), 0);	// Pan to center image
 	else if (view_type == GFXVIEW_SPRITE)
-		glTranslated(-image->offset().x, -image->offset().y, 0); // Pan by offsets
+		glTranslated(-image->offset().x, -image->offset().y, 0);	// Pan by offsets
 	else if (view_type == GFXVIEW_HUD) {
 		glTranslated(-160, -100, 0);								// Pan to hud 'top left'
 		glTranslated(-image->offset().x, -image->offset().y, 0);	// Pan by offsets
@@ -273,13 +277,13 @@ void GfxCanvas::drawImage() {
 	// Disable textures
 	glDisable(GL_TEXTURE_2D);
 
-	// Draw outline
+	// Draw outline just outside the picture
 	rgba_t(0, 0, 0, 64).set_gl();
 	glBegin(GL_LINES);
-	glVertex2d(0, 0); glVertex2d(0, y);
-	glVertex2d(0, y); glVertex2d(x, y);
-	glVertex2d(x, y); glVertex2d(x, 0);
-	glVertex2d(x, 0); glVertex2d(0, 0);
+	glVertex2d(0, 0-1/scale); glVertex2d(0, y);
+	glVertex2d(0, y); glVertex2d(x+1/scale, y);
+	glVertex2d(x+1/scale, y); glVertex2d(x+1/scale, 0-1/scale);
+	glVertex2d(x+1/scale, 0-1/scale); glVertex2d(0, 0-1/scale);
 	glEnd();
 
 	// Restore previous matrix
