@@ -45,6 +45,7 @@
 TextureXPanel::TextureXPanel(wxWindow* parent, PatchTable* patch_table) : wxPanel(parent, -1) {
 	// Init variables
 	tx_entry = NULL;
+	this->patch_table = patch_table;
 
 	// Setup sizer
 	wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
@@ -57,6 +58,18 @@ TextureXPanel::TextureXPanel(wxWindow* parent, PatchTable* patch_table) : wxPane
 	list_textures->showIcons(false);
 	framesizer->Add(list_textures, 1, wxEXPAND|wxALL, 4);
 	sizer->Add(framesizer, 0, wxEXPAND|wxALL, 4);
+
+	// New Texture button
+	btn_new_texture = new wxButton(this, -1, _T("New"));
+	framesizer->Add(btn_new_texture, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+	// New Texture from Patch button
+	btn_new_from_patch = new wxButton(this, -1, _T("New From Patch"));
+	framesizer->Add(btn_new_from_patch, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+	// Remove Texture button
+	btn_remove_texture = new wxButton(this, -1, _T("Remove"));
+	framesizer->Add(btn_remove_texture, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
 	// Add texture editor area
 	texture_editor = new TextureEditorPanel(this, patch_table);
@@ -77,9 +90,19 @@ TextureXPanel::~TextureXPanel() {
 /* TextureXPanel::openTEXTUREX
  * Loads a TEXTUREX format texture list into the editor
  *******************************************************************/
-bool TextureXPanel::openTEXTUREX(ArchiveEntry* texturex) {
-	if (this->texturex.readTEXTUREXData(texturex)) {
-		tx_entry = texturex;
+bool TextureXPanel::openTEXTUREX(ArchiveEntry* entry) {
+	if (texturex.readTEXTUREXData(entry)) {
+		tx_entry = entry;
+
+		// Update patch table usage info
+		for (size_t a = 0; a < texturex.nTextures(); a++) {
+			tx_texture_t tex = texturex.getTexture(a);
+
+			// Go through texture's patches
+			for (size_t p = 0; p < tex.patches.size(); p++)
+				patch_table->patch(tex.patches[p].patch).used += 1;
+		}
+
 		return true;
 	}
 	else

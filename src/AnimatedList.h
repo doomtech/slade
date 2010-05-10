@@ -38,6 +38,9 @@ public:
 	void			clear();
 	bool			readANIMATEDData(ArchiveEntry* animated);
 	bool			writeANIMATEDData(ArchiveEntry* animated);
+
+	// Static functions
+	static bool convertAnimated(ArchiveEntry* entry, MemChunk* animdata);
 };
 
 #endif //ANIMATEDLIST_H

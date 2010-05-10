@@ -80,7 +80,7 @@ SwitchesEntry* SwitchesList::getEntry(size_t index) {
 }
 
 /* SwitchesList::getEntry
- * Returns a SwitchesEntry matching [name], or NULL if no match 
+ * Returns a SwitchesEntry matching [name], or NULL if no match
  * found; looks for name at both the on and the off frames
  *******************************************************************/
 SwitchesEntry* SwitchesList::getEntry(string name) {
@@ -137,8 +137,7 @@ bool SwitchesList::readSWITCHESData(ArchiveEntry* switches) {
 	return true;
 }
 
-bool Misc::convertSwitches(ArchiveEntry* entry, MemChunk * animdata)
-{
+bool SwitchesList::convertSwitches(ArchiveEntry* entry, MemChunk* animdata) {
 	const uint8_t * cursor = entry->getData(true);
 	const uint8_t * eodata = cursor + entry->getSize();
 	const switches_t * switches;

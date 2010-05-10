@@ -565,12 +565,19 @@ void TextureEditorPanel::onBtnPatchAdd(wxCommandEvent& e) {
 	// Get texture
 	CTexture& tex = tex_canvas->getTexture();
 
-	// Add new patch (temporary, testing)
-	tex.addPatch(patch_table->patch(0));
+	// Temporary choice dialog
+	wxArrayString patches;
+	for (size_t a = 0; a < patch_table->nPatches(); a++) patches.Add(patch_table->patchName(a));
+	wxSingleChoiceDialog dlg(this, _T("Select a patch to add"), _T("Add Patch"), patches);
 
-	// Update UI
-	populatePatchList();
-	updatePatchControls();
+	if (dlg.ShowModal() == wxID_OK) {
+		// Add new patch (temporary, testing)
+		tex.addPatch(patch_table->patch(dlg.GetSelection()));
+
+		// Update UI
+		populatePatchList();
+		updatePatchControls();
+	}
 }
 
 /* TextureEditorPanel::onBtnPatchRemove
@@ -665,9 +672,16 @@ void TextureEditorPanel::onBtnPatchReplace(wxCommandEvent& e) {
 	// Get texture
 	CTexture& tex = tex_canvas->getTexture();
 
-	// Go through selection and replace each patch (temporary, testing)
-	for (size_t a = 0; a < selection.size(); a++)
-		tex.replacePatch(selection[a], patch_table->patch(0));
+	// Temporary choice dialog
+	wxArrayString patches;
+	for (size_t a = 0; a < patch_table->nPatches(); a++) patches.Add(patch_table->patchName(a));
+	wxSingleChoiceDialog dlg(this, _T("Select a patch to replace the selected patch(es) with"), _T("Replace Patch"), patches);
+
+	if (dlg.ShowModal() == wxID_OK) {
+		// Go through selection and replace each patch
+		for (size_t a = 0; a < selection.size(); a++)
+			tex.replacePatch(selection[a], patch_table->patch(dlg.GetSelection()));
+	}
 
 	// Repopulate patch list
 	populatePatchList();

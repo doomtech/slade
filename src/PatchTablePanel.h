@@ -9,6 +9,9 @@ class PatchTablePanel : public wxPanel {
 private:
 	PatchTable*		patch_table;
 	ListView*		list_patches;
+	wxButton*		btn_add_patch;
+	wxButton*		btn_remove_patch;
+	wxButton*		btn_change_patch;
 
 public:
 	PatchTablePanel(wxWindow* parent, PatchTable* patch_table);

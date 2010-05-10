@@ -82,7 +82,7 @@ AnimatedEntry* AnimatedList::getEntry(size_t index) {
 }
 
 /* AnimatedList::getEntry
- * Returns an AnimatedEntry matching [name], or NULL if no match 
+ * Returns an AnimatedEntry matching [name], or NULL if no match
  * found; looks for name at both the first and the last frames
  *******************************************************************/
 AnimatedEntry* AnimatedList::getEntry(string name) {
@@ -172,8 +172,7 @@ bool AnimatedList::writeANIMATEDData(ArchiveEntry* animated) {
 	return true;
 }
 
-bool Misc::convertAnimated(ArchiveEntry* entry, MemChunk * animdata)
-{
+bool AnimatedList::convertAnimated(ArchiveEntry* entry, MemChunk * animdata) {
 	const uint8_t * cursor = entry->getData(true);
 	const uint8_t * eodata = cursor + entry->getSize();
 	const animated_t * animation;
@@ -189,7 +188,7 @@ bool Misc::convertAnimated(ArchiveEntry* entry, MemChunk * animdata)
 		cursor += sizeof(animated_t);
 
 		// Create animation string
-		conversion = s_fmt(_T("%s\tOptional\t%-8s\tRange\t%-8s\tTics %i%s"), 
+		conversion = s_fmt(_T("%s\tOptional\t%-8s\tRange\t%-8s\tTics %i%s"),
 			(animation->type ? "Texture" : "Flat"),
 			animation->first, animation->last, animation->speed,
 			(animation->type == ANIM_DECALS ? " AllowDecals\n" : "\n"));

@@ -25,6 +25,7 @@ TextureXPanel
 - Handles a single TEXTURE1/2/S list
 - Has a TextureXList
 - Has a pointer to the TEXTUREX entry (null if it's a newly created list)
+- Has ability to add/remove (etc) textures
 
 TextureEditorPanel
 ------------------
@@ -47,6 +48,9 @@ private:
 
 	ListView*			list_textures;
 	TextureEditorPanel*	texture_editor;
+	wxButton*			btn_new_texture;
+	wxButton*			btn_new_from_patch;
+	wxButton*			btn_remove_texture;
 
 public:
 	TextureXPanel(wxWindow* parent, PatchTable* patch_table);

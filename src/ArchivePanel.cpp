@@ -2,24 +2,24 @@
 /*******************************************************************
  * SLADE - It's a Doom Editor
  * Copyright (C) 2008 Simon Judd
- * 
+ *
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
  * Filename:    ArchivePanel.cpp
  * Description: ArchivePanel class. The base wxWidgets panel for
  *              archive content editing. One of these is opened in
  *              a tab for each open archive.
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -500,9 +500,9 @@ bool ArchivePanel::basConvert() {
 		// Check each selected entry for possible conversion
 		for (size_t a = 0; a < selection.size(); a++) {
 			if (selection[a]->getType()->getFormat() == EDF_ANIMATED)
-				Misc::convertAnimated(selection[a], &animdata);
+				AnimatedList::convertAnimated(selection[a], &animdata);
 			else if (selection[a]->getType()->getFormat() == EDF_SWITCHES)
-				Misc::convertSwitches(selection[a], &animdata);
+				SwitchesList::convertSwitches(selection[a], &animdata);
 		}
 		animdef->importMemChunk(animdata);
 
@@ -872,7 +872,7 @@ void ArchivePanel::onEntryListKeyDown(wxKeyEvent& e) {
 	// Move entry up (Ctrl+U or Ctrl+Up Arrow)
 	else if (e.ControlDown() && (e.GetKeyCode() == 'U' || e.GetKeyCode() == WXK_UP))
 		moveUp();
-				
+
 	// Move entry down (Ctrl+D or Ctrl+Down Arrow)
 	else if (e.ControlDown() && (e.GetKeyCode() == 'D' || e.GetKeyCode() == WXK_DOWN))
 		moveDown();
@@ -884,7 +884,7 @@ void ArchivePanel::onEntryListKeyDown(wxKeyEvent& e) {
 	// New entry (Ctrl+N)
 	else if (e.GetKeyCode() == 'N' && e.ControlDown() && !e.ShiftDown())
 		newEntry();
-	
+
 	// New entry from file (Shift+Ctrl+N)
 	else if (e.GetKeyCode() == 'N' && e.ControlDown() && e.ShiftDown())
 		newEntryFromFile();

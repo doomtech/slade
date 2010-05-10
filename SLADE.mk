@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Simon
-Date                   :=02/05/10
+Date                   :=11/05/10
 CodeLitePath           :="/home/simonj/.codelite"
 LinkerName             :=g++
 ArchiveTool            :=ar rcus
@@ -48,14 +48,14 @@ LibPath                := "$(LibraryPathSwitch)."
 ## User defined environment variables
 ##
 CodeLiteDir:=/usr/share/codelite
-Objects=$(IntermediateDirectory)/src_GfxConvDialog$(ObjectSuffix) $(IntermediateDirectory)/src_ModifyOffsetsDialog$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteDialog$(ObjectSuffix) $(IntermediateDirectory)/src_Clipboard$(ObjectSuffix) $(IntermediateDirectory)/src_Console$(ObjectSuffix) $(IntermediateDirectory)/src_CVar$(ObjectSuffix) $(IntermediateDirectory)/src_MainApp$(ObjectSuffix) $(IntermediateDirectory)/src_MemChunk$(ObjectSuffix) $(IntermediateDirectory)/src_Misc$(ObjectSuffix) $(IntermediateDirectory)/src_Tokenizer$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_WxStuff$(ObjectSuffix) $(IntermediateDirectory)/src_OpenGL$(ObjectSuffix) $(IntermediateDirectory)/src_ListenerAnnouncer$(ObjectSuffix) $(IntermediateDirectory)/src_Property$(ObjectSuffix) $(IntermediateDirectory)/src_PropertyList$(ObjectSuffix) $(IntermediateDirectory)/src_ArchivePanel$(ObjectSuffix) $(IntermediateDirectory)/src_EntryListPanel$(ObjectSuffix) $(IntermediateDirectory)/src_AnimatedEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_DefaultEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_EntryPanel$(ObjectSuffix) \
+Objects=$(IntermediateDirectory)/src_GfxConvDialog$(ObjectSuffix) $(IntermediateDirectory)/src_ModifyOffsetsDialog$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteDialog$(ObjectSuffix) $(IntermediateDirectory)/src_Clipboard$(ObjectSuffix) $(IntermediateDirectory)/src_Console$(ObjectSuffix) $(IntermediateDirectory)/src_CVar$(ObjectSuffix) $(IntermediateDirectory)/src_MainApp$(ObjectSuffix) $(IntermediateDirectory)/src_MemChunk$(ObjectSuffix) $(IntermediateDirectory)/src_Misc$(ObjectSuffix) $(IntermediateDirectory)/src_WxStuff$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_OpenGL$(ObjectSuffix) $(IntermediateDirectory)/src_ListenerAnnouncer$(ObjectSuffix) $(IntermediateDirectory)/src_Property$(ObjectSuffix) $(IntermediateDirectory)/src_PropertyList$(ObjectSuffix) $(IntermediateDirectory)/src_Tokenizer$(ObjectSuffix) $(IntermediateDirectory)/src_ArchivePanel$(ObjectSuffix) $(IntermediateDirectory)/src_EntryListPanel$(ObjectSuffix) $(IntermediateDirectory)/src_AnimatedEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_DefaultEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_EntryPanel$(ObjectSuffix) \
 	$(IntermediateDirectory)/src_GfxEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_MultiEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_SwitchesEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_TextEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_PnamesEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_ZipArchivePanel$(ObjectSuffix) $(IntermediateDirectory)/src_ZipEntryListPanel$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveManagerPanel$(ObjectSuffix) $(IntermediateDirectory)/src_PatchTablePanel$(ObjectSuffix) \
 	$(IntermediateDirectory)/src_TextureEditorPanel$(ObjectSuffix) $(IntermediateDirectory)/src_TextureXEditor$(ObjectSuffix) $(IntermediateDirectory)/src_MainWindow$(ObjectSuffix) $(IntermediateDirectory)/src_EntryOperations$(ObjectSuffix) $(IntermediateDirectory)/src_MapLine$(ObjectSuffix) $(IntermediateDirectory)/src_MapSector$(ObjectSuffix) $(IntermediateDirectory)/src_MapSide$(ObjectSuffix) $(IntermediateDirectory)/src_MapThing$(ObjectSuffix) $(IntermediateDirectory)/src_MapVertex$(ObjectSuffix) $(IntermediateDirectory)/src_SLADEMap$(ObjectSuffix) \
 	$(IntermediateDirectory)/src_MapCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_MapEditorWindow$(ObjectSuffix) $(IntermediateDirectory)/src_Archive$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveEntry$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveManager$(ObjectSuffix) $(IntermediateDirectory)/src_WadArchive$(ObjectSuffix) $(IntermediateDirectory)/src_ZipArchive$(ObjectSuffix) $(IntermediateDirectory)/src_EntryType$(ObjectSuffix) $(IntermediateDirectory)/src_AnimatedList$(ObjectSuffix) $(IntermediateDirectory)/src_SwitchesList$(ObjectSuffix) \
 	$(IntermediateDirectory)/src_PnamesList$(ObjectSuffix) $(IntermediateDirectory)/src_CTexture$(ObjectSuffix) $(IntermediateDirectory)/src_PatchTable$(ObjectSuffix) $(IntermediateDirectory)/src_TextureXList$(ObjectSuffix) $(IntermediateDirectory)/src_SImage$(ObjectSuffix) $(IntermediateDirectory)/src_Palette$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteManager$(ObjectSuffix) $(IntermediateDirectory)/src_GLTexture$(ObjectSuffix) $(IntermediateDirectory)/src_Icons$(ObjectSuffix) $(IntermediateDirectory)/src_ColourBox$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_CTextureCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_GfxCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_ListView$(ObjectSuffix) $(IntermediateDirectory)/src_OGLCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteChooser$(ObjectSuffix) $(IntermediateDirectory)/src_TextEditor$(ObjectSuffix) $(IntermediateDirectory)/src_ConsolePanel$(ObjectSuffix) $(IntermediateDirectory)/src_SplashWindow$(ObjectSuffix) $(IntermediateDirectory)/src_BaseResourceArchivesPanel$(ObjectSuffix) \
-	
+	$(IntermediateDirectory)/src_GfxCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_ListView$(ObjectSuffix) $(IntermediateDirectory)/src_OGLCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteChooser$(ObjectSuffix) $(IntermediateDirectory)/src_TextEditor$(ObjectSuffix) $(IntermediateDirectory)/src_ConsolePanel$(ObjectSuffix) $(IntermediateDirectory)/src_SplashWindow$(ObjectSuffix) $(IntermediateDirectory)/src_BaseResourceArchivesPanel$(ObjectSuffix) $(IntermediateDirectory)/src_BrowserCanvas$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_Browser$(ObjectSuffix) $(IntermediateDirectory)/src_CTextureCanvas$(ObjectSuffix) 
 
 ##
 ## Main Build Targets 
@@ -147,14 +147,6 @@ $(IntermediateDirectory)/src_Misc$(DependSuffix): src/Misc.cpp
 $(IntermediateDirectory)/src_Misc$(PreprocessSuffix): src/Misc.cpp
 	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_Misc$(PreprocessSuffix) "/home/simonj/dev/slade/trunk/src/Misc.cpp"
 
-$(IntermediateDirectory)/src_Tokenizer$(ObjectSuffix): src/Tokenizer.cpp $(IntermediateDirectory)/src_Tokenizer$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simonj/dev/slade/trunk/src/Tokenizer.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_Tokenizer$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/src_Tokenizer$(DependSuffix): src/Tokenizer.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_Tokenizer$(ObjectSuffix) -MF$(IntermediateDirectory)/src_Tokenizer$(DependSuffix) -MM "/home/simonj/dev/slade/trunk/src/Tokenizer.cpp"
-
-$(IntermediateDirectory)/src_Tokenizer$(PreprocessSuffix): src/Tokenizer.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_Tokenizer$(PreprocessSuffix) "/home/simonj/dev/slade/trunk/src/Tokenizer.cpp"
-
 $(IntermediateDirectory)/src_WxStuff$(ObjectSuffix): src/WxStuff.cpp $(IntermediateDirectory)/src_WxStuff$(DependSuffix)
 	$(CompilerName) $(SourceSwitch) "/home/simonj/dev/slade/trunk/src/WxStuff.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_WxStuff$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_WxStuff$(DependSuffix): src/WxStuff.cpp
@@ -194,6 +186,14 @@ $(IntermediateDirectory)/src_PropertyList$(DependSuffix): src/PropertyList.cpp
 
 $(IntermediateDirectory)/src_PropertyList$(PreprocessSuffix): src/PropertyList.cpp
 	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_PropertyList$(PreprocessSuffix) "/home/simonj/dev/slade/trunk/src/PropertyList.cpp"
+
+$(IntermediateDirectory)/src_Tokenizer$(ObjectSuffix): src/Tokenizer.cpp $(IntermediateDirectory)/src_Tokenizer$(DependSuffix)
+	$(CompilerName) $(SourceSwitch) "/home/simonj/dev/slade/trunk/src/Tokenizer.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_Tokenizer$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_Tokenizer$(DependSuffix): src/Tokenizer.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_Tokenizer$(ObjectSuffix) -MF$(IntermediateDirectory)/src_Tokenizer$(DependSuffix) -MM "/home/simonj/dev/slade/trunk/src/Tokenizer.cpp"
+
+$(IntermediateDirectory)/src_Tokenizer$(PreprocessSuffix): src/Tokenizer.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_Tokenizer$(PreprocessSuffix) "/home/simonj/dev/slade/trunk/src/Tokenizer.cpp"
 
 $(IntermediateDirectory)/src_ArchivePanel$(ObjectSuffix): src/ArchivePanel.cpp $(IntermediateDirectory)/src_ArchivePanel$(DependSuffix)
 	$(CompilerName) $(SourceSwitch) "/home/simonj/dev/slade/trunk/src/ArchivePanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ArchivePanel$(ObjectSuffix) $(IncludePath)
@@ -555,14 +555,6 @@ $(IntermediateDirectory)/src_ColourBox$(DependSuffix): src/ColourBox.cpp
 $(IntermediateDirectory)/src_ColourBox$(PreprocessSuffix): src/ColourBox.cpp
 	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ColourBox$(PreprocessSuffix) "/home/simonj/dev/slade/trunk/src/ColourBox.cpp"
 
-$(IntermediateDirectory)/src_CTextureCanvas$(ObjectSuffix): src/CTextureCanvas.cpp $(IntermediateDirectory)/src_CTextureCanvas$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simonj/dev/slade/trunk/src/CTextureCanvas.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_CTextureCanvas$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/src_CTextureCanvas$(DependSuffix): src/CTextureCanvas.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_CTextureCanvas$(ObjectSuffix) -MF$(IntermediateDirectory)/src_CTextureCanvas$(DependSuffix) -MM "/home/simonj/dev/slade/trunk/src/CTextureCanvas.cpp"
-
-$(IntermediateDirectory)/src_CTextureCanvas$(PreprocessSuffix): src/CTextureCanvas.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_CTextureCanvas$(PreprocessSuffix) "/home/simonj/dev/slade/trunk/src/CTextureCanvas.cpp"
-
 $(IntermediateDirectory)/src_GfxCanvas$(ObjectSuffix): src/GfxCanvas.cpp $(IntermediateDirectory)/src_GfxCanvas$(DependSuffix)
 	$(CompilerName) $(SourceSwitch) "/home/simonj/dev/slade/trunk/src/GfxCanvas.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_GfxCanvas$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_GfxCanvas$(DependSuffix): src/GfxCanvas.cpp
@@ -635,6 +627,30 @@ $(IntermediateDirectory)/src_BaseResourceArchivesPanel$(DependSuffix): src/BaseR
 $(IntermediateDirectory)/src_BaseResourceArchivesPanel$(PreprocessSuffix): src/BaseResourceArchivesPanel.cpp
 	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_BaseResourceArchivesPanel$(PreprocessSuffix) "/home/simonj/dev/slade/trunk/src/BaseResourceArchivesPanel.cpp"
 
+$(IntermediateDirectory)/src_BrowserCanvas$(ObjectSuffix): src/BrowserCanvas.cpp $(IntermediateDirectory)/src_BrowserCanvas$(DependSuffix)
+	$(CompilerName) $(SourceSwitch) "/home/simonj/dev/slade/trunk/src/BrowserCanvas.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_BrowserCanvas$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_BrowserCanvas$(DependSuffix): src/BrowserCanvas.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_BrowserCanvas$(ObjectSuffix) -MF$(IntermediateDirectory)/src_BrowserCanvas$(DependSuffix) -MM "/home/simonj/dev/slade/trunk/src/BrowserCanvas.cpp"
+
+$(IntermediateDirectory)/src_BrowserCanvas$(PreprocessSuffix): src/BrowserCanvas.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_BrowserCanvas$(PreprocessSuffix) "/home/simonj/dev/slade/trunk/src/BrowserCanvas.cpp"
+
+$(IntermediateDirectory)/src_Browser$(ObjectSuffix): src/Browser.cpp $(IntermediateDirectory)/src_Browser$(DependSuffix)
+	$(CompilerName) $(SourceSwitch) "/home/simonj/dev/slade/trunk/src/Browser.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_Browser$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_Browser$(DependSuffix): src/Browser.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_Browser$(ObjectSuffix) -MF$(IntermediateDirectory)/src_Browser$(DependSuffix) -MM "/home/simonj/dev/slade/trunk/src/Browser.cpp"
+
+$(IntermediateDirectory)/src_Browser$(PreprocessSuffix): src/Browser.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_Browser$(PreprocessSuffix) "/home/simonj/dev/slade/trunk/src/Browser.cpp"
+
+$(IntermediateDirectory)/src_CTextureCanvas$(ObjectSuffix): src/CTextureCanvas.cpp $(IntermediateDirectory)/src_CTextureCanvas$(DependSuffix)
+	$(CompilerName) $(SourceSwitch) "/home/simonj/dev/slade/trunk/src/CTextureCanvas.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_CTextureCanvas$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_CTextureCanvas$(DependSuffix): src/CTextureCanvas.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_CTextureCanvas$(ObjectSuffix) -MF$(IntermediateDirectory)/src_CTextureCanvas$(DependSuffix) -MM "/home/simonj/dev/slade/trunk/src/CTextureCanvas.cpp"
+
+$(IntermediateDirectory)/src_CTextureCanvas$(PreprocessSuffix): src/CTextureCanvas.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_CTextureCanvas$(PreprocessSuffix) "/home/simonj/dev/slade/trunk/src/CTextureCanvas.cpp"
+
 
 -include $(IntermediateDirectory)/*$(DependSuffix)
 ##
@@ -668,9 +684,6 @@ clean:
 	$(RM) $(IntermediateDirectory)/src_Misc$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/src_Misc$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/src_Misc$(PreprocessSuffix)
-	$(RM) $(IntermediateDirectory)/src_Tokenizer$(ObjectSuffix)
-	$(RM) $(IntermediateDirectory)/src_Tokenizer$(DependSuffix)
-	$(RM) $(IntermediateDirectory)/src_Tokenizer$(PreprocessSuffix)
 	$(RM) $(IntermediateDirectory)/src_WxStuff$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/src_WxStuff$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/src_WxStuff$(PreprocessSuffix)
@@ -686,6 +699,9 @@ clean:
 	$(RM) $(IntermediateDirectory)/src_PropertyList$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/src_PropertyList$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/src_PropertyList$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/src_Tokenizer$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/src_Tokenizer$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/src_Tokenizer$(PreprocessSuffix)
 	$(RM) $(IntermediateDirectory)/src_ArchivePanel$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/src_ArchivePanel$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/src_ArchivePanel$(PreprocessSuffix)
@@ -821,9 +837,6 @@ clean:
 	$(RM) $(IntermediateDirectory)/src_ColourBox$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/src_ColourBox$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/src_ColourBox$(PreprocessSuffix)
-	$(RM) $(IntermediateDirectory)/src_CTextureCanvas$(ObjectSuffix)
-	$(RM) $(IntermediateDirectory)/src_CTextureCanvas$(DependSuffix)
-	$(RM) $(IntermediateDirectory)/src_CTextureCanvas$(PreprocessSuffix)
 	$(RM) $(IntermediateDirectory)/src_GfxCanvas$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/src_GfxCanvas$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/src_GfxCanvas$(PreprocessSuffix)
@@ -851,6 +864,15 @@ clean:
 	$(RM) $(IntermediateDirectory)/src_BaseResourceArchivesPanel$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/src_BaseResourceArchivesPanel$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/src_BaseResourceArchivesPanel$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/src_BrowserCanvas$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/src_BrowserCanvas$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/src_BrowserCanvas$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/src_Browser$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/src_Browser$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/src_Browser$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/src_CTextureCanvas$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/src_CTextureCanvas$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/src_CTextureCanvas$(PreprocessSuffix)
 	$(RM) $(OutputFile)
 
 

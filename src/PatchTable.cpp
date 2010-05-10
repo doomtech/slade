@@ -193,3 +193,8 @@ bool PatchTable::loadPNAMES(ArchiveEntry* pnames, Archive* parent) {
 
 	return true;
 }
+
+void PatchTable::clearPatchUsage() {
+	for (size_t a = 0; a < patches.size(); a++)
+		patches[a].used = 0;
+}

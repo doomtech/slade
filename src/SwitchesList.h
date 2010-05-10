@@ -34,6 +34,9 @@ public:
 	void			clear();
 	bool			readSWITCHESData(ArchiveEntry* switches);
 	bool			writeSWITCHESData(ArchiveEntry* switches);
+
+	// Static functions
+	static bool convertSwitches(ArchiveEntry* entry, MemChunk* animdata);
 };
 
 #endif //SWITCHESLIST_H

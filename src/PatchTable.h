@@ -7,8 +7,9 @@
 struct patch_t {
 	string			name;
 	ArchiveEntry*	entry;
+	uint32_t		used;
 
-	patch_t() { entry = NULL; }
+	patch_t() { entry = NULL; used = 0; }
 };
 
 class PatchTable {
@@ -20,7 +21,7 @@ private:
 public:
 	PatchTable(Archive* parent = NULL);
 	~PatchTable();
-	
+
 	size_t	nPatches() { return patches.size(); }
 
 	patch_t&		patch(size_t index);
@@ -31,6 +32,7 @@ public:
 	int32_t			patchIndex(ArchiveEntry* entry);
 
 	bool	loadPNAMES(ArchiveEntry* pnames, Archive* parent = NULL);
+	void	clearPatchUsage();
 };
 
 #endif//__PATCH_TABLE_T__

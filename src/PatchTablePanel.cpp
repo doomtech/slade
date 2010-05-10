@@ -54,6 +54,23 @@ PatchTablePanel::PatchTablePanel(wxWindow* parent, PatchTable* patch_table) : wx
 	sizer->Add(framesizer, 0, wxEXPAND|wxALL, 4);
 	list_patches = new ListView(this, -1);
 	framesizer->Add(list_patches, 1, wxEXPAND|wxALL, 4);
+
+	// Add editing controls
+	frame = new wxStaticBox(this, -1, _T("Actions"));
+	framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
+	sizer->Add(framesizer, 0, wxALL, 4);
+
+	// Add patch button
+	btn_add_patch = new wxButton(this, -1, _T("Add Patch"));
+	framesizer->Add(btn_add_patch, 0, wxEXPAND|wxALL, 4);
+
+	// Remove patch button
+	btn_remove_patch = new wxButton(this, -1, _T("Remove Patch"));
+	framesizer->Add(btn_remove_patch, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
+
+	// Change patch button
+	btn_change_patch = new wxButton(this, -1, _T("Change Patch"));
+	framesizer->Add(btn_change_patch, 0, wxEXPAND|wxALL, 4);
 }
 
 /* PatchTablePanel::~PatchTablePanel
@@ -74,7 +91,8 @@ void PatchTablePanel::populatePatchList() {
 	// Add columns
 	list_patches->InsertColumn(0, _T("#"));
 	list_patches->InsertColumn(1, _T("Patch Name"));
-	list_patches->InsertColumn(2, _T("In Archive"));
+	list_patches->InsertColumn(2, _T("Use Count"));
+	list_patches->InsertColumn(3, _T("In Archive"));
 
 	// Add pnames entries to the list
 	list_patches->enableSizeUpdate(false);
@@ -87,8 +105,8 @@ void PatchTablePanel::populatePatchList() {
 		if (entry)
 			archive = entry->getParent()->getFileName(false);
 
-		string cols[] = { s_fmt(_T("%04d"), a), name, archive };
-		list_patches->addItem(a, wxArrayString(3, cols));
+		string cols[] = { s_fmt(_T("%04d"), a), name, s_fmt(_T("%d"), patch_table->patch(a).used), archive };
+		list_patches->addItem(a, wxArrayString(4, cols));
 
 		// Colour red if patch entry not found
 		if (!entry)
