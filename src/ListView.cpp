@@ -232,7 +232,7 @@ bool ListView::updateSize() {
 		for (int a = 0; a < GetColumnCount(); a++) {
 			// Get header width
 			int maxsize = 0;
-			SetColumnWidth(a, wxLIST_AUTOSIZE_USEHEADER);
+			SetColumnWidth(a, (a == GetColumnCount() -1 ? wxLIST_AUTOSIZE : wxLIST_AUTOSIZE_USEHEADER));
 			maxsize = GetColumnWidth(a);
 
 			// Autosize column
