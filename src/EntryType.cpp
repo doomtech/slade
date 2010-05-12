@@ -119,7 +119,7 @@ bool EntryDataFormat::detectGif(MemChunk& mc) {
 	// Check size
 	if (mc.getSize() > 6) {
 		// Check for GIF header
-		if (mc[0] == 'G' && mc[1] == 'I' && mc[2] == 'F' && mc[3] == '8' && 
+		if (mc[0] == 'G' && mc[1] == 'I' && mc[2] == 'F' && mc[3] == '8' &&
 			(mc[4] == '7' || mc[4] =='9') && mc[5] == 'a')
 			return true;
 	}
@@ -302,12 +302,12 @@ bool EntryDataFormat::detectDoomGfxAlpha(MemChunk& mc) {
 	// Get entry data
 	const uint8_t* data = mc.getData();
 
-	// Check that it ends on a FF byte
-	if (mc[mc.getSize() -1] != 0xFF)
-		return false;
-
 	// Check size
 	if (mc.getSize() > sizeof(oldpatch_header_t)) {
+		// Check that it ends on a FF byte
+		if (mc[mc.getSize() -1] != 0xFF)
+			return false;
+
 		const oldpatch_header_t *header = (const oldpatch_header_t *)data;
 
 		// Check header values are 'sane'
@@ -338,6 +338,10 @@ bool EntryDataFormat::detectDoomGfxAlpha(MemChunk& mc) {
 }
 
 bool EntryDataFormat::detectDoomGfxBeta(MemChunk& mc) {
+	// Check size
+	if (mc.getSize() <= sizeof(patch_header_t))
+		return false;
+
 	const uint8_t* data = mc.getData();
 
 	// Check that it ends on a FF byte.
@@ -353,30 +357,27 @@ bool EntryDataFormat::detectDoomGfxBeta(MemChunk& mc) {
 		}
 	}
 
-	// Check size
-	if (mc.getSize() > sizeof(patch_header_t)) {
-		const patch_header_t *header = (const patch_header_t *)data;
+	const patch_header_t *header = (const patch_header_t *)data;
 
-		// Check header values are 'sane'
-		if (header->height > 0 && header->height < 4096 &&
-		        header->width > 0 && header->width < 4096 &&
-		        header->top > -2000 && header->top < 2000 &&
-		        header->left > -2000 && header->left < 2000) {
-			uint16_t *col_offsets = (uint16_t *)((const uint8_t *)data + sizeof(patch_header_t));
+	// Check header values are 'sane'
+	if (header->height > 0 && header->height < 4096 &&
+			header->width > 0 && header->width < 4096 &&
+			header->top > -2000 && header->top < 2000 &&
+			header->left > -2000 && header->left < 2000) {
+		uint16_t *col_offsets = (uint16_t *)((const uint8_t *)data + sizeof(patch_header_t));
 
-			// Check there is room for needed column pointers
-			if (mc.getSize() < sizeof(patch_header_t) + (header->width * sizeof(uint16_t)))
+		// Check there is room for needed column pointers
+		if (mc.getSize() < sizeof(patch_header_t) + (header->width * sizeof(uint16_t)))
+			return false;
+
+		// Check column pointers are within range
+		for (int a = 0; a < header->width; a++) {
+			if (col_offsets[a] > mc.getSize() || col_offsets[a] < sizeof(patch_header_t))
 				return false;
-
-			// Check column pointers are within range
-			for (int a = 0; a < header->width; a++) {
-				if (col_offsets[a] > mc.getSize() || col_offsets[a] < sizeof(patch_header_t))
-					return false;
-			}
-
-			// Passed all checks, so probably is doom gfx
-			return true;
 		}
+
+		// Passed all checks, so probably is doom gfx
+		return true;
 	}
 
 	return false;
@@ -394,6 +395,10 @@ bool EntryDataFormat::detectDoomGfxBeta(MemChunk& mc) {
  *	etc., and so on. No transparency.
  */
 bool EntryDataFormat::detectDoomGfxSnea(MemChunk& mc) {
+	// Check size
+	if (mc.getSize() < 2)
+		return false;
+
 	const uint8_t* data = mc.getData();
 	uint8_t qwidth = data[0]; // quarter of width
 	uint8_t height = data[1];
@@ -1120,6 +1125,8 @@ bool EntryType::readEntryTypeDefinition(MemChunk& mc) {
 
 				if (parent_type != EntryType::unknownType())
 					parent_type->copyToType(ntype);
+				else
+					wxLogMessage(_T("Warning: Entry type %s inherits from unknown type %s"), chr(ntype->getId()), chr(inherit));
 			}
 
 			// Read all fields until we get to the closing brace
@@ -1377,18 +1384,25 @@ bool EntryType::loadEntryTypes() {
 		return false;
 	}
 
-	// Get entry_types.txt
-	ArchiveEntry* et_entry = res_archive->getEntry(_T("config/entry_types.txt"));
+	// Get entry types directory
+	zipdir_t* et_dir = ((ZipArchive*)res_archive)->getDirectory(_T("config/entry_types"));
 
 	// Check it exists
-	if (!et_entry) {
-		wxLogMessage(_T("Error: config/entry_types.txt not found in slade.pk3!"));
+	if (!et_dir) {
+		wxLogMessage(_T("Error: config/entry_types does not exist in slade.pk3"));
 		return false;
 	}
 
-	// Read in entry types definition
-	if (!readEntryTypeDefinition(et_entry->getMCData()))
-		return false;
+	// Read in each file in the directory
+	bool etypes_read = false;
+	for (unsigned a = 0; a < et_dir->numEntries(); a++) {
+		if (readEntryTypeDefinition(et_dir->entries[a]->getMCData()))
+			etypes_read = true;
+	}
+
+	// Warn if no types were read (this shouldn't happen unless the resource archive is corrupted)
+	if (!etypes_read)
+		wxLogMessage(_T("Warning: No built-in entry types could be loaded from slade.pk3"));
 
 	// -------- READ CUSTOM TYPES ---------
 

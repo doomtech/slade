@@ -42,11 +42,28 @@
  *******************************************************************/
 TextEditor::TextEditor(wxWindow* parent, int id)
 : wxStyledTextCtrl(parent, id) {
+	// Set default font
 	wxFont f(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 	StyleSetFont(wxSTC_STYLE_DEFAULT, f);
 	SetTabWidth(4);
 
+	// Line numbers by default
+	SetMarginType(0, wxSTC_MARGIN_NUMBER);
+	SetMarginWidth(0, TextWidth(wxSTC_STYLE_LINENUMBER, _T("9999")));
+	SetMarginWidth(1, 4);
+
+	// Test colours
+	StyleSetForeground(wxSTC_C_COMMENT, wxColor(0, 150, 0));
+	StyleSetForeground(wxSTC_C_COMMENTDOC, wxColor(0, 150, 0));
+	StyleSetForeground(wxSTC_C_COMMENTLINE, wxColor(0, 150, 0));
+	StyleSetForeground(wxSTC_C_STRING, wxColor(0, 120, 130));
+	StyleSetForeground(wxSTC_C_CHARACTER, wxColor(0, 120, 130));
+
+	// Temp
+	SetLexer(wxSTC_LEX_CPP);
+
 	Bind(wxEVT_STC_MODIFIED, &TextEditor::onModified, this);
+	Bind(wxEVT_STC_CHANGE, &TextEditor::onTextChanged, this);
 }
 
 /* TextEditor::~TextEditor
@@ -98,6 +115,13 @@ void TextEditor::getRawText(MemChunk& mc) {
 }
 
 void TextEditor::onModified(wxStyledTextEvent& e) {
+	e.Skip();
+}
+
+void TextEditor::onTextChanged(wxStyledTextEvent& e) {
+	// Update line numbers margin width
+	string numlines = s_fmt(_T("0%d"), GetNumberOfLines());
+	SetMarginWidth(0, TextWidth(wxSTC_STYLE_LINENUMBER, numlines));
 	e.Skip();
 }
 

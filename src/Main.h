@@ -22,6 +22,8 @@ typedef unsigned __int32 uint64_t;
 #include <wx/string.h>
 typedef wxString string;
 #define s_fmt wxString::Format
+#define s_cmp(s1, s2) s1.Cmp(s2) == 0
+#define s_cmpnocase(s1, s2) s1.CmpNoCase(s2) == 0
 
 // Macro to convert a wxString to a c string
 #define chr(s) ((const char*)(s).ToAscii())

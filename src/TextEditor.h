@@ -17,6 +17,7 @@ public:
 	void	getRawText(MemChunk& mc);
 
 	void	onModified(wxStyledTextEvent& e);
+	void	onTextChanged(wxStyledTextEvent& e);
 };
 
 #endif //__TEXTEDITOR_H__
