@@ -78,11 +78,13 @@ private:
 	// Type info
 	string		id;
 	string		name;
-	string		extension;	// File extension to use when exporting entries of this type
-	string		icon;		// Icon to use in entry list
-	string		editor;		// The in-program editor to use (hardcoded ids, see *EntryPanel constructors)
+	string		extension;		// File extension to use when exporting entries of this type
+	string		icon;			// Icon to use in entry list
+	string		editor;			// The in-program editor to use (hardcoded ids, see *EntryPanel constructors)
 	int			index;
-	bool		detectable;	// False only for special types that should be set not detected
+	bool		detectable;		// False only for special types that should be set not detected
+	uint8_t		reliability;	// How 'reliable' this type's detection is. A higher value means it's less
+								// likely this type can be detected erroneously. 0-255 (default is 255)
 
 	// Type matching criteria
 	uint16_t		format;				// To be of this type, the entry data must match the specified format
@@ -112,15 +114,17 @@ public:
 	void addMatchSize(int size)			{ this->match_size.push_back(size); }
 	void setDetectable(bool detect)		{ this->detectable = detect; }
 	void setSection(string section)		{ this->section = section; }
+	void setReliability(uint8_t val)	{ this->reliability = val; }
 
 	// Getters
-	string		getId()			{ return id; }
-	string		getName()		{ return name; }
-	string		getExtension()	{ return extension; }
-	uint16_t	getFormat()		{ return format; }
-	string		getEditor()		{ return editor; }
-	string		getIcon()		{ return icon; }
-	int			getIndex()		{ return index; }
+	string		getId()				{ return id; }
+	string		getName()			{ return name; }
+	string		getExtension()		{ return extension; }
+	uint16_t	getFormat()			{ return format; }
+	string		getEditor()			{ return editor; }
+	string		getIcon()			{ return icon; }
+	int			getIndex()			{ return index; }
+	uint8_t		getReliability()	{ return reliability; }
 
 	// Misc
 	void	addToList();

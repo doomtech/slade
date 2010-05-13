@@ -891,6 +891,7 @@ EntryType::EntryType(string id) {
 	editor = _T("default");
 	detectable = true;
 	section = _T("none");
+	reliability = 255;
 }
 
 /* EntryType::~EntryType
@@ -939,6 +940,7 @@ void EntryType::copyToType(EntryType* target) {
 	target->setExtension(extension);
 	target->setIcon(icon);
 	target->setName(name);
+	target->setReliability(reliability);
 
 	// Copy type match criteria
 	target->setFormat(format);
@@ -1337,6 +1339,19 @@ bool EntryType::readEntryTypeDefinition(MemChunk& mc) {
 					}
 				}
 
+				// Reliability field
+				if (s_cmp(token, _T("reliability"))) {
+					if (!tz.checkToken(_T("=")))		// Check for =
+						return false;
+
+					int reliability = tz.getInteger();	// Get reliability value
+
+					if (!tz.checkToken(_T(";")))		// Check for ;
+						return false;
+
+					ntype->setReliability(reliability);	// Set reliability
+				}
+
 				token = tz.getToken();
 			}
 
@@ -1359,6 +1374,7 @@ bool EntryType::loadEntryTypes() {
 	// Setup unknown type
 	etype_unknown.setIcon(_T("e_unknown"));
 	etype_unknown.setDetectable(false);
+	etype_unknown.setReliability(0);
 	etype_unknown.addToList();
 
 	// Setup folder type
@@ -1440,18 +1456,30 @@ bool EntryType::detectEntryType(ArchiveEntry* entry) {
 	if (entry->getType() == &etype_folder || entry->getType() == &etype_map)
 		return false;
 
+	// Reset entry type
+	entry->setType(&etype_unknown);
+
 	// Go through all registered types
 	for (size_t a = 0; a < entry_types.size(); a++) {
+		// Check for possible type match
 		if (entry_types[a]->isThisType(entry)) {
-			entry->setType(entry_types[a]);
-			return true;
+			// Type matches, test against currently detected type's reliability
+			if (entry->getType()->getReliability() < entry_types[a]->getReliability()) {
+				// This type is more reliable, so set it
+				entry->setType(entry_types[a]);
+
+				// No need to continue if the type is 100% reliable
+				if (entry_types[a]->getReliability() == 255)
+					return true;
+			}
 		}
 	}
 
-	// No matching type found, set to unknown
-	entry->setType(&etype_unknown);
-
-	return false;
+	// Return t/f depending on if a matching type was found
+	if (entry->getType() == &etype_unknown)
+		return false;
+	else
+		return true;
 }
 
 /* EntryType::getType
