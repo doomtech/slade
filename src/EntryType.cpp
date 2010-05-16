@@ -63,6 +63,7 @@ vector<EntryType*>	entry_types;	// The big list of all entry types
 // Special entry types
 EntryType			etype_unknown;	// The default, 'unknown' entry type
 EntryType			etype_folder;	// Folder entry type
+EntryType			etype_marker;	// Marker entry type
 EntryType			etype_map;		// Map marker type
 
 
@@ -1383,6 +1384,12 @@ bool EntryType::loadEntryTypes() {
 	etype_folder.setDetectable(false);
 	etype_folder.addToList();
 
+	// Setup marker type
+	etype_marker.setIcon(_T("e_marker"));
+	etype_marker.setName(_T("Marker"));
+	etype_marker.setDetectable(false);
+	etype_marker.addToList();
+
 	// Setup map marker type
 	etype_map.setIcon(_T("e_map"));
 	etype_map.setName(_T("Map Marker"));
@@ -1455,6 +1462,12 @@ bool EntryType::detectEntryType(ArchiveEntry* entry) {
 	// Do nothing if the entry is a folder or a map marker
 	if (entry->getType() == &etype_folder || entry->getType() == &etype_map)
 		return false;
+
+	// If the entry's size is zero, set it to marker type
+	if (entry->getSize() == 0) {
+		entry->setType(&etype_marker);
+		return true;
+	}
 
 	// Reset entry type
 	entry->setType(&etype_unknown);
