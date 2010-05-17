@@ -1539,8 +1539,11 @@ wxArrayString EntryType::getIconList() {
 }
 
 void EntryType::cleanupEntryTypes() {
-	for (size_t a = 3; a < entry_types.size(); a++)
-		delete entry_types[a];
+	for (size_t a = 3; a < entry_types.size(); a++) {
+		EntryType* e = entry_types[a];
+		if (e != &etype_unknown && e != &etype_folder && e != &etype_marker && e != &etype_map)
+			delete entry_types[a];
+	}
 }
 
 
