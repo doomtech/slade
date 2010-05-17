@@ -1,0 +1,265 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{33CC5FBD-4EB0-48A9-9069-0EC0B5FF5A46}</ProjectGuid>
+    <RootNamespace>SLADE</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v90</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v90</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\dist\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\dist\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</GenerateManifest>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(WXWIN)\lib\vc_lib\mswu;$(WXWIN)\include;$(FREEIMAGE)\Dist;$(IncludePath)</IncludePath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(WXWIN)\lib\vc_lib;$(FREEIMAGE)\Dist;$(LibraryPath)</LibraryPath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(WXWIN)\lib\vc_lib\mswu;$(WXWIN)\include;$(FREEIMAGE)\Dist;$(IncludePath)</IncludePath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(WXWIN)\lib\vc_lib;$(FREEIMAGE)\Dist;$(LibraryPath)</LibraryPath>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">SLADE-dbg</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WXDEBUG;WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>winmm.lib;rpcrt4.lib;kernel32.lib;user32.lib;gdi32.lib;ole32.lib;oleaut32.lib;comctl32.lib;comdlg32.lib;uuid.lib;advapi32.lib;shell32.lib;wxbase29ud.lib;wxmsw29ud_core.lib;wxmsw29ud_gl.lib;wxmsw29ud_aui.lib;wxmsw29ud_html.lib;wxmsw29ud_adv.lib;wxmsw29ud_stc.lib;wxzlibd.lib;wxpngd.lib;wxscintillad.lib;opengl32.lib;glu32.lib;FreeImage.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(ProjectName)-dbg.exe</OutputFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <PreprocessorDefinitions>WIN32;__WXMSW__;_WINDOWS;NOPCH;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessToFile>false</PreprocessToFile>
+      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>FreeImage.lib;wxbase29u.lib;wxmsw29u_core.lib;wxmsw29u_aui.lib;wxmsw29u_gl.lib;wxmsw29u_html.lib;wxmsw29u_adv.lib;wxmsw29u_stc.lib;wxtiff.lib;wxjpeg.lib;wxpng.lib;wxzlib.lib;wxregexu.lib;wxexpat.lib;wxscintilla.lib;winmm.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <EnableUAC>false</EnableUAC>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <LinkTimeCodeGeneration>
+      </LinkTimeCodeGeneration>
+      <TargetMachine>MachineX86</TargetMachine>
+      <AllowIsolation>true</AllowIsolation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="src\BrowserCanvas.cpp" />
+    <ClCompile Include="src\GfxConvDialog.cpp" />
+    <ClCompile Include="src\ModifyOffsetsDialog.cpp" />
+    <ClCompile Include="src\PaletteDialog.cpp" />
+    <ClCompile Include="src\Clipboard.cpp" />
+    <ClCompile Include="src\Console.cpp" />
+    <ClCompile Include="src\CVar.cpp" />
+    <ClCompile Include="src\ListenerAnnouncer.cpp" />
+    <ClCompile Include="src\MainApp.cpp" />
+    <ClCompile Include="src\MemChunk.cpp" />
+    <ClCompile Include="src\Misc.cpp" />
+    <ClCompile Include="src\OpenGL.cpp" />
+    <ClCompile Include="src\Tokenizer.cpp" />
+    <ClCompile Include="src\WxStuff.cpp" />
+    <ClCompile Include="src\Property.cpp" />
+    <ClCompile Include="src\PropertyList.cpp" />
+    <ClCompile Include="src\EntryOperations.cpp" />
+    <ClCompile Include="src\MainWindow.cpp" />
+    <ClCompile Include="src\ArchiveManagerPanel.cpp" />
+    <ClCompile Include="src\ConsolePanel.cpp" />
+    <ClCompile Include="src\TextEditor.cpp" />
+    <ClCompile Include="src\ArchivePanel.cpp" />
+    <ClCompile Include="src\EntryListPanel.cpp" />
+    <ClCompile Include="src\AnimatedEntryPanel.cpp" />
+    <ClCompile Include="src\DefaultEntryPanel.cpp" />
+    <ClCompile Include="src\EntryPanel.cpp" />
+    <ClCompile Include="src\GfxEntryPanel.cpp" />
+    <ClCompile Include="src\MultiEntryPanel.cpp" />
+    <ClCompile Include="src\PaletteEntryPanel.cpp" />
+    <ClCompile Include="src\SwitchesEntryPanel.cpp" />
+    <ClCompile Include="src\TextEntryPanel.cpp" />
+    <ClCompile Include="src\ZipArchivePanel.cpp" />
+    <ClCompile Include="src\ZipEntryListPanel.cpp" />
+    <ClCompile Include="src\PatchTablePanel.cpp" />
+    <ClCompile Include="src\TextureEditorPanel.cpp" />
+    <ClCompile Include="src\TextureXEditor.cpp" />
+    <ClCompile Include="src\MapEditorWindow.cpp" />
+    <ClCompile Include="src\MapCanvas.cpp" />
+    <ClCompile Include="src\MapLine.cpp" />
+    <ClCompile Include="src\MapSector.cpp" />
+    <ClCompile Include="src\MapSide.cpp" />
+    <ClCompile Include="src\MapThing.cpp" />
+    <ClCompile Include="src\MapVertex.cpp" />
+    <ClCompile Include="src\SLADEMap.cpp" />
+    <ClCompile Include="src\Archive.cpp" />
+    <ClCompile Include="src\ArchiveEntry.cpp" />
+    <ClCompile Include="src\ArchiveManager.cpp" />
+    <ClCompile Include="src\EntryType.cpp" />
+    <ClCompile Include="src\WadArchive.cpp" />
+    <ClCompile Include="src\ZipArchive.cpp" />
+    <ClCompile Include="src\AnimatedList.cpp" />
+    <ClCompile Include="src\SwitchesList.cpp" />
+    <ClCompile Include="src\GLTexture.cpp" />
+    <ClCompile Include="src\Icons.cpp" />
+    <ClCompile Include="src\SImage.cpp" />
+    <ClCompile Include="src\Palette.cpp" />
+    <ClCompile Include="src\PaletteManager.cpp" />
+    <ClCompile Include="src\CTexture.cpp" />
+    <ClCompile Include="src\PatchTable.cpp" />
+    <ClCompile Include="src\TextureXList.cpp" />
+    <ClCompile Include="src\ColourBox.cpp" />
+    <ClCompile Include="src\CTextureCanvas.cpp" />
+    <ClCompile Include="src\GfxCanvas.cpp" />
+    <ClCompile Include="src\ListView.cpp" />
+    <ClCompile Include="src\OGLCanvas.cpp" />
+    <ClCompile Include="src\PaletteCanvas.cpp" />
+    <ClCompile Include="src\PaletteChooser.cpp" />
+    <ClCompile Include="src\SplashWindow.cpp" />
+    <ClCompile Include="src\BaseResourceArchivesPanel.cpp" />
+    <ClCompile Include="src\Browser.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\BrowserCanvas.h" />
+    <ClInclude Include="src\EntryDataFormat.h" />
+    <ClInclude Include="src\GfxConvDialog.h" />
+    <ClInclude Include="src\ModifyOffsetsDialog.h" />
+    <ClInclude Include="src\PaletteDialog.h" />
+    <ClInclude Include="src\Clipboard.h" />
+    <ClInclude Include="src\Console.h" />
+    <ClInclude Include="src\CVar.h" />
+    <ClInclude Include="src\ListenerAnnouncer.h" />
+    <ClInclude Include="src\Main.h" />
+    <ClInclude Include="src\MainApp.h" />
+    <ClInclude Include="src\MemChunk.h" />
+    <ClInclude Include="src\Misc.h" />
+    <ClInclude Include="src\OpenGL.h" />
+    <ClInclude Include="src\Structs.h" />
+    <ClInclude Include="src\Tokenizer.h" />
+    <ClInclude Include="src\WxStuff.h" />
+    <ClInclude Include="src\Property.h" />
+    <ClInclude Include="src\PropertyList.h" />
+    <ClInclude Include="src\EntryOperations.h" />
+    <ClInclude Include="src\MainWindow.h" />
+    <ClInclude Include="src\ArchiveManagerPanel.h" />
+    <ClInclude Include="src\ConsolePanel.h" />
+    <ClInclude Include="src\TextEditor.h" />
+    <ClInclude Include="src\ArchivePanel.h" />
+    <ClInclude Include="src\EntryListPanel.h" />
+    <ClInclude Include="src\AnimatedEntryPanel.h" />
+    <ClInclude Include="src\DefaultEntryPanel.h" />
+    <ClInclude Include="src\EntryPanel.h" />
+    <ClInclude Include="src\GfxEntryPanel.h" />
+    <ClInclude Include="src\MultiEntryPanel.h" />
+    <ClInclude Include="src\PaletteEntryPanel.h" />
+    <ClInclude Include="src\SwitchesEntryPanel.h" />
+    <ClInclude Include="src\TextEntryPanel.h" />
+    <ClInclude Include="src\ZipArchivePanel.h" />
+    <ClInclude Include="src\ZipEntryListPanel.h" />
+    <ClInclude Include="src\PatchTablePanel.h" />
+    <ClInclude Include="src\TextureEditorPanel.h" />
+    <ClInclude Include="src\TextureXEditor.h" />
+    <ClInclude Include="src\MapEditorWindow.h" />
+    <ClInclude Include="src\MapCanvas.h" />
+    <ClInclude Include="src\MapLine.h" />
+    <ClInclude Include="src\MapSector.h" />
+    <ClInclude Include="src\MapSide.h" />
+    <ClInclude Include="src\MapThing.h" />
+    <ClInclude Include="src\MapVertex.h" />
+    <ClInclude Include="src\SLADEMap.h" />
+    <ClInclude Include="src\Archive.h" />
+    <ClInclude Include="src\ArchiveEntry.h" />
+    <ClInclude Include="src\ArchiveManager.h" />
+    <ClInclude Include="src\EntryType.h" />
+    <ClInclude Include="src\EntryTypeList.h" />
+    <ClInclude Include="src\WadArchive.h" />
+    <ClInclude Include="src\ZipArchive.h" />
+    <ClInclude Include="src\AnimatedList.h" />
+    <ClInclude Include="src\BinaryControlLump.h" />
+    <ClInclude Include="src\SwitchesList.h" />
+    <ClInclude Include="src\GLTexture.h" />
+    <ClInclude Include="src\Icons.h" />
+    <ClInclude Include="src\SImage.h" />
+    <ClInclude Include="src\Palette.h" />
+    <ClInclude Include="src\PaletteManager.h" />
+    <ClInclude Include="src\CTexture.h" />
+    <ClInclude Include="src\PatchTable.h" />
+    <ClInclude Include="src\TextureXList.h" />
+    <ClInclude Include="src\SFont.h" />
+    <ClInclude Include="src\ColourBox.h" />
+    <ClInclude Include="src\CTextureCanvas.h" />
+    <ClInclude Include="src\GfxCanvas.h" />
+    <ClInclude Include="src\ListView.h" />
+    <ClInclude Include="src\OGLCanvas.h" />
+    <ClInclude Include="src\PaletteCanvas.h" />
+    <ClInclude Include="src\PaletteChooser.h" />
+    <ClInclude Include="src\SplashWindow.h" />
+    <ClInclude Include="src\BaseResourceArchivesPanel.h" />
+    <ClInclude Include="src\Browser.h" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="slade.ico" />
+    <None Include="stuff.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="SLADE.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

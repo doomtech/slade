@@ -1,0 +1,527 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Dialogs">
+      <UniqueIdentifier>{53990eef-5d13-4259-b3e5-9e49e8c7ae8d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="General">
+      <UniqueIdentifier>{f7d552f7-3fec-4baa-b8a5-cadc09d10893}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="General\PropertyList">
+      <UniqueIdentifier>{363ddaab-2da0-45fb-8fc2-042e5c6723c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main Editor">
+      <UniqueIdentifier>{fef8e5a6-0991-4153-8f52-5d3f2da4e9d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main Editor\UI Elements">
+      <UniqueIdentifier>{f2373f73-d7a8-4389-a7d0-1b55a7511024}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main Editor\UI Elements\ArchivePanel">
+      <UniqueIdentifier>{21ca3a2e-c518-498c-8bd7-5e9b5293b5cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main Editor\UI Elements\EntryPanel">
+      <UniqueIdentifier>{0355b563-40d6-4783-b213-61d8271580d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main Editor\UI Elements\ZipArchivePanel">
+      <UniqueIdentifier>{7310ac92-d15e-4dfa-80cb-3bd3df523e7c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main Editor\UI Elements\TextureXEditor">
+      <UniqueIdentifier>{68f7e12d-ec2c-42a8-8c84-f26092dd8c1f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Map Editor">
+      <UniqueIdentifier>{e7c66597-c337-43fc-bedc-5e753bf3ddb8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Map Editor\UI Elements">
+      <UniqueIdentifier>{d4677dbf-fb1f-45ef-9d81-5e63d8539139}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Map Editor\SLADEMap">
+      <UniqueIdentifier>{fe62c46a-6958-43f8-912e-d4a1bf97c10b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{d64306f1-d31f-41ea-9c7d-216cd339fe06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\Archive">
+      <UniqueIdentifier>{186bc297-c8b4-4c2d-b577-b663901227b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\Binary Control Lumps">
+      <UniqueIdentifier>{d01d3677-f00e-4933-b65c-688a19cb3264}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\Graphics">
+      <UniqueIdentifier>{04a700d1-4c59-4db0-8c1b-7f55d079dbdc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\Graphics\Image">
+      <UniqueIdentifier>{2282b917-8937-43a4-946a-3d44fc79c9aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\Graphics\Palette">
+      <UniqueIdentifier>{91874625-b386-4240-be30-42817f5916bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\Graphics\Composite Texture">
+      <UniqueIdentifier>{26f9c0ed-fcab-4243-977a-b0caec429bde}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\Graphics\Font">
+      <UniqueIdentifier>{a67c614b-3c23-4e50-8a01-6dd9e96388b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI Elements">
+      <UniqueIdentifier>{ec031215-840a-462e-b238-3ad04f542e91}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI Elements\Browser">
+      <UniqueIdentifier>{2bb47c0d-bf68-47e1-bc1c-ce7926a17d1a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI Elements\Options">
+      <UniqueIdentifier>{c7c973ec-b572-4b0a-87f2-0b305f2122ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\Archive\EntryType">
+      <UniqueIdentifier>{d894001c-5335-4237-9b18-60440a1e6a60}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\GfxConvDialog.cpp">
+      <Filter>Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ModifyOffsetsDialog.cpp">
+      <Filter>Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PaletteDialog.cpp">
+      <Filter>Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Clipboard.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Console.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CVar.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ListenerAnnouncer.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MainApp.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MemChunk.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Misc.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OpenGL.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tokenizer.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WxStuff.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Property.cpp">
+      <Filter>General\PropertyList</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyList.cpp">
+      <Filter>General\PropertyList</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EntryOperations.cpp">
+      <Filter>Main Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MainWindow.cpp">
+      <Filter>Main Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ArchiveManagerPanel.cpp">
+      <Filter>Main Editor\UI Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ArchivePanel.cpp">
+      <Filter>Main Editor\UI Elements\ArchivePanel</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EntryListPanel.cpp">
+      <Filter>Main Editor\UI Elements\ArchivePanel</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AnimatedEntryPanel.cpp">
+      <Filter>Main Editor\UI Elements\EntryPanel</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DefaultEntryPanel.cpp">
+      <Filter>Main Editor\UI Elements\EntryPanel</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EntryPanel.cpp">
+      <Filter>Main Editor\UI Elements\EntryPanel</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GfxEntryPanel.cpp">
+      <Filter>Main Editor\UI Elements\EntryPanel</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MultiEntryPanel.cpp">
+      <Filter>Main Editor\UI Elements\EntryPanel</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PaletteEntryPanel.cpp">
+      <Filter>Main Editor\UI Elements\EntryPanel</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SwitchesEntryPanel.cpp">
+      <Filter>Main Editor\UI Elements\EntryPanel</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TextEntryPanel.cpp">
+      <Filter>Main Editor\UI Elements\EntryPanel</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ZipArchivePanel.cpp">
+      <Filter>Main Editor\UI Elements\ZipArchivePanel</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ZipEntryListPanel.cpp">
+      <Filter>Main Editor\UI Elements\ZipArchivePanel</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PatchTablePanel.cpp">
+      <Filter>Main Editor\UI Elements\TextureXEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TextureEditorPanel.cpp">
+      <Filter>Main Editor\UI Elements\TextureXEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TextureXEditor.cpp">
+      <Filter>Main Editor\UI Elements\TextureXEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MapEditorWindow.cpp">
+      <Filter>Map Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MapCanvas.cpp">
+      <Filter>Map Editor\UI Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MapLine.cpp">
+      <Filter>Map Editor\SLADEMap</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MapSector.cpp">
+      <Filter>Map Editor\SLADEMap</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MapSide.cpp">
+      <Filter>Map Editor\SLADEMap</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MapThing.cpp">
+      <Filter>Map Editor\SLADEMap</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MapVertex.cpp">
+      <Filter>Map Editor\SLADEMap</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SLADEMap.cpp">
+      <Filter>Map Editor\SLADEMap</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Archive.cpp">
+      <Filter>Resources\Archive</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ArchiveEntry.cpp">
+      <Filter>Resources\Archive</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ArchiveManager.cpp">
+      <Filter>Resources\Archive</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WadArchive.cpp">
+      <Filter>Resources\Archive</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ZipArchive.cpp">
+      <Filter>Resources\Archive</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AnimatedList.cpp">
+      <Filter>Resources\Binary Control Lumps</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SwitchesList.cpp">
+      <Filter>Resources\Binary Control Lumps</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GLTexture.cpp">
+      <Filter>Resources\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Icons.cpp">
+      <Filter>Resources\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SImage.cpp">
+      <Filter>Resources\Graphics\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Palette.cpp">
+      <Filter>Resources\Graphics\Palette</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PaletteManager.cpp">
+      <Filter>Resources\Graphics\Palette</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CTexture.cpp">
+      <Filter>Resources\Graphics\Composite Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PatchTable.cpp">
+      <Filter>Resources\Graphics\Composite Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TextureXList.cpp">
+      <Filter>Resources\Graphics\Composite Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BaseResourceArchivesPanel.cpp">
+      <Filter>UI Elements\Options</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Browser.cpp">
+      <Filter>UI Elements\Browser</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ColourBox.cpp">
+      <Filter>UI Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ConsolePanel.cpp">
+      <Filter>UI Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CTextureCanvas.cpp">
+      <Filter>UI Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GfxCanvas.cpp">
+      <Filter>UI Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ListView.cpp">
+      <Filter>UI Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OGLCanvas.cpp">
+      <Filter>UI Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PaletteCanvas.cpp">
+      <Filter>UI Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PaletteChooser.cpp">
+      <Filter>UI Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SplashWindow.cpp">
+      <Filter>UI Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TextEditor.cpp">
+      <Filter>UI Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EntryType.cpp">
+      <Filter>Resources\Archive\EntryType</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BrowserCanvas.cpp">
+      <Filter>UI Elements\Browser</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\GfxConvDialog.h">
+      <Filter>Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ModifyOffsetsDialog.h">
+      <Filter>Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PaletteDialog.h">
+      <Filter>Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Clipboard.h">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Console.h">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CVar.h">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ListenerAnnouncer.h">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Main.h">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MainApp.h">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MemChunk.h">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Misc.h">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OpenGL.h">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Structs.h">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Tokenizer.h">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="src\WxStuff.h">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Property.h">
+      <Filter>General\PropertyList</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PropertyList.h">
+      <Filter>General\PropertyList</Filter>
+    </ClInclude>
+    <ClInclude Include="src\EntryOperations.h">
+      <Filter>Main Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MainWindow.h">
+      <Filter>Main Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ArchiveManagerPanel.h">
+      <Filter>Main Editor\UI Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ArchivePanel.h">
+      <Filter>Main Editor\UI Elements\ArchivePanel</Filter>
+    </ClInclude>
+    <ClInclude Include="src\EntryListPanel.h">
+      <Filter>Main Editor\UI Elements\ArchivePanel</Filter>
+    </ClInclude>
+    <ClInclude Include="src\AnimatedEntryPanel.h">
+      <Filter>Main Editor\UI Elements\EntryPanel</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DefaultEntryPanel.h">
+      <Filter>Main Editor\UI Elements\EntryPanel</Filter>
+    </ClInclude>
+    <ClInclude Include="src\EntryPanel.h">
+      <Filter>Main Editor\UI Elements\EntryPanel</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GfxEntryPanel.h">
+      <Filter>Main Editor\UI Elements\EntryPanel</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MultiEntryPanel.h">
+      <Filter>Main Editor\UI Elements\EntryPanel</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PaletteEntryPanel.h">
+      <Filter>Main Editor\UI Elements\EntryPanel</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SwitchesEntryPanel.h">
+      <Filter>Main Editor\UI Elements\EntryPanel</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TextEntryPanel.h">
+      <Filter>Main Editor\UI Elements\EntryPanel</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ZipArchivePanel.h">
+      <Filter>Main Editor\UI Elements\ZipArchivePanel</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ZipEntryListPanel.h">
+      <Filter>Main Editor\UI Elements\ZipArchivePanel</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PatchTablePanel.h">
+      <Filter>Main Editor\UI Elements\TextureXEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TextureEditorPanel.h">
+      <Filter>Main Editor\UI Elements\TextureXEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TextureXEditor.h">
+      <Filter>Main Editor\UI Elements\TextureXEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MapEditorWindow.h">
+      <Filter>Map Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MapCanvas.h">
+      <Filter>Map Editor\UI Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MapLine.h">
+      <Filter>Map Editor\SLADEMap</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MapSector.h">
+      <Filter>Map Editor\SLADEMap</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MapSide.h">
+      <Filter>Map Editor\SLADEMap</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MapThing.h">
+      <Filter>Map Editor\SLADEMap</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MapVertex.h">
+      <Filter>Map Editor\SLADEMap</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SLADEMap.h">
+      <Filter>Map Editor\SLADEMap</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Archive.h">
+      <Filter>Resources\Archive</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ArchiveEntry.h">
+      <Filter>Resources\Archive</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ArchiveManager.h">
+      <Filter>Resources\Archive</Filter>
+    </ClInclude>
+    <ClInclude Include="src\WadArchive.h">
+      <Filter>Resources\Archive</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ZipArchive.h">
+      <Filter>Resources\Archive</Filter>
+    </ClInclude>
+    <ClInclude Include="src\AnimatedList.h">
+      <Filter>Resources\Binary Control Lumps</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BinaryControlLump.h">
+      <Filter>Resources\Binary Control Lumps</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SwitchesList.h">
+      <Filter>Resources\Binary Control Lumps</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GLTexture.h">
+      <Filter>Resources\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Icons.h">
+      <Filter>Resources\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SImage.h">
+      <Filter>Resources\Graphics\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Palette.h">
+      <Filter>Resources\Graphics\Palette</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PaletteManager.h">
+      <Filter>Resources\Graphics\Palette</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CTexture.h">
+      <Filter>Resources\Graphics\Composite Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PatchTable.h">
+      <Filter>Resources\Graphics\Composite Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TextureXList.h">
+      <Filter>Resources\Graphics\Composite Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SFont.h">
+      <Filter>Resources\Graphics\Font</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BaseResourceArchivesPanel.h">
+      <Filter>UI Elements\Options</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Browser.h">
+      <Filter>UI Elements\Browser</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="src\ColourBox.h">
+      <Filter>UI Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ConsolePanel.h">
+      <Filter>UI Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CTextureCanvas.h">
+      <Filter>UI Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GfxCanvas.h">
+      <Filter>UI Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ListView.h">
+      <Filter>UI Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OGLCanvas.h">
+      <Filter>UI Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PaletteCanvas.h">
+      <Filter>UI Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PaletteChooser.h">
+      <Filter>UI Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SplashWindow.h">
+      <Filter>UI Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TextEditor.h">
+      <Filter>UI Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="src\EntryTypeList.h">
+      <Filter>Resources\Archive\EntryType</Filter>
+    </ClInclude>
+    <ClInclude Include="src\EntryType.h">
+      <Filter>Resources\Archive\EntryType</Filter>
+    </ClInclude>
+    <ClInclude Include="src\EntryDataFormat.h">
+      <Filter>Resources\Archive\EntryType</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BrowserCanvas.h">
+      <Filter>UI Elements\Browser</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="slade.ico" />
+    <None Include="stuff.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="SLADE.rc" />
+  </ItemGroup>
+</Project>

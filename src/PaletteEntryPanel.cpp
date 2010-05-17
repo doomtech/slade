@@ -59,9 +59,15 @@ PaletteEntryPanel::PaletteEntryPanel(wxWindow* parent)
 	sizer_bottom->Add(btn_nextpal, 0, wxEXPAND|wxRIGHT, 4);
 	sizer_bottom->Add(text_curpal, 0, wxALIGN_CENTER_VERTICAL, 4);
 
+	// Add colour info label
+	label_selected_colour = new wxStaticText(this, -1, wxEmptyString);
+	sizer_bottom->AddSpacer(8);
+	sizer_bottom->Add(label_selected_colour, 0, wxALIGN_CENTER_VERTICAL, 4);
+
 	// Bind events
 	btn_nextpal->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &PaletteEntryPanel::onBtnNextPal, this);
 	btn_prevpal->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &PaletteEntryPanel::onBtnPrevPal, this);
+	pal_canvas->Bind(wxEVT_LEFT_DOWN, &PaletteEntryPanel::onPalCanvasMouseEvent, this);
 
 	// Init variables
 	cur_palette = 0;
@@ -144,4 +150,18 @@ void PaletteEntryPanel::onBtnNextPal(wxCommandEvent& e) {
 void PaletteEntryPanel::onBtnPrevPal(wxCommandEvent& e) {
 	if (showPalette(cur_palette - 1))
 		cur_palette--;
+}
+
+void PaletteEntryPanel::onPalCanvasMouseEvent(wxMouseEvent& e) {
+	// Update colour info label with selected colour (if any)
+	if (e.LeftDown()) {
+		// Send to palette canvas
+		pal_canvas->onMouseLeftDown(e);
+
+		// Get colour
+		rgba_t col = pal_canvas->getSelectedColour();
+
+		// Set label
+		label_selected_colour->SetLabel(s_fmt(_T("R%d G%d B%d"), col.r, col.g, col.b));
+	}
 }

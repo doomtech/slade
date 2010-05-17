@@ -19,6 +19,8 @@ private:
 	wxButton*				btn_prevpal;
 	wxStaticText*			text_curpal;
 
+	wxStaticText*			label_selected_colour;
+
 public:
 	PaletteEntryPanel(wxWindow* parent);
 	~PaletteEntryPanel();
@@ -30,6 +32,7 @@ public:
 	// Events
 	void	onBtnNextPal(wxCommandEvent& e);
 	void	onBtnPrevPal(wxCommandEvent& e);
+	void	onPalCanvasMouseEvent(wxMouseEvent& e);
 };
 
 #endif //__PALETTEENTRYPANEL_H__
