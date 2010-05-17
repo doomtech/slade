@@ -114,6 +114,7 @@
     <ClCompile Include="src\MemChunk.cpp" />
     <ClCompile Include="src\Misc.cpp" />
     <ClCompile Include="src\OpenGL.cpp" />
+    <ClCompile Include="src\TextLanguage.cpp" />
     <ClCompile Include="src\Tokenizer.cpp" />
     <ClCompile Include="src\WxStuff.cpp" />
     <ClCompile Include="src\Property.cpp" />
@@ -189,6 +190,7 @@
     <ClInclude Include="src\Misc.h" />
     <ClInclude Include="src\OpenGL.h" />
     <ClInclude Include="src\Structs.h" />
+    <ClInclude Include="src\TextLanguage.h" />
     <ClInclude Include="src\Tokenizer.h" />
     <ClInclude Include="src\WxStuff.h" />
     <ClInclude Include="src\Property.h" />

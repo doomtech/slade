@@ -73,6 +73,9 @@
     <Filter Include="Resources\Archive\EntryType">
       <UniqueIdentifier>{d894001c-5335-4237-9b18-60440a1e6a60}</UniqueIdentifier>
     </Filter>
+    <Filter Include="UI Elements\TextEditor">
+      <UniqueIdentifier>{54fbf714-855d-444d-885d-1e12f9df2ef7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\GfxConvDialog.cpp">
@@ -276,14 +279,17 @@
     <ClCompile Include="src\SplashWindow.cpp">
       <Filter>UI Elements</Filter>
     </ClCompile>
-    <ClCompile Include="src\TextEditor.cpp">
-      <Filter>UI Elements</Filter>
-    </ClCompile>
     <ClCompile Include="src\EntryType.cpp">
       <Filter>Resources\Archive\EntryType</Filter>
     </ClCompile>
     <ClCompile Include="src\BrowserCanvas.cpp">
       <Filter>UI Elements\Browser</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TextEditor.cpp">
+      <Filter>UI Elements\TextEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TextLanguage.cpp">
+      <Filter>UI Elements\TextEditor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -501,9 +507,6 @@
     <ClInclude Include="src\SplashWindow.h">
       <Filter>UI Elements</Filter>
     </ClInclude>
-    <ClInclude Include="src\TextEditor.h">
-      <Filter>UI Elements</Filter>
-    </ClInclude>
     <ClInclude Include="src\EntryTypeList.h">
       <Filter>Resources\Archive\EntryType</Filter>
     </ClInclude>
@@ -515,6 +518,12 @@
     </ClInclude>
     <ClInclude Include="src\BrowserCanvas.h">
       <Filter>UI Elements\Browser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TextEditor.h">
+      <Filter>UI Elements\TextEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TextLanguage.h">
+      <Filter>UI Elements\TextEditor</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
