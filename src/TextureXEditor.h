@@ -56,6 +56,8 @@ public:
 	TextureXPanel(wxWindow* parent, PatchTable* patch_table);
 	~TextureXPanel();
 
+	TextureXList&	txList() { return texturex; }
+
 	bool	openTEXTUREX(ArchiveEntry* texturex);
 	void	populateTextureList();
 	bool	updateTextureListItem(int index);
@@ -84,6 +86,9 @@ public:
 	Archive*	getArchive() { return archive; }
 
 	bool	openArchive(Archive* archive);
+
+	// Editing
+	bool	removePatch(unsigned index);
 
 	// Events
 	void	onPaletteChanged(wxCommandEvent& e);

@@ -31,6 +31,7 @@
 #include "WxStuff.h"
 #include "PatchTablePanel.h"
 #include "Archive.h"
+#include "TextureXEditor.h"
 
 
 /*******************************************************************
@@ -43,6 +44,7 @@
 PatchTablePanel::PatchTablePanel(wxWindow* parent, PatchTable* patch_table) : wxPanel(parent, -1) {
 	// Init variables
 	this->patch_table = patch_table;
+	this->parent = (TextureXEditor*)parent;
 
 	// Setup sizer
 	wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
@@ -76,17 +78,35 @@ PatchTablePanel::PatchTablePanel(wxWindow* parent, PatchTable* patch_table) : wx
 	btn_add_patch->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &PatchTablePanel::onBtnAddPatch, this);
 	btn_remove_patch->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &PatchTablePanel::onBtnRemovePatch, this);
 	btn_change_patch->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &PatchTablePanel::onBtnChangePatch, this);
-
-	// Disable unimplemented
-	btn_add_patch->Enable(false);
-	btn_remove_patch->Enable(false);
-	btn_change_patch->Enable(false);
 }
 
 /* PatchTablePanel::~PatchTablePanel
  * PatchTablePanel class destructor
  *******************************************************************/
 PatchTablePanel::~PatchTablePanel() {
+}
+
+void PatchTablePanel::updatePatchListItem(unsigned index) {
+	// Check index
+	if (index >= list_patches->GetItemCount())
+		return;
+
+	// Get patch
+	patch_t& patch = patch_table->patch(index);
+
+	// Get patch entry's parent archive
+	string archive = _T("NOT FOUND");
+	if (patch.entry)
+		archive = patch.entry->getParent()->getFileName(false);
+
+	// Update list item
+	list_patches->setItemText(index, 1, patch.name);
+	list_patches->setItemText(index, 2, s_fmt(_T("%d"), patch.used));
+	list_patches->setItemText(index, 3, archive);
+
+	// Update list width
+	list_patches->updateSize();
+	list_patches->GetParent()->Layout();
 }
 
 /* PatchTablePanel::populatePatchList
@@ -132,13 +152,59 @@ void PatchTablePanel::populatePatchList() {
 
 
 void PatchTablePanel::onBtnAddPatch(wxCommandEvent& e) {
+	// Prompt for new patch name
+	string patch = wxGetTextFromUser(_T("Enter patch entry name:"), _T("Add Patch"), wxEmptyString, this);
 
+	// Add to patch table
+	patch_table->addPatch(patch, parent->getArchive());
+
+	// Add to patch list
+	int index = list_patches->GetItemCount();
+	list_patches->addItem(index, s_fmt(_T("%04d"), index));
+	updatePatchListItem(index);
 }
 
 void PatchTablePanel::onBtnRemovePatch(wxCommandEvent& e) {
+	// Go through patch list selection
+	wxArrayInt selection = list_patches->selectedItems();
+	for (int a = selection.size() - 1; a >= 0; a--) {
+		// Check if patch is currently in use
+		patch_t& patch = patch_table->patch(selection[a]);
+		if (patch.used > 0) {
+			// In use, ask if it's ok to remove the patch
+			int answer = wxMessageBox(s_fmt(_T("The patch \"%s\" is currently used by %d texture(s), are you sure you wish to remove it?"), chr(patch.name), patch.used), _T("Confirm Remove Patch"), wxYES_NO|wxCANCEL, this);
+			if (answer == wxYES) {
+				// Answered yes, remove the patch
+				parent->removePatch(selection[a]);
+			}
+		}
+		else {
+			// Not in use, just delete it
+			parent->removePatch(selection[a]);
+		}
+	}
 
+	// Delete selection from list
+	list_patches->deleteItems(selection);
+
+	// Update items after deleted ones (index # will be changed)
+	list_patches->enableSizeUpdate(false);
+	for (unsigned a = selection[0]; a < list_patches->GetItemCount(); a++)
+		updatePatchListItem(a);
+
+	// Update list width
+	list_patches->enableSizeUpdate(true);
+	list_patches->updateSize();
+	list_patches->GetParent()->Layout();
 }
 
 void PatchTablePanel::onBtnChangePatch(wxCommandEvent& e) {
+	// Go through patch list selection
+	wxArrayInt selection = list_patches->selectedItems();
+	for (unsigned a = 0; a < selection.size(); a++) {
+		patch_t& patch = patch_table->patch(selection[a]);
 
+		// Prompt for new patch name
+		string newname = wxGetTextFromUser(_T("Enter new patch entry name:"), _T("Change Patch"), patch.name, this);
+	}
 }

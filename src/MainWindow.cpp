@@ -465,5 +465,6 @@ void MainWindow::onHTMLLinkClicked(wxHtmlLinkEvent &e) {
  *******************************************************************/
 void MainWindow::onClose(wxCloseEvent& e) {
 	main_window_layout = m_mgr->SavePerspective();
+	wxTheApp->Exit();
 	e.Skip();
 }

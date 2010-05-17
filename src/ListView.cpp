@@ -57,6 +57,23 @@ bool ListView::addItem(int index, wxArrayString text) {
 	return true;
 }
 
+int cmp_int(int* a, int* b) {
+	if (*a > *b) return 1;
+	else if (*a < *b) return -1;
+	else return 0;
+}
+
+bool ListView::deleteItems(wxArrayInt items) {
+	// Sort items list
+	items.Sort(cmp_int);
+
+	// Go through list backwards and delete each item
+	for (int a = items.size() - 1; a >= 0; a--)
+		DeleteItem(items[a]);
+
+	return true;
+}
+
 bool ListView::setItemStatus(int item, int status) {
 	// Check item id is in range
 	if (item >= GetItemCount())

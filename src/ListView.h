@@ -29,6 +29,8 @@ public:
 	bool	addItem(int index, string text);
 	bool	addItem(int index, wxArrayString text);
 
+	bool	deleteItems(wxArrayInt items);
+
 	bool	setItemStatus(int item, int status);
 	bool	setItemText(int item, int column, string text);
 

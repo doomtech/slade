@@ -5,6 +5,12 @@
 #include "PatchTable.h"
 #include "ListView.h"
 
+class TextureXEditor;
+
+/* TODO:
+ * - More buttons: new patch from file, import file to patch
+ * - Stop patch list updates refreshing the list so much (slow)
+*/
 class PatchTablePanel : public wxPanel {
 private:
 	PatchTable*		patch_table;
@@ -12,11 +18,13 @@ private:
 	wxButton*		btn_add_patch;
 	wxButton*		btn_remove_patch;
 	wxButton*		btn_change_patch;
+	TextureXEditor*	parent;
 
 public:
 	PatchTablePanel(wxWindow* parent, PatchTable* patch_table);
 	~PatchTablePanel();
 
+	void	updatePatchListItem(unsigned index);
 	void	populatePatchList();
 
 	// Events

@@ -134,6 +134,75 @@ int32_t PatchTable::patchIndex(ArchiveEntry* entry) {
 	return -1;
 }
 
+/* PatchTable::removePatch
+ * Removes the patch at [index]. Returns false if [index] is out of
+ * range, true otherwise
+ *******************************************************************/
+bool PatchTable::removePatch(unsigned index) {
+	// Check index
+	if (index >= patches.size())
+		return false;
+
+	// Remove the patch
+	patches.erase(patches.begin() + index);
+
+	return true;
+}
+
+/* PatchTable::replacePatch
+ * Replaces the patch info at [index] with a new name (newname).
+ * Also attempts to find the ArchiveEntry matching [newname] in
+ * [parent] and resource archives. Returns false if [index] is out
+ * of range or no matching entry was found, true otherwise
+ *******************************************************************/
+bool PatchTable::replacePatch(unsigned index, string newname, Archive* parent) {
+	// Check index
+	if (index >= patches.size())
+		return false;
+
+	// Change the patch name
+	patches[index].name = newname;
+
+	// Attempt to find patch entry
+	ArchiveEntry* entry = NULL;
+	if (parent)
+		entry = parent->getEntry(newname);						// Search parent archive first
+	if (!entry)
+		entry = theArchiveManager->getResourceEntry(newname);	// Next search open resource archives + base resource archive
+
+	// Update patch entry
+	patches[index].entry = entry;
+
+	return !!entry;
+}
+
+/* PatchTable::addPatch
+ * Adds a new patch with [name] to the end of the list. Also attempts
+ * to find the ArchiveEntry matching [name] in [parent] and resource
+ * archives. Returns false if no matching entry was found,
+ * true otherwise
+ *******************************************************************/
+bool PatchTable::addPatch(string name, Archive* parent) {
+	// Create/init new patch
+	patch_t patch;
+	patch.name = name;
+
+	// Attempt to find patch entry
+	ArchiveEntry* entry = NULL;
+	if (parent)
+		entry = parent->getEntry(name);						// Search parent archive first
+	if (!entry)
+		entry = theArchiveManager->getResourceEntry(name);	// Next search open resource archives + base resource archive
+
+	// Set patch entry
+	patch.entry = entry;
+
+	// Add the patch
+	patches.push_back(patch);
+
+	return !!entry;
+}
+
 /* PatchTable::loadPNAMES
  * Loads a PNAMES entry, returns true on success, false otherwise
  *******************************************************************/
@@ -168,24 +237,12 @@ bool PatchTable::loadPNAMES(ArchiveEntry* pnames, Archive* parent) {
 			return false;
 		}
 
-		// Create patch info
-		patch_t patch;
-		patch.name = wxString(pname).Upper();
+		// Add new patch
+		bool success = addPatch(wxString(pname).Upper(), parent);
 
-		// Attempt to find patch entry
-		ArchiveEntry* entry = NULL;
-		if (parent)
-			entry = parent->getEntry(patch.name);						// Search parent archive first
-		if (!entry)
-			entry = theArchiveManager->getResourceEntry(patch.name);	// Next search open resource archives + base resource archive
-
-		if (entry)
-			patch.entry = entry;
-		else
+		// Write log message if patch entry not found
+		if (!success)
 			wxLogMessage(_T("Patch \"%s\" not found"), pname);
-
-		// Add patch to list
-		patches.push_back(patch);
 	}
 
 	// Update variables

@@ -116,6 +116,7 @@
     <ClCompile Include="src\OpenGL.cpp" />
     <ClCompile Include="src\TextLanguage.cpp" />
     <ClCompile Include="src\Tokenizer.cpp" />
+    <ClCompile Include="src\Tree.cpp" />
     <ClCompile Include="src\WxStuff.cpp" />
     <ClCompile Include="src\Property.cpp" />
     <ClCompile Include="src\PropertyList.cpp" />
@@ -192,6 +193,7 @@
     <ClInclude Include="src\Structs.h" />
     <ClInclude Include="src\TextLanguage.h" />
     <ClInclude Include="src\Tokenizer.h" />
+    <ClInclude Include="src\Tree.h" />
     <ClInclude Include="src\WxStuff.h" />
     <ClInclude Include="src\Property.h" />
     <ClInclude Include="src\PropertyList.h" />

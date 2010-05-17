@@ -119,6 +119,31 @@ struct ftdef_t
 };
 
 
+/* TextureXList::removePatch
+ * Updates all textures in the list to 'remove' the patch [index]
+ *******************************************************************/
+void TextureXList::removePatch(unsigned index) {
+	// Go through all textures
+	for (unsigned a = 0; a < textures.size(); a++) {
+		tx_texture_t& tex = textures[a];
+
+		// Go through texture's patches
+		for (int p = 0; p < (int)tex.patches.size(); p++) {
+			tx_patch_t& patch = tex.patches[p];
+
+			// Remove if it matches [index]
+			if (patch.patch == index) {
+				tex.patches.erase(tex.patches.begin() + p);
+				p--;
+			}
+
+			// Reduce patch index # if it's greater than the patch being removed
+			if (patch.patch > index)
+				patch.patch--;
+		}
+	}
+}
+
 /* TextureXList::readTEXTUREXData
  * Reads in a doom-format TEXTUREx entry. Returns true on success,
  * false otherwise

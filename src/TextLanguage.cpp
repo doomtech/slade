@@ -54,6 +54,8 @@ string TextLanguage::getConstantsList() {
 	// Add each constant to return string (separated by spaces)
 	for (size_t a = 0; a < constants.size(); a++)
 		ret += constants[a] + " ";
+
+	return ret;
 }
 
 string TextLanguage::getFunctionsList() {
@@ -63,6 +65,8 @@ string TextLanguage::getFunctionsList() {
 	// Add each function name to return string (separated by spaces)
 	for (size_t a = 0; a < functions.size(); a++)
 		ret += functions[a].name + " ";
+
+	return ret;
 }
 
 bool TextLanguage::readLanguageDefinition(MemChunk& mc) {

@@ -49,6 +49,7 @@ public:
 	tx_texture_t	getTexture(string name);
 
 	void	clear(bool clear_patches = false);
+	void	removePatch(unsigned index);
 
 	bool	readTEXTUREXData(ArchiveEntry* texturex);
 };

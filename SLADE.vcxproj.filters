@@ -291,6 +291,9 @@
     <ClCompile Include="src\TextLanguage.cpp">
       <Filter>UI Elements\TextEditor</Filter>
     </ClCompile>
+    <ClCompile Include="src\Tree.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -524,6 +527,9 @@
     </ClInclude>
     <ClInclude Include="src\TextLanguage.h">
       <Filter>UI Elements\TextEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Tree.h">
+      <Filter>General</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

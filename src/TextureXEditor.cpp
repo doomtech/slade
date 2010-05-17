@@ -88,6 +88,7 @@ TextureXPanel::TextureXPanel(wxWindow* parent, PatchTable* patch_table) : wxPane
  * TextureXPanel class destructor
  *******************************************************************/
 TextureXPanel::~TextureXPanel() {
+	// FIXME: Can cause crash if archive is closed before this
 	if (tx_entry)
 		tx_entry->unlock();
 }
@@ -208,6 +209,7 @@ TextureXEditor::TextureXEditor(wxWindow* parent) : wxPanel(parent, -1) {
  * TextureXEditor class destructor
  *******************************************************************/
 TextureXEditor::~TextureXEditor() {
+	// FIXME: Can cause crash if archive is closed before this
 	if (pnames)
 		pnames->unlock();
 }
@@ -285,6 +287,17 @@ bool TextureXEditor::openArchive(Archive* archive) {
 	// Lock pnames entry if it exists
 	if (pnames)
 		pnames->lock();
+
+	return true;
+}
+
+bool TextureXEditor::removePatch(unsigned index) {
+	// Remove patch from patch table
+	patch_table.removePatch(index);
+	
+	// Update TEXTUREx lists
+	for (unsigned a = 0; a < texture_editors.size(); a++)
+		texture_editors[a]->txList().removePatch(index);
 
 	return true;
 }
