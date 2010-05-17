@@ -18,6 +18,11 @@ public:
 	~PatchTablePanel();
 
 	void	populatePatchList();
+
+	// Events
+	void	onBtnAddPatch(wxCommandEvent& e);
+	void	onBtnRemovePatch(wxCommandEvent& e);
+	void	onBtnChangePatch(wxCommandEvent& e);
 };
 
 #endif//__PATCH_TABLE_PANEL_H__

@@ -71,6 +71,16 @@ PatchTablePanel::PatchTablePanel(wxWindow* parent, PatchTable* patch_table) : wx
 	// Change patch button
 	btn_change_patch = new wxButton(this, -1, _T("Change Patch"));
 	framesizer->Add(btn_change_patch, 0, wxEXPAND|wxALL, 4);
+
+	// Bind events
+	btn_add_patch->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &PatchTablePanel::onBtnAddPatch, this);
+	btn_remove_patch->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &PatchTablePanel::onBtnRemovePatch, this);
+	btn_change_patch->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &PatchTablePanel::onBtnChangePatch, this);
+
+	// Disable unimplemented
+	btn_add_patch->Enable(false);
+	btn_remove_patch->Enable(false);
+	btn_change_patch->Enable(false);
 }
 
 /* PatchTablePanel::~PatchTablePanel
@@ -118,4 +128,17 @@ void PatchTablePanel::populatePatchList() {
 	list_patches->enableSizeUpdate(true);
 	list_patches->updateSize();
 	list_patches->GetParent()->Layout();
+}
+
+
+void PatchTablePanel::onBtnAddPatch(wxCommandEvent& e) {
+
+}
+
+void PatchTablePanel::onBtnRemovePatch(wxCommandEvent& e) {
+
+}
+
+void PatchTablePanel::onBtnChangePatch(wxCommandEvent& e) {
+
 }

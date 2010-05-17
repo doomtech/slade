@@ -45,6 +45,8 @@
       <File Name="src/Tokenizer.cpp"/>
       <File Name="src/Tokenizer.h"/>
       <File Name="src/Structs.h"/>
+      <File Name="src/Tree.h"/>
+      <File Name="src/Tree.cpp"/>
     </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="Main Editor">
@@ -58,7 +60,6 @@
       <VirtualDirectory Name="EntryPanel">
         <File Name="src/AnimatedEntryPanel.cpp"/>
         <File Name="src/AnimatedEntryPanel.h"/>
-        <File Name="src/DefaultEntryPanel.cpp"/>
         <File Name="src/DefaultEntryPanel.h"/>
         <File Name="src/EntryPanel.cpp"/>
         <File Name="src/EntryPanel.h"/>
@@ -74,6 +75,7 @@
         <File Name="src/TextEntryPanel.h"/>
         <File Name="src/PnamesEntryPanel.cpp"/>
         <File Name="src/PnamesEntryPanel.h"/>
+        <File Name="src/DefaultEntryPanel.cpp"/>
       </VirtualDirectory>
       <VirtualDirectory Name="ZipArchivePanel">
         <File Name="src/ZipArchivePanel.cpp"/>
@@ -131,9 +133,12 @@
       <File Name="src/WadArchive.h"/>
       <File Name="src/ZipArchive.cpp"/>
       <File Name="src/ZipArchive.h"/>
-      <File Name="src/EntryType.h"/>
-      <File Name="src/EntryType.cpp"/>
-      <File Name="src/EntryTypeList.h"/>
+      <VirtualDirectory Name="EntryType">
+        <File Name="src/EntryType.cpp"/>
+        <File Name="src/EntryType.h"/>
+        <File Name="src/EntryTypeList.h"/>
+        <File Name="src/EntryDataFormat.h"/>
+      </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="Binary Control Lumps">
       <File Name="src/AnimatedList.cpp"/>
@@ -186,8 +191,6 @@
     <File Name="src/PaletteCanvas.h"/>
     <File Name="src/PaletteChooser.cpp"/>
     <File Name="src/PaletteChooser.h"/>
-    <File Name="src/TextEditor.cpp"/>
-    <File Name="src/TextEditor.h"/>
     <File Name="src/ConsolePanel.cpp"/>
     <File Name="src/ConsolePanel.h"/>
     <File Name="src/SplashWindow.h"/>
@@ -199,10 +202,16 @@
     <VirtualDirectory Name="Browser">
       <File Name="src/BrowserCanvas.cpp"/>
       <File Name="src/BrowserCanvas.h"/>
-      <File Name="src/Browser.h"/>
       <File Name="src/Browser.cpp"/>
+      <File Name="src/Browser.h"/>
     </VirtualDirectory>
     <File Name="src/CTextureCanvas.cpp"/>
+    <VirtualDirectory Name="TextEditor">
+      <File Name="src/TextEditor.cpp"/>
+      <File Name="src/TextEditor.h"/>
+      <File Name="src/TextLanguage.h"/>
+      <File Name="src/TextLanguage.cpp"/>
+    </VirtualDirectory>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>

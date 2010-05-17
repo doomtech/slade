@@ -4,8 +4,10 @@
   <BuildMatrix>
     <WorkspaceConfiguration Name="Debug" Selected="no">
       <Project Name="SLADE" ConfigName="Debug"/>
+      <Project Name="SLADE" ConfigName="Debug"/>
     </WorkspaceConfiguration>
     <WorkspaceConfiguration Name="Release" Selected="yes">
+      <Project Name="SLADE" ConfigName="Release"/>
       <Project Name="SLADE" ConfigName="Release"/>
     </WorkspaceConfiguration>
   </BuildMatrix>

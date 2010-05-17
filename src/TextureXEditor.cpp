@@ -77,6 +77,11 @@ TextureXPanel::TextureXPanel(wxWindow* parent, PatchTable* patch_table) : wxPane
 
 	// Bind events
 	list_textures->Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &TextureXPanel::onTextureListSelect, this);
+
+	// Disable unimplemented
+	btn_new_texture->Enable(false);
+	btn_new_from_patch->Enable(false);
+	btn_remove_texture->Enable(false);
 }
 
 /* TextureXPanel::~TextureXPanel

@@ -32,6 +32,7 @@ TODO List ---------------------------------------------------------------
 	- Option not to show save dialog on export (or show only once)
 	- Option to automatically save entry changes
 	- List of entry types, ability to enable/disable detection of certain types
+	- Action to take on archive tab closed - close archive, leave archive open, or ask
 - *Nicer entry data format (EDF_*) system:
 	- Simple user-definable data formats:
 		- Minimum/maximum size
@@ -39,6 +40,8 @@ TODO List ---------------------------------------------------------------
 		  pattern = 10, 255, 255, 255, 0; = look for 255,255,255,0 at offset 10 in file
 		- Call inbuilt tests for more complex detection algorithms (wad files, doom gfx, etc)
 	- Handling EntryPanel should be determined by format rather than type as it is now
+	- Should have some kind of 'class' attribute: gfx, text, etc.
+		- Used when, for instance, searching for all gfx entries in an archive
 - Rearrange menus
 - *Resources system:
 	- opened archives are either used as resources or not
