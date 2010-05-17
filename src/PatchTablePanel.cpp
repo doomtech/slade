@@ -100,9 +100,16 @@ void PatchTablePanel::updatePatchListItem(unsigned index) {
 		archive = patch.entry->getParent()->getFileName(false);
 
 	// Update list item
+	list_patches->setItemText(index, 0, s_fmt(_T("%04d"), index));
 	list_patches->setItemText(index, 1, patch.name);
 	list_patches->setItemText(index, 2, s_fmt(_T("%d"), patch.used));
 	list_patches->setItemText(index, 3, archive);
+
+	// Update item colour
+	if (patch.entry)
+		list_patches->setItemStatus(index, LV_STATUS_NORMAL);
+	else
+		list_patches->setItemStatus(index, LV_STATUS_ERROR);
 
 	// Update list width
 	list_patches->updateSize();
@@ -206,5 +213,11 @@ void PatchTablePanel::onBtnChangePatch(wxCommandEvent& e) {
 
 		// Prompt for new patch name
 		string newname = wxGetTextFromUser(_T("Enter new patch entry name:"), _T("Change Patch"), patch.name, this);
+
+		// Update the patch
+		patch_table->replacePatch(selection[a], newname, parent->getArchive());
+
+		// Update the list entry
+		updatePatchListItem(selection[a]);
 	}
 }
