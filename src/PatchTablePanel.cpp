@@ -63,8 +63,12 @@ PatchTablePanel::PatchTablePanel(wxWindow* parent, PatchTable* patch_table) : wx
 	sizer->Add(framesizer, 0, wxALL, 4);
 
 	// Add patch button
-	btn_add_patch = new wxButton(this, -1, _T("Add Patch"));
+	btn_add_patch = new wxButton(this, -1, _T("New Patch"));
 	framesizer->Add(btn_add_patch, 0, wxEXPAND|wxALL, 4);
+
+	// New patch from file button
+	btn_patch_from_file = new wxButton(this, -1, _T("New Patch from File"));
+	framesizer->Add(btn_patch_from_file, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
 
 	// Remove patch button
 	btn_remove_patch = new wxButton(this, -1, _T("Remove Patch"));

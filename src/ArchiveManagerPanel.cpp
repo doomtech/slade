@@ -329,6 +329,32 @@ void ArchiveManagerPanel::openTextureTab(int archive_index) {
 	}
 }
 
+/* ArchiveManagerPanel::closeTextureTab
+ * Closes the texture editor tab for the archive at <archive_index>
+ * in the archive manager
+ *******************************************************************/
+void ArchiveManagerPanel::closeTextureTab(int archive_index) {
+	Archive* archive = theArchiveManager->getArchive(archive_index);
+
+	if (archive) {
+		// Go through all tabs
+		for (size_t a = 0; a < notebook_archives->GetPageCount(); a++) {
+			// Check page type is "texture"
+			if (notebook_archives->GetPage(a)->GetName().CmpNoCase(_T("texture")))
+				continue;
+
+			// Check for archive match
+			TextureXEditor* txed = (TextureXEditor*)notebook_archives->GetPage(a);
+			if (txed->getArchive() == archive) {
+				// Close the tab
+				notebook_archives->DeletePage(a);
+
+				return;
+			}
+		}
+	}
+}
+
 /* ArchiveManagerPanel::openFile
  * Opens an archive and initialises the UI for it
  *******************************************************************/
@@ -449,6 +475,13 @@ vector<int> ArchiveManagerPanel::getSelectedArchives() {
 void ArchiveManagerPanel::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
 	// Reset event data for reading
 	event_data.seek(0, SEEK_SET);
+
+	// If an archive is about to be closed
+	if (event_name == _T("archive_closing")) {
+		int32_t index = -1;
+		event_data.read(&index, 4);
+		closeTextureTab(index);
+	}
 
 	// If an archive was closed
 	if (event_name == _T("archive_closed")) {

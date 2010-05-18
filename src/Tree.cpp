@@ -11,8 +11,13 @@ STreeNode::STreeNode(STreeNode* parent) {
 }
 
 STreeNode::~STreeNode() {
+	// Remove from parent
 	if (parent)
 		parent->removeChild(this);
+
+	// Delete children
+	while (children.size() > 0)
+		delete children.pop_back();
 }
 
 string STreeNode::getPath() {

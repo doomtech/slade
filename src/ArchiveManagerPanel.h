@@ -56,6 +56,7 @@ public:
 
 	void	openTab(int archive_index);
 	void	openTextureTab(int archive_index);
+	void	closeTextureTab(int archive_index);
 	void	openFile(string filename);
 	void	openFiles(wxArrayString& files);
 

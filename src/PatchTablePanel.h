@@ -16,8 +16,10 @@ private:
 	PatchTable*		patch_table;
 	ListView*		list_patches;
 	wxButton*		btn_add_patch;
+	wxButton*		btn_patch_from_file;
 	wxButton*		btn_remove_patch;
 	wxButton*		btn_change_patch;
+	wxButton*		btn_import_patch_file;
 	TextureXEditor*	parent;
 
 public:

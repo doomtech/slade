@@ -4,6 +4,7 @@
 
 class ArchiveEntry;
 
+/*
 enum {
 #define xa(id, name, val)			id = val,
 #define xb(id, name)				id,
@@ -72,6 +73,7 @@ public:
 	static bool detectMD2(MemChunk& mc);
 	static bool detectMD3(MemChunk& mc);
 };
+*/
 
 class EntryType {
 private:

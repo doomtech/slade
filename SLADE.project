@@ -47,6 +47,8 @@
       <File Name="src/Structs.h"/>
       <File Name="src/Tree.h"/>
       <File Name="src/Tree.cpp"/>
+      <File Name="src/Parser.h"/>
+      <File Name="src/Parser.cpp"/>
     </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="Main Editor">
@@ -138,6 +140,7 @@
         <File Name="src/EntryType.h"/>
         <File Name="src/EntryTypeList.h"/>
         <File Name="src/EntryDataFormat.h"/>
+        <File Name="src/EntryDataFormat.cpp"/>
       </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="Binary Control Lumps">

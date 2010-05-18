@@ -303,6 +303,9 @@ int MainApp::OnExit() {
 	// Save configuration
 	saveConfigFile();
 
+	// Close all open archives
+	theArchiveManager->closeAll();
+
 	// Clean up
 	EntryType::cleanupEntryTypes();
 	ArchiveManager::deleteInstance();

@@ -253,6 +253,11 @@ bool ArchiveManager::closeArchive(int index) {
 	if (index < 0 || index >= (int) open_archives.size())
 		return false;
 
+	// Announce archive closing
+	MemChunk mc;
+	mc.write(&index, sizeof(int));
+	announce(_T("archive_closing"), mc);
+
 	// Close any open child archives
 	for (size_t a = 0; a < open_archives[index].open_children.size(); a++) {
 		int ci = archiveIndex(open_archives[index].open_children[a]);
@@ -269,9 +274,7 @@ bool ArchiveManager::closeArchive(int index) {
 	// Remove the archive at index from the list
 	open_archives.erase(open_archives.begin() + index);
 
-	// Announce it
-	MemChunk mc;
-	mc.write(&index, sizeof(int));
+	// Announce closed
 	announce(_T("archive_closed"), mc);
 
 	return true;
@@ -340,14 +343,14 @@ string ArchiveManager::getArchiveExtensionsString(bool wad, bool zip, bool pk3, 
 	string ext_zip = _T("*.zip;*.ZIP;*.Zip");
 	string ext_pk3 = _T("*.pk3;*.PK3;*.Pk3");
 	string ext_jdf = _T("*.jdf;*.JDF;*.Jdf");
-	
+
 	// Create extensions string
 	string extensions = s_fmt(_T("Any Supported File (*.wad; *.zip; *.pk3; *.jdf)|%s;%s;%s;%s"), ext_wad.c_str(), ext_zip.c_str(), ext_pk3.c_str(), ext_jdf.c_str());
 	extensions += s_fmt(_T("|Doom Wad files (*.wad)|%s"), ext_wad.c_str());
 	extensions += s_fmt(_T("|Zip files (*.zip)|%s"), ext_zip.c_str());
 	extensions += s_fmt(_T("|Pk3 (zip) files (*.pk3)|%s"), ext_pk3.c_str());
 	extensions += s_fmt(_T("|JDF (zip) files (*.jdf)|%s"), ext_jdf.c_str());
-	
+
 	return extensions;
 }
 
@@ -393,7 +396,7 @@ string ArchiveManager::baseResourcePath(uint32_t index) {
 void ArchiveManager::addBaseResourcePath(string path) {
 	// Add the path
 	base_resource_list.Add(path);
-	
+
 	// Announce
 	announce(_T("base_resource_path_added"));
 }
