@@ -13,14 +13,16 @@ private:
 	vector<Property>	values;
 
 protected:
-	STreeNode*	createChild() { return new ParseTreeNode(); }
+	STreeNode*	createChild(string name) { ParseTreeNode* ret = new ParseTreeNode(); ret->setName(name); return ret; }
 
 public:
-	ParseTreeNode();
+	ParseTreeNode(ParseTreeNode* parent = NULL);
 	~ParseTreeNode();
 
 	string	getName() { return name; }
 	void	setName(string name) { this->name = name; }
+
+	bool	parse(Tokenizer& tz);
 };
 
 class Parser {

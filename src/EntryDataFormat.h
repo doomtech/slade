@@ -2,6 +2,7 @@
 #ifndef __ENTRYDATAFORMAT_H__
 #define __ENTRYDATAFORMAT_H__
 
+/*
 class EntryDataFormat {
 private:
 	// Struct to specify a range for a byte (min <= valid >= max)
@@ -37,9 +38,8 @@ private:
 	unsigned				size_min;
 	unsigned				size_max;
 	vector<byte_pattern_t>	patterns;
-	/* Also needed:
-	 * Some way to check more complex values (eg. multiply byte 0 and 1, result must be in a certain range)
-	 */
+	// Also needed:
+	// Some way to check more complex values (eg. multiply byte 0 and 1, result must be in a certain range)
 
 public:
 	EntryDataFormat();
@@ -100,5 +100,6 @@ public:
 	static bool detectMD2(MemChunk& mc);
 	static bool detectMD3(MemChunk& mc);
 };
+*/
 
 #endif//__ENTRYDATAFORMAT_H__

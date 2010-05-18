@@ -7,9 +7,6 @@
     <Filter Include="General">
       <UniqueIdentifier>{f7d552f7-3fec-4baa-b8a5-cadc09d10893}</UniqueIdentifier>
     </Filter>
-    <Filter Include="General\PropertyList">
-      <UniqueIdentifier>{363ddaab-2da0-45fb-8fc2-042e5c6723c4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Main Editor">
       <UniqueIdentifier>{fef8e5a6-0991-4153-8f52-5d3f2da4e9d5}</UniqueIdentifier>
     </Filter>
@@ -76,6 +73,12 @@
     <Filter Include="UI Elements\TextEditor">
       <UniqueIdentifier>{54fbf714-855d-444d-885d-1e12f9df2ef7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="General\Utility">
+      <UniqueIdentifier>{3bdecab8-98a4-45cf-ab63-fe6368271c60}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="General\Utility\PropertyList">
+      <UniqueIdentifier>{363ddaab-2da0-45fb-8fc2-042e5c6723c4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\GfxConvDialog.cpp">
@@ -111,17 +114,14 @@
     <ClCompile Include="src\OpenGL.cpp">
       <Filter>General</Filter>
     </ClCompile>
-    <ClCompile Include="src\Tokenizer.cpp">
-      <Filter>General</Filter>
-    </ClCompile>
     <ClCompile Include="src\WxStuff.cpp">
       <Filter>General</Filter>
     </ClCompile>
     <ClCompile Include="src\Property.cpp">
-      <Filter>General\PropertyList</Filter>
+      <Filter>General\Utility\PropertyList</Filter>
     </ClCompile>
     <ClCompile Include="src\PropertyList.cpp">
-      <Filter>General\PropertyList</Filter>
+      <Filter>General\Utility\PropertyList</Filter>
     </ClCompile>
     <ClCompile Include="src\EntryOperations.cpp">
       <Filter>Main Editor</Filter>
@@ -292,7 +292,16 @@
       <Filter>UI Elements\TextEditor</Filter>
     </ClCompile>
     <ClCompile Include="src\Tree.cpp">
-      <Filter>General</Filter>
+      <Filter>General\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Tokenizer.cpp">
+      <Filter>General\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Parser.cpp">
+      <Filter>General\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EntryDataFormat.cpp">
+      <Filter>Resources\Archive\EntryType</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -332,20 +341,14 @@
     <ClInclude Include="src\OpenGL.h">
       <Filter>General</Filter>
     </ClInclude>
-    <ClInclude Include="src\Structs.h">
-      <Filter>General</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Tokenizer.h">
-      <Filter>General</Filter>
-    </ClInclude>
     <ClInclude Include="src\WxStuff.h">
       <Filter>General</Filter>
     </ClInclude>
     <ClInclude Include="src\Property.h">
-      <Filter>General\PropertyList</Filter>
+      <Filter>General\Utility\PropertyList</Filter>
     </ClInclude>
     <ClInclude Include="src\PropertyList.h">
-      <Filter>General\PropertyList</Filter>
+      <Filter>General\Utility\PropertyList</Filter>
     </ClInclude>
     <ClInclude Include="src\EntryOperations.h">
       <Filter>Main Editor</Filter>
@@ -529,7 +532,16 @@
       <Filter>UI Elements\TextEditor</Filter>
     </ClInclude>
     <ClInclude Include="src\Tree.h">
-      <Filter>General</Filter>
+      <Filter>General\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Tokenizer.h">
+      <Filter>General\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Structs.h">
+      <Filter>General\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Parser.h">
+      <Filter>General\Utility</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -316,10 +316,12 @@ int MainApp::OnExit() {
 }
 
 void MainApp::OnFatalException() {
+#ifndef _DEBUG
 	SLADEStackTrace st;
 	st.WalkFromException();
 	SLADECrashDialog sd(st);
 	sd.ShowModal();
+#endif
 }
 
 /* MainApp::initLogFile

@@ -103,6 +103,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\BrowserCanvas.cpp" />
+    <ClCompile Include="src\EntryDataFormat.cpp" />
     <ClCompile Include="src\GfxConvDialog.cpp" />
     <ClCompile Include="src\ModifyOffsetsDialog.cpp" />
     <ClCompile Include="src\PaletteDialog.cpp" />
@@ -114,6 +115,7 @@
     <ClCompile Include="src\MemChunk.cpp" />
     <ClCompile Include="src\Misc.cpp" />
     <ClCompile Include="src\OpenGL.cpp" />
+    <ClCompile Include="src\Parser.cpp" />
     <ClCompile Include="src\TextLanguage.cpp" />
     <ClCompile Include="src\Tokenizer.cpp" />
     <ClCompile Include="src\Tree.cpp" />
@@ -190,6 +192,7 @@
     <ClInclude Include="src\MemChunk.h" />
     <ClInclude Include="src\Misc.h" />
     <ClInclude Include="src\OpenGL.h" />
+    <ClInclude Include="src\Parser.h" />
     <ClInclude Include="src\Structs.h" />
     <ClInclude Include="src\TextLanguage.h" />
     <ClInclude Include="src\Tokenizer.h" />

@@ -27,7 +27,7 @@
  * INCLUDES
  *******************************************************************/
 #include "Main.h"
-#include "EntryDataFormat.h"
+//#include "EntryDataFormat.h"
 #include "ZipArchive.h"
 #include "WadArchive.h"
 #include "BinaryControlLump.h"
@@ -45,6 +45,7 @@ EDFMap data_formats;
  * ENTRYDATAFORMAT CLASS FUNCTIONS
  *******************************************************************/
 
+/*
 EntryDataFormat::EntryDataFormat() {
 	// Init variables
 	extension = _T("dat");
@@ -119,6 +120,7 @@ bool EntryDataFormat::readDataFormatDefinition(MemChunk& mc) {
 		}
 	}
 }
+*/
 
 bool EntryDataFormat::detectPng(MemChunk& mc) {
 	// Check size

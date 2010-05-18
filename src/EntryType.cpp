@@ -42,7 +42,7 @@
  * VARIABLES
  *******************************************************************/
 
-/*
+///*
 // Basic formats system for now
 struct id_format_t {
 	string 		id;
@@ -58,7 +58,7 @@ id_format_t formats[] = {
 
 	{ "",				EDF_ANY }, // Dummy type to mark end of list
 };
-*/
+//*/
 
 vector<EntryType*>	entry_types;	// The big list of all entry types
 
@@ -72,7 +72,7 @@ EntryType			etype_map;		// Map marker type
 /*******************************************************************
  * ENTRYDATAFORMAT CLASS FUNCTIONS
  *******************************************************************/
- /*
+ ///*
 bool EntryDataFormat::isFormat(MemChunk& mc, uint16_t format) {
 	switch (format) {
 #define xa(id, name, val)
@@ -84,7 +84,7 @@ bool EntryDataFormat::isFormat(MemChunk& mc, uint16_t format) {
 		return false;
 	}
 }
-*/
+//*/
 
 /*******************************************************************
  * ENTRYTYPE CLASS FUNCTIONS
