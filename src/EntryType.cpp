@@ -34,6 +34,7 @@
 #include "ZipArchive.h"
 #include "WadArchive.h"
 #include "BinaryControlLump.h"
+#include "Parser.h"
 #include <wx/dir.h>
 #include <wx/filename.h>
 
@@ -292,6 +293,7 @@ bool EntryType::isThisType(ArchiveEntry* entry) {
  * was a parsing error, true otherwise
  *******************************************************************/
 bool EntryType::readEntryTypeDefinition(MemChunk& mc) {
+	/*
 	Tokenizer tz;
 
 	// Open the given text data
@@ -575,6 +577,107 @@ bool EntryType::readEntryTypeDefinition(MemChunk& mc) {
 			ntype->addToList();
 			token = tz.getToken();
 		}
+	}
+	*/
+
+	// Parse the definition
+	Parser p;
+	p.parseText(mc);
+
+	// Get entry_types tree
+	ParseTreeNode* pt_etypes = (ParseTreeNode*)(p.parseTreeRoot()->getChild("entry_types"));
+
+	// Check it exists
+	if (!pt_etypes)
+		return false;
+
+	// Go through all parsed types
+	for (unsigned a = 0; a < pt_etypes->nChildren(); a++) {
+		// Get child as ParseTreeNode
+		ParseTreeNode* typenode = (ParseTreeNode*)pt_etypes->getChild(a);
+
+		// Create new entry type
+		EntryType* ntype = new EntryType(typenode->getName());
+
+		// Copy from existing type if inherited
+		if (!typenode->getInherit().IsEmpty()) {
+			EntryType* parent_type = EntryType::getType(typenode->getInherit());
+
+			if (parent_type != EntryType::unknownType())
+				parent_type->copyToType(ntype);
+			else
+				wxLogMessage(_T("Warning: Entry type %s inherits from unknown type %s"), chr(ntype->getId()), chr(typenode->getInherit()));
+		}
+
+		// Go through all parsed fields
+		for (unsigned b = 0; b < typenode->nChildren(); b++) {
+			// Get child as ParseTreeNode
+			ParseTreeNode* fieldnode = (ParseTreeNode*)typenode->getChild(b);
+
+			// Process it
+			if (s_cmpnocase(fieldnode->getName(), _T("name"))) {			// Name field
+				ntype->setName(fieldnode->getStringValue());
+			}
+			else if (s_cmpnocase(fieldnode->getName(), _T("detectable"))) {	// Detectable field
+				ntype->setDetectable(fieldnode->getBoolValue());
+			}
+			else if (s_cmpnocase(fieldnode->getName(), _T("export_ext"))) {	// Export Extension field
+				ntype->setExtension(fieldnode->getStringValue());
+			}
+			else if (s_cmpnocase(fieldnode->getName(), _T("format"))) {	// Format field
+				// Get format type matching format string
+				bool fmt_exists = false;
+				for (unsigned f = 0; f < EDF_UNKNOWN; f++) {
+					if (formats[f].id.IsEmpty())
+						break;
+
+					if (s_cmpnocase(fieldnode->getStringValue(), formats[f].id)) {
+						ntype->setFormat(formats[f].format);
+						fmt_exists = true;
+					}
+				}
+
+				if (!fmt_exists)
+					ntype->setFormat(EDF_UNKNOWN);
+			}
+			else if (s_cmpnocase(fieldnode->getName(), _T("icon"))) {	// Icon field
+				ntype->setIcon(fieldnode->getStringValue());
+			}
+			else if (s_cmpnocase(fieldnode->getName(), _T("editor"))) {	// Editor field (to be removed)
+				ntype->setEditor(fieldnode->getStringValue());
+			}
+			else if (s_cmpnocase(fieldnode->getName(), _T("section"))) {	// Section field
+				ntype->setSection(fieldnode->getStringValue());
+			}
+			else if (s_cmpnocase(fieldnode->getName(), _T("match_ext"))) {	// Match Extension field
+				for (unsigned v = 0; v < fieldnode->nValues(); v++)
+					ntype->addMatchExtension(fieldnode->getStringValue(v));
+			}
+			else if (s_cmpnocase(fieldnode->getName(), _T("match_name"))) {	// Match Name field
+				for (unsigned v = 0; v < fieldnode->nValues(); v++)
+					ntype->addMatchName(fieldnode->getStringValue(v));
+			}
+			else if (s_cmpnocase(fieldnode->getName(), _T("size"))) {	// Size field
+				for (unsigned v = 0; v < fieldnode->nValues(); v++)
+					ntype->addMatchSize(fieldnode->getIntValue(v));
+			}
+			else if (s_cmpnocase(fieldnode->getName(), _T("min_size"))) {	// Min Size field
+				ntype->setMinSize(fieldnode->getIntValue());
+			}
+			else if (s_cmpnocase(fieldnode->getName(), _T("max_size"))) {	// Max Size field
+				ntype->setMaxSize(fieldnode->getIntValue());
+			}
+			else if (s_cmpnocase(fieldnode->getName(), _T("size_multiple"))) {	// Size Multiple field
+				for (unsigned v = 0; v < fieldnode->nValues(); v++)
+					ntype->addSizeMultiple(fieldnode->getIntValue(v));
+			}
+			else if (s_cmpnocase(fieldnode->getName(), _T("reliability"))) {	// Reliability field
+				ntype->setReliability(fieldnode->getIntValue());
+			}
+		}
+
+		//ntype->dump();
+		ntype->addToList();
 	}
 
 	return true;

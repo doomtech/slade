@@ -8,9 +8,9 @@
 
 class ParseTreeNode : public STreeNode {
 private:
-	string				name;
-	string				inherit;
-	vector<Property>	values;
+	string			name;
+	string			inherit;
+	vector<string>	values;
 
 protected:
 	STreeNode*	createChild(string name) { ParseTreeNode* ret = new ParseTreeNode(); ret->setName(name); return ret; }
@@ -19,8 +19,14 @@ public:
 	ParseTreeNode(ParseTreeNode* parent = NULL);
 	~ParseTreeNode();
 
-	string	getName() { return name; }
-	void	setName(string name) { this->name = name; }
+	string		getName() { return name; }
+	void		setName(string name) { this->name = name; }
+	string		getInherit() { return inherit; }
+	unsigned	nValues() { return values.size(); }
+	string		getStringValue(unsigned index = 0);
+	int			getIntValue(unsigned index = 0);
+	bool		getBoolValue(unsigned index = 0);
+	float		getFloatValue(unsigned index = 0);
 
 	bool	parse(Tokenizer& tz);
 };
@@ -32,6 +38,8 @@ private:
 public:
 	Parser();
 	~Parser();
+
+	ParseTreeNode*	parseTreeRoot() { return pt_root; }
 
 	bool	parseText(MemChunk& mc);
 };

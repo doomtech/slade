@@ -22,6 +22,8 @@ public:
 	virtual void	setName(string name) = 0;
 	virtual string	getPath();
 
+	unsigned			nChildren() { return children.size(); }
+	STreeNode*			getChild(unsigned index);
 	virtual STreeNode*	getChild(string name);
 	virtual void 		addChild(STreeNode* child);
 	virtual STreeNode*	addChild(string name);

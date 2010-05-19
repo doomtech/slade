@@ -23,6 +23,14 @@ string STreeNode::getPath() {
 		return parent->getPath() + _T("/") + getName();
 }
 
+STreeNode* STreeNode::getChild(unsigned index) {
+	// Check index
+	if (index >= children.size())
+		return NULL;
+
+	return children[index];
+}
+
 STreeNode* STreeNode::getChild(string name) {
 	// Check name was given
 	if (name.IsEmpty())
