@@ -166,6 +166,10 @@ void PatchTablePanel::onBtnAddPatch(wxCommandEvent& e) {
 	// Prompt for new patch name
 	string patch = wxGetTextFromUser(_T("Enter patch entry name:"), _T("Add Patch"), wxEmptyString, this);
 
+	// Check something was entered
+	if (patch.IsEmpty())
+		return;
+
 	// Add to patch table
 	patch_table->addPatch(patch, parent->getArchive());
 
@@ -176,8 +180,12 @@ void PatchTablePanel::onBtnAddPatch(wxCommandEvent& e) {
 }
 
 void PatchTablePanel::onBtnRemovePatch(wxCommandEvent& e) {
-	// Go through patch list selection
+	// Check anything is selected
 	wxArrayInt selection = list_patches->selectedItems();
+	if (selection.size() == 0)
+		return;
+
+	// Go through patch list selection
 	for (int a = selection.size() - 1; a >= 0; a--) {
 		// Check if patch is currently in use
 		patch_t& patch = patch_table->patch(selection[a]);
@@ -210,8 +218,12 @@ void PatchTablePanel::onBtnRemovePatch(wxCommandEvent& e) {
 }
 
 void PatchTablePanel::onBtnChangePatch(wxCommandEvent& e) {
-	// Go through patch list selection
+	// Check anything is selected
 	wxArrayInt selection = list_patches->selectedItems();
+	if (selection.size() == 0)
+		return;
+
+	// Go through patch list selection
 	for (unsigned a = 0; a < selection.size(); a++) {
 		patch_t& patch = patch_table->patch(selection[a]);
 
