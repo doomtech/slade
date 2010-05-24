@@ -83,16 +83,16 @@ bool EntryOperations::modifyGfxOffsets(ArchiveEntry* entry, int auto_type, point
 
 	// Check entry type
 	EntryType* type = entry->getType();
-	uint16_t entryformat = type->getFormat(); 
-	if (!(entryformat == EDF_GFX_DOOM || entryformat == EDF_GFX_DOOM_ARAH || 
-		entryformat == EDF_GFX_DOOM_ALPHA || EDF_GFX_DOOM_BETA || entryformat == EDF_PNG)) {
+	string entryformat = type->getFormat(); 
+	if (!(entryformat == "img_doom" || entryformat == "img_doom_arah" || 
+		entryformat == "img_doom_alpha" || "img_doom_beta" || entryformat == "img_png")) {
 		wxLogMessage(s_fmt(_T("Entry \"%s\" is of type \"%s\" which does not support offsets"), entry->getName().c_str(), entry->getTypeString().c_str()));
 		return false;
 	}
 
 	// Doom gfx format, normal and beta version.
 	// Also arah format from alpha 0.2 because it uses the same header format.
-	if (entryformat == EDF_GFX_DOOM || entryformat == EDF_GFX_DOOM_BETA || entryformat == EDF_GFX_DOOM_ARAH)
+	if (entryformat == "img_doom" || entryformat == "img_doom_beta" || entryformat == "image_doom_arah")
 	{
 		// Get patch header
 		patch_header_t header;
@@ -139,7 +139,7 @@ bool EntryOperations::modifyGfxOffsets(ArchiveEntry* entry, int auto_type, point
 	}
 
 	// Doom alpha gfx format
-	else if (entryformat == EDF_GFX_DOOM_ALPHA) {
+	else if (entryformat == "img_doom_alpha") {
 		// Get patch header
 		entry->seek(0, SEEK_SET);
 		oldpatch_header_t header;
@@ -184,7 +184,7 @@ bool EntryOperations::modifyGfxOffsets(ArchiveEntry* entry, int auto_type, point
 	}
 
 	// PNG format
-	else if (entryformat == EDF_PNG) {
+	else if (entryformat == "img_png") {
 		// Read width and height from IHDR chunk
 		const uint8_t* data = entry->getData(true);
 		const ihdr_t* ihdr = (ihdr_t*)(data + 12);
@@ -310,7 +310,7 @@ bool EntryOperations::modifyalPhChunk(ArchiveEntry* entry, bool value) {
 		return false;
 
 	// Check entry type
-	if (!(entry->getType()->getFormat() == EDF_PNG)) {
+	if (!(entry->getType()->getFormat() == "img_png")) {
 		wxLogMessage(s_fmt(_T("Entry \"%s\" is of type \"%s\" rather than PNG"), entry->getName().c_str(), entry->getTypeString().c_str()));
 		return false;
 	}
@@ -415,7 +415,7 @@ bool EntryOperations::modifytRNSChunk(ArchiveEntry* entry, bool value) {
 		return false;
 
 	// Check entry type
-	if (!(entry->getType()->getFormat() == EDF_PNG)) {
+	if (!(entry->getType()->getFormat() == "img_png")) {
 		wxLogMessage(s_fmt(_T("Entry \"%s\" is of type \"%s\" rather than PNG"), entry->getName().c_str(), entry->getTypeString().c_str()));
 		return false;
 	}
@@ -528,7 +528,7 @@ bool EntryOperations::getalPhChunk(ArchiveEntry* entry) {
 		return false;
 
 	// Check entry type
-	if (entry->getType()->getFormat() != EDF_PNG) {
+	if (entry->getType()->getFormat() != "img_png") {
 		wxLogMessage(s_fmt(_T("Entry \"%s\" is of type \"%s\" rather than PNG"), entry->getName().c_str(), entry->getTypeString().c_str()));
 		return false;
 	}
@@ -558,7 +558,7 @@ bool EntryOperations::gettRNSChunk(ArchiveEntry* entry) {
 		return false;
 
 	// Check entry type
-	if (entry->getType()->getFormat() != EDF_PNG) {
+	if (entry->getType()->getFormat() != "img_png") {
 		wxLogMessage(s_fmt(_T("Entry \"%s\" is of type \"%s\" rather than PNG"), entry->getName().c_str(), entry->getTypeString().c_str()));
 		return false;
 	}

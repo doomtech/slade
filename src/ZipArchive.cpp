@@ -131,6 +131,7 @@ ArchiveEntry* zipdir_t::getEntry(string name, bool include_subdirs) {
 }
 
 ArchiveEntry* zipdir_t::getEntry(int edftype, bool include_subdirs) {
+	/*
 	for (size_t a = 0; a < entries.size(); a++) {
 		if (entries[a]->getType()->getFormat() == edftype)
 			return entries[a];
@@ -145,6 +146,7 @@ ArchiveEntry* zipdir_t::getEntry(int edftype, bool include_subdirs) {
 			if (test) return test;
 		}
 	}
+	*/
 	return NULL;
 }
 
@@ -164,6 +166,7 @@ void zipdir_t::getEntries(vector<ArchiveEntry*> &ret, string name, bool include_
 }
 
 void zipdir_t::getEntries(vector<ArchiveEntry*> &ret, int edftype, bool include_subdirs) {
+	/*
 	for (size_t a = 0; a < numEntries(); a++) {
 		if (entries[a]->getType()->getFormat() == edftype)
 			ret.push_back(entries[a]);
@@ -175,6 +178,7 @@ void zipdir_t::getEntries(vector<ArchiveEntry*> &ret, int edftype, bool include_
 			subdirectories[a]->getEntries(ret, edftype, true);
 		}
 	}
+	*/
 }
 
 
@@ -878,7 +882,7 @@ bool ZipArchive::removeEntry(ArchiveEntry* entry, bool delete_entry) {
 	wxUIntPtr ptr = wxPtrToUInt(entry);
 	mc.write(&index, sizeof(uint32_t));
 	mc.write(&ptr, sizeof(wxUIntPtr));
-	announce(_T("entry_removed"), mc);
+	announce(_T("entry_removing"), mc);
 
 	// Remove it from the directory
 	dir->entries.erase(dir->entries.begin() + index);
@@ -886,6 +890,9 @@ bool ZipArchive::removeEntry(ArchiveEntry* entry, bool delete_entry) {
 	// Delete the entry if specified
 	if (delete_entry)
 		delete entry;
+
+	// Announce deletion
+	announce(_T("entry_removed"), mc);
 
 	// Update variables etc
 	setModified(true);

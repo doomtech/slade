@@ -2,9 +2,10 @@
 #ifndef __ENTRYTYPE_H__
 #define __ENTRYTYPE_H__
 
+#include "PropertyList.h"
 class ArchiveEntry;
 
-///*
+/*
 enum {
 #define xa(id, name, val)			id = val,
 #define xb(id, name)				id,
@@ -73,7 +74,7 @@ public:
 	static bool detectMD2(MemChunk& mc);
 	static bool detectMD3(MemChunk& mc);
 };
-//*/
+*/
 
 class EntryType {
 private:
@@ -87,9 +88,13 @@ private:
 	bool		detectable;		// False only for special types that should be set not detected
 	uint8_t		reliability;	// How 'reliable' this type's detection is. A higher value means it's less
 								// likely this type can be detected erroneously. 0-255 (default is 255)
+	PropertyList	extra;		// Extra properties for types with certain special behaviours
+								// Current recognised properties listed below:
+								// bool "image": Can be loaded into a SImage, therefore can be converted to other supported image formats
+								// bool "patch": Can be used as a TEXTUREx patch
 
 	// Type matching criteria
-	uint16_t		format;				// To be of this type, the entry data must match the specified format
+	string			format;				// To be of this type, the entry data must match the specified format
 	vector<string>	match_extension;
 	vector<string>	match_name;
 	vector<int>		match_size;
@@ -103,10 +108,11 @@ public:
 	~EntryType();
 
 	// Setters
+	/*
 	void setName(string name)			{ this->name = name; }
 	void setExtension(string extension)	{ this->extension = extension; }
 	void setIcon(string icon)			{ this->icon = icon; }
-	void setFormat(uint16_t format)		{ this->format = format; }
+	void setFormat(string format)		{ this->format = format; }
 	void setEditor(string editor)		{ this->editor = editor; }
 	void addMatchExtension(string ext) 	{ this->match_extension.push_back(ext); }
 	void addMatchName(string name) 		{ this->match_name.push_back(name); }
@@ -117,16 +123,20 @@ public:
 	void setDetectable(bool detect)		{ this->detectable = detect; }
 	void setSection(string section)		{ this->section = section; }
 	void setReliability(uint8_t val)	{ this->reliability = val; }
+	//void setGroup(string group)			{ this->group = group; }
+	 */
 
 	// Getters
-	string		getId()				{ return id; }
-	string		getName()			{ return name; }
-	string		getExtension()		{ return extension; }
-	uint16_t	getFormat()			{ return format; }
-	string		getEditor()			{ return editor; }
-	string		getIcon()			{ return icon; }
-	int			getIndex()			{ return index; }
-	uint8_t		getReliability()	{ return reliability; }
+	string			getId()				{ return id; }
+	string			getName()			{ return name; }
+	string			getExtension()		{ return extension; }
+	string			getFormat()			{ return format; }
+	string			getEditor()			{ return editor; }
+	string			getIcon()			{ return icon; }
+	//string			getGroup()			{ return group; }
+	int				getIndex()			{ return index; }
+	uint8_t			getReliability()	{ return reliability; }
+	PropertyList&	extraProps()		{ return extra; }
 
 	// Misc
 	void	addToList();

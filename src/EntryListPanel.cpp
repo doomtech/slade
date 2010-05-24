@@ -530,11 +530,11 @@ void EntryListPanel::onEntryListActivated(wxListEvent& e) {
 	if (!entry)
 		return;
 	
-	if (entry->getType()->getFormat() == EDF_WAD ||
-		entry->getType()->getFormat() == EDF_ZIP)
+	if (entry->getType()->getFormat() == "archive_wad" ||
+		entry->getType()->getFormat() == "archive_zip")
 		theArchiveManager->openArchive(entry);
 
-	if (entry->getType()->getFormat() == EDF_TEXTUREX)
+	if (entry->getType()->getFormat() == "texturex")
 		theArchiveManager->openTextureEditor(theArchiveManager->archiveIndex(archive));
 }
 

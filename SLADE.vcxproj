@@ -102,6 +102,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\ArchiveEntryList.cpp" />
     <ClCompile Include="src\BrowserCanvas.cpp" />
     <ClCompile Include="src\EntryDataFormat.cpp" />
     <ClCompile Include="src\GfxConvDialog.cpp" />
@@ -137,6 +138,7 @@
     <ClCompile Include="src\PaletteEntryPanel.cpp" />
     <ClCompile Include="src\SwitchesEntryPanel.cpp" />
     <ClCompile Include="src\TextEntryPanel.cpp" />
+    <ClCompile Include="src\ZipArchiveEntryList.cpp" />
     <ClCompile Include="src\ZipArchivePanel.cpp" />
     <ClCompile Include="src\ZipEntryListPanel.cpp" />
     <ClCompile Include="src\PatchTablePanel.cpp" />
@@ -178,6 +180,7 @@
     <ClCompile Include="src\Browser.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\ArchiveEntryList.h" />
     <ClInclude Include="src\BrowserCanvas.h" />
     <ClInclude Include="src\EntryDataFormat.h" />
     <ClInclude Include="src\GfxConvDialog.h" />
@@ -215,6 +218,7 @@
     <ClInclude Include="src\PaletteEntryPanel.h" />
     <ClInclude Include="src\SwitchesEntryPanel.h" />
     <ClInclude Include="src\TextEntryPanel.h" />
+    <ClInclude Include="src\ZipArchiveEntryList.h" />
     <ClInclude Include="src\ZipArchivePanel.h" />
     <ClInclude Include="src\ZipEntryListPanel.h" />
     <ClInclude Include="src\PatchTablePanel.h" />
@@ -260,6 +264,7 @@
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="detect_functions.txt" />
     <None Include="slade.ico" />
     <None Include="stuff.txt" />
   </ItemGroup>

@@ -36,6 +36,7 @@
 #include "Console.h"
 #include "Icons.h"
 #include "SplashWindow.h"
+#include "EntryDataFormat.h"
 #include <wx/image.h>
 #include <wx/stdpaths.h>
 #include <wx/ffile.h>
@@ -277,6 +278,7 @@ bool MainApp::OnInit() {
 
 	// Load entry types
 	wxLogMessage(_T("Loading entry types"));
+	EntryDataFormat::initBuiltinFormats();
 	EntryType::loadEntryTypes();
 
 	// Open any archives on the command line

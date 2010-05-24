@@ -158,7 +158,7 @@ bool GfxEntryPanel::loadEntry(ArchiveEntry* entry) {
 	spin_yoffset->SetValue(gfx_canvas->getImage()->offset().y);
 
 	// Set PNG check boxes
-	if (this->entry->getType() != NULL && this->entry->getType()->getFormat() == EDF_PNG) {
+	if (this->entry->getType() != NULL && this->entry->getType()->getFormat() == "img_png") {
 		cb_alph_chunk->Show(true);		cb_alph_chunk->Enable(true);
 		cb_alph_chunk->SetValue(EntryOperations::getalPhChunk(this->entry));
 		cb_trns_chunk->Show(true);		cb_trns_chunk->Enable(true);
@@ -236,7 +236,7 @@ int GfxEntryPanel::detectOffsetType() {
 	}
 
 	// Check for png image
-	if (entry->getType()->getFormat() == EDF_PNG) {
+	if (entry->getType()->getFormat() == "img_png") {
 		if (gfx_canvas->getImage()->offset().x == 0 &&
 			gfx_canvas->getImage()->offset().y == 0)
 			return GFXVIEW_DEFAULT;

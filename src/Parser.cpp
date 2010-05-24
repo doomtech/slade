@@ -8,7 +8,8 @@
  * Filename:    Parser.cpp
  * Description: Parser/Parse tree classes. Parses formatted text
  *              data and generates a tree of ParseTreeNodes containing
- *              the parsed data.
+ *              the parsed data. Currently supports SLADE/DB/UDMF
+ *              formatting style.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License

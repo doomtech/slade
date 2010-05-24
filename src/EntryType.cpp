@@ -35,6 +35,7 @@
 #include "WadArchive.h"
 #include "BinaryControlLump.h"
 #include "Parser.h"
+#include "EntryDataFormat.h"
 #include <wx/dir.h>
 #include <wx/filename.h>
 
@@ -43,7 +44,7 @@
  * VARIABLES
  *******************************************************************/
 
-///*
+/*
 // Basic formats system for now
 struct id_format_t {
 	string 		id;
@@ -59,7 +60,7 @@ id_format_t formats[] = {
 
 	{ "",				EDF_ANY }, // Dummy type to mark end of list
 };
-//*/
+*/
 
 vector<EntryType*>	entry_types;	// The big list of all entry types
 
@@ -73,7 +74,7 @@ EntryType			etype_map;		// Map marker type
 /*******************************************************************
  * ENTRYDATAFORMAT CLASS FUNCTIONS
  *******************************************************************/
- ///*
+ /*
 bool EntryDataFormat::isFormat(MemChunk& mc, uint16_t format) {
 	switch (format) {
 #define xa(id, name, val)
@@ -85,7 +86,7 @@ bool EntryDataFormat::isFormat(MemChunk& mc, uint16_t format) {
 		return false;
 	}
 }
-//*/
+*/
 
 /*******************************************************************
  * ENTRYTYPE CLASS FUNCTIONS
@@ -95,17 +96,20 @@ bool EntryDataFormat::isFormat(MemChunk& mc, uint16_t format) {
  * EntryType class constructor
  *******************************************************************/
 EntryType::EntryType(string id) {
+	// Init info variables
 	this->id = id;
 	name = _T("Unknown");
-	format = EDF_ANY;
 	extension = _T("dat");
 	icon = _T("e_default");
+	editor = _T("default");
+	reliability = 255;
+
+	// Init match criteria
+	format = _T("any");
 	size_limit[0] = -1;
 	size_limit[1] = -1;
-	editor = _T("default");
 	detectable = true;
 	section = _T("none");
-	reliability = 255;
 }
 
 /* EntryType::~EntryType
@@ -130,7 +134,7 @@ void EntryType::addToList() {
  * Dumps entry type info to the log
  *******************************************************************/
 void EntryType::dump() {
-	wxLogMessage(s_fmt(_T("Type %s \"%s\", format %d, extension %s"), chr(id), chr(name), format, chr(extension)));
+	wxLogMessage(s_fmt(_T("Type %s \"%s\", format %s, extension %s"), chr(id), chr(name), chr(format), chr(extension)));
 	wxLogMessage(s_fmt(_T("Size limit: %d-%d"), size_limit[0], size_limit[1]));
 
 	for (size_t a = 0; a < match_extension.size(); a++)
@@ -150,18 +154,23 @@ void EntryType::dump() {
 
 void EntryType::copyToType(EntryType* target) {
 	// Copy type attributes
-	target->setEditor(editor);
-	target->setExtension(extension);
-	target->setIcon(icon);
-	target->setName(name);
-	target->setReliability(reliability);
+	target->editor = editor;
+	target->extension = extension;
+	target->icon = icon;
+	target->name = name;
+	target->reliability = reliability;
 
 	// Copy type match criteria
-	target->setFormat(format);
-	target->setMaxSize(size_limit[1]);
-	target->setMinSize(size_limit[0]);
-	target->setSection(section);
+	target->format = format;
+	target->size_limit[0] = size_limit[0];
+	target->size_limit[1] = size_limit[1];
+	target->section = section;
+	target->match_extension = match_extension;
+	target->match_name = match_name;
+	target->match_size = match_size;
+	target->size_multiple = size_multiple;
 
+/*
 	// Copy match names
 	for (size_t a = 0; a < match_name.size(); a++)
 		target->addMatchName(match_name[a]);
@@ -177,6 +186,7 @@ void EntryType::copyToType(EntryType* target) {
 	// Copy size multiples
 	for (size_t a = 0; a < size_multiple.size(); a++)
 		target->addSizeMultiple(size_multiple[a]);
+		 */
 }
 
 /* EntryType::isThisType
@@ -273,14 +283,15 @@ bool EntryType::isThisType(ArchiveEntry* entry) {
 	}
 
 	// Check for data format match if needed
-	if (format == EDF_TEXT) {
+	if (format == "text") {
 		// Text is a special case, as other data formats can sometimes be detected as 'text',
 		// we'll only check for it if text data is specified in the entry type
 		if (memchr(entry->getData(), 0, entry->getSize()-1) != NULL)
 			return false;
 	}
-	else if (format != EDF_ANY) {
-		if (!EntryDataFormat::isFormat(entry->getMCData(), format))
+	else if (format != "any") {
+		//EntryDataFormat::anyFormat()->isThisFormat(entry->getMCData());
+		if (!(EntryDataFormat::getFormat(format)->isThisFormat(entry->getMCData())))
 			return false;
 	}
 
@@ -293,293 +304,6 @@ bool EntryType::isThisType(ArchiveEntry* entry) {
  * was a parsing error, true otherwise
  *******************************************************************/
 bool EntryType::readEntryTypeDefinition(MemChunk& mc) {
-	/*
-	Tokenizer tz;
-
-	// Open the given text data
-	if (!tz.openMem((const char*)mc.getData(), mc.getSize())) {
-		wxLogMessage(_T("Unable to open file"));
-		return false;
-	}
-
-	// Get first token
-	string token = tz.getToken();
-
-	// If it's an entry_types definition, read it
-	if (!token.Cmp(_T("entry_types"))) {
-		// Check for opening brace
-		if (!tz.checkToken(_T("{")))
-			return false;
-
-		// Parse all definitions until closing brace
-		token = tz.getToken(); // Get type id
-		while (token.Cmp(_T("}"))) {
-			// Check if we reached the end of the file for some reason
-			if (!token.Cmp(_T("")))
-				return false;
-
-			// Check for inherited type
-			string inherit = _T("");
-			if (tz.peekToken() == _T(":")) {
-				// Skip :
-				tz.getToken();
-
-				// Read inherited type id
-				inherit = tz.getToken();
-			}
-
-			// Check for opening brace
-			if (!tz.checkToken(_T("{")))
-				return false;
-
-			// Begin parsing entry type
-			EntryType* ntype = new EntryType(token);
-			token = tz.getToken();
-
-			// Copy from existing type if inherited
-			if (!inherit.IsEmpty()) {
-				EntryType* parent_type = EntryType::getType(inherit);
-
-				if (parent_type != EntryType::unknownType())
-					parent_type->copyToType(ntype);
-				else
-					wxLogMessage(_T("Warning: Entry type %s inherits from unknown type %s"), chr(ntype->getId()), chr(inherit));
-			}
-
-			// Read all fields until we get to the closing brace
-			while (token.Cmp(_T("}"))) {
-				// Name field
-				if (!token.Cmp(_T("name"))) {
-					if (!tz.checkToken(_T("=")))	// Check for =
-						return false;
-
-					string name = tz.getToken();	// Get name value
-
-					if (!tz.checkToken(_T(";")))	// Check for ;
-						return false;
-
-					ntype->setName(name);			// Set type name
-				}
-
-				// Detectable field
-				if (!token.Cmp(_T("detectable"))) {
-					if (!tz.checkToken(_T("=")))	// Check for =
-						return false;
-
-					bool detect = tz.getBool();		// Get detectable value
-
-					if (!tz.checkToken(_T(";")))	// Check for ;
-						return false;
-
-					ntype->setDetectable(detect);	// Set detectable
-				}
-
-				// Extension field
-				if (!token.Cmp(_T("export_ext"))) {
-					if (!tz.checkToken(_T("=")))	// Check for =
-						return false;
-
-					string ext = tz.getToken();		// Get extension value
-
-					if (!tz.checkToken(_T(";")))	// Check for ;
-						return false;
-
-					ntype->setExtension(ext);		// Set type extension
-				}
-
-				// Format field
-				if (!token.Cmp(_T("format"))) {
-					if (!tz.checkToken(_T("=")))	// Check for =
-						return false;
-
-					string format = tz.getToken();	// Get format value
-
-					if (!tz.checkToken(_T(";")))	// Check for ;
-						return false;
-
-					// Get format type matching format string
-					bool fmt_exists = false;
-					for (int a = 0; a < EDF_UNKNOWN; a++) {
-						if (formats[a].id.IsEmpty())
-							break;
-
-						if (!format.Cmp(formats[a].id)) {
-							ntype->setFormat(formats[a].format);
-							fmt_exists = true;
-						}
-					}
-
-					if (!fmt_exists)
-						ntype->setFormat(EDF_UNKNOWN);
-				}
-
-				// Icon field
-				if (!token.Cmp(_T("icon"))) {
-					if (!tz.checkToken(_T("=")))	// Check for =
-						return false;
-
-					string icon = tz.getToken();	// Get format value
-
-					if (!tz.checkToken(_T(";")))	// Check for ;
-						return false;
-
-					ntype->setIcon(icon);			// Set type icon
-				}
-
-				// Editor field
-				if (!token.Cmp(_T("editor"))) {
-					if (!tz.checkToken(_T("=")))	// Check for =
-						return false;
-
-					string editor = tz.getToken();	// Get name value
-
-					if (!tz.checkToken(_T(";")))	// Check for ;
-						return false;
-
-					ntype->setEditor(editor);		// Set type editor
-				}
-
-				// Section field
-				if (!token.Cmp(_T("section"))) {
-					if (!tz.checkToken(_T("=")))	// Check for =
-						return false;
-
-					string section = tz.getToken();	// Get name value
-
-					if (!tz.checkToken(_T(";")))	// Check for ;
-						return false;
-
-					ntype->setSection(section);		// Set type section
-				}
-
-				// MatchExtension field
-				if (!token.Cmp(_T("match_ext"))) {
-					if (!tz.checkToken(_T("=")))	// Check for =
-						return false;
-
-					while (true) {
-						string ext = tz.getToken();	// Get extension value
-
-						// Add the extension to the type
-						ntype->addMatchExtension(ext);
-
-						string symbol = tz.getToken();
-						if (!symbol.Cmp(_T(";")))
-							break;					// If ; found, we're done
-						else if (symbol.Cmp(_T(",")))
-							return false;			// Error if token isn't ; or ,
-					}
-				}
-
-				// MatchName field
-				if (!token.Cmp(_T("match_name"))) {
-					if (!tz.checkToken(_T("=")))	// Check for =
-						return false;
-
-					while (true) {
-						string name = tz.getToken();	// Get name value
-
-						// Add the match name to the type
-						ntype->addMatchName(name);
-
-						string symbol = tz.getToken();
-						if (!symbol.Cmp(_T(";")))
-							break;					// If ; found, we're done
-						else if (symbol.Cmp(_T(",")))
-							return false;			// Error if token isn't ; or ,
-					}
-				}
-
-				// Size field
-				if (!token.Cmp(_T("size"))) {
-					if (!tz.checkToken(_T("=")))	// Check for =
-						return false;
-
-					while (true) {
-						int size = tz.getInteger();	// Get size value
-
-						// Add the match size to the type
-						ntype->addMatchSize(size);
-
-						string symbol = tz.getToken();
-						if (!symbol.Cmp(_T(";")))
-							break;					// If ; found, we're done
-						else if (symbol.Cmp(_T(",")))
-							return false;			// Error if token isn't ; or ,
-					}
-				}
-
-				// MinSize field
-				if (!token.Cmp(_T("min_size"))) {
-					if (!tz.checkToken(_T("=")))	// Check for =
-						return false;
-
-					int size = tz.getInteger();		// Get size value
-
-					if (!tz.checkToken(_T(";")))	// Check for ;
-						return false;
-
-					ntype->setMinSize(size);		// Set min size
-				}
-
-				// MaxSize field
-				if (!token.Cmp(_T("max_size"))) {
-					if (!tz.checkToken(_T("=")))	// Check for =
-						return false;
-
-					int size = tz.getInteger();		// Get size value
-
-					if (!tz.checkToken(_T(";")))	// Check for ;
-						return false;
-
-					ntype->setMaxSize(size);		// Set max size
-				}
-
-				// SizeMultiple field
-				if (!token.Cmp(_T("size_multiple"))) {
-					if (!tz.checkToken(_T("=")))	// Check for =
-						return false;
-
-					while (true) {
-						int size = tz.getInteger();	// Get size value
-
-						// Add the size multiple to the type
-						ntype->addSizeMultiple(size);
-
-						string symbol = tz.getToken();
-						if (!symbol.Cmp(_T(";")))
-							break;					// If ; found, we're done
-						else if (symbol.Cmp(_T(",")))
-							return false;			// Error if token isn't ; or ,
-					}
-				}
-
-				// Reliability field
-				if (s_cmp(token, _T("reliability"))) {
-					if (!tz.checkToken(_T("=")))		// Check for =
-						return false;
-
-					int reliability = tz.getInteger();	// Get reliability value
-
-					if (!tz.checkToken(_T(";")))		// Check for ;
-						return false;
-
-					ntype->setReliability(reliability);	// Set reliability
-				}
-
-				token = tz.getToken();
-			}
-
-			//if (!inherit.IsEmpty())
-			//	wxLogMessage(_T("EntryType %s inherit from type %s"), ntype->getName().c_str(), inherit.c_str());
-
-			//ntype->dump();
-			ntype->addToList();
-			token = tz.getToken();
-		}
-	}
-	*/
-
 	// Parse the definition
 	Parser p;
 	p.parseText(mc);
@@ -597,11 +321,11 @@ bool EntryType::readEntryTypeDefinition(MemChunk& mc) {
 		ParseTreeNode* typenode = (ParseTreeNode*)pt_etypes->getChild(a);
 
 		// Create new entry type
-		EntryType* ntype = new EntryType(typenode->getName());
+		EntryType* ntype = new EntryType(typenode->getName().Lower());
 
 		// Copy from existing type if inherited
 		if (!typenode->getInherit().IsEmpty()) {
-			EntryType* parent_type = EntryType::getType(typenode->getInherit());
+			EntryType* parent_type = EntryType::getType(typenode->getInherit().Lower());
 
 			if (parent_type != EntryType::unknownType())
 				parent_type->copyToType(ntype);
@@ -615,64 +339,59 @@ bool EntryType::readEntryTypeDefinition(MemChunk& mc) {
 			ParseTreeNode* fieldnode = (ParseTreeNode*)typenode->getChild(b);
 
 			// Process it
-			if (s_cmpnocase(fieldnode->getName(), _T("name"))) {			// Name field
-				ntype->setName(fieldnode->getStringValue());
+			if (s_cmpnocase(fieldnode->getName(), "name")) {				// Name field
+				ntype->name = fieldnode->getStringValue();
 			}
-			else if (s_cmpnocase(fieldnode->getName(), _T("detectable"))) {	// Detectable field
-				ntype->setDetectable(fieldnode->getBoolValue());
+			else if (s_cmpnocase(fieldnode->getName(), "detectable")) {		// Detectable field
+				ntype->detectable = fieldnode->getBoolValue();
 			}
-			else if (s_cmpnocase(fieldnode->getName(), _T("export_ext"))) {	// Export Extension field
-				ntype->setExtension(fieldnode->getStringValue());
+			else if (s_cmpnocase(fieldnode->getName(), "export_ext")) {		// Export Extension field
+				ntype->extension = fieldnode->getStringValue();
 			}
-			else if (s_cmpnocase(fieldnode->getName(), _T("format"))) {	// Format field
-				// Get format type matching format string
-				bool fmt_exists = false;
-				for (unsigned f = 0; f < EDF_UNKNOWN; f++) {
-					if (formats[f].id.IsEmpty())
-						break;
+			else if (s_cmpnocase(fieldnode->getName(), "format")) {			// Format field
+				ntype->format = fieldnode->getStringValue();
 
-					if (s_cmpnocase(fieldnode->getStringValue(), formats[f].id)) {
-						ntype->setFormat(formats[f].format);
-						fmt_exists = true;
-					}
-				}
-
-				if (!fmt_exists)
-					ntype->setFormat(EDF_UNKNOWN);
+				// Warn if undefined format
+				if (EntryDataFormat::getFormat(ntype->getFormat()) == EntryDataFormat::anyFormat())
+					wxLogMessage("Warning: Entry type %s requires undefined format %s", chr(ntype->getId()), chr(ntype->getFormat()));
 			}
-			else if (s_cmpnocase(fieldnode->getName(), _T("icon"))) {	// Icon field
-				ntype->setIcon(fieldnode->getStringValue());
+			else if (s_cmpnocase(fieldnode->getName(), "icon")) {			// Icon field
+				ntype->icon = fieldnode->getStringValue();
 			}
-			else if (s_cmpnocase(fieldnode->getName(), _T("editor"))) {	// Editor field (to be removed)
-				ntype->setEditor(fieldnode->getStringValue());
+			else if (s_cmpnocase(fieldnode->getName(), "editor")) {			// Editor field (to be removed)
+				ntype->editor = fieldnode->getStringValue();
 			}
-			else if (s_cmpnocase(fieldnode->getName(), _T("section"))) {	// Section field
-				ntype->setSection(fieldnode->getStringValue());
+			else if (s_cmpnocase(fieldnode->getName(), "section")) {		// Section field
+				ntype->section = fieldnode->getStringValue();
 			}
-			else if (s_cmpnocase(fieldnode->getName(), _T("match_ext"))) {	// Match Extension field
+			else if (s_cmpnocase(fieldnode->getName(), "match_ext")) {		// Match Extension field
 				for (unsigned v = 0; v < fieldnode->nValues(); v++)
-					ntype->addMatchExtension(fieldnode->getStringValue(v));
+					ntype->match_extension.push_back(fieldnode->getStringValue(v));
 			}
-			else if (s_cmpnocase(fieldnode->getName(), _T("match_name"))) {	// Match Name field
+			else if (s_cmpnocase(fieldnode->getName(), "match_name")) {		// Match Name field
 				for (unsigned v = 0; v < fieldnode->nValues(); v++)
-					ntype->addMatchName(fieldnode->getStringValue(v));
+					ntype->match_name.push_back(fieldnode->getStringValue(v));
 			}
-			else if (s_cmpnocase(fieldnode->getName(), _T("size"))) {	// Size field
+			else if (s_cmpnocase(fieldnode->getName(), "size")) {			// Size field
 				for (unsigned v = 0; v < fieldnode->nValues(); v++)
-					ntype->addMatchSize(fieldnode->getIntValue(v));
+					ntype->match_size.push_back(fieldnode->getIntValue(v));
 			}
-			else if (s_cmpnocase(fieldnode->getName(), _T("min_size"))) {	// Min Size field
-				ntype->setMinSize(fieldnode->getIntValue());
+			else if (s_cmpnocase(fieldnode->getName(), "min_size")) {		// Min Size field
+				ntype->size_limit[0] = fieldnode->getIntValue();
 			}
-			else if (s_cmpnocase(fieldnode->getName(), _T("max_size"))) {	// Max Size field
-				ntype->setMaxSize(fieldnode->getIntValue());
+			else if (s_cmpnocase(fieldnode->getName(), "max_size")) {		// Max Size field
+				ntype->size_limit[1] = fieldnode->getIntValue();
 			}
-			else if (s_cmpnocase(fieldnode->getName(), _T("size_multiple"))) {	// Size Multiple field
+			else if (s_cmpnocase(fieldnode->getName(), "size_multiple")) {	// Size Multiple field
 				for (unsigned v = 0; v < fieldnode->nValues(); v++)
-					ntype->addSizeMultiple(fieldnode->getIntValue(v));
+					ntype->size_multiple.push_back(fieldnode->getIntValue(v));
 			}
-			else if (s_cmpnocase(fieldnode->getName(), _T("reliability"))) {	// Reliability field
-				ntype->setReliability(fieldnode->getIntValue());
+			else if (s_cmpnocase(fieldnode->getName(), "reliability")) {	// Reliability field
+				ntype->reliability = fieldnode->getIntValue();
+			}
+			else if (s_cmpnocase(fieldnode->getName(), "extra")) {				// Extra properties
+				for (unsigned v = 0; v < fieldnode->nValues(); v++)
+					ntype->extra.addFlag(fieldnode->getStringValue(v));
 			}
 		}
 
@@ -688,27 +407,27 @@ bool EntryType::readEntryTypeDefinition(MemChunk& mc) {
  *******************************************************************/
 bool EntryType::loadEntryTypes() {
 	// Setup unknown type
-	etype_unknown.setIcon(_T("e_unknown"));
-	etype_unknown.setDetectable(false);
-	etype_unknown.setReliability(0);
+	etype_unknown.icon = "e_unknown";
+	etype_unknown.detectable = false;
+	etype_unknown.reliability = 0;
 	etype_unknown.addToList();
 
 	// Setup folder type
-	etype_folder.setIcon(_T("e_folder"));
-	etype_folder.setName(_T("Folder"));
-	etype_folder.setDetectable(false);
+	etype_folder.icon = "e_folder";
+	etype_folder.name = "Folder";
+	etype_folder.detectable = false;
 	etype_folder.addToList();
 
 	// Setup marker type
-	etype_marker.setIcon(_T("e_marker"));
-	etype_marker.setName(_T("Marker"));
-	etype_marker.setDetectable(false);
+	etype_marker.icon = "e_marker";
+	etype_marker.name = "Marker";
+	etype_marker.detectable = false;
 	etype_marker.addToList();
 
 	// Setup map marker type
-	etype_map.setIcon(_T("e_map"));
-	etype_map.setName(_T("Map Marker"));
-	etype_map.setDetectable(false);
+	etype_map.icon = "e_map";
+	etype_map.name = "Map Marker";
+	etype_map.detectable = false;
 	etype_map.addToList();
 
 	// -------- READ BUILT-IN TYPES ---------
@@ -789,17 +508,18 @@ bool EntryType::detectEntryType(ArchiveEntry* entry) {
 
 	// Go through all registered types
 	for (size_t a = 0; a < entry_types.size(); a++) {
+		// If the current type is more 'reliable' than this one, skip it
+		if (entry->getType()->getReliability() >= entry_types[a]->getReliability())
+			continue;
+
 		// Check for possible type match
 		if (entry_types[a]->isThisType(entry)) {
-			// Type matches, test against currently detected type's reliability
-			if (entry->getType()->getReliability() < entry_types[a]->getReliability()) {
-				// This type is more reliable, so set it
-				entry->setType(entry_types[a]);
+			// Type matches, set it
+			entry->setType(entry_types[a]);
 
-				// No need to continue if the type is 100% reliable
-				if (entry_types[a]->getReliability() == 255)
-					return true;
-			}
+			// No need to continue if the type is 100% reliable
+			if (entry_types[a]->getReliability() >= 255)
+				return true;
 		}
 	}
 

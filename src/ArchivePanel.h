@@ -3,14 +3,14 @@
 #define __ARCHIVEPANEL_H__
 
 #include "Archive.h"
-#include "EntryListPanel.h"
 #include "EntryPanel.h"
 #include "ListenerAnnouncer.h"
+#include "ArchiveEntryList.h"
 
 class ArchivePanel : public wxPanel, Listener {
 protected:
-	Archive*		archive;
-	EntryListPanel*	entry_list;
+	Archive*			archive;
+	ArchiveEntryList*	entry_list;
 
 	// Entry panels
 	EntryPanel*	cur_area;
@@ -81,11 +81,13 @@ public:
 	virtual void onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 
 	// Events
-	void	onEntryListSelect(wxListEvent& e);
-	void	onEntryListDeselect(wxListEvent& e);
-	void	onEntryListRightClick(wxListEvent& e);
-	void	onEntryMenuClick(wxCommandEvent& e);
-	void	onEntryListKeyDown(wxKeyEvent& e);
+	void			onEntryListFocusChange(wxListEvent& e);
+	void			onEntryListSelect(wxListEvent& e);
+	void			onEntryListDeselect(wxListEvent& e);
+	void			onEntryListRightClick(wxListEvent& e);
+	void			onEntryMenuClick(wxCommandEvent& e);
+	void			onEntryListKeyDown(wxKeyEvent& e);
+	virtual void	onEntryListActivated(wxListEvent& e);
 };
 
 #endif //__ARCHIVEPANEL_H__

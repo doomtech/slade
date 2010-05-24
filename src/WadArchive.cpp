@@ -734,7 +734,7 @@ bool WadArchive::removeEntry(ArchiveEntry* entry, bool delete_entry) {
 	wxUIntPtr ptr = wxPtrToUInt(entry);
 	mc.write(&index, sizeof(int));
 	mc.write(&ptr, sizeof(wxUIntPtr));
-	announce(_T("entry_removed"), mc);
+	announce("entry_removing", mc);
 
 	// Remove it from the entry list
 	entries.erase(entries.begin() + index);
@@ -742,6 +742,9 @@ bool WadArchive::removeEntry(ArchiveEntry* entry, bool delete_entry) {
 	// Delete the entry if needed
 	if (delete_entry)
 		delete entry;
+
+	// Announce post-deletion
+	announce("entry_removed", mc);
 
 	// Update variables etc
 	setModified(true);
@@ -847,10 +850,10 @@ ArchiveEntry* WadArchive::findEntry(string search, bool incsub) {
 }
 
 ArchiveEntry* WadArchive::findEntry(int edftype, bool incsub) {
-	for (size_t a = 0; a < numEntries(); a++) {
-		if (getEntry(a)->getType()->getFormat() == edftype)
-			return getEntry(a);
-	}
+	//for (size_t a = 0; a < numEntries(); a++) {
+	//	if (getEntry(a)->getType()->getFormat() == edftype)
+	//		return getEntry(a);
+	//}
 	return NULL;
 }
 
@@ -865,10 +868,10 @@ vector<ArchiveEntry*> WadArchive::findEntries(string search, bool incsub) {
 
 vector<ArchiveEntry*> WadArchive::findEntries(int edftype, bool incsub) {
 	vector<ArchiveEntry*> ret;
-	for (size_t a = 0; a < numEntries(); a++) {
-		if (getEntry(a)->getType()->getFormat() == edftype)
-			ret.push_back(getEntry(a));
-	}
+	//for (size_t a = 0; a < numEntries(); a++) {
+	//	if (getEntry(a)->getType()->getFormat() == edftype)
+	//		ret.push_back(getEntry(a));
+	//}
 	return ret;
 }
 

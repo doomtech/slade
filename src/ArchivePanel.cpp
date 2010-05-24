@@ -46,6 +46,7 @@
 #include "ModifyOffsetsDialog.h"
 #include "EntryOperations.h"
 #include "Clipboard.h"
+#include "ArchiveManager.h"
 #include <wx/aui/auibook.h>
 #include <wx/filename.h>
 
@@ -63,7 +64,7 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 	listenTo(archive);
 
 	// Create entry panels
-	entry_area = new EntryPanel(this, _T("nil"));
+	entry_area = new EntryPanel(this, "nil");
 	default_area = new DefaultEntryPanel(this);
 	text_area = new TextEntryPanel(this);
 	gfx_area = new GfxEntryPanel(this);
@@ -73,9 +74,8 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 	switches_area = new SwitchesEntryPanel(this);
 
 	// Bind events
-	Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &ArchivePanel::onEntryListSelect, this, ENTRY_LIST_PANEL);
-	Bind(wxEVT_COMMAND_LIST_ITEM_DESELECTED, &ArchivePanel::onEntryListDeselect, this, ENTRY_LIST_PANEL);
-	Bind(wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK, &ArchivePanel::onEntryListRightClick, this, ENTRY_LIST_PANEL);
+	//Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &ArchivePanel::onEntryListSelect, this, ENTRY_LIST_PANEL);
+	//Bind(wxEVT_COMMAND_LIST_ITEM_DESELECTED, &ArchivePanel::onEntryListDeselect, this, ENTRY_LIST_PANEL);
 	Bind(wxEVT_COMMAND_MENU_SELECTED, &ArchivePanel::onEntryMenuClick, this, MENU_ENTRY_RENAME, MENU_ENTRY_END);
 }
 
@@ -96,19 +96,30 @@ void ArchivePanel::init() {
 	SetSizer(m_hbox);
 
 	// Entry list panel
-	entry_list = new EntryListPanel(this, ENTRY_LIST_PANEL, archive);
-	m_hbox->Add(entry_list, 0, wxEXPAND | wxALL, 4);
 
-	// Add default entry panel to the panel
+	// Create & set sizer & border
+	wxStaticBox *frame = new wxStaticBox(this, -1, "Entries");
+	wxStaticBoxSizer *framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
+	m_hbox->Add(framesizer, 0, wxEXPAND|wxALL, 4);
+
+	// Create entry list panel
+	entry_list = new ArchiveEntryList(this, archive);
+	framesizer->Add(entry_list, 1, wxEXPAND | wxALL, 4);
+
+	// Add default entry panel
 	cur_area = entry_area;
 	m_hbox->Add(cur_area, 1, wxEXPAND | wxALL, 4);
 	cur_area->Show(true);
 
 	// Setup events
-	entry_list->getEntryListCtrl()->Bind(wxEVT_KEY_DOWN, &ArchivePanel::onEntryListKeyDown, this);
+	entry_list->Bind(wxEVT_KEY_DOWN, &ArchivePanel::onEntryListKeyDown, this);
+	entry_list->Bind(wxEVT_COMMAND_LIST_ITEM_FOCUSED, &ArchivePanel::onEntryListFocusChange, this);
+	entry_list->Bind(wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK, &ArchivePanel::onEntryListRightClick, this);
+	entry_list->Bind(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, &ArchivePanel::onEntryListActivated, this);
 
+	// Update size+layout
+	entry_list->updateWidth();
 	Layout();
-	entry_list->populateEntryList();
 }
 
 /* ArchivePanel::save
@@ -177,7 +188,7 @@ bool ArchivePanel::newEntry() {
 	if (index >= 0)
 		index++;
 	else
-		index = entry_list->getListSize(); // If not add to the end of the list
+		index = -1;	// If not add to the end of the list
 
 	// Add the entry to the archive
 	ArchiveEntry* new_entry = archive->addNewEntry(name, index);
@@ -207,7 +218,8 @@ bool ArchivePanel::newEntryFromFile() {
 		if (index >= 0)
 			index++;
 		else
-			index = entry_list->getListSize(); // If not add to the end of the list
+			index = -1;	// If not add to the end of the list
+			//index = entry_list->getListSize(); // If not add to the end of the list
 
 		// Go through the list of files
 		bool ok = false;
@@ -317,9 +329,7 @@ bool ArchivePanel::pasteEntry() {
 	if (index >= 0)
 		index++;
 	else
-		index = entry_list->getListSize(); // If not add to the end of the list
-
-	entry_list->columnsUpdate(false);
+		index = -1;	// If not add to the end of the list
 
 	// Go through all items on the clipboard
 	for (uint32_t a = 0; a < theClipboard->nItems(); a++) {
@@ -336,8 +346,8 @@ bool ArchivePanel::pasteEntry() {
 	}
 
 	// Force entrylist width update
-	entry_list->columnsUpdate(true);
-	entry_list->updateListWidth();
+	//entry_list->columnsUpdate(true);
+	//entry_list->updateListWidth();
 	Layout();
 
 	return true;
@@ -420,16 +430,60 @@ bool ArchivePanel::exportEntryWad() {
  * Moves selected entries up
  *******************************************************************/
 bool ArchivePanel::moveUp() {
-	// Get the entry list class to handle it
-	return entry_list->moveUp();
+	// Get selection
+	vector<int> selection = entry_list->getSelection();
+
+	// If nothing is selected, do nothing
+	if (selection.size() == 0)
+		return false;
+
+	// If the first selected item is at the top of the list
+	// then don't move anything up
+	if (selection[0] == 0)
+		return false;
+
+	// Move each one up by swapping it with the entry above it
+	for (size_t a = 0; a < selection.size(); a++) {
+		// Get the entries to swap
+		ArchiveEntry* entry = archive->getEntry(selection[a]);
+		ArchiveEntry* above = archive->getEntry(selection[a]-1);
+
+		// Swap them in the archive
+		archive->swapEntries(entry, above);
+	}
+
+	// Return success
+	return true;
 }
 
 /* ArchivePanel::moveDown
  * Moves selected entries down
  *******************************************************************/
 bool ArchivePanel::moveDown() {
-	// Get the entry list class to handle it
-	return entry_list->moveDown();
+	// Get selection
+	vector<int> selection = entry_list->getSelection();
+
+	// If nothing is selected, do nothing
+	if (selection.size() == 0)
+		return false;
+
+	// If the last selected item is at the end of the list
+	// then don't move anything down
+	if (selection.back() == entry_list->GetItemCount()-1)
+		return false;
+
+	// Move each one down by swapping it with the entry below it
+	for (int a = selection.size()-1; a >= 0; a--) {
+		// Get the entries to swap
+		ArchiveEntry* entry = archive->getEntry(selection[a]);
+		ArchiveEntry* below = archive->getEntry(selection[a]+1);
+
+		// Swap them in the archive
+		archive->swapEntries(entry, below);
+	}
+
+	// Return success
+	return true;
 }
 
 /* ArchivePanel::gfxConvert
@@ -485,11 +539,11 @@ bool ArchivePanel::basConvert() {
 	// Get a list of selected entries
 	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
 
-	entry_list->columnsUpdate(false);
+	//entry_list->columnsUpdate(false);
 
 	// Create new entry
 	ArchiveEntry * animdef = archive->addNewEntry((archive->getType() == ARCHIVE_WAD ?
-		_T("ANIMDEFS") : _T("animdefs.txt")), index);
+		"ANIMDEFS" : "animdefs.txt"), index);
 
 	if (animdef) {
 		// Create the memory buffer
@@ -499,9 +553,9 @@ bool ArchivePanel::basConvert() {
 
 		// Check each selected entry for possible conversion
 		for (size_t a = 0; a < selection.size(); a++) {
-			if (selection[a]->getType()->getFormat() == EDF_ANIMATED)
+			if (selection[a]->getType()->getFormat() == "animated")
 				AnimatedList::convertAnimated(selection[a], &animdata);
-			else if (selection[a]->getType()->getFormat() == EDF_SWITCHES)
+			else if (selection[a]->getType()->getFormat() == "switches")
 				SwitchesList::convertSwitches(selection[a], &animdata);
 		}
 		animdef->importMemChunk(animdata);
@@ -515,8 +569,8 @@ bool ArchivePanel::basConvert() {
 	}
 
 	// Force entrylist width update
-	entry_list->columnsUpdate(true);
-	entry_list->updateListWidth();
+	//entry_list->columnsUpdate(true);
+	//entry_list->updateListWidth();
 	Layout();
 
 	// Load entry data into the text editor
@@ -535,7 +589,7 @@ void ArchivePanel::onAnnouncement(Announcer* announcer, string event_name, MemCh
 	event_data.seek(0, SEEK_SET);
 
 	// If the archive was closed
-	if (announcer == archive && event_name == _T("close")) {
+	if (announcer == archive && event_name == "close") {
 		// Remove the archive panel from the parent notebook
 		wxAuiNotebook* parent = (wxAuiNotebook*)GetParent();
 		parent->RemovePage(parent->GetPageIndex(this));
@@ -545,12 +599,13 @@ void ArchivePanel::onAnnouncement(Announcer* announcer, string event_name, MemCh
 	}
 
 	// If the archive was saved
-	if (announcer == archive && event_name == _T("saved")) {
+	if (announcer == archive && event_name == "saved") {
 		// Update this tab's name in the parent notebook (if filename was changed)
 		wxAuiNotebook* parent = (wxAuiNotebook*)GetParent();
 		parent->SetPageText(parent->GetPageIndex(this), archive->getFileName(false));
 	}
 
+	/*
 	// Archive entries were swapped
 	if (announcer == archive && event_name == _T("entries_swapped")) {
 		int i1, i2;
@@ -603,6 +658,7 @@ void ArchivePanel::onAnnouncement(Announcer* announcer, string event_name, MemCh
 		// Send to entry list to handle
 		entry_list->removeEntry(index, (ArchiveEntry*)wxUIntToPtr(e));
 	}
+	*/
 }
 
 /* ArchivePanel::openEntry
@@ -611,7 +667,7 @@ void ArchivePanel::onAnnouncement(Announcer* announcer, string event_name, MemCh
 bool ArchivePanel::openEntry(ArchiveEntry* entry) {
 	// Null entry, do nothing
 	if (!entry) {
-		wxLogMessage(_T("Warning: NULL entry focused in the list"));
+		wxLogMessage("Warning: NULL entry focused in the list");
 		return false;
 	}
 
@@ -625,20 +681,20 @@ bool ArchivePanel::openEntry(ArchiveEntry* entry) {
 
 	// Get the appropriate entry panel for the entry's type
 	EntryPanel* new_area = default_area;
-	if (!entry->getType()->getEditor().Cmp(_T("gfx")))
+	if (!entry->getType()->getEditor().Cmp("gfx"))
 		new_area = gfx_area;
-	else if (!entry->getType()->getEditor().Cmp(_T("palette")))
+	else if (!entry->getType()->getEditor().Cmp("palette"))
 		new_area = pal_area;
-	else if (!entry->getType()->getEditor().Cmp(_T("text")))
+	else if (!entry->getType()->getEditor().Cmp("text"))
 		new_area = text_area;
-	else if (!entry->getType()->getEditor().Cmp(_T("animated")))
+	else if (!entry->getType()->getEditor().Cmp("animated"))
 		new_area = animated_area;
-	else if (!entry->getType()->getEditor().Cmp(_T("switches")))
+	else if (!entry->getType()->getEditor().Cmp("switches"))
 		new_area = switches_area;
-	else if (!entry->getType()->getEditor().Cmp(_T("default")))
+	else if (!entry->getType()->getEditor().Cmp("default"))
 		new_area = default_area;
 	else
-		wxLogMessage(_T("Entry editor %s does not exist, using default editor"), entry->getType()->getEditor().c_str());
+		wxLogMessage("Entry editor %s does not exist, using default editor", entry->getType()->getEditor().c_str());
 
 	// Show the new entry panel
 	if (!showEntryPanel(new_area))
@@ -646,7 +702,7 @@ bool ArchivePanel::openEntry(ArchiveEntry* entry) {
 
 	// Load the entry into the panel
 	if (!cur_area->openEntry(entry)) {
-		wxMessageBox(s_fmt(_T("Error loading entry:\n%s"), Global::error.c_str()), _T("Error"), wxOK|wxICON_ERROR);
+		wxMessageBox(s_fmt("Error loading entry:\n%s", Global::error.c_str()), "Error", wxOK|wxICON_ERROR);
 	}
 
 	return true;
@@ -655,8 +711,8 @@ bool ArchivePanel::openEntry(ArchiveEntry* entry) {
 bool ArchivePanel::showEntryPanel(EntryPanel* new_area, bool ask_save) {
 	// If the current entry area has unsaved changes, ask the user if they wish to save the changes
 	if (cur_area->isModified() && cur_area->getEntry() && ask_save) {
-		int result = wxMessageBox(s_fmt(_T("Save changes to entry \"%s\"?"), cur_area->getEntry()->getName().c_str()),
-									_T("Unsaved Changes"), wxYES_NO|wxICON_QUESTION);
+		int result = wxMessageBox(s_fmt("Save changes to entry \"%s\"?", cur_area->getEntry()->getName().c_str()),
+									"Unsaved Changes", wxYES_NO|wxICON_QUESTION);
 
 		if (result == wxYES)
 			cur_area->saveEntry();	// Save changes to the entry if yes clicked
@@ -683,6 +739,26 @@ bool ArchivePanel::showEntryPanel(EntryPanel* new_area, bool ask_save) {
 /*******************************************************************
  * ARCHIVEPANEL EVENTS
  *******************************************************************/
+
+void ArchivePanel::onEntryListFocusChange(wxListEvent& e) {
+	// Get selected entries
+	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
+
+	if (selection.size() == 0)
+		return;	// If no entries are selected do nothing
+	else if (selection.size() == 1) {
+		// If one entry is selected, open it in the entry area
+		openEntry(selection[0]);
+	}
+	else {
+		// If multiple entries are selected, show/update the multi entry area
+		showEntryPanel(multi_area);
+		((MultiEntryPanel*)multi_area)->loadEntries(selection);
+
+		// Update panel layout
+		Layout();
+	}
+}
 
 /* ArchivePanel::onEntryListSelect
  * Called when an entry list item is selected
@@ -759,12 +835,12 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 	for (size_t a = 0; a < selection.size(); a++) {
 		// Check for gfx entry
 		if (!gfx_selected) {
-			if (!selection[a]->getType()->getEditor().Cmp(_T("gfx")))
+			if (selection[a]->getType()->extraProps().propertyExists("image"))
 				gfx_selected = true;
 		}
 		if (!bas_selected) {
-			if (selection[a]->getType()->getFormat() == EDF_ANIMATED ||
-				selection[a]->getType()->getFormat() == EDF_SWITCHES)
+			if (selection[a]->getType()->getFormat() == "animated" ||
+				selection[a]->getType()->getFormat() == "switches")
 				bas_selected = true;
 		}
 	}
@@ -878,8 +954,8 @@ void ArchivePanel::onEntryListKeyDown(wxKeyEvent& e) {
 		moveDown();
 
 	// Select all entries (Ctrl+A)
-	else if (e.GetKeyCode() == 'A' && e.ControlDown())
-		entry_list->selectAll();
+	//else if (e.GetKeyCode() == 'A' && e.ControlDown())
+	//	entry_list->selectAll();
 
 	// New entry (Ctrl+N)
 	else if (e.GetKeyCode() == 'N' && e.ControlDown() && !e.ShiftDown())
@@ -892,4 +968,24 @@ void ArchivePanel::onEntryListKeyDown(wxKeyEvent& e) {
 	// Not handled here, send off to be handled by a parent window
 	else
 		e.Skip();
+}
+
+/* ArchivePanel::onEntryListActivated
+ * Called when an item on the entry list is 'activated'
+ * (via double-click or enter)
+ *******************************************************************/
+void ArchivePanel::onEntryListActivated(wxListEvent& e) {
+	ArchiveEntry* entry = entry_list->getFocusedEntry();
+	
+	if (!entry)
+		return;
+	
+	if (entry->getType()->getFormat() == "archive_wad" ||
+		entry->getType()->getFormat() == "archive_zip")
+		theArchiveManager->openArchive(entry);
+
+	if (entry->getType()->getFormat() == "texturex")
+		theArchiveManager->openTextureEditor(theArchiveManager->archiveIndex(archive));
+
+	e.Skip();
 }

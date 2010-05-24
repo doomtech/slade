@@ -79,6 +79,9 @@
     <Filter Include="General\Utility\PropertyList">
       <UniqueIdentifier>{363ddaab-2da0-45fb-8fc2-042e5c6723c4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="UI Elements\Lists">
+      <UniqueIdentifier>{13cacd50-0c22-431c-b94e-2fc031b1c3dc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\GfxConvDialog.cpp">
@@ -264,9 +267,6 @@
     <ClCompile Include="src\GfxCanvas.cpp">
       <Filter>UI Elements</Filter>
     </ClCompile>
-    <ClCompile Include="src\ListView.cpp">
-      <Filter>UI Elements</Filter>
-    </ClCompile>
     <ClCompile Include="src\OGLCanvas.cpp">
       <Filter>UI Elements</Filter>
     </ClCompile>
@@ -302,6 +302,15 @@
     </ClCompile>
     <ClCompile Include="src\EntryDataFormat.cpp">
       <Filter>Resources\Archive\EntryType</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ArchiveEntryList.cpp">
+      <Filter>UI Elements\Lists</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ListView.cpp">
+      <Filter>UI Elements\Lists</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ZipArchiveEntryList.cpp">
+      <Filter>UI Elements\Lists</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -498,9 +507,6 @@
     <ClInclude Include="src\GfxCanvas.h">
       <Filter>UI Elements</Filter>
     </ClInclude>
-    <ClInclude Include="src\ListView.h">
-      <Filter>UI Elements</Filter>
-    </ClInclude>
     <ClInclude Include="src\OGLCanvas.h">
       <Filter>UI Elements</Filter>
     </ClInclude>
@@ -543,10 +549,20 @@
     <ClInclude Include="src\Parser.h">
       <Filter>General\Utility</Filter>
     </ClInclude>
+    <ClInclude Include="src\ArchiveEntryList.h">
+      <Filter>UI Elements\Lists</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ListView.h">
+      <Filter>UI Elements\Lists</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ZipArchiveEntryList.h">
+      <Filter>UI Elements\Lists</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="slade.ico" />
     <None Include="stuff.txt" />
+    <None Include="detect_functions.txt" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SLADE.rc" />

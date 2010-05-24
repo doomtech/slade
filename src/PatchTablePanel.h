@@ -8,8 +8,8 @@
 class TextureXEditor;
 
 /* TODO:
- * - More buttons: new patch from file, import file to patch
- * - Stop patch list updates refreshing the list so much (slow)
+ * - More buttons: import file to patch
+ * - Stop patch list updates refreshing the list so much (slow on wxmsw)
 */
 class PatchTablePanel : public wxPanel {
 private:

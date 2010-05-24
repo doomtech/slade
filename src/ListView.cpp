@@ -285,3 +285,19 @@ bool ListView::updateSize() {
 
 	return true;
 }
+
+wxColour ListView::colourModified() {
+	return col_modified;
+}
+
+wxColour ListView::colourNew() {
+	return col_new;
+}
+
+wxColour ListView::colourLocked() {
+	return col_locked;
+}
+
+wxColour ListView::colourError() {
+	return col_error;
+}

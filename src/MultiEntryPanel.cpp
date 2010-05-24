@@ -106,7 +106,7 @@ bool MultiEntryPanel::loadEntries(vector<ArchiveEntry*>& list) {
 		}
 		// Check for png entry
 		if (!png_selected) {
-			if (list[a]->getType()->getFormat() == EDF_PNG)
+			if (list[a]->getType()->getFormat() == "img_png")
 				png_selected = true;
 		}
 	}

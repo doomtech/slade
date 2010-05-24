@@ -32,7 +32,7 @@
 #include "Main.h"
 #include "WxStuff.h"
 #include "ZipArchivePanel.h"
-#include "ZipEntryListPanel.h"
+#include "ZipArchiveEntryList.h"
 #include "ZipArchive.h"
 #include "Clipboard.h"
 #include <wx/aui/auibook.h>
@@ -126,19 +126,30 @@ void ZipArchivePanel::init() {
 	SetSizer(m_hbox);
 
 	// Entry list panel
-	entry_list = new ZipEntryListPanel(this, ENTRY_LIST_PANEL, archive);
-	m_hbox->Add(entry_list, 0, wxEXPAND | wxALL, 4);
 
-	// Add default entry panel to the panel
+	// Create & set sizer & border
+	wxStaticBox *frame = new wxStaticBox(this, -1, "Entries");
+	wxStaticBoxSizer *framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
+	m_hbox->Add(framesizer, 0, wxEXPAND|wxALL, 4);
+
+	// Create entry list panel
+	entry_list = new ZipArchiveEntryList(this, archive);
+	framesizer->Add(entry_list, 1, wxEXPAND | wxALL, 4);
+
+	// Add default entry panel
 	cur_area = entry_area;
 	m_hbox->Add(cur_area, 1, wxEXPAND | wxALL, 4);
 	cur_area->Show(true);
 
 	// Setup events
-	entry_list->getEntryListCtrl()->Bind(wxEVT_KEY_DOWN, &ArchivePanel::onEntryListKeyDown, this);
+	entry_list->Bind(wxEVT_KEY_DOWN, &ArchivePanel::onEntryListKeyDown, this);
+	entry_list->Bind(wxEVT_COMMAND_LIST_ITEM_FOCUSED, &ArchivePanel::onEntryListFocusChange, this);
+	entry_list->Bind(wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK, &ArchivePanel::onEntryListRightClick, this);
+	entry_list->Bind(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, &ArchivePanel::onEntryListActivated, this);
 
+	// Update size+layout
+	entry_list->updateWidth();
 	Layout();
-	entry_list->populateEntryList();
 }
 
 /* ZipArchivePanel::save
@@ -150,8 +161,8 @@ void ZipArchivePanel::save() {
 	ArchivePanel::save();
 
 	// Update all directories
-	for (int a = 0; a < ((ZipEntryListPanel*)entry_list)->entriesBegin(); a++)
-		((ZipEntryListPanel*)entry_list)->updateDirectoryEntry(a);
+	//for (int a = 0; a < ((ZipEntryListPanel*)entry_list)->entriesBegin(); a++)
+	//	((ZipEntryListPanel*)entry_list)->updateDirectoryEntry(a);
 }
 
 /* ZipArchivePanel::saveAs
@@ -163,8 +174,8 @@ void ZipArchivePanel::saveAs() {
 	ArchivePanel::saveAs();
 
 	// Update all directories
-	for (int a = 0; a < ((ZipEntryListPanel*)entry_list)->entriesBegin(); a++)
-		((ZipEntryListPanel*)entry_list)->updateDirectoryEntry(a);
+	//for (int a = 0; a < ((ZipEntryListPanel*)entry_list)->entriesBegin(); a++)
+	//	((ZipEntryListPanel*)entry_list)->updateDirectoryEntry(a);
 }
 
 /* ZipArchivePanel::newEntry
@@ -182,7 +193,7 @@ bool ZipArchivePanel::newEntry() {
 		string name = ned.getName();
 
 		// Get the current directory
-		zipdir_t* dir = ((ZipEntryListPanel*)entry_list)->getCurrentDir();
+		zipdir_t* dir = ((ZipArchiveEntryList*)entry_list)->getCurrentDir();
 
 		// If an absolute path wasn't given, add the current directory before the name
 		if (!name.StartsWith(_T("/")))
@@ -197,7 +208,7 @@ bool ZipArchivePanel::newEntry() {
 			if (index >= 0)
 				index++;
 			else
-				index = entry_list->getListSize(); // If not add to the end of the list
+				index = -1; // If not add to the end of the list
 
 			// Add the entry to the archive
 			return !!(archive->addNewEntry(name, index));
@@ -242,7 +253,7 @@ bool ZipArchivePanel::newEntryFromFile() {
 		if (index >= 0)
 			index++;
 		else
-			index = entry_list->getListSize(); // If not add to the end of the list
+			index = -1; // If not add to the end of the list
 
 		// Go through the list of files
 		bool ok = false;
@@ -254,7 +265,7 @@ bool ZipArchivePanel::newEntryFromFile() {
 				name = wxGetTextFromUser(_T("Enter new entry name:"), _T("New Entry"), name);
 
 			// Get the current directory
-			zipdir_t* dir = ((ZipEntryListPanel*)entry_list)->getCurrentDir();
+			zipdir_t* dir = ((ZipArchiveEntryList*)entry_list)->getCurrentDir();
 
 			// If an absolute path wasn't given, add the current directory before the name
 			if (!name.StartsWith(_T("/")))
@@ -273,42 +284,6 @@ bool ZipArchivePanel::newEntryFromFile() {
 		}
 
 		return ok;
-
-		/*
-		wxFileName fn(dialog_open.GetPath());
-		string filename = fn.GetFullName();
-
-		// Prompt for new entry name
-		string name = wxGetTextFromUser(_T("Enter new entry name:"), _T("New Entry"), filename);
-
-		// Get the current directory
-		zipdir_t* dir = ((ZipEntryListPanel*)entry_list)->getCurrentDir();
-
-		// If an absolute path wasn't given, add the current directory before the name
-		if (!name.StartsWith(_T("/")))
-			name = dir->getFullPath() + name;
-
-		// Get the entry index of the last selected list item
-		int index = archive->entryIndex(entry_list->getLastSelectedEntry());
-
-		// If something was selected, add 1 to the index so we add the new entry after the last selected
-		if (index >= 0)
-			index++;
-		else
-			index = entry_list->getListSize(); // If not add to the end of the list
-
-		// Add the entry to the archive
-		ArchiveEntry* new_entry = archive->addNewEntry(name, index);
-
-		// If the entry was created ok load the file into it and return true
-		// otherwise, return false
-		if (new_entry) {
-			new_entry->importFile(dialog_open.GetPath());
-			return true;
-		}
-		else
-			return false;
-		*/
 	}
 	else // If user canceled return false
 		return false;
@@ -340,7 +315,7 @@ bool ZipArchivePanel::renameEntry() {
 	}
 
 	// Get a list of selected directories
-	vector<zipdir_t*> selected_dirs = ((ZipEntryListPanel*)entry_list)->getSelectedDirectories();
+	vector<zipdir_t*> selected_dirs = ((ZipArchiveEntryList*)entry_list)->getSelectedDirectories();
 
 	// Go through the list
 	for (size_t a = 0; a < selected_dirs.size(); a++) {
@@ -386,7 +361,7 @@ bool ZipArchivePanel::deleteEntry() {
 	}
 
 	// Get a list of selected directories
-	vector<zipdir_t*> selected_dirs = ((ZipEntryListPanel*)entry_list)->getSelectedDirectories();
+	vector<zipdir_t*> selected_dirs = ((ZipArchiveEntryList*)entry_list)->getSelectedDirectories();
 
 	// Go through the list
 	for (size_t a = 0; a < selected_dirs.size(); a++) {
@@ -418,7 +393,7 @@ bool ZipArchivePanel::copyEntry() {
 	}
 
 	// Get a list of selected directories
-	vector<zipdir_t*> selected_dirs = ((ZipEntryListPanel*)entry_list)->getSelectedDirectories();
+	vector<zipdir_t*> selected_dirs = ((ZipArchiveEntryList*)entry_list)->getSelectedDirectories();
 
 	// Go through the list
 	for (size_t a = 0; a < selected_dirs.size(); a++) {
@@ -453,12 +428,10 @@ bool ZipArchivePanel::pasteEntry() {
 	if (index >= 0)
 		index++;
 	else
-		index = entry_list->getListSize(); // If not add to the end of the list
+		index = -1; // If not add to the end of the list
 
 	// Get the current directory
-	zipdir_t* cur_dir = ((ZipEntryListPanel*)entry_list)->getCurrentDir();
-
-	entry_list->columnsUpdate(false);
+	zipdir_t* cur_dir = ((ZipArchiveEntryList*)entry_list)->getCurrentDir();
 
 	// Go through all items on the clipboard
 	for (uint32_t a = 0; a < theClipboard->nItems(); a++) {
@@ -489,11 +462,6 @@ bool ZipArchivePanel::pasteEntry() {
 		}
 	}
 
-	// Force entrylist width update
-	entry_list->columnsUpdate(true);
-	entry_list->updateEntry(0, NULL);
-	Layout();
-
 	return true;
 }
 
@@ -505,6 +473,7 @@ void ZipArchivePanel::onAnnouncement(Announcer* announcer, string event_name, Me
 	// Do default announcement handling
 	ArchivePanel::onAnnouncement(announcer, event_name, event_data);
 
+	/*
 	// If a directory was added to the archive
 	if (announcer == archive && !event_name.Cmp(_T("directory_added"))) {
 		wxUIntPtr ptr;
@@ -525,4 +494,5 @@ void ZipArchivePanel::onAnnouncement(Announcer* announcer, string event_name, Me
 		if (event_data.read(&ptr, sizeof(wxUIntPtr)))
 			((ZipEntryListPanel*)entry_list)->updateDirectory(ptr);
 	}
+	*/
 }

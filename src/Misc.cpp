@@ -31,6 +31,7 @@
  *******************************************************************/
 #include "Main.h"
 #include "Misc.h"
+#include "EntryDataFormat.h"
 
 
 /*******************************************************************
@@ -49,6 +50,7 @@ bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry) {
 	if (entry->getType() == EntryType::unknownType())
 		EntryType::detectEntryType(entry);
 
+	/*
 	switch (entry->getType()->getFormat()) {
 #define xa(id, name, val)
 #define xb(id, name)
@@ -66,6 +68,54 @@ bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry) {
 			else
 				return true;
 	}
+	*/
+
+	// Check for format "image" property
+	if (!entry->getType()->extraProps().propertyExists("image")) {
+		Global::error = "Entry type is not a valid image";
+		return false;
+	}
+
+	// Load depending on format
+	string format = entry->getType()->getFormat();
+	if (s_cmpnocase(format, _T("img_doom")))
+		return image->loadDoomGfx(entry->getData(), entry->getSize());
+	else if (s_cmpnocase(format, _T("img_doom_alpha")))
+		return image->loadDoomGfxA(entry->getData(), entry->getSize());
+	else if (s_cmpnocase(format, _T("img_doom_beta")))
+		return image->loadDoomGfxB(entry->getData(), entry->getSize());
+	else if (s_cmpnocase(format, _T("img_doom_snea")))
+		return image->loadDoomSnea(entry->getData(), entry->getSize());
+	else if (s_cmpnocase(format, _T("img_doom_arah")))
+		return image->loadDoomArah(entry->getData(), entry->getSize());
+	else if (s_cmpnocase(format, _T("img_imgz")))
+		return image->loadImgz(entry->getData(), entry->getSize());
+	else if (s_cmpnocase(format, _T("img_legacy")))
+		return image->loadDoomLegacy(entry->getData(), entry->getSize());
+	else if (s_cmpnocase(format, _T("img_planar")))
+		return image->loadPlanar(entry->getData(), entry->getSize());
+	else if (s_cmpnocase(format, _T("img_4bitchunk")))
+		return image->load4bitChunk(entry->getData(), entry->getSize());
+	else if (s_cmpnocase(format, "img_raw"))
+		return image->loadDoomFlat(entry->getData(), entry->getSize());
+	else if (s_cmpnocase(format, _T("font_doom_alpha")))
+		return image->loadFont0(entry->getData(), entry->getSize());
+	else if (s_cmpnocase(format, _T("font_zd_console")))
+		return image->loadFont1(entry->getData(), entry->getSize());
+	else if (s_cmpnocase(format, _T("font_zd_big")))
+		return image->loadFont2(entry->getData(), entry->getSize());
+	else if (s_cmpnocase(format, _T("font_bmf")))
+		return image->loadBMF(entry->getData(), entry->getSize());
+	else if (s_cmpnocase(format, _T("font_mono")))
+		return image->loadFontM(entry->getData(), entry->getSize());
+	else {
+		if (!image->loadImage(entry->getData(true), entry->getSize())) {
+			Global::error = _T("Image format not supported by FreeImage");
+			return false;
+		}
+		else
+			return true;
+	}
 
 	// Unknown image type
 	Global::error = _T("Entry is not a known image format");
@@ -80,11 +130,11 @@ int	Misc::detectPaletteHack(ArchiveEntry* entry)
 {
 	if (entry == NULL || entry->getType() == NULL)
 		return PAL_NOHACK;
-	else if (entry->getType()->getFormat() == EDF_GFX_DOOM_ARAH		&& entry->getName() == "TITLEPIC")
+	else if (entry->getType()->getFormat() == "img_doom_arah"	&& entry->getName() == "TITLEPIC")
 		return PAL_ALPHAHACK;	// Doom Alpha 0.2
-	else if (entry->getType()->getFormat() == EDF_GFX_DOOM_SNEA		&& entry->getName() == "TITLEPIC")
+	else if (entry->getType()->getFormat() == "img_doom_snea"	&& entry->getName() == "TITLEPIC")
 		return PAL_ALPHAHACK;	// Doom Alpha 0.4 and 0.5
-	else if (entry->getType()->getFormat() == EDF_GFX_FULLSCREEN	&& entry->getName() == "E2END")
+	else if (entry->getType()->getFormat() == "img_raw"			&& entry->getName() == "E2END")
 		return PAL_HERETICHACK;	// Heretic
 
 	// Default:
