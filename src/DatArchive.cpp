@@ -120,7 +120,7 @@ bool DatArchive::open(string filename) {
 	}
 
 	// Load from MemChunk
-	if (open(mc, filename)) {
+	if (open(mc)) {
 		// Update variables
 		this->filename = filename;
 		this->on_disk = true;
@@ -137,7 +137,7 @@ bool DatArchive::open(string filename) {
  *******************************************************************/
 bool DatArchive::open(ArchiveEntry* entry) {
 	// Load from entry's data
-	if (entry && open(entry->getMCData(), entry->getName())) {
+	if (entry && open(entry->getMCData())) {
 		// Update variables and return success
 		parent = entry;
 		parent->lock();
@@ -151,7 +151,7 @@ bool DatArchive::open(ArchiveEntry* entry) {
  * Reads wad format data from a MemChunk
  * Returns true if successful, false otherwise
  *******************************************************************/
-bool DatArchive::open(MemChunk& mc, string name) {
+bool DatArchive::open(MemChunk& mc) {
 	// Check data was given
 	if (!mc.hasData())
 		return false;
@@ -176,7 +176,7 @@ bool DatArchive::open(MemChunk& mc, string name) {
 
 	// Read the directory
 	mc.seek(dir_offset, SEEK_SET);
-	theSplashWindow->setProgressMessage(s_fmt(_T("Reading lib archive %s data"), name));
+	theSplashWindow->setProgressMessage(_T("Reading dat archive data"));
 	for (uint32_t d = 0; d < num_lumps; d++) {
 		// Update splash window progress
 		theSplashWindow->setProgress(((float)d / (float)num_lumps));

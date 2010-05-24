@@ -4,26 +4,6 @@
 
 #include "Archive.h"
 
-#if 0
-#define DIRSTART1	0x819FE	// Start of directory in SHADOW.LIB (floppy)
-#define SHADOWLIB	534053	// Size of SHADOW.LIB (floppy)
-#elif 0
-#define DIRSTART1	0x819FE	// Start of directory in SHADOW2.LIB (floppy)
-#define SHADOWLIB	534053	// Size of SHADOW2.LIB (floppy)
-#else
-#define DIRSTART1	0xD1CD3	// Start of directory in SHADOW2.LIB
-#define SHADOWLIB	861156	// Size of SHADOW2.LIB
-#endif
-#pragma pack(1)
-typedef struct ShadowCasterLump
-{
-	uint8_t		unused;
-	uint32_t	lmpsize;
-	uint32_t	ofs;
-	char		lmpname[12];
-} lump_t;
-#pragma pack()
-
 class LibArchive : public Archive {
 private:
 	vector<ArchiveEntry*>	entries;
@@ -39,7 +19,7 @@ public:
 
 	bool	open(string filename);
 	bool	open(ArchiveEntry* entry);
-	bool	open(MemChunk& mc, string name = _T(""));
+	bool	open(MemChunk& mc);
 
 	bool	write(MemChunk& mc, bool update = true);
 	bool	write(string filename, bool update = true);

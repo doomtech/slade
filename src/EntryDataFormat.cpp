@@ -616,7 +616,6 @@ public:
 	~ShadowCasterSpriteFormat() {}
 
 	bool isThisFormat(MemChunk& mc) {
-		return true;
 		int size = mc.getSize();
 		if (size < 3)
 			return false;

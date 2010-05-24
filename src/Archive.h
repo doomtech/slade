@@ -51,7 +51,7 @@ public:
 
 	virtual bool	open(string filename) = 0;
 	virtual bool	open(ArchiveEntry* entry) = 0;
-	virtual bool	open(MemChunk& mc, string name = _T("")) = 0;
+	virtual bool	open(MemChunk& mc) = 0;
 
 	virtual bool	write(MemChunk& mc, bool update = true) = 0;
 	virtual bool	write(string filename, bool update = true) = 0;
