@@ -8,6 +8,8 @@
 #define ARCHIVE_INVALID	0
 #define ARCHIVE_WAD		1
 #define ARCHIVE_ZIP		2
+#define ARCHIVE_LIB		3
+#define ARCHIVE_DAT		4
 
 class Archive : public Announcer {
 private:
@@ -49,7 +51,7 @@ public:
 
 	virtual bool	open(string filename) = 0;
 	virtual bool	open(ArchiveEntry* entry) = 0;
-	virtual bool	open(MemChunk& mc) = 0;
+	virtual bool	open(MemChunk& mc, string name = _T("")) = 0;
 
 	virtual bool	write(MemChunk& mc, bool update = true) = 0;
 	virtual bool	write(string filename, bool update = true) = 0;

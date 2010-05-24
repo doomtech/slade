@@ -85,8 +85,7 @@ SImage::SImage() {
  * SImage class destructor
  *******************************************************************/
 SImage::~SImage() {
-	if (data)
-		delete[] data;
+	clearData();
 }
 
 /* SImage::getRGBAData
@@ -210,7 +209,6 @@ void SImage::clearData(bool clear_mask) {
 		delete[] data;
 		data = NULL;
 	}
-
 	// Delete mask if it exists
 	if (mask && clear_mask) {
 		delete[] mask;
@@ -658,6 +656,91 @@ bool SImage::loadDoomFlat(const uint8_t* gfx_data, int size) {
 	return true;
 }
 
+bool SImage::loadSCSprite(const uint8_t* gfx_data, int size) {
+	// Check data
+	if (!gfx_data)
+		return false;
+	if (size < 3)
+		return false;
+
+	width = gfx_data[2] + (gfx_data[3]<<8);
+	if (width == 0)
+		return false;
+
+	height = 0;
+	for (int j = 0; j < width; ++j)
+	{
+		int offstart = gfx_data[(j<<1)+4]+(gfx_data[(j<<1)+5]<<8);
+		// Columns with a null offset are skipped
+		if (offstart == 0) break;
+		if (offstart < 0 || size < offstart+2 || offstart < (width*2+4))
+		{
+			return false;
+		}
+		int start		= gfx_data[offstart];
+		int stop		= gfx_data[offstart+1];
+		int colheight	= start - stop;
+		if (colheight < 0 || size < offstart+colheight+1)
+		{
+			return false;
+		}
+		if (colheight > height)
+			height = colheight;
+	}
+
+	if (height == 0)
+		return false;
+
+	// Clear current data if it exists
+	clearData();
+
+	// Setup variables
+	format = PALMASK;
+	has_palette = false;
+
+	// Format has no offsets, so just set them automatically
+	offset_x = width/2;
+	offset_y = height;
+
+	// Create raw pixel data
+	if (data || mask)
+		wxLogMessage(s_fmt(_T("Warning: data/mask not null (%x/%x)"), data, mask));
+	data = new uint8_t[width*height];
+	memset(data, 0, width*height);
+	mask = new uint8_t[width*height];
+	memset(mask, 0, width*height);
+	int bound = width*height;
+
+	// Read pixel data
+	for (int h = 0, i = 4; h < width; ++h, i+=2)
+	{
+		int colstart = gfx_data[i]+(gfx_data[i+1]<<8);
+		if (colstart)
+		{
+			int colheight = gfx_data[colstart];
+			int startheight = height - colheight;
+			colheight -= gfx_data[colstart+1];
+			for (int z = 0; z < colheight; ++z)
+			{
+				int mypixel = ((z+startheight)*width)+h;
+				if (mypixel >= bound)
+				{
+					wxLogMessage(s_fmt(_T("Warning: in column %d, pixel %d gets out of bound (%d/%d)"),
+						h, z, mypixel, bound));
+					return false;
+				}
+				data[mypixel] = gfx_data[colstart+2+z];
+				if (data[mypixel]) mask[mypixel] = 0xFF;
+			}
+		}
+	}
+
+	// Announce change
+	announce(_T("image_changed"));
+
+	return true;
+}
+
 /* SImage::loadDoomLegacy
  * Loads one of those weird Legacy screens with a header.
  * Returns false if the image data was invalid, true otherwise.
@@ -770,7 +853,7 @@ bool SImage::loadDoomArah(const uint8_t* gfx_data, int size) {
 
 	// Mark as transparent all pixels that are set to FF
 	for (size_t  i = 0; i < (unsigned)(width*height); ++i)
-		if (data[i] == 255) mask[i] = 0;
+		if (data[i] == 0) mask[i] = 0;
 
 	// Announce change
 	announce(_T("image_changed"));
@@ -2101,104 +2184,6 @@ bool SImage::convertPaletted(Palette8bit* pal_target, Palette8bit* pal_current) 
 
 	// Load given palette
 	palette.copyPalette(pal_target);
-
-	// Clear current image data (but not mask)
-	clearData(false);
-
-	// Load pixel data from the FIBITMAP
-	data = new uint8_t[width * height];
-	for (int a = 0; a < height; a++)
-		memcpy(data + a * width, FreeImage_GetScanLine(pbm, a), width);
-
-	// Update variables
-	format = PALMASK;
-	has_palette = true;
-
-	// Clean up
-	FreeImage_Unload(bm32);
-	FreeImage_Unload(bm);
-	FreeImage_Unload(pbm);
-
-	// Announce change
-	announce(_T("image_changed"));
-
-	// Success
-	return true;
-}
-
-/* SImage::convertPaletted
- * Converts the image to paletted + mask. Parameters:
- * <pal>: The palette to apply to the image
- * <alpha_threshold>: Specifies what alpha level is the cutoff for
- * the mask (equal or less is completely transparent, greater is
- * completely opaque)
- * <keep_trans>: If true, existing transparency information is kept
- * <col_trans>: If <keep_trans> is false, this colour will be
- * completely transparent, and everything else completely opaque
- * <quant_type>: Type of colour quantization (0 for Xiaolin Wu, 1
- * for NeuQuant)
- *******************************************************************/
-/*
-bool SImage::convertPaletted(Palette8bit* pal, uint8_t alpha_threshold, bool keep_trans, rgba_t col_trans, int quant_type) {
-	// Check image is valid
-	if (!isValid())
-		return false;
-
-	// Get image data as RGBA
-	MemChunk rgba_data;
-	getRGBAData(rgba_data);
-
-	// Swap red and blue colour information because FreeImage is retarded
-	for (int a = 0; a < width * height * 4; a += 4) {
-		uint8_t red = rgba_data[a];
-		rgba_data[a] = rgba_data[a+2];
-		rgba_data[a+2] = red;
-	}
-
-	// Build FIBITMAP from it
-	FIBITMAP* bm32 = FreeImage_ConvertFromRawBits((uint8_t*)rgba_data.getData(), width, height, width * 4, 32, 0, 0, 0, false);
-	FIBITMAP* bm = FreeImage_ConvertTo24Bits(bm32);
-
-	// Create mask from alpha info (if converting from RGBA)
-	if (format == RGBA) {
-		// Clear current mask
-		if (mask)
-			delete[] mask;
-
-		// Init mask
-		mask = new uint8_t[width * height];
-
-		// Get values from alpha channel
-		int c = 0;
-		for (int a = 3; a < width * height * 4; a += 4)
-			mask[c++] = rgba_data[a];
-	}
-
-	// If we are keeping the existing transparency, just apply the alpha threshold
-	if (keep_trans)
-		cutoffMask(alpha_threshold, true);
-	else {
-		// If we aren't keeping the existing transparency, apply the given transparency colour to the mask
-		maskFromColour(col_trans, true);
-	}
-
-	// Create FreeImage palette
-	RGBQUAD fi_pal[256];
-	for (int a = 0; a < 256; a++) {
-		fi_pal[a].rgbRed = pal->colour(a).r;
-		fi_pal[a].rgbGreen = pal->colour(a).g;
-		fi_pal[a].rgbBlue = pal->colour(a).b;
-	}
-
-	// Convert image to palette
-	FIBITMAP* pbm = NULL;
-	if (quant_type == 0)
-		pbm = FreeImage_ColorQuantizeEx(bm, FIQ_NNQUANT, 256, 256, fi_pal);
-	else
-		pbm = FreeImage_ColorQuantizeEx(bm, FIQ_WUQUANT, 256, 256, fi_pal);
-
-	// Load given palette
-	palette.copyPalette(pal);
 
 	// Clear current image data (but not mask)
 	clearData(false);

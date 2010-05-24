@@ -110,7 +110,7 @@ bool ZipArchiveEntryList::isEntry(int index) {
 	if (current_dir->parent_dir)
 		index--;
 
-	return (index >= current_dir->numSubDirs() && index < current_dir->numSubDirs() + current_dir->numEntries());
+	return ((unsigned)index >= current_dir->numSubDirs() && (unsigned)index < current_dir->numSubDirs() + current_dir->numEntries());
 }
 
 ArchiveEntry* ZipArchiveEntryList::getEntry(int index) const {
@@ -132,7 +132,7 @@ ArchiveEntry* ZipArchiveEntryList::getEntry(int index) const {
 		return current_dir->subdirectories[index]->entry;
 
 	// Entries
-	if (index < subdirs + current_dir->numEntries())
+	if ((unsigned)index < subdirs + current_dir->numEntries())
 		return current_dir->entries[index - subdirs];
 
 	// Out of bounds

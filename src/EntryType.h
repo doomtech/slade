@@ -46,6 +46,9 @@ public:
 	static bool detectTranslationTable(MemChunk& mc);
 	static bool detectWad(MemChunk& mc);
 	static bool detectZip(MemChunk& mc);
+	static bool detectLib(MemChunk& mc);
+	static bool detectDat(MemChunk& mc);
+	static bool detectSCSprite(MemChunk& mc);
 	static bool detectMus(MemChunk& mc);
 	static bool detectMidi(MemChunk& mc);
 	static bool detectModIt(MemChunk& mc);

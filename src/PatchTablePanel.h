@@ -26,7 +26,7 @@ public:
 	PatchTablePanel(wxWindow* parent, PatchTable* patch_table);
 	~PatchTablePanel();
 
-	void	updatePatchListItem(unsigned index);
+	void	updatePatchListItem(int index);
 	void	populatePatchList();
 
 	// Events

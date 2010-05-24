@@ -108,6 +108,8 @@ bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry) {
 		return image->loadBMF(entry->getData(), entry->getSize());
 	else if (s_cmpnocase(format, _T("font_mono")))
 		return image->loadFontM(entry->getData(), entry->getSize());
+	else if (s_cmpnocase(format, _T("img_scsprite")))
+		return image->loadSCSprite(entry->getData(), entry->getSize());
 	else {
 		if (!image->loadImage(entry->getData(true), entry->getSize())) {
 			Global::error = _T("Image format not supported by FreeImage");
@@ -136,6 +138,8 @@ int	Misc::detectPaletteHack(ArchiveEntry* entry)
 		return PAL_ALPHAHACK;	// Doom Alpha 0.4 and 0.5
 	else if (entry->getType()->getFormat() == "img_raw"			&& entry->getName() == "E2END")
 		return PAL_HERETICHACK;	// Heretic
+	else if (entry->getType()->getFormat() == "img_doom_arah"	&& entry->getName() == "shadowpage")
+		return PAL_SHADOWHACK;	// Shadowcaster
 
 	// Default:
 	return PAL_NOHACK;
@@ -158,6 +162,8 @@ bool Misc::loadPaletteFromArchive(Palette8bit* pal, Archive* archive, int lump) 
 		playpal = archive->getEntry(_T("TITLEPAL"));
 	else if (lump == PAL_HERETICHACK)
 		playpal = archive->getEntry(_T("E2PAL"));
+	else if (lump == PAL_SHADOWHACK)
+		playpal = archive->getEntry(_T("shadowpage+1"));
 	if (!playpal)
 		playpal = archive->getEntry(_T("PLAYPAL"));
 

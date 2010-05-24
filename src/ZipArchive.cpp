@@ -546,7 +546,7 @@ bool ZipArchive::open(ArchiveEntry* entry) {
  * Reads zip format data from a MemChunk
  * Returns true if successful, false otherwise
  *******************************************************************/
-bool ZipArchive::open(MemChunk& mc) {
+bool ZipArchive::open(MemChunk& mc, string name) {
 	// Write the MemChunk to a temp file
 	string tempfile = appPath(_T("slade-temp.zip"), DIR_TEMP);
 	mc.exportFile(tempfile);

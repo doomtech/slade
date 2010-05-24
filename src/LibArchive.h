@@ -1,23 +1,36 @@
 
-#ifndef __WADARCHIVE_H__
-#define	__WADARCHIVE_H__
+#ifndef __LIBARCHIVE_H__
+#define	__LIBARCHIVE_H__
 
 #include "Archive.h"
 
-class WadArchive : public Archive {
+#if 0
+#define DIRSTART1	0x819FE	// Start of directory in SHADOW.LIB (floppy)
+#define SHADOWLIB	534053	// Size of SHADOW.LIB (floppy)
+#elif 0
+#define DIRSTART1	0x819FE	// Start of directory in SHADOW2.LIB (floppy)
+#define SHADOWLIB	534053	// Size of SHADOW2.LIB (floppy)
+#else
+#define DIRSTART1	0xD1CD3	// Start of directory in SHADOW2.LIB
+#define SHADOWLIB	861156	// Size of SHADOW2.LIB
+#endif
+#pragma pack(1)
+typedef struct ShadowCasterLump
+{
+	uint8_t		unused;
+	uint32_t	lmpsize;
+	uint32_t	ofs;
+	char		lmpname[12];
+} lump_t;
+#pragma pack()
+
+class LibArchive : public Archive {
 private:
 	vector<ArchiveEntry*>	entries;
-	char					wad_type[4];
-	int						patches[2];
-	int						sprites[2];
-	int						flats[2];
-	int						tx[2];
 
 public:
-	WadArchive();
-	~WadArchive();
-
-	bool	isIWAD();
+	LibArchive();
+	~LibArchive();
 
 	int				entryIndex(ArchiveEntry* entry);
 	ArchiveEntry*	getEntry(uint32_t index);
@@ -42,33 +55,18 @@ public:
 	ArchiveEntry*	addNewEntry(string name = _T(""), uint32_t position = 0);
 	ArchiveEntry*	addExistingEntry(ArchiveEntry* entry, uint32_t position = 0, bool copy = false);
 	bool			removeEntry(ArchiveEntry* entry, bool delete_entry = true);
+	vector<mapdesc_t>	detectMaps();
 
 	bool	swapEntries(ArchiveEntry* entry1, ArchiveEntry* entry2);
-
-	bool	renameEntry(ArchiveEntry* entry, string new_name);
-
-	vector<mapdesc_t>	detectMaps();
-	string				detectEntrySection(ArchiveEntry* entry);
+	bool	renameEntry(ArchiveEntry *,string){return false;}
 
 	ArchiveEntry*			findEntry(string search, bool includesubdirs = true);
 	ArchiveEntry*			findEntry(int edftype, bool includesubdirs = true);
 	vector<ArchiveEntry*>	findEntries(string search, bool includesubdirs = true);
 	vector<ArchiveEntry*>	findEntries(int edftype, bool includesubdirs = true);
 
-	static bool exportEntriesAsWad(string filename, vector<ArchiveEntry*> entries) {
-		WadArchive wad;
-
-		// Add entries to wad archive
-		for (size_t a = 0; a < entries.size(); a++) {
-			// Add each entry to the wad archive
-			wad.addExistingEntry(entries[a], entries.size(), true);
-		}
-
-		return wad.save(filename);
-	}
-	
-	static bool isWadArchive(MemChunk& mc);
-	static bool isWadArchive(string filename);
+	static bool isLibArchive(MemChunk& mc);
+	static bool isLibArchive(string filename);
 };
 
-#endif	/* _WADARCHIVE_H */
+#endif	/* __LIBARCHIVE_H__ */

@@ -42,6 +42,7 @@ public:
 		MENU_ENTRY_GFX_CONVERT,
 		MENU_ENTRY_GFX_OFFSETS,
 		MENU_ENTRY_BAS_CONVERT,
+		MENU_ENTRY_PAL_CONVERT,
 
 		MENU_ENTRY_END,
 	};
@@ -72,6 +73,7 @@ public:
 	bool			gfxConvert();
 	bool			gfxModifyOffsets();
 	bool			basConvert();
+	bool			palConvert();
 
 	// UI related
 	bool	openEntry(ArchiveEntry* entry);

@@ -195,7 +195,7 @@ bool WadArchive::open(ArchiveEntry* entry) {
  * Reads wad format data from a MemChunk
  * Returns true if successful, false otherwise
  *******************************************************************/
-bool WadArchive::open(MemChunk& mc) {
+bool WadArchive::open(MemChunk& mc, string name) {
 	// Check data was given
 	if (!mc.hasData())
 		return false;

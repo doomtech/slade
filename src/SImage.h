@@ -68,6 +68,7 @@ public:
 	bool	loadFont2(const uint8_t* gfx_data, int size);
 	bool	loadFontM(const uint8_t* gfx_data, int size);
 	bool	loadBMF(const uint8_t* gfx_data, int size);
+	bool	loadSCSprite(const uint8_t* data, int size);
 
 	// Image format writing
 	bool	toPNG(MemChunk& out, Palette8bit* pal = NULL);

@@ -10,6 +10,7 @@ enum {
 	PAL_NOHACK = 0,
 	PAL_ALPHAHACK,
 	PAL_HERETICHACK,
+	PAL_SHADOWHACK,
 };
 
 namespace Misc {

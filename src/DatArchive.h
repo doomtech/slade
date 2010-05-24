@@ -1,23 +1,19 @@
 
-#ifndef __WADARCHIVE_H__
-#define	__WADARCHIVE_H__
+#ifndef __DATARCHIVE_H__
+#define	__DATARCHIVE_H__
 
 #include "Archive.h"
 
-class WadArchive : public Archive {
+class DatArchive : public Archive {
 private:
 	vector<ArchiveEntry*>	entries;
-	char					wad_type[4];
-	int						patches[2];
 	int						sprites[2];
 	int						flats[2];
-	int						tx[2];
+	int						walls[2];
 
 public:
-	WadArchive();
-	~WadArchive();
-
-	bool	isIWAD();
+	DatArchive();
+	~DatArchive();
 
 	int				entryIndex(ArchiveEntry* entry);
 	ArchiveEntry*	getEntry(uint32_t index);
@@ -44,8 +40,7 @@ public:
 	bool			removeEntry(ArchiveEntry* entry, bool delete_entry = true);
 
 	bool	swapEntries(ArchiveEntry* entry1, ArchiveEntry* entry2);
-
-	bool	renameEntry(ArchiveEntry* entry, string new_name);
+	bool	renameEntry(ArchiveEntry *,string){return false;}
 
 	vector<mapdesc_t>	detectMaps();
 	string				detectEntrySection(ArchiveEntry* entry);
@@ -55,20 +50,8 @@ public:
 	vector<ArchiveEntry*>	findEntries(string search, bool includesubdirs = true);
 	vector<ArchiveEntry*>	findEntries(int edftype, bool includesubdirs = true);
 
-	static bool exportEntriesAsWad(string filename, vector<ArchiveEntry*> entries) {
-		WadArchive wad;
-
-		// Add entries to wad archive
-		for (size_t a = 0; a < entries.size(); a++) {
-			// Add each entry to the wad archive
-			wad.addExistingEntry(entries[a], entries.size(), true);
-		}
-
-		return wad.save(filename);
-	}
-	
-	static bool isWadArchive(MemChunk& mc);
-	static bool isWadArchive(string filename);
+	static bool isDatArchive(MemChunk& mc);
+	static bool isDatArchive(string filename);
 };
 
-#endif	/* _WADARCHIVE_H */
+#endif	/* __DATARCHIVE_H__ */

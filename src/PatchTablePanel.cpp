@@ -90,7 +90,7 @@ PatchTablePanel::PatchTablePanel(wxWindow* parent, PatchTable* patch_table) : wx
 PatchTablePanel::~PatchTablePanel() {
 }
 
-void PatchTablePanel::updatePatchListItem(unsigned index) {
+void PatchTablePanel::updatePatchListItem(int index) {
 	// Check index
 	if (index >= list_patches->GetItemCount())
 		return;
@@ -208,7 +208,7 @@ void PatchTablePanel::onBtnRemovePatch(wxCommandEvent& e) {
 
 	// Update items after deleted ones (index # will be changed)
 	list_patches->enableSizeUpdate(false);
-	for (unsigned a = selection[0]; a < list_patches->GetItemCount(); a++)
+	for (int a = selection[0]; a < list_patches->GetItemCount(); a++)
 		updatePatchListItem(a);
 
 	// Update list width

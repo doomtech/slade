@@ -267,8 +267,8 @@ void GfxConvDialog::updatePreviewGfx() {
 	Misc::loadImageFromEntry(gfx_target->getImage(), entry);
 
 	// Set gfx canvas views
-	gfx_current->zoomToFit(true, 0.05f);
-	gfx_target->zoomToFit(true, 0.05f);
+	//gfx_current->zoomToFit(true, 0.05f);
+	//gfx_target->zoomToFit(true, 0.05f);
 
 	// Update controls
 	updateControls();
@@ -295,10 +295,7 @@ void GfxConvDialog::updateControls() {
 	// Disable/enable current gfx palette as needed
 	/*
 	uint16_t entryformat = entry->getType()->getFormat();
-	if (entryformat == EDF_GFX_DOOM || entryformat == EDF_GFX_DOOM_ALPHA || entryformat == EDF_GFX_DOOM_BETA || 
-		entryformat == EDF_GFX_FLAT || entryformat == EDF_GFX_DOOM_GNUM  || entryformat == EDF_GFX_DOOM_SNEA ||
-		entryformat == EDF_GFX_FULLSCREEN || entryformat == EDF_GFX_DOOM_ARAH || entryformat == EDF_GFX_IMGZ ||
-		entryformat == EDF_GFX_STRIFESU || entryformat == EDF_GFX_AUTOPAGE)
+	if (entryformat > EDF_PALETTED_START && entryformat < EDF_PALETTED_STOP)
 		pal_chooser_current->Enable(true);
 	else*/
 		pal_chooser_current->Enable(true);

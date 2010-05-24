@@ -580,6 +580,24 @@ bool ArchivePanel::basConvert() {
 	return true;
 }
 
+/* ArchivePanel::palConvert
+ * turns a palette from 6-bit to 8-bit
+ *******************************************************************/
+bool ArchivePanel::palConvert() {
+	// Get the entry index of the last selected list item
+	ArchiveEntry* pal6bit = entry_list->getLastSelectedEntry();
+	const uint8_t * mehmeh = pal6bit->getData(true);
+	uint8_t * meh = new uint8_t[pal6bit->getSize()];
+	memcpy(meh, mehmeh, pal6bit->getSize());
+	for (size_t i = 0; i < pal6bit->getSize(); ++i)
+	{
+		meh[i] = ((meh[i] << 2) | (meh[i] >> 6));
+	}
+	pal6bit->importMem(meh, pal6bit->getSize());
+	delete[] meh;
+	return true;
+}
+
 /* ArchivePanel::onAnnouncement
  * Called when an announcement is recieved from the archive that
  * this ArchivePanel is managing
@@ -857,6 +875,7 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 		context->AppendSeparator();
 		context->Append(MENU_ENTRY_BAS_CONVERT, _T("Convert to ANIMDEFS"));
 	}
+	context->Append(MENU_ENTRY_PAL_CONVERT, _T("Pal 6-bit to 8-bit"));
 
 	// Popup the context menu
 	PopupMenu(context);
@@ -905,6 +924,9 @@ void ArchivePanel::onEntryMenuClick(wxCommandEvent& e) {
 			break;
 		case MENU_ENTRY_BAS_CONVERT:
 			basConvert();
+			break;
+		case MENU_ENTRY_PAL_CONVERT:
+			palConvert();
 			break;
 	}
 }
@@ -980,8 +1002,7 @@ void ArchivePanel::onEntryListActivated(wxListEvent& e) {
 	if (!entry)
 		return;
 	
-	if (entry->getType()->getFormat() == "archive_wad" ||
-		entry->getType()->getFormat() == "archive_zip")
+	if (entry->getType()->getFormat().substr(0, 8) == "archive_")
 		theArchiveManager->openArchive(entry);
 
 	if (entry->getType()->getFormat() == "texturex")

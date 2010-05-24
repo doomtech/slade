@@ -30,6 +30,8 @@
 #include "EntryDataFormat.h"
 #include "ZipArchive.h"
 #include "WadArchive.h"
+#include "LibArchive.h"
+#include "DatArchive.h"
 #include "BinaryControlLump.h"
 #include "Parser.h"
 
@@ -113,6 +115,7 @@ bool EntryDataFormat::readDataFormatDefinition(MemChunk& mc) {
 			*/
 		}
 	}
+	return true;
 }
 
 
@@ -607,6 +610,35 @@ public:
 	}
 };
 
+class ShadowCasterSpriteFormat: public EntryDataFormat {
+public:
+	ShadowCasterSpriteFormat() : EntryDataFormat(_T("img_scsprite")) {};
+	~ShadowCasterSpriteFormat() {}
+
+	bool isThisFormat(MemChunk& mc) {
+		return true;
+		int size = mc.getSize();
+		if (size < 3)
+			return false;
+		int width = mc[2] + (mc[3]<<8);
+		int height = 0;
+		for (int j = 0; j < width; ++j)
+		{
+			int offstart = mc[(j<<1)+4]+(mc[(j<<1)+5]<<8);
+			if (offstart < 0 || size < offstart+2 || offstart < (width*2+5))
+				return false;
+			int start		= mc[offstart];
+			int stop		= mc[offstart+1];
+			int colheight= start - stop;
+			if (colheight < 0 || size < offstart+colheight+1)
+				return false;
+			if (colheight > height)
+				height = colheight;
+		}
+		return true;
+	}
+}; 
+
 class WadDataFormat : public EntryDataFormat {
 public:
 	WadDataFormat() : EntryDataFormat(_T("archive_wad")) {};
@@ -632,6 +664,27 @@ public:
 		return ZipArchive::isZipArchive(mc);
 	}
 };
+
+class LibDataFormat : public EntryDataFormat {
+public:
+	LibDataFormat() : EntryDataFormat(_T("archive_lib")) {};
+	~LibDataFormat() {}
+
+	bool isThisFormat(MemChunk& mc) {
+		return LibArchive::isLibArchive(mc);
+	}
+};
+
+class DatDataFormat : public EntryDataFormat {
+public:
+	DatDataFormat() : EntryDataFormat(_T("archive_dat")) {};
+	~DatDataFormat() {}
+
+	bool isThisFormat(MemChunk& mc) {
+		return DatArchive::isDatArchive(mc);
+	}
+};
+
 
 class MUSDataFormat : public EntryDataFormat {
 public:
@@ -1109,10 +1162,13 @@ void EntryDataFormat::initBuiltinFormats() {
 	new DoomGfxBetaDataFormat();
 	new DoomSneaDataFormat();
 	new DoomArahDataFormat();
+	new ShadowCasterSpriteFormat();
 	new IMGZDataFormat();
 	new LegacyGfxDataFormat();
 	new WadDataFormat();
 	new ZipDataFormat();
+	new LibDataFormat();
+	new DatDataFormat();
 	new MUSDataFormat();
 	new MIDIDataFormat();
 	new ITModuleDataFormat();
@@ -1146,3 +1202,4 @@ void EntryDataFormat::initBuiltinFormats() {
 	new EntryDataFormat(_T("img_4bitchunk"));
 	new EntryDataFormat(_T("font_mono"));
 }
+

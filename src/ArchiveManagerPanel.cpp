@@ -51,7 +51,7 @@
  *******************************************************************/
 WMFileBrowser::WMFileBrowser(wxWindow* parent, ArchiveManagerPanel* wm, int id)
 : wxGenericDirCtrl(parent, id, wxDirDialogDefaultFolderStr, wxDefaultPosition, wxDefaultSize, wxDIRCTRL_SHOW_FILTERS,
-_T("Any Supported Archive File (*.wad; *.zip; *.pk3)|*.wad;*.zip;*.pk3|Doom Wad files (*.wad)|*.wad|Zip files (*.zip)|*.zip|Pk3 (zip) files (*.pk3)|*.pk3|All Files (*.*)|*.*")) {
+_T("Any Supported Archive File (*.wad; *.zip; *.pk3; *.lib; *.dat)|*.wad;*.zip;*.pk3;*.lib;*.dat|Doom Wad files (*.wad)|*.wad|Zip files (*.zip)|*.zip|Pk3 (zip) files (*.pk3)|*.pk3|All Files (*.*)|*.*")) {
 	// Set the parent
 	this->parent = wm;
 
@@ -277,7 +277,7 @@ void ArchiveManagerPanel::openTab(int archive_index) {
 
 		// If tab isn't already open, open a new one
 		ArchivePanel *wp = NULL;
-		if (archive->getType() == ARCHIVE_WAD)
+		if (archive->getType() == ARCHIVE_WAD || archive->getType() == ARCHIVE_LIB || archive->getType() == ARCHIVE_DAT)
 			wp = new ArchivePanel(notebook_archives, archive);
 		else if (archive->getType() == ARCHIVE_ZIP)
 			wp = new ZipArchivePanel(notebook_archives, archive);

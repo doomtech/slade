@@ -47,7 +47,7 @@ public:
 
 	bool	open(string filename);
 	bool	open(ArchiveEntry* entry);
-	bool	open(MemChunk& mc);
+	bool	open(MemChunk& mc, string name = _T(""));
 
 	bool	write(MemChunk& mc, bool update = true);
 	bool	write(string filename, bool update = true);

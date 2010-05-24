@@ -530,8 +530,7 @@ void EntryListPanel::onEntryListActivated(wxListEvent& e) {
 	if (!entry)
 		return;
 	
-	if (entry->getType()->getFormat() == "archive_wad" ||
-		entry->getType()->getFormat() == "archive_zip")
+	if (entry->getType()->getFormat().substr(0, 8) == "archive_")
 		theArchiveManager->openArchive(entry);
 
 	if (entry->getType()->getFormat() == "texturex")

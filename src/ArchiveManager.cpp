@@ -32,6 +32,8 @@
 #include "ArchiveManager.h"
 #include "WadArchive.h"
 #include "ZipArchive.h"
+#include "LibArchive.h"
+#include "DatArchive.h"
 #include "Console.h"
 #include <wx/filename.h>
 
@@ -153,6 +155,10 @@ Archive* ArchiveManager::openArchive(string filename) {
 		new_archive = new WadArchive();
 	else if (ZipArchive::isZipArchive(filename))
 		new_archive = new ZipArchive();
+	else if (LibArchive::isLibArchive(filename))
+		new_archive = new LibArchive();
+	else if (DatArchive::isDatArchive(filename))
+		new_archive = new DatArchive();
 	else
 		return NULL;	// Unsupported format
 
@@ -189,6 +195,10 @@ Archive* ArchiveManager::openArchive(ArchiveEntry* entry) {
 		new_archive = new WadArchive();
 	else if (ZipArchive::isZipArchive(entry->getMCData()))
 		new_archive = new ZipArchive();
+	else if (LibArchive::isLibArchive(entry->getMCData()))
+		new_archive = new LibArchive();
+	else if (DatArchive::isDatArchive(entry->getMCData()))
+		new_archive = new DatArchive();
 	else
 		return NULL;	// Unsupported format
 
@@ -231,6 +241,14 @@ Archive* ArchiveManager::newArchive(uint8_t type) {
 		case ARCHIVE_ZIP:
 			new_archive = new ZipArchive();
 			format_str = _T("zip");
+			break;
+		case ARCHIVE_LIB:
+			new_archive = new LibArchive();
+			format_str = _T("lib");
+			break;
+		case ARCHIVE_DAT:
+			new_archive = new DatArchive();
+			format_str = _T("dat");
 			break;
 	}
 
@@ -343,13 +361,18 @@ string ArchiveManager::getArchiveExtensionsString(bool wad, bool zip, bool pk3, 
 	string ext_zip = _T("*.zip;*.ZIP;*.Zip");
 	string ext_pk3 = _T("*.pk3;*.PK3;*.Pk3");
 	string ext_jdf = _T("*.jdf;*.JDF;*.Jdf");
+	string ext_dat = _T("*.dat;*.DAT;*.Dat");
+	string ext_lib = _T("*.lib;*.LIB;*.Lib");
 
 	// Create extensions string
-	string extensions = s_fmt(_T("Any Supported File (*.wad; *.zip; *.pk3; *.jdf)|%s;%s;%s;%s"), ext_wad.c_str(), ext_zip.c_str(), ext_pk3.c_str(), ext_jdf.c_str());
+	string extensions = s_fmt(_T("Any Supported File (*.wad; *.zip; *.pk3; *.jdf)|%s;%s;%s;%s;%s;%s"), 
+		ext_wad.c_str(), ext_zip.c_str(), ext_pk3.c_str(), ext_jdf.c_str(), ext_dat.c_str(), ext_lib.c_str());
 	extensions += s_fmt(_T("|Doom Wad files (*.wad)|%s"), ext_wad.c_str());
 	extensions += s_fmt(_T("|Zip files (*.zip)|%s"), ext_zip.c_str());
 	extensions += s_fmt(_T("|Pk3 (zip) files (*.pk3)|%s"), ext_pk3.c_str());
 	extensions += s_fmt(_T("|JDF (zip) files (*.jdf)|%s"), ext_jdf.c_str());
+	extensions += s_fmt(_T("|Data (dat) files (*.dat)|%s"), ext_dat.c_str());
+	extensions += s_fmt(_T("|Library (lib) files (*.lib)|%s"), ext_lib.c_str());
 
 	return extensions;
 }
