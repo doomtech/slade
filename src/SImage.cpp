@@ -703,13 +703,11 @@ bool SImage::loadSCSprite(const uint8_t* gfx_data, int size) {
 	offset_y = height;
 
 	// Create raw pixel data
-	if (data || mask)
-		wxLogMessage(s_fmt(_T("Warning: data/mask not null (%x/%x)"), data, mask));
-	data = new uint8_t[width*height];
-	memset(data, 0, width*height);
-	mask = new uint8_t[width*height];
-	memset(mask, 0, width*height);
 	int bound = width*height;
+	data = new uint8_t[bound];
+	memset(data, 0, bound);
+	mask = new uint8_t[bound];
+	memset(mask, 0, bound);
 
 	// Read pixel data
 	for (int h = 0, i = 4; h < width; ++h, i+=2)
@@ -724,11 +722,7 @@ bool SImage::loadSCSprite(const uint8_t* gfx_data, int size) {
 			{
 				int mypixel = ((z+startheight)*width)+h;
 				if (mypixel >= bound)
-				{
-					wxLogMessage(s_fmt(_T("Warning: in column %d, pixel %d gets out of bound (%d/%d)"),
-						h, z, mypixel, bound));
 					return false;
-				}
 				data[mypixel] = gfx_data[colstart+2+z];
 				if (data[mypixel]) mask[mypixel] = 0xFF;
 			}

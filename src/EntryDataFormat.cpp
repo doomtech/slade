@@ -620,6 +620,8 @@ public:
 		if (size < 3)
 			return false;
 		int width = mc[2] + (mc[3]<<8);
+		if (width == 0)
+			return false;
 		int height = 0;
 		for (int j = 0; j < width; ++j)
 		{
@@ -635,7 +637,7 @@ public:
 			if (colheight > height)
 				height = colheight;
 		}
-		return true;
+		return (height > 0);
 	}
 }; 
 
