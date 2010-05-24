@@ -265,6 +265,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="detect_functions.txt" />
+    <None Include="dist\slade.pk3" />
     <None Include="slade.ico" />
     <None Include="stuff.txt" />
   </ItemGroup>

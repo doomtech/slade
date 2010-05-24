@@ -563,6 +563,7 @@
     <None Include="slade.ico" />
     <None Include="stuff.txt" />
     <None Include="detect_functions.txt" />
+    <None Include="dist\slade.pk3" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SLADE.rc" />
