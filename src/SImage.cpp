@@ -670,22 +670,22 @@ bool SImage::loadSCSprite(const uint8_t* gfx_data, int size) {
 	height = 0;
 	for (int j = 0; j < width; ++j)
 	{
-		int offstart = gfx_data[(j<<1)+4]+(gfx_data[(j<<1)+5]<<8);
+		int colstart = gfx_data[(j<<1)+4]+(gfx_data[(j<<1)+5]<<8);
 		// Columns with a null offset are skipped
-		if (offstart == 0) break;
-		if (offstart < 0 || size < offstart+2 || offstart < (width*2+4))
+		if (colstart == 0) continue;
+		if (colstart < 0 || size < colstart+2 || colstart < (width*2+4))
 		{
 			return false;
 		}
-		int start		= gfx_data[offstart];
-		int stop		= gfx_data[offstart+1];
+		int start		= gfx_data[colstart];
+		int stop		= gfx_data[colstart+1];
 		int colheight	= start - stop;
-		if (colheight < 0 || size < offstart+colheight+1)
+		if (colheight < 0 || size < colstart+colheight+1)
 		{
 			return false;
 		}
-		if (colheight > height)
-			height = colheight;
+		if (start > height)
+			height = start;
 	}
 
 	if (height == 0)
@@ -715,19 +715,39 @@ bool SImage::loadSCSprite(const uint8_t* gfx_data, int size) {
 		int colstart = gfx_data[i]+(gfx_data[i+1]<<8);
 		if (colstart)
 		{
-			int colheight = gfx_data[colstart];
-			int startheight = height - colheight;
-			colheight -= gfx_data[colstart+1];
+			int start		= gfx_data[colstart];
+			int stop		= gfx_data[colstart+1];
+			int colheight	= start - stop;
+			int startheight = height - start;
 			for (int z = 0; z < colheight; ++z)
 			{
 				int mypixel = ((z+startheight)*width)+h;
-				if (mypixel >= bound)
+				if (mypixel >= bound || (colstart+2+z) >= size)
+					return false;
+				if (mypixel < 0)
 					return false;
 				data[mypixel] = gfx_data[colstart+2+z];
-				if (data[mypixel]) mask[mypixel] = 0xFF;
+				if (data[mypixel])
+					mask[mypixel] = 0xFF;
 			}
 		}
 	}
+#if 0
+	width = 256;
+	height = 256;
+	offset_x = 128;
+	offset_y = 128;
+	format = PALMASK;
+	has_palette = false;
+	clearData();
+	data = new uint8_t[65536];
+	mask = new uint8_t[65536];
+	for (int i = 0; i < 65536; ++i)
+	{
+		data[i] = i%256;
+		mask[i] = i/256;
+	}
+#endif
 
 	// Announce change
 	announce(_T("image_changed"));

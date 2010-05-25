@@ -626,7 +626,7 @@ public:
 		for (int j = 0; j < width; ++j)
 		{
 			int offstart = mc[(j<<1)+4]+(mc[(j<<1)+5]<<8);
-			if (offstart == 0) break;
+			if (offstart == 0) continue;
 			if (offstart < 0 || size < offstart+2 || offstart < (width*2+4))
 				return false;
 			int start		= mc[offstart];
