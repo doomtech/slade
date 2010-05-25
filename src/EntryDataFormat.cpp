@@ -372,7 +372,15 @@ public:
 				if (mc.getSize() < sizeof(patch_header_t) + (header->width * sizeof(uint32_t)))
 					return false;
 
-				// Check column pointers are within range
+				// Check if total size is reasonable; this computation corresponds to the most inefficient
+				// possible use of space by the format (horizontal stripes of 1 pixel, 1 pixel apart).
+				int numpixels = (header->height + header->height%2)/2;
+				int maxcolsize = sizeof(uint32_t) + (numpixels*5) + 1;
+				if (mc.getSize() > (sizeof(patch_header_t) + (header->width * maxcolsize))) {
+					return false;
+				}
+
+					// Check column pointers are within range
 				for (int a = 0; a < header->width; a++) {
 					if (col_offsets[a] > mc.getSize() || col_offsets[a] < sizeof(patch_header_t))
 						return false;
@@ -421,6 +429,14 @@ public:
 				for (int a = 0; a < header->width; a++) {
 					if (col_offsets[a] > mc.getSize() || col_offsets[a] < sizeof(oldpatch_header_t))
 						return false;
+				}
+
+				// Check if total size is reasonable; this computation corresponds to the most inefficient
+				// possible use of space by the format (horizontal stripes of 1 pixel, 1 pixel apart).
+				int numpixels = (header->height + header->height%2)/2;
+				int maxcolsize = sizeof(uint16_t) + (numpixels*3) + 1;
+				if (mc.getSize() > (sizeof(oldpatch_header_t) + (header->width * maxcolsize))) {
+					return false;
 				}
 
 				// Passed all checks, so probably is doom gfx
@@ -474,6 +490,14 @@ public:
 			for (int a = 0; a < header->width; a++) {
 				if (col_offsets[a] > mc.getSize() || col_offsets[a] < sizeof(patch_header_t))
 					return false;
+			}
+
+			// Check if total size is reasonable; this computation corresponds to the most inefficient
+			// possible use of space by the format (horizontal stripes of 1 pixel, 1 pixel apart).
+			int numpixels = (header->height + header->height%2)/2;
+			int maxcolsize = sizeof(uint16_t) + (numpixels*3) + 1;
+			if (mc.getSize() > (sizeof(patch_header_t) + (header->width * maxcolsize))) {
+				return false;
 			}
 
 			// Passed all checks, so probably is doom gfx

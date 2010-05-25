@@ -569,13 +569,17 @@ bool SImage::loadDoomGfx(const uint8_t* gfx_data, int size, uint8_t version) {
 				bits++;
 				int pos = ((top + p)*width + c);
 
-				// Stop if we're outside the image
+					// Stop if we're outside the image
 				if (pos > width*height)
 					break;
 
 				// Stop if for some reason we're outside the gfx data
 				if (bits > gfx_data + size)
 					break;
+
+				// Fail if bogus data gives a negative pos (this corrupts the heap!)
+				if (pos < 0)
+					return false;
 
 				// Write pixel data
 				data[pos] = *bits;
@@ -732,22 +736,6 @@ bool SImage::loadSCSprite(const uint8_t* gfx_data, int size) {
 			}
 		}
 	}
-#if 0
-	width = 256;
-	height = 256;
-	offset_x = 128;
-	offset_y = 128;
-	format = PALMASK;
-	has_palette = false;
-	clearData();
-	data = new uint8_t[65536];
-	mask = new uint8_t[65536];
-	for (int i = 0; i < 65536; ++i)
-	{
-		data[i] = i%256;
-		mask[i] = i/256;
-	}
-#endif
 
 	// Announce change
 	announce(_T("image_changed"));
