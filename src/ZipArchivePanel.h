@@ -22,6 +22,8 @@ public:
 	bool	deleteEntry();
 	bool	copyEntry();
 	bool	pasteEntry();
+	bool	moveUp();
+	bool	moveDown();
 
 	void onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 };

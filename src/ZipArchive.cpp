@@ -1301,9 +1301,12 @@ void ZipArchive::deleteDirectory(zipdir_t* dir) {
 
 	// Announce
 	MemChunk mc;
+	int32_t index = -1;
+	if (dir->parent_dir) index = dir->parent_dir->dirIndex(dir);
 	wxUIntPtr ptr = wxPtrToUInt(dir);
 	mc.write(&ptr, sizeof(wxUIntPtr));
-	announce(_T("directory_removed"), mc);
+	mc.write(&index, 4);
+	announce(_T("directory_removing"), mc);
 
 	// Remove this directory from its parent's subdirectory list
 	if (dir->parent_dir) {
@@ -1329,6 +1332,8 @@ void ZipArchive::deleteDirectory(zipdir_t* dir) {
 
 	// Delete the directory itself
 	delete dir;
+
+	announce(_T("directory_removed"), mc);
 
 	// Update variables etc
 	setModified(true);

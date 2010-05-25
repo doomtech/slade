@@ -68,8 +68,8 @@ public:
 	bool			importEntry();
 	bool			exportEntry();
 	bool			exportEntryWad();
-	bool			moveUp();
-	bool			moveDown();
+	virtual bool	moveUp();
+	virtual bool	moveDown();
 	bool			gfxConvert();
 	bool			gfxModifyOffsets();
 	bool			basConvert();
@@ -86,6 +86,7 @@ public:
 	void			onEntryListFocusChange(wxListEvent& e);
 	void			onEntryListSelect(wxListEvent& e);
 	void			onEntryListDeselect(wxListEvent& e);
+	void			onEntryListLeftClick(wxMouseEvent& e);
 	void			onEntryListRightClick(wxListEvent& e);
 	void			onEntryMenuClick(wxCommandEvent& e);
 	void			onEntryListKeyDown(wxKeyEvent& e);

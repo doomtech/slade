@@ -82,8 +82,8 @@
       <VirtualDirectory Name="ZipArchivePanel">
         <File Name="src/ZipArchivePanel.cpp"/>
         <File Name="src/ZipArchivePanel.h"/>
-        <File Name="src/ZipEntryListPanel.cpp"/>
         <File Name="src/ZipEntryListPanel.h"/>
+        <File Name="src/ZipEntryListPanel.cpp"/>
       </VirtualDirectory>
       <File Name="src/ArchiveManagerPanel.h"/>
       <File Name="src/ArchiveManagerPanel.cpp"/>
@@ -142,6 +142,10 @@
         <File Name="src/EntryDataFormat.h"/>
         <File Name="src/EntryDataFormat.cpp"/>
       </VirtualDirectory>
+      <File Name="src/DatArchive.cpp"/>
+      <File Name="src/DatArchive.h"/>
+      <File Name="src/LibArchive.cpp"/>
+      <File Name="src/LibArchive.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Binary Control Lumps">
       <File Name="src/AnimatedList.cpp"/>
@@ -186,8 +190,6 @@
     <File Name="src/CTextureCanvas.h"/>
     <File Name="src/GfxCanvas.cpp"/>
     <File Name="src/GfxCanvas.h"/>
-    <File Name="src/ListView.cpp"/>
-    <File Name="src/ListView.h"/>
     <File Name="src/OGLCanvas.cpp"/>
     <File Name="src/OGLCanvas.h"/>
     <File Name="src/PaletteCanvas.cpp"/>
@@ -214,6 +216,14 @@
       <File Name="src/TextEditor.h"/>
       <File Name="src/TextLanguage.h"/>
       <File Name="src/TextLanguage.cpp"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="Lists">
+      <File Name="src/ArchiveEntryList.cpp"/>
+      <File Name="src/ArchiveEntryList.h"/>
+      <File Name="src/ListView.cpp"/>
+      <File Name="src/ListView.h"/>
+      <File Name="src/ZipArchiveEntryList.cpp"/>
+      <File Name="src/ZipArchiveEntryList.h"/>
     </VirtualDirectory>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>

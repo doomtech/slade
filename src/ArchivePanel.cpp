@@ -74,8 +74,6 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 	switches_area = new SwitchesEntryPanel(this);
 
 	// Bind events
-	//Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &ArchivePanel::onEntryListSelect, this, ENTRY_LIST_PANEL);
-	//Bind(wxEVT_COMMAND_LIST_ITEM_DESELECTED, &ArchivePanel::onEntryListDeselect, this, ENTRY_LIST_PANEL);
 	Bind(wxEVT_COMMAND_MENU_SELECTED, &ArchivePanel::onEntryMenuClick, this, MENU_ENTRY_RENAME, MENU_ENTRY_END);
 }
 
@@ -103,7 +101,8 @@ void ArchivePanel::init() {
 	m_hbox->Add(framesizer, 0, wxEXPAND|wxALL, 4);
 
 	// Create entry list panel
-	entry_list = new ArchiveEntryList(this, archive);
+	entry_list = new ArchiveEntryList(this);
+	entry_list->setArchive(archive);
 	framesizer->Add(entry_list, 1, wxEXPAND | wxALL, 4);
 
 	// Add default entry panel
@@ -114,6 +113,8 @@ void ArchivePanel::init() {
 	// Setup events
 	entry_list->Bind(wxEVT_KEY_DOWN, &ArchivePanel::onEntryListKeyDown, this);
 	entry_list->Bind(wxEVT_COMMAND_LIST_ITEM_FOCUSED, &ArchivePanel::onEntryListFocusChange, this);
+	entry_list->Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &ArchivePanel::onEntryListFocusChange, this);
+	//entry_list->Bind(wxEVT_LEFT_DOWN, &ArchivePanel::onEntryListLeftClick, this);
 	entry_list->Bind(wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK, &ArchivePanel::onEntryListRightClick, this);
 	entry_list->Bind(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, &ArchivePanel::onEntryListActivated, this);
 
@@ -141,6 +142,9 @@ void ArchivePanel::save() {
 		// If there was an error pop up a message box
 		wxMessageBox(s_fmt(_T("Error:\n%s"), Global::error.c_str()), _T("Error"), wxICON_ERROR);
 	}
+
+	// Refresh entry list
+	entry_list->updateList();
 }
 
 /* ArchivePanel::saveAs
@@ -164,6 +168,9 @@ void ArchivePanel::saveAs() {
 			wxMessageBox(s_fmt(_T("Error:\n%s"), Global::error.c_str()), _T("Error"), wxICON_ERROR);
 		}
 	}
+
+	// Refresh entry list
+	entry_list->updateList();
 }
 
 /* ArchivePanel::newEntry
@@ -278,8 +285,11 @@ bool ArchivePanel::deleteEntry() {
 	// Get a list of selected entries
 	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
 
+	// Clear selection
+	entry_list->clearSelection();
+
 	// Go through the list
-	for (size_t a = 0; a < selection.size(); a++) {
+	for (int a = selection.size() - 1; a >= 0; a--) {
 		// Remove the current selected entry
 		archive->removeEntry(selection[a]);
 	}
@@ -612,6 +622,9 @@ void ArchivePanel::onAnnouncement(Announcer* announcer, string event_name, MemCh
 		wxAuiNotebook* parent = (wxAuiNotebook*)GetParent();
 		parent->RemovePage(parent->GetPageIndex(this));
 
+		// Clear list archive
+		entry_list->setArchive(NULL);
+
 		// Destroy the archive panel
 		this->Destroy();
 	}
@@ -759,6 +772,10 @@ bool ArchivePanel::showEntryPanel(EntryPanel* new_area, bool ask_save) {
  *******************************************************************/
 
 void ArchivePanel::onEntryListFocusChange(wxListEvent& e) {
+	// Do nothing if not shown
+	if (!IsShown())
+		return;
+
 	// Get selected entries
 	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
 
@@ -805,6 +822,29 @@ void ArchivePanel::onEntryListSelect(wxListEvent& e) {
  * Called when an entry list item is deselected
  *******************************************************************/
 void ArchivePanel::onEntryListDeselect(wxListEvent& e) {
+	// Get selected entries
+	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
+
+	if (selection.size() == 0)
+		return;	// If no entries are selected do nothing
+	else if (selection.size() == 1) {
+		// If one entry is selected, open it in the entry area
+		openEntry(selection[0]);
+	}
+	else {
+		// If multiple entries are selected, show/update the multi entry area
+		showEntryPanel(multi_area);
+		((MultiEntryPanel*)multi_area)->loadEntries(selection);
+
+		// Update panel layout
+		Layout();
+	}
+}
+
+void ArchivePanel::onEntryListLeftClick(wxMouseEvent& e) {
+	// Do usual stuff first
+	e.Skip();
+
 	// Get selected entries
 	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
 
@@ -976,8 +1016,8 @@ void ArchivePanel::onEntryListKeyDown(wxKeyEvent& e) {
 		moveDown();
 
 	// Select all entries (Ctrl+A)
-	//else if (e.GetKeyCode() == 'A' && e.ControlDown())
-	//	entry_list->selectAll();
+	else if (e.GetKeyCode() == 'A' && e.ControlDown())
+		entry_list->selectAll();
 
 	// New entry (Ctrl+N)
 	else if (e.GetKeyCode() == 'N' && e.ControlDown() && !e.ShiftDown())
@@ -998,10 +1038,10 @@ void ArchivePanel::onEntryListKeyDown(wxKeyEvent& e) {
  *******************************************************************/
 void ArchivePanel::onEntryListActivated(wxListEvent& e) {
 	ArchiveEntry* entry = entry_list->getFocusedEntry();
-	
+
 	if (!entry)
 		return;
-	
+
 	if (entry->getType()->getFormat().substr(0, 8) == "archive_")
 		theArchiveManager->openArchive(entry);
 

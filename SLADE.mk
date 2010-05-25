@@ -2,10 +2,10 @@
 ## Auto Generated makefile by CodeLite IDE
 ## any manual changes will be erased      
 ##
-## Release
+## Debug
 ProjectName            :=SLADE
-ConfigurationName      :=Release
-IntermediateDirectory  :=./Release
+ConfigurationName      :=Debug
+IntermediateDirectory  :=./Debug
 OutDir                 := $(IntermediateDirectory)
 WorkspacePath          := "/home/simon/dev/slade/trunk"
 ProjectPath            := "/home/simon/dev/slade/trunk"
@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Simon
-Date                   :=20/05/10
+Date                   :=25/05/10
 CodeLitePath           :="/home/simon/.codelite"
 LinkerName             :=g++
 ArchiveTool            :=ar rcus
@@ -30,14 +30,14 @@ PreprocessorSwitch     :=-D
 SourceSwitch           :=-c 
 CompilerName           :=g++
 C_CompilerName         :=gcc
-OutputFile             :=./dist/slade
+OutputFile             :=./dist/slade-dbg
 Preprocessors          :=$(PreprocessorSwitch)__WX__ 
 ObjectSwitch           :=-o 
 ArchiveOutputSwitch    := 
 PreprocessOnlySwitch   :=-E 
 MakeDirCommand         :=mkdir -p
-CmpOptions             := -O2 $(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no) $(Preprocessors)
-LinkOptions            :=  -s $(shell wx-config --debug=no --libs std,gl,stc,aui --unicode=yes)
+CmpOptions             := -g $(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=yes) $(Preprocessors)
+LinkOptions            :=  $(shell wx-config --debug=yes --libs std,gl,stc,aui --unicode=yes)
 IncludePath            :=  "$(IncludeSwitch)." 
 RcIncludePath          :=
 Libs                   :=$(LibrarySwitch)freeimage 
@@ -53,9 +53,10 @@ Objects=$(IntermediateDirectory)/src_GfxConvDialog$(ObjectSuffix) $(Intermediate
 	$(IntermediateDirectory)/src_EntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_GfxEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_MultiEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_SwitchesEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_TextEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_PnamesEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_DefaultEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_ZipArchivePanel$(ObjectSuffix) $(IntermediateDirectory)/src_ZipEntryListPanel$(ObjectSuffix) \
 	$(IntermediateDirectory)/src_ArchiveManagerPanel$(ObjectSuffix) $(IntermediateDirectory)/src_PatchTablePanel$(ObjectSuffix) $(IntermediateDirectory)/src_TextureEditorPanel$(ObjectSuffix) $(IntermediateDirectory)/src_TextureXEditor$(ObjectSuffix) $(IntermediateDirectory)/src_MainWindow$(ObjectSuffix) $(IntermediateDirectory)/src_EntryOperations$(ObjectSuffix) $(IntermediateDirectory)/src_MapLine$(ObjectSuffix) $(IntermediateDirectory)/src_MapSector$(ObjectSuffix) $(IntermediateDirectory)/src_MapSide$(ObjectSuffix) $(IntermediateDirectory)/src_MapThing$(ObjectSuffix) \
 	$(IntermediateDirectory)/src_MapVertex$(ObjectSuffix) $(IntermediateDirectory)/src_SLADEMap$(ObjectSuffix) $(IntermediateDirectory)/src_MapCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_MapEditorWindow$(ObjectSuffix) $(IntermediateDirectory)/src_Archive$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveEntry$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveManager$(ObjectSuffix) $(IntermediateDirectory)/src_WadArchive$(ObjectSuffix) $(IntermediateDirectory)/src_ZipArchive$(ObjectSuffix) $(IntermediateDirectory)/src_EntryType$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_EntryDataFormat$(ObjectSuffix) $(IntermediateDirectory)/src_AnimatedList$(ObjectSuffix) $(IntermediateDirectory)/src_SwitchesList$(ObjectSuffix) $(IntermediateDirectory)/src_PnamesList$(ObjectSuffix) $(IntermediateDirectory)/src_CTexture$(ObjectSuffix) $(IntermediateDirectory)/src_PatchTable$(ObjectSuffix) $(IntermediateDirectory)/src_TextureXList$(ObjectSuffix) $(IntermediateDirectory)/src_SImage$(ObjectSuffix) $(IntermediateDirectory)/src_Palette$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteManager$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_GLTexture$(ObjectSuffix) $(IntermediateDirectory)/src_Icons$(ObjectSuffix) $(IntermediateDirectory)/src_ColourBox$(ObjectSuffix) $(IntermediateDirectory)/src_GfxCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_ListView$(ObjectSuffix) $(IntermediateDirectory)/src_OGLCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteChooser$(ObjectSuffix) $(IntermediateDirectory)/src_ConsolePanel$(ObjectSuffix) $(IntermediateDirectory)/src_SplashWindow$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_BaseResourceArchivesPanel$(ObjectSuffix) $(IntermediateDirectory)/src_BrowserCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_Browser$(ObjectSuffix) $(IntermediateDirectory)/src_CTextureCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_TextEditor$(ObjectSuffix) $(IntermediateDirectory)/src_TextLanguage$(ObjectSuffix) 
+	$(IntermediateDirectory)/src_EntryDataFormat$(ObjectSuffix) $(IntermediateDirectory)/src_DatArchive$(ObjectSuffix) $(IntermediateDirectory)/src_LibArchive$(ObjectSuffix) $(IntermediateDirectory)/src_AnimatedList$(ObjectSuffix) $(IntermediateDirectory)/src_SwitchesList$(ObjectSuffix) $(IntermediateDirectory)/src_PnamesList$(ObjectSuffix) $(IntermediateDirectory)/src_CTexture$(ObjectSuffix) $(IntermediateDirectory)/src_PatchTable$(ObjectSuffix) $(IntermediateDirectory)/src_TextureXList$(ObjectSuffix) $(IntermediateDirectory)/src_SImage$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_Palette$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteManager$(ObjectSuffix) $(IntermediateDirectory)/src_GLTexture$(ObjectSuffix) $(IntermediateDirectory)/src_Icons$(ObjectSuffix) $(IntermediateDirectory)/src_ColourBox$(ObjectSuffix) $(IntermediateDirectory)/src_GfxCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_OGLCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteChooser$(ObjectSuffix) $(IntermediateDirectory)/src_ConsolePanel$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_SplashWindow$(ObjectSuffix) $(IntermediateDirectory)/src_BaseResourceArchivesPanel$(ObjectSuffix) $(IntermediateDirectory)/src_BrowserCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_Browser$(ObjectSuffix) $(IntermediateDirectory)/src_CTextureCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_TextEditor$(ObjectSuffix) $(IntermediateDirectory)/src_TextLanguage$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveEntryList$(ObjectSuffix) $(IntermediateDirectory)/src_ListView$(ObjectSuffix) $(IntermediateDirectory)/src_ZipArchiveEntryList$(ObjectSuffix) \
+	
 
 ##
 ## Main Build Targets 
@@ -67,7 +68,7 @@ $(OutputFile): makeDirStep $(Objects)
 	$(LinkerName) $(OutputSwitch)$(OutputFile) $(Objects) $(LibPath) $(Libs) $(LinkOptions)
 
 makeDirStep:
-	@test -d ./Release || $(MakeDirCommand) ./Release
+	@test -d ./Debug || $(MakeDirCommand) ./Debug
 
 PreBuild:
 
@@ -483,6 +484,22 @@ $(IntermediateDirectory)/src_EntryDataFormat$(DependSuffix): src/EntryDataFormat
 $(IntermediateDirectory)/src_EntryDataFormat$(PreprocessSuffix): src/EntryDataFormat.cpp
 	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_EntryDataFormat$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/EntryDataFormat.cpp"
 
+$(IntermediateDirectory)/src_DatArchive$(ObjectSuffix): src/DatArchive.cpp $(IntermediateDirectory)/src_DatArchive$(DependSuffix)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/DatArchive.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_DatArchive$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_DatArchive$(DependSuffix): src/DatArchive.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_DatArchive$(ObjectSuffix) -MF$(IntermediateDirectory)/src_DatArchive$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/DatArchive.cpp"
+
+$(IntermediateDirectory)/src_DatArchive$(PreprocessSuffix): src/DatArchive.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_DatArchive$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/DatArchive.cpp"
+
+$(IntermediateDirectory)/src_LibArchive$(ObjectSuffix): src/LibArchive.cpp $(IntermediateDirectory)/src_LibArchive$(DependSuffix)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/LibArchive.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_LibArchive$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_LibArchive$(DependSuffix): src/LibArchive.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_LibArchive$(ObjectSuffix) -MF$(IntermediateDirectory)/src_LibArchive$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/LibArchive.cpp"
+
+$(IntermediateDirectory)/src_LibArchive$(PreprocessSuffix): src/LibArchive.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_LibArchive$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/LibArchive.cpp"
+
 $(IntermediateDirectory)/src_AnimatedList$(ObjectSuffix): src/AnimatedList.cpp $(IntermediateDirectory)/src_AnimatedList$(DependSuffix)
 	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/AnimatedList.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_AnimatedList$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_AnimatedList$(DependSuffix): src/AnimatedList.cpp
@@ -587,14 +604,6 @@ $(IntermediateDirectory)/src_GfxCanvas$(DependSuffix): src/GfxCanvas.cpp
 $(IntermediateDirectory)/src_GfxCanvas$(PreprocessSuffix): src/GfxCanvas.cpp
 	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_GfxCanvas$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/GfxCanvas.cpp"
 
-$(IntermediateDirectory)/src_ListView$(ObjectSuffix): src/ListView.cpp $(IntermediateDirectory)/src_ListView$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/ListView.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ListView$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/src_ListView$(DependSuffix): src/ListView.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_ListView$(ObjectSuffix) -MF$(IntermediateDirectory)/src_ListView$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/ListView.cpp"
-
-$(IntermediateDirectory)/src_ListView$(PreprocessSuffix): src/ListView.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ListView$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/ListView.cpp"
-
 $(IntermediateDirectory)/src_OGLCanvas$(ObjectSuffix): src/OGLCanvas.cpp $(IntermediateDirectory)/src_OGLCanvas$(DependSuffix)
 	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/OGLCanvas.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_OGLCanvas$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_OGLCanvas$(DependSuffix): src/OGLCanvas.cpp
@@ -682,6 +691,30 @@ $(IntermediateDirectory)/src_TextLanguage$(DependSuffix): src/TextLanguage.cpp
 
 $(IntermediateDirectory)/src_TextLanguage$(PreprocessSuffix): src/TextLanguage.cpp
 	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_TextLanguage$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/TextLanguage.cpp"
+
+$(IntermediateDirectory)/src_ArchiveEntryList$(ObjectSuffix): src/ArchiveEntryList.cpp $(IntermediateDirectory)/src_ArchiveEntryList$(DependSuffix)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/ArchiveEntryList.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ArchiveEntryList$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_ArchiveEntryList$(DependSuffix): src/ArchiveEntryList.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_ArchiveEntryList$(ObjectSuffix) -MF$(IntermediateDirectory)/src_ArchiveEntryList$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/ArchiveEntryList.cpp"
+
+$(IntermediateDirectory)/src_ArchiveEntryList$(PreprocessSuffix): src/ArchiveEntryList.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ArchiveEntryList$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/ArchiveEntryList.cpp"
+
+$(IntermediateDirectory)/src_ListView$(ObjectSuffix): src/ListView.cpp $(IntermediateDirectory)/src_ListView$(DependSuffix)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/ListView.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ListView$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_ListView$(DependSuffix): src/ListView.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_ListView$(ObjectSuffix) -MF$(IntermediateDirectory)/src_ListView$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/ListView.cpp"
+
+$(IntermediateDirectory)/src_ListView$(PreprocessSuffix): src/ListView.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ListView$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/ListView.cpp"
+
+$(IntermediateDirectory)/src_ZipArchiveEntryList$(ObjectSuffix): src/ZipArchiveEntryList.cpp $(IntermediateDirectory)/src_ZipArchiveEntryList$(DependSuffix)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/ZipArchiveEntryList.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ZipArchiveEntryList$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_ZipArchiveEntryList$(DependSuffix): src/ZipArchiveEntryList.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_ZipArchiveEntryList$(ObjectSuffix) -MF$(IntermediateDirectory)/src_ZipArchiveEntryList$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/ZipArchiveEntryList.cpp"
+
+$(IntermediateDirectory)/src_ZipArchiveEntryList$(PreprocessSuffix): src/ZipArchiveEntryList.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ZipArchiveEntryList$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/ZipArchiveEntryList.cpp"
 
 
 -include $(IntermediateDirectory)/*$(DependSuffix)
@@ -842,6 +875,12 @@ clean:
 	$(RM) $(IntermediateDirectory)/src_EntryDataFormat$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/src_EntryDataFormat$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/src_EntryDataFormat$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/src_DatArchive$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/src_DatArchive$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/src_DatArchive$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/src_LibArchive$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/src_LibArchive$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/src_LibArchive$(PreprocessSuffix)
 	$(RM) $(IntermediateDirectory)/src_AnimatedList$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/src_AnimatedList$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/src_AnimatedList$(PreprocessSuffix)
@@ -881,9 +920,6 @@ clean:
 	$(RM) $(IntermediateDirectory)/src_GfxCanvas$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/src_GfxCanvas$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/src_GfxCanvas$(PreprocessSuffix)
-	$(RM) $(IntermediateDirectory)/src_ListView$(ObjectSuffix)
-	$(RM) $(IntermediateDirectory)/src_ListView$(DependSuffix)
-	$(RM) $(IntermediateDirectory)/src_ListView$(PreprocessSuffix)
 	$(RM) $(IntermediateDirectory)/src_OGLCanvas$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/src_OGLCanvas$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/src_OGLCanvas$(PreprocessSuffix)
@@ -917,6 +953,15 @@ clean:
 	$(RM) $(IntermediateDirectory)/src_TextLanguage$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/src_TextLanguage$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/src_TextLanguage$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/src_ArchiveEntryList$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/src_ArchiveEntryList$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/src_ArchiveEntryList$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/src_ListView$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/src_ListView$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/src_ListView$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/src_ZipArchiveEntryList$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/src_ZipArchiveEntryList$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/src_ZipArchiveEntryList$(PreprocessSuffix)
 	$(RM) $(OutputFile)
 
 

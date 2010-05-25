@@ -121,7 +121,7 @@ bool EntryDataFormat::readDataFormatDefinition(MemChunk& mc) {
 
 
 
-// Special format that always returns true on detection
+// Special format that always returns false on detection
 // Used when a format is requested that doesn't exist
 class AnyDataFormat : public EntryDataFormat {
 public:
@@ -663,7 +663,7 @@ public:
 		}
 		return (height > 0);
 	}
-}; 
+};
 
 class WadDataFormat : public EntryDataFormat {
 public:

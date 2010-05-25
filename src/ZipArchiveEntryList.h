@@ -17,7 +17,7 @@ private:
 	ArchiveEntry*	entry_folder_back;
 
 public:
-	ZipArchiveEntryList(wxWindow* parent, Archive* archive);
+	ZipArchiveEntryList(wxWindow* parent);
 	~ZipArchiveEntryList();
 
 	zipdir_t*	getCurrentDir() { return current_dir; }
@@ -25,10 +25,13 @@ public:
 	void	setArchive(Archive* archive);
 	void	updateList();
 
+	int					entriesBegin();
 	bool				isFolder(int index);
 	bool				isEntry(int index);
 	ArchiveEntry*		getEntry(int index) const;
 	vector<zipdir_t*>	getSelectedDirectories();
+	int					getEntryListIndex(int index);
+	int					getDirListIndex(int subdir);
 
 	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 

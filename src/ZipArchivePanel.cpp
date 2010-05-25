@@ -133,7 +133,8 @@ void ZipArchivePanel::init() {
 	m_hbox->Add(framesizer, 0, wxEXPAND|wxALL, 4);
 
 	// Create entry list panel
-	entry_list = new ZipArchiveEntryList(this, archive);
+	entry_list = new ZipArchiveEntryList(this);
+	entry_list->setArchive(archive);
 	framesizer->Add(entry_list, 1, wxEXPAND | wxALL, 4);
 
 	// Add default entry panel
@@ -144,6 +145,7 @@ void ZipArchivePanel::init() {
 	// Setup events
 	entry_list->Bind(wxEVT_KEY_DOWN, &ArchivePanel::onEntryListKeyDown, this);
 	entry_list->Bind(wxEVT_COMMAND_LIST_ITEM_FOCUSED, &ArchivePanel::onEntryListFocusChange, this);
+	entry_list->Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &ArchivePanel::onEntryListFocusChange, this);
 	entry_list->Bind(wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK, &ArchivePanel::onEntryListRightClick, this);
 	entry_list->Bind(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, &ArchivePanel::onEntryListActivated, this);
 
@@ -351,20 +353,23 @@ bool ZipArchivePanel::renameEntry() {
  *******************************************************************/
 bool ZipArchivePanel::deleteEntry() {
 	// Get a list of selected entries
-	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
-
-	// Go through the list
-	for (size_t a = 0; a < selection.size(); a++) {
-		// Remove the current selected entry if it isn't a directory
-		if (selection[a]->getType() != EntryType::folderType())
-			archive->removeEntry(selection[a]);
-	}
+	vector<ArchiveEntry*> selected_entries = entry_list->getSelectedEntries();
 
 	// Get a list of selected directories
 	vector<zipdir_t*> selected_dirs = ((ZipArchiveEntryList*)entry_list)->getSelectedDirectories();
 
-	// Go through the list
-	for (size_t a = 0; a < selected_dirs.size(); a++) {
+	// Clear the selection
+	entry_list->clearSelection();
+
+	// Go through the selected entries
+	for (int a = selected_entries.size() - 1; a >= 0; a--) {
+		// Remove the current selected entry if it isn't a directory
+		if (selected_entries[a]->getType() != EntryType::folderType())
+			archive->removeEntry(selected_entries[a]);
+	}
+
+	// Go through the selected directories
+	for (int a = selected_dirs.size() - 1; a >= 0; a--) {
 		// Remove the selected directory from the archive
 		((ZipArchive*)archive)->deleteDirectory(selected_dirs[a]);
 	}
@@ -462,6 +467,60 @@ bool ZipArchivePanel::pasteEntry() {
 		}
 	}
 
+	return true;
+}
+
+bool ZipArchivePanel::moveUp() {
+	// Get selection
+	vector<int> selection = entry_list->getSelection();
+
+	// If nothing is selected, do nothing
+	if (selection.size() == 0)
+		return false;
+
+	// If the first selected item is at the top of the list
+	// or before entries start then don't move anything up
+	if (selection[0] <= ((ZipArchiveEntryList*)entry_list)->entriesBegin())
+		return false;
+
+	// Move each one up by swapping it with the entry above it
+	for (size_t a = 0; a < selection.size(); a++) {
+		// Get the entries to swap
+		ArchiveEntry* entry = entry_list->getEntry(selection[a]);
+		ArchiveEntry* above = entry_list->getEntry(selection[a]-1);
+
+		// Swap them in the archive
+		archive->swapEntries(entry, above);
+	}
+
+	// Return success
+	return true;
+}
+
+bool ZipArchivePanel::moveDown() {
+	// Get selection
+	vector<int> selection = entry_list->getSelection();
+
+	// If nothing is selected, do nothing
+	if (selection.size() == 0)
+		return false;
+
+	// If the last selected item is at the end of the list
+	// then don't move anything down
+	if (selection.back() == entry_list->GetItemCount()-1)
+		return false;
+
+	// Move each one down by swapping it with the entry below it
+	for (int a = selection.size()-1; a >= 0; a--) {
+		// Get the entries to swap
+		ArchiveEntry* entry = entry_list->getEntry(selection[a]);
+		ArchiveEntry* below = entry_list->getEntry(selection[a]+1);
+
+		// Swap them in the archive
+		archive->swapEntries(entry, below);
+	}
+
+	// Return success
 	return true;
 }
 

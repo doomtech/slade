@@ -42,6 +42,10 @@ TODO List ---------------------------------------------------------------
 	- Handling EntryPanel should be determined by format rather than type as it is now
 	- Should have some kind of 'class' attribute: gfx, text, etc.
 		- Used when, for instance, searching for all gfx entries in an archive
+- General optimisation:
+	- Entry type detection
+	- Selecting lots of entries
+	- Gfx conversion (not sure if it can be optimised so much, but at least should show a progress bar)
 - Rearrange menus
 - *Resources system:
 	- opened archives are either used as resources or not

@@ -25,7 +25,7 @@ protected:
 	wxListItemAttr*	OnGetItemAttr(long item) const;
 
 public:
-	ArchiveEntryList(wxWindow* parent, Archive* archive);
+	ArchiveEntryList(wxWindow* parent);
 	~ArchiveEntryList();
 
 	virtual void	setArchive(Archive* archive);
@@ -41,6 +41,10 @@ public:
 	virtual vector<int>		getSelection();
 	int						getLastSelected();
 	ArchiveEntry*			getLastSelectedEntry();
+
+	void	selectItem(int index, bool select = true);
+	void	clearSelection();
+	void	selectAll();
 
 	virtual void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 

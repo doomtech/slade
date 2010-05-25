@@ -16,13 +16,10 @@ CVAR(Bool, elist_coltype_show, true, CVAR_SAVE)
 CVAR(Bool, elist_hrules, false, CVAR_SAVE)
 CVAR(Bool, elist_vrules, false, CVAR_SAVE)
 
-ArchiveEntryList::ArchiveEntryList(wxWindow* parent, Archive* archive) : wxListCtrl(parent, -1, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxLC_VIRTUAL) {
+ArchiveEntryList::ArchiveEntryList(wxWindow* parent) : wxListCtrl(parent, -1, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxLC_VIRTUAL) {
 	// Init variables
 	this->archive = archive;
 	item_attr = new wxListItemAttr();
-
-	// Setup archive
-	setArchive(archive);
 
 	// Setup columns
 	setupColumns();
@@ -129,7 +126,7 @@ ArchiveEntry* ArchiveEntryList::getEntry(int index) const {
 	// Check index
 	if (index < 0 || index >= (signed)archive->numEntries())
 		return NULL;
-	
+
 	return archive->getEntry(index);
 }
 
@@ -238,6 +235,28 @@ ArchiveEntry* ArchiveEntryList::getLastSelectedEntry() {
 		return getEntry(index);
 	else
 		return NULL;
+}
+
+void ArchiveEntryList::selectItem(int item, bool select) {
+	// Check item id is in range
+	if (item >= GetItemCount())
+		return;
+
+	// Select/deselect the item
+	if (select)
+		SetItemState(item, 0xFFFF, wxLIST_STATE_SELECTED);
+	else
+		SetItemState(item, 0x0000, wxLIST_STATE_SELECTED);
+}
+
+void ArchiveEntryList::selectAll() {
+	for (int a = 0; a < GetItemCount(); a++)
+		SetItemState(a, 0xFFFF, wxLIST_STATE_SELECTED|wxLIST_STATE_FOCUSED);
+}
+
+void ArchiveEntryList::clearSelection() {
+	for (int a = 0; a < GetItemCount(); a++)
+		SetItemState(a, 0x0000, wxLIST_STATE_SELECTED|wxLIST_STATE_FOCUSED);
 }
 
 string ArchiveEntryList::OnGetItemText(long item, long column) const {
@@ -443,7 +462,8 @@ void c_test_ael(vector<string> args) {
 	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
 	dlg.SetSizer(hbox);
 
-	ArchiveEntryList* ael = new ArchiveEntryList(&dlg, theArchiveManager->getArchive(0));
+	ArchiveEntryList* ael = new ArchiveEntryList(&dlg);
+	ael->setArchive(theArchiveManager->getArchive(0));
 	hbox->Add(ael, 1, wxEXPAND|wxALL, 4);
 
 	dlg.ShowModal();
