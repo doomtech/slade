@@ -161,7 +161,7 @@ bool LibArchive::open(MemChunk& mc) {
 	uint32_t num_lumps = 0;
 	mc.read(&num_lumps, 2);		// Size
 	num_lumps = wxINT16_SWAP_ON_BE(num_lumps);
-	uint32_t dir_offset = mc.getSize() - (3 + (num_lumps * 21));
+	uint32_t dir_offset = mc.getSize() - (2 + (num_lumps * 21));
 
 	// Stop announcements (don't want to be announcing modification due to entries being added etc)
 	setMuted(true);
@@ -175,14 +175,14 @@ bool LibArchive::open(MemChunk& mc) {
 
 		// Read lump info
 		char myname[13] = "";
-		uint8_t trash = 0;
 		uint32_t offset = 0;
 		uint32_t size = 0;
+		uint8_t dummy = 0;
 		
-		mc.read(&trash, 1);		// Unused
 		mc.read(&size, 4);		// Size
 		mc.read(&offset, 4);	// Offset
-		mc.read(myname, 12);		// Name
+		mc.read(myname, 12);	// Name
+		mc.read(&dummy, 1);		// Separator
 		myname[12] = '\0';
 
 		// Byteswap values for big endian if needed

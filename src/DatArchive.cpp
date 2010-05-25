@@ -490,6 +490,9 @@ bool DatArchive::isDatArchive(MemChunk& mc) {
 	dir_offset	= wxINT32_SWAP_ON_BE(dir_offset);
 	junk		= wxINT32_SWAP_ON_BE(junk);
 
+	if (dir_offset >= mc.getSize())
+		return false;
+
 	// Read the directory
 	mc.seek(dir_offset, SEEK_SET);
 	// Read lump info
@@ -509,19 +512,29 @@ bool DatArchive::isDatArchive(MemChunk& mc) {
 	nameofs = wxINT16_SWAP_ON_BE(nameofs);
 	unknown = wxINT16_SWAP_ON_BE(unknown);
 
-	if (nameofs == 0 || offset + size > mc.getSize()) {
+	// The first lump should have a name (subsequent lumps need not have one).
+	// Also, sanity check the values.
+	if (nameofs == 0 || nameofs >=  mc.getSize() || offset + size >= mc.getSize()) {
 		return false;
 	}
 
 	string name;
 	size_t len = 1;
 	size_t start = nameofs+dir_offset;
-	if (start > mc.getSize())
+	// Sanity checks again. Make sure there is actually a name.
+	if (start > mc.getSize() || mc[start] < 33)
+		return false;
+	for (size_t i = start; (mc[i] != 0 && i < mc.getSize()); ++i, ++len) {
+		// Names should not contain garbage characters
+		if (mc[i] < 32)
+			return false;
+	}
+	// Let's be reasonable here. While names aren't limited, if it's too long, it's suspicious.
+	if (len > 60)
 		return false;
 	const uint8_t * mcdata = mc.getData();
-	for (size_t i = start; (mcdata[i] != 0 && i < mc.getSize()); ++i, ++len) {}
 	name = wxString::FromAscii(mcdata+start, len);
-	return (name.Length() < 60);
+	return true;
 }
 
 bool DatArchive::isDatArchive(string filename) {
