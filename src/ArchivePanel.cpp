@@ -616,6 +616,7 @@ void ArchivePanel::onAnnouncement(Announcer* announcer, string event_name, MemCh
 	// Reset event data for reading
 	event_data.seek(0, SEEK_SET);
 
+/*
 	// If the archive was closed
 	if (announcer == archive && event_name == "close") {
 		// Remove the archive panel from the parent notebook
@@ -628,6 +629,7 @@ void ArchivePanel::onAnnouncement(Announcer* announcer, string event_name, MemCh
 		// Destroy the archive panel
 		this->Destroy();
 	}
+*/
 
 	// If the archive was saved
 	if (announcer == archive && event_name == "saved") {

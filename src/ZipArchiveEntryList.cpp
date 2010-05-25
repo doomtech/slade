@@ -106,8 +106,8 @@ bool ZipArchiveEntryList::isEntry(int index) {
 }
 
 ArchiveEntry* ZipArchiveEntryList::getEntry(int index) const {
-	// Check index
-	if (index < 0)
+	// Check index & archive
+	if (index < 0 || !archive)
 		return NULL;
 
 	// Index modifier if 'up folder' entry exists

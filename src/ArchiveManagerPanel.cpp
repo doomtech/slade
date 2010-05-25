@@ -292,6 +292,32 @@ void ArchiveManagerPanel::openTab(int archive_index) {
 	}
 }
 
+/* ArchiveManagerPanel::closeTab
+ * Closes the archive editor tab for the archive at <archive_index>
+ * in the archive manager
+ *******************************************************************/
+void ArchiveManagerPanel::closeTab(int archive_index) {
+	Archive* archive = theArchiveManager->getArchive(archive_index);
+
+	if (archive) {
+		// Go through all tabs
+		for (size_t a = 0; a < notebook_archives->GetPageCount(); a++) {
+			// Check page type is "texture"
+			if (notebook_archives->GetPage(a)->GetName().CmpNoCase(_T("archive")))
+				continue;
+
+			// Check for archive match
+			ArchivePanel* ap = (ArchivePanel*)notebook_archives->GetPage(a);
+			if (ap->getArchive() == archive) {
+				// Close the tab
+				notebook_archives->DeletePage(a);
+
+				return;
+			}
+		}
+	}
+}
+
 /* ArchiveManagerPanel::openTextureTab
  * Opens a new texture editor tab for the archive at <archive_index>
  * in the archive manager
@@ -480,7 +506,10 @@ void ArchiveManagerPanel::onAnnouncement(Announcer* announcer, string event_name
 	if (event_name == _T("archive_closing")) {
 		int32_t index = -1;
 		event_data.read(&index, 4);
+
+		// Close any related tabs
 		closeTextureTab(index);
+		closeTab(index);
 	}
 
 	// If an archive was closed
