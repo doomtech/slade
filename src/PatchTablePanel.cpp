@@ -51,31 +51,31 @@ PatchTablePanel::PatchTablePanel(wxWindow* parent, PatchTable* patch_table) : wx
 	SetSizer(sizer);
 
 	// Add PNAMES list
-	wxStaticBox* frame = new wxStaticBox(this, -1, _T("Patches (PNAMES)"));
+	wxStaticBox* frame = new wxStaticBox(this, -1, "Patches (PNAMES)");
 	wxStaticBoxSizer* framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
 	sizer->Add(framesizer, 0, wxEXPAND|wxALL, 4);
 	list_patches = new ListView(this, -1);
 	framesizer->Add(list_patches, 1, wxEXPAND|wxALL, 4);
 
 	// Add editing controls
-	frame = new wxStaticBox(this, -1, _T("Actions"));
+	frame = new wxStaticBox(this, -1, "Actions");
 	framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
 	sizer->Add(framesizer, 0, wxALL, 4);
 
 	// Add patch button
-	btn_add_patch = new wxButton(this, -1, _T("New Patch"));
+	btn_add_patch = new wxButton(this, -1, "New Patch");
 	framesizer->Add(btn_add_patch, 0, wxEXPAND|wxALL, 4);
 
 	// New patch from file button
-	btn_patch_from_file = new wxButton(this, -1, _T("New Patch from File"));
+	btn_patch_from_file = new wxButton(this, -1, "New Patch from File");
 	framesizer->Add(btn_patch_from_file, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
 	// Remove patch button
-	btn_remove_patch = new wxButton(this, -1, _T("Remove Patch"));
+	btn_remove_patch = new wxButton(this, -1, "Remove Patch");
 	framesizer->Add(btn_remove_patch, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
 	// Change patch button
-	btn_change_patch = new wxButton(this, -1, _T("Change Patch"));
+	btn_change_patch = new wxButton(this, -1, "Change Patch");
 	framesizer->Add(btn_change_patch, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
 	// Bind events
@@ -99,14 +99,14 @@ void PatchTablePanel::updatePatchListItem(int index) {
 	patch_t& patch = patch_table->patch(index);
 
 	// Get patch entry's parent archive
-	string archive = _T("NOT FOUND");
+	string archive = "NOT FOUND";
 	if (patch.entry)
 		archive = patch.entry->getParent()->getFileName(false);
 
 	// Update list item
-	list_patches->setItemText(index, 0, s_fmt(_T("%04d"), index));
+	list_patches->setItemText(index, 0, s_fmt("%04d", index));
 	list_patches->setItemText(index, 1, patch.name);
-	list_patches->setItemText(index, 2, s_fmt(_T("%d"), patch.used));
+	list_patches->setItemText(index, 2, s_fmt("%d", patch.used));
 	list_patches->setItemText(index, 3, archive);
 
 	// Update item colour
@@ -130,23 +130,23 @@ void PatchTablePanel::populatePatchList() {
 	list_patches->Show(false);
 
 	// Add columns
-	list_patches->InsertColumn(0, _T("#"));
-	list_patches->InsertColumn(1, _T("Patch Name"));
-	list_patches->InsertColumn(2, _T("Use Count"));
-	list_patches->InsertColumn(3, _T("In Archive"));
+	list_patches->InsertColumn(0, "#");
+	list_patches->InsertColumn(1, "Patch Name");
+	list_patches->InsertColumn(2, "Use Count");
+	list_patches->InsertColumn(3, "In Archive");
 
 	// Add pnames entries to the list
 	list_patches->enableSizeUpdate(false);
 	for (uint32_t a = 0; a < patch_table->nPatches(); a++) {
 		string name = patch_table->patchName(a);
-		string archive = _T("NOT FOUND");
+		string archive = "NOT FOUND";
 
 		// Get parent archive if any
 		ArchiveEntry* entry = patch_table->patchEntry(a);
 		if (entry)
 			archive = entry->getParent()->getFileName(false);
 
-		string cols[] = { s_fmt(_T("%04d"), a), name, s_fmt(_T("%d"), patch_table->patch(a).used), archive };
+		string cols[] = { s_fmt("%04d", a), name, s_fmt("%d", patch_table->patch(a).used), archive };
 		list_patches->addItem(a, wxArrayString(4, cols));
 
 		// Colour red if patch entry not found
@@ -164,7 +164,7 @@ void PatchTablePanel::populatePatchList() {
 
 void PatchTablePanel::onBtnAddPatch(wxCommandEvent& e) {
 	// Prompt for new patch name
-	string patch = wxGetTextFromUser(_T("Enter patch entry name:"), _T("Add Patch"), wxEmptyString, this);
+	string patch = wxGetTextFromUser("Enter patch entry name:", "Add Patch", wxEmptyString, this);
 
 	// Check something was entered
 	if (patch.IsEmpty())
@@ -175,7 +175,7 @@ void PatchTablePanel::onBtnAddPatch(wxCommandEvent& e) {
 
 	// Add to patch list
 	int index = list_patches->GetItemCount();
-	list_patches->addItem(index, s_fmt(_T("%04d"), index));
+	list_patches->addItem(index, s_fmt("%04d", index));
 	updatePatchListItem(index);
 }
 
@@ -191,7 +191,7 @@ void PatchTablePanel::onBtnRemovePatch(wxCommandEvent& e) {
 		patch_t& patch = patch_table->patch(selection[a]);
 		if (patch.used > 0) {
 			// In use, ask if it's ok to remove the patch
-			int answer = wxMessageBox(s_fmt(_T("The patch \"%s\" is currently used by %d texture(s), are you sure you wish to remove it?"), chr(patch.name), patch.used), _T("Confirm Remove Patch"), wxYES_NO|wxCANCEL, this);
+			int answer = wxMessageBox(s_fmt("The patch \"%s\" is currently used by %d texture(s), are you sure you wish to remove it?", chr(patch.name), patch.used), "Confirm Remove Patch", wxYES_NO|wxCANCEL, this);
 			if (answer == wxYES) {
 				// Answered yes, remove the patch
 				parent->removePatch(selection[a]);
@@ -228,7 +228,7 @@ void PatchTablePanel::onBtnChangePatch(wxCommandEvent& e) {
 		patch_t& patch = patch_table->patch(selection[a]);
 
 		// Prompt for new patch name
-		string newname = wxGetTextFromUser(_T("Enter new patch entry name:"), _T("Change Patch"), patch.name, this);
+		string newname = wxGetTextFromUser("Enter new patch entry name:", "Change Patch", patch.name, this);
 
 		// Update the patch
 		patch_table->replacePatch(selection[a], newname, parent->getArchive());

@@ -45,7 +45,7 @@
  * GfxConvDialog class constructor
  *******************************************************************/
 GfxConvDialog::GfxConvDialog()
-: wxDialog(NULL, -1, _T("Graphic Format Conversion"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER) {
+: wxDialog(NULL, -1, "Graphic Format Conversion", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER) {
 	current_entry = 0;
 	setupLayout();
 }
@@ -111,30 +111,30 @@ void GfxConvDialog::setupLayout() {
 	m_vbox->Add(hbox, 0, wxEXPAND|wxTOP|wxLEFT|wxRIGHT, 4);
 
 	// Add 'Convert To' combo box
-	hbox->Add(new wxStaticText(this, -1, _T("Convert to:")), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
+	hbox->Add(new wxStaticText(this, -1, "Convert to:"), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
 
 	// This must remain in sync with the ConversionFormat enum in the header
-	wxString s_formats[] = { 
-		_T("Hexen 4-bit Chunky Format"), 
-		_T("Hexen Planar Format"), 
-		_T("Raw Format (Flat, Colormap, etc.)"), 
-		_T("Doom Graphic Format"), 
-		_T("PNG Format (8bit Paletted)"), 
-		_T("PNG Format (32bit Truecolour)") };
+	wxString s_formats[] = {
+		"Hexen 4-bit Chunky Format",
+		"Hexen Planar Format",
+		"Raw Format (Flat, Colormap, etc.)",
+		"Doom Graphic Format",
+		"PNG Format (8bit Paletted)",
+		"PNG Format (32bit Truecolour)" };
 	combo_target_format = new wxComboBox(this, -1, s_formats[CONV_DOOMGFX], wxDefaultPosition, wxDefaultSize, NUMCONVS, s_formats, wxCB_READONLY);
 	combo_target_format->Select(CONV_DOOMGFX);
 	hbox->Add(combo_target_format, 1, wxEXPAND|wxALL, 4);
 
 
 	// Add Gfx previews
-	wxStaticBox *frame = new wxStaticBox(this, -1, _T("Graphic"));
+	wxStaticBox *frame = new wxStaticBox(this, -1, "Graphic");
 	wxStaticBoxSizer *framesizer = new wxStaticBoxSizer(frame, wxHORIZONTAL);
 	m_vbox->Add(framesizer, 1, wxEXPAND|wxALL, 4);
 
 	wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
 	framesizer->Add(vbox, 1, wxEXPAND|wxALL, 0);
 
-	vbox->Add(new wxStaticText(this, -1, _T("Current Graphic")), 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
+	vbox->Add(new wxStaticText(this, -1, "Current Graphic"), 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
 
 	gfx_current = new GfxCanvas(this, -1);
 	gfx_current->SetInitialSize(wxSize(192, 192));
@@ -148,7 +148,7 @@ void GfxConvDialog::setupLayout() {
 	vbox = new wxBoxSizer(wxVERTICAL);
 	framesizer->Add(vbox, 1, wxEXPAND|wxALL, 0);
 
-	vbox->Add(new wxStaticText(this, -1, _T("Converted Graphic")), 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
+	vbox->Add(new wxStaticText(this, -1, "Converted Graphic"), 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
 
 	gfx_target = new GfxCanvas(this, -1);
 	gfx_target->SetInitialSize(wxSize(192, 192));
@@ -160,14 +160,14 @@ void GfxConvDialog::setupLayout() {
 
 
 	// 'Enable transparency' checkbox
-	cb_enable_transparency = new wxCheckBox(this, -1, _T("Enable Transparency"));
+	cb_enable_transparency = new wxCheckBox(this, -1, "Enable Transparency");
 	cb_enable_transparency->SetValue(true);
-	cb_enable_transparency->SetToolTip(_T("Uncheck this to remove any existing transparency from the graphic"));
+	cb_enable_transparency->SetToolTip("Uncheck this to remove any existing transparency from the graphic");
 	m_vbox->AddSpacer(4);
 	m_vbox->Add(cb_enable_transparency, 0, wxEXPAND|wxALL, 4);
 
 	// Add transparency options
-	frame = new wxStaticBox(this, -1, _T("Transparency Options"));
+	frame = new wxStaticBox(this, -1, "Transparency Options");
 	framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
 	m_vbox->Add(framesizer, 0, wxEXPAND|wxALL, 4);
 
@@ -177,20 +177,20 @@ void GfxConvDialog::setupLayout() {
 	// Keep existing transparency
 	hbox = new wxBoxSizer(wxHORIZONTAL);
 	vbox_ttypes->Add(hbox, 0, wxEXPAND|wxALL, 0);
-	rb_transparency_existing = new wxRadioButton(this, 100, _T("Existing w/Threshold:"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+	rb_transparency_existing = new wxRadioButton(this, 100, "Existing w/Threshold:", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
 	rb_transparency_existing->SetValue(true);
 	hbox->Add(rb_transparency_existing, 0, wxEXPAND|wxALL, 4);
 
 	// Alpha threshold
 	slider_alpha_threshold = new wxSlider(this, -1, 0, 0, 255, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_LABELS|wxSL_BOTTOM);
-	slider_alpha_threshold->SetToolTip(_T("Specifies the 'cutoff' transparency level, anything above this will be fully opaque, anything equal or below will be completely transparent"));
+	slider_alpha_threshold->SetToolTip("Specifies the 'cutoff' transparency level, anything above this will be fully opaque, anything equal or below will be completely transparent");
 	hbox->Add(slider_alpha_threshold, 1, wxEXPAND|wxALL, 4);
 
 
 	// Transparent colour
 	hbox = new wxBoxSizer(wxHORIZONTAL);
 	vbox_ttypes->Add(hbox, 0, wxEXPAND|wxALL, 0);
-	rb_transparency_colour = new wxRadioButton(this, 101, _T("Transparent Colour:"), wxDefaultPosition, wxDefaultSize, 0);
+	rb_transparency_colour = new wxRadioButton(this, 101, "Transparent Colour:", wxDefaultPosition, wxDefaultSize, 0);
 	rb_transparency_colour->SetValue(false);
 	hbox->Add(rb_transparency_colour, 0, wxEXPAND|wxALL, 4);
 
@@ -203,10 +203,10 @@ void GfxConvDialog::setupLayout() {
 	hbox = new wxBoxSizer(wxHORIZONTAL);
 	m_vbox->Add(hbox, 0, wxEXPAND|wxALL, 4);
 
-	btn_convert = new wxButton(this, -1, _T("Convert"));
-	btn_convert_all = new wxButton(this, -1, _T("Convert All"));
-	btn_skip = new wxButton(this, -1, _T("Skip"));
-	btn_skip_all = new wxButton(this, -1, _T("Skip All"));
+	btn_convert = new wxButton(this, -1, "Convert");
+	btn_convert_all = new wxButton(this, -1, "Convert All");
+	btn_skip = new wxButton(this, -1, "Skip");
+	btn_skip_all = new wxButton(this, -1, "Skip All");
 
 	hbox->AddStretchSpacer(1);
 	hbox->Add(btn_convert, 0, wxEXPAND|wxRIGHT, 4);
@@ -439,27 +439,27 @@ void GfxConvDialog::onTargetFormatChanged(wxCommandEvent& e) {
 void GfxConvDialog::validateTargetFormat() {
 	if (combo_target_format->GetCurrentSelection() == CONV_DOOMFLAT) {
 		if (!gfx_current->getImage()->validFlatSize()) {
-			wxMessageBox(_T("Raw graphics only support the following formats:\n")
-				_T("64x64 or 64x128 (Doom and Hexen flats)\n")
-				_T("128x128, 256x256 or 512x512 (ZDoom Hires flats)\n")
-				_T("320x200 (fullscreen graphics)\n")
-				_T("320xSomething (Heretic or Hexen Autopage)\n")
-				_T("10x12, 16x16, 32x64 or 48x48 (Alpha GNUM and Strife startup sprites)"),
-				_T("Invalid Image Size"), wxOK|wxICON_ERROR);
+			wxMessageBox("Raw graphics only support the following formats:\n"
+				"64x64 or 64x128 (Doom and Hexen flats)\n"
+				"128x128, 256x256 or 512x512 (ZDoom Hires flats)\n"
+				"320x200 (fullscreen graphics)\n"
+				"320xSomething (Heretic or Hexen Autopage)\n"
+				"10x12, 16x16, 32x64 or 48x48 (Alpha GNUM and Strife startup sprites)",
+				"Invalid Image Size", wxOK|wxICON_ERROR);
 			combo_target_format->SetSelection(CONV_DOOMGFX);
 		}
 	} else if (combo_target_format->GetCurrentSelection() == CONV_PLANAR) {
 		if (gfx_current->getImage()->getWidth() != 640 || gfx_current->getImage()->getHeight() != 480) {
-			wxMessageBox(_T("Hexen planar format only supports images of size 640x480"), _T("Invalid Image Size"), wxOK|wxICON_ERROR);
+			wxMessageBox("Hexen planar format only supports images of size 640x480", "Invalid Image Size", wxOK|wxICON_ERROR);
 			combo_target_format->SetSelection(CONV_DOOMGFX);
 		}
 		else if (gfx_current->getImage()->countColours() > 16) {
-			wxMessageBox(_T("Hexen planar format only supports images with 16 colors or less"), _T("Invalid Palette Size"), wxOK|wxICON_ERROR);
+			wxMessageBox("Hexen planar format only supports images with 16 colors or less", "Invalid Palette Size", wxOK|wxICON_ERROR);
 			combo_target_format->SetSelection(CONV_DOOMGFX);
 		}
 	} else if (combo_target_format->GetCurrentSelection() == CONV_4BITCHUNKY) {
 		if (gfx_current->getImage()->countColours() > 16) {
-			wxMessageBox(_T("4-bit formats only supports images with 16 colors or less"), _T("Invalid Palette Size"), wxOK|wxICON_ERROR);
+			wxMessageBox("4-bit formats only supports images with 16 colors or less", "Invalid Palette Size", wxOK|wxICON_ERROR);
 			combo_target_format->SetSelection(CONV_DOOMGFX);
 		}
 	}
@@ -528,7 +528,7 @@ void c_test_gcd(vector<string> args) {
 			if (entry)
 				entries.push_back(entry);
 			else
-				wxLogMessage(s_fmt(_T("Entry %s not found"), args[a].c_str()));
+				wxLogMessage(s_fmt("Entry %s not found", args[a].c_str()));
 		}
 
 		gcd.openEntries(entries);
@@ -536,4 +536,4 @@ void c_test_gcd(vector<string> args) {
 
 	gcd.ShowModal();
 }
-ConsoleCommand test_gcd(_T("test_gcd"), &c_test_gcd, 0);
+ConsoleCommand test_gcd("test_gcd", &c_test_gcd, 0);

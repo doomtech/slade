@@ -1,13 +1,45 @@
 
+/*******************************************************************
+ * SLADE - It's a Doom Editor
+ * Copyright (C) 2008 Simon Judd
+ *
+ * Email:       veilofsorrow@gmail.com
+ * Web:         http://slade.mancubus.net
+ * Filename:    ArchiveEntryList.cpp
+ * Description: A list widget that shows all entries in a list-based
+ *              archive (eg WadArchive). Keeps in sync with it's
+ *              associated archive automatically.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *******************************************************************/
+
+
+/*******************************************************************
+ * INCLUDES
+ *******************************************************************/
 #include "Main.h"
 #include "WxStuff.h"
 #include "ArchiveEntryList.h"
 #include "Icons.h"
-#include "ArchiveManager.h"
-#include "Console.h"
 #include "ListView.h"
 #include <wx/imaglist.h>
 
+
+/*******************************************************************
+ * VARIABLES
+ *******************************************************************/
 CVAR(Int, elist_colname_width, 80, CVAR_SAVE)
 CVAR(Int, elist_colsize_width, 64, CVAR_SAVE)
 CVAR(Int, elist_coltype_width, 160, CVAR_SAVE)
@@ -16,6 +48,14 @@ CVAR(Bool, elist_coltype_show, true, CVAR_SAVE)
 CVAR(Bool, elist_hrules, false, CVAR_SAVE)
 CVAR(Bool, elist_vrules, false, CVAR_SAVE)
 
+
+/*******************************************************************
+ * ARCHIVEENTRYLIST CLASS FUNCTIONS
+ *******************************************************************/
+
+/* ArchiveEntryList::ArchiveEntryList
+ * ArchiveEntryList class constructor
+ *******************************************************************/
 ArchiveEntryList::ArchiveEntryList(wxWindow* parent) : wxListCtrl(parent, -1, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxLC_VIRTUAL) {
 	// Init variables
 	this->archive = archive;
@@ -45,9 +85,16 @@ ArchiveEntryList::ArchiveEntryList(wxWindow* parent) : wxListCtrl(parent, -1, wx
 	SetSingleStyle(wxLC_VRULES, elist_vrules);
 }
 
+/* ArchiveEntryList::~ArchiveEntryList
+ * ArchiveEntryList class destructor
+ *******************************************************************/
 ArchiveEntryList::~ArchiveEntryList() {
 }
 
+/* ArchiveEntryList::setArchive
+ * Sets the archive for this widget to handle (can be NULL for no
+ * archive)
+ *******************************************************************/
 void ArchiveEntryList::setArchive(Archive* archive) {
 	// Stop listening to current archive (if any)
 	if (this->archive)
@@ -63,6 +110,9 @@ void ArchiveEntryList::setArchive(Archive* archive) {
 	}
 }
 
+/* ArchiveEntryList::setupColumns
+ * Creates/sets the list columns depending on user options
+ *******************************************************************/
 void ArchiveEntryList::setupColumns() {
 	// Remove existing columns
 	while (GetColumnCount() > 0)
@@ -82,6 +132,10 @@ void ArchiveEntryList::setupColumns() {
 	}
 }
 
+/* ArchiveEntryList::updateWidth
+ * Updates the entry list's minimum requested width to allow the
+ * widget to be shown with no horizontal scrollbar
+ *******************************************************************/
 void ArchiveEntryList::updateWidth() {
 	// Get total column width
 	int width = 8;
@@ -95,6 +149,9 @@ void ArchiveEntryList::updateWidth() {
 	SetSizeHints(width, -1);
 }
 
+/* ArchiveEntryList::columnType
+ * Returns the 'type' of column at [column] (name, size or type)
+ *******************************************************************/
 int ArchiveEntryList::columnType(int column) const {
 	if (column == 0)
 		return AEL_COLUMN_NAME;		// Name column is always 0
@@ -110,6 +167,9 @@ int ArchiveEntryList::columnType(int column) const {
 		return -1;					// Invalid column
 }
 
+/* ArchiveEntryList::updateList
+ * Updates + refreshes the list
+ *******************************************************************/
 void ArchiveEntryList::updateList(bool clear) {
 	// Clear all items if needed
 	if (clear)
@@ -122,15 +182,19 @@ void ArchiveEntryList::updateList(bool clear) {
 	Refresh();
 }
 
+/* ArchiveEntryList::getEntry
+ * Returns the ArchiveEntry associated with the list item at [index].
+ * Returns NULL if the index is out of bounds or no archive is open
+ *******************************************************************/
 ArchiveEntry* ArchiveEntryList::getEntry(int index) const {
 	// Check index
-	if (index < 0 || index >= (signed)archive->numEntries())
+	if (!archive || index < 0 || index >= (signed)archive->numEntries())
 		return NULL;
 
 	return archive->getEntry(index);
 }
 
-/* EntryListPanel::getFocusedEntry
+/* ArchiveEntryList::getFocusedEntry
  * Gets the archive entry associated with the currently focused list
  * item. Returns NULL if nothing is focused or no archive is open
  *******************************************************************/
@@ -149,7 +213,7 @@ ArchiveEntry* ArchiveEntryList::getFocusedEntry() {
 		return NULL;
 }
 
-/* EntryListPanel::getFocus
+/* ArchiveEntryList::getFocus
  * Gets the list index of the currently focused list item
  *******************************************************************/
 int ArchiveEntryList::getFocus() {
@@ -157,7 +221,7 @@ int ArchiveEntryList::getFocus() {
 	return GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_FOCUSED);
 }
 
-/* EntryListPanel::getSelectedEntries
+/* ArchiveEntryList::getSelectedEntries
  * Returns a vector of all selected archive entries
  *******************************************************************/
 vector<ArchiveEntry*> ArchiveEntryList::getSelectedEntries() {
@@ -178,7 +242,7 @@ vector<ArchiveEntry*> ArchiveEntryList::getSelectedEntries() {
 	return ret;
 }
 
-/* EntryListPanel::getSelection
+/* ArchiveEntryList::getSelection
  * Returns a vector of all selected list item indices
  *******************************************************************/
 vector<int> ArchiveEntryList::getSelection() {
@@ -202,7 +266,7 @@ vector<int> ArchiveEntryList::getSelection() {
 	return ret;
 }
 
-/* EntryListPanel::getLastSelected
+/* ArchiveEntryList::getLastSelected
  * Gets the index of the last selected item in the list, or -1 if no
  * item is selected
  *******************************************************************/
@@ -224,7 +288,7 @@ int ArchiveEntryList::getLastSelected() {
 	return item;
 }
 
-/* EntryListPanel::getLastSelectedEntry
+/* ArchiveEntryList::getLastSelectedEntry
  * Gets the archive entry associated with the last selected item in
  * the list. Returns NULL if no item is selected
  *******************************************************************/
@@ -237,6 +301,9 @@ ArchiveEntry* ArchiveEntryList::getLastSelectedEntry() {
 		return NULL;
 }
 
+/* ArchiveEntryList::selectItem
+ * Selects or deselects [item] depending on [select]
+ *******************************************************************/
 void ArchiveEntryList::selectItem(int item, bool select) {
 	// Check item id is in range
 	if (item >= GetItemCount())
@@ -249,16 +316,25 @@ void ArchiveEntryList::selectItem(int item, bool select) {
 		SetItemState(item, 0x0000, wxLIST_STATE_SELECTED);
 }
 
+/* ArchiveEntryList::selectAll
+ * Selects all items in the list
+ *******************************************************************/
 void ArchiveEntryList::selectAll() {
 	for (int a = 0; a < GetItemCount(); a++)
 		SetItemState(a, 0xFFFF, wxLIST_STATE_SELECTED|wxLIST_STATE_FOCUSED);
 }
 
+/* ArchiveEntryList::clearSelection
+ * Deselects all items in the list
+ *******************************************************************/
 void ArchiveEntryList::clearSelection() {
 	for (int a = 0; a < GetItemCount(); a++)
 		SetItemState(a, 0x0000, wxLIST_STATE_SELECTED|wxLIST_STATE_FOCUSED);
 }
 
+/* ArchiveEntryList::OnGetItemText
+ * Called when the widget requests the text for [item] at [column]
+ *******************************************************************/
 string ArchiveEntryList::OnGetItemText(long item, long column) const {
 	ArchiveEntry* entry = getEntry(item);
 
@@ -270,7 +346,7 @@ string ArchiveEntryList::OnGetItemText(long item, long column) const {
 	int col = columnType(column);
 
 	if (col == AEL_COLUMN_NAME)
-		return entry->getName();	// Name column
+		return entry->getName();		// Name column
 	else if (col == AEL_COLUMN_SIZE)
 		return entry->getSizeString();	// Size column
 	else if (col == AEL_COLUMN_TYPE)
@@ -279,6 +355,9 @@ string ArchiveEntryList::OnGetItemText(long item, long column) const {
 		return "INVALID COLUMN";		// Invalid column
 }
 
+/* ArchiveEntryList::OnGetItemImage
+ * Called when the widget requests the image for [item]
+ *******************************************************************/
 int ArchiveEntryList::OnGetItemImage(long item) const {
 	// Get associated entry
 	ArchiveEntry* entry = getEntry(item);
@@ -290,6 +369,10 @@ int ArchiveEntryList::OnGetItemImage(long item) const {
 	return entry->getType()->getIndex();
 }
 
+/* ArchiveEntryList::OnGetItemAttr
+ * Called when widget requests the attributes (text colour /
+ * background colour / font) for [item]
+ *******************************************************************/
 wxListItemAttr* ArchiveEntryList::OnGetItemAttr(long item) const {
 	// Get associated entry
 	ArchiveEntry* entry = getEntry(item);
@@ -321,6 +404,10 @@ wxListItemAttr* ArchiveEntryList::OnGetItemAttr(long item) const {
 	return item_attr;
 }
 
+/* ArchiveEntryList::onAnnouncement
+ * Called when an announcement is recieved from the archive being
+ * managed
+ *******************************************************************/
 void ArchiveEntryList::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
 	// Archive entries were swapped
 	if (announcer == archive && event_name == "entries_swapped") {
@@ -395,7 +482,13 @@ void ArchiveEntryList::onAnnouncement(Announcer* announcer, string event_name, M
 }
 
 
+/*******************************************************************
+ * ARCHIVEENTRYLIST EVENTS
+ *******************************************************************/
 
+/* ArchiveEntryList::onColumnHeaderRightClick
+ * Called when a column header is right clicked
+ *******************************************************************/
 void ArchiveEntryList::onColumnHeaderRightClick(wxListEvent& e) {
 	// Create simple popup menu with options to toggle columns
 	wxMenu* popup = new wxMenu();
@@ -412,6 +505,9 @@ void ArchiveEntryList::onColumnHeaderRightClick(wxListEvent& e) {
 	PopupMenu(popup);
 }
 
+/* ArchiveEntryList::onColumnResize
+ * Called when a column is resized
+ *******************************************************************/
 void ArchiveEntryList::onColumnResize(wxListEvent& e) {
 	// Save column widths
 	int col = 0;
@@ -427,6 +523,10 @@ void ArchiveEntryList::onColumnResize(wxListEvent& e) {
 		GetParent()->Layout();
 }
 
+/* ArchiveEntryList::onMenu
+ * Called when a menu item is clicked (from the column header context
+ * menu)
+ *******************************************************************/
 void ArchiveEntryList::onMenu(wxCommandEvent& e) {
 	if (e.GetId() == AEL_COLUMN_SIZE) {
 		elist_colsize_show = !elist_colsize_show;
@@ -453,19 +553,3 @@ void ArchiveEntryList::onMenu(wxCommandEvent& e) {
 		Refresh();
 	}
 }
-
-
-
-void c_test_ael(vector<string> args) {
-	wxDialog dlg(NULL, -1, "ArchiveEntryList!", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
-
-	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
-	dlg.SetSizer(hbox);
-
-	ArchiveEntryList* ael = new ArchiveEntryList(&dlg);
-	ael->setArchive(theArchiveManager->getArchive(0));
-	hbox->Add(ael, 1, wxEXPAND|wxALL, 4);
-
-	dlg.ShowModal();
-}
-ConsoleCommand test_ael("test_ael", &c_test_ael, 0);

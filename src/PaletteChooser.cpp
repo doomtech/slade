@@ -48,14 +48,14 @@ PaletteChooser::PaletteChooser(wxWindow* parent, int id)
 	pal_global.copyPalette(thePaletteManager->globalPalette());
 
 	// Add first 'existing' item
-	Append(_T("Existing/Global"));
+	Append("Existing/Global");
 
 	// Add palette names from palette manager
 	for (int a = 0; a < thePaletteManager->numPalettes(); a++)
 		Append(thePaletteManager->getPalName(a));
 
 	// Add greyscale palette
-	Append(_T("Greyscale"));
+	Append("Greyscale");
 
 	// Select first item
 	SetSelection(0);

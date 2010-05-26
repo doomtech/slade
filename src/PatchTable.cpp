@@ -41,7 +41,7 @@
  *******************************************************************/
 PatchTable::PatchTable(Archive* parent) {
 	this->parent = parent;
-	patch_invalid.name = _T("INVALID_PATCH");
+	patch_invalid.name = "INVALID_PATCH";
 }
 
 /* PatchTable::~PatchTable
@@ -222,7 +222,7 @@ bool PatchTable::loadPNAMES(ArchiveEntry* pnames, Archive* parent) {
 	uint32_t n_pnames = 0;
 	pnames->seek(0, SEEK_SET);
 	if (!pnames->read(&n_pnames, 4)) {
-		wxLogMessage(_T("Error: PNAMES entry is corrupt"));
+		wxLogMessage("Error: PNAMES entry is corrupt");
 		return false;
 	}
 
@@ -233,7 +233,7 @@ bool PatchTable::loadPNAMES(ArchiveEntry* pnames, Archive* parent) {
 
 		// Try to read pname
 		if (!pnames->read(&pname, 8)) {
-			wxLogMessage(_T("Error: PNAMES entry is corrupt"));
+			wxLogMessage("Error: PNAMES entry is corrupt");
 			return false;
 		}
 
@@ -242,7 +242,7 @@ bool PatchTable::loadPNAMES(ArchiveEntry* pnames, Archive* parent) {
 
 		// Write log message if patch entry not found
 		if (!success)
-			wxLogMessage(_T("Patch \"%s\" not found"), pname);
+			wxLogMessage("Patch \"%s\" not found", pname);
 	}
 
 	// Update variables

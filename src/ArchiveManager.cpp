@@ -58,18 +58,18 @@ ArchiveManager::ArchiveManager() {
 	base_resource_archive = NULL;
 
 	// Find slade3.pk3 directory
-	string dir_slade_pk3 = appPath(_T("slade.pk3"), DIR_DATA);
+	string dir_slade_pk3 = appPath("slade.pk3", DIR_DATA);
 	if (!wxFileExists(dir_slade_pk3))
-		dir_slade_pk3 = appPath(_T("slade.pk3"), DIR_APP);
+		dir_slade_pk3 = appPath("slade.pk3", DIR_APP);
 	if (!wxFileExists(dir_slade_pk3))
-		dir_slade_pk3 = appPath(_T("slade.pk3"), DIR_USER);
+		dir_slade_pk3 = appPath("slade.pk3", DIR_USER);
 	if (!wxFileExists(dir_slade_pk3))
-		dir_slade_pk3 = _T("slade.pk3");
+		dir_slade_pk3 = "slade.pk3";
 
 	// Open slade.pk3
 	program_resource_archive = new ZipArchive();
 	if (!program_resource_archive->open(dir_slade_pk3)) {
-		wxLogMessage(_T("Unable to find slade.pk3!"));
+		wxLogMessage("Unable to find slade.pk3!");
 		res_archive_open = false;
 	}
 
@@ -102,7 +102,7 @@ bool ArchiveManager::addArchive(Archive* archive) {
 		listenTo(archive);
 
 		// Announce the addition
-		announce(_T("archive_added"));
+		announce("archive_added");
 
 		return true;
 	} else
@@ -146,7 +146,7 @@ Archive* ArchiveManager::openArchive(string filename) {
 
 	// Check that the file isn't already open
 	if (getArchive(filename)) {
-		Global::error = _T("Archive is already open");
+		Global::error = "Archive is already open";
 		return NULL;
 	}
 
@@ -168,7 +168,7 @@ Archive* ArchiveManager::openArchive(string filename) {
 		addArchive(new_archive);
 		return new_archive;
 	} else {
-		wxLogMessage(_T("Error: ") + Global::error);
+		wxLogMessage("Error: " + Global::error);
 		delete new_archive;
 		return NULL;
 	}
@@ -216,7 +216,7 @@ Archive* ArchiveManager::openArchive(ArchiveEntry* entry) {
 		addArchive(new_archive);
 		return new_archive;
 	} else {
-		wxLogMessage(_T("Error: ") + Global::error);
+		wxLogMessage("Error: " + Global::error);
 		delete new_archive;
 		return NULL;
 	}
@@ -230,31 +230,31 @@ Archive* ArchiveManager::openArchive(ArchiveEntry* entry) {
 Archive* ArchiveManager::newArchive(uint8_t type) {
 	// Init variables
 	Archive* new_archive = NULL;
-	string format_str = _T("");
+	string format_str = "";
 
 	// Create a new archive depending on the type specified
 	switch (type) {
 		case ARCHIVE_WAD:
 			new_archive = new WadArchive();
-			format_str = _T("wad");
+			format_str = "wad";
 			break;
 		case ARCHIVE_ZIP:
 			new_archive = new ZipArchive();
-			format_str = _T("zip");
+			format_str = "zip";
 			break;
 		case ARCHIVE_LIB:
 			new_archive = new LibArchive();
-			format_str = _T("lib");
+			format_str = "lib";
 			break;
 		case ARCHIVE_DAT:
 			new_archive = new DatArchive();
-			format_str = _T("dat");
+			format_str = "dat";
 			break;
 	}
 
 	// If the archive was created, set its filename and add it to the list
 	if (new_archive) {
-		new_archive->setFileName(s_fmt(_T("UNSAVED (%s)"), format_str.c_str()));
+		new_archive->setFileName(s_fmt("UNSAVED (%s)", format_str.c_str()));
 		addArchive(new_archive);
 	}
 
@@ -274,7 +274,7 @@ bool ArchiveManager::closeArchive(int index) {
 	// Announce archive closing
 	MemChunk mc;
 	mc.write(&index, sizeof(int));
-	announce(_T("archive_closing"), mc);
+	announce("archive_closing", mc);
 
 	// Close any open child archives
 	for (size_t a = 0; a < open_archives[index].open_children.size(); a++) {
@@ -293,7 +293,7 @@ bool ArchiveManager::closeArchive(int index) {
 	open_archives.erase(open_archives.begin() + index);
 
 	// Announce closed
-	announce(_T("archive_closed"), mc);
+	announce("archive_closed", mc);
 
 	return true;
 }
@@ -357,22 +357,22 @@ int ArchiveManager::archiveIndex(Archive* archive) {
 }
 
 string ArchiveManager::getArchiveExtensionsString(bool wad, bool zip, bool pk3, bool jdf) {
-	string ext_wad = _T("*.wad;*.WAD;*.Wad");
-	string ext_zip = _T("*.zip;*.ZIP;*.Zip");
-	string ext_pk3 = _T("*.pk3;*.PK3;*.Pk3");
-	string ext_jdf = _T("*.jdf;*.JDF;*.Jdf");
-	string ext_dat = _T("*.dat;*.DAT;*.Dat");
-	string ext_lib = _T("*.lib;*.LIB;*.Lib");
+	string ext_wad = "*.wad;*.WAD;*.Wad";
+	string ext_zip = "*.zip;*.ZIP;*.Zip";
+	string ext_pk3 = "*.pk3;*.PK3;*.Pk3";
+	string ext_jdf = "*.jdf;*.JDF;*.Jdf";
+	string ext_dat = "*.dat;*.DAT;*.Dat";
+	string ext_lib = "*.lib;*.LIB;*.Lib";
 
 	// Create extensions string
-	string extensions = s_fmt(_T("Any Supported File (*.wad; *.zip; *.pk3; *.jdf)|%s;%s;%s;%s;%s;%s"), 
+	string extensions = s_fmt("Any Supported File (*.wad; *.zip; *.pk3; *.jdf)|%s;%s;%s;%s;%s;%s",
 		ext_wad.c_str(), ext_zip.c_str(), ext_pk3.c_str(), ext_jdf.c_str(), ext_dat.c_str(), ext_lib.c_str());
-	extensions += s_fmt(_T("|Doom Wad files (*.wad)|%s"), ext_wad.c_str());
-	extensions += s_fmt(_T("|Zip files (*.zip)|%s"), ext_zip.c_str());
-	extensions += s_fmt(_T("|Pk3 (zip) files (*.pk3)|%s"), ext_pk3.c_str());
-	extensions += s_fmt(_T("|JDF (zip) files (*.jdf)|%s"), ext_jdf.c_str());
-	extensions += s_fmt(_T("|Data (dat) files (*.dat)|%s"), ext_dat.c_str());
-	extensions += s_fmt(_T("|Library (lib) files (*.lib)|%s"), ext_lib.c_str());
+	extensions += s_fmt("|Doom Wad files (*.wad)|%s", ext_wad.c_str());
+	extensions += s_fmt("|Zip files (*.zip)|%s", ext_zip.c_str());
+	extensions += s_fmt("|Pk3 (zip) files (*.pk3)|%s", ext_pk3.c_str());
+	extensions += s_fmt("|JDF (zip) files (*.jdf)|%s", ext_jdf.c_str());
+	extensions += s_fmt("|Data (dat) files (*.dat)|%s", ext_dat.c_str());
+	extensions += s_fmt("|Library (lib) files (*.lib)|%s", ext_lib.c_str());
 
 	return extensions;
 }
@@ -411,7 +411,7 @@ bool ArchiveManager::openBaseResource(string filename) {
 string ArchiveManager::baseResourcePath(uint32_t index) {
 	// Check index
 	if (index >= base_resource_list.size())
-		return _T("");
+		return "";
 
 	return base_resource_list[index];
 }
@@ -421,7 +421,7 @@ void ArchiveManager::addBaseResourcePath(string path) {
 	base_resource_list.Add(path);
 
 	// Announce
-	announce(_T("base_resource_path_added"));
+	announce("base_resource_path_added");
 }
 
 ArchiveEntry* ArchiveManager::getResourceEntry(string name) {
@@ -456,7 +456,7 @@ bool ArchiveManager::openTextureEditor(uint32_t index) {
 	// Announce
 	MemChunk mc(4);
 	mc.write(&index, 4);
-	announce(_T("open_tex_editor"), mc);
+	announce("open_tex_editor", mc);
 
 	return true;
 }
@@ -474,17 +474,17 @@ void ArchiveManager::onAnnouncement(Announcer* announcer, string event_name, Mem
 	int32_t index = archiveIndex((Archive*)announcer);
 	if (index >= 0) {
 		// If the archive was saved
-		if (event_name == _T("saved")) {
+		if (event_name == "saved") {
 			MemChunk mc;
 			mc.write(&index, 4);
-			announce(_T("archive_saved"), mc);
+			announce("archive_saved", mc);
 		}
 
 		// If the archive was modified
-		if (event_name == _T("modified") || event_name == _T("entry_modified")) {
+		if (event_name == "modified" || event_name == "entry_modified") {
 			MemChunk mc;
 			mc.write(&index, 4);
-			announce(_T("archive_modified"), mc);
+			announce("archive_modified", mc);
 		}
 	}
 }
@@ -494,14 +494,14 @@ void ArchiveManager::onAnnouncement(Announcer* announcer, string event_name, Mem
  * Lists the filenames of all open archives
  *******************************************************************/
 void c_list_archives(vector<string> args) {
-	wxLogMessage(s_fmt(_T("%d Open Archives:"), theArchiveManager->numArchives()));
+	wxLogMessage(s_fmt("%d Open Archives:", theArchiveManager->numArchives()));
 
 	for (int a = 0; a < theArchiveManager->numArchives(); a++) {
 		Archive* archive = theArchiveManager->getArchive(a);
-		wxLogMessage(s_fmt(_T("%d: \"%s\""), a + 1, archive->getFileName().c_str()));
+		wxLogMessage(s_fmt("%d: \"%s\"", a + 1, archive->getFileName().c_str()));
 	}
 }
-ConsoleCommand am_list_archives(_T("list_archives"), &c_list_archives, 0);
+ConsoleCommand am_list_archives("list_archives", &c_list_archives, 0);
 
 /* Console Command - "open"
  * Attempts to open each given argument (filenames)
@@ -510,4 +510,4 @@ void c_open(vector<string> args) {
 	for (size_t a = 0; a < args.size(); a++)
 		theArchiveManager->openArchive(args[a]);
 }
-ConsoleCommand am_open(_T("open"), &c_open, 1);
+ConsoleCommand am_open("open", &c_open, 1);

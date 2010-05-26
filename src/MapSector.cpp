@@ -15,7 +15,7 @@ bool MapSector::parseUDMF(Tokenizer& tz) {
 
 	// TODO: Read sector definition
 	string token = tz.getToken();
-	while (token != _T("}")) {
+	while (token != "}") {
 
 		token = tz.getToken();
 	}

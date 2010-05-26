@@ -51,7 +51,7 @@
  *******************************************************************/
 WMFileBrowser::WMFileBrowser(wxWindow* parent, ArchiveManagerPanel* wm, int id)
 : wxGenericDirCtrl(parent, id, wxDirDialogDefaultFolderStr, wxDefaultPosition, wxDefaultSize, wxDIRCTRL_SHOW_FILTERS,
-_T("Any Supported Archive File (*.wad; *.zip; *.pk3; *.lib; *.dat)|*.wad;*.zip;*.pk3;*.lib;*.dat|Doom Wad files (*.wad)|*.wad|Zip files (*.zip)|*.zip|Pk3 (zip) files (*.pk3)|*.pk3|All Files (*.*)|*.*")) {
+"Any Supported Archive File (*.wad; *.zip; *.pk3; *.lib; *.dat)|*.wad;*.zip;*.pk3;*.lib;*.dat|Doom Wad files (*.wad)|*.wad|Zip files (*.zip)|*.zip|Pk3 (zip) files (*.pk3)|*.pk3|All Files (*.*)|*.*") {
 	// Set the parent
 	this->parent = wm;
 
@@ -104,18 +104,18 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
 
 	// Open archives & maps list
 	wxPanel *panel_am = new wxPanel(notebook_tabs);
-	notebook_tabs->AddPage(panel_am, _T("Archives"), true);
+	notebook_tabs->AddPage(panel_am, "Archives", true);
 
 	// Create/setup archive list
 	wxBoxSizer *box_am = new wxBoxSizer(wxVERTICAL);
 	panel_am->SetSizer(box_am);
-	box_am->Add(new wxStaticText(panel_am, -1, _T("Open Archives:")), 0, wxEXPAND | wxALL, 4);
+	box_am->Add(new wxStaticText(panel_am, -1, "Open Archives:"), 0, wxEXPAND | wxALL, 4);
 	list_archives = new ListView(panel_am, -1);
 	box_am->Add(list_archives, 1, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, 4);
 	refreshArchiveList();
 
 	// Create/setup map list
-	box_am->Add(new wxStaticText(panel_am, -1, _T("Maps:")), 0, wxEXPAND | wxALL, 4);
+	box_am->Add(new wxStaticText(panel_am, -1, "Maps:"), 0, wxEXPAND | wxALL, 4);
 	list_maps = new wxListCtrl(panel_am, -1, wxDefaultPosition, wxSize(-1, 128), wxLC_LIST | wxLC_SINGLE_SEL);
 	box_am->Add(list_maps, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, 4);
 
@@ -125,9 +125,9 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
 
 	// Create/setup Archive context menu
 	menu_context = new wxMenu();
-	menu_context->Append(MENU_SAVE, _("Save"), _("Save the selected Archive(s)"));
-	menu_context->Append(MENU_SAVEAS, _("Save As"), _("Save the selected Archive(s) to a new file(s)"));
-	menu_context->Append(MENU_CLOSE, _T("Close"), _("Close the selected Archive(s)"));
+	menu_context->Append(MENU_SAVE, "Save", "Save the selected Archive(s)");
+	menu_context->Append(MENU_SAVEAS, "Save As", "Save the selected Archive(s) to a new file(s)");
+	menu_context->Append(MENU_CLOSE, "Close", "Close the selected Archive(s)");
 
 	// Bind events
 	list_archives->Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &ArchiveManagerPanel::onListArchivesChanged, this);
@@ -160,7 +160,7 @@ void ArchiveManagerPanel::refreshArchiveList() {
 	list_archives->ClearAll();
 
 	// Add columns
-	list_archives->InsertColumn(0, _T("Path"));
+	list_archives->InsertColumn(0, "Path");
 
 	// Add each archive that is opened in the ArchiveManager
 	list_archives->enableSizeUpdate(false);
@@ -195,11 +195,11 @@ void ArchiveManagerPanel::populateMapList(Archive* archive) {
 
 		// Add map format to name string
 		if (maps[a].format == 0)
-			name = _T("(D) ");
+			name = "(D) ";
 		if (maps[a].format == 1)
-			name = _T("(H) ");
+			name = "(H) ";
 		if (maps[a].format == 2)
-			name = _T("(U) ");
+			name = "(U) ";
 
 		// Add map name to string
 		name += maps[a].name;
@@ -245,7 +245,7 @@ bool ArchiveManagerPanel::isArchivePanel(int tab_index) {
 		return false;
 
 	// Check the page's name
-	if (!notebook_archives->GetPage(tab_index)->GetName().CmpNoCase(_T("archive")))
+	if (!notebook_archives->GetPage(tab_index)->GetName().CmpNoCase("archive"))
 		return true;
 	else
 		return false;
@@ -262,7 +262,7 @@ void ArchiveManagerPanel::openTab(int archive_index) {
 		// Go through all tabs
 		for (size_t a = 0; a < notebook_archives->GetPageCount(); a++) {
 			// Check page type is "archive"
-			if (notebook_archives->GetPage(a)->GetName().CmpNoCase(_T("archive")))
+			if (notebook_archives->GetPage(a)->GetName().CmpNoCase("archive"))
 				continue;
 
 			// Check for archive match
@@ -284,7 +284,7 @@ void ArchiveManagerPanel::openTab(int archive_index) {
 		else return;
 
 		notebook_archives->AddPage(wp, archive->getFileName(false), true);
-		wp->SetName(_T("archive"));
+		wp->SetName("archive");
 		wp->Show(true);
 		wp->init();
 		wp->SetFocus();
@@ -303,7 +303,7 @@ void ArchiveManagerPanel::closeTab(int archive_index) {
 		// Go through all tabs
 		for (size_t a = 0; a < notebook_archives->GetPageCount(); a++) {
 			// Check page type is "texture"
-			if (notebook_archives->GetPage(a)->GetName().CmpNoCase(_T("archive")))
+			if (notebook_archives->GetPage(a)->GetName().CmpNoCase("archive"))
 				continue;
 
 			// Check for archive match
@@ -329,7 +329,7 @@ void ArchiveManagerPanel::openTextureTab(int archive_index) {
 		// Go through all tabs
 		for (size_t a = 0; a < notebook_archives->GetPageCount(); a++) {
 			// Check page type is "texture"
-			if (notebook_archives->GetPage(a)->GetName().CmpNoCase(_T("texture")))
+			if (notebook_archives->GetPage(a)->GetName().CmpNoCase("texture"))
 				continue;
 
 			// Check for archive match
@@ -349,8 +349,8 @@ void ArchiveManagerPanel::openTextureTab(int archive_index) {
 			return;
 		}
 
-		notebook_archives->AddPage(txed, s_fmt(_T("Texture Editor (%s)"), archive->getFileName(false).c_str()), true);
-		txed->SetName(_T("texture"));
+		notebook_archives->AddPage(txed, s_fmt("Texture Editor (%s)", archive->getFileName(false).c_str()), true);
+		txed->SetName("texture");
 		txed->Show(true);
 	}
 }
@@ -366,7 +366,7 @@ void ArchiveManagerPanel::closeTextureTab(int archive_index) {
 		// Go through all tabs
 		for (size_t a = 0; a < notebook_archives->GetPageCount(); a++) {
 			// Check page type is "texture"
-			if (notebook_archives->GetPage(a)->GetName().CmpNoCase(_T("texture")))
+			if (notebook_archives->GetPage(a)->GetName().CmpNoCase("texture"))
 				continue;
 
 			// Check for archive match
@@ -386,7 +386,7 @@ void ArchiveManagerPanel::closeTextureTab(int archive_index) {
  *******************************************************************/
 void ArchiveManagerPanel::openFile(string filename) {
 	// Show splash screen
-	theSplashWindow->show(_T("Opening Archive..."), true);
+	theSplashWindow->show("Opening Archive...", true);
 
 	// test
 	wxStopWatch sw;
@@ -396,7 +396,7 @@ void ArchiveManagerPanel::openFile(string filename) {
 	Archive* new_archive = theArchiveManager->openArchive(filename);
 
 	sw.Pause();
-	wxLogMessage(_T("Opening took %dms"), sw.Time());
+	wxLogMessage("Opening took %dms", sw.Time());
 
 	// Hide splash screen
 	theSplashWindow->hide();
@@ -404,7 +404,7 @@ void ArchiveManagerPanel::openFile(string filename) {
 	// Check that the archive opened ok
 	if (!new_archive) {
 		// If archive didn't open ok, show error message
-		wxMessageBox(s_fmt(_T("Error opening %s:\n%s"), filename.c_str(), Global::error.c_str()), _T("Error"), wxICON_ERROR);
+		wxMessageBox(s_fmt("Error opening %s:\n%s", filename.c_str(), Global::error.c_str()), "Error", wxICON_ERROR);
 	}
 }
 
@@ -439,7 +439,7 @@ void ArchiveManagerPanel::saveAll() {
 			// Save the archive if possible
 			if (!archive->save()) {
 				// If there was an error pop up a message box
-				wxMessageBox(s_fmt(_T("Error: %s"), Global::error.c_str()), _T("Error"), wxICON_ERROR);
+				wxMessageBox(s_fmt("Error: %s", Global::error.c_str()), "Error", wxICON_ERROR);
 			}
 		}
 		else {
@@ -447,14 +447,14 @@ void ArchiveManagerPanel::saveAll() {
 
 			// Popup file save dialog
 			string formats = archive->getFileExtensionString();
-			string filename = wxFileSelector(_T("Save Archive ") + archive->getFileName(false) + _T(" As"), _T(""), _T(""), wxEmptyString, formats, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+			string filename = wxFileSelector("Save Archive " + archive->getFileName(false) + " As", "", "", wxEmptyString, formats, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 
 			// Check a filename was selected
 			if (!filename.empty()) {
 				// Save the archive
 				if (!archive->save(filename)) {
 					// If there was an error pop up a message box
-					wxMessageBox(s_fmt(_T("Error: %s"), Global::error.c_str()), _T("Error"), wxICON_ERROR);
+					wxMessageBox(s_fmt("Error: %s", Global::error.c_str()), "Error", wxICON_ERROR);
 				}
 			}
 		}
@@ -503,7 +503,7 @@ void ArchiveManagerPanel::onAnnouncement(Announcer* announcer, string event_name
 	event_data.seek(0, SEEK_SET);
 
 	// If an archive is about to be closed
-	if (event_name == _T("archive_closing")) {
+	if (event_name == "archive_closing") {
 		int32_t index = -1;
 		event_data.read(&index, 4);
 
@@ -513,7 +513,7 @@ void ArchiveManagerPanel::onAnnouncement(Announcer* announcer, string event_name
 	}
 
 	// If an archive was closed
-	if (event_name == _T("archive_closed")) {
+	if (event_name == "archive_closed") {
 		int32_t index = -1;
 		event_data.read(&index, 4);
 		list_archives->DeleteItem(index);
@@ -521,28 +521,28 @@ void ArchiveManagerPanel::onAnnouncement(Announcer* announcer, string event_name
 	}
 
 	// If an archive was added
-	if (event_name == _T("archive_added")) {
+	if (event_name == "archive_added") {
 		int index = theArchiveManager->numArchives();
 		list_archives->addItem(index, theArchiveManager->getArchive(theArchiveManager->numArchives()-1)->getFileName(true));
 		openTab(theArchiveManager->numArchives()-1);
 	}
 
 	// If an archive was saved
-	if (event_name == _T("archive_saved")) {
+	if (event_name == "archive_saved") {
 		int32_t index = -1;
 		event_data.read(&index, 4);
 		updateListItem(index);
 	}
 
 	// If an archive was modified
-	if (event_name == _T("archive_modified")) {
+	if (event_name == "archive_modified") {
 		int32_t index = -1;
 		event_data.read(&index, 4);
 		updateListItem(index);
 	}
 
 	// If a texture editor is to be opened
-	if (event_name == _T("open_tex_editor")) {
+	if (event_name == "open_tex_editor") {
 		uint32_t index = 0;
 		event_data.read(&index, 4);
 		openTextureTab(index);
@@ -569,7 +569,7 @@ void ArchiveManagerPanel::saveSelection() {
 			// Save the archive if possible
 			if (!theArchiveManager->getArchive(selection[a])->save()) {
 				// If there was an error pop up a message box
-				wxMessageBox(s_fmt(_T("Error: %s"), Global::error.c_str()), _T("Error"), wxICON_ERROR);
+				wxMessageBox(s_fmt("Error: %s", Global::error.c_str()), "Error", wxICON_ERROR);
 			}
 		}
 		else {
@@ -577,14 +577,14 @@ void ArchiveManagerPanel::saveSelection() {
 
 			// Popup file save dialog
 			string formats = archive->getFileExtensionString();
-			string filename = wxFileSelector(_T("Save Archive ") + archive->getFileName(false) + _T(" As"), _T(""), _T(""), wxEmptyString, formats, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+			string filename = wxFileSelector("Save Archive " + archive->getFileName(false) + " As", "", "", wxEmptyString, formats, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 
 			// Check a filename was selected
 			if (!filename.empty()) {
 				// Save the archive
 				if (!archive->save(filename)) {
 					// If there was an error pop up a message box
-					wxMessageBox(s_fmt(_T("Error: %s"), Global::error.c_str()), _T("Error"), wxICON_ERROR);
+					wxMessageBox(s_fmt("Error: %s", Global::error.c_str()), "Error", wxICON_ERROR);
 				}
 			}
 		}
@@ -603,8 +603,8 @@ void ArchiveManagerPanel::saveSelectionAs() {
 		return;
 
 	// Setup file filters (temporary, should go through all archive types somehow)
-	//string formats = _T("Doom Wad File (*.wad)|*.wad");
-	//string deftype = _T("*.wad");
+	//string formats = "Doom Wad File (*.wad)|*.wad";
+	//string deftype = "*.wad";
 
 	// Go through the selection
 	for (size_t a = 0; a < selection.size(); a++) {
@@ -613,14 +613,14 @@ void ArchiveManagerPanel::saveSelectionAs() {
 
 		// Popup file save dialog
 		string formats = archive->getFileExtensionString();
-		string filename = wxFileSelector(_T("Save Archive ") + archive->getFileName(false) + _T(" As"), _T(""), _T(""), wxEmptyString, formats, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+		string filename = wxFileSelector("Save Archive " + archive->getFileName(false) + " As", "", "", wxEmptyString, formats, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 
 		// Check a filename was selected
 		if (!filename.empty()) {
 			// Save the archive
 			if (!archive->save(filename)) {
 				// If there was an error pop up a message box
-				wxMessageBox(s_fmt(_T("Error: %s"), Global::error.c_str()), _T("Error"), wxICON_ERROR);
+				wxMessageBox(s_fmt("Error: %s", Global::error.c_str()), "Error", wxICON_ERROR);
 			}
 		}
 	}
@@ -824,7 +824,7 @@ void ArchiveManagerPanel::onListMapsChanged(wxCommandEvent& e) {
  *******************************************************************/
 void ArchiveManagerPanel::onListMapsActivated(wxListEvent& e) {
 	//new MapEditorWindow();
-	wxMessageBox(_T("Map Editor is not implemented yet."));
+	wxMessageBox("Map Editor is not implemented yet.");
 }
 
 /* ArchiveManagerPanel::onListArchivesRightClick
@@ -860,15 +860,15 @@ void ArchiveManagerPanel::onTabChanged(wxAuiNotebookEvent& e) {
 	int selection = notebook_archives->GetSelection();
 	if (isArchivePanel(selection)) {
 		Archive* archive = ((ArchivePanel*)notebook_archives->GetPage(selection))->getArchive();
-		((wxFrame*)GetParent())->SetTitle(s_fmt(_T("SLADE - %s"), archive->getFileName(false)));
+		((wxFrame*)GetParent())->SetTitle(s_fmt("SLADE - %s", chr(archive->getFileName(false))));
 	}
 	else
-		((wxFrame*)GetParent())->SetTitle(_T("SLADE"));
+		((wxFrame*)GetParent())->SetTitle("SLADE");
 }
 
 /*
 void ArchiveManagerPanel::onBtnEditBaseResources(wxCommandEvent& e) {
-	wxDialog dialog_ebr(this, -1, _T("Edit Base Resource Archives"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
+	wxDialog dialog_ebr(this, -1, "Edit Base Resource Archives", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
 
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 	sizer->Add(new BaseResourceArchivesPanel(&dialog_ebr), 1, wxEXPAND|wxALL, 4);

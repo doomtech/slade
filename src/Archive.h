@@ -55,7 +55,7 @@ public:
 
 	virtual bool	write(MemChunk& mc, bool update = true) = 0;
 	virtual bool	write(string filename, bool update = true) = 0;
-	virtual bool	save(string filename = _T(""));
+	virtual bool	save(string filename = "");
 
 	virtual bool		loadEntryData(ArchiveEntry* entry) = 0;
 	virtual uint32_t	numEntries() = 0;
@@ -63,7 +63,7 @@ public:
 
 	// Entry addition/removal
 	virtual bool			addEntry(ArchiveEntry* entry, uint32_t position = 0) = 0;
-	virtual ArchiveEntry*	addNewEntry(string name = _T(""), uint32_t position = 0) = 0;
+	virtual ArchiveEntry*	addNewEntry(string name = "", uint32_t position = 0) = 0;
 	virtual ArchiveEntry*	addExistingEntry(ArchiveEntry* entry, uint32_t position = 0, bool copy = false) = 0;
 	virtual bool			removeEntry(ArchiveEntry* entry, bool delete_entry = true) = 0;
 
@@ -76,7 +76,7 @@ public:
 
 	// Detection
 	virtual vector<mapdesc_t>	detectMaps() = 0;
-	virtual string				detectEntrySection(ArchiveEntry* entry) { return _T("none"); }
+	virtual string				detectEntrySection(ArchiveEntry* entry) { return "none"; }
 
 	// Search
 	virtual ArchiveEntry*			findEntry(string search, bool incsub = true) = 0;

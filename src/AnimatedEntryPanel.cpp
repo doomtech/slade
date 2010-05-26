@@ -2,23 +2,23 @@
 /*******************************************************************
  * SLADE - It's a Doom Editor
  * Copyright (C) 2008 Simon Judd
- * 
+ *
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
  * Filename:    AnimatedEntryPanel.cpp
  * Description: AnimatedEntryPanel class. The UI for editing Boom
  *              ANIMATED lumps.
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -45,13 +45,13 @@
  * AnimatedEntryPanel class constructor
  *******************************************************************/
 AnimatedEntryPanel::AnimatedEntryPanel(wxWindow* parent)
-: EntryPanel(parent, _T("animated")) {
+: EntryPanel(parent, "animated") {
 	// Setup panel sizer
 	wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
 	sizer_main->Add(sizer, 1, wxEXPAND, 0);
-	
+
 	// Add entry list
-	wxStaticBox* frame = new wxStaticBox(this, -1, _T("Animations"));
+	wxStaticBox* frame = new wxStaticBox(this, -1, "Animations");
 	wxStaticBoxSizer* framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
 	list_entries = new ListView(this, -1);
 	list_entries->showIcons(false);
@@ -59,27 +59,27 @@ AnimatedEntryPanel::AnimatedEntryPanel(wxWindow* parent)
 	sizer->Add(framesizer, 0, wxEXPAND|wxALL, 4);
 
 	// Add editing controls
-	frame = new wxStaticBox(this, -1, _T("Selection"));
+	frame = new wxStaticBox(this, -1, "Selection");
 	framesizer = new wxStaticBoxSizer(frame, wxHORIZONTAL);
 
 	wxStaticBox* textframe;
 	wxStaticBoxSizer* textframesizer;
 
-	textframe = new wxStaticBox(this, -1, _T("First frame"));
+	textframe = new wxStaticBox(this, -1, "First frame");
 	textframesizer = new wxStaticBoxSizer(textframe, wxHORIZONTAL);
-	text_firstname = new wxTextCtrl(this, -1, _T(""), wxDefaultPosition, wxSize(80, -1));  
+	text_firstname = new wxTextCtrl(this, -1, "", wxDefaultPosition, wxSize(80, -1));
 	textframesizer->Add(text_firstname, 1, wxTILE, 4);
 	framesizer->Add(textframesizer, 1, wxTILE, 4);
 
-	textframe = new wxStaticBox(this, -1, _T("Last frame"));
+	textframe = new wxStaticBox(this, -1, "Last frame");
 	textframesizer = new wxStaticBoxSizer(textframe, wxHORIZONTAL);
-	text_lastname = new wxTextCtrl(this, -1, _T(""), wxDefaultPosition, wxSize(80, -1));  
+	text_lastname = new wxTextCtrl(this, -1, "", wxDefaultPosition, wxSize(80, -1));
 	textframesizer->Add(text_lastname, 1, wxTILE, 4);
 	framesizer->Add(textframesizer, 1, wxTILE, 4);
 
-	textframe = new wxStaticBox(this, -1, _T("Speed"));
+	textframe = new wxStaticBox(this, -1, "Speed");
 	textframesizer = new wxStaticBoxSizer(textframe, wxHORIZONTAL);
-	text_speed = new wxTextCtrl(this, -1, _T(""), wxDefaultPosition, wxSize(80, -1));  
+	text_speed = new wxTextCtrl(this, -1, "", wxDefaultPosition, wxSize(80, -1));
 	textframesizer->Add(text_speed, 1, wxTILE, 4);
 	framesizer->Add(textframesizer, 1, wxTILE, 4);
 
@@ -135,20 +135,20 @@ void AnimatedEntryPanel::populateEntryList() {
 	list_entries->ClearAll();
 
 	// Add columns
-	list_entries->InsertColumn(0, _T("Type"));
-	list_entries->InsertColumn(1, _T("Fist frame"));
-	list_entries->InsertColumn(2, _T("Last frame"));
-	list_entries->InsertColumn(3, _T("Speed"));
-	list_entries->InsertColumn(4, _T("Decals"));
+	list_entries->InsertColumn(0, "Type");
+	list_entries->InsertColumn(1, "Fist frame");
+	list_entries->InsertColumn(2, "Last frame");
+	list_entries->InsertColumn(3, "Speed");
+	list_entries->InsertColumn(4, "Decals");
 
 	// Add each animation to the list
 	list_entries->enableSizeUpdate(false);
 	for (uint32_t a = 0; a < animated.nEntries(); a++) {
 		AnimatedEntry* ent = animated.getEntry(a);
-		string cols[] = { ent->getType() ? _T("Texture") : _T("Flat"), 
-			ent->getFirst(), ent->getLast(), 
-			ent->getSpeed() < 65535 ? s_fmt(_T("%d tics"), ent->getSpeed()) : _T("Swirling"), 
-			ent->getDecals()? _T("Allowed") : _T(" ") };
+		string cols[] = { ent->getType() ? "Texture" : "Flat",
+			ent->getFirst(), ent->getLast(),
+			ent->getSpeed() < 65535 ? s_fmt("%d tics", ent->getSpeed()) : "Swirling",
+			ent->getDecals()? "Allowed" : " " };
 		list_entries->addItem(a, wxArrayString(5, cols));
 	}
 

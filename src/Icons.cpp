@@ -54,7 +54,7 @@ wxBitmap icon_empty;
  * Loads all icons from slade.pk3 (in the icons/ dir)
  *******************************************************************/
 bool loadIcons() {
-	string tempfile = appPath(_T("sladetemp"), DIR_TEMP);
+	string tempfile = appPath("sladetemp", DIR_TEMP);
 
 	// Get slade.pk3
 	ZipArchive* res_archive = (ZipArchive*)theArchiveManager->programResourceArchive();
@@ -64,7 +64,7 @@ bool loadIcons() {
 		return false;
 
 	// Get the icons directory of the archive
-	zipdir_t* dir_icons = res_archive->getDirectory(_T("icons"));
+	zipdir_t* dir_icons = res_archive->getDirectory("icons");
 
 	// Go through each entry in the directory
 	for (size_t a = 0; a < dir_icons->numEntries(false); a++) {
@@ -98,6 +98,6 @@ wxBitmap getIcon(string name) {
 			return wxBitmap(icons[a].image);
 	}
 
-	wxLogMessage(_T("Icon \"%s\" does not exist"), name.c_str());
+	wxLogMessage("Icon \"%s\" does not exist", name.c_str());
 	return wxNullBitmap;
 }

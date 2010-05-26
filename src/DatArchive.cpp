@@ -104,7 +104,7 @@ ArchiveEntry* DatArchive::getEntry(string name) {
  * Gets the wxWidgets file dialog filter string for the archive type
  *******************************************************************/
 string DatArchive::getFileExtensionString() {
-	return _T("Wad Files (*.dat)|*.dat");
+	return "Shadowcaster Dat Files (*.dat)|*.dat";
 }
 
 /* DatArchive::open
@@ -115,7 +115,7 @@ bool DatArchive::open(string filename) {
 	// Read the file into a MemChunk
 	MemChunk mc;
 	if (!mc.importFile(filename)) {
-		Global::error = _T("Unable to open file. Make sure it isn't in use by another program.");
+		Global::error = "Unable to open file. Make sure it isn't in use by another program.";
 		return false;
 	}
 
@@ -176,7 +176,7 @@ bool DatArchive::open(MemChunk& mc) {
 
 	// Read the directory
 	mc.seek(dir_offset, SEEK_SET);
-	theSplashWindow->setProgressMessage(_T("Reading dat archive data"));
+	theSplashWindow->setProgressMessage("Reading dat archive data");
 	for (uint32_t d = 0; d < num_lumps; d++) {
 		// Update splash window progress
 		theSplashWindow->setProgress(((float)d / (float)num_lumps));
@@ -186,7 +186,7 @@ bool DatArchive::open(MemChunk& mc) {
 		uint32_t size = 0;
 		uint16_t nameofs = 0;
 		uint16_t unknown = 0;
-		
+
 		mc.read(&offset,	4);		// Offset
 		mc.read(&size,		4);		// Size
 		mc.read(&nameofs,	2);		// Name offset
@@ -201,8 +201,8 @@ bool DatArchive::open(MemChunk& mc) {
 		// If the lump data goes past the directory,
 		// the wadfile is invalid
 		if (offset + size > mc.getSize()) {
-			wxLogMessage(_T("DatArchive::open: Dat archive is invalid or corrupt"));
-			Global::error = _T("Archive is invalid and/or corrupt");
+			wxLogMessage("DatArchive::open: Dat archive is invalid or corrupt");
+			Global::error = "Archive is invalid and/or corrupt";
 			setMuted(false);
 			return false;
 		}
@@ -217,40 +217,40 @@ bool DatArchive::open(MemChunk& mc) {
 		}
 		else
 		{
-			myname = s_fmt(_T("%s+%d"), lastname, ++namecount);
+			myname = s_fmt("%s+%d", lastname, ++namecount);
 		}
 
-//		wxLogMessage(s_fmt(_T("Entry %d in %s: %s @ %x, size %d"), d, name, myname, offset, size));
+//		wxLogMessage(s_fmt("Entry %d in %s: %s @ %x, size %d"), d, name, myname, offset, size);
 
 		// Create & setup lump
 		ArchiveEntry* nlump = new ArchiveEntry(myname, size, this);
 		nlump->setLoaded(false);
-		nlump->extraProp(_T("Offset")) = (int)offset;
+		nlump->extraProp("Offset") = (int)offset;
 		nlump->setState(0);
 
 		// Check for markers
-		if (!nlump->getName().Cmp(_T("startflats")))
+		if (!nlump->getName().Cmp("startflats"))
 			flats[0] = d;
-		if (!nlump->getName().Cmp(_T("endflats")))
+		if (!nlump->getName().Cmp("endflats"))
 			flats[1] = d;
-		if (!nlump->getName().Cmp(_T("startsprites")))
+		if (!nlump->getName().Cmp("startsprites"))
 			sprites[0] = d;
-		if (!nlump->getName().Cmp(_T("endmonsters")))
+		if (!nlump->getName().Cmp("endmonsters"))
 			sprites[1] = d;
-		if (!nlump->getName().Cmp(_T("startwalls")))
+		if (!nlump->getName().Cmp("startwalls"))
 			walls[0] = d;
-		if (!nlump->getName().Cmp(_T("endwalls")))
+		if (!nlump->getName().Cmp("endwalls"))
 			walls[1] = d;
 
 		// Add to entry list
 		entries.push_back(nlump);
 	}
 
-//	wxLogMessage(s_fmt(_T("Total: %d entries"), entries.size()));
+//	wxLogMessage(s_fmt("Total: %d entries", entries.size()));
 
 	// Detect all entry types
 	MemChunk edata;
-	theSplashWindow->setProgressMessage(_T("Detecting entry types"));
+	theSplashWindow->setProgressMessage("Detecting entry types");
 	for (size_t a = 0; a < entries.size(); a++) {
 		// Update splash window progress
 		theSplashWindow->setProgress((((float)a / (float)num_lumps)));
@@ -273,15 +273,15 @@ bool DatArchive::open(MemChunk& mc) {
 	}
 
 	// Detect maps (will detect map entry types)
-	theSplashWindow->setProgressMessage(_T("Detecting maps"));
+	theSplashWindow->setProgressMessage("Detecting maps");
 	detectMaps();
 
 	// Setup variables
 	setMuted(false);
 	setModified(false);
-	announce(_T("opened"));
+	announce("opened");
 
-	theSplashWindow->setProgressMessage(_T(""));
+	theSplashWindow->setProgressMessage("");
 
 	return true;
 }
@@ -289,24 +289,24 @@ bool DatArchive::open(MemChunk& mc) {
 string DatArchive::detectEntrySection(ArchiveEntry* entry) {
 	// Check the entry is valid and part of this archive
 	if (!checkEntry(entry))
-		return _T("none");
+		return "none";
 
 	// Check if entry is within any markers
 	int index = entryIndex(entry);
 
 	// Textures
 	if (index > walls[0] && index < walls[1])
-		return _T("textures");
+		return "textures";
 
 	// Flats
 	if (index > flats[0] && index < flats[1])
-		return _T("flats");
+		return "flats";
 
 	// Sprites
 	if (index > sprites[0] && index < sprites[1])
-		return _T("sprites");
+		return "sprites";
 
-	return _T("none");
+	return "none";
 }
 
 /* DatArchive::write
@@ -340,7 +340,7 @@ void DatArchive::close() {
 		parent->unlock();
 
 	// Announce
-	announce(_T("close"));
+	announce("close");
 }
 
 /* DatArchive::getEntryOffset
@@ -348,14 +348,14 @@ void DatArchive::close() {
  * Returns the lump entry's offset, or zero if it doesn't exist
  *******************************************************************/
 uint32_t DatArchive::getEntryOffset(ArchiveEntry* entry) {
-	return uint32_t((int)entry->extraProp(_T("Offset")));
+	return uint32_t((int)entry->extraProp("Offset"));
 }
 
 /* DatArchive::setEntryOffset
  * Sets a lump entry's offset
  *******************************************************************/
 void DatArchive::setEntryOffset(ArchiveEntry* entry, uint32_t offset) {
-	entry->extraProp(_T("Offset")) = (int)offset;
+	entry->extraProp("Offset") = (int)offset;
 }
 
 /* DatArchive::loadEntryData
@@ -379,7 +379,7 @@ bool DatArchive::loadEntryData(ArchiveEntry* entry) {
 
 	// Check if opening the file failed
 	if (!file.IsOpened()) {
-		wxLogMessage(_T("DatArchive::loadEntryData: Failed to open libfile %s"), filename.c_str());
+		wxLogMessage("DatArchive::loadEntryData: Failed to open libfile %s", filename.c_str());
 		return false;
 	}
 
@@ -500,7 +500,7 @@ bool DatArchive::isDatArchive(MemChunk& mc) {
 	uint32_t size = 0;
 	uint16_t nameofs = 0;
 	uint16_t unknown = 0;
-		
+
 	mc.read(&offset,	4);		// Offset
 	mc.read(&size,		4);		// Size
 	mc.read(&nameofs,	2);		// Name offset

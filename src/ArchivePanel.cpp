@@ -140,7 +140,7 @@ void ArchivePanel::save() {
 	// Save the archive
 	if (!archive->save()) {
 		// If there was an error pop up a message box
-		wxMessageBox(s_fmt(_T("Error:\n%s"), Global::error.c_str()), _T("Error"), wxICON_ERROR);
+		wxMessageBox(s_fmt("Error:\n%s", Global::error.c_str()), "Error", wxICON_ERROR);
 	}
 
 	// Refresh entry list
@@ -157,15 +157,15 @@ void ArchivePanel::saveAs() {
 
 	// Setup file filters (temporary, should go through all archive types somehow)
 	string formats = archive->getFileExtensionString();
-	//string deftype = _T("*.wad");
-	string filename = wxFileSelector(_T("Save Archive ") + archive->getFileName(false) + _T(" As"), _T(""), _T(""), wxEmptyString, formats, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+	//string deftype = "*.wad";
+	string filename = wxFileSelector("Save Archive " + archive->getFileName(false) + " As", "", "", wxEmptyString, formats, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 
 	// Check a filename was selected
 	if (!filename.empty()) {
 		// Save the archive
 		if (!archive->save(filename)) {
 			// If there was an error pop up a message box
-			wxMessageBox(s_fmt(_T("Error:\n%s"), Global::error.c_str()), _T("Error"), wxICON_ERROR);
+			wxMessageBox(s_fmt("Error:\n%s", Global::error.c_str()), "Error", wxICON_ERROR);
 		}
 	}
 
@@ -182,10 +182,10 @@ void ArchivePanel::saveAs() {
  *******************************************************************/
 bool ArchivePanel::newEntry() {
 	// Prompt for new entry name
-	string name = wxGetTextFromUser(_T("Enter new entry name:"), _T("New Entry"));
+	string name = wxGetTextFromUser("Enter new entry name:", "New Entry");
 
 	// Check if any name was entered
-	if (name == _T(""))
+	if (name == "")
 		return false;
 
 	// Get the entry index of the last selected list item
@@ -209,8 +209,8 @@ bool ArchivePanel::newEntry() {
  *******************************************************************/
 bool ArchivePanel::newEntryFromFile() {
 	// Create open file dialog
-	wxFileDialog dialog_open(this, _T("Choose file to open"), wxEmptyString, wxEmptyString,
-			_T("Any File (*.*)|*.*"), wxFD_OPEN|wxFD_MULTIPLE|wxFD_FILE_MUST_EXIST, wxDefaultPosition);
+	wxFileDialog dialog_open(this, "Choose file to open", wxEmptyString, wxEmptyString,
+			"Any File (*.*)|*.*", wxFD_OPEN|wxFD_MULTIPLE|wxFD_FILE_MUST_EXIST, wxDefaultPosition);
 
 	// Run the dialog & check that the user didn't cancel
 	if (dialog_open.ShowModal() == wxID_OK) {
@@ -234,7 +234,7 @@ bool ArchivePanel::newEntryFromFile() {
 			// If only 1 file was selected, prompt for a name
 			string name = wxFileName(files[a]).GetName().Upper().Truncate(8);
 			if (files.size() == 1)
-				name = wxGetTextFromUser(_T("Enter new entry name:"), _T("New Entry"), name);
+				name = wxGetTextFromUser("Enter new entry name:", "New Entry", name);
 
 			// Add the entry to the archive
 			ArchiveEntry* new_entry = archive->addNewEntry(name, index);
@@ -268,7 +268,7 @@ bool ArchivePanel::renameEntry() {
 		string old_name = entry->getName();
 
 		// Prompt for a new name
-		string new_name = wxGetTextFromUser(_T("Enter new entry name:"), _T("New Entry"), old_name);
+		string new_name = wxGetTextFromUser("Enter new entry name:", "New Entry", old_name);
 
 		// Rename the entry if a different name was specified
 		if (new_name.Cmp(wxEmptyString) && new_name.Cmp(old_name))
@@ -373,8 +373,8 @@ bool ArchivePanel::importEntry() {
 	// Go through the list
 	for (size_t a = 0; a < selection.size(); a++) {
 		// Create open file dialog
-		wxFileDialog *dialog_open = new wxFileDialog(this, s_fmt(_T("Import Entry \"%s\""), selection[a]->getName().c_str()),
-											wxEmptyString, wxEmptyString, _T("Any File (*.*)|*.*"), wxFD_OPEN | wxFD_FILE_MUST_EXIST, wxDefaultPosition);
+		wxFileDialog *dialog_open = new wxFileDialog(this, s_fmt("Import Entry \"%s\"", selection[a]->getName().c_str()),
+											wxEmptyString, wxEmptyString, "Any File (*.*)|*.*", wxFD_OPEN | wxFD_FILE_MUST_EXIST, wxDefaultPosition);
 
 		// Run the dialog & check that the user didn't cancel
 		if (dialog_open->ShowModal() == wxID_OK) {
@@ -406,8 +406,8 @@ bool ArchivePanel::exportEntry() {
 		fn.SetExt(selection[a]->getType()->getExtension());
 
 		// Create save file dialog
-		wxFileDialog *dialog_save = new wxFileDialog(this, s_fmt(_T("Export Entry \"%s\""), selection[a]->getName().c_str()),
-											wxEmptyString, fn.GetFullName(), _T("Any File (*.*)|*.*"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT, wxDefaultPosition);
+		wxFileDialog *dialog_save = new wxFileDialog(this, s_fmt("Export Entry \"%s\"", selection[a]->getName().c_str()),
+											wxEmptyString, fn.GetFullName(), "Any File (*.*)|*.*", wxFD_SAVE | wxFD_OVERWRITE_PROMPT, wxDefaultPosition);
 
 		// Run the dialog & check that the user didn't cancel
 		if (dialog_save->ShowModal() == wxID_OK) {
@@ -424,8 +424,8 @@ bool ArchivePanel::exportEntry() {
  *******************************************************************/
 bool ArchivePanel::exportEntryWad() {
 	// Create save file dialog
-	wxFileDialog dialog_save(this, _T(""), wxEmptyString, wxEmptyString,
-								_T("Doom Wad File (*.wad)|*.wad"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT, wxDefaultPosition);
+	wxFileDialog dialog_save(this, "", wxEmptyString, wxEmptyString,
+								"Doom Wad File (*.wad)|*.wad", wxFD_SAVE | wxFD_OVERWRITE_PROMPT, wxDefaultPosition);
 
 	// Run the dialog & check that the user didn't cancel
 	if (dialog_save.ShowModal() == wxID_OK) {
@@ -575,7 +575,7 @@ bool ArchivePanel::basConvert() {
 		EntryType::detectEntryType(animdef);
 		// Failsafe is detectEntryType doesn't accept to work, grumble
 		if (animdef->getType() == EntryType::unknownType())
-			animdef->setType(EntryType::getType(_T("animdefs")));
+			animdef->setType(EntryType::getType("animdefs"));
 	}
 
 	// Force entrylist width update
@@ -616,82 +616,12 @@ void ArchivePanel::onAnnouncement(Announcer* announcer, string event_name, MemCh
 	// Reset event data for reading
 	event_data.seek(0, SEEK_SET);
 
-/*
-	// If the archive was closed
-	if (announcer == archive && event_name == "close") {
-		// Remove the archive panel from the parent notebook
-		wxAuiNotebook* parent = (wxAuiNotebook*)GetParent();
-		parent->RemovePage(parent->GetPageIndex(this));
-
-		// Clear list archive
-		entry_list->setArchive(NULL);
-
-		// Destroy the archive panel
-		this->Destroy();
-	}
-*/
-
 	// If the archive was saved
 	if (announcer == archive && event_name == "saved") {
 		// Update this tab's name in the parent notebook (if filename was changed)
 		wxAuiNotebook* parent = (wxAuiNotebook*)GetParent();
 		parent->SetPageText(parent->GetPageIndex(this), archive->getFileName(false));
 	}
-
-	/*
-	// Archive entries were swapped
-	if (announcer == archive && event_name == _T("entries_swapped")) {
-		int i1, i2;
-		wxUIntPtr e1, e2;
-
-		// Check all event data is there
-		if (!event_data.read(&i1, sizeof(int)) || !event_data.read(&i2, sizeof(int)) ||
-			!event_data.read(&e1, sizeof(wxUIntPtr)) || !event_data.read(&e2, sizeof(wxUIntPtr)))
-			return;
-
-		// Send to entry list to handle
-		entry_list->swapItems(i1, i2, (ArchiveEntry*)wxUIntToPtr(e1), (ArchiveEntry*)wxUIntToPtr(e2));
-	}
-
-	// An entry was added to the archive
-	if (announcer == archive && event_name == _T("entry_added")) {
-		uint32_t index = 0;
-		wxUIntPtr e = 0;
-
-		// Check all event data is there
-		if (!event_data.read(&index, sizeof(uint32_t)) || !event_data.read(&e, sizeof(wxUIntPtr)))
-			return;
-
-		// Send to entry list to handle
-		entry_list->addEntry(index, (ArchiveEntry*)wxUIntToPtr(e));
-	}
-
-	// An entry in the archive was modified
-	if (announcer == archive && event_name == _T("entry_modified")) {
-		uint32_t index = 0;
-		wxUIntPtr e = 0;
-
-		// Check all event data is there
-		if (!event_data.read(&index, sizeof(uint32_t)) || !event_data.read(&e, sizeof(wxUIntPtr)))
-			return;
-
-		// Send to entry list to handle
-		entry_list->updateEntry(index, (ArchiveEntry*)wxUIntToPtr(e));
-	}
-
-	// An entry in the archive was removed
-	if (announcer == archive && event_name == _T("entry_removed")) {
-		uint32_t index = 0;
-		wxUIntPtr e = 0;
-
-		// Check all event data is there
-		if (!event_data.read(&index, sizeof(uint32_t)) || !event_data.read(&e, sizeof(wxUIntPtr)))
-			return;
-
-		// Send to entry list to handle
-		entry_list->removeEntry(index, (ArchiveEntry*)wxUIntToPtr(e));
-	}
-	*/
 }
 
 /* ArchivePanel::openEntry
@@ -872,19 +802,19 @@ void ArchivePanel::onEntryListLeftClick(wxMouseEvent& e) {
 void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 	// Generate context menu
 	wxMenu* context = new wxMenu();
-	context->Append(MENU_ENTRY_RENAME, _T("Rename"));
-	context->Append(MENU_ENTRY_DELETE, _T("Delete"));
+	context->Append(MENU_ENTRY_RENAME, "Rename");
+	context->Append(MENU_ENTRY_DELETE, "Delete");
 	context->AppendSeparator();
-	context->Append(MENU_ENTRY_COPY, _T("Copy"));
-	context->Append(MENU_ENTRY_CUT, _T("Cut"));
-	context->Append(MENU_ENTRY_PASTE, _T("Paste"));
+	context->Append(MENU_ENTRY_COPY, "Copy");
+	context->Append(MENU_ENTRY_CUT, "Cut");
+	context->Append(MENU_ENTRY_PASTE, "Paste");
 	context->AppendSeparator();
-	context->Append(MENU_ENTRY_IMPORT, _T("Import"));
-	context->Append(MENU_ENTRY_EXPORT, _T("Export"));
-	context->Append(MENU_ENTRY_EXPORTWAD, _T("Export as Wad"));
+	context->Append(MENU_ENTRY_IMPORT, "Import");
+	context->Append(MENU_ENTRY_EXPORT, "Export");
+	context->Append(MENU_ENTRY_EXPORTWAD, "Export as Wad");
 	context->AppendSeparator();
-	context->Append(MENU_ENTRY_MOVEUP, _T("Move Up"));
-	context->Append(MENU_ENTRY_MOVEDOWN, _T("Move Down"));
+	context->Append(MENU_ENTRY_MOVEUP, "Move Up");
+	context->Append(MENU_ENTRY_MOVEDOWN, "Move Down");
 
 	// Get selected entries
 	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
@@ -908,16 +838,16 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 	// Add gfx-related menu items if gfx are selected
 	if (gfx_selected) {
 		context->AppendSeparator();
-		context->Append(MENU_ENTRY_GFX_CONVERT, _T("Convert Gfx to..."));
-		context->Append(MENU_ENTRY_GFX_OFFSETS, _T("Modify Gfx Offsets"));
+		context->Append(MENU_ENTRY_GFX_CONVERT, "Convert Gfx to...");
+		context->Append(MENU_ENTRY_GFX_OFFSETS, "Modify Gfx Offsets");
 	}
 
 	// Add Boom Animations/Switches related menu items if they are selected
 	if (bas_selected) {
 		context->AppendSeparator();
-		context->Append(MENU_ENTRY_BAS_CONVERT, _T("Convert to ANIMDEFS"));
+		context->Append(MENU_ENTRY_BAS_CONVERT, "Convert to ANIMDEFS");
 	}
-	context->Append(MENU_ENTRY_PAL_CONVERT, _T("Pal 6-bit to 8-bit"));
+	context->Append(MENU_ENTRY_PAL_CONVERT, "Pal 6-bit to 8-bit");
 
 	// Popup the context menu
 	PopupMenu(context);

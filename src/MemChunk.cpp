@@ -107,7 +107,7 @@ bool MemChunk::clear() {
 bool MemChunk::reSize(uint32_t new_size, bool preserve_data) {
 	// Check for invalid new size
 	if (new_size == 0) {
-		wxLogMessage(_T("MemChunk::reSize: new_size cannot be 0"));
+		wxLogMessage("MemChunk::reSize: new_size cannot be 0");
 		return false;
 	}
 
@@ -139,8 +139,8 @@ bool MemChunk::importFile(string filename, uint32_t offset, uint32_t len) {
 
 	// Return false if file open failed
 	if (!file.IsOpened()) {
-		wxLogMessage(_T("MemChunk::loadFile: Unable to open file %s"), filename.c_str());
-		Global::error = s_fmt(_T("Unable to open file %s"), filename.c_str());
+		wxLogMessage("MemChunk::loadFile: Unable to open file %s", filename.c_str());
+		Global::error = s_fmt("Unable to open file %s", filename.c_str());
 		return false;
 	}
 
@@ -245,7 +245,7 @@ bool MemChunk::exportFile(string filename, uint32_t start, uint32_t size) {
 	// Open file for writing
 	wxFile file(filename, wxFile::write);
 	if (!file.IsOpened()) {
-		wxLogMessage(s_fmt(_T("Unable to write to file %s"), filename.c_str()));
+		wxLogMessage(s_fmt("Unable to write to file %s", filename.c_str()));
 		return false;
 	}
 
@@ -272,7 +272,7 @@ bool MemChunk::exportMemChunk(MemChunk& mc, uint32_t start, uint32_t size) {
 	// Check size
 	if (size == 0)
 		size = this->size - start;
-	
+
 	// Write data to MemChunk
 	mc.reSize(size, false);
 	return mc.importMem(data+start, size);
@@ -290,7 +290,7 @@ bool MemChunk::write(const void* data, uint32_t size) {
 	// If we're trying to write past the end of the memory chunk,
 	// resize it so we can write at this point
 	if (cur_ptr + size > this->size) {
-		//wxLogMessage(_T("MC::write resize %d > %d"), cur_ptr+size, this->size);
+		//wxLogMessage("MC::write resize %d > %d", cur_ptr+size, this->size);
 		reSize(cur_ptr + size, true);
 	}
 

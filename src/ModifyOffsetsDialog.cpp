@@ -42,7 +42,7 @@
  * ModifyOffsetsDialog class constructor
  *******************************************************************/
 ModifyOffsetsDialog::ModifyOffsetsDialog()
-:	wxDialog(NULL, -1, _T("Modify Gfx Offset(s)"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER) {
+:	wxDialog(NULL, -1, "Modify Gfx Offset(s)", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER) {
 	// Create main sizer
 	wxBoxSizer *m_vbox = new wxBoxSizer(wxVERTICAL);
 	SetSizer(m_vbox);
@@ -52,12 +52,12 @@ ModifyOffsetsDialog::ModifyOffsetsDialog()
 	m_vbox->Add(hbox, 0, wxEXPAND|wxALL, 4);
 
 	// 'Set Offsets'
-	opt_set = new wxRadioButton(this, -1, _T("Set Offsets"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+	opt_set = new wxRadioButton(this, -1, "Set Offsets", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
 	hbox->Add(opt_set, 1, wxEXPAND|wxALL, 4);
 
-	entry_xoff = new wxTextCtrl(this, -1, _T(""), wxDefaultPosition, wxSize(40, -1));
-	entry_yoff = new wxTextCtrl(this, -2, _T(""), wxDefaultPosition, wxSize(40, -1));
-	cbox_relative = new wxCheckBox(this, -1, _T("Relative"));
+	entry_xoff = new wxTextCtrl(this, -1, "", wxDefaultPosition, wxSize(40, -1));
+	entry_yoff = new wxTextCtrl(this, -2, "", wxDefaultPosition, wxSize(40, -1));
+	cbox_relative = new wxCheckBox(this, -1, "Relative");
 	hbox->Add(entry_xoff, 0, wxEXPAND|wxALL, 4);
 	hbox->Add(entry_yoff, 0, wxEXPAND|wxALL, 4);
 	hbox->Add(cbox_relative, 0, wxEXPAND|wxALL, 4);
@@ -66,13 +66,13 @@ ModifyOffsetsDialog::ModifyOffsetsDialog()
 	m_vbox->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
 	// 'Auto Offsets'
-	opt_auto = new wxRadioButton(this, -1, _T("Automatic Offsets"));
+	opt_auto = new wxRadioButton(this, -1, "Automatic Offsets");
 	hbox->Add(opt_auto, 1, wxEXPAND|wxALL, 4);
 
 	string offtypes[] = {
-		_T("Monster"),
-		_T("Projectile"),
-		_T("Hud/Weapon")
+		"Monster",
+		"Projectile",
+		"Hud/Weapon"
 	};
 
 	combo_aligntype = new wxChoice(this, -1, wxDefaultPosition, wxDefaultSize, 3, offtypes);
@@ -194,4 +194,4 @@ void c_test_mod(vector<string> args) {
 	ModifyOffsetsDialog mod;
 	mod.ShowModal();
 }
-ConsoleCommand test_mod(_T("test_mod"), &c_test_mod, 0);
+ConsoleCommand test_mod("test_mod", &c_test_mod, 0);

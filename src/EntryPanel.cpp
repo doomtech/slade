@@ -2,23 +2,23 @@
 /*******************************************************************
  * SLADE - It's a Doom Editor
  * Copyright (C) 2008 Simon Judd
- * 
+ *
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
  * Filename:    EntryPanel.cpp
  * Description: EntryPanel class. Different UI panels for editing
  *              different entry types extend from this class.
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -48,7 +48,7 @@ EntryPanel::EntryPanel(wxWindow* parent, string id)
 	this->id = id;
 
 	// Create & set sizer & border
-	frame = new wxStaticBox(this, -1, _T("Entry Contents"));
+	frame = new wxStaticBox(this, -1, "Entry Contents");
 	wxStaticBoxSizer *framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
 	SetSizer(framesizer);
 	Show(false);
@@ -63,9 +63,9 @@ EntryPanel::EntryPanel(wxWindow* parent, string id)
 	hbox->Add(sizer_bottom, 1, wxEXPAND|wxBOTTOM, 4);
 
 	// Create generic EntryPanel buttons
-	btn_save = new wxButton(this, -1, _T("Save Changes"));
-	btn_revert = new wxButton(this, -1, _T("Revert Changes"));
-	btn_edit_ext = new wxButton(this, -1, _T("Edit Externally"));
+	btn_save = new wxButton(this, -1, "Save Changes");
+	btn_revert = new wxButton(this, -1, "Revert Changes");
+	btn_edit_ext = new wxButton(this, -1, "Edit Externally");
 
 	hbox->Add(btn_edit_ext, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
 	hbox->Add(btn_revert, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
@@ -104,9 +104,9 @@ void EntryPanel::setModified(bool c) {
 
 	// Set frame label
 	//if (modified)
-	//	frame->SetLabel(s_fmt(_T("Entry Contents (%s, unsaved changes)"), entry->getName().c_str()));
+	//	frame->SetLabel(s_fmt("Entry Contents (%s, unsaved changes)", entry->getName().c_str()));
 	//else
-	//	frame->SetLabel(s_fmt(_T("Entry Contents (%s)"), entry->getName().c_str()));
+	//	frame->SetLabel(s_fmt("Entry Contents (%s)", entry->getName().c_str()));
 }
 
 /* EntryPanel::openEntry
@@ -118,7 +118,7 @@ bool EntryPanel::openEntry(ArchiveEntry* entry) {
 		return false;
 
 	// Set frame label
-	//frame->SetLabel(s_fmt(_T("Entry Contents (%s)"), entry->getName().c_str()));
+	//frame->SetLabel(s_fmt("Entry Contents (%s)", entry->getName().c_str()));
 
 	// Copy current entry content
 	entry_data.clear();
@@ -138,7 +138,7 @@ bool EntryPanel::openEntry(ArchiveEntry* entry) {
  * overridden by child classes)
  *******************************************************************/
 bool EntryPanel::loadEntry(ArchiveEntry* entry) {
-	Global::error = _T("Cannot open an entry with the base EntryPanel class");
+	Global::error = "Cannot open an entry with the base EntryPanel class";
 	return false;
 }
 
@@ -147,7 +147,7 @@ bool EntryPanel::loadEntry(ArchiveEntry* entry) {
  * be overridden by child classes)
  *******************************************************************/
 bool EntryPanel::saveEntry() {
-	Global::error = _T("Cannot save an entry with the base EntryPanel class");
+	Global::error = "Cannot save an entry with the base EntryPanel class";
 	return false;
 }
 
@@ -183,5 +183,5 @@ void EntryPanel::onBtnRevert(wxCommandEvent& e) {
 }
 
 void EntryPanel::onBtnEditExt(wxCommandEvent& e) {
-	wxLogMessage(_T("External edit not implemented"));
+	wxLogMessage("External edit not implemented");
 }

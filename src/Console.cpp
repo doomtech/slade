@@ -2,22 +2,22 @@
 /*******************************************************************
  * SLADE - It's a Doom Editor
  * Copyright (C) 2008 Simon Judd
- * 
+ *
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
  * Filename:    Console.cpp
  * Description: The SLADE Console implementation
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -71,14 +71,14 @@ void Console::addCommand(ConsoleCommand &c) {
  * Attempts to execute the command line given
  *******************************************************************/
 void Console::execute(string command) {
-	wxLogMessage(s_fmt(_T("> %s"), command.c_str()));
+	wxLogMessage(s_fmt("> %s", command.c_str()));
 
 	// Add the command to the log
 	cmd_log.push_back(command);
 
 	// Announce that a command has been executed
 	MemChunk mc;
-	announce(_T("console_execute"), mc);
+	announce("console_execute", mc);
 
 	// Tokenize the command string
 	Tokenizer tz;
@@ -90,7 +90,7 @@ void Console::execute(string command) {
 	// Get all args
 	string arg = tz.getToken();
 	vector<string> args;
-	while (arg != _T("")) {
+	while (arg != "") {
 		args.push_back(arg);
 		arg = tz.getToken();
 	}
@@ -105,7 +105,7 @@ void Console::execute(string command) {
 	}
 
 	// Command not found
-	logMessage(s_fmt(_T("Unknown command: \"%s\""), cmd_name.c_str()));
+	logMessage(s_fmt("Unknown command: \"%s\"", cmd_name.c_str()));
 	return;
 }
 
@@ -115,14 +115,14 @@ void Console::execute(string command) {
 void Console::logMessage(string message) {
 	// Add a newline to the end of the message if there isn't one
 	if (message.Last() != '\n')
-		message.Append(_T("\n"));
+		message.Append("\n");
 
 	// Log the message
 	log.push_back(message);
 
 	// Announce that a new message has been logged
 	MemChunk mc;
-	announce(_T("console_logmessage"), mc);
+	announce("console_logmessage", mc);
 }
 
 /* Console::lastLogLine
@@ -130,7 +130,7 @@ void Console::logMessage(string message) {
  *******************************************************************/
 string Console::lastLogLine() {
 	// Init blank string
-	string lastLine = _T("");
+	string lastLine = "";
 
 	// Get last line if any exist
 	if (log.size() > 0)
@@ -141,7 +141,7 @@ string Console::lastLogLine() {
 
 string Console::lastCommand() {
 	// Init blank string
-	string lastCmd = _T("");
+	string lastCmd = "";
 
 	// Get last command if any exist
 	if (cmd_log.size() > 0)
@@ -155,7 +155,7 @@ string Console::lastCommand() {
  * separated by a newline
  *******************************************************************/
 string Console::dumpLog() {
-	string ret = _T("");
+	string ret = "";
 
 	for (size_t a = 0; a < log.size(); a++)
 		ret += log.at(a);
@@ -194,7 +194,7 @@ void ConsoleCommand::execute(vector<string> args) {
 	if (args.size() >= min_args)
 		commandFunc(args);
 	else
-		theConsole->logMessage(_T("Missing command arguments"));
+		theConsole->logMessage("Missing command arguments");
 }
 
 
@@ -209,24 +209,24 @@ void ConsoleCommand::execute(vector<string> args) {
 void c_echo(vector<string> args) {
 	theConsole->logMessage(args[0]);
 }
-ConsoleCommand con_echo(_T("echo"), &c_echo, 1);
+ConsoleCommand con_echo("echo", &c_echo, 1);
 
 /* Console Command - "cmdlist"
  * Lists all valid console commands
  *******************************************************************/
 void c_cmdlist(vector<string> args) {
-	theConsole->logMessage(s_fmt(_T("%d Valid Commands:"), theConsole->numCommands()));
+	theConsole->logMessage(s_fmt("%d Valid Commands:", theConsole->numCommands()));
 
 	for (int a = 0; a < theConsole->numCommands(); a++)
-		theConsole->logMessage(s_fmt(_T("\"%s\""), theConsole->command(a).getName().c_str()));
+		theConsole->logMessage(s_fmt("\"%s\"", theConsole->command(a).getName().c_str()));
 }
-ConsoleCommand con_cmdlist(_T("cmdlist"), &c_cmdlist, 0);
+ConsoleCommand con_cmdlist("cmdlist", &c_cmdlist, 0);
 
 void c_testmatch(vector<string> args) {
 	bool match = args[0].Matches(args[1]);
 	if (match)
-		theConsole->logMessage(_T("Match"));
+		theConsole->logMessage("Match");
 	else
-		theConsole->logMessage(_T("No Match"));
+		theConsole->logMessage("No Match");
 }
-ConsoleCommand con_testmatch(_T("testmatch"), &c_testmatch, 2);
+ConsoleCommand con_testmatch("testmatch", &c_testmatch, 2);

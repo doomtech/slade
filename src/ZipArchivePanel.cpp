@@ -50,7 +50,7 @@ private:
 	wxRadioBox*	rb_entrytype;
 
 public:
-	NewEntryDialog() : wxDialog(NULL, -1, _T("New Entry"), wxDefaultPosition) {
+	NewEntryDialog() : wxDialog(NULL, -1, "New Entry", wxDefaultPosition) {
 		// Setup main sizer
 		wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 		wxSizerFlags sizer_flags;
@@ -58,13 +58,13 @@ public:
 		sizer_flags.Expand();
 
 		// Add entry type radio options
-		string types[] = { _T("Entry"), _T("Folder") };
-		rb_entrytype = new wxRadioBox(this, -1, _T("Entry Type:"), wxDefaultPosition, wxDefaultSize, 2, types, 2);
+		string types[] = { "Entry", "Folder" };
+		rb_entrytype = new wxRadioBox(this, -1, "Entry Type:", wxDefaultPosition, wxDefaultSize, 2, types, 2);
 		sizer->Add(rb_entrytype, sizer_flags);
 
 		// Add entry name textbox
-		sizer->Add(CreateTextSizer(_T("Entry Name:")), wxSizerFlags().Expand().DoubleBorder(wxLEFT|wxRIGHT));
-		text_entryname = new wxTextCtrl(this, -1, _T(""), wxDefaultPosition, wxSize(300, -1));
+		sizer->Add(CreateTextSizer("Entry Name:"), wxSizerFlags().Expand().DoubleBorder(wxLEFT|wxRIGHT));
+		text_entryname = new wxTextCtrl(this, -1, "", wxDefaultPosition, wxSize(300, -1));
 		sizer->Add(text_entryname, sizer_flags);
 
 		// Add OK/Cancel buttons
@@ -86,7 +86,7 @@ public:
 		if (text_entryname)
 			return text_entryname->GetValue();
 		else
-			return _T("");
+			return "";
 	}
 
 	int getType() {
@@ -198,7 +198,7 @@ bool ZipArchivePanel::newEntry() {
 		zipdir_t* dir = ((ZipArchiveEntryList*)entry_list)->getCurrentDir();
 
 		// If an absolute path wasn't given, add the current directory before the name
-		if (!name.StartsWith(_T("/")))
+		if (!name.StartsWith("/"))
 			name = dir->getFullPath() + name;
 
 		// Check if the user selected to create an entry
@@ -219,8 +219,8 @@ bool ZipArchivePanel::newEntry() {
 		// Otherwise if the user selected to create a folder
 		else if (ned.getType() == 1) {
 			// Add an ending / if one wasn't entered
-			if (!name.EndsWith(_T("/")))
-				name += _T("/");
+			if (!name.EndsWith("/"))
+				name += "/";
 
 			// Add the directory to the archive
 			((ZipArchive*)archive)->addDirectory(name);
@@ -239,8 +239,8 @@ bool ZipArchivePanel::newEntry() {
  *******************************************************************/
 bool ZipArchivePanel::newEntryFromFile() {
 	// Create open file dialog
-	wxFileDialog dialog_open(this, _T("Choose file to open"), wxEmptyString, wxEmptyString,
-			_T("Any File (*.*)|*.*"), wxFD_OPEN|wxFD_FILE_MUST_EXIST|wxFD_MULTIPLE, wxDefaultPosition);
+	wxFileDialog dialog_open(this, "Choose file to open", wxEmptyString, wxEmptyString,
+			"Any File (*.*)|*.*", wxFD_OPEN|wxFD_FILE_MUST_EXIST|wxFD_MULTIPLE, wxDefaultPosition);
 
 	// Run the dialog & check that the user didn't cancel
 	if (dialog_open.ShowModal() == wxID_OK) {
@@ -264,13 +264,13 @@ bool ZipArchivePanel::newEntryFromFile() {
 
 			// If only 1 file was selected, prompt for an entry name
 			if (files.size() == 1)
-				name = wxGetTextFromUser(_T("Enter new entry name:"), _T("New Entry"), name);
+				name = wxGetTextFromUser("Enter new entry name:", "New Entry", name);
 
 			// Get the current directory
 			zipdir_t* dir = ((ZipArchiveEntryList*)entry_list)->getCurrentDir();
 
 			// If an absolute path wasn't given, add the current directory before the name
-			if (!name.StartsWith(_T("/")))
+			if (!name.StartsWith("/"))
 				name = dir->getFullPath() + name;
 
 			// Add the entry to the archive
@@ -309,7 +309,7 @@ bool ZipArchivePanel::renameEntry() {
 			continue;
 
 		// Prompt for a new name
-		string new_name = wxGetTextFromUser(_T("Enter new entry name:"), s_fmt(_T("Rename Entry %s"), old_name.c_str()), old_name);
+		string new_name = wxGetTextFromUser("Enter new entry name:", s_fmt("Rename Entry %s", old_name.c_str()), old_name);
 
 		// Rename the entry if a different name was specified
 		if (new_name.Cmp(wxEmptyString) && new_name.Cmp(old_name))
@@ -325,20 +325,20 @@ bool ZipArchivePanel::renameEntry() {
 		string old_name = selected_dirs[a]->getName();
 
 		// Prompt for a new name
-		string new_name = wxGetTextFromUser(_T("Enter new directory name:"), s_fmt(_T("Rename Directory %s"), old_name.c_str()), old_name);
+		string new_name = wxGetTextFromUser("Enter new directory name:", s_fmt("Rename Directory %s", old_name.c_str()), old_name);
 
 		// Do nothing if no name was entered
-		if (!new_name.Cmp(_T("")))
+		if (!new_name.Cmp(""))
 			continue;
 
 		// Add trailing '/' to new name if one wasn't entered
-		if (!new_name.EndsWith(_T("/")))
-			new_name += _T("/");
+		if (!new_name.EndsWith("/"))
+			new_name += "/";
 
 		// If the entered name is a path with more than one directory, just use the first (for now)
 		wxFileName fn(new_name);
 		if (fn.GetDirCount() > 1)
-			new_name = fn.GetDirs()[0] + _T("/");
+			new_name = fn.GetDirs()[0] + "/";
 
 		// Rename the directory if the new entered name is different from the original
 		if (new_name.Cmp(old_name))
@@ -444,8 +444,8 @@ bool ZipArchivePanel::pasteEntry() {
 		if (theClipboard->getItem(a)->getType() == CLIPBOARD_ENTRY) {
 			EntryClipboardItem* item = (EntryClipboardItem*)theClipboard->getItem(a);
 			ArchiveEntry* copied_entry = new ArchiveEntry(*(item->getEntry()));
-			//copied_entry->setExProp(_T("Directory"), cur_dir->getFullPath());
-			copied_entry->extraProp(_T("Directory")) = cur_dir->getFullPath();
+			//copied_entry->setExProp("Directory", cur_dir->getFullPath());
+			copied_entry->extraProp("Directory") = cur_dir->getFullPath();
 			archive->addEntry(copied_entry, index);
 			index++;
 		}
@@ -457,10 +457,10 @@ bool ZipArchivePanel::pasteEntry() {
 			// Go through all entries in the directory
 			for (uint32_t e = 0; e < item->nEntries(); e++) {
 				ArchiveEntry* copied_entry = new ArchiveEntry(*(item->getEntry(e)));
-				//string dir = copied_entry->getExProp(_T("Directory"));
-				string dir = copied_entry->extraProp(_T("Directory"));
-				//copied_entry->setExProp(_T("Directory"), cur_dir->getFullPath() + dir);
-				copied_entry->extraProp(_T("Directory")) = cur_dir->getFullPath() + dir;
+				//string dir = copied_entry->getExProp("Directory");
+				string dir = copied_entry->extraProp("Directory");
+				//copied_entry->setExProp("Directory", cur_dir->getFullPath() + dir);
+				copied_entry->extraProp("Directory") = cur_dir->getFullPath() + dir;
 				archive->addEntry(copied_entry, index);
 				index++;
 			}
@@ -528,30 +528,30 @@ bool ZipArchivePanel::moveDown() {
  * Called when an announcement is recieved from the archive that
  * this ZipArchivePanel is managing
  *******************************************************************/
+ /*
 void ZipArchivePanel::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
 	// Do default announcement handling
 	ArchivePanel::onAnnouncement(announcer, event_name, event_data);
 
-	/*
 	// If a directory was added to the archive
-	if (announcer == archive && !event_name.Cmp(_T("directory_added"))) {
+	if (announcer == archive && !event_name.Cmp("directory_added")) {
 		wxUIntPtr ptr;
 		if (event_data.read(&ptr, sizeof(wxUIntPtr)))
 			((ZipEntryListPanel*)entry_list)->addDirectory(ptr);
 	}
 
 	// If a directory was removed from the archive
-	if (announcer == archive && !event_name.Cmp(_T("directory_removed"))) {
+	if (announcer == archive && !event_name.Cmp("directory_removed")) {
 		wxUIntPtr ptr;
 		if (event_data.read(&ptr, sizeof(wxUIntPtr)))
 			((ZipEntryListPanel*)entry_list)->removeDirectory(ptr);
 	}
 
 	// If a directory was renamed in the archive
-	if (announcer == archive && !event_name.Cmp(_T("directory_modified"))) {
+	if (announcer == archive && !event_name.Cmp("directory_modified")) {
 		wxUIntPtr ptr;
 		if (event_data.read(&ptr, sizeof(wxUIntPtr)))
 			((ZipEntryListPanel*)entry_list)->updateDirectory(ptr);
 	}
-	*/
 }
+*/

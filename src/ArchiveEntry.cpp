@@ -171,7 +171,7 @@ void ArchiveEntry::unloadData() {
 void ArchiveEntry::lock() {
 	// Lock the entry
 	locked = true;
-	
+
 	// Inform parent
 	if (parent)
 		parent->entryModified(this);
@@ -192,7 +192,7 @@ void ArchiveEntry::unlock() {
 bool ArchiveEntry::rename(string new_name) {
 	// Check if locked
 	if (locked) {
-		Global::error = _T("Entry is locked");
+		Global::error = "Entry is locked";
 		return false;
 	}
 
@@ -206,7 +206,7 @@ bool ArchiveEntry::rename(string new_name) {
 bool ArchiveEntry::resize(uint32_t new_size, bool preserve_data) {
 	// Check if locked
 	if (locked) {
-		Global::error = _T("Entry is locked");
+		Global::error = "Entry is locked";
 		return false;
 	}
 
@@ -222,7 +222,7 @@ bool ArchiveEntry::resize(uint32_t new_size, bool preserve_data) {
 void ArchiveEntry::clearData() {
 	// Check if locked
 	if (locked) {
-		Global::error = _T("Entry is locked");
+		Global::error = "Entry is locked";
 		return;
 	}
 
@@ -247,7 +247,7 @@ bool ArchiveEntry::importMem(const void* data, uint32_t size) {
 
 	// Check if locked
 	if (locked) {
-		Global::error = _T("Entry is locked");
+		Global::error = "Entry is locked";
 		return false;
 	}
 
@@ -290,7 +290,7 @@ bool ArchiveEntry::importMemChunk(MemChunk& mc) {
 bool ArchiveEntry::importFile(string filename, uint32_t offset, uint32_t size) {
 	// Check if locked
 	if (locked) {
-		Global::error = _T("Entry is locked");
+		Global::error = "Entry is locked";
 		return false;
 	}
 
@@ -299,7 +299,7 @@ bool ArchiveEntry::importFile(string filename, uint32_t offset, uint32_t size) {
 
 	// Check that it opened ok
 	if (!file.IsOpened()) {
-		Global::error = _T("Unable to open file for reading");
+		Global::error = "Unable to open file for reading";
 		return false;
 	}
 
@@ -328,7 +328,7 @@ bool ArchiveEntry::importFile(string filename, uint32_t offset, uint32_t size) {
 bool ArchiveEntry::importFileStream(wxFile& file, uint32_t len) {
 	// Check if locked
 	if (locked) {
-		Global::error = _T("Entry is locked");
+		Global::error = "Entry is locked";
 		return false;
 	}
 
@@ -354,7 +354,7 @@ bool ArchiveEntry::importFileStream(wxFile& file, uint32_t len) {
 bool ArchiveEntry::importEntry(ArchiveEntry* entry) {
 	// Check if locked
 	if (locked) {
-		Global::error = _T("Entry is locked");
+		Global::error = "Entry is locked";
 		return false;
 	}
 
@@ -378,7 +378,7 @@ bool ArchiveEntry::exportFile(string filename) {
 
 	// Check it opened ok
 	if (!file.IsOpened()) {
-		Global::error = s_fmt(_T("Unable to open file %s for writing"), filename);
+		Global::error = s_fmt("Unable to open file %s for writing", filename);
 		return false;
 	}
 
@@ -402,7 +402,7 @@ string ArchiveEntry::getSizeString() {
 bool ArchiveEntry::write(const void* data, uint32_t size) {
 	// Check if locked
 	if (locked) {
-		Global::error = _T("Entry is locked");
+		Global::error = "Entry is locked";
 		return false;
 	}
 

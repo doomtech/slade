@@ -42,7 +42,7 @@
  *******************************************************************/
 TextureXList::TextureXList() {
 	// Setup 'invalid' texture
-	tex_invalid.name = _T("INVALID_TEXTURE");	// Deliberately set the name to >8 characters
+	tex_invalid.name = "INVALID_TEXTURE";	// Deliberately set the name to >8 characters
 	tex_invalid.width = -1;
 	tex_invalid.height = -1;
 }
@@ -165,26 +165,26 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex) {
 
 	// Number of textures
 	if (!texturex->read(&n_tex, 4)) {
-		wxLogMessage(_T("Error: TEXTUREx entry is corrupt"));
+		wxLogMessage("Error: TEXTUREx entry is corrupt");
 		return false;
 	}
 
 	// Texture definition offsets
 	offsets = new int32_t[n_tex];
 	if (!texturex->read(offsets, n_tex * 4)) {
-		wxLogMessage(_T("Error: TEXTUREx entry is corrupt"));
+		wxLogMessage("Error: TEXTUREx entry is corrupt");
 		return false;
 	}
 
 	// Read the first texture definition to try to identify the format
 	if (!texturex->seek(offsets[0], SEEK_SET)) {
-		wxLogMessage(_T("Error: TEXTUREx entry is corrupt"));
+		wxLogMessage("Error: TEXTUREx entry is corrupt");
 		return false;
 	}
 	// Look at the name field. Is it present or not?
 	char tempname[8];
 	if (!texturex->read(&tempname, 8)) {
-		wxLogMessage(_T("Error: TEXTUREx entry is corrupt"));
+		wxLogMessage("Error: TEXTUREx entry is corrupt");
 		return false;
 	}
 	// Let's pretend it is and see what happens.
@@ -208,7 +208,7 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex) {
 		texturex->seek(offsets[0], SEEK_SET);
 		ftdef_t temp;
 		if (!texturex->read(&temp, 22)) {
-			wxLogMessage(_T("Error: TEXTUREx entry is corrupt"));
+			wxLogMessage("Error: TEXTUREx entry is corrupt");
 			return false;
 		}
 		// Test condition adapted from ZDoom; apparently the first two bytes of columndir
@@ -221,7 +221,7 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex) {
 	for (int32_t a = 0; a < n_tex; a++) {
 		// Skip to texture definition
 		if (!texturex->seek(offsets[a], SEEK_SET)) {
-			wxLogMessage(_T("Error: TEXTUREx entry is corrupt"));
+			wxLogMessage("Error: TEXTUREx entry is corrupt");
 			return false;
 		}
 
@@ -231,7 +231,7 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex) {
 			nltdef_t nameless;
 			// Auto-naming mechanism taken from DeuTex
 			if (a > 99999) {
-				wxLogMessage(_T("Error: More than 100000 nameless textures"));
+				wxLogMessage("Error: More than 100000 nameless textures");
 				return false;
 			}
 			char temp[9] = "";
@@ -240,7 +240,7 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex) {
 
 			// Read texture info
 			if (!texturex->read(&nameless, 8)) {
-				wxLogMessage(_T("Error: TEXTUREx entry is corrupt"));
+				wxLogMessage("Error: TEXTUREx entry is corrupt");
 				return false;
 			}
 
@@ -252,14 +252,14 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex) {
 			tdef.height = nameless.height;
 		}
 		else if (!texturex->read(&tdef, 16)) {
-			wxLogMessage(_T("Error: TEXTUREx entry is corrupt"));
+			wxLogMessage("Error: TEXTUREx entry is corrupt");
 			return false;
 		}
 
 		// Skip unused
 		if (txformat != TXF_STRIFE11) {
 			if (!texturex->seek(4, SEEK_CUR)) {
-				wxLogMessage(_T("Error: TEXTUREx entry is corrupt"));
+				wxLogMessage("Error: TEXTUREx entry is corrupt");
 				return false;
 			}
 		}
@@ -276,7 +276,7 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex) {
 		// Read patches
 		int16_t n_patches = 0;
 		if (!texturex->read(&n_patches, 2)) {
-			wxLogMessage(_T("Error: TEXTUREx entry is corrupt"));
+			wxLogMessage("Error: TEXTUREx entry is corrupt");
 			return false;
 		}
 
@@ -284,14 +284,14 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex) {
 			// Read patch definition
 			tx_patch_t pdef;
 			if (!texturex->read(&pdef, 6)) {
-				wxLogMessage(_T("Error: TEXTUREx entry is corrupt"));
+				wxLogMessage("Error: TEXTUREx entry is corrupt");
 				return false;
 			}
 
 			// Skip unused
 			if (txformat != TXF_STRIFE11) {
 				if (!texturex->seek(4, SEEK_CUR)) {
-					wxLogMessage(_T("Error: TEXTUREx entry is corrupt"));
+					wxLogMessage("Error: TEXTUREx entry is corrupt");
 					return false;
 				}
 			}

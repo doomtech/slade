@@ -44,7 +44,7 @@
  * GfxEntryPanel class constructor
  *******************************************************************/
 GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
-: EntryPanel(parent, _T("gfx")) {
+: EntryPanel(parent, "gfx") {
 	// Create sizer for this panel
 	wxBoxSizer* m_vbox = new wxBoxSizer(wxVERTICAL);
 	sizer_main->Add(m_vbox, 1, wxEXPAND);
@@ -57,28 +57,28 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 	slider_zoom = new wxSlider(this, -1, 100, 20, 800);
 	slider_zoom->SetLineSize(10);
 	slider_zoom->SetPageSize(100);
-	label_current_zoom = new wxStaticText(this, -1, _T("100%"));
-	hbox->Add(new wxStaticText(this, -1, _T("Zoom:")), 0, wxALIGN_CENTER_VERTICAL, 0);
+	label_current_zoom = new wxStaticText(this, -1, "100%");
+	hbox->Add(new wxStaticText(this, -1, "Zoom:"), 0, wxALIGN_CENTER_VERTICAL, 0);
 	hbox->Add(slider_zoom, 1, wxEXPAND, 0);
 	hbox->Add(label_current_zoom, 0, wxALIGN_CENTER_VERTICAL, 0);
 
 	hbox->AddStretchSpacer();
 
 	// Tile checkbox
-	cb_tile = new wxCheckBox(this, -1, _T("Tile"));
+	cb_tile = new wxCheckBox(this, -1, "Tile");
 	hbox->Add(cb_tile, 0, wxEXPAND, 0);
 	hbox->AddSpacer(8);
 
 	// Gfx (offset) type
-	string offset_types[] = { _T("Auto"), _T("Graphic"), _T("Sprite"), _T("HUD") };
+	string offset_types[] = { "Auto", "Graphic", "Sprite", "HUD" };
 	combo_offset_type = new wxComboBox(this, -1, offset_types[0], wxDefaultPosition, wxDefaultSize, 4, offset_types, wxCB_READONLY);
-	hbox->Add(new wxStaticText(this, -1, _T("Type:")), 0, wxALIGN_CENTER_VERTICAL, 0);
+	hbox->Add(new wxStaticText(this, -1, "Type:"), 0, wxALIGN_CENTER_VERTICAL, 0);
 	hbox->Add(combo_offset_type, 0, wxEXPAND, 0);
 	hbox->AddSpacer(8);
 
 	// Palette chooser
 	combo_palette = new PaletteChooser(this, -1);
-	hbox->Add(new wxStaticText(this, -1, _T("Palette:")), 0, wxALIGN_CENTER_VERTICAL, 0);
+	hbox->Add(new wxStaticText(this, -1, "Palette:"), 0, wxALIGN_CENTER_VERTICAL, 0);
 	hbox->Add(combo_palette, 0, wxEXPAND, 0);
 
 	// Add gfx canvas
@@ -95,19 +95,19 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 	// Offsets
 	spin_xoffset = new wxSpinCtrl(this, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, SHRT_MIN, SHRT_MAX, 0);
 	spin_yoffset = new wxSpinCtrl(this, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, SHRT_MIN, SHRT_MAX, 0);
-	hbox->Add(new wxStaticText(this, -1, _T("Offsets:")), 0, wxALIGN_CENTER_VERTICAL, 0);
+	hbox->Add(new wxStaticText(this, -1, "Offsets:"), 0, wxALIGN_CENTER_VERTICAL, 0);
 	hbox->Add(spin_xoffset, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
 	hbox->Add(spin_yoffset, 0, wxEXPAND|wxRIGHT, 4);
 
 	// Size
-	label_dimensions = new wxStaticText(this, -1, _T("Size: N/A"));
+	label_dimensions = new wxStaticText(this, -1, "Size: N/A");
 	hbox->Add(label_dimensions, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT, 4);
 
 	// PNG stuff
-	cb_alph_chunk = new wxCheckBox(this, -1, _T("alPh"));
+	cb_alph_chunk = new wxCheckBox(this, -1, "alPh");
 	cb_alph_chunk->Show(false);		cb_alph_chunk->Enable(false);
 	hbox->Add(cb_alph_chunk, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
-	cb_trns_chunk = new wxCheckBox(this, -1, _T("tRNS"));
+	cb_trns_chunk = new wxCheckBox(this, -1, "tRNS");
 	cb_trns_chunk->Show(false);		cb_trns_chunk->Enable(false);
 	hbox->Add(cb_trns_chunk, 0, wxEXPAND, 0);
 	hbox->AddSpacer(8);
@@ -171,7 +171,7 @@ bool GfxEntryPanel::loadEntry(ArchiveEntry* entry) {
 	}
 
 	// Set size label
-	label_dimensions->SetLabel(s_fmt(_T("Size: %d x %d"), gfx_canvas->getImage()->getWidth(), gfx_canvas->getImage()->getHeight()));
+	label_dimensions->SetLabel(s_fmt("Size: %d x %d", gfx_canvas->getImage()->getWidth(), gfx_canvas->getImage()->getHeight()));
 
 	// Apply offset view type
 	applyViewType();
@@ -215,14 +215,14 @@ void GfxEntryPanel::updateImagePalette() {
 int GfxEntryPanel::detectOffsetType() {
 	if (!entry)
 		return GFXVIEW_DEFAULT;
-	
+
 	if (!entry->getParent())
 		return GFXVIEW_DEFAULT;
 
 	// Check what section of the archive the entry is in
 	string section = entry->getParent()->detectEntrySection(entry);
 
-	if (section == _T("sprites")) {
+	if (section == "sprites") {
 		SImage* img = gfx_canvas->getImage();
 		int left = -img->offset().x;
 		int right = -img->offset().x + img->getWidth();
@@ -305,7 +305,7 @@ void GfxEntryPanel::onZoomChanged(wxCommandEvent& e) {
 	zoom_percent -= remainder;
 
 	// Update zoom label
-	label_current_zoom->SetLabel(s_fmt(_T("%d%%"), zoom_percent));
+	label_current_zoom->SetLabel(s_fmt("%d%%", zoom_percent));
 
 	// Zoom gfx canvas and update
 	gfx_canvas->setScale((double)zoom_percent * 0.01);

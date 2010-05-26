@@ -15,7 +15,7 @@ bool MapSide::parseUDMF(Tokenizer& tz) {
 
 	// TODO: Read side definition
 	string token = tz.getToken();
-	while (token != _T("}")) {
+	while (token != "}") {
 
 		token = tz.getToken();
 	}

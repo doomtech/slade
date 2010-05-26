@@ -98,18 +98,18 @@ bool EntryDataFormat::isFormat(MemChunk& mc, uint16_t format) {
 EntryType::EntryType(string id) {
 	// Init info variables
 	this->id = id;
-	name = _T("Unknown");
-	extension = _T("dat");
-	icon = _T("e_default");
-	editor = _T("default");
+	name = "Unknown";
+	extension = "dat";
+	icon = "e_default";
+	editor = "default";
 	reliability = 255;
 
 	// Init match criteria
-	format = _T("any");
+	format = "any";
 	size_limit[0] = -1;
 	size_limit[1] = -1;
 	detectable = true;
-	section = _T("none");
+	section = "none";
 }
 
 /* EntryType::~EntryType
@@ -134,22 +134,22 @@ void EntryType::addToList() {
  * Dumps entry type info to the log
  *******************************************************************/
 void EntryType::dump() {
-	wxLogMessage(s_fmt(_T("Type %s \"%s\", format %s, extension %s"), chr(id), chr(name), chr(format), chr(extension)));
-	wxLogMessage(s_fmt(_T("Size limit: %d-%d"), size_limit[0], size_limit[1]));
+	wxLogMessage(s_fmt("Type %s \"%s\", format %s, extension %s", chr(id), chr(name), chr(format), chr(extension)));
+	wxLogMessage(s_fmt("Size limit: %d-%d", size_limit[0], size_limit[1]));
 
 	for (size_t a = 0; a < match_extension.size(); a++)
-		wxLogMessage(s_fmt(_T("Match Extension: \"%s\""), chr(match_extension[a])));
+		wxLogMessage(s_fmt("Match Extension: \"%s\"", chr(match_extension[a])));
 
 	for (size_t a = 0; a < match_name.size(); a++)
-		wxLogMessage(s_fmt(_T("Match Name: \"%s\""), chr(match_name[a])));
+		wxLogMessage(s_fmt("Match Name: \"%s\"", chr(match_name[a])));
 
 	for (size_t a = 0; a < match_size.size(); a++)
-		wxLogMessage(s_fmt(_T("Match Size: %d"), match_size[a]));
+		wxLogMessage(s_fmt("Match Size: %d", match_size[a]));
 
 	for (size_t a = 0; a < size_multiple.size(); a++)
-		wxLogMessage(s_fmt(_T("Size Multiple: %d"), size_multiple[a]));
+		wxLogMessage(s_fmt("Size Multiple: %d", size_multiple[a]));
 
-	wxLogMessage(_T("---"));
+	wxLogMessage("---");
 }
 
 void EntryType::copyToType(EntryType* target) {
@@ -271,7 +271,7 @@ bool EntryType::isThisType(ArchiveEntry* entry) {
 	}
 
 	// Check for entry section match if needed
-	if (section != _T("none")) {
+	if (section != "none") {
 		// Check entry is part of an archive (if not it can't be in a section)
 		if (!entry->getParent())
 			return false;
@@ -330,7 +330,7 @@ bool EntryType::readEntryTypeDefinition(MemChunk& mc) {
 			if (parent_type != EntryType::unknownType())
 				parent_type->copyToType(ntype);
 			else
-				wxLogMessage(_T("Warning: Entry type %s inherits from unknown type %s"), chr(ntype->getId()), chr(typenode->getInherit()));
+				wxLogMessage("Warning: Entry type %s inherits from unknown type %s", chr(ntype->getId()), chr(typenode->getInherit()));
 		}
 
 		// Go through all parsed fields
@@ -437,16 +437,16 @@ bool EntryType::loadEntryTypes() {
 
 	// Check resource archive exists
 	if (!res_archive) {
-		wxLogMessage(_T("Error: No resource archive open!"));
+		wxLogMessage("Error: No resource archive open!");
 		return false;
 	}
 
 	// Get entry types directory
-	zipdir_t* et_dir = ((ZipArchive*)res_archive)->getDirectory(_T("config/entry_types"));
+	zipdir_t* et_dir = ((ZipArchive*)res_archive)->getDirectory("config/entry_types");
 
 	// Check it exists
 	if (!et_dir) {
-		wxLogMessage(_T("Error: config/entry_types does not exist in slade.pk3"));
+		wxLogMessage("Error: config/entry_types does not exist in slade.pk3");
 		return false;
 	}
 
@@ -459,17 +459,17 @@ bool EntryType::loadEntryTypes() {
 
 	// Warn if no types were read (this shouldn't happen unless the resource archive is corrupted)
 	if (!etypes_read)
-		wxLogMessage(_T("Warning: No built-in entry types could be loaded from slade.pk3"));
+		wxLogMessage("Warning: No built-in entry types could be loaded from slade.pk3");
 
 	// -------- READ CUSTOM TYPES ---------
 
 	// If the directory doesn't exist create it
-	if (!wxDirExists(appPath(_T("entry_types"), DIR_USER)))
-		wxMkdir(appPath(_T("entry_types"), DIR_USER));
+	if (!wxDirExists(appPath("entry_types", DIR_USER)))
+		wxMkdir(appPath("entry_types", DIR_USER));
 
 	// Open the custom palettes directory
 	wxDir res_dir;
-	res_dir.Open(appPath(_T("entry_types"), DIR_USER));
+	res_dir.Open(appPath("entry_types", DIR_USER));
 
 	// Go through each file in the directory
 	string filename = wxEmptyString;
@@ -477,7 +477,7 @@ bool EntryType::loadEntryTypes() {
 	while (files) {
 		// Load file data
 		MemChunk mc;
-		mc.importFile(res_dir.GetName() + _T("/") + filename);
+		mc.importFile(res_dir.GetName() + "/" + filename);
 
 		// Parse file
 		readEntryTypeDefinition(mc);
@@ -588,7 +588,7 @@ void EntryType::cleanupEntryTypes() {
 void c_test_entry_types(vector<string> args) {
 	EntryType::loadEntryTypes();
 }
-ConsoleCommand et_test_entry_types(_T("test_entry_types"), &c_test_entry_types, 0);
+ConsoleCommand et_test_entry_types("test_entry_types", &c_test_entry_types, 0);
 
 
 /* Console Command - "test_entry_type_detection"
@@ -601,4 +601,4 @@ void c_test_entry_type_detection(vector<string> args) {
 		EntryType::detectEntryType(archive->getEntry(a));
 	}
 }
-ConsoleCommand et_test_entry_type_detection(_T("test_entry_type_detection"), &c_test_entry_type_detection, 0);
+ConsoleCommand et_test_entry_type_detection("test_entry_type_detection", &c_test_entry_type_detection, 0);

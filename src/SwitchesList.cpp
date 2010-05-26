@@ -122,7 +122,7 @@ bool SwitchesList::readSWITCHESData(ArchiveEntry* switches) {
 	while (cursor < eodata && *cursor != SWCH_STOP) {
 		// reads an entry
 		if (cursor + sizeof(switches_t) > eodata) {
-			wxLogMessage(_T("Error: SWITCHES entry is corrupt"));
+			wxLogMessage("Error: SWITCHES entry is corrupt");
 			delete[] data;
 			return false;
 		}
@@ -146,14 +146,14 @@ bool SwitchesList::convertSwitches(ArchiveEntry* entry, MemChunk* animdata) {
 	while (cursor < eodata && *cursor != SWCH_STOP) {
 		// reads an entry
 		if (cursor + sizeof(switches_t) > eodata) {
-			wxLogMessage(_T("Error: ANIMATED entry is corrupt"));
+			wxLogMessage("Error: ANIMATED entry is corrupt");
 			return false;
 		}
 		switches = (switches_t *) cursor;
 		cursor += sizeof(switches_t);
 
 		// Create animation string
-		conversion = s_fmt(_T("Switch\tDoom %d\t\t%-8s\tOn Pic\t%-8s\tTics 0\n"),
+		conversion = s_fmt("Switch\tDoom %d\t\t%-8s\tOn Pic\t%-8s\tTics 0\n",
 			switches->type, switches->off, switches->on);
 
 		// Write string to animdata

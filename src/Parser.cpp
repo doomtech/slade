@@ -86,9 +86,9 @@ bool ParseTreeNode::getBoolValue(unsigned index) {
 	if (index >= values.size())
 		return false;
 
-	if (s_cmpnocase(values[index], _T("false")) ||
-		s_cmpnocase(values[index], _T("0")) ||
-		s_cmpnocase(values[index], _T("no")))
+	if (s_cmpnocase(values[index], "false") ||
+		s_cmpnocase(values[index], "0") ||
+		s_cmpnocase(values[index], "no"))
 		return false;
 	else
 		return true;
@@ -123,10 +123,10 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 	string token = tz.getToken();
 
 	// Keep parsing until final } is reached (or end of file)
-	while (!(s_cmp(token, _T("}"))) && !token.IsEmpty()) {
+	while (!(s_cmp(token, "}")) && !token.IsEmpty()) {
 		// If it's a special character (ie not a valid name), parsing fails
 		if (tz.isSpecialCharacter(token.at(0))) {
-			wxLogMessage(_T("Parsing error: Unexpected special character"));
+			wxLogMessage("Parsing error: Unexpected special character");
 			return false;
 		}
 
@@ -137,26 +137,24 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 		string next = tz.peekToken();
 
 		// Assignment
-		if (s_cmp(next, _T("="))) {
+		if (s_cmp(next, "=")) {
 			// Skip =
 			tz.getToken();
 
 			// Create item node
 			ParseTreeNode* child = (ParseTreeNode*)addChild(name);
-			//wxLogMessage(_T("Item %s"), chr(name));
 
 			// Parse until ;
 			token = tz.getToken();
-			while (!(s_cmp(token, _T(";")))) {
+			while (!(s_cmp(token, ";"))) {
 				// Add value
 				child->values.push_back(token);
-				//wxLogMessage(_T("Value %s"), chr(token));
 
 				// Check for ,
-				if (s_cmp(tz.peekToken(), _T(",")))
+				if (s_cmp(tz.peekToken(), ","))
 					tz.getToken();	// Skip it
-				else if (!(s_cmp(tz.peekToken(), _T(";")))) {
-					wxLogMessage(_T("Parsing error: Expected \",\" or \";\", got \"%s\""), chr(tz.getToken()));
+				else if (!(s_cmp(tz.peekToken(), ";"))) {
+					wxLogMessage("Parsing error: Expected \",\" or \";\", got \"%s\"", chr(tz.getToken()));
 					return false;
 				}
 
@@ -165,10 +163,9 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 		}
 
 		// Child node
-		else if (s_cmp(next, _T("{"))) {
+		else if (s_cmp(next, "{")) {
 			// Add child node
 			ParseTreeNode* child = (ParseTreeNode*)addChild(name);
-			//wxLogMessage(_T("Child %s"), chr(name));
 
 			// Skip {
 			tz.getToken();
@@ -179,7 +176,7 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 		}
 
 		// Child node + inheritance
-		else if (s_cmp(next, _T(":"))) {
+		else if (s_cmp(next, ":")) {
 			// Skip :
 			tz.getToken();
 
@@ -187,13 +184,12 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 			string inherit = tz.getToken();
 
 			// Check for opening brace
-			if (tz.checkToken(_T("{"))) {
+			if (tz.checkToken("{")) {
 				// Add child node
 				ParseTreeNode* child = (ParseTreeNode*)addChild(name);
 
 				// Set its inheritance
 				child->inherit = inherit;
-				//wxLogMessage(_T("Child %s inherits %s"), chr(name), chr(inherit));
 
 				// Parse child node
 				if (!child->parse(tz))
@@ -203,7 +199,7 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 
 		// Unexpected token
 		else {
-			wxLogMessage(_T("Parsing error: \"%s\" unexpected"), chr(next));
+			wxLogMessage("Parsing error: \"%s\" unexpected", chr(next));
 			return false;
 		}
 
@@ -270,7 +266,7 @@ bool Parser::parseText(MemChunk& mc) {
 
 	// Open the given text data
 	if (!tz.openMem((const char*)mc.getData(), mc.getSize())) {
-		wxLogMessage(_T("Unable to open text data for parsing"));
+		wxLogMessage("Unable to open text data for parsing");
 		return false;
 	}
 
@@ -282,9 +278,9 @@ bool Parser::parseText(MemChunk& mc) {
 
 // Console test command
 void c_testparse(vector<string> args) {
-	string test = _T("root { item1 = value1; item2 = value1, value2; child1 { item1 = value1, value2, value3; item2 = value4; } child2 : child1 { item1 = value1; child3 { item1 = value1, value2; } } }");
+	string test = "root { item1 = value1; item2 = value1, value2; child1 { item1 = value1, value2, value3; item2 = value4; } child2 : child1 { item1 = value1; child3 { item1 = value1, value2; } } }";
 	Parser tp;
 	MemChunk mc((const uint8_t*)chr(test), test.Length());
 	tp.parseText(mc);
 }
-ConsoleCommand testparse(_T("testparse"), &c_testparse, 0);
+ConsoleCommand testparse("testparse", &c_testparse, 0);

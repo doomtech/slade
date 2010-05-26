@@ -49,12 +49,12 @@ struct grab_chunk_t {
 // Define valid flat sizes
 uint32_t valid_flat_size[][2] = {
 	{  10,  12 },	// gnum format
-	{  16,  16 },	// \ 
+	{  16,  16 },	// \
 	{  32,  64 },	// Strife startup sprite
 	{  48,  48 },	// /
 	{  64,  64 },	// standard flat size
 	{  64, 128 },	// Hexen flat size variant
-	{ 128, 128 },	// \ 
+	{ 128, 128 },	// \
 	{ 256, 256 },	// hires flat size
 	{ 512, 512 },	// /
 	{ 320, 200 },	// full screen format
@@ -186,7 +186,7 @@ void SImage::setXOffset(int offset) {
 	offset_x = offset;
 
 	// Announce change
-	announce(_T("offsets_changed"));
+	announce("offsets_changed");
 }
 
 /* SImage::setYOffset
@@ -197,7 +197,7 @@ void SImage::setYOffset(int offset) {
 	offset_y = offset;
 
 	// Announce change
-	announce(_T("offsets_changed"));
+	announce("offsets_changed");
 }
 
 /* SImage::clearData
@@ -227,7 +227,7 @@ void SImage::clear() {
 	offset_y = 0;
 
 	// Announce change
-	announce(_T("image_changed"));
+	announce("image_changed");
 }
 
 /* SImage::fillAlpha
@@ -252,7 +252,7 @@ void SImage::fillAlpha(uint8_t alpha) {
 	}
 
 	// Announce change
-	announce(_T("image_changed"));
+	announce("image_changed");
 }
 
 /* SImage::findUnusedColour
@@ -332,7 +332,7 @@ bool SImage::trim(int width, int height) {
 	}
 
 	// Announce change
-	announce(_T("image_changed"));
+	announce("image_changed");
 
 	return false;
 }
@@ -353,13 +353,13 @@ bool SImage::validFlatSize() {
 bool SImage::loadImage(const uint8_t* img_data, int size) {
 	// Check data
 	if (!img_data) {
-		Global::error = _T("Invalid data given");
+		Global::error = "Invalid data given";
 		return false;
 	}
 
 	// Check size
 	if (size < 8) {
-		Global::error = _T("Invalid data size");
+		Global::error = "Invalid data size";
 		return false;
 	}
 
@@ -375,7 +375,7 @@ bool SImage::loadImage(const uint8_t* img_data, int size) {
 
 	// Check it created/read ok
 	if (!bm) {
-		Global::error = _T("Unable to read image data (unsupported format?)");
+		Global::error = "Unable to read image data (unsupported format?)";
 		return false;
 	}
 
@@ -466,7 +466,7 @@ bool SImage::loadImage(const uint8_t* img_data, int size) {
 	FreeImage_Unload(bm);
 
 	// Announce change
-	announce(_T("image_changed"));
+	announce("image_changed");
 
 	// Return success
 	return true;
@@ -591,7 +591,7 @@ bool SImage::loadDoomGfx(const uint8_t* gfx_data, int size, uint8_t version) {
 	}
 
 	// Announce change
-	announce(_T("image_changed"));
+	announce("image_changed");
 
 	// Return success
 	return true;
@@ -655,7 +655,7 @@ bool SImage::loadDoomFlat(const uint8_t* gfx_data, int size) {
 	memset(mask, 255, width*height);
 
 	// Announce change
-	announce(_T("image_changed"));
+	announce("image_changed");
 
 	return true;
 }
@@ -738,7 +738,7 @@ bool SImage::loadSCSprite(const uint8_t* gfx_data, int size) {
 	}
 
 	// Announce change
-	announce(_T("image_changed"));
+	announce("image_changed");
 
 	return true;
 }
@@ -818,7 +818,7 @@ bool SImage::loadDoomLegacy(const uint8_t* gfx_data, int size) {
 	}
 
 	// Announce change
-	announce(_T("image_changed"));
+	announce("image_changed");
 
 	return true;
 }
@@ -858,7 +858,7 @@ bool SImage::loadDoomArah(const uint8_t* gfx_data, int size) {
 		if (data[i] == 0) mask[i] = 0;
 
 	// Announce change
-	announce(_T("image_changed"));
+	announce("image_changed");
 
 	return true;
 }
@@ -866,8 +866,8 @@ bool SImage::loadDoomArah(const uint8_t* gfx_data, int size) {
 /* SImage::loadDoomSnea
  * Loads a Doom alpha "snea" format image, using the given palette.
  * I have no idea if "snea" if the official name of the format, or
- * even what it is supposed to mean, but that's how DeuTex calls 
- * them, and it's the only available tool that can read them as far 
+ * even what it is supposed to mean, but that's how DeuTex calls
+ * them, and it's the only available tool that can read them as far
  * as I know, so this name will do.
  * Returns false if the image data was invalid, true otherwise.
  *******************************************************************/
@@ -882,7 +882,7 @@ bool SImage::loadDoomSnea(const uint8_t* gfx_data, int size) {
 	width = qwidth * 4;
 	height = gfx_data[1];
 
-	// The TITLEPIC in the Doom Press-Release Beta has 
+	// The TITLEPIC in the Doom Press-Release Beta has
 	// two extraneous null bytes at the end for padding.
 	if (size == 64004 && qwidth == 80 && height == 200)
 		size = 64002;
@@ -910,7 +910,7 @@ bool SImage::loadDoomSnea(const uint8_t* gfx_data, int size) {
 	uint8_t* brush = data;
 
 	// Algorithm taken from DeuTex.
-	// I do not pretend to understand it, 
+	// I do not pretend to understand it,
 	// but my own attempt didn't work.
 	while (pixel < entryend) {
 		*brush = *pixel++;
@@ -926,7 +926,7 @@ bool SImage::loadDoomSnea(const uint8_t* gfx_data, int size) {
 	memset(mask, 255, width*height);
 
 	// Announce change
-	announce(_T("image_changed"));
+	announce("image_changed");
 
 	return true;
 }
@@ -962,7 +962,7 @@ bool SImage::loadPlanar(const uint8_t* gfx_data, int size) {
 
 	// Initialize the bitmap palette.
 	for (int i = 0; i < 16; ++i) {
-		color.rgbRed   = gfx_data[i*3+0]; 
+		color.rgbRed   = gfx_data[i*3+0];
 		color.rgbGreen = gfx_data[i*3+1];
 		color.rgbBlue  = gfx_data[i*3+2];
 		// Convert from 6-bit per component to 8-bit per component.
@@ -1077,7 +1077,7 @@ bool SImage::loadImgz(const uint8_t* gfx_data, int size) {
 	}
 	else {
 		// Since gfx_data is a const pointer, we can't work on it.
-		uint8_t * tempdata = new uint8_t[size]; 
+		uint8_t * tempdata = new uint8_t[size];
 		memcpy(tempdata, gfx_data, size);
 
 		// We'll use wandering pointers. The original pointer is kept for cleanup.
@@ -1093,7 +1093,7 @@ bool SImage::loadImgz(const uint8_t* gfx_data, int size) {
 			if (code < 0x80) {
 				length = code + 1;
 				memcpy(dest, read, length);
-				dest+=length; 
+				dest+=length;
 				read+=length;
 			}
 			else if (code > 0x80) {
@@ -1112,7 +1112,7 @@ bool SImage::loadImgz(const uint8_t* gfx_data, int size) {
 /* SImage::loadFont0
  * Loads a Doom alpha HUFONT lump and displays it as a picture.
  * Why "font0" when it has no FON0 header? Because alpha. ;)
- * The format used is simple: 
+ * The format used is simple:
  * Offset | Length | Type | Name
  *  0x000 |      2 | ui16 | image height (one value for all chars)
  *  0x002 |  256*1 | ui08 | characterwidth (one value per char)
@@ -1221,7 +1221,7 @@ bool SImage::loadFont1(const uint8_t* gfx_data, int size) {
 		if (code < 0x80) {
 			length = code + 1;
 			memcpy(dest, read, length);
-			dest+=length; 
+			dest+=length;
 			read+=length;
 		}
 		else if (code > 0x80) {
@@ -1238,7 +1238,7 @@ bool SImage::loadFont1(const uint8_t* gfx_data, int size) {
 			mask[i] = 0x00;
 
 	// Announce change
-	announce(_T("image_changed"));
+	announce("image_changed");
 
 	return true;
 }
@@ -1301,7 +1301,7 @@ bool SImage::loadFont2(const uint8_t* gfx_data, int size) {
 			p+=2;
 	}
 
-	// Let's build the palette now. 
+	// Let's build the palette now.
 	for (size_t i = 0; i < header->palsize + 1u; ++i) {
 		rgba_t color;
 		color.r = *p++;
@@ -1336,7 +1336,7 @@ bool SImage::loadFont2(const uint8_t* gfx_data, int size) {
 						return false;
 					}
 					memcpy(d, p, length);
-					d+=length; 
+					d+=length;
 					p+=length;
 					numpixels -= length;
 				}
@@ -1466,14 +1466,14 @@ bool SImage::loadBMF(const uint8_t* gfx_data, int size) {
 	// Palette index 0 is used as the transparent color and not described at all.
 	palette.setColour(0, rgba_t(0, 0, 0, 0));
 	for (size_t i = 0; i < mf.pal_size; ++i) {
-		palette.setColour(i+1, rgba_t((ofs[(i*3)]<<2)+(ofs[(i*3)]>>4), 
+		palette.setColour(i+1, rgba_t((ofs[(i*3)]<<2)+(ofs[(i*3)]>>4),
 			(ofs[(i*3)+1]<<2)+(ofs[(i*3)]>>4), (ofs[(i*3)+2]<<2)+(ofs[(i*3)+2]>>4), 255));
 	}
 
 	// Move to after the palette and get amount of characters
 	ofs += mf.pal_size*3;
 	if (ofs >= eod) {
-		wxLogMessage(_T("BMF aborted: no data after palette"));
+		wxLogMessage("BMF aborted: no data after palette");
 		return false;
 	}
 	mf.info_size = ofs[0];
@@ -1488,7 +1488,7 @@ bool SImage::loadBMF(const uint8_t* gfx_data, int size) {
 	// Now we are at the beginning of character data
 	ofs+=2;
 	if (ofs >= eod) {
-		wxLogMessage(_T("BMF aborted: no data after char size"));
+		wxLogMessage("BMF aborted: no data after char size");
 		return false;
 	}
 	// Let's create each character's data and compute the total size
@@ -1734,11 +1734,11 @@ bool SImage::toPNG(MemChunk& out, Palette8bit* pal) {
 	FreeImage_FlipVertical(bm);
 
 	// Write the image to a temp file
-	FreeImage_Save(FIF_PNG, bm, chr(appPath(_T("temp.png"), DIR_TEMP)));
+	FreeImage_Save(FIF_PNG, bm, chr(appPath("temp.png", DIR_TEMP)));
 
 	// Load it into a memchunk
 	MemChunk png;
-	png.importFile(appPath(_T("temp.png"), DIR_TEMP));
+	png.importFile(appPath("temp.png", DIR_TEMP));
 	const uint8_t* png_data = png.getData();
 
 	// Write PNG header and IHDR
@@ -1760,7 +1760,7 @@ bool SImage::toPNG(MemChunk& out, Palette8bit* pal) {
 	out.write(png_data + 33, png.getSize() - 33);
 
 	// Clean up
-	wxRemoveFile(appPath(_T("temp.png"), DIR_TEMP));
+	wxRemoveFile(appPath("temp.png", DIR_TEMP));
 
 	// Success
 	return true;
@@ -1783,7 +1783,7 @@ struct column_t {
 bool SImage::toDoomGfx(MemChunk& out, uint8_t alpha_threshold) {
 	// Check if data is paletted
 	if (format != PALMASK) {
-		wxLogMessage(_T("Cannot convert truecolour image to doom gfx format - convert to 256-colour first."));
+		wxLogMessage("Cannot convert truecolour image to doom gfx format - convert to 256-colour first.");
 		return false;
 	}
 
@@ -1875,7 +1875,7 @@ bool SImage::toDoomGfx(MemChunk& out, uint8_t alpha_threshold) {
 	header.left = offset_x;
 	header.width = getWidth();
 	header.height = getHeight();
-	
+
 	// Byteswap header values if needed
 	header.top = wxINT16_SWAP_ON_BE(header.top);
 	header.left = wxINT16_SWAP_ON_BE(header.left);
@@ -1946,13 +1946,13 @@ bool SImage::toDoomGfx(MemChunk& out, uint8_t alpha_threshold) {
 bool SImage::toDoomFlat(MemChunk& out) {
 	// Check if data is paletted
 	if (format != PALMASK) {
-		wxLogMessage(_T("Cannot convert truecolour image to doom flat format - convert to 256-colour first."));
+		wxLogMessage("Cannot convert truecolour image to doom flat format - convert to 256-colour first.");
 		return false;
 	}
 
 	// Check image size
 	if (!validFlatSize()) {
-		wxLogMessage(_T("Cannot convert to doom flat format, invalid size (must be either 64x64, 64x128, 128x128 or 320x200)"));
+		wxLogMessage("Cannot convert to doom flat format, invalid size (must be either 64x64, 64x128, 128x128 or 320x200)");
 		return false;
 	}
 
@@ -1970,18 +1970,18 @@ bool SImage::toDoomFlat(MemChunk& out) {
 bool SImage::toPlanar(MemChunk& out, Palette8bit* pal) {
 	// Check if data is paletted
 	if (format != PALMASK) {
-		wxLogMessage(_T("Cannot convert truecolour image to planar format - convert to 16-colour first."));
+		wxLogMessage("Cannot convert truecolour image to planar format - convert to 16-colour first.");
 		return false;
 	}
 
 	if (countColours() > 16) {
-		wxLogMessage(s_fmt(_T("Cannot convert to planar format, too many colors (%d)"), countColours()));
+		wxLogMessage(s_fmt("Cannot convert to planar format, too many colors (%d)"), countColours());
 		return false;
 	}
 
 	// Check image size
 	if (!(width == 640 && height == 480)) {
-		wxLogMessage(_T("Cannot convert to planar format, invalid size (must be 640x480)"));
+		wxLogMessage("Cannot convert to planar format, invalid size (must be 640x480)");
 		return false;
 	}
 
@@ -2055,18 +2055,18 @@ bool SImage::toPlanar(MemChunk& out, Palette8bit* pal) {
 bool SImage::to4bitChunk(MemChunk& out, Palette8bit* pal) {
 	// Check if data is paletted
 	if (format != PALMASK) {
-		wxLogMessage(_T("Cannot convert truecolour image to 4-bit format - convert to 16-colour first."));
+		wxLogMessage("Cannot convert truecolour image to 4-bit format - convert to 16-colour first.");
 		return false;
 	}
 
 	if (countColours() > 16) {
-		wxLogMessage(s_fmt(_T("Cannot convert to 4-bit format, too many colors (%d)"), countColours()));
+		wxLogMessage(s_fmt("Cannot convert to 4-bit format, too many colors (%d)"), countColours());
 		return false;
 	}
 
 	// Check image size
 	if (!((width == 4 && height == 16) || (width == 16 && height == 23))) {
-		wxLogMessage(_T("No point in converting to 4-bit format, image isn't a valid Hexen size (4x16 or 16x23)"));
+		wxLogMessage("No point in converting to 4-bit format, image isn't a valid Hexen size (4x16 or 16x23)");
 		return false;
 	}
 
@@ -2125,7 +2125,7 @@ bool SImage::convertRGBA(Palette8bit* pal) {
 	has_palette = false;
 
 	// Announce change
-	announce(_T("image_changed"));
+	announce("image_changed");
 
 	// Done
 	return true;
@@ -2205,7 +2205,7 @@ bool SImage::convertPaletted(Palette8bit* pal_target, Palette8bit* pal_current) 
 	FreeImage_Unload(pbm);
 
 	// Announce change
-	announce(_T("image_changed"));
+	announce("image_changed");
 
 	// Success
 	return true;
@@ -2261,7 +2261,7 @@ bool SImage::maskFromColour(rgba_t colour, Palette8bit* pal, bool force_mask) {
 		return false;
 
 	// Announce change
-	announce(_T("image_changed"));
+	announce("image_changed");
 
 	return true;
 }
@@ -2303,7 +2303,7 @@ bool SImage::cutoffMask(uint8_t threshold, bool force_mask) {
 		return false;
 
 	// Announce change
-	announce(_T("image_changed"));
+	announce("image_changed");
 
 	return true;
 }

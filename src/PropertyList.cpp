@@ -110,7 +110,7 @@ string PropertyList::toString() {
 		// Add "key = value;\n" to the return string
 		string key = i->first;
 		string val = i->second;
-		ret += key + _T(" = ") + val + _T(";\n");
+		ret += key + " = " + val + ";\n";
 
 		// Next property
 		i++;

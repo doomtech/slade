@@ -19,7 +19,7 @@ bool MapLine::parseUDMF(Tokenizer& tz) {
 
 	// TODO: Read line definition
 	string token = tz.getToken();
-	while (token != _T("}")) {
+	while (token != "}") {
 
 		token = tz.getToken();
 	}

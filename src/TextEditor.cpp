@@ -49,7 +49,7 @@ TextEditor::TextEditor(wxWindow* parent, int id)
 
 	// Line numbers by default
 	SetMarginType(0, wxSTC_MARGIN_NUMBER);
-	SetMarginWidth(0, TextWidth(wxSTC_STYLE_LINENUMBER, _T("9999")));
+	SetMarginWidth(0, TextWidth(wxSTC_STYLE_LINENUMBER, "9999"));
 	SetMarginWidth(1, 4);
 
 	// Test colours
@@ -82,7 +82,7 @@ bool TextEditor::loadEntry(ArchiveEntry* entry) {
 
 	// Check that the entry exists
 	if (!entry) {
-		Global::error = _T("Invalid archive entry given");
+		Global::error = "Invalid archive entry given";
 		return false;
 	}
 
@@ -120,7 +120,7 @@ void TextEditor::onModified(wxStyledTextEvent& e) {
 
 void TextEditor::onTextChanged(wxStyledTextEvent& e) {
 	// Update line numbers margin width
-	string numlines = s_fmt(_T("0%d"), GetNumberOfLines());
+	string numlines = s_fmt("0%d", GetNumberOfLines());
 	SetMarginWidth(0, TextWidth(wxSTC_STYLE_LINENUMBER, numlines));
 	e.Skip();
 }
@@ -136,7 +136,7 @@ bool TextEditor::loadHexEntry(ArchiveEntry* entry) {
 
 	// Check that the entry exists
 	if (!entry) {
-		Global::error = _T("Invalid archive entry given");
+		Global::error = "Invalid archive entry given";
 		return false;
 	}
 

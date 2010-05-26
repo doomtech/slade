@@ -2,23 +2,23 @@
 /*******************************************************************
  * SLADE - It's a Doom Editor
  * Copyright (C) 2008 Simon Judd
- * 
+ *
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
  * Filename:    SwitchesEntryPanel.cpp
  * Description: SwitchesEntryPanel class. The UI for editing Boom
  *              SWITCHES lumps.
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -45,17 +45,17 @@
  * SwitchesEntryPanel class constructor
  *******************************************************************/
 SwitchesEntryPanel::SwitchesEntryPanel(wxWindow* parent)
-: EntryPanel(parent, _T("switches")) {
+: EntryPanel(parent, "switches") {
 	// Setup panel sizer
 	wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
 	sizer_main->Add(sizer, 1, wxEXPAND, 0);
-	
+
 	// Add editing controls
 	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
 	sizer_bottom->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
- 
+
 	// Add entry list
-	wxStaticBox* frame = new wxStaticBox(this, -1, _T("Switches"));
+	wxStaticBox* frame = new wxStaticBox(this, -1, "Switches");
 	wxStaticBoxSizer* framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
 	list_entries = new ListView(this, -1);
 	list_entries->showIcons(false);
@@ -108,19 +108,19 @@ void SwitchesEntryPanel::populateEntryList() {
 	list_entries->ClearAll();
 
 	// Add columns
-	list_entries->InsertColumn(0, _T("Off Texture"));
-	list_entries->InsertColumn(1, _T("On Texture"));
-	list_entries->InsertColumn(2, _T("Range"));
+	list_entries->InsertColumn(0, "Off Texture");
+	list_entries->InsertColumn(1, "On Texture");
+	list_entries->InsertColumn(2, "Range");
 
 	// Add each switch to the list
 	list_entries->enableSizeUpdate(false);
 	for (uint32_t a = 0; a < switches.nEntries(); a++) {
 		SwitchesEntry* ent = switches.getEntry(a);
-		string cols[] = { ent->getOff(), ent->getOn(), 
-			ent->getType() >= SWCH_COMM ? _T("Commercial")
-			: ent->getType() == SWCH_FULL ? _T("Registered")
-			: ent->getType() == SWCH_DEMO ? _T("Shareware")
-			: _T("BugBugBug") };
+		string cols[] = { ent->getOff(), ent->getOn(),
+			ent->getType() >= SWCH_COMM ? "Commercial"
+			: ent->getType() == SWCH_FULL ? "Registered"
+			: ent->getType() == SWCH_DEMO ? "Shareware"
+			: "BugBugBug" };
 		list_entries->addItem(a, wxArrayString(3, cols));
 	}
 

@@ -93,7 +93,7 @@ CTPatch* CTexture::getPatch(size_t index) {
  * Clears all texture data
  *******************************************************************/
 void CTexture::clear() {
-	this->name = _T("");
+	this->name = "";
 	this->width = 0;
 	this->height = 0;
 	this->scale_x = 1.0;
@@ -117,7 +117,7 @@ bool CTexture::addPatch(patch_t& patch, int16_t offset_x, int16_t offset_y, int 
 		patches.push_back(np);
 
 	// Announce
-	announce(_T("patches_modified"));
+	announce("patches_modified");
 
 	return true;
 }
@@ -135,7 +135,7 @@ bool CTexture::removePatch(size_t index) {
 	patches.erase(patches.begin() + index);
 
 	// Announce
-	announce(_T("patches_modified"));
+	announce("patches_modified");
 
 	return true;
 }
@@ -150,7 +150,7 @@ bool CTexture::replacePatch(size_t index, patch_t newpatch) {
 	patches[index].setPatchEntry(newpatch.entry);
 
 	// Announce
-	announce(_T("patches_modified"));
+	announce("patches_modified");
 
 	return true;
 }
@@ -171,7 +171,7 @@ bool CTexture::duplicatePatch(size_t index, int16_t offset_x, int16_t offset_y) 
 	patches[index+1].setOffsetY(dp.yOffset() + offset_y);
 
 	// Announce
-	announce(_T("patches_modified"));
+	announce("patches_modified");
 
 	return true;
 }
@@ -191,7 +191,7 @@ bool CTexture::swapPatches(size_t p1, size_t p2) {
 	patches[p2] = temp;
 
 	// Announce
-	announce(_T("patches_modified"));
+	announce("patches_modified");
 
 	return true;
 }
@@ -218,7 +218,7 @@ bool CTexture::fromTX(tx_texture_t& info, PatchTable& ptable) {
 
 	// Flags
 	if (info.flags & TX_WORLDPANNING)
-		ex_props.addFlag(_T("WorldPanning"));
+		ex_props.addFlag("WorldPanning");
 
 	// Setup patches
 	for (size_t a = 0; a < info.patches.size(); a++) {
@@ -227,7 +227,7 @@ bool CTexture::fromTX(tx_texture_t& info, PatchTable& ptable) {
 
 		// Check patch index is in range
 		if (index >= ptable.nPatches()) {
-			wxLogMessage(_T("Texture %s contains invalid patch index %d"), name.c_str(), index);
+			wxLogMessage("Texture %s contains invalid patch index %d", name.c_str(), index);
 			continue;
 		}
 
@@ -259,7 +259,7 @@ bool CTexture::toTX(tx_texture_t& info, PatchTable& ptable) {
 
 	// Write flags
 	uint16_t flags = 0;
-	if (ex_props.propertyExists(_T("WorldPanning")))
+	if (ex_props.propertyExists("WorldPanning"))
 		flags |= TX_WORLDPANNING;
 	info.flags = flags;
 
@@ -271,7 +271,7 @@ bool CTexture::toTX(tx_texture_t& info, PatchTable& ptable) {
 		if (index < 0)
 			index = ptable.patchIndex(patches[a].getPatchEntry());
 		if (index < 0) {
-			wxLogMessage(_T("Could not find patch %s in patch table"), patches[a].getPatchName().c_str());
+			wxLogMessage("Could not find patch %s in patch table", patches[a].getPatchName().c_str());
 			continue;
 		}
 

@@ -47,13 +47,13 @@
  * VARIABLES
  *******************************************************************/
 namespace Global {
-	string error = _T("");
-	string version = _T("3.0 beta 5");
+	string error = "";
+	string version = "3.0 beta 5";
 }
 MainWindow*		main_window = NULL;
-string	dir_data = _T("");
-string	dir_user = _T("");
-string	dir_app = _T("");
+string	dir_data = "";
+string	dir_user = "";
+string	dir_app = "";
 
 
 /*******************************************************************
@@ -77,7 +77,7 @@ private:
 
 public:
 	SLADEStackTrace() {
-		stack_trace = _T("Stack Trace:\n");
+		stack_trace = "Stack Trace:\n";
 	}
 
 	~SLADEStackTrace() {
@@ -90,7 +90,7 @@ public:
 	void OnStackFrame(const wxStackFrame& frame) {
 		string location = wxEmptyString;
 		if (frame.HasSourceLocation())
-			location = s_fmt(_T("(%s:%d) "), frame.GetFileName().c_str(), frame.GetLine());
+			location = s_fmt("(%s:%d) ", frame.GetFileName().c_str(), frame.GetLine());
 
 		string parameters = wxEmptyString;
 		/*
@@ -100,14 +100,14 @@ public:
 			string value = wxEmptyString;
 			frame.GetParam(a, &type, &name, &value);
 
-			parameters.Append(s_fmt(_T("%s %s = %s"), type.c_str(), name.c_str(), value.c_str()));
+			parameters.Append(s_fmt("%s %s = %s", type.c_str(), name.c_str(), value.c_str()));
 
 			if (a < frame.GetParamCount() - 1)
-				parameters.Append(_T(", "));
+				parameters.Append(", );
 		}
 		*/
 
-		stack_trace.Append(s_fmt(_T("%d: %s%s(%s)\n"), frame.GetLevel(), location.c_str(), frame.GetName().c_str(), parameters.c_str()));
+		stack_trace.Append(s_fmt("%d: %s%s(%s)\n", frame.GetLevel(), location.c_str(), frame.GetName().c_str(), parameters.c_str()));
 	}
 };
 
@@ -121,13 +121,13 @@ private:
 	wxTextCtrl*	text_stack;
 
 public:
-	SLADECrashDialog(SLADEStackTrace& st) : wxDialog(wxTheApp->GetTopWindow(), -1, _T("SLADE3 Application Crash")) {
+	SLADECrashDialog(SLADEStackTrace& st) : wxDialog(wxTheApp->GetTopWindow(), -1, "SLADE3 Application Crash") {
 		// Setup sizer
 		wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 		SetSizer(sizer);
 
 		// Add general crash method
-		string message = _T("SLADE3 has crashed unexpectedly. To help fix the problem that caused this crash,\nplease copy+paste the information from the window below to a text file, and email\nit to <sirjuddington@gmail.com> along with a description of what you were\ndoing at the time of the crash. Sorry for the inconvenience.");
+		string message = "SLADE3 has crashed unexpectedly. To help fix the problem that caused this crash,\nplease copy+paste the information from the window below to a text file, and email\nit to <sirjuddington@gmail.com> along with a description of what you were\ndoing at the time of the crash. Sorry for the inconvenience.";
 		sizer->Add(new wxStaticText(this, -1, message), 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 4);
 
 		// Add stack trace text area
@@ -137,7 +137,7 @@ public:
 		sizer->Add(text_stack, 1, wxEXPAND|wxALL, 4);
 
 		// Dump stack trace to a file (just in case)
-		wxFile file(appPath(_T("slade3_crash.log"), DIR_APP), wxFile::write);
+		wxFile file(appPath("slade3_crash.log", DIR_APP), wxFile::write);
 		file.Write(st.getTraceString());
 		file.Close();
 
@@ -168,9 +168,9 @@ public:
 string appPath(string filename, int dir) {
 	// Setup separator character
 #ifdef WIN32
-	string sep = _T("\\");
+	string sep = "\\";
 #else
-	string sep = _T("/");
+	string sep = "/";
 #endif
 
 	if (dir == DIR_DATA)
@@ -210,7 +210,7 @@ bool MainApp::initDirectories() {
 	dir_app = wxFileName(wxStandardPaths::Get().GetExecutablePath()).GetPath();
 
 	// Check for portable install
-	if (wxFileExists(appPath(_T("portable"), DIR_APP))) {
+	if (wxFileExists(appPath("portable", DIR_APP))) {
 		dir_user = dir_data = dir_app;
 		return true;
 	}
@@ -219,7 +219,7 @@ bool MainApp::initDirectories() {
 	dir_user = wxStandardPaths::Get().GetUserDataDir();
 	if (!wxDirExists(dir_user)) {
 		if (!wxMkdir(dir_user)) {
-			wxMessageBox(s_fmt(_T("Unable to create user directory \"%s\""), dir_user.c_str()), _T("Error"), wxICON_ERROR);
+			wxMessageBox(s_fmt("Unable to create user directory \"%s\"", dir_user.c_str()), "Error", wxICON_ERROR);
 			return false;
 		}
 	}
@@ -237,10 +237,10 @@ bool MainApp::initDirectories() {
  *******************************************************************/
 bool MainApp::OnInit() {
 	// Init global variables
-	Global::error = _T("");
+	Global::error = "";
 
 	// Set application name (for wx directory stuff)
-	wxApp::SetAppName(_T("slade3"));
+	wxApp::SetAppName("slade3");
 
 	// Handle exceptions using wxDebug stuff
 	wxHandleFatalExceptions(true);
@@ -257,27 +257,27 @@ bool MainApp::OnInit() {
 	initLogFile();
 
 	// Load configuration file
-	wxLogMessage(_T("Loading configuration"));
+	wxLogMessage("Loading configuration");
 	readConfigFile();
 
 	// Check that SLADE.pk3 can be found
-	wxLogMessage(_T("Loading slade.pk3"));
+	wxLogMessage("Loading slade.pk3");
 	if (!theArchiveManager->resArchiveOK())
 		return false;
 
 	// Show splash screen
 	theSplashWindow->init();
-	theSplashWindow->show(_T("Starting up..."));
+	theSplashWindow->show("Starting up...");
 
 	// Load program icons
-	wxLogMessage(_T("Loading icons"));
+	wxLogMessage("Loading icons");
 	loadIcons();
 
 	// Create the main window
 	main_window = new MainWindow();
 
 	// Load entry types
-	wxLogMessage(_T("Loading entry types"));
+	wxLogMessage("Loading entry types");
 	EntryDataFormat::initBuiltinFormats();
 	EntryType::loadEntryTypes();
 
@@ -293,7 +293,7 @@ bool MainApp::OnInit() {
 	// Hide splash screen
 	theSplashWindow->hide();
 
-	wxLogMessage(_T("SLADE Initialisation OK"));
+	wxLogMessage("SLADE Initialisation OK");
 
 	return true;
 }
@@ -332,15 +332,15 @@ void MainApp::OnFatalException() {
 void MainApp::initLogFile() {
 	// Set wxLog target(s)
 	wxLog::SetActiveTarget(new SLADELog());
-	FILE* log_file = fopen(chr(appPath(_T("slade3.log"), DIR_USER)), "wt");
+	FILE* log_file = fopen(chr(appPath("slade3.log", DIR_USER)), "wt");
 	new wxLogChain(new wxLogStderr(log_file));
 
 	// Write logfile header
 	string year = wxNow().Right(4);
-	wxLogMessage(_T("SLADE - It's a Doom Editor"));
-	wxLogMessage(_T("Version %s"), Global::version.c_str());
-	wxLogMessage(_T("Written by Simon Judd, 2008-%s"), year.c_str());
-	wxLogMessage(_T("--------------------------------"));
+	wxLogMessage("SLADE - It's a Doom Editor");
+	wxLogMessage("Version %s", Global::version.c_str());
+	wxLogMessage("Written by Simon Judd, 2008-%s", year.c_str());
+	wxLogMessage("--------------------------------");
 }
 
 /* MainApp::readConfigFile
@@ -349,19 +349,19 @@ void MainApp::initLogFile() {
 void MainApp::readConfigFile() {
 	// Open SLADE.cfg
 	Tokenizer tz;
-	if (!tz.openFile(appPath(_T("slade3.cfg"), DIR_USER)))
+	if (!tz.openFile(appPath("slade3.cfg", DIR_USER)))
 		return;
 
 	// Go through the file with the tokenizer
 	string token = tz.getToken();
-	while (token.Cmp(_T(""))) {
+	while (token.Cmp("")) {
 		// If we come across a 'cvars' token, read in the cvars section
-		if (!token.Cmp(_T("cvars"))) {
+		if (!token.Cmp("cvars")) {
 			token = tz.getToken();	// Skip '{'
 
 			// Keep reading name/value pairs until we hit the ending '}'
 			string cvar_name = tz.getToken();
-			while (cvar_name.Cmp(_T("}"))) {
+			while (cvar_name.Cmp("}")) {
 				string cvar_val = tz.getToken();
 				read_cvar(cvar_name, cvar_val);
 				cvar_name = tz.getToken();
@@ -369,18 +369,18 @@ void MainApp::readConfigFile() {
 		}
 
 		// Read saved main window AUI layout
-		if (!token.Cmp(_T("main_window_layout"))) {
+		if (!token.Cmp("main_window_layout")) {
 			main_window_layout = tz.getToken();
 		}
 
 		// Read base resource archive paths
-		if (!token.Cmp(_T("base_resource_paths"))) {
+		if (!token.Cmp("base_resource_paths")) {
 			// Skip {
 			token = tz.getToken();
 
 			// Read paths until closing brace found
 			token = tz.getToken();
-			while (token.Cmp(_T("}"))) {
+			while (token.Cmp("}")) {
 				theArchiveManager->addBaseResourcePath(token);
 				token = tz.getToken();
 			}
@@ -396,41 +396,41 @@ void MainApp::readConfigFile() {
  *******************************************************************/
 void MainApp::saveConfigFile() {
 	// Open SLADE.cfg for writing text
-	wxFile file(appPath(_T("slade3.cfg"), DIR_USER), wxFile::write);
+	wxFile file(appPath("slade3.cfg", DIR_USER), wxFile::write);
 
 	// Do nothing if it didn't open correctly
 	if (!file.IsOpened())
 		return;
 
 	// Write cfg header
-	file.Write(_T("/*****************************************************\n"));
-	file.Write(_T(" * SLADE Configuration File\n"));
-	file.Write(_T(" * Don't edit this unless you know what you're doing\n"));
-	file.Write(_T(" *****************************************************/\n\n"));
+	file.Write("/*****************************************************\n");
+	file.Write(" * SLADE Configuration File\n");
+	file.Write(" * Don't edit this unless you know what you're doing\n");
+	file.Write(" *****************************************************/\n\n");
 
 	// Write cvars
 	save_cvars(file);
 
 	// Write main window AUI layout
-	string layout = s_fmt(_T("%3d%s"), MW_LAYOUT_VERS, main_window_layout.c_str());
-	file.Write(s_fmt(_T("main_window_layout \"%s\"\n"), chr(layout)));
+	string layout = s_fmt("%3d%s", MW_LAYOUT_VERS, main_window_layout.c_str());
+	file.Write(s_fmt("main_window_layout \"%s\"\n", chr(layout)));
 
 	// Write base resource archive paths
-	file.Write(_T("\nbase_resource_paths\n{\n"));
+	file.Write("\nbase_resource_paths\n{\n");
 	for (size_t a = 0; a < theArchiveManager->baseResourceListLength(); a++)
-		file.Write(s_fmt(_T("\t\"%s\"\n"), theArchiveManager->baseResourcePath(a)));
-	file.Write(_T("}\n"));
+		file.Write(s_fmt("\t\"%s\"\n", theArchiveManager->baseResourcePath(a)));
+	file.Write("}\n");
 
 	// Close configuration file
-	file.Write(_T("\n// End Configuration File\n\n"));
+	file.Write("\n// End Configuration File\n\n");
 }
 
 
 
 void c_crash(vector<string> args) {
-	if (wxMessageBox(_T("Yes, this command does actually exist and *will* crash the program. Do you really want it to crash?"), _T("...Really?"), wxYES_NO|wxCENTRE) == wxYES) {
+	if (wxMessageBox("Yes, this command does actually exist and *will* crash the program. Do you really want it to crash?", "...Really?", wxYES_NO|wxCENTRE) == wxYES) {
 		uint8_t* test = NULL;
 		test[123] = 5;
 	}
 }
-ConsoleCommand crash(_T("crash"), &c_crash, 0);
+ConsoleCommand crash("crash", &c_crash, 0);

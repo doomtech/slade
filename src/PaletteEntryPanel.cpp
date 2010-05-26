@@ -41,7 +41,7 @@
  * PaletteEntryPanel class constructor
  *******************************************************************/
 PaletteEntryPanel::PaletteEntryPanel(wxWindow* parent)
-: EntryPanel(parent, _T("palette")) {
+: EntryPanel(parent, "palette") {
 	// Add palette canvas
 	pal_canvas = new PaletteCanvas(this, -1);
 	sizer_main->Add(pal_canvas->toPanel(this), 1, wxEXPAND|wxALL, 4);
@@ -52,9 +52,9 @@ PaletteEntryPanel::PaletteEntryPanel(wxWindow* parent)
 	btn_edit_ext->Enable(false);
 
 	// Add palette selection buttons
-	btn_nextpal = new wxButton(this, -1, _T("Next >"));
-	btn_prevpal = new wxButton(this, -1, _T("< Prev"));
-	text_curpal = new wxStaticText(this, -1, _T("Palette XX/XX"));
+	btn_nextpal = new wxButton(this, -1, "Next >");
+	btn_prevpal = new wxButton(this, -1, "< Prev");
+	text_curpal = new wxStaticText(this, -1, "Palette XX/XX");
 	sizer_bottom->Add(btn_prevpal, 0, wxEXPAND|wxRIGHT|wxLEFT, 4);
 	sizer_bottom->Add(btn_nextpal, 0, wxEXPAND|wxRIGHT, 4);
 	sizer_bottom->Add(text_curpal, 0, wxALIGN_CENTER_VERTICAL, 4);
@@ -130,7 +130,7 @@ bool PaletteEntryPanel::showPalette(uint32_t index) {
 	pal_canvas->getPalette().copyPalette(palettes[index]);
 
 	// Set current palette text
-	text_curpal->SetLabel(s_fmt(_T("Palette %d/%d"), index+1, palettes.size()));
+	text_curpal->SetLabel(s_fmt("Palette %d/%d", index+1, palettes.size()));
 
 	// Refresh
 	Layout();
@@ -162,6 +162,6 @@ void PaletteEntryPanel::onPalCanvasMouseEvent(wxMouseEvent& e) {
 		rgba_t col = pal_canvas->getSelectedColour();
 
 		// Set label
-		label_selected_colour->SetLabel(s_fmt(_T("R%d G%d B%d"), col.r, col.g, col.b));
+		label_selected_colour->SetLabel(s_fmt("R%d G%d B%d", col.r, col.g, col.b));
 	}
 }

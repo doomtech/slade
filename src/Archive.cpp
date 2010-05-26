@@ -58,9 +58,9 @@ Archive::~Archive() {
 string Archive::getFileName(bool fullpath) {
 	// If the archive is within another archive, return "<parent archive>/<entry name>"
 	if (parent) {
-		string parent_archive = _T("");
+		string parent_archive = "";
 		if (parent->getParent())
-			parent_archive = parent->getParent()->getFileName(false) + _T("/");
+			parent_archive = parent->getParent()->getFileName(false) + "/";
 
 		return parent_archive + parent->getName(false);
 	}
@@ -106,7 +106,7 @@ void Archive::entryModified(ArchiveEntry* entry) {
 		uint32_t index = entryIndex(entry);
 		mc.write(&index, sizeof(uint32_t));
 		mc.write(&ptr, sizeof(wxUIntPtr));
-		announce(_T("entry_modified"), mc);
+		announce("entry_modified", mc);
 	}
 
 	// If entry was set to unmodified, don't set the archive to modified
@@ -123,7 +123,7 @@ void Archive::setModified(bool mod) {
 	modified = mod;
 
 	// Announce
-	announce(_T("modified"));
+	announce("modified");
 }
 
 /* Archive::save
@@ -156,13 +156,13 @@ bool Archive::save(string filename) {
 
 			// Create backup
 			if (wxFileName::FileExists(this->filename)) {
-				string bakfile = this->filename + _T(".bak");
+				string bakfile = this->filename + ".bak";
 
 				// Remove old backup file
 				wxRemoveFile(bakfile);
 
 				// Copy current file contents to new backup file
-				wxLogMessage(_T("Creating backup %s"), bakfile.c_str());
+				wxLogMessage("Creating backup %s", bakfile.c_str());
 				wxCopyFile(this->filename, bakfile);
 			}
 
@@ -177,7 +177,7 @@ bool Archive::save(string filename) {
 	// If saving was successful, update variables and announce save
 	if (success) {
 		setModified(false);
-		announce(_T("saved"));
+		announce("saved");
 	}
 
 	return success;

@@ -61,15 +61,15 @@ TextureEditorPanel::TextureEditorPanel(wxWindow* parent, PatchTable* patch_table
 	slider_zoom = new wxSlider(this, -1, 100, 20, 800);
 	slider_zoom->SetLineSize(10);
 	slider_zoom->SetPageSize(100);
-	label_current_zoom = new wxStaticText(this, -1, _T("100%"));
-	hbox->Add(new wxStaticText(this, -1, _T("Zoom:")), 0, wxALIGN_CENTER_VERTICAL, 0);
+	label_current_zoom = new wxStaticText(this, -1, "100%");
+	hbox->Add(new wxStaticText(this, -1, "Zoom:"), 0, wxALIGN_CENTER_VERTICAL, 0);
 	hbox->Add(slider_zoom, 1, wxEXPAND, 0);
 	hbox->Add(label_current_zoom, 0, wxALIGN_CENTER_VERTICAL, 0);
 
 	hbox->AddStretchSpacer();
 
 	// 'Show Outside' checkbox
-	cb_draw_outside = new wxCheckBox(this, -1, _T("Show Outside"));
+	cb_draw_outside = new wxCheckBox(this, -1, "Show Outside");
 	cb_draw_outside->SetValue(true);
 	hbox->Add(cb_draw_outside, 0, wxEXPAND);
 
@@ -133,7 +133,7 @@ wxPanel* TextureEditorPanel::createTextureControls(wxWindow* parent) {
 	panel->SetSizer(sizer);
 
 	// "Texture Properties" frame
-	wxStaticBox* frame = new wxStaticBox(panel, -1, _T("Texture Properties"));
+	wxStaticBox* frame = new wxStaticBox(panel, -1, "Texture Properties");
 	wxStaticBoxSizer* framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
 	sizer->Add(framesizer, 0, wxEXPAND|wxALL, 4);
 
@@ -143,25 +143,25 @@ wxPanel* TextureEditorPanel::createTextureControls(wxWindow* parent) {
 	// Name
 	text_tex_name = new wxTextCtrl(panel, -1);
 	text_tex_name->SetMaxLength(8);
-	gb_sizer->Add(new wxStaticText(panel, -1, _T("Name:")), wxGBPosition(0, 0), wxDefaultSpan, wxALIGN_CENTER_VERTICAL);
+	gb_sizer->Add(new wxStaticText(panel, -1, "Name:"), wxGBPosition(0, 0), wxDefaultSpan, wxALIGN_CENTER_VERTICAL);
 	gb_sizer->Add(text_tex_name, wxGBPosition(0, 1), wxGBSpan(1, 2), wxEXPAND);
 
 	// Size
 	spin_tex_width = new wxSpinCtrl(panel, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxALIGN_RIGHT, 0, SHRT_MAX);
 	spin_tex_height = new wxSpinCtrl(panel, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxALIGN_RIGHT, 0, SHRT_MAX);
-	gb_sizer->Add(new wxStaticText(panel, -1, _T("Size:")), wxGBPosition(1, 0), wxDefaultSpan, wxALIGN_CENTER_VERTICAL);
+	gb_sizer->Add(new wxStaticText(panel, -1, "Size:"), wxGBPosition(1, 0), wxDefaultSpan, wxALIGN_CENTER_VERTICAL);
 	gb_sizer->Add(spin_tex_width, wxGBPosition(1, 1), wxDefaultSpan);
 	gb_sizer->Add(spin_tex_height, wxGBPosition(1, 2), wxDefaultSpan);
 
 	// Scale
 	spin_tex_scalex = new wxSpinCtrl(panel, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxALIGN_RIGHT, 0, UCHAR_MAX);
 	spin_tex_scaley = new wxSpinCtrl(panel, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxALIGN_RIGHT, 0, UCHAR_MAX);
-	gb_sizer->Add(new wxStaticText(panel, -1, _T("Scale:")), wxGBPosition(2, 0), wxDefaultSpan, wxALIGN_CENTER_VERTICAL);
+	gb_sizer->Add(new wxStaticText(panel, -1, "Scale:"), wxGBPosition(2, 0), wxDefaultSpan, wxALIGN_CENTER_VERTICAL);
 	gb_sizer->Add(spin_tex_scalex, wxGBPosition(2, 1), wxDefaultSpan);
 	gb_sizer->Add(spin_tex_scaley, wxGBPosition(2, 2), wxDefaultSpan);
 
 	// Scaled size
-	label_scaled_size = new wxStaticText(panel, -1, _T("Scaled Size: N/A"));
+	label_scaled_size = new wxStaticText(panel, -1, "Scaled Size: N/A");
 	gb_sizer->Add(label_scaled_size, wxGBPosition(3, 0), wxGBSpan(1, 3), wxALIGN_CENTER_VERTICAL);
 
 	return panel;
@@ -197,7 +197,7 @@ void TextureEditorPanel::updateTextureScaleLabel() {
 		scaled_y /= tex_current.getScaleY();
 
 	// Update the label
-	label_scaled_size->SetLabel(s_fmt(_T("Scaled Size: %dx%d"), scaled_x, scaled_y));
+	label_scaled_size->SetLabel(s_fmt("Scaled Size: %dx%d", scaled_x, scaled_y));
 }
 
 /* TextureEditorPanel::createPatchControls
@@ -211,7 +211,7 @@ wxPanel* TextureEditorPanel::createPatchControls(wxWindow* parent) {
 	panel->SetSizer(sizer);
 
 	// -- Texture Patches frame --
-	wxStaticBox* frame = new wxStaticBox(panel, -1, _T("Patches"));
+	wxStaticBox* frame = new wxStaticBox(panel, -1, "Patches");
 	wxStaticBoxSizer* framesizer = new wxStaticBoxSizer(frame, wxHORIZONTAL);
 	sizer->Add(framesizer, 0, wxEXPAND|wxALL, 4);
 
@@ -225,39 +225,39 @@ wxPanel* TextureEditorPanel::createPatchControls(wxWindow* parent) {
 	framesizer->Add(vbox, 0, wxEXPAND|wxTOP|wxRIGHT|wxBOTTOM, 4);
 
 	// 'Add' button
-	btn_patch_add = new wxBitmapButton(panel, -1, getIcon(_T("t_patch_add")));
-	btn_patch_add->SetToolTip(_T("Add new patch to texture"));
+	btn_patch_add = new wxBitmapButton(panel, -1, getIcon("t_patch_add"));
+	btn_patch_add->SetToolTip("Add new patch to texture");
 	vbox->Add(btn_patch_add, 0, wxBOTTOM, 4);
 
 	// 'Remove' button
-	btn_patch_remove = new wxBitmapButton(panel, -1, getIcon(_T("t_patch_remove")));
-	btn_patch_remove->SetToolTip(_T("Remove selected patch(es) from texture"));
+	btn_patch_remove = new wxBitmapButton(panel, -1, getIcon("t_patch_remove"));
+	btn_patch_remove->SetToolTip("Remove selected patch(es) from texture");
 	vbox->Add(btn_patch_remove, 0, wxBOTTOM, 4);
 
 	// 'Back' button
-	btn_patch_back = new wxBitmapButton(panel, -1, getIcon(_T("t_patch_back")));
-	btn_patch_back->SetToolTip(_T("Send selected patch(es) back"));
+	btn_patch_back = new wxBitmapButton(panel, -1, getIcon("t_patch_back"));
+	btn_patch_back->SetToolTip("Send selected patch(es) back");
 	vbox->Add(btn_patch_back, 0, wxBOTTOM, 4);
 
 	// 'Forward' button
-	btn_patch_forward = new wxBitmapButton(panel, -1, getIcon(_T("t_patch_forward")));
-	btn_patch_forward->SetToolTip(_T("Bring selected patch(es) forward"));
+	btn_patch_forward = new wxBitmapButton(panel, -1, getIcon("t_patch_forward"));
+	btn_patch_forward->SetToolTip("Bring selected patch(es) forward");
 	vbox->Add(btn_patch_forward, 0, wxBOTTOM, 4);
 
 	// 'Replace' button
-	btn_patch_replace = new wxBitmapButton(panel, -1, getIcon(_T("t_patch_replace")));
-	btn_patch_replace->SetToolTip(_T("Replace selected patch(es)"));
+	btn_patch_replace = new wxBitmapButton(panel, -1, getIcon("t_patch_replace"));
+	btn_patch_replace->SetToolTip("Replace selected patch(es)");
 	vbox->Add(btn_patch_replace, 0, wxBOTTOM, 4);
 
 	// 'Duplicate' button
-	btn_patch_duplicate = new wxBitmapButton(panel, -1, getIcon(_T("t_patch_duplicate")));
-	btn_patch_duplicate->SetToolTip(_T("Duplicate selected patch(es)"));
+	btn_patch_duplicate = new wxBitmapButton(panel, -1, getIcon("t_patch_duplicate"));
+	btn_patch_duplicate->SetToolTip("Duplicate selected patch(es)");
 	vbox->Add(btn_patch_duplicate, 0, wxBOTTOM, 4);
 
 
 
 	// -- Patch Properties frame --
-	frame = new wxStaticBox(panel, -1, _T("Patch Properties"));
+	frame = new wxStaticBox(panel, -1, "Patch Properties");
 	framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
 	sizer->Add(framesizer, 0, wxEXPAND|wxALL, 4);
 
@@ -265,14 +265,14 @@ wxPanel* TextureEditorPanel::createPatchControls(wxWindow* parent) {
 	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
 	framesizer->Add(hbox, 0, wxEXPAND|wxALL, 4);
 	spin_patch_left = new wxSpinCtrl(panel, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxALIGN_RIGHT, SHRT_MIN, SHRT_MAX);
-	hbox->Add(new wxStaticText(panel, -1, _T("X Position:")), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
+	hbox->Add(new wxStaticText(panel, -1, "X Position:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
 	hbox->Add(spin_patch_left, 1);
 
 	// Y Position
 	hbox = new wxBoxSizer(wxHORIZONTAL);
 	framesizer->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 	spin_patch_top = new wxSpinCtrl(panel, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxALIGN_RIGHT, SHRT_MIN, SHRT_MAX);
-	hbox->Add(new wxStaticText(panel, -1, _T("Y Position:")), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
+	hbox->Add(new wxStaticText(panel, -1, "Y Position:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
 	hbox->Add(spin_patch_top, 1);
 
 	return panel;
@@ -287,7 +287,7 @@ void TextureEditorPanel::populatePatchList() {
 	list_patches->Show(false);
 
 	// Add columns
-	list_patches->InsertColumn(0, _T("Name"));
+	list_patches->InsertColumn(0, "Name");
 
 	// Add each patch to the list
 	for (size_t a = 0; a < tex_canvas->getTexture().nPatches(); a++)
@@ -321,7 +321,7 @@ void TextureEditorPanel::updatePatchControls() {
 		if (selection.size() == 1) {
 			CTPatch* patch = tex_canvas->getTexture().getPatch(selection[0]);
 			if (!patch) {
-				wxLogMessage(_T("Error: Selected patch does not exist in texture"));
+				wxLogMessage("Error: Selected patch does not exist in texture");
 				return;
 			}
 
@@ -381,7 +381,7 @@ void TextureEditorPanel::onZoomChanged(wxCommandEvent& e) {
 	zoom_percent -= remainder;
 
 	// Update zoom label
-	label_current_zoom->SetLabel(s_fmt(_T("%d%%"), zoom_percent));
+	label_current_zoom->SetLabel(s_fmt("%d%%", zoom_percent));
 
 	// Zoom gfx canvas and update
 	tex_canvas->setScale((double)zoom_percent * 0.01);
@@ -568,7 +568,7 @@ void TextureEditorPanel::onBtnPatchAdd(wxCommandEvent& e) {
 	// Temporary choice dialog
 	wxArrayString patches;
 	for (size_t a = 0; a < patch_table->nPatches(); a++) patches.Add(patch_table->patchName(a));
-	wxSingleChoiceDialog dlg(this, _T("Select a patch to add"), _T("Add Patch"), patches);
+	wxSingleChoiceDialog dlg(this, "Select a patch to add", "Add Patch", patches);
 
 	if (dlg.ShowModal() == wxID_OK) {
 		// Add new patch (temporary, testing)
@@ -675,7 +675,7 @@ void TextureEditorPanel::onBtnPatchReplace(wxCommandEvent& e) {
 	// Temporary choice dialog
 	wxArrayString patches;
 	for (size_t a = 0; a < patch_table->nPatches(); a++) patches.Add(patch_table->patchName(a));
-	wxSingleChoiceDialog dlg(this, _T("Select a patch to replace the selected patch(es) with"), _T("Replace Patch"), patches);
+	wxSingleChoiceDialog dlg(this, "Select a patch to replace the selected patch(es) with", "Replace Patch", patches);
 
 	if (dlg.ShowModal() == wxID_OK) {
 		// Go through selection and replace each patch

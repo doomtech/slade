@@ -28,14 +28,14 @@ BaseResourceArchivesPanel::BaseResourceArchivesPanel(wxWindow* parent)
 	hbox->Add(list_base_archive_paths, 1, wxEXPAND|wxALL, 4);
 
 	// Setup buttons
-	btn_add = new wxButton(this, -1, _T("Add Archive"));
-	btn_remove = new wxButton(this, -1, _T("Remove Archive"));
+	btn_add = new wxButton(this, -1, "Add Archive");
+	btn_remove = new wxButton(this, -1, "Remove Archive");
 
 	wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
 	vbox->Add(btn_add, 0, wxEXPAND|wxBOTTOM, 4);
 	vbox->Add(btn_remove, 0, wxEXPAND|wxBOTTOM, 4);
 	hbox->Add(vbox, 0, wxEXPAND|wxALL, 4);
-	
+
 	// Bind events
 	btn_add->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &BaseResourceArchivesPanel::onBtnAdd, this);
 	btn_remove->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &BaseResourceArchivesPanel::onBtnRemove, this);
@@ -56,7 +56,7 @@ void BaseResourceArchivesPanel::onBtnAdd(wxCommandEvent& e) {
 	string extensions = theArchiveManager->getArchiveExtensionsString();
 
 	// Open a file browser dialog that allows multiple selection
-	wxFileDialog dialog_open(this, _T("Choose file(s) to open"), wxEmptyString, wxEmptyString, extensions, wxFD_OPEN|wxFD_MULTIPLE|wxFD_FILE_MUST_EXIST, wxDefaultPosition);
+	wxFileDialog dialog_open(this, "Choose file(s) to open", wxEmptyString, wxEmptyString, extensions, wxFD_OPEN|wxFD_MULTIPLE|wxFD_FILE_MUST_EXIST, wxDefaultPosition);
 
 	// Run the dialog & check that the user didn't cancel
 	if (dialog_open.ShowModal() == wxID_OK) {

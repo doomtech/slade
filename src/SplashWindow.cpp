@@ -50,8 +50,8 @@ void SplashWindow::setProgress(float progress) {
 
 void SplashWindow::init() {
 	// Load logo image
-	string tempfile = appPath(_T("temp.png"), DIR_TEMP);
-	ArchiveEntry* logo = theArchiveManager->programResourceArchive()->getEntry(_T("logo.png"));
+	string tempfile = appPath("temp.png", DIR_TEMP);
+	ArchiveEntry* logo = theArchiveManager->programResourceArchive()->getEntry("logo.png");
 	if (logo) {
 		logo->exportFile(tempfile);
 		bm_logo.LoadFile(tempfile, wxBITMAP_TYPE_PNG);
@@ -104,7 +104,7 @@ void SplashWindow::onPaint(wxPaintEvent& e) {
 	dc.DrawBitmap(bm_logo, 0, 0, true);
 
 	// Setup text
-	wxFont font(10, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, _T("Calibri"));
+	wxFont font(10, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, "Calibri");
 	dc.SetFont(font);
 
 	// Draw message
@@ -185,4 +185,4 @@ void c_sw_splash(vector<string> args) {
 		theSplashWindow->setProgress(prog);
 	}
 }
-ConsoleCommand sw_splash(_T("splash"), &c_sw_splash, 0);
+ConsoleCommand sw_splash("splash", &c_sw_splash, 0);

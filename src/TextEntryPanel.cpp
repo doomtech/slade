@@ -40,7 +40,7 @@
  * TextEntryPanel class constructor
  *******************************************************************/
 TextEntryPanel::TextEntryPanel(wxWindow* parent)
-: EntryPanel(parent, _T("text")) {
+: EntryPanel(parent, "text") {
 	// Create the text area
 	text_area = new TextEditor(this, -1);
 	sizer_main->Add(text_area, 1, wxEXPAND | wxALL, 4);

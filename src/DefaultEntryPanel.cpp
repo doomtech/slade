@@ -43,12 +43,12 @@
  * DefaultEntryPanel class constructor
  *******************************************************************/
 DefaultEntryPanel::DefaultEntryPanel(wxWindow* parent)
-: EntryPanel(parent, _T("default")) {
+: EntryPanel(parent, "default") {
 	// Create widgets
-	label_type = new wxStaticText(this, -1, _T("Entry Type:"));
-	label_size = new wxStaticText(this, -1, _T("Entry Size:"));
-	btn_edit_text = new wxButton(this, -1, _T("Edit as Text"));
-	btn_view_hex = new wxButton(this, -1, _T("View as Hex"));
+	label_type = new wxStaticText(this, -1, "Entry Type:");
+	label_size = new wxStaticText(this, -1, "Entry Size:");
+	btn_edit_text = new wxButton(this, -1, "Edit as Text");
+	btn_view_hex = new wxButton(this, -1, "View as Hex");
 	text_area = new TextEditor(this, -1);
 
 	// Bind Events
@@ -139,13 +139,13 @@ void DefaultEntryPanel::showTextEditor() {
 bool DefaultEntryPanel::loadEntry(ArchiveEntry* entry) {
 	// Check that the entry exists
 	if (!entry) {
-		Global::error = _T("Invalid archive entry given");
+		Global::error = "Invalid archive entry given";
 		return false;
 	}
 
 	// Set labels
-	label_type->SetLabel(s_fmt(_T("Entry Type: %s"), entry->getTypeString().c_str()));
-	label_size->SetLabel(s_fmt(_T("Entry Size: %d bytes"), entry->getSize()));
+	label_type->SetLabel(s_fmt("Entry Type: %s", entry->getTypeString().c_str()));
+	label_size->SetLabel(s_fmt("Entry Size: %d bytes", entry->getSize()));
 
 	// Update variables
 	this->entry = entry;
@@ -177,7 +177,7 @@ bool DefaultEntryPanel::saveEntry() {
 	entry->importMem(text_raw, text_raw.length());
 
 	// Set entry type to text
-	entry->setType(EntryType::getType(_T("text")));
+	entry->setType(EntryType::getType("text"));
 	entry->setState(1);
 
 	return true;

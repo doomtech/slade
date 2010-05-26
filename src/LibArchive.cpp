@@ -104,7 +104,7 @@ ArchiveEntry* LibArchive::getEntry(string name) {
  * Gets the wxWidgets file dialog filter string for the archive type
  *******************************************************************/
 string LibArchive::getFileExtensionString() {
-	return _T("Wad Files (*.lib)|*.lib");
+	return "Shadowcaster Lib Files (*.lib)|*.lib";
 }
 
 /* LibArchive::open
@@ -115,7 +115,7 @@ bool LibArchive::open(string filename) {
 	// Read the file into a MemChunk
 	MemChunk mc;
 	if (!mc.importFile(filename)) {
-		Global::error = _T("Unable to open file. Make sure it isn't in use by another program.");
+		Global::error = "Unable to open file. Make sure it isn't in use by another program.";
 		return false;
 	}
 
@@ -168,7 +168,7 @@ bool LibArchive::open(MemChunk& mc) {
 
 	// Read the directory
 	mc.seek(dir_offset, SEEK_SET);
-	theSplashWindow->setProgressMessage(_T("Reading lib archive data"));
+	theSplashWindow->setProgressMessage("Reading lib archive data");
 	for (uint32_t d = 0; d < num_lumps; d++) {
 		// Update splash window progress
 		theSplashWindow->setProgress(((float)d / (float)num_lumps));
@@ -178,7 +178,7 @@ bool LibArchive::open(MemChunk& mc) {
 		uint32_t offset = 0;
 		uint32_t size = 0;
 		uint8_t dummy = 0;
-		
+
 		mc.read(&size, 4);		// Size
 		mc.read(&offset, 4);	// Offset
 		mc.read(myname, 12);	// Name
@@ -192,8 +192,8 @@ bool LibArchive::open(MemChunk& mc) {
 		// If the lump data goes past the directory,
 		// the wadfile is invalid
 		if (offset + size > dir_offset) {
-			wxLogMessage(_T("LibArchive::open: Lib archive is invalid or corrupt"));
-			Global::error = _T("Archive is invalid and/or corrupt");
+			wxLogMessage("LibArchive::open: Lib archive is invalid or corrupt");
+			Global::error = "Archive is invalid and/or corrupt";
 			setMuted(false);
 			return false;
 		}
@@ -201,7 +201,7 @@ bool LibArchive::open(MemChunk& mc) {
 		// Create & setup lump
 		ArchiveEntry* nlump = new ArchiveEntry(wxString::FromAscii(myname), size, this);
 		nlump->setLoaded(false);
-		nlump->extraProp(_T("Offset")) = (int)offset;
+		nlump->extraProp("Offset") = (int)offset;
 		nlump->setState(0);
 
 		// Add to entry list
@@ -210,7 +210,7 @@ bool LibArchive::open(MemChunk& mc) {
 
 	// Detect all entry types
 	MemChunk edata;
-	theSplashWindow->setProgressMessage(_T("Detecting entry types"));
+	theSplashWindow->setProgressMessage("Detecting entry types");
 	for (size_t a = 0; a < entries.size(); a++) {
 		// Update splash window progress
 		theSplashWindow->setProgress((((float)a / (float)num_lumps)));
@@ -233,15 +233,15 @@ bool LibArchive::open(MemChunk& mc) {
 	}
 
 	// Detect maps (will detect map entry types)
-	theSplashWindow->setProgressMessage(_T("Detecting maps"));
+	theSplashWindow->setProgressMessage("Detecting maps");
 	detectMaps();
 
 	// Setup variables
 	setMuted(false);
 	setModified(false);
-	announce(_T("opened"));
+	announce("opened");
 
-	theSplashWindow->setProgressMessage(_T(""));
+	theSplashWindow->setProgressMessage("");
 
 	return true;
 }
@@ -277,7 +277,7 @@ void LibArchive::close() {
 		parent->unlock();
 
 	// Announce
-	announce(_T("close"));
+	announce("close");
 }
 
 /* LibArchive::getEntryOffset
@@ -285,14 +285,14 @@ void LibArchive::close() {
  * Returns the lump entry's offset, or zero if it doesn't exist
  *******************************************************************/
 uint32_t LibArchive::getEntryOffset(ArchiveEntry* entry) {
-	return uint32_t((int)entry->extraProp(_T("Offset")));
+	return uint32_t((int)entry->extraProp("Offset"));
 }
 
 /* LibArchive::setEntryOffset
  * Sets a lump entry's offset
  *******************************************************************/
 void LibArchive::setEntryOffset(ArchiveEntry* entry, uint32_t offset) {
-	entry->extraProp(_T("Offset")) = (int)offset;
+	entry->extraProp("Offset") = (int)offset;
 }
 
 /* LibArchive::loadEntryData
@@ -316,7 +316,7 @@ bool LibArchive::loadEntryData(ArchiveEntry* entry) {
 
 	// Check if opening the file failed
 	if (!file.IsOpened()) {
-		wxLogMessage(_T("LibArchive::loadEntryData: Failed to open libfile %s"), filename.c_str());
+		wxLogMessage("LibArchive::loadEntryData: Failed to open libfile %s", filename.c_str());
 		return false;
 	}
 

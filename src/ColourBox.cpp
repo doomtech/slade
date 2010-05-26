@@ -147,7 +147,7 @@ void ColourBox::onMouseRightDown(wxMouseEvent& e) {
 		return;
 
 	// Popup a dialog with a slider control for alpha
-	wxDialog dlg(NULL, -1, _T("Set Alpha"), wxDefaultPosition, wxDefaultSize);
+	wxDialog dlg(NULL, -1, "Set Alpha", wxDefaultPosition, wxDefaultSize);
 	wxBoxSizer *box = new wxBoxSizer(wxVERTICAL);
 	dlg.SetSizer(box);
 	wxSlider *slider = new wxSlider(&dlg, -1, colour.a, 0, 255, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL);

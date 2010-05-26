@@ -20,7 +20,7 @@ string STreeNode::getPath() {
 	if (!parent)
 		return getName();
 	else
-		return parent->getPath() + _T("/") + getName();
+		return parent->getPath() + "/" + getName();
 }
 
 STreeNode* STreeNode::getChild(unsigned index) {

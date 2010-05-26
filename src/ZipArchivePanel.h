@@ -25,7 +25,7 @@ public:
 	bool	moveUp();
 	bool	moveDown();
 
-	void onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
+	//void onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 };
 
 #endif //__ZIPARCHIVEPANEL_H__

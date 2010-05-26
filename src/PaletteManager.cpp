@@ -113,7 +113,7 @@ Palette8bit* PaletteManager::getPalette(string name) {
  *******************************************************************/
 string PaletteManager::getPalName(int index) {
 	if (index < 0 || index >= numPalettes())
-		return _T("");
+		return "";
 	else
 		return pal_names[index];
 }
@@ -128,7 +128,7 @@ string PaletteManager::getPalName(Palette8bit* pal) {
 			return pal_names[a];
 	}
 
-	return _T("");
+	return "";
 }
 
 /* PaletteManager::loadResourcePalettes
@@ -138,7 +138,7 @@ string PaletteManager::getPalName(Palette8bit* pal) {
 bool PaletteManager::loadResourcePalettes() {
 	// Get the 'palettes' directory of SLADE.pk3
 	ZipArchive* res_archive = (ZipArchive*)(theArchiveManager->programResourceArchive());
-	zipdir_t* dir_palettes = res_archive->getDirectory(_T("palettes"));
+	zipdir_t* dir_palettes = res_archive->getDirectory("palettes");
 
 	// Check it exists
 	if (!dir_palettes)
@@ -165,12 +165,12 @@ bool PaletteManager::loadResourcePalettes() {
  *******************************************************************/
 bool PaletteManager::loadCustomPalettes() {
 	// If the directory doesn't exist create it
-	if (!wxDirExists(appPath(_T("palettes"), DIR_USER)))
-		wxMkdir(appPath(_T("palettes"), DIR_USER));
+	if (!wxDirExists(appPath("palettes", DIR_USER)))
+		wxMkdir(appPath("palettes", DIR_USER));
 
 	// Open the custom palettes directory
 	wxDir res_dir;
-	res_dir.Open(appPath(_T("palettes"), DIR_USER));
+	res_dir.Open(appPath("palettes", DIR_USER));
 
 	// Go through each file in the directory
 	string filename = wxEmptyString;
@@ -179,7 +179,7 @@ bool PaletteManager::loadCustomPalettes() {
 		// Load palette data
 		Palette8bit* pal = new Palette8bit();
 		MemChunk mc;
-		mc.importFile(res_dir.GetName() + _T("/") + filename);
+		mc.importFile(res_dir.GetName() + "/" + filename);
 		pal->loadMem(mc);
 
 		// Add the palette

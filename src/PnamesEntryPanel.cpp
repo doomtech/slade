@@ -2,23 +2,23 @@
 /*******************************************************************
  * SLADE - It's a Doom Editor
  * Copyright (C) 2008 Simon Judd
- * 
+ *
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
  * Filename:    PnamesEntryPanel.cpp
  * Description: PnamesEntryPanel class. The UI for editing PNAMES
  *              and similar lumps.
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -45,15 +45,15 @@
  * PnamesEntryPanel class constructor
  *******************************************************************/
 PnamesEntryPanel::PnamesEntryPanel(wxWindow* parent, uint8_t mode)
-: EntryPanel(parent, _T("pnames")) {
+: EntryPanel(parent, "pnames") {
 	type = mode;
 
 	// Setup panel sizer
 	wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
 	sizer_main->Add(sizer, 1, wxEXPAND, 0);
-	
+
 	// Add entry list
-	wxStaticBox* frame = new wxStaticBox(this, -1, _T("Names"));
+	wxStaticBox* frame = new wxStaticBox(this, -1, "Names");
 	wxStaticBoxSizer* framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
 	list_entries = new ListView(this, -1);
 	list_entries->showIcons(false);
@@ -87,7 +87,7 @@ bool PnamesEntryPanel::loadEntry(ArchiveEntry* entry) {
 	uint32_t n_pnames = 0;
 	entry->seek(0, SEEK_SET);
 	if (!entry->read(&n_pnames, 4)) {
-		wxLogMessage(_T("Error: PNAMES entry is corrupt"));
+		wxLogMessage("Error: PNAMES entry is corrupt");
 		return false;
 	}
 
@@ -98,7 +98,7 @@ bool PnamesEntryPanel::loadEntry(ArchiveEntry* entry) {
 
 		// Try to read pname
 		if (!entry->read(&pname, 8)) {
-			wxLogMessage(_T("Error: PNAMES entry is corrupt"));
+			wxLogMessage("Error: PNAMES entry is corrupt");
 			return false;
 		}
 
@@ -132,13 +132,13 @@ void PnamesEntryPanel::populateEntryList() {
 	list_entries->ClearAll();
 
 	// Add columns
-	list_entries->InsertColumn(0, _T("Index"));
-	list_entries->InsertColumn(1, _T("Name"));
+	list_entries->InsertColumn(0, "Index");
+	list_entries->InsertColumn(1, "Name");
 
 	// Add each graphic to the list
 	list_entries->enableSizeUpdate(false);
 	for (uint32_t a = 0; a < names.size(); a++) {
-		string cols[] = { s_fmt(_T("%d"), a), s_fmt(_T("%s"), names[a]) };
+		string cols[] = { s_fmt("%d", a), s_fmt("%s", names[a]) };
 		list_entries->addItem(a, wxArrayString(2, cols));
 	}
 

@@ -111,7 +111,7 @@ bool EntryDataFormat::readDataFormatDefinition(MemChunk& mc) {
 			if (parent_type != EntryType::unknownType())
 				parent_type->copyToType(ntype);
 			else
-				wxLogMessage(_T("Warning: Entry type %s inherits from unknown type %s"), chr(ntype->getId()), chr(typenode->getInherit()));
+				wxLogMessage("Warning: Entry type %s inherits from unknown type %s", chr(ntype->getId()), chr(typenode->getInherit()));
 			*/
 		}
 	}
@@ -125,7 +125,7 @@ bool EntryDataFormat::readDataFormatDefinition(MemChunk& mc) {
 // Used when a format is requested that doesn't exist
 class AnyDataFormat : public EntryDataFormat {
 public:
-	AnyDataFormat() : EntryDataFormat(_T("any")) {}
+	AnyDataFormat() : EntryDataFormat("any") {}
 	~AnyDataFormat() {}
 
 	bool isThisFormat(MemChunk& mc) { return false; }
@@ -133,7 +133,7 @@ public:
 
 class PNGDataFormat : public EntryDataFormat {
 public:
-	PNGDataFormat() : EntryDataFormat(_T("img_png")) {}
+	PNGDataFormat() : EntryDataFormat("img_png") {}
 	~PNGDataFormat() {}
 
 	bool isThisFormat(MemChunk& mc) {
@@ -153,7 +153,7 @@ public:
 
 class BMPDataFormat : public EntryDataFormat {
 public:
-	BMPDataFormat() : EntryDataFormat(_T("img_bmp")) {};
+	BMPDataFormat() : EntryDataFormat("img_bmp") {};
 	~BMPDataFormat() {}
 
 	bool isThisFormat(MemChunk& mc) {
@@ -170,7 +170,7 @@ public:
 
 class GIFDataFormat : public EntryDataFormat {
 public:
-	GIFDataFormat() : EntryDataFormat(_T("img_gif")) {};
+	GIFDataFormat() : EntryDataFormat("img_gif") {};
 	~GIFDataFormat() {}
 
 	bool isThisFormat(MemChunk& mc) {
@@ -188,7 +188,7 @@ public:
 
 class PCXDataFormat : public EntryDataFormat {
 public:
-	PCXDataFormat() : EntryDataFormat(_T("img_pcx")) {};
+	PCXDataFormat() : EntryDataFormat("img_pcx") {};
 	~PCXDataFormat() {}
 
 	bool isThisFormat(MemChunk& mc) {
@@ -252,7 +252,7 @@ public:
 
 class TGADataFormat : public EntryDataFormat {
 public:
-	TGADataFormat() : EntryDataFormat(_T("img_tga")) {};
+	TGADataFormat() : EntryDataFormat("img_tga") {};
 	~TGADataFormat() {}
 
 	bool isThisFormat(MemChunk& mc) {
@@ -289,7 +289,7 @@ public:
 
 class TIFFDataFormat : public EntryDataFormat {
 public:
-	TIFFDataFormat() : EntryDataFormat(_T("img_tiff")) {};
+	TIFFDataFormat() : EntryDataFormat("img_tiff") {};
 	~TIFFDataFormat() {}
 
 	bool isThisFormat(MemChunk& mc) {
@@ -330,7 +330,7 @@ public:
 
 class JPEGDataFormat : public EntryDataFormat {
 public:
-	JPEGDataFormat() : EntryDataFormat(_T("img_jpeg")) {};
+	JPEGDataFormat() : EntryDataFormat("img_jpeg") {};
 	~JPEGDataFormat() {}
 
 	bool isThisFormat(MemChunk& mc) {
@@ -351,7 +351,7 @@ public:
 
 class DoomGfxDataFormat : public EntryDataFormat {
 public:
-	DoomGfxDataFormat() : EntryDataFormat(_T("img_doom")) {};
+	DoomGfxDataFormat() : EntryDataFormat("img_doom") {};
 	~DoomGfxDataFormat() {}
 
 	bool isThisFormat(MemChunk& mc) {
@@ -397,7 +397,7 @@ public:
 
 class DoomGfxAlphaDataFormat : public EntryDataFormat {
 public:
-	DoomGfxAlphaDataFormat() : EntryDataFormat(_T("img_doom_alpha")) {};
+	DoomGfxAlphaDataFormat() : EntryDataFormat("img_doom_alpha") {};
 	~DoomGfxAlphaDataFormat() {}
 
 	bool isThisFormat(MemChunk& mc) {
@@ -450,7 +450,7 @@ public:
 
 class DoomGfxBetaDataFormat : public EntryDataFormat {
 public:
-	DoomGfxBetaDataFormat() : EntryDataFormat(_T("img_doom_beta")) {};
+	DoomGfxBetaDataFormat() : EntryDataFormat("img_doom_beta") {};
 	~DoomGfxBetaDataFormat() {}
 
 	bool isThisFormat(MemChunk& mc) {
@@ -510,7 +510,7 @@ public:
 
 class DoomSneaDataFormat : public EntryDataFormat {
 public:
-	DoomSneaDataFormat() : EntryDataFormat(_T("img_doom_snea")) {};
+	DoomSneaDataFormat() : EntryDataFormat("img_doom_snea") {};
 	~DoomSneaDataFormat() {}
 
 	/* The following is the documentation about sneas from
@@ -543,7 +543,7 @@ public:
 
 class DoomArahDataFormat : public EntryDataFormat {
 public:
-	DoomArahDataFormat() : EntryDataFormat(_T("img_doom_arah")) {};
+	DoomArahDataFormat() : EntryDataFormat("img_doom_arah") {};
 	~DoomArahDataFormat() {}
 
 	/* This format is used in Doom alpha 0.2. DeuTex doesn't know it,
@@ -578,7 +578,7 @@ public:
 
 class IMGZDataFormat : public EntryDataFormat {
 public:
-	IMGZDataFormat() : EntryDataFormat(_T("img_imgz")) {};
+	IMGZDataFormat() : EntryDataFormat("img_imgz") {};
 	~IMGZDataFormat() {}
 
 	bool isThisFormat(MemChunk& mc) {
@@ -611,7 +611,7 @@ public:
 
 class LegacyGfxDataFormat : public EntryDataFormat {
 public:
-	LegacyGfxDataFormat() : EntryDataFormat(_T("img_legacy")) {};
+	LegacyGfxDataFormat() : EntryDataFormat("img_legacy") {};
 	~LegacyGfxDataFormat() {}
 
 	// A data format found while rifling through some Legacy mods,
@@ -636,7 +636,7 @@ public:
 
 class ShadowCasterSpriteFormat: public EntryDataFormat {
 public:
-	ShadowCasterSpriteFormat() : EntryDataFormat(_T("img_scsprite")) {};
+	ShadowCasterSpriteFormat() : EntryDataFormat("img_scsprite") {};
 	~ShadowCasterSpriteFormat() {}
 
 	bool isThisFormat(MemChunk& mc) {
@@ -667,7 +667,7 @@ public:
 
 class WadDataFormat : public EntryDataFormat {
 public:
-	WadDataFormat() : EntryDataFormat(_T("archive_wad")) {};
+	WadDataFormat() : EntryDataFormat("archive_wad") {};
 	~WadDataFormat() {}
 
 	bool isThisFormat(MemChunk& mc) {
@@ -683,7 +683,7 @@ bool EntryDataFormat::detectZip(MemChunk& mc) {
 */
 class ZipDataFormat : public EntryDataFormat {
 public:
-	ZipDataFormat() : EntryDataFormat(_T("archive_zip")) {};
+	ZipDataFormat() : EntryDataFormat("archive_zip") {};
 	~ZipDataFormat() {}
 
 	bool isThisFormat(MemChunk& mc) {
@@ -693,7 +693,7 @@ public:
 
 class LibDataFormat : public EntryDataFormat {
 public:
-	LibDataFormat() : EntryDataFormat(_T("archive_lib")) {};
+	LibDataFormat() : EntryDataFormat("archive_lib") {};
 	~LibDataFormat() {}
 
 	bool isThisFormat(MemChunk& mc) {
@@ -703,7 +703,7 @@ public:
 
 class DatDataFormat : public EntryDataFormat {
 public:
-	DatDataFormat() : EntryDataFormat(_T("archive_dat")) {};
+	DatDataFormat() : EntryDataFormat("archive_dat") {};
 	~DatDataFormat() {}
 
 	bool isThisFormat(MemChunk& mc) {
@@ -714,7 +714,7 @@ public:
 
 class MUSDataFormat : public EntryDataFormat {
 public:
-	MUSDataFormat() : EntryDataFormat(_T("mus")) {};
+	MUSDataFormat() : EntryDataFormat("mus") {};
 	~MUSDataFormat() {}
 
 	bool isThisFormat(MemChunk& mc) {
@@ -731,7 +731,7 @@ public:
 
 class MIDIDataFormat : public EntryDataFormat {
 public:
-	MIDIDataFormat() : EntryDataFormat(_T("midi")) {};
+	MIDIDataFormat() : EntryDataFormat("midi") {};
 	~MIDIDataFormat() {}
 
 	bool isThisFormat(MemChunk& mc) {
@@ -748,7 +748,7 @@ public:
 
 class ITModuleDataFormat : public EntryDataFormat {
 public:
-	ITModuleDataFormat() : EntryDataFormat(_T("mod_it")) {};
+	ITModuleDataFormat() : EntryDataFormat("mod_it") {};
 	~ITModuleDataFormat() {}
 
 	bool isThisFormat(MemChunk& mc) {
@@ -765,7 +765,7 @@ public:
 
 class XMModuleDataFormat : public EntryDataFormat {
 public:
-	XMModuleDataFormat() : EntryDataFormat(_T("mod_xm")) {};
+	XMModuleDataFormat() : EntryDataFormat("mod_xm") {};
 	~XMModuleDataFormat() {}
 
 	bool isThisFormat(MemChunk& mc) {
@@ -774,7 +774,7 @@ public:
 			// Check for mod header
 			char temp[17] = "";
 			memcpy(temp, mc.getData(), 17);
-			if (!s_fmt(_T("%s"), temp).Cmp(_T("Extended module: "))) {
+			if (!s_fmt("%s", temp).Cmp("Extended module: ")) {
 				if (mc[37] == 0x1a) {
 					return true;
 				}
@@ -787,7 +787,7 @@ public:
 
 class S3MModuleDataFormat : public EntryDataFormat {
 public:
-	S3MModuleDataFormat() : EntryDataFormat(_T("mod_s3m")) {};
+	S3MModuleDataFormat() : EntryDataFormat("mod_s3m") {};
 	~S3MModuleDataFormat() {}
 
 	bool isThisFormat(MemChunk& mc) {
@@ -804,7 +804,7 @@ public:
 
 class MODModuleDataFormat : public EntryDataFormat {
 public:
-	MODModuleDataFormat() : EntryDataFormat(_T("mod_mod")) {};
+	MODModuleDataFormat() : EntryDataFormat("mod_mod") {};
 	~MODModuleDataFormat() {}
 
 	bool isThisFormat(MemChunk& mc) {
@@ -828,7 +828,7 @@ public:
 
 class DoomSoundDataFormat : public EntryDataFormat {
 public:
-	DoomSoundDataFormat() : EntryDataFormat(_T("snd_doom")) {};
+	DoomSoundDataFormat() : EntryDataFormat("snd_doom") {};
 	~DoomSoundDataFormat() {}
 
 	bool isThisFormat(MemChunk& mc) {
@@ -852,7 +852,7 @@ public:
 
 class DoomPCSpeakerDataFormat : public EntryDataFormat {
 public:
-	DoomPCSpeakerDataFormat() : EntryDataFormat(_T("snd_speaker")) {};
+	DoomPCSpeakerDataFormat() : EntryDataFormat("snd_speaker") {};
 	~DoomPCSpeakerDataFormat() {}
 
 	bool isThisFormat(MemChunk& mc) {
@@ -873,7 +873,7 @@ public:
 
 class WAVDataFormat : public EntryDataFormat {
 public:
-	WAVDataFormat() : EntryDataFormat(_T("snd_wav")) {};
+	WAVDataFormat() : EntryDataFormat("snd_wav") {};
 	~WAVDataFormat() {}
 
 	bool isThisFormat(MemChunk& mc) {
@@ -890,7 +890,7 @@ public:
 
 class OggDataFormat : public EntryDataFormat {
 public:
-	OggDataFormat() : EntryDataFormat(_T("snd_ogg")) {};
+	OggDataFormat() : EntryDataFormat("snd_ogg") {};
 	~OggDataFormat() {}
 
 	bool isThisFormat(MemChunk& mc) {
@@ -908,7 +908,7 @@ public:
 
 class FLACDataFormat : public EntryDataFormat {
 public:
-	FLACDataFormat() : EntryDataFormat(_T("snd_flac")) {};
+	FLACDataFormat() : EntryDataFormat("snd_flac") {};
 	~FLACDataFormat() {}
 
 	bool isThisFormat(MemChunk& mc) {
@@ -924,7 +924,7 @@ public:
 
 class TextureXDataFormat : public EntryDataFormat {
 public:
-	TextureXDataFormat() : EntryDataFormat(_T("texturex")) {};
+	TextureXDataFormat() : EntryDataFormat("texturex") {};
 	~TextureXDataFormat() {}
 
 	bool isThisFormat(MemChunk& mc) {
@@ -942,7 +942,7 @@ public:
 
 class PNamesDataFormat : public EntryDataFormat {
 public:
-	PNamesDataFormat() : EntryDataFormat(_T("pnames")) {};
+	PNamesDataFormat() : EntryDataFormat("pnames") {};
 	~PNamesDataFormat() {}
 
 	bool isThisFormat(MemChunk& mc) {
@@ -959,7 +959,7 @@ public:
 
 class BoomAnimatedDataFormat : public EntryDataFormat {
 public:
-	BoomAnimatedDataFormat() : EntryDataFormat(_T("animated")) {};
+	BoomAnimatedDataFormat() : EntryDataFormat("animated") {};
 	~BoomAnimatedDataFormat() {}
 
 	bool isThisFormat(MemChunk& mc) {
@@ -980,7 +980,7 @@ public:
 
 class BoomSwitchesDataFormat : public EntryDataFormat {
 public:
-	BoomSwitchesDataFormat() : EntryDataFormat(_T("switches")) {};
+	BoomSwitchesDataFormat() : EntryDataFormat("switches") {};
 	~BoomSwitchesDataFormat() {}
 
 	bool isThisFormat(MemChunk& mc) {
@@ -998,7 +998,7 @@ public:
 
 class Font0DataFormat : public EntryDataFormat {
 public:
-	Font0DataFormat() : EntryDataFormat(_T("font_doom_alpha")) {};
+	Font0DataFormat() : EntryDataFormat("font_doom_alpha") {};
 	~Font0DataFormat() {}
 
 	bool isThisFormat(MemChunk& mc) {
@@ -1028,7 +1028,7 @@ public:
 
 class Font1DataFormat : public EntryDataFormat {
 public:
-	Font1DataFormat() : EntryDataFormat(_T("font_zd_console")) {};
+	Font1DataFormat() : EntryDataFormat("font_zd_console") {};
 	~Font1DataFormat() {}
 
 	bool isThisFormat(MemChunk& mc) {
@@ -1044,7 +1044,7 @@ public:
 
 class Font2DataFormat : public EntryDataFormat {
 public:
-	Font2DataFormat() : EntryDataFormat(_T("font_zd_big")) {};
+	Font2DataFormat() : EntryDataFormat("font_zd_big") {};
 	~Font2DataFormat() {}
 
 	bool isThisFormat(MemChunk& mc) {
@@ -1060,7 +1060,7 @@ public:
 
 class BMFontDataFormat : public EntryDataFormat {
 public:
-	BMFontDataFormat() : EntryDataFormat(_T("font_bmf")) {};
+	BMFontDataFormat() : EntryDataFormat("font_bmf") {};
 	~BMFontDataFormat() {}
 
 	bool isThisFormat(MemChunk& mc) {
@@ -1076,7 +1076,7 @@ public:
 
 class ZGLNodesDataFormat : public EntryDataFormat {
 public:
-	ZGLNodesDataFormat() : EntryDataFormat(_T("zgln")) {};
+	ZGLNodesDataFormat() : EntryDataFormat("zgln") {};
 	~ZGLNodesDataFormat() {}
 
 	bool isThisFormat(MemChunk& mc) {
@@ -1092,7 +1092,7 @@ public:
 
 class ZGLNodes2DataFormat : public EntryDataFormat {
 public:
-	ZGLNodes2DataFormat() : EntryDataFormat(_T("zgl2")) {};
+	ZGLNodes2DataFormat() : EntryDataFormat("zgl2") {};
 	~ZGLNodes2DataFormat() {}
 
 	bool isThisFormat(MemChunk& mc) {
@@ -1108,7 +1108,7 @@ public:
 
 class DMDModelDataFormat : public EntryDataFormat {
 public:
-	DMDModelDataFormat() : EntryDataFormat(_T("mesh_dmd")) {};
+	DMDModelDataFormat() : EntryDataFormat("mesh_dmd") {};
 	~DMDModelDataFormat() {}
 
 	bool isThisFormat(MemChunk& mc) {
@@ -1124,7 +1124,7 @@ public:
 
 class MDLModelDataFormat : public EntryDataFormat {
 public:
-	MDLModelDataFormat() : EntryDataFormat(_T("mesh_mdl")) {};
+	MDLModelDataFormat() : EntryDataFormat("mesh_mdl") {};
 	~MDLModelDataFormat() {}
 
 	bool isThisFormat(MemChunk& mc) {
@@ -1140,7 +1140,7 @@ public:
 
 class MD2ModelDataFormat : public EntryDataFormat {
 public:
-	MD2ModelDataFormat() : EntryDataFormat(_T("mesh_md2")) {};
+	MD2ModelDataFormat() : EntryDataFormat("mesh_md2") {};
 	~MD2ModelDataFormat() {}
 
 	bool isThisFormat(MemChunk& mc) {
@@ -1156,7 +1156,7 @@ public:
 
 class MD3ModelDataFormat : public EntryDataFormat {
 public:
-	MD3ModelDataFormat() : EntryDataFormat(_T("mesh_md3")) {};
+	MD3ModelDataFormat() : EntryDataFormat("mesh_md3") {};
 	~MD3ModelDataFormat() {}
 
 	bool isThisFormat(MemChunk& mc) {
@@ -1223,9 +1223,9 @@ void EntryDataFormat::initBuiltinFormats() {
 
 	// And here are some dummy formats needed for certain image formats
 	// that can't be detected by anything but size (which is done in EntryType detection anyway)
-	new EntryDataFormat(_T("img_raw"));
-	new EntryDataFormat(_T("img_planar"));
-	new EntryDataFormat(_T("img_4bitchunk"));
-	new EntryDataFormat(_T("font_mono"));
+	new EntryDataFormat("img_raw");
+	new EntryDataFormat("img_planar");
+	new EntryDataFormat("img_4bitchunk");
+	new EntryDataFormat("font_mono");
 }
 

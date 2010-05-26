@@ -21,7 +21,7 @@ bool MapThing::parseUDMF(Tokenizer& tz) {
 
 	// TODO: Read thing definition
 	string token = tz.getToken();
-	while (token != _T("}")) {
+	while (token != "}") {
 
 		token = tz.getToken();
 	}

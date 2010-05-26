@@ -2,22 +2,22 @@
 /*******************************************************************
  * SLADE - It's a Doom Editor
  * Copyright (C) 2008 Simon Judd
- * 
+ *
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
  * Filename:    SLADEMap.cpp
  * Description: SLADEMap class, the internal SLADE map handler.
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -42,7 +42,7 @@ bool SLADEMap::readMap(Archive* map_entries, uint8_t format) {
 	else if (format == 1)
 		return readHexenMap(map_entries);
 	else if (format == 2) {
-		ArchiveEntry* entry = map_entries->getEntry(_T("TEXTMAP"));
+		ArchiveEntry* entry = map_entries->getEntry("TEXTMAP");
 		return readUDMFMap(entry);
 	}
 
@@ -52,9 +52,9 @@ bool SLADEMap::readMap(Archive* map_entries, uint8_t format) {
 bool SLADEMap::readDoomMap(Archive* map_entries) {
 
 	// ---- Read vertices ----
-	ArchiveEntry* entry = map_entries->getEntry(_T("VERTEXES"));
+	ArchiveEntry* entry = map_entries->getEntry("VERTEXES");
 	if (!entry) {
-		Global::error = _T("Map has no VERTEXES entry!");
+		Global::error = "Map has no VERTEXES entry!";
 		return false;
 	}
 
@@ -70,9 +70,9 @@ bool SLADEMap::readDoomMap(Archive* map_entries) {
 bool SLADEMap::readHexenMap(Archive* map_entries) {
 
 	// ---- Read vertices ----
-	ArchiveEntry* entry = map_entries->getEntry(_T("VERTEXES"));
+	ArchiveEntry* entry = map_entries->getEntry("VERTEXES");
 	if (!entry) {
-		Global::error = _T("Map has no VERTEXES entry!");
+		Global::error = "Map has no VERTEXES entry!";
 		return false;
 	}
 
@@ -90,9 +90,9 @@ bool SLADEMap::readUDMFMap(ArchiveEntry* map_data) {
 	udmf_data.openMem((char*)map_data->getData(true), map_data->getSize());
 
 	string token = udmf_data.getToken();
-	while (token != _T("")) {
+	while (token != "") {
 		// Vertex definition
-		if (token == _T("vertex")) {
+		if (token == "vertex") {
 			MapVertex* new_vertex = new MapVertex();
 			if (new_vertex->parseUDMF(udmf_data))
 				vertices.push_back(new_vertex);
@@ -101,7 +101,7 @@ bool SLADEMap::readUDMFMap(ArchiveEntry* map_data) {
 		}
 
 		// Line definition
-		if (token == _T("linedef")) {
+		if (token == "linedef") {
 			MapLine* new_line = new MapLine();
 			if (new_line->parseUDMF(udmf_data))
 				lines.push_back(new_line);
@@ -110,7 +110,7 @@ bool SLADEMap::readUDMFMap(ArchiveEntry* map_data) {
 		}
 
 		// Side definition
-		if (token == _T("sidedef")) {
+		if (token == "sidedef") {
 			MapSide* new_side = new MapSide();
 			if (new_side->parseUDMF(udmf_data))
 				sides.push_back(new_side);
@@ -119,7 +119,7 @@ bool SLADEMap::readUDMFMap(ArchiveEntry* map_data) {
 		}
 
 		// Sector definition
-		if (token == _T("sector")) {
+		if (token == "sector") {
 			MapSector* new_sector = new MapSector();
 			if (new_sector->parseUDMF(udmf_data))
 				sectors.push_back(new_sector);

@@ -17,16 +17,16 @@ bool MapVertex::parseUDMF(Tokenizer& tz) {
 
 	// Read definition
 	string token = tz.getToken();
-	while (token != _T("}")) {
+	while (token != "}") {
 		// X position
-		if (token == _T("x") && tz.peekToken() == _T("=")) {
+		if (token == "x" && tz.peekToken() == "=") {
 			tz.getToken();	// Skip =
 			x = tz.getFloat();
 			x_set = true;
 		}
 
 		// Y position
-		if (token == _T("y") && tz.peekToken() == _T("=")) {
+		if (token == "y" && tz.peekToken() == "=") {
 			// Skip =
 			tz.getToken();
 			y = tz.getFloat();
@@ -40,7 +40,7 @@ bool MapVertex::parseUDMF(Tokenizer& tz) {
 	if (x_set && y_set)
 		return true;
 	else {
-		Global::error = _T("UDMF Vertex definition missing x or y value");
+		Global::error = "UDMF Vertex definition missing x or y value";
 		return false;
 	}
 }

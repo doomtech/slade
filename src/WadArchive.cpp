@@ -42,18 +42,18 @@ CVAR(Bool, archive_load_data, false, CVAR_SAVE)
 
 // Used for map detection
 string map_lumps[12] = {
-	_T("THINGS"),
-	_T("VERTEXES"),
-	_T("LINEDEFS"),
-	_T("SIDEDEFS"),
-	_T("SECTORS"),
-	_T("SEGS"),
-	_T("SSECTORS"),
-	_T("NODES"),
-	_T("BLOCKMAP"),
-	_T("REJECT"),
-	_T("SCRIPTS"),
-	_T("BEHAVIOR")
+	"THINGS",
+	"VERTEXES",
+	"LINEDEFS",
+	"SIDEDEFS",
+	"SECTORS",
+	"SEGS",
+	"SSECTORS",
+	"NODES",
+	"BLOCKMAP",
+	"REJECT",
+	"SCRIPTS",
+	"BEHAVIOR"
 };
 
 
@@ -148,7 +148,7 @@ ArchiveEntry* WadArchive::getEntry(string name) {
  * Gets the wxWidgets file dialog filter string for the archive type
  *******************************************************************/
 string WadArchive::getFileExtensionString() {
-	return _T("Wad Files (*.wad)|*.wad");
+	return "Wad Files (*.wad)|*.wad";
 }
 
 /* WadArchive::open
@@ -159,7 +159,7 @@ bool WadArchive::open(string filename) {
 	// Read the file into a MemChunk
 	MemChunk mc;
 	if (!mc.importFile(filename)) {
-		Global::error = _T("Unable to open file. Make sure it isn't in use by another program.");
+		Global::error = "Unable to open file. Make sure it isn't in use by another program.";
 		return false;
 	}
 
@@ -214,8 +214,8 @@ bool WadArchive::open(MemChunk& mc) {
 
 	// Check the header
 	if (wad_type[1] != 'W' || wad_type[2] != 'A' || wad_type[3] != 'D') {
-		wxLogMessage(_T("WadArchive::openFile: File %s has invalid header"), filename.c_str());
-		Global::error = _T("Invalid wad header");
+		wxLogMessage("WadArchive::openFile: File %s has invalid header", filename.c_str());
+		Global::error = "Invalid wad header";
 		return false;
 	}
 
@@ -224,7 +224,7 @@ bool WadArchive::open(MemChunk& mc) {
 
 	// Read the directory
 	mc.seek(dir_offset, SEEK_SET);
-	theSplashWindow->setProgressMessage(_T("Reading wad archive data"));
+	theSplashWindow->setProgressMessage("Reading wad archive data");
 	for (uint32_t d = 0; d < num_lumps; d++) {
 		// Update splash window progress
 		theSplashWindow->setProgress(((float)d / (float)num_lumps));
@@ -246,8 +246,8 @@ bool WadArchive::open(MemChunk& mc) {
 		// If the lump data goes past the end of the file,
 		// the wadfile is invalid
 		if (offset + size > mc.getSize()) {
-			wxLogMessage(_T("WadArchive::open: Wad archive is invalid or corrupt"));
-			Global::error = _T("Archive is invalid and/or corrupt");
+			wxLogMessage("WadArchive::open: Wad archive is invalid or corrupt");
+			Global::error = "Archive is invalid and/or corrupt";
 			setMuted(false);
 			return false;
 		}
@@ -255,37 +255,37 @@ bool WadArchive::open(MemChunk& mc) {
 		// Create & setup lump
 		ArchiveEntry* nlump = new ArchiveEntry(wxString::FromAscii(name), size, this);
 		nlump->setLoaded(false);
-		nlump->extraProp(_T("Offset")) = (int)offset;
+		nlump->extraProp("Offset") = (int)offset;
 		nlump->setState(0);
 
 		// Check for markers
-		if (!nlump->getName().Cmp(_T("P_START")))
+		if (!nlump->getName().Cmp("P_START"))
 			patches[0] = d;
-		if (!nlump->getName().Cmp(_T("PP_START")))
+		if (!nlump->getName().Cmp("PP_START"))
 			patches[0] = d;
-		if (!nlump->getName().Cmp(_T("P_END")))
+		if (!nlump->getName().Cmp("P_END"))
 			patches[1] = d;
-		if (!nlump->getName().Cmp(_T("PP_END")))
+		if (!nlump->getName().Cmp("PP_END"))
 			patches[1] = d;
-		if (!nlump->getName().Cmp(_T("F_START")))
+		if (!nlump->getName().Cmp("F_START"))
 			flats[0] = d;
-		if (!nlump->getName().Cmp(_T("FF_START")))
+		if (!nlump->getName().Cmp("FF_START"))
 			flats[0] = d;
-		if (!nlump->getName().Cmp(_T("F_END")))
+		if (!nlump->getName().Cmp("F_END"))
 			flats[1] = d;
-		if (!nlump->getName().Cmp(_T("FF_END")))
+		if (!nlump->getName().Cmp("FF_END"))
 			flats[1] = d;
-		if (!nlump->getName().Cmp(_T("S_START")))
+		if (!nlump->getName().Cmp("S_START"))
 			sprites[0] = d;
-		if (!nlump->getName().Cmp(_T("SS_START")))
+		if (!nlump->getName().Cmp("SS_START"))
 			sprites[0] = d;
-		if (!nlump->getName().Cmp(_T("S_END")))
+		if (!nlump->getName().Cmp("S_END"))
 			sprites[1] = d;
-		if (!nlump->getName().Cmp(_T("SS_END")))
+		if (!nlump->getName().Cmp("SS_END"))
 			sprites[1] = d;
-		if (!nlump->getName().Cmp(_T("TX_START")))
+		if (!nlump->getName().Cmp("TX_START"))
 			tx[0] = d;
-		if (!nlump->getName().Cmp(_T("TX_END")))
+		if (!nlump->getName().Cmp("TX_END"))
 			tx[1] = d;
 
 		// Add to entry list
@@ -294,7 +294,7 @@ bool WadArchive::open(MemChunk& mc) {
 
 	// Detect all entry types
 	MemChunk edata;
-	theSplashWindow->setProgressMessage(_T("Detecting entry types"));
+	theSplashWindow->setProgressMessage("Detecting entry types");
 	for (size_t a = 0; a < entries.size(); a++) {
 		// Update splash window progress
 		theSplashWindow->setProgress((((float)a / (float)num_lumps)));
@@ -325,15 +325,15 @@ bool WadArchive::open(MemChunk& mc) {
 	}
 
 	// Detect maps (will detect map entry types)
-	theSplashWindow->setProgressMessage(_T("Detecting maps"));
+	theSplashWindow->setProgressMessage("Detecting maps");
 	detectMaps();
 
 	// Setup variables
 	setMuted(false);
 	setModified(false);
-	announce(_T("opened"));
+	announce("opened");
 
-	theSplashWindow->setProgressMessage(_T(""));
+	theSplashWindow->setProgressMessage("");
 
 	return true;
 }
@@ -393,7 +393,7 @@ bool WadArchive::write(MemChunk& mc, bool update) {
 
 		if (update) {
 			entries[l]->setState(0);
-			entries[l]->extraProp(_T("Offset")) = (int)offset;
+			entries[l]->extraProp("Offset") = (int)offset;
 		}
 	}
 
@@ -415,7 +415,7 @@ void WadArchive::close() {
 		parent->unlock();
 
 	// Announce
-	announce(_T("close"));
+	announce("close");
 }
 
 /* WadArchive::getEntryOffset
@@ -424,21 +424,21 @@ void WadArchive::close() {
  *******************************************************************/
 uint32_t WadArchive::getEntryOffset(ArchiveEntry* entry) {
 	/*
-	if (entry->hasExProp(_T("Offset"))) {
-		return (uint32_t)atoi(chr(entry->getExProp(_T("Offset"))));
+	if (entry->hasExProp("Offset")) {
+		return (uint32_t)atoi(chr(entry->getExProp("Offset")));
 	}
 	else
 		return 0;
 	*/
-	return uint32_t((int)entry->extraProp(_T("Offset")));
+	return uint32_t((int)entry->extraProp("Offset"));
 }
 
 /* WadArchive::setEntryOffset
  * Sets a lump entry's offset
  *******************************************************************/
 void WadArchive::setEntryOffset(ArchiveEntry* entry, uint32_t offset) {
-	//entry->setExProp(_T("Offset"), s_fmt(_T("%d"), offset));
-	entry->extraProp(_T("Offset")) = (int)offset;
+	//entry->setExProp("Offset", s_fmt("%d", offset));
+	entry->extraProp("Offset") = (int)offset;
 }
 
 /* WadArchive::loadEntryData
@@ -462,7 +462,7 @@ bool WadArchive::loadEntryData(ArchiveEntry* entry) {
 
 	// Check if opening the file failed
 	if (!file.IsOpened()) {
-		wxLogMessage(_T("WadArchive::loadEntryData: Failed to open wadfile %s"), filename.c_str());
+		wxLogMessage("WadArchive::loadEntryData: Failed to open wadfile %s", filename.c_str());
 		return false;
 	}
 
@@ -495,7 +495,7 @@ vector<Archive::mapdesc_t> WadArchive::detectMaps() {
 		// UDMF format map check ********************************************************
 
 		// Check for UDMF format map lump (TEXTMAP lump)
-		if (entries[i]->getName() == _T("TEXTMAP") && i > 0) {
+		if (entries[i]->getName() == "TEXTMAP" && i > 0) {
 			// Get map info
 			mapdesc_t md;
 			md.head = entries[i - 1]; // Header lump
@@ -508,12 +508,12 @@ vector<Archive::mapdesc_t> WadArchive::detectMaps() {
 				// If we've somehow reached the end of the wad without finding ENDMAP,
 				// log an error and return
 				if (i == numEntries()) {
-					wxLogMessage(_T("UDMF Map with no ENDMAP marker in %s"), filename.c_str());
+					wxLogMessage("UDMF Map with no ENDMAP marker in %s", filename.c_str());
 					return maps;
 				}
 
 				// If ENDMAP marker is here, exit the loop, otherwise skip to next lump
-				if (entries[i]->getName() == _T("ENDMAP"))
+				if (entries[i]->getName() == "ENDMAP")
 					done = true;
 				else
 					i++;
@@ -639,7 +639,7 @@ bool WadArchive::addEntry(ArchiveEntry* entry, uint32_t position) {
 	// Truncate name to 8 characters if needed
 	string name = entry->getName();
 	if (name.size() > 8) {
-		entry->extraProp(_T("full_name")) = name;
+		entry->extraProp("full_name") = name;
 		name.Truncate(8);
 		entry->setName(name);
 	}
@@ -666,7 +666,7 @@ bool WadArchive::addEntry(ArchiveEntry* entry, uint32_t position) {
 	wxUIntPtr ptr = wxPtrToUInt(entry);
 	mc.write(&position, sizeof(uint32_t));
 	mc.write(&ptr, sizeof(wxUIntPtr));
-	announce(_T("entry_added"), mc);
+	announce("entry_added", mc);
 
 	return true;
 }
@@ -785,7 +785,7 @@ bool WadArchive::swapEntries(ArchiveEntry* entry1, ArchiveEntry* entry2) {
 	mc.write(&i2, sizeof(int));
 	mc.write(&ptr1, sizeof(wxUIntPtr));
 	mc.write(&ptr2, sizeof(wxUIntPtr));
-	announce(_T("entries_swapped"), mc);
+	announce("entries_swapped", mc);
 
 	// Return success
 	return true;
@@ -821,24 +821,24 @@ bool WadArchive::renameEntry(ArchiveEntry* entry, string new_name) {
 string WadArchive::detectEntrySection(ArchiveEntry* entry) {
 	// Check the entry is valid and part of this archive
 	if (!checkEntry(entry))
-		return _T("none");
+		return "none";
 
 	// Check if entry is within any markers
 	int index = entryIndex(entry);
 
 	// Patches
 	if (index > patches[0] && index < patches[1])
-		return _T("patches");
+		return "patches";
 
 	// Flats
 	if (index > flats[0] && index < flats[1])
-		return _T("flats");
+		return "flats";
 
 	// Sprites
 	if (index > sprites[0] && index < sprites[1])
-		return _T("sprites");
+		return "sprites";
 
-	return _T("none");
+	return "none";
 }
 
 ArchiveEntry* WadArchive::findEntry(string search, bool incsub) {

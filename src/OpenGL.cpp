@@ -2,22 +2,22 @@
 /*******************************************************************
  * SLADE - It's a Doom Editor
  * Copyright (C) 2008 Simon Judd
- * 
+ *
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
  * Filename:    OpenGL.cpp
  * Description: OpenGL management stuff
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -60,7 +60,7 @@ wxGLContext* OpenGL::getContext(wxGLCanvas* canvas) {
 			init();
 		}
 		else
-			wxLogMessage(_T("Can't create global GL context, wxGLCanvas is hidden"));
+			wxLogMessage("Can't create global GL context, wxGLCanvas is hidden");
 	}
 
 	return context;
@@ -70,17 +70,17 @@ wxGLContext* OpenGL::getContext(wxGLCanvas* canvas) {
  * Initialises general OpenGL variables and settings
  *******************************************************************/
 bool OpenGL::init() {
-	wxLogMessage(_T("Initialising OpenGL..."));
+	wxLogMessage("Initialising OpenGL...");
 
 	// Get OpenGL version
 	string temp = wxString::From8BitData((const char*)glGetString(GL_VERSION));
 	temp.Truncate(3);
 	temp.ToDouble(&version);
-	wxLogMessage(_T("OpenGL Version: %1.1f"), version);
+	wxLogMessage("OpenGL Version: %1.1f", version);
 
 	// Get max texture size
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_tex_size);
-	wxLogMessage(_T("Max Texture Size: %dx%d"), max_tex_size, max_tex_size);
+	wxLogMessage("Max Texture Size: %dx%d", max_tex_size, max_tex_size);
 
 	return true;
 }

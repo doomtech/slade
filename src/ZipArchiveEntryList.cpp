@@ -1,13 +1,46 @@
 
+/*******************************************************************
+ * SLADE - It's a Doom Editor
+ * Copyright (C) 2008 Simon Judd
+ *
+ * Email:       veilofsorrow@gmail.com
+ * Web:         http://slade.mancubus.net
+ * Filename:    ZipArchiveEntryList.cpp
+ * Description: A list widget that shows all entries in a tree-based
+ *              archive (eg ZipArchive). Keeps in sync with it's
+ *              associated archive automatically.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *******************************************************************/
+
+
+/*******************************************************************
+ * INCLUDES
+ *******************************************************************/
 #include "Main.h"
 #include "WxStuff.h"
 #include "ZipArchiveEntryList.h"
 
 
-EXTERN_CVAR(Bool, elist_colsize_show)
-EXTERN_CVAR(Bool, elist_coltype_show)
+/*******************************************************************
+ * ZIPARCHIVEENTRYLIST CLASS FUNCTIONS
+ *******************************************************************/
 
-
+/* ZipArchiveEntryList::ZipArchiveEntryList
+ * ZipArchiveEntryList class constructor
+ *******************************************************************/
 ZipArchiveEntryList::ZipArchiveEntryList(wxWindow* parent) : ArchiveEntryList(parent) {
 	// Bind events
 	Bind(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, &ZipArchiveEntryList::onListItemActivated, this);
@@ -16,12 +49,19 @@ ZipArchiveEntryList::ZipArchiveEntryList(wxWindow* parent) : ArchiveEntryList(pa
 	entry_folder_back = new ArchiveEntry();
 	entry_folder_back->setType(EntryType::folderType());
 	entry_folder_back->setState(0);
-	entry_folder_back->setName(_T(".."));
+	entry_folder_back->setName("..");
 }
 
+/* ZipArchiveEntryList::~ZipArchiveEntryList
+ * ZipArchiveEntryList class destructor
+ *******************************************************************/
 ZipArchiveEntryList::~ZipArchiveEntryList() {
 }
 
+/* ZipArchiveEntryList::setArchive
+ * Sets the archive for this widget to handle (can be NULL for no
+ * archive)
+ *******************************************************************/
 void ZipArchiveEntryList::setArchive(Archive* archive) {
 	// Stop listening to current archive (if any)
 	if (this->archive)
@@ -49,6 +89,9 @@ void ZipArchiveEntryList::setArchive(Archive* archive) {
 	}
 }
 
+/* ZipArchiveEntryList::updateList
+ * Updates + refreshes the list
+ *******************************************************************/
 void ZipArchiveEntryList::updateList() {
 	// If no current directory, set size to 0
 	if (!current_dir) {
@@ -67,6 +110,10 @@ void ZipArchiveEntryList::updateList() {
 	Refresh();
 }
 
+/* ZipArchiveEntryList::entriesBegin
+ * Returns the index of the first list item that is an entry (rather
+ * than a directory), or -1 if no directory/archive is open)
+ *******************************************************************/
 int ZipArchiveEntryList::entriesBegin() {
 	// Check directory is open
 	if (!current_dir)
@@ -81,6 +128,9 @@ int ZipArchiveEntryList::entriesBegin() {
 	return index;
 }
 
+/* ZipArchiveEntryList::isFolder
+ * Returns true if the list item at [index] is a folder
+ *******************************************************************/
 bool ZipArchiveEntryList::isFolder(int index) {
 	// Return false if no directory is open
 	if (!current_dir)
@@ -93,6 +143,9 @@ bool ZipArchiveEntryList::isFolder(int index) {
 	return (index < (signed)current_dir->numSubDirs() && index >= 0);
 }
 
+/* ZipArchiveEntryList::isEntry
+ * Returns true if the list item at [index] is an entry
+ *******************************************************************/
 bool ZipArchiveEntryList::isEntry(int index) {
 	// Return false if no directory is open
 	if (!current_dir)
@@ -105,6 +158,10 @@ bool ZipArchiveEntryList::isEntry(int index) {
 	return ((unsigned)index >= current_dir->numSubDirs() && (unsigned)index < current_dir->numSubDirs() + current_dir->numEntries());
 }
 
+/* ZipArchiveEntryList::getEntry
+ * Returns the ArchiveEntry associated with the list item at [index].
+ * Returns NULL if the index is out of bounds or no archive is open
+ *******************************************************************/
 ArchiveEntry* ZipArchiveEntryList::getEntry(int index) const {
 	// Check index & archive
 	if (index < 0 || !archive)
@@ -131,6 +188,9 @@ ArchiveEntry* ZipArchiveEntryList::getEntry(int index) const {
 	return NULL;
 }
 
+/* ZipArchiveEntryList::getSelectedDirectories
+ * Returns a vector of all currently selected directories
+ *******************************************************************/
 vector<zipdir_t*> ZipArchiveEntryList::getSelectedDirectories() {
 	vector<zipdir_t*> ret;
 
@@ -157,6 +217,10 @@ vector<zipdir_t*> ZipArchiveEntryList::getSelectedDirectories() {
 	return ret;
 }
 
+/* ZipArchiveEntryList::getEntryListIndex
+ * Returns the list index of the entry at [index] in the current
+ * directory
+ *******************************************************************/
 int ZipArchiveEntryList::getEntryListIndex(int index) {
 	// Check the index and current directory is ok
 	if (!current_dir || index < 0 || index >= current_dir->numEntries())
@@ -171,6 +235,10 @@ int ZipArchiveEntryList::getEntryListIndex(int index) {
 	return start + index;
 }
 
+/* ZipArchiveEntryList::getDirListIndex
+ * Returns the list index of the subdirectory at [subdir] in the
+ * currentdirectory
+ *******************************************************************/
 int ZipArchiveEntryList::getDirListIndex(int subdir) {
 	// Check the index and current directory is ok
 	if (!current_dir || subdir < 0 || subdir >= current_dir->numSubDirs())
@@ -183,6 +251,9 @@ int ZipArchiveEntryList::getDirListIndex(int subdir) {
 		return subdir;
 }
 
+/* ArchiveEntryList::OnGetItemText
+ * Called when the widget requests the text for [item] at [column]
+ *******************************************************************/
 string ZipArchiveEntryList::OnGetItemText(long item, long column) const {
 	// Get entry
 	ArchiveEntry* entry = getEntry(item);
@@ -225,26 +296,10 @@ string ZipArchiveEntryList::OnGetItemText(long item, long column) const {
 		return "INVALID COLUMN";		// Invalid column
 }
 
-/*
-int ZipArchiveEntryList::OnGetItemImage(long item) const {
-	// Get associated entry
-	ArchiveEntry* entry = getEntry(item);
-
-	// If entry doesn't exist, return invalid image
-	if (!entry)
-		return -1;
-
-	return entry->getType()->getIndex();
-}
-
-wxListItemAttr* ZipArchiveEntryList::OnGetItemAttr(long item) const {
-	// Get entry
-	ArchiveEntry* entry = getEntry(item);
-
-	return item_attr;
-}
-*/
-
+/* ZipArchiveEntryList::onAnnouncement
+ * Called when an announcement is recieved from the archive being
+ * managed
+ *******************************************************************/
 void ZipArchiveEntryList::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
 	event_data.seek(0, SEEK_SET);
 
@@ -344,59 +399,37 @@ void ZipArchiveEntryList::onAnnouncement(Announcer* announcer, string event_name
 
 	// An entry in the archive was removed
 	if (announcer == archive && event_name == "entry_removed") {
-		uint32_t index = 0;
-		wxUIntPtr e = 0;
-
-		// Check all event data is there
-		if (!event_data.read(&index, sizeof(uint32_t)) || !event_data.read(&e, sizeof(wxUIntPtr)))
-			return;
-
 		// Update the list (we can't check if the entry is in the current folder as it's already been deleted
 		updateList();
 	}
 
 	// A directory was added to the archive
 	if (announcer == archive && event_name == "directory_added") {
-		//wxUIntPtr ptr;
-		//if (!event_data.read(&ptr, sizeof(wxUIntPtr)))
-		//	return;
-
 		// Update the list
 		updateList();
 	}
 
 	// A directory was removed from the archive
-	if (announcer == archive && !event_name.Cmp(_T("directory_removed"))) {
-		wxUIntPtr ptr;
-		int32_t index;
-		if (!event_data.read(&ptr, sizeof(wxUIntPtr)) || !event_data.read(&index, 4))
-			return;
-
-/*
-		// Get list index of removed directory
-		int item = getDirListIndex(index);
-
-		// If it's in the current directory, deselect it
-		SetItemState(getEntryListIndex(index), 0x0000, wxLIST_STATE_SELECTED|wxLIST_STATE_FOCUSED);
-*/
-
+	if (announcer == archive && event_name == "directory_removed") {
 		// Update the list
 		updateList();
 	}
 
 	// A directory was renamed in the archive
-	if (announcer == archive && !event_name.Cmp(_T("directory_modified"))) {
-		//wxUIntPtr ptr;
-		//if (event_data.read(&ptr, sizeof(wxUIntPtr)))
-		//	((ZipEntryListPanel*)entry_list)->updateDirectory(ptr);
-
+	if (announcer == archive && event_name == "directory_modified") {
 		// Update the list
 		updateList();
 	}
 }
 
 
+/*******************************************************************
+ * ZIPARCHIVEENTRYLIST EVENTS
+ *******************************************************************/
 
+/* ZipArchiveEntryList::onListItemActivated
+ * Called when a list item is 'activated' (double-click or enter)
+ *******************************************************************/
 void ZipArchiveEntryList::onListItemActivated(wxListEvent& e) {
 	// Get item entry
 	ArchiveEntry* entry = getEntry(e.GetIndex());

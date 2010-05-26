@@ -71,7 +71,7 @@ bool Tokenizer::openFile(string filename, uint32_t offset, uint32_t length) {
 
 	// Check file opened
 	if (!file.IsOpened()) {
-		wxLogMessage(_T("Tokenizer::openFile: Unable to open file %s"), filename.c_str());
+		wxLogMessage("Tokenizer::openFile: Unable to open file %s", filename.c_str());
 		return false;
 	}
 
@@ -118,7 +118,7 @@ bool Tokenizer::openString(string text, uint32_t offset, uint32_t length) {
 bool Tokenizer::openMem(const char* mem, uint32_t length) {
 	// Length must be specified
 	if (length == 0) {
-		wxLogMessage(_T("Tokenizer::openMem: length not specified"));
+		wxLogMessage("Tokenizer::openMem: length not specified");
 		return false;
 	}
 
@@ -208,7 +208,7 @@ void Tokenizer::skipMultilineComment() {
  * a blank string if we're at the end of the text
  *******************************************************************/
 string Tokenizer::getToken() {
-	string ret_str = _T("");
+	string ret_str = "";
 	bool ready = false;
 
 	// Increment pointer to next token
@@ -374,7 +374,7 @@ bool Tokenizer::getBool() {
 
 	// If the token is a string "no" or "false", the value is false
 	//if (!stricmp(chr(token), "no") || !stricmp(chr(token), "false"))
-	if (!token.CmpNoCase(_T("no")) || !token.CmpNoCase(_T("false")))
+	if (!token.CmpNoCase("no") || !token.CmpNoCase("false"))
 		return false;
 
 	// Returns true ("1") or false ("0")

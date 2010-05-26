@@ -23,7 +23,7 @@ private:
 	PropertyList	ex_props;
 
 public:
-	ArchiveEntry(string name = _T(""), uint32_t size = 0, Archive* parent = NULL);
+	ArchiveEntry(string name = "", uint32_t size = 0, Archive* parent = NULL);
 	ArchiveEntry(ArchiveEntry& copy);
 	virtual ~ArchiveEntry();
 

@@ -74,7 +74,7 @@ bool TextLanguage::readLanguageDefinition(MemChunk& mc) {
 
 	// Open the given text data
 	if (!tz.openMem((const char*)mc.getData(), mc.getSize())) {
-		wxLogMessage(_T("Unable to open file"));
+		wxLogMessage("Unable to open file");
 		return false;
 	}
 
@@ -82,7 +82,7 @@ bool TextLanguage::readLanguageDefinition(MemChunk& mc) {
 	string token = tz.getToken();
 
 	// If it's an entry_types definition, read it
-	if (!token.Cmp(_T("language"))) {
+	if (!token.Cmp("language")) {
 		// Read language id
 		string id = tz.getToken();
 
@@ -90,89 +90,89 @@ bool TextLanguage::readLanguageDefinition(MemChunk& mc) {
 		TextLanguage* language = new TextLanguage(id);
 
 		// Check for ":" (inheritance)
-		if (tz.peekToken() == _T(":")) {
+		if (tz.peekToken() == ":") {
 			string parent = tz.getToken();
 
 			// Do inheritance stuff
 		}
 
 		// Skip opening brace
-		if (!tz.checkToken(_T("{")))
+		if (!tz.checkToken("{"))
 			return false;
 
 		// Read language definition
 		token = tz.getToken();
-		while (token != _T("}")) {
+		while (token != "}") {
 			// Language name
-			if (s_cmpnocase(token, _T("name"))) {
+			if (s_cmpnocase(token, "name")) {
 				tz.getToken();						// Skip =
 				language->setName(tz.getToken());	// Set name
 				tz.getToken();						// Skip ;
 			}
 
 			// Line comment
-			if (s_cmpnocase(token, _T("line_comment"))) {
+			if (s_cmpnocase(token, "line_comment")) {
 				tz.getToken();								// Skip =
 				language->setLineComment(tz.getToken());	// Set line comment
 				tz.getToken();								// Skip ;
 			}
 
 			// Comment begin
-			if (s_cmpnocase(token, _T("comment_begin"))) {
+			if (s_cmpnocase(token, "comment_begin")) {
 				tz.getToken();								// Skip =
 				language->setCommentBegin(tz.getToken());	// Set comment begin
 				tz.getToken();								// Skip ;
 			}
 
 			// Comment end
-			if (s_cmpnocase(token, _T("comment_end"))) {
+			if (s_cmpnocase(token, "comment_end")) {
 				tz.getToken();							// Skip =
 				language->setCommentEnd(tz.getToken());	// Set comment end
 				tz.getToken();							// Skip ;
 			}
 
 			// Preprocessor
-			if (s_cmpnocase(token, _T("preprocessor"))) {
+			if (s_cmpnocase(token, "preprocessor")) {
 				tz.getToken();								// Skip =
 				language->setPreprocessor(tz.getToken());	// Set preprocessor
 				tz.getToken();								// Skip ;
 			}
 
 			// Keywords list
-			if (s_cmpnocase(token, _T("keywords"))) {
+			if (s_cmpnocase(token, "keywords")) {
 				tz.getToken();		// Skip {
 				token = tz.getToken();
-				while (!(s_cmp(token, _T("}")))) {
+				while (!(s_cmp(token, "}"))) {
 					language->addKeyword(token);	// Add keyword
 					token = tz.getToken();
 				}
 			}
 
 			// Constants list
-			if (s_cmpnocase(token, _T("constants"))) {
+			if (s_cmpnocase(token, "constants")) {
 				tz.getToken();		// Skip {
 				token = tz.getToken();
-				while (!(s_cmp(token, _T("}")))) {
+				while (!(s_cmp(token, "}"))) {
 					language->addConstant(token);	// Add constant
 					token = tz.getToken();
 				}
 			}
 
 			// Functions list
-			if (s_cmpnocase(token, _T("functions"))) {
+			if (s_cmpnocase(token, "functions")) {
 				tz.getToken();		// Skip {
 				token = tz.getToken();
-				while (!(s_cmp(token, _T("}")))) {
+				while (!(s_cmp(token, "}"))) {
 					// Read function name
 					string func_name = token;
 					token = tz.getToken();
 
 					// If next token is =, read parameter list
-					if (s_cmp(token, _T("="))) {
+					if (s_cmp(token, "=")) {
 						vector<string> args;
 						tz.getToken();	// Skip {
 						token = tz.getToken();
-						while (!(s_cmp(token, _T("}")))) {
+						while (!(s_cmp(token, "}"))) {
 							args.push_back(token);
 							token = tz.getToken();
 						}
@@ -183,7 +183,7 @@ bool TextLanguage::readLanguageDefinition(MemChunk& mc) {
 					}
 
 					// If next token is ;, function has no parameters
-					else if (s_cmp(token, _T(";"))) {
+					else if (s_cmp(token, ";")) {
 						// Add new function
 						language->addFunction(func_name, vector<string>());
 					}

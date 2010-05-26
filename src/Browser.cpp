@@ -33,7 +33,7 @@ Browser::~Browser() {
 
 
 void c_test_browser(vector<string> args) {
-	wxDialog dlg(NULL, -1, _T("Browser!"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
+	wxDialog dlg(NULL, -1, "Browser!", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
 
 	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
 	dlg.SetSizer(hbox);
@@ -43,4 +43,4 @@ void c_test_browser(vector<string> args) {
 
 	dlg.ShowModal();
 }
-ConsoleCommand test_browser(_T("test_browser"), &c_test_browser, 0);
+ConsoleCommand test_browser("test_browser", &c_test_browser, 0);

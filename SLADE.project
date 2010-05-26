@@ -56,8 +56,8 @@
       <VirtualDirectory Name="ArchivePanel">
         <File Name="src/ArchivePanel.cpp"/>
         <File Name="src/ArchivePanel.h"/>
-        <File Name="src/EntryListPanel.cpp"/>
-        <File Name="src/EntryListPanel.h"/>
+        <File Name="src/ZipArchivePanel.cpp"/>
+        <File Name="src/ZipArchivePanel.h"/>
       </VirtualDirectory>
       <VirtualDirectory Name="EntryPanel">
         <File Name="src/AnimatedEntryPanel.cpp"/>
@@ -79,12 +79,6 @@
         <File Name="src/PnamesEntryPanel.h"/>
         <File Name="src/DefaultEntryPanel.cpp"/>
       </VirtualDirectory>
-      <VirtualDirectory Name="ZipArchivePanel">
-        <File Name="src/ZipArchivePanel.cpp"/>
-        <File Name="src/ZipArchivePanel.h"/>
-        <File Name="src/ZipEntryListPanel.h"/>
-        <File Name="src/ZipEntryListPanel.cpp"/>
-      </VirtualDirectory>
       <File Name="src/ArchiveManagerPanel.h"/>
       <File Name="src/ArchiveManagerPanel.cpp"/>
       <VirtualDirectory Name="TextureXEditor">
@@ -96,10 +90,10 @@
         <File Name="src/TextureXEditor.h"/>
       </VirtualDirectory>
     </VirtualDirectory>
-    <File Name="src/MainWindow.cpp"/>
     <File Name="src/MainWindow.h"/>
     <File Name="src/EntryOperations.cpp"/>
     <File Name="src/EntryOperations.h"/>
+    <File Name="src/MainWindow.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="Map Editor">
     <VirtualDirectory Name="SLADEMap">

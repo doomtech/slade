@@ -2,22 +2,22 @@
 /*******************************************************************
  * SLADE - It's a Doom Editor
  * Copyright (C) 2008 Simon Judd
- * 
+ *
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
  * Filename:    ConsolePanel.cpp
  * Description: UI Frontend panel for the console
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -70,12 +70,12 @@ void ConsolePanel::initLayout() {
 	SetSizer(vbox);
 
 	// Create and add the message log textbox
-	text_log = new wxTextCtrl(this, -1, _T(""), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE | wxTE_READONLY);
+	text_log = new wxTextCtrl(this, -1, "", wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE | wxTE_READONLY);
 	text_log->SetSizeHints(wxSize(-1, 0));
 	vbox->Add(text_log, 1, wxEXPAND | wxALL, 4);
 
 	// Create and add the command entry textbox
-	text_command = new wxTextCtrl(this, -1, _T(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
+	text_command = new wxTextCtrl(this, -1, "", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
 	vbox->Add(text_command, 0, wxEXPAND | wxBOTTOM | wxLEFT | wxRIGHT, 4);
 
 	Layout();
@@ -92,7 +92,7 @@ void ConsolePanel::initLayout() {
  *******************************************************************/
 void ConsolePanel::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
 	// New console log message added
-	if (event_name == _T("console_logmessage")) {
+	if (event_name == "console_logmessage") {
 		text_log->AppendText(theConsole->lastLogLine());
 	}
 }

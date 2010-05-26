@@ -62,7 +62,7 @@ bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry) {
 		// General image formats (that FreeImage supports at least)
 		default:
 			if (!image->loadImage(entry->getData(true), entry->getSize())) {
-				Global::error = _T("Image format not supported by FreeImage");
+				Global::error = "Image format not supported by FreeImage";
 				return false;
 			}
 			else
@@ -78,41 +78,41 @@ bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry) {
 
 	// Load depending on format
 	string format = entry->getType()->getFormat();
-	if (s_cmpnocase(format, _T("img_doom")))
+	if (s_cmpnocase(format, "img_doom"))
 		return image->loadDoomGfx(entry->getData(), entry->getSize());
-	else if (s_cmpnocase(format, _T("img_doom_alpha")))
+	else if (s_cmpnocase(format, "img_doom_alpha"))
 		return image->loadDoomGfxA(entry->getData(), entry->getSize());
-	else if (s_cmpnocase(format, _T("img_doom_beta")))
+	else if (s_cmpnocase(format, "img_doom_beta"))
 		return image->loadDoomGfxB(entry->getData(), entry->getSize());
-	else if (s_cmpnocase(format, _T("img_doom_snea")))
+	else if (s_cmpnocase(format, "img_doom_snea"))
 		return image->loadDoomSnea(entry->getData(), entry->getSize());
-	else if (s_cmpnocase(format, _T("img_doom_arah")))
+	else if (s_cmpnocase(format, "img_doom_arah"))
 		return image->loadDoomArah(entry->getData(), entry->getSize());
-	else if (s_cmpnocase(format, _T("img_imgz")))
+	else if (s_cmpnocase(format, "img_imgz"))
 		return image->loadImgz(entry->getData(), entry->getSize());
-	else if (s_cmpnocase(format, _T("img_legacy")))
+	else if (s_cmpnocase(format, "img_legacy"))
 		return image->loadDoomLegacy(entry->getData(), entry->getSize());
-	else if (s_cmpnocase(format, _T("img_planar")))
+	else if (s_cmpnocase(format, "img_planar"))
 		return image->loadPlanar(entry->getData(), entry->getSize());
-	else if (s_cmpnocase(format, _T("img_4bitchunk")))
+	else if (s_cmpnocase(format, "img_4bitchunk"))
 		return image->load4bitChunk(entry->getData(), entry->getSize());
 	else if (s_cmpnocase(format, "img_raw"))
 		return image->loadDoomFlat(entry->getData(), entry->getSize());
-	else if (s_cmpnocase(format, _T("font_doom_alpha")))
+	else if (s_cmpnocase(format, "font_doom_alpha"))
 		return image->loadFont0(entry->getData(), entry->getSize());
-	else if (s_cmpnocase(format, _T("font_zd_console")))
+	else if (s_cmpnocase(format, "font_zd_console"))
 		return image->loadFont1(entry->getData(), entry->getSize());
-	else if (s_cmpnocase(format, _T("font_zd_big")))
+	else if (s_cmpnocase(format, "font_zd_big"))
 		return image->loadFont2(entry->getData(), entry->getSize());
-	else if (s_cmpnocase(format, _T("font_bmf")))
+	else if (s_cmpnocase(format, "font_bmf"))
 		return image->loadBMF(entry->getData(), entry->getSize());
-	else if (s_cmpnocase(format, _T("font_mono")))
+	else if (s_cmpnocase(format, "font_mono"))
 		return image->loadFontM(entry->getData(), entry->getSize());
-	else if (s_cmpnocase(format, _T("img_scsprite")))
+	else if (s_cmpnocase(format, "img_scsprite"))
 		return image->loadSCSprite(entry->getData(), entry->getSize());
 	else {
 		if (!image->loadImage(entry->getData(true), entry->getSize())) {
-			Global::error = _T("Image format not supported by FreeImage");
+			Global::error = "Image format not supported by FreeImage";
 			return false;
 		}
 		else
@@ -120,7 +120,7 @@ bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry) {
 	}
 
 	// Unknown image type
-	Global::error = _T("Entry is not a known image format");
+	Global::error = "Entry is not a known image format";
 	return false;
 }
 
@@ -159,13 +159,13 @@ bool Misc::loadPaletteFromArchive(Palette8bit* pal, Archive* archive, int lump) 
 	// Find PLAYPAL entry
 	ArchiveEntry* playpal = NULL;
 	if (lump == PAL_ALPHAHACK)
-		playpal = archive->getEntry(_T("TITLEPAL"));
+		playpal = archive->getEntry("TITLEPAL");
 	else if (lump == PAL_HERETICHACK)
-		playpal = archive->getEntry(_T("E2PAL"));
+		playpal = archive->getEntry("E2PAL");
 	else if (lump == PAL_SHADOWHACK)
-		playpal = archive->getEntry(_T("shadowpage+1"));
+		playpal = archive->getEntry("shadowpage+1");
 	if (!playpal)
-		playpal = archive->getEntry(_T("PLAYPAL"));
+		playpal = archive->getEntry("PLAYPAL");
 
 	// Check it was found
 	if (!playpal)
@@ -194,15 +194,15 @@ bool Misc::loadPaletteFromArchive(Palette8bit* pal, Archive* archive, int lump) 
  *******************************************************************/
 string Misc::sizeAsString(uint32_t size) {
 	if (size < 1024) {
-		return s_fmt(_T("%d"), size);
+		return s_fmt("%d", size);
 	}
 	else if (size < 1024*1024) {
 		double kb = (double)size / 1024;
-		return s_fmt(_T("%1.2fkb"), kb);
+		return s_fmt("%1.2fkb", kb);
 	}
 	else {
 		double mb = (double)size / (1024*1024);
-		return s_fmt(_T("%1.2fmb"), mb);
+		return s_fmt("%1.2fmb", mb);
 	}
 }
 

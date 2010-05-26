@@ -384,7 +384,7 @@ void GfxCanvas::endOffsetDrag() {
  * GfxCanvas is displaying
  *******************************************************************/
 void GfxCanvas::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
-	if (announcer == image && event_name.Cmp(_T("image_changed")) == 0)
+	if (announcer == image && event_name.Cmp("image_changed") == 0)
 		update_texture = true;
 }
 

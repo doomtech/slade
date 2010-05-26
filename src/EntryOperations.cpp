@@ -83,10 +83,10 @@ bool EntryOperations::modifyGfxOffsets(ArchiveEntry* entry, int auto_type, point
 
 	// Check entry type
 	EntryType* type = entry->getType();
-	string entryformat = type->getFormat(); 
-	if (!(entryformat == "img_doom" || entryformat == "img_doom_arah" || 
+	string entryformat = type->getFormat();
+	if (!(entryformat == "img_doom" || entryformat == "img_doom_arah" ||
 		entryformat == "img_doom_alpha" || "img_doom_beta" || entryformat == "img_png")) {
-		wxLogMessage(s_fmt(_T("Entry \"%s\" is of type \"%s\" which does not support offsets"), entry->getName().c_str(), entry->getTypeString().c_str()));
+		wxLogMessage(s_fmt("Entry \"%s\" is of type \"%s\" which does not support offsets", entry->getName().c_str(), entry->getTypeString().c_str()));
 		return false;
 	}
 
@@ -311,7 +311,7 @@ bool EntryOperations::modifyalPhChunk(ArchiveEntry* entry, bool value) {
 
 	// Check entry type
 	if (!(entry->getType()->getFormat() == "img_png")) {
-		wxLogMessage(s_fmt(_T("Entry \"%s\" is of type \"%s\" rather than PNG"), entry->getName().c_str(), entry->getTypeString().c_str()));
+		wxLogMessage(s_fmt("Entry \"%s\" is of type \"%s\" rather than PNG", entry->getName().c_str(), entry->getTypeString().c_str()));
 		return false;
 	}
 
@@ -416,7 +416,7 @@ bool EntryOperations::modifytRNSChunk(ArchiveEntry* entry, bool value) {
 
 	// Check entry type
 	if (!(entry->getType()->getFormat() == "img_png")) {
-		wxLogMessage(s_fmt(_T("Entry \"%s\" is of type \"%s\" rather than PNG"), entry->getName().c_str(), entry->getTypeString().c_str()));
+		wxLogMessage(s_fmt("Entry \"%s\" is of type \"%s\" rather than PNG", entry->getName().c_str(), entry->getTypeString().c_str()));
 		return false;
 	}
 
@@ -432,7 +432,7 @@ bool EntryOperations::modifytRNSChunk(ArchiveEntry* entry, bool value) {
 	uint32_t idat_start = 0;
 	for (uint32_t a = 0; a < entry->getSize(); a++) {
 
-		// Check for 'tRNS' header 
+		// Check for 'tRNS' header
 		if (data[a] == 't' && data[a + 1] == 'R' &&
 			data[a + 2] == 'N' && data[a + 3] == 'S') {
 			trns_start = a - 4;
@@ -461,7 +461,7 @@ bool EntryOperations::modifytRNSChunk(ArchiveEntry* entry, bool value) {
 	else if (!value && trns_start == 0)
 		return false;
 
-	// We want to set tRNS, which is missing: create it. We're just going to set index 0 to 0, 
+	// We want to set tRNS, which is missing: create it. We're just going to set index 0 to 0,
 	// and leave the rest of the palette indices alone.
 	else if (value && trns_start == 0)
 	{
@@ -529,7 +529,7 @@ bool EntryOperations::getalPhChunk(ArchiveEntry* entry) {
 
 	// Check entry type
 	if (entry->getType()->getFormat() != "img_png") {
-		wxLogMessage(s_fmt(_T("Entry \"%s\" is of type \"%s\" rather than PNG"), entry->getName().c_str(), entry->getTypeString().c_str()));
+		wxLogMessage(s_fmt("Entry \"%s\" is of type \"%s\" rather than PNG", entry->getName().c_str(), entry->getTypeString().c_str()));
 		return false;
 	}
 
@@ -559,7 +559,7 @@ bool EntryOperations::gettRNSChunk(ArchiveEntry* entry) {
 
 	// Check entry type
 	if (entry->getType()->getFormat() != "img_png") {
-		wxLogMessage(s_fmt(_T("Entry \"%s\" is of type \"%s\" rather than PNG"), entry->getName().c_str(), entry->getTypeString().c_str()));
+		wxLogMessage(s_fmt("Entry \"%s\" is of type \"%s\" rather than PNG", entry->getName().c_str(), entry->getTypeString().c_str()));
 		return false;
 	}
 
@@ -593,8 +593,8 @@ void c_test_ee(vector<string> args) {
 			if (entry)
 				EntryOperations::openExternal(entry);
 			else
-				wxLogMessage(s_fmt(_T("Entry %s not found"), args[a].c_str()));
+				wxLogMessage(s_fmt("Entry %s not found"), args[a].c_str());
 		}
 	}
 }
-ConsoleCommand test_ee(_T("test_ee"), &c_test_ee, 1);
+ConsoleCommand test_ee("test_ee", &c_test_ee, 1);

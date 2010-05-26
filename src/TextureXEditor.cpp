@@ -52,7 +52,7 @@ TextureXPanel::TextureXPanel(wxWindow* parent, PatchTable* patch_table) : wxPane
 	SetSizer(sizer);
 
 	// Add textures list
-	wxStaticBox* frame = new wxStaticBox(this, -1, _T("Textures"));
+	wxStaticBox* frame = new wxStaticBox(this, -1, "Textures");
 	wxStaticBoxSizer* framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
 	list_textures = new ListView(this, -1);
 	list_textures->showIcons(false);
@@ -60,15 +60,15 @@ TextureXPanel::TextureXPanel(wxWindow* parent, PatchTable* patch_table) : wxPane
 	sizer->Add(framesizer, 0, wxEXPAND|wxALL, 4);
 
 	// New Texture button
-	btn_new_texture = new wxButton(this, -1, _T("New"));
+	btn_new_texture = new wxButton(this, -1, "New");
 	framesizer->Add(btn_new_texture, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
 	// New Texture from Patch button
-	btn_new_from_patch = new wxButton(this, -1, _T("New From Patch"));
+	btn_new_from_patch = new wxButton(this, -1, "New From Patch");
 	framesizer->Add(btn_new_from_patch, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
 	// Remove Texture button
-	btn_remove_texture = new wxButton(this, -1, _T("Remove"));
+	btn_remove_texture = new wxButton(this, -1, "Remove");
 	framesizer->Add(btn_remove_texture, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
 	// Add texture editor area
@@ -124,7 +124,7 @@ void TextureXPanel::populateTextureList() {
 	list_textures->Show(false);
 
 	// Add columns
-	list_textures->InsertColumn(0, _T("Name"));
+	list_textures->InsertColumn(0, "Name");
 
 	// Add each texture to the list
 	list_textures->enableSizeUpdate(false);
@@ -194,7 +194,7 @@ TextureXEditor::TextureXEditor(wxWindow* parent) : wxPanel(parent, -1) {
 
 	// Add palette chooser
 	pal_chooser = new PaletteChooser(this, -1);
-	hbox->Add(new wxStaticText(this, -1, _T("Palette:")), 0, wxALIGN_CENTER_VERTICAL|wxALL, 4);
+	hbox->Add(new wxStaticText(this, -1, "Palette:"), 0, wxALIGN_CENTER_VERTICAL|wxALL, 4);
 	hbox->Add(pal_chooser, 0, wxEXPAND|wxALL, 4);
 
 	// Bind events
@@ -235,14 +235,14 @@ bool TextureXEditor::openArchive(Archive* archive) {
 		// TODO: Probably a better idea here to get the user to select an archive to import the patch table from
 		// If no PNAMES entry was found, search resource archives
 		if (!entry_pnames)
-			entry_pnames = theArchiveManager->getResourceEntry(_T("PNAMES"));	// TODO: Need to search by *format*, as well as name!
+			entry_pnames = theArchiveManager->getResourceEntry("PNAMES");	// TODO: Need to search by *format*, as well as name!
 		else
 			pnames = entry_pnames;	// If PNAMES was found in the archive, set the class variable so it is written to if modified
 
 		// If no PNAMES entry is found at all, show an error and abort
 		// TODO: ask user to select appropriate base resource archive
 		if (!entry_pnames) {
-			wxMessageBox(_T("PNAMES entry not found!"), wxMessageBoxCaptionStr, wxICON_ERROR);
+			wxMessageBox("PNAMES entry not found!", wxMessageBoxCaptionStr, wxICON_ERROR);
 			return false;
 		}
 
@@ -274,7 +274,7 @@ bool TextureXEditor::openArchive(Archive* archive) {
 	// Open patch table tab if needed
 	if (entry_pnames) {
 		PatchTablePanel* ptp = new PatchTablePanel(this, &patch_table);
-		tabs->AddPage(ptp, _T("Patch Table (PNAMES)"));
+		tabs->AddPage(ptp, "Patch Table (PNAMES)");
 		ptp->populatePatchList();
 	}
 
@@ -294,7 +294,7 @@ bool TextureXEditor::openArchive(Archive* archive) {
 bool TextureXEditor::removePatch(unsigned index) {
 	// Remove patch from patch table
 	patch_table.removePatch(index);
-	
+
 	// Update TEXTUREx lists
 	for (unsigned a = 0; a < texture_editors.size(); a++)
 		texture_editors[a]->txList().removePatch(index);
@@ -330,10 +330,10 @@ void TextureXEditor::onPaletteChanged(wxCommandEvent& e) {
 // Command to test the texture editor
 /*
 void c_text_txeditor(vector<string> args) {
-	wxDialog dialog(NULL, -1, _T("Texture Editor!"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
+	wxDialog dialog(NULL, -1, "Texture Editor!", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
 	TextureXEditor txed(&dialog);
 	if (!txed.openArchive(theArchiveManager->getArchive(0))) {
-		wxLogMessage(_T("No archive open"));
+		wxLogMessage("No archive open");
 		return;
 	}
 
@@ -345,5 +345,5 @@ void c_text_txeditor(vector<string> args) {
 	dialog.SetInitialSize(wxSize(1024, 768));
 	dialog.ShowModal();
 }
-ConsoleCommand test_txeditor(_T("test_txeditor"), &c_text_txeditor, 0);
+ConsoleCommand test_txeditor("test_txeditor", &c_text_txeditor, 0);
 */

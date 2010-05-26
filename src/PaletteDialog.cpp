@@ -42,7 +42,7 @@
  * PaletteDialog class constructor
  *******************************************************************/
 PaletteDialog::PaletteDialog(Palette8bit* palette)
-: wxDialog(NULL, -1, _T("Palette"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER) {
+: wxDialog(NULL, -1, "Palette", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER) {
 	wxBoxSizer* m_vbox = new wxBoxSizer(wxVERTICAL);
 	SetSizer(m_vbox);
 

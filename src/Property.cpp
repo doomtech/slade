@@ -117,7 +117,7 @@ bool Property::getBoolValue(bool warn_wrong_type) {
 
 	// Write warning to log if needed
 	if (warn_wrong_type && type != PROP_BOOL)
-		wxLogMessage(_T("Warning: Requested Boolean value of a %s Property"), typeString().c_str());
+		wxLogMessage("Warning: Requested Boolean value of a %s Property", typeString().c_str());
 
 	// Return value (convert if needed)
 	if (type == PROP_BOOL)
@@ -128,7 +128,7 @@ bool Property::getBoolValue(bool warn_wrong_type) {
 		return !!((int)value.Floating);
 	else if (type == PROP_STRING) {
 		// Anything except "0", "no" or "false" is considered true
-		if (!val_string.Cmp(_T("0")) || !val_string.CmpNoCase(_T("no")) || !val_string.CmpNoCase(_T("false")))
+		if (!val_string.Cmp("0") || !val_string.CmpNoCase("no") || !val_string.CmpNoCase("false"))
 			return false;
 		else
 			return true;
@@ -150,7 +150,7 @@ int Property::getIntValue(bool warn_wrong_type) {
 
 	// Write warning to log if needed
 	if (warn_wrong_type && type != PROP_INT)
-		wxLogMessage(_T("Warning: Requested Integer value of a %s Property"), typeString().c_str());
+		wxLogMessage("Warning: Requested Integer value of a %s Property", typeString().c_str());
 
 	// Return value (convert if needed)
 	if (type == PROP_INT)
@@ -178,7 +178,7 @@ double Property::getFloatValue(bool warn_wrong_type) {
 
 	// Write warning to log if needed
 	if (warn_wrong_type && type != PROP_FLOAT)
-		wxLogMessage(_T("Warning: Requested Float value of a %s Property"), typeString().c_str());
+		wxLogMessage("Warning: Requested Float value of a %s Property", typeString().c_str());
 
 	// Return value (convert if needed)
 	if (type == PROP_FLOAT)
@@ -202,25 +202,25 @@ double Property::getFloatValue(bool warn_wrong_type) {
 string Property::getStringValue(bool warn_wrong_type) {
 	// If this is a flag, just return boolean 'true' (or equivalent)
 	if (type == PROP_FLAG)
-		return _T("1");
+		return "1";
 
 	// Write warning to log if needed
 	if (warn_wrong_type && type != PROP_STRING)
-		wxLogMessage(_T("Warning: Requested String value of a %s Property"), typeString().c_str());
+		wxLogMessage("Warning: Requested String value of a %s Property", typeString().c_str());
 
 	// Return value (convert if needed)
 	if (type == PROP_STRING)
 		return val_string;
 	else if (type == PROP_INT)
-		return s_fmt(_T("%d"), value.Integer);
+		return s_fmt("%d", value.Integer);
 	else if (type == PROP_BOOL) {
 		if (value.Boolean)
-			return _T("1");
+			return "1";
 		else
-			return _T("0");
+			return "0";
 	}
 	else if (type == PROP_FLOAT)
-		return s_fmt(_T("%f"), value.Floating);
+		return s_fmt("%f", value.Floating);
 
 	// Return default string value
 	return wxEmptyString;
@@ -312,16 +312,16 @@ void Property::changeType(uint8_t newtype) {
 string Property::typeString() {
 	switch (type) {
 	case PROP_BOOL:
-		return _T("Boolean");
+		return "Boolean";
 	case PROP_INT:
-		return _T("Integer");
+		return "Integer";
 	case PROP_FLOAT:
-		return _T("Float");
+		return "Float";
 	case PROP_STRING:
-		return _T("String");
+		return "String";
 	case PROP_FLAG:
-		return _T("Flag");
+		return "Flag";
 	default:
-		return _T("Unknown");
+		return "Unknown";
 	}
 }

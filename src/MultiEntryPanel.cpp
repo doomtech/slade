@@ -48,17 +48,17 @@
  * MultiEntryPanel class constructor
  *******************************************************************/
 MultiEntryPanel::MultiEntryPanel(wxWindow* parent)
-: EntryPanel(parent, _T("multi")) {
+: EntryPanel(parent, "multi") {
 	// Init variables
 	gfx_selected = false;
 
 	// Init widgets
-	label_entries = new wxStaticText(this, -1, _T("0 selected entries"));
-	label_size = new wxStaticText(this, -1, _T("Total size: 0"));
-	btn_export_archive = new wxButton(this, -1, _T("Export as Wad"));
-	btn_convert_gfx = new wxButton(this, -1, _T("Convert Gfx to..."));
-	btn_modify_offsets = new wxButton(this, -1, _T("Modify Gfx Offsets"));
-	btn_add_trns_chunk = new wxButton(this, -1, _T("Add tRNS chunks to PNG images"));
+	label_entries = new wxStaticText(this, -1, "0 selected entries");
+	label_size = new wxStaticText(this, -1, "Total size: 0");
+	btn_export_archive = new wxButton(this, -1, "Export as Wad");
+	btn_convert_gfx = new wxButton(this, -1, "Convert Gfx to...");
+	btn_modify_offsets = new wxButton(this, -1, "Modify Gfx Offsets");
+	btn_add_trns_chunk = new wxButton(this, -1, "Add tRNS chunks to PNG images");
 
 	// Bind Events
 	btn_export_archive->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MultiEntryPanel::onBtnExportArchive, this);
@@ -101,7 +101,7 @@ bool MultiEntryPanel::loadEntries(vector<ArchiveEntry*>& list) {
 
 		// Check for gfx entry
 		if (!gfx_selected) {
-			if (list[a]->getType()->getEditor() == _T("gfx"))
+			if (list[a]->getType()->getEditor() == "gfx")
 				gfx_selected = true;
 		}
 		// Check for png entry
@@ -112,8 +112,8 @@ bool MultiEntryPanel::loadEntries(vector<ArchiveEntry*>& list) {
 	}
 
 	// Update labels
-	label_entries->SetLabel(s_fmt(_T("%d selected entries"), entries.size()));
-	label_size->SetLabel(s_fmt(_T("Total size: %s"), Misc::sizeAsString(total_size).c_str()));
+	label_entries->SetLabel(s_fmt("%d selected entries", entries.size()));
+	label_size->SetLabel(s_fmt("Total size: %s", Misc::sizeAsString(total_size).c_str()));
 
 	// Update panel layout
 	updateLayout();
@@ -138,7 +138,7 @@ void MultiEntryPanel::updateLayout() {
 	sizer_main->AddSpacer(8);
 
 	// Actions frame
-	wxStaticBox* frame_actions = new wxStaticBox(this, -1, _T("Actions"));
+	wxStaticBox* frame_actions = new wxStaticBox(this, -1, "Actions");
 	wxStaticBoxSizer* frame_sizer = new wxStaticBoxSizer(frame_actions, wxVERTICAL);
 	frame_sizer->Add(btn_export_archive, 0, wxEXPAND|wxALL, 4);
 
@@ -159,7 +159,7 @@ void MultiEntryPanel::updateLayout() {
 		btn_add_trns_chunk->Show(true);
 		frame_sizer->Add(btn_add_trns_chunk, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 	}
-	else 
+	else
 		btn_add_trns_chunk->Show(false);
 
 	sizer_main->Add(frame_sizer, 0, wxALIGN_CENTER|wxALL, 4);
@@ -181,8 +181,8 @@ void MultiEntryPanel::updateLayout() {
  *******************************************************************/
 void MultiEntryPanel::onBtnExportArchive(wxCommandEvent& e) {
 	// Create save file dialog
-	wxFileDialog dialog_save(this, _T(""), wxEmptyString, wxEmptyString,
-								_T("Doom Wad File (*.wad)|*.wad"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT, wxDefaultPosition);
+	wxFileDialog dialog_save(this, "", wxEmptyString, wxEmptyString,
+								"Doom Wad File (*.wad)|*.wad", wxFD_SAVE | wxFD_OVERWRITE_PROMPT, wxDefaultPosition);
 
 	// Run the dialog & check that the user didn't cancel
 	if (dialog_save.ShowModal() == wxID_OK) {
@@ -197,7 +197,7 @@ void MultiEntryPanel::onBtnExportArchive(wxCommandEvent& e) {
 void MultiEntryPanel::onBtnConvertGfx(wxCommandEvent& e) {
 	// Create gfx conversion dialog
 	GfxConvDialog gcd;
-	
+
 	// Send entries to the gcd
 	gcd.openEntries(entries);
 

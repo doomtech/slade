@@ -124,7 +124,7 @@ bool AnimatedList::readANIMATEDData(ArchiveEntry* animated) {
 	while (cursor < eodata && *cursor != ANIM_STOP) {
 		// reads an entry
 		if (cursor + sizeof(animated_t) > eodata) {
-			wxLogMessage(_T("Error: ANIMATED entry is corrupt"));
+			wxLogMessage("Error: ANIMATED entry is corrupt");
 			delete[] data;
 			return false;
 		}
@@ -157,7 +157,7 @@ bool AnimatedList::writeANIMATEDData(ArchiveEntry* animated) {
 	while (cursor < eodata && *cursor != ANIM_STOP) {
 		// reads an entry
 		if (cursor + sizeof(animated_t) > eodata) {
-			wxLogMessage(_T("Error: ANIMATED entry is corrupt"));
+			wxLogMessage("Error: ANIMATED entry is corrupt");
 			delete[] data;
 			return false;
 		}
@@ -181,14 +181,14 @@ bool AnimatedList::convertAnimated(ArchiveEntry* entry, MemChunk * animdata) {
 	while (cursor < eodata && *cursor != ANIM_STOP) {
 		// reads an entry
 		if (cursor + sizeof(animated_t) > eodata) {
-			wxLogMessage(_T("Error: ANIMATED entry is corrupt"));
+			wxLogMessage("Error: ANIMATED entry is corrupt");
 			return false;
 		}
 		animation = (animated_t *) cursor;
 		cursor += sizeof(animated_t);
 
 		// Create animation string
-		conversion = s_fmt(_T("%s\tOptional\t%-8s\tRange\t%-8s\tTics %i%s"),
+		conversion = s_fmt("%s\tOptional\t%-8s\tRange\t%-8s\tTics %i%s",
 			(animation->type ? "Texture" : "Flat"),
 			animation->first, animation->last, animation->speed,
 			(animation->type == ANIM_DECALS ? " AllowDecals\n" : "\n"));
