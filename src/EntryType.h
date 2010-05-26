@@ -107,7 +107,7 @@ private:
 										// between SS_START/SS_END in a wad, or the 'sprites' folder in a zip
 
 public:
-	EntryType(string id = _T("Unknown"));
+	EntryType(string id = "Unknown");
 	~EntryType();
 
 	// Setters

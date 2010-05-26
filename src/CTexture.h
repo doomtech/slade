@@ -54,11 +54,11 @@ public:
 	size_t		nPatches() { return patches.size(); }
 	CTPatch*	getPatch(size_t index);
 
-	void	setName(string name) { this->name = name; announce(_T("modified")); }
-	void	setWidth(uint16_t width) { this->width = width; announce(_T("modified")); }
-	void	setHeight(uint16_t height) { this->height = height; announce(_T("modified")); }
-	void	setScaleX(double scale) { this->scale_x = scale; announce(_T("modified")); }
-	void	setScaleY(double scale) { this->scale_y = scale; announce(_T("modified")); }
+	void	setName(string name) { this->name = name; announce("modified"); }
+	void	setWidth(uint16_t width) { this->width = width; announce("modified"); }
+	void	setHeight(uint16_t height) { this->height = height; announce("modified"); }
+	void	setScaleX(double scale) { this->scale_x = scale; announce("modified"); }
+	void	setScaleY(double scale) { this->scale_y = scale; announce("modified"); }
 
 	void	clear();
 

@@ -58,7 +58,7 @@ public:
 
 	// Entry addition/removal
 	bool			addEntry(ArchiveEntry* entry, uint32_t position = 0);
-	ArchiveEntry*	addNewEntry(string name = _T(""), uint32_t position = 0);
+	ArchiveEntry*	addNewEntry(string name = "", uint32_t position = 0);
 	ArchiveEntry*	addExistingEntry(ArchiveEntry* entry, uint32_t position = 0, bool copy = false);
 	bool			removeEntry(ArchiveEntry* entry, bool delete_entry = true);
 
@@ -87,7 +87,7 @@ public:
 	zipdir_t*	getRootDirectory() { return directory; }
 	void		dumpDirectoryTree(zipdir_t* start = NULL);
 	void		getTreeAsList(vector<ArchiveEntry*>& list, zipdir_t* start = NULL);
-	
+
 	static bool	isZipArchive(MemChunk& mc);
 	static bool isZipArchive(string filename);
 };

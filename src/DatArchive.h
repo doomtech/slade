@@ -35,7 +35,7 @@ public:
 	uint32_t	numEntries();
 
 	bool			addEntry(ArchiveEntry* entry, uint32_t position = 0);
-	ArchiveEntry*	addNewEntry(string name = _T(""), uint32_t position = 0);
+	ArchiveEntry*	addNewEntry(string name = "", uint32_t position = 0);
 	ArchiveEntry*	addExistingEntry(ArchiveEntry* entry, uint32_t position = 0, bool copy = false);
 	bool			removeEntry(ArchiveEntry* entry, bool delete_entry = true);
 
