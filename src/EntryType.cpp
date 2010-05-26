@@ -119,6 +119,7 @@ EntryType::~EntryType() {
 	match_extension.clear();
 	match_name.clear();
 	match_size.clear();
+	match_archive.clear();
 	size_multiple.clear();
 }
 
@@ -136,6 +137,9 @@ void EntryType::addToList() {
 void EntryType::dump() {
 	wxLogMessage(s_fmt("Type %s \"%s\", format %s, extension %s", chr(id), chr(name), chr(format), chr(extension)));
 	wxLogMessage(s_fmt("Size limit: %d-%d", size_limit[0], size_limit[1]));
+
+	for (size_t a = 0; a < match_archive.size(); a++)
+		wxLogMessage(s_fmt("Match Archive: \"%s\"", chr(match_archive[a])));
 
 	for (size_t a = 0; a < match_extension.size(); a++)
 		wxLogMessage(s_fmt("Match Extension: \"%s\"", chr(match_extension[a])));
@@ -168,7 +172,8 @@ void EntryType::copyToType(EntryType* target) {
 	target->match_extension = match_extension;
 	target->match_name = match_name;
 	target->match_size = match_size;
-	target->size_multiple = size_multiple;
+	target->match_extension = match_extension;
+	target->match_archive = match_archive;
 
 /*
 	// Copy match names
@@ -212,6 +217,19 @@ bool EntryType::isThisType(ArchiveEntry* entry) {
 	// Check max size
 	if (size_limit[1] >= 0 && entry->getSize() > (unsigned)size_limit[1])
 		return false;
+
+	// Check for archive match if needed
+	if (match_archive.size() > 0) {
+		bool match = false;
+		for (size_t a = 0; a < match_archive.size(); a++) {
+			if (entry->getParent()->getFormat() == match_archive[a]) {
+				match = true;
+				break;
+			}
+		}
+		if (!match)
+			return false;
+	}
 
 	// Check for size match if needed
 	if (match_size.size() > 0) {
@@ -389,7 +407,11 @@ bool EntryType::readEntryTypeDefinition(MemChunk& mc) {
 			else if (s_cmpnocase(fieldnode->getName(), "reliability")) {	// Reliability field
 				ntype->reliability = fieldnode->getIntValue();
 			}
-			else if (s_cmpnocase(fieldnode->getName(), "extra")) {				// Extra properties
+			else if (s_cmpnocase(fieldnode->getName(), "match_archive")) {		// Archive field
+				for (unsigned v = 0; v < fieldnode->nValues(); v++)
+					ntype->match_archive.push_back(fieldnode->getStringValue(v));
+			}
+			else if (s_cmpnocase(fieldnode->getName(), "extra")) {			// Extra properties
 				for (unsigned v = 0; v < fieldnode->nValues(); v++)
 					ntype->extra.addFlag(fieldnode->getStringValue(v));
 			}

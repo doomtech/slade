@@ -822,6 +822,7 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 	// Check what types exist in the selection
 	bool gfx_selected = false;
 	bool bas_selected = false;
+//	bool rle_selected = false;
 	for (size_t a = 0; a < selection.size(); a++) {
 		// Check for gfx entry
 		if (!gfx_selected) {
@@ -833,6 +834,12 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 				selection[a]->getType()->getFormat() == "switches")
 				bas_selected = true;
 		}
+#if 0
+		if (!rle_selected) {
+			if (selection[a]->getType()->getFormat() == "misc_rle0")
+				rle_selected = true;
+		}
+#endif
 	}
 
 	// Add gfx-related menu items if gfx are selected
@@ -847,7 +854,8 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 		context->AppendSeparator();
 		context->Append(MENU_ENTRY_BAS_CONVERT, "Convert to ANIMDEFS");
 	}
-	context->Append(MENU_ENTRY_PAL_CONVERT, "Pal 6-bit to 8-bit");
+	// This is not generally useful
+	//context->Append(MENU_ENTRY_PAL_CONVERT, "Pal 6-bit to 8-bit");
 
 	// Popup the context menu
 	PopupMenu(context);
@@ -897,9 +905,12 @@ void ArchivePanel::onEntryMenuClick(wxCommandEvent& e) {
 		case MENU_ENTRY_BAS_CONVERT:
 			basConvert();
 			break;
+#if 0
+		// That stuff is not for general consumption ;)
 		case MENU_ENTRY_PAL_CONVERT:
 			palConvert();
 			break;
+#endif
 	}
 }
 

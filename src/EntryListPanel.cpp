@@ -73,7 +73,7 @@ EntryList::EntryList(EntryListPanel *parent, int id)
 	wxArrayString et_icon_list = EntryType::getIconList();
 	for (size_t a = 0; a < et_icon_list.size(); a++) {
 		if (image_list->Add(getIcon(et_icon_list[a])) < 0)
-			image_list->Add(getIcon(_T("e_default")));
+			image_list->Add(getIcon("e_default"));
 	}
 
 	SetImageList(image_list, wxIMAGE_LIST_SMALL);
@@ -100,7 +100,7 @@ bool EntryList::updateEntry(int index) {
 
 	// Check that it exists
 	if (!entry) {
-		wxLogMessage(_T("EntryList item %d has no associated archive entry!"), index);
+		wxLogMessage("EntryList item %d has no associated archive entry!", index);
 		return false;
 	}
 
@@ -151,7 +151,7 @@ EntryListPanel::EntryListPanel(wxWindow *parent, int id, Archive* archive)
 	this->archive = archive;
 
 	// Create & set sizer & border
-	wxStaticBox *frame = new wxStaticBox(this, -1, _T("Entries"));
+	wxStaticBox *frame = new wxStaticBox(this, -1, "Entries");
 	wxStaticBoxSizer *framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
 	SetSizer(framesizer);
 
@@ -187,21 +187,21 @@ void EntryListPanel::populateEntryList() {
 	entry_list->Show(false);
 
 	// Create the "Name" column
-	entry_list->InsertColumn(0, _T("Name"));
+	entry_list->InsertColumn(0, "Name");
 
 	// Create the "Size" column
 	int col = 1;
 	if (col_size) {
-		entry_list->InsertColumn(1, _T("Size"));
+		entry_list->InsertColumn(1, "Size");
 		col++;
 	}
 
 	// Create the "Type" column
-	if (col_type) entry_list->InsertColumn(col, _T("Type"));
+	if (col_type) entry_list->InsertColumn(col, "Type");
 
 	// Go through all entries and add them to the list
 	entry_list->enableSizeUpdate(false);
-	theSplashWindow->setProgressMessage(_T("Populating entry list"));
+	theSplashWindow->setProgressMessage("Populating entry list");
 	for (uint32_t a = 0; a < archive->numEntries(); a++) {
 		// Update splash window
 		theSplashWindow->setProgress((float)a / (float)archive->numEntries());
@@ -562,8 +562,8 @@ void EntryListPanel::onEntryListColResize(wxListEvent& e) {
  *******************************************************************/
 void EntryListPanel::onEntryListColRightClick(wxListEvent& e) {
 	wxMenu* popup = new wxMenu();
-	popup->AppendCheckItem(MENU_COLUMNS_SIZE, _T("Size"), _T("Show the size column"));
-	popup->AppendCheckItem(MENU_COLUMNS_TYPE, _T("Type"), _T("Show the type column"));
+	popup->AppendCheckItem(MENU_COLUMNS_SIZE, "Size", "Show the size column");
+	popup->AppendCheckItem(MENU_COLUMNS_TYPE, "Type", "Show the type column");
 	popup->Check(MENU_COLUMNS_SIZE, col_size);
 	popup->Check(MENU_COLUMNS_TYPE, col_type);
 

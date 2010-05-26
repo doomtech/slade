@@ -86,8 +86,10 @@ bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry) {
 		return image->loadDoomGfxB(entry->getData(), entry->getSize());
 	else if (s_cmpnocase(format, "img_doom_snea"))
 		return image->loadDoomSnea(entry->getData(), entry->getSize());
-	else if (s_cmpnocase(format, "img_doom_arah"))
-		return image->loadDoomArah(entry->getData(), entry->getSize());
+	else if (s_cmpnocase(format, "img_doom_arah")) {
+		int transindex = (entry->getType()->extraProps().propertyExists("zerotransparent")) ?  0 : 255;
+		return image->loadDoomArah(entry->getData(), entry->getSize(), transindex);
+	}
 	else if (s_cmpnocase(format, "img_imgz"))
 		return image->loadImgz(entry->getData(), entry->getSize());
 	else if (s_cmpnocase(format, "img_legacy"))
@@ -110,6 +112,8 @@ bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry) {
 		return image->loadFontM(entry->getData(), entry->getSize());
 	else if (s_cmpnocase(format, "img_scsprite"))
 		return image->loadSCSprite(entry->getData(), entry->getSize());
+	else if (s_cmpnocase(format, "img_scwall"))
+		return image->loadSCWall(entry->getData(), entry->getSize());
 	else {
 		if (!image->loadImage(entry->getData(true), entry->getSize())) {
 			Global::error = "Image format not supported by FreeImage";

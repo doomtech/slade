@@ -151,6 +151,13 @@ string WadArchive::getFileExtensionString() {
 	return "Wad Files (*.wad)|*.wad";
 }
 
+/* WadArchive::getFormat
+ * Gives the "archive_wad" string
+ *******************************************************************/
+string WadArchive::getFormat() {
+	return "archive_wad";
+}
+
 /* WadArchive::open
  * Reads a wad format file from disk
  * Returns true if successful, false otherwise

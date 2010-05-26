@@ -70,6 +70,7 @@ xy(EDF_GFX_DOOM_BETA,	"gfx_doom_beta",	detectDoomGfxBeta,		loadDoomGfxB)// Beta 
 xy(EDF_GFX_DOOM_SNEA,	"gfx_doom_snea",	detectDoomGfxSnea,		loadDoomSnea)// Alpha Doom snea format
 xy(EDF_GFX_DOOM_GNUM,	"gfx_doom_gnum",	detectDoomFlat,			loadDoomFlat)// 10x12 raw
 xy(EDF_SCSPRITE,		"scsprite",			detectSCSprite,			loadSCSprite)// Shadowcaster sprite format
+xy(EDF_SCSPRITE,		"scwall",			detectSCWall,			loadSCWall)// Shadowcaster sprite format
 xb(EDF_PALETTED_STOP,	"palettedstop")
 xb(EDF_GRAPHIC_END,		"gfxend")
 

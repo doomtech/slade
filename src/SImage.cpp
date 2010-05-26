@@ -49,14 +49,14 @@ struct grab_chunk_t {
 // Define valid flat sizes
 uint32_t valid_flat_size[][2] = {
 	{  10,  12 },	// gnum format
-	{  16,  16 },	// \
+	{  16,  16 },	// \ 
 	{  32,  64 },	// Strife startup sprite
-	{  48,  48 },	// /
+	{  48,  48 },	// / 
 	{  64,  64 },	// standard flat size
 	{  64, 128 },	// Hexen flat size variant
-	{ 128, 128 },	// \
+	{ 128, 128 },	// \ 
 	{ 256, 256 },	// hires flat size
-	{ 512, 512 },	// /
+	{ 512, 512 },	// / 
 	{ 320, 200 },	// full screen format
 };
 uint32_t	n_valid_flat_sizes = 10;
@@ -660,6 +660,10 @@ bool SImage::loadDoomFlat(const uint8_t* gfx_data, int size) {
 	return true;
 }
 
+/* SImage::loadSCSprite
+ * Loads a sprite in ShadowCaster's format.
+ * Returns false if the image data was invalid, true otherwise.
+*******************************************************************/
 bool SImage::loadSCSprite(const uint8_t* gfx_data, int size) {
 	// Check data
 	if (!gfx_data)
@@ -734,6 +738,49 @@ bool SImage::loadSCSprite(const uint8_t* gfx_data, int size) {
 				if (data[mypixel])
 					mask[mypixel] = 0xFF;
 			}
+		}
+	}
+
+	// Announce change
+	announce("image_changed");
+
+	return true;
+}
+
+/* SImage::loadSCWall
+ * Loads a wall in ShadowCaster's format.
+ * Returns false if the image data was invalid, true otherwise.
+*******************************************************************/
+#define SCWALLOFFSET 130 // Headers contain 129 bytes of junk.
+bool SImage::loadSCWall(const uint8_t* gfx_data, int size) {
+	if (!size)
+		return false;
+
+	height = gfx_data[0]*4;
+	width = 64;
+	if (size != width * height + SCWALLOFFSET)
+		return false;
+
+	// Clear current data if it exists
+	clearData();
+	data = new uint8_t[width*height];
+	memset(data, 0xFF, width*height);
+	mask = new uint8_t[width*height];
+	memset(mask, 0xFF, width*height);
+
+	// Setup variables
+	format = PALMASK;
+	has_palette = false;
+
+	// Read pixel data
+	int pixelreader = SCWALLOFFSET;
+	int brush = 0;
+	for (int x = 0; x < width; ++x) {
+		for (int y = 0; y < height; ++y, ++pixelreader) {
+			brush = (y*64)+x;
+			data[brush] = gfx_data[pixelreader];
+			if (data[brush] == 0)
+				mask[brush] = 0;
 		}
 	}
 
@@ -828,7 +875,7 @@ bool SImage::loadDoomLegacy(const uint8_t* gfx_data, int size) {
  * Returns false if the image data was invalid, true otherwise.
  * It seems index 255 is treated as transparent in this format.
  *******************************************************************/
-bool SImage::loadDoomArah(const uint8_t* gfx_data, int size) {
+bool SImage::loadDoomArah(const uint8_t* gfx_data, int size, int transindex) {
 	// Check data
 	if (!gfx_data)
 		return false;
@@ -853,9 +900,9 @@ bool SImage::loadDoomArah(const uint8_t* gfx_data, int size) {
 	mask = new uint8_t[width*height];
 	memset(mask, 255, width*height);
 
-	// Mark as transparent all pixels that are set to FF
+	// Mark as transparent all pixels that are set to 'transindex'
 	for (size_t  i = 0; i < (unsigned)(width*height); ++i)
-		if (data[i] == 0) mask[i] = 0;
+		if (data[i] == transindex) mask[i] = 0;
 
 	// Announce change
 	announce("image_changed");

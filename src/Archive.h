@@ -44,6 +44,7 @@ public:
 	virtual ArchiveEntry*	getEntry(uint32_t index) = 0;
 	virtual ArchiveEntry*	getEntry(string name) = 0;
 	virtual string			getFileExtensionString() = 0;
+	virtual string			getFormat() = 0;
 	bool					checkEntry(ArchiveEntry* entry);
 	void					setModified(bool mod);
 	bool					canSave() { return parent || on_disk; }

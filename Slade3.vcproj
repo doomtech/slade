@@ -650,26 +650,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\EntryDataFormat.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\EntryDataFormat.h"
-					>
-				</File>
-				<File
-					RelativePath=".\src\EntryType.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\EntryType.h"
-					>
-				</File>
-				<File
-					RelativePath=".\src\EntryTypeList.h"
-					>
-				</File>
-				<File
 					RelativePath=".\src\LibArchive.cpp"
 					>
 				</File>
@@ -805,6 +785,54 @@
 						>
 					</File>
 				</Filter>
+			</Filter>
+			<Filter
+				Name="Entries"
+				>
+				<File
+					RelativePath=".\src\ArchiveFormats.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\AudioFormats.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\EntryDataFormat.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\EntryDataFormat.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\EntryType.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\EntryType.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\EntryTypeList.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ImageFormats.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\LumpFormats.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\MiscFormats.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ModelFormats.h"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter

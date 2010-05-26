@@ -107,6 +107,13 @@ string LibArchive::getFileExtensionString() {
 	return "Shadowcaster Lib Files (*.lib)|*.lib";
 }
 
+/* LibArchive::getFormat
+ * Gives the "archive_lib" string
+ *******************************************************************/
+string LibArchive::getFormat() {
+	return "archive_lib";
+}
+
 /* LibArchive::open
  * Reads a wad format file from disk
  * Returns true if successful, false otherwise

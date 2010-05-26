@@ -422,6 +422,13 @@ string ZipArchive::getFileExtensionString() {
 	return "Any Zip Format File (*.zip;*.pk3;*.jdf)|*.zip;*.pk3;*.jdf|Zip File (*.zip)|*.zip|Pk3 File (*.pk3)|*.pk3|JDF File (*.jdf)|*.jdf";
 }
 
+/* ZipArchive::getFormat
+ * Gives the "archive_zip" string
+ *******************************************************************/
+string ZipArchive::getFormat() {
+	return "archive_zip";
+}
+
 /* ZipArchive::open
  * Reads zip data from a file
  * Returns true if successful, false otherwise

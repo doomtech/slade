@@ -16,6 +16,7 @@ public:
 	ArchiveEntry*	getEntry(uint32_t index);
 	ArchiveEntry*	getEntry(string name);
 	string			getFileExtensionString();
+	string			getFormat();
 
 	bool	open(string filename);
 	bool	open(ArchiveEntry* entry);

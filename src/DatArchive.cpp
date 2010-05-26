@@ -107,6 +107,13 @@ string DatArchive::getFileExtensionString() {
 	return "Shadowcaster Dat Files (*.dat)|*.dat";
 }
 
+/* DatArchive::getFormat
+ * Gives the "archive_dat" string
+ *******************************************************************/
+string DatArchive::getFormat() {
+	return "archive_dat";
+}
+
 /* DatArchive::open
  * Reads a wad format file from disk
  * Returns true if successful, false otherwise
@@ -359,7 +366,7 @@ void DatArchive::setEntryOffset(ArchiveEntry* entry, uint32_t offset) {
 }
 
 /* DatArchive::loadEntryData
- * Loads an entry's data from the wadfile
+ * Loads an entry's data from the datfile
  * Returns true if successful, false otherwise
  *******************************************************************/
 bool DatArchive::loadEntryData(ArchiveEntry* entry) {
@@ -379,7 +386,7 @@ bool DatArchive::loadEntryData(ArchiveEntry* entry) {
 
 	// Check if opening the file failed
 	if (!file.IsOpened()) {
-		wxLogMessage("DatArchive::loadEntryData: Failed to open libfile %s", filename.c_str());
+		wxLogMessage("DatArchive::loadEntryData: Failed to open datfile %s", filename.c_str());
 		return false;
 	}
 

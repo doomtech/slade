@@ -105,6 +105,7 @@ private:
 	vector<int>		size_multiple;		// Entry size must be a multiple of this
 	string			section;			// The 'section' of the archive the entry is in, eg "sprites" for entries
 										// between SS_START/SS_END in a wad, or the 'sprites' folder in a zip
+	vector<string>	match_archive;		// The types of archive the entry can be found in (e.g., wad or zip)
 
 public:
 	EntryType(string id = "Unknown");

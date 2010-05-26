@@ -57,7 +57,7 @@ ZipEntryListPanel::ZipEntryListPanel(wxWindow* parent, int id, Archive* archive)
 : EntryListPanel(parent, id, archive) {
 	// Check the archive type
 	if (archive->getType() != ARCHIVE_ZIP) {
-		wxMessageBox(_T("Error: Attempt to open a non-zip archive with a zip entry list, this shouldn't happen"), _T("Error"));
+		wxMessageBox("Error: Attempt to open a non-zip archive with a zip entry list, this shouldn't happen", "Error");
 		archive = NULL;
 	}
 
@@ -68,7 +68,7 @@ ZipEntryListPanel::ZipEntryListPanel(wxWindow* parent, int id, Archive* archive)
 	dummy_folder_entry = new ArchiveEntry();
 	dummy_folder_entry->setType(EntryType::folderType());
 	dummy_folder_entry->setState(0);
-	dummy_folder_entry->setName(_T(".."));
+	dummy_folder_entry->setName("..");
 
 	// Init beginning index of entries
 	entries_begin = 0;
@@ -132,9 +132,9 @@ void ZipEntryListPanel::updateDirectoryEntry(int index) {
 		li.SetColumn(1);
 		int entry_count = dir->numEntries(false) + dir->numSubDirs(false);
 		if (entry_count == 1)
-			li.SetText(_T("1 Entry"));
+			li.SetText("1 Entry");
 		else
-			li.SetText(s_fmt(_T("%d Entries"), entry_count));
+			li.SetText(s_fmt("%d Entries", entry_count));
 		entry_list->SetItem(li);
 	}
 }
@@ -193,17 +193,17 @@ void ZipEntryListPanel::populateEntryList() {
 	entry_list->Show(false);
 
 	// Create the "Name" column
-	entry_list->InsertColumn(0, _T("Name"));
+	entry_list->InsertColumn(0, "Name");
 
 	// Create the "Size" column
 	int col = 1;
 	if (col_size) {
-		entry_list->InsertColumn(1, _T("Size"));
+		entry_list->InsertColumn(1, "Size");
 		col++;
 	}
 
 	// Create the "Type" column
-	if (col_type) entry_list->InsertColumn(col, _T("Type"));
+	if (col_type) entry_list->InsertColumn(col, "Type");
 
 	// Get current directory
 	zipdir_t* dir = getCurrentDir();
@@ -222,7 +222,7 @@ void ZipEntryListPanel::populateEntryList() {
 		updateDirectoryEntry(0);
 
 		// Set name manually
-		li.SetText(_T(".."));
+		li.SetText("..");
 		entry_list->SetItem(li);
 
 		index++;

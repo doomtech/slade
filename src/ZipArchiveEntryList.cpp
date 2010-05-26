@@ -223,7 +223,7 @@ vector<zipdir_t*> ZipArchiveEntryList::getSelectedDirectories() {
  *******************************************************************/
 int ZipArchiveEntryList::getEntryListIndex(int index) {
 	// Check the index and current directory is ok
-	if (!current_dir || index < 0 || index >= current_dir->numEntries())
+	if (!current_dir || index < 0 || (unsigned)index >= current_dir->numEntries())
 		return -1;
 
 	// Determine where the entry indices start
@@ -241,7 +241,7 @@ int ZipArchiveEntryList::getEntryListIndex(int index) {
  *******************************************************************/
 int ZipArchiveEntryList::getDirListIndex(int subdir) {
 	// Check the index and current directory is ok
-	if (!current_dir || subdir < 0 || subdir >= current_dir->numSubDirs())
+	if (!current_dir || subdir < 0 || (unsigned)subdir >= current_dir->numSubDirs())
 		return -1;
 
 	// Only need to check for .. entry

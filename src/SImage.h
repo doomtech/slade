@@ -58,7 +58,7 @@ public:
 	bool	loadDoomGfxB(const uint8_t* data, int size) {return loadDoomGfx(data, size, 1);}
 	bool	loadDoomSnea(const uint8_t* data, int size);
 	bool	loadDoomFlat(const uint8_t* data, int size);
-	bool	loadDoomArah(const uint8_t* gfx_data, int size);
+	bool	loadDoomArah(const uint8_t* gfx_data, int size, int transindex = 255);
 	bool	loadDoomLegacy(const uint8_t* gfx_data, int size);
 	bool	loadPlanar(const uint8_t* gfx_data, int size);
 	bool	load4bitChunk(const uint8_t* gfx_data, int size);
@@ -69,6 +69,7 @@ public:
 	bool	loadFontM(const uint8_t* gfx_data, int size);
 	bool	loadBMF(const uint8_t* gfx_data, int size);
 	bool	loadSCSprite(const uint8_t* data, int size);
+	bool	loadSCWall(const uint8_t* data, int size);
 
 	// Image format writing
 	bool	toPNG(MemChunk& out, Palette8bit* pal = NULL);
