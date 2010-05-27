@@ -553,7 +553,7 @@ bool ZipArchive::open(ArchiveEntry* entry) {
  *******************************************************************/
 bool ZipArchive::open(MemChunk& mc) {
 	// Write the MemChunk to a temp file
-	string tempfile = appPath("slade-temp.zip", DIR_TEMP);
+	string tempfile = appPath("slade-temp-open.zip", DIR_TEMP);
 	mc.exportFile(tempfile);
 
 	// Load the file
@@ -573,7 +573,7 @@ bool ZipArchive::write(MemChunk& mc, bool update) {
 	bool success = false;
 
 	// Write to a temporary file
-	string tempfile = appPath("slade-temp.zip", DIR_TEMP);
+	string tempfile = appPath("slade-temp-write.zip", DIR_TEMP);
 	if (write(tempfile, true)) {
 		// Load file into MemChunk
 		success = mc.importFile(tempfile);
@@ -593,7 +593,7 @@ bool ZipArchive::write(string filename, bool update) {
 	// If we're overwriting the current file, rename it so that it can still be read while writing the 'new' file
 	string current = this->filename;
 	if (!filename.CmpNoCase(this->filename)) {
-		current = appPath("slade-temp.zip", DIR_TEMP);
+		current = appPath("slade-temp-write.zip", DIR_TEMP);
 		wxRenameFile(this->filename, current);
 	}
 
