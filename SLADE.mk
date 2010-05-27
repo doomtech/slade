@@ -55,7 +55,7 @@ Objects=$(IntermediateDirectory)/src_GfxConvDialog$(ObjectSuffix) $(Intermediate
 	$(IntermediateDirectory)/src_MapCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_MapEditorWindow$(ObjectSuffix) $(IntermediateDirectory)/src_Archive$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveEntry$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveManager$(ObjectSuffix) $(IntermediateDirectory)/src_WadArchive$(ObjectSuffix) $(IntermediateDirectory)/src_ZipArchive$(ObjectSuffix) $(IntermediateDirectory)/src_EntryType$(ObjectSuffix) $(IntermediateDirectory)/src_EntryDataFormat$(ObjectSuffix) $(IntermediateDirectory)/src_DatArchive$(ObjectSuffix) \
 	$(IntermediateDirectory)/src_LibArchive$(ObjectSuffix) $(IntermediateDirectory)/src_AnimatedList$(ObjectSuffix) $(IntermediateDirectory)/src_SwitchesList$(ObjectSuffix) $(IntermediateDirectory)/src_PnamesList$(ObjectSuffix) $(IntermediateDirectory)/src_CTexture$(ObjectSuffix) $(IntermediateDirectory)/src_PatchTable$(ObjectSuffix) $(IntermediateDirectory)/src_TextureXList$(ObjectSuffix) $(IntermediateDirectory)/src_SImage$(ObjectSuffix) $(IntermediateDirectory)/src_Palette$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteManager$(ObjectSuffix) \
 	$(IntermediateDirectory)/src_GLTexture$(ObjectSuffix) $(IntermediateDirectory)/src_Icons$(ObjectSuffix) $(IntermediateDirectory)/src_ColourBox$(ObjectSuffix) $(IntermediateDirectory)/src_GfxCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_OGLCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteChooser$(ObjectSuffix) $(IntermediateDirectory)/src_ConsolePanel$(ObjectSuffix) $(IntermediateDirectory)/src_SplashWindow$(ObjectSuffix) $(IntermediateDirectory)/src_BaseResourceArchivesPanel$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_BrowserCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_Browser$(ObjectSuffix) $(IntermediateDirectory)/src_CTextureCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_TextEditor$(ObjectSuffix) $(IntermediateDirectory)/src_TextLanguage$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveEntryList$(ObjectSuffix) $(IntermediateDirectory)/src_ListView$(ObjectSuffix) $(IntermediateDirectory)/src_ZipArchiveEntryList$(ObjectSuffix) 
+	$(IntermediateDirectory)/src_BrowserCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_Browser$(ObjectSuffix) $(IntermediateDirectory)/src_CTextureCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_TextEditor$(ObjectSuffix) $(IntermediateDirectory)/src_TextLanguage$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveEntryList$(ObjectSuffix) $(IntermediateDirectory)/src_ListView$(ObjectSuffix) $(IntermediateDirectory)/src_ZipArchiveEntryList$(ObjectSuffix) $(IntermediateDirectory)/src_VirtualListView$(ObjectSuffix) 
 
 ##
 ## Main Build Targets 
@@ -699,6 +699,14 @@ $(IntermediateDirectory)/src_ZipArchiveEntryList$(DependSuffix): src/ZipArchiveE
 $(IntermediateDirectory)/src_ZipArchiveEntryList$(PreprocessSuffix): src/ZipArchiveEntryList.cpp
 	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ZipArchiveEntryList$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/ZipArchiveEntryList.cpp"
 
+$(IntermediateDirectory)/src_VirtualListView$(ObjectSuffix): src/VirtualListView.cpp $(IntermediateDirectory)/src_VirtualListView$(DependSuffix)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/VirtualListView.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_VirtualListView$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_VirtualListView$(DependSuffix): src/VirtualListView.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_VirtualListView$(ObjectSuffix) -MF$(IntermediateDirectory)/src_VirtualListView$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/VirtualListView.cpp"
+
+$(IntermediateDirectory)/src_VirtualListView$(PreprocessSuffix): src/VirtualListView.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_VirtualListView$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/VirtualListView.cpp"
+
 
 -include $(IntermediateDirectory)/*$(DependSuffix)
 ##
@@ -939,6 +947,9 @@ clean:
 	$(RM) $(IntermediateDirectory)/src_ZipArchiveEntryList$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/src_ZipArchiveEntryList$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/src_ZipArchiveEntryList$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/src_VirtualListView$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/src_VirtualListView$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/src_VirtualListView$(PreprocessSuffix)
 	$(RM) $(OutputFile)
 
 

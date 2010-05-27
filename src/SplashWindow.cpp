@@ -162,12 +162,6 @@ void SplashWindow::onPaint(wxPaintEvent& e) {
 	timer.Start();
 }
 
-/*
-void SplashWindow::onTimerNotify(wxTimerEvent& e) {
-	Refresh();
-	Update();
-}
-*/
 
 
 /* Console Command - "splash"

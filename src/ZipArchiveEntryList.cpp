@@ -118,7 +118,8 @@ void ZipArchiveEntryList::updateList(bool clear) {
 }
 
 /* ZipArchiveEntryList::filterList
- * Filters the list to only entries with names matching [filter]
+ * Filters the list to only entries and directories with names
+ * matching [filter]
  *******************************************************************/
 void ZipArchiveEntryList::filterList(string filter) {
 	if (filter.IsEmpty()) {

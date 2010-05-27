@@ -226,6 +226,8 @@
       <File Name="src/ListView.h"/>
       <File Name="src/ZipArchiveEntryList.cpp"/>
       <File Name="src/ZipArchiveEntryList.h"/>
+      <File Name="src/VirtualListView.h"/>
+      <File Name="src/VirtualListView.cpp"/>
     </VirtualDirectory>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
