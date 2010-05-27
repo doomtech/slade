@@ -92,13 +92,17 @@ void ZipArchiveEntryList::setArchive(Archive* archive) {
 /* ZipArchiveEntryList::updateList
  * Updates + refreshes the list
  *******************************************************************/
-void ZipArchiveEntryList::updateList() {
+void ZipArchiveEntryList::updateList(bool clear) {
 	// If no current directory, set size to 0
 	if (!current_dir) {
 		SetItemCount(0);
 		Refresh();
 		return;
 	}
+
+	// Clear all items if needed
+	if (clear)
+		DeleteAllItems();
 
 	// Determine if we need a 'back folder' entry
 	int back_folder = 0;

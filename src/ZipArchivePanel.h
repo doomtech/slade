@@ -13,8 +13,8 @@ public:
 
 	void			init();
 
-	void	save();
-	void	saveAs();
+	//void	save();
+	//void	saveAs();
 
 	bool	newEntry();
 	bool	newEntryFromFile();

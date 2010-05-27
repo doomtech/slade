@@ -23,7 +23,7 @@ public:
 	zipdir_t*	getCurrentDir() { return current_dir; }
 
 	void	setArchive(Archive* archive);
-	void	updateList();
+	void	updateList(bool clear = false);
 
 	int					entriesBegin();
 	bool				isFolder(int index);

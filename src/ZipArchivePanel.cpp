@@ -158,27 +158,29 @@ void ZipArchivePanel::init() {
  * Override of ArchivePanel::save to also update any directories in
  * the entry list
  *******************************************************************/
+/*
 void ZipArchivePanel::save() {
 	// Do default save
 	ArchivePanel::save();
 
-	// Update all directories
-	//for (int a = 0; a < ((ZipEntryListPanel*)entry_list)->entriesBegin(); a++)
-	//	((ZipEntryListPanel*)entry_list)->updateDirectoryEntry(a);
+	// Update list
+	entry_list->updateList();
 }
+*/
 
 /* ZipArchivePanel::saveAs
  * Override of ArchivePanel::saveAs to also update any directories in
  * the entry list
  *******************************************************************/
+/*
 void ZipArchivePanel::saveAs() {
 	// Do default save as
 	ArchivePanel::saveAs();
 
-	// Update all directories
-	//for (int a = 0; a < ((ZipEntryListPanel*)entry_list)->entriesBegin(); a++)
-	//	((ZipEntryListPanel*)entry_list)->updateDirectoryEntry(a);
+	// Update list
+	entry_list->updateList();
 }
+*/
 
 /* ZipArchivePanel::newEntry
  * The same as ArchivePanel::newEntry, but more advanced to deal

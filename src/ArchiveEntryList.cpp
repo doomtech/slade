@@ -180,6 +180,8 @@ void ArchiveEntryList::updateList(bool clear) {
 
 	// Refresh
 	Refresh();
+
+	wxLogMessage("ArchiveEntryList update");
 }
 
 /* ArchiveEntryList::getEntry
