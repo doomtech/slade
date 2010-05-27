@@ -82,6 +82,9 @@
     <Filter Include="UI Elements\Lists">
       <UniqueIdentifier>{13cacd50-0c22-431c-b94e-2fc031b1c3dc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resources\Archive\EntryType\EntryDataFormat">
+      <UniqueIdentifier>{c59be1fa-5ac3-471b-8512-cf3695aeac84}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\GfxConvDialog.cpp">
@@ -300,9 +303,6 @@
     <ClCompile Include="src\Parser.cpp">
       <Filter>General\Utility</Filter>
     </ClCompile>
-    <ClCompile Include="src\EntryDataFormat.cpp">
-      <Filter>Resources\Archive\EntryType</Filter>
-    </ClCompile>
     <ClCompile Include="src\ArchiveEntryList.cpp">
       <Filter>UI Elements\Lists</Filter>
     </ClCompile>
@@ -311,6 +311,18 @@
     </ClCompile>
     <ClCompile Include="src\ZipArchiveEntryList.cpp">
       <Filter>UI Elements\Lists</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EntryDataFormat.cpp">
+      <Filter>Resources\Archive\EntryType\EntryDataFormat</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VirtualListView.cpp">
+      <Filter>UI Elements\Lists</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DatArchive.cpp">
+      <Filter>Resources\Archive</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LibArchive.cpp">
+      <Filter>Resources\Archive</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -525,9 +537,6 @@
     <ClInclude Include="src\EntryType.h">
       <Filter>Resources\Archive\EntryType</Filter>
     </ClInclude>
-    <ClInclude Include="src\EntryDataFormat.h">
-      <Filter>Resources\Archive\EntryType</Filter>
-    </ClInclude>
     <ClInclude Include="src\BrowserCanvas.h">
       <Filter>UI Elements\Browser</Filter>
     </ClInclude>
@@ -557,6 +566,33 @@
     </ClInclude>
     <ClInclude Include="src\ZipArchiveEntryList.h">
       <Filter>UI Elements\Lists</Filter>
+    </ClInclude>
+    <ClInclude Include="src\EntryDataFormat.h">
+      <Filter>Resources\Archive\EntryType\EntryDataFormat</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ArchiveFormats.h">
+      <Filter>Resources\Archive\EntryType\EntryDataFormat</Filter>
+    </ClInclude>
+    <ClInclude Include="src\AudioFormats.h">
+      <Filter>Resources\Archive\EntryType\EntryDataFormat</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ImageFormats.h">
+      <Filter>Resources\Archive\EntryType\EntryDataFormat</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MiscFormats.h">
+      <Filter>Resources\Archive\EntryType\EntryDataFormat</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ModelFormats.h">
+      <Filter>Resources\Archive\EntryType\EntryDataFormat</Filter>
+    </ClInclude>
+    <ClInclude Include="src\VirtualListView.h">
+      <Filter>UI Elements\Lists</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DatArchive.h">
+      <Filter>Resources\Archive</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LibArchive.h">
+      <Filter>Resources\Archive</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

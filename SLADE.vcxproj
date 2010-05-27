@@ -104,8 +104,10 @@
   <ItemGroup>
     <ClCompile Include="src\ArchiveEntryList.cpp" />
     <ClCompile Include="src\BrowserCanvas.cpp" />
+    <ClCompile Include="src\DatArchive.cpp" />
     <ClCompile Include="src\EntryDataFormat.cpp" />
     <ClCompile Include="src\GfxConvDialog.cpp" />
+    <ClCompile Include="src\LibArchive.cpp" />
     <ClCompile Include="src\ModifyOffsetsDialog.cpp" />
     <ClCompile Include="src\PaletteDialog.cpp" />
     <ClCompile Include="src\Clipboard.cpp" />
@@ -120,6 +122,7 @@
     <ClCompile Include="src\TextLanguage.cpp" />
     <ClCompile Include="src\Tokenizer.cpp" />
     <ClCompile Include="src\Tree.cpp" />
+    <ClCompile Include="src\VirtualListView.cpp" />
     <ClCompile Include="src\WxStuff.cpp" />
     <ClCompile Include="src\Property.cpp" />
     <ClCompile Include="src\PropertyList.cpp" />
@@ -181,9 +184,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ArchiveEntryList.h" />
+    <ClInclude Include="src\ArchiveFormats.h" />
+    <ClInclude Include="src\AudioFormats.h" />
     <ClInclude Include="src\BrowserCanvas.h" />
+    <ClInclude Include="src\DatArchive.h" />
     <ClInclude Include="src\EntryDataFormat.h" />
     <ClInclude Include="src\GfxConvDialog.h" />
+    <ClInclude Include="src\ImageFormats.h" />
+    <ClInclude Include="src\LibArchive.h" />
+    <ClInclude Include="src\MiscFormats.h" />
+    <ClInclude Include="src\ModelFormats.h" />
     <ClInclude Include="src\ModifyOffsetsDialog.h" />
     <ClInclude Include="src\PaletteDialog.h" />
     <ClInclude Include="src\Clipboard.h" />
@@ -200,6 +210,7 @@
     <ClInclude Include="src\TextLanguage.h" />
     <ClInclude Include="src\Tokenizer.h" />
     <ClInclude Include="src\Tree.h" />
+    <ClInclude Include="src\VirtualListView.h" />
     <ClInclude Include="src\WxStuff.h" />
     <ClInclude Include="src\Property.h" />
     <ClInclude Include="src\PropertyList.h" />
