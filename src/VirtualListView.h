@@ -37,6 +37,7 @@ public:
 
 	// Events
 	void	onMouseEvent(wxMouseEvent& e);
+	void	onMouseLeftDown(wxMouseEvent& e);
 	void	onKeyDown(wxKeyEvent& e);
 };
 

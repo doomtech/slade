@@ -946,6 +946,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\VirtualListView.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\VirtualListView.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\ZipArchiveEntryList.cpp"
 					>
 				</File>

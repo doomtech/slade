@@ -217,7 +217,7 @@ ArchiveEntry* ZipArchiveEntryList::getEntry(int index) const {
 	// Check if filtering is active
 	if (filter_active) {
 		// If it is, modify index for filtered list
-		if (index < 0 || index >= filter.size())
+		if (index < 0 || (unsigned) index >= filter.size())
 			return NULL;
 
 		index = filter[index];
