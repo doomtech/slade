@@ -110,8 +110,50 @@ void ZipArchiveEntryList::updateList(bool clear) {
 		back_folder = 1;
 
 	// Update list
-	SetItemCount(current_dir->numEntries() + current_dir->numSubDirs() + back_folder);
+	if (filter_active)
+		SetItemCount(filter.size());
+	else
+		SetItemCount(current_dir->numEntries() + current_dir->numSubDirs() + back_folder);
 	Refresh();
+}
+
+/* ZipArchiveEntryList::filterList
+ * Filters the list to only entries with names matching [filter]
+ *******************************************************************/
+void ZipArchiveEntryList::filterList(string filter) {
+	if (filter.IsEmpty()) {
+		filter_active = false;
+		updateList();
+		return;
+	}
+	else
+		filter_active = true;
+
+	// Clear current filter list
+	this->filter.clear();
+
+	// Add * to filter string
+	filter += "*";
+
+	// Convert filter to lowercase (to avoid case-sensitivity)
+	filter = filter.Lower();
+
+	// Go through entries
+	filter_active = false;
+	unsigned index = 0;
+	ArchiveEntry* entry = getEntry(index);
+	while (entry) {
+		// Check for name match with filter
+		if (entry == entry_folder_back || entry->getName().Lower().Matches(filter))
+			this->filter.push_back(index);
+
+		// Go to next unfiltered entry
+		entry = getEntry(++index);
+	}
+	filter_active = true;
+
+	// Update the list
+	updateList();
 }
 
 /* ZipArchiveEntryList::entriesBegin
@@ -170,6 +212,15 @@ ArchiveEntry* ZipArchiveEntryList::getEntry(int index) const {
 	// Check index & archive
 	if (index < 0 || !archive)
 		return NULL;
+
+	// Check if filtering is active
+	if (filter_active) {
+		// If it is, modify index for filtered list
+		if (index < 0 || index >= filter.size())
+			return NULL;
+
+		index = filter[index];
+	}
 
 	// Index modifier if 'up folder' entry exists
 	if (current_dir->parent_dir) {
@@ -462,6 +513,10 @@ void ZipArchiveEntryList::onListItemActivated(wxListEvent& e) {
 
 		// Clear current selection
 		clearSelection();
+
+		// Update filter
+		if (text_filter)
+			filterList(text_filter->GetValue());
 
 		// Update list
 		updateList();

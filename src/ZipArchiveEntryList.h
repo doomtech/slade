@@ -24,6 +24,7 @@ public:
 
 	void	setArchive(Archive* archive);
 	void	updateList(bool clear = false);
+	void	filterList(string filter);
 
 	int					entriesBegin();
 	bool				isFolder(int index);

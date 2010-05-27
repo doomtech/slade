@@ -60,6 +60,7 @@ ArchiveEntryList::ArchiveEntryList(wxWindow* parent) : wxListCtrl(parent, -1, wx
 	// Init variables
 	this->archive = archive;
 	item_attr = new wxListItemAttr();
+	filter_active = false;
 
 	// Setup columns
 	setupColumns();
@@ -108,6 +109,21 @@ void ArchiveEntryList::setArchive(Archive* archive) {
 		listenTo(archive);						// Listen to it
 		SetItemCount(archive->numEntries());	// Set list size to no. of entries
 	}
+}
+
+/* ArchiveEntryList::setFilterCtrl
+ * Sets the wxTextCtrl widget responsible for filtering the list
+ *******************************************************************/
+void ArchiveEntryList::setFilterCtrl(wxTextCtrl* text_filter) {
+	// Check control was given
+	if (!text_filter)
+		return;
+
+	// Set variables
+	this->text_filter = text_filter;
+
+	// Bind the event
+	text_filter->Bind(wxEVT_COMMAND_TEXT_UPDATED, &ArchiveEntryList::onFilterChanged, this);
 }
 
 /* ArchiveEntryList::setupColumns
@@ -176,12 +192,45 @@ void ArchiveEntryList::updateList(bool clear) {
 		DeleteAllItems();
 
 	// Update list size
-	SetItemCount(archive->numEntries());
+	if (!filter_active)
+		SetItemCount(archive->numEntries());
+	else
+		SetItemCount(filter.size());
 
 	// Refresh
 	Refresh();
+}
 
-	wxLogMessage("ArchiveEntryList update");
+/* ArchiveEntryList::filterList
+ * Filters the list to only entries with names matching [filter]
+ *******************************************************************/
+void ArchiveEntryList::filterList(string filter) {
+	if (filter.IsEmpty()) {
+		filter_active = false;
+		updateList();
+		return;
+	}
+	else
+		filter_active = true;
+
+	// Clear current filter list
+	this->filter.clear();
+
+	// Add * to filter string
+	filter += "*";
+
+	// Convert filter to lowercase (to avoid case-sensitivity)
+	filter = filter.Lower();
+
+	// Go through archive entries
+	for (unsigned a = 0; a < archive->numEntries(); a++) {
+		// Check for name match with filter
+		if (archive->getEntry(a)->getName().Lower().Matches(filter))
+			this->filter.push_back(a);
+	}
+
+	// Update the list
+	updateList();
 }
 
 /* ArchiveEntryList::getEntry
@@ -189,11 +238,24 @@ void ArchiveEntryList::updateList(bool clear) {
  * Returns NULL if the index is out of bounds or no archive is open
  *******************************************************************/
 ArchiveEntry* ArchiveEntryList::getEntry(int index) const {
-	// Check index
-	if (!archive || index < 0 || index >= (signed)archive->numEntries())
+	// Check archive is open
+	if (!archive)
 		return NULL;
 
-	return archive->getEntry(index);
+	if (filter_active) {
+		// Check index
+		if (index < 0 || index >= (signed)filter.size())
+			return NULL;
+
+		return archive->getEntry(filter[index]);
+	}
+	else {
+		// Check index
+		if (index < 0 || index >= (signed)archive->numEntries())
+			return NULL;
+
+		return archive->getEntry(index);
+	}
 }
 
 /* ArchiveEntryList::getFocusedEntry
@@ -554,4 +616,15 @@ void ArchiveEntryList::onMenu(wxCommandEvent& e) {
 		SetSingleStyle(wxLC_VRULES, elist_vrules);
 		Refresh();
 	}
+}
+
+/* ArchiveEntryList::onFilterChanged
+ * Called when the text in the associated 'filter' wxTextCtrl is
+ * changed
+ *******************************************************************/
+void ArchiveEntryList::onFilterChanged(wxCommandEvent& e) {
+	// Update the filter
+	filterList(text_filter->GetValue());
+
+	e.Skip();
 }

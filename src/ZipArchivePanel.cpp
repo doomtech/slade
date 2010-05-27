@@ -132,9 +132,17 @@ void ZipArchivePanel::init() {
 	wxStaticBoxSizer *framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
 	m_hbox->Add(framesizer, 0, wxEXPAND|wxALL, 4);
 
+	// Create filter
+	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
+	framesizer->Add(hbox, 0, wxEXPAND|wxTOP|wxLEFT|wxRIGHT, 4);
+	hbox->Add(new wxStaticText(this, -1, "Filter:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
+	wxTextCtrl* text_filter = new wxTextCtrl(this, -1);
+	hbox->Add(text_filter, 1, wxEXPAND, 0);
+
 	// Create entry list panel
 	entry_list = new ZipArchiveEntryList(this);
 	entry_list->setArchive(archive);
+	entry_list->setFilterCtrl(text_filter);
 	framesizer->Add(entry_list, 1, wxEXPAND | wxALL, 4);
 
 	// Add default entry panel

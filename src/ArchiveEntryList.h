@@ -5,11 +5,15 @@
 #include "ListenerAnnouncer.h"
 #include "Archive.h"
 #include <wx/listctrl.h>
+#include <wx/textctrl.h>
 
 class ArchiveEntryList : public wxListCtrl, public Listener {
 protected:
-	Archive*		archive;
-	wxListItemAttr*	item_attr;
+	Archive*			archive;
+	wxListItemAttr*		item_attr;
+	wxTextCtrl*			text_filter;
+	vector<unsigned>	filter;
+	bool				filter_active;
 
 	enum {
 		AEL_COLUMN_NAME,
@@ -29,10 +33,12 @@ public:
 	~ArchiveEntryList();
 
 	virtual void	setArchive(Archive* archive);
+	void			setFilterCtrl(wxTextCtrl* text_filter);
 	void			setupColumns();
 	void			updateWidth();
 	int				columnType(int column) const;
 	virtual void	updateList(bool clear = false);
+	virtual void	filterList(string filter);
 
 	virtual ArchiveEntry*	getEntry(int index) const;
 	ArchiveEntry*			getFocusedEntry();
@@ -52,6 +58,7 @@ public:
 	void			onColumnHeaderRightClick(wxListEvent& e);
 	void			onColumnResize(wxListEvent& e);
 	void			onMenu(wxCommandEvent& e);
+	void			onFilterChanged(wxCommandEvent& e);
 };
 
 #endif//__ARCHIVE_ENTRY_LIST_H__

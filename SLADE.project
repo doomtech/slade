@@ -133,8 +133,16 @@
         <File Name="src/EntryType.cpp"/>
         <File Name="src/EntryType.h"/>
         <File Name="src/EntryTypeList.h"/>
-        <File Name="src/EntryDataFormat.h"/>
-        <File Name="src/EntryDataFormat.cpp"/>
+        <VirtualDirectory Name="EntryDataFormat">
+          <File Name="src/EntryDataFormat.cpp"/>
+          <File Name="src/EntryDataFormat.h"/>
+          <File Name="src/ArchiveFormats.h"/>
+          <File Name="src/AudioFormats.h"/>
+          <File Name="src/ImageFormats.h"/>
+          <File Name="src/LumpFormats.h"/>
+          <File Name="src/MiscFormats.h"/>
+          <File Name="src/ModelFormats.h"/>
+        </VirtualDirectory>
       </VirtualDirectory>
       <File Name="src/DatArchive.cpp"/>
       <File Name="src/DatArchive.h"/>
