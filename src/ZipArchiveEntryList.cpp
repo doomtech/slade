@@ -310,7 +310,51 @@ int ZipArchiveEntryList::getDirListIndex(int subdir) {
 /* ArchiveEntryList::OnGetItemText
  * Called when the widget requests the text for [item] at [column]
  *******************************************************************/
+ /*
 string ZipArchiveEntryList::OnGetItemText(long item, long column) const {
+	// Get entry
+	ArchiveEntry* entry = getEntry(item);
+
+	// Check entry
+	if (!entry)
+		return "INVALID INDEX";
+
+	// Determine what column we want
+	int col = columnType(column);
+
+	if (col == AEL_COLUMN_NAME)
+		return entry->getName();	// Name column
+	else if (col == AEL_COLUMN_SIZE) {
+		// Size column
+
+		if (entry->getType() == EntryType::folderType()) {
+			// Entry is a folder, return the number of entries+subdirectories in it
+			zipdir_t* dir = NULL;
+
+			// Get selected directory
+			if (entry == entry_folder_back)
+				dir = current_dir->parent_dir;	// If it's the 'back directory', get the current dir's parent
+			else
+				dir = dir = ((ZipArchive*)archive)->getDirectory(entry->getName(), current_dir);
+
+			// If it's null, return error
+			if (!dir)
+				return "INVALID DIRECTORY";
+
+			// Return the number of items in the directory
+			return s_fmt("%d entries", dir->numEntries() + dir->numSubDirs());
+		}
+		else
+			return entry->getSizeString();	// Not a folder, just return the normal size string
+	}
+	else if (col == AEL_COLUMN_TYPE)
+		return entry->getTypeString();	// Type column
+	else
+		return "INVALID COLUMN";		// Invalid column
+}
+*/
+
+string ZipArchiveEntryList::getItemText(long item, long column) const {
 	// Get entry
 	ArchiveEntry* entry = getEntry(item);
 

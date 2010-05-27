@@ -2,15 +2,16 @@
 #ifndef __ARCHIVE_ENTRY_LIST_H__
 #define __ARCHIVE_ENTRY_LIST_H__
 
+#include "VirtualListView.h"
 #include "ListenerAnnouncer.h"
 #include "Archive.h"
 #include <wx/listctrl.h>
 #include <wx/textctrl.h>
 
-class ArchiveEntryList : public wxListCtrl, public Listener {
+class ArchiveEntryList : public VirtualListView, public Listener {
 protected:
 	Archive*			archive;
-	wxListItemAttr*		item_attr;
+	//wxListItemAttr*		item_attr;
 	wxTextCtrl*			text_filter;
 	vector<unsigned>	filter;
 	bool				filter_active;
@@ -24,9 +25,12 @@ protected:
 	};
 
 	// Virtual wxListCtrl overrides
-	string			OnGetItemText(long item, long column) const;
-	int				OnGetItemImage(long item) const;
-	wxListItemAttr*	OnGetItemAttr(long item) const;
+	string	getItemText(long item, long column) const;
+	int		getItemIcon(long item) const;
+	void	updateItemAttr(long item) const;
+	//string			OnGetItemText(long item, long column) const;
+	//int				OnGetItemImage(long item) const;
+	//wxListItemAttr*	OnGetItemAttr(long item) const;
 
 public:
 	ArchiveEntryList(wxWindow* parent);
@@ -42,15 +46,15 @@ public:
 
 	virtual ArchiveEntry*	getEntry(int index) const;
 	ArchiveEntry*			getFocusedEntry();
-	int						getFocus();
+	//int						getFocus();
 	vector<ArchiveEntry*>	getSelectedEntries();
-	virtual vector<int>		getSelection();
-	int						getLastSelected();
+	//virtual vector<int>		getSelection();
+	//int						getLastSelected();
 	ArchiveEntry*			getLastSelectedEntry();
 
-	void	selectItem(int index, bool select = true);
-	void	clearSelection();
-	void	selectAll();
+	//void	selectItem(int index, bool select = true);
+	//void	clearSelection();
+	//void	selectAll();
 
 	virtual void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 

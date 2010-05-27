@@ -119,10 +119,12 @@ void ArchivePanel::init() {
 	cur_area->Show(true);
 
 	// Setup events
-	entry_list->Bind(wxEVT_KEY_DOWN, &ArchivePanel::onEntryListKeyDown, this);
+#ifdef __WXGTK__
+	entry_list->Bind(EVT_VLV_SELECTION_CHANGED, &ArchivePanel::onEntryListSelectionChange, this);
+#else
 	entry_list->Bind(wxEVT_COMMAND_LIST_ITEM_FOCUSED, &ArchivePanel::onEntryListFocusChange, this);
-	entry_list->Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &ArchivePanel::onEntryListFocusChange, this);
-	//entry_list->Bind(wxEVT_LEFT_DOWN, &ArchivePanel::onEntryListLeftClick, this);
+#endif
+	entry_list->Bind(wxEVT_KEY_DOWN, &ArchivePanel::onEntryListKeyDown, this);
 	entry_list->Bind(wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK, &ArchivePanel::onEntryListRightClick, this);
 	entry_list->Bind(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, &ArchivePanel::onEntryListActivated, this);
 
@@ -449,7 +451,7 @@ bool ArchivePanel::exportEntryWad() {
  *******************************************************************/
 bool ArchivePanel::moveUp() {
 	// Get selection
-	vector<int> selection = entry_list->getSelection();
+	vector<long> selection = entry_list->getSelection();
 
 	// If nothing is selected, do nothing
 	if (selection.size() == 0)
@@ -479,7 +481,7 @@ bool ArchivePanel::moveUp() {
  *******************************************************************/
 bool ArchivePanel::moveDown() {
 	// Get selection
-	vector<int> selection = entry_list->getSelection();
+	vector<long> selection = entry_list->getSelection();
 
 	// If nothing is selected, do nothing
 	if (selection.size() == 0)
@@ -711,7 +713,7 @@ bool ArchivePanel::showEntryPanel(EntryPanel* new_area, bool ask_save) {
  * ARCHIVEPANEL EVENTS
  *******************************************************************/
 
-void ArchivePanel::onEntryListFocusChange(wxListEvent& e) {
+void ArchivePanel::onEntryListSelectionChange(wxCommandEvent& e) {
 	// Do nothing if not shown
 	if (!IsShown())
 		return;
@@ -735,55 +737,10 @@ void ArchivePanel::onEntryListFocusChange(wxListEvent& e) {
 	}
 }
 
-/* ArchivePanel::onEntryListSelect
- * Called when an entry list item is selected
- *******************************************************************/
-void ArchivePanel::onEntryListSelect(wxListEvent& e) {
-	// Get selected entries
-	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
-
-	if (selection.size() == 0)
-		return;	// If no entries are selected do nothing
-	else if (selection.size() == 1) {
-		// If one entry is selected, open it in the entry area
-		openEntry(selection[0]);
-	}
-	else {
-		// If multiple entries are selected, show/update the multi entry area
-		showEntryPanel(multi_area);
-		((MultiEntryPanel*)multi_area)->loadEntries(selection);
-
-		// Update panel layout
-		Layout();
-	}
-}
-
-/* ArchivePanel::onEntryListDeselect
- * Called when an entry list item is deselected
- *******************************************************************/
-void ArchivePanel::onEntryListDeselect(wxListEvent& e) {
-	// Get selected entries
-	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
-
-	if (selection.size() == 0)
-		return;	// If no entries are selected do nothing
-	else if (selection.size() == 1) {
-		// If one entry is selected, open it in the entry area
-		openEntry(selection[0]);
-	}
-	else {
-		// If multiple entries are selected, show/update the multi entry area
-		showEntryPanel(multi_area);
-		((MultiEntryPanel*)multi_area)->loadEntries(selection);
-
-		// Update panel layout
-		Layout();
-	}
-}
-
-void ArchivePanel::onEntryListLeftClick(wxMouseEvent& e) {
-	// Do usual stuff first
-	e.Skip();
+void ArchivePanel::onEntryListFocusChange(wxListEvent& e) {
+	// Do nothing if not shown
+	if (!IsShown())
+		return;
 
 	// Get selected entries
 	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();

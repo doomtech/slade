@@ -83,10 +83,8 @@ public:
 	virtual void onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 
 	// Events
+	void			onEntryListSelectionChange(wxCommandEvent& e);
 	void			onEntryListFocusChange(wxListEvent& e);
-	void			onEntryListSelect(wxListEvent& e);
-	void			onEntryListDeselect(wxListEvent& e);
-	void			onEntryListLeftClick(wxMouseEvent& e);
 	void			onEntryListRightClick(wxListEvent& e);
 	void			onEntryMenuClick(wxCommandEvent& e);
 	void			onEntryListKeyDown(wxKeyEvent& e);

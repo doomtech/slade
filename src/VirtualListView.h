@@ -9,6 +9,8 @@ wxDECLARE_EVENT(EVT_VLV_SELECTION_CHANGED, wxCommandEvent);
 
 class VirtualListView : public wxListCtrl {
 private:
+	long	last_focus;
+
 	void	sendSelectionChangedEvent();
 
 protected:
@@ -29,11 +31,16 @@ public:
 
 	// Selection
 	void			selectItem(long item, bool select = true);
+	void			selectItems(long start, long end, bool select = true);
 	void			selectAll();
 	void			clearSelection();
 	vector<long>	getSelection();
 	long			getFirstSelected();
 	long			getLastSelected();
+
+	// Focus
+	void			focusItem(long item, bool focus = true);
+	long			getFocus();
 
 	// Events
 	void	onMouseEvent(wxMouseEvent& e);

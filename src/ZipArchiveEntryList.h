@@ -8,7 +8,8 @@
 class ZipArchiveEntryList : public ArchiveEntryList {
 protected:
 	// Virtual wxListCtrl overrides
-	string			OnGetItemText(long item, long column) const;
+	string	getItemText(long item, long column) const;
+	//string			OnGetItemText(long item, long column) const;
 	//int				OnGetItemImage(long item) const;
 	//wxListItemAttr*	OnGetItemAttr(long item) const;
 

@@ -56,7 +56,7 @@ CVAR(Bool, elist_vrules, false, CVAR_SAVE)
 /* ArchiveEntryList::ArchiveEntryList
  * ArchiveEntryList class constructor
  *******************************************************************/
-ArchiveEntryList::ArchiveEntryList(wxWindow* parent) : wxListCtrl(parent, -1, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxLC_VIRTUAL) {
+ArchiveEntryList::ArchiveEntryList(wxWindow* parent) : VirtualListView(parent) {
 	// Init variables
 	this->archive = archive;
 	item_attr = new wxListItemAttr();
@@ -280,6 +280,7 @@ ArchiveEntry* ArchiveEntryList::getFocusedEntry() {
 /* ArchiveEntryList::getFocus
  * Gets the list index of the currently focused list item
  *******************************************************************/
+ /*
 int ArchiveEntryList::getFocus() {
 	// Get the item in the list that is focused
 	return GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_FOCUSED);
@@ -297,7 +298,7 @@ vector<ArchiveEntry*> ArchiveEntryList::getSelectedEntries() {
 		return ret;
 
 	// Get selection
-	vector<int> selection = getSelection();
+	vector<long> selection = getSelection();
 
 	// Go through selection and add associated entries to the return vector
 	for (size_t a = 0; a < selection.size(); a++)
@@ -309,6 +310,7 @@ vector<ArchiveEntry*> ArchiveEntryList::getSelectedEntries() {
 /* ArchiveEntryList::getSelection
  * Returns a vector of all selected list item indices
  *******************************************************************/
+ /*
 vector<int> ArchiveEntryList::getSelection() {
 	// Init vector
 	vector<int> ret;
@@ -334,6 +336,7 @@ vector<int> ArchiveEntryList::getSelection() {
  * Gets the index of the last selected item in the list, or -1 if no
  * item is selected
  *******************************************************************/
+ /*
 int ArchiveEntryList::getLastSelected() {
 	// Go through all items
 	int item = -1;
@@ -368,6 +371,7 @@ ArchiveEntry* ArchiveEntryList::getLastSelectedEntry() {
 /* ArchiveEntryList::selectItem
  * Selects or deselects [item] depending on [select]
  *******************************************************************/
+ /*
 void ArchiveEntryList::selectItem(int item, bool select) {
 	// Check item id is in range
 	if (item >= GetItemCount())
@@ -383,6 +387,7 @@ void ArchiveEntryList::selectItem(int item, bool select) {
 /* ArchiveEntryList::selectAll
  * Selects all items in the list
  *******************************************************************/
+ /*
 void ArchiveEntryList::selectAll() {
 	for (int a = 0; a < GetItemCount(); a++)
 		SetItemState(a, 0xFFFF, wxLIST_STATE_SELECTED|wxLIST_STATE_FOCUSED);
@@ -391,6 +396,7 @@ void ArchiveEntryList::selectAll() {
 /* ArchiveEntryList::clearSelection
  * Deselects all items in the list
  *******************************************************************/
+ /*
 void ArchiveEntryList::clearSelection() {
 	for (int a = 0; a < GetItemCount(); a++)
 		SetItemState(a, 0x0000, wxLIST_STATE_SELECTED|wxLIST_STATE_FOCUSED);
@@ -399,7 +405,29 @@ void ArchiveEntryList::clearSelection() {
 /* ArchiveEntryList::OnGetItemText
  * Called when the widget requests the text for [item] at [column]
  *******************************************************************/
+ /*
 string ArchiveEntryList::OnGetItemText(long item, long column) const {
+	ArchiveEntry* entry = getEntry(item);
+
+	// If entry doesn't exist, return invalid string
+	if (!entry)
+		return "INVALID INDEX";
+
+	// Determine what column we want
+	int col = columnType(column);
+
+	if (col == AEL_COLUMN_NAME)
+		return entry->getName();		// Name column
+	else if (col == AEL_COLUMN_SIZE)
+		return entry->getSizeString();	// Size column
+	else if (col == AEL_COLUMN_TYPE)
+		return entry->getTypeString();	// Type column
+	else
+		return "INVALID COLUMN";		// Invalid column
+}
+ */
+
+string ArchiveEntryList::getItemText(long item, long column) const {
 	ArchiveEntry* entry = getEntry(item);
 
 	// If entry doesn't exist, return invalid string
@@ -422,7 +450,20 @@ string ArchiveEntryList::OnGetItemText(long item, long column) const {
 /* ArchiveEntryList::OnGetItemImage
  * Called when the widget requests the image for [item]
  *******************************************************************/
+ /*
 int ArchiveEntryList::OnGetItemImage(long item) const {
+	// Get associated entry
+	ArchiveEntry* entry = getEntry(item);
+
+	// If entry doesn't exist, return invalid image
+	if (!entry)
+		return -1;
+
+	return entry->getType()->getIndex();
+}
+ */
+
+int ArchiveEntryList::getItemIcon(long item) const {
 	// Get associated entry
 	ArchiveEntry* entry = getEntry(item);
 
@@ -437,6 +478,7 @@ int ArchiveEntryList::OnGetItemImage(long item) const {
  * Called when widget requests the attributes (text colour /
  * background colour / font) for [item]
  *******************************************************************/
+ /*
 wxListItemAttr* ArchiveEntryList::OnGetItemAttr(long item) const {
 	// Get associated entry
 	ArchiveEntry* entry = getEntry(item);
@@ -466,6 +508,36 @@ wxListItemAttr* ArchiveEntryList::OnGetItemAttr(long item) const {
 		item_attr->SetTextColour(ListView::colourLocked());
 
 	return item_attr;
+}
+ */
+
+void ArchiveEntryList::updateItemAttr(long item) const {
+	// Get associated entry
+	ArchiveEntry* entry = getEntry(item);
+
+	// Init attributes
+	item_attr->SetTextColour(ListView::colourError());
+
+	// If entry doesn't exist, return error colour
+	if (!entry)
+		return;
+
+	// Set colour depending on entry state
+	switch (entry->getState()) {
+	case 1:
+		item_attr->SetTextColour(ListView::colourModified());
+		break;
+	case 2:
+		item_attr->SetTextColour(ListView::colourNew());
+		break;
+	default:
+		item_attr->SetTextColour(wxSystemSettings::GetColour(wxSYS_COLOUR_LISTBOXTEXT));
+		break;
+	};
+
+	// Locked state overrides others
+	if (entry->isLocked())
+		item_attr->SetTextColour(ListView::colourLocked());
 }
 
 /* ArchiveEntryList::onAnnouncement
