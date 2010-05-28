@@ -33,7 +33,6 @@
 #include "Misc.h"
 #include "WxStuff.h"
 #include "ArchivePanel.h"
-#include "EntryListPanel.h"
 #include "WadArchive.h"
 #include "TextEntryPanel.h"
 #include "DefaultEntryPanel.h"

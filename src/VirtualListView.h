@@ -42,8 +42,12 @@ public:
 	void			focusItem(long item, bool focus = true);
 	long			getFocus();
 
+	// Layout
+	void			updateWidth();
+	virtual void	updateList(bool clear = false) { SetItemCount(0); }
+
 	// Events
-	void	onMouseEvent(wxMouseEvent& e);
+	void	onColumnResize(wxListEvent& e);
 	void	onMouseLeftDown(wxMouseEvent& e);
 	void	onKeyDown(wxKeyEvent& e);
 };

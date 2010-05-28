@@ -275,7 +275,6 @@ bool TextureXEditor::openArchive(Archive* archive) {
 	if (entry_pnames) {
 		PatchTablePanel* ptp = new PatchTablePanel(this, &patch_table);
 		tabs->AddPage(ptp, "Patch Table (PNAMES)");
-		ptp->populatePatchList();
 	}
 
 	// Update layout

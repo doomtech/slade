@@ -39,7 +39,7 @@ public:
 	virtual void	setArchive(Archive* archive);
 	void			setFilterCtrl(wxTextCtrl* text_filter);
 	void			setupColumns();
-	void			updateWidth();
+	//void			updateWidth();
 	int				columnType(int column) const;
 	virtual void	updateList(bool clear = false);
 	virtual void	filterList(string filter);
@@ -59,10 +59,10 @@ public:
 	virtual void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 
 	// Events
-	void			onColumnHeaderRightClick(wxListEvent& e);
-	void			onColumnResize(wxListEvent& e);
-	void			onMenu(wxCommandEvent& e);
-	void			onFilterChanged(wxCommandEvent& e);
+	void	onColumnHeaderRightClick(wxListEvent& e);
+	void	onColumnResize(wxListEvent& e);
+	void	onMenu(wxCommandEvent& e);
+	void	onFilterChanged(wxCommandEvent& e);
 };
 
 #endif//__ARCHIVE_ENTRY_LIST_H__

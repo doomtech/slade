@@ -34,6 +34,86 @@
 #include "TextureXEditor.h"
 
 
+PatchTableListView::PatchTableListView(wxWindow* parent, PatchTable* patch_table) : VirtualListView(parent) {
+	// Init Variables
+	this->patch_table = patch_table;
+
+	// Add columns
+	InsertColumn(0, "#");
+	InsertColumn(1, "Patch Name");
+	InsertColumn(2, "Use Count");
+	InsertColumn(3, "In Archive");
+
+	// Update list
+	updateList();
+}
+
+PatchTableListView::~PatchTableListView() {
+}
+
+string PatchTableListView::getItemText(long item, long column) const {
+	// Check patch table exists
+	if (!patch_table)
+		return "INVALID INDEX";
+
+	// Check index is ok
+	if (item < 0 || item > patch_table->nPatches())
+		return "INVALID INDEX";
+
+	// Get associated patch
+	patch_t patch = patch_table->patch(item);
+
+	if (column == 0)						// Index column
+		return s_fmt("%04d", item);
+	else if (column == 1)					// Name column
+		return patch.name;
+	else if (column == 2)					// Usage count column
+		return s_fmt("%d", patch.used);
+	else if (column == 3) {					// Archive column
+		// Get patch entry's parent archive
+		string archive = "NOT FOUND";
+		if (patch.entry)
+			archive = patch.entry->getParent()->getFileName(false);
+		return archive;
+	}
+	else									// Invalid column
+		return "INVALID COLUMN";
+}
+
+void PatchTableListView::updateItemAttr(long item) const {
+	// Init attributes (to error colour)
+	item_attr->SetTextColour(ListView::colourError());
+
+	// Check patch table exists
+	if (!patch_table)
+		return;
+
+	// Check index is ok
+	if (item < 0 || item > patch_table->nPatches())
+		return;
+
+	// Get associated patch
+	patch_t patch = patch_table->patch(item);
+
+	// Set normal colour if patch is ok
+	if (patch.entry)
+		item_attr->SetTextColour(wxSystemSettings::GetColour(wxSYS_COLOUR_LISTBOXTEXT));
+}
+
+void PatchTableListView::updateList(bool clear) {
+	if (clear)
+		ClearAll();
+
+	// Set list size
+	if (patch_table)
+		SetItemCount(patch_table->nPatches());
+	else
+		SetItemCount(0);
+
+	updateWidth();
+	Refresh();
+}
+
 /*******************************************************************
  * PATCHTABLEPANEL CLASS FUNCTIONS
  *******************************************************************/
@@ -54,7 +134,7 @@ PatchTablePanel::PatchTablePanel(wxWindow* parent, PatchTable* patch_table) : wx
 	wxStaticBox* frame = new wxStaticBox(this, -1, "Patches (PNAMES)");
 	wxStaticBoxSizer* framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
 	sizer->Add(framesizer, 0, wxEXPAND|wxALL, 4);
-	list_patches = new ListView(this, -1);
+	list_patches = new PatchTableListView(this, patch_table);
 	framesizer->Add(list_patches, 1, wxEXPAND|wxALL, 4);
 
 	// Add editing controls
@@ -90,78 +170,6 @@ PatchTablePanel::PatchTablePanel(wxWindow* parent, PatchTable* patch_table) : wx
 PatchTablePanel::~PatchTablePanel() {
 }
 
-void PatchTablePanel::updatePatchListItem(int index) {
-	// Check index
-	if (index >= list_patches->GetItemCount())
-		return;
-
-	// Get patch
-	patch_t& patch = patch_table->patch(index);
-
-	// Get patch entry's parent archive
-	string archive = "NOT FOUND";
-	if (patch.entry)
-		archive = patch.entry->getParent()->getFileName(false);
-
-	// Update list item
-	list_patches->setItemText(index, 0, s_fmt("%04d", index));
-	list_patches->setItemText(index, 1, patch.name);
-	list_patches->setItemText(index, 2, s_fmt("%d", patch.used));
-	list_patches->setItemText(index, 3, archive);
-
-	// Update item colour
-	if (patch.entry)
-		list_patches->setItemStatus(index, LV_STATUS_NORMAL);
-	else
-		list_patches->setItemStatus(index, LV_STATUS_ERROR);
-
-	// Update list width
-	list_patches->updateSize();
-	list_patches->GetParent()->Layout();
-}
-
-/* PatchTablePanel::populatePatchList
- * Populated the patch list with details of all patches in the patch
- * table
- *******************************************************************/
-void PatchTablePanel::populatePatchList() {
-	// Clear current list
-	list_patches->ClearAll();
-	list_patches->Show(false);
-
-	// Add columns
-	list_patches->InsertColumn(0, "#");
-	list_patches->InsertColumn(1, "Patch Name");
-	list_patches->InsertColumn(2, "Use Count");
-	list_patches->InsertColumn(3, "In Archive");
-
-	// Add pnames entries to the list
-	list_patches->enableSizeUpdate(false);
-	for (uint32_t a = 0; a < patch_table->nPatches(); a++) {
-		string name = patch_table->patchName(a);
-		string archive = "NOT FOUND";
-
-		// Get parent archive if any
-		ArchiveEntry* entry = patch_table->patchEntry(a);
-		if (entry)
-			archive = entry->getParent()->getFileName(false);
-
-		string cols[] = { s_fmt("%04d", a), name, s_fmt("%d", patch_table->patch(a).used), archive };
-		list_patches->addItem(a, wxArrayString(4, cols));
-
-		// Colour red if patch entry not found
-		if (!entry)
-			list_patches->setItemStatus(a, LV_STATUS_ERROR);
-	}
-
-	// Update list width
-	list_patches->Show(true);
-	list_patches->enableSizeUpdate(true);
-	list_patches->updateSize();
-	list_patches->GetParent()->Layout();
-}
-
-
 void PatchTablePanel::onBtnAddPatch(wxCommandEvent& e) {
 	// Prompt for new patch name
 	string patch = wxGetTextFromUser("Enter patch entry name:", "Add Patch", wxEmptyString, this);
@@ -173,15 +181,13 @@ void PatchTablePanel::onBtnAddPatch(wxCommandEvent& e) {
 	// Add to patch table
 	patch_table->addPatch(patch, parent->getArchive());
 
-	// Add to patch list
-	int index = list_patches->GetItemCount();
-	list_patches->addItem(index, s_fmt("%04d", index));
-	updatePatchListItem(index);
+	// Update list
+	list_patches->updateList();
 }
 
 void PatchTablePanel::onBtnRemovePatch(wxCommandEvent& e) {
 	// Check anything is selected
-	wxArrayInt selection = list_patches->selectedItems();
+	vector<long> selection = list_patches->getSelection();
 	if (selection.size() == 0)
 		return;
 
@@ -195,31 +201,27 @@ void PatchTablePanel::onBtnRemovePatch(wxCommandEvent& e) {
 			if (answer == wxYES) {
 				// Answered yes, remove the patch
 				parent->removePatch(selection[a]);
+
+				// Deselect it
+				list_patches->selectItem(selection[a], false);
 			}
 		}
 		else {
 			// Not in use, just delete it
 			parent->removePatch(selection[a]);
+
+			// Deselect it
+			list_patches->selectItem(selection[a], false);
 		}
 	}
 
-	// Delete selection from list
-	list_patches->deleteItems(selection);
-
-	// Update items after deleted ones (index # will be changed)
-	list_patches->enableSizeUpdate(false);
-	for (int a = selection[0]; a < list_patches->GetItemCount(); a++)
-		updatePatchListItem(a);
-
-	// Update list width
-	list_patches->enableSizeUpdate(true);
-	list_patches->updateSize();
-	list_patches->GetParent()->Layout();
+	// Update list
+	list_patches->updateList();
 }
 
 void PatchTablePanel::onBtnChangePatch(wxCommandEvent& e) {
 	// Check anything is selected
-	wxArrayInt selection = list_patches->selectedItems();
+	vector<long> selection = list_patches->getSelection();
 	if (selection.size() == 0)
 		return;
 
@@ -233,7 +235,7 @@ void PatchTablePanel::onBtnChangePatch(wxCommandEvent& e) {
 		// Update the patch
 		patch_table->replacePatch(selection[a], newname, parent->getArchive());
 
-		// Update the list entry
-		updatePatchListItem(selection[a]);
+		// Update the list
+		list_patches->updateList();
 	}
 }

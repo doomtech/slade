@@ -148,23 +148,6 @@ void ArchiveEntryList::setupColumns() {
 	}
 }
 
-/* ArchiveEntryList::updateWidth
- * Updates the entry list's minimum requested width to allow the
- * widget to be shown with no horizontal scrollbar
- *******************************************************************/
-void ArchiveEntryList::updateWidth() {
-	// Get total column width
-	int width = 8;
-	for (int a = 0; a < GetColumnCount(); a++)
-		width += GetColumnWidth(a);
-
-	// Always leave room for the scrollbar (wxWidgets is silly)
-	width += wxSystemSettings::GetMetric(wxSYS_VSCROLL_X, this);
-
-	// Set widget size
-	SetSizeHints(width, -1);
-}
-
 /* ArchiveEntryList::columnType
  * Returns the 'type' of column at [column] (name, size or type)
  *******************************************************************/
@@ -652,11 +635,8 @@ void ArchiveEntryList::onColumnResize(wxListEvent& e) {
 		elist_colsize_width = GetColumnWidth(col++);
 	if (elist_coltype_show)
 		elist_coltype_width = GetColumnWidth(col++);
-
-	// Update width etc
-	updateWidth();
-	if (GetParent())
-		GetParent()->Layout();
+	
+	e.Skip();
 }
 
 /* ArchiveEntryList::onMenu

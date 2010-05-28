@@ -3,31 +3,44 @@
 #define __PATCH_TABLE_PANEL_H__
 
 #include "PatchTable.h"
-#include "ListView.h"
+//#include "ListView.h"
+#include "VirtualListView.h"
 
 class TextureXEditor;
 
+class PatchTableListView : public VirtualListView {
+private:
+	PatchTable*		patch_table;
+
+protected:
+	string	getItemText(long item, long column) const;
+	//int		getItemIcon(long item) const;
+	void	updateItemAttr(long item) const;
+
+public:
+	PatchTableListView(wxWindow* parent, PatchTable* patch_table);
+	~PatchTableListView();
+
+	void	updateList(bool clear = false);
+};
+
 /* TODO:
  * - More buttons: import file to patch
- * - Stop patch list updates refreshing the list so much (slow on wxmsw)
 */
 class PatchTablePanel : public wxPanel {
 private:
-	PatchTable*		patch_table;
-	ListView*		list_patches;
-	wxButton*		btn_add_patch;
-	wxButton*		btn_patch_from_file;
-	wxButton*		btn_remove_patch;
-	wxButton*		btn_change_patch;
-	wxButton*		btn_import_patch_file;
-	TextureXEditor*	parent;
+	PatchTable*			patch_table;
+	PatchTableListView*	list_patches;
+	wxButton*			btn_add_patch;
+	wxButton*			btn_patch_from_file;
+	wxButton*			btn_remove_patch;
+	wxButton*			btn_change_patch;
+	wxButton*			btn_import_patch_file;
+	TextureXEditor*		parent;
 
 public:
 	PatchTablePanel(wxWindow* parent, PatchTable* patch_table);
 	~PatchTablePanel();
-
-	void	updatePatchListItem(int index);
-	void	populatePatchList();
 
 	// Events
 	void	onBtnAddPatch(wxCommandEvent& e);

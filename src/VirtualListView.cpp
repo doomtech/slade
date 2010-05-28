@@ -19,6 +19,7 @@ VirtualListView::VirtualListView(wxWindow* parent)
 	Bind(wxEVT_LEFT_DOWN, &VirtualListView::onMouseLeftDown, this);
 	Bind(wxEVT_KEY_DOWN, &VirtualListView::onKeyDown, this);
 #endif
+	Bind(wxEVT_COMMAND_LIST_COL_END_DRAG, &VirtualListView::onColumnResize, this);
 }
 
 VirtualListView::~VirtualListView() {
@@ -29,6 +30,24 @@ void VirtualListView::sendSelectionChangedEvent() {
 	wxCommandEvent evt(EVT_VLV_SELECTION_CHANGED, GetId());
 	ProcessWindowEvent(evt);
 }
+
+/* VirtualListView::updateWidth
+ * Updates the list's minimum requested width to allow the
+ * widget to be shown with no horizontal scrollbar
+ *******************************************************************/
+void VirtualListView::updateWidth() {
+	// Get total column width
+	int width = 8;
+	for (int a = 0; a < GetColumnCount(); a++)
+		width += GetColumnWidth(a);
+
+	// Always leave room for the scrollbar (wxWidgets is silly)
+	width += wxSystemSettings::GetMetric(wxSYS_VSCROLL_X, this);
+
+	// Set widget size
+	SetSizeHints(width, -1);
+}
+
 
 void VirtualListView::selectItem(long item, bool select) {
 	// Check item id is in range
@@ -137,6 +156,15 @@ long VirtualListView::getFocus() {
 
 
 
+/* VirtualListView::onColumnResize
+ * Called when a column is resized
+ *******************************************************************/
+void VirtualListView::onColumnResize(wxListEvent& e) {
+	// Update width etc
+	updateWidth();
+	if (GetParent())
+		GetParent()->Layout();
+}
 
 void VirtualListView::onMouseLeftDown(wxMouseEvent& e) {
 	// Get item at click position
