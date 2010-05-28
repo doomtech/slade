@@ -141,9 +141,6 @@
     <ClCompile Include="src\ArchivePanel.cpp">
       <Filter>Main Editor\UI Elements\ArchivePanel</Filter>
     </ClCompile>
-    <ClCompile Include="src\EntryListPanel.cpp">
-      <Filter>Main Editor\UI Elements\ArchivePanel</Filter>
-    </ClCompile>
     <ClCompile Include="src\AnimatedEntryPanel.cpp">
       <Filter>Main Editor\UI Elements\EntryPanel</Filter>
     </ClCompile>
@@ -167,12 +164,6 @@
     </ClCompile>
     <ClCompile Include="src\TextEntryPanel.cpp">
       <Filter>Main Editor\UI Elements\EntryPanel</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ZipArchivePanel.cpp">
-      <Filter>Main Editor\UI Elements\ZipArchivePanel</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ZipEntryListPanel.cpp">
-      <Filter>Main Editor\UI Elements\ZipArchivePanel</Filter>
     </ClCompile>
     <ClCompile Include="src\PatchTablePanel.cpp">
       <Filter>Main Editor\UI Elements\TextureXEditor</Filter>
@@ -324,6 +315,9 @@
     <ClCompile Include="src\LibArchive.cpp">
       <Filter>Resources\Archive</Filter>
     </ClCompile>
+    <ClCompile Include="src\ZipArchivePanel.cpp">
+      <Filter>Main Editor\UI Elements\ArchivePanel</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -383,9 +377,6 @@
     <ClInclude Include="src\ArchivePanel.h">
       <Filter>Main Editor\UI Elements\ArchivePanel</Filter>
     </ClInclude>
-    <ClInclude Include="src\EntryListPanel.h">
-      <Filter>Main Editor\UI Elements\ArchivePanel</Filter>
-    </ClInclude>
     <ClInclude Include="src\AnimatedEntryPanel.h">
       <Filter>Main Editor\UI Elements\EntryPanel</Filter>
     </ClInclude>
@@ -409,12 +400,6 @@
     </ClInclude>
     <ClInclude Include="src\TextEntryPanel.h">
       <Filter>Main Editor\UI Elements\EntryPanel</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ZipArchivePanel.h">
-      <Filter>Main Editor\UI Elements\ZipArchivePanel</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ZipEntryListPanel.h">
-      <Filter>Main Editor\UI Elements\ZipArchivePanel</Filter>
     </ClInclude>
     <ClInclude Include="src\PatchTablePanel.h">
       <Filter>Main Editor\UI Elements\TextureXEditor</Filter>
@@ -593,6 +578,9 @@
     </ClInclude>
     <ClInclude Include="src\LibArchive.h">
       <Filter>Resources\Archive</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ZipArchivePanel.h">
+      <Filter>Main Editor\UI Elements\ArchivePanel</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

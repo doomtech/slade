@@ -15,8 +15,10 @@ VirtualListView::VirtualListView(wxWindow* parent)
 	last_focus = 0;
 
 	// Bind events
+#ifdef __WXGTK__
 	Bind(wxEVT_LEFT_DOWN, &VirtualListView::onMouseLeftDown, this);
 	Bind(wxEVT_KEY_DOWN, &VirtualListView::onKeyDown, this);
+#endif
 }
 
 VirtualListView::~VirtualListView() {

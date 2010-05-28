@@ -132,7 +132,6 @@
     <ClCompile Include="src\ConsolePanel.cpp" />
     <ClCompile Include="src\TextEditor.cpp" />
     <ClCompile Include="src\ArchivePanel.cpp" />
-    <ClCompile Include="src\EntryListPanel.cpp" />
     <ClCompile Include="src\AnimatedEntryPanel.cpp" />
     <ClCompile Include="src\DefaultEntryPanel.cpp" />
     <ClCompile Include="src\EntryPanel.cpp" />
@@ -143,7 +142,6 @@
     <ClCompile Include="src\TextEntryPanel.cpp" />
     <ClCompile Include="src\ZipArchiveEntryList.cpp" />
     <ClCompile Include="src\ZipArchivePanel.cpp" />
-    <ClCompile Include="src\ZipEntryListPanel.cpp" />
     <ClCompile Include="src\PatchTablePanel.cpp" />
     <ClCompile Include="src\TextureEditorPanel.cpp" />
     <ClCompile Include="src\TextureXEditor.cpp" />
@@ -220,7 +218,6 @@
     <ClInclude Include="src\ConsolePanel.h" />
     <ClInclude Include="src\TextEditor.h" />
     <ClInclude Include="src\ArchivePanel.h" />
-    <ClInclude Include="src\EntryListPanel.h" />
     <ClInclude Include="src\AnimatedEntryPanel.h" />
     <ClInclude Include="src\DefaultEntryPanel.h" />
     <ClInclude Include="src\EntryPanel.h" />
@@ -231,7 +228,6 @@
     <ClInclude Include="src\TextEntryPanel.h" />
     <ClInclude Include="src\ZipArchiveEntryList.h" />
     <ClInclude Include="src\ZipArchivePanel.h" />
-    <ClInclude Include="src\ZipEntryListPanel.h" />
     <ClInclude Include="src\PatchTablePanel.h" />
     <ClInclude Include="src\TextureEditorPanel.h" />
     <ClInclude Include="src\TextureXEditor.h" />
