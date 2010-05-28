@@ -247,11 +247,7 @@ public:
 				int numpixels = (header->height + 2 + header->height%2)/2;
 				int maxcolsize = sizeof(uint32_t) + (numpixels*5) + 1;
 				if (mc.getSize() > (sizeof(patch_header_t) + (header->width * maxcolsize))) {
-				wxLogMessage(s_fmt("height %d, width %d, numpixels %d, "
-					"maxcolsize %d, header+width*maxcolsize %d, size %d",
-					header->height, header->width, numpixels, maxcolsize, 
-					sizeof(patch_header_t)+(header->width*maxcolsize), mc.getSize()));
-//					return false;
+					return false;
 				}
 
 					// Check column pointers are within range
