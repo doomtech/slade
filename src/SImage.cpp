@@ -48,18 +48,20 @@ struct grab_chunk_t {
 
 // Define valid flat sizes
 uint32_t valid_flat_size[][2] = {
+	{	2,	 2 },	// lol Heretic F_SKY1
 	{  10,  12 },	// gnum format
 	{  16,  16 },	// \ 
 	{  32,  64 },	// Strife startup sprite
 	{  48,  48 },	// / 
 	{  64,  64 },	// standard flat size
+	{  64,	65 },	// Heretic flat size variant
 	{  64, 128 },	// Hexen flat size variant
 	{ 128, 128 },	// \ 
 	{ 256, 256 },	// hires flat size
 	{ 512, 512 },	// / 
 	{ 320, 200 },	// full screen format
 };
-uint32_t	n_valid_flat_sizes = 10;
+uint32_t	n_valid_flat_sizes = 12;
 
 
 /*******************************************************************

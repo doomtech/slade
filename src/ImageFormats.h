@@ -244,10 +244,14 @@ public:
 
 				// Check if total size is reasonable; this computation corresponds to the most inefficient
 				// possible use of space by the format (horizontal stripes of 1 pixel, 1 pixel apart).
-				int numpixels = (header->height + header->height%2)/2;
+				int numpixels = (header->height + 2 + header->height%2)/2;
 				int maxcolsize = sizeof(uint32_t) + (numpixels*5) + 1;
 				if (mc.getSize() > (sizeof(patch_header_t) + (header->width * maxcolsize))) {
-					return false;
+				wxLogMessage(s_fmt("height %d, width %d, numpixels %d, "
+					"maxcolsize %d, header+width*maxcolsize %d, size %d",
+					header->height, header->width, numpixels, maxcolsize, 
+					sizeof(patch_header_t)+(header->width*maxcolsize), mc.getSize()));
+//					return false;
 				}
 
 					// Check column pointers are within range

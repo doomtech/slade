@@ -388,14 +388,6 @@
 						RelativePath=".\src\ArchivePanel.h"
 						>
 					</File>
-					<File
-						RelativePath=".\src\EntryListPanel.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\src\EntryListPanel.h"
-						>
-					</File>
 				</Filter>
 				<Filter
 					Name="EntryPanel"
@@ -474,14 +466,6 @@
 					</File>
 					<File
 						RelativePath=".\src\ZipArchivePanel.h"
-						>
-					</File>
-					<File
-						RelativePath=".\src\ZipEntryListPanel.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\src\ZipEntryListPanel.h"
 						>
 					</File>
 				</Filter>

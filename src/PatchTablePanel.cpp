@@ -57,7 +57,7 @@ string PatchTableListView::getItemText(long item, long column) const {
 		return "INVALID INDEX";
 
 	// Check index is ok
-	if (item < 0 || item > patch_table->nPatches())
+	if (item < 0 || (unsigned)item > patch_table->nPatches())
 		return "INVALID INDEX";
 
 	// Get associated patch
@@ -89,7 +89,7 @@ void PatchTableListView::updateItemAttr(long item) const {
 		return;
 
 	// Check index is ok
-	if (item < 0 || item > patch_table->nPatches())
+	if (item < 0 || (unsigned)item > patch_table->nPatches())
 		return;
 
 	// Get associated patch
