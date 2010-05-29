@@ -44,6 +44,7 @@ public:
 
 	// Events
 	void	onBtnAddPatch(wxCommandEvent& e);
+	void	onBtnPatchFromFile(wxCommandEvent& e);
 	void	onBtnRemovePatch(wxCommandEvent& e);
 	void	onBtnChangePatch(wxCommandEvent& e);
 };

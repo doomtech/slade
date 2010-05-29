@@ -555,8 +555,6 @@ bool ArchivePanel::basConvert() {
 	// Get a list of selected entries
 	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
 
-	//entry_list->columnsUpdate(false);
-
 	// Create new entry
 	ArchiveEntry * animdef = archive->addNewEntry((archive->getType() == ARCHIVE_WAD ?
 		"ANIMDEFS" : "animdefs.txt"), index);
@@ -585,8 +583,6 @@ bool ArchivePanel::basConvert() {
 	}
 
 	// Force entrylist width update
-	//entry_list->columnsUpdate(true);
-	//entry_list->updateListWidth();
 	Layout();
 
 	// Load entry data into the text editor

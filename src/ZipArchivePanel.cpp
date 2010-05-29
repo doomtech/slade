@@ -454,7 +454,6 @@ bool ZipArchivePanel::pasteEntry() {
 		if (theClipboard->getItem(a)->getType() == CLIPBOARD_ENTRY) {
 			EntryClipboardItem* item = (EntryClipboardItem*)theClipboard->getItem(a);
 			ArchiveEntry* copied_entry = new ArchiveEntry(*(item->getEntry()));
-			//copied_entry->setExProp("Directory", cur_dir->getFullPath());
 			copied_entry->extraProp("Directory") = cur_dir->getFullPath();
 			archive->addEntry(copied_entry, index);
 			index++;

@@ -356,7 +356,6 @@ ZipArchive::ZipArchive()
  *******************************************************************/
 ZipArchive::~ZipArchive() {
 	deleteDirectory();
-	//if (directory) delete directory;
 }
 
 /* ZipArchive::entryIndex
@@ -1187,7 +1186,7 @@ zipdir_t* ZipArchive::getDirectory(string name, zipdir_t* dir) {
 	// a subdirectory of the current directory
 	string first = fn.GetDirs()[0] + "/";
 	for (size_t a = 0; a < dir->subdirectories.size(); a++) {
-		if (!dir->subdirectories[a]->getName().Cmp(first)) {
+		if (s_cmpnocase(dir->subdirectories[a]->getName(), first)) {
 			// The subdirectory exists within the current directory
 			// Remove the first directory from the dirname
 			fn.RemoveDir(0);
@@ -1255,7 +1254,7 @@ zipdir_t* ZipArchive::addDirectory(string name, zipdir_t* dir) {
 	// Check the first dir doesn't already exist
 	zipdir_t* dir_add = NULL;
 	for (size_t a = 0; a < dir->subdirectories.size(); a++) {
-		if (!dir->subdirectories[a]->getName().Cmp(first))
+		if (s_cmpnocase(dir->subdirectories[a]->getName(), first))
 			dir_add = dir->subdirectories[a];
 	}
 

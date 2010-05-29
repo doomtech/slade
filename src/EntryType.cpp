@@ -44,24 +44,6 @@
  * VARIABLES
  *******************************************************************/
 
-/*
-// Basic formats system for now
-struct id_format_t {
-	string 		id;
-	uint16_t	format;
-};
-id_format_t formats[] = {
-#define xa(id, name, val)			{ name,	id },
-#define xb(id, name)				{ name,	id },
-#define xx(id, name, func)			{ name,	id },
-#define xy(id, name, func, load)	{ name,	id },
-#define xz(id, name)				{ name,	id },
-#include "EntryTypeList.h"
-
-	{ "",				EDF_ANY }, // Dummy type to mark end of list
-};
-*/
-
 vector<EntryType*>	entry_types;	// The big list of all entry types
 
 // Special entry types
@@ -70,23 +52,6 @@ EntryType			etype_folder;	// Folder entry type
 EntryType			etype_marker;	// Marker entry type
 EntryType			etype_map;		// Map marker type
 
-
-/*******************************************************************
- * ENTRYDATAFORMAT CLASS FUNCTIONS
- *******************************************************************/
- /*
-bool EntryDataFormat::isFormat(MemChunk& mc, uint16_t format) {
-	switch (format) {
-#define xa(id, name, val)
-#define xb(id, name)
-#define xx(id, name, func)			case id: return func(mc);
-#define xy(id, name, func, load)	case id: return func(mc);
-#include "EntryTypeList.h"
-	default:
-		return false;
-	}
-}
-*/
 
 /*******************************************************************
  * ENTRYTYPE CLASS FUNCTIONS
@@ -174,24 +139,15 @@ void EntryType::copyToType(EntryType* target) {
 	target->match_size = match_size;
 	target->match_extension = match_extension;
 	target->match_archive = match_archive;
+}
 
-/*
-	// Copy match names
-	for (size_t a = 0; a < match_name.size(); a++)
-		target->addMatchName(match_name[a]);
+string EntryType::getFileFilterString() {
+	string ret = name + " files (*.";
+	ret += extension;
+	ret += ")|*.";
+	ret += extension;
 
-	// Copy match extensions
-	for (size_t a = 0; a < match_extension.size(); a++)
-		target->addMatchExtension(match_extension[a]);
-
-	// Copy match sizes
-	for (size_t a = 0; a < match_size.size(); a++)
-		target->addMatchSize(match_size[a]);
-
-	// Copy size multiples
-	for (size_t a = 0; a < size_multiple.size(); a++)
-		target->addSizeMultiple(size_multiple[a]);
-		 */
+	return ret;
 }
 
 /* EntryType::isThisType
@@ -222,7 +178,7 @@ bool EntryType::isThisType(ArchiveEntry* entry) {
 	if (match_archive.size() > 0) {
 		bool match = false;
 		for (size_t a = 0; a < match_archive.size(); a++) {
-			if (entry->getParent()->getFormat() == match_archive[a]) {
+			if (entry->getParent() && entry->getParent()->getFormat() == match_archive[a]) {
 				match = true;
 				break;
 			}
@@ -601,6 +557,10 @@ void EntryType::cleanupEntryTypes() {
 		if (e != &etype_unknown && e != &etype_folder && e != &etype_marker && e != &etype_map)
 			delete entry_types[a];
 	}
+}
+
+vector<EntryType*> EntryType::allTypes() {
+	return entry_types;
 }
 
 

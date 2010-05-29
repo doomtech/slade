@@ -32,6 +32,9 @@
 #include "Main.h"
 #include "Misc.h"
 #include "EntryDataFormat.h"
+#include "WadArchive.h"
+#include "ZipArchive.h"
+#include <wx/filename.h>
 
 
 /*******************************************************************
@@ -208,6 +211,47 @@ string Misc::sizeAsString(uint32_t size) {
 		double mb = (double)size / (1024*1024);
 		return s_fmt("%1.2fmb", mb);
 	}
+}
+
+// TODO: Ideally later this should be replaced by some kind of
+// 'namespace' functionality in the archive system
+bool Misc::addPatchEntry(Archive* archive, ArchiveEntry* entry) {
+	// Check entry & archive were given
+	if (!entry || !archive)
+		return false;
+
+	// If archive is a wad
+	if (archive->getType() == ARCHIVE_WAD) {
+		// Get archive as wad
+		WadArchive* wad = (WadArchive*)archive;
+
+		// Check if any patches exist
+		if (!wad->patchesBegin()) {
+			// None currently exist, create P_START and P_END markers
+			ArchiveEntry* p_start = wad->addNewEntry("P_START", wad->numEntries());
+			ArchiveEntry* p_end = wad->addNewEntry("P_END", wad->numEntries());
+
+			// Update patches start and end variables
+			wad->setPatchMarkers(p_start, p_end);
+		}
+
+		// Add the entry to the wad at the end of the patches namespace
+		wad->addExistingEntry(entry, wad->entryIndex(wad->patchesEnd()));
+
+		return true;
+	}
+
+	// If archive is a zip
+	else if (archive->getType() == ARCHIVE_ZIP) {
+		// Get archive as zip
+		ZipArchive* zip = (ZipArchive*)archive;
+
+		// Add the entry to the patches folder
+		entry->extraProp("Directory") = wxString("patches/");
+		zip->addExistingEntry(entry, 99999999);
+	}
+
+	return false;
 }
 
 

@@ -227,8 +227,8 @@ bool TextureXEditor::openArchive(Archive* archive) {
 	pal_chooser->setGlobalFromArchive(archive);
 
 	// Search archive for any texture-related entries
-	vector<ArchiveEntry*>	tx_entries = archive->findEntries("TEXTURE?", false);
-	ArchiveEntry*			entry_pnames = archive->findEntry("PNAMES", false);
+	vector<ArchiveEntry*>	tx_entries = archive->findEntries("TEXTURE?*", false);
+	ArchiveEntry*			entry_pnames = archive->findEntry("PNAMES*", false);
 
 	// If any TEXTURE1/2 entries were found, setup patch table stuff
 	if (tx_entries.size() > 0) {

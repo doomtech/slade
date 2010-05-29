@@ -73,14 +73,14 @@ WadArchive::WadArchive()
 	wad_type[3] = 'D';
 
 	// Init entry type ranges
-	patches[0] = -1;
-	patches[1] = -1;
-	flats[0] = -1;
-	flats[1] = -1;
-	sprites[0] = -1;
-	sprites[1] = -1;
-	tx[0] = -1;
-	tx[1] = -1;
+	patches[0] = NULL;
+	patches[1] = NULL;
+	flats[0] = NULL;
+	flats[1] = NULL;
+	sprites[0] = NULL;
+	sprites[1] = NULL;
+	tx[0] = NULL;
+	tx[1] = NULL;
 }
 
 /* WadArchive::~WadArchive
@@ -266,34 +266,34 @@ bool WadArchive::open(MemChunk& mc) {
 		nlump->setState(0);
 
 		// Check for markers
-		if (!nlump->getName().Cmp("P_START"))
-			patches[0] = d;
-		if (!nlump->getName().Cmp("PP_START"))
-			patches[0] = d;
-		if (!nlump->getName().Cmp("P_END"))
-			patches[1] = d;
-		if (!nlump->getName().Cmp("PP_END"))
-			patches[1] = d;
-		if (!nlump->getName().Cmp("F_START"))
-			flats[0] = d;
-		if (!nlump->getName().Cmp("FF_START"))
-			flats[0] = d;
-		if (!nlump->getName().Cmp("F_END"))
-			flats[1] = d;
-		if (!nlump->getName().Cmp("FF_END"))
-			flats[1] = d;
-		if (!nlump->getName().Cmp("S_START"))
-			sprites[0] = d;
-		if (!nlump->getName().Cmp("SS_START"))
-			sprites[0] = d;
-		if (!nlump->getName().Cmp("S_END"))
-			sprites[1] = d;
-		if (!nlump->getName().Cmp("SS_END"))
-			sprites[1] = d;
-		if (!nlump->getName().Cmp("TX_START"))
-			tx[0] = d;
-		if (!nlump->getName().Cmp("TX_END"))
-			tx[1] = d;
+		if (s_cmp(nlump->getName(), "P_START"))
+			patches[0] = nlump;
+		if (s_cmp(nlump->getName(), "PP_START"))
+			patches[0] = nlump;
+		if (s_cmp(nlump->getName(), "P_END"))
+			patches[1] = nlump;
+		if (s_cmp(nlump->getName(), "PP_END"))
+			patches[1] = nlump;
+		if (s_cmp(nlump->getName(), "F_START"))
+			flats[0] = nlump;
+		if (s_cmp(nlump->getName(), "FF_START"))
+			flats[0] = nlump;
+		if (s_cmp(nlump->getName(), "F_END"))
+			flats[1] = nlump;
+		if (s_cmp(nlump->getName(), "FF_END"))
+			flats[1] = nlump;
+		if (s_cmp(nlump->getName(), "S_START"))
+			sprites[0] = nlump;
+		if (s_cmp(nlump->getName(), "SS_START"))
+			sprites[0] = nlump;
+		if (s_cmp(nlump->getName(), "S_END"))
+			sprites[1] = nlump;
+		if (s_cmp(nlump->getName(), "SS_END"))
+			sprites[1] = nlump;
+		if (s_cmp(nlump->getName(), "TX_START"))
+			tx[0] = nlump;
+		if (s_cmp(nlump->getName(), "TX_END"))
+			tx[1] = nlump;
 
 		// Add to entry list
 		entries.push_back(nlump);
@@ -834,15 +834,15 @@ string WadArchive::detectEntrySection(ArchiveEntry* entry) {
 	int index = entryIndex(entry);
 
 	// Patches
-	if (index > patches[0] && index < patches[1])
+	if (index > entryIndex(patches[0]) && index < entryIndex(patches[1]))
 		return "patches";
 
 	// Flats
-	if (index > flats[0] && index < flats[1])
+	if (index > entryIndex(flats[0]) && index < entryIndex(flats[1]))
 		return "flats";
 
 	// Sprites
-	if (index > sprites[0] && index < sprites[1])
+	if (index > entryIndex(sprites[0]) && index < entryIndex(sprites[1]))
 		return "sprites";
 
 	return "none";

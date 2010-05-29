@@ -32,8 +32,16 @@
 #include "PatchTablePanel.h"
 #include "Archive.h"
 #include "TextureXEditor.h"
+#include <wx/filename.h>
 
 
+/*******************************************************************
+ * PATCHTABLELISTVIEW CLASS FUNCTIONS
+ *******************************************************************/
+
+/* PatchTableListView::PatchTableListView
+ * PatchTableListView class constructor
+ *******************************************************************/
 PatchTableListView::PatchTableListView(wxWindow* parent, PatchTable* patch_table) : VirtualListView(parent) {
 	// Init Variables
 	this->patch_table = patch_table;
@@ -48,9 +56,15 @@ PatchTableListView::PatchTableListView(wxWindow* parent, PatchTable* patch_table
 	updateList();
 }
 
+/* PatchTableListView::~PatchTableListView
+ * PatchTableListView class constructor
+ *******************************************************************/
 PatchTableListView::~PatchTableListView() {
 }
 
+/* PatchTableListView::getItemText
+ * Returns the string for [item] at [column]
+ *******************************************************************/
 string PatchTableListView::getItemText(long item, long column) const {
 	// Check patch table exists
 	if (!patch_table)
@@ -80,6 +94,10 @@ string PatchTableListView::getItemText(long item, long column) const {
 		return "INVALID COLUMN";
 }
 
+/* PatchTableListView::updateItemAttr
+ * Updates the item attributes for [item] (red text if patch entry
+ * not found, default otherwise)
+ *******************************************************************/
 void PatchTableListView::updateItemAttr(long item) const {
 	// Init attributes (to error colour)
 	item_attr->SetTextColour(ListView::colourError());
@@ -100,6 +118,9 @@ void PatchTableListView::updateItemAttr(long item) const {
 		item_attr->SetTextColour(wxSystemSettings::GetColour(wxSYS_COLOUR_LISTBOXTEXT));
 }
 
+/* PatchTableListView::updateList
+ * Updates + refreshes the patch list
+ *******************************************************************/
 void PatchTableListView::updateList(bool clear) {
 	if (clear)
 		ClearAll();
@@ -113,6 +134,7 @@ void PatchTableListView::updateList(bool clear) {
 	updateWidth();
 	Refresh();
 }
+
 
 /*******************************************************************
  * PATCHTABLEPANEL CLASS FUNCTIONS
@@ -160,6 +182,7 @@ PatchTablePanel::PatchTablePanel(wxWindow* parent, PatchTable* patch_table) : wx
 
 	// Bind events
 	btn_add_patch->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &PatchTablePanel::onBtnAddPatch, this);
+	btn_patch_from_file->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &PatchTablePanel::onBtnPatchFromFile, this);
 	btn_remove_patch->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &PatchTablePanel::onBtnRemovePatch, this);
 	btn_change_patch->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &PatchTablePanel::onBtnChangePatch, this);
 }
@@ -183,6 +206,64 @@ void PatchTablePanel::onBtnAddPatch(wxCommandEvent& e) {
 
 	// Update list
 	list_patches->updateList();
+}
+
+void PatchTablePanel::onBtnPatchFromFile(wxCommandEvent& e) {
+	// Get all entry types
+	vector<EntryType*> etypes = EntryType::allTypes();
+
+	// Go through types
+	string ext_filter = "All files (*.*)|*.*|";
+	for (unsigned a = 0; a < etypes.size(); a++) {
+		// If the type is a valid image type, add it's extension filter
+		if (etypes[a]->extraProps().propertyExists("image")) {
+			ext_filter += etypes[a]->getFileFilterString();
+			ext_filter += "|";
+		}
+	}
+
+	// Create open file dialog
+	wxFileDialog dialog_open(this, "Choose file(s) to open", wxEmptyString, wxEmptyString,
+			ext_filter, wxFD_OPEN|wxFD_MULTIPLE|wxFD_FILE_MUST_EXIST, wxDefaultPosition);
+
+	// Run the dialog & check that the user didn't cancel
+	if (dialog_open.ShowModal() == wxID_OK) {
+		// Get file selection
+		wxArrayString files;
+		dialog_open.GetPaths(files);
+
+		// Go through file selection
+		for (unsigned a = 0; a < files.size(); a++) {
+			// Load the file into a temporary ArchiveEntry
+			ArchiveEntry* entry = new ArchiveEntry();
+			entry->importFile(files[a]);
+
+			// Determine type
+			EntryType::detectEntryType(entry);
+
+			// If it's not a valid image type, ignore this file
+			if (!entry->getType()->extraProps().propertyExists("image")) {
+				wxLogMessage("%s is not a valid image file", chr(files[a]));
+				continue;
+			}
+
+			// Ask for name for patch
+			wxFileName fn(files[a]);
+			string name = fn.GetName().Upper().Truncate(8);
+			name = wxGetTextFromUser(s_fmt("Enter a patch name for %s:", chr(fn.GetFullName())), "New Patch", name);
+			name = name.Truncate(8);
+
+			// Add patch to archive
+			entry->setName(name);
+			Misc::addPatchEntry(parent->getArchive(), entry);
+
+			// Add patch to patch table
+			patch_table->addPatch(name, parent->getArchive());
+		}
+
+		// Refresh patch list
+		list_patches->updateList();
+	}
 }
 
 void PatchTablePanel::onBtnRemovePatch(wxCommandEvent& e) {

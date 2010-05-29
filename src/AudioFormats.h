@@ -49,7 +49,7 @@ public:
 				mc[8] == 'X' && mc [9] == 'D' && mc[10] == 'I' && mc[11] == 'R' &&
 				mc[12] == 'I' && mc[13] == 'N' && mc[14] == 'F' && mc[15] == 'O' &&
 				mc[16] == 0 && mc[17] == 0 && mc [18] == 0 &&
-				mc[22] == 'C' && mc[23] == 'A' && mc[24] == 'T' && 
+				mc[22] == 'C' && mc[23] == 'A' && mc[24] == 'T' &&
 				mc[30] == 'X' && mc[31] == 'M' && mc[32] == 'I' && mc[33] == 'D' &&
 				mc[34] == 'F' && mc[35] && 'O' && mc[36] == 'R' && mc[37] == 'M' &&
 				mc[42] == 'X' && mc[43] && 'M' && mc[44] == 'I' && mc[45] == 'D')
@@ -245,12 +245,15 @@ public:
 		// Check size
 		if (mc.getSize() > 26) {
 			// Check for header, see specs at http://wiki.multimedia.cx/index.php?title=Creative_Voice
-			string header(wxString::FromAscii(mc.getData(), 19));
-			if (header == "Creative Voice File" && mc[19] == 26 && mc [20] == 26 && mc[21] == 0) {
+			if (mc[19] == 26 && mc [20] == 26 && mc[21] == 0) {
 				uint16_t version = (mc[23]<<8) + mc[22];
 				uint16_t validity = ~version + 0x1234;
-				if ((mc[24] + (mc[25] << 8)) == validity)
+				if ((mc[24] + (mc[25] << 8)) == validity) {
+					// Lastly, check for header text
+					string header(wxString::FromAscii(mc.getData(), 19));
+					if (header == "Creative Voice File")
 					return true;
+				}
 			}
 		}
 		return false;

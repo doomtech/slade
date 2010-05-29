@@ -8,16 +8,29 @@ class WadArchive : public Archive {
 private:
 	vector<ArchiveEntry*>	entries;
 	char					wad_type[4];
-	int						patches[2];
-	int						sprites[2];
-	int						flats[2];
-	int						tx[2];
+	ArchiveEntry*			patches[2];
+	ArchiveEntry*			sprites[2];
+	ArchiveEntry*			flats[2];
+	ArchiveEntry*			tx[2];
 
 public:
 	WadArchive();
 	~WadArchive();
 
-	bool	isIWAD();
+	// Wad specific
+	bool			isIWAD();
+	ArchiveEntry*	patchesBegin() { return patches[0]; }
+	ArchiveEntry*	patchesEnd() { return patches[1]; }
+	ArchiveEntry*	spritesBegin() { return sprites[0]; }
+	ArchiveEntry*	spritesEnd() { return sprites[1]; }
+	ArchiveEntry*	flatsBegin() { return flats[0]; }
+	ArchiveEntry*	flatsEnd() { return flats[1]; }
+	ArchiveEntry*	txBegin() { return tx[0]; }
+	ArchiveEntry*	txEnd() { return tx[1]; }
+	void			setPatchMarkers(ArchiveEntry* begin, ArchiveEntry* end) { patches[0] = begin; patches[1] = end; }
+	void			setSpriteMarkers(ArchiveEntry* begin, ArchiveEntry* end) { sprites[0] = begin; sprites[1] = end; }
+	void			setFlatMarkers(ArchiveEntry* begin, ArchiveEntry* end) { flats[0] = begin; flats[1] = end; }
+	void			setTxMarkers(ArchiveEntry* begin, ArchiveEntry* end) { tx[0] = begin; tx[1] = end; }
 
 	int				entryIndex(ArchiveEntry* entry);
 	ArchiveEntry*	getEntry(uint32_t index);

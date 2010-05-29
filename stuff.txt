@@ -61,16 +61,13 @@ TODO List ---------------------------------------------------------------
 - Ability to set an archive never to read entry data into memory (read data from the file every time)
 - MemChunk subclass that deals with a file rather than a memory block
 - Some lump (sub)formats can only be identified properly from the presence of other lumps; e.g. GL nodes and THINGS/LINEDEFS
-- Rewrite the ListView class with better/advanced features:
-	- Associate with a 'Filter' text control that, when typed into, filters the list by name, eg:
-	  for entries "ENTRY1", "ENTRY2", "ENTRY3", "ENTRY4", "ITEM1", "ITEM5", "TEST2", "TEST3"
-	  filter "ENT" - result "ENTRY1", "ENTRY2", "ENTRY3", "ENTRY4"
-	  filter "*1" - result "ENTRY1", "ITEM1"
-	  filter "*E?T" - result "ENTRY1", "ENTRY2", "ENTRY3", "ENTRY4", "TEST2", "TEST3"
-	  etc...
-	- For the above, a fast method of 'showing/hiding' list items without 'removing' them is needed
 - Fine-tune identification of Doom SFX lumps if possible (most fail the test at the moment)
 - Should probably merge MultiEntryPanel stuff into DefaultEntryPanel
+- Really should change the way entries are added to zip archives
+	- Maybe change it so all archives use a tree structure to store entries, but
+	  non-zips will force all entries to be put in the root directory
+	- Need a better way of entry searching in zips (currently can only search by full path)
+	- Some kind of namespace feature would be good
 
 
 Unimplemented Feature Requests ------------------------------------------
