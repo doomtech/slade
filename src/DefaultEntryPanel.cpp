@@ -196,6 +196,9 @@ void DefaultEntryPanel::onEditTextClicked(wxCommandEvent& event) {
 	// Show the text editor
 	showTextEditor();
 
+	// Enable saving (in case it was disabled earlier)
+	btn_save->Enable();
+
 	// Load entry data into the text editor
 	text_area->loadEntry(entry);
 	setModified(false);
@@ -205,12 +208,16 @@ void DefaultEntryPanel::onEditTextClicked(wxCommandEvent& event) {
  * Called when the text in the TextEditor is modified
  *******************************************************************/
 void DefaultEntryPanel::onTextModified(wxStyledTextEvent& e) {
-	setModified();
+	if (btn_save->IsEnabled())
+		setModified();
 }
 
 void DefaultEntryPanel::onViewHexClicked(wxCommandEvent& event) {
 	// Show the text editor
 	showTextEditor();
+
+	// Disable saving (it's unsafe!)
+	btn_save->Disable();
 
 	// Load entry data into the text editor
 	text_area->loadHexEntry(entry);

@@ -552,13 +552,9 @@ bool DatArchive::isDatArchive(string filename) {
 	if (!file.IsOpened())
 		return false;
 
-	if (filename.Contains(string("RAVDATA")))
-		return true;
-	if (filename.Contains(string("D_CASTR")))
-		return true;
-	return false;
-
-	return true;
+	MemChunk mc;
+	mc.importFile(filename);
+	return isDatArchive(mc);
 }
 
 /* DatArchive::detectMaps

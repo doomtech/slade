@@ -462,9 +462,9 @@ bool LibArchive::isLibArchive(string filename) {
 	if (!file.IsOpened())
 		return false;
 
-	if (filename.Contains(string("SHADOW")))
-		return true;
-	return false;
+	MemChunk mc;
+	mc.importFile(filename);
+	return isLibArchive(mc);
 }
 
 /* LibArchive::detectMaps
