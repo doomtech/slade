@@ -250,6 +250,8 @@ void VirtualListView::onKeyDown(wxKeyEvent& e) {
 			}
 		}
 	}
+	else
+		e.Skip();
 }
 
 
