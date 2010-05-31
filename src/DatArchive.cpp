@@ -104,7 +104,7 @@ ArchiveEntry* DatArchive::getEntry(string name) {
  * Gets the wxWidgets file dialog filter string for the archive type
  *******************************************************************/
 string DatArchive::getFileExtensionString() {
-	return "Shadowcaster Dat Files (*.dat)|*.dat";
+	return "Raven Software Data Files (*.dat; *.cd; *.hd)|*.dat;*.cd;*.hd";
 }
 
 /* DatArchive::getFormat

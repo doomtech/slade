@@ -862,12 +862,9 @@ void ArchivePanel::onEntryMenuClick(wxCommandEvent& e) {
 		case MENU_ENTRY_BAS_CONVERT:
 			basConvert();
 			break;
-#if 0
-		// That stuff is not for general consumption ;)
 		case MENU_ENTRY_PAL_CONVERT:
 			palConvert();
 			break;
-#endif
 	}
 }
 
