@@ -43,7 +43,7 @@
  * PaletteChooser class constructor
  *******************************************************************/
 PaletteChooser::PaletteChooser(wxWindow* parent, int id)
-: wxComboBox(parent, id, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY|wxCB_DROPDOWN) {
+: wxChoice(parent, id) { //, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY|wxCB_DROPDOWN) {
 	// Init variables
 	pal_global.copyPalette(thePaletteManager->globalPalette());
 

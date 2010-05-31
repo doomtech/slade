@@ -6,7 +6,7 @@
 #include "Archive.h"
 #include "Misc.h"
 
-class PaletteChooser : public wxComboBox {
+class PaletteChooser : public wxChoice {
 private:
 	Palette8bit	pal_global;
 
