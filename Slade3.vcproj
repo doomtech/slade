@@ -886,6 +886,14 @@
 				RelativePath=".\src\SplashWindow.h"
 				>
 			</File>
+			<File
+				RelativePath=".\src\TranslationTableChooser.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\TranslationTableChooser.h"
+				>
+			</File>
 			<Filter
 				Name="Options"
 				>

@@ -431,22 +431,22 @@ bool LibArchive::isLibArchive(MemChunk& mc) {
 	uint32_t num_lumps = 0;
 	mc.read(&num_lumps, 2);		// Size
 	num_lumps = wxINT16_SWAP_ON_BE(num_lumps);
-	uint32_t dir_offset = mc.getSize() - (3 + (num_lumps * 21));
+	uint32_t dir_offset = mc.getSize() - (2 + (num_lumps * 21));
 
 	// Check directory offset is decent
 	mc.seek(dir_offset, SEEK_SET);
-	uint8_t trash = 0;
 	uint32_t offset = 0;
 	uint32_t size = 0;
-	mc.read(&trash, 1);		// Unused
+	uint8_t dummy = 0;
 	mc.read(&size, 4);		// Size
 	mc.read(&offset, 4);	// Offset
+	mc.read(&dummy, 1);		// Separator
 	offset = wxINT32_SWAP_ON_BE(offset);
 	size = wxINT32_SWAP_ON_BE(size);
 
 	// If the lump data goes past the directory,
-	// the wadfile is invalid
-	if (offset != 0x0A || offset + size > mc.getSize()) {
+	// the library is invalid
+	if (dummy != 0 || offset != 0 || offset + size > mc.getSize()) {
 		return false;
 	}
 
@@ -461,10 +461,32 @@ bool LibArchive::isLibArchive(string filename) {
 	// Check it opened ok
 	if (!file.IsOpened())
 		return false;
+	// Read lib footer
+	file.Seek(2, wxFromEnd);
+	uint32_t num_lumps = 0;
+	file.Read(&num_lumps, 2);		// Size
+	num_lumps = wxINT16_SWAP_ON_BE(num_lumps);
+	uint32_t dir_offset = file.Length() - (2 + (num_lumps * 21));
 
-	MemChunk mc;
-	mc.importFile(filename);
-	return isLibArchive(mc);
+	// Check directory offset is decent
+	file.Seek(dir_offset, wxFromStart);
+	uint32_t offset = 0;
+	uint32_t size = 0;
+	uint8_t dummy = 0;
+	file.Read(&size, 4);	// Size
+	file.Read(&offset, 4);	// Offset
+	file.Read(&dummy, 1);	// Separator
+	offset = wxINT32_SWAP_ON_BE(offset);
+	size = wxINT32_SWAP_ON_BE(size);
+
+	// If the lump data goes past the directory,
+	// the library is invalid
+	if (dummy != 0 || offset != 0 || offset + size > file.Length()) {
+		return false;
+	}
+
+	// If it's passed to here it's probably a lib file
+	return true;
 }
 
 /* LibArchive::detectMaps

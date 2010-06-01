@@ -206,7 +206,7 @@ bool DatArchive::open(MemChunk& mc) {
 		unknown = wxINT16_SWAP_ON_BE(unknown);
 
 		// If the lump data goes past the directory,
-		// the wadfile is invalid
+		// the data file is invalid
 		if (offset + size > mc.getSize()) {
 			wxLogMessage("DatArchive::open: Dat archive is invalid or corrupt");
 			Global::error = "Archive is invalid and/or corrupt";
@@ -226,8 +226,6 @@ bool DatArchive::open(MemChunk& mc) {
 		{
 			myname = s_fmt("%s+%d", lastname, ++namecount);
 		}
-
-//		wxLogMessage(s_fmt("Entry %d in %s: %s @ %x, size %d"), d, name, myname, offset, size);
 
 		// Create & setup lump
 		ArchiveEntry* nlump = new ArchiveEntry(myname, size, this);
@@ -252,8 +250,6 @@ bool DatArchive::open(MemChunk& mc) {
 		// Add to entry list
 		entries.push_back(nlump);
 	}
-
-//	wxLogMessage(s_fmt("Total: %d entries", entries.size()));
 
 	// Detect all entry types
 	MemChunk edata;
@@ -525,7 +521,6 @@ bool DatArchive::isDatArchive(MemChunk& mc) {
 		return false;
 	}
 
-	string name;
 	size_t len = 1;
 	size_t start = nameofs+dir_offset;
 	// Sanity checks again. Make sure there is actually a name.
@@ -539,8 +534,6 @@ bool DatArchive::isDatArchive(MemChunk& mc) {
 	// Let's be reasonable here. While names aren't limited, if it's too long, it's suspicious.
 	if (len > 60)
 		return false;
-	const uint8_t * mcdata = mc.getData();
-	name = wxString::FromAscii(mcdata+start, len);
 	return true;
 }
 
@@ -552,9 +545,69 @@ bool DatArchive::isDatArchive(string filename) {
 	if (!file.IsOpened())
 		return false;
 
-	MemChunk mc;
-	mc.importFile(filename);
-	return isDatArchive(mc);
+	// Read dat header
+	file.Seek(0, wxFromStart);
+	uint16_t num_lumps;
+	uint32_t dir_offset, junk;
+	file.Read(&num_lumps, 2);	// Size
+	file.Read(&dir_offset, 4);	// Directory offset
+	file.Read(&junk, 4);		// Unknown value
+	num_lumps	= wxINT16_SWAP_ON_BE(num_lumps);
+	dir_offset	= wxINT32_SWAP_ON_BE(dir_offset);
+	junk		= wxINT32_SWAP_ON_BE(junk);
+
+	if (dir_offset >= file.Length())
+		return false;
+
+	// Read the directory
+	file.Seek(dir_offset, wxFromStart);
+	// Read lump info
+	uint32_t offset = 0;
+	uint32_t size = 0;
+	uint16_t nameofs = 0;
+	uint16_t unknown = 0;
+
+	file.Read(&offset,	4);		// Offset
+	file.Read(&size,	4);		// Size
+	file.Read(&nameofs,	2);		// Name offset
+	file.Read(&unknown,	2);		// Name offset
+
+	// Byteswap values for big endian if needed
+	offset	= wxINT32_SWAP_ON_BE(offset);
+	size	= wxINT32_SWAP_ON_BE(size);
+	nameofs = wxINT16_SWAP_ON_BE(nameofs);
+	unknown = wxINT16_SWAP_ON_BE(unknown);
+
+	// The first lump should have a name (subsequent lumps need not have one).
+	// Also, sanity check the values.
+	if (nameofs == 0 || nameofs >=  file.Length() || offset + size >= file.Length()) {
+		return false;
+	}
+
+	string name;
+	size_t len = 1;
+	size_t start = nameofs+dir_offset;
+	// Sanity checks again. Make sure there is actually a name.
+	if (start > file.Length())
+		return false;
+	uint8_t temp;
+	file.Seek(start, wxFromStart);
+	file.Read(&temp, 1);
+	if (temp < 33)
+		return false;
+	for (size_t i = start; i < file.Length(); ++i, ++len) {
+		file.Read(&temp, 1);
+		// Found end of name
+		if (temp == 0)
+			break;
+		// Names should not contain garbage characters
+		if (temp < 32)
+			return false;
+	}
+	// Let's be reasonable here. While names aren't limited, if it's too long, it's suspicious.
+	if (len > 60)
+		return false;
+	return true;
 }
 
 /* DatArchive::detectMaps

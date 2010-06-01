@@ -222,8 +222,8 @@ void GfxConvDialog::setupLayout() {
 	btn_skip->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &GfxConvDialog::onBtnSkip, this);
 	btn_skip_all->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &GfxConvDialog::onBtnSkipAll, this);
 	combo_target_format->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &GfxConvDialog::onTargetFormatChanged, this);
-	pal_chooser_current->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &GfxConvDialog::onCurrentPaletteChanged, this);
-	pal_chooser_target->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &GfxConvDialog::onTargetPaletteChanged, this);
+	pal_chooser_current->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &GfxConvDialog::onCurrentPaletteChanged, this);
+	pal_chooser_target->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &GfxConvDialog::onTargetPaletteChanged, this);
 	slider_alpha_threshold->Bind(wxEVT_COMMAND_SLIDER_UPDATED, &GfxConvDialog::onAlphaThresholdChanged, this);
 	cb_enable_transparency->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &GfxConvDialog::onEnableTransparencyChanged, this);
 	rb_transparency_colour->Bind(wxEVT_COMMAND_RADIOBUTTON_SELECTED, &GfxConvDialog::onTransTypeChanged, this);

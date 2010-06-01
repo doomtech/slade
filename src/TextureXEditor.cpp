@@ -198,7 +198,7 @@ TextureXEditor::TextureXEditor(wxWindow* parent) : wxPanel(parent, -1) {
 	hbox->Add(pal_chooser, 0, wxEXPAND|wxALL, 4);
 
 	// Bind events
-	pal_chooser->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &TextureXEditor::onPaletteChanged, this);
+	pal_chooser->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &TextureXEditor::onPaletteChanged, this);
 
 	// Update+ layout
 	Layout();

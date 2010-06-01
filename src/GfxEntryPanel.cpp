@@ -114,7 +114,7 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 
 	// Bind Events
 	slider_zoom->Bind(wxEVT_COMMAND_SLIDER_UPDATED, &GfxEntryPanel::onZoomChanged, this);
-	combo_palette->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &GfxEntryPanel::onPaletteChanged, this);
+	combo_palette->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &GfxEntryPanel::onPaletteChanged, this);
 	spin_xoffset->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &GfxEntryPanel::onXOffsetChanged, this);
 	spin_yoffset->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &GfxEntryPanel::onYOffsetChanged, this);
 	combo_offset_type->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &GfxEntryPanel::onOffsetTypeChanged, this);

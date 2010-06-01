@@ -282,7 +282,9 @@ bool MainApp::OnInit() {
 	EntryType::loadEntryTypes();
 
 	// Open any archives on the command line
-	for (int a = 0; a < argc; a++) {
+	// argv[0] is normally the executable itself (i.e. Slade.exe) 
+	// and opening it as an archive should not be attempted...
+	for (int a = 1; a < argc; a++) {
 		string arg = argv[a];
 		theArchiveManager->openArchive(arg);
 	}

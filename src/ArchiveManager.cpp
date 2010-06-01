@@ -144,6 +144,8 @@ Archive* ArchiveManager::getArchive(string filename) {
 Archive* ArchiveManager::openArchive(string filename) {
 	Archive* new_archive = NULL;
 
+	wxLogMessage(s_fmt("Opening archive %s", filename));
+
 	// Check that the file isn't already open
 	if (getArchive(filename)) {
 		Global::error = "Archive is already open";
@@ -155,10 +157,10 @@ Archive* ArchiveManager::openArchive(string filename) {
 		new_archive = new WadArchive();
 	else if (ZipArchive::isZipArchive(filename))
 		new_archive = new ZipArchive();
-	else if (LibArchive::isLibArchive(filename))
-		new_archive = new LibArchive();
 	else if (DatArchive::isDatArchive(filename))
 		new_archive = new DatArchive();
+	else if (LibArchive::isLibArchive(filename))
+		new_archive = new LibArchive();
 	else
 		return NULL;	// Unsupported format
 
