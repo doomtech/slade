@@ -2,6 +2,7 @@
 #ifndef __MAINAPP_H__
 #define __MAINAPP_H__
 
+#include "MainWindow.h"
 #include <wx/log.h>
 
 class SLADELog : public wxLog {
@@ -16,11 +17,14 @@ public:
 
 class MainApp : public wxApp {
 private:
+	MainWindow*	main_window;
 
 public:
 	virtual bool OnInit();
 	virtual int OnExit();
 	virtual void OnFatalException();
+
+	MainWindow*	getMainWindow() { return main_window; }
 
 	bool	initDirectories();
 	void	initLogFile();

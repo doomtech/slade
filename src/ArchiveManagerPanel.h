@@ -49,10 +49,11 @@ public:
 	ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_archives);
 	~ArchiveManagerPanel();
 
-	void	refreshArchiveList();
-	void	populateMapList(Archive* archive);
-	void	updateListItem(int index);
-	bool	isArchivePanel(int tab_index);
+	void		refreshArchiveList();
+	void		populateMapList(Archive* archive);
+	void		updateListItem(int index);
+	bool		isArchivePanel(int tab_index);
+	Archive*	currentArchive();
 
 	void	openTab(int archive_index);
 	void	closeTab(int archive_index);
@@ -83,6 +84,7 @@ public:
 	void	exportEntryWad();
 	void	moveUp();
 	void	moveDown();
+	void	textureEditor();
 
 	vector<int>	getSelectedArchives();
 

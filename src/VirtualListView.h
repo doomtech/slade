@@ -10,6 +10,7 @@ wxDECLARE_EVENT(EVT_VLV_SELECTION_CHANGED, wxCommandEvent);
 class VirtualListView : public wxListCtrl {
 private:
 	long	last_focus;
+	string	search;
 
 	void	sendSelectionChangedEvent();
 
@@ -50,6 +51,7 @@ public:
 	void	onColumnResize(wxListEvent& e);
 	void	onMouseLeftDown(wxMouseEvent& e);
 	void	onKeyDown(wxKeyEvent& e);
+	void	onKeyChar(wxKeyEvent& e);
 };
 
 #endif//__VIRTUAL_LIST_VIEW_H__

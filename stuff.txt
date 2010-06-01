@@ -11,7 +11,7 @@ TODO List ---------------------------------------------------------------
 - TEXTUREx editor
 - Text editor special features
 - Media panel
-- Entry search/filter
+- Entry filter by type/category
 - Archive merging
 - Archive conversion
 - 'Export As' for both entries and archives - does conversion+export
@@ -44,7 +44,6 @@ TODO List ---------------------------------------------------------------
 		- Used when, for instance, searching for all gfx entries in an archive
 - General optimisation:
 	- Entry type detection
-	- Selecting lots of entries
 	- Gfx conversion (not sure if it can be optimised so much, but at least should show a progress bar)
 - Rearrange menus
 - *Resources system:

@@ -20,6 +20,7 @@ VirtualListView::VirtualListView(wxWindow* parent)
 	Bind(wxEVT_KEY_DOWN, &VirtualListView::onKeyDown, this);
 #endif
 	Bind(wxEVT_COMMAND_LIST_COL_END_DRAG, &VirtualListView::onColumnResize, this);
+	Bind(wxEVT_CHAR, &VirtualListView::onKeyChar, this);
 }
 
 VirtualListView::~VirtualListView() {
@@ -201,7 +202,7 @@ void VirtualListView::onKeyDown(wxKeyEvent& e) {
 	// shift+up/down - same as up/down but doesn't clear previous selection
 	// ctrl+up/down - does nothing
 	if (e.GetKeyCode() == WXK_UP) {
-		if (e.ShiftDown()) {
+		if (e.GetModifiers() == wxMOD_SHIFT) {
 			long focus = getFocus();
 			if (focus < 0) focus = last_focus;		// If no current focus, go with last focused item
 			if (focus > 0) {
@@ -212,7 +213,7 @@ void VirtualListView::onKeyDown(wxKeyEvent& e) {
 				sendSelectionChangedEvent();
 			}
 		}
-		else if (!e.AltDown() && !e.ControlDown()) {
+		else if (e.GetModifiers() == wxMOD_NONE) {
 			long focus = getFocus();
 			if (focus < 0) focus = last_focus;		// If no current focus, go with last focused item
 			if (focus > 0) {
@@ -226,7 +227,7 @@ void VirtualListView::onKeyDown(wxKeyEvent& e) {
 		}
 	}
 	else if (e.GetKeyCode() == WXK_DOWN) {
-		if (e.ShiftDown()) {
+		if (e.GetModifiers() == wxMOD_SHIFT) {
 			long focus = getFocus();
 			if (focus < 0) focus = last_focus;		// If no current focus, go with last focused item
 			if (focus < GetItemCount() - 1) {
@@ -237,7 +238,7 @@ void VirtualListView::onKeyDown(wxKeyEvent& e) {
 				sendSelectionChangedEvent();
 			}
 		}
-		else if (!e.AltDown() && !e.ControlDown()) {
+		else if (e.GetModifiers() == wxMOD_NONE) {
 			long focus = getFocus();
 			if (focus < 0) focus = last_focus;		// If no current focus, go with last focused item
 			if (focus < GetItemCount() - 1) {
@@ -252,6 +253,17 @@ void VirtualListView::onKeyDown(wxKeyEvent& e) {
 	}
 	else
 		e.Skip();
+}
+
+void VirtualListView::onKeyChar(wxKeyEvent& e) {
+	// Check the key pressed is actually a character (a-z, 0-9 etc)
+	if ((e.GetKeyCode() >= 'a' && e.GetKeyCode() <= 'z') ||
+		(e.GetKeyCode() >= 'A' && e.GetKeyCode() <= 'Z') ||
+		(e.GetKeyCode() >= '1' && e.GetKeyCode() <= '0')) {
+		// Do stuff
+	}
+
+	e.Skip();
 }
 
 

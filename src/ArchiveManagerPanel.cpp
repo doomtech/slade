@@ -251,6 +251,24 @@ bool ArchiveManagerPanel::isArchivePanel(int tab_index) {
 		return false;
 }
 
+/* ArchiveManagerPanel::currentArchive
+ * Returns the currently 'open' archive - the archive associated
+ * with the current ArchivePanel tab. Returns NULL if the current tab
+ * isn't an ArchivePanel
+ *******************************************************************/
+Archive* ArchiveManagerPanel::currentArchive() {
+	// Get current tab index
+	int selected = notebook_archives->GetSelection();
+
+	// Check it's an archive tab
+	if (!isArchivePanel(selected))
+		return NULL;
+
+	// Get the archive associated with the panel
+	ArchivePanel* ap = (ArchivePanel*)notebook_archives->GetPage(selected);
+	return ap->getArchive();
+}
+
 /* ArchiveManagerPanel::openTab
  * Opens a new tab for the archive at <archive_index> in the archive
  * manager
@@ -780,6 +798,15 @@ void ArchiveManagerPanel::moveDown() {
 	int selection = notebook_archives->GetSelection();
 	if (isArchivePanel(selection))
 		((ArchivePanel*) notebook_archives->GetPage(selection))->moveDown();
+}
+
+/* ArchiveManagerPanel::textureEditor
+ * Opens the texture editor for the current archive (if any)
+ *******************************************************************/
+void ArchiveManagerPanel::textureEditor() {
+	Archive* current = currentArchive();
+	if (current)
+		openTextureTab(theArchiveManager->archiveIndex(current));
 }
 
 
