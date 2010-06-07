@@ -238,6 +238,7 @@ bool MainApp::initDirectories() {
 bool MainApp::OnInit() {
 	// Init global variables
 	Global::error = "";
+	ArchiveManager::getInstance();
 
 	// Set application name (for wx directory stuff)
 	wxApp::SetAppName("slade3");
@@ -261,7 +262,8 @@ bool MainApp::OnInit() {
 	readConfigFile();
 
 	// Check that SLADE.pk3 can be found
-	wxLogMessage("Loading slade.pk3");
+	wxLogMessage("Loading resources");
+	theArchiveManager->init();
 	if (!theArchiveManager->resArchiveOK())
 		return false;
 

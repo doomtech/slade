@@ -235,6 +235,10 @@ void Misc::doMassRename(wxArrayString& names, string name_filter) {
 		while (name.size() < name_filter.size())
 			name += " ";
 
+		// If the filter string is shorter than the name, just truncate the name
+		if (name_filter.size() < name.size())
+			name.Truncate(name_filter.size());
+
 		// Go through characters
 		for (unsigned c = 0; c < name_filter.size(); c++) {
 			// Check character

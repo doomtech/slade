@@ -36,6 +36,7 @@ public:
 		if (instance) delete instance;
 	}
 
+	bool		init();
 	bool		resArchiveOK() { return res_archive_open; }
 	bool		addArchive(Archive* archive);
 	Archive*	getArchive(int index);

@@ -55,9 +55,20 @@ CVAR(Int, base_resource, -1, CVAR_SAVE)
  *******************************************************************/
 ArchiveManager::ArchiveManager() {
 	// Init variables
-	res_archive_open = true;
+	res_archive_open = false;
 	base_resource_archive = NULL;
+}
 
+/* ArchiveManager::~ArchiveManager
+ * ArchiveManager class destructor
+ *******************************************************************/
+ArchiveManager::~ArchiveManager() {
+	clearAnnouncers();
+	if (program_resource_archive) delete program_resource_archive;
+	if (base_resource_archive) delete base_resource_archive;
+}
+
+bool ArchiveManager::init() {
 	// Find slade3.pk3 directory
 	string dir_slade_pk3 = appPath("slade.pk3", DIR_DATA);
 	if (!wxFileExists(dir_slade_pk3))
@@ -73,18 +84,13 @@ ArchiveManager::ArchiveManager() {
 		wxLogMessage("Unable to find slade.pk3!");
 		res_archive_open = false;
 	}
+	else
+		res_archive_open = true;
 
 	// Open base resource archive (if any)
-	openBaseResource(base_resource);
-}
+	bool bro = openBaseResource((int)base_resource);
 
-/* ArchiveManager::~ArchiveManager
- * ArchiveManager class destructor
- *******************************************************************/
-ArchiveManager::~ArchiveManager() {
-	clearAnnouncers();
-	if (program_resource_archive) delete program_resource_archive;
-	if (base_resource_archive) delete base_resource_archive;
+	return res_archive_open && bro;
 }
 
 /* ArchiveManager::addArchive
@@ -404,7 +410,7 @@ string ArchiveManager::getBaseResourcePath(unsigned index) {
 
 bool ArchiveManager::openBaseResource(int index) {
 	// Check we're opening a different archive
-	if (base_resource == index)
+	if (base_resource_archive && base_resource == index)
 		return true;
 
 	// Close/delete current base resource archive
