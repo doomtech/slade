@@ -13,14 +13,8 @@
     <Filter Include="Main Editor\UI Elements">
       <UniqueIdentifier>{f2373f73-d7a8-4389-a7d0-1b55a7511024}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Main Editor\UI Elements\ArchivePanel">
-      <UniqueIdentifier>{21ca3a2e-c518-498c-8bd7-5e9b5293b5cb}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Main Editor\UI Elements\EntryPanel">
       <UniqueIdentifier>{0355b563-40d6-4783-b213-61d8271580d7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Main Editor\UI Elements\ZipArchivePanel">
-      <UniqueIdentifier>{7310ac92-d15e-4dfa-80cb-3bd3df523e7c}</UniqueIdentifier>
     </Filter>
     <Filter Include="Main Editor\UI Elements\TextureXEditor">
       <UniqueIdentifier>{68f7e12d-ec2c-42a8-8c84-f26092dd8c1f}</UniqueIdentifier>
@@ -137,9 +131,6 @@
     </ClCompile>
     <ClCompile Include="src\ArchiveManagerPanel.cpp">
       <Filter>Main Editor\UI Elements</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ArchivePanel.cpp">
-      <Filter>Main Editor\UI Elements\ArchivePanel</Filter>
     </ClCompile>
     <ClCompile Include="src\AnimatedEntryPanel.cpp">
       <Filter>Main Editor\UI Elements\EntryPanel</Filter>
@@ -300,9 +291,6 @@
     <ClCompile Include="src\ListView.cpp">
       <Filter>UI Elements\Lists</Filter>
     </ClCompile>
-    <ClCompile Include="src\ZipArchiveEntryList.cpp">
-      <Filter>UI Elements\Lists</Filter>
-    </ClCompile>
     <ClCompile Include="src\EntryDataFormat.cpp">
       <Filter>Resources\Archive\EntryType\EntryDataFormat</Filter>
     </ClCompile>
@@ -315,8 +303,8 @@
     <ClCompile Include="src\LibArchive.cpp">
       <Filter>Resources\Archive</Filter>
     </ClCompile>
-    <ClCompile Include="src\ZipArchivePanel.cpp">
-      <Filter>Main Editor\UI Elements\ArchivePanel</Filter>
+    <ClCompile Include="src\ArchivePanel.cpp">
+      <Filter>Main Editor\UI Elements</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -373,9 +361,6 @@
     </ClInclude>
     <ClInclude Include="src\ArchiveManagerPanel.h">
       <Filter>Main Editor\UI Elements</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ArchivePanel.h">
-      <Filter>Main Editor\UI Elements\ArchivePanel</Filter>
     </ClInclude>
     <ClInclude Include="src\AnimatedEntryPanel.h">
       <Filter>Main Editor\UI Elements\EntryPanel</Filter>
@@ -549,9 +534,6 @@
     <ClInclude Include="src\ListView.h">
       <Filter>UI Elements\Lists</Filter>
     </ClInclude>
-    <ClInclude Include="src\ZipArchiveEntryList.h">
-      <Filter>UI Elements\Lists</Filter>
-    </ClInclude>
     <ClInclude Include="src\EntryDataFormat.h">
       <Filter>Resources\Archive\EntryType\EntryDataFormat</Filter>
     </ClInclude>
@@ -579,8 +561,8 @@
     <ClInclude Include="src\LibArchive.h">
       <Filter>Resources\Archive</Filter>
     </ClInclude>
-    <ClInclude Include="src\ZipArchivePanel.h">
-      <Filter>Main Editor\UI Elements\ArchivePanel</Filter>
+    <ClInclude Include="src\ArchivePanel.h">
+      <Filter>Main Editor\UI Elements</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

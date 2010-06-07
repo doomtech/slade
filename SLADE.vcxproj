@@ -140,8 +140,6 @@
     <ClCompile Include="src\PaletteEntryPanel.cpp" />
     <ClCompile Include="src\SwitchesEntryPanel.cpp" />
     <ClCompile Include="src\TextEntryPanel.cpp" />
-    <ClCompile Include="src\ZipArchiveEntryList.cpp" />
-    <ClCompile Include="src\ZipArchivePanel.cpp" />
     <ClCompile Include="src\PatchTablePanel.cpp" />
     <ClCompile Include="src\TextureEditorPanel.cpp" />
     <ClCompile Include="src\TextureXEditor.cpp" />
@@ -226,8 +224,6 @@
     <ClInclude Include="src\PaletteEntryPanel.h" />
     <ClInclude Include="src\SwitchesEntryPanel.h" />
     <ClInclude Include="src\TextEntryPanel.h" />
-    <ClInclude Include="src\ZipArchiveEntryList.h" />
-    <ClInclude Include="src\ZipArchivePanel.h" />
     <ClInclude Include="src\PatchTablePanel.h" />
     <ClInclude Include="src\TextureEditorPanel.h" />
     <ClInclude Include="src\TextureXEditor.h" />
