@@ -128,6 +128,11 @@ void MainWindow::setupLayout() {
 	wxMenu* entryMenu = new wxMenu("");
 	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_RENAME,		"Rename",			"Rename the selected entries",										"t_rename"));
 	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_DELETE,		"Delete",			"Delete the selected entries",										"t_delete"));
+	entryMenu->AppendSeparator();
+	entryMenu->Append(createMenuItem(entryMenu,	MENU_ENTRY_CUT,			"Cut",				"Cut the selected entries"));
+	entryMenu->Append(createMenuItem(entryMenu,	MENU_ENTRY_COPY,		"Copy",				"Copy the selected entries"));
+	entryMenu->Append(createMenuItem(entryMenu,	MENU_ENTRY_COPY,		"Paste",			"Paste the previously cut/copied entries"));
+	entryMenu->AppendSeparator();
 	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_MOVEUP,		"Move Up",			"Move the selected entries up",										"t_up"));
 	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_MOVEDOWN,	"Move Down",		"Move the selected entries down",									"t_down"));
 	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_MOVEDOWN,	"Convert To...",	"Convert selected entries to a different format/type"));
@@ -331,11 +336,20 @@ void MainWindow::populateBRAChoice() {
  *******************************************************************/
 void MainWindow::onMenuItemClicked(wxCommandEvent& e) {
 	// *******************************************************
+	// FILE MENU
+	// *******************************************************
+
+	// File->Exit
+	if (e.GetId() == MENU_FILE_EXIT)
+		Destroy();
+
+
+	// *******************************************************
 	// EDITOR MENU
 	// *******************************************************
 
 	// Editor->Set Base Resource Archive
-	if (e.GetId() == MENU_EDITOR_SETBASERESOURCE) {
+	else if (e.GetId() == MENU_EDITOR_SETBASERESOURCE) {
 		wxDialog dialog_ebr(this, -1, "Edit Base Resource Archives", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
 		BaseResourceArchivesPanel brap(&dialog_ebr);
 
