@@ -32,7 +32,6 @@
 #include "WxStuff.h"
 #include "Icons.h"
 #include "ArchiveManager.h"
-#include "ZipArchive.h"
 
 
 /*******************************************************************
@@ -57,18 +56,18 @@ bool loadIcons() {
 	string tempfile = appPath("sladetemp", DIR_TEMP);
 
 	// Get slade.pk3
-	ZipArchive* res_archive = (ZipArchive*)theArchiveManager->programResourceArchive();
+	Archive* res_archive = theArchiveManager->programResourceArchive();
 
 	// Do nothing if it doesn't exist
 	if (!res_archive)
 		return false;
 
 	// Get the icons directory of the archive
-	zipdir_t* dir_icons = res_archive->getDirectory("icons");
+	ArchiveTreeNode* dir_icons = res_archive->getDir("icons/");
 
 	// Go through each entry in the directory
 	for (size_t a = 0; a < dir_icons->numEntries(false); a++) {
-		ArchiveEntry* entry = dir_icons->entries[a];
+		ArchiveEntry* entry = dir_icons->getEntry(a);
 
 		// Export entry data to a temporary file
 		entry->exportFile(tempfile);

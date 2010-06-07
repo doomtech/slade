@@ -6,9 +6,9 @@
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
  * Filename:    ArchiveEntryList.cpp
- * Description: A list widget that shows all entries in a list-based
- *              archive (eg WadArchive). Keeps in sync with it's
- *              associated archive automatically.
+ * Description: A list widget that shows all entries in an archive.
+ *              Keeps in sync with it's associated archive
+ *              automatically.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -58,9 +58,16 @@ CVAR(Bool, elist_vrules, false, CVAR_SAVE)
  *******************************************************************/
 ArchiveEntryList::ArchiveEntryList(wxWindow* parent) : VirtualListView(parent) {
 	// Init variables
-	this->archive = archive;
-	item_attr = new wxListItemAttr();
+	archive = NULL;
+	text_filter = NULL;
 	filter_active = false;
+	current_dir = false;
+
+	// Create dummy 'up folder' entry
+	entry_dir_back = new ArchiveEntry();
+	entry_dir_back->setType(EntryType::folderType());
+	entry_dir_back->setState(0);
+	entry_dir_back->setName("..");
 
 	// Setup columns
 	setupColumns();
@@ -80,6 +87,7 @@ ArchiveEntryList::ArchiveEntryList(wxWindow* parent) : VirtualListView(parent) {
 	Bind(wxEVT_COMMAND_LIST_COL_RIGHT_CLICK, &ArchiveEntryList::onColumnHeaderRightClick, this);
 	Bind(wxEVT_COMMAND_LIST_COL_END_DRAG, &ArchiveEntryList::onColumnResize, this);
 	Bind(wxEVT_COMMAND_MENU_SELECTED, &ArchiveEntryList::onMenu, this);
+	Bind(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, &ArchiveEntryList::onListItemActivated, this);
 
 	// Setup flags
 	SetSingleStyle(wxLC_HRULES, elist_hrules);
@@ -90,6 +98,98 @@ ArchiveEntryList::ArchiveEntryList(wxWindow* parent) : VirtualListView(parent) {
  * ArchiveEntryList class destructor
  *******************************************************************/
 ArchiveEntryList::~ArchiveEntryList() {
+}
+
+/* ArchiveEntryList::getItemText
+ * Called when the widget requests the text for [item] at [column]
+ *******************************************************************/
+string ArchiveEntryList::getItemText(long item, long column) const {
+	// Get entry
+	ArchiveEntry* entry = getEntry(item);
+
+	// Check entry
+	if (!entry)
+		return "INVALID INDEX";
+
+	// Determine what column we want
+	int col = columnType(column);
+
+	if (col == AEL_COLUMN_NAME)
+		return entry->getName();	// Name column
+	else if (col == AEL_COLUMN_SIZE) {
+		// Size column
+
+		if (entry->getType() == EntryType::folderType()) {
+			// Entry is a folder, return the number of entries+subdirectories in it
+			ArchiveTreeNode* dir = NULL;
+
+			// Get selected directory
+			if (entry == entry_dir_back)
+				dir = (ArchiveTreeNode*)current_dir->getParent();	// If it's the 'back directory', get the current dir's parent
+			else
+				dir = dir = archive->getDir(entry->getName(), current_dir);
+
+			// If it's null, return error
+			if (!dir)
+				return "INVALID DIRECTORY";
+
+			// Return the number of items in the directory
+			return s_fmt("%d entries", dir->numEntries() + dir->nChildren());
+		}
+		else
+			return entry->getSizeString();	// Not a folder, just return the normal size string
+	}
+	else if (col == AEL_COLUMN_TYPE)
+		return entry->getTypeString();	// Type column
+	else
+		return "INVALID COLUMN";		// Invalid column
+}
+
+/* ArchiveEntryList::getItemIcon
+ * Called when the widget requests the icon for [item]
+ *******************************************************************/
+int ArchiveEntryList::getItemIcon(long item) const {
+	// Get associated entry
+	ArchiveEntry* entry = getEntry(item);
+
+	// If entry doesn't exist, return invalid image
+	if (!entry)
+		return -1;
+
+	return entry->getType()->getIndex();
+}
+
+/* ArchiveEntryList::updateItemAttr
+ * Called when widget requests the attributes (text colour /
+ * background colour / font) for [item]
+ *******************************************************************/
+void ArchiveEntryList::updateItemAttr(long item) const {
+	// Get associated entry
+	ArchiveEntry* entry = getEntry(item);
+
+	// Init attributes
+	item_attr->SetTextColour(ListView::colourError());
+
+	// If entry doesn't exist, return error colour
+	if (!entry)
+		return;
+
+	// Set colour depending on entry state
+	switch (entry->getState()) {
+	case 1:
+		item_attr->SetTextColour(ListView::colourModified());
+		break;
+	case 2:
+		item_attr->SetTextColour(ListView::colourNew());
+		break;
+	default:
+		item_attr->SetTextColour(wxSystemSettings::GetColour(wxSYS_COLOUR_LISTBOXTEXT));
+		break;
+	};
+
+	// Locked state overrides others
+	if (entry->isLocked())
+		item_attr->SetTextColour(ListView::colourLocked());
 }
 
 /* ArchiveEntryList::setArchive
@@ -106,8 +206,12 @@ void ArchiveEntryList::setArchive(Archive* archive) {
 
 	// Init new archive if given
 	if (archive) {
-		listenTo(archive);						// Listen to it
-		SetItemCount(archive->numEntries());	// Set list size to no. of entries
+		// Listen to it
+		listenTo(archive);
+
+		// Open root directory
+		current_dir = archive->getRoot();
+		updateList();
 	}
 }
 
@@ -169,26 +273,35 @@ int ArchiveEntryList::columnType(int column) const {
 /* ArchiveEntryList::updateList
  * Updates + refreshes the list
  *******************************************************************/
-void ArchiveEntryList::updateList(bool clear) {
-	// Clear all items if needed
-	if (clear)
-		DeleteAllItems();
+void ArchiveEntryList::updateList() {
+	// If no current directory, set size to 0
+	if (!current_dir) {
+		SetItemCount(0);
+		Refresh();
+		return;
+	}
 
-	// Update list size
-	if (!filter_active)
-		SetItemCount(archive->numEntries());
-	else
+	// Determine if we need a 'back folder' entry
+	int back_folder = 0;
+	if (current_dir->getParent())
+		back_folder = 1;
+
+	// Update list
+	if (filter_active)
 		SetItemCount(filter.size());
-
-	// Refresh
+	else
+		SetItemCount(current_dir->numEntries() + current_dir->nChildren() + back_folder);
 	Refresh();
 }
 
 /* ArchiveEntryList::filterList
- * Filters the list to only entries with names matching [filter]
+ * Filters the list to only entries and directories with names
+ * matching [filter]
  *******************************************************************/
 void ArchiveEntryList::filterList(string filter) {
+	// Check if any filter string was given
 	if (filter.IsEmpty()) {
+		// No filter, disable it
 		filter_active = false;
 		updateList();
 		return;
@@ -205,15 +318,40 @@ void ArchiveEntryList::filterList(string filter) {
 	// Convert filter to lowercase (to avoid case-sensitivity)
 	filter = filter.Lower();
 
-	// Go through archive entries
-	for (unsigned a = 0; a < archive->numEntries(); a++) {
+	// Go through entries
+	filter_active = false;
+	unsigned index = 0;
+	ArchiveEntry* entry = getEntry(index);
+	while (entry) {
 		// Check for name match with filter
-		if (archive->getEntry(a)->getName().Lower().Matches(filter))
-			this->filter.push_back(a);
+		if (entry == entry_dir_back || entry->getName().Lower().Matches(filter))
+			this->filter.push_back(index);
+
+		// Go to next unfiltered entry
+		entry = getEntry(++index);
 	}
+	filter_active = true;
 
 	// Update the list
 	updateList();
+}
+
+/* ArchiveEntryList::entriesBegin
+ * Returns the index of the first list item that is an entry (rather
+ * than a directory), or -1 if no directory/archive is open)
+ *******************************************************************/
+int ArchiveEntryList::entriesBegin() {
+	// Check directory is open
+	if (!current_dir)
+		return -1;
+
+	// Determine first entry index
+	int index = 0;
+	if (current_dir->getParent())		// Offset if '..' item exists
+		index++;
+	index += current_dir->nChildren();	// Offset by number of subdirs
+
+	return index;
 }
 
 /* ArchiveEntryList::getEntry
@@ -221,24 +359,38 @@ void ArchiveEntryList::filterList(string filter) {
  * Returns NULL if the index is out of bounds or no archive is open
  *******************************************************************/
 ArchiveEntry* ArchiveEntryList::getEntry(int index) const {
-	// Check archive is open
-	if (!archive)
+	// Check index & archive
+	if (index < 0 || !archive)
 		return NULL;
 
+	// Check if filtering is active
 	if (filter_active) {
-		// Check index
-		if (index < 0 || index >= (signed)filter.size())
+		// If it is, modify index for filtered list
+		if (index < 0 || (unsigned) index >= filter.size())
 			return NULL;
 
-		return archive->getEntry(filter[index]);
+		index = filter[index];
 	}
-	else {
-		// Check index
-		if (index < 0 || index >= (signed)archive->numEntries())
-			return NULL;
 
-		return archive->getEntry(index);
+	// Index modifier if 'up folder' entry exists
+	if (current_dir->getParent()) {
+		if (index == 0)
+			return entry_dir_back;
+		else
+			index--;
 	}
+
+	// Subdirectories
+	int subdirs = current_dir->nChildren();
+	if (index < subdirs)
+		return ((ArchiveTreeNode*)(current_dir->getChild(index)))->getDirEntry();
+
+	// Entries
+	if ((unsigned)index < subdirs + current_dir->numEntries())
+		return current_dir->getEntry(index - subdirs);
+
+	// Out of bounds
+	return NULL;
 }
 
 /* ArchiveEntryList::getFocusedEntry
@@ -260,15 +412,6 @@ ArchiveEntry* ArchiveEntryList::getFocusedEntry() {
 		return NULL;
 }
 
-/* ArchiveEntryList::getFocus
- * Gets the list index of the currently focused list item
- *******************************************************************/
- /*
-int ArchiveEntryList::getFocus() {
-	// Get the item in the list that is focused
-	return GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_FOCUSED);
-}
-
 /* ArchiveEntryList::getSelectedEntries
  * Returns a vector of all selected archive entries
  *******************************************************************/
@@ -284,58 +427,14 @@ vector<ArchiveEntry*> ArchiveEntryList::getSelectedEntries() {
 	vector<long> selection = getSelection();
 
 	// Go through selection and add associated entries to the return vector
-	for (size_t a = 0; a < selection.size(); a++)
-		ret.push_back(getEntry(selection[a]));
-
-	return ret;
-}
-
-/* ArchiveEntryList::getSelection
- * Returns a vector of all selected list item indices
- *******************************************************************/
- /*
-vector<int> ArchiveEntryList::getSelection() {
-	// Init vector
-	vector<int> ret;
-
-	// Go through all items
-	long item = -1;
-	while (true) {
-		// Get the next item in the list that is selected
-		item = GetNextItem(item, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-
-		// If -1 then none were selected
-		if (item == -1)
-			break;
-
-		// Otherwise add the selected index to the vector
-		ret.push_back(item);
+	ArchiveEntry* entry = NULL;
+	for (size_t a = 0; a < selection.size(); a++) {
+		entry = getEntry(selection[a]);
+		if (entry && entry->getType() != EntryType::folderType())
+			ret.push_back(entry);
 	}
 
 	return ret;
-}
-
-/* ArchiveEntryList::getLastSelected
- * Gets the index of the last selected item in the list, or -1 if no
- * item is selected
- *******************************************************************/
- /*
-int ArchiveEntryList::getLastSelected() {
-	// Go through all items
-	int item = -1;
-	while (true) {
-		// Get the next item in the list that is selected
-		int index = GetNextItem(item, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-
-		// Exit loop if there is no selected item after the current
-		if (index == -1)
-			break;
-
-		// Otherwise set the item to this index and keep going
-		item = index;
-	}
-
-	return item;
 }
 
 /* ArchiveEntryList::getLastSelectedEntry
@@ -351,176 +450,33 @@ ArchiveEntry* ArchiveEntryList::getLastSelectedEntry() {
 		return NULL;
 }
 
-/* ArchiveEntryList::selectItem
- * Selects or deselects [item] depending on [select]
+/* ArchiveEntryList::getSelectedDirectories
+ * Returns a vector of all currently selected directories
  *******************************************************************/
- /*
-void ArchiveEntryList::selectItem(int item, bool select) {
-	// Check item id is in range
-	if (item >= GetItemCount())
-		return;
+vector<ArchiveTreeNode*> ArchiveEntryList::getSelectedDirectories() {
+	vector<ArchiveTreeNode*> ret;
 
-	// Select/deselect the item
-	if (select)
-		SetItemState(item, 0xFFFF, wxLIST_STATE_SELECTED);
-	else
-		SetItemState(item, 0x0000, wxLIST_STATE_SELECTED);
-}
+	// Get all selected items
+	vector<long> selection = getSelection();
 
-/* ArchiveEntryList::selectAll
- * Selects all items in the list
- *******************************************************************/
- /*
-void ArchiveEntryList::selectAll() {
-	for (int a = 0; a < GetItemCount(); a++)
-		SetItemState(a, 0xFFFF, wxLIST_STATE_SELECTED|wxLIST_STATE_FOCUSED);
-}
+	// Go through the selection
+	for (size_t a = 0; a < selection.size(); a++) {
+		ArchiveEntry* entry = getEntry(selection[a]);
 
-/* ArchiveEntryList::clearSelection
- * Deselects all items in the list
- *******************************************************************/
- /*
-void ArchiveEntryList::clearSelection() {
-	for (int a = 0; a < GetItemCount(); a++)
-		SetItemState(a, 0x0000, wxLIST_STATE_SELECTED|wxLIST_STATE_FOCUSED);
-}
+		// If the selected entry is the 'back folder', ignore it
+		if (entry == entry_dir_back)
+			continue;
+		else if (entry->getType() == EntryType::folderType()) {
+			// If the entry is a folder type, get it's ArchiveTreeNode counterpart
+			ArchiveTreeNode* dir = archive->getDir(entry->getName(), current_dir);
 
-/* ArchiveEntryList::OnGetItemText
- * Called when the widget requests the text for [item] at [column]
- *******************************************************************/
- /*
-string ArchiveEntryList::OnGetItemText(long item, long column) const {
-	ArchiveEntry* entry = getEntry(item);
+			// Add it to the return list
+			if (dir)
+				ret.push_back(dir);
+		}
+	}
 
-	// If entry doesn't exist, return invalid string
-	if (!entry)
-		return "INVALID INDEX";
-
-	// Determine what column we want
-	int col = columnType(column);
-
-	if (col == AEL_COLUMN_NAME)
-		return entry->getName();		// Name column
-	else if (col == AEL_COLUMN_SIZE)
-		return entry->getSizeString();	// Size column
-	else if (col == AEL_COLUMN_TYPE)
-		return entry->getTypeString();	// Type column
-	else
-		return "INVALID COLUMN";		// Invalid column
-}
- */
-
-string ArchiveEntryList::getItemText(long item, long column) const {
-	ArchiveEntry* entry = getEntry(item);
-
-	// If entry doesn't exist, return invalid string
-	if (!entry)
-		return "INVALID INDEX";
-
-	// Determine what column we want
-	int col = columnType(column);
-
-	if (col == AEL_COLUMN_NAME)
-		return entry->getName();		// Name column
-	else if (col == AEL_COLUMN_SIZE)
-		return entry->getSizeString();	// Size column
-	else if (col == AEL_COLUMN_TYPE)
-		return entry->getTypeString();	// Type column
-	else
-		return "INVALID COLUMN";		// Invalid column
-}
-
-/* ArchiveEntryList::OnGetItemImage
- * Called when the widget requests the image for [item]
- *******************************************************************/
- /*
-int ArchiveEntryList::OnGetItemImage(long item) const {
-	// Get associated entry
-	ArchiveEntry* entry = getEntry(item);
-
-	// If entry doesn't exist, return invalid image
-	if (!entry)
-		return -1;
-
-	return entry->getType()->getIndex();
-}
- */
-
-int ArchiveEntryList::getItemIcon(long item) const {
-	// Get associated entry
-	ArchiveEntry* entry = getEntry(item);
-
-	// If entry doesn't exist, return invalid image
-	if (!entry)
-		return -1;
-
-	return entry->getType()->getIndex();
-}
-
-/* ArchiveEntryList::OnGetItemAttr
- * Called when widget requests the attributes (text colour /
- * background colour / font) for [item]
- *******************************************************************/
- /*
-wxListItemAttr* ArchiveEntryList::OnGetItemAttr(long item) const {
-	// Get associated entry
-	ArchiveEntry* entry = getEntry(item);
-
-	// Init attributes
-	item_attr->SetTextColour(ListView::colourError());
-
-	// If entry doesn't exist, return error colour
-	if (!entry)
-		return item_attr;
-
-	// Set colour depending on entry state
-	switch (entry->getState()) {
-	case 1:
-		item_attr->SetTextColour(ListView::colourModified());
-		break;
-	case 2:
-		item_attr->SetTextColour(ListView::colourNew());
-		break;
-	default:
-		item_attr->SetTextColour(wxSystemSettings::GetColour(wxSYS_COLOUR_LISTBOXTEXT));
-		break;
-	};
-
-	// Locked state overrides others
-	if (entry->isLocked())
-		item_attr->SetTextColour(ListView::colourLocked());
-
-	return item_attr;
-}
- */
-
-void ArchiveEntryList::updateItemAttr(long item) const {
-	// Get associated entry
-	ArchiveEntry* entry = getEntry(item);
-
-	// Init attributes
-	item_attr->SetTextColour(ListView::colourError());
-
-	// If entry doesn't exist, return error colour
-	if (!entry)
-		return;
-
-	// Set colour depending on entry state
-	switch (entry->getState()) {
-	case 1:
-		item_attr->SetTextColour(ListView::colourModified());
-		break;
-	case 2:
-		item_attr->SetTextColour(ListView::colourNew());
-		break;
-	default:
-		item_attr->SetTextColour(wxSystemSettings::GetColour(wxSYS_COLOUR_LISTBOXTEXT));
-		break;
-	};
-
-	// Locked state overrides others
-	if (entry->isLocked())
-		item_attr->SetTextColour(ListView::colourLocked());
+	return ret;
 }
 
 /* ArchiveEntryList::onAnnouncement
@@ -528,75 +484,10 @@ void ArchiveEntryList::updateItemAttr(long item) const {
  * managed
  *******************************************************************/
 void ArchiveEntryList::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
-	// Archive entries were swapped
-	if (announcer == archive && event_name == "entries_swapped") {
-		int i1, i2;
-		wxUIntPtr e1, e2;
 
-		// Check all event data is there
-		if (!event_data.read(&i1, sizeof(int)) || !event_data.read(&i2, sizeof(int)) ||
-			!event_data.read(&e1, sizeof(wxUIntPtr)) || !event_data.read(&e2, sizeof(wxUIntPtr)))
-			return;
-
-		// Swap selection
-		long state1 = GetItemState(i1, wxLIST_STATE_FOCUSED|wxLIST_STATE_SELECTED);
-		long state2 = GetItemState(i2, wxLIST_STATE_FOCUSED|wxLIST_STATE_SELECTED);
-		SetItemState(i1, state2, wxLIST_STATE_FOCUSED|wxLIST_STATE_SELECTED);
-		SetItemState(i2, state1, wxLIST_STATE_FOCUSED|wxLIST_STATE_SELECTED);
-
-		// Update affected items
-		RefreshItem(i1);
-		RefreshItem(i2);
-	}
-
-	// An entry was added to the archive
-	if (announcer == archive && event_name == "entry_added") {
-		uint32_t index = 0;
-		wxUIntPtr e = 0;
-
-		// Check all event data is there
-		if (!event_data.read(&index, sizeof(uint32_t)) || !event_data.read(&e, sizeof(wxUIntPtr)))
-			return;
-
-		// Update item count
-		SetItemCount(archive->numEntries());
-
-		// Refresh
-		if (index >= (unsigned)GetTopItem())
-			Refresh();
-	}
-
-	// An entry in the archive was modified
-	if (announcer == archive && event_name == "entry_modified") {
-		uint32_t index = 0;
-		wxUIntPtr e = 0;
-
-		// Check all event data is there
-		if (!event_data.read(&index, sizeof(uint32_t)) || !event_data.read(&e, sizeof(wxUIntPtr)))
-			return;
-
-		// Update affected item
-		RefreshItem(index);
-	}
-
-	// An entry in the archive was removed
-	if (announcer == archive && event_name == "entry_removed") {
-		uint32_t index = 0;
-		wxUIntPtr e = 0;
-
-		// Check all event data is there
-		if (!event_data.read(&index, sizeof(uint32_t)) || !event_data.read(&e, sizeof(wxUIntPtr)))
-			return;
-
-		// Deselect item
-		SetItemState(index, 0, wxLIST_STATE_SELECTED|wxLIST_STATE_FOCUSED);
-
-		// Update item count
-		SetItemCount(archive->numEntries());
-
-		// Refresh
-		if (index >= (unsigned)GetTopItem())
-			Refresh();
+	if (announcer == archive) {
+		// Since refreshing the list is relatively fast, just refresh it on any change
+		updateList();
 	}
 }
 
@@ -635,7 +526,7 @@ void ArchiveEntryList::onColumnResize(wxListEvent& e) {
 		elist_colsize_width = GetColumnWidth(col++);
 	if (elist_coltype_show)
 		elist_coltype_width = GetColumnWidth(col++);
-	
+
 	e.Skip();
 }
 
@@ -679,4 +570,47 @@ void ArchiveEntryList::onFilterChanged(wxCommandEvent& e) {
 	filterList(text_filter->GetValue());
 
 	e.Skip();
+}
+
+/* ArchiveEntryList::onListItemActivated
+ * Called when a list item is 'activated' (double-click or enter)
+ *******************************************************************/
+void ArchiveEntryList::onListItemActivated(wxListEvent& e) {
+	// Get item entry
+	ArchiveEntry* entry = getEntry(e.GetIndex());
+
+	// Do nothing if NULL (shouldn't be)
+	if (!entry)
+		return;
+
+	// If it's a folder, open it
+	if (entry->getType() == EntryType::folderType()) {
+		// Get directory to open
+		ArchiveTreeNode* dir = NULL;
+		if (entry == entry_dir_back)
+			dir = (ArchiveTreeNode*)current_dir->getParent();	// 'Back directory' entry, open current dir's parent
+		else
+			dir = archive->getDir(entry->getName(), current_dir);
+
+		// Check it exists (really should)
+		if (!dir) {
+			wxLogMessage("Error: Trying to open nonexistant directory");
+			return;
+		}
+
+		// Set current dir
+		current_dir = dir;
+
+		// Clear current selection
+		clearSelection();
+
+		// Update filter
+		if (text_filter)
+			filterList(text_filter->GetValue());
+
+		// Update list
+		updateList();
+	}
+	else
+		e.Skip();
 }

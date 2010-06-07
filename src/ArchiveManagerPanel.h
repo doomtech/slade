@@ -71,6 +71,10 @@ public:
 	void	saveSelectionAs();
 	void	closeSelection();
 
+	// Handler for MainWindow menu actions
+	void	handleAction(int menu_id);
+
+	/*
 	// Currently opened tab
 	void	saveCurrent();
 	void	saveCurrentAs();
@@ -85,6 +89,7 @@ public:
 	void	moveUp();
 	void	moveDown();
 	void	textureEditor();
+	*/
 
 	vector<int>	getSelectedArchives();
 

@@ -227,15 +227,21 @@ bool TextureXEditor::openArchive(Archive* archive) {
 	pal_chooser->setGlobalFromArchive(archive);
 
 	// Search archive for any texture-related entries
-	vector<ArchiveEntry*>	tx_entries = archive->findEntries("TEXTURE?*", false);
-	ArchiveEntry*			entry_pnames = archive->findEntry("PNAMES*", false);
+	Archive::search_options_t options;
+	options.match_type = EntryType::getType("texturex");
+	vector<ArchiveEntry*> tx_entries = archive->findAll(options);
+	options.match_type = EntryType::getType("pnames");
+	ArchiveEntry* entry_pnames = archive->findLast(options);
 
 	// If any TEXTURE1/2 entries were found, setup patch table stuff
 	if (tx_entries.size() > 0) {
 		// TODO: Probably a better idea here to get the user to select an archive to import the patch table from
 		// If no PNAMES entry was found, search resource archives
-		if (!entry_pnames)
-			entry_pnames = theArchiveManager->getResourceEntry("PNAMES");	// TODO: Need to search by *format*, as well as name!
+		if (!entry_pnames) {
+			Archive::search_options_t options;
+			options.match_type = EntryType::getType("pnames");
+			entry_pnames = theArchiveManager->findResourceEntry(options, archive);
+		}
 		else
 			pnames = entry_pnames;	// If PNAMES was found in the archive, set the class variable so it is written to if modified
 

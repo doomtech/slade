@@ -35,11 +35,11 @@
 #include "ArchiveManager.h"
 #include "ArchivePanel.h"
 #include "MapEditorWindow.h"
-#include "ZipArchivePanel.h"
 #include "ZipArchive.h"
 #include "BaseResourceArchivesPanel.h"
 #include "TextureXEditor.h"
 #include "SplashWindow.h"
+#include "MainWindow.h"
 
 
 /*******************************************************************
@@ -222,7 +222,7 @@ void ArchiveManagerPanel::updateListItem(int index) {
 		return;
 
 	// Set item name
-	list_archives->setItemText(index, 0, archive->getFileName());
+	list_archives->setItemText(index, 0, archive->getFilename());
 
 	// Set item status colour
 	if (archive->canSave()) {
@@ -294,17 +294,11 @@ void ArchiveManagerPanel::openTab(int archive_index) {
 		}
 
 		// If tab isn't already open, open a new one
-		ArchivePanel *wp = NULL;
-		if (archive->getType() == ARCHIVE_WAD || archive->getType() == ARCHIVE_LIB || archive->getType() == ARCHIVE_DAT)
-			wp = new ArchivePanel(notebook_archives, archive);
-		else if (archive->getType() == ARCHIVE_ZIP)
-			wp = new ZipArchivePanel(notebook_archives, archive);
-		else return;
+		ArchivePanel* wp = new ArchivePanel(notebook_archives, archive);
 
-		notebook_archives->AddPage(wp, archive->getFileName(false), true);
+		notebook_archives->AddPage(wp, archive->getFilename(false), true);
 		wp->SetName("archive");
 		wp->Show(true);
-		wp->init();
 		wp->SetFocus();
 		wp->focusEntryList();
 	}
@@ -367,7 +361,7 @@ void ArchiveManagerPanel::openTextureTab(int archive_index) {
 			return;
 		}
 
-		notebook_archives->AddPage(txed, s_fmt("Texture Editor (%s)", archive->getFileName(false).c_str()), true);
+		notebook_archives->AddPage(txed, s_fmt("Texture Editor (%s)", archive->getFilename(false).c_str()), true);
 		txed->SetName("texture");
 		txed->Show(true);
 	}
@@ -465,7 +459,7 @@ void ArchiveManagerPanel::saveAll() {
 
 			// Popup file save dialog
 			string formats = archive->getFileExtensionString();
-			string filename = wxFileSelector("Save Archive " + archive->getFileName(false) + " As", "", "", wxEmptyString, formats, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+			string filename = wxFileSelector("Save Archive " + archive->getFilename(false) + " As", "", "", wxEmptyString, formats, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 
 			// Check a filename was selected
 			if (!filename.empty()) {
@@ -541,7 +535,7 @@ void ArchiveManagerPanel::onAnnouncement(Announcer* announcer, string event_name
 	// If an archive was added
 	if (event_name == "archive_added") {
 		int index = theArchiveManager->numArchives();
-		list_archives->addItem(index, theArchiveManager->getArchive(theArchiveManager->numArchives()-1)->getFileName(true));
+		list_archives->addItem(index, theArchiveManager->getArchive(theArchiveManager->numArchives()-1)->getFilename(true));
 		openTab(theArchiveManager->numArchives()-1);
 	}
 
@@ -595,7 +589,7 @@ void ArchiveManagerPanel::saveSelection() {
 
 			// Popup file save dialog
 			string formats = archive->getFileExtensionString();
-			string filename = wxFileSelector("Save Archive " + archive->getFileName(false) + " As", "", "", wxEmptyString, formats, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+			string filename = wxFileSelector("Save Archive " + archive->getFilename(false) + " As", "", "", wxEmptyString, formats, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 
 			// Check a filename was selected
 			if (!filename.empty()) {
@@ -631,7 +625,7 @@ void ArchiveManagerPanel::saveSelectionAs() {
 
 		// Popup file save dialog
 		string formats = archive->getFileExtensionString();
-		string filename = wxFileSelector("Save Archive " + archive->getFileName(false) + " As", "", "", wxEmptyString, formats, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+		string filename = wxFileSelector("Save Archive " + archive->getFilename(false) + " As", "", "", wxEmptyString, formats, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 
 		// Check a filename was selected
 		if (!filename.empty()) {
@@ -667,9 +661,63 @@ void ArchiveManagerPanel::closeSelection() {
 		theArchiveManager->closeArchive(selected_archives[a]);
 }
 
+void ArchiveManagerPanel::handleAction(int menu_id) {
+	// *************************************************************
+	// FILE MENU
+	// *************************************************************
+
+	// File->New Wad
+	if (menu_id == MainWindow::MENU_FILE_NEWWAD)
+		createNewArchive(ARCHIVE_WAD);
+
+	// File->New Zip
+	else if (menu_id == MainWindow::MENU_FILE_NEWZIP)
+		createNewArchive(ARCHIVE_ZIP);
+
+	// File->Open
+	else if (menu_id == MainWindow::MENU_FILE_OPEN) {
+		// Create extensions string
+		string extensions = theArchiveManager->getArchiveExtensionsString();
+
+		// Open a file browser dialog that allows multiple selection
+		// and filters by wad, zip and pk3 file extensions
+		wxFileDialog *dialog_open = new wxFileDialog(this, "Choose file(s) to open", wxEmptyString, wxEmptyString, extensions, wxFD_OPEN|wxFD_MULTIPLE|wxFD_FILE_MUST_EXIST, wxDefaultPosition);
+
+		// Run the dialog & check that the user didn't cancel
+		if (dialog_open->ShowModal() == wxID_OK) {
+			wxBeginBusyCursor();
+
+			// Get an array of selected filenames
+			wxArrayString files;
+			dialog_open->GetPaths(files);
+
+			// Open them
+			openFiles(files);
+
+			wxEndBusyCursor();
+		}
+	}
+
+	// File->Save All
+	else if (menu_id == MainWindow::MENU_FILE_SAVEALL)
+		saveAll();
+
+	// File->Close All
+	else if (menu_id == MainWindow::MENU_FILE_CLOSEALL)
+		closeAll();
+
+	else {
+		// Check if the current tab is an archive tab
+		wxWindow* tab = notebook_archives->GetPage(notebook_archives->GetSelection());
+		if (tab->GetName() == "archive")
+			((ArchivePanel*)tab)->handleAction(menu_id);	// Send action to current ArchivePanel
+	}
+}
+
 /* ArchiveManagerPanel::saveCurrent
  * Saves the currently opened archive (the currently opened tab)
  *******************************************************************/
+/*
 void ArchiveManagerPanel::saveCurrent() {
 	// Send to current archive panel
 	int selection = notebook_archives->GetSelection();
@@ -683,6 +731,7 @@ void ArchiveManagerPanel::saveCurrent() {
  * Saves the currently opened archive as a new file (the currently
  * opened tab)
  *******************************************************************/
+/*
 void ArchiveManagerPanel::saveCurrentAs() {
 	// Send to current archive panel
 	int selection = notebook_archives->GetSelection();
@@ -695,6 +744,7 @@ void ArchiveManagerPanel::saveCurrentAs() {
 /* ArchiveManagerPanel::closeCurrent
  * Closes the currently opened archive (the currently opened tab)
  *******************************************************************/
+/*
 void ArchiveManagerPanel::closeCurrent() {
 	int selection = notebook_archives->GetSelection();
 	if (isArchivePanel(selection)) {
@@ -707,6 +757,7 @@ void ArchiveManagerPanel::closeCurrent() {
  * Signals the currently opened archive panel tab to create a new
  * entry
  *******************************************************************/
+/*
 void ArchiveManagerPanel::newEntry() {
 	// Send to current archive panel
 	int selection = notebook_archives->GetSelection();
@@ -718,6 +769,7 @@ void ArchiveManagerPanel::newEntry() {
  * Signals the currently opened archive panel tab to create a new
  * entry from a file
  *******************************************************************/
+/*
 void ArchiveManagerPanel::newEntryFromFile() {
 	// Send to current archive panel
 	int selection = notebook_archives->GetSelection();
@@ -729,6 +781,7 @@ void ArchiveManagerPanel::newEntryFromFile() {
  * Signals the currently opened archive panel tab to rename any
  * selected entries
  *******************************************************************/
+/*
 void ArchiveManagerPanel::renameEntry() {
 	// Send to current archive panel
 	int selection = notebook_archives->GetSelection();
@@ -740,6 +793,7 @@ void ArchiveManagerPanel::renameEntry() {
  * Signals the currently opened archive panel tab to delete any
  * selected entries
  *******************************************************************/
+/*
 void ArchiveManagerPanel::deleteEntry() {
 	// Send to current archive panel
 	int selection = notebook_archives->GetSelection();
@@ -751,6 +805,7 @@ void ArchiveManagerPanel::deleteEntry() {
  * Signals the currently opened archive panel tab to import files to
  * any selected entries
  *******************************************************************/
+/*
 void ArchiveManagerPanel::importEntry() {
 	// Send to current archive panel
 	int selection = notebook_archives->GetSelection();
@@ -762,6 +817,7 @@ void ArchiveManagerPanel::importEntry() {
  * Signals the currently opened archive panel tab to export any
  * selected entries to files
  *******************************************************************/
+/*
 void ArchiveManagerPanel::exportEntry() {
 	// Send to current archive panel
 	int selection = notebook_archives->GetSelection();
@@ -773,6 +829,7 @@ void ArchiveManagerPanel::exportEntry() {
  * Signals the currently opened archive panel tab to export any
  * selected entries to a new wad archive
  *******************************************************************/
+/*
 void ArchiveManagerPanel::exportEntryWad() {
 	// Send to current archive panel
 	int selection = notebook_archives->GetSelection();
@@ -784,6 +841,7 @@ void ArchiveManagerPanel::exportEntryWad() {
  * Signals the currently opened archive panel tab to move selected
  * entries up
  *******************************************************************/
+/*
 void ArchiveManagerPanel::moveUp() {
 	int selection = notebook_archives->GetSelection();
 	if (isArchivePanel(selection))
@@ -794,6 +852,7 @@ void ArchiveManagerPanel::moveUp() {
  * Signals the currently opened archive panel tab to move selected
  * entries down
  *******************************************************************/
+/*
 void ArchiveManagerPanel::moveDown() {
 	int selection = notebook_archives->GetSelection();
 	if (isArchivePanel(selection))
@@ -803,6 +862,7 @@ void ArchiveManagerPanel::moveDown() {
 /* ArchiveManagerPanel::textureEditor
  * Opens the texture editor for the current archive (if any)
  *******************************************************************/
+/*
 void ArchiveManagerPanel::textureEditor() {
 	Archive* current = currentArchive();
 	if (current)
@@ -887,7 +947,7 @@ void ArchiveManagerPanel::onTabChanged(wxAuiNotebookEvent& e) {
 	int selection = notebook_archives->GetSelection();
 	if (isArchivePanel(selection)) {
 		Archive* archive = ((ArchivePanel*)notebook_archives->GetPage(selection))->getArchive();
-		((wxFrame*)GetParent())->SetTitle(s_fmt("SLADE - %s", chr(archive->getFileName(false))));
+		((wxFrame*)GetParent())->SetTitle(s_fmt("SLADE - %s", chr(archive->getFilename(false))));
 	}
 	else
 		((wxFrame*)GetParent())->SetTitle("SLADE");

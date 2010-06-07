@@ -220,7 +220,7 @@ int GfxEntryPanel::detectOffsetType() {
 		return GFXVIEW_DEFAULT;
 
 	// Check what section of the archive the entry is in
-	string section = entry->getParent()->detectEntrySection(entry);
+	string section = entry->getParent()->detectNamespace(entry);
 
 	if (section == "sprites") {
 		SImage* img = gfx_canvas->getImage();

@@ -53,12 +53,6 @@
   </VirtualDirectory>
   <VirtualDirectory Name="Main Editor">
     <VirtualDirectory Name="UI Elements">
-      <VirtualDirectory Name="ArchivePanel">
-        <File Name="src/ArchivePanel.cpp"/>
-        <File Name="src/ArchivePanel.h"/>
-        <File Name="src/ZipArchivePanel.cpp"/>
-        <File Name="src/ZipArchivePanel.h"/>
-      </VirtualDirectory>
       <VirtualDirectory Name="EntryPanel">
         <File Name="src/AnimatedEntryPanel.cpp"/>
         <File Name="src/AnimatedEntryPanel.h"/>
@@ -89,6 +83,8 @@
         <File Name="src/TextureXEditor.cpp"/>
         <File Name="src/TextureXEditor.h"/>
       </VirtualDirectory>
+      <File Name="src/ArchivePanel.cpp"/>
+      <File Name="src/ArchivePanel.h"/>
     </VirtualDirectory>
     <File Name="src/MainWindow.h"/>
     <File Name="src/EntryOperations.cpp"/>
@@ -224,8 +220,6 @@
       <File Name="src/ArchiveEntryList.h"/>
       <File Name="src/ListView.cpp"/>
       <File Name="src/ListView.h"/>
-      <File Name="src/ZipArchiveEntryList.cpp"/>
-      <File Name="src/ZipArchiveEntryList.h"/>
       <File Name="src/VirtualListView.h"/>
       <File Name="src/VirtualListView.cpp"/>
     </VirtualDirectory>

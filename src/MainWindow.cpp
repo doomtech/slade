@@ -46,6 +46,11 @@ string main_window_layout = "";
 
 
 /*******************************************************************
+ * EXTERNAL VARIABLES
+ *******************************************************************/
+EXTERN_CVAR(Int, base_resource)
+
+/*******************************************************************
  * MAINWINDOW CLASS FUNCTIONS
  *******************************************************************/
 
@@ -174,6 +179,17 @@ void MainWindow::setupLayout() {
 	tb_entry->AddTool(MENU_ENTRY_MOVEDOWN,		"Move Down",	getIcon("t_down"),		"Move Down");
 	tb_entry->Realize();
 
+/*
+	// Create Base Resource Archive toolbar
+	wxAuiToolBar* tb_bra = new wxAuiToolBar(this, -1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
+	choice_base_resource = new wxChoice(tb_bra, -1, wxDefaultPosition, wxSize(128, -1));
+	populateBRAChoice();
+	tb_bra->AddLabel(-1, "Base Resource:");
+	tb_bra->AddControl(choice_base_resource);
+	tb_bra->AddTool(MENU_EDITOR_SETBASERESOURCE, "...", getIcon("t_settings"), "Setup Base Resource Archive paths");
+	tb_bra->Realize();
+*/
+
 	// Setup panel info & add toolbar panels
 	// File toolbar
 	p_inf.ToolbarPane();
@@ -188,6 +204,14 @@ void MainWindow::setupLayout() {
 	p_inf.Name("tb_entry");
 	m_mgr->AddPane(tb_entry, p_inf);
 
+/*
+	// Base Resource Archive toolbar
+	p_inf.ToolbarPane();
+	p_inf.Top();
+	p_inf.Position(2);
+	p_inf.Name("tb_bra");
+	m_mgr->AddPane(tb_bra, p_inf);
+*/
 
 /*
 	// Palette Toolbar
@@ -218,7 +242,7 @@ void MainWindow::setupLayout() {
 	html_startpage->SetName("startpage");
 	notebook_tabs->AddPage(html_startpage,"Start Page");
 	Archive* res_archive = theArchiveManager->programResourceArchive();
-	ArchiveEntry* sp_entry = res_archive->getEntry("html/startpage.htm");
+	ArchiveEntry* sp_entry = res_archive->getEntry("startpage.htm", res_archive->getDir("html"));
 	if (sp_entry)
 		html_startpage->SetPage(wxString::From8BitData((const char *)(sp_entry->getData(true)), sp_entry->getSize()));
 	else { // Fallback
@@ -274,6 +298,27 @@ void MainWindow::setupLayout() {
 	html_startpage->Bind(wxEVT_COMMAND_HTML_LINK_CLICKED, &MainWindow::onHTMLLinkClicked, this);
 	Bind(wxEVT_COMMAND_MENU_SELECTED, &MainWindow::onMenuItemClicked, this, MENU_START, MENU_END);
 	Bind(wxEVT_CLOSE_WINDOW, &MainWindow::onClose, this);
+	Bind(wxEVT_COMMAND_CHOICE_SELECTED, &MainWindow::onBaseResourceChanged, this);
+}
+
+void MainWindow::populateBRAChoice() {
+	// Clear current items
+	choice_base_resource->Clear();
+
+	// Add 'none' item
+	choice_base_resource->AppendString("<none>");
+
+	// Go through base resource paths list
+	for (unsigned a = 0; a < theArchiveManager->numBaseResourcePaths(); a++) {
+		// Convert to wxFileName for processing
+		wxFileName fn(theArchiveManager->getBaseResourcePath(a));
+
+		// Add the filename (no path) to the list
+		choice_base_resource->AppendString(fn.GetFullName());
+	}
+
+	// Select current base resource
+	choice_base_resource->SetSelection(base_resource + 1);
 }
 
 
@@ -286,82 +331,11 @@ void MainWindow::setupLayout() {
  *******************************************************************/
 void MainWindow::onMenuItemClicked(wxCommandEvent& e) {
 	// *******************************************************
-	// FILE MENU
-	// *******************************************************
-
-	// File->New->Wad Archive
-	if (e.GetId() == MENU_FILE_NEWWAD)
-		panel_archivemanager->createNewArchive(ARCHIVE_WAD);
-
-	// File->New->Zip Archive
-	else if (e.GetId() == MENU_FILE_NEWZIP)
-		panel_archivemanager->createNewArchive(ARCHIVE_ZIP);
-
-	// File->Open
-	else if (e.GetId() == MENU_FILE_OPEN) {
-		// Create extensions string
-		string extensions = theArchiveManager->getArchiveExtensionsString();
-
-		// Open a file browser dialog that allows multiple selection
-		// and filters by wad, zip and pk3 file extensions
-		wxFileDialog *dialog_open = new wxFileDialog(this, "Choose file(s) to open", wxEmptyString, wxEmptyString, extensions, wxFD_OPEN|wxFD_MULTIPLE|wxFD_FILE_MUST_EXIST, wxDefaultPosition);
-
-		// Run the dialog & check that the user didn't cancel
-		if (dialog_open->ShowModal() == wxID_OK) {
-			wxBeginBusyCursor();
-
-			// Get an array of selected filenames
-			wxArrayString files;
-			dialog_open->GetPaths(files);
-
-			// Send it to the Archive Manager Panel
-			panel_archivemanager->openFiles(files);
-
-			wxEndBusyCursor();
-		}
-	}
-
-	// File->Save
-	else if (e.GetId() == MENU_FILE_SAVE) {
-		wxBeginBusyCursor();
-		panel_archivemanager->saveCurrent();
-		wxEndBusyCursor();
-	}
-
-	// File->Save As
-	else if (e.GetId() == MENU_FILE_SAVEAS) {
-		wxBeginBusyCursor();
-		panel_archivemanager->saveCurrentAs();
-		wxEndBusyCursor();
-	}
-
-	// File->Save All
-	else if (e.GetId() == MENU_FILE_SAVEALL) {
-		wxBeginBusyCursor();
-		panel_archivemanager->saveAll();
-		wxEndBusyCursor();
-	}
-
-	// File->Close
-	else if (e.GetId() == MENU_FILE_CLOSE)
-		panel_archivemanager->closeCurrent();
-
-	// File->Close All
-	else if (e.GetId() == MENU_FILE_CLOSEALL)
-		panel_archivemanager->closeAll();
-
-	// File->Quit
-	else if (e.GetId() == MENU_FILE_EXIT)
-		this->Close(true);
-		//wxTheApp->ExitMainLoop();
-
-
-	// *******************************************************
 	// EDITOR MENU
 	// *******************************************************
 
 	// Editor->Set Base Resource Archive
-	else if (e.GetId() == MENU_EDITOR_SETBASERESOURCE) {
+	if (e.GetId() == MENU_EDITOR_SETBASERESOURCE) {
 		wxDialog dialog_ebr(this, -1, "Edit Base Resource Archives", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
 		BaseResourceArchivesPanel brap(&dialog_ebr);
 
@@ -377,66 +351,9 @@ void MainWindow::onMenuItemClicked(wxCommandEvent& e) {
 			theArchiveManager->openBaseResource(brap.getSelectedPath());
 	}
 
-
-	// *******************************************************
-	// ARCHIVE MENU
-	// *******************************************************
-
-	// Archive->New->Entry
-	else if (e.GetId() == MENU_ARCHIVE_NEWENTRY)
-		panel_archivemanager->newEntry();
-
-	// Archive->Texture Editor
-	else if (e.GetId() == MENU_ARCHIVE_TEXEDITOR)
-		panel_archivemanager->textureEditor();
-
-
-	// *******************************************************
-	// ENTRY MENU
-	// *******************************************************
-
-	// Entry->New From File
-	//else if (e.GetId() == MENU_ENTRY_NEWFROMFILE)
-	//	panel_archivemanager->newEntryFromFile();
-
-	// Entry->Rename
-	else if (e.GetId() == MENU_ENTRY_RENAME)
-		panel_archivemanager->renameEntry();
-
-	// Entry->Delete
-	else if (e.GetId() == MENU_ENTRY_DELETE)
-		panel_archivemanager->deleteEntry();
-
-	// Entry->Import
-	else if (e.GetId() == MENU_ENTRY_IMPORT) {
-		wxBeginBusyCursor();
-		panel_archivemanager->importEntry();
-		wxEndBusyCursor();
-	}
-
-	// Entry->Export
-	else if (e.GetId() == MENU_ENTRY_EXPORT) {
-		wxBeginBusyCursor();
-		panel_archivemanager->exportEntry();
-		wxEndBusyCursor();
-	}
-
-	// Entry->Export as Wad
-	/*
-	else if (e.GetId() == MENU_ENTRY_EXPORTWAD) {
-		wxBeginBusyCursor();
-		panel_archivemanager->exportEntryWad();
-		wxEndBusyCursor();
-	}
-	*/
-
-	// Entry->Move Up
-	else if (e.GetId() == MENU_ENTRY_MOVEUP)
-		panel_archivemanager->moveUp();
-
-	// Entry->Move Down
-	else if (e.GetId() == MENU_ENTRY_MOVEDOWN)
-		panel_archivemanager->moveDown();
+	// Editor->Preferences
+	if (e.GetId() == MENU_EDITOR_PREFERENCES)
+		wxMessageBox("Not Implemented");
 
 
 	// *******************************************************
@@ -458,6 +375,7 @@ void MainWindow::onMenuItemClicked(wxCommandEvent& e) {
 		p_inf.Show(!p_inf.IsShown());
 		m_mgr->Update();
 	}
+
 
 	// *******************************************************
 	// HELP MENU
@@ -483,9 +401,13 @@ void MainWindow::onMenuItemClicked(wxCommandEvent& e) {
 		wxAboutBox(info);
 	}
 
-	// Unimplemented
+	// Help->Online Documentation
+	else if (e.GetId() == MENU_HELP_ONLINEDOCUMENTATION)
+		wxMessageBox("Not Implemented");
+
+	// Not handled here, sent to ArchiveManagerPanel
 	else
-		wxMessageBox("Not currently implemented");
+		panel_archivemanager->handleAction(e.GetId());
 }
 
 /* MainWindow::onHTMLLinkClicked
@@ -506,4 +428,9 @@ void MainWindow::onClose(wxCloseEvent& e) {
 	main_window_layout = m_mgr->SavePerspective();
 	wxTheApp->Exit();
 	e.Skip();
+}
+
+void MainWindow::onBaseResourceChanged(wxCommandEvent& e) {
+	// Load the selection
+	theArchiveManager->openBaseResource(choice_base_resource->GetSelection() - 1);
 }

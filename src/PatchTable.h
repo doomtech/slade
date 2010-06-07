@@ -31,8 +31,9 @@ public:
 	int32_t			patchIndex(string name);
 	int32_t			patchIndex(ArchiveEntry* entry);
 	bool			removePatch(unsigned index);
-	bool			replacePatch(unsigned index, string newname, Archive* parent = NULL);
-	bool			addPatch(string name, Archive* parent = NULL);
+	bool			replacePatch(unsigned index, string newname);
+	bool			addPatch(string name);
+	void			updatePatchEntry(unsigned index);
 
 	bool	loadPNAMES(ArchiveEntry* pnames, Archive* parent = NULL);
 	void	clearPatchUsage();

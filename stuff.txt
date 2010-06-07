@@ -54,7 +54,6 @@ TODO List ---------------------------------------------------------------
 	- Should be general enough to be used by the map editor also
 
 --- Internal / Dev ---
-- Generalised zipdir_t class to replace it and for use elsewhere (ie not just with ArchiveEntries)
 - SFont class
 - Graphical browser
 - Ability to set an archive never to read entry data into memory (read data from the file every time)
@@ -67,6 +66,7 @@ TODO List ---------------------------------------------------------------
 	  non-zips will force all entries to be put in the root directory
 	- Need a better way of entry searching in zips (currently can only search by full path)
 	- Some kind of namespace feature would be good
+- Needs some kind of proper archive type system, handled by ArchiveManager
 
 
 Unimplemented Feature Requests ------------------------------------------

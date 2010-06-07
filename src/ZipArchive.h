@@ -4,91 +4,40 @@
 
 #include "Archive.h"
 
-struct zipdir_t {
-	ArchiveEntry*			entry;
-	vector<zipdir_t*>		subdirectories;
-	vector<ArchiveEntry*>	entries;
-	zipdir_t*				parent_dir;
-
-	zipdir_t();
-	~zipdir_t();
-
-	string	getName() { return entry->getName(); }
-	void	setName(string name) { entry->setName(name); }
-
-	bool			entryExists(ArchiveEntry* entry, bool include_subdirs = false);
-	ArchiveEntry*	getEntry(string name, bool include_subdirs = true);
-	ArchiveEntry*	getEntry(int edftype, bool include_subdirs = true);
-	void			getEntries(vector<ArchiveEntry*> &ret, string name, bool include_subdirs = true);
-	void			getEntries(vector<ArchiveEntry*> &ret, int edftype, bool include_subdirs = true);
-	int				entryIndex(ArchiveEntry* entry);
-	zipdir_t*		getSubDir(string name);
-	int				dirIndex(zipdir_t* dir);
-	string			getFullPath();
-	uint32_t		numEntries(bool include_subdirs = false);
-	uint32_t		numSubDirs(bool include_subdirs = false);
-	zipdir_t*		copy(bool include_subdirs = true);
-	void			clear(bool delete_entries);
-	void			addToList(vector<ArchiveEntry*>& list);
-};
-
 class ZipArchive : public Archive {
-private:
-	zipdir_t*	directory;
-
 public:
 	ZipArchive();
 	~ZipArchive();
 
-	int				entryIndex(ArchiveEntry* entry);
-	ArchiveEntry*	getEntry(uint32_t index);
-	ArchiveEntry*	getEntry(string name);
-	string			getFileExtensionString();
-	string			getFormat();
+	// Archive type info
+	string	getFileExtensionString();
+	string	getFormat();
 
-	bool	open(string filename);
-	bool	open(ArchiveEntry* entry);
-	bool	open(MemChunk& mc);
+	// Opening
+	bool	open(string filename);		// Open from File
+	bool	open(ArchiveEntry* entry);	// Open from ArchiveEntry
+	bool	open(MemChunk& mc);			// Open from MemChunk
 
-	bool	write(MemChunk& mc, bool update = true);
-	bool	write(string filename, bool update = true);
+	// Writing/Saving
+	bool	write(MemChunk& mc, bool update = true);	// Write to MemChunk
+	bool	write(string filename, bool update = true);	// Write to File
 
-	bool		loadEntryData(ArchiveEntry* entry);
-	uint32_t	numEntries();
-	void		close();
+	// Misc
+	bool	loadEntryData(ArchiveEntry* entry);
 
 	// Entry addition/removal
-	bool			addEntry(ArchiveEntry* entry, uint32_t position = 0);
-	ArchiveEntry*	addNewEntry(string name = "", uint32_t position = 0);
-	ArchiveEntry*	addExistingEntry(ArchiveEntry* entry, uint32_t position = 0, bool copy = false);
-	bool			removeEntry(ArchiveEntry* entry, bool delete_entry = true);
+	ArchiveEntry*	addEntry(ArchiveEntry* entry, string add_namespace, bool copy = false);
 
-	// Entry moving
-	bool			swapEntries(ArchiveEntry* entry1, ArchiveEntry* entry2);
-
-	// Entry modification
-	bool	renameEntry(ArchiveEntry* entry, string new_name);
-
+	// Detection
 	vector<mapdesc_t>	detectMaps();
-	string				detectEntrySection(ArchiveEntry* entry);
+	string				detectNamespace(ArchiveEntry* entry);
 
-	ArchiveEntry*			findEntry(string search, bool incsub = true);
-	ArchiveEntry*			findEntry(int edftype, bool incsub = true);
-	vector<ArchiveEntry*>	findEntries(string search, bool incsub = true);
-	vector<ArchiveEntry*>	findEntries(int edftype, bool incsub = true);
+	// Search
+	ArchiveEntry*			findFirst(search_options_t& options);
+	ArchiveEntry*			findLast(search_options_t& options);
+	vector<ArchiveEntry*>	findAll(search_options_t& options);
 
-	// ---- Zip-specific ----
-	zipdir_t*	getEntryDirectory(ArchiveEntry* entry, zipdir_t* dir = NULL);
-	string		getEntryFullPath(ArchiveEntry* entry);
-	zipdir_t*	getDirectory(string name, zipdir_t* dir = NULL);
-	zipdir_t*	getDirectory(ArchiveEntry* dir_entry, zipdir_t* dir = NULL);
-	zipdir_t*	addDirectory(string name, zipdir_t* dir = NULL);
-	bool		renameDirectory(zipdir_t* dir, string newname);
-	void		deleteDirectory(zipdir_t* dir = NULL);
-	zipdir_t*	getRootDirectory() { return directory; }
-	void		dumpDirectoryTree(zipdir_t* start = NULL);
-	void		getTreeAsList(vector<ArchiveEntry*>& list, zipdir_t* start = NULL);
-
+	// Static functions
 	static bool	isZipArchive(MemChunk& mc);
 	static bool isZipArchive(string filename);
 };

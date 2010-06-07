@@ -85,6 +85,10 @@ ArchiveEntry* PatchTable::patchEntry(size_t index) {
 	if (index >= patches.size())
 		return NULL;
 
+	// Update patch entry if needed
+	if (!patches[index].entry)
+		updatePatchEntry(index);
+
 	// Return entry at index
 	return patches[index].entry;
 }
@@ -96,8 +100,13 @@ ArchiveEntry* PatchTable::patchEntry(size_t index) {
 ArchiveEntry* PatchTable::patchEntry(string name) {
 	// Search for patch by name
 	for (size_t a = 0; a < patches.size(); a++) {
-		if (!patches[a].name.CmpNoCase(name))
+		if (!patches[a].name.CmpNoCase(name)) {
+			// Update patch entry if needed
+			if (!patches[a].entry)
+				updatePatchEntry(a);
+
 			return patches[a].entry;
+		}
 	}
 
 	// Not found
@@ -155,7 +164,7 @@ bool PatchTable::removePatch(unsigned index) {
  * [parent] and resource archives. Returns false if [index] is out
  * of range or no matching entry was found, true otherwise
  *******************************************************************/
-bool PatchTable::replacePatch(unsigned index, string newname, Archive* parent) {
+bool PatchTable::replacePatch(unsigned index, string newname) {
 	// Check index
 	if (index >= patches.size())
 		return false;
@@ -163,17 +172,10 @@ bool PatchTable::replacePatch(unsigned index, string newname, Archive* parent) {
 	// Change the patch name
 	patches[index].name = newname;
 
-	// Attempt to find patch entry
-	ArchiveEntry* entry = NULL;
-	if (parent)
-		entry = parent->getEntry(newname);						// Search parent archive first
-	if (!entry)
-		entry = theArchiveManager->getResourceEntry(newname);	// Next search open resource archives + base resource archive
-
 	// Update patch entry
-	patches[index].entry = entry;
+	updatePatchEntry(index);
 
-	return !!entry;
+	return !!patch(index).entry;
 }
 
 /* PatchTable::addPatch
@@ -182,25 +184,37 @@ bool PatchTable::replacePatch(unsigned index, string newname, Archive* parent) {
  * archives. Returns false if no matching entry was found,
  * true otherwise
  *******************************************************************/
-bool PatchTable::addPatch(string name, Archive* parent) {
+bool PatchTable::addPatch(string name) {
 	// Create/init new patch
 	patch_t patch;
 	patch.name = name;
 
-	// Attempt to find patch entry
-	ArchiveEntry* entry = NULL;
-	if (parent)
-		entry = parent->getEntry(name);						// Search parent archive first
-	if (!entry)
-		entry = theArchiveManager->getResourceEntry(name);	// Next search open resource archives + base resource archive
-
-	// Set patch entry
-	patch.entry = entry;
-
 	// Add the patch
 	patches.push_back(patch);
 
-	return !!entry;
+	return !!patch.entry;
+}
+
+void PatchTable::updatePatchEntry(unsigned index) {
+	// Check index
+	if (index >= patches.size())
+		return;
+
+	// Get patch name
+	string name = patch(index).name;
+
+	// Attempt to find patch entry
+	ArchiveEntry* entry = NULL;
+	Archive::search_options_t options;
+	options.match_name = name;
+	options.match_namespace = "patches";
+	if (parent)
+		entry = parent->findFirst(options);								// Search parent archive first
+	if (!entry)
+		entry = theArchiveManager->findResourceEntry(options, parent);	// Next search open resource archives + base resource archive
+
+	// Set patch entry
+	patch(index).entry = entry;
 }
 
 /* PatchTable::loadPNAMES
@@ -238,11 +252,11 @@ bool PatchTable::loadPNAMES(ArchiveEntry* pnames, Archive* parent) {
 		}
 
 		// Add new patch
-		bool success = addPatch(wxString(pname).Upper(), parent);
+		bool success = addPatch(wxString(pname).Upper());
 
 		// Write log message if patch entry not found
-		if (!success)
-			wxLogMessage("Patch \"%s\" not found", pname);
+		//if (!success)
+		//	wxLogMessage("Patch \"%s\" not found", pname);
 	}
 
 	// Update variables

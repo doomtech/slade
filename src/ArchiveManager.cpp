@@ -35,6 +35,7 @@
 #include "LibArchive.h"
 #include "DatArchive.h"
 #include "Console.h"
+#include "SplashWindow.h"
 #include <wx/filename.h>
 
 
@@ -42,7 +43,7 @@
  * VARIABLES
  *******************************************************************/
 ArchiveManager* ArchiveManager::instance = NULL;
-CVAR(String, base_resource_path, "", CVAR_SAVE)
+CVAR(Int, base_resource, -1, CVAR_SAVE)
 
 
 /*******************************************************************
@@ -74,7 +75,7 @@ ArchiveManager::ArchiveManager() {
 	}
 
 	// Open base resource archive (if any)
-	openBaseResource(base_resource_path);
+	openBaseResource(base_resource);
 }
 
 /* ArchiveManager::~ArchiveManager
@@ -129,7 +130,7 @@ Archive* ArchiveManager::getArchive(string filename) {
 	// Go through all open archives
 	for (int a = 0; a < (int) open_archives.size(); a++) {
 		// If the filename matches, return it
-		if (open_archives[a].archive->getFileName().compare(filename) == 0)
+		if (open_archives[a].archive->getFilename().compare(filename) == 0)
 			return open_archives[a].archive;
 	}
 
@@ -256,7 +257,7 @@ Archive* ArchiveManager::newArchive(uint8_t type) {
 
 	// If the archive was created, set its filename and add it to the list
 	if (new_archive) {
-		new_archive->setFileName(s_fmt("UNSAVED (%s)", format_str.c_str()));
+		new_archive->setFilename(s_fmt("UNSAVED (%s)", format_str.c_str()));
 		addArchive(new_archive);
 	}
 
@@ -309,7 +310,7 @@ bool ArchiveManager::closeArchive(string filename) {
 	// Go through all open archives
 	for (int a = 0; a < (int) open_archives.size(); a++) {
 		// If the filename matches, remove it
-		if (open_archives[a].archive->getFileName().compare(filename) == 0)
+		if (open_archives[a].archive->getFilename().compare(filename) == 0)
 			return closeArchive(a);
 	}
 
@@ -369,7 +370,7 @@ string ArchiveManager::getArchiveExtensionsString(bool wad, bool zip, bool pk3, 
 
 	// Create extensions string
 	string extensions = s_fmt("Any Supported File (*.wad; *.zip; *.pk3; *.jdf)|%s;%s;%s;%s;%s;%s;%s",
-		ext_wad.c_str(), ext_zip.c_str(), ext_pk3.c_str(), ext_jdf.c_str(), 
+		ext_wad.c_str(), ext_zip.c_str(), ext_pk3.c_str(), ext_jdf.c_str(),
 		ext_dat.c_str(), ext_lib.c_str(), ext_cdhd.c_str());
 	extensions += s_fmt("|Doom Wad files (*.wad)|%s", ext_wad.c_str());
 	extensions += s_fmt("|Zip files (*.zip)|%s", ext_zip.c_str());
@@ -382,18 +383,45 @@ string ArchiveManager::getArchiveExtensionsString(bool wad, bool zip, bool pk3, 
 	return extensions;
 }
 
-bool ArchiveManager::openBaseResource(string filename) {
+void ArchiveManager::addBaseResourcePath(string path) {
+	// First check the path doesn't already exist
+	for (unsigned a = 0; a < base_resource_paths.size(); a++) {
+		if (s_cmp(base_resource_paths[a], path))
+			return;
+	}
+
+	// Add it
+	base_resource_paths.push_back(path);
+}
+
+string ArchiveManager::getBaseResourcePath(unsigned index) {
+	// Check index
+	if (index >= base_resource_paths.size())
+		return "INVALID INDEX";
+
+	return base_resource_paths[index];
+}
+
+bool ArchiveManager::openBaseResource(int index) {
+	// Check we're opening a different archive
+	if (base_resource == index)
+		return true;
+
 	// Close/delete current base resource archive
 	if (base_resource_archive) {
 		delete base_resource_archive;
 		base_resource_archive = NULL;
 	}
 
-	// Check filename was given
-	if (filename.IsEmpty())
+	// Check index
+	if (index < 0 || index >= base_resource_paths.size()) {
+		base_resource = -1;
+		announce("base_resource_changed");
 		return false;
+	}
 
 	// Create archive based on file type
+	string filename = base_resource_paths[index];
 	if (WadArchive::isWadArchive(filename))
 		base_resource_archive = new WadArchive();
 	else if (ZipArchive::isZipArchive(filename))
@@ -402,38 +430,31 @@ bool ArchiveManager::openBaseResource(string filename) {
 		return false;
 
 	// Attempt to open the file
+	theSplashWindow->show(s_fmt("Opening %s...", chr(filename)), true);
 	if (base_resource_archive->open(filename)) {
-		base_resource_path = filename;
+		base_resource = index;
+		theSplashWindow->hide();
+		announce("base_resource_changed");
 		return true;
 	}
 	else {
 		delete base_resource_archive;
 		base_resource_archive = NULL;
+		theSplashWindow->hide();
+		announce("base_resource_changed");
 		return false;
 	}
 }
 
-string ArchiveManager::baseResourcePath(uint32_t index) {
-	// Check index
-	if (index >= base_resource_list.size())
-		return "";
-
-	return base_resource_list[index];
-}
-
-void ArchiveManager::addBaseResourcePath(string path) {
-	// Add the path
-	base_resource_list.Add(path);
-
-	// Announce
-	announce("base_resource_path_added");
-}
-
-ArchiveEntry* ArchiveManager::getResourceEntry(string name) {
+ArchiveEntry* ArchiveManager::getResourceEntry(string name, Archive* ignore) {
 	// Go through all open archives
 	for (size_t a = 0; a < open_archives.size(); a++) {
 		// If it isn't a resource archive, skip it
 		if (!open_archives[a].resource)
+			continue;
+
+		// If it's being ignored, skip it
+		if (open_archives[a].archive == ignore)
 			continue;
 
 		// Try to find the entry in the archive
@@ -447,6 +468,57 @@ ArchiveEntry* ArchiveManager::getResourceEntry(string name) {
 		return base_resource_archive->getEntry(name);
 
 	return NULL;
+}
+
+ArchiveEntry* ArchiveManager::findResourceEntry(Archive::search_options_t& options, Archive* ignore) {
+	// Go through all open archives
+	for (size_t a = 0; a < open_archives.size(); a++) {
+		// If it isn't a resource archive, skip it
+		if (!open_archives[a].resource)
+			continue;
+
+		// If it's being ignored, skip it
+		if (open_archives[a].archive == ignore)
+			continue;
+
+		// Try to find the entry in the archive
+		ArchiveEntry* entry = open_archives[a].archive->findLast(options);
+		if (entry)
+			return entry;
+	}
+
+	// If entry isn't found yet, search the base resource archive
+	if (base_resource_archive)
+		return base_resource_archive->findLast(options);
+
+	return NULL;
+}
+
+vector<ArchiveEntry*> ArchiveManager::findAllResourceEntries(Archive::search_options_t& options, Archive* ignore) {
+	vector<ArchiveEntry*> ret;
+
+	// Search the base resource archive first
+	if (base_resource_archive) {
+		vector<ArchiveEntry*> vec = base_resource_archive->findAll(options);
+		ret.insert(ret.end(), vec.begin(), vec.end());
+	}
+
+	// Go through all open archives
+	for (size_t a = 0; a < open_archives.size(); a++) {
+		// If it isn't a resource archive, skip it
+		if (!open_archives[a].resource)
+			continue;
+
+		// If it's being ignored, skip it
+		if (open_archives[a].archive == ignore)
+			continue;
+
+		// Add matching entries from this archive
+		vector<ArchiveEntry*> vec = open_archives[a].archive->findAll(options);
+		ret.insert(ret.end(), vec.begin(), vec.end());
+	}
+
+	return ret;
 }
 
 /* ArchivePanel::openTextureEditor
@@ -503,7 +575,7 @@ void c_list_archives(vector<string> args) {
 
 	for (int a = 0; a < theArchiveManager->numArchives(); a++) {
 		Archive* archive = theArchiveManager->getArchive(a);
-		wxLogMessage(s_fmt("%d: \"%s\"", a + 1, archive->getFileName().c_str()));
+		wxLogMessage(s_fmt("%d: \"%s\"", a + 1, archive->getFilename().c_str()));
 	}
 }
 ConsoleCommand am_list_archives("list_archives", &c_list_archives, 0);

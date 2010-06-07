@@ -4,9 +4,8 @@
 
 #include "Archive.h"
 
-class DatArchive : public Archive {
+class DatArchive : public TreelessArchive {
 private:
-	vector<ArchiveEntry*>	entries;
 	int						sprites[2];
 	int						flats[2];
 	int						walls[2];
@@ -15,41 +14,42 @@ public:
 	DatArchive();
 	~DatArchive();
 
-	int				entryIndex(ArchiveEntry* entry);
-	ArchiveEntry*	getEntry(uint32_t index);
-	ArchiveEntry*	getEntry(string name);
+	// Dat specific
+	uint32_t	getEntryOffset(ArchiveEntry* entry);
+	void		setEntryOffset(ArchiveEntry* entry, uint32_t offset);
+
+	// Archive type info
 	string			getFileExtensionString();
 	string			getFormat();
 
-	bool	open(string filename);
-	bool	open(ArchiveEntry* entry);
-	bool	open(MemChunk& mc);
+	// Opening
+	bool	open(string filename);		// Open from File
+	bool	open(ArchiveEntry* entry);	// Open from ArchiveEntry
+	bool	open(MemChunk& mc);			// Open from MemChunk
 
-	bool	write(MemChunk& mc, bool update = true);
-	bool	write(string filename, bool update = true);
+	// Writing/Saving
+	bool	write(MemChunk& mc, bool update = true);	// Write to MemChunk
+	bool	write(string filename, bool update = true);	// Write to File
 
-	void	close();
-
-	uint32_t	getEntryOffset(ArchiveEntry* entry);
-	void		setEntryOffset(ArchiveEntry* entry, uint32_t offset);
+	// Misc
 	bool		loadEntryData(ArchiveEntry* entry);
-	uint32_t	numEntries();
+	unsigned 	numEntries() { return getRoot()->numEntries(); }
 
-	bool			addEntry(ArchiveEntry* entry, uint32_t position = 0);
-	ArchiveEntry*	addNewEntry(string name = "", uint32_t position = 0);
-	ArchiveEntry*	addExistingEntry(ArchiveEntry* entry, uint32_t position = 0, bool copy = false);
-	bool			removeEntry(ArchiveEntry* entry, bool delete_entry = true);
+	// Entry addition/removal (unimplemented)
+	ArchiveEntry*	addEntry(ArchiveEntry* entry, unsigned position = 0xFFFFFFFF, ArchiveTreeNode* dir = NULL, bool copy = false) { return NULL; }
+	ArchiveEntry*	addNewEntry(string name = "", unsigned position = 0xFFFFFFFF, ArchiveTreeNode* dir = NULL) { return NULL; }
+	bool			removeEntry(ArchiveEntry* entry, bool delete_entry = true) { return false; }
 
-	bool	swapEntries(ArchiveEntry* entry1, ArchiveEntry* entry2);
-	bool	renameEntry(ArchiveEntry *,string){return false;}
+	// Entry moving (unimplemented)
+	bool	swapEntries(ArchiveEntry* entry1, ArchiveEntry* entry2) { return false; }
+	bool	moveEntry(ArchiveEntry* entry, unsigned position = 0xFFFFFFFF, ArchiveTreeNode* dir = NULL) { return false; }
 
-	vector<mapdesc_t>	detectMaps();
-	string				detectEntrySection(ArchiveEntry* entry);
+	// Entry modification (unimplemented)
+	bool	renameEntry(ArchiveEntry* entry, string name) { return false; }
 
-	ArchiveEntry*			findEntry(string search, bool includesubdirs = true);
-	ArchiveEntry*			findEntry(int edftype, bool includesubdirs = true);
-	vector<ArchiveEntry*>	findEntries(string search, bool includesubdirs = true);
-	vector<ArchiveEntry*>	findEntries(int edftype, bool includesubdirs = true);
+	// Detection
+	vector<mapdesc_t>	detectMaps() { vector<mapdesc_t> ret; return ret; }
+	string				detectNamespace(ArchiveEntry* entry);
 
 	static bool isDatArchive(MemChunk& mc);
 	static bool isDatArchive(string filename);

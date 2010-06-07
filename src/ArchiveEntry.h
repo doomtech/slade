@@ -1,47 +1,52 @@
 
 #ifndef __ARCHIVEENTRY_H__
-#define	__ARCHIVEENTRY_H__
+#define __ARCHIVEENTRY_H__
 
-class Archive;
-
-#include "ListenerAnnouncer.h"
-#include "MemChunk.h"
 #include "EntryType.h"
 #include "PropertyList.h"
 
-class ArchiveEntry : public Announcer {
+class ArchiveTreeNode;
+class Archive;
+
+class ArchiveEntry {
+	friend class ArchiveTreeNode;
+	friend class Archive;
 private:
-	Archive*		parent;
-	string			name;
-	MemChunk		data;
-	uint32_t		size;
-	bool			data_loaded;
-	EntryType*		type;
-	uint8_t			state;			// 0 = unmodified, 1 = modified, 2 = newly created
-	bool			locked;
-	bool			state_locked;	// If true entry state cannot be changed (for initial loading etc)
-	PropertyList	ex_props;
+	// Entry Info
+	string				name;
+	uint32_t			size;
+	MemChunk			data;
+	EntryType*			type;
+	ArchiveTreeNode*	parent;
+	PropertyList		ex_props;
+
+	// Entry status
+	uint8_t			state;			// 0 = unmodified, 1 = modified, 2 = newly created (not saved to disk)
+	bool			state_locked;	// If true the entry state cannot be changed (used for initial loading)
+	bool			locked;			// If true the entry data+info cannot be changed
+	bool			data_loaded;	// True if the entry's data is currently loaded into the data MemChunk
 
 public:
-	ArchiveEntry(string name = "", uint32_t size = 0, Archive* parent = NULL);
+	ArchiveEntry(string name = "", uint32_t size = 0);
 	ArchiveEntry(ArchiveEntry& copy);
-	virtual ~ArchiveEntry();
+	~ArchiveEntry();
 
 	// Accessors
-	Archive*		getParent() { return parent; }
-	string			getName(bool cut_ext = false);
-	uint32_t		getSize() { return size; }
-	bool			isLoaded() { return data_loaded; }
-	EntryType*		getType() { return type; }
-	uint8_t			getState() { return state; }
-	bool			isLocked() { return locked; }
-	const uint8_t*	getData(bool allow_load = true);
-	MemChunk&		getMCData(bool allow_load = true);
-	PropertyList&	extraProps() { return ex_props; }
-	Property&		extraProp(string key) { return ex_props[key]; }
+	string				getName(bool cut_ext = false);
+	uint32_t			getSize()			{ return size; }
+	MemChunk&			getMCData(bool allow_load = true);
+	const uint8_t*		getData(bool allow_load = true);
+	ArchiveTreeNode*	getParentDir()		{ return parent; }
+	Archive*			getParent();
+	string				getPath(bool name = false);
+	EntryType*			getType()			{ return type; }
+	PropertyList&		exProps()			{ return ex_props; }
+	Property&			exProp(string key)	{ return ex_props[key]; }
+	uint8_t				getState()			{ return state; }
+	bool				isLocked()			{ return locked; }
+	bool				isLoaded()			{ return data_loaded; }
 
-	// Modifiers (won't change entry state)
-	void		setParent(Archive* parent) { this->parent = parent; }
+	// Modifiers (won't change entry state, except setState of course :P)
 	void		setName(string name) { this->name = name; }
 	void		setLoaded(bool loaded = true) { data_loaded = loaded; }
 	void		setType(EntryType* type) { this->type = type; }
@@ -69,28 +74,16 @@ public:
 	// Data export
 	bool	exportFile(string filename);
 
-	// Type detection
-	//void	detectType(bool data_check, bool force = false);
-	string	getTypeString();
-
-	// Misc
-	string	getSizeString();
-
 	// Data access
 	bool		write(const void* data, uint32_t size);
 	bool		read(void* buf, uint32_t size);
 	bool		seek(uint32_t offset, uint32_t start) { return data.seek(offset, start); }
 	uint32_t	currentPos() { return data.currentPos(); }
 
-	// Extra properties stuff
-	/*
-	bool	hasExProp(string key);
-	string	getExProp(string key);
-	bool	setExProp(string key, string value);
-	bool	removeExProp(string key);
-	void	allExProps(vector<string>& keys, vector<string>& values);
-	*/
+	// Misc
+	string	getSizeString();
+	string	getTypeString() { if (type) return type->getName(); else return "Unknown"; }
+	void	stateChanged();
 };
 
-
-#endif //__ARCHIVEENTRY_H__
+#endif//__ARCHIVEENTRY_H__

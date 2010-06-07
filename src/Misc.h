@@ -20,9 +20,9 @@ namespace Misc {
 	string		sizeAsString(uint32_t size);
 	uint32_t	crc(uint8_t *buf, uint32_t len);
 
-	// Below are some hacky hard-coded things that I plan to remove eventually
-	// (but they'll do for now :P)
-	bool		addPatchEntry(Archive* archive, ArchiveEntry* entry);
+	// Mass Rename
+	string	massRenameFilter(wxArrayString& names);
+	void	doMassRename(wxArrayString& names, string name_filter);
 }
 
 #endif //__MISC_H__

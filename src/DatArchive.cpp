@@ -46,59 +46,30 @@
  * DatArchive class constructor
  *******************************************************************/
 DatArchive::DatArchive()
-: Archive(ARCHIVE_DAT) {
+: TreelessArchive(ARCHIVE_DAT) {
 }
 
 /* DatArchive::~DatArchive
  * DatArchive class destructor
  *******************************************************************/
 DatArchive::~DatArchive() {
-	// Delete entries
-	for (size_t a = 0; a < entries.size(); a++)
-		delete entries[a];
 }
 
-/* DatArchive::entryIndex
- * Returns the given entry's index in the Archive entry list.
- * Returns -1 if the entry doesn't exist in the Archive.
+/* DatArchive::getEntryOffset
+ * Gets a lump entry's offset
+ * Returns the lump entry's offset, or zero if it doesn't exist
  *******************************************************************/
-int DatArchive::entryIndex(ArchiveEntry* entry) {
-	// Check the entry is valid and part of this archive
-	if (!checkEntry(entry))
-		return -1;
-
-	for (size_t a = 0; a < entries.size(); a++) {
-		if (entries[a] == entry)
-			return a;
-	}
-
-	return -1;
+uint32_t DatArchive::getEntryOffset(ArchiveEntry* entry) {
+	return uint32_t((int)entry->exProp("Offset"));
 }
 
-/* DatArchive::getEntry
- * Returns the entry at the index specified,
- * or NULL if the index is invalid
+/* DatArchive::setEntryOffset
+ * Sets a lump entry's offset
  *******************************************************************/
-ArchiveEntry* DatArchive::getEntry(uint32_t index) {
-	// Check index
-	if (index >= entries.size())
-		return NULL;
-
-	return entries[index];
+void DatArchive::setEntryOffset(ArchiveEntry* entry, uint32_t offset) {
+	entry->exProp("Offset") = (int)offset;
 }
 
-/* DatArchive::getEntry
- * Returns the first entry with the specified name,
- * or NULL if no entry exists with that name
- *******************************************************************/
-ArchiveEntry* DatArchive::getEntry(string name) {
-	for (size_t a = 0; a < entries.size(); a++) {
-		if (getEntry(a)->getName() == name)
-			return getEntry(a);
-	}
-
-	return NULL;
-}
 
 /* DatArchive::getFileExtensionString
  * Gets the wxWidgets file dialog filter string for the archive type
@@ -228,9 +199,9 @@ bool DatArchive::open(MemChunk& mc) {
 		}
 
 		// Create & setup lump
-		ArchiveEntry* nlump = new ArchiveEntry(myname, size, this);
+		ArchiveEntry* nlump = new ArchiveEntry(myname, size);
 		nlump->setLoaded(false);
-		nlump->extraProp("Offset") = (int)offset;
+		nlump->exProp("Offset") = (int)offset;
 		nlump->setState(0);
 
 		// Check for markers
@@ -248,18 +219,18 @@ bool DatArchive::open(MemChunk& mc) {
 			walls[1] = d;
 
 		// Add to entry list
-		entries.push_back(nlump);
+		getRoot()->addEntry(nlump);
 	}
 
 	// Detect all entry types
 	MemChunk edata;
 	theSplashWindow->setProgressMessage("Detecting entry types");
-	for (size_t a = 0; a < entries.size(); a++) {
+	for (size_t a = 0; a < numEntries(); a++) {
 		// Update splash window progress
 		theSplashWindow->setProgress((((float)a / (float)num_lumps)));
 
 		// Get entry
-		ArchiveEntry* entry = entries[a];
+		ArchiveEntry* entry = getEntry(a);
 
 		// Read entry data if it isn't zero-sized
 		if (entry->getSize() > 0) {
@@ -289,10 +260,10 @@ bool DatArchive::open(MemChunk& mc) {
 	return true;
 }
 
-string DatArchive::detectEntrySection(ArchiveEntry* entry) {
+string DatArchive::detectNamespace(ArchiveEntry* entry) {
 	// Check the entry is valid and part of this archive
 	if (!checkEntry(entry))
-		return "none";
+		return "global";
 
 	// Check if entry is within any markers
 	int index = entryIndex(entry);
@@ -309,7 +280,7 @@ string DatArchive::detectEntrySection(ArchiveEntry* entry) {
 	if (index > sprites[0] && index < sprites[1])
 		return "sprites";
 
-	return "none";
+	return "global";
 }
 
 /* DatArchive::write
@@ -326,39 +297,6 @@ bool DatArchive::write(string filename, bool update) {
  *******************************************************************/
 bool DatArchive::write(MemChunk& mc, bool update) {
 	return false;
-}
-
-/* DatArchive::close
- * 'Closes' the archive
- *******************************************************************/
-void DatArchive::close() {
-	// Delete all entries
-	while (entries.size() > 0) {
-		delete entries[0];
-		entries.erase(entries.begin());
-	}
-
-	// Unlock parent entry if it exists
-	if (parent)
-		parent->unlock();
-
-	// Announce
-	announce("close");
-}
-
-/* DatArchive::getEntryOffset
- * Gets a lump entry's offset
- * Returns the lump entry's offset, or zero if it doesn't exist
- *******************************************************************/
-uint32_t DatArchive::getEntryOffset(ArchiveEntry* entry) {
-	return uint32_t((int)entry->extraProp("Offset"));
-}
-
-/* DatArchive::setEntryOffset
- * Sets a lump entry's offset
- *******************************************************************/
-void DatArchive::setEntryOffset(ArchiveEntry* entry, uint32_t offset) {
-	entry->extraProp("Offset") = (int)offset;
 }
 
 /* DatArchive::loadEntryData
@@ -394,91 +332,6 @@ bool DatArchive::loadEntryData(ArchiveEntry* entry) {
 	entry->setLoaded();
 
 	return true;
-}
-
-/* DatArchive::numEntries
- * Returns the number of entries in the archive
- *******************************************************************/
-uint32_t DatArchive::numEntries() {
-	return entries.size();
-}
-
-/* DatArchive::addEntry
- * Adds an entry to the entry list before position. If position is
- * invalid the entry will be added at the end of the list. Truncates
- * the given name to 8 characters, and also stores the original full
- * name as an extra property of the entry. Returns false if the given
- * entry was invalid, true otherwise
- *******************************************************************/
-bool DatArchive::addEntry(ArchiveEntry* entry, uint32_t position) {
-	return false;
-}
-
-/* DatArchive::addNewEntry
- * Creates a new ArchiveEntry and adds it to the archive before the
- * position specified. Returns the created entry
- *******************************************************************/
-ArchiveEntry* DatArchive::addNewEntry(string name, uint32_t position) {
-	return NULL;
-}
-
-/* DatArchive::addExistingEntry
- * Adds an existing ArchiveEntry to the archive before the position
- * specified. Returns the added archive entry
- *******************************************************************/
-ArchiveEntry* DatArchive::addExistingEntry(ArchiveEntry* entry, uint32_t position, bool copy) {
-	return NULL;
-}
-
-/* DatArchive::removeEntry
- * Removes an entry from the archive, and deletes it if delete_entry
- * is true. Returns false if the given entry doesn't exist in the
- * archive, true otherwise
- *******************************************************************/
-bool DatArchive::removeEntry(ArchiveEntry* entry, bool delete_entry) {
-	return false;
-}
-
-/* DatArchive::swapEntries
- * Swaps the specified entries. Returns false if either entry is
- * invalid or not part of this Archive, true otherwise.
- *******************************************************************/
-bool DatArchive::swapEntries(ArchiveEntry* entry1, ArchiveEntry* entry2) {
-	return false;
-}
-
-ArchiveEntry* DatArchive::findEntry(string search, bool incsub) {
-	for (size_t a = 0; a < numEntries(); a++) {
-		if (getEntry(a)->getName().Lower().Matches(search.Lower()))
-			return getEntry(a);
-	}
-	return NULL;
-}
-
-ArchiveEntry* DatArchive::findEntry(int edftype, bool incsub) {
-//	for (size_t a = 0; a < numEntries(); a++) {
-//		if (getEntry(a)->getType()->getFormat() == edftype)
-//			return getEntry(a);
-//	}
-	return NULL;
-}
-
-vector<ArchiveEntry*> DatArchive::findEntries(string search, bool incsub) {
-	vector<ArchiveEntry*> ret;
-	for (size_t a = 0; a < numEntries(); a++) {
-		if (getEntry(a)->getName().Lower().Matches(search.Lower()))
-			ret.push_back(getEntry(a));
-	}
-	return ret;
-}
-
-vector<ArchiveEntry*> DatArchive::findEntries(int edftype, bool incsub) {
-	vector<ArchiveEntry*> ret;
-//	for (size_t a = 0; a < numEntries(); a++) {
-//		if (getEntry(a)->getType()->getFormat() == edftype)
-//			ret.push_back(getEntry(a));
-//	}
-	return ret;
 }
 
 bool DatArchive::isDatArchive(MemChunk& mc) {
@@ -609,13 +462,3 @@ bool DatArchive::isDatArchive(string filename) {
 		return false;
 	return true;
 }
-
-/* DatArchive::detectMaps
- * Detects all the maps in the archive and returns a vector of
- * information about them.
- *******************************************************************/
-vector<Archive::mapdesc_t> DatArchive::detectMaps() {
-	vector<mapdesc_t> ret;
-	return ret;
-}
-

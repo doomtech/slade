@@ -9,12 +9,80 @@
 #include <wx/textctrl.h>
 
 class ArchiveEntryList : public VirtualListView, public Listener {
-protected:
+private:
 	Archive*			archive;
-	//wxListItemAttr*		item_attr;
 	wxTextCtrl*			text_filter;
 	vector<unsigned>	filter;
 	bool				filter_active;
+	ArchiveTreeNode*	current_dir;
+	ArchiveEntry*		entry_dir_back;
+
+	enum {
+		AEL_COLUMN_NAME,
+		AEL_COLUMN_SIZE,
+		AEL_COLUMN_TYPE,
+		AEL_HRULES,
+		AEL_VRULES,
+	};
+
+protected:
+	// Virtual wxListCtrl overrides
+	string	getItemText(long item, long column) const;
+	int		getItemIcon(long item) const;
+	void	updateItemAttr(long item) const;
+
+public:
+	ArchiveEntryList(wxWindow* parent);
+	~ArchiveEntryList();
+
+	ArchiveTreeNode*	getCurrentDir() { return current_dir; }
+
+	void	setArchive(Archive* archive);
+	void	setFilterCtrl(wxTextCtrl* text_filter);
+
+	void	setupColumns();
+	int		columnType(int column) const;
+	void	updateList();
+	void	filterList(string filter);
+	int		entriesBegin();
+
+	ArchiveEntry*				getEntry(int index) const;
+	ArchiveEntry*				getFocusedEntry();
+	vector<ArchiveEntry*>		getSelectedEntries();
+	ArchiveEntry*				getLastSelectedEntry();
+	vector<ArchiveTreeNode*>	getSelectedDirectories();
+
+	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
+
+	// Events
+	void	onColumnHeaderRightClick(wxListEvent& e);
+	void	onColumnResize(wxListEvent& e);
+	void	onMenu(wxCommandEvent& e);
+	void	onFilterChanged(wxCommandEvent& e);
+	void	onListItemActivated(wxListEvent& e);
+};
+
+#endif//__ARCHIVE_ENTRY_LIST_H__
+
+
+/*
+#ifndef __ARCHIVE_ENTRY_LIST_H__
+#define __ARCHIVE_ENTRY_LIST_H__
+
+#include "VirtualListView.h"
+#include "ListenerAnnouncer.h"
+#include "Archive.h"
+#include <wx/listctrl.h>
+#include <wx/textctrl.h>
+
+class ArchiveEntryList : public VirtualListView, public Listener {
+private:
+	Archive*			archive;
+	wxTextCtrl*			text_filter;
+	vector<unsigned>	filter;
+	bool				filter_active;
+	ArchiveTreeNode*	current_dir;
+	ArchiveEntry*		entry_folder_back;
 
 	enum {
 		AEL_COLUMN_NAME,
@@ -28,33 +96,31 @@ protected:
 	string	getItemText(long item, long column) const;
 	int		getItemIcon(long item) const;
 	void	updateItemAttr(long item) const;
-	//string			OnGetItemText(long item, long column) const;
-	//int				OnGetItemImage(long item) const;
-	//wxListItemAttr*	OnGetItemAttr(long item) const;
 
 public:
 	ArchiveEntryList(wxWindow* parent);
 	~ArchiveEntryList();
 
+	ArchiveTreeNode*	getCurrentDir() { return current_dir; }
+
 	virtual void	setArchive(Archive* archive);
 	void			setFilterCtrl(wxTextCtrl* text_filter);
 	void			setupColumns();
-	//void			updateWidth();
 	int				columnType(int column) const;
 	virtual void	updateList(bool clear = false);
 	virtual void	filterList(string filter);
 
 	virtual ArchiveEntry*	getEntry(int index) const;
 	ArchiveEntry*			getFocusedEntry();
-	//int						getFocus();
 	vector<ArchiveEntry*>	getSelectedEntries();
-	//virtual vector<int>		getSelection();
-	//int						getLastSelected();
 	ArchiveEntry*			getLastSelectedEntry();
 
-	//void	selectItem(int index, bool select = true);
-	//void	clearSelection();
-	//void	selectAll();
+	int							entriesBegin();
+	bool						isFolder(int index);
+	bool						isEntry(int index);
+	vector<ArchiveTreeNode*>	getSelectedDirectories();
+	int							getEntryListIndex(int index);
+	int							getDirListIndex(int subdir);
 
 	virtual void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 
@@ -66,3 +132,4 @@ public:
 };
 
 #endif//__ARCHIVE_ENTRY_LIST_H__
+*/

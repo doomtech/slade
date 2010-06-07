@@ -2,11 +2,12 @@
 #ifndef __CLIPBOARD_H__
 #define	__CLIPBOARD_H__
 
-#include "ArchiveEntry.h"
+#include "Archive.h"
 
 enum ClipboardType {
-	CLIPBOARD_ENTRY,
-	CLIPBOARD_ZIPDIR,
+	CLIPBOARD_ENTRY_TREE,
+	//CLIPBOARD_ENTRY,
+	//CLIPBOARD_ZIPDIR,
 	CLIPBOARD_COMPOSITE_TEXTURE,
 	CLIPBOARD_PATCH,
 
@@ -24,6 +25,18 @@ public:
 	int	getType() { return type; }
 };
 
+class EntryTreeClipboardItem : public ClipboardItem {
+private:
+	ArchiveTreeNode*	tree;
+
+public:
+	EntryTreeClipboardItem(vector<ArchiveEntry*>& entries, vector<ArchiveTreeNode*>& dirs);
+	~EntryTreeClipboardItem();
+
+	ArchiveTreeNode*	getTree() { return tree; }
+};
+
+/*
 class EntryClipboardItem : public ClipboardItem {
 private:
 	ArchiveEntry*	entry;
@@ -47,6 +60,7 @@ public:
 	bool			addEntry(ArchiveEntry* entry);
 	ArchiveEntry*	getEntry(uint32_t index);
 };
+*/
 
 class Clipboard {
 private:

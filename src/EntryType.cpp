@@ -250,7 +250,7 @@ bool EntryType::isThisType(ArchiveEntry* entry) {
 		if (!entry->getParent())
 			return false;
 
-		string e_section = entry->getParent()->detectEntrySection(entry);
+		string e_section = entry->getParent()->detectNamespace(entry);
 
 		if (e_section != section)
 			return false;
@@ -420,7 +420,7 @@ bool EntryType::loadEntryTypes() {
 	}
 
 	// Get entry types directory
-	zipdir_t* et_dir = ((ZipArchive*)res_archive)->getDirectory("config/entry_types");
+	ArchiveTreeNode* et_dir = res_archive->getDir("config/entry_types/");
 
 	// Check it exists
 	if (!et_dir) {
@@ -431,7 +431,7 @@ bool EntryType::loadEntryTypes() {
 	// Read in each file in the directory
 	bool etypes_read = false;
 	for (unsigned a = 0; a < et_dir->numEntries(); a++) {
-		if (readEntryTypeDefinition(et_dir->entries[a]->getMCData()))
+		if (readEntryTypeDefinition(et_dir->getEntry(a)->getMCData()))
 			etypes_read = true;
 	}
 

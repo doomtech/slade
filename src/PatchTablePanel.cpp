@@ -75,7 +75,7 @@ string PatchTableListView::getItemText(long item, long column) const {
 		return "INVALID INDEX";
 
 	// Get associated patch
-	patch_t patch = patch_table->patch(item);
+	patch_t& patch = patch_table->patch(item);
 
 	if (column == 0)						// Index column
 		return s_fmt("%04d", item);
@@ -84,11 +84,18 @@ string PatchTableListView::getItemText(long item, long column) const {
 	else if (column == 2)					// Usage count column
 		return s_fmt("%d", patch.used);
 	else if (column == 3) {					// Archive column
-		// Get patch entry's parent archive
-		string archive = "NOT FOUND";
 		if (patch.entry)
-			archive = patch.entry->getParent()->getFileName(false);
-		return archive;
+			return patch.entry->getParent()->getFilename(false);
+		else {
+			// Attempt to find the patch's entry
+			patch_table->updatePatchEntry(item);
+
+			// If it still can't be found return invalid
+			if (patch.entry)
+				return patch.entry->getParent()->getFilename(false);
+			else
+				return "NOT FOUND";
+		}
 	}
 	else									// Invalid column
 		return "INVALID COLUMN";
@@ -202,7 +209,7 @@ void PatchTablePanel::onBtnAddPatch(wxCommandEvent& e) {
 		return;
 
 	// Add to patch table
-	patch_table->addPatch(patch, parent->getArchive());
+	patch_table->addPatch(patch);
 
 	// Update list
 	list_patches->updateList();
@@ -255,10 +262,10 @@ void PatchTablePanel::onBtnPatchFromFile(wxCommandEvent& e) {
 
 			// Add patch to archive
 			entry->setName(name);
-			Misc::addPatchEntry(parent->getArchive(), entry);
+			parent->getArchive()->addEntry(entry, "patches");
 
 			// Add patch to patch table
-			patch_table->addPatch(name, parent->getArchive());
+			patch_table->addPatch(name);
 		}
 
 		// Refresh patch list
@@ -314,7 +321,7 @@ void PatchTablePanel::onBtnChangePatch(wxCommandEvent& e) {
 		string newname = wxGetTextFromUser("Enter new patch entry name:", "Change Patch", patch.name, this);
 
 		// Update the patch
-		patch_table->replacePatch(selection[a], newname, parent->getArchive());
+		patch_table->replacePatch(selection[a], newname);
 
 		// Update the list
 		list_patches->updateList();

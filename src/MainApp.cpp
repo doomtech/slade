@@ -282,7 +282,7 @@ bool MainApp::OnInit() {
 	EntryType::loadEntryTypes();
 
 	// Open any archives on the command line
-	// argv[0] is normally the executable itself (i.e. Slade.exe) 
+	// argv[0] is normally the executable itself (i.e. Slade.exe)
 	// and opening it as an archive should not be attempted...
 	for (int a = 1; a < argc; a++) {
 		string arg = argv[a];
@@ -419,8 +419,8 @@ void MainApp::saveConfigFile() {
 
 	// Write base resource archive paths
 	file.Write("\nbase_resource_paths\n{\n");
-	for (size_t a = 0; a < theArchiveManager->baseResourceListLength(); a++)
-		file.Write(s_fmt("\t\"%s\"\n", theArchiveManager->baseResourcePath(a)));
+	for (size_t a = 0; a < theArchiveManager->numBaseResourcePaths(); a++)
+		file.Write(s_fmt("\t\"%s\"\n", theArchiveManager->getBaseResourcePath(a)));
 	file.Write("}\n");
 
 	// Close configuration file

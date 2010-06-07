@@ -51,9 +51,30 @@ ClipboardItem::~ClipboardItem() {
 
 
 /*******************************************************************
+ * ENTRYTREECLIPBOARDITEM CLASS FUNCTIONS
+ *******************************************************************/
+EntryTreeClipboardItem::EntryTreeClipboardItem(vector<ArchiveEntry*>& entries, vector<ArchiveTreeNode*>& dirs)
+: ClipboardItem(CLIPBOARD_ENTRY_TREE) {
+	// Create tree
+	tree = new ArchiveTreeNode();
+
+	for (unsigned a = 0; a < entries.size(); a++)
+		tree->addEntry(new ArchiveEntry(*(entries[a])));
+
+	for (unsigned a = 0; a < dirs.size(); a++)
+		tree->addChild(dirs[a]->clone());
+}
+
+EntryTreeClipboardItem::~EntryTreeClipboardItem() {
+	if (tree)
+		delete tree;
+}
+
+
+/*******************************************************************
  * ENTRYCLIPBOARDITEM CLASS FUNCTIONS
  *******************************************************************/
-
+/*
 EntryClipboardItem::EntryClipboardItem(ArchiveEntry* entry)
 : ClipboardItem(CLIPBOARD_ENTRY) {
 	if (entry)
@@ -71,7 +92,7 @@ EntryClipboardItem::~EntryClipboardItem() {
 /*******************************************************************
  * ZIPDIRCLIPBOARDITEM CLASS FUNCTIONS
  *******************************************************************/
-
+/*
 ZipDirClipboardItem::ZipDirClipboardItem()
 : ClipboardItem(CLIPBOARD_ZIPDIR) {
 }

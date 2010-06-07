@@ -17,7 +17,7 @@ private:
 	Archive*			program_resource_archive;
 	Archive*			base_resource_archive;
 	bool				res_archive_open;
-	wxArrayString		base_resource_list;
+	vector<string>		base_resource_paths;
 
 	static ArchiveManager*	instance;
 
@@ -54,15 +54,18 @@ public:
 
 	// Base resource archive stuff
 	Archive*	baseResourceArchive() { return base_resource_archive; }
-	bool		openBaseResource(string filename);
-	string		baseResourcePath(uint32_t index);
 	void		addBaseResourcePath(string path);
-	size_t		baseResourceListLength() { return base_resource_list.size(); }
+	unsigned	numBaseResourcePaths() { return base_resource_paths.size(); }
+	string		getBaseResourcePath(unsigned index);
+	bool		openBaseResource(int index);
 
-	ArchiveEntry*	getResourceEntry(string name);
+	// Resource entry get/search
+	ArchiveEntry*			getResourceEntry(string name, Archive* ignore = NULL);
+	ArchiveEntry*			findResourceEntry(Archive::search_options_t& options, Archive* ignore = NULL);
+	vector<ArchiveEntry*>	findAllResourceEntries(Archive::search_options_t& options, Archive* ignore = NULL);
 
 	// Misc
-	bool		openTextureEditor(uint32_t index);
+	bool	openTextureEditor(uint32_t index);
 
 	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 };

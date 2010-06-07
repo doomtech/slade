@@ -7,7 +7,7 @@ STreeNode::STreeNode(STreeNode* parent) {
 	if (parent)
 		parent->addChild(this);
 	else
-		parent = NULL;
+		this->parent = NULL;
 }
 
 STreeNode::~STreeNode() {
@@ -18,9 +18,9 @@ STreeNode::~STreeNode() {
 
 string STreeNode::getPath() {
 	if (!parent)
-		return getName();
+		return getName() + "/";
 	else
-		return parent->getPath() + "/" + getName();
+		return parent->getPath() + getName() + "/";
 }
 
 STreeNode* STreeNode::getChild(unsigned index) {
@@ -36,6 +36,10 @@ STreeNode* STreeNode::getChild(string name) {
 	if (name.IsEmpty())
 		return NULL;
 
+	// If name ends with /, remove it
+	if (name.EndsWith("/"))
+		name.RemoveLast(1);
+
 	// Convert name to path for processing
 	wxFileName fn(name);
 
@@ -43,7 +47,7 @@ STreeNode* STreeNode::getChild(string name) {
 	if (fn.GetDirCount() == 0) {
 		// Find child of this node
 		for (unsigned a = 0; a < children.size(); a++) {
-			if (s_cmp(name, children[a]->getName()))
+			if (s_cmpnocase(name, children[a]->getName()))
 				return children[a];
 		}
 
@@ -59,7 +63,7 @@ STreeNode* STreeNode::getChild(string name) {
 		if (child) {
 			// It is, remove the first directory and continue searching that child
 			fn.RemoveDir(0);
-			return child->getChild(fn.GetPath(true, wxPATH_UNIX));
+			return child->getChild(fn.GetFullPath(wxPATH_UNIX));
 		}
 		else
 			return NULL;	// Child doesn't exist
@@ -76,36 +80,55 @@ STreeNode* STreeNode::addChild(string name) {
 	if (name.IsEmpty())
 		return NULL;
 
+	// If name ends with /, remove it
+	if (name.EndsWith("/"))
+		name.RemoveLast(1);
+
 	// Convert name to path for processing
 	wxFileName fn(name);
 
-	// Get the name of the first directory in the path (or just the name if no directories were specified)
-	string cname;
-	if (fn.GetDirCount() == 0)
-		cname = name;
-	else
-		cname = fn.GetDirs()[0];
+	// If no directories were given
+	if (fn.GetDirCount() == 0) {
+		// Check if a child with this name exists
+		STreeNode* child = getChild(name);
 
-	// Check if a child already exists with this name
-	STreeNode* child = getChild(cname);
-	if (!child) {
-		// No child with the name exists, create+add one
-		child = createChild(cname);
-		addChild(child);
+		// If it doesn't exist, create it
+		if (!child) {
+			child = createChild(name);
+			addChild(child);
+		}
+
+		// Return the created child
+		return child;
 	}
+	else {
+		// Directories were given, get the first directory
+		string dir = fn.GetDirs()[0];
 
-	return child;
+		// Check if a child with this name exists
+		STreeNode* child = getChild(dir);
+
+		// If it doesn't exist, create it
+		if (!child) {
+			child = createChild(dir);
+			addChild(child);
+		}
+
+		// Continue adding child nodes
+		fn.RemoveDir(0);
+		return child->addChild(fn.GetFullPath(wxPATH_UNIX));
+	}
 }
 
 bool STreeNode::removeChild(STreeNode* child) {
 	// Find child node
 	for (unsigned a = 0; a < children.size(); a++) {
 		if (children[a] == child) {
-			// Remove child from list
-			children.erase(children.begin() + a);
-
 			// Reset child's parent
 			children[a]->parent = NULL;
+
+			// Remove child from list
+			children.erase(children.begin() + a);
 
 			return true;
 		}

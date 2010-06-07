@@ -137,23 +137,23 @@ string PaletteManager::getPalName(Palette8bit* pal) {
  *******************************************************************/
 bool PaletteManager::loadResourcePalettes() {
 	// Get the 'palettes' directory of SLADE.pk3
-	ZipArchive* res_archive = (ZipArchive*)(theArchiveManager->programResourceArchive());
-	zipdir_t* dir_palettes = res_archive->getDirectory("palettes");
+	Archive* res_archive = theArchiveManager->programResourceArchive();
+	ArchiveTreeNode* dir_palettes = res_archive->getDir("palettes/");
 
 	// Check it exists
 	if (!dir_palettes)
 		return false;
 
 	// Go through all entries in the directory
-	for (size_t a = 0; a < dir_palettes->entries.size(); a++) {
+	for (size_t a = 0; a < dir_palettes->numEntries(); a++) {
 		// Load palette data
 		Palette8bit* pal = new Palette8bit();
-		MemChunk mc(dir_palettes->entries[a]->getData(true), dir_palettes->entries[a]->getSize());
+		MemChunk mc(dir_palettes->getEntry(a)->getData(true), dir_palettes->getEntry(a)->getSize());
 		pal->loadMem(mc);
 
 		// Add the palette
 		palettes.push_back(pal);
-		pal_names.push_back(dir_palettes->entries[a]->getName(true));
+		pal_names.push_back(dir_palettes->getEntry(a)->getName(true));
 	}
 
 	return true;

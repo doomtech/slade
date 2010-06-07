@@ -46,6 +46,8 @@
 #include "EntryOperations.h"
 #include "Clipboard.h"
 #include "ArchiveManager.h"
+#include "MainWindow.h"
+#include "SplashWindow.h"
 #include <wx/aui/auibook.h>
 #include <wx/filename.h>
 
@@ -59,6 +61,7 @@
  *******************************************************************/
 ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 : wxPanel(parent, -1) {
+	// Set archive
 	this->archive = archive;
 	listenTo(archive);
 
@@ -72,23 +75,10 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 	animated_area = new AnimatedEntryPanel(this);
 	switches_area = new SwitchesEntryPanel(this);
 
-	// Bind events
-	Bind(wxEVT_COMMAND_MENU_SELECTED, &ArchivePanel::onEntryMenuClick, this, MENU_ENTRY_RENAME, MENU_ENTRY_END);
-}
 
-/* ArchivePanel::~ArchivePanel
- * ArchivePanel class destructor
- *******************************************************************/
-ArchivePanel::~ArchivePanel() {
-}
+	// --- Setup Layout ---
 
-/* ArchivePanel::init
- * Initialises the panel layout (has to be called separately from the
- * constructor, otherwise ZipArchivePanel won't create a
- * ZipEntryListPanel for whatever reason)
- *******************************************************************/
-void ArchivePanel::init() {
-	// Create & set sizer
+	// Create sizer
 	wxBoxSizer *m_hbox = new wxBoxSizer(wxHORIZONTAL);
 	SetSizer(m_hbox);
 
@@ -117,54 +107,62 @@ void ArchivePanel::init() {
 	m_hbox->Add(cur_area, 1, wxEXPAND | wxALL, 4);
 	cur_area->Show(true);
 
-	// Setup events
+	// Bind events
 	entry_list->Bind(EVT_VLV_SELECTION_CHANGED, &ArchivePanel::onEntryListSelectionChange, this);
 	entry_list->Bind(wxEVT_COMMAND_LIST_ITEM_FOCUSED, &ArchivePanel::onEntryListFocusChange, this);
 	entry_list->Bind(wxEVT_KEY_DOWN, &ArchivePanel::onEntryListKeyDown, this);
 	entry_list->Bind(wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK, &ArchivePanel::onEntryListRightClick, this);
 	entry_list->Bind(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, &ArchivePanel::onEntryListActivated, this);
+	Bind(wxEVT_COMMAND_MENU_SELECTED, &ArchivePanel::onEntryMenuClick, this, MENU_ENTRY_RENAME, MENU_ENTRY_END);
 
 	// Update size+layout
 	entry_list->updateWidth();
 	Layout();
 }
 
+/* ArchivePanel::~ArchivePanel
+ * ArchivePanel class destructor
+ *******************************************************************/
+ArchivePanel::~ArchivePanel() {
+}
+
 /* ArchivePanel::save
  * Saves the archive
  *******************************************************************/
-void ArchivePanel::save() {
+bool ArchivePanel::save() {
 	// Check the archive exists
 	if (!archive)
-		return;
+		return false;
 
 	// Check the archive has been previously saved
-	if (!archive->canSave()) {
-		saveAs();
-		return;
-	}
+	if (!archive->canSave())
+		return saveAs();
 
 	// Save the archive
 	if (!archive->save()) {
 		// If there was an error pop up a message box
 		wxMessageBox(s_fmt("Error:\n%s", Global::error.c_str()), "Error", wxICON_ERROR);
+		return false;
 	}
 
 	// Refresh entry list
 	entry_list->updateList();
+
+	return true;
 }
 
 /* ArchivePanel::saveAs
  * Saves the archive to a new file
  *******************************************************************/
-void ArchivePanel::saveAs() {
+bool ArchivePanel::saveAs() {
 	// Check the archive exists
 	if (!archive)
-		return;
+		return false;
 
 	// Setup file filters (temporary, should go through all archive types somehow)
 	string formats = archive->getFileExtensionString();
 	//string deftype = "*.wad";
-	string filename = wxFileSelector("Save Archive " + archive->getFileName(false) + " As", "", "", wxEmptyString, formats, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+	string filename = wxFileSelector("Save Archive " + archive->getFilename(false) + " As", "", "", wxEmptyString, formats, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 
 	// Check a filename was selected
 	if (!filename.empty()) {
@@ -172,11 +170,14 @@ void ArchivePanel::saveAs() {
 		if (!archive->save(filename)) {
 			// If there was an error pop up a message box
 			wxMessageBox(s_fmt("Error:\n%s", Global::error.c_str()), "Error", wxICON_ERROR);
+			return false;
 		}
 	}
 
 	// Refresh entry list
 	entry_list->updateList();
+
+	return true;
 }
 
 /* ArchivePanel::newEntry
@@ -194,6 +195,10 @@ bool ArchivePanel::newEntry() {
 	if (name == "")
 		return false;
 
+	// Remove any path from the name, if any (for now)
+	wxFileName fn(name);
+	name = fn.GetFullName();
+
 	// Get the entry index of the last selected list item
 	int index = archive->entryIndex(entry_list->getLastSelectedEntry());
 
@@ -204,18 +209,40 @@ bool ArchivePanel::newEntry() {
 		index = -1;	// If not add to the end of the list
 
 	// Add the entry to the archive
-	ArchiveEntry* new_entry = archive->addNewEntry(name, index);
+	ArchiveEntry* new_entry = archive->addNewEntry(name, index, entry_list->getCurrentDir());
 
 	// Return whether the entry was created ok
 	return !!new_entry;
 }
 
-/* ArchivePanel::newEntryFromFile
- * Same as newEntry, but imports a file into the created entry
- *******************************************************************/
-bool ArchivePanel::newEntryFromFile() {
+bool ArchivePanel::newDirectory() {
+	// Check archive supports directories
+	if (archive->getType() != ARCHIVE_ZIP) {
+		wxMessageBox("This Archive format does not support directories", "Can't create new directory", wxICON_ERROR);
+		return false;
+	}
+
+	// Prompt for new directory name
+	string name = wxGetTextFromUser("Enter new directory name:", "New Directory");
+
+	// Check if any name was entered
+	if (name == "")
+		return false;
+
+	// Remove any path from the name, if any (for now)
+	wxFileName fn(name);
+	name = fn.GetFullName();
+
+	// Add the directory to the archive
+	ArchiveTreeNode* dir = archive->createDir(name, entry_list->getCurrentDir());
+
+	// Return whether the directory was created ok
+	return !!dir;
+}
+
+bool ArchivePanel::importFiles() {
 	// Create open file dialog
-	wxFileDialog dialog_open(this, "Choose file to open", wxEmptyString, wxEmptyString,
+	wxFileDialog dialog_open(this, "Choose files to import", wxEmptyString, wxEmptyString,
 			"Any File (*.*)|*.*", wxFD_OPEN|wxFD_MULTIPLE|wxFD_FILE_MUST_EXIST, wxDefaultPosition);
 
 	// Run the dialog & check that the user didn't cancel
@@ -232,146 +259,205 @@ bool ArchivePanel::newEntryFromFile() {
 			index++;
 		else
 			index = -1;	// If not add to the end of the list
-			//index = entry_list->getListSize(); // If not add to the end of the list
 
 		// Go through the list of files
 		bool ok = false;
+		entry_list->Show(false);
+		theSplashWindow->show("Importing Files...", true);
 		for (size_t a = 0; a < files.size(); a++) {
 			// If only 1 file was selected, prompt for a name
-			string name = wxFileName(files[a]).GetName().Upper().Truncate(8);
-			if (files.size() == 1)
-				name = wxGetTextFromUser("Enter new entry name:", "New Entry", name);
+			string name = wxFileName(files[a]).GetFullName();
+
+			// Update splash window
+			theSplashWindow->setProgress(float(a) / float(files.size()));
+			theSplashWindow->setProgressMessage(name);
 
 			// Add the entry to the archive
 			ArchiveEntry* new_entry = archive->addNewEntry(name, index);
 
 			// If the entry was created ok, load the file into it
 			if (new_entry) {
-				new_entry->importFile(files[a]);
+				new_entry->importFile(files[a]);		// Import file to entry
+				EntryType::detectEntryType(new_entry);	// Detect entry type
 				ok = true;
 			}
 
 			index++;
 		}
+		theSplashWindow->hide();
+		entry_list->Show(true);
 
 		return ok;
 	}
-	else // If user canceled return false
+	else	// User cancelled, return false
 		return false;
 }
 
-/* ArchivePanel::renameEntry
- * Renames the selected entries
- *******************************************************************/
+bool ArchivePanel::convertArchiveTo() {
+	wxMessageBox("Not Implemented");
+	return false;
+}
+
+bool ArchivePanel::cleanupArchive() {
+	wxMessageBox("Not Implemented");
+	return false;
+}
+
 bool ArchivePanel::renameEntry() {
 	// Get a list of selected entries
 	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
 
-	// Go through the list
-	for (size_t a = 0; a < selection.size(); a++) {
-		// Get the current entry's name
-		ArchiveEntry* entry = selection[a];
-		string old_name = entry->getName();
+	// Check any are selected
+	if (selection.size() > 0) {
+		// Get a list of entry names
+		wxArrayString names;
+		for (unsigned a = 0; a < selection.size(); a++)
+			names.push_back(selection[a]->getName());
+
+		// Get filter string
+		string filter = Misc::massRenameFilter(names);
 
 		// Prompt for a new name
-		string new_name = wxGetTextFromUser("Enter new entry name:", "New Entry", old_name);
+		string new_name = wxGetTextFromUser("Enter new entry name: (* = unchanged)", "Rename", filter);
 
-		// Rename the entry if a different name was specified
-		if (new_name.Cmp(wxEmptyString) && new_name.Cmp(old_name))
-			archive->renameEntry(entry, new_name);
+		// Apply mass rename to list of names
+		Misc::doMassRename(names, new_name);
+
+		// Go through the list
+		for (size_t a = 0; a < selection.size(); a++) {
+			ArchiveEntry* entry = selection[a];
+
+			// If the entry is a folder then skip it
+			if (entry->getType() == EntryType::folderType())
+				continue;
+
+			// Rename the entry (if needed)
+			if (names[a] != entry->getName())
+				archive->renameEntry(entry, names[a]);
+		}
 	}
 
-	return true;
-}
 
-/* ArchivePanel::deleteEntry
- * Deletes the selected entries
- *******************************************************************/
-bool ArchivePanel::deleteEntry() {
-	// Get a list of selected entries
-	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
-
-	// Clear selection
-	entry_list->clearSelection();
+	// Get a list of selected directories
+	vector<ArchiveTreeNode*> selected_dirs = entry_list->getSelectedDirectories();
 
 	// Go through the list
-	for (int a = selection.size() - 1; a >= 0; a--) {
-		// Remove the current selected entry
-		archive->removeEntry(selection[a]);
-	}
+	for (size_t a = 0; a < selected_dirs.size(); a++) {
+		// Get the current directory's name
+		string old_name = selected_dirs[a]->getName();
 
-	return true;
-}
+		// Prompt for a new name
+		string new_name = wxGetTextFromUser("Enter new directory name:", s_fmt("Rename Directory %s", old_name.c_str()), old_name);
 
-/* ArchivePanel::copyEntry
- * Copies the selected entries
- *******************************************************************/
-bool ArchivePanel::copyEntry() {
-	// Get a list of selected entries
-	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
-
-	// If something is selected, clear the clipboard
-	if (selection.size() > 0)
-		theClipboard->clear();
-	else
-		return false;
-
-	// Copy all selected entries to the clipboard
-	for (size_t a = 0; a < selection.size(); a++)
-		theClipboard->addItem(new EntryClipboardItem(selection[a]));
-
-	return true;
-}
-
-/* ArchivePanel::cutEntry
- * Cuts the selected entries (copy+delete)
- *******************************************************************/
-bool ArchivePanel::cutEntry() {
-	if (copyEntry())
-		return deleteEntry();
-	else
-		return false;
-}
-
-/* ArchivePanel::pasteEntry
- * Pastes any entries on the clipboard either after the last selected
- * entry or at the end of the entry list if nothing is selected
- *******************************************************************/
-bool ArchivePanel::pasteEntry() {
-	// Get the entry index of the last selected list item
-	int index = archive->entryIndex(entry_list->getLastSelectedEntry());
-
-	// If something was selected, add 1 to the index so we add the new entry after the last selected
-	if (index >= 0)
-		index++;
-	else
-		index = -1;	// If not add to the end of the list
-
-	// Go through all items on the clipboard
-	for (uint32_t a = 0; a < theClipboard->nItems(); a++) {
-		// Get the item
-		EntryClipboardItem* item = (EntryClipboardItem*)theClipboard->getItem(a);
-
-		// Check it is of the correct type
-		if (item->getType() != CLIPBOARD_ENTRY)
+		// Do nothing if no name was entered
+		if (new_name.IsEmpty())
 			continue;
 
-		// Add a copy of the entry to the archive
-		archive->addExistingEntry(item->getEntry(), index, true);
-		index++;
-	}
+		// Discard any given path (for now)
+		wxFileName fn(new_name);
+		new_name = fn.GetName();
 
-	// Force entrylist width update
-	//entry_list->columnsUpdate(true);
-	//entry_list->updateListWidth();
-	Layout();
+		// Rename the directory if the new entered name is different from the original
+		if (new_name != old_name)
+			archive->renameDir(selected_dirs[a], new_name);
+	}
 
 	return true;
 }
 
-/* ArchivePanel::importEntry
- * Imports files to the selected entries
- *******************************************************************/
+bool ArchivePanel::deleteEntry() {
+	// Get a list of selected entries
+	vector<ArchiveEntry*> selected_entries = entry_list->getSelectedEntries();
+
+	// Get a list of selected directories
+	vector<ArchiveTreeNode*> selected_dirs = entry_list->getSelectedDirectories();
+
+	// Clear the selection
+	entry_list->clearSelection();
+
+	// Go through the selected entries
+	for (int a = selected_entries.size() - 1; a >= 0; a--) {
+		// Remove the current selected entry if it isn't a directory
+		if (selected_entries[a]->getType() != EntryType::folderType())
+			archive->removeEntry(selected_entries[a]);
+	}
+
+	// Go through the selected directories
+	for (int a = selected_dirs.size() - 1; a >= 0; a--) {
+		// Remove the selected directory from the archive
+		archive->removeDir(selected_dirs[a]->getName(), entry_list->getCurrentDir());
+	}
+
+	return true;
+}
+
+bool ArchivePanel::moveUp() {
+	// Get selection
+	vector<long> selection = entry_list->getSelection();
+
+	// If nothing is selected, do nothing
+	if (selection.size() == 0)
+		return false;
+
+	// If the first selected item is at the top of the list
+	// or before entries start then don't move anything up
+	if (selection[0] <= entry_list->entriesBegin())
+		return false;
+
+	// Move each one up by swapping it with the entry above it
+	for (size_t a = 0; a < selection.size(); a++) {
+		// Get the entries to swap
+		ArchiveEntry* entry = entry_list->getEntry(selection[a]);
+		ArchiveEntry* above = entry_list->getEntry(selection[a]-1);
+
+		// Swap them in the archive
+		archive->swapEntries(entry, above);
+
+		// Swap the selection
+		entry_list->selectItem(selection[a], false);
+		entry_list->selectItem(selection[a] - 1, true);
+	}
+
+	// Return success
+	return true;
+}
+
+bool ArchivePanel::moveDown() {
+	// Get selection
+	vector<long> selection = entry_list->getSelection();
+
+	// If nothing is selected, do nothing
+	if (selection.size() == 0)
+		return false;
+
+	// If the last selected item is at the end of the list
+	// then don't move anything down
+	if (selection.back() == entry_list->GetItemCount()-1)
+		return false;
+
+	// Move each one down by swapping it with the entry below it
+	for (int a = selection.size()-1; a >= 0; a--) {
+		// Get the entries to swap
+		ArchiveEntry* entry = entry_list->getEntry(selection[a]);
+		ArchiveEntry* below = entry_list->getEntry(selection[a]+1);
+
+		// Swap them in the archive
+		archive->swapEntries(entry, below);
+
+		// Swap the selection
+		entry_list->selectItem(selection[a], false);
+		entry_list->selectItem(selection[a] + 1, true);
+	}
+
+	// Return success
+	return true;
+}
+
+bool ArchivePanel::convertEntryTo() {
+	wxMessageBox("Not Implemented");
+	return false;
+}
+
 bool ArchivePanel::importEntry() {
 	// Get a list of selected entries
 	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
@@ -396,234 +482,142 @@ bool ArchivePanel::importEntry() {
 	return true;
 }
 
-/* ArchivePanel::exportEntry
- * Exports the selected entries to files
- *******************************************************************/
 bool ArchivePanel::exportEntry() {
 	// Get a list of selected entries
 	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
 
-	// Go through the list
-	for (size_t a = 0; a < selection.size(); a++) {
+	// If we're just exporting 1 entry
+	if (selection.size() == 1) {
 		// Setup filename
-		wxFileName fn(selection[a]->getName());
+		wxFileName fn(selection[0]->getName());
 
 		// Add appropriate extension if needed
-		fn.SetExt(selection[a]->getType()->getExtension());
+		fn.SetExt(selection[0]->getType()->getExtension());
 
 		// Create save file dialog
-		wxFileDialog *dialog_save = new wxFileDialog(this, s_fmt("Export Entry \"%s\"", selection[a]->getName().c_str()),
+		wxFileDialog *dialog_save = new wxFileDialog(this, s_fmt("Export Entry \"%s\"", selection[0]->getName().c_str()),
 											wxEmptyString, fn.GetFullName(), "Any File (*.*)|*.*", wxFD_SAVE | wxFD_OVERWRITE_PROMPT, wxDefaultPosition);
 
 		// Run the dialog & check that the user didn't cancel
 		if (dialog_save->ShowModal() == wxID_OK) {
 			// If a filename was selected, export it
-			selection[a]->exportFile(dialog_save->GetPath());
+			selection[0]->exportFile(dialog_save->GetPath());
+		}
+
+		return true;
+	}
+	else {
+		// Open dialog to select folder to export to
+		wxDirDialog dd(this, "Select a Directory to Export Entries to");
+
+		if (dd.ShowModal() == wxID_OK) {
+			// Go through the selection
+			for (size_t a = 0; a < selection.size(); a++) {
+				// Setup entry filename
+				wxFileName fn(selection[a]->getName());
+				fn.SetPath(dd.GetPath());
+
+				// Add file extension if it doesn't exist
+				if (!fn.HasExt())
+					fn.SetExt(selection[a]->getType()->getExtension());
+
+				// Do export
+				selection[a]->exportFile(fn.GetFullPath());
+			}
 		}
 	}
 
 	return true;
 }
 
-/* ArchivePanel::exportEntryWad
- * Exports the selected entries to a Wad archive
- *******************************************************************/
-bool ArchivePanel::exportEntryWad() {
-	// Create save file dialog
-	wxFileDialog dialog_save(this, "", wxEmptyString, wxEmptyString,
-								"Doom Wad File (*.wad)|*.wad", wxFD_SAVE | wxFD_OVERWRITE_PROMPT, wxDefaultPosition);
+bool ArchivePanel::exportEntryAs() {
+	wxMessageBox("Not Implemented");
+	return false;
+}
 
-	// Run the dialog & check that the user didn't cancel
-	if (dialog_save.ShowModal() == wxID_OK) {
-		// If a filename was selected, export the selected entries to a wad archive
-		WadArchive::exportEntriesAsWad(dialog_save.GetPath(), entry_list->getSelectedEntries());
-	}
+bool ArchivePanel::copyEntry() {
+	// Get a list of selected entries
+	vector<ArchiveEntry*> entries = entry_list->getSelectedEntries();
+
+	// Get a list of selected directories
+	vector<ArchiveTreeNode*> dirs = entry_list->getSelectedDirectories();
+
+	// If something is selected, clear the clipboard
+	if (entries.size() > 0 || dirs.size() > 0)
+		theClipboard->clear();
+	else
+		return false;
+
+	// Create clipboard item from selection
+	theClipboard->addItem(new EntryTreeClipboardItem(entries, dirs));
 
 	return true;
 }
 
-/* ArchivePanel::moveUp
- * Moves selected entries up
- *******************************************************************/
-bool ArchivePanel::moveUp() {
-	// Get selection
-	vector<long> selection = entry_list->getSelection();
-
-	// If nothing is selected, do nothing
-	if (selection.size() == 0)
+bool ArchivePanel::cutEntry() {
+	if (copyEntry())
+		return deleteEntry();
+	else
 		return false;
-
-	// If the first selected item is at the top of the list
-	// then don't move anything up
-	if (selection[0] == 0)
-		return false;
-
-	// Move each one up by swapping it with the entry above it
-	for (size_t a = 0; a < selection.size(); a++) {
-		// Get the entries to swap
-		ArchiveEntry* entry = archive->getEntry(selection[a]);
-		ArchiveEntry* above = archive->getEntry(selection[a]-1);
-
-		// Swap them in the archive
-		archive->swapEntries(entry, above);
-	}
-
-	// Return success
-	return true;
 }
 
-/* ArchivePanel::moveDown
- * Moves selected entries down
- *******************************************************************/
-bool ArchivePanel::moveDown() {
-	// Get selection
-	vector<long> selection = entry_list->getSelection();
-
-	// If nothing is selected, do nothing
-	if (selection.size() == 0)
+bool ArchivePanel::pasteEntry() {
+	// Do nothing if there is nothing in the clipboard
+	if (theClipboard->nItems() == 0)
 		return false;
 
-	// If the last selected item is at the end of the list
-	// then don't move anything down
-	if (selection.back() == entry_list->GetItemCount()-1)
-		return false;
-
-	// Move each one down by swapping it with the entry below it
-	for (int a = selection.size()-1; a >= 0; a--) {
-		// Get the entries to swap
-		ArchiveEntry* entry = archive->getEntry(selection[a]);
-		ArchiveEntry* below = archive->getEntry(selection[a]+1);
-
-		// Swap them in the archive
-		archive->swapEntries(entry, below);
-	}
-
-	// Return success
-	return true;
-}
-
-/* ArchivePanel::gfxConvert
- * Runs the Gfx Conversion Dialog on all selected entries
- *******************************************************************/
-bool ArchivePanel::gfxConvert() {
-	// Create gfx conversion dialog
-	GfxConvDialog gcd;
-
-	// Send entries to the gcd
-	gcd.openEntries(entry_list->getSelectedEntries());
-
-	// Run the gcd
-	gcd.ShowModal();
-
-	return true;
-}
-
-/* ArchivePanel::gfxModifyOffsets
- * Runs the Modify Offsets Dialog and applies the selected offset
- * settings to all selected entries
- *******************************************************************/
-bool ArchivePanel::gfxModifyOffsets() {
-	// Create modify offsets dialog
-	ModifyOffsetsDialog mod;
-
-	// Run the dialog
-	if (mod.ShowModal() == wxID_CANCEL)
-		return false;
-
-	// Go through selected entries
-	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
-	for (uint32_t a = 0; a < selection.size(); a++)
-		EntryOperations::modifyGfxOffsets(selection[a], mod.getAlignType(), mod.getOffset(), mod.xOffChange(), mod.yOffChange(), mod.relativeOffset());
-
-	return true;
-}
-
-/* ArchivePanel::basConvert
- * Create a new entry after the current one and fill it with an
- * ANIMDEFS conversion of a Boom ANIMATED or SWITCHES lump.
- *******************************************************************/
-bool ArchivePanel::basConvert() {
 	// Get the entry index of the last selected list item
-	int index = archive->entryIndex(entry_list->getLastSelectedEntry());
+	int index = archive->entryIndex(entry_list->getLastSelectedEntry(), entry_list->getCurrentDir());
 
 	// If something was selected, add 1 to the index so we add the new entry after the last selected
 	if (index >= 0)
 		index++;
 	else
-		return false; // If not there's a problem
+		index = -1;	// If not add to the end of the list
 
-	// Get a list of selected entries
-	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
+	// Go through all clipboard items
+	bool pasted = false;
+	for (unsigned a = 0; a < theClipboard->nItems(); a++) {
+		// Check item type
+		if (theClipboard->getItem(a)->getType() != CLIPBOARD_ENTRY_TREE)
+			continue;
 
-	// Create new entry
-	ArchiveEntry * animdef = archive->addNewEntry((archive->getType() == ARCHIVE_WAD ?
-		"ANIMDEFS" : "animdefs.txt"), index);
+		// Get clipboard item
+		EntryTreeClipboardItem* clip = (EntryTreeClipboardItem*)theClipboard->getItem(a);
 
-	if (animdef) {
-		// Create the memory buffer
-		MemChunk animdata(38);
-		animdata.seek(0, SEEK_SET);
-		animdata.write("// ANIMDEFS lump generated by SLADE3\n\n", 38);
-
-		// Check each selected entry for possible conversion
-		for (size_t a = 0; a < selection.size(); a++) {
-			if (selection[a]->getType()->getFormat() == "animated")
-				AnimatedList::convertAnimated(selection[a], &animdata);
-			else if (selection[a]->getType()->getFormat() == "switches")
-				SwitchesList::convertSwitches(selection[a], &animdata);
-		}
-		animdef->importMemChunk(animdata);
-
-		wxLogMessage("Treatment complete\n");
-		// Identify the new lump as what it is
-		EntryType::detectEntryType(animdef);
-		// Failsafe is detectEntryType doesn't accept to work, grumble
-		if (animdef->getType() == EntryType::unknownType())
-			animdef->setType(EntryType::getType("animdefs"));
+		// Merge it in
+		entry_list->getCurrentDir()->merge(clip->getTree(), index);
+		pasted = true;
 	}
 
-	// Force entrylist width update
-	Layout();
+	if (pasted) {
+		// Update archive
+		archive->setModified(true);
 
-	// Load entry data into the text editor
-	DefaultEntryPanel * meh = (DefaultEntryPanel *)default_area;
-	meh->openTextEntry(animdef);
-
-	return true;
+		return true;
+	}
+	else
+		return false;
 }
 
-/* ArchivePanel::palConvert
- * turns a palette from 6-bit to 8-bit
- *******************************************************************/
+bool ArchivePanel::gfxConvert() {
+	wxMessageBox("Not Implemented");
+	return false;
+}
+
+bool ArchivePanel::gfxModifyOffsets() {
+	wxMessageBox("Not Implemented");
+	return false;
+}
+
+bool ArchivePanel::basConvert() {
+	wxMessageBox("Not Implemented");
+	return false;
+}
+
 bool ArchivePanel::palConvert() {
-	// Get the entry index of the last selected list item
-	ArchiveEntry* pal6bit = entry_list->getLastSelectedEntry();
-	const uint8_t * mehmeh = pal6bit->getData(true);
-	uint8_t * meh = new uint8_t[pal6bit->getSize()];
-	memcpy(meh, mehmeh, pal6bit->getSize());
-	for (size_t i = 0; i < pal6bit->getSize(); ++i)
-	{
-		meh[i] = ((meh[i] << 2) | (meh[i] >> 6));
-	}
-	pal6bit->importMem(meh, pal6bit->getSize());
-	delete[] meh;
-	return true;
-}
-
-/* ArchivePanel::onAnnouncement
- * Called when an announcement is recieved from the archive that
- * this ArchivePanel is managing
- *******************************************************************/
-void ArchivePanel::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
-	// Reset event data for reading
-	event_data.seek(0, SEEK_SET);
-
-	// If the archive was saved
-	if (announcer == archive && event_name == "saved") {
-		// Update this tab's name in the parent notebook (if filename was changed)
-		wxAuiNotebook* parent = (wxAuiNotebook*)GetParent();
-		parent->SetPageText(parent->GetPageIndex(this), archive->getFileName(false));
-	}
+	wxMessageBox("Not Implemented");
+	return false;
 }
 
 /* ArchivePanel::openEntry
@@ -700,6 +694,102 @@ bool ArchivePanel::showEntryPanel(EntryPanel* new_area, bool ask_save) {
 	return true;
 }
 
+void ArchivePanel::handleAction(int menu_id) {
+	// *************************************************************
+	// FILE MENU
+	// *************************************************************
+
+	// File->Save
+	if (menu_id == MainWindow::MENU_FILE_SAVE)
+		save();
+
+	// File->Save As
+	else if (menu_id == MainWindow::MENU_FILE_SAVEAS)
+		saveAs();
+
+	// File->Close
+	else if (menu_id == MainWindow::MENU_FILE_CLOSE)
+		theArchiveManager->closeArchive(archive);
+
+
+	// *************************************************************
+	// ARCHIVE MENU
+	// *************************************************************
+
+	// Archive->New->Entry
+	else if (menu_id == MainWindow::MENU_ARCHIVE_NEWENTRY)
+		newEntry();
+
+	// Archive->New->Directory
+	else if (menu_id == MainWindow::MENU_ARCHIVE_NEWDIRECTORY)
+		newDirectory();
+
+	// Archive->Import Files
+	else if (menu_id == MainWindow::MENU_ARCHIVE_IMPORTFILES)
+		importFiles();
+
+	// Archive->Convert To...
+	else if (menu_id == MainWindow::MENU_ARCHIVE_CONVERTTO)
+		convertArchiveTo();
+
+	// Archive->Clean Up
+	else if (menu_id == MainWindow::MENU_ARCHIVE_CLEANUP)
+		cleanupArchive();
+
+
+	// *************************************************************
+	// ENTRY MENU
+	// *************************************************************
+
+	// Entry->Rename
+	else if (menu_id == MainWindow::MENU_ENTRY_RENAME)
+		renameEntry();
+
+	// Entry->Delete
+	else if (menu_id == MainWindow::MENU_ENTRY_DELETE)
+		deleteEntry();
+
+	// Entry->Move Up
+	else if (menu_id == MainWindow::MENU_ENTRY_MOVEUP)
+		moveUp();
+
+	// Entry->Move Down
+	else if (menu_id == MainWindow::MENU_ENTRY_MOVEDOWN)
+		moveDown();
+
+	// Entry->Convert To...
+	else if (menu_id == MainWindow::MENU_ENTRY_CONVERTTO)
+		convertEntryTo();
+
+	// Entry->Import
+	else if (menu_id == MainWindow::MENU_ENTRY_IMPORT)
+		importEntry();
+
+	// Entry->Export
+	else if (menu_id == MainWindow::MENU_ENTRY_EXPORT)
+		exportEntry();
+
+	// Entry->Export As...
+	else if (menu_id == MainWindow::MENU_ENTRY_EXPORTAS)
+		exportEntryAs();
+}
+
+/* ArchivePanel::onAnnouncement
+ * Called when an announcement is recieved from the archive that
+ * this ArchivePanel is managing
+ *******************************************************************/
+void ArchivePanel::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
+	// Reset event data for reading
+	event_data.seek(0, SEEK_SET);
+
+	// If the archive was saved
+	if (announcer == archive && event_name == "saved") {
+		// Update this tab's name in the parent notebook (if filename was changed)
+		wxAuiNotebook* parent = (wxAuiNotebook*)GetParent();
+		parent->SetPageText(parent->GetPageIndex(this), archive->getFilename(false));
+	}
+}
+
 
 /*******************************************************************
  * ARCHIVEPANEL EVENTS
@@ -757,6 +847,7 @@ void ArchivePanel::onEntryListFocusChange(wxListEvent& e) {
  * Called when the entry list is right clicked
  *******************************************************************/
 void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
+	/*
 	// Generate context menu
 	wxMenu* context = new wxMenu();
 	context->Append(MENU_ENTRY_RENAME, "Rename");
@@ -816,12 +907,14 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 
 	// Popup the context menu
 	PopupMenu(context);
+	*/
 }
 
 /* ArchivePanel::onEntryMenuClick
  * Called when an entry menu item is selected
  *******************************************************************/
 void ArchivePanel::onEntryMenuClick(wxCommandEvent& e) {
+	/*
 	switch (e.GetId()) {
 		case MENU_ENTRY_RENAME:
 			renameEntry();
@@ -866,6 +959,7 @@ void ArchivePanel::onEntryMenuClick(wxCommandEvent& e) {
 			palConvert();
 			break;
 	}
+	*/
 }
 
 /* ArchivePanel::onEntryListKeyDown
@@ -901,8 +995,8 @@ void ArchivePanel::onEntryListKeyDown(wxKeyEvent& e) {
 		exportEntry();
 
 	// Export entry to wad (Shift+Ctrl+E)
-	else if (e.GetKeyCode() == 'E' && e.ShiftDown() && e.ControlDown())
-		exportEntryWad();
+	//else if (e.GetKeyCode() == 'E' && e.ShiftDown() && e.ControlDown())
+	//	exportEntryWad();
 
 	// Move entry up (Ctrl+U or Ctrl+Up Arrow)
 	else if (e.ControlDown() && (e.GetKeyCode() == 'U' || e.GetKeyCode() == WXK_UP))
@@ -921,8 +1015,8 @@ void ArchivePanel::onEntryListKeyDown(wxKeyEvent& e) {
 		newEntry();
 
 	// New entry from file (Shift+Ctrl+N)
-	else if (e.GetKeyCode() == 'N' && e.ControlDown() && e.ShiftDown())
-		newEntryFromFile();
+	//else if (e.GetKeyCode() == 'N' && e.ControlDown() && e.ShiftDown())
+	//	newEntryFromFile();
 
 	// Not handled here, send off to be handled by a parent window
 	else

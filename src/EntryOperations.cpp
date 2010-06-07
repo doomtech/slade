@@ -86,7 +86,7 @@ bool EntryOperations::modifyGfxOffsets(ArchiveEntry* entry, int auto_type, point
 	string entryformat = type->getFormat();
 	if (!(entryformat == "img_doom" || entryformat == "img_doom_arah" ||
 		entryformat == "img_doom_alpha" || "img_doom_beta" || entryformat == "img_png")) {
-		wxLogMessage(s_fmt("Entry \"%s\" is of type \"%s\" which does not support offsets", entry->getName().c_str(), entry->getTypeString().c_str()));
+		wxLogMessage(s_fmt("Entry \"%s\" is of type \"%s\" which does not support offsets", chr(entry->getName()), chr(entry->getType()->getName())));
 		return false;
 	}
 
@@ -311,7 +311,7 @@ bool EntryOperations::modifyalPhChunk(ArchiveEntry* entry, bool value) {
 
 	// Check entry type
 	if (!(entry->getType()->getFormat() == "img_png")) {
-		wxLogMessage(s_fmt("Entry \"%s\" is of type \"%s\" rather than PNG", entry->getName().c_str(), entry->getTypeString().c_str()));
+		wxLogMessage(s_fmt("Entry \"%s\" is of type \"%s\" rather than PNG", chr(entry->getName()), chr(entry->getType()->getName())));
 		return false;
 	}
 

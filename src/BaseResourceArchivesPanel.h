@@ -11,8 +11,8 @@ private:
 public:
 	BaseResourceArchivesPanel(wxWindow* parent);
 	~BaseResourceArchivesPanel();
-	
-	string	getSelectedPath();
+
+	int		getSelectedPath();
 
 	void	onBtnAdd(wxCommandEvent& e);
 	void	onBtnRemove(wxCommandEvent& e);

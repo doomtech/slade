@@ -53,26 +53,6 @@ bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry) {
 	if (entry->getType() == EntryType::unknownType())
 		EntryType::detectEntryType(entry);
 
-	/*
-	switch (entry->getType()->getFormat()) {
-#define xa(id, name, val)
-#define xb(id, name)
-#define xx(id, name, func)
-#define xy(id, name, func, load)	case id: return image->load(entry->getData(true), entry->getSize());
-#define xz(id, name)
-#include "EntryTypeList.h"
-
-		// General image formats (that FreeImage supports at least)
-		default:
-			if (!image->loadImage(entry->getData(true), entry->getSize())) {
-				Global::error = "Image format not supported by FreeImage";
-				return false;
-			}
-			else
-				return true;
-	}
-	*/
-
 	// Check for format "image" property
 	if (!entry->getType()->extraProps().propertyExists("image")) {
 		Global::error = "Entry type is not a valid image";
@@ -213,46 +193,59 @@ string Misc::sizeAsString(uint32_t size) {
 	}
 }
 
-// TODO: Ideally later this should be replaced by some kind of
-// 'namespace' functionality in the archive system
-bool Misc::addPatchEntry(Archive* archive, ArchiveEntry* entry) {
-	// Check entry & archive were given
-	if (!entry || !archive)
-		return false;
+string Misc::massRenameFilter(wxArrayString& names) {
+	// Check any names were given
+	if (names.size() == 0)
+		return "";
 
-	// If archive is a wad
-	if (archive->getType() == ARCHIVE_WAD) {
-		// Get archive as wad
-		WadArchive* wad = (WadArchive*)archive;
+	// Init filter string
+	string filter = names[0];
 
-		// Check if any patches exist
-		if (!wad->patchesBegin()) {
-			// None currently exist, create P_START and P_END markers
-			ArchiveEntry* p_start = wad->addNewEntry("P_START", wad->numEntries());
-			ArchiveEntry* p_end = wad->addNewEntry("P_END", wad->numEntries());
+	// Go through names
+	for (unsigned a = 1; a < names.size(); a++) {
+		// If the filter string is shorter than this name, extend it with *s
+		while (filter.size() < names[a].size())
+			filter += '*';
 
-			// Update patches start and end variables
-			wad->setPatchMarkers(p_start, p_end);
+		// Check each character
+		for (unsigned c = 0; c < names[a].size(); c++) {
+			// Skip if current filter character is *
+			if (filter[c] == '*')
+				continue;
+
+			// Check for character mismatch
+			if (filter[c] != names[a][c])
+				filter[c] = '*';
 		}
-
-		// Add the entry to the wad at the end of the patches namespace
-		wad->addExistingEntry(entry, wad->entryIndex(wad->patchesEnd()));
-
-		return true;
 	}
 
-	// If archive is a zip
-	else if (archive->getType() == ARCHIVE_ZIP) {
-		// Get archive as zip
-		ZipArchive* zip = (ZipArchive*)archive;
-
-		// Add the entry to the patches folder
-		entry->extraProp("Directory") = wxString("patches/");
-		zip->addExistingEntry(entry, 99999999);
-	}
-
-	return false;
+	return filter;
 }
+
+void Misc::doMassRename(wxArrayString& names, string name_filter) {
+	// Remove any *s from the end of name_filter
+	while (name_filter.EndsWith("*"))
+		name_filter.RemoveLast(1);
+
+	// Go through names
+	for (unsigned a = 0; a < names.size(); a++) {
+		string& name = names[a];
+
+		// If this name is shorter than the filter string, extend it with spaces
+		while (name.size() < name_filter.size())
+			name += " ";
+
+		// Go through characters
+		for (unsigned c = 0; c < name_filter.size(); c++) {
+			// Check character
+			if (name_filter[c] == '*')
+				continue;					// Skip if *
+			else
+				name[c] = name_filter[c];	// Otherwise replace character
+		}
+	}
+}
+
 
 
 

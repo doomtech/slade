@@ -172,7 +172,7 @@ void VirtualListView::onMouseLeftDown(wxMouseEvent& e) {
 	int flags = 0;
 	long item = this->HitTest(wxPoint(e.GetX(), e.GetY()), flags);
 	if (flags & wxLIST_HITTEST_ONITEM) {
-		if (e.ShiftDown()) {
+		if (e.GetModifiers() == wxMOD_SHIFT) {
 			// Shift+left click: Add all items between the focused item and the item that was clicked to the selection
 			long focus = getFocus();
 			if (focus < 0) focus = last_focus;		// If no current focus, go with last focused item
@@ -180,14 +180,14 @@ void VirtualListView::onMouseLeftDown(wxMouseEvent& e) {
 			focusItem(item);
 			sendSelectionChangedEvent();
 		}
-		else if (e.ControlDown()) {
+		else if (e.GetModifiers() == wxMOD_CONTROL) {
 			// Ctrl+left click: Toggle the selection status of the clicked item
 			bool selected = !!(GetItemState(item, wxLIST_STATE_SELECTED) & wxLIST_STATE_SELECTED);
 			selectItem(item, !selected);
 			focusItem(item, !selected);
 			sendSelectionChangedEvent();
 		}
-		else {
+		else if (e.GetModifiers() == wxMOD_NONE)  {
 			// Just a left click, select+focus the item
 			clearSelection();
 			selectItem(item);
@@ -198,9 +198,6 @@ void VirtualListView::onMouseLeftDown(wxMouseEvent& e) {
 }
 
 void VirtualListView::onKeyDown(wxKeyEvent& e) {
-	// up/down - sets selection+focus to item above/below current focus
-	// shift+up/down - same as up/down but doesn't clear previous selection
-	// ctrl+up/down - does nothing
 	if (e.GetKeyCode() == WXK_UP) {
 		if (e.GetModifiers() == wxMOD_SHIFT) {
 			long focus = getFocus();
