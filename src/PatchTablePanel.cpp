@@ -94,7 +94,7 @@ string PatchTableListView::getItemText(long item, long column) const {
 			if (patch.entry)
 				return patch.entry->getParent()->getFilename(false);
 			else
-				return "NOT FOUND";
+				return "(!) NOT FOUND";
 		}
 	}
 	else									// Invalid column
@@ -106,6 +106,10 @@ string PatchTableListView::getItemText(long item, long column) const {
  * not found, default otherwise)
  *******************************************************************/
 void PatchTableListView::updateItemAttr(long item) const {
+	// Just set normal text colour
+	item_attr->SetTextColour(wxSystemSettings::GetColour(wxSYS_COLOUR_LISTBOXTEXT));
+
+	/*
 	// Init attributes (to error colour)
 	item_attr->SetTextColour(ListView::colourError());
 
@@ -123,6 +127,14 @@ void PatchTableListView::updateItemAttr(long item) const {
 	// Set normal colour if patch is ok
 	if (patch.entry)
 		item_attr->SetTextColour(wxSystemSettings::GetColour(wxSYS_COLOUR_LISTBOXTEXT));
+	/*else {
+		// Attempt to find the patch's entry
+		patch_table->updatePatchEntry(item);
+
+		// If it was found set normal colour
+		if (patch.entry)
+			item_attr->SetTextColour(wxSystemSettings::GetColour(wxSYS_COLOUR_LISTBOXTEXT));
+	}*/
 }
 
 /* PatchTableListView::updateList
