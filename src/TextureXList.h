@@ -48,6 +48,8 @@ public:
 	tx_texture_t	getTexture(size_t index);
 	tx_texture_t	getTexture(string name);
 
+	void	addTexture(tx_texture_t& tex, int position = -1);
+
 	void	clear(bool clear_patches = false);
 	void	removePatch(unsigned index);
 

@@ -36,139 +36,6 @@
 
 
 /*******************************************************************
- * TEXTUREXPANEL CLASS FUNCTIONS
- *******************************************************************/
-
-/* TextureXPanel::TextureXPanel
- * TextureXPanel class constructor
- *******************************************************************/
-TextureXPanel::TextureXPanel(wxWindow* parent, PatchTable* patch_table) : wxPanel(parent, -1) {
-	// Init variables
-	tx_entry = NULL;
-	this->patch_table = patch_table;
-
-	// Setup sizer
-	wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
-	SetSizer(sizer);
-
-	// Add textures list
-	wxStaticBox* frame = new wxStaticBox(this, -1, "Textures");
-	wxStaticBoxSizer* framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
-	list_textures = new ListView(this, -1);
-	list_textures->showIcons(false);
-	framesizer->Add(list_textures, 1, wxEXPAND|wxALL, 4);
-	sizer->Add(framesizer, 0, wxEXPAND|wxALL, 4);
-
-	// New Texture button
-	btn_new_texture = new wxButton(this, -1, "New");
-	framesizer->Add(btn_new_texture, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
-
-	// New Texture from Patch button
-	btn_new_from_patch = new wxButton(this, -1, "New From Patch");
-	framesizer->Add(btn_new_from_patch, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
-
-	// Remove Texture button
-	btn_remove_texture = new wxButton(this, -1, "Remove");
-	framesizer->Add(btn_remove_texture, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
-
-	// Add texture editor area
-	texture_editor = new TextureEditorPanel(this, patch_table);
-	sizer->Add(texture_editor, 1, wxEXPAND|wxALL, 4);
-
-	// Bind events
-	list_textures->Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &TextureXPanel::onTextureListSelect, this);
-
-	// Disable unimplemented
-	btn_new_texture->Enable(false);
-	btn_new_from_patch->Enable(false);
-	btn_remove_texture->Enable(false);
-}
-
-/* TextureXPanel::~TextureXPanel
- * TextureXPanel class destructor
- *******************************************************************/
-TextureXPanel::~TextureXPanel() {
-	// FIXME: Can cause crash if archive is closed before this
-	if (tx_entry)
-		tx_entry->unlock();
-}
-
-/* TextureXPanel::openTEXTUREX
- * Loads a TEXTUREX format texture list into the editor
- *******************************************************************/
-bool TextureXPanel::openTEXTUREX(ArchiveEntry* entry) {
-	if (texturex.readTEXTUREXData(entry)) {
-		tx_entry = entry;
-
-		// Update patch table usage info
-		for (size_t a = 0; a < texturex.nTextures(); a++) {
-			tx_texture_t tex = texturex.getTexture(a);
-
-			// Go through texture's patches
-			for (size_t p = 0; p < tex.patches.size(); p++)
-				patch_table->patch(tex.patches[p].patch).used += 1;
-		}
-
-		return true;
-	}
-	else
-		return false;
-}
-
-/* TextureXPanel::populateTextureList
- * Populates the texture list with all textures in the TextureXList
- *******************************************************************/
-void TextureXPanel::populateTextureList() {
-	// Clear current list
-	list_textures->ClearAll();
-	list_textures->Show(false);
-
-	// Add columns
-	list_textures->InsertColumn(0, "Name");
-
-	// Add each texture to the list
-	list_textures->enableSizeUpdate(false);
-	for (uint32_t a = 0; a < texturex.nTextures(); a++) {
-		tx_texture_t tex = texturex.getTexture(a);
-		list_textures->addItem(a, (tex.name));
-	}
-
-	// Update list width
-	list_textures->Show(true);
-	list_textures->enableSizeUpdate(true);
-	list_textures->updateSize();
-	list_textures->GetParent()->Layout();
-}
-
-/* TextureXPanel::updateTextureListItem
- * Updates the texture list item at [index]
- *******************************************************************/
-bool TextureXPanel::updateTextureListItem(int index) {
-	return false;
-}
-
-/* TextureXPanel::setPalette
- * Sets the texture editor's palette
- *******************************************************************/
-void TextureXPanel::setPalette(Palette8bit *pal) {
-	texture_editor->setPalette(pal);
-}
-
-
-/*******************************************************************
- * TEXTUREXPANEL EVENTS
- *******************************************************************/
-
-/* TextureXPanel::onTextureListSelect
- * Called when an item on the texture list is selected
- *******************************************************************/
-void TextureXPanel::onTextureListSelect(wxListEvent& e) {
-	tx_texture_t tex = texturex.getTexture(e.GetIndex());
-	texture_editor->openTexture(tex);
-}
-
-
-/*******************************************************************
  * TEXTUREXEDITOR CLASS FUNCTIONS
  *******************************************************************/
 
@@ -265,7 +132,7 @@ bool TextureXEditor::openArchive(Archive* archive) {
 
 		// Open TEXTUREX entry
 		if (tx_panel->openTEXTUREX(tx_entries[a])) {
-			tx_panel->populateTextureList();							// Populate texture list
+			//tx_panel->populateTextureList();							// Populate texture list
 			tx_panel->setPalette(pal_chooser->getSelectedPalette());	// Set palette
 			tx_entries[a]->lock();										// Lock entry
 

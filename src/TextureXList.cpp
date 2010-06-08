@@ -81,6 +81,14 @@ tx_texture_t TextureXList::getTexture(string name) {
 	return tex_invalid;
 }
 
+void TextureXList::addTexture(tx_texture_t& tex, int position) {
+	// Add it to the list at position if valid
+	if (position < textures.size() && position >= 0)
+		textures.insert(textures.begin() + position, tex);
+	else
+		textures.push_back(tex);
+}
+
 /* TextureXList::clear
  * Clears all textures
  *******************************************************************/

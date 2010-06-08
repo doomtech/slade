@@ -120,6 +120,7 @@
     <ClCompile Include="src\OpenGL.cpp" />
     <ClCompile Include="src\Parser.cpp" />
     <ClCompile Include="src\TextLanguage.cpp" />
+    <ClCompile Include="src\TextureXPanel.cpp" />
     <ClCompile Include="src\Tokenizer.cpp" />
     <ClCompile Include="src\Tree.cpp" />
     <ClCompile Include="src\VirtualListView.cpp" />
@@ -204,6 +205,7 @@
     <ClInclude Include="src\Parser.h" />
     <ClInclude Include="src\Structs.h" />
     <ClInclude Include="src\TextLanguage.h" />
+    <ClInclude Include="src\TextureXPanel.h" />
     <ClInclude Include="src\Tokenizer.h" />
     <ClInclude Include="src\Tree.h" />
     <ClInclude Include="src\VirtualListView.h" />

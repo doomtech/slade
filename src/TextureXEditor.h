@@ -2,12 +2,12 @@
 #ifndef __TEXTUREX_EDITOR_H__
 #define __TEXTUREX_EDITOR_H__
 
+#include "TextureXPanel.h"
 #include "TextureEditorPanel.h"
 #include "PatchTablePanel.h"
 #include "Archive.h"
 #include "PatchTable.h"
 #include "ListView.h"
-#include "TextureXList.h"
 #include "PaletteChooser.h"
 #include <wx/aui/auibook.h>
 
@@ -39,33 +39,6 @@ PatchTablePanel
 - Has a pointer to TextureXEditor::PatchTable
 
 */
-
-class TextureXPanel : public wxPanel {
-private:
-	TextureXList		texturex;
-	PatchTable*			patch_table;
-	ArchiveEntry*		tx_entry;
-
-	ListView*			list_textures;
-	TextureEditorPanel*	texture_editor;
-	wxButton*			btn_new_texture;
-	wxButton*			btn_new_from_patch;
-	wxButton*			btn_remove_texture;
-
-public:
-	TextureXPanel(wxWindow* parent, PatchTable* patch_table);
-	~TextureXPanel();
-
-	TextureXList&	txList() { return texturex; }
-
-	bool	openTEXTUREX(ArchiveEntry* texturex);
-	void	populateTextureList();
-	bool	updateTextureListItem(int index);
-	void	setPalette(Palette8bit* pal);
-
-	// Events
-	void	onTextureListSelect(wxListEvent& e);
-};
 
 class TextureXEditor : public wxPanel {
 private:

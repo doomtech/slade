@@ -811,6 +811,10 @@ void ArchivePanel::handleAction(int menu_id) {
 	else if (menu_id == MainWindow::MENU_ARCHIVE_IMPORTFILES)
 		importFiles();
 
+	// Archive->Texture Editor
+	else if (menu_id == MainWindow::MENU_ARCHIVE_TEXEDITOR)
+		theArchiveManager->openTextureEditor(theArchiveManager->archiveIndex(archive));
+
 	// Archive->Convert To...
 	else if (menu_id == MainWindow::MENU_ARCHIVE_CONVERTTO)
 		convertArchiveTo();
