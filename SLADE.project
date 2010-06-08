@@ -82,6 +82,8 @@
         <File Name="src/TextureEditorPanel.h"/>
         <File Name="src/TextureXEditor.cpp"/>
         <File Name="src/TextureXEditor.h"/>
+        <File Name="src/TextureXPanel.cpp"/>
+        <File Name="src/TextureXPanel.h"/>
       </VirtualDirectory>
       <File Name="src/ArchivePanel.cpp"/>
       <File Name="src/ArchivePanel.h"/>
