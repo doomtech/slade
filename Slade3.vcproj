@@ -458,18 +458,6 @@
 					</File>
 				</Filter>
 				<Filter
-					Name="ZipArchivePanel"
-					>
-					<File
-						RelativePath=".\src\ZipArchivePanel.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\src\ZipArchivePanel.h"
-						>
-					</File>
-				</Filter>
-				<Filter
 					Name="TextureXEditor"
 					>
 					<File
@@ -494,6 +482,14 @@
 					</File>
 					<File
 						RelativePath=".\src\TextureXEditor.h"
+						>
+					</File>
+					<File
+						RelativePath=".\src\TextureXPanel.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\TextureXPanel.h"
 						>
 					</File>
 				</Filter>
@@ -951,14 +947,6 @@
 				</File>
 				<File
 					RelativePath=".\src\VirtualListView.h"
-					>
-				</File>
-				<File
-					RelativePath=".\src\ZipArchiveEntryList.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\ZipArchiveEntryList.h"
 					>
 				</File>
 			</Filter>

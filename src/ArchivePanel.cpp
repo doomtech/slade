@@ -842,11 +842,11 @@ void ArchivePanel::handleAction(int menu_id) {
 
 	// Entry->Copy
 	else if (menu_id == MainWindow::MENU_ENTRY_COPY)
-		cutEntry();
+		copyEntry();
 
 	// Entry->Paste
 	else if (menu_id == MainWindow::MENU_ENTRY_PASTE)
-		cutEntry();
+		pasteEntry();
 
 	// Entry->Move Up
 	else if (menu_id == MainWindow::MENU_ENTRY_MOVEUP)
