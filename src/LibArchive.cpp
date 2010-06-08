@@ -300,20 +300,38 @@ bool LibArchive::isLibArchive(MemChunk& mc) {
 
 	// Check directory offset is decent
 	mc.seek(dir_offset, SEEK_SET);
+	char myname[13] = "";
 	uint32_t offset = 0;
 	uint32_t size = 0;
 	uint8_t dummy = 0;
 	mc.read(&size, 4);		// Size
 	mc.read(&offset, 4);	// Offset
+	mc.read(myname, 12);	// Name
 	mc.read(&dummy, 1);		// Separator
 	offset = wxINT32_SWAP_ON_BE(offset);
 	size = wxINT32_SWAP_ON_BE(size);
+	myname[12] = '\0';
 
 	// If the lump data goes past the directory,
 	// the library is invalid
 	if (dummy != 0 || offset != 0 || offset + size > mc.getSize()) {
 		return false;
 	}
+
+	// Check that the file name given for the first lump is acceptable
+	int filnamlen = 0;
+	for (; filnamlen < 13; ++filnamlen) {
+		if (myname[filnamlen] == 0)
+			break;
+		if (myname[filnamlen] < 33 || myname[filnamlen] > 126 ||
+			myname[filnamlen] == '"' || myname[filnamlen] == '*' || myname[filnamlen] == '/' ||
+			myname[filnamlen] == ':' || myname[filnamlen] == '<' || myname[filnamlen] == '?' ||
+			myname[filnamlen] == '\\' || myname[filnamlen] == '|')
+			return false;
+	}
+	// At a minimum, one character for the name and the dot separating it from the extension
+	if (filnamlen < 2)
+		return false;
 
 	// If it's passed to here it's probably a lib file
 	return true;
@@ -327,7 +345,7 @@ bool LibArchive::isLibArchive(string filename) {
 	if (!file.IsOpened())
 		return false;
 	// Read lib footer
-	file.Seek(2, wxFromEnd);
+	file.Seek(file.Length() - 2, wxFromStart); // wxFromEnd does not work for some reason
 	uint32_t num_lumps = 0;
 	file.Read(&num_lumps, 2);		// Size
 	num_lumps = wxINT16_SWAP_ON_BE(num_lumps);
@@ -339,20 +357,37 @@ bool LibArchive::isLibArchive(string filename) {
 
 	// Check directory offset is decent
 	file.Seek(dir_offset, wxFromStart);
+	char myname[13] = "";
 	uint32_t offset = 0;
 	uint32_t size = 0;
 	uint8_t dummy = 0;
 	file.Read(&size, 4);	// Size
 	file.Read(&offset, 4);	// Offset
+	file.Read(myname, 12);	// Name
 	file.Read(&dummy, 1);	// Separator
 	offset = wxINT32_SWAP_ON_BE(offset);
 	size = wxINT32_SWAP_ON_BE(size);
+	myname[12] = '\0';
 
 	// If the lump data goes past the directory,
 	// the library is invalid
 	if (dummy != 0 || offset != 0 || offset + size > file.Length()) {
 		return false;
 	}
+	// Check that the file name given for the first lump is acceptable
+	int filnamlen = 0;
+	for (; filnamlen < 13; ++filnamlen) {
+		if (myname[filnamlen] == 0)
+			break;
+		if (myname[filnamlen] < 33 || myname[filnamlen] > 126 ||
+			myname[filnamlen] == '"' || myname[filnamlen] == '*' || myname[filnamlen] == '/' ||
+			myname[filnamlen] == ':' || myname[filnamlen] == '<' || myname[filnamlen] == '?' ||
+			myname[filnamlen] == '\\' || myname[filnamlen] == '|')
+			return false;
+	}
+	// At a minimum, one character for the name and the dot separating it from the extension
+	if (filnamlen == 0)
+		return false;
 
 	// If it's passed to here it's probably a lib file
 	return true;

@@ -420,7 +420,7 @@ bool ArchiveManager::openBaseResource(int index) {
 	}
 
 	// Check index
-	if (index < 0 || index >= base_resource_paths.size()) {
+	if (index < 0 || (unsigned)index >= base_resource_paths.size()) {
 		base_resource = -1;
 		announce("base_resource_changed");
 		return false;
