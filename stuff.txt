@@ -67,6 +67,8 @@ TODO List ---------------------------------------------------------------
 	- Need a better way of entry searching in zips (currently can only search by full path)
 	- Some kind of namespace feature would be good
 - Needs some kind of proper archive type system, handled by ArchiveManager
+- Need to do something about keeping ArchiveEntry.data.size and ArchiveEntry.size in sync
+  (Still need the size member for entries that don't have their data loaded into memory yet)
 
 
 Unimplemented Feature Requests ------------------------------------------

@@ -387,7 +387,7 @@ bool ArchiveEntry::read(void* buf, uint32_t size) {
 }
 
 string ArchiveEntry::getSizeString() {
-	return Misc::sizeAsString(size);
+	return Misc::sizeAsString(getSize());
 }
 
 void ArchiveEntry::stateChanged() {
