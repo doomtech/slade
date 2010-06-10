@@ -385,9 +385,6 @@ bool WadArchive::write(MemChunk& mc, bool update) {
 	mc.clear();
 	mc.seek(0, SEEK_SET);
 	mc.reSize(dir_offset + numEntries() * 16);
-	wxLogMessage("%d entries", numEntries());
-	wxLogMessage("size %d", mc.getSize());
-	wxLogMessage("dir_offset %d", dir_offset);
 
 	// Setup wad type
 	char wad_type[4] = { 'P', 'W', 'A', 'D' };
