@@ -272,7 +272,7 @@ bool ZipArchive::write(string filename, bool update) {
 
 	// Go through all entries
 	for (size_t a = 0; a < entries.size(); a++) {
-		wxLogMessage(entries[a]->getPath(true));
+		//wxLogMessage(entries[a]->getPath(true));
 
 		if (entries[a]->getType() == EntryType::folderType()) {
 			// If the current entry is a folder, just write a directory entry and continue

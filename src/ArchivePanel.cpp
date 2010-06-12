@@ -670,7 +670,6 @@ bool ArchivePanel::basConvert() {
 		}
 		animdef->importMemChunk(animdata);
 
-		wxLogMessage("Treatment complete\n");
 		// Identify the new lump as what it is
 		EntryType::detectEntryType(animdef);
 		// Failsafe is detectEntryType doesn't accept to work, grumble

@@ -413,7 +413,7 @@ void ArchiveManager::removeBaseResourcePath(unsigned index) {
 		openBaseResource(-1);
 
 	// Modify base_resource cvar if needed
-	else if (base_resource > index)
+	else if (base_resource > (signed)index)
 		base_resource = base_resource - 1;
 
 	// Remove the path

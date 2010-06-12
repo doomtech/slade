@@ -83,7 +83,7 @@ tx_texture_t TextureXList::getTexture(string name) {
 
 void TextureXList::addTexture(tx_texture_t& tex, int position) {
 	// Add it to the list at position if valid
-	if (position < textures.size() && position >= 0)
+	if (position >= 0 && (unsigned)position < textures.size())
 		textures.insert(textures.begin() + position, tex);
 	else
 		textures.push_back(tex);

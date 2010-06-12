@@ -343,6 +343,14 @@
 			Name="Main Editor"
 			>
 			<File
+				RelativePath=".\src\BaseResourceChooser.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\BaseResourceChooser.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\EntryOperations.cpp"
 				>
 			</File>
