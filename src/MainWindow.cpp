@@ -36,6 +36,7 @@
 #include "Icons.h"
 #include "BaseResourceArchivesPanel.h"
 #include "PaletteChooser.h"
+#include "BaseResourceChooser.h"
 #include <wx/aboutdlg.h>
 
 
@@ -44,11 +45,6 @@
  *******************************************************************/
 string main_window_layout = "";
 
-
-/*******************************************************************
- * EXTERNAL VARIABLES
- *******************************************************************/
-EXTERN_CVAR(Int, base_resource)
 
 /*******************************************************************
  * MAINWINDOW CLASS FUNCTIONS
@@ -184,16 +180,13 @@ void MainWindow::setupLayout() {
 	tb_entry->AddTool(MENU_ENTRY_MOVEDOWN,		"Move Down",	getIcon("t_down"),		"Move Down");
 	tb_entry->Realize();
 
-/*
 	// Create Base Resource Archive toolbar
 	wxAuiToolBar* tb_bra = new wxAuiToolBar(this, -1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
-	choice_base_resource = new wxChoice(tb_bra, -1, wxDefaultPosition, wxSize(128, -1));
-	populateBRAChoice();
+	BaseResourceChooser* brc = new BaseResourceChooser(tb_bra);
 	tb_bra->AddLabel(-1, "Base Resource:");
-	tb_bra->AddControl(choice_base_resource);
+	tb_bra->AddControl(brc);
 	tb_bra->AddTool(MENU_EDITOR_SETBASERESOURCE, "...", getIcon("t_settings"), "Setup Base Resource Archive paths");
 	tb_bra->Realize();
-*/
 
 	// Setup panel info & add toolbar panels
 	// File toolbar
@@ -209,14 +202,12 @@ void MainWindow::setupLayout() {
 	p_inf.Name("tb_entry");
 	m_mgr->AddPane(tb_entry, p_inf);
 
-/*
 	// Base Resource Archive toolbar
 	p_inf.ToolbarPane();
 	p_inf.Top();
 	p_inf.Position(2);
 	p_inf.Name("tb_bra");
 	m_mgr->AddPane(tb_bra, p_inf);
-*/
 
 /*
 	// Palette Toolbar
@@ -303,27 +294,6 @@ void MainWindow::setupLayout() {
 	html_startpage->Bind(wxEVT_COMMAND_HTML_LINK_CLICKED, &MainWindow::onHTMLLinkClicked, this);
 	Bind(wxEVT_COMMAND_MENU_SELECTED, &MainWindow::onMenuItemClicked, this, MENU_START, MENU_END);
 	Bind(wxEVT_CLOSE_WINDOW, &MainWindow::onClose, this);
-	Bind(wxEVT_COMMAND_CHOICE_SELECTED, &MainWindow::onBaseResourceChanged, this);
-}
-
-void MainWindow::populateBRAChoice() {
-	// Clear current items
-	choice_base_resource->Clear();
-
-	// Add 'none' item
-	choice_base_resource->AppendString("<none>");
-
-	// Go through base resource paths list
-	for (unsigned a = 0; a < theArchiveManager->numBaseResourcePaths(); a++) {
-		// Convert to wxFileName for processing
-		wxFileName fn(theArchiveManager->getBaseResourcePath(a));
-
-		// Add the filename (no path) to the list
-		choice_base_resource->AppendString(fn.GetFullName());
-	}
-
-	// Select current base resource
-	choice_base_resource->SetSelection(base_resource + 1);
 }
 
 
@@ -360,7 +330,7 @@ void MainWindow::onMenuItemClicked(wxCommandEvent& e) {
 
 		dialog_ebr.SetSizer(sizer);
 		dialog_ebr.Layout();
-		dialog_ebr.SetInitialSize(wxSize(400, 240));
+		dialog_ebr.SetInitialSize(wxSize(-1, 300));
 		if (dialog_ebr.ShowModal() == wxID_OK)
 			theArchiveManager->openBaseResource(brap.getSelectedPath());
 	}
@@ -442,9 +412,4 @@ void MainWindow::onClose(wxCloseEvent& e) {
 	main_window_layout = m_mgr->SavePerspective();
 	wxTheApp->Exit();
 	e.Skip();
-}
-
-void MainWindow::onBaseResourceChanged(wxCommandEvent& e) {
-	// Load the selection
-	theArchiveManager->openBaseResource(choice_base_resource->GetSelection() - 1);
 }

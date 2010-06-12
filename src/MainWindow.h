@@ -11,7 +11,7 @@
 // then a previously saved perspective is loaded from slade3.cfg, the new item won't show
 // up at all. So when saving the perspective, add this number to the start of the string,
 // and check against it when loading. In other words, wxAUI is silly.
-#define MW_LAYOUT_VERS 002
+#define MW_LAYOUT_VERS 003
 
 class MainWindow : public wxFrame {
 private:
@@ -19,7 +19,6 @@ private:
 	wxAuiNotebook*			notebook_tabs;
 	wxHtmlWindow*			html_startpage;
 	wxAuiManager*			m_mgr;
-	wxChoice*				choice_base_resource;
 
 public:
 	enum {
@@ -70,13 +69,11 @@ public:
 	~MainWindow();
 
 	void	setupLayout();
-	void	populateBRAChoice();
 
 	// Events
 	void	onMenuItemClicked(wxCommandEvent &e);
 	void	onHTMLLinkClicked(wxHtmlLinkEvent &e);
 	void	onClose(wxCloseEvent &e);
-	void	onBaseResourceChanged(wxCommandEvent& e);
 };
 
 #endif //__MAINWINDOW_H__

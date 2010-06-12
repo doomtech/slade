@@ -56,6 +56,7 @@ public:
 	// Base resource archive stuff
 	Archive*	baseResourceArchive() { return base_resource_archive; }
 	void		addBaseResourcePath(string path);
+	void		removeBaseResourcePath(unsigned index);
 	unsigned	numBaseResourcePaths() { return base_resource_paths.size(); }
 	string		getBaseResourcePath(unsigned index);
 	bool		openBaseResource(int index);

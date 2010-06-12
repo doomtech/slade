@@ -101,6 +101,10 @@ void OGLCanvas::init() {
 	init_done = true;
 }
 
+/* OGLCanvas::toPanel
+ * Places the canvas on top of a new wxPanel and returns the panel.
+ * This is sometimes needed to fix redraw problems in Windows XP
+ *******************************************************************/
 wxPanel* OGLCanvas::toPanel(wxWindow* parent) {
 	// Create panel
 	wxPanel* panel = new wxPanel(parent, -1);

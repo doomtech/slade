@@ -87,6 +87,8 @@
       </VirtualDirectory>
       <File Name="src/ArchivePanel.cpp"/>
       <File Name="src/ArchivePanel.h"/>
+      <File Name="src/BaseResourceChooser.h"/>
+      <File Name="src/BaseResourceChooser.cpp"/>
     </VirtualDirectory>
     <File Name="src/MainWindow.h"/>
     <File Name="src/EntryOperations.cpp"/>

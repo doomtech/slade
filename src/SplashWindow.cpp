@@ -1,4 +1,34 @@
 
+/*******************************************************************
+ * SLADE - It's a Doom Editor
+ * Copyright (C) 2008 Simon Judd
+ *
+ * Email:       veilofsorrow@gmail.com
+ * Web:         http://slade.mancubus.net
+ * Filename:    SplashWindow.cpp
+ * Description: The SLADE splash window. Shows the SLADE logo, a
+ *              message, and an optional progress bar (with it's
+ *              own message)
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *******************************************************************/
+
+
+/*******************************************************************
+ * INCLUDES
+ *******************************************************************/
 #include "Main.h"
 #include "WxStuff.h"
 #include "SplashWindow.h"
@@ -6,11 +36,23 @@
 #include "Console.h"
 #include <wx/dcbuffer.h>
 
+
+/*******************************************************************
+ * VARIABLES
+ *******************************************************************/
 SplashWindow*	SplashWindow::instance = NULL;
 wxBitmap		SplashWindow::bm_logo;
 int				SplashWindow::width = 300;
 int				SplashWindow::height = 204;
 
+
+/*******************************************************************
+ * SPLASHWINDOW CLASS FUNCTIONS
+ *******************************************************************/
+
+/* SplashWindow::SplashWindow
+ * SplashWindow class constructor
+ *******************************************************************/
 SplashWindow::SplashWindow()
 : wxMiniFrame(NULL, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSTAY_ON_TOP|wxBORDER_NONE) {
 	// Init
@@ -27,19 +69,34 @@ SplashWindow::SplashWindow()
 	Show(false);
 }
 
+/* SplashWindow::~SplashWindow
+ * SplashWindow class destructor
+ *******************************************************************/
 SplashWindow::~SplashWindow() {
 }
 
+/* SplashWindow::setMessage
+ * Changes the splash window message
+ *******************************************************************/
 void SplashWindow::setMessage(string message) {
 	this->message = message;
 	forceRedraw();
 }
 
+/* SplashWindow::setProgressMessage
+ * Changes the progress bar message
+ *******************************************************************/
 void SplashWindow::setProgressMessage(string message) {
 	message_progress = message;
 	forceRedraw();
 }
 
+/* SplashWindow::setProgress
+ * Sets the progress bar level, where 0.0f is 0% and 1.0f is 100%.
+ * A negative value indicates 'indefinite' progress. It is safe to
+ * call this very rapidly as it will only redraw the window once
+ * every 20ms no matter how often it is called
+ *******************************************************************/
 void SplashWindow::setProgress(float progress) {
 	this->progress = progress;
 
@@ -48,6 +105,9 @@ void SplashWindow::setProgress(float progress) {
 		forceRedraw();
 }
 
+/* SplashWindow::init
+ * Sets up the splash window
+ *******************************************************************/
 void SplashWindow::init() {
 	// Load logo image
 	string tempfile = appPath("temp.png", DIR_TEMP);
@@ -61,6 +121,10 @@ void SplashWindow::init() {
 	wxRemoveFile(tempfile);
 }
 
+/* SplashWindow::show
+ * Shows the splash window with [message]. If [progress] is true, a
+ * progress bar will also be shown
+ *******************************************************************/
 void SplashWindow::show(string message, bool progress) {
 	// Setup progress bar
 	int rheight = height;
@@ -80,17 +144,30 @@ void SplashWindow::show(string message, bool progress) {
 	forceRedraw();
 }
 
+/* SplashWindow::hide
+ * Hides (destroys) the splash window
+ *******************************************************************/
 void SplashWindow::hide() {
 	// Destroy instance
 	deleteInstance();
 }
 
+/* SplashWindow::forceRedraw
+ * Forces the splash window to redraw itself
+ *******************************************************************/
 void SplashWindow::forceRedraw() {
 	Refresh();
 	Update();
 }
 
 
+/*******************************************************************
+ * SPLASHWINDOW CLASS EVENTS
+ *******************************************************************/
+
+/* SplashWindow::onPaint
+ * Handles drawing the splash window
+ *******************************************************************/
 void SplashWindow::onPaint(wxPaintEvent& e) {
 	// Create device context
 	wxAutoBufferedPaintDC dc(this);

@@ -33,8 +33,6 @@ private:
 	WMFileBrowser*		file_browser;
 	wxButton*			btn_browser_open;
 	wxMenu*				menu_context;
-	//wxComboBox*		choice_base_resource;
-	//wxButton*			btn_edit_base_resources;
 
 public:
 	// wxWidgets ID table
@@ -74,23 +72,6 @@ public:
 	// Handler for MainWindow menu actions
 	void	handleAction(int menu_id);
 
-	/*
-	// Currently opened tab
-	void	saveCurrent();
-	void	saveCurrentAs();
-	void	closeCurrent();
-	void	newEntry();
-	void	newEntryFromFile();
-	void	renameEntry();
-	void	deleteEntry();
-	void	importEntry();
-	void	exportEntry();
-	void	exportEntryWad();
-	void	moveUp();
-	void	moveDown();
-	void	textureEditor();
-	*/
-
 	vector<int>	getSelectedArchives();
 
 	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
@@ -103,7 +84,6 @@ public:
 	void	onListArchivesRightClick(wxListEvent& e);
 	void	onMenu(wxCommandEvent& e);
 	void	onTabChanged(wxAuiNotebookEvent& e);
-	//void	onBtnEditBaseResources(wxCommandEvent& e);
 };
 
 #endif //__ARCHIVEMANAGERPANEL_H__

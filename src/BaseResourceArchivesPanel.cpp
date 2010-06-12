@@ -80,4 +80,7 @@ void BaseResourceArchivesPanel::onBtnRemove(wxCommandEvent& e) {
 	// Get the selected item index and remove it
 	int index = list_base_archive_paths->GetSelection();
 	list_base_archive_paths->Delete(index);
+
+	// Also remove it from the archive manager
+	theArchiveManager->removeBaseResourcePath(index);
 }

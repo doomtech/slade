@@ -398,6 +398,29 @@ void ArchiveManager::addBaseResourcePath(string path) {
 
 	// Add it
 	base_resource_paths.push_back(path);
+
+	// Announce
+	announce("base_resource_path_added");
+}
+
+void ArchiveManager::removeBaseResourcePath(unsigned index) {
+	// Check index
+	if (index >= base_resource_paths.size())
+		return;
+
+	// Unload base resource if removed is open
+	if (index == base_resource)
+		openBaseResource(-1);
+
+	// Modify base_resource cvar if needed
+	else if (base_resource > index)
+		base_resource = base_resource - 1;
+
+	// Remove the path
+	base_resource_paths.erase(base_resource_paths.begin() + index);
+
+	// Announce
+	announce("base_resource_path_removed");
 }
 
 string ArchiveManager::getBaseResourcePath(unsigned index) {
