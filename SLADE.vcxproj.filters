@@ -309,6 +309,9 @@
     <ClCompile Include="src\TextureXPanel.cpp">
       <Filter>Main Editor\UI Elements\TextureXEditor</Filter>
     </ClCompile>
+    <ClCompile Include="src\BaseResourceChooser.cpp">
+      <Filter>Main Editor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -569,6 +572,9 @@
     </ClInclude>
     <ClInclude Include="src\TextureXPanel.h">
       <Filter>Main Editor\UI Elements\TextureXEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BaseResourceChooser.h">
+      <Filter>Main Editor</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
