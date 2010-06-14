@@ -330,19 +330,21 @@ bool ArchivePanel::renameEntry() {
 		string new_name = wxGetTextFromUser("Enter new entry name: (* = unchanged)", "Rename", filter);
 
 		// Apply mass rename to list of names
-		Misc::doMassRename(names, new_name);
+		if (!new_name.IsEmpty()) {
+			Misc::doMassRename(names, new_name);
 
-		// Go through the list
-		for (size_t a = 0; a < selection.size(); a++) {
-			ArchiveEntry* entry = selection[a];
+			// Go through the list
+			for (size_t a = 0; a < selection.size(); a++) {
+				ArchiveEntry* entry = selection[a];
 
-			// If the entry is a folder then skip it
-			if (entry->getType() == EntryType::folderType())
-				continue;
+				// If the entry is a folder then skip it
+				if (entry->getType() == EntryType::folderType())
+					continue;
 
-			// Rename the entry (if needed)
-			if (names[a] != entry->getName())
-				archive->renameEntry(entry, names[a]);
+				// Rename the entry (if needed)
+				if (names[a] != entry->getName())
+					archive->renameEntry(entry, names[a]);
+			}
 		}
 	}
 
