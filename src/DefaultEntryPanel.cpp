@@ -32,6 +32,7 @@
  *******************************************************************/
 #include "Main.h"
 #include "WxStuff.h"
+#include "ArchiveManager.h"
 #include "DefaultEntryPanel.h"
 
 
@@ -47,18 +48,20 @@ DefaultEntryPanel::DefaultEntryPanel(wxWindow* parent)
 	// Create widgets
 	label_type = new wxStaticText(this, -1, "Entry Type:");
 	label_size = new wxStaticText(this, -1, "Entry Size:");
+	btn_texture = new wxButton(this, -1, "Edit Textures");
 	btn_edit_text = new wxButton(this, -1, "Edit as Text");
 	btn_view_hex = new wxButton(this, -1, "View as Hex");
 	text_area = new TextEditor(this, -1);
 
 	// Bind Events
+	btn_texture->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &DefaultEntryPanel::onTexturesClicked, this);
 	btn_edit_text->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &DefaultEntryPanel::onEditTextClicked, this);
 	btn_view_hex->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &DefaultEntryPanel::onViewHexClicked, this);
 	text_area->Bind(wxEVT_STC_MODIFIED, &DefaultEntryPanel::onTextModified, this);
 
 	// Show entry info stuff
 	view_text = true;
-	showEntryInfo(true);
+	showEntryInfo(true, false);
 }
 
 /* DefaultEntryPanel::~DefaultEntryPanel
@@ -70,7 +73,7 @@ DefaultEntryPanel::~DefaultEntryPanel() {
 /* DefaultEntryPanel::showEntryInfo
  * Shows entry info stuff on the panel
  *******************************************************************/
-void DefaultEntryPanel::showEntryInfo(bool show_btn_edittext) {
+void DefaultEntryPanel::showEntryInfo(bool show_btn_edittext, bool show_btn_texture) {
 	// Hide the text editor
 	text_area->Show(false);
 
@@ -82,6 +85,7 @@ void DefaultEntryPanel::showEntryInfo(bool show_btn_edittext) {
 	label_size->Show(true);
 	btn_edit_text->Show(show_btn_edittext);
 	btn_view_hex->Show(show_btn_edittext);
+	btn_texture->Show(show_btn_texture);
 
 	// Add entry info stuff to the panel sizer
 	sizer_main->AddStretchSpacer();
@@ -90,12 +94,14 @@ void DefaultEntryPanel::showEntryInfo(bool show_btn_edittext) {
 	sizer_main->AddSpacer(8);
 	sizer_main->Add(btn_edit_text, 0, wxALIGN_CENTER|wxALL, 4);
 	sizer_main->Add(btn_view_hex, 0, wxALIGN_CENTER|wxALL, 4);
+	sizer_main->Add(btn_texture, 0, wxALIGN_CENTER|wxALL, 4);
 	sizer_main->AddStretchSpacer();
 
 	// Update variables etc
 	view_text = false;
 
 	Layout();
+	Refresh();
 }
 
 /* DefaultEntryPanel::openTextEntry
@@ -156,8 +162,13 @@ bool DefaultEntryPanel::loadEntry(ArchiveEntry* entry) {
 	if (entry->getType() == EntryType::folderType())
 		show_btn_edittext = false;
 
+	// Check whether to show the 'open texture editor' button
+	bool show_btn_texture = false;
+	if (entry->getType()->extraProps().propertyExists("textures"))
+		show_btn_texture = true;
+
 	// Show entry info stuff
-	showEntryInfo(show_btn_edittext);
+	showEntryInfo(show_btn_edittext, show_btn_texture);
 
 	// Enable save changes button depending on if the entry is locked
 	if (entry->isLocked())
@@ -187,6 +198,14 @@ bool DefaultEntryPanel::saveEntry() {
 /*******************************************************************
  * DEFAULTENTRYPANEL CLASS EVENTS
  *******************************************************************/
+
+/* DefaultEntryPanel::onTexturesClicked
+ * Called when the 'Edit Textures' button is clicked. Opens the*
+ * texture editor panel in a new tab
+ *******************************************************************/
+void DefaultEntryPanel::onTexturesClicked(wxCommandEvent& event) {
+	theArchiveManager->openTextureEditor(theArchiveManager->archiveIndex(entry->getParent()));
+}
 
 /* DefaultEntryPanel::onEditTextClicked
  * Called when the 'Edit as Text' button is clicked. Shows the text

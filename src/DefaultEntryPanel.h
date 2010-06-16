@@ -9,6 +9,7 @@ class DefaultEntryPanel : public EntryPanel {
 private:
 	wxStaticText*	label_type;
 	wxStaticText*	label_size;
+	wxButton*		btn_texture;
 	wxButton*		btn_edit_text;
 	wxButton*		btn_view_hex;
 	TextEditor*		text_area;
@@ -21,9 +22,10 @@ public:
 	bool loadEntry(ArchiveEntry* entry);
 	bool saveEntry();
 	void showTextEditor();
-	void showEntryInfo(bool show_btn_edittext = false);
+	void showEntryInfo(bool show_btn_edittext = false, bool show_btn_texture = false);
 	void openTextEntry(ArchiveEntry * text_entry);
 
+	void onTexturesClicked(wxCommandEvent& e);
 	void onEditTextClicked(wxCommandEvent& e);
 	void onViewHexClicked(wxCommandEvent& e);
 	void onTextModified(wxStyledTextEvent& e);

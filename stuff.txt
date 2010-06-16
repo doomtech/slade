@@ -98,6 +98,7 @@ Unimplemented Feature Requests ------------------------------------------
 --- General ---
 - in-editor generation and editing of boom's binary animated/switches lumps. ("generation" in this case just meaning "stick the default one in there as a new lump", with the standard switches and animations from boom's default one, sort of like how a new texture1 lump gets the iwad stuff as a base)
 - Support for LZMA, Bzip2 and zip formats other than store and deflate
+- Mass research & replace of map elements (thing numbers, texture or flat names) across a map or all the maps of an archive
 
 
 
@@ -144,7 +145,9 @@ Ideas / Possible Features -----------------------------------------------
 
 
 Other / Notes -----------------------------------------------------------
-
+- Mousewheel scroll in text editor panel
+- Restore keypress functions to select an entry by typing the letters of its name
+- "Recent files" tab in Archive Manager
 
 
 
