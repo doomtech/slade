@@ -57,7 +57,7 @@ DefaultEntryPanel::DefaultEntryPanel(wxWindow* parent)
 	btn_texture->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &DefaultEntryPanel::onTexturesClicked, this);
 	btn_edit_text->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &DefaultEntryPanel::onEditTextClicked, this);
 	btn_view_hex->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &DefaultEntryPanel::onViewHexClicked, this);
-	text_area->Bind(wxEVT_STC_MODIFIED, &DefaultEntryPanel::onTextModified, this);
+	text_area->Bind(wxEVT_STC_CHANGE, &DefaultEntryPanel::onTextModified, this);
 
 	// Show entry info stuff
 	view_text = true;
