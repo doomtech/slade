@@ -191,6 +191,9 @@ bool DefaultEntryPanel::saveEntry() {
 	entry->setType(EntryType::getType("text"));
 	entry->setState(1);
 
+	// Update variables
+	setModified(false);
+
 	return true;
 }
 

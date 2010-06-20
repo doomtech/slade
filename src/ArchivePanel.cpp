@@ -143,6 +143,9 @@ bool ArchivePanel::save() {
 	if (!archive)
 		return false;
 
+	// Save any changes in the current entry panel
+	cur_area->saveEntry();
+
 	// Check the archive has been previously saved
 	if (!archive->canSave())
 		return saveAs();
