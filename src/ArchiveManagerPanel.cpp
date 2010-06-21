@@ -43,6 +43,13 @@
 
 
 /*******************************************************************
+ * VARIABLES
+ *******************************************************************/
+CVAR(Bool, close_archive_with_tab, false, CVAR_SAVE)
+bool tab_closing = false;	// Hacky workaround to prevent crash on closing a tab when close_archive_with_tab is true
+
+
+/*******************************************************************
  * WMFILEBROWSER CLASS FUNCTIONS
  *******************************************************************/
 
@@ -136,6 +143,7 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
 	list_maps->Bind(wxEVT_COMMAND_LISTBOX_SELECTED, &ArchiveManagerPanel::onListMapsChanged, this);
 	list_maps->Bind(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, &ArchiveManagerPanel::onListMapsActivated, this);
 	notebook_archives->Bind(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED, &ArchiveManagerPanel::onTabChanged, this);
+	notebook_archives->Bind(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSE, &ArchiveManagerPanel::onTabClose, this);
 	Bind(wxEVT_COMMAND_MENU_SELECTED, &ArchiveManagerPanel::onMenu, this, MENU_SAVE, MENU_END);
 
 	// Listen to the ArchiveManager
@@ -309,12 +317,16 @@ void ArchiveManagerPanel::openTab(int archive_index) {
  * in the archive manager
  *******************************************************************/
 void ArchiveManagerPanel::closeTab(int archive_index) {
+	// Don't close if a tab is already closing
+	if (tab_closing)
+		return;
+
 	Archive* archive = theArchiveManager->getArchive(archive_index);
 
 	if (archive) {
 		// Go through all tabs
 		for (size_t a = 0; a < notebook_archives->GetPageCount(); a++) {
-			// Check page type is "texture"
+			// Check page type is "archive"
 			if (notebook_archives->GetPage(a)->GetName().CmpNoCase("archive"))
 				continue;
 
@@ -536,7 +548,14 @@ void ArchiveManagerPanel::onAnnouncement(Announcer* announcer, string event_name
 	if (event_name == "archive_added") {
 		int index = theArchiveManager->numArchives();
 		list_archives->addItem(index, theArchiveManager->getArchive(theArchiveManager->numArchives()-1)->getFilename(true));
-		openTab(theArchiveManager->numArchives()-1);
+		//openTab(theArchiveManager->numArchives()-1);
+	}
+
+	// If an archive was opened
+	if (event_name == "archive_opened") {
+		uint32_t index = -1;
+		event_data.read(&index, 4);
+		openTab(index);
 	}
 
 	// If an archive was saved
@@ -796,4 +815,15 @@ void ArchiveManagerPanel::onTabChanged(wxAuiNotebookEvent& e) {
 	}
 	else
 		((wxFrame*)GetParent())->SetTitle("SLADE");
+}
+
+/* ArchiveManagerPanel::onTabClose
+ * Called when the user clicks the close button on a tab
+ *******************************************************************/
+void ArchiveManagerPanel::onTabClose(wxAuiNotebookEvent& e) {
+	if (close_archive_with_tab) {
+		tab_closing = true;
+		theArchiveManager->closeArchive(currentArchive());
+		tab_closing = false;
+	}
 }

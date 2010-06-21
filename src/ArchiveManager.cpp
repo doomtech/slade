@@ -149,14 +149,19 @@ Archive* ArchiveManager::getArchive(string filename) {
  * newly opened and added archive, or NULL if an error occurred
  *******************************************************************/
 Archive* ArchiveManager::openArchive(string filename) {
-	Archive* new_archive = NULL;
+	Archive* new_archive = getArchive(filename);
 
 	wxLogMessage(s_fmt("Opening archive %s", filename));
 
-	// Check that the file isn't already open
-	if (getArchive(filename)) {
-		Global::error = "Archive is already open";
-		return NULL;
+	// If the archive is already open, just return it
+	if (new_archive) {
+		// Announce open
+		MemChunk mc;
+		uint32_t index = archiveIndex(new_archive);
+		mc.write(&index, 4);
+		announce("archive_opened", mc);
+
+		return new_archive;
 	}
 
 	// Determine file format
@@ -174,9 +179,19 @@ Archive* ArchiveManager::openArchive(string filename) {
 	// If it opened successfully, add it to the list & return it,
 	// Otherwise, delete it and return NULL
 	if (new_archive->open(filename)) {
+		// Add the archive
 		addArchive(new_archive);
+
+		// Announce open
+		MemChunk mc;
+		uint32_t index = archiveIndex(new_archive);
+		mc.write(&index, 4);
+		announce("archive_opened", mc);
+
+		// Return the opened archive
 		return new_archive;
-	} else {
+	}
+	else {
 		wxLogMessage("Error: " + Global::error);
 		delete new_archive;
 		return NULL;
@@ -195,8 +210,15 @@ Archive* ArchiveManager::openArchive(ArchiveEntry* entry) {
 
 	// Check if the entry is already opened
 	for (size_t a = 0; a < open_archives.size(); a++) {
-		if (open_archives[a].archive->getParent() == entry)
+		if (open_archives[a].archive->getParent() == entry) {
+			// Announce open
+			MemChunk mc;
+			uint32_t index = archiveIndex(open_archives[a].archive);
+			mc.write(&index, 4);
+			announce("archive_opened", mc);
+
 			return open_archives[a].archive;
+		}
 	}
 
 	// Check entry type
@@ -221,8 +243,15 @@ Archive* ArchiveManager::openArchive(ArchiveEntry* entry) {
 		if (index_parent >= 0)
 			open_archives[index_parent].open_children.push_back(new_archive);
 
-		// Add the new archive and return it
+		// Add the new archive
 		addArchive(new_archive);
+
+		// Announce open
+		MemChunk mc;
+		uint32_t index = archiveIndex(new_archive);
+		mc.write(&index, 4);
+		announce("archive_opened", mc);
+
 		return new_archive;
 	} else {
 		wxLogMessage("Error: " + Global::error);

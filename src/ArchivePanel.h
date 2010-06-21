@@ -30,6 +30,7 @@ public:
 	~ArchivePanel();
 
 	Archive*	getArchive() { return archive; }
+	bool		saveEntryChanges();
 
 	// Editing actions - return success
 
@@ -60,26 +61,6 @@ public:
 	bool	gfxModifyOffsets();
 	bool	basConvert();
 	bool	palConvert();
-
-	/*
-	// Entry manipulation functions
-	virtual bool	newEntry();
-	virtual bool	newEntryFromFile();
-	virtual bool	renameEntry();
-	virtual bool	deleteEntry();
-	virtual bool	copyEntry();
-	bool			cutEntry();
-	virtual bool	pasteEntry();
-	bool			importEntry();
-	bool			exportEntry();
-	bool			exportEntryWad();
-	virtual bool	moveUp();
-	virtual bool	moveDown();
-	bool			gfxConvert();
-	bool			gfxModifyOffsets();
-	bool			basConvert();
-	bool			palConvert();
-	*/
 
 	// UI related
 	bool	openEntry(ArchiveEntry* entry);

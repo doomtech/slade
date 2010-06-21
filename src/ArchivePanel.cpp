@@ -55,6 +55,8 @@
 /*******************************************************************
  * VARIABLES
  *******************************************************************/
+CVAR(Int, autosave_entry_changes, 2, CVAR_SAVE)	// 0=no, 1=yes, 2=ask
+
 // Temporary
 const int MENU_GFX_CONVERT = 10001;
 const int MENU_GFX_MODIFY_OFFSETS = 10002;
@@ -135,6 +137,29 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 ArchivePanel::~ArchivePanel() {
 }
 
+bool ArchivePanel::saveEntryChanges() {
+	// Ignore if no changes have been made (or no entry is open)
+	if (!cur_area->isModified() || !cur_area->getEntry())
+		return true;
+
+	// Don't save if autosave is off
+	if (autosave_entry_changes == 0)
+		return false;
+
+	// Ask if needed
+	if (autosave_entry_changes > 1) {
+		int result = wxMessageBox(s_fmt("Save changes to entry \"%s\"?", cur_area->getEntry()->getName().c_str()),
+									"Unsaved Changes", wxYES_NO|wxICON_QUESTION);
+
+		// Stop if user clicked no
+		if (result == wxNO)
+			return false;
+	}
+
+	// Save entry changes
+	return cur_area->saveEntry();
+}
+
 /* ArchivePanel::save
  * Saves the archive
  *******************************************************************/
@@ -144,7 +169,7 @@ bool ArchivePanel::save() {
 		return false;
 
 	// Save any changes in the current entry panel
-	cur_area->saveEntry();
+	saveEntryChanges();
 
 	// Check the archive has been previously saved
 	if (!archive->canSave())
@@ -755,6 +780,7 @@ bool ArchivePanel::openEntry(ArchiveEntry* entry) {
 }
 
 bool ArchivePanel::showEntryPanel(EntryPanel* new_area, bool ask_save) {
+	/*
 	// If the current entry area has unsaved changes, ask the user if they wish to save the changes
 	if (cur_area->isModified() && cur_area->getEntry() && ask_save) {
 		int result = wxMessageBox(s_fmt("Save changes to entry \"%s\"?", cur_area->getEntry()->getName().c_str()),
@@ -763,6 +789,10 @@ bool ArchivePanel::showEntryPanel(EntryPanel* new_area, bool ask_save) {
 		if (result == wxYES)
 			cur_area->saveEntry();	// Save changes to the entry if yes clicked
 	}
+	*/
+
+	// Save any changes if needed
+	saveEntryChanges();
 
 	// Get the panel sizer
 	wxSizer* sizer = GetSizer();

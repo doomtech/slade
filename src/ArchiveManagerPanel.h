@@ -84,6 +84,7 @@ public:
 	void	onListArchivesRightClick(wxListEvent& e);
 	void	onMenu(wxCommandEvent& e);
 	void	onTabChanged(wxAuiNotebookEvent& e);
+	void	onTabClose(wxAuiNotebookEvent& e);
 };
 
 #endif //__ARCHIVEMANAGERPANEL_H__
