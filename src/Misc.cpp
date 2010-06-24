@@ -151,11 +151,11 @@ bool Misc::loadPaletteFromArchive(Palette8bit* pal, Archive* archive, int lump) 
 		playpal = archive->getEntry("E2PAL");
 	else if (lump == PAL_SHADOWHACK)
 		playpal = archive->getEntry("shadowpage+1");
-	if (!playpal)
+	if (!playpal || playpal->getSize() < 768)
 		playpal = archive->getEntry("PLAYPAL");
 
 	// Check it was found
-	if (!playpal)
+	if (!playpal || playpal->getSize() < 768)
 		return false;
 
 	// Check it is the correct size
