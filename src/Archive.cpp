@@ -266,12 +266,10 @@ bool ArchiveTreeNode::merge(ArchiveTreeNode* node, unsigned position) {
 
 	// Merge entries
 	for (unsigned a = 0; a < node->numEntries(); a++) {
-		ArchiveEntry * ae = new ArchiveEntry(*(node->getEntry(a)));
-		if (ae != NULL && addEntry(ae, position)) {
-			getArchive()->renameEntry(ae, ae->getName());
-			if (position < entries.size())
-				position++;
-		}
+		addEntry(new ArchiveEntry(*(node->getEntry(a))), position);
+
+		if (position < entries.size())
+			position++;
 	}
 
 	// Merge subdirectories
@@ -531,6 +529,24 @@ void Archive::getEntryTreeAsList(vector<ArchiveEntry*>& list, ArchiveTreeNode* s
 	// Go through subdirectories and add them to the list
 	for (unsigned a = 0; a < start->nChildren(); a++)
 		getEntryTreeAsList(list, (ArchiveTreeNode*)start->getChild(a));
+}
+
+/* Archive::paste
+ * 'Pastes' the [tree] into the archive, with it's root entries
+ * starting at [position] in [base] directory. If [base] is null,
+ * the root directory is used
+ *******************************************************************/
+bool Archive::paste(ArchiveTreeNode* tree, unsigned position, ArchiveTreeNode* base) {
+	// Check tree was given to paste
+	if (!tree)
+		return false;
+
+	// Paste to root dir if none specified
+	if (!base)
+		base = getRoot();
+
+	// Just do a merge
+	return base->merge(tree, position);
 }
 
 /* Archive::getDir
@@ -1065,4 +1081,37 @@ vector<ArchiveEntry*> Archive::findAll(search_options_t& options) {
 
 	// Return matches
 	return ret;
+}
+
+
+/*******************************************************************
+ * TREELESSARCHIVE CLASS FUNCTIONS
+ *******************************************************************/
+
+/* TreelessArchive::paste
+ * Treeless version of Archive::paste. Pastes all entries in [tree]
+ * and it's subdirectories straight into the root dir at [position]
+ *******************************************************************/
+bool TreelessArchive::paste(ArchiveTreeNode* tree, unsigned position, ArchiveTreeNode* base) {
+	// Check tree was given to paste
+	if (!tree)
+		return false;
+
+	// Paste root entries only
+	for (unsigned a = 0; a < tree->numEntries(); a++) {
+		// Add entry to archive
+		ArchiveEntry* entry = addEntry(tree->getEntry(a), position, NULL, true);
+
+		// Update [position] if needed
+		if (position < 0xFFFFFFFF)
+			position++;
+	}
+
+	// Go through paste tree subdirs and paste their entries recursively
+	for (unsigned a = 0; a < tree->nChildren(); a++) {
+		ArchiveTreeNode* dir = (ArchiveTreeNode*)tree->getChild(a);
+		paste(dir, position);
+	}
+
+	return true;
 }

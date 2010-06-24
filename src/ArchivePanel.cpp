@@ -625,7 +625,8 @@ bool ArchivePanel::pasteEntry() {
 		EntryTreeClipboardItem* clip = (EntryTreeClipboardItem*)theClipboard->getItem(a);
 
 		// Merge it in
-		entry_list->getCurrentDir()->merge(clip->getTree(), index);
+		archive->paste(clip->getTree(), index, entry_list->getCurrentDir());
+		//entry_list->getCurrentDir()->merge(clip->getTree(), index);
 		pasted = true;
 	}
 

@@ -162,6 +162,8 @@ bool MemChunk::importFile(string filename, uint32_t offset, uint32_t len) {
 		// Read the file
 		file.Seek(offset, wxFromStart);
 		file.Read(data, size);
+
+		file.Close();
 	}
 
 	return true;

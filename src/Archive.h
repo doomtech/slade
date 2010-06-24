@@ -113,6 +113,7 @@ public:
 	void					entryStateChanged(ArchiveEntry* entry);
 	void					getEntryTreeAsList(vector<ArchiveEntry*>& list, ArchiveTreeNode* start = NULL);
 	bool					canSave() { return parent || on_disk; }
+	virtual bool			paste(ArchiveTreeNode* tree, unsigned position = 0xFFFFFFFF, ArchiveTreeNode* base = NULL);
 
 	// Directory stuff
 	virtual ArchiveTreeNode*	getDir(string path, ArchiveTreeNode* base = NULL);
@@ -174,6 +175,7 @@ public:
 	// Misc
 	virtual unsigned		numEntries() { return getRoot()->numEntries(); }
 	void					getEntryTreeAsList(vector<ArchiveEntry*>& list, ArchiveTreeNode* start = NULL) { return Archive::getEntryTreeAsList(list, NULL); }
+	bool					paste(ArchiveTreeNode* tree, unsigned position = 0xFFFFFFFF, ArchiveTreeNode* base = NULL);
 
 	// Directory stuff
 	virtual ArchiveTreeNode*	getDir(string path, ArchiveTreeNode* base = NULL) { return getRoot(); }

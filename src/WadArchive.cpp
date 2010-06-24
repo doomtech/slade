@@ -37,6 +37,8 @@
 /*******************************************************************
  * VARIABLES
  *******************************************************************/
+CVAR(Bool, wad_force_uppercase, true, CVAR_SAVE)
+
 // Used for map detection
 string map_lumps[12] = {
 	"THINGS",
@@ -482,7 +484,7 @@ ArchiveEntry* WadArchive::addEntry(ArchiveEntry* entry, unsigned position, Archi
 	// Process name (must be 8 characters max, also cut any extension as wad entries don't usually want them)
 	wxFileName fn(entry->getName());
 	string name = fn.GetName().Truncate(8);
-	name.MakeUpper();
+	if (wad_force_uppercase) name.MakeUpper();
 
 	// Set new wad-friendly name
 	entry->setName(name);
@@ -555,7 +557,7 @@ bool WadArchive::renameEntry(ArchiveEntry* entry, string name) {
 	// Process name (must be 8 characters max, also cut any extension as wad entries don't usually want them)
 	wxFileName fn(name);
 	name = fn.GetName().Truncate(8);
-	name.MakeUpper();
+	if (wad_force_uppercase) name.MakeUpper();
 
 	// Do default rename
 	bool ok = Archive::renameEntry(entry, name);
