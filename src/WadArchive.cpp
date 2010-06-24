@@ -57,8 +57,8 @@ string map_lumps[12] = {
 /*******************************************************************
  * EXTERNAL VARIABLES
  *******************************************************************/
+CVAR(Bool, iwad_lock, true, CVAR_SAVE)
 EXTERN_CVAR(Bool, archive_load_data)
-
 
 /*******************************************************************
  * WADARCHIVE CLASS FUNCTIONS
@@ -332,7 +332,7 @@ bool WadArchive::open(MemChunk& mc) {
 			entry->unloadData();
 
 		// Lock entry if IWAD
-		if (wad_type[0] == 'I')
+		if (wad_type[0] == 'I' && iwad_lock)
 			entry->lock();
 
 		// Set entry to unchanged
@@ -346,7 +346,7 @@ bool WadArchive::open(MemChunk& mc) {
 	// Setup variables
 	setMuted(false);
 	setModified(false);
-	if (iwad) read_only = true;
+	if (iwad && iwad_lock) read_only = true;
 	announce("opened");
 
 	theSplashWindow->setProgressMessage("");
@@ -409,7 +409,7 @@ bool WadArchive::write(MemChunk& mc, bool update) {
 		long offset = getEntryOffset(entry);
 		long size = entry->getSize();
 
-		for (size_t c = 0; c < entry->getName().length(); c++)
+		for (size_t c = 0; c < entry->getName().length() && c < 8; c++)
 			name[c] = entry->getName()[c];
 
 		mc.write(&offset, 4);
@@ -482,6 +482,7 @@ ArchiveEntry* WadArchive::addEntry(ArchiveEntry* entry, unsigned position, Archi
 	// Process name (must be 8 characters max, also cut any extension as wad entries don't usually want them)
 	wxFileName fn(entry->getName());
 	string name = fn.GetName().Truncate(8);
+	name.MakeUpper();
 
 	// Set new wad-friendly name
 	entry->setName(name);
@@ -554,6 +555,7 @@ bool WadArchive::renameEntry(ArchiveEntry* entry, string name) {
 	// Process name (must be 8 characters max, also cut any extension as wad entries don't usually want them)
 	wxFileName fn(name);
 	name = fn.GetName().Truncate(8);
+	name.MakeUpper();
 
 	// Do default rename
 	bool ok = Archive::renameEntry(entry, name);

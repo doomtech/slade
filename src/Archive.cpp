@@ -266,9 +266,12 @@ bool ArchiveTreeNode::merge(ArchiveTreeNode* node, unsigned position) {
 
 	// Merge entries
 	for (unsigned a = 0; a < node->numEntries(); a++) {
-		addEntry(new ArchiveEntry(*(node->getEntry(a))), position);
-		if (position < entries.size())
-			position++;
+		ArchiveEntry * ae = new ArchiveEntry(*(node->getEntry(a)));
+		if (ae != NULL && addEntry(ae, position)) {
+			getArchive()->renameEntry(ae, ae->getName());
+			if (position < entries.size())
+				position++;
+		}
 	}
 
 	// Merge subdirectories

@@ -350,7 +350,7 @@ bool ArchiveEntry::exportFile(string filename) {
 	}
 
 	// Write entry data to the file
-	file.Write(getData(), this->size);
+	file.Write(getData(), this->getSize());
 
 	return true;
 }
