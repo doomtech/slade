@@ -532,7 +532,7 @@ void Archive::getEntryTreeAsList(vector<ArchiveEntry*>& list, ArchiveTreeNode* s
 }
 
 /* Archive::paste
- * 'Pastes' the [tree] into the archive, with it's root entries
+ * 'Pastes' the [tree] into the archive, with its root entries
  * starting at [position] in [base] directory. If [base] is null,
  * the root directory is used
  *******************************************************************/
@@ -1090,7 +1090,7 @@ vector<ArchiveEntry*> Archive::findAll(search_options_t& options) {
 
 /* TreelessArchive::paste
  * Treeless version of Archive::paste. Pastes all entries in [tree]
- * and it's subdirectories straight into the root dir at [position]
+ * and its subdirectories straight into the root dir at [position]
  *******************************************************************/
 bool TreelessArchive::paste(ArchiveTreeNode* tree, unsigned position, ArchiveTreeNode* base) {
 	// Check tree was given to paste

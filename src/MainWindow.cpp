@@ -172,6 +172,7 @@ void MainWindow::setupLayout() {
 	// Create Entry toolbar
 	wxAuiToolBar* tb_entry = new wxAuiToolBar(this, -1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
 	tb_entry->AddTool(MENU_ARCHIVE_NEWENTRY, 	"New",			getIcon("t_newentry"),	"New Entry");
+	tb_entry->AddTool(MENU_ARCHIVE_NEWDIRECTORY,"Directory",	getIcon("t_newfolder"),	"New Directory");
 	tb_entry->AddTool(MENU_ENTRY_RENAME,		"Rename",		getIcon("t_rename"),	"Rename");
 	tb_entry->AddTool(MENU_ENTRY_DELETE,		"Delete",		getIcon("t_delete"),	"Delete");
 	tb_entry->AddTool(MENU_ENTRY_IMPORT,		"Import",		getIcon("t_import"),	"Import");

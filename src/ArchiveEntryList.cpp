@@ -7,7 +7,7 @@
  * Web:         http://slade.mancubus.net
  * Filename:    ArchiveEntryList.cpp
  * Description: A list widget that shows all entries in an archive.
- *              Keeps in sync with it's associated archive
+ *              Keeps in sync with its associated archive
  *              automatically.
  *
  * This program is free software; you can redistribute it and/or
@@ -467,7 +467,7 @@ vector<ArchiveTreeNode*> ArchiveEntryList::getSelectedDirectories() {
 		if (entry == entry_dir_back)
 			continue;
 		else if (entry->getType() == EntryType::folderType()) {
-			// If the entry is a folder type, get it's ArchiveTreeNode counterpart
+			// If the entry is a folder type, get its ArchiveTreeNode counterpart
 			ArchiveTreeNode* dir = archive->getDir(entry->getName(), current_dir);
 
 			// Add it to the return list

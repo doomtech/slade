@@ -234,7 +234,7 @@ void PatchTablePanel::onBtnPatchFromFile(wxCommandEvent& e) {
 	// Go through types
 	string ext_filter = "All files (*.*)|*.*|";
 	for (unsigned a = 0; a < etypes.size(); a++) {
-		// If the type is a valid image type, add it's extension filter
+		// If the type is a valid image type, add its extension filter
 		if (etypes[a]->extraProps().propertyExists("image")) {
 			ext_filter += etypes[a]->getFileFilterString();
 			ext_filter += "|";
