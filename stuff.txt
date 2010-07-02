@@ -145,8 +145,6 @@ Ideas / Possible Features -----------------------------------------------
 
 
 Other / Notes -----------------------------------------------------------
-- Mousewheel scroll in text editor panel
-- Restore keypress functions to select an entry by typing the letters of its name
 - "Recent files" tab in Archive Manager
 
 

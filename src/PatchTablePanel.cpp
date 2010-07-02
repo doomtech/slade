@@ -332,8 +332,9 @@ void PatchTablePanel::onBtnChangePatch(wxCommandEvent& e) {
 		// Prompt for new patch name
 		string newname = wxGetTextFromUser("Enter new patch entry name:", "Change Patch", patch.name, this);
 
-		// Update the patch
-		patch_table->replacePatch(selection[a], newname);
+		// Update the patch if it's not the Cancel button that was clicked
+		if (newname.Length() > 0)
+			patch_table->replacePatch(selection[a], newname);
 
 		// Update the list
 		list_patches->updateList();
