@@ -84,6 +84,7 @@ public:
 	string	getSizeString();
 	string	getTypeString() { if (type) return type->getName(); else return "Unknown"; }
 	void	stateChanged();
+	void	setExtensionByType();
 };
 
 #endif//__ARCHIVEENTRY_H__

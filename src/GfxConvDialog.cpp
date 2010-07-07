@@ -97,6 +97,12 @@ bool GfxConvDialog::writeToEntry() {
 	// Write data to the entry
 	entry->importMemChunk(mc);
 
+	// Re-detect entry type
+	EntryType::detectEntryType(entry);
+
+	// Update entry extension
+	entry->setExtensionByType();
+
 	return true;
 }
 

@@ -512,9 +512,15 @@ bool ArchivePanel::importEntry() {
 			// If a file was selected, import it
 			selection[a]->importFile(dialog_open->GetPath());
 
+			// Re-detect entry type
+			EntryType::detectEntryType(selection[a]);
+
+			// Set extension by type
+			selection[a]->setExtensionByType();
+
 			// If the entry is currently open, refresh the entry panel
 			if (cur_area->getEntry() == selection[a])
-				cur_area->loadEntry(selection[a]);
+				openEntry(selection[a], true);
 		}
 	}
 
@@ -734,9 +740,10 @@ bool ArchivePanel::palConvert() {
 }
 
 /* ArchivePanel::openEntry
- * Shows the appropriate entry area and sends the given entry to it
+ * Shows the appropriate entry area and sends the given entry to it.
+ * If [force] is true, the entry is opened even if it is already open
  *******************************************************************/
-bool ArchivePanel::openEntry(ArchiveEntry* entry) {
+bool ArchivePanel::openEntry(ArchiveEntry* entry, bool force) {
 	// Null entry, do nothing
 	if (!entry) {
 		wxLogMessage("Warning: NULL entry focused in the list");
@@ -744,7 +751,7 @@ bool ArchivePanel::openEntry(ArchiveEntry* entry) {
 	}
 
 	// Do nothing if the entry is already open
-	if (cur_area->getEntry() == entry)
+	if (cur_area->getEntry() == entry && !force)
 		return false;
 
 	// Detect entry type if it hasn't been already

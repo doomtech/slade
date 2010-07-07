@@ -395,3 +395,18 @@ void ArchiveEntry::stateChanged() {
 	if (parent_archive)
 		parent_archive->entryStateChanged(this);
 }
+
+void ArchiveEntry::setExtensionByType() {
+	// Convert name to wxFileName for processing
+	wxFileName fn(name);
+
+	// Set new extension
+	fn.SetExt(type->getExtension());
+
+	// Rename
+	Archive* parent_archive = getParent();
+	if (parent_archive)
+		parent_archive->renameEntry(this, fn.GetFullName());
+	else
+		rename(fn.GetFullName());
+}

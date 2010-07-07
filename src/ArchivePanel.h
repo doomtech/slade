@@ -63,7 +63,7 @@ public:
 	bool	palConvert();
 
 	// UI related
-	bool	openEntry(ArchiveEntry* entry);
+	bool	openEntry(ArchiveEntry* entry, bool force = false);
 	bool	showEntryPanel(EntryPanel* new_area, bool ask_save = true);
 	void	focusEntryList() { entry_list->SetFocus(); }
 
