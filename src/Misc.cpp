@@ -223,10 +223,6 @@ string Misc::massRenameFilter(wxArrayString& names) {
 }
 
 void Misc::doMassRename(wxArrayString& names, string name_filter) {
-	// Remove any *s from the end of name_filter
-	while (name_filter.EndsWith("*"))
-		name_filter.RemoveLast(1);
-
 	// Go through names
 	for (unsigned a = 0; a < names.size(); a++) {
 		string& name = names[a];

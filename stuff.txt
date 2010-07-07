@@ -16,6 +16,10 @@ TODO List ---------------------------------------------------------------
 - Recent files list
 - Proper start page
 
+--- Bugs ---
+- Copy/paste entry parent problem
+- Gfx panel bottom bar resizing
+
 --- Editor Features ---
 - Map editor (!)
 - Map preview
@@ -59,11 +63,6 @@ TODO List ---------------------------------------------------------------
 - Some lump (sub)formats can only be identified properly from the presence of other lumps; e.g. GL nodes and THINGS/LINEDEFS
 - Fine-tune identification of Doom SFX lumps if possible (most fail the test at the moment)
 - Should probably merge MultiEntryPanel stuff into DefaultEntryPanel
-- Really should change the way entries are added to zip archives
-	- Maybe change it so all archives use a tree structure to store entries, but
-	  non-zips will force all entries to be put in the root directory
-	- Need a better way of entry searching in zips (currently can only search by full path)
-	- Some kind of namespace feature would be good
 - Needs some kind of proper archive type system, handled by ArchiveManager
 - Need to do something about keeping ArchiveEntry.data.size and ArchiveEntry.size in sync
   (Still need the size member for entries that don't have their data loaded into memory yet)
@@ -99,6 +98,7 @@ Unimplemented Feature Requests ------------------------------------------
 - in-editor generation and editing of boom's binary animated/switches lumps. ("generation" in this case just meaning "stick the default one in there as a new lump", with the standard switches and animations from boom's default one, sort of like how a new texture1 lump gets the iwad stuff as a base)
 - Support for LZMA, Bzip2 and zip formats other than store and deflate
 - Mass research & replace of map elements (thing numbers, texture or flat names) across a map or all the maps of an archive
+- option to preserve sprite offsets when replacing a sprite from a file
 
 
 
@@ -141,7 +141,7 @@ Ideas / Possible Features -----------------------------------------------
 		- CRC (will be used to determine if the info is up-to-date)
 		- Extra properties
 		- Entry type
-- Model viewer?
+- Model viewer
 
 
 Other / Notes -----------------------------------------------------------

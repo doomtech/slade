@@ -349,7 +349,7 @@ bool ArchivePanel::renameEntry() {
 		// Get a list of entry names
 		wxArrayString names;
 		for (unsigned a = 0; a < selection.size(); a++)
-			names.push_back(selection[a]->getName());
+			names.push_back(selection[a]->getName((selection.size() > 1)));
 
 		// Get filter string
 		string filter = Misc::massRenameFilter(names);
