@@ -198,7 +198,6 @@ bool ArchivePanel::saveAs() {
 
 	// Setup file filters (temporary, should go through all archive types somehow)
 	string formats = archive->getFileExtensionString();
-	//string deftype = "*.wad";
 	string filename = wxFileSelector("Save Archive " + archive->getFilename(false) + " As", "", "", wxEmptyString, formats, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 
 	// Check a filename was selected
@@ -213,6 +212,9 @@ bool ArchivePanel::saveAs() {
 
 	// Refresh entry list
 	entry_list->updateList();
+
+	// Add as recent file
+	theArchiveManager->addRecentFile(filename);
 
 	return true;
 }

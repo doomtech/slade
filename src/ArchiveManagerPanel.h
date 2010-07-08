@@ -33,6 +33,7 @@ private:
 	WMFileBrowser*		file_browser;
 	wxButton*			btn_browser_open;
 	wxMenu*				menu_context;
+	wxMenu*				menu_recent;
 
 public:
 	// wxWidgets ID table
@@ -46,6 +47,8 @@ public:
 
 	ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_archives);
 	~ArchiveManagerPanel();
+
+	wxMenu*		recentFilesMenu() { return menu_recent; }
 
 	void		refreshArchiveList();
 	void		populateMapList(Archive* archive);

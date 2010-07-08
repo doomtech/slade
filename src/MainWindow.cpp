@@ -80,6 +80,57 @@ void MainWindow::setupLayout() {
 	wxRemoveFile(icon_filename);
 
 
+	// -- Editor Area --
+	notebook_tabs = new wxAuiNotebook(this, -1, wxDefaultPosition, wxDefaultSize, wxAUI_NB_DEFAULT_STYLE|wxNO_BORDER|wxAUI_NB_WINDOWLIST_BUTTON);
+
+	// Setup panel info & add panel
+	p_inf.CenterPane();
+	p_inf.Name("editor_area");
+	p_inf.PaneBorder(false);
+	m_mgr->AddPane(notebook_tabs, p_inf);
+
+	// Create Start Page (temporary)
+	html_startpage = new wxHtmlWindow(notebook_tabs, -1);
+	html_startpage->SetName("startpage");
+	notebook_tabs->AddPage(html_startpage,"Start Page");
+	Archive* res_archive = theArchiveManager->programResourceArchive();
+	ArchiveEntry* sp_entry = res_archive->getEntry("startpage.htm", res_archive->getDir("html"));
+	if (sp_entry)
+		html_startpage->SetPage(wxString::From8BitData((const char *)(sp_entry->getData(true)), sp_entry->getSize()));
+	else { // Fallback
+		wxLogMessage("Warning: html/startpage.htm not found in slade.pk3!");
+		html_startpage->SetPage("<HTML><BODY><CENTER><H1>SLADE<FONT SIZE=-4>3</FONT></H1><BR>It's A Doom Editor<BR><BR><BR><A HREF=http://slade.mancubus.net>http://slade.mancubus.net</A></CENTER></BODY></HTML>");
+	}
+
+
+	// -- Console Panel --
+	ConsolePanel *panel_console = new ConsolePanel(this, -1);
+
+	// Setup panel info & add panel
+	p_inf.DefaultPane();
+	p_inf.Float();
+	p_inf.FloatingSize(600, 400);
+	p_inf.FloatingPosition(100, 100);
+	p_inf.Show(false);
+	p_inf.Caption("Console");
+	p_inf.Name("console");
+	m_mgr->AddPane(panel_console, p_inf);
+
+
+	// -- Archive Manager Panel --
+	panel_archivemanager = new ArchiveManagerPanel(this, notebook_tabs);
+
+	// Setup panel info & add panel
+	p_inf.DefaultPane();
+	p_inf.Left();
+	p_inf.BottomDockable(false);
+	p_inf.TopDockable(false);
+	p_inf.BestSize(192, 480);
+	p_inf.Caption("Archive Manager");
+	p_inf.Name("archive_manager");
+	m_mgr->AddPane(panel_archivemanager, p_inf);
+
+
 	// -- Menu bar --
 	wxMenuBar *menu = new wxMenuBar();
 
@@ -94,6 +145,7 @@ void MainWindow::setupLayout() {
 	fileMenu->Append(createMenuItem(fileMenu, MENU_FILE_SAVE,		"&Save\tCtrl+S",		"Save the currently open Archive",					"t_save"));
 	fileMenu->Append(createMenuItem(fileMenu, MENU_FILE_SAVEAS,		"Save &As...",			"Save the currently open Archive to a new file",	"t_saveas"));
 	fileMenu->Append(createMenuItem(fileMenu, MENU_FILE_SAVEALL,	"Save All",				"Save all open Archives",							"t_saveall"));
+	fileMenu->AppendSubMenu(panel_archivemanager->recentFilesMenu(), "&Recent Files");
 	fileMenu->AppendSeparator();
 	fileMenu->Append(createMenuItem(fileMenu, MENU_FILE_CLOSE,		"&Close",				"Close the currently open Archive",					"t_close"));
 	fileMenu->Append(createMenuItem(fileMenu, MENU_FILE_CLOSEALL,	"Close All",			"Close all open Archives",							"t_closeall"));
@@ -223,58 +275,6 @@ void MainWindow::setupLayout() {
 	p_inf.Name("tb_palette");
 	m_mgr->AddPane(tb_palette, p_inf);
 */
-
-
-	// -- Editor Area --
-	notebook_tabs = new wxAuiNotebook(this, -1, wxDefaultPosition, wxDefaultSize, wxAUI_NB_DEFAULT_STYLE|wxNO_BORDER|wxAUI_NB_WINDOWLIST_BUTTON);
-
-	// Setup panel info & add panel
-	p_inf.CenterPane();
-	p_inf.Name("editor_area");
-	p_inf.PaneBorder(false);
-	m_mgr->AddPane(notebook_tabs, p_inf);
-
-	// Create Start Page (temporary)
-	html_startpage = new wxHtmlWindow(notebook_tabs, -1);
-	html_startpage->SetName("startpage");
-	notebook_tabs->AddPage(html_startpage,"Start Page");
-	Archive* res_archive = theArchiveManager->programResourceArchive();
-	ArchiveEntry* sp_entry = res_archive->getEntry("startpage.htm", res_archive->getDir("html"));
-	if (sp_entry)
-		html_startpage->SetPage(wxString::From8BitData((const char *)(sp_entry->getData(true)), sp_entry->getSize()));
-	else { // Fallback
-		wxLogMessage("Warning: html/startpage.htm not found in slade.pk3!");
-		html_startpage->SetPage("<HTML><BODY><CENTER><H1>SLADE<FONT SIZE=-4>3</FONT></H1><BR>It's A Doom Editor<BR><BR><BR><A HREF=http://slade.mancubus.net>http://slade.mancubus.net</A></CENTER></BODY></HTML>");
-	}
-
-
-	// -- Archive Manager Panel --
-	panel_archivemanager = new ArchiveManagerPanel(this, notebook_tabs);
-
-	// Setup panel info & add panel
-	p_inf.DefaultPane();
-	p_inf.Left();
-	p_inf.BottomDockable(false);
-	p_inf.TopDockable(false);
-	p_inf.BestSize(192, 480);
-	p_inf.Caption("Archive Manager");
-	p_inf.Name("archive_manager");
-	m_mgr->AddPane(panel_archivemanager, p_inf);
-
-
-
-	// -- Console Panel --
-	ConsolePanel *panel_console = new ConsolePanel(this, -1);
-
-	// Setup panel info & add panel
-	p_inf.DefaultPane();
-	p_inf.Float();
-	p_inf.FloatingSize(600, 400);
-	p_inf.FloatingPosition(100, 100);
-	p_inf.Show(false);
-	p_inf.Caption("Console");
-	p_inf.Name("console");
-	m_mgr->AddPane(panel_console, p_inf);
 
 
 	// -- Status Bar --

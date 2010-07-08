@@ -19,6 +19,8 @@ private:
 	bool				res_archive_open;
 	vector<string>		base_resource_paths;
 
+	vector<string>		recent_files;
+
 	static ArchiveManager*	instance;
 
 public:
@@ -65,6 +67,11 @@ public:
 	ArchiveEntry*			getResourceEntry(string name, Archive* ignore = NULL);
 	ArchiveEntry*			findResourceEntry(Archive::search_options_t& options, Archive* ignore = NULL);
 	vector<ArchiveEntry*>	findAllResourceEntries(Archive::search_options_t& options, Archive* ignore = NULL);
+
+	// Recent files
+	string		recentFile(unsigned index);
+	unsigned	numRecentFiles() { return recent_files.size(); }
+	void		addRecentFile(string path);
 
 	// Misc
 	bool	openTextureEditor(uint32_t index);

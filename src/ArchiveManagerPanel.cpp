@@ -136,6 +136,11 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
 	menu_context->Append(MENU_SAVEAS, "Save As", "Save the selected Archive(s) to a new file(s)");
 	menu_context->Append(MENU_CLOSE, "Close", "Close the selected Archive(s)");
 
+	// Create/setup recent files menu
+	menu_recent = new wxMenu();
+	for (unsigned a = 0; a < theArchiveManager->numRecentFiles(); a++)
+		menu_recent->Append(MainWindow::MENU_RECENT_1+a, theArchiveManager->recentFile(a));
+
 	// Bind events
 	list_archives->Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &ArchiveManagerPanel::onListArchivesChanged, this);
 	list_archives->Bind(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, &ArchiveManagerPanel::onListArchivesActivated, this);
@@ -578,6 +583,17 @@ void ArchiveManagerPanel::onAnnouncement(Announcer* announcer, string event_name
 		event_data.read(&index, 4);
 		openTextureTab(index);
 	}
+
+	// If the recent files list has changed
+	if (event_name == "recent_files_changed") {
+		// Clear menu
+		for (unsigned a = 0; a < 8; a++)
+			menu_recent->Destroy(MainWindow::MENU_RECENT_1 + a);
+
+		// (Re)Populate menu with recent files list
+		for (unsigned a = 0; a < theArchiveManager->numRecentFiles(); a++)
+			menu_recent->Append(MainWindow::MENU_RECENT_1+a, theArchiveManager->recentFile(a));
+	}
 }
 
 /* ArchiveManagerPanel::saveSelection
@@ -715,6 +731,15 @@ void ArchiveManagerPanel::handleAction(int menu_id) {
 
 			wxEndBusyCursor();
 		}
+	}
+
+	// File->Recent
+	else if (menu_id >= MainWindow::MENU_RECENT_1 && menu_id <= MainWindow::MENU_RECENT_8) {
+		// Get recent file index
+		unsigned index = menu_id - MainWindow::MENU_RECENT_1;
+
+		// Open it
+		openFile(theArchiveManager->recentFile(index));
 	}
 
 	// File->Save All

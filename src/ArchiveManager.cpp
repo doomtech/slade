@@ -188,6 +188,9 @@ Archive* ArchiveManager::openArchive(string filename) {
 		mc.write(&index, 4);
 		announce("archive_opened", mc);
 
+		// Add to recent files
+		addRecentFile(filename);
+
 		// Return the opened archive
 		return new_archive;
 	}
@@ -577,6 +580,44 @@ vector<ArchiveEntry*> ArchiveManager::findAllResourceEntries(Archive::search_opt
 	}
 
 	return ret;
+}
+
+string ArchiveManager::recentFile(unsigned index) {
+	// Check index
+	if (index >= recent_files.size())
+		return "";
+
+	return recent_files[index];
+}
+
+void ArchiveManager::addRecentFile(string path) {
+	// Check the path is valid
+	if (!wxFileName::FileExists(path))
+		return;
+
+	// Check if the file is already in the list
+	for (unsigned a = 0; a < recent_files.size(); a++) {
+		if (recent_files[a] == path) {
+			// Move this file to the top of the list
+			recent_files.erase(recent_files.begin() + a);
+			recent_files.insert(recent_files.begin(), path);
+
+			// Announce
+			announce("recent_files_changed");
+
+			return;
+		}
+	}
+
+	// Add the file to the top of the list
+	recent_files.insert(recent_files.begin(), path);
+
+	// List is 8 files max
+	while (recent_files.size() > 8)
+		recent_files.pop_back();
+
+	// Announce
+	announce("recent_files_changed");
 }
 
 /* ArchivePanel::openTextureEditor

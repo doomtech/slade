@@ -390,6 +390,19 @@ void MainApp::readConfigFile() {
 			}
 		}
 
+		// Read recent files list
+		if (token == "recent_files") {
+			// Skip {
+			token = tz.getToken();
+
+			// Read files until closing brace found
+			token = tz.getToken();
+			while (token != "") {
+				theArchiveManager->addRecentFile(token);
+				token = tz.getToken();
+			}
+		}
+
 		// Get next token
 		token = tz.getToken();
 	}
@@ -423,6 +436,12 @@ void MainApp::saveConfigFile() {
 	file.Write("\nbase_resource_paths\n{\n");
 	for (size_t a = 0; a < theArchiveManager->numBaseResourcePaths(); a++)
 		file.Write(s_fmt("\t\"%s\"\n", theArchiveManager->getBaseResourcePath(a)));
+	file.Write("}\n");
+
+	// Write recent files list (in reverse to keep proper order when reading back)
+	file.Write("\nrecent_files\n{\n");
+	for (int a = theArchiveManager->numRecentFiles()-1; a >= 0; a--)
+		file.Write(s_fmt("\t\"%s\"\n", theArchiveManager->recentFile(a)));
 	file.Write("}\n");
 
 	// Close configuration file
