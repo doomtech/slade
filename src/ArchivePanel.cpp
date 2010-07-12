@@ -347,11 +347,21 @@ bool ArchivePanel::renameEntry() {
 	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
 
 	// Check any are selected
-	if (selection.size() > 0) {
+	if (selection.size() == 1) {
+		// If only one entry is selected, just do basic rename
+
+		// Prompt for a new name
+		string new_name = wxGetTextFromUser("Enter new entry name: (* = unchanged)", "Rename", selection[0]->getName());
+
+		// Rename entry (if needed)
+		if (!new_name.IsEmpty() && selection[0]->getName() != new_name)
+			archive->renameEntry(selection[0], new_name);
+	}
+	else if (selection.size() > 1) {
 		// Get a list of entry names
 		wxArrayString names;
 		for (unsigned a = 0; a < selection.size(); a++)
-			names.push_back(selection[a]->getName((selection.size() > 1)));
+			names.push_back(selection[a]->getName(true));
 
 		// Get filter string
 		string filter = Misc::massRenameFilter(names);
@@ -371,9 +381,14 @@ bool ArchivePanel::renameEntry() {
 				if (entry->getType() == EntryType::folderType())
 					continue;
 
+				// Get current name as wxFileName for processing
+				wxFileName fn(entry->getName());
+
 				// Rename the entry (if needed)
-				if (names[a] != entry->getName())
-					archive->renameEntry(entry, names[a]);
+				if (fn.GetName() != names[a]) {
+					fn.SetName(names[a]);							// Change name
+					archive->renameEntry(entry, fn.GetFullName());	// Rename in archive
+				}
 			}
 		}
 	}

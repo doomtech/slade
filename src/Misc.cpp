@@ -228,20 +228,29 @@ void Misc::doMassRename(wxArrayString& names, string name_filter) {
 		string& name = names[a];
 
 		// If this name is shorter than the filter string, extend it with spaces
-		while (name.size() < name_filter.size())
-			name += " ";
+		//while (name.size() < name_filter.size())
+		//	name += " ";
 
 		// If the filter string is shorter than the name, just truncate the name
 		if (name_filter.size() < name.size())
 			name.Truncate(name_filter.size());
 
-		// Go through characters
+		// Go through filter characters
 		for (unsigned c = 0; c < name_filter.size(); c++) {
 			// Check character
 			if (name_filter[c] == '*')
 				continue;					// Skip if *
-			else
-				name[c] = name_filter[c];	// Otherwise replace character
+			else {
+				// First check that we aren't past the end of the name
+				if (c >= name.size()) {
+					// If we are, pad it with spaces
+					while (name.size() <= c)
+						name += " ";
+				}
+
+				// Replace character
+				name[c] = name_filter[c];
+			}
 		}
 	}
 }
