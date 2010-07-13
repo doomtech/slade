@@ -173,7 +173,8 @@ void ArchiveManagerPanel::refreshArchiveList() {
 	list_archives->ClearAll();
 
 	// Add columns
-	list_archives->InsertColumn(0, "Path");
+	list_archives->InsertColumn(0, "Filename");
+	list_archives->InsertColumn(1, "Path");
 
 	// Add each archive that is opened in the ArchiveManager
 	list_archives->enableSizeUpdate(false);
@@ -234,8 +235,12 @@ void ArchiveManagerPanel::updateListItem(int index) {
 	if (!archive)
 		return;
 
+	// Get path as wxFileName for processing
+	wxFileName fn(archive->getFilename());
+
 	// Set item name
-	list_archives->setItemText(index, 0, archive->getFilename());
+	list_archives->setItemText(index, 0, fn.GetFullName());
+	list_archives->setItemText(index, 1, fn.GetPath(true));
 
 	// Set item status colour
 	if (archive->canSave()) {
@@ -551,9 +556,9 @@ void ArchiveManagerPanel::onAnnouncement(Announcer* announcer, string event_name
 
 	// If an archive was added
 	if (event_name == "archive_added") {
-		int index = theArchiveManager->numArchives();
-		list_archives->addItem(index, theArchiveManager->getArchive(theArchiveManager->numArchives()-1)->getFilename(true));
-		//openTab(theArchiveManager->numArchives()-1);
+		int index = theArchiveManager->numArchives() - 1;
+		list_archives->addItem(index, wxEmptyString);
+		updateListItem(index);
 	}
 
 	// If an archive was opened
