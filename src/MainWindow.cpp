@@ -94,7 +94,7 @@ void MainWindow::setupLayout() {
 	html_startpage->SetName("startpage");
 	notebook_tabs->AddPage(html_startpage,"Start Page");
 	Archive* res_archive = theArchiveManager->programResourceArchive();
-	ArchiveEntry* sp_entry = res_archive->getEntry("startpage.htm", res_archive->getDir("html"));
+	ArchiveEntry* sp_entry = res_archive->getEntry("startpage.htm", false, res_archive->getDir("html"));
 	if (sp_entry)
 		html_startpage->SetPage(wxString::From8BitData((const char *)(sp_entry->getData(true)), sp_entry->getSize()));
 	else { // Fallback

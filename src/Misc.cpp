@@ -146,13 +146,13 @@ bool Misc::loadPaletteFromArchive(Palette8bit* pal, Archive* archive, int lump) 
 	// Find PLAYPAL entry
 	ArchiveEntry* playpal = NULL;
 	if (lump == PAL_ALPHAHACK)
-		playpal = archive->getEntry("TITLEPAL");
+		playpal = archive->getEntry("TITLEPAL", true);
 	else if (lump == PAL_HERETICHACK)
-		playpal = archive->getEntry("E2PAL");
+		playpal = archive->getEntry("E2PAL", true);
 	else if (lump == PAL_SHADOWHACK)
-		playpal = archive->getEntry("shadowpage+1");
+		playpal = archive->getEntry("shadowpage+1", true);
 	if (!playpal || playpal->getSize() < 768)
-		playpal = archive->getEntry("PLAYPAL");
+		playpal = archive->getEntry("PLAYPAL", true);
 
 	// Check it was found
 	if (!playpal || playpal->getSize() < 768)

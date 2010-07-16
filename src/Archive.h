@@ -31,7 +31,7 @@ public:
 	string			getName();
 	ArchiveEntry*	getDirEntry() { return dir_entry; }
 	ArchiveEntry*	getEntry(unsigned index);
-	ArchiveEntry*	getEntry(string name);
+	ArchiveEntry*	getEntry(string name, bool cut_ext = false);
 	unsigned		numEntries(bool inc_subdirs = false);
 	int				entryIndex(ArchiveEntry* entry);
 
@@ -78,6 +78,7 @@ public:
 	uint8_t				getType() { return type; }
 	string				getFilename(bool full = true);
 	ArchiveEntry*		getParent() { return parent; }
+	Archive*			getParentArchive() { return (parent ? parent->getParent() : NULL); }
 	ArchiveTreeNode*	getRoot() { return dir_root; }
 	bool				isModified() { return modified; }
 	bool				isOnDisk() { return on_disk; }
@@ -88,7 +89,7 @@ public:
 
 	// Entry retrieval/info
 	bool						checkEntry(ArchiveEntry* entry);
-	virtual ArchiveEntry*		getEntry(string name, ArchiveTreeNode* dir = NULL);
+	virtual ArchiveEntry*		getEntry(string name, bool cut_ext = false, ArchiveTreeNode* dir = NULL);
 	virtual ArchiveEntry*		getEntry(unsigned index, ArchiveTreeNode* dir = NULL);
 	virtual int					entryIndex(ArchiveEntry* entry, ArchiveTreeNode* dir = NULL);
 
@@ -168,7 +169,7 @@ public:
 	virtual ~TreelessArchive() {}
 
 	// Entry retrieval/info
-	virtual ArchiveEntry*		getEntry(string name, ArchiveTreeNode* dir = NULL) { return Archive::getEntry(name, NULL); }
+	virtual ArchiveEntry*		getEntry(string name, bool cut_ext = false, ArchiveTreeNode* dir = NULL) { return Archive::getEntry(name, NULL); }
 	virtual ArchiveEntry*		getEntry(unsigned index, ArchiveTreeNode* dir = NULL) { return Archive::getEntry(index, NULL); }
 	virtual int					entryIndex(ArchiveEntry* entry, ArchiveTreeNode* dir = NULL) { return Archive::entryIndex(entry, NULL); }
 

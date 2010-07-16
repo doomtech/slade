@@ -147,7 +147,7 @@ ArchiveEntry* ArchiveTreeNode::getEntry(unsigned index) {
  * Returns the entry matching [name] in this directory, or NULL if
  * no entries match
  *******************************************************************/
-ArchiveEntry* ArchiveTreeNode::getEntry(string name) {
+ArchiveEntry* ArchiveTreeNode::getEntry(string name, bool cut_ext) {
 	// Check name was given
 	if (name == "")
 		return NULL;
@@ -155,7 +155,7 @@ ArchiveEntry* ArchiveTreeNode::getEntry(string name) {
 	// Go through entries
 	for (unsigned a = 0; a < entries.size(); a++) {
 		// Check for (non-case-sensitive) name match
-		if (s_cmpnocase(entries[a]->getName(), name))
+		if (s_cmpnocase(entries[a]->getName(cut_ext), name))
 			return entries[a];
 	}
 
@@ -317,8 +317,8 @@ string Archive::getFilename(bool full) {
 	// If the archive is within another archive, return "<parent archive>/<entry name>"
 	if (parent) {
 		string parent_archive = "";
-		if (parent->getParent())
-			parent_archive = parent->getParent()->getFilename(false) + "/";
+		if (getParentArchive())
+			parent_archive = getParentArchive()->getFilename(false) + "/";
 
 		wxFileName fn(parent->getName());
 		return parent_archive + fn.GetName();
@@ -364,12 +364,12 @@ bool Archive::checkEntry(ArchiveEntry* entry) {
  * Returns the entry matching [name] within [dir]. If no dir is given
  * the root dir is used
  *******************************************************************/
-ArchiveEntry* Archive::getEntry(string name, ArchiveTreeNode* dir) {
+ArchiveEntry* Archive::getEntry(string name, bool cut_ext, ArchiveTreeNode* dir) {
 	// Check if dir was given
 	if (!dir)
 		dir = dir_root;	// None given, use root
 
-	return dir->getEntry(name);
+	return dir->getEntry(name, cut_ext);
 }
 
 /* Archive::getEntry
