@@ -31,6 +31,8 @@ struct tx_texture_t {
 	int16_t		height;
 
 	vector<tx_patch_t>	patches;
+
+	tx_texture_t() { flags = scale_x = scale_y = width = height = 0; }
 };
 
 class TextureXList {
@@ -49,11 +51,15 @@ public:
 	tx_texture_t	getTexture(string name);
 
 	void	addTexture(tx_texture_t& tex, int position = -1);
+	void	removeTexture(unsigned index);
 
 	void	clear(bool clear_patches = false);
 	void	removePatch(unsigned index);
 
 	bool	readTEXTUREXData(ArchiveEntry* texturex);
+	bool	writeTEXTUREXData(ArchiveEntry* texturex);
+
+	string	getTextureXFormatString();
 };
 
 #endif//__TEXTUREXLIST_H__

@@ -89,6 +89,15 @@ void TextureXList::addTexture(tx_texture_t& tex, int position) {
 		textures.push_back(tex);
 }
 
+void TextureXList::removeTexture(unsigned index) {
+	// Check index
+	if (index > textures.size())
+		return;
+
+	// Remove the texture from the list
+	textures.erase(textures.begin() + index);
+}
+
 /* TextureXList::clear
  * Clears all textures
  *******************************************************************/
@@ -316,4 +325,28 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex) {
 	delete[] offsets;
 
 	return true;
+}
+
+bool TextureXList::writeTEXTUREXData(ArchiveEntry* texturex) {
+	// Check entry was given
+	if (!texturex)
+		return false;
+
+
+}
+
+string TextureXList::getTextureXFormatString() {
+	switch (txformat) {
+		case TXF_NORMAL:
+			return "Doom";
+			break;
+		case TXF_STRIFE11:
+			return "Strife";
+			break;
+		case TXF_NAMELESS:
+			return "Doom Alpha Nameless";
+			break;
+		default:
+			return "Unknown";
+	}
 }

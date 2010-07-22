@@ -348,7 +348,13 @@ bool TextureEditorPanel::openTexture(tx_texture_t &tex) {
 	tex_canvas->openTexture(tex, *patch_table);
 
 	// Set control values
-	updateTextureControls();
+	//updateTextureControls();
+	text_tex_name->SetValue(tex.name);
+	spin_tex_width->SetValue(tex.width);
+	spin_tex_height->SetValue(tex.height);
+	spin_tex_scalex->SetValue(tex.scale_x);
+	spin_tex_scaley->SetValue(tex.scale_y);
+	updateTextureScaleLabel();
 	populatePatchList();
 	updatePatchControls();
 
@@ -499,6 +505,7 @@ void TextureEditorPanel::onTexWidthChanged(wxSpinEvent &e) {
 
 	// Update UI
 	tex_canvas->Refresh();
+	updateTextureScaleLabel();
 }
 
 /* TextureEditorPanel::onTexHeightChanged
@@ -510,6 +517,7 @@ void TextureEditorPanel::onTexHeightChanged(wxSpinEvent& e) {
 
 	// Update UI
 	tex_canvas->Refresh();
+	updateTextureScaleLabel();
 }
 
 /* TextureEditorPanel::onTexScaleXChanged

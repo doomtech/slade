@@ -65,6 +65,7 @@ public:
 
 	// Events
 	void	onPaletteChanged(wxCommandEvent& e);
+	void	onSaveClicked(wxCommandEvent& e);
 };
 
 #endif//__TEXTUREX_EDITOR_H__

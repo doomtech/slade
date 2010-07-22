@@ -64,8 +64,14 @@ TextureXEditor::TextureXEditor(wxWindow* parent) : wxPanel(parent, -1) {
 	hbox->Add(new wxStaticText(this, -1, "Palette:"), 0, wxALIGN_CENTER_VERTICAL|wxALL, 4);
 	hbox->Add(pal_chooser, 0, wxEXPAND|wxALL, 4);
 
+	// Add save changes button
+	btn_save = new wxButton(this, -1, "Save Changes");
+	hbox->AddStretchSpacer();
+	hbox->Add(btn_save, 0, wxEXPAND|wxALL, 4);
+
 	// Bind events
 	pal_chooser->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &TextureXEditor::onPaletteChanged, this);
+	btn_save->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureXEditor::onSaveClicked, this);
 
 	// Update+ layout
 	Layout();
@@ -189,6 +195,10 @@ void TextureXEditor::onPaletteChanged(wxCommandEvent& e) {
 	// Send to whatever needs it
 	for (size_t a = 0; a < texture_editors.size(); a++)
 		texture_editors[a]->setPalette(pal);
+}
+
+void TextureXEditor::onSaveClicked(wxCommandEvent& e) {
+
 }
 
 

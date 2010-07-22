@@ -96,11 +96,10 @@ TextureXPanel::TextureXPanel(wxWindow* parent, PatchTable* patch_table) : wxPane
 	// Bind events
 	list_textures->Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &TextureXPanel::onTextureListSelect, this);
 	btn_new_texture->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureXPanel::onBtnNewTexture, this);
+	btn_remove_texture->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureXPanel::onBtnRemoveTexture, this);
 
 	// Disable unimplemented
-	btn_new_texture->Enable(false);
 	btn_new_from_patch->Enable(false);
-	btn_remove_texture->Enable(false);
 }
 
 /* TextureXPanel::~TextureXPanel
@@ -206,4 +205,16 @@ void TextureXPanel::onBtnNewTextureFromPatch(wxCommandEvent& e) {
 }
 
 void TextureXPanel::onBtnRemoveTexture(wxCommandEvent& e) {
+	// Get selected textures
+	vector<long> selection = list_textures->getSelection();
+
+	// Go through selection backwards
+	for (int a = selection.size() - 1; a >= 0; a--) {
+		// Remove texture from list
+		texturex.removeTexture(selection[a]);
+	}
+
+	// Clear selection & refresh
+	list_textures->clearSelection();
+	list_textures->updateList();
 }
