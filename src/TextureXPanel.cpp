@@ -136,6 +136,14 @@ bool TextureXPanel::openTEXTUREX(ArchiveEntry* entry) {
 		return false;
 }
 
+/* TextureXPanel::saveTEXTUREX
+ * Saves a TEXTUREX format texture list
+ *******************************************************************/
+bool TextureXPanel::saveTEXTUREX() {
+	return texturex.writeTEXTUREXData(tx_entry);
+}
+
+
 /* TextureXPanel::setPalette
  * Sets the texture editor's palette
  *******************************************************************/

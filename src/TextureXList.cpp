@@ -108,7 +108,7 @@ void TextureXList::clear(bool clear_patches) {
 
 // Some structs for reading TEXTUREx data
 struct tdef_t
-{ // The normal version with just the relevant data
+{ // Just the data relevant to SLADE3
 	char		name[8];
 	uint16_t	flags;
 	uint8_t		scale[2];
@@ -122,6 +122,8 @@ struct nltdef_t
 	uint8_t		scale[2];
 	int16_t		width;
 	int16_t		height;
+	int16_t		columndir[2];
+	int16_t		patchcount;
 };
 
 struct ftdef_t
@@ -135,6 +137,15 @@ struct ftdef_t
 	int16_t		patchcount;
 };
 
+struct stdef_t
+{ // The Strife version with less useless data
+	char		name[8];
+	uint16_t	flags;
+	uint8_t		scale[2];
+	int16_t		width;
+	int16_t		height;
+	int16_t		patchcount;
+};
 
 /* TextureXList::removePatch
  * Updates all textures in the list to 'remove' the patch [index]
@@ -256,7 +267,7 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex) {
 			memcpy(tdef.name, temp, 8);
 
 			// Read texture info
-			if (!texturex->read(&nameless, 8)) {
+			if (!texturex->read(&nameless, 14)) {
 				wxLogMessage("Error: TEXTUREx entry is corrupt");
 				return false;
 			}
@@ -327,12 +338,133 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex) {
 	return true;
 }
 
+#define SAFEFUNC(x) if(!x) return false;
+
 bool TextureXList::writeTEXTUREXData(ArchiveEntry* texturex) {
 	// Check entry was given
 	if (!texturex)
 		return false;
 
+	if (texturex->isLocked())
+		return false;
 
+	/* Total size of a TEXTUREx lump, in bytes:
+		Header: 4 + (4 * numtextures)
+		Textures:
+			22 * numtextures (normal format)
+			14 * numtextures (nameless format)
+			18 * numtextures (Strife 1.1 format)
+		Patches:
+			10 * sum of patchcounts (normal and nameless formats)
+			 6 * sum of patchcounts (Strife 1.1 format)
+	*/
+	size_t numpatchrefs = 0;
+	size_t numtextures = textures.size();
+	for (size_t i = 0; i < numtextures; ++i) {
+		numpatchrefs += textures[i].patches.size();
+	}
+	wxLogMessage("%i patch references in %i textures", numpatchrefs, numtextures);
+
+	size_t datasize = 0;
+	size_t headersize = 4 + (4 * numtextures);
+	switch (txformat) {
+		case TXF_NORMAL:	datasize = 4 + (26 * numtextures) + (10 * numpatchrefs); break;
+		case TXF_NAMELESS:	datasize = 4 + (18 * numtextures) + (10 * numpatchrefs); break;
+		case TXF_STRIFE11:	datasize = 4 + (22 * numtextures) + ( 6 * numpatchrefs); break;
+		// Some compilers insist on having default cases.
+		default: return false;
+	}
+	
+	MemChunk * txdata = new MemChunk(datasize);
+	size_t txoffset = headersize;
+	int32_t foo = wxINT32_SWAP_ON_BE((signed) numtextures);
+
+	// Write header
+	txdata->seek(0, SEEK_SET);
+	SAFEFUNC(txdata->write(&foo, 4));
+
+	for (size_t i = 0; i < numtextures; ++i) {
+		foo = wxINT32_SWAP_ON_BE((signed) txoffset);
+		SAFEFUNC(txdata->write(&foo, 4));
+		SAFEFUNC(txdata->seek(txoffset, SEEK_SET));
+		// Write texture entry
+		switch (txformat) {
+			case TXF_NORMAL:
+			{
+				ftdef_t tex;
+				strncpy(tex.name, (const char*)textures[i].name.mb_str(), 8);
+				if (textures[i].name.Len() < 8) {
+					// Padding for XWE
+					for (size_t j = textures[i].name.Len() - 1; j < 8; ++j)
+						tex.name[j] = '\0';
+				}
+				tex.flags		= textures[i].flags;
+				tex.scale[0]	= textures[i].scale_x;
+				tex.scale[1]	= textures[i].scale_y;
+				tex.width		= textures[i].width;
+				tex.height		= textures[i].height;
+				tex.columndir[0]= 0;
+				tex.columndir[1]= 0;
+				tex.patchcount	= textures[i].patches.size();
+				SAFEFUNC(txdata->write(&tex, 22));
+				txoffset += (22 + (10 * tex.patchcount));
+				break;
+			}
+			case TXF_NAMELESS:
+			{
+				nltdef_t tex;
+				tex.flags		= textures[i].flags;
+				tex.scale[0]	= textures[i].scale_x;
+				tex.scale[1]	= textures[i].scale_y;
+				tex.width		= textures[i].width;
+				tex.height		= textures[i].height;
+				tex.columndir[0]= 0;
+				tex.columndir[1]= 0;
+				tex.patchcount	= textures[i].patches.size();
+				SAFEFUNC(txdata->write(&tex, 14));
+				txoffset += (14 + (10 * tex.patchcount));
+				break;
+			}
+			case TXF_STRIFE11:
+			{
+				stdef_t tex;
+				strncpy(tex.name, (const char*)textures[i].name.mb_str(), 8);
+				if (textures[i].name.Len() < 8) {
+					// Padding for XWE
+					for (size_t j = textures[i].name.Len() - 1; j < 8; ++j)
+						tex.name[j] = '\0';
+				}
+				tex.flags		= textures[i].flags;
+				tex.scale[0]	= textures[i].scale_x;
+				tex.scale[1]	= textures[i].scale_y;
+				tex.width		= textures[i].width;
+				tex.height		= textures[i].height;
+				tex.patchcount	= textures[i].patches.size();
+				SAFEFUNC(txdata->write(&tex, 18));
+				txoffset += (18 + (6 * tex.patchcount));
+				break;
+			}
+			default: return false;
+		}
+
+		// Write patch references
+		for (size_t k = 0; k < textures[i].patches.size(); ++k) {
+			// Write common data
+			SAFEFUNC(txdata->write(&(textures[i].patches[k]), 6));
+			// In non-Strife formats, there's some added rubbish
+			if (txformat != TXF_STRIFE11) {
+				foo = 0;
+				SAFEFUNC(txdata->write(&foo, 4));
+			}
+		}
+
+		// Return to offset list
+		SAFEFUNC(txdata->seek(4*(i+1), SEEK_SET));
+	}
+
+	texturex->importMemChunk(*txdata);
+
+	return true;
 }
 
 string TextureXList::getTextureXFormatString() {

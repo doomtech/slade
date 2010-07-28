@@ -41,6 +41,7 @@ public:
 	TextureXList&	txList() { return texturex; }
 
 	bool	openTEXTUREX(ArchiveEntry* texturex);
+	bool	saveTEXTUREX();
 	void	setPalette(Palette8bit* pal);
 
 	// Events

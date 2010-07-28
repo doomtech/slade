@@ -14,7 +14,7 @@ enum TextureXFormat {
 // Texture flags
 #define TX_WORLDPANNING	0x8000
 
-// TEXTUREx teture patch
+// TEXTUREx texture patch
 struct tx_patch_t {
 	int16_t		left;
 	int16_t		top;

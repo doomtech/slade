@@ -736,14 +736,6 @@
 						RelativePath=".\src\PaletteManager.h"
 						>
 					</File>
-					<File
-						RelativePath=".\src\TranslationTable.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\src\TranslationTable.h"
-						>
-					</File>
 				</Filter>
 				<Filter
 					Name="Composite Texture"
