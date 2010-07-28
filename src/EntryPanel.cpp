@@ -173,8 +173,10 @@ bool EntryPanel::revertEntry() {
 
 void EntryPanel::onBtnSave(wxCommandEvent& e) {
 	if (modified) {
-		if (saveEntry())
+		if (saveEntry()) {
 			modified = false;
+			EntryType::detectEntryType(entry);
+		}
 	}
 }
 

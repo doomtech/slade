@@ -207,10 +207,8 @@
       <File Name="src/BaseResourceArchivesPanel.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Browser">
-      <File Name="src/BrowserCanvas.cpp"/>
-      <File Name="src/BrowserCanvas.h"/>
-      <File Name="src/Browser.cpp"/>
-      <File Name="src/Browser.h"/>
+      <File Name="src/BrowserWindow.h"/>
+      <File Name="src/BrowserItem.h"/>
     </VirtualDirectory>
     <File Name="src/CTextureCanvas.cpp"/>
     <VirtualDirectory Name="TextEditor">
@@ -235,6 +233,8 @@
     <File Name="udmf11.txt"/>
     <File Name="udmf_zdoom.txt"/>
     <File Name="dist/slade.pk3"/>
+    <File Name="Makefile"/>
+    <File Name="Makefile-debug"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <Configuration Name="Debug" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
@@ -268,6 +268,7 @@
     <Configuration Name="Release" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
       <Compiler Options="-O2;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no)" Required="yes" PreCompiledHeader="">
         <Preprocessor Value="__WX__"/>
+        <Preprocessor Value="NDEBUG"/>
       </Compiler>
       <Linker Options="-s;$(shell wx-config --debug=no --libs std,gl,stc,aui --unicode=yes)" Required="yes"/>
       <ResourceCompiler Options="$(shell wx-config --rcflags)" Required="no"/>

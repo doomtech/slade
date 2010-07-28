@@ -178,7 +178,8 @@ void SplashWindow::onPaint(wxPaintEvent& e) {
 	dc.DrawRectangle(0, 0, width, height);
 
 	// Draw SLADE logo
-	dc.DrawBitmap(bm_logo, 0, 0, true);
+	if (bm_logo.IsOk())
+		dc.DrawBitmap(bm_logo, 0, 0, true);
 
 	// Setup text
 	wxFont font(10, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, "Calibri");
