@@ -242,39 +242,9 @@ void MainWindow::setupLayout() {
 	tb_bra->Realize();
 
 	// Setup panel info & add toolbar panels
-	// File toolbar
-	p_inf.ToolbarPane();
-	p_inf.Top();
-	p_inf.Name("tb_file");
-	m_mgr->AddPane(tb_file, p_inf);
-
-	// Entry toolbar
-	p_inf.ToolbarPane();
-	p_inf.Top();
-	p_inf.Position(1);
-	p_inf.Name("tb_entry");
-	m_mgr->AddPane(tb_entry, p_inf);
-
-	// Base Resource Archive toolbar
-	p_inf.ToolbarPane();
-	p_inf.Top();
-	p_inf.Position(2);
-	p_inf.Name("tb_bra");
-	m_mgr->AddPane(tb_bra, p_inf);
-
-/*
-	// Palette Toolbar
-	wxAuiToolBar* tb_palette = new wxAuiToolBar(this, -1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
-	tb_palette->AddLabel(-1, "Palette:");
-	tb_palette->AddControl(new PaletteChooser(tb_palette, -1));
-	tb_palette->Realize();
-
-	p_inf.ToolbarPane();
-	p_inf.Top();
-	p_inf.Position(2);
-	p_inf.Name("tb_palette");
-	m_mgr->AddPane(tb_palette, p_inf);
-*/
+	m_mgr->AddPane(tb_file, wxAuiPaneInfo().ToolbarPane().Top().Name("tb_file"));				// File toolbar
+	m_mgr->AddPane(tb_entry, wxAuiPaneInfo().ToolbarPane().Top().Name("tb_entry").Position(1));	// Entry toolbar
+	m_mgr->AddPane(tb_bra, wxAuiPaneInfo().ToolbarPane().Top().Name("tb_bra").Position(2));		// Base Resource Archive toolbar
 
 
 	// -- Status Bar --
