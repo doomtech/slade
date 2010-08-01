@@ -29,12 +29,12 @@ string TextureXListView::getItemText(long item, long column) const {
 		return "INVALID INDEX";
 
 	// Get associated texture
-	tx_texture_t tex = texturex->getTexture(item);
+	CTexture* tex = texturex->getTexture(item);
 
 	if (column == 0)						// Name column
-		return tex.name;
+		return tex->getName();
 	else if (column == 1)					// Size column
-		return s_fmt("%dx%d", tex.width, tex.height);
+		return s_fmt("%dx%d", tex->getWidth(), tex->getHeight());
 	else
 		return "INVALID COLUMN";
 }
@@ -115,16 +115,16 @@ TextureXPanel::~TextureXPanel() {
  * Loads a TEXTUREX format texture list into the editor
  *******************************************************************/
 bool TextureXPanel::openTEXTUREX(ArchiveEntry* entry) {
-	if (texturex.readTEXTUREXData(entry)) {
+	if (texturex.readTEXTUREXData(entry, *patch_table)) {
 		tx_entry = entry;
 
 		// Update patch table usage info
 		for (size_t a = 0; a < texturex.nTextures(); a++) {
-			tx_texture_t tex = texturex.getTexture(a);
+			CTexture* tex = texturex.getTexture(a);
 
 			// Go through texture's patches
-			for (size_t p = 0; p < tex.patches.size(); p++)
-				patch_table->patch(tex.patches[p].patch).used += 1;
+			for (size_t p = 0; p < tex->nPatches(); p++)
+				patch_table->patch(tex->getPatch(p)->patchName()).used += 1;
 		}
 
 		// Update texture list
@@ -140,7 +140,7 @@ bool TextureXPanel::openTEXTUREX(ArchiveEntry* entry) {
  * Saves a TEXTUREX format texture list
  *******************************************************************/
 bool TextureXPanel::saveTEXTUREX() {
-	return texturex.writeTEXTUREXData(tx_entry);
+	return texturex.writeTEXTUREXData(tx_entry, *patch_table);
 }
 
 
@@ -160,7 +160,7 @@ void TextureXPanel::setPalette(Palette8bit *pal) {
  * Called when an item on the texture list is selected
  *******************************************************************/
 void TextureXPanel::onTextureListSelect(wxListEvent& e) {
-	tx_texture_t tex = texturex.getTexture(e.GetIndex());
+	CTexture* tex = texturex.getTexture(e.GetIndex());
 	texture_editor->openTexture(tex);
 }
 
@@ -176,8 +176,8 @@ void TextureXPanel::onBtnNewTexture(wxCommandEvent& e) {
 	name = name.Upper().Truncate(8);
 
 	// Create new texture
-	tx_texture_t tex;
-	tex.name = name;
+	CTexture* tex = new CTexture();
+	tex->setName(name);
 
 	// Add it after the last selected item
 	int selected = list_textures->getLastSelected();

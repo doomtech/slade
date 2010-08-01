@@ -10,6 +10,7 @@
 class TextureEditorPanel : public wxPanel {
 private:
 	PatchTable*		patch_table;
+	CTexture*		tex_current;
 
 	// View controls
 	wxSlider*		slider_zoom;
@@ -50,7 +51,7 @@ public:
 	void		populatePatchList();
 	void		updatePatchControls();
 
-	bool	openTexture(tx_texture_t& tex);
+	bool	openTexture(CTexture* tex);
 	void	setPalette(Palette8bit* pal);
 
 	// Events

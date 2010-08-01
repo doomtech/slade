@@ -237,9 +237,6 @@
     <ClCompile Include="src\BaseResourceArchivesPanel.cpp">
       <Filter>UI Elements\Options</Filter>
     </ClCompile>
-    <ClCompile Include="src\Browser.cpp">
-      <Filter>UI Elements\Browser</Filter>
-    </ClCompile>
     <ClCompile Include="src\ColourBox.cpp">
       <Filter>UI Elements</Filter>
     </ClCompile>
@@ -266,9 +263,6 @@
     </ClCompile>
     <ClCompile Include="src\EntryType.cpp">
       <Filter>Resources\Archive\EntryType</Filter>
-    </ClCompile>
-    <ClCompile Include="src\BrowserCanvas.cpp">
-      <Filter>UI Elements\Browser</Filter>
     </ClCompile>
     <ClCompile Include="src\TextEditor.cpp">
       <Filter>UI Elements\TextEditor</Filter>
@@ -479,9 +473,6 @@
     <ClInclude Include="src\BaseResourceArchivesPanel.h">
       <Filter>UI Elements\Options</Filter>
     </ClInclude>
-    <ClInclude Include="src\Browser.h">
-      <Filter>UI Elements\Browser</Filter>
-    </ClInclude>
     <ClInclude Include="resource.h" />
     <ClInclude Include="src\ColourBox.h">
       <Filter>UI Elements</Filter>
@@ -512,9 +503,6 @@
     </ClInclude>
     <ClInclude Include="src\EntryType.h">
       <Filter>Resources\Archive\EntryType</Filter>
-    </ClInclude>
-    <ClInclude Include="src\BrowserCanvas.h">
-      <Filter>UI Elements\Browser</Filter>
     </ClInclude>
     <ClInclude Include="src\TextEditor.h">
       <Filter>UI Elements\TextEditor</Filter>
@@ -575,6 +563,12 @@
     </ClInclude>
     <ClInclude Include="src\BaseResourceChooser.h">
       <Filter>Main Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BrowserItem.h">
+      <Filter>UI Elements\Browser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BrowserWindow.h">
+      <Filter>UI Elements\Browser</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

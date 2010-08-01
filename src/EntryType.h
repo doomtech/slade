@@ -13,6 +13,7 @@ private:
 	string		extension;		// File extension to use when exporting entries of this type
 	string		icon;			// Icon to use in entry list
 	string		editor;			// The in-program editor to use (hardcoded ids, see *EntryPanel constructors)
+	string		category;		// The type 'category', used for type filtering
 	int			index;
 	bool		detectable;		// False only for special types that should be set not detected
 	uint8_t		reliability;	// How 'reliable' this type's detection is. A higher value means it's less
@@ -37,30 +38,13 @@ public:
 	EntryType(string id = "Unknown");
 	~EntryType();
 
-	// Setters
-	/*
-	void setName(string name)			{ this->name = name; }
-	void setExtension(string extension)	{ this->extension = extension; }
-	void setIcon(string icon)			{ this->icon = icon; }
-	void setFormat(string format)		{ this->format = format; }
-	void setEditor(string editor)		{ this->editor = editor; }
-	void addMatchExtension(string ext) 	{ this->match_extension.push_back(ext); }
-	void addMatchName(string name) 		{ this->match_name.push_back(name); }
-	void setMinSize(int size) 			{ this->size_limit[0] = size; }
-	void setMaxSize(int size)			{ this->size_limit[1] = size; }
-	void addSizeMultiple(int size) 		{ this->size_multiple.push_back(size); }
-	void addMatchSize(int size)			{ this->match_size.push_back(size); }
-	void setDetectable(bool detect)		{ this->detectable = detect; }
-	void setSection(string section)		{ this->section = section; }
-	void setReliability(uint8_t val)	{ this->reliability = val; }
-	*/
-
 	// Getters
 	string			getId()				{ return id; }
 	string			getName()			{ return name; }
 	string			getExtension()		{ return extension; }
 	string			getFormat()			{ return format; }
 	string			getEditor()			{ return editor; }
+	string			getCategory()		{ return category; }
 	string			getIcon()			{ return icon; }
 	int				getIndex()			{ return index; }
 	uint8_t			getReliability()	{ return reliability; }

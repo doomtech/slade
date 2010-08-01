@@ -77,7 +77,7 @@
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <PreprocessorDefinitions>WIN32;__WXMSW__;_WINDOWS;NOPCH;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;__WXMSW__;_WINDOWS;NOPCH;_CRT_SECURE_NO_WARNINGS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
       <StringPooling>true</StringPooling>
@@ -104,7 +104,6 @@
   <ItemGroup>
     <ClCompile Include="src\ArchiveEntryList.cpp" />
     <ClCompile Include="src\BaseResourceChooser.cpp" />
-    <ClCompile Include="src\BrowserCanvas.cpp" />
     <ClCompile Include="src\DatArchive.cpp" />
     <ClCompile Include="src\EntryDataFormat.cpp" />
     <ClCompile Include="src\GfxConvDialog.cpp" />
@@ -178,14 +177,14 @@
     <ClCompile Include="src\PaletteChooser.cpp" />
     <ClCompile Include="src\SplashWindow.cpp" />
     <ClCompile Include="src\BaseResourceArchivesPanel.cpp" />
-    <ClCompile Include="src\Browser.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ArchiveEntryList.h" />
     <ClInclude Include="src\ArchiveFormats.h" />
     <ClInclude Include="src\AudioFormats.h" />
     <ClInclude Include="src\BaseResourceChooser.h" />
-    <ClInclude Include="src\BrowserCanvas.h" />
+    <ClInclude Include="src\BrowserItem.h" />
+    <ClInclude Include="src\BrowserWindow.h" />
     <ClInclude Include="src\DatArchive.h" />
     <ClInclude Include="src\EntryDataFormat.h" />
     <ClInclude Include="src\GfxConvDialog.h" />
@@ -267,7 +266,6 @@
     <ClInclude Include="src\PaletteChooser.h" />
     <ClInclude Include="src\SplashWindow.h" />
     <ClInclude Include="src\BaseResourceArchivesPanel.h" />
-    <ClInclude Include="src\Browser.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>

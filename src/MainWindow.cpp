@@ -128,6 +128,8 @@ void MainWindow::setupLayout() {
 	p_inf.BestSize(192, 480);
 	p_inf.Caption("Archive Manager");
 	p_inf.Name("archive_manager");
+	p_inf.Show(true);
+	p_inf.Dock();
 	m_mgr->AddPane(panel_archivemanager, p_inf);
 
 

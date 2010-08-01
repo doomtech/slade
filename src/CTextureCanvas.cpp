@@ -140,13 +140,13 @@ void CTextureCanvas::updatePatchTextures() {
 /* CTextureCanvas::openTexture
  * Loads a composite texture to be displayed
  *******************************************************************/
-bool CTextureCanvas::openTexture(tx_texture_t& tex, PatchTable& ptable) {
+bool CTextureCanvas::openTexture(CTexture* tex, PatchTable& ptable) {
 	// Clear the current texture
 	clearTexture();
 
 	// Init patches
 	clearPatchTextures();
-	for (uint32_t a = 0; a < tex.patches.size(); a++) {
+	for (uint32_t a = 0; a < tex->nPatches(); a++) {
 		// Create GL texture
 		patch_textures.push_back(new GLTexture());
 
@@ -155,7 +155,7 @@ bool CTextureCanvas::openTexture(tx_texture_t& tex, PatchTable& ptable) {
 	}
 
 	// Load in texture info
-	texture.fromTX(tex, ptable);
+	//texture.fromTX(tex, ptable);
 
 	// Redraw
 	Refresh();
@@ -311,11 +311,10 @@ void CTextureCanvas::drawPatch(int num, rgba_t col) {
 
 	// Load the patch as an opengl texture if it isn't already
 	if (!patch_textures[num]->isLoaded()) {
-		if (patch) {
-			SImage temp;
-			Misc::loadImageFromEntry(&temp, patch->getPatchEntry());
-			patch_textures[num]->loadImage(&temp, &palette);
-		}
+		SImage temp;
+		// TODO: Load patch by name
+		//Misc::loadImageFromEntry(&temp, patch->getPatchEntry());
+		patch_textures[num]->loadImage(&temp, &palette);
 	}
 
 	// Enable textures

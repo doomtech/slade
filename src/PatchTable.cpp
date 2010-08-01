@@ -63,6 +63,20 @@ patch_t& PatchTable::patch(size_t index) {
 	return patches[index];
 }
 
+/* PatchTable::patch
+ * Returns the patch matching [name], or an 'invalid' patch if no
+ * match is found
+ *******************************************************************/
+patch_t& PatchTable::patch(string name) {
+	// Go through list
+	for (unsigned a = 0; a < patches.size(); a++) {
+		if (s_cmp(patches[a].name, name))
+			return patches[a];
+	}
+
+	return patch_invalid;
+}
+
 /* PatchTable::patchName
  * Returns the name of the patch at [index], or an empty string if
  * [index] is out of bounds
@@ -253,10 +267,6 @@ bool PatchTable::loadPNAMES(ArchiveEntry* pnames, Archive* parent) {
 
 		// Add new patch
 		bool success = addPatch(wxString(pname).Upper());
-
-		// Write log message if patch entry not found
-		//if (!success)
-		//	wxLogMessage("Patch \"%s\" not found", pname);
 	}
 
 	// Update variables

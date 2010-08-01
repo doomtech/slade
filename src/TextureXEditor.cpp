@@ -62,7 +62,7 @@ TextureXEditor::TextureXEditor(wxWindow* parent) : wxPanel(parent, -1) {
 	// Add palette chooser
 	pal_chooser = new PaletteChooser(this, -1);
 	hbox->Add(new wxStaticText(this, -1, "Palette:"), 0, wxALIGN_CENTER_VERTICAL|wxALL, 4);
-	hbox->Add(pal_chooser, 0, wxEXPAND|wxALL, 4);
+	hbox->Add(pal_chooser, 0, wxALIGN_CENTER|wxALL, 4);
 
 	// Add save changes button
 	btn_save = new wxButton(this, -1, "Save Changes");
@@ -170,12 +170,12 @@ bool TextureXEditor::openArchive(Archive* archive) {
 }
 
 bool TextureXEditor::removePatch(unsigned index) {
-	// Remove patch from patch table
-	patch_table.removePatch(index);
-
 	// Update TEXTUREx lists
 	for (unsigned a = 0; a < texture_editors.size(); a++)
-		texture_editors[a]->txList().removePatch(index);
+		texture_editors[a]->txList().removePatch(patch_table.patchName(index));
+
+	// Remove patch from patch table
+	patch_table.removePatch(index);
 
 	return true;
 }

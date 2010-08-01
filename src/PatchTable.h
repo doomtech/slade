@@ -25,6 +25,7 @@ public:
 	size_t	nPatches() { return patches.size(); }
 
 	patch_t&		patch(size_t index);
+	patch_t&		patch(string name);
 	string			patchName(size_t index);
 	ArchiveEntry*	patchEntry(size_t index);
 	ArchiveEntry*	patchEntry(string name);

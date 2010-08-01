@@ -47,9 +47,8 @@ CTPatch::CTPatch() {
 /* CTPatch::CTPatch
  * CTPatch class constructor w/initial values
  *******************************************************************/
-CTPatch::CTPatch(patch_t& patch, int16_t offset_x, int16_t offset_y) {
-	this->patch.entry = patch.entry;
-	this->patch.name = patch.name;
+CTPatch::CTPatch(string patch, int16_t offset_x, int16_t offset_y) {
+	this->patch = patch;
 	this->offset_x = offset_x;
 	this->offset_y = offset_y;
 }
@@ -106,7 +105,7 @@ void CTexture::clear() {
  * Adds a patch to the texture with the given attributes, at [index].
  * If [index] is -1, the patch is added to the end of the list
  *******************************************************************/
-bool CTexture::addPatch(patch_t& patch, int16_t offset_x, int16_t offset_y, int index) {
+bool CTexture::addPatch(string patch, int16_t offset_x, int16_t offset_y, int index) {
 	// Create new patch
 	CTPatch np(patch, offset_x, offset_y);
 
@@ -140,14 +139,36 @@ bool CTexture::removePatch(size_t index) {
 	return true;
 }
 
-bool CTexture::replacePatch(size_t index, patch_t newpatch) {
+/* CTexture::removePatch
+ * Removes all instances of [patch] from the texture. Returns true if
+ * any were removed, false otherwise
+ *******************************************************************/
+bool CTexture::removePatch(string patch) {
+	// Go through patches
+	bool removed = false;
+	vector<CTPatch>::iterator i = patches.begin();
+	while (i != patches.end()) {
+		if (s_cmp((*i).patchName(), patch)) {
+			patches.erase(i);
+			removed = true;
+		}
+		else
+			i++;
+	}
+
+	if (removed)
+		announce("patches_modified");
+
+	return removed;
+}
+
+bool CTexture::replacePatch(size_t index, string newpatch) {
 	// Check index
 	if (index >= patches.size())
 		return false;
 
 	// Replace patch at [index] with new
-	patches[index].setPatchName(newpatch.name);
-	patches[index].setPatchEntry(newpatch.entry);
+	patches[index].setPatchName(newpatch);
 
 	// Announce
 	announce("patches_modified");
@@ -199,6 +220,7 @@ bool CTexture::swapPatches(size_t p1, size_t p2) {
 /* CTexture::fromTX
  * Reads in texture information from a TEXTUREx format texture
  *******************************************************************/
+/*
 bool CTexture::fromTX(tx_texture_t& info, PatchTable& ptable) {
 	// Clear any current texture data
 	clear();
@@ -234,7 +256,6 @@ bool CTexture::fromTX(tx_texture_t& info, PatchTable& ptable) {
 		// Create patch
 		CTPatch patch;
 		patch.setPatchName(ptable.patchName(index));
-		patch.setPatchEntry(ptable.patchEntry(index));
 		patch.setOffsetX(info.patches[a].left);
 		patch.setOffsetY(info.patches[a].top);
 
@@ -245,10 +266,12 @@ bool CTexture::fromTX(tx_texture_t& info, PatchTable& ptable) {
 	// Done
 	return true;
 }
+*/
 
 /* CTexture::toTX
  * Writes texture information to a TEXTUREx format texture
  *******************************************************************/
+/*
 bool CTexture::toTX(tx_texture_t& info, PatchTable& ptable) {
 	// Write texture properties
 	info.name = name;
@@ -267,11 +290,9 @@ bool CTexture::toTX(tx_texture_t& info, PatchTable& ptable) {
 	info.patches.clear();
 	for (size_t a = 0; a < patches.size(); a++) {
 		// Get patch index
-		int16_t index = ptable.patchIndex(patches[a].getPatchName());
-		if (index < 0)
-			index = ptable.patchIndex(patches[a].getPatchEntry());
+		int16_t index = ptable.patchIndex(patches[a].patchName());
 		if (index < 0) {
-			wxLogMessage("Could not find patch %s in patch table", patches[a].getPatchName().c_str());
+			wxLogMessage("Could not find patch %s in patch table", patches[a].patchName().c_str());
 			continue;
 		}
 
@@ -288,19 +309,24 @@ bool CTexture::toTX(tx_texture_t& info, PatchTable& ptable) {
 	// Done
 	return true;
 }
+*/
 
 /* CTexture::fromZD
  * Reads in texture information from a ZDoom TEXTURES format texture
  *******************************************************************/
+/*
 bool CTexture::fromZD(Tokenizer& tz) {
 	// TODO: Implement reading TEXTURES definition
 	return false;
 }
+*/
 
 /* CTexture::toZD
  * Writes texture information to a ZDoom TEXTURES format texture
  *******************************************************************/
+/*
 string CTexture::toZD() {
 	// TODO: Implement writing TEXUTRES definition
 	return wxEmptyString;
 }
+*/

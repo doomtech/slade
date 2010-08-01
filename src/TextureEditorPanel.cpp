@@ -44,6 +44,7 @@
 TextureEditorPanel::TextureEditorPanel(wxWindow* parent, PatchTable* patch_table) : wxPanel(parent, -1) {
 	// Init variables
 	this->patch_table = patch_table;
+	tex_current = NULL;
 
 	// Setup sizer
 	wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
@@ -171,12 +172,11 @@ wxPanel* TextureEditorPanel::createTextureControls(wxWindow* parent) {
  * Updates all texture editing controls with values from the texture
  *******************************************************************/
 void TextureEditorPanel::updateTextureControls() {
-	CTexture& tex_current = tex_canvas->getTexture();
-	text_tex_name->SetValue(tex_current.getName());
-	spin_tex_width->SetValue(tex_current.getWidth());
-	spin_tex_height->SetValue(tex_current.getHeight());
-	spin_tex_scalex->SetValue(tex_current.getScaleX());
-	spin_tex_scaley->SetValue(tex_current.getScaleY());
+	text_tex_name->SetValue(tex_current->getName());
+	spin_tex_width->SetValue(tex_current->getWidth());
+	spin_tex_height->SetValue(tex_current->getHeight());
+	spin_tex_scalex->SetValue(tex_current->getScaleX());
+	spin_tex_scaley->SetValue(tex_current->getScaleY());
 	updateTextureScaleLabel();
 }
 
@@ -186,15 +186,14 @@ void TextureEditorPanel::updateTextureControls() {
  *******************************************************************/
 void TextureEditorPanel::updateTextureScaleLabel() {
 	// Determine scaled X value
-	CTexture& tex_current = tex_canvas->getTexture();
-	uint32_t scaled_x = tex_current.getWidth();
-	if (tex_current.getScaleX() != 0)
-		scaled_x /= tex_current.getScaleX();
+	uint32_t scaled_x = tex_current->getWidth();
+	if (tex_current->getScaleX() != 0)
+		scaled_x /= tex_current->getScaleX();
 
 	// Determine scaled Y value
-	uint32_t scaled_y = tex_current.getHeight();
-	if (tex_current.getScaleY() != 0)
-		scaled_y /= tex_current.getScaleY();
+	uint32_t scaled_y = tex_current->getHeight();
+	if (tex_current->getScaleY() != 0)
+		scaled_y /= tex_current->getScaleY();
 
 	// Update the label
 	label_scaled_size->SetLabel(s_fmt("Scaled Size: %dx%d", scaled_x, scaled_y));
@@ -289,9 +288,13 @@ void TextureEditorPanel::populatePatchList() {
 	// Add columns
 	list_patches->InsertColumn(0, "Name");
 
+	// Check a texture is currently opened for editing
+	if (!tex_current)
+		return;
+
 	// Add each patch to the list
-	for (size_t a = 0; a < tex_canvas->getTexture().nPatches(); a++)
-		list_patches->addItem(a, tex_canvas->getTexture().getPatch(a)->getPatchName());
+	for (size_t a = 0; a < tex_current->nPatches(); a++)
+		list_patches->addItem(a, tex_current->getPatch(a)->patchName());
 
 	// Update list width
 	list_patches->Show(true);
@@ -319,7 +322,7 @@ void TextureEditorPanel::updatePatchControls() {
 
 		// If only 1 patch is selected, just set the controls to this patch
 		if (selection.size() == 1) {
-			CTPatch* patch = tex_canvas->getTexture().getPatch(selection[0]);
+			CTPatch* patch = tex_current->getPatch(selection[0]);
 			if (!patch) {
 				wxLogMessage("Error: Selected patch does not exist in texture");
 				return;
@@ -339,22 +342,19 @@ void TextureEditorPanel::updatePatchControls() {
 /* TextureEditorPanel::openTexture
  * Loads a TEXTUREX format texture into the editor
  *******************************************************************/
-bool TextureEditorPanel::openTexture(tx_texture_t &tex) {
+bool TextureEditorPanel::openTexture(CTexture* tex) {
 	// Can't open if no patch table
 	if (!patch_table)
 		return false;
+
+	// Set as current texture
+	tex_current = tex;
 
 	// Open texture in canvas
 	tex_canvas->openTexture(tex, *patch_table);
 
 	// Set control values
-	//updateTextureControls();
-	text_tex_name->SetValue(tex.name);
-	spin_tex_width->SetValue(tex.width);
-	spin_tex_height->SetValue(tex.height);
-	spin_tex_scalex->SetValue(tex.scale_x);
-	spin_tex_scaley->SetValue(tex.scale_y);
-	updateTextureScaleLabel();
+	updateTextureControls();
 	populatePatchList();
 	updatePatchControls();
 
@@ -461,7 +461,7 @@ void TextureEditorPanel::onTexCanvasMouseEvent(wxMouseEvent& e) {
 			// Move any selected patches
 			wxArrayInt selected_patches = list_patches->selectedItems();
 			for (size_t a = 0; a < selected_patches.size(); a++) {
-				CTPatch* patch = tex_canvas->getTexture().getPatch(selected_patches[a]);
+				CTPatch* patch = tex_current->getPatch(selected_patches[a]);
 				if (!patch) continue;
 				int16_t cx = patch->xOffset();
 				int16_t cy = patch->yOffset();
@@ -493,7 +493,7 @@ void TextureEditorPanel::onTexCanvasDragEnd(wxCommandEvent& e) {
  *******************************************************************/
 void TextureEditorPanel::onTexNameChanged(wxCommandEvent& e) {
 	// Change texture name
-	tex_canvas->getTexture().setName(text_tex_name->GetValue());
+	tex_current->setName(text_tex_name->GetValue());
 }
 
 /* TextureEditorPanel::onTexWidthChanged
@@ -501,7 +501,7 @@ void TextureEditorPanel::onTexNameChanged(wxCommandEvent& e) {
  *******************************************************************/
 void TextureEditorPanel::onTexWidthChanged(wxSpinEvent &e) {
 	// Set texture's width
-	tex_canvas->getTexture().setWidth(spin_tex_width->GetValue());
+	tex_current->setWidth(spin_tex_width->GetValue());
 
 	// Update UI
 	tex_canvas->Refresh();
@@ -513,7 +513,7 @@ void TextureEditorPanel::onTexWidthChanged(wxSpinEvent &e) {
  *******************************************************************/
 void TextureEditorPanel::onTexHeightChanged(wxSpinEvent& e) {
 	// Set texture's height
-	tex_canvas->getTexture().setHeight(spin_tex_height->GetValue());
+	tex_current->setHeight(spin_tex_height->GetValue());
 
 	// Update UI
 	tex_canvas->Refresh();
@@ -525,7 +525,7 @@ void TextureEditorPanel::onTexHeightChanged(wxSpinEvent& e) {
  *******************************************************************/
 void TextureEditorPanel::onTexScaleXChanged(wxSpinEvent& e) {
 	// Set texture's x scale
-	tex_canvas->getTexture().setScaleX((double)spin_tex_scalex->GetValue() / 8.0);
+	tex_current->setScaleX((double)spin_tex_scalex->GetValue() / 8.0);
 
 	// Update UI
 	updateTextureScaleLabel();
@@ -536,7 +536,7 @@ void TextureEditorPanel::onTexScaleXChanged(wxSpinEvent& e) {
  *******************************************************************/
 void TextureEditorPanel::onTexScaleYChanged(wxSpinEvent& e) {
 	// Set texture's y scale
-	tex_canvas->getTexture().setScaleY((double)spin_tex_scaley->GetValue() / 8.0);
+	tex_current->setScaleY((double)spin_tex_scaley->GetValue() / 8.0);
 
 	// Update UI
 	updateTextureScaleLabel();
@@ -570,9 +570,6 @@ void TextureEditorPanel::onPatchListDeSelect(wxListEvent &e) {
  * Called when the 'add patch' button is pressed
  *******************************************************************/
 void TextureEditorPanel::onBtnPatchAdd(wxCommandEvent& e) {
-	// Get texture
-	CTexture& tex = tex_canvas->getTexture();
-
 	// Temporary choice dialog
 	wxArrayString patches;
 	for (size_t a = 0; a < patch_table->nPatches(); a++) patches.Add(patch_table->patchName(a));
@@ -580,7 +577,8 @@ void TextureEditorPanel::onBtnPatchAdd(wxCommandEvent& e) {
 
 	if (dlg.ShowModal() == wxID_OK) {
 		// Add new patch (temporary, testing)
-		tex.addPatch(patch_table->patch(dlg.GetSelection()));
+		patch_table->updatePatchEntry(dlg.GetSelection());
+		tex_current->addPatch(dlg.GetStringSelection());
 
 		// Update UI
 		populatePatchList();
@@ -599,14 +597,11 @@ void TextureEditorPanel::onBtnPatchRemove(wxCommandEvent& e) {
 	if (selection.size() == 0)
 		return;
 
-	// Get texture
-	CTexture& tex = tex_canvas->getTexture();
-
 	// Remove each selected patch
 	for (int a = selection.size()-1; a >= 0; a--) {
 		int index = selection[a];
 		// Remove patch from texture
-		tex.removePatch(index);
+		tex_current->removePatch(index);
 
 		// Remove patch from list
 		list_patches->DeleteItem(index);
@@ -677,18 +672,18 @@ void TextureEditorPanel::onBtnPatchReplace(wxCommandEvent& e) {
 	if (selection.size() == 0)
 		return;
 
-	// Get texture
-	CTexture& tex = tex_canvas->getTexture();
-
 	// Temporary choice dialog
 	wxArrayString patches;
 	for (size_t a = 0; a < patch_table->nPatches(); a++) patches.Add(patch_table->patchName(a));
 	wxSingleChoiceDialog dlg(this, "Select a patch to replace the selected patch(es) with", "Replace Patch", patches);
 
 	if (dlg.ShowModal() == wxID_OK) {
+		// Update patch entry
+		patch_table->updatePatchEntry(dlg.GetSelection());
+
 		// Go through selection and replace each patch
 		for (size_t a = 0; a < selection.size(); a++)
-			tex.replacePatch(selection[a], patch_table->patch(dlg.GetSelection()));
+			tex_current->replacePatch(selection[a], dlg.GetStringSelection());
 	}
 
 	// Repopulate patch list
@@ -713,13 +708,10 @@ void TextureEditorPanel::onBtnPatchDuplicate(wxCommandEvent& e) {
 	if (selection.size() == 0)
 		return;
 
-	// Get texture
-	CTexture& tex = tex_canvas->getTexture();
-
 	// Go through selection backwards
 	for (int a = selection.size()-1; a >= 0; a--) {
 		// Duplicate selected patch
-		tex.duplicatePatch(selection[a]);
+		tex_current->duplicatePatch(selection[a]);
 	}
 
 	// Repopulate patch list
@@ -745,7 +737,7 @@ void TextureEditorPanel::onPatchPositionXChanged(wxSpinEvent& e) {
 		return;
 
 	// Get selected patch
-	CTPatch* patch = tex_canvas->getTexture().getPatch(list_patches->selectedItems()[0]);
+	CTPatch* patch = tex_current->getPatch(list_patches->selectedItems()[0]);
 	if (!patch) return;
 
 	// Set patch x offset
@@ -764,7 +756,7 @@ void TextureEditorPanel::onPatchPositionYChanged(wxSpinEvent& e) {
 		return;
 
 	// Get selected patch
-	CTPatch* patch = tex_canvas->getTexture().getPatch(list_patches->selectedItems()[0]);
+	CTPatch* patch = tex_current->getPatch(list_patches->selectedItems()[0]);
 	if (!patch) return;
 
 	// Set patch y offset

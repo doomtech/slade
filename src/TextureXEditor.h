@@ -11,35 +11,6 @@
 #include "PaletteChooser.h"
 #include <wx/aui/auibook.h>
 
-/* Some notes to stop me forgetting stuff :P
-
-TextureXEditor
---------------
-- Brings together all texture editing stuff
-- Has the PatchTable
-- Has a pointer to the PNAMES entry (null if it's not needed or in an external/resource archive)
-- Has a list of TextureXPanels
-
-TextureXPanel
--------------
-- Handles a single TEXTURE1/2/S list
-- Has a TextureXList
-- Has a pointer to the TEXTUREX entry (null if it's a newly created list)
-- Has ability to add/remove (etc) textures
-
-TextureEditorPanel
-------------------
-- Handles editing/viewing of a single texture
-- Has a CTexture (within the CTextureCanvas)
-- Has a pointer to TextureXEditor::PatchTable
-
-PatchTablePanel
----------------
-- Handles editing/viewing of the patch table
-- Has a pointer to TextureXEditor::PatchTable
-
-*/
-
 class TextureXEditor : public wxPanel {
 private:
 	Archive*					archive;			// The archive this editor is handling

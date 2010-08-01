@@ -3,6 +3,8 @@
 #define __TEXTUREXLIST_H__
 
 #include "ArchiveEntry.h"
+#include "CTexture.h"
+#include "PatchTable.h"
 
 // Enum for different texturex formats
 enum TextureXFormat {
@@ -21,25 +23,11 @@ struct tx_patch_t {
 	uint16_t	patch;
 };
 
-// TEXTUREx texture definition
-struct tx_texture_t {
-	string		name;
-	uint16_t	flags;
-	uint8_t		scale_x;
-	uint8_t		scale_y;
-	int16_t		width;
-	int16_t		height;
-
-	vector<tx_patch_t>	patches;
-
-	tx_texture_t() { flags = scale_x = scale_y = width = height = 0; }
-};
-
 class TextureXList {
 private:
-	vector<tx_texture_t>	textures;
-	uint8_t					txformat;
-	tx_texture_t			tex_invalid;
+	vector<CTexture*>	textures;
+	uint8_t				txformat;
+	CTexture			tex_invalid;
 
 public:
 	TextureXList();
@@ -47,17 +35,17 @@ public:
 
 	uint32_t	nTextures() { return textures.size(); }
 
-	tx_texture_t	getTexture(size_t index);
-	tx_texture_t	getTexture(string name);
+	CTexture*	getTexture(size_t index);
+	CTexture*	getTexture(string name);
 
-	void	addTexture(tx_texture_t& tex, int position = -1);
+	void	addTexture(CTexture* tex, int position = -1);
 	void	removeTexture(unsigned index);
 
 	void	clear(bool clear_patches = false);
-	void	removePatch(unsigned index);
+	void	removePatch(string patch);
 
-	bool	readTEXTUREXData(ArchiveEntry* texturex);
-	bool	writeTEXTUREXData(ArchiveEntry* texturex);
+	bool	readTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_table);
+	bool	writeTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_table);
 
 	string	getTextureXFormatString();
 };

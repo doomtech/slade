@@ -68,6 +68,7 @@ EntryType::EntryType(string id) {
 	icon = "e_default";
 	editor = "default";
 	reliability = 255;
+	category = "Data";
 
 	// Init match criteria
 	format = "any";
@@ -370,6 +371,9 @@ bool EntryType::readEntryTypeDefinition(MemChunk& mc) {
 			else if (s_cmpnocase(fieldnode->getName(), "extra")) {			// Extra properties
 				for (unsigned v = 0; v < fieldnode->nValues(); v++)
 					ntype->extra.addFlag(fieldnode->getStringValue(v));
+			}
+			else if (s_cmpnocase(fieldnode->getName(), "category")) {		// Type category
+				ntype->category = fieldnode->getStringValue();
 			}
 		}
 
