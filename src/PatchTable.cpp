@@ -170,6 +170,9 @@ bool PatchTable::removePatch(unsigned index) {
 	// Remove the patch
 	patches.erase(patches.begin() + index);
 
+	// Announce
+	announce("modified");
+
 	return true;
 }
 
@@ -190,6 +193,9 @@ bool PatchTable::replacePatch(unsigned index, string newname) {
 	// Update patch entry
 	updatePatchEntry(index);
 
+	// Announce
+	announce("modified");
+
 	return !!patch(index).entry;
 }
 
@@ -203,6 +209,9 @@ bool PatchTable::addPatch(string name) {
 
 	// Add the patch
 	patches.push_back(patch);
+
+	// Announce
+	announce("modified");
 
 	return !!patch.entry;
 }
@@ -241,6 +250,9 @@ bool PatchTable::loadPNAMES(ArchiveEntry* pnames, Archive* parent) {
 	if (!pnames)
 		return false;
 
+	// Mute while loading
+	setMuted(true);
+
 	// Clear current table
 	patches.clear();
 
@@ -273,6 +285,10 @@ bool PatchTable::loadPNAMES(ArchiveEntry* pnames, Archive* parent) {
 
 	// Update variables
 	this->parent = parent;
+	setMuted(false);
+
+	// Announce
+	announce("modified");
 
 	return true;
 }
@@ -315,6 +331,9 @@ bool PatchTable::writePNAMES(ArchiveEntry* pnames) {
 void PatchTable::clearPatchUsage() {
 	for (size_t a = 0; a < patches.size(); a++)
 		patches[a].used_in.clear();
+
+	// Announce
+	announce("modified");
 }
 
 /* PatchTable::updatePatchUsage
@@ -328,4 +347,7 @@ void PatchTable::updatePatchUsage(CTexture* tex) {
 	// Update patch usage counts for texture
 	for (unsigned a = 0; a < tex->nPatches(); a++)
 		patch(tex->getPatch(a)->getName()).used_in.push_back(tex->getName());
+
+	// Announce
+	announce("modified");
 }

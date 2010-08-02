@@ -95,6 +95,7 @@ TextureEditorPanel::TextureEditorPanel(wxWindow* parent, PatchTable* patch_table
 	cb_draw_outside->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &TextureEditorPanel::onDrawOutsideChanged, this);
 	tex_canvas->Bind(wxEVT_LEFT_DOWN, &TextureEditorPanel::onTexCanvasMouseEvent, this);
 	tex_canvas->Bind(wxEVT_LEFT_UP, &TextureEditorPanel::onTexCanvasMouseEvent, this);
+	tex_canvas->Bind(wxEVT_RIGHT_UP, &TextureEditorPanel::onTexCanvasMouseEvent, this);
 	tex_canvas->Bind(wxEVT_MOTION, &TextureEditorPanel::onTexCanvasMouseEvent, this);
 	tex_canvas->Bind(EVT_DRAG_END, &TextureEditorPanel::onTexCanvasDragEnd, this);
 	text_tex_name->Bind(wxEVT_COMMAND_TEXT_UPDATED, &TextureEditorPanel::onTexNameChanged, this);
@@ -112,6 +113,7 @@ TextureEditorPanel::TextureEditorPanel(wxWindow* parent, PatchTable* patch_table
 	btn_patch_duplicate->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureEditorPanel::onBtnPatchDuplicate, this);
 	spin_patch_left->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &TextureEditorPanel::onPatchPositionXChanged, this);
 	spin_patch_top->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &TextureEditorPanel::onPatchPositionYChanged, this);
+	Bind(wxEVT_COMMAND_MENU_SELECTED, &TextureEditorPanel::onContextMenu, this, M_BEGIN, M_END);
 
 	// Init layout
 	Layout();
@@ -390,6 +392,150 @@ void TextureEditorPanel::setPalette(Palette8bit *pal) {
 	tex_canvas->Refresh();
 }
 
+void TextureEditorPanel::addPatch() {
+	// Do nothing if patch list is empty
+	if (patch_table->nPatches() == 0 || !tex_current)
+		return;
+
+	// Temporary choice dialog
+	wxArrayString patches;
+	for (size_t a = 0; a < patch_table->nPatches(); a++) patches.Add(patch_table->patchName(a));
+	wxSingleChoiceDialog dlg(this, "Select a patch to add", "Add Patch", patches);
+
+	if (dlg.ShowModal() == wxID_OK) {
+		// Add new patch (temporary, testing)
+		tex_current->addPatch(dlg.GetStringSelection(), 0, 0, patch_table->patchEntry(dlg.GetSelection()));
+
+		// Update UI
+		populatePatchList();
+		updatePatchControls();
+	}
+}
+
+void TextureEditorPanel::removePatch() {
+	// Get selection
+	wxArrayInt selection = list_patches->selectedItems();
+
+	// Do nothing if no patches are selected
+	if (selection.size() == 0 )
+		return;
+
+	// Remove each selected patch
+	for (int a = selection.size()-1; a >= 0; a--) {
+		int index = selection[a];
+		// Remove patch from texture
+		tex_current->removePatch(index);
+
+		// Remove patch from list
+		list_patches->DeleteItem(index);
+	}
+
+	// Update UI
+	updatePatchControls();
+}
+
+void TextureEditorPanel::patchBack() {
+	// Get selected patch(es)
+	wxArrayInt selection = list_patches->selectedItems();
+
+	// Do nothing if nothing is selected
+	if (selection.size() == 0)
+		return;
+
+	// Go through selection
+	for (size_t a = 0; a < selection.size(); a++) {
+		// Swap in list
+		list_patches->swapItems(selection[a], selection[a] - 1);
+
+		// Swap in texture
+		tex_canvas->swapPatches(selection[a], selection[a] - 1);
+	}
+
+	// Update UI
+	updatePatchControls();
+	tex_canvas->Refresh();
+}
+
+void TextureEditorPanel::patchForward() {
+	// Get selected patch(es)
+	wxArrayInt selection = list_patches->selectedItems();
+
+	// Do nothing if nothing is selected
+	if (selection.size() == 0)
+		return;
+
+	// Go through selection from bottom up
+	for (int a = selection.size() - 1; a >= 0; a--) {
+		// Swap in list
+		list_patches->swapItems(selection[a], selection[a] + 1);
+
+		// Swap in texture
+		tex_canvas->swapPatches(selection[a], selection[a] + 1);
+	}
+
+	// Update UI
+	updatePatchControls();
+	tex_canvas->Refresh();
+}
+
+void TextureEditorPanel::replacePatch() {
+	// Get selection
+	wxArrayInt selection = list_patches->selectedItems();
+
+	// Do nothing if no patches are selected
+	if (selection.size() == 0)
+		return;
+
+	// Temporary choice dialog
+	wxArrayString patches;
+	for (size_t a = 0; a < patch_table->nPatches(); a++) patches.Add(patch_table->patchName(a));
+	wxSingleChoiceDialog dlg(this, "Select a patch to replace the selected patch(es) with", "Replace Patch", patches);
+
+	if (dlg.ShowModal() == wxID_OK) {
+		// Go through selection and replace each patch
+		for (size_t a = 0; a < selection.size(); a++)
+			tex_current->replacePatch(selection[a], dlg.GetStringSelection(), patch_table->patchEntry(dlg.GetSelection()));
+	}
+
+	// Repopulate patch list
+	populatePatchList();
+
+	// Restore selection
+	for (size_t a = 0; a < selection.size(); a++)
+		list_patches->selectItem(selection[a]);
+
+	// Update UI
+	updatePatchControls();
+}
+
+void TextureEditorPanel::duplicatePatch() {
+	// Get selection
+	wxArrayInt selection = list_patches->selectedItems();
+
+	// Do nothing if no patches are selected
+	if (selection.size() == 0)
+		return;
+
+	// Go through selection backwards
+	for (int a = selection.size()-1; a >= 0; a--) {
+		// Duplicate selected patch
+		tex_current->duplicatePatch(selection[a]);
+	}
+
+	// Repopulate patch list
+	populatePatchList();
+
+	// Update selection
+	int offset = 1;
+	for (size_t a = 0; a < selection.size(); a++) {
+		list_patches->selectItem(selection[a] + offset);
+		offset++;
+	}
+
+	// Update UI
+	updatePatchControls();
+}
+
 void TextureEditorPanel::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
 	if (announcer != tex_current)
 		return;
@@ -475,6 +621,20 @@ void TextureEditorPanel::onTexCanvasMouseEvent(wxMouseEvent& e) {
 			list_patches->clearSelection();
 			list_patches->selectItem(patch);
 		}
+	}
+
+	// RIGHT MOUSE UP
+	else if (e.RightUp()) {
+		// Create context menu
+		wxMenu* popup = new wxMenu();
+		popup->Append(M_PATCH_ADD, "Add Patch");
+		popup->Append(M_PATCH_REMOVE, "Remove Selected Patch(es)");
+		popup->Append(M_PATCH_REPLACE, "Replace Selected Patch(es)");
+		popup->Append(M_PATCH_BACK, "Send Selected Patch(es) Back");
+		popup->Append(M_PATCH_FORWARD, "Bring Selected Patch(es) Forward");
+		popup->Append(M_PATCH_DUPLICATE, "Duplicate Selected Patch(es)");
+
+		PopupMenu(popup);
 	}
 
 	// MOUSE DRAGGING
@@ -604,162 +764,42 @@ void TextureEditorPanel::onPatchListDeSelect(wxListEvent &e) {
  * Called when the 'add patch' button is pressed
  *******************************************************************/
 void TextureEditorPanel::onBtnPatchAdd(wxCommandEvent& e) {
-	// Do nothing if patch list is empty
-	if (patch_table->nPatches() == 0 || !tex_current)
-		return;
-
-	// Temporary choice dialog
-	wxArrayString patches;
-	for (size_t a = 0; a < patch_table->nPatches(); a++) patches.Add(patch_table->patchName(a));
-	wxSingleChoiceDialog dlg(this, "Select a patch to add", "Add Patch", patches);
-
-	if (dlg.ShowModal() == wxID_OK) {
-		// Add new patch (temporary, testing)
-		tex_current->addPatch(dlg.GetStringSelection(), 0, 0, patch_table->patchEntry(dlg.GetSelection()));
-
-		// Update UI
-		populatePatchList();
-		updatePatchControls();
-	}
+	addPatch();
 }
 
 /* TextureEditorPanel::onBtnPatchRemove
  * Called when the 'remove patch' button is pressed
  *******************************************************************/
 void TextureEditorPanel::onBtnPatchRemove(wxCommandEvent& e) {
-	// Get selection
-	wxArrayInt selection = list_patches->selectedItems();
-
-	// Do nothing if no patches are selected
-	if (selection.size() == 0 )
-		return;
-
-	// Remove each selected patch
-	for (int a = selection.size()-1; a >= 0; a--) {
-		int index = selection[a];
-		// Remove patch from texture
-		tex_current->removePatch(index);
-
-		// Remove patch from list
-		list_patches->DeleteItem(index);
-	}
-
-	// Update UI
-	updatePatchControls();
+	removePatch();
 }
 
 /* TextureEditorPanel::onBtnPatchBack
  * Called when the 'send patch back' button is pressed
  *******************************************************************/
 void TextureEditorPanel::onBtnPatchBack(wxCommandEvent &e) {
-	// Get selected patch(es)
-	wxArrayInt selection = list_patches->selectedItems();
-
-	// Do nothing if nothing is selected
-	if (selection.size() == 0)
-		return;
-
-	// Go through selection
-	for (size_t a = 0; a < selection.size(); a++) {
-		// Swap in list
-		list_patches->swapItems(selection[a], selection[a] - 1);
-
-		// Swap in texture
-		tex_canvas->swapPatches(selection[a], selection[a] - 1);
-	}
-
-	// Update UI
-	updatePatchControls();
-	tex_canvas->Refresh();
+	patchBack();
 }
 
 /* TextureEditorPanel::onBtnPatchForward
  * Called when the 'bring patch forward' button is pressed
  *******************************************************************/
 void TextureEditorPanel::onBtnPatchForward(wxCommandEvent &e) {
-	// Get selected patch(es)
-	wxArrayInt selection = list_patches->selectedItems();
-
-	// Do nothing if nothing is selected
-	if (selection.size() == 0)
-		return;
-
-	// Go through selection from bottom up
-	for (int a = selection.size() - 1; a >= 0; a--) {
-		// Swap in list
-		list_patches->swapItems(selection[a], selection[a] + 1);
-
-		// Swap in texture
-		tex_canvas->swapPatches(selection[a], selection[a] + 1);
-	}
-
-	// Update UI
-	updatePatchControls();
-	tex_canvas->Refresh();
+	patchForward();
 }
 
 /* TextureEditorPanel::onBtnPatchReplace
  * Called when the 'replace patch' button is pressed
  *******************************************************************/
 void TextureEditorPanel::onBtnPatchReplace(wxCommandEvent& e) {
-	// Get selection
-	wxArrayInt selection = list_patches->selectedItems();
-
-	// Do nothing if no patches are selected
-	if (selection.size() == 0)
-		return;
-
-	// Temporary choice dialog
-	wxArrayString patches;
-	for (size_t a = 0; a < patch_table->nPatches(); a++) patches.Add(patch_table->patchName(a));
-	wxSingleChoiceDialog dlg(this, "Select a patch to replace the selected patch(es) with", "Replace Patch", patches);
-
-	if (dlg.ShowModal() == wxID_OK) {
-		// Go through selection and replace each patch
-		for (size_t a = 0; a < selection.size(); a++)
-			tex_current->replacePatch(selection[a], dlg.GetStringSelection(), patch_table->patchEntry(dlg.GetSelection()));
-	}
-
-	// Repopulate patch list
-	populatePatchList();
-
-	// Restore selection
-	for (size_t a = 0; a < selection.size(); a++)
-		list_patches->selectItem(selection[a]);
-
-	// Update UI
-	updatePatchControls();
+	replacePatch();
 }
 
 /* TextureEditorPanel::onBtnPatchDuplicate
  * Called when the 'duplicate patch' button is pressed
  *******************************************************************/
 void TextureEditorPanel::onBtnPatchDuplicate(wxCommandEvent& e) {
-	// Get selection
-	wxArrayInt selection = list_patches->selectedItems();
-
-	// Do nothing if no patches are selected
-	if (selection.size() == 0)
-		return;
-
-	// Go through selection backwards
-	for (int a = selection.size()-1; a >= 0; a--) {
-		// Duplicate selected patch
-		tex_current->duplicatePatch(selection[a]);
-	}
-
-	// Repopulate patch list
-	populatePatchList();
-
-	// Update selection
-	int offset = 1;
-	for (size_t a = 0; a < selection.size(); a++) {
-		list_patches->selectItem(selection[a] + offset);
-		offset++;
-	}
-
-	// Update UI
-	updatePatchControls();
+	duplicatePatch();
 }
 
 /* TextureEditorPanel::onPatchPositionXChanged
@@ -798,4 +838,35 @@ void TextureEditorPanel::onPatchPositionYChanged(wxSpinEvent& e) {
 
 	// Update UI
 	tex_canvas->Refresh();
+}
+
+void TextureEditorPanel::onContextMenu(wxCommandEvent& e) {
+	switch (e.GetId()) {
+	case M_PATCH_ADD:
+		addPatch();
+		break;
+
+	case M_PATCH_REMOVE:
+		removePatch();
+		break;
+
+	case M_PATCH_BACK:
+		patchBack();
+		break;
+
+	case M_PATCH_FORWARD:
+		patchForward();
+		break;
+
+	case M_PATCH_REPLACE:
+		replacePatch();
+		break;
+
+	case M_PATCH_DUPLICATE:
+		duplicatePatch();
+		break;
+
+	default:
+		break;
+	}
 }

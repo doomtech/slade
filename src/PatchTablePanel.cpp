@@ -45,6 +45,7 @@
 PatchTableListView::PatchTableListView(wxWindow* parent, PatchTable* patch_table) : VirtualListView(parent) {
 	// Init Variables
 	this->patch_table = patch_table;
+	listenTo(patch_table);
 
 	// Add columns
 	InsertColumn(0, "#");
@@ -152,6 +153,12 @@ void PatchTableListView::updateList(bool clear) {
 
 	updateWidth();
 	Refresh();
+}
+
+void PatchTableListView::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
+	// Just refresh on any event from the patch table
+	if (announcer == patch_table)
+		updateList();
 }
 
 

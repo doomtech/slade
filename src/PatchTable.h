@@ -3,6 +3,7 @@
 #define __PATCH_TABLE_H__
 
 #include "ArchiveEntry.h"
+#include "ListenerAnnouncer.h"
 
 struct patch_t {
 	string			name;
@@ -24,7 +25,7 @@ struct patch_t {
 
 class CTexture;
 
-class PatchTable {
+class PatchTable : public Announcer {
 private:
 	Archive*		parent;
 	vector<patch_t>	patches;

@@ -44,6 +44,20 @@ public:
 	TextureEditorPanel(wxWindow* parent, PatchTable* patch_table);
 	~TextureEditorPanel();
 
+	// wxWidgets IDs
+	enum {
+		M_BEGIN,
+
+		M_PATCH_ADD,
+		M_PATCH_REMOVE,
+		M_PATCH_BACK,
+		M_PATCH_FORWARD,
+		M_PATCH_REPLACE,
+		M_PATCH_DUPLICATE,
+
+		M_END,
+	};
+
 	bool		texModified() { return tex_modified; }
 	CTexture*	getTexture() { return tex_current; }
 
@@ -57,6 +71,14 @@ public:
 
 	bool	openTexture(CTexture* tex);
 	void	setPalette(Palette8bit* pal);
+
+	// Editing
+	void	addPatch();
+	void	removePatch();
+	void	patchBack();
+	void	patchForward();
+	void	replacePatch();
+	void	duplicatePatch();
 
 	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 
@@ -80,6 +102,7 @@ public:
 	void	onBtnPatchDuplicate(wxCommandEvent& e);
 	void	onPatchPositionXChanged(wxSpinEvent& e);
 	void	onPatchPositionYChanged(wxSpinEvent& e);
+	void	onContextMenu(wxCommandEvent& e);
 };
 
 #endif//__TEXTURE_EDITOR_PANEL_H__

@@ -34,6 +34,7 @@ private:
 	wxButton*			btn_new_texture;
 	wxButton*			btn_remove_texture;
 	wxButton*			btn_new_from_patch;
+	wxButton*			btn_new_from_file;
 	wxStaticText*		label_tx_format;
 
 public:
@@ -48,10 +49,13 @@ public:
 	void	setPalette(Palette8bit* pal);
 	void	applyChanges();
 
+	CTexture*	newTextureFromPatch(string name, string patch);
+
 	// Events
 	void	onTextureListSelect(wxListEvent& e);
 	void	onBtnNewTexture(wxCommandEvent& e);
 	void	onBtnNewTextureFromPatch(wxCommandEvent& e);
+	void	onBtnNewTextureFromFile(wxCommandEvent& e);
 	void	onBtnRemoveTexture(wxCommandEvent& e);
 };
 

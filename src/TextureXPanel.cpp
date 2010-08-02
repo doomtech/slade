@@ -3,6 +3,7 @@
 #include "WxStuff.h"
 #include "TextureXPanel.h"
 #include "Misc.h"
+#include <wx/filename.h>
 
 
 TextureXListView::TextureXListView(wxWindow* parent, TextureXList* texturex) : VirtualListView(parent) {
@@ -89,6 +90,10 @@ TextureXPanel::TextureXPanel(wxWindow* parent, PatchTable* patch_table) : wxPane
 	btn_new_from_patch = new wxButton(this, -1, "New From Patch");
 	framesizer->Add(btn_new_from_patch, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
+	// New Texture from File button
+	btn_new_from_file = new wxButton(this, -1, "New From File");
+	framesizer->Add(btn_new_from_file, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
 	// Remove Texture button
 	btn_remove_texture = new wxButton(this, -1, "Remove");
 	framesizer->Add(btn_remove_texture, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
@@ -101,6 +106,7 @@ TextureXPanel::TextureXPanel(wxWindow* parent, PatchTable* patch_table) : wxPane
 	list_textures->Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &TextureXPanel::onTextureListSelect, this);
 	btn_new_texture->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureXPanel::onBtnNewTexture, this);
 	btn_new_from_patch->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureXPanel::onBtnNewTextureFromPatch, this);
+	btn_new_from_file->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureXPanel::onBtnNewTextureFromFile, this);
 	btn_remove_texture->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureXPanel::onBtnRemoveTexture, this);
 }
 
@@ -168,6 +174,27 @@ void TextureXPanel::applyChanges() {
 		patch_table->updatePatchUsage(tex_current);
 		list_textures->updateList();
 	}
+}
+
+CTexture* TextureXPanel::newTextureFromPatch(string name, string patch) {
+	// Load patch image to get dimensions (yeah it's not optimal, but at the moment it's the best I can do)
+	SImage image;
+	ArchiveEntry* patch_entry = patch_table->patchEntry(patch);
+	Misc::loadImageFromEntry(&image, patch_entry);
+
+	// Create new texture
+	CTexture* tex = new CTexture();
+	tex->setName(name);
+
+	// Set dimensions
+	tex->setWidth(image.getWidth());
+	tex->setHeight(image.getHeight());
+
+	// Add patch
+	tex->addPatch(patch, 0, 0, patch_entry);
+
+	// Return the new texture
+	return tex;
 }
 
 
@@ -246,21 +273,8 @@ void TextureXPanel::onBtnNewTextureFromPatch(wxCommandEvent& e) {
 		// Process name
 		name = name.Upper().Truncate(8);
 
-		// Load patch image to get dimensions (yeah it's not optimal, but at the moment it's the best I can do)
-		SImage image;
-		ArchiveEntry* patch_entry = patch_table->patchEntry(dlg.GetSelection());
-		Misc::loadImageFromEntry(&image, patch_entry);
-
-		// Create new texture
-		CTexture* tex = new CTexture();
-		tex->setName(name);
-
-		// Set dimensions
-		tex->setWidth(image.getWidth());
-		tex->setHeight(image.getHeight());
-
-		// Add patch
-		tex->addPatch(dlg.GetStringSelection(), 0, 0, patch_entry);
+		// Create new texture from patch
+		CTexture* tex = newTextureFromPatch(name, dlg.GetStringSelection());
 
 		// Add texture after the last selected item
 		int selected = list_textures->getLastSelected();
@@ -277,6 +291,82 @@ void TextureXPanel::onBtnNewTextureFromPatch(wxCommandEvent& e) {
 
 		// Update patch table counts
 		patch_table->updatePatchUsage(tex);
+	}
+}
+
+void TextureXPanel::onBtnNewTextureFromFile(wxCommandEvent& e) {
+	// Get all entry types
+	vector<EntryType*> etypes = EntryType::allTypes();
+
+	// Go through types
+	string ext_filter = "All files (*.*)|*.*|";
+	for (unsigned a = 0; a < etypes.size(); a++) {
+		// If the type is a valid image type, add its extension filter
+		if (etypes[a]->extraProps().propertyExists("image")) {
+			ext_filter += etypes[a]->getFileFilterString();
+			ext_filter += "|";
+		}
+	}
+
+	// Create open file dialog
+	wxFileDialog dialog_open(this, "Choose file(s) to open", wxEmptyString, wxEmptyString,
+			ext_filter, wxFD_OPEN|wxFD_MULTIPLE|wxFD_FILE_MUST_EXIST, wxDefaultPosition);
+
+	// Run the dialog & check that the user didn't cancel
+	if (dialog_open.ShowModal() == wxID_OK) {
+		// Get file selection
+		wxArrayString files;
+		dialog_open.GetPaths(files);
+
+		// Go through file selection
+		for (unsigned a = 0; a < files.size(); a++) {
+			// Load the file into a temporary ArchiveEntry
+			ArchiveEntry* entry = new ArchiveEntry();
+			entry->importFile(files[a]);
+
+			// Determine type
+			EntryType::detectEntryType(entry);
+
+			// If it's not a valid image type, ignore this file
+			if (!entry->getType()->extraProps().propertyExists("image")) {
+				wxLogMessage("%s is not a valid image file", chr(files[a]));
+				continue;
+			}
+
+			// Ask for name for texture
+			wxFileName fn(files[a]);
+			string name = fn.GetName().Upper().Truncate(8);
+			name = wxGetTextFromUser(s_fmt("Enter a texture name for %s:", chr(fn.GetFullName())), "New Texture", name);
+			name = name.Truncate(8);
+
+			// Add patch to archive
+			entry->setName(name);
+			entry->setExtensionByType();
+			tx_entry->getParent()->addEntry(entry, "patches");
+
+			// Add patch to patch table
+			patch_table->addPatch(name);
+
+
+			// Create new texture from patch
+			CTexture* tex = newTextureFromPatch(name, name);
+
+			// Add texture after the last selected item
+			int selected = list_textures->getLastSelected();
+			if (selected == -1) selected = texturex.nTextures() - 1; // Add to end of the list if nothing selected
+			texturex.addTexture(tex, selected + 1);
+
+			// Update texture list
+			list_textures->updateList();
+
+			// Select the new texture
+			list_textures->clearSelection();
+			list_textures->selectItem(selected + 1);
+			list_textures->EnsureVisible(selected + 1);
+
+			// Update patch table counts
+			patch_table->updatePatchUsage(tex);
+		}
 	}
 }
 
