@@ -184,7 +184,7 @@ void TextureXPanel::onTextureListSelect(wxListEvent& e) {
 
 	// Save any changes to previous texture
 	applyChanges();
-	
+
 	// Open texture in editor
 	texture_editor->openTexture(tex);
 
@@ -226,6 +226,10 @@ void TextureXPanel::onBtnNewTexture(wxCommandEvent& e) {
 }
 
 void TextureXPanel::onBtnNewTextureFromPatch(wxCommandEvent& e) {
+	// Do nothing if patch list is empty
+	if (patch_table->nPatches() == 0)
+		return;
+
 	// Temporary choice dialog
 	wxArrayString patches;
 	for (size_t a = 0; a < patch_table->nPatches(); a++) patches.Add(patch_table->patchName(a));
@@ -286,7 +290,7 @@ void TextureXPanel::onBtnRemoveTexture(wxCommandEvent& e) {
 		CTexture* tex = texturex.getTexture(selection[a]);
 		for (unsigned p = 0; p < tex->nPatches(); p++)
 			patch_table->patch(tex->getPatch(p)->getName()).removeTextureUsage(tex->getName());
-		
+
 		// Remove texture from list
 		texturex.removeTexture(selection[a]);
 	}

@@ -62,7 +62,7 @@ public:
 		m_vbox->Add(framesizer, 0, wxEXPAND|wxALL, 4);
 
 		// Doom format
-		rb_format_doom = new wxRadioButton(this, -1, "Doom (TEXTURE1 + PNAMES)");
+		rb_format_doom = new wxRadioButton(this, -1, "Doom (TEXTURE1 + PNAMES)", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
 		framesizer->Add(rb_format_doom, 0, wxEXPAND|wxALL, 4);
 
 		// Strife format
@@ -223,10 +223,10 @@ bool TextureXEditor::openArchive(Archive* archive) {
 	else {
 		// No TEXTUREx entries found, so ask if the user wishes to create one
 		wxMessageDialog dlg(this, "The archive does not contain any texture definitions (TEXTURE1/2 or TEXTURES). Do you wish to create a new texture definition list?", "No Texture Definitions Found", wxYES_NO);
-		
+
 		if (dlg.ShowModal() == wxID_YES) {
 			CreateTextureXDialog ctxd(this);
-			
+
 			while (1) {
 				// Check if cancelled
 				if (ctxd.ShowModal() == wxID_CANCEL)
@@ -262,8 +262,8 @@ bool TextureXEditor::openArchive(Archive* archive) {
 
 					// Open TEXTUREX panel
 					TextureXPanel* tx_panel = new TextureXPanel(this, &patch_table);
-					tx_panel->openTEXTUREX(texturex);
 					tx_panel->txList().setFormat(format);
+					tx_panel->openTEXTUREX(texturex);
 					tx_panel->setPalette(pal_chooser->getSelectedPalette());
 					texturex->lock();
 

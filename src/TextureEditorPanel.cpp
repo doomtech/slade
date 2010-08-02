@@ -172,6 +172,10 @@ wxPanel* TextureEditorPanel::createTextureControls(wxWindow* parent) {
  * Updates all texture editing controls with values from the texture
  *******************************************************************/
 void TextureEditorPanel::updateTextureControls() {
+	// Check texture is open
+	if (!tex_current)
+		return;
+
 	text_tex_name->SetValue(tex_current->getName());
 	spin_tex_width->SetValue(tex_current->getWidth());
 	spin_tex_height->SetValue(tex_current->getHeight());
@@ -185,6 +189,10 @@ void TextureEditorPanel::updateTextureControls() {
  * dimensions and scale
  *******************************************************************/
 void TextureEditorPanel::updateTextureScaleLabel() {
+	// Check texture is open
+	if (!tex_current)
+		return;
+
 	// Determine scaled X value
 	uint32_t scaled_x = tex_current->getWidth();
 	if (tex_current->getScaleX() != 0)
@@ -514,7 +522,8 @@ void TextureEditorPanel::onTexCanvasDragEnd(wxCommandEvent& e) {
  *******************************************************************/
 void TextureEditorPanel::onTexNameChanged(wxCommandEvent& e) {
 	// Change texture name
-	tex_current->setName(text_tex_name->GetValue());
+	if (tex_current)
+		tex_current->setName(text_tex_name->GetValue());
 }
 
 /* TextureEditorPanel::onTexWidthChanged
@@ -522,7 +531,8 @@ void TextureEditorPanel::onTexNameChanged(wxCommandEvent& e) {
  *******************************************************************/
 void TextureEditorPanel::onTexWidthChanged(wxSpinEvent &e) {
 	// Set texture's width
-	tex_current->setWidth(spin_tex_width->GetValue());
+	if (tex_current)
+		tex_current->setWidth(spin_tex_width->GetValue());
 
 	// Update UI
 	tex_canvas->Refresh();
@@ -534,7 +544,8 @@ void TextureEditorPanel::onTexWidthChanged(wxSpinEvent &e) {
  *******************************************************************/
 void TextureEditorPanel::onTexHeightChanged(wxSpinEvent& e) {
 	// Set texture's height
-	tex_current->setHeight(spin_tex_height->GetValue());
+	if (tex_current)
+		tex_current->setHeight(spin_tex_height->GetValue());
 
 	// Update UI
 	tex_canvas->Refresh();
@@ -546,7 +557,8 @@ void TextureEditorPanel::onTexHeightChanged(wxSpinEvent& e) {
  *******************************************************************/
 void TextureEditorPanel::onTexScaleXChanged(wxSpinEvent& e) {
 	// Set texture's x scale
-	tex_current->setScaleX((double)spin_tex_scalex->GetValue() / 8.0);
+	if (tex_current)
+		tex_current->setScaleX((double)spin_tex_scalex->GetValue() / 8.0);
 
 	// Update UI
 	updateTextureScaleLabel();
@@ -557,7 +569,8 @@ void TextureEditorPanel::onTexScaleXChanged(wxSpinEvent& e) {
  *******************************************************************/
 void TextureEditorPanel::onTexScaleYChanged(wxSpinEvent& e) {
 	// Set texture's y scale
-	tex_current->setScaleY((double)spin_tex_scaley->GetValue() / 8.0);
+	if (tex_current)
+		tex_current->setScaleY((double)spin_tex_scaley->GetValue() / 8.0);
 
 	// Update UI
 	updateTextureScaleLabel();
@@ -591,6 +604,10 @@ void TextureEditorPanel::onPatchListDeSelect(wxListEvent &e) {
  * Called when the 'add patch' button is pressed
  *******************************************************************/
 void TextureEditorPanel::onBtnPatchAdd(wxCommandEvent& e) {
+	// Do nothing if patch list is empty
+	if (patch_table->nPatches() == 0 || !tex_current)
+		return;
+
 	// Temporary choice dialog
 	wxArrayString patches;
 	for (size_t a = 0; a < patch_table->nPatches(); a++) patches.Add(patch_table->patchName(a));
@@ -614,7 +631,7 @@ void TextureEditorPanel::onBtnPatchRemove(wxCommandEvent& e) {
 	wxArrayInt selection = list_patches->selectedItems();
 
 	// Do nothing if no patches are selected
-	if (selection.size() == 0)
+	if (selection.size() == 0 )
 		return;
 
 	// Remove each selected patch
