@@ -55,6 +55,22 @@ string map_lumps[12] = {
 	"BEHAVIOR"
 };
 
+// Special namespaces (at the moment these are just mapping to zdoom's "zip as wad" namespace folders)
+// http://zdoom.org/wiki/Using_ZIPs_as_WAD_replacement#How_to
+struct ns_special_t { string name; string letter; };
+ns_special_t special_namespaces[] = {
+	{ "patches",	"p"		},
+	{ "sprites",	"s"		},
+	{ "flats",		"f"		},
+	{ "textures",	"tx"	},
+	{ "hires",		"hi"	},
+	{ "colormaps",	"c"		},
+	{ "acs",		"a"		},
+	{ "voices",		"v"		},
+};
+const int n_special_namespaces = 8;
+
+
 
 /*******************************************************************
  * EXTERNAL VARIABLES
@@ -121,6 +137,14 @@ void WadArchive::updateNamespaces() {
 			string name = entry->getName();
 			ns.name = name.Left(name.Length() - 6).Lower();
 
+			// Convert some special cases (because technically PP_START->P_END is a valid namespace)
+			if (ns.name == "pp")
+				ns.name = "p";
+			if (ns.name == "ff")
+				ns.name = "f";
+			if (ns.name == "ss")
+				ns.name = "s";
+
 			// Add to namespace list
 			namespaces.push_back(ns);
 		}
@@ -129,6 +153,14 @@ void WadArchive::updateNamespaces() {
 			// Get namespace 'name'
 			int len = entry->getName().Length() - 4;
 			string ns_name = entry->getName().Left(len).Lower();
+
+			// Convert some special cases (because technically P_START->PP_END is a valid namespace)
+			if (ns_name == "pp")
+				ns_name = "p";
+			if (ns_name == "ff")
+				ns_name = "f";
+			if (ns_name == "ss")
+				ns_name = "s";
 
 			// Check if it's the end of an existing namespace
 			for (unsigned a = 0; a < namespaces.size(); a++) {
@@ -151,24 +183,11 @@ void WadArchive::updateNamespaces() {
 			continue;
 		}
 
-		// Check namespace name for special cases (at the moment these are just mapping to zdoom's "zip as wad" namespace folders)
-		// http://zdoom.org/wiki/Using_ZIPs_as_WAD_replacement#How_to
-		if (s_cmp(ns.name, "p") || s_cmp(ns.name, "pp"))
-			ns.name = "patches";
-		else if (s_cmp(ns.name, "s") || s_cmp(ns.name, "ss"))
-			ns.name = "sprites";
-		else if (s_cmp(ns.name, "f") || s_cmp(ns.name, "ff"))
-			ns.name = "flats";
-		else if (s_cmp(ns.name, "tx"))
-			ns.name = "textures";
-		else if (s_cmp(ns.name, "hi"))
-			ns.name = "hires";
-		else if (s_cmp(ns.name, "c"))
-			ns.name = "colormaps";
-		else if (s_cmp(ns.name, "a"))
-			ns.name = "acs";
-		else if (s_cmp(ns.name, "v"))
-			ns.name = "voices";
+		// Check namespace name for special cases
+		for (int a = 0; a < n_special_namespaces; a++) {
+			if (s_cmp(ns.name, special_namespaces[a].letter))
+				ns.name = special_namespaces[a].name;
+		}
 
 		// Testing
 		//wxLogMessage("Namespace %s", chr(ns.name));
@@ -514,7 +533,16 @@ ArchiveEntry* WadArchive::addEntry(ArchiveEntry* entry, string add_namespace, bo
 		}
 	}
 
-	// Namespace not found, add to global namespace (ie end of archive)
+	// If the requested namespace is a special namespace and doesn't exist, create it
+	for (int a = 0; a < n_special_namespaces; a++) {
+		if (add_namespace == special_namespaces[a].name) {
+			addNewEntry(special_namespaces[a].letter + "_start");
+			addNewEntry(special_namespaces[a].letter + "_end");
+			return addEntry(entry, add_namespace, copy);
+		}
+	}
+
+	// Unsupported namespace not found, so add to global namespace (ie end of archive)
 	return addEntry(entry, 0xFFFFFFFF, NULL, copy);
 }
 
