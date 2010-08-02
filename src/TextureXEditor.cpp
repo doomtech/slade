@@ -82,7 +82,6 @@ TextureXEditor::TextureXEditor(wxWindow* parent) : wxPanel(parent, -1) {
  * TextureXEditor class destructor
  *******************************************************************/
 TextureXEditor::~TextureXEditor() {
-	// FIXME: Can cause crash if archive is closed before this
 	if (pnames)
 		pnames->unlock();
 }

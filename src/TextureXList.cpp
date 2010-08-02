@@ -316,7 +316,7 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_ta
 				wxLogMessage("Warning: Texture %s contains patch %d which is invalid - may be incorrect PNAMES entry", chr(tex->getName()), pdef.patch);
 				patch = s_fmt("INVPATCH%04d", pdef.patch);
 			}
-			
+
 			tex->addPatch(patch, pdef.left, pdef.top);
 		}
 
@@ -366,7 +366,7 @@ bool TextureXList::writeTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_t
 		// Some compilers insist on having default cases.
 		default: return false;
 	}
-	
+
 	MemChunk txdata(datasize);
 	size_t txoffset = headersize;
 	int32_t foo = wxINT32_SWAP_ON_BE((signed) numtextures);
@@ -472,7 +472,7 @@ bool TextureXList::writeTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_t
 			tx_patch_t pdef;
 			pdef.left = patch->xOffset();
 			pdef.top = patch->yOffset();
-			pdef.patch = patch_table.patchIndex(patch->patchName());	// Note this will be -1 if the patch doesn't exist in the patch table. This should never happen with the texture editor, though.
+			pdef.patch = patch_table.patchIndex(patch->getName());	// Note this will be -1 if the patch doesn't exist in the patch table. This should never happen with the texture editor, though.
 
 			// Write common data
 			SAFEFUNC(txdata.write(&pdef, 6));

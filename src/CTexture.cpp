@@ -42,15 +42,17 @@
 CTPatch::CTPatch() {
 	this->offset_x = 0;
 	this->offset_y = 0;
+	this->entry = NULL;
 }
 
 /* CTPatch::CTPatch
  * CTPatch class constructor w/initial values
  *******************************************************************/
-CTPatch::CTPatch(string patch, int16_t offset_x, int16_t offset_y) {
-	this->patch = patch;
+CTPatch::CTPatch(string name, int16_t offset_x, int16_t offset_y, ArchiveEntry* entry) {
+	this->name = name;
 	this->offset_x = offset_x;
 	this->offset_y = offset_y;
+	this->entry = entry;
 }
 
 /* CTPatch::~CTPatch
@@ -74,6 +76,25 @@ CTexture::CTexture() {
  * CTexture class destructor
  *******************************************************************/
 CTexture::~CTexture() {
+}
+
+void CTexture::copyTexture(CTexture* tex) {
+	// Clear current texture
+	clear();
+
+	// Copy texture info
+	this->name = tex->getName();
+	this->width = tex->getWidth();
+	this->height = tex->getHeight();
+	this->scale_x = tex->getScaleX();
+	this->scale_y = tex->getScaleY();
+	tex->exProps().copyTo(ex_props);
+
+	// Copy patches
+	for (unsigned a = 0; a < tex->nPatches(); a++) {
+		CTPatch* patch = tex->getPatch(a);
+		addPatch(patch->getName(), patch->xOffset(), patch->yOffset(), patch->getEntry());
+	}
 }
 
 /* CTexture::getPatch
@@ -103,11 +124,11 @@ void CTexture::clear() {
 
 /* CTexture::addPatch
  * Adds a patch to the texture with the given attributes, at [index].
- * If [index] is -1, the patch is added to the end of the list
+ * If [index] is -1, the patch is added to the end of the list.
  *******************************************************************/
-bool CTexture::addPatch(string patch, int16_t offset_x, int16_t offset_y, int index) {
+bool CTexture::addPatch(string patch, int16_t offset_x, int16_t offset_y, ArchiveEntry* entry, int index) {
 	// Create new patch
-	CTPatch np(patch, offset_x, offset_y);
+	CTPatch np(patch, offset_x, offset_y, entry);
 
 	// Add it either after [index] or at the end
 	if (index >= 0 && (unsigned) index < patches.size())
@@ -148,7 +169,7 @@ bool CTexture::removePatch(string patch) {
 	bool removed = false;
 	vector<CTPatch>::iterator i = patches.begin();
 	while (i != patches.end()) {
-		if (s_cmp((*i).patchName(), patch)) {
+		if (s_cmp((*i).getName(), patch)) {
 			patches.erase(i);
 			removed = true;
 		}
@@ -162,13 +183,14 @@ bool CTexture::removePatch(string patch) {
 	return removed;
 }
 
-bool CTexture::replacePatch(size_t index, string newpatch) {
+bool CTexture::replacePatch(size_t index, string newpatch, ArchiveEntry* newentry) {
 	// Check index
 	if (index >= patches.size())
 		return false;
 
 	// Replace patch at [index] with new
-	patches[index].setPatchName(newpatch);
+	patches[index].setName(newpatch);
+	patches[index].setEntry(newentry);
 
 	// Announce
 	announce("patches_modified");

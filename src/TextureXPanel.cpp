@@ -106,7 +106,6 @@ TextureXPanel::TextureXPanel(wxWindow* parent, PatchTable* patch_table) : wxPane
  * TextureXPanel class destructor
  *******************************************************************/
 TextureXPanel::~TextureXPanel() {
-	// FIXME: Can cause crash if archive is closed before this
 	if (tx_entry)
 		tx_entry->unlock();
 }
@@ -124,7 +123,7 @@ bool TextureXPanel::openTEXTUREX(ArchiveEntry* entry) {
 
 			// Go through texture's patches
 			for (size_t p = 0; p < tex->nPatches(); p++)
-				patch_table->patch(tex->getPatch(p)->patchName()).used += 1;
+				patch_table->patch(tex->getPatch(p)->getName()).used_in.push_back(tex->getName());
 		}
 
 		// Update texture list

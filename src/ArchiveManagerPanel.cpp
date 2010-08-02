@@ -430,7 +430,7 @@ void ArchiveManagerPanel::openFile(string filename) {
 	Archive* new_archive = theArchiveManager->openArchive(filename);
 
 	sw.Pause();
-	wxLogMessage("Opening took %dms", sw.Time());
+	wxLogMessage("Opening took %d ms", sw.Time());
 
 	// Hide splash screen
 	theSplashWindow->hide();
@@ -592,7 +592,7 @@ void ArchiveManagerPanel::onAnnouncement(Announcer* announcer, string event_name
 	// If the recent files list has changed
 	if (event_name == "recent_files_changed") {
 		// Clear menu
-		for (unsigned a = 0; a < 8; a++)
+		for (unsigned a = 0; a < menu_recent->GetMenuItemCount(); a++)
 			menu_recent->Destroy(MainWindow::MENU_RECENT_1 + a);
 
 		// (Re)Populate menu with recent files list

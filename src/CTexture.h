@@ -4,28 +4,32 @@
 
 #include "Tokenizer.h"
 #include "PropertyList.h"
+#include "ArchiveEntry.h"
 #include "ListenerAnnouncer.h"
 
 class CTPatch {
 private:
-	string		patch;
-	int16_t		offset_x;
-	int16_t		offset_y;
+	string			name;
+	ArchiveEntry*	entry;
+	int16_t			offset_x;
+	int16_t			offset_y;
 
 	PropertyList	ex_props;
 
 public:
 	CTPatch();
-	CTPatch(string patch, int16_t offset_x = 0, int16_t offset_y = 0);
+	CTPatch(string name, int16_t offset_x = 0, int16_t offset_y = 0, ArchiveEntry* entry = NULL);
 	~CTPatch();
 
-	string			patchName() { return patch; }
+	string			getName() { return name; }
+	ArchiveEntry*	getEntry() { return entry; }
 	int16_t			xOffset() { return offset_x; }
 	int16_t			yOffset() { return offset_y; }
 
-	void			setPatchName(string name) { patch = name; }
-	void			setOffsetX(int16_t offset) { offset_x = offset; }
-	void			setOffsetY(int16_t offset) { offset_y = offset; }
+	void	setName(string name) { this->name = name; }
+	void	setEntry(ArchiveEntry* entry) { this->entry = entry; }
+	void	setOffsetX(int16_t offset) { offset_x = offset; }
+	void	setOffsetY(int16_t offset) { offset_y = offset; }
 };
 
 class CTexture : public Announcer {
@@ -42,6 +46,8 @@ private:
 public:
 	CTexture();
 	~CTexture();
+
+	void	copyTexture(CTexture* copy);
 
 	string			getName() { return name; }
 	uint16_t		getWidth() { return width; }
@@ -61,10 +67,10 @@ public:
 
 	void	clear();
 
-	bool	addPatch(string patch, int16_t offset_x = 0, int16_t offset_y = 0, int index = -1);
+	bool	addPatch(string patch, int16_t offset_x = 0, int16_t offset_y = 0, ArchiveEntry* entry = NULL, int index = -1);
 	bool	removePatch(size_t index);
 	bool	removePatch(string patch);
-	bool	replacePatch(size_t index, string newpatch);
+	bool	replacePatch(size_t index, string newpatch, ArchiveEntry* newentry = NULL);
 	bool	duplicatePatch(size_t index, int16_t offset_x = 8, int16_t offset_y = 8);
 	bool	swapPatches(size_t p1, size_t p2);
 };

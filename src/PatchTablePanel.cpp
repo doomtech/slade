@@ -82,7 +82,7 @@ string PatchTableListView::getItemText(long item, long column) const {
 	else if (column == 1)					// Name column
 		return patch.name;
 	else if (column == 2)					// Usage count column
-		return s_fmt("%d", patch.used);
+		return s_fmt("%d", patch.used_in.size());
 	else if (column == 3) {					// Archive column
 		if (patch.entry)
 			return patch.entry->getParent()->getFilename(false);
@@ -295,9 +295,9 @@ void PatchTablePanel::onBtnRemovePatch(wxCommandEvent& e) {
 	for (int a = selection.size() - 1; a >= 0; a--) {
 		// Check if patch is currently in use
 		patch_t& patch = patch_table->patch(selection[a]);
-		if (patch.used > 0) {
+		if (patch.used_in.size() > 0) {
 			// In use, ask if it's ok to remove the patch
-			int answer = wxMessageBox(s_fmt("The patch \"%s\" is currently used by %d texture(s), are you sure you wish to remove it?", chr(patch.name), patch.used), "Confirm Remove Patch", wxYES_NO|wxCANCEL, this);
+			int answer = wxMessageBox(s_fmt("The patch \"%s\" is currently used by %d texture(s), are you sure you wish to remove it?", chr(patch.name), patch.used_in.size()), "Confirm Remove Patch", wxYES_NO|wxCANCEL, this);
 			if (answer == wxYES) {
 				// Answered yes, remove the patch
 				parent->removePatch(selection[a]);

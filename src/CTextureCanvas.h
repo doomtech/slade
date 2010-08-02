@@ -13,7 +13,7 @@ wxDECLARE_EVENT(EVT_DRAG_END, wxCommandEvent);
 
 class CTextureCanvas : public OGLCanvas, Listener {
 private:
-	CTexture			texture;
+	CTexture*			texture;
 	vector<GLTexture*>	patch_textures;
 	vector<bool>		selected_patches;
 	int					hilight_patch;
@@ -27,7 +27,7 @@ public:
 	CTextureCanvas(wxWindow* parent, int id);
 	~CTextureCanvas();
 
-	CTexture&	getTexture() { return texture; }
+	CTexture*	getTexture() { return texture; }
 	void		setScale(double scale) { this->scale = scale; }
 	void		drawOutside(bool draw = true) { draw_outside = draw; }
 	point2_t	getMousePrevPos() { return mouse_prev; }

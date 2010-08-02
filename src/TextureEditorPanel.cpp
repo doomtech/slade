@@ -294,7 +294,7 @@ void TextureEditorPanel::populatePatchList() {
 
 	// Add each patch to the list
 	for (size_t a = 0; a < tex_current->nPatches(); a++)
-		list_patches->addItem(a, tex_current->getPatch(a)->patchName());
+		list_patches->addItem(a, tex_current->getPatch(a)->getName());
 
 	// Update list width
 	list_patches->Show(true);
@@ -347,11 +347,19 @@ bool TextureEditorPanel::openTexture(CTexture* tex) {
 	if (!patch_table)
 		return false;
 
+	// Update patch entries
+	for (unsigned a = 0; a < tex->nPatches(); a++) {
+		CTPatch* patch = tex->getPatch(a);
+		patch->setEntry(patch_table->patchEntry(patch->getName()));
+	}
+
 	// Set as current texture
-	tex_current = tex;
+	if (!tex_current)
+		tex_current = new CTexture();
+	tex_current->copyTexture(tex);
 
 	// Open texture in canvas
-	tex_canvas->openTexture(tex, *patch_table);
+	tex_canvas->openTexture(tex_current, *patch_table);
 
 	// Set control values
 	updateTextureControls();

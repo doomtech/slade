@@ -7,9 +7,9 @@
 struct patch_t {
 	string			name;
 	ArchiveEntry*	entry;
-	uint32_t		used;
+	vector<string>	used_in;
 
-	patch_t() { entry = NULL; used = 0; }
+	patch_t() { entry = NULL; }
 };
 
 class PatchTable {

@@ -53,14 +53,12 @@ CTextureCanvas::CTextureCanvas(wxWindow* parent, int id)
 	hilight_patch = -1;
 	draw_outside = true;
 	dragging = false;
+	texture = NULL;
 
 	// Bind events
 	Bind(wxEVT_MOTION, &CTextureCanvas::onMouseEvent, this);
 	Bind(wxEVT_LEFT_UP, &CTextureCanvas::onMouseEvent, this);
 	Bind(wxEVT_LEAVE_WINDOW, &CTextureCanvas::onMouseEvent, this);
-
-	// Listen to texture
-	listenTo(&texture);
 }
 
 /* CTextureCanvas::~CTextureCanvas
@@ -75,7 +73,7 @@ CTextureCanvas::~CTextureCanvas() {
  *******************************************************************/
 void CTextureCanvas::selectPatch(int index) {
 	// Check patch index is ok
-	if (index < 0 || (unsigned) index >= texture.nPatches())
+	if (index < 0 || (unsigned) index >= texture->nPatches())
 		return;
 
 	// Select the patch
@@ -87,7 +85,7 @@ void CTextureCanvas::selectPatch(int index) {
  *******************************************************************/
 void CTextureCanvas::deSelectPatch(int index) {
 	// Check patch index is ok
-	if (index < 0 || (unsigned) index >= texture.nPatches())
+	if (index < 0 || (unsigned) index >= texture->nPatches())
 		return;
 
 	// De-Select the patch
@@ -96,7 +94,7 @@ void CTextureCanvas::deSelectPatch(int index) {
 
 bool CTextureCanvas::patchSelected(int index) {
 	// Check index is ok
-	if (index < 0 || (unsigned)index >= texture.nPatches())
+	if (index < 0 || (unsigned)index >= texture->nPatches())
 		return false;
 
 	// Return if patch index is selected
@@ -107,8 +105,12 @@ bool CTextureCanvas::patchSelected(int index) {
  * Clears the current texture and the patch textures list
  *******************************************************************/
 void CTextureCanvas::clearTexture() {
-	// Clear texture
-	texture.clear();
+	// Stop listening to the current texture (if it exists)
+	if (texture)
+		stopListening(texture);
+
+	// Clear texture;
+	texture = NULL;
 
 	// Clear patch textures
 	clearPatchTextures();
@@ -144,6 +146,9 @@ bool CTextureCanvas::openTexture(CTexture* tex, PatchTable& ptable) {
 	// Clear the current texture
 	clearTexture();
 
+	// Set texture
+	texture = tex;
+
 	// Init patches
 	clearPatchTextures();
 	for (uint32_t a = 0; a < tex->nPatches(); a++) {
@@ -154,8 +159,8 @@ bool CTextureCanvas::openTexture(CTexture* tex, PatchTable& ptable) {
 		selected_patches.push_back(false);
 	}
 
-	// Load in texture info
-	//texture.fromTX(tex, ptable);
+	// Listen to it
+	listenTo(tex);
 
 	// Redraw
 	Refresh();
@@ -189,7 +194,7 @@ void CTextureCanvas::draw() {
 	glTranslated(offset.x, offset.y, 0);
 
 	// Draw texture
-	if (texture.getWidth() > 0)
+	if (texture)
 		drawTexture();
 
 	// Swap buffers (ie show what was drawn)
@@ -235,8 +240,8 @@ void CTextureCanvas::drawTexture() {
 	glPushMatrix();
 
 	// Calculate top-left position of texture (for glScissor, since it ignores the current translation/scale)
-	double left = offset.x + (GetSize().x * 0.5) - (texture.getWidth() * 0.5 * scale);
-	double top = -offset.y + (GetSize().y * 0.5) - (texture.getHeight() * 0.5 * scale);
+	double left = offset.x + (GetSize().x * 0.5) - (texture->getWidth() * 0.5 * scale);
+	double top = -offset.y + (GetSize().y * 0.5) - (texture->getHeight() * 0.5 * scale);
 
 	// Translate to middle of the canvas
 	glTranslated(GetSize().x * 0.5, GetSize().y * 0.5, 0);
@@ -245,21 +250,21 @@ void CTextureCanvas::drawTexture() {
 	glScaled(scale, scale, 1);
 
 	// Translate to top-left of texture
-	glTranslated(texture.getWidth() * -0.5, texture.getHeight() * -0.5, 0);
+	glTranslated(texture->getWidth() * -0.5, texture->getHeight() * -0.5, 0);
 
 	// First, draw patches semitransparently (for anything outside the texture)
 	// But only if we are drawing stuff outside the texture area
 	if (draw_outside) {
-		for (uint32_t a = 0; a < texture.nPatches(); a++)
+		for (uint32_t a = 0; a < texture->nPatches(); a++)
 			drawPatch(a, rgba_t(200, 50, 50, 80, 0));
 			//drawPatch(a, rgba_t(128, 50, 50, 255, 0));
 	}
 
 	// Now, clip to texture boundaries and draw patches fully opaque
 	glEnable(GL_SCISSOR_TEST);
-	glScissor(left, top, texture.getWidth() * scale, texture.getHeight() * scale);
+	glScissor(left, top, texture->getWidth() * scale, texture->getHeight() * scale);
 
-	for (uint32_t a = 0; a < texture.nPatches(); a++)
+	for (uint32_t a = 0; a < texture->nPatches(); a++)
 		drawPatch(a);
 
 	glDisable(GL_SCISSOR_TEST);
@@ -269,9 +274,9 @@ void CTextureCanvas::drawTexture() {
 	COL_BLACK.set_gl();
 	glBegin(GL_QUADS);
 	glVertex2d(0, 0);
-	glVertex2d(0, texture.getHeight());
-	glVertex2d(texture.getWidth(), texture.getHeight());
-	glVertex2d(texture.getWidth(), 0);
+	glVertex2d(0, texture->getHeight());
+	glVertex2d(texture->getWidth(), texture->getHeight());
+	glVertex2d(texture->getWidth(), 0);
 	glEnd();
 
 	// Now loop through selected patches and draw selection outlines
@@ -282,7 +287,7 @@ void CTextureCanvas::drawTexture() {
 			continue;
 
 		// Get patch
-		CTPatch* patch = texture.getPatch(a);
+		CTPatch* patch = texture->getPatch(a);
 
 		// Draw outline
 		glBegin(GL_QUADS);
@@ -303,7 +308,7 @@ void CTextureCanvas::drawTexture() {
  *******************************************************************/
 void CTextureCanvas::drawPatch(int num, rgba_t col) {
 	// Get patch to draw
-	CTPatch* patch = texture.getPatch(num);
+	CTPatch* patch = texture->getPatch(num);
 
 	// Check it exists
 	if (!patch)
@@ -312,8 +317,7 @@ void CTextureCanvas::drawPatch(int num, rgba_t col) {
 	// Load the patch as an opengl texture if it isn't already
 	if (!patch_textures[num]->isLoaded()) {
 		SImage temp;
-		// TODO: Load patch by name
-		//Misc::loadImageFromEntry(&temp, patch->getPatchEntry());
+		Misc::loadImageFromEntry(&temp, patch->getEntry());
 		patch_textures[num]->loadImage(&temp, &palette);
 	}
 
@@ -353,18 +357,18 @@ void CTextureCanvas::drawTextureBorder() {
 	glScaled(scale, scale, 1);
 
 	// Translate to top-left of texture
-	glTranslated(texture.getWidth() * -0.5, texture.getHeight() * -0.5, 0);
+	glTranslated(texture->getWidth() * -0.5, texture->getHeight() * -0.5, 0);
 
 	// Draw border
 	COL_BLACK.set_gl();
 	glBegin(GL_LINES);
 	glVertex2d(0, 0);
-	glVertex2d(texture.getWidth(), 0);
-	glVertex2d(texture.getWidth(), 0);
-	glVertex2d(texture.getWidth(), texture.getHeight());
-	glVertex2d(texture.getWidth(), texture.getHeight());
-	glVertex2d(0, texture.getHeight());
-	glVertex2d(0, texture.getHeight());
+	glVertex2d(texture->getWidth(), 0);
+	glVertex2d(texture->getWidth(), 0);
+	glVertex2d(texture->getWidth(), texture->getHeight());
+	glVertex2d(texture->getWidth(), texture->getHeight());
+	glVertex2d(0, texture->getHeight());
+	glVertex2d(0, texture->getHeight());
 	glVertex2d(0, 0);
 	glEnd();
 
@@ -377,11 +381,15 @@ void CTextureCanvas::drawTextureBorder() {
  * relative to the top left of the texture
  *******************************************************************/
 point2_t CTextureCanvas::screenToTexPosition(int x, int y) {
+	// Check a texture is open
+	if (!texture)
+		return point2_t(0, 0);
+
 	// Get top-left of texture in screen coordinates (ie relative to the top-left of the canvas)
 	int left = GetSize().x * 0.5 + offset.x;
 	int top = GetSize().y * 0.5 + offset.y;
-	left -= (double)texture.getWidth() * 0.5 * scale;
-	top -= (double)texture.getHeight() * 0.5 * scale;
+	left -= (double)texture->getWidth() * 0.5 * scale;
+	top -= (double)texture->getHeight() * 0.5 * scale;
 
 	return point2_t(double(x - left) / scale, double(y - top) / scale);
 }
@@ -391,10 +399,14 @@ point2_t CTextureCanvas::screenToTexPosition(int x, int y) {
  * if no patch is at that position
  *******************************************************************/
 int CTextureCanvas::patchAt(int x, int y) {
+	// Check a texture is open
+	if (!texture)
+		return -1;
+
 	// Go through texture patches backwards (ie from frontmost to back)
-	for (int a = texture.nPatches() - 1; a >= 0; a--) {
+	for (int a = texture->nPatches() - 1; a >= 0; a--) {
 		// Check if x,y is within patch bounds
-		CTPatch* patch = texture.getPatch(a);
+		CTPatch* patch = texture->getPatch(a);
 		if (x >= patch->xOffset() && x < patch->xOffset() + (int)patch_textures[a]->getWidth() &&
 			y >= patch->yOffset() && y < patch->yOffset() + (int)patch_textures[a]->getHeight()) {
 			return a;
@@ -410,8 +422,12 @@ int CTextureCanvas::patchAt(int x, int y) {
  * either index is invalid, true otherwise
  *******************************************************************/
 bool CTextureCanvas::swapPatches(size_t p1, size_t p2) {
+	// Check a texture is open
+	if (!texture)
+		return false;
+
 	// Check indices
-	if (p1 >= texture.nPatches() || p2 >= texture.nPatches())
+	if (p1 >= texture->nPatches() || p2 >= texture->nPatches())
 		return false;
 
 	// Swap patch gl textures
@@ -420,12 +436,12 @@ bool CTextureCanvas::swapPatches(size_t p1, size_t p2) {
 	patch_textures[p2] = temp;
 
 	// Swap patches in the texture itself
-	return texture.swapPatches(p1, p2);
+	return texture->swapPatches(p1, p2);
 }
 
 void CTextureCanvas::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
 	// If the announcer isn't this canvas' texture, ignore it
-	if (announcer != &texture)
+	if (announcer != texture)
 		return;
 
 	// Texture modified
@@ -437,7 +453,7 @@ void CTextureCanvas::onAnnouncement(Announcer* announcer, string event_name, Mem
 		// Reload patches
 		selected_patches.clear();
 		clearPatchTextures();
-		for (uint32_t a = 0; a < texture.nPatches(); a++) {
+		for (uint32_t a = 0; a < texture->nPatches(); a++) {
 			// Create GL texture
 			patch_textures.push_back(new GLTexture());
 

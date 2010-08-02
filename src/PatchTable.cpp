@@ -193,10 +193,7 @@ bool PatchTable::replacePatch(unsigned index, string newname) {
 }
 
 /* PatchTable::addPatch
- * Adds a new patch with [name] to the end of the list. Also attempts
- * to find the ArchiveEntry matching [name] in [parent] and resource
- * archives. Returns false if no matching entry was found,
- * true otherwise
+ * Adds a new patch with [name] to the end of the list
  *******************************************************************/
 bool PatchTable::addPatch(string name) {
 	// Create/init new patch
@@ -209,6 +206,10 @@ bool PatchTable::addPatch(string name) {
 	return !!patch.entry;
 }
 
+/* PatchTable::updatePatchEntry
+ * Updates the ArchiveEntry associated with the patch at [index].
+ * Searches the parent archive first, then all resource archives.
+ *******************************************************************/
 void PatchTable::updatePatchEntry(unsigned index) {
 	// Check index
 	if (index >= patches.size())
@@ -275,7 +276,10 @@ bool PatchTable::loadPNAMES(ArchiveEntry* pnames, Archive* parent) {
 	return true;
 }
 
+/* PatchTable::clearPatchUsage
+ * Clears all patch use count data
+ *******************************************************************/
 void PatchTable::clearPatchUsage() {
 	for (size_t a = 0; a < patches.size(); a++)
-		patches[a].used = 0;
+		patches[a].used_in.clear();
 }
