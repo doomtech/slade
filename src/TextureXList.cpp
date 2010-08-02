@@ -181,6 +181,10 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_ta
 		return false;
 	}
 
+	// If it's an empty TEXTUREx entry, stop here
+	if (n_tex == 0)
+		return true;
+
 	// Texture definition offsets
 	offsets = new int32_t[n_tex];
 	if (!texturex->read(offsets, n_tex * 4)) {
@@ -498,13 +502,16 @@ bool TextureXList::writeTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_t
 string TextureXList::getTextureXFormatString() {
 	switch (txformat) {
 		case TXF_NORMAL:
-			return "Doom";
+			return "Doom TEXTUREx";
 			break;
 		case TXF_STRIFE11:
-			return "Strife";
+			return "Strife TEXTUREx";
 			break;
 		case TXF_NAMELESS:
-			return "Doom Alpha Nameless";
+			return "Nameless (Doom Alpha)";
+			break;
+		case TXF_TEXTURES:
+			return "ZDoom TEXTURES";
 			break;
 		default:
 			return "Unknown";

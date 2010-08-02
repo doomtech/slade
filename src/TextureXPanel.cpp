@@ -74,6 +74,8 @@ TextureXPanel::TextureXPanel(wxWindow* parent, PatchTable* patch_table) : wxPane
 	// Add textures list
 	wxStaticBox* frame = new wxStaticBox(this, -1, "Textures");
 	wxStaticBoxSizer* framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
+	label_tx_format = new wxStaticText(this, -1, "Format:");
+	framesizer->Add(label_tx_format, 0, wxEXPAND|wxALL, 4);
 	list_textures = new TextureXListView(this, &texturex);
 	framesizer->Add(list_textures, 1, wxEXPAND|wxALL, 4);
 	sizer->Add(framesizer, 0, wxEXPAND|wxALL, 4);
@@ -127,6 +129,9 @@ bool TextureXPanel::openTEXTUREX(ArchiveEntry* entry) {
 				patch_table->patch(tex->getPatch(p)->getName()).used_in.push_back(tex->getName());
 		}
 
+		// Update format label
+		label_tx_format->SetLabel("Format: " + texturex.getTextureXFormatString());
+
 		// Update texture list
 		list_textures->updateList();
 
@@ -168,8 +173,10 @@ void TextureXPanel::onTextureListSelect(wxListEvent& e) {
 	CTexture* tex = texturex.getTexture(e.GetIndex());
 
 	// Save any changes to previous texture
-	if (texture_editor->texModified() && tex_current)
+	if (texture_editor->texModified() && tex_current) {
 		tex_current->copyTexture(texture_editor->getTexture());
+		patch_table->updatePatchUsage(tex_current);
+	}
 	
 	// Open texture in editor
 	texture_editor->openTexture(tex);
@@ -192,6 +199,10 @@ void TextureXPanel::onBtnNewTexture(wxCommandEvent& e) {
 	// Create new texture
 	CTexture* tex = new CTexture();
 	tex->setName(name);
+
+	// Default size = 64x128
+	tex->setWidth(64);
+	tex->setHeight(128);
 
 	// Add it after the last selected item
 	int selected = list_textures->getLastSelected();

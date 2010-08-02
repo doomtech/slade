@@ -7,9 +7,10 @@
 
 class BaseResourceChooser : public wxChoice, public Listener {
 private:
+	bool	load_change;
 
 public:
-	BaseResourceChooser(wxWindow* parent);
+	BaseResourceChooser(wxWindow* parent, bool load_change = true);
 	~BaseResourceChooser();
 
 	void	populateChoices();

@@ -277,6 +277,38 @@ bool PatchTable::loadPNAMES(ArchiveEntry* pnames, Archive* parent) {
 	return true;
 }
 
+bool PatchTable::writePNAMES(ArchiveEntry* pnames) {
+	// Check entry was given
+	if (!pnames)
+		return false;
+
+	// Determine entry size
+	int32_t npnames = patches.size();
+	uint32_t entrysize = 4 + (npnames * 8);
+	
+	// Create MemChunk to write to
+	MemChunk pndata(entrysize);
+
+	// Write header
+	pndata.write(&npnames, 4);
+
+	// Write patch names
+	for (unsigned a = 0; a < patches.size(); a++) {
+		char name[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };	// Init name to all zeros for XWE compatibility
+		strncpy(name, chr(patches[a].name), patches[a].name.Len());
+
+		pndata.write(name, 8);
+	}
+
+	// Load data to entry
+	pnames->importMemChunk(pndata);
+
+	// Update entry type
+	EntryType::detectEntryType(pnames);
+
+	return true;
+}
+
 /* PatchTable::clearPatchUsage
  * Clears all patch use count data
  *******************************************************************/

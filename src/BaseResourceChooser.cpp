@@ -50,8 +50,11 @@ EXTERN_CVAR(Int, base_resource)
 /* BaseResourceChooser::BaseResourceChooser
  * BaseResourceChooser class constructor
  *******************************************************************/
-BaseResourceChooser::BaseResourceChooser(wxWindow* parent)
+BaseResourceChooser::BaseResourceChooser(wxWindow* parent, bool load_change)
 : wxChoice(parent, -1, wxDefaultPosition, wxSize(128, -1)) {
+	// Init Variables
+	this->load_change = load_change;
+
 	// Populate
 	populateChoices();
 
@@ -116,5 +119,6 @@ void BaseResourceChooser::onAnnouncement(Announcer* announcer, string event_name
  *******************************************************************/
 void BaseResourceChooser::onChoiceChanged(wxCommandEvent& e) {
 	// Open the selected base resource
-	theArchiveManager->openBaseResource(GetSelection() - 1);
+	if (load_change)
+		theArchiveManager->openBaseResource(GetSelection() - 1);
 }

@@ -148,7 +148,7 @@ Archive* ArchiveManager::getArchive(string filename) {
  * Opens and adds a archive to the list, returns a pointer to the
  * newly opened and added archive, or NULL if an error occurred
  *******************************************************************/
-Archive* ArchiveManager::openArchive(string filename) {
+Archive* ArchiveManager::openArchive(string filename, bool manage) {
 	Archive* new_archive = getArchive(filename);
 
 	wxLogMessage(s_fmt("Opening archive %s", filename));
@@ -176,20 +176,22 @@ Archive* ArchiveManager::openArchive(string filename) {
 	else
 		return NULL;	// Unsupported format
 
-	// If it opened successfully, add it to the list & return it,
+	// If it opened successfully, add it to the list if needed & return it,
 	// Otherwise, delete it and return NULL
 	if (new_archive->open(filename)) {
-		// Add the archive
-		addArchive(new_archive);
+		if (manage) {
+			// Add the archive
+			addArchive(new_archive);
 
-		// Announce open
-		MemChunk mc;
-		uint32_t index = archiveIndex(new_archive);
-		mc.write(&index, 4);
-		announce("archive_opened", mc);
+			// Announce open
+			MemChunk mc;
+			uint32_t index = archiveIndex(new_archive);
+			mc.write(&index, 4);
+			announce("archive_opened", mc);
 
-		// Add to recent files
-		addRecentFile(filename);
+			// Add to recent files
+			addRecentFile(filename);
+		}
 
 		// Return the opened archive
 		return new_archive;
@@ -204,7 +206,7 @@ Archive* ArchiveManager::openArchive(string filename) {
 /* ArchiveManager::openArchive
  * Same as the above function, except it opens from an ArchiveEntry
  *******************************************************************/
-Archive* ArchiveManager::openArchive(ArchiveEntry* entry) {
+Archive* ArchiveManager::openArchive(ArchiveEntry* entry, bool manage) {
 	Archive* new_archive = NULL;
 
 	// Check entry was given
@@ -239,21 +241,23 @@ Archive* ArchiveManager::openArchive(ArchiveEntry* entry) {
 	// If it opened successfully, add it to the list & return it,
 	// Otherwise, delete it and return NULL
 	if (new_archive->open(entry)) {
-		// Add to parent's child list if parent is open in the manager (it should be)
-		int index_parent = -1;
-		if (entry->getParent())
-			index_parent = archiveIndex(entry->getParent());
-		if (index_parent >= 0)
-			open_archives[index_parent].open_children.push_back(new_archive);
+		if (manage) {
+			// Add to parent's child list if parent is open in the manager (it should be)
+			int index_parent = -1;
+			if (entry->getParent())
+				index_parent = archiveIndex(entry->getParent());
+			if (index_parent >= 0)
+				open_archives[index_parent].open_children.push_back(new_archive);
 
-		// Add the new archive
-		addArchive(new_archive);
+			// Add the new archive
+			addArchive(new_archive);
 
-		// Announce open
-		MemChunk mc;
-		uint32_t index = archiveIndex(new_archive);
-		mc.write(&index, 4);
-		announce("archive_opened", mc);
+			// Announce open
+			MemChunk mc;
+			uint32_t index = archiveIndex(new_archive);
+			mc.write(&index, 4);
+			announce("archive_opened", mc);
+		}
 
 		return new_archive;
 	} else {

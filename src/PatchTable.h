@@ -49,6 +49,7 @@ public:
 	void			updatePatchEntry(unsigned index);
 
 	bool	loadPNAMES(ArchiveEntry* pnames, Archive* parent = NULL);
+	bool	writePNAMES(ArchiveEntry* pnames);
 
 	void	clearPatchUsage();
 	void	updatePatchUsage(CTexture* tex);

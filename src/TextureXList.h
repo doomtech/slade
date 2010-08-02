@@ -11,6 +11,7 @@ enum TextureXFormat {
     TXF_NORMAL,
     TXF_STRIFE11,
     TXF_NAMELESS,
+	TXF_TEXTURES,
 };
 
 // Texture flags
@@ -37,6 +38,8 @@ public:
 
 	CTexture*	getTexture(size_t index);
 	CTexture*	getTexture(string name);
+
+	void	setFormat(uint8_t format) { txformat = format; }
 
 	void	addTexture(CTexture* tex, int position = -1);
 	void	removeTexture(unsigned index);

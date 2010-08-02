@@ -34,6 +34,9 @@ public:
 	// Editing
 	bool	removePatch(unsigned index);
 
+	// Checks
+	bool	checkTextures();
+
 	// Events
 	void	onPaletteChanged(wxCommandEvent& e);
 	void	onSaveClicked(wxCommandEvent& e);

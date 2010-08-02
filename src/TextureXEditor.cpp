@@ -33,6 +33,84 @@
 #include "TextureXEditor.h"
 #include "ArchiveManager.h"
 #include "Console.h"
+#include <wx/dialog.h>
+#include <wx/radiobut.h>
+
+
+/*******************************************************************
+ * CREATETEXTUREXDIALOG CLASS
+ *******************************************************************/
+class CreateTextureXDialog : public wxDialog {
+private:
+	wxRadioButton*	rb_format_doom;
+	wxRadioButton*	rb_format_strife;
+	wxRadioButton*	rb_format_textures;
+
+	wxRadioButton*	rb_new;
+	wxRadioButton*	rb_import_bra;
+	wxRadioButton*	rb_import_archive;
+
+public:
+	CreateTextureXDialog(wxWindow* parent) : wxDialog(parent, -1, "Create Texture Definitions") {
+		// Setup layout
+		wxBoxSizer* m_vbox = new wxBoxSizer(wxVERTICAL);
+		SetSizer(m_vbox);
+
+		// --- Format options ---
+		wxStaticBox* frame = new wxStaticBox(this, -1, "Format");
+		wxStaticBoxSizer* framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
+		m_vbox->Add(framesizer, 0, wxEXPAND|wxALL, 4);
+
+		// Doom format
+		rb_format_doom = new wxRadioButton(this, -1, "Doom (TEXTURE1 + PNAMES)");
+		framesizer->Add(rb_format_doom, 0, wxEXPAND|wxALL, 4);
+
+		// Strife format
+		rb_format_strife = new wxRadioButton(this, -1, "Strife (TEXTURE1 + PNAMES)");
+		framesizer->Add(rb_format_strife, 0, wxEXPAND|wxALL, 4);
+
+		// ZDoom TEXTURES format
+		rb_format_textures = new wxRadioButton(this, -1, "ZDoom (TEXTURES)");
+		framesizer->Add(rb_format_textures, 0, wxEXPAND|wxALL, 4);
+
+
+		// --- Source options ---
+		frame = new wxStaticBox(this, -1, "Source");
+		framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
+		m_vbox->Add(framesizer, 0, wxEXPAND|wxALL, 4);
+
+		// New list
+		rb_new = new wxRadioButton(this, -1, "Create New (Empty)", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+		framesizer->Add(rb_new, 0, wxEXPAND|wxALL, 4);
+
+		// Import from Base Resource Archive
+		rb_import_bra = new wxRadioButton(this, -1, "Import from Base Resource Archive:");
+		framesizer->Add(rb_import_bra, 0, wxEXPAND|wxALL, 4);
+
+		// Add buttons
+		m_vbox->Add(CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND|wxALL, 4);
+
+		SetInitialSize(wxSize(-1, -1));
+		Layout();
+	}
+
+	~CreateTextureXDialog() {}
+
+	int	getSelectedFormat() {
+		if (rb_format_doom->GetValue())
+			return TXF_NORMAL;
+		else if (rb_format_strife->GetValue())
+			return TXF_STRIFE11;
+		else if (rb_format_textures->GetValue())
+			return TXF_TEXTURES;
+		else
+			return -1;
+	}
+
+	bool createNewSelected() {
+		return rb_new->GetValue();
+	}
+};
 
 
 /*******************************************************************
@@ -101,9 +179,9 @@ bool TextureXEditor::openArchive(Archive* archive) {
 	// Search archive for any texture-related entries
 	Archive::search_options_t options;
 	options.match_type = EntryType::getType("texturex");
-	vector<ArchiveEntry*> tx_entries = archive->findAll(options);
+	vector<ArchiveEntry*> tx_entries = archive->findAll(options);	// Find all TEXTUREx entries
 	options.match_type = EntryType::getType("pnames");
-	ArchiveEntry* entry_pnames = archive->findLast(options);
+	ArchiveEntry* entry_pnames = archive->findLast(options);		// Find last PNAMES entry
 
 	// If any TEXTURE1/2 entries were found, setup patch table stuff
 	if (tx_entries.size() > 0) {
@@ -127,6 +205,100 @@ bool TextureXEditor::openArchive(Archive* archive) {
 		// Load patch table
 		patch_table.loadPNAMES(entry_pnames, archive);
 	}
+	else {
+		// No TEXTUREx entries found, so ask if the user wishes to create one
+		wxMessageDialog dlg(this, "The archive does not contain any texture definitions (TEXTURE1/2 or TEXTURES). Do you wish to create a new texture definition list?", "No Texture Definitions Found", wxYES_NO);
+		
+		if (dlg.ShowModal() == wxID_YES) {
+			CreateTextureXDialog ctxd(this);
+			
+			while (1) {
+				// Check if cancelled
+				if (ctxd.ShowModal() == wxID_CANCEL)
+					return false;
+
+				if (ctxd.createNewSelected()) {
+					// User selected to create a new TEXTUREx list
+					ArchiveEntry* texturex = NULL;
+
+					int format = ctxd.getSelectedFormat();
+					if (ctxd.getSelectedFormat() == TXF_NORMAL || ctxd.getSelectedFormat() == TXF_STRIFE11) {	// Doom or Strife TEXTUREx
+						// Add empty TEXTURE1 entry to archive
+						texturex = archive->addNewEntry("TEXTURE1");
+						texturex->resize(4, false);
+						texturex->getMCData().fillData(0);
+						texturex->setType(EntryType::getType("texturex"));
+						texturex->setExtensionByType();
+
+						// Add empty PNAMES entry to archive
+						pnames = archive->addNewEntry("PNAMES");
+						pnames->resize(4, false);
+						pnames->getMCData().fillData(0);
+						pnames->setType(EntryType::getType("pnames"));
+						pnames->setExtensionByType();
+					}
+					else if (ctxd.getSelectedFormat() == TXF_TEXTURES) {
+						wxMessageBox("ZDoom TEXTURES Not Implemented");
+						return false;
+					}
+
+					if (!texturex)
+						return false;
+
+					// Open TEXTUREX panel
+					TextureXPanel* tx_panel = new TextureXPanel(this, &patch_table);
+					tx_panel->openTEXTUREX(texturex);
+					tx_panel->txList().setFormat(format);
+					texturex->lock();
+
+					// Add it to the list of editors, and a tab
+					texture_editors.push_back(tx_panel);
+					tabs->AddPage(tx_panel, texturex->getName());
+				}
+				else {
+					// User selected to import texture definitions from the base resource archive
+					Archive* bra = theArchiveManager->baseResourceArchive();
+
+					if (!bra) {
+						wxMessageBox("No Base Resource Archive is opened, please select/open one", "Error", wxICON_ERROR);
+						continue;
+					}
+
+					// Find all relevant entries in the base resource archive
+					Archive::search_options_t options;
+					options.match_type = EntryType::getType("texturex");
+					vector<ArchiveEntry*> import_tx = bra->findAll(options);	// Find all TEXTUREx entries
+					options.match_type = EntryType::getType("pnames");
+					ArchiveEntry* import_pnames = bra->findLast(options);		// Find last PNAMES entry
+
+					// Check enough entries exist
+					if (import_tx.size() == 0 || !import_pnames) {
+						wxMessageBox("The selected Base Resource Archive does not contain sufficient texture definition entries", "Error", wxICON_ERROR);
+						continue;
+					}
+
+					// Copy TEXTUREx entries over to current archive
+					for (unsigned a = 0; a < import_tx.size(); a++) {
+						ArchiveEntry* texturex = archive->addEntry(import_tx[a], "global", true);
+						texturex->setType(EntryType::getType("texturex"));
+						texturex->setExtensionByType();
+
+						tx_entries.push_back(texturex);
+					}
+
+					// Copt PNAMES entry over to current archive
+					pnames = archive->addEntry(import_pnames, "global", true);
+					pnames->setType(EntryType::getType("pnames"));
+					pnames->setExtensionByType();
+					patch_table.loadPNAMES(pnames, archive);
+				}
+
+				break;
+			}
+		}
+		else
+			return false;
+	}
 
 	// Open texture editor tabs
 	for (size_t a = 0; a < tx_entries.size(); a++) {
@@ -137,7 +309,6 @@ bool TextureXEditor::openArchive(Archive* archive) {
 
 		// Open TEXTUREX entry
 		if (tx_panel->openTEXTUREX(tx_entries[a])) {
-			//tx_panel->populateTextureList();							// Populate texture list
 			tx_panel->setPalette(pal_chooser->getSelectedPalette());	// Set palette
 			tx_entries[a]->lock();										// Lock entry
 
@@ -150,7 +321,7 @@ bool TextureXEditor::openArchive(Archive* archive) {
 	}
 
 	// Open patch table tab if needed
-	if (entry_pnames) {
+	if (pnames) {
 		PatchTablePanel* ptp = new PatchTablePanel(this, &patch_table);
 		tabs->AddPage(ptp, "Patch Table (PNAMES)");
 	}
@@ -179,6 +350,37 @@ bool TextureXEditor::removePatch(unsigned index) {
 	return true;
 }
 
+bool TextureXEditor::checkTextures() {
+	string problems;
+
+	// Go through all texturex lists
+	for (unsigned a = 0; a < texture_editors.size(); a++) {
+		// Go through all textures
+		for (unsigned t = 0; t < texture_editors[a]->txList().nTextures(); t++) {
+			// Get texture
+			CTexture* tex = texture_editors[a]->txList().getTexture(t);
+
+			// Check it's patches are all valid
+			for (unsigned p = 0; p < tex->nPatches(); p++) {
+				if (patch_table.patchIndex(tex->getPatch(p)->getName()) == -1) {
+					problems += s_fmt("Texture %s contains invalid/unknown patch %s\n");
+				}
+			}
+		}
+	}
+
+	// Display a message box with any problems found
+	if (problems.size() > 0) {
+		wxMessageDialog dlg(this, "The following problems were found, please correct them before saving:");
+		dlg.SetExtendedMessage(problems);
+		dlg.ShowModal();
+
+		return false;
+	}
+	else
+		return true;
+}
+
 
 /*******************************************************************
  * TEXTUREXEDITOR EVENTS
@@ -197,8 +399,27 @@ void TextureXEditor::onPaletteChanged(wxCommandEvent& e) {
 }
 
 void TextureXEditor::onSaveClicked(wxCommandEvent& e) {
+	if (!checkTextures())
+		return;
+
+	// Save TEXTUREx entries
 	for (unsigned a = 0; a < texture_editors.size(); a++)
 		texture_editors[a]->saveTEXTUREX();
+
+	// Save PNAMES if it exists
+	if (patch_table.nPatches() > 0) {
+		if (!pnames) {
+			// If no PNAMES entry exists in the archive, create one
+			int index = archive->entryIndex(texture_editors.back()->txEntry()) + 1;
+			pnames = archive->addNewEntry("PNAMES", index);
+			pnames->setType(EntryType::getType("pnames"));
+			pnames->setExtensionByType();
+		}
+
+		pnames->unlock();	// Have to unlock it to write
+		patch_table.writePNAMES(pnames);
+		pnames->lock();
+	}
 }
 
 

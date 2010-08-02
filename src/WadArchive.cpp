@@ -812,7 +812,11 @@ ArchiveEntry* WadArchive::findFirst(search_options_t& options) {
 
 		// Check type
 		if (options.match_type) {
-			if (options.match_type != entry->getType())
+			if (entry->getType() == EntryType::unknownType()) {
+				if (!options.match_type->isThisType(entry))
+					continue;
+			}
+			else if (options.match_type != entry->getType())
 				continue;
 		}
 
@@ -859,7 +863,11 @@ ArchiveEntry* WadArchive::findLast(search_options_t& options) {
 
 		// Check type
 		if (options.match_type) {
-			if (options.match_type != entry->getType())
+			if (entry->getType() == EntryType::unknownType()) {
+				if (!options.match_type->isThisType(entry))
+					continue;
+			}
+			else if (options.match_type != entry->getType())
 				continue;
 		}
 
@@ -906,7 +914,11 @@ vector<ArchiveEntry*> WadArchive::findAll(search_options_t& options) {
 
 		// Check type
 		if (options.match_type) {
-			if (options.match_type != entry->getType())
+			if (entry->getType() == EntryType::unknownType()) {
+				if (!options.match_type->isThisType(entry))
+					continue;
+			}
+			else if (options.match_type != entry->getType())
 				continue;
 		}
 

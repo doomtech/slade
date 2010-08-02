@@ -43,8 +43,8 @@ public:
 	bool		addArchive(Archive* archive);
 	Archive*	getArchive(int index);
 	Archive*	getArchive(string filename);
-	Archive*	openArchive(string filename);
-	Archive*	openArchive(ArchiveEntry* entry);
+	Archive*	openArchive(string filename, bool manage = true);
+	Archive*	openArchive(ArchiveEntry* entry, bool manage = true);
 	Archive*	newArchive(uint8_t type);
 	bool		closeArchive(int index);
 	bool		closeArchive(string filename);

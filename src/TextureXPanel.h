@@ -34,12 +34,14 @@ private:
 	wxButton*			btn_new_texture;
 	wxButton*			btn_remove_texture;
 	wxButton*			btn_new_from_patch;
+	wxStaticText*		label_tx_format;
 
 public:
 	TextureXPanel(wxWindow* parent, PatchTable* patch_table);
 	~TextureXPanel();
 
 	TextureXList&	txList() { return texturex; }
+	ArchiveEntry*	txEntry() { return tx_entry; }
 
 	bool	openTEXTUREX(ArchiveEntry* texturex);
 	bool	saveTEXTUREX();

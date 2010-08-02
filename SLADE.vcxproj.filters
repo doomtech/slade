@@ -304,7 +304,7 @@
       <Filter>Main Editor\UI Elements\TextureXEditor</Filter>
     </ClCompile>
     <ClCompile Include="src\BaseResourceChooser.cpp">
-      <Filter>Main Editor</Filter>
+      <Filter>Main Editor\UI Elements</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -561,14 +561,14 @@
     <ClInclude Include="src\TextureXPanel.h">
       <Filter>Main Editor\UI Elements\TextureXEditor</Filter>
     </ClInclude>
-    <ClInclude Include="src\BaseResourceChooser.h">
-      <Filter>Main Editor</Filter>
-    </ClInclude>
     <ClInclude Include="src\BrowserItem.h">
       <Filter>UI Elements\Browser</Filter>
     </ClInclude>
     <ClInclude Include="src\BrowserWindow.h">
       <Filter>UI Elements\Browser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BaseResourceChooser.h">
+      <Filter>Main Editor\UI Elements</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

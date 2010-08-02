@@ -393,7 +393,7 @@ bool ZipArchive::loadEntryData(ArchiveEntry* entry) {
  *******************************************************************/
 ArchiveEntry* ZipArchive::addEntry(ArchiveEntry* entry, string add_namespace, bool copy) {
 	// Check namespace
-	if (add_namespace.IsEmpty())
+	if (add_namespace.IsEmpty() || add_namespace == "global")
 		return Archive::addEntry(entry, 0xFFFFFFFF, NULL, copy);
 
 	// Get/Create namespace dir
