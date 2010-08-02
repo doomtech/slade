@@ -7,10 +7,11 @@
 #include "ListView.h"
 #include <wx/spinctrl.h>
 
-class TextureEditorPanel : public wxPanel {
+class TextureEditorPanel : public wxPanel, Listener {
 private:
 	PatchTable*		patch_table;
 	CTexture*		tex_current;
+	bool			tex_modified;
 
 	// View controls
 	wxSlider*		slider_zoom;
@@ -43,6 +44,9 @@ public:
 	TextureEditorPanel(wxWindow* parent, PatchTable* patch_table);
 	~TextureEditorPanel();
 
+	bool		texModified() { return tex_modified; }
+	CTexture*	getTexture() { return tex_current; }
+
 	// UI Stuff
 	wxPanel*	createTextureControls(wxWindow* parent);
 	void		updateTextureControls();
@@ -53,6 +57,8 @@ public:
 
 	bool	openTexture(CTexture* tex);
 	void	setPalette(Palette8bit* pal);
+
+	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 
 	// Events
 	void	onZoomChanged(wxCommandEvent& e);

@@ -10,7 +10,19 @@ struct patch_t {
 	vector<string>	used_in;
 
 	patch_t() { entry = NULL; }
+
+	void removeTextureUsage(string texture) {
+		vector<string>::iterator i = used_in.begin();
+		while (i != used_in.end()) {
+			if (s_cmp(texture, *i))
+				used_in.erase(i);
+			else
+				i++;
+		}
+	}
 };
+
+class CTexture;
 
 class PatchTable {
 private:
@@ -37,7 +49,9 @@ public:
 	void			updatePatchEntry(unsigned index);
 
 	bool	loadPNAMES(ArchiveEntry* pnames, Archive* parent = NULL);
+
 	void	clearPatchUsage();
+	void	updatePatchUsage(CTexture* tex);
 };
 
 #endif//__PATCH_TABLE_T__

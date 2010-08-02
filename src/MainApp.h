@@ -6,13 +6,14 @@
 #include <wx/log.h>
 
 class SLADELog : public wxLog {
-private:
+protected:
+	void DoLogText(const wxString& msg);
 
 public:
 	SLADELog() {}
 	~SLADELog() {}
 
-	void DoLogString(const wxString& msg, time_t t);
+	//void DoLogString(const wxString& msg, time_t t);
 };
 
 class MainApp : public wxApp {

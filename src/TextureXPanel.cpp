@@ -63,8 +63,9 @@ void TextureXListView::updateList(bool clear) {
  *******************************************************************/
 TextureXPanel::TextureXPanel(wxWindow* parent, PatchTable* patch_table) : wxPanel(parent, -1) {
 	// Init variables
-	tx_entry = NULL;
+	this->tx_entry = NULL;
 	this->patch_table = patch_table;
+	this->tex_current = NULL;
 
 	// Setup sizer
 	wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
@@ -139,7 +140,11 @@ bool TextureXPanel::openTEXTUREX(ArchiveEntry* entry) {
  * Saves a TEXTUREX format texture list
  *******************************************************************/
 bool TextureXPanel::saveTEXTUREX() {
-	return texturex.writeTEXTUREXData(tx_entry, *patch_table);
+	tx_entry->unlock();	// Have to unlock the entry first
+	bool ok = texturex.writeTEXTUREXData(tx_entry, *patch_table);
+	tx_entry->lock();
+
+	return ok;
 }
 
 
@@ -159,8 +164,18 @@ void TextureXPanel::setPalette(Palette8bit *pal) {
  * Called when an item on the texture list is selected
  *******************************************************************/
 void TextureXPanel::onTextureListSelect(wxListEvent& e) {
+	// Get selected texture
 	CTexture* tex = texturex.getTexture(e.GetIndex());
+
+	// Save any changes to previous texture
+	if (texture_editor->texModified() && tex_current)
+		tex_current->copyTexture(texture_editor->getTexture());
+	
+	// Open texture in editor
 	texture_editor->openTexture(tex);
+
+	// Set current texture
+	tex_current = tex;
 }
 
 void TextureXPanel::onBtnNewTexture(wxCommandEvent& e) {
@@ -217,6 +232,11 @@ void TextureXPanel::onBtnRemoveTexture(wxCommandEvent& e) {
 
 	// Go through selection backwards
 	for (int a = selection.size() - 1; a >= 0; a--) {
+		// Remove texture from patch table entries
+		CTexture* tex = texturex.getTexture(selection[a]);
+		for (unsigned p = 0; p < tex->nPatches(); p++)
+			patch_table->patch(tex->getPatch(p)->getName()).removeTextureUsage(tex->getName());
+		
 		// Remove texture from list
 		texturex.removeTexture(selection[a]);
 	}

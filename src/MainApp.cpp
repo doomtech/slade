@@ -190,7 +190,7 @@ string appPath(string filename, int dir) {
  * SLADELOG CLASS FUNCTIONS
  *******************************************************************/
 
-void SLADELog::DoLogString(const wxString& msg, time_t time) {
+void SLADELog::DoLogText(const wxString& msg) {
 	theConsole->logMessage(msg);
 }
 

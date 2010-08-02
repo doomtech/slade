@@ -197,7 +197,8 @@ void TextureXEditor::onPaletteChanged(wxCommandEvent& e) {
 }
 
 void TextureXEditor::onSaveClicked(wxCommandEvent& e) {
-
+	for (unsigned a = 0; a < texture_editors.size(); a++)
+		texture_editors[a]->saveTEXTUREX();
 }
 
 

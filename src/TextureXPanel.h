@@ -27,6 +27,7 @@ private:
 	TextureXList		texturex;
 	PatchTable*			patch_table;
 	ArchiveEntry*		tx_entry;
+	CTexture*			tex_current;
 
 	TextureXListView*	list_textures;
 	TextureEditorPanel*	texture_editor;

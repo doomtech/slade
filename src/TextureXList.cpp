@@ -340,6 +340,8 @@ bool TextureXList::writeTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_t
 	if (texturex->isLocked())
 		return false;
 
+	wxLogMessage("Writing " + getTextureXFormatString() + " format TEXTUREx entry");
+
 	/* Total size of a TEXTUREx lump, in bytes:
 		Header: 4 + (4 * numtextures)
 		Textures:
@@ -368,22 +370,23 @@ bool TextureXList::writeTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_t
 	}
 
 	MemChunk txdata(datasize);
-	size_t txoffset = headersize;
+	int32_t* offsets = new int32_t[numtextures];
 	int32_t foo = wxINT32_SWAP_ON_BE((signed) numtextures);
 
 	// Write header
 	txdata.seek(0, SEEK_SET);
 	SAFEFUNC(txdata.write(&foo, 4));
 
+	// Go to beginning of texture definitions
+	SAFEFUNC(txdata.seek(4 + (numtextures*4), SEEK_SET));
+
 	// Write texture entries
 	for (size_t i = 0; i < numtextures; ++i) {
 		// Get texture to write
 		CTexture* tex = textures[i];
 
-		// Write offset
-		foo = wxINT32_SWAP_ON_BE((signed) txoffset);
-		SAFEFUNC(txdata.write(&foo, 4));
-		SAFEFUNC(txdata.seek(txoffset, SEEK_SET));
+		// Set offset
+		offsets[i] = (signed)txdata.currentPos();
 
 		// Write texture entry
 		switch (txformat) {
@@ -407,10 +410,7 @@ bool TextureXList::writeTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_t
 					txdef.flags |= TX_WORLDPANNING;
 
 				// Write texture definition
-				SAFEFUNC(txdata.write(&tex, 22));
-
-				// Increment offset
-				txoffset += (22 + (10 * txdef.patchcount));
+				SAFEFUNC(txdata.write(&txdef, 22));
 
 				break;
 			}
@@ -429,9 +429,6 @@ bool TextureXList::writeTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_t
 
 				// Write texture definition
 				SAFEFUNC(txdata.write(&txdef, 14));
-
-				// Increment offset
-				txoffset += (14 + (10 * txdef.patchcount));
 
 				break;
 			}
@@ -454,9 +451,6 @@ bool TextureXList::writeTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_t
 
 				// Write texture definition
 				SAFEFUNC(txdata.write(&txdef, 18));
-
-				// Increment offset
-				txoffset += (18 + (6 * txdef.patchcount));
 
 				break;
 			}
@@ -483,13 +477,20 @@ bool TextureXList::writeTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_t
 				SAFEFUNC(txdata.write(&foo, 4));
 			}
 		}
-
-		// Return to offset list
-		SAFEFUNC(txdata.seek(4*(i+1), SEEK_SET));
 	}
+
+	// Write offsets
+	SAFEFUNC(txdata.seek(4, SEEK_SET));
+	SAFEFUNC(txdata.write(offsets, 4*numtextures));
 
 	// Write data to the TEXTUREx entry
 	texturex->importMemChunk(txdata);
+
+	// Update entry type
+	EntryType::detectEntryType(texturex);
+
+	// Clean up
+	delete[] offsets;
 
 	return true;
 }

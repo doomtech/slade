@@ -354,8 +354,10 @@ bool TextureEditorPanel::openTexture(CTexture* tex) {
 	}
 
 	// Set as current texture
-	if (!tex_current)
+	if (!tex_current) {
 		tex_current = new CTexture();
+		listenTo(tex_current);
+	}
 	tex_current->copyTexture(tex);
 
 	// Open texture in canvas
@@ -365,6 +367,8 @@ bool TextureEditorPanel::openTexture(CTexture* tex) {
 	updateTextureControls();
 	populatePatchList();
 	updatePatchControls();
+
+	tex_modified = false;
 
 	return true;
 }
@@ -376,6 +380,14 @@ void TextureEditorPanel::setPalette(Palette8bit *pal) {
 	tex_canvas->setPalette(pal);
 	tex_canvas->updatePatchTextures();
 	tex_canvas->Refresh();
+}
+
+void TextureEditorPanel::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
+	if (announcer != tex_current)
+		return;
+
+	if (event_name == "modified" || event_name == "patches_modified")
+		tex_modified = true;
 }
 
 
@@ -475,6 +487,7 @@ void TextureEditorPanel::onTexCanvasMouseEvent(wxMouseEvent& e) {
 				int16_t cy = patch->yOffset();
 				patch->setOffsetX(cx + diff.x);
 				patch->setOffsetY(cy + diff.y);
+				tex_modified = true;
 			}
 
 			// Refresh texture canvas
@@ -585,8 +598,7 @@ void TextureEditorPanel::onBtnPatchAdd(wxCommandEvent& e) {
 
 	if (dlg.ShowModal() == wxID_OK) {
 		// Add new patch (temporary, testing)
-		patch_table->updatePatchEntry(dlg.GetSelection());
-		tex_current->addPatch(dlg.GetStringSelection());
+		tex_current->addPatch(dlg.GetStringSelection(), 0, 0, patch_table->patchEntry(dlg.GetSelection()));
 
 		// Update UI
 		populatePatchList();
@@ -686,12 +698,9 @@ void TextureEditorPanel::onBtnPatchReplace(wxCommandEvent& e) {
 	wxSingleChoiceDialog dlg(this, "Select a patch to replace the selected patch(es) with", "Replace Patch", patches);
 
 	if (dlg.ShowModal() == wxID_OK) {
-		// Update patch entry
-		patch_table->updatePatchEntry(dlg.GetSelection());
-
 		// Go through selection and replace each patch
 		for (size_t a = 0; a < selection.size(); a++)
-			tex_current->replacePatch(selection[a], dlg.GetStringSelection());
+			tex_current->replacePatch(selection[a], dlg.GetStringSelection(), patch_table->patchEntry(dlg.GetSelection()));
 	}
 
 	// Repopulate patch list
