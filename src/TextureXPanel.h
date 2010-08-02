@@ -46,6 +46,7 @@ public:
 	bool	openTEXTUREX(ArchiveEntry* texturex);
 	bool	saveTEXTUREX();
 	void	setPalette(Palette8bit* pal);
+	void	applyChanges();
 
 	// Events
 	void	onTextureListSelect(wxListEvent& e);

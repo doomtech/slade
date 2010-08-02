@@ -822,6 +822,9 @@ ArchiveEntry* WadArchive::findFirst(search_options_t& options) {
 
 		// Check name
 		if (!options.match_name.IsEmpty()) {
+			// Force case insensitivity
+			options.match_name.MakeLower();
+
 			if (!options.match_name.Matches(entry->getName().Lower()))
 				continue;
 		}
@@ -873,6 +876,9 @@ ArchiveEntry* WadArchive::findLast(search_options_t& options) {
 
 		// Check name
 		if (!options.match_name.IsEmpty()) {
+			// Force case insensitivity
+			options.match_name.MakeLower();
+
 			if (!options.match_name.Matches(entry->getName().Lower()))
 				continue;
 		}
@@ -924,6 +930,9 @@ vector<ArchiveEntry*> WadArchive::findAll(search_options_t& options) {
 
 		// Check name
 		if (!options.match_name.IsEmpty()) {
+			// Force case insensitivity
+			options.match_name.MakeLower();
+
 			if (!options.match_name.Matches(entry->getName().Lower()))
 				continue;
 		}

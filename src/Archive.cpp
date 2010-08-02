@@ -930,7 +930,11 @@ ArchiveEntry* Archive::findFirst(search_options_t& options) {
 			else
 				name = fn.GetFullName();
 
-			if (!options.match_name.Matches(name.Lower()))
+			// Force case insensitivity
+			name.MakeLower();
+			options.match_name.MakeLower();
+
+			if (!options.match_name.Matches(name))
 				continue;
 		}
 
@@ -1010,7 +1014,11 @@ ArchiveEntry* Archive::findLast(search_options_t& options) {
 			else
 				name = fn.GetFullName();
 
-			if (!options.match_name.Matches(name.Lower()))
+			// Force case insensitivity
+			name.MakeLower();
+			options.match_name.MakeLower();
+
+			if (!options.match_name.Matches(name))
 				continue;
 		}
 
@@ -1065,7 +1073,11 @@ vector<ArchiveEntry*> Archive::findAll(search_options_t& options) {
 			else
 				name = fn.GetFullName();
 
-			if (!options.match_name.Matches(name.Lower()))
+			// Force case insensitivity
+			name.MakeLower();
+			options.match_name.MakeLower();
+
+			if (!options.match_name.Matches(name))
 				continue;
 		}
 

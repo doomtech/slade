@@ -399,7 +399,7 @@ bool TextureXList::writeTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_t
 				// Create 'normal' doom format texture definition
 				ftdef_t txdef;
 				memset(txdef.name, 0, 8); // Set texture name to all 0's (to ensure compatibility with XWE)
-				strncpy(txdef.name, chr(tex->getName()), tex->getName().Len());
+				strncpy(txdef.name, chr(tex->getName().Upper()), tex->getName().Len());
 				txdef.flags			= 0;
 				txdef.scale[0]		= tex->getScaleX();
 				txdef.scale[1]		= tex->getScaleY();
@@ -441,7 +441,7 @@ bool TextureXList::writeTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_t
 				// Create strife format texture definition
 				stdef_t txdef;
 				memset(txdef.name, 0, 8); // Set texture name to all 0's (to ensure compatibility with XWE)
-				strncpy(txdef.name, chr(tex->getName()), tex->getName().Len());
+				strncpy(txdef.name, chr(tex->getName().Upper()), tex->getName().Len());
 				txdef.flags			= 0;
 				txdef.scale[0]		= tex->getScaleX();
 				txdef.scale[1]		= tex->getScaleY();

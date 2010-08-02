@@ -2,6 +2,7 @@
 #include "Main.h"
 #include "WxStuff.h"
 #include "TextureXPanel.h"
+#include "Misc.h"
 
 
 TextureXListView::TextureXListView(wxWindow* parent, TextureXList* texturex) : VirtualListView(parent) {
@@ -99,10 +100,8 @@ TextureXPanel::TextureXPanel(wxWindow* parent, PatchTable* patch_table) : wxPane
 	// Bind events
 	list_textures->Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &TextureXPanel::onTextureListSelect, this);
 	btn_new_texture->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureXPanel::onBtnNewTexture, this);
+	btn_new_from_patch->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureXPanel::onBtnNewTextureFromPatch, this);
 	btn_remove_texture->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureXPanel::onBtnRemoveTexture, this);
-
-	// Disable unimplemented
-	btn_new_from_patch->Enable(false);
 }
 
 /* TextureXPanel::~TextureXPanel
@@ -145,6 +144,9 @@ bool TextureXPanel::openTEXTUREX(ArchiveEntry* entry) {
  * Saves a TEXTUREX format texture list
  *******************************************************************/
 bool TextureXPanel::saveTEXTUREX() {
+	// Save any changes to current texture
+	applyChanges();
+
 	tx_entry->unlock();	// Have to unlock the entry first
 	bool ok = texturex.writeTEXTUREXData(tx_entry, *patch_table);
 	tx_entry->lock();
@@ -160,6 +162,14 @@ void TextureXPanel::setPalette(Palette8bit *pal) {
 	texture_editor->setPalette(pal);
 }
 
+void TextureXPanel::applyChanges() {
+	if (texture_editor->texModified() && tex_current) {
+		tex_current->copyTexture(texture_editor->getTexture());
+		patch_table->updatePatchUsage(tex_current);
+		list_textures->updateList();
+	}
+}
+
 
 /*******************************************************************
  * TEXTUREXPANEL EVENTS
@@ -173,10 +183,7 @@ void TextureXPanel::onTextureListSelect(wxListEvent& e) {
 	CTexture* tex = texturex.getTexture(e.GetIndex());
 
 	// Save any changes to previous texture
-	if (texture_editor->texModified() && tex_current) {
-		tex_current->copyTexture(texture_editor->getTexture());
-		patch_table->updatePatchUsage(tex_current);
-	}
+	applyChanges();
 	
 	// Open texture in editor
 	texture_editor->openTexture(tex);
@@ -234,6 +241,38 @@ void TextureXPanel::onBtnNewTextureFromPatch(wxCommandEvent& e) {
 
 		// Process name
 		name = name.Upper().Truncate(8);
+
+		// Load patch image to get dimensions (yeah it's not optimal, but at the moment it's the best I can do)
+		SImage image;
+		ArchiveEntry* patch_entry = patch_table->patchEntry(dlg.GetSelection());
+		Misc::loadImageFromEntry(&image, patch_entry);
+
+		// Create new texture
+		CTexture* tex = new CTexture();
+		tex->setName(name);
+
+		// Set dimensions
+		tex->setWidth(image.getWidth());
+		tex->setHeight(image.getHeight());
+
+		// Add patch
+		tex->addPatch(dlg.GetStringSelection(), 0, 0, patch_entry);
+
+		// Add texture after the last selected item
+		int selected = list_textures->getLastSelected();
+		if (selected == -1) selected = texturex.nTextures() - 1; // Add to end of the list if nothing selected
+		texturex.addTexture(tex, selected + 1);
+
+		// Update texture list
+		list_textures->updateList();
+
+		// Select the new texture
+		list_textures->clearSelection();
+		list_textures->selectItem(selected + 1);
+		list_textures->EnsureVisible(selected + 1);
+
+		// Update patch table counts
+		patch_table->updatePatchUsage(tex);
 	}
 }
 

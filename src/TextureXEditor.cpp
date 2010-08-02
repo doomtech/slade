@@ -90,6 +90,10 @@ public:
 		// Add buttons
 		m_vbox->Add(CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND|wxALL, 4);
 
+		// Bind events
+		rb_new->Bind(wxEVT_COMMAND_RADIOBUTTON_SELECTED, &CreateTextureXDialog::onRadioNewSelected, this);
+		rb_import_bra->Bind(wxEVT_COMMAND_RADIOBUTTON_SELECTED, &CreateTextureXDialog::onRadioNewSelected, this);
+
 		SetInitialSize(wxSize(-1, -1));
 		Layout();
 	}
@@ -109,6 +113,20 @@ public:
 
 	bool createNewSelected() {
 		return rb_new->GetValue();
+	}
+
+	void onRadioNewSelected(wxCommandEvent& e) {
+		// Enable/Disable format selection depending on rb_new state
+		if (rb_new->GetValue()) {
+			rb_format_doom->Enable(true);
+			rb_format_strife->Enable(true);
+			rb_format_textures->Enable(true);
+		}
+		else {
+			rb_format_doom->Enable(false);
+			rb_format_strife->Enable(false);
+			rb_format_textures->Enable(false);
+		}
 	}
 };
 
@@ -172,9 +190,6 @@ bool TextureXEditor::openArchive(Archive* archive) {
 	// Check any archive was given
 	if (!archive)
 		return false;
-
-	// Set global palette
-	pal_chooser->setGlobalFromArchive(archive);
 
 	// Search archive for any texture-related entries
 	Archive::search_options_t options;
@@ -249,11 +264,15 @@ bool TextureXEditor::openArchive(Archive* archive) {
 					TextureXPanel* tx_panel = new TextureXPanel(this, &patch_table);
 					tx_panel->openTEXTUREX(texturex);
 					tx_panel->txList().setFormat(format);
+					tx_panel->setPalette(pal_chooser->getSelectedPalette());
 					texturex->lock();
 
 					// Add it to the list of editors, and a tab
 					texture_editors.push_back(tx_panel);
 					tabs->AddPage(tx_panel, texturex->getName());
+
+					// Set patch table parent (so it finds patches properly)
+					patch_table.setParent(archive);
 				}
 				else {
 					// User selected to import texture definitions from the base resource archive
@@ -336,6 +355,9 @@ bool TextureXEditor::openArchive(Archive* archive) {
 	if (pnames)
 		pnames->lock();
 
+	// Set global palette
+	pal_chooser->setGlobalFromArchive(archive);
+
 	return true;
 }
 
@@ -351,7 +373,7 @@ bool TextureXEditor::removePatch(unsigned index) {
 }
 
 bool TextureXEditor::checkTextures() {
-	string problems;
+	string problems = wxEmptyString;
 
 	// Go through all texturex lists
 	for (unsigned a = 0; a < texture_editors.size(); a++) {
@@ -363,19 +385,39 @@ bool TextureXEditor::checkTextures() {
 			// Check it's patches are all valid
 			for (unsigned p = 0; p < tex->nPatches(); p++) {
 				if (patch_table.patchIndex(tex->getPatch(p)->getName()) == -1) {
-					problems += s_fmt("Texture %s contains invalid/unknown patch %s\n");
+					problems += s_fmt("Texture %s contains invalid/unknown patch %s\n", chr(tex->getName()), chr(tex->getPatch(p)->getName()));
 				}
 			}
 		}
 	}
 
+	// Go through patch table
+	for (unsigned a = 0; a < patch_table.nPatches(); a++) {
+		// Check patch entry is valid
+		patch_table.updatePatchEntry(a);
+		patch_t& patch = patch_table.patch(a);
+
+		if (!patch.entry) {
+			problems += s_fmt("Patch %s cannot be found in any open archive\n", chr(patch.name));
+		}
+		else {
+			// Check patch entry type
+			if (patch.entry->getType() == EntryType::unknownType())
+				EntryType::detectEntryType(patch.entry);
+			EntryType* type = patch.entry->getType();
+
+			if (!type->extraProps().propertyExists("patch"))
+				problems += s_fmt("Patch %s is of type \"%s\", which is not a valid gfx format for patches. Convert it to either Doom Gfx or PNG\n", chr(patch.name), chr(type->getName()));
+		}
+	}
+
 	// Display a message box with any problems found
-	if (problems.size() > 0) {
-		wxMessageDialog dlg(this, "The following problems were found, please correct them before saving:");
+	if (!problems.IsEmpty()) {
+		wxMessageDialog dlg(this, "The following problems were found:");
 		dlg.SetExtendedMessage(problems);
 		dlg.ShowModal();
 
-		return false;
+		return true;
 	}
 	else
 		return true;

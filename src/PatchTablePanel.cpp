@@ -274,6 +274,7 @@ void PatchTablePanel::onBtnPatchFromFile(wxCommandEvent& e) {
 
 			// Add patch to archive
 			entry->setName(name);
+			entry->setExtensionByType();
 			parent->getArchive()->addEntry(entry, "patches");
 
 			// Add patch to patch table

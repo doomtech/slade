@@ -3,7 +3,6 @@
 #define __PATCH_TABLE_PANEL_H__
 
 #include "PatchTable.h"
-//#include "ListView.h"
 #include "VirtualListView.h"
 
 class TextureXEditor;
@@ -14,7 +13,6 @@ private:
 
 protected:
 	string	getItemText(long item, long column) const;
-	//int		getItemIcon(long item) const;
 	void	updateItemAttr(long item) const;
 
 public:
@@ -24,9 +22,6 @@ public:
 	void	updateList(bool clear = false);
 };
 
-/* TODO:
- * - More buttons: import file to patch
-*/
 class PatchTablePanel : public wxPanel {
 private:
 	PatchTable*			patch_table;
