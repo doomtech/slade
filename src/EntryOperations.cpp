@@ -284,6 +284,9 @@ bool EntryOperations::modifyGfxOffsets(ArchiveEntry* entry, int auto_type, point
 
 		// Load new png data to the entry
 		entry->importMemChunk(npng);
+
+		// Set it's type back to png
+		entry->setType(type);
 	}
 	else
 		return false;
