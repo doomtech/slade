@@ -392,6 +392,10 @@ void TextureEditorPanel::setPalette(Palette8bit *pal) {
 	tex_canvas->Refresh();
 }
 
+/* TextureEditorPanel::addPatch
+ * Prompts the user to select a patch from the patch table to be
+ * added to the current texture
+ *******************************************************************/
 void TextureEditorPanel::addPatch() {
 	// Do nothing if patch list is empty
 	if (patch_table->nPatches() == 0 || !tex_current)
@@ -412,6 +416,9 @@ void TextureEditorPanel::addPatch() {
 	}
 }
 
+/* TextureEditorPanel::removePatch
+ * Removes selected patch(es) from the current texture
+ *******************************************************************/
 void TextureEditorPanel::removePatch() {
 	// Get selection
 	wxArrayInt selection = list_patches->selectedItems();
@@ -434,6 +441,9 @@ void TextureEditorPanel::removePatch() {
 	updatePatchControls();
 }
 
+/* TextureEditorPanel::patchBack
+ * Moves selected patch(es) 'back' in the current texture
+ *******************************************************************/
 void TextureEditorPanel::patchBack() {
 	// Get selected patch(es)
 	wxArrayInt selection = list_patches->selectedItems();
@@ -456,6 +466,9 @@ void TextureEditorPanel::patchBack() {
 	tex_canvas->Refresh();
 }
 
+/* TextureEditorPanel::patchForward
+ * Moves selected patch(es) 'forward' in the current texture
+ *******************************************************************/
 void TextureEditorPanel::patchForward() {
 	// Get selected patch(es)
 	wxArrayInt selection = list_patches->selectedItems();
@@ -478,6 +491,10 @@ void TextureEditorPanel::patchForward() {
 	tex_canvas->Refresh();
 }
 
+/* TextureEditorPanel::replacePatch
+ * Prompts the user to select a patch from the patch table to replace
+ * selectes patch(es) with
+ *******************************************************************/
 void TextureEditorPanel::replacePatch() {
 	// Get selection
 	wxArrayInt selection = list_patches->selectedItems();
@@ -508,6 +525,10 @@ void TextureEditorPanel::replacePatch() {
 	updatePatchControls();
 }
 
+/* TextureEditorPanel::duplicatePatch
+ * Duplicates selected patch(es) in the current texture (each
+ * duplication is placed 8 units right+down from it's original patch)
+ *******************************************************************/
 void TextureEditorPanel::duplicatePatch() {
 	// Get selection
 	wxArrayInt selection = list_patches->selectedItems();
@@ -536,6 +557,9 @@ void TextureEditorPanel::duplicatePatch() {
 	updatePatchControls();
 }
 
+/* TextureEditorPanel::onAnnouncement
+ * Handles any announcements from the current texture
+ *******************************************************************/
 void TextureEditorPanel::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
 	if (announcer != tex_current)
 		return;
@@ -840,6 +864,9 @@ void TextureEditorPanel::onPatchPositionYChanged(wxSpinEvent& e) {
 	tex_canvas->Refresh();
 }
 
+/* TextureEditorPanel::onContextMenu
+ * Called when a context menu item is selected
+ *******************************************************************/
 void TextureEditorPanel::onContextMenu(wxCommandEvent& e) {
 	switch (e.GetId()) {
 	case M_PATCH_ADD:

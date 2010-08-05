@@ -360,7 +360,7 @@ void MainWindow::onMenuItemClicked(wxCommandEvent& e) {
 
 	// Help->Online Documentation
 	else if (e.GetId() == MENU_HELP_ONLINEDOCUMENTATION)
-		wxMessageBox("Not Implemented");
+		wxLaunchDefaultBrowser("http://slade-editor.wikia.com");
 
 	// Not handled here, sent to ArchiveManagerPanel
 	else

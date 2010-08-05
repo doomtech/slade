@@ -171,19 +171,30 @@ bool EntryPanel::revertEntry() {
 }
 
 
+/*******************************************************************
+ * ENTRYPANEL CLASS EVENTS
+ *******************************************************************/
+
+/* EntryPanel::onBtnSave
+ * Called when the 'Save Changes' button is clicked
+ *******************************************************************/
 void EntryPanel::onBtnSave(wxCommandEvent& e) {
 	if (modified) {
-		if (saveEntry()) {
+		if (saveEntry())
 			modified = false;
-			EntryType::detectEntryType(entry);
-		}
 	}
 }
 
+/* EntryPanel::onBtnRevert
+ * Called when the 'Revert Changes' button is clicked
+ *******************************************************************/
 void EntryPanel::onBtnRevert(wxCommandEvent& e) {
 	revertEntry();
 }
 
+/* EntryPanel::onBtnEditExt
+ * Called when the 'Edit Externally' button is clicked
+ *******************************************************************/
 void EntryPanel::onBtnEditExt(wxCommandEvent& e) {
 	wxLogMessage("External edit not implemented");
 }

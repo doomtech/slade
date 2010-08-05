@@ -86,6 +86,9 @@ bool TextEntryPanel::saveEntry() {
 	wxCharBuffer text_raw = text_area->GetTextRaw();
 	entry->importMem(text_raw, text_raw.length());
 
+	// Re-detect entry type
+	EntryType::detectEntryType(entry);
+
 	// Update variables
 	setModified(false);
 

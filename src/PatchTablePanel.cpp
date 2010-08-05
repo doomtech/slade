@@ -155,6 +155,9 @@ void PatchTableListView::updateList(bool clear) {
 	Refresh();
 }
 
+/* PatchTableListView::onAnnouncement
+ * Handles announcements from the panel's PatchTable
+ *******************************************************************/
 void PatchTableListView::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
 	// Just refresh on any event from the patch table
 	if (announcer == patch_table)
@@ -219,6 +222,14 @@ PatchTablePanel::PatchTablePanel(wxWindow* parent, PatchTable* patch_table) : wx
 PatchTablePanel::~PatchTablePanel() {
 }
 
+
+/*******************************************************************
+ * PATCHTABLEPANEL CLASS EVENTS
+ *******************************************************************/
+
+/* PatchTablePanel::onBtnAddPatch
+ * Called when the 'New Patch' button is clicked
+ *******************************************************************/
 void PatchTablePanel::onBtnAddPatch(wxCommandEvent& e) {
 	// Prompt for new patch name
 	string patch = wxGetTextFromUser("Enter patch entry name:", "Add Patch", wxEmptyString, this);
@@ -234,6 +245,9 @@ void PatchTablePanel::onBtnAddPatch(wxCommandEvent& e) {
 	list_patches->updateList();
 }
 
+/* PatchTablePanel::onBtnPatchFromFile
+ * Called when the 'New Patch from File' button is clicked
+ *******************************************************************/
 void PatchTablePanel::onBtnPatchFromFile(wxCommandEvent& e) {
 	// Get all entry types
 	vector<EntryType*> etypes = EntryType::allTypes();
@@ -293,6 +307,9 @@ void PatchTablePanel::onBtnPatchFromFile(wxCommandEvent& e) {
 	}
 }
 
+/* PatchTablePanel::onBtnRemovePatch
+ * Called when the 'Remove Patch' button is clicked
+ *******************************************************************/
 void PatchTablePanel::onBtnRemovePatch(wxCommandEvent& e) {
 	// Check anything is selected
 	vector<long> selection = list_patches->getSelection();
@@ -327,6 +344,9 @@ void PatchTablePanel::onBtnRemovePatch(wxCommandEvent& e) {
 	list_patches->updateList();
 }
 
+/* PatchTablePanel::onBtnChangePatch
+ * Called when the 'Change Patch' button is clicked
+ *******************************************************************/
 void PatchTablePanel::onBtnChangePatch(wxCommandEvent& e) {
 	// Check anything is selected
 	vector<long> selection = list_patches->getSelection();

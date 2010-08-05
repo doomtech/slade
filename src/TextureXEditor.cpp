@@ -39,7 +39,11 @@
 
 /*******************************************************************
  * CREATETEXTUREXDIALOG CLASS
- *******************************************************************/
+ *******************************************************************
+ A simple dialog that provides options to create new (empty) texture
+ definitions or import them from the base resource archive. Also has
+ options for the desired texture format (doom, strife or TEXTURES)
+ */
 class CreateTextureXDialog : public wxDialog {
 private:
 	wxRadioButton*	rb_format_doom;
@@ -184,7 +188,9 @@ TextureXEditor::~TextureXEditor() {
 
 /* TextureXEditor::openArchive
  * Opens an archive to manage. Opens all texture related entries in
- * the archive and sorts a bunch of stuff out
+ * the archive and sorts a bunch of stuff out. If no texture related
+ * entries exist in the archive, give the user options to create or
+ * import them
  *******************************************************************/
 bool TextureXEditor::openArchive(Archive* archive) {
 	// Check any archive was given
@@ -361,6 +367,10 @@ bool TextureXEditor::openArchive(Archive* archive) {
 	return true;
 }
 
+/* TextureXEditor::removePatch
+ * Removes the patch at [index] on the patch table from any textures
+ * that contain it (and from the patch table itself)
+ *******************************************************************/
 bool TextureXEditor::removePatch(unsigned index) {
 	// Update TEXTUREx lists
 	for (unsigned a = 0; a < texture_editors.size(); a++)
@@ -372,6 +382,11 @@ bool TextureXEditor::removePatch(unsigned index) {
 	return true;
 }
 
+/* TextureXEditor::checkTextures
+ * Checks all texture definitions for problems and alerts the user
+ * if any are found. Returns true if any problems were found, false
+ * otherwise
+ *******************************************************************/
 bool TextureXEditor::checkTextures() {
 	string problems = wxEmptyString;
 
@@ -420,7 +435,7 @@ bool TextureXEditor::checkTextures() {
 		return true;
 	}
 	else
-		return true;
+		return false;
 }
 
 
@@ -440,9 +455,12 @@ void TextureXEditor::onPaletteChanged(wxCommandEvent& e) {
 		texture_editors[a]->setPalette(pal);
 }
 
+/* TextureXEditor::onSaveClicked
+ * Called when the 'Save Changes' button is clicked
+ *******************************************************************/
 void TextureXEditor::onSaveClicked(wxCommandEvent& e) {
-	if (!checkTextures())
-		return;
+	// Check for problems
+	checkTextures();
 
 	// Save TEXTUREx entries
 	for (unsigned a = 0; a < texture_editors.size(); a++)
@@ -463,32 +481,3 @@ void TextureXEditor::onSaveClicked(wxCommandEvent& e) {
 		pnames->lock();
 	}
 }
-
-
-
-
-
-/*******************************************************************
- * CONSOLE COMMANDS
- *******************************************************************/
-
-// Command to test the texture editor
-/*
-void c_text_txeditor(vector<string> args) {
-	wxDialog dialog(NULL, -1, "Texture Editor!", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
-	TextureXEditor txed(&dialog);
-	if (!txed.openArchive(theArchiveManager->getArchive(0))) {
-		wxLogMessage("No archive open");
-		return;
-	}
-
-	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
-	sizer->Add(&txed, 1, wxEXPAND|wxALL, 4);
-
-	dialog.SetSizer(sizer);
-	dialog.Layout();
-	dialog.SetInitialSize(wxSize(1024, 768));
-	dialog.ShowModal();
-}
-ConsoleCommand test_txeditor("test_txeditor", &c_text_txeditor, 0);
-*/

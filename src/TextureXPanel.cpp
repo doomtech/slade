@@ -1,4 +1,33 @@
 
+/*******************************************************************
+ * SLADE - It's a Doom Editor
+ * Copyright (C) 2008 Simon Judd
+ *
+ * Email:       veilofsorrow@gmail.com
+ * Web:         http://slade.mancubus.net
+ * Filename:    TextureXPanel.cpp
+ * Description: The UI for viewing/editing a texture definitions
+ *              entry (TEXTURE1/2/S)
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *******************************************************************/
+
+
+/*******************************************************************
+ * INCLUDES
+ *******************************************************************/
 #include "Main.h"
 #include "WxStuff.h"
 #include "TextureXPanel.h"
@@ -6,6 +35,13 @@
 #include <wx/filename.h>
 
 
+/*******************************************************************
+ * TEXTUREXLISTVIEW CLASS FUNCTIONS
+ *******************************************************************/
+
+/* TextureXListView::TextureXListView
+ * TextureXListView class constructor
+ *******************************************************************/
 TextureXListView::TextureXListView(wxWindow* parent, TextureXList* texturex) : VirtualListView(parent) {
 	// Init variables
 	this->texturex = texturex;
@@ -18,9 +54,15 @@ TextureXListView::TextureXListView(wxWindow* parent, TextureXList* texturex) : V
 	updateList();
 }
 
+/* TextureXListView::~TextureXListView
+ * TextureXListView class destructor
+ *******************************************************************/
 TextureXListView::~TextureXListView() {
 }
 
+/* TextureXListView::getItemText
+ * Returns the string for [item] at [column]
+ *******************************************************************/
 string TextureXListView::getItemText(long item, long column) const {
 	// Check texture list exists
 	if (!texturex)
@@ -41,6 +83,9 @@ string TextureXListView::getItemText(long item, long column) const {
 		return "INVALID COLUMN";
 }
 
+/* TextureXListView::updateList
+ * Clears the list if [clear] is true, and refreshes it
+ *******************************************************************/
 void TextureXListView::updateList(bool clear) {
 	if (clear)
 		ClearAll();
@@ -168,6 +213,9 @@ void TextureXPanel::setPalette(Palette8bit *pal) {
 	texture_editor->setPalette(pal);
 }
 
+/* TextureXPanel::applyChanges
+ * Applies changes to the current texture, if any
+ *******************************************************************/
 void TextureXPanel::applyChanges() {
 	if (texture_editor->texModified() && tex_current) {
 		tex_current->copyTexture(texture_editor->getTexture());
@@ -176,6 +224,11 @@ void TextureXPanel::applyChanges() {
 	}
 }
 
+/* TextureXPanel::newTextureFromPatch
+ * Creates a new texture called [name] from [patch]. The new texture
+ * will be set to the dimensions of the patch, with the patch added
+ * at 0,0
+ *******************************************************************/
 CTexture* TextureXPanel::newTextureFromPatch(string name, string patch) {
 	// Load patch image to get dimensions (yeah it's not optimal, but at the moment it's the best I can do)
 	SImage image;
@@ -219,6 +272,9 @@ void TextureXPanel::onTextureListSelect(wxListEvent& e) {
 	tex_current = tex;
 }
 
+/* TextureXPanel::onBtnNewTexture
+ * Called when the 'New Texture' button is clicked
+ *******************************************************************/
 void TextureXPanel::onBtnNewTexture(wxCommandEvent& e) {
 	// Prompt for new texture name
 	string name = wxGetTextFromUser("Enter a texture name:", "New Texture");
@@ -252,6 +308,9 @@ void TextureXPanel::onBtnNewTexture(wxCommandEvent& e) {
 	list_textures->EnsureVisible(selected + 1);
 }
 
+/* TextureXPanel::onBtnNewTextureFromPatch
+ * Called when the 'New Texture from Patch' button is clicked
+ *******************************************************************/
 void TextureXPanel::onBtnNewTextureFromPatch(wxCommandEvent& e) {
 	// Do nothing if patch list is empty
 	if (patch_table->nPatches() == 0)
@@ -294,6 +353,9 @@ void TextureXPanel::onBtnNewTextureFromPatch(wxCommandEvent& e) {
 	}
 }
 
+/* TextureXPanel::onBtnNewTextureFromFile
+ * Called when the 'New Texture from File' button is clicked
+ *******************************************************************/
 void TextureXPanel::onBtnNewTextureFromFile(wxCommandEvent& e) {
 	// Get all entry types
 	vector<EntryType*> etypes = EntryType::allTypes();
@@ -370,6 +432,9 @@ void TextureXPanel::onBtnNewTextureFromFile(wxCommandEvent& e) {
 	}
 }
 
+/* TextureXPanel::onBtnRemoveTexture
+ * Called when the 'Remove Texture' button is clicked
+ *******************************************************************/
 void TextureXPanel::onBtnRemoveTexture(wxCommandEvent& e) {
 	// Get selected textures
 	vector<long> selection = list_textures->getSelection();
