@@ -370,7 +370,7 @@ bool GfxConvDialog::doConvert() {
 	}
 	else {
 		// Convert to RGBA (32bit)
-		gfx_target->getImage()->convertRGBA();
+		gfx_target->getImage()->convertRGBA(gfx_current->getPalette());
 	}
 
 	// If doom flat, planar or no transparency is selected, remove any transparency
