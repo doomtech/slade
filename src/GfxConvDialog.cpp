@@ -35,6 +35,7 @@
 #include "ArchiveManager.h"
 #include "Misc.h"
 #include "PaletteManager.h"
+#include "SplashWindow.h"
 
 
 /*******************************************************************
@@ -69,6 +70,10 @@ void GfxConvDialog::nextEntry() {
 
 	updatePreviewGfx();
 	validateTargetFormat();
+
+	// Update splash window
+	theSplashWindow->setProgressMessage(entries[current_entry]->getName(true));
+	theSplashWindow->setProgress((float)current_entry / (float)entries.size());
 }
 
 /* GfxConvDialog::writeToEntry
@@ -409,10 +414,17 @@ void GfxConvDialog::onBtnConvert(wxCommandEvent& e) {
  * Called when the 'Convert All' button is clicked
  *******************************************************************/
 void GfxConvDialog::onBtnConvertAll(wxCommandEvent& e) {
+	// Show splash window
+	theSplashWindow->show("Converting Gfx...", true);
+
+	// Convert all entries
 	for (size_t a = current_entry; a < entries.size(); a++) {
 		writeToEntry();
 		nextEntry();
 	}
+
+	// Hide splash window
+	theSplashWindow->hide();
 }
 
 /* GfxConvDialog::btnSkipClicked
