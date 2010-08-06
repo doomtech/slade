@@ -209,6 +209,8 @@
     <VirtualDirectory Name="Browser">
       <File Name="src/BrowserWindow.h"/>
       <File Name="src/BrowserItem.h"/>
+      <File Name="src/BrowserItem.cpp"/>
+      <File Name="src/BrowserWindow.cpp"/>
     </VirtualDirectory>
     <File Name="src/CTextureCanvas.cpp"/>
     <VirtualDirectory Name="TextEditor">
