@@ -32,6 +32,7 @@
 #include "WadArchive.h"
 #include "LibArchive.h"
 #include "DatArchive.h"
+#include "ResArchive.h"
 #include "BinaryControlLump.h"
 #include "Parser.h"
 
@@ -155,12 +156,14 @@ void EntryDataFormat::initBuiltinFormats() {
 	new DoomArahDataFormat();
 	new ShadowCasterSpriteFormat();
 	new ShadowCasterWallFormat();
+	new AnaMipImageFormat();
 	new IMGZDataFormat();
 	new LegacyGfxDataFormat();
 	new WadDataFormat();
 	new ZipDataFormat();
 	new LibDataFormat();
 	new DatDataFormat();
+	new ResDataFormat();
 	new MUSDataFormat();
 	new MIDIDataFormat();
 	new XMIDataFormat();

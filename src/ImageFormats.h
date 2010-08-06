@@ -137,6 +137,11 @@ public:
 		if (width > 2048 || height > 2048)
 			return false;
 
+		// Let's have halfway "reasonable" limits on the compression ratio
+		// that can be expected from a TGA picture...
+		if ((unsigned)(5000u * mc.getSize()) < (unsigned)(height * width))
+			return false;
+
 		// Check image type, must be a value between 1 and 3 or 9 and 11
 		if (mc[2] == 0 || mc[2] > 11 || (mc[2] > 3 && mc[2] < 9))
 			return false;
@@ -303,7 +308,7 @@ public:
 
 				// Check if total size is reasonable; this computation corresponds to the most inefficient
 				// possible use of space by the format (horizontal stripes of 1 pixel, 1 pixel apart).
-				int numpixels = (header->height + header->height%2)/2;
+				int numpixels = (header->height + 2 + header->height%2)/2;
 				int maxcolsize = sizeof(uint16_t) + (numpixels*3) + 1;
 				if (mc.getSize() > (sizeof(oldpatch_header_t) + (header->width * maxcolsize))) {
 					return false;
@@ -364,7 +369,7 @@ public:
 
 			// Check if total size is reasonable; this computation corresponds to the most inefficient
 			// possible use of space by the format (horizontal stripes of 1 pixel, 1 pixel apart).
-			int numpixels = (header->height + header->height%2)/2;
+			int numpixels = (header->height + 2 + header->height%2)/2;
 			int maxcolsize = sizeof(uint16_t) + (numpixels*3) + 1;
 			if (mc.getSize() > (sizeof(patch_header_t) + (header->width * maxcolsize))) {
 				return false;
@@ -404,7 +409,7 @@ public:
 		uint8_t height = data[1];
 		if (mc.getSize() != (2 + (4 * qwidth * height)) &&
 			// The TITLEPIC in the Doom Press-Release Beta has
-			// two extraneous null bytes at the end.
+			// two extraneous null bytes at the end, for padding.
 			(qwidth != 80 || height != 200 || mc.getSize() != 64004))
 			return false;
 		return true;
@@ -467,7 +472,7 @@ public:
 			return false;
 
 		// Check that values are sane
-		if (header->width == 0xFFFF || !(header->width | header->height))
+		if (header->width == 0xFFFF || !header->width || !header->height)
 			return false;
 
 		// The reserved values should all be null
@@ -511,27 +516,39 @@ public:
 
 	bool isThisFormat(MemChunk& mc) {
 		int size = mc.getSize();
-		if (size < 3)
+		if (size < 4)
 			return false;
 		int width = mc[2] + (mc[3]<<8);
-		if (width == 0)
+		if (width <= 0)
 			return false;
 		int height = 0;
-		for (int j = 0; j < width; ++j)
-		{
+		// Error checking with average column height and proportion of empty columns
+		int avgcolheight = 0, pnumemptycol = 0;
+		for (int j = 0; j < width; ++j) {
 			int offstart = mc[(j<<1)+4]+(mc[(j<<1)+5]<<8);
 			if (offstart == 0) continue;
 			if (offstart < 0 || size < offstart+2 || offstart < (width*2+4))
 				return false;
 			int start		= mc[offstart];
 			int stop		= mc[offstart+1];
-			int colheight= start - stop;
+			int colheight = start - stop;
 			if (colheight < 0 || size < offstart+colheight+1)
 				return false;
-			if (colheight > height)
-				height = colheight;
+			if (start > height)
+				height = start;
+			avgcolheight += colheight;
+			if (colheight == 0)
+				pnumemptycol++;
 		}
-		return (height > 0);
+		avgcolheight *= 16;	avgcolheight /= width;
+		pnumemptycol *= 16;	pnumemptycol /= width;
+		
+		// Arbitrary value: sprite must be about 12% filled
+		if ((avgcolheight < height / 2) || (pnumemptycol > 14))
+			return false;
+
+		// Least efficient sprites: single rows (amounts to 6 bytes per pixel + 4 header bytes)
+		return (size < (5 + ((5 + height) * width)));
 	}
 };
 
@@ -546,11 +563,29 @@ public:
 		// successfully loaded: 130 header, +1 line of 64.
 		if (size < 194)
 			return false;
-		if (size != (mc[0]*256) + 130)
-			return false;
-		return true;
+		return (size == (mc[0]*256) + 130);
 	}
 }; 
+
+class AnaMipImageFormat: public EntryDataFormat {
+public:
+	AnaMipImageFormat() : EntryDataFormat("img_mipimage") {};
+	~AnaMipImageFormat() {}
+
+	bool isThisFormat(MemChunk& mc) {
+		size_t size = mc.getSize();
+		if (size < 4)
+			return false;
+		size_t width = mc[0] + (mc[1]<<8);
+		if (width == 0)
+			return false;
+		size_t height = mc[2] + (mc[3]<<8);
+		if (height == 0)
+			return false;
+		size_t pixels = width * height;
+		return (size >= (pixels + 4));// && size < 2 * pixels + 4);
+	}
+};
 
 class Font0DataFormat : public EntryDataFormat {
 public:

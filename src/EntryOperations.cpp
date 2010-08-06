@@ -589,7 +589,7 @@ bool EntryOperations::gettRNSChunk(ArchiveEntry* entry) {
  * CONSOLE COMMANDS
  *******************************************************************/
 
-void c_test_ee(vector<string> args) {
+CONSOLE_COMMAND (test_ee, 1) {
 	if (theArchiveManager->numArchives() > 0) {
 		for (size_t a = 0; a < args.size(); a++) {
 			ArchiveEntry* entry = theArchiveManager->getArchive(0)->getEntry(args[a]);
@@ -600,4 +600,3 @@ void c_test_ee(vector<string> args) {
 		}
 	}
 }
-ConsoleCommand test_ee("test_ee", &c_test_ee, 1);

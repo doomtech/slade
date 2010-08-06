@@ -7,7 +7,7 @@
  * Web:         http://slade.mancubus.net
  * Filename:    SplashWindow.cpp
  * Description: The SLADE splash window. Shows the SLADE logo, a
- *              message, and an optional progress bar (with it's
+ *              message, and an optional progress bar (with its
  *              own message)
  *
  * This program is free software; you can redistribute it and/or
@@ -246,7 +246,7 @@ void SplashWindow::onPaint(wxPaintEvent& e) {
  * Shows the splash screen with the given message, or hides it if
  * no message is given
  *******************************************************************/
-void c_sw_splash(vector<string> args) {
+CONSOLE_COMMAND (splash, 0) {
 	if (args.size() == 0)
 		theSplashWindow->hide();
 	else if (args.size() == 1)
@@ -257,4 +257,3 @@ void c_sw_splash(vector<string> args) {
 		theSplashWindow->setProgress(prog);
 	}
 }
-ConsoleCommand sw_splash("splash", &c_sw_splash, 0);

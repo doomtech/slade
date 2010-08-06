@@ -269,6 +269,13 @@ bool ArchiveManagerPanel::isArchivePanel(int tab_index) {
 		return false;
 }
 
+/* ArchiveManagerPanel::currentTabIndex
+ * Returns the index of the currently open tab
+ *******************************************************************/
+int ArchiveManagerPanel::currentTabIndex() {
+	return notebook_archives->GetSelection();
+}
+	
 /* ArchiveManagerPanel::currentArchive
  * Returns the currently 'open' archive - the archive associated
  * with the current ArchivePanel tab. Returns NULL if the current tab
@@ -285,6 +292,28 @@ Archive* ArchiveManagerPanel::currentArchive() {
 	// Get the archive associated with the panel
 	ArchivePanel* ap = (ArchivePanel*)notebook_archives->GetPage(selected);
 	return ap->getArchive();
+}
+
+/* ArchiveManagerPanel::currentPanel
+ * Returns the current panel tab
+ *******************************************************************/
+wxWindow* ArchiveManagerPanel::currentPanel() {
+	return notebook_archives->GetPage(notebook_archives->GetSelection());
+}
+
+/* ArchiveManagerPanel::currentArea
+ * Returns the current panel tab
+ *******************************************************************/
+EntryPanel* ArchiveManagerPanel::currentArea() {
+	// Get current tab index
+	int selected = notebook_archives->GetSelection();
+
+	// Check it's an archive tab
+	if (!isArchivePanel(selected))
+		return NULL;
+
+	ArchivePanel* ap = (ArchivePanel*)notebook_archives->GetPage(selected);
+	return ap->currentArea();
 }
 
 /* ArchiveManagerPanel::openTab

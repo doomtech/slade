@@ -9,6 +9,7 @@
 #include "ListenerAnnouncer.h"
 #include "Archive.h"
 #include "ListView.h"
+#include "EntryPanel.h"
 
 class ArchiveManagerPanel;
 
@@ -48,13 +49,16 @@ public:
 	ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_archives);
 	~ArchiveManagerPanel();
 
-	wxMenu*		recentFilesMenu() { return menu_recent; }
+	wxMenu*			recentFilesMenu() { return menu_recent; }
 
-	void		refreshArchiveList();
-	void		populateMapList(Archive* archive);
-	void		updateListItem(int index);
-	bool		isArchivePanel(int tab_index);
-	Archive*	currentArchive();
+	void			refreshArchiveList();
+	void			populateMapList(Archive* archive);
+	void			updateListItem(int index);
+	bool			isArchivePanel(int tab_index);
+	int				currentTabIndex();
+	Archive*		currentArchive();
+	wxWindow*		currentPanel();
+	EntryPanel*		currentArea();
 
 	void	openTab(int archive_index);
 	void	closeTab(int archive_index);

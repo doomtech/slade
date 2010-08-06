@@ -612,7 +612,7 @@ bool Archive::removeDir(string path, ArchiveTreeNode* base) {
 	if (!dir || dir == getRoot())
 		return false;
 
-	// Remove the directory from it's parent
+	// Remove the directory from its parent
 	if (dir->getParent())
 		dir->getParent()->removeChild(dir);
 
@@ -754,7 +754,7 @@ bool Archive::removeEntry(ArchiveEntry* entry, bool delete_entry) {
 	mc.write(&ptr, sizeof(wxUIntPtr));
 	announce("entry_removing", mc);
 
-	// Remove it from it's directory
+	// Remove it from its directory
 	bool ok = dir->removeEntry(index);
 
 	// If it was removed ok
@@ -858,7 +858,7 @@ bool Archive::moveEntry(ArchiveEntry* entry, unsigned position, ArchiveTreeNode*
 	if (!dir)
 		dir = dir_root;
 
-	// Remove the entry from it's current dir
+	// Remove the entry from its current dir
 	removeEntry(entry, false);
 
 	// Add it to the destination dir

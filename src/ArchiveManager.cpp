@@ -34,6 +34,7 @@
 #include "ZipArchive.h"
 #include "LibArchive.h"
 #include "DatArchive.h"
+#include "ResArchive.h"
 #include "Console.h"
 #include "SplashWindow.h"
 #include <wx/filename.h>
@@ -169,6 +170,8 @@ Archive* ArchiveManager::openArchive(string filename, bool manage) {
 		new_archive = new WadArchive();
 	else if (ZipArchive::isZipArchive(filename))
 		new_archive = new ZipArchive();
+	else if (ResArchive::isResArchive(filename))
+		new_archive = new ResArchive();
 	else if (DatArchive::isDatArchive(filename))
 		new_archive = new DatArchive();
 	else if (LibArchive::isLibArchive(filename))
@@ -231,6 +234,8 @@ Archive* ArchiveManager::openArchive(ArchiveEntry* entry, bool manage) {
 		new_archive = new WadArchive();
 	else if (ZipArchive::isZipArchive(entry->getMCData()))
 		new_archive = new ZipArchive();
+	else if (ResArchive::isResArchive(entry->getMCData()))
+		new_archive = new ResArchive();
 	else if (LibArchive::isLibArchive(entry->getMCData()))
 		new_archive = new LibArchive();
 	else if (DatArchive::isDatArchive(entry->getMCData()))
@@ -294,6 +299,10 @@ Archive* ArchiveManager::newArchive(uint8_t type) {
 		case ARCHIVE_DAT:
 			new_archive = new DatArchive();
 			format_str = "dat";
+			break;
+		case ARCHIVE_RES:
+			new_archive = new ResArchive();
+			format_str = "res";
 			break;
 	}
 
@@ -407,20 +416,22 @@ string ArchiveManager::getArchiveExtensionsString(bool wad, bool zip, bool pk3, 
 	string ext_pk3 = "*.pk3;*.PK3;*.Pk3";
 	string ext_jdf = "*.jdf;*.JDF;*.Jdf";
 	string ext_dat = "*.dat;*.DAT;*.Dat";
-	string ext_cdhd = "*.cd;*.CD;*.Cd;*.hd;*.HD;*.Hd";
+	string ext_chd = "*.cd;*.CD;*.Cd;*.hd;*.HD;*.Hd";
 	string ext_lib = "*.lib;*.LIB;*.Lib";
+	string ext_res = "*.res;*.RES;*.Res";
 
 	// Create extensions string
-	string extensions = s_fmt("Any Supported File (*.wad; *.zip; *.pk3; *.jdf)|%s;%s;%s;%s;%s;%s;%s",
+	string extensions = s_fmt("Any Supported File (*.wad; *.zip; *.pk3; *.jdf)|%s;%s;%s;%s;%s;%s;%s;%s",
 		ext_wad.c_str(), ext_zip.c_str(), ext_pk3.c_str(), ext_jdf.c_str(),
-		ext_dat.c_str(), ext_lib.c_str(), ext_cdhd.c_str());
+		ext_dat.c_str(), ext_lib.c_str(), ext_chd.c_str(), ext_res.c_str());
 	extensions += s_fmt("|Doom Wad files (*.wad)|%s", ext_wad.c_str());
 	extensions += s_fmt("|Zip files (*.zip)|%s", ext_zip.c_str());
 	extensions += s_fmt("|Pk3 (zip) files (*.pk3)|%s", ext_pk3.c_str());
 	extensions += s_fmt("|JDF (zip) files (*.jdf)|%s", ext_jdf.c_str());
 	extensions += s_fmt("|Data (dat) files (*.dat)|%s", ext_dat.c_str());
-	extensions += s_fmt("|CD/HD (cd/hd) files (*.cd; *.hd)|%s", ext_cdhd.c_str());
+	extensions += s_fmt("|CD/HD (cd/hd) files (*.cd; *.hd)|%s", ext_chd.c_str());
 	extensions += s_fmt("|Library (lib) files (*.lib)|%s", ext_lib.c_str());
+	extensions += s_fmt("|Resource (res) files (*.res)|%s", ext_res.c_str());
 
 	return extensions;
 }
@@ -624,7 +635,7 @@ void ArchiveManager::addRecentFile(string path) {
 	announce("recent_files_changed");
 }
 
-/* ArchivePanel::openTextureEditor
+/* ArchiveManager::openTextureEditor
  * Announces that the texture editor for archive [index] should be
  * opened
  *******************************************************************/
@@ -642,7 +653,7 @@ bool ArchiveManager::openTextureEditor(uint32_t index) {
 }
 
 
-/* ArchivePanel::onAnnouncement
+/* ArchiveManager::onAnnouncement
  * Called when an announcement is recieved from one of the archives
  * in the list
  *******************************************************************/
@@ -673,7 +684,7 @@ void ArchiveManager::onAnnouncement(Announcer* announcer, string event_name, Mem
 /* Console Command - "list_archives"
  * Lists the filenames of all open archives
  *******************************************************************/
-void c_list_archives(vector<string> args) {
+CONSOLE_COMMAND (list_archives, 0) {
 	wxLogMessage(s_fmt("%d Open Archives:", theArchiveManager->numArchives()));
 
 	for (int a = 0; a < theArchiveManager->numArchives(); a++) {
@@ -681,7 +692,6 @@ void c_list_archives(vector<string> args) {
 		wxLogMessage(s_fmt("%d: \"%s\"", a + 1, archive->getFilename().c_str()));
 	}
 }
-ConsoleCommand am_list_archives("list_archives", &c_list_archives, 0);
 
 /* Console Command - "open"
  * Attempts to open each given argument (filenames)
@@ -690,4 +700,4 @@ void c_open(vector<string> args) {
 	for (size_t a = 0; a < args.size(); a++)
 		theArchiveManager->openArchive(args[a]);
 }
-ConsoleCommand am_open("open", &c_open, 1);
+ConsoleCommand am_open("open", &c_open, 1); // Can't use the macro with this name

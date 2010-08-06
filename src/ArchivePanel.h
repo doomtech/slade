@@ -61,6 +61,11 @@ public:
 	bool	gfxModifyOffsets();
 	bool	basConvert();
 	bool	palConvert();
+	bool	reloadCurrentPanel();
+
+	// Needed for some console commands
+	EntryPanel *	currentArea() { return cur_area;}
+	ArchiveEntry*	currentEntry();
 
 	// UI related
 	bool	openEntry(ArchiveEntry* entry, bool force = false);

@@ -36,6 +36,7 @@
 #include "BinaryControlLump.h"
 #include "Parser.h"
 #include "EntryDataFormat.h"
+#include "ConsoleHelpers.h"
 #include <wx/dir.h>
 #include <wx/filename.h>
 
@@ -476,7 +477,7 @@ bool EntryType::loadEntryTypes() {
  *******************************************************************/
 bool EntryType::detectEntryType(ArchiveEntry* entry) {
 	// Do nothing if the entry is a folder or a map marker
-	if (entry->getType() == &etype_folder || entry->getType() == &etype_map)
+	if (!entry || entry->getType() == &etype_folder || entry->getType() == &etype_map)
 		return false;
 
 	// If the entry's size is zero, set it to marker type
@@ -571,20 +572,82 @@ vector<EntryType*> EntryType::allTypes() {
 /* Console Command - "test_entry_types"
  * Testingggg
  *******************************************************************/
-void c_test_entry_types(vector<string> args) {
+CONSOLE_COMMAND (test_entry_types, 0) {
 	EntryType::loadEntryTypes();
 }
-ConsoleCommand et_test_entry_types("test_entry_types", &c_test_entry_types, 0);
 
 
 /* Console Command - "test_entry_type_detection"
  * Testingggg moar
  *******************************************************************/
-void c_test_entry_type_detection(vector<string> args) {
+CONSOLE_COMMAND (test_entry_type_detection, 0) {
 	Archive* archive = theArchiveManager->getArchive(0);
 
 	for (uint32_t a = 0; a < archive->numEntries(); a++) {
 		EntryType::detectEntryType(archive->getEntry(a));
 	}
 }
-ConsoleCommand et_test_entry_type_detection("test_entry_type_detection", &c_test_entry_type_detection, 0);
+
+CONSOLE_COMMAND (type, 0) {
+	vector<EntryType*> all_types = EntryType::allTypes();
+	if (args.size() == 0) {
+		// List existing types and their IDs
+		string listing = "List of entry types:\n\t";
+		string separator = "]\n\t"; string colon = ": "; string paren = " [";
+		for (size_t a = 3; a < all_types.size(); a++) {
+			listing += all_types[a]->getName();
+			listing += paren;
+			listing += all_types[a]->getId();
+			listing += colon;
+			listing += all_types[a]->getFormat();
+			listing += separator;
+		}
+		wxLogMessage(listing);
+	} else {
+		// Find type by id or first matching format
+		bool match = false;
+		size_t a;
+		for (a = 3; a < all_types.size(); a++) {
+			if (!args[0].CmpNoCase(all_types[a]->getFormat()) || !args[0].CmpNoCase(all_types[a]->getId())) {
+				match = true;
+				break;
+			}
+		}
+		if (!match) {
+			wxLogMessage("Type %s does not exist (use \"type\" without parameter for a list)", args[0].mb_str());
+			return;
+		}
+
+		// Allow to force type change even if format checks fails (use at own risk!)
+		bool okay = false, force = !(args.size() < 2 || args[1].CmpNoCase("force"));
+		ArchiveEntry * meep = CH::getCurrentArchiveEntry();
+		if (!meep) {
+			wxLogMessage("No entry selected");
+			return;
+		}
+
+		// Check if format corresponds to entry
+		EntryDataFormat* foo = EntryDataFormat::getFormat(all_types[a]->getFormat());
+		if (foo) {
+			wxLogMessage("Identifying as %s", all_types[a]->getName().mb_str());
+			okay = foo->isThisFormat(meep->getMCData());
+			if (okay) wxLogMessage("Identification successful");
+			else wxLogMessage("Identification failed");
+		} else wxLogMessage("No data format for this type!");
+
+		// Change type
+		if (force || okay) {
+			meep->setType(all_types[a]);
+			wxLogMessage("Type changed.");
+		}
+	}
+}
+
+CONSOLE_COMMAND (size, 0) {
+	ArchiveEntry * meep = CH::getCurrentArchiveEntry();
+	if (!meep) {
+		wxLogMessage("No entry selected");
+		return;
+	}
+	wxLogMessage("%s: %i bytes", meep->getName().mb_str(), meep->getSize());
+}

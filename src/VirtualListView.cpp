@@ -266,7 +266,7 @@ void VirtualListView::onKeyChar(wxKeyEvent& e) {
 
 
 
-void c_test_vlv(vector<string> args) {
+CONSOLE_COMMAND (test_vlv, 0) {
 	wxDialog dlg(NULL, -1, "VLV!", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
 
 	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
@@ -279,4 +279,3 @@ void c_test_vlv(vector<string> args) {
 
 	dlg.ShowModal();
 }
-ConsoleCommand test_vlv("test_vlv", &c_test_vlv, 0);

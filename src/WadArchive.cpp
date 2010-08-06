@@ -38,6 +38,7 @@
  * VARIABLES
  *******************************************************************/
 CVAR(Bool, wad_force_uppercase, true, CVAR_SAVE)
+CVAR(Bool, iwad_lock, true, CVAR_SAVE)
 
 // Used for map detection
 string map_lumps[12] = {
@@ -75,7 +76,6 @@ const int n_special_namespaces = 8;
 /*******************************************************************
  * EXTERNAL VARIABLES
  *******************************************************************/
-CVAR(Bool, iwad_lock, true, CVAR_SAVE)
 EXTERN_CVAR(Bool, archive_load_data)
 
 /*******************************************************************

@@ -61,8 +61,9 @@ public:
 #define theConsole Console::getInstance()
 
 // Define for neat console command definitions
-#define CONSOLE_COMMAND(name, min_args, func) \
-	void c_##name##(vector<string> args) func \
-	ConsoleCommand name (#name, &c_##name##, min_args);
+#define CONSOLE_COMMAND(name, min_args) \
+	void c_##name##(vector<string> args); \
+	ConsoleCommand name (#name, &c_##name##, min_args); \
+	void c_##name##(vector<string> args) \
 
 #endif //__CONSOLE_H__

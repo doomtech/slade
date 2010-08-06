@@ -149,6 +149,24 @@ bool GfxEntryPanel::loadEntry(ArchiveEntry* entry) {
 	if (!Misc::loadImageFromEntry(gfx_canvas->getImage(), this->entry))
 		return false;
 
+	// Refresh everything
+	refresh();
+
+	return true;
+}
+
+/* GfxEntryPanel::saveEntry
+ * Saves any changes to the entry
+ *******************************************************************/
+bool GfxEntryPanel::saveEntry() {
+	// Set gfx entry offsets
+	return EntryOperations::modifyGfxOffsets(entry, -1, point2_t(spin_xoffset->GetValue(), spin_yoffset->GetValue()), true, true, false);
+}
+
+/* GfxEntryPanel::refresh
+ * Reloads image data and force refresh
+ *******************************************************************/
+void GfxEntryPanel::refresh() {
 	// Setup palette
 	combo_palette->setGlobalFromArchive(entry->getParent(), Misc::detectPaletteHack(entry));
 	updateImagePalette();
@@ -188,16 +206,6 @@ bool GfxEntryPanel::loadEntry(ArchiveEntry* entry) {
 
 	// Refresh the canvas
 	gfx_canvas->Refresh();
-
-	return true;
-}
-
-/* GfxEntryPanel::saveEntry
- * Saves any changes to the entry
- *******************************************************************/
-bool GfxEntryPanel::saveEntry() {
-	// Set gfx entry offsets
-	return EntryOperations::modifyGfxOffsets(entry, -1, point2_t(spin_xoffset->GetValue(), spin_yoffset->GetValue()), true, true, false);
 }
 
 /* GfxEntryPanel::updateImagePalette
@@ -407,4 +415,110 @@ void GfxEntryPanel::onGfxOffsetChanged(wxEvent& e) {
 
 	// Set changed
 	setModified();
+}
+
+/*******************************************************************
+ * EXTRA CONSOLE COMMANDS
+ *******************************************************************/
+
+// I'd love to put them in their own file, but attempting to do so
+// results in a circular include nightmare and nothing works anymore.
+#include "ConsoleHelpers.h"
+#include "Console.h"
+#include "MainApp.h"
+#include "ArchivePanel.h"
+
+GfxEntryPanel * CH::getCurrentGfxPanel() {
+	if (theApp->getMainWindow())
+	{
+		ArchiveManagerPanel * archie = theApp->getMainWindow()->getArchiveManagerPanel();
+		if (archie)
+		{
+			EntryPanel* panie = archie->currentArea();
+			if (panie) {
+				if (!(panie->GetName().CmpNoCase("gfx"))) {
+					return (GfxEntryPanel *)panie;
+				}
+			}
+		}
+	}
+	return NULL;
+}
+
+CONSOLE_COMMAND(rotate, 1) {
+	double val;
+	string bluh = args[0];
+	if (!bluh.ToDouble(&val)) {
+		if (!bluh.CmpNoCase("l") || !bluh.CmpNoCase("left"))
+			val = 90.;
+		else if (!bluh.CmpNoCase("f") || !bluh.CmpNoCase("flip"))
+			val = 180.; 
+		else if (!bluh.CmpNoCase("r") || !bluh.CmpNoCase("right"))
+			val = 270.;
+		else {
+			wxLogMessage("Invalid parameter: %s is not a number.", bluh.mb_str());
+			return;
+		}
+	}
+	int angle = (int)val;
+	if (angle % 90) {
+		wxLogMessage("Invalid parameter: %i is not a multiple of 90.", angle);
+		return;
+	}
+	ArchivePanel * foo = CH::getCurrentArchivePanel();
+	if (!foo) {
+		wxLogMessage("No active panel.");
+		return;
+	}
+	ArchiveEntry * bar = foo->currentEntry();
+	if (!bar) {
+		wxLogMessage("No active entry.");
+	}
+	GfxEntryPanel * meep = CH::getCurrentGfxPanel();
+	if (!meep) {
+		wxLogMessage("No image selected.");
+		return;
+	}
+	if (meep->getImage())
+	{
+		meep->getImage()->rotate(angle);
+		meep->refresh();
+		MemChunk mc;
+		meep->getImage()->safeConvert(mc);
+		bar->importMemChunk(mc);
+	}
+}
+
+CONSOLE_COMMAND (mirror, 1) {
+	bool vertical;
+	string bluh = args[0];
+	if (!bluh.CmpNoCase("y") || !bluh.CmpNoCase("v") || 
+		!bluh.CmpNoCase("vert") || !bluh.CmpNoCase("vertical"))
+		vertical = true;
+	else if (!bluh.CmpNoCase("x") || !bluh.CmpNoCase("h") || 
+		!bluh.CmpNoCase("horz") || !bluh.CmpNoCase("horizontal"))
+		vertical = false;
+	else {
+		wxLogMessage("Invalid parameter: %s is not a known value.", bluh.mb_str());
+		return;
+		}
+	ArchivePanel * foo = CH::getCurrentArchivePanel();
+	if (!foo) {
+		wxLogMessage("No active panel.");
+		return;
+	}
+	ArchiveEntry * bar = foo->currentEntry();
+	if (!bar) {
+		wxLogMessage("No active entry.");
+	}
+	GfxEntryPanel * meep = CH::getCurrentGfxPanel();
+	if (!meep) {
+		wxLogMessage("No image selected.");
+		return;
+	}
+	if (meep->getImage())
+	{
+		meep->getImage()->mirror(vertical);
+		meep->refresh();
+	}
 }

@@ -34,6 +34,7 @@ public:
 	SIFormat		getFormat() { return format; }
 	bool			getRGBAData(MemChunk& mc, Palette8bit* pal = NULL);
 	bool			getRGBData(MemChunk& mc, Palette8bit* pal = NULL);
+	bool			getPalData(MemChunk& mc);
 	int				getWidth() { return width; }
 	int				getHeight() { return height; }
 	bool			hasPalette() { return has_palette; }
@@ -70,8 +71,10 @@ public:
 	bool	loadBMF(const uint8_t* gfx_data, int size);
 	bool	loadSCSprite(const uint8_t* data, int size);
 	bool	loadSCWall(const uint8_t* data, int size);
+	bool	loadAnaMip(const uint8_t* data, int size);
 
 	// Image format writing
+	bool	safeConvert(MemChunk& out, Palette8bit* pal = NULL);
 	bool	toPNG(MemChunk& out, Palette8bit* pal = NULL);
 	bool	toDoomGfx(MemChunk& out, uint8_t alpha_threshold = 0);
 	bool	toDoomFlat(MemChunk& out);
@@ -83,6 +86,10 @@ public:
 	bool	convertPaletted(Palette8bit* pal_target, Palette8bit* pal_current = NULL);
 	bool	maskFromColour(rgba_t colour, Palette8bit* pal = NULL, bool force_mask = false);
 	bool	cutoffMask(uint8_t threshold, bool force_mask = false);
+
+	// Miscellaneous operations
+	bool	rotate(int angle);
+	bool	mirror(bool vert);
 };
 
 #endif //__SIMAGE_H__

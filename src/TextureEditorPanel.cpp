@@ -527,7 +527,7 @@ void TextureEditorPanel::replacePatch() {
 
 /* TextureEditorPanel::duplicatePatch
  * Duplicates selected patch(es) in the current texture (each
- * duplication is placed 8 units right+down from it's original patch)
+ * duplication is placed 8 units right+down from its original patch)
  *******************************************************************/
 void TextureEditorPanel::duplicatePatch() {
 	// Get selection

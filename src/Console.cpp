@@ -206,27 +206,24 @@ void ConsoleCommand::execute(vector<string> args) {
  * A simple command to print the first given argument to the console.
  * Subsequent arguments are ignored.
  *******************************************************************/
-void c_echo(vector<string> args) {
+CONSOLE_COMMAND (echo, 1) {
 	theConsole->logMessage(args[0]);
 }
-ConsoleCommand con_echo("echo", &c_echo, 1);
 
 /* Console Command - "cmdlist"
  * Lists all valid console commands
  *******************************************************************/
-void c_cmdlist(vector<string> args) {
+CONSOLE_COMMAND (cmdlist, 0) {
 	theConsole->logMessage(s_fmt("%d Valid Commands:", theConsole->numCommands()));
 
 	for (int a = 0; a < theConsole->numCommands(); a++)
 		theConsole->logMessage(s_fmt("\"%s\"", theConsole->command(a).getName().c_str()));
 }
-ConsoleCommand con_cmdlist("cmdlist", &c_cmdlist, 0);
 
-void c_testmatch(vector<string> args) {
+CONSOLE_COMMAND (testmatch, 0) {
 	bool match = args[0].Matches(args[1]);
 	if (match)
 		theConsole->logMessage("Match");
 	else
 		theConsole->logMessage("No Match");
 }
-ConsoleCommand con_testmatch("testmatch", &c_testmatch, 2);

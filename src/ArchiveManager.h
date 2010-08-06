@@ -35,7 +35,10 @@ public:
 	}
 
 	static void deleteInstance() {
-		if (instance) delete instance;
+		if (instance) {
+			delete instance;
+			instance = NULL;
+		}
 	}
 
 	bool		init();

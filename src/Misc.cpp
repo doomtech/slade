@@ -97,6 +97,8 @@ bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry) {
 		return image->loadSCSprite(entry->getData(), entry->getSize());
 	else if (s_cmpnocase(format, "img_scwall"))
 		return image->loadSCWall(entry->getData(), entry->getSize());
+	else if (s_cmpnocase(format, "img_mipimage"))
+		return image->loadAnaMip(entry->getData(), entry->getSize());
 	else {
 		if (!image->loadImage(entry->getData(true), entry->getSize())) {
 			Global::error = "Image format not supported by FreeImage";

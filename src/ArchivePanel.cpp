@@ -692,9 +692,15 @@ bool ArchivePanel::gfxModifyOffsets() {
 	return true;
 }
 
+ArchiveEntry * ArchivePanel::currentEntry() {
+	if (entry_list)
+		return entry_list->getLastSelectedEntry();
+	return NULL;
+}
+
 bool ArchivePanel::basConvert() {
 	// Get the entry index of the last selected list item
-	int index = archive->entryIndex(entry_list->getLastSelectedEntry());
+	int index = archive->entryIndex(currentEntry());
 
 	// If something was selected, add 1 to the index so we add the new entry after the last selected
 	if (index >= 0)
@@ -743,7 +749,7 @@ bool ArchivePanel::basConvert() {
 
 bool ArchivePanel::palConvert() {
 	// Get the entry index of the last selected list item
-	ArchiveEntry* pal6bit = entry_list->getLastSelectedEntry();
+	ArchiveEntry* pal6bit = currentEntry();
 	const uint8_t * mehmeh = pal6bit->getData(true);
 	uint8_t * meh = new uint8_t[pal6bit->getSize()];
 	memcpy(meh, mehmeh, pal6bit->getSize());
@@ -804,6 +810,20 @@ bool ArchivePanel::openEntry(ArchiveEntry* entry, bool force) {
 	return true;
 }
 
+/* ArchivePanel::reloadCurrentPanel
+ * If only one entry is selected, force its reload
+ *******************************************************************/
+bool ArchivePanel::reloadCurrentPanel() {
+	// Do nothing if there are multiple entries
+	if (cur_area == multi_area)
+		return false;
+
+	return openEntry(cur_area->getEntry(), true);
+}
+
+/* ArchivePanel::showEntryPanel
+ * Show an entry panel appropriate to the current entry
+ *******************************************************************/
 bool ArchivePanel::showEntryPanel(EntryPanel* new_area, bool ask_save) {
 	/*
 	// If the current entry area has unsaved changes, ask the user if they wish to save the changes
@@ -1160,4 +1180,54 @@ void ArchivePanel::onEntryListActivated(wxListEvent& e) {
 		theArchiveManager->openTextureEditor(theArchiveManager->archiveIndex(archive));
 
 	e.Skip();
+}
+
+/*******************************************************************
+ * EXTRA CONSOLE COMMANDS
+ *******************************************************************/
+
+// I'd love to put them in their own file, but attempting to do so
+// results in a circular include nightmare and nothing works anymore.
+#include "ConsoleHelpers.h"
+#include "Console.h"
+#include "MainApp.h"
+Archive * CH::getCurrentArchive() {
+	if (theApp->getMainWindow())
+	{
+		if (theApp->getMainWindow()->getArchiveManagerPanel())
+		{
+			return theApp->getMainWindow()->getArchiveManagerPanel()->currentArchive();
+		}
+	}
+	return NULL;
+}
+
+ArchiveEntry * CH::getCurrentArchiveEntry() {
+	if (CH::getCurrentArchivePanel())
+	{
+		return CH::getCurrentArchivePanel()->currentEntry();
+	}
+	return NULL;
+}
+
+ArchivePanel * CH::getCurrentArchivePanel() {
+	if (theApp->getMainWindow())
+	{
+		ArchiveManagerPanel * archie = theApp->getMainWindow()->getArchiveManagerPanel();
+		if (archie)
+		{
+			if (archie->isArchivePanel(archie->currentTabIndex()))
+				return (ArchivePanel *)(archie->currentPanel());
+		}
+	}
+	return NULL;
+}
+
+CONSOLE_COMMAND(palconv, 0) {
+	ArchivePanel * meep = CH::getCurrentArchivePanel();
+	if (meep)
+	{
+		meep->palConvert();
+		meep->reloadCurrentPanel();
+	}
 }

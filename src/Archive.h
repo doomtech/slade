@@ -51,6 +51,7 @@ public:
 #define ARCHIVE_ZIP		2
 #define ARCHIVE_LIB		3
 #define ARCHIVE_DAT		4
+#define ARCHIVE_RES		5
 
 class Archive : public Announcer {
 private:

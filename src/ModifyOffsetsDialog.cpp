@@ -190,8 +190,7 @@ void ModifyOffsetsDialog::onOptAuto(wxCommandEvent& e) {
  * CONSOLE COMMANDS
  *******************************************************************/
 
-void c_test_mod(vector<string> args) {
+CONSOLE_COMMAND (test_mod, 0) {
 	ModifyOffsetsDialog mod;
 	mod.ShowModal();
 }
-ConsoleCommand test_mod("test_mod", &c_test_mod, 0);

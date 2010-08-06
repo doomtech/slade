@@ -54,6 +54,7 @@ namespace Global {
 string	dir_data = "";
 string	dir_user = "";
 string	dir_app = "";
+MainApp* MainApp::instance = NULL;
 
 
 /*******************************************************************
@@ -190,7 +191,12 @@ string appPath(string filename, int dir) {
  * SLADELOG CLASS FUNCTIONS
  *******************************************************************/
 
+// How fun. DoLogString() does not work with 2.9.1, and DoLogText() with 2.9.0.
+#if (wxMAJOR_VERSION == 2 && wxMINOR_VERSION == 9 && wxRELEASE_NUMBER == 0)
+void SLADELog::DoLogString(const wxString& msg, time_t time) {
+#else
 void SLADELog::DoLogText(const wxString& msg) {
+#endif
 	theConsole->logMessage(msg);
 }
 
@@ -237,6 +243,7 @@ bool MainApp::initDirectories() {
  *******************************************************************/
 bool MainApp::OnInit() {
 	// Init global variables
+	setInstance(this);
 	Global::error = "";
 	ArchiveManager::getInstance();
 
@@ -256,6 +263,8 @@ bool MainApp::OnInit() {
 
 	// Init logfile
 	initLogFile();
+
+	wxLogMessage("Compiled with wxWidgets %i.%i.%i", wxMAJOR_VERSION, wxMINOR_VERSION, wxRELEASE_NUMBER);
 
 	// Load configuration file
 	wxLogMessage("Loading configuration");
@@ -449,11 +458,9 @@ void MainApp::saveConfigFile() {
 }
 
 
-
-void c_crash(vector<string> args) {
+CONSOLE_COMMAND (crash, 0) {
 	if (wxMessageBox("Yes, this command does actually exist and *will* crash the program. Do you really want it to crash?", "...Really?", wxYES_NO|wxCENTRE) == wxYES) {
 		uint8_t* test = NULL;
 		test[123] = 5;
 	}
 }
-ConsoleCommand crash("crash", &c_crash, 0);

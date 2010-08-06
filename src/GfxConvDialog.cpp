@@ -536,7 +536,7 @@ void GfxConvDialog::onTransColourChanged(wxEvent& e) {
  * CONSOLE COMMANDS
  *******************************************************************/
 
-void c_test_gcd(vector<string> args) {
+CONSOLE_COMMAND (test_gcd, 0) {
 	GfxConvDialog gcd;
 
 	if (theArchiveManager->numArchives() > 0) {
@@ -554,4 +554,3 @@ void c_test_gcd(vector<string> args) {
 
 	gcd.ShowModal();
 }
-ConsoleCommand test_gcd("test_gcd", &c_test_gcd, 0);

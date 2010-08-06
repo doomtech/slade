@@ -79,10 +79,13 @@ public:
 
 	void	setupLayout();
 
+	ArchiveManagerPanel*	getArchiveManagerPanel() { return panel_archivemanager; }
+
 	// Events
 	void	onMenuItemClicked(wxCommandEvent &e);
 	void	onHTMLLinkClicked(wxHtmlLinkEvent &e);
 	void	onClose(wxCloseEvent &e);
 };
+
 
 #endif //__MAINWINDOW_H__

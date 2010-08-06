@@ -41,4 +41,14 @@ public:
 	}
 };
 
+class ResDataFormat : public EntryDataFormat {
+public:
+	ResDataFormat() : EntryDataFormat("archive_res") {};
+	~ResDataFormat() {}
+
+	bool isThisFormat(MemChunk& mc) {
+		return ResArchive::isResArchive(mc);
+	}
+};
+
 #endif //ARCHIVEFORMATS_H

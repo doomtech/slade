@@ -30,6 +30,7 @@ public:
 	void	updateImagePalette();
 	int		detectOffsetType();
 	void	applyViewType();
+	void	refresh();
 
 	void	onZoomChanged(wxCommandEvent& e);
 	void	onPaletteChanged(wxCommandEvent& e);
@@ -40,6 +41,8 @@ public:
 	void	onalPhChanged(wxCommandEvent& e);
 	void	ontRNSChanged(wxCommandEvent& e);
 	void	onGfxOffsetChanged(wxEvent& e);
+
+	SImage*	getImage() { if (gfx_canvas) return gfx_canvas->getImage(); else return NULL; }
 };
 
 #endif //__GFXENTRYPANEL_H__

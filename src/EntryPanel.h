@@ -26,6 +26,7 @@ public:
 	EntryPanel(wxWindow* parent, string id);
 	~EntryPanel();
 
+	string			GetName() { return id; }
 	ArchiveEntry*	getEntry() { return entry; }
 	bool			isModified() { return modified; }
 
