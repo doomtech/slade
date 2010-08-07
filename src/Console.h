@@ -62,8 +62,8 @@ public:
 
 // Define for neat console command definitions
 #define CONSOLE_COMMAND(name, min_args) \
-	void c_##name##(vector<string> args); \
-	ConsoleCommand name (#name, &c_##name##, min_args); \
-	void c_##name##(vector<string> args) \
+	void c_##name(vector<string> args); \
+	ConsoleCommand name(#name, &c_##name, min_args); \
+	void c_##name(vector<string> args)
 
 #endif //__CONSOLE_H__

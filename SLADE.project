@@ -18,8 +18,6 @@
   <VirtualDirectory Name="General">
     <File Name="src/Clipboard.cpp"/>
     <File Name="src/Clipboard.h"/>
-    <File Name="src/Console.cpp"/>
-    <File Name="src/Console.h"/>
     <File Name="src/CVar.cpp"/>
     <File Name="src/ListenerAnnouncer.h"/>
     <File Name="src/Main.h"/>
@@ -49,6 +47,11 @@
       <File Name="src/Tree.cpp"/>
       <File Name="src/Parser.h"/>
       <File Name="src/Parser.cpp"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="Console">
+      <File Name="src/Console.cpp"/>
+      <File Name="src/Console.h"/>
+      <File Name="src/ConsoleHelpers.h"/>
     </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="Main Editor">
@@ -148,6 +151,8 @@
       <File Name="src/DatArchive.h"/>
       <File Name="src/LibArchive.cpp"/>
       <File Name="src/LibArchive.h"/>
+      <File Name="src/ResArchive.cpp"/>
+      <File Name="src/ResArchive.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Binary Control Lumps">
       <File Name="src/AnimatedList.cpp"/>
@@ -173,6 +178,7 @@
       <VirtualDirectory Name="Image">
         <File Name="src/SImage.cpp"/>
         <File Name="src/SImage.h"/>
+        <File Name="src/SImageFormats.cpp"/>
       </VirtualDirectory>
       <VirtualDirectory Name="Palette">
         <File Name="src/Palette.cpp"/>

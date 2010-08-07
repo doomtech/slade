@@ -182,7 +182,11 @@ bool ResArchive::readDirectory(MemChunk& mc, size_t dir_offset, size_t num_lumps
 		// the resfile is invalid
 		if (offset + size > mc.getSize()) {
 			wxLogMessage("ResArchive::readDirectory: Res archive is invalid or corrupt, offset overflow");
+			#ifdef WIN32
 			Sleep(3000);
+			#else
+			usleep(3000);
+			#endif
 			Global::error = "Archive is invalid and/or corrupt";
 			setMuted(false);
 			return false;
@@ -266,7 +270,7 @@ bool ResArchive::open(MemChunk& mc) {
 		Global::error = "Invalid res directory size";
 		return false;
 	}
-	uint32_t num_lumps = dir_size / RESDIRENTRYSIZE; 
+	uint32_t num_lumps = dir_size / RESDIRENTRYSIZE;
 
 	// Stop announcements (don't want to be announcing modification due to entries being added etc)
 	setMuted(true);
