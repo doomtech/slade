@@ -79,6 +79,9 @@
     <Filter Include="Resources\Archive\EntryType\EntryDataFormat">
       <UniqueIdentifier>{c59be1fa-5ac3-471b-8512-cf3695aeac84}</UniqueIdentifier>
     </Filter>
+    <Filter Include="General\Console">
+      <UniqueIdentifier>{511149d3-5ded-4b1c-b004-d65769996d9d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\GfxConvDialog.cpp">
@@ -91,9 +94,6 @@
       <Filter>Dialogs</Filter>
     </ClCompile>
     <ClCompile Include="src\Clipboard.cpp">
-      <Filter>General</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Console.cpp">
       <Filter>General</Filter>
     </ClCompile>
     <ClCompile Include="src\CVar.cpp">
@@ -306,6 +306,21 @@
     <ClCompile Include="src\BaseResourceChooser.cpp">
       <Filter>Main Editor\UI Elements</Filter>
     </ClCompile>
+    <ClCompile Include="src\BrowserItem.cpp">
+      <Filter>UI Elements\Browser</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BrowserWindow.cpp">
+      <Filter>UI Elements\Browser</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Console.cpp">
+      <Filter>General\Console</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ResArchive.cpp">
+      <Filter>Resources\Archive</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SImageFormats.cpp">
+      <Filter>Resources\Graphics\Image</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -318,9 +333,6 @@
       <Filter>Dialogs</Filter>
     </ClInclude>
     <ClInclude Include="src\Clipboard.h">
-      <Filter>General</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Console.h">
       <Filter>General</Filter>
     </ClInclude>
     <ClInclude Include="src\CVar.h">
@@ -569,6 +581,15 @@
     </ClInclude>
     <ClInclude Include="src\BaseResourceChooser.h">
       <Filter>Main Editor\UI Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Console.h">
+      <Filter>General\Console</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ConsoleHelpers.h">
+      <Filter>General\Console</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ResArchive.h">
+      <Filter>Resources\Archive</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

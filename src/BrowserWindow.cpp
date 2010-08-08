@@ -109,6 +109,7 @@ BrowserWindow::~BrowserWindow() {
 bool BrowserWindow::addItem(BrowserItem* item, string where) {
 	BrowserTreeNode* target = (BrowserTreeNode*)items_root->addChild(where);
 	target->addItem(item);
+	return true;
 }
 
 void BrowserWindow::populateItemTree() {

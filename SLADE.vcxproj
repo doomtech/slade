@@ -104,6 +104,8 @@
   <ItemGroup>
     <ClCompile Include="src\ArchiveEntryList.cpp" />
     <ClCompile Include="src\BaseResourceChooser.cpp" />
+    <ClCompile Include="src\BrowserItem.cpp" />
+    <ClCompile Include="src\BrowserWindow.cpp" />
     <ClCompile Include="src\DatArchive.cpp" />
     <ClCompile Include="src\EntryDataFormat.cpp" />
     <ClCompile Include="src\GfxConvDialog.cpp" />
@@ -119,6 +121,8 @@
     <ClCompile Include="src\Misc.cpp" />
     <ClCompile Include="src\OpenGL.cpp" />
     <ClCompile Include="src\Parser.cpp" />
+    <ClCompile Include="src\ResArchive.cpp" />
+    <ClCompile Include="src\SImageFormats.cpp" />
     <ClCompile Include="src\TextLanguage.cpp" />
     <ClCompile Include="src\TextureXPanel.cpp" />
     <ClCompile Include="src\Tokenizer.cpp" />
@@ -185,6 +189,7 @@
     <ClInclude Include="src\BaseResourceChooser.h" />
     <ClInclude Include="src\BrowserItem.h" />
     <ClInclude Include="src\BrowserWindow.h" />
+    <ClInclude Include="src\ConsoleHelpers.h" />
     <ClInclude Include="src\DatArchive.h" />
     <ClInclude Include="src\EntryDataFormat.h" />
     <ClInclude Include="src\GfxConvDialog.h" />
@@ -204,6 +209,7 @@
     <ClInclude Include="src\Misc.h" />
     <ClInclude Include="src\OpenGL.h" />
     <ClInclude Include="src\Parser.h" />
+    <ClInclude Include="src\ResArchive.h" />
     <ClInclude Include="src\Structs.h" />
     <ClInclude Include="src\TextLanguage.h" />
     <ClInclude Include="src\TextureXPanel.h" />
