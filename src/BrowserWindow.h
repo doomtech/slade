@@ -26,7 +26,10 @@ public:
 	string	getName() { return name; }
 	void	setName(string name) { this->name = name; }
 
-	void	clearItems();
+	void			clearItems();
+	unsigned		nItems() { return items.size(); }
+	BrowserItem*	getItem(unsigned index);
+	void			addItem(BrowserItem* item, unsigned index = 0xFFFFFFFF);
 };
 
 class BrowserCanvas : public OGLCanvas {
@@ -49,6 +52,11 @@ private:
 public:
 	BrowserWindow();
 	~BrowserWindow();
+
+	bool	addItem(BrowserItem* item, string where = "");
+
+	void	populateItemTree();
+	void	addItemTree(BrowserTreeNode* node, wxTreeItemId& item);
 };
 
 #endif//__BROWSER_WINDOW_H__
