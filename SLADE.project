@@ -14,6 +14,8 @@
     <File Name="src/ModifyOffsetsDialog.h"/>
     <File Name="src/PaletteDialog.cpp"/>
     <File Name="src/PaletteDialog.h"/>
+    <File Name="src/PreferencesDialog.h"/>
+    <File Name="src/PreferencesDialog.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="General">
     <File Name="src/Clipboard.cpp"/>

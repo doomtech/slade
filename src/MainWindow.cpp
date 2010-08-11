@@ -37,6 +37,7 @@
 #include "BaseResourceArchivesPanel.h"
 #include "PaletteChooser.h"
 #include "BaseResourceChooser.h"
+#include "PreferencesDialog.h"
 #include <wx/aboutdlg.h>
 
 
@@ -309,8 +310,10 @@ void MainWindow::onMenuItemClicked(wxCommandEvent& e) {
 	}
 
 	// Editor->Preferences
-	if (e.GetId() == MENU_EDITOR_PREFERENCES)
-		wxMessageBox("Not Implemented");
+	if (e.GetId() == MENU_EDITOR_PREFERENCES) {
+		PreferencesDialog pd(this);
+		pd.ShowModal();
+	}
 
 
 	// *******************************************************

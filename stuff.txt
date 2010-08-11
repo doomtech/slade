@@ -13,7 +13,6 @@ TODO List ---------------------------------------------------------------
 - Media panel
 - Entry filter by type/category
 - 'Export As' for both entries and archives - does conversion+export
-- Recent files list
 - Proper start page
 
 --- Bugs ---
