@@ -206,6 +206,14 @@
 				RelativePath=".\src\PaletteDialog.h"
 				>
 			</File>
+			<File
+				RelativePath=".\src\PreferencesDialog.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\PreferencesDialog.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="General"
@@ -476,6 +484,10 @@
 				<Filter
 					Name="TextureXEditor"
 					>
+					<File
+						RelativePath=".\src\PatchTableBrowser.h"
+						>
+					</File>
 					<File
 						RelativePath=".\src\PatchTablePanel.cpp"
 						>
