@@ -312,7 +312,7 @@ bool ArchivePanel::importFiles() {
 			theSplashWindow->setProgressMessage(name);
 
 			// Add the entry to the archive
-			ArchiveEntry* new_entry = archive->addNewEntry(name, index);
+			ArchiveEntry* new_entry = archive->addNewEntry(name, index, entry_list->getCurrentDir());
 
 			// If the entry was created ok, load the file into it
 			if (new_entry) {

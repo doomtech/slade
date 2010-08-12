@@ -94,6 +94,7 @@ void MainWindow::setupLayout() {
 	html_startpage = new wxHtmlWindow(notebook_tabs, -1);
 	html_startpage->SetName("startpage");
 	notebook_tabs->AddPage(html_startpage,"Start Page");
+	notebook_tabs->SetPageBitmap(0, getIcon("i_logo"));
 	Archive* res_archive = theArchiveManager->programResourceArchive();
 	ArchiveEntry* sp_entry = res_archive->getEntry("startpage.htm", false, res_archive->getDir("html"));
 	if (sp_entry)

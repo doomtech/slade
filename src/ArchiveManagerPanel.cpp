@@ -40,6 +40,7 @@
 #include "TextureXEditor.h"
 #include "SplashWindow.h"
 #include "MainWindow.h"
+#include "Icons.h"
 
 
 /*******************************************************************
@@ -343,7 +344,15 @@ void ArchiveManagerPanel::openTab(int archive_index) {
 		// If tab isn't already open, open a new one
 		ArchivePanel* wp = new ArchivePanel(notebook_archives, archive);
 
+		// Determine icon
+		string icon = "t_newarchive";
+		if (archive->getType() == ARCHIVE_WAD)
+			icon = "e_wad";
+		else if (archive->getType() == ARCHIVE_ZIP)
+			icon = "e_zip";
+
 		notebook_archives->AddPage(wp, archive->getFilename(false), true);
+		notebook_archives->SetPageBitmap(notebook_archives->GetPageCount() - 1, getIcon(icon));
 		wp->SetName("archive");
 		wp->Show(true);
 		wp->SetFocus();
@@ -413,6 +422,7 @@ void ArchiveManagerPanel::openTextureTab(int archive_index) {
 		}
 
 		notebook_archives->AddPage(txed, s_fmt("Texture Editor (%s)", archive->getFilename(false).c_str()), true);
+		notebook_archives->SetPageBitmap(notebook_archives->GetPageCount() - 1, getIcon("e_texturex"));
 		txed->SetName("texture");
 		txed->Show(true);
 	}
