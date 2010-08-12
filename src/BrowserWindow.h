@@ -40,20 +40,25 @@ public:
 	BrowserCanvas(wxWindow* parent);
 	~BrowserCanvas();
 
+	void openTree(BrowserTreeNode* tree) { items_root = tree; Refresh(); }
+
 	void draw();
 };
 
 class BrowserWindow : public wxFrame {
 private:
-	BrowserTreeNode*	items_root;
 	BrowserCanvas*		canvas;
 	wxTreeCtrl*			tree_items;
 
+protected:
+	BrowserTreeNode*	items_root;
+
 public:
-	BrowserWindow();
+	BrowserWindow(wxWindow* parent);
 	~BrowserWindow();
 
 	bool	addItem(BrowserItem* item, string where = "");
+	void	clearItems(BrowserTreeNode* node = NULL);
 
 	void	populateItemTree();
 	void	addItemTree(BrowserTreeNode* node, wxTreeItemId& item);

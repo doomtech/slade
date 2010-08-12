@@ -321,6 +321,12 @@
     <ClCompile Include="src\SImageFormats.cpp">
       <Filter>Resources\Graphics\Image</Filter>
     </ClCompile>
+    <ClCompile Include="src\PatchBrowser.cpp">
+      <Filter>Main Editor\UI Elements\TextureXEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PreferencesDialog.cpp">
+      <Filter>Dialogs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -590,6 +596,12 @@
     </ClInclude>
     <ClInclude Include="src\ResArchive.h">
       <Filter>Resources\Archive</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PatchBrowser.h">
+      <Filter>Main Editor\UI Elements\TextureXEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PreferencesDialog.h">
+      <Filter>Dialogs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

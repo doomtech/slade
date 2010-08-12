@@ -80,7 +80,7 @@ public:
 };
 
 
-BrowserWindow::BrowserWindow() : wxFrame(NULL, -1, "Browser") {
+BrowserWindow::BrowserWindow(wxWindow* parent) : wxFrame(parent, -1, "Browser") {
 	// Init variables
 	items_root = new BrowserTreeNode();
 	items_root->setName("All");
@@ -112,6 +112,23 @@ bool BrowserWindow::addItem(BrowserItem* item, string where) {
 	return true;
 }
 
+void BrowserWindow::clearItems(BrowserTreeNode* node) {
+	// Check node was given to begin clear
+	if (!node)
+		node = items_root;
+
+	// Clear all items from node
+	node->clearItems();
+
+	// Clear all child nodes
+	while (node->nChildren() > 0) {
+		BrowserTreeNode* child = (BrowserTreeNode*)node->getChild(0);
+		clearItems(child);
+		node->removeChild(child);
+		delete child;
+	}
+}
+
 void BrowserWindow::populateItemTree() {
 	// Clear current tree
 	tree_items->DeleteAllItems();
@@ -139,7 +156,7 @@ void BrowserWindow::addItemTree(BrowserTreeNode* node, wxTreeItemId& item) {
 
 
 CONSOLE_COMMAND(test_browser, 0) {
-	BrowserWindow* win = new BrowserWindow();
+	BrowserWindow* win = new BrowserWindow(NULL);
 
 	// Test
 	BrowserItem* bi = new BrowserItem("test");

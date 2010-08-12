@@ -121,6 +121,8 @@
     <ClCompile Include="src\Misc.cpp" />
     <ClCompile Include="src\OpenGL.cpp" />
     <ClCompile Include="src\Parser.cpp" />
+    <ClCompile Include="src\PatchBrowser.cpp" />
+    <ClCompile Include="src\PreferencesDialog.cpp" />
     <ClCompile Include="src\ResArchive.cpp" />
     <ClCompile Include="src\SImageFormats.cpp" />
     <ClCompile Include="src\TextLanguage.cpp" />
@@ -209,6 +211,8 @@
     <ClInclude Include="src\Misc.h" />
     <ClInclude Include="src\OpenGL.h" />
     <ClInclude Include="src\Parser.h" />
+    <ClInclude Include="src\PatchBrowser.h" />
+    <ClInclude Include="src\PreferencesDialog.h" />
     <ClInclude Include="src\ResArchive.h" />
     <ClInclude Include="src\Structs.h" />
     <ClInclude Include="src\TextLanguage.h" />

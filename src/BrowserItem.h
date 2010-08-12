@@ -5,7 +5,7 @@
 #include "GLTexture.h"
 
 class BrowserItem {
-private:
+protected:
 	string		name;
 	GLTexture	image;
 

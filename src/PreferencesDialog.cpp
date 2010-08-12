@@ -92,7 +92,7 @@ PreferencesDialog::~PreferencesDialog() {
  *******************************************************************/
 wxPanel* PreferencesDialog::setupGeneralPrefsPanel() {
 	// Create panel
-	wxPanel* panel = new wxPanel(this, -1);
+	wxPanel* panel = new wxPanel(tree_prefs, -1);
 	wxBoxSizer* psizer = new wxBoxSizer(wxVERTICAL);
 	panel->SetSizer(psizer);
 
@@ -132,7 +132,7 @@ wxPanel* PreferencesDialog::setupGeneralPrefsPanel() {
  *******************************************************************/
 wxPanel* PreferencesDialog::setupEditingPrefsPanel() {
 	// Create panel
-	wxPanel* panel = new wxPanel(this, -1);
+	wxPanel* panel = new wxPanel(tree_prefs, -1);
 	wxBoxSizer* psizer = new wxBoxSizer(wxVERTICAL);
 	panel->SetSizer(psizer);
 
