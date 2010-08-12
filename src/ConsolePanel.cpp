@@ -42,6 +42,9 @@
  *******************************************************************/
 ConsolePanel::ConsolePanel(wxWindow *parent, int id)
 : wxPanel(parent, id) {
+	// Init variables
+	cmd_log_index = 0;
+
 	// Setup layout
 	initLayout();
 
@@ -50,6 +53,7 @@ ConsolePanel::ConsolePanel(wxWindow *parent, int id)
 
 	// Bind events
 	text_command->Bind(wxEVT_COMMAND_TEXT_ENTER, &ConsolePanel::onCommandEnter, this);
+	text_command->Bind(wxEVT_KEY_DOWN, &ConsolePanel::onCommandKeyDown, this);
 
 	// Load the current contents of the console log
 	text_log->AppendText(theConsole->dumpLog());
@@ -108,4 +112,21 @@ void ConsolePanel::onAnnouncement(Announcer* announcer, string event_name, MemCh
 void ConsolePanel::onCommandEnter(wxCommandEvent& e) {
 	theConsole->execute(e.GetString());
 	text_command->Clear();
+	cmd_log_index = 0;
+}
+
+void ConsolePanel::onCommandKeyDown(wxKeyEvent& e) {
+	if (e.GetKeyCode() == WXK_UP) {
+		text_command->SetValue(theConsole->prevCommand(cmd_log_index));
+		if (cmd_log_index < theConsole->numPrevCommands()-1)
+			cmd_log_index++;
+	}
+	else if (e.GetKeyCode() == WXK_DOWN) {
+		cmd_log_index--;
+		text_command->SetValue(theConsole->prevCommand(cmd_log_index));
+		if (cmd_log_index < 0)
+			cmd_log_index = 0;
+	}
+	else
+		e.Skip();
 }

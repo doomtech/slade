@@ -396,6 +396,21 @@ int	Archive::entryIndex(ArchiveEntry* entry, ArchiveTreeNode* dir) {
 	return dir->entryIndex(entry);
 }
 
+ArchiveEntry* Archive::entryAtPath(string path) {
+	// Get path as wxFileName for processing
+	wxFileName fn(path);
+
+	// Get directory from path
+	ArchiveTreeNode* dir = getDir(fn.GetPath(true));
+
+	// If dir doesn't exist, return null
+	if (!dir)
+		return NULL;
+
+	// Return entry
+	return dir->getEntry(fn.GetFullName());
+}
+
 /* Archive::save
  * This is the general, all-purpose 'save archive' function. Takes
  * into account whether the archive is contained within another,

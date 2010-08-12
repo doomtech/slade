@@ -32,10 +32,7 @@ TODO List ---------------------------------------------------------------
 
 --- General ---
 - Preferences Dialog:
-	- Option not to show save dialog on export (or show only once)
-	- Option to automatically save entry changes
 	- List of entry types, ability to enable/disable detection of certain types
-	- Action to take on archive tab closed - close archive, leave archive open, or ask
 	- Program-wide colour configuration (including general modified/new/error/locked colours)
 - Finish entry data format (EDF_*) system:
 	- Simple user-definable data formats:

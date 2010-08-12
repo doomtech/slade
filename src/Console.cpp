@@ -74,7 +74,7 @@ void Console::execute(string command) {
 	wxLogMessage(s_fmt("> %s", command.c_str()));
 
 	// Add the command to the log
-	cmd_log.push_back(command);
+	cmd_log.insert(cmd_log.begin(), command);
 
 	// Announce that a command has been executed
 	MemChunk mc;
@@ -161,6 +161,18 @@ string Console::dumpLog() {
 		ret += log.at(a);
 
 	return ret;
+}
+
+/* Console::prevCommand
+ * Returns the previous command at [index] from the last entered (ie,
+ * index=0 will be the directly previous command)
+ *******************************************************************/
+string Console::prevCommand(int index) {
+	// Check index
+	if (index < 0 || index >= cmd_log.size())
+		return "";
+
+	return cmd_log[index];
 }
 
 /* Console::command

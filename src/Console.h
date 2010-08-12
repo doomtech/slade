@@ -49,12 +49,14 @@ public:
 	int numCommands() { return (int) commands.size(); }
 	ConsoleCommand& command(size_t index);
 
-	void addCommand(ConsoleCommand &c);
-	void execute(string command);
-	void logMessage(string message);
-	string lastLogLine();
-	string lastCommand();
-	string dumpLog();
+	void	addCommand(ConsoleCommand &c);
+	void	execute(string command);
+	void	logMessage(string message);
+	string	lastLogLine();
+	string	lastCommand();
+	string	dumpLog();
+	string	prevCommand(int index);
+	int		numPrevCommands() { return cmd_log.size(); }
 };
 
 // Define for less cumbersome Console::getInstance()

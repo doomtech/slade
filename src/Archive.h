@@ -93,6 +93,7 @@ public:
 	virtual ArchiveEntry*		getEntry(string name, bool cut_ext = false, ArchiveTreeNode* dir = NULL);
 	virtual ArchiveEntry*		getEntry(unsigned index, ArchiveTreeNode* dir = NULL);
 	virtual int					entryIndex(ArchiveEntry* entry, ArchiveTreeNode* dir = NULL);
+	virtual ArchiveEntry*		entryAtPath(string path);
 
 	// Archive type info
 	virtual string	getFileExtensionString() = 0;

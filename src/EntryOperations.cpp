@@ -32,6 +32,8 @@
 #include "Misc.h"
 #include "Console.h"
 #include "ArchiveManager.h"
+#include <wx/filename.h>
+#include <wx/utils.h>
 
 
 /*******************************************************************
@@ -297,6 +299,19 @@ bool EntryOperations::modifyGfxOffsets(ArchiveEntry* entry, int auto_type, point
 bool EntryOperations::openExternal(ArchiveEntry* entry) {
 	if (!entry)
 		return false;
+
+	// Build entry filename
+	wxFileName fn;
+	fn.SetFullName(entry->getName(false));
+	if (entry->getType() != EntryType::unknownType())
+		fn.SetExt(entry->getType()->getExtension());
+
+	// Export to file
+	string path = appPath(fn.GetFullName(), DIR_TEMP);
+	entry->exportFile(path);
+
+	// Open the file externally
+	wxLaunchDefaultApplication(path);
 
 	return true;
 }
@@ -592,11 +607,11 @@ bool EntryOperations::gettRNSChunk(ArchiveEntry* entry) {
 CONSOLE_COMMAND (test_ee, 1) {
 	if (theArchiveManager->numArchives() > 0) {
 		for (size_t a = 0; a < args.size(); a++) {
-			ArchiveEntry* entry = theArchiveManager->getArchive(0)->getEntry(args[a]);
+			ArchiveEntry* entry = theArchiveManager->getArchive(0)->entryAtPath(args[a]);
 			if (entry)
 				EntryOperations::openExternal(entry);
 			else
-				wxLogMessage(s_fmt("Entry %s not found"), args[a].c_str());
+				wxLogMessage("Entry %s not found", chr(args[a]));
 		}
 	}
 }

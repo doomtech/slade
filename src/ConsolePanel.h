@@ -7,8 +7,9 @@
 
 class ConsolePanel : public wxPanel, Listener {
 private:
-	wxTextCtrl	*text_log;
-	wxTextCtrl	*text_command;
+	wxTextCtrl*	text_log;
+	wxTextCtrl*	text_command;
+	int			cmd_log_index;
 
 public:
 	ConsolePanel(wxWindow *parent, int id);
@@ -21,6 +22,7 @@ public:
 
 	// Events
 	void onCommandEnter(wxCommandEvent& e);
+	void onCommandKeyDown(wxKeyEvent& e);
 };
 
 #endif//__CONSOLEPANEL_H__
