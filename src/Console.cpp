@@ -169,7 +169,7 @@ string Console::dumpLog() {
  *******************************************************************/
 string Console::prevCommand(int index) {
 	// Check index
-	if (index < 0 || index >= cmd_log.size())
+	if (index < 0 || (unsigned)index >= cmd_log.size())
 		return "";
 
 	return cmd_log[index];

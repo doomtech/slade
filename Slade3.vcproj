@@ -485,6 +485,14 @@
 					Name="TextureXEditor"
 					>
 					<File
+						RelativePath=".\src\PatchBrowser.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\PatchBrowser.h"
+						>
+					</File>
+					<File
 						RelativePath=".\src\PatchTableBrowser.h"
 						>
 					</File>
