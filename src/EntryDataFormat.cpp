@@ -61,8 +61,8 @@ EntryDataFormat::EntryDataFormat(string id) {
 EntryDataFormat::~EntryDataFormat() {
 }
 
-bool EntryDataFormat::isThisFormat(MemChunk& mc) {
-	return true;
+int EntryDataFormat::isThisFormat(MemChunk& mc) {
+	return EDF_TRUE;
 }
 
 void EntryDataFormat::copyToFormat(EntryDataFormat& target) {
@@ -126,7 +126,7 @@ public:
 	AnyDataFormat() : EntryDataFormat("any") {}
 	~AnyDataFormat() {}
 
-	bool isThisFormat(MemChunk& mc) { return false; }
+	int isThisFormat(MemChunk& mc) { return EDF_FALSE; }
 };
 
 // Format enumeration moved to separate files

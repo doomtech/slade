@@ -57,7 +57,7 @@ public:
 	string	getFileFilterString();
 
 	// Magic goes here
-	bool	isThisType(ArchiveEntry* entry);
+	int		isThisType(ArchiveEntry* entry);
 
 	// Static functions
 	static bool 				readEntryTypeDefinition(MemChunk& mc);

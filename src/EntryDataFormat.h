@@ -2,6 +2,12 @@
 #ifndef __ENTRYDATAFORMAT_H__
 #define __ENTRYDATAFORMAT_H__
 
+#define EDF_FALSE 0
+#define EDF_UNLIKELY 64
+#define EDF_MAYBE 128
+#define EDF_PROBABLY 192
+#define EDF_TRUE 255
+
 class EntryDataFormat {
 private:
 	// Struct to specify a range for a byte (min <= valid >= max)
@@ -38,7 +44,7 @@ public:
 	EntryDataFormat(string id);
 	virtual ~EntryDataFormat();
 
-	virtual bool	isThisFormat(MemChunk& mc);
+	virtual int		isThisFormat(MemChunk& mc);
 	void			copyToFormat(EntryDataFormat& target);
 
 	static void				initBuiltinFormats();

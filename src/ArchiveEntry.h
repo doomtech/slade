@@ -26,6 +26,9 @@ private:
 	bool			locked;			// If true the entry data+info cannot be changed
 	bool			data_loaded;	// True if the entry's data is currently loaded into the data MemChunk
 
+	// Misc stuff
+	int				reliability;	// The reliability of the entry's identification
+
 public:
 	ArchiveEntry(string name = "", uint32_t size = 0);
 	ArchiveEntry(ArchiveEntry& copy);
@@ -49,7 +52,7 @@ public:
 	// Modifiers (won't change entry state, except setState of course :P)
 	void		setName(string name) { this->name = name; }
 	void		setLoaded(bool loaded = true) { data_loaded = loaded; }
-	void		setType(EntryType* type) { this->type = type; }
+	void		setType(EntryType* type, int r = 0) { this->type = type; reliability = r; }
 	void		setState(uint8_t state);
 	void		unloadData();
 	void		lock();
@@ -85,6 +88,7 @@ public:
 	string	getTypeString() { if (type) return type->getName(); else return "Unknown"; }
 	void	stateChanged();
 	void	setExtensionByType();
+	int		getTypeReliability() { return (type ? (getType()->getReliability() * reliability / 255) : 0); }
 };
 
 #endif//__ARCHIVEENTRY_H__

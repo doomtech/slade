@@ -156,25 +156,25 @@ string EntryType::getFileFilterString() {
  * Returns true if [entry] matches the EntryType's criteria, false
  * otherwise
  *******************************************************************/
-bool EntryType::isThisType(ArchiveEntry* entry) {
+int EntryType::isThisType(ArchiveEntry* entry) {
 	// Check entry was given
 	if (!entry)
-		return false;
+		return EDF_FALSE;
 
 	// Check type is detectable
 	if (!detectable)
-		return false;
+		return EDF_FALSE;
 
 	// Get full entry name as filename
 	wxFileName fn(entry->getName());
 
 	// Check min size
 	if (size_limit[0] >= 0 && entry->getSize() < (unsigned)size_limit[0])
-		return false;
+		return EDF_FALSE;
 
 	// Check max size
 	if (size_limit[1] >= 0 && entry->getSize() > (unsigned)size_limit[1])
-		return false;
+		return EDF_FALSE;
 
 	// Check for archive match if needed
 	if (match_archive.size() > 0) {
@@ -186,7 +186,7 @@ bool EntryType::isThisType(ArchiveEntry* entry) {
 			}
 		}
 		if (!match)
-			return false;
+			return EDF_FALSE;
 	}
 
 	// Check for size match if needed
@@ -200,7 +200,7 @@ bool EntryType::isThisType(ArchiveEntry* entry) {
 		}
 
 		if (!match)
-			return false;
+			return EDF_FALSE;
 	}
 
 	// Check for name match if needed
@@ -215,7 +215,7 @@ bool EntryType::isThisType(ArchiveEntry* entry) {
 		}
 
 		if (!match)
-			return false;
+			return EDF_FALSE;
 	}
 
 	// Check for extension match if needed
@@ -229,7 +229,7 @@ bool EntryType::isThisType(ArchiveEntry* entry) {
 		}
 
 		if (!match)
-			return false;
+			return EDF_FALSE;
 	}
 
 	// Check for size multiple match if needed
@@ -243,36 +243,38 @@ bool EntryType::isThisType(ArchiveEntry* entry) {
 		}
 
 		if (!match)
-			return false;
+			return EDF_FALSE;
 	}
 
 	// Check for entry section match if needed
 	if (section != "none") {
 		// Check entry is part of an archive (if not it can't be in a section)
 		if (!entry->getParent())
-			return false;
+			return EDF_FALSE;
 
 		string e_section = entry->getParent()->detectNamespace(entry);
 
 		if (e_section != section)
-			return false;
+			return EDF_FALSE;
 	}
+
+	int r = EDF_TRUE;
 
 	// Check for data format match if needed
 	if (format == "text") {
 		// Text is a special case, as other data formats can sometimes be detected as 'text',
 		// we'll only check for it if text data is specified in the entry type
 		if (memchr(entry->getData(), 0, entry->getSize()-1) != NULL)
-			return false;
+			return EDF_FALSE;
 	}
 	else if (format != "any") {
-		//EntryDataFormat::anyFormat()->isThisFormat(entry->getMCData());
-		if (!(EntryDataFormat::getFormat(format)->isThisFormat(entry->getMCData())))
-			return false;
+		r = EntryDataFormat::getFormat(format)->isThisFormat(entry->getMCData());
+		if (r == EDF_FALSE)
+			return EDF_FALSE;
 	}
 
 	// Passed all checks, so we have a match
-	return true;
+	return r;
 }
 
 /* EntryType::readEntryTypeDefinition
@@ -492,16 +494,17 @@ bool EntryType::detectEntryType(ArchiveEntry* entry) {
 	// Go through all registered types
 	for (size_t a = 0; a < entry_types.size(); a++) {
 		// If the current type is more 'reliable' than this one, skip it
-		if (entry->getType()->getReliability() >= entry_types[a]->getReliability())
+		if (entry->getTypeReliability() >= entry_types[a]->getReliability())
 			continue;
 
 		// Check for possible type match
-		if (entry_types[a]->isThisType(entry)) {
+		int r = entry_types[a]->isThisType(entry);
+		if (r > 0) {
 			// Type matches, set it
-			entry->setType(entry_types[a]);
+			entry->setType(entry_types[a], r);
 
-			// No need to continue if the type is 100% reliable
-			if (entry_types[a]->getReliability() >= 255)
+			// No need to continue if the identification is 100% reliable
+			if (entry->getTypeReliability() >= 255)
 				return true;
 		}
 	}
@@ -619,7 +622,7 @@ CONSOLE_COMMAND (type, 0) {
 		}
 
 		// Allow to force type change even if format checks fails (use at own risk!)
-		bool okay = false, force = !(args.size() < 2 || args[1].CmpNoCase("force"));
+		int okay = 0, force = !(args.size() < 2 || args[1].CmpNoCase("force"));
 		ArchiveEntry * meep = CH::getCurrentArchiveEntry();
 		if (!meep) {
 			wxLogMessage("No entry selected");
@@ -631,13 +634,13 @@ CONSOLE_COMMAND (type, 0) {
 		if (foo) {
 			wxLogMessage("Identifying as %s", all_types[a]->getName().mb_str());
 			okay = foo->isThisFormat(meep->getMCData());
-			if (okay) wxLogMessage("Identification successful");
+			if (okay) wxLogMessage("Identification successful: %i/255", okay);
 			else wxLogMessage("Identification failed");
 		} else wxLogMessage("No data format for this type!");
 
 		// Change type
 		if (force || okay) {
-			meep->setType(all_types[a]);
+			meep->setType(all_types[a], okay);
 			wxLogMessage("Type changed.");
 		}
 	}

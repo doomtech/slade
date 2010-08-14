@@ -6,15 +6,15 @@ public:
 	RLE0DataFormat() : EntryDataFormat("misc_rle0") {};
 	~RLE0DataFormat() {}
 
-	bool isThisFormat(MemChunk& mc) {
+	int isThisFormat(MemChunk& mc) {
 		// Check size
 		if (mc.getSize() > 6) {
 			// Check for RLE0 header
 			if (mc[0] == 'R' && mc[1] == 'L' && mc[2] == 'E' && mc[3] == '0')
-				return true;
+				return EDF_TRUE;
 		}
 
-		return false;
+		return EDF_FALSE;
 	}
 };
 

@@ -19,6 +19,7 @@ ArchiveEntry::ArchiveEntry(string name, uint32_t size) {
 	this->type = EntryType::unknownType();
 	this->locked = false;
 	this->state_locked = false;
+	this->reliability = 0;
 }
 
 /* ArchiveEntry::ArchiveEntry
@@ -31,6 +32,7 @@ ArchiveEntry::ArchiveEntry(ArchiveEntry& copy) {
 	size = copy.getSize();
 	data_loaded = true;
 	type = copy.type;
+	reliability = copy.reliability;
 	locked = false;
 
 	// Copy data
