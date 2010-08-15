@@ -554,7 +554,7 @@ bool ArchivePanel::exportEntry() {
 		wxFileName fn(selection[0]->getName());
 
 		// Add appropriate extension if needed
-		fn.SetExt(selection[0]->getType()->getExtension());
+		if (fn.GetExt().Len() == 0) fn.SetExt(selection[0]->getType()->getExtension());
 
 		// Create save file dialog
 		wxFileDialog *dialog_save = new wxFileDialog(this, s_fmt("Export Entry \"%s\"", selection[0]->getName().c_str()),
