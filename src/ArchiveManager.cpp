@@ -635,6 +635,23 @@ void ArchiveManager::addRecentFile(string path) {
 	announce("recent_files_changed");
 }
 
+void ArchiveManager::addRecentFiles(vector<string> paths) {
+	// Mute annoucements
+	setMuted(true);
+
+	// Clear existing list
+	recent_files.clear();
+
+	// Add the files
+	for (size_t a = 0; a < paths.size(); ++a) {
+		addRecentFile(paths[a]);
+	}
+
+	// Announce
+	setMuted(false);
+	announce("recent_files_changed");
+}
+
 /* ArchiveManager::openTextureEditor
  * Announces that the texture editor for archive [index] should be
  * opened

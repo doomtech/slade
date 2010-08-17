@@ -75,6 +75,7 @@ public:
 	string		recentFile(unsigned index);
 	unsigned	numRecentFiles() { return recent_files.size(); }
 	void		addRecentFile(string path);
+	void		addRecentFiles(vector<string> paths);
 
 	// Misc
 	bool	openTextureEditor(uint32_t index);

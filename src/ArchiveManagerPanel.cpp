@@ -132,10 +132,10 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
 	notebook_tabs->AddPage(file_browser, _("File Browser"));
 
 	// Create/setup Archive context menu
-	menu_context = new wxMenu();
-	menu_context->Append(MENU_SAVE, "Save", "Save the selected Archive(s)");
-	menu_context->Append(MENU_SAVEAS, "Save As", "Save the selected Archive(s) to a new file(s)");
-	menu_context->Append(MENU_CLOSE, "Close", "Close the selected Archive(s)");
+	menu_context_open = new wxMenu();
+	menu_context_open->Append(MENU_SAVE, "Save", "Save the selected Archive(s)");
+	menu_context_open->Append(MENU_SAVEAS, "Save As", "Save the selected Archive(s) to a new file(s)");
+	menu_context_open->Append(MENU_CLOSE, "Close", "Close the selected Archive(s)");
 
 	// Create/setup recent files list and menu
 	menu_recent = new wxMenu();
@@ -148,11 +148,15 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
 	refreshRecentFileList();
 	notebook_tabs->AddPage(panel_rf, "Recent Files", true);
 
+	// Create/setup Archive context menu
+	menu_context_recent = new wxMenu();
+	menu_context_recent->Append(MENU_OPEN, "Open", "Open the selected Archive(s)");
+	menu_context_recent->Append(MENU_REMOVE, "Remove", "Remove the selected Archive(s) from the Recent list");
+
 	// Bind events
 	list_archives->Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &ArchiveManagerPanel::onListArchivesChanged, this);
 	list_archives->Bind(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, &ArchiveManagerPanel::onListArchivesActivated, this);
 	list_archives->Bind(wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK, &ArchiveManagerPanel::onListArchivesRightClick, this);
-	list_recent->Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &ArchiveManagerPanel::onListRecentChanged, this);
 	list_recent->Bind(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, &ArchiveManagerPanel::onListRecentActivated, this);
 	list_recent->Bind(wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK, &ArchiveManagerPanel::onListRecentRightClick, this);
 	list_maps->Bind(wxEVT_COMMAND_LISTBOX_SELECTED, &ArchiveManagerPanel::onListMapsChanged, this);
@@ -172,7 +176,8 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
  * ArchiveManagerPanel class destructor
  *******************************************************************/
 ArchiveManagerPanel::~ArchiveManagerPanel() {
-	if (menu_context) delete menu_context;
+	if (menu_context_open) delete menu_context_open;
+	if (menu_context_recent) delete menu_context_recent;
 }
 
 /* ArchiveManagerPanel::refreshRecentFileList
@@ -619,6 +624,29 @@ vector<int> ArchiveManagerPanel::getSelectedArchives() {
 	return ret;
 }
 
+/* ArchiveManagerPanel::getSelectedFiles
+ * Gets a list of indices of all selected recent files list items
+ *******************************************************************/
+vector<int> ArchiveManagerPanel::getSelectedFiles() {
+	vector<int> ret;
+
+	// Go through all wad list items
+	long item = -1;
+	while (true) {
+		// Get the next item in the list that is selected
+		item = list_recent->GetNextItem(item, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+
+		// If -1 then none were selected
+		if (item == -1)
+			break;
+
+		// Otherwise add the selected item to the vector
+		ret.push_back(item);
+	}
+
+	return ret;
+}
+
 /* ArchiveManagerPanel::onAnnouncement
  * Called when an announcement is recieved from the Archive Manager
  *******************************************************************/
@@ -738,10 +766,6 @@ void ArchiveManagerPanel::saveSelectionAs() {
 	if (selection.size() == 0)
 		return;
 
-	// Setup file filters (temporary, should go through all archive types somehow)
-	//string formats = "Doom Wad File (*.wad)|*.wad";
-	//string deftype = "*.wad";
-
 	// Go through the selection
 	for (size_t a = 0; a < selection.size(); a++) {
 		// Get the archive
@@ -783,6 +807,60 @@ void ArchiveManagerPanel::closeSelection() {
 	// Close all selected archives
 	for (size_t a = 0; a < selected_archives.size(); a++)
 		theArchiveManager->closeArchive(selected_archives[a]);
+}
+
+/* ArchiveManagerPanel::openSelection
+ * Open the currently selected archive(s) in the recent file list
+ *******************************************************************/
+void ArchiveManagerPanel::openSelection() {
+	// Get the list of selected list items
+	vector<int> selection = getSelectedFiles();
+
+	// Don't continue if there are no selected items
+	if (selection.size() == 0)
+		return;
+
+	// Get the list of selected archives
+	vector<string> selected_archives;
+	for (size_t a = 0; a < selection.size(); a++)
+		selected_archives.push_back(theArchiveManager->recentFile(selection[a]));
+
+	// Open all selected archives
+	for (size_t a = 0; a < selected_archives.size(); a++)
+		theArchiveManager->openArchive(selected_archives[a]);
+}
+
+/* ArchiveManagerPanel::openSelection
+ * Remove the currently selected archive(s) from the recent file list
+ *******************************************************************/
+void ArchiveManagerPanel::removeSelection() {
+	// Get the list of selected list items
+	vector<int> selection = getSelectedFiles();
+
+	// Don't continue if there are no selected items
+	if (selection.size() == 0)
+		return;
+
+	// Prepare list of kept archives
+	int numfiles = theArchiveManager->numRecentFiles();
+	bool * okay = new bool[numfiles];
+	for (int a = 0; a < (signed)numfiles; ++a)
+		okay[a] = true;
+
+	// Deselect the files that are being removed
+	for (int a = 0; a < (signed)selection.size(); ++a) {
+		if (selection[a] < numfiles)
+			okay[selection[a]] = false;
+	}
+
+	// Get the list of kept files
+	vector<string> kept_files;
+	for (int a = 0; a < numfiles; a++)
+		if (okay[a])
+			kept_files.push_back(theArchiveManager->recentFile(a));
+
+	// Renew the list of recent files
+	theArchiveManager->addRecentFiles(kept_files);
 }
 
 void ArchiveManagerPanel::handleAction(int menu_id) {
@@ -897,15 +975,7 @@ void ArchiveManagerPanel::onListMapsActivated(wxListEvent& e) {
  * pops up a context menu
  *******************************************************************/
 void ArchiveManagerPanel::onListArchivesRightClick(wxListEvent& e) {
-	PopupMenu(menu_context);
-}
-
-/* ArchiveManagerPanel::onListRecentChanged
- * Called when the user selects an archive in the recent files list.
- * Updates the maps list with any maps found within the selected
- * archive
- *******************************************************************/
-void ArchiveManagerPanel::onListRecentChanged(wxListEvent& e) {
+	PopupMenu(menu_context_open);
 }
 
 /* ArchiveManagerPanel::onListRecentActivated
@@ -924,7 +994,7 @@ void ArchiveManagerPanel::onListRecentActivated(wxListEvent& e) {
  * pops up a context menu
  *******************************************************************/
 void ArchiveManagerPanel::onListRecentRightClick(wxListEvent& e) {
-	PopupMenu(menu_context);
+	PopupMenu(menu_context_recent);
 }
 
 /* ArchiveManagerPanel::onMenu
@@ -942,6 +1012,14 @@ void ArchiveManagerPanel::onMenu(wxCommandEvent& e) {
 	// Close
 	else if (e.GetId() == MENU_CLOSE)
 		closeSelection();
+
+	// Open
+	else if (e.GetId() == MENU_OPEN)
+		openSelection();
+
+	// Remove
+	else if (e.GetId() == MENU_REMOVE)
+		removeSelection();
 }
 
 /* ArchiveManagerPanel::onTabChanged

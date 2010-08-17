@@ -35,7 +35,8 @@ private:
 	wxListCtrl*			list_maps;
 	WMFileBrowser*		file_browser;
 	wxButton*			btn_browser_open;
-	wxMenu*				menu_context;
+	wxMenu*				menu_context_open;
+	wxMenu*				menu_context_recent;
 	wxMenu*				menu_recent;
 
 public:
@@ -44,6 +45,9 @@ public:
 		MENU_SAVE,
 		MENU_SAVEAS,
 		MENU_CLOSE,
+
+		MENU_OPEN,
+		MENU_REMOVE,
 
 		MENU_END,
 	};
@@ -75,15 +79,18 @@ public:
 	void	closeAll();
 	void	saveAll();
 
-	// Selected archives in the list
+	// Selected archives in the lists
 	void	saveSelection();
 	void	saveSelectionAs();
 	void	closeSelection();
+	void	openSelection();
+	void	removeSelection();
 
 	// Handler for MainWindow menu actions
 	void	handleAction(int menu_id);
 
 	vector<int>	getSelectedArchives();
+	vector<int>	getSelectedFiles();
 
 	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 
