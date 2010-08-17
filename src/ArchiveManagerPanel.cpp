@@ -137,15 +137,24 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
 	menu_context->Append(MENU_SAVEAS, "Save As", "Save the selected Archive(s) to a new file(s)");
 	menu_context->Append(MENU_CLOSE, "Close", "Close the selected Archive(s)");
 
-	// Create/setup recent files menu
+	// Create/setup recent files list and menu
 	menu_recent = new wxMenu();
-	for (unsigned a = 0; a < theArchiveManager->numRecentFiles(); a++)
-		menu_recent->Append(MainWindow::MENU_RECENT_1+a, theArchiveManager->recentFile(a));
+	wxPanel *panel_rf = new wxPanel(notebook_tabs);
+	wxBoxSizer *box_rf = new wxBoxSizer(wxVERTICAL);
+	panel_rf->SetSizer(box_rf);
+	box_rf->Add(new wxStaticText(panel_rf, -1, "Recent Files:"), 0, wxEXPAND | wxALL, 4);
+	list_recent = new ListView(panel_rf, -1);
+	box_rf->Add(list_recent, 1, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, 4);
+	refreshRecentFileList();
+	notebook_tabs->AddPage(panel_rf, "Recent Files", true);
 
 	// Bind events
 	list_archives->Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &ArchiveManagerPanel::onListArchivesChanged, this);
 	list_archives->Bind(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, &ArchiveManagerPanel::onListArchivesActivated, this);
 	list_archives->Bind(wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK, &ArchiveManagerPanel::onListArchivesRightClick, this);
+	list_recent->Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &ArchiveManagerPanel::onListRecentChanged, this);
+	list_recent->Bind(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, &ArchiveManagerPanel::onListRecentActivated, this);
+	list_recent->Bind(wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK, &ArchiveManagerPanel::onListRecentRightClick, this);
 	list_maps->Bind(wxEVT_COMMAND_LISTBOX_SELECTED, &ArchiveManagerPanel::onListMapsChanged, this);
 	list_maps->Bind(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, &ArchiveManagerPanel::onListMapsActivated, this);
 	notebook_archives->Bind(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED, &ArchiveManagerPanel::onTabChanged, this);
@@ -166,6 +175,35 @@ ArchiveManagerPanel::~ArchiveManagerPanel() {
 	if (menu_context) delete menu_context;
 }
 
+/* ArchiveManagerPanel::refreshRecentFileList
+ * Clears and rebuilds the recent file list in the menu and the tab
+ *******************************************************************/
+void ArchiveManagerPanel::refreshRecentFileList() {
+	// Clear the list
+	list_recent->ClearAll();
+
+	// Clear menu; needs to do with a count down rather than up
+	// otherwise the following elements are not properly removed
+	for (unsigned a = menu_recent->GetMenuItemCount(); a > 0; a--)
+		menu_recent->Destroy(MainWindow::MENU_RECENT_1 + a - 1);
+
+	// Add columns
+	list_recent->InsertColumn(0, "Filename");
+	list_recent->InsertColumn(1, "Path");
+
+	// Add each recent archive (same logic as the recent files submenu)
+	list_recent->enableSizeUpdate(false);
+	for (unsigned a = 0; a < theArchiveManager->numRecentFiles(); a++) {
+		list_recent->addItem(a, wxEmptyString);
+		updateRecentListItem(a);
+		menu_recent->Append(MainWindow::MENU_RECENT_1+a, theArchiveManager->recentFile(a));
+	}
+
+	// Update size
+	list_recent->enableSizeUpdate(true);
+	list_recent->updateSize();
+}
+
 /* ArchiveManagerPanel::refreshArchiveList
  * Clears and rebuilds the open archives list
  *******************************************************************/
@@ -181,7 +219,7 @@ void ArchiveManagerPanel::refreshArchiveList() {
 	list_archives->enableSizeUpdate(false);
 	for (int a = 0; a < theArchiveManager->numArchives(); a++) {
 		list_archives->addItem(a, wxEmptyString);
-		updateListItem(a);
+		updateOpenListItem(a);
 	}
 
 	// Update size
@@ -227,10 +265,10 @@ void ArchiveManagerPanel::populateMapList(Archive* archive) {
 	}
 }
 
-/* ArchiveManagerPanel::updateListItem
+/* ArchiveManagerPanel::updateOpenListItem
  * Updates the archive list item at <index>
  *******************************************************************/
-void ArchiveManagerPanel::updateListItem(int index) {
+void ArchiveManagerPanel::updateOpenListItem(int index) {
 	Archive* archive = theArchiveManager->getArchive(index);
 
 	if (!archive)
@@ -252,6 +290,19 @@ void ArchiveManagerPanel::updateListItem(int index) {
 	}
 	else
 		list_archives->setItemStatus(index, LV_STATUS_NEW);
+}
+
+/* ArchiveManagerPanel::updateRecentListItem
+ * Updates the recent file list item at <index>
+ *******************************************************************/
+void ArchiveManagerPanel::updateRecentListItem(int index) {
+
+	// Get path as wxFileName for processing
+	wxFileName fn(theArchiveManager->recentFile(index));
+
+	// Set item name
+	list_recent->setItemText(index, 0, fn.GetFullName());
+	list_recent->setItemText(index, 1, fn.GetPath(true));
 }
 
 /* ArchiveManagerPanel::isArchivePanel
@@ -597,7 +648,7 @@ void ArchiveManagerPanel::onAnnouncement(Announcer* announcer, string event_name
 	if (event_name == "archive_added") {
 		int index = theArchiveManager->numArchives() - 1;
 		list_archives->addItem(index, wxEmptyString);
-		updateListItem(index);
+		updateOpenListItem(index);
 	}
 
 	// If an archive was opened
@@ -611,14 +662,14 @@ void ArchiveManagerPanel::onAnnouncement(Announcer* announcer, string event_name
 	if (event_name == "archive_saved") {
 		int32_t index = -1;
 		event_data.read(&index, 4);
-		updateListItem(index);
+		updateOpenListItem(index);
 	}
 
 	// If an archive was modified
 	if (event_name == "archive_modified") {
 		int32_t index = -1;
 		event_data.read(&index, 4);
-		updateListItem(index);
+		updateOpenListItem(index);
 	}
 
 	// If a texture editor is to be opened
@@ -630,13 +681,7 @@ void ArchiveManagerPanel::onAnnouncement(Announcer* announcer, string event_name
 
 	// If the recent files list has changed
 	if (event_name == "recent_files_changed") {
-		// Clear menu
-		for (unsigned a = 0; a < menu_recent->GetMenuItemCount(); a++)
-			menu_recent->Destroy(MainWindow::MENU_RECENT_1 + a);
-
-		// (Re)Populate menu with recent files list
-		for (unsigned a = 0; a < theArchiveManager->numRecentFiles(); a++)
-			menu_recent->Append(MainWindow::MENU_RECENT_1+a, theArchiveManager->recentFile(a));
+		refreshRecentFileList();
 	}
 }
 
@@ -852,6 +897,33 @@ void ArchiveManagerPanel::onListMapsActivated(wxListEvent& e) {
  * pops up a context menu
  *******************************************************************/
 void ArchiveManagerPanel::onListArchivesRightClick(wxListEvent& e) {
+	PopupMenu(menu_context);
+}
+
+/* ArchiveManagerPanel::onListRecentChanged
+ * Called when the user selects an archive in the recent files list.
+ * Updates the maps list with any maps found within the selected
+ * archive
+ *******************************************************************/
+void ArchiveManagerPanel::onListRecentChanged(wxListEvent& e) {
+}
+
+/* ArchiveManagerPanel::onListRecentActivated
+ * Called when the user activates an archive in the list.
+ * Opens the archive in a new tab, if it isn't already open.
+ *******************************************************************/
+void ArchiveManagerPanel::onListRecentActivated(wxListEvent& e) {
+	// Open the archive
+	openFile(theArchiveManager->recentFile(e.GetIndex()));
+	// Refresh the list
+	refreshRecentFileList();
+}
+
+/* ArchiveManagerPanel::onListRecentRightClick
+ * Called when the user right clicks an item on the archive list,
+ * pops up a context menu
+ *******************************************************************/
+void ArchiveManagerPanel::onListRecentRightClick(wxListEvent& e) {
 	PopupMenu(menu_context);
 }
 
