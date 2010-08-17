@@ -82,7 +82,6 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 	text_area = new TextEntryPanel(this);
 	gfx_area = new GfxEntryPanel(this);
 	pal_area = new PaletteEntryPanel(this);
-	multi_area = new MultiEntryPanel(this);
 	animated_area = new AnimatedEntryPanel(this);
 	switches_area = new SwitchesEntryPanel(this);
 
@@ -816,7 +815,7 @@ bool ArchivePanel::openEntry(ArchiveEntry* entry, bool force) {
  *******************************************************************/
 bool ArchivePanel::reloadCurrentPanel() {
 	// Do nothing if there are multiple entries
-	if (cur_area == multi_area)
+	if (cur_area == default_area)
 		return false;
 
 	return openEntry(cur_area->getEntry(), true);
@@ -1024,8 +1023,8 @@ void ArchivePanel::onEntryListFocusChange(wxListEvent& e) {
 	}
 	else {
 		// If multiple entries are selected, show/update the multi entry area
-		showEntryPanel(multi_area);
-		((MultiEntryPanel*)multi_area)->loadEntries(selection);
+		showEntryPanel(default_area);
+		((DefaultEntryPanel*)default_area)->loadEntries(selection);
 
 		// Update panel layout
 		Layout();

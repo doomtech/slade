@@ -449,14 +449,6 @@
 						>
 					</File>
 					<File
-						RelativePath=".\src\MultiEntryPanel.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\src\MultiEntryPanel.h"
-						>
-					</File>
-					<File
 						RelativePath=".\src\PaletteEntryPanel.cpp"
 						>
 					</File>
@@ -546,6 +538,18 @@
 					</File>
 					<File
 						RelativePath=".\src\TextLanguage.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="HexEditor"
+					>
+					<File
+						RelativePath=".\src\HexEditorPanel.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\HexEditorPanel.h"
 						>
 					</File>
 				</Filter>

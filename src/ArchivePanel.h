@@ -19,7 +19,6 @@ protected:
 	EntryPanel*	text_area;
 	EntryPanel*	gfx_area;
 	EntryPanel*	pal_area;
-	EntryPanel*	multi_area;
 	EntryPanel* texturex_area;
 	EntryPanel* animated_area;
 	EntryPanel* switches_area;
