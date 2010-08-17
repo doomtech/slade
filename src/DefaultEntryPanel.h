@@ -1,34 +1,38 @@
 
-#ifndef __DEFAULTENTRYPANEL_H__
-#define	__DEFAULTENTRYPANEL_H__
+#ifndef __DEFAULT_ENTRY_PANEL_H__
+#define __DEFAULT_ENTRY_PANEL_H__
 
 #include "EntryPanel.h"
-#include "TextEditor.h"
 
 class DefaultEntryPanel : public EntryPanel {
 private:
+	vector<ArchiveEntry*>	entries;
+
 	wxStaticText*	label_type;
 	wxStaticText*	label_size;
-	wxButton*		btn_texture;
 	wxButton*		btn_edit_text;
 	wxButton*		btn_view_hex;
-	TextEditor*		text_area;
-	bool			view_text;
+
+	// Actions
+	wxStaticBox*	frame_actions;
+	wxButton*		btn_gfx_convert;
+	wxButton*		btn_gfx_modify_offsets;
+	wxButton*		btn_texture_edit;
 
 public:
 	DefaultEntryPanel(wxWindow* parent);
 	~DefaultEntryPanel();
 
-	bool loadEntry(ArchiveEntry* entry);
-	bool saveEntry();
-	void showTextEditor();
-	void showEntryInfo(bool show_btn_edittext = false, bool show_btn_texture = false);
-	void openTextEntry(ArchiveEntry * text_entry);
+	wxButton*	getEditTextButton() { return btn_edit_text; }
 
-	void onTexturesClicked(wxCommandEvent& e);
-	void onEditTextClicked(wxCommandEvent& e);
-	void onViewHexClicked(wxCommandEvent& e);
-	void onTextModified(wxStyledTextEvent& e);
+	bool	loadEntry(ArchiveEntry* entry);
+	bool	loadEntries(vector<ArchiveEntry*>& entries);
+	bool	saveEntry();
+
+	void	onBtnGfxConvert(wxCommandEvent& e);
+	void	onBtnGfxModifyOffsets(wxCommandEvent& e);
+	void	onBtnTextureEdit(wxCommandEvent& e);
+	void	onBtnViewHex(wxCommandEvent& e);
 };
 
-#endif //__DEFAULTENTRYPANEL_H__
+#endif//__DEFAULT_ENTRY_PANEL_H__

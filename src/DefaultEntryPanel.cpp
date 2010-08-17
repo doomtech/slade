@@ -26,14 +26,18 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *******************************************************************/
 
-
 /*******************************************************************
  * INCLUDES
  *******************************************************************/
 #include "Main.h"
 #include "WxStuff.h"
-#include "ArchiveManager.h"
 #include "DefaultEntryPanel.h"
+#include "Misc.h"
+#include "GfxConvDialog.h"
+#include "ModifyOffsetsDialog.h"
+#include "EntryOperations.h"
+#include "ArchiveManager.h"
+#include "HexEditorPanel.h"
 
 
 /*******************************************************************
@@ -45,203 +49,186 @@
  *******************************************************************/
 DefaultEntryPanel::DefaultEntryPanel(wxWindow* parent)
 : EntryPanel(parent, "default") {
-	// Create widgets
-	label_type = new wxStaticText(this, -1, "Entry Type:");
-	label_size = new wxStaticText(this, -1, "Entry Size:");
-	btn_texture = new wxButton(this, -1, "Edit Textures");
+	sizer_main->AddStretchSpacer(1);
+
+	// Add type label
+	label_type = new wxStaticText(this, -1, "Type");
+	sizer_main->Add(label_type, 0, wxALL|wxALIGN_CENTER, 4);
+
+	// Add size label
+	label_size = new wxStaticText(this, -1, "Size");
+	sizer_main->Add(label_size, 0, wxALL|wxALIGN_CENTER, 4);
+
+	// Add actions frame
+	frame_actions = new wxStaticBox(this, -1, "Actions");
+	wxStaticBoxSizer* framesizer = new wxStaticBoxSizer(frame_actions, wxVERTICAL);
+	sizer_main->Add(framesizer, 0, wxALL|wxALIGN_CENTER, 4);
+
+	// Add 'Convert Gfx' button
+	btn_gfx_convert = new wxButton(this, -1, "Convert Gfx To...");
+	framesizer->AddSpacer(4);
+	framesizer->Add(btn_gfx_convert, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+	// Add 'Modify Gfx Offsets' button
+	btn_gfx_modify_offsets = new wxButton(this, -1, "Modify Gfx Offsets");
+	framesizer->Add(btn_gfx_modify_offsets, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+	// Add 'Edit Textures' button
+	btn_texture_edit = new wxButton(this, -1, "Edit Textures");
+	framesizer->Add(btn_texture_edit, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+	sizer_main->AddStretchSpacer(1);
+
+	// Hide default buttons
+	btn_save->Enable(false);
+	btn_revert->Enable(false);
+
+	// Add 'Edit as Text' button
 	btn_edit_text = new wxButton(this, -1, "Edit as Text");
+	sizer_bottom->AddStretchSpacer(1);
+	sizer_bottom->Add(btn_edit_text, 0, wxEXPAND, 0);
+
+	// Add 'View as Hex' button
 	btn_view_hex = new wxButton(this, -1, "View as Hex");
-	text_area = new TextEditor(this, -1);
+	sizer_bottom->Add(btn_view_hex, 0, wxEXPAND|wxLEFT, 4);
 
-	// Bind Events
-	btn_texture->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &DefaultEntryPanel::onTexturesClicked, this);
-	btn_edit_text->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &DefaultEntryPanel::onEditTextClicked, this);
-	btn_view_hex->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &DefaultEntryPanel::onViewHexClicked, this);
-	text_area->Bind(wxEVT_STC_CHANGE, &DefaultEntryPanel::onTextModified, this);
+	// Bind events
+	btn_gfx_convert->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &DefaultEntryPanel::onBtnGfxConvert, this);
+	btn_gfx_modify_offsets->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &DefaultEntryPanel::onBtnGfxModifyOffsets, this);
+	btn_texture_edit->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &DefaultEntryPanel::onBtnTextureEdit, this);
+	btn_view_hex->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &DefaultEntryPanel::onBtnViewHex, this);
 
-	// Show entry info stuff
-	view_text = true;
-	showEntryInfo(true, false);
+	Layout();
 }
 
-/* DefaultEntryPanel::~DefaultEntryPanel
- * DefaultEntryPanel class destructor
- *******************************************************************/
 DefaultEntryPanel::~DefaultEntryPanel() {
 }
 
-/* DefaultEntryPanel::showEntryInfo
- * Shows entry info stuff on the panel
- *******************************************************************/
-void DefaultEntryPanel::showEntryInfo(bool show_btn_edittext, bool show_btn_texture) {
-	// Hide the text editor
-	text_area->Show(false);
-
-	// Clear the sizer
-	sizer_main->Clear(false);
-
-	// Show entry info stuff
-	label_type->Show(true);
-	label_size->Show(true);
-	btn_edit_text->Show(show_btn_edittext);
-	btn_view_hex->Show(show_btn_edittext);
-	btn_texture->Show(show_btn_texture);
-
-	// Add entry info stuff to the panel sizer
-	sizer_main->AddStretchSpacer();
-	sizer_main->Add(label_type, 0, wxALIGN_CENTER|wxALL, 4);
-	sizer_main->Add(label_size, 0, wxALIGN_CENTER|wxALL, 4);
-	sizer_main->AddSpacer(8);
-	sizer_main->Add(btn_edit_text, 0, wxALIGN_CENTER|wxALL, 4);
-	sizer_main->Add(btn_view_hex, 0, wxALIGN_CENTER|wxALL, 4);
-	sizer_main->Add(btn_texture, 0, wxALIGN_CENTER|wxALL, 4);
-	sizer_main->AddStretchSpacer();
-
-	// Update variables etc
-	view_text = false;
-
-	Layout();
-	Refresh();
-}
-
-/* DefaultEntryPanel::openTextEntry
- * Open an entry and show it on the text editor panel
- *******************************************************************/
-void DefaultEntryPanel::openTextEntry(ArchiveEntry * text_entry) {
-	showTextEditor();
-	text_area->loadEntry(text_entry);
-	setModified(false);
-}
-
-/* DefaultEntryPanel::showTextEditor
- * Shows the text editor on the panel
- *******************************************************************/
-void DefaultEntryPanel::showTextEditor() {
-	// Hide entry info stuff
-	label_type->Show(false);
-	label_size->Show(false);
-	btn_edit_text->Show(false);
-	btn_view_hex->Show(false);
-
-	// Clear the sizer
-	sizer_main->Clear(false);
-
-	// Show text editor
-	text_area->Show(true);
-
-	// Add text editor to the panel sizer
-	sizer_main->Add(text_area, 1, wxEXPAND|wxALL, 4);
-
-	// Update variables etc
-	view_text = true;
-
-	Layout();
-
-}
-
-/* DefaultEntryPanel::loadEntry
- * Loads entry info into the panel
- *******************************************************************/
 bool DefaultEntryPanel::loadEntry(ArchiveEntry* entry) {
-	// Check that the entry exists
-	if (!entry) {
-		Global::error = "Invalid archive entry given";
-		return false;
-	}
-
-	// Set labels
-	label_type->SetLabel(s_fmt("Entry Type: %s", entry->getTypeString().c_str()));
+	// Update labels
+	label_type->SetLabel(s_fmt("Entry Type: %s", chr(entry->getTypeString())));
 	label_size->SetLabel(s_fmt("Entry Size: %d bytes", entry->getSize()));
 
-	// Update variables
-	this->entry = entry;
-	setModified(false);
+	// Show edit buttons
+	btn_edit_text->Show(true);
 
-	// Check whether to show the 'edit as text' button
-	bool show_btn_edittext = true;
-	if (entry->getType() == EntryType::folderType())
-		show_btn_edittext = false;
+	// Setup actions frame
+	btn_gfx_convert->Show(false);
+	btn_gfx_modify_offsets->Show(false);
+	btn_texture_edit->Show(false);
+	frame_actions->Show(false);
 
-	// Check whether to show the 'open texture editor' button
-	bool show_btn_texture = false;
-	if (entry->getType()->extraProps().propertyExists("textures"))
-		show_btn_texture = true;
+	// Check for gfx entry
+	if (entry->getType()->extraProps().propertyExists("image")) {
+		frame_actions->Show(true);
+		btn_gfx_convert->Show(true);
+		btn_gfx_modify_offsets->Show(true);
+	}
 
-	// Show entry info stuff
-	showEntryInfo(show_btn_edittext, show_btn_texture);
+	// Check for TEXTUREx related entry
+	if (entry->getType()->getId() == "texturex" || entry->getType()->getId() == "pnames") {
+		frame_actions->Show(true);
+		btn_texture_edit->Show(true);
+	}
 
-	// Enable save changes button depending on if the entry is locked
-	if (entry->isLocked())
-		btn_save->Enable(false);
-	else
-		btn_save->Enable(true);
+	// Update layout
+	Layout();
 
 	return true;
 }
 
-/* DefaultEntryPanel::saveEntry
- * Saves any changes to the entry
- *******************************************************************/
+bool DefaultEntryPanel::loadEntries(vector<ArchiveEntry*>& entries) {
+	// Update labels
+	label_type->SetLabel(s_fmt("%d selected entries", entries.size()));
+	unsigned size = 0;
+	for (unsigned a = 0; a < entries.size(); a++)
+		size += entries[a]->getSize();
+	label_size->SetLabel(s_fmt("Total Size: %s", chr(Misc::sizeAsString(size))));
+
+	// Hide edit buttons
+	btn_edit_text->Show(false);
+
+	// Setup actions frame
+	btn_gfx_convert->Show(false);
+	btn_gfx_modify_offsets->Show(false);
+	btn_texture_edit->Show(false);
+	frame_actions->Show(false);
+
+	bool gfx = false;
+	bool texture = false;
+	this->entries.clear();
+	for (unsigned a = 0; a < entries.size(); a++) {
+		// Check for gfx entry
+		if (entries[a]->getType()->extraProps().propertyExists("image"))
+			gfx = true;
+
+		// Check for TEXTUREx related entry
+		if (entries[a]->getType()->getId() == "texturex" || entries[a]->getType()->getId() == "pnames")
+			texture = true;
+
+		this->entries.push_back(entries[a]);
+	}
+	if (gfx) {
+		frame_actions->Show(true);
+		btn_gfx_convert->Show(true);
+		btn_gfx_modify_offsets->Show(true);
+	}
+	if (texture) {
+		frame_actions->Show(true);
+		btn_texture_edit->Show(true);
+	}
+
+	// Update layout
+	Layout();
+
+	return true;
+}
+
 bool DefaultEntryPanel::saveEntry() {
-	// Write raw text to the entry
-	wxCharBuffer text_raw = text_area->GetTextRaw();
-	entry->importMem(text_raw, text_raw.length());
-
-	// Set entry type to text
-	entry->setType(EntryType::getType("text"));
-	entry->setState(1);
-
-	// Update variables
-	setModified(false);
-
 	return true;
 }
 
 
-/*******************************************************************
- * DEFAULTENTRYPANEL CLASS EVENTS
- *******************************************************************/
+void DefaultEntryPanel::onBtnGfxConvert(wxCommandEvent& e) {
+	// Create gfx conversion dialog
+	GfxConvDialog gcd;
 
-/* DefaultEntryPanel::onTexturesClicked
- * Called when the 'Edit Textures' button is clicked. Opens the*
- * texture editor panel in a new tab
- *******************************************************************/
-void DefaultEntryPanel::onTexturesClicked(wxCommandEvent& event) {
+	// Send entries to the gcd
+	gcd.openEntries(entries);
+
+	// Run the gcd
+	gcd.ShowModal();
+}
+
+void DefaultEntryPanel::onBtnGfxModifyOffsets(wxCommandEvent& e) {
+// Create and run modify offsets dialog
+	ModifyOffsetsDialog mod;
+	if (mod.ShowModal() == wxID_CANCEL)
+		return;
+
+	// Apply offsets to selected entries
+	for (uint32_t a = 0; a < entries.size(); a++)
+		EntryOperations::modifyGfxOffsets(entries[a], mod.getAlignType(), mod.getOffset(),
+											mod.xOffChange(), mod.yOffChange(), mod.relativeOffset());
+}
+
+void DefaultEntryPanel::onBtnTextureEdit(wxCommandEvent& e) {
 	theArchiveManager->openTextureEditor(theArchiveManager->archiveIndex(entry->getParent()));
 }
 
-/* DefaultEntryPanel::onEditTextClicked
- * Called when the 'Edit as Text' button is clicked. Shows the text
- * editor on the panel and loads entry contents into it
- *******************************************************************/
-void DefaultEntryPanel::onEditTextClicked(wxCommandEvent& event) {
-	// Show the text editor
-	showTextEditor();
+void DefaultEntryPanel::onBtnViewHex(wxCommandEvent& e) {
+	wxDialog dlg(NULL, -1, "Hex Editor (temp dialog)", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
 
-	// Enable saving (in case it was disabled earlier)
-	btn_save->Enable();
+	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
+	dlg.SetSizer(hbox);
 
-	// Load entry data into the text editor
-	text_area->loadEntry(entry);
-	setModified(false);
-}
+	HexEditorPanel* hex = new HexEditorPanel(&dlg);
+	hbox->Add(hex, 1, wxEXPAND|wxALL, 4);
 
-/* DefaultEntryPanel::onTextModified
- * Called when the text in the TextEditor is modified
- *******************************************************************/
-void DefaultEntryPanel::onTextModified(wxStyledTextEvent& e) {
-	if (btn_save->IsEnabled())
-		setModified();
-}
+	if (entry)
+		hex->loadData(entry->getMCData());
 
-void DefaultEntryPanel::onViewHexClicked(wxCommandEvent& event) {
-	// Show the text editor
-	showTextEditor();
-
-	// Disable saving (it's unsafe!)
-	btn_save->Disable();
-
-	// Load entry data into the text editor
-	text_area->loadHexEntry(entry);
-	setModified(false);
+	dlg.Layout();
+	dlg.SetInitialSize(wxSize(800, 500));
+	dlg.ShowModal();
 }

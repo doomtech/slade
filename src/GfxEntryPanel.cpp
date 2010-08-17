@@ -206,6 +206,9 @@ void GfxEntryPanel::refresh() {
 
 	// Refresh the canvas
 	gfx_canvas->Refresh();
+
+	// Update layout
+	Layout();
 }
 
 /* GfxEntryPanel::updateImagePalette
@@ -452,7 +455,7 @@ CONSOLE_COMMAND(rotate, 1) {
 		if (!bluh.CmpNoCase("l") || !bluh.CmpNoCase("left"))
 			val = 90.;
 		else if (!bluh.CmpNoCase("f") || !bluh.CmpNoCase("flip"))
-			val = 180.; 
+			val = 180.;
 		else if (!bluh.CmpNoCase("r") || !bluh.CmpNoCase("right"))
 			val = 270.;
 		else {
@@ -492,10 +495,10 @@ CONSOLE_COMMAND(rotate, 1) {
 CONSOLE_COMMAND (mirror, 1) {
 	bool vertical;
 	string bluh = args[0];
-	if (!bluh.CmpNoCase("y") || !bluh.CmpNoCase("v") || 
+	if (!bluh.CmpNoCase("y") || !bluh.CmpNoCase("v") ||
 		!bluh.CmpNoCase("vert") || !bluh.CmpNoCase("vertical"))
 		vertical = true;
-	else if (!bluh.CmpNoCase("x") || !bluh.CmpNoCase("h") || 
+	else if (!bluh.CmpNoCase("x") || !bluh.CmpNoCase("h") ||
 		!bluh.CmpNoCase("horz") || !bluh.CmpNoCase("horizontal"))
 		vertical = false;
 	else {

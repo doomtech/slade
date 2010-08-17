@@ -66,8 +66,6 @@
         <File Name="src/EntryPanel.h"/>
         <File Name="src/GfxEntryPanel.cpp"/>
         <File Name="src/GfxEntryPanel.h"/>
-        <File Name="src/MultiEntryPanel.cpp"/>
-        <File Name="src/MultiEntryPanel.h"/>
         <File Name="src/PaletteEntryPanel.cpp"/>
         <File Name="src/PaletteEntryPanel.h"/>
         <File Name="src/SwitchesEntryPanel.cpp"/>
@@ -89,6 +87,8 @@
         <File Name="src/TextureXEditor.h"/>
         <File Name="src/TextureXPanel.cpp"/>
         <File Name="src/TextureXPanel.h"/>
+        <File Name="src/PatchBrowser.cpp"/>
+        <File Name="src/PatchBrowser.h"/>
       </VirtualDirectory>
       <File Name="src/ArchivePanel.cpp"/>
       <File Name="src/ArchivePanel.h"/>
@@ -235,6 +235,8 @@
       <File Name="src/VirtualListView.h"/>
       <File Name="src/VirtualListView.cpp"/>
     </VirtualDirectory>
+    <File Name="src/HexEditorPanel.h"/>
+    <File Name="src/HexEditorPanel.cpp"/>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>

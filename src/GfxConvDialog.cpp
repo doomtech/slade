@@ -253,6 +253,19 @@ void GfxConvDialog::setupLayout() {
 bool GfxConvDialog::openEntries(vector<ArchiveEntry*> entries) {
 	this->entries = entries;
 	current_entry = 0;
+
+	// Check all entries are valid image formats
+	for (unsigned a = 0; a < this->entries.size(); a++) {
+		if (!(this->entries[a]->getType()->extraProps().propertyExists("image"))) {
+			this->entries.erase(this->entries.begin() + a);
+			a--;
+		}
+	}
+
+	// Return false if no valid image entries were given
+	if (this->entries.size() == 0)
+		return false;
+
 	updatePreviewGfx();
 
 	return true;

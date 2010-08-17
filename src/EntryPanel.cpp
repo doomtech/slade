@@ -67,9 +67,9 @@ EntryPanel::EntryPanel(wxWindow* parent, string id)
 	btn_revert = new wxButton(this, -1, "Revert Changes");
 	btn_edit_ext = new wxButton(this, -1, "Edit Externally");
 
-	hbox->Add(btn_edit_ext, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
-	hbox->Add(btn_revert, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
-	hbox->Add(btn_save, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
+	hbox->Add(btn_edit_ext, 0, wxEXPAND|wxLEFT|wxBOTTOM, 4);
+	hbox->Add(btn_revert, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+	hbox->Add(btn_save, 0, wxEXPAND|wxRIGHT|wxBOTTOM, 4);
 
 	// Bind button events
 	btn_save->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &EntryPanel::onBtnSave, this);

@@ -125,6 +125,7 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 	entry_list->Bind(wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK, &ArchivePanel::onEntryListRightClick, this);
 	entry_list->Bind(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, &ArchivePanel::onEntryListActivated, this);
 	Bind(wxEVT_COMMAND_MENU_SELECTED, &ArchivePanel::onEntryMenuClick, this, MENU_GFX_CONVERT, MENU_BAS_CONVERT);
+	((DefaultEntryPanel*)default_area)->getEditTextButton()->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &ArchivePanel::onDEPEditAsText, this);
 
 	// Update size+layout
 	entry_list->updateWidth();
@@ -741,8 +742,8 @@ bool ArchivePanel::basConvert() {
 	Layout();
 
 	// Load entry data into the text editor
-	DefaultEntryPanel * meh = (DefaultEntryPanel *)default_area;
-	meh->openTextEntry(animdef);
+	//DefaultEntryPanel * meh = (DefaultEntryPanel *)default_area;
+	//meh->openTextEntry(animdef);
 
 	return true;
 }
@@ -999,8 +1000,8 @@ void ArchivePanel::onEntryListSelectionChange(wxCommandEvent& e) {
 	}
 	else {
 		// If multiple entries are selected, show/update the multi entry area
-		showEntryPanel(multi_area);
-		((MultiEntryPanel*)multi_area)->loadEntries(selection);
+		showEntryPanel(default_area);
+		((DefaultEntryPanel*)default_area)->loadEntries(selection);
 
 		// Update panel layout
 		Layout();
@@ -1181,6 +1182,22 @@ void ArchivePanel::onEntryListActivated(wxListEvent& e) {
 
 	e.Skip();
 }
+
+/* ArchivePanel::onDEPEditAsText
+ * Called when the 'Edit as Text' button is clicked on the default
+ * entry panel - opens the entry in the text editor panel
+ *******************************************************************/
+void ArchivePanel::onDEPEditAsText(wxCommandEvent& e) {
+	// Get entry to edit
+	ArchiveEntry* entry = default_area->getEntry();
+
+	// Switch to TextEntryPanel
+	showEntryPanel(text_area, false);
+
+	// Load entry to text area
+	text_area->openEntry(entry);
+}
+
 
 /*******************************************************************
  * EXTRA CONSOLE COMMANDS

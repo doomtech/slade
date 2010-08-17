@@ -84,6 +84,7 @@ public:
 	void			onEntryMenuClick(wxCommandEvent& e);
 	void			onEntryListKeyDown(wxKeyEvent& e);
 	virtual void	onEntryListActivated(wxListEvent& e);
+	void			onDEPEditAsText(wxCommandEvent& e);
 };
 
 #endif //__ARCHIVEPANEL_H__
