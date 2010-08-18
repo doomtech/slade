@@ -98,6 +98,7 @@ TextureEditorPanel::TextureEditorPanel(wxWindow* parent, PatchTable* patch_table
 	tex_canvas->Bind(wxEVT_RIGHT_UP, &TextureEditorPanel::onTexCanvasMouseEvent, this);
 	tex_canvas->Bind(wxEVT_MOTION, &TextureEditorPanel::onTexCanvasMouseEvent, this);
 	tex_canvas->Bind(EVT_DRAG_END, &TextureEditorPanel::onTexCanvasDragEnd, this);
+	tex_canvas->Bind(wxEVT_KEY_DOWN, &TextureEditorPanel::onTexCanvasKeyDown, this);
 	text_tex_name->Bind(wxEVT_COMMAND_TEXT_UPDATED, &TextureEditorPanel::onTexNameChanged, this);
 	spin_tex_width->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &TextureEditorPanel::onTexWidthChanged, this);
 	spin_tex_height->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &TextureEditorPanel::onTexHeightChanged, this);
@@ -699,6 +700,63 @@ void TextureEditorPanel::onTexCanvasDragEnd(wxCommandEvent& e) {
 		// Update patch controls
 		updatePatchControls();
 	}
+}
+
+void TextureEditorPanel::onTexCanvasKeyDown(wxKeyEvent& e) {
+	// Check for movement keys
+	int x_movement = 0;
+	int y_movement = 0;
+	bool move = false;
+	if (e.GetKeyCode() == WXK_UP) {
+		if (e.GetModifiers() == wxMOD_CONTROL)
+			y_movement = -1;
+		else
+			y_movement = -8;
+
+		move = true;
+	}
+	else if (e.GetKeyCode() == WXK_DOWN) {
+		if (e.GetModifiers() == wxMOD_CONTROL)
+			y_movement = 1;
+		else
+			y_movement = 8;
+
+		move = true;
+	}
+	else if (e.GetKeyCode() == WXK_LEFT) {
+		if (e.GetModifiers() == wxMOD_CONTROL)
+			x_movement = -1;
+		else
+			x_movement = -8;
+
+		move = true;
+	}
+	else if (e.GetKeyCode() == WXK_RIGHT) {
+		if (e.GetModifiers() == wxMOD_CONTROL)
+			x_movement = 1;
+		else
+			x_movement = 8;
+
+		move = true;
+	}
+
+	// Move patches if needed
+	if (move) {
+		wxArrayInt selected_patches = list_patches->selectedItems();
+		for (size_t a = 0; a < selected_patches.size(); a++) {
+			CTPatch* patch = tex_current->getPatch(selected_patches[a]);
+			if (!patch) continue;
+			int16_t cx = patch->xOffset();
+			int16_t cy = patch->yOffset();
+			patch->setOffsetX(cx + x_movement);
+			patch->setOffsetY(cy + y_movement);
+			tex_modified = true;
+		}
+
+		tex_canvas->Refresh();
+	}
+	else
+		e.Skip();
 }
 
 /* TextureEditorPanel::onTexNameChanged

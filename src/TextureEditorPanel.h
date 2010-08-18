@@ -87,6 +87,7 @@ public:
 	void	onDrawOutsideChanged(wxCommandEvent& e);
 	void	onTexCanvasMouseEvent(wxMouseEvent& e);
 	void	onTexCanvasDragEnd(wxCommandEvent& e);
+	void	onTexCanvasKeyDown(wxKeyEvent& e);
 	void	onTexNameChanged(wxCommandEvent& e);
 	void	onTexWidthChanged(wxSpinEvent& e);
 	void	onTexHeightChanged(wxSpinEvent& e);
