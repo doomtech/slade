@@ -965,6 +965,10 @@ void ArchivePanel::handleAction(int menu_id) {
 	else if (menu_id == MainWindow::MENU_ENTRY_EXPORTAS)
 		exportEntryAs();
 
+	// Entry->Bookmark
+	else if (menu_id == MainWindow::MENU_ENTRY_BOOKMARK)
+		bookmark();
+
 
 
 	// Temporary ones
@@ -1302,4 +1306,3 @@ bool ArchivePanel::bookmark() {
 	}
 	return false;
 }
-

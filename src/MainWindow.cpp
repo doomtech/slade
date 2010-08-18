@@ -183,15 +183,17 @@ void MainWindow::setupLayout() {
 	entryMenu->AppendSeparator();
 	entryMenu->Append(createMenuItem(entryMenu,	MENU_ENTRY_CUT,			"Cut",				"Cut the selected entries"));
 	entryMenu->Append(createMenuItem(entryMenu,	MENU_ENTRY_COPY,		"Copy",				"Copy the selected entries"));
-	entryMenu->Append(createMenuItem(entryMenu,	MENU_ENTRY_COPY,		"Paste",			"Paste the previously cut/copied entries"));
+	entryMenu->Append(createMenuItem(entryMenu,	MENU_ENTRY_PASTE,		"Paste",			"Paste the previously cut/copied entries"));
 	entryMenu->AppendSeparator();
 	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_MOVEUP,		"Move Up",			"Move the selected entries up",										"t_up"));
 	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_MOVEDOWN,	"Move Down",		"Move the selected entries down",									"t_down"));
-	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_MOVEDOWN,	"Convert To...",	"Convert selected entries to a different format/type"));
+	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_CONVERTTO,	"Convert To...",	"Convert selected entries to a different format/type"));
 	entryMenu->AppendSeparator();
 	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_IMPORT,		"Import",			"Import a file to the selected entry",								"t_import"));
 	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_EXPORT,		"Export",			"Export the selected entries to files",								"t_export"));
 	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_EXPORTAS,	"Export As...",		"Export the selected entries to files as a different format/type"));
+	entryMenu->AppendSeparator();
+	entryMenu->Append(createMenuItem(entryMenu,	MENU_ENTRY_BOOKMARK,	"Bookmark",			"Bookmark the current entry"));
 	menu->Append(entryMenu, "&Entry");
 
 	// View menu
