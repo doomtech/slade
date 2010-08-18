@@ -1,46 +1,117 @@
 
+/*******************************************************************
+ * SLADE - It's a Doom Editor
+ * Copyright (C) 2008 Simon Judd
+ *
+ * Email:       veilofsorrow@gmail.com
+ * Web:         http://slade.mancubus.net
+ * Filename:    HexEditorPanel.cpp
+ * Description: HexEditorPanel class. A panel that displays data
+ *              in a hex grid, and shows some basic information
+ *              about the currently selected byte
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *******************************************************************/
+
+
+/*******************************************************************
+ * INCLUDES
+ *******************************************************************/
 #include "Main.h"
 #include "WxStuff.h"
 #include "HexEditorPanel.h"
 #include "Console.h"
 #include "ArchiveManager.h"
+#include <wx/numdlg.h>
 
 
+/*******************************************************************
+ * VARIABLES
+ *******************************************************************/
+const int NUMCOLS = 16;
+
+
+/*******************************************************************
+ * HEXTABLE CLASS FUNCTIONS
+ *******************************************************************
+ * HexTable simply provides data for the wxGrid in HexEditorPanel to display
+ */
+
+/* HexTable::HexTable
+ * HexTable class constructor
+ *******************************************************************/
 HexTable::HexTable() {
 }
 
+/* HexTable::~HexTable
+ * HexTable class destructor
+ *******************************************************************/
 HexTable::~HexTable() {
 }
 
+/* HexTable::GetNumberRows
+ * Returns the number of rows in the grid
+ *******************************************************************/
 int HexTable::GetNumberRows() {
-	return (data.getSize() / 16) + 1;
+	return (data.getSize() / NUMCOLS) + 1;
 }
 
+/* HexTable::GetNumberCols
+ * Returns the number of columns in the grid (always 16)
+ *******************************************************************/
 int HexTable::GetNumberCols() {
-	return 16;
+	return NUMCOLS;
 }
 
+/* HexTable::GetValue
+ * Returns the value of the byte at [row],[col] as a hex string
+ *******************************************************************/
 string HexTable::GetValue(int row, int col) {
-	if (row*16+col >= data.getSize())
+	if (row*NUMCOLS+col >= data.getSize())
 		return "";
 	else {
-		uint8_t val = data[row*16 + col];
+		uint8_t val = data[row*NUMCOLS + col];
 		return s_fmt("%02X", val);
 	}
 }
 
+/* HexTable::SetValue
+ * Sets the value of the byte at [row],[col]
+ * (does nothing, only here because it's required)
+ *******************************************************************/
 void HexTable::SetValue(int row, int col, const string& value) {
-	// Can't set values (yet)
+	// Can't set values
 }
 
+/* HexTable::loadData
+ * Loads in data from [mc]. Returns true on success, false otherwise
+ *******************************************************************/
 bool HexTable::loadData(MemChunk& mc) {
 	return data.importMem(mc.getData(), mc.getSize());
 }
 
+/* HexTable::getOffset
+ * Returns the offset of the byte at [row],[col]
+ *******************************************************************/
 uint32_t HexTable::getOffset(int row, int col) {
-	return row*16 + col;
+	return row*NUMCOLS + col;
 }
 
+/* HexTable::getUByteValue
+ * Returns the value at [offset] as an unsigned byte
+ *******************************************************************/
 uint8_t HexTable::getUByteValue(uint32_t offset) {
 	if (offset < data.getSize())
 		return data[offset];
@@ -48,6 +119,9 @@ uint8_t HexTable::getUByteValue(uint32_t offset) {
 		return 0;
 }
 
+/* HexTable::getUShortValue
+ * Returns the value at [offset] as an unsigned short
+ *******************************************************************/
 uint16_t HexTable::getUShortValue(uint32_t offset) {
 	uint16_t val = 0;
 	if (offset < data.getSize()-1)
@@ -55,6 +129,9 @@ uint16_t HexTable::getUShortValue(uint32_t offset) {
 	return val;
 }
 
+/* HexTable::getUInt32Value
+ * Returns the value at [offset] as an unsigned 32-bit integer
+ *******************************************************************/
 uint32_t HexTable::getUInt32Value(uint32_t offset) {
 	uint32_t val = 0;
 	if (offset < data.getSize()-3)
@@ -62,6 +139,9 @@ uint32_t HexTable::getUInt32Value(uint32_t offset) {
 	return val;
 }
 
+/* HexTable::getUInt64Value
+ * Returns the value at [offset] as an unsigned 64-bit integer
+ *******************************************************************/
 uint64_t HexTable::getUInt64Value(uint32_t offset) {
 	uint64_t val = 0;
 	if (offset < data.getSize()-7)
@@ -69,6 +149,9 @@ uint64_t HexTable::getUInt64Value(uint32_t offset) {
 	return val;
 }
 
+/* HexTable::getByteValue
+ * Returns the value at [offset] as a signed byte
+ *******************************************************************/
 int8_t HexTable::getByteValue(uint32_t offset) {
 	int8_t val = 0;
 	if (offset < data.getSize())
@@ -76,6 +159,9 @@ int8_t HexTable::getByteValue(uint32_t offset) {
 	return val;
 }
 
+/* HexTable::getShortValue
+ * Returns the value at [offset] as a signed short
+ *******************************************************************/
 int16_t HexTable::getShortValue(uint32_t offset) {
 	int16_t val = 0;
 	if (offset < data.getSize()-1)
@@ -83,6 +169,9 @@ int16_t HexTable::getShortValue(uint32_t offset) {
 	return val;
 }
 
+/* HexTable::getInt32Value
+ * Returns the value at [offset] as a signed 32-bit integer
+ *******************************************************************/
 int32_t HexTable::getInt32Value(uint32_t offset) {
 	int32_t val = 0;
 	if (offset < data.getSize()-3)
@@ -90,6 +179,9 @@ int32_t HexTable::getInt32Value(uint32_t offset) {
 	return val;
 }
 
+/* HexTable::getInt64Value
+ * Returns the value at [offset] as a signed 64-bit integer
+ *******************************************************************/
 int64_t HexTable::getInt64Value(uint32_t offset) {
 	int64_t val = 0;
 	if (offset < data.getSize()-7)
@@ -97,6 +189,9 @@ int64_t HexTable::getInt64Value(uint32_t offset) {
 	return val;
 }
 
+/* HexTable::getFloatValue
+ * Returns the value at [offset] as a float
+ *******************************************************************/
 float HexTable::getFloatValue(uint32_t offset) {
 	float val = 0;
 	if (offset < data.getSize()-3)
@@ -104,6 +199,9 @@ float HexTable::getFloatValue(uint32_t offset) {
 	return val;
 }
 
+/* HexTable::getDoubleValue
+ * Returns the value at [offset] as a double
+ *******************************************************************/
 double HexTable::getDoubleValue(uint32_t offset) {
 	double val = 0;
 	if (offset < data.getSize()-7)
@@ -112,8 +210,13 @@ double HexTable::getDoubleValue(uint32_t offset) {
 }
 
 
+/*******************************************************************
+ * HEXEDITORPANEL CLASS FUNCTIONS
+ *******************************************************************/
 
-
+/* HexEditorPanel::HexEditorPanel
+ * HexEditorPanel class constructor
+ *******************************************************************/
 HexEditorPanel::HexEditorPanel(wxWindow* parent) : wxPanel(parent, -1) {
 	// Setup layout
 	wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
@@ -123,7 +226,7 @@ HexEditorPanel::HexEditorPanel(wxWindow* parent) : wxPanel(parent, -1) {
 	table_hex = new HexTable();
 
 	// Create hex grid
-	grid_hex = new wxGrid(this, -1);
+	grid_hex = new wxGrid(this, -1, wxDefaultPosition, wxDefaultSize, wxWANTS_CHARS|wxBORDER_SUNKEN);
 	sizer->Add(grid_hex, 0, wxEXPAND|wxALL, 4);
 
 	// Setup hex grid
@@ -135,7 +238,7 @@ HexEditorPanel::HexEditorPanel(wxWindow* parent) : wxPanel(parent, -1) {
 	grid_hex->DisableDragGridSize();
 	grid_hex->SetDefaultCellAlignment(wxALIGN_CENTER, wxALIGN_CENTER);
 	grid_hex->SetTable(table_hex);
-	grid_hex->SetInitialSize(wxSize(27*16+8, -1));
+	grid_hex->SetInitialSize(wxSize(27*NUMCOLS+8, -1));
 
 	// Info frames
 	wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
@@ -194,16 +297,28 @@ HexEditorPanel::HexEditorPanel(wxWindow* parent) : wxPanel(parent, -1) {
 	//framesizer->Add(label_float_be, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 	//framesizer->Add(label_double_be, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
+
+	// Add 'Go to Offset' button
+	btn_go_to_offset = new wxButton(this, -1, "Go to Offset...");
+	vbox->Add(btn_go_to_offset, 0, wxALL, 4);
+
 	// Bind events
 	grid_hex->Bind(wxEVT_GRID_SELECT_CELL, &HexEditorPanel::onCellSelected, this);
+	btn_go_to_offset->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &HexEditorPanel::onBtnGoToOffset, this);
 
 	SetInitialSize(wxDefaultSize);
 	Layout();
 }
 
+/* HexEditorPanel::~HexEditorPanel
+ * HexEditorPanel class destructor
+ *******************************************************************/
 HexEditorPanel::~HexEditorPanel() {
 }
 
+/* HexEditorPanel::loadData
+ * Loads data from [mc] into the hex grid
+ *******************************************************************/
 bool HexEditorPanel::loadData(MemChunk& mc) {
 	if (table_hex->loadData(mc)) {
 		grid_hex->SetTable(table_hex);
@@ -214,6 +329,14 @@ bool HexEditorPanel::loadData(MemChunk& mc) {
 		return false;
 }
 
+
+/*******************************************************************
+ * HEXEDITORPANEL CLASS EVENTS
+ *******************************************************************/
+
+/* HexEditorPanel::onCellSelected
+ * Called when the cell selection (focus) is changed
+ *******************************************************************/
 void HexEditorPanel::onCellSelected(wxGridEvent& e) {
 	if (!e.Selecting())
 		return;
@@ -302,9 +425,31 @@ void HexEditorPanel::onCellSelected(wxGridEvent& e) {
 	Update();
 }
 
+/* HexEditorPanel::onBtnGoToOffset
+ * Called when the 'Go to Offset' button is clicked
+ *******************************************************************/
+void HexEditorPanel::onBtnGoToOffset(wxCommandEvent& e) {
+	// Do nothing if no data
+	if (table_hex->getData().getSize() == 0)
+		return;
+
+	// Pop up dialog to prompt user for an offset
+	int ofs = wxGetNumberFromUser("Enter Offset", "Offset", "Go to Offset", 0, 0, table_hex->getData().getSize()-1);
+	if (ofs >= 0) {
+		// Determine row/col of offset
+		int row = ofs / NUMCOLS;
+		int col = ofs % NUMCOLS;
+
+		// Go to that cell
+		grid_hex->GoToCell(row, col);
+		grid_hex->SetFocus();
+	}
+}
 
 
-
+/*******************************************************************
+ * CONSOLE COMMANDS
+ *******************************************************************/
 
 CONSOLE_COMMAND(test_hex, 0) {
 	wxDialog dlg(NULL, -1, "HEX!", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);

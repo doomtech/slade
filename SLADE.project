@@ -75,6 +75,8 @@
         <File Name="src/PnamesEntryPanel.cpp"/>
         <File Name="src/PnamesEntryPanel.h"/>
         <File Name="src/DefaultEntryPanel.cpp"/>
+        <File Name="src/HexEntryPanel.h"/>
+        <File Name="src/HexEntryPanel.cpp"/>
       </VirtualDirectory>
       <File Name="src/ArchiveManagerPanel.h"/>
       <File Name="src/ArchiveManagerPanel.cpp"/>

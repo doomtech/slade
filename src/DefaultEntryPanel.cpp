@@ -96,7 +96,7 @@ DefaultEntryPanel::DefaultEntryPanel(wxWindow* parent)
 	btn_gfx_convert->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &DefaultEntryPanel::onBtnGfxConvert, this);
 	btn_gfx_modify_offsets->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &DefaultEntryPanel::onBtnGfxModifyOffsets, this);
 	btn_texture_edit->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &DefaultEntryPanel::onBtnTextureEdit, this);
-	btn_view_hex->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &DefaultEntryPanel::onBtnViewHex, this);
+	//btn_view_hex->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &DefaultEntryPanel::onBtnViewHex, this);
 
 	Layout();
 }
@@ -216,6 +216,7 @@ void DefaultEntryPanel::onBtnTextureEdit(wxCommandEvent& e) {
 	theArchiveManager->openTextureEditor(theArchiveManager->archiveIndex(entry->getParent()));
 }
 
+/*
 void DefaultEntryPanel::onBtnViewHex(wxCommandEvent& e) {
 	wxDialog dlg(NULL, -1, "Hex Editor (temp dialog)", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
 
@@ -232,3 +233,4 @@ void DefaultEntryPanel::onBtnViewHex(wxCommandEvent& e) {
 	dlg.SetInitialSize(wxSize(800, 500));
 	dlg.ShowModal();
 }
+*/

@@ -50,7 +50,7 @@ LibPath                := "$(LibraryPathSwitch)."
 CodeLiteDir:=/usr/share/codelite
 Objects=$(IntermediateDirectory)/src_GfxConvDialog$(ObjectSuffix) $(IntermediateDirectory)/src_ModifyOffsetsDialog$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteDialog$(ObjectSuffix) $(IntermediateDirectory)/src_PreferencesDialog$(ObjectSuffix) $(IntermediateDirectory)/src_Clipboard$(ObjectSuffix) $(IntermediateDirectory)/src_CVar$(ObjectSuffix) $(IntermediateDirectory)/src_MainApp$(ObjectSuffix) $(IntermediateDirectory)/src_MemChunk$(ObjectSuffix) $(IntermediateDirectory)/src_Misc$(ObjectSuffix) $(IntermediateDirectory)/src_WxStuff$(ObjectSuffix) \
 	$(IntermediateDirectory)/src_OpenGL$(ObjectSuffix) $(IntermediateDirectory)/src_ListenerAnnouncer$(ObjectSuffix) $(IntermediateDirectory)/src_Property$(ObjectSuffix) $(IntermediateDirectory)/src_PropertyList$(ObjectSuffix) $(IntermediateDirectory)/src_Tokenizer$(ObjectSuffix) $(IntermediateDirectory)/src_Tree$(ObjectSuffix) $(IntermediateDirectory)/src_Parser$(ObjectSuffix) $(IntermediateDirectory)/src_Console$(ObjectSuffix) $(IntermediateDirectory)/src_AnimatedEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_EntryPanel$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_GfxEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_MultiEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_SwitchesEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_TextEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_PnamesEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_DefaultEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveManagerPanel$(ObjectSuffix) $(IntermediateDirectory)/src_PatchTablePanel$(ObjectSuffix) $(IntermediateDirectory)/src_TextureEditorPanel$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_GfxEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_SwitchesEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_TextEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_PnamesEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_DefaultEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_HexEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveManagerPanel$(ObjectSuffix) $(IntermediateDirectory)/src_PatchTablePanel$(ObjectSuffix) $(IntermediateDirectory)/src_TextureEditorPanel$(ObjectSuffix) \
 	$(IntermediateDirectory)/src_TextureXEditor$(ObjectSuffix) $(IntermediateDirectory)/src_TextureXPanel$(ObjectSuffix) $(IntermediateDirectory)/src_PatchBrowser$(ObjectSuffix) $(IntermediateDirectory)/src_ArchivePanel$(ObjectSuffix) $(IntermediateDirectory)/src_BaseResourceChooser$(ObjectSuffix) $(IntermediateDirectory)/src_EntryOperations$(ObjectSuffix) $(IntermediateDirectory)/src_MainWindow$(ObjectSuffix) $(IntermediateDirectory)/src_MapLine$(ObjectSuffix) $(IntermediateDirectory)/src_MapSector$(ObjectSuffix) $(IntermediateDirectory)/src_MapSide$(ObjectSuffix) \
 	$(IntermediateDirectory)/src_MapThing$(ObjectSuffix) $(IntermediateDirectory)/src_MapVertex$(ObjectSuffix) $(IntermediateDirectory)/src_SLADEMap$(ObjectSuffix) $(IntermediateDirectory)/src_MapCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_MapEditorWindow$(ObjectSuffix) $(IntermediateDirectory)/src_Archive$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveEntry$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveManager$(ObjectSuffix) $(IntermediateDirectory)/src_WadArchive$(ObjectSuffix) $(IntermediateDirectory)/src_ZipArchive$(ObjectSuffix) \
 	$(IntermediateDirectory)/src_EntryType$(ObjectSuffix) $(IntermediateDirectory)/src_EntryDataFormat$(ObjectSuffix) $(IntermediateDirectory)/src_DatArchive$(ObjectSuffix) $(IntermediateDirectory)/src_LibArchive$(ObjectSuffix) $(IntermediateDirectory)/src_ResArchive$(ObjectSuffix) $(IntermediateDirectory)/src_AnimatedList$(ObjectSuffix) $(IntermediateDirectory)/src_SwitchesList$(ObjectSuffix) $(IntermediateDirectory)/src_PnamesList$(ObjectSuffix) $(IntermediateDirectory)/src_CTexture$(ObjectSuffix) $(IntermediateDirectory)/src_PatchTable$(ObjectSuffix) \
@@ -244,14 +244,6 @@ $(IntermediateDirectory)/src_GfxEntryPanel$(DependSuffix): src/GfxEntryPanel.cpp
 $(IntermediateDirectory)/src_GfxEntryPanel$(PreprocessSuffix): src/GfxEntryPanel.cpp
 	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_GfxEntryPanel$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/GfxEntryPanel.cpp"
 
-$(IntermediateDirectory)/src_MultiEntryPanel$(ObjectSuffix): src/MultiEntryPanel.cpp $(IntermediateDirectory)/src_MultiEntryPanel$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/MultiEntryPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_MultiEntryPanel$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/src_MultiEntryPanel$(DependSuffix): src/MultiEntryPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_MultiEntryPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_MultiEntryPanel$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/MultiEntryPanel.cpp"
-
-$(IntermediateDirectory)/src_MultiEntryPanel$(PreprocessSuffix): src/MultiEntryPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_MultiEntryPanel$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/MultiEntryPanel.cpp"
-
 $(IntermediateDirectory)/src_PaletteEntryPanel$(ObjectSuffix): src/PaletteEntryPanel.cpp $(IntermediateDirectory)/src_PaletteEntryPanel$(DependSuffix)
 	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/PaletteEntryPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_PaletteEntryPanel$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_PaletteEntryPanel$(DependSuffix): src/PaletteEntryPanel.cpp
@@ -291,6 +283,14 @@ $(IntermediateDirectory)/src_DefaultEntryPanel$(DependSuffix): src/DefaultEntryP
 
 $(IntermediateDirectory)/src_DefaultEntryPanel$(PreprocessSuffix): src/DefaultEntryPanel.cpp
 	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_DefaultEntryPanel$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/DefaultEntryPanel.cpp"
+
+$(IntermediateDirectory)/src_HexEntryPanel$(ObjectSuffix): src/HexEntryPanel.cpp $(IntermediateDirectory)/src_HexEntryPanel$(DependSuffix)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/HexEntryPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_HexEntryPanel$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_HexEntryPanel$(DependSuffix): src/HexEntryPanel.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_HexEntryPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_HexEntryPanel$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/HexEntryPanel.cpp"
+
+$(IntermediateDirectory)/src_HexEntryPanel$(PreprocessSuffix): src/HexEntryPanel.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_HexEntryPanel$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/HexEntryPanel.cpp"
 
 $(IntermediateDirectory)/src_ArchiveManagerPanel$(ObjectSuffix): src/ArchiveManagerPanel.cpp $(IntermediateDirectory)/src_ArchiveManagerPanel$(DependSuffix)
 	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/ArchiveManagerPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ArchiveManagerPanel$(ObjectSuffix) $(IncludePath)
@@ -817,9 +817,6 @@ clean:
 	$(RM) $(IntermediateDirectory)/src_GfxEntryPanel$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/src_GfxEntryPanel$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/src_GfxEntryPanel$(PreprocessSuffix)
-	$(RM) $(IntermediateDirectory)/src_MultiEntryPanel$(ObjectSuffix)
-	$(RM) $(IntermediateDirectory)/src_MultiEntryPanel$(DependSuffix)
-	$(RM) $(IntermediateDirectory)/src_MultiEntryPanel$(PreprocessSuffix)
 	$(RM) $(IntermediateDirectory)/src_PaletteEntryPanel$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/src_PaletteEntryPanel$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/src_PaletteEntryPanel$(PreprocessSuffix)
@@ -835,6 +832,9 @@ clean:
 	$(RM) $(IntermediateDirectory)/src_DefaultEntryPanel$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/src_DefaultEntryPanel$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/src_DefaultEntryPanel$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/src_HexEntryPanel$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/src_HexEntryPanel$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/src_HexEntryPanel$(PreprocessSuffix)
 	$(RM) $(IntermediateDirectory)/src_ArchiveManagerPanel$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/src_ArchiveManagerPanel$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/src_ArchiveManagerPanel$(PreprocessSuffix)

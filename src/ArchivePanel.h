@@ -23,6 +23,7 @@ protected:
 	EntryPanel* animated_area;
 	EntryPanel* switches_area;
 	EntryPanel* pnames_area;
+	EntryPanel* hex_area;
 
 public:
 	ArchivePanel(wxWindow *parent, Archive* archive);
@@ -84,6 +85,7 @@ public:
 	void			onEntryListKeyDown(wxKeyEvent& e);
 	virtual void	onEntryListActivated(wxListEvent& e);
 	void			onDEPEditAsText(wxCommandEvent& e);
+	void			onDEPViewAsHex(wxCommandEvent& e);
 };
 
 #endif //__ARCHIVEPANEL_H__

@@ -41,6 +41,7 @@
 #include "MultiEntryPanel.h"
 #include "AnimatedEntryPanel.h"
 #include "SwitchesEntryPanel.h"
+#include "HexEntryPanel.h"
 #include "GfxConvDialog.h"
 #include "ModifyOffsetsDialog.h"
 #include "EntryOperations.h"
@@ -84,6 +85,7 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 	pal_area = new PaletteEntryPanel(this);
 	animated_area = new AnimatedEntryPanel(this);
 	switches_area = new SwitchesEntryPanel(this);
+	hex_area = new HexEntryPanel(this);
 
 
 	// --- Setup Layout ---
@@ -125,6 +127,7 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 	entry_list->Bind(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, &ArchivePanel::onEntryListActivated, this);
 	Bind(wxEVT_COMMAND_MENU_SELECTED, &ArchivePanel::onEntryMenuClick, this, MENU_GFX_CONVERT, MENU_BAS_CONVERT);
 	((DefaultEntryPanel*)default_area)->getEditTextButton()->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &ArchivePanel::onDEPEditAsText, this);
+	((DefaultEntryPanel*)default_area)->getViewHexButton()->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &ArchivePanel::onDEPViewAsHex, this);
 
 	// Update size+layout
 	entry_list->updateWidth();
@@ -1195,6 +1198,21 @@ void ArchivePanel::onDEPEditAsText(wxCommandEvent& e) {
 
 	// Load entry to text area
 	text_area->openEntry(entry);
+}
+
+/* ArchivePanel::onDEPEViewAsHex
+ * Called when the 'View as Hex' button is clicked on the default
+ * entry panel - opens the entry in the hex editor panel
+ *******************************************************************/
+void ArchivePanel::onDEPViewAsHex(wxCommandEvent& e) {
+	// Get entry to view
+	ArchiveEntry* entry = default_area->getEntry();
+
+	// Switch to HexEntryPanel
+	showEntryPanel(hex_area, false);
+
+	// Load entry to text area
+	hex_area->openEntry(entry);
 }
 
 

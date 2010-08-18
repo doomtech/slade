@@ -24,6 +24,7 @@ public:
 	~DefaultEntryPanel();
 
 	wxButton*	getEditTextButton() { return btn_edit_text; }
+	wxButton*	getViewHexButton() { return btn_view_hex; }
 
 	bool	loadEntry(ArchiveEntry* entry);
 	bool	loadEntries(vector<ArchiveEntry*>& entries);
@@ -32,7 +33,7 @@ public:
 	void	onBtnGfxConvert(wxCommandEvent& e);
 	void	onBtnGfxModifyOffsets(wxCommandEvent& e);
 	void	onBtnTextureEdit(wxCommandEvent& e);
-	void	onBtnViewHex(wxCommandEvent& e);
+	//void	onBtnViewHex(wxCommandEvent& e);
 };
 
 #endif//__DEFAULT_ENTRY_PANEL_H__

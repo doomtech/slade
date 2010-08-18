@@ -40,6 +40,7 @@ class HexEditorPanel : public wxPanel {
 private:
 	wxGrid*		grid_hex;
 	HexTable*	table_hex;
+	wxButton*	btn_go_to_offset;
 
 	// Info labels
 	wxStaticText*	label_offset;
@@ -69,6 +70,7 @@ public:
 	bool	loadData(MemChunk& mc);
 
 	void	onCellSelected(wxGridEvent& e);
+	void	onBtnGoToOffset(wxCommandEvent& e);
 };
 
 #endif//__HEX_EDITOR_PANEL_H__
