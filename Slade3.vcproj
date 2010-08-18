@@ -449,6 +449,14 @@
 						>
 					</File>
 					<File
+						RelativePath=".\src\HexEntryPanel.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\HexEntryPanel.h"
+						>
+					</File>
+					<File
 						RelativePath=".\src\PaletteEntryPanel.cpp"
 						>
 					</File>
