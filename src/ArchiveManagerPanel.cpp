@@ -153,12 +153,29 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
 	menu_context_recent->Append(MENU_OPEN, "Open", "Open the selected Archive(s)");
 	menu_context_recent->Append(MENU_REMOVE, "Remove", "Remove the selected Archive(s) from the Recent list");
 
+	// Create/setup bookmarks tab
+	wxPanel *panel_bm = new wxPanel(notebook_tabs);
+	wxBoxSizer *box_bm = new wxBoxSizer(wxVERTICAL);
+	panel_bm->SetSizer(box_bm);
+	box_bm->Add(new wxStaticText(panel_bm, -1, "Bookmarks:"), 0, wxEXPAND | wxALL, 4);
+	list_bookmarks = new ListView(panel_bm, -1);
+	box_bm->Add(list_bookmarks, 1, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, 4);
+	refreshBookmarkList();
+	notebook_tabs->AddPage(panel_bm, "Bookmarks", true);
+
+	// Create/setup Archive context menu
+	menu_context_bookmarks = new wxMenu();
+	menu_context_bookmarks->Append(MENU_GO, "Go To", "Go to the chosen bookmark");
+	menu_context_bookmarks->Append(MENU_DELETE, "Remove", "Remove the selected bookmarks from the list");
+
 	// Bind events
 	list_archives->Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &ArchiveManagerPanel::onListArchivesChanged, this);
 	list_archives->Bind(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, &ArchiveManagerPanel::onListArchivesActivated, this);
 	list_archives->Bind(wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK, &ArchiveManagerPanel::onListArchivesRightClick, this);
 	list_recent->Bind(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, &ArchiveManagerPanel::onListRecentActivated, this);
 	list_recent->Bind(wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK, &ArchiveManagerPanel::onListRecentRightClick, this);
+	list_bookmarks->Bind(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, &ArchiveManagerPanel::onListBookmarksActivated, this);
+	list_bookmarks->Bind(wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK, &ArchiveManagerPanel::onListBookmarksRightClick, this);
 	list_maps->Bind(wxEVT_COMMAND_LISTBOX_SELECTED, &ArchiveManagerPanel::onListMapsChanged, this);
 	list_maps->Bind(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, &ArchiveManagerPanel::onListMapsActivated, this);
 	notebook_archives->Bind(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED, &ArchiveManagerPanel::onTabChanged, this);
@@ -178,6 +195,7 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
 ArchiveManagerPanel::~ArchiveManagerPanel() {
 	if (menu_context_open) delete menu_context_open;
 	if (menu_context_recent) delete menu_context_recent;
+	if (menu_context_bookmarks) delete menu_context_bookmarks;
 }
 
 /* ArchiveManagerPanel::refreshRecentFileList
@@ -379,7 +397,15 @@ EntryPanel* ArchiveManagerPanel::currentArea() {
  *******************************************************************/
 void ArchiveManagerPanel::openTab(int archive_index) {
 	Archive* archive = theArchiveManager->getArchive(archive_index);
+	if (archive) {
+		openTab(archive);
+	}
+}
 
+/* ArchiveManagerPanel::openTab
+ * Opens a new tab for the archive
+ *******************************************************************/
+void ArchiveManagerPanel::openTab(Archive* archive) {
 	if (archive) {
 		// Go through all tabs
 		for (size_t a = 0; a < notebook_archives->GetPageCount(); a++) {
@@ -625,7 +651,7 @@ vector<int> ArchiveManagerPanel::getSelectedArchives() {
 }
 
 /* ArchiveManagerPanel::getSelectedFiles
- * Gets a list of indices of all selected recent files list items
+ * Gets a list of indices of all selected recent file list items
  *******************************************************************/
 vector<int> ArchiveManagerPanel::getSelectedFiles() {
 	vector<int> ret;
@@ -635,6 +661,29 @@ vector<int> ArchiveManagerPanel::getSelectedFiles() {
 	while (true) {
 		// Get the next item in the list that is selected
 		item = list_recent->GetNextItem(item, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+
+		// If -1 then none were selected
+		if (item == -1)
+			break;
+
+		// Otherwise add the selected item to the vector
+		ret.push_back(item);
+	}
+
+	return ret;
+}
+
+/* ArchiveManagerPanel::getSelectedBookmarks
+ * Gets a list of indices of all selected bookmark list items
+ *******************************************************************/
+vector<int> ArchiveManagerPanel::getSelectedBookmarks() {
+	vector<int> ret;
+
+	// Go through all wad list items
+	long item = -1;
+	while (true) {
+		// Get the next item in the list that is selected
+		item = list_bookmarks->GetNextItem(item, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
 
 		// If -1 then none were selected
 		if (item == -1)
@@ -859,6 +908,8 @@ void ArchiveManagerPanel::removeSelection() {
 		if (okay[a])
 			kept_files.push_back(theArchiveManager->recentFile(a));
 
+	delete[] okay;
+
 	// Renew the list of recent files
 	theArchiveManager->addRecentFiles(kept_files);
 }
@@ -997,29 +1048,44 @@ void ArchiveManagerPanel::onListRecentRightClick(wxListEvent& e) {
 	PopupMenu(menu_context_recent);
 }
 
+/* ArchiveManagerPanel::onListBookmarksActivated
+ * Called when the user activates an entry in the list.
+ * Opens the entry and if needed its archive in a new tab, if it 
+ * isn't already open.
+ *******************************************************************/
+void ArchiveManagerPanel::onListBookmarksActivated(wxListEvent& e) {
+	// Open the archive
+	goToBookmark(e.GetIndex());
+}
+
+/* ArchiveManagerPanel::onListBookmarksRightClick
+ * Called when the user right clicks an item on the bookmark list,
+ * pops up a context menu
+ *******************************************************************/
+void ArchiveManagerPanel::onListBookmarksRightClick(wxListEvent& e) {
+	PopupMenu(menu_context_bookmarks);
+}
+
 /* ArchiveManagerPanel::onMenu
  * Called when an item on the archive list context menu is selected
  *******************************************************************/
 void ArchiveManagerPanel::onMenu(wxCommandEvent& e) {
-	// Save
-	if (e.GetId() == MENU_SAVE)
-		saveSelection();
+	switch(e.GetId()) {
+	
+	// Open Archives menu
+	case MENU_SAVE:		saveSelection();	break;	// Save
+	case MENU_SAVEAS:	saveSelectionAs();	break;	// Save As
+	case MENU_CLOSE:	closeSelection();	break;	// Close
 
-	// Save As
-	else if (e.GetId() == MENU_SAVEAS)
-		saveSelectionAs();
+	// Recent Files menu
+	case MENU_OPEN:		openSelection();	break;	// Open
+	case MENU_REMOVE:	removeSelection();	break;	// Remove
+		
+	// Bookmarks menu
+	case MENU_GO:		goToBookmark();		break;	// Go To
+	case MENU_DELETE:	deleteBookmarks();	break;	// Delete
+	}
 
-	// Close
-	else if (e.GetId() == MENU_CLOSE)
-		closeSelection();
-
-	// Open
-	else if (e.GetId() == MENU_OPEN)
-		openSelection();
-
-	// Remove
-	else if (e.GetId() == MENU_REMOVE)
-		removeSelection();
 }
 
 /* ArchiveManagerPanel::onTabChanged
@@ -1045,4 +1111,148 @@ void ArchiveManagerPanel::onTabClose(wxAuiNotebookEvent& e) {
 		theArchiveManager->closeArchive(currentArchive());
 		tab_closing = false;
 	}
+}
+
+#include "ConsoleHelpers.h"
+
+/* ArchiveManagerPanel::updateBookmarkListItem
+ * Updates the bookmark list item at <index>
+ *******************************************************************/
+void ArchiveManagerPanel::updateBookmarkListItem(int index) {
+	// Only valid indices
+	if (index < 0 || (unsigned)index >= bookmarks.size())
+		return;
+
+	ArchiveEntry* entry = bookmarks[index];
+
+	if (!entry) {
+		bookmarks.erase(bookmarks.begin()+index);
+		refreshBookmarkList();
+		return;
+	}
+
+	// Set item name
+	list_bookmarks->setItemText(index, 0, entry->getName());
+	list_bookmarks->setItemText(index, 1, entry->getParent()->getFilename());
+
+	// Set item status colour
+	if (entry->isLocked())
+		list_bookmarks->setItemStatus(index, LV_STATUS_LOCKED);
+	else switch (entry->getState()) {
+		case 0:	list_bookmarks->setItemStatus(index, LV_STATUS_NORMAL); break;
+		case 1:	list_bookmarks->setItemStatus(index, LV_STATUS_MODIFIED); break;
+		case 2:	list_bookmarks->setItemStatus(index, LV_STATUS_NEW); break;
+		default:list_bookmarks->setItemStatus(index, LV_STATUS_ERROR); break;
+	}
+}
+
+/* ArchiveManagerPanel::refreshBookmarkList
+ * Clears and rebuilds the bookmark list
+ *******************************************************************/
+void ArchiveManagerPanel::refreshBookmarkList() {
+	// Clear the list
+	list_bookmarks->ClearAll();
+
+	// Add columns
+	list_bookmarks->InsertColumn(0, "Entry");
+	list_bookmarks->InsertColumn(1, "Archive");
+
+	// Add each bookmark
+	list_bookmarks->enableSizeUpdate(false);
+	for (int a = 0; (unsigned)a < bookmarks.size(); a++) {
+		list_bookmarks->addItem(a, wxEmptyString);
+		updateBookmarkListItem(a);
+	}
+
+	// Update size
+	list_bookmarks->enableSizeUpdate(true);
+	list_bookmarks->updateSize();
+}
+
+/* ArchiveManagerPanel::AddBookmark
+ * Adds the given archive entry to the list of bookmarks
+ *******************************************************************/
+void ArchiveManagerPanel::addBookmark(ArchiveEntry * bookmark) {
+	// Check that it's not a duplicate of an existing bookmark
+	for (size_t a = 0; a < bookmarks.size(); ++a)
+		if (bookmarks[a] == bookmark)
+			return;
+
+	// Add the bookmark
+	bookmarks.push_back(bookmark);
+
+	// Sync displayed list with vector
+	refreshBookmarkList();
+}
+
+/* ArchiveManagerPanel::deleteBookmarks
+ * Deletes selected bookmarks from the list
+ *******************************************************************/
+void ArchiveManagerPanel::deleteBookmarks() {
+	vector<int> selection = getSelectedBookmarks();
+
+	// Don't continue if there are no selected items
+	if (selection.size() == 0)
+		return;
+
+	// Prepare list of kept archives
+	int nummarks = bookmarks.size();
+	bool * okay = new bool[nummarks];
+	for (int a = 0; a < (signed)nummarks; ++a)
+		okay[a] = true;
+
+	// Deselect the bookmarks that are being removed
+	for (int a = 0; a < (signed)selection.size(); ++a) {
+		if (selection[a] < nummarks)
+			okay[selection[a]] = false;
+	}
+
+	// Delete bookmarks starting from the end
+	vector<ArchiveEntry *> kept_marks;
+	for (int a = nummarks; a > 0; --a)
+		if (!okay[a-1])
+			bookmarks.erase(bookmarks.begin() + a - 1);
+
+	delete[] okay;
+
+	// Sync displayed list with vector
+	refreshBookmarkList();
+}
+
+/* ArchiveManagerPanel::goToBookmark
+ * Open the bookmark in the entry panel
+ *******************************************************************/
+void ArchiveManagerPanel::goToBookmark(long index) {
+
+	// Get the first item in the list that is selected
+	if (index < 0)
+		index = list_bookmarks->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+	if (index < 0 || (unsigned)index >= bookmarks.size())
+		return;
+
+	ArchiveEntry * foo = bookmarks[index];
+	if (foo == NULL)
+		return;
+
+	openTab(foo->getParent());
+
+	ArchivePanel * meep = CH::getCurrentArchivePanel();
+	if (meep == NULL)
+		return;
+
+	meep->openEntry(foo, true);
+}
+
+/* ArchiveManagerPanel::deleteBookmarks
+ * Deletes all bookmarks that are from the closing archive
+ *******************************************************************/
+void ArchiveManagerPanel::deleteBookmarks(Archive * closing) {
+	// Delete starting from the last
+	for (size_t a = bookmarks.size(); a > 0; --a) {
+		if (bookmarks[a - 1] == NULL || bookmarks[a - 1]->getParent() == closing)
+			bookmarks.erase(bookmarks.begin() + a - 1);
+	}
+
+	// Sync displayed list with vector
+	refreshBookmarkList();
 }

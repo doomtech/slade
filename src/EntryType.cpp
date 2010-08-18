@@ -608,10 +608,17 @@ CONSOLE_COMMAND (type, 0) {
 		wxLogMessage(listing);
 	} else {
 		// Find type by id or first matching format
+		EntryType * desttype = EntryType::unknownType();
 		bool match = false;
-		size_t a;
-		for (a = 3; a < all_types.size(); a++) {
+
+		// Use true unknown type rather than map marker...
+		if (!args[0].CmpNoCase("unknown") || !args[0].CmpNoCase("none") || !args[0].CmpNoCase("any"))
+			match = true;
+
+		// Find actual format
+		else for (size_t a = 3; a < all_types.size(); a++) {
 			if (!args[0].CmpNoCase(all_types[a]->getFormat()) || !args[0].CmpNoCase(all_types[a]->getId())) {
+				desttype = all_types[a];
 				match = true;
 				break;
 			}
@@ -623,25 +630,36 @@ CONSOLE_COMMAND (type, 0) {
 
 		// Allow to force type change even if format checks fails (use at own risk!)
 		int okay = 0, force = !(args.size() < 2 || args[1].CmpNoCase("force"));
-		ArchiveEntry * meep = CH::getCurrentArchiveEntry();
-		if (!meep) {
+		vector<ArchiveEntry *> meep = CH::getCurrentArchiveEntries();
+		if (meep.size() == 0) {
 			wxLogMessage("No entry selected");
 			return;
 		}
 
-		// Check if format corresponds to entry
-		EntryDataFormat* foo = EntryDataFormat::getFormat(all_types[a]->getFormat());
-		if (foo) {
-			wxLogMessage("Identifying as %s", all_types[a]->getName().mb_str());
-			okay = foo->isThisFormat(meep->getMCData());
-			if (okay) wxLogMessage("Identification successful: %i/255", okay);
-			else wxLogMessage("Identification failed");
-		} else wxLogMessage("No data format for this type!");
+		EntryDataFormat* foo = NULL;
+		if (desttype != EntryType::unknownType()) {
+			// Check if format corresponds to entry
+			foo = EntryDataFormat::getFormat(desttype->getFormat());
+			if (foo)
+				wxLogMessage("Identifying as %s", desttype->getName().mb_str());
+			else wxLogMessage("No data format for this type!");
+		}
+		else force = true; // Always force the unknown type
 
-		// Change type
-		if (force || okay) {
-			meep->setType(all_types[a], okay);
-			wxLogMessage("Type changed.");
+		for (size_t b = 0; b < meep.size(); ++b) {
+			okay = false;
+			if (foo)
+			{
+				okay = foo->isThisFormat(meep[b]->getMCData());
+				if (okay) wxLogMessage("%s: Identification successful (%i/255)", meep[b]->getName().mb_str(), okay);
+				else wxLogMessage("%s: Identification failed", meep[b]->getName().mb_str());
+			}
+
+			// Change type
+			if (force || okay) {
+				meep[b]->setType(desttype, okay);
+				wxLogMessage("%s: Type changed.", meep[b]->getName().mb_str());
+			}
 		}
 	}
 }

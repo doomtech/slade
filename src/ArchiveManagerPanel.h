@@ -37,18 +37,28 @@ private:
 	wxButton*			btn_browser_open;
 	wxMenu*				menu_context_open;
 	wxMenu*				menu_context_recent;
+	wxMenu*				menu_context_bookmarks;
 	wxMenu*				menu_recent;
+
+	vector<ArchiveEntry*>	bookmarks;
 
 public:
 	// wxWidgets ID table
 	enum {
+		// Open Achives menu items
 		MENU_SAVE,
 		MENU_SAVEAS,
 		MENU_CLOSE,
 
+		// Recent Files menu items
 		MENU_OPEN,
 		MENU_REMOVE,
 
+		// Bookmarks menu items
+		MENU_GO,
+		MENU_DELETE,
+
+		// End
 		MENU_END,
 	};
 
@@ -59,9 +69,11 @@ public:
 
 	void			refreshArchiveList();
 	void			refreshRecentFileList();
+	void			refreshBookmarkList();
 	void			populateMapList(Archive* archive);
 	void			updateOpenListItem(int index);
 	void			updateRecentListItem(int index);
+	void			updateBookmarkListItem(int index);
 	bool			isArchivePanel(int tab_index);
 	int				currentTabIndex();
 	Archive*		currentArchive();
@@ -69,6 +81,7 @@ public:
 	EntryPanel*		currentArea();
 
 	void	openTab(int archive_index);
+	void	openTab(Archive * archive);
 	void	closeTab(int archive_index);
 	void	openTextureTab(int archive_index);
 	void	closeTextureTab(int archive_index);
@@ -86,10 +99,17 @@ public:
 	void	openSelection();
 	void	removeSelection();
 
+	// Bookmark functions
+	void	addBookmark(ArchiveEntry * bookmark);
+	void	deleteBookmarks(Archive * closing);
+	void	deleteBookmarks();
+	void	goToBookmark(long index = -1);
+
 	// Handler for MainWindow menu actions
 	void	handleAction(int menu_id);
 
 	vector<int>	getSelectedArchives();
+	vector<int>	getSelectedBookmarks();
 	vector<int>	getSelectedFiles();
 
 	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
@@ -101,6 +121,8 @@ public:
 	void	onListRecentChanged(wxListEvent& e);
 	void	onListRecentActivated(wxListEvent& e);
 	void	onListRecentRightClick(wxListEvent& e);
+	void	onListBookmarksActivated(wxListEvent& e);
+	void	onListBookmarksRightClick(wxListEvent& e);
 	void	onListMapsChanged(wxCommandEvent& e);
 	void	onListMapsActivated(wxListEvent& e);
 	void	onMenu(wxCommandEvent& e);

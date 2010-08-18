@@ -29,6 +29,7 @@
  *******************************************************************/
 #include "Main.h"
 #include "Archive.h"
+#include "MainApp.h"
 #include <wx/filename.h>
 
 /* Archive Directory Layout:
@@ -481,6 +482,15 @@ unsigned Archive::numEntries() {
 void Archive::close() {
 	// Announce
 	announce("closing");
+
+	// Delete bookmarks associated to the archive
+	if (theApp->getMainWindow())
+	{
+		if (theApp->getMainWindow()->getArchiveManagerPanel())
+		{
+			theApp->getMainWindow()->getArchiveManagerPanel()->deleteBookmarks(this);
+		}
+	}
 
 	// Delete root directory
 	delete dir_root;

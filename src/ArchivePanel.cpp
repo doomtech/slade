@@ -701,6 +701,13 @@ ArchiveEntry * ArchivePanel::currentEntry() {
 	return NULL;
 }
 
+vector<ArchiveEntry*> ArchivePanel::currentEntries() {
+	vector<ArchiveEntry*> selection;
+	if (entry_list)
+		selection = entry_list->getSelectedEntries();
+	return selection;
+}
+
 bool ArchivePanel::basConvert() {
 	// Get the entry index of the last selected list item
 	int index = archive->entryIndex(currentEntry());
@@ -938,6 +945,10 @@ void ArchivePanel::handleAction(int menu_id) {
 	else if (menu_id == MainWindow::MENU_ENTRY_MOVEDOWN)
 		moveDown();
 
+	// Entry->Bookmark
+	else if (menu_id == MainWindow::MENU_ENTRY_BOOKMARK)
+		bookmark();
+
 	// Entry->Convert To...
 	else if (menu_id == MainWindow::MENU_ENTRY_CONVERTTO)
 		convertEntryTo();
@@ -1052,6 +1063,8 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 	context->AppendSeparator();
 	context->Append(MainWindow::MENU_ENTRY_MOVEUP, "Move Up");
 	context->Append(MainWindow::MENU_ENTRY_MOVEDOWN, "Move Down");
+	context->AppendSeparator();
+	context->Append(MainWindow::MENU_ENTRY_BOOKMARK, "Bookmark");
 
 	// Get selected entries
 	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
@@ -1244,6 +1257,15 @@ ArchiveEntry * CH::getCurrentArchiveEntry() {
 	return NULL;
 }
 
+vector<ArchiveEntry*> CH::getCurrentArchiveEntries() {
+	vector<ArchiveEntry*> blank;
+	if (CH::getCurrentArchivePanel())
+	{
+		return CH::getCurrentArchivePanel()->currentEntries();
+	}
+	return blank;
+}
+
 ArchivePanel * CH::getCurrentArchivePanel() {
 	if (theApp->getMainWindow())
 	{
@@ -1265,3 +1287,19 @@ CONSOLE_COMMAND(palconv, 0) {
 		meep->reloadCurrentPanel();
 	}
 }
+
+/* ArchivePanel::bookmark
+ * Adds the given archive entry to the list of bookmarks
+ *******************************************************************/
+bool ArchivePanel::bookmark() {
+	if (theApp->getMainWindow())
+	{
+		if (theApp->getMainWindow()->getArchiveManagerPanel())
+		{
+			theApp->getMainWindow()->getArchiveManagerPanel()->addBookmark(entry_list->getFocusedEntry());
+			return true;
+		}
+	}
+	return false;
+}
+

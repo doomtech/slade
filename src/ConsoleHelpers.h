@@ -9,10 +9,11 @@ class GfxEntryPanel;
 
 // Console helpers
 namespace CH {
-	Archive*		getCurrentArchive();
-	ArchiveEntry*	getCurrentArchiveEntry();
-	ArchivePanel*	getCurrentArchivePanel();
-	GfxEntryPanel*	getCurrentGfxPanel();
+	Archive*				getCurrentArchive();
+	ArchiveEntry*			getCurrentArchiveEntry();
+	vector<ArchiveEntry*>	getCurrentArchiveEntries();
+	ArchivePanel*			getCurrentArchivePanel();
+	GfxEntryPanel*			getCurrentGfxPanel();
 }
 
 #endif // __CONSOLEHELPERS_H__

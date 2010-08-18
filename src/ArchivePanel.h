@@ -48,6 +48,7 @@ public:
 	bool	deleteEntry();
 	bool	moveUp();
 	bool	moveDown();
+	bool	bookmark();
 	bool	convertEntryTo();
 	bool	importEntry();
 	bool	exportEntry();
@@ -64,8 +65,9 @@ public:
 	bool	reloadCurrentPanel();
 
 	// Needed for some console commands
-	EntryPanel *	currentArea() { return cur_area;}
-	ArchiveEntry*	currentEntry();
+	EntryPanel *			currentArea() { return cur_area;}
+	ArchiveEntry*			currentEntry();
+	vector<ArchiveEntry*>	currentEntries();
 
 	// UI related
 	bool	openEntry(ArchiveEntry* entry, bool force = false);
