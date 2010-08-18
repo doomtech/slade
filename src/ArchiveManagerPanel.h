@@ -126,8 +126,9 @@ public:
 	void	onListMapsChanged(wxCommandEvent& e);
 	void	onListMapsActivated(wxListEvent& e);
 	void	onMenu(wxCommandEvent& e);
-	void	onTabChanged(wxAuiNotebookEvent& e);
-	void	onTabClose(wxAuiNotebookEvent& e);
+	void	onArchiveTabChanged(wxAuiNotebookEvent& e);
+	void	onArchiveTabClose(wxAuiNotebookEvent& e);
+	void	onAMTabChanged(wxAuiNotebookEvent& e);
 };
 
 #endif //__ARCHIVEMANAGERPANEL_H__

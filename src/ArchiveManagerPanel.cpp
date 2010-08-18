@@ -47,6 +47,7 @@
  * VARIABLES
  *******************************************************************/
 CVAR(Bool, close_archive_with_tab, false, CVAR_SAVE)
+CVAR(Int, am_current_tab, 0, CVAR_SAVE)
 bool tab_closing = false;	// Hacky workaround to prevent crash on closing a tab when close_archive_with_tab is true
 
 
@@ -163,6 +164,9 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
 	refreshBookmarkList();
 	notebook_tabs->AddPage(panel_bm, "Bookmarks", true);
 
+	// Set current tab
+	notebook_tabs->SetSelection(am_current_tab);
+
 	// Create/setup Archive context menu
 	menu_context_bookmarks = new wxMenu();
 	menu_context_bookmarks->Append(MENU_GO, "Go To", "Go to the chosen bookmark");
@@ -178,8 +182,9 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
 	list_bookmarks->Bind(wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK, &ArchiveManagerPanel::onListBookmarksRightClick, this);
 	list_maps->Bind(wxEVT_COMMAND_LISTBOX_SELECTED, &ArchiveManagerPanel::onListMapsChanged, this);
 	list_maps->Bind(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, &ArchiveManagerPanel::onListMapsActivated, this);
-	notebook_archives->Bind(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED, &ArchiveManagerPanel::onTabChanged, this);
-	notebook_archives->Bind(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSE, &ArchiveManagerPanel::onTabClose, this);
+	notebook_archives->Bind(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED, &ArchiveManagerPanel::onArchiveTabChanged, this);
+	notebook_archives->Bind(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSE, &ArchiveManagerPanel::onArchiveTabClose, this);
+	notebook_tabs->Bind(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED, &ArchiveManagerPanel::onAMTabChanged, this);
 	Bind(wxEVT_COMMAND_MENU_SELECTED, &ArchiveManagerPanel::onMenu, this, MENU_SAVE, MENU_END);
 
 	// Listen to the ArchiveManager
@@ -350,7 +355,7 @@ bool ArchiveManagerPanel::isArchivePanel(int tab_index) {
 int ArchiveManagerPanel::currentTabIndex() {
 	return notebook_archives->GetSelection();
 }
-	
+
 /* ArchiveManagerPanel::currentArchive
  * Returns the currently 'open' archive - the archive associated
  * with the current ArchivePanel tab. Returns NULL if the current tab
@@ -1050,7 +1055,7 @@ void ArchiveManagerPanel::onListRecentRightClick(wxListEvent& e) {
 
 /* ArchiveManagerPanel::onListBookmarksActivated
  * Called when the user activates an entry in the list.
- * Opens the entry and if needed its archive in a new tab, if it 
+ * Opens the entry and if needed its archive in a new tab, if it
  * isn't already open.
  *******************************************************************/
 void ArchiveManagerPanel::onListBookmarksActivated(wxListEvent& e) {
@@ -1071,7 +1076,7 @@ void ArchiveManagerPanel::onListBookmarksRightClick(wxListEvent& e) {
  *******************************************************************/
 void ArchiveManagerPanel::onMenu(wxCommandEvent& e) {
 	switch(e.GetId()) {
-	
+
 	// Open Archives menu
 	case MENU_SAVE:		saveSelection();	break;	// Save
 	case MENU_SAVEAS:	saveSelectionAs();	break;	// Save As
@@ -1080,7 +1085,7 @@ void ArchiveManagerPanel::onMenu(wxCommandEvent& e) {
 	// Recent Files menu
 	case MENU_OPEN:		openSelection();	break;	// Open
 	case MENU_REMOVE:	removeSelection();	break;	// Remove
-		
+
 	// Bookmarks menu
 	case MENU_GO:		goToBookmark();		break;	// Go To
 	case MENU_DELETE:	deleteBookmarks();	break;	// Delete
@@ -1088,10 +1093,10 @@ void ArchiveManagerPanel::onMenu(wxCommandEvent& e) {
 
 }
 
-/* ArchiveManagerPanel::onTabChanged
+/* ArchiveManagerPanel::onArchiveTabChanged
  * Called when the user switches between archive tabs
  *******************************************************************/
-void ArchiveManagerPanel::onTabChanged(wxAuiNotebookEvent& e) {
+void ArchiveManagerPanel::onArchiveTabChanged(wxAuiNotebookEvent& e) {
 	// If an archive tab is selected, set the frame title accordingly
 	int selection = notebook_archives->GetSelection();
 	if (isArchivePanel(selection)) {
@@ -1102,15 +1107,22 @@ void ArchiveManagerPanel::onTabChanged(wxAuiNotebookEvent& e) {
 		((wxFrame*)GetParent())->SetTitle("SLADE");
 }
 
-/* ArchiveManagerPanel::onTabClose
- * Called when the user clicks the close button on a tab
+/* ArchiveManagerPanel::onArchiveTabClose
+ * Called when the user clicks the close button on an archive tab
  *******************************************************************/
-void ArchiveManagerPanel::onTabClose(wxAuiNotebookEvent& e) {
+void ArchiveManagerPanel::onArchiveTabClose(wxAuiNotebookEvent& e) {
 	if (close_archive_with_tab) {
 		tab_closing = true;
 		theArchiveManager->closeArchive(currentArchive());
 		tab_closing = false;
 	}
+}
+
+/* ArchiveManagerPanel::onAMTabChanged
+ * Called when a different archive manager tab is selected
+ *******************************************************************/
+void ArchiveManagerPanel::onAMTabChanged(wxAuiNotebookEvent& e) {
+	am_current_tab = notebook_tabs->GetSelection();
 }
 
 #include "ConsoleHelpers.h"
