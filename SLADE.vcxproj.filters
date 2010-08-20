@@ -327,6 +327,12 @@
     <ClCompile Include="src\PreferencesDialog.cpp">
       <Filter>Dialogs</Filter>
     </ClCompile>
+    <ClCompile Include="src\HexEntryPanel.cpp">
+      <Filter>Main Editor\UI Elements\EntryPanel</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HexEditorPanel.cpp">
+      <Filter>UI Elements</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -602,6 +608,12 @@
     </ClInclude>
     <ClInclude Include="src\PreferencesDialog.h">
       <Filter>Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\HexEntryPanel.h">
+      <Filter>Main Editor\UI Elements\EntryPanel</Filter>
+    </ClInclude>
+    <ClInclude Include="src\HexEditorPanel.h">
+      <Filter>UI Elements</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

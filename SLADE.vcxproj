@@ -109,6 +109,8 @@
     <ClCompile Include="src\DatArchive.cpp" />
     <ClCompile Include="src\EntryDataFormat.cpp" />
     <ClCompile Include="src\GfxConvDialog.cpp" />
+    <ClCompile Include="src\HexEditorPanel.cpp" />
+    <ClCompile Include="src\HexEntryPanel.cpp" />
     <ClCompile Include="src\LibArchive.cpp" />
     <ClCompile Include="src\ModifyOffsetsDialog.cpp" />
     <ClCompile Include="src\PaletteDialog.cpp" />
@@ -195,6 +197,8 @@
     <ClInclude Include="src\DatArchive.h" />
     <ClInclude Include="src\EntryDataFormat.h" />
     <ClInclude Include="src\GfxConvDialog.h" />
+    <ClInclude Include="src\HexEditorPanel.h" />
+    <ClInclude Include="src\HexEntryPanel.h" />
     <ClInclude Include="src\ImageFormats.h" />
     <ClInclude Include="src\LibArchive.h" />
     <ClInclude Include="src\MiscFormats.h" />

@@ -483,15 +483,6 @@ void Archive::close() {
 	// Announce
 	announce("closing");
 
-	// Delete bookmarks associated to the archive
-	if (theApp->getMainWindow())
-	{
-		if (theApp->getMainWindow()->getArchiveManagerPanel())
-		{
-			theApp->getMainWindow()->getArchiveManagerPanel()->deleteBookmarks(this);
-		}
-	}
-
 	// Delete root directory
 	delete dir_root;
 

@@ -13,14 +13,13 @@ private:
 		bool				resource;
 	};
 
-	vector<archive_t>	open_archives;
-	Archive*			program_resource_archive;
-	Archive*			base_resource_archive;
-	bool				res_archive_open;
-	vector<string>		base_resource_paths;
-
-	vector<string>		recent_files;
-
+	vector<archive_t>		open_archives;
+	Archive*				program_resource_archive;
+	Archive*				base_resource_archive;
+	bool					res_archive_open;
+	vector<string>			base_resource_paths;
+	vector<string>			recent_files;
+	vector<ArchiveEntry*>	bookmarks;
 	static ArchiveManager*	instance;
 
 public:
@@ -76,6 +75,14 @@ public:
 	unsigned	numRecentFiles() { return recent_files.size(); }
 	void		addRecentFile(string path);
 	void		addRecentFiles(vector<string> paths);
+
+	// Bookmarks
+	void			addBookmark(ArchiveEntry* entry);
+	bool			deleteBookmark(ArchiveEntry* entry);
+	bool			deleteBookmark(unsigned index);
+	bool			deleteBookmarksInArchive(Archive* archive);
+	ArchiveEntry*	getBookmark(unsigned index);
+	unsigned		numBookmarks() { return bookmarks.size(); }
 
 	// Misc
 	bool	openTextureEditor(uint32_t index);

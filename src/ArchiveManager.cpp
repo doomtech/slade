@@ -330,6 +330,9 @@ bool ArchiveManager::closeArchive(int index) {
 	mc.write(&index, sizeof(int));
 	announce("archive_closing", mc);
 
+	// Delete any bookmarked entries contained in the archive
+	deleteBookmarksInArchive(open_archives[index].archive);
+
 	// Close any open child archives
 	for (size_t a = 0; a < open_archives[index].open_children.size(); a++) {
 		int ci = archiveIndex(open_archives[index].open_children[a]);
@@ -650,6 +653,81 @@ void ArchiveManager::addRecentFiles(vector<string> paths) {
 	// Announce
 	setMuted(false);
 	announce("recent_files_changed");
+}
+
+void ArchiveManager::addBookmark(ArchiveEntry* entry) {
+	// Check the bookmark isn't already in the list
+	for (unsigned a = 0; a < bookmarks.size(); a++) {
+		if (bookmarks[a] == entry)
+			return;
+	}
+
+	// Add bookmark
+	bookmarks.push_back(entry);
+
+	// Announce
+	announce("bookmarks_changed");
+}
+
+bool ArchiveManager::deleteBookmark(ArchiveEntry* entry) {
+	// Find bookmark to remove
+	for (unsigned a = 0; a < bookmarks.size(); a++) {
+		if (bookmarks[a] == entry) {
+			// Remove it
+			bookmarks.erase(bookmarks.begin() + a);
+
+			// Announce
+			announce("bookmarks_changed");
+
+			return true;
+		}
+	}
+
+	// Entry not in bookmarks list
+	return false;
+}
+
+bool ArchiveManager::deleteBookmark(unsigned index) {
+	// Check index
+	if (index >= bookmarks.size())
+		return false;
+
+	// Remove bookmark
+	bookmarks.erase(bookmarks.begin() + index);
+
+	// Announce
+	announce("bookmarks_changed");
+
+	return true;
+}
+
+bool ArchiveManager::deleteBookmarksInArchive(Archive* archive) {
+	// Go through bookmarks
+	bool removed = false;
+	for (unsigned a = 0; a < bookmarks.size(); a++) {
+		// Check bookmarked entry's parent archive
+		if (bookmarks[a]->getParent() == archive) {
+			bookmarks.erase(bookmarks.begin() + a);
+			a--;
+			removed = true;
+		}
+	}
+
+	if (removed) {
+		// Announce
+		announce("bookmarks_changed");
+		return true;
+	}
+	else
+		return false;
+}
+
+ArchiveEntry* ArchiveManager::getBookmark(unsigned index) {
+	// Check index
+	if (index >= bookmarks.size())
+		return NULL;
+
+	return bookmarks[index];
 }
 
 /* ArchiveManager::openTextureEditor

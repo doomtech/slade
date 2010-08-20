@@ -40,8 +40,6 @@ private:
 	wxMenu*				menu_context_bookmarks;
 	wxMenu*				menu_recent;
 
-	vector<ArchiveEntry*>	bookmarks;
-
 public:
 	// wxWidgets ID table
 	enum {
@@ -100,9 +98,7 @@ public:
 	void	removeSelection();
 
 	// Bookmark functions
-	void	addBookmark(ArchiveEntry * bookmark);
-	void	deleteBookmarks(Archive * closing);
-	void	deleteBookmarks();
+	void	deleteSelectedBookmarks();
 	void	goToBookmark(long index = -1);
 
 	// Handler for MainWindow menu actions

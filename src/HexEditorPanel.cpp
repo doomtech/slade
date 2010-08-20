@@ -79,7 +79,7 @@ int HexTable::GetNumberCols() {
  * Returns the value of the byte at [row],[col] as a hex string
  *******************************************************************/
 string HexTable::GetValue(int row, int col) {
-	if (row*NUMCOLS+col >= data.getSize())
+	if (unsigned(row*NUMCOLS+col) >= data.getSize())
 		return "";
 	else {
 		uint8_t val = data[row*NUMCOLS + col];

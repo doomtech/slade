@@ -512,6 +512,20 @@ bool ArchivePanel::moveDown() {
 	return true;
 }
 
+/* ArchivePanel::bookmark
+ * Adds the currently focused archive entry to the list of bookmarks
+ *******************************************************************/
+bool ArchivePanel::bookmark() {
+	ArchiveEntry* entry = entry_list->getFocusedEntry();
+
+	if (entry) {
+		theArchiveManager->addBookmark(entry_list->getFocusedEntry());
+		return true;
+	}
+	else
+		return false;
+}
+
 bool ArchivePanel::convertEntryTo() {
 	wxMessageBox("Not Implemented");
 	return false;
@@ -1290,19 +1304,4 @@ CONSOLE_COMMAND(palconv, 0) {
 		meep->palConvert();
 		meep->reloadCurrentPanel();
 	}
-}
-
-/* ArchivePanel::bookmark
- * Adds the given archive entry to the list of bookmarks
- *******************************************************************/
-bool ArchivePanel::bookmark() {
-	if (theApp->getMainWindow())
-	{
-		if (theApp->getMainWindow()->getArchiveManagerPanel())
-		{
-			theApp->getMainWindow()->getArchiveManagerPanel()->addBookmark(entry_list->getFocusedEntry());
-			return true;
-		}
-	}
-	return false;
 }
