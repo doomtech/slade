@@ -48,7 +48,7 @@
  *******************************************************************/
 namespace Global {
 	string error = "";
-	string version = "3.0 beta 5";
+	string version = "3.0 beta 6";
 }
 //MainWindow*		main_window = NULL;
 string	dir_data = "";

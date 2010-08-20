@@ -9,6 +9,8 @@ TODO List ---------------------------------------------------------------
 
 --- Before Final 3.0 Release ---
 - TEXTUREx editor
+	- Patch browser
+	- Copy+Paste textures
 - Text editor special features
 - Media panel
 - Entry filter by type/category
@@ -66,6 +68,7 @@ TODO List ---------------------------------------------------------------
 	- Needs ability to get an image's properties without actually loading it
 	- Image format detection in SImage class
 	- General 'loadImage' function to load any supported format
+- Better way to get the currently selected entries would be nice
 
 
 Unimplemented Feature Requests ------------------------------------------

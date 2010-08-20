@@ -140,6 +140,9 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 ArchivePanel::~ArchivePanel() {
 }
 
+/* ArchivePanel::saveEntryChanges
+ * Saves any changes made to the currently open entry
+ *******************************************************************/
 bool ArchivePanel::saveEntryChanges() {
 	// Ignore if no changes have been made (or no entry is open)
 	if (!cur_area->isModified() || !cur_area->getEntry())
@@ -257,6 +260,10 @@ bool ArchivePanel::newEntry() {
 	return !!new_entry;
 }
 
+/* ArchivePanel::newDirectory
+ * Adds a new subdirectory to the current directory, but only if the
+ * archive supports them
+ *******************************************************************/
 bool ArchivePanel::newDirectory() {
 	// Check archive supports directories
 	if (archive->getType() != ARCHIVE_ZIP) {
@@ -282,6 +289,10 @@ bool ArchivePanel::newDirectory() {
 	return !!dir;
 }
 
+/* ArchivePanel::importFiles
+ * Opens a file selection dialog and imports any selected files to
+ * the current directory, using the filenames as entry names
+ *******************************************************************/
 bool ArchivePanel::importFiles() {
 	// Create open file dialog
 	wxFileDialog dialog_open(this, "Choose files to import", wxEmptyString, wxEmptyString,
@@ -335,16 +346,26 @@ bool ArchivePanel::importFiles() {
 		return false;
 }
 
+/* ArchivePanel::convertArchiveTo
+ * Not implemented
+ *******************************************************************/
 bool ArchivePanel::convertArchiveTo() {
 	wxMessageBox("Not Implemented");
 	return false;
 }
 
+/* ArchivePanel::cleanupArchive
+ * Not implemented
+ *******************************************************************/
 bool ArchivePanel::cleanupArchive() {
 	wxMessageBox("Not Implemented");
 	return false;
 }
 
+/* ArchivePanel::renameEntry
+ * Opens a dialog to rename the selected entries. If multiple entries
+ * are selected, a mass-rename is performed
+ *******************************************************************/
 bool ArchivePanel::renameEntry() {
 	// Get a list of selected entries
 	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
@@ -424,6 +445,9 @@ bool ArchivePanel::renameEntry() {
 	return true;
 }
 
+/* ArchivePanel::deleteEntry
+ * Deletes any selected entries from the archive
+ *******************************************************************/
 bool ArchivePanel::deleteEntry() {
 	// Get a list of selected entries
 	vector<ArchiveEntry*> selected_entries = entry_list->getSelectedEntries();
@@ -450,6 +474,9 @@ bool ArchivePanel::deleteEntry() {
 	return true;
 }
 
+/* ArchivePanel::moveUp
+ * Moves any selected entries up in the list
+ *******************************************************************/
 bool ArchivePanel::moveUp() {
 	// Get selection
 	vector<long> selection = entry_list->getSelection();
@@ -481,6 +508,9 @@ bool ArchivePanel::moveUp() {
 	return true;
 }
 
+/* ArchivePanel::moveDown
+ * Moves any selected entries down in the list
+ *******************************************************************/
 bool ArchivePanel::moveDown() {
 	// Get selection
 	vector<long> selection = entry_list->getSelection();
@@ -526,11 +556,18 @@ bool ArchivePanel::bookmark() {
 		return false;
 }
 
+/* ArchivePanel::convertEntryTo
+ * Not implemented
+ *******************************************************************/
 bool ArchivePanel::convertEntryTo() {
 	wxMessageBox("Not Implemented");
 	return false;
 }
 
+/* ArchivePanel::importEntry
+ * For each selected entry, opens a file selection dialog. The
+ * selected file will be imported into the entry
+ *******************************************************************/
 bool ArchivePanel::importEntry() {
 	// Get a list of selected entries
 	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
@@ -561,6 +598,11 @@ bool ArchivePanel::importEntry() {
 	return true;
 }
 
+/* ArchivePanel::exportEntry
+ * Exports any selected entries to files. If multiple entries are
+ * selected, a directory selection dialog is shown, and any selected
+ * entries will be exported to that directory
+ *******************************************************************/
 bool ArchivePanel::exportEntry() {
 	// Get a list of selected entries
 	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
@@ -609,11 +651,17 @@ bool ArchivePanel::exportEntry() {
 	return true;
 }
 
+/* ArchivePanel::exportEntryAs
+ * Not implemented
+ *******************************************************************/
 bool ArchivePanel::exportEntryAs() {
 	wxMessageBox("Not Implemented");
 	return false;
 }
 
+/* ArchivePanel::copyEntry
+ * Copies selected entries+directories to the clipboard
+ *******************************************************************/
 bool ArchivePanel::copyEntry() {
 	// Get a list of selected entries
 	vector<ArchiveEntry*> entries = entry_list->getSelectedEntries();
@@ -633,6 +681,10 @@ bool ArchivePanel::copyEntry() {
 	return true;
 }
 
+/* ArchivePanel::cutEntry
+ * Copies selected entries+diretories to the clipboard, and deletes
+ * them from the archive
+ *******************************************************************/
 bool ArchivePanel::cutEntry() {
 	if (copyEntry())
 		return deleteEntry();
@@ -640,6 +692,13 @@ bool ArchivePanel::cutEntry() {
 		return false;
 }
 
+/* ArchivePanel::pasteEntry
+ * Pastes any entries and directories on the clipboard into the
+ * current directory. Entries will be pasted after the last selected
+ * entry, whereas directories will be pasted after any
+ * subdirectories. Pasting a directory will also paste any entries
+ * and subdirectories within it.
+ *******************************************************************/
 bool ArchivePanel::pasteEntry() {
 	// Do nothing if there is nothing in the clipboard
 	if (theClipboard->nItems() == 0)
@@ -680,6 +739,9 @@ bool ArchivePanel::pasteEntry() {
 		return false;
 }
 
+/* ArchivePanel::gfxConvert
+ * Opens the Gfx Conversion dialog and sends selected entries to it
+ *******************************************************************/
 bool ArchivePanel::gfxConvert() {
 	// Create gfx conversion dialog
 	GfxConvDialog gcd;
@@ -693,6 +755,10 @@ bool ArchivePanel::gfxConvert() {
 	return true;
 }
 
+/* ArchivePanel::gfxModifyOffsets
+ * Opens the Modify Offsets dialog to mass-modify offsets of any
+ * selected, offset-compatible gfx entries
+ *******************************************************************/
 bool ArchivePanel::gfxModifyOffsets() {
 	// Create modify offsets dialog
 	ModifyOffsetsDialog mod;
@@ -709,12 +775,19 @@ bool ArchivePanel::gfxModifyOffsets() {
 	return true;
 }
 
+/* ArchivePanel::currentEntry
+ * Returns the entry currently open for editing
+ *******************************************************************/
 ArchiveEntry * ArchivePanel::currentEntry() {
-	if (entry_list)
-		return entry_list->getLastSelectedEntry();
-	return NULL;
+	if (entry_list->GetSelectedItemCount() == 1)
+		return cur_area->getEntry();
+	else
+		return NULL;
 }
 
+/* ArchivePanel::currentEntry
+ * Returns a vector of all selected entries
+ *******************************************************************/
 vector<ArchiveEntry*> ArchivePanel::currentEntries() {
 	vector<ArchiveEntry*> selection;
 	if (entry_list)
@@ -722,6 +795,10 @@ vector<ArchiveEntry*> ArchivePanel::currentEntries() {
 	return selection;
 }
 
+/* ArchivePanel::basConvert
+ * Converts any selected SWITCHES or ANIMATED entries to a newly
+ * created ANIMDEFS entry
+ *******************************************************************/
 bool ArchivePanel::basConvert() {
 	// Get the entry index of the last selected list item
 	int index = archive->entryIndex(currentEntry());
@@ -771,6 +848,9 @@ bool ArchivePanel::basConvert() {
 	return true;
 }
 
+/* ArchivePanel::palConvert
+ * Unused (converts 6-bit palette to 8-bit)
+ *******************************************************************/
 bool ArchivePanel::palConvert() {
 	// Get the entry index of the last selected list item
 	ArchiveEntry* pal6bit = currentEntry();
@@ -849,17 +929,6 @@ bool ArchivePanel::reloadCurrentPanel() {
  * Show an entry panel appropriate to the current entry
  *******************************************************************/
 bool ArchivePanel::showEntryPanel(EntryPanel* new_area, bool ask_save) {
-	/*
-	// If the current entry area has unsaved changes, ask the user if they wish to save the changes
-	if (cur_area->isModified() && cur_area->getEntry() && ask_save) {
-		int result = wxMessageBox(s_fmt("Save changes to entry \"%s\"?", cur_area->getEntry()->getName().c_str()),
-									"Unsaved Changes", wxYES_NO|wxICON_QUESTION);
-
-		if (result == wxYES)
-			cur_area->saveEntry();	// Save changes to the entry if yes clicked
-	}
-	*/
-
 	// Save any changes if needed
 	saveEntryChanges();
 
@@ -880,6 +949,9 @@ bool ArchivePanel::showEntryPanel(EntryPanel* new_area, bool ask_save) {
 	return true;
 }
 
+/* ArchivePanel::handleAction
+ * Handles a menu action from the main window
+ *******************************************************************/
 void ArchivePanel::handleAction(int menu_id) {
 	// *************************************************************
 	// FILE MENU
@@ -1168,10 +1240,6 @@ void ArchivePanel::onEntryListKeyDown(wxKeyEvent& e) {
 	else if (e.GetKeyCode() == 'E' && e.ControlDown() && !e.ShiftDown())
 		exportEntry();
 
-	// Export entry to wad (Shift+Ctrl+E)
-	//else if (e.GetKeyCode() == 'E' && e.ShiftDown() && e.ControlDown())
-	//	exportEntryWad();
-
 	// Move entry up (Ctrl+U or Ctrl+Up Arrow)
 	else if (e.ControlDown() && (e.GetKeyCode() == 'U' || e.GetKeyCode() == WXK_UP))
 		moveUp();
@@ -1187,10 +1255,6 @@ void ArchivePanel::onEntryListKeyDown(wxKeyEvent& e) {
 	// New entry (Ctrl+N)
 	else if (e.GetKeyCode() == 'N' && e.ControlDown() && !e.ShiftDown())
 		newEntry();
-
-	// New entry from file (Shift+Ctrl+N)
-	//else if (e.GetKeyCode() == 'N' && e.ControlDown() && e.ShiftDown())
-	//	newEntryFromFile();
 
 	// Not handled here, send off to be handled by a parent window
 	else
