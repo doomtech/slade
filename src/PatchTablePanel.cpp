@@ -32,6 +32,7 @@
 #include "PatchTablePanel.h"
 #include "Archive.h"
 #include "TextureXEditor.h"
+#include "ArchiveEntry.h"
 #include <wx/filename.h>
 
 
@@ -177,9 +178,11 @@ PatchTablePanel::PatchTablePanel(wxWindow* parent, PatchTable* patch_table) : wx
 	this->patch_table = patch_table;
 	this->parent = (TextureXEditor*)parent;
 
-	// Setup sizer
+	// Setup sizers
 	wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
 	SetSizer(sizer);
+	wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
+	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
 
 	// Add PNAMES list
 	wxStaticBox* frame = new wxStaticBox(this, -1, "Patches (PNAMES)");
@@ -189,9 +192,11 @@ PatchTablePanel::PatchTablePanel(wxWindow* parent, PatchTable* patch_table) : wx
 	framesizer->Add(list_patches, 1, wxEXPAND|wxALL, 4);
 
 	// Add editing controls
+	sizer->Add(vbox, 1, wxEXPAND|wxALL, 4);
+	vbox->Add(hbox, 0, wxEXPAND, 4);
 	frame = new wxStaticBox(this, -1, "Actions");
 	framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
-	sizer->Add(framesizer, 0, wxALL, 4);
+	hbox->Add(framesizer, 0, wxEXPAND|wxALL, 4);
 
 	// Add patch button
 	btn_add_patch = new wxButton(this, -1, "New Patch");
@@ -209,11 +214,37 @@ PatchTablePanel::PatchTablePanel(wxWindow* parent, PatchTable* patch_table) : wx
 	btn_change_patch = new wxButton(this, -1, "Change Patch");
 	framesizer->Add(btn_change_patch, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
+	// Add information display
+	frame = new wxStaticBox(this, -1, "Info");
+	framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
+	hbox->Add(framesizer, 1, wxEXPAND|wxALL, 4);
+	label_dimensions = new wxStaticText(this, -1, "Size: N/A");
+	framesizer->Add(label_dimensions, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT, 4);
+	label_textures = new wxStaticText(this, -1, "In Textures: -");
+	framesizer->Add(label_textures, 1, wxEXPAND/*|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT*/, 4);
+
+	// Add patch canvas
+	frame = new wxStaticBox(this, -1, "Display");
+	framesizer = new wxStaticBoxSizer(frame, wxHORIZONTAL);
+	vbox->Add(framesizer, 1, wxEXPAND|wxALL, 4);
+	wxBoxSizer* c_box = new wxBoxSizer(wxVERTICAL);
+	framesizer->Add(c_box, 1, wxEXPAND|wxALL, 4);
+	patch_canvas = new GfxCanvas(this, -1);
+	c_box->Add(patch_canvas->toPanel(this), 1, wxEXPAND|wxALL, 4);
+	patch_canvas->setViewType(GFXVIEW_DEFAULT);
+	patch_canvas->allowDrag(true);
+	patch_canvas->allowScroll(true);
+	combo_palette = new PaletteChooser(this, -1);
+	c_box->Add(new wxStaticText(this, -1, "Palette:"), 0, wxALIGN_CENTER_VERTICAL, 0);
+	c_box->Add(combo_palette, 0, wxEXPAND, 0);
+
 	// Bind events
 	btn_add_patch->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &PatchTablePanel::onBtnAddPatch, this);
 	btn_patch_from_file->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &PatchTablePanel::onBtnPatchFromFile, this);
 	btn_remove_patch->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &PatchTablePanel::onBtnRemovePatch, this);
 	btn_change_patch->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &PatchTablePanel::onBtnChangePatch, this);
+	list_patches->Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &PatchTablePanel::onDisplayChanged, this);
+	combo_palette->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &PatchTablePanel::onDisplayChanged, this);
 }
 
 /* PatchTablePanel::~PatchTablePanel
@@ -366,5 +397,75 @@ void PatchTablePanel::onBtnChangePatch(wxCommandEvent& e) {
 
 		// Update the list
 		list_patches->updateList();
+	}
+}
+
+/* PatchTablePanel::onDisplayChanged
+ * Called when a different patch or palette is selected
+ * TODO: Separate palette changed and patch changed without breaking
+ * default palette display; optimize label_textures display, and find
+ * some way to convince wxWidgets to word-wrap it.
+ *******************************************************************/
+void PatchTablePanel::onDisplayChanged(wxCommandEvent& e) {
+	// Get selected patch
+	patch_t& patch = patch_table->patch(list_patches->getLastSelected());
+
+	// Check validity
+	ArchiveEntry * entry = patch_table->patchEntry(list_patches->getLastSelected());
+	if (entry == NULL)
+		return;
+
+	// Load the image
+	if (Misc::loadImageFromEntry(patch_canvas->getImage(), entry)) {
+		combo_palette->setGlobalFromArchive(entry->getParent());
+		patch_canvas->setPalette(combo_palette->getSelectedPalette());
+		patch_canvas->Refresh();
+		label_dimensions->SetLabel(s_fmt("Size: %d x %d", patch_canvas->getImage()->getWidth(), patch_canvas->getImage()->getHeight()));
+
+		// List which textures use this patch
+		if (patch.used_in.size() > 0) {
+			string alltextures = "";
+			int count = 0;
+			string previous = "";
+			for (size_t a = 0; a < patch.used_in.size(); ++a) {
+				string current = patch.used_in[a];
+
+				// Is the use repeated for the same texture?
+				if (!current.CmpNoCase(previous)) {
+					count++;
+				// Else it's a new texture
+				} else {
+					// First add the count to the previous texture if needed
+					if (count) {
+						alltextures += s_fmt(" (%i)", count + 1);
+						count = 0;
+					}
+
+					// Add a separator if appropriate
+					if (a > 0)
+						alltextures += ';';
+
+					// Automatic word-wrapping is not a feature worth the wxDevs' time apparently
+					if (!(a % 5))
+						alltextures+="\n";
+
+					// Then print the new texture's name
+					alltextures += s_fmt(" %s", patch.used_in[a].mb_str());
+
+					// And set it for comparison with the next one
+					previous = current;
+				}
+			}
+			// If count is still non-zero, it's because the patch was repeated in the last texture
+			if (count)
+				alltextures += s_fmt(" (%i)", count + 1);
+
+			// Finally display the listing
+			label_textures->SetLabel(s_fmt("In Textures:%s", alltextures.mb_str()));
+
+			// wxWidgets couldn't get some automatic word-wrapping function, could they?
+			//int width, height; label_textures->GetClientSize(&width, &height);
+			//label_textures->Wrap(width); doesn't work
+		} else label_textures->SetLabel("In Textures: -");
 	}
 }

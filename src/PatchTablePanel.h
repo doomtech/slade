@@ -4,6 +4,8 @@
 
 #include "PatchTable.h"
 #include "VirtualListView.h"
+#include "PaletteChooser.h"
+#include "GfxCanvas.h"
 
 class TextureXEditor;
 
@@ -33,6 +35,10 @@ private:
 	wxButton*			btn_change_patch;
 	wxButton*			btn_import_patch_file;
 	TextureXEditor*		parent;
+	GfxCanvas*			patch_canvas;
+	PaletteChooser*		combo_palette;
+	wxStaticText*		label_dimensions;
+	wxStaticText*		label_textures;
 
 public:
 	PatchTablePanel(wxWindow* parent, PatchTable* patch_table);
@@ -43,6 +49,7 @@ public:
 	void	onBtnPatchFromFile(wxCommandEvent& e);
 	void	onBtnRemovePatch(wxCommandEvent& e);
 	void	onBtnChangePatch(wxCommandEvent& e);
+	void	onDisplayChanged(wxCommandEvent& e);
 };
 
 #endif//__PATCH_TABLE_PANEL_H__
