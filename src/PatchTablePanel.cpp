@@ -219,9 +219,9 @@ PatchTablePanel::PatchTablePanel(wxWindow* parent, PatchTable* patch_table) : wx
 	framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
 	hbox->Add(framesizer, 1, wxEXPAND|wxALL, 4);
 	label_dimensions = new wxStaticText(this, -1, "Size: N/A");
-	framesizer->Add(label_dimensions, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT, 4);
-	label_textures = new wxStaticText(this, -1, "In Textures: -");
-	framesizer->Add(label_textures, 1, wxEXPAND/*|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT*/, 4);
+	framesizer->Add(label_dimensions, 0, wxEXPAND|wxALL, 4);
+	label_textures = new wxStaticText(this, -1, "In Textures: -", wxDefaultPosition, wxDefaultSize, wxST_ELLIPSIZE_END);
+	framesizer->Add(label_textures, 1, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
 	// Add patch canvas
 	frame = new wxStaticBox(this, -1, "Display");
@@ -403,69 +403,68 @@ void PatchTablePanel::onBtnChangePatch(wxCommandEvent& e) {
 /* PatchTablePanel::onDisplayChanged
  * Called when a different patch or palette is selected
  * TODO: Separate palette changed and patch changed without breaking
- * default palette display; optimize label_textures display, and find
- * some way to convince wxWidgets to word-wrap it.
+ * default palette display; optimize label_textures display
  *******************************************************************/
 void PatchTablePanel::onDisplayChanged(wxCommandEvent& e) {
 	// Get selected patch
 	patch_t& patch = patch_table->patch(list_patches->getLastSelected());
 
-	// Check validity
-	ArchiveEntry * entry = patch_table->patchEntry(list_patches->getLastSelected());
-	if (entry == NULL)
-		return;
-
 	// Load the image
+	ArchiveEntry * entry = patch_table->patchEntry(list_patches->getLastSelected());
 	if (Misc::loadImageFromEntry(patch_canvas->getImage(), entry)) {
 		combo_palette->setGlobalFromArchive(entry->getParent());
 		patch_canvas->setPalette(combo_palette->getSelectedPalette());
-		patch_canvas->Refresh();
 		label_dimensions->SetLabel(s_fmt("Size: %d x %d", patch_canvas->getImage()->getWidth(), patch_canvas->getImage()->getHeight()));
-
-		// List which textures use this patch
-		if (patch.used_in.size() > 0) {
-			string alltextures = "";
-			int count = 0;
-			string previous = "";
-			for (size_t a = 0; a < patch.used_in.size(); ++a) {
-				string current = patch.used_in[a];
-
-				// Is the use repeated for the same texture?
-				if (!current.CmpNoCase(previous)) {
-					count++;
-				// Else it's a new texture
-				} else {
-					// First add the count to the previous texture if needed
-					if (count) {
-						alltextures += s_fmt(" (%i)", count + 1);
-						count = 0;
-					}
-
-					// Add a separator if appropriate
-					if (a > 0)
-						alltextures += ';';
-
-					// Automatic word-wrapping is not a feature worth the wxDevs' time apparently
-					if (!(a % 5))
-						alltextures+="\n";
-
-					// Then print the new texture's name
-					alltextures += s_fmt(" %s", patch.used_in[a].mb_str());
-
-					// And set it for comparison with the next one
-					previous = current;
-				}
-			}
-			// If count is still non-zero, it's because the patch was repeated in the last texture
-			if (count)
-				alltextures += s_fmt(" (%i)", count + 1);
-
-			// Finally display the listing
-			label_textures->SetLabel(s_fmt("In Textures:%s", alltextures.mb_str()));
-
-			// wxWidgets couldn't get some automatic word-wrapping function, could they?
-			//int width, height; label_textures->GetClientSize(&width, &height);
-			//label_textures->Wrap(width); doesn't work
-		} else label_textures->SetLabel("In Textures: -");
 	}
+	else {
+		patch_canvas->getImage()->clear();
+		label_dimensions->SetLabel("Size: ? x ?");
+	}
+	patch_canvas->Refresh();
+
+	// List which textures use this patch
+	if (patch.used_in.size() > 0) {
+		string alltextures = "";
+		int count = 0;
+		string previous = "";
+		for (size_t a = 0; a < patch.used_in.size(); ++a) {
+			string current = patch.used_in[a];
+
+			// Is the use repeated for the same texture?
+			if (!current.CmpNoCase(previous)) {
+				count++;
+			// Else it's a new texture
+			} else {
+				// First add the count to the previous texture if needed
+				if (count) {
+					alltextures += s_fmt(" (%i)", count + 1);
+					count = 0;
+				}
+
+				// Add a separator if appropriate
+				if (a > 0)
+					alltextures += ';';
+
+				// Then print the new texture's name
+				alltextures += s_fmt(" %s", patch.used_in[a].mb_str());
+
+				// And set it for comparison with the next one
+				previous = current;
+			}
+		}
+		// If count is still non-zero, it's because the patch was repeated in the last texture
+		if (count)
+			alltextures += s_fmt(" (%i)", count + 1);
+
+		// Finally display the listing
+		label_textures->SetLabel(s_fmt("In Textures:%s", alltextures.mb_str()));
+	}
+	else
+		label_textures->SetLabel("In Textures: -");
+
+	// Wrap the text label
+	label_textures->Wrap(label_textures->GetSize().GetWidth());
+
+	// Update layout
+	Layout();
 }
