@@ -33,6 +33,7 @@
 #include "Archive.h"
 #include "TextureXEditor.h"
 #include "ArchiveEntry.h"
+#include "ArchiveManager.h"
 #include <wx/filename.h>
 
 
@@ -56,6 +57,9 @@ PatchTableListView::PatchTableListView(wxWindow* parent, PatchTable* patch_table
 
 	// Update list
 	updateList();
+
+	// Listen to archive manager
+	listenTo(theArchiveManager);
 }
 
 /* PatchTableListView::~PatchTableListView
@@ -163,6 +167,16 @@ void PatchTableListView::onAnnouncement(Announcer* announcer, string event_name,
 	// Just refresh on any event from the patch table
 	if (announcer == patch_table)
 		updateList();
+
+	if (announcer == theArchiveManager) {
+		if (event_name == "base_resource_changed") {
+			// Clear all patch entries
+			for (unsigned a = 0; a < patch_table->nPatches(); a++)
+				patch_table->patch(a).entry = NULL;
+		}
+
+		updateList();
+	}
 }
 
 
