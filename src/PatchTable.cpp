@@ -202,7 +202,15 @@ bool PatchTable::replacePatch(unsigned index, string newname) {
 /* PatchTable::addPatch
  * Adds a new patch with [name] to the end of the list
  *******************************************************************/
-bool PatchTable::addPatch(string name) {
+bool PatchTable::addPatch(string name, bool allow_dup) {
+	// Check patch doesn't already exist
+	if (!allow_dup) {
+		for (unsigned a = 0; a < patches.size(); a++) {
+			if (s_cmp(name, patches[a].name))
+				return false;
+		}
+	}
+
 	// Create/init new patch
 	patch_t patch;
 	patch.name = name;
@@ -237,6 +245,12 @@ void PatchTable::updatePatchEntry(unsigned index) {
 		entry = parent->findFirst(options);								// Search parent archive first
 	if (!entry)
 		entry = theArchiveManager->findResourceEntry(options, parent);	// Next search open resource archives + base resource archive
+	if (!entry) {
+		options.match_namespace = "global";								// Still not found, search global namespace
+		entry = parent->findFirst(options);
+	}
+	if (!entry)
+		entry = theArchiveManager->findResourceEntry(options, parent);
 
 	// Set patch entry
 	patch(index).entry = entry;
@@ -280,7 +294,7 @@ bool PatchTable::loadPNAMES(ArchiveEntry* pnames, Archive* parent) {
 		}
 
 		// Add new patch
-		bool success = addPatch(wxString(pname).Upper());
+		bool success = addPatch(wxString(pname).Upper(), true);
 	}
 
 	// Update variables

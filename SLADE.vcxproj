@@ -256,7 +256,6 @@
     <ClInclude Include="src\ArchiveEntry.h" />
     <ClInclude Include="src\ArchiveManager.h" />
     <ClInclude Include="src\EntryType.h" />
-    <ClInclude Include="src\EntryTypeList.h" />
     <ClInclude Include="src\WadArchive.h" />
     <ClInclude Include="src\ZipArchive.h" />
     <ClInclude Include="src\AnimatedList.h" />

@@ -1189,7 +1189,6 @@ void ArchiveManagerPanel::onMenu(wxCommandEvent& e) {
 	case MENU_GO:		goToBookmark();		break;	// Go To
 	case MENU_DELETE:	deleteSelectedBookmarks();	break;	// Delete
 	}
-
 }
 
 /* ArchiveManagerPanel::onArchiveTabChanged
@@ -1198,12 +1197,14 @@ void ArchiveManagerPanel::onMenu(wxCommandEvent& e) {
 void ArchiveManagerPanel::onArchiveTabChanged(wxAuiNotebookEvent& e) {
 	// If an archive tab is selected, set the frame title accordingly
 	int selection = notebook_archives->GetSelection();
+	/*
 	if (isArchivePanel(selection)) {
 		Archive* archive = ((ArchivePanel*)notebook_archives->GetPage(selection))->getArchive();
 		((wxFrame*)GetParent())->SetTitle(s_fmt("SLADE - %s", chr(archive->getFilename(false))));
 	}
 	else
 		((wxFrame*)GetParent())->SetTitle("SLADE");
+	*/
 }
 
 /* ArchiveManagerPanel::onArchiveTabClose
