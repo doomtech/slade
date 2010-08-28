@@ -197,6 +197,10 @@ bool TextureXEditor::openArchive(Archive* archive) {
 	if (!archive)
 		return false;
 
+	// Setup archive texture entries
+	if (!setupTextureEntries(archive))
+		return false;
+
 	// Search archive for any texture-related entries
 	Archive::search_options_t options;
 	options.match_type = EntryType::getType("texturex");
@@ -226,9 +230,11 @@ bool TextureXEditor::openArchive(Archive* archive) {
 		// Load patch table
 		patch_table.loadPNAMES(entry_pnames, archive);
 	}
+
+	/*
 	else {
 		// No TEXTUREx entries found, so ask if the user wishes to create one
-		wxMessageDialog dlg(this, "The archive does not contain any texture definitions (TEXTURE1/2 or TEXTURES). Do you wish to create a new texture definition list?", "No Texture Definitions Found", wxYES_NO);
+		wxMessageDialog dlg(this, "The archive does not contain any texture definitions (TEXTURE1/2 or TEXTURES). Do you wish to create or import a texture definition list?", "No Texture Definitions Found", wxYES_NO);
 
 		if (dlg.ShowModal() == wxID_YES) {
 			CreateTextureXDialog ctxd(this);
@@ -324,6 +330,7 @@ bool TextureXEditor::openArchive(Archive* archive) {
 		else
 			return false;
 	}
+	*/
 
 	// Open texture editor tabs
 	for (size_t a = 0; a < tx_entries.size(); a++) {
@@ -480,4 +487,145 @@ void TextureXEditor::onSaveClicked(wxCommandEvent& e) {
 		patch_table.writePNAMES(pnames);
 		pnames->lock();
 	}
+}
+
+
+/* TextureXEditor::setupTextureEntries
+ * Static function to check if an archive has sufficient texture
+ * related entries, and if not, prompts the user to either create
+ * or import them. Returns true if the entries exist, false otherwise
+ *******************************************************************/
+bool TextureXEditor::setupTextureEntries(Archive* archive) {
+	// Check any archive was given
+	if (!archive)
+		return false;
+
+	// Search archive for any texture-related entries
+	Archive::search_options_t options;
+	options.match_type = EntryType::getType("texturex");
+	ArchiveEntry* entry_tx = archive->findFirst(options);		// Find any TEXTUREx entry
+	options.match_type = EntryType::getType("pnames");
+	ArchiveEntry* entry_pnames = archive->findFirst(options);	// Find any PNAMES entry
+
+	// If both exist, we're done
+	if (entry_tx && entry_pnames)
+		return true;
+
+	// If no TEXTUREx entry exists
+	if (!entry_tx) {
+		// No TEXTUREx entries found, so ask if the user wishes to create one
+		wxMessageDialog dlg(NULL, "The archive does not contain any texture definitions (TEXTURE1/2 or TEXTURES). Do you wish to create or import a texture definition list?", "No Texture Definitions Found", wxYES_NO);
+
+		if (dlg.ShowModal() == wxID_YES) {
+			CreateTextureXDialog ctxd(NULL);
+
+			while (1) {
+				// Check if cancelled
+				if (ctxd.ShowModal() == wxID_CANCEL)
+					return false;
+
+				if (ctxd.createNewSelected()) {
+					// User selected to create a new TEXTUREx list
+					ArchiveEntry* texturex = NULL;
+
+					int format = ctxd.getSelectedFormat();
+					if (ctxd.getSelectedFormat() == TXF_NORMAL || ctxd.getSelectedFormat() == TXF_STRIFE11) {	// Doom or Strife TEXTUREx
+						// Create texture list
+						TextureXList txlist;
+						txlist.setFormat(ctxd.getSelectedFormat());
+						
+						// Create dummy texture
+						CTexture* dummytex = new CTexture();
+						dummytex->setName("DUMMY");
+
+						// Add dummy texture to list
+						// (this serves two purposes - supplies the special 'invalid' texture by default,
+						//   and allows the texturex format to be detected)
+						txlist.addTexture(dummytex);
+
+						// Add empty TEXTURE1 entry to archive
+						texturex = archive->addNewEntry("TEXTURE1");
+						txlist.writeTEXTUREXData(texturex, PatchTable());
+						texturex->setType(EntryType::getType("texturex"));
+						texturex->setExtensionByType();
+
+						// Add empty PNAMES entry to archive
+						entry_pnames = archive->addNewEntry("PNAMES");
+						entry_pnames->resize(4, false);
+						entry_pnames->getMCData().fillData(0);
+						entry_pnames->setType(EntryType::getType("pnames"));
+						entry_pnames->setExtensionByType();
+					}
+					else if (ctxd.getSelectedFormat() == TXF_TEXTURES) {
+						wxMessageBox("ZDoom TEXTURES Not Implemented");
+						return false;
+					}
+
+					if (!texturex)
+						return false;
+				}
+				else {
+					// User selected to import texture definitions from the base resource archive
+					Archive* bra = theArchiveManager->baseResourceArchive();
+
+					if (!bra) {
+						wxMessageBox("No Base Resource Archive is opened, please select/open one", "Error", wxICON_ERROR);
+						continue;
+					}
+
+					// Find all relevant entries in the base resource archive
+					Archive::search_options_t options;
+					options.match_type = EntryType::getType("texturex");
+					vector<ArchiveEntry*> import_tx = bra->findAll(options);	// Find all TEXTUREx entries
+					options.match_type = EntryType::getType("pnames");
+					ArchiveEntry* import_pnames = bra->findLast(options);		// Find last PNAMES entry
+
+					// Check enough entries exist
+					if (import_tx.size() == 0 || !import_pnames) {
+						wxMessageBox("The selected Base Resource Archive does not contain sufficient texture definition entries", "Error", wxICON_ERROR);
+						continue;
+					}
+
+					// Copy TEXTUREx entries over to current archive
+					for (unsigned a = 0; a < import_tx.size(); a++) {
+						ArchiveEntry* texturex = archive->addEntry(import_tx[a], "global", true);
+						texturex->setType(EntryType::getType("texturex"));
+						texturex->setExtensionByType();
+					}
+
+					// Copy PNAMES entry over to current archive
+					entry_pnames = archive->addEntry(import_pnames, "global", true);
+					entry_pnames->setType(EntryType::getType("pnames"));
+					entry_pnames->setExtensionByType();
+				}
+
+				break;
+			}
+
+			return true;
+		}
+
+		// 'No' clicked
+		return false;
+	}
+	else {	// TEXTUREx entry exists
+		// TODO: Probably a better idea here to get the user to select an archive to import the patch table from
+		// If no PNAMES entry was found, search resource archives
+		if (!entry_pnames) {
+			Archive::search_options_t options;
+			options.match_type = EntryType::getType("pnames");
+			entry_pnames = theArchiveManager->findResourceEntry(options, archive);
+		}
+
+		// If no PNAMES entry is found at all, show an error and abort
+		// TODO: ask user to select appropriate base resource archive
+		if (!entry_pnames) {
+			wxMessageBox("PNAMES entry not found!", wxMessageBoxCaptionStr, wxICON_ERROR);
+			return false;
+		}
+
+		return true;
+	}
+
+	return false;
 }

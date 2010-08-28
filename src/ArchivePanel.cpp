@@ -62,6 +62,9 @@ CVAR(Int, autosave_entry_changes, 2, CVAR_SAVE)	// 0=no, 1=yes, 2=ask
 const int MENU_GFX_CONVERT = 10001;
 const int MENU_GFX_MODIFY_OFFSETS = 10002;
 const int MENU_BAS_CONVERT = 10003;
+const int MENU_GFX_ADD_PATCH_TABLE = 10004;
+const int MENU_GFX_ADD_TEXTUREX = 10005;
+const int MENU_TEMP_END = 10100;
 
 
 /*******************************************************************
@@ -125,7 +128,7 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 	entry_list->Bind(wxEVT_KEY_DOWN, &ArchivePanel::onEntryListKeyDown, this);
 	entry_list->Bind(wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK, &ArchivePanel::onEntryListRightClick, this);
 	entry_list->Bind(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, &ArchivePanel::onEntryListActivated, this);
-	Bind(wxEVT_COMMAND_MENU_SELECTED, &ArchivePanel::onEntryMenuClick, this, MENU_GFX_CONVERT, MENU_BAS_CONVERT);
+	Bind(wxEVT_COMMAND_MENU_SELECTED, &ArchivePanel::onEntryMenuClick, this, MENU_GFX_CONVERT, MENU_TEMP_END);
 	((DefaultEntryPanel*)default_area)->getEditTextButton()->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &ArchivePanel::onDEPEditAsText, this);
 	((DefaultEntryPanel*)default_area)->getViewHexButton()->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &ArchivePanel::onDEPViewAsHex, this);
 
@@ -1064,6 +1067,10 @@ void ArchivePanel::handleAction(int menu_id) {
 		gfxModifyOffsets();
 	else if (menu_id == MENU_BAS_CONVERT)
 		basConvert();
+	else if (menu_id == MENU_GFX_ADD_PATCH_TABLE)
+		EntryOperations::addToPatchTable(entry_list->getSelectedEntries());
+	else if (menu_id == MENU_GFX_ADD_TEXTUREX)
+		EntryOperations::createTexture(entry_list->getSelectedEntries());
 }
 
 /* ArchivePanel::onAnnouncement
@@ -1187,6 +1194,8 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 		context->AppendSeparator();
 		context->Append(MENU_GFX_CONVERT, "Convert Gfx to...");
 		context->Append(MENU_GFX_MODIFY_OFFSETS, "Modify Gfx Offsets");
+		context->Append(MENU_GFX_ADD_PATCH_TABLE, "Add to Patch Table");
+		context->Append(MENU_GFX_ADD_TEXTUREX, "Add to TEXTUREx");
 	}
 
 	// Add Boom Animations/Switches related menu items if they are selected

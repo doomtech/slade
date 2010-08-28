@@ -11,6 +11,8 @@ namespace EntryOperations {
 	bool	modifytRNSChunk(ArchiveEntry* entry, bool value);
 	bool	getalPhChunk(ArchiveEntry* entry);
 	bool	gettRNSChunk(ArchiveEntry* entry);
+	bool	addToPatchTable(vector<ArchiveEntry*> entries);
+	bool	createTexture(vector<ArchiveEntry*> entries);
 };
 
 #endif//__ENTRYOPERATIONS_H__

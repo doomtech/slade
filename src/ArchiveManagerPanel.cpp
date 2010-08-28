@@ -307,7 +307,7 @@ void ArchiveManagerPanel::updateOpenListItem(int index) {
 
 	// Set item name
 	list_archives->setItemText(index, 0, fn.GetFullName());
-	list_archives->setItemText(index, 1, fn.GetPath(true));
+	list_archives->setItemText(index, 1, fn.GetPath());
 
 	// Set item status colour
 	if (archive->canSave()) {
@@ -330,7 +330,7 @@ void ArchiveManagerPanel::updateRecentListItem(int index) {
 
 	// Set item name
 	list_recent->setItemText(index, 0, fn.GetFullName());
-	list_recent->setItemText(index, 1, fn.GetPath(true));
+	list_recent->setItemText(index, 1, fn.GetPath());
 }
 
 /* ArchiveManagerPanel::isArchivePanel

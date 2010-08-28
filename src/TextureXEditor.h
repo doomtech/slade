@@ -40,6 +40,9 @@ public:
 	// Events
 	void	onPaletteChanged(wxCommandEvent& e);
 	void	onSaveClicked(wxCommandEvent& e);
+
+	// Static
+	static bool	setupTextureEntries(Archive* archive);
 };
 
 #endif//__TEXTUREX_EDITOR_H__

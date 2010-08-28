@@ -28,10 +28,12 @@
  * INCLUDES
  *******************************************************************/
 #include "Main.h"
+#include "WxStuff.h"
 #include "EntryOperations.h"
 #include "Misc.h"
 #include "Console.h"
 #include "ArchiveManager.h"
+#include "TextureXEditor.h"
 #include <wx/filename.h>
 #include <wx/utils.h>
 
@@ -599,6 +601,153 @@ bool EntryOperations::gettRNSChunk(ArchiveEntry* entry) {
 	}
 	return false;
 }
+
+bool EntryOperations::addToPatchTable(vector<ArchiveEntry*> entries) {
+	// Check any entries were given
+	if (entries.size() == 0)
+		return true;
+
+	// Get parent archive
+	Archive* parent = entries[0]->getParent();
+
+	// Find patch table in parent archive
+	Archive::search_options_t opt;
+	opt.match_type = EntryType::getType("pnames");
+	ArchiveEntry* pnames = parent->findLast(opt);
+
+	// Check it exists
+	if (!pnames) {
+		// Create texture entries
+		if (!TextureXEditor::setupTextureEntries(parent))
+			return false;
+
+		pnames = parent->findLast(opt);
+	}
+
+	// Check it isn't locked (texturex editor open or iwad)
+	if (pnames->isLocked()) {
+		if (parent->isReadOnly())
+			wxMessageBox("Cannot perform this action on an IWAD", "Error", wxICON_ERROR);
+		else
+			wxMessageBox("Cannot perform this action because one or more texture related entries is locked. Please close the archive's texture editor if it is open.", "Error", wxICON_ERROR);
+
+		return false;
+	}
+
+	// Load to patch table
+	PatchTable ptable;
+	ptable.loadPNAMES(pnames);
+
+	// Add entry names to patch table
+	for (unsigned a = 0; a < entries.size(); a++) {
+		// Check entry type
+		if (!(entries[a]->getType()->extraProps().propertyExists("image"))) {
+			wxLogMessage("Entry %s is not a valid image", entries[a]->getName());
+			continue;
+		}
+
+		// Check entry name
+		if (entries[a]->getName(true).Length() > 8) {
+			wxLogMessage("Entry %s has too long a name to add to the patch table (name must be 8 characters max)", entries[a]->getName());
+			continue;
+		}
+
+		ptable.addPatch(entries[a]->getName(true));
+	}
+
+	// Write patch table data back to pnames entry
+	return ptable.writePNAMES(pnames);
+}
+
+bool EntryOperations::createTexture(vector<ArchiveEntry*> entries) {
+	// Check any entries were given
+	if (entries.size() == 0)
+		return true;
+
+	// Get parent archive
+	Archive* parent = entries[0]->getParent();
+
+	// Create texture entries if needed
+	if (!TextureXEditor::setupTextureEntries(parent))
+		return false;
+
+	// Find patch table in parent archive
+	Archive::search_options_t opt;
+	opt.match_type = EntryType::getType("pnames");
+	ArchiveEntry* pnames = parent->findLast(opt);
+
+	// Check it exists
+	if (!pnames)
+		return false;
+
+	// Find texturex entry to add to
+	opt.match_type = EntryType::getType("texturex");
+	ArchiveEntry* texturex = parent->findFirst(opt);
+
+	// Check it exists
+	if (!texturex)
+		return false;
+
+	// Check entries aren't locked (texture editor open or iwad)
+	if (pnames->isLocked() || texturex->isLocked()) {
+		if (parent->isReadOnly())
+			wxMessageBox("Cannot perform this action on an IWAD", "Error", wxICON_ERROR);
+		else
+			wxMessageBox("Cannot perform this action because one or more texture related entries is locked. Please close the archive's texture editor if it is open.", "Error", wxICON_ERROR);
+
+		return false;
+	}
+
+	// Load patch table
+	PatchTable ptable;
+	ptable.loadPNAMES(pnames);
+
+	// Load texture list
+	TextureXList tx;
+	tx.readTEXTUREXData(texturex, ptable);
+
+	// Create textures from entries
+	SImage image;
+	for (unsigned a = 0; a < entries.size(); a++) {
+		// Check entry type
+		if (!(entries[a]->getType()->extraProps().propertyExists("image"))) {
+			wxLogMessage("Entry %s is not a valid image", entries[a]->getName());
+			continue;
+		}
+
+		// Check entry name
+		string name = entries[a]->getName(true);
+		if (name.Length() > 8) {
+			wxLogMessage("Entry %s has too long a name to add to the patch table (name must be 8 characters max)", entries[a]->getName());
+			continue;
+		}
+
+		// Add to patch table
+		ptable.addPatch(name);
+
+		// Load patch to temp image
+		Misc::loadImageFromEntry(&image, entries[a]);
+
+		// Create texture
+		CTexture* ntex = new CTexture();
+		ntex->setName(name);
+		ntex->addPatch(name, 0, 0);
+		ntex->setWidth(image.getWidth());
+		ntex->setHeight(image.getHeight());
+
+		// Add to texture list
+		tx.addTexture(ntex);
+	}
+
+	// Write patch table data back to pnames entry
+	ptable.writePNAMES(pnames);
+
+	// Write texture data back to texturex entry
+	tx.writeTEXTUREXData(texturex, ptable);
+
+	return true;
+}
+
 
 /*******************************************************************
  * CONSOLE COMMANDS
