@@ -70,6 +70,12 @@ CTPatch::~CTPatch() {
  * CTexture class constructor
  *******************************************************************/
 CTexture::CTexture() {
+	this->width = 0;
+	this->height = 0;
+	this->name = "";
+	this->scale_tx = false;
+	this->scale_x = 1.0;
+	this->scale_y = 1.0;
 }
 
 /* CTexture::~CTexture

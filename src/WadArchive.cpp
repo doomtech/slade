@@ -685,7 +685,7 @@ vector<Archive::mapdesc_t> WadArchive::detectMaps() {
 				if (entry->getName() == "ENDMAP")
 					done = true;
 				else
-					i++;
+					entry = getEntry(++i);
 			}
 
 			// Set end lump
@@ -711,7 +711,7 @@ vector<Archive::mapdesc_t> WadArchive::detectMaps() {
 		bool maplump_found = false;
 		for (int a = 0; a < 5; a++) {
 			// Compare with all base map lump names
-			if (entry->getName() == map_lumps[a]) {
+			if (s_cmp(entry->getName(), map_lumps[a])) {
 				maplump_found = true;
 				existing_map_lumps[a] = 1;
 				break;
@@ -731,14 +731,14 @@ vector<Archive::mapdesc_t> WadArchive::detectMaps() {
 
 				// If we're at the end of the wad, exit the loop
 				if (i == numEntries()) {
-					i--;
+					entry = getEntry(--i);
 					break;
 				}
 
 				// Compare with all map lump names
 				for (int a = 0; a < 12; a++) {
 					// Compare with all base map lump names
-					if (entry->getName() == map_lumps[a]) {
+					if (s_cmp(entry->getName(), map_lumps[a])) {
 						existing_map_lumps[a] = 1;
 						done = false;
 						break;
@@ -746,11 +746,11 @@ vector<Archive::mapdesc_t> WadArchive::detectMaps() {
 				}
 
 				// Go to next lump
-				i++;
+				entry = getEntry(++i);
 			}
 
 			// Go back to the lump just after the last map lump found
-			i--;
+			entry = getEntry(--i);
 
 			// Check that we have all the required map lumps: VERTEXES, LINEDEFS, SIDEDEFS, THINGS & SECTORS
 			if (!memchr(existing_map_lumps, 0, 5)) {
