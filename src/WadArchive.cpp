@@ -930,7 +930,7 @@ ArchiveEntry* WadArchive::findLast(search_options_t& options) {
  *******************************************************************/
 vector<ArchiveEntry*> WadArchive::findAll(search_options_t& options) {
 	// Init search variables
-	ArchiveEntry* start = getEntry(numEntries()-1);
+	ArchiveEntry* start = getEntry(0);
 	ArchiveEntry* end = NULL;
 	options.match_name = options.match_name.Lower();
 	vector<ArchiveEntry*> ret;
@@ -940,8 +940,8 @@ vector<ArchiveEntry*> WadArchive::findAll(search_options_t& options) {
 		// Find matching namespace
 		for (unsigned a = 0; a < namespaces.size(); a++) {
 			if (namespaces[a].name == options.match_namespace) {
-				start = namespaces[a].end->prevEntry();
-				end = namespaces[a].start;
+				start = namespaces[a].start->nextEntry();
+				end = namespaces[a].end;
 				break;
 			}
 		}
@@ -953,12 +953,12 @@ vector<ArchiveEntry*> WadArchive::findAll(search_options_t& options) {
 		if (options.match_type) {
 			if (entry->getType() == EntryType::unknownType()) {
 				if (!options.match_type->isThisType(entry)) {
-					entry = entry->prevEntry();
+					entry = entry->nextEntry();
 					continue;
 				}
 			}
 			else if (options.match_type != entry->getType()) {
-				entry = entry->prevEntry();
+				entry = entry->nextEntry();
 				continue;
 			}
 		}
@@ -969,7 +969,7 @@ vector<ArchiveEntry*> WadArchive::findAll(search_options_t& options) {
 			options.match_name.MakeLower();
 
 			if (!options.match_name.Matches(entry->getName().Lower())) {
-				entry = entry->prevEntry();
+				entry = entry->nextEntry();
 				continue;
 			}
 		}
