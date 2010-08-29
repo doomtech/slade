@@ -630,8 +630,8 @@ void ArchiveManager::addRecentFile(string path) {
 	// Add the file to the top of the list
 	recent_files.insert(recent_files.begin(), path);
 
-	// List is 8 files max
-	while (recent_files.size() > 8)
+	// Keep it trimmed
+	while (recent_files.size() > MAX_RECENT_FILES)
 		recent_files.pop_back();
 
 	// Announce

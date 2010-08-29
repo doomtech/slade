@@ -224,7 +224,9 @@ void ArchiveManagerPanel::refreshRecentFileList() {
 	for (unsigned a = 0; a < theArchiveManager->numRecentFiles(); a++) {
 		list_recent->addItem(a, wxEmptyString);
 		updateRecentListItem(a);
-		menu_recent->Append(MainWindow::MENU_RECENT_1+a, theArchiveManager->recentFile(a));
+
+		if (a <= 8)
+			menu_recent->Append(MainWindow::MENU_RECENT_1+a, theArchiveManager->recentFile(a));
 	}
 
 	// Update size

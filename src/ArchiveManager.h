@@ -5,6 +5,8 @@
 #include "ListenerAnnouncer.h"
 #include "Archive.h"
 
+#define MAX_RECENT_FILES 20
+
 class ArchiveManager : public Announcer, Listener {
 private:
 	struct archive_t {
