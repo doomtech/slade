@@ -333,6 +333,9 @@
     <ClCompile Include="src\HexEditorPanel.cpp">
       <Filter>UI Elements</Filter>
     </ClCompile>
+    <ClCompile Include="src\MapEntryPanel.cpp">
+      <Filter>Main Editor\UI Elements\EntryPanel</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -611,6 +614,9 @@
     </ClInclude>
     <ClInclude Include="src\HexEditorPanel.h">
       <Filter>UI Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MapEntryPanel.h">
+      <Filter>Main Editor\UI Elements\EntryPanel</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

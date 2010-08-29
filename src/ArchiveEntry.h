@@ -28,6 +28,8 @@ private:
 
 	// Misc stuff
 	int				reliability;	// The reliability of the entry's identification
+	ArchiveEntry*	next;
+	ArchiveEntry*	prev;
 
 public:
 	ArchiveEntry(string name = "", uint32_t size = 0);
@@ -48,6 +50,8 @@ public:
 	uint8_t				getState()			{ return state; }
 	bool				isLocked()			{ return locked; }
 	bool				isLoaded()			{ return data_loaded; }
+	ArchiveEntry*		nextEntry()			{ return next; }
+	ArchiveEntry*		prevEntry()			{ return prev; }
 
 	// Modifiers (won't change entry state, except setState of course :P)
 	void		setName(string name) { this->name = name; }

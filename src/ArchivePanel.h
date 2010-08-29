@@ -24,6 +24,7 @@ protected:
 	EntryPanel* switches_area;
 	EntryPanel* pnames_area;
 	EntryPanel* hex_area;
+	EntryPanel* map_area;
 
 public:
 	ArchivePanel(wxWindow *parent, Archive* archive);

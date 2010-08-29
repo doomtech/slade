@@ -189,10 +189,20 @@ bool ArchiveTreeNode::addEntry(ArchiveEntry* entry, unsigned index) {
 		return false;
 
 	// Check index
-	if (index >= entries.size())
-		entries.push_back(entry);	// Invalid index, add to end of list
-	else
+	if (index >= entries.size()) {
+		// 'Invalid' index, add to end of list
+		if (entries.size() > 0) {
+			entries.back()->next = entry;
+			entry->prev = entries.back();
+		}
+		entries.push_back(entry);
+		entry->next = NULL;
+	}
+	else {
+		if (index > 0) entries[index-1]->next = entry;
+		entries[index]->prev = entry;
 		entries.insert(entries.begin() + index, entry);
+	}
 
 	// Set entry's parent to this node
 	entry->parent = this;
@@ -212,6 +222,12 @@ bool ArchiveTreeNode::removeEntry(unsigned index) {
 	// De-parent entry
 	entries[index]->parent = NULL;
 
+	// De-link entry
+	entries[index]->prev = NULL;
+	entries[index]->next = NULL;
+	if (index > 0) entries[index-1] = getEntry(index+1);
+	if (index < entries.size()-1) entries[index+1] = getEntry(index-1);
+
 	// Remove it from the entry list
 	entries.erase(entries.begin() + index);
 
@@ -225,13 +241,24 @@ bool ArchiveTreeNode::removeEntry(unsigned index) {
  *******************************************************************/
 bool ArchiveTreeNode::swapEntries(unsigned index1, unsigned index2) {
 	// Check indices
-	if (index1 >= entries.size() || index2 >= entries.size())
+	if (index1 >= entries.size() || index2 >= entries.size() || index1==index2)
 		return false;
 
-	// Do swap
-	ArchiveEntry* temp = entries[index1];
-	entries[index1] = entries[index2];
-	entries[index2] = temp;
+	// Get entries to swap
+	ArchiveEntry* entry1 = entries[index1];
+	ArchiveEntry* entry2 = entries[index2];
+
+	// Swap links
+	ArchiveEntry* e1prev = entry1->prev;
+	ArchiveEntry* e1next = entry1->next;
+	entry1->prev = entry2->prev;
+	entry1->next = entry2->next;
+	entry2->prev = e1prev;
+	entry2->next = e1next;
+
+	// Swap entries
+	entries[index1] = entry1;
+	entries[index2] = entry2;
 
 	return true;
 }

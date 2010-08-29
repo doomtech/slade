@@ -42,6 +42,7 @@
 #include "AnimatedEntryPanel.h"
 #include "SwitchesEntryPanel.h"
 #include "HexEntryPanel.h"
+#include "MapEntryPanel.h"
 #include "GfxConvDialog.h"
 #include "ModifyOffsetsDialog.h"
 #include "EntryOperations.h"
@@ -89,6 +90,7 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 	animated_area = new AnimatedEntryPanel(this);
 	switches_area = new SwitchesEntryPanel(this);
 	hex_area = new HexEntryPanel(this);
+	map_area = new MapEntryPanel(this);
 
 
 	// --- Setup Layout ---
@@ -890,7 +892,9 @@ bool ArchivePanel::openEntry(ArchiveEntry* entry, bool force) {
 
 	// Get the appropriate entry panel for the entry's type
 	EntryPanel* new_area = default_area;
-	if (!entry->getType()->getEditor().Cmp("gfx"))
+	if (entry->getType() == EntryType::mapMarkerType())
+		new_area = map_area;
+	else if (!entry->getType()->getEditor().Cmp("gfx"))
 		new_area = gfx_area;
 	else if (!entry->getType()->getEditor().Cmp("palette"))
 		new_area = pal_area;

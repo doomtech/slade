@@ -20,6 +20,8 @@ ArchiveEntry::ArchiveEntry(string name, uint32_t size) {
 	this->locked = false;
 	this->state_locked = false;
 	this->reliability = 0;
+	this->next = NULL;
+	this->prev = NULL;
 }
 
 /* ArchiveEntry::ArchiveEntry
@@ -27,7 +29,6 @@ ArchiveEntry::ArchiveEntry(string name, uint32_t size) {
  *******************************************************************/
 ArchiveEntry::ArchiveEntry(ArchiveEntry& copy) {
 	// Copy attributes
-	//parent = copy.getParent();
 	name = copy.getName();
 	size = copy.getSize();
 	data_loaded = true;

@@ -112,6 +112,7 @@
     <ClCompile Include="src\HexEditorPanel.cpp" />
     <ClCompile Include="src\HexEntryPanel.cpp" />
     <ClCompile Include="src\LibArchive.cpp" />
+    <ClCompile Include="src\MapEntryPanel.cpp" />
     <ClCompile Include="src\ModifyOffsetsDialog.cpp" />
     <ClCompile Include="src\PaletteDialog.cpp" />
     <ClCompile Include="src\Clipboard.cpp" />
@@ -201,6 +202,7 @@
     <ClInclude Include="src\HexEntryPanel.h" />
     <ClInclude Include="src\ImageFormats.h" />
     <ClInclude Include="src\LibArchive.h" />
+    <ClInclude Include="src\MapEntryPanel.h" />
     <ClInclude Include="src\MiscFormats.h" />
     <ClInclude Include="src\ModelFormats.h" />
     <ClInclude Include="src\ModifyOffsetsDialog.h" />

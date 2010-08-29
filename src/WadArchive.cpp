@@ -657,18 +657,16 @@ vector<Archive::mapdesc_t> WadArchive::detectMaps() {
 	vector<mapdesc_t> maps;
 
 	// Go through all lumps
-	size_t i = 0;
-	while (i < numEntries()) {
-		ArchiveEntry* entry = getEntry(i);
-
+	ArchiveEntry* entry = getEntry(0);
+	while (entry) {
 		// UDMF format map check ********************************************************
 
 		// Check for UDMF format map lump (TEXTMAP lump)
-		if (entry->getName() == "TEXTMAP" && i > 0) {
+		if (entry->getName() == "TEXTMAP" && entry->prevEntry()) {
 			// Get map info
 			mapdesc_t md;
-			md.head = getEntry(i - 1); // Header lump
-			md.name = getEntry(i - 1)->getName(); // Map title
+			md.head = entry->prevEntry(); // Header lump
+			md.name = entry->prevEntry()->getName(); // Map title
 			md.format = 2; // Format = 2 (UDMF)
 
 			// Skip lumps until we find the ENDMAP marker
@@ -676,7 +674,7 @@ vector<Archive::mapdesc_t> WadArchive::detectMaps() {
 			while (!done) {
 				// If we've somehow reached the end of the wad without finding ENDMAP,
 				// log an error and return
-				if (i == numEntries()) {
+				if (!entry) {
 					wxLogMessage("UDMF Map with no ENDMAP marker in %s", filename.c_str());
 					return maps;
 				}
@@ -685,7 +683,7 @@ vector<Archive::mapdesc_t> WadArchive::detectMaps() {
 				if (entry->getName() == "ENDMAP")
 					done = true;
 				else
-					entry = getEntry(++i);
+					entry = entry->nextEntry();
 			}
 
 			// Set end lump
@@ -696,7 +694,7 @@ vector<Archive::mapdesc_t> WadArchive::detectMaps() {
 
 			// Current index is ENDMAP, we don't want to check for a doom/hexen format
 			// map so just go to the next index and continue the loop
-			i++;
+			entry = entry->nextEntry();
 			continue;
 		}
 
@@ -720,20 +718,14 @@ vector<Archive::mapdesc_t> WadArchive::detectMaps() {
 
 		// If we've found what might be a map
 		if (maplump_found) {
-			// Save position of map header lump
-			int header_index = i - 1;
+			// Save map header entry
+			ArchiveEntry* header_entry = entry->prevEntry();
 
 			// Check off map lumps until we find a non-map lump
 			bool done = false;
 			while (!done) {
 				// Loop will end if no map lump is found
 				done = true;
-
-				// If we're at the end of the wad, exit the loop
-				if (i == numEntries()) {
-					entry = getEntry(--i);
-					break;
-				}
 
 				// Compare with all map lump names
 				for (int a = 0; a < 12; a++) {
@@ -745,20 +737,26 @@ vector<Archive::mapdesc_t> WadArchive::detectMaps() {
 					}
 				}
 
+				// If we're at the end of the wad, exit the loop
+				if (!entry->nextEntry()) {
+					entry = entry->prevEntry();
+					break;
+				}
+
 				// Go to next lump
-				entry = getEntry(++i);
+				entry = entry->nextEntry();
 			}
 
 			// Go back to the lump just after the last map lump found
-			entry = getEntry(--i);
+			entry = entry->prevEntry();
 
 			// Check that we have all the required map lumps: VERTEXES, LINEDEFS, SIDEDEFS, THINGS & SECTORS
 			if (!memchr(existing_map_lumps, 0, 5)) {
 				// Get map info
 				mapdesc_t md;
-				md.head = getEntry(header_index);				// Header lump
-				md.name = getEntry(header_index)->getName();	// Map title
-				md.end = getEntry(i - 1);						// End lump
+				md.head = header_entry;				// Header lump
+				md.name = header_entry->getName();	// Map title
+				md.end = entry->prevEntry();		// End lump
 
 				// If BEHAVIOR lump exists, it's a hexen format map, otherwise it's doom format
 				if (existing_map_lumps[11])
@@ -779,7 +777,7 @@ vector<Archive::mapdesc_t> WadArchive::detectMaps() {
 
 
 		// Not a UDMF or Doom/Hexen map lump, go to next lump
-		i++;
+		entry = entry->nextEntry();
 	}
 
 	// Set all map header entries to ETYPE_MAP type
@@ -817,8 +815,8 @@ string WadArchive::detectNamespace(ArchiveEntry* entry) {
  *******************************************************************/
 ArchiveEntry* WadArchive::findFirst(search_options_t& options) {
 	// Init search variables
-	int start = 0;
-	int end = numEntries();
+	ArchiveEntry* start = getEntry(0);
+	ArchiveEntry* end = NULL;
 	options.match_name = options.match_name.Lower();
 
 	// Check for namespace to search
@@ -826,26 +824,28 @@ ArchiveEntry* WadArchive::findFirst(search_options_t& options) {
 		// Find matching namespace
 		for (unsigned a = 0; a < namespaces.size(); a++) {
 			if (namespaces[a].name == options.match_namespace) {
-				start = entryIndex(namespaces[a].start) + 1;
-				end = entryIndex(namespaces[a].end);
+				start = namespaces[a].start->nextEntry();
+				end = namespaces[a].end;
 				break;
 			}
 		}
 	}
 
 	// Begin search
-	ArchiveEntry* entry = NULL;
-	for (int a = start; a < end; a++) {
-		entry = getEntry(a);
-
+	ArchiveEntry* entry = start;
+	while (entry != end) {
 		// Check type
 		if (options.match_type) {
 			if (entry->getType() == EntryType::unknownType()) {
-				if (!options.match_type->isThisType(entry))
+				if (!options.match_type->isThisType(entry)) {
+					entry = entry->nextEntry();
 					continue;
+				}
 			}
-			else if (options.match_type != entry->getType())
+			else if (options.match_type != entry->getType()) {
+				entry = entry->nextEntry();
 				continue;
+			}
 		}
 
 		// Check name
@@ -853,8 +853,10 @@ ArchiveEntry* WadArchive::findFirst(search_options_t& options) {
 			// Force case insensitivity
 			options.match_name.MakeLower();
 
-			if (!options.match_name.Matches(entry->getName().Lower()))
+			if (!options.match_name.Matches(entry->getName().Lower())) {
+				entry = entry->nextEntry();
 				continue;
+			}
 		}
 
 		// Entry passed all checks so far, so we found a match
@@ -871,8 +873,8 @@ ArchiveEntry* WadArchive::findFirst(search_options_t& options) {
  *******************************************************************/
 ArchiveEntry* WadArchive::findLast(search_options_t& options) {
 	// Init search variables
-	int start = 0;
-	int end = numEntries();
+	ArchiveEntry* start = getEntry(numEntries()-1);
+	ArchiveEntry* end = NULL;
 	options.match_name = options.match_name.Lower();
 
 	// Check for namespace to search
@@ -880,26 +882,28 @@ ArchiveEntry* WadArchive::findLast(search_options_t& options) {
 		// Find matching namespace
 		for (unsigned a = 0; a < namespaces.size(); a++) {
 			if (namespaces[a].name == options.match_namespace) {
-				start = entryIndex(namespaces[a].start) + 1;
-				end = entryIndex(namespaces[a].end);
+				start = namespaces[a].end->prevEntry();
+				end = namespaces[a].start;
 				break;
 			}
 		}
 	}
 
-	// Begin search (bottom-up)
-	ArchiveEntry* entry = NULL;
-	for (int a = end - 1; a >= start; a--) {
-		entry = getEntry(a);
-
+	// Begin search
+	ArchiveEntry* entry = start;
+	while (entry != end) {
 		// Check type
 		if (options.match_type) {
 			if (entry->getType() == EntryType::unknownType()) {
-				if (!options.match_type->isThisType(entry))
+				if (!options.match_type->isThisType(entry)) {
+					entry = entry->prevEntry();
 					continue;
+				}
 			}
-			else if (options.match_type != entry->getType())
+			else if (options.match_type != entry->getType()) {
+				entry = entry->prevEntry();
 				continue;
+			}
 		}
 
 		// Check name
@@ -907,8 +911,10 @@ ArchiveEntry* WadArchive::findLast(search_options_t& options) {
 			// Force case insensitivity
 			options.match_name.MakeLower();
 
-			if (!options.match_name.Matches(entry->getName().Lower()))
+			if (!options.match_name.Matches(entry->getName().Lower())) {
+				entry = entry->prevEntry();
 				continue;
+			}
 		}
 
 		// Entry passed all checks so far, so we found a match
@@ -924,8 +930,8 @@ ArchiveEntry* WadArchive::findLast(search_options_t& options) {
  *******************************************************************/
 vector<ArchiveEntry*> WadArchive::findAll(search_options_t& options) {
 	// Init search variables
-	int start = 0;
-	int end = numEntries();
+	ArchiveEntry* start = getEntry(numEntries()-1);
+	ArchiveEntry* end = NULL;
 	options.match_name = options.match_name.Lower();
 	vector<ArchiveEntry*> ret;
 
@@ -934,26 +940,27 @@ vector<ArchiveEntry*> WadArchive::findAll(search_options_t& options) {
 		// Find matching namespace
 		for (unsigned a = 0; a < namespaces.size(); a++) {
 			if (namespaces[a].name == options.match_namespace) {
-				start = entryIndex(namespaces[a].start) + 1;
-				end = entryIndex(namespaces[a].end);
+				start = namespaces[a].end->prevEntry();
+				end = namespaces[a].start;
 				break;
 			}
 		}
 	}
 
-	// Begin search
-	ArchiveEntry* entry = NULL;
-	for (int a = start; a < end; a++) {
-		entry = getEntry(a);
-
+	ArchiveEntry* entry = start;
+	while (entry != end) {
 		// Check type
 		if (options.match_type) {
 			if (entry->getType() == EntryType::unknownType()) {
-				if (!options.match_type->isThisType(entry))
+				if (!options.match_type->isThisType(entry)) {
+					entry = entry->prevEntry();
 					continue;
+				}
 			}
-			else if (options.match_type != entry->getType())
+			else if (options.match_type != entry->getType()) {
+				entry = entry->prevEntry();
 				continue;
+			}
 		}
 
 		// Check name
@@ -961,12 +968,15 @@ vector<ArchiveEntry*> WadArchive::findAll(search_options_t& options) {
 			// Force case insensitivity
 			options.match_name.MakeLower();
 
-			if (!options.match_name.Matches(entry->getName().Lower()))
+			if (!options.match_name.Matches(entry->getName().Lower())) {
+				entry = entry->prevEntry();
 				continue;
+			}
 		}
 
 		// Entry passed all checks so far, so we found a match
 		ret.push_back(entry);
+		entry = entry->nextEntry();
 	}
 
 	// Return search result
