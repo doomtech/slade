@@ -533,7 +533,7 @@ bool TextureXEditor::setupTextureEntries(Archive* archive) {
 						// Create texture list
 						TextureXList txlist;
 						txlist.setFormat(ctxd.getSelectedFormat());
-						
+
 						// Create dummy texture
 						CTexture* dummytex = new CTexture();
 						dummytex->setName("DUMMY");
@@ -545,7 +545,8 @@ bool TextureXEditor::setupTextureEntries(Archive* archive) {
 
 						// Add empty TEXTURE1 entry to archive
 						texturex = archive->addNewEntry("TEXTURE1");
-						txlist.writeTEXTUREXData(texturex, PatchTable());
+						PatchTable ptt;
+						txlist.writeTEXTUREXData(texturex, ptt);
 						texturex->setType(EntryType::getType("texturex"));
 						texturex->setExtensionByType();
 

@@ -19,7 +19,6 @@ TODO List ---------------------------------------------------------------
 
 --- Bugs ---
 - Copy/paste entry parent problem
-- Gfx panel bottom bar resizing
 
 --- Editor Features ---
 - Map editor (!)
