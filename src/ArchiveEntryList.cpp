@@ -314,7 +314,7 @@ void ArchiveEntryList::applyFilter() {
 	unsigned index = 0;
 	ArchiveEntry* entry = getEntry(index);
 	while (entry) {
-		if (filter_category.IsEmpty())
+		if (filter_category.IsEmpty() || entry->getType() == EntryType::folderType())
 			filter.push_back(index);	// If no category specified, just add all entries to the filter
 		else {
 			// Check for category match
