@@ -70,6 +70,7 @@ public:
 	static wxArrayString		getIconList();
 	static void					cleanupEntryTypes();
 	static vector<EntryType*>	allTypes();
+	static vector<string>		allCategories();
 };
 
 #endif//__ENTRYTYPE_H__

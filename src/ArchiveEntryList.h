@@ -11,9 +11,10 @@
 class ArchiveEntryList : public VirtualListView, public Listener {
 private:
 	Archive*			archive;
-	wxTextCtrl*			text_filter;
 	vector<unsigned>	filter;
 	bool				filter_active;
+	string				filter_name;
+	string				filter_category;
 	ArchiveTreeNode*	current_dir;
 	ArchiveEntry*		entry_dir_back;
 
@@ -38,13 +39,14 @@ public:
 	ArchiveTreeNode*	getCurrentDir() { return current_dir; }
 
 	void	setArchive(Archive* archive);
-	void	setFilterCtrl(wxTextCtrl* text_filter);
 
 	void	setupColumns();
 	int		columnType(int column) const;
 	void	updateList();
-	void	filterList(string filter);
 	int		entriesBegin();
+
+	void	filterList(string filter = "", string category = "");
+	void	applyFilter();
 
 	ArchiveEntry*				getEntry(int index) const;
 	ArchiveEntry*				getFocusedEntry();
@@ -58,7 +60,6 @@ public:
 	void	onColumnHeaderRightClick(wxListEvent& e);
 	void	onColumnResize(wxListEvent& e);
 	void	onMenu(wxCommandEvent& e);
-	void	onFilterChanged(wxCommandEvent& e);
 	void	onListItemActivated(wxListEvent& e);
 };
 

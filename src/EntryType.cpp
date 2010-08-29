@@ -45,7 +45,8 @@
  * VARIABLES
  *******************************************************************/
 
-vector<EntryType*>	entry_types;	// The big list of all entry types
+vector<EntryType*>	entry_types;		// The big list of all entry types
+vector<string>		entry_categories;	// All entry type categories
 
 // Special entry types
 EntryType			etype_unknown;	// The default, 'unknown' entry type
@@ -130,6 +131,7 @@ void EntryType::copyToType(EntryType* target) {
 	target->icon = icon;
 	target->name = name;
 	target->reliability = reliability;
+	target->category = category;
 
 	// Copy type match criteria
 	target->format = format;
@@ -377,6 +379,16 @@ bool EntryType::readEntryTypeDefinition(MemChunk& mc) {
 			}
 			else if (s_cmpnocase(fieldnode->getName(), "category")) {		// Type category
 				ntype->category = fieldnode->getStringValue();
+
+				// Add to category list if needed
+				bool exists = false;
+				for (unsigned a = 0; a < entry_categories.size(); a++) {
+					if (s_cmpnocase(entry_categories[a], ntype->category)) {
+						exists = true;
+						break;
+					}
+				}
+				if (!exists) entry_categories.push_back(ntype->category);
 			}
 		}
 
@@ -407,11 +419,13 @@ bool EntryType::loadEntryTypes() {
 	etype_marker.icon = "e_marker";
 	etype_marker.name = "Marker";
 	etype_marker.detectable = false;
+	etype_marker.category = "";		// No category, markers only appear when 'All' categories shown
 	etype_marker.addToList();
 
 	// Setup map marker type
 	etype_map.icon = "e_map";
 	etype_map.name = "Map Marker";
+	etype_map.category = "Maps";	// Should appear with maps
 	etype_map.detectable = false;
 	etype_map.addToList();
 
@@ -569,6 +583,10 @@ void EntryType::cleanupEntryTypes() {
 
 vector<EntryType*> EntryType::allTypes() {
 	return entry_types;
+}
+
+vector<string> EntryType::allCategories() {
+	return entry_categories;
 }
 
 

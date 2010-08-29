@@ -52,6 +52,7 @@
 #include "SplashWindow.h"
 #include <wx/aui/auibook.h>
 #include <wx/filename.h>
+#include <wx/gbsizer.h>
 
 
 /*******************************************************************
@@ -106,17 +107,28 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 	wxStaticBoxSizer *framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
 	m_hbox->Add(framesizer, 0, wxEXPAND|wxALL, 4);
 
+	wxGridBagSizer* gb_sizer = new wxGridBagSizer(4, 4);
+	framesizer->Add(gb_sizer, 0, wxEXPAND|wxALL, 4);
+
+	// Create category selector
+	choice_category = new wxChoice(this, -1);
+	choice_category->Append("All");
+	vector<string> cats = EntryType::allCategories();
+	for (unsigned a = 0; a < cats.size(); a++)
+		choice_category->Append(cats[a]);
+	choice_category->SetSelection(0);
+	gb_sizer->Add(new wxStaticText(this, -1, "Show:"), wxGBPosition(0, 0), wxDefaultSpan, wxALIGN_CENTER_VERTICAL);
+	gb_sizer->Add(choice_category, wxGBPosition(0, 1), wxDefaultSpan, wxEXPAND);
+	gb_sizer->AddGrowableCol(1, 1);
+
 	// Create filter
-	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
-	framesizer->Add(hbox, 0, wxEXPAND|wxTOP|wxLEFT|wxRIGHT, 4);
-	hbox->Add(new wxStaticText(this, -1, "Filter:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
-	wxTextCtrl* text_filter = new wxTextCtrl(this, -1);
-	hbox->Add(text_filter, 1, wxEXPAND, 0);
+	text_filter = new wxTextCtrl(this, -1);
+	gb_sizer->Add(new wxStaticText(this, -1, "Filter:"), wxGBPosition(1, 0), wxDefaultSpan, wxALIGN_CENTER_VERTICAL);
+	gb_sizer->Add(text_filter, wxGBPosition(1, 1), wxDefaultSpan, wxEXPAND);
 
 	// Create entry list panel
 	entry_list = new ArchiveEntryList(this);
 	entry_list->setArchive(archive);
-	entry_list->setFilterCtrl(text_filter);
 	framesizer->Add(entry_list, 1, wxEXPAND | wxALL, 4);
 
 	// Add default entry panel
@@ -130,6 +142,8 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 	entry_list->Bind(wxEVT_KEY_DOWN, &ArchivePanel::onEntryListKeyDown, this);
 	entry_list->Bind(wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK, &ArchivePanel::onEntryListRightClick, this);
 	entry_list->Bind(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, &ArchivePanel::onEntryListActivated, this);
+	text_filter->Bind(wxEVT_COMMAND_TEXT_UPDATED, &ArchivePanel::onTextFilterChanged, this);
+	choice_category->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &ArchivePanel::onChoiceCategoryChanged, this);
 	Bind(wxEVT_COMMAND_MENU_SELECTED, &ArchivePanel::onEntryMenuClick, this, MENU_GFX_CONVERT, MENU_TEMP_END);
 	((DefaultEntryPanel*)default_area)->getEditTextButton()->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &ArchivePanel::onDEPEditAsText, this);
 	((DefaultEntryPanel*)default_area)->getViewHexButton()->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &ArchivePanel::onDEPViewAsHex, this);
@@ -1321,6 +1335,30 @@ void ArchivePanel::onDEPViewAsHex(wxCommandEvent& e) {
 
 	// Load entry to text area
 	hex_area->openEntry(entry);
+}
+
+void ArchivePanel::onTextFilterChanged(wxCommandEvent& e) {
+	// Get category string to filter by
+	string category = "";
+	if (choice_category->GetSelection() > 0)
+		category = choice_category->GetStringSelection();
+
+	// Filter the entry list
+	entry_list->filterList(text_filter->GetValue(), category);
+
+	e.Skip();
+}
+
+void ArchivePanel::onChoiceCategoryChanged(wxCommandEvent& e) {
+	// Get category string to filter by
+	string category = "";
+	if (choice_category->GetSelection() > 0)
+		category = choice_category->GetStringSelection();
+
+	// Filter the entry list
+	entry_list->filterList(text_filter->GetValue(), category);
+
+	e.Skip();
 }
 
 

@@ -6,11 +6,15 @@
 #include "EntryPanel.h"
 #include "ListenerAnnouncer.h"
 #include "ArchiveEntryList.h"
+#include <wx/textctrl.h>
+#include <wx/choice.h>
 
 class ArchivePanel : public wxPanel, public Listener {
 protected:
 	Archive*			archive;
 	ArchiveEntryList*	entry_list;
+	wxTextCtrl*			text_filter;
+	wxChoice*			choice_category;
 
 	// Entry panels
 	EntryPanel*	cur_area;
@@ -89,6 +93,8 @@ public:
 	virtual void	onEntryListActivated(wxListEvent& e);
 	void			onDEPEditAsText(wxCommandEvent& e);
 	void			onDEPViewAsHex(wxCommandEvent& e);
+	void			onTextFilterChanged(wxCommandEvent& e);
+	void			onChoiceCategoryChanged(wxCommandEvent& e);
 };
 
 #endif //__ARCHIVEPANEL_H__

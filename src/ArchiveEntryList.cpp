@@ -59,8 +59,9 @@ CVAR(Bool, elist_vrules, false, CVAR_SAVE)
 ArchiveEntryList::ArchiveEntryList(wxWindow* parent) : VirtualListView(parent) {
 	// Init variables
 	archive = NULL;
-	text_filter = NULL;
 	filter_active = false;
+	filter_name = "";
+	filter_category = "";
 	current_dir = false;
 
 	// Create dummy 'up folder' entry
@@ -215,21 +216,6 @@ void ArchiveEntryList::setArchive(Archive* archive) {
 	}
 }
 
-/* ArchiveEntryList::setFilterCtrl
- * Sets the wxTextCtrl widget responsible for filtering the list
- *******************************************************************/
-void ArchiveEntryList::setFilterCtrl(wxTextCtrl* text_filter) {
-	// Check control was given
-	if (!text_filter)
-		return;
-
-	// Set variables
-	this->text_filter = text_filter;
-
-	// Bind the event
-	text_filter->Bind(wxEVT_COMMAND_TEXT_UPDATED, &ArchiveEntryList::onFilterChanged, this);
-}
-
 /* ArchiveEntryList::setupColumns
  * Creates/sets the list columns depending on user options
  *******************************************************************/
@@ -291,45 +277,74 @@ void ArchiveEntryList::updateList() {
 		SetItemCount(filter.size());
 	else
 		SetItemCount(current_dir->numEntries() + current_dir->nChildren() + back_folder);
+
 	Refresh();
 }
 
 /* ArchiveEntryList::filterList
  * Filters the list to only entries and directories with names
- * matching [filter]
+ * matching [filter], and with type categories matching [category].
  *******************************************************************/
-void ArchiveEntryList::filterList(string filter) {
-	// Check if any filter string was given
-	if (filter.IsEmpty()) {
-		// No filter, disable it
-		filter_active = false;
+void ArchiveEntryList::filterList(string filter, string category) {
+	// Update variables
+	filter_name = filter;
+	filter_category = category;
+
+	applyFilter();
+}
+
+/* ArchiveEntryList::applyFilter
+ * Applies the current filter(s) to the list
+ *******************************************************************/
+void ArchiveEntryList::applyFilter() {
+	// Disable filter initially
+	filter_active = false;
+
+	// Check if any filters were given
+	if (filter_name.IsEmpty() && filter_category.IsEmpty()) {
+		// No filter, just refresh the list
 		updateList();
 		return;
 	}
-	else
-		filter_active = true;
 
 	// Clear current filter list
-	this->filter.clear();
+	filter.clear();
 
-	// Add * to filter string
-	filter += "*";
-
-	// Convert filter to lowercase (to avoid case-sensitivity)
-	filter = filter.Lower();
-
-	// Go through entries
-	filter_active = false;
+	// Filter by category
 	unsigned index = 0;
 	ArchiveEntry* entry = getEntry(index);
 	while (entry) {
-		// Check for name match with filter
-		if (entry == entry_dir_back || entry->getName().Lower().Matches(filter))
-			this->filter.push_back(index);
+		if (filter_category.IsEmpty())
+			filter.push_back(index);	// If no category specified, just add all entries to the filter
+		else {
+			// Check for category match
+			if (s_cmpnocase(entry->getType()->getCategory(), filter_category))
+				filter.push_back(index);
+		}
 
-		// Go to next unfiltered entry
 		entry = getEntry(++index);
 	}
+
+	// Now filter by name if needed
+	if (!filter_name.IsEmpty()) {
+		// Convert filter to lowercase (to avoid case-sensitivity)
+		string filterstring = filter_name.Lower() + "*";
+
+		// Go through filtered list
+		for (unsigned a = 0; a < filter.size(); a++) {
+			entry = getEntry(filter[a]);
+
+			// Check for name match with filter
+			if (entry == entry_dir_back || entry->getName().Lower().Matches(filterstring))
+				continue;
+
+			// No match, remove from filtered list
+			filter.erase(filter.begin() + a);
+			a--;
+		}
+	}
+
+	// Enable the filter
 	filter_active = true;
 
 	// Update the list
@@ -561,17 +576,6 @@ void ArchiveEntryList::onMenu(wxCommandEvent& e) {
 	}
 }
 
-/* ArchiveEntryList::onFilterChanged
- * Called when the text in the associated 'filter' wxTextCtrl is
- * changed
- *******************************************************************/
-void ArchiveEntryList::onFilterChanged(wxCommandEvent& e) {
-	// Update the filter
-	filterList(text_filter->GetValue());
-
-	e.Skip();
-}
-
 /* ArchiveEntryList::onListItemActivated
  * Called when a list item is 'activated' (double-click or enter)
  *******************************************************************/
@@ -605,8 +609,7 @@ void ArchiveEntryList::onListItemActivated(wxListEvent& e) {
 		clearSelection();
 
 		// Update filter
-		if (text_filter)
-			filterList(text_filter->GetValue());
+		applyFilter();
 
 		// Update list
 		updateList();
