@@ -66,6 +66,8 @@ const int MENU_GFX_MODIFY_OFFSETS = 10002;
 const int MENU_BAS_CONVERT = 10003;
 const int MENU_GFX_ADD_PATCH_TABLE = 10004;
 const int MENU_GFX_ADD_TEXTUREX = 10005;
+const int MENU_VIEW_TEXT = 10006;
+const int MENU_VIEW_HEX = 10007;
 const int MENU_TEMP_END = 10100;
 
 
@@ -935,6 +937,40 @@ bool ArchivePanel::openEntry(ArchiveEntry* entry, bool force) {
 	return true;
 }
 
+bool ArchivePanel::openEntryAsText(ArchiveEntry* entry) {
+	// Check entry was given
+	if (!entry)
+		return false;
+
+	// Show the text entry panel
+	if (!showEntryPanel(text_area))
+		return false;
+
+	// Load the current entry into the panel
+	if (!cur_area->openEntry(entry)) {
+		wxMessageBox(s_fmt("Error loading entry:\n%s", Global::error.c_str()), "Error", wxOK|wxICON_ERROR);
+	}
+
+	return true;
+}
+
+bool ArchivePanel::openEntryAsHex(ArchiveEntry* entry) {
+	// Check entry was given
+	if (!entry)
+		return false;
+
+	// Show the text entry panel
+	if (!showEntryPanel(hex_area))
+		return false;
+
+	// Load the current entry into the panel
+	if (!cur_area->openEntry(entry)) {
+		wxMessageBox(s_fmt("Error loading entry:\n%s", Global::error.c_str()), "Error", wxOK|wxICON_ERROR);
+	}
+
+	return true;
+}
+
 /* ArchivePanel::reloadCurrentPanel
  * If only one entry is selected, force its reload
  *******************************************************************/
@@ -1089,6 +1125,10 @@ void ArchivePanel::handleAction(int menu_id) {
 		EntryOperations::addToPatchTable(entry_list->getSelectedEntries());
 	else if (menu_id == MENU_GFX_ADD_TEXTUREX)
 		EntryOperations::createTexture(entry_list->getSelectedEntries());
+	else if (menu_id == MENU_VIEW_TEXT)
+		openEntryAsText(entry_list->getFocusedEntry());
+	else if (menu_id == MENU_VIEW_HEX)
+		openEntryAsHex(entry_list->getFocusedEntry());
 }
 
 /* ArchivePanel::onAnnouncement
@@ -1175,6 +1215,12 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 	context->AppendSeparator();
 	context->Append(MainWindow::MENU_ENTRY_BOOKMARK, "Bookmark");
 
+	// 'View As' menu
+	wxMenu* viewas = new wxMenu();
+	context->AppendSubMenu(viewas, "View As");
+	viewas->Append(MENU_VIEW_TEXT, "Text", "Opens the selected entry in the text editor, regardless of type");
+	viewas->Append(MENU_VIEW_HEX, "Hex", "Opens the selected entry in the hex editor, regardless of type");
+
 	// Get selected entries
 	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
 
@@ -1203,17 +1249,19 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 
 	// Add gfx-related menu items if gfx are selected
 	if (gfx_selected) {
-		context->AppendSeparator();
-		context->Append(MENU_GFX_CONVERT, "Convert Gfx to...");
-		context->Append(MENU_GFX_MODIFY_OFFSETS, "Modify Gfx Offsets");
-		context->Append(MENU_GFX_ADD_PATCH_TABLE, "Add to Patch Table");
-		context->Append(MENU_GFX_ADD_TEXTUREX, "Add to TEXTUREx");
+		wxMenu* gfx = new wxMenu();
+		context->AppendSubMenu(gfx, "Gfx");
+		gfx->Append(MENU_GFX_CONVERT, "Convert to...");
+		gfx->Append(MENU_GFX_MODIFY_OFFSETS, "Modify Gfx Offsets");
+		gfx->Append(MENU_GFX_ADD_PATCH_TABLE, "Add to Patch Table");
+		gfx->Append(MENU_GFX_ADD_TEXTUREX, "Add to TEXTUREx");
 	}
 
 	// Add Boom Animations/Switches related menu items if they are selected
 	if (bas_selected) {
-		context->AppendSeparator();
-		context->Append(MENU_BAS_CONVERT, "Convert to ANIMDEFS");
+		wxMenu* boom = new wxMenu();
+		context->AppendSubMenu(boom, "Boom");
+		boom->Append(MENU_BAS_CONVERT, "Convert to ANIMDEFS");
 	}
 	// This is not generally useful
 	//context->Append(MENU_ENTRY_PAL_CONVERT, "Pal 6-bit to 8-bit");
@@ -1309,11 +1357,8 @@ void ArchivePanel::onDEPEditAsText(wxCommandEvent& e) {
 	// Get entry to edit
 	ArchiveEntry* entry = default_area->getEntry();
 
-	// Switch to TextEntryPanel
-	showEntryPanel(text_area, false);
-
-	// Load entry to text area
-	text_area->openEntry(entry);
+	// Open in text editor
+	openEntryAsText(entry);
 }
 
 /* ArchivePanel::onDEPEViewAsHex
@@ -1324,11 +1369,8 @@ void ArchivePanel::onDEPViewAsHex(wxCommandEvent& e) {
 	// Get entry to view
 	ArchiveEntry* entry = default_area->getEntry();
 
-	// Switch to HexEntryPanel
-	showEntryPanel(hex_area, false);
-
-	// Load entry to text area
-	hex_area->openEntry(entry);
+	// Open in hex editor
+	openEntryAsHex(entry);
 }
 
 void ArchivePanel::onTextFilterChanged(wxCommandEvent& e) {

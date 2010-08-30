@@ -9,6 +9,8 @@
 
 class GfxEntryPanel : public EntryPanel {
 private:
+	bool			alph;
+	bool			trns;
 	GfxCanvas*		gfx_canvas;
 	wxSlider*		slider_zoom;
 	wxStaticText*	label_current_zoom;

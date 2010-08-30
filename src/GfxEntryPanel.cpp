@@ -160,7 +160,23 @@ bool GfxEntryPanel::loadEntry(ArchiveEntry* entry) {
  *******************************************************************/
 bool GfxEntryPanel::saveEntry() {
 	// Set gfx entry offsets
-	return EntryOperations::modifyGfxOffsets(entry, -1, point2_t(spin_xoffset->GetValue(), spin_yoffset->GetValue()), true, true, false);
+	bool ok = EntryOperations::modifyGfxOffsets(entry, -1, point2_t(spin_xoffset->GetValue(), spin_yoffset->GetValue()), true, true, false);
+
+	if (ok && entry->getType()->getFormat() == "img_png") {
+		// Check if we need to modify alph
+		if (cb_alph_chunk->GetValue() != alph) {
+			alph = !alph;
+			ok = EntryOperations::modifyalPhChunk(entry, alph);
+		}
+
+		// Check if we need to modify trns
+		if (ok && cb_trns_chunk->GetValue() != trns) {
+			trns = !trns;
+			ok = EntryOperations::modifytRNSChunk(entry, trns);
+		}
+	}
+
+	return ok;
 }
 
 /* GfxEntryPanel::refresh
@@ -177,10 +193,17 @@ void GfxEntryPanel::refresh() {
 
 	// Set PNG check boxes
 	if (this->entry->getType() != NULL && this->entry->getType()->getFormat() == "img_png") {
-		cb_alph_chunk->Show(true);		cb_alph_chunk->Enable(true);
-		cb_alph_chunk->SetValue(EntryOperations::getalPhChunk(this->entry));
-		cb_trns_chunk->Show(true);		cb_trns_chunk->Enable(true);
-		cb_trns_chunk->SetValue(EntryOperations::gettRNSChunk(this->entry));
+		// Check for alph
+		alph = EntryOperations::getalPhChunk(this->entry);
+		cb_alph_chunk->Show(true);
+		cb_alph_chunk->Enable(true);
+		cb_alph_chunk->SetValue(alph);
+
+		// Check for trns
+		trns = EntryOperations::gettRNSChunk(this->entry);
+		cb_trns_chunk->Show(true);
+		cb_trns_chunk->Enable(true);
+		cb_trns_chunk->SetValue(trns);
 	} else {
 		cb_alph_chunk->Show(false);		cb_alph_chunk->Enable(false);
 		cb_alph_chunk->SetValue(false);
@@ -380,6 +403,9 @@ void GfxEntryPanel::onTileChanged(wxCommandEvent& e) {
  * Called when the 'alPh chunk' checkbox is checked/unchecked
  *******************************************************************/
 void GfxEntryPanel::onalPhChanged(wxCommandEvent& e) {
+	// Set changed
+	setModified();
+	/*
 	if (EntryOperations::modifyalPhChunk(entry, cb_alph_chunk->IsChecked()))
 	{
 		// Set changed
@@ -390,12 +416,16 @@ void GfxEntryPanel::onalPhChanged(wxCommandEvent& e) {
 		gfx_canvas->Refresh();
 	}
 	cb_alph_chunk->SetValue(EntryOperations::getalPhChunk(this->entry));
+	*/
 }
 
 /* GfxEntryPanel::cbtRNSChecked
  * Called when the 'tRNS chunk' checkbox is checked/unchecked
  *******************************************************************/
 void GfxEntryPanel::ontRNSChanged(wxCommandEvent& e) {
+	// Set changed
+	setModified();
+	/*
 	if (EntryOperations::modifytRNSChunk(entry, cb_trns_chunk->IsChecked()))
 	{
 		// Set changed
@@ -406,6 +436,7 @@ void GfxEntryPanel::ontRNSChanged(wxCommandEvent& e) {
 		gfx_canvas->Refresh();
 	}
 	cb_trns_chunk->SetValue(EntryOperations::gettRNSChunk(this->entry));
+	*/
 }
 
 /* GfxEntryPanel::gfxOffsetChanged

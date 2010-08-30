@@ -225,8 +225,8 @@ bool ArchiveTreeNode::removeEntry(unsigned index) {
 	// De-link entry
 	entries[index]->prev = NULL;
 	entries[index]->next = NULL;
-	if (index > 0) entries[index-1] = getEntry(index+1);
-	if (index < entries.size()-1) entries[index+1] = getEntry(index-1);
+	if (index > 0) entries[index-1]->next = getEntry(index+1);
+	if (index < entries.size()-1) entries[index+1]->prev = getEntry(index-1);
 
 	// Remove it from the entry list
 	entries.erase(entries.begin() + index);
