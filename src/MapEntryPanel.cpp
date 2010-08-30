@@ -184,6 +184,9 @@ void MEPCanvas::draw() {
 		glEnd();
 	}
 
+	glLineWidth(1.0f);
+	glDisable(GL_LINE_SMOOTH);
+
 	// Swap buffers (ie show what was drawn)
 	SwapBuffers();
 }

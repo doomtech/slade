@@ -962,10 +962,10 @@ bool ArchivePanel::showEntryPanel(EntryPanel* new_area, bool ask_save) {
 		sizer->Replace(cur_area, new_area);	// Swap the panels
 		cur_area = new_area;				// Set the new panel to current
 		cur_area->Show(true);				// Show current
-	}
 
-	// Update panel layout
-	Layout();
+		// Update panel layout
+		Layout();
+	}
 
 	return true;
 }
@@ -1130,9 +1130,6 @@ void ArchivePanel::onEntryListSelectionChange(wxCommandEvent& e) {
 		// If multiple entries are selected, show/update the multi entry area
 		showEntryPanel(default_area);
 		((DefaultEntryPanel*)default_area)->loadEntries(selection);
-
-		// Update panel layout
-		Layout();
 	}
 }
 
@@ -1154,9 +1151,6 @@ void ArchivePanel::onEntryListFocusChange(wxListEvent& e) {
 		// If multiple entries are selected, show/update the multi entry area
 		showEntryPanel(default_area);
 		((DefaultEntryPanel*)default_area)->loadEntries(selection);
-
-		// Update panel layout
-		Layout();
 	}
 }
 
