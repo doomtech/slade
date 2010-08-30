@@ -457,6 +457,14 @@
 						>
 					</File>
 					<File
+						RelativePath=".\src\MapEntryPanel.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\MapEntryPanel.h"
+						>
+					</File>
+					<File
 						RelativePath=".\src\PaletteEntryPanel.cpp"
 						>
 					</File>
@@ -1012,6 +1020,14 @@
 			</File>
 			<File
 				RelativePath=".\udmf_zdoom.txt"
+				>
+			</File>
+			<File
+				RelativePath=".\usdf.txt"
+				>
+			</File>
+			<File
+				RelativePath=".\usdf_zdoom.txt"
 				>
 			</File>
 		</Filter>
