@@ -53,6 +53,12 @@ public:
 #define ARCHIVE_DAT		4
 #define ARCHIVE_RES		5
 
+// Define map types
+#define MAP_DOOM	0
+#define MAP_HEXEN	1
+#define MAP_DOOM64	2
+#define MAP_UDMF	3
+
 class Archive : public Announcer {
 private:
 	bool				modified;

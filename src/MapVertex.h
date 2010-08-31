@@ -13,6 +13,13 @@ struct doomvertex_t
 	short y;
 };
 
+// Those are actually fixed_t
+struct doom64vertex_t
+{
+	int32_t x;
+	int32_t y;
+};
+
 class MapVertex {
 private:
 	double	x;
@@ -25,6 +32,7 @@ private:
 public:
 	MapVertex(){}
 	MapVertex(doomvertex_t v);
+	MapVertex(doom64vertex_t v);
 	~MapVertex(){}
 
 	double	xPos() { return x; }

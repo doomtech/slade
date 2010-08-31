@@ -75,6 +75,22 @@ public:
 	}
 };
 
+class ZNodesDataFormat : public EntryDataFormat {
+public:
+	ZNodesDataFormat() : EntryDataFormat("znod") {};
+	~ZNodesDataFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		// Check size
+		if (mc.getSize() > 4) {
+			// Check for ZNOD header
+			if (mc[0] == 'Z' && mc[1] == 'G' && mc[2] == 'L' && mc[3] == 'N')
+				return EDF_TRUE;
+		}
+		return EDF_FALSE;
+	}
+};
+
 class ZGLNodesDataFormat : public EntryDataFormat {
 public:
 	ZGLNodesDataFormat() : EntryDataFormat("zgln") {};
@@ -101,6 +117,54 @@ public:
 		if (mc.getSize() > 4) {
 			// Check for ZGL2 header
 			if (mc[0] == 'Z' && mc[1] == 'G' && mc[2] == 'L' && mc[3] == '2')
+				return EDF_TRUE;
+		}
+		return EDF_FALSE;
+	}
+};
+
+class XNodesDataFormat : public EntryDataFormat {
+public:
+	XNodesDataFormat() : EntryDataFormat("xnod") {};
+	~XNodesDataFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		// Check size
+		if (mc.getSize() > 4) {
+			// Check for XNOD header
+			if (mc[0] == 'X' && mc[1] == 'G' && mc[2] == 'L' && mc[3] == 'N')
+				return EDF_TRUE;
+		}
+		return EDF_FALSE;
+	}
+};
+
+class XGLNodesDataFormat : public EntryDataFormat {
+public:
+	XGLNodesDataFormat() : EntryDataFormat("xgln") {};
+	~XGLNodesDataFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		// Check size
+		if (mc.getSize() > 4) {
+			// Check for XGLN header
+			if (mc[0] == 'X' && mc[1] == 'G' && mc[2] == 'L' && mc[3] == 'N')
+				return EDF_TRUE;
+		}
+		return EDF_FALSE;
+	}
+};
+
+class XGLNodes2DataFormat : public EntryDataFormat {
+public:
+	XGLNodes2DataFormat() : EntryDataFormat("xgl2") {};
+	~XGLNodes2DataFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		// Check size
+		if (mc.getSize() > 4) {
+			// Check for XGL2 header
+			if (mc[0] == 'X' && mc[1] == 'G' && mc[2] == 'L' && mc[3] == '2')
 				return EDF_TRUE;
 		}
 		return EDF_FALSE;

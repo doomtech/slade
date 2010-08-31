@@ -277,12 +277,12 @@ void ArchiveManagerPanel::populateMapList(Archive* archive) {
 		string name;
 
 		// Add map format to name string
-		if (maps[a].format == 0)
-			name = "(D) ";
-		if (maps[a].format == 1)
-			name = "(H) ";
-		if (maps[a].format == 2)
-			name = "(U) ";
+		switch(maps[a].format) {
+			case MAP_DOOM:		name = "(D) "; break;
+			case MAP_HEXEN:		name = "(H) "; break;
+			case MAP_DOOM64:	name = "(K) "; break;
+			case MAP_UDMF:		name = "(U) "; break;
+		}
 
 		// Add map name to string
 		name += maps[a].name;

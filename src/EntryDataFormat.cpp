@@ -185,8 +185,12 @@ void EntryDataFormat::initBuiltinFormats() {
 	new Font1DataFormat();
 	new Font2DataFormat();
 	new BMFontDataFormat();
+	new ZNodesDataFormat();
 	new ZGLNodesDataFormat();
 	new ZGLNodes2DataFormat();
+	new XNodesDataFormat();
+	new XGLNodesDataFormat();
+	new XGLNodes2DataFormat();
 	new DMDModelDataFormat();
 	new MDLModelDataFormat();
 	new MD2ModelDataFormat();

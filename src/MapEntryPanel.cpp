@@ -233,7 +233,7 @@ bool MapEntryPanel::loadEntry(ArchiveEntry* entry) {
 	}
 
 	// Read vertices
-	if (thismap.format == 0 || thismap.format == 1) {	// Doom/Hexen format
+	if (thismap.format == MAP_DOOM || thismap.format == MAP_HEXEN || thismap.format == MAP_DOOM64) {
 		// Find VERTEXES entry
 		ArchiveEntry* mapentry = thismap.head;
 		ArchiveEntry* vertexes = NULL;
@@ -259,20 +259,32 @@ bool MapEntryPanel::loadEntry(ArchiveEntry* entry) {
 		MemChunk& mc = vertexes->getMCData();
 		mc.seek(0, SEEK_SET);
 
-		doomvertex_t v;
-		while (1) {
-			// Read vertex
-			if (!mc.read(&v, 4))
-				break;
+		if (thismap.format == MAP_DOOM64) {
+			doom64vertex_t v;
+			while (1) {
+				// Read vertex
+				if (!mc.read(&v, 8))
+					break;
 
-			// Add vertex
-			map_canvas->addVertex((double)v.x, (double)v.y);
+				// Add vertex
+				map_canvas->addVertex((double)v.x/65536, (double)v.y/65536);
+			}
+		} else {
+			doomvertex_t v;
+			while (1) {
+				// Read vertex
+				if (!mc.read(&v, 4))
+					break;
+
+				// Add vertex
+				map_canvas->addVertex((double)v.x, (double)v.y);
+			}
 		}
 	}
 
 
 	// Read linedefs
-	if (thismap.format == 0 || thismap.format == 1) {	// Doom/Hexen format
+	if (thismap.format == MAP_DOOM || thismap.format == MAP_HEXEN || thismap.format == MAP_DOOM64) {
 		// Find LINEDEFS entry
 		ArchiveEntry* mapentry = thismap.head;
 		ArchiveEntry* linedefs = NULL;
@@ -297,7 +309,7 @@ bool MapEntryPanel::loadEntry(ArchiveEntry* entry) {
 		// Read line data
 		MemChunk& mc = linedefs->getMCData();
 		mc.seek(0, SEEK_SET);
-		if (thismap.format == 0) {			// Doom format
+		if (thismap.format == MAP_DOOM) {
 			while (1) {
 				// Read line
 				doomline_t l;
@@ -316,7 +328,26 @@ bool MapEntryPanel::loadEntry(ArchiveEntry* entry) {
 				map_canvas->addLine(l.vertex1, l.vertex2, twosided, special);
 			}
 		}
-		else if (thismap.format == 1) {		// Hexen format
+		else if (thismap.format == MAP_DOOM64) {
+			while (1) {
+				// Read line
+				doom64line_t l;
+				if (!mc.read(&l, sizeof(doom64line_t)))
+					break;
+
+				// Check properties
+				bool special = false;
+				bool twosided = false;
+				if (l.side2 >= 0)
+					twosided = true;
+				if (l.type > 0)
+					special = true;
+
+				// Add line
+				map_canvas->addLine(l.vertex1, l.vertex2, twosided, special);
+			}
+		}
+		else if (thismap.format == MAP_HEXEN) {
 			while (1) {
 				// Read line
 				hexenline_t l;

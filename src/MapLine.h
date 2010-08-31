@@ -30,6 +30,17 @@ struct hexenline_t
 	short	side2;
 };
 
+struct doom64line_t
+{
+	short vertex1;
+	short vertex2;
+	uint32_t flags;
+	short type;
+	short sector_tag;
+	short side1;
+	short side2;
+};
+
 class MapLine {
 private:
 	MapVertex*	vertex1;

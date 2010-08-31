@@ -41,7 +41,7 @@ CVAR(Bool, wad_force_uppercase, true, CVAR_SAVE)
 CVAR(Bool, iwad_lock, true, CVAR_SAVE)
 
 // Used for map detection
-string map_lumps[12] = {
+string map_lumps[NUMMAPLUMPS] = {
 	"THINGS",
 	"VERTEXES",
 	"LINEDEFS",
@@ -53,7 +53,10 @@ string map_lumps[12] = {
 	"BLOCKMAP",
 	"REJECT",
 	"SCRIPTS",
-	"BEHAVIOR"
+	"BEHAVIOR",
+	"LEAFS",
+	"LIGHTS",
+	"MACROS"
 };
 
 // Special namespaces (at the moment these are just mapping to zdoom's "zip as wad" namespace folders)
@@ -667,7 +670,7 @@ vector<Archive::mapdesc_t> WadArchive::detectMaps() {
 			mapdesc_t md;
 			md.head = entry->prevEntry(); // Header lump
 			md.name = entry->prevEntry()->getName(); // Map title
-			md.format = 2; // Format = 2 (UDMF)
+			md.format = MAP_UDMF;
 
 			// Skip lumps until we find the ENDMAP marker
 			bool done = false;
@@ -703,7 +706,7 @@ vector<Archive::mapdesc_t> WadArchive::detectMaps() {
 		// Doom/Hexen format map check **************************************************
 
 		// Array to keep track of what doom/hexen map lumps have been found
-		uint8_t existing_map_lumps[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		uint8_t existing_map_lumps[NUMMAPLUMPS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 		// Check if the current lump is a doom/hexen map lump
 		bool maplump_found = false;
@@ -728,7 +731,7 @@ vector<Archive::mapdesc_t> WadArchive::detectMaps() {
 				done = true;
 
 				// Compare with all map lump names
-				for (int a = 0; a < 12; a++) {
+				for (int a = 0; a < NUMMAPLUMPS; a++) {
 					// Compare with all base map lump names
 					if (s_cmp(entry->getName(), map_lumps[a])) {
 						existing_map_lumps[a] = 1;
@@ -758,11 +761,16 @@ vector<Archive::mapdesc_t> WadArchive::detectMaps() {
 				md.name = header_entry->getName();	// Map title
 				md.end = entry->prevEntry();		// End lump
 
-				// If BEHAVIOR lump exists, it's a hexen format map, otherwise it's doom format
-				if (existing_map_lumps[11])
-					md.format = 1;
+				// If BEHAVIOR lump exists, it's a hexen format map
+				if (existing_map_lumps[LUMP_BEHAVIOR])
+					md.format = MAP_HEXEN;
+				// If LEAFS, LIGHTS and MACROS exist, it's a doom 64 format map
+				else if (existing_map_lumps[LUMP_LEAFS] && existing_map_lumps[LUMP_LIGHTS]
+							&& existing_map_lumps[LUMP_MACROS])
+					md.format = MAP_DOOM64;
+				// Otherwise it's doom format
 				else
-					md.format = 0;
+					md.format = MAP_DOOM;
 
 				// Add map info to the maps list
 				maps.push_back(md);

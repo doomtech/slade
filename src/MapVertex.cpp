@@ -7,6 +7,11 @@ MapVertex::MapVertex(doomvertex_t v) {
 	this->y = v.y;
 }
 
+MapVertex::MapVertex(doom64vertex_t v) {
+	this->x = v.x/65536;
+	this->y = v.y/65536;
+}
+
 bool MapVertex::parseUDMF(Tokenizer& tz) {
 	// Skip opening {
 	tz.getToken();

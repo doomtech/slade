@@ -17,6 +17,16 @@ struct doomside_t
 	short	sector;
 };
 
+struct doom64side_t
+{
+	short	x_offset;
+	short	y_offset;
+	WORD	tex_upper;
+	WORD	tex_lower;
+	WORD	tex_middle;
+	short	sector;
+};
+
 class MapSide {
 private:
 	MapSector*	sector;

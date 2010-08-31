@@ -27,6 +27,17 @@ struct hexenthing_t
 	uint8_t		args[5];
 };
 
+struct doom64thing_t
+{
+	short		x;
+	short		y;
+	short		z;
+	short		angle;
+	short		type;
+	short		flags;
+	uint16_t	tid;
+};
+
 class MapThing {
 private:
 	double x;

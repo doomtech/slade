@@ -18,6 +18,18 @@ struct doomsector_t
 	short	tag;
 };
 
+struct doom64sector_t
+{
+	short	f_height;
+	short	c_height;
+	WORD	f_tex;
+	WORD	c_tex;
+	WORD	color[5];
+	short	special;
+	short	tag;
+	WORD	flags;
+};
+
 class MapSector {
 private:
 	vector<MapSide*>	connected_sides;
