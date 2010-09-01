@@ -72,13 +72,13 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 	// Gfx (offset) type
 	string offset_types[] = { "Auto", "Graphic", "Sprite", "HUD" };
 	combo_offset_type = new wxComboBox(this, -1, offset_types[0], wxDefaultPosition, wxDefaultSize, 4, offset_types, wxCB_READONLY);
-	hbox->Add(new wxStaticText(this, -1, "Type:"), 0, wxALIGN_CENTER_VERTICAL, 0);
+	hbox->Add(new wxStaticText(this, -1, "Type:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
 	hbox->Add(combo_offset_type, 0, wxEXPAND, 0);
 	hbox->AddSpacer(8);
 
 	// Palette chooser
 	combo_palette = new PaletteChooser(this, -1);
-	hbox->Add(new wxStaticText(this, -1, "Palette:"), 0, wxALIGN_CENTER_VERTICAL, 0);
+	hbox->Add(new wxStaticText(this, -1, "Palette:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
 	hbox->Add(combo_palette, 0, wxEXPAND, 0);
 
 	// Add gfx canvas
@@ -90,7 +90,7 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 
 	// Add editing/info controls
 	hbox = new wxBoxSizer(wxHORIZONTAL);
-	sizer_bottom->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
+	sizer_bottom->Add(hbox, 1, wxEXPAND|wxLEFT|wxRIGHT, 4);
 
 	// Offsets
 	spin_xoffset = new wxSpinCtrl(this, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, SHRT_MIN, SHRT_MAX, 0);
@@ -104,11 +104,10 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 	hbox->Add(label_dimensions, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT, 4);
 
 	// PNG stuff
+	hbox->AddStretchSpacer();
 	cb_alph_chunk = new wxCheckBox(this, -1, "alPh");
-	cb_alph_chunk->Show(false);		cb_alph_chunk->Enable(false);
 	hbox->Add(cb_alph_chunk, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
 	cb_trns_chunk = new wxCheckBox(this, -1, "tRNS");
-	cb_trns_chunk->Show(false);		cb_trns_chunk->Enable(false);
 	hbox->Add(cb_trns_chunk, 0, wxEXPAND, 0);
 	hbox->AddSpacer(8);
 
@@ -195,19 +194,17 @@ void GfxEntryPanel::refresh() {
 	if (this->entry->getType() != NULL && this->entry->getType()->getFormat() == "img_png") {
 		// Check for alph
 		alph = EntryOperations::getalPhChunk(this->entry);
-		cb_alph_chunk->Show(true);
 		cb_alph_chunk->Enable(true);
 		cb_alph_chunk->SetValue(alph);
 
 		// Check for trns
 		trns = EntryOperations::gettRNSChunk(this->entry);
-		cb_trns_chunk->Show(true);
 		cb_trns_chunk->Enable(true);
 		cb_trns_chunk->SetValue(trns);
 	} else {
-		cb_alph_chunk->Show(false);		cb_alph_chunk->Enable(false);
+		cb_alph_chunk->Enable(false);
 		cb_alph_chunk->SetValue(false);
-		cb_trns_chunk->Show(false);		cb_trns_chunk->Enable(false);
+		cb_trns_chunk->Enable(false);
 		cb_trns_chunk->SetValue(false);
 	}
 
@@ -229,9 +226,6 @@ void GfxEntryPanel::refresh() {
 
 	// Refresh the canvas
 	gfx_canvas->Refresh();
-
-	// Update layout
-	Layout();
 }
 
 /* GfxEntryPanel::updateImagePalette
