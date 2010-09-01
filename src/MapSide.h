@@ -19,12 +19,12 @@ struct doomside_t
 
 struct doom64side_t
 {
-	short	x_offset;
-	short	y_offset;
-	WORD	tex_upper;
-	WORD	tex_lower;
-	WORD	tex_middle;
-	short	sector;
+	short		x_offset;
+	short		y_offset;
+	uint16_t	tex_upper;
+	uint16_t	tex_lower;
+	uint16_t	tex_middle;
+	short		sector;
 };
 
 class MapSide {

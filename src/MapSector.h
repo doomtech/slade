@@ -20,14 +20,14 @@ struct doomsector_t
 
 struct doom64sector_t
 {
-	short	f_height;
-	short	c_height;
-	WORD	f_tex;
-	WORD	c_tex;
-	WORD	color[5];
-	short	special;
-	short	tag;
-	WORD	flags;
+	short		f_height;
+	short		c_height;
+	uint16_t	f_tex;
+	uint16_t	c_tex;
+	uint16_t	color[5];
+	short		special;
+	short		tag;
+	uint16_t	flags;
 };
 
 class MapSector {

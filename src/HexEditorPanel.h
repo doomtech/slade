@@ -46,6 +46,7 @@ private:
 	wxStaticText*	label_offset;
 	wxStaticText*	label_ubyte;
 	wxStaticText*	label_byte;
+	wxStaticText*	label_ascii;
 	wxStaticText*	label_ushort_le;
 	wxStaticText*	label_uint32_le;
 	wxStaticText*	label_uint64_le;

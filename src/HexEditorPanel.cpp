@@ -42,6 +42,17 @@
  *******************************************************************/
 const int NUMCOLS = 16;
 
+string asciitable[128] = {
+	"NUL", "SOH", "STX", "ETX", "EOT", "ENQ", "ACK", "BEL", "BS", "TAB", "LF", "VT", "FF", "CR", "SO", "SI",
+	"DLE", "DC1", "DC2", "DC3", "DC4", "NAK", "SYN", "ETB", "CAN", "EM", "SUB", "ESC", "FS", "GS", "RS", "US",
+	"Space", "!", "\"", "#", "$", "%", "&", "\'", "(", ")", "*", "+", ",", "-", ".", "/",
+	"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ":", ";", "<", "=", ">", "?",
+	"@", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O",
+	"P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "[", "\\", "]", "^", "_",
+	"`", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o",
+	"p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "{", "|", "}", "~", "DEL",
+};
+
 
 /*******************************************************************
  * HEXTABLE CLASS FUNCTIONS
@@ -251,9 +262,11 @@ HexEditorPanel::HexEditorPanel(wxWindow* parent) : wxPanel(parent, -1) {
 	label_offset = new wxStaticText(this, -1, "Offset:");
 	label_byte = new wxStaticText(this, -1, "Signed Byte:");
 	label_ubyte = new wxStaticText(this, -1, "Unsigned Byte:");
+	label_ascii = new wxStaticText(this, -1, "ASCII:");
 	framesizer->Add(label_offset, 0, wxEXPAND|wxALL, 4);
 	framesizer->Add(label_byte, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 	framesizer->Add(label_ubyte, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+	framesizer->Add(label_ascii, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
 	frame = new wxStaticBox(this, -1, "Values (Little Endian)");
 	framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
@@ -348,6 +361,7 @@ void HexEditorPanel::onCellSelected(wxGridEvent& e) {
 	label_offset->SetLabel(s_fmt("Offset: %d", offset));
 	label_byte->SetLabel("Signed Byte:");
 	label_ubyte->SetLabel("Unsigned Byte:");
+	label_ascii->SetLabel("ASCII:");
 	label_short_le->SetLabel("Signed Short:");
 	label_ushort_le->SetLabel("Unsigned Short:");
 	label_int32_le->SetLabel("Signed Int (32bit):");
@@ -362,7 +376,7 @@ void HexEditorPanel::onCellSelected(wxGridEvent& e) {
 	label_uint32_be->SetLabel("Unsigned Int (32bit):");
 	//label_int64_be->SetLabel("Signed Int (64bit):");
 	//label_uint64_be->SetLabel("Unsigned Int (64bit):");
-//	label_float_be->SetLabel("Float:");
+	//label_float_be->SetLabel("Float:");
 	//label_double_be->SetLabel("Double:");
 
 	// Get values
@@ -384,6 +398,8 @@ void HexEditorPanel::onCellSelected(wxGridEvent& e) {
 
 		label_byte->SetLabel(s_fmt("Signed Byte: %d", vbyte));
 		label_ubyte->SetLabel(s_fmt("Unsigned Byte: %d", vubyte));
+		if (vubyte <= 128)
+			label_ascii->SetLabel(s_fmt("ASCII: %s", chr(asciitable[vubyte])));
 
 		if (size > 1) {
 			// Short values
