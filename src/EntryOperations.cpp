@@ -448,7 +448,7 @@ bool EntryOperations::modifytRNSChunk(ArchiveEntry* entry, bool value) {
 	// Specs say they must be after PLTE chunk as well, so to play it safe, we'll insert
 	// them just before the first IDAT.
 	uint32_t trns_start = 0;
-	uint8_t  trns_size	= 0;
+	uint32_t trns_size	= 0;
 	uint32_t idat_start = 0;
 	for (uint32_t a = 0; a < entry->getSize(); a++) {
 
@@ -457,7 +457,7 @@ bool EntryOperations::modifytRNSChunk(ArchiveEntry* entry, bool value) {
 			data[a + 2] == 'N' && data[a + 3] == 'S') {
 			trns_start = a - 4;
 			trans_chunk_t* trns = (trans_chunk_t*)(data + a);
-			trns_size = 12 + (uint8_t)data[a-1];
+			trns_size = 12 + data[a-1] | (data[a-2]<<8) | (data[a-3]<<16) | (data[a-4]<<24) ;
 		}
 
 		// Stop when we get to the 'IDAT' chunk
