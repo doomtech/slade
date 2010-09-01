@@ -378,10 +378,17 @@ bool TextureXEditor::openArchive(Archive* archive) {
  * Removes the patch at [index] on the patch table from any textures
  * that contain it (and from the patch table itself)
  *******************************************************************/
-bool TextureXEditor::removePatch(unsigned index) {
+bool TextureXEditor::removePatch(unsigned index, bool delete_entry) {
+	// Get patch we're removing
+	patch_t& p = patch_table.patch(index);
+
 	// Update TEXTUREx lists
 	for (unsigned a = 0; a < texture_editors.size(); a++)
-		texture_editors[a]->txList().removePatch(patch_table.patchName(index));
+		texture_editors[a]->txList().removePatch(p.name);
+
+	// Delete patch entry if it's part of this archive (and delete_entry is true)
+	if (delete_entry && p.entry && p.entry->getParent() == archive)
+		archive->removeEntry(p.entry);
 
 	// Remove patch from patch table
 	patch_table.removePatch(index);

@@ -50,6 +50,7 @@
 #include "ArchiveManager.h"
 #include "MainWindow.h"
 #include "SplashWindow.h"
+#include "ArchiveOperations.h"
 #include <wx/aui/auibook.h>
 #include <wx/filename.h>
 #include <wx/gbsizer.h>
@@ -1052,8 +1053,9 @@ void ArchivePanel::handleAction(int menu_id) {
 		convertArchiveTo();
 
 	// Archive->Clean Up
-	else if (menu_id == MainWindow::MENU_ARCHIVE_CLEANUP)
-		cleanupArchive();
+	else if (menu_id == MainWindow::MENU_ARCHIVE_CLEAN_PATCHES)
+		ArchiveOperations::removeUnusedPatches(archive);
+		//cleanupArchive();
 
 
 	// *************************************************************

@@ -361,6 +361,8 @@ void PatchTablePanel::onBtnRemovePatch(wxCommandEvent& e) {
 	if (selection.size() == 0)
 		return;
 
+	// TODO: Yes(to All) + No(to All) messagebox asking to delete entries along with patches
+
 	// Go through patch list selection
 	for (int a = selection.size() - 1; a >= 0; a--) {
 		// Check if patch is currently in use

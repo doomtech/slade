@@ -173,7 +173,10 @@ void MainWindow::setupLayout() {
 	archiveMenu->AppendSeparator();
 	archiveMenu->Append(createMenuItem(archiveMenu,	MENU_ARCHIVE_TEXEDITOR,		"&Texture Editor",	"Open the texture editor for the current archive"));
 	archiveMenu->Append(createMenuItem(archiveMenu,	MENU_ARCHIVE_CONVERTTO,		"&Convert To...",	"Convert the current archive to a different format"));
-	archiveMenu->Append(createMenuItem(archiveMenu,	MENU_ARCHIVE_CLEANUP,		"Clean &Up",		"Clean up the current archive by removing unused entries and data"));
+	//archiveMenu->Append(createMenuItem(archiveMenu,	MENU_ARCHIVE_CLEANUP,		"Clean &Up",		"Clean up the current archive by removing unused entries and data"));
+	wxMenu* archiveCleanMenu = new wxMenu("");
+	archiveCleanMenu->Append(createMenuItem(archiveCleanMenu, MENU_ARCHIVE_CLEAN_PATCHES, "Remove Unused &Patches", "Removes any unused patches, and their associated entries"));
+	archiveMenu->AppendSubMenu(archiveCleanMenu, "Clean &Up");
 	menu->Append(archiveMenu, "&Archive");
 
 	// Entry menu
