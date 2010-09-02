@@ -359,6 +359,14 @@
 			Name="Main Editor"
 			>
 			<File
+				RelativePath=".\src\ArchiveOperations.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\ArchiveOperations.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\EntryOperations.cpp"
 				>
 			</File>
