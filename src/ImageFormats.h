@@ -540,7 +540,7 @@ public:
 			if (colheight == 0)
 				pnumemptycol++;
 		}
-		if (height = 0)
+		if (height == 0)
 			return EDF_FALSE;
 
 		avgcolheight *= 16;	avgcolheight /= width;
@@ -548,10 +548,10 @@ public:
 		
 		// Arbitrary value: sprite must be at least about 12% filled
 		if ((avgcolheight < height / 2) || (pnumemptycol > 14))
-			return EDF_FALSE;
+			return EDF_UNLIKELY;
 
 		// Least efficient sprites: single rows (amounts to 6 bytes per pixel + 4 header bytes)
-		return (size < (5 + ((5 + height) * width)));
+		return (size < (5 + ((5 + height) * width))) ? EDF_TRUE : EDF_UNLIKELY;
 	}
 };
 
@@ -566,7 +566,7 @@ public:
 		// successfully loaded: 130 header, +1 line of 64.
 		if (size < 194)
 			return EDF_FALSE;
-		return (size == (mc[0]*256) + 130);
+		return (size == (mc[0]*256) + 130) ? EDF_TRUE : EDF_FALSE;
 	}
 }; 
 
@@ -586,7 +586,7 @@ public:
 		if (height == 0)
 			return EDF_FALSE;
 		size_t pixels = width * height;
-		return (size >= (pixels + 4) && size < 2 * pixels + 4);
+		return (size >= (pixels + 4) && (size < (2 * pixels + 4))) ? EDF_TRUE : EDF_FALSE;
 	}
 };
 

@@ -1376,7 +1376,7 @@ bool SImage::loadAnaMip(const uint8_t* gfx_data, int size) {
 	has_palette = false;
 	format = PALMASK;
 
-	if (size < 4 + width * height)
+	if (size < (4 + (width * height)))
 		return false;
 
 	// Create data (all white) and mask
