@@ -79,6 +79,7 @@ public:
 	~MainWindow();
 
 	void	setupLayout();
+	void	createStartPage();
 
 	ArchiveManagerPanel*	getArchiveManagerPanel() { return panel_archivemanager; }
 

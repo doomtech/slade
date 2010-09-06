@@ -38,6 +38,7 @@
 #include "PaletteChooser.h"
 #include "BaseResourceChooser.h"
 #include "PreferencesDialog.h"
+#include "Tokenizer.h"
 #include <wx/aboutdlg.h>
 
 
@@ -91,18 +92,11 @@ void MainWindow::setupLayout() {
 	m_mgr->AddPane(notebook_tabs, p_inf);
 
 	// Create Start Page (temporary)
-	html_startpage = new wxHtmlWindow(notebook_tabs, -1);
+	html_startpage = new wxHtmlWindow(notebook_tabs, -1, wxDefaultPosition, wxDefaultSize, wxHW_SCROLLBAR_NEVER|wxHW_NO_SELECTION);
 	html_startpage->SetName("startpage");
 	notebook_tabs->AddPage(html_startpage,"Start Page");
 	notebook_tabs->SetPageBitmap(0, getIcon("i_logo"));
-	Archive* res_archive = theArchiveManager->programResourceArchive();
-	ArchiveEntry* sp_entry = res_archive->getEntry("startpage.htm", false, res_archive->getDir("html"));
-	if (sp_entry)
-		html_startpage->SetPage(wxString::From8BitData((const char *)(sp_entry->getData(true)), sp_entry->getSize()));
-	else { // Fallback
-		wxLogMessage("Warning: html/startpage.htm not found in slade.pk3!");
-		html_startpage->SetPage("<HTML><BODY><CENTER><H1>SLADE<FONT SIZE=-4>3</FONT></H1><BR>It's A Doom Editor<BR><BR><BR><A HREF=http://slade.mancubus.net>http://slade.mancubus.net</A></CENTER></BODY></HTML>");
-	}
+	createStartPage();
 
 
 	// -- Console Panel --
@@ -276,6 +270,68 @@ void MainWindow::setupLayout() {
 	Bind(wxEVT_CLOSE_WINDOW, &MainWindow::onClose, this);
 }
 
+void MainWindow::createStartPage() {
+	// Get relevant resource entries
+	Archive* res_archive = theArchiveManager->programResourceArchive();
+	if (!res_archive)
+		return;
+	ArchiveEntry* entry_html = res_archive->entryAtPath("html/startpage.htm");
+	ArchiveEntry* entry_logo = res_archive->entryAtPath("logo.png");
+	ArchiveEntry* entry_tips = res_archive->entryAtPath("tips.txt");
+
+	// Can't do anything without html entry
+	if (!entry_html) {
+		html_startpage->SetPage("<html><head>SLADE</head><body>Something is wrong with slade.pk3 :(</body></html>");
+		return;
+	}
+
+	// Get html as string
+	string html = wxString::FromAscii((const char*)(entry_html->getData()), entry_html->getSize());
+
+	// Generate tip of the day string
+	string tip = "Tip";
+	if (entry_tips) {
+		Tokenizer tz;
+		tz.openMem((const char*)entry_tips->getData(), entry_tips->getSize());
+		srand(wxGetLocalTime());
+		int numtips = tz.getInteger();
+		int tipindex = rand() % numtips;
+		for (unsigned a = 0; a < tipindex; a++)
+			tip = tz.getToken();
+	}
+
+	// Generate recent files string
+	string recent;
+	for (unsigned a = 0; a < 4; a++) {
+		if (a >= theArchiveManager->numRecentFiles())
+			break;	// No more recent files
+
+		// Add line break if needed
+		if (a > 0) recent += "<br/>\n";
+
+		// Add recent file link
+		recent += s_fmt("<a href=\"recent://%d\">%s</a>", a, theArchiveManager->recentFile(a));
+	}
+
+	// Insert tip and recent files into html
+	html.Replace("#recent#", recent);
+	html.Replace("#totd#", tip);
+
+	// Write html and images to temp folder
+	if (entry_logo) entry_logo->exportFile(appPath("logo.png", DIR_TEMP));
+	string html_file = appPath("startpage.htm", DIR_TEMP);
+	wxFile outfile(html_file, wxFile::write);
+	outfile.Write(html);
+	outfile.Close();
+
+	// Load page
+	html_startpage->LoadPage(html_file);
+
+	// Clean up
+	wxRemoveFile(html_file);
+	wxRemoveFile(appPath("logo.png", DIR_TEMP));
+}
+
 
 /*******************************************************************
  * MAINWINDOW EVENTS
@@ -381,8 +437,27 @@ void MainWindow::onMenuItemClicked(wxCommandEvent& e) {
  * external (http) links are opened in the default browser
  *******************************************************************/
 void MainWindow::onHTMLLinkClicked(wxHtmlLinkEvent &e) {
-	if (e.GetLinkInfo().GetHref().StartsWith("http://"))
+	string href = e.GetLinkInfo().GetHref();
+
+	if (href.StartsWith("http://"))
 		wxLaunchDefaultBrowser(e.GetLinkInfo().GetHref());
+	else if (href.StartsWith("recent://")) {
+		// Recent file
+		string rs = href.Right(1);
+		unsigned long index = 0;
+		rs.ToULong(&index);
+
+		panel_archivemanager->handleAction(MENU_RECENT_1 + index);
+	}
+	else if (href.StartsWith("action://")) {
+		// Action
+		if (href.EndsWith("open"))
+			panel_archivemanager->handleAction(MENU_FILE_OPEN);
+		else if (href.EndsWith("newwad"))
+			panel_archivemanager->handleAction(MENU_FILE_NEWWAD);
+		else if (href.EndsWith("newzip"))
+			panel_archivemanager->handleAction(MENU_FILE_NEWZIP);
+	}
 	else
 		html_startpage->OnLinkClicked(e.GetLinkInfo());
 }

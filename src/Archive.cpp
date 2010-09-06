@@ -424,12 +424,20 @@ int	Archive::entryIndex(ArchiveEntry* entry, ArchiveTreeNode* dir) {
 	return dir->entryIndex(entry);
 }
 
+/* Archive::entryAtPath
+ * Returns the entry at the given path in the archive, or NULL if it
+ * doesn't exist
+ *******************************************************************/
 ArchiveEntry* Archive::entryAtPath(string path) {
 	// Get path as wxFileName for processing
 	wxFileName fn(path);
 
 	// Get directory from path
-	ArchiveTreeNode* dir = getDir(fn.GetPath(true));
+	ArchiveTreeNode* dir;
+	if (fn.GetPath(false).IsEmpty())
+		dir = getRoot();
+	else
+		dir = getDir(fn.GetPath(true));
 
 	// If dir doesn't exist, return null
 	if (!dir)
