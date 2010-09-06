@@ -15,7 +15,6 @@ TODO List ---------------------------------------------------------------
 - Media panel
 - Entry filter by type/category
 - 'Export As' for both entries and archives - does conversion+export
-- Proper start page
 
 --- Bugs ---
 - Copy/paste entry parent problem
@@ -144,7 +143,6 @@ Ideas / Possible Features -----------------------------------------------
 
 
 Other / Notes -----------------------------------------------------------
-- "Recent files" tab in Archive Manager
 
 
 
