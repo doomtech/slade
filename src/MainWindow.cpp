@@ -92,7 +92,7 @@ void MainWindow::setupLayout() {
 	m_mgr->AddPane(notebook_tabs, p_inf);
 
 	// Create Start Page (temporary)
-	html_startpage = new wxHtmlWindow(notebook_tabs, -1, wxDefaultPosition, wxDefaultSize, wxHW_SCROLLBAR_NEVER|wxHW_NO_SELECTION);
+	html_startpage = new wxHtmlWindow(notebook_tabs, -1, wxDefaultPosition, wxDefaultSize, wxHW_SCROLLBAR_NEVER, "startpage");
 	html_startpage->SetName("startpage");
 	notebook_tabs->AddPage(html_startpage,"Start Page");
 	notebook_tabs->SetPageBitmap(0, getIcon("i_logo"));
@@ -268,6 +268,7 @@ void MainWindow::setupLayout() {
 	html_startpage->Bind(wxEVT_COMMAND_HTML_LINK_CLICKED, &MainWindow::onHTMLLinkClicked, this);
 	Bind(wxEVT_COMMAND_MENU_SELECTED, &MainWindow::onMenuItemClicked, this, MENU_START, MENU_END);
 	Bind(wxEVT_CLOSE_WINDOW, &MainWindow::onClose, this);
+	Bind(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED, &MainWindow::onTabChanged, this);
 }
 
 void MainWindow::createStartPage() {
@@ -468,5 +469,20 @@ void MainWindow::onHTMLLinkClicked(wxHtmlLinkEvent &e) {
 void MainWindow::onClose(wxCloseEvent& e) {
 	main_window_layout = m_mgr->SavePerspective();
 	wxTheApp->Exit();
+	e.Skip();
+}
+
+/* MainWindow::onTabChanged
+ * Called when the current tab is changed
+ *******************************************************************/
+void MainWindow::onTabChanged(wxAuiNotebookEvent& e) {
+	// Get current page
+	wxWindow* page = notebook_tabs->GetPage(notebook_tabs->GetSelection());
+
+	// If start page is selected, refresh it
+	if (page->GetName() == "startpage")
+		createStartPage();
+
+	// Continue
 	e.Skip();
 }

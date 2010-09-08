@@ -87,6 +87,7 @@ public:
 	void	onMenuItemClicked(wxCommandEvent &e);
 	void	onHTMLLinkClicked(wxHtmlLinkEvent &e);
 	void	onClose(wxCloseEvent &e);
+	void	onTabChanged(wxAuiNotebookEvent& e);
 };
 
 

@@ -1207,6 +1207,8 @@ void ArchiveManagerPanel::onArchiveTabChanged(wxAuiNotebookEvent& e) {
 	else
 		((wxFrame*)GetParent())->SetTitle("SLADE");
 	*/
+
+	e.Skip();
 }
 
 /* ArchiveManagerPanel::onArchiveTabClose

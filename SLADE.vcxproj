@@ -103,6 +103,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\ArchiveEntryList.cpp" />
+    <ClCompile Include="src\ArchiveOperations.cpp" />
     <ClCompile Include="src\BaseResourceChooser.cpp" />
     <ClCompile Include="src\BrowserItem.cpp" />
     <ClCompile Include="src\BrowserWindow.cpp" />
@@ -190,6 +191,7 @@
   <ItemGroup>
     <ClInclude Include="src\ArchiveEntryList.h" />
     <ClInclude Include="src\ArchiveFormats.h" />
+    <ClInclude Include="src\ArchiveOperations.h" />
     <ClInclude Include="src\AudioFormats.h" />
     <ClInclude Include="src\BaseResourceChooser.h" />
     <ClInclude Include="src\BrowserItem.h" />

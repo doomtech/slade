@@ -336,6 +336,9 @@
     <ClCompile Include="src\MapEntryPanel.cpp">
       <Filter>Main Editor\UI Elements\EntryPanel</Filter>
     </ClCompile>
+    <ClCompile Include="src\ArchiveOperations.cpp">
+      <Filter>Main Editor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -617,6 +620,9 @@
     </ClInclude>
     <ClInclude Include="src\MapEntryPanel.h">
       <Filter>Main Editor\UI Elements\EntryPanel</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ArchiveOperations.h">
+      <Filter>Main Editor</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
