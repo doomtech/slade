@@ -281,7 +281,7 @@ void MainWindow::createStartPage() {
 
 	// Can't do anything without html entry
 	if (!entry_html) {
-		html_startpage->SetPage("<html><head>SLADE</head><body>Something is wrong with slade.pk3 :(</body></html>");
+		html_startpage->SetPage("<html><head><title>SLADE</title></head><body><center><h1>Something is wrong with slade.pk3 :(</h1><center></body></html>");
 		return;
 	}
 

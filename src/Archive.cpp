@@ -434,10 +434,10 @@ ArchiveEntry* Archive::entryAtPath(string path) {
 
 	// Get directory from path
 	ArchiveTreeNode* dir;
-	if (fn.GetPath(false).IsEmpty())
+	if (fn.GetPath(false, wxPATH_UNIX).IsEmpty())
 		dir = getRoot();
 	else
-		dir = getDir(fn.GetPath(true));
+		dir = getDir(fn.GetPath(true, wxPATH_UNIX));
 
 	// If dir doesn't exist, return null
 	if (!dir)
