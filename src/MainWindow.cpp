@@ -297,7 +297,7 @@ void MainWindow::createStartPage() {
 		tz.openMem((const char*)entry_tips->getData(), entry_tips->getSize());
 		srand(wxGetLocalTime());
 		int numtips = tz.getInteger();
-		if (numtips < 1)
+		if (numtips < 2) // Needs at least two choices or it's kinda pointless.
 			tip = "Did you know? Something is wrong with the tips.txt file in your slade.pk3.";
 		else {
 			int tipindex = 0;

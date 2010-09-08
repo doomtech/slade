@@ -346,9 +346,8 @@ bool MapEntryPanel::loadEntry(ArchiveEntry* entry) {
 				if (l.side2 >= 0)
 					twosided = true;
 				if (l.type > 0) {
-					if (l.flags & 0x100) {
-						wxLogMessage("lolmacro");
-						macro = true;}
+					if (l.type & 0x100)
+						macro = true;
 					else special = true;
 				}
 
