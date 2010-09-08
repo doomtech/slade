@@ -19,6 +19,7 @@ private:
 	wxAuiNotebook*			notebook_tabs;
 	wxHtmlWindow*			html_startpage;
 	wxAuiManager*			m_mgr;
+	int						lasttipindex;
 
 public:
 	enum {

@@ -167,6 +167,8 @@ void EntryDataFormat::initBuiltinFormats() {
 	new MUSDataFormat();
 	new MIDIDataFormat();
 	new XMIDataFormat();
+	new HMIDataFormat();
+	new HMPDataFormat();
 	new ITModuleDataFormat();
 	new XMModuleDataFormat();
 	new S3MModuleDataFormat();

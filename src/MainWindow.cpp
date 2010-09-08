@@ -57,6 +57,7 @@ string main_window_layout = "";
  *******************************************************************/
 MainWindow::MainWindow()
 : wxFrame((wxFrame *) NULL, -1, "SLADE", wxPoint(0, 0), wxSize(1024, 768)) {
+	lasttipindex = 0;
 	Maximize();
 	setupLayout();
 }
@@ -296,9 +297,16 @@ void MainWindow::createStartPage() {
 		tz.openMem((const char*)entry_tips->getData(), entry_tips->getSize());
 		srand(wxGetLocalTime());
 		int numtips = tz.getInteger();
-		int tipindex = rand() % numtips;
-		for (unsigned a = 0; a < tipindex; a++)
-			tip = tz.getToken();
+		if (numtips < 1)
+			tip = "Did you know? Something is wrong with the tips.txt file in your slade.pk3.";
+		else {
+			int tipindex = 0;
+			// Don't show same tip twice in a row
+			do { tipindex = 1 + (rand() % numtips); } while (tipindex == lasttipindex);
+			lasttipindex = tipindex;
+			for (int a = 0; a < tipindex; a++)
+				tip = tz.getToken();
+		}
 	}
 
 	// Generate recent files string

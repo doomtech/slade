@@ -60,6 +60,42 @@ public:
 	}
 };
 
+class HMIDataFormat : public EntryDataFormat {
+public:
+	HMIDataFormat() : EntryDataFormat("hmi") {};
+	~HMIDataFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		// Check size
+		if (mc.getSize() > 50) {
+			// Check for HMI header: HMI-MIDI
+			if (mc[0] == 'H' && mc[1] == 'M' && mc[2] == 'I' && mc[3] == '-' &&
+				mc[4] == 'M' && mc[5] == 'I' && mc[6] == 'D' && mc[7] == 'I')
+				return EDF_TRUE;
+		}
+
+		return EDF_FALSE;
+	}
+};
+
+class HMPDataFormat : public EntryDataFormat {
+public:
+	HMPDataFormat() : EntryDataFormat("hmp") {};
+	~HMPDataFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		// Check size
+		if (mc.getSize() > 50) {
+			// Check for HMI header: HMIMIDIP
+			if (mc[0] == 'H' && mc[1] == 'M' && mc[2] == 'I' && mc[3] == 'M' &&
+				mc[4] == 'I' && mc[5] == 'D' && mc[6] == 'I' && mc[7] == 'P')
+				return EDF_TRUE;
+		}
+
+		return EDF_FALSE;
+	}
+};
+
 class ITModuleDataFormat : public EntryDataFormat {
 public:
 	ITModuleDataFormat() : EntryDataFormat("mod_it") {};

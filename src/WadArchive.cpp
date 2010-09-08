@@ -67,12 +67,13 @@ ns_special_t special_namespaces[] = {
 	{ "sprites",	"s"		},
 	{ "flats",		"f"		},
 	{ "textures",	"tx"	},
+	{ "textures",	"t"		},	// alias for Doom 64
 	{ "hires",		"hi"	},
 	{ "colormaps",	"c"		},
 	{ "acs",		"a"		},
 	{ "voices",		"v"		},
 };
-const int n_special_namespaces = 8;
+const int n_special_namespaces = 9;
 
 
 

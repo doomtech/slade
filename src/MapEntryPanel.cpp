@@ -43,6 +43,7 @@
 rgba_t col_line_1s(255, 255, 255, 255);
 rgba_t col_line_2s(170, 170, 170, 255);
 rgba_t col_line_special(130, 140, 255, 255);
+rgba_t col_line_macro(255, 170, 130, 255);
 
 
 /*******************************************************************
@@ -74,10 +75,11 @@ void MEPCanvas::addVertex(double x, double y) {
 /* MEPCanvas::addLine
  * Adds a line to the map data
  *******************************************************************/
-void MEPCanvas::addLine(unsigned v1, unsigned v2, bool twosided, bool special) {
+void MEPCanvas::addLine(unsigned v1, unsigned v2, bool twosided, bool special, bool macro) {
 	mep_line_t line(v1, v2);
 	line.twosided = twosided;
 	line.special = special;
+	line.macro = macro;
 	lines.push_back(line);
 }
 
@@ -172,6 +174,8 @@ void MEPCanvas::draw() {
 		// Set colour
 		if (line.special)
 			col_line_special.set_gl();
+		else if (line.macro)
+			col_line_macro.set_gl();
 		else if (line.twosided)
 			col_line_2s.set_gl();
 		else
@@ -336,15 +340,20 @@ bool MapEntryPanel::loadEntry(ArchiveEntry* entry) {
 					break;
 
 				// Check properties
+				bool macro = false;
 				bool special = false;
 				bool twosided = false;
 				if (l.side2 >= 0)
 					twosided = true;
-				if (l.type > 0)
-					special = true;
+				if (l.type > 0) {
+					if (l.flags & 0x100) {
+						wxLogMessage("lolmacro");
+						macro = true;}
+					else special = true;
+				}
 
 				// Add line
-				map_canvas->addLine(l.vertex1, l.vertex2, twosided, special);
+				map_canvas->addLine(l.vertex1, l.vertex2, twosided, special, macro);
 			}
 		}
 		else if (thismap.format == MAP_HEXEN) {

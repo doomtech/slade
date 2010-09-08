@@ -17,6 +17,7 @@ struct mep_line_t {
 	unsigned	v2;
 	bool		twosided;
 	bool		special;
+	bool		macro;
 	mep_line_t(unsigned v1, unsigned v2) { this->v1 = v1; this->v2 = v2; }
 };
 
@@ -33,7 +34,7 @@ public:
 	~MEPCanvas();
 
 	void addVertex(double x, double y);
-	void addLine(unsigned v1, unsigned v2, bool twosided, bool special);
+	void addLine(unsigned v1, unsigned v2, bool twosided, bool special, bool macro = false);
 	void clearMap();
 	void showMap();
 	void draw();
