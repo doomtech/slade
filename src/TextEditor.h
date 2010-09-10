@@ -4,16 +4,17 @@
 
 #include <wx/stc/stc.h>
 #include "ArchiveEntry.h"
+#include "TextLanguage.h"
 
 class TextEditor : public wxStyledTextCtrl {
 private:
+	TextLanguage	language;
 
 public:
 	TextEditor(wxWindow* parent, int id);
 	~TextEditor();
 
 	bool	loadEntry(ArchiveEntry* entry);
-	bool	loadHexEntry(ArchiveEntry* entry);
 	void	getRawText(MemChunk& mc);
 
 	void	onModified(wxStyledTextEvent& e);

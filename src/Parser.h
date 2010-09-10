@@ -3,7 +3,6 @@
 #define __PARSER_H__
 
 #include "Tree.h"
-#include "Property.h"
 #include "Tokenizer.h"
 
 class ParseTreeNode : public STreeNode {

@@ -179,7 +179,7 @@ struct rgba_t {
 	// Constructors
 	rgba_t() { r = 0; g = 0; b = 0; a = 0; blend = -1; }
 
-	rgba_t(uint8_t R, uint8_t G, uint8_t B, uint8_t A, char BLEND = -1) {
+	rgba_t(uint8_t R, uint8_t G, uint8_t B, uint8_t A = 255, char BLEND = -1) {
 		r = R;
 		g = G;
 		b = B;
@@ -188,7 +188,7 @@ struct rgba_t {
 	}
 
 	// Functions
-	void set(uint8_t R, uint8_t G, uint8_t B, uint8_t A, char BLEND = -1) {
+	void set(uint8_t R, uint8_t G, uint8_t B, uint8_t A = 255, char BLEND = -1) {
 		r = R;
 		g = G;
 		b = B;

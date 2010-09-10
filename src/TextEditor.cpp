@@ -34,6 +34,15 @@
 
 
 /*******************************************************************
+ * VARIABLES
+ *******************************************************************/
+rgba_t col_comment(0, 150, 0, 255);
+rgba_t col_string(0, 120, 130, 255);
+rgba_t col_keyword(0, 30, 200, 255);
+rgba_t col_constant(0, 30, 200, 255);
+
+
+/*******************************************************************
  * TEXTEDITOR CLASS FUNCTIONS
  *******************************************************************/
 
@@ -41,7 +50,7 @@
  * TextEditor class constructor
  *******************************************************************/
 TextEditor::TextEditor(wxWindow* parent, int id)
-: wxStyledTextCtrl(parent, id) {
+: wxStyledTextCtrl(parent, id), language("lang") {
 	// Set default font
 	wxFont f(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 	StyleSetFont(wxSTC_STYLE_DEFAULT, f);
@@ -53,14 +62,19 @@ TextEditor::TextEditor(wxWindow* parent, int id)
 	SetMarginWidth(1, 4);
 
 	// Test colours
-	StyleSetForeground(wxSTC_C_COMMENT, wxColor(0, 150, 0));
-	StyleSetForeground(wxSTC_C_COMMENTDOC, wxColor(0, 150, 0));
-	StyleSetForeground(wxSTC_C_COMMENTLINE, wxColor(0, 150, 0));
-	StyleSetForeground(wxSTC_C_STRING, wxColor(0, 120, 130));
-	StyleSetForeground(wxSTC_C_CHARACTER, wxColor(0, 120, 130));
+	StyleSetForeground(wxSTC_C_COMMENT, WXCOL(col_comment));
+	StyleSetForeground(wxSTC_C_COMMENTDOC, WXCOL(col_comment));
+	StyleSetForeground(wxSTC_C_COMMENTLINE, WXCOL(col_comment));
+	StyleSetForeground(wxSTC_C_STRING, WXCOL(col_string));
+	StyleSetForeground(wxSTC_C_CHARACTER, WXCOL(col_string));
+	StyleSetForeground(wxSTC_C_WORD, WXCOL(col_keyword));
 
 	// Temp
 	SetLexer(wxSTC_LEX_CPP);
+
+	SetKeyWords(0, language.getKeywordsList());
+	SetKeyWords(1, language.getFunctionsList());
+	SetKeyWords(2, language.getConstantsList());
 
 	Bind(wxEVT_STC_MODIFIED, &TextEditor::onModified, this);
 	Bind(wxEVT_STC_CHANGE, &TextEditor::onTextChanged, this);
@@ -130,6 +144,7 @@ void TextEditor::onTextChanged(wxStyledTextEvent& e) {
  * Should be completely yanked out and replaced by a real hex editor
  * as soon as possible. This merely displays hex as text!
  *******************************************************************/
+/*
 bool TextEditor::loadHexEntry(ArchiveEntry* entry) {
 	// Clear current text
 	ClearAll();
@@ -174,4 +189,4 @@ bool TextEditor::loadHexEntry(ArchiveEntry* entry) {
 
 	return true;
 }
-
+*/

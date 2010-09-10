@@ -35,8 +35,8 @@
 /*******************************************************************
  * VARIABLES
  *******************************************************************/
-char special_tokens[] = { ';', ',', ':', '|', '=', '{', '}', '/' };
-int n_special_tokens = 9;
+//char special_tokens[] = { ';', ',', ':', '|', '=', '{', '}', '/' };
+//int n_special_tokens = 9;
 
 /*******************************************************************
  * TOKENIZER CLASS FUNCTIONS
@@ -52,6 +52,7 @@ Tokenizer::Tokenizer(bool c_comments, bool h_comments, bool s_comments) {
 	size = 0;
 	comments = 0 | c_comments | h_comments << 1 | s_comments << 2;
 	debug = false;
+	special = ";,:|={}/";	// Default special characters
 }
 
 /* Tokenizer::~Tokenizer
@@ -149,9 +150,17 @@ bool Tokenizer::isWhitespace(char p) {
  * that should always be its own token (;, =, | etc)
  *******************************************************************/
 bool Tokenizer::isSpecialCharacter(char p) {
+
+	/*
 	// Check though special_tokens array
 	for (int a = 0; a < n_special_tokens; a++) {
 		if (p == special_tokens[a])
+			return true;
+	}
+	*/
+	// Check through special tokens string
+	for (unsigned a = 0; a < special.size(); a++) {
+		if (special[a] == p)
 			return true;
 	}
 

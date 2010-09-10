@@ -112,6 +112,7 @@ float ParseTreeNode::getFloatValue(unsigned index) {
  * Parses formatted text data. Current valid formatting is:
  * child = value;
  * child = value1, value2, ...;
+ * child = { value1, value2, ... }
  * child { grandchild = value; etc... }
  * child : inherited { ... }
  * All values are read as strings, but can be retrieved as string,
@@ -144,17 +145,24 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 			// Create item node
 			ParseTreeNode* child = (ParseTreeNode*)addChild(name);
 
-			// Parse until ;
+			// Check type of assignment list
 			token = tz.getToken();
-			while (!(s_cmp(token, ";"))) {
+			string list_end = ";";
+			if (token == "{") {
+				list_end = "}";
+				token = tz.getToken();
+			}
+
+			// Parse until ; or }
+			while (!(s_cmp(token, list_end))) {
 				// Add value
 				child->values.push_back(token);
 
 				// Check for ,
 				if (s_cmp(tz.peekToken(), ","))
 					tz.getToken();	// Skip it
-				else if (!(s_cmp(tz.peekToken(), ";"))) {
-					wxLogMessage("Parsing error: Expected \",\" or \";\", got \"%s\"", chr(tz.getToken()));
+				else if (!(s_cmp(tz.peekToken(), list_end))) {
+					wxLogMessage("Parsing error: Expected \",\" or \"%s\", got \"%s\"", chr(list_end), chr(tz.getToken()));
 					return false;
 				}
 

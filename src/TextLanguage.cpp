@@ -2,6 +2,7 @@
 #include "Main.h"
 #include "TextLanguage.h"
 #include "Tokenizer.h"
+#include "Parser.h"
 
 vector<TextLanguage*>	text_languages;
 
@@ -78,123 +79,102 @@ bool TextLanguage::readLanguageDefinition(MemChunk& mc) {
 		return false;
 	}
 
-	// Get first token
-	string token = tz.getToken();
+	// Parse the definition text
+	ParseTreeNode root;
+	if (!root.parse(tz))
+		return false;
 
-	// If it's an entry_types definition, read it
-	if (!token.Cmp("language")) {
-		// Read language id
-		string id = tz.getToken();
+	// Get parsed data
+	for (unsigned a = 0; a < root.nChildren(); a++) {
+		ParseTreeNode* node = (ParseTreeNode*)root.getChild(a);
 
-		// Create new language
-		TextLanguage* language = new TextLanguage(id);
+		// Create language
+		TextLanguage* lang = new TextLanguage(node->getName());
 
-		// Check for ":" (inheritance)
-		if (tz.peekToken() == ":") {
-			string parent = tz.getToken();
+		// Parse language info
+		for (unsigned c = 0; c < node->nChildren(); c++) {
+			ParseTreeNode* child = (ParseTreeNode*)node->getChild(c);
 
-			// Do inheritance stuff
-		}
-
-		// Skip opening brace
-		if (!tz.checkToken("{"))
-			return false;
-
-		// Read language definition
-		token = tz.getToken();
-		while (token != "}") {
 			// Language name
-			if (s_cmpnocase(token, "name")) {
-				tz.getToken();						// Skip =
-				language->setName(tz.getToken());	// Set name
-				tz.getToken();						// Skip ;
-			}
-
-			// Line comment
-			if (s_cmpnocase(token, "line_comment")) {
-				tz.getToken();								// Skip =
-				language->setLineComment(tz.getToken());	// Set line comment
-				tz.getToken();								// Skip ;
-			}
+			if (s_cmpnocase(child->getName(), "name"))
+				lang->setName(child->getStringValue());
 
 			// Comment begin
-			if (s_cmpnocase(token, "comment_begin")) {
-				tz.getToken();								// Skip =
-				language->setCommentBegin(tz.getToken());	// Set comment begin
-				tz.getToken();								// Skip ;
-			}
+			else if (s_cmpnocase(child->getName(), "comment_begin"))
+				lang->setCommentBegin(child->getStringValue());
 
 			// Comment end
-			if (s_cmpnocase(token, "comment_end")) {
-				tz.getToken();							// Skip =
-				language->setCommentEnd(tz.getToken());	// Set comment end
-				tz.getToken();							// Skip ;
-			}
+			else if (s_cmpnocase(child->getName(), "comment_end"))
+				lang->setCommentEnd(child->getStringValue());
+
+			// Line comment
+			else if (s_cmpnocase(child->getName(), "line_comment"))
+				lang->setLineComment(child->getStringValue());
 
 			// Preprocessor
-			if (s_cmpnocase(token, "preprocessor")) {
-				tz.getToken();								// Skip =
-				language->setPreprocessor(tz.getToken());	// Set preprocessor
-				tz.getToken();								// Skip ;
-			}
+			else if (s_cmpnocase(child->getName(), "preprocessor"))
+				lang->setPreprocessor(child->getStringValue());
 
-			// Keywords list
-			if (s_cmpnocase(token, "keywords")) {
-				tz.getToken();		// Skip {
-				token = tz.getToken();
-				while (!(s_cmp(token, "}"))) {
-					language->addKeyword(token);	// Add keyword
-					token = tz.getToken();
-				}
-			}
+			// Case sensitive
+			else if (s_cmpnocase(child->getName(), "case_sensitive"))
+				lang->setCaseSensitive(child->getBoolValue());
 
-			// Constants list
-			if (s_cmpnocase(token, "constants")) {
-				tz.getToken();		// Skip {
-				token = tz.getToken();
-				while (!(s_cmp(token, "}"))) {
-					language->addConstant(token);	// Add constant
-					token = tz.getToken();
-				}
-			}
+			// Keywords
+			else if (s_cmpnocase(child->getName(), "keywords")) {
+				// Go through values
+				for (unsigned v = 0; v < child->nValues(); v++) {
+					string val = child->getStringValue(v);
 
-			// Functions list
-			if (s_cmpnocase(token, "functions")) {
-				tz.getToken();		// Skip {
-				token = tz.getToken();
-				while (!(s_cmp(token, "}"))) {
-					// Read function name
-					string func_name = token;
-					token = tz.getToken();
-
-					// If next token is =, read parameter list
-					if (s_cmp(token, "=")) {
-						vector<string> args;
-						tz.getToken();	// Skip {
-						token = tz.getToken();
-						while (!(s_cmp(token, "}"))) {
-							args.push_back(token);
-							token = tz.getToken();
-						}
-						tz.getToken();	// Skip }
-
-						// Add new function
-						language->addFunction(func_name, args);
+					// Check for '$override'
+					if (s_cmpnocase(val, "$override")) {
+						// Clear any inherited keywords
+						lang->clearKeywords();
 					}
 
-					// If next token is ;, function has no parameters
-					else if (s_cmp(token, ";")) {
-						// Add new function
-						language->addFunction(func_name, vector<string>());
-					}
-
-					token = tz.getToken();
+					// Not a special symbol, add as keyword
+					else
+						lang->addKeyword(val);
 				}
 			}
 
-			token = tz.getToken();
+			// Constants
+			else if (s_cmpnocase(child->getName(), "constants")) {
+				// Go through values
+				for (unsigned v = 0; v < child->nValues(); v++) {
+					string val = child->getStringValue(v);
+
+					// Check for '$override'
+					if (s_cmpnocase(val, "$override")) {
+						// Clear any inherited constants
+						lang->clearConstants();
+					}
+
+					// Not a special symbol, add as constant
+					else
+						lang->addConstant(val);
+				}
+			}
+
+			// Functions
+			else if (s_cmpnocase(child->getName(), "functions")) {
+				// Go through children (functions)
+				for (unsigned f = 0; f < child->nChildren(); f++) {
+					ParseTreeNode* child_func = (ParseTreeNode*)child->getChild(f);
+
+					// Get name
+					tl_function_t fn;
+					fn.name = child_func->getName();
+
+					// Get args
+					for (unsigned v = 0; v < child_func->nValues(); v++)
+						fn.args.push_back(child_func->getStringValue(v));
+
+					// Add function
+					lang->addFunction(fn.name, fn.args);
+				}
+			}
 		}
 	}
 
-	return false;
+	return true;
 }

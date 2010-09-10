@@ -243,3 +243,61 @@ CONSOLE_COMMAND (testmatch, 0) {
 	else
 		theConsole->logMessage("No Match");
 }
+
+
+// Converts DB-style ACS function definitions to SLADE-style:
+// from Function = "Function(Arg1, Arg2, Arg3)";
+// to Function = "Arg1", "Arg2", "Arg3";
+// Reads from a text file and outputs the result to the console
+#if 1
+#include "Parser.h"
+
+CONSOLE_COMMAND (langfuncsplit, 1) {
+	MemChunk mc;
+	if (!mc.importFile(args[0]))
+		return;
+
+	Parser p;
+	if (!p.parseText(mc))
+		return;
+
+	ParseTreeNode* root = p.parseTreeRoot();
+	for (unsigned a = 0; a < root->nChildren(); a++) {
+		ParseTreeNode* node = (ParseTreeNode*)root->getChild(a);
+
+		// Get function definition line (eg "Function(arg1, arg2, arg3)")
+		string funcline = node->getStringValue();
+
+		// Remove brackets
+		funcline.Replace("(", " ");
+		funcline.Replace(")", " ");
+
+		// Parse definition
+		vector<string> args;
+		Tokenizer tz2;
+		tz2.setSpecialCharacters(",;");
+		tz2.openString(funcline);
+		tz2.getToken();	// Skip function name
+		string token = tz2.getToken();
+		while (token != "") {
+			if (token != ",")
+				args.push_back(token);
+			token = tz2.getToken();
+		}
+
+		// Print to console
+		string lmsg = node->getName();
+		if (args.size() > 0) {
+			lmsg += " = ";
+			for (unsigned arg = 0; arg < args.size(); arg++) {
+				if (arg > 0)
+					lmsg += ", ";
+				lmsg += "\"" + args[arg] + "\"";
+			}
+		}
+		lmsg += ";";
+		theConsole->logMessage(lmsg);
+	}
+}
+
+#endif

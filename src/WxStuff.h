@@ -14,6 +14,9 @@
 #define max(a,b) (((a)>(b))?(a):(b))
 #define min(a,b) (((a)<(b))?(a):(b))
 
+// Some misc wx-related defines
+#define WXCOL(rgba) wxColor(rgba.r, rgba.g, rgba.b, rgba.a)
+
 // Some misc wx-related functions
 wxMenuItem* createMenuItem(wxMenu* menu, int id, string label, string help = wxEmptyString, string icon = wxEmptyString);
 

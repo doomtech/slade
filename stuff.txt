@@ -8,12 +8,20 @@
 TODO List ---------------------------------------------------------------
 
 --- Before Final 3.0 Release ---
-- TEXTUREx editor
+- TEXTUREx editor:
 	- Patch browser
 	- Copy+Paste textures
-- Text editor special features
+- Text editor special features:
+	- Keyword/Constant/Function highlighting and autocomplete
+	- Function calltips
+	- Auto-indent
+	- Web lookup for k/c/f
+	- Preferences:
+		- Option to clear empty lines / unneeded whitespace on save
+		- Colour configuration (separate from global colour config?)
+		- Font configuration
+		- Tab size
 - Media panel
-- Entry filter by type/category
 - 'Export As' for both entries and archives - does conversion+export
 
 --- Bugs ---

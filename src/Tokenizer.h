@@ -16,10 +16,13 @@ private:
 	uint32_t	position;	// Current position
 	uint8_t		comments;	// See CommentTypes enum
 	bool		debug;		// If true every getToken() is printed to the console
+	string		special;	// A string defining the 'special characters'. These will always be parsed as separate tokens
 
 public:
 	Tokenizer(bool c_comments = true, bool h_comments = true, bool s_comments = false);
 	~Tokenizer();
+
+	void setSpecialCharacters(string special) { this->special = special; }
 
 	void enableDebug(bool debug = true) { this->debug = debug; }
 

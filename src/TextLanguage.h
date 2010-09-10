@@ -15,6 +15,7 @@ private:
 	string					comment_begin;
 	string					comment_end;
 	string					preprocessor;
+	bool					case_sensitive;
 	vector<string>			keywords;
 	vector<string>			constants;
 	vector<tl_function_t>	functions;
@@ -28,6 +29,7 @@ public:
 	void	setCommentBegin(string token) { comment_begin = token; }
 	void	setCommentEnd(string token) { comment_end = token; }
 	void	setPreprocessor(string token) { preprocessor = token; }
+	void	setCaseSensitive(bool cs) { case_sensitive = cs; }
 	void	addKeyword(string keyword) { keywords.push_back(keyword); }
 	void	addConstant(string constant) { constants.push_back(constant); }
 	void	addFunction(string name, vector<string> args);
@@ -35,6 +37,10 @@ public:
 	string	getKeywordsList();
 	string	getConstantsList();
 	string	getFunctionsList();
+
+	void	clearKeywords() { keywords.clear(); }
+	void	clearConstants() { constants.clear(); }
+	void	clearFunctions() { functions.clear(); }
 
 	// Static functions
 	static bool	readLanguageDefinition(MemChunk& mc);
