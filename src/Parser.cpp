@@ -183,6 +183,15 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 				return false;
 		}
 
+		// Child node (with no values/children)
+		else if (s_cmp(next, ";")) {
+			// Add child node
+			addChild(name);
+
+			// Skip ;
+			tz.getToken();
+		}
+
 		// Child node + inheritance
 		else if (s_cmp(next, ":")) {
 			// Skip :

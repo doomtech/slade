@@ -8,14 +8,16 @@
 
 class TextEditor : public wxStyledTextCtrl {
 private:
-	TextLanguage	language;
+	TextLanguage*	language;
 
 public:
 	TextEditor(wxWindow* parent, int id);
 	~TextEditor();
 
+	bool	setLanguage(TextLanguage* lang);
 	bool	loadEntry(ArchiveEntry* entry);
 	void	getRawText(MemChunk& mc);
+	void	trimWhitespace();
 
 	void	onModified(wxStyledTextEvent& e);
 	void	onTextChanged(wxStyledTextEvent& e);

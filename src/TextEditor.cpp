@@ -36,10 +36,12 @@
 /*******************************************************************
  * VARIABLES
  *******************************************************************/
+CVAR(Bool, text_trim_whitespace, false, CVAR_SAVE)
 rgba_t col_comment(0, 150, 0, 255);
 rgba_t col_string(0, 120, 130, 255);
 rgba_t col_keyword(0, 30, 200, 255);
-rgba_t col_constant(0, 30, 200, 255);
+rgba_t col_constant(180, 30, 200, 255);
+rgba_t col_function(200, 100, 30, 255);
 
 
 /*******************************************************************
@@ -50,7 +52,7 @@ rgba_t col_constant(0, 30, 200, 255);
  * TextEditor class constructor
  *******************************************************************/
 TextEditor::TextEditor(wxWindow* parent, int id)
-: wxStyledTextCtrl(parent, id), language("lang") {
+: wxStyledTextCtrl(parent, id) {
 	// Set default font
 	wxFont f(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 	StyleSetFont(wxSTC_STYLE_DEFAULT, f);
@@ -68,13 +70,12 @@ TextEditor::TextEditor(wxWindow* parent, int id)
 	StyleSetForeground(wxSTC_C_STRING, WXCOL(col_string));
 	StyleSetForeground(wxSTC_C_CHARACTER, WXCOL(col_string));
 	StyleSetForeground(wxSTC_C_WORD, WXCOL(col_keyword));
+	StyleSetForeground(wxSTC_C_WORD2, WXCOL(col_function));
+	StyleSetForeground(wxSTC_C_GLOBALCLASS, WXCOL(col_constant));
 
 	// Temp
-	SetLexer(wxSTC_LEX_CPP);
-
-	SetKeyWords(0, language.getKeywordsList());
-	SetKeyWords(1, language.getFunctionsList());
-	SetKeyWords(2, language.getConstantsList());
+	SetLexer(wxSTC_LEX_CPPNOCASE);
+	setLanguage(TextLanguage::getLanguage("decorate"));
 
 	Bind(wxEVT_STC_MODIFIED, &TextEditor::onModified, this);
 	Bind(wxEVT_STC_CHANGE, &TextEditor::onTextChanged, this);
@@ -86,8 +87,24 @@ TextEditor::TextEditor(wxWindow* parent, int id)
 TextEditor::~TextEditor() {
 }
 
+bool TextEditor::setLanguage(TextLanguage* lang) {
+	// Check language was given
+	if (!lang)
+		return false;
+
+	// Load word lists
+	SetKeyWords(0, lang->getKeywordsList().Lower());
+	SetKeyWords(1, lang->getFunctionsList().Lower());
+	SetKeyWords(3, lang->getConstantsList().Lower());
+
+	// Update variables
+	this->language = lang;
+
+	return true;
+}
+
 /* TextEditor::loadEntry
- * Reads the contents of <entry> into the text area, returns false
+ * Reads the contents of [entry] into the text area, returns false
  * if the given entry is invalid
  *******************************************************************/
 bool TextEditor::loadEntry(ArchiveEntry* entry) {
@@ -125,7 +142,9 @@ void TextEditor::getRawText(MemChunk& mc) {
 	mc.clear();
 	const char* raw_text = GetTextRaw();
 	mc.importMem((const uint8_t*)raw_text, GetTextLength());
-	//mc.importMem((const uint8_t*)(chr(GetText())), GetText().size());
+}
+
+void TextEditor::trimWhitespace() {
 }
 
 void TextEditor::onModified(wxStyledTextEvent& e) {

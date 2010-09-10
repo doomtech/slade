@@ -3,6 +3,7 @@
 #include "TextLanguage.h"
 #include "Tokenizer.h"
 #include "Parser.h"
+#include "ArchiveManager.h"
 
 vector<TextLanguage*>	text_languages;
 
@@ -90,6 +91,7 @@ bool TextLanguage::readLanguageDefinition(MemChunk& mc) {
 
 		// Create language
 		TextLanguage* lang = new TextLanguage(node->getName());
+		text_languages.push_back(lang);
 
 		// Parse language info
 		for (unsigned c = 0; c < node->nChildren(); c++) {
@@ -177,4 +179,36 @@ bool TextLanguage::readLanguageDefinition(MemChunk& mc) {
 	}
 
 	return true;
+}
+
+bool TextLanguage::loadLanguages() {
+	// Get slade resource archive
+	Archive* res_archive = theArchiveManager->programResourceArchive();
+
+	// Read language definitions from resource archive
+	if (res_archive) {
+		// Get 'config/languages' directlry
+		ArchiveTreeNode* dir = res_archive->getDir("config/languages");
+
+		if (dir) {
+			// Read all entries in this dir
+			for (unsigned a = 0; a < dir->numEntries(); a++)
+				readLanguageDefinition(dir->getEntry(a)->getMCData());
+		}
+		else
+			wxLogMessage("Warning: 'config/languages' not found in slade.pk3, no builtin text language definitions loaded");
+	}
+
+	return true;
+}
+
+TextLanguage* TextLanguage::getLanguage(string id) {
+	// Find text language matching [id]
+	for (unsigned a = 0; a < text_languages.size(); a++) {
+		if (text_languages[a]->id == id)
+			return text_languages[a];
+	}
+
+	// Not found
+	return NULL;
 }

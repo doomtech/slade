@@ -37,6 +37,7 @@
 #include "Icons.h"
 #include "SplashWindow.h"
 #include "EntryDataFormat.h"
+#include "TextLanguage.h"
 #include <wx/image.h>
 #include <wx/stdpaths.h>
 #include <wx/ffile.h>
@@ -291,6 +292,10 @@ bool MainApp::OnInit() {
 	wxLogMessage("Loading entry types");
 	EntryDataFormat::initBuiltinFormats();
 	EntryType::loadEntryTypes();
+
+	// Load text languages
+	wxLogMessage("Loading text languages");
+	TextLanguage::loadLanguages();
 
 	// Open any archives on the command line
 	// argv[0] is normally the executable itself (i.e. Slade.exe)

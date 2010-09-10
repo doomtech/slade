@@ -75,6 +75,8 @@ TODO List ---------------------------------------------------------------
 	- Image format detection in SImage class
 	- General 'loadImage' function to load any supported format
 - Better way to get the currently selected entries would be nice
+- Should probably write my own lexer for TextEditor since the default cpp/cppnocase ones are somewhat limited
+
 
 
 Unimplemented Feature Requests ------------------------------------------
@@ -143,6 +145,7 @@ Ideas / Possible Features -----------------------------------------------
 	- A system of cascading configurations will be needed to handle all the game/port/format combinations
 - Archive/Entry information database:
 	- Store within the archive or in a separate file (optional)
+	- Menu item 'Archive->Write Metadata'
 	- Keeps information about archive entries:
 		- CRC (will be used to determine if the info is up-to-date)
 		- Extra properties

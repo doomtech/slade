@@ -43,7 +43,9 @@ public:
 	void	clearFunctions() { functions.clear(); }
 
 	// Static functions
-	static bool	readLanguageDefinition(MemChunk& mc);
+	static bool				readLanguageDefinition(MemChunk& mc);
+	static bool				loadLanguages();
+	static TextLanguage*	getLanguage(string id);
 };
 
 #endif//__TEXTLANGUAGE_H__
