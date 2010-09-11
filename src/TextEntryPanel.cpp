@@ -45,8 +45,15 @@ TextEntryPanel::TextEntryPanel(wxWindow* parent)
 	text_area = new TextEditor(this, -1);
 	sizer_main->Add(text_area, 1, wxEXPAND | wxALL, 4);
 
+	// Add 'Find/Replace' button to bottom sizer
+	sizer_bottom->AddStretchSpacer();
+	btn_find_replace = new wxButton(this, -1, "Find + Replace");
+	sizer_bottom->Add(btn_find_replace, 0, wxEXPAND|wxRIGHT, 4);
+
+
 	// Bind events
 	text_area->Bind(wxEVT_STC_CHANGE, &TextEntryPanel::onTextModified, this);
+	btn_find_replace->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextEntryPanel::onBtnFindReplace, this);
 
 	Layout();
 }
@@ -105,4 +112,8 @@ bool TextEntryPanel::saveEntry() {
  *******************************************************************/
 void TextEntryPanel::onTextModified(wxStyledTextEvent& e) {
 	setModified();
+}
+
+void TextEntryPanel::onBtnFindReplace(wxCommandEvent& e) {
+	text_area->showFindReplaceDialog();
 }

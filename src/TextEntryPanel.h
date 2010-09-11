@@ -8,6 +8,7 @@
 class TextEntryPanel : public EntryPanel {
 private:
 	TextEditor*	text_area;
+	wxButton*	btn_find_replace;
 
 public:
 	TextEntryPanel(wxWindow* parent);
@@ -18,6 +19,7 @@ public:
 
 	// Events
 	void	onTextModified(wxStyledTextEvent& e);
+	void	onBtnFindReplace(wxCommandEvent& e);
 };
 
 

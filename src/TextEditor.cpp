@@ -36,12 +36,89 @@
 /*******************************************************************
  * VARIABLES
  *******************************************************************/
-CVAR(Bool, text_trim_whitespace, false, CVAR_SAVE)
+CVAR(Bool, txed_trim_whitespace, false, CVAR_SAVE)
+CVAR(Int, txed_tab_width, 4, CVAR_SAVE)
 rgba_t col_comment(0, 150, 0, 255);
 rgba_t col_string(0, 120, 130, 255);
 rgba_t col_keyword(0, 30, 200, 255);
 rgba_t col_constant(180, 30, 200, 255);
 rgba_t col_function(200, 100, 30, 255);
+
+
+/*******************************************************************
+ * FINDREPLACEDIALOG CLASS FUNCTIONS
+ *******************************************************************/
+
+/* FindReplaceDialog::FindReplaceDialog
+ * FindReplaceDialog class constructor
+ *******************************************************************/
+FindReplaceDialog::FindReplaceDialog(wxWindow* parent) : wxMiniFrame(parent, -1, "Find + Replace", wxDefaultPosition, wxDefaultSize, wxCAPTION|wxCLOSE_BOX) {
+	// Create backing panel
+	wxPanel* panel = new wxPanel(this, -1);
+	wxBoxSizer* fsizer = new wxBoxSizer(wxVERTICAL);
+	fsizer->Add(panel, 1, wxEXPAND);
+	SetSizer(fsizer);
+
+	// Create/set dialog sizer
+	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+	panel->SetSizer(sizer);
+
+
+	// 'Find' text entry
+	sizer->Add(new wxStaticText(panel, -1, "Find:"), 0, wxTOP|wxLEFT|wxRIGHT, 4);
+	text_find = new wxTextCtrl(panel, -1);
+	sizer->Add(text_find, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+	// Find options checkboxes
+	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
+	sizer->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+	sizer->AddSpacer(4);
+	hbox->AddStretchSpacer(1);
+
+	// 'Match Case' checkbox
+	cb_match_case = new wxCheckBox(panel, -1, "Match Case");
+	hbox->Add(cb_match_case, 0, wxEXPAND|wxRIGHT, 4);
+
+	// 'Match Whole Word' checkbox
+	cb_match_word = new wxCheckBox(panel, -1, "Match Whole Word");
+	hbox->Add(cb_match_word, 0, wxEXPAND);
+
+
+	// 'Replace With' text entry
+	sizer->Add(new wxStaticText(panel, -1, "Replace With:"), 0, wxTOP|wxLEFT|wxRIGHT, 4);
+	text_replace = new wxTextCtrl(panel, -1);
+	sizer->Add(text_replace, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+
+	// Buttons
+	hbox = new wxBoxSizer(wxHORIZONTAL);
+	sizer->Add(hbox, 0, wxEXPAND|wxALL, 4);
+	hbox->AddStretchSpacer(1);
+
+	// 'Find Next'
+	btn_find_next = new wxButton(panel, -1, "Find Next");
+	hbox->Add(btn_find_next, 0, wxEXPAND|wxRIGHT, 4);
+
+	// 'Replace'
+	btn_replace = new wxButton(panel, -1, "Replace");
+	hbox->Add(btn_replace, 0, wxEXPAND|wxRIGHT, 4);
+
+	// 'Replace All'
+	btn_replace_all = new wxButton(panel, -1, "Replace All");
+	hbox->Add(btn_replace_all, 0, wxEXPAND);
+
+
+	// Init layout
+	Layout();
+	SetInitialSize(wxSize(400, -1));
+	Fit();
+}
+
+/* FindReplaceDialog::~FindReplaceDialog
+ * FindReplaceDialog class destructor
+ *******************************************************************/
+FindReplaceDialog::~FindReplaceDialog() {
+}
 
 
 /*******************************************************************
@@ -56,12 +133,16 @@ TextEditor::TextEditor(wxWindow* parent, int id)
 	// Set default font
 	wxFont f(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 	StyleSetFont(wxSTC_STYLE_DEFAULT, f);
-	SetTabWidth(4);
+	SetTabWidth(txed_tab_width);
 
 	// Line numbers by default
 	SetMarginType(0, wxSTC_MARGIN_NUMBER);
 	SetMarginWidth(0, TextWidth(wxSTC_STYLE_LINENUMBER, "9999"));
 	SetMarginWidth(1, 4);
+
+	// General settings
+	SetBufferedDraw(true);
+	SetUseAntiAliasing(true);
 
 	// Test colours
 	StyleSetForeground(wxSTC_C_COMMENT, WXCOL(col_comment));
@@ -73,12 +154,23 @@ TextEditor::TextEditor(wxWindow* parent, int id)
 	StyleSetForeground(wxSTC_C_WORD2, WXCOL(col_function));
 	StyleSetForeground(wxSTC_C_GLOBALCLASS, WXCOL(col_constant));
 
+	StyleSetBackground(wxSTC_STYLE_BRACELIGHT, WXCOL(rgba_t(170, 255, 170, 255)));
+	StyleSetBold(wxSTC_STYLE_BRACELIGHT, true);
+
 	// Temp
 	SetLexer(wxSTC_LEX_CPPNOCASE);
 	setLanguage(TextLanguage::getLanguage("decorate"));
 
+	// Find+Replace dialog
+	dlg_fr = new FindReplaceDialog(this);
+
+	// Bind events
 	Bind(wxEVT_STC_MODIFIED, &TextEditor::onModified, this);
 	Bind(wxEVT_STC_CHANGE, &TextEditor::onTextChanged, this);
+	Bind(wxEVT_STC_UPDATEUI, &TextEditor::onUpdateUI, this);
+	dlg_fr->getBtnFindNext()->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextEditor::onFRDBtnFindNext, this);
+	dlg_fr->getBtnReplace()->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextEditor::onFRDBtnReplace, this);
+	dlg_fr->getBtnReplaceAll()->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextEditor::onFRDBtnReplaceAll, this);
 }
 
 /* TextEditor::~TextEditor
@@ -136,7 +228,7 @@ bool TextEditor::loadEntry(ArchiveEntry* entry) {
 }
 
 /* TextEditor::getRawText
- * Writes the raw ASCII text to <mc>
+ * Writes the raw ASCII text to [mc]
  *******************************************************************/
 void TextEditor::getRawText(MemChunk& mc) {
 	mc.clear();
@@ -147,16 +239,197 @@ void TextEditor::getRawText(MemChunk& mc) {
 void TextEditor::trimWhitespace() {
 }
 
+/* TextEditor::findNext
+ * Finds the next occurrence of the [find] after the caret position,
+ * selects it and scrolls to it if needed. Returns false if the
+ * [find] was invalid or no match was found, true otherwise
+ *******************************************************************/
+bool TextEditor::findNext(string find) {
+	// Check search string
+	if (find.IsEmpty())
+		return false;
+
+	// Setup target range
+	SetTargetEnd(GetTextLength());
+	SetTargetStart(GetSelectionEnd());
+
+	// Search within current target range
+	if (SearchInTarget(find) < 0) {
+		// None found, search again from start
+		SetTargetStart(0);
+		SetTargetEnd(GetTextLength());
+		if (SearchInTarget(find) < 0) {
+			// No matches found in entire text
+			return false;
+		}
+	}
+
+	// Select matched text
+	SetSelection(GetTargetStart(), GetTargetEnd());
+
+	// Scroll to selection
+	EnsureCaretVisible();
+
+	return true;
+}
+
+/* TextEditor::replaceCurrent
+ * Replaces the currently selected occurrence of [find] with
+ * [replace], then selects and scrolls to the next occurrence of
+ * [find] in the text. Returns false if [find] is invalid or the
+ * current selection does not match it, true otherwise
+ *******************************************************************/
+bool TextEditor::replaceCurrent(string find, string replace) {
+	// Check search string
+	if (find.IsEmpty())
+		return false;
+
+	// Check that we've done a find previously
+	// (by searching for the find string within the current selection)
+	if (GetSelectedText().Length() != find.Length())
+		return false;
+	SetTargetStart(GetSelectionStart());
+	SetTargetEnd(GetSelectionEnd());
+	if (SearchInTarget(find) < 0)
+		return false;
+
+	// Do the replace
+	ReplaceTarget(replace);
+
+	// Update selection
+	SetSelection(GetTargetStart(), GetTargetEnd());
+
+	// Do find next
+	findNext(find);
+
+	return true;
+}
+
+/* TextEditor::replaceAll
+ * Replaces all occurrences of [find] in the text with [replace].
+ * Returns the number of occurrences replaced
+ *******************************************************************/
+int TextEditor::replaceAll(string find, string replace) {
+	// Check search string
+	if (find.IsEmpty())
+		return false;
+
+	// Init search target to entire text
+	SetTargetStart(0);
+	SetTargetEnd(GetTextLength());
+
+	// Loop of death
+	int replaced = 0;
+	while (1) {
+		if (SearchInTarget(find) < 0)
+			break;	// No matches, finished
+		else {
+			// Replace text & increment counter
+			ReplaceTarget(replace);
+			replaced++;
+
+			// Continue search from end of replaced text to end of text
+			SetTargetStart(GetTargetEnd());
+			SetTargetEnd(GetTextLength());
+		}
+	}
+
+	// Return number of instances replaced
+	return replaced;
+}
+
+void TextEditor::checkBraceMatch() {
+	int bracematch = BraceMatch(GetCurrentPos());
+
+	if (bracematch == wxSTC_INVALID_POSITION)
+		BraceHighlight(-1, -1);
+	else {
+		BraceHighlight(GetCurrentPos(), bracematch);
+	}
+}
+
+
+/*******************************************************************
+ * TEXTEDITOR CLASS EVENTS
+ *******************************************************************/
+
+/* TextEditor::onModified
+ * Called when the text is about to be modified
+ *******************************************************************/
 void TextEditor::onModified(wxStyledTextEvent& e) {
 	e.Skip();
 }
 
+/* TextEditor::onTextChanged
+ * Called when the text is changed
+ *******************************************************************/
 void TextEditor::onTextChanged(wxStyledTextEvent& e) {
 	// Update line numbers margin width
 	string numlines = s_fmt("0%d", GetNumberOfLines());
 	SetMarginWidth(0, TextWidth(wxSTC_STYLE_LINENUMBER, numlines));
 	e.Skip();
 }
+
+void TextEditor::onUpdateUI(wxStyledTextEvent& e) {
+	//checkBraceMatch();	// Disabled for now, wxSTC bug makes it not redraw properly
+	e.Skip();
+}
+
+/* TextEditor::onFRDBtnFindNext
+ * Called when the 'Find Next' button on the Find+Replace frame is
+ * clicked
+ *******************************************************************/
+void TextEditor::onFRDBtnFindNext(wxCommandEvent& e) {
+	// Check find string
+	string find = dlg_fr->getFindString();
+	if (find.IsEmpty())
+		return;
+
+	// Set search options
+	int flags = 0;
+	if (dlg_fr->matchCase()) flags |= wxSTC_FIND_MATCHCASE;
+	if (dlg_fr->matchWord()) flags |= wxSTC_FIND_WHOLEWORD;
+	SetSearchFlags(flags);
+
+	// Do find
+	if (!findNext(find))
+		wxLogMessage(s_fmt("No text matching \"%s\" found.", chr(find)));
+}
+
+/* TextEditor::onFRDBtnReplace
+ * Called when the 'Replace' button on the Find+Replace frame is
+ * clicked
+ *******************************************************************/
+void TextEditor::onFRDBtnReplace(wxCommandEvent& e) {
+	// Set search options
+	int flags = 0;
+	if (dlg_fr->matchCase()) flags |= wxSTC_FIND_MATCHCASE;
+	if (dlg_fr->matchWord()) flags |= wxSTC_FIND_WHOLEWORD;
+	SetSearchFlags(flags);
+
+	// Do replace
+	replaceCurrent(dlg_fr->getFindString(), dlg_fr->getReplaceString());
+}
+
+/* TextEditor::onFRDBtnReplaceAll
+ * Called when the 'Replace All' button on the Find+Replace frame is
+ * clicked
+ *******************************************************************/
+void TextEditor::onFRDBtnReplaceAll(wxCommandEvent& e) {
+	// Set search options
+	int flags = 0;
+	if (dlg_fr->matchCase()) flags |= wxSTC_FIND_MATCHCASE;
+	if (dlg_fr->matchWord()) flags |= wxSTC_FIND_WHOLEWORD;
+	SetSearchFlags(flags);
+
+	// Do replace all
+	int replaced = replaceAll(dlg_fr->getFindString(), dlg_fr->getReplaceString());
+	wxMessageBox(s_fmt("Replaced %d occurrences", replaced), "Replace All");
+}
+
+
+
+
 
 /* TextEditor::loadHexEntry
  * Temporary function, used just to quickly look at some lumps.
