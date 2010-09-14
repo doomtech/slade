@@ -287,6 +287,7 @@ bool MainApp::OnInit() {
 
 	// Create the main window
 	main_window = new MainWindow();
+	theSplashWindow->SetParent(main_window);
 
 	// Load entry types
 	wxLogMessage("Loading entry types");

@@ -46,7 +46,7 @@
 /*******************************************************************
  * VARIABLES
  *******************************************************************/
-CVAR(Bool, close_archive_with_tab, false, CVAR_SAVE)
+CVAR(Bool, close_archive_with_tab, true, CVAR_SAVE)
 CVAR(Int, am_current_tab, 0, CVAR_SAVE)
 bool tab_closing = false;	// Hacky workaround to prevent crash on closing a tab when close_archive_with_tab is true
 

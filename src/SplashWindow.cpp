@@ -54,7 +54,7 @@ int				SplashWindow::height = 204;
  * SplashWindow class constructor
  *******************************************************************/
 SplashWindow::SplashWindow()
-: wxMiniFrame(NULL, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSTAY_ON_TOP|wxBORDER_NONE) {
+: wxMiniFrame(NULL, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE) {
 	// Init
 	show_progress = false;
 	progress = 0.0f;
