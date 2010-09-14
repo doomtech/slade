@@ -63,7 +63,7 @@ bool PropertyList::propertyExists(string key) {
 }
 
 /* PropertyList::removeProperty
- * Removes an property value, returns true if [key] was removed
+ * Removes a property value, returns true if [key] was removed
  * or false if key didn't exist
  *******************************************************************/
 bool PropertyList::removeProperty(string key) {

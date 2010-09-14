@@ -54,6 +54,7 @@ public:
 	MapLine(){}
 	MapLine(doomline_t l);
 	MapLine(hexenline_t l);
+	MapLine(doom64line_t l);
 	~MapLine(){}
 
 	MapVertex*	v1() { return vertex1; }

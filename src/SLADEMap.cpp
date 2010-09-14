@@ -37,11 +37,13 @@ SLADEMap::~SLADEMap() {
 }
 
 bool SLADEMap::readMap(Archive* map_entries, uint8_t format) {
-	if (format == 0)
+	if (format == MAP_DOOM)
 		return readDoomMap(map_entries);
-	else if (format == 1)
+	else if (format == MAP_HEXEN)
 		return readHexenMap(map_entries);
-	else if (format == 2) {
+	else if (format == MAP_DOOM64)
+		return readDoom64Map(map_entries);
+	else if (format == MAP_UDMF) {
 		ArchiveEntry* entry = map_entries->getEntry("TEXTMAP");
 		return readUDMFMap(entry);
 	}
@@ -49,38 +51,245 @@ bool SLADEMap::readMap(Archive* map_entries, uint8_t format) {
 	return false;
 }
 
-bool SLADEMap::readDoomMap(Archive* map_entries) {
-
-	// ---- Read vertices ----
-	ArchiveEntry* entry = map_entries->getEntry("VERTEXES");
+bool SLADEMap::readDoomVertexes(ArchiveEntry * entry) {
 	if (!entry) {
 		Global::error = "Map has no VERTEXES entry!";
 		return false;
 	}
 
 	doomvertex_t* vert_data = (doomvertex_t*)entry->getData(true);
-	for (size_t a = 0; a < entry->getSize() / 4; a++) {
+	for (size_t a = 0; a < entry->getSize() / sizeof(doomvertex_t); a++) {
 		MapVertex* nv = new MapVertex(vert_data[a]);
 		vertices.push_back(nv);
 	}
+	return true;
+}
 
+bool SLADEMap::readDoomSidedefs(ArchiveEntry * entry) {
+	if (!entry) {
+		Global::error = "Map has no SIDEDEFS entry!";
+		return false;
+	}
+
+	doomside_t* side_data = (doomside_t*)entry->getData(true);
+	for (size_t a = 0; a < entry->getSize() / sizeof(doomside_t); a++) {
+		MapSide* ns = new MapSide(side_data[a]);
+		sides.push_back(ns);
+	}
+	return true;
+}
+
+bool SLADEMap::readDoomLinedefs(ArchiveEntry * entry) {
+	if (!entry) {
+		Global::error = "Map has no LINEDEFS entry!";
+		return false;
+	}
+
+	doomline_t* line_data = (doomline_t*)entry->getData(true);
+	for (size_t a = 0; a < entry->getSize() / sizeof(doomline_t); a++) {
+		MapLine* nv = new MapLine(line_data[a]);
+		lines.push_back(nv);
+	}
+	return true;
+}
+
+bool SLADEMap::readDoomSectors(ArchiveEntry * entry) {
+	if (!entry) {
+		Global::error = "Map has no SECTORS entry!";
+		return false;
+	}
+
+	doomsector_t* sect_data = (doomsector_t*)entry->getData(true);
+	for (size_t a = 0; a < entry->getSize() / sizeof(doomsector_t); a++) {
+		MapSector* ns = new MapSector(sect_data[a]);
+		sectors.push_back(ns);
+	}
+	return true;
+}
+
+bool SLADEMap::readDoomThings(ArchiveEntry * entry) {
+	if (!entry) {
+		Global::error = "Map has no THINGS entry!";
+		return false;
+	}
+
+	doomthing_t* thng_data = (doomthing_t*)entry->getData(true);
+	for (size_t a = 0; a < entry->getSize() / sizeof(doomthing_t); a++) {
+		MapThing* nv = new MapThing(thng_data[a]);
+		things.push_back(nv);
+	}
+	return true;
+}
+
+bool SLADEMap::readDoomMap(Archive* map_entries) {
+
+	// ---- Read vertices ----
+	if (!readDoomVertexes(map_entries->getEntry("VERTEXES")))
+		return false;
+
+	// ---- Read sides ----
+	if (!readDoomSidedefs(map_entries->getEntry("SIDEDEFS")))
+		return false;
+
+	// ---- Read lines ----
+	if (!readDoomLinedefs(map_entries->getEntry("LINEDEFS")))
+		return false;
+
+	// ---- Read sectors ----
+	if (!readDoomSectors(map_entries->getEntry("SECTORS")))
+		return false;
+
+	// ---- Read things ----
+	if (!readDoomThings(map_entries->getEntry("THINGS")))
+		return false;
+
+	return true;
+}
+
+bool SLADEMap::readHexenLinedefs(ArchiveEntry * entry) {
+	if (!entry) {
+		Global::error = "Map has no LINEDEFS entry!";
+		return false;
+	}
+
+	hexenline_t* line_data = (hexenline_t*)entry->getData(true);
+	for (size_t a = 0; a < entry->getSize() / sizeof(hexenline_t); a++) {
+		MapLine* nv = new MapLine(line_data[a]);
+		lines.push_back(nv);
+	}
+	return true;
+}
+
+bool SLADEMap::readHexenThings(ArchiveEntry * entry) {
+	if (!entry) {
+		Global::error = "Map has no THINGS entry!";
+		return false;
+	}
+
+	hexenthing_t* thng_data = (hexenthing_t*)entry->getData(true);
+	for (size_t a = 0; a < entry->getSize() / sizeof(hexenthing_t); a++) {
+		MapThing* nv = new MapThing(thng_data[a]);
+		things.push_back(nv);
+	}
 	return true;
 }
 
 bool SLADEMap::readHexenMap(Archive* map_entries) {
 
 	// ---- Read vertices ----
-	ArchiveEntry* entry = map_entries->getEntry("VERTEXES");
+	if (!readDoomVertexes(map_entries->getEntry("VERTEXES")))
+		return false;
+
+	// ---- Read sides ----
+	if (!readDoomSidedefs(map_entries->getEntry("SIDEDEFS")))
+		return false;
+
+	// ---- Read lines ----
+	if (!readHexenLinedefs(map_entries->getEntry("LINEDEFS")))
+		return false;
+
+	// ---- Read sectors ----
+	if (!readDoomSectors(map_entries->getEntry("SECTORS")))
+		return false;
+
+	// ---- Read things ----
+	if (!readHexenThings(map_entries->getEntry("THINGS")))
+		return false;
+
+	return true;
+}
+
+bool SLADEMap::readDoom64Vertexes(ArchiveEntry * entry) {
 	if (!entry) {
 		Global::error = "Map has no VERTEXES entry!";
 		return false;
 	}
 
-	doomvertex_t* vert_data = (doomvertex_t*)entry->getData(true);
-	for (size_t a = 0; a < entry->getSize() / 4; a++) {
+	doom64vertex_t* vert_data = (doom64vertex_t*)entry->getData(true);
+	for (size_t a = 0; a < entry->getSize() / sizeof(doom64vertex_t); a++) {
 		MapVertex* nv = new MapVertex(vert_data[a]);
 		vertices.push_back(nv);
 	}
+	return true;
+}
+
+bool SLADEMap::readDoom64Sidedefs(ArchiveEntry * entry) {
+	if (!entry) {
+		Global::error = "Map has no SIDEDEFS entry!";
+		return false;
+	}
+
+	doom64side_t* side_data = (doom64side_t*)entry->getData(true);
+	for (size_t a = 0; a < entry->getSize() / sizeof(doom64side_t); a++) {
+		MapSide* ns = new MapSide(side_data[a]);
+		sides.push_back(ns);
+	}
+	return true;
+}
+
+bool SLADEMap::readDoom64Linedefs(ArchiveEntry * entry) {
+	if (!entry) {
+		Global::error = "Map has no LINEDEFS entry!";
+		return false;
+	}
+
+	doom64line_t* line_data = (doom64line_t*)entry->getData(true);
+	for (size_t a = 0; a < entry->getSize() / sizeof(doom64line_t); a++) {
+		MapLine* nv = new MapLine(line_data[a]);
+		lines.push_back(nv);
+	}
+	return true;
+}
+
+bool SLADEMap::readDoom64Sectors(ArchiveEntry * entry) {
+	if (!entry) {
+		Global::error = "Map has no SECTORS entry!";
+		return false;
+	}
+
+	doom64sector_t* sect_data = (doom64sector_t*)entry->getData(true);
+	for (size_t a = 0; a < entry->getSize() / sizeof(doom64sector_t); a++) {
+		MapSector* ns = new MapSector(sect_data[a]);
+		sectors.push_back(ns);
+	}
+	return true;
+}
+
+bool SLADEMap::readDoom64Things(ArchiveEntry * entry) {
+	if (!entry) {
+		Global::error = "Map has no THINGS entry!";
+		return false;
+	}
+
+	doom64thing_t* thng_data = (doom64thing_t*)entry->getData(true);
+	for (size_t a = 0; a < entry->getSize() / sizeof(doom64thing_t); a++) {
+		MapThing* nv = new MapThing(thng_data[a]);
+		things.push_back(nv);
+	}
+	return true;
+}
+
+bool SLADEMap::readDoom64Map(Archive* map_entries) {
+
+	// ---- Read vertices ----
+	if (!readDoom64Vertexes(map_entries->getEntry("VERTEXES")))
+		return false;
+
+	// ---- Read sides ----
+	if (!readDoom64Sidedefs(map_entries->getEntry("SIDEDEFS")))
+		return false;
+
+	// ---- Read lines ----
+	if (!readDoom64Linedefs(map_entries->getEntry("LINEDEFS")))
+		return false;
+
+	// ---- Read sectors ----
+	if (!readDoom64Sectors(map_entries->getEntry("SECTORS")))
+		return false;
+
+	// ---- Read things ----
+	if (!readDoom64Things(map_entries->getEntry("THINGS")))
+		return false;
 
 	return true;
 }

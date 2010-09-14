@@ -49,6 +49,7 @@ public:
 	MapThing(){}
 	MapThing(doomthing_t t);
 	MapThing(hexenthing_t t);
+	MapThing(doom64thing_t t);
 	~MapThing(){}
 
 	bool	parseUDMF(Tokenizer& tz);

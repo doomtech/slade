@@ -36,6 +36,7 @@ private:
 public:
 	MapSide(){}
 	MapSide(doomside_t s);
+	MapSide(doom64side_t s);
 	~MapSide(){}
 
 	bool parseUDMF(Tokenizer& tz);

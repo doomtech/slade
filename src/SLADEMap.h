@@ -25,12 +25,33 @@ public:
 	~SLADEMap();
 
 	bool	readMap(Archive* map_entries, uint8_t format);
-	bool	readDoomMap(Archive* map_entries);
-	bool	readHexenMap(Archive* map_entries);
-	bool	readUDMFMap(ArchiveEntry* map_data);
-
 	void	drawVertices();
 	void	drawLines();
+
+	// Doom format
+	bool	readDoomMap(Archive* map_entries);
+	bool	readDoomVertexes(ArchiveEntry* entry);
+	bool	readDoomSidedefs(ArchiveEntry* entry);
+	bool	readDoomLinedefs(ArchiveEntry* entry);
+	bool	readDoomSectors(ArchiveEntry* entry);
+	bool	readDoomThings(ArchiveEntry* entry);
+
+	// Hexen format
+	bool	readHexenMap(Archive* map_entries);
+	bool	readHexenLinedefs(ArchiveEntry* entry);
+	bool	readHexenThings(ArchiveEntry* entry);
+
+	// Doom 64 format
+	bool	readDoom64Map(Archive* map_entries);
+	bool	readDoom64Vertexes(ArchiveEntry* entry);
+	bool	readDoom64Sidedefs(ArchiveEntry* entry);
+	bool	readDoom64Linedefs(ArchiveEntry* entry);
+	bool	readDoom64Sectors(ArchiveEntry* entry);
+	bool	readDoom64Things(ArchiveEntry* entry);
+
+	// UDMF
+	bool	readUDMFMap(ArchiveEntry* map_data);
+
 };
 
 #endif //__SLADEMAP_H__

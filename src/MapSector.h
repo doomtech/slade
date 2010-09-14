@@ -39,6 +39,7 @@ private:
 public:
 	MapSector(){}
 	MapSector(doomsector_t s);
+	MapSector(doom64sector_t s);
 	~MapSector(){}
 
 	bool parseUDMF(Tokenizer& tz);

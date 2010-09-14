@@ -7,6 +7,10 @@ MapSide::MapSide(doomside_t s) {
 	// TODO: MapSide constructor from doomside_t
 }
 
+MapSide::MapSide(doom64side_t s) {
+	// TODO: MapSide constructor from doom64side_t
+}
+
 bool MapSide::parseUDMF(Tokenizer& tz) {
 	// Skip opening {
 	tz.getToken();

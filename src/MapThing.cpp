@@ -13,6 +13,11 @@ MapThing::MapThing(hexenthing_t t) {
 	this->y = t.y;
 }
 
+MapThing::MapThing(doom64thing_t t) {
+	this->x = t.x;
+	this->y = t.y;
+}
+
 bool MapThing::parseUDMF(Tokenizer& tz) {
 	// Skip opening {
 	tz.getToken();

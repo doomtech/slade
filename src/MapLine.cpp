@@ -11,6 +11,10 @@ MapLine::MapLine(hexenline_t l) {
 	// TODO: MapLine constructor from hexenline_t
 }
 
+MapLine::MapLine(doom64line_t l) {
+	// TODO: MapLine constructor from doom64line_t
+}
+
 bool MapLine::parseUDMF(Tokenizer& tz) {
 	// Skip opening {
 	tz.getToken();
