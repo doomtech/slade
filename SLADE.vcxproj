@@ -115,6 +115,7 @@
     <ClCompile Include="src\LibArchive.cpp" />
     <ClCompile Include="src\MapEntryPanel.cpp" />
     <ClCompile Include="src\ModifyOffsetsDialog.cpp" />
+    <ClCompile Include="src\PakArchive.cpp" />
     <ClCompile Include="src\PaletteDialog.cpp" />
     <ClCompile Include="src\Clipboard.cpp" />
     <ClCompile Include="src\Console.cpp" />
@@ -134,6 +135,7 @@
     <ClCompile Include="src\Tokenizer.cpp" />
     <ClCompile Include="src\Tree.cpp" />
     <ClCompile Include="src\VirtualListView.cpp" />
+    <ClCompile Include="src\Wad2Archive.cpp" />
     <ClCompile Include="src\WxStuff.cpp" />
     <ClCompile Include="src\Property.cpp" />
     <ClCompile Include="src\PropertyList.cpp" />
@@ -208,6 +210,7 @@
     <ClInclude Include="src\MiscFormats.h" />
     <ClInclude Include="src\ModelFormats.h" />
     <ClInclude Include="src\ModifyOffsetsDialog.h" />
+    <ClInclude Include="src\PakArchive.h" />
     <ClInclude Include="src\PaletteDialog.h" />
     <ClInclude Include="src\Clipboard.h" />
     <ClInclude Include="src\Console.h" />
@@ -228,6 +231,7 @@
     <ClInclude Include="src\Tokenizer.h" />
     <ClInclude Include="src\Tree.h" />
     <ClInclude Include="src\VirtualListView.h" />
+    <ClInclude Include="src\Wad2Archive.h" />
     <ClInclude Include="src\WxStuff.h" />
     <ClInclude Include="src\Property.h" />
     <ClInclude Include="src\PropertyList.h" />

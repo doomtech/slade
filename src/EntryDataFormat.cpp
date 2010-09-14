@@ -33,6 +33,8 @@
 #include "LibArchive.h"
 #include "DatArchive.h"
 #include "ResArchive.h"
+#include "PakArchive.h"
+#include "Wad2Archive.h"
 #include "BinaryControlLump.h"
 #include "Parser.h"
 
@@ -164,6 +166,8 @@ void EntryDataFormat::initBuiltinFormats() {
 	new LibDataFormat();
 	new DatDataFormat();
 	new ResDataFormat();
+	new PakDataFormat();
+	new Wad2DataFormat();
 	new MUSDataFormat();
 	new MIDIDataFormat();
 	new XMIDataFormat();

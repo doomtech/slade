@@ -51,4 +51,24 @@ public:
 	}
 };
 
+class PakDataFormat : public EntryDataFormat {
+public:
+	PakDataFormat() : EntryDataFormat("archive_pak") {};
+	~PakDataFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		return PakArchive::isPakArchive(mc) ? EDF_TRUE : EDF_FALSE;
+	}
+};
+
+class Wad2DataFormat : public EntryDataFormat {
+public:
+	Wad2DataFormat() : EntryDataFormat("archive_wad2") {}
+	~Wad2DataFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		return Wad2Archive::isWad2Archive(mc) ? EDF_TRUE : EDF_FALSE;
+	}
+};
+
 #endif //ARCHIVEFORMATS_H

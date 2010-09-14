@@ -38,6 +38,10 @@ TODO List ---------------------------------------------------------------
 - Archive merging
 - Archive conversion
 
+--- Formats ---
+- 7z/bz2
+- Quake .spr (http://www.gamers.org/dEngine/quake/spec/quake-spec31.html#CSPRF)
+
 --- General ---
 - Preferences Dialog:
 	- List of entry types, ability to enable/disable detection of certain types

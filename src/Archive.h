@@ -52,6 +52,8 @@ public:
 #define ARCHIVE_LIB		3
 #define ARCHIVE_DAT		4
 #define ARCHIVE_RES		5
+#define ARCHIVE_WAD2	6
+#define ARCHIVE_PAK		7
 
 // Define map types
 #define MAP_DOOM	0

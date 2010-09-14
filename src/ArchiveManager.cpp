@@ -35,6 +35,8 @@
 #include "LibArchive.h"
 #include "DatArchive.h"
 #include "ResArchive.h"
+#include "PakArchive.h"
+#include "Wad2Archive.h"
 #include "Console.h"
 #include "SplashWindow.h"
 #include <wx/filename.h>
@@ -176,6 +178,10 @@ Archive* ArchiveManager::openArchive(string filename, bool manage) {
 		new_archive = new DatArchive();
 	else if (LibArchive::isLibArchive(filename))
 		new_archive = new LibArchive();
+	else if (PakArchive::isPakArchive(filename))
+		new_archive = new PakArchive();
+	else if (Wad2Archive::isWad2Archive(filename))
+		new_archive = new Wad2Archive();
 	else
 		return NULL;	// Unsupported format
 
@@ -240,6 +246,10 @@ Archive* ArchiveManager::openArchive(ArchiveEntry* entry, bool manage) {
 		new_archive = new LibArchive();
 	else if (DatArchive::isDatArchive(entry->getMCData()))
 		new_archive = new DatArchive();
+	else if (PakArchive::isPakArchive(entry->getMCData()))
+		new_archive = new PakArchive();
+	else if (Wad2Archive::isWad2Archive(entry->getMCData()))
+		new_archive = new Wad2Archive();
 	else
 		return NULL;	// Unsupported format
 
@@ -303,6 +313,10 @@ Archive* ArchiveManager::newArchive(uint8_t type) {
 		case ARCHIVE_RES:
 			new_archive = new ResArchive();
 			format_str = "res";
+			break;
+		case ARCHIVE_PAK:
+			new_archive = new PakArchive();
+			format_str = "pak";
 			break;
 	}
 
@@ -422,11 +436,13 @@ string ArchiveManager::getArchiveExtensionsString(bool wad, bool zip, bool pk3, 
 	string ext_chd = "*.cd;*.CD;*.Cd;*.hd;*.HD;*.Hd";
 	string ext_lib = "*.lib;*.LIB;*.Lib";
 	string ext_res = "*.res;*.RES;*.Res";
+	string ext_pak = "*.pak;*.PAK;*.Pak";
 
 	// Create extensions string
-	string extensions = s_fmt("Any Supported File (*.wad; *.zip; *.pk3; *.jdf)|%s;%s;%s;%s;%s;%s;%s;%s",
+	string extensions = s_fmt("Any Supported File (*.wad; *.zip; *.pk3; *.jdf)|%s;%s;%s;%s;%s;%s;%s;%s;%s",
 		ext_wad.c_str(), ext_zip.c_str(), ext_pk3.c_str(), ext_jdf.c_str(),
-		ext_dat.c_str(), ext_lib.c_str(), ext_chd.c_str(), ext_res.c_str());
+		ext_dat.c_str(), ext_lib.c_str(), ext_chd.c_str(), ext_res.c_str(),
+		ext_pak.c_str());
 	extensions += s_fmt("|Doom Wad files (*.wad)|%s", ext_wad.c_str());
 	extensions += s_fmt("|Zip files (*.zip)|%s", ext_zip.c_str());
 	extensions += s_fmt("|Pk3 (zip) files (*.pk3)|%s", ext_pk3.c_str());
@@ -435,6 +451,7 @@ string ArchiveManager::getArchiveExtensionsString(bool wad, bool zip, bool pk3, 
 	extensions += s_fmt("|CD/HD (cd/hd) files (*.cd; *.hd)|%s", ext_chd.c_str());
 	extensions += s_fmt("|Library (lib) files (*.lib)|%s", ext_lib.c_str());
 	extensions += s_fmt("|Resource (res) files (*.res)|%s", ext_res.c_str());
+	extensions += s_fmt("|Quake Pak files (*.pak)|%s", ext_pak.c_str());
 
 	return extensions;
 }

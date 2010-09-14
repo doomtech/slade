@@ -339,6 +339,12 @@
     <ClCompile Include="src\ArchiveOperations.cpp">
       <Filter>Main Editor</Filter>
     </ClCompile>
+    <ClCompile Include="src\Wad2Archive.cpp">
+      <Filter>Resources\Archive</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PakArchive.cpp">
+      <Filter>Resources\Archive</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -623,6 +629,12 @@
     </ClInclude>
     <ClInclude Include="src\ArchiveOperations.h">
       <Filter>Main Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Wad2Archive.h">
+      <Filter>Resources\Archive</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PakArchive.h">
+      <Filter>Resources\Archive</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
