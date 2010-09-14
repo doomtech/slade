@@ -34,6 +34,7 @@
 #include "Archive.h"
 #include "MapLine.h"
 #include "MapVertex.h"
+#include "Parser.h"
 
 
 /*******************************************************************
@@ -236,6 +237,103 @@ bool MapEntryPanel::loadEntry(ArchiveEntry* entry) {
 		}
 	}
 
+	// Parse UDMF map
+	if (thismap.format == MAP_UDMF) {
+		ArchiveEntry* udmfdata = NULL;
+		for (ArchiveEntry* mapentry = thismap.head; mapentry != thismap.end; mapentry = mapentry->nextEntry()) {
+			// Check entry type
+			if (mapentry->getType() == EntryType::getType("udmf_textmap")) {
+				udmfdata = mapentry;
+				break;
+			}
+		}
+		if (udmfdata == NULL)
+			return false;
+
+		// Start parsing
+		Tokenizer tz;
+		tz.openMem(udmfdata->getData(), udmfdata->getSize());
+
+		// Get first token
+		string token = tz.getToken();
+		size_t vertcounter = 0, linecounter = 0;
+		while (!token.IsEmpty()) {
+			if (!token.CmpNoCase("namespace")) {
+				//  skip till we reach the ';'
+				do { token = tz.getToken(); } while (token.Cmp(";"));
+			} else if (!token.CmpNoCase("vertex")) {
+				// Get X and Y properties
+				bool gotx = false;
+				bool goty = false;
+				double x = 0.;
+				double y = 0.;
+				do {
+					token = tz.getToken();
+					if (!token.CmpNoCase("x") || !token.CmpNoCase("y")) {
+						bool isx = !token.CmpNoCase("x");
+						token = tz.getToken();
+						if (token.Cmp("=")) {
+							wxLogMessage("Bad syntax for vertex %i in UDMF map data", vertcounter);
+							return false;
+						}
+						if (isx) x = tz.getDouble(), gotx = true;
+						else y = tz.getDouble(), goty = true;
+						// skip to end of declaration after each key
+						do { token = tz.getToken(); } while (token.Cmp(";"));
+					}
+				} while (token.Cmp("}"));
+				if (gotx && goty)
+					map_canvas->addVertex(x, y);
+				else {
+					wxLogMessage("Wrong vertex %i in UDMF map data", vertcounter);
+					return false;
+				}
+				vertcounter++;
+			} else if (!token.CmpNoCase("linedef")) {
+				bool special = false;
+				bool twosided = false;
+				bool gotv1 = false, gotv2 = false;
+				size_t v1 = 0, v2 = 0;
+				do {
+					token = tz.getToken();
+					if (!token.CmpNoCase("v1") || !token.CmpNoCase("v2")) {
+						bool isv1 = !token.CmpNoCase("v1");
+						token = tz.getToken();
+						if (token.Cmp("=")) {
+							wxLogMessage("Bad syntax for linedef %i in UDMF map data", linecounter);
+							return false;
+						}
+						if (isv1) v1 = tz.getInteger(), gotv1 = true;
+						else v2 = tz.getInteger(), gotv2 = true;
+						// skip to end of declaration after each key
+						do { token = tz.getToken(); } while (token.Cmp(";"));
+					} else if (!token.CmpNoCase("special")) {
+						special = true;
+						// skip to end of declaration after each key
+						do { token = tz.getToken(); } while (token.Cmp(";"));
+					} else if (!token.CmpNoCase("sideback")) {
+						twosided = true;
+						// skip to end of declaration after each key
+						do { token = tz.getToken(); } while (token.Cmp(";"));
+					}
+				} while (token.Cmp("}"));
+				if (gotv1 && gotv2)
+					map_canvas->addLine(v1, v2, twosided, special);
+				else {
+					wxLogMessage("Wrong line %i in UDMF map data", linecounter);
+					return false;
+				}
+				linecounter++;
+			} else {
+				// map preview ignores things, sidedefs, sectors, comments,
+				// unknown fields, etc. so skip to end of block
+				do { token = tz.getToken(); } while (token.Cmp("}"));
+			}
+			// Iterate to next token
+			token = tz.getToken();
+		}
+	}
+
 	// Read vertices
 	if (thismap.format == MAP_DOOM || thismap.format == MAP_HEXEN || thismap.format == MAP_DOOM64) {
 		// Find VERTEXES entry
@@ -306,7 +404,7 @@ bool MapEntryPanel::loadEntry(ArchiveEntry* entry) {
 				mapentry = mapentry->nextEntry();
 		}
 
-		// Can't open a map without vertices
+		// Can't open a map without linedefs
 		if (!linedefs)
 			return false;
 

@@ -1,6 +1,7 @@
 
 #ifndef __TOKENIZER_H__
 #define __TOKENIZER_H__
+#include "MemChunk.h"
 
 enum CommentTypes {
 	CCOMMENTS = 1<<0,		// If true C comments are skipped (// and /* */)
@@ -29,6 +30,8 @@ public:
 	bool openFile(string filename, uint32_t offset = 0, uint32_t length = 0);
 	bool openString(string text, uint32_t offset = 0, uint32_t length = 0);
 	bool openMem(const char* mem, uint32_t length);
+	bool openMem(const uint8_t* mem, uint32_t length);
+	bool openMem(MemChunk * mc);
 	bool isWhitespace(char p);
 	bool isSpecialCharacter(char p);
 	bool incrementCurrent();

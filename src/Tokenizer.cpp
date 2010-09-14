@@ -134,6 +134,48 @@ bool Tokenizer::openMem(const char* mem, uint32_t length) {
 	return true;
 }
 
+/* Tokenizer::openMem
+ * Reads a chunk of memory to the Tokenizer
+ *******************************************************************/
+bool Tokenizer::openMem(const uint8_t* mem, uint32_t length) {
+	// Length must be specified
+	if (length == 0) {
+		wxLogMessage("Tokenizer::openMem: length not specified");
+		return false;
+	}
+
+	// Setup variables & allocate memory
+	size = length;
+	position = 0;
+	start = current = (char*) malloc(size);
+
+	// Copy the data
+	memcpy(start, mem, size);
+
+	return true;
+}
+
+/* Tokenizer::openMem
+ * Reads a chunk of memory to the Tokenizer
+ *******************************************************************/
+bool Tokenizer::openMem(MemChunk * mem) {
+	// Needs to be valid
+	if (mem == NULL) {
+		wxLogMessage("Tokenizer::openMem: invalid MemChunk");
+		return false;
+	}
+
+	// Setup variables & allocate memory
+	size = mem->getSize();
+	position = 0;
+	start = current = (char*) malloc(size);
+
+	// Copy the data
+	memcpy(start, mem->getData(), size);
+
+	return true;
+}
+
 /* Tokenizer::isWhitespace
  * Checks if a character is 'whitespace'
  *******************************************************************/
@@ -333,7 +375,7 @@ string Tokenizer::peekToken() {
 }
 
 /* Tokenizer::checkToken
- * Compares the current token with a string (unused)
+ * Compares the current token with a string
  *******************************************************************/
 bool Tokenizer::checkToken(string check) {
 	return !(getToken().Cmp(check));
