@@ -162,19 +162,16 @@ bool DatArchive::open(MemChunk& mc) {
 		// Read lump info
 		uint32_t offset = 0;
 		uint32_t size = 0;
-		uint16_t nameofs = 0;
-		uint16_t unknown = 0;
+		uint32_t nameofs = 0;
 
 		mc.read(&offset,	4);		// Offset
 		mc.read(&size,		4);		// Size
-		mc.read(&nameofs,	2);		// Name offset
-		mc.read(&unknown,	2);		// Name offset
+		mc.read(&nameofs,	4);		// Name offset
 
 		// Byteswap values for big endian if needed
 		offset = wxINT32_SWAP_ON_BE(offset);
 		size = wxINT32_SWAP_ON_BE(size);
-		nameofs = wxINT16_SWAP_ON_BE(nameofs);
-		unknown = wxINT16_SWAP_ON_BE(unknown);
+		nameofs = wxINT32_SWAP_ON_BE(nameofs);
 
 		// If the lump data goes past the directory,
 		// the data file is invalid
@@ -260,6 +257,9 @@ bool DatArchive::open(MemChunk& mc) {
 	return true;
 }
 
+/* DatArchive::detectNamespace
+ * Returns the namespace that [entry] is within
+ *******************************************************************/
 string DatArchive::detectNamespace(ArchiveEntry* entry) {
 	// Check the entry is valid and part of this archive
 	if (!checkEntry(entry))
@@ -283,20 +283,292 @@ string DatArchive::detectNamespace(ArchiveEntry* entry) {
 	return "global";
 }
 
-/* DatArchive::write
- * Writes the wad archive to a file
- * Returns true if successful, false otherwise
+/* DatArchive::updateNamespaces
+ * Updates the namespace list
  *******************************************************************/
-bool DatArchive::write(string filename, bool update) {
-	return false;
+void DatArchive::updateNamespaces() {
+	// Clear current namespace info
+	sprites[0] = sprites[1] = flats[0] = flats[1] = walls[0] = walls[1] = -1;
+
+	// Go through all entries
+	for (unsigned a = 0; a < numEntries(); a++) {
+		ArchiveEntry* entry = getRoot()->getEntry(a);
+
+		// Check for markers
+		if (!entry->getName().Cmp("startflats"))
+			flats[0] = a;
+		if (!entry->getName().Cmp("endflats"))
+			flats[1] = a;
+		if (!entry->getName().Cmp("startsprites"))
+			sprites[0] = a;
+		if (!entry->getName().Cmp("endmonsters"))
+			sprites[1] = a;
+		if (!entry->getName().Cmp("startwalls"))
+			walls[0] = a;
+		if (!entry->getName().Cmp("endwalls"))
+			walls[1] = a;
+	}
+}
+
+/* DatArchive::addEntry
+ * Override of Archive::addEntry to force entry addition to the root
+ * directory, and update namespaces if needed
+ *******************************************************************/
+ArchiveEntry* DatArchive::addEntry(ArchiveEntry* entry, unsigned position, ArchiveTreeNode* dir, bool copy) {
+	// Check entry
+	if (!entry)
+		return NULL;
+
+	// Check if read-only
+	if (isReadOnly())
+		return NULL;
+
+	// Copy if necessary
+	if (copy)
+		entry = new ArchiveEntry(*entry);
+
+	// Do default entry addition (to root directory)
+	Archive::addEntry(entry, position);
+
+	// Update namespaces if necessary
+	if (entry->getName().Upper().Matches("START*") ||
+		entry->getName().Upper().Matches("END*"))
+		updateNamespaces();
+
+	return entry;
+}
+
+/* DatArchive::addEntry
+ * Adds [entry] to the end of the namespace matching [add_namespace].
+ * If [copy] is true a copy of the entry is added. Returns the added
+ * entry or NULL if the entry is invalid
+ *******************************************************************/
+ArchiveEntry* DatArchive::addEntry(ArchiveEntry* entry, string add_namespace, bool copy) {
+	// Find requested namespace, only three non-global namespaces are valid in this format
+	if (s_cmpnocase(add_namespace, "textures")) {
+		if (walls[1] >= 0) return addEntry(entry, walls[1], NULL, copy);
+		else {
+			addNewEntry("startwalls");
+			addNewEntry("endwalls");
+			return addEntry(entry, add_namespace, copy);
+		}
+	} else if (s_cmpnocase(add_namespace, "flats")) {
+		if (flats[1] >= 0) return addEntry(entry, flats[1], NULL, copy);
+		else {
+			addNewEntry("startflats");
+			addNewEntry("endflats");
+			return addEntry(entry, add_namespace, copy);
+		}
+	} else if (s_cmpnocase(add_namespace, "sprites")) {
+		if (sprites[1] >= 0) return addEntry(entry, sprites[1], NULL, copy);
+		else {
+			addNewEntry("startsprites");
+			addNewEntry("endmonsters");
+			return addEntry(entry, add_namespace, copy);
+		}
+	} else return addEntry(entry, 0xFFFFFFFF, NULL, copy);
+}
+
+/* DatArchive::removeEntry
+ * Override of Archive::removeEntry to update namespaces if needed
+ *******************************************************************/
+bool DatArchive::removeEntry(ArchiveEntry* entry, bool delete_entry) {
+	// Check entry
+	if (!checkEntry(entry))
+		return false;
+
+	// Get entry name (for later)
+	string name = entry->getName();
+
+	// Do default remove
+	bool ok = Archive::removeEntry(entry, delete_entry);
+
+	if (ok) {
+		// Update namespaces if necessary
+		if (name.Upper().Matches("START*") ||
+			name.Upper().Matches("END*"))
+			updateNamespaces();
+
+		return true;
+	}
+	else
+		return false;
+}
+
+/* DatArchive::renameEntry
+ * Override of Archive::renameEntry to update namespaces if needed
+ *******************************************************************/
+bool DatArchive::renameEntry(ArchiveEntry* entry, string name) {
+	// Check entry
+	if (!checkEntry(entry))
+		return false;
+
+	// Do default rename
+	bool ok = Archive::renameEntry(entry, name);
+
+	if (ok) {
+		// Update namespaces if necessary
+		if (entry->getName().Upper().Matches("START*") ||
+			entry->getName().Upper().Matches("END*"))
+			updateNamespaces();
+
+		return true;
+	}
+	else
+		return false;
+}
+
+/* DatArchive::swapEntries
+ * Override of Archive::swapEntries to update namespaces if needed
+ *******************************************************************/
+bool DatArchive::swapEntries(ArchiveEntry* entry1, ArchiveEntry* entry2) {
+	// Check entries
+	if (!checkEntry(entry1) || !checkEntry(entry2))
+		return false;
+
+	// Do default swap (force root dir)
+	bool ok = Archive::swapEntries(entry1, entry2);
+
+	if (ok) {
+		// Update namespaces if needed
+		if (entry1->getName().Upper().Matches("START*") ||
+			entry1->getName().Upper().Matches("END*") ||
+			entry2->getName().Upper().Matches("START*") ||
+			entry2->getName().Upper().Matches("END*"))
+			updateNamespaces();
+
+		return true;
+	}
+	else
+		return false;
+}
+
+/* DatArchive::moveEntry
+ * Override of Archive::moveEntry to update namespaces if needed
+ *******************************************************************/
+bool DatArchive::moveEntry(ArchiveEntry* entry, unsigned position, ArchiveTreeNode* dir) {
+	// Check entry
+	if (!checkEntry(entry))
+		return false;
+
+	// Do default move (force root dir)
+	bool ok = Archive::moveEntry(entry, position, NULL);
+
+	if (ok) {
+		// Update namespaces if necessary
+		if (entry->getName().Upper().Matches("START*") ||
+			entry->getName().Upper().Matches("END*"))
+			updateNamespaces();
+
+		return true;
+	}
+	else
+		return false;
 }
 
 /* DatArchive::write
- * Writes the wad archive to a MemChunk
+ * Writes the dat archive to a file
+ * Returns true if successful, false otherwise
+ *******************************************************************/
+bool DatArchive::write(string filename, bool update) {
+	// Write to a MemChunk, then export it to a file
+	MemChunk mc;
+	if (write(mc, true))
+		return mc.exportFile(filename);
+	else
+		return false;
+}
+
+/* DatArchive::write
+ * Writes the dat archive to a MemChunk
  * Returns true if successful, false otherwise
  *******************************************************************/
 bool DatArchive::write(MemChunk& mc, bool update) {
-	return false;
+	// Only two bytes are used for storing entry amount,
+	// so abort for excessively large files:
+	if (numEntries() > 65535)
+		return false;
+
+	// Determine directory offset, name offsets & individual lump offsets
+	uint32_t dir_offset = 10;
+	uint16_t name_offset = numEntries() * 12;
+	uint32_t name_size = 0;
+	string previousname = "";
+	uint32_t * nameoffsets = new uint32_t[numEntries()];
+	ArchiveEntry* entry = NULL;
+	for (uint16_t l = 0; l < numEntries(); l++) {
+		entry = getEntry(l);
+		setEntryOffset(entry, dir_offset);
+		dir_offset += entry->getSize();
+
+		// Does the entry has a name?
+		string name = entry->getName();
+		if (l > 0 && previousname.length() > 0 && name.length() > previousname.length() &&
+				!previousname.compare(0, previousname.length(), name, 0, previousname.length()) &&
+				name.at(previousname.length()) == '+') {
+			// This is a fake name
+			name = "";
+			nameoffsets[l] = 0;
+		} else {
+			// This is a true name
+			previousname = name;
+			nameoffsets[l] = name_offset + name_size;
+			name_size += name.length() + 1;
+		}
+	}
+
+	// Clear/init MemChunk
+	mc.clear();
+	mc.seek(0, SEEK_SET);
+	mc.reSize(dir_offset + name_size + numEntries() * 12);
+
+	// Write the header
+	uint16_t num_lumps = wxINT16_SWAP_ON_BE(numEntries());
+	dir_offset = wxINT32_SWAP_ON_BE(dir_offset);
+	uint32_t unknown = 0;
+	mc.write(&num_lumps, 2);
+	mc.write(&dir_offset, 4);
+	mc.write(&unknown, 4);
+
+	// Write the lumps
+	for (uint16_t l = 0; l < numEntries(); l++) {
+		entry = getEntry(l);
+		mc.write(entry->getData(), entry->getSize());
+	}
+
+	// Write the directory
+	for (uint16_t l = 0; l < num_lumps; l++) {
+		entry = getEntry(l);
+
+		uint32_t offset = wxINT32_SWAP_ON_BE(getEntryOffset(entry));
+		uint32_t size = wxINT32_SWAP_ON_BE(entry->getSize());
+		uint32_t nameofs = wxINT32_SWAP_ON_BE(nameoffsets[l]);
+
+		mc.write(&offset,	4);		// Offset
+		mc.write(&size,		4);		// Size
+		mc.write(&nameofs,	4);		// Name offset
+
+		if (update) {
+			entry->setState(0);
+			entry->exProp("Offset") = (int)wxINT32_SWAP_ON_BE(offset);
+		}
+	}
+
+	// Write the names
+	for (uint16_t l = 0; l < num_lumps; l++) {
+		uint8_t zero = 0;
+		entry = getEntry(l);
+		if (nameoffsets[l]) {
+			mc.write(entry->getName(), entry->getName().length());
+			mc.write(&zero, 1);
+		}
+	}
+
+	// Clean-up
+	delete[] nameoffsets;
+
+	// Finished!
+	return true;
 }
 
 /* DatArchive::loadEntryData
@@ -334,6 +606,9 @@ bool DatArchive::loadEntryData(ArchiveEntry* entry) {
 	return true;
 }
 
+/* DatArchive::isDatArchive
+ * Checks if the given data is a valid Shadowcaster dat archive
+ *******************************************************************/
 bool DatArchive::isDatArchive(MemChunk& mc) {
 	// Read dat header
 	mc.seek(0, SEEK_SET);
@@ -390,6 +665,9 @@ bool DatArchive::isDatArchive(MemChunk& mc) {
 	return true;
 }
 
+/* DatArchive::isDatArchive
+ * Checks if the file at [filename] is a valid Shadowcaster dat archive
+ *******************************************************************/
 bool DatArchive::isDatArchive(string filename) {
 	// Open file for reading
 	wxFile file(filename);

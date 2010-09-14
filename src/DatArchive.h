@@ -17,6 +17,7 @@ public:
 	// Dat specific
 	uint32_t	getEntryOffset(ArchiveEntry* entry);
 	void		setEntryOffset(ArchiveEntry* entry, uint32_t offset);
+	void		updateNamespaces();
 
 	// Archive type info
 	string			getFileExtensionString();
@@ -35,17 +36,17 @@ public:
 	bool		loadEntryData(ArchiveEntry* entry);
 	unsigned 	numEntries() { return getRoot()->numEntries(); }
 
-	// Entry addition/removal (unimplemented)
-	ArchiveEntry*	addEntry(ArchiveEntry* entry, unsigned position = 0xFFFFFFFF, ArchiveTreeNode* dir = NULL, bool copy = false) { return NULL; }
-	ArchiveEntry*	addNewEntry(string name = "", unsigned position = 0xFFFFFFFF, ArchiveTreeNode* dir = NULL) { return NULL; }
-	bool			removeEntry(ArchiveEntry* entry, bool delete_entry = true) { return false; }
+	// Entry addition/removal
+	ArchiveEntry*	addEntry(ArchiveEntry* entry, unsigned position = 0xFFFFFFFF, ArchiveTreeNode* dir = NULL, bool copy = false);
+	ArchiveEntry*	addEntry(ArchiveEntry* entry, string add_namespace, bool copy = false);
+	bool			removeEntry(ArchiveEntry* entry, bool delete_entry = true);
 
-	// Entry moving (unimplemented)
-	bool	swapEntries(ArchiveEntry* entry1, ArchiveEntry* entry2) { return false; }
-	bool	moveEntry(ArchiveEntry* entry, unsigned position = 0xFFFFFFFF, ArchiveTreeNode* dir = NULL) { return false; }
+	// Entry moving
+	bool	swapEntries(ArchiveEntry* entry1, ArchiveEntry* entry2);
+	bool	moveEntry(ArchiveEntry* entry, unsigned position = 0xFFFFFFFF, ArchiveTreeNode* dir = NULL);
 
-	// Entry modification (unimplemented)
-	bool	renameEntry(ArchiveEntry* entry, string name) { return false; }
+	// Entry modification
+	bool	renameEntry(ArchiveEntry* entry, string name);
 
 	// Detection
 	vector<mapdesc_t>	detectMaps() { vector<mapdesc_t> ret; return ret; }

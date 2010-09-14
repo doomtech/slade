@@ -69,8 +69,6 @@ TODO List ---------------------------------------------------------------
 - Ability to set an archive never to read entry data into memory (read data from the file every time)
 - MemChunk subclass that deals with a file rather than a memory block
 - Some lump (sub)formats can only be identified properly from the presence of other lumps; e.g. GL nodes and THINGS/LINEDEFS
-- Fine-tune identification of Doom SFX lumps if possible (most fail the test at the moment)
-- Should probably merge MultiEntryPanel stuff into DefaultEntryPanel
 - Needs some kind of proper archive type system, handled by ArchiveManager
 - Need to do something about keeping ArchiveEntry.data.size and ArchiveEntry.size in sync
   (Still need the size member for entries that don't have their data loaded into memory yet)
