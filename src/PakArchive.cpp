@@ -135,7 +135,7 @@ bool PakArchive::open(MemChunk& mc) {
 	setMuted(true);
 
 	// Read the directory
-	int num_entries = dir_size / 64;
+	size_t num_entries = dir_size / 64;
 	mc.seek(dir_offset, SEEK_SET);
 	theSplashWindow->setProgressMessage("Reading pak archive data");
 	for (uint32_t d = 0; d < num_entries; d++) {
@@ -155,7 +155,7 @@ bool PakArchive::open(MemChunk& mc) {
 		size = wxINT32_SWAP_ON_BE(size);
 
 		// Check offset+size
-		if (offset + size > mc.getSize()) {
+		if ((unsigned)(offset + size) > mc.getSize()) {
 			wxLogMessage("PakArchive::open: Pak archive is invalid or corrupt (entry goes past end of file)");
 			Global::error = "Archive is invalid and/or corrupt";
 			setMuted(false);
@@ -389,7 +389,7 @@ bool PakArchive::isPakArchive(MemChunk& mc) {
 		return false;
 
 	// Check directory is sane
-	if (dir_offset < 12 || dir_offset + dir_size > mc.getSize())
+	if (dir_offset < 12 || (unsigned)(dir_offset + dir_size) > mc.getSize())
 		return false;
 
 	// That'll do

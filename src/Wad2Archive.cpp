@@ -160,7 +160,7 @@ bool Wad2Archive::open(MemChunk& mc) {
 
 		// If the lump data goes past the end of the file,
 		// the wadfile is invalid
-		if (info.offset + info.dsize > mc.getSize()) {
+		if ((unsigned)(info.offset + info.dsize) > mc.getSize()) {
 			wxLogMessage("Wad2Archive::open: Wad2 archive is invalid or corrupt");
 			Global::error = "Archive is invalid and/or corrupt";
 			setMuted(false);
@@ -173,7 +173,7 @@ bool Wad2Archive::open(MemChunk& mc) {
 		nlump->exProp("Offset") = (int)info.offset;
 		nlump->exProp("W2Type") = info.type;
 		nlump->exProp("W2Size") = (int)info.size;
-		nlump->exProp("W2Comp") = (bool)info.cmprs;
+		nlump->exProp("W2Comp") = !!(info.cmprs);
 		nlump->setState(0);
 
 		// Add to entry list
@@ -412,7 +412,7 @@ bool Wad2Archive::isWad2Archive(MemChunk& mc) {
 	dir_offset = wxINT32_SWAP_ON_BE(dir_offset);
 
 	// Check directory offset is decent
-	if ((dir_offset + (num_lumps * 32)) > mc.getSize() ||
+	if ((unsigned)(dir_offset + (num_lumps * 32)) > mc.getSize() ||
 	        dir_offset < 12)
 		return false;
 

@@ -702,11 +702,27 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\PakArchive.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\PakArchive.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\ResArchive.cpp"
 					>
 				</File>
 				<File
 					RelativePath=".\src\ResArchive.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Wad2Archive.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Wad2Archive.h"
 					>
 				</File>
 				<File
