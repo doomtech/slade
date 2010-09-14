@@ -1,25 +1,78 @@
 
+/*******************************************************************
+ * SLADE - It's a Doom Editor
+ * Copyright (C) 2008 Simon Judd
+ *
+ * Email:       veilofsorrow@gmail.com
+ * Web:         http://slade.mancubus.net
+ * Filename:    PakArchive.cpp
+ * Description: PakArchive, archive class to handle the Quake pak format
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *******************************************************************/
+
+
+/*******************************************************************
+ * INCLUDES
+ *******************************************************************/
 #include "Main.h"
 #include "PakArchive.h"
 #include "SplashWindow.h"
 #include <wx/filename.h>
 
+
+/*******************************************************************
+ * EXTERNAL VARIABLES
+ *******************************************************************/
 EXTERN_CVAR(Bool, archive_load_data)
 
+
+/*******************************************************************
+ * PAKARCHIVE CLASS FUNCTIONS
+ *******************************************************************/
+
+/* PakArchive::PakArchive
+ * PakArchive class constructor
+ *******************************************************************/
 PakArchive::PakArchive() : Archive(ARCHIVE_PAK) {
 }
 
+/* PakArchive::~PakArchive
+ * PakArchive class destructor
+ *******************************************************************/
 PakArchive::~PakArchive() {
 }
 
+/* PakArchive::getFileExtensionString
+ * Returns the file extension string to use in the file open dialog
+ *******************************************************************/
 string PakArchive::getFileExtensionString() {
 	return "Pak Files (*.pak)|*.pak";
 }
 
+/* PakArchive::getFormat
+ * Returns the string id for the pak EntryDataFormat
+ *******************************************************************/
 string PakArchive::getFormat() {
 	return "archive_pak";
 }
 
+/* PakArchive::open
+ * Reads a pak format file from disk
+ * Returns true if successful, false otherwise
+ *******************************************************************/
 bool PakArchive::open(string filename) {
 	// Read the file into a MemChunk
 	MemChunk mc;
@@ -40,6 +93,10 @@ bool PakArchive::open(string filename) {
 		return false;
 }
 
+/* PakArchive::open
+ * Reads pak format data from an ArchiveEntry
+ * Returns true if successful, false otherwise
+ *******************************************************************/
 bool PakArchive::open(ArchiveEntry* entry) {
 	// Check entry was given
 	if (!entry)
@@ -49,6 +106,10 @@ bool PakArchive::open(ArchiveEntry* entry) {
 	return open(entry->getMCData());
 }
 
+/* PakArchive::open
+ * Reads pak format data from a MemChunk
+ * Returns true if successful, false otherwise
+ *******************************************************************/
 bool PakArchive::open(MemChunk& mc) {
 	// Check given data is valid
 	if (mc.getSize() < 12)
@@ -157,14 +218,115 @@ bool PakArchive::open(MemChunk& mc) {
 	return true;
 }
 
+/* PakArchive::write
+ * Writes the pak archive to a MemChunk
+ * Returns true if successful, false otherwise
+ *******************************************************************/
 bool PakArchive::write(MemChunk& mc, bool update) {
-	return false;
+	// Clear current data
+	mc.clear();
+
+	// Get archive tree as a list
+	vector<ArchiveEntry*> entries;
+	getEntryTreeAsList(entries);
+
+	// Process entry list
+	long dir_offset = 12;
+	long dir_size = 0;
+	for (unsigned a = 0; a < entries.size(); a++) {
+		// Ignore folder entries
+		if (entries[a]->getType() == EntryType::folderType())
+			continue;
+
+		// Increment directory offset and size
+		dir_offset += entries[a]->getSize();
+		dir_size += 64;
+	}
+
+	// Init data size
+	mc.reSize(dir_offset + dir_size, false);
+
+	// Write header
+	char pack[4] = { 'P', 'A', 'C', 'K' };
+	mc.seek(0, SEEK_SET);
+	mc.write(pack, 4);
+	mc.write(&dir_offset, 4);
+	mc.write(&dir_size, 4);
+
+	// Write directory
+	mc.seek(dir_offset, SEEK_SET);
+	long offset = 12;
+	for (unsigned a = 0; a < entries.size(); a++) {
+		// Skip folders
+		if (entries[a]->getType() == EntryType::folderType())
+			continue;
+
+		// Update entry
+		if (update) {
+			entries[a]->setState(0);
+			entries[a]->exProp("Offset") = (int)offset;
+		}
+
+		// Check entry name
+		string name = entries[a]->getPath(true);
+		name.Remove(0, 1);	// Remove leading /
+		if (name.Len() > 56) {
+			wxLogMessage("Warning: Entry %s path is too long (> 56 characters), putting it in the root directory", chr(name));
+			wxFileName fn(name);
+			name = fn.GetFullName();
+			if (name.Len() > 56)
+				name.Truncate(56);
+		}
+		wxLogMessage(name);
+
+		// Write entry name
+		char name_data[56];
+		memset(name_data, 0, 56);
+		memcpy(name_data, chr(name), name.Length());
+		mc.write(name_data, 56);
+
+		// Write entry offset
+		mc.write(&offset, 4);
+
+		// Write entry size
+		long size = entries[a]->getSize();
+		mc.write(&size, 4);
+
+		// Increment/update offset
+		offset += size;
+	}
+
+	// Write entry data
+	mc.seek(12, SEEK_SET);
+	for (unsigned a = 0; a < entries.size(); a++) {
+		// Skip folders
+		if (entries[a]->getType() == EntryType::folderType())
+			continue;
+
+		// Write data
+		mc.write(entries[a]->getData(), entries[a]->getSize());
+	}
+
+	return true;
 }
 
+/* PakArchive::write
+ * Writes the pak archive to a file
+ * Returns true if successful, false otherwise
+ *******************************************************************/
 bool PakArchive::write(string filename, bool update) {
-	return false;
+	// Write to a MemChunk, then export it to a file
+	MemChunk mc;
+	if (write(mc, true))
+		return mc.exportFile(filename);
+	else
+		return false;
 }
 
+/* PakArchive::loadEntryData
+ * Loads an entry's data from the pak file
+ * Returns true if successful, false otherwise
+ *******************************************************************/
 bool PakArchive::loadEntryData(ArchiveEntry* entry) {
 	// Check entry is ok
 	if (!checkEntry(entry))
@@ -197,8 +359,13 @@ bool PakArchive::loadEntryData(ArchiveEntry* entry) {
 }
 
 
+/*******************************************************************
+ * PAKARCHIVE CLASS STATIC FUNCTIONS
+ *******************************************************************/
 
-
+/* PakArchive::isPakArchive
+ * Checks if the given data is a valid Quake pak archive
+ *******************************************************************/
 bool PakArchive::isPakArchive(MemChunk& mc) {
 	// Check given data is valid
 	if (mc.getSize() < 12)
@@ -229,6 +396,9 @@ bool PakArchive::isPakArchive(MemChunk& mc) {
 	return true;
 }
 
+/* PakArchive::isWadArchive
+ * Checks if the file at [filename] is a valid Quake pak archive
+ *******************************************************************/
 bool PakArchive::isPakArchive(string filename) {
 	// Open file for reading
 	wxFile file(filename);

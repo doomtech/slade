@@ -1,8 +1,37 @@
 
+/*******************************************************************
+ * SLADE - It's a Doom Editor
+ * Copyright (C) 2008 Simon Judd
+ *
+ * Email:       veilofsorrow@gmail.com
+ * Web:         http://slade.mancubus.net
+ * Filename:    Wad2Archive.cpp
+ * Description: Wad2Archive, archive class to handle the Quake wad2 format
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *******************************************************************/
+
+
+/*******************************************************************
+ * INCLUDES
+ *******************************************************************/
 #include "Main.h"
 #include "Wad2Archive.h"
 #include "SplashWindow.h"
 #include <wx/filename.h>
+
 
 /*******************************************************************
  * EXTERNAL VARIABLES
@@ -10,16 +39,33 @@
 EXTERN_CVAR(Bool, archive_load_data)
 EXTERN_CVAR(Bool, wad_force_uppercase)
 
+
+/*******************************************************************
+ * WAD2ARCHIVE CLASS FUNCTIONS
+ *******************************************************************/
+
+/* Wad2Archive::Wad2Archive
+ * Wad2Archive class constructor
+ *******************************************************************/
 Wad2Archive::Wad2Archive() : TreelessArchive(ARCHIVE_WAD2) {
 }
 
+/* Wad2Archive::~Wad2Archive
+ * Wad2Archive class destructor
+ *******************************************************************/
 Wad2Archive::~Wad2Archive() {
 }
 
+/* Wad2Archive::getFileExtensionString
+ * Gets the wxWidgets file dialog filter string for the archive type
+ *******************************************************************/
 string Wad2Archive::getFileExtensionString() {
 	return "WAD2 Files (*.wad)|*.wad";
 }
 
+/* Wad2Archive::getFormat
+ * Returns the EntryDataFormat id of this archive type
+ *******************************************************************/
 string Wad2Archive::getFormat() {
 	return "archive_wad2";
 }
@@ -169,7 +215,6 @@ bool Wad2Archive::open(MemChunk& mc) {
 	// Setup variables
 	setMuted(false);
 	setModified(false);
-	read_only = true;
 	announce("opened");
 
 	theSplashWindow->setProgressMessage("");
@@ -195,7 +240,57 @@ bool Wad2Archive::write(string filename, bool update) {
  * Returns true if successful, false otherwise
  *******************************************************************/
 bool Wad2Archive::write(MemChunk& mc, bool update) {
-	return false;
+	// Determine directory offset & individual lump offsets
+	uint32_t dir_offset = 12;
+	ArchiveEntry* entry = NULL;
+	for (uint32_t l = 0; l < numEntries(); l++) {
+		entry = getEntry(l);
+		entry->exProp("Offset") = (int)dir_offset;
+		dir_offset += entry->getSize();
+	}
+
+	// Clear/init MemChunk
+	mc.clear();
+	mc.seek(0, SEEK_SET);
+	mc.reSize(dir_offset + numEntries() * 32);
+
+	// Setup wad type
+	char wad_type[4] = { 'W', 'A', 'D', '2' };
+
+	// Write the header
+	uint32_t num_lumps = numEntries();
+	mc.write(wad_type, 4);
+	mc.write(&num_lumps, 4);
+	mc.write(&dir_offset, 4);
+
+	// Write the lumps
+	for (uint32_t l = 0; l < num_lumps; l++) {
+		entry = getEntry(l);
+		mc.write(entry->getData(), entry->getSize());
+	}
+
+	// Write the directory
+	for (uint32_t l = 0; l < num_lumps; l++) {
+		entry = getEntry(l);
+
+		// Setup directory entry
+		wad2entry_t info;
+		memset(info.name, 0, 16);
+		memcpy(info.name, chr(entry->getName()), entry->getName().Len());
+		info.cmprs = (bool)entry->exProp("W2Comp");
+		info.dsize = entry->getSize();
+		info.size = entry->getSize();
+		info.offset = (int)entry->exProp("Offset");
+		info.type = (int)entry->exProp("W2Type");
+		
+		// Write it
+		mc.write(&info, 32);
+
+		if (update)
+			entry->setState(0);
+	}
+
+	return true;
 }
 
 /* Wad2Archive::loadEntryData
@@ -233,6 +328,11 @@ bool Wad2Archive::loadEntryData(ArchiveEntry* entry) {
 	return true;
 }
 
+/* Wad2Archive::addEntry
+ * Override of Archive::addEntry to force entry addition to the root
+ * directory and rename the entry if necessary to be wad2-friendly
+ * (16 characters max and no file extension)
+ *******************************************************************/
 ArchiveEntry* Wad2Archive::addEntry(ArchiveEntry* entry, unsigned position, ArchiveTreeNode* dir, bool copy) {
 	// Check entry
 	if (!entry)
@@ -260,6 +360,10 @@ ArchiveEntry* Wad2Archive::addEntry(ArchiveEntry* entry, unsigned position, Arch
 	return entry;
 }
 
+/* Wad2Archive::renameEntry
+ * Override of Archive::renameEntry enforce wad2-friendly entry names
+ * (16 characters max and uppercase if forced)
+ *******************************************************************/
 bool Wad2Archive::renameEntry(ArchiveEntry* entry, string name) {
 	// Check entry
 	if (!checkEntry(entry))
@@ -277,6 +381,9 @@ bool Wad2Archive::renameEntry(ArchiveEntry* entry, string name) {
 }
 
 
+/*******************************************************************
+ * WAD2ARCHIVE CLASS STATIC FUNCTIONS
+ *******************************************************************/
 
 /* Wad2Archive::isWad2Archive
  * Checks if the given data is a valid Quake wad2 archive
