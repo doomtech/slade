@@ -345,6 +345,9 @@
     <ClCompile Include="src\PakArchive.cpp">
       <Filter>Resources\Archive</Filter>
     </ClCompile>
+    <ClCompile Include="src\WadJArchive.cpp">
+      <Filter>Resources\Archive</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -634,6 +637,9 @@
       <Filter>Resources\Archive</Filter>
     </ClInclude>
     <ClInclude Include="src\PakArchive.h">
+      <Filter>Resources\Archive</Filter>
+    </ClInclude>
+    <ClInclude Include="src\WadJArchive.h">
       <Filter>Resources\Archive</Filter>
     </ClInclude>
   </ItemGroup>

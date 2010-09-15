@@ -7,6 +7,76 @@
 
 vector<TextLanguage*>	text_languages;
 
+
+TLFunction::TLFunction(string name) {
+	this->name = name;
+}
+
+TLFunction::~TLFunction() {
+}
+
+string TLFunction::generateCallTipString(int arg_set) {
+	// Check requested arg set exists
+	if (arg_set < 0 || arg_set >= arg_sets.size())
+		return "<invalid argset index>";
+
+	string calltip;
+
+	// Add extra buttons for selection if there is more than one arg set
+	//if (arg_sets.size() > 1)
+	//	calltip += s_fmt("\001 %d of %d \002 ", arg_set+1, arg_sets.size());
+
+	// Generate scintilla-format calltip string
+	calltip += name + "(";
+	calltip += arg_sets[arg_set];
+	calltip += ")";
+
+	return calltip;
+}
+
+point2_t TLFunction::getArgTextExtent(int arg, int arg_set) {
+	point2_t extent(-1, -1);
+
+	// Check requested arg set exists
+	if (arg_set < 0 || arg_set >= arg_sets.size() || arg < 0)
+		return extent;
+
+	// Get start position of args list
+	int start_pos = name.Length() + 1;
+	//if (arg_sets.size() > 1) {
+	//	string temp = s_fmt("\001 %d of %d \002 ", arg_set+1, arg_sets.size());
+	//	start_pos += temp.Length();
+	//}
+
+	// Go through arg set string
+	string args = arg_sets[arg_set];
+	int current_arg = 0;
+	extent.x = start_pos;
+	extent.y = start_pos + args.Length();
+	for (unsigned a = 0; a < args.Length(); a++) {
+		// Check for ,
+		if (args.at(a) == ',') {
+			// ',' found, so increment current arg
+			current_arg++;
+
+			// If we're at the start of the arg we want
+			if (current_arg == arg)
+				extent.x = start_pos + a+1;
+
+			// If we've reached the end of the arg we want
+			if (current_arg > arg) {
+				extent.y = start_pos + a;
+				break;
+			}
+		}
+	}
+
+	return extent;
+}
+
+
+
+
 TextLanguage::TextLanguage(string id) {
 	// Init variables
 	this->id = id;
@@ -23,19 +93,18 @@ TextLanguage::~TextLanguage() {
 	}
 }
 
-void TextLanguage::addFunction(string name, vector<string> args) {
-	// Init new function
-	tl_function_t func;
+void TextLanguage::addFunction(string name, string args) {
+	// Check if the function exists
+	TLFunction* func = getFunction(name);
 
-	// Set name
-	func.name = name;
+	// If it doesn't, create it
+	if (!func) {
+		func = new TLFunction(name);
+		functions.push_back(func);
+	}
 
-	// Set args
-	for (size_t a = 0; a < args.size(); a++)
-		func.args.push_back(args[a]);
-
-	// Add to list
-	functions.push_back(func);
+	// Add the arg set
+	func->addArgSet(args);
 }
 
 string TextLanguage::getKeywordsList() {
@@ -65,10 +134,21 @@ string TextLanguage::getFunctionsList() {
 	string ret = "";
 
 	// Add each function name to return string (separated by spaces)
-	for (size_t a = 0; a < functions.size(); a++)
-		ret += functions[a].name + " ";
+	for (unsigned a = 0; a < functions.size(); a++)
+		ret += functions[a]->getName() + " ";
 
 	return ret;
+}
+
+TLFunction* TextLanguage::getFunction(string name) {
+	// Find function matching [name]
+	for (unsigned a = 0; a < functions.size(); a++) {
+		if (functions[a]->getName() == name)
+			return functions[a];
+	}
+
+	// Not found
+	return NULL;
 }
 
 bool TextLanguage::readLanguageDefinition(MemChunk& mc) {
@@ -163,16 +243,10 @@ bool TextLanguage::readLanguageDefinition(MemChunk& mc) {
 				for (unsigned f = 0; f < child->nChildren(); f++) {
 					ParseTreeNode* child_func = (ParseTreeNode*)child->getChild(f);
 
-					// Get name
-					tl_function_t fn;
-					fn.name = child_func->getName();
-
-					// Get args
-					for (unsigned v = 0; v < child_func->nValues(); v++)
-						fn.args.push_back(child_func->getStringValue(v));
-
-					// Add function
-					lang->addFunction(fn.name, fn.args);
+					// Add function (and overloaded args if existing)
+					for (unsigned v = 0; v < child_func->nValues(); v++) {
+						lang->addFunction(child_func->getName(), child_func->getStringValue(v));
+					}
 				}
 			}
 		}

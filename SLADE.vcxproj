@@ -136,6 +136,7 @@
     <ClCompile Include="src\Tree.cpp" />
     <ClCompile Include="src\VirtualListView.cpp" />
     <ClCompile Include="src\Wad2Archive.cpp" />
+    <ClCompile Include="src\WadJArchive.cpp" />
     <ClCompile Include="src\WxStuff.cpp" />
     <ClCompile Include="src\Property.cpp" />
     <ClCompile Include="src\PropertyList.cpp" />
@@ -232,6 +233,7 @@
     <ClInclude Include="src\Tree.h" />
     <ClInclude Include="src\VirtualListView.h" />
     <ClInclude Include="src\Wad2Archive.h" />
+    <ClInclude Include="src\WadJArchive.h" />
     <ClInclude Include="src\WxStuff.h" />
     <ClInclude Include="src\Property.h" />
     <ClInclude Include="src\PropertyList.h" />

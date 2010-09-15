@@ -33,6 +33,7 @@ public:
 class TextEditor : public wxStyledTextCtrl {
 private:
 	TextLanguage*		language;
+	TLFunction*			func_calltip;
 	FindReplaceDialog*	dlg_fr;
 
 public:
@@ -51,10 +52,14 @@ public:
 	int		replaceAll(string find, string replace);
 
 	void	checkBraceMatch();
+	bool	openCalltip(int pos);
+	void	updateCalltip();
 
-	void	onModified(wxStyledTextEvent& e);
-	void	onTextChanged(wxStyledTextEvent& e);
+	void	onKeyDown(wxKeyEvent& e);
+	void	onKeyUp(wxKeyEvent& e);
+	void	onCharAdded(wxStyledTextEvent& e);
 	void	onUpdateUI(wxStyledTextEvent& e);
+	void	onCalltipClicked(wxStyledTextEvent& e);
 	void	onFRDBtnFindNext(wxCommandEvent& e);
 	void	onFRDBtnReplace(wxCommandEvent& e);
 	void	onFRDBtnReplaceAll(wxCommandEvent& e);

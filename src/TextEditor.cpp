@@ -38,6 +38,7 @@
  *******************************************************************/
 CVAR(Bool, txed_trim_whitespace, false, CVAR_SAVE)
 CVAR(Int, txed_tab_width, 4, CVAR_SAVE)
+CVAR(Bool, txed_auto_indent, true, CVAR_SAVE)
 rgba_t col_comment(0, 150, 0, 255);
 rgba_t col_string(0, 120, 130, 255);
 rgba_t col_keyword(0, 30, 200, 255);
@@ -165,9 +166,11 @@ TextEditor::TextEditor(wxWindow* parent, int id)
 	dlg_fr = new FindReplaceDialog(this);
 
 	// Bind events
-	Bind(wxEVT_STC_MODIFIED, &TextEditor::onModified, this);
-	Bind(wxEVT_STC_CHANGE, &TextEditor::onTextChanged, this);
+	Bind(wxEVT_KEY_DOWN, &TextEditor::onKeyDown, this);
+	Bind(wxEVT_KEY_UP, &TextEditor::onKeyUp, this);
+	Bind(wxEVT_STC_CHARADDED, &TextEditor::onCharAdded, this);
 	Bind(wxEVT_STC_UPDATEUI, &TextEditor::onUpdateUI, this);
+	Bind(wxEVT_STC_CALLTIP_CLICK, &TextEditor::onCalltipClicked, this);
 	dlg_fr->getBtnFindNext()->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextEditor::onFRDBtnFindNext, this);
 	dlg_fr->getBtnReplace()->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextEditor::onFRDBtnReplace, this);
 	dlg_fr->getBtnReplaceAll()->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextEditor::onFRDBtnReplaceAll, this);
@@ -223,6 +226,10 @@ bool TextEditor::loadEntry(ArchiveEntry* entry) {
 
 	// Clean up
 	delete[] data;
+
+	// Update line numbers margin width
+	string numlines = s_fmt("0%d", GetNumberOfLines());
+	SetMarginWidth(0, TextWidth(wxSTC_STYLE_LINENUMBER, numlines));
 
 	return true;
 }
@@ -348,31 +355,175 @@ void TextEditor::checkBraceMatch() {
 	}
 }
 
+bool TextEditor::openCalltip(int pos) {
+	// Get start of word before bracket
+	int start = WordStartPosition(pos - 1, false);
+
+	// Get word before bracket
+	string word = GetTextRange(WordStartPosition(start, true), WordEndPosition(start, true));
+
+	// Get matching language function (if any)
+	TLFunction* func = language->getFunction(word);
+
+	// Show calltip if it's a function
+	if (func) {
+		CallTipShow(GetCurrentPos(), func->generateCallTipString());
+		func_calltip = func;
+
+		// Highlight first arg
+		point2_t arg_ext = func_calltip->getArgTextExtent(0);
+		CallTipSetHighlight(arg_ext.x, arg_ext.y);
+
+		return true;
+	}
+	else {
+		func_calltip = NULL;
+		return false;
+	}
+}
+
+void TextEditor::updateCalltip() {
+	if (!CallTipActive()) {
+		// No calltip currently showing, check if we're in a function
+		int pos = GetCurrentPos() - 1;
+		while (1) {
+			// Exit if we get to the start of the text
+			if (pos < 0)
+				return;
+
+			// Get character
+			int chr = GetCharAt(pos);
+
+			// If we find a closing bracket, exit
+			if (chr == ')')
+				return;
+
+			// If we find an opening bracket, try to open a calltip
+			if (chr == '(') {
+				if (!openCalltip(pos))
+					return;
+				else
+					break;
+			}
+
+			// Go to previous character
+			pos--;
+		}
+	}
+
+	if (func_calltip) {
+		// Calltip currently showing, determine what arg we're at
+		int pos = GetCurrentPos() - 1;
+		int arg = 0;
+		while (1) {
+			// Exit if we get to the start of the text
+			if (pos < 0)
+				break;
+
+			// Get character
+			int chr = GetCharAt(pos);
+
+			// If we find a comma, increment the arg number
+			if (chr == ',')
+				arg++;
+
+			// If we find a starting brace, exit
+			if (chr == '(')
+				break;
+
+			// If we find an ending brace, we're outside a function, so cancel the calltip
+			if (chr == ')') {
+				CallTipCancel();
+				func_calltip = NULL;
+				return;
+			}
+
+			// Go to previous character
+			pos--;
+		}
+
+		// Update calltip string with the current arg highlighted
+		point2_t arg_ext = func_calltip->getArgTextExtent(arg);
+		CallTipSetHighlight(arg_ext.x, arg_ext.y);
+	}
+}
+
 
 /*******************************************************************
  * TEXTEDITOR CLASS EVENTS
  *******************************************************************/
 
-/* TextEditor::onModified
- * Called when the text is about to be modified
- *******************************************************************/
-void TextEditor::onModified(wxStyledTextEvent& e) {
+void TextEditor::onKeyDown(wxKeyEvent& e) {
+	// Check for Ctrl+Shift+Space (invoke calltip)
+	if (e.GetModifiers() & wxMOD_SHIFT && e.GetModifiers() & wxMOD_CONTROL && e.GetKeyCode() == WXK_SPACE)
+		updateCalltip();
+
 	e.Skip();
 }
 
-/* TextEditor::onTextChanged
- * Called when the text is changed
- *******************************************************************/
-void TextEditor::onTextChanged(wxStyledTextEvent& e) {
+void TextEditor::onKeyUp(wxKeyEvent& e) {
+	e.Skip();
+}
+
+void TextEditor::onCharAdded(wxStyledTextEvent& e) {
 	// Update line numbers margin width
 	string numlines = s_fmt("0%d", GetNumberOfLines());
 	SetMarginWidth(0, TextWidth(wxSTC_STYLE_LINENUMBER, numlines));
+
+	// Auto indent
+    int currentLine = GetCurrentLine();
+    if (txed_auto_indent && e.GetKey() == '\n') {
+		// Get indentation amount
+        int lineInd = 0;
+        if (currentLine > 0)
+            lineInd = GetLineIndentation(currentLine - 1);
+
+		// Do auto-indent if needed
+        if (lineInd != 0) {
+			SetLineIndentation(currentLine, lineInd);
+
+			// Skip to end of tabs
+			while (1) {
+				int chr = GetCharAt(GetCurrentPos());
+				if (chr == '\t' || chr == ' ')
+					GotoPos(GetCurrentPos()+1);
+				else
+					break;
+			}
+		}
+    }
+
+	// Call tip
+	if (e.GetKey() == '(') {
+		openCalltip(GetCurrentPos());
+	}
+
+	// End call tip
+	if (e.GetKey() == ')') {
+		CallTipCancel();
+	}
+
+	// Comma, possibly update calltip
+	if (e.GetKey() == ',') {
+		if (CallTipActive())
+			updateCalltip();
+	}
+
+	// Continue
 	e.Skip();
 }
 
 void TextEditor::onUpdateUI(wxStyledTextEvent& e) {
 	//checkBraceMatch();	// Disabled for now, wxSTC bug makes it not redraw properly
+
+	// If a calltip is open, update it
+	if (CallTipActive())
+		updateCalltip();
+
 	e.Skip();
+}
+
+void TextEditor::onCalltipClicked(wxStyledTextEvent& e) {
 }
 
 /* TextEditor::onFRDBtnFindNext
