@@ -162,12 +162,10 @@ bool LibArchive::open(MemChunk& mc) {
 		char myname[13] = "";
 		uint32_t offset = 0;
 		uint32_t size = 0;
-		uint8_t dummy = 0;
 
 		mc.read(&size, 4);		// Size
 		mc.read(&offset, 4);	// Offset
-		mc.read(myname, 12);	// Name
-		mc.read(&dummy, 1);		// Separator
+		mc.read(myname, 13);	// Name
 		myname[12] = '\0';
 
 		// Byteswap values for big endian if needed
@@ -237,7 +235,12 @@ bool LibArchive::open(MemChunk& mc) {
  * Returns true if successful, false otherwise
  *******************************************************************/
 bool LibArchive::write(string filename, bool update) {
-	return false;
+	// Write to a MemChunk, then export it to a file
+	MemChunk mc;
+	if (write(mc, true))
+		return mc.exportFile(filename);
+	else
+		return false;
 }
 
 /* LibArchive::write
@@ -245,7 +248,57 @@ bool LibArchive::write(string filename, bool update) {
  * Returns true if successful, false otherwise
  *******************************************************************/
 bool LibArchive::write(MemChunk& mc, bool update) {
-	return false;
+	// Only two bytes are used for storing entry amount,
+	// so abort for excessively large files:
+	if (numEntries() > 65535)
+		return false;
+
+	uint16_t num_files = numEntries();
+	uint32_t dir_offset = 0;
+	ArchiveEntry* entry = NULL;
+	for (uint16_t l = 0; l < num_files; l++) {
+		entry = getEntry(l);
+		setEntryOffset(entry, dir_offset);
+		dir_offset += entry->getSize();
+	}
+
+	// Clear/init MemChunk
+	mc.clear();
+	mc.seek(0, SEEK_SET);
+	mc.reSize(2 + dir_offset + num_files * 21);
+
+	// Write the files
+	for (uint16_t l = 0; l < num_files; l++) {
+		entry = getEntry(l);
+		mc.write(entry->getData(), entry->getSize());
+	}
+
+	// Write the directory
+	for (uint16_t l = 0; l < num_files; l++) {
+		entry = getEntry(l);
+		char name[13] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+		long offset = wxINT32_SWAP_ON_BE(getEntryOffset(entry));
+		long size = wxINT32_SWAP_ON_BE(entry->getSize());
+
+		for (size_t c = 0; c < entry->getName().length() && c < 12; c++)
+			name[c] = entry->getName()[c];
+
+		mc.write(&size, 4);		// Size
+		mc.write(&offset, 4);	// Offset
+		mc.write(name, 13);		// Name
+
+		if (update) {
+			entry->setState(0);
+			entry->exProp("Offset") = (int)wxINT32_SWAP_ON_BE(offset);
+		}
+	}
+
+	// Write the footer
+	num_files = wxINT16_SWAP_ON_BE(num_files);
+	mc.write(&num_files, 2);
+
+	// Finished!
+	return true;
 }
 
 /* LibArchive::loadEntryData
@@ -283,6 +336,63 @@ bool LibArchive::loadEntryData(ArchiveEntry* entry) {
 	return true;
 }
 
+/* LibArchive::addEntry
+ * Override of Archive::addEntry to force entry addition to the root
+ * directory and rename the entry if necessary to be lib-friendly 
+ * (12 characters max)
+ *******************************************************************/
+ArchiveEntry* LibArchive::addEntry(ArchiveEntry* entry, unsigned position, ArchiveTreeNode* dir, bool copy) {
+	// Check entry
+	if (!entry)
+		return NULL;
+
+	// Check if read-only
+	if (isReadOnly())
+		return NULL;
+
+	// Copy if necessary
+	if (copy)
+		entry = new ArchiveEntry(*entry);
+
+	// Process name (must be 12 characters max)
+	string name = entry->getName().Truncate(12);
+
+	// Set new wad-friendly name
+	entry->setName(name);
+
+	// Do default entry addition (to root directory)
+	Archive::addEntry(entry, position);
+
+	return entry;
+}
+
+/* LibArchive::addEntry
+ * There is no namespaces in lib archives, so just put it at the end
+ *******************************************************************/
+ArchiveEntry* LibArchive::addEntry(ArchiveEntry* entry, string add_namespace, bool copy) {
+	return addEntry(entry, 0xFFFFFFFF, NULL, copy);
+}
+
+/* LibArchive::renameEntry
+ * Override of Archive::renameEntry to rename the entry if necessary
+ * to be lib-friendly (12 characters max)
+ *******************************************************************/
+bool LibArchive::renameEntry(ArchiveEntry* entry, string name) {
+	// Check entry
+	if (!checkEntry(entry))
+		return false;
+
+	// Process name (must be 12 characters max)
+	name = name.Truncate(12);
+
+	// Do default rename
+	return Archive::renameEntry(entry, name);
+}
+
+
+/* LibArchive::isLibArchive
+ * Checks if the given data is a valid Shadowcaster lib archive
+ *******************************************************************/
 bool LibArchive::isLibArchive(MemChunk& mc) {
 	if (mc.getSize() < 64)
 		return false;
@@ -337,6 +447,9 @@ bool LibArchive::isLibArchive(MemChunk& mc) {
 	return true;
 }
 
+/* LibArchive::isLibArchive
+ * Checks if the file at [filename] is a valid Shadowcaster lib archive
+ *******************************************************************/
 bool LibArchive::isLibArchive(string filename) {
 	// Open file for reading
 	wxFile file(filename);
