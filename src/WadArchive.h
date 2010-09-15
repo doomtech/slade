@@ -83,6 +83,8 @@ public:
 
 		return wad.save(filename);
 	}
+
+	friend class WadJArchive;
 };
 
 enum MapLumpNames {

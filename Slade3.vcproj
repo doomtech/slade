@@ -734,6 +734,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\WadJArchive.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\WadJArchive.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\ZipArchive.cpp"
 					>
 				</File>

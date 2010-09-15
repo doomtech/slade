@@ -396,7 +396,7 @@ bool PakArchive::isPakArchive(MemChunk& mc) {
 	return true;
 }
 
-/* PakArchive::isWadArchive
+/* PakArchive::isPakArchive
  * Checks if the file at [filename] is a valid Quake pak archive
  *******************************************************************/
 bool PakArchive::isPakArchive(string filename) {

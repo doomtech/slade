@@ -71,4 +71,14 @@ public:
 	}
 };
 
+class WadJDataFormat : public EntryDataFormat {
+public:
+	WadJDataFormat() : EntryDataFormat("archive_wadj") {}
+	~WadJDataFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		return WadJArchive::isWadJArchive(mc) ? EDF_TRUE : EDF_FALSE;
+	}
+};
+
 #endif //ARCHIVEFORMATS_H

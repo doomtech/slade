@@ -22,6 +22,7 @@ ArchiveEntry::ArchiveEntry(string name, uint32_t size) {
 	this->reliability = 0;
 	this->next = NULL;
 	this->prev = NULL;
+	this->encrypted = ENC_NONE;
 }
 
 /* ArchiveEntry::ArchiveEntry
@@ -35,6 +36,7 @@ ArchiveEntry::ArchiveEntry(ArchiveEntry& copy) {
 	type = copy.type;
 	reliability = copy.reliability;
 	locked = false;
+	encrypted = copy.encrypted;
 
 	// Copy data
 	data.importMem(copy.getData(true), copy.getSize());

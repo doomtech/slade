@@ -8,6 +8,12 @@
 class ArchiveTreeNode;
 class Archive;
 
+enum EncryptionModes
+{
+	ENC_NONE = 0,
+	ENC_JAGUAR,
+};
+
 class ArchiveEntry {
 	friend class ArchiveTreeNode;
 	friend class Archive;
@@ -25,6 +31,7 @@ private:
 	bool			state_locked;	// If true the entry state cannot be changed (used for initial loading)
 	bool			locked;			// If true the entry data+info cannot be changed
 	bool			data_loaded;	// True if the entry's data is currently loaded into the data MemChunk
+	int				encrypted;		// Is there some encrypting on the archive?
 
 	// Misc stuff
 	int				reliability;	// The reliability of the entry's identification
@@ -50,6 +57,7 @@ public:
 	uint8_t				getState()			{ return state; }
 	bool				isLocked()			{ return locked; }
 	bool				isLoaded()			{ return data_loaded; }
+	int					isEncrypted()		{ return encrypted; }
 	ArchiveEntry*		nextEntry()			{ return next; }
 	ArchiveEntry*		prevEntry()			{ return prev; }
 
@@ -58,6 +66,7 @@ public:
 	void		setLoaded(bool loaded = true) { data_loaded = loaded; }
 	void		setType(EntryType* type, int r = 0) { this->type = type; reliability = r; }
 	void		setState(uint8_t state);
+	void		setEncryption(int enc) { encrypted = enc; }
 	void		unloadData();
 	void		lock();
 	void		unlock();

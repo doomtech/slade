@@ -37,6 +37,7 @@
 #include "ResArchive.h"
 #include "PakArchive.h"
 #include "Wad2Archive.h"
+#include "WadJArchive.h"
 #include "Console.h"
 #include "SplashWindow.h"
 #include <wx/filename.h>
@@ -182,6 +183,8 @@ Archive* ArchiveManager::openArchive(string filename, bool manage) {
 		new_archive = new PakArchive();
 	else if (Wad2Archive::isWad2Archive(filename))
 		new_archive = new Wad2Archive();
+	else if (WadJArchive::isWadJArchive(filename))
+		new_archive = new WadJArchive();
 	else
 		return NULL;	// Unsupported format
 
@@ -250,6 +253,8 @@ Archive* ArchiveManager::openArchive(ArchiveEntry* entry, bool manage) {
 		new_archive = new PakArchive();
 	else if (Wad2Archive::isWad2Archive(entry->getMCData()))
 		new_archive = new Wad2Archive();
+	else if (WadJArchive::isWadJArchive(entry->getMCData()))
+		new_archive = new WadJArchive();
 	else
 		return NULL;	// Unsupported format
 
