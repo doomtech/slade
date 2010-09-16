@@ -259,8 +259,7 @@ bool MainApp::OnInit() {
 		return false;
 
 	// Load image handlers
-	wxImage::AddHandler(new wxPNGHandler);
-	wxImage::AddHandler(new wxICOHandler);
+	wxInitAllImageHandlers();
 
 	// Init logfile
 	initLogFile();

@@ -267,7 +267,7 @@ bool ArchivePanel::newEntry() {
 	name = fn.GetFullName();
 
 	// Get the entry index of the last selected list item
-	int index = archive->entryIndex(entry_list->getLastSelectedEntry());
+	int index = archive->entryIndex(entry_list->getLastSelectedEntry(), entry_list->getCurrentDir());
 
 	// If something was selected, add 1 to the index so we add the new entry after the last selected
 	if (index >= 0)
@@ -327,7 +327,7 @@ bool ArchivePanel::importFiles() {
 		dialog_open.GetPaths(files);
 
 		// Get the entry index of the last selected list item
-		int index = archive->entryIndex(entry_list->getLastSelectedEntry());
+		int index = archive->entryIndex(entry_list->getLastSelectedEntry(), entry_list->getCurrentDir());
 
 		// If something was selected, add 1 to the index so we add the new entry after the last selected
 		if (index >= 0)
@@ -823,7 +823,7 @@ vector<ArchiveEntry*> ArchivePanel::currentEntries() {
  *******************************************************************/
 bool ArchivePanel::basConvert() {
 	// Get the entry index of the last selected list item
-	int index = archive->entryIndex(currentEntry());
+	int index = archive->entryIndex(currentEntry(), entry_list->getCurrentDir());
 
 	// If something was selected, add 1 to the index so we add the new entry after the last selected
 	if (index >= 0)

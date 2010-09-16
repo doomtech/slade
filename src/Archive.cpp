@@ -257,8 +257,8 @@ bool ArchiveTreeNode::swapEntries(unsigned index1, unsigned index2) {
 	entry2->next = e1next;
 
 	// Swap entries
-	entries[index1] = entry1;
-	entries[index2] = entry2;
+	entries[index1] = entry2;
+	entries[index2] = entry1;
 
 	return true;
 }

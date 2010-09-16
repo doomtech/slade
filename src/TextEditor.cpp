@@ -31,6 +31,7 @@
 #include "Main.h"
 #include "WxStuff.h"
 #include "TextEditor.h"
+#include "Icons.h"
 
 
 /*******************************************************************
@@ -153,6 +154,12 @@ TextEditor::TextEditor(wxWindow* parent, int id)
 	SetBufferedDraw(true);
 	SetUseAntiAliasing(true);
 	SetMouseDwellTime(500);
+	AutoCompSetIgnoreCase(true);
+
+	// Register icons for autocompletion list
+	RegisterImage(1, getIcon("ac_key"));
+	RegisterImage(2, getIcon("ac_const"));
+	RegisterImage(3, getIcon("ac_func"));
 
 	// Test colours
 	StyleSetForeground(wxSTC_C_COMMENT, WXCOL(col_comment));
@@ -200,6 +207,9 @@ bool TextEditor::setLanguage(TextLanguage* lang) {
 		SetKeyWords(1, "");
 		SetKeyWords(2, "");
 		SetKeyWords(3, "");
+
+		// Clear autocompletion list
+		autocomp_list.Clear();
 	}
 
 	// Setup syntax hilighting if needed
@@ -209,6 +219,9 @@ bool TextEditor::setLanguage(TextLanguage* lang) {
 		SetKeyWords(1, lang->getFunctionsList().Lower());
 		SetKeyWords(2, lang->getConstantsList().Lower());
 		SetKeyWords(3, lang->getConstantsList().Lower());
+
+		// Load autocompletion list
+		autocomp_list = lang->getAutocompletionList();
 	}
 
 	// Set lexer
@@ -508,8 +521,18 @@ void TextEditor::updateCalltip() {
  *******************************************************************/
 void TextEditor::onKeyDown(wxKeyEvent& e) {
 	// Check for Ctrl+Shift+Space (invoke calltip)
-	if (e.GetModifiers() & wxMOD_SHIFT && e.GetModifiers() & wxMOD_CONTROL && e.GetKeyCode() == WXK_SPACE)
+	if (e.GetModifiers() == wxMOD_SHIFT|wxMOD_CONTROL && e.GetKeyCode() == WXK_SPACE)
 		updateCalltip();
+
+	// Check for Ctrl+Space
+	if (e.GetModifiers() == wxMOD_CONTROL && e.GetKeyCode() == WXK_SPACE) {
+		// Get word before cursor
+		string word = GetTextRange(WordStartPosition(GetCurrentPos(), true), GetCurrentPos());
+
+		// If a language is loaded, bring up autocompletion list
+		if (language)
+			AutoCompShow(word.size(), autocomp_list);
+	}
 
 	e.Skip();
 }

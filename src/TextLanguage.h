@@ -66,6 +66,7 @@ public:
 	string	getKeywordsList();
 	string	getConstantsList();
 	string	getFunctionsList();
+	string	getAutocompletionList();
 
 	TLFunction*	getFunction(string name);
 

@@ -40,6 +40,9 @@ private:
 	int			ct_argset;
 	int			ct_start;
 
+	// Autocompletion
+	string		autocomp_list;
+
 public:
 	TextEditor(wxWindow* parent, int id);
 	~TextEditor();

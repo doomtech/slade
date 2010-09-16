@@ -146,6 +146,27 @@ string TextLanguage::getFunctionsList() {
 	return ret;
 }
 
+string TextLanguage::getAutocompletionList() {
+	// Firstly, add all functions, constants and keywords to a wxArrayString
+	wxArrayString list;
+	for (unsigned a = 0; a < keywords.size(); a++)
+		list.Add(keywords[a] + "?1");
+	for (unsigned a = 0; a < constants.size(); a++)
+		list.Add(constants[a] + "?2");
+	for (unsigned a = 0; a < functions.size(); a++)
+		list.Add(functions[a]->getName() + "?3");
+
+	// Sort the list
+	list.Sort();
+
+	// Now build a string of the list items separated by spaces
+	string ret;
+	for (unsigned a = 0; a < list.size(); a++)
+		ret += list[a] + " ";
+
+	return ret;
+}
+
 TLFunction* TextLanguage::getFunction(string name) {
 	// Find function matching [name]
 	for (unsigned a = 0; a < functions.size(); a++) {
