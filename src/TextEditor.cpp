@@ -521,11 +521,11 @@ void TextEditor::updateCalltip() {
  *******************************************************************/
 void TextEditor::onKeyDown(wxKeyEvent& e) {
 	// Check for Ctrl+Shift+Space (invoke calltip)
-	if (e.GetModifiers() == wxMOD_SHIFT|wxMOD_CONTROL && e.GetKeyCode() == WXK_SPACE)
+	if ((e.GetModifiers() == (wxMOD_SHIFT|wxMOD_CONTROL)) && (e.GetKeyCode() == WXK_SPACE))
 		updateCalltip();
 
 	// Check for Ctrl+Space
-	if (e.GetModifiers() == wxMOD_CONTROL && e.GetKeyCode() == WXK_SPACE) {
+	if ((e.GetModifiers() == wxMOD_CONTROL) && (e.GetKeyCode() == WXK_SPACE)) {
 		// Get word before cursor
 		string word = GetTextRange(WordStartPosition(GetCurrentPos(), true), GetCurrentPos());
 
