@@ -33,8 +33,12 @@ public:
 class TextEditor : public wxStyledTextCtrl {
 private:
 	TextLanguage*		language;
-	TLFunction*			func_calltip;
 	FindReplaceDialog*	dlg_fr;
+
+	// Calltip stuff
+	TLFunction*	ct_function;
+	int			ct_argset;
+	int			ct_start;
 
 public:
 	TextEditor(wxWindow* parent, int id);

@@ -23,8 +23,8 @@ string TLFunction::generateCallTipString(int arg_set) {
 	string calltip;
 
 	// Add extra buttons for selection if there is more than one arg set
-	//if (arg_sets.size() > 1)
-	//	calltip += s_fmt("\001 %d of %d \002 ", arg_set+1, arg_sets.size());
+	if (arg_sets.size() > 1)
+		calltip += s_fmt("\001 %d of %d \002 ", arg_set+1, arg_sets.size());
 
 	// Generate scintilla-format calltip string
 	calltip += name + "(";
@@ -43,10 +43,10 @@ point2_t TLFunction::getArgTextExtent(int arg, int arg_set) {
 
 	// Get start position of args list
 	int start_pos = name.Length() + 1;
-	//if (arg_sets.size() > 1) {
-	//	string temp = s_fmt("\001 %d of %d \002 ", arg_set+1, arg_sets.size());
-	//	start_pos += temp.Length();
-	//}
+	if (arg_sets.size() > 1) {
+		string temp = s_fmt("\001 %d of %d \002 ", arg_set+1, arg_sets.size());
+		start_pos += temp.Length();
+	}
 
 	// Go through arg set string
 	string args = arg_sets[arg_set];
@@ -244,10 +244,10 @@ bool TextLanguage::readLanguageDefinition(MemChunk& mc) {
 					ParseTreeNode* child_func = (ParseTreeNode*)child->getChild(f);
 
 					// Add function
-					lang->addFunction(child_func->getName(), "");
+					lang->addFunction(child_func->getName(), child_func->getStringValue(0));
 
 					// Add args
-					for (unsigned v = 0; v < child_func->nValues(); v++) {
+					for (unsigned v = 1; v < child_func->nValues(); v++) {
 						lang->addFunction(child_func->getName(), child_func->getStringValue(v));
 					}
 				}

@@ -368,16 +368,18 @@ bool TextEditor::openCalltip(int pos) {
 	// Show calltip if it's a function
 	if (func && func->nArgSets() > 0) {
 		CallTipShow(GetCurrentPos(), func->generateCallTipString());
-		func_calltip = func;
+		ct_function = func;
+		ct_argset = 0;
+		ct_start = GetCurrentPos();
 
 		// Highlight first arg
-		point2_t arg_ext = func_calltip->getArgTextExtent(0);
+		point2_t arg_ext = ct_function->getArgTextExtent(0);
 		CallTipSetHighlight(arg_ext.x, arg_ext.y);
 
 		return true;
 	}
 	else {
-		func_calltip = NULL;
+		ct_function = NULL;
 		return false;
 	}
 }
@@ -411,7 +413,7 @@ void TextEditor::updateCalltip() {
 		}
 	}
 
-	if (func_calltip) {
+	if (ct_function) {
 		// Calltip currently showing, determine what arg we're at
 		int pos = GetCurrentPos() - 1;
 		int arg = 0;
@@ -434,7 +436,7 @@ void TextEditor::updateCalltip() {
 			// If we find an ending brace, we're outside a function, so cancel the calltip
 			if (chr == ')') {
 				CallTipCancel();
-				func_calltip = NULL;
+				ct_function = NULL;
 				return;
 			}
 
@@ -442,8 +444,9 @@ void TextEditor::updateCalltip() {
 			pos--;
 		}
 
-		// Update calltip string with the current arg highlighted
-		point2_t arg_ext = func_calltip->getArgTextExtent(arg);
+		// Update calltip string with the selected arg set and the current arg highlighted
+		CallTipShow(ct_start, ct_function->generateCallTipString(ct_argset));
+		point2_t arg_ext = ct_function->getArgTextExtent(arg, ct_argset);
 		CallTipSetHighlight(arg_ext.x, arg_ext.y);
 	}
 }
@@ -524,6 +527,25 @@ void TextEditor::onUpdateUI(wxStyledTextEvent& e) {
 }
 
 void TextEditor::onCalltipClicked(wxStyledTextEvent& e) {
+	// Can't do anything without function
+	if (!ct_function)
+		return;
+
+	// Argset up
+	if (e.GetPosition() == 1) {
+		if (ct_argset > 0) {
+			ct_argset--;
+			updateCalltip();
+		}
+	}
+
+	// Argset down
+	if (e.GetPosition() == 2) {
+		if (ct_argset < ct_function->nArgSets() - 1) {
+			ct_argset++;
+			updateCalltip();
+		}
+	}
 }
 
 /* TextEditor::onFRDBtnFindNext
