@@ -12,9 +12,6 @@ TODO List ---------------------------------------------------------------
 	- Patch browser
 	- Copy+Paste textures
 - Text editor special features:
-	- Keyword/Constant/Function highlighting and autocomplete
-	- Function calltips
-	- Auto-indent
 	- Web lookup for k/c/f
 	- Preferences:
 		- Option to clear empty lines / unneeded whitespace on save
