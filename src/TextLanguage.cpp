@@ -243,7 +243,10 @@ bool TextLanguage::readLanguageDefinition(MemChunk& mc) {
 				for (unsigned f = 0; f < child->nChildren(); f++) {
 					ParseTreeNode* child_func = (ParseTreeNode*)child->getChild(f);
 
-					// Add function (and overloaded args if existing)
+					// Add function
+					lang->addFunction(child_func->getName(), "");
+
+					// Add args
 					for (unsigned v = 0; v < child_func->nValues(); v++) {
 						lang->addFunction(child_func->getName(), child_func->getStringValue(v));
 					}

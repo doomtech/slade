@@ -11,7 +11,8 @@ public:
 	TLFunction(string name = "");
 	~TLFunction();
 
-	string	getName() { return name; }
+	string		getName() { return name; }
+	unsigned	nArgSets() { return arg_sets.size(); }
 
 	void	setName(string name) { this->name = name; }
 	void	addArgSet(string args) { arg_sets.push_back(args); }

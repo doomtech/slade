@@ -366,7 +366,7 @@ bool TextEditor::openCalltip(int pos) {
 	TLFunction* func = language->getFunction(word);
 
 	// Show calltip if it's a function
-	if (func) {
+	if (func && func->nArgSets() > 0) {
 		CallTipShow(GetCurrentPos(), func->generateCallTipString());
 		func_calltip = func;
 
@@ -577,59 +577,3 @@ void TextEditor::onFRDBtnReplaceAll(wxCommandEvent& e) {
 	int replaced = replaceAll(dlg_fr->getFindString(), dlg_fr->getReplaceString());
 	wxMessageBox(s_fmt("Replaced %d occurrences", replaced), "Replace All");
 }
-
-
-
-
-
-/* TextEditor::loadHexEntry
- * Temporary function, used just to quickly look at some lumps.
- * Should be completely yanked out and replaced by a real hex editor
- * as soon as possible. This merely displays hex as text!
- *******************************************************************/
-/*
-bool TextEditor::loadHexEntry(ArchiveEntry* entry) {
-	// Clear current text
-	ClearAll();
-
-	// Check that the entry exists
-	if (!entry) {
-		Global::error = "Invalid archive entry given";
-		return false;
-	}
-
-	// Check that the entry has any data, if not do nothing
-	if (entry->getSize() == 0 || !entry->getData())
-		return true;
-
-	// Compute total size of printed data:
-	size_t size = (entry->getSize()) * 3;
-
-	// Get character entry data
-	char* data = new char[size];
-	const uint8_t* rd = entry->getData();
-	const uint8_t mask = 0x0F;
-	char view = 0;
-
-	// Convert hex into text. This is horribly ugly but I don't care at the moment.
-	for (size_t i = 0; i < entry->getSize(); ++i)
-	{
-		for (size_t j = 0; j < 2; ++j)
-		{
-			view = (j ? rd[i] : rd[i] >> 4) & mask;
-			view += (view < 10 ? '0' : 'A' - 10);
-			data[i*3 + j] = view;
-		}
-		data[i*3 +2] = ((i+1)%16 ? ' ' : '\n');
-	}
-	data[size - 1] = '\0';
-
-	// Load text into editor
-	SetTextRaw(data);
-
-	// Clean up
-	delete[] data;
-
-	return true;
-}
-*/
