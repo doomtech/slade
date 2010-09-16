@@ -161,6 +161,12 @@
       <File Name="src/LibArchive.h"/>
       <File Name="src/ResArchive.cpp"/>
       <File Name="src/ResArchive.h"/>
+      <File Name="src/PakArchive.cpp"/>
+      <File Name="src/PakArchive.h"/>
+      <File Name="src/Wad2Archive.cpp"/>
+      <File Name="src/Wad2Archive.h"/>
+      <File Name="src/WadJArchive.cpp"/>
+      <File Name="src/WadJArchive.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Binary Control Lumps">
       <File Name="src/AnimatedList.cpp"/>
