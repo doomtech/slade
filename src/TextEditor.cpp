@@ -40,6 +40,7 @@ CVAR(Bool, txed_trim_whitespace, false, CVAR_SAVE)
 CVAR(Int, txed_tab_width, 4, CVAR_SAVE)
 CVAR(Bool, txed_auto_indent, true, CVAR_SAVE)
 CVAR(Bool, txed_syntax_hilight, true, CVAR_SAVE)
+CVAR(Bool, txed_brace_match, false, CVAR_SAVE)
 rgba_t col_comment(0, 150, 0, 255);
 rgba_t col_string(0, 120, 130, 255);
 rgba_t col_keyword(0, 30, 200, 255);
@@ -579,7 +580,9 @@ void TextEditor::onCharAdded(wxStyledTextEvent& e) {
  * position, styling, text, etc)
  *******************************************************************/
 void TextEditor::onUpdateUI(wxStyledTextEvent& e) {
-	//checkBraceMatch();	// Disabled for now, wxSTC bug makes it not redraw properly
+	// Check for brace match
+	if (txed_brace_match)
+		checkBraceMatch();
 
 	// If a calltip is open, update it
 	if (CallTipActive())
