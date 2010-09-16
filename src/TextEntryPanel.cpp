@@ -41,17 +41,32 @@
  *******************************************************************/
 TextEntryPanel::TextEntryPanel(wxWindow* parent)
 : EntryPanel(parent, "text") {
+	// Setup top bar sizer
+	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
+	sizer_main->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
+
+	// Add 'Text Language' choice
+	wxArrayString languages = TextLanguage::getLanguageNames();
+	languages.Insert("None", 0, 1);
+	choice_text_language = new wxChoice(this, -1, wxDefaultPosition, wxDefaultSize, languages);
+	choice_text_language->Select(0);
+	hbox->Add(new wxStaticText(this, -1, "Text Language:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
+	hbox->Add(choice_text_language, 0, wxEXPAND|wxRIGHT, 4);
+
+
 	// Create the text area
 	text_area = new TextEditor(this, -1);
 	sizer_main->Add(text_area, 1, wxEXPAND | wxALL, 4);
 
+
 	// Add 'Find/Replace' button to bottom sizer
 	sizer_bottom->AddStretchSpacer();
 	btn_find_replace = new wxButton(this, -1, "Find + Replace");
-	sizer_bottom->Add(btn_find_replace, 0, wxEXPAND|wxRIGHT, 4);
+	sizer_bottom->Add(btn_find_replace, 0, wxEXPAND, 4);
 
 
 	// Bind events
+	choice_text_language->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &TextEntryPanel::onChoiceLanguageChanged, this);
 	text_area->Bind(wxEVT_STC_CHANGE, &TextEntryPanel::onTextModified, this);
 	btn_find_replace->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextEntryPanel::onBtnFindReplace, this);
 
@@ -116,4 +131,9 @@ void TextEntryPanel::onTextModified(wxStyledTextEvent& e) {
 
 void TextEntryPanel::onBtnFindReplace(wxCommandEvent& e) {
 	text_area->showFindReplaceDialog();
+}
+
+void TextEntryPanel::onChoiceLanguageChanged(wxCommandEvent& e) {
+	int index = choice_text_language->GetSelection();
+	text_area->setLanguage(TextLanguage::getLanguage(index - 1));
 }

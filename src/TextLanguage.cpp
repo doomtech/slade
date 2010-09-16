@@ -177,7 +177,6 @@ bool TextLanguage::readLanguageDefinition(MemChunk& mc) {
 
 		// Create language
 		TextLanguage* lang = new TextLanguage(node->getName());
-		text_languages.push_back(lang);
 
 		// Parse language info
 		for (unsigned c = 0; c < node->nChildren(); c++) {
@@ -294,4 +293,21 @@ TextLanguage* TextLanguage::getLanguage(string id) {
 
 	// Not found
 	return NULL;
+}
+
+TextLanguage* TextLanguage::getLanguage(unsigned index) {
+	// Check index
+	if (index >= text_languages.size())
+		return NULL;
+
+	return text_languages[index];
+}
+
+wxArrayString TextLanguage::getLanguageNames() {
+	wxArrayString ret;
+
+	for (unsigned a = 0; a < text_languages.size(); a++)
+		ret.push_back(text_languages[a]->name);
+
+	return ret;
 }

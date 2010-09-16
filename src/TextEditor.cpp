@@ -39,6 +39,7 @@
 CVAR(Bool, txed_trim_whitespace, false, CVAR_SAVE)
 CVAR(Int, txed_tab_width, 4, CVAR_SAVE)
 CVAR(Bool, txed_auto_indent, true, CVAR_SAVE)
+CVAR(Bool, txed_syntax_hilight, true, CVAR_SAVE)
 rgba_t col_comment(0, 150, 0, 255);
 rgba_t col_string(0, 120, 130, 255);
 rgba_t col_keyword(0, 30, 200, 255);
@@ -131,6 +132,12 @@ FindReplaceDialog::~FindReplaceDialog() {
  *******************************************************************/
 TextEditor::TextEditor(wxWindow* parent, int id)
 : wxStyledTextCtrl(parent, id) {
+	// Init variables
+	language = NULL;
+	ct_argset = 0;
+	ct_function = NULL;
+	ct_start = 0;
+
 	// Set default font
 	wxFont f(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 	StyleSetFont(wxSTC_STYLE_DEFAULT, f);
@@ -159,9 +166,8 @@ TextEditor::TextEditor(wxWindow* parent, int id)
 	StyleSetBackground(wxSTC_STYLE_BRACELIGHT, WXCOL(rgba_t(170, 255, 170, 255)));
 	StyleSetBold(wxSTC_STYLE_BRACELIGHT, true);
 
-	// Temp
-	SetLexer(wxSTC_LEX_CPPNOCASE);
-	setLanguage(TextLanguage::getLanguage("decorate"));
+	// Init w/no language
+	setLanguage(NULL);
 
 	// Find+Replace dialog
 	dlg_fr = new FindReplaceDialog(this);
@@ -187,16 +193,34 @@ TextEditor::~TextEditor() {
 
 bool TextEditor::setLanguage(TextLanguage* lang) {
 	// Check language was given
-	if (!lang)
-		return false;
+	if (!lang) {
+		// Clear keywords
+		SetKeyWords(0, "");
+		SetKeyWords(1, "");
+		SetKeyWords(2, "");
+		SetKeyWords(3, "");
+	}
 
-	// Load word lists
-	SetKeyWords(0, lang->getKeywordsList().Lower());
-	SetKeyWords(1, lang->getFunctionsList().Lower());
-	SetKeyWords(3, lang->getConstantsList().Lower());
+	// Setup syntax hilighting if needed
+	else {
+		// Load word lists
+		SetKeyWords(0, lang->getKeywordsList().Lower());
+		SetKeyWords(1, lang->getFunctionsList().Lower());
+		SetKeyWords(2, lang->getConstantsList().Lower());
+		SetKeyWords(3, lang->getConstantsList().Lower());
+	}
+
+	// Set lexer
+	if (txed_syntax_hilight)
+		SetLexer(wxSTC_LEX_CPPNOCASE);
+	else
+		SetLexer(wxSTC_LEX_NULL);
 
 	// Update variables
 	this->language = lang;
+
+	// Re-colour text
+	Colourise(0, GetTextLength());
 
 	return true;
 }
@@ -366,6 +390,10 @@ void TextEditor::checkBraceMatch() {
  * if the word before [pos] was not a function name, true otherwise
  *******************************************************************/
 bool TextEditor::openCalltip(int pos, int arg) {
+	// Don't bother if no language
+	if (!language)
+		return false;
+
 	// Get start of word before bracket
 	int start = WordStartPosition(pos - 1, false);
 
@@ -399,6 +427,10 @@ bool TextEditor::openCalltip(int pos, int arg) {
  * currently showing
  *******************************************************************/
 void TextEditor::updateCalltip() {
+	// Don't bother if no language
+	if (!language)
+		return;
+
 	if (!CallTipActive()) {
 		// No calltip currently showing, check if we're in a function
 		int pos = GetCurrentPos() - 1;
@@ -519,20 +551,23 @@ void TextEditor::onCharAdded(wxStyledTextEvent& e) {
 		}
     }
 
-	// Call tip
-	if (e.GetKey() == '(') {
-		openCalltip(GetCurrentPos());
-	}
+	// The following require a language to work
+	if (language) {
+		// Call tip
+		if (e.GetKey() == '(') {
+			openCalltip(GetCurrentPos());
+		}
 
-	// End call tip
-	if (e.GetKey() == ')') {
-		CallTipCancel();
-	}
+		// End call tip
+		if (e.GetKey() == ')') {
+			CallTipCancel();
+		}
 
-	// Comma, possibly update calltip
-	if (e.GetKey() == ',') {
-		if (CallTipActive())
-			updateCalltip();
+		// Comma, possibly update calltip
+		if (e.GetKey() == ',') {
+			if (CallTipActive())
+				updateCalltip();
+		}
 	}
 
 	// Continue

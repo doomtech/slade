@@ -30,9 +30,24 @@ private:
 	string				comment_end;
 	string				preprocessor;
 	bool				case_sensitive;
+
+	// Keywords
 	vector<string>		keywords;
+	bool				k_upper;
+	bool				k_lower;
+	bool				k_caps;
+
+	// Constants
 	vector<string>		constants;
+	bool				c_upper;
+	bool				c_lower;
+	bool				c_caps;
+
+	// Functions
 	vector<TLFunction*>	functions;
+	bool				f_upper;
+	bool				f_lower;
+	bool				f_caps;
 
 public:
 	TextLanguage(string id);
@@ -62,6 +77,8 @@ public:
 	static bool				readLanguageDefinition(MemChunk& mc);
 	static bool				loadLanguages();
 	static TextLanguage*	getLanguage(string id);
+	static TextLanguage*	getLanguage(unsigned index);
+	static wxArrayString	getLanguageNames();
 };
 
 #endif//__TEXTLANGUAGE_H__

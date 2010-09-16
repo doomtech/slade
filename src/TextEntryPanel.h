@@ -9,6 +9,7 @@ class TextEntryPanel : public EntryPanel {
 private:
 	TextEditor*	text_area;
 	wxButton*	btn_find_replace;
+	wxChoice*	choice_text_language;
 
 public:
 	TextEntryPanel(wxWindow* parent);
@@ -20,8 +21,8 @@ public:
 	// Events
 	void	onTextModified(wxStyledTextEvent& e);
 	void	onBtnFindReplace(wxCommandEvent& e);
+	void	onChoiceLanguageChanged(wxCommandEvent& e);
 };
 
 
 #endif //__TEXTENTRYPANEL_H__
-
