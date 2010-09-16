@@ -63,13 +63,13 @@ bool JaguarDecode(MemChunk mc)
 	size_t isize = mc.getSize();
 	
 	// It seems that encoded lumps are given their actual uncompressed size in the directory.
-	uint8_t *ostart = new uint8_t[isize];
+	uint8_t *ostart = new uint8_t[64000];
 	uint8_t *output = ostart;
 	uint8_t idbyte = 0;
 
 	size_t length = 0;
 
-	while (((unsigned)(input - istart) < isize)&&((unsigned)(output - ostart) < isize))
+	while (1)//((unsigned)(input - istart) < isize)&&((unsigned)(output - ostart) < 64000))
 	{
 		/* get a new idbyte if necessary */
 		if (!getidbyte) idbyte = *input++;
@@ -227,8 +227,28 @@ bool WadJArchive::open(MemChunk& mc) {
 		bool jaguarencrypt = !!(name[0] & 0x80);	// look at high bit
 		name[0] = name[0] & 0x7F;					// then strip it away
 
+		// Look for encryption shenanigans
+		size_t actualsize = size;
+		if (jaguarencrypt) {
+			if (d < num_lumps - 1) {
+				size_t pos = mc.currentPos();
+				uint32_t nextoffset;
+				mc.read(&nextoffset, 4);
+				mc.seek(pos, SEEK_SET);
+				actualsize = wxINT32_SWAP_ON_LE(nextoffset) - offset;
+			} else {
+				// We're kinda assuming here that the directory
+				// comes after the entries, which is not guaranteed.
+				actualsize = dir_offset - offset;
+			}
+			if (actualsize > size) {
+				wxLogMessage("Not sure what's wrong about entry %i (%s) here", d, name);
+				actualsize = size;
+			}
+		}
+
 		// Create & setup lump
-		ArchiveEntry* nlump = new ArchiveEntry(wxString::FromAscii(name), size);
+		ArchiveEntry* nlump = new ArchiveEntry(wxString::FromAscii(name), actualsize);
 		nlump->setLoaded(false);
 		nlump->exProp("Offset") = (int)offset;
 		nlump->setState(0);
@@ -236,6 +256,7 @@ bool WadJArchive::open(MemChunk& mc) {
 		if (jaguarencrypt)
 		{
 			nlump->setEncryption(ENC_JAGUAR);
+			nlump->exProp("FullSize") = (int)size;
 		}
 
 		// Add to entry list
@@ -262,16 +283,19 @@ bool WadJArchive::open(MemChunk& mc) {
 			// Read the entry data
 			edata.clear();
 			mc.exportMemChunk(edata, getEntryOffset(entry), entry->getSize());
-#if 0
 			// Attempting to decode some entries cause a crash, so doing this here
 			// is a bad idea as long as the problem remains. The only lumps that
 			// can be safely and meaningfully decoded are the flats. For them it
 			// does work.
 			if (entry->isEncrypted()) {
+				if (entry->exProps().propertyExists("FullSize")
+					&& (unsigned)(int)(entry->exProp("FullSize")) >  entry->getSize())
+					edata.reSize((int)(entry->exProp("FullSize")), true);
+#if 0
 				wxLogMessage("Attempting to decode %s ", chr(entry->getName()), chr(previousname));
 				if (!JaguarDecode(edata)) wxLogMessage("%s is screwed up", chr(entry->getName()));
-			}
 #endif
+			}
 			entry->importMemChunk(edata);
 		}
 		previousname = entry->getName();
@@ -469,6 +493,7 @@ CONSOLE_COMMAND(decode, 0) {
 			MemChunk mc = beep->getMCData();
 			if (JaguarDecode(mc) && beep->importMemChunk(mc))
 				beep->setEncryption(ENC_NONE);
+			mc.clear();
 		}
 	}
 }

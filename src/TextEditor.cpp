@@ -571,7 +571,7 @@ void TextEditor::onCalltipClicked(wxStyledTextEvent& e) {
 
 	// Argset down
 	if (e.GetPosition() == 2) {
-		if (ct_argset < ct_function->nArgSets() - 1) {
+		if ((unsigned)ct_argset < ct_function->nArgSets() - 1) {
 			ct_argset++;
 			updateCalltip();
 		}

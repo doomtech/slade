@@ -17,7 +17,7 @@ TLFunction::~TLFunction() {
 
 string TLFunction::generateCallTipString(int arg_set) {
 	// Check requested arg set exists
-	if (arg_set < 0 || arg_set >= arg_sets.size())
+	if (arg_set < 0 || (unsigned)arg_set >= arg_sets.size())
 		return "<invalid argset index>";
 
 	string calltip;
@@ -38,7 +38,7 @@ point2_t TLFunction::getArgTextExtent(int arg, int arg_set) {
 	point2_t extent(-1, -1);
 
 	// Check requested arg set exists
-	if (arg_set < 0 || arg_set >= arg_sets.size())
+	if (arg_set < 0 || (unsigned)arg_set >= arg_sets.size())
 		return extent;
 
 	// Get start position of args list
