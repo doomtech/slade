@@ -38,7 +38,7 @@ point2_t TLFunction::getArgTextExtent(int arg, int arg_set) {
 	point2_t extent(-1, -1);
 
 	// Check requested arg set exists
-	if (arg_set < 0 || arg_set >= arg_sets.size() || arg < 0)
+	if (arg_set < 0 || arg_set >= arg_sets.size())
 		return extent;
 
 	// Get start position of args list
@@ -48,8 +48,14 @@ point2_t TLFunction::getArgTextExtent(int arg, int arg_set) {
 		start_pos += temp.Length();
 	}
 
-	// Go through arg set string
+	// Check arg
 	string args = arg_sets[arg_set];
+	if (arg < 0) {
+		extent.set(start_pos, start_pos + args.Length());
+		return extent;
+	}
+
+	// Go through arg set string
 	int current_arg = 0;
 	extent.x = start_pos;
 	extent.y = start_pos + args.Length();

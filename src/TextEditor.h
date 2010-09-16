@@ -47,6 +47,8 @@ public:
 	bool	setLanguage(TextLanguage* lang);
 	bool	loadEntry(ArchiveEntry* entry);
 	void	getRawText(MemChunk& mc);
+
+	// Misc
 	void	trimWhitespace();
 
 	// Find/Replace
@@ -55,15 +57,21 @@ public:
 	bool	replaceCurrent(string find, string replace);
 	int		replaceAll(string find, string replace);
 
+	// Brace matching
 	void	checkBraceMatch();
-	bool	openCalltip(int pos);
+
+	// Calltips
+	bool	openCalltip(int pos, int arg = 0);
 	void	updateCalltip();
 
+	// Events
 	void	onKeyDown(wxKeyEvent& e);
 	void	onKeyUp(wxKeyEvent& e);
 	void	onCharAdded(wxStyledTextEvent& e);
 	void	onUpdateUI(wxStyledTextEvent& e);
 	void	onCalltipClicked(wxStyledTextEvent& e);
+	void	onMouseDwellStart(wxStyledTextEvent& e);
+	void	onMouseDwellEnd(wxStyledTextEvent& e);
 	void	onFRDBtnFindNext(wxCommandEvent& e);
 	void	onFRDBtnReplace(wxCommandEvent& e);
 	void	onFRDBtnReplaceAll(wxCommandEvent& e);

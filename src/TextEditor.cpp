@@ -144,6 +144,7 @@ TextEditor::TextEditor(wxWindow* parent, int id)
 	// General settings
 	SetBufferedDraw(true);
 	SetUseAntiAliasing(true);
+	SetMouseDwellTime(500);
 
 	// Test colours
 	StyleSetForeground(wxSTC_C_COMMENT, WXCOL(col_comment));
@@ -171,6 +172,8 @@ TextEditor::TextEditor(wxWindow* parent, int id)
 	Bind(wxEVT_STC_CHARADDED, &TextEditor::onCharAdded, this);
 	Bind(wxEVT_STC_UPDATEUI, &TextEditor::onUpdateUI, this);
 	Bind(wxEVT_STC_CALLTIP_CLICK, &TextEditor::onCalltipClicked, this);
+	Bind(wxEVT_STC_DWELLSTART, &TextEditor::onMouseDwellStart, this);
+	Bind(wxEVT_STC_DWELLEND, &TextEditor::onMouseDwellEnd, this);
 	dlg_fr->getBtnFindNext()->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextEditor::onFRDBtnFindNext, this);
 	dlg_fr->getBtnReplace()->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextEditor::onFRDBtnReplace, this);
 	dlg_fr->getBtnReplaceAll()->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextEditor::onFRDBtnReplaceAll, this);
@@ -345,6 +348,9 @@ int TextEditor::replaceAll(string find, string replace) {
 	return replaced;
 }
 
+/* TextEditor::checkBraceMatch
+ * Checks for a brace match at the current cursor position
+ *******************************************************************/
 void TextEditor::checkBraceMatch() {
 	int bracematch = BraceMatch(GetCurrentPos());
 
@@ -355,7 +361,11 @@ void TextEditor::checkBraceMatch() {
 	}
 }
 
-bool TextEditor::openCalltip(int pos) {
+/* TextEditor::openCalltip
+ * Opens a calltip for the function name before [pos]. Returns false
+ * if the word before [pos] was not a function name, true otherwise
+ *******************************************************************/
+bool TextEditor::openCalltip(int pos, int arg) {
 	// Get start of word before bracket
 	int start = WordStartPosition(pos - 1, false);
 
@@ -367,13 +377,13 @@ bool TextEditor::openCalltip(int pos) {
 
 	// Show calltip if it's a function
 	if (func && func->nArgSets() > 0) {
-		CallTipShow(GetCurrentPos(), func->generateCallTipString());
+		CallTipShow(pos, func->generateCallTipString());
 		ct_function = func;
 		ct_argset = 0;
-		ct_start = GetCurrentPos();
+		ct_start = pos;
 
-		// Highlight first arg
-		point2_t arg_ext = ct_function->getArgTextExtent(0);
+		// Highlight arg
+		point2_t arg_ext = ct_function->getArgTextExtent(arg);
 		CallTipSetHighlight(arg_ext.x, arg_ext.y);
 
 		return true;
@@ -384,6 +394,10 @@ bool TextEditor::openCalltip(int pos) {
 	}
 }
 
+/* TextEditor::updateCalltip
+ * Updates the current calltip, or attempts to open one if none is
+ * currently showing
+ *******************************************************************/
 void TextEditor::updateCalltip() {
 	if (!CallTipActive()) {
 		// No calltip currently showing, check if we're in a function
@@ -456,6 +470,9 @@ void TextEditor::updateCalltip() {
  * TEXTEDITOR CLASS EVENTS
  *******************************************************************/
 
+/* TextEditor::onKeyDown
+ * Called when a key is pressed
+ *******************************************************************/
 void TextEditor::onKeyDown(wxKeyEvent& e) {
 	// Check for Ctrl+Shift+Space (invoke calltip)
 	if (e.GetModifiers() & wxMOD_SHIFT && e.GetModifiers() & wxMOD_CONTROL && e.GetKeyCode() == WXK_SPACE)
@@ -464,10 +481,16 @@ void TextEditor::onKeyDown(wxKeyEvent& e) {
 	e.Skip();
 }
 
+/* TextEditor::onKeyUp
+ * Called when a key is released
+ *******************************************************************/
 void TextEditor::onKeyUp(wxKeyEvent& e) {
 	e.Skip();
 }
 
+/* TextEditor::onCharAdded
+ * Called when a character is added to the text
+ *******************************************************************/
 void TextEditor::onCharAdded(wxStyledTextEvent& e) {
 	// Update line numbers margin width
 	string numlines = s_fmt("0%d", GetNumberOfLines());
@@ -516,6 +539,10 @@ void TextEditor::onCharAdded(wxStyledTextEvent& e) {
 	e.Skip();
 }
 
+/* TextEditor::onUpdateUI
+ * Called when anything is modified in the text editor (cursor
+ * position, styling, text, etc)
+ *******************************************************************/
 void TextEditor::onUpdateUI(wxStyledTextEvent& e) {
 	//checkBraceMatch();	// Disabled for now, wxSTC bug makes it not redraw properly
 
@@ -526,6 +553,9 @@ void TextEditor::onUpdateUI(wxStyledTextEvent& e) {
 	e.Skip();
 }
 
+/* TextEditor::onCalltipClicked
+ * Called when the current calltip is clicked on
+ *******************************************************************/
 void TextEditor::onCalltipClicked(wxStyledTextEvent& e) {
 	// Can't do anything without function
 	if (!ct_function)
@@ -546,6 +576,23 @@ void TextEditor::onCalltipClicked(wxStyledTextEvent& e) {
 			updateCalltip();
 		}
 	}
+}
+
+/* TextEditor::onMouseDwellStart
+ * Called when the mouse pointer has 'dwelt' in one position for a
+ * certain amount of time
+ *******************************************************************/
+void TextEditor::onMouseDwellStart(wxStyledTextEvent& e) {
+	if (!CallTipActive())
+		openCalltip(e.GetPosition(), -1);
+}
+
+/* TextEditor::onMouseDwellEnd
+ * Called when a mouse 'dwell' is interrupted/ended
+ *******************************************************************/
+void TextEditor::onMouseDwellEnd(wxStyledTextEvent& e) {
+	if (!(ct_function && ct_function->nArgSets() > 1))
+		CallTipCancel();
 }
 
 /* TextEditor::onFRDBtnFindNext
