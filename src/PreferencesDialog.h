@@ -13,6 +13,7 @@ private:
 	wxCheckBox*	cb_gl_np2;
 	wxCheckBox*	cb_archive_load;
 	wxCheckBox*	cb_archive_close_tab;
+	wxCheckBox*	cb_size_as_string;
 
 	// Editing
 	wxCheckBox*	cb_wad_force_uppercase;
@@ -32,6 +33,7 @@ public:
 	wxPanel*	setupBaseResourceArchivesPanel();
 
 	// Events
+	void	onCBSASChanged(wxCommandEvent& e);
 	void	onCBGLNP2Changed(wxCommandEvent& e);
 	void	onCBArchiveLoadChanged(wxCommandEvent& e);
 	void	onCBArchiveCloseTabChanged(wxCommandEvent& e);

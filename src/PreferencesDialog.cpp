@@ -43,6 +43,7 @@ EXTERN_CVAR(Bool, archive_load_data)
 EXTERN_CVAR(Int, autosave_entry_changes)
 EXTERN_CVAR(Bool, close_archive_with_tab)
 EXTERN_CVAR(Bool, gl_tex_enable_np2)
+EXTERN_CVAR(Bool, size_as_string)
 
 
 /*******************************************************************
@@ -106,22 +107,28 @@ wxPanel* PreferencesDialog::setupGeneralPrefsPanel() {
 	sizer->Add(cb_archive_load, 0, wxEXPAND|wxALL, 4);
 
 	// Close archive with tab
-	cb_archive_close_tab = new wxCheckBox(panel, -1, "Close archive when it's tab is closed");
+	cb_archive_close_tab = new wxCheckBox(panel, -1, "Close archive when its tab is closed");
 	sizer->Add(cb_archive_close_tab, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
 
 	// Enable np2 textures
 	cb_gl_np2 = new wxCheckBox(panel, -1, "Enable Non-power-of-two textures if supported");
 	sizer->Add(cb_gl_np2, 0, wxEXPAND|wxALL, 4);
 
+	// Show entry size as string instead of a number
+	cb_size_as_string = new wxCheckBox(panel, -1, "Adapt size units to entry size");
+	sizer->Add(cb_size_as_string, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
+
 	// Init controls
 	cb_archive_load->SetValue(archive_load_data);
 	cb_archive_close_tab->SetValue(close_archive_with_tab);
 	cb_gl_np2->SetValue(gl_tex_enable_np2);
+	cb_size_as_string->SetValue(size_as_string);
 
 	// Bind events
 	cb_archive_load->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &PreferencesDialog::onCBArchiveLoadChanged, this);
 	cb_archive_close_tab->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &PreferencesDialog::onCBArchiveCloseTabChanged, this);
 	cb_gl_np2->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &PreferencesDialog::onCBGLNP2Changed, this);
+	cb_size_as_string->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &PreferencesDialog::onCBSASChanged, this);
 
 	return panel;
 }
@@ -216,6 +223,13 @@ void PreferencesDialog::onCBArchiveLoadChanged(wxCommandEvent& e) {
  *******************************************************************/
 void PreferencesDialog::onCBArchiveCloseTabChanged(wxCommandEvent& e) {
 	close_archive_with_tab = cb_archive_close_tab->GetValue();
+}
+
+/* PreferencesDialog::onCBSASChanged
+ * Called when the 'Adapt Units to Size' checkbox is changed
+ *******************************************************************/
+void PreferencesDialog::onCBSASChanged(wxCommandEvent& e) {
+	size_as_string = cb_size_as_string->GetValue();
 }
 
 /* PreferencesDialog::onCBGLNP2Changed

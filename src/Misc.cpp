@@ -36,6 +36,10 @@
 #include "ZipArchive.h"
 #include <wx/filename.h>
 
+/*******************************************************************
+ * VARIABLES
+ *******************************************************************/
+CVAR(Bool, size_as_string, true, CVAR_SAVE)
 
 /*******************************************************************
  * FUNCTIONS
@@ -182,7 +186,7 @@ bool Misc::loadPaletteFromArchive(Palette8bit* pal, Archive* archive, int lump) 
  * "1.24kb", "4.00mb". Sizes under 1kb aren't given an appendage
  *******************************************************************/
 string Misc::sizeAsString(uint32_t size) {
-	if (size < 1024) {
+	if (size < 1024 || !size_as_string) {
 		return s_fmt("%d", size);
 	}
 	else if (size < 1024*1024) {
