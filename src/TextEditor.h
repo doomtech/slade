@@ -6,6 +6,7 @@
 #include <wx/minifram.h>
 #include "ArchiveEntry.h"
 #include "TextLanguage.h"
+#include "TextStyle.h"
 
 class FindReplaceDialog : public wxMiniFrame {
 private:
@@ -48,6 +49,7 @@ public:
 	~TextEditor();
 
 	bool	setLanguage(TextLanguage* lang);
+	bool	setStyleSet(StyleSet* style);
 	bool	loadEntry(ArchiveEntry* entry);
 	void	getRawText(MemChunk& mc);
 

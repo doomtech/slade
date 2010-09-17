@@ -38,6 +38,7 @@
 #include "SplashWindow.h"
 #include "EntryDataFormat.h"
 #include "TextLanguage.h"
+#include "TextStyle.h"
 #include <wx/image.h>
 #include <wx/stdpaths.h>
 #include <wx/ffile.h>
@@ -213,17 +214,29 @@ IMPLEMENT_APP(MainApp)
  * needed, false otherwise
  *******************************************************************/
 bool MainApp::initDirectories() {
+	// Setup separator character
+#ifdef WIN32
+	string sep = "\\";
+#else
+	string sep = "/";
+#endif
+
 	// Setup app dir
 	dir_app = wxFileName(wxStandardPaths::Get().GetExecutablePath()).GetPath();
 
 	// Check for portable install
 	if (wxFileExists(appPath("portable", DIR_APP))) {
-		dir_user = dir_data = dir_app;
-		return true;
+		// Setup portable user/data dirs
+		dir_data = dir_app;
+		dir_user = dir_app + sep + "config";
+	}
+	else {
+		// Setup standard user/data dirs
+		dir_user = wxStandardPaths::Get().GetUserDataDir();
+		dir_data = wxStandardPaths::Get().GetDataDir();
 	}
 
-	// Setup or create user directory if necessary
-	dir_user = wxStandardPaths::Get().GetUserDataDir();
+	// Create user dir if necessart
 	if (!wxDirExists(dir_user)) {
 		if (!wxMkdir(dir_user)) {
 			wxMessageBox(s_fmt("Unable to create user directory \"%s\"", dir_user.c_str()), "Error", wxICON_ERROR);
@@ -231,8 +244,7 @@ bool MainApp::initDirectories() {
 		}
 	}
 
-	// Setup data dir
-	dir_data = wxStandardPaths::Get().GetDataDir();
+	// Check data dir
 	if (!wxDirExists(dir_data))
 		dir_data = dir_app;	// Use app dir if data dir doesn't exist
 
@@ -265,6 +277,9 @@ bool MainApp::OnInit() {
 	initLogFile();
 
 	wxLogMessage("Compiled with wxWidgets %i.%i.%i", wxMAJOR_VERSION, wxMINOR_VERSION, wxRELEASE_NUMBER);
+
+	// Init text stylesets
+	StyleSet::initDefaultStyleSet();
 
 	// Load configuration file
 	wxLogMessage("Loading configuration");
@@ -350,7 +365,7 @@ void MainApp::OnFatalException() {
 void MainApp::initLogFile() {
 	// Set wxLog target(s)
 	wxLog::SetActiveTarget(new SLADELog());
-	FILE* log_file = fopen(chr(appPath("slade3.log", DIR_USER)), "wt");
+	FILE* log_file = fopen(chr(appPath("slade3.log", DIR_DATA)), "wt");
 	new wxLogChain(new wxLogStderr(log_file));
 
 	// Write logfile header

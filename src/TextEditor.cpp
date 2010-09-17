@@ -32,6 +32,7 @@
 #include "WxStuff.h"
 #include "TextEditor.h"
 #include "Icons.h"
+#include "TextStyle.h"
 
 
 /*******************************************************************
@@ -42,11 +43,14 @@ CVAR(Int, txed_tab_width, 4, CVAR_SAVE)
 CVAR(Bool, txed_auto_indent, true, CVAR_SAVE)
 CVAR(Bool, txed_syntax_hilight, true, CVAR_SAVE)
 CVAR(Bool, txed_brace_match, false, CVAR_SAVE)
+CVAR(Int, txed_edge_column, 80, CVAR_SAVE)
+CVAR(String, txed_style_set, "SLADE Default", CVAR_SAVE)
 rgba_t col_comment(0, 150, 0, 255);
 rgba_t col_string(0, 120, 130, 255);
 rgba_t col_keyword(0, 30, 200, 255);
 rgba_t col_constant(180, 30, 200, 255);
 rgba_t col_function(200, 100, 30, 255);
+rgba_t col_edge_line(200, 200, 230, 255);
 
 
 /*******************************************************************
@@ -156,12 +160,18 @@ TextEditor::TextEditor(wxWindow* parent, int id)
 	SetMouseDwellTime(500);
 	AutoCompSetIgnoreCase(true);
 
+	// Right margin line
+	SetEdgeColour(WXCOL(col_edge_line));
+	SetEdgeColumn(txed_edge_column);
+	SetEdgeMode(wxSTC_EDGE_LINE);
+
 	// Register icons for autocompletion list
 	RegisterImage(1, getIcon("ac_key"));
 	RegisterImage(2, getIcon("ac_const"));
 	RegisterImage(3, getIcon("ac_func"));
 
 	// Test colours
+	/*
 	StyleSetForeground(wxSTC_C_COMMENT, WXCOL(col_comment));
 	StyleSetForeground(wxSTC_C_COMMENTDOC, WXCOL(col_comment));
 	StyleSetForeground(wxSTC_C_COMMENTLINE, WXCOL(col_comment));
@@ -173,6 +183,10 @@ TextEditor::TextEditor(wxWindow* parent, int id)
 
 	StyleSetBackground(wxSTC_STYLE_BRACELIGHT, WXCOL(rgba_t(170, 255, 170, 255)));
 	StyleSetBold(wxSTC_STYLE_BRACELIGHT, true);
+	*/
+
+	// Apply default style
+	StyleSet::getStyleSet(0)->applyTo(this);
 
 	// Init w/no language
 	setLanguage(NULL);
@@ -231,12 +245,21 @@ bool TextEditor::setLanguage(TextLanguage* lang) {
 		SetLexer(wxSTC_LEX_NULL);
 
 	// Update variables
+	SetWordChars("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-.$");
 	this->language = lang;
 
 	// Re-colour text
 	Colourise(0, GetTextLength());
 
 	return true;
+}
+
+bool TextEditor::setStyleSet(StyleSet* style) {
+	// Check if one was given
+	if (!style)
+		return false;
+
+	
 }
 
 /* TextEditor::loadEntry

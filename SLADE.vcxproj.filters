@@ -348,6 +348,9 @@
     <ClCompile Include="src\WadJArchive.cpp">
       <Filter>Resources\Archive</Filter>
     </ClCompile>
+    <ClCompile Include="src\TextStyle.cpp">
+      <Filter>UI Elements\TextEditor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -641,6 +644,9 @@
     </ClInclude>
     <ClInclude Include="src\WadJArchive.h">
       <Filter>Resources\Archive</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TextStyle.h">
+      <Filter>UI Elements\TextEditor</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

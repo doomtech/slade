@@ -8,6 +8,9 @@ STreeNode::STreeNode(STreeNode* parent) {
 		parent->addChild(this);
 	else
 		this->parent = NULL;
+
+	// Disallow duplicate child names by default
+	allow_dup_child = false;
 }
 
 STreeNode::~STreeNode() {
@@ -70,6 +73,45 @@ STreeNode* STreeNode::getChild(string name) {
 	}
 }
 
+vector<STreeNode*> STreeNode::getChildren(string name) {
+	// Init return vector
+	vector<STreeNode*> ret;
+
+	// Check name was given
+	if (name.IsEmpty())
+		return ret;
+
+	// If name ends with /, remove it
+	if (name.EndsWith("/"))
+		name.RemoveLast(1);
+
+	// Convert name to path for processing
+	wxFileName fn(name);
+
+	// If no directories were given
+	if (fn.GetDirCount() == 0) {
+		// Find child of this node
+		for (unsigned a = 0; a < children.size(); a++) {
+			if (s_cmpnocase(name, children[a]->getName()))
+				ret.push_back(children[a]);
+		}
+	}
+	else {
+		// Directories were given, get the first directory
+		string dir = fn.GetDirs()[0];
+
+		// See if it is a child of this node
+		STreeNode* child = getChild(dir);
+		if (child) {
+			// It is, remove the first directory and continue searching that child
+			fn.RemoveDir(0);
+			return child->getChildren(fn.GetFullPath(wxPATH_UNIX));
+		}
+	}
+
+	return ret;
+}
+
 void STreeNode::addChild(STreeNode* child) {
 	children.push_back(child);
 	child->parent = this;
@@ -89,8 +131,11 @@ STreeNode* STreeNode::addChild(string name) {
 
 	// If no directories were given
 	if (fn.GetDirCount() == 0) {
-		// Check if a child with this name exists
-		STreeNode* child = getChild(name);
+		// If child name duplication is disallowed,
+		// check if a child with this name exists
+		STreeNode* child = NULL;
+		if (!allow_dup_child)
+			child = getChild(name);
 
 		// If it doesn't exist, create it
 		if (!child) {
@@ -100,13 +145,17 @@ STreeNode* STreeNode::addChild(string name) {
 
 		// Return the created child
 		return child;
+
 	}
 	else {
 		// Directories were given, get the first directory
 		string dir = fn.GetDirs()[0];
 
-		// Check if a child with this name exists
-		STreeNode* child = getChild(dir);
+		// If child name duplication is disallowed,
+		// check if a child with this name exists
+		STreeNode* child = NULL;
+		if (!allow_dup_child)
+			child = getChild(dir);
 
 		// If it doesn't exist, create it
 		if (!child) {

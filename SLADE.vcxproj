@@ -131,6 +131,7 @@
     <ClCompile Include="src\ResArchive.cpp" />
     <ClCompile Include="src\SImageFormats.cpp" />
     <ClCompile Include="src\TextLanguage.cpp" />
+    <ClCompile Include="src\TextStyle.cpp" />
     <ClCompile Include="src\TextureXPanel.cpp" />
     <ClCompile Include="src\Tokenizer.cpp" />
     <ClCompile Include="src\Tree.cpp" />
@@ -228,6 +229,7 @@
     <ClInclude Include="src\ResArchive.h" />
     <ClInclude Include="src\Structs.h" />
     <ClInclude Include="src\TextLanguage.h" />
+    <ClInclude Include="src\TextStyle.h" />
     <ClInclude Include="src\TextureXPanel.h" />
     <ClInclude Include="src\Tokenizer.h" />
     <ClInclude Include="src\Tree.h" />
