@@ -564,6 +564,14 @@
 						RelativePath=".\src\TextLanguage.h"
 						>
 					</File>
+					<File
+						RelativePath=".\src\TextStyle.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\TextStyle.h"
+						>
+					</File>
 				</Filter>
 				<Filter
 					Name="HexEditor"
