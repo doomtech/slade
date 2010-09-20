@@ -8,6 +8,8 @@
 #include <wx/listctrl.h>
 #include <wx/textctrl.h>
 
+wxDECLARE_EVENT(EVT_AEL_DIR_CHANGED, wxCommandEvent);
+
 class ArchiveEntryList : public VirtualListView, public Listener {
 private:
 	Archive*			archive;
@@ -17,6 +19,7 @@ private:
 	string				filter_category;
 	ArchiveTreeNode*	current_dir;
 	ArchiveEntry*		entry_dir_back;
+	bool				show_dir_back;
 
 	enum {
 		AEL_COLUMN_NAME,
@@ -38,6 +41,9 @@ public:
 
 	ArchiveTreeNode*	getCurrentDir() { return current_dir; }
 
+	bool	showDirBack() { return show_dir_back; }
+	void	showDirBack(bool db) { show_dir_back = db; }
+
 	void	setArchive(Archive* archive);
 
 	void	setupColumns();
@@ -47,6 +53,7 @@ public:
 
 	void	filterList(string filter = "", string category = "");
 	void	applyFilter();
+	bool	goUpDir();
 
 	ArchiveEntry*				getEntry(int index) const;
 	ArchiveEntry*				getFocusedEntry();

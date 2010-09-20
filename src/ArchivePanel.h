@@ -15,6 +15,8 @@ protected:
 	ArchiveEntryList*	entry_list;
 	wxTextCtrl*			text_filter;
 	wxChoice*			choice_category;
+	wxStaticText*		label_path;
+	wxBitmapButton*		btn_updir;
 
 	// Entry panels
 	EntryPanel*	cur_area;
@@ -98,6 +100,8 @@ public:
 	void			onDEPViewAsHex(wxCommandEvent& e);
 	void			onTextFilterChanged(wxCommandEvent& e);
 	void			onChoiceCategoryChanged(wxCommandEvent& e);
+	void			onDirChanged(wxCommandEvent& e);
+	void			onBtnUpDir(wxCommandEvent& e);
 };
 
 #endif //__ARCHIVEPANEL_H__

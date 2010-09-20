@@ -51,6 +51,7 @@
 #include "MainWindow.h"
 #include "SplashWindow.h"
 #include "ArchiveOperations.h"
+#include "Icons.h"
 #include <wx/aui/auibook.h>
 #include <wx/filename.h>
 #include <wx/gbsizer.h>
@@ -110,6 +111,28 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 	wxStaticBoxSizer *framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
 	m_hbox->Add(framesizer, 0, wxEXPAND|wxALL, 4);
 
+
+	// Create path display
+	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
+	framesizer->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT|wxTOP, 4);
+	framesizer->AddSpacer(2);
+
+	// Label
+	label_path = new wxStaticText(this, -1, "Path:", wxDefaultPosition, wxDefaultSize, wxST_ELLIPSIZE_START);
+	hbox->Add(label_path, 1, wxRIGHT|wxALIGN_CENTER_VERTICAL, 4);
+
+	// 'Up' button
+	btn_updir = new wxBitmapButton(this, -1, getIcon("e_upfolder"));
+	btn_updir->Enable(false);
+	hbox->Add(btn_updir, 0, wxEXPAND);
+
+
+	// Create entry list panel
+	entry_list = new ArchiveEntryList(this);
+	entry_list->setArchive(archive);
+	framesizer->Add(entry_list, 1, wxEXPAND | wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+
 	wxGridBagSizer* gb_sizer = new wxGridBagSizer(4, 4);
 	framesizer->Add(gb_sizer, 0, wxEXPAND|wxALL, 4);
 
@@ -129,10 +152,6 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 	gb_sizer->Add(new wxStaticText(this, -1, "Filter:"), wxGBPosition(1, 0), wxDefaultSpan, wxALIGN_CENTER_VERTICAL);
 	gb_sizer->Add(text_filter, wxGBPosition(1, 1), wxDefaultSpan, wxEXPAND);
 
-	// Create entry list panel
-	entry_list = new ArchiveEntryList(this);
-	entry_list->setArchive(archive);
-	framesizer->Add(entry_list, 1, wxEXPAND | wxALL, 4);
 
 	// Add default entry panel
 	cur_area = entry_area;
@@ -148,8 +167,14 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 	text_filter->Bind(wxEVT_COMMAND_TEXT_UPDATED, &ArchivePanel::onTextFilterChanged, this);
 	choice_category->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &ArchivePanel::onChoiceCategoryChanged, this);
 	Bind(wxEVT_COMMAND_MENU_SELECTED, &ArchivePanel::onEntryMenuClick, this, MENU_GFX_CONVERT, MENU_TEMP_END);
+	Bind(EVT_AEL_DIR_CHANGED, &ArchivePanel::onDirChanged, this);
+	btn_updir->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &ArchivePanel::onBtnUpDir, this);
 	((DefaultEntryPanel*)default_area)->getEditTextButton()->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &ArchivePanel::onDEPEditAsText, this);
 	((DefaultEntryPanel*)default_area)->getViewHexButton()->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &ArchivePanel::onDEPViewAsHex, this);
+
+	// Do a quick check to see if we need the path display
+	if (archive->getRoot()->nChildren() == 0)
+		hbox->Show(false);
 
 	// Update size+layout
 	entry_list->updateWidth();
@@ -1414,6 +1439,33 @@ void ArchivePanel::onChoiceCategoryChanged(wxCommandEvent& e) {
 	entry_list->filterList(text_filter->GetValue(), category);
 
 	e.Skip();
+}
+
+void ArchivePanel::onDirChanged(wxCommandEvent& e) {
+	// Get directory
+	ArchiveTreeNode* dir = entry_list->getCurrentDir();
+
+	if (!dir->getParent()) {
+		// Root dir
+		label_path->SetLabel("Path:");
+		btn_updir->Enable(false);
+	}
+	else {
+		// Setup path string
+		string path = dir->getPath();
+		path.Remove(0, 1);
+		path.Prepend("Path: ");
+
+		label_path->SetLabel(path);
+		btn_updir->Enable(true);
+	}
+
+	label_path->GetContainingSizer()->Layout();
+}
+
+void ArchivePanel::onBtnUpDir(wxCommandEvent& e) {
+	// Go up a directory in the entry list
+	entry_list->goUpDir();
 }
 
 

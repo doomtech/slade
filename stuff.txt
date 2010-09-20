@@ -26,7 +26,6 @@ TODO List ---------------------------------------------------------------
 
 --- Editor Features ---
 - Map editor (!)
-- Map preview
 - Generic entry data view (for VERTEXES, LINEDEFS, SIDEDEFS, SECTORS, THINGS, DEMO*, TEXTUREX/PNAMES, ...)
 - ANSI screen viewer (/editor)
 - Proper font viewer

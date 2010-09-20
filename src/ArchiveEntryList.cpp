@@ -47,6 +47,7 @@ CVAR(Bool, elist_colsize_show, true, CVAR_SAVE)
 CVAR(Bool, elist_coltype_show, true, CVAR_SAVE)
 CVAR(Bool, elist_hrules, false, CVAR_SAVE)
 CVAR(Bool, elist_vrules, false, CVAR_SAVE)
+wxDEFINE_EVENT(EVT_AEL_DIR_CHANGED, wxCommandEvent);
 
 
 /*******************************************************************
@@ -63,6 +64,7 @@ ArchiveEntryList::ArchiveEntryList(wxWindow* parent) : VirtualListView(parent) {
 	filter_name = "";
 	filter_category = "";
 	current_dir = false;
+	show_dir_back = false;
 
 	// Create dummy 'up folder' entry
 	entry_dir_back = new ArchiveEntry();
@@ -269,7 +271,7 @@ void ArchiveEntryList::updateList() {
 
 	// Determine if we need a 'back folder' entry
 	int back_folder = 0;
-	if (current_dir->getParent())
+	if (show_dir_back && current_dir->getParent())
 		back_folder = 1;
 
 	// Update list
@@ -351,6 +353,36 @@ void ArchiveEntryList::applyFilter() {
 	updateList();
 }
 
+/* ArchiveEntryList::goUpDir
+ * Opens the parent directory of the current directory (if it exists)
+ *******************************************************************/
+bool ArchiveEntryList::goUpDir() {
+	// Get parent directory
+	ArchiveTreeNode* dir = (ArchiveTreeNode*)current_dir->getParent();
+
+	// If it doesn't exist, do nothing
+	if (!dir)
+		return false;
+
+	// Set current dir
+	current_dir = dir;
+
+	// Clear current selection
+	clearSelection();
+
+	// Update filter
+	applyFilter();
+
+	// Update list
+	updateList();
+
+	// Fire event
+	wxCommandEvent evt(EVT_AEL_DIR_CHANGED, GetId());
+	ProcessWindowEvent(evt);
+
+	return true;
+}
+
 /* ArchiveEntryList::entriesBegin
  * Returns the index of the first list item that is an entry (rather
  * than a directory), or -1 if no directory/archive is open)
@@ -362,9 +394,9 @@ int ArchiveEntryList::entriesBegin() {
 
 	// Determine first entry index
 	int index = 0;
-	if (current_dir->getParent())		// Offset if '..' item exists
+	if (show_dir_back && current_dir->getParent())		// Offset if '..' item exists
 		index++;
-	index += current_dir->nChildren();	// Offset by number of subdirs
+	index += current_dir->nChildren();					// Offset by number of subdirs
 
 	return index;
 }
@@ -388,7 +420,7 @@ ArchiveEntry* ArchiveEntryList::getEntry(int index) const {
 	}
 
 	// Index modifier if 'up folder' entry exists
-	if (current_dir->getParent()) {
+	if (show_dir_back && current_dir->getParent()) {
 		if (index == 0)
 			return entry_dir_back;
 		else
@@ -613,6 +645,10 @@ void ArchiveEntryList::onListItemActivated(wxListEvent& e) {
 
 		// Update list
 		updateList();
+
+		// Fire event
+		wxCommandEvent evt(EVT_AEL_DIR_CHANGED, GetId());
+		ProcessWindowEvent(evt);
 	}
 	else
 		e.Skip();
