@@ -1459,8 +1459,6 @@ void ArchivePanel::onDirChanged(wxCommandEvent& e) {
 		label_path->SetLabel(path);
 		btn_updir->Enable(true);
 	}
-
-	label_path->GetContainingSizer()->Layout();
 }
 
 void ArchivePanel::onBtnUpDir(wxCommandEvent& e) {

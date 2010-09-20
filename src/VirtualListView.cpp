@@ -168,6 +168,12 @@ void VirtualListView::onColumnResize(wxListEvent& e) {
 }
 
 void VirtualListView::onMouseLeftDown(wxMouseEvent& e) {
+	// Default handler for double-click
+	if (e.ButtonDClick()) {
+		e.Skip();
+		return;
+	}
+
 	// Get item at click position
 	int flags = 0;
 	long item = this->HitTest(wxPoint(e.GetX(), e.GetY()), flags);
@@ -193,6 +199,7 @@ void VirtualListView::onMouseLeftDown(wxMouseEvent& e) {
 			selectItem(item);
 			focusItem(item);
 			sendSelectionChangedEvent();
+			e.Skip();
 		}
 	}
 }
