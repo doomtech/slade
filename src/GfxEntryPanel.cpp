@@ -455,6 +455,7 @@ void GfxEntryPanel::onGfxOffsetChanged(wxEvent& e) {
 #include "Console.h"
 #include "MainApp.h"
 #include "ArchivePanel.h"
+#include "MainWindow.h"
 
 GfxEntryPanel * CH::getCurrentGfxPanel() {
 	if (theApp->getMainWindow())
@@ -493,6 +494,7 @@ CONSOLE_COMMAND(rotate, 1) {
 		wxLogMessage("Invalid parameter: %i is not a multiple of 90.", angle);
 		return;
 	}
+
 	ArchivePanel * foo = CH::getCurrentArchivePanel();
 	if (!foo) {
 		wxLogMessage("No active panel.");
@@ -507,6 +509,10 @@ CONSOLE_COMMAND(rotate, 1) {
 		wxLogMessage("No image selected.");
 		return;
 	}
+
+	// Get current entry
+	ArchiveEntry* entry = theMainWindow->getCurrentEntry();
+
 	if (meep->getImage())
 	{
 		meep->getImage()->rotate(angle);

@@ -945,6 +945,30 @@ bool Archive::renameEntry(ArchiveEntry* entry, string name) {
 	return true;
 }
 
+/* Archive::revertEntry
+ * Reverts [entry] to the data it contained at the last time the
+ * archive was saved. Returns false if entry was invalid, true
+ * otherwise
+ *******************************************************************/
+bool Archive::revertEntry(ArchiveEntry* entry) {
+	// Check entry
+	if (!checkEntry(entry))
+		return false;
+
+	// Check if entry is locked
+	if (entry->isLocked())
+		return false;
+
+	// No point if entry is unmodified or newly created
+	if (entry->getState() != 1)
+		return true;
+
+	// Reload entry data from the archive on disk
+	entry->setState(0);
+	entry->unloadData();
+	return loadEntryData(entry);
+}
+
 /* Archive::findFirst
  * Returns the first entry matching the search criteria in [options],
  * or NULL if no matching entry was found

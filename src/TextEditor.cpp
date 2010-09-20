@@ -38,7 +38,6 @@
 /*******************************************************************
  * VARIABLES
  *******************************************************************/
-CVAR(Bool, txed_trim_whitespace, false, CVAR_SAVE)
 CVAR(Int, txed_tab_width, 4, CVAR_SAVE)
 CVAR(Bool, txed_auto_indent, true, CVAR_SAVE)
 CVAR(Bool, txed_syntax_hilight, true, CVAR_SAVE)
@@ -170,23 +169,8 @@ TextEditor::TextEditor(wxWindow* parent, int id)
 	RegisterImage(2, getIcon("ac_const"));
 	RegisterImage(3, getIcon("ac_func"));
 
-	// Test colours
-	/*
-	StyleSetForeground(wxSTC_C_COMMENT, WXCOL(col_comment));
-	StyleSetForeground(wxSTC_C_COMMENTDOC, WXCOL(col_comment));
-	StyleSetForeground(wxSTC_C_COMMENTLINE, WXCOL(col_comment));
-	StyleSetForeground(wxSTC_C_STRING, WXCOL(col_string));
-	StyleSetForeground(wxSTC_C_CHARACTER, WXCOL(col_string));
-	StyleSetForeground(wxSTC_C_WORD, WXCOL(col_keyword));
-	StyleSetForeground(wxSTC_C_WORD2, WXCOL(col_function));
-	StyleSetForeground(wxSTC_C_GLOBALCLASS, WXCOL(col_constant));
-
-	StyleSetBackground(wxSTC_STYLE_BRACELIGHT, WXCOL(rgba_t(170, 255, 170, 255)));
-	StyleSetBold(wxSTC_STYLE_BRACELIGHT, true);
-	*/
-
 	// Apply default style
-	StyleSet::getStyleSet(0)->applyTo(this);
+	applyStyleSet(StyleSet::getStyleSet(0));
 
 	// Init w/no language
 	setLanguage(NULL);
@@ -254,12 +238,18 @@ bool TextEditor::setLanguage(TextLanguage* lang) {
 	return true;
 }
 
-bool TextEditor::setStyleSet(StyleSet* style) {
+/* TextEditor::applyStyleSet
+ * Applies the styleset [style] to the text editor
+ *******************************************************************/
+bool TextEditor::applyStyleSet(StyleSet* style) {
 	// Check if one was given
 	if (!style)
 		return false;
 
-	
+	// Apply it
+	style->applyTo(this);
+
+	return true;
 }
 
 /* TextEditor::loadEntry
@@ -307,7 +297,29 @@ void TextEditor::getRawText(MemChunk& mc) {
 	mc.importMem((const uint8_t*)raw_text, GetTextLength());
 }
 
+/* TextEditor::trimWhitespace
+ * Removes any unneeded whitespace from the ends of lines
+ *******************************************************************/
 void TextEditor::trimWhitespace() {
+	// Go through lines
+	for (int a = 0; a < GetLineCount(); a++) {
+		// Get line start and end positions
+		int pos = GetLineEndPosition(a) - 1;
+		int start = pos - GetLineLength(a);
+
+		while (pos > start) {
+			int chr = GetCharAt(pos);
+
+			// Check for whitespace character
+			if (chr == ' ' || chr == '\t') {
+				// Remove character if whitespace
+				Remove(pos, pos+1);
+				pos--;
+			}
+			else
+				break;	// Not whitespace, stop
+		}
+	}
 }
 
 /* TextEditor::findNext

@@ -299,10 +299,6 @@ bool MainApp::OnInit() {
 	wxLogMessage("Loading icons");
 	loadIcons();
 
-	// Create the main window
-	main_window = new MainWindow();
-	theSplashWindow->SetParent(main_window);
-
 	// Load entry types
 	wxLogMessage("Loading entry types");
 	EntryDataFormat::initBuiltinFormats();
@@ -321,7 +317,8 @@ bool MainApp::OnInit() {
 	}
 
 	// Show the main window
-	main_window->Show(true);
+	theMainWindow->Show(true);
+	theSplashWindow->SetParent(theMainWindow);
 
 	// Hide splash screen
 	theSplashWindow->hide();

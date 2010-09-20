@@ -46,6 +46,7 @@
  * VARIABLES
  *******************************************************************/
 string main_window_layout = "";
+MainWindow* MainWindow::instance = NULL;
 
 
 /*******************************************************************
@@ -176,19 +177,20 @@ void MainWindow::setupLayout() {
 
 	// Entry menu
 	wxMenu* entryMenu = new wxMenu("");
-	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_RENAME,		"Rename",			"Rename the selected entries",										"t_rename"));
-	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_DELETE,		"Delete",			"Delete the selected entries",										"t_delete"));
+	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_RENAME,		"Rename",			"Rename the selected entries",													"t_rename"));
+	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_DELETE,		"Delete",			"Delete the selected entries",													"t_delete"));
+	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_REVERT,		"Revert",			"Reverts any modifications made to the selected entries since the last save"));
 	entryMenu->AppendSeparator();
 	entryMenu->Append(createMenuItem(entryMenu,	MENU_ENTRY_CUT,			"Cut",				"Cut the selected entries"));
 	entryMenu->Append(createMenuItem(entryMenu,	MENU_ENTRY_COPY,		"Copy",				"Copy the selected entries"));
 	entryMenu->Append(createMenuItem(entryMenu,	MENU_ENTRY_PASTE,		"Paste",			"Paste the previously cut/copied entries"));
 	entryMenu->AppendSeparator();
-	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_MOVEUP,		"Move Up",			"Move the selected entries up",										"t_up"));
-	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_MOVEDOWN,	"Move Down",		"Move the selected entries down",									"t_down"));
+	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_MOVEUP,		"Move Up",			"Move the selected entries up",													"t_up"));
+	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_MOVEDOWN,	"Move Down",		"Move the selected entries down",												"t_down"));
 	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_CONVERTTO,	"Convert To...",	"Convert selected entries to a different format/type"));
 	entryMenu->AppendSeparator();
-	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_IMPORT,		"Import",			"Import a file to the selected entry",								"t_import"));
-	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_EXPORT,		"Export",			"Export the selected entries to files",								"t_export"));
+	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_IMPORT,		"Import",			"Import a file to the selected entry",											"t_import"));
+	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_EXPORT,		"Export",			"Export the selected entries to files",											"t_export"));
 	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_EXPORTAS,	"Export As...",		"Export the selected entries to files as a different format/type"));
 	entryMenu->AppendSeparator();
 	entryMenu->Append(createMenuItem(entryMenu,	MENU_ENTRY_BOOKMARK,	"Bookmark",			"Bookmark the current entry"));
@@ -272,6 +274,10 @@ void MainWindow::setupLayout() {
 	Bind(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED, &MainWindow::onTabChanged, this);
 }
 
+/* MainWindow::createStartPage
+ * Builds the HTML start page and loads it into the html viewer
+ * (start page tab)
+ *******************************************************************/
 void MainWindow::createStartPage() {
 	// Get relevant resource entries
 	Archive* res_archive = theArchiveManager->programResourceArchive();
@@ -339,6 +345,32 @@ void MainWindow::createStartPage() {
 	// Clean up
 	wxRemoveFile(html_file);
 	wxRemoveFile(appPath("logo.png", DIR_TEMP));
+}
+
+bool MainWindow::exitProgram() {
+	// Close all archives
+	if (!panel_archivemanager->closeAll())
+		return false;
+
+	// Save current layout
+	main_window_layout = m_mgr->SavePerspective();
+
+	// Exit application
+	wxTheApp->Exit();
+
+	return true;
+}
+
+Archive* MainWindow::getCurrentArchive() {
+	return panel_archivemanager->currentArchive();
+}
+
+ArchiveEntry* MainWindow::getCurrentEntry() {
+	return panel_archivemanager->currentEntry();
+}
+
+vector<ArchiveEntry*> MainWindow::getCurrentEntrySelection() {
+	return panel_archivemanager->currentEntrySelection();
 }
 
 
@@ -475,9 +507,10 @@ void MainWindow::onHTMLLinkClicked(wxHtmlLinkEvent &e) {
  * Called when the window is closed
  *******************************************************************/
 void MainWindow::onClose(wxCloseEvent& e) {
-	main_window_layout = m_mgr->SavePerspective();
-	wxTheApp->Exit();
-	e.Skip();
+	if (!exitProgram())
+		e.Veto();
+	else
+		e.Skip();
 }
 
 /* MainWindow::onTabChanged

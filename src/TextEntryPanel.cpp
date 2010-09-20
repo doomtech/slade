@@ -33,6 +33,12 @@
 
 
 /*******************************************************************
+ * VARIABLES
+ *******************************************************************/
+CVAR(Bool, txed_trim_whitespace, false, CVAR_SAVE)
+
+
+/*******************************************************************
  * TEXTENTRYPANEL CLASS FUNCTIONS
  *******************************************************************/
 
@@ -47,6 +53,7 @@ TextEntryPanel::TextEntryPanel(wxWindow* parent)
 
 	// Add 'Text Language' choice
 	wxArrayString languages = TextLanguage::getLanguageNames();
+	languages.Sort();
 	languages.Insert("None", 0, 1);
 	choice_text_language = new wxChoice(this, -1, wxDefaultPosition, wxDefaultSize, languages);
 	choice_text_language->Select(0);
@@ -104,6 +111,10 @@ bool TextEntryPanel::loadEntry(ArchiveEntry* entry) {
  * Saves any changes to the entry
  *******************************************************************/
 bool TextEntryPanel::saveEntry() {
+	// Trim whitespace
+	if (txed_trim_whitespace)
+		text_area->trimWhitespace();
+
 	// Write raw text to the entry
 	wxCharBuffer text_raw = text_area->GetTextRaw();
 	entry->importMem(text_raw, text_raw.length());
@@ -135,5 +146,5 @@ void TextEntryPanel::onBtnFindReplace(wxCommandEvent& e) {
 
 void TextEntryPanel::onChoiceLanguageChanged(wxCommandEvent& e) {
 	int index = choice_text_language->GetSelection();
-	text_area->setLanguage(TextLanguage::getLanguage(index - 1));
+	text_area->setLanguage(TextLanguage::getLanguageByName(choice_text_language->GetStringSelection()));
 }

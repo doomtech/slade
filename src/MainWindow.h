@@ -21,6 +21,9 @@ private:
 	wxAuiManager*			m_mgr;
 	int						lasttipindex;
 
+	// Singleton instance
+	static MainWindow*		instance;
+
 public:
 	enum {
 		MENU_START,
@@ -56,6 +59,7 @@ public:
 
 		MENU_ENTRY_RENAME,
 		MENU_ENTRY_DELETE,
+		MENU_ENTRY_REVERT,
 		MENU_ENTRY_CUT,
 		MENU_ENTRY_COPY,
 		MENU_ENTRY_PASTE,
@@ -79,10 +83,23 @@ public:
 	MainWindow();
 	~MainWindow();
 
+	// Singleton implementation
+	static MainWindow* getInstance() {
+		if (!instance)
+			instance = new MainWindow();
+
+		return instance;
+	}
+
 	void	setupLayout();
 	void	createStartPage();
+	bool	exitProgram();
 
 	ArchiveManagerPanel*	getArchiveManagerPanel() { return panel_archivemanager; }
+
+	Archive*				getCurrentArchive();
+	ArchiveEntry*			getCurrentEntry();
+	vector<ArchiveEntry*>	getCurrentEntrySelection();
 
 	// Events
 	void	onMenuItemClicked(wxCommandEvent &e);
@@ -90,6 +107,9 @@ public:
 	void	onClose(wxCloseEvent &e);
 	void	onTabChanged(wxAuiNotebookEvent& e);
 };
+
+// Define for less cumbersome MainWindow::getInstance()
+#define theMainWindow MainWindow::getInstance()
 
 
 #endif //__MAINWINDOW_H__

@@ -218,7 +218,6 @@
     <File Name="src/PaletteCanvas.h"/>
     <File Name="src/PaletteChooser.cpp"/>
     <File Name="src/PaletteChooser.h"/>
-    <File Name="src/ConsolePanel.cpp"/>
     <File Name="src/ConsolePanel.h"/>
     <File Name="src/SplashWindow.h"/>
     <File Name="src/SplashWindow.cpp"/>
@@ -238,6 +237,8 @@
       <File Name="src/TextEditor.h"/>
       <File Name="src/TextLanguage.h"/>
       <File Name="src/TextLanguage.cpp"/>
+      <File Name="src/TextStyle.cpp"/>
+      <File Name="src/TextStyle.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Lists">
       <File Name="src/ArchiveEntryList.cpp"/>
@@ -249,6 +250,7 @@
     </VirtualDirectory>
     <File Name="src/HexEditorPanel.h"/>
     <File Name="src/HexEditorPanel.cpp"/>
+    <File Name="src/ConsolePanel.cpp"/>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>

@@ -15,6 +15,14 @@ TLFunction::TLFunction(string name) {
 TLFunction::~TLFunction() {
 }
 
+string TLFunction::getArgSet(unsigned index) {
+	// Check index
+	if (index >= arg_sets.size())
+		return "";
+
+	return arg_sets[index];
+}
+
 string TLFunction::generateCallTipString(int arg_set) {
 	// Check requested arg set exists
 	if (arg_set < 0 || (unsigned)arg_set >= arg_sets.size())
@@ -97,6 +105,42 @@ TextLanguage::~TextLanguage() {
 		if (text_languages[a] == this)
 			text_languages.erase(text_languages.begin() + a);
 	}
+}
+
+void TextLanguage::copyTo(TextLanguage* copy) {
+	// Copy general attributes
+	copy->line_comment = line_comment;
+	copy->comment_begin = comment_begin;
+	copy->comment_end = comment_end;
+	copy->preprocessor = preprocessor;
+	copy->case_sensitive = case_sensitive;
+
+	// Copy keywords
+	for (unsigned a = 0; a < keywords.size(); a++)
+		copy->keywords.push_back(keywords[a]);
+
+	// Copy constants
+	for (unsigned a = 0; a < constants.size(); a++)
+		copy->constants.push_back(constants[a]);
+
+	// Copy functions
+	for (unsigned a = 0; a < functions.size(); a++) {
+		TLFunction* f = functions[a];
+		for (unsigned b = 0; b < f->nArgSets(); b++)
+			copy->addFunction(f->getName(), f->getArgSet(b));
+	}
+}
+
+void TextLanguage::addKeyword(string keyword) {
+	// Add only if it doesn't already exist
+	if (std::find(keywords.begin(), keywords.end(), keyword) == keywords.end())
+		keywords.push_back(keyword);
+}
+
+void TextLanguage::addConstant(string constant) {
+	// Add only if it doesn't already exist
+	if (std::find(constants.begin(), constants.end(), constant) == constants.end())
+		constants.push_back(constant);
 }
 
 void TextLanguage::addFunction(string name, string args) {
@@ -198,6 +242,15 @@ bool TextLanguage::readLanguageDefinition(MemChunk& mc) {
 
 		// Create language
 		TextLanguage* lang = new TextLanguage(node->getName());
+
+		// Check for inheritance
+		if (!node->getInherit().IsEmpty()) {
+			TextLanguage* inherit = getLanguage(node->getInherit());
+			if (inherit)
+				inherit->copyTo(lang);
+			else
+				wxLogMessage("Warning: Language %s inherits from undefined language %s", chr(node->getName()), chr(node->getInherit()));
+		}
 
 		// Parse language info
 		for (unsigned c = 0; c < node->nChildren(); c++) {
@@ -322,6 +375,17 @@ TextLanguage* TextLanguage::getLanguage(unsigned index) {
 		return NULL;
 
 	return text_languages[index];
+}
+
+TextLanguage* TextLanguage::getLanguageByName(string name) {
+	// Find text language matching [name]
+	for (unsigned a = 0; a < text_languages.size(); a++) {
+		if (s_cmpnocase(text_languages[a]->name, name))
+			return text_languages[a];
+	}
+
+	// Not found
+	return NULL;
 }
 
 wxArrayString TextLanguage::getLanguageNames() {

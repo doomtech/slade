@@ -51,6 +51,7 @@ public:
 	// Entry manipulation actions
 	bool	renameEntry();
 	bool	deleteEntry();
+	bool	revertEntry();
 	bool	moveUp();
 	bool	moveDown();
 	bool	bookmark();

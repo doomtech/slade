@@ -144,6 +144,7 @@ public:
 
 	// Entry modification
 	virtual bool	renameEntry(ArchiveEntry* entry, string name);
+	virtual bool	revertEntry(ArchiveEntry* entry);
 
 	// Detection
 	virtual vector<mapdesc_t>	detectMaps() = 0;

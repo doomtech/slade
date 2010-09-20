@@ -1,3 +1,4 @@
+
 #ifndef __CONSOLEHELPERS_H__
 #define	__CONSOLEHELPERS_H__
 

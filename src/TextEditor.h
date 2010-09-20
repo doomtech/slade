@@ -49,7 +49,7 @@ public:
 	~TextEditor();
 
 	bool	setLanguage(TextLanguage* lang);
-	bool	setStyleSet(StyleSet* style);
+	bool	applyStyleSet(StyleSet* style);
 	bool	loadEntry(ArchiveEntry* entry);
 	void	getRawText(MemChunk& mc);
 

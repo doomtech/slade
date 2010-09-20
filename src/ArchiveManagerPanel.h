@@ -78,6 +78,9 @@ public:
 	wxWindow*		currentPanel();
 	EntryPanel*		currentArea();
 
+	ArchiveEntry*			currentEntry();
+	vector<ArchiveEntry*>	currentEntrySelection();
+
 	void	openTab(int archive_index);
 	void	openTab(Archive * archive);
 	void	closeTab(int archive_index);
@@ -86,14 +89,19 @@ public:
 	void	openFile(string filename);
 	void	openFiles(wxArrayString& files);
 
+	// Single archive actions
+	bool	saveArchive(Archive* archive);
+	bool	saveArchiveAs(Archive* archive);
+	bool	closeArchive(Archive* archive);
+
 	void	createNewArchive(uint8_t type);
-	void	closeAll();
+	bool	closeAll();
 	void	saveAll();
 
 	// Selected archives in the lists
 	void	saveSelection();
 	void	saveSelectionAs();
-	void	closeSelection();
+	bool	closeSelection();
 	void	openSelection();
 	void	removeSelection();
 

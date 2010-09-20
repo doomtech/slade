@@ -398,6 +398,32 @@ EntryPanel* ArchiveManagerPanel::currentArea() {
 	return ap->currentArea();
 }
 
+ArchiveEntry* ArchiveManagerPanel::currentEntry() {
+	// Get current tab index
+	int selected = notebook_archives->GetSelection();
+
+	// Check it's an archive tab
+	if (!isArchivePanel(selected))
+		return NULL;
+
+	// Get the archive panel
+	ArchivePanel* ap = (ArchivePanel*)notebook_archives->GetPage(selected);
+	return ap->currentEntry();
+}
+
+vector<ArchiveEntry*> ArchiveManagerPanel::currentEntrySelection() {
+	// Get current tab index
+	int selected = notebook_archives->GetSelection();
+
+	// Check it's an archive tab
+	if (!isArchivePanel(selected))
+		return vector<ArchiveEntry*>();
+
+	// Get the archive panel
+	ArchivePanel* ap = (ArchivePanel*)notebook_archives->GetPage(selected);
+	return ap->currentEntries();
+}
+
 /* ArchiveManagerPanel::openTab
  * Opens a new tab for the archive at <archive_index> in the archive
  * manager
@@ -584,8 +610,13 @@ void ArchiveManagerPanel::openFiles(wxArrayString& files) {
 /* ArchiveManagerPanel::closeAll
  * Closes all currently open archives
  *******************************************************************/
-void ArchiveManagerPanel::closeAll() {
-	theArchiveManager->closeAll();
+bool ArchiveManagerPanel::closeAll() {
+	for (unsigned a = 0; a < theArchiveManager->numArchives(); a++) {
+		if (!closeArchive(theArchiveManager->getArchive(a)))
+			return false;
+	}
+
+	return true;
 }
 
 /* ArchiveManagerPanel::saveAll
@@ -632,6 +663,57 @@ void ArchiveManagerPanel::createNewArchive(uint8_t type) {
 	if (new_archive) {
 		openTab(theArchiveManager->archiveIndex(new_archive));
 	}
+}
+
+bool ArchiveManagerPanel::saveArchive(Archive* archive) {
+	if (archive->isOnDisk()) {
+		// Save the archive if possible
+		if (!archive->save()) {
+			// If there was an error pop up a message box
+			wxMessageBox(s_fmt("Error: %s", Global::error.c_str()), "Error", wxICON_ERROR);
+			return false;
+		}
+
+		return true;
+	}
+	else
+		return saveArchiveAs(archive);	// If the archive is newly created, do Save As instead
+}
+
+bool ArchiveManagerPanel::saveArchiveAs(Archive* archive) {
+	// Popup file save dialog
+	string formats = archive->getFileExtensionString();
+	string filename = wxFileSelector("Save Archive " + archive->getFilename(false) + " As", "", "", wxEmptyString, formats, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+
+	// Check a filename was selected
+	if (!filename.empty()) {
+		// Save the archive
+		if (!archive->save(filename)) {
+			// If there was an error pop up a message box
+			wxMessageBox(s_fmt("Error: %s", Global::error.c_str()), "Error", wxICON_ERROR);
+			return false;
+		}
+	}
+
+	return true;
+}
+
+bool ArchiveManagerPanel::closeArchive(Archive* archive) {
+	// If the archive has unsaved changes, prompt to save
+	if (archive->isModified()) {
+		wxMessageDialog md(this, s_fmt("Save changes to %s?", archive->getFilename(false)), "Unsaved Changes", wxYES_NO|wxCANCEL);
+		int result = md.ShowModal();
+		if (result == wxID_YES) {
+			// User selected to save
+			if (!saveArchive(archive))
+				return false;	// Unsuccessful save, don't close
+		}
+		else if (result == wxID_CANCEL)
+			return false;	// User selected cancel, don't close the archive
+	}
+
+	// Close the archive
+	return theArchiveManager->closeArchive(archive);
 }
 
 /* ArchiveManagerPanel::getSelectedArchives
@@ -790,29 +872,7 @@ void ArchiveManagerPanel::saveSelection() {
 		// Get the archive to be saved
 		Archive* archive = theArchiveManager->getArchive(selection[a]);
 
-		if (archive->isOnDisk()) {
-			// Save the archive if possible
-			if (!theArchiveManager->getArchive(selection[a])->save()) {
-				// If there was an error pop up a message box
-				wxMessageBox(s_fmt("Error: %s", Global::error.c_str()), "Error", wxICON_ERROR);
-			}
-		}
-		else {
-			// If the archive is newly created, do Save As instead
-
-			// Popup file save dialog
-			string formats = archive->getFileExtensionString();
-			string filename = wxFileSelector("Save Archive " + archive->getFilename(false) + " As", "", "", wxEmptyString, formats, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
-
-			// Check a filename was selected
-			if (!filename.empty()) {
-				// Save the archive
-				if (!archive->save(filename)) {
-					// If there was an error pop up a message box
-					wxMessageBox(s_fmt("Error: %s", Global::error.c_str()), "Error", wxICON_ERROR);
-				}
-			}
-		}
+		saveArchive(archive);
 	}
 }
 
@@ -831,19 +891,7 @@ void ArchiveManagerPanel::saveSelectionAs() {
 	for (size_t a = 0; a < selection.size(); a++) {
 		// Get the archive
 		Archive* archive = theArchiveManager->getArchive(selection[a]);
-
-		// Popup file save dialog
-		string formats = archive->getFileExtensionString();
-		string filename = wxFileSelector("Save Archive " + archive->getFilename(false) + " As", "", "", wxEmptyString, formats, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
-
-		// Check a filename was selected
-		if (!filename.empty()) {
-			// Save the archive
-			if (!archive->save(filename)) {
-				// If there was an error pop up a message box
-				wxMessageBox(s_fmt("Error: %s", Global::error.c_str()), "Error", wxICON_ERROR);
-			}
-		}
+		saveArchiveAs(archive);
 	}
 
 	refreshArchiveList();
@@ -852,13 +900,13 @@ void ArchiveManagerPanel::saveSelectionAs() {
 /* ArchiveManagerPanel::closeSelection
  * Closes the currently selected archive(s) in the list
  *******************************************************************/
-void ArchiveManagerPanel::closeSelection() {
+bool ArchiveManagerPanel::closeSelection() {
 	// Get the list of selected list items
 	vector<int> selection = getSelectedArchives();
 
 	// Don't continue if there are no selected items
 	if (selection.size() == 0)
-		return;
+		true;
 
 	// Get the list of selected archives
 	vector<Archive*> selected_archives;
@@ -866,8 +914,13 @@ void ArchiveManagerPanel::closeSelection() {
 		selected_archives.push_back(theArchiveManager->getArchive(selection[a]));
 
 	// Close all selected archives
-	for (size_t a = 0; a < selected_archives.size(); a++)
-		theArchiveManager->closeArchive(selected_archives[a]);
+	bool all_closed = true;
+	for (size_t a = 0; a < selected_archives.size(); a++) {
+		if (!closeArchive(selected_archives[a]))
+			all_closed = false;
+	}
+
+	return all_closed;
 }
 
 /* ArchiveManagerPanel::openSelection

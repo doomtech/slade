@@ -496,6 +496,20 @@ bool ArchivePanel::deleteEntry() {
 	return true;
 }
 
+/* ArchivePanel::revertEntry
+ * Reverts any selected entries
+ *******************************************************************/
+bool ArchivePanel::revertEntry() {
+	// Get selected entries
+	vector<ArchiveEntry*> selected_entries = entry_list->getSelectedEntries();
+
+	// Go through selection
+	for (unsigned a = 0; a < selected_entries.size(); a++)
+		archive->revertEntry(selected_entries[a]);
+
+	return true;
+}
+
 /* ArchivePanel::moveUp
  * Moves any selected entries up in the list
  *******************************************************************/
@@ -1055,7 +1069,6 @@ void ArchivePanel::handleAction(int menu_id) {
 	// Archive->Clean Up
 	else if (menu_id == MainWindow::MENU_ARCHIVE_CLEAN_PATCHES)
 		ArchiveOperations::removeUnusedPatches(archive);
-		//cleanupArchive();
 
 
 	// *************************************************************
@@ -1069,6 +1082,9 @@ void ArchivePanel::handleAction(int menu_id) {
 	// Entry->Delete
 	else if (menu_id == MainWindow::MENU_ENTRY_DELETE)
 		deleteEntry();
+
+	else if (menu_id == MainWindow::MENU_ENTRY_REVERT)
+		revertEntry();
 
 	// Entry->Cut
 	else if (menu_id == MainWindow::MENU_ENTRY_CUT)
@@ -1204,6 +1220,7 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 	wxMenu* context = new wxMenu();
 	context->Append(MainWindow::MENU_ENTRY_RENAME, "Rename");
 	context->Append(MainWindow::MENU_ENTRY_DELETE, "Delete");
+	context->Append(MainWindow::MENU_ENTRY_REVERT, "Revert");
 	context->AppendSeparator();
 	context->Append(MainWindow::MENU_ENTRY_CUT, "Cut");
 	context->Append(MainWindow::MENU_ENTRY_COPY, "Copy");

@@ -12,6 +12,7 @@ public:
 	~TLFunction();
 
 	string		getName() { return name; }
+	string		getArgSet(unsigned index);
 	unsigned	nArgSets() { return arg_sets.size(); }
 
 	void	setName(string name) { this->name = name; }
@@ -53,14 +54,16 @@ public:
 	TextLanguage(string id);
 	~TextLanguage();
 
+	void	copyTo(TextLanguage* copy);
+
 	void	setName(string name) { this->name = name; }
 	void	setLineComment(string token) { line_comment = token; }
 	void	setCommentBegin(string token) { comment_begin = token; }
 	void	setCommentEnd(string token) { comment_end = token; }
 	void	setPreprocessor(string token) { preprocessor = token; }
 	void	setCaseSensitive(bool cs) { case_sensitive = cs; }
-	void	addKeyword(string keyword) { keywords.push_back(keyword); }
-	void	addConstant(string constant) { constants.push_back(constant); }
+	void	addKeyword(string keyword);
+	void	addConstant(string constant);
 	void	addFunction(string name, string args);
 
 	string	getKeywordsList();
@@ -79,6 +82,7 @@ public:
 	static bool				loadLanguages();
 	static TextLanguage*	getLanguage(string id);
 	static TextLanguage*	getLanguage(unsigned index);
+	static TextLanguage*	getLanguageByName(string name);
 	static wxArrayString	getLanguageNames();
 };
 
