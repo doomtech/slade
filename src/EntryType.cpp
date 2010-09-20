@@ -390,6 +390,10 @@ bool EntryType::readEntryTypeDefinition(MemChunk& mc) {
 				}
 				if (!exists) entry_categories.push_back(ntype->category);
 			}
+			else {
+				// Unhandled properties can go into 'extra', only their first value is kept
+				ntype->extra[fieldnode->getName()] = fieldnode->getStringValue();
+			}
 		}
 
 		//ntype->dump();

@@ -54,6 +54,9 @@ public:
 	TextLanguage(string id);
 	~TextLanguage();
 
+	string	getId() { return id; }
+	string	getName() { return name; }
+
 	void	copyTo(TextLanguage* copy);
 
 	void	setName(string name) { this->name = name; }

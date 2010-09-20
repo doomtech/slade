@@ -36,6 +36,7 @@
  * VARIABLES
  *******************************************************************/
 CVAR(Bool, txed_trim_whitespace, false, CVAR_SAVE)
+wxArrayString languages;
 
 
 /*******************************************************************
@@ -52,7 +53,7 @@ TextEntryPanel::TextEntryPanel(wxWindow* parent)
 	sizer_main->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
 
 	// Add 'Text Language' choice
-	wxArrayString languages = TextLanguage::getLanguageNames();
+	languages = TextLanguage::getLanguageNames();
 	languages.Sort();
 	languages.Insert("None", 0, 1);
 	choice_text_language = new wxChoice(this, -1, wxDefaultPosition, wxDefaultSize, languages);
@@ -100,6 +101,38 @@ bool TextEntryPanel::loadEntry(ArchiveEntry* entry) {
 	else
 		btn_save->Enable(true);
 
+
+	// --- Attempt to determine text language ---
+	TextLanguage* tl = NULL;
+
+	// From entry language hint
+	if (entry->exProps().propertyExists("TextLanguage")) {
+		string lang_id = entry->exProp("TextLanguage");
+		tl = TextLanguage::getLanguage(lang_id);
+	}
+
+	// Or, from entry type
+	if (!tl && entry->getType()->extraProps().propertyExists("text_language")) {
+		string lang_id = entry->getType()->extraProps()["text_language"];
+		tl = TextLanguage::getLanguage(lang_id);
+	}
+
+	// Load language
+	text_area->setLanguage(tl);
+
+	// Select it in the choice box
+	if (tl) {
+		for (unsigned a = 0; a < languages.size(); a++) {
+			if (s_cmpnocase(tl->getName(), languages[a])) {
+				choice_text_language->Select(a);
+				break;
+			}
+		}
+	}
+	else
+		choice_text_language->Select(0);
+
+
 	// Update variables
 	this->entry = entry;
 	setModified(false);
@@ -146,5 +179,15 @@ void TextEntryPanel::onBtnFindReplace(wxCommandEvent& e) {
 
 void TextEntryPanel::onChoiceLanguageChanged(wxCommandEvent& e) {
 	int index = choice_text_language->GetSelection();
-	text_area->setLanguage(TextLanguage::getLanguageByName(choice_text_language->GetStringSelection()));
+	// Get selected language
+	TextLanguage* tl = TextLanguage::getLanguageByName(choice_text_language->GetStringSelection());
+
+	// Set text editor language
+	text_area->setLanguage(tl);
+
+	// Set entry language hint
+	if (tl)
+		entry->exProp("TextLanguage") = tl->getId();
+	else
+		entry->exProps().removeProperty("TextLanguage");
 }
