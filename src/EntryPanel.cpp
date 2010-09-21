@@ -170,6 +170,11 @@ bool EntryPanel::revertEntry() {
 	return false;
 }
 
+void EntryPanel::refreshPanel() {
+	Update();
+	Refresh();
+}
+
 
 /*******************************************************************
  * ENTRYPANEL CLASS EVENTS

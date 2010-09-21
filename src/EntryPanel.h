@@ -34,6 +34,7 @@ public:
 	virtual bool	loadEntry(ArchiveEntry* entry);
 	virtual bool	saveEntry();
 	virtual bool	revertEntry();
+	virtual void	refreshPanel();
 
 	virtual void	onBtnSave(wxCommandEvent& e);
 	virtual void	onBtnRevert(wxCommandEvent& e);

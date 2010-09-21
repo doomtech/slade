@@ -84,6 +84,7 @@ public:
 	bool	openEntryAsHex(ArchiveEntry* entry);
 	bool	showEntryPanel(EntryPanel* new_area, bool ask_save = true);
 	void	focusEntryList() { entry_list->SetFocus(); }
+	void	refreshPanel();
 
 	// Function to handle menu actions from MainWindow
 	void	handleAction(int menu_id);

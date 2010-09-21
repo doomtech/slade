@@ -1050,6 +1050,15 @@ bool ArchivePanel::showEntryPanel(EntryPanel* new_area, bool ask_save) {
 	return true;
 }
 
+void ArchivePanel::refreshPanel() {
+	// Refresh current entry panel
+	cur_area->refreshPanel();
+
+	// Refresh entire panel
+	Update();
+	Refresh();
+}
+
 /* ArchivePanel::handleAction
  * Handles a menu action from the main window
  *******************************************************************/

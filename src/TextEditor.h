@@ -48,6 +48,7 @@ public:
 	TextEditor(wxWindow* parent, int id);
 	~TextEditor();
 
+	void	setup();
 	bool	setLanguage(TextLanguage* lang);
 	bool	applyStyleSet(StyleSet* style);
 	bool	loadEntry(ArchiveEntry* entry);

@@ -3,6 +3,7 @@
 #define __PREFERENCES_DIALOG_H__
 
 #include "BaseResourceArchivesPanel.h"
+#include "TextEditorPrefsPanel.h"
 #include <wx/treebook.h>
 
 class PreferencesDialog : public wxDialog {
@@ -24,6 +25,9 @@ private:
 	BaseResourceArchivesPanel*	panel_bra;
 	wxButton*					btn_bra_open;
 
+	// Text editor
+	TextEditorPrefsPanel*	panel_text_editor;
+
 public:
 	PreferencesDialog(wxWindow* parent);
 	~PreferencesDialog();
@@ -31,6 +35,8 @@ public:
 	wxPanel*	setupGeneralPrefsPanel();
 	wxPanel*	setupEditingPrefsPanel();
 	wxPanel*	setupBaseResourceArchivesPanel();
+
+	void	applyPreferences();
 
 	// Events
 	void	onCBSASChanged(wxCommandEvent& e);

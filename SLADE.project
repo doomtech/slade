@@ -14,8 +14,15 @@
     <File Name="src/ModifyOffsetsDialog.h"/>
     <File Name="src/PaletteDialog.cpp"/>
     <File Name="src/PaletteDialog.h"/>
-    <File Name="src/PreferencesDialog.h"/>
-    <File Name="src/PreferencesDialog.cpp"/>
+    <VirtualDirectory Name="Preferences">
+      <File Name="src/PreferencesDialog.cpp"/>
+      <File Name="src/PreferencesDialog.h"/>
+      <File Name="src/BaseResourceArchivesPanel.cpp"/>
+      <File Name="src/BaseResourceArchivesPanel.h"/>
+      <File Name="src/TextStylesPanel.h"/>
+      <File Name="src/TextEditorPrefsPanel.h"/>
+      <File Name="src/TextEditorPrefsPanel.cpp"/>
+    </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="General">
     <File Name="src/Clipboard.cpp"/>
@@ -223,10 +230,7 @@
     <File Name="src/ConsolePanel.h"/>
     <File Name="src/SplashWindow.h"/>
     <File Name="src/SplashWindow.cpp"/>
-    <VirtualDirectory Name="Options">
-      <File Name="src/BaseResourceArchivesPanel.h"/>
-      <File Name="src/BaseResourceArchivesPanel.cpp"/>
-    </VirtualDirectory>
+    <VirtualDirectory Name="Options"/>
     <VirtualDirectory Name="Browser">
       <File Name="src/BrowserWindow.h"/>
       <File Name="src/BrowserItem.h"/>

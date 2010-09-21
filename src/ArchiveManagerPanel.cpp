@@ -257,6 +257,17 @@ void ArchiveManagerPanel::refreshArchiveList() {
 	list_archives->updateSize();
 }
 
+void ArchiveManagerPanel::refreshAllTabs() {
+	// Go through tabs
+	for (unsigned a = 0; a < notebook_archives->GetPageCount(); a++) {
+		wxWindow* tab = notebook_archives->GetPage(a);
+
+		// Refresh if it's an archive panel
+		if (isArchivePanel(a))
+			((ArchivePanel*)tab)->refreshPanel();
+	}
+}
+
 /* ArchiveManagerPanel::populateMapList
  * Adds all maps in <archive> to the maps list widget
  *******************************************************************/

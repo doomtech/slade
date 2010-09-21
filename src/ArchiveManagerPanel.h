@@ -68,6 +68,7 @@ public:
 	void			refreshArchiveList();
 	void			refreshRecentFileList();
 	void			refreshBookmarkList();
+	void			refreshAllTabs();
 	void			populateMapList(Archive* archive);
 	void			updateOpenListItem(int index);
 	void			updateRecentListItem(int index);

@@ -17,6 +17,7 @@ public:
 
 	bool	loadEntry(ArchiveEntry* entry);
 	bool	saveEntry();
+	void	refreshPanel();
 
 	// Events
 	void	onTextModified(wxStyledTextEvent& e);

@@ -43,12 +43,8 @@ CVAR(Bool, txed_auto_indent, true, CVAR_SAVE)
 CVAR(Bool, txed_syntax_hilight, true, CVAR_SAVE)
 CVAR(Bool, txed_brace_match, false, CVAR_SAVE)
 CVAR(Int, txed_edge_column, 80, CVAR_SAVE)
+CVAR(Bool, txed_indent_guides, false, CVAR_SAVE)
 CVAR(String, txed_style_set, "SLADE Default", CVAR_SAVE)
-rgba_t col_comment(0, 150, 0, 255);
-rgba_t col_string(0, 120, 130, 255);
-rgba_t col_keyword(0, 30, 200, 255);
-rgba_t col_constant(180, 30, 200, 255);
-rgba_t col_function(200, 100, 30, 255);
 rgba_t col_edge_line(200, 200, 230, 255);
 
 
@@ -153,30 +149,19 @@ TextEditor::TextEditor(wxWindow* parent, int id)
 	SetMarginWidth(0, TextWidth(wxSTC_STYLE_LINENUMBER, "9999"));
 	SetMarginWidth(1, 4);
 
-	// General settings
-	SetBufferedDraw(true);
-	SetUseAntiAliasing(true);
-	SetMouseDwellTime(500);
-	AutoCompSetIgnoreCase(true);
-
-	// Right margin line
-	SetEdgeColour(WXCOL(col_edge_line));
-	SetEdgeColumn(txed_edge_column);
-	SetEdgeMode(wxSTC_EDGE_LINE);
-
 	// Register icons for autocompletion list
 	RegisterImage(1, getIcon("ac_key"));
 	RegisterImage(2, getIcon("ac_const"));
 	RegisterImage(3, getIcon("ac_func"));
-
-	// Apply default style
-	applyStyleSet(StyleSet::getStyleSet(0));
 
 	// Init w/no language
 	setLanguage(NULL);
 
 	// Find+Replace dialog
 	dlg_fr = new FindReplaceDialog(this);
+
+	// Setup various configurable properties
+	setup();
 
 	// Bind events
 	Bind(wxEVT_KEY_DOWN, &TextEditor::onKeyDown, this);
@@ -197,6 +182,36 @@ TextEditor::TextEditor(wxWindow* parent, int id)
  * TextEditor class destructor
  *******************************************************************/
 TextEditor::~TextEditor() {
+}
+
+void TextEditor::setup() {
+	// General settings
+	SetBufferedDraw(true);
+	SetUseAntiAliasing(true);
+	SetMouseDwellTime(500);
+	AutoCompSetIgnoreCase(true);
+	SetIndentationGuides(txed_indent_guides);
+	StyleSetBackground(wxSTC_STYLE_INDENTGUIDE, WXCOL(col_edge_line));
+
+	// Right margin line
+	SetEdgeColour(WXCOL(col_edge_line));
+	SetEdgeColumn(txed_edge_column);
+	if (txed_edge_column == 0)
+		SetEdgeMode(wxSTC_EDGE_NONE);
+	else
+		SetEdgeMode(wxSTC_EDGE_LINE);
+
+	// Apply default style
+	applyStyleSet(StyleSet::getStyleSet(0));
+
+	// Set lexer
+	if (txed_syntax_hilight)
+		SetLexer(wxSTC_LEX_CPPNOCASE);
+	else
+		SetLexer(wxSTC_LEX_NULL);
+
+	// Re-colour text
+	Colourise(0, GetTextLength());
 }
 
 bool TextEditor::setLanguage(TextLanguage* lang) {

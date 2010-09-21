@@ -32,6 +32,8 @@
 #include "WxStuff.h"
 #include "PreferencesDialog.h"
 #include "ArchiveManager.h"
+#include "TextEditorPrefsPanel.h"
+#include <wx/gbsizer.h>
 
 
 /*******************************************************************
@@ -58,11 +60,17 @@ PreferencesDialog::PreferencesDialog(wxWindow* parent) : wxDialog(parent, -1, "S
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 	SetSizer(sizer);
 
-	// Setup preferences TreeBook
+	// Create preferences TreeBook
 	tree_prefs = new wxTreebook(this, -1, wxDefaultPosition, wxDefaultSize);
+
+	// Create separate preferences panels
+	panel_text_editor = new TextEditorPrefsPanel(tree_prefs);
+
+	// Setup preferences TreeBook
 	tree_prefs->AddPage(setupGeneralPrefsPanel(), "General", true);
 	tree_prefs->AddPage(setupEditingPrefsPanel(), "Editing");
 	tree_prefs->AddSubPage(setupBaseResourceArchivesPanel(), "Base Resource Archive");
+	tree_prefs->AddPage(panel_text_editor, "Text Editor");
 
 	// Expand all tree nodes (so it gets sized properly)
 	tree_prefs->ExpandNode(1);
@@ -115,7 +123,7 @@ wxPanel* PreferencesDialog::setupGeneralPrefsPanel() {
 	sizer->Add(cb_gl_np2, 0, wxEXPAND|wxALL, 4);
 
 	// Show entry size as string instead of a number
-	cb_size_as_string = new wxCheckBox(panel, -1, "Adapt size units to entry size");
+	cb_size_as_string = new wxCheckBox(panel, -1, "Show entry size as a string with units");
 	sizer->Add(cb_size_as_string, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
 
 	// Init controls
@@ -183,7 +191,7 @@ wxPanel* PreferencesDialog::setupEditingPrefsPanel() {
  *******************************************************************/
 wxPanel* PreferencesDialog::setupBaseResourceArchivesPanel() {
 	// Create panel
-	wxPanel* panel = new wxPanel(this, -1);
+	wxPanel* panel = new wxPanel(tree_prefs, -1);
 	wxBoxSizer* psizer = new wxBoxSizer(wxVERTICAL);
 	panel->SetSizer(psizer);
 
@@ -204,6 +212,11 @@ wxPanel* PreferencesDialog::setupBaseResourceArchivesPanel() {
 	btn_bra_open->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &PreferencesDialog::onBtnBRAOpenClicked, this);
 
 	return panel;
+}
+
+void PreferencesDialog::applyPreferences() {
+	// Apply text editor preferences
+	panel_text_editor->applyPreferences();
 }
 
 

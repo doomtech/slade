@@ -161,6 +161,14 @@ bool TextEntryPanel::saveEntry() {
 	return true;
 }
 
+void TextEntryPanel::refreshPanel() {
+	// Update text editor
+	text_area->setup();
+
+	Refresh();
+	Update();
+}
+
 
 /*******************************************************************
  * TEXTENTRYPANEL CLASS EVENTS
