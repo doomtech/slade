@@ -8,11 +8,17 @@ Download the required libraries:
 2)
 Compile/install the required libraries if needed.
 
-a) wxWidgets:
--Extract the wxWidgets tar
--Follow the instructions in docs/gtk/install.txt ('the simplest case'), but add '--with-opengl' to the ../configure line
+a) wxWidgets required libs
+The following libraries/packages are required to build wxWidgets with wxMediaCtrl enabled:
+libgstreamer-plugins-base0.10-dev
+libgstreamer0.10-dev
+libgconf2-dev
 
-b) FreeImage:
+b) wxWidgets:
+-Extract the wxWidgets tar
+-Follow the instructions in docs/gtk/install.txt ('the simplest case'), but add '--with-opengl --enable-mediactrl' to the ../configure line
+
+c) FreeImage:
 -Extract the FreeImage tar
 -Follow the instructions in README.linux (to install normal FreeImage, not FreeImagePlus)
 

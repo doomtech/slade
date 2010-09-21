@@ -79,6 +79,8 @@
         <File Name="src/HexEntryPanel.cpp"/>
         <File Name="src/MapEntryPanel.cpp"/>
         <File Name="src/MapEntryPanel.h"/>
+        <File Name="src/AudioEntryPanel.cpp"/>
+        <File Name="src/AudioEntryPanel.h"/>
       </VirtualDirectory>
       <File Name="src/ArchiveManagerPanel.h"/>
       <File Name="src/ArchiveManagerPanel.cpp"/>
@@ -261,6 +263,7 @@
     <File Name="dist/slade.pk3"/>
     <File Name="Makefile"/>
     <File Name="Makefile-debug"/>
+    <File Name="README-unix"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <Configuration Name="Debug" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
@@ -292,11 +295,11 @@
       </AdditionalRules>
     </Configuration>
     <Configuration Name="Release" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-O2;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no)" Required="yes" PreCompiledHeader="">
+      <Compiler Options="-O2;$(shell wx-config --cxxflags std,gl,stc,aui,media --unicode=yes --debug=no)" Required="yes" PreCompiledHeader="">
         <Preprocessor Value="__WX__"/>
         <Preprocessor Value="NDEBUG"/>
       </Compiler>
-      <Linker Options="-s;$(shell wx-config --debug=no --libs std,gl,stc,aui --unicode=yes)" Required="yes"/>
+      <Linker Options="-s;$(shell wx-config --debug=no --libs std,gl,stc,aui,media --unicode=yes)" Required="yes"/>
       <ResourceCompiler Options="$(shell wx-config --rcflags)" Required="no"/>
       <General OutputFile="./dist/slade" IntermediateDirectory="./Release" Command="./slade" CommandArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
