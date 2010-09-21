@@ -300,7 +300,7 @@ void MainWindow::createStartPage() {
 	string tip = "Tip";
 	if (entry_tips) {
 		Tokenizer tz;
-		tz.openMem((const char*)entry_tips->getData(), entry_tips->getSize());
+		tz.openMem((const char*)entry_tips->getData(), entry_tips->getSize(), entry_tips->getName());
 		srand(wxGetLocalTime());
 		int numtips = tz.getInteger();
 		if (numtips < 2) // Needs at least two choices or it's kinda pointless.

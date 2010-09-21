@@ -206,14 +206,34 @@
 				RelativePath=".\src\PaletteDialog.h"
 				>
 			</File>
-			<File
-				RelativePath=".\src\PreferencesDialog.cpp"
+			<Filter
+				Name="Preferences"
 				>
-			</File>
-			<File
-				RelativePath=".\src\PreferencesDialog.h"
-				>
-			</File>
+				<File
+					RelativePath=".\src\BaseResourceArchivesPanel.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\BaseResourceArchivesPanel.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\PreferencesDialog.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\PreferencesDialog.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\TextEditorPrefsPanel.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\TextEditorPrefsPanel.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="General"
@@ -993,14 +1013,6 @@
 			<Filter
 				Name="Options"
 				>
-				<File
-					RelativePath=".\src\BaseResourceArchivesPanel.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\BaseResourceArchivesPanel.h"
-					>
-				</File>
 			</Filter>
 			<Filter
 				Name="Lists"

@@ -18,6 +18,7 @@ private:
 	uint8_t		comments;	// See CommentTypes enum
 	bool		debug;		// If true every getToken() is printed to the console
 	string		special;	// A string defining the 'special characters'. These will always be parsed as separate tokens
+	string		name;		// What file/entry/chunk is being tokenized
 
 public:
 	Tokenizer(bool c_comments = true, bool h_comments = true, bool s_comments = false);
@@ -27,11 +28,12 @@ public:
 
 	void enableDebug(bool debug = true) { this->debug = debug; }
 
+	string getName() { return name; }
 	bool openFile(string filename, uint32_t offset = 0, uint32_t length = 0);
 	bool openString(string text, uint32_t offset = 0, uint32_t length = 0);
-	bool openMem(const char* mem, uint32_t length);
-	bool openMem(const uint8_t* mem, uint32_t length);
-	bool openMem(MemChunk * mc);
+	bool openMem(const char* mem, uint32_t length, string source);
+	bool openMem(const uint8_t* mem, uint32_t length, string source);
+	bool openMem(MemChunk * mc, string source);
 	bool isWhitespace(char p);
 	bool isSpecialCharacter(char p);
 	bool incrementCurrent();

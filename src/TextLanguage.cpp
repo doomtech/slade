@@ -252,11 +252,11 @@ TLFunction* TextLanguage::getFunction(string name) {
 	return NULL;
 }
 
-bool TextLanguage::readLanguageDefinition(MemChunk& mc) {
+bool TextLanguage::readLanguageDefinition(MemChunk& mc, string source) {
 	Tokenizer tz;
 
 	// Open the given text data
-	if (!tz.openMem((const char*)mc.getData(), mc.getSize())) {
+	if (!tz.openMem(&mc, source)) {
 		wxLogMessage("Unable to open file");
 		return false;
 	}
@@ -391,7 +391,7 @@ bool TextLanguage::loadLanguages() {
 		if (dir) {
 			// Read all entries in this dir
 			for (unsigned a = 0; a < dir->numEntries(); a++)
-				readLanguageDefinition(dir->getEntry(a)->getMCData());
+				readLanguageDefinition(dir->getEntry(a)->getMCData(), dir->getEntry(a)->getName());
 		}
 		else
 			wxLogMessage("Warning: 'config/languages' not found in slade.pk3, no builtin text language definitions loaded");

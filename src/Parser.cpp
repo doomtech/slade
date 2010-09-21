@@ -127,7 +127,7 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 	while (!(s_cmp(token, "}")) && !token.IsEmpty()) {
 		// If it's a special character (ie not a valid name), parsing fails
 		if (tz.isSpecialCharacter(token.at(0))) {
-			wxLogMessage("Parsing error: Unexpected special character");
+			wxLogMessage("Parsing error: Unexpected special character '%s' in %s", chr(token), chr(tz.getName()));
 			return false;
 		}
 
@@ -162,7 +162,7 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 				if (s_cmp(tz.peekToken(), ","))
 					tz.getToken();	// Skip it
 				else if (!(s_cmp(tz.peekToken(), list_end))) {
-					wxLogMessage("Parsing error: Expected \",\" or \"%s\", got \"%s\"", chr(list_end), chr(tz.getToken()));
+					wxLogMessage("Parsing error: Expected \",\" or \"%s\", got \"%s\" in %s", chr(list_end), chr(tz.getToken()), chr(tz.getName()));
 					return false;
 				}
 
@@ -216,7 +216,7 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 
 		// Unexpected token
 		else {
-			wxLogMessage("Parsing error: \"%s\" unexpected", chr(next));
+			wxLogMessage("Parsing error: \"%s\" unexpected in %s", chr(next), chr(tz.getName()));
 			return false;
 		}
 
@@ -281,8 +281,10 @@ Parser::~Parser() {
 bool Parser::parseText(MemChunk& mc) {
 	Tokenizer tz;
 
+	string source = "memory chunk";
+
 	// Open the given text data
-	if (!tz.openMem((const char*)mc.getData(), mc.getSize())) {
+	if (!tz.openMem(&mc, source)) {
 		wxLogMessage("Unable to open text data for parsing");
 		return false;
 	}

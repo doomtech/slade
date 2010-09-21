@@ -296,7 +296,7 @@ bool SLADEMap::readDoom64Map(Archive* map_entries) {
 
 bool SLADEMap::readUDMFMap(ArchiveEntry* map_data) {
 	Tokenizer udmf_data;
-	udmf_data.openMem((char*)map_data->getData(true), map_data->getSize());
+	udmf_data.openMem((char*)map_data->getData(true), map_data->getSize(), map_data->getName());
 
 	string token = udmf_data.getToken();
 	while (token != "") {

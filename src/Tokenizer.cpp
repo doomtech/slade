@@ -53,6 +53,7 @@ Tokenizer::Tokenizer(bool c_comments, bool h_comments, bool s_comments) {
 	comments = 0 | c_comments | h_comments << 1 | s_comments << 2;
 	debug = false;
 	special = ";,:|={}/";	// Default special characters
+	name = "nothing";
 }
 
 /* Tokenizer::~Tokenizer
@@ -69,6 +70,8 @@ Tokenizer::~Tokenizer() {
 bool Tokenizer::openFile(string filename, uint32_t offset, uint32_t length) {
 	// Open the file
 	wxFile file(filename);
+
+	name = filename;
 
 	// Check file opened
 	if (!file.IsOpened()) {
@@ -102,6 +105,8 @@ bool Tokenizer::openString(string text, uint32_t offset, uint32_t length) {
 	if (offset + length > (uint32_t) text.length() || length == 0)
 		length = (uint32_t) text.length() - offset;
 
+	name = text;
+
 	// Setup variables & allocate memory
 	size = length;
 	position = 0;
@@ -116,12 +121,14 @@ bool Tokenizer::openString(string text, uint32_t offset, uint32_t length) {
 /* Tokenizer::openMem
  * Reads a chunk of memory to the Tokenizer
  *******************************************************************/
-bool Tokenizer::openMem(const char* mem, uint32_t length) {
+bool Tokenizer::openMem(const char* mem, uint32_t length, string source) {
 	// Length must be specified
 	if (length == 0) {
 		wxLogMessage("Tokenizer::openMem: length not specified");
 		return false;
 	}
+
+	name = source;
 
 	// Setup variables & allocate memory
 	size = length;
@@ -137,12 +144,14 @@ bool Tokenizer::openMem(const char* mem, uint32_t length) {
 /* Tokenizer::openMem
  * Reads a chunk of memory to the Tokenizer
  *******************************************************************/
-bool Tokenizer::openMem(const uint8_t* mem, uint32_t length) {
+bool Tokenizer::openMem(const uint8_t* mem, uint32_t length, string source) {
 	// Length must be specified
 	if (length == 0) {
 		wxLogMessage("Tokenizer::openMem: length not specified");
 		return false;
 	}
+
+	name = source;
 
 	// Setup variables & allocate memory
 	size = length;
@@ -158,12 +167,14 @@ bool Tokenizer::openMem(const uint8_t* mem, uint32_t length) {
 /* Tokenizer::openMem
  * Reads a chunk of memory to the Tokenizer
  *******************************************************************/
-bool Tokenizer::openMem(MemChunk * mem) {
+bool Tokenizer::openMem(MemChunk * mem, string source) {
 	// Needs to be valid
 	if (mem == NULL) {
 		wxLogMessage("Tokenizer::openMem: invalid MemChunk");
 		return false;
 	}
+
+	name = source;
 
 	// Setup variables & allocate memory
 	size = mem->getSize();
@@ -193,13 +204,6 @@ bool Tokenizer::isWhitespace(char p) {
  *******************************************************************/
 bool Tokenizer::isSpecialCharacter(char p) {
 
-	/*
-	// Check though special_tokens array
-	for (int a = 0; a < n_special_tokens; a++) {
-		if (p == special_tokens[a])
-			return true;
-	}
-	*/
 	// Check through special tokens string
 	for (unsigned a = 0; a < special.size(); a++) {
 		if (special[a] == p)

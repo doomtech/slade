@@ -252,7 +252,7 @@ bool MapEntryPanel::loadEntry(ArchiveEntry* entry) {
 
 		// Start parsing
 		Tokenizer tz;
-		tz.openMem(udmfdata->getData(), udmfdata->getSize());
+		tz.openMem(udmfdata->getData(), udmfdata->getSize(), thismap.head->getName());
 
 		// Get first token
 		string token = tz.getToken();
