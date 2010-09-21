@@ -611,7 +611,7 @@ void ArchiveManagerPanel::openFiles(wxArrayString& files) {
  * Closes all currently open archives
  *******************************************************************/
 bool ArchiveManagerPanel::closeAll() {
-	for (unsigned a = 0; a < theArchiveManager->numArchives(); a++) {
+	for (int a = 0; a < theArchiveManager->numArchives(); a++) {
 		if (!closeArchive(theArchiveManager->getArchive(a)))
 			return false;
 	}
