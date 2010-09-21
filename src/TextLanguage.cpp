@@ -114,6 +114,9 @@ void TextLanguage::copyTo(TextLanguage* copy) {
 	copy->comment_end = comment_end;
 	copy->preprocessor = preprocessor;
 	copy->case_sensitive = case_sensitive;
+	copy->k_lookup_url = k_lookup_url;
+	copy->c_lookup_url = c_lookup_url;
+	copy->f_lookup_url = f_lookup_url;
 
 	// Copy keywords
 	for (unsigned a = 0; a < keywords.size(); a++)
@@ -211,6 +214,33 @@ string TextLanguage::getAutocompletionList() {
 	return ret;
 }
 
+bool TextLanguage::isKeyword(string word) {
+	for (unsigned a = 0; a < keywords.size(); a++) {
+		if (keywords[a] == word)
+			return true;
+	}
+
+	return false;
+}
+
+bool TextLanguage::isConstant(string word) {
+	for (unsigned a = 0; a < constants.size(); a++) {
+		if (constants[a] == word)
+			return true;
+	}
+
+	return false;
+}
+
+bool TextLanguage::isFunction(string word) {
+	for (unsigned a = 0; a < functions.size(); a++) {
+		if (functions[a]->getName() == word)
+			return true;
+	}
+
+	return false;
+}
+
 TLFunction* TextLanguage::getFunction(string name) {
 	// Find function matching [name]
 	for (unsigned a = 0; a < functions.size(); a++) {
@@ -279,6 +309,18 @@ bool TextLanguage::readLanguageDefinition(MemChunk& mc) {
 			// Case sensitive
 			else if (s_cmpnocase(child->getName(), "case_sensitive"))
 				lang->setCaseSensitive(child->getBoolValue());
+
+			// Keyword lookup link
+			else if (s_cmpnocase(child->getName(), "keyword_link"))
+				lang->k_lookup_url = child->getStringValue();
+
+			// Constant lookup link
+			else if (s_cmpnocase(child->getName(), "constant_link"))
+				lang->c_lookup_url = child->getStringValue();
+
+			// Function lookup link
+			else if (s_cmpnocase(child->getName(), "function_link"))
+				lang->f_lookup_url = child->getStringValue();
 
 			// Keywords
 			else if (s_cmpnocase(child->getName(), "keywords")) {

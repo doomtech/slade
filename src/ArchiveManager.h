@@ -86,9 +86,6 @@ public:
 	ArchiveEntry*	getBookmark(unsigned index);
 	unsigned		numBookmarks() { return bookmarks.size(); }
 
-	// Misc
-	bool	openTextureEditor(uint32_t index);
-
 	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 };
 

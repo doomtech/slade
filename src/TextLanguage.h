@@ -37,18 +37,21 @@ private:
 	bool				k_upper;
 	bool				k_lower;
 	bool				k_caps;
+	string				k_lookup_url;
 
 	// Constants
 	vector<string>		constants;
 	bool				c_upper;
 	bool				c_lower;
 	bool				c_caps;
+	string				c_lookup_url;
 
 	// Functions
 	vector<TLFunction*>	functions;
 	bool				f_upper;
 	bool				f_lower;
 	bool				f_caps;
+	string				f_lookup_url;
 
 public:
 	TextLanguage(string id);
@@ -73,6 +76,14 @@ public:
 	string	getConstantsList();
 	string	getFunctionsList();
 	string	getAutocompletionList();
+
+	string	getKeywordLink() { return k_lookup_url; }
+	string	getConstantLink() { return c_lookup_url; }
+	string	getFunctionLink() { return f_lookup_url; }
+
+	bool	isKeyword(string word);
+	bool	isConstant(string word);
+	bool	isFunction(string word);
 
 	TLFunction*	getFunction(string name);
 

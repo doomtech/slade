@@ -752,23 +752,6 @@ ArchiveEntry* ArchiveManager::getBookmark(unsigned index) {
 	return bookmarks[index];
 }
 
-/* ArchiveManager::openTextureEditor
- * Announces that the texture editor for archive [index] should be
- * opened
- *******************************************************************/
-bool ArchiveManager::openTextureEditor(uint32_t index) {
-	// Check index
-	if (index >= open_archives.size())
-		return false;
-
-	// Announce
-	MemChunk mc(4);
-	mc.write(&index, 4);
-	announce("open_tex_editor", mc);
-
-	return true;
-}
-
 
 /* ArchiveManager::onAnnouncement
  * Called when an announcement is recieved from one of the archives

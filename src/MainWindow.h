@@ -101,6 +101,9 @@ public:
 	ArchiveEntry*			getCurrentEntry();
 	vector<ArchiveEntry*>	getCurrentEntrySelection();
 
+	void	openTextureEditor(Archive* archive);
+	void	openEntry(ArchiveEntry* entry);
+
 	// Events
 	void	onMenuItemClicked(wxCommandEvent &e);
 	void	onHTMLLinkClicked(wxHtmlLinkEvent &e);

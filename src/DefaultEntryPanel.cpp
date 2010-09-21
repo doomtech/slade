@@ -38,6 +38,7 @@
 #include "EntryOperations.h"
 #include "ArchiveManager.h"
 #include "HexEditorPanel.h"
+#include "MainWindow.h"
 
 
 /*******************************************************************
@@ -213,7 +214,8 @@ void DefaultEntryPanel::onBtnGfxModifyOffsets(wxCommandEvent& e) {
 }
 
 void DefaultEntryPanel::onBtnTextureEdit(wxCommandEvent& e) {
-	theArchiveManager->openTextureEditor(theArchiveManager->archiveIndex(entry->getParent()));
+	theMainWindow->openTextureEditor(entry->getParent());
+	//theArchiveManager->openTextureEditor(theArchiveManager->archiveIndex(entry->getParent()));
 }
 
 /*

@@ -186,6 +186,8 @@ TextEditor::TextEditor(wxWindow* parent, int id)
 	Bind(wxEVT_STC_CALLTIP_CLICK, &TextEditor::onCalltipClicked, this);
 	Bind(wxEVT_STC_DWELLSTART, &TextEditor::onMouseDwellStart, this);
 	Bind(wxEVT_STC_DWELLEND, &TextEditor::onMouseDwellEnd, this);
+	Bind(wxEVT_LEFT_DOWN, &TextEditor::onMouseDown, this);
+	Bind(wxEVT_KILL_FOCUS, &TextEditor::onFocusLoss, this);
 	dlg_fr->getBtnFindNext()->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextEditor::onFRDBtnFindNext, this);
 	dlg_fr->getBtnReplace()->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextEditor::onFRDBtnReplace, this);
 	dlg_fr->getBtnReplaceAll()->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextEditor::onFRDBtnReplaceAll, this);
@@ -483,17 +485,19 @@ void TextEditor::updateCalltip() {
 	if (!CallTipActive()) {
 		// No calltip currently showing, check if we're in a function
 		int pos = GetCurrentPos() - 1;
-		while (1) {
-			// Exit if we get to the start of the text
-			if (pos < 0)
-				return;
-
+		while (pos >= 0) {
 			// Get character
 			int chr = GetCharAt(pos);
 
-			// If we find a closing bracket, exit
-			if (chr == ')')
-				return;
+			// If we find a closing bracket, skip to matching brace
+			if (chr == ')') {
+				while (pos >= 0 && chr != '(') {
+					pos--;
+					chr = GetCharAt(pos);
+				}
+				pos--;
+				continue;
+			}
 
 			// If we find an opening bracket, try to open a calltip
 			if (chr == '(') {
@@ -510,33 +514,41 @@ void TextEditor::updateCalltip() {
 
 	if (ct_function) {
 		// Calltip currently showing, determine what arg we're at
-		int pos = GetCurrentPos() - 1;
+		int pos = ct_start+1;
 		int arg = 0;
-		while (1) {
-			// Exit if we get to the start of the text
-			if (pos < 0)
-				break;
-
+		while (pos < GetCurrentPos() && pos < GetTextLength()) {
 			// Get character
 			int chr = GetCharAt(pos);
 
-			// If we find a comma, increment the arg number
+			// If it's an opening brace, skip until closing (ie skip a function as an arg)
+			if (chr == '(') {
+				while (chr != ')') {
+					// Exit if we get to the current position or the end of the text
+					if (pos == GetCurrentPos() || pos == GetTextLength()-1)
+						break;
+
+					// Get next character
+					pos++;
+					chr = GetCharAt(pos);
+				}
+
+				pos++;
+				continue;
+			}
+
+			// If it's a comma, increment arg
 			if (chr == ',')
 				arg++;
 
-			// If we find a starting brace, exit
-			if (chr == '(')
-				break;
-
-			// If we find an ending brace, we're outside a function, so cancel the calltip
+			// If it's a closing brace, we're outside the function, so cancel the calltip
 			if (chr == ')') {
 				CallTipCancel();
 				ct_function = NULL;
 				return;
 			}
 
-			// Go to previous character
-			pos--;
+			// Go to next character
+			pos++;
 		}
 
 		// Update calltip string with the selected arg set and the current arg highlighted
@@ -560,7 +572,7 @@ void TextEditor::onKeyDown(wxKeyEvent& e) {
 		updateCalltip();
 
 	// Check for Ctrl+Space
-	if ((e.GetModifiers() == wxMOD_CONTROL) && (e.GetKeyCode() == WXK_SPACE)) {
+	else if ((e.GetModifiers() == wxMOD_CONTROL) && (e.GetKeyCode() == WXK_SPACE)) {
 		// Get word before cursor
 		string word = GetTextRange(WordStartPosition(GetCurrentPos(), true), GetCurrentPos());
 
@@ -689,6 +701,56 @@ void TextEditor::onMouseDwellStart(wxStyledTextEvent& e) {
 void TextEditor::onMouseDwellEnd(wxStyledTextEvent& e) {
 	if (!(ct_function && ct_function->nArgSets() > 1))
 		CallTipCancel();
+}
+
+void TextEditor::onMouseDown(wxMouseEvent& e) {
+	e.Skip();
+
+	// No language, no checks
+	if (!language)
+		return;
+
+	// Check for ctrl+left (web lookup)
+	if (e.LeftDown() && e.GetModifiers() == wxMOD_CONTROL) {
+		int pos = CharPositionFromPointClose(e.GetX(), e.GetY());
+		string word = GetTextRange(WordStartPosition(pos, true), WordEndPosition(pos, true));
+
+		if (!word.IsEmpty()) {
+			// Check for keyword
+			if (language->isKeyword(word)) {
+				string url = language->getKeywordLink();
+				if (!url.IsEmpty()) {
+					url.Replace("%s", word);
+					wxLaunchDefaultBrowser(url);
+				}
+			}
+
+			// Check for constant
+			else if (language->isConstant(word)) {
+				string url = language->getConstantLink();
+				if (!url.IsEmpty()) {
+					url.Replace("%s", word);
+					wxLaunchDefaultBrowser(url);
+				}
+			}
+
+			// Check for function
+			else if (language->isFunction(word)) {
+				string url = language->getFunctionLink();
+				if (!url.IsEmpty()) {
+					url.Replace("%s", word);
+					wxLaunchDefaultBrowser(url);
+				}
+			}
+
+			CallTipCancel();
+		}
+	}
+}
+
+void TextEditor::onFocusLoss(wxFocusEvent& e) {
+	CallTipCancel();
+	AutoCompCancel();
 }
 
 /* TextEditor::onFRDBtnFindNext

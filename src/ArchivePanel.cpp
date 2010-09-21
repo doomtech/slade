@@ -1085,7 +1085,7 @@ void ArchivePanel::handleAction(int menu_id) {
 
 	// Archive->Texture Editor
 	else if (menu_id == MainWindow::MENU_ARCHIVE_TEXEDITOR)
-		theArchiveManager->openTextureEditor(theArchiveManager->archiveIndex(archive));
+		theMainWindow->openTextureEditor(archive);
 
 	// Archive->Convert To...
 	else if (menu_id == MainWindow::MENU_ARCHIVE_CONVERTTO)
@@ -1388,7 +1388,7 @@ void ArchivePanel::onEntryListActivated(wxListEvent& e) {
 		theArchiveManager->openArchive(entry);
 
 	if (entry->getType()->getFormat() == "texturex")
-		theArchiveManager->openTextureEditor(theArchiveManager->archiveIndex(archive));
+		theMainWindow->openTextureEditor(archive);
 
 	e.Skip();
 }

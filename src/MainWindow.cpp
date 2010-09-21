@@ -373,6 +373,13 @@ vector<ArchiveEntry*> MainWindow::getCurrentEntrySelection() {
 	return panel_archivemanager->currentEntrySelection();
 }
 
+void MainWindow::openTextureEditor(Archive* archive) {
+	panel_archivemanager->openTextureTab(theArchiveManager->archiveIndex(archive));
+}
+
+void MainWindow::openEntry(ArchiveEntry* entry) {
+}
+
 
 /*******************************************************************
  * MAINWINDOW EVENTS
