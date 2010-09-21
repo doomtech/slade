@@ -89,7 +89,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>FreeImage.lib;wxbase29u.lib;wxmsw29u_core.lib;wxmsw29u_aui.lib;wxmsw29u_gl.lib;wxmsw29u_html.lib;wxmsw29u_adv.lib;wxmsw29u_stc.lib;wxtiff.lib;wxjpeg.lib;wxpng.lib;wxzlib.lib;wxregexu.lib;wxexpat.lib;wxscintilla.lib;winmm.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>FreeImage.lib;wxbase29u.lib;wxmsw29u_core.lib;wxmsw29u_aui.lib;wxmsw29u_gl.lib;wxmsw29u_html.lib;wxmsw29u_adv.lib;wxmsw29u_stc.lib;wxmsw29u_media.lib;wxtiff.lib;wxjpeg.lib;wxpng.lib;wxzlib.lib;wxregexu.lib;wxexpat.lib;wxscintilla.lib;winmm.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <EnableUAC>false</EnableUAC>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -104,6 +104,7 @@
   <ItemGroup>
     <ClCompile Include="src\ArchiveEntryList.cpp" />
     <ClCompile Include="src\ArchiveOperations.cpp" />
+    <ClCompile Include="src\AudioEntryPanel.cpp" />
     <ClCompile Include="src\BaseResourceChooser.cpp" />
     <ClCompile Include="src\BrowserItem.cpp" />
     <ClCompile Include="src\BrowserWindow.cpp" />
@@ -196,6 +197,7 @@
     <ClInclude Include="src\ArchiveEntryList.h" />
     <ClInclude Include="src\ArchiveFormats.h" />
     <ClInclude Include="src\ArchiveOperations.h" />
+    <ClInclude Include="src\AudioEntryPanel.h" />
     <ClInclude Include="src\AudioFormats.h" />
     <ClInclude Include="src\BaseResourceChooser.h" />
     <ClInclude Include="src\BrowserItem.h" />

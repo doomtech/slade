@@ -43,6 +43,7 @@
 #include "SwitchesEntryPanel.h"
 #include "HexEntryPanel.h"
 #include "MapEntryPanel.h"
+#include "AudioEntryPanel.h"
 #include "GfxConvDialog.h"
 #include "ModifyOffsetsDialog.h"
 #include "EntryOperations.h"
@@ -96,6 +97,7 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 	switches_area = new SwitchesEntryPanel(this);
 	hex_area = new HexEntryPanel(this);
 	map_area = new MapEntryPanel(this);
+	audio_area = new AudioEntryPanel(this);
 
 
 	// --- Setup Layout ---
@@ -960,6 +962,8 @@ bool ArchivePanel::openEntry(ArchiveEntry* entry, bool force) {
 		new_area = animated_area;
 	else if (!entry->getType()->getEditor().Cmp("switches"))
 		new_area = switches_area;
+	else if (s_cmpnocase(entry->getType()->getEditor(), "audio"))
+		new_area = audio_area;
 	else if (!entry->getType()->getEditor().Cmp("default"))
 		new_area = default_area;
 	else

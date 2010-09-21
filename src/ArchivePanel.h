@@ -31,6 +31,7 @@ protected:
 	EntryPanel* pnames_area;
 	EntryPanel* hex_area;
 	EntryPanel* map_area;
+	EntryPanel* audio_area;
 
 public:
 	ArchivePanel(wxWindow *parent, Archive* archive);

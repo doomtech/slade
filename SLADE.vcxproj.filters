@@ -351,6 +351,9 @@
     <ClCompile Include="src\TextStyle.cpp">
       <Filter>UI Elements\TextEditor</Filter>
     </ClCompile>
+    <ClCompile Include="src\AudioEntryPanel.cpp">
+      <Filter>Main Editor\UI Elements\EntryPanel</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -647,6 +650,9 @@
     </ClInclude>
     <ClInclude Include="src\TextStyle.h">
       <Filter>UI Elements\TextEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\AudioEntryPanel.h">
+      <Filter>Main Editor\UI Elements\EntryPanel</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
