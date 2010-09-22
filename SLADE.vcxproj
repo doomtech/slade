@@ -131,6 +131,7 @@
     <ClCompile Include="src\PreferencesDialog.cpp" />
     <ClCompile Include="src\ResArchive.cpp" />
     <ClCompile Include="src\SImageFormats.cpp" />
+    <ClCompile Include="src\TextEditorPrefsPanel.cpp" />
     <ClCompile Include="src\TextLanguage.cpp" />
     <ClCompile Include="src\TextStyle.cpp" />
     <ClCompile Include="src\TextureXPanel.cpp" />
@@ -230,6 +231,7 @@
     <ClInclude Include="src\PreferencesDialog.h" />
     <ClInclude Include="src\ResArchive.h" />
     <ClInclude Include="src\Structs.h" />
+    <ClInclude Include="src\TextEditorPrefsPanel.h" />
     <ClInclude Include="src\TextLanguage.h" />
     <ClInclude Include="src\TextStyle.h" />
     <ClInclude Include="src\TextureXPanel.h" />

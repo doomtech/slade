@@ -58,9 +58,6 @@
     <Filter Include="UI Elements\Browser">
       <UniqueIdentifier>{2bb47c0d-bf68-47e1-bc1c-ce7926a17d1a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="UI Elements\Options">
-      <UniqueIdentifier>{c7c973ec-b572-4b0a-87f2-0b305f2122ea}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Resources\Archive\EntryType">
       <UniqueIdentifier>{d894001c-5335-4237-9b18-60440a1e6a60}</UniqueIdentifier>
     </Filter>
@@ -81,6 +78,9 @@
     </Filter>
     <Filter Include="General\Console">
       <UniqueIdentifier>{511149d3-5ded-4b1c-b004-d65769996d9d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dialogs\Preferences">
+      <UniqueIdentifier>{22c29a05-108c-473f-a3cc-a3a235cea9e5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -234,9 +234,6 @@
     <ClCompile Include="src\TextureXList.cpp">
       <Filter>Resources\Graphics\Composite Texture</Filter>
     </ClCompile>
-    <ClCompile Include="src\BaseResourceArchivesPanel.cpp">
-      <Filter>UI Elements\Options</Filter>
-    </ClCompile>
     <ClCompile Include="src\ColourBox.cpp">
       <Filter>UI Elements</Filter>
     </ClCompile>
@@ -324,9 +321,6 @@
     <ClCompile Include="src\PatchBrowser.cpp">
       <Filter>Main Editor\UI Elements\TextureXEditor</Filter>
     </ClCompile>
-    <ClCompile Include="src\PreferencesDialog.cpp">
-      <Filter>Dialogs</Filter>
-    </ClCompile>
     <ClCompile Include="src\HexEntryPanel.cpp">
       <Filter>Main Editor\UI Elements\EntryPanel</Filter>
     </ClCompile>
@@ -353,6 +347,15 @@
     </ClCompile>
     <ClCompile Include="src\AudioEntryPanel.cpp">
       <Filter>Main Editor\UI Elements\EntryPanel</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PreferencesDialog.cpp">
+      <Filter>Dialogs\Preferences</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BaseResourceArchivesPanel.cpp">
+      <Filter>Dialogs\Preferences</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TextEditorPrefsPanel.cpp">
+      <Filter>Dialogs\Preferences</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -515,9 +518,6 @@
     <ClInclude Include="src\SFont.h">
       <Filter>Resources\Graphics\Font</Filter>
     </ClInclude>
-    <ClInclude Include="src\BaseResourceArchivesPanel.h">
-      <Filter>UI Elements\Options</Filter>
-    </ClInclude>
     <ClInclude Include="resource.h" />
     <ClInclude Include="src\ColourBox.h">
       <Filter>UI Elements</Filter>
@@ -624,9 +624,6 @@
     <ClInclude Include="src\PatchBrowser.h">
       <Filter>Main Editor\UI Elements\TextureXEditor</Filter>
     </ClInclude>
-    <ClInclude Include="src\PreferencesDialog.h">
-      <Filter>Dialogs</Filter>
-    </ClInclude>
     <ClInclude Include="src\HexEntryPanel.h">
       <Filter>Main Editor\UI Elements\EntryPanel</Filter>
     </ClInclude>
@@ -653,6 +650,15 @@
     </ClInclude>
     <ClInclude Include="src\AudioEntryPanel.h">
       <Filter>Main Editor\UI Elements\EntryPanel</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PreferencesDialog.h">
+      <Filter>Dialogs\Preferences</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BaseResourceArchivesPanel.h">
+      <Filter>Dialogs\Preferences</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TextEditorPrefsPanel.h">
+      <Filter>Dialogs\Preferences</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
