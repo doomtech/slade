@@ -1500,23 +1500,6 @@ Archive * CH::getCurrentArchive() {
 	return NULL;
 }
 
-ArchiveEntry * CH::getCurrentArchiveEntry() {
-	if (CH::getCurrentArchivePanel())
-	{
-		return CH::getCurrentArchivePanel()->currentEntry();
-	}
-	return NULL;
-}
-
-vector<ArchiveEntry*> CH::getCurrentArchiveEntries() {
-	vector<ArchiveEntry*> blank;
-	if (CH::getCurrentArchivePanel())
-	{
-		return CH::getCurrentArchivePanel()->currentEntries();
-	}
-	return blank;
-}
-
 ArchivePanel * CH::getCurrentArchivePanel() {
 	if (theApp->getMainWindow())
 	{

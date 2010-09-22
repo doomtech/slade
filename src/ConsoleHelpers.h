@@ -4,15 +4,12 @@
 
 // No #includes, they're a headache
 class Archive;
-class ArchiveEntry;
 class ArchivePanel;
 class GfxEntryPanel;
 
 // Console helpers
 namespace CH {
 	Archive*				getCurrentArchive();
-	ArchiveEntry*			getCurrentArchiveEntry();
-	vector<ArchiveEntry*>	getCurrentArchiveEntries();
 	ArchivePanel*			getCurrentArchivePanel();
 	GfxEntryPanel*			getCurrentGfxPanel();
 }

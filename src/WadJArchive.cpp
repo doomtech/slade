@@ -29,6 +29,7 @@
  * INCLUDES
  *******************************************************************/
 #include "Main.h"
+#include "MainWindow.h"
 #include "WadJArchive.h"
 #include "SplashWindow.h"
 #include <wx/log.h>
@@ -481,7 +482,7 @@ bool WadJArchive::isWadJArchive(string filename) {
 #include "Console.h"
 
 CONSOLE_COMMAND(decode, 0) {
-	vector<ArchiveEntry *> meep = CH::getCurrentArchiveEntries();
+	vector<ArchiveEntry *> meep = theMainWindow->getCurrentEntrySelection();
 	if (meep.size() == 0) {
 		wxLogMessage("No entry selected");
 		return;

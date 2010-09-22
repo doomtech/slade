@@ -272,6 +272,55 @@ public:
 	}
 };
 
+class MP3DataFormat : public EntryDataFormat {
+public:
+	MP3DataFormat() : EntryDataFormat("snd_mp3") {};
+	~MP3DataFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		// Check size
+		if (mc.getSize() > 4) {
+			// Check for MP3 frame header. Here it starts directly with a frame.
+			// Is there a way to guess the length of a frame and check whether
+			// what's after is another frame, a tag, or the end of the file?
+			if (mc[0] == 0xFF && mc[1] ==  0xFB)
+				return EDF_MAYBE;
+		}
+		// But it's more likely to start with an ID3 tag.
+		if (mc.getSize() > 14) {
+			// Check for ID3 header (ID3v2). Version and revision numbers cannot be FF.
+			// Only the four upper flags are valid.
+			if (mc[0] == 'I' && mc[1] == 'D' && mc[2] == '3' && 
+				mc[3] != 0xFF && mc[4] != 0xFF && ((mc[5] & 0x0F) == 0) &&
+				mc[6] < 0x80 && mc[7] < 0x80 && mc[8] < 0x80 && mc[9] < 0x80)
+			{
+				// Compute size. It is stored as a "synchsafe integer", that is to say,
+				// a big-endian value where the highest bit of each byte is not used.
+				size_t size = (mc[6] << 21) + (mc[7] << 14) + (mc[8] << 7) + mc[9] + 10;
+				// If there is a footer, then add 10 more to the size
+				if (mc[5] & 0x10) size += 10;
+				// Needs to be at least that big
+				if (mc.getSize() < size + 4)
+					return EDF_FALSE;
+				// Check for audio data at the end of the tag
+				if (mc[0+size] == 0xFF && mc[1+size] ==  0xFB)
+					return EDF_TRUE;
+			}
+		}
+		// It's also possible to get an ID3v1 (or v1.1) tag.
+		// Though normally they're at the end of the file.
+		if (mc.getSize() > 132) {
+			// Check for ID3 header (ID3v1)	followed by MP3 frame header.
+			if (mc[0] == 'T' && mc[1] == 'A' && mc[2] == 'G'
+				&& mc[128] == 0xFF && mc[129] == 0xFB)
+			{
+				return EDF_PROBABLY;
+			}
+		}
+		return EDF_FALSE;
+	}
+};
+
 class VocDataFormat : public EntryDataFormat {
 public:
 	VocDataFormat() : EntryDataFormat("snd_voc") {};

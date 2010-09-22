@@ -185,6 +185,7 @@ void EntryDataFormat::initBuiltinFormats() {
 	new WAVDataFormat();
 	new OggDataFormat();
 	new FLACDataFormat();
+	new MP3DataFormat();
 	new TextureXDataFormat();
 	new PNamesDataFormat();
 	new BoomAnimatedDataFormat();

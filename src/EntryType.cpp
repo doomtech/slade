@@ -27,6 +27,7 @@
  * INCLUDES
  *******************************************************************/
 #include "Main.h"
+#include "MainWindow.h"
 #include "EntryType.h"
 #include "Tokenizer.h"
 #include "Console.h"
@@ -652,7 +653,7 @@ CONSOLE_COMMAND (type, 0) {
 
 		// Allow to force type change even if format checks fails (use at own risk!)
 		int okay = 0, force = !(args.size() < 2 || args[1].CmpNoCase("force"));
-		vector<ArchiveEntry *> meep = CH::getCurrentArchiveEntries();
+		vector<ArchiveEntry *> meep = theMainWindow->getCurrentEntrySelection();
 		if (meep.size() == 0) {
 			wxLogMessage("No entry selected");
 			return;
@@ -687,7 +688,7 @@ CONSOLE_COMMAND (type, 0) {
 }
 
 CONSOLE_COMMAND (size, 0) {
-	ArchiveEntry * meep = CH::getCurrentArchiveEntry();
+	ArchiveEntry * meep = theMainWindow->getCurrentEntry();
 	if (!meep) {
 		wxLogMessage("No entry selected");
 		return;
