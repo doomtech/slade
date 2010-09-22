@@ -442,13 +442,22 @@ int TextEditor::replaceAll(string find, string replace) {
  * Checks for a brace match at the current cursor position
  *******************************************************************/
 void TextEditor::checkBraceMatch() {
+	// Check for brace match at current position
 	int bracematch = BraceMatch(GetCurrentPos());
-
-	if (bracematch == wxSTC_INVALID_POSITION)
-		BraceHighlight(-1, -1);
-	else {
+	if (bracematch != wxSTC_INVALID_POSITION) {
 		BraceHighlight(GetCurrentPos(), bracematch);
+		return;
 	}
+
+	// No match, check for match at previous position
+	bracematch = BraceMatch(GetCurrentPos() - 1);
+	if (bracematch != wxSTC_INVALID_POSITION) {
+		BraceHighlight(GetCurrentPos() - 1, bracematch);
+		return;
+	}
+
+	// No match at all, clear any previous brace match
+	BraceHighlight(-1, -1);
 }
 
 /* TextEditor::openCalltip

@@ -36,11 +36,11 @@ ObjectSwitch           :=-o
 ArchiveOutputSwitch    := 
 PreprocessOnlySwitch   :=-E 
 MakeDirCommand         :=mkdir -p
-CmpOptions             := -O2 $(shell wx-config --cxxflags std,gl,stc,aui,media --unicode=yes --debug=no) $(Preprocessors)
-LinkOptions            :=  -s $(shell wx-config --debug=no --libs std,gl,stc,aui,media --unicode=yes)
+CmpOptions             := -O2 $(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no) $(Preprocessors)
+LinkOptions            :=  -s $(shell wx-config --debug=no --libs std,gl,stc,aui --unicode=yes)
 IncludePath            :=  "$(IncludeSwitch)." 
 RcIncludePath          :=
-Libs                   :=$(LibrarySwitch)freeimage 
+Libs                   :=$(LibrarySwitch)freeimage $(LibrarySwitch)audiere 
 LibPath                := "$(LibraryPathSwitch)." 
 
 

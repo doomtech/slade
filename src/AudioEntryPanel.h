@@ -3,16 +3,28 @@
 #define __AUDIO_ENTRY_PANEL_H__
 
 #include "EntryPanel.h"
-#include <wx/mediactrl.h>
+
+// Need to undef some stuff for audiere.h to work
+#undef vector
+#include <audiere.h>
+using namespace audiere;
+#define vector std::vector
 
 class AudioEntryPanel : public EntryPanel {
 private:
-	wxMediaCtrl*	media_player;
 	string			prevfile;
+
+	OutputStreamPtr	stream;
 
 	wxBitmapButton*	btn_play;
 	wxBitmapButton*	btn_pause;
 	wxBitmapButton*	btn_stop;
+	wxSlider*		slider_seek;
+	wxSlider*		slider_volume;
+	wxTimer*		timer_seek;
+
+	// Global audio device
+	static AudioDevicePtr	device;
 
 public:
 	AudioEntryPanel(wxWindow* parent);
@@ -25,6 +37,8 @@ public:
 	void	onBtnPlay(wxCommandEvent& e);
 	void	onBtnPause(wxCommandEvent& e);
 	void	onBtnStop(wxCommandEvent& e);
+	void	onTimer(wxTimerEvent& e);
+	void	onSliderSeekChanged(wxCommandEvent& e);
 };
 
 #endif//__AUDIO_ENTRY_PANEL_H__
