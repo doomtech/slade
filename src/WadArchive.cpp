@@ -662,6 +662,7 @@ vector<Archive::mapdesc_t> WadArchive::detectMaps() {
 
 	// Go through all lumps
 	ArchiveEntry* entry = getEntry(0);
+	bool lastentryismapentry = false;
 	while (entry) {
 		// UDMF format map check ********************************************************
 
@@ -743,16 +744,16 @@ vector<Archive::mapdesc_t> WadArchive::detectMaps() {
 
 				// If we're at the end of the wad, exit the loop
 				if (!entry->nextEntry()) {
-					entry = entry->prevEntry();
+					lastentryismapentry = true;
 					break;
 				}
 
-				// Go to next lump
-				entry = entry->nextEntry();
+				// Go to next lump if there is one
+				if (!lastentryismapentry) entry = entry->nextEntry();
 			}
 
-			// Go back to the lump just after the last map lump found
-			entry = entry->prevEntry();
+			// Go back to the lump just after the last map lump found, but only if we actually moved
+			if (!lastentryismapentry) entry = entry->prevEntry();
 
 			// Check that we have all the required map lumps: VERTEXES, LINEDEFS, SIDEDEFS, THINGS & SECTORS
 			if (!memchr(existing_map_lumps, 0, 5)) {
@@ -760,7 +761,8 @@ vector<Archive::mapdesc_t> WadArchive::detectMaps() {
 				mapdesc_t md;
 				md.head = header_entry;				// Header lump
 				md.name = header_entry->getName();	// Map title
-				md.end = entry->prevEntry();		// End lump
+				md.end = lastentryismapentry ?		// End lump
+					entry : entry->prevEntry();
 
 				// If BEHAVIOR lump exists, it's a hexen format map
 				if (existing_map_lumps[LUMP_BEHAVIOR])
