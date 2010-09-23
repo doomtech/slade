@@ -25,6 +25,8 @@ TODO List ---------------------------------------------------------------
 
 --- Bugs ---
 - Copy/paste entry parent problem
+- Improve parser to allow special characters in quoted strings so as to get rid of 
+  "Parsing error: Unexpected special character ';' in hexen.txt" at startup.
 
 --- Editor Features ---
 - Map editor (!)

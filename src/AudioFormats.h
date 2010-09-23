@@ -283,7 +283,7 @@ public:
 			// Check for MP3 frame header. Here it starts directly with a frame.
 			// Is there a way to guess the length of a frame and check whether
 			// what's after is another frame, a tag, or the end of the file?
-			if (mc[0] == 0xFF && mc[1] ==  0xFB)
+			if (mc[0] == 0xFF && (mc[1] ==  0xFB || mc[1] ==  0xFA))
 				return EDF_MAYBE;
 		}
 		// But it's more likely to start with an ID3 tag.
@@ -303,7 +303,7 @@ public:
 				if (mc.getSize() < size + 4)
 					return EDF_FALSE;
 				// Check for audio data at the end of the tag
-				if (mc[0+size] == 0xFF && mc[1+size] ==  0xFB)
+				if (mc[0+size] == 0xFF && (mc[1+size] ==  0xFB || mc[1+size] ==  0xFA))
 					return EDF_TRUE;
 			}
 		}
@@ -312,7 +312,7 @@ public:
 		if (mc.getSize() > 132) {
 			// Check for ID3 header (ID3v1)	followed by MP3 frame header.
 			if (mc[0] == 'T' && mc[1] == 'A' && mc[2] == 'G'
-				&& mc[128] == 0xFF && mc[129] == 0xFB)
+				&& mc[128] == 0xFF && (mc[129] == 0xFB || mc[129] == 0xFA))
 			{
 				return EDF_PROBABLY;
 			}
