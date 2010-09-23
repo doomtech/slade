@@ -13,8 +13,10 @@ using namespace audiere;
 class AudioEntryPanel : public EntryPanel {
 private:
 	string			prevfile;
+	bool			midi;
 
 	OutputStreamPtr	stream;
+	MIDIStreamPtr	stream_midi;
 
 	wxBitmapButton*	btn_play;
 	wxBitmapButton*	btn_pause;
@@ -25,6 +27,7 @@ private:
 
 	// Global audio device
 	static AudioDevicePtr	device;
+	static MIDIDevicePtr	device_midi;
 
 public:
 	AudioEntryPanel(wxWindow* parent);
@@ -33,12 +36,19 @@ public:
 	bool	loadEntry(ArchiveEntry* entry);
 	bool	saveEntry();
 
+	bool	openAudio(string filename);
+	bool	openMidi(string filename);
+	void	startStream();
+	void	stopStream();
+	void	resetStream();
+
 	// Events
 	void	onBtnPlay(wxCommandEvent& e);
 	void	onBtnPause(wxCommandEvent& e);
 	void	onBtnStop(wxCommandEvent& e);
 	void	onTimer(wxTimerEvent& e);
 	void	onSliderSeekChanged(wxCommandEvent& e);
+	void	onSliderVolumeChanged(wxCommandEvent& e);
 };
 
 #endif//__AUDIO_ENTRY_PANEL_H__
