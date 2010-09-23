@@ -108,6 +108,7 @@
     <ClCompile Include="src\BaseResourceChooser.cpp" />
     <ClCompile Include="src\BrowserItem.cpp" />
     <ClCompile Include="src\BrowserWindow.cpp" />
+    <ClCompile Include="src\Conversions.cpp" />
     <ClCompile Include="src\DatArchive.cpp" />
     <ClCompile Include="src\EntryDataFormat.cpp" />
     <ClCompile Include="src\GfxConvDialog.cpp" />
@@ -129,6 +130,7 @@
     <ClCompile Include="src\Parser.cpp" />
     <ClCompile Include="src\PatchBrowser.cpp" />
     <ClCompile Include="src\PreferencesDialog.cpp" />
+    <ClCompile Include="src\qmus2mid\qmus2mid.cpp" />
     <ClCompile Include="src\ResArchive.cpp" />
     <ClCompile Include="src\SImageFormats.cpp" />
     <ClCompile Include="src\TextEditorPrefsPanel.cpp" />
@@ -204,6 +206,7 @@
     <ClInclude Include="src\BrowserItem.h" />
     <ClInclude Include="src\BrowserWindow.h" />
     <ClInclude Include="src\ConsoleHelpers.h" />
+    <ClInclude Include="src\Conversions.h" />
     <ClInclude Include="src\DatArchive.h" />
     <ClInclude Include="src\EntryDataFormat.h" />
     <ClInclude Include="src\GfxConvDialog.h" />
@@ -229,6 +232,7 @@
     <ClInclude Include="src\Parser.h" />
     <ClInclude Include="src\PatchBrowser.h" />
     <ClInclude Include="src\PreferencesDialog.h" />
+    <ClInclude Include="src\qmus2mid\qmus2mid.h" />
     <ClInclude Include="src\ResArchive.h" />
     <ClInclude Include="src\Structs.h" />
     <ClInclude Include="src\TextEditorPrefsPanel.h" />

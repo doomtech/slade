@@ -3,6 +3,7 @@
 #include "WxStuff.h"
 #include "AudioEntryPanel.h"
 #include "Icons.h"
+#include "Conversions.h"
 #include <wx/filename.h>
 #include <wx/gbsizer.h>
 #include <wx/statline.h>
@@ -80,19 +81,39 @@ bool AudioEntryPanel::loadEntry(ArchiveEntry* entry) {
 	if (wxFileExists(prevfile))
 		wxRemoveFile(prevfile);
 
-	// Dump entry to temp file
+	// Get entry data
+	MemChunk& mcdata = entry->getMCData();
+
+	// Setup temp filename
 	wxFileName path(appPath(entry->getName(), DIR_TEMP));
 	// Add extension if missing
 	if (path.GetExt().IsEmpty())
 		path.SetExt(entry->getType()->getExtension());
-	entry->exportFile(path.GetFullPath());
 	prevfile = path.GetFullPath();
+
+	// Convert if necessary, then write to file
+	if (entry->getType()->getFormat() == "snd_doom") {
+		// Doom Sound -> WAV
+		MemChunk convdata;
+		Conversions::doomSndToWav(mcdata, convdata);
+		path.SetExt("wav");
+		convdata.exportFile(path.GetFullPath());
+	}
+	else if (entry->getType()->getFormat() == "mus") {
+		// MUS -> MIDI
+		MemChunk convdata;
+		Conversions::musToMidi(mcdata, convdata);
+		path.SetExt("mid");
+		convdata.exportFile(path.GetFullPath());
+	}
+	else
+		mcdata.exportFile(path.GetFullPath());
 
 	// Reset seek slider
 	slider_seek->SetValue(0);
 
 	// Open it
-	if (entry->getType()->getFormat() == "midi") {
+	if (entry->getType()->getFormat() == "midi" || entry->getType()->getFormat() == "mus") {
 		openMidi(path.GetFullPath());
 		midi = true;
 	}
