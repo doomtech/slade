@@ -90,6 +90,7 @@ public:
 	// Miscellaneous operations
 	bool	rotate(int angle);
 	bool	mirror(bool vert);
+	bool	crop(long x1, long y1, long x2, long y2);
 };
 
 #endif //__SIMAGE_H__

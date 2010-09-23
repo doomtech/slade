@@ -1501,14 +1501,11 @@ Archive * CH::getCurrentArchive() {
 }
 
 ArchivePanel * CH::getCurrentArchivePanel() {
-	if (theApp->getMainWindow())
+	ArchiveManagerPanel * archie = theMainWindow->getArchiveManagerPanel();
+	if (archie)
 	{
-		ArchiveManagerPanel * archie = theApp->getMainWindow()->getArchiveManagerPanel();
-		if (archie)
-		{
-			if (archie->isArchivePanel(archie->currentTabIndex()))
-				return (ArchivePanel *)(archie->currentPanel());
-		}
+		if (archie->isArchivePanel(archie->currentTabIndex()))
+			return (ArchivePanel *)(archie->currentPanel());
 	}
 	return NULL;
 }

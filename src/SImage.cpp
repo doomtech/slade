@@ -730,3 +730,50 @@ bool SImage::mirror(bool vertical) {
 	announce("image_changed");
 	return true;
 }
+
+/* SImage::crop
+ * Crops a section of the image.
+ *******************************************************************/
+bool SImage::crop(long x1, long y1, long x2, long y2) {
+
+	if (x2 == 0 || x2 > width) x2 = width;
+	if (y2 == 0 || y2 > height) y2 = height;
+
+	// No need to bother with incorrect values
+	if (x2 <= x1 || y2 <= y1 || x1 > width || y1 > height)
+		return false;
+
+	uint8_t * nd, * nm;
+	size_t nw, nh;
+	nw = x2 - x1;
+	nh = y2 - y1;
+
+	// Compute numbers of pixels and bytes
+	int numpixels = nw*nh; int numbpp = 0;
+	if (format==PALMASK)	numbpp = 1;
+	else if (format==RGBA)	numbpp = 4;
+	else return false;
+
+	// Create new data and mask
+	nd = new uint8_t[numpixels*numbpp];
+	if (mask) nm = new uint8_t[numpixels*numbpp];
+	else nm = NULL;
+
+	// Remapping loop
+	size_t i, a, b;
+	for (i = 0; i < nh; ++i) {
+		a = i*nw*numbpp;
+		b = (((i+y1)*width)+x1)*numbpp;
+		memcpy(nd+a, data+b, nw*numbpp);
+		if (mask) memcpy(nm+a, mask+b, nw*numbpp);
+	}
+
+	// It worked, yay
+	clearData();
+	data = nd; mask = nm;
+	width = nw; height = nh;
+
+	// Announce change
+	announce("image_changed");
+	return true;
+}

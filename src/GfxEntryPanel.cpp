@@ -458,16 +458,13 @@ void GfxEntryPanel::onGfxOffsetChanged(wxEvent& e) {
 #include "MainWindow.h"
 
 GfxEntryPanel * CH::getCurrentGfxPanel() {
-	if (theApp->getMainWindow())
+	ArchiveManagerPanel * archie = theMainWindow->getArchiveManagerPanel();
+	if (archie)
 	{
-		ArchiveManagerPanel * archie = theApp->getMainWindow()->getArchiveManagerPanel();
-		if (archie)
-		{
-			EntryPanel* panie = archie->currentArea();
-			if (panie) {
-				if (!(panie->GetName().CmpNoCase("gfx"))) {
-					return (GfxEntryPanel *)panie;
-				}
+		EntryPanel* panie = archie->currentArea();
+		if (panie) {
+			if (!(panie->GetName().CmpNoCase("gfx"))) {
+				return (GfxEntryPanel *)panie;
 			}
 		}
 	}
@@ -503,6 +500,7 @@ CONSOLE_COMMAND(rotate, 1) {
 	ArchiveEntry * bar = foo->currentEntry();
 	if (!bar) {
 		wxLogMessage("No active entry.");
+		return;
 	}
 	GfxEntryPanel * meep = CH::getCurrentGfxPanel();
 	if (!meep) {
@@ -544,6 +542,7 @@ CONSOLE_COMMAND (mirror, 1) {
 	ArchiveEntry * bar = foo->currentEntry();
 	if (!bar) {
 		wxLogMessage("No active entry.");
+		return;
 	}
 	GfxEntryPanel * meep = CH::getCurrentGfxPanel();
 	if (!meep) {
@@ -554,5 +553,39 @@ CONSOLE_COMMAND (mirror, 1) {
 	{
 		meep->getImage()->mirror(vertical);
 		meep->refresh();
+		MemChunk mc;
+		meep->getImage()->safeConvert(mc);
+		bar->importMemChunk(mc);
 	}
 }
+
+CONSOLE_COMMAND (crop, 4) {
+	long x1, y1, x2, y2;
+	if (args[0].ToLong(&x1) && args[1].ToLong(&y1) && args[2].ToLong(&x2) && args[3].ToLong(&y2))
+	{
+		ArchivePanel * foo = CH::getCurrentArchivePanel();
+		if (!foo) {
+			wxLogMessage("No active panel.");
+			return;
+		}
+		GfxEntryPanel * meep = CH::getCurrentGfxPanel();
+		if (!meep) {
+			wxLogMessage("No image selected.");
+			return;
+		}
+		ArchiveEntry * bar = foo->currentEntry();
+		if (!bar) {
+			wxLogMessage("No active entry.");
+			return;
+		}
+		if (meep->getImage())
+		{
+			meep->getImage()->crop(x1, y1, x2, y2);
+			meep->refresh();
+			MemChunk mc;
+			meep->getImage()->safeConvert(mc);
+			bar->importMemChunk(mc);
+		}
+	}
+}
+
