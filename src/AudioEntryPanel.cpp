@@ -71,6 +71,17 @@ bool AudioEntryPanel::loadEntry(ArchiveEntry* entry) {
 			slider_seek->Enable();
 			slider_seek->SetRange(0, length);
 		}
+
+		// Enable play controls
+		btn_play->Enable();
+		btn_pause->Enable();
+		btn_stop->Enable();
+	}
+	else {
+		// Unable to open audio, disable play controls
+		btn_play->Enable(false);
+		btn_pause->Enable(false);
+		btn_stop->Enable(false);
 	}
 
 	return true;

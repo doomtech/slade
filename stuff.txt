@@ -12,13 +12,15 @@ TODO List ---------------------------------------------------------------
 	- Patch browser
 	- Copy+Paste textures
 - Text editor special features:
-	- Web lookup for k/c/f
 	- Preferences:
 		- Option to clear empty lines / unneeded whitespace on save
 		- Colour configuration (separate from global colour config?)
 		- Font configuration
 		- Tab size
-- Media panel
+- Basic audio format conversions:
+	- Doom sound <-> WAV
+	- MUS <-> MIDI
+	- (?) PC Speaker -> WAV
 - 'Export As' for both entries and archives - does conversion+export
 
 --- Bugs ---

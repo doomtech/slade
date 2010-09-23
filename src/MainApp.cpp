@@ -308,6 +308,10 @@ bool MainApp::OnInit() {
 	wxLogMessage("Loading text languages");
 	TextLanguage::loadLanguages();
 
+	// Show the main window
+	theMainWindow->Show(true);
+	theSplashWindow->SetParent(theMainWindow);
+
 	// Open any archives on the command line
 	// argv[0] is normally the executable itself (i.e. Slade.exe)
 	// and opening it as an archive should not be attempted...
@@ -315,10 +319,6 @@ bool MainApp::OnInit() {
 		string arg = argv[a];
 		theArchiveManager->openArchive(arg);
 	}
-
-	// Show the main window
-	theMainWindow->Show(true);
-	theSplashWindow->SetParent(theMainWindow);
 
 	// Hide splash screen
 	theSplashWindow->hide();
