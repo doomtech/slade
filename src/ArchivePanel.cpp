@@ -53,6 +53,7 @@
 #include "SplashWindow.h"
 #include "ArchiveOperations.h"
 #include "Icons.h"
+#include "Conversions.h"
 #include <wx/aui/auibook.h>
 #include <wx/filename.h>
 #include <wx/gbsizer.h>
@@ -71,6 +72,9 @@ const int MENU_GFX_ADD_PATCH_TABLE = 10004;
 const int MENU_GFX_ADD_TEXTUREX = 10005;
 const int MENU_VIEW_TEXT = 10006;
 const int MENU_VIEW_HEX = 10007;
+const int MENU_CONV_WAV_DSND = 10008;
+const int MENU_CONV_DSND_WAV = 10009;
+const int MENU_CONV_MUS_MIDI = 10010;
 const int MENU_TEMP_END = 10100;
 
 
@@ -929,6 +933,72 @@ bool ArchivePanel::palConvert() {
 	return true;
 }
 
+bool ArchivePanel::wavDSndConvert() {
+	// Get selected entries
+	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
+
+	// Go through selection
+	for (unsigned a = 0; a < selection.size(); a++) {
+		// Convert WAV -> Doom Sound if the entry is WAV format
+		if (selection[a]->getType()->getFormat() == "snd_wav") {
+			MemChunk dsnd;
+			// Attempt conversion
+			if (!Conversions::wavToDoomSnd(selection[a]->getMCData(), dsnd)) {
+				wxLogMessage("Error: Unable to convert entry %s: %s", chr(selection[a]->getName()), chr(Global::error));
+				continue;
+			}
+			selection[a]->importMemChunk(dsnd);							// Load doom sound data
+			EntryType::detectEntryType(selection[a]);					// Update entry type
+			selection[a]->setExtensionByType();							// Update extension if necessary
+		}
+	}
+
+	return true;
+}
+
+bool ArchivePanel::dSndWavConvert() {
+	// Get selected entries
+	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
+
+	// Go through selection
+	for (unsigned a = 0; a < selection.size(); a++) {
+		// Convert Doom Sound -> WAV if the entry is Doom Sound format
+		if (selection[a]->getType()->getFormat() == "snd_doom") {
+			MemChunk wav;
+			// Attempt conversion
+			if (!Conversions::doomSndToWav(selection[a]->getMCData(), wav)) {
+				wxLogMessage("Error: Unable to convert entry %s: %s", chr(selection[a]->getName()), chr(Global::error));
+				continue;
+			}
+			selection[a]->importMemChunk(wav);							// Load wav data
+			EntryType::detectEntryType(selection[a]);					// Update entry type
+			selection[a]->setExtensionByType();							// Update extension if necessary
+		}
+	}
+
+	return true;
+}
+
+bool ArchivePanel::musMidiConvert() {
+	// Get selected entries
+	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
+
+	// Go through selection
+	for (unsigned a = 0; a < selection.size(); a++) {
+		// Convert MUS -> MIDI if the entry is Doom Sound format
+		if (selection[a]->getType()->getFormat() == "mus") {
+			MemChunk midi;
+			Conversions::musToMidi(selection[a]->getMCData(), midi);	// Convert
+			selection[a]->importMemChunk(midi);							// Load wav data
+			EntryType::detectEntryType(selection[a]);					// Update entry type
+			selection[a]->setExtensionByType();							// Update extension if necessary
+		}
+	}
+
+	return true;
+}
+
+
 /* ArchivePanel::openEntry
  * Shows the appropriate entry area and sends the given entry to it.
  * If [force] is true, the entry is opened even if it is already open
@@ -1185,6 +1255,12 @@ void ArchivePanel::handleAction(int menu_id) {
 		openEntryAsText(entry_list->getFocusedEntry());
 	else if (menu_id == MENU_VIEW_HEX)
 		openEntryAsHex(entry_list->getFocusedEntry());
+	else if (menu_id == MENU_CONV_DSND_WAV)
+		dSndWavConvert();
+	else if (menu_id == MENU_CONV_WAV_DSND)
+		wavDSndConvert();
+	else if (menu_id == MENU_CONV_MUS_MIDI)
+		musMidiConvert();
 }
 
 /* ArchivePanel::onAnnouncement
@@ -1284,6 +1360,9 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 	// Check what types exist in the selection
 	bool gfx_selected = false;
 	bool bas_selected = false;
+	bool wav_selected = false;
+	bool dsnd_selected = false;
+	bool mus_selected = false;
 //	bool rle_selected = false;
 	for (size_t a = 0; a < selection.size(); a++) {
 		// Check for gfx entry
@@ -1295,6 +1374,18 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 			if (selection[a]->getType()->getFormat() == "animated" ||
 				selection[a]->getType()->getFormat() == "switches")
 				bas_selected = true;
+		}
+		if (!wav_selected) {
+			if (selection[a]->getType()->getFormat() == "snd_wav")
+				wav_selected = true;
+		}
+		if (!dsnd_selected) {
+			if (selection[a]->getType()->getFormat() == "snd_doom")
+				dsnd_selected = true;
+		}
+		if (!mus_selected) {
+			if (selection[a]->getType()->getFormat() == "mus")
+				mus_selected = true;
 		}
 #if 0
 		if (!rle_selected) {
@@ -1322,6 +1413,18 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 	}
 	// This is not generally useful
 	//context->Append(MENU_ENTRY_PAL_CONVERT, "Pal 6-bit to 8-bit");
+
+	// Add Audio related menu items if needed
+	if (wav_selected || dsnd_selected || mus_selected) {
+		wxMenu* audio = new wxMenu();
+		context->AppendSubMenu(audio, "Audio");
+		if (wav_selected)
+			audio->Append(MENU_CONV_WAV_DSND, "Convert WAV to Doom Sound");
+		if (dsnd_selected)
+			audio->Append(MENU_CONV_DSND_WAV, "Convert Doom Sound to WAV");
+		if (mus_selected)
+			audio->Append(MENU_CONV_MUS_MIDI, "Convert MUS to MIDI");
+	}
 
 	// Popup the context menu
 	PopupMenu(context);

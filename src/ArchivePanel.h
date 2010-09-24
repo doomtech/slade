@@ -72,6 +72,9 @@ public:
 	bool	basConvert();
 	bool	palConvert();
 	bool	reloadCurrentPanel();
+	bool	wavDSndConvert();
+	bool	dSndWavConvert();
+	bool	musMidiConvert();
 
 	// Needed for some console commands
 	EntryPanel *			currentArea() { return cur_area;}

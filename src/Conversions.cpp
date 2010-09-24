@@ -34,10 +34,14 @@ bool Conversions::doomSndToWav(MemChunk& in, MemChunk& out) {
 	in.read(&header, 8);
 
 	// Format checks
-	if (header.three != 3)	// Check for magic number
+	if (header.three != 3) {	// Check for magic number
+		Global::error = "Invalid Doom Sound";
 		return false;
-	if (header.samples > (in.getSize() - 8) || header.samples <= 4)	// Check for sane values
+	}
+	if (header.samples > (in.getSize() - 8) || header.samples <= 4) {	// Check for sane values
+		Global::error = "Invalid Doom Sound";
 		return false;
+	}
 
 	// Read samples
 	uint8_t* samples = new uint8_t[header.samples];
@@ -85,12 +89,73 @@ bool Conversions::doomSndToWav(MemChunk& in, MemChunk& out) {
 }
 
 bool Conversions::wavToDoomSnd(MemChunk& in, MemChunk& out) {
-	return false;
-}
+	// --- Read WAV ---
+	wav_chunk_t chunk;
 
-bool Conversions::midiToMus(MemChunk& in, MemChunk& out) {
-	// Not implemented (ever? is there really any need?)
-	return false;
+	// Read header
+	in.seek(0, SEEK_SET);
+	in.read(&chunk, 8);
+
+	// Check header
+	if (chunk.id[0] != 'R' || chunk.id[1] != 'I' || chunk.id[2] != 'F' || chunk.id[3] != 'F') {
+		Global::error = "Invalid WAV";
+		return false;
+	}
+
+	// Read format
+	char format[4];
+	in.read(format, 4);
+
+	// Check format
+	if (format[0] != 'W' || format[1] != 'A' || format[2] != 'V' || format[3] != 'E') {
+		Global::error = "Invalid WAV format";
+		return false;
+	}
+
+	// Read fmt chunk
+	wav_fmtchunk_t fmtchunk;
+	in.read(&fmtchunk, sizeof(wav_fmtchunk_t));
+
+	// Check fmt chunk values
+	if (fmtchunk.header.id[0] != 'f' || fmtchunk.header.id[1] != 'm' || fmtchunk.header.id[2] != 't' || fmtchunk.header.id[3] != ' ') {
+		Global::error = "Invalid WAV";
+		return false;
+	}
+	if (fmtchunk.channels != 1) {
+		Global::error = "Cannot convert, must be mono";
+		return false;
+	}
+	if (fmtchunk.bps != 8) {
+		Global::error = "Cannot convert, must be 8bit";
+		return false;
+	}
+
+	// Read data
+	in.read(&chunk, 8);
+
+	// Check data
+	if (chunk.id[0] != 'd' || chunk.id[1] != 'a' || chunk.id[2] != 't' || chunk.id[3] != 'a') {
+		Global::error = "Invalid WAV";
+		return false;
+	}
+
+	uint8_t* data = new uint8_t[chunk.size];
+	in.read(data, chunk.size);
+
+
+	// --- Write Doom Sound ---
+
+	// Write header
+	dsnd_header_t ds_hdr;
+	ds_hdr.three = 3;
+	ds_hdr.samplerate = fmtchunk.samplerate;
+	ds_hdr.samples = chunk.size;
+	out.write(&ds_hdr, 8);
+
+	// Write data
+	out.write(data, chunk.size);
+
+	return true;
 }
 
 bool Conversions::musToMidi(MemChunk& in, MemChunk& out) {
@@ -110,5 +175,5 @@ bool Conversions::musToMidi(MemChunk& in, MemChunk& out) {
 	wxRemoveFile(tempmidi);
 	wxRemoveFile(tempmus);
 
-	return false;
+	return true;
 }

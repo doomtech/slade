@@ -13,14 +13,8 @@ TODO List ---------------------------------------------------------------
 	- Copy+Paste textures
 - Text editor special features:
 	- Preferences:
-		- Option to clear empty lines / unneeded whitespace on save
 		- Colour configuration (separate from global colour config?)
 		- Font configuration
-		- Tab size
-- Basic audio format conversions:
-	- Doom sound <-> WAV
-	- MUS <-> MIDI
-	- (?) PC Speaker -> WAV
 - 'Export As' for both entries and archives - does conversion+export
 
 --- Bugs ---

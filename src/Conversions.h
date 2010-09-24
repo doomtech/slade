@@ -5,7 +5,6 @@
 namespace Conversions {
 	bool	wavToDoomSnd(MemChunk& in, MemChunk& out);
 	bool	doomSndToWav(MemChunk& in, MemChunk& out);
-	bool	midiToMus(MemChunk& in, MemChunk& out);
 	bool	musToMidi(MemChunk& in, MemChunk& out);
 };
 
