@@ -387,6 +387,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\Conversions.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\Conversions.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\EntryOperations.cpp"
 				>
 			</File>
@@ -1090,6 +1098,34 @@
 				RelativePath=".\usdf_zdoom.txt"
 				>
 			</File>
+		</Filter>
+		<Filter
+			Name="External"
+			>
+			<Filter
+				Name="QMus2Mid"
+				>
+				<File
+					RelativePath=".\src\qmus2mid\qmus2mid.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\qmus2mid\qmus2mid.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="HMI"
+				>
+				<File
+					RelativePath=".\src\qmus2mid\hmi2mid.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\qmus2mid\hmi2mid.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<File
 			RelativePath=".\resource.h"
