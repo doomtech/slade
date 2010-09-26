@@ -19,9 +19,10 @@
       <File Name="src/PreferencesDialog.h"/>
       <File Name="src/BaseResourceArchivesPanel.cpp"/>
       <File Name="src/BaseResourceArchivesPanel.h"/>
-      <File Name="src/TextStylesPanel.h"/>
       <File Name="src/TextEditorPrefsPanel.h"/>
       <File Name="src/TextEditorPrefsPanel.cpp"/>
+      <File Name="src/TextStylePrefsPanel.cpp"/>
+      <File Name="src/TextStylePrefsPanel.h"/>
     </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="General">
@@ -115,6 +116,7 @@
     <File Name="src/ArchiveOperations.h"/>
     <File Name="src/ArchiveOperations.cpp"/>
     <File Name="src/Conversions.h"/>
+    <File Name="src/Conversions.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="Map Editor">
     <VirtualDirectory Name="SLADEMap">
@@ -340,4 +342,10 @@
       <ResourceCompiler Options=""/>
     </GlobalSettings>
   </Settings>
+  <VirtualDirectory Name="External">
+    <VirtualDirectory Name="QMus2Mid">
+      <File Name="src/qmus2mid/qmus2mid.cpp"/>
+      <File Name="src/qmus2mid/qmus2mid.h"/>
+    </VirtualDirectory>
+  </VirtualDirectory>
 </CodeLite_Project>

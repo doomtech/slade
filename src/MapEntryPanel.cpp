@@ -207,7 +207,7 @@ void MEPCanvas::draw() {
 MapEntryPanel::MapEntryPanel(wxWindow* parent) : EntryPanel(parent, "map") {
 	// Setup map canvas
 	map_canvas = new MEPCanvas(this);
-	sizer_main->Add(map_canvas, 1, wxEXPAND|wxALL, 4);
+	sizer_main->Add(map_canvas->toPanel(this), 1, wxEXPAND|wxALL, 4);
 
 	// Layout
 	Layout();
