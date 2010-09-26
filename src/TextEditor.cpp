@@ -140,8 +140,8 @@ TextEditor::TextEditor(wxWindow* parent, int id)
 	ct_start = 0;
 
 	// Set default font
-	wxFont f(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
-	StyleSetFont(wxSTC_STYLE_DEFAULT, f);
+	//wxFont f(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
+	//StyleSetFont(wxSTC_STYLE_DEFAULT, f);
 	SetTabWidth(txed_tab_width);
 
 	// Line numbers by default
@@ -202,7 +202,7 @@ void TextEditor::setup() {
 		SetEdgeMode(wxSTC_EDGE_LINE);
 
 	// Apply default style
-	applyStyleSet(StyleSet::getStyleSet(0));
+	StyleSet::applyCurrent(this);
 
 	// Set lexer
 	if (txed_syntax_hilight)

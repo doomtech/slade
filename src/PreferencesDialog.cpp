@@ -65,12 +65,14 @@ PreferencesDialog::PreferencesDialog(wxWindow* parent) : wxDialog(parent, -1, "S
 
 	// Create separate preferences panels
 	panel_text_editor = new TextEditorPrefsPanel(tree_prefs);
+	panel_text_styles = new TextStylePrefsPanel(tree_prefs);
 
 	// Setup preferences TreeBook
 	tree_prefs->AddPage(setupGeneralPrefsPanel(), "General", true);
 	tree_prefs->AddPage(setupEditingPrefsPanel(), "Editing");
 	tree_prefs->AddSubPage(setupBaseResourceArchivesPanel(), "Base Resource Archive");
 	tree_prefs->AddPage(panel_text_editor, "Text Editor");
+	tree_prefs->AddSubPage(panel_text_styles, "Fonts & Colours");
 
 	// Expand all tree nodes (so it gets sized properly)
 	tree_prefs->ExpandNode(1);
@@ -82,7 +84,7 @@ PreferencesDialog::PreferencesDialog(wxWindow* parent) : wxDialog(parent, -1, "S
 	sizer->Add(CreateButtonSizer(wxOK), 0, wxEXPAND|wxALL, 4);
 
 	// Setup layout
-	SetInitialSize(wxSize(-1, 300));
+	SetInitialSize(wxSize(-1, -1));
 	Layout();
 
 	// Collapse all tree nodes

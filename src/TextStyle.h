@@ -23,12 +23,21 @@ public:
 	TextStyle();
 	~TextStyle();
 
+	string	getFontFace() { return font; }
+	int		getFontSize() { return size; }
+	bool	hasForeground() { return fg_defined; }
+	bool	hasBackground() { return bg_defined; }
+	int		getBold() { return bold; }
+	int		getItalic() { return italic; }
+	int		getUnderlined() { return underlined; }
+
 	wxFont	getFont();
-	rgba_t	getForeground();
-	rgba_t	getBackground();
+	rgba_t	getForeground() { return foreground; }
+	rgba_t	getBackground() { return background; }
 
 	bool	parse(ParseTreeNode* node);
 	void	applyTo(wxStyledTextCtrl* stc, int style);
+	bool	copyStyle(TextStyle* copy);
 };
 
 class StyleSet {
@@ -49,14 +58,24 @@ public:
 	StyleSet();
 	~StyleSet();
 
-	bool	parseSet(ParseTreeNode* root);
-	void	applyTo(wxStyledTextCtrl* stc);
+	string	getName() { return name; }
 
-	static void			initDefaultStyleSet();
-	static bool			readStyleSets(Tokenizer& tz);
-	static bool			writeStyleSets(wxFile& file);
-	static StyleSet*	getStyleSet(string name);
-	static StyleSet*	getStyleSet(unsigned index);
+	bool		parseSet(ParseTreeNode* root);
+	void		applyTo(wxStyledTextCtrl* stc);
+	bool		copySet(StyleSet* copy);
+	TextStyle*	getStyle(string name);
+
+	// Static functions for styleset management
+	static void			initCurrent();
+	static StyleSet*	currentSet();
+	static bool			loadSet(string name);
+	static bool			loadSet(unsigned index);
+	static void			applyCurrent(wxStyledTextCtrl* stc);
+	static string		getName(unsigned index);
+	static unsigned		numSets();
+
+	static bool			loadResourceStyles();
+	static bool			loadCustomStyles();
 };
 
 #endif//__TEXT_STYLE_H__

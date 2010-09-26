@@ -265,6 +265,7 @@ void Tokenizer::skipMultilineComment() {
 string Tokenizer::getToken() {
 	string ret_str = "";
 	bool ready = false;
+	qstring = false;
 
 	// Increment pointer to next token
 	while (!ready) {
@@ -322,6 +323,8 @@ string Tokenizer::getToken() {
 
 	// Now read the token
 	if (current[0] == '\"') { // If we have a literal string (enclosed with "")
+		qstring = true;
+
 		// Skip opening "
 		incrementCurrent();
 

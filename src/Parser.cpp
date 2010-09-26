@@ -154,7 +154,11 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 			}
 
 			// Parse until ; or }
-			while (!(s_cmp(token, list_end))) {
+			while (1) {
+				// Check for list end
+				if (s_cmp(token, list_end) && !tz.quotedString())
+					break;
+
 				// Add value
 				child->values.push_back(token);
 

@@ -4,6 +4,7 @@
 
 #include "BaseResourceArchivesPanel.h"
 #include "TextEditorPrefsPanel.h"
+#include "TextStylePrefsPanel.h"
 #include <wx/treebook.h>
 
 class PreferencesDialog : public wxDialog {
@@ -27,6 +28,7 @@ private:
 
 	// Text editor
 	TextEditorPrefsPanel*	panel_text_editor;
+	TextStylePrefsPanel*	panel_text_styles;
 
 public:
 	PreferencesDialog(wxWindow* parent);

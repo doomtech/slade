@@ -278,9 +278,6 @@ bool MainApp::OnInit() {
 
 	wxLogMessage("Compiled with wxWidgets %i.%i.%i", wxMAJOR_VERSION, wxMINOR_VERSION, wxRELEASE_NUMBER);
 
-	// Init text stylesets
-	StyleSet::initDefaultStyleSet();
-
 	// Load configuration file
 	wxLogMessage("Loading configuration");
 	readConfigFile();
@@ -307,6 +304,11 @@ bool MainApp::OnInit() {
 	// Load text languages
 	wxLogMessage("Loading text languages");
 	TextLanguage::loadLanguages();
+
+	// Init text stylesets
+	wxLogMessage("Loading text style sets");
+	StyleSet::loadResourceStyles();
+	StyleSet::loadCustomStyles();
 
 	// Show the main window
 	theMainWindow->Show(true);

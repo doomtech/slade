@@ -11,16 +11,16 @@ TODO List ---------------------------------------------------------------
 - TEXTUREx editor:
 	- Patch browser
 	- Copy+Paste textures
-- Text editor special features:
+- Text editor:
 	- Preferences:
 		- Colour configuration (separate from global colour config?)
 		- Font configuration
 - 'Export As' for both entries and archives - does conversion+export
+- ACS script compilation
+- Linux MIDI playback
 
 --- Bugs ---
 - Copy/paste entry parent problem
-- Improve parser to allow special characters in quoted strings so as to get rid of 
-  "Parsing error: Unexpected special character ';' in hexen.txt" at startup.
 
 --- Editor Features ---
 - Map editor (!)
@@ -28,7 +28,7 @@ TODO List ---------------------------------------------------------------
 - ANSI screen viewer (/editor)
 - Proper font viewer
 - 'Cleanup' stuff (unused patches, textures, flats, unneeded entries...)
-- ACS script compilation (other languages too)
+- Compilation of other language scripts
 - Archive merging
 - Archive conversion
 
@@ -84,13 +84,9 @@ Unimplemented Feature Requests ------------------------------------------
 - SBARINFO viewer/editor
 
 --- Text Editor ---
-- find/replace in text editor
 
 --- TEXTUREx Editor ---
 - ability to 'search' for patches or textures by clicking in the list and typing the first few letters of the name, like you can in the lumps list
-- an option to automatically delete any patches from the wad that aren't used in any defined textures (maybe with option to back them up)
-- ability to double-click the name of a patch in an existing texture and type in another name, so that you can swap out one patch for another one
-- ability to move a patch forwards or backwards (i.e. to put it in front of or behind other patches)
 - list textures and patches in alphabetical order (with non-iwad ones at the bottom of the list)
 - ability to copy/paste textures (with patches), including between different TEXTUREx entries
 - find/replace for patches

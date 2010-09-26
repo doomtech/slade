@@ -369,6 +369,9 @@
     <ClCompile Include="src\qmus2mid\qmus2mid.cpp">
       <Filter>External\QMus2Mid</Filter>
     </ClCompile>
+    <ClCompile Include="src\TextStylePrefsPanel.cpp">
+      <Filter>Dialogs\Preferences</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -677,6 +680,9 @@
     </ClInclude>
     <ClInclude Include="src\qmus2mid\qmus2mid.h">
       <Filter>External\QMus2Mid</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TextStylePrefsPanel.h">
+      <Filter>Dialogs\Preferences</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

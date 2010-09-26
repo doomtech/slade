@@ -19,6 +19,7 @@ private:
 	bool		debug;		// If true every getToken() is printed to the console
 	string		special;	// A string defining the 'special characters'. These will always be parsed as separate tokens
 	string		name;		// What file/entry/chunk is being tokenized
+	bool		qstring;	// True if the last read token was a quoted string
 
 public:
 	Tokenizer(bool c_comments = true, bool h_comments = true, bool s_comments = false);
@@ -42,6 +43,7 @@ public:
 	string getToken();
 	string peekToken();
 	bool checkToken(string check);
+	bool quotedString() { return qstring; }
 
 	int	getInteger();
 	float getFloat();
