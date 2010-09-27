@@ -233,6 +233,14 @@
 					RelativePath=".\src\TextEditorPrefsPanel.h"
 					>
 				</File>
+				<File
+					RelativePath=".\src\TextStylePrefsPanel.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\TextStylePrefsPanel.h"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
@@ -1111,18 +1119,6 @@
 				</File>
 				<File
 					RelativePath=".\src\qmus2mid\qmus2mid.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="HMI"
-				>
-				<File
-					RelativePath=".\src\qmus2mid\hmi2mid.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\qmus2mid\hmi2mid.h"
 					>
 				</File>
 			</Filter>

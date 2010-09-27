@@ -223,7 +223,7 @@ void TextStylePrefsPanel::onStyleSelected(wxCommandEvent& e) {
 		cb_bold->Enable(true);
 	}
 
-	cb_bold->SetValue((bool)bold);
+	cb_bold->SetValue(!!bold);
 
 
 	// Update italic checkbox
@@ -238,7 +238,7 @@ void TextStylePrefsPanel::onStyleSelected(wxCommandEvent& e) {
 		cb_italic->Enable(true);
 	}
 
-	cb_italic->SetValue((bool)italic);
+	cb_italic->SetValue(!!italic);
 
 
 	// Update underlined checkbox
@@ -253,7 +253,7 @@ void TextStylePrefsPanel::onStyleSelected(wxCommandEvent& e) {
 		cb_underlined->Enable(true);
 	}
 
-	cb_underlined->SetValue((bool)underlined);
+	cb_underlined->SetValue(!!underlined);
 
 
 	// Update foreground colour
