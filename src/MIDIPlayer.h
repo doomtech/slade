@@ -7,7 +7,10 @@
 #define MIDI_LIB_FS
 #include <fluidsynth.h>
 #else
+#undef vector
 #include <audiere.h>
+using namespace audiere;
+#define vector std::vector
 #endif
 
 class MIDIPlayer {

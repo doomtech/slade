@@ -95,7 +95,7 @@ bool MIDIPlayer::openFile(string filename) {
 	// Load the midi
 	stream_midi = device_midi->openStream(chr(filename));
 
-	return !!stream;
+	return !!stream_midi;
 }
 
 bool MIDIPlayer::play() {
@@ -139,6 +139,8 @@ bool MIDIPlayer::setPosition(int pos) {
 int MIDIPlayer::getLength() {
 	if (stream_midi)
 		return stream_midi->getLength();
+	else
+		return 0;
 }
 
 #endif
