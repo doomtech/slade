@@ -6,17 +6,17 @@
 // Some structs for wav conversion
 struct wav_chunk_t {
 	char id[4];
-	long size;
+	uint32_t size;
 };
 
 struct wav_fmtchunk_t {
 	wav_chunk_t header;
-	short tag;
-	short channels;
-	long samplerate;
-	long datarate;
-	short blocksize;
-	short bps;
+	uint16_t tag;
+	uint16_t channels;
+	uint32_t samplerate;
+	uint32_t datarate;
+	uint16_t blocksize;
+	uint16_t bps;
 };
 
 struct dsnd_header_t {

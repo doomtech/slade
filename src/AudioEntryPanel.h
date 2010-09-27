@@ -16,7 +16,6 @@ private:
 	bool			midi;
 
 	OutputStreamPtr	stream;
-	MIDIStreamPtr	stream_midi;
 
 	wxBitmapButton*	btn_play;
 	wxBitmapButton*	btn_pause;
@@ -27,7 +26,6 @@ private:
 
 	// Global audio device
 	static AudioDevicePtr	device;
-	static MIDIDevicePtr	device_midi;
 
 public:
 	AudioEntryPanel(wxWindow* parent);

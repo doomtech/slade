@@ -4,6 +4,7 @@
 #include "AudioEntryPanel.h"
 #include "Icons.h"
 #include "Conversions.h"
+#include "MIDIPlayer.h"
 #include <wx/filename.h>
 #include <wx/gbsizer.h>
 #include <wx/statline.h>
@@ -11,7 +12,6 @@
 CVAR(Int, snd_volume, 100, CVAR_SAVE)
 
 AudioDevicePtr AudioEntryPanel::device = NULL;
-MIDIDevicePtr AudioEntryPanel::device_midi = NULL;
 
 AudioEntryPanel::AudioEntryPanel(wxWindow* parent) : EntryPanel(parent, "audio") {
 	// Init variables
@@ -49,12 +49,6 @@ AudioEntryPanel::AudioEntryPanel(wxWindow* parent) : EntryPanel(parent, "audio")
 		device = OpenDevice();
 	if (!device)
 		wxLogMessage("Error: Unable to open audio device, sound playback disabled");
-
-	// Open midi device
-	if (!device_midi)
-		device_midi = OpenMIDIDevice("");
-	if (!device_midi)
-		wxLogMessage("Error: Unable to open midi device, midi playback disabled");
 
 	// Disable general entrypanel buttons
 	btn_save->Disable();
@@ -162,46 +156,50 @@ bool AudioEntryPanel::openAudio(string filename) {
 }
 
 bool AudioEntryPanel::openMidi(string filename) {
-	stream_midi = device_midi->openStream(chr(filename));
-	if (stream_midi) {
-		// Update seekbar
-		slider_seek->Enable();
-		slider_seek->SetRange(0, stream_midi->getLength());
-
+	// Attempt to open midi
+	if (theMIDIPlayer->openFile(filename)) {
 		// Enable play controls
 		btn_play->Enable();
 		btn_pause->Enable();
 		btn_stop->Enable();
 
+		// Setup seekbar
+		int length = theMIDIPlayer->getLength();
+		if (length > 0) {
+			slider_seek->Enable();
+			slider_seek->SetRange(0, length);
+		}
+
 		return true;
 	}
 	else {
-		// Unable to open midi, disable play controls
+		// Disable play controls
 		btn_play->Enable(false);
 		btn_pause->Enable(false);
 		btn_stop->Enable(false);
+		slider_seek->Enable(false);
 
 		return false;
 	}
 }
 
 void AudioEntryPanel::startStream() {
-	if (midi && stream_midi)
-		stream_midi->play();
+	if (midi)
+		theMIDIPlayer->play();
 	else if (stream)
 		stream->play();
 }
 
 void AudioEntryPanel::stopStream() {
-	if (midi && stream_midi)
-		stream_midi->pause();
+	if (midi)
+		theMIDIPlayer->pause();
 	else if (stream)
 		stream->stop();
 }
 
 void AudioEntryPanel::resetStream() {
-	if (midi && stream_midi)
-		stream_midi->setPosition(0);
+	if (midi)
+		theMIDIPlayer->stop();
 	else if (stream)
 		stream->reset();
 }
@@ -231,8 +229,8 @@ void AudioEntryPanel::onBtnStop(wxCommandEvent& e) {
 void AudioEntryPanel::onTimer(wxTimerEvent& e) {
 	// Get current playback position
 	int pos = 0;
-	if (midi && stream_midi)
-		pos = stream_midi->getPosition();
+	if (midi)
+		pos = theMIDIPlayer->getPosition();
 	else if (stream && stream->isSeekable())
 		pos = stream->getPosition();
 
@@ -245,8 +243,8 @@ void AudioEntryPanel::onTimer(wxTimerEvent& e) {
 }
 
 void AudioEntryPanel::onSliderSeekChanged(wxCommandEvent& e) {
-	if (midi && stream_midi)
-		stream_midi->setPosition(slider_seek->GetValue());
+	if (midi)
+		theMIDIPlayer->setPosition(slider_seek->GetValue());
 	else if (stream && stream->isSeekable())
 		stream->setPosition(slider_seek->GetValue());
 }

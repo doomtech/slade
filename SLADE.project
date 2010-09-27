@@ -63,6 +63,8 @@
       <File Name="src/Console.h"/>
       <File Name="src/ConsoleHelpers.h"/>
     </VirtualDirectory>
+    <File Name="src/MIDIPlayer.h"/>
+    <File Name="src/MIDIPlayer.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="Main Editor">
     <VirtualDirectory Name="UI Elements">
@@ -272,6 +274,12 @@
     <File Name="Makefile-debug"/>
     <File Name="README-unix"/>
   </VirtualDirectory>
+  <VirtualDirectory Name="External">
+    <VirtualDirectory Name="QMus2Mid">
+      <File Name="src/qmus2mid/qmus2mid.cpp"/>
+      <File Name="src/qmus2mid/qmus2mid.h"/>
+    </VirtualDirectory>
+  </VirtualDirectory>
   <Settings Type="Executable">
     <Configuration Name="Debug" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
       <Compiler Options="-g;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=yes)" Required="yes" PreCompiledHeader="">
@@ -338,14 +346,9 @@
         <LibraryPath Value="."/>
         <Library Value="freeimage"/>
         <Library Value="audiere"/>
+        <Library Value="fluidsynth"/>
       </Linker>
       <ResourceCompiler Options=""/>
     </GlobalSettings>
   </Settings>
-  <VirtualDirectory Name="External">
-    <VirtualDirectory Name="QMus2Mid">
-      <File Name="src/qmus2mid/qmus2mid.cpp"/>
-      <File Name="src/qmus2mid/qmus2mid.h"/>
-    </VirtualDirectory>
-  </VirtualDirectory>
 </CodeLite_Project>
