@@ -23,6 +23,10 @@
       <File Name="src/TextEditorPrefsPanel.cpp"/>
       <File Name="src/TextStylePrefsPanel.cpp"/>
       <File Name="src/TextStylePrefsPanel.h"/>
+      <File Name="src/GeneralPrefsPanel.h"/>
+      <File Name="src/GeneralPrefsPanel.cpp"/>
+      <File Name="src/EditingPrefsPanel.h"/>
+      <File Name="src/EditingPrefsPanel.cpp"/>
     </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="General">

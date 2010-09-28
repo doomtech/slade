@@ -1121,6 +1121,9 @@ bool ArchivePanel::showEntryPanel(EntryPanel* new_area, bool ask_save) {
 }
 
 void ArchivePanel::refreshPanel() {
+	// Refresh entry list
+	entry_list->applyFilter();
+
 	// Refresh current entry panel
 	cur_area->refreshPanel();
 

@@ -17,16 +17,11 @@ BaseResourceArchivesPanel::BaseResourceArchivesPanel(wxWindow* parent)
 	list_base_archive_paths = new wxListBox(this, -1);
 	for (size_t a = 0; a < theArchiveManager->numBaseResourcePaths(); a++) {
 		list_base_archive_paths->Append(theArchiveManager->getBaseResourcePath(a));
-
-		//if (theArchiveManager->baseResourceArchive() && s_cmp(theArchiveManager->baseResourceArchive()->getFilename(true), theArchiveManager->baseResourcePath(a)))
-		//	sel_index = a;
 	}
 
 	// Select the currently open base archive if any
 	if (base_resource >= 0)
 		list_base_archive_paths->Select(base_resource);
-	//if (sel_index >= 0)
-	//	list_base_archive_paths->Select(sel_index);
 
 	// Add paths list
 	hbox->Add(list_base_archive_paths, 1, wxEXPAND|wxALL, 4);

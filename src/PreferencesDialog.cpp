@@ -37,18 +37,6 @@
 
 
 /*******************************************************************
- * EXTERNAL VARIABLES
- *******************************************************************/
-EXTERN_CVAR(Bool, wad_force_uppercase)
-EXTERN_CVAR(Bool, iwad_lock)
-EXTERN_CVAR(Bool, archive_load_data)
-EXTERN_CVAR(Int, autosave_entry_changes)
-EXTERN_CVAR(Bool, close_archive_with_tab)
-EXTERN_CVAR(Bool, gl_tex_enable_np2)
-EXTERN_CVAR(Bool, size_as_string)
-
-
-/*******************************************************************
  * PREFERENCESDIALOG CLASS FUNCTIONS
  *******************************************************************/
 
@@ -64,12 +52,14 @@ PreferencesDialog::PreferencesDialog(wxWindow* parent) : wxDialog(parent, -1, "S
 	tree_prefs = new wxTreebook(this, -1, wxDefaultPosition, wxDefaultSize);
 
 	// Create separate preferences panels
+	panel_general = new GeneralPrefsPanel(tree_prefs);
+	panel_editing = new EditingPrefsPanel(tree_prefs);
 	panel_text_editor = new TextEditorPrefsPanel(tree_prefs);
 	panel_text_styles = new TextStylePrefsPanel(tree_prefs);
 
 	// Setup preferences TreeBook
-	tree_prefs->AddPage(setupGeneralPrefsPanel(), "General", true);
-	tree_prefs->AddPage(setupEditingPrefsPanel(), "Editing");
+	tree_prefs->AddPage(panel_general, "General", true);
+	tree_prefs->AddPage(panel_editing, "Editing");
 	tree_prefs->AddSubPage(setupBaseResourceArchivesPanel(), "Base Resource Archive");
 	tree_prefs->AddPage(panel_text_editor, "Text Editor");
 	tree_prefs->AddSubPage(panel_text_styles, "Fonts & Colours");
@@ -81,7 +71,7 @@ PreferencesDialog::PreferencesDialog(wxWindow* parent) : wxDialog(parent, -1, "S
 	sizer->Add(tree_prefs, 1, wxEXPAND|wxALL, 4);
 
 	// Add buttons
-	sizer->Add(CreateButtonSizer(wxOK), 0, wxEXPAND|wxALL, 4);
+	sizer->Add(CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND|wxALL, 4);
 
 	// Setup layout
 	SetInitialSize(wxSize(-1, -1));
@@ -95,96 +85,6 @@ PreferencesDialog::PreferencesDialog(wxWindow* parent) : wxDialog(parent, -1, "S
  * PreferencesDialog class destructor
  *******************************************************************/
 PreferencesDialog::~PreferencesDialog() {
-}
-
-/* PreferencesDialog::setupGeneralPrefsPanel
- * Creates the wxPanel containing 'General' preferences and returns
- * the panel
- *******************************************************************/
-wxPanel* PreferencesDialog::setupGeneralPrefsPanel() {
-	// Create panel
-	wxPanel* panel = new wxPanel(tree_prefs, -1);
-	wxBoxSizer* psizer = new wxBoxSizer(wxVERTICAL);
-	panel->SetSizer(psizer);
-
-	// Create frame+sizer
-	wxStaticBox *frame = new wxStaticBox(panel, -1, "General Preferences");
-	wxStaticBoxSizer *sizer = new wxStaticBoxSizer(frame, wxVERTICAL);
-	psizer->Add(sizer, 1, wxEXPAND|wxALL, 4);
-
-	// Load on open archive
-	cb_archive_load = new wxCheckBox(panel, -1, "Load all archive entry data to memory when opened");
-	sizer->Add(cb_archive_load, 0, wxEXPAND|wxALL, 4);
-
-	// Close archive with tab
-	cb_archive_close_tab = new wxCheckBox(panel, -1, "Close archive when its tab is closed");
-	sizer->Add(cb_archive_close_tab, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
-
-	// Enable np2 textures
-	cb_gl_np2 = new wxCheckBox(panel, -1, "Enable Non-power-of-two textures if supported");
-	sizer->Add(cb_gl_np2, 0, wxEXPAND|wxALL, 4);
-
-	// Show entry size as string instead of a number
-	cb_size_as_string = new wxCheckBox(panel, -1, "Show entry size as a string with units");
-	sizer->Add(cb_size_as_string, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
-
-	// Init controls
-	cb_archive_load->SetValue(archive_load_data);
-	cb_archive_close_tab->SetValue(close_archive_with_tab);
-	cb_gl_np2->SetValue(gl_tex_enable_np2);
-	cb_size_as_string->SetValue(size_as_string);
-
-	// Bind events
-	cb_archive_load->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &PreferencesDialog::onCBArchiveLoadChanged, this);
-	cb_archive_close_tab->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &PreferencesDialog::onCBArchiveCloseTabChanged, this);
-	cb_gl_np2->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &PreferencesDialog::onCBGLNP2Changed, this);
-	cb_size_as_string->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &PreferencesDialog::onCBSASChanged, this);
-
-	return panel;
-}
-
-/* PreferencesDialog::setupEditingPrefsPanel
- * Creates the wxPanel containing 'Editing' preferences and returns
- * the panel
- *******************************************************************/
-wxPanel* PreferencesDialog::setupEditingPrefsPanel() {
-	// Create panel
-	wxPanel* panel = new wxPanel(tree_prefs, -1);
-	wxBoxSizer* psizer = new wxBoxSizer(wxVERTICAL);
-	panel->SetSizer(psizer);
-
-	// Create frame+sizer
-	wxStaticBox *frame = new wxStaticBox(panel, -1, "Editing Preferences");
-	wxStaticBoxSizer *sizer = new wxStaticBoxSizer(frame, wxVERTICAL);
-	psizer->Add(sizer, 1, wxEXPAND|wxALL, 4);
-
-	// Force uppercase
-	cb_wad_force_uppercase = new wxCheckBox(panel, -1, "Force uppercase entry names in Wad Archives");
-	sizer->Add(cb_wad_force_uppercase, 0, wxEXPAND|wxALL, 4);
-
-	// Lock IWAD
-	cb_wad_lock_iwad = new wxCheckBox(panel, -1, "Lock all IWAD entries");
-	sizer->Add(cb_wad_lock_iwad, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
-
-	// Unsaved entry changes
-	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
-	sizer->Add(hbox, 0, wxALL, 4);
-	string choices[] = { "Don't Save", "Save", "Ask" };
-	choice_entry_mod = new wxChoice(panel, -1, wxDefaultPosition, wxDefaultSize, 3, choices);
-	hbox->Add(new wxStaticText(panel, -1, "Action on unsaved entry changes:"), 1, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
-	hbox->Add(choice_entry_mod, 0, wxEXPAND, 0);
-
-	// Init controls
-	cb_wad_force_uppercase->SetValue(wad_force_uppercase);
-	cb_wad_lock_iwad->SetValue(iwad_lock);
-	choice_entry_mod->SetSelection(autosave_entry_changes);
-
-	// Bind events
-	cb_wad_force_uppercase->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &PreferencesDialog::onCBWadForceUppercaseChanged, this);
-	cb_wad_lock_iwad->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &PreferencesDialog::onCBWadLockIWAD, this);
-	choice_entry_mod->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &PreferencesDialog::onChoiceEntryModChanged, this);
-
-	return panel;
 }
 
 /* PreferencesDialog::setupBaseResourceArchivesPanel
@@ -217,7 +117,8 @@ wxPanel* PreferencesDialog::setupBaseResourceArchivesPanel() {
 }
 
 void PreferencesDialog::applyPreferences() {
-	// Apply text editor preferences
+	panel_general->applyPreferences();
+	panel_editing->applyPreferences();
 	panel_text_editor->applyPreferences();
 }
 
@@ -225,55 +126,6 @@ void PreferencesDialog::applyPreferences() {
 /*******************************************************************
  * PREFERENCESDIALOG CLASS EVENTS
  *******************************************************************/
-
-/* PreferencesDialog::onCBArchiveLoadChanged
- * Called when the 'Load Archive Data' checkbox is changed
- *******************************************************************/
-void PreferencesDialog::onCBArchiveLoadChanged(wxCommandEvent& e) {
-	archive_load_data = cb_archive_load->GetValue();
-}
-
-/* PreferencesDialog::onCBArchiveCloseTabChanged
- * Called when the 'Close Archive with Tab' checkbox is changed
- *******************************************************************/
-void PreferencesDialog::onCBArchiveCloseTabChanged(wxCommandEvent& e) {
-	close_archive_with_tab = cb_archive_close_tab->GetValue();
-}
-
-/* PreferencesDialog::onCBSASChanged
- * Called when the 'Adapt Units to Size' checkbox is changed
- *******************************************************************/
-void PreferencesDialog::onCBSASChanged(wxCommandEvent& e) {
-	size_as_string = cb_size_as_string->GetValue();
-}
-
-/* PreferencesDialog::onCBGLNP2Changed
- * Called when the 'Enable NP2 Textures' checkbox is changed
- *******************************************************************/
-void PreferencesDialog::onCBGLNP2Changed(wxCommandEvent& e) {
-	gl_tex_enable_np2 = cb_gl_np2->GetValue();
-}
-
-/* PreferencesDialog::onCBWadForceUppercaseChanged
- * Called when the 'Force Uppercase Entry Names' checkbox is changed
- *******************************************************************/
-void PreferencesDialog::onCBWadForceUppercaseChanged(wxCommandEvent& e) {
-	wad_force_uppercase = cb_wad_force_uppercase->GetValue();
-}
-
-/* PreferencesDialog::onCBWadLockIWAD
- * Called when the 'Lock IWAD Entries' checkbox is changed
- *******************************************************************/
-void PreferencesDialog::onCBWadLockIWAD(wxCommandEvent& e) {
-	iwad_lock = cb_wad_lock_iwad->GetValue();
-}
-
-/* PreferencesDialog::onChoiceEntryModChanged
- * Called when the 'Unsaved Entry Changes' choice is changed
- *******************************************************************/
-void PreferencesDialog::onChoiceEntryModChanged(wxCommandEvent& e) {
-	autosave_entry_changes = choice_entry_mod->GetSelection();
-}
 
 /* PreferencesDialog::onBtnBRAOpenClicked
  * Called when the 'Open Selected BRA' button is clicked

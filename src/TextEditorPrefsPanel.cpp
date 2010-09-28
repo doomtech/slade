@@ -1,9 +1,41 @@
 
+/*******************************************************************
+ * SLADE - It's a Doom Editor
+ * Copyright (C) 2008 Simon Judd
+ *
+ * Email:       veilofsorrow@gmail.com
+ * Web:         http://slade.mancubus.net
+ * Filename:    TextEditorPrefsPanel.cpp
+ * Description: Panel containing text editor preference controls
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *******************************************************************/
+
+
+/*******************************************************************
+ * INCLUDES
+ *******************************************************************/
 #include "Main.h"
 #include "WxStuff.h"
 #include "TextEditorPrefsPanel.h"
 #include <wx/statline.h>
 
+
+/*******************************************************************
+ * EXTERNAL VARIABLES
+ *******************************************************************/
 EXTERN_CVAR(Int, txed_tab_width)
 EXTERN_CVAR(Bool, txed_auto_indent)
 EXTERN_CVAR(Bool, txed_syntax_hilight)
@@ -13,6 +45,14 @@ EXTERN_CVAR(Bool, txed_indent_guides)
 EXTERN_CVAR(String, txed_style_set)
 EXTERN_CVAR(Bool, txed_trim_whitespace)
 
+
+/*******************************************************************
+ * TEXTEDITORPREFSPANEL CLASS FUNCTIONS
+ *******************************************************************/
+
+/* TextEditorPrefsPanel::TextEditorPrefsPanel
+ * TextEditorPrefsPanel class constructor
+ *******************************************************************/
 TextEditorPrefsPanel::TextEditorPrefsPanel(wxWindow* parent) : wxPanel(parent, -1) {
 	// Create main sizer
 	wxBoxSizer* psizer = new wxBoxSizer(wxVERTICAL);
@@ -68,9 +108,15 @@ TextEditorPrefsPanel::TextEditorPrefsPanel(wxWindow* parent) : wxPanel(parent, -
 	cb_brace_match->SetValue(txed_brace_match);
 }
 
+/* TextEditorPrefsPanel::~TextEditorPrefsPanel
+ * TextEditorPrefsPanel class destructor
+ *******************************************************************/
 TextEditorPrefsPanel::~TextEditorPrefsPanel() {
 }
 
+/* TextEditorPrefsPanel::applyPreferences
+ * Applies preference values from the controls to CVARs
+ *******************************************************************/
 void TextEditorPrefsPanel::applyPreferences() {
 	txed_auto_indent = cb_auto_indent->GetValue();
 	txed_trim_whitespace = cb_trim_whitespace->GetValue();

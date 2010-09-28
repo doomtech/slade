@@ -53,64 +53,57 @@ TextStylePrefsPanel::TextStylePrefsPanel(wxWindow* parent) : wxPanel(parent, -1)
 	list_styles = new wxListBox(this, -1, wxDefaultPosition, wxDefaultSize, style_names);
 	hbox->Add(list_styles, 0, wxEXPAND|wxALL, 4);
 
+
 	// Style settings
-	wxGridBagSizer* sizer_gb = new wxGridBagSizer(4, 4);
-	hbox->Add(sizer_gb, 1, wxEXPAND|wxALL, 4);
+	wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
+	hbox->Add(vbox, 1, wxEXPAND|wxALL, 4);
 
-	// Font
-	sizer_gb->Add(new wxStaticText(this, -1, "Font:"), wxGBPosition(0, 0));
+	// Font picker
+	vbox->Add(new wxStaticText(this, -1, "Font:"), 0, wxBOTTOM, 2);
 	fp_font = new wxFontPickerCtrl(this, -1);
-	sizer_gb->Add(fp_font, wxGBPosition(1, 0), wxDefaultSpan, wxEXPAND);
+	vbox->Add(fp_font, 0, wxEXPAND|wxBOTTOM, 4);
 
-	cb_font_default = new wxCheckBox(this, -1, "");
-	sizer_gb->Add(new wxStaticText(this, -1, "Use Default"), wxGBPosition(0, 1), wxDefaultSpan, wxALIGN_CENTER);
-	sizer_gb->Add(cb_font_default, wxGBPosition(1, 1), wxDefaultSpan, wxALIGN_CENTER);
-	sizer_gb->AddGrowableCol(0);
+	// Font property overrides
+	vbox->Add(new wxStaticText(this, -1, "Override default font properties:"), 0, wxBOTTOM, 4);
+	hbox = new wxBoxSizer(wxHORIZONTAL);
+	vbox->Add(hbox, 0, wxEXPAND|wxBOTTOM, 4);
+	cb_override_font_face = new wxCheckBox(this, -1, "Font Face");
+	cb_override_font_size = new wxCheckBox(this, -1, "Font Size");
+	hbox->Add(cb_override_font_face, 0, wxEXPAND|wxRIGHT, 4);
+	hbox->Add(cb_override_font_size, 0, wxEXPAND);
+	hbox = new wxBoxSizer(wxHORIZONTAL);
+	vbox->Add(hbox, 0, wxEXPAND|wxBOTTOM, 4);
+	cb_override_font_bold = new wxCheckBox(this, -1, "Bold");
+	cb_override_font_italic = new wxCheckBox(this, -1, "Italic");
+	cb_override_font_underlined = new wxCheckBox(this, -1, "Underlined");
+	hbox->Add(cb_override_font_bold, 0, wxEXPAND|wxRIGHT, 4);
+	hbox->Add(cb_override_font_italic, 0, wxEXPAND|wxRIGHT, 4);
+	hbox->Add(cb_override_font_underlined, 0, wxEXPAND);
 
-	// Bold
-	cb_bold = new wxCheckBox(this, -1, "Bold");
-	sizer_gb->Add(cb_bold, wxGBPosition(2, 0));
-	cb_bold_default = new wxCheckBox(this, -1, "");
-	sizer_gb->Add(cb_bold_default, wxGBPosition(2, 1), wxDefaultSpan, wxALIGN_CENTER);
 
-	// Italic
-	cb_italic = new wxCheckBox(this, -1, "Italic");
-	sizer_gb->Add(cb_italic, wxGBPosition(3, 0));
-	cb_italic_default = new wxCheckBox(this, -1, "");
-	sizer_gb->Add(cb_italic_default, wxGBPosition(3, 1), wxDefaultSpan, wxALIGN_CENTER);
-
-	// Underlined
-	cb_underlined = new wxCheckBox(this, -1, "Underlined");
-	sizer_gb->Add(cb_underlined, wxGBPosition(4, 0));
-	cb_underlined_default = new wxCheckBox(this, -1, "");
-	sizer_gb->Add(cb_underlined_default, wxGBPosition(4, 1), wxDefaultSpan, wxALIGN_CENTER);
-
-	// Separator
-	sizer_gb->Add(new wxStaticLine(this, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL), wxGBPosition(5, 0), wxGBSpan(1, 2), wxEXPAND);
-
-	// Foreground Colour
-	sizer_gb->Add(new wxStaticText(this, -1, "Foreground Colour:"), wxGBPosition(6, 0), wxGBSpan(1, 2));
+	// Foreground colour
+	vbox->Add(new wxStaticLine(this, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL), 0, wxEXPAND|wxALL, 4);
+	hbox = new wxBoxSizer(wxHORIZONTAL);
+	vbox->Add(hbox, 0, wxEXPAND|wxBOTTOM, 4);
+	hbox->Add(new wxStaticText(this, -1, "Foreground:"), 1, wxALIGN_CENTER_VERTICAL);
+	cb_override_foreground = new wxCheckBox(this, -1, "Override Default");
+	hbox->Add(cb_override_foreground, 1, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT);
 	cp_foreground = new wxColourPickerCtrl(this, -1, WXCOL(COL_BLACK), wxDefaultPosition, wxDefaultSize, wxCLRP_SHOW_LABEL|wxCLRP_USE_TEXTCTRL);
-	sizer_gb->Add(cp_foreground, wxGBPosition(7, 0));
-	cb_foreground_default = new wxCheckBox(this, -1, "");
-	sizer_gb->Add(cb_foreground_default, wxGBPosition(7, 1), wxDefaultSpan, wxALIGN_CENTER);
+	vbox->Add(cp_foreground, 0, wxEXPAND|wxBOTTOM, 8);
 
-	// Background Colour
-	sizer_gb->Add(new wxStaticText(this, -1, "Background Colour:"), wxGBPosition(8, 0), wxGBSpan(1, 2));
+	// Background colour
+	vbox->Add(new wxStaticLine(this, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL), 0, wxEXPAND|wxALL, 4);
+	hbox = new wxBoxSizer(wxHORIZONTAL);
+	vbox->Add(hbox, 0, wxEXPAND|wxBOTTOM, 4);
+	hbox->Add(new wxStaticText(this, -1, "Background:"), 1, wxALIGN_CENTER_VERTICAL);
+	cb_override_background = new wxCheckBox(this, -1, "Override Default");
+	hbox->Add(cb_override_background, 1, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT);
 	cp_background = new wxColourPickerCtrl(this, -1, WXCOL(COL_BLACK), wxDefaultPosition, wxDefaultSize, wxCLRP_SHOW_LABEL|wxCLRP_USE_TEXTCTRL);
-	sizer_gb->Add(cp_background, wxGBPosition(9, 0));
-	cb_background_default = new wxCheckBox(this, -1, "");
-	sizer_gb->Add(cb_background_default, wxGBPosition(9, 1), wxDefaultSpan, wxALIGN_CENTER);
+	vbox->Add(cp_background, 0, wxEXPAND);
 
 
 	// Bind events
 	list_styles->Bind(wxEVT_COMMAND_LISTBOX_SELECTED, &TextStylePrefsPanel::onStyleSelected, this);
-	cb_font_default->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &TextStylePrefsPanel::onCBFontDefaultChanged, this);
-	cb_bold_default->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &TextStylePrefsPanel::onCBBoldDefaultChanged, this);
-	cb_italic_default->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &TextStylePrefsPanel::onCBItalicDefaultChanged, this);
-	cb_underlined_default->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &TextStylePrefsPanel::onCBUnderlinedDefaultChanged, this);
-	cb_foreground_default->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &TextStylePrefsPanel::onCBForegroundDefaultChanged, this);
-	cb_background_default->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &TextStylePrefsPanel::onCBBackgroundDefaultChanged, this);
 
 	// Select default style
 	list_styles->SetSelection(0);
@@ -169,7 +162,8 @@ void TextStylePrefsPanel::onStyleSelected(wxCommandEvent& e) {
 	// Check if something went wrong
 	if (!style)
 		return;
-
+}
+/*
 	// If default style was selected, disable 'use default' checkboxes
 	if (list_styles->GetSelection() == 0) {
 		cb_background_default->Enable(false);
@@ -285,27 +279,4 @@ void TextStylePrefsPanel::onStyleSelected(wxCommandEvent& e) {
 	}
 	cp_background->SetColour(WXCOL(bgcol));
 }
-
-void TextStylePrefsPanel::onCBFontDefaultChanged(wxCommandEvent& e) {
-	fp_font->Enable(!cb_font_default->GetValue());
-}
-
-void TextStylePrefsPanel::onCBBoldDefaultChanged(wxCommandEvent& e) {
-	cb_bold->Enable(!cb_bold_default->GetValue());
-}
-
-void TextStylePrefsPanel::onCBItalicDefaultChanged(wxCommandEvent& e) {
-	cb_italic->Enable(!cb_italic_default->GetValue());
-}
-
-void TextStylePrefsPanel::onCBUnderlinedDefaultChanged(wxCommandEvent& e) {
-	cb_underlined->Enable(!cb_underlined_default->GetValue());
-}
-
-void TextStylePrefsPanel::onCBForegroundDefaultChanged(wxCommandEvent& e) {
-	cp_foreground->Enable(!cb_foreground_default->GetValue());
-}
-
-void TextStylePrefsPanel::onCBBackgroundDefaultChanged(wxCommandEvent& e) {
-	cp_background->Enable(!cb_background_default->GetValue());
-}
+*/

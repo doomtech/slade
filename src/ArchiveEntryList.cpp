@@ -47,6 +47,7 @@ CVAR(Bool, elist_colsize_show, true, CVAR_SAVE)
 CVAR(Bool, elist_coltype_show, true, CVAR_SAVE)
 CVAR(Bool, elist_hrules, false, CVAR_SAVE)
 CVAR(Bool, elist_vrules, false, CVAR_SAVE)
+CVAR(Bool, elist_filter_dirs, false, CVAR_SAVE)
 wxDEFINE_EVENT(EVT_AEL_DIR_CHANGED, wxCommandEvent);
 
 
@@ -336,6 +337,10 @@ void ArchiveEntryList::applyFilter() {
 		for (unsigned a = 0; a < filter.size(); a++) {
 			entry = getEntry(filter[a]);
 
+			// Don't filter folders if !elist_filter_dirs
+			if (!elist_filter_dirs && entry->getType() == EntryType::folderType())
+				continue;
+
 			// Check for name match with filter
 			if (entry == entry_dir_back || entry->getName().Lower().Matches(filterstring))
 				continue;
@@ -535,6 +540,7 @@ void ArchiveEntryList::onAnnouncement(Announcer* announcer, string event_name, M
 	if (announcer == archive) {
 		// Since refreshing the list is relatively fast, just refresh it on any change
 		updateList();
+		applyFilter();
 	}
 }
 
