@@ -422,8 +422,8 @@ void MainWindow::onMenuItemClicked(wxCommandEvent& e) {
 	// Editor->Preferences
 	if (e.GetId() == MENU_EDITOR_PREFERENCES) {
 		PreferencesDialog pd(this);
-		pd.ShowModal();
-		pd.applyPreferences();
+		if (pd.ShowModal() == wxID_OK)
+			pd.applyPreferences();
 		panel_archivemanager->refreshAllTabs();
 	}
 

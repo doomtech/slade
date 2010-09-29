@@ -375,6 +375,12 @@
     <ClCompile Include="src\MIDIPlayer.cpp">
       <Filter>General</Filter>
     </ClCompile>
+    <ClCompile Include="src\EditingPrefsPanel.cpp">
+      <Filter>Dialogs\Preferences</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GeneralPrefsPanel.cpp">
+      <Filter>Dialogs\Preferences</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -689,6 +695,12 @@
     </ClInclude>
     <ClInclude Include="src\MIDIPlayer.h">
       <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="src\EditingPrefsPanel.h">
+      <Filter>Dialogs\Preferences</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GeneralPrefsPanel.h">
+      <Filter>Dialogs\Preferences</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

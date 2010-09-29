@@ -31,6 +31,16 @@ public:
 	int		getItalic() { return italic; }
 	int		getUnderlined() { return underlined; }
 
+	void	setFontFace(string font) { this->font = font; }
+	void	setFontSize(int size) { this->size = size; }
+	void	setBold(int bold) { this->bold = bold; }
+	void	setItalic(int italic) { this->italic = italic; }
+	void	setUnderlined(int underlined) { this->underlined = underlined; }
+	void	setForeground(rgba_t col) { foreground.set(col); fg_defined = true; }
+	void	clearForeground() { fg_defined = false; }
+	void	setBackground(rgba_t col) { background.set(col); bg_defined = true; }
+	void	clearBackground() { bg_defined = false; }
+
 	wxFont	getFont();
 	rgba_t	getForeground() { return foreground; }
 	rgba_t	getBackground() { return background; }
@@ -38,6 +48,7 @@ public:
 	bool	parse(ParseTreeNode* node);
 	void	applyTo(wxStyledTextCtrl* stc, int style);
 	bool	copyStyle(TextStyle* copy);
+	string	getDefinition(unsigned tabs = 0);
 };
 
 class StyleSet {
@@ -55,7 +66,7 @@ private:
 	TextStyle	ts_bracebad;
 
 public:
-	StyleSet();
+	StyleSet(string name = "Unnamed Style");
 	~StyleSet();
 
 	string	getName() { return name; }
@@ -64,15 +75,18 @@ public:
 	void		applyTo(wxStyledTextCtrl* stc);
 	bool		copySet(StyleSet* copy);
 	TextStyle*	getStyle(string name);
+	bool		writeFile(string filename);
 
 	// Static functions for styleset management
 	static void			initCurrent();
+	static void			saveCurrent();
 	static StyleSet*	currentSet();
 	static bool			loadSet(string name);
 	static bool			loadSet(unsigned index);
 	static void			applyCurrent(wxStyledTextCtrl* stc);
 	static string		getName(unsigned index);
 	static unsigned		numSets();
+	static StyleSet*	getSet(unsigned index);
 
 	static bool			loadResourceStyles();
 	static bool			loadCustomStyles();

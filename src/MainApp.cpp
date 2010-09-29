@@ -337,6 +337,9 @@ int MainApp::OnExit() {
 	// Save configuration
 	saveConfigFile();
 
+	// Save text style configuration
+	StyleSet::saveCurrent();
+
 	// Close all open archives
 	theArchiveManager->closeAll();
 

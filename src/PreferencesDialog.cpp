@@ -120,6 +120,7 @@ void PreferencesDialog::applyPreferences() {
 	panel_general->applyPreferences();
 	panel_editing->applyPreferences();
 	panel_text_editor->applyPreferences();
+	panel_text_styles->applyPreferences();
 }
 
 
