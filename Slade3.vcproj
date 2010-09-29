@@ -218,6 +218,22 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\EditingPrefsPanel.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\EditingPrefsPanel.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\GeneralPrefsPanel.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\GeneralPrefsPanel.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\PreferencesDialog.cpp"
 					>
 				</File>
@@ -280,6 +296,14 @@
 			</File>
 			<File
 				RelativePath=".\src\MemChunk.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\MIDIPlayer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\MIDIPlayer.h"
 				>
 			</File>
 			<File
