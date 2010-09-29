@@ -6,7 +6,6 @@
 #include "PaletteCanvas.h"
 
 /* TODO:
- * - Ability to export to custom palettes directory
  * - Ability to edit the palette (though might make a full-fledged PLAYPAL/COLORMAP editor)
  */
 class PaletteEntryPanel : public EntryPanel {
@@ -18,6 +17,7 @@ private:
 	wxButton*				btn_nextpal;
 	wxButton*				btn_prevpal;
 	wxStaticText*			text_curpal;
+	wxButton*				btn_exportpal;
 
 	wxStaticText*			label_selected_colour;
 
@@ -33,6 +33,7 @@ public:
 	void	onBtnNextPal(wxCommandEvent& e);
 	void	onBtnPrevPal(wxCommandEvent& e);
 	void	onPalCanvasMouseEvent(wxMouseEvent& e);
+	void	onBtnExportPal(wxCommandEvent& e);
 };
 
 #endif //__PALETTEENTRYPANEL_H__

@@ -31,6 +31,7 @@
 #include "Main.h"
 #include "WxStuff.h"
 #include "PaletteEntryPanel.h"
+#include "PaletteManager.h"
 
 
 /*******************************************************************
@@ -64,10 +65,16 @@ PaletteEntryPanel::PaletteEntryPanel(wxWindow* parent)
 	sizer_bottom->AddSpacer(8);
 	sizer_bottom->Add(label_selected_colour, 0, wxALIGN_CENTER_VERTICAL, 4);
 
+	// Add 'Add to Palettes' button
+	btn_exportpal = new wxButton(this, -1, "Add to Palettes");
+	sizer_bottom->AddStretchSpacer();
+	sizer_bottom->Add(btn_exportpal, 0, wxEXPAND);
+
 	// Bind events
 	btn_nextpal->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &PaletteEntryPanel::onBtnNextPal, this);
 	btn_prevpal->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &PaletteEntryPanel::onBtnPrevPal, this);
 	pal_canvas->Bind(wxEVT_LEFT_DOWN, &PaletteEntryPanel::onPalCanvasMouseEvent, this);
+	btn_exportpal->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &PaletteEntryPanel::onBtnExportPal, this);
 
 	// Init variables
 	cur_palette = 0;
@@ -140,18 +147,30 @@ bool PaletteEntryPanel::showPalette(uint32_t index) {
 }
 
 
+/*******************************************************************
+ * PALETTEENTRYPANEL CLASS EVENTS
+ *******************************************************************/
 
-
+/* PaletteEntryPanel::onBtnNextPal
+ * Called when the 'next palette' button is clicked
+ *******************************************************************/
 void PaletteEntryPanel::onBtnNextPal(wxCommandEvent& e) {
 	if (showPalette(cur_palette + 1))
 		cur_palette++;
 }
 
+/* PaletteEntryPanel::onBtnPrevPal
+ * Called when the 'previous palette' button is clicked
+ *******************************************************************/
 void PaletteEntryPanel::onBtnPrevPal(wxCommandEvent& e) {
 	if (showPalette(cur_palette - 1))
 		cur_palette--;
 }
 
+/* PaletteEntryPanel::onPalCanvasMouseEvent
+ * Called when a mouse event happens within the palette canvas (eg.
+ * button clicked, pointer moved, etc)
+ *******************************************************************/
 void PaletteEntryPanel::onPalCanvasMouseEvent(wxMouseEvent& e) {
 	// Update colour info label with selected colour (if any)
 	if (e.LeftDown()) {
@@ -164,4 +183,23 @@ void PaletteEntryPanel::onPalCanvasMouseEvent(wxMouseEvent& e) {
 		// Set label
 		label_selected_colour->SetLabel(s_fmt("R%d G%d B%d", col.r, col.g, col.b));
 	}
+}
+
+/* PaletteEntryPanel::onBtnExportPal
+ * Called when the 'Add to Palettes' button is clicked
+ *******************************************************************/
+void PaletteEntryPanel::onBtnExportPal(wxCommandEvent& e) {
+	// Get name to export as
+	string name = wxGetTextFromUser("Enter name for Palette:", "Add to Palettes");
+	if (name.IsEmpty())
+		return;
+
+	// Write current palette to the user palettes directory
+	string path = appPath(s_fmt("palettes/%s.pal", chr(name)), DIR_USER);
+	palettes[cur_palette]->saveFile(path);
+
+	// Add to palette manager
+	Palette8bit* pal = new Palette8bit();
+	pal->copyPalette(palettes[cur_palette]);
+	thePaletteManager->addPalette(pal, name);
 }

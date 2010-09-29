@@ -73,6 +73,18 @@ PaletteManager::~PaletteManager() {
 	delete pal_global;
 }
 
+bool PaletteManager::addPalette(Palette8bit* pal, string name) {
+	// Check palette and name were given
+	if (!pal || name.IsEmpty())
+		return false;
+
+	// Add palette+name
+	palettes.push_back(pal);
+	pal_names.push_back(name);
+
+	return true;
+}
+
 Palette8bit* PaletteManager::globalPalette() {
 	// Check if a base resource archive is open
 	if (!theArchiveManager->baseResourceArchive())
@@ -152,8 +164,7 @@ bool PaletteManager::loadResourcePalettes() {
 		pal->loadMem(mc);
 
 		// Add the palette
-		palettes.push_back(pal);
-		pal_names.push_back(dir_palettes->getEntry(a)->getName(true));
+		addPalette(pal, dir_palettes->getEntry(a)->getName(true));
 	}
 
 	return true;
@@ -183,8 +194,7 @@ bool PaletteManager::loadCustomPalettes() {
 		pal->loadMem(mc);
 
 		// Add the palette
-		palettes.push_back(pal);
-		pal_names.push_back(filename);
+		addPalette(pal, filename);
 
 		// Next file
 		files = res_dir.GetNext(&filename);

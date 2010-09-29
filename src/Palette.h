@@ -16,6 +16,8 @@ public:
 
 	bool	loadMem(MemChunk& mc);
 	bool	loadMem(const uint8_t* data, uint32_t size);
+	bool	saveMem(MemChunk& mc);
+	bool	saveFile(string filename);
 
 	void	setColour (uint8_t index, rgba_t  col)	{ colours[index]   = col; }
 	void	setColourR(uint8_t index, uint8_t val)	{ colours[index].r = val; }

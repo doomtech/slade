@@ -24,6 +24,7 @@ public:
 		return instance;
 	}
 
+	bool			addPalette(Palette8bit* pal, string name);
 	int				numPalettes() { return (int)palettes.size(); }
 	Palette8bit*	defaultPalette() { return pal_default; }
 	Palette8bit*	globalPalette();

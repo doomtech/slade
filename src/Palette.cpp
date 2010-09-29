@@ -102,6 +102,38 @@ bool Palette8bit::loadMem(const uint8_t* data, uint32_t size) {
 	return true;
 }
 
+/* Palette8bit::saveMem
+ * Writes colour information to a MemChunk
+ *******************************************************************/
+bool Palette8bit::saveMem(MemChunk& mc) {
+	// Write colours to mc
+	mc.clear();
+	mc.reSize(768);
+	for (unsigned a = 0; a < 256; a++)
+		mc.write(&colours[a], 3);
+
+	return true;
+}
+
+/* Palette8bit::saveFile
+ * Writes colour information to a file at [filename]. Returns false
+ * if the file could not be opened/created, true otherwise
+ *******************************************************************/
+bool Palette8bit::saveFile(string filename) {
+	// Open the file
+	wxFile file(filename, wxFile::write);
+	if (!file.IsOpened())
+		return false;
+
+	// Write colours
+	for (unsigned a = 0; a < 256; a++) {
+		file.Write(&colours[a], 3);
+	}
+
+	// Close file
+	file.Close();
+}
+
 /* Palette8bit::copyPalette8bit
  * Copies the given palette into this one
  *******************************************************************/
