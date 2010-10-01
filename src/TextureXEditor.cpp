@@ -147,6 +147,10 @@ TextureXEditor::TextureXEditor(wxWindow* parent) : wxPanel(parent, -1) {
 	this->archive = archive;
 	this->pnames = NULL;
 
+	// Create patch browser
+	patch_browser = new PatchBrowser(this);
+	patch_browser->Show(false);
+
 	// Setup sizer
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 	SetSizer(sizer);
@@ -231,110 +235,9 @@ bool TextureXEditor::openArchive(Archive* archive) {
 		patch_table.loadPNAMES(entry_pnames, archive);
 	}
 
-	/*
-	else {
-		// No TEXTUREx entries found, so ask if the user wishes to create one
-		wxMessageDialog dlg(this, "The archive does not contain any texture definitions (TEXTURE1/2 or TEXTURES). Do you wish to create or import a texture definition list?", "No Texture Definitions Found", wxYES_NO);
-
-		if (dlg.ShowModal() == wxID_YES) {
-			CreateTextureXDialog ctxd(this);
-
-			while (1) {
-				// Check if cancelled
-				if (ctxd.ShowModal() == wxID_CANCEL)
-					return false;
-
-				if (ctxd.createNewSelected()) {
-					// User selected to create a new TEXTUREx list
-					ArchiveEntry* texturex = NULL;
-
-					int format = ctxd.getSelectedFormat();
-					if (ctxd.getSelectedFormat() == TXF_NORMAL || ctxd.getSelectedFormat() == TXF_STRIFE11) {	// Doom or Strife TEXTUREx
-						// Add empty TEXTURE1 entry to archive
-						texturex = archive->addNewEntry("TEXTURE1");
-						texturex->resize(4, false);
-						texturex->getMCData().fillData(0);
-						texturex->setType(EntryType::getType("texturex"));
-						texturex->setExtensionByType();
-
-						// Add empty PNAMES entry to archive
-						pnames = archive->addNewEntry("PNAMES");
-						pnames->resize(4, false);
-						pnames->getMCData().fillData(0);
-						pnames->setType(EntryType::getType("pnames"));
-						pnames->setExtensionByType();
-					}
-					else if (ctxd.getSelectedFormat() == TXF_TEXTURES) {
-						wxMessageBox("ZDoom TEXTURES Not Implemented");
-						return false;
-					}
-
-					if (!texturex)
-						return false;
-
-					// Open TEXTUREX panel
-					TextureXPanel* tx_panel = new TextureXPanel(this, &patch_table);
-					tx_panel->txList().setFormat(format);
-					tx_panel->openTEXTUREX(texturex);
-					tx_panel->setPalette(pal_chooser->getSelectedPalette());
-					texturex->lock();
-
-					// Add it to the list of editors, and a tab
-					texture_editors.push_back(tx_panel);
-					tabs->AddPage(tx_panel, texturex->getName());
-
-					// Set patch table parent (so it finds patches properly)
-					patch_table.setParent(archive);
-				}
-				else {
-					// User selected to import texture definitions from the base resource archive
-					Archive* bra = theArchiveManager->baseResourceArchive();
-
-					if (!bra) {
-						wxMessageBox("No Base Resource Archive is opened, please select/open one", "Error", wxICON_ERROR);
-						continue;
-					}
-
-					// Find all relevant entries in the base resource archive
-					Archive::search_options_t options;
-					options.match_type = EntryType::getType("texturex");
-					vector<ArchiveEntry*> import_tx = bra->findAll(options);	// Find all TEXTUREx entries
-					options.match_type = EntryType::getType("pnames");
-					ArchiveEntry* import_pnames = bra->findLast(options);		// Find last PNAMES entry
-
-					// Check enough entries exist
-					if (import_tx.size() == 0 || !import_pnames) {
-						wxMessageBox("The selected Base Resource Archive does not contain sufficient texture definition entries", "Error", wxICON_ERROR);
-						continue;
-					}
-
-					// Copy TEXTUREx entries over to current archive
-					for (unsigned a = 0; a < import_tx.size(); a++) {
-						ArchiveEntry* texturex = archive->addEntry(import_tx[a], "global", true);
-						texturex->setType(EntryType::getType("texturex"));
-						texturex->setExtensionByType();
-
-						tx_entries.push_back(texturex);
-					}
-
-					// Copt PNAMES entry over to current archive
-					pnames = archive->addEntry(import_pnames, "global", true);
-					pnames->setType(EntryType::getType("pnames"));
-					pnames->setExtensionByType();
-					patch_table.loadPNAMES(pnames, archive);
-				}
-
-				break;
-			}
-		}
-		else
-			return false;
-	}
-	*/
-
 	// Open texture editor tabs
 	for (size_t a = 0; a < tx_entries.size(); a++) {
-		TextureXPanel* tx_panel = new TextureXPanel(this, &patch_table);
+		TextureXPanel* tx_panel = new TextureXPanel(this, this);
 
 		// Init texture panel
 		tx_panel->Show(false);
@@ -371,6 +274,9 @@ bool TextureXEditor::openArchive(Archive* archive) {
 	// Set global palette
 	pal_chooser->setGlobalFromArchive(archive);
 
+	// Setup patch browser
+	patch_browser->openPatchTable(&patch_table);
+
 	return true;
 }
 
@@ -394,6 +300,11 @@ bool TextureXEditor::removePatch(unsigned index, bool delete_entry) {
 	patch_table.removePatch(index);
 
 	return true;
+}
+
+unsigned TextureXEditor::browsePatch() {
+	patch_browser->ShowModal();
+	return 0;
 }
 
 /* TextureXEditor::checkTextures

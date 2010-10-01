@@ -3,9 +3,10 @@
 #define __TEXTUREX_PANEL_H__
 
 #include "TextureXList.h"
-#include "PatchTable.h"
 #include "TextureEditorPanel.h"
 #include "VirtualListView.h"
+
+class TextureXEditor;
 
 class TextureXListView : public VirtualListView {
 private:
@@ -25,7 +26,7 @@ public:
 class TextureXPanel : public wxPanel {
 private:
 	TextureXList		texturex;
-	PatchTable*			patch_table;
+	TextureXEditor*		tx_editor;
 	ArchiveEntry*		tx_entry;
 	CTexture*			tex_current;
 
@@ -38,7 +39,7 @@ private:
 	wxStaticText*		label_tx_format;
 
 public:
-	TextureXPanel(wxWindow* parent, PatchTable* patch_table);
+	TextureXPanel(wxWindow* parent, TextureXEditor* tx_editor);
 	~TextureXPanel();
 
 	TextureXList&	txList() { return texturex; }

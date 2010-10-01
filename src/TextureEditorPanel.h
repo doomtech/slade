@@ -7,9 +7,12 @@
 #include "ListView.h"
 #include <wx/spinctrl.h>
 
+class TextureXEditor;
+
 class TextureEditorPanel : public wxPanel, Listener {
 private:
-	PatchTable*		patch_table;
+	//PatchTable*		patch_table;
+	TextureXEditor*	tx_editor;
 	CTexture*		tex_current;
 	bool			tex_modified;
 
@@ -41,7 +44,7 @@ private:
 	wxSpinCtrl*		spin_patch_top;
 
 public:
-	TextureEditorPanel(wxWindow* parent, PatchTable* patch_table);
+	TextureEditorPanel(wxWindow* parent, TextureXEditor* tx_editor);
 	~TextureEditorPanel();
 
 	// wxWidgets IDs

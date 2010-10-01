@@ -35,8 +35,9 @@ public:
 	PatchTable(Archive* parent = NULL);
 	~PatchTable();
 
-	size_t	nPatches() { return patches.size(); }
-	void	setParent(Archive* parent) { this->parent = parent; }
+	size_t		nPatches() { return patches.size(); }
+	Archive*	getParent() { return parent; }
+	void		setParent(Archive* parent) { this->parent = parent; }
 
 	patch_t&		patch(size_t index);
 	patch_t&		patch(string name);

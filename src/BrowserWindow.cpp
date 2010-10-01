@@ -1,8 +1,9 @@
 
 #include "Main.h"
-#include "BrowserWindow.h"
 #include "WxStuff.h"
+#include "BrowserWindow.h"
 #include "Console.h"
+#include <algorithm>
 
 
 BrowserTreeNode::BrowserTreeNode(BrowserTreeNode* parent) : STreeNode(parent) {
@@ -43,6 +44,9 @@ BrowserCanvas::BrowserCanvas(wxWindow* parent) : OGLCanvas(parent, -1) {
 BrowserCanvas::~BrowserCanvas() {
 }
 
+void BrowserCanvas::openTree(BrowserTreeNode* tree) {
+}
+
 void BrowserCanvas::draw() {
 	// Setup the viewport
 	glViewport(0, 0, GetSize().x, GetSize().y);
@@ -59,6 +63,38 @@ void BrowserCanvas::draw() {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
+	// Translate to middle of pixel (otherwise inaccuracies can occur on certain gl implemenataions)
+	glTranslatef(0.375f, 0.375f, 0);
+
+	// Init for texture drawing
+	glEnable(GL_TEXTURE_2D);
+	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+
+	// Draw items
+	int x = 4;
+	int y = 4;
+	for (unsigned a = 0; a < items.size(); a++) {
+		glPushMatrix();
+
+		// Go to position
+		glTranslated(x, y, 0);
+
+		// Draw item
+		items[a]->draw(64);
+
+		glPopMatrix();
+
+		// Move over for next item
+		x += 72;
+		if (x > GetSize().x - 72) {
+			x = 4;
+			y += 72;
+
+			// Canvas is filled, stop drawing
+			if (y > GetSize().y - 72)
+				break;
+		}
+	}
 
 	// Swap Buffers
 	SwapBuffers();
@@ -80,7 +116,7 @@ public:
 };
 
 
-BrowserWindow::BrowserWindow(wxWindow* parent) : wxFrame(parent, -1, "Browser") {
+BrowserWindow::BrowserWindow(wxWindow* parent) : wxDialog(parent, -1, "Browser", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX) {
 	// Init variables
 	items_root = new BrowserTreeNode();
 	items_root->setName("All");
@@ -94,9 +130,35 @@ BrowserWindow::BrowserWindow(wxWindow* parent) : wxFrame(parent, -1, "Browser") 
 	tree_items->SetSizeHints(wxSize(100, -1));
 	m_hbox->Add(tree_items, 0, wxEXPAND|wxALL, 4);
 
+	// Browser area
+	wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
+	m_hbox->Add(vbox, 1, wxEXPAND|wxALL, 4);
+
+	// Sorting
+	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
+	vbox->Add(hbox, 0, wxEXPAND|wxBOTTOM, 4);
+	choice_sort = new wxChoice(this, -1);
+	hbox->AddStretchSpacer();
+	hbox->Add(new wxStaticText(this, -1, "Sort:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 2);
+	hbox->Add(choice_sort, 0, wxEXPAND);
+
 	// Browser canvas
 	canvas = new BrowserCanvas(this);
-	m_hbox->Add(canvas, 1, wxEXPAND|wxALL, 4);
+	vbox->Add(canvas, 1, wxEXPAND|wxBOTTOM, 4);
+
+	// Bottom sizer
+	sizer_bottom = new wxBoxSizer(wxHORIZONTAL);
+	vbox->Add(sizer_bottom, 0, wxEXPAND|wxBOTTOM, 4);
+
+	// Buttons
+	vbox->Add(CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND);
+
+	// Setup sorting options
+	addSortType("Index");
+	addSortType("Name (Alphabetical)");
+
+	// Bind events
+	tree_items->Bind(wxEVT_COMMAND_TREE_SEL_CHANGED, &BrowserWindow::onTreeItemSelected, this);
 
 	Layout();
 	SetInitialSize(wxSize(600, 400));
@@ -129,12 +191,65 @@ void BrowserWindow::clearItems(BrowserTreeNode* node) {
 	}
 }
 
+// Sorting functions
+bool sortBIIndex(BrowserItem* left, BrowserItem* right) {
+	return left->getIndex() < right->getIndex();
+}
+bool sortBIName(BrowserItem* left, BrowserItem* right) {
+	return left->getName() < right->getName();
+}
+
+unsigned BrowserWindow::addSortType(string name) {
+	choice_sort->AppendString(name);
+	return choice_sort->GetCount() - 1;
+}
+
+void BrowserWindow::doSort(unsigned sort_type) {
+	// Get item list
+	vector<BrowserItem*>& items = canvas->itemList();
+
+	// Do sorting
+
+	// 0: By Index
+	if (sort_type == 0)
+		std::sort(items.begin(), items.end(), sortBIIndex);
+
+	// 1: By Name (Alphabetical)
+	else if (sort_type == 1)
+		std::sort(items.begin(), items.end(), sortBIName);
+
+	// Refresh canvas
+	canvas->Refresh();
+}
+
+void BrowserWindow::openTree(BrowserTreeNode* node, bool clear) {
+	// Get item list from canvas
+	vector<BrowserItem*>& list = canvas->itemList();
+
+	// Clear it if needed
+	if (clear)
+		list.clear();
+
+	// Add all items in the node
+	for (unsigned a = 0; a < node->nItems(); a++)
+		list.push_back(node->getItem(a));
+
+	// Add all child nodes' items
+	for (unsigned a = 0; a < node->nChildren(); a++)
+		openTree((BrowserTreeNode*)node->getChild(a), false);
+
+	// If the list was cleared, sort it
+	if (clear)
+		doSort(choice_sort->GetSelection());
+}
+
 void BrowserWindow::populateItemTree() {
 	// Clear current tree
 	tree_items->DeleteAllItems();
 
 	// Add root item
 	wxTreeItemId item = tree_items->AddRoot("All");
+	tree_items->SetItemData(item, new BrowserTreeItemData(items_root));
 
 	// Add tree
 	addItemTree(items_root, item);
@@ -150,6 +265,14 @@ void BrowserWindow::addItemTree(BrowserTreeNode* node, wxTreeItemId& item) {
 		// Add children
 		addItemTree(child, i);
 	}
+}
+
+
+
+void BrowserWindow::onTreeItemSelected(wxTreeEvent& e) {
+	BrowserTreeItemData* data = (BrowserTreeItemData*)tree_items->GetItemData(e.GetItem());
+	openTree(data->getNode());
+	canvas->Refresh();
 }
 
 

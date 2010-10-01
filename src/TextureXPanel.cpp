@@ -32,6 +32,7 @@
 #include "WxStuff.h"
 #include "TextureXPanel.h"
 #include "Misc.h"
+#include "TextureXEditor.h"
 #include <wx/filename.h>
 
 
@@ -108,10 +109,10 @@ void TextureXListView::updateList(bool clear) {
 /* TextureXPanel::TextureXPanel
  * TextureXPanel class constructor
  *******************************************************************/
-TextureXPanel::TextureXPanel(wxWindow* parent, PatchTable* patch_table) : wxPanel(parent, -1) {
+TextureXPanel::TextureXPanel(wxWindow* parent, TextureXEditor* tx_editor) : wxPanel(parent, -1) {
 	// Init variables
 	this->tx_entry = NULL;
-	this->patch_table = patch_table;
+	this->tx_editor = tx_editor;
 	this->tex_current = NULL;
 
 	// Setup sizer
@@ -144,7 +145,7 @@ TextureXPanel::TextureXPanel(wxWindow* parent, PatchTable* patch_table) : wxPane
 	framesizer->Add(btn_remove_texture, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
 	// Add texture editor area
-	texture_editor = new TextureEditorPanel(this, patch_table);
+	texture_editor = new TextureEditorPanel(this, tx_editor);
 	sizer->Add(texture_editor, 1, wxEXPAND|wxALL, 4);
 
 	// Bind events
@@ -167,7 +168,7 @@ TextureXPanel::~TextureXPanel() {
  * Loads a TEXTUREX format texture list into the editor
  *******************************************************************/
 bool TextureXPanel::openTEXTUREX(ArchiveEntry* entry) {
-	if (texturex.readTEXTUREXData(entry, *patch_table)) {
+	if (texturex.readTEXTUREXData(entry, tx_editor->patchTable())) {
 		tx_entry = entry;
 
 		// Update patch table usage info
@@ -176,7 +177,7 @@ bool TextureXPanel::openTEXTUREX(ArchiveEntry* entry) {
 
 			// Go through texture's patches
 			for (size_t p = 0; p < tex->nPatches(); p++)
-				patch_table->patch(tex->getPatch(p)->getName()).used_in.push_back(tex->getName());
+				tx_editor->patchTable().patch(tex->getPatch(p)->getName()).used_in.push_back(tex->getName());
 		}
 
 		// Update format label
@@ -199,7 +200,7 @@ bool TextureXPanel::saveTEXTUREX() {
 	applyChanges();
 
 	tx_entry->unlock();	// Have to unlock the entry first
-	bool ok = texturex.writeTEXTUREXData(tx_entry, *patch_table);
+	bool ok = texturex.writeTEXTUREXData(tx_entry, tx_editor->patchTable());
 	tx_entry->lock();
 
 	return ok;
@@ -219,7 +220,7 @@ void TextureXPanel::setPalette(Palette8bit *pal) {
 void TextureXPanel::applyChanges() {
 	if (texture_editor->texModified() && tex_current) {
 		tex_current->copyTexture(texture_editor->getTexture());
-		patch_table->updatePatchUsage(tex_current);
+		tx_editor->patchTable().updatePatchUsage(tex_current);
 		list_textures->updateList();
 	}
 }
@@ -232,7 +233,7 @@ void TextureXPanel::applyChanges() {
 CTexture* TextureXPanel::newTextureFromPatch(string name, string patch) {
 	// Load patch image to get dimensions (yeah it's not optimal, but at the moment it's the best I can do)
 	SImage image;
-	ArchiveEntry* patch_entry = patch_table->patchEntry(patch);
+	ArchiveEntry* patch_entry = tx_editor->patchTable().patchEntry(patch);
 	Misc::loadImageFromEntry(&image, patch_entry);
 
 	// Create new texture
@@ -313,12 +314,12 @@ void TextureXPanel::onBtnNewTexture(wxCommandEvent& e) {
  *******************************************************************/
 void TextureXPanel::onBtnNewTextureFromPatch(wxCommandEvent& e) {
 	// Do nothing if patch list is empty
-	if (patch_table->nPatches() == 0)
+	if (tx_editor->patchTable().nPatches() == 0)
 		return;
 
 	// Temporary choice dialog
 	wxArrayString patches;
-	for (size_t a = 0; a < patch_table->nPatches(); a++) patches.Add(patch_table->patchName(a));
+	for (size_t a = 0; a < tx_editor->patchTable().nPatches(); a++) patches.Add(tx_editor->patchTable().patchName(a));
 	wxSingleChoiceDialog dlg(this, "Select a patch", "Create Texture from Patch", patches);
 
 	if (dlg.ShowModal() == wxID_OK) {
@@ -349,7 +350,7 @@ void TextureXPanel::onBtnNewTextureFromPatch(wxCommandEvent& e) {
 		list_textures->EnsureVisible(selected + 1);
 
 		// Update patch table counts
-		patch_table->updatePatchUsage(tex);
+		tx_editor->patchTable().updatePatchUsage(tex);
 	}
 }
 
@@ -407,7 +408,7 @@ void TextureXPanel::onBtnNewTextureFromFile(wxCommandEvent& e) {
 			tx_entry->getParent()->addEntry(entry, "patches");
 
 			// Add patch to patch table
-			patch_table->addPatch(name);
+			tx_editor->patchTable().addPatch(name);
 
 
 			// Create new texture from patch
@@ -427,7 +428,7 @@ void TextureXPanel::onBtnNewTextureFromFile(wxCommandEvent& e) {
 			list_textures->EnsureVisible(selected + 1);
 
 			// Update patch table counts
-			patch_table->updatePatchUsage(tex);
+			tx_editor->patchTable().updatePatchUsage(tex);
 		}
 	}
 }
@@ -444,7 +445,7 @@ void TextureXPanel::onBtnRemoveTexture(wxCommandEvent& e) {
 		// Remove texture from patch table entries
 		CTexture* tex = texturex.getTexture(selection[a]);
 		for (unsigned p = 0; p < tex->nPatches(); p++)
-			patch_table->patch(tex->getPatch(p)->getName()).removeTextureUsage(tex->getName());
+			tx_editor->patchTable().patch(tex->getPatch(p)->getName()).removeTextureUsage(tex->getName());
 
 		// Remove texture from list
 		texturex.removeTexture(selection[a]);

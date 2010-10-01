@@ -187,10 +187,13 @@ void CTextureCanvas::draw() {
 	glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
+	// Translate to middle of pixel (otherwise inaccuracies can occur on certain gl implemenataions)
+	glTranslatef(0.375f, 0.375f, 0);
+
 	// Draw background
 	drawCheckeredBackground();
 
-	 // Pan by view offset
+	// Pan by view offset
 	glTranslated(offset.x, offset.y, 0);
 
 	// Draw texture
@@ -257,26 +260,23 @@ void CTextureCanvas::drawTexture() {
 	if (draw_outside) {
 		for (uint32_t a = 0; a < texture->nPatches(); a++)
 			drawPatch(a, rgba_t(200, 50, 50, 80, 0));
-			//drawPatch(a, rgba_t(128, 50, 50, 255, 0));
 	}
 
 	// Now, clip to texture boundaries and draw patches fully opaque
 	glEnable(GL_SCISSOR_TEST);
 	glScissor(left, top, texture->getWidth() * scale, texture->getHeight() * scale);
-
 	for (uint32_t a = 0; a < texture->nPatches(); a++)
 		drawPatch(a);
 
 	glDisable(GL_SCISSOR_TEST);
 
 	// Draw the texture border
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	COL_BLACK.set_gl();
-	glBegin(GL_QUADS);
-	glVertex2d(0, 0);
-	glVertex2d(0, texture->getHeight());
-	glVertex2d(texture->getWidth(), texture->getHeight());
-	glVertex2d(texture->getWidth(), 0);
+	glBegin(GL_LINE_LOOP);
+	glVertex2i(0, 0);
+	glVertex2i(0, texture->getHeight());
+	glVertex2i(texture->getWidth(), texture->getHeight());
+	glVertex2i(texture->getWidth(), 0);
 	glEnd();
 
 	// Now loop through selected patches and draw selection outlines
@@ -290,14 +290,13 @@ void CTextureCanvas::drawTexture() {
 		CTPatch* patch = texture->getPatch(a);
 
 		// Draw outline
-		glBegin(GL_QUADS);
-		glVertex2d(patch->xOffset(), patch->yOffset());
-		glVertex2d(patch->xOffset(), patch->yOffset() + (int)patch_textures[a]->getHeight());
-		glVertex2d(patch->xOffset() + (int)patch_textures[a]->getWidth(), patch->yOffset() + (int)patch_textures[a]->getHeight());
-		glVertex2d(patch->xOffset() + (int)patch_textures[a]->getWidth(), patch->yOffset());
+		glBegin(GL_LINE_LOOP);
+		glVertex2i(patch->xOffset(), patch->yOffset());
+		glVertex2i(patch->xOffset(), patch->yOffset() + (int)patch_textures[a]->getHeight());
+		glVertex2i(patch->xOffset() + (int)patch_textures[a]->getWidth(), patch->yOffset() + (int)patch_textures[a]->getHeight());
+		glVertex2i(patch->xOffset() + (int)patch_textures[a]->getWidth(), patch->yOffset());
 		glEnd();
 	}
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	// Pop matrix
 	glPopMatrix();

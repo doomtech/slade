@@ -83,6 +83,7 @@ void OGLCanvas::init() {
 	glClearDepth(1.0);
 	glShadeModel(GL_SMOOTH);
 	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glCullFace(GL_NONE);
@@ -93,7 +94,7 @@ void OGLCanvas::init() {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
-	glOrtho(0, GetSize().x, GetSize().y, 0, -1, 1);
+	glOrtho(0, GetSize().x, GetSize().y, 0, -1, 100);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();

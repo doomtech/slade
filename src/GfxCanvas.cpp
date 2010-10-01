@@ -98,6 +98,9 @@ void GfxCanvas::draw() {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
+	// Translate to middle of pixel (otherwise inaccuracies can occur on certain gl implemenataions)
+	glTranslatef(0.375f, 0.375f, 0);
+
 	// Draw the background
 	drawCheckeredBackground();
 
@@ -277,13 +280,13 @@ void GfxCanvas::drawImage() {
 	// Disable textures
 	glDisable(GL_TEXTURE_2D);
 
-	// Draw outline just outside the picture
+	// Draw outline
 	rgba_t(0, 0, 0, 64).set_gl();
-	glBegin(GL_LINES);
-	glVertex2d(0, 0-1/scale); glVertex2d(0, y);
-	glVertex2d(0, y); glVertex2d(x+1/scale, y);
-	glVertex2d(x+1/scale, y); glVertex2d(x+1/scale, 0-1/scale);
-	glVertex2d(x+1/scale, 0-1/scale); glVertex2d(0, 0-1/scale);
+	glBegin(GL_LINE_LOOP);
+	glVertex2d(0, 0);
+	glVertex2d(0, y);
+	glVertex2d(x, y);
+	glVertex2d(x, 0);
 	glEnd();
 
 	// Restore previous matrix

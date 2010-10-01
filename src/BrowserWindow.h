@@ -23,8 +23,8 @@ public:
 	BrowserTreeNode(BrowserTreeNode* parent = NULL);
 	~BrowserTreeNode();
 
-	string	getName() { return name; }
-	void	setName(string name) { this->name = name; }
+	string		getName() { return name; }
+	void		setName(string name) { this->name = name; }
 
 	void			clearItems();
 	unsigned		nItems() { return items.size(); }
@@ -34,34 +34,44 @@ public:
 
 class BrowserCanvas : public OGLCanvas {
 private:
-	BrowserTreeNode*	items_root;
+	vector<BrowserItem*>	items;
 
 public:
 	BrowserCanvas(wxWindow* parent);
 	~BrowserCanvas();
 
-	void openTree(BrowserTreeNode* tree) { items_root = tree; Refresh(); }
-
-	void draw();
+	vector<BrowserItem*>&	itemList() { return items; }
+	void					openTree(BrowserTreeNode* tree);
+	void					draw();
 };
 
-class BrowserWindow : public wxFrame {
+class BrowserWindow : public wxDialog {
 private:
 	BrowserCanvas*		canvas;
 	wxTreeCtrl*			tree_items;
+	wxChoice*			choice_sort;
 
 protected:
 	BrowserTreeNode*	items_root;
+	wxBoxSizer*			sizer_bottom;
 
 public:
 	BrowserWindow(wxWindow* parent);
 	~BrowserWindow();
 
-	bool	addItem(BrowserItem* item, string where = "");
-	void	clearItems(BrowserTreeNode* node = NULL);
+	bool			addItem(BrowserItem* item, string where = "");
+	void			clearItems(BrowserTreeNode* node = NULL);
+
+	unsigned		addSortType(string name);
+	virtual void	doSort(unsigned sort_type = 0);
+
+	void	openTree(BrowserTreeNode* node, bool clear = true);
 
 	void	populateItemTree();
 	void	addItemTree(BrowserTreeNode* node, wxTreeItemId& item);
+
+	// Events
+	void	onTreeItemSelected(wxTreeEvent& e);
 };
 
 #endif//__BROWSER_WINDOW_H__

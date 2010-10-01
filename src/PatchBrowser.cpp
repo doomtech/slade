@@ -1,13 +1,15 @@
 
 #include "Main.h"
+#include "WxStuff.h"
 #include "PatchBrowser.h"
 #include "ArchiveManager.h"
 #include "Misc.h"
 
 
-PatchBrowserItem::PatchBrowserItem(string name, ArchiveEntry* entry) : BrowserItem(name) {
+PatchBrowserItem::PatchBrowserItem(string name, ArchiveEntry* entry, unsigned index) : BrowserItem(name, index) {
 	// Init variables
 	this->entry = entry;
+	this->palette = NULL;
 }
 
 PatchBrowserItem::~PatchBrowserItem() {
@@ -23,7 +25,7 @@ bool PatchBrowserItem::loadImage() {
 	Misc::loadImageFromEntry(temp_image, entry);
 
 	// Load texture from image
-	bool ok = image.loadImage(temp_image);	// TODO: Palette, how?
+	bool ok = image.loadImage(temp_image, palette);
 
 	// Clean up
 	delete temp_image;
@@ -42,6 +44,14 @@ PatchBrowser::PatchBrowser(wxWindow* parent) : BrowserWindow(parent) {
 	items_root->addChild("IWAD");
 	items_root->addChild("Custom");
 	items_root->addChild("Unknown");
+
+	// Init palette chooser
+	pal_chooser = new PaletteChooser(this, -1);
+	sizer_bottom->Add(new wxStaticText(this, -1, "Palette:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 2);
+	sizer_bottom->Add(pal_chooser, 0, wxEXPAND|wxRIGHT, 4);
+
+	// Set dialog title
+	SetTitle("Patch Browser");
 }
 
 PatchBrowser::~PatchBrowser() {
@@ -54,6 +64,9 @@ bool PatchBrowser::openPatchTable(PatchTable* table) {
 
 	// Clear any existing browser items
 	clearItems();
+
+	// Setup palette chooser
+	pal_chooser->setGlobalFromArchive(table->getParent());
 
 	// Go through patch table
 	for (unsigned a = 0; a < table->nPatches(); a++) {
@@ -76,7 +89,8 @@ bool PatchBrowser::openPatchTable(PatchTable* table) {
 		}
 
 		// Add it
-		PatchBrowserItem* item = new PatchBrowserItem(patch.name, patch.entry);
+		PatchBrowserItem* item = new PatchBrowserItem(patch.name, patch.entry, a);
+		item->setPalette(pal_chooser->getSelectedPalette());
 		addItem(item, where);
 	}
 
@@ -84,6 +98,9 @@ bool PatchBrowser::openPatchTable(PatchTable* table) {
 	if (patch_table) stopListening(patch_table);
 	patch_table = table;
 	listenTo(table);
+
+	// Update tree control
+	populateItemTree();
 
 	return true;
 }

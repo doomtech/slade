@@ -31,6 +31,7 @@
 #include "WxStuff.h"
 #include "TextureEditorPanel.h"
 #include "Icons.h"
+#include "TextureXEditor.h"
 #include <wx/gbsizer.h>
 
 
@@ -41,9 +42,9 @@
 /* TextureEditorPanel::TextureEditorPanel
  * TextureEditorPanel class constructor
  *******************************************************************/
-TextureEditorPanel::TextureEditorPanel(wxWindow* parent, PatchTable* patch_table) : wxPanel(parent, -1) {
+TextureEditorPanel::TextureEditorPanel(wxWindow* parent, TextureXEditor* tx_editor) : wxPanel(parent, -1) {
 	// Init variables
-	this->patch_table = patch_table;
+	this->tx_editor = tx_editor;
 	tex_current = NULL;
 
 	// Setup sizer
@@ -354,14 +355,10 @@ void TextureEditorPanel::updatePatchControls() {
  * Loads a TEXTUREX format texture into the editor
  *******************************************************************/
 bool TextureEditorPanel::openTexture(CTexture* tex) {
-	// Can't open if no patch table
-	if (!patch_table)
-		return false;
-
 	// Update patch entries
 	for (unsigned a = 0; a < tex->nPatches(); a++) {
 		CTPatch* patch = tex->getPatch(a);
-		patch->setEntry(patch_table->patchEntry(patch->getName()));
+		patch->setEntry(tx_editor->patchTable().patchEntry(patch->getName()));
 	}
 
 	// Set as current texture
@@ -372,7 +369,7 @@ bool TextureEditorPanel::openTexture(CTexture* tex) {
 	tex_current->copyTexture(tex);
 
 	// Open texture in canvas
-	tex_canvas->openTexture(tex_current, *patch_table);
+	tex_canvas->openTexture(tex_current, tx_editor->patchTable());
 
 	// Set control values
 	updateTextureControls();
@@ -399,22 +396,26 @@ void TextureEditorPanel::setPalette(Palette8bit *pal) {
  *******************************************************************/
 void TextureEditorPanel::addPatch() {
 	// Do nothing if patch list is empty
-	if (patch_table->nPatches() == 0 || !tex_current)
+	if (tx_editor->patchTable().nPatches() == 0 || !tex_current)
 		return;
 
 	// Temporary choice dialog
+	/*
 	wxArrayString patches;
-	for (size_t a = 0; a < patch_table->nPatches(); a++) patches.Add(patch_table->patchName(a));
+	for (size_t a = 0; a < tx_editor->patchTable().nPatches(); a++) patches.Add(tx_editor->patchTable().patchName(a));
 	wxSingleChoiceDialog dlg(this, "Select a patch to add", "Add Patch", patches);
 
 	if (dlg.ShowModal() == wxID_OK) {
 		// Add new patch (temporary, testing)
-		tex_current->addPatch(dlg.GetStringSelection(), 0, 0, patch_table->patchEntry(dlg.GetSelection()));
+		tex_current->addPatch(dlg.GetStringSelection(), 0, 0, tx_editor->patchTable().patchEntry(dlg.GetSelection()));
 
 		// Update UI
 		populatePatchList();
 		updatePatchControls();
 	}
+	*/
+
+	tx_editor->browsePatch();
 }
 
 /* TextureEditorPanel::removePatch
@@ -506,13 +507,13 @@ void TextureEditorPanel::replacePatch() {
 
 	// Temporary choice dialog
 	wxArrayString patches;
-	for (size_t a = 0; a < patch_table->nPatches(); a++) patches.Add(patch_table->patchName(a));
+	for (size_t a = 0; a < tx_editor->patchTable().nPatches(); a++) patches.Add(tx_editor->patchTable().patchName(a));
 	wxSingleChoiceDialog dlg(this, "Select a patch to replace the selected patch(es) with", "Replace Patch", patches);
 
 	if (dlg.ShowModal() == wxID_OK) {
 		// Go through selection and replace each patch
 		for (size_t a = 0; a < selection.size(); a++)
-			tex_current->replacePatch(selection[a], dlg.GetStringSelection(), patch_table->patchEntry(dlg.GetSelection()));
+			tex_current->replacePatch(selection[a], dlg.GetStringSelection(), tx_editor->patchTable().patchEntry(dlg.GetSelection()));
 	}
 
 	// Repopulate patch list

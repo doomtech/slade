@@ -296,9 +296,9 @@ bool GLTexture::draw2d(double x, double y) {
 		// Draw
 		glBegin(GL_QUADS);
 		glTexCoord2d(0, 0);	glVertex2d(x, y);
-		glTexCoord2d(0, 1);	glVertex2d(x, y+height);
-		glTexCoord2d(1, 1);	glVertex2d(x+width, y+height);
-		glTexCoord2d(1, 0); glVertex2d(x+width, y);
+		glTexCoord2d(0, 1);	glVertex2d(x, y+(double)height);
+		glTexCoord2d(1, 1);	glVertex2d(x+(double)width, y+(double)height);
+		glTexCoord2d(1, 0); glVertex2d(x+(double)width, y);
 		glEnd();
 	}
 

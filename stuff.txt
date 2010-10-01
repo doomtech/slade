@@ -11,7 +11,7 @@ TODO List ---------------------------------------------------------------
 - TEXTUREx editor:
 	- Patch browser
 	- Copy+Paste textures
-- 'Export As' for both entries and archives - does conversion+export
+- 'Export As' for entries - does conversion+export
 - ACS script compilation
 - Linux MIDI playback
 
@@ -27,6 +27,7 @@ TODO List ---------------------------------------------------------------
 - Compilation of other language scripts
 - Archive merging
 - Archive conversion
+- 'Export As' for archives (or just ability to select a different type/extension on save as)
 
 --- Formats ---
 - 7z/bz2

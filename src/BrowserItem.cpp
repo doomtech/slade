@@ -2,8 +2,9 @@
 #include "Main.h"
 #include "BrowserItem.h"
 
-BrowserItem::BrowserItem(string name) {
+BrowserItem::BrowserItem(string name, unsigned index) {
 	this->name = name;
+	this->index = index;
 }
 
 BrowserItem::~BrowserItem() {
@@ -20,23 +21,28 @@ void BrowserItem::draw(int size) {
 
 	// If it still isn't just draw a red box with an X
 	if (!image.isLoaded()) {
+		glPushAttrib(GL_ENABLE_BIT|GL_CURRENT_BIT);
+
 		glColor3f(1, 0, 0);
+		glDisable(GL_TEXTURE_2D);
 
 		// Outline
 		glBegin(GL_LINE_LOOP);
-		glVertex2d(0, 0);
-		glVertex2d(0, size);
-		glVertex2d(size, size);
-		glVertex2d(size, 0);
+		glVertex2i(0, 0);
+		glVertex2i(0, size);
+		glVertex2i(size, size);
+		glVertex2i(size, 0);
 		glEnd();
 
 		// X
 		glBegin(GL_LINES);
-		glVertex2d(0, 0);
-		glVertex2d(size, size);
-		glVertex2d(0, size);
-		glVertex2d(size, 0);
+		glVertex2i(0, 0);
+		glVertex2i(size, size);
+		glVertex2i(0, size);
+		glVertex2i(size, 0);
 		glEnd();
+
+		glPopAttrib();
 
 		return;
 	}
@@ -69,9 +75,9 @@ void BrowserItem::draw(int size) {
 	image.bind();
 
 	glBegin(GL_QUADS);
-	glTexCoord2f(0.0f, 0.0f);	glVertex2d(top, left);
-	glTexCoord2f(0.0f, 1.0f);	glVertex2d(top + height, left);
-	glTexCoord2f(1.0f, 1.0f);	glVertex2d(top + height, left + width);
-	glTexCoord2f(1.0f, 0.0f);	glVertex2d(top, left + width);
+	glTexCoord2f(0.0f, 0.0f);	glVertex2d(left, top);
+	glTexCoord2f(0.0f, 1.0f);	glVertex2d(left, top + height);
+	glTexCoord2f(1.0f, 1.0f);	glVertex2d(left + width, top + height);
+	glTexCoord2f(1.0f, 0.0f);	glVertex2d(left + width, top);
 	glEnd();
 }
