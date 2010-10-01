@@ -81,3 +81,7 @@ void BrowserItem::draw(int size) {
 	glTexCoord2f(1.0f, 0.0f);	glVertex2d(left + width, top);
 	glEnd();
 }
+
+void BrowserItem::clearImage() {
+	image.clear();
+}

@@ -99,6 +99,9 @@ bool PatchBrowser::openPatchTable(PatchTable* table) {
 	patch_table = table;
 	listenTo(table);
 
+	// Open 'all' node
+	openTree(items_root);
+
 	// Update tree control
 	populateItemTree();
 

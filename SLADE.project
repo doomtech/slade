@@ -245,6 +245,8 @@
       <File Name="src/BrowserItem.h"/>
       <File Name="src/BrowserItem.cpp"/>
       <File Name="src/BrowserWindow.cpp"/>
+      <File Name="src/BrowserCanvas.h"/>
+      <File Name="src/BrowserCanvas.cpp"/>
     </VirtualDirectory>
     <File Name="src/CTextureCanvas.cpp"/>
     <VirtualDirectory Name="TextEditor">

@@ -38,71 +38,6 @@ void BrowserTreeNode::addItem(BrowserItem* item, unsigned index) {
 
 
 
-BrowserCanvas::BrowserCanvas(wxWindow* parent) : OGLCanvas(parent, -1) {
-}
-
-BrowserCanvas::~BrowserCanvas() {
-}
-
-void BrowserCanvas::openTree(BrowserTreeNode* tree) {
-}
-
-void BrowserCanvas::draw() {
-	// Setup the viewport
-	glViewport(0, 0, GetSize().x, GetSize().y);
-
-	// Setup the screen projection
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, GetSize().x, GetSize().y, 0, -1, 1);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-	// Clear
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-
-	// Translate to middle of pixel (otherwise inaccuracies can occur on certain gl implemenataions)
-	glTranslatef(0.375f, 0.375f, 0);
-
-	// Init for texture drawing
-	glEnable(GL_TEXTURE_2D);
-	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-
-	// Draw items
-	int x = 4;
-	int y = 4;
-	for (unsigned a = 0; a < items.size(); a++) {
-		glPushMatrix();
-
-		// Go to position
-		glTranslated(x, y, 0);
-
-		// Draw item
-		items[a]->draw(64);
-
-		glPopMatrix();
-
-		// Move over for next item
-		x += 72;
-		if (x > GetSize().x - 72) {
-			x = 4;
-			y += 72;
-
-			// Canvas is filled, stop drawing
-			if (y > GetSize().y - 72)
-				break;
-		}
-	}
-
-	// Swap Buffers
-	SwapBuffers();
-}
-
-
-
-
 // wxTreeItemData class needed to associate BrowserTreeNodes with tree items
 class BrowserTreeItemData : public wxTreeItemData {
 private:
@@ -143,8 +78,14 @@ BrowserWindow::BrowserWindow(wxWindow* parent) : wxDialog(parent, -1, "Browser",
 	hbox->Add(choice_sort, 0, wxEXPAND);
 
 	// Browser canvas
+	hbox = new wxBoxSizer(wxHORIZONTAL);
+	vbox->Add(hbox, 1, wxEXPAND|wxBOTTOM, 4);
 	canvas = new BrowserCanvas(this);
-	vbox->Add(canvas, 1, wxEXPAND|wxBOTTOM, 4);
+	hbox->Add(canvas, 1, wxEXPAND);
+	// Canvas scrollbar
+	wxScrollBar* scrollbar = new wxScrollBar(this, -1, wxDefaultPosition, wxDefaultSize, wxSB_VERTICAL);
+	hbox->Add(scrollbar, 0, wxEXPAND);
+	canvas->setScrollBar(scrollbar);
 
 	// Bottom sizer
 	sizer_bottom = new wxBoxSizer(wxHORIZONTAL);
@@ -156,6 +97,7 @@ BrowserWindow::BrowserWindow(wxWindow* parent) : wxDialog(parent, -1, "Browser",
 	// Setup sorting options
 	addSortType("Index");
 	addSortType("Name (Alphabetical)");
+	choice_sort->SetSelection(0);
 
 	// Bind events
 	tree_items->Bind(wxEVT_COMMAND_TREE_SEL_CHANGED, &BrowserWindow::onTreeItemSelected, this);
@@ -189,6 +131,20 @@ void BrowserWindow::clearItems(BrowserTreeNode* node) {
 		node->removeChild(child);
 		delete child;
 	}
+}
+
+void BrowserWindow::reloadItems(BrowserTreeNode* node) {
+	// Check node was given to begin reload
+	if (!node)
+		node = items_root;
+
+	// Go through items in this node
+	for (unsigned a = 0; a < node->nItems(); a++)
+		node->getItem(a)->clearImage();
+
+	// Go through child nodes
+	for (unsigned a = 0; a < node->nChildren(); a++)
+		reloadItems((BrowserTreeNode*)node->getChild(a));
 }
 
 // Sorting functions
@@ -274,7 +230,6 @@ void BrowserWindow::onTreeItemSelected(wxTreeEvent& e) {
 	openTree(data->getNode());
 	canvas->Refresh();
 }
-
 
 
 

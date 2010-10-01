@@ -19,6 +19,7 @@ public:
 
 	virtual bool	loadImage();
 	void			draw(int size);
+	void			clearImage();
 };
 
 #endif//__BROWSER_ITEM_H__

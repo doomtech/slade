@@ -3,8 +3,8 @@
 #define __BROWSER_WINDOW_H__
 
 #include "Tree.h"
-#include "OGLCanvas.h"
 #include "BrowserItem.h"
+#include "BrowserCanvas.h"
 #include <wx/treectrl.h>
 #include <wx/frame.h>
 
@@ -32,19 +32,6 @@ public:
 	void			addItem(BrowserItem* item, unsigned index = 0xFFFFFFFF);
 };
 
-class BrowserCanvas : public OGLCanvas {
-private:
-	vector<BrowserItem*>	items;
-
-public:
-	BrowserCanvas(wxWindow* parent);
-	~BrowserCanvas();
-
-	vector<BrowserItem*>&	itemList() { return items; }
-	void					openTree(BrowserTreeNode* tree);
-	void					draw();
-};
-
 class BrowserWindow : public wxDialog {
 private:
 	BrowserCanvas*		canvas;
@@ -59,8 +46,9 @@ public:
 	BrowserWindow(wxWindow* parent);
 	~BrowserWindow();
 
-	bool			addItem(BrowserItem* item, string where = "");
-	void			clearItems(BrowserTreeNode* node = NULL);
+	bool	addItem(BrowserItem* item, string where = "");
+	void	clearItems(BrowserTreeNode* node = NULL);
+	void	reloadItems(BrowserTreeNode* node = NULL);
 
 	unsigned		addSortType(string name);
 	virtual void	doSort(unsigned sort_type = 0);
