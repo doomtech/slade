@@ -20,7 +20,6 @@ int checkForTags(MemChunk & mc) {
 			// If there is a footer, then add 10 more to the size
 			if (mc[5] & 0x10) size += 10;
 			// Needs to be at least that big
-			wxLogMessage("ID3 tag size is %i", size);
 			if (mc.getSize() < size + 4)
 				return 0;
 			return size;
