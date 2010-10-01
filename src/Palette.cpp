@@ -132,6 +132,7 @@ bool Palette8bit::saveFile(string filename) {
 
 	// Close file
 	file.Close();
+	return true;
 }
 
 /* Palette8bit::copyPalette8bit
