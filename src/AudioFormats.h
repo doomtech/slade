@@ -161,7 +161,7 @@ public:
 			// Check for mod header
 			char temp[17] = "";
 			memcpy(temp, mc.getData(), 17);
-			if (!s_fmt("%s", temp).Cmp("Extended module: ")) {
+			if (!s_fmt("%s", temp).CmpNoCase("Extended module: ")) {
 				if (mc[37] == 0x1a) {
 					return EDF_TRUE;
 				}
