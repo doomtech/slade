@@ -1086,6 +1086,14 @@
 				Name="Browser"
 				>
 				<File
+					RelativePath=".\src\BrowserCanvas.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\BrowserCanvas.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\BrowserItem.cpp"
 					>
 				</File>
