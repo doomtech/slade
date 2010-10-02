@@ -11,7 +11,6 @@ TODO List ---------------------------------------------------------------
 - TEXTUREx editor:
 	- Patch browser:
 		- Show item names (should implement sfont class for this i guess)
-		- Palette changing
 	- Copy+Paste textures
 - 'Export As' for entries - does conversion+export
 - ACS script compilation
@@ -81,6 +80,9 @@ Unimplemented Feature Requests ------------------------------------------
 
 --- Entry Editing ---
 - SBARINFO viewer/editor
+
+--- Gfx ---
+- Keep existing gfx offsets on import
 
 --- Text Editor ---
 

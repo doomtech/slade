@@ -35,10 +35,10 @@ public:
 
 class BrowserWindow : public wxDialog {
 private:
-	BrowserCanvas*		canvas;
 	wxTreeCtrl*			tree_items;
 	wxChoice*			choice_sort;
 	wxTextCtrl*			text_filter;
+	BrowserCanvas*		canvas;
 
 protected:
 	BrowserTreeNode*	items_root;

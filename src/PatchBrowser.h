@@ -31,6 +31,10 @@ public:
 
 	bool	openPatchTable(PatchTable* table);
 	int		getSelectedPatch();
+	void	updateItemPalettes(BrowserTreeNode* node = NULL);
+
+	// Events
+	void	onPaletteChanged(wxCommandEvent& e);
 };
 
 #endif//__PATCH_BROWSER_H__

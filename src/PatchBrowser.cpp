@@ -50,6 +50,9 @@ PatchBrowser::PatchBrowser(wxWindow* parent) : BrowserWindow(parent) {
 	sizer_bottom->Add(new wxStaticText(this, -1, "Palette:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 2);
 	sizer_bottom->Add(pal_chooser, 0, wxEXPAND|wxRIGHT, 4);
 
+	// Bind events
+	pal_chooser->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &PatchBrowser::onPaletteChanged, this);
+
 	// Set dialog title
 	SetTitle("Patch Browser");
 }
@@ -116,4 +119,27 @@ int PatchBrowser::getSelectedPatch() {
 		return item->getIndex();
 	else
 		return -1;
+}
+
+void PatchBrowser::updateItemPalettes(BrowserTreeNode* node) {
+	// Root node if none given
+	if (!node)
+		node = items_root;
+
+	// Go through items and update their palettes
+	for (unsigned a = 0; a < node->nItems(); a++)
+		((PatchBrowserItem*)node->getItem(a))->setPalette(pal_chooser->getSelectedPalette());
+
+	// Go through child nodes and update their items
+	for (unsigned a = 0; a < node->nChildren(); a++)
+		updateItemPalettes((BrowserTreeNode*)node->getChild(a));
+}
+
+
+
+void PatchBrowser::onPaletteChanged(wxCommandEvent& e) {
+	// Update all item palettes and reload them
+	updateItemPalettes();
+	reloadItems();
+	Refresh();
 }
