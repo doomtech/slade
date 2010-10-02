@@ -75,7 +75,12 @@ BrowserWindow::BrowserWindow(wxWindow* parent) : wxDialog(parent, -1, "Browser",
 	choice_sort = new wxChoice(this, -1);
 	hbox->AddStretchSpacer();
 	hbox->Add(new wxStaticText(this, -1, "Sort:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 2);
-	hbox->Add(choice_sort, 0, wxEXPAND);
+	hbox->Add(choice_sort, 0, wxEXPAND|wxRIGHT, 4);
+
+	// Filter
+	text_filter = new wxTextCtrl(this, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0);
+	hbox->Add(new wxStaticText(this, -1, "Filter:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 2);
+	hbox->Add(text_filter, 0, wxEXPAND);
 
 	// Browser canvas
 	hbox = new wxBoxSizer(wxHORIZONTAL);
@@ -103,6 +108,7 @@ BrowserWindow::BrowserWindow(wxWindow* parent) : wxDialog(parent, -1, "Browser",
 	tree_items->Bind(wxEVT_COMMAND_TREE_SEL_CHANGED, &BrowserWindow::onTreeItemSelected, this);
 	choice_sort->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &BrowserWindow::onChoiceSortChanged, this);
 	canvas->Bind(wxEVT_LEFT_DCLICK, &BrowserWindow::onCanvasDClick, this);
+	text_filter->Bind(wxEVT_COMMAND_TEXT_UPDATED, &BrowserWindow::onTextFilterChanged, this);
 
 	Layout();
 	SetInitialSize(wxSize(600, 400));
@@ -196,10 +202,11 @@ void BrowserWindow::openTree(BrowserTreeNode* node, bool clear) {
 	for (unsigned a = 0; a < node->nChildren(); a++)
 		openTree((BrowserTreeNode*)node->getChild(a), false);
 
-	// If the list was cleared, sort it and update the canvas scrollbar
+	// If the list was cleared, sort it, filter it and update the canvas scrollbar
 	if (clear) {
 		doSort(choice_sort->GetSelection());
 		canvas->updateScrollBar();
+		canvas->filterItems(text_filter->GetValue());
 	}
 }
 
@@ -243,6 +250,11 @@ void BrowserWindow::onChoiceSortChanged(wxCommandEvent& e) {
 void BrowserWindow::onCanvasDClick(wxMouseEvent& e) {
 	// End modal if an item was double-clicked
 	EndModal(wxID_OK);
+}
+
+void BrowserWindow::onTextFilterChanged(wxCommandEvent& e) {
+	// Filter canvas items
+	canvas->filterItems(text_filter->GetValue());
 }
 
 

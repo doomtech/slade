@@ -38,6 +38,7 @@ private:
 	BrowserCanvas*		canvas;
 	wxTreeCtrl*			tree_items;
 	wxChoice*			choice_sort;
+	wxTextCtrl*			text_filter;
 
 protected:
 	BrowserTreeNode*	items_root;
@@ -64,6 +65,7 @@ public:
 	void	onTreeItemSelected(wxTreeEvent& e);
 	void	onChoiceSortChanged(wxCommandEvent& e);
 	void	onCanvasDClick(wxMouseEvent& e);
+	void	onTextFilterChanged(wxCommandEvent& e);
 };
 
 #endif//__BROWSER_WINDOW_H__

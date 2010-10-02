@@ -8,6 +8,7 @@
 class BrowserCanvas : public OGLCanvas {
 private:
 	vector<BrowserItem*>	items;
+	vector<int>				items_filter;
 	wxScrollBar*			scrollbar;
 
 	// Display
@@ -30,6 +31,7 @@ public:
 	int						fullItemSize() { return item_size + (item_border*2); }
 	void					updateScrollBar();
 	BrowserItem*			getSelectedItem();
+	void					filterItems(string filter);
 
 	// Events
 	void	onSize(wxSizeEvent& e);

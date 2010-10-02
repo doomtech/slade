@@ -47,7 +47,7 @@ void BrowserCanvas::draw() {
 	int x = item_border;
 	int y = item_border;
 	top_index = -1;
-	for (unsigned a = 0; a < items.size(); a++) {
+	for (unsigned a = 0; a < items_filter.size(); a++) {
 		// If we're not yet into the viewable area, skip
 		if (y < yoff - fullItemSize()) {
 			x += fullItemSize();
@@ -71,7 +71,7 @@ void BrowserCanvas::draw() {
 		// Draw item
 		glPushMatrix();
 		glTranslated(x, y - yoff, 0);
-		items[a]->draw(item_size);
+		items[items_filter[a]]->draw(item_size);
 
 		// Draw selection box if selected
 		if (item_selected == a) {
@@ -141,7 +141,7 @@ void BrowserCanvas::updateScrollBar() {
 
 	// Determine total height of all items
 	int items_row = GetSize().x / fullItemSize();
-	int rows = items.size() / items_row;
+	int rows = items_filter.size() / items_row;
 	int total_height = rows * fullItemSize();
 
 	// Setup scrollbar
@@ -151,10 +151,37 @@ void BrowserCanvas::updateScrollBar() {
 
 BrowserItem* BrowserCanvas::getSelectedItem() {
 	// Check selected index
-	if (item_selected < 0 || item_selected >= items.size())
+	if (item_selected < 0 || item_selected >= (int)items_filter.size())
 		return NULL;
 
-	return items[item_selected];
+	return items[items_filter[item_selected]];
+}
+
+void BrowserCanvas::filterItems(string filter) {
+	// Clear current filter list
+	items_filter.clear();
+
+	// If the filter is empty, just add all items to the filter
+	if (filter.IsEmpty()) {
+		for (unsigned a = 0; a < items.size(); a++)
+			items_filter.push_back(a);
+	}
+	else {
+		// Setup filter string
+		filter.MakeLower();
+		filter += "*";
+
+		// Go through items
+		for (unsigned a = 0; a < items.size(); a++) {
+			// Add to filter list if name matches
+			if (items[a]->getName().Lower().Matches(filter))
+				items_filter.push_back(a);
+		}
+	}
+
+	// Update scrollbar and refresh
+	updateScrollBar();
+	Refresh();
 }
 
 

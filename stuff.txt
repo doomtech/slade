@@ -9,7 +9,9 @@ TODO List ---------------------------------------------------------------
 
 --- Before Final 3.0 Release ---
 - TEXTUREx editor:
-	- Patch browser
+	- Patch browser:
+		- Show item names (should implement sfont class for this i guess)
+		- Palette changing
 	- Copy+Paste textures
 - 'Export As' for entries - does conversion+export
 - ACS script compilation
