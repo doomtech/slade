@@ -107,3 +107,13 @@ bool PatchBrowser::openPatchTable(PatchTable* table) {
 
 	return true;
 }
+
+int PatchBrowser::getSelectedPatch() {
+	// Get selected item
+	PatchBrowserItem* item = (PatchBrowserItem*)getSelectedItem();
+
+	if (item)
+		return item->getIndex();
+	else
+		return -1;
+}

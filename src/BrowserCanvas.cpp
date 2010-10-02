@@ -9,10 +9,12 @@ BrowserCanvas::BrowserCanvas(wxWindow* parent) : OGLCanvas(parent, -1) {
 	item_size = 64;
 	item_border = 4;
 	scrollbar = NULL;
+	item_selected = 0;
 
 	// Bind events
 	Bind(wxEVT_SIZE, &BrowserCanvas::onSize, this);
 	Bind(wxEVT_MOUSEWHEEL, &BrowserCanvas::onMouseEvent, this);
+	Bind(wxEVT_LEFT_DOWN, &BrowserCanvas::onMouseEvent, this);
 }
 
 BrowserCanvas::~BrowserCanvas() {
@@ -44,6 +46,7 @@ void BrowserCanvas::draw() {
 	// Draw items
 	int x = item_border;
 	int y = item_border;
+	top_index = -1;
 	for (unsigned a = 0; a < items.size(); a++) {
 		// If we're not yet into the viewable area, skip
 		if (y < yoff - fullItemSize()) {
@@ -59,13 +62,47 @@ void BrowserCanvas::draw() {
 			continue;
 		}
 
-		glPushMatrix();
-
-		// Go to position
-		glTranslated(x, y - yoff, 0);
+		// If we're drawing the first non-hidden item, save it
+		if (top_index < 0) {
+			top_index = a;
+			top_y = y - yoff;
+		}
 
 		// Draw item
+		glPushMatrix();
+		glTranslated(x, y - yoff, 0);
 		items[a]->draw(item_size);
+
+		// Draw selection box if selected
+		if (item_selected == a) {
+			// Setup
+			glDisable(GL_TEXTURE_2D);
+			glColor4f(0.3f, 0.5f, 1.0f, 0.3f);
+			glPushMatrix();
+			glTranslated(-item_border, -item_border, 0);
+
+			// Selection background
+			glBegin(GL_QUADS);
+			glVertex2i(2, 2);
+			glVertex2i(2, fullItemSize()-3);
+			glVertex2i(fullItemSize()-3, fullItemSize()-3);
+			glVertex2i(fullItemSize()-3, 2);
+			glEnd();
+
+			// Selection border
+			glColor4f(0.6f, 0.8f, 1.0f, 1.0f);
+			glBegin(GL_LINE_LOOP);
+			glVertex2i(2, 2);
+			glVertex2i(2, fullItemSize()-3);
+			glVertex2i(fullItemSize()-3, fullItemSize()-3);
+			glVertex2i(fullItemSize()-3, 2);
+			glEnd();
+
+			// Finish
+			glPopMatrix();
+			glEnable(GL_TEXTURE_2D);
+			glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+		}
 
 		glPopMatrix();
 
@@ -97,9 +134,7 @@ void BrowserCanvas::setScrollBar(wxScrollBar* scrollbar) {
 	scrollbar->Bind(wxEVT_SCROLL_PAGEDOWN, &BrowserCanvas::onScrollPageDown, this);
 }
 
-
-
-void BrowserCanvas::onSize(wxSizeEvent& e) {
+void BrowserCanvas::updateScrollBar() {
 	// Do nothing special if no scrollbar present
 	if (!scrollbar)
 		return;
@@ -112,6 +147,20 @@ void BrowserCanvas::onSize(wxSizeEvent& e) {
 	// Setup scrollbar
 	scrollbar->SetScrollbar(scrollbar->GetThumbPosition(), GetSize().y, total_height, GetSize().y);
 	yoff = scrollbar->GetThumbPosition();
+}
+
+BrowserItem* BrowserCanvas::getSelectedItem() {
+	// Check selected index
+	if (item_selected < 0 || item_selected >= items.size())
+		return NULL;
+
+	return items[item_selected];
+}
+
+
+
+void BrowserCanvas::onSize(wxSizeEvent& e) {
+	updateScrollBar();
 
 	// Do default stuff
 	e.Skip();
@@ -175,4 +224,23 @@ void BrowserCanvas::onMouseEvent(wxMouseEvent& e) {
 		yoff = scrollbar->GetThumbPosition();
 		Refresh();
 	}
+
+	// --- Left click ---
+	else if (e.GetEventType() == wxEVT_LEFT_DOWN) {
+		// Clear selection
+		item_selected = -1;
+
+		// Get column clicked & number of columns
+		int col = e.GetPosition().x / fullItemSize();
+		int num_cols = GetSize().x / fullItemSize();
+
+		// Get row clicked
+		int row = (e.GetPosition().y - top_y) / fullItemSize();
+
+		// Select item
+		item_selected = top_index + (row * num_cols) + col;
+		Refresh();
+	}
+
+	e.Skip();
 }

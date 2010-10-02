@@ -101,6 +101,8 @@ BrowserWindow::BrowserWindow(wxWindow* parent) : wxDialog(parent, -1, "Browser",
 
 	// Bind events
 	tree_items->Bind(wxEVT_COMMAND_TREE_SEL_CHANGED, &BrowserWindow::onTreeItemSelected, this);
+	choice_sort->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &BrowserWindow::onChoiceSortChanged, this);
+	canvas->Bind(wxEVT_LEFT_DCLICK, &BrowserWindow::onCanvasDClick, this);
 
 	Layout();
 	SetInitialSize(wxSize(600, 400));
@@ -194,9 +196,11 @@ void BrowserWindow::openTree(BrowserTreeNode* node, bool clear) {
 	for (unsigned a = 0; a < node->nChildren(); a++)
 		openTree((BrowserTreeNode*)node->getChild(a), false);
 
-	// If the list was cleared, sort it
-	if (clear)
+	// If the list was cleared, sort it and update the canvas scrollbar
+	if (clear) {
 		doSort(choice_sort->GetSelection());
+		canvas->updateScrollBar();
+	}
 }
 
 void BrowserWindow::populateItemTree() {
@@ -229,6 +233,16 @@ void BrowserWindow::onTreeItemSelected(wxTreeEvent& e) {
 	BrowserTreeItemData* data = (BrowserTreeItemData*)tree_items->GetItemData(e.GetItem());
 	openTree(data->getNode());
 	canvas->Refresh();
+}
+
+void BrowserWindow::onChoiceSortChanged(wxCommandEvent& e) {
+	// Re-sort items
+	doSort(choice_sort->GetSelection());
+}
+
+void BrowserWindow::onCanvasDClick(wxMouseEvent& e) {
+	// End modal if an item was double-clicked
+	EndModal(wxID_OK);
 }
 
 

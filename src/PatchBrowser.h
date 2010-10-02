@@ -30,6 +30,7 @@ public:
 	~PatchBrowser();
 
 	bool	openPatchTable(PatchTable* table);
+	int		getSelectedPatch();
 };
 
 #endif//__PATCH_BROWSER_H__

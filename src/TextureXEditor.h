@@ -35,8 +35,8 @@ public:
 	bool	openArchive(Archive* archive);
 
 	// Editing
-	bool		removePatch(unsigned index, bool delete_entry = false);
-	unsigned	browsePatch();
+	bool	removePatch(unsigned index, bool delete_entry = false);
+	int		browsePatch();
 
 	// Checks
 	bool	checkTextures();

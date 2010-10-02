@@ -15,6 +15,11 @@ private:
 	int	item_size;
 	int	item_border;
 
+	// Item selection
+	int	top_index;
+	int	top_y;
+	int	item_selected;
+
 public:
 	BrowserCanvas(wxWindow* parent);
 	~BrowserCanvas();
@@ -23,6 +28,8 @@ public:
 	void					draw();
 	void					setScrollBar(wxScrollBar* scrollbar);
 	int						fullItemSize() { return item_size + (item_border*2); }
+	void					updateScrollBar();
+	BrowserItem*			getSelectedItem();
 
 	// Events
 	void	onSize(wxSizeEvent& e);

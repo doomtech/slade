@@ -302,9 +302,11 @@ bool TextureXEditor::removePatch(unsigned index, bool delete_entry) {
 	return true;
 }
 
-unsigned TextureXEditor::browsePatch() {
-	patch_browser->ShowModal();
-	return 0;
+int TextureXEditor::browsePatch() {
+	if (patch_browser->ShowModal() == wxID_OK)
+		return patch_browser->getSelectedPatch();
+	else
+		return -1;
 }
 
 /* TextureXEditor::checkTextures

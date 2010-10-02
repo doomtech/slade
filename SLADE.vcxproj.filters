@@ -381,6 +381,9 @@
     <ClCompile Include="src\GeneralPrefsPanel.cpp">
       <Filter>Dialogs\Preferences</Filter>
     </ClCompile>
+    <ClCompile Include="src\BrowserCanvas.cpp">
+      <Filter>UI Elements\Browser</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -701,6 +704,9 @@
     </ClInclude>
     <ClInclude Include="src\GeneralPrefsPanel.h">
       <Filter>Dialogs\Preferences</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BrowserCanvas.h">
+      <Filter>UI Elements\Browser</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

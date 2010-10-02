@@ -106,6 +106,7 @@
     <ClCompile Include="src\ArchiveOperations.cpp" />
     <ClCompile Include="src\AudioEntryPanel.cpp" />
     <ClCompile Include="src\BaseResourceChooser.cpp" />
+    <ClCompile Include="src\BrowserCanvas.cpp" />
     <ClCompile Include="src\BrowserItem.cpp" />
     <ClCompile Include="src\BrowserWindow.cpp" />
     <ClCompile Include="src\Conversions.cpp" />
@@ -207,6 +208,7 @@
     <ClInclude Include="src\AudioEntryPanel.h" />
     <ClInclude Include="src\AudioFormats.h" />
     <ClInclude Include="src\BaseResourceChooser.h" />
+    <ClInclude Include="src\BrowserCanvas.h" />
     <ClInclude Include="src\BrowserItem.h" />
     <ClInclude Include="src\BrowserWindow.h" />
     <ClInclude Include="src\ConsoleHelpers.h" />

@@ -32,6 +32,7 @@ public:
 	void			addItem(BrowserItem* item, unsigned index = 0xFFFFFFFF);
 };
 
+
 class BrowserWindow : public wxDialog {
 private:
 	BrowserCanvas*		canvas;
@@ -46,9 +47,10 @@ public:
 	BrowserWindow(wxWindow* parent);
 	~BrowserWindow();
 
-	bool	addItem(BrowserItem* item, string where = "");
-	void	clearItems(BrowserTreeNode* node = NULL);
-	void	reloadItems(BrowserTreeNode* node = NULL);
+	bool			addItem(BrowserItem* item, string where = "");
+	void			clearItems(BrowserTreeNode* node = NULL);
+	void			reloadItems(BrowserTreeNode* node = NULL);
+	BrowserItem*	getSelectedItem() { return canvas->getSelectedItem(); }
 
 	unsigned		addSortType(string name);
 	virtual void	doSort(unsigned sort_type = 0);
@@ -60,6 +62,8 @@ public:
 
 	// Events
 	void	onTreeItemSelected(wxTreeEvent& e);
+	void	onChoiceSortChanged(wxCommandEvent& e);
+	void	onCanvasDClick(wxMouseEvent& e);
 };
 
 #endif//__BROWSER_WINDOW_H__

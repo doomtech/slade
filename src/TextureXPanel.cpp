@@ -317,14 +317,11 @@ void TextureXPanel::onBtnNewTextureFromPatch(wxCommandEvent& e) {
 	if (tx_editor->patchTable().nPatches() == 0)
 		return;
 
-	// Temporary choice dialog
-	wxArrayString patches;
-	for (size_t a = 0; a < tx_editor->patchTable().nPatches(); a++) patches.Add(tx_editor->patchTable().patchName(a));
-	wxSingleChoiceDialog dlg(this, "Select a patch", "Create Texture from Patch", patches);
-
-	if (dlg.ShowModal() == wxID_OK) {
+	// Browse for patch
+	int patch = tx_editor->browsePatch();
+	if (patch >= 0) {
 		// Prompt for new texture name
-		string name = wxGetTextFromUser("Enter a texture name:", "New Texture", dlg.GetStringSelection());
+		string name = wxGetTextFromUser("Enter a texture name:", "New Texture", tx_editor->patchTable().patchName(patch));
 
 		// Do nothing if no name entered
 		if (name.IsEmpty())
@@ -334,7 +331,7 @@ void TextureXPanel::onBtnNewTextureFromPatch(wxCommandEvent& e) {
 		name = name.Upper().Truncate(8);
 
 		// Create new texture from patch
-		CTexture* tex = newTextureFromPatch(name, dlg.GetStringSelection());
+		CTexture* tex = newTextureFromPatch(name, tx_editor->patchTable().patchName(patch));
 
 		// Add texture after the last selected item
 		int selected = list_textures->getLastSelected();
