@@ -551,6 +551,13 @@ void ArchiveManagerPanel::openTextureTab(int archive_index) {
 		notebook_archives->SetPageBitmap(notebook_archives->GetPageCount() - 1, getIcon("e_texturex"));
 		txed->SetName("texture");
 		txed->Show(true);
+		// Select the new tab
+		for (size_t a = 0; a < notebook_archives->GetPageCount(); a++) {
+			if (notebook_archives->GetPage(a) == txed) {
+				notebook_archives->SetSelection(a);
+				return;
+			}
+		}
 	}
 }
 
