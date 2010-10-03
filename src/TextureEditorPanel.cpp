@@ -36,6 +36,13 @@
 
 
 /*******************************************************************
+ * VARIABLES
+ *******************************************************************/
+bool hack_nodrag = false;	// Hack to stop the drag event being erroneously triggered when
+							// double-clicking a patch in the patch browser to select it
+
+
+/*******************************************************************
  * TEXTUREEDITORPANEL CLASS FUNCTIONS
  *******************************************************************/
 
@@ -650,13 +657,16 @@ void TextureEditorPanel::onTexCanvasMouseEvent(wxMouseEvent& e) {
 		popup->Append(M_PATCH_FORWARD, "Bring Selected Patch(es) Forward");
 		popup->Append(M_PATCH_DUPLICATE, "Duplicate Selected Patch(es)");
 
+		hack_nodrag = true;
 		PopupMenu(popup);
 	}
 
 	// MOUSE DRAGGING
 	else if (e.Dragging()) {
 		// Drag selected patches if left button is down and any patch is selected
-		if (e.LeftIsDown() && list_patches->GetSelectedItemCount() > 0) {
+		if (hack_nodrag)
+			hack_nodrag = false;
+		else if (e.LeftIsDown() && list_patches->GetSelectedItemCount() > 0) {
 			// Get drag amount according to texture
 			point2_t tex_cur = tex_canvas->screenToTexPosition(e.GetX(), e.GetY());
 			point2_t tex_prev = tex_canvas->screenToTexPosition(tex_canvas->getMousePrevPos().x, tex_canvas->getMousePrevPos().y);
@@ -694,6 +704,8 @@ void TextureEditorPanel::onTexCanvasDragEnd(wxCommandEvent& e) {
 }
 
 void TextureEditorPanel::onTexCanvasKeyDown(wxKeyEvent& e) {
+	bool handled = false;
+
 	// Check for movement keys
 	int x_movement = 0;
 	int y_movement = 0;
@@ -731,6 +743,46 @@ void TextureEditorPanel::onTexCanvasKeyDown(wxKeyEvent& e) {
 		move = true;
 	}
 
+	// --- Shortcut keys ---
+
+	// Add patch (INS)
+	else if (e.GetKeyCode() == WXK_INSERT) {
+		hack_nodrag = true;
+		addPatch();
+		handled = true;
+	}
+
+	// Delete patch (DEL)
+	else if (e.GetKeyCode() == WXK_DELETE) {
+		removePatch();
+		handled = true;
+	}
+
+	// Replace patch (Ctrl+R or F2)
+	else if ((e.GetKeyCode() == 'R' && e.GetModifiers() == wxMOD_CONTROL) || (e.GetKeyCode() == WXK_F2)) {
+		hack_nodrag = true;
+		replacePatch();
+		handled = true;
+	}
+
+	// Duplicate patch (Ctrl+D)
+	else if (e.GetKeyCode() == 'D' && e.GetModifiers() == wxMOD_CONTROL) {
+		duplicatePatch();
+		handled = true;
+	}
+
+	// Bring patch forward (])
+	else if (e.GetKeyCode() == ']') {
+		patchForward();
+		handled = true;
+	}
+
+	// Send patch back ([)
+	else if (e.GetKeyCode() == '[') {
+		patchBack();
+		handled = true;
+	}
+
 	// Move patches if needed
 	if (move) {
 		wxArrayInt selected_patches = list_patches->selectedItems();
@@ -745,8 +797,10 @@ void TextureEditorPanel::onTexCanvasKeyDown(wxKeyEvent& e) {
 		}
 
 		tex_canvas->Refresh();
+		handled = true;
 	}
-	else
+
+	if (!handled)
 		e.Skip();
 }
 

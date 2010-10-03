@@ -300,6 +300,10 @@ void ArchiveEntryList::filterList(string filter, string category) {
  * Applies the current filter(s) to the list
  *******************************************************************/
 void ArchiveEntryList::applyFilter() {
+	// Get current selection
+	vector<ArchiveEntry*> selection = getSelectedEntries();
+	clearSelection();
+
 	// Disable filter initially
 	filter_active = false;
 
@@ -307,6 +311,17 @@ void ArchiveEntryList::applyFilter() {
 	if (filter_name.IsEmpty() && filter_category.IsEmpty()) {
 		// No filter, just refresh the list
 		updateList();
+
+		// Update selection
+		for (unsigned a = 0; a < current_dir->numEntries(); a++) {
+			for (unsigned b = 0; b < selection.size(); b++) {
+				if (current_dir->getEntry(a) == selection[b]) {
+					selectItem(a);
+					break;
+				}
+			}
+		}
+
 		return;
 	}
 
@@ -356,6 +371,16 @@ void ArchiveEntryList::applyFilter() {
 
 	// Update the list
 	updateList();
+
+	// Update selection
+	for (unsigned a = 0; a < filter.size(); a++) {
+		for (unsigned b = 0; b < selection.size(); b++) {
+			if (getEntry(a) == selection[b]) {
+				selectItem(a);
+				break;
+			}
+		}
+	}
 }
 
 /* ArchiveEntryList::goUpDir
