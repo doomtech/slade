@@ -6,6 +6,7 @@
 #include <wx/aui/auibook.h>
 #include <wx/html/htmlwin.h>
 #include <wx/aui/aui.h>
+#include "PaletteChooser.h"
 
 // The below is needed because, if I add a toolbar or dockable window to the main window,
 // then a previously saved perspective is loaded from slade3.cfg, the new item won't show
@@ -20,6 +21,7 @@ private:
 	wxHtmlWindow*			html_startpage;
 	wxAuiManager*			m_mgr;
 	int						lasttipindex;
+	PaletteChooser*			palette_chooser;
 
 	// Singleton instance
 	static MainWindow*		instance;
@@ -96,6 +98,7 @@ public:
 	bool	exitProgram();
 
 	ArchiveManagerPanel*	getArchiveManagerPanel() { return panel_archivemanager; }
+	PaletteChooser*			getPaletteChooser() { return palette_chooser; }
 
 	Archive*				getCurrentArchive();
 	ArchiveEntry*			getCurrentEntry();
@@ -113,6 +116,8 @@ public:
 
 // Define for less cumbersome MainWindow::getInstance()
 #define theMainWindow MainWindow::getInstance()
+#define thePaletteChooser theMainWindow->getPaletteChooser()
+#define thePaletteAnnouncer thePaletteChooser->paletteAnnouncer
 
 
 #endif //__MAINWINDOW_H__

@@ -28,6 +28,7 @@
  * INCLUDES
  *******************************************************************/
 #include "Main.h"
+#include "MainWindow.h"
 #include "TextureXList.h"
 #include "Archive.h"
 #include "ArchiveManager.h"
@@ -167,6 +168,9 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_ta
 
 	// Clear current textures
 	clear();
+
+	// Update palette
+	thePaletteChooser->setGlobalFromArchive(texturex->getParent());
 
 	// Read TEXTUREx
 

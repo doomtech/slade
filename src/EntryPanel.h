@@ -3,8 +3,9 @@
 #define __ENTRYPANEL_H__
 
 #include "ArchiveEntry.h"
+#include "ListenerAnnouncer.h"
 
-class EntryPanel : public wxPanel {
+class EntryPanel : public wxPanel, public Listener {
 private:
 	bool			modified;
 	wxStaticBox*	frame;
@@ -39,6 +40,7 @@ public:
 	virtual void	onBtnSave(wxCommandEvent& e);
 	virtual void	onBtnRevert(wxCommandEvent& e);
 	virtual void	onBtnEditExt(wxCommandEvent& e);
+	virtual void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {}
 };
 
 #endif //__ENTRYPANEL_H__

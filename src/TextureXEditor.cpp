@@ -29,6 +29,7 @@
  * INCLUDES
  *******************************************************************/
 #include "Main.h"
+#include "MainWindow.h"
 #include "WxStuff.h"
 #include "TextureXEditor.h"
 #include "ArchiveManager.h"
@@ -163,19 +164,17 @@ TextureXEditor::TextureXEditor(wxWindow* parent) : wxPanel(parent, -1) {
 	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
 	sizer->Add(hbox, 0, wxEXPAND|wxALL, 4);
 
-	// Add palette chooser
-	pal_chooser = new PaletteChooser(this, -1);
-	hbox->Add(new wxStaticText(this, -1, "Palette:"), 0, wxALIGN_CENTER_VERTICAL|wxALL, 4);
-	hbox->Add(pal_chooser, 0, wxALIGN_CENTER|wxALL, 4);
-
 	// Add save changes button
 	btn_save = new wxButton(this, -1, "Save Changes");
 	hbox->AddStretchSpacer();
 	hbox->Add(btn_save, 0, wxEXPAND|wxALL, 4);
 
 	// Bind events
-	pal_chooser->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &TextureXEditor::onPaletteChanged, this);
 	btn_save->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureXEditor::onSaveClicked, this);
+
+	// Palette chooser
+	listenTo(thePaletteAnnouncer);
+	updateTexturePalette();
 
 	// Update+ layout
 	Layout();
@@ -244,8 +243,10 @@ bool TextureXEditor::openArchive(Archive* archive) {
 
 		// Open TEXTUREX entry
 		if (tx_panel->openTEXTUREX(tx_entries[a])) {
-			tx_panel->setPalette(pal_chooser->getSelectedPalette());	// Set palette
-			tx_entries[a]->lock();										// Lock entry
+			// Set palette
+			tx_panel->setPalette(thePaletteChooser->getSelectedPalette());
+			// Lock entry
+			tx_entries[a]->lock();
 
 			// Add it to the list of editors, and a tab
 			texture_editors.push_back(tx_panel);
@@ -272,7 +273,7 @@ bool TextureXEditor::openArchive(Archive* archive) {
 		pnames->lock();
 
 	// Set global palette
-	pal_chooser->setGlobalFromArchive(archive);
+	thePaletteChooser->setGlobalFromArchive(archive);
 
 	// Setup patch browser
 	patch_browser->openPatchTable(&patch_table);
@@ -370,16 +371,29 @@ bool TextureXEditor::checkTextures() {
  * TEXTUREXEDITOR EVENTS
  *******************************************************************/
 
-/* TextureXEditor::onPaletteChanged
- * Called when a palette is selected in the palette chooser
+/* TextureXEditor::updateTexturePalette
+ * Sets the texture panels' palettes to what is selected in the
+ * palette chooser
  *******************************************************************/
-void TextureXEditor::onPaletteChanged(wxCommandEvent& e) {
+void TextureXEditor::updateTexturePalette() {
 	// Get palette
-	Palette8bit* pal = pal_chooser->getSelectedPalette();
+	Palette8bit* pal = thePaletteChooser->getSelectedPalette();
 
 	// Send to whatever needs it
 	for (size_t a = 0; a < texture_editors.size(); a++)
 		texture_editors[a]->setPalette(pal);
+}
+
+/* TextureXEditor::onAnnouncement
+ * Handles any announcements from the current texture
+ *******************************************************************/
+void TextureXEditor::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
+	if (announcer != thePaletteAnnouncer)
+		return;
+
+	if (event_name == "main_palette_changed") {
+		updateTexturePalette();
+	}
 }
 
 /* TextureXEditor::onSaveClicked

@@ -28,6 +28,7 @@
  * INCLUDES
  *******************************************************************/
 #include "Main.h"
+#include "MainWindow.h"
 #include "WxStuff.h"
 #include "GfxEntryPanel.h"
 #include "Palette.h"
@@ -77,9 +78,7 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 	hbox->AddSpacer(8);
 
 	// Palette chooser
-	combo_palette = new PaletteChooser(this, -1);
-	hbox->Add(new wxStaticText(this, -1, "Palette:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
-	hbox->Add(combo_palette, 0, wxEXPAND, 0);
+	listenTo(thePaletteAnnouncer);
 
 	// Add gfx canvas
 	gfx_canvas = new GfxCanvas(this, -1);
@@ -113,7 +112,6 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 
 	// Bind Events
 	slider_zoom->Bind(wxEVT_COMMAND_SLIDER_UPDATED, &GfxEntryPanel::onZoomChanged, this);
-	combo_palette->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &GfxEntryPanel::onPaletteChanged, this);
 	spin_xoffset->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &GfxEntryPanel::onXOffsetChanged, this);
 	spin_yoffset->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &GfxEntryPanel::onYOffsetChanged, this);
 	combo_offset_type->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &GfxEntryPanel::onOffsetTypeChanged, this);
@@ -183,7 +181,7 @@ bool GfxEntryPanel::saveEntry() {
  *******************************************************************/
 void GfxEntryPanel::refresh() {
 	// Setup palette
-	combo_palette->setGlobalFromArchive(entry->getParent(), Misc::detectPaletteHack(entry));
+	thePaletteChooser->setGlobalFromArchive(entry->getParent(), Misc::detectPaletteHack(entry));
 	updateImagePalette();
 
 	// Set offset text boxes
@@ -233,7 +231,7 @@ void GfxEntryPanel::refresh() {
  * chooser, and refreshes the gfx canvas
  *******************************************************************/
 void GfxEntryPanel::updateImagePalette() {
-	gfx_canvas->setPalette(combo_palette->getSelectedPalette());
+	gfx_canvas->setPalette(thePaletteChooser->getSelectedPalette());
 	gfx_canvas->updateImageTexture();
 }
 
@@ -340,14 +338,6 @@ void GfxEntryPanel::onZoomChanged(wxCommandEvent& e) {
 	gfx_canvas->Refresh();
 }
 
-/* GfxEntryPanel::paletteChanged
- * Called when the palette chooser selection changes
- *******************************************************************/
-void GfxEntryPanel::onPaletteChanged(wxCommandEvent& e) {
-	updateImagePalette();
-	gfx_canvas->Refresh();
-}
-
 /* GfxEntryPanel::textXOffsetChanged
  * Called when enter is pressed within the x offset text entry
  *******************************************************************/
@@ -444,6 +434,21 @@ void GfxEntryPanel::onGfxOffsetChanged(wxEvent& e) {
 	// Set changed
 	setModified();
 }
+
+/* GfxEntryPanel::onAnnouncement
+ * Handles any announcements
+ *******************************************************************/
+void GfxEntryPanel::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
+	if (announcer != thePaletteAnnouncer)
+		return;
+
+	if (event_name == "main_palette_changed") {
+		updateImagePalette();
+		gfx_canvas->Refresh();
+	}
+}
+
+
 
 /*******************************************************************
  * EXTRA CONSOLE COMMANDS

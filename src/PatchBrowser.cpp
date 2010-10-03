@@ -1,5 +1,6 @@
 
 #include "Main.h"
+#include "MainWindow.h"
 #include "WxStuff.h"
 #include "PatchBrowser.h"
 #include "ArchiveManager.h"
@@ -46,12 +47,7 @@ PatchBrowser::PatchBrowser(wxWindow* parent) : BrowserWindow(parent) {
 	items_root->addChild("Unknown");
 
 	// Init palette chooser
-	pal_chooser = new PaletteChooser(this, -1);
-	sizer_bottom->Add(new wxStaticText(this, -1, "Palette:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 2);
-	sizer_bottom->Add(pal_chooser, 0, wxEXPAND|wxRIGHT, 4);
-
-	// Bind events
-	pal_chooser->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &PatchBrowser::onPaletteChanged, this);
+	listenTo(thePaletteAnnouncer);
 
 	// Set dialog title
 	SetTitle("Patch Browser");
@@ -69,7 +65,7 @@ bool PatchBrowser::openPatchTable(PatchTable* table) {
 	clearItems();
 
 	// Setup palette chooser
-	pal_chooser->setGlobalFromArchive(table->getParent());
+	thePaletteChooser->setGlobalFromArchive(table->getParent());
 
 	// Go through patch table
 	for (unsigned a = 0; a < table->nPatches(); a++) {
@@ -93,7 +89,7 @@ bool PatchBrowser::openPatchTable(PatchTable* table) {
 
 		// Add it
 		PatchBrowserItem* item = new PatchBrowserItem(patch.name, patch.entry, a);
-		item->setPalette(pal_chooser->getSelectedPalette());
+		item->setPalette(thePaletteChooser->getSelectedPalette());
 		addItem(item, where);
 	}
 
@@ -128,18 +124,24 @@ void PatchBrowser::updateItemPalettes(BrowserTreeNode* node) {
 
 	// Go through items and update their palettes
 	for (unsigned a = 0; a < node->nItems(); a++)
-		((PatchBrowserItem*)node->getItem(a))->setPalette(pal_chooser->getSelectedPalette());
+		((PatchBrowserItem*)node->getItem(a))->setPalette(thePaletteChooser->getSelectedPalette());
 
 	// Go through child nodes and update their items
 	for (unsigned a = 0; a < node->nChildren(); a++)
 		updateItemPalettes((BrowserTreeNode*)node->getChild(a));
 }
 
+/* PatchBrowser::onAnnouncement
+ * Handles any announcements
+ *******************************************************************/
+void PatchBrowser::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
+	if (announcer != thePaletteAnnouncer)
+		return;
 
-
-void PatchBrowser::onPaletteChanged(wxCommandEvent& e) {
-	// Update all item palettes and reload them
-	updateItemPalettes();
-	reloadItems();
-	Refresh();
+	if (event_name == "main_palette_changed") {
+		// Update all item palettes and reload them
+		updateItemPalettes();
+		reloadItems();
+		Refresh();
+	}
 }

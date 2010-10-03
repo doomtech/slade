@@ -28,6 +28,7 @@
  * INCLUDES
  *******************************************************************/
 #include "Main.h"
+#include "MainWindow.h"
 #include "WxStuff.h"
 #include "PatchTablePanel.h"
 #include "Archive.h"
@@ -248,9 +249,6 @@ PatchTablePanel::PatchTablePanel(wxWindow* parent, PatchTable* patch_table) : wx
 	patch_canvas->setViewType(GFXVIEW_DEFAULT);
 	patch_canvas->allowDrag(true);
 	patch_canvas->allowScroll(true);
-	combo_palette = new PaletteChooser(this, -1);
-	c_box->Add(new wxStaticText(this, -1, "Palette:"), 0, wxALIGN_CENTER_VERTICAL, 0);
-	c_box->Add(combo_palette, 0, wxEXPAND, 0);
 
 	// Bind events
 	btn_add_patch->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &PatchTablePanel::onBtnAddPatch, this);
@@ -258,7 +256,9 @@ PatchTablePanel::PatchTablePanel(wxWindow* parent, PatchTable* patch_table) : wx
 	btn_remove_patch->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &PatchTablePanel::onBtnRemovePatch, this);
 	btn_change_patch->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &PatchTablePanel::onBtnChangePatch, this);
 	list_patches->Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &PatchTablePanel::onDisplayChanged, this);
-	combo_palette->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &PatchTablePanel::onDisplayChanged, this);
+
+	// Palette chooser
+	listenTo(thePaletteAnnouncer);
 }
 
 /* PatchTablePanel::~PatchTablePanel
@@ -416,20 +416,20 @@ void PatchTablePanel::onBtnChangePatch(wxCommandEvent& e) {
 	}
 }
 
-/* PatchTablePanel::onDisplayChanged
+/* PatchTablePanel::updateDisplay
  * Called when a different patch or palette is selected
  * TODO: Separate palette changed and patch changed without breaking
  * default palette display; optimize label_textures display
  *******************************************************************/
-void PatchTablePanel::onDisplayChanged(wxCommandEvent& e) {
+void PatchTablePanel::updateDisplay() {
 	// Get selected patch
 	patch_t& patch = patch_table->patch(list_patches->getLastSelected());
 
 	// Load the image
 	ArchiveEntry * entry = patch_table->patchEntry(list_patches->getLastSelected());
 	if (Misc::loadImageFromEntry(patch_canvas->getImage(), entry)) {
-		combo_palette->setGlobalFromArchive(entry->getParent());
-		patch_canvas->setPalette(combo_palette->getSelectedPalette());
+		thePaletteChooser->setGlobalFromArchive(entry->getParent());
+		patch_canvas->setPalette(thePaletteChooser->getSelectedPalette());
 		label_dimensions->SetLabel(s_fmt("Size: %d x %d", patch_canvas->getImage()->getWidth(), patch_canvas->getImage()->getHeight()));
 	}
 	else {
@@ -484,3 +484,25 @@ void PatchTablePanel::onDisplayChanged(wxCommandEvent& e) {
 	// Update layout
 	Layout();
 }
+
+/* PatchTablePanel::onDisplayChanged
+ * Called when a different patch or palette is selected
+ * TODO: Separate palette changed and patch changed without breaking
+ * default palette display; optimize label_textures display
+ *******************************************************************/
+void PatchTablePanel::onDisplayChanged(wxCommandEvent& e) {
+	updateDisplay();
+}
+
+/* PatchTablePanel::onAnnouncement
+ * Handles any announcements
+ *******************************************************************/
+void PatchTablePanel::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
+	if (announcer != thePaletteAnnouncer)
+		return;
+
+	if (event_name == "main_palette_changed") {
+		updateDisplay();
+	}
+}
+

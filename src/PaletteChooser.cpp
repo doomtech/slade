@@ -59,12 +59,24 @@ PaletteChooser::PaletteChooser(wxWindow* parent, int id)
 
 	// Select first item
 	SetSelection(0);
+
+	// Create announcer
+	paletteAnnouncer = new Announcer();
+	Bind(wxEVT_COMMAND_CHOICE_SELECTED, &PaletteChooser::onPaletteChanged, this);
 }
 
 /* PaletteChooser::~PaletteChooser
  * PaletteChooser class destructor
  *******************************************************************/
 PaletteChooser::~PaletteChooser() {
+	delete paletteAnnouncer;
+}
+
+/* GfxConvDialog::paletteCurrentChanged
+ * Called when the current image palette chooser is changed
+ *******************************************************************/
+void PaletteChooser::onPaletteChanged(wxCommandEvent& e) {
+	paletteAnnouncer->announce("main_palette_changed");
 }
 
 /* PaletteChooser::setGlobalFromArchive

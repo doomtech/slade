@@ -8,11 +8,10 @@
 #include "Archive.h"
 #include "PatchTable.h"
 #include "ListView.h"
-#include "PaletteChooser.h"
 #include "PatchBrowser.h"
 #include <wx/aui/auibook.h>
 
-class TextureXEditor : public wxPanel {
+class TextureXEditor : public wxPanel, public Listener {
 private:
 	Archive*					archive;			// The archive this editor is handling
 	ArchiveEntry*				pnames;				// The PNAMES entry to modify (can be null)
@@ -23,7 +22,6 @@ private:
 	// UI Stuff
 	wxAuiNotebook*		tabs;
 	wxButton*			btn_save;
-	PaletteChooser*		pal_chooser;
 
 public:
 	TextureXEditor(wxWindow* parent);
@@ -33,6 +31,7 @@ public:
 	PatchTable&	patchTable() { return patch_table; }
 
 	bool	openArchive(Archive* archive);
+	void	updateTexturePalette();
 
 	// Editing
 	bool	removePatch(unsigned index, bool delete_entry = false);
@@ -42,8 +41,8 @@ public:
 	bool	checkTextures();
 
 	// Events
-	void	onPaletteChanged(wxCommandEvent& e);
 	void	onSaveClicked(wxCommandEvent& e);
+	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 
 	// Static
 	static bool	setupTextureEntries(Archive* archive);

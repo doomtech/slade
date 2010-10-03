@@ -35,7 +35,6 @@
 #include "Archive.h"
 #include "Icons.h"
 #include "BaseResourceArchivesPanel.h"
-#include "PaletteChooser.h"
 #include "BaseResourceChooser.h"
 #include "PreferencesDialog.h"
 #include "Tokenizer.h"
@@ -247,10 +246,18 @@ void MainWindow::setupLayout() {
 	tb_bra->AddTool(MENU_EDITOR_SETBASERESOURCE, "...", getIcon("t_settings"), "Setup Base Resource Archive paths");
 	tb_bra->Realize();
 
+	// Create Palette Chooser toolbar
+	wxAuiToolBar* tb_pal = new wxAuiToolBar(this, -1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
+	palette_chooser = new PaletteChooser(tb_pal, -1);
+	tb_pal->AddLabel(-1, "Palette:");
+	tb_pal->AddControl(palette_chooser);
+	tb_pal->Realize();
+
 	// Setup panel info & add toolbar panels
 	m_mgr->AddPane(tb_file, wxAuiPaneInfo().ToolbarPane().Top().Name("tb_file"));				// File toolbar
 	m_mgr->AddPane(tb_entry, wxAuiPaneInfo().ToolbarPane().Top().Name("tb_entry").Position(1));	// Entry toolbar
 	m_mgr->AddPane(tb_bra, wxAuiPaneInfo().ToolbarPane().Top().Name("tb_bra").Position(2));		// Base Resource Archive toolbar
+	m_mgr->AddPane(tb_pal, wxAuiPaneInfo().ToolbarPane().Top().Name("tb_pal").Position(3));		// Palette toolbar
 
 
 	// -- Status Bar --

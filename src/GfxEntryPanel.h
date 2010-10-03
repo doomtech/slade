@@ -4,7 +4,6 @@
 
 #include "EntryPanel.h"
 #include "GfxCanvas.h"
-#include "PaletteChooser.h"
 #include <wx/spinctrl.h>
 
 class GfxEntryPanel : public EntryPanel {
@@ -15,7 +14,6 @@ private:
 	wxSlider*		slider_zoom;
 	wxStaticText*	label_current_zoom;
 	wxStaticText*	label_dimensions;
-	PaletteChooser*	combo_palette;
 	wxComboBox*		combo_offset_type;
 	wxSpinCtrl*		spin_xoffset;
 	wxSpinCtrl*		spin_yoffset;
@@ -35,7 +33,6 @@ public:
 	void	refresh();
 
 	void	onZoomChanged(wxCommandEvent& e);
-	void	onPaletteChanged(wxCommandEvent& e);
 	void	onXOffsetChanged(wxSpinEvent& e);
 	void	onYOffsetChanged(wxSpinEvent& e);
 	void	onOffsetTypeChanged(wxCommandEvent& e);
@@ -43,6 +40,7 @@ public:
 	void	onalPhChanged(wxCommandEvent& e);
 	void	ontRNSChanged(wxCommandEvent& e);
 	void	onGfxOffsetChanged(wxEvent& e);
+	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 
 	SImage*	getImage() { if (gfx_canvas) return gfx_canvas->getImage(); else return NULL; }
 };

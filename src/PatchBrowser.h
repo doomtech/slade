@@ -5,7 +5,6 @@
 #include "BrowserWindow.h"
 #include "ListenerAnnouncer.h"
 #include "PatchTable.h"
-#include "PaletteChooser.h"
 
 class PatchBrowserItem : public BrowserItem {
 private:
@@ -23,7 +22,6 @@ public:
 class PatchBrowser : public BrowserWindow, Listener {
 private:
 	PatchTable*		patch_table;
-	PaletteChooser*	pal_chooser;
 
 public:
 	PatchBrowser(wxWindow* parent);
@@ -34,7 +32,7 @@ public:
 	void	updateItemPalettes(BrowserTreeNode* node = NULL);
 
 	// Events
-	void	onPaletteChanged(wxCommandEvent& e);
+	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 };
 
 #endif//__PATCH_BROWSER_H__
