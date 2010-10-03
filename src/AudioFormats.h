@@ -257,6 +257,17 @@ public:
 	}
 };
 
+class Doom64SoundDataFormat : public EntryDataFormat {
+public:
+	Doom64SoundDataFormat() : EntryDataFormat("snd_doom64") {};
+	~Doom64SoundDataFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		// The only check we can do is make sure its size is an even number of bytes.
+		return (mc.getSize()%2 ? EDF_FALSE : EDF_MAYBE);
+	}
+};
+
 class WAVDataFormat : public EntryDataFormat {
 public:
 	WAVDataFormat() : EntryDataFormat("snd_wav") {};

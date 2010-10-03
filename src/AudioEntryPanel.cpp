@@ -92,8 +92,13 @@ bool AudioEntryPanel::loadEntry(ArchiveEntry* entry) {
 		Conversions::doomSndToWav(mcdata, convdata);
 		path.SetExt("wav");
 		convdata.exportFile(path.GetFullPath());
-	}
-	else if (entry->getType()->getFormat() == "mus") {
+	} else if (entry->getType()->getFormat() == "snd_doom64") {
+		// Doom 64 SFX -> WAV
+		MemChunk convdata;
+		Conversions::d64SfxToWav(mcdata, convdata);
+		path.SetExt("wav");
+		convdata.exportFile(path.GetFullPath());
+	} else if (entry->getType()->getFormat() == "mus") {
 		// MUS -> MIDI
 		MemChunk convdata;
 		Conversions::musToMidi(mcdata, convdata);
@@ -110,8 +115,7 @@ bool AudioEntryPanel::loadEntry(ArchiveEntry* entry) {
 	if (entry->getType()->getFormat() == "midi" || entry->getType()->getFormat() == "mus") {
 		openMidi(path.GetFullPath());
 		midi = true;
-	}
-	else {
+	} else {
 		openAudio(path.GetFullPath());
 		midi = false;
 	}

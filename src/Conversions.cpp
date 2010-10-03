@@ -63,9 +63,9 @@ bool Conversions::doomSndToWav(MemChunk& in, MemChunk& out) {
 	memcpy(&fmtchunk.header.id, &fid, 4);
 	fmtchunk.header.size = 16;
 	fmtchunk.tag = 1;
+	fmtchunk.channels = 1;
 	fmtchunk.samplerate = header.samplerate;
 	fmtchunk.datarate = header.samplerate;
-	fmtchunk.channels = 1;
 	fmtchunk.blocksize = 1;
 	fmtchunk.bps = 8;
 
@@ -84,6 +84,52 @@ bool Conversions::doomSndToWav(MemChunk& in, MemChunk& out) {
 	// Ensure data ends on even byte boundary
 	if (header.samples % 2 != 0)
 		out.write('\0', 1);
+
+	return true;
+}
+
+/* Conversions::d64SfxToWav
+ * These entries are in raw 22050 Hz 16-bit-per-sample PCM format.
+ *******************************************************************/
+bool Conversions::d64SfxToWav(MemChunk& in, MemChunk& out) {
+	// Ridiculously weak format check.
+	// but that's the best we can do with raw data.
+	if (in.getSize() % 2) {
+		Global::error = "Invalid Doom 64 SFX";
+		return false;
+	}
+
+	// --- Write WAV ---
+	wav_chunk_t whdr, wdhdr;
+	wav_fmtchunk_t fmtchunk;
+
+	// Setup data header
+	char did[4] = { 'd', 'a', 't', 'a' };
+	memcpy(&wdhdr.id, &did, 4);
+	wdhdr.size = in.getSize();
+
+	// Setup fmt chunk
+	char fid[4] = { 'f', 'm', 't', ' ' };
+	memcpy(&fmtchunk.header.id, &fid, 4);
+	fmtchunk.header.size = 16;
+	fmtchunk.tag = 1;
+	fmtchunk.channels = 1;
+	fmtchunk.samplerate = 22050;
+	fmtchunk.datarate = 44100;
+	fmtchunk.blocksize = 2;
+	fmtchunk.bps = 16;
+
+	// Setup main header
+	char wid[4] = { 'R', 'I', 'F', 'F' };
+	memcpy(&whdr.id, &wid, 4);
+	whdr.size = wdhdr.size + fmtchunk.header.size + 8;
+
+	// Write chunks
+	out.write(&whdr, 8);
+	out.write("WAVE", 4);
+	out.write(&fmtchunk, sizeof(wav_fmtchunk_t));
+	out.write(&wdhdr, 8);
+	out.write(in.getData(), in.getSize());
 
 	return true;
 }
