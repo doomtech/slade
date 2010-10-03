@@ -271,13 +271,7 @@ void CTextureCanvas::drawTexture() {
 	glDisable(GL_SCISSOR_TEST);
 
 	// Draw the texture border
-	COL_BLACK.set_gl();
-	glBegin(GL_LINE_LOOP);
-	glVertex2i(0, 0);
-	glVertex2i(0, texture->getHeight());
-	glVertex2i(texture->getWidth(), texture->getHeight());
-	glVertex2i(texture->getWidth(), 0);
-	glEnd();
+	drawTextureBorder();
 
 	// Now loop through selected patches and draw selection outlines
 	rgba_t(70, 210, 220, 255, 0).set_gl();
@@ -346,33 +340,41 @@ void CTextureCanvas::drawPatch(int num, rgba_t col) {
  * Draws a black border around the texture
  *******************************************************************/
 void CTextureCanvas::drawTextureBorder() {
-	// Push matrix
-	glPushMatrix();
-
-	// Translate to middle of the canvas
-	glTranslated(GetSize().x * 0.5, GetSize().y * 0.5, 0);
-
-	// Zoom
-	glScaled(scale, scale, 1);
-
-	// Translate to top-left of texture
-	glTranslated(texture->getWidth() * -0.5, texture->getHeight() * -0.5, 0);
-
-	// Draw border
+	// Draw the texture border
 	COL_BLACK.set_gl();
-	glBegin(GL_LINES);
-	glVertex2d(0, 0);
-	glVertex2d(texture->getWidth(), 0);
-	glVertex2d(texture->getWidth(), 0);
-	glVertex2d(texture->getWidth(), texture->getHeight());
-	glVertex2d(texture->getWidth(), texture->getHeight());
-	glVertex2d(0, texture->getHeight());
-	glVertex2d(0, texture->getHeight());
-	glVertex2d(0, 0);
+	glBegin(GL_LINE_LOOP);
+	glVertex2i(0, 0);
+	glVertex2i(0, texture->getHeight());
+	glVertex2i(texture->getWidth(), texture->getHeight());
+	glVertex2i(texture->getWidth(), 0);
 	glEnd();
 
-	// Pop matrix
-	glPopMatrix();
+	// Draw vertical ticks
+	int y = 0;
+	glColor4f(0.0f, 0.0f, 0.0f, 0.6f);
+	while (y <= texture->getHeight()) {
+		glBegin(GL_LINES);
+		glVertex2i(-4, y);
+		glVertex2i(0, y);
+		glVertex2i(texture->getWidth(), y);
+		glVertex2i(texture->getWidth() + 4, y);
+		glEnd();
+
+		y += 8;
+	}
+
+	// Draw horizontal ticks
+	int x = 0;
+	while (x <= texture->getWidth()) {
+		glBegin(GL_LINES);
+		glVertex2i(x, -4);
+		glVertex2i(x, 0);
+		glVertex2i(x, texture->getHeight());
+		glVertex2i(x, texture->getHeight() + 4);
+		glEnd();
+
+		x += 8;
+	}
 }
 
 /* CTextureCanvas::screenToTextPosition

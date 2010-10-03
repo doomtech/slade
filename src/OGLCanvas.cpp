@@ -41,7 +41,7 @@
  * OGLCanvas class constructor
  *******************************************************************/
 OGLCanvas::OGLCanvas(wxWindow* parent, int id)
-: wxGLCanvas(parent, id, NULL, wxDefaultPosition, wxDefaultSize, wxBORDER_SIMPLE) {
+: wxGLCanvas(parent, id, NULL, wxDefaultPosition, wxDefaultSize, wxBORDER_SIMPLE|wxWANTS_CHARS) {
 	init_done = false;
 
 	// Bind events
