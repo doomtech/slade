@@ -1139,7 +1139,7 @@ void ArchiveManagerPanel::goToBookmark(long index) {
 	if (!bookmark)
 		return;
 
-	// Open it's parent archive in a tab
+	// Open its parent archive in a tab
 	openTab(bookmark->getParent());
 
 	// Get the opened tab (should be an ArchivePanel unless something went wrong)

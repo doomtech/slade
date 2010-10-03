@@ -383,13 +383,11 @@ void ArchiveEntryList::applyFilter() {
 	}
 }
 
-/* ArchiveEntryList::goUpDir
- * Opens the parent directory of the current directory (if it exists)
- *******************************************************************/
-bool ArchiveEntryList::goUpDir() {
-	// Get parent directory
-	ArchiveTreeNode* dir = (ArchiveTreeNode*)current_dir->getParent();
 
+/* ArchiveEntryList::setDir
+ * Opens the given directory (if it exists)
+ *******************************************************************/
+bool ArchiveEntryList::setDir(ArchiveTreeNode* dir) {
 	// If it doesn't exist, do nothing
 	if (!dir)
 		return false;
@@ -411,6 +409,14 @@ bool ArchiveEntryList::goUpDir() {
 	ProcessWindowEvent(evt);
 
 	return true;
+}
+
+/* ArchiveEntryList::goUpDir
+ * Opens the parent directory of the current directory (if it exists)
+ *******************************************************************/
+bool ArchiveEntryList::goUpDir() {
+	// Get parent directory
+	return (setDir((ArchiveTreeNode*)current_dir->getParent()));
 }
 
 /* ArchiveEntryList::entriesBegin
@@ -666,20 +672,7 @@ void ArchiveEntryList::onListItemActivated(wxListEvent& e) {
 		}
 
 		// Set current dir
-		current_dir = dir;
-
-		// Clear current selection
-		clearSelection();
-
-		// Update filter
-		applyFilter();
-
-		// Update list
-		updateList();
-
-		// Fire event
-		wxCommandEvent evt(EVT_AEL_DIR_CHANGED, GetId());
-		ProcessWindowEvent(evt);
+		setDir(dir);
 	}
 	else
 		e.Skip();

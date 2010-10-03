@@ -54,6 +54,7 @@ public:
 	void	filterList(string filter = "", string category = "");
 	void	applyFilter();
 	bool	goUpDir();
+	bool	setDir(ArchiveTreeNode* dir);
 
 	ArchiveEntry*				getEntry(int index) const;
 	ArchiveEntry*				getFocusedEntry();

@@ -1018,36 +1018,55 @@ bool ArchivePanel::openEntry(ArchiveEntry* entry, bool force) {
 	if (entry->getType() == EntryType::unknownType())
 		EntryType::detectEntryType(entry);
 
-	// Get the appropriate entry panel for the entry's type
-	EntryPanel* new_area = default_area;
-	if (entry->getType() == EntryType::mapMarkerType())
-		new_area = map_area;
-	else if (!entry->getType()->getEditor().Cmp("gfx"))
-		new_area = gfx_area;
-	else if (!entry->getType()->getEditor().Cmp("palette"))
-		new_area = pal_area;
-	else if (!entry->getType()->getEditor().Cmp("text"))
-		new_area = text_area;
-	else if (!entry->getType()->getEditor().Cmp("animated"))
-		new_area = animated_area;
-	else if (!entry->getType()->getEditor().Cmp("switches"))
-		new_area = switches_area;
-	else if (s_cmpnocase(entry->getType()->getEditor(), "audio"))
-		new_area = audio_area;
-	else if (!entry->getType()->getEditor().Cmp("default"))
-		new_area = default_area;
-	else
-		wxLogMessage("Entry editor %s does not exist, using default editor", entry->getType()->getEditor().c_str());
+	// Are we trying to open a directory? This can happen from bookmarks.
+	if (entry->getType() == EntryType::folderType()) {
+		// Get directory to open
+		ArchiveTreeNode* dir = NULL;
 
-	// Show the new entry panel
-	if (!showEntryPanel(new_area))
-		return false;
+		// Removes starting / from path
+		string name = entry->getPath(true);
+		if (name.StartsWith("/"))
+			name.Remove(0, 1);
 
-	// Load the entry into the panel
-	if (!cur_area->openEntry(entry)) {
-		wxMessageBox(s_fmt("Error loading entry:\n%s", Global::error.c_str()), "Error", wxOK|wxICON_ERROR);
+		dir = archive->getDir(name, NULL);
+
+		// Check it exists (really should)
+		if (!dir) {
+			wxLogMessage("Error: Trying to open nonexistant directory %s", chr(name));
+			return false;
+		}
+		entry_list->setDir(dir);
+	} else {
+		// Get the appropriate entry panel for the entry's type
+		EntryPanel* new_area = default_area;
+		if (entry->getType() == EntryType::mapMarkerType())
+			new_area = map_area;
+		else if (!entry->getType()->getEditor().Cmp("gfx"))
+			new_area = gfx_area;
+		else if (!entry->getType()->getEditor().Cmp("palette"))
+			new_area = pal_area;
+		else if (!entry->getType()->getEditor().Cmp("text"))
+			new_area = text_area;
+		else if (!entry->getType()->getEditor().Cmp("animated"))
+			new_area = animated_area;
+		else if (!entry->getType()->getEditor().Cmp("switches"))
+			new_area = switches_area;
+		else if (s_cmpnocase(entry->getType()->getEditor(), "audio"))
+			new_area = audio_area;
+		else if (!entry->getType()->getEditor().Cmp("default"))
+			new_area = default_area;
+		else
+			wxLogMessage("Entry editor %s does not exist, using default editor", entry->getType()->getEditor().c_str());
+
+		// Show the new entry panel
+		if (!showEntryPanel(new_area))
+			return false;
+
+		// Load the entry into the panel
+		if (!cur_area->openEntry(entry)) {
+			wxMessageBox(s_fmt("Error loading entry:\n%s", Global::error.c_str()), "Error", wxOK|wxICON_ERROR);
+		}
 	}
-
 	return true;
 }
 
