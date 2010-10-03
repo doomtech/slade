@@ -22,6 +22,7 @@ private:
 	double				scale;
 	bool				draw_outside;
 	bool				dragging;
+	bool				show_grid;
 
 public:
 	CTextureCanvas(wxWindow* parent, int id);
@@ -32,6 +33,8 @@ public:
 	void		drawOutside(bool draw = true) { draw_outside = draw; }
 	point2_t	getMousePrevPos() { return mouse_prev; }
 	bool		isDragging() { return dragging; }
+	bool		showGrid() { return show_grid; }
+	void		showGrid(bool show = true) { show_grid = show; }
 
 	void	selectPatch(int index);
 	void	deSelectPatch(int index);

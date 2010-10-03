@@ -54,6 +54,7 @@ CTextureCanvas::CTextureCanvas(wxWindow* parent, int id)
 	draw_outside = true;
 	dragging = false;
 	texture = NULL;
+	show_grid = false;
 
 	// Bind events
 	Bind(wxEVT_MOTION, &CTextureCanvas::onMouseEvent, this);
@@ -374,6 +375,62 @@ void CTextureCanvas::drawTextureBorder() {
 		glEnd();
 
 		x += 8;
+	}
+
+	// Draw grid
+	if (show_grid) {
+		// Draw inverted grid lines
+		glBlendFunc(GL_ONE_MINUS_DST_COLOR, GL_ZERO);
+		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+
+		// Vertical
+		y = 8;
+		while (y <= texture->getHeight() - 8) {
+			glBegin(GL_LINES);
+			glVertex2i(0, y);
+			glVertex2i(texture->getWidth(), y);
+			glEnd();
+
+			y += 8;
+		}
+
+		// Horizontal
+		x = 8;
+		while (x <= texture->getWidth() - 8) {
+			glBegin(GL_LINES);
+			glVertex2i(x, 0);
+			glVertex2i(x, texture->getHeight());
+			glEnd();
+
+			x += 8;
+		}
+
+
+		// Darken grid lines
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glColor4f(0.0f, 0.0f, 0.0f, 0.5f);
+
+		// Vertical
+		y = 8;
+		while (y <= texture->getHeight() - 8) {
+			glBegin(GL_LINES);
+			glVertex2i(0, y);
+			glVertex2i(texture->getWidth(), y);
+			glEnd();
+
+			y += 8;
+		}
+
+		// Horizontal
+		x = 8;
+		while (x <= texture->getWidth() - 8) {
+			glBegin(GL_LINES);
+			glVertex2i(x, 0);
+			glVertex2i(x, texture->getHeight());
+			glEnd();
+
+			x += 8;
+		}
 	}
 }
 

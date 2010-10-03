@@ -638,12 +638,18 @@ void TextureEditorPanel::onTexCanvasMouseEvent(wxMouseEvent& e) {
 
 	// LEFT MOUSE UP
 	else if (e.LeftUp()) {
+		// Hide texture grid
+		tex_canvas->showGrid(false);
+
 		// If mouse up over an already-selected patch, and shift/ctrl aren't down,
 		// select only that patch (this mimics 'normal' drag-and-drop/selection behaviour)
 		if (!e.ShiftDown() && !e.ControlDown() && tex_canvas->patchSelected(patch) && !tex_canvas->isDragging()) {
 			list_patches->clearSelection();
 			list_patches->selectItem(patch);
 		}
+
+		// Redraw texture canvas
+		tex_canvas->Refresh();
 	}
 
 	// RIGHT MOUSE UP
@@ -685,6 +691,7 @@ void TextureEditorPanel::onTexCanvasMouseEvent(wxMouseEvent& e) {
 			}
 
 			// Refresh texture canvas
+			tex_canvas->showGrid(true);
 			tex_canvas->Refresh();
 		}
 	}
