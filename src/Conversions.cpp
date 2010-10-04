@@ -223,3 +223,163 @@ bool Conversions::musToMidi(MemChunk& in, MemChunk& out) {
 
 	return true;
 }
+
+/* Conversions::vocToWav
+ * Creative Voice files to wav format
+ *******************************************************************/
+bool Conversions::vocToWav(MemChunk& in, MemChunk& out) {
+	if (in.getSize() < 26 || in[19] != 26 || in[20] != 26 || in[21] != 0
+		|| (0x1234 + ~((in[23]<<8) + in[22])) != (in[24] + (in[25] << 8))) {
+		Global::error = "Invalid VOC";
+		return false;
+	}
+
+	// --- Prepare WAV ---
+	wav_chunk_t whdr, wdhdr;
+	wav_fmtchunk_t fmtchunk;
+
+	// --- Pre-process the file to make sure we can convert it ---
+	int codec = -1;
+	int blockcount = 0;
+	size_t datasize = 0;
+	size_t i = 26, e = in.getSize();
+	bool gotextra = false;
+	while (i < e) {
+		// Parses through blocks
+		uint8_t blocktype = in[i];
+		size_t blocksize = in[i+1] + (in[i+2]<<8) + (in[i+3]<<16);
+		i+=4;
+		if (i + blocksize > e && blocktype != 0) {
+			Global::error = s_fmt("VOC file cut abruptly in block %i", blockcount);
+			return false;
+		}
+		blockcount++;
+		switch (blocktype) {
+			case 0: // Terminator, the rest should be ignored
+				i = e; break;
+			case 1: // Sound data
+				if (!gotextra && codec >= 0 && codec != in[i+1]) {
+					Global::error = "VOC files with different codecs are not supported";
+					return false;
+				} else if (codec == -1) {
+					fmtchunk.samplerate = 1000000/(256 - in[i]);
+					fmtchunk.channels = 1;
+					fmtchunk.tag = 1;
+					codec = in[i+1];
+				}
+				datasize += blocksize;
+				break;
+			case 2: // Sound data continuation
+				if (codec == -1) {
+						Global::error = "Sound data without codec in VOC file";
+						return false;
+				}
+				datasize += blocksize;
+				break;
+			case 3: // Silence
+			case 4: // Marker
+			case 5: // Text
+			case 6: // Repeat start point
+			case 7: // Repeat end point
+				break;
+			case 8: // Extra info, overrides any following sound data codec info
+				if (codec != -1) {
+					Global::error = "Extra info block must precede sound data info block in VOC file";
+					return false;
+				} else {
+					fmtchunk.samplerate = 256000000/((in[i+3] + 1) * (65536 - (in[i] + (in[i+1]<<8))));
+					fmtchunk.channels = in[i+3] + 1;
+					fmtchunk.tag = 1;
+					codec = in[i+2];
+				}
+				break;
+			case 9: // Sound data in new format
+				if (codec >= 0 && codec != (in[i+6]+(in[i+7]<<8))) {
+					Global::error = "VOC files with different codecs are not supported";
+					return false;
+				} else if (codec == -1) {
+					fmtchunk.samplerate = in[i] + (in[i+1]<<8) + (in[i+2]<<16) + (in[i+3]<<24);
+					fmtchunk.bps = in[i+4];
+					fmtchunk.channels = in[i+5];
+					fmtchunk.tag = 1;
+					codec = in[i+6]+(in[i+7]<<8);
+				}
+				break;
+		}
+		i += blocksize;
+	}
+	wdhdr.size = datasize;
+	switch (codec) {
+		case 0: // 8 bits unsigned PCM
+			fmtchunk.bps = 8;
+			fmtchunk.datarate = fmtchunk.samplerate;
+			fmtchunk.blocksize = 1;
+			break;
+		case 4: // 16 bits signed PCM
+			fmtchunk.bps = 16;
+			fmtchunk.datarate = fmtchunk.samplerate<<1;
+			fmtchunk.blocksize = 2;
+			break;
+		case 1: // 4 bits to 8 bits Creative ADPCM
+		case 2: // 3 bits to 8 bits Creative ADPCM (AKA 2.6 bits)
+		case 3: // 2 bits to 8 bits Creative ADPCM
+		case 6: // alaw
+		case 7: // ulaw
+		case 0x200: // 4 bits to 16 bits Creative ADPCM (only valid in block type 0x09)
+			Global::error = s_fmt("Unsupported codec %i in VOC file", codec);
+			return false;
+		default: 
+			Global::error = s_fmt("Unknown codec %i in VOC file", codec);
+			return false;
+	}
+
+	// --- Write WAV ---
+
+	// Setup data header
+	char did[4] = { 'd', 'a', 't', 'a' };
+	memcpy(&wdhdr.id, &did, 4);
+
+	// Setup fmt chunk
+	char fid[4] = { 'f', 'm', 't', ' ' };
+	memcpy(&fmtchunk.header.id, &fid, 4);
+	fmtchunk.header.size = 16;
+
+	// Setup main header
+	char wid[4] = { 'R', 'I', 'F', 'F' };
+	memcpy(&whdr.id, &wid, 4);
+	whdr.size = wdhdr.size + fmtchunk.header.size + 8;
+
+	// Write chunks
+	out.write(&whdr, 8);
+	out.write("WAVE", 4);
+	out.write(&fmtchunk, sizeof(wav_fmtchunk_t));
+	out.write(&wdhdr, 8);
+
+	// Now go and copy sound data
+	const uint8_t * src = in.getData();
+	i = 26;
+	while (i < e) {
+		// Parses through blocks again
+		uint8_t blocktype = in[i];
+		size_t blocksize = in[i+1] + (in[i+2]<<8) + (in[i+3]<<16);
+		i+=4;
+		switch (blocktype) {
+			case 1: // Sound data
+				out.write(src+i+2, blocksize - 2);
+				break;
+			case 2: // Sound data continuation
+				out.write(src+i, blocksize);
+				break;
+			case 3: // Silence
+				// Not supported yet
+				break;
+			case 9: // Sound data in new format
+				out.write(src+i+12, blocksize - 12);
+			default:
+				break;
+		}
+		i += blocksize;
+	}
+
+	return true;
+}

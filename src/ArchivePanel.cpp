@@ -962,21 +962,25 @@ bool ArchivePanel::dSndWavConvert() {
 
 	// Go through selection
 	for (unsigned a = 0; a < selection.size(); a++) {
+		bool worked = false;
+		MemChunk wav;
 		// Convert Doom Sound -> WAV if the entry is Doom Sound format
-		bool d64 = false;
-		if (selection[a]->getType()->getFormat() == "snd_doom" ||
-			// If the file is in Doom 64 format, set the d64 bool to true!
-			(selection[a]->getType()->getFormat() == "snd_doom64" && (d64 = true))) {
-			MemChunk wav;
-			// Attempt conversion
-			if ((d64 && !Conversions::d64SfxToWav(selection[a]->getMCData(), wav))
-				&& !Conversions::doomSndToWav(selection[a]->getMCData(), wav)) {
-				wxLogMessage("Error: Unable to convert entry %s: %s", chr(selection[a]->getName()), chr(Global::error));
-				continue;
-			}
-			selection[a]->importMemChunk(wav);							// Load wav data
-			EntryType::detectEntryType(selection[a]);					// Update entry type
-			selection[a]->setExtensionByType();							// Update extension if necessary
+		if (selection[a]->getType()->getFormat() == "snd_doom")
+			worked = Conversions::doomSndToWav(selection[a]->getMCData(), wav);
+		// Or Doom 64 SFX format
+		else if (selection[a]->getType()->getFormat() == "snd_doom64")
+			worked = Conversions::d64SfxToWav(selection[a]->getMCData(), wav);
+		// Or Creative Voice File format
+		else if (selection[a]->getType()->getFormat() == "snd_voc")
+			worked = Conversions::vocToWav(selection[a]->getMCData(), wav);
+		// If successfully converted, update the entry
+		if (worked) {
+			selection[a]->importMemChunk(wav);			// Load wav data
+			EntryType::detectEntryType(selection[a]);	// Update entry type
+			selection[a]->setExtensionByType();			// Update extension if necessary
+		} else {
+			wxLogMessage("Error: Unable to convert entry %s: %s", chr(selection[a]->getName()), chr(Global::error));
+			continue;
 		}
 	}
 
@@ -1407,7 +1411,8 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 		}
 		if (!dsnd_selected) {
 			if (selection[a]->getType()->getFormat() == "snd_doom" ||
-				selection[a]->getType()->getFormat() == "snd_doom64")
+				selection[a]->getType()->getFormat() == "snd_doom64" ||
+				selection[a]->getType()->getFormat() == "snd_voc")
 				dsnd_selected = true;
 		}
 		if (!mus_selected) {
@@ -1448,7 +1453,7 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 		if (wav_selected)
 			audio->Append(MENU_CONV_WAV_DSND, "Convert WAV to Doom Sound");
 		if (dsnd_selected)
-			audio->Append(MENU_CONV_DSND_WAV, "Convert Doom Sound to WAV");
+			audio->Append(MENU_CONV_DSND_WAV, "Convert sounds to WAV");
 		if (mus_selected)
 			audio->Append(MENU_CONV_MUS_MIDI, "Convert MUS to MIDI");
 	}
