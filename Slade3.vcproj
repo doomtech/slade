@@ -770,6 +770,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\GrpArchive.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\GrpArchive.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\LibArchive.cpp"
 					>
 				</File>

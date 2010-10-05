@@ -54,6 +54,7 @@ public:
 #define ARCHIVE_RES		5
 #define ARCHIVE_WAD2	6
 #define ARCHIVE_PAK		7
+#define ARCHIVE_GRP		8
 
 // Define map types
 #define MAP_DOOM	0

@@ -81,4 +81,14 @@ public:
 	}
 };
 
+class GrpDataFormat : public EntryDataFormat {
+public:
+	GrpDataFormat() : EntryDataFormat("archive_grp") {};
+	~GrpDataFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		return GrpArchive::isGrpArchive(mc) ? EDF_TRUE : EDF_FALSE;
+	}
+};
+
 #endif //ARCHIVEFORMATS_H

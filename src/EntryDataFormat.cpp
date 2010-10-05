@@ -34,6 +34,7 @@
 #include "DatArchive.h"
 #include "ResArchive.h"
 #include "PakArchive.h"
+#include "GrpArchive.h"
 #include "Wad2Archive.h"
 #include "WadJArchive.h"
 #include "BinaryControlLump.h"
@@ -168,6 +169,7 @@ void EntryDataFormat::initBuiltinFormats() {
 	new DatDataFormat();
 	new ResDataFormat();
 	new PakDataFormat();
+	new GrpDataFormat();
 	new Wad2DataFormat();
 	new WadJDataFormat();
 	new MUSDataFormat();
