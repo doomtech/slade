@@ -267,7 +267,7 @@ bool Conversions::vocToWav(MemChunk& in, MemChunk& out) {
 					fmtchunk.tag = 1;
 					codec = in[i+1];
 				}
-				datasize += blocksize;
+				datasize += blocksize - 2;
 				break;
 			case 2: // Sound data continuation
 				if (codec == -1) {
@@ -304,6 +304,7 @@ bool Conversions::vocToWav(MemChunk& in, MemChunk& out) {
 					fmtchunk.tag = 1;
 					codec = in[i+6]+(in[i+7]<<8);
 				}
+				datasize += blocksize - 12;
 				break;
 		}
 		i += blocksize;
