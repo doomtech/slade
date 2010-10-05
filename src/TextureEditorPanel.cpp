@@ -102,6 +102,7 @@ TextureEditorPanel::TextureEditorPanel(wxWindow* parent, TextureXEditor* tx_edit
 	slider_zoom->Bind(wxEVT_COMMAND_SLIDER_UPDATED, &TextureEditorPanel::onZoomChanged, this);
 	cb_draw_outside->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &TextureEditorPanel::onDrawOutsideChanged, this);
 	tex_canvas->Bind(wxEVT_LEFT_DOWN, &TextureEditorPanel::onTexCanvasMouseEvent, this);
+	tex_canvas->Bind(wxEVT_LEFT_DCLICK, &TextureEditorPanel::onTexCanvasMouseEvent, this);
 	tex_canvas->Bind(wxEVT_LEFT_UP, &TextureEditorPanel::onTexCanvasMouseEvent, this);
 	tex_canvas->Bind(wxEVT_RIGHT_UP, &TextureEditorPanel::onTexCanvasMouseEvent, this);
 	tex_canvas->Bind(wxEVT_MOTION, &TextureEditorPanel::onTexCanvasMouseEvent, this);
@@ -612,8 +613,13 @@ void TextureEditorPanel::onTexCanvasMouseEvent(wxMouseEvent& e) {
 	// Get patch that the mouse is over (if any)
 	int patch = tex_canvas->patchAt(pos.x, pos.y);
 
+	// LEFT DOUBLE CLICK
+	if (e.ButtonDClick(wxMOUSE_BTN_LEFT)) {
+		replacePatch();
+	}
+
 	// LEFT MOUSE DOWN
-	if (e.LeftDown()) {
+	else if (e.LeftDown()) {
 		// If not dragging
 		if (e.ShiftDown()) {
 			// Shift is down, add to selection
