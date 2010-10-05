@@ -155,7 +155,7 @@ bool GrpArchive::open(MemChunk& mc) {
 	ken_magic[12] = 0;
 
 	// Check the header
-	if (_stricmp(ken_magic, "KenSilverman")) {
+	if (!(s_cmp(wxString::FromAscii(ken_magic), "KenSilverman"))) {
 		wxLogMessage("GrpArchive::openFile: File %s has invalid header", filename.c_str());
 		Global::error = "Invalid grp header";
 		return false;
@@ -402,7 +402,7 @@ bool GrpArchive::removeEntry(ArchiveEntry* entry, bool delete_entry) {
 
 /* GrpArchive::renameEntry
  * Override of Archive::renameEntry to update namespaces if needed
- * and rename the entry if necessary to be grp-friendly (twelve 
+ * and rename the entry if necessary to be grp-friendly (twelve
  * characters max)
  *******************************************************************/
 bool GrpArchive::renameEntry(ArchiveEntry* entry, string name) {
@@ -460,7 +460,7 @@ bool GrpArchive::isGrpArchive(MemChunk& mc) {
 	ken_magic[12] = 0;
 
 	// Check the header
-	if (_stricmp(ken_magic, "KenSilverman"))
+	if (!(s_cmp(wxString::FromAscii(ken_magic), "KenSilverman")))
 		return false;
 
 	// Compute total size
@@ -509,7 +509,7 @@ bool GrpArchive::isGrpArchive(string filename) {
 	ken_magic[12] = 0;
 
 	// Check the header
-	if (_stricmp(ken_magic, "KenSilverman"))
+	if (!(s_cmp(wxString::FromAscii(ken_magic), "KenSilverman")))
 		return false;
 
 	// Compute total size

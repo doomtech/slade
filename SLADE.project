@@ -101,7 +101,6 @@
       <VirtualDirectory Name="TextureXEditor">
         <File Name="src/PatchTablePanel.cpp"/>
         <File Name="src/PatchTablePanel.h"/>
-        <File Name="src/TextureEditorPanel.cpp"/>
         <File Name="src/TextureEditorPanel.h"/>
         <File Name="src/TextureXEditor.cpp"/>
         <File Name="src/TextureXEditor.h"/>
@@ -172,6 +171,7 @@
           <File Name="src/MiscFormats.h"/>
           <File Name="src/ModelFormats.h"/>
         </VirtualDirectory>
+        <File Name="src/TextureEditorPanel.cpp"/>
       </VirtualDirectory>
       <File Name="src/DatArchive.cpp"/>
       <File Name="src/DatArchive.h"/>
@@ -185,6 +185,8 @@
       <File Name="src/Wad2Archive.h"/>
       <File Name="src/WadJArchive.cpp"/>
       <File Name="src/WadJArchive.h"/>
+      <File Name="src/GrpArchive.cpp"/>
+      <File Name="src/GrpArchive.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Binary Control Lumps">
       <File Name="src/AnimatedList.cpp"/>
