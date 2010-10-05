@@ -12,7 +12,7 @@
 // then a previously saved perspective is loaded from slade3.cfg, the new item won't show
 // up at all. So when saving the perspective, add this number to the start of the string,
 // and check against it when loading. In other words, wxAUI is silly.
-#define MW_LAYOUT_VERS 004
+#define MW_LAYOUT_VERS 005
 
 class MainWindow : public wxFrame {
 private:
