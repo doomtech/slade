@@ -185,8 +185,11 @@ Archive* ArchiveManager::openArchive(string filename, bool manage) {
 		new_archive = new Wad2Archive();
 	else if (WadJArchive::isWadJArchive(filename))
 		new_archive = new WadJArchive();
-	else
-		return NULL;	// Unsupported format
+	else {
+		// Unsupported format
+		Global::error = "Unsupported or invalid Archive format";
+		return NULL;
+	}
 
 	// If it opened successfully, add it to the list if needed & return it,
 	// Otherwise, delete it and return NULL
@@ -255,8 +258,11 @@ Archive* ArchiveManager::openArchive(ArchiveEntry* entry, bool manage) {
 		new_archive = new Wad2Archive();
 	else if (WadJArchive::isWadJArchive(entry->getMCData()))
 		new_archive = new WadJArchive();
-	else
-		return NULL;	// Unsupported format
+	else {
+		// Unsupported format
+		Global::error = "Unsupported or invalid Archive format";
+		return NULL;
+	}
 
 	// If it opened successfully, add it to the list & return it,
 	// Otherwise, delete it and return NULL
