@@ -14,7 +14,7 @@ enum {
 };
 
 namespace Misc {
-	bool		loadImageFromEntry(SImage* image, ArchiveEntry* entry);
+	bool		loadImageFromEntry(SImage* image, ArchiveEntry* entry, int index = 0);
 	int			detectPaletteHack(ArchiveEntry* entry);
 	bool		loadPaletteFromArchive(Palette8bit* pal, Archive* archive, int lump = PAL_NOHACK);
 	string		sizeAsString(uint32_t size);

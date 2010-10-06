@@ -49,7 +49,7 @@ CVAR(Bool, size_as_string, true, CVAR_SAVE)
  * Loads an image from <entry> into <image>. Returns false if the
  * given entry wasn't a valid image, true otherwise
  *******************************************************************/
-bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry) {
+bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry, int index) {
 	if (!entry)
 		return false;
 
@@ -103,6 +103,8 @@ bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry) {
 		return image->loadSCWall(entry->getData(), entry->getSize());
 	else if (s_cmpnocase(format, "img_mipimage"))
 		return image->loadAnaMip(entry->getData(), entry->getSize());
+	else if (s_cmpnocase(format, "img_arttile"))
+		return image->loadBuildTile(entry->getData(), entry->getSize(), index);
 	else {
 		if (!image->loadImage(entry->getData(true), entry->getSize())) {
 			Global::error = "Image format not supported by FreeImage";

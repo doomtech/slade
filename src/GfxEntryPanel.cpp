@@ -77,6 +77,14 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 	hbox->Add(combo_offset_type, 0, wxEXPAND, 0);
 	hbox->AddSpacer(8);
 
+	// Image selection buttons
+	btn_nextimg = new wxButton(this, -1, "Next >");
+	btn_previmg = new wxButton(this, -1, "< Prev");
+	text_curimg = new wxStaticText(this, -1, "Image XX/XX");
+	hbox->Add(btn_previmg, 0, wxEXPAND|wxRIGHT|wxLEFT, 4);
+	hbox->Add(btn_nextimg, 0, wxEXPAND|wxRIGHT, 4);
+	hbox->Add(text_curimg, 0, wxALIGN_CENTER_VERTICAL, 4);
+
 	// Palette chooser
 	listenTo(thePaletteAnnouncer);
 
@@ -119,6 +127,8 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 	cb_alph_chunk->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &GfxEntryPanel::onalPhChanged, this);
 	cb_trns_chunk->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &GfxEntryPanel::ontRNSChanged, this);
 	Bind(wxEVT_GFXCANVAS_OFFSET_CHANGED, &GfxEntryPanel::onGfxOffsetChanged, this, gfx_canvas->GetId());
+	btn_nextimg->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &GfxEntryPanel::onBtnNextImg, this);
+	btn_previmg->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &GfxEntryPanel::onBtnPrevImg, this);
 
 	// Apply layout
 	Layout();
@@ -134,6 +144,9 @@ GfxEntryPanel::~GfxEntryPanel() {
  * Loads an entry into the entry panel if it is a valid image format
  *******************************************************************/
 bool GfxEntryPanel::loadEntry(ArchiveEntry* entry) {
+	return loadEntry(entry, 0);
+}
+bool GfxEntryPanel::loadEntry(ArchiveEntry* entry, int index) {
 	// Check entry was given
 	if (entry == NULL)
 		return false;
@@ -143,7 +156,7 @@ bool GfxEntryPanel::loadEntry(ArchiveEntry* entry) {
 	setModified(false);
 
 	// Attempt to load the image
-	if (!Misc::loadImageFromEntry(gfx_canvas->getImage(), this->entry))
+	if (!Misc::loadImageFromEntry(gfx_canvas->getImage(), this->entry, index))
 		return false;
 
 	// Refresh everything
@@ -208,6 +221,10 @@ void GfxEntryPanel::refresh() {
 
 	// Set size label
 	label_dimensions->SetLabel(s_fmt("Size: %d x %d", gfx_canvas->getImage()->getWidth(), gfx_canvas->getImage()->getHeight()));
+
+	// Set multi-image format stuff thingies
+	cur_index = gfx_canvas->getImage()->getIndex();
+	text_curimg->SetLabel(s_fmt("Image %d/%d", cur_index+1, gfx_canvas->getImage()->getSize()));
 
 	// Apply offset view type
 	applyViewType();
@@ -445,6 +462,24 @@ void GfxEntryPanel::onAnnouncement(Announcer* announcer, string event_name, MemC
 	if (event_name == "main_palette_changed") {
 		updateImagePalette();
 		gfx_canvas->Refresh();
+	}
+}
+
+/* GfxEntryPanel::onBtnNextImg
+ * Called when the 'next image' button is clicked
+ *******************************************************************/
+void GfxEntryPanel::onBtnNextImg(wxCommandEvent& e) {
+	if (gfx_canvas->getImage()->getSize() > 1){
+		loadEntry(entry, cur_index + 1);
+	}
+}
+
+/* GfxEntryPanel::onBtnPrevImg
+ * Called when the 'previous image' button is clicked
+ *******************************************************************/
+void GfxEntryPanel::onBtnPrevImg(wxCommandEvent& e) {
+	if (gfx_canvas->getImage()->getSize() > 1){
+		loadEntry(entry, cur_index - 1);
 	}
 }
 

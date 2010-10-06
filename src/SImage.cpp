@@ -57,8 +57,9 @@ SImage::SImage() {
 	offset_x = 0;
 	offset_y = 0;
 	//has_palette = false;
-	//has_builtinpal = false;
 	format = RGBA;
+	numimages = 1;
+	imgindex = 0;
 }
 
 /* SImage::~SImage

@@ -590,6 +590,36 @@ public:
 	}
 };
 
+class BuildTileFormat: public EntryDataFormat {
+public:
+	BuildTileFormat() : EntryDataFormat("img_arttile") {};
+	~BuildTileFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		size_t size = mc.getSize();
+		if (size < 16)
+			return EDF_FALSE;
+		uint32_t version = mc[0] + (mc[1]<<8) + (mc[2]<<16) + (mc[3]<<24);
+		if (version != 1)
+			return EDF_FALSE;
+		uint32_t firsttile = mc[ 8] + (mc[ 9]<<8) + (mc[10]<<16) + (mc[11]<<24);
+		uint32_t lasttile  = mc[12] + (mc[13]<<8) + (mc[14]<<16) + (mc[15]<<24);
+		uint32_t tilecount = 1 + lasttile - firsttile;
+		size_t datastart = (16 + (tilecount * 8));
+		if (size < datastart)
+			return EDF_FALSE;
+		size_t gfxdatasize = 0;
+		size_t xofs = 16;
+		size_t yofs = xofs + (tilecount<<1);
+		for (size_t a = 0; a < tilecount; ++a) {
+			gfxdatasize += (mc[xofs+(a<<1)] * mc[yofs+(a<<1)]);
+		}
+		if (size < (datastart + gfxdatasize))
+			return EDF_FALSE;
+		return EDF_TRUE;
+	}
+};
+
 class Font0DataFormat : public EntryDataFormat {
 public:
 	Font0DataFormat() : EntryDataFormat("font_doom_alpha") {};

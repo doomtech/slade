@@ -80,6 +80,10 @@ bool SImage::loadImage(const uint8_t* img_data, int size) {
 	offset_x = 0;
 	offset_y = 0;
 
+	// Reset index
+	numimages = 1;
+	imgindex = 0;
+
 	// Create FreeImage bitmap from entry data
 	FIMEMORY* mem = FreeImage_OpenMemory((BYTE*)img_data, size);
 	FREE_IMAGE_FORMAT fif = FreeImage_GetFileTypeFromMemory(mem, 0);
@@ -324,6 +328,9 @@ bool SImage::loadDoomGfx(const uint8_t* gfx_data, int size, uint8_t version) {
 	uint32_t* col_offsets = NULL;
 	format = PALMASK;
 	has_palette = false;
+	numimages = 1;
+	imgindex = 0;
+
 
 	// Read header
 	uint8_t hdr_size = 0;
@@ -668,6 +675,8 @@ bool SImage::loadDoomFlat(const uint8_t* gfx_data, int size) {
 	// Setup variables
 	format = PALMASK;
 	has_palette = false;
+	numimages = 1;
+	imgindex = 0;
 
 	// Clear current data if it exists
 	clearData();
@@ -732,6 +741,8 @@ bool SImage::loadDoomArah(const uint8_t* gfx_data, int size, int transindex) {
 	offset_y = wxINT16_SWAP_ON_BE(header->top);
 	format = PALMASK;
 	has_palette = false;
+	numimages = 1;
+	imgindex = 0;
 
 	// Clear current data if it exists
 	clearData();
@@ -784,6 +795,8 @@ bool SImage::loadDoomSnea(const uint8_t* gfx_data, int size) {
 	// Setup variables
 	format = PALMASK;
 	has_palette = false;
+	numimages = 1;
+	imgindex = 0;
 
 	// Clear current data if it exists
 	clearData();
@@ -848,6 +861,8 @@ bool SImage::loadPlanar(const uint8_t* gfx_data, int size) {
 	height = 480;
 	format = PALMASK;
 	has_palette = true;
+	numimages = 1;
+	imgindex = 0;
 
 	union {
 		RGBQUAD		color;
@@ -1017,6 +1032,8 @@ bool SImage::load4bitChunk(const uint8_t* gfx_data, int size) {
 
 	format = PALMASK;
 	has_palette = false;
+	numimages = 1;
+	imgindex = 0;
 	clearData();
 	data = new uint8_t[width*height];
 	mask = new uint8_t[width*height];
@@ -1108,6 +1125,8 @@ bool SImage::loadDoomLegacy(const uint8_t* gfx_data, int size) {
 	uint8_t mode = gfx_data[3];
 	offset_x = 0;
 	offset_y = 0;
+	numimages = 1;
+	imgindex = 0;
 	if (mode < LEG_RGB24)
 		format = PALMASK;
 	else format = RGBA;
@@ -1183,6 +1202,8 @@ bool SImage::loadImgz(const uint8_t* gfx_data, int size) {
 	offset_y = wxINT16_SWAP_ON_BE(header->top);
 	has_palette = false;
 	format = PALMASK;
+	numimages = 1;
+	imgindex = 0;
 
 	// Create data (all white) and mask
 	clearData();
@@ -1277,6 +1298,8 @@ bool SImage::loadSCSprite(const uint8_t* gfx_data, int size) {
 	// Setup variables
 	format = PALMASK;
 	has_palette = false;
+	numimages = 1;
+	imgindex = 0;
 
 	// Format has no offsets, so just set them automatically
 	offset_x = width/2;
@@ -1343,6 +1366,8 @@ bool SImage::loadSCWall(const uint8_t* gfx_data, int size) {
 	// Setup variables
 	format = PALMASK;
 	has_palette = false;
+	numimages = 1;
+	imgindex = 0;
 
 	// Read pixel data
 	int pixelreader = SCWALLOFFSET;
@@ -1376,6 +1401,11 @@ bool SImage::loadAnaMip(const uint8_t* gfx_data, int size) {
 	has_palette = false;
 	format = PALMASK;
 
+	// Technically false, as there are multiple mipmap levels.
+	// May implement them later. Not in any hurry about them.
+	numimages = 1;
+	imgindex = 0;
+
 	if (size < (4 + (width * height)))
 		return false;
 
@@ -1389,6 +1419,91 @@ bool SImage::loadAnaMip(const uint8_t* gfx_data, int size) {
 	return true;
 }
 
+/* SImage::loadBuildTile
+ * Loads a picture from an ART tile collection.
+ * Returns false if the image data was invalid, true otherwise.
+ *******************************************************************/
+bool SImage::loadBuildTile(const uint8_t* gfx_data, int size, int index) {
+	if (size < 16)
+		return false;
+
+	uint32_t firsttile = wxUINT32_SWAP_ON_BE(((uint32_t*)gfx_data)[2]);
+	uint32_t lasttile  = wxUINT32_SWAP_ON_BE(((uint32_t*)gfx_data)[3]);
+
+	// Setup variables
+	numimages = 1 + lasttile - firsttile;
+	has_palette = false;
+	format = PALMASK;
+
+	// Sanitize index if needed
+	index %= numimages;
+	if (index < 0)
+		index = numimages + index;
+		
+	// Each tile has a 2-byte width, a 2-byte height, and a 4-byte
+	// picanm struct. The header itself is 16 bytes.
+	size_t x_offs = 16;
+	size_t y_offs = x_offs + (numimages<<1);
+	size_t o_offs = y_offs + (numimages<<1);
+
+	// Compute the address where our tile's graphic data starts
+	size_t datastart = (numimages * 8) + 16;
+	if (index > 0)
+	{
+		// We can skip these steps if looking at the first tile in the ART file.
+		for (int i = 0; i < index; ++i) {
+			width = gfx_data[x_offs+(i<<1)] + (gfx_data[x_offs+1+(i<<1)]<<8);
+			height = gfx_data[y_offs+(i<<1)] + (gfx_data[y_offs+1+(i<<1)]<<8);
+			datastart += (width * height);
+		}
+
+		// Increment values to that of the tile we want
+		x_offs += (index<<1);
+		y_offs += (index<<1);
+		o_offs += (index<<2);
+	}
+	if ((unsigned)size < datastart)
+		return false;
+
+	// Setup variables
+
+	// Little cheat here as they are defined in column-major format,
+	// not row-major. So we'll just call the rotate function.
+	height = gfx_data[x_offs] + (gfx_data[x_offs+1]<<8);
+	width = gfx_data[y_offs] + (gfx_data[y_offs+1]<<8);
+	if ((unsigned)size < (datastart+(width*height)))
+		return false;
+
+	// Offsets are signed bytes, so they need a cast
+	offset_x = (int8_t)gfx_data[o_offs+1];
+	offset_y = (int8_t)gfx_data[o_offs+2];
+
+	imgindex = index;
+
+	// Create data
+	clearData();
+	data = new uint8_t[width*height];
+
+	// Fill data with pixel data
+	memcpy(data, gfx_data + datastart, width * height);
+
+	// Convert from column-major to row-major
+	rotate(90);
+	mirror(true);
+
+	// Create mask
+	mask = new uint8_t[width*height];
+	for (int i = 0; i < width*height; ++i) {
+		if (data[i] == 0xFF)	mask[i] = 0;
+		else					mask[i] = 0xFF;
+	}
+
+	// Offsets are not computed from the same reference point, so convert them
+	offset_x += (width>>1);
+	offset_y += height;
+
+	return true;
+}
 
 /*******************************************************************
  * FONT FORMATS
@@ -1426,6 +1541,10 @@ bool SImage::loadFont0(const uint8_t* gfx_data, int size) {
 	clearData();
 	has_palette = false;
 	format = PALMASK;
+
+	// Technically each character is its own image, though.
+	numimages = 1;
+	imgindex = 0;
 
 	// Create new picture and mask
 	const uint8_t* r = gfx_data + 0x302;
@@ -1478,6 +1597,10 @@ bool SImage::loadFont1(const uint8_t* gfx_data, int size) {
 	offset_x = offset_y = 0;
 	has_palette = false;
 	format = PALMASK;
+
+	// Technically each character is its own image, though.
+	numimages = 1;
+	imgindex = 0;
 
 	// Clear current data if it exists
 	clearData();
@@ -1555,6 +1678,10 @@ bool SImage::loadFont2(const uint8_t* gfx_data, int size) {
 	offset_x = offset_y = 0;
 	has_palette = true;
 	format = PALMASK;
+
+	// Technically each character is its own image, though.
+	numimages = 1;
+	imgindex = 0;
 
 	if (size < sizeof(Font2Header))
 		return false;
@@ -1745,6 +1872,10 @@ bool SImage::loadBMF(const uint8_t* gfx_data, int size) {
 	format = PALMASK;
 	has_palette = true;
 
+	// Technically each character is its own image, though.
+	numimages = 1;
+	imgindex = 0;
+
 	const uint8_t * ofs = gfx_data+17;
 
 	// Setup palette -- it's a 6-bit palette (63 max) so we have to convert it to 8-bit.
@@ -1870,6 +2001,10 @@ bool SImage::loadFontM(const uint8_t* gfx_data, int size) {
 	memset(data, 0xFF, width*height);
 	mask = new uint8_t[width*height];
 	memset(mask, 0x00, width*height);
+
+	// Technically each character is its own image, though.
+	numimages = 1;
+	imgindex = 0;
 
 	//Each pixel is described as a single bit, either on or off
 	for (size_t i = 0; i < (unsigned)size; ++i) {

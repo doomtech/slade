@@ -21,11 +21,17 @@ private:
 	wxCheckBox*		cb_alph_chunk;
 	wxCheckBox*		cb_trns_chunk;
 
+	wxButton*		btn_nextimg;
+	wxButton*		btn_previmg;
+	wxStaticText*	text_curimg;
+	int				cur_index;
+
 public:
 	GfxEntryPanel(wxWindow* parent);
 	~GfxEntryPanel();
 
-	bool	loadEntry(ArchiveEntry* entry);
+	bool	loadEntry(ArchiveEntry* entry); // override for EntryPanel::loadEntry
+	bool	loadEntry(ArchiveEntry* entry, int index);
 	bool	saveEntry();
 	void	updateImagePalette();
 	int		detectOffsetType();
@@ -40,6 +46,8 @@ public:
 	void	onalPhChanged(wxCommandEvent& e);
 	void	ontRNSChanged(wxCommandEvent& e);
 	void	onGfxOffsetChanged(wxEvent& e);
+	void	onBtnNextImg(wxCommandEvent& e);
+	void	onBtnPrevImg(wxCommandEvent& e);
 	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 
 	SImage*	getImage() { if (gfx_canvas) return gfx_canvas->getImage(); else return NULL; }

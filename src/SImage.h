@@ -22,6 +22,10 @@ private:
 	int			offset_x;
 	int			offset_y;
 
+	// For multi-image files
+	int			imgindex;
+	int			numimages;
+
 	// Internal functions
 	void	clearData(bool clear_mask = true);
 
@@ -37,6 +41,8 @@ public:
 	bool			getPalData(MemChunk& mc);
 	int				getWidth() { return width; }
 	int				getHeight() { return height; }
+	int				getIndex() { return imgindex; }
+	int				getSize() { return numimages; }
 	bool			hasPalette() { return has_palette; }
 	point2_t		offset() { return point2_t(offset_x, offset_y); }
 
@@ -72,6 +78,7 @@ public:
 	bool	loadSCSprite(const uint8_t* data, int size);
 	bool	loadSCWall(const uint8_t* data, int size);
 	bool	loadAnaMip(const uint8_t* data, int size);
+	bool	loadBuildTile(const uint8_t* gfx_data, int size, int index);
 
 	// Image format writing
 	bool	safeConvert(MemChunk& out, Palette8bit* pal = NULL);

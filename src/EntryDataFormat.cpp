@@ -161,6 +161,7 @@ void EntryDataFormat::initBuiltinFormats() {
 	new ShadowCasterSpriteFormat();
 	new ShadowCasterWallFormat();
 	new AnaMipImageFormat();
+	new BuildTileFormat();
 	new IMGZDataFormat();
 	new LegacyGfxDataFormat();
 	new WadDataFormat();
