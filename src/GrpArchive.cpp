@@ -528,3 +528,132 @@ bool GrpArchive::isGrpArchive(string filename) {
 	// If it's passed to here it's probably a grp file
 	return true;
 }
+
+
+/*******************************************************************
+ * EXTRA CONSOLE COMMANDS
+ *******************************************************************/
+#include "Console.h"
+#include "MainWindow.h"
+
+CONSOLE_COMMAND(lookupdat, 0) {
+	ArchiveEntry * entry = theMainWindow->getCurrentEntry();
+
+	if (!entry)
+		return;
+
+	MemChunk mc = entry->getMCData();
+	if (mc.getSize() == 0)
+		return;
+
+	ArchiveEntry * nentry = NULL;
+	uint32_t * data = NULL;
+	int index = entry->getParent()->entryIndex(entry);
+	mc.seek(0, SEEK_SET);
+
+	// Create lookup table
+	uint8_t numlookup = 0;
+	uint8_t dummy = 0;
+	mc.read(&numlookup, 1);
+	if (mc.getSize() < (uint32_t)((numlookup * 256)+(5*768)+1))
+		return;
+
+	nentry = entry->getParent()->addNewEntry("COLORMAP.DAT", index);
+	if (!nentry)
+		return;
+
+	data = new uint32_t[numlookup * 256];
+	for (int i = 0; i < numlookup; ++i)	{
+		mc.read(&dummy, 1);
+		mc.read(data, numlookup * 256);
+	}
+	nentry->importMem(data, numlookup * 256);
+	delete[] data;
+
+	// Create extra palettes
+	data = new uint32_t[768];
+	nentry = entry->getParent()->addNewEntry("WATERPAL.PAL", index+1); if (!nentry) return;
+	mc.read(data, 768); nentry->importMem(data, 768);
+	nentry = entry->getParent()->addNewEntry("SLIMEPAL.PAL", index+2); if (!nentry) return;
+	mc.read(data, 768); nentry->importMem(data, 768);
+	nentry = entry->getParent()->addNewEntry("TITLEPAL.PAL", index+3); if (!nentry) return;
+	mc.read(data, 768); nentry->importMem(data, 768);
+	nentry = entry->getParent()->addNewEntry("3DREALMS.PAL", index+4); if (!nentry) return;
+	mc.read(data, 768); nentry->importMem(data, 768);
+	nentry = entry->getParent()->addNewEntry("ENDINPAL.PAL", index+5); if (!nentry) return;
+	mc.read(data, 768); nentry->importMem(data, 768);
+	
+	// Clean up and go away
+	delete[] data;
+	mc.clear();
+}
+
+CONSOLE_COMMAND(palettedat, 0) {
+	ArchiveEntry * entry = theMainWindow->getCurrentEntry();
+
+	if (!entry)
+		return;
+
+	MemChunk mc = entry->getMCData();
+	// Minimum size: 768 bytes for the palette, 2 for the number of lookup tables,
+	// 0 for these tables if there are none, and 65536 for the transparency map.
+	if (mc.getSize() < 66306)
+		return;
+
+	ArchiveEntry * nentry = NULL;
+	uint32_t * data = NULL;
+	int index = entry->getParent()->entryIndex(entry);
+	mc.seek(0, SEEK_SET);
+
+	// Create palette
+	data = new uint32_t[768];
+	nentry = entry->getParent()->addNewEntry("MAINPAL.PAL", index+0); if (!nentry) return;
+	mc.read(data, 768); nentry->importMem(data, 768);
+
+	// Create lookup tables
+	uint16_t numlookup = 0; mc.read(&numlookup, 2);
+	numlookup = wxINT16_SWAP_ON_BE(numlookup);
+	delete[] data;
+	nentry = entry->getParent()->addNewEntry("COLORMAP.DAT", index+1); if (!nentry) return;
+	data = new uint32_t[numlookup * 256];
+	mc.read(data, numlookup * 256); nentry->importMem(data, numlookup * 256);
+
+	// Create transparency tables
+	delete[] data;
+	nentry = entry->getParent()->addNewEntry("TRANMAP.DAT", index+2); if (!nentry) return;
+	data = new uint32_t[65536];
+	mc.read(data, 65536); nentry->importMem(data, 65536);
+
+	// Clean up and go away
+	delete[] data;
+	mc.clear();
+}
+
+CONSOLE_COMMAND(tablesdat, 0) {
+	ArchiveEntry * entry = theMainWindow->getCurrentEntry();
+
+	if (!entry)
+		return;
+
+	MemChunk mc = entry->getMCData();
+	// Sin/cos table: 4096; atn table 1280; gamma table 1024
+	// Fonts: 1024 byte each.
+	if (mc.getSize() != 8448)
+		return;
+
+	ArchiveEntry * nentry = NULL;
+	uint32_t * data = NULL;
+	int index = entry->getParent()->entryIndex(entry);
+	mc.seek(5376, SEEK_SET);
+
+	// Create fonts
+	data = new uint32_t[1024];
+	nentry = entry->getParent()->addNewEntry("VGAFONT1.FNT", index+0); if (!nentry) return;
+	mc.read(data, 1024); nentry->importMem(data, 1024);
+	nentry = entry->getParent()->addNewEntry("VGAFONT2.FNT", index+1); if (!nentry) return;
+	mc.read(data, 1024); nentry->importMem(data, 1024);
+
+	// Clean up and go away
+	delete[] data;
+	mc.clear();
+}

@@ -208,6 +208,8 @@ void EntryDataFormat::initBuiltinFormats() {
 	new MDLModelDataFormat();
 	new MD2ModelDataFormat();
 	new MD3ModelDataFormat();
+	new VOXVoxelDataFormat();
+	new KVXVoxelDataFormat();
 	new RLE0DataFormat();
 
 	// And here are some dummy formats needed for certain image formats
