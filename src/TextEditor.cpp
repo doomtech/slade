@@ -288,15 +288,10 @@ bool TextEditor::loadEntry(ArchiveEntry* entry) {
 		return true;
 
 	// Get character entry data
-	char* data = new char[entry->getSize() + 1];
-	memcpy(data, entry->getData(), entry->getSize());
-	data[entry->getSize()] = 0;
+	string text = wxString::From8BitData((const char*)entry->getData(), entry->getSize());
 
 	// Load text into editor
-	SetTextRaw(data);
-
-	// Clean up
-	delete[] data;
+	SetText(text);
 
 	// Update line numbers margin width
 	string numlines = s_fmt("0%d", GetNumberOfLines());
