@@ -91,4 +91,14 @@ public:
 	}
 };
 
+class RffDataFormat : public EntryDataFormat {
+public:
+	RffDataFormat() : EntryDataFormat("archive_rff") {};
+	~RffDataFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		return RffArchive::isRffArchive(mc) ? EDF_TRUE : EDF_FALSE;
+	}
+};
+
 #endif //ARCHIVEFORMATS_H

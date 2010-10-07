@@ -1,6 +1,8 @@
 
 #include "Main.h"
+#include "Archive.h"
 #include "Conversions.h"
+#include "ArchiveEntry.h"
 #include "qmus2mid/qmus2mid.h"
 
 // Some structs for wav conversion
@@ -381,6 +383,70 @@ bool Conversions::vocToWav(MemChunk& in, MemChunk& out) {
 		}
 		i += blocksize;
 	}
+
+	return true;
+}
+
+/* Conversions::bloodToWav
+ * Blood SFX files to wav format
+ *******************************************************************/
+bool Conversions::bloodToWav(ArchiveEntry * in, MemChunk& out) {
+	MemChunk mc = in->getMCData();
+	if (mc.getSize() < 22 || mc.getSize() > 29 || (mc[12] != 1 && mc[12] != 5 || mc[mc.getSize()-1] != 0)) {
+		Global::error = "Invalid SFX";
+		return false;
+	}
+	string name;
+	for (size_t i = 20; i < mc.getSize() - 1; ++i) {
+		// Check that the entry does give a purely alphanumeric ASCII name
+		if ((mc[i] < '0' || (mc[i] > '9' && mc[i] < 'A') ||
+			(mc[i] > 'Z' && mc[i] < 'a') || mc[i] > 'z') && mc[i] != '_') {
+			Global::error = "Invalid SFX";
+			return false;
+		} else name += mc[i];
+	}
+
+	// Find raw data
+	name += ".raw";
+	ArchiveEntry * raw = in->getParent()->getEntry(name);
+	if (!raw || raw->getSize() == 0) {
+		Global::error = "No RAW data for SFX";
+		return false;
+	}
+
+	size_t rawsize = raw->getSize();
+
+	// --- Write WAV ---
+	wav_chunk_t whdr, wdhdr;
+	wav_fmtchunk_t fmtchunk;
+
+	// Setup data header
+	char did[4] = { 'd', 'a', 't', 'a' };
+	memcpy(&wdhdr.id, &did, 4);
+	wdhdr.size = rawsize;
+
+	// Setup fmt chunk
+	char fid[4] = { 'f', 'm', 't', ' ' };
+	memcpy(&fmtchunk.header.id, &fid, 4);
+	fmtchunk.header.size = 16;
+	fmtchunk.tag = 1;
+	fmtchunk.channels = 1;
+	fmtchunk.samplerate = mc[12] == 5 ? 22050 : 11025;
+	fmtchunk.datarate = fmtchunk.samplerate;
+	fmtchunk.blocksize = 1;
+	fmtchunk.bps = 8;
+
+	// Setup main header
+	char wid[4] = { 'R', 'I', 'F', 'F' };
+	memcpy(&whdr.id, &wid, 4);
+	whdr.size = wdhdr.size + fmtchunk.header.size + 8;
+
+	// Write chunks
+	out.write(&whdr, 8);
+	out.write("WAVE", 4);
+	out.write(&fmtchunk, sizeof(wav_fmtchunk_t));
+	out.write(&wdhdr, 8);
+	out.write(raw->getData(), raw->getSize());
 
 	return true;
 }

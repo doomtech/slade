@@ -104,6 +104,12 @@ bool AudioEntryPanel::loadEntry(ArchiveEntry* entry) {
 		Conversions::vocToWav(mcdata, convdata);
 		path.SetExt("wav");
 		convdata.exportFile(path.GetFullPath());
+	} else if (entry->getType()->getFormat() == "snd_bloodsfx") {
+		// Creative Voice File -> WAV
+		MemChunk convdata;
+		Conversions::bloodToWav(entry, convdata);
+		path.SetExt("wav");
+		convdata.exportFile(path.GetFullPath());
 	} else if (entry->getType()->getFormat() == "mus") {
 		// MUS -> MIDI
 		MemChunk convdata;

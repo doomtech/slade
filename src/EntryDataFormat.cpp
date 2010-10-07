@@ -35,6 +35,7 @@
 #include "ResArchive.h"
 #include "PakArchive.h"
 #include "GrpArchive.h"
+#include "RffArchive.h"
 #include "Wad2Archive.h"
 #include "WadJArchive.h"
 #include "BinaryControlLump.h"
@@ -171,6 +172,7 @@ void EntryDataFormat::initBuiltinFormats() {
 	new ResDataFormat();
 	new PakDataFormat();
 	new GrpDataFormat();
+	new RffDataFormat();
 	new Wad2DataFormat();
 	new WadJDataFormat();
 	new MUSDataFormat();
@@ -186,6 +188,7 @@ void EntryDataFormat::initBuiltinFormats() {
 	new DoomPCSpeakerDataFormat();
 	new Doom64SoundDataFormat();
 	new VocDataFormat();
+	new BloodSFXDataFormat();
 	new WAVDataFormat();
 	new OggDataFormat();
 	new FLACDataFormat();
@@ -218,6 +221,9 @@ void EntryDataFormat::initBuiltinFormats() {
 	new EntryDataFormat("img_planar");
 	new EntryDataFormat("img_4bitchunk");
 	new EntryDataFormat("font_mono");
+
+	// Dummy for generic raw data format
+	new EntryDataFormat("rawdata");
 
 	// Another dummy for the generic text format
 	new EntryDataFormat("text");

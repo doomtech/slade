@@ -802,6 +802,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\RffArchive.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\RffArchive.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\Wad2Archive.cpp"
 					>
 				</File>

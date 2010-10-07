@@ -5,9 +5,9 @@
  *
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
- * Filename:    GrpArchive.cpp
- * Description: GrpArchive, archive class to handle GRP archives
- *              like those of Duke Nukem 3D
+ * Filename:    RffArchive.cpp
+ * Description: RffArchive, archive class to handle Blood's
+ *              encrypted RFF archives
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -23,13 +23,47 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *******************************************************************/
+/*
+** Part of this file have been taken or adapted from ZDoom's rff_file.cpp.
+**
+**---------------------------------------------------------------------------
+** Copyright 1998-2009 Randy Heit
+** Copyright 2005-2009 Christoph Oelckers
+** All rights reserved.
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions
+** are met:
+**
+** 1. Redistributions of source code must retain the above copyright
+**    notice, this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. The name of the author may not be used to endorse or promote products
+**    derived from this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+** IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+** OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+** IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+** INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+** NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+** DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+** THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+** THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+**---------------------------------------------------------------------------
+**
+**
+*/
 
 
 /*******************************************************************
  * INCLUDES
  *******************************************************************/
 #include "Main.h"
-#include "GrpArchive.h"
+#include "RffArchive.h"
 #include "SplashWindow.h"
 #include <wx/filename.h>
 
@@ -41,25 +75,58 @@ EXTERN_CVAR(Bool, wad_force_uppercase)
 EXTERN_CVAR(Bool, archive_load_data)
 
 /*******************************************************************
- * GRPARCHIVE CLASS FUNCTIONS
+ * RFFARCHIVE HELPER FUNCTIONS AND STRUCTS
  *******************************************************************/
 
-/* GrpArchive::GrpArchive
- * GrpArchive class constructor
+/* BloodCrypt
+ * From ZDoom: decrypts RFF data
  *******************************************************************/
-GrpArchive::GrpArchive() : TreelessArchive(ARCHIVE_GRP) {
+void BloodCrypt (void *data, int key, int len)
+{
+	int p = (BYTE)key, i;
+
+	for (i = 0; i < len; ++i)
+	{
+		((BYTE *)data)[i] ^= (unsigned char)(p+(i>>1));
+	}
 }
 
-/* GrpArchive::~GrpArchive
- * GrpArchive class destructor
+/* RFFLump struct
+ * From ZDoom: store lump data. We need it because of the encryption
  *******************************************************************/
-GrpArchive::~GrpArchive() {
+struct RFFLump
+{
+	uint32_t	DontKnow1[4];
+	uint32_t	FilePos;
+	uint32_t	Size;
+	uint32_t	DontKnow2;
+	uint32_t	Time;
+	uint8_t		Flags;
+	char		Extension[3];
+	char		Name[8];
+	uint32_t	IndexNum;	// Used by .sfx, possibly others
+};
+
+/*******************************************************************
+ * RFFARCHIVE CLASS FUNCTIONS
+ *******************************************************************/
+
+/* RffArchive::RffArchive
+ * RffArchive class constructor
+ *******************************************************************/
+RffArchive::RffArchive() : TreelessArchive(ARCHIVE_RFF) {
 }
 
-/* GrpArchive::getEntryOffset
+/* RffArchive::~RffArchive
+ * RffArchive class destructor
+ *******************************************************************/
+RffArchive::~RffArchive() {
+}
+
+/* RffArchive::getEntryOffset
  * Returns the file byte offset for [entry]
  *******************************************************************/
-uint32_t GrpArchive::getEntryOffset(ArchiveEntry* entry) {
+uint32_t RffArchive::getEntryOffset(ArchiveEntry* entry) {
 	// Check entry
 	if (!checkEntry(entry))
 		return 0;
@@ -67,10 +134,10 @@ uint32_t GrpArchive::getEntryOffset(ArchiveEntry* entry) {
 	return (uint32_t)(int)entry->exProp("Offset");
 }
 
-/* GrpArchive::setEntryOffset
+/* RffArchive::setEntryOffset
  * Sets the file byte offset for [entry]
  *******************************************************************/
-void GrpArchive::setEntryOffset(ArchiveEntry* entry, uint32_t offset) {
+void RffArchive::setEntryOffset(ArchiveEntry* entry, uint32_t offset) {
 	// Check entry
 	if (!checkEntry(entry))
 		return;
@@ -78,25 +145,25 @@ void GrpArchive::setEntryOffset(ArchiveEntry* entry, uint32_t offset) {
 	entry->exProp("Offset") = (int)offset;
 }
 
-/* GrpArchive::getFileExtensionString
+/* RffArchive::getFileExtensionString
  * Gets the wxWidgets file dialog filter string for the archive type
  *******************************************************************/
-string GrpArchive::getFileExtensionString() {
-	return "Grp Files (*.grp)|*.grp";
+string RffArchive::getFileExtensionString() {
+	return "Rff Files (*.rff)|*.rff";
 }
 
-/* GrpArchive::getFormat
+/* RffArchive::getFormat
  * Returns the EntryDataFormat id of this archive type
  *******************************************************************/
-string GrpArchive::getFormat() {
-	return "archive_grp";
+string RffArchive::getFormat() {
+	return "archive_rff";
 }
 
-/* GrpArchive::open
+/* RffArchive::open
  * Reads a grp format file from disk
  * Returns true if successful, false otherwise
  *******************************************************************/
-bool GrpArchive::open(string filename) {
+bool RffArchive::open(string filename) {
 	// Read the file into a MemChunk
 	MemChunk mc;
 	if (!mc.importFile(filename)) {
@@ -116,11 +183,11 @@ bool GrpArchive::open(string filename) {
 		return false;
 }
 
-/* GrpArchive::open
- * Reads grp format data from an ArchiveEntry
+/* RffArchive::open
+ * Reads rff format data from an ArchiveEntry
  * Returns true if successful, false otherwise
  *******************************************************************/
-bool GrpArchive::open(ArchiveEntry* entry) {
+bool RffArchive::open(ArchiveEntry* entry) {
 	// Load from entry's data
 	if (entry && open(entry->getMCData())) {
 		// Update variables and return success
@@ -132,66 +199,68 @@ bool GrpArchive::open(ArchiveEntry* entry) {
 		return false;
 }
 
-/* GrpArchive::open
+/* RffArchive::open
  * Reads grp format data from a MemChunk
  * Returns true if successful, false otherwise
  *******************************************************************/
-bool GrpArchive::open(MemChunk& mc) {
+bool RffArchive::open(MemChunk& mc) {
 	// Check data was given
 	if (!mc.hasData())
 		return false;
 
 	// Read grp header
-	uint32_t	num_lumps = 0;
-	char		ken_magic[13] = "";
+	uint8_t magic[4];
+	uint32_t version, dir_offset, num_lumps;
+
 	mc.seek(0, SEEK_SET);
-	mc.read(ken_magic, 12);		// "KenSilverman"
-	mc.read(&num_lumps, 4);		// No. of lumps in grp
+	mc.read(magic, 4);			// Should be "RFF\x18"
+	mc.read(&version, 4);		// 0x01 0x03 \x00 \x00
+	mc.read(&dir_offset, 4);	// Offset to directory
+	mc.read(&num_lumps, 4);		// No. of lumps in rff
 
 	// Byteswap values for big endian if needed
+	dir_offset = wxINT32_SWAP_ON_BE(dir_offset);
 	num_lumps = wxINT32_SWAP_ON_BE(num_lumps);
-
-	// Null-terminate the magic header
-	ken_magic[12] = 0;
+	version = wxINT32_SWAP_ON_BE(version);
 
 	// Check the header
-	if (!(s_cmp(wxString::FromAscii(ken_magic), "KenSilverman"))) {
-		wxLogMessage("GrpArchive::openFile: File %s has invalid header", filename.c_str());
-		Global::error = "Invalid grp header";
+	if (magic[0] != 'R' || magic[1] != 'F' || magic[2] != 'F' || magic[3] != 0x1A || version != 0x301) {
+		wxLogMessage("RffArchive::openFile: File %s has invalid header", filename.c_str());
+		Global::error = "Invalid rff header";
 		return false;
 	}
 
 	// Stop announcements (don't want to be announcing modification due to entries being added etc)
 	setMuted(true);
 
-	// The header takes as much space as a directory entry
-	uint32_t	entryoffset = 16 * (1 + num_lumps);
-
 	// Read the directory
-	theSplashWindow->setProgressMessage("Reading grp archive data");
+	RFFLump *lumps = new RFFLump[num_lumps];
+	mc.seek(dir_offset, SEEK_SET);
+	theSplashWindow->setProgressMessage("Reading rff archive data");
+	mc.read (lumps, num_lumps * sizeof(RFFLump));
+	BloodCrypt (lumps, dir_offset, num_lumps * sizeof(RFFLump));
 	for (uint32_t d = 0; d < num_lumps; d++) {
 		// Update splash window progress
 		theSplashWindow->setProgress(((float)d / (float)num_lumps));
 
 		// Read lump info
-		char name[13] = "";
-		uint32_t offset = entryoffset;
-		uint32_t size = 0;
+		char name[13] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+		uint32_t offset = wxINT32_SWAP_ON_BE(lumps[d].FilePos);
+		uint32_t size = wxINT32_SWAP_ON_BE(lumps[d].Size);
 
-		mc.read(name, 12);		// Name
-		mc.read(&size, 4);		// Size
-		name[12] = '\0';
-
-		// Byteswap values for big endian if needed
-		size = wxINT32_SWAP_ON_BE(size);
-
-		// Increase offset of next entry by this entry's size
-		entryoffset += size;
+		// Reconstruct name
+		int i, j = 0;
+		for (i = 0; i < 8; ++i) {
+			if (lumps[d].Name[i] == 0) break;
+			name[i] = lumps[d].Name[i];
+		}
+		for (name[i++] = '.'; j < 3; ++j)
+			name[i+j] = lumps[d].Extension[j];
 
 		// If the lump data goes past the end of the file,
-		// the grpfile is invalid
+		// the rfffile is invalid
 		if (offset + size > mc.getSize()) {
-			wxLogMessage("GrpArchive::open: grp archive is invalid or corrupt");
+			wxLogMessage("RffArchive::open: rff archive is invalid or corrupt");
 			Global::error = "Archive is invalid and/or corrupt";
 			setMuted(false);
 			return false;
@@ -203,9 +272,14 @@ bool GrpArchive::open(MemChunk& mc) {
 		nlump->exProp("Offset") = (int)offset;
 		nlump->setState(0);
 
+		// Is the entry encrypted?
+		if (lumps[d].Flags & 0x10)
+			nlump->setEncryption(ENC_BLOOD);
+
 		// Add to entry list
 		getRoot()->addEntry(nlump);
 	}
+	delete[] lumps;
 
 	// Detect all entry types
 	MemChunk edata;
@@ -221,6 +295,18 @@ bool GrpArchive::open(MemChunk& mc) {
 		if (entry->getSize() > 0) {
 			// Read the entry data
 			mc.exportMemChunk(edata, getEntryOffset(entry), entry->getSize());
+
+			// If the entry is encrypted, decrypt it
+			if (entry->isEncrypted()) {
+				uint8_t * cdata = new uint8_t[entry->getSize()];
+				memcpy(cdata, edata.getData(), entry->getSize());
+				int cryptlen = entry->getSize() < 256 ? entry->getSize() : 256;
+				BloodCrypt(cdata, 0, cryptlen);
+				edata.importMem(cdata, entry->getSize());
+				delete[] cdata;
+			}
+
+			// Import data
 			entry->importMemChunk(edata);
 		}
 
@@ -249,11 +335,11 @@ bool GrpArchive::open(MemChunk& mc) {
 	return true;
 }
 
-/* GrpArchive::write
- * Writes the grp archive to a file
+/* RffArchive::write
+ * Writes the rff archive to a file
  * Returns true if successful, false otherwise
  *******************************************************************/
-bool GrpArchive::write(string filename, bool update) {
+bool RffArchive::write(string filename, bool update) {
 	// Write to a MemChunk, then export it to a file
 	MemChunk mc;
 	if (write(mc, true))
@@ -262,55 +348,20 @@ bool GrpArchive::write(string filename, bool update) {
 		return false;
 }
 
-/* GrpArchive::write
- * Writes the grp archive to a MemChunk
- * Returns true if successful, false otherwise
+/* RffArchive::write
+ * Writes the rff archive to a MemChunk
+ * Not implemented because of encrypted directory and unknown stuff.
  *******************************************************************/
-bool GrpArchive::write(MemChunk& mc, bool update) {
-	// Clear/init MemChunk
-	mc.clear();
-	mc.seek(0, SEEK_SET);
-	mc.reSize((1 + numEntries()) * 16);
-	ArchiveEntry* entry = NULL;
-
-	// Write the header
-	uint32_t num_lumps = numEntries();
-	mc.write("KenSilverman", 12);
-	mc.write(&num_lumps, 4);
-
-	// Write the directory
-	for (uint32_t l = 0; l < num_lumps; l++) {
-		entry = getEntry(l);
-		char name[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-		long size = entry->getSize();
-
-		for (size_t c = 0; c < entry->getName().length() && c < 12; c++)
-			name[c] = entry->getName()[c];
-
-		mc.write(name, 12);
-		mc.write(&size, 4);
-
-		if (update) {
-			long offset = getEntryOffset(entry);
-			entry->setState(0);
-			entry->exProp("Offset") = (int)offset;
-		}
-	}
-
-	// Write the lumps
-	for (uint32_t l = 0; l < num_lumps; l++) {
-		entry = getEntry(l);
-		mc.write(entry->getData(), entry->getSize());
-	}
-
-	return true;
+bool RffArchive::write(MemChunk& mc, bool update) {
+	wxLogMessage("Saving RFF files is not implemented because the format is not entirely known.");
+	return false;
 }
 
-/* GrpArchive::loadEntryData
+/* RffArchive::loadEntryData
  * Loads an entry's data from the grpfile
  * Returns true if successful, false otherwise
  *******************************************************************/
-bool GrpArchive::loadEntryData(ArchiveEntry* entry) {
+bool RffArchive::loadEntryData(ArchiveEntry* entry) {
 	// Check the entry is valid and part of this archive
 	if (!checkEntry(entry))
 		return false;
@@ -322,12 +373,12 @@ bool GrpArchive::loadEntryData(ArchiveEntry* entry) {
 		return true;
 	}
 
-	// Open grpfile
+	// Open rfffile
 	wxFile file(filename);
 
 	// Check if opening the file failed
 	if (!file.IsOpened()) {
-		wxLogMessage("GrpArchive::loadEntryData: Failed to open grpfile %s", filename.c_str());
+		wxLogMessage("RffArchive::loadEntryData: Failed to open rfffile %s", filename.c_str());
 		return false;
 	}
 
@@ -341,12 +392,12 @@ bool GrpArchive::loadEntryData(ArchiveEntry* entry) {
 	return true;
 }
 
-/* GrpArchive::addEntry
+/* RffArchive::addEntry
  * Override of Archive::addEntry to force entry addition to the root
  * directory, update namespaces if needed and rename the entry if
- * necessary to be grp-friendly (12 characters max with extension)
+ * necessary to be rff-friendly  (12 characters max with extension)
  *******************************************************************/
-ArchiveEntry* GrpArchive::addEntry(ArchiveEntry* entry, unsigned position, ArchiveTreeNode* dir, bool copy) {
+ArchiveEntry* RffArchive::addEntry(ArchiveEntry* entry, unsigned position, ArchiveTreeNode* dir, bool copy) {
 	// Check entry
 	if (!entry)
 		return NULL;
@@ -372,19 +423,19 @@ ArchiveEntry* GrpArchive::addEntry(ArchiveEntry* entry, unsigned position, Archi
 	return entry;
 }
 
-/* GrpArchive::addEntry
- * Since GRP files have no namespaces, just call the other function.
+/* RffArchive::addEntry
+ * Since RFF files have no namespaces, just call the other function.
  *******************************************************************/
-ArchiveEntry* GrpArchive::addEntry(ArchiveEntry* entry, string add_namespace, bool copy) {
+ArchiveEntry* RffArchive::addEntry(ArchiveEntry* entry, string add_namespace, bool copy) {
 	return addEntry(entry, 0xFFFFFFFF, NULL, copy);
 }
 
-/* GrpArchive::renameEntry
+/* RffArchive::renameEntry
  * Override of Archive::renameEntry to update namespaces if needed
  * and rename the entry if necessary to be grp-friendly (twelve
  * characters max)
  *******************************************************************/
-bool GrpArchive::renameEntry(ArchiveEntry* entry, string name) {
+bool RffArchive::renameEntry(ArchiveEntry* entry, string name) {
 	// Check entry
 	if (!checkEntry(entry))
 		return false;
@@ -402,53 +453,59 @@ bool GrpArchive::renameEntry(ArchiveEntry* entry, string name) {
 		return false;
 }
 
-/* GrpArchive::detectMaps
+/* RffArchive::detectMaps
  * Searches for any maps in the grp and adds them to the map list
  *******************************************************************/
-vector<Archive::mapdesc_t> GrpArchive::detectMaps() {
+vector<Archive::mapdesc_t> RffArchive::detectMaps() {
 	vector<mapdesc_t> maps;
 	return maps;
 }
 
-/* GrpArchive::detectNamespace
+/* RffArchive::detectNamespace
  * Returns "global" because there are no namespaces in grp files.
  *******************************************************************/
-string GrpArchive::detectNamespace(ArchiveEntry* entry) {
+string RffArchive::detectNamespace(ArchiveEntry* entry) {
 	return "global";
 }
 
-/* GrpArchive::isGrpArchive
+/* RffArchive::isRffArchive
  * Checks if the given data is a valid Duke Nukem 3D grp archive
  *******************************************************************/
-bool GrpArchive::isGrpArchive(MemChunk& mc) {
+bool RffArchive::isRffArchive(MemChunk& mc) {
 	// Check size
-	if (mc.getSize() < 16)
+	if (mc.getSize() < 12)
 		return false;
 
-	// Get number of lumps
-	uint32_t	num_lumps = 0;
-	char		ken_magic[13] = "";
+	// Read grp header
+	uint8_t magic[4];
+	uint32_t version, dir_offset, num_lumps;
+
 	mc.seek(0, SEEK_SET);
-	mc.read(ken_magic, 12);		// "KenSilverman"
-	mc.read(&num_lumps, 4);		// No. of lumps in grp
+	mc.read(magic, 4);			// Should be "RFF\x18"
+	mc.read(&version, 4);		// 0x01 0x03 \x00 \x00
+	mc.read(&dir_offset, 4);	// Offset to directory
+	mc.read(&num_lumps, 4);		// No. of lumps in rff
 
 	// Byteswap values for big endian if needed
+	dir_offset = wxINT32_SWAP_ON_BE(dir_offset);
 	num_lumps = wxINT32_SWAP_ON_BE(num_lumps);
-
-	// Null-terminate the magic header
-	ken_magic[12] = 0;
+	version = wxINT32_SWAP_ON_BE(version);
 
 	// Check the header
-	if (!(s_cmp(wxString::FromAscii(ken_magic), "KenSilverman")))
+	if (magic[0] != 'R' || magic[1] != 'F' || magic[2] != 'F' || magic[3] != 0x1A || version != 0x301)
 		return false;
 
+
 	// Compute total size
-	uint32_t totalsize = (1 + num_lumps) * 16;
+	RFFLump *lumps = new RFFLump[num_lumps];
+	mc.seek(dir_offset, SEEK_SET);
+	theSplashWindow->setProgressMessage("Reading rff archive data");
+	mc.read (lumps, num_lumps * sizeof(RFFLump));
+	BloodCrypt (lumps, dir_offset, num_lumps * sizeof(RFFLump));
+	uint32_t totalsize = 12 + num_lumps * sizeof(RFFLump);
 	uint32_t size = 0;
 	for (uint32_t a = 0; a < num_lumps; ++a) {
-		mc.read(ken_magic, 12);
-		mc.read(&size, 4);
-		totalsize += size;
+		totalsize += lumps[a].Size;
 	}
 
 	// Check if total size is correct
@@ -459,10 +516,10 @@ bool GrpArchive::isGrpArchive(MemChunk& mc) {
 	return true;
 }
 
-/* GrpArchive::isGrpArchive
+/* RffArchive::isRffArchive
  * Checks if the file at [filename] is a valid DN3D grp archive
  *******************************************************************/
-bool GrpArchive::isGrpArchive(string filename) {
+bool RffArchive::isRffArchive(string filename) {
 	// Open file for reading
 	wxFile file(filename);
 
@@ -471,33 +528,39 @@ bool GrpArchive::isGrpArchive(string filename) {
 		return false;
 
 	// Check size
-	if (file.Length() < 16)
+	if (file.Length() < 12)
 		return false;
 
-	// Get number of lumps
-	uint32_t	num_lumps = 0;
-	char		ken_magic[13] = "";
+	// Read grp header
+	uint8_t magic[4];
+	uint32_t version, dir_offset, num_lumps;
+
 	file.Seek(0, wxFromStart);
-	file.Read(ken_magic, 12);		// "KenSilverman"
-	file.Read(&num_lumps, 4);		// No. of lumps in grp
+	file.Read(magic, 4);			// Should be "RFF\x18"
+	file.Read(&version, 4);		// 0x01 0x03 \x00 \x00
+	file.Read(&dir_offset, 4);	// Offset to directory
+	file.Read(&num_lumps, 4);		// No. of lumps in rff
 
 	// Byteswap values for big endian if needed
+	dir_offset = wxINT32_SWAP_ON_BE(dir_offset);
 	num_lumps = wxINT32_SWAP_ON_BE(num_lumps);
-
-	// Null-terminate the magic header
-	ken_magic[12] = 0;
+	version = wxINT32_SWAP_ON_BE(version);
 
 	// Check the header
-	if (!(s_cmp(wxString::FromAscii(ken_magic), "KenSilverman")))
+	if (magic[0] != 'R' || magic[1] != 'F' || magic[2] != 'F' || magic[3] != 0x1A || version != 0x301)
 		return false;
 
+
 	// Compute total size
-	uint32_t totalsize = (1 + num_lumps) * 16;
+	RFFLump *lumps = new RFFLump[num_lumps];
+	file.Seek(dir_offset, wxFromStart);
+	theSplashWindow->setProgressMessage("Reading rff archive data");
+	file.Read(lumps, num_lumps * sizeof(RFFLump));
+	BloodCrypt (lumps, dir_offset, num_lumps * sizeof(RFFLump));
+	uint32_t totalsize = 12 + num_lumps * sizeof(RFFLump);
 	uint32_t size = 0;
 	for (uint32_t a = 0; a < num_lumps; ++a) {
-		file.Read(ken_magic, 12);
-		file.Read(&size, 4);
-		totalsize += size;
+		totalsize += lumps[a].Size;
 	}
 
 	// Check if total size is correct
@@ -512,127 +575,5 @@ bool GrpArchive::isGrpArchive(string filename) {
 /*******************************************************************
  * EXTRA CONSOLE COMMANDS
  *******************************************************************/
-#include "Console.h"
-#include "MainWindow.h"
-
-CONSOLE_COMMAND(lookupdat, 0) {
-	ArchiveEntry * entry = theMainWindow->getCurrentEntry();
-
-	if (!entry)
-		return;
-
-	MemChunk mc = entry->getMCData();
-	if (mc.getSize() == 0)
-		return;
-
-	ArchiveEntry * nentry = NULL;
-	uint32_t * data = NULL;
-	int index = entry->getParent()->entryIndex(entry);
-	mc.seek(0, SEEK_SET);
-
-	// Create lookup table
-	uint8_t numlookup = 0;
-	uint8_t dummy = 0;
-	mc.read(&numlookup, 1);
-	if (mc.getSize() < (uint32_t)((numlookup * 256)+(5*768)+1))
-		return;
-
-	nentry = entry->getParent()->addNewEntry("COLORMAP.DAT", index);
-	if (!nentry)
-		return;
-
-	data = new uint32_t[numlookup * 256];
-	for (int i = 0; i < numlookup; ++i)	{
-		mc.read(&dummy, 1);
-		mc.read(data, numlookup * 256);
-	}
-	nentry->importMem(data, numlookup * 256);
-	delete[] data;
-
-	// Create extra palettes
-	data = new uint32_t[768];
-	nentry = entry->getParent()->addNewEntry("WATERPAL.PAL", index+1); if (!nentry) return;
-	mc.read(data, 768); nentry->importMem(data, 768);
-	nentry = entry->getParent()->addNewEntry("SLIMEPAL.PAL", index+2); if (!nentry) return;
-	mc.read(data, 768); nentry->importMem(data, 768);
-	nentry = entry->getParent()->addNewEntry("TITLEPAL.PAL", index+3); if (!nentry) return;
-	mc.read(data, 768); nentry->importMem(data, 768);
-	nentry = entry->getParent()->addNewEntry("3DREALMS.PAL", index+4); if (!nentry) return;
-	mc.read(data, 768); nentry->importMem(data, 768);
-	nentry = entry->getParent()->addNewEntry("ENDINPAL.PAL", index+5); if (!nentry) return;
-	mc.read(data, 768); nentry->importMem(data, 768);
-	
-	// Clean up and go away
-	delete[] data;
-	mc.clear();
-}
-
-CONSOLE_COMMAND(palettedat, 0) {
-	ArchiveEntry * entry = theMainWindow->getCurrentEntry();
-
-	if (!entry)
-		return;
-
-	MemChunk mc = entry->getMCData();
-	// Minimum size: 768 bytes for the palette, 2 for the number of lookup tables,
-	// 0 for these tables if there are none, and 65536 for the transparency map.
-	if (mc.getSize() < 66306)
-		return;
-
-	ArchiveEntry * nentry = NULL;
-	uint32_t * data = NULL;
-	int index = entry->getParent()->entryIndex(entry);
-	mc.seek(0, SEEK_SET);
-
-	// Create palette
-	data = new uint32_t[768];
-	nentry = entry->getParent()->addNewEntry("MAINPAL.PAL", index+0); if (!nentry) return;
-	mc.read(data, 768); nentry->importMem(data, 768);
-
-	// Create lookup tables
-	uint16_t numlookup = 0; mc.read(&numlookup, 2);
-	numlookup = wxINT16_SWAP_ON_BE(numlookup);
-	delete[] data;
-	nentry = entry->getParent()->addNewEntry("COLORMAP.DAT", index+1); if (!nentry) return;
-	data = new uint32_t[numlookup * 256];
-	mc.read(data, numlookup * 256); nentry->importMem(data, numlookup * 256);
-
-	// Create transparency tables
-	delete[] data;
-	nentry = entry->getParent()->addNewEntry("TRANMAP.DAT", index+2); if (!nentry) return;
-	data = new uint32_t[65536];
-	mc.read(data, 65536); nentry->importMem(data, 65536);
-
-	// Clean up and go away
-	delete[] data;
-	mc.clear();
-}
-
-CONSOLE_COMMAND(tablesdat, 0) {
-	ArchiveEntry * entry = theMainWindow->getCurrentEntry();
-
-	if (!entry)
-		return;
-
-	MemChunk mc = entry->getMCData();
-	// Sin/cos table: 4096; atn table 1280; gamma table 1024
-	// Fonts: 1024 byte each.
-	if (mc.getSize() != 8448)
-		return;
-
-	ArchiveEntry * nentry = NULL;
-	uint32_t * data = NULL;
-	int index = entry->getParent()->entryIndex(entry);
-	mc.seek(5376, SEEK_SET);
-
-	// Create fonts
-	data = new uint32_t[1024];
-	nentry = entry->getParent()->addNewEntry("VGAFONT1.FNT", index+0); if (!nentry) return;
-	mc.read(data, 1024); nentry->importMem(data, 1024);
-	nentry = entry->getParent()->addNewEntry("VGAFONT2.FNT", index+1); if (!nentry) return;
-	mc.read(data, 1024); nentry->importMem(data, 1024);
-
-	// Clean up and go away
-	delete[] data;
-	mc.clear();
-}
+//#include "Console.h"
+//#include "MainWindow.h"

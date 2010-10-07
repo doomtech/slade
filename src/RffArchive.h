@@ -1,15 +1,15 @@
 
-#ifndef __GRPARCHIVE_H__
-#define __GRPARCHIVE_H__
+#ifndef __RFFARCHIVE_H__
+#define __RFFARCHIVE_H__
 
 #include "Archive.h"
 
-class GrpArchive : public TreelessArchive {
+class RffArchive : public TreelessArchive {
 public:
-	GrpArchive();
-	~GrpArchive();
+	RffArchive();
+	~RffArchive();
 
-	// GRP specific
+	// RFF specific
 	uint32_t	getEntryOffset(ArchiveEntry* entry);
 	void		setEntryOffset(ArchiveEntry* entry, uint32_t offset);
 
@@ -41,20 +41,20 @@ public:
 	string				detectNamespace(ArchiveEntry* entry);
 
 	// Static functions
-	static bool isGrpArchive(MemChunk& mc);
-	static bool isGrpArchive(string filename);
+	static bool isRffArchive(MemChunk& mc);
+	static bool isRffArchive(string filename);
 
 	static bool exportEntriesAsWad(string filename, vector<ArchiveEntry*> entries) {
-		GrpArchive grp;
+		RffArchive rff;
 
 		// Add entries to grp archive
 		for (size_t a = 0; a < entries.size(); a++) {
 			// Add each entry to the grp archive
-			grp.addEntry(entries[a], entries.size(), NULL, true);
+			rff.addEntry(entries[a], entries.size(), NULL, true);
 		}
 
-		return grp.save(filename);
+		return rff.save(filename);
 	}
 };
 
-#endif//__GRPARCHIVE_H__
+#endif//__RFFARCHIVE_H__

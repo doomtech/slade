@@ -360,4 +360,30 @@ public:
 	}
 };
 
+// Blood SFX+RAW format
+class BloodSFXDataFormat : public EntryDataFormat {
+public:
+	BloodSFXDataFormat() : EntryDataFormat("snd_bloodsfx") {};
+	~BloodSFXDataFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		// Check size, must be between 22 and 29 included
+		if (mc.getSize() > 21 && mc.getSize() < 30) {
+			if (mc[12] == 1 || mc[12] == 5) {
+				size_t i = 20;
+				for (; i < mc.getSize() - 1; ++i) {
+					// Check that the entry does give a purely alphanumeric ASCII name
+					if ((mc[i] < '0' || (mc[i] > '9' && mc[i] < 'A') ||
+						(mc[i] > 'Z' && mc[i] < 'a') || mc[i] > 'z') && mc[i] != '_')
+						return EDF_FALSE;
+				}
+				// And check that it null-terminates
+				if (mc[i] == 0)
+					return EDF_TRUE;
+			}
+		}
+		return EDF_FALSE;
+	}
+};
+
 #endif //AUDIOFORMATS_H

@@ -973,6 +973,9 @@ bool ArchivePanel::dSndWavConvert() {
 		// Or Creative Voice File format
 		else if (selection[a]->getType()->getFormat() == "snd_voc")
 			worked = Conversions::vocToWav(selection[a]->getMCData(), wav);
+		// Or Blood SFX format (this one needs to be given the entry, not just the mem chunk)
+		else if (selection[a]->getType()->getFormat() == "snd_bloodsfx")
+			worked = Conversions::bloodToWav(selection[a], wav);
 		// If successfully converted, update the entry
 		if (worked) {
 			selection[a]->importMemChunk(wav);			// Load wav data
@@ -1412,6 +1415,7 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 		if (!dsnd_selected) {
 			if (selection[a]->getType()->getFormat() == "snd_doom" ||
 				selection[a]->getType()->getFormat() == "snd_doom64" ||
+				selection[a]->getType()->getFormat() == "snd_bloodsfx" ||
 				selection[a]->getType()->getFormat() == "snd_voc")
 				dsnd_selected = true;
 		}
