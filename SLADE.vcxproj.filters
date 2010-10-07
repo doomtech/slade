@@ -384,6 +384,9 @@
     <ClCompile Include="src\BrowserCanvas.cpp">
       <Filter>UI Elements\Browser</Filter>
     </ClCompile>
+    <ClCompile Include="src\GrpArchive.cpp">
+      <Filter>Resources\Archive</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -707,6 +710,9 @@
     </ClInclude>
     <ClInclude Include="src\BrowserCanvas.h">
       <Filter>UI Elements\Browser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GrpArchive.h">
+      <Filter>Resources\Archive</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
