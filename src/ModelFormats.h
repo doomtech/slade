@@ -116,7 +116,7 @@ public:
 				mc.read(&szy, 4); szy = wxINT32_SWAP_ON_BE(szy);
 				mc.read(&szz, 4); szz = wxINT32_SWAP_ON_BE(szz);
 				// Compute size of the different data segments to do some checks
-				szofx = (szx+1)<<2; szofxy = szx*(szy+1)<<1;
+				szofx = (szx+1)<<2; szofxy = szx*((szy+1)<<1);
 				szvxd = szd - (szofx + szofxy);
 				if (szvxd < 0)
 					return EDF_FALSE;
@@ -127,15 +127,10 @@ public:
 				mc.read(&dummy, 4); dummy = wxINT32_SWAP_ON_BE(dummy);
 				if (dummy != ((szx+1)*4 + 2*szx*(szy+1)))
 					return EDF_FALSE;
-				// Go through the rest of the X offsets
-				for (size_t i = 0; i < szx; ++i) mc.read(&dummy, 4);
-				// Now for the XY offsets
-				for (size_t i = 0; i < szx*(szy+1); ++i) mc.read(&dummy, 2);
-				// Now through the voxel data
-				for (int i = 0; i < szvxd; ++i) mc.read(&dummy, 1);
 
 				// Update the parse count
 				parsed += szd;
+				mc.seek(parsed, SEEK_SET);
 
 				// We're at the end of a mip level, 
 				// have we reached the palette yet?
