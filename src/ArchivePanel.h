@@ -23,6 +23,7 @@ protected:
 	EntryPanel*	entry_area;
 	EntryPanel*	default_area;
 	EntryPanel*	text_area;
+	EntryPanel*	ansi_area;
 	EntryPanel*	gfx_area;
 	EntryPanel*	pal_area;
 	EntryPanel* texturex_area;

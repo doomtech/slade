@@ -42,6 +42,7 @@
 #include "AnimatedEntryPanel.h"
 #include "SwitchesEntryPanel.h"
 #include "HexEntryPanel.h"
+#include "ANSIEntryPanel.h"
 #include "MapEntryPanel.h"
 #include "AudioEntryPanel.h"
 #include "GfxConvDialog.h"
@@ -100,6 +101,7 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 	animated_area = new AnimatedEntryPanel(this);
 	switches_area = new SwitchesEntryPanel(this);
 	hex_area = new HexEntryPanel(this);
+	ansi_area = new ANSIEntryPanel(this);
 	map_area = new MapEntryPanel(this);
 	audio_area = new AudioEntryPanel(this);
 
@@ -926,7 +928,7 @@ bool ArchivePanel::palConvert() {
 	memcpy(meh, mehmeh, pal6bit->getSize());
 	for (size_t i = 0; i < pal6bit->getSize(); ++i)
 	{
-		meh[i] = ((meh[i] << 2) | (meh[i] >> 6));
+		meh[i] = ((meh[i] << 2) | (meh[i] >> 4));
 	}
 	pal6bit->importMem(meh, pal6bit->getSize());
 	delete[] meh;
@@ -1056,13 +1058,15 @@ bool ArchivePanel::openEntry(ArchiveEntry* entry, bool force) {
 			new_area = gfx_area;
 		else if (!entry->getType()->getEditor().Cmp("palette"))
 			new_area = pal_area;
+		else if (!entry->getType()->getEditor().Cmp("ansi"))
+			new_area = ansi_area;
 		else if (!entry->getType()->getEditor().Cmp("text"))
 			new_area = text_area;
 		else if (!entry->getType()->getEditor().Cmp("animated"))
 			new_area = animated_area;
 		else if (!entry->getType()->getEditor().Cmp("switches"))
 			new_area = switches_area;
-		else if (s_cmpnocase(entry->getType()->getEditor(), "audio"))
+		else if (!entry->getType()->getEditor().Cmp("audio"))
 			new_area = audio_area;
 		else if (!entry->getType()->getEditor().Cmp("default"))
 			new_area = default_area;

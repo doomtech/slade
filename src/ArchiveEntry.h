@@ -13,6 +13,7 @@ enum EncryptionModes
 	ENC_NONE = 0,
 	ENC_JAGUAR,
 	ENC_BLOOD,
+	ENC_SCRLE0,
 };
 
 class ArchiveEntry {

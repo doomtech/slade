@@ -342,6 +342,14 @@
 				Name="Utility"
 				>
 				<File
+					RelativePath=".\src\CodePages.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\CodePages.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\Parser.cpp"
 					>
 				</File>
@@ -490,6 +498,14 @@
 					</File>
 					<File
 						RelativePath=".\src\AnimatedEntryPanel.h"
+						>
+					</File>
+					<File
+						RelativePath=".\src\ANSIEntryPanel.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\ANSIEntryPanel.h"
 						>
 					</File>
 					<File

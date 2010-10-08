@@ -162,16 +162,19 @@ bool DatArchive::open(MemChunk& mc) {
 		// Read lump info
 		uint32_t offset = 0;
 		uint32_t size = 0;
-		uint32_t nameofs = 0;
+		uint16_t nameofs = 0;
+		uint16_t flags = 0;
 
 		mc.read(&offset,	4);		// Offset
 		mc.read(&size,		4);		// Size
-		mc.read(&nameofs,	4);		// Name offset
+		mc.read(&nameofs,	2);		// Name offset
+		mc.read(&flags,		2);		// Flags (only one: RLE encoded)
 
 		// Byteswap values for big endian if needed
 		offset = wxINT32_SWAP_ON_BE(offset);
 		size = wxINT32_SWAP_ON_BE(size);
-		nameofs = wxINT32_SWAP_ON_BE(nameofs);
+		nameofs = wxINT16_SWAP_ON_BE(nameofs);
+		flags = wxINT16_SWAP_ON_BE(flags);
 
 		// If the lump data goes past the directory,
 		// the data file is invalid
@@ -186,7 +189,7 @@ bool DatArchive::open(MemChunk& mc) {
 		if (nameofs != 0) {
 			size_t len = 1;
 			size_t start = nameofs+dir_offset;
-			for (size_t i = start; mcdata[i] != 0; ++i, ++len) {}
+			for (size_t i = start; mcdata[i] != 0; ++i) { ++len; }
 			lastname = myname = wxString::FromAscii(mcdata+start, len);
 			namecount = 0;
 		}
@@ -200,6 +203,8 @@ bool DatArchive::open(MemChunk& mc) {
 		nlump->setLoaded(false);
 		nlump->exProp("Offset") = (int)offset;
 		nlump->setState(0);
+
+		if (flags & 1) nlump->setEncryption(ENC_SCRLE0);
 
 		// Check for markers
 		if (!nlump->getName().Cmp("startflats"))
@@ -244,8 +249,8 @@ bool DatArchive::open(MemChunk& mc) {
 	}
 
 	// Detect maps (will detect map entry types)
-	theSplashWindow->setProgressMessage("Detecting maps");
-	detectMaps();
+	//theSplashWindow->setProgressMessage("Detecting maps");
+	//detectMaps();
 
 	// Setup variables
 	setMuted(false);
@@ -494,7 +499,7 @@ bool DatArchive::write(MemChunk& mc, bool update) {
 	uint16_t name_offset = numEntries() * 12;
 	uint32_t name_size = 0;
 	string previousname = "";
-	uint32_t * nameoffsets = new uint32_t[numEntries()];
+	uint16_t * nameoffsets = new uint16_t[numEntries()];
 	ArchiveEntry* entry = NULL;
 	for (uint16_t l = 0; l < numEntries(); l++) {
 		entry = getEntry(l);
@@ -542,11 +547,13 @@ bool DatArchive::write(MemChunk& mc, bool update) {
 
 		uint32_t offset = wxINT32_SWAP_ON_BE(getEntryOffset(entry));
 		uint32_t size = wxINT32_SWAP_ON_BE(entry->getSize());
-		uint32_t nameofs = wxINT32_SWAP_ON_BE(nameoffsets[l]);
+		uint16_t nameofs = wxINT16_SWAP_ON_BE(nameoffsets[l]);
+		uint16_t flags = wxINT16_SWAP_ON_BE((entry->isEncrypted() == ENC_SCRLE0) ? 1 : 0);
 
 		mc.write(&offset,	4);		// Offset
 		mc.write(&size,		4);		// Size
-		mc.write(&nameofs,	4);		// Name offset
+		mc.write(&nameofs,	2);		// Name offset
+		mc.write(&flags,	2);		// Flags
 
 		if (update) {
 			entry->setState(0);
@@ -630,18 +637,18 @@ bool DatArchive::isDatArchive(MemChunk& mc) {
 	uint32_t offset = 0;
 	uint32_t size = 0;
 	uint16_t nameofs = 0;
-	uint16_t unknown = 0;
+	uint16_t flags = 0;
 
 	mc.read(&offset,	4);		// Offset
 	mc.read(&size,		4);		// Size
 	mc.read(&nameofs,	2);		// Name offset
-	mc.read(&unknown,	2);		// Name offset
+	mc.read(&flags,		2);		// Flags
 
 	// Byteswap values for big endian if needed
-	offset = wxINT32_SWAP_ON_BE(offset);
-	size = wxINT32_SWAP_ON_BE(size);
-	nameofs = wxINT16_SWAP_ON_BE(nameofs);
-	unknown = wxINT16_SWAP_ON_BE(unknown);
+	offset	= wxINT32_SWAP_ON_BE(offset);
+	size	= wxINT32_SWAP_ON_BE(size);
+	nameofs	= wxINT16_SWAP_ON_BE(nameofs);
+	flags	= wxINT16_SWAP_ON_BE(flags);
 
 	// The first lump should have a name (subsequent lumps need not have one).
 	// Also, sanity check the values.
@@ -696,18 +703,18 @@ bool DatArchive::isDatArchive(string filename) {
 	uint32_t offset = 0;
 	uint32_t size = 0;
 	uint16_t nameofs = 0;
-	uint16_t unknown = 0;
+	uint16_t flags = 0;
 
 	file.Read(&offset,	4);		// Offset
 	file.Read(&size,	4);		// Size
 	file.Read(&nameofs,	2);		// Name offset
-	file.Read(&unknown,	2);		// Name offset
+	file.Read(&flags,	2);		// Flags
 
 	// Byteswap values for big endian if needed
 	offset	= wxINT32_SWAP_ON_BE(offset);
 	size	= wxINT32_SWAP_ON_BE(size);
 	nameofs = wxINT16_SWAP_ON_BE(nameofs);
-	unknown = wxINT16_SWAP_ON_BE(unknown);
+	flags	= wxINT16_SWAP_ON_BE(flags);
 
 	// The first lump should have a name (subsequent lumps need not have one).
 	// Also, sanity check the values.
