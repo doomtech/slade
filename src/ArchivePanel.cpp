@@ -1525,6 +1525,11 @@ void ArchivePanel::onEntryListKeyDown(wxKeyEvent& e) {
 	else if (e.GetKeyCode() == 'N' && e.ControlDown() && !e.ShiftDown())
 		newEntry();
 
+	// Up directory (backspace)
+	else if (e.GetKeyCode() == WXK_BACK)
+		entry_list->goUpDir();
+		
+
 	// Not handled here, send off to be handled by a parent window
 	else
 		e.Skip();
