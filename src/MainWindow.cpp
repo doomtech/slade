@@ -46,6 +46,7 @@
  *******************************************************************/
 string main_window_layout = "";
 MainWindow* MainWindow::instance = NULL;
+CVAR(Bool, show_start_page, true, CVAR_SAVE);
 
 
 /*******************************************************************
@@ -95,9 +96,13 @@ void MainWindow::setupLayout() {
 	// Create Start Page (temporary)
 	html_startpage = new wxHtmlWindow(notebook_tabs, -1, wxDefaultPosition, wxDefaultSize, wxHW_SCROLLBAR_NEVER, "startpage");
 	html_startpage->SetName("startpage");
-	notebook_tabs->AddPage(html_startpage,"Start Page");
-	notebook_tabs->SetPageBitmap(0, getIcon("i_logo"));
-	createStartPage();
+	if (show_start_page) {
+		notebook_tabs->AddPage(html_startpage,"Start Page");
+		notebook_tabs->SetPageBitmap(0, getIcon("i_logo"));
+		createStartPage();
+	}
+	else
+		html_startpage->Show(false);
 
 
 	// -- Console Panel --

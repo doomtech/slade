@@ -40,6 +40,7 @@ EXTERN_CVAR(Bool, archive_load_data)
 EXTERN_CVAR(Bool, gl_tex_enable_np2)
 EXTERN_CVAR(Bool, size_as_string)
 EXTERN_CVAR(Bool, elist_filter_dirs)
+EXTERN_CVAR(Bool, show_start_page)
 
 
 /*******************************************************************
@@ -65,19 +66,23 @@ GeneralPrefsPanel::GeneralPrefsPanel(wxWindow* parent) : wxPanel(parent, -1) {
 
 	// Close archive with tab
 	cb_archive_close_tab = new wxCheckBox(this, -1, "Close archive when its tab is closed");
-	sizer->Add(cb_archive_close_tab, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
+	sizer->Add(cb_archive_close_tab, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
 	// Enable np2 textures
 	cb_gl_np2 = new wxCheckBox(this, -1, "Enable Non-power-of-two textures if supported");
-	sizer->Add(cb_gl_np2, 0, wxEXPAND|wxALL, 4);
+	sizer->Add(cb_gl_np2, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
 	// Show entry size as string instead of a number
 	cb_size_as_string = new wxCheckBox(this, -1, "Show entry size as a string with units");
-	sizer->Add(cb_size_as_string, 0, wxEXPAND|wxALL, 4);
+	sizer->Add(cb_size_as_string, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
 	// Filter directories
 	cb_filter_dirs = new wxCheckBox(this, -1, "Ignore directories when filtering by name");
-	sizer->Add(cb_filter_dirs, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
+	sizer->Add(cb_filter_dirs, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+	// Show startpage
+	cb_start_page = new wxCheckBox(this, -1, "Show Start Page on Startup");
+	sizer->Add(cb_start_page, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
 	// Init controls
 	cb_archive_load->SetValue(archive_load_data);
@@ -85,6 +90,7 @@ GeneralPrefsPanel::GeneralPrefsPanel(wxWindow* parent) : wxPanel(parent, -1) {
 	cb_gl_np2->SetValue(gl_tex_enable_np2);
 	cb_size_as_string->SetValue(size_as_string);
 	cb_filter_dirs->SetValue(!elist_filter_dirs);
+	cb_start_page->SetValue(show_start_page);
 }
 
 /* GeneralPrefsPanel::~GeneralPrefsPanel
@@ -102,4 +108,5 @@ void GeneralPrefsPanel::applyPreferences() {
 	gl_tex_enable_np2 = cb_gl_np2->GetValue();
 	size_as_string = cb_size_as_string->GetValue();
 	elist_filter_dirs = !cb_filter_dirs->GetValue();
+	show_start_page = cb_start_page->GetValue();
 }
