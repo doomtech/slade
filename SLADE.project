@@ -97,6 +97,8 @@
         <File Name="src/MapEntryPanel.h"/>
         <File Name="src/AudioEntryPanel.cpp"/>
         <File Name="src/AudioEntryPanel.h"/>
+        <File Name="src/ANSIEntryPanel.cpp"/>
+        <File Name="src/ANSIEntryPanel.h"/>
       </VirtualDirectory>
       <File Name="src/ArchiveManagerPanel.h"/>
       <File Name="src/ArchiveManagerPanel.cpp"/>
