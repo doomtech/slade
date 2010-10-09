@@ -53,7 +53,7 @@
       <File Name="src/PropertyList.h"/>
     </VirtualDirectory>
     <File Name="src/CVar.h"/>
-    <VirtualDirectory Name="Util">
+    <VirtualDirectory Name="Utility">
       <File Name="src/Tokenizer.cpp"/>
       <File Name="src/Tokenizer.h"/>
       <File Name="src/Structs.h"/>
@@ -61,6 +61,8 @@
       <File Name="src/Tree.cpp"/>
       <File Name="src/Parser.h"/>
       <File Name="src/Parser.cpp"/>
+      <File Name="src/CodePages.cpp"/>
+      <File Name="src/CodePages.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Console">
       <File Name="src/Console.cpp"/>
@@ -108,6 +110,7 @@
         <File Name="src/TextureXPanel.h"/>
         <File Name="src/PatchBrowser.cpp"/>
         <File Name="src/PatchBrowser.h"/>
+        <File Name="src/TextureEditorPanel.cpp"/>
       </VirtualDirectory>
       <File Name="src/ArchivePanel.cpp"/>
       <File Name="src/ArchivePanel.h"/>
@@ -171,7 +174,6 @@
           <File Name="src/MiscFormats.h"/>
           <File Name="src/ModelFormats.h"/>
         </VirtualDirectory>
-        <File Name="src/TextureEditorPanel.cpp"/>
       </VirtualDirectory>
       <File Name="src/DatArchive.cpp"/>
       <File Name="src/DatArchive.h"/>
@@ -187,6 +189,8 @@
       <File Name="src/WadJArchive.h"/>
       <File Name="src/GrpArchive.cpp"/>
       <File Name="src/GrpArchive.h"/>
+      <File Name="src/RffArchive.cpp"/>
+      <File Name="src/RffArchive.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Binary Control Lumps">
       <File Name="src/AnimatedList.cpp"/>
@@ -241,7 +245,6 @@
     <File Name="src/ConsolePanel.h"/>
     <File Name="src/SplashWindow.h"/>
     <File Name="src/SplashWindow.cpp"/>
-    <VirtualDirectory Name="Options"/>
     <VirtualDirectory Name="Browser">
       <File Name="src/BrowserWindow.h"/>
       <File Name="src/BrowserItem.h"/>
@@ -268,8 +271,8 @@
       <File Name="src/VirtualListView.cpp"/>
     </VirtualDirectory>
     <File Name="src/HexEditorPanel.h"/>
-    <File Name="src/HexEditorPanel.cpp"/>
     <File Name="src/ConsolePanel.cpp"/>
+    <File Name="src/HexEditorPanel.cpp"/>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>

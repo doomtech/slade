@@ -83,11 +83,11 @@ EXTERN_CVAR(Bool, archive_load_data)
  *******************************************************************/
 void BloodCrypt (void *data, int key, int len)
 {
-	int p = (BYTE)key, i;
+	int p = (uint8_t)key, i;
 
 	for (i = 0; i < len; ++i)
 	{
-		((BYTE *)data)[i] ^= (unsigned char)(p+(i>>1));
+		((uint8_t *)data)[i] ^= (unsigned char)(p+(i>>1));
 	}
 }
 
