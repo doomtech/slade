@@ -91,6 +91,54 @@ bool GLTexture::loadData(const uint8_t* data, uint32_t width, uint32_t height, b
 	return true;
 }
 
+bool GLTexture::loadRawData(const uint8_t* data, uint32_t w, uint32_t h) {
+	// Check image was given
+	if (!data)
+		return false;
+
+	// Clear current texture
+	clear();
+
+	// Check image dimensions
+	if (OpenGL::validTexDimension(w) && OpenGL::validTexDimension(h)) {
+		// If the image dimensions are valid for OpenGL on this system, just load it as a single texture
+
+		return loadData(data, width, height);
+	} else {
+		// Otherwise split the image into 128x128 chunks
+		uint8_t * buf = new uint8_t[128*128*4];
+		size_t top = 0;
+		while (top < h) {
+			size_t left = 0;
+			while (left < w) {
+				// Load 128x128 portion of image
+				memset(buf, 0, 128*128*4);
+				size_t rowlen = min(128, w - left);
+				size_t collen = min(128, h - top);
+				for (size_t i = 0; i < collen; ++i) {
+					size_t doffset = (((top + i) * w) + left) * 4;
+					size_t boffset = i * 128 * 4;
+					memcpy(buf + boffset, data + doffset, rowlen*4);
+				}
+				loadData(buf, 128, 128, true);
+
+				// Move right 128px
+				left += 128;
+			}
+
+			// Move down 128px
+			top += 128;
+		}
+		delete[] buf;
+
+		// Update variables
+		width = w;
+		height = h;
+
+		return true;
+	}
+}
+
 bool GLTexture::loadImage(SImage* image, Palette8bit* pal) {
 	// Check image was given
 	if (!image)

@@ -144,7 +144,7 @@ string CP::fromCP437(uint8_t val) {
 	return wxString::FromUTF8((const char *)cp437table[val], cp437len[val]);
 }
 
-wxColour CP::ansiColor(uint8_t val) {
+rgba_t CP::ansiColor(uint8_t val) {
 	if (val >= 16) val = ((val >> 4) & 7);
-	return wxColour(ansicolors[val][0], ansicolors[val][1], ansicolors[val][2]);
+	return rgba_t(ansicolors[val][0], ansicolors[val][1], ansicolors[val][2]);
 }

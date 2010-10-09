@@ -6,9 +6,9 @@
 #include <wx/colour.h>
 
 namespace CP {
-	string		fromASCII(uint8_t val);
-	string		fromCP437(uint8_t val);
-	wxColour	ansiColor(uint8_t val);
+	string	fromASCII(uint8_t val);
+	string	fromCP437(uint8_t val);
+	rgba_t	ansiColor(uint8_t val);
 };
 
 #endif //__CODEPAGES_H__

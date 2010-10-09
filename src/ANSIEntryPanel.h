@@ -3,11 +3,12 @@
 #define __ANSI_ENTRY_PANEL__
 
 #include "EntryPanel.h"
-#include <wx/grid.h>
+#include "ANSICanvas.h"
 
 class ANSIEntryPanel : public EntryPanel {
 private:
-	wxGrid*		grid_ansi;
+	ANSICanvas*		ansi_canvas;
+	uint8_t*		ansi_chardata;
 
 public:
 	ANSIEntryPanel(wxWindow* parent);
@@ -15,6 +16,7 @@ public:
 
 	bool	loadEntry(ArchiveEntry* entry);
 	bool	saveEntry();
+	void	drawCharacter(size_t index);
 };
 
 #endif//__ANSI_ENTRY_PANEL__

@@ -33,6 +33,12 @@
 #include "ANSIEntryPanel.h"
 
 /*******************************************************************
+ * CONSTANTS
+ *******************************************************************/
+
+#define DATASIZE 4000
+
+/*******************************************************************
  * ANSIENTRYPANEL CLASS FUNCTIONS
  *******************************************************************/
 
@@ -40,20 +46,11 @@
  * ANSIEntryPanel class constructor
  *******************************************************************/
 ANSIEntryPanel::ANSIEntryPanel(wxWindow* parent) : EntryPanel(parent, "ansi") {
+	// Get the VGA font
 
-	// Create and setup ANSI text grid
-	grid_ansi = new wxGrid(this, -1, wxDefaultPosition, wxDefaultSize, wxWANTS_CHARS|wxBORDER_SUNKEN);
-	grid_ansi->SetDefaultRowSize(14, true);
-	grid_ansi->SetDefaultColSize(5, true);
-	grid_ansi->HideColLabels();
-	grid_ansi->HideRowLabels();
-	grid_ansi->CreateGrid(25, 80);
-	grid_ansi->EnableEditing(false);
-	grid_ansi->DisableDragGridSize();
-	grid_ansi->EnableGridLines(false);
-	grid_ansi->SetDefaultCellAlignment(wxALIGN_CENTER, wxALIGN_CENTER);
-	grid_ansi->SetInitialSize(wxSize(5*80+8, -1));
-	sizer_main->Add(grid_ansi, 1, wxEXPAND|wxALL);
+	ansi_chardata = new uint8_t[4000];
+	ansi_canvas = new ANSICanvas(this, -1);
+	sizer_main->Add(ansi_canvas->toPanel(this), 1, wxEXPAND|wxALL, 4);
 
 	// Disable save/revert buttons
 	btn_save->Enable(false);
@@ -67,6 +64,7 @@ ANSIEntryPanel::ANSIEntryPanel(wxWindow* parent) : EntryPanel(parent, "ansi") {
  * ANSIEntryPanel class destructor
  *******************************************************************/
 ANSIEntryPanel::~ANSIEntryPanel() {
+	delete[] ansi_chardata;
 }
 
 /* ANSIEntryPanel::loadEntry
@@ -77,17 +75,15 @@ bool ANSIEntryPanel::loadEntry(ArchiveEntry* entry) {
 	if (!entry)
 		return false;
 
-	MemChunk& mc = entry->getMCData();
-	if (mc.getSize() == 4000) {
-		for (size_t i = 0; i < 2000; i++) {
-			grid_ansi->SetCellValue(i/80, i%80, CP::fromCP437(mc[i<<1]));
-			grid_ansi->SetCellTextColour(i/80, i%80, CP::ansiColor(mc[(i<<1)+1]&15));
-			grid_ansi->SetCellBackgroundColour(i/80, i%80, CP::ansiColor(mc[(i<<1)+1]&112));
-		}
+	if (entry->getSize() == DATASIZE) {
+		memcpy(ansi_chardata, entry->getData(), DATASIZE);
+		ansi_canvas->loadData(ansi_chardata);
+		for (size_t i = 0; i < DATASIZE/2; i++)
+			drawCharacter(i);
 		Layout();
+		Refresh();
 		return true;
 	}
-
 	return false;
 }
 
@@ -95,5 +91,14 @@ bool ANSIEntryPanel::loadEntry(ArchiveEntry* entry) {
  * Saves changes to the entry
  *******************************************************************/
 bool ANSIEntryPanel::saveEntry() {
+	entry->importMem(ansi_chardata, DATASIZE);
 	return true;
+}
+
+/* ANSIEntryPanel::drawCharacter
+ * Draws a single character in the canvas
+ *******************************************************************/
+void ANSIEntryPanel::drawCharacter(size_t i) {
+	if (ansi_canvas)
+		ansi_canvas->drawCharacter(i);
 }

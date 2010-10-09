@@ -1027,6 +1027,14 @@
 			Name="UI Elements"
 			>
 			<File
+				RelativePath=".\src\ANSICanvas.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\ANSICanvas.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\ColourBox.cpp"
 				>
 			</File>

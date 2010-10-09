@@ -21,6 +21,10 @@ private:
 	// Some generic/global textures
 	static GLTexture	tex_background;	// Checkerboard background texture
 
+	// Stuff used internally
+	bool	loadData(const uint8_t* data, uint32_t width, uint32_t height, bool add = false);
+	bool	loadImagePortion(SImage* image, rect_t rect, Palette8bit* pal = NULL, bool add = false);
+
 public:
 	GLTexture(bool allow_split = true);
 	~GLTexture();
@@ -29,9 +33,8 @@ public:
 	uint32_t	getWidth() { return width; }
 	uint32_t	getHeight() { return height; }
 
-	bool	loadData(const uint8_t* data, uint32_t width, uint32_t height, bool add = false);
 	bool	loadImage(SImage* image, Palette8bit* pal = NULL);
-	bool	loadImagePortion(SImage* image, rect_t rect, Palette8bit* pal = NULL, bool add = false);
+	bool	loadRawData(const uint8_t* data, uint32_t width, uint32_t height);
 
 	bool	clear();
 	bool	genChequeredTexture(uint8_t block_size, rgba_t col1, rgba_t col2);
