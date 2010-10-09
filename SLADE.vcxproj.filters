@@ -387,6 +387,15 @@
     <ClCompile Include="src\GrpArchive.cpp">
       <Filter>Resources\Archive</Filter>
     </ClCompile>
+    <ClCompile Include="src\CodePages.cpp">
+      <Filter>General\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ANSIEntryPanel.cpp">
+      <Filter>Main Editor\UI Elements\EntryPanel</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RffArchive.cpp">
+      <Filter>Resources\Archive</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -712,6 +721,15 @@
       <Filter>UI Elements\Browser</Filter>
     </ClInclude>
     <ClInclude Include="src\GrpArchive.h">
+      <Filter>Resources\Archive</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CodePages.h">
+      <Filter>General\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ANSIEntryPanel.h">
+      <Filter>Main Editor\UI Elements\EntryPanel</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RffArchive.h">
       <Filter>Resources\Archive</Filter>
     </ClInclude>
   </ItemGroup>

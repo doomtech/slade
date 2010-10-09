@@ -77,7 +77,7 @@ bool ANSIEntryPanel::loadEntry(ArchiveEntry* entry) {
 	if (!entry)
 		return false;
 
-	MemChunk mc = entry->getMCData();
+	MemChunk& mc = entry->getMCData();
 	if (mc.getSize() == 4000) {
 		for (size_t i = 0; i < 2000; i++) {
 			grid_ansi->SetCellValue(i/80, i%80, CP::fromCP437(mc[i<<1]));
@@ -85,10 +85,9 @@ bool ANSIEntryPanel::loadEntry(ArchiveEntry* entry) {
 			grid_ansi->SetCellBackgroundColour(i/80, i%80, CP::ansiColor(mc[(i<<1)+1]&112));
 		}
 		Layout();
-		mc.clear();
 		return true;
 	}
-	mc.clear();
+
 	return false;
 }
 
