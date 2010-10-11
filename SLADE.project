@@ -275,6 +275,8 @@
     <File Name="src/HexEditorPanel.h"/>
     <File Name="src/ConsolePanel.cpp"/>
     <File Name="src/HexEditorPanel.cpp"/>
+    <File Name="src/ANSICanvas.cpp"/>
+    <File Name="src/ANSICanvas.h"/>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>
