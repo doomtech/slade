@@ -389,7 +389,7 @@ void HexEditorPanel::onCellSelected(wxGridEvent& e) {
 		label_byte->SetLabel(s_fmt("Signed Byte: %d", vbyte));
 		label_ubyte->SetLabel(s_fmt("Unsigned Byte: %d", vubyte));
 		if (vubyte <= 128)
-			label_ascii->SetLabel(s_fmt("ASCII: %s", chr(CP::fromASCII(vubyte))));
+			label_ascii->SetLabel(s_fmt("ASCII: %s", chr(CodePages::fromASCII(vubyte))));
 
 		if (size > 1) {
 			// Short values

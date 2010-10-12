@@ -171,37 +171,6 @@ void GfxCanvas::drawOffsetLines() {
 	}
 }
 
-/* GfxCanvas::drawCheckeredBackground
- * Fills the canvas with a checkered pattern (used as the
- * 'background' - to indicate transparency)
- *******************************************************************/
-void GfxCanvas::drawCheckeredBackground() {
-	// Save current matrix
-	glPushMatrix();
-
-	// Enable textures
-	glEnable(GL_TEXTURE_2D);
-
-	// Bind background texture
-	GLTexture::bgTex().bind();
-
-	// Draw background
-	frect_t rect(0, 0, GetSize().x, GetSize().y);
-	COL_WHITE.set_gl();
-	glBegin(GL_QUADS);
-	glTexCoord2d(rect.x1()*0.0625, rect.y1()*0.0625);	glVertex2d(rect.x1(), rect.y1());
-	glTexCoord2d(rect.x1()*0.0625, rect.y2()*0.0625);	glVertex2d(rect.x1(), rect.y2());
-	glTexCoord2d(rect.x2()*0.0625, rect.y2()*0.0625);	glVertex2d(rect.x2(), rect.y2());
-	glTexCoord2d(rect.x2()*0.0625, rect.y1()*0.0625);	glVertex2d(rect.x2(), rect.y1());
-	glEnd();
-
-	// Disable textures
-	glDisable(GL_TEXTURE_2D);
-
-	// Restore previous matrix
-	glPopMatrix();
-}
-
 /* GfxCanvas::drawImage
  * Draws the image (reloads the image as a texture each time, will
  * change this later...)

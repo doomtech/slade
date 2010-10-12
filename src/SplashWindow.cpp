@@ -54,7 +54,7 @@ int				SplashWindow::height = 204;
  * SplashWindow class constructor
  *******************************************************************/
 SplashWindow::SplashWindow()
-: wxMiniFrame(NULL, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE) {
+: wxMiniFrame(NULL, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxBORDER_SIMPLE|wxFRAME_FLOAT_ON_PARENT) {
 	// Init
 	show_progress = false;
 	progress = 0.0f;
@@ -138,9 +138,9 @@ void SplashWindow::show(string message, bool progress) {
 
 	// Show & init window
 	SetInitialSize(wxSize(width, rheight));
-	Centre();
 	setMessage(message);
 	Show();
+	CentreOnParent();
 	forceRedraw();
 }
 
@@ -238,6 +238,8 @@ void SplashWindow::onPaint(wxPaintEvent& e) {
 	}
 
 	timer.Start();
+
+	e.Skip();
 }
 
 

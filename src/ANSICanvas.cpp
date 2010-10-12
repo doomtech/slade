@@ -86,11 +86,11 @@ ANSICanvas::~ANSICanvas() {
 void ANSICanvas::writeRGBAData(uint8_t* dest) {
 	for (size_t i = 0; i < width*height; ++i) {
 		size_t j = i<<2;
-		rgba_t c = CP::ansiColor(picdata[i]);
+		rgba_t c = CodePages::ansiColor(picdata[i]);
 		dest[j+0] = c.r; dest[j+1] = c.g; dest[j+2] = c.b; dest[j+3] = 0xFF;
 	}
 }
-	
+
 /* ANSICanvas::draw
  * Draws the image
  *******************************************************************/
@@ -112,6 +112,9 @@ void ANSICanvas::draw() {
 
 	// Translate to middle of pixel (otherwise inaccuracies can occur on certain gl implemenataions)
 	glTranslatef(0.375f, 0.375f, 0);
+
+	// Draw background
+	drawCheckeredBackground();
 
 	// Draw the image
 	drawImage();
@@ -135,6 +138,7 @@ void ANSICanvas::drawImage() {
 	// Enable textures
 	glEnable(GL_TEXTURE_2D);
 
+	// Load texture data
 	uint8_t * RGBAData = new uint8_t[width*height*4];
 	writeRGBAData(RGBAData);
 	tex_image->loadRawData(RGBAData, width, height);
@@ -143,8 +147,11 @@ void ANSICanvas::drawImage() {
 	double x = (double)width;
 	double y = (double)height;
 
+	// Move in by 4
+	glTranslated(4, 4, 0);
+
 	// Draw the image
-	rgba_t(255, 255, 255, 255, 0).set_gl();
+	COL_WHITE.set_gl();
 	tex_image->draw2d();
 
 	// Disable textures
@@ -170,10 +177,14 @@ void ANSICanvas::drawImage() {
 void ANSICanvas::drawCharacter(size_t index) {
 	if (!ansidata)
 		return;
-	uint8_t chara = ansidata[index<<1];
-	uint8_t color = ansidata[(index<<1)+1];
-	uint8_t * pic = picdata + ((index/NUMCOLS)*width*char_height) + ((index%NUMCOLS)*char_width);
-	const uint8_t * fnt = fontdata + (char_height * chara);
+
+	// Setup some variables
+	uint8_t chara = ansidata[index<<1];		// Character
+	uint8_t color = ansidata[(index<<1)+1];	// Colour
+	uint8_t * pic = picdata + ((index/NUMCOLS)*width*char_height) + ((index%NUMCOLS)*char_width);	// Position on canvas to draw
+	const uint8_t * fnt = fontdata + (char_height * chara);	// Position of character in font image
+
+	// Draw character (including background)
 	for (int y = 0; y < char_height; ++y) {
 		for (int x = 0; x < char_width; ++x) {
 			pic[x+(y*width)] = (fnt[y]&(1<<(char_width-1-x))) ? (color&15) : ((color&112)>>4);

@@ -12,7 +12,6 @@ private:
 	float		progress;
 	float		progress_indefinite_anim;
 	bool		show_progress;
-	//wxTimer*	timer_update;
 	wxStopWatch	timer;
 
 	static SplashWindow*	instance;

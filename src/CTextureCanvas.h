@@ -45,7 +45,6 @@ public:
 	void	updatePatchTextures();
 	bool	openTexture(CTexture* tex, PatchTable& ptable);
 	void	draw();
-	void	drawCheckeredBackground();
 	void	drawTexture();
 	void	drawPatch(int num, rgba_t col = COL_WHITE);
 	void	drawTextureBorder();

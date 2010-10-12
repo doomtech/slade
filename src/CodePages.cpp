@@ -48,8 +48,8 @@ string asciitable[128] = {
 // Those are the UTF-8 values for the characters in the IBM Code Page 437
 uint8_t cp437table[256][3] = {
 	{ 0xc2, 0xb7 }, // NULL represented by a middle dot (which isn't actually part of CP437)
-	{ 0xe2, 0x98, 0xba }, { 0xe2, 0x98, 0xbb }, { 0xe2, 0x99, 0xa5 }, { 0xe2, 0x99, 0xa6 }, 
-	{ 0xe2, 0x99, 0xa3 }, { 0xe2, 0x99, 0xa0 }, { 0xe2, 0x80, 0xa2 }, { 0xe2, 0x97, 0x98 }, 
+	{ 0xe2, 0x98, 0xba }, { 0xe2, 0x98, 0xbb }, { 0xe2, 0x99, 0xa5 }, { 0xe2, 0x99, 0xa6 },
+	{ 0xe2, 0x99, 0xa3 }, { 0xe2, 0x99, 0xa0 }, { 0xe2, 0x80, 0xa2 }, { 0xe2, 0x97, 0x98 },
 	{ 0xe2, 0x97, 0x8b }, { 0xe2, 0x97, 0x99 }, { 0xe2, 0x99, 0x82 }, { 0xe2, 0x99, 0x80 },
 	{ 0xe2, 0x99, 0xaa }, { 0xe2, 0x99, 0xab }, { 0xe2, 0x98, 0xbc },
 	{ 0xe2, 0x96, 0xba }, { 0xe2, 0x97, 0x84 }, { 0xe2, 0x86, 0x95 }, { 0xe2, 0x80, 0xbc },
@@ -57,7 +57,7 @@ uint8_t cp437table[256][3] = {
 	{ 0xe2, 0x86, 0x91 }, { 0xe2, 0x86, 0x93 }, { 0xe2, 0x86, 0x92 }, { 0xe2, 0x86, 0x90 },
 	{ 0xe2, 0x88, 0x9f }, { 0xe2, 0x86, 0x94 }, { 0xe2, 0x96, 0xb2 }, { 0xe2, 0x96, 0xbc },
 	// Boring ASCII characters begin here
-	{ ' ' }, { '!' }, { '"' }, { '#' }, { '$' }, { '%' }, { '&' }, { '\'' }, 
+	{ ' ' }, { '!' }, { '"' }, { '#' }, { '$' }, { '%' }, { '&' }, { '\'' },
 	{ '(' }, { ')' }, { '*' }, { '+' }, { ',' }, { '-' }, { '.' }, { '/' },
 	{ '0' }, { '1' }, { '2' }, { '3' }, { '4' }, { '5' }, { '6' }, { '7' },
 	{ '8' }, { '9' }, { ':' }, { ';' }, { '<' }, { '=' }, { '>' }, { '?' },
@@ -135,16 +135,16 @@ uint8_t ansicolors[16][3] = {
 /*******************************************************************
  * FUNCTIONS
  *******************************************************************/
-string CP::fromASCII(uint8_t val) {
+string CodePages::fromASCII(uint8_t val) {
 	if (val < 128)				return asciitable[val];
 	else						return "";
 }
 
-string CP::fromCP437(uint8_t val) {
+string CodePages::fromCP437(uint8_t val) {
 	return wxString::FromUTF8((const char *)cp437table[val], cp437len[val]);
 }
 
-rgba_t CP::ansiColor(uint8_t val) {
+rgba_t CodePages::ansiColor(uint8_t val) {
 	if (val >= 16) val = ((val >> 4) & 7);
 	return rgba_t(ansicolors[val][0], ansicolors[val][1], ansicolors[val][2]);
 }

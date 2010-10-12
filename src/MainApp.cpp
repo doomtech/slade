@@ -313,6 +313,7 @@ bool MainApp::OnInit() {
 	// Show the main window
 	theMainWindow->Show(true);
 	theSplashWindow->SetParent(theMainWindow);
+	theSplashWindow->CentreOnParent();
 
 	// Open any archives on the command line
 	// argv[0] is normally the executable itself (i.e. Slade.exe)

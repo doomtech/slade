@@ -20,6 +20,7 @@ public:
 	bool			setContext();
 	void			init();
 	virtual void	draw() = 0;
+	void			drawCheckeredBackground();
 	wxPanel*		toPanel(wxWindow* parent);
 
 	void	onPaint(wxPaintEvent &e);

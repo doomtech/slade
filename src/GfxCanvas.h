@@ -46,7 +46,6 @@ public:
 	void	allowScroll(bool allow) { allow_scroll = allow; }
 
 	void	draw();
-	void	drawCheckeredBackground();
 	void	drawImage();
 	void	drawOffsetLines();
 	void	updateImageTexture();

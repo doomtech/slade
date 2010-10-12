@@ -103,7 +103,7 @@ bool GLTexture::loadRawData(const uint8_t* data, uint32_t w, uint32_t h) {
 	if (OpenGL::validTexDimension(w) && OpenGL::validTexDimension(h)) {
 		// If the image dimensions are valid for OpenGL on this system, just load it as a single texture
 
-		return loadData(data, width, height);
+		return loadData(data, w, h);
 	} else {
 		// Otherwise split the image into 128x128 chunks
 		uint8_t * buf = new uint8_t[128*128*4];

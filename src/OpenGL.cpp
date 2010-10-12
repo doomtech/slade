@@ -39,8 +39,8 @@ CVAR(Bool, gl_tex_enable_np2, true, CVAR_SAVE)
 namespace OpenGL {
 	wxGLContext*	context = NULL;
 	double			version = 0;
-	GLint			max_tex_size = 128;
-	uint32_t		pow_two[] = { 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768 };
+	unsigned		max_tex_size = 128;
+	unsigned		pow_two[] = { 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768 };
 	uint8_t			n_pow_two = 16;
 }
 
@@ -79,7 +79,9 @@ bool OpenGL::init() {
 	wxLogMessage("OpenGL Version: %1.1f", version);
 
 	// Get max texture size
-	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_tex_size);
+	GLint val = 0;
+	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &val);
+	max_tex_size = val;
 	wxLogMessage("Max Texture Size: %dx%d", max_tex_size, max_tex_size);
 
 	return true;
@@ -97,7 +99,7 @@ bool OpenGL::np2TexSupport() {
  * Returns true if [dim] is a valid texture dimension on the system
  * OpenGL version
  *******************************************************************/
-bool OpenGL::validTexDimension(GLint dim) {
+bool OpenGL::validTexDimension(unsigned dim) {
 	if (dim > max_tex_size)
 		return false;
 	else if (!np2TexSupport()) {
