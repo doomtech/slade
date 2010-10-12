@@ -459,29 +459,29 @@ int ArchiveManager::archiveIndex(Archive* archive) {
 string ArchiveManager::getArchiveExtensionsString() {
 	// Create extensions strings
 	string extensions = "Any supported file|";
-	string ext_wad = "*.wad;*.WAD;*.Wad";						extensions += ext_wad;
-	string ext_zip = "*.zip;*.ZIP;*.Zip";						extensions += ext_zip;
-	string ext_pk3 = "*.pk3;*.PK3;*.Pk3";						extensions += ext_pk3;
-	string ext_jdf = "*.jdf;*.JDF;*.Jdf";						extensions += ext_jdf;
-	string ext_dat = "*.dat;*.DAT;*.Dat";						extensions += ext_dat;
-	string ext_chd = "*.cd;*.CD;*.Cd;*.hd;*.HD;*.Hd";			extensions += ext_chd;
-	string ext_lib = "*.lib;*.LIB;*.Lib";						extensions += ext_lib;
-	string ext_res = "*.res;*.RES;*.Res";						extensions += ext_res;
-	string ext_pak = "*.pak;*.PAK;*.Pak";						extensions += ext_pak;
-	string ext_grp = "*.grp;*.GRP;*.Grp;*.prg;*.PRG;*.Prg";		extensions += ext_grp;
-	string ext_rff = "*.rff;*.RFF;*.Rff";						extensions += ext_rff;
+	string ext_wad = "*.wad;*.WAD;*.Wad";						extensions += ext_wad + ";";
+	string ext_zip = "*.zip;*.ZIP;*.Zip";						extensions += ext_zip + ";";
+	string ext_pk3 = "*.pk3;*.PK3;*.Pk3";						extensions += ext_pk3 + ";";
+	string ext_jdf = "*.jdf;*.JDF;*.Jdf";						extensions += ext_jdf + ";";
+	string ext_dat = "*.dat;*.DAT;*.Dat";						extensions += ext_dat + ";";
+	string ext_chd = "*.cd;*.CD;*.Cd;*.hd;*.HD;*.Hd";			extensions += ext_chd + ";";
+	string ext_lib = "*.lib;*.LIB;*.Lib";						extensions += ext_lib + ";";
+	string ext_res = "*.res;*.RES;*.Res";						extensions += ext_res + ";";
+	string ext_pak = "*.pak;*.PAK;*.Pak";						extensions += ext_pak + ";";
+	string ext_grp = "*.grp;*.GRP;*.Grp;*.prg;*.PRG;*.Prg";		extensions += ext_grp + ";";
+	string ext_rff = "*.rff;*.RFF;*.Rff";						extensions += ext_rff + ";";
 
-	extensions += s_fmt("|Doom Wad files (*.wad)|%s",			ext_wad.c_str());
-	extensions += s_fmt("|Zip files (*.zip)|%s",				ext_zip.c_str());
-	extensions += s_fmt("|Pk3 (zip) files (*.pk3)|%s",			ext_pk3.c_str());
-	extensions += s_fmt("|JDF (zip) files (*.jdf)|%s",			ext_jdf.c_str());
-	extensions += s_fmt("|Data (dat) files (*.dat)|%s",			ext_dat.c_str());
-	extensions += s_fmt("|CD/HD (cd/hd) files (*.cd; *.hd)|%s",	ext_chd.c_str());
-	extensions += s_fmt("|Library (lib) files (*.lib)|%s",		ext_lib.c_str());
-	extensions += s_fmt("|Resource (res) files (*.res)|%s",		ext_res.c_str());
-	extensions += s_fmt("|Quake Pak files (*.pak)|%s",			ext_pak.c_str());
-	extensions += s_fmt("|Build Grp files (*.grp)|%s",			ext_grp.c_str());
-	extensions += s_fmt("|Blood Rff files (*.rff)|%s",			ext_rff.c_str());
+	extensions += s_fmt("|Doom Wad files (*.wad)|%s",			chr(ext_wad));
+	extensions += s_fmt("|Zip files (*.zip)|%s",				chr(ext_zip));
+	extensions += s_fmt("|Pk3 (zip) files (*.pk3)|%s",			chr(ext_pk3));
+	extensions += s_fmt("|JDF (zip) files (*.jdf)|%s",			chr(ext_jdf));
+	extensions += s_fmt("|Data (dat) files (*.dat)|%s",			chr(ext_dat));
+	extensions += s_fmt("|CD/HD (cd/hd) files (*.cd; *.hd)|%s",	chr(ext_chd));
+	extensions += s_fmt("|Library (lib) files (*.lib)|%s",		chr(ext_lib));
+	extensions += s_fmt("|Resource (res) files (*.res)|%s",		chr(ext_res));
+	extensions += s_fmt("|Quake Pak files (*.pak)|%s",			chr(ext_pak));
+	extensions += s_fmt("|Build Grp files (*.grp)|%s",			chr(ext_grp));
+	extensions += s_fmt("|Blood Rff files (*.rff)|%s",			chr(ext_rff));
 
 	return extensions;
 }
