@@ -137,7 +137,11 @@ void SplashWindow::show(string message, bool progress) {
 		show_progress = false;
 
 	// Show & init window
+#ifndef __WXGTK__
 	SetInitialSize(wxSize(width, rheight));
+#else
+	SetInitialSize(wxSize(width + 6, rheight + 6));
+#endif
 	setMessage(message);
 	Show();
 	CentreOnParent();

@@ -214,6 +214,7 @@
       </VirtualDirectory>
       <VirtualDirectory Name="Font">
         <File Name="src/SFont.h"/>
+        <File Name="src/SFont.cpp"/>
       </VirtualDirectory>
       <VirtualDirectory Name="Image">
         <File Name="src/SImage.cpp"/>
