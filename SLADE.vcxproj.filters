@@ -396,6 +396,12 @@
     <ClCompile Include="src\RffArchive.cpp">
       <Filter>Resources\Archive</Filter>
     </ClCompile>
+    <ClCompile Include="src\ANSICanvas.cpp">
+      <Filter>UI Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SFont.cpp">
+      <Filter>Resources\Graphics\Font</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -731,6 +737,9 @@
     </ClInclude>
     <ClInclude Include="src\RffArchive.h">
       <Filter>Resources\Archive</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ANSICanvas.h">
+      <Filter>UI Elements</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -102,6 +102,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\ANSICanvas.cpp" />
     <ClCompile Include="src\ANSIEntryPanel.cpp" />
     <ClCompile Include="src\ArchiveEntryList.cpp" />
     <ClCompile Include="src\ArchiveOperations.cpp" />
@@ -140,6 +141,7 @@
     <ClCompile Include="src\qmus2mid\qmus2mid.cpp" />
     <ClCompile Include="src\ResArchive.cpp" />
     <ClCompile Include="src\RffArchive.cpp" />
+    <ClCompile Include="src\SFont.cpp" />
     <ClCompile Include="src\SImageFormats.cpp" />
     <ClCompile Include="src\TextEditorPrefsPanel.cpp" />
     <ClCompile Include="src\TextLanguage.cpp" />
@@ -206,6 +208,7 @@
     <ClCompile Include="src\BaseResourceArchivesPanel.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\ANSICanvas.h" />
     <ClInclude Include="src\ANSIEntryPanel.h" />
     <ClInclude Include="src\ArchiveEntryList.h" />
     <ClInclude Include="src\ArchiveFormats.h" />
