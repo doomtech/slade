@@ -1505,6 +1505,56 @@ bool SImage::loadBuildTile(const uint8_t* gfx_data, int size, int index) {
 	return true;
 }
 
+/* SImage::loadHeretic2M8
+ * Loads a picture Heretic II mipmapped image.
+ * Returns false if the image data was invalid, true otherwise.
+ *******************************************************************/
+bool SImage::loadHeretic2M8(const uint8_t* gfx_data, int size, int index) {
+	if (size < 1040)
+		return false;
+
+	const uint32_t * g_data = (uint32_t *) gfx_data;
+	int i = 9;
+	while (i < 25 && g_data[i] != 0) ++i;
+	numimages = i - 9;
+	has_palette = true;
+	format = PALMASK;
+
+	// Sanitize index if needed
+	index %= numimages;
+	if (index < 0)
+		index = numimages + index;
+		
+
+	// Setup variables
+	imgindex = index;
+	width = wxUINT32_SWAP_ON_BE(g_data[index+9]);
+	height = wxUINT32_SWAP_ON_BE(g_data[index+25]);
+	size_t data_offset = wxUINT32_SWAP_ON_BE(g_data[index+41]);
+	if (!width || !height || ! data_offset) {
+		Global::error = "M8 file: invalid data for mip level";
+		return false;
+	}
+
+	// Let's build the palette now.
+	for (size_t c = 0; c < 256; ++c) {
+		rgba_t color;
+		color.r = gfx_data[(c*3)+0x104];
+		color.g = gfx_data[(c*3)+0x105];
+		color.b = gfx_data[(c*3)+0x106];
+		palette.setColour(c, color);
+	}
+
+	// Create data
+	clearData();
+	data = new uint8_t[width*height];
+
+	// Fill data with pixel data
+	memcpy(data, gfx_data + data_offset, width * height);
+
+	return true;
+}
+
 /*******************************************************************
  * FONT FORMATS
  *******************************************************************/

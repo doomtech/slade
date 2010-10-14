@@ -620,6 +620,35 @@ public:
 	}
 };
 
+class Heretic2M8Format: public EntryDataFormat {
+public:
+	Heretic2M8Format() : EntryDataFormat("img_m8") {};
+	~Heretic2M8Format() {}
+
+	int isThisFormat(MemChunk& mc) {
+		size_t size = mc.getSize();
+		if (size < 1040)
+			return EDF_FALSE;
+		uint32_t version = mc[0] + (mc[1]<<8) + (mc[2]<<16) + (mc[3]<<24);
+		if (version != 2)
+			return EDF_FALSE;
+		for (int m = 0; m < 16; ++m) {
+			size_t width = mc[36+(m<<2)] + (mc[37+(m<<2)]<<8) + (mc[38+(m<<2)]<<16) + (mc[39+(m<<2)]<<24);
+			size_t height = mc[100+(m<<2)] + (mc[101+(m<<2)]<<8) + (mc[102+(m<<2)]<<16) + (mc[103+(m<<2)]<<24);
+			size_t offset = mc[164+(m<<2)] + (mc[165+(m<<2)]<<8) + (mc[166+(m<<2)]<<16) + (mc[167+(m<<2)]<<24);
+			if (width == 0 && height == 0 && offset == 0)
+				break;
+			else if ((width == 0 && (height|offset) != 0) ||
+				(height == 0 && (width|offset) != 0) ||
+				(offset == 0 && (width|height) != 0))
+				return EDF_FALSE;
+			else if (offset + (width * height) > size)
+				return EDF_FALSE;
+		}
+		return EDF_TRUE;
+	}
+};
+
 class Font0DataFormat : public EntryDataFormat {
 public:
 	Font0DataFormat() : EntryDataFormat("font_doom_alpha") {};

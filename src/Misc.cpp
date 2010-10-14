@@ -105,6 +105,8 @@ bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry, int index) {
 		return image->loadAnaMip(entry->getData(), entry->getSize());
 	else if (s_cmpnocase(format, "img_arttile"))
 		return image->loadBuildTile(entry->getData(), entry->getSize(), index);
+	else if (s_cmpnocase(format, "img_m8"))
+		return image->loadHeretic2M8(entry->getData(), entry->getSize(), index);
 	else {
 		if (!image->loadImage(entry->getData(true), entry->getSize())) {
 			Global::error = "Image format not supported by FreeImage";

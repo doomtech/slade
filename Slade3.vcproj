@@ -969,6 +969,10 @@
 					Name="Font"
 					>
 					<File
+						RelativePath=".\src\SFont.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\src\SFont.h"
 						>
 					</File>
