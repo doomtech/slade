@@ -19,6 +19,10 @@ TODO List ---------------------------------------------------------------
 --- Bugs ---
 - Copy/paste entry parent problem
 
+--- Minor Problems/Annoyances ---
+- Console (docked) height is not remembered when hidden then shown again
+- Long calltips can extend off the edge of the screen
+
 --- Editor Features ---
 - Map editor (!)
 - Generic entry data view (for VERTEXES, LINEDEFS, SIDEDEFS, SECTORS, THINGS, DEMO*, TEXTUREX/PNAMES, ...)

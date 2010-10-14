@@ -121,18 +121,18 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 
 
 	// Create path display
-	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
-	framesizer->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT|wxTOP, 4);
+	sizer_path_controls = new wxBoxSizer(wxHORIZONTAL);
+	framesizer->Add(sizer_path_controls, 0, wxEXPAND|wxLEFT|wxRIGHT|wxTOP, 4);
 	framesizer->AddSpacer(2);
 
 	// Label
 	label_path = new wxStaticText(this, -1, "Path:", wxDefaultPosition, wxDefaultSize, wxST_ELLIPSIZE_START);
-	hbox->Add(label_path, 1, wxRIGHT|wxALIGN_CENTER_VERTICAL, 4);
+	sizer_path_controls->Add(label_path, 1, wxRIGHT|wxALIGN_CENTER_VERTICAL, 4);
 
 	// 'Up' button
 	btn_updir = new wxBitmapButton(this, -1, getIcon("e_upfolder"));
 	btn_updir->Enable(false);
-	hbox->Add(btn_updir, 0, wxEXPAND);
+	sizer_path_controls->Add(btn_updir, 0, wxEXPAND);
 
 
 	// Create entry list panel
@@ -182,7 +182,7 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 
 	// Do a quick check to see if we need the path display
 	if (archive->getRoot()->nChildren() == 0)
-		hbox->Show(false);
+		sizer_path_controls->Show(false);
 
 	// Update size+layout
 	entry_list->updateWidth();
@@ -339,6 +339,12 @@ bool ArchivePanel::newDirectory() {
 
 	// Add the directory to the archive
 	ArchiveTreeNode* dir = archive->createDir(name, entry_list->getCurrentDir());
+
+	// Show path controls (if they aren't already)
+	if (!GetSizer()->IsShown(sizer_path_controls)) {
+		sizer_path_controls->Show(true);
+		Layout();
+	}
 
 	// Return whether the directory was created ok
 	return !!dir;
@@ -1528,7 +1534,7 @@ void ArchivePanel::onEntryListKeyDown(wxKeyEvent& e) {
 	// Up directory (backspace)
 	else if (e.GetKeyCode() == WXK_BACK)
 		entry_list->goUpDir();
-		
+
 
 	// Not handled here, send off to be handled by a parent window
 	else

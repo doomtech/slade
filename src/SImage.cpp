@@ -629,8 +629,67 @@ bool SImage::safeConvert(MemChunk& out, Palette8bit* pal) {
 	else return toPNG(out, pal);
 }
 
+/* SImage::setPixel
+ * Sets the pixel at [x],[y] to [colour]. Returns false if the
+ * position is out of range or the image isn't RGBA format, true
+ * otherwise
+ *******************************************************************/
+bool SImage::setPixel(int x, int y, rgba_t colour) {
+	// Can't do this on paletted images
+	if (format != RGBA)
+		return false;
+
+	// Check position
+	if (x < 0 || x >= width || y < 0 || y >= height)
+		return false;
+
+	// Set the pixel
+	colour.write(data + (y * (width*4) + (x*4)));
+
+	// Announce
+	announce("image_changed");
+
+	return true;
+}
+
+/* SImage::setPixel
+ * Sets the pixel at [x],[y] to the palette colour at [pal_index],
+ * and the transparency of the pixel to [alpha] (if possible).
+ * Returns false if the position is out of bounds, true otherwise
+ *******************************************************************/
+bool SImage::setPixel(int x, int y, uint8_t pal_index, uint8_t alpha) {
+	// Check position
+	if (x < 0 || x >= width || y < 0 || y >= height)
+		return false;
+
+	// RGBA (use palette colour, probably don't want this, but it's here anyway :P)
+	if (format == RGBA) {
+		// Set the pixel
+		rgba_t col = palette.colour(pal_index);
+		col.a = alpha;
+		col.write(data + (y * (width*4) + (x*4)));
+
+		return true;
+	}
+
+	// Paletted
+	else if (format == PALMASK) {
+		// Set the pixel
+		data[y*width+x] = pal_index;
+		if (mask) mask[y*width+x] = alpha;
+
+		return true;
+	}
+
+	// Announce
+	announce("image_changed");
+
+	// Invalid format
+	return false;
+}
+
 /* SImage::rotate
- * Rotates the image with an angle of 90°, 180° or 270°. Why not
+ * Rotates the image with an angle of 90Â°, 180Â° or 270Â°. Why not
  * use FreeImage_Rotate instead? So as not to bother converting
  * to and fro a FIBITMAP...
  *******************************************************************/
@@ -638,7 +697,7 @@ bool SImage::rotate(int angle) {
 	if (!data)
 		return false;
 
-	if (angle == 0)	return true;				// Nothing to do 
+	if (angle == 0)	return true;				// Nothing to do
 	if (angle < 0 || angle % 90) return false;	// Unsupported angle
 	angle %= 360;
 
@@ -776,5 +835,64 @@ bool SImage::crop(long x1, long y1, long x2, long y2) {
 
 	// Announce change
 	announce("image_changed");
+	return true;
+}
+
+/* SImage::resize
+ * Resizes the image, conserving current data (will be cropped if
+ * new size is smaller)
+ *******************************************************************/
+bool SImage::resize(int nwidth, int nheight) {
+	// Check values
+	if (nwidth < 0 || nheight < 0)
+		return false;
+
+	// If either dimension is zero, just clear the image
+	if (nwidth == 0 || nheight == 0) {
+		clear();
+		return true;
+	}
+
+	// Init new image data
+	uint8_t* newdata, *newmask;
+	uint8_t bpp = 1;
+	if (format == RGBA) bpp = 4;
+	// Create new image data
+	newdata = new uint8_t[nwidth * nheight * bpp];
+	memset(newdata, 0, nwidth*nheight*bpp);
+	// Create new mask if needed
+	if (format == PALMASK && mask) {
+		newmask = new uint8_t[nwidth * nheight];
+		memset(newmask, 0, nwidth*nheight);
+	}
+	else
+		newmask = NULL;
+
+	// Write new image data
+	unsigned offset = 0;
+	unsigned rowlen = min(width, nwidth)*bpp;
+	unsigned nrows = min(height, nheight);
+	for (unsigned y = 0; y < nrows; y++) {
+		// Copy data row
+		memcpy(newdata + offset, data + (y * width * bpp), rowlen);
+
+		// Copy mask row
+		if (newmask)
+			memcpy(newmask + offset, mask + (y * width), rowlen);
+
+		// Go to next row
+		offset += nwidth*bpp;
+	}
+
+	// Update variables
+	width = nwidth;
+	height = nheight;
+	clearData();
+	data = newdata;
+	mask = newmask;
+
+	// Announce change
+	announce("image_changed");
+
 	return true;
 }

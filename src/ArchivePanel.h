@@ -17,6 +17,7 @@ protected:
 	wxChoice*			choice_category;
 	wxStaticText*		label_path;
 	wxBitmapButton*		btn_updir;
+	wxSizer*			sizer_path_controls;
 
 	// Entry panels
 	EntryPanel*	cur_area;

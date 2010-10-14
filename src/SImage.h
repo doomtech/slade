@@ -94,10 +94,13 @@ public:
 	bool	maskFromColour(rgba_t colour, Palette8bit* pal = NULL, bool force_mask = false);
 	bool	cutoffMask(uint8_t threshold, bool force_mask = false);
 
-	// Miscellaneous operations
+	// Image modification
+	bool	setPixel(int x, int y, rgba_t colour);
+	bool	setPixel(int x, int y, uint8_t pal_index, uint8_t alpha = 255);
 	bool	rotate(int angle);
 	bool	mirror(bool vert);
 	bool	crop(long x1, long y1, long x2, long y2);
+	bool	resize(int nwidth, int nheight);
 };
 
 #endif //__SIMAGE_H__
