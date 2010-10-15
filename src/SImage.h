@@ -80,6 +80,7 @@ public:
 	bool	loadAnaMip(const uint8_t* data, int size);
 	bool	loadBuildTile(const uint8_t* gfx_data, int size, int index);
 	bool	loadHeretic2M8(const uint8_t* gfx_data, int size, int index);
+	bool	loadHeretic2M32(const uint8_t* gfx_data, int size, int index);
 
 	// Image format writing
 	bool	safeConvert(MemChunk& out, Palette8bit* pal = NULL);

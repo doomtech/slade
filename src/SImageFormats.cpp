@@ -1506,7 +1506,7 @@ bool SImage::loadBuildTile(const uint8_t* gfx_data, int size, int index) {
 }
 
 /* SImage::loadHeretic2M8
- * Loads a picture Heretic II mipmapped image.
+ * Loads a Heretic II mipmapped paletted image.
  * Returns false if the image data was invalid, true otherwise.
  *******************************************************************/
 bool SImage::loadHeretic2M8(const uint8_t* gfx_data, int size, int index) {
@@ -1531,7 +1531,7 @@ bool SImage::loadHeretic2M8(const uint8_t* gfx_data, int size, int index) {
 	width = wxUINT32_SWAP_ON_BE(g_data[index+9]);
 	height = wxUINT32_SWAP_ON_BE(g_data[index+25]);
 	size_t data_offset = wxUINT32_SWAP_ON_BE(g_data[index+41]);
-	if (!width || !height || ! data_offset) {
+	if (!width || !height || ! data_offset || size < (int)data_offset + (width*height)) {
 		Global::error = "M8 file: invalid data for mip level";
 		return false;
 	}
@@ -1551,6 +1551,47 @@ bool SImage::loadHeretic2M8(const uint8_t* gfx_data, int size, int index) {
 
 	// Fill data with pixel data
 	memcpy(data, gfx_data + data_offset, width * height);
+
+	return true;
+}
+
+/* SImage::loadHeretic2M32
+ * Loads a Heretic II mipmapped truecolor image.
+ * Returns false if the image data was invalid, true otherwise.
+ *******************************************************************/
+bool SImage::loadHeretic2M32(const uint8_t* gfx_data, int size, int index) {
+	if (size < 968)
+		return false;
+
+	const uint32_t * g_data = (uint32_t *) gfx_data;
+	int i = 129;
+	while (i < 145 && g_data[i] != 0) ++i;
+	numimages = i - 129;
+	has_palette = false;
+	format = RGBA;
+
+	// Sanitize index if needed
+	index %= numimages;
+	if (index < 0)
+		index = numimages + index;
+		
+
+	// Setup variables
+	imgindex = index;
+	width = wxUINT32_SWAP_ON_BE(g_data[index+129]);
+	height = wxUINT32_SWAP_ON_BE(g_data[index+145]);
+	size_t data_offset = wxUINT32_SWAP_ON_BE(g_data[index+161]);
+	if (!width || !height || ! data_offset || size < (int)data_offset + (4*width*height)) {
+		Global::error = "M32 file: invalid data for mip level";
+		return false;
+	}
+
+	// Create data
+	clearData();
+	data = new uint8_t[width*height*4];
+
+	// Fill data with pixel data
+	memcpy(data, gfx_data + data_offset, width * height * 4);
 
 	return true;
 }
