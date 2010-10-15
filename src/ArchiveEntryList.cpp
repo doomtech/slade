@@ -568,7 +568,7 @@ vector<ArchiveTreeNode*> ArchiveEntryList::getSelectedDirectories() {
  *******************************************************************/
 void ArchiveEntryList::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
 
-	if (announcer == archive) {
+	if (announcer == archive && event_name != "closed") {
 		// Since refreshing the list is relatively fast, just refresh it on any change
 		updateList();
 		applyFilter();
