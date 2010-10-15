@@ -79,6 +79,10 @@ TODO List ---------------------------------------------------------------
 
 Unimplemented Feature Requests ------------------------------------------
 
+--- General / User Interface ---
+- Ability to toggle toolbars, access all toolbar functions from menus
+- Fully customisable toolbars
+
 --- Archive / Entry Management ---
 - mass export to format (XWE)
 
