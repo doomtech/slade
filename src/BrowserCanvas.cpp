@@ -6,8 +6,8 @@
 BrowserCanvas::BrowserCanvas(wxWindow* parent) : OGLCanvas(parent, -1) {
 	// Init variables
 	yoff = 0;
-	item_size = 64;
-	item_border = 4;
+	item_size = 96;
+	item_border = 8;
 	scrollbar = NULL;
 	item_selected = 0;
 
@@ -141,8 +141,8 @@ void BrowserCanvas::updateScrollBar() {
 
 	// Determine total height of all items
 	int items_row = GetSize().x / fullItemSize();
-	int rows = items_filter.size() / items_row;
-	int total_height = rows * fullItemSize();
+	int rows = ((double)items_filter.size() / (double)items_row) + 0.5;
+	int total_height = rows * (fullItemSize());
 
 	// Setup scrollbar
 	scrollbar->SetScrollbar(scrollbar->GetThumbPosition(), GetSize().y, total_height, GetSize().y);
@@ -242,7 +242,7 @@ void BrowserCanvas::onMouseEvent(wxMouseEvent& e) {
 		float scroll_mult = (float)e.GetWheelRotation() / (float)e.GetWheelDelta();
 
 		// Scrolling by 1.0 means by 1 row
-		int scroll_amount = fullItemSize() * -scroll_mult;
+		int scroll_amount = (fullItemSize()) * -scroll_mult;
 
 		// Do scroll
 		scrollbar->SetThumbPosition(yoff + scroll_amount);
@@ -262,7 +262,7 @@ void BrowserCanvas::onMouseEvent(wxMouseEvent& e) {
 		int num_cols = GetSize().x / fullItemSize();
 
 		// Get row clicked
-		int row = (e.GetPosition().y - top_y) / fullItemSize();
+		int row = (e.GetPosition().y - top_y) / (fullItemSize());
 
 		// Select item
 		item_selected = top_index + (row * num_cols) + col;

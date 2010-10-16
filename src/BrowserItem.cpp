@@ -1,6 +1,7 @@
 
 #include "Main.h"
 #include "BrowserItem.h"
+#include "SFont.h"
 
 BrowserItem::BrowserItem(string name, unsigned index) {
 	this->name = name;
@@ -42,6 +43,16 @@ void BrowserItem::draw(int size) {
 		glVertex2i(size, 0);
 		glEnd();
 
+		// Item name
+		glEnable(GL_TEXTURE_2D);
+		SFont& fnt = SFont::vgaFont();
+		glPushMatrix();
+		glTranslated(size*0.5 + 1, size - fnt.lineHeight()*0.5 + 1, 0);
+		fnt.drawString(name, COL_BLACK, SF_ALIGN_CENTER);
+		glTranslated(-1, -1, 0);
+		fnt.drawString(name, COL_WHITE, SF_ALIGN_CENTER);
+		glPopMatrix();
+
 		glPopAttrib();
 
 		return;
@@ -80,6 +91,15 @@ void BrowserItem::draw(int size) {
 	glTexCoord2f(1.0f, 1.0f);	glVertex2d(left + width, top + height);
 	glTexCoord2f(1.0f, 0.0f);	glVertex2d(left + width, top);
 	glEnd();
+
+	// Item name
+	SFont& fnt = SFont::vgaFont();
+	glPushMatrix();
+	glTranslated(size*0.5 + 1, size - fnt.lineHeight()*0.5 + 1, 0);
+	fnt.drawString(name, COL_BLACK, SF_ALIGN_CENTER);
+	glTranslated(-1, -1, 0);
+	fnt.drawString(name, COL_WHITE, SF_ALIGN_CENTER);
+	glPopMatrix();
 }
 
 void BrowserItem::clearImage() {
