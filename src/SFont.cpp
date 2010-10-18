@@ -1,46 +1,112 @@
 
+/*******************************************************************
+ * SLADE - It's a Doom Editor
+ * Copyright (C) 2008 Simon Judd
+ *
+ * Email:       veilofsorrow@gmail.com
+ * Web:         http://slade.mancubus.net
+ * Filename:    SFont.cpp
+ * Description: SFont class, encapsulates a bitmap font, with
+ *              functions to read various bitmap font formats and
+ *              draw characters and strings with the font in opengl
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *******************************************************************/
+
+
+/*******************************************************************
+ * INCLUDES
+ *******************************************************************/
 #include "Main.h"
 #include "SFont.h"
 #include "SImage.h"
 #include "ArchiveManager.h"
 
 
+/*******************************************************************
+ * VARIABLES
+ *******************************************************************/
 SFont SFont::font_vga;
 SFont SFont::font_slade;
 
 
+/*******************************************************************
+ * SFONTCHAR CLASS FUNCTIONS
+ *******************************************************************/
+
+/* SFontChar::SFontChar
+ * SFontChar class constructor
+ *******************************************************************/
 SFontChar::SFontChar() {
 	// Init variables
 	width = 0;
 	height = 0;
 }
 
+/* SFontChar::~SFontChar
+ * SFontChar class destructor
+ *******************************************************************/
 SFontChar::~SFontChar() {
 }
 
 
+/*******************************************************************
+ * SFONT CLASS FUNCTIONS
+ *******************************************************************/
 
+/* SFont::SFont
+ * SFont class constructor
+ *******************************************************************/
 SFont::SFont() {
 	// Init character map
 	for (unsigned a = 0; a < 256; a++)
 		characters[a] = NULL;
 }
 
+/* SFont::~SFont
+ * SFont class destructor
+ *******************************************************************/
 SFont::~SFont() {
 }
 
+/* SFont::loadFont0
+ * Loads a Doom alpha HUFONT font. Returns true on success, false
+ * otherwise
+ *******************************************************************/
 bool SFont::loadFont0(MemChunk& mc) {
 	return false;
 }
 
+/* SFont::loadFont1
+ * Loads a ZDoom FON1 font. Returns true on success, false otherwise
+ *******************************************************************/
 bool SFont::loadFont1(MemChunk& mc) {
 	return false;
 }
 
+/* SFont::loadFont2
+ * Loads a ZDoom FON2 font. Returns true on success, false otherwise
+ *******************************************************************/
 bool SFont::loadFont2(MemChunk& mc) {
 	return false;
 }
 
+/* SFont::loadFontM
+ * Loads a monochrome vga font. Returns true on success, false
+ * otherwise
+ *******************************************************************/
 bool SFont::loadFontM(MemChunk& mc) {
 	// Check data
 	if (mc.getSize() == 0 || mc.getSize() % 256)
@@ -96,51 +162,18 @@ bool SFont::loadFontM(MemChunk& mc) {
 	texture.loadImage(&image);
 
 	return true;
-
-	/*
-	// Check data
-	if (!gfx_data || size % 256)
-		return false;
-
-	// Setup variables
-	offset_x = offset_y = 0;
-	has_palette = false;
-	format = PALMASK;
-
-	size_t charwidth = 8;
-	size_t charheight = size>>8;
-	width = charwidth;
-	height = charheight << 8;
-
-	if (width * height != size * 8)
-		return false;
-
-	// reset data
-	clearData();
-	data = new uint8_t[width*height];
-	memset(data, 0xFF, width*height);
-	mask = new uint8_t[width*height];
-	memset(mask, 0x00, width*height);
-
-	// Technically each character is its own image, though.
-	numimages = 1;
-	imgindex = 0;
-
-	//Each pixel is described as a single bit, either on or off
-	for (size_t i = 0; i < (unsigned)size; ++i) {
-		for (size_t p = 0; p < 8; ++p)
-			mask[(i*8)+p] = ((gfx_data[i]>>(7-p)) & 1) * 255;
-	}
-	return true;
-	*/
-
-	return false;
 }
 
+/* SFont::loadBMF
+ * Loads a BMF font. Returns true on success, false otherwise
+ *******************************************************************/
 bool SFont::loadBMF(MemChunk& mc) {
 	return false;
 }
 
+/* SFont::drawCharacter
+ * Draws the character [c] with the font, in [colour]
+ *******************************************************************/
 void SFont::drawCharacter(char c, rgba_t colour) {
 	// Bind texture
 	if (!texture.bind())
@@ -166,6 +199,10 @@ void SFont::drawCharacter(char c, rgba_t colour) {
 	glEnd();
 }
 
+/* SFont::drawString
+ * Draws the string [srt] with the font, in [colour]. [align] can be
+ * one of SF_ALIGN_LEFT, SF_ALIGN_RIGHT or SF_ALIGN_CENTER
+ *******************************************************************/
 void SFont::drawString(string str, rgba_t colour, uint8_t align) {
 	// Bind texture
 	if (!texture.bind())
@@ -223,6 +260,13 @@ void SFont::drawString(string str, rgba_t colour, uint8_t align) {
 }
 
 
+/*******************************************************************
+ * SFONT CLASS STATIC FUNCTIONS
+ *******************************************************************/
+
+/* SFont::sladeFont
+ * Returns the global SLADE font
+ *******************************************************************/
 SFont& SFont::sladeFont() {
 	if (!font_slade.texture.isLoaded()) {
 		// Load slade font
@@ -231,6 +275,9 @@ SFont& SFont::sladeFont() {
 	return font_slade;
 }
 
+/* SFont::vgaFont
+ * Returns the global VGA font
+ *******************************************************************/
 SFont& SFont::vgaFont() {
 	if (!font_vga.texture.isLoaded()) {
 		// Get vga font entry

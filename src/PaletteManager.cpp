@@ -73,6 +73,11 @@ PaletteManager::~PaletteManager() {
 	delete pal_global;
 }
 
+/* PaletteManager::addPalette
+ * Adds the palette [pal] to the list of managed palettes, identified
+ * by [name]. Returns false if the palette doesn't exist or the name
+ * is invalid, true otherwise
+ *******************************************************************/
 bool PaletteManager::addPalette(Palette8bit* pal, string name) {
 	// Check palette and name were given
 	if (!pal || name.IsEmpty())
@@ -85,6 +90,11 @@ bool PaletteManager::addPalette(Palette8bit* pal, string name) {
 	return true;
 }
 
+/* PaletteManager::globalPalette
+ * Returns the 'global' palette. This is the palette within the
+ * current base resource archive. If no base resource archive is
+ * loaded, the default greyscale palette is used
+ *******************************************************************/
 Palette8bit* PaletteManager::globalPalette() {
 	// Check if a base resource archive is open
 	if (!theArchiveManager->baseResourceArchive())

@@ -74,6 +74,10 @@ ArchiveManager::~ArchiveManager() {
 	if (base_resource_archive) delete base_resource_archive;
 }
 
+/* ArchiveManager::init
+ * Initialised the ArchiveManager. Opens the program resource archive
+ * and the base resource archive
+ *******************************************************************/
 bool ArchiveManager::init() {
 	// Find slade3.pk3 directory
 	string dir_slade_pk3 = appPath("slade.pk3", DIR_DATA);
@@ -456,6 +460,10 @@ int ArchiveManager::archiveIndex(Archive* archive) {
 	return -1;
 }
 
+/* ArchiveManager::getArchiveExtensionsString
+ * Returns a string containing the extensions of all supported
+ * archive formats, that can be used for wxWidgets file dialogs
+ *******************************************************************/
 string ArchiveManager::getArchiveExtensionsString() {
 	// Create extensions strings
 	string extensions = "Any supported file|";
@@ -486,6 +494,9 @@ string ArchiveManager::getArchiveExtensionsString() {
 	return extensions;
 }
 
+/* ArchiveManager::addBaseResourcePath
+ * Adds [path] to the list of base resource paths
+ *******************************************************************/
 void ArchiveManager::addBaseResourcePath(string path) {
 	// First check the path doesn't already exist
 	for (unsigned a = 0; a < base_resource_paths.size(); a++) {
@@ -500,6 +511,9 @@ void ArchiveManager::addBaseResourcePath(string path) {
 	announce("base_resource_path_added");
 }
 
+/* ArchiveManager::removeBaseResourcePath
+ * Removes the base resource path at [index]
+ *******************************************************************/
 void ArchiveManager::removeBaseResourcePath(unsigned index) {
 	// Check index
 	if (index >= base_resource_paths.size())
@@ -520,6 +534,9 @@ void ArchiveManager::removeBaseResourcePath(unsigned index) {
 	announce("base_resource_path_removed");
 }
 
+/* ArchiveManager::getBaseResourcePath
+ * Returns the base resource path at [index]
+ *******************************************************************/
 string ArchiveManager::getBaseResourcePath(unsigned index) {
 	// Check index
 	if (index >= base_resource_paths.size())
@@ -528,6 +545,9 @@ string ArchiveManager::getBaseResourcePath(unsigned index) {
 	return base_resource_paths[index];
 }
 
+/* ArchiveManager::openBaseResource
+ * Opens the base resource archive [index]
+ *******************************************************************/
 bool ArchiveManager::openBaseResource(int index) {
 	// Check we're opening a different archive
 	if (base_resource_archive && base_resource == index)
@@ -572,6 +592,10 @@ bool ArchiveManager::openBaseResource(int index) {
 	}
 }
 
+/* ArchiveManager::getResourceEntry
+ * Returns the first entry matching [name] in the resource archives.
+ * Resource archives = open archives -> base resource archives.
+ *******************************************************************/
 ArchiveEntry* ArchiveManager::getResourceEntry(string name, Archive* ignore) {
 	// Go through all open archives
 	for (size_t a = 0; a < open_archives.size(); a++) {
@@ -596,6 +620,9 @@ ArchiveEntry* ArchiveManager::getResourceEntry(string name, Archive* ignore) {
 	return NULL;
 }
 
+/* ArchiveManager::findResourceEntry
+ * Searches for an entry matching [options] in the resource archives
+ *******************************************************************/
 ArchiveEntry* ArchiveManager::findResourceEntry(Archive::search_options_t& options, Archive* ignore) {
 	// Go through all open archives
 	for (size_t a = 0; a < open_archives.size(); a++) {
@@ -620,6 +647,9 @@ ArchiveEntry* ArchiveManager::findResourceEntry(Archive::search_options_t& optio
 	return NULL;
 }
 
+/* ArchiveManager::findAllResourceEntries
+ * Searches for entries matching [options] in the resource archives
+ *******************************************************************/
 vector<ArchiveEntry*> ArchiveManager::findAllResourceEntries(Archive::search_options_t& options, Archive* ignore) {
 	vector<ArchiveEntry*> ret;
 
@@ -647,6 +677,9 @@ vector<ArchiveEntry*> ArchiveManager::findAllResourceEntries(Archive::search_opt
 	return ret;
 }
 
+/* ArchiveManager::recentFile
+ * Returns the recent file path at [index]
+ *******************************************************************/
 string ArchiveManager::recentFile(unsigned index) {
 	// Check index
 	if (index >= recent_files.size())
@@ -655,6 +688,9 @@ string ArchiveManager::recentFile(unsigned index) {
 	return recent_files[index];
 }
 
+/* ArchiveManager::addRecentFile
+ * Adds a recent file to the list, if it doesn't exist already
+ *******************************************************************/
 void ArchiveManager::addRecentFile(string path) {
 	// Check the path is valid
 	if (!wxFileName::FileExists(path))
@@ -685,6 +721,9 @@ void ArchiveManager::addRecentFile(string path) {
 	announce("recent_files_changed");
 }
 
+/* ArchiveManager::addRecentFiles
+ * Adds a list of recent file paths to the recent file list
+ *******************************************************************/
 void ArchiveManager::addRecentFiles(vector<string> paths) {
 	// Mute annoucements
 	setMuted(true);
@@ -702,6 +741,9 @@ void ArchiveManager::addRecentFiles(vector<string> paths) {
 	announce("recent_files_changed");
 }
 
+/* ArchiveManager::addBookmark
+ * Adds [entry] to the bookmark list
+ *******************************************************************/
 void ArchiveManager::addBookmark(ArchiveEntry* entry) {
 	// Check the bookmark isn't already in the list
 	for (unsigned a = 0; a < bookmarks.size(); a++) {
@@ -716,6 +758,9 @@ void ArchiveManager::addBookmark(ArchiveEntry* entry) {
 	announce("bookmarks_changed");
 }
 
+/* ArchiveManager::deleteBookmark
+ * Removes [entry] from the bookmarks list
+ *******************************************************************/
 bool ArchiveManager::deleteBookmark(ArchiveEntry* entry) {
 	// Find bookmark to remove
 	for (unsigned a = 0; a < bookmarks.size(); a++) {
@@ -734,6 +779,9 @@ bool ArchiveManager::deleteBookmark(ArchiveEntry* entry) {
 	return false;
 }
 
+/* ArchiveManager::deleteBookmark
+ * Removes the bookmarked entry [index]
+ *******************************************************************/
 bool ArchiveManager::deleteBookmark(unsigned index) {
 	// Check index
 	if (index >= bookmarks.size())
@@ -748,6 +796,9 @@ bool ArchiveManager::deleteBookmark(unsigned index) {
 	return true;
 }
 
+/* ArchiveManager::deleteBookmarksInArchive
+ * Removes any bookmarked entries in [archive] from the list
+ *******************************************************************/
 bool ArchiveManager::deleteBookmarksInArchive(Archive* archive) {
 	// Go through bookmarks
 	bool removed = false;
@@ -769,6 +820,9 @@ bool ArchiveManager::deleteBookmarksInArchive(Archive* archive) {
 		return false;
 }
 
+/* ArchiveManager::getBookmark
+ * Returns the bookmarked entry at [index]
+ *******************************************************************/
 ArchiveEntry* ArchiveManager::getBookmark(unsigned index) {
 	// Check index
 	if (index >= bookmarks.size())

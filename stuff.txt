@@ -8,13 +8,7 @@
 TODO List ---------------------------------------------------------------
 
 --- Before Final 3.0 Release ---
-- TEXTUREx editor:
-	- Patch browser:
-		- Show item names (should implement sfont class for this i guess)
-	- Copy+Paste textures
-- 'Export As' for entries - does conversion+export
 - ACS script compilation
-- Linux MIDI playback
 
 --- Bugs ---
 - Copy/paste entry parent problem
@@ -33,6 +27,7 @@ TODO List ---------------------------------------------------------------
 - Archive merging
 - Archive conversion
 - 'Export As' for archives (or just ability to select a different type/extension on save as)
+- 'Export As' for entries - does conversion+export
 
 --- Formats ---
 - 7z/bz2

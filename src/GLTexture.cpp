@@ -50,8 +50,8 @@ GLTexture::GLTexture(bool allow_split) {
 	this->allow_split = allow_split;
 }
 
-/* GLTexture::GLTexture
- * GLTexture class constructor
+/* GLTexture::~GLTexture
+ * GLTexture class destructor
  *******************************************************************/
 GLTexture::~GLTexture() {
 	// Delete current textures if they exist
@@ -59,6 +59,11 @@ GLTexture::~GLTexture() {
 		clear();
 }
 
+/* GLTexture::loadData
+ * Builds an opengl texture from [data] (raw RGBA). If [add] is true,
+ * the texture is added to the texture list (for split images),
+ * otherwise any current texture data is overwritten
+ *******************************************************************/
 bool GLTexture::loadData(const uint8_t* data, uint32_t width, uint32_t height, bool add) {
 	// Check data was given
 	if (!data)
@@ -91,6 +96,12 @@ bool GLTexture::loadData(const uint8_t* data, uint32_t width, uint32_t height, b
 	return true;
 }
 
+/* GLTexture::loadRawData
+ * Loads raw RGBA data to the texture. If the dimensions are invalid
+ * for the system opengl implementation, the data will be split into
+ * 128x128 squares. Returns false if the given data is invalid, true
+ * otherwise
+ *******************************************************************/
 bool GLTexture::loadRawData(const uint8_t* data, uint32_t w, uint32_t h) {
 	// Check image was given
 	if (!data)
@@ -139,6 +150,12 @@ bool GLTexture::loadRawData(const uint8_t* data, uint32_t w, uint32_t h) {
 	}
 }
 
+/* GLTexture::loadImage
+ * Loads SImage data to the texture. If the dimensions are invalid
+ * for the system opengl implementation, the data will be split into
+ * 128x128 squares. Returns false if the given data is invalid, true
+ * otherwise
+ *******************************************************************/
 bool GLTexture::loadImage(SImage* image, Palette8bit* pal) {
 	// Check image was given
 	if (!image)
@@ -187,6 +204,10 @@ bool GLTexture::loadImage(SImage* image, Palette8bit* pal) {
 	}
 }
 
+/* GLTexture::loadImagePortion
+ * Loads a portion of a SImage to the texture. Only used internally,
+ * the portion must be 128x128 in size
+ *******************************************************************/
 bool GLTexture::loadImagePortion(SImage* image, rect_t rect, Palette8bit* pal, bool add) {
 	// Check image was given
 	if (!image)
@@ -255,6 +276,9 @@ bool GLTexture::loadImagePortion(SImage* image, rect_t rect, Palette8bit* pal, b
 	return loadData(portion.getData(), rect.width(), rect.height(), add);
 }
 
+/* GLTexture::clear
+ * Clears the texture and resets variables
+ *******************************************************************/
 bool GLTexture::clear() {
 	// Delete texture(s)
 	for (size_t a = 0; a < tex.size(); a++)
@@ -269,6 +293,10 @@ bool GLTexture::clear() {
 	return true;
 }
 
+/* GLTexture::genChequeredTexture
+ * Generates a chequered pattern, with each square being [size] and
+ * alternating between [col1] and [col2]
+ *******************************************************************/
 bool GLTexture::genChequeredTexture(uint8_t block_size, rgba_t col1, rgba_t col2) {
 	// Check given block size and change if necessary
 	for (uint8_t s = 1; s <= 64; s *= 2) {
@@ -320,6 +348,10 @@ bool GLTexture::genChequeredTexture(uint8_t block_size, rgba_t col1, rgba_t col2
 	return true;
 }
 
+/* GLTexture::bind
+ * Binds the texture for use in opengl. Returns false if the texture
+ * isn't loaded, true otherwise
+ *******************************************************************/
 bool GLTexture::bind() {
 	// Check texture is loaded
 	if (!loaded)
@@ -331,6 +363,10 @@ bool GLTexture::bind() {
 	return true;
 }
 
+/* GLTexture::draw2d
+ * Draws the texture as a 2d image at [x], [y]. Returns false if the
+ * texture isn't loaded, true otherwise
+ *******************************************************************/
 bool GLTexture::draw2d(double x, double y) {
 	// Can't draw if texture not loaded
 	if (!loaded)
@@ -387,6 +423,10 @@ bool GLTexture::draw2d(double x, double y) {
 	return true;
 }
 
+/* GLTexture::draw2dTiled
+ * Draws the texture tiled within an area [width]x[height]. Returns
+ * false if the texture isn't loaded, true otherwise
+ *******************************************************************/
 bool GLTexture::draw2dTiled(uint32_t width, uint32_t height) {
 	// Can't draw if texture not loaded
 	if (!loaded)
@@ -431,6 +471,14 @@ bool GLTexture::draw2dTiled(uint32_t width, uint32_t height) {
 	return true;
 }
 
+
+/*******************************************************************
+ * GLTEXTURE CLASS FUNCTIONS
+ *******************************************************************/
+
+/* GLTexture::bgTex
+ * Returns the global chequered 'background' texture
+ *******************************************************************/
 GLTexture& GLTexture::bgTex() {
 	if (!tex_background.isLoaded())
 		tex_background.genChequeredTexture(8, rgba_t(64, 64, 80, 255), rgba_t(80, 80, 96, 255));

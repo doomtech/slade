@@ -53,7 +53,6 @@ public:
 	void	clear();
 	void	fillAlpha(uint8_t alpha = 0);
 	short	findUnusedColour();
-	bool	trim(int width, int height);
 	bool	validFlatSize();
 	size_t	countColours();
 	void	shrinkPalette(Palette8bit* pal = NULL);

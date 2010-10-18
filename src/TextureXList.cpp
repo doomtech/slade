@@ -80,6 +80,9 @@ CTexture* TextureXList::getTexture(string name) {
 	return &tex_invalid;
 }
 
+/* TextureXList::addTexture
+ * Adds [tex] to the texture list at [position]
+ *******************************************************************/
 void TextureXList::addTexture(CTexture* tex, int position) {
 	// Add it to the list at position if valid
 	if (position >= 0 && (unsigned)position < textures.size())
@@ -88,10 +91,16 @@ void TextureXList::addTexture(CTexture* tex, int position) {
 		textures.push_back(tex);
 }
 
+/* TextureXList::removeTexture
+ * Removes the texture at [index] from the list
+ *******************************************************************/
 void TextureXList::removeTexture(unsigned index) {
 	// Check index
 	if (index > textures.size())
 		return;
+
+	// Delete the texture
+	delete textures[index];
 
 	// Remove the texture from the list
 	textures.erase(textures.begin() + index);
@@ -340,6 +349,11 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_ta
 
 #define SAFEFUNC(x) if(!x) return false;
 
+/* TextureXList::writeTEXTUREXData
+ * Writes the texture list in TEXTUREX format to [texturex], using
+ * [patch_table] for patch information. Returns true on success,
+ * false otherwise
+ *******************************************************************/
 bool TextureXList::writeTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_table) {
 	// Check entry was given
 	if (!texturex)
@@ -503,6 +517,9 @@ bool TextureXList::writeTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_t
 	return true;
 }
 
+/* TextureXList::getTextureXFormatString
+ * Returns a string representation of the texture list format
+ *******************************************************************/
 string TextureXList::getTextureXFormatString() {
 	switch (txformat) {
 		case TXF_NORMAL:

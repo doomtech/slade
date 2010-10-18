@@ -83,6 +83,10 @@ ArchiveTreeNode::~ArchiveTreeNode() {
 		delete entries[a];
 }
 
+/* ArchiveTreeNode::addChild
+ * Override of STreeNode::addChild to also set the child node's
+ * directory entry parent to this node
+ *******************************************************************/
 void ArchiveTreeNode::addChild(STreeNode* child) {
 	// Do default child add
 	STreeNode::addChild(child);

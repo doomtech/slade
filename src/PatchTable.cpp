@@ -307,6 +307,10 @@ bool PatchTable::loadPNAMES(ArchiveEntry* pnames, Archive* parent) {
 	return true;
 }
 
+/* PatchTable::writePNAMES
+ * Writes the patch table to the entry [pnames]. Returns false if
+ * no entry was given, true otherwise
+ *******************************************************************/
 bool PatchTable::writePNAMES(ArchiveEntry* pnames) {
 	// Check entry was given
 	if (!pnames)
@@ -315,7 +319,7 @@ bool PatchTable::writePNAMES(ArchiveEntry* pnames) {
 	// Determine entry size
 	int32_t npnames = patches.size();
 	uint32_t entrysize = 4 + (npnames * 8);
-	
+
 	// Create MemChunk to write to
 	MemChunk pndata(entrysize);
 

@@ -84,6 +84,9 @@ CTexture::CTexture() {
 CTexture::~CTexture() {
 }
 
+/* CTexture::copyTexture
+ * Copies the texture [tex] to this texture
+ *******************************************************************/
 void CTexture::copyTexture(CTexture* tex) {
 	// Clear current texture
 	clear();
@@ -189,6 +192,11 @@ bool CTexture::removePatch(string patch) {
 	return removed;
 }
 
+/* CTexture::replacePatch
+ * Replaces the patch at [index] with [newpatch], and updates it's
+ * associated ArchiveEntry with [newentry]. Returns false if [index]
+ * is out of bounds, true otherwise
+ *******************************************************************/
 bool CTexture::replacePatch(size_t index, string newpatch, ArchiveEntry* newentry) {
 	// Check index
 	if (index >= patches.size())
@@ -204,6 +212,11 @@ bool CTexture::replacePatch(size_t index, string newpatch, ArchiveEntry* newentr
 	return true;
 }
 
+/* CTexture::duplicatePatch
+ * Duplicates the patch at [index], placing the duplicated patch
+ * at [offset_x],[offset_y] from the original. Returns false if
+ * [index] is out of bounds, true otherwise
+ *******************************************************************/
 bool CTexture::duplicatePatch(size_t index, int16_t offset_x, int16_t offset_y) {
 	// Check index
 	if (index >= patches.size())
@@ -244,117 +257,3 @@ bool CTexture::swapPatches(size_t p1, size_t p2) {
 
 	return true;
 }
-
-/* CTexture::fromTX
- * Reads in texture information from a TEXTUREx format texture
- *******************************************************************/
-/*
-bool CTexture::fromTX(tx_texture_t& info, PatchTable& ptable) {
-	// Clear any current texture data
-	clear();
-
-	// Setup texture properties
-	name = info.name;
-	width = info.width;
-	height = info.height;
-	scale_x = 1.0;
-	scale_y = 1.0;
-
-	// Convert from TEXTUREx scale
-	if (info.scale_x != 0)
-		scale_x = (double)info.scale_x / 8.0;
-	if (info.scale_y != 0)
-		scale_y = (double)info.scale_y / 8.0;
-
-	// Flags
-	if (info.flags & TX_WORLDPANNING)
-		ex_props.addFlag("WorldPanning");
-
-	// Setup patches
-	for (size_t a = 0; a < info.patches.size(); a++) {
-		// Get patch index
-		uint16_t index = info.patches[a].patch;
-
-		// Check patch index is in range
-		if (index >= ptable.nPatches()) {
-			wxLogMessage("Texture %s contains invalid patch index %d", name.c_str(), index);
-			continue;
-		}
-
-		// Create patch
-		CTPatch patch;
-		patch.setPatchName(ptable.patchName(index));
-		patch.setOffsetX(info.patches[a].left);
-		patch.setOffsetY(info.patches[a].top);
-
-		// Add it to the texture
-		patches.push_back(patch);
-	}
-
-	// Done
-	return true;
-}
-*/
-
-/* CTexture::toTX
- * Writes texture information to a TEXTUREx format texture
- *******************************************************************/
-/*
-bool CTexture::toTX(tx_texture_t& info, PatchTable& ptable) {
-	// Write texture properties
-	info.name = name;
-	info.width = width;
-	info.height = height;
-	info.scale_x = uint8_t(scale_x * 8);
-	info.scale_y = uint8_t(scale_y * 8);
-
-	// Write flags
-	uint16_t flags = 0;
-	if (ex_props.propertyExists("WorldPanning"))
-		flags |= TX_WORLDPANNING;
-	info.flags = flags;
-
-	// Write patches info
-	info.patches.clear();
-	for (size_t a = 0; a < patches.size(); a++) {
-		// Get patch index
-		int16_t index = ptable.patchIndex(patches[a].patchName());
-		if (index < 0) {
-			wxLogMessage("Could not find patch %s in patch table", patches[a].patchName().c_str());
-			continue;
-		}
-
-		// Create patch
-		tx_patch_t patch;
-		patch.left = patches[a].xOffset();
-		patch.top = patches[a].yOffset();
-		patch.patch = index;
-
-		// Write patch info
-		info.patches.push_back(patch);
-	}
-
-	// Done
-	return true;
-}
-*/
-
-/* CTexture::fromZD
- * Reads in texture information from a ZDoom TEXTURES format texture
- *******************************************************************/
-/*
-bool CTexture::fromZD(Tokenizer& tz) {
-	// TODO: Implement reading TEXTURES definition
-	return false;
-}
-*/
-
-/* CTexture::toZD
- * Writes texture information to a ZDoom TEXTURES format texture
- *******************************************************************/
-/*
-string CTexture::toZD() {
-	// TODO: Implement writing TEXUTRES definition
-	return wxEmptyString;
-}
-*/

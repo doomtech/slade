@@ -40,9 +40,6 @@
 
 
 /*******************************************************************
- * VARIABLES
- *******************************************************************/
-/*******************************************************************
  * SIMAGE CLASS FUNCTIONS
  *******************************************************************/
 
@@ -221,6 +218,10 @@ void SImage::clearData(bool clear_mask) {
 	}
 }
 
+/* SImage::clear
+ * Deletes/clears any existing image data, and resets the image to
+ * zero-sized
+ *******************************************************************/
 void SImage::clear() {
 	// Clear image data
 	clearData(true);
@@ -285,61 +286,6 @@ short SImage::findUnusedColour() {
 
 	// No unused colours found
 	return -1;
-}
-
-bool SImage::trim(int width, int height) {
-	// Check new width/height are smaller than current
-	if (width > this->width || height > this->height)
-		return false;
-
-	if (format == RGBA) {
-		// Write image portion to new data
-		uint8_t* new_data = new uint8_t[width * height * 4];
-		uint32_t c = 0;
-		for (int row = 0; row < height; row++) {
-			memcpy(new_data + c, data + c, width * 4);
-			c += this->width * 4;
-		}
-
-		// Update variables
-		clearData(true);
-		data = new_data;
-		this->width = width;
-		this->height = height;
-
-		return true;
-	}
-	else if (format == PALMASK) {
-		// Write image portion to new data
-		uint8_t* new_data = new uint8_t[width * height];
-		uint32_t c = 0;
-		for (int row = 0; row < height; row++) {
-			memcpy(new_data + c, data + c, width);
-			c += this->width;
-		}
-
-		// Write mask portion to new mask
-		uint8_t* new_mask = new uint8_t[width * height];
-		c = 0;
-		for (int row = 0; row < height; row++) {
-			memcpy(new_mask + c, mask + c, width);
-			c += this->width;
-		}
-
-		// Update variables
-		clearData(true);
-		data = new_data;
-		mask = new_mask;
-		this->width = width;
-		this->height = height;
-
-		return true;
-	}
-
-	// Announce change
-	announce("image_changed");
-
-	return false;
 }
 
 /* SImage::countColours

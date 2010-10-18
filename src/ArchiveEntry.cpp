@@ -52,6 +52,10 @@ ArchiveEntry::ArchiveEntry(ArchiveEntry& copy) {
 ArchiveEntry::~ArchiveEntry() {
 }
 
+/* ArchiveEntry::getName
+ * Returns the entry name. If [cut_ext] is true and the name has an
+ * extension, it will be cut from the returned name
+ *******************************************************************/
 string ArchiveEntry::getName(bool cut_ext) {
 	if (!cut_ext)
 		return name;
@@ -60,6 +64,9 @@ string ArchiveEntry::getName(bool cut_ext) {
 	return fn.GetName();
 }
 
+/* ArchiveEntry::getParent
+ * Returns the entry's parent archive
+ *******************************************************************/
 Archive* ArchiveEntry::getParent() {
 	if (parent)
 		return parent->getArchive();
@@ -67,6 +74,9 @@ Archive* ArchiveEntry::getParent() {
 		return NULL;
 }
 
+/* ArchiveEntry::getPath
+ * Returns the entry path in its parent archive
+ *******************************************************************/
 string ArchiveEntry::getPath(bool name) {
 	// Get the entry path
 	string path = parent->getPath();
@@ -143,6 +153,9 @@ void ArchiveEntry::unloadData() {
 	setLoaded(false);
 }
 
+/* ArchiveEntry::lock
+ * Locks the entry. A locked entry cannot be modified
+ *******************************************************************/
 void ArchiveEntry::lock() {
 	// Lock the entry
 	locked = true;
@@ -151,6 +164,9 @@ void ArchiveEntry::lock() {
 	stateChanged();
 }
 
+/* ArchiveEntry::unlock
+ * Unlocks the entry
+ *******************************************************************/
 void ArchiveEntry::unlock() {
 	// Unlock the entry
 	locked = false;
@@ -176,6 +192,10 @@ bool ArchiveEntry::rename(string new_name) {
 	return true;
 }
 
+/* ArchiveEntry::resize
+ * Resizes the entry to [new_size]. If [preserve_data] is true, any
+ * existing data is preserved
+ *******************************************************************/
 bool ArchiveEntry::resize(uint32_t new_size, bool preserve_data) {
 	// Check if locked
 	if (locked) {
@@ -297,6 +317,9 @@ bool ArchiveEntry::importFile(string filename, uint32_t offset, uint32_t size) {
 	return true;
 }
 
+/* ArchiveEntry::importFileStream
+ * Imports [len] data from [file]
+ *******************************************************************/
 bool ArchiveEntry::importFileStream(wxFile& file, uint32_t len) {
 	// Check if locked
 	if (locked) {
@@ -360,6 +383,9 @@ bool ArchiveEntry::exportFile(string filename) {
 	return true;
 }
 
+/* ArchiveEntry::write
+ * Writes data to the entry MemChunk
+ *******************************************************************/
 bool ArchiveEntry::write(const void* data, uint32_t size) {
 	// Check if locked
 	if (locked) {
@@ -383,6 +409,9 @@ bool ArchiveEntry::write(const void* data, uint32_t size) {
 	return false;
 }
 
+/* ArchiveEntry::read
+ * Reads data from the entry MemChunk
+ *******************************************************************/
 bool ArchiveEntry::read(void* buf, uint32_t size) {
 	// Load data if it isn't already
 	if (isLoaded())
@@ -391,16 +420,27 @@ bool ArchiveEntry::read(void* buf, uint32_t size) {
 	return data.read(buf, size);
 }
 
+/* ArchiveEntry::getSizeString
+ * Returns the entry's size as a string
+ *******************************************************************/
 string ArchiveEntry::getSizeString() {
 	return Misc::sizeAsString(getSize());
 }
 
+/* ArchiveEntry::stateChanged
+ * Notifies the entry's parent archive that the entry has been
+ * modified
+ *******************************************************************/
 void ArchiveEntry::stateChanged() {
 	Archive* parent_archive = getParent();
 	if (parent_archive)
 		parent_archive->entryStateChanged(this);
 }
 
+/* ArchiveEntry::setExtensionByType
+ * Sets the entry's name extension to the extension defined in its
+ * EntryType
+ *******************************************************************/
 void ArchiveEntry::setExtensionByType() {
 	// Convert name to wxFileName for processing
 	wxFileName fn(name);
