@@ -467,7 +467,7 @@ int ArchiveManager::archiveIndex(Archive* archive) {
 string ArchiveManager::getArchiveExtensionsString() {
 	// Create extensions strings
 	string extensions = "Any supported file|";
-	string ext_wad = "*.wad;*.WAD;*.Wad";						extensions += ext_wad + ";";
+	string ext_wad = "*.wad;*.WAD;*.Wad;*.rts;*.RTS;*.Rts";		extensions += ext_wad + ";";
 	string ext_zip = "*.zip;*.ZIP;*.Zip";						extensions += ext_zip + ";";
 	string ext_pk3 = "*.pk3;*.PK3;*.Pk3";						extensions += ext_pk3 + ";";
 	string ext_jdf = "*.jdf;*.JDF;*.Jdf";						extensions += ext_jdf + ";";

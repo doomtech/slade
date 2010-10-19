@@ -615,9 +615,10 @@ uint32_t valid_flat_size[][2] = {
 	{ 128, 128 },	// \ 
 	{ 256, 256 },	// hires flat size
 	{ 512, 512 },	// / 
+	{ 256, 200 },	// Rise of the Triad sky
 	{ 320, 200 },	// full screen format
 };
-uint32_t	n_valid_flat_sizes = 12;
+uint32_t	n_valid_flat_sizes = 13;
 
 /* SImage::validFlatSize
  * Returns whether the image has dimensions appropriate for a flat
@@ -673,6 +674,14 @@ bool SImage::loadDoomFlat(const uint8_t* gfx_data, int size, bool columnmajor) {
 			return false;
 		}
 	}
+
+	// Swap height and width for column-major formats
+	if (columnmajor) {
+		int tmp = width;
+		width = height;
+		height = tmp;
+	}
+
 
 	// Setup variables
 	format = PALMASK;
