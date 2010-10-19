@@ -547,6 +547,16 @@ struct oldpatch_header_t {
 	int8_t top;
 };
 
+// rottpatch_header_t: The header of a rott-format gfx image
+struct rottpatch_header_t {
+	short	origsize;
+	short	width;
+	short	height;
+	short	left;
+	short	top;
+	//short	translevel; // Not all of them have that
+};
+
 // imgz_header: The header of a ZDoom imgz image
 struct imgz_header_t {
 	uint8_t  magic[4];

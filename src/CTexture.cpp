@@ -193,7 +193,7 @@ bool CTexture::removePatch(string patch) {
 }
 
 /* CTexture::replacePatch
- * Replaces the patch at [index] with [newpatch], and updates it's
+ * Replaces the patch at [index] with [newpatch], and updates its
  * associated ArchiveEntry with [newentry]. Returns false if [index]
  * is out of bounds, true otherwise
  *******************************************************************/

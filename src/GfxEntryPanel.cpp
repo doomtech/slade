@@ -629,3 +629,28 @@ CONSOLE_COMMAND (crop, 4) {
 	}
 }
 
+CONSOLE_COMMAND(imgconv, 0) {
+	ArchivePanel * foo = CH::getCurrentArchivePanel();
+	if (!foo) {
+		wxLogMessage("No active panel.");
+		return;
+	}
+	ArchiveEntry * bar = foo->currentEntry();
+	if (!bar) {
+		wxLogMessage("No active entry.");
+		return;
+	}
+	GfxEntryPanel * meep = CH::getCurrentGfxPanel();
+	if (!meep) {
+		wxLogMessage("No image selected.");
+		return;
+	}
+	if (meep->getImage())
+	{
+		meep->getImage()->imgconv();
+		meep->refresh();
+		MemChunk mc;
+		meep->getImage()->safeConvert(mc);
+		bar->importMemChunk(mc);
+	}
+}

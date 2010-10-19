@@ -166,7 +166,12 @@ void EntryDataFormat::initBuiltinFormats() {
 	new Heretic2M8Format();
 	new Heretic2M32Format();
 	new IMGZDataFormat();
-	new LegacyGfxDataFormat();
+	new QuakeGfxDataFormat();
+	new RottGfxDataFormat();
+	new RottTransGfxDataFormat();
+	new RottLBMDataFormat();
+	new RottRawDataFormat();
+	new RottPicDataFormat();
 	new WadDataFormat();
 	new ZipDataFormat();
 	new LibDataFormat();
@@ -220,6 +225,7 @@ void EntryDataFormat::initBuiltinFormats() {
 	// And here are some dummy formats needed for certain image formats
 	// that can't be detected by anything but size (which is done in EntryType detection anyway)
 	new EntryDataFormat("img_raw");
+	new EntryDataFormat("img_rottwall");
 	new EntryDataFormat("img_planar");
 	new EntryDataFormat("img_4bitchunk");
 	new EntryDataFormat("font_mono");

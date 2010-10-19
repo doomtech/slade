@@ -419,8 +419,10 @@ bool SImage::loadDoomGfx(const uint8_t* gfx_data, int size, uint8_t version) {
 					break;
 
 				// Fail if bogus data gives a negative pos (this corrupts the heap!)
-				if (pos < 0)
+				if (pos < 0) {
+					clearData();
 					return false;
+				}
 
 				// Write pixel data
 				data[pos] = *bits;
@@ -636,7 +638,7 @@ bool SImage::validFlatSize() {
  * but with a different dimension.
  * Returns false if the image data was invalid, true otherwise.
  *******************************************************************/
-bool SImage::loadDoomFlat(const uint8_t* gfx_data, int size) {
+bool SImage::loadDoomFlat(const uint8_t* gfx_data, int size, bool columnmajor) {
 	// Check data
 	if (!gfx_data)
 		return false;
@@ -688,6 +690,12 @@ bool SImage::loadDoomFlat(const uint8_t* gfx_data, int size) {
 	// Create mask (all opaque)
 	mask = new uint8_t[width*height];
 	memset(mask, 255, width*height);
+
+	// Handle column-major flat formats
+	if (columnmajor) {
+		rotate(90);
+		mirror(true);
+	}
 
 	// Announce change
 	announce("image_changed");
@@ -786,8 +794,8 @@ bool SImage::loadDoomSnea(const uint8_t* gfx_data, int size) {
 
 	// The TITLEPIC in the Doom Press-Release Beta has
 	// two extraneous null bytes at the end for padding.
-	if (size == 64004 && qwidth == 80 && height == 200)
-		size = 64002;
+	if (size == width * height + 4)
+		size -= 2;
 
 	if (size != 2 + width * height)
 		return false;
@@ -1102,88 +1110,6 @@ bool SImage::to4bitChunk(MemChunk& out, Palette8bit* pal) {
  * SOURCE PORT FORMATS
  *******************************************************************/
 
-/* SImage::loadDoomLegacy
- * Loads one of those weird Legacy screens with a header.
- * Returns false if the image data was invalid, true otherwise.
- *******************************************************************/
-enum LegacyPicType
-{
-	LEG_PALETTE		= 0,
-	LEG_INTENSITY	= 1,
-	LEG_ALPHA		= 2,
-	LEG_RGB24		= 3,
-	LEG_RGB32		= 4
-};
-bool SImage::loadDoomLegacy(const uint8_t* gfx_data, int size) {
-	// Check data
-	if (!gfx_data)
-		return false;
-
-	// Setup variables
-	width = wxINT16_SWAP_ON_BE(*(const uint16_t*)(gfx_data));
-	height = wxINT16_SWAP_ON_BE(*(const uint16_t*)(gfx_data+4));
-	uint8_t mode = gfx_data[3];
-	offset_x = 0;
-	offset_y = 0;
-	numimages = 1;
-	imgindex = 0;
-	if (mode < LEG_RGB24)
-		format = PALMASK;
-	else format = RGBA;
-	if (mode == 0 || mode > LEG_ALPHA)
-		has_palette = false;
-	else {
-		// Picture is an intensity map, so use greyscale palette
-		has_palette = true;
-		for (size_t i = 0; i < 256; ++i) {
-			palette.setColour(i, rgba_t(i, i, i, 255));
-		}
-	}
-
-	// Clear current data if it exists
-	clearData();
-
-	if (mode == LEG_PALETTE) {
-		// Read raw pixel data
-		data = new uint8_t[width*height];
-		memcpy(data, gfx_data+8, width * height);
-
-		// Create mask (all opaque)
-		mask = new uint8_t[width*height];
-		memset(mask, 255, width*height);
-	} else if (mode == LEG_INTENSITY) {
-		// Read raw pixel data
-		data = mask = new uint8_t[width*height];
-		memcpy(data, gfx_data+8, width * height);
-	} else if (mode == LEG_ALPHA) {
-		// Read raw pixel data
-		data = new uint8_t[width*height];
-		mask = new uint8_t[width*height];
-		for (int i = 0; i < size - 8; i+=2) {
-			data[i/2] = gfx_data[i+8];
-			mask[i/2] = gfx_data[i+9];
-		}
-	} else if (mode == LEG_RGB24) {
-		// Read raw pixel data
-		data = new uint8_t[width*height*4];
-		for (int i = 0; i < size - 8; i+=3) {
-			data[(i/3)*4  ] = gfx_data[i+ 8];
-			data[(i/3)*4+1] = gfx_data[i+ 9];
-			data[(i/3)*4+2] = gfx_data[i+10];
-			data[(i/3)*4+3] = 255;
-		}
-	} else if (mode == LEG_RGB32) {
-		// Read raw pixel data
-		data = new uint8_t[width*height*4];
-		memcpy(data, gfx_data+8, width * height * 4);
-	}
-
-	// Announce change
-	announce("image_changed");
-
-	return true;
-}
-
 /* SImage::loadImgz
  * Loads a picture in ZDoom's imgz format, using code adapted from it.
  * This format is special in that the info given is only for the alpha
@@ -1252,6 +1178,88 @@ bool SImage::loadImgz(const uint8_t* gfx_data, int size) {
 /*******************************************************************
  * OTHER GAMES FORMATS
  *******************************************************************/
+
+/* SImage::loadQuake
+ * Loads a graphic in the Quake HUD picture format.
+ * Returns false if the image data was invalid, true otherwise.
+ *******************************************************************/
+enum QuakePicType
+{
+	QUAKE_PALETTE	= 0,
+	QUAKE_INTENSITY	= 1,
+	QUAKE_ALPHA		= 2,
+	QUAKE_RGB24		= 3,
+	QUAKE_RGB32		= 4
+};
+bool SImage::loadQuake(const uint8_t* gfx_data, int size) {
+	// Check data
+	if (!gfx_data)
+		return false;
+
+	// Setup variables
+	width = wxINT16_SWAP_ON_BE(*(const uint16_t*)(gfx_data));
+	height = wxINT16_SWAP_ON_BE(*(const uint16_t*)(gfx_data+4));
+	uint8_t mode = gfx_data[3];
+	offset_x = 0;
+	offset_y = 0;
+	numimages = 1;
+	imgindex = 0;
+	if (mode < QUAKE_RGB24)
+		format = PALMASK;
+	else format = RGBA;
+	if (mode == 0 || mode > QUAKE_ALPHA)
+		has_palette = false;
+	else {
+		// Picture is an intensity map, so use greyscale palette
+		has_palette = true;
+		for (size_t i = 0; i < 256; ++i) {
+			palette.setColour(i, rgba_t(i, i, i, 255));
+		}
+	}
+
+	// Clear current data if it exists
+	clearData();
+
+	if (mode == QUAKE_PALETTE) {
+		// Read raw pixel data
+		data = new uint8_t[width*height];
+		memcpy(data, gfx_data+8, width * height);
+
+		// Create mask (all opaque)
+		mask = new uint8_t[width*height];
+		memset(mask, 255, width*height);
+	} else if (mode == QUAKE_INTENSITY) {
+		// Read raw pixel data
+		data = mask = new uint8_t[width*height];
+		memcpy(data, gfx_data+8, width * height);
+	} else if (mode == QUAKE_ALPHA) {
+		// Read raw pixel data
+		data = new uint8_t[width*height];
+		mask = new uint8_t[width*height];
+		for (int i = 0; i < size - 8; i+=2) {
+			data[i/2] = gfx_data[i+8];
+			mask[i/2] = gfx_data[i+9];
+		}
+	} else if (mode == QUAKE_RGB24) {
+		// Read raw pixel data
+		data = new uint8_t[width*height*4];
+		for (int i = 0; i < size - 8; i+=3) {
+			data[(i/3)*4  ] = gfx_data[i+ 8];
+			data[(i/3)*4+1] = gfx_data[i+ 9];
+			data[(i/3)*4+2] = gfx_data[i+10];
+			data[(i/3)*4+3] = 255;
+		}
+	} else if (mode == QUAKE_RGB32) {
+		// Read raw pixel data
+		data = new uint8_t[width*height*4];
+		memcpy(data, gfx_data+8, width * height * 4);
+	}
+
+	// Announce change
+	announce("image_changed");
+
+	return true;
+}
 
 /* SImage::loadSCSprite
  * Loads a sprite in ShadowCaster's format.
@@ -1592,6 +1600,294 @@ bool SImage::loadHeretic2M32(const uint8_t* gfx_data, int size, int index) {
 
 	// Fill data with pixel data
 	memcpy(data, gfx_data + data_offset, width * height * 4);
+
+	return true;
+}
+
+/* SImage::loadRottGfx
+ * Loads a Rise of the Triad Gfx format image, using the image palette.
+ * This format, descibed in hacker.txt from the ROTT source code pack,
+ * is "extremely similar to the patches used in another game".
+ * Returns false if the image data was invalid, true otherwise
+ *******************************************************************/
+bool SImage::loadRottGfx(const uint8_t* gfx_data, int size, bool transparent) {
+	// Check data
+	if (!gfx_data)
+		return false;
+
+	// Check size
+	if ((unsigned)size < sizeof(rottpatch_header_t))
+		return false;
+
+	// Init variables
+	uint16_t* col_offsets = NULL;
+	format = PALMASK;
+	has_palette = false;
+	numimages = 1;
+	imgindex = 0;
+
+
+	// Read header
+	rottpatch_header_t* header = (rottpatch_header_t*)gfx_data;
+	width = wxINT16_SWAP_ON_BE(header->width);
+	height = wxINT16_SWAP_ON_BE(header->height);
+	offset_x = wxINT16_SWAP_ON_BE(header->left);
+	offset_y = wxINT16_SWAP_ON_BE(header->top);
+	size_t hdr_size = sizeof(rottpatch_header_t);
+	uint8_t alpha = 0xFF;
+	if (transparent) {
+		//wxLogMessage("Transparent");
+		//alpha = gfx_data[sizeof(rottpatch_header_t)];
+		hdr_size +=2;
+	}
+
+	// Read column offsets
+	col_offsets = new uint16_t[width];
+	uint16_t* c_ofs = (uint16_t*)((uint8_t*)gfx_data + hdr_size);
+	for (int a = 0; a < width; a++)
+		col_offsets[a] = wxUINT16_SWAP_ON_BE(c_ofs[a]);
+
+	// Clear current data if it exists
+	clearData();
+
+	// Load data
+	data = new uint8_t[width * height];
+	memset(data, 0, width * height);	// Set colour to palette index 0
+	mask = new uint8_t[width * height];
+	memset(mask, 0, width * height);	// Set mask to fully transparent
+	for (int c = 0; c < width; c++) {
+		// Get current column offset
+		uint16_t col_offset = col_offsets[c];
+		//if (transparent) wxLogMessage("Column %i, offset at %i, offset %i", c, (c<<1) + hdr_size, col_offset);
+
+		// Check column offset is valid
+		if (col_offset >= (unsigned)size) {
+			clearData();
+			return false;
+		}
+
+		// Go to start of column
+		const uint8_t* bits = gfx_data + col_offset;
+
+		// Read posts
+		int counter = 0;
+		while (1) {
+			// Get row offset
+			//if (transparent) wxLogMessage("Row number %i at offset %i", *bits, bits - gfx_data);
+			uint8_t row = *bits++;
+
+			if (row == 0xFF/* || row > height*/) // End of column?
+				break;
+
+			// This apparently triggers translucency mode, but I'm not sure how it works
+			if (transparent && *bits == 254) {
+				clearData();
+				Global::error = "Sorry, masked ROTT patches with translucency are not yet supported";
+				return false;
+			} else {
+
+				// Get no. of pixels
+				uint8_t n_pix = *bits++;
+				//if (transparent) wxLogMessage("Post %i, row = %i, numpixels = %i, offset %i", counter++, row, n_pix, bits - gfx_data);
+
+				if (n_pix >= height && row != 0 && row < height) {
+					wxLogMessage("Hack triggered!");
+					bits+=2;
+					continue;
+				}
+
+				for (uint8_t p = 0; p < n_pix; p++) {
+					// Get pixel position
+					int pos = ((row + p)*width + c);
+					//if (transparent) wxLogMessage("Pixel %i: pos %i, offset %i", p, pos, bits - gfx_data);
+
+						// Stop if we're outside the image
+					if (pos > width*height)
+						break;
+
+					// Stop if for some reason we're outside the gfx data
+					if (bits > gfx_data + size)
+						break;
+
+					// Fail if bogus data gives a negative pos (this corrupts the heap!)
+					if (pos < 0) {
+						clearData();
+						return false;
+					}
+
+					// Write pixel data
+					data[pos] = *bits++;
+					mask[pos] = alpha;
+				}
+			}
+		}
+	}
+
+	// Announce change
+	announce("image_changed");
+
+	// Return success
+	return true;
+}
+
+/* SImage::loadRottLbm
+ * Loads a Rise of the Triad LBM format image.
+ * Returns false if the image data was invalid, true otherwise
+ *******************************************************************/
+bool SImage::loadRottLbm(const uint8_t* gfx_data, int size) {
+	// Check data
+	if (!gfx_data)
+		return false;
+
+	// Setup variables
+	offset_x = offset_y = 0;
+	width = gfx_data[0] + (gfx_data[1]<<8);
+	height = gfx_data[2] + (gfx_data[3]<<8);
+	has_palette = true;
+	format = PALMASK;
+	numimages = 1;
+	imgindex = 0;
+
+	// ROTT source code says: "LIMITATIONS - Only works with 320x200!!!"
+	if (width != 320 || height != 200)
+		return false;
+
+	// Clear current data if it exists
+	clearData();
+
+	// Let's build the palette now.
+	for (size_t c = 0; c < 256; ++c) {
+		rgba_t color;
+		color.r = gfx_data[(c*3)+4];
+		color.g = gfx_data[(c*3)+5];
+		color.b = gfx_data[(c*3)+6];
+		palette.setColour(c, color);
+	}
+
+	// Read raw pixel data
+	data = new uint8_t[width*height];
+
+	// Create some variables needed for LMB decompression
+	const uint8_t * read = gfx_data + 768 +4;
+	const uint8_t * readend = gfx_data + size;
+	uint8_t * dest = data;
+	uint8_t * destend = data + (width * height);
+	uint8_t code = 0;
+	uint8_t length = 0;
+	uint8_t count = 0;
+
+	while (read < readend && dest < destend && count < width) {
+		code = *read++;
+		if (code < 0x80) {
+			length = code + 1;
+			memcpy(dest, read, length);
+			dest+=length;
+			read+=length;
+		} else if (code > 0x80) {
+			length = (code^0xFF)+2;;
+			code = *read++;
+			memset(dest, code, length);
+			dest+=length;
+		} else length = 0;
+		count += length;
+	}
+
+	// Announce change
+	announce("image_changed");
+
+	return true;
+}
+
+/* SImage::loadRottRaw
+ * Loads a ROTT raw data + header image.
+ *******************************************************************/
+bool SImage::loadRottRaw(const uint8_t* gfx_data, int size) {
+	// Check data
+	if (!gfx_data)
+		return false;
+
+	// Setup variables
+	patch_header_t* header = (patch_header_t*)gfx_data;
+	height = wxINT16_SWAP_ON_BE(header->width); // Cheat a bit since 
+	width = wxINT16_SWAP_ON_BE(header->height); // it's column-major
+	offset_x = wxINT16_SWAP_ON_BE(header->left);
+	offset_y = wxINT16_SWAP_ON_BE(header->top);
+	format = PALMASK;
+	has_palette = false;
+	numimages = 1;
+	imgindex = 0;
+
+	// Clear current data if it exists
+	clearData();
+
+	// Read raw pixel data
+	data = new uint8_t[width*height];
+	memcpy(data, gfx_data+8, width * height);
+
+	// Convert from column-major to row-major
+	rotate(90);
+	mirror(true);
+
+	// Announce change
+	announce("image_changed");
+
+	return true;
+}
+
+/* SImage::loadRottPic
+ * Loads a ROTT picture: same as Doom snea, but with transparency.
+ *******************************************************************/
+bool SImage::loadRottPic(const uint8_t* gfx_data, int size) {
+	// Check data
+	if (!gfx_data)
+		return false;
+
+	// Check/setup size
+	offset_x = offset_y = 0;
+	uint8_t qwidth = gfx_data[0];
+	width = qwidth * 4;
+	height = gfx_data[1];
+
+	if (size != 4 + width * height)
+		return false;
+
+	// Setup variables
+	format = PALMASK;
+	has_palette = false;
+	numimages = 1;
+	imgindex = 0;
+
+	// Clear current data if it exists
+	clearData();
+
+	// Read raw pixel data
+	data = new uint8_t[width*height];
+
+	// Since gfx_data is a const pointer, we can't work on it.
+	uint8_t * tempdata = new uint8_t[size];
+	memcpy(tempdata, gfx_data, size);
+
+	uint8_t* entryend = tempdata + size - 2;
+	uint8_t* dataend = data + size - 4;
+	uint8_t* pixel = tempdata + 2;
+	uint8_t* brush = data;
+	while (pixel < entryend) {
+		*brush = *pixel++;
+		brush += 4;
+		if (brush >= dataend)
+			brush -= size - 5;
+	}
+
+	delete[] tempdata;
+
+	// Create mask (index 255 is transparent)
+	mask = new uint8_t[width*height];
+	memset(mask, 255, width*height);
+	for (int i = 0; i < width*height; ++i)
+		if (data[i] == 0xFF) mask[i] = 0;
+
+	// Announce change
+	announce("image_changed");
 
 	return true;
 }

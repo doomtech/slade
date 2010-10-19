@@ -737,6 +737,19 @@ bool SImage::mirror(bool vertical) {
 	return true;
 }
 
+/* SImage::imgconv
+ * Converts from column-major to row-major
+ *******************************************************************/
+bool SImage::imgconv() {
+	int oldwidth = width;
+	width = height;
+	height = oldwidth;
+	rotate(90);
+	mirror(true);
+	return true;
+}
+
+
 /* SImage::crop
  * Crops a section of the image.
  *******************************************************************/

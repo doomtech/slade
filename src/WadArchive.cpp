@@ -75,8 +75,6 @@ ns_special_t special_namespaces[] = {
 };
 const int n_special_namespaces = 9;
 
-
-
 /*******************************************************************
  * EXTERNAL VARIABLES
  *******************************************************************/
@@ -174,6 +172,16 @@ void WadArchive::updateNamespaces() {
 			}
 		}
 	}
+
+	// ROTT stuff. The first lump in the archive is always WALLSTRT, the last lump is either
+	// LICENSE (darkwar.wad) or VENDOR (huntbgin.wad), with TABLES just before in both cases.
+	if (getRoot()->getEntry(0)->getName().Matches("WALLSTRT") && 
+		getRoot()->getEntry(numEntries()-2)->getName().Matches("TABLES")) {
+			wad_ns_pair_t ns(getRoot()->getEntry(0), getRoot()->getEntry(numEntries()-1));
+			ns.name = "rott";
+			namespaces.push_back(ns);
+	}
+
 
 	// Check namespaces
 	for (unsigned a = 0; a < namespaces.size(); a++) {

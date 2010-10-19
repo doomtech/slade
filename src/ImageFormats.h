@@ -484,10 +484,10 @@ public:
 	}
 };
 
-class LegacyGfxDataFormat : public EntryDataFormat {
+class QuakeGfxDataFormat : public EntryDataFormat {
 public:
-	LegacyGfxDataFormat() : EntryDataFormat("img_legacy") {};
-	~LegacyGfxDataFormat() {}
+	QuakeGfxDataFormat() : EntryDataFormat("img_quake") {};
+	~QuakeGfxDataFormat() {}
 
 	// A data format found while rifling through some Legacy mods,
 	// specifically High Tech Hell 2. It seems to be how it works.
@@ -675,6 +675,168 @@ public:
 				return EDF_FALSE;
 		}
 		return EDF_TRUE;
+	}
+};
+
+class RottGfxDataFormat : public EntryDataFormat {
+public:
+	RottGfxDataFormat() : EntryDataFormat("img_rott") {};
+	~RottGfxDataFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		const uint8_t* data = mc.getData();
+
+		// Check size
+		if (mc.getSize() > sizeof(rottpatch_header_t)) {
+			const rottpatch_header_t *header = (const rottpatch_header_t *)data;
+
+			// Check header values are 'sane'
+			if (header->height > 0 && header->height < 4096 &&
+					header->width > 0 && header->width < 4096 &&
+					header->top > -2000 && header->top < 2000 &&
+					header->left > -2000 && header->left < 2000) {
+				uint16_t *col_offsets = (uint16_t *)((const uint8_t *)data + sizeof(rottpatch_header_t));
+
+				// Check there is room for needed column pointers
+				if (mc.getSize() < sizeof(rottpatch_header_t) + (header->width * sizeof(uint16_t)))
+					return EDF_FALSE;
+
+				// Check column pointers are within range
+				for (int a = 0; a < header->width; a++) {
+					if (col_offsets[a] > mc.getSize() ||
+						col_offsets[a] < (header->width<<1) + sizeof(rottpatch_header_t))
+						return EDF_FALSE;
+				}
+
+				// Check if total size is reasonable; this computation corresponds to the most inefficient
+				// possible use of space by the format (horizontal stripes of 1 pixel, 1 pixel apart).
+				int numpixels = (header->height + 2 + header->height%2)/2;
+				int maxcolsize = sizeof(uint32_t) + (numpixels*3) + 1;
+				if (mc.getSize() > (2 + sizeof(rottpatch_header_t) + (header->width * maxcolsize))) {
+					return EDF_UNLIKELY;	// This may still be good anyway 
+				}
+
+				// Passed all checks, so probably is ROTT gfx
+				return EDF_TRUE;
+			}
+		}
+		return EDF_FALSE;
+	}
+};
+
+class RottTransGfxDataFormat : public EntryDataFormat {
+public:
+	RottTransGfxDataFormat() : EntryDataFormat("img_rottmask") {};
+	~RottTransGfxDataFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		const uint8_t* data = mc.getData();
+
+		// Check size
+		if (mc.getSize() > sizeof(rottpatch_header_t)) {
+			const rottpatch_header_t *header = (const rottpatch_header_t *)data;
+
+			// Check header values are 'sane'
+			if (header->height > 0 && header->height < 4096 &&
+					header->width > 0 && header->width < 4096 &&
+					header->top > -2000 && header->top < 2000 &&
+					header->left > -2000 && header->left < 2000) {
+				uint16_t *col_offsets = (uint16_t *)(2 + (const uint8_t *)data + sizeof(rottpatch_header_t));
+
+				// Check there is room for needed column pointers
+				if (mc.getSize() < 2 + sizeof(rottpatch_header_t) + (header->width * sizeof(uint16_t)))
+					return EDF_FALSE;
+
+				// Check column pointers are within range
+				for (int a = 0; a < header->width; a++) {
+					if (col_offsets[a] > mc.getSize() ||
+						col_offsets[a] < (header->width<<1) + sizeof(rottpatch_header_t))
+						return EDF_FALSE;
+				}
+
+				// Check if total size is reasonable; this computation corresponds to the most inefficient
+				// possible use of space by the format (horizontal stripes of 1 pixel, 1 pixel apart).
+				int numpixels = (header->height + 2 + header->height%2)/2;
+				int maxcolsize = sizeof(uint32_t) + (numpixels*3) + 1;
+				if (mc.getSize() > (2 + sizeof(rottpatch_header_t) + (header->width * maxcolsize))) {
+					return EDF_UNLIKELY;	// This may still be good anyway 
+				}
+
+				// Passed all checks, so probably is ROTT masked gfx
+				return EDF_TRUE;
+			}
+		}
+
+		return EDF_FALSE;
+	}
+};
+
+class RottLBMDataFormat : public EntryDataFormat {
+public:
+	RottLBMDataFormat() : EntryDataFormat("img_rottlbm") {};
+	~RottLBMDataFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		const uint8_t* data = mc.getData();
+
+		// Check size
+		if (mc.getSize() > 800)
+		{
+			if (data[0] == 0x40 && data[1] == 0x01 && data[2] == 0xC8 && data[3] == 0x00)
+			{
+				// May be ROTT LBM
+				return EDF_TRUE;
+			}
+		}
+		return EDF_FALSE;
+	}
+};
+
+class RottRawDataFormat : public EntryDataFormat {
+public:
+	RottRawDataFormat() : EntryDataFormat("img_rottraw") {};
+	~RottRawDataFormat() {}
+
+	/* How many format does ROTT need? This is just like the raw data plus header
+	 * format from the Doom alpha, except that it's column-major instead of row-major.
+	 */
+	int isThisFormat(MemChunk& mc) {
+		if (mc.getSize() < sizeof(patch_header_t))
+			return EDF_FALSE;
+
+		const uint8_t* data = mc.getData();
+		const patch_header_t *header = (const patch_header_t *)data;
+
+		// Check header values are 'sane'
+		if (!(header->height > 0 && header->height < 4096 &&
+			header->width > 0 && header->width < 4096 &&
+			header->top > -2000 && header->top < 2000 &&
+			header->left > -2000 && header->left < 2000))
+			return EDF_FALSE;
+
+		// Check the size matches
+		if (mc.getSize() != (sizeof(patch_header_t) + (header->width * header->height)))
+			return EDF_FALSE;
+
+		return EDF_TRUE;
+	}
+};
+
+class RottPicDataFormat : public EntryDataFormat {
+public:
+	RottPicDataFormat() : EntryDataFormat("img_rottpic") {};
+	~RottPicDataFormat() {}
+
+	// Yet another ROTT image format. Cheesus.
+	int isThisFormat(MemChunk& mc) {
+		size_t size = mc.getSize();
+		if (size < 8)
+			return EDF_FALSE;
+
+		const uint8_t* data = mc.getData();
+		if (data[0] && data[1] && (size - 4 == (data[0] * data[1] * 4)) && data[size-2] == 0 && data[size-1] == 0)
+			return EDF_TRUE;
+		return EDF_FALSE;
 	}
 };
 

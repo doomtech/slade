@@ -79,8 +79,8 @@ bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry, int index) {
 	}
 	else if (s_cmpnocase(format, "img_imgz"))
 		return image->loadImgz(entry->getData(), entry->getSize());
-	else if (s_cmpnocase(format, "img_legacy"))
-		return image->loadDoomLegacy(entry->getData(), entry->getSize());
+	else if (s_cmpnocase(format, "img_quake"))
+		return image->loadQuake(entry->getData(), entry->getSize());
 	else if (s_cmpnocase(format, "img_planar"))
 		return image->loadPlanar(entry->getData(), entry->getSize());
 	else if (s_cmpnocase(format, "img_4bitchunk"))
@@ -101,6 +101,18 @@ bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry, int index) {
 		return image->loadSCSprite(entry->getData(), entry->getSize());
 	else if (s_cmpnocase(format, "img_scwall"))
 		return image->loadSCWall(entry->getData(), entry->getSize());
+	else if (s_cmpnocase(format, "img_rott"))
+		return image->loadRottGfx(entry->getData(), entry->getSize(), false);
+	else if (s_cmpnocase(format, "img_rottmask"))
+		return image->loadRottGfx(entry->getData(), entry->getSize(), true);
+	else if (s_cmpnocase(format, "img_rottwall"))
+		return image->loadDoomFlat(entry->getData(), entry->getSize(), true);
+	else if (s_cmpnocase(format, "img_rottlbm"))
+		return image->loadRottLbm(entry->getData(), entry->getSize());
+	else if (s_cmpnocase(format, "img_rottraw"))
+		return image->loadRottRaw(entry->getData(), entry->getSize());
+	else if (s_cmpnocase(format, "img_rottpic"))
+		return image->loadRottPic(entry->getData(), entry->getSize());
 	else if (s_cmpnocase(format, "img_mipimage"))
 		return image->loadAnaMip(entry->getData(), entry->getSize());
 	else if (s_cmpnocase(format, "img_arttile"))
@@ -139,6 +151,15 @@ int	Misc::detectPaletteHack(ArchiveEntry* entry)
 		return PAL_HERETICHACK;	// Heretic
 	else if (entry->getType()->getFormat() == "img_doom_arah"	&& entry->getName() == "shadowpage")
 		return PAL_SHADOWHACK;	// Shadowcaster
+	else if (entry->getType()->getFormat() == "img_rott"		&& entry->getName() == "NICOLAS")
+		return PAL_ROTTNHACK;	// Rise of the Triad
+	else if (entry->getType()->getFormat() == "img_rott"		&& entry->getName() == "FINLDOOR")
+		return PAL_ROTTDHACK;	// Rise of the Triad
+	else if (entry->getType()->getFormat() == "img_rott"		&& entry->getName() == "FINLFIRE")
+		return PAL_ROTTFHACK;	// Rise of the Triad
+	else if ((entry->getType()->getFormat() == "img_rott"		&& entry->getName() == "AP_TITL")
+			||(entry->getType()->getFormat() == "img_rottraw"	&& entry->getName() == "AP_WRLD"))
+		return PAL_ROTTAHACK;	// Rise of the Triad
 
 	// Default:
 	return PAL_NOHACK;
@@ -163,8 +184,18 @@ bool Misc::loadPaletteFromArchive(Palette8bit* pal, Archive* archive, int lump) 
 		playpal = archive->getEntry("E2PAL", true);
 	else if (lump == PAL_SHADOWHACK)
 		playpal = archive->getEntry("shadowpage+1", true);
+	else if (lump == PAL_ROTTNHACK)
+		playpal = archive->getEntry("NICPAL", true);
+	else if (lump == PAL_ROTTDHACK)
+		playpal = archive->getEntry("FINDRPAL", true);
+	else if (lump == PAL_ROTTFHACK)
+		playpal = archive->getEntry("FINFRPAL", true);
+	else if (lump == PAL_ROTTAHACK)
+		playpal = archive->getEntry("AP_PAL", true);
 	if (!playpal || playpal->getSize() < 768)
 		playpal = archive->getEntry("PLAYPAL", true);
+	if (!playpal || playpal->getSize() < 768)
+		playpal = archive->getEntry("PAL", true);
 
 	// Check it was found
 	if (!playpal || playpal->getSize() < 768)

@@ -63,9 +63,13 @@ public:
 	bool	loadDoomGfxA(const uint8_t* data, int size) {return loadDoomGfx(data, size, 2);}
 	bool	loadDoomGfxB(const uint8_t* data, int size) {return loadDoomGfx(data, size, 1);}
 	bool	loadDoomSnea(const uint8_t* data, int size);
-	bool	loadDoomFlat(const uint8_t* data, int size);
+	bool	loadDoomFlat(const uint8_t* data, int size, bool columnmajor = false);
 	bool	loadDoomArah(const uint8_t* gfx_data, int size, int transindex = 255);
-	bool	loadDoomLegacy(const uint8_t* gfx_data, int size);
+	bool	loadQuake(const uint8_t* gfx_data, int size);
+	bool	loadRottGfx(const uint8_t* gfx_data, int size, bool transparent);
+	bool	loadRottLbm(const uint8_t* gfx_data, int size);
+	bool	loadRottRaw(const uint8_t* gfx_data, int size);
+	bool	loadRottPic(const uint8_t* gfx_data, int size);
 	bool	loadPlanar(const uint8_t* gfx_data, int size);
 	bool	load4bitChunk(const uint8_t* gfx_data, int size);
 	bool	loadImgz(const uint8_t* gfx_data, int size);
@@ -98,6 +102,7 @@ public:
 	// Image modification
 	bool	setPixel(int x, int y, rgba_t colour);
 	bool	setPixel(int x, int y, uint8_t pal_index, uint8_t alpha = 255);
+	bool	imgconv();
 	bool	rotate(int angle);
 	bool	mirror(bool vert);
 	bool	crop(long x1, long y1, long x2, long y2);
