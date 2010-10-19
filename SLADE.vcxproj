@@ -102,6 +102,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\ACSPrefsPanel.cpp" />
     <ClCompile Include="src\ANSICanvas.cpp" />
     <ClCompile Include="src\ANSIEntryPanel.cpp" />
     <ClCompile Include="src\ArchiveEntryList.cpp" />
@@ -208,6 +209,7 @@
     <ClCompile Include="src\BaseResourceArchivesPanel.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\ACSPrefsPanel.h" />
     <ClInclude Include="src\ANSICanvas.h" />
     <ClInclude Include="src\ANSIEntryPanel.h" />
     <ClInclude Include="src\ArchiveEntryList.h" />

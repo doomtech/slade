@@ -402,6 +402,9 @@
     <ClCompile Include="src\SFont.cpp">
       <Filter>Resources\Graphics\Font</Filter>
     </ClCompile>
+    <ClCompile Include="src\ACSPrefsPanel.cpp">
+      <Filter>Dialogs\Preferences</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -740,6 +743,9 @@
     </ClInclude>
     <ClInclude Include="src\ANSICanvas.h">
       <Filter>UI Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ACSPrefsPanel.h">
+      <Filter>Dialogs\Preferences</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

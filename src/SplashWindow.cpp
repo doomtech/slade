@@ -186,13 +186,23 @@ void SplashWindow::onPaint(wxPaintEvent& e) {
 		dc.DrawBitmap(bm_logo, 0, 0, true);
 
 	// Setup text
-	wxFont font(10, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, "Calibri");
+	wxFont font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, "Calibri");
 	dc.SetFont(font);
 
+	// Draw version
+	string vers = "v" + Global::version;
+	wxSize text_size = dc.GetTextExtent(vers);
+	wxCoord x = width - text_size.GetWidth() - 8;
+	wxCoord y = 188 - text_size.GetHeight();
+	dc.DrawText(vers, x, y);
+
 	// Draw message
-	wxSize text_size = dc.GetTextExtent(message);
-	wxCoord x = (width*0.5) - int((double)text_size.GetWidth() * 0.5);
-	wxCoord y = (height-4) - text_size.GetHeight();
+	font.SetPointSize(10);
+	font.SetWeight(wxFONTWEIGHT_BOLD);
+	dc.SetFont(font);
+	text_size = dc.GetTextExtent(message);
+	x = (width*0.5) - int((double)text_size.GetWidth() * 0.5);
+	y = (height-4) - text_size.GetHeight();
 	dc.DrawText(message, x, y);
 
 	// Draw progress bar if necessary
