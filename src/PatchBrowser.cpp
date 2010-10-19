@@ -82,9 +82,9 @@ bool PatchBrowser::openPatchTable(PatchTable* table) {
 
 			// If it's the base resource archive, put it under 'IWAD', otherwise 'Custom'
 			if (parent_archive == theArchiveManager->baseResourceArchive())
-				where = "IWAD";
+				where = "Base";
 			else
-				where = "Custom";
+				where = "Archive";
 		}
 
 		// Add it

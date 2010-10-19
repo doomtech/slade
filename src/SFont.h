@@ -26,6 +26,7 @@ private:
 	SFontChar*	characters[256];
 	GLTexture	texture;
 	int			line_height;
+	int			spacing;
 
 	// Global fonts
 	static SFont	font_vga;

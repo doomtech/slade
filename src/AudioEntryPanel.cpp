@@ -80,7 +80,7 @@ AudioEntryPanel::AudioEntryPanel(wxWindow* parent) : EntryPanel(parent, "audio")
 
 	// Add volume slider
 	sizer_gb->Add(new wxStaticText(this, -1, "Volume:"), wxGBPosition(1, 4), wxDefaultSpan, wxALIGN_CENTER_VERTICAL);
-	slider_volume = new wxSlider(this, -1, 0, 0, 100);
+	slider_volume = new wxSlider(this, -1, 0, 0, 100, wxDefaultPosition, wxSize(128, -1));
 	slider_volume->SetValue(snd_volume);
 	sizer_gb->Add(slider_volume, wxGBPosition(1, 5));
 
@@ -121,6 +121,9 @@ bool AudioEntryPanel::loadEntry(ArchiveEntry* entry) {
 	// Delete previous temp file
 	if (wxFileExists(prevfile))
 		wxRemoveFile(prevfile);
+
+	// Stop anything currently playing
+	stopStream();
 
 	// Get entry data
 	MemChunk& mcdata = entry->getMCData();

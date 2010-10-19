@@ -77,6 +77,7 @@ public:
 	bool	wavDSndConvert();
 	bool	dSndWavConvert();
 	bool	musMidiConvert();
+	bool	compileACS();
 
 	// Needed for some console commands
 	EntryPanel *			currentArea() { return cur_area;}

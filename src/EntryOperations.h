@@ -13,6 +13,7 @@ namespace EntryOperations {
 	bool	gettRNSChunk(ArchiveEntry* entry);
 	bool	addToPatchTable(vector<ArchiveEntry*> entries);
 	bool	createTexture(vector<ArchiveEntry*> entries);
+	bool	compileACS(ArchiveEntry* entry);
 };
 
 #endif//__ENTRYOPERATIONS_H__

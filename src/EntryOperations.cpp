@@ -34,6 +34,7 @@
 #include "Console.h"
 #include "ArchiveManager.h"
 #include "TextureXEditor.h"
+#include "EntryDataFormat.h"
 #include <wx/filename.h>
 #include <wx/utils.h>
 
@@ -41,6 +42,7 @@
 /*******************************************************************
  * VARIABLES
  *******************************************************************/
+CVAR(String, path_acc, "", CVAR_SAVE);
 
 // Define some png chunk structures
 struct ihdr_t {
@@ -744,6 +746,98 @@ bool EntryOperations::createTexture(vector<ArchiveEntry*> entries) {
 
 	// Write texture data back to texturex entry
 	tx.writeTEXTUREXData(texturex, ptable);
+
+	return true;
+}
+
+bool EntryOperations::compileACS(ArchiveEntry* entry) {
+	// Check entry was given
+	if (!entry)
+		return false;
+
+	// Check entry has a parent (this is useless otherwise)
+	if (!entry->getParent())
+		return false;
+
+	// Check entry is text
+	if (!EntryDataFormat::getFormat("text")->isThisFormat(entry->getMCData())) {
+		wxMessageBox("Error: Entry does not appear to be text", "Error", wxOK|wxCENTRE|wxICON_ERROR);
+		return false;
+	}
+
+	// Check if the ACC path is set up
+	string accpath = path_acc;
+	if (accpath.IsEmpty() || !wxFileExists(accpath)) {
+		wxMessageBox("Error: ACC path not defined, please configure in SLADE preferences", "Error", wxOK|wxCENTRE|wxICON_ERROR);
+		return false;
+	}
+
+	// Setup some path strings
+	wxFileName fn(accpath);
+	fn.SetFullName(entry->getName());
+	fn.SetExt("acs");
+	string srcfile = fn.GetFullPath();
+	fn.SetExt("o");
+	string ofile = fn.GetFullPath();
+
+	// Export script to file
+	entry->exportFile(srcfile);
+
+	// Execute acc
+	string command = path_acc + " \"" + srcfile + "\" \"" + ofile + "\"";
+	wxExecute(command, wxEXEC_SYNC);
+
+	// Delete source file
+	wxRemoveFile(srcfile);
+
+	// Check it compiled successfully
+	if (wxFileExists(ofile)) {
+		// Check if the script is a map script (BEHAVIOR)
+		if (s_cmpnocase(entry->getName(), "SCRIPTS")) {
+			// Get entry before SCRIPTS
+			ArchiveEntry* prev = entry->prevEntry();
+
+			// Create a new entry there if it isn't BEHAVIOR
+			if (!(s_cmpnocase(prev->getName(), "BEHAVIOR")))
+				prev = entry->getParent()->addNewEntry("BEHAVIOR", entry->getParent()->entryIndex(entry));
+
+			// Import compiled script
+			prev->importFile(ofile);
+		}
+		else {
+			// Otherwise, treat it as a library
+
+			// See if the compiled library already exists as an entry
+			Archive::search_options_t opt;
+			opt.match_namespace = "acs";
+			opt.match_name = entry->getName(true);
+			ArchiveEntry* lib = entry->getParent()->findLast(opt);
+
+			// If it doesn't exist, create it
+			if (!lib)
+				lib = entry->getParent()->addEntry(new ArchiveEntry(entry->getName(true) + ".o"), "acs");
+
+			// Import compiled script
+			lib->importFile(ofile);
+		}
+
+		// Delete compiled script file
+		wxRemoveFile(ofile);
+	}
+	else {
+		// Read acs.err to string
+		fn.SetFullName("acs.err");
+		wxFile file(fn.GetFullPath());
+		char* buf = new char[file.Length()];
+		file.Read(buf, file.Length());
+		string errors = wxString::From8BitData(buf, file.Length());
+		delete[] buf;
+
+		wxMessageDialog dlg(NULL, "Errors were encountered while compiling:", "Error", wxOK|wxCENTRE|wxICON_ERROR);
+		dlg.SetExtendedMessage(errors);
+		dlg.ShowModal();
+		return false;
+	}
 
 	return true;
 }

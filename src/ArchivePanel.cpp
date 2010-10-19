@@ -76,6 +76,7 @@ const int MENU_VIEW_HEX = 10007;
 const int MENU_CONV_WAV_DSND = 10008;
 const int MENU_CONV_DSND_WAV = 10009;
 const int MENU_CONV_MUS_MIDI = 10010;
+const int MENU_SCRIPT_COMPILE_ACS = 10011;
 const int MENU_TEMP_END = 10100;
 
 
@@ -339,12 +340,6 @@ bool ArchivePanel::newDirectory() {
 
 	// Add the directory to the archive
 	ArchiveTreeNode* dir = archive->createDir(name, entry_list->getCurrentDir());
-
-	// Show path controls (if they aren't already)
-	if (!GetSizer()->IsShown(sizer_path_controls)) {
-		sizer_path_controls->Show(true);
-		Layout();
-	}
 
 	// Return whether the directory was created ok
 	return !!dir;
@@ -1017,6 +1012,19 @@ bool ArchivePanel::musMidiConvert() {
 	return true;
 }
 
+bool ArchivePanel::compileACS() {
+	// Get selected entries
+	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
+
+	// Go through selection
+	for (unsigned a = 0; a < selection.size(); a++) {
+		// Compile ACS script
+		EntryOperations::compileACS(selection[a]);
+	}
+
+	return true;
+}
+
 
 /* ArchivePanel::openEntry
  * Shows the appropriate entry area and sends the given entry to it.
@@ -1304,6 +1312,8 @@ void ArchivePanel::handleAction(int menu_id) {
 		wavDSndConvert();
 	else if (menu_id == MENU_CONV_MUS_MIDI)
 		musMidiConvert();
+	else if (menu_id == MENU_SCRIPT_COMPILE_ACS)
+		compileACS();
 }
 
 /* ArchivePanel::onAnnouncement
@@ -1319,6 +1329,15 @@ void ArchivePanel::onAnnouncement(Announcer* announcer, string event_name, MemCh
 		// Update this tab's name in the parent notebook (if filename was changed)
 		wxAuiNotebook* parent = (wxAuiNotebook*)GetParent();
 		parent->SetPageText(parent->GetPageIndex(this), archive->getFilename(false));
+	}
+
+	// If a directory was added
+	if (announcer == archive && event_name == "directory_added") {
+		// Show path controls (if they aren't already)
+		if (!GetSizer()->IsShown(sizer_path_controls)) {
+			sizer_path_controls->Show(true);
+			Layout();
+		}
 	}
 }
 
@@ -1401,11 +1420,14 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
 
 	// Check what types exist in the selection
+	// TODO: This stuff is absolutely terrible, nicer system needed
 	bool gfx_selected = false;
 	bool bas_selected = false;
 	bool wav_selected = false;
 	bool dsnd_selected = false;
 	bool mus_selected = false;
+	bool text_selected = false;
+	bool unknown_selected = false;
 //	bool rle_selected = false;
 	for (size_t a = 0; a < selection.size(); a++) {
 		// Check for gfx entry
@@ -1432,6 +1454,14 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 		if (!mus_selected) {
 			if (selection[a]->getType()->getFormat() == "mus")
 				mus_selected = true;
+		}
+		if (!text_selected) {
+			if (selection[a]->getType()->getFormat() == "text")
+				text_selected = true;
+		}
+		if (!unknown_selected) {
+			if (selection[a]->getType() == EntryType::unknownType())
+				unknown_selected = true;
 		}
 #if 0
 		if (!rle_selected) {
@@ -1470,6 +1500,13 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 			audio->Append(MENU_CONV_DSND_WAV, "Convert sounds to WAV");
 		if (mus_selected)
 			audio->Append(MENU_CONV_MUS_MIDI, "Convert MUS to MIDI");
+	}
+
+	// Add script related menu items if needed
+	if (text_selected || unknown_selected) {
+		wxMenu* scripts = new wxMenu();
+		context->AppendSubMenu(scripts, "Scripts");
+		scripts->Append(MENU_SCRIPT_COMPILE_ACS, "Compile ACS");
 	}
 
 	// Popup the context menu

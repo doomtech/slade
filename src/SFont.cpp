@@ -120,7 +120,10 @@ bool SFont::loadFontM(MemChunk& mc) {
 	// Determine character size
 	unsigned charwidth = 8;
 	unsigned charheight = mc.getSize() >> 8;
+
+	// Setup font properties
 	line_height = charheight + 1;
+	spacing = 1;
 
 	// Setup image
 	image.resize(width, height);
@@ -219,9 +222,9 @@ void SFont::drawString(string str, rgba_t colour, uint8_t align) {
 
 		// Increment total width
 		if (ch)
-			total_width += ch->width + 1;
+			total_width += ch->width + spacing;
 		else
-			total_width++;
+			total_width += spacing;
 	}
 
 	// Translate for alignment
@@ -237,7 +240,7 @@ void SFont::drawString(string str, rgba_t colour, uint8_t align) {
 		// Get character
 		SFontChar* ch = characters[chr(str)[a]];
 		if (!ch) {
-			xoff++;
+			xoff += spacing;
 			continue;
 		}
 
@@ -253,7 +256,7 @@ void SFont::drawString(string str, rgba_t colour, uint8_t align) {
 		glEnd();
 
 		// Increment x to next character (1 pixel spacing)
-		xoff += ch->width + 1;
+		xoff += ch->width + spacing;
 	}
 
 	glPopMatrix();

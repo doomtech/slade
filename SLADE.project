@@ -27,6 +27,8 @@
       <File Name="src/GeneralPrefsPanel.cpp"/>
       <File Name="src/EditingPrefsPanel.h"/>
       <File Name="src/EditingPrefsPanel.cpp"/>
+      <File Name="src/ACSPrefsPanel.h"/>
+      <File Name="src/ACSPrefsPanel.cpp"/>
     </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="General">

@@ -175,7 +175,7 @@ void WadArchive::updateNamespaces() {
 
 	// ROTT stuff. The first lump in the archive is always WALLSTRT, the last lump is either
 	// LICENSE (darkwar.wad) or VENDOR (huntbgin.wad), with TABLES just before in both cases.
-	if (getRoot()->getEntry(0)->getName().Matches("WALLSTRT") && 
+	if (getRoot()->getEntry(0)->getName().Matches("WALLSTRT") &&
 		getRoot()->getEntry(numEntries()-2)->getName().Matches("TABLES")) {
 			wad_ns_pair_t ns(getRoot()->getEntry(0), getRoot()->getEntry(numEntries()-1));
 			ns.name = "rott";
@@ -841,13 +841,19 @@ ArchiveEntry* WadArchive::findFirst(search_options_t& options) {
 	// Check for namespace to search
 	if (!options.match_namespace.IsEmpty()) {
 		// Find matching namespace
+		bool ns_found = false;
 		for (unsigned a = 0; a < namespaces.size(); a++) {
 			if (namespaces[a].name == options.match_namespace) {
 				start = namespaces[a].start->nextEntry();
 				end = namespaces[a].end;
+				ns_found = true;
 				break;
 			}
 		}
+
+		// Return none if namespace not found
+		if (!ns_found)
+			return NULL;
 	}
 
 	// Begin search
@@ -899,13 +905,19 @@ ArchiveEntry* WadArchive::findLast(search_options_t& options) {
 	// Check for namespace to search
 	if (!options.match_namespace.IsEmpty()) {
 		// Find matching namespace
+		bool ns_found = false;
 		for (unsigned a = 0; a < namespaces.size(); a++) {
 			if (namespaces[a].name == options.match_namespace) {
 				start = namespaces[a].end->prevEntry();
 				end = namespaces[a].start;
+				ns_found = true;
 				break;
 			}
 		}
+
+		// Return none if namespace not found
+		if (!ns_found)
+			return NULL;
 	}
 
 	// Begin search
@@ -957,13 +969,19 @@ vector<ArchiveEntry*> WadArchive::findAll(search_options_t& options) {
 	// Check for namespace to search
 	if (!options.match_namespace.IsEmpty()) {
 		// Find matching namespace
+		bool ns_found = false;
 		for (unsigned a = 0; a < namespaces.size(); a++) {
 			if (namespaces[a].name == options.match_namespace) {
 				start = namespaces[a].start->nextEntry();
 				end = namespaces[a].end;
+				ns_found = true;
 				break;
 			}
 		}
+
+		// Return none if namespace not found
+		if (!ns_found)
+			return ret;
 	}
 
 	ArchiveEntry* entry = start;

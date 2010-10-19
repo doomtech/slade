@@ -111,7 +111,7 @@ BrowserWindow::BrowserWindow(wxWindow* parent) : wxDialog(parent, -1, "Browser",
 	text_filter->Bind(wxEVT_COMMAND_TEXT_UPDATED, &BrowserWindow::onTextFilterChanged, this);
 
 	Layout();
-	SetInitialSize(wxSize(600, 400));
+	SetInitialSize(wxSize(610, 400));
 	CenterOnScreen();
 }
 
@@ -220,6 +220,12 @@ void BrowserWindow::populateItemTree() {
 
 	// Add tree
 	addItemTree(items_root, item);
+
+	// Update window layout
+	tree_items->ExpandAll();
+	tree_items->SetInitialSize(wxDefaultSize);
+	Layout();
+	tree_items->CollapseAll();
 }
 
 void BrowserWindow::addItemTree(BrowserTreeNode* node, wxTreeItemId& item) {

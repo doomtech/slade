@@ -7,6 +7,7 @@
 #include "TextStylePrefsPanel.h"
 #include "GeneralPrefsPanel.h"
 #include "EditingPrefsPanel.h"
+#include "ACSPrefsPanel.h"
 #include <wx/treebook.h>
 
 class PreferencesDialog : public wxDialog {
@@ -17,6 +18,7 @@ private:
 	EditingPrefsPanel*		panel_editing;
 	TextEditorPrefsPanel*	panel_text_editor;
 	TextStylePrefsPanel*	panel_text_styles;
+	ACSPrefsPanel*			panel_script_acs;
 
 	// Base Resource Archive
 	BaseResourceArchivesPanel*	panel_bra;

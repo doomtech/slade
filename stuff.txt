@@ -8,10 +8,12 @@
 TODO List ---------------------------------------------------------------
 
 --- Before Final 3.0 Release ---
-- ACS script compilation
+- Fix bugs, etc
+- Clean up sources
 
 --- Bugs ---
 - Copy/paste entry parent problem
+- 'View as Hex' doesn't work for zero-sized entries
 
 --- Minor Problems/Annoyances ---
 - Long calltips can extend off the edge of the screen
@@ -43,7 +45,7 @@ TODO List ---------------------------------------------------------------
 		  pattern = 10, 255, 255, 255, 0; = look for 255,255,255,0 at offset 10 in file
 		- Call inbuilt tests for more complex detection algorithms (wad files, doom gfx, etc)
 - General optimisation:
-	- Entry type detection
+	- Entry type detection (maybe move the initial detection to a background thread)
 	- Gfx conversion (not sure if it can be optimised so much, but at least should show a progress bar)
 - Rearrange menus
 - *Resources system:
@@ -52,6 +54,9 @@ TODO List ---------------------------------------------------------------
 	- archive list on archive manager panel could have 'resource' checkboxes for each list item
 - Undo/Redo system
 	- Should be general enough to be used by the map editor also
+- Improved menu/toolbar system
+	- Some kind of dynamic menu/toolbar system, perhaps try to emulate Qt's 'Action' system
+	- Complete icon set
 
 --- Internal / Dev ---
 - SFont class
