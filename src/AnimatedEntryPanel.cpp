@@ -41,7 +41,7 @@
  * ANIMATEDENTRYPANEL CLASS FUNCTIONS
  *******************************************************************/
 
-/* AnimatedEntryPanel::TextureXEntryPanel
+/* AnimatedEntryPanel::AnimatedEntryPanel
  * AnimatedEntryPanel class constructor
  *******************************************************************/
 AnimatedEntryPanel::AnimatedEntryPanel(wxWindow* parent)

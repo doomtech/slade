@@ -85,7 +85,7 @@ void MainWindow::setupLayout() {
 
 
 	// -- Editor Area --
-	notebook_tabs = new wxAuiNotebook(this, -1, wxDefaultPosition, wxDefaultSize, wxAUI_NB_DEFAULT_STYLE|wxNO_BORDER|wxAUI_NB_WINDOWLIST_BUTTON);
+	notebook_tabs = new wxAuiNotebook(this, -1, wxDefaultPosition, wxDefaultSize, wxAUI_NB_DEFAULT_STYLE|wxNO_BORDER|wxAUI_NB_WINDOWLIST_BUTTON|wxNB_FLAT);
 
 	// Setup panel info & add panel
 	p_inf.CenterPane();
@@ -113,6 +113,7 @@ void MainWindow::setupLayout() {
 	p_inf.Float();
 	p_inf.FloatingSize(600, 400);
 	p_inf.FloatingPosition(100, 100);
+	p_inf.MinSize(-1, 192);
 	p_inf.Show(false);
 	p_inf.Caption("Console");
 	p_inf.Name("console");
@@ -457,6 +458,7 @@ void MainWindow::onMenuItemClicked(wxCommandEvent& e) {
 		wxAuiManager *m_mgr = wxAuiManager::GetManager(panel_archivemanager);
 		wxAuiPaneInfo& p_inf = m_mgr->GetPane("console");
 		p_inf.Show(!p_inf.IsShown());
+		p_inf.MinSize(200, 128);
 		m_mgr->Update();
 	}
 

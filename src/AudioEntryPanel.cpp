@@ -1,4 +1,33 @@
 
+/*******************************************************************
+ * SLADE - It's a Doom Editor
+ * Copyright (C) 2008 Simon Judd
+ *
+ * Email:       veilofsorrow@gmail.com
+ * Web:         http://slade.mancubus.net
+ * Filename:    AudioEntryPanel.cpp
+ * Description: AudioEntryPanel class. The UI for previewing supported
+ *              audio entries
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *******************************************************************/
+
+
+/*******************************************************************
+ * INCLUDES
+ *******************************************************************/
 #include "Main.h"
 #include "WxStuff.h"
 #include "AudioEntryPanel.h"
@@ -9,10 +38,21 @@
 #include <wx/gbsizer.h>
 #include <wx/statline.h>
 
-CVAR(Int, snd_volume, 100, CVAR_SAVE)
 
+/*******************************************************************
+ * VARIABLES
+ *******************************************************************/
+CVAR(Int, snd_volume, 100, CVAR_SAVE)
 AudioDevicePtr AudioEntryPanel::device = NULL;
 
+
+/*******************************************************************
+ * AUDIOENTRYPANEL CLASS FUNCTIONS
+ *******************************************************************/
+
+/* AudioEntryPanel::AudioEntryPanel
+ * AudioEntryPanel class constructor
+ *******************************************************************/
 AudioEntryPanel::AudioEntryPanel(wxWindow* parent) : EntryPanel(parent, "audio") {
 	// Init variables
 	timer_seek = new wxTimer(this);
@@ -65,11 +105,18 @@ AudioEntryPanel::AudioEntryPanel(wxWindow* parent) : EntryPanel(parent, "audio")
 	Layout();
 }
 
+/* AudioEntryPanel::~AudioEntryPanel
+ * AudioEntryPanel class constructor
+ *******************************************************************/
 AudioEntryPanel::~AudioEntryPanel() {
 	// Stop the timer to avoid crashes
 	timer_seek->Stop();
 }
 
+
+/* AudioEntryPanel::loadEntry
+ * Loads an entry into the audio entry panel
+ *******************************************************************/
 bool AudioEntryPanel::loadEntry(ArchiveEntry* entry) {
 	// Delete previous temp file
 	if (wxFileExists(prevfile))
@@ -135,10 +182,16 @@ bool AudioEntryPanel::loadEntry(ArchiveEntry* entry) {
 	return true;
 }
 
+/* AudioEntryPanel::saveEntry
+ * Saves any changes to the entry (does nothing here)
+ *******************************************************************/
 bool AudioEntryPanel::saveEntry() {
 	return true;
 }
 
+/* AudioEntryPanel::openAudio
+ * Opens an audio file for playback
+ *******************************************************************/
 bool AudioEntryPanel::openAudio(string filename) {
 	stream = OpenSound(device, chr(filename), true);
 	if (stream) {
@@ -171,7 +224,13 @@ bool AudioEntryPanel::openAudio(string filename) {
 	}
 }
 
+/* AudioEntryPanel::openMidi
+ * Opens a MIDI file for playback
+ *******************************************************************/
 bool AudioEntryPanel::openMidi(string filename) {
+	// Disable volume control
+	slider_volume->Enable(false);
+
 	// Attempt to open midi
 	if (theMIDIPlayer->openFile(filename)) {
 		// Enable play controls
@@ -199,6 +258,9 @@ bool AudioEntryPanel::openMidi(string filename) {
 	}
 }
 
+/* AudioEntryPanel::startStream
+ * Begins playback of the current audio or MIDI stream
+ *******************************************************************/
 void AudioEntryPanel::startStream() {
 	if (midi)
 		theMIDIPlayer->play();
@@ -206,6 +268,9 @@ void AudioEntryPanel::startStream() {
 		stream->play();
 }
 
+/* AudioEntryPanel::stopStream
+ * Stops playback of the current audio or MIDI stream
+ *******************************************************************/
 void AudioEntryPanel::stopStream() {
 	if (midi)
 		theMIDIPlayer->pause();
@@ -213,6 +278,9 @@ void AudioEntryPanel::stopStream() {
 		stream->stop();
 }
 
+/* AudioEntryPanel::resetStream
+ * Resets the current audio or MIDI stream to the beginning
+ *******************************************************************/
 void AudioEntryPanel::resetStream() {
 	if (midi)
 		theMIDIPlayer->stop();
@@ -221,17 +289,30 @@ void AudioEntryPanel::resetStream() {
 }
 
 
+/*******************************************************************
+ * AUDIOENTRYPANEL CLASS EVENTS
+ *******************************************************************/
+
+/* AudioEntryPanel::onBtnPlay
+ * Called when the play button is pressed
+ *******************************************************************/
 void AudioEntryPanel::onBtnPlay(wxCommandEvent& e) {
 	startStream();
 	timer_seek->Start(10);
 }
 
+/* AudioEntryPanel::onBtnPause
+ * Called when the pause button is pressed
+ *******************************************************************/
 void AudioEntryPanel::onBtnPause(wxCommandEvent& e) {
 	// Stop playing (no reset)
 	stopStream();
 	timer_seek->Stop();
 }
 
+/* AudioEntryPanel::onBtnStop
+ * Called when the stop button is pressed
+ *******************************************************************/
 void AudioEntryPanel::onBtnStop(wxCommandEvent& e) {
 	// Stop playing
 	stopStream();
@@ -242,6 +323,9 @@ void AudioEntryPanel::onBtnStop(wxCommandEvent& e) {
 	slider_seek->SetValue(0);
 }
 
+/* AudioEntryPanel::onTimer
+ * Called when the playback timer ticks
+ *******************************************************************/
 void AudioEntryPanel::onTimer(wxTimerEvent& e) {
 	// Get current playback position
 	int pos = 0;
@@ -258,6 +342,9 @@ void AudioEntryPanel::onTimer(wxTimerEvent& e) {
 		timer_seek->Stop();
 }
 
+/* AudioEntryPanel::onSliderSeekChanged
+ * Called when the seek slider position is changed
+ *******************************************************************/
 void AudioEntryPanel::onSliderSeekChanged(wxCommandEvent& e) {
 	if (midi)
 		theMIDIPlayer->setPosition(slider_seek->GetValue());
@@ -265,6 +352,9 @@ void AudioEntryPanel::onSliderSeekChanged(wxCommandEvent& e) {
 		stream->setPosition(slider_seek->GetValue());
 }
 
+/* AudioEntryPanel::onSliderVolumeChanged
+ * Called when the volume slider position is changed
+ *******************************************************************/
 void AudioEntryPanel::onSliderVolumeChanged(wxCommandEvent& e) {
 	snd_volume = slider_volume->GetValue();
 	if (stream)

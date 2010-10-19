@@ -14,7 +14,6 @@ TODO List ---------------------------------------------------------------
 - Copy/paste entry parent problem
 
 --- Minor Problems/Annoyances ---
-- Console (docked) height is not remembered when hidden then shown again
 - Long calltips can extend off the edge of the screen
 
 --- Editor Features ---
