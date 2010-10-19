@@ -24,7 +24,9 @@ private:
 								// bool "patch": Can be used as a TEXTUREx patch
 
 	// Type matching criteria
-	string			format;				// To be of this type, the entry data must match the specified format
+	string			format;				// To be of this type, the entry data must match the specified format*
+	bool			matchextorname;		// If true, the type fits if it matches the name OR the extension,
+										// rather than having to match both. Many definition lumps need this.
 	vector<string>	match_extension;
 	vector<string>	match_name;
 	vector<int>		match_size;

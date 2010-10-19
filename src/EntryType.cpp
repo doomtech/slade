@@ -206,6 +206,13 @@ int EntryType::isThisType(ArchiveEntry* entry) {
 			return EDF_FALSE;
 	}
 
+	// If both names and extensions are defined, and the type only needs one
+	// of the two, not both, take it into account.
+	bool extorname = false;
+	bool matchedname = false;
+	if (matchextorname && match_name.size() > 0 && match_extension.size() > 0)
+		extorname = true;
+
 	// Check for name match if needed
 	if (match_name.size() > 0) {
 		string name = fn.GetName().Lower();
@@ -217,8 +224,9 @@ int EntryType::isThisType(ArchiveEntry* entry) {
 			}
 		}
 
-		if (!match)
+		if (!match && !extorname)
 			return EDF_FALSE;
+		else matchedname = match;
 	}
 
 	// Check for extension match if needed
@@ -231,7 +239,7 @@ int EntryType::isThisType(ArchiveEntry* entry) {
 			}
 		}
 
-		if (!match)
+		if (!match && !(extorname && matchedname))
 			return EDF_FALSE;
 	}
 
@@ -352,6 +360,9 @@ bool EntryType::readEntryTypeDefinition(MemChunk& mc) {
 			else if (s_cmpnocase(fieldnode->getName(), "match_name")) {		// Match Name field
 				for (unsigned v = 0; v < fieldnode->nValues(); v++)
 					ntype->match_name.push_back(fieldnode->getStringValue(v));
+			}
+			else if (s_cmpnocase(fieldnode->getName(), "match_extorname")) {// Match name or extension
+					ntype->matchextorname = fieldnode->getBoolValue();
 			}
 			else if (s_cmpnocase(fieldnode->getName(), "size")) {			// Size field
 				for (unsigned v = 0; v < fieldnode->nValues(); v++)

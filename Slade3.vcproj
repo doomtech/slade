@@ -210,6 +210,14 @@
 				Name="Preferences"
 				>
 				<File
+					RelativePath=".\src\ACSPrefsPanel.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ACSPrefsPanel.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\BaseResourceArchivesPanel.cpp"
 					>
 				</File>
