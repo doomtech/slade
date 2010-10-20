@@ -100,7 +100,8 @@ void HexTable::SetValue(int row, int col, const string& value) {
  * Loads in data from [mc]. Returns true on success, false otherwise
  *******************************************************************/
 bool HexTable::loadData(MemChunk& mc) {
-	return data.importMem(mc.getData(), mc.getSize());
+	data.importMem(mc.getData(), mc.getSize());
+	return true;
 }
 
 /* HexTable::getOffset

@@ -240,17 +240,27 @@ void PatchTable::updatePatchEntry(unsigned index) {
 	ArchiveEntry* entry = NULL;
 	Archive::search_options_t options;
 	options.match_name = name;
-	options.match_namespace = "patches";
-	if (parent)
-		entry = parent->findFirst(options);								// Search parent archive first
-	if (!entry)
-		entry = theArchiveManager->findResourceEntry(options, parent);	// Next search open resource archives + base resource archive
-	if (!entry) {
-		options.match_namespace = "global";								// Still not found, search global namespace
+
+	// First, search parent archive (patches namespace > global namespace)
+	if (parent) {
+		options.match_namespace = "patches";
 		entry = parent->findFirst(options);
+
+		if (!entry) {
+			options.match_namespace = "";
+			entry = parent->findFirst(options);
+		}
 	}
-	if (!entry)
+
+	// Next, search open resource archives + base resource archive
+	if (!entry) {
+		options.match_namespace = "patches";
 		entry = theArchiveManager->findResourceEntry(options, parent);
+	}
+	if (!entry) {
+		options.match_namespace = "";
+		entry = theArchiveManager->findResourceEntry(options, parent);
+	}
 
 	// Set patch entry
 	patch(index).entry = entry;

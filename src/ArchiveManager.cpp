@@ -374,7 +374,8 @@ bool ArchiveManager::closeArchive(int index) {
 
 	// Announce archive closing
 	MemChunk mc;
-	mc.write(&index, sizeof(int));
+	int32_t temp = index;
+	mc.write(&temp, 4);
 	announce("archive_closing", mc);
 
 	// Delete any bookmarked entries contained in the archive

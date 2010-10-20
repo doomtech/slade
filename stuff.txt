@@ -10,10 +10,10 @@ TODO List ---------------------------------------------------------------
 --- Before Final 3.0 Release ---
 - Fix bugs, etc
 - Clean up sources
+- Remove test console commands
 
 --- Bugs ---
 - Copy/paste entry parent problem
-- 'View as Hex' doesn't work for zero-sized entries
 - Temp files for QMUS2MIDI don't work wirh non-ASCII paths
 
 --- Minor Problems/Annoyances ---
@@ -60,6 +60,7 @@ TODO List ---------------------------------------------------------------
 - Improved menu/toolbar system
 	- Some kind of dynamic menu/toolbar system, perhaps try to emulate Qt's 'Action' system
 	- Complete icon set
+- Different icon sets (eg. one that has different entry type icons colour-coded)
 
 --- Internal / Dev ---
 - SFont class
@@ -84,6 +85,9 @@ Unimplemented Feature Requests ------------------------------------------
 --- General / User Interface ---
 - Ability to toggle toolbars, access all toolbar functions from menus
 - Fully customisable toolbars
+- Sorting by column (I.E. Name or Type)
+- Duplicate entry name checking
+- Confirm dialog for entry deletion
 
 --- Archive / Entry Management ---
 - mass export to format (XWE)

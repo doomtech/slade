@@ -532,8 +532,6 @@ void MainWindow::onHTMLLinkClicked(wxHtmlLinkEvent &e) {
 void MainWindow::onClose(wxCloseEvent& e) {
 	if (!exitProgram())
 		e.Veto();
-	else
-		e.Skip();
 }
 
 /* MainWindow::onTabChanged
