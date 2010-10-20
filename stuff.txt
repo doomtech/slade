@@ -14,14 +14,17 @@ TODO List ---------------------------------------------------------------
 --- Bugs ---
 - Copy/paste entry parent problem
 - 'View as Hex' doesn't work for zero-sized entries
+- Temp files for QMUS2MIDI don't work wirh non-ASCII paths
 
 --- Minor Problems/Annoyances ---
 - Long calltips can extend off the edge of the screen
+- Jumping to an entry by typing the first few letters of its name in the entry list does not work if there are too many entries; instead it always jumps to the first entry of the list. It does work, though, when there are but a handful of entries.
+- Relatedly, the currently selected entry is deselected if the filter is changed, even if it is still displayed.
 
 --- Editor Features ---
 - Map editor (!)
 - Generic entry data view (for VERTEXES, LINEDEFS, SIDEDEFS, SECTORS, THINGS, DEMO*, TEXTUREX/PNAMES, ...)
-- ANSI screen viewer (/editor)
+- ANSI screen editor
 - Proper font viewer
 - 'Cleanup' stuff (unused patches, textures, flats, unneeded entries...)
 - Compilation of other language scripts
