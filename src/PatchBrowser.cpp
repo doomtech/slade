@@ -76,7 +76,7 @@ bool PatchBrowser::openPatchTable(PatchTable* table) {
 		string where = "Unknown";
 
 		// Check it's parent archive
-		table->updatePatchEntry(a);
+		//table->updatePatchEntry(a);
 		if (patch.entry) {
 			Archive* parent_archive = patch.entry->getParent();
 

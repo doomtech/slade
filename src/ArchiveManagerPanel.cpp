@@ -602,7 +602,7 @@ void ArchiveManagerPanel::openFile(string filename) {
 	Archive* new_archive = theArchiveManager->openArchive(filename);
 
 	sw.Pause();
-	wxLogMessage("Opening took %d ms", sw.Time());
+	wxLogMessage("Opening took %d ms", (int)sw.Time());
 
 	// Hide splash screen
 	theSplashWindow->hide();

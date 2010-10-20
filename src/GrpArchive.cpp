@@ -439,7 +439,7 @@ bool GrpArchive::isGrpArchive(MemChunk& mc) {
 	ken_magic[12] = 0;
 
 	// Check the header
-	if (!(s_cmp(wxString::FromAscii(ken_magic), "KenSilverman")))
+	if (!(s_cmp(wxString::From8BitData(ken_magic), "KenSilverman")))
 		return false;
 
 	// Compute total size
@@ -488,7 +488,7 @@ bool GrpArchive::isGrpArchive(string filename) {
 	ken_magic[12] = 0;
 
 	// Check the header
-	if (!(s_cmp(wxString::FromAscii(ken_magic), "KenSilverman")))
+	if (!(s_cmp(wxString::From8BitData(ken_magic), "KenSilverman")))
 		return false;
 
 	// Compute total size
@@ -561,7 +561,7 @@ CONSOLE_COMMAND(lookupdat, 0) {
 	mc.read(data, 768); nentry->importMem(data, 768);
 	nentry = entry->getParent()->addNewEntry("ENDINPAL.PAL", index+5); if (!nentry) return;
 	mc.read(data, 768); nentry->importMem(data, 768);
-	
+
 	// Clean up and go away
 	delete[] data;
 	mc.clear();

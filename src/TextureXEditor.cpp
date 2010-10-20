@@ -34,6 +34,7 @@
 #include "TextureXEditor.h"
 #include "ArchiveManager.h"
 #include "Console.h"
+#include "SplashWindow.h"
 #include <wx/dialog.h>
 #include <wx/radiobut.h>
 
@@ -274,6 +275,16 @@ bool TextureXEditor::openArchive(Archive* archive) {
 
 	// Set global palette
 	thePaletteChooser->setGlobalFromArchive(archive);
+
+	// Find patch entries (this really needs to be faster)
+	theSplashWindow->show("Opening Texture List...", true);
+	theSplashWindow->setProgressMessage("Searching for patches");
+	float np = (float)patch_table.nPatches();
+	for (unsigned a = 0; a < patch_table.nPatches(); a++) {
+		theSplashWindow->setProgress((float)a / np);
+		patch_table.updatePatchEntry(a);
+	}
+	theSplashWindow->hide();
 
 	// Setup patch browser
 	patch_browser->openPatchTable(&patch_table);
