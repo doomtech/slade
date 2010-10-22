@@ -1054,7 +1054,7 @@ void ArchiveManagerPanel::handleAction(int menu_id) {
 	else {
 		// Check if the current tab is an archive tab
 		wxWindow* tab = notebook_archives->GetPage(notebook_archives->GetSelection());
-		if (tab->GetName() == "archive")
+		if (tab && tab->GetName() == "archive")
 			((ArchivePanel*)tab)->handleAction(menu_id);	// Send action to current ArchivePanel
 	}
 }
