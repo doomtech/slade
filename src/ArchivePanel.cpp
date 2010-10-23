@@ -568,11 +568,12 @@ bool ArchivePanel::moveUp() {
 
 		// Swap them in the archive
 		archive->swapEntries(entry, above);
-
-		// Swap the selection
-		entry_list->selectItem(selection[a], false);
-		entry_list->selectItem(selection[a] - 1, true);
 	}
+
+	// Update selection
+	entry_list->clearSelection();
+	for (unsigned a = 0; a < selection.size(); a++)
+		entry_list->selectItem(selection[a] - 1);
 
 	// Return success
 	return true;
@@ -602,11 +603,12 @@ bool ArchivePanel::moveDown() {
 
 		// Swap them in the archive
 		archive->swapEntries(entry, below);
-
-		// Swap the selection
-		entry_list->selectItem(selection[a], false);
-		entry_list->selectItem(selection[a] + 1, true);
 	}
+
+	// Update selection
+	entry_list->clearSelection();
+	for (unsigned a = 0; a < selection.size(); a++)
+		entry_list->selectItem(selection[a] + 1);
 
 	// Return success
 	return true;

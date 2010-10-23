@@ -600,6 +600,9 @@ bool Archive::paste(ArchiveTreeNode* tree, unsigned position, ArchiveTreeNode* b
 	if (!base)
 		base = getRoot();
 
+	// Set modified
+	setModified(true);
+
 	// Just do a merge
 	return base->merge(tree, position);
 }
@@ -880,6 +883,9 @@ bool Archive::swapEntries(ArchiveEntry* entry1, ArchiveEntry* entry2) {
 	mc.write(&ptr2, sizeof(wxUIntPtr));
 	announce("entries_swapped", mc);
 
+	// Set modified
+	setModified(true);
+
 	// Return success
 	return true;
 }
@@ -918,6 +924,9 @@ bool Archive::moveEntry(ArchiveEntry* entry, unsigned position, ArchiveTreeNode*
 
 	// Add it to the destination dir
 	addEntry(entry, position, dir);
+
+	// Set modified
+	setModified(true);
 
 	// Return success
 	return true;
@@ -1197,6 +1206,9 @@ bool TreelessArchive::paste(ArchiveTreeNode* tree, unsigned position, ArchiveTre
 		ArchiveTreeNode* dir = (ArchiveTreeNode*)tree->getChild(a);
 		paste(dir, position);
 	}
+
+	// Set modified
+	setModified(true);
 
 	return true;
 }
