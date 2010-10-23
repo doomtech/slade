@@ -7,7 +7,7 @@
 #include "Misc.h"
 #include "ListenerAnnouncer.h"
 
-class PaletteChooser : public wxChoice {
+class PaletteChooser : public wxChoice, public Announcer {
 private:
 	Palette8bit	pal_global;
 
@@ -18,8 +18,8 @@ public:
 	void			setGlobalFromArchive(Archive* archive, int lump = PAL_NOHACK);
 	Palette8bit*	getSelectedPalette(ArchiveEntry* entry = NULL);
 	bool			globalSelected();
+	void			selectPalette(string name);
 	void			onPaletteChanged(wxCommandEvent& e);
-	Announcer*		paletteAnnouncer;
 };
 
 #endif//__PALETTECHOOSER_H__

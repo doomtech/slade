@@ -258,7 +258,7 @@ PatchTablePanel::PatchTablePanel(wxWindow* parent, PatchTable* patch_table) : wx
 	list_patches->Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &PatchTablePanel::onDisplayChanged, this);
 
 	// Palette chooser
-	listenTo(thePaletteAnnouncer);
+	listenTo(theMainWindow->getPaletteChooser());
 }
 
 /* PatchTablePanel::~PatchTablePanel
@@ -428,8 +428,8 @@ void PatchTablePanel::updateDisplay() {
 	// Load the image
 	ArchiveEntry * entry = patch_table->patchEntry(list_patches->getLastSelected());
 	if (Misc::loadImageFromEntry(patch_canvas->getImage(), entry)) {
-		thePaletteChooser->setGlobalFromArchive(entry->getParent());
-		patch_canvas->setPalette(thePaletteChooser->getSelectedPalette());
+		theMainWindow->getPaletteChooser()->setGlobalFromArchive(entry->getParent());
+		patch_canvas->setPalette(theMainWindow->getPaletteChooser()->getSelectedPalette());
 		label_dimensions->SetLabel(s_fmt("Size: %d x %d", patch_canvas->getImage()->getWidth(), patch_canvas->getImage()->getHeight()));
 	}
 	else {
@@ -498,7 +498,7 @@ void PatchTablePanel::onDisplayChanged(wxCommandEvent& e) {
  * Handles any announcements
  *******************************************************************/
 void PatchTablePanel::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
-	if (announcer != thePaletteAnnouncer)
+	if (announcer != theMainWindow->getPaletteChooser())
 		return;
 
 	if (event_name == "main_palette_changed") {

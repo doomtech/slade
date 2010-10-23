@@ -55,7 +55,7 @@ rgba_t col_edge_line(200, 200, 230, 255);
 /* FindReplaceDialog::FindReplaceDialog
  * FindReplaceDialog class constructor
  *******************************************************************/
-FindReplaceDialog::FindReplaceDialog(wxWindow* parent) : wxMiniFrame(parent, -1, "Find + Replace", wxDefaultPosition, wxDefaultSize, wxCAPTION|wxCLOSE_BOX) {
+FindReplaceDialog::FindReplaceDialog(wxWindow* parent) : wxMiniFrame(parent, -1, "Find + Replace", wxDefaultPosition, wxDefaultSize, wxCAPTION|wxCLOSE_BOX|wxFRAME_FLOAT_ON_PARENT) {
 	// Create backing panel
 	wxPanel* panel = new wxPanel(this, -1);
 	wxBoxSizer* fsizer = new wxBoxSizer(wxVERTICAL);
@@ -111,6 +111,10 @@ FindReplaceDialog::FindReplaceDialog(wxWindow* parent) : wxMiniFrame(parent, -1,
 	hbox->Add(btn_replace_all, 0, wxEXPAND);
 
 
+	// Bind events
+	Bind(wxEVT_CLOSE_WINDOW, &FindReplaceDialog::onClose, this);
+
+
 	// Init layout
 	Layout();
 	SetInitialSize(wxSize(400, -1));
@@ -121,6 +125,13 @@ FindReplaceDialog::FindReplaceDialog(wxWindow* parent) : wxMiniFrame(parent, -1,
  * FindReplaceDialog class destructor
  *******************************************************************/
 FindReplaceDialog::~FindReplaceDialog() {
+}
+
+/* FindReplaceDialog::onClose
+ * Called when the frame close button is clicked
+ *******************************************************************/
+void FindReplaceDialog::onClose(wxCloseEvent& e) {
+	Show(false);
 }
 
 

@@ -60,8 +60,7 @@ PaletteChooser::PaletteChooser(wxWindow* parent, int id)
 	// Select first item
 	SetSelection(0);
 
-	// Create announcer
-	paletteAnnouncer = new Announcer();
+	// Bind events
 	Bind(wxEVT_COMMAND_CHOICE_SELECTED, &PaletteChooser::onPaletteChanged, this);
 }
 
@@ -69,14 +68,13 @@ PaletteChooser::PaletteChooser(wxWindow* parent, int id)
  * PaletteChooser class destructor
  *******************************************************************/
 PaletteChooser::~PaletteChooser() {
-	delete paletteAnnouncer;
 }
 
 /* GfxConvDialog::paletteCurrentChanged
  * Called when the current image palette chooser is changed
  *******************************************************************/
 void PaletteChooser::onPaletteChanged(wxCommandEvent& e) {
-	paletteAnnouncer->announce("main_palette_changed");
+	announce("main_palette_changed");
 }
 
 /* PaletteChooser::setGlobalFromArchive
@@ -106,4 +104,21 @@ Palette8bit* PaletteChooser::getSelectedPalette(ArchiveEntry* entry) {
  *******************************************************************/
 bool PaletteChooser::globalSelected() {
 	return (GetSelection() == 0);
+}
+
+/* PaletteChooser::selectPalette
+ * Selects the palette matching [name], or the default palette if
+ * no match was found
+ *******************************************************************/
+void PaletteChooser::selectPalette(string name) {
+	// Go through palettes list
+	for (unsigned a = 0; a < GetCount(); a++) {
+		if (s_cmpnocase(GetString(a), name)) {
+			SetSelection(a);
+			return;
+		}
+	}
+
+	// No match found, set to default
+	SetSelection(0);
 }

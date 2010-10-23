@@ -116,8 +116,5 @@ public:
 
 // Define for less cumbersome MainWindow::getInstance()
 #define theMainWindow MainWindow::getInstance()
-#define thePaletteChooser theMainWindow->getPaletteChooser()
-#define thePaletteAnnouncer thePaletteChooser->paletteAnnouncer
-
 
 #endif //__MAINWINDOW_H__

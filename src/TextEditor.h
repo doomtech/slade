@@ -29,6 +29,9 @@ public:
 	string		getReplaceString() { return text_replace->GetValue(); }
 	bool		matchCase() { return cb_match_case->GetValue(); }
 	bool		matchWord() { return cb_match_word->GetValue(); }
+
+	// Events
+	void	onClose(wxCloseEvent& e);
 };
 
 class TextEditor : public wxStyledTextCtrl {

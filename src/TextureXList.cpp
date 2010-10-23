@@ -179,7 +179,7 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_ta
 	clear();
 
 	// Update palette
-	thePaletteChooser->setGlobalFromArchive(texturex->getParent());
+	theMainWindow->getPaletteChooser()->setGlobalFromArchive(texturex->getParent());
 
 	// Read TEXTUREx
 

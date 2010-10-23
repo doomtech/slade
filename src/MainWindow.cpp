@@ -47,6 +47,7 @@
 string main_window_layout = "";
 MainWindow* MainWindow::instance = NULL;
 CVAR(Bool, show_start_page, true, CVAR_SAVE);
+CVAR(String, global_palette, "", CVAR_SAVE);
 
 
 /*******************************************************************
@@ -255,6 +256,7 @@ void MainWindow::setupLayout() {
 	// Create Palette Chooser toolbar
 	wxAuiToolBar* tb_pal = new wxAuiToolBar(this, -1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
 	palette_chooser = new PaletteChooser(tb_pal, -1);
+	palette_chooser->selectPalette(global_palette);
 	tb_pal->AddLabel(-1, "Palette:");
 	tb_pal->AddControl(palette_chooser);
 	tb_pal->Realize();
@@ -367,6 +369,9 @@ bool MainWindow::exitProgram() {
 
 	// Save current layout
 	main_window_layout = m_mgr->SavePerspective();
+
+	// Save selected palette
+	global_palette = palette_chooser->GetStringSelection();
 
 	// Exit application
 	wxTheApp->Exit();

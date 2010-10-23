@@ -47,7 +47,7 @@ PatchBrowser::PatchBrowser(wxWindow* parent) : BrowserWindow(parent) {
 	items_root->addChild("Unknown");
 
 	// Init palette chooser
-	listenTo(thePaletteAnnouncer);
+	listenTo(theMainWindow->getPaletteChooser());
 
 	// Set dialog title
 	SetTitle("Patch Browser");
@@ -65,7 +65,7 @@ bool PatchBrowser::openPatchTable(PatchTable* table) {
 	clearItems();
 
 	// Setup palette chooser
-	thePaletteChooser->setGlobalFromArchive(table->getParent());
+	theMainWindow->getPaletteChooser()->setGlobalFromArchive(table->getParent());
 
 	// Go through patch table
 	for (unsigned a = 0; a < table->nPatches(); a++) {
@@ -89,7 +89,7 @@ bool PatchBrowser::openPatchTable(PatchTable* table) {
 
 		// Add it
 		PatchBrowserItem* item = new PatchBrowserItem(patch.name, patch.entry, a);
-		item->setPalette(thePaletteChooser->getSelectedPalette());
+		item->setPalette(theMainWindow->getPaletteChooser()->getSelectedPalette());
 		addItem(item, where);
 	}
 
@@ -124,7 +124,7 @@ void PatchBrowser::updateItemPalettes(BrowserTreeNode* node) {
 
 	// Go through items and update their palettes
 	for (unsigned a = 0; a < node->nItems(); a++)
-		((PatchBrowserItem*)node->getItem(a))->setPalette(thePaletteChooser->getSelectedPalette());
+		((PatchBrowserItem*)node->getItem(a))->setPalette(theMainWindow->getPaletteChooser()->getSelectedPalette());
 
 	// Go through child nodes and update their items
 	for (unsigned a = 0; a < node->nChildren(); a++)
@@ -135,7 +135,7 @@ void PatchBrowser::updateItemPalettes(BrowserTreeNode* node) {
  * Handles any announcements
  *******************************************************************/
 void PatchBrowser::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
-	if (announcer != thePaletteAnnouncer)
+	if (announcer != theMainWindow->getPaletteChooser())
 		return;
 
 	if (event_name == "main_palette_changed") {

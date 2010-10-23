@@ -86,7 +86,7 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 	hbox->Add(text_curimg, 0, wxALIGN_CENTER_VERTICAL, 4);
 
 	// Palette chooser
-	listenTo(thePaletteAnnouncer);
+	listenTo(theMainWindow->getPaletteChooser());
 
 	// Add gfx canvas
 	gfx_canvas = new GfxCanvas(this, -1);
@@ -194,7 +194,7 @@ bool GfxEntryPanel::saveEntry() {
  *******************************************************************/
 void GfxEntryPanel::refresh() {
 	// Setup palette
-	thePaletteChooser->setGlobalFromArchive(entry->getParent(), Misc::detectPaletteHack(entry));
+	theMainWindow->getPaletteChooser()->setGlobalFromArchive(entry->getParent(), Misc::detectPaletteHack(entry));
 	updateImagePalette();
 
 	// Set offset text boxes
@@ -248,7 +248,7 @@ void GfxEntryPanel::refresh() {
  * chooser, and refreshes the gfx canvas
  *******************************************************************/
 void GfxEntryPanel::updateImagePalette() {
-	gfx_canvas->setPalette(thePaletteChooser->getSelectedPalette());
+	gfx_canvas->setPalette(theMainWindow->getPaletteChooser()->getSelectedPalette());
 	gfx_canvas->updateImageTexture();
 }
 
@@ -456,7 +456,7 @@ void GfxEntryPanel::onGfxOffsetChanged(wxEvent& e) {
  * Handles any announcements
  *******************************************************************/
 void GfxEntryPanel::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
-	if (announcer != thePaletteAnnouncer)
+	if (announcer != theMainWindow->getPaletteChooser())
 		return;
 
 	if (event_name == "main_palette_changed") {

@@ -174,7 +174,7 @@ TextureXEditor::TextureXEditor(wxWindow* parent) : wxPanel(parent, -1) {
 	btn_save->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureXEditor::onSaveClicked, this);
 
 	// Palette chooser
-	listenTo(thePaletteAnnouncer);
+	listenTo(theMainWindow->getPaletteChooser());
 	updateTexturePalette();
 
 	// Update+ layout
@@ -245,7 +245,7 @@ bool TextureXEditor::openArchive(Archive* archive) {
 		// Open TEXTUREX entry
 		if (tx_panel->openTEXTUREX(tx_entries[a])) {
 			// Set palette
-			tx_panel->setPalette(thePaletteChooser->getSelectedPalette());
+			tx_panel->setPalette(theMainWindow->getPaletteChooser()->getSelectedPalette());
 			// Lock entry
 			tx_entries[a]->lock();
 
@@ -274,7 +274,7 @@ bool TextureXEditor::openArchive(Archive* archive) {
 		pnames->lock();
 
 	// Set global palette
-	thePaletteChooser->setGlobalFromArchive(archive);
+	theMainWindow->getPaletteChooser()->setGlobalFromArchive(archive);
 
 	// Find patch entries (this really needs to be faster)
 	theSplashWindow->show("Opening Texture List...", true);
@@ -388,7 +388,7 @@ bool TextureXEditor::checkTextures() {
  *******************************************************************/
 void TextureXEditor::updateTexturePalette() {
 	// Get palette
-	Palette8bit* pal = thePaletteChooser->getSelectedPalette();
+	Palette8bit* pal = theMainWindow->getPaletteChooser()->getSelectedPalette();
 
 	// Send to whatever needs it
 	for (size_t a = 0; a < texture_editors.size(); a++)
@@ -399,7 +399,7 @@ void TextureXEditor::updateTexturePalette() {
  * Handles any announcements from the current texture
  *******************************************************************/
 void TextureXEditor::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
-	if (announcer != thePaletteAnnouncer)
+	if (announcer != theMainWindow->getPaletteChooser())
 		return;
 
 	if (event_name == "main_palette_changed") {
