@@ -236,6 +236,7 @@ CONSOLE_COMMAND (cmdlist, 0) {
 		theConsole->logMessage(s_fmt("\"%s\"", theConsole->command(a).getName().c_str()));
 }
 
+/*
 CONSOLE_COMMAND (testmatch, 0) {
 	bool match = args[0].Matches(args[1]);
 	if (match)
@@ -243,13 +244,14 @@ CONSOLE_COMMAND (testmatch, 0) {
 	else
 		theConsole->logMessage("No Match");
 }
+*/
 
 
 // Converts DB-style ACS function definitions to SLADE-style:
 // from Function = "Function(Arg1, Arg2, Arg3)";
 // to Function = "Arg1", "Arg2", "Arg3";
 // Reads from a text file and outputs the result to the console
-#if 1
+#if 0
 #include "Parser.h"
 
 CONSOLE_COMMAND (langfuncsplit, 1) {

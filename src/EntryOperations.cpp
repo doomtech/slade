@@ -856,6 +856,7 @@ bool EntryOperations::compileACS(ArchiveEntry* entry) {
  * CONSOLE COMMANDS
  *******************************************************************/
 
+/*
 CONSOLE_COMMAND (test_ee, 1) {
 	if (theArchiveManager->numArchives() > 0) {
 		for (size_t a = 0; a < args.size(); a++) {
@@ -867,3 +868,4 @@ CONSOLE_COMMAND (test_ee, 1) {
 		}
 	}
 }
+*/

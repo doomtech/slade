@@ -549,6 +549,7 @@ void GfxConvDialog::onTransColourChanged(wxEvent& e) {
  * CONSOLE COMMANDS
  *******************************************************************/
 
+/*
 CONSOLE_COMMAND (test_gcd, 0) {
 	GfxConvDialog gcd;
 
@@ -567,3 +568,4 @@ CONSOLE_COMMAND (test_gcd, 0) {
 
 	gcd.ShowModal();
 }
+*/

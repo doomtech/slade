@@ -10,7 +10,6 @@ TODO List ---------------------------------------------------------------
 --- Before Final 3.0 Release ---
 - Fix bugs, etc
 - Clean up sources
-- Remove test console commands
 - Fix up menu shortcuts etc
 
 --- Bugs ---

@@ -264,7 +264,7 @@ void BrowserWindow::onTextFilterChanged(wxCommandEvent& e) {
 }
 
 
-
+/*
 CONSOLE_COMMAND(test_browser, 0) {
 	BrowserWindow* win = new BrowserWindow(NULL);
 
@@ -278,3 +278,4 @@ CONSOLE_COMMAND(test_browser, 0) {
 	win->populateItemTree();
 	win->Show(true);
 }
+*/

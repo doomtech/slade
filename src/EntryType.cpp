@@ -609,14 +609,16 @@ vector<string> EntryType::allCategories() {
 /* Console Command - "test_entry_types"
  * Testingggg
  *******************************************************************/
+/*
 CONSOLE_COMMAND (test_entry_types, 0) {
 	EntryType::loadEntryTypes();
 }
-
+*/
 
 /* Console Command - "test_entry_type_detection"
  * Testingggg moar
  *******************************************************************/
+/*
 CONSOLE_COMMAND (test_entry_type_detection, 0) {
 	Archive* archive = theArchiveManager->getArchive(0);
 
@@ -624,6 +626,7 @@ CONSOLE_COMMAND (test_entry_type_detection, 0) {
 		EntryType::detectEntryType(archive->getEntry(a));
 	}
 }
+*/
 
 CONSOLE_COMMAND (type, 0) {
 	vector<EntryType*> all_types = EntryType::allTypes();

@@ -458,6 +458,7 @@ void HexEditorPanel::onBtnGoToOffset(wxCommandEvent& e) {
  * CONSOLE COMMANDS
  *******************************************************************/
 
+/*
 CONSOLE_COMMAND(test_hex, 0) {
 	wxDialog dlg(NULL, -1, "HEX!", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
 
@@ -476,3 +477,4 @@ CONSOLE_COMMAND(test_hex, 0) {
 	dlg.Layout();
 	dlg.ShowModal();
 }
+*/

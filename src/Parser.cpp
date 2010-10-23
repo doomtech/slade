@@ -300,9 +300,11 @@ bool Parser::parseText(MemChunk& mc) {
 
 
 // Console test command
+/*
 CONSOLE_COMMAND (testparse, 0) {
 	string test = "root { item1 = value1; item2 = value1, value2; child1 { item1 = value1, value2, value3; item2 = value4; } child2 : child1 { item1 = value1; child3 { item1 = value1, value2; } } }";
 	Parser tp;
 	MemChunk mc((const uint8_t*)chr(test), test.Length());
 	tp.parseText(mc);
 }
+*/

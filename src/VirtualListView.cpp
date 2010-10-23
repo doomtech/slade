@@ -272,7 +272,7 @@ void VirtualListView::onKeyChar(wxKeyEvent& e) {
 
 
 
-
+/*
 CONSOLE_COMMAND (test_vlv, 0) {
 	wxDialog dlg(NULL, -1, "VLV!", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
 
@@ -286,3 +286,4 @@ CONSOLE_COMMAND (test_vlv, 0) {
 
 	dlg.ShowModal();
 }
+*/
