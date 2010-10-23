@@ -981,6 +981,7 @@ ArchiveEntry* Archive::findFirst(search_options_t& options) {
 	// Init search variables
 	ArchiveTreeNode* dir = options.dir;
 	if (!dir) dir = dir_root;
+	options.match_name.MakeLower();		// Force case-insensitive
 
 	// Begin search
 
@@ -1000,20 +1001,13 @@ ArchiveEntry* Archive::findFirst(search_options_t& options) {
 
 		// Check name
 		if (!options.match_name.IsEmpty()) {
-			wxFileName fn(entry->getName());
-			string name;
-
 			// Cut extension if ignoring
-			if (options.ignore_ext)
-				name = fn.GetName();
-			else
-				name = fn.GetFullName();
-
-			// Force case insensitivity
-			name.MakeLower();
-			options.match_name.MakeLower();
-
-			if (!options.match_name.Matches(name))
+			wxFileName fn(entry->getName());
+			if (options.ignore_ext) {
+				if (!options.match_name.Matches(fn.GetName().Lower()))
+					continue;
+			}
+			else if (!options.match_name.Matches(fn.GetFullName().Lower()))
 				continue;
 		}
 
@@ -1052,6 +1046,7 @@ ArchiveEntry* Archive::findLast(search_options_t& options) {
 	// Init search variables
 	ArchiveTreeNode* dir = options.dir;
 	if (!dir) dir = dir_root;
+	options.match_name.MakeLower();		// Force case-insensitive
 
 	// Begin search
 
@@ -1084,20 +1079,13 @@ ArchiveEntry* Archive::findLast(search_options_t& options) {
 
 		// Check name
 		if (!options.match_name.IsEmpty()) {
-			wxFileName fn(entry->getName());
-			string name;
-
 			// Cut extension if ignoring
-			if (options.ignore_ext)
-				name = fn.GetName();
-			else
-				name = fn.GetFullName();
-
-			// Force case insensitivity
-			name.MakeLower();
-			options.match_name.MakeLower();
-
-			if (!options.match_name.Matches(name))
+			wxFileName fn(entry->getName());
+			if (options.ignore_ext) {
+				if (!options.match_name.Matches(fn.GetName().Lower()))
+					continue;
+			}
+			else if (!options.match_name.Matches(fn.GetFullName().Lower()))
 				continue;
 		}
 
@@ -1124,6 +1112,7 @@ vector<ArchiveEntry*> Archive::findAll(search_options_t& options) {
 	ArchiveTreeNode* dir = options.dir;
 	if (!dir) dir = dir_root;
 	vector<ArchiveEntry*> ret;
+	options.match_name.MakeLower();		// Force case-insensitive
 
 	// Begin search
 
@@ -1143,20 +1132,13 @@ vector<ArchiveEntry*> Archive::findAll(search_options_t& options) {
 
 		// Check name
 		if (!options.match_name.IsEmpty()) {
-			wxFileName fn(entry->getName());
-			string name;
-
 			// Cut extension if ignoring
-			if (options.ignore_ext)
-				name = fn.GetName();
-			else
-				name = fn.GetFullName();
-
-			// Force case insensitivity
-			name.MakeLower();
-			options.match_name.MakeLower();
-
-			if (!options.match_name.Matches(name))
+			wxFileName fn(entry->getName());
+			if (options.ignore_ext) {
+				if (!options.match_name.Matches(fn.GetName().Lower()))
+					continue;
+			}
+			else if (!options.match_name.Matches(fn.GetFullName().Lower()))
 				continue;
 		}
 

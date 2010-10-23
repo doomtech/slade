@@ -244,11 +244,11 @@ void PatchTable::updatePatchEntry(unsigned index) {
 	// First, search parent archive (patches namespace > global namespace)
 	if (parent) {
 		options.match_namespace = "patches";
-		entry = parent->findFirst(options);
+		entry = parent->findLast(options);
 
 		if (!entry) {
 			options.match_namespace = "";
-			entry = parent->findFirst(options);
+			entry = parent->findLast(options);
 		}
 	}
 
