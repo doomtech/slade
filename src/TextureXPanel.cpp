@@ -128,9 +128,26 @@ TextureXPanel::TextureXPanel(wxWindow* parent, TextureXEditor* tx_editor) : wxPa
 	framesizer->Add(list_textures, 1, wxEXPAND|wxALL, 4);
 	sizer->Add(framesizer, 0, wxEXPAND|wxALL, 4);
 
+
+	// Move Up button
+	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
+	framesizer->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+	btn_move_up = new wxButton(this, -1, "Move Up");
+	hbox->Add(btn_move_up, 1, wxEXPAND|wxRIGHT, 4);
+
+	// Move Down button
+	btn_move_down = new wxButton(this, -1, "Move Down");
+	hbox->Add(btn_move_down, 1, wxEXPAND);
+
 	// New Texture button
+	hbox = new wxBoxSizer(wxHORIZONTAL);
+	framesizer->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 	btn_new_texture = new wxButton(this, -1, "New");
-	framesizer->Add(btn_new_texture, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+	hbox->Add(btn_new_texture, 1, wxEXPAND|wxRIGHT, 4);
+
+	// Remove Texture button
+	btn_remove_texture = new wxButton(this, -1, "Remove");
+	hbox->Add(btn_remove_texture, 1);
 
 	// New Texture from Patch button
 	btn_new_from_patch = new wxButton(this, -1, "New From Patch");
@@ -139,10 +156,6 @@ TextureXPanel::TextureXPanel(wxWindow* parent, TextureXEditor* tx_editor) : wxPa
 	// New Texture from File button
 	btn_new_from_file = new wxButton(this, -1, "New From File");
 	framesizer->Add(btn_new_from_file, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
-
-	// Remove Texture button
-	btn_remove_texture = new wxButton(this, -1, "Remove");
-	framesizer->Add(btn_remove_texture, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
 	// Add texture editor area
 	texture_editor = new TextureEditorPanel(this, tx_editor);
@@ -154,6 +167,8 @@ TextureXPanel::TextureXPanel(wxWindow* parent, TextureXEditor* tx_editor) : wxPa
 	btn_new_from_patch->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureXPanel::onBtnNewTextureFromPatch, this);
 	btn_new_from_file->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureXPanel::onBtnNewTextureFromFile, this);
 	btn_remove_texture->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureXPanel::onBtnRemoveTexture, this);
+	btn_move_up->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureXPanel::onBtnMoveUp, this);
+	btn_move_down->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureXPanel::onBtnMoveDown, this);
 }
 
 /* TextureXPanel::~TextureXPanel
@@ -244,6 +259,12 @@ CTexture* TextureXPanel::newTextureFromPatch(string name, string patch) {
 	tex->setWidth(image.getWidth());
 	tex->setHeight(image.getHeight());
 
+	// Setup texture scale
+	if (texturex.getFormat() == TXF_TEXTURES)
+		tex->setScale(1, 1, false);
+	else
+		tex->setScale(0, 0, true);
+
 	// Add patch
 	tex->addPatch(patch, 0, 0, patch_entry);
 
@@ -294,6 +315,12 @@ void TextureXPanel::onBtnNewTexture(wxCommandEvent& e) {
 	// Default size = 64x128
 	tex->setWidth(64);
 	tex->setHeight(128);
+
+	// Setup texture scale
+	if (texturex.getFormat() == TXF_TEXTURES)
+		tex->setScale(1, 1, false);
+	else
+		tex->setScale(0, 0, true);
 
 	// Add it after the last selected item
 	int selected = list_textures->getLastSelected();
@@ -450,5 +477,57 @@ void TextureXPanel::onBtnRemoveTexture(wxCommandEvent& e) {
 
 	// Clear selection & refresh
 	list_textures->clearSelection();
+	list_textures->updateList();
+}
+
+/* TextureXPanel::onBtnMoveUp
+ * Called when the 'Move Up' button is clicked
+ *******************************************************************/
+void TextureXPanel::onBtnMoveUp(wxCommandEvent& e) {
+	// Get selected textures
+	vector<long> selection = list_textures->getSelection();
+
+	// Do nothing if the first selected item is at the top of the list
+	if (selection.size() > 0 && selection[0] == 0)
+		return;
+
+	// Go through selection
+	for (unsigned a = 0; a < selection.size(); a++) {
+		// Swap selected texture with the one above it
+		texturex.swapTextures(selection[a], selection[a] - 1);
+	}
+
+	// Update selection
+	list_textures->clearSelection();
+	for (unsigned a = 0; a < selection.size(); a++)
+		list_textures->selectItem(selection[a] - 1);
+
+	// Refresh
+	list_textures->updateList();
+}
+
+/* TextureXPanel::onBtnMoveDown
+ * Called when the 'Move Down' button is clicked
+ *******************************************************************/
+void TextureXPanel::onBtnMoveDown(wxCommandEvent& e) {
+	// Get selected textures
+	vector<long> selection = list_textures->getSelection();
+
+	// Do nothing if the last selected item is at the end of the list
+	if (selection.size() > 0 && selection.back() == list_textures->GetItemCount()-1)
+		return;
+
+	// Go through selection backwards
+	for (int a = selection.size()-1; a >= 0; a--) {
+		// Swap selected texture with the one below it
+		texturex.swapTextures(selection[a], selection[a] + 1);
+	}
+
+	// Update selection
+	list_textures->clearSelection();
+	for (unsigned a = 0; a < selection.size(); a++)
+		list_textures->selectItem(selection[a] + 1);
+
+	// Refresh
 	list_textures->updateList();
 }

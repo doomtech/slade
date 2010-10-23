@@ -35,6 +35,7 @@
 #include "ArchiveManager.h"
 #include "TextureXEditor.h"
 #include "EntryDataFormat.h"
+#include "ExtMessageDialog.h"
 #include <wx/filename.h>
 #include <wx/utils.h>
 
@@ -737,6 +738,12 @@ bool EntryOperations::createTexture(vector<ArchiveEntry*> entries) {
 		ntex->setWidth(image.getWidth());
 		ntex->setHeight(image.getHeight());
 
+		// Setup texture scale
+		if (tx.getFormat() == TXF_TEXTURES)
+			ntex->setScale(1, 1, false);
+		else
+			ntex->setScale(0, 0, true);
+
 		// Add to texture list
 		tx.addTexture(ntex);
 	}
@@ -833,9 +840,11 @@ bool EntryOperations::compileACS(ArchiveEntry* entry) {
 		string errors = wxString::From8BitData(buf, file.Length());
 		delete[] buf;
 
-		wxMessageDialog dlg(NULL, "Errors were encountered while compiling:", "Error", wxOK|wxCENTRE|wxICON_ERROR);
-		dlg.SetExtendedMessage(errors);
+		ExtMessageDialog dlg(NULL, "Error Compiling");
+		dlg.setMessage("The following errors were encountered while compiling, please fix them and recompile:");
+		dlg.setExt(errors);
 		dlg.ShowModal();
+
 		return false;
 	}
 

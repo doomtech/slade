@@ -36,6 +36,8 @@ private:
 	wxButton*			btn_remove_texture;
 	wxButton*			btn_new_from_patch;
 	wxButton*			btn_new_from_file;
+	wxButton*			btn_move_up;
+	wxButton*			btn_move_down;
 	wxStaticText*		label_tx_format;
 
 public:
@@ -58,6 +60,8 @@ public:
 	void	onBtnNewTextureFromPatch(wxCommandEvent& e);
 	void	onBtnNewTextureFromFile(wxCommandEvent& e);
 	void	onBtnRemoveTexture(wxCommandEvent& e);
+	void	onBtnMoveUp(wxCommandEvent& e);
+	void	onBtnMoveDown(wxCommandEvent& e);
 };
 
 #endif//__TEXTUREX_PANEL_H__

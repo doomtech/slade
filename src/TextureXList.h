@@ -38,11 +38,13 @@ public:
 
 	CTexture*	getTexture(size_t index);
 	CTexture*	getTexture(string name);
+	uint8_t		getFormat() { return txformat; }
 
 	void	setFormat(uint8_t format) { txformat = format; }
 
 	void	addTexture(CTexture* tex, int position = -1);
 	void	removeTexture(unsigned index);
+	void	swapTextures(unsigned index1, unsigned index2);
 
 	void	clear(bool clear_patches = false);
 	void	removePatch(string patch);

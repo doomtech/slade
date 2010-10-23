@@ -11,6 +11,7 @@ TODO List ---------------------------------------------------------------
 - Fix bugs, etc
 - Clean up sources
 - Remove test console commands
+- Fix up menu shortcuts etc
 
 --- Bugs ---
 - Copy/paste entry parent problem
@@ -88,6 +89,7 @@ Unimplemented Feature Requests ------------------------------------------
 - Sorting by column (I.E. Name or Type)
 - Duplicate entry name checking
 - Confirm dialog for entry deletion
+- SLumpEd style mass rename option
 
 --- Archive / Entry Management ---
 - mass export to format (XWE)

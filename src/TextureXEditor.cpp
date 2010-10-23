@@ -35,6 +35,7 @@
 #include "ArchiveManager.h"
 #include "Console.h"
 #include "SplashWindow.h"
+#include "ExtMessageDialog.h"
 #include <wx/dialog.h>
 #include <wx/radiobut.h>
 
@@ -367,8 +368,9 @@ bool TextureXEditor::checkTextures() {
 
 	// Display a message box with any problems found
 	if (!problems.IsEmpty()) {
-		wxMessageDialog dlg(this, "The following problems were found:");
-		dlg.SetExtendedMessage(problems);
+		ExtMessageDialog dlg(this, "Problems Found");
+		dlg.setMessage("The following problems were found:");
+		dlg.setExt(problems);
 		dlg.ShowModal();
 
 		return true;

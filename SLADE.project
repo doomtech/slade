@@ -30,6 +30,8 @@
       <File Name="src/ACSPrefsPanel.h"/>
       <File Name="src/ACSPrefsPanel.cpp"/>
     </VirtualDirectory>
+    <File Name="src/ExtMessageDialog.h"/>
+    <File Name="src/ExtMessageDialog.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="General">
     <File Name="src/Clipboard.cpp"/>
