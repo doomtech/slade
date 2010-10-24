@@ -136,7 +136,7 @@ void AnimatedEntryPanel::populateEntryList() {
 
 	// Add columns
 	list_entries->InsertColumn(0, "Type");
-	list_entries->InsertColumn(1, "Fist frame");
+	list_entries->InsertColumn(1, "First frame");
 	list_entries->InsertColumn(2, "Last frame");
 	list_entries->InsertColumn(3, "Speed");
 	list_entries->InsertColumn(4, "Decals");
