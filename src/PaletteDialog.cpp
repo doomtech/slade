@@ -7,7 +7,8 @@
  * Web:         http://slade.mancubus.net
  * Filename:    PaletteDialog.cpp
  * Description: A simple dialog that contains a palette canvas, and
- *              OK/Cancel buttons
+ *              OK/Cancel buttons, allowing the user to select a
+ *              colour in the palette
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License

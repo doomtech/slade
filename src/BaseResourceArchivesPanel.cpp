@@ -1,11 +1,52 @@
 
+/*******************************************************************
+ * SLADE - It's a Doom Editor
+ * Copyright (C) 2008 Simon Judd
+ *
+ * Email:       veilofsorrow@gmail.com
+ * Web:         http://slade.mancubus.net
+ * Filename:    BaseResourceArchivesPanel.cpp
+ * Description: Panel containing controls to select from and modify
+ *              saved paths to base resource archives
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *******************************************************************/
+
+
+/*******************************************************************
+ * INCLUDES
+ *******************************************************************/
 #include "Main.h"
 #include "WxStuff.h"
 #include "BaseResourceArchivesPanel.h"
 #include "ArchiveManager.h"
 
+
+/*******************************************************************
+ * EXTERNAL VARIABLES
+ *******************************************************************/
 EXTERN_CVAR(Int, base_resource)
 
+
+/*******************************************************************
+ * BASERESOURCEARCHIVESPANEL CLASS FUNCTIONS
+ *******************************************************************/
+
+/* BaseResourceArchivesPanel::BaseResourceArchivesPanel
+ * BaseResourceArchivesPanel class constructor
+ *******************************************************************/
 BaseResourceArchivesPanel::BaseResourceArchivesPanel(wxWindow* parent)
 : wxPanel(parent, -1) {
 	// Setup sizer
@@ -43,13 +84,27 @@ BaseResourceArchivesPanel::BaseResourceArchivesPanel(wxWindow* parent)
 	Layout();
 }
 
+/* BaseResourceArchivesPanel::~BaseResourceArchivesPanel
+ * BaseResourceArchivesPanel class destructor
+ *******************************************************************/
 BaseResourceArchivesPanel::~BaseResourceArchivesPanel() {
 }
 
+/* BaseResourceArchivesPanel::getSelectedPath
+ * Returns the currently selected base resource path
+ *******************************************************************/
 int BaseResourceArchivesPanel::getSelectedPath() {
 	return list_base_archive_paths->GetSelection();
 }
 
+
+/*******************************************************************
+ * BASERESOURCEARCHIVESPANEL CLASS EVENTS
+ *******************************************************************/
+
+/* BaseResourceArchivesPanel::onBtnAdd
+ * Called when the 'Add Archive' button is clicked
+ *******************************************************************/
 void BaseResourceArchivesPanel::onBtnAdd(wxCommandEvent& e) {
 	// Create extensions string
 	string extensions = theArchiveManager->getArchiveExtensionsString();
@@ -71,6 +126,9 @@ void BaseResourceArchivesPanel::onBtnAdd(wxCommandEvent& e) {
 	}
 }
 
+/* BaseResourceArchivesPanel::onBtnRemove
+ * Called when the 'Remove Archive' button is clicked
+ *******************************************************************/
 void BaseResourceArchivesPanel::onBtnRemove(wxCommandEvent& e) {
 	// Get the selected item index and remove it
 	int index = list_base_archive_paths->GetSelection();

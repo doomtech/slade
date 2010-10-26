@@ -1,11 +1,51 @@
 
+/*******************************************************************
+ * SLADE - It's a Doom Editor
+ * Copyright (C) 2008 Simon Judd
+ *
+ * Email:       veilofsorrow@gmail.com
+ * Web:         http://slade.mancubus.net
+ * Filename:    ACSPrefsPanel.cpp
+ * Description: Panel containing ACS script preference controls
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *******************************************************************/
+
+
+/*******************************************************************
+ * INCLUDES
+ *******************************************************************/
 #include "Main.h"
 #include "WxStuff.h"
 #include "ACSPrefsPanel.h"
 #include <wx/filedlg.h>
 
+
+/*******************************************************************
+ * EXTERNAL VARIABLES
+ *******************************************************************/
 EXTERN_CVAR(String, path_acc)
 
+
+/*******************************************************************
+ * ACSPREFSPANEL CLASS FUNCTIONS
+ *******************************************************************/
+
+/* ACSPrefsPanel::ACSPrefsPanel
+ * ACSPrefsPanel class constructor
+ *******************************************************************/
 ACSPrefsPanel::ACSPrefsPanel(wxWindow* parent) : wxPanel(parent, -1) {
 	// Create sizer
 	wxBoxSizer* psizer = new wxBoxSizer(wxVERTICAL);
@@ -29,15 +69,27 @@ ACSPrefsPanel::ACSPrefsPanel(wxWindow* parent) : wxPanel(parent, -1) {
 	btn_browse_accpath->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &ACSPrefsPanel::onBtnBrowseACCPath, this);
 }
 
+/* ACSPrefsPanel::~ACSPrefsPanel
+ * ACSPrefsPanel class destructor
+ *******************************************************************/
 ACSPrefsPanel::~ACSPrefsPanel() {
 }
 
+/* ACSPrefsPanel::applyPreferences
+ * Applies preferences from the panel controls
+ *******************************************************************/
 void ACSPrefsPanel::applyPreferences() {
 	path_acc = text_accpath->GetValue();
 }
 
 
+/*******************************************************************
+ * ACSPREFSPANEL CLASS EVENTS
+ *******************************************************************/
 
+/* ACSPrefsPanel::onBtnBrowseACCPath
+ * Called when the 'Browse' for ACC path button is clicked
+ *******************************************************************/
 void ACSPrefsPanel::onBtnBrowseACCPath(wxCommandEvent& e) {
 	// Setup acc executable file string
 	string acc_exe = "acc";

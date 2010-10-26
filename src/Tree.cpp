@@ -1,8 +1,47 @@
 
+/*******************************************************************
+ * SLADE - It's a Doom Editor
+ * Copyright (C) 2008 Simon Judd
+ *
+ * Email:       veilofsorrow@gmail.com
+ * Web:         http://slade.mancubus.net
+ * Filename:    STree.cpp
+ * Description: STreeNode class, a generic container representing a
+ *              'node' in a tree structure, where each 'node' has a
+ *              name, child nodes and can be subclassed to hold
+ *              different data
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *******************************************************************/
+
+
+/*******************************************************************
+ * INCLUDES
+ *******************************************************************/
 #include "Main.h"
 #include "Tree.h"
 #include <wx/filename.h>
 
+
+/*******************************************************************
+ * STREENODE CLASS FUNCTIONS
+ *******************************************************************/
+
+/* STreeNode::STreeNode
+ * STreeNode class constructor
+ *******************************************************************/
 STreeNode::STreeNode(STreeNode* parent) {
 	if (parent)
 		parent->addChild(this);
@@ -13,12 +52,19 @@ STreeNode::STreeNode(STreeNode* parent) {
 	allow_dup_child = false;
 }
 
+/* STreeNode::~STreeNode
+ * STreeNode class destructor
+ *******************************************************************/
 STreeNode::~STreeNode() {
 	// Delete children
 	for (unsigned a = 0; a < children.size(); a++)
 		delete children[a];
 }
 
+/* STreeNode::getPath
+ * Returns the 'path' to this node, ie, the names of all it's parent
+ * nodes each separated by a / (including the name of this node)
+ *******************************************************************/
 string STreeNode::getPath() {
 	if (!parent)
 		return getName() + "/";
@@ -26,6 +72,9 @@ string STreeNode::getPath() {
 		return parent->getPath() + getName() + "/";
 }
 
+/* STreeNode::getChild
+ * Returns the child node at [index], or NULL if index is invalid
+ *******************************************************************/
 STreeNode* STreeNode::getChild(unsigned index) {
 	// Check index
 	if (index >= children.size())
@@ -34,6 +83,11 @@ STreeNode* STreeNode::getChild(unsigned index) {
 	return children[index];
 }
 
+/* STreeNode::getChild
+ * Returns the child node matching [name]. Can also find deeper
+ * child nodes if a path is given in [name]. Returns NULL if no
+ * match is found
+ *******************************************************************/
 STreeNode* STreeNode::getChild(string name) {
 	// Check name was given
 	if (name.IsEmpty())
@@ -73,6 +127,10 @@ STreeNode* STreeNode::getChild(string name) {
 	}
 }
 
+/* STreeNode::getChildren
+ * Returns a list of all the node's children matching [name]. Also
+ * handles paths as per getChild
+ *******************************************************************/
 vector<STreeNode*> STreeNode::getChildren(string name) {
 	// Init return vector
 	vector<STreeNode*> ret;
@@ -112,11 +170,18 @@ vector<STreeNode*> STreeNode::getChildren(string name) {
 	return ret;
 }
 
+/* STreeNode::addChild
+ * Adds [child] to this node
+ *******************************************************************/
 void STreeNode::addChild(STreeNode* child) {
 	children.push_back(child);
 	child->parent = this;
 }
 
+/* STreeNode::addChild
+ * Creates a new child node matching [name] and adds it to the node's
+ * children. Also works recursively if a path is given
+ *******************************************************************/
 STreeNode* STreeNode::addChild(string name) {
 	// Check name was given
 	if (name.IsEmpty())
@@ -169,6 +234,10 @@ STreeNode* STreeNode::addChild(string name) {
 	}
 }
 
+/* STreeNode::removeChild
+ * Removes [child] from this node's children. Returns false if
+ * [child] is not a child node, true otherwise
+ *******************************************************************/
 bool STreeNode::removeChild(STreeNode* child) {
 	// Find child node
 	for (unsigned a = 0; a < children.size(); a++) {

@@ -79,6 +79,9 @@ bool PropertyList::removeProperty(string key) {
 		return false;
 }
 
+/* PropertyList::copyTo
+ * Copies all properties to [list]
+ *******************************************************************/
 void PropertyList::copyTo(PropertyList &list) {
 	// Clear given list
 	list.clear();
@@ -93,11 +96,17 @@ void PropertyList::copyTo(PropertyList &list) {
 	}
 }
 
+/* PropertyList::addFlag
+ * Adds a 'flag' property [key]
+ *******************************************************************/
 void PropertyList::addFlag(string key) {
 	Property flag;
 	properties[key] = flag;
 }
 
+/* PropertyList::toString
+ * Returns a string representation of the property list
+ *******************************************************************/
 string PropertyList::toString() {
 	// Init return string
 	string ret = wxEmptyString;

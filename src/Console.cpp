@@ -143,6 +143,9 @@ string Console::lastLogLine() {
 	return lastLine;
 }
 
+/* Console::lastCommand
+ * Returns the last command sent to the console
+ *******************************************************************/
 string Console::lastCommand() {
 	// Init blank string
 	string lastCmd = "";
