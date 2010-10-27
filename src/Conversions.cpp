@@ -1,10 +1,42 @@
 
+/*******************************************************************
+ * SLADE - It's a Doom Editor
+ * Copyright (C) 2008 Simon Judd
+ *
+ * Email:       veilofsorrow@gmail.com
+ * Web:         http://slade.mancubus.net
+ * Filename:    Conversions.cpp
+ * Description: Functions to perform various data type conversions
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *******************************************************************/
+
+
+/*******************************************************************
+ * INCLUDES
+ *******************************************************************/
 #include "Main.h"
 #include "Archive.h"
 #include "Conversions.h"
 #include "ArchiveEntry.h"
 #include "qmus2mid/qmus2mid.h"
 
+
+/*******************************************************************
+ * STRUCTS
+ *******************************************************************/
 // Some structs for wav conversion
 struct wav_chunk_t {
 	char id[4];
@@ -21,12 +53,21 @@ struct wav_fmtchunk_t {
 	uint16_t bps;
 };
 
+// For doom sound conversion
 struct dsnd_header_t {
 	uint16_t three;
 	uint16_t samplerate;
 	uint32_t samples;
 };
 
+
+/*******************************************************************
+ * FUNCTIONS
+ *******************************************************************/
+
+/* Conversions::doomSndToWav
+ * Converts doom sound data [in] to wav format, written to [out]
+ *******************************************************************/
 bool Conversions::doomSndToWav(MemChunk& in, MemChunk& out) {
 	// --- Read Doom sound ---
 
@@ -136,6 +177,9 @@ bool Conversions::d64SfxToWav(MemChunk& in, MemChunk& out) {
 	return true;
 }
 
+/* Conversions::wavToDoomSnd
+ * Converts wav data [in] to doom sound format, written to [out]
+ *******************************************************************/
 bool Conversions::wavToDoomSnd(MemChunk& in, MemChunk& out) {
 	// --- Read WAV ---
 	wav_chunk_t chunk;
@@ -206,6 +250,9 @@ bool Conversions::wavToDoomSnd(MemChunk& in, MemChunk& out) {
 	return true;
 }
 
+/* Conversions::musToMidi
+ * Converts mus data [in] to midi, written to [out]
+ *******************************************************************/
 bool Conversions::musToMidi(MemChunk& in, MemChunk& out) {
 	string tempmidi = appPath("sladetemp.mid", DIR_TEMP);
 	string tempmus = appPath("sladetemp.mus", DIR_TEMP);
@@ -331,7 +378,7 @@ bool Conversions::vocToWav(MemChunk& in, MemChunk& out) {
 		case 0x200: // 4 bits to 16 bits Creative ADPCM (only valid in block type 0x09)
 			Global::error = s_fmt("Unsupported codec %i in VOC file", codec);
 			return false;
-		default: 
+		default:
 			Global::error = s_fmt("Unknown codec %i in VOC file", codec);
 			return false;
 	}

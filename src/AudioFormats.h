@@ -1,16 +1,17 @@
+
 #ifndef AUDIOFORMATS_H
 #define AUDIOFORMATS_H
 
 /* CheckForTags
  * Looks whether the memory chunk starts with an ID3 tag, and if
- * there is one, returns the index at which the true audio data 
+ * there is one, returns the index at which the true audio data
  * begins. Returns 0 if there is no tag before audio data.
  *******************************************************************/
 int checkForTags(MemChunk & mc) {
 	if (mc.getSize() > 14) {
 		// Check for ID3 header (ID3v2). Version and revision numbers cannot be FF.
 		// Only the four upper flags are valid.
-		if (mc[0] == 'I' && mc[1] == 'D' && mc[2] == '3' && 
+		if (mc[0] == 'I' && mc[1] == 'D' && mc[2] == '3' &&
 			mc[3] != 0xFF && mc[4] != 0xFF && ((mc[5] & 0x0F) == 0) &&
 			mc[6] < 0x80 && mc[7] < 0x80 && mc[8] < 0x80 && mc[9] < 0x80)
 		{

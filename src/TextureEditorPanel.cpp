@@ -716,6 +716,9 @@ void TextureEditorPanel::onTexCanvasDragEnd(wxCommandEvent& e) {
 	}
 }
 
+/* TextureEditorPanel::onTexCanvasKeyDown
+ * Called when a key is pressed within the texture canvas
+ *******************************************************************/
 void TextureEditorPanel::onTexCanvasKeyDown(wxKeyEvent& e) {
 	bool handled = false;
 

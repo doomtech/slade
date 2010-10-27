@@ -79,6 +79,7 @@ public:
 		// ZDoom TEXTURES format
 		rb_format_textures = new wxRadioButton(this, -1, "ZDoom (TEXTURES)");
 		framesizer->Add(rb_format_textures, 0, wxEXPAND|wxALL, 4);
+		rb_format_textures->Enable(false);
 
 
 		// --- Source options ---

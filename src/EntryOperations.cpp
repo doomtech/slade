@@ -45,6 +45,10 @@
  *******************************************************************/
 CVAR(String, path_acc, "", CVAR_SAVE);
 
+
+/*******************************************************************
+ * STRUCTS
+ *******************************************************************/
 // Define some png chunk structures
 struct ihdr_t {
 	uint32_t id;
@@ -301,6 +305,9 @@ bool EntryOperations::modifyGfxOffsets(ArchiveEntry* entry, int auto_type, point
 	return true;
 }
 
+/* EntryOperations::openExternal
+ * Opens [entry] in the default OS program for it's data type
+ *******************************************************************/
 bool EntryOperations::openExternal(ArchiveEntry* entry) {
 	if (!entry)
 		return false;
@@ -605,6 +612,11 @@ bool EntryOperations::gettRNSChunk(ArchiveEntry* entry) {
 	return false;
 }
 
+/* EntryOperations::addToPatchTable
+ * Adds all [entries] to their parent archive's patch table, if it
+ * exists. If not, the user is prompted to create or import texturex
+ * entries
+ *******************************************************************/
 bool EntryOperations::addToPatchTable(vector<ArchiveEntry*> entries) {
 	// Check any entries were given
 	if (entries.size() == 0)
@@ -662,6 +674,10 @@ bool EntryOperations::addToPatchTable(vector<ArchiveEntry*> entries) {
 	return ptable.writePNAMES(pnames);
 }
 
+/* EntryOperations::createTexture
+ * Same as addToPatchTable, but also creates a single-patch texture
+ * from each added patch
+ *******************************************************************/
 bool EntryOperations::createTexture(vector<ArchiveEntry*> entries) {
 	// Check any entries were given
 	if (entries.size() == 0)
@@ -757,6 +773,12 @@ bool EntryOperations::createTexture(vector<ArchiveEntry*> entries) {
 	return true;
 }
 
+/* EntryOperations::compileACS
+ * Attempts to compile [entry] as an ACS script. If the entry is
+ * named SCRIPTS, the compiled data is imported to the BEHAVIOR
+ * entry previous to it, otherwise it is imported to a same-name
+ * compiled library entry in the acs namespace
+ *******************************************************************/
 bool EntryOperations::compileACS(ArchiveEntry* entry) {
 	// Check entry was given
 	if (!entry)

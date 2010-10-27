@@ -257,6 +257,9 @@ void ArchiveManagerPanel::refreshArchiveList() {
 	list_archives->updateSize();
 }
 
+/* ArchiveManagerPanel::refreshAllTabs
+ * Refreshes all open archive tabs
+ *******************************************************************/
 void ArchiveManagerPanel::refreshAllTabs() {
 	// Go through tabs
 	for (unsigned a = 0; a < notebook_archives->GetPageCount(); a++) {
@@ -409,6 +412,10 @@ EntryPanel* ArchiveManagerPanel::currentArea() {
 	return ap->currentArea();
 }
 
+/* ArchiveManagerPanel::currentEntry
+ * Returns the currently open entry in the current archive panel
+ * (if any)
+ *******************************************************************/
 ArchiveEntry* ArchiveManagerPanel::currentEntry() {
 	// Get current tab index
 	int selected = notebook_archives->GetSelection();
@@ -422,6 +429,10 @@ ArchiveEntry* ArchiveManagerPanel::currentEntry() {
 	return ap->currentEntry();
 }
 
+/* ArchiveManagerPanel::currentEntrySelection
+ * Returns a list of all selected entries in the current archive
+ * panel
+ *******************************************************************/
 vector<ArchiveEntry*> ArchiveManagerPanel::currentEntrySelection() {
 	// Get current tab index
 	int selected = notebook_archives->GetSelection();
@@ -683,6 +694,9 @@ void ArchiveManagerPanel::createNewArchive(uint8_t type) {
 	}
 }
 
+/* ArchiveManagerPanel::saveArchive
+ * Saves [archive] to disk, opens a file dialog if necessary
+ *******************************************************************/
 bool ArchiveManagerPanel::saveArchive(Archive* archive) {
 	if (archive->isOnDisk()) {
 		// Save the archive if possible
@@ -698,6 +712,10 @@ bool ArchiveManagerPanel::saveArchive(Archive* archive) {
 		return saveArchiveAs(archive);	// If the archive is newly created, do Save As instead
 }
 
+/* ArchiveManagerPanel::saveArchive
+ * Saves [archive] to disk under a different filename, opens
+ * a file dialog to select the new name/path
+ *******************************************************************/
 bool ArchiveManagerPanel::saveArchiveAs(Archive* archive) {
 	// Popup file save dialog
 	string formats = archive->getFileExtensionString();
@@ -716,6 +734,10 @@ bool ArchiveManagerPanel::saveArchiveAs(Archive* archive) {
 	return true;
 }
 
+/* ArchiveManagerPanel::closeArchive
+ * Checks for any unsaved changes and prompts the user to save if
+ * needed before closing [archive]
+ *******************************************************************/
 bool ArchiveManagerPanel::closeArchive(Archive* archive) {
 	// If the archive has unsaved changes, prompt to save
 	if (archive->isModified()) {

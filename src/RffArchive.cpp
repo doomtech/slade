@@ -570,10 +570,3 @@ bool RffArchive::isRffArchive(string filename) {
 	// If it's passed to here it's probably a grp file
 	return true;
 }
-
-
-/*******************************************************************
- * EXTRA CONSOLE COMMANDS
- *******************************************************************/
-//#include "Console.h"
-//#include "MainWindow.h"

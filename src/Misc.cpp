@@ -236,6 +236,9 @@ string Misc::sizeAsString(uint32_t size) {
 	}
 }
 
+/* Misc::massRenameFilter
+ * Creates a mass rename filter string from [names]
+ *******************************************************************/
 string Misc::massRenameFilter(wxArrayString& names) {
 	// Check any names were given
 	if (names.size() == 0)
@@ -265,6 +268,10 @@ string Misc::massRenameFilter(wxArrayString& names) {
 	return filter;
 }
 
+/* Misc::doMassRename
+ * Performs a mass rename on [names] using the filter [name_filter].
+ * Any * in the filter means that character should not be changed
+ *******************************************************************/
 void Misc::doMassRename(wxArrayString& names, string name_filter) {
 	// Go through names
 	for (unsigned a = 0; a < names.size(); a++) {

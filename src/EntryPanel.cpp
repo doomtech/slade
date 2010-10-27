@@ -102,7 +102,7 @@ void EntryPanel::setModified(bool c) {
 			modified = c;
 	}
 
-	// Set frame label
+	// Set frame label (disabled, causes flicker in windows)
 	//if (modified)
 	//	frame->SetLabel(s_fmt("Entry Contents (%s, unsaved changes)", entry->getName().c_str()));
 	//else
@@ -117,7 +117,7 @@ bool EntryPanel::openEntry(ArchiveEntry* entry) {
 	if (!entry)
 		return false;
 
-	// Set frame label
+	// Set frame label (disabled, causes flicker in windows)
 	//frame->SetLabel(s_fmt("Entry Contents (%s)", entry->getName().c_str()));
 
 	// Copy current entry content
@@ -170,6 +170,9 @@ bool EntryPanel::revertEntry() {
 	return false;
 }
 
+/* EntryPanel::refreshPanel
+ * Redraws the panel
+ *******************************************************************/
 void EntryPanel::refreshPanel() {
 	Update();
 	Refresh();

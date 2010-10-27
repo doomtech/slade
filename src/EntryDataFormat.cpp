@@ -5,7 +5,8 @@
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
  * Filename:    EntryDataFormat.cpp
- * Description: Entry data format detection system
+ * Description: Entry data format detection system, still fairly
+ *              unfinished but good enough for now
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -55,6 +56,9 @@ EntryDataFormat*	edf_any = 0;
  * ENTRYDATAFORMAT CLASS FUNCTIONS
  *******************************************************************/
 
+/* EntryDataFormat::EntryDataFormat
+ * EntryDataFormat class constructor
+ *******************************************************************/
 EntryDataFormat::EntryDataFormat(string id) {
 	// Init variables
 	size_min = 0;
@@ -63,20 +67,37 @@ EntryDataFormat::EntryDataFormat(string id) {
 	data_formats[id] = this;
 }
 
+/* EntryDataFormat::~EntryDataFormat
+ * EntryDataFormat class destructor
+ *******************************************************************/
 EntryDataFormat::~EntryDataFormat() {
 }
 
+/* EntryDataFormat::isThisFormat
+ * To be overridden by specific data types, returns true if the data
+ * in [mc] matches the data format
+ *******************************************************************/
 int EntryDataFormat::isThisFormat(MemChunk& mc) {
 	return EDF_TRUE;
 }
 
+/* EntryDataFormat::copyToFormat
+ * Copies data format properties to [target]
+ *******************************************************************/
 void EntryDataFormat::copyToFormat(EntryDataFormat& target) {
 	target.patterns = patterns;
 	target.size_min = size_min;
 }
 
 
+/*******************************************************************
+ * ENTRYDATAFORMAT STATIC FUNCTIONS
+ *******************************************************************/
 
+/* EntryDataFormat::getFormat
+ * Returns the entry data format matching [id], or the 'any' type
+ * if no match found
+ *******************************************************************/
 EntryDataFormat* EntryDataFormat::getFormat(string id) {
 	EDFMap::iterator i = data_formats.find(id);
 	if (i == data_formats.end())
@@ -85,10 +106,16 @@ EntryDataFormat* EntryDataFormat::getFormat(string id) {
 		return i->second;
 }
 
+/* EntryDataFormat::anyFormat
+ * Returns the 'any' data format
+ *******************************************************************/
 EntryDataFormat* EntryDataFormat::anyFormat() {
 	return edf_any;
 }
 
+/* EntryDataFormat::readDataFormatDefinition
+ * Parses a user data format definition (unimplemented, currently)
+ *******************************************************************/
 bool EntryDataFormat::readDataFormatDefinition(MemChunk& mc) {
 	// Parse the definition
 	Parser p;
@@ -142,11 +169,17 @@ public:
 #include "MiscFormats.h"
 #include "ModelFormats.h"
 
+/* EntryDataFormat::initBuiltinFormats
+ * Initialises all built-in data formats (this is currently all
+ * formats, as externally defined formats are not implemented yet)
+ *******************************************************************/
 void EntryDataFormat::initBuiltinFormats() {
 	// Create the 'any' format
 	edf_any = new AnyDataFormat();
 
 	// Just need to create an instance of each builtin format class
+	// TODO: Ugly ugly ugly, need a better way of doing this, defining
+	// each data format in a single place etc
 	new PNGDataFormat();
 	new BMPDataFormat();
 	new GIFDataFormat();

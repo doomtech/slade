@@ -172,6 +172,10 @@ bool AnimatedList::writeANIMATEDData(ArchiveEntry* animated) {
 	return true;
 }
 
+/* AnimatedList::convertAnimated
+ * Converts ANIMATED data in [entry] to ANIMDEFS format, written to
+ * [animdata]
+ *******************************************************************/
 bool AnimatedList::convertAnimated(ArchiveEntry* entry, MemChunk * animdata) {
 	const uint8_t * cursor = entry->getData(true);
 	const uint8_t * eodata = cursor + entry->getSize();

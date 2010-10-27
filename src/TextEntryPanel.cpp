@@ -161,6 +161,9 @@ bool TextEntryPanel::saveEntry() {
 	return true;
 }
 
+/* TextEntryPanel::refreshPanel
+ * Updates the text editor options and redraws it
+ *******************************************************************/
 void TextEntryPanel::refreshPanel() {
 	// Update text editor
 	text_area->setup();
@@ -181,10 +184,16 @@ void TextEntryPanel::onTextModified(wxStyledTextEvent& e) {
 	setModified();
 }
 
+/* TextEntryPanel::onBtnFindReplace
+ * Called when the 'Find+Replace' button is clicked
+ *******************************************************************/
 void TextEntryPanel::onBtnFindReplace(wxCommandEvent& e) {
 	text_area->showFindReplaceDialog();
 }
 
+/* TextEntryPanel::onChoiceLanguageChanged
+ * Called when the language in the dropdown is changed
+ *******************************************************************/
 void TextEntryPanel::onChoiceLanguageChanged(wxCommandEvent& e) {
 	int index = choice_text_language->GetSelection();
 	// Get selected language

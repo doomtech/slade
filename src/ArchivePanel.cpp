@@ -938,6 +938,9 @@ bool ArchivePanel::palConvert() {
 	return true;
 }
 
+/* ArchivePanel::wavDSndConvert
+ * Converts selected wav format entries to doom sound format
+ *******************************************************************/
 bool ArchivePanel::wavDSndConvert() {
 	// Get selected entries
 	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
@@ -961,6 +964,9 @@ bool ArchivePanel::wavDSndConvert() {
 	return true;
 }
 
+/* ArchivePanel::dSndWavConvert
+ * Converts selected doom sound format entries to wav format
+ *******************************************************************/
 bool ArchivePanel::dSndWavConvert() {
 	// Get selected entries
 	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
@@ -995,6 +1001,9 @@ bool ArchivePanel::dSndWavConvert() {
 	return true;
 }
 
+/* ArchivePanel::musMidiConvert
+ * Converts selected mus format entries to midi format
+ *******************************************************************/
 bool ArchivePanel::musMidiConvert() {
 	// Get selected entries
 	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
@@ -1014,6 +1023,9 @@ bool ArchivePanel::musMidiConvert() {
 	return true;
 }
 
+/* ArchivePanel::compileACS
+ * Compiles any selected text entries as ACS scripts
+ *******************************************************************/
 bool ArchivePanel::compileACS() {
 	// Get selected entries
 	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
@@ -1101,6 +1113,9 @@ bool ArchivePanel::openEntry(ArchiveEntry* entry, bool force) {
 	return true;
 }
 
+/* ArchivePanel::openEntryAsText
+ * Opens [entry] in the text editor panel
+ *******************************************************************/
 bool ArchivePanel::openEntryAsText(ArchiveEntry* entry) {
 	// Check entry was given
 	if (!entry)
@@ -1118,6 +1133,9 @@ bool ArchivePanel::openEntryAsText(ArchiveEntry* entry) {
 	return true;
 }
 
+/* ArchivePanel::openEntryAsHex
+ * Opens [entry] in the hex editor panel
+ *******************************************************************/
 bool ArchivePanel::openEntryAsHex(ArchiveEntry* entry) {
 	// Check entry was given
 	if (!entry)
@@ -1170,6 +1188,9 @@ bool ArchivePanel::showEntryPanel(EntryPanel* new_area, bool ask_save) {
 	return true;
 }
 
+/* ArchivePanel::refreshPanel
+ * Refreshes everything on the panel
+ *******************************************************************/
 void ArchivePanel::refreshPanel() {
 	// Refresh entry list
 	entry_list->applyFilter();
@@ -1348,6 +1369,9 @@ void ArchivePanel::onAnnouncement(Announcer* announcer, string event_name, MemCh
  * ARCHIVEPANEL EVENTS
  *******************************************************************/
 
+/* ArchivePanel::onEntryListSelectionChange
+ * Called when the selection on the entry list is changed
+ *******************************************************************/
 void ArchivePanel::onEntryListSelectionChange(wxCommandEvent& e) {
 	// Do nothing if not shown
 	if (!IsShown())
@@ -1369,6 +1393,9 @@ void ArchivePanel::onEntryListSelectionChange(wxCommandEvent& e) {
 	}
 }
 
+/* ArchivePanel::onEntryListFocusChange
+ * Called when the focused item on the entry list is changed
+ *******************************************************************/
 void ArchivePanel::onEntryListFocusChange(wxListEvent& e) {
 	// Do nothing if not shown
 	if (!IsShown())
@@ -1623,6 +1650,9 @@ void ArchivePanel::onDEPViewAsHex(wxCommandEvent& e) {
 	openEntryAsHex(entry);
 }
 
+/* ArchivePanel::onTextFilterChanged
+ * Called when the filter text is changed
+ *******************************************************************/
 void ArchivePanel::onTextFilterChanged(wxCommandEvent& e) {
 	// Get category string to filter by
 	string category = "";
@@ -1635,6 +1665,9 @@ void ArchivePanel::onTextFilterChanged(wxCommandEvent& e) {
 	e.Skip();
 }
 
+/* ArchivePanel::onChoiceCategoryChanged
+ * Called when the 'Category' choice is changed
+ *******************************************************************/
 void ArchivePanel::onChoiceCategoryChanged(wxCommandEvent& e) {
 	// Get category string to filter by
 	string category = "";
@@ -1647,6 +1680,9 @@ void ArchivePanel::onChoiceCategoryChanged(wxCommandEvent& e) {
 	e.Skip();
 }
 
+/* ArchivePanel::onDirChanged
+ * Called when the entry list directory is changed
+ *******************************************************************/
 void ArchivePanel::onDirChanged(wxCommandEvent& e) {
 	// Get directory
 	ArchiveTreeNode* dir = entry_list->getCurrentDir();
@@ -1667,6 +1703,9 @@ void ArchivePanel::onDirChanged(wxCommandEvent& e) {
 	}
 }
 
+/* ArchivePanel::onBtnUpDir
+ * Called when the 'Up Directory' button is clicked
+ *******************************************************************/
 void ArchivePanel::onBtnUpDir(wxCommandEvent& e) {
 	// Go up a directory in the entry list
 	entry_list->goUpDir();

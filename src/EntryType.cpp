@@ -45,7 +45,6 @@
 /*******************************************************************
  * VARIABLES
  *******************************************************************/
-
 vector<EntryType*>	entry_types;		// The big list of all entry types
 vector<string>		entry_categories;	// All entry type categories
 
@@ -125,6 +124,9 @@ void EntryType::dump() {
 	wxLogMessage("---");
 }
 
+/* EntryType::copyToType
+ * Copies this entry type's info/properties to [target]
+ *******************************************************************/
 void EntryType::copyToType(EntryType* target) {
 	// Copy type attributes
 	target->editor = editor;
@@ -146,6 +148,10 @@ void EntryType::copyToType(EntryType* target) {
 	target->match_archive = match_archive;
 }
 
+/* EntryType::getFileFilterString
+ * Returns a file filter string for this type:
+ * "<type name> files (*.<type extension)|*.<type extension>"
+ *******************************************************************/
 string EntryType::getFileFilterString() {
 	string ret = name + " files (*.";
 	ret += extension;
@@ -580,6 +586,10 @@ EntryType* EntryType::mapMarkerType() {
 	return &etype_map;
 }
 
+/* EntryType::getIconList
+ * Returns a list of icons for all entry types, organised by type
+ * index
+ *******************************************************************/
 wxArrayString EntryType::getIconList() {
 	wxArrayString list;
 
@@ -589,6 +599,9 @@ wxArrayString EntryType::getIconList() {
 	return list;
 }
 
+/* EntryType::cleanupEntryTypes
+ * Clears all defined entry types
+ *******************************************************************/
 void EntryType::cleanupEntryTypes() {
 	for (size_t a = 3; a < entry_types.size(); a++) {
 		EntryType* e = entry_types[a];
@@ -597,37 +610,27 @@ void EntryType::cleanupEntryTypes() {
 	}
 }
 
+/* EntryType::allTypes
+ * Returns a list of all entry types
+ *******************************************************************/
 vector<EntryType*> EntryType::allTypes() {
 	return entry_types;
 }
 
+/* EntryType::allCategories
+ * Returns a list of all entry type categories
+ *******************************************************************/
 vector<string> EntryType::allCategories() {
 	return entry_categories;
 }
 
 
-/* Console Command - "test_entry_types"
- * Testingggg
+/*******************************************************************
+ * CONSOLE COMMANDS
  *******************************************************************/
-/*
-CONSOLE_COMMAND (test_entry_types, 0) {
-	EntryType::loadEntryTypes();
-}
-*/
 
-/* Console Command - "test_entry_type_detection"
- * Testingggg moar
- *******************************************************************/
-/*
-CONSOLE_COMMAND (test_entry_type_detection, 0) {
-	Archive* archive = theArchiveManager->getArchive(0);
-
-	for (uint32_t a = 0; a < archive->numEntries(); a++) {
-		EntryType::detectEntryType(archive->getEntry(a));
-	}
-}
-*/
-
+// Command to attempt to detect the currently selected entries
+// as the given type id. Lists all type ids if no parameters given
 CONSOLE_COMMAND (type, 0) {
 	vector<EntryType*> all_types = EntryType::allTypes();
 	if (args.size() == 0) {

@@ -97,14 +97,19 @@ DefaultEntryPanel::DefaultEntryPanel(wxWindow* parent)
 	btn_gfx_convert->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &DefaultEntryPanel::onBtnGfxConvert, this);
 	btn_gfx_modify_offsets->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &DefaultEntryPanel::onBtnGfxModifyOffsets, this);
 	btn_texture_edit->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &DefaultEntryPanel::onBtnTextureEdit, this);
-	//btn_view_hex->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &DefaultEntryPanel::onBtnViewHex, this);
 
 	Layout();
 }
 
+/* DefaultEntryPanel::~DefaultEntryPanel
+ * DefaultEntryPanel class destructor
+ *******************************************************************/
 DefaultEntryPanel::~DefaultEntryPanel() {
 }
 
+/* DefaultEntryPanel::loadEntry
+ * Loads [entry] into the panel
+ *******************************************************************/
 bool DefaultEntryPanel::loadEntry(ArchiveEntry* entry) {
 	// Update labels
 	label_type->SetLabel(s_fmt("Entry Type: %s", chr(entry->getTypeString())));
@@ -138,6 +143,9 @@ bool DefaultEntryPanel::loadEntry(ArchiveEntry* entry) {
 	return true;
 }
 
+/* DefaultEntryPanel::loadEntries
+ * Loads [entries] into the panel, for multiple selection handling
+ *******************************************************************/
 bool DefaultEntryPanel::loadEntries(vector<ArchiveEntry*>& entries) {
 	// Update labels
 	label_type->SetLabel(s_fmt("%d selected entries", entries.size()));
@@ -185,11 +193,18 @@ bool DefaultEntryPanel::loadEntries(vector<ArchiveEntry*>& entries) {
 	return true;
 }
 
+/* DefaultEntryPanel::saveEntry
+ * Saves any changes to the entry
+ *******************************************************************/
 bool DefaultEntryPanel::saveEntry() {
 	return true;
 }
 
 
+
+/* DefaultEntryPanel::onBtnGfxConvert
+ * Called when the 'Convert Gfx To' button is clicked
+ *******************************************************************/
 void DefaultEntryPanel::onBtnGfxConvert(wxCommandEvent& e) {
 	// Create gfx conversion dialog
 	GfxConvDialog gcd;
@@ -201,6 +216,9 @@ void DefaultEntryPanel::onBtnGfxConvert(wxCommandEvent& e) {
 	gcd.ShowModal();
 }
 
+/* DefaultEntryPanel::onBtnGfxModifyOffsets
+ * Called when the 'Modify Offsets' button is clicked
+ *******************************************************************/
 void DefaultEntryPanel::onBtnGfxModifyOffsets(wxCommandEvent& e) {
 // Create and run modify offsets dialog
 	ModifyOffsetsDialog mod;
@@ -213,26 +231,9 @@ void DefaultEntryPanel::onBtnGfxModifyOffsets(wxCommandEvent& e) {
 											mod.xOffChange(), mod.yOffChange(), mod.relativeOffset());
 }
 
+/* DefaultEntryPanel::onBtnTextureEdit
+ * Called when the 'Edit Textures' button is clicked
+ *******************************************************************/
 void DefaultEntryPanel::onBtnTextureEdit(wxCommandEvent& e) {
 	theMainWindow->openTextureEditor(entry->getParent());
-	//theArchiveManager->openTextureEditor(theArchiveManager->archiveIndex(entry->getParent()));
 }
-
-/*
-void DefaultEntryPanel::onBtnViewHex(wxCommandEvent& e) {
-	wxDialog dlg(NULL, -1, "Hex Editor (temp dialog)", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
-
-	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
-	dlg.SetSizer(hbox);
-
-	HexEditorPanel* hex = new HexEditorPanel(&dlg);
-	hbox->Add(hex, 1, wxEXPAND|wxALL, 4);
-
-	if (entry)
-		hex->loadData(entry->getMCData());
-
-	dlg.Layout();
-	dlg.SetInitialSize(wxSize(800, 500));
-	dlg.ShowModal();
-}
-*/

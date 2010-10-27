@@ -124,7 +124,7 @@ bool PnamesEntryPanel::saveEntry() {
 	return false;
 }
 
-/* AnimatedEntryPanel::populateEntryList
+/* PnamesEntryPanel::populateEntryList
  * Clears and adds all entries to the entry list
  *******************************************************************/
 void PnamesEntryPanel::populateEntryList() {

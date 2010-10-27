@@ -1,4 +1,36 @@
 
+/*******************************************************************
+ * SLADE - It's a Doom Editor
+ * Copyright (C) 2008 Simon Judd
+ *
+ * Email:       veilofsorrow@gmail.com
+ * Web:         http://slade.mancubus.net
+ * Filename:    PatchBrowser.cpp
+ * Description: A specialisation of the Browser class for browsing
+ *              the contents of a patch table. Splits the patches
+ *              into three categories - Base, Archive and Unknown
+ *              for patches existing in the base resource, the
+ *              current archive, and entries not found, respectively
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *******************************************************************/
+
+
+/*******************************************************************
+ * INCLUDES
+ *******************************************************************/
 #include "Main.h"
 #include "MainWindow.h"
 #include "WxStuff.h"
@@ -7,15 +39,28 @@
 #include "Misc.h"
 
 
+/*******************************************************************
+ * PATCHBROWSERITEM CLASS FUNCTIONS
+ *******************************************************************/
+
+/* PatchBrowserItem::PatchBrowserItem
+ * PatchBrowserItem class constructor
+ *******************************************************************/
 PatchBrowserItem::PatchBrowserItem(string name, ArchiveEntry* entry, unsigned index) : BrowserItem(name, index) {
 	// Init variables
 	this->entry = entry;
 	this->palette = NULL;
 }
 
+/* PatchBrowserItem::~PatchBrowserItem
+ * PatchBrowserItem class destructor
+ *******************************************************************/
 PatchBrowserItem::~PatchBrowserItem() {
 }
 
+/* PatchBrowserItem::loadImage
+ * Loads the item's image from it's associated entry (if any)
+ *******************************************************************/
 bool PatchBrowserItem::loadImage() {
 	// Do nothing if no patch entry defined
 	if (!entry)
@@ -35,8 +80,13 @@ bool PatchBrowserItem::loadImage() {
 }
 
 
+/*******************************************************************
+ * PATCHBROWSER CLASS FUNCTIONS
+ *******************************************************************/
 
-
+/* PatchBrowser::PatchBrowser
+ * PatchBrowser class constructor
+ *******************************************************************/
 PatchBrowser::PatchBrowser(wxWindow* parent) : BrowserWindow(parent) {
 	// Init variables
 	this->patch_table = NULL;
@@ -53,9 +103,15 @@ PatchBrowser::PatchBrowser(wxWindow* parent) : BrowserWindow(parent) {
 	SetTitle("Patch Browser");
 }
 
+/* PatchBrowser::~PatchBrowser
+ * PatchBrowser class destructor
+ *******************************************************************/
 PatchBrowser::~PatchBrowser() {
 }
 
+/* PatchBrowser::openPatchTable
+ * Opens contents of the patch table [table] for browsing
+ *******************************************************************/
 bool PatchBrowser::openPatchTable(PatchTable* table) {
 	// Check table was given
 	if (!table)
@@ -107,6 +163,10 @@ bool PatchBrowser::openPatchTable(PatchTable* table) {
 	return true;
 }
 
+/* PatchBrowser::getSelectedPatch
+ * Returns the index of the currently selected patch, or -1 if none
+ * are selected
+ *******************************************************************/
 int PatchBrowser::getSelectedPatch() {
 	// Get selected item
 	PatchBrowserItem* item = (PatchBrowserItem*)getSelectedItem();
@@ -117,6 +177,9 @@ int PatchBrowser::getSelectedPatch() {
 		return -1;
 }
 
+/* PatchBrowser::updateItemPalettes
+ * Updates the palette for each browser item
+ *******************************************************************/
 void PatchBrowser::updateItemPalettes(BrowserTreeNode* node) {
 	// Root node if none given
 	if (!node)

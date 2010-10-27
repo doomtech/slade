@@ -406,18 +406,6 @@ void GfxEntryPanel::onTileChanged(wxCommandEvent& e) {
 void GfxEntryPanel::onalPhChanged(wxCommandEvent& e) {
 	// Set changed
 	setModified();
-	/*
-	if (EntryOperations::modifyalPhChunk(entry, cb_alph_chunk->IsChecked()))
-	{
-		// Set changed
-		setModified();
-
-		// Refresh canvas
-		Misc::loadImageFromEntry(gfx_canvas->getImage(), this->entry);
-		gfx_canvas->Refresh();
-	}
-	cb_alph_chunk->SetValue(EntryOperations::getalPhChunk(this->entry));
-	*/
 }
 
 /* GfxEntryPanel::cbtRNSChecked
@@ -426,18 +414,6 @@ void GfxEntryPanel::onalPhChanged(wxCommandEvent& e) {
 void GfxEntryPanel::ontRNSChanged(wxCommandEvent& e) {
 	// Set changed
 	setModified();
-	/*
-	if (EntryOperations::modifytRNSChunk(entry, cb_trns_chunk->IsChecked()))
-	{
-		// Set changed
-		setModified();
-
-		// Refresh canvas
-		Misc::loadImageFromEntry(gfx_canvas->getImage(), this->entry);
-		gfx_canvas->Refresh();
-	}
-	cb_trns_chunk->SetValue(EntryOperations::gettRNSChunk(this->entry));
-	*/
 }
 
 /* GfxEntryPanel::gfxOffsetChanged

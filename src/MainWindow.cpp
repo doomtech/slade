@@ -362,6 +362,10 @@ void MainWindow::createStartPage() {
 	wxRemoveFile(appPath("logo.png", DIR_TEMP));
 }
 
+/* MainWindow::exitProgram
+ * Attempts to exit the program. Only fails if an unsaved archive is
+ * found and the user cancels the exit
+ *******************************************************************/
 bool MainWindow::exitProgram() {
 	// Close all archives
 	if (!panel_archivemanager->closeAll())
@@ -379,22 +383,41 @@ bool MainWindow::exitProgram() {
 	return true;
 }
 
+/* MainWindow::getCurrentArchive
+ * Returns the currently open archive (ie the current tab's archive,
+ * if any)
+ *******************************************************************/
 Archive* MainWindow::getCurrentArchive() {
 	return panel_archivemanager->currentArchive();
 }
 
+/* MainWindow::getCurrentEntry
+ * Returns the currently open entry (current tab -> current entry
+ * panel)
+ *******************************************************************/
 ArchiveEntry* MainWindow::getCurrentEntry() {
 	return panel_archivemanager->currentEntry();
 }
 
+/* MainWindow::getCurrentEntrySelection
+ * Returns a list of all currently selected entries, in the current
+ * archive panel
+ *******************************************************************/
 vector<ArchiveEntry*> MainWindow::getCurrentEntrySelection() {
 	return panel_archivemanager->currentEntrySelection();
 }
 
+/* MainWindow::openTextureEditor
+ * Opens the texture editor for the current archive tab
+ *******************************************************************/
 void MainWindow::openTextureEditor(Archive* archive) {
 	panel_archivemanager->openTextureTab(theArchiveManager->archiveIndex(archive));
 }
 
+/* MainWindow::openEntry
+ * (Unimplemented) open [entry] in the editor, opening the correct
+ * archive tab and entry panel
+ *******************************************************************/
 void MainWindow::openEntry(ArchiveEntry* entry) {
 }
 
