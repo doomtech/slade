@@ -694,10 +694,36 @@ void ArchiveManagerPanel::createNewArchive(uint8_t type) {
 	}
 }
 
+/* ArchiveManagerPanel::saveEntryChanges
+ * If there are any unsaved entry changes in [archive]'s ArchivePanel
+ * tab, saves the changes (or not, depending on user settings)
+ *******************************************************************/
+bool ArchiveManagerPanel::saveEntryChanges(Archive* archive) {
+	// Go through tabs
+	for (size_t a = 0; a < notebook_archives->GetPageCount(); a++) {
+		// Check page type is "archive"
+		if (notebook_archives->GetPage(a)->GetName().CmpNoCase("archive"))
+			continue;
+
+		// Check for archive match
+		ArchivePanel* ap = (ArchivePanel*)notebook_archives->GetPage(a);
+		if (ap->getArchive() == archive) {
+			// Save entry changes
+			wxLogMessage("ho");
+			return ap->saveEntryChanges();
+		}
+	}
+
+	return false;
+}
+
 /* ArchiveManagerPanel::saveArchive
  * Saves [archive] to disk, opens a file dialog if necessary
  *******************************************************************/
 bool ArchiveManagerPanel::saveArchive(Archive* archive) {
+	// Check for unsaved entry changes
+	saveEntryChanges(archive);
+
 	if (archive->isOnDisk()) {
 		// Save the archive if possible
 		if (!archive->save()) {
@@ -717,6 +743,9 @@ bool ArchiveManagerPanel::saveArchive(Archive* archive) {
  * a file dialog to select the new name/path
  *******************************************************************/
 bool ArchiveManagerPanel::saveArchiveAs(Archive* archive) {
+	// Check for unsaved entry changes
+	saveEntryChanges(archive);
+
 	// Popup file save dialog
 	string formats = archive->getFileExtensionString();
 	string filename = wxFileSelector("Save Archive " + archive->getFilename(false) + " As", "", "", wxEmptyString, formats, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
@@ -739,6 +768,9 @@ bool ArchiveManagerPanel::saveArchiveAs(Archive* archive) {
  * needed before closing [archive]
  *******************************************************************/
 bool ArchiveManagerPanel::closeArchive(Archive* archive) {
+	// Check for unsaved entry changes
+	saveEntryChanges(archive);
+
 	// If the archive has unsaved changes, prompt to save
 	if (archive->isModified()) {
 		wxMessageDialog md(this, s_fmt("Save changes to %s?", archive->getFilename(false)), "Unsaved Changes", wxYES_NO|wxCANCEL);
@@ -1073,6 +1105,10 @@ void ArchiveManagerPanel::handleAction(int menu_id) {
 	else if (menu_id == MainWindow::MENU_FILE_CLOSEALL)
 		closeAll();
 
+	// File->Close
+	else if (menu_id == MainWindow::MENU_FILE_CLOSE)
+		closeArchive(currentArchive());
+
 	else {
 		// Check if the current tab is an archive tab
 		wxWindow* tab = notebook_archives->GetPage(notebook_archives->GetSelection());
@@ -1310,7 +1346,8 @@ void ArchiveManagerPanel::onArchiveTabChanged(wxAuiNotebookEvent& e) {
 void ArchiveManagerPanel::onArchiveTabClose(wxAuiNotebookEvent& e) {
 	if (close_archive_with_tab) {
 		tab_closing = true;
-		theArchiveManager->closeArchive(currentArchive());
+		closeArchive(currentArchive());
+		//theArchiveManager->closeArchive(currentArchive());
 		tab_closing = false;
 	}
 }

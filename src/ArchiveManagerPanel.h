@@ -91,6 +91,7 @@ public:
 	void	openFiles(wxArrayString& files);
 
 	// Single archive actions
+	bool	saveEntryChanges(Archive* archive);
 	bool	saveArchive(Archive* archive);
 	bool	saveArchiveAs(Archive* archive);
 	bool	closeArchive(Archive* archive);

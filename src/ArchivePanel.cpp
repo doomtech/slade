@@ -1219,10 +1219,6 @@ void ArchivePanel::handleAction(int menu_id) {
 	else if (menu_id == MainWindow::MENU_FILE_SAVEAS)
 		saveAs();
 
-	// File->Close
-	else if (menu_id == MainWindow::MENU_FILE_CLOSE)
-		theArchiveManager->closeArchive(archive);
-
 
 	// *************************************************************
 	// ARCHIVE MENU

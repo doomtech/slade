@@ -174,7 +174,7 @@ void MainWindow::setupLayout() {
 	archiveMenu->Append(createMenuItem(archiveMenu,	MENU_ARCHIVE_IMPORTFILES,	"&Import Files",	"Import multiple files into the archive"));
 	archiveMenu->AppendSeparator();
 	archiveMenu->Append(createMenuItem(archiveMenu,	MENU_ARCHIVE_TEXEDITOR,		"&Texture Editor",	"Open the texture editor for the current archive"));
-	archiveMenu->Append(createMenuItem(archiveMenu,	MENU_ARCHIVE_CONVERTTO,		"&Convert To...",	"Convert the current archive to a different format"));
+	//archiveMenu->Append(createMenuItem(archiveMenu,	MENU_ARCHIVE_CONVERTTO,		"&Convert To...",	"Convert the current archive to a different format"));
 	//archiveMenu->Append(createMenuItem(archiveMenu,	MENU_ARCHIVE_CLEANUP,		"Clean &Up",		"Clean up the current archive by removing unused entries and data"));
 	wxMenu* archiveCleanMenu = new wxMenu("");
 	archiveCleanMenu->Append(createMenuItem(archiveCleanMenu, MENU_ARCHIVE_CLEAN_PATCHES, "Remove Unused &Patches", "Removes any unused patches, and their associated entries"));
@@ -193,11 +193,11 @@ void MainWindow::setupLayout() {
 	entryMenu->AppendSeparator();
 	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_MOVEUP,		"Move Up",			"Move the selected entries up",													"t_up"));
 	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_MOVEDOWN,	"Move Down",		"Move the selected entries down",												"t_down"));
-	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_CONVERTTO,	"Convert To...",	"Convert selected entries to a different format/type"));
+	//entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_CONVERTTO,	"Convert To...",	"Convert selected entries to a different format/type"));
 	entryMenu->AppendSeparator();
 	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_IMPORT,		"Import",			"Import a file to the selected entry",											"t_import"));
 	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_EXPORT,		"Export",			"Export the selected entries to files",											"t_export"));
-	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_EXPORTAS,	"Export As...",		"Export the selected entries to files as a different format/type"));
+	//entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_EXPORTAS,	"Export As...",		"Export the selected entries to files as a different format/type"));
 	entryMenu->AppendSeparator();
 	entryMenu->Append(createMenuItem(entryMenu,	MENU_ENTRY_BOOKMARK,	"Bookmark",			"Bookmark the current entry"));
 	menu->Append(entryMenu, "&Entry");
