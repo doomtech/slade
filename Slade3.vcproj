@@ -183,6 +183,14 @@
 			Name="Dialogs"
 			>
 			<File
+				RelativePath=".\src\ExtMessageDialog.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\ExtMessageDialog.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\GfxConvDialog.cpp"
 				>
 			</File>
