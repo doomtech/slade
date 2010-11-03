@@ -438,7 +438,7 @@ bool Conversions::vocToWav(MemChunk& in, MemChunk& out) {
  * Blood SFX files to wav format
  *******************************************************************/
 bool Conversions::bloodToWav(ArchiveEntry * in, MemChunk& out) {
-	MemChunk mc = in->getMCData();
+	MemChunk& mc = in->getMCData();
 	if (mc.getSize() < 22 || mc.getSize() > 29 || (mc[12] != 1 && mc[12] != 5 || mc[mc.getSize()-1] != 0)) {
 		Global::error = "Invalid SFX";
 		return false;

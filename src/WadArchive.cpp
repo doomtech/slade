@@ -175,7 +175,8 @@ void WadArchive::updateNamespaces() {
 
 	// ROTT stuff. The first lump in the archive is always WALLSTRT, the last lump is either
 	// LICENSE (darkwar.wad) or VENDOR (huntbgin.wad), with TABLES just before in both cases.
-	if (getRoot()->getEntry(0)->getName().Matches("WALLSTRT") &&
+	// The shareware version has 2091 lumps, the complete version has about 50% more.
+	if (numEntries() > 2090 && getRoot()->getEntry(0)->getName().Matches("WALLSTRT") &&
 		getRoot()->getEntry(numEntries()-2)->getName().Matches("TABLES")) {
 			wad_ns_pair_t ns(getRoot()->getEntry(0), getRoot()->getEntry(numEntries()-1));
 			ns.name = "rott";

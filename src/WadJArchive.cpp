@@ -49,7 +49,7 @@ extern string map_lumps[];
 
 // Taken and adapted from Jaguar Doom source code
 #define LENSHIFT 4		/* this must be log2(LOOKAHEAD_SIZE) */
-bool JaguarDecode(MemChunk mc)
+bool JaguarDecode(MemChunk& mc)
 {
 	bool okay = false;
 	uint8_t getidbyte = 0;
@@ -64,7 +64,7 @@ bool JaguarDecode(MemChunk mc)
 	size_t isize = mc.getSize();
 	
 	// It seems that encoded lumps are given their actual uncompressed size in the directory.
-	uint8_t *ostart = new uint8_t[64000];
+	uint8_t *ostart = new uint8_t[isize + 1];
 	uint8_t *output = ostart;
 	uint8_t idbyte = 0;
 
@@ -284,18 +284,11 @@ bool WadJArchive::open(MemChunk& mc) {
 			// Read the entry data
 			edata.clear();
 			mc.exportMemChunk(edata, getEntryOffset(entry), entry->getSize());
-			// Attempting to decode some entries cause a crash, so doing this here
-			// is a bad idea as long as the problem remains. The only lumps that
-			// can be safely and meaningfully decoded are the flats. For them it
-			// does work.
 			if (entry->isEncrypted()) {
 				if (entry->exProps().propertyExists("FullSize")
 					&& (unsigned)(int)(entry->exProp("FullSize")) >  entry->getSize())
 					edata.reSize((int)(entry->exProp("FullSize")), true);
-#if 0
-				wxLogMessage("Attempting to decode %s ", chr(entry->getName()), chr(previousname));
 				if (!JaguarDecode(edata)) wxLogMessage("%s is screwed up", chr(entry->getName()));
-#endif
 			}
 			entry->importMemChunk(edata);
 		}
@@ -478,6 +471,7 @@ bool WadJArchive::isWadJArchive(string filename) {
 	return true;
 }
 
+/*
 #include "ConsoleHelpers.h"
 #include "Console.h"
 
@@ -491,10 +485,11 @@ CONSOLE_COMMAND(decode, 0) {
 	for (size_t a = 0; a < meep.size(); ++a) {
 		ArchiveEntry * beep = meep[a];
 		if ((beep != NULL) && (beep->isEncrypted() == ENC_JAGUAR)) {
-			MemChunk mc = beep->getMCData();
+			MemChunk& mc = beep->getMCData();
 			if (JaguarDecode(mc) && beep->importMemChunk(mc))
 				beep->setEncryption(ENC_NONE);
 			mc.clear();
 		}
 	}
 }
+*/

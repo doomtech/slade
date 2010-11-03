@@ -131,7 +131,7 @@ bool PatchBrowser::openPatchTable(PatchTable* table) {
 		// Init position to add
 		string where = "Unknown";
 
-		// Check it's parent archive
+		// Check its parent archive
 		//table->updatePatchEntry(a);
 		if (patch.entry) {
 			Archive* parent_archive = patch.entry->getParent();
