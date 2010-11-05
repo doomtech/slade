@@ -41,6 +41,7 @@ EXTERN_CVAR(Bool, gl_tex_enable_np2)
 EXTERN_CVAR(Bool, size_as_string)
 EXTERN_CVAR(Bool, elist_filter_dirs)
 EXTERN_CVAR(Bool, show_start_page)
+EXTERN_CVAR(Bool, temp_use_appdir)
 
 
 /*******************************************************************
@@ -84,6 +85,10 @@ GeneralPrefsPanel::GeneralPrefsPanel(wxWindow* parent) : wxPanel(parent, -1) {
 	cb_start_page = new wxCheckBox(this, -1, "Show Start Page on Startup");
 	sizer->Add(cb_start_page, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
+	// Use app dir for temp files
+	cb_temp_dir = new wxCheckBox(this, -1, "Write temp files to SLADE directory rather than system temp folder");
+	sizer->Add(cb_temp_dir, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
 	// Init controls
 	cb_archive_load->SetValue(archive_load_data);
 	cb_archive_close_tab->SetValue(close_archive_with_tab);
@@ -91,6 +96,7 @@ GeneralPrefsPanel::GeneralPrefsPanel(wxWindow* parent) : wxPanel(parent, -1) {
 	cb_size_as_string->SetValue(size_as_string);
 	cb_filter_dirs->SetValue(!elist_filter_dirs);
 	cb_start_page->SetValue(show_start_page);
+	cb_temp_dir->SetValue(temp_use_appdir);
 }
 
 /* GeneralPrefsPanel::~GeneralPrefsPanel
@@ -109,4 +115,17 @@ void GeneralPrefsPanel::applyPreferences() {
 	size_as_string = cb_size_as_string->GetValue();
 	elist_filter_dirs = !cb_filter_dirs->GetValue();
 	show_start_page = cb_start_page->GetValue();
+	temp_use_appdir = cb_temp_dir->GetValue();
+
+	// Create temp dir if necessary
+	if (temp_use_appdir) {
+		string dir_temp = appPath("", DIR_TEMP);
+		if (!wxDirExists(dir_temp)) {
+			if (!wxMkdir(dir_temp)) {
+				// Unable to create it, just use system temp dir
+				wxMessageBox(s_fmt("Unable to create temp directory \"%s\"", dir_temp.c_str()), "Error", wxICON_ERROR);
+				temp_use_appdir = false;
+			}
+		}
+	}
 }

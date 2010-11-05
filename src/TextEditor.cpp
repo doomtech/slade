@@ -7,7 +7,8 @@
  * Web:         http://slade.mancubus.net
  * Filename:    TextEditor.cpp
  * Description: The SLADE Text Editor control, does syntax
- *              highlighting etc
+ *              highlighting, calltips, autocomplete and more,
+ *              using an associated TextLanguage
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -150,9 +151,7 @@ TextEditor::TextEditor(wxWindow* parent, int id)
 	ct_function = NULL;
 	ct_start = 0;
 
-	// Set default font
-	//wxFont f(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
-	//StyleSetFont(wxSTC_STYLE_DEFAULT, f);
+	// Set tab width
 	SetTabWidth(txed_tab_width);
 
 	// Line numbers by default
@@ -195,6 +194,10 @@ TextEditor::TextEditor(wxWindow* parent, int id)
 TextEditor::~TextEditor() {
 }
 
+/* TextEditor::setup
+ * Sets up text editor properties depending on cvars and the current
+ * text styleset/style
+ *******************************************************************/
 void TextEditor::setup() {
 	// General settings
 	SetBufferedDraw(true);
@@ -225,6 +228,9 @@ void TextEditor::setup() {
 	Colourise(0, GetTextLength());
 }
 
+/* TextEditor::setLanguage
+ * Sets the text editor language
+ *******************************************************************/
 bool TextEditor::setLanguage(TextLanguage* lang) {
 	// Check language was given
 	if (!lang) {
@@ -733,6 +739,9 @@ void TextEditor::onMouseDwellEnd(wxStyledTextEvent& e) {
 		CallTipCancel();
 }
 
+/* TextEditor::onMouseDown
+ * Called when a mouse button is clicked
+ *******************************************************************/
 void TextEditor::onMouseDown(wxMouseEvent& e) {
 	e.Skip();
 
@@ -782,6 +791,9 @@ void TextEditor::onMouseDown(wxMouseEvent& e) {
 #endif
 }
 
+/* TextEditor::onFocusLoss
+ * Called when the text editor loses focus
+ *******************************************************************/
 void TextEditor::onFocusLoss(wxFocusEvent& e) {
 	CallTipCancel();
 	AutoCompCancel();

@@ -43,6 +43,7 @@
 #include <wx/stdpaths.h>
 #include <wx/ffile.h>
 #include <wx/stackwalk.h>
+#include <wx/dir.h>
 
 
 /*******************************************************************
@@ -57,6 +58,7 @@ string	dir_data = "";
 string	dir_user = "";
 string	dir_app = "";
 MainApp* MainApp::instance = NULL;
+CVAR(Bool, temp_use_appdir, false, CVAR_SAVE);
 
 
 /*******************************************************************
@@ -182,8 +184,12 @@ string appPath(string filename, int dir) {
 		return dir_user + sep + filename;
 	else if (dir == DIR_APP)
 		return dir_app + sep + filename;
-	else if (dir == DIR_TEMP)
-		return wxStandardPaths::Get().GetTempDir().Append(sep).Append(filename);
+	else if (dir == DIR_TEMP) {
+		if (temp_use_appdir)
+			return dir_app + sep + "temp" + sep + filename;
+		else
+			return wxStandardPaths::Get().GetTempDir().Append(sep).Append(filename);
+	}
 	else
 		return filename;
 }
@@ -236,11 +242,21 @@ bool MainApp::initDirectories() {
 		dir_data = wxStandardPaths::Get().GetDataDir();
 	}
 
-	// Create user dir if necessart
+	// Create user dir if necessary
 	if (!wxDirExists(dir_user)) {
 		if (!wxMkdir(dir_user)) {
 			wxMessageBox(s_fmt("Unable to create user directory \"%s\"", dir_user.c_str()), "Error", wxICON_ERROR);
 			return false;
+		}
+	}
+
+	// Create temp dir if necessary
+	string dir_temp = dir_app + sep + "temp";
+	if (!wxDirExists(dir_temp)) {
+		if (!wxMkdir(dir_temp)) {
+			// Unable to create it, just use system temp dir
+			wxMessageBox(s_fmt("Unable to create temp directory \"%s\", using system temp directory instead", dir_temp.c_str()), "Error", wxICON_ERROR);
+			temp_use_appdir = false;
 		}
 	}
 
@@ -349,6 +365,16 @@ int MainApp::OnExit() {
 	ArchiveManager::deleteInstance();
 	Console::deleteInstance();
 	SplashWindow::deleteInstance();
+
+	// Clear temp folder
+	wxDir temp;
+	temp.Open(appPath("", DIR_TEMP));
+	string filename = wxEmptyString;
+	bool files = temp.GetFirst(&filename, wxEmptyString, wxDIR_FILES);
+	while (files) {
+		wxRemoveFile(appPath(filename, DIR_TEMP));
+		files = temp.GetNext(&filename);
+	}
 
 	return 0;
 }

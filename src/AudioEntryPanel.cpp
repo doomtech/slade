@@ -118,10 +118,6 @@ AudioEntryPanel::~AudioEntryPanel() {
  * Loads an entry into the audio entry panel
  *******************************************************************/
 bool AudioEntryPanel::loadEntry(ArchiveEntry* entry) {
-	// Delete previous temp file
-	if (wxFileExists(prevfile))
-		wxRemoveFile(prevfile);
-
 	// Stop anything currently playing
 	stopStream();
 
@@ -133,7 +129,6 @@ bool AudioEntryPanel::loadEntry(ArchiveEntry* entry) {
 	// Add extension if missing
 	if (path.GetExt().IsEmpty())
 		path.SetExt(entry->getType()->getExtension());
-	prevfile = path.GetFullPath();
 
 	// Convert if necessary, then write to file
 	if (entry->getType()->getFormat() == "snd_doom") {
@@ -181,6 +176,13 @@ bool AudioEntryPanel::loadEntry(ArchiveEntry* entry) {
 		openAudio(path.GetFullPath());
 		midi = false;
 	}
+
+	// Delete previous temp file
+	if (wxFileExists(prevfile))
+		wxRemoveFile(prevfile);
+
+	// Keep filename so we can delete it later
+	prevfile = path.GetFullPath();
 
 	return true;
 }

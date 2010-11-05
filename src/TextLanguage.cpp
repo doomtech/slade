@@ -1,20 +1,69 @@
 
+/*******************************************************************
+ * SLADE - It's a Doom Editor
+ * Copyright (C) 2008 Simon Judd
+ *
+ * Email:       veilofsorrow@gmail.com
+ * Web:         http://slade.mancubus.net
+ * Filename:    TextLanguage.cpp
+ * Description: Defines a 'language' for use by the TextEditor for
+ *              syntax hilighting/autocompletion/etc. Contains lists
+ *              of keywords, constants and functions, with various
+ *              utility functions for using them.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *******************************************************************/
+
+
+/*******************************************************************
+ * INCLUDES
+ *******************************************************************/
 #include "Main.h"
 #include "TextLanguage.h"
 #include "Tokenizer.h"
 #include "Parser.h"
 #include "ArchiveManager.h"
 
+
+/*******************************************************************
+ * VARIABLES
+ *******************************************************************/
 vector<TextLanguage*>	text_languages;
 
 
+/*******************************************************************
+ * TLFUNCTION CLASS FUNCTIONS
+ *******************************************************************/
+
+/* TLFunction::TLFunction
+ * TLFunction class constructor
+ *******************************************************************/
 TLFunction::TLFunction(string name) {
 	this->name = name;
 }
 
+/* TLFunction::~TLFunction
+ * TLFunction class destructor
+ *******************************************************************/
 TLFunction::~TLFunction() {
 }
 
+/* TLFunction::getArgSet
+ * Returns the arg set [index], or an empty string if [index] is
+ * out of bounds
+ *******************************************************************/
 string TLFunction::getArgSet(unsigned index) {
 	// Check index
 	if (index >= arg_sets.size())
@@ -23,6 +72,10 @@ string TLFunction::getArgSet(unsigned index) {
 	return arg_sets[index];
 }
 
+/* TLFunction::generateCallTipString
+ * Returns a string representation of arg set [arg_set] that can be
+ * used directly in a scintilla calltip
+ *******************************************************************/
 string TLFunction::generateCallTipString(int arg_set) {
 	// Check requested arg set exists
 	if (arg_set < 0 || (unsigned)arg_set >= arg_sets.size())
@@ -42,6 +95,9 @@ string TLFunction::generateCallTipString(int arg_set) {
 	return calltip;
 }
 
+/* TLFunction::getArgTextExtent
+ * Returns the start and end position of [arg] within [arg_set]
+ *******************************************************************/
 point2_t TLFunction::getArgTextExtent(int arg, int arg_set) {
 	point2_t extent(-1, -1);
 
@@ -89,8 +145,13 @@ point2_t TLFunction::getArgTextExtent(int arg, int arg_set) {
 }
 
 
+/*******************************************************************
+ * TEXTLANGUAGE CLASS FUNCTIONS
+ *******************************************************************/
 
-
+/* TextLanguage::TextLanguage
+ * TextLanguage class constructor
+ *******************************************************************/
 TextLanguage::TextLanguage(string id) {
 	// Init variables
 	this->id = id;
@@ -99,6 +160,9 @@ TextLanguage::TextLanguage(string id) {
 	text_languages.push_back(this);
 }
 
+/* TextLanguage::~TextLanguage
+ * TextLanguage class destructor
+ *******************************************************************/
 TextLanguage::~TextLanguage() {
 	// Remove from languages list
 	for (size_t a = 0; a < text_languages.size(); a++) {
@@ -107,6 +171,9 @@ TextLanguage::~TextLanguage() {
 	}
 }
 
+/* TextLanguage::copyTo
+ * Copies all language info to [copy]
+ *******************************************************************/
 void TextLanguage::copyTo(TextLanguage* copy) {
 	// Copy general attributes
 	copy->line_comment = line_comment;
@@ -134,18 +201,29 @@ void TextLanguage::copyTo(TextLanguage* copy) {
 	}
 }
 
+/* TextLanguage::addKeyword
+ * Adds a new keyword to the language, if it doesn't exist already
+ *******************************************************************/
 void TextLanguage::addKeyword(string keyword) {
 	// Add only if it doesn't already exist
 	if (std::find(keywords.begin(), keywords.end(), keyword) == keywords.end())
 		keywords.push_back(keyword);
 }
 
+/* TextLanguage::addConstant
+ * Adds a new constant to the language, if it doesn't exist already
+ *******************************************************************/
 void TextLanguage::addConstant(string constant) {
 	// Add only if it doesn't already exist
 	if (std::find(constants.begin(), constants.end(), constant) == constants.end())
 		constants.push_back(constant);
 }
 
+/* TextLanguage::addFunction
+ * Adds a function arg set to the language. If the function [name]
+ * exists, [args] will be added to it as a new arg set, otherwise
+ * a new function will be added
+ *******************************************************************/
 void TextLanguage::addFunction(string name, string args) {
 	// Check if the function exists
 	TLFunction* func = getFunction(name);
@@ -160,6 +238,11 @@ void TextLanguage::addFunction(string name, string args) {
 	func->addArgSet(args);
 }
 
+/* TextLanguage::getKeywordsList
+ * Returns a string of all keywords in the language, separated by
+ * spaces, which can be sent directly to scintilla for syntax
+ * hilighting
+ *******************************************************************/
 string TextLanguage::getKeywordsList() {
 	// Init return string
 	string ret = "";
@@ -171,6 +254,11 @@ string TextLanguage::getKeywordsList() {
 	return ret;
 }
 
+/* TextLanguage::getConstantsList
+ * Returns a string of all constants in the language, separated by
+ * spaces, which can be sent directly to scintilla for syntax
+ * hilighting
+ *******************************************************************/
 string TextLanguage::getConstantsList() {
 	// Init return string
 	string ret = "";
@@ -182,6 +270,11 @@ string TextLanguage::getConstantsList() {
 	return ret;
 }
 
+/* TextLanguage::getFunctionsList
+ * Returns a string of all functions in the language, separated by
+ * spaces, which can be sent directly to scintilla for syntax
+ * hilighting
+ *******************************************************************/
 string TextLanguage::getFunctionsList() {
 	// Init return string
 	string ret = "";
@@ -193,6 +286,10 @@ string TextLanguage::getFunctionsList() {
 	return ret;
 }
 
+/* TextLanguage::getAutocompletionList
+ * Returns a string containing all keywords, constants and functions
+ * that can be used directly in scintilla for an autocompletion list
+ *******************************************************************/
 string TextLanguage::getAutocompletionList() {
 	// Firstly, add all functions, constants and keywords to a wxArrayString
 	wxArrayString list;
@@ -214,6 +311,10 @@ string TextLanguage::getAutocompletionList() {
 	return ret;
 }
 
+/* TextLanguage::isKeyword
+ * Returns true if [word] is a keyword in this language, false
+ * otherwise
+ *******************************************************************/
 bool TextLanguage::isKeyword(string word) {
 	for (unsigned a = 0; a < keywords.size(); a++) {
 		if (keywords[a] == word)
@@ -223,6 +324,10 @@ bool TextLanguage::isKeyword(string word) {
 	return false;
 }
 
+/* TextLanguage::isConstant
+ * Returns true if [word] is a constant in this language, false
+ * otherwise
+ *******************************************************************/
 bool TextLanguage::isConstant(string word) {
 	for (unsigned a = 0; a < constants.size(); a++) {
 		if (constants[a] == word)
@@ -232,6 +337,10 @@ bool TextLanguage::isConstant(string word) {
 	return false;
 }
 
+/* TextLanguage::isFunction
+ * Returns true if [word] is a function in this language, false
+ * otherwise
+ *******************************************************************/
 bool TextLanguage::isFunction(string word) {
 	for (unsigned a = 0; a < functions.size(); a++) {
 		if (functions[a]->getName() == word)
@@ -241,6 +350,10 @@ bool TextLanguage::isFunction(string word) {
 	return false;
 }
 
+/* TextLanguage::getFunction
+ * Returns the function definition matching [name], or NULL if no
+ * matching function exists
+ *******************************************************************/
 TLFunction* TextLanguage::getFunction(string name) {
 	// Find function matching [name]
 	for (unsigned a = 0; a < functions.size(); a++) {
@@ -252,6 +365,15 @@ TLFunction* TextLanguage::getFunction(string name) {
 	return NULL;
 }
 
+
+/*******************************************************************
+ * TEXTLANGUAGE STATIC FUNCTIONS
+ *******************************************************************/
+
+/* TextLanguage::readLanguageDefinition
+ * Reads in a text definition of a language. See slade.pk3 for
+ * formatting examples
+ *******************************************************************/
 bool TextLanguage::readLanguageDefinition(MemChunk& mc, string source) {
 	Tokenizer tz;
 
@@ -379,6 +501,9 @@ bool TextLanguage::readLanguageDefinition(MemChunk& mc, string source) {
 	return true;
 }
 
+/* TextLanguage::loadLanguages
+ * Loads all text language definitions from slade.pk3
+ *******************************************************************/
 bool TextLanguage::loadLanguages() {
 	// Get slade resource archive
 	Archive* res_archive = theArchiveManager->programResourceArchive();
@@ -400,6 +525,10 @@ bool TextLanguage::loadLanguages() {
 	return true;
 }
 
+/* TextLanguage::getLanguage
+ * Returns the language definition matching [id], or NULL if no
+ * match found
+ *******************************************************************/
 TextLanguage* TextLanguage::getLanguage(string id) {
 	// Find text language matching [id]
 	for (unsigned a = 0; a < text_languages.size(); a++) {
@@ -411,6 +540,10 @@ TextLanguage* TextLanguage::getLanguage(string id) {
 	return NULL;
 }
 
+/* TextLanguage::getLanguage
+ * Returns the language definition at [index], or NULL if [index] is
+ * out of bounds
+ *******************************************************************/
 TextLanguage* TextLanguage::getLanguage(unsigned index) {
 	// Check index
 	if (index >= text_languages.size())
@@ -419,6 +552,10 @@ TextLanguage* TextLanguage::getLanguage(unsigned index) {
 	return text_languages[index];
 }
 
+/* TextLanguage::getLanguageByName
+ * Returns the language definition matching [name], or NULL if no
+ * match found
+ *******************************************************************/
 TextLanguage* TextLanguage::getLanguageByName(string name) {
 	// Find text language matching [name]
 	for (unsigned a = 0; a < text_languages.size(); a++) {
@@ -430,6 +567,9 @@ TextLanguage* TextLanguage::getLanguageByName(string name) {
 	return NULL;
 }
 
+/* TextLanguage::getLanguageNames
+ * Returns a list of all language names
+ *******************************************************************/
 wxArrayString TextLanguage::getLanguageNames() {
 	wxArrayString ret;
 

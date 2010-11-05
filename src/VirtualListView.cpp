@@ -1,4 +1,37 @@
 
+/*******************************************************************
+ * SLADE - It's a Doom Editor
+ * Copyright (C) 2008 Simon Judd
+ *
+ * Email:       veilofsorrow@gmail.com
+ * Web:         http://slade.mancubus.net
+ * Filename:    VirtualListView.cpp
+ * Description: A 'virtual' list control that akes use of the
+ *              wxListCtrl::wxLC_VERTICAL style. With this, the list
+ *              works differently to the normal list view. Rather
+ *              than containing specific items, the virtual list
+ *              uses virtual functions to get item details from an
+ *              external source.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *******************************************************************/
+
+
+/*******************************************************************
+ * INCLUDES
+ *******************************************************************/
 #include "Main.h"
 #include "WxStuff.h"
 #include "VirtualListView.h"
@@ -6,9 +39,19 @@
 #include "Console.h"
 
 
+/*******************************************************************
+ * VARIABLES
+ *******************************************************************/
 wxDEFINE_EVENT(EVT_VLV_SELECTION_CHANGED, wxCommandEvent);
 
 
+/*******************************************************************
+ * VIRTUALLISTVIEW CLASS FUNCTIONS
+ *******************************************************************/
+
+/* VirtualListView::VirtualListView
+ * VirtualListView class constructor
+ *******************************************************************/
 VirtualListView::VirtualListView(wxWindow* parent)
 : wxListCtrl(parent, -1, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxLC_VIRTUAL) {
 	item_attr = new wxListItemAttr();
@@ -23,10 +66,16 @@ VirtualListView::VirtualListView(wxWindow* parent)
 	Bind(wxEVT_CHAR, &VirtualListView::onKeyChar, this);
 }
 
+/* VirtualListView::~VirtualListView
+ * VirtualListView class destructor
+ *******************************************************************/
 VirtualListView::~VirtualListView() {
 	delete item_attr;
 }
 
+/* VirtualListView::sendSelectionChangedEvent
+ * Creates and sends an EVT_VLV_SELECTION_CHANGED wxwidgets event
+ *******************************************************************/
 void VirtualListView::sendSelectionChangedEvent() {
 	wxCommandEvent evt(EVT_VLV_SELECTION_CHANGED, GetId());
 	ProcessWindowEvent(evt);
@@ -49,7 +98,9 @@ void VirtualListView::updateWidth() {
 	SetSizeHints(width, -1);
 }
 
-
+/* VirtualListView::selectItem
+ * Selects (or deselects) [item], depending on [select]
+ *******************************************************************/
 void VirtualListView::selectItem(long item, bool select) {
 	// Check item id is in range
 	if (item >= GetItemCount())
@@ -62,6 +113,10 @@ void VirtualListView::selectItem(long item, bool select) {
 		SetItemState(item, 0x0000, wxLIST_STATE_SELECTED);
 }
 
+/* VirtualListView::selectItems
+ * Selects/deselects all items within the range [start]->[end],
+ * depending on [select]
+ *******************************************************************/
 void VirtualListView::selectItems(long start, long end, bool select) {
 	// Check/correct indices
 	if (start > end) {
@@ -82,6 +137,9 @@ void VirtualListView::selectItems(long start, long end, bool select) {
 	}
 }
 
+/* VirtualListView::selectAll
+ * Selects all list items
+ *******************************************************************/
 void VirtualListView::selectAll() {
 	for (int a = 0; a < GetItemCount(); a++)
 		SetItemState(a, 0xFFFF, wxLIST_STATE_SELECTED);
@@ -89,11 +147,17 @@ void VirtualListView::selectAll() {
 	sendSelectionChangedEvent();
 }
 
+/* VirtualListView::clearSelection
+ * Deselects all list items
+ *******************************************************************/
 void VirtualListView::clearSelection() {
 	for (int a = 0; a < GetItemCount(); a++)
 		SetItemState(a, 0x0000, wxLIST_STATE_SELECTED|wxLIST_STATE_FOCUSED);
 }
 
+/* VirtualListView::getSelection
+ * Returns a list of all selected item indices
+ *******************************************************************/
 vector<long> VirtualListView::getSelection() {
 	// Init return array
 	vector<long> ret;
@@ -115,10 +179,16 @@ vector<long> VirtualListView::getSelection() {
 	return ret;
 }
 
+/* VirtualListView::getFirstSelected
+ * Returns the first selected item index
+ *******************************************************************/
 long VirtualListView::getFirstSelected() {
 	return GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
 }
 
+/* VirtualListView::getLastSelected
+ * Returns the last selected item index
+ *******************************************************************/
 long VirtualListView::getLastSelected() {
 	// Go through all items
 	long item = -1;
@@ -137,6 +207,9 @@ long VirtualListView::getLastSelected() {
 	return item;
 }
 
+/* VirtualListView::focusItem
+ * Sets the focus of [item]
+ *******************************************************************/
 void VirtualListView::focusItem(long item, bool focus) {
 	// Check item id is in range
 	if (item >= GetItemCount())
@@ -151,6 +224,9 @@ void VirtualListView::focusItem(long item, bool focus) {
 		SetItemState(item, 0x0000, wxLIST_STATE_FOCUSED);
 }
 
+/* VirtualListView::getFocus
+ * Returns the index of the currently focused item
+ *******************************************************************/
 long VirtualListView::getFocus() {
 	return GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_FOCUSED);
 }
@@ -167,6 +243,9 @@ void VirtualListView::onColumnResize(wxListEvent& e) {
 		GetParent()->Layout();
 }
 
+/* VirtualListView::onMouseLeftDown
+ * Called when the list is left clicked
+ *******************************************************************/
 void VirtualListView::onMouseLeftDown(wxMouseEvent& e) {
 	// Default handler for double-click
 	if (e.ButtonDClick()) {
@@ -204,6 +283,9 @@ void VirtualListView::onMouseLeftDown(wxMouseEvent& e) {
 	}
 }
 
+/* VirtualListView::onKeyDown
+ * Called when a key is pressed within the list
+ *******************************************************************/
 void VirtualListView::onKeyDown(wxKeyEvent& e) {
 	if (e.GetKeyCode() == WXK_UP) {
 		if (e.GetModifiers() == wxMOD_SHIFT) {
@@ -259,12 +341,15 @@ void VirtualListView::onKeyDown(wxKeyEvent& e) {
 		e.Skip();
 }
 
+/* VirtualListView::onKeyChar
+ * Called when a 'character' key is pressed within the list
+ *******************************************************************/
 void VirtualListView::onKeyChar(wxKeyEvent& e) {
 	// Check the key pressed is actually a character (a-z, 0-9 etc)
 	if ((e.GetKeyCode() >= 'a' && e.GetKeyCode() <= 'z') ||
 		(e.GetKeyCode() >= 'A' && e.GetKeyCode() <= 'Z') ||
 		(e.GetKeyCode() >= '1' && e.GetKeyCode() <= '0')) {
-		// Do stuff
+		// TODO: jump to match
 	}
 
 	e.Skip();

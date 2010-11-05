@@ -9,17 +9,15 @@ TODO List ---------------------------------------------------------------
 
 --- Before Final 3.0 Release ---
 - Fix bugs, etc
-- Clean up sources
 - Fix up menu shortcuts etc
 
 --- Bugs ---
 - Copy/paste entry parent problem
-- Temp files for QMUS2MIDI don't work wirh non-ASCII paths
+- Temp files for QMUS2MIDI don't work with non-ASCII paths
 
 --- Minor Problems/Annoyances ---
 - Long calltips can extend off the edge of the screen
 - Jumping to an entry by typing the first few letters of its name in the entry list does not work if there are too many entries; instead it always jumps to the first entry of the list. It does work, though, when there are but a handful of entries.
-- Relatedly, the currently selected entry is deselected if the filter is changed, even if it is still displayed.
 
 --- Editor Features ---
 - Map editor (!)
@@ -61,6 +59,7 @@ TODO List ---------------------------------------------------------------
 	- Some kind of dynamic menu/toolbar system, perhaps try to emulate Qt's 'Action' system
 	- Complete icon set
 - Different icon sets (eg. one that has different entry type icons colour-coded)
+- Better backup system
 
 --- Internal / Dev ---
 - SFont class

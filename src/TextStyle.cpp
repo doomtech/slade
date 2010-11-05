@@ -1,13 +1,58 @@
 
+/*******************************************************************
+ * SLADE - It's a Doom Editor
+ * Copyright (C) 2008 Simon Judd
+ *
+ * Email:       veilofsorrow@gmail.com
+ * Web:         http://slade.mancubus.net
+ * Filename:    TextStyle.cpp
+ * Description: Classes which handle font and colour settings for
+ *              the text editor. TextStyle contains the actual font
+ *              and colour settings for a particular 'style' (eg.
+ *              keywords, comments, etc). StyleSet is just a set
+ *              of these styles that can be loaded to the scintilla
+ *              'styles' in the text editor
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *******************************************************************/
+
+
+/*******************************************************************
+ * INCLUDES
+ *******************************************************************/
 #include "Main.h"
 #include "WxStuff.h"
 #include "TextStyle.h"
 #include "ArchiveManager.h"
 #include <wx/dir.h>
 
+
+/*******************************************************************
+ * VARIABLES
+ *******************************************************************/
 vector<StyleSet*>	style_sets;
 StyleSet*			ss_current = NULL;
 
+
+/*******************************************************************
+ * TEXTSTYLE CLASS FUNCTIONS
+ *******************************************************************/
+
+/* TextStyle::TextStyle
+ * TextStyle class constructor
+ *******************************************************************/
 TextStyle::TextStyle() {
 	// Default (undefined) values
 	font = "";
@@ -19,9 +64,15 @@ TextStyle::TextStyle() {
 	underlined = -1;
 }
 
+/* TextStyle::~TextStyle
+ * TextStyle class destructor
+ *******************************************************************/
 TextStyle::~TextStyle() {
 }
 
+/* TextStyle::parse
+ * Reads text style information from a parse tree
+ *******************************************************************/
 bool TextStyle::parse(ParseTreeNode* node) {
 	// Check any info was given
 	if (!node)
@@ -68,6 +119,10 @@ bool TextStyle::parse(ParseTreeNode* node) {
 	return true;
 }
 
+/* TextStyle::applyTo
+ * Applies the style settings to [style] in the scintilla text
+ * control [stc]
+ *******************************************************************/
 void TextStyle::applyTo(wxStyledTextCtrl* stc, int style) {
 	// Set font face
 	if (!font.IsEmpty())
@@ -104,6 +159,9 @@ void TextStyle::applyTo(wxStyledTextCtrl* stc, int style) {
 		stc->StyleSetUnderline(style, false);
 }
 
+/* TextStyle::copyStyle
+ * Copies style info from [copy]
+ *******************************************************************/
 bool TextStyle::copyStyle(TextStyle* copy) {
 	if (!copy)
 		return false;
@@ -122,6 +180,9 @@ bool TextStyle::copyStyle(TextStyle* copy) {
 	return true;
 }
 
+/* TextStyle::getDefinition
+ * Returns a formatted string defining this style
+ *******************************************************************/
 string TextStyle::getDefinition(unsigned tabs) {
 	string ret = "";
 
@@ -171,7 +232,13 @@ string TextStyle::getDefinition(unsigned tabs) {
 }
 
 
+/*******************************************************************
+ * STYLESET CLASS FUNCTIONS
+ *******************************************************************/
 
+/* StyleSet::StyleSet
+ * StyleSet class constructor
+ *******************************************************************/
 StyleSet::StyleSet(string name) {
 	// Init default style
 	wxFont f(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
@@ -189,9 +256,15 @@ StyleSet::StyleSet(string name) {
 	this->name = name;
 }
 
+/* StyleSet::~StyleSet
+ * StyleSet class destructor
+ *******************************************************************/
 StyleSet::~StyleSet() {
 }
 
+/* StyleSet::parseSet
+ * Reads style set info from a parse tree
+ *******************************************************************/
 bool StyleSet::parseSet(ParseTreeNode* root) {
 	if (!root)
 		return false;
@@ -216,6 +289,10 @@ bool StyleSet::parseSet(ParseTreeNode* root) {
 	return true;
 }
 
+/* StyleSet::applyTo
+ * Applies all the styles in this set to the text styles in scintilla
+ * text control [stc]
+ *******************************************************************/
 void StyleSet::applyTo(wxStyledTextCtrl* stc) {
 	// Set default style
 	ts_default.applyTo(stc, wxSTC_STYLE_DEFAULT);
@@ -236,6 +313,9 @@ void StyleSet::applyTo(wxStyledTextCtrl* stc) {
 	ts_bracebad.applyTo(stc, wxSTC_STYLE_BRACEBAD);
 }
 
+/* StyleSet::copySet
+ * Copies all styles in [copy] to this set
+ *******************************************************************/
 bool StyleSet::copySet(StyleSet* copy) {
 	if (!copy)
 		return false;
@@ -255,6 +335,10 @@ bool StyleSet::copySet(StyleSet* copy) {
 	return true;
 }
 
+/* StyleSet::getStyle
+ * Returns the text style associated with [name] (these are hard
+ * coded), or NULL if [name] was invalid
+ *******************************************************************/
 TextStyle* StyleSet::getStyle(string name) {
 	// Return style matching name given
 	if (s_cmpnocase(name, "default"))
@@ -282,6 +366,9 @@ TextStyle* StyleSet::getStyle(string name) {
 	return NULL;
 }
 
+/* StyleSet::writeFile
+ * Writes this style set as a text definition to a file [filename]
+ *******************************************************************/
 bool StyleSet::writeFile(string filename) {
 	// Open file for writing
 	wxFile file(filename, wxFile::write);
@@ -355,7 +442,15 @@ bool StyleSet::writeFile(string filename) {
 }
 
 
+/*******************************************************************
+ * STYLESET STATIC FUNCTIONS
+ *******************************************************************/
 
+/* StyleSet::initCurrent
+ * Initialises the 'current' style set from the previously saved
+ * 'current.sss' file, or uses the default set if the file does not
+ * exist
+ *******************************************************************/
 void StyleSet::initCurrent() {
 	// Create 'current' styleset
 	ss_current = new StyleSet();
@@ -387,6 +482,9 @@ void StyleSet::initCurrent() {
 		ss_current->copySet(style_sets[0]);
 }
 
+/* StyleSet::saveCurrent
+ * Writes the current style set to the 'current.sss' file
+ *******************************************************************/
 void StyleSet::saveCurrent() {
 	if (!ss_current)
 		return;
@@ -394,6 +492,9 @@ void StyleSet::saveCurrent() {
 	ss_current->writeFile(appPath("current.sss", DIR_USER));
 }
 
+/* StyleSet::currentSet
+ * Returns the current style set
+ *******************************************************************/
 StyleSet* StyleSet::currentSet() {
 	if (!ss_current)
 		initCurrent();
@@ -401,6 +502,10 @@ StyleSet* StyleSet::currentSet() {
 	return ss_current;
 }
 
+/* StyleSet::loadSet
+ * Loads the style set matching [name] to the current style set.
+ * Returns false if no match was found, true otherwise
+ *******************************************************************/
 bool StyleSet::loadSet(string name) {
 	// Search for set matching name
 	for (unsigned a = 0; a < style_sets.size(); a++) {
@@ -413,6 +518,10 @@ bool StyleSet::loadSet(string name) {
 	return false;
 }
 
+/* StyleSet::loadSet
+ * Loads the style set at [index] to the current style set. Returns
+ * false if [index] was out of bounds, true otherwise
+ *******************************************************************/
 bool StyleSet::loadSet(unsigned index) {
 	// Check index
 	if (index >= style_sets.size())
@@ -423,10 +532,17 @@ bool StyleSet::loadSet(unsigned index) {
 	return true;
 }
 
+/* StyleSet::applyCurrent
+ * Applies the current style set to the scintilla text control [stc]
+ *******************************************************************/
 void StyleSet::applyCurrent(wxStyledTextCtrl* stc) {
 	currentSet()->applyTo(stc);
 }
 
+/* StyleSet::getName
+ * Returns the name of the style set at [index], or an empty string
+ * if [index] is out of bounds
+ *******************************************************************/
 string StyleSet::getName(unsigned index) {
 	// Check index
 	if (index >= style_sets.size())
@@ -435,10 +551,16 @@ string StyleSet::getName(unsigned index) {
 	return style_sets[index]->name;
 }
 
+/* StyleSet::numSets
+ * Returns the number of loaded style sets
+ *******************************************************************/
 unsigned StyleSet::numSets() {
 	return style_sets.size();
 }
 
+/* StyleSet::getSet
+ * Returns the style set at [index], or NULL if [index] is out of bounds
+ *******************************************************************/
 StyleSet* StyleSet::getSet(unsigned index) {
 	// Check index
 	if (index >= style_sets.size())
@@ -447,6 +569,9 @@ StyleSet* StyleSet::getSet(unsigned index) {
 	return style_sets[index];
 }
 
+/* StyleSet::loadResourceStyles
+ * Loads all text styles from the slade resource archive (slade.pk3)
+ *******************************************************************/
 bool StyleSet::loadResourceStyles() {
 	// Get 'config/text_styles' directory in slade.pk3
 	ArchiveTreeNode* dir = theArchiveManager->programResourceArchive()->getDir("config/text_styles");
@@ -484,6 +609,9 @@ bool StyleSet::loadResourceStyles() {
 	return true;
 }
 
+/* StyleSet::loadCustomStyles
+ * Loads all text styles from the user text style directory
+ *******************************************************************/
 bool StyleSet::loadCustomStyles() {
 	// If the custom stylesets directory doesn't exist, create it
 	if (!wxDirExists(appPath("text_styles", DIR_USER)))

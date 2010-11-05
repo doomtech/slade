@@ -93,6 +93,9 @@ void CTextureCanvas::deSelectPatch(int index) {
 	selected_patches[index] = false;
 }
 
+/* CTextureCanvas::patchSelected
+ * Returns true if the patch at [index] is selected, false otherwise
+ *******************************************************************/
 bool CTextureCanvas::patchSelected(int index) {
 	// Check index is ok
 	if (index < 0 || (unsigned)index >= texture->nPatches())
@@ -466,6 +469,10 @@ bool CTextureCanvas::swapPatches(size_t p1, size_t p2) {
 	return texture->swapPatches(p1, p2);
 }
 
+/* CTextureCanvas::onAnnouncement
+ * Called when the texture canvas recieves an announcement from the
+ * texture being displayed
+ *******************************************************************/
 void CTextureCanvas::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
 	// If the announcer isn't this canvas' texture, ignore it
 	if (announcer != texture)

@@ -115,6 +115,9 @@ void ConsolePanel::onCommandEnter(wxCommandEvent& e) {
 	cmd_log_index = 0;
 }
 
+/* ConsolePanel::onCommandKeyDown
+ * Called when a key is pressed in the command text box
+ *******************************************************************/
 void ConsolePanel::onCommandKeyDown(wxKeyEvent& e) {
 	if (e.GetKeyCode() == WXK_UP) {
 		text_command->SetValue(theConsole->prevCommand(cmd_log_index));

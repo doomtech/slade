@@ -10,6 +10,7 @@ private:
 	wxCheckBox*	cb_size_as_string;
 	wxCheckBox* cb_filter_dirs;
 	wxCheckBox*	cb_start_page;
+	wxCheckBox*	cb_temp_dir;
 
 public:
 	GeneralPrefsPanel(wxWindow* parent);

@@ -24,12 +24,12 @@ public:
 
 class TextLanguage {
 private:
-	string				id;
-	string				name;
-	string				line_comment;
-	string				comment_begin;
-	string				comment_end;
-	string				preprocessor;
+	string				id;				// Used internally
+	string				name;			// The language 'name' (will show up in the language selection dropdown, etc)
+	string				line_comment;	// The beginning token for a line comment
+	string				comment_begin;	// The beginning token for a block comment
+	string				comment_end;	// The ending token for a block comment
+	string				preprocessor;	// The beginning token for a preprocessor directive
 	bool				case_sensitive;
 
 	// Keywords
