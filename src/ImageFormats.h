@@ -854,7 +854,7 @@ public:
 		size_t height = wxINT16_SWAP_ON_BE(gfx_data[0]);
 
 		size_t datasize = mc.getSize() - 0x302;
-		if (height > 0 && datasize % height)
+		if (height == 0 || datasize % height)
 			return EDF_FALSE;
 
 		// It seems okay so far. Check that one
