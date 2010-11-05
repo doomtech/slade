@@ -1,9 +1,11 @@
 SLADE3 SVN UNIX COMPILATION INSTRUCTIONS
 ----------------------------------------
 1)
-Download the required libraries:
--wxWidgets *2.9+* from http://wxwidgets.org (or use synaptic/apt-get on debian/ubuntu)
--FreeImage from http://freeimage.sourceforge.net (or use synaptic/apt-get on debian/ubuntu)
+Download the required libraries (most should be available in your distro's package repository):
+-wxWidgets *2.9+* from http://wxwidgets.org (most repositories don't currently have 2.9)
+-FreeImage from http://freeimage.sourceforge.net
+-FluidSynth from http://fluidsynth.org
+-Audiere from http://audiere.sourceforge.net
 
 2)
 Compile/install the required libraries if needed.
@@ -17,7 +19,8 @@ b) FreeImage:
 -Follow the instructions in README.linux (to install normal FreeImage, not FreeImagePlus)
 
 3)
-To compile SLADE3, there are two ways to go about it, either install CodeLite IDE and use that (reccommended), or build it using the Makefile
+To compile SLADE3, there are two ways to go about it, either install CodeLite IDE and use that (reccommended),
+or build it using the Makefile
 
 a) IDE Compilation
 -Download and install CodeLite IDE from http://codelite.org
@@ -32,3 +35,10 @@ b) Makefile Compilation
 And that should be it. If you are having problems I can be contacted via email:
 sirjuddington@gmail.com
 
+
+OTHER SLADE3 UNIX ISSUES
+------------------------
+Audio support:
+The current release of Audiere is quite old, and can cause some problems. For one, it only supports OSS output
+in linux. If your distro has dropped OSS support (eg ubuntu 10.10), you'll have to get the alsa-oss wrapper,
+and run slade3 like "aoss ./slade3", or no audio playback (except MIDI via fluidsynth) will be available.

@@ -1,20 +1,69 @@
 
+/*******************************************************************
+ * SLADE - It's a Doom Editor
+ * Copyright (C) 2008 Simon Judd
+ *
+ * Email:       veilofsorrow@gmail.com
+ * Web:         http://slade.mancubus.net
+ * Filename:    BrowserItem.cpp
+ * Description: A class representing a single browser item. Each
+ *              item has a name, index and image associated with
+ *              it, and handles drawing itself.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *******************************************************************/
+
+
+/*******************************************************************
+ * INCLUDES
+ *******************************************************************/
 #include "Main.h"
 #include "BrowserItem.h"
 #include "SFont.h"
 
+
+/*******************************************************************
+ * BROWSERITEM CLASS FUNCTIONS
+ *******************************************************************/
+
+/* BrowserItem::BrowserItem
+ * BrowserItem class constructor
+ *******************************************************************/
 BrowserItem::BrowserItem(string name, unsigned index) {
 	this->name = name;
 	this->index = index;
 }
 
+/* BrowserItem::~BrowserItem
+ * BrowserItem class destructor
+ *******************************************************************/
 BrowserItem::~BrowserItem() {
 }
 
+/* BrowserItem::loadImage
+ * Loads the item image (base class does nothing, must be overridden
+ * by child classes to be useful at all)
+ *******************************************************************/
 bool BrowserItem::loadImage() {
 	return false;
 }
 
+/* BrowserItem::draw
+ * Draws the item in a [size]x[size] box, keeping the correct aspect
+ * ratio of it's image
+ *******************************************************************/
 void BrowserItem::draw(int size) {
 	// Try to load image if it isn't already
 	if (!image.isLoaded())
@@ -102,6 +151,9 @@ void BrowserItem::draw(int size) {
 	glPopMatrix();
 }
 
+/* BrowserItem::clearImage
+ * Clears the item image
+ *******************************************************************/
 void BrowserItem::clearImage() {
 	image.clear();
 }

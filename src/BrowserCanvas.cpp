@@ -1,8 +1,46 @@
 
+/*******************************************************************
+ * SLADE - It's a Doom Editor
+ * Copyright (C) 2008 Simon Judd
+ *
+ * Email:       veilofsorrow@gmail.com
+ * Web:         http://slade.mancubus.net
+ * Filename:    BrowserCanvas.cpp
+ * Description: The OpenGL canvas for displaying browser items. Also
+ *              keeps track of a vertical scrollbar to scroll through
+ *              the items it contains
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *******************************************************************/
+
+
+/*******************************************************************
+ * INCLUDES
+ *******************************************************************/
 #include "Main.h"
 #include "WxStuff.h"
 #include "BrowserCanvas.h"
 
+
+/*******************************************************************
+ * BROWSERCANVAS CLASS FUNCTIONS
+ *******************************************************************/
+
+/* BrowserCanvas::BrowserCanvas
+ * BrowserCanvas class constructor
+ *******************************************************************/
 BrowserCanvas::BrowserCanvas(wxWindow* parent) : OGLCanvas(parent, -1) {
 	// Init variables
 	yoff = 0;
@@ -17,9 +55,15 @@ BrowserCanvas::BrowserCanvas(wxWindow* parent) : OGLCanvas(parent, -1) {
 	Bind(wxEVT_LEFT_DOWN, &BrowserCanvas::onMouseEvent, this);
 }
 
+/* BrowserCanvas::~BrowserCanvas
+ * BrowserCanvas class destructor
+ *******************************************************************/
 BrowserCanvas::~BrowserCanvas() {
 }
 
+/* BrowserCanvas::draw
+ * Handles drawing of the canvas content
+ *******************************************************************/
 void BrowserCanvas::draw() {
 	// Setup the viewport
 	glViewport(0, 0, GetSize().x, GetSize().y);
@@ -122,6 +166,9 @@ void BrowserCanvas::draw() {
 	SwapBuffers();
 }
 
+/* BrowserCanvas::setScrollBar
+ * Sets this canvas' associated vertical scrollbar
+ *******************************************************************/
 void BrowserCanvas::setScrollBar(wxScrollBar* scrollbar) {
 	// Set scrollbar
 	this->scrollbar = scrollbar;
@@ -134,6 +181,10 @@ void BrowserCanvas::setScrollBar(wxScrollBar* scrollbar) {
 	scrollbar->Bind(wxEVT_SCROLL_PAGEDOWN, &BrowserCanvas::onScrollPageDown, this);
 }
 
+/* BrowserCanvas::updateScrollBar
+ * Updates the associated scrollbar's properties depending on the
+ * number of items, the canvas size, etc.
+ *******************************************************************/
 void BrowserCanvas::updateScrollBar() {
 	// Do nothing special if no scrollbar present
 	if (!scrollbar)
@@ -149,6 +200,10 @@ void BrowserCanvas::updateScrollBar() {
 	yoff = scrollbar->GetThumbPosition();
 }
 
+/* BrowserCanvas::getSelectedItem
+ * Returns the currently selected BrowserItem, or NULL if nothing is
+ * selected
+ *******************************************************************/
 BrowserItem* BrowserCanvas::getSelectedItem() {
 	// Check selected index
 	if (item_selected < 0 || item_selected >= (int)items_filter.size())
@@ -157,6 +212,9 @@ BrowserItem* BrowserCanvas::getSelectedItem() {
 	return items[items_filter[item_selected]];
 }
 
+/* BrowserCanvas::filterItems
+ * Filters the visible items by [filter], by name
+ *******************************************************************/
 void BrowserCanvas::filterItems(string filter) {
 	// Clear current filter list
 	items_filter.clear();
@@ -185,7 +243,13 @@ void BrowserCanvas::filterItems(string filter) {
 }
 
 
+/*******************************************************************
+ * BROWSERCANVAS CLASS EVENTS
+ *******************************************************************/
 
+/* BrowserCanvas::onSize
+ * Called when the canvas is resized
+ *******************************************************************/
 void BrowserCanvas::onSize(wxSizeEvent& e) {
 	updateScrollBar();
 
@@ -193,12 +257,19 @@ void BrowserCanvas::onSize(wxSizeEvent& e) {
 	e.Skip();
 }
 
+/* BrowserCanvas::onScrollThumbTrack
+ * Called when the scrollbar 'thumb' is moved
+ *******************************************************************/
 void BrowserCanvas::onScrollThumbTrack(wxScrollEvent& e) {
 	// Update y-offset and refresh
 	yoff = scrollbar->GetThumbPosition();
 	Refresh();
 }
 
+/* BrowserCanvas::onScrollLineUp
+ * Called when the scrollbar recieves a 'line up' command (ie when
+ * the up arrow is clicked)
+ *******************************************************************/
 void BrowserCanvas::onScrollLineUp(wxScrollEvent& e) {
 	// Scroll up by one row
 	scrollbar->SetThumbPosition(yoff - fullItemSize());
@@ -208,6 +279,10 @@ void BrowserCanvas::onScrollLineUp(wxScrollEvent& e) {
 	Refresh();
 }
 
+/* BrowserCanvas::onScrollLineDown
+ * Called when the scrollbar recieves a 'line down' command (ie when
+ * the down arrow is clicked)
+ *******************************************************************/
 void BrowserCanvas::onScrollLineDown(wxScrollEvent& e) {
 	// Scroll down by one row
 	scrollbar->SetThumbPosition(yoff + fullItemSize());
@@ -217,6 +292,10 @@ void BrowserCanvas::onScrollLineDown(wxScrollEvent& e) {
 	Refresh();
 }
 
+/* BrowserCanvas::onScrollPageUp
+ * Called when the scrollbar recieves a 'page up' command (ie when
+ * the area above the 'thumb' is clicked)
+ *******************************************************************/
 void BrowserCanvas::onScrollPageUp(wxScrollEvent& e) {
 	// Scroll up by one screen
 	scrollbar->SetThumbPosition(yoff - GetSize().y);
@@ -226,6 +305,10 @@ void BrowserCanvas::onScrollPageUp(wxScrollEvent& e) {
 	Refresh();
 }
 
+/* BrowserCanvas::onScrollPageDown
+ * Called when the scrollbar recieves a 'page down' command (ie when
+ * the area below the 'thumb' is clicked)
+ *******************************************************************/
 void BrowserCanvas::onScrollPageDown(wxScrollEvent& e) {
 	// Scroll down by one screen
 	scrollbar->SetThumbPosition(yoff + GetSize().y);
@@ -235,6 +318,9 @@ void BrowserCanvas::onScrollPageDown(wxScrollEvent& e) {
 	Refresh();
 }
 
+/* BrowserCanvas::onMouseEvent
+ * Called when any mouse event is generated (click, scroll, etc)
+ *******************************************************************/
 void BrowserCanvas::onMouseEvent(wxMouseEvent& e) {
 	// --- Scroll wheel ---
 	if (e.GetEventType() == wxEVT_MOUSEWHEEL) {

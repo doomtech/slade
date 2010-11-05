@@ -1,4 +1,35 @@
 
+/*******************************************************************
+ * SLADE - It's a Doom Editor
+ * Copyright (C) 2008 Simon Judd
+ *
+ * Email:       veilofsorrow@gmail.com
+ * Web:         http://slade.mancubus.net
+ * Filename:    BrowserWindow.cpp
+ * Description: The browser window implementation. A frame that
+ *              contains a tree of item categories/subcategories,
+ *              and an OGLCanvas where the browser items under
+ *              the currently selected category are displayed
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *******************************************************************/
+
+
+/*******************************************************************
+ * INCLUDES
+ *******************************************************************/
 #include "Main.h"
 #include "WxStuff.h"
 #include "BrowserWindow.h"
@@ -6,19 +37,35 @@
 #include <algorithm>
 
 
+/*******************************************************************
+ * BROWSERTREENODE CLASS FUNCTIONS
+ *******************************************************************/
+
+/* BrowserTreeNode::BrowserTreeNode
+ * BrowserTreeNode class constructor
+ *******************************************************************/
 BrowserTreeNode::BrowserTreeNode(BrowserTreeNode* parent) : STreeNode(parent) {
 }
 
+/* BrowserTreeNode::~BrowserTreeNode
+ * BrowserTreeNode class destructor
+ *******************************************************************/
 BrowserTreeNode::~BrowserTreeNode() {
 	clearItems();
 }
 
+/* BrowserTreeNode::clearItems
+ * Clears all items in the node
+ *******************************************************************/
 void BrowserTreeNode::clearItems() {
 	for (unsigned a = 0; a < items.size(); a++)
 		delete items[a];
 	items.clear();
 }
 
+/* BrowserTreeNode::getItem
+ * Gets the item at [index], or NULL if [index] is out of bounds
+ *******************************************************************/
 BrowserItem* BrowserTreeNode::getItem(unsigned index) {
 	// Check index
 	if (index >= items.size())
@@ -28,6 +75,10 @@ BrowserItem* BrowserTreeNode::getItem(unsigned index) {
 	return items[index];
 }
 
+/* BrowserTreeNode::addItem
+ * Adds [item] to the node at [index], or at the end if [index] is
+ * out of bounds
+ *******************************************************************/
 void BrowserTreeNode::addItem(BrowserItem* item, unsigned index) {
 	// Check where to add item
 	if (index >= items.size())
@@ -37,8 +88,11 @@ void BrowserTreeNode::addItem(BrowserItem* item, unsigned index) {
 }
 
 
-
-// wxTreeItemData class needed to associate BrowserTreeNodes with tree items
+/*******************************************************************
+ * BROWSERTREEITEMDATA CLASS
+ *******************************************************************
+ * wxTreeItemData class needed to associate BrowserTreeNodes with tree items
+ */
 class BrowserTreeItemData : public wxTreeItemData {
 private:
 	BrowserTreeNode*	node;
@@ -51,6 +105,13 @@ public:
 };
 
 
+/*******************************************************************
+ * BROWSERWINDOW CLASS FUNCTIONS
+ *******************************************************************/
+
+/* BrowserWindow::BrowserWindow
+ * BrowserWindow class constructor
+ *******************************************************************/
 BrowserWindow::BrowserWindow(wxWindow* parent) : wxDialog(parent, -1, "Browser", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX) {
 	// Init variables
 	items_root = new BrowserTreeNode();
@@ -115,15 +176,25 @@ BrowserWindow::BrowserWindow(wxWindow* parent) : wxDialog(parent, -1, "Browser",
 	CenterOnScreen();
 }
 
+/* BrowserWindow::~BrowserWindow
+ * BrowserWindow class destructor
+ *******************************************************************/
 BrowserWindow::~BrowserWindow() {
 }
 
+/* BrowserWindow::addItem
+ * Adds [item] to the browser tree at the tree path [where]. This
+ * will be created if it doesn't exist
+ *******************************************************************/
 bool BrowserWindow::addItem(BrowserItem* item, string where) {
 	BrowserTreeNode* target = (BrowserTreeNode*)items_root->addChild(where);
 	target->addItem(item);
 	return true;
 }
 
+/* BrowserWindow::clearItems
+ * Removes all items from [node] and its children recursively
+ *******************************************************************/
 void BrowserWindow::clearItems(BrowserTreeNode* node) {
 	// Check node was given to begin clear
 	if (!node)
@@ -141,6 +212,10 @@ void BrowserWindow::clearItems(BrowserTreeNode* node) {
 	}
 }
 
+/* BrowserWindow::reloadItems
+ * Reloads (clears) all item images in [node] and its children
+ * recursively
+ *******************************************************************/
 void BrowserWindow::reloadItems(BrowserTreeNode* node) {
 	// Check node was given to begin reload
 	if (!node)
@@ -163,11 +238,20 @@ bool sortBIName(BrowserItem* left, BrowserItem* right) {
 	return left->getName() < right->getName();
 }
 
+/* BrowserWindow::addSortType
+ * Adds a sorting type [name] to the window
+ *******************************************************************/
 unsigned BrowserWindow::addSortType(string name) {
 	choice_sort->AppendString(name);
 	return choice_sort->GetCount() - 1;
 }
 
+/* BrowserWindow::doSort
+ * Performs sorting of the items currently being browsed, the sort
+ * criteria depending on [sort_type]. Default sorting types are by
+ * index (0) and by name (1), more can be added to BrowserWindow
+ * child classes if needed
+ *******************************************************************/
 void BrowserWindow::doSort(unsigned sort_type) {
 	// Get item list
 	vector<BrowserItem*>& items = canvas->itemList();
@@ -186,6 +270,11 @@ void BrowserWindow::doSort(unsigned sort_type) {
 	canvas->Refresh();
 }
 
+/* BrowserWindow::openTree
+ * 'Opens' the items in [node] and all it's children, adding them
+ * to the browser canvas' list of items. If [clear] is true, the
+ * current list contents will be cleared
+ *******************************************************************/
 void BrowserWindow::openTree(BrowserTreeNode* node, bool clear) {
 	// Get item list from canvas
 	vector<BrowserItem*>& list = canvas->itemList();
@@ -210,6 +299,10 @@ void BrowserWindow::openTree(BrowserTreeNode* node, bool clear) {
 	}
 }
 
+/* BrowserWindow::populateItemTree
+ * Populates the wxTreeCtrl with the contents of the browser item
+ * category tree
+ *******************************************************************/
 void BrowserWindow::populateItemTree() {
 	// Clear current tree
 	tree_items->DeleteAllItems();
@@ -228,6 +321,9 @@ void BrowserWindow::populateItemTree() {
 	tree_items->CollapseAll();
 }
 
+/* BrowserWindow::addItemTree
+ * Adds [node] to the wxTreeCtrl after [item]
+ *******************************************************************/
 void BrowserWindow::addItemTree(BrowserTreeNode* node, wxTreeItemId& item) {
 	// Go through child items
 	for (unsigned a = 0; a < node->nChildren(); a++) {
@@ -241,28 +337,42 @@ void BrowserWindow::addItemTree(BrowserTreeNode* node, wxTreeItemId& item) {
 }
 
 
+/*******************************************************************
+ * BROWSERWINDOW CLASS EVENTS
+ *******************************************************************/
 
+/* BrowserWindow::onTreeItemSelected
+ * Called when an item on the category wxTreeCtrl is selected
+ *******************************************************************/
 void BrowserWindow::onTreeItemSelected(wxTreeEvent& e) {
 	BrowserTreeItemData* data = (BrowserTreeItemData*)tree_items->GetItemData(e.GetItem());
 	openTree(data->getNode());
 	canvas->Refresh();
 }
 
+/* BrowserWindow::onChoiceSortChanged
+ * Called when the 'Sort By' dropdown selection is changed
+ *******************************************************************/
 void BrowserWindow::onChoiceSortChanged(wxCommandEvent& e) {
 	// Re-sort items
 	doSort(choice_sort->GetSelection());
 }
 
+/* BrowserWindow::onCanvasDClick
+ * Called when the browser canvas is double-clicked
+ *******************************************************************/
 void BrowserWindow::onCanvasDClick(wxMouseEvent& e) {
 	// End modal if an item was double-clicked
 	EndModal(wxID_OK);
 }
 
+/* BrowserWindow::onTextFilterChanged
+ * Called when the name filter is changed
+ *******************************************************************/
 void BrowserWindow::onTextFilterChanged(wxCommandEvent& e) {
 	// Filter canvas items
 	canvas->filterItems(text_filter->GetValue());
 }
-
 
 /*
 CONSOLE_COMMAND(test_browser, 0) {

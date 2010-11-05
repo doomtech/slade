@@ -1,24 +1,74 @@
 
+/*******************************************************************
+ * SLADE - It's a Doom Editor
+ * Copyright (C) 2008 Simon Judd
+ *
+ * Email:       veilofsorrow@gmail.com
+ * Web:         http://slade.mancubus.net
+ * Filename:    ListView.cpp
+ * Description: An extended version of the default wxListCtrl, in
+ *              'report' mode. Provides various commonly used
+ *              functionality that doesn't exist in wxListCtrl by
+ *              default: selection stuff, basic item addition,
+ *              swapping, and setting item colours to various program
+ *              defaults ('new', 'modified', etc).
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *******************************************************************/
+
+
+/*******************************************************************
+ * INCLUDES
+ *******************************************************************/
 #include "Main.h"
 #include "WxStuff.h"
 #include "ListView.h"
 
 
+/*******************************************************************
+ * VARIABLES
+ *******************************************************************/
+// Eventually these should go into the global colour configuration
 wxColor col_new(0, 150, 0);
 wxColor col_modified(0, 80, 180);
 wxColor col_locked(180, 50, 0);
 wxColor col_error(230, 30, 0);
 
 
+/*******************************************************************
+ * LISTVIEW CLASS FUNCTIONS
+ *******************************************************************/
+
+/* ListView::ListView
+ * ListView class constructor
+ *******************************************************************/
 ListView::ListView(wxWindow* parent, int id, long style)
 : wxListCtrl(parent, id, wxDefaultPosition, wxDefaultSize, style) {
 	icons = true;
 	update_width = true;
 }
 
+/* ListView::~ListView
+ * ListView class destructor
+ *******************************************************************/
 ListView::~ListView() {
 }
 
+/* ListView::addItem
+ * Adds an item to the list at [index] with [text]
+ *******************************************************************/
 bool ListView::addItem(int index, string text) {
 	// Check index
 	if (index < 0) index = 0;
@@ -37,6 +87,10 @@ bool ListView::addItem(int index, string text) {
 	return true;
 }
 
+/* ListView::addItem
+ * Adds an item to the list at [index], with [text] in the columns;
+ * text[0] goes in column 0, etc
+ *******************************************************************/
 bool ListView::addItem(int index, wxArrayString text) {
 	// Check index
 	if (index < 0) index = 0;
@@ -57,12 +111,16 @@ bool ListView::addItem(int index, wxArrayString text) {
 	return true;
 }
 
+// Compare two integers
 int cmp_int(int* a, int* b) {
 	if (*a > *b) return 1;
 	else if (*a < *b) return -1;
 	else return 0;
 }
 
+/* ListView::deleteItems
+ * Deletes all items at indices [items]
+ *******************************************************************/
 bool ListView::deleteItems(wxArrayInt items) {
 	// Sort items list
 	items.Sort(cmp_int);
@@ -74,6 +132,15 @@ bool ListView::deleteItems(wxArrayInt items) {
 	return true;
 }
 
+/* ListView::setItemStatus
+ * Sets the 'status' of [item], changing it's text colour. Currently
+ * there are 5 statuses:
+ * LV_STATUS_NORMAL - default colour
+ * LV_STATUS_MODIFIED - blue
+ * LV_STATUS_NEW - green
+ * LV_STATUS_LOCKED - orange
+ * LV_STATUS_ERROR - red
+ *******************************************************************/
 bool ListView::setItemStatus(int item, int status) {
 	// Check item id is in range
 	if (item >= GetItemCount())
@@ -108,6 +175,9 @@ bool ListView::setItemStatus(int item, int status) {
 	return true;
 }
 
+/* ListView::setItemText
+ * Sets the text of [item] at [column] to [text]
+ *******************************************************************/
 bool ListView::setItemText(int item, int column, string text) {
 	// Check if column is in range
 	if (column < 0 || column >= GetColumnCount())
@@ -138,11 +208,17 @@ bool ListView::setItemText(int item, int column, string text) {
 	return true;
 }
 
+/* ListView::clearSelection
+ * Deselects all list items
+ *******************************************************************/
 void ListView::clearSelection() {
 	for (int a = 0; a < GetItemCount(); a++)
 		SetItemState(a, 0x0000, wxLIST_STATE_SELECTED|wxLIST_STATE_FOCUSED);
 }
 
+/* ListView::selectItem
+ * Selects [item]. Sets the focus to [item] if [focus] is true
+ *******************************************************************/
 bool ListView::selectItem(int item, bool focus) {
 	// Check item id is in range
 	if (item >= GetItemCount())
@@ -165,6 +241,9 @@ bool ListView::selectItem(int item, bool focus) {
 	return true;
 }
 
+/* ListView::deSelectItem
+ * Deselects [item]
+ *******************************************************************/
 bool ListView::deSelectItem(int item) {
 	// Check item id is in range
 	if (item >= GetItemCount())
@@ -182,6 +261,9 @@ bool ListView::deSelectItem(int item) {
 	return true;
 }
 
+/* ListView::selectedItems
+ * Returns a list with the indices of all selected items
+ *******************************************************************/
 wxArrayInt ListView::selectedItems() {
 	// Init return array
 	wxArrayInt ret;
@@ -203,6 +285,10 @@ wxArrayInt ListView::selectedItems() {
 	return ret;
 }
 
+/* ListView::showItem
+ * Ensures [item] can be seen. If not, the list is scrolled so that
+ * it is. (probably not really needed)
+ *******************************************************************/
 bool ListView::showItem(int item) {
 	// Check item id is in range
 	if (item < 0 || item >= GetItemCount())
@@ -213,6 +299,9 @@ bool ListView::showItem(int item) {
 	return true;
 }
 
+/* ListView::swapItems
+ * Swaps [item1] with [item2]
+ *******************************************************************/
 bool ListView::swapItems(int item1, int item2) {
 	// Check item id's are in range
 	if (item1 < 0 || item1 >= GetItemCount() || item2 < 0 || item2 >= GetItemCount())
@@ -243,6 +332,11 @@ bool ListView::swapItems(int item1, int item2) {
 	return true;
 }
 
+/* ListView::updateSize
+ * As the default wxListCtrl does a terrible job at autosizing
+ * itself, this is here and should be called whenever a change is
+ * made to the list that could change its size
+ *******************************************************************/
 bool ListView::updateSize() {
 	// Update column widths if enabled
 	if (update_width) {
@@ -286,18 +380,35 @@ bool ListView::updateSize() {
 	return true;
 }
 
+
+/*******************************************************************
+ * LISTVIEW STATIC FUNCTIONS
+ *******************************************************************/
+
+/* ListView::colourModified
+ * Returns the 'modified' colour
+ *******************************************************************/
 wxColour ListView::colourModified() {
 	return col_modified;
 }
 
+/* ListView::colourNew
+ * Returns the 'new' colour
+ *******************************************************************/
 wxColour ListView::colourNew() {
 	return col_new;
 }
 
+/* ListView::colourLocked
+ * Returns the 'locked' colour
+ *******************************************************************/
 wxColour ListView::colourLocked() {
 	return col_locked;
 }
 
+/* ListView::colourError
+ * Returns the 'error' colour
+ *******************************************************************/
 wxColour ListView::colourError() {
 	return col_error;
 }
