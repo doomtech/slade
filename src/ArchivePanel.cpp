@@ -592,7 +592,7 @@ bool ArchivePanel::moveDown() {
 
 	// If the last selected item is at the end of the list
 	// then don't move anything down
-	if (selection.back() == entry_list->GetItemCount()-1)
+	if (selection.back() == entry_list->GetItemCount()-1 || selection.back() < entry_list->entriesBegin())
 		return false;
 
 	// Move each one down by swapping it with the entry below it

@@ -174,9 +174,6 @@ int EntryType::isThisType(ArchiveEntry* entry) {
 	if (!detectable)
 		return EDF_FALSE;
 
-	// Get full entry name as filename
-	wxFileName fn(entry->getName());
-
 	// Check min size
 	if (size_limit[0] >= 0 && entry->getSize() < (unsigned)size_limit[0])
 		return EDF_FALSE;
@@ -212,40 +209,17 @@ int EntryType::isThisType(ArchiveEntry* entry) {
 			return EDF_FALSE;
 	}
 
-	// If both names and extensions are defined, and the type only needs one
-	// of the two, not both, take it into account.
-	bool extorname = false;
-	bool matchedname = false;
-	if (matchextorname && match_name.size() > 0 && match_extension.size() > 0)
-		extorname = true;
-
-	// Check for name match if needed
-	if (match_name.size() > 0) {
-		string name = fn.GetName().Lower();
-		bool match = false;
-		for (size_t a = 0; a < match_name.size(); a++) {
-			if (name.Matches(match_name[a].Lower())) {
-				match = true;
-				break;
-			}
-		}
-
-		if (!match && !extorname)
+	// Check for data format match if needed
+	int r = EDF_TRUE;
+	if (format == "text") {
+		// Text is a special case, as other data formats can sometimes be detected as 'text',
+		// we'll only check for it if text data is specified in the entry type
+		if (memchr(entry->getData(), 0, entry->getSize()-1) != NULL)
 			return EDF_FALSE;
-		else matchedname = match;
 	}
-
-	// Check for extension match if needed
-	if (match_extension.size() > 0) {
-		bool match = false;
-		for (size_t a = 0; a < match_extension.size(); a++) {
-			if (!fn.GetExt().CmpNoCase(match_extension[a])) {
-				match = true;
-				break;
-			}
-		}
-
-		if (!match && !(extorname && matchedname))
+	else if (format != "any") {
+		r = EntryDataFormat::getFormat(format)->isThisFormat(entry->getMCData());
+		if (r == EDF_FALSE)
 			return EDF_FALSE;
 	}
 
@@ -263,6 +237,49 @@ int EntryType::isThisType(ArchiveEntry* entry) {
 			return EDF_FALSE;
 	}
 
+	// If both names and extensions are defined, and the type only needs one
+	// of the two, not both, take it into account.
+	bool extorname = false;
+	bool matchedname = false;
+	if (matchextorname && match_name.size() > 0 && match_extension.size() > 0)
+		extorname = true;
+
+	// Entry name related stuff
+	if (match_name.size() > 0 || match_extension.size() > 0) {
+		// Get full entry name as filename (only do this if absolutely necessary, wxFileName stuff is slow)
+		wxFileName fn(entry->getName());
+
+		// Check for name match if needed
+		if (match_name.size() > 0) {
+			string name = fn.GetName().Lower();
+			bool match = false;
+			for (size_t a = 0; a < match_name.size(); a++) {
+				if (name.Matches(match_name[a])) {
+					match = true;
+					break;
+				}
+			}
+
+			if (!match && !extorname)
+				return EDF_FALSE;
+			else matchedname = match;
+		}
+
+		// Check for extension match if needed
+		if (match_extension.size() > 0) {
+			bool match = false;
+			for (size_t a = 0; a < match_extension.size(); a++) {
+				if (!fn.GetExt().CmpNoCase(match_extension[a])) {
+					match = true;
+					break;
+				}
+			}
+
+			if (!match && !(extorname && matchedname))
+				return EDF_FALSE;
+		}
+	}
+
 	// Check for entry section match if needed
 	if (section != "none") {
 		// Check entry is part of an archive (if not it can't be in a section)
@@ -272,21 +289,6 @@ int EntryType::isThisType(ArchiveEntry* entry) {
 		string e_section = entry->getParent()->detectNamespace(entry);
 
 		if (e_section != section)
-			return EDF_FALSE;
-	}
-
-	int r = EDF_TRUE;
-
-	// Check for data format match if needed
-	if (format == "text") {
-		// Text is a special case, as other data formats can sometimes be detected as 'text',
-		// we'll only check for it if text data is specified in the entry type
-		if (memchr(entry->getData(), 0, entry->getSize()-1) != NULL)
-			return EDF_FALSE;
-	}
-	else if (format != "any") {
-		r = EntryDataFormat::getFormat(format)->isThisFormat(entry->getMCData());
-		if (r == EDF_FALSE)
 			return EDF_FALSE;
 	}
 
@@ -361,11 +363,11 @@ bool EntryType::readEntryTypeDefinition(MemChunk& mc) {
 			}
 			else if (s_cmpnocase(fieldnode->getName(), "match_ext")) {		// Match Extension field
 				for (unsigned v = 0; v < fieldnode->nValues(); v++)
-					ntype->match_extension.push_back(fieldnode->getStringValue(v));
+					ntype->match_extension.push_back(fieldnode->getStringValue(v).Lower());
 			}
 			else if (s_cmpnocase(fieldnode->getName(), "match_name")) {		// Match Name field
 				for (unsigned v = 0; v < fieldnode->nValues(); v++)
-					ntype->match_name.push_back(fieldnode->getStringValue(v));
+					ntype->match_name.push_back(fieldnode->getStringValue(v).Lower());
 			}
 			else if (s_cmpnocase(fieldnode->getName(), "match_extorname")) {// Match name or extension
 					ntype->matchextorname = fieldnode->getBoolValue();
@@ -389,7 +391,7 @@ bool EntryType::readEntryTypeDefinition(MemChunk& mc) {
 			}
 			else if (s_cmpnocase(fieldnode->getName(), "match_archive")) {		// Archive field
 				for (unsigned v = 0; v < fieldnode->nValues(); v++)
-					ntype->match_archive.push_back(fieldnode->getStringValue(v));
+					ntype->match_archive.push_back(fieldnode->getStringValue(v).Lower());
 			}
 			else if (s_cmpnocase(fieldnode->getName(), "extra")) {			// Extra properties
 				for (unsigned v = 0; v < fieldnode->nValues(); v++)

@@ -7,7 +7,9 @@
 // Struct to hold namespace info
 struct wad_ns_pair_t {
 	ArchiveEntry*	start;	// eg. P_START
+	int				start_index;
 	ArchiveEntry*	end;	// eg. P_END
+	int				end_index;
 	string			name;	// eg. "P" (since P or PP is a special case will be set to "patches")
 
 	wad_ns_pair_t(ArchiveEntry* start, ArchiveEntry* end) {

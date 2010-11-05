@@ -202,6 +202,9 @@ void WadArchive::updateNamespaces() {
 				ns.name = special_namespaces[a].name;
 		}
 
+		ns.start_index = entryIndex(ns.start);
+		ns.end_index = entryIndex(ns.end);
+
 		// Testing
 		//wxLogMessage("Namespace %s", chr(ns.name));
 	}
@@ -817,8 +820,8 @@ string WadArchive::detectNamespace(ArchiveEntry* entry) {
 	// Go through namespaces
 	for (unsigned a = 0; a < namespaces.size(); a++) {
 		// Get namespace start and end indices
-		int start = entryIndex(namespaces[a].start);
-		int end = entryIndex(namespaces[a].end);
+		int start = namespaces[a].start_index;
+		int end = namespaces[a].end_index;
 
 		// Check if the entry is within this namespace
 		if (start < index && index < end)
