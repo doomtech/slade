@@ -270,16 +270,11 @@ void ArchiveEntryList::updateList() {
 		return;
 	}
 
-	// Determine if we need a 'back folder' entry
-	int back_folder = 0;
-	if (show_dir_back && current_dir->getParent())
-		back_folder = 1;
-
 	// Update list
 	if (filter_active)
 		SetItemCount(filter.size());
 	else
-		SetItemCount(current_dir->numEntries() + current_dir->nChildren() + back_folder);
+		SetItemCount(current_dir->numEntries() + current_dir->nChildren());
 
 	Refresh();
 }
@@ -293,17 +288,34 @@ void ArchiveEntryList::filterList(string filter, string category) {
 	filter_name = filter;
 	filter_category = category;
 
+	// Save current selection
+	vector<ArchiveEntry*> selection = getSelectedEntries();
+	ArchiveEntry* focus = getFocusedEntry();
+
+	// Apply the filter
+	clearSelection();
 	applyFilter();
+
+	// Restore selection (if selected entries aren't filtered)
+	ArchiveEntry* entry = NULL;
+	for (int a = 0; a < GetItemCount(); a++) {
+		entry = getEntry(a);
+		for (unsigned b = 0; b < selection.size(); b++) {
+			if (entry == selection[b]) {
+				selectItem(a);
+				break;
+			}
+		}
+
+		if (entry == focus)
+			focusItem(a);
+	}
 }
 
 /* ArchiveEntryList::applyFilter
  * Applies the current filter(s) to the list
  *******************************************************************/
 void ArchiveEntryList::applyFilter() {
-	// Get current selection
-	vector<ArchiveEntry*> selection = getSelectedEntries();
-	clearSelection();
-
 	// Disable filter initially
 	filter_active = false;
 
@@ -311,16 +323,6 @@ void ArchiveEntryList::applyFilter() {
 	if (filter_name.IsEmpty() && filter_category.IsEmpty()) {
 		// No filter, just refresh the list
 		updateList();
-
-		// Update selection
-		for (unsigned a = 0; a < current_dir->numEntries(); a++) {
-			for (unsigned b = 0; b < selection.size(); b++) {
-				if (current_dir->getEntry(a) == selection[b]) {
-					selectItem(a);
-					break;
-				}
-			}
-		}
 
 		return;
 	}
@@ -371,16 +373,6 @@ void ArchiveEntryList::applyFilter() {
 
 	// Update the list
 	updateList();
-
-	// Update selection
-	for (unsigned a = 0; a < filter.size(); a++) {
-		for (unsigned b = 0; b < selection.size(); b++) {
-			if (getEntry(a) == selection[b]) {
-				selectItem(a);
-				break;
-			}
-		}
-	}
 }
 
 

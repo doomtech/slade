@@ -878,7 +878,7 @@ void ArchiveManagerPanel::onAnnouncement(Announcer* announcer, string event_name
 	if (event_name == "archive_closed") {
 		int32_t index = -1;
 		event_data.read(&index, 4);
-		list_archives->DeleteItem(index);
+		refreshArchiveList();
 		populateMapList(NULL);
 	}
 
