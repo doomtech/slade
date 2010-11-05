@@ -19,7 +19,7 @@ b) FreeImage:
 -Follow the instructions in README.linux (to install normal FreeImage, not FreeImagePlus)
 
 3)
-To compile SLADE3, there are two ways to go about it, either install CodeLite IDE and use that (reccommended),
+To compile SLADE3, there are two ways to go about it, either install CodeLite IDE and use that (recommended),
 or build it using the Makefile
 
 a) IDE Compilation

@@ -768,6 +768,11 @@ bool ArchiveManagerPanel::saveArchiveAs(Archive* archive) {
  * needed before closing [archive]
  *******************************************************************/
 bool ArchiveManagerPanel::closeArchive(Archive* archive) {
+	// Check for NULL pointers -- this can happen, for example,
+	// with onArchiveTabClose() when closing a texture editor tab.
+	if (!archive)
+		return false;
+
 	// Check for unsaved entry changes
 	saveEntryChanges(archive);
 
