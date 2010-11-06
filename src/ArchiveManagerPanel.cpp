@@ -709,7 +709,6 @@ bool ArchiveManagerPanel::saveEntryChanges(Archive* archive) {
 		ArchivePanel* ap = (ArchivePanel*)notebook_archives->GetPage(a);
 		if (ap->getArchive() == archive) {
 			// Save entry changes
-			wxLogMessage("ho");
 			return ap->saveEntryChanges();
 		}
 	}

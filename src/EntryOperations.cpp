@@ -36,6 +36,7 @@
 #include "TextureXEditor.h"
 #include "EntryDataFormat.h"
 #include "ExtMessageDialog.h"
+#include "MainWindow.h"
 #include <wx/filename.h>
 #include <wx/utils.h>
 
@@ -871,6 +872,33 @@ bool EntryOperations::compileACS(ArchiveEntry* entry) {
 	}
 
 	return true;
+}
+
+/* EntryOperations::exportAsPNG
+ * Converts [entry] to a PNG image (if possible) and saves the PNG
+ * data to a file [filename]. Does not alter the entry data itself
+ *******************************************************************/
+bool EntryOperations::exportAsPNG(ArchiveEntry* entry, string filename) {
+	// Check entry was given
+	if (!entry)
+		return false;
+
+	// Create image from entry
+	SImage image;
+	if (!Misc::loadImageFromEntry(&image, entry)) {
+		wxLogMessage("Error converting %s: %s", chr(entry->getName()), chr(Global::error));
+		return false;
+	}
+
+	// Write png data
+	MemChunk png;
+	if (!image.toPNG(png, theMainWindow->getPaletteChooser()->getSelectedPalette(entry))) {
+		wxLogMessage("Error converting %s", chr(entry->getName()));
+		return false;
+	}
+
+	// Export file
+	return png.exportFile(filename);
 }
 
 

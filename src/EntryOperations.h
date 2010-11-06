@@ -14,6 +14,7 @@ namespace EntryOperations {
 	bool	addToPatchTable(vector<ArchiveEntry*> entries);
 	bool	createTexture(vector<ArchiveEntry*> entries);
 	bool	compileACS(ArchiveEntry* entry);
+	bool	exportAsPNG(ArchiveEntry* entry, string filename);
 };
 
 #endif//__ENTRYOPERATIONS_H__

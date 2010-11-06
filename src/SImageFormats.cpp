@@ -228,9 +228,9 @@ bool SImage::toPNG(MemChunk& out, Palette8bit* pal) {
 		// Set palette
 		RGBQUAD* bm_pal = FreeImage_GetPalette(bm);
 		for (int a = 0; a < 256; a++) {
-			bm_pal[a].rgbRed = palette.colour(a).r;
-			bm_pal[a].rgbGreen = palette.colour(a).g;
-			bm_pal[a].rgbBlue = palette.colour(a).b;
+			bm_pal[a].rgbRed = usepal.colour(a).r;
+			bm_pal[a].rgbGreen = usepal.colour(a).g;
+			bm_pal[a].rgbBlue = usepal.colour(a).b;
 		}
 
 		// Find unused colour (for transparency)
@@ -269,9 +269,15 @@ bool SImage::toPNG(MemChunk& out, Palette8bit* pal) {
 	// Load it into a memchunk
 	MemChunk png;
 	png.importFile(appPath("temp.png", DIR_TEMP));
-	const uint8_t* png_data = png.getData();
+
+	// Check it loaded ok
+	if (png.getSize() == 0) {
+		wxLogMessage("Error reading temporary file");
+		return false;
+	}
 
 	// Write PNG header and IHDR
+	const uint8_t* png_data = png.getData();
 	out.write(png_data, 33);
 
 	// Create grAb chunk with offsets

@@ -71,12 +71,13 @@ const int MENU_GFX_MODIFY_OFFSETS = 10002;
 const int MENU_BAS_CONVERT = 10003;
 const int MENU_GFX_ADD_PATCH_TABLE = 10004;
 const int MENU_GFX_ADD_TEXTUREX = 10005;
-const int MENU_VIEW_TEXT = 10006;
-const int MENU_VIEW_HEX = 10007;
-const int MENU_CONV_WAV_DSND = 10008;
-const int MENU_CONV_DSND_WAV = 10009;
-const int MENU_CONV_MUS_MIDI = 10010;
-const int MENU_SCRIPT_COMPILE_ACS = 10011;
+const int MENU_GFX_EXPORT_PNG = 10006;
+const int MENU_VIEW_TEXT = 10007;
+const int MENU_VIEW_HEX = 10008;
+const int MENU_CONV_WAV_DSND = 10009;
+const int MENU_CONV_DSND_WAV = 10010;
+const int MENU_CONV_MUS_MIDI = 10011;
+const int MENU_SCRIPT_COMPILE_ACS = 10012;
 const int MENU_TEMP_END = 10100;
 
 
@@ -847,6 +848,57 @@ bool ArchivePanel::gfxModifyOffsets() {
 	return true;
 }
 
+/* ArchivePanel::gfxExportPNG
+ * Exports any selected gfx entries as png format images
+ *******************************************************************/
+bool ArchivePanel::gfxExportPNG() {
+	// Get a list of selected entries
+	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
+
+	// If we're just exporting 1 entry
+	if (selection.size() == 1) {
+		// Setup filename
+		wxFileName fn(selection[0]->getName());
+
+		// Set extension
+		fn.SetExt("png");
+
+		// Create save file dialog
+		wxFileDialog *dialog_save = new wxFileDialog(this, s_fmt("Export Entry \"%s\"", selection[0]->getName().c_str()),
+											wxEmptyString, fn.GetFullName(), "PNG Files (*.png)|*.png", wxFD_SAVE | wxFD_OVERWRITE_PROMPT, wxDefaultPosition);
+
+		// Run the dialog & check that the user didn't cancel
+		if (dialog_save->ShowModal() == wxID_OK) {
+			// If a filename was selected, export it
+			if (!EntryOperations::exportAsPNG(selection[0], dialog_save->GetPath())) {
+				wxMessageBox(s_fmt("Error: %s", chr(Global::error)), "Error", wxOK|wxICON_ERROR);
+				return false;
+			}
+		}
+
+		return true;
+	}
+	else {
+		// Open dialog to select folder to export to
+		wxDirDialog dd(this, "Select a Directory to Export Entries to");
+
+		if (dd.ShowModal() == wxID_OK) {
+			// Go through the selection
+			for (size_t a = 0; a < selection.size(); a++) {
+				// Setup entry filename
+				wxFileName fn(selection[a]->getName());
+				fn.SetPath(dd.GetPath());
+				fn.SetExt("png");
+
+				// Do export
+				EntryOperations::exportAsPNG(selection[a], fn.GetFullPath());
+			}
+		}
+	}
+
+	return true;
+}
+
 /* ArchivePanel::currentEntry
  * Returns the entry currently open for editing
  *******************************************************************/
@@ -1321,6 +1373,8 @@ void ArchivePanel::handleAction(int menu_id) {
 		EntryOperations::addToPatchTable(entry_list->getSelectedEntries());
 	else if (menu_id == MENU_GFX_ADD_TEXTUREX)
 		EntryOperations::createTexture(entry_list->getSelectedEntries());
+	else if (menu_id == MENU_GFX_EXPORT_PNG)
+		gfxExportPNG();
 	else if (menu_id == MENU_VIEW_TEXT)
 		openEntryAsText(entry_list->getFocusedEntry());
 	else if (menu_id == MENU_VIEW_HEX)
@@ -1504,6 +1558,7 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 		gfx->Append(MENU_GFX_MODIFY_OFFSETS, "Modify Gfx Offsets");
 		gfx->Append(MENU_GFX_ADD_PATCH_TABLE, "Add to Patch Table");
 		gfx->Append(MENU_GFX_ADD_TEXTUREX, "Add to TEXTUREx");
+		gfx->Append(MENU_GFX_EXPORT_PNG, "Export as PNG");
 	}
 
 	// Add Boom Animations/Switches related menu items if they are selected

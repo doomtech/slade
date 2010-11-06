@@ -71,6 +71,7 @@ public:
 	// Other entry actions
 	bool	gfxConvert();
 	bool	gfxModifyOffsets();
+	bool	gfxExportPNG();
 	bool	basConvert();
 	bool	palConvert();
 	bool	reloadCurrentPanel();
