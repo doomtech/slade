@@ -426,19 +426,24 @@ bool EntryType::readEntryTypeDefinition(MemChunk& mc) {
  * Loads all built-in and custom user entry types
  *******************************************************************/
 bool EntryType::loadEntryTypes() {
+	EntryDataFormat* fmt_any = EntryDataFormat::anyFormat();
+
 	// Setup unknown type
+	etype_unknown.format = fmt_any;
 	etype_unknown.icon = "e_unknown";
 	etype_unknown.detectable = false;
 	etype_unknown.reliability = 0;
 	etype_unknown.addToList();
 
 	// Setup folder type
+	etype_folder.format = fmt_any;
 	etype_folder.icon = "e_folder";
 	etype_folder.name = "Folder";
 	etype_folder.detectable = false;
 	etype_folder.addToList();
 
 	// Setup marker type
+	etype_marker.format = fmt_any;
 	etype_marker.icon = "e_marker";
 	etype_marker.name = "Marker";
 	etype_marker.detectable = false;
@@ -446,6 +451,7 @@ bool EntryType::loadEntryTypes() {
 	etype_marker.addToList();
 
 	// Setup map marker type
+	etype_map.format = fmt_any;
 	etype_map.icon = "e_map";
 	etype_map.name = "Map Marker";
 	etype_map.category = "Maps";	// Should appear with maps

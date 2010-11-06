@@ -276,6 +276,6 @@ void EntryDataFormat::initBuiltinFormats() {
 	new EntryDataFormat("rawdata");
 
 	// Another dummy for the generic text format
-	new EntryDataFormat("text");
+	edf_text = new EntryDataFormat("text");
 }
 
