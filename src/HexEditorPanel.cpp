@@ -348,6 +348,10 @@ void HexEditorPanel::onCellSelected(wxGridEvent& e) {
 	// Get offset of focused cell
 	uint32_t offset = table_hex->getOffset(e.GetRow(), e.GetCol());
 
+	// Check offset
+	if (offset > table_hex->getData().getSize())
+		return;
+
 	// Reset labels
 	label_offset->SetLabel(s_fmt("Offset: %d", offset));
 	label_byte->SetLabel("Signed Byte:");
