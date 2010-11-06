@@ -308,6 +308,7 @@
       <Linker Options="$(shell wx-config --debug=yes --libs std,gl,stc,aui --unicode=yes)" Required="yes"/>
       <ResourceCompiler Options="$(shell wx-config --rcflags)" Required="no"/>
       <General OutputFile="./dist/slade-dbg" IntermediateDirectory="./Debug" Command="./slade-dbg" CommandArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
+      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;"/>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
         <PostConnectCommands/>
         <StartupCommands/>
@@ -330,13 +331,14 @@
       </AdditionalRules>
     </Configuration>
     <Configuration Name="Release" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-O2;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no)" Required="yes" PreCompiledHeader="">
+      <Compiler Options="-O3;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no)" Required="yes" PreCompiledHeader="">
         <Preprocessor Value="__WX__"/>
         <Preprocessor Value="NDEBUG"/>
       </Compiler>
       <Linker Options="-s;$(shell wx-config --debug=no --libs std,gl,stc,aui --unicode=yes)" Required="yes"/>
       <ResourceCompiler Options="$(shell wx-config --rcflags)" Required="no"/>
       <General OutputFile="./dist/slade" IntermediateDirectory="./Release" Command="./slade" CommandArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
+      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;"/>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
         <PostConnectCommands/>
         <StartupCommands/>

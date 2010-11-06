@@ -9,11 +9,9 @@ TODO List ---------------------------------------------------------------
 
 --- Before Final 3.0 Release ---
 - Fix bugs, etc
-- Fix up menu shortcuts etc
 
 --- Bugs ---
 - Copy/paste entry parent problem
-- Temp files for QMUS2MIDI don't work with non-ASCII paths
 
 --- Minor Problems/Annoyances ---
 - Long calltips can extend off the edge of the screen

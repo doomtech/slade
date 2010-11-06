@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Simon
-Date                   :=05/11/10
+Date                   :=07/11/10
 CodeLitePath           :="/home/simon/.codelite"
 LinkerName             :=g++
 ArchiveTool            :=ar rcus
@@ -36,7 +36,7 @@ ObjectSwitch           :=-o
 ArchiveOutputSwitch    := 
 PreprocessOnlySwitch   :=-E 
 MakeDirCommand         :=mkdir -p
-CmpOptions             := -O2 $(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no) $(Preprocessors)
+CmpOptions             := -O3 $(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no) $(Preprocessors)
 LinkOptions            :=  -s $(shell wx-config --debug=no --libs std,gl,stc,aui --unicode=yes)
 IncludePath            :=  "$(IncludeSwitch)." 
 RcIncludePath          :=

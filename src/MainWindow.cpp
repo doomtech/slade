@@ -142,21 +142,21 @@ void MainWindow::setupLayout() {
 
 	// File menu
 	wxMenu* fileNewMenu = new wxMenu("");
-	fileNewMenu->Append(createMenuItem(fileNewMenu, MENU_FILE_NEWWAD,	"&Wad Archive\tCtrl+Shift+W",	"Create a new Doom Wad Archive",			"t_newarchive"));
-	fileNewMenu->Append(createMenuItem(fileNewMenu, MENU_FILE_NEWZIP,	"&Zip Archive\tCtrl+Shift+Z",	"Create a new Zip Archive (zip/pk3/jdf)",	"t_newzip"));
+	fileNewMenu->Append(createMenuItem(fileNewMenu, MENU_FILE_NEWWAD,	"&Wad Archive\tCtrl+Shift+W",	"Create a new Doom Wad Archive",					"t_newarchive"));
+	fileNewMenu->Append(createMenuItem(fileNewMenu, MENU_FILE_NEWZIP,	"&Zip Archive\tCtrl+Shift+Z",	"Create a new Zip Archive (zip/pk3/jdf)",			"t_newzip"));
 	wxMenu* fileMenu = new wxMenu("");
 	fileMenu->AppendSubMenu(fileNewMenu,	"&New",				"Create a new Archive");
-	fileMenu->Append(createMenuItem(fileMenu, MENU_FILE_OPEN,		"&Open\tCtrl+O",		"Open an existing Archive",							"t_open"));
+	fileMenu->Append(createMenuItem(fileMenu, MENU_FILE_OPEN,		"&Open\tCtrl+O",					"Open an existing Archive",							"t_open"));
 	fileMenu->AppendSeparator();
-	fileMenu->Append(createMenuItem(fileMenu, MENU_FILE_SAVE,		"&Save\tCtrl+S",		"Save the currently open Archive",					"t_save"));
-	fileMenu->Append(createMenuItem(fileMenu, MENU_FILE_SAVEAS,		"Save &As...",			"Save the currently open Archive to a new file",	"t_saveas"));
-	fileMenu->Append(createMenuItem(fileMenu, MENU_FILE_SAVEALL,	"Save All",				"Save all open Archives",							"t_saveall"));
+	fileMenu->Append(createMenuItem(fileMenu, MENU_FILE_SAVE,		"&Save\tCtrl+S",					"Save the currently open Archive",					"t_save"));
+	fileMenu->Append(createMenuItem(fileMenu, MENU_FILE_SAVEAS,		"Save &As...\tCtrl+Shift+S",		"Save the currently open Archive to a new file",	"t_saveas"));
+	fileMenu->Append(createMenuItem(fileMenu, MENU_FILE_SAVEALL,	"Save All",							"Save all open Archives",							"t_saveall"));
 	fileMenu->AppendSubMenu(panel_archivemanager->recentFilesMenu(), "&Recent Files");
 	fileMenu->AppendSeparator();
-	fileMenu->Append(createMenuItem(fileMenu, MENU_FILE_CLOSE,		"&Close",				"Close the currently open Archive",					"t_close"));
-	fileMenu->Append(createMenuItem(fileMenu, MENU_FILE_CLOSEALL,	"Close All",			"Close all open Archives",							"t_closeall"));
+	fileMenu->Append(createMenuItem(fileMenu, MENU_FILE_CLOSE,		"&Close\tCtrl+W",					"Close the currently open Archive",					"t_close"));
+	fileMenu->Append(createMenuItem(fileMenu, MENU_FILE_CLOSEALL,	"Close All",						"Close all open Archives",							"t_closeall"));
 	fileMenu->AppendSeparator();
-	fileMenu->Append(createMenuItem(fileMenu, MENU_FILE_EXIT,		"E&xit",				"Quit SLADE"));
+	fileMenu->Append(createMenuItem(fileMenu, MENU_FILE_EXIT,		"E&xit",							"Quit SLADE"));
 	menu->Append(fileMenu, "&File");
 
 	// Editor menu
@@ -167,17 +167,17 @@ void MainWindow::setupLayout() {
 
 	// Archive menu
 	wxMenu* archiveNewMenu = new wxMenu("");
-	archiveNewMenu->Append(createMenuItem(archiveNewMenu,	MENU_ARCHIVE_NEWENTRY,		"&Entry",		"Create a new empty entry",		"t_newentry"));
-	archiveNewMenu->Append(createMenuItem(archiveNewMenu,	MENU_ARCHIVE_NEWDIRECTORY,	"&Directory",	"Create a new empty directory",	"t_newfolder"));
+	archiveNewMenu->Append(createMenuItem(archiveNewMenu,	MENU_ARCHIVE_NEWENTRY,			"&Entry",					"Create a new empty entry",		"t_newentry"));
+	archiveNewMenu->Append(createMenuItem(archiveNewMenu,	MENU_ARCHIVE_NEWDIRECTORY,		"&Directory",				"Create a new empty directory",	"t_newfolder"));
 	wxMenu* archiveMenu = new wxMenu("");
 	archiveMenu->AppendSubMenu(archiveNewMenu, "&New");
-	archiveMenu->Append(createMenuItem(archiveMenu,	MENU_ARCHIVE_IMPORTFILES,	"&Import Files",	"Import multiple files into the archive"));
+	archiveMenu->Append(createMenuItem(archiveMenu,			MENU_ARCHIVE_IMPORTFILES,		"&Import Files",			"Import multiple files into the archive"));
 	archiveMenu->AppendSeparator();
-	archiveMenu->Append(createMenuItem(archiveMenu,	MENU_ARCHIVE_TEXEDITOR,		"&Texture Editor",	"Open the texture editor for the current archive"));
+	archiveMenu->Append(createMenuItem(archiveMenu,			MENU_ARCHIVE_TEXEDITOR,			"&Texture Editor",			"Open the texture editor for the current archive"));
 	//archiveMenu->Append(createMenuItem(archiveMenu,	MENU_ARCHIVE_CONVERTTO,		"&Convert To...",	"Convert the current archive to a different format"));
 	//archiveMenu->Append(createMenuItem(archiveMenu,	MENU_ARCHIVE_CLEANUP,		"Clean &Up",		"Clean up the current archive by removing unused entries and data"));
 	wxMenu* archiveCleanMenu = new wxMenu("");
-	archiveCleanMenu->Append(createMenuItem(archiveCleanMenu, MENU_ARCHIVE_CLEAN_PATCHES, "Remove Unused &Patches", "Removes any unused patches, and their associated entries"));
+	archiveCleanMenu->Append(createMenuItem(archiveCleanMenu, MENU_ARCHIVE_CLEAN_PATCHES, 	"Remove Unused &Patches",	"Removes any unused patches, and their associated entries"));
 	archiveMenu->AppendSubMenu(archiveCleanMenu, "Clean &Up");
 	menu->Append(archiveMenu, "&Archive");
 
