@@ -7,9 +7,6 @@
 
 TODO List ---------------------------------------------------------------
 
---- Before Final 3.0 Release ---
-- Fix bugs, etc
-
 --- Bugs ---
 - Copy/paste entry parent problem
 
@@ -74,6 +71,7 @@ TODO List ---------------------------------------------------------------
 	- General 'loadImage' function to load any supported format
 - Better way to get the currently selected entries would be nice
 - Should probably write my own lexer for TextEditor since the default cpp/cppnocase ones are somewhat limited
+- Implement custom replacement for wxFileName that allows fast matching against name/extension etc
 
 
 

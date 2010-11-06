@@ -499,7 +499,7 @@ void MainWindow::onMenuItemClicked(wxCommandEvent& e) {
 	else if (e.GetId() == MENU_HELP_ABOUT) {
 		wxAboutDialogInfo info;
 		info.SetName("SLADE");
-		info.SetVersion(Global::version);
+		info.SetVersion("v" + Global::version);
 		info.SetWebSite("http://slade.mancubus.net");
 		info.SetDescription("It's a Doom Editor");
 

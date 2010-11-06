@@ -1013,10 +1013,10 @@ ArchiveEntry* Archive::findFirst(search_options_t& options) {
 			// Cut extension if ignoring
 			wxFileName fn(entry->getName());
 			if (options.ignore_ext) {
-				if (!options.match_name.Matches(fn.GetName().Lower()))
+				if (!options.match_name.Matches(fn.GetName().MakeLower()))
 					continue;
 			}
-			else if (!options.match_name.Matches(fn.GetFullName().Lower()))
+			else if (!options.match_name.Matches(fn.GetFullName().MakeLower()))
 				continue;
 		}
 
@@ -1064,7 +1064,7 @@ ArchiveEntry* Archive::findLast(search_options_t& options) {
 		for (int a = dir->nChildren() - 1; a >= 0; a--) {
 			search_options_t opt = options;
 			opt.dir = (ArchiveTreeNode*)dir->getChild(a);
-			ArchiveEntry* match = findFirst(opt);
+			ArchiveEntry* match = findLast(opt);
 
 			// If a match was found in this subdir, return it
 			if (match)
@@ -1091,10 +1091,10 @@ ArchiveEntry* Archive::findLast(search_options_t& options) {
 			// Cut extension if ignoring
 			wxFileName fn(entry->getName());
 			if (options.ignore_ext) {
-				if (!options.match_name.Matches(fn.GetName().Lower()))
+				if (!options.match_name.Matches(fn.GetName().MakeLower()))
 					continue;
 			}
-			else if (!options.match_name.Matches(fn.GetFullName().Lower()))
+			else if (!options.match_name.Matches(fn.GetFullName().MakeLower()))
 				continue;
 		}
 
@@ -1144,10 +1144,10 @@ vector<ArchiveEntry*> Archive::findAll(search_options_t& options) {
 			// Cut extension if ignoring
 			wxFileName fn(entry->getName());
 			if (options.ignore_ext) {
-				if (!options.match_name.Matches(fn.GetName().Lower()))
+				if (!options.match_name.Matches(fn.GetName().MakeLower()))
 					continue;
 			}
-			else if (!options.match_name.Matches(fn.GetFullName().Lower()))
+			else if (!options.match_name.Matches(fn.GetFullName().MakeLower()))
 				continue;
 		}
 

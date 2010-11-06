@@ -49,7 +49,8 @@
 // Declare hash map class to hold EntryDataFormats
 WX_DECLARE_STRING_HASH_MAP(EntryDataFormat*, EDFMap);
 EDFMap data_formats;
-EntryDataFormat*	edf_any = 0;
+EntryDataFormat*	edf_any = NULL;
+EntryDataFormat*	edf_text = NULL;
 
 
 /*******************************************************************
@@ -62,6 +63,7 @@ EntryDataFormat*	edf_any = 0;
 EntryDataFormat::EntryDataFormat(string id) {
 	// Init variables
 	size_min = 0;
+	this->id = id;
 
 	// Add to hash map
 	data_formats[id] = this;
@@ -111,6 +113,13 @@ EntryDataFormat* EntryDataFormat::getFormat(string id) {
  *******************************************************************/
 EntryDataFormat* EntryDataFormat::anyFormat() {
 	return edf_any;
+}
+
+/* EntryDataFormat::textFormat
+ * Returns the 'text' data format
+ *******************************************************************/
+EntryDataFormat* EntryDataFormat::textFormat() {
+	return edf_text;
 }
 
 /* EntryDataFormat::readDataFormatDefinition

@@ -36,7 +36,6 @@
 #include "WadArchive.h"
 #include "BinaryControlLump.h"
 #include "Parser.h"
-#include "EntryDataFormat.h"
 #include "ConsoleHelpers.h"
 #include <wx/dir.h>
 #include <wx/filename.h>
@@ -73,7 +72,7 @@ EntryType::EntryType(string id) {
 	category = "Data";
 
 	// Init match criteria
-	format = "any";
+	format = EntryDataFormat::anyFormat();
 	size_limit[0] = -1;
 	size_limit[1] = -1;
 	detectable = true;
@@ -103,7 +102,7 @@ void EntryType::addToList() {
  * Dumps entry type info to the log
  *******************************************************************/
 void EntryType::dump() {
-	wxLogMessage(s_fmt("Type %s \"%s\", format %s, extension %s", chr(id), chr(name), chr(format), chr(extension)));
+	wxLogMessage(s_fmt("Type %s \"%s\", format %s, extension %s", chr(id), chr(name), chr(format->getId()), chr(extension)));
 	wxLogMessage(s_fmt("Size limit: %d-%d", size_limit[0], size_limit[1]));
 
 	for (size_t a = 0; a < match_archive.size(); a++)
@@ -211,14 +210,14 @@ int EntryType::isThisType(ArchiveEntry* entry) {
 
 	// Check for data format match if needed
 	int r = EDF_TRUE;
-	if (format == "text") {
+	if (format == EntryDataFormat::textFormat()) {
 		// Text is a special case, as other data formats can sometimes be detected as 'text',
 		// we'll only check for it if text data is specified in the entry type
 		if (memchr(entry->getData(), 0, entry->getSize()-1) != NULL)
 			return EDF_FALSE;
 	}
-	else if (format != "any") {
-		r = EntryDataFormat::getFormat(format)->isThisFormat(entry->getMCData());
+	else if (format != EntryDataFormat::anyFormat()) {
+		r = format->isThisFormat(entry->getMCData());
 		if (r == EDF_FALSE)
 			return EDF_FALSE;
 	}
@@ -346,10 +345,10 @@ bool EntryType::readEntryTypeDefinition(MemChunk& mc) {
 				ntype->extension = fieldnode->getStringValue();
 			}
 			else if (s_cmpnocase(fieldnode->getName(), "format")) {			// Format field
-				ntype->format = fieldnode->getStringValue();
+				ntype->format = EntryDataFormat::getFormat(fieldnode->getStringValue());
 
 				// Warn if undefined format
-				if (EntryDataFormat::getFormat(ntype->getFormat()) == EntryDataFormat::anyFormat())
+				if (ntype->format == EntryDataFormat::anyFormat())
 					wxLogMessage("Warning: Entry type %s requires undefined format %s", chr(ntype->getId()), chr(ntype->getFormat()));
 			}
 			else if (s_cmpnocase(fieldnode->getName(), "icon")) {			// Icon field

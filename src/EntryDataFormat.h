@@ -10,6 +10,8 @@
 
 class EntryDataFormat {
 private:
+	string	id;
+
 	// Struct to specify a range for a byte (min <= valid >= max)
 	// If max == min, only 1 valid value
 	struct byte_vrange_t {
@@ -44,6 +46,8 @@ public:
 	EntryDataFormat(string id);
 	virtual ~EntryDataFormat();
 
+	string	getId() { return id; }
+
 	virtual int		isThisFormat(MemChunk& mc);
 	void			copyToFormat(EntryDataFormat& target);
 
@@ -51,6 +55,7 @@ public:
 	static bool				readDataFormatDefinition(MemChunk& mc);
 	static EntryDataFormat*	getFormat(string id);
 	static EntryDataFormat*	anyFormat();
+	static EntryDataFormat*	textFormat();
 };
 
 #endif//__ENTRYDATAFORMAT_H__
