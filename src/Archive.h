@@ -46,16 +46,17 @@ public:
 };
 
 // Define archive types
-#define ARCHIVE_INVALID	0
-#define ARCHIVE_WAD		1
-#define ARCHIVE_ZIP		2
-#define ARCHIVE_LIB		3
-#define ARCHIVE_DAT		4
-#define ARCHIVE_RES		5
-#define ARCHIVE_WAD2	6
-#define ARCHIVE_PAK		7
-#define ARCHIVE_GRP		8
-#define ARCHIVE_RFF		9
+#define ARCHIVE_INVALID	 0
+#define ARCHIVE_WAD		 1
+#define ARCHIVE_ZIP		 2
+#define ARCHIVE_LIB		 3
+#define ARCHIVE_DAT		 4
+#define ARCHIVE_RES		 5
+#define ARCHIVE_WAD2	 6
+#define ARCHIVE_PAK		 7
+#define ARCHIVE_GRP		 8
+#define ARCHIVE_RFF		 9
+#define ARCHIVE_WOLF	10
 
 // Define map types
 #define MAP_DOOM	0

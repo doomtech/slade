@@ -35,16 +35,24 @@
 #include "MapLine.h"
 #include "MapVertex.h"
 #include "Parser.h"
+#include "SImage.h"
+#include <wx/filename.h>
 
 
 /*******************************************************************
  * VARIABLES
  *******************************************************************/
 // Some temporary colours (these will eventually be setup in some kind of global colour configuration)
-rgba_t col_line_1s(255, 255, 255, 255);
-rgba_t col_line_2s(170, 170, 170, 255);
-rgba_t col_line_special(130, 140, 255, 255);
-rgba_t col_line_macro(255, 170, 130, 255);
+rgba_t col_view_background(0, 0, 0, 255);
+rgba_t col_view_line_1s(255, 255, 255, 255);
+rgba_t col_view_line_2s(170, 170, 170, 255);
+rgba_t col_view_line_special(130, 140, 255, 255);
+rgba_t col_view_line_macro(255, 170, 130, 255);
+rgba_t col_save_background(255, 255, 255, 0);
+rgba_t col_save_line_1s(0, 0, 0, 255);
+rgba_t col_save_line_2s(144, 144, 144, 255);
+rgba_t col_save_line_special(220, 130, 50, 255);
+rgba_t col_save_line_macro(50, 130, 220, 255);
 
 
 /*******************************************************************
@@ -139,7 +147,8 @@ void MEPCanvas::draw() {
 	glLoadIdentity();
 
 	// Clear
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClearColor(((double)col_view_background.r)/255.f, ((double)col_view_background.g)/255.f, 
+				 ((double)col_view_background.b)/255.f, ((double)col_view_background.a)/255.f);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
 	// Translate to middle of pixel (otherwise inaccuracies can occur on certain gl implemenataions)
@@ -177,13 +186,13 @@ void MEPCanvas::draw() {
 
 		// Set colour
 		if (line.special)
-			col_line_special.set_gl();
+			col_view_line_special.set_gl();
 		else if (line.macro)
-			col_line_macro.set_gl();
+			col_view_line_macro.set_gl();
 		else if (line.twosided)
-			col_line_2s.set_gl();
+			col_view_line_2s.set_gl();
 		else
-			col_line_1s.set_gl();
+			col_view_line_1s.set_gl();
 
 		// Draw line
 		glBegin(GL_LINES);
@@ -200,6 +209,114 @@ void MEPCanvas::draw() {
 }
 
 
+/* MEPCanvas::createImage
+ * Draws the map in an image
+ * TODO: Factorize code with normal draw() and showMap() functions.
+ *******************************************************************/
+void MEPCanvas::createImage(ArchiveEntry& ae, int width, int height) {
+	glViewport(0, 0, width, height);
+
+	// Setup the screen projection
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0, width, 0, height, -1, 1);
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+	// Clear
+	glClearColor(((double)col_save_background.r)/255.f, ((double)col_save_background.g)/255.f, 
+				 ((double)col_save_background.b)/255.f, ((double)col_save_background.a)/255.f);
+	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+
+	// Translate to middle of pixel (otherwise inaccuracies can occur on certain gl implemenataions)
+	glTranslatef(0.375f, 0.375f, 0);
+
+	// Zoom/offset to show full map
+	// Find extents of map
+	mep_vertex_t m_min(999999.0, 999999.0);
+	mep_vertex_t m_max(-999999.0, -999999.0);
+	for (unsigned a = 0; a < verts.size(); a++) {
+		if (verts[a].x < m_min.x)
+			m_min.x = verts[a].x;
+		if (verts[a].x > m_max.x)
+			m_max.x = verts[a].x;
+		if (verts[a].y < m_min.y)
+			m_min.y = verts[a].y;
+		if (verts[a].y > m_max.y)
+			m_max.y = verts[a].y;
+	}
+
+	// Offset to center of map
+	double mapwidth = m_max.x - m_min.x;
+	double mapheight = m_max.y - m_min.y;
+	offset_x = m_min.x + (mapwidth * 0.5);
+	offset_y = m_min.y + (mapheight * 0.5);
+
+	// Zoom to fit whole map
+	double x_scale = ((double)width) / mapwidth;
+	double y_scale = ((double)height) / mapheight;
+	zoom = min(x_scale, y_scale);
+	zoom *= 0.95;
+
+	// Translate to middle of canvas
+	glTranslated(width>>1, height>>1, 0);
+
+	// Zoom
+	glScaled(zoom, zoom, 1);
+
+	// Translate to offset
+	glTranslated(-offset_x, -offset_y, 0);
+
+	// Setup drawing
+	glDisable(GL_TEXTURE_2D);
+	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+	glLineWidth(1.5f);
+	glEnable(GL_LINE_SMOOTH);
+
+	// Draw lines
+	for (unsigned a = 0; a < lines.size(); a++) {
+		mep_line_t line = lines[a];
+
+		// Check ends
+		if (line.v1 >= verts.size() || line.v2 >= verts.size())
+			continue;
+
+		// Get vertices
+		mep_vertex_t v1 = verts[lines[a].v1];
+		mep_vertex_t v2 = verts[lines[a].v2];
+
+		// Set colour
+		if (line.special)
+			col_save_line_special.set_gl();
+		else if (line.macro)
+			col_save_line_macro.set_gl();
+		else if (line.twosided)
+			col_save_line_2s.set_gl();
+		else
+			col_save_line_1s.set_gl();
+
+		// Draw line
+		glBegin(GL_LINES);
+		glVertex2d(v1.x, v1.y);
+		glVertex2d(v2.x, v2.y);
+		glEnd();
+	}
+
+	glLineWidth(1.0f);
+	glDisable(GL_LINE_SMOOTH);
+
+	uint8_t * ImageBuffer = new uint8_t[width * height * 4];
+	glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, ImageBuffer);
+	SImage img;
+	img.setImageData(ImageBuffer, width, height, RGBA);
+	img.mirror(true);
+	MemChunk mc;
+	img.toPNG(mc);
+	ae.importMemChunk(mc);
+
+}
+
 /*******************************************************************
  * MAPENTRYPANEL CLASS FUNCTIONS
  *******************************************************************/
@@ -211,6 +328,14 @@ MapEntryPanel::MapEntryPanel(wxWindow* parent) : EntryPanel(parent, "map") {
 	// Setup map canvas
 	map_canvas = new MEPCanvas(this);
 	sizer_main->Add(map_canvas->toPanel(this), 1, wxEXPAND|wxALL, 4);
+
+	// Add 'Save Map Image' button
+	btn_saveimg = new wxButton(this, -1, "Save Map Image");
+	sizer_bottom->AddStretchSpacer(1);
+	sizer_bottom->Add(btn_saveimg, 0, wxEXPAND, 0);
+
+	// Bind events
+	btn_saveimg->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MapEntryPanel::onBtnSaveImage, this);
 
 	// Layout
 	Layout();
@@ -488,4 +613,40 @@ bool MapEntryPanel::loadEntry(ArchiveEntry* entry) {
  *******************************************************************/
 bool MapEntryPanel::saveEntry() {
 	return true;
+}
+
+/* MapEntryPanel::createImage
+ * Creates a PNG file of the map preview
+ * TODO: Preference panel for background and line colors, 
+ * as well as for image size
+ *******************************************************************/
+bool MapEntryPanel::createImage() {
+	if (entry == NULL)
+		return false;
+
+	ArchiveEntry temp;
+	map_canvas->createImage(temp, 800, 600);
+	string name = s_fmt("%s_%s", chr(entry->getParent()->getFilename(false)), chr(entry->getName()));
+	wxFileName fn(name);
+
+	// Create save file dialog
+	wxFileDialog *dialog_save = new wxFileDialog(this, s_fmt("Save Map Preview \"%s\"", name.c_str()),
+												wxEmptyString, fn.GetFullName(), "PNG (*.PNG)|*.png",
+												wxFD_SAVE | wxFD_OVERWRITE_PROMPT, wxDefaultPosition);
+
+	// Run the dialog & check that the user didn't cancel
+	if (dialog_save->ShowModal() == wxID_OK) {
+		// If a filename was selected, export it
+		bool ret = temp.exportFile(dialog_save->GetPath());
+		delete dialog_save;
+		return ret;
+	}
+	return true;
+}
+
+/* MapEntryPanel::onBtnSaveImage
+ * Called when the 'Save Map Image' button is clicked
+ *******************************************************************/
+void MapEntryPanel::onBtnSaveImage(wxCommandEvent& e) {
+	createImage();
 }

@@ -855,3 +855,22 @@ bool SImage::resize(int nwidth, int nheight) {
 
 	return true;
 }
+
+/* SImage::setImageData
+ * Sets the image data, size, and format from raw data
+ *******************************************************************/
+bool SImage::setImageData(uint8_t *ndata, int nwidth, int nheight, SIFormat nformat) {
+	if (ndata) {
+		clearData();
+		format = nformat;
+		width = nwidth;
+		height = nheight;
+		data = ndata;
+
+		// Announce change
+		announce("image_changed");
+
+		return true;
+	}
+	return false;
+}

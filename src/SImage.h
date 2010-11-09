@@ -70,6 +70,8 @@ public:
 	bool	loadRottLbm(const uint8_t* gfx_data, int size);
 	bool	loadRottRaw(const uint8_t* gfx_data, int size);
 	bool	loadRottPic(const uint8_t* gfx_data, int size);
+	bool	loadWolfPic(const uint8_t* gfx_data, int size);
+	bool	loadWolfSprite(const uint8_t* gfx_data, int size);
 	bool	loadPlanar(const uint8_t* gfx_data, int size);
 	bool	load4bitChunk(const uint8_t* gfx_data, int size);
 	bool	loadImgz(const uint8_t* gfx_data, int size);
@@ -78,6 +80,7 @@ public:
 	bool	loadFont2(const uint8_t* gfx_data, int size);
 	bool	loadFontM(const uint8_t* gfx_data, int size);
 	bool	loadBMF(const uint8_t* gfx_data, int size);
+	bool	loadWolfFont(const uint8_t* gfx_data, int size);
 	bool	loadSCSprite(const uint8_t* data, int size);
 	bool	loadSCWall(const uint8_t* data, int size);
 	bool	loadAnaMip(const uint8_t* data, int size);
@@ -107,6 +110,7 @@ public:
 	bool	mirror(bool vert);
 	bool	crop(long x1, long y1, long x2, long y2);
 	bool	resize(int nwidth, int nheight);
+	bool	setImageData(uint8_t *ndata, int nwidth, int nheight, SIFormat nformat);
 };
 
 #endif //__SIMAGE_H__

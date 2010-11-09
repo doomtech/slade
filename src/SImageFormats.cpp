@@ -624,7 +624,7 @@ uint32_t valid_flat_size[][2] = {
 	{ 256, 200 },	// Rise of the Triad sky
 	{ 320, 200 },	// full screen format
 };
-uint32_t	n_valid_flat_sizes = 13;
+uint32_t	n_valid_flat_sizes = 14;
 
 /* SImage::validFlatSize
  * Returns whether the image has dimensions appropriate for a flat
@@ -1907,6 +1907,112 @@ bool SImage::loadRottPic(const uint8_t* gfx_data, int size) {
 	return true;
 }
 
+/* SImage::loadWolfPic
+ * Loads a Wolfenstein 3D picture.
+ *******************************************************************/
+bool SImage::loadWolfPic(const uint8_t* gfx_data, int size) {
+	// Check data
+	if (!gfx_data)
+		return false;
+
+	// Check/setup size
+	offset_x = offset_y = 0;
+	width = gfx_data[0] + (gfx_data[1]<<8);
+	height = gfx_data[2] + (gfx_data[3]<<8);
+
+	if (size != 4 + width * height)
+		return false;
+
+	// Setup variables
+	format = PALMASK;
+	has_palette = false;
+	numimages = 1;
+	imgindex = 0;
+
+	// Clear current data if it exists
+	clearData();
+
+	// Read raw pixel data
+	data = new uint8_t[width*height];
+
+	const uint8_t* pixel = gfx_data + 4;
+	const uint8_t* entryend = gfx_data + size;
+	uint8_t* brush = data;
+	uint8_t* dataend = data + size - 4;
+
+	while (pixel < entryend) {
+		*brush = *pixel++;
+		brush += 4;
+		if (brush >= dataend)
+			brush -= size - 5;
+	}
+
+	// Create mask (index 255 is transparent)
+	/*mask = new uint8_t[width*height];
+	memset(mask, 255, width*height);
+	for (int i = 0; i < width*height; ++i)
+		if (data[i] == 0xFF) mask[i] = 0;*/
+
+	// Announce change
+	announce("image_changed");
+
+	return true;
+}
+
+/* SImage::loadWolfSprite
+ * Loads a Wolfenstein 3D sprite.
+ *******************************************************************/
+bool SImage::loadWolfSprite(const uint8_t* gfx_data, int size) {
+	// Check data
+	if (!gfx_data)
+		return false;
+
+	// Check/setup size
+	uint8_t leftpix, rightpix;
+	leftpix = gfx_data[0];
+	rightpix = gfx_data[2];
+	width = 1 + rightpix - leftpix;
+	height = 64;
+	offset_x = 32 - leftpix;
+	offset_y = height;
+
+	// Setup variables
+	format = PALMASK;
+	has_palette = false;
+	numimages = 1;
+	imgindex = 0;
+
+	// Clear current data if it exists
+	clearData();
+
+	// Read raw pixel data
+	data = new uint8_t[width*height];
+	mask = new uint8_t[width*height];
+	memset(mask, 0, (width*height));
+
+	uint16_t * cmdptr = (uint16_t *)(gfx_data + 4);
+	uint32_t i, x, y;
+	for (x = 0 ; x < (unsigned)width ; ++x )
+	{		
+        int16_t * linecmds = (int16_t *)(gfx_data + wxINT16_SWAP_ON_BE( *cmdptr ));
+		cmdptr++;
+		for (; wxINT16_SWAP_ON_BE(*linecmds); linecmds += 3)
+		{
+			i = (wxINT16_SWAP_ON_BE(linecmds[2])>>1) + wxINT16_SWAP_ON_BE(linecmds[1]);
+			for (y = (uint32_t)(wxINT16_SWAP_ON_BE(linecmds[2])>>1); y < (uint32_t)(wxINT16_SWAP_ON_BE(linecmds[0]) / 2); ++y, ++i)
+			{
+				data[y * width + x] = gfx_data[i];
+				mask[y * width + x] = 255;
+			}
+		}
+	}
+
+	// Announce change
+	announce("image_changed");
+
+	return true;
+}
+
 /*******************************************************************
  * FONT FORMATS
  *******************************************************************/
@@ -2416,3 +2522,67 @@ bool SImage::loadFontM(const uint8_t* gfx_data, int size) {
 	return true;
 }
 
+/* SImage::loadWolfFont
+ * Loads a Wolf3D-format font.
+ * The format used is simple, basically like the Doom alpha HUFONT,
+ * except not in the same order:
+ * Offset | Length | Type | Name
+ *  0x000 |      2 | ui16 | image height (one value for all chars)
+ *  0x002 |  256*2 | ui16 | characteroffset (one value per char)
+ *  0x202 |  256*1 | ui08 | characterwidth (one value per char)
+ *  0x302 |    x*1 | ui08 | pixel color index (one value per pixel)
+ * So, total size - 302 % value @ 0x00 must be null.
+ * Returns false if the image data was invalid, true otherwise.
+ *******************************************************************/
+bool SImage::loadWolfFont(const uint8_t* gfx_data, int size) {
+	// Check data
+	if (!gfx_data)
+		return false;
+
+	if (size <= 0x302)
+		return false;
+
+	offset_x = offset_y = 0;
+	height = gfx_data[0] + (gfx_data[1]<<8);
+
+	size_t datasize = size - 0x302;
+	if (datasize % height)
+		return false;
+
+	width = datasize / height;
+
+	clearData();
+	has_palette = false;
+	format = PALMASK;
+
+	// Technically each character is its own image, though.
+	numimages = 1;
+	imgindex = 0;
+
+	// Create new picture and mask
+	const uint8_t* r = gfx_data + 0x302;
+	data = new uint8_t[datasize];
+	mask = new uint8_t[datasize];
+	memset(mask, 0xFF, datasize);
+	memcpy(data, r, datasize);
+
+	size_t p = 0; // Previous width
+	size_t w = 0; // This character's width
+	// Run through each character
+	for (size_t c = 0; c < 256; ++c) {
+		p += w; // Add previous character width to total
+		w = gfx_data[c + 0x202]; // Get this character's width
+		if (!w) continue;
+		size_t o = gfx_data[(c<<1) + 2] + (gfx_data[(c<<1) + 3]<<8);
+		for (size_t i = 0; i < w * height; ++i) {
+			// Compute source and destination offsets
+			size_t s = o + i;
+			size_t d = ((i/w) * width) + (i%w) + p;
+			data[d] = gfx_data[s];
+			// Index 0 is transparent
+			if (data[d] == 0)
+				mask[d] = 0;
+		}
+	}
+	return true;
+}

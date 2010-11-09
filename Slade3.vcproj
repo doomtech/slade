@@ -866,6 +866,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\WolfArchive.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\WolfArchive.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\ZipArchive.cpp"
 					>
 				</File>

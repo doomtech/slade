@@ -40,6 +40,7 @@
 #include "RffArchive.h"
 #include "Wad2Archive.h"
 #include "WadJArchive.h"
+#include "WolfArchive.h"
 #include "Console.h"
 #include "SplashWindow.h"
 #include <wx/filename.h>
@@ -195,6 +196,8 @@ Archive* ArchiveManager::openArchive(string filename, bool manage) {
 		new_archive = new Wad2Archive();
 	else if (WadJArchive::isWadJArchive(filename))
 		new_archive = new WadJArchive();
+	else if (WolfArchive::isWolfArchive(filename))
+		new_archive = new WolfArchive();
 	else {
 		// Unsupported format
 		Global::error = "Unsupported or invalid Archive format";
@@ -272,6 +275,8 @@ Archive* ArchiveManager::openArchive(ArchiveEntry* entry, bool manage) {
 		new_archive = new Wad2Archive();
 	else if (WadJArchive::isWadJArchive(entry->getMCData()))
 		new_archive = new WadJArchive();
+	else if (WolfArchive::isWolfArchive(entry->getMCData()))
+		new_archive = new WolfArchive();
 	else {
 		// Unsupported format
 		Global::error = "Unsupported or invalid Archive format";
@@ -350,6 +355,10 @@ Archive* ArchiveManager::newArchive(uint8_t type) {
 		case ARCHIVE_RFF:
 			new_archive = new RffArchive();
 			format_str = "rff";
+			break;
+		case ARCHIVE_WOLF:
+			new_archive = new WolfArchive();
+			format_str = "wlf";
 			break;
 	}
 
@@ -479,6 +488,14 @@ string ArchiveManager::getArchiveExtensionsString() {
 	string ext_pak = "*.pak;*.PAK;*.Pak";						extensions += ext_pak + ";";
 	string ext_grp = "*.grp;*.GRP;*.Grp;*.prg;*.PRG;*.Prg";		extensions += ext_grp + ";";
 	string ext_rff = "*.rff;*.RFF;*.Rff";						extensions += ext_rff + ";";
+	string ext_wolf =	"vswap.*;VSWAP.*Vswap.*;"
+						"audiot.*;AUDIOT.*;Audiot.*;"
+						"audiohed.*;AUDIOHED.*;Audiohed.*;"
+						"gamemaps.*;GAMEMAPS.*;Gamemaps.*;"
+						"maphead.*;MAPHEAD.*;Maphead.*"
+						"vgagraph.*;VGAGRAPH.*;Vgagraph.*"
+						"vgahead.*;VGAHEAD.*;Vgahead.*;"
+						"vgadict.*;VGADICT.*;Vgadict.*";		extensions += ext_wolf +";";
 
 	extensions += s_fmt("|Doom Wad files (*.wad)|%s",			chr(ext_wad));
 	extensions += s_fmt("|Zip files (*.zip)|%s",				chr(ext_zip));
@@ -491,6 +508,7 @@ string ArchiveManager::getArchiveExtensionsString() {
 	extensions += s_fmt("|Quake Pak files (*.pak)|%s",			chr(ext_pak));
 	extensions += s_fmt("|Build Grp files (*.grp)|%s",			chr(ext_grp));
 	extensions += s_fmt("|Blood Rff files (*.rff)|%s",			chr(ext_rff));
+	extensions += s_fmt("|Wolfenstein 3D files|%s",				chr(ext_wolf));
 
 	return extensions;
 }

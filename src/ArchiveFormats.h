@@ -102,4 +102,14 @@ public:
 	}
 };
 
+class WolfDataFormat : public EntryDataFormat {
+public:
+	WolfDataFormat() : EntryDataFormat("archive_wolf") {};
+	~WolfDataFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		return WolfArchive::isWolfArchive(mc) ? EDF_TRUE : EDF_FALSE;
+	}
+};
+
 #endif //ARCHIVEFORMATS_H

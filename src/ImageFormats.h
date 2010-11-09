@@ -840,6 +840,40 @@ public:
 	}
 };
 
+class WolfPicDataFormat : public EntryDataFormat {
+public:
+	WolfPicDataFormat() : EntryDataFormat("img_wolfpic") {};
+	~WolfPicDataFormat() {}
+
+	// Wolf picture format
+	int isThisFormat(MemChunk& mc) {
+		size_t size = mc.getSize();
+		if (size < 4)
+			return EDF_FALSE;
+		if ((4 + ((mc[0] + (mc[1]<<8))*(mc[2] + (mc[3]<<8)))) != mc.getSize())
+			return EDF_FALSE;
+
+		return EDF_TRUE;
+	}
+};
+
+class WolfSpriteDataFormat : public EntryDataFormat {
+public:
+	WolfSpriteDataFormat() : EntryDataFormat("img_wolfsprite") {};
+	~WolfSpriteDataFormat() {}
+
+	// Wolf picture format
+	int isThisFormat(MemChunk& mc) {
+		size_t size = mc.getSize();
+		if (size < 8 || size > 4228)
+			return EDF_FALSE;
+		if (mc[0] > 63 || mc[1] || mc[2] > 64 || mc[1] >= mc [2] || mc[3])
+			return EDF_FALSE;
+
+		return EDF_TRUE;
+	}
+};
+
 class Font0DataFormat : public EntryDataFormat {
 public:
 	Font0DataFormat() : EntryDataFormat("font_doom_alpha") {};
@@ -914,6 +948,36 @@ public:
 			if (mc[0] == 0xE1 && mc[1] == 0xE6 && mc[2] == 0xD5 && mc[3] == 0x1A)
 				return EDF_TRUE;
 		}
+		return EDF_FALSE;
+	}
+};
+
+class FontWolfDataFormat : public EntryDataFormat {
+public:
+	FontWolfDataFormat() : EntryDataFormat("font_wolf") {};
+	~FontWolfDataFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		if (mc.getSize() <= 0x302)
+			return EDF_FALSE;
+
+		const uint16_t * gfx_data = (const uint16_t *) mc.getData();
+
+		size_t height = wxINT16_SWAP_ON_BE(gfx_data[0]);
+
+		size_t datasize = mc.getSize() - 0x302;
+		if (height == 0 || datasize % height)
+			return EDF_FALSE;
+
+		// It seems okay so far. Check that one
+		// character does start at offset 0x302.
+		// The offsets are themselves between
+		// offsets 0x002 and 0x202. Halved for int16_t.
+		for (size_t i = 0x01; i < 0x101; ++i)
+			if (gfx_data[i] == wxINT16_SWAP_ON_BE(0x302))
+				return EDF_TRUE;
+
+		// Doesn't seem to be such a file after all.
 		return EDF_FALSE;
 	}
 };

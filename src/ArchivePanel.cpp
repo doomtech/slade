@@ -697,6 +697,7 @@ bool ArchivePanel::exportEntry() {
 			// If a filename was selected, export it
 			selection[0]->exportFile(dialog_save->GetPath());
 		}
+		delete dialog_save;
 
 		return true;
 	}

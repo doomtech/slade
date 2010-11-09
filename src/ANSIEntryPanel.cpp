@@ -48,7 +48,7 @@
 ANSIEntryPanel::ANSIEntryPanel(wxWindow* parent) : EntryPanel(parent, "ansi") {
 	// Get the VGA font
 
-	ansi_chardata = new uint8_t[4000];
+	ansi_chardata = new uint8_t[DATASIZE];
 	ansi_canvas = new ANSICanvas(this, -1);
 	sizer_main->Add(ansi_canvas->toPanel(this), 1, wxEXPAND|wxALL, 4);
 

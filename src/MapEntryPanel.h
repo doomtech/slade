@@ -38,11 +38,13 @@ public:
 	void clearMap();
 	void showMap();
 	void draw();
+	void createImage(ArchiveEntry& ae, int width, int height);
 };
 
 class MapEntryPanel : public EntryPanel {
 private:
 	MEPCanvas*	map_canvas;
+	wxButton*	btn_saveimg;
 
 public:
 	MapEntryPanel(wxWindow* parent);
@@ -50,6 +52,9 @@ public:
 
 	bool	loadEntry(ArchiveEntry* entry);
 	bool	saveEntry();
+	bool	createImage();
+
+	void	onBtnSaveImage(wxCommandEvent& e);
 };
 
 #endif//__MAP_ENTRY_PANEL_H__

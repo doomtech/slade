@@ -39,6 +39,7 @@
 #include "RffArchive.h"
 #include "Wad2Archive.h"
 #include "WadJArchive.h"
+#include "WolfArchive.h"
 #include "BinaryControlLump.h"
 #include "Parser.h"
 
@@ -214,6 +215,8 @@ void EntryDataFormat::initBuiltinFormats() {
 	new RottLBMDataFormat();
 	new RottRawDataFormat();
 	new RottPicDataFormat();
+	new WolfPicDataFormat();
+	new WolfSpriteDataFormat();
 	new WadDataFormat();
 	new ZipDataFormat();
 	new LibDataFormat();
@@ -224,6 +227,7 @@ void EntryDataFormat::initBuiltinFormats() {
 	new RffDataFormat();
 	new Wad2DataFormat();
 	new WadJDataFormat();
+	new WolfDataFormat();
 	new MUSDataFormat();
 	new MIDIDataFormat();
 	new XMIDataFormat();
@@ -250,6 +254,7 @@ void EntryDataFormat::initBuiltinFormats() {
 	new Font1DataFormat();
 	new Font2DataFormat();
 	new BMFontDataFormat();
+	new FontWolfDataFormat();
 	new ZNodesDataFormat();
 	new ZGLNodesDataFormat();
 	new ZGLNodes2DataFormat();

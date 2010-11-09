@@ -113,6 +113,12 @@ bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry, int index) {
 		return image->loadRottRaw(entry->getData(), entry->getSize());
 	else if (s_cmpnocase(format, "img_rottpic"))
 		return image->loadRottPic(entry->getData(), entry->getSize());
+	else if (s_cmpnocase(format, "img_wolfpic"))
+		return image->loadWolfPic(entry->getData(), entry->getSize());
+	else if (s_cmpnocase(format, "img_wolfsprite"))
+		return image->loadWolfSprite(entry->getData(), entry->getSize());
+	else if (s_cmpnocase(format, "font_wolf"))
+		return image->loadWolfFont(entry->getData(), entry->getSize());
 	else if (s_cmpnocase(format, "img_mipimage"))
 		return image->loadAnaMip(entry->getData(), entry->getSize());
 	else if (s_cmpnocase(format, "img_arttile"))
@@ -160,6 +166,15 @@ int	Misc::detectPaletteHack(ArchiveEntry* entry)
 	else if ((entry->getType()->getFormat() == "img_rott"		&& entry->getName() == "AP_TITL")
 			||(entry->getType()->getFormat() == "img_rottraw"	&& entry->getName() == "AP_WRLD"))
 		return PAL_ROTTAHACK;	// Rise of the Triad
+	else if (entry->getType()->getFormat() == "img_wolfpic"		&& entry->getName().Matches("IDG*"))
+		return PAL_SODIDHACK;	// Spear of Destiny team screens
+	else if (entry->getType()->getFormat() == "img_wolfpic"		&& entry->getName().Matches("TIT*"))
+		return PAL_SODTITLEHACK;// Spear of Destiny title screens
+	else if (entry->getType()->getFormat() == "img_wolfpic"		&& entry->getName().Matches("END*")) {
+		long endscreen;			// Spear of Destiny ending screens (extra-hacky!)
+		if (entry->getName().Right(3).ToLong(&endscreen))
+			return PAL_SODENDHACK + endscreen - 81;
+	}
 
 	// Default:
 	return PAL_NOHACK;
@@ -177,13 +192,14 @@ bool Misc::loadPaletteFromArchive(Palette8bit* pal, Archive* archive, int lump) 
 		return false;
 
 	// Find PLAYPAL entry
+	bool sixbit = false;
 	ArchiveEntry* playpal = NULL;
 	if (lump == PAL_ALPHAHACK)
 		playpal = archive->getEntry("TITLEPAL", true);
 	else if (lump == PAL_HERETICHACK)
 		playpal = archive->getEntry("E2PAL", true);
 	else if (lump == PAL_SHADOWHACK)
-		playpal = archive->getEntry("shadowpage+1", true);
+		playpal = archive->getEntry("shadowpage+1", true), sixbit = true;
 	else if (lump == PAL_ROTTNHACK)
 		playpal = archive->getEntry("NICPAL", true);
 	else if (lump == PAL_ROTTDHACK)
@@ -192,8 +208,19 @@ bool Misc::loadPaletteFromArchive(Palette8bit* pal, Archive* archive, int lump) 
 		playpal = archive->getEntry("FINFRPAL", true);
 	else if (lump == PAL_ROTTAHACK)
 		playpal = archive->getEntry("AP_PAL", true);
+	else if (lump == PAL_SODIDHACK)
+		playpal = archive->getEntry("PAL00163", true), sixbit = true;
+	else if (lump == PAL_SODTITLEHACK)
+		playpal = archive->getEntry("PAL00153", true), sixbit = true;
+	else if (lump >= PAL_SODENDHACK) {
+		int endscreen = lump - PAL_SODENDHACK;
+		endscreen += 154;
+		string palname = s_fmt("PAL%05d", endscreen);
+		playpal = archive->getEntry(palname, true);
+		sixbit = true;
+	}
 	if (!playpal || playpal->getSize() < 768)
-		playpal = archive->getEntry("PLAYPAL", true);
+		playpal = archive->getEntry("PLAYPAL", true), sixbit = false;
 	if (!playpal || playpal->getSize() < 768)
 		playpal = archive->getEntry("PAL", true);
 
@@ -212,6 +239,11 @@ bool Misc::loadPaletteFromArchive(Palette8bit* pal, Archive* archive, int lump) 
 		uint8_t r = playpal_dat[c++];
 		uint8_t g = playpal_dat[c++];
 		uint8_t b = playpal_dat[c++];
+		if (sixbit) {
+			r = (r<<2) | (r>>4);
+			g = (g<<2) | (g>>4);
+			b = (b<<2) | (b>>4);
+		}
 		pal->setColour(a, rgba_t(r, g,  b, 255));
 	}
 
