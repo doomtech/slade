@@ -81,7 +81,7 @@ public:
 		string			name;
 		ArchiveEntry*	head;
 		ArchiveEntry*	end;
-		uint8_t			format;	// 0=doom 1=hexen 2=udmf
+		uint8_t			format;
 	};
 
 	Archive(uint8_t type = ARCHIVE_INVALID);

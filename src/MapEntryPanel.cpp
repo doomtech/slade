@@ -625,7 +625,8 @@ bool MapEntryPanel::createImage() {
 		return false;
 
 	ArchiveEntry temp;
-	map_canvas->createImage(temp, 800, 600);
+	// Stupid OpenGL grumble grumble grumble
+	map_canvas->createImage(temp, map_canvas->GetSize().x, map_canvas->GetSize().y);
 	string name = s_fmt("%s_%s", chr(entry->getParent()->getFilename(false)), chr(entry->getName()));
 	wxFileName fn(name);
 

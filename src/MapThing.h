@@ -16,32 +16,36 @@ struct doomthing_t
 
 struct hexenthing_t
 {
-	uint16_t	tid;
-	short		x;
-	short		y;
-	short		z;
-	short		angle;
-	short		type;
-	short		flags;
-	uint8_t		special;
-	uint8_t		args[5];
+	short	tid;
+	short	x;
+	short	y;
+	short	z;
+	short	angle;
+	short	type;
+	short	flags;
+	uint8_t	special;
+	uint8_t	args[5];
 };
 
 struct doom64thing_t
 {
-	short		x;
-	short		y;
-	short		z;
-	short		angle;
-	short		type;
-	short		flags;
-	uint16_t	tid;
+	short	x;
+	short	y;
+	short	z;
+	short	angle;
+	short	type;
+	short	flags;
+	short	tid;
 };
 
 class MapThing {
 private:
-	double x;
-	double y;
+	short	type;
+	double	x;
+	double	y;
+	double	z;
+	short	angle;
+	short	tid;
 
 	PropertyList	udmf_props;
 
@@ -53,6 +57,8 @@ public:
 	~MapThing(){}
 
 	bool	parseUDMF(Tokenizer& tz);
+
+	short	getType() { return type; }
 };
 
 #endif //__MAPTHING_H__
