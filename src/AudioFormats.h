@@ -159,8 +159,9 @@ public:
 		// Check size
 		if (mc.getSize() > 80) {
 			// Check for mod header
-			char temp[17] = "";
-			memcpy(temp, mc.getData(), 17);
+			char temp[18] = "";
+			memcpy(temp, mc.getData(), 18);
+			temp[17] = 0;
 			if (!s_fmt("%s", temp).CmpNoCase("Extended module: ")) {
 				if (mc[37] == 0x1a) {
 					return EDF_TRUE;
@@ -198,7 +199,7 @@ public:
 		// Check size
 		if (mc.getSize() > 1084) {
 			// Check format
-			if (mc[950] >= 1 && mc[950] <= 128 && mc[951] == 127) {
+			if (mc[950] >= 1 && mc[950] <= 128 && (mc[951] & 127) == 127) {
 				if ((mc[1080] == 'M' && mc[1081] == '.' && mc[1082] == 'K' && mc[1083] == '.') ||
 						(mc[1080] == 'M' && mc[1081] == '!' && mc[1082] == 'K' && mc[1083] == '!') ||
 						(mc[1080] == 'F' && mc[1081] == 'L' && mc[1082] == 'T' && mc[1083] == '4') ||
