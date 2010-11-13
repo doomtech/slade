@@ -245,6 +245,7 @@ void EntryDataFormat::initBuiltinFormats() {
 	new WAVDataFormat();
 	new OggDataFormat();
 	new FLACDataFormat();
+	new MP2DataFormat();
 	new MP3DataFormat();
 	new TextureXDataFormat();
 	new PNamesDataFormat();
