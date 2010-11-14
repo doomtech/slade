@@ -72,8 +72,9 @@ ns_special_t special_namespaces[] = {
 	{ "colormaps",	"c"		},
 	{ "acs",		"a"		},
 	{ "voices",		"v"		},
+	{ "voxels",		"vx"	},
 };
-const int n_special_namespaces = 9;
+const int n_special_namespaces = 10;
 
 /*******************************************************************
  * EXTERNAL VARIABLES
@@ -206,7 +207,7 @@ void WadArchive::updateNamespaces() {
 		ns.end_index = entryIndex(ns.end);
 
 		// Testing
-		//wxLogMessage("Namespace %s", chr(ns.name));
+		//wxLogMessage("Namespace %s from %s to %s", chr(ns.name), chr(ns.start->getName()), chr(ns.end->getName()));
 	}
 }
 
@@ -879,9 +880,6 @@ ArchiveEntry* WadArchive::findFirst(search_options_t& options) {
 
 		// Check name
 		if (!options.match_name.IsEmpty()) {
-			// Force case insensitivity
-			options.match_name.MakeLower();
-
 			if (!options.match_name.Matches(entry->getName().Lower())) {
 				entry = entry->nextEntry();
 				continue;
@@ -943,9 +941,6 @@ ArchiveEntry* WadArchive::findLast(search_options_t& options) {
 
 		// Check name
 		if (!options.match_name.IsEmpty()) {
-			// Force case insensitivity
-			options.match_name.MakeLower();
-
 			if (!options.match_name.Matches(entry->getName().Lower())) {
 				entry = entry->prevEntry();
 				continue;

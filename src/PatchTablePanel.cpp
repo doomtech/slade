@@ -285,6 +285,7 @@ void PatchTablePanel::onBtnAddPatch(wxCommandEvent& e) {
 
 	// Add to patch table
 	patch_table->addPatch(patch);
+	patch_table->updatePatchEntry(patch_table->nPatches() - 1);
 
 	// Update list
 	list_patches->updateList();
@@ -345,6 +346,7 @@ void PatchTablePanel::onBtnPatchFromFile(wxCommandEvent& e) {
 
 			// Add patch to patch table
 			patch_table->addPatch(name);
+			patch_table->patch(patch_table->nPatches()-1).entry = entry;
 		}
 
 		// Refresh patch list

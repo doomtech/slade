@@ -95,7 +95,7 @@ void BrowserCanvas::draw() {
 		// If we're not yet into the viewable area, skip
 		if (y < yoff - fullItemSize()) {
 			x += fullItemSize();
-			if (x > GetSize().x - fullItemSize()) {
+			if (x - item_border > GetSize().x - fullItemSize()) {
 				x = item_border;
 				y += fullItemSize();
 
@@ -152,7 +152,7 @@ void BrowserCanvas::draw() {
 
 		// Move over for next item
 		x += fullItemSize();
-		if (x > GetSize().x - fullItemSize()) {
+		if (x - item_border > GetSize().x - fullItemSize()) {
 			x = item_border;
 			y += fullItemSize();
 
@@ -192,8 +192,8 @@ void BrowserCanvas::updateScrollBar() {
 
 	// Determine total height of all items
 	int items_row = GetSize().x / fullItemSize();
-	int rows = ((double)items_filter.size() / (double)items_row) + 0.5;
-	int total_height = rows * (fullItemSize());
+	int rows = (double)items_filter.size() / (double)items_row + 0.9999;
+	int total_height = rows * fullItemSize();
 
 	// Setup scrollbar
 	scrollbar->SetScrollbar(scrollbar->GetThumbPosition(), GetSize().y, total_height, GetSize().y);

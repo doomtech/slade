@@ -102,6 +102,26 @@ public:
 	}
 };
 
+class GobDataFormat : public EntryDataFormat {
+public:
+	GobDataFormat() : EntryDataFormat("archive_gob") {};
+	~GobDataFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		return GobArchive::isGobArchive(mc) ? EDF_TRUE : EDF_FALSE;
+	}
+};
+
+class LfdDataFormat : public EntryDataFormat {
+public:
+	LfdDataFormat() : EntryDataFormat("archive_lfd") {};
+	~LfdDataFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		return LfdArchive::isLfdArchive(mc) ? EDF_TRUE : EDF_FALSE;
+	}
+};
+
 class WolfDataFormat : public EntryDataFormat {
 public:
 	WolfDataFormat() : EntryDataFormat("archive_wolf") {};

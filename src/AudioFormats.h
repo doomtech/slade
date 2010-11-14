@@ -7,7 +7,7 @@
  * there is one, returns the index at which the true audio data
  * begins. Returns 0 if there is no tag before audio data.
  *******************************************************************/
-int checkForTags(MemChunk & mc) {
+size_t checkForTags(MemChunk & mc) {
 	if (mc.getSize() > 14) {
 		// Check for ID3 header (ID3v2). Version and revision numbers cannot be FF.
 		// Only the four upper flags are valid.
@@ -159,8 +159,9 @@ public:
 		// Check size
 		if (mc.getSize() > 80) {
 			// Check for mod header
-			char temp[17] = "";
-			memcpy(temp, mc.getData(), 17);
+			char temp[18] = "";
+			memcpy(temp, mc.getData(), 18);
+			temp[17] = 0;
 			if (!s_fmt("%s", temp).CmpNoCase("Extended module: ")) {
 				if (mc[37] == 0x1a) {
 					return EDF_TRUE;
@@ -198,7 +199,7 @@ public:
 		// Check size
 		if (mc.getSize() > 1084) {
 			// Check format
-			if (mc[950] >= 1 && mc[950] <= 128 && mc[951] == 127) {
+			if (mc[950] >= 1 && mc[950] <= 128 && (mc[951] & 127) == 127) {
 				if ((mc[1080] == 'M' && mc[1081] == '.' && mc[1082] == 'K' && mc[1083] == '.') ||
 						(mc[1080] == 'M' && mc[1081] == '!' && mc[1082] == 'K' && mc[1083] == '!') ||
 						(mc[1080] == 'F' && mc[1081] == 'L' && mc[1082] == 'T' && mc[1083] == '4') ||
@@ -320,20 +321,53 @@ public:
 	}
 };
 
+// This function was written using the following page as reference:
+// http://mpgedit.org/mpgedit/mpeg_format/mpeghdr.htm
+int validMPEG(MemChunk& mc, uint8_t layer, size_t size) {
+		// Check size
+		if (mc.getSize() > 4+size) {
+			// Check for MP3 frame header. Warning, it is a very weak signature.
+			uint16_t framesync = ((mc[0+size]<<4) + (mc[1+size]>>4)) & 0xFFE;
+			// Check for presence of the sync word (the first eleven bits, all set)
+			if (framesync == 0xFFE) {
+				uint8_t version = (mc[1+size]>>3) & 3;
+				uint8_t mylayer = (mc[1+size]>>1) & 3;
+				// Version: 0 MPEG v2.5 (unofficial), 1 invalid, 2 MPEG v2, 3 MPEG v3
+				// Layer: 0 invalid, 1 III, 2 II, 3 I (this sure makes sense :p)
+				if (version != 1 && mylayer == (4 - layer)) {
+					// The bitrate index has values that depend on version and layer,
+					// but 1111b is invalid across the board. Same for sample rate,
+					// 11b is invalid. Finally, an emphasis setting of 10b is bad, too.
+					uint8_t rates = (mc[2+size]>>2);
+					uint8_t emphasis = mc[3+size] & 3;
+					if (rates != 0x3F && emphasis != 2) {
+						// More checks could be done here, notably to compute frame length
+						// and check that it corresponds to either another frame or EOF...
+						return EDF_MAYBE;
+					}
+				}
+			}
+		}
+		return EDF_FALSE;
+}
+
+class MP2DataFormat : public EntryDataFormat {
+public:
+	MP2DataFormat() : EntryDataFormat("snd_mp2") {};
+	~MP2DataFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		return validMPEG(mc, 2, checkForTags(mc));
+	}
+};
+
 class MP3DataFormat : public EntryDataFormat {
 public:
 	MP3DataFormat() : EntryDataFormat("snd_mp3") {};
 	~MP3DataFormat() {}
 
 	int isThisFormat(MemChunk& mc) {
-		size_t size = checkForTags(mc);
-		// Check size
-		if (mc.getSize() > 4+size) {
-			// Check for MP3 frame header. Warning, it is a very weak signature.
-			if (mc[0+size] == 0xFF && (mc[1+size] ==  0xFB || mc[1+size] ==  0xFA))
-				return EDF_MAYBE;
-		}
-		return EDF_FALSE;
+		return validMPEG(mc, 3, checkForTags(mc));
 	}
 };
 

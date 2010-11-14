@@ -375,9 +375,7 @@ bool Wad2Archive::renameEntry(ArchiveEntry* entry, string name) {
 	if (wad_force_uppercase) name.MakeUpper();
 
 	// Do default rename
-	bool ok = Archive::renameEntry(entry, name);
-
-	return ok;
+	return Archive::renameEntry(entry, name);
 }
 
 

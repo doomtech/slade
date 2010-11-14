@@ -37,24 +37,11 @@ public:
 	bool	renameEntry(ArchiveEntry* entry, string name);
 
 	// Detection
-	vector<mapdesc_t>	detectMaps();
-	string				detectNamespace(ArchiveEntry* entry);
+	vector<mapdesc_t>	detectMaps() { vector<mapdesc_t> ret; return ret; }
 
 	// Static functions
 	static bool isGrpArchive(MemChunk& mc);
 	static bool isGrpArchive(string filename);
-
-	static bool exportEntriesAsWad(string filename, vector<ArchiveEntry*> entries) {
-		GrpArchive grp;
-
-		// Add entries to grp archive
-		for (size_t a = 0; a < entries.size(); a++) {
-			// Add each entry to the grp archive
-			grp.addEntry(entries[a], entries.size(), NULL, true);
-		}
-
-		return grp.save(filename);
-	}
 };
 
 #endif//__GRPARCHIVE_H__

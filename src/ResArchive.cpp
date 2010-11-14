@@ -433,27 +433,6 @@ ArchiveEntry* ResArchive::addEntry(ArchiveEntry* entry, string add_namespace, bo
 	return addEntry(entry, 0xFFFFFFFF, NULL, copy);
 }
 
-/* ResArchive::removeEntry
- * Override of Archive::removeEntry to update namespaces if needed
- *******************************************************************/
-bool ResArchive::removeEntry(ArchiveEntry* entry, bool delete_entry) {
-	// Check entry
-	if (!checkEntry(entry))
-		return false;
-
-	// Get entry name (for later)
-	string name = entry->getName();
-
-	// Do default remove
-	bool ok = Archive::removeEntry(entry, delete_entry);
-
-	if (ok) {
-		return true;
-	}
-	else
-		return false;
-}
-
 /* ResArchive::renameEntry
  * Override of Archive::renameEntry to update namespaces if needed
  * and rename the entry if necessary to be res-friendly (14 chars max)
@@ -468,64 +447,8 @@ bool ResArchive::renameEntry(ArchiveEntry* entry, string name) {
 	name = fn.GetName().Truncate(14);
 
 	// Do default rename
-	bool ok = Archive::renameEntry(entry, name);
+	return Archive::renameEntry(entry, name);
 
-	if (ok) {
-		return true;
-	}
-	else
-		return false;
-}
-
-/* ResArchive::swapEntries
- * Override of Archive::swapEntries to update namespaces if needed
- *******************************************************************/
-bool ResArchive::swapEntries(ArchiveEntry* entry1, ArchiveEntry* entry2) {
-	// Check entries
-	if (!checkEntry(entry1) || !checkEntry(entry2))
-		return false;
-
-	// Do default swap (force root dir)
-	bool ok = Archive::swapEntries(entry1, entry2);
-
-	if (ok) {
-		return true;
-	}
-	else
-		return false;
-}
-
-/* ResArchive::moveEntry
- * Override of Archive::moveEntry to update namespaces if needed
- *******************************************************************/
-bool ResArchive::moveEntry(ArchiveEntry* entry, unsigned position, ArchiveTreeNode* dir) {
-	// Check entry
-	if (!checkEntry(entry))
-		return false;
-
-	// Do default move (force root dir)
-	bool ok = Archive::moveEntry(entry, position, NULL);
-
-	if (ok) {
-		return true;
-	}
-	else
-		return false;
-}
-
-/* ResArchive::detectMaps
- * Searches for any maps in the res and adds them to the map list
- *******************************************************************/
-vector<Archive::mapdesc_t> ResArchive::detectMaps() {
-	vector<mapdesc_t> maps;
-	return maps;
-}
-
-/* ResArchive::detectNamespace
- * Returns the namespace that [entry] is within
- *******************************************************************/
-string ResArchive::detectNamespace(ArchiveEntry* entry) {
-	return "global";
 }
 
 /* ResArchive::findFirst

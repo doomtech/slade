@@ -1782,7 +1782,7 @@ bool SImage::loadRottLbm(const uint8_t* gfx_data, int size) {
 	// Read raw pixel data
 	data = new uint8_t[width*height];
 
-	// Create some variables needed for LMB decompression
+	// Create some variables needed for LBM decompression
 	const uint8_t * read = gfx_data + 768 +4;
 	const uint8_t * readend = gfx_data + size;
 	uint8_t * dest = data;

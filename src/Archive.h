@@ -46,28 +46,36 @@ public:
 };
 
 // Define archive types
-#define ARCHIVE_INVALID	 0
-#define ARCHIVE_WAD		 1
-#define ARCHIVE_ZIP		 2
-#define ARCHIVE_LIB		 3
-#define ARCHIVE_DAT		 4
-#define ARCHIVE_RES		 5
-#define ARCHIVE_WAD2	 6
-#define ARCHIVE_PAK		 7
-#define ARCHIVE_GRP		 8
-#define ARCHIVE_RFF		 9
-#define ARCHIVE_WOLF	10
+enum ArchiveTypes {
+	ARCHIVE_INVALID = 0,
+	ARCHIVE_WAD,
+	ARCHIVE_ZIP,
+	ARCHIVE_LIB,
+	ARCHIVE_DAT,
+	ARCHIVE_RES,
+	ARCHIVE_WAD2,
+	ARCHIVE_PAK,
+	ARCHIVE_GRP,
+	ARCHIVE_RFF,
+	ARCHIVE_WOLF,
+	ARCHIVE_GOB,
+	ARCHIVE_LFD,
+	ARCHIVE_HOG,
+	ARCHIVE_HOG2,
+};
 
 // Define map types
-#define MAP_DOOM	0
-#define MAP_HEXEN	1
-#define MAP_DOOM64	2
-#define MAP_UDMF	3
+enum MapTypes {
+	MAP_DOOM,
+	MAP_HEXEN,
+	MAP_DOOM64,
+	MAP_UDMF,
+};
 
 class Archive : public Announcer {
 private:
 	bool				modified;
-	uint8_t				type;
+	uint8_t				type;	// See ArchiveTypes enum
 	ArchiveTreeNode*	dir_root;
 
 protected:
@@ -81,7 +89,7 @@ public:
 		string			name;
 		ArchiveEntry*	head;
 		ArchiveEntry*	end;
-		uint8_t			format;	// 0=doom 1=hexen 2=udmf
+		uint8_t			format;	// See MapTypes enum
 	};
 
 	Archive(uint8_t type = ARCHIVE_INVALID);

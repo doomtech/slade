@@ -37,24 +37,11 @@ public:
 	bool	renameEntry(ArchiveEntry* entry, string name);
 
 	// Detection
-	vector<mapdesc_t>	detectMaps();
-	string				detectNamespace(ArchiveEntry* entry);
+	vector<mapdesc_t>	detectMaps() { vector<mapdesc_t> ret; return ret; }
 
 	// Static functions
 	static bool isRffArchive(MemChunk& mc);
 	static bool isRffArchive(string filename);
-
-	static bool exportEntriesAsWad(string filename, vector<ArchiveEntry*> entries) {
-		RffArchive rff;
-
-		// Add entries to grp archive
-		for (size_t a = 0; a < entries.size(); a++) {
-			// Add each entry to the grp archive
-			rff.addEntry(entries[a], entries.size(), NULL, true);
-		}
-
-		return rff.save(filename);
-	}
 };
 
 #endif//__RFFARCHIVE_H__

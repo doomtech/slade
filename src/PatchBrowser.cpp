@@ -177,21 +177,28 @@ int PatchBrowser::getSelectedPatch() {
 		return -1;
 }
 
-/* PatchBrowser::updateItemPalettes
- * Updates the palette for each browser item
+/* PatchBrowser::updateItems
+ * Updates the palette and entry for each browser item
  *******************************************************************/
-void PatchBrowser::updateItemPalettes(BrowserTreeNode* node) {
+void PatchBrowser::updateItems(BrowserTreeNode* node) {
 	// Root node if none given
 	if (!node)
 		node = items_root;
 
-	// Go through items and update their palettes
-	for (unsigned a = 0; a < node->nItems(); a++)
-		((PatchBrowserItem*)node->getItem(a))->setPalette(theMainWindow->getPaletteChooser()->getSelectedPalette());
+	// Go through items
+	for (unsigned a = 0; a < node->nItems(); a++) {
+		PatchBrowserItem* item = (PatchBrowserItem*)node->getItem(a);
+
+		// Update palette
+		item->setPalette(theMainWindow->getPaletteChooser()->getSelectedPalette());
+
+		// Update image entry
+		item->setEntry(patch_table->patch(item->getIndex()).entry);
+	}
 
 	// Go through child nodes and update their items
 	for (unsigned a = 0; a < node->nChildren(); a++)
-		updateItemPalettes((BrowserTreeNode*)node->getChild(a));
+		updateItems((BrowserTreeNode*)node->getChild(a));
 }
 
 /* PatchBrowser::onAnnouncement
@@ -203,7 +210,7 @@ void PatchBrowser::onAnnouncement(Announcer* announcer, string event_name, MemCh
 
 	if (event_name == "main_palette_changed") {
 		// Update all item palettes and reload them
-		updateItemPalettes();
+		updateItems();
 		reloadItems();
 		Refresh();
 	}

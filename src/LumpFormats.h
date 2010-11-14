@@ -7,6 +7,10 @@ public:
 	~TextureXDataFormat() {}
 
 	int isThisFormat(MemChunk& mc) {
+		// Check size
+		if (mc.getSize() < 4)
+			return EDF_FALSE;
+
 		// Not the best test in the world. But a text-based texture lump ought
 		// to fail it every time; as it would be interpreted as too high a number.
 		const uint8_t * data = mc.getData();

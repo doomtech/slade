@@ -123,9 +123,11 @@
     <ClCompile Include="src\ExtMessageDialog.cpp" />
     <ClCompile Include="src\GeneralPrefsPanel.cpp" />
     <ClCompile Include="src\GfxConvDialog.cpp" />
+    <ClCompile Include="src\GobArchive.cpp" />
     <ClCompile Include="src\GrpArchive.cpp" />
     <ClCompile Include="src\HexEditorPanel.cpp" />
     <ClCompile Include="src\HexEntryPanel.cpp" />
+    <ClCompile Include="src\LfdArchive.cpp" />
     <ClCompile Include="src\LibArchive.cpp" />
     <ClCompile Include="src\MapEntryPanel.cpp" />
     <ClCompile Include="src\MIDIPlayer.cpp" />
@@ -158,6 +160,7 @@
     <ClCompile Include="src\VirtualListView.cpp" />
     <ClCompile Include="src\Wad2Archive.cpp" />
     <ClCompile Include="src\WadJArchive.cpp" />
+    <ClCompile Include="src\WolfArchive.cpp" />
     <ClCompile Include="src\WxStuff.cpp" />
     <ClCompile Include="src\Property.cpp" />
     <ClCompile Include="src\PropertyList.cpp" />
@@ -219,6 +222,7 @@
     <ClInclude Include="src\ArchiveEntryList.h" />
     <ClInclude Include="src\ArchiveFormats.h" />
     <ClInclude Include="src\ArchiveOperations.h" />
+    <ClInclude Include="src\Archives.h" />
     <ClInclude Include="src\AudioEntryPanel.h" />
     <ClInclude Include="src\AudioFormats.h" />
     <ClInclude Include="src\BaseResourceChooser.h" />
@@ -234,11 +238,14 @@
     <ClInclude Include="src\ExtMessageDialog.h" />
     <ClInclude Include="src\GeneralPrefsPanel.h" />
     <ClInclude Include="src\GfxConvDialog.h" />
+    <ClInclude Include="src\GobArchive.h" />
     <ClInclude Include="src\GrpArchive.h" />
     <ClInclude Include="src\HexEditorPanel.h" />
     <ClInclude Include="src\HexEntryPanel.h" />
     <ClInclude Include="src\ImageFormats.h" />
+    <ClInclude Include="src\LfdArchive.h" />
     <ClInclude Include="src\LibArchive.h" />
+    <ClInclude Include="src\LumpFormats.h" />
     <ClInclude Include="src\MapEntryPanel.h" />
     <ClInclude Include="src\MIDIPlayer.h" />
     <ClInclude Include="src\MiscFormats.h" />
@@ -272,6 +279,7 @@
     <ClInclude Include="src\VirtualListView.h" />
     <ClInclude Include="src\Wad2Archive.h" />
     <ClInclude Include="src\WadJArchive.h" />
+    <ClInclude Include="src\WolfArchive.h" />
     <ClInclude Include="src\WxStuff.h" />
     <ClInclude Include="src\Property.h" />
     <ClInclude Include="src\PropertyList.h" />

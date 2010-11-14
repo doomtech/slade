@@ -16,6 +16,7 @@ public:
 	~PatchBrowserItem();
 
 	void	setPalette(Palette8bit* pal) { this->palette = pal; }
+	void	setEntry(ArchiveEntry* entry) { this->entry = entry; }
 	bool	loadImage();
 };
 
@@ -29,7 +30,7 @@ public:
 
 	bool	openPatchTable(PatchTable* table);
 	int		getSelectedPatch();
-	void	updateItemPalettes(BrowserTreeNode* node = NULL);
+	void	updateItems(BrowserTreeNode* node = NULL);
 
 	// Events
 	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);

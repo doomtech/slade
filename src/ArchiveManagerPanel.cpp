@@ -225,7 +225,7 @@ void ArchiveManagerPanel::refreshRecentFileList() {
 		list_recent->addItem(a, wxEmptyString);
 		updateRecentListItem(a);
 
-		if (a <= 8)
+		if (a < 8)
 			menu_recent->Append(MainWindow::MENU_RECENT_1+a, theArchiveManager->recentFile(a));
 	}
 
@@ -1075,15 +1075,15 @@ void ArchiveManagerPanel::handleAction(int menu_id) {
 
 		// Open a file browser dialog that allows multiple selection
 		// and filters by wad, zip and pk3 file extensions
-		wxFileDialog *dialog_open = new wxFileDialog(this, "Choose file(s) to open", wxEmptyString, wxEmptyString, extensions, wxFD_OPEN|wxFD_MULTIPLE|wxFD_FILE_MUST_EXIST, wxDefaultPosition);
+		wxFileDialog dialog_open(this, "Choose file(s) to open", wxEmptyString, wxEmptyString, extensions, wxFD_OPEN|wxFD_MULTIPLE|wxFD_FILE_MUST_EXIST, wxDefaultPosition);
 
 		// Run the dialog & check that the user didn't cancel
-		if (dialog_open->ShowModal() == wxID_OK) {
+		if (dialog_open.ShowModal() == wxID_OK) {
 			wxBeginBusyCursor();
 
 			// Get an array of selected filenames
 			wxArrayString files;
-			dialog_open->GetPaths(files);
+			dialog_open.GetPaths(files);
 
 			// Open them
 			openFiles(files);
