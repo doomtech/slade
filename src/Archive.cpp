@@ -48,7 +48,7 @@
  */
 
 
- /*******************************************************************
+/*******************************************************************
  * VARIABLES
  *******************************************************************/
  CVAR(Bool, archive_load_data, false, CVAR_SAVE)
@@ -195,16 +195,27 @@ bool ArchiveTreeNode::addEntry(ArchiveEntry* entry, unsigned index) {
 	// Check index
 	if (index >= entries.size()) {
 		// 'Invalid' index, add to end of list
+
+		// Link entry
 		if (entries.size() > 0) {
 			entries.back()->next = entry;
 			entry->prev = entries.back();
 		}
-		entries.push_back(entry);
 		entry->next = NULL;
+
+		// Add it to end
+		entries.push_back(entry);
 	}
 	else {
-		if (index > 0) entries[index-1]->next = entry;
+		// Link entry
+		if (index > 0) {
+			entries[index-1]->next = entry;
+			entry->prev = entries[index-1];
+		}
 		entries[index]->prev = entry;
+		entry->next = entries[index];
+
+		// Add it at index
 		entries.insert(entries.begin() + index, entry);
 	}
 

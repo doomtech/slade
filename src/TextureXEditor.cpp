@@ -179,6 +179,9 @@ TextureXEditor::TextureXEditor(wxWindow* parent) : wxPanel(parent, -1) {
 	listenTo(theMainWindow->getPaletteChooser());
 	updateTexturePalette();
 
+	// Listen to patch table
+	listenTo(&patch_table);
+
 	// Update+ layout
 	Layout();
 	Show();
@@ -316,7 +319,13 @@ bool TextureXEditor::removePatch(unsigned index, bool delete_entry) {
 	return true;
 }
 
+/* TextureXEditor::browsePatch
+ * Opens the patch browser. Returns the selected patch index, or -1
+ * if no patch was selected
+ *******************************************************************/
 int TextureXEditor::browsePatch() {
+	patch_browser->updateItems();
+
 	if (patch_browser->ShowModal() == wxID_OK)
 		return patch_browser->getSelectedPatch();
 	else
@@ -402,11 +411,12 @@ void TextureXEditor::updateTexturePalette() {
  * Handles any announcements from the current texture
  *******************************************************************/
 void TextureXEditor::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
-	if (announcer != theMainWindow->getPaletteChooser())
-		return;
-
-	if (event_name == "main_palette_changed") {
+	if (announcer == theMainWindow->getPaletteChooser() && event_name == "main_palette_changed") {
 		updateTexturePalette();
+	}
+
+	if (announcer == &patch_table && event_name == "modified") {
+		patch_browser->openPatchTable(&patch_table);
 	}
 }
 
@@ -482,28 +492,38 @@ bool TextureXEditor::setupTextureEntries(Archive* archive) {
 						TextureXList txlist;
 						txlist.setFormat(ctxd.getSelectedFormat());
 
+						// Create patch table
+						PatchTable ptt;
+
+						// Create dummy patch
+						ArchiveEntry* dpatch = theArchiveManager->programResourceArchive()->entryAtPath("s3dummy.lmp");
+						dpatch = archive->addEntry(dpatch, "patches", true);
+						ptt.addPatch("S3DUMMY");
+
 						// Create dummy texture
 						CTexture* dummytex = new CTexture();
-						dummytex->setName("DUMMY");
+						dummytex->setName("S3DUMMY");
+						dummytex->addPatch("S3DUMMY", 0, 0, dpatch);
+						dummytex->setWidth(128);
+						dummytex->setHeight(128);
+						dummytex->setScale(0, 0, true);
 
 						// Add dummy texture to list
 						// (this serves two purposes - supplies the special 'invalid' texture by default,
 						//   and allows the texturex format to be detected)
 						txlist.addTexture(dummytex);
 
+						// Add empty PNAMES entry to archive
+						entry_pnames = archive->addNewEntry("PNAMES");
+						ptt.writePNAMES(entry_pnames);
+						entry_pnames->setType(EntryType::getType("pnames"));
+						entry_pnames->setExtensionByType();
+
 						// Add empty TEXTURE1 entry to archive
 						texturex = archive->addNewEntry("TEXTURE1");
-						PatchTable ptt;
 						txlist.writeTEXTUREXData(texturex, ptt);
 						texturex->setType(EntryType::getType("texturex"));
 						texturex->setExtensionByType();
-
-						// Add empty PNAMES entry to archive
-						entry_pnames = archive->addNewEntry("PNAMES");
-						entry_pnames->resize(4, false);
-						entry_pnames->getMCData().fillData(0);
-						entry_pnames->setType(EntryType::getType("pnames"));
-						entry_pnames->setExtensionByType();
 					}
 					else if (ctxd.getSelectedFormat() == TXF_TEXTURES) {
 						wxMessageBox("ZDoom TEXTURES Not Implemented");

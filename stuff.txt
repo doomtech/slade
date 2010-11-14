@@ -8,7 +8,7 @@
 TODO List ---------------------------------------------------------------
 
 --- Bugs ---
-- Copy/paste entry parent problem
+- Copy/paste entry parent problem (haven't heard anything of this for a while - fixed?)
 
 --- Minor Problems/Annoyances ---
 - Long calltips can extend off the edge of the screen
@@ -43,7 +43,6 @@ TODO List ---------------------------------------------------------------
 - General optimisation:
 	- Entry type detection (maybe move the initial detection to a background thread)
 	- Gfx conversion (not sure if it can be optimised so much, but at least should show a progress bar)
-- Rearrange menus
 - *Resources system:
 	- opened archives are either used as resources or not
 	- when searching for patches etc, resource archives are searched, then base resource archive
@@ -55,6 +54,9 @@ TODO List ---------------------------------------------------------------
 	- Complete icon set
 - Different icon sets (eg. one that has different entry type icons colour-coded)
 - Better backup system
+- Gfx Conversion Dialog:
+	- 'Palette' labels w/palette selection dropdowns
+	- Show current format
 
 --- Internal / Dev ---
 - SFont class
