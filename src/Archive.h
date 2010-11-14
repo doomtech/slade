@@ -58,6 +58,10 @@ enum ArchiveTypes {
 	ARCHIVE_GRP,
 	ARCHIVE_RFF,
 	ARCHIVE_WOLF,
+	ARCHIVE_GOB,
+	ARCHIVE_LFD,
+	ARCHIVE_HOG,
+	ARCHIVE_HOG2,
 };
 
 // Define map types

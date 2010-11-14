@@ -212,6 +212,8 @@ void MEPCanvas::draw() {
 /* MEPCanvas::createImage
  * Draws the map in an image
  * TODO: Factorize code with normal draw() and showMap() functions.
+ * TODO: Find a way to generate an arbitrary-sized image through
+ * tiled rendering.
  *******************************************************************/
 void MEPCanvas::createImage(ArchiveEntry& ae, int width, int height) {
 	glViewport(0, 0, width, height);
@@ -626,7 +628,7 @@ bool MapEntryPanel::createImage() {
 
 	ArchiveEntry temp;
 	// Stupid OpenGL grumble grumble grumble
-	map_canvas->createImage(temp, map_canvas->GetSize().x, map_canvas->GetSize().y);
+	map_canvas->createImage(temp, min<int>(800, map_canvas->GetSize().x), min<int>(600, map_canvas->GetSize().y));
 	string name = s_fmt("%s_%s", chr(entry->getParent()->getFilename(false)), chr(entry->getName()));
 	wxFileName fn(name);
 

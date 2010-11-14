@@ -37,8 +37,7 @@ public:
 	bool	renameEntry(ArchiveEntry* entry, string name);
 
 	// Detection
-	vector<mapdesc_t>	detectMaps();
-	string				detectNamespace(ArchiveEntry* entry);
+	vector<mapdesc_t>	detectMaps() { vector<mapdesc_t> ret; return ret; }
 
 	// Static functions
 	static bool isRffArchive(MemChunk& mc);

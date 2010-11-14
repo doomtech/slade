@@ -445,27 +445,7 @@ bool RffArchive::renameEntry(ArchiveEntry* entry, string name) {
 	if (wad_force_uppercase) name.MakeUpper();
 
 	// Do default rename
-	bool ok = Archive::renameEntry(entry, name);
-
-	if (ok)
-		return true;
-	else
-		return false;
-}
-
-/* RffArchive::detectMaps
- * Searches for any maps in the grp and adds them to the map list
- *******************************************************************/
-vector<Archive::mapdesc_t> RffArchive::detectMaps() {
-	vector<mapdesc_t> maps;
-	return maps;
-}
-
-/* RffArchive::detectNamespace
- * Returns "global" because there are no namespaces in grp files.
- *******************************************************************/
-string RffArchive::detectNamespace(ArchiveEntry* entry) {
-	return "global";
+	return Archive::renameEntry(entry, name);
 }
 
 /* RffArchive::isRffArchive

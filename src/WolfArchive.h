@@ -51,7 +51,6 @@ public:
 	bool	renameEntry(ArchiveEntry* entry, string name);
 
 	// Detection
-	string detectNamespace(ArchiveEntry* entry);
 	vector<mapdesc_t>	detectMaps() { vector<mapdesc_t> ret; return ret; }
 
 	static bool isWolfArchive(MemChunk& mc);

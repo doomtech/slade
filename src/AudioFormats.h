@@ -7,7 +7,7 @@
  * there is one, returns the index at which the true audio data
  * begins. Returns 0 if there is no tag before audio data.
  *******************************************************************/
-int checkForTags(MemChunk & mc) {
+size_t checkForTags(MemChunk & mc) {
 	if (mc.getSize() > 14) {
 		// Check for ID3 header (ID3v2). Version and revision numbers cannot be FF.
 		// Only the four upper flags are valid.

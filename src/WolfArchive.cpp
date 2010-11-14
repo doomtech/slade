@@ -879,13 +879,6 @@ bool WolfArchive::loadEntryData(ArchiveEntry* entry) {
 	return true;
 }
 
-/* WolfArchive::detectNamespace
- * Returns "wolf" to help identify Wolf file formats.
- *******************************************************************/
-string WolfArchive::detectNamespace(ArchiveEntry* entry) {
-	return "wolf";
-}
-
 /* WolfArchive::isWolfArchive
  * Checks if the given data is a valid Wolfenstein VSWAP archive
  *******************************************************************/

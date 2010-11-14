@@ -72,8 +72,9 @@ ns_special_t special_namespaces[] = {
 	{ "colormaps",	"c"		},
 	{ "acs",		"a"		},
 	{ "voices",		"v"		},
+	{ "voxels",		"vx"	},
 };
-const int n_special_namespaces = 9;
+const int n_special_namespaces = 10;
 
 /*******************************************************************
  * EXTERNAL VARIABLES

@@ -794,6 +794,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\Archives.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\DatArchive.cpp"
 					>
 				</File>
@@ -802,11 +806,27 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\GobArchive.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\GobArchive.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\GrpArchive.cpp"
 					>
 				</File>
 				<File
 					RelativePath=".\src\GrpArchive.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\LfdArchive.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\LfdArchive.h"
 					>
 				</File>
 				<File

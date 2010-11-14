@@ -1,22 +1,17 @@
 
-#ifndef __RESARCHIVE_H__
-#define __RESARCHIVE_H__
+#ifndef __LFDARCHIVE_H__
+#define __LFDARCHIVE_H__
 
 #include "Archive.h"
 
-#define RESDIRENTRYSIZE 39	// The size of a res entry in the res directory
-
-class ResArchive : public Archive {
-private:
-
+class LfdArchive : public TreelessArchive {
 public:
-	ResArchive();
-	~ResArchive();
+	LfdArchive();
+	~LfdArchive();
 
-	// Res specific
+	// LFD specific
 	uint32_t	getEntryOffset(ArchiveEntry* entry);
 	void		setEntryOffset(ArchiveEntry* entry, uint32_t offset);
-	void		updateNamespaces();
 
 	// Archive type info
 	string	getFileExtensionString();
@@ -26,7 +21,6 @@ public:
 	bool	open(string filename);		// Open from File
 	bool	open(ArchiveEntry* entry);	// Open from ArchiveEntry
 	bool	open(MemChunk& mc);			// Open from MemChunk
-	bool	readDirectory(MemChunk& mc, size_t dir_offset, size_t num_lumps, ArchiveTreeNode* parent);
 
 	// Writing/Saving
 	bool	write(MemChunk& mc, bool update = true);	// Write to MemChunk
@@ -45,16 +39,9 @@ public:
 	// Detection
 	vector<mapdesc_t>	detectMaps() { vector<mapdesc_t> ret; return ret; }
 
-	// Search
-	ArchiveEntry*			findFirst(search_options_t& options);
-	ArchiveEntry*			findLast(search_options_t& options);
-	vector<ArchiveEntry*>	findAll(search_options_t& options);
-
 	// Static functions
-	static bool isResArchive(MemChunk& mc);
-	static bool isResArchive(MemChunk& mc, size_t& d_o, size_t& n_l);
-	static bool isResArchive(string filename);
-
+	static bool isLfdArchive(MemChunk& mc);
+	static bool isLfdArchive(string filename);
 };
 
-#endif//__RESARCHIVE_H__
+#endif//__LFDARCHIVE_H__

@@ -29,17 +29,7 @@
  *******************************************************************/
 #include "Main.h"
 #include "EntryDataFormat.h"
-#include "ZipArchive.h"
-#include "WadArchive.h"
-#include "LibArchive.h"
-#include "DatArchive.h"
-#include "ResArchive.h"
-#include "PakArchive.h"
-#include "GrpArchive.h"
-#include "RffArchive.h"
-#include "Wad2Archive.h"
-#include "WadJArchive.h"
-#include "WolfArchive.h"
+#include "Archives.h"
 #include "BinaryControlLump.h"
 #include "Parser.h"
 
@@ -225,6 +215,8 @@ void EntryDataFormat::initBuiltinFormats() {
 	new PakDataFormat();
 	new GrpDataFormat();
 	new RffDataFormat();
+	new GobDataFormat();
+	new LfdDataFormat();
 	new Wad2DataFormat();
 	new WadJDataFormat();
 	new WolfDataFormat();
