@@ -2013,6 +2013,272 @@ bool SImage::loadWolfSprite(const uint8_t* gfx_data, int size) {
 	return true;
 }
 
+/* JediRLE0
+ * Used by several Jedi Engine formats
+ *******************************************************************/
+bool JediRLE0(const uint8_t* src, int coloffs, int width, int height, uint8_t * data) {
+	for (int x = 0; x < width; ++x) {
+		int o = coloffs + (x<<2);
+		int p = src[o] + (src[o+1]<<8) + (src[o+2]<<16) + (src[o+3]<<24);
+		uint8_t * endcol = data + height;
+		while (data < endcol) {
+			int val = src[p++];
+			if (val < 0x80) {
+				memcpy(data, src + p, val);
+				data += val;
+				p += val;
+			} else {
+				memset(data, 0, val - 0x80);
+				data += (val - 0x80);
+			}
+		}
+	}
+	return true;
+}
+
+/* JediRLE
+ * Used by several Jedi Engine formats
+ *******************************************************************/
+bool JediRLE(const uint8_t* src, int coloffs, int width, int height, uint8_t * data) {
+	for (int x = 0; x < width; ++x) {
+		int o = coloffs + (x<<2);
+		int p = src[o] + (src[o+1]<<8) + (src[o+2]<<16) + (src[o+3]<<24);
+		uint8_t * endcol = data + height;
+		while (data < endcol) {
+			int val = src[p++];
+			if (val < 0x80) {
+				memcpy(data, src + p, val);
+				data += val;
+				p += val;
+			} else {
+				memset(data, src[p++], val - 0x80);
+				data += (val - 0x80);
+			}
+		}
+	}
+	return true;
+}
+
+/* Jedi Engine bitmap header struct
+ *******************************************************************/
+struct JediBMHeader
+{
+	char magic[4];		// "BM "0x1E
+	uint16_t width;		// If 1 and height not 1, multiple BM
+	uint16_t height;	// If height and width both 1, 1x1 bitmap
+	uint16_t wid2;		// Same as width except for multiple BM, then it's 65534
+	uint16_t hei2;		// Same as height except for multiple BM, then it's number of images
+	uint8_t flag;		// Determines transparency among other stuff
+	uint8_t log;		// Worth either log2(height) or 0
+	uint16_t rle;		// 0: not compressed, 1: compressed with RLE, 2: compressed with RLE0
+	uint32_t coloffs;	// Column offsets in compressed bitmaps
+	uint32_t pad[3];	// Padding, should be zero
+};
+struct JediBMSubheader
+{
+	uint16_t width;		// If 1 and height not 1, multiple BM
+	uint16_t height;	// If height and width both 1, 1x1 bitmap
+	uint16_t wid2;		// Unused
+	uint16_t hei2;		// Unused
+	uint32_t size;		// Unused
+	uint8_t log;		// Worth log2(height)
+	uint8_t pad1[11];	// No known use
+	uint8_t flag;		// Determines transparency among other stuff
+	uint8_t pad2[3];	// No known use
+};
+
+/* SImage::loadJediBM
+ * Loads a Jedi Engine bitmap
+ * Returns false if the image data was invalid, true otherwise.
+ *******************************************************************/
+bool SImage::loadJediBM(const uint8_t* gfx_data, int size, int index) {
+	if (size < 32)
+		return false;
+
+	const JediBMHeader * header = (JediBMHeader *) gfx_data;
+	bool multibm = false;
+	bool transparent = !!(header->flag & 8);
+	size_t data_offset = 32;
+
+	// Check for multiple images
+	if (wxINT16_SWAP_ON_BE(header->width) == 1 && wxINT16_SWAP_ON_BE(header->height) != 1) {
+		if (header->rle == 0 && wxINT16_SWAP_ON_BE(header->wid2) == 65534) {
+			numimages = wxINT16_SWAP_ON_BE(header->hei2);
+		} else {
+			Global::error = "Jedi BM file: invalid multi-BM file";
+			return false;
+		}
+		multibm = true;
+	} else numimages = 1;
+
+	// Sanitize index if needed
+	index %= numimages;
+	if (index < 0)
+		index = numimages + index;
+
+	// Setup variables
+	has_palette = false;
+	format = PALMASK;
+	imgindex = index;
+
+	if (multibm) {
+		// 32 for the header, 2 for control data, then four bytes per subimage
+		int offset_offset = 34 + (imgindex<<2);
+		if (offset_offset + 4 > size) {
+			Global::error = "Jedi BM file: invalid multi-BM file";
+			return false;
+		}
+		const uint32_t * header_poffset = (uint32_t *)(gfx_data + offset_offset);
+		uint32_t header_offset = wxINT32_SWAP_ON_BE(*header_poffset)+34;
+		const JediBMSubheader * subheader = (JediBMSubheader *) (gfx_data + header_offset);
+		transparent = !!(subheader->flag & 8);
+		// Little cheat here as they are defined in column-major format,
+		// not row-major. So we'll just call the rotate function.
+		height = wxINT16_SWAP_ON_BE(subheader->width);
+		width = wxINT16_SWAP_ON_BE(subheader->height);
+		data_offset = header_offset + 28;
+	} else {
+		// Same little cheat.
+		height = wxINT16_SWAP_ON_BE(header->width);
+		width = wxINT16_SWAP_ON_BE(header->height);
+	}
+
+	// Create data
+	clearData();
+	data = new uint8_t[width*height];
+
+	// Fill data with pixel data
+	if (header->rle == 0) {
+		memcpy(data, gfx_data + data_offset, width * height);
+	} else if (header->rle == 1) {
+		JediRLE(gfx_data + data_offset, header->coloffs, height, width, data);
+	} else if (header->rle == 2) {
+		JediRLE0(gfx_data + data_offset, header->coloffs, height, width, data);
+	} else {
+		Global::error = "Jedi BM file: Invalid compression scheme";
+		clearData();
+		return false;
+	}
+
+	// Convert from column-major to row-major
+	rotate(90);
+
+	// Manage transparency
+	if (transparent) {
+		mask = new uint8_t[width*height];
+		memset(mask, 0xFF, width*height);
+		for (int i = 0; i < width*height; ++i)
+			if (data[i] == 0)
+				mask[i] = 0;
+	}
+
+	return true;
+}
+
+/* Jedi Engine frame header struct
+ *******************************************************************/
+struct JediFMEHeader1
+{
+	int32_t offsx;		// X offset (right is positive)
+	int32_t offsy;		// Y offset (down is positive)
+	uint32_t flag;		// Only one flag used: 1 for flipped horizontally
+	uint32_t head2;		// Offset to secondary header
+	uint32_t width;		// Unused; the data from the secondary header is used instead
+	uint32_t height;	// Unused; the data from the secondary header is used instead
+	uint32_t pad[2];	// Padding, should be zero
+};
+struct JediFMEHeader2
+{
+	uint32_t width;		// Used instead of the value in the primary header
+	uint32_t height;	// Used instead of the value in the primary header
+	uint32_t flag;		// Only one flag used: 1 for RLE0 compression
+	uint32_t size;		// Data size for compressed FME, same as file size - 32
+	uint32_t coloffs;	// Offset to column data, practically always 0
+	uint32_t padding;	// No known use
+};
+
+/* SImage::loadJediFME
+ * Loads a Jedi Engine frame
+ * Returns false if the image data was invalid, true otherwise.
+ *******************************************************************/
+bool SImage::loadJediFME(const uint8_t* gfx_data, int size) {
+	if (size < 32)
+		return false;
+
+	const JediFMEHeader1 * header1 = (JediFMEHeader1 *) gfx_data;
+	const JediFMEHeader2 * header2 = (JediFMEHeader2 *) (gfx_data+32);
+	bool flip = !!(header1->flag & 1);
+	size_t data_offset = 32;
+
+	// Setup variables
+	has_palette = false;
+	format = PALMASK;
+	imgindex = 0;
+	numimages = 1;
+
+	// Little cheat here as they are defined in column-major format,
+	// not row-major. So we'll just call the rotate function.
+	height = wxINT32_SWAP_ON_BE(header2->width);
+	width = wxINT32_SWAP_ON_BE(header2->height);
+
+	// Create data
+	clearData();
+	data = new uint8_t[width*height];
+
+	// Fill data with pixel data
+	if ((header2->flag & 1) == 0) memcpy(data, gfx_data + 56, width * height);
+	else JediRLE0(gfx_data + 32, 24, header2->width, header2->height, data);
+
+	// Convert from column-major to row-major
+	rotate(90);
+
+	// Mirror if needed
+	if (flip) mirror(false);
+
+	// Manage transparency
+	mask = new uint8_t[width*height];
+	memset(mask, 0xFF, width*height);
+	for (int i = 0; i < width*height; ++i)
+		if (data[i] == 0)
+			mask[i] = 0;
+
+	return true;
+}
+
+/* Jedi Engine wax header struct
+ *******************************************************************/
+struct JediWAXHeader
+{
+	uint32_t version;	// Constant worth 0x00100100
+	uint32_t numseqs;	// Number of sequences
+	uint32_t numframes;	// Number of frames
+	uint32_t numcells;	// Number of cells
+	uint32_t pad[4];	// Unused values
+	uint32_t waxes[32];	// Offsets to the WAX subheaders
+};
+struct JediWAXSubheader
+{
+	uint32_t width;		// Scaled width, in world units
+	uint32_t height;	// Scaled height, in world units
+	uint32_t fps;		// Frames per second of animation
+	uint32_t pad[4];	// Unused values, must be zero
+	uint32_t seqs[32];	// Offsets to sequences
+};
+
+struct JediWAXSequence
+{
+	uint32_t pad[4];	// Unused values, must be zero
+	uint32_t frames[32];// Offsets to frames
+};
+
+/* SImage::loadJediWAX
+ * Loads a Jedi Engine frame
+ * Returns false if the image data was invalid, true otherwise.
+ *******************************************************************/
+bool SImage::loadJediWAX(const uint8_t* gfx_data, int size, int index) {
+	return false;
+}
+
 /*******************************************************************
  * FONT FORMATS
  *******************************************************************/

@@ -207,6 +207,8 @@ void EntryDataFormat::initBuiltinFormats() {
 	new RottPicDataFormat();
 	new WolfPicDataFormat();
 	new WolfSpriteDataFormat();
+	new JediBMFormat();
+	new JediFMEFormat();
 	new WadDataFormat();
 	new ZipDataFormat();
 	new LibDataFormat();

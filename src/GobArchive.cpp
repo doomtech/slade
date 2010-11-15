@@ -439,7 +439,7 @@ bool GobArchive::isGobArchive(MemChunk& mc) {
 
 	// Compute directory size
 	uint32_t dir_size = (num_lumps * 21) + 4;
-	if ((unsigned)mc.getSize() <= (dir_offset + dir_size))
+	if ((unsigned)mc.getSize() < (dir_offset + dir_size))
 		return false;
 
 	// If it's passed to here it's probably a gob file

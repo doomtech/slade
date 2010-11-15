@@ -874,6 +874,72 @@ public:
 	}
 };
 
+// Dark Forces uses the "Jedi engine" so its data formats are named jedi too.
+class JediBMFormat : public EntryDataFormat {
+public:
+	JediBMFormat() : EntryDataFormat("img_jedi_bm") {};
+	~JediBMFormat() {}
+
+	// Jedi engine bitmap format
+	int isThisFormat(MemChunk& mc) {
+		size_t size = mc.getSize();
+		if (size > 32) {
+			if (mc[0] == 'B' && mc[1] == 'M' && mc[2] == ' ' && mc[3] == 0x1E
+				&& (mc[4] + (mc[5]<<8) != 0) && (mc[6] + (mc[7]<<8) != 0)
+				&& mc[14] < 3 && mc[15] == 0) {
+				// Check that padding is left alone
+				for (int i = 20; i < 32; ++i)
+					if (mc[i]) return EDF_FALSE;
+				// Probably okay
+				return EDF_TRUE;
+			}
+		}
+		return EDF_FALSE;
+	}
+};
+
+class JediFMEFormat : public EntryDataFormat {
+public:
+	JediFMEFormat() : EntryDataFormat("img_jedi_fme") {};
+	~JediFMEFormat() {}
+
+	// Jedi engine frame format
+	int isThisFormat(MemChunk& mc) {
+		size_t size = mc.getSize();
+		if (size > 64) {
+			// The only constants we have is that byte 8 is either 1 or 0 (h-flip)
+			// and byte 12 is always 32 (secondary header after the first header)
+			// Then in the secondary header, byte 40 is 1 or 0 (compression) and
+			// bytes 44-47 correspond to the little-endian size of the file - 32.
+			if (mc[8] < 2 && mc[12] == 32 && (mc[9]|mc[10]|mc[11]|mc[13]|mc[14]|mc[15]) == 0 && mc[40] < 2) {
+				// Check that padding is left alone
+				for (int i = 16; i < 32; ++i)
+					if (mc[i]) return EDF_FALSE;
+				for (int i = 16; i < 32; ++i)
+					if (mc[i]) return EDF_FALSE;
+				// Check size if compressed:
+				if (mc[40] == 1) {
+					if ((mc[44] + (mc[45]<<8) + (mc[46]<<16) + (mc[47]<<24)) != size - 32)
+						return EDF_FALSE;
+					// Check some padding
+					for (int i = 41; i < 44; ++i)
+						if (mc[i]) return EDF_FALSE;
+					for (int i = 48; i < 56; ++i)
+						if (mc[i]) return EDF_FALSE;
+				} else {
+					// All that should be zero if uncompressed
+					for (int i = 41; i < 56; ++i)
+						if (mc[i]) return EDF_FALSE;
+				}
+				// Probably okay
+				return EDF_TRUE;
+			}
+		}
+		return EDF_FALSE;
+	}
+};
+
+
 class Font0DataFormat : public EntryDataFormat {
 public:
 	Font0DataFormat() : EntryDataFormat("font_doom_alpha") {};
