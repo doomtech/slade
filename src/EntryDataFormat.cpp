@@ -209,6 +209,11 @@ void EntryDataFormat::initBuiltinFormats() {
 	new WolfSpriteDataFormat();
 	new JediBMFormat();
 	new JediFMEFormat();
+	new JediWAXFormat();
+	new JediFNTFormat();
+	new JediFONTFormat();
+	//new JediDELTFormat();
+	//new JediANIMFormat();
 	new WadDataFormat();
 	new ZipDataFormat();
 	new LibDataFormat();

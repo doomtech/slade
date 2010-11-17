@@ -13,8 +13,7 @@ public:
 
 		// Not the best test in the world. But a text-based texture lump ought
 		// to fail it every time; as it would be interpreted as too high a number.
-		const uint8_t * data = mc.getData();
-		uint32_t ntex = data[0] + (data[1]<<8) + (data[2]<<16) + (data[3]<<24);
+		uint32_t ntex = READ_L32(mc, 0);
 		if ((int32_t) ntex < 0)
 			return EDF_FALSE;
 		if (mc.getSize() < (ntex * 24))
@@ -30,8 +29,7 @@ public:
 
 	int isThisFormat(MemChunk& mc) {
 		// It's a pretty simple format alright
-		const uint8_t * data = mc.getData();
-		uint32_t number = data[0] + (data[1]<<8) + (data[2]<<16) + (data[3]<<24);
+		uint32_t number = READ_L32(mc, 0);
 		if ((int32_t) number < 0)
 			return EDF_FALSE;
 		if (mc.getSize() != (4 + number * 8))
@@ -71,8 +69,7 @@ public:
 			size_t numentries = mc.getSize()/sizeof(switches_t);
 
 			// Check that the last entry ends on a SWCH_STOP type
-			if (((mc[numentries*sizeof(switches_t) -1]<<8)
-				+ mc[numentries*sizeof(switches_t) -2]) == SWCH_STOP)
+			if (READ_L16(mc, (numentries*sizeof(switches_t) -2)) == SWCH_STOP)
 				return EDF_TRUE;
 		}
 		return EDF_FALSE;

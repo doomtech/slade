@@ -278,7 +278,7 @@ bool Conversions::musToMidi(MemChunk& in, MemChunk& out) {
  *******************************************************************/
 bool Conversions::vocToWav(MemChunk& in, MemChunk& out) {
 	if (in.getSize() < 26 || in[19] != 26 || in[20] != 26 || in[21] != 0
-		|| (0x1234 + ~((in[23]<<8) + in[22])) != (in[24] + (in[25] << 8))) {
+		|| (0x1234 + ~(READ_L16(in, 22)) != (READ_L16(in, 24)))) {
 		Global::error = "Invalid VOC";
 		return false;
 	}
@@ -296,7 +296,7 @@ bool Conversions::vocToWav(MemChunk& in, MemChunk& out) {
 	while (i < e) {
 		// Parses through blocks
 		uint8_t blocktype = in[i];
-		size_t blocksize = in[i+1] + (in[i+2]<<8) + (in[i+3]<<16);
+		size_t blocksize = READ_L24(in, i+1);
 		i+=4;
 		if (i + blocksize > e && blocktype != 0) {
 			Global::error = s_fmt("VOC file cut abruptly in block %i", blockcount);
@@ -336,22 +336,22 @@ bool Conversions::vocToWav(MemChunk& in, MemChunk& out) {
 					Global::error = "Extra info block must precede sound data info block in VOC file";
 					return false;
 				} else {
-					fmtchunk.samplerate = 256000000/((in[i+3] + 1) * (65536 - (in[i] + (in[i+1]<<8))));
+					fmtchunk.samplerate = 256000000/((in[i+3] + 1) * (65536 - READ_L16(in, i)));
 					fmtchunk.channels = in[i+3] + 1;
 					fmtchunk.tag = 1;
 					codec = in[i+2];
 				}
 				break;
 			case 9: // Sound data in new format
-				if (codec >= 0 && codec != (in[i+6]+(in[i+7]<<8))) {
+				if (codec >= 0 && codec != READ_L16(in, i+6)) {
 					Global::error = "VOC files with different codecs are not supported";
 					return false;
 				} else if (codec == -1) {
-					fmtchunk.samplerate = in[i] + (in[i+1]<<8) + (in[i+2]<<16) + (in[i+3]<<24);
+					fmtchunk.samplerate = READ_L32(in, i);
 					fmtchunk.bps = in[i+4];
 					fmtchunk.channels = in[i+5];
 					fmtchunk.tag = 1;
-					codec = in[i+6]+(in[i+7]<<8);
+					codec = READ_L16(in, i+6);
 				}
 				datasize += blocksize - 12;
 				break;
@@ -411,7 +411,7 @@ bool Conversions::vocToWav(MemChunk& in, MemChunk& out) {
 	while (i < e) {
 		// Parses through blocks again
 		uint8_t blocktype = in[i];
-		size_t blocksize = in[i+1] + (in[i+2]<<8) + (in[i+3]<<16);
+		size_t blocksize = READ_L24(in, i+1);
 		i+=4;
 		switch (blocktype) {
 			case 1: // Sound data

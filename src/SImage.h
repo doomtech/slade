@@ -88,8 +88,11 @@ public:
 	bool	loadHeretic2M8(const uint8_t* gfx_data, int size, int index);
 	bool	loadHeretic2M32(const uint8_t* gfx_data, int size, int index);
 	bool	loadJediBM(const uint8_t* gfx_data, int size, int index);
+	bool	JediFrame(const uint8_t* gfx_data, uint32_t hdroffs);
 	bool	loadJediFME(const uint8_t* gfx_data, int size);
 	bool	loadJediWAX(const uint8_t* gfx_data, int size, int index);
+	bool	loadJediFNT(const uint8_t* gfx_data, int size);
+	bool	loadJediFONT(const uint8_t* gfx_data, int size);
 
 	// Image format writing
 	bool	safeConvert(MemChunk& out, Palette8bit* pal = NULL);

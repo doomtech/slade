@@ -104,15 +104,15 @@ public:
 				return EDF_FALSE;
 		// Min/Max fields
 		int16_t offsx, offsy, limx, limy, width, height;
-		offsx = (int16_t) (mc[ 4] + (mc[ 5]<<8));
-		offsy = (int16_t) (mc[ 6] + (mc[ 7]<<8));
-		limx  = (int16_t) (mc[ 8] + (mc[ 9]<<8));
-		limy  = (int16_t) (mc[10] + (mc[11]<<8));
+		offsx = (int16_t) READ_L16(mc, 4);
+		offsy = (int16_t) READ_L16(mc, 6);
+		limx  = (int16_t) READ_L16(mc, 8);
+		limy  = (int16_t) READ_L16(mc, 10);
 		width = 1 + limx - offsx; height = 1 + limy - offsy;
 		// Compute number of bytes needed per scanline, and account for possible padding
 		int16_t bnpsl = (width * mc[3]) / 8; if (bnpsl % 2) bnpsl++;
 		// Bytes per scanline field is always an even number and should correspond to guessed value
-		int16_t bpsl = (int16_t) (mc[66] + (mc[67]<<8));
+		int16_t bpsl = (int16_t) READ_L16(mc, 66);
 		if (bpsl%2 || bpsl != bnpsl)
 			return EDF_FALSE;
 		// Passed all tests, so this seems to be a valid PCX
@@ -132,8 +132,8 @@ public:
 
 		// Check dimensions, both ZDoom and Vavoom refuse to load TGA
 		// with image sizes greater than 2048 so let's use that as well
-		uint16_t width  = mc[12] + (mc[13]<<8);
-		uint16_t height = mc[14] + (mc[15]<<8);
+		uint16_t width  = READ_L16(mc, 12);
+		uint16_t height = READ_L16(mc, 14);
 		if (width > 2048 || height > 2048)
 			return EDF_FALSE;
 
@@ -501,8 +501,8 @@ public:
 		if (mc[3] > 4)
 			return EDF_FALSE;
 		uint8_t bpp = (mc[3]?mc[3]:1);
-		uint16_t width  = mc[0] + (mc[1]<<8);
-		uint16_t height = mc[4] + (mc[5]<<8);
+		uint16_t width  = READ_L16(mc, 0);
+		uint16_t height = READ_L16(mc, 4);
 		if (size != (8 + width * height * bpp))
 			return EDF_FALSE;
 		return EDF_TRUE;
@@ -518,14 +518,14 @@ public:
 		int size = mc.getSize();
 		if (size < 4)
 			return EDF_FALSE;
-		int width = mc[2] + (mc[3]<<8);
+		int width = READ_L16(mc, 2);
 		if (width <= 0)
 			return EDF_FALSE;
 		int height = 0;
 		// Error checking with average column height and proportion of empty columns
 		int avgcolheight = 0, pnumemptycol = 0;
 		for (int j = 0; j < width; ++j) {
-			int offstart = mc[(j<<1)+4]+(mc[(j<<1)+5]<<8);
+			int offstart = READ_L16(mc, ((j<<1)+4));
 			if (offstart == 0) continue;
 			if (offstart < 0 || size < offstart+2 || offstart < (width*2+4))
 				return EDF_FALSE;
@@ -579,11 +579,9 @@ public:
 		size_t size = mc.getSize();
 		if (size < 4)
 			return EDF_FALSE;
-		size_t width = mc[0] + (mc[1]<<8);
-		if (width == 0)
-			return EDF_FALSE;
-		size_t height = mc[2] + (mc[3]<<8);
-		if (height == 0)
+		size_t width = READ_L16(mc, 0);
+		size_t height = READ_L16(mc, 2);
+		if ((width|height) == 0)
 			return EDF_FALSE;
 		size_t pixels = width * height;
 		return (size >= (pixels + 4) && (size < (2 * pixels + 4))) ? EDF_TRUE : EDF_FALSE;
@@ -599,11 +597,11 @@ public:
 		size_t size = mc.getSize();
 		if (size < 16)
 			return EDF_FALSE;
-		uint32_t version = mc[0] + (mc[1]<<8) + (mc[2]<<16) + (mc[3]<<24);
+		uint32_t version = READ_L32(mc, 0);
 		if (version != 1)
 			return EDF_FALSE;
-		uint32_t firsttile = mc[ 8] + (mc[ 9]<<8) + (mc[10]<<16) + (mc[11]<<24);
-		uint32_t lasttile  = mc[12] + (mc[13]<<8) + (mc[14]<<16) + (mc[15]<<24);
+		uint32_t firsttile = READ_L32(mc, 8);
+		uint32_t lasttile  = READ_L16(mc, 12);
 		uint32_t tilecount = 1 + lasttile - firsttile;
 		size_t datastart = (16 + (tilecount * 8));
 		if (size < datastart)
@@ -629,13 +627,13 @@ public:
 		size_t size = mc.getSize();
 		if (size < 1040)
 			return EDF_FALSE;
-		uint32_t version = mc[0] + (mc[1]<<8) + (mc[2]<<16) + (mc[3]<<24);
+		uint32_t version = READ_L32(mc, 0);
 		if (version != 2)
 			return EDF_FALSE;
 		for (int m = 0; m < 16; ++m) {
-			size_t width = mc[36+(m<<2)] + (mc[37+(m<<2)]<<8) + (mc[38+(m<<2)]<<16) + (mc[39+(m<<2)]<<24);
-			size_t height = mc[100+(m<<2)] + (mc[101+(m<<2)]<<8) + (mc[102+(m<<2)]<<16) + (mc[103+(m<<2)]<<24);
-			size_t offset = mc[164+(m<<2)] + (mc[165+(m<<2)]<<8) + (mc[166+(m<<2)]<<16) + (mc[167+(m<<2)]<<24);
+			size_t width = READ_L32(mc, (36+(m<<2)));
+			size_t height = READ_L32(mc, (100+(m<<2)));
+			size_t offset = READ_L32(mc, (164+(m<<2)));
 			if (width == 0 && height == 0 && offset == 0)
 				break;
 			else if ((width == 0 && (height|offset) != 0) ||
@@ -658,13 +656,13 @@ public:
 		size_t size = mc.getSize();
 		if (size < 1040)
 			return EDF_FALSE;
-		uint32_t version = mc[0] + (mc[1]<<8) + (mc[2]<<16) + (mc[3]<<24);
+		uint32_t version = READ_L32(mc, 0);
 		if (version != 4)
 			return EDF_FALSE;
 		for (int m = 0; m < 16; ++m) {
-			size_t width = mc[516+(m<<2)] + (mc[517+(m<<2)]<<8) + (mc[518+(m<<2)]<<16) + (mc[519+(m<<2)]<<24);
-			size_t height = mc[580+(m<<2)] + (mc[581+(m<<2)]<<8) + (mc[582+(m<<2)]<<16) + (mc[583+(m<<2)]<<24);
-			size_t offset = mc[644+(m<<2)] + (mc[645+(m<<2)]<<8) + (mc[646+(m<<2)]<<16) + (mc[647+(m<<2)]<<24);
+			size_t width = READ_L32(mc, (516+(m<<2)));
+			size_t height = READ_L32(mc, (580+(m<<2)));
+			size_t offset = READ_L32(mc, (644+(m<<2)));
 			if (width == 0 && height == 0 && offset == 0)
 				break;
 			else if ((width == 0 && (height|offset) != 0) ||
@@ -850,7 +848,7 @@ public:
 		size_t size = mc.getSize();
 		if (size < 4)
 			return EDF_FALSE;
-		if ((4 + ((mc[0] + (mc[1]<<8))*(mc[2] + (mc[3]<<8)))) != mc.getSize())
+		if ((4 + (READ_L16(mc, 0)*READ_L16(mc, 2))) != mc.getSize())
 			return EDF_FALSE;
 
 		return EDF_TRUE;
@@ -885,7 +883,7 @@ public:
 		size_t size = mc.getSize();
 		if (size > 32) {
 			if (mc[0] == 'B' && mc[1] == 'M' && mc[2] == ' ' && mc[3] == 0x1E
-				&& (mc[4] + (mc[5]<<8) != 0) && (mc[6] + (mc[7]<<8) != 0)
+				&& READ_L16(mc, 4) != 0 && READ_L16(mc, 6) != 0
 				&& mc[14] < 3 && mc[15] == 0) {
 				// Check that padding is left alone
 				for (int i = 20; i < 32; ++i)
@@ -919,7 +917,7 @@ public:
 					if (mc[i]) return EDF_FALSE;
 				// Check size if compressed:
 				if (mc[40] == 1) {
-					if ((mc[44] + (mc[45]<<8) + (mc[46]<<16) + (mc[47]<<24)) != size - 32)
+					if (READ_L32(mc, 44) != size - 32)
 						return EDF_FALSE;
 					// Check some padding
 					for (int i = 41; i < 44; ++i)
@@ -931,6 +929,33 @@ public:
 					for (int i = 41; i < 56; ++i)
 						if (mc[i]) return EDF_FALSE;
 				}
+				// Probably okay
+				return EDF_TRUE;
+			}
+		}
+		return EDF_FALSE;
+	}
+};
+
+class JediWAXFormat : public EntryDataFormat {
+public:
+	JediWAXFormat() : EntryDataFormat("img_jedi_wax") {};
+	~JediWAXFormat() {}
+
+	// Jedi engine wax format
+	int isThisFormat(MemChunk& mc) {
+		size_t size = mc.getSize();
+		if (size > 460) {
+			// Constant identifier 00 10 01 00 *or* 00 00 01 00
+			if (mc[0] == 0 && (mc[1] == 16 || mc[1] == 0) && mc[2] == 1 && mc[3] == 0) {
+				// The numbers of sequences, frames and cells should not exceed 255.
+				// Also check that padding is left alone.
+				for (int i = 5; i < 8; ++i)
+					if (mc[i]) return EDF_FALSE;
+				for (int i = 9; i < 12; ++i)
+					if (mc[i]) return EDF_FALSE;
+				for (int i = 13; i < 32; ++i)
+					if (mc[i]) return EDF_FALSE;
 				// Probably okay
 				return EDF_TRUE;
 			}
@@ -1047,5 +1072,60 @@ public:
 		return EDF_FALSE;
 	}
 };
+
+class JediFNTFormat : public EntryDataFormat {
+public:
+	JediFNTFormat() : EntryDataFormat("font_jedi_fnt") {};
+	~JediFNTFormat() {}
+
+	// Jedi engine fnt format
+	int isThisFormat(MemChunk& mc) {
+		size_t size = mc.getSize();
+		if (size > 35) {
+			// Constant identifier FNT\15, height should be greater than 0, 
+			// last should be greater than first.
+			if (mc[0] == 'F' && mc[1] == 'N' && mc[2] == 'T' && mc[3] == 0x15
+				&& mc[4] > 0 && mc[8] <= mc[9]) {
+				// Check that padding is left alone.
+				for (int i = 10; i < 32; ++i)
+					if (mc[i]) return EDF_FALSE;
+				// Probably okay
+				return EDF_TRUE;
+			}
+		}
+		return EDF_FALSE;
+	}
+};
+
+class JediFONTFormat : public EntryDataFormat {
+public:
+	JediFONTFormat() : EntryDataFormat("font_jedi_font") {};
+	~JediFONTFormat() {}
+
+	// Jedi engine font format
+	int isThisFormat(MemChunk& mc) {
+		size_t size = mc.getSize();
+		if (size > 16) {
+			// Numchar should be greater than 0, width should be multiple of 8,
+			// height should be greater than 0, padding should be null.
+			if (READ_L16(mc, 2) >= 0 && (READ_L16(mc, 4)%8) == 0 && 
+				READ_L16(mc, 6) >= 0 && READ_L16(mc, 10) == 0) {
+				int numchr = READ_L16(mc, 2);
+				// Also check that character width never exceeds max width.
+				for (int i = 12; i < 12 + numchr; ++i)
+					if (mc[i] > READ_L16(mc, 4)) return EDF_FALSE;
+				// Check that there are enough data to cover all characters and the header
+				size_t neededbytes = 12 + numchr + ((numchr * READ_L16(mc, 6)) * (READ_L16(mc, 4)>>3));
+				if (size != neededbytes)
+					return EDF_FALSE;
+				// Probably okay
+				return EDF_TRUE;
+			}
+		}
+		return EDF_FALSE;
+	}
+};
+
+
 
 #endif //IMAGEFORMATS_H
