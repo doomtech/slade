@@ -172,4 +172,21 @@ public:
 	}
 };
 
+class ACSDataFormat : public EntryDataFormat {
+public:
+	ACSDataFormat() : EntryDataFormat("acs") {};
+	~ACSDataFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		// Check size
+		if (mc.getSize() > 4) {
+			// Check for ACS header
+			if (mc[0] == 'A' && mc[1] == 'C' && mc[2] == 'S' && 
+				(mc[3] == 0 || mc[3] == 'E' || mc[3] == 'e'))
+				return EDF_TRUE;
+		}
+		return EDF_FALSE;
+	}
+};
+
 #endif //LUMPFORMATS_H

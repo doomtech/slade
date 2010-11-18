@@ -2169,6 +2169,8 @@ bool SImage::loadJediBM(const uint8_t* gfx_data, int size, int index) {
 				mask[i] = 0;
 	}
 
+	// Announce change and return success
+	announce("image_changed");
 	return true;
 }
 

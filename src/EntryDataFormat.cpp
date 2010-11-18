@@ -248,6 +248,7 @@ void EntryDataFormat::initBuiltinFormats() {
 	new MP3DataFormat();
 	new TextureXDataFormat();
 	new PNamesDataFormat();
+	new ACSDataFormat();
 	new BoomAnimatedDataFormat();
 	new BoomSwitchesDataFormat();
 	new Font0DataFormat();
