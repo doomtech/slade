@@ -1234,6 +1234,7 @@ void ArchiveManagerPanel::onListArchivesChanged(wxListEvent& e) {
 		return;
 
 	populateMapList(selected_archive);
+	current_maps = selected_archive;
 }
 
 /* ArchiveManagerPanel::onListArchivesActivated
@@ -1256,8 +1257,16 @@ void ArchiveManagerPanel::onListMapsChanged(wxCommandEvent& e) {
  * Opens the map in a new map editor window
  *******************************************************************/
 void ArchiveManagerPanel::onListMapsActivated(wxListEvent& e) {
-	//new MapEditorWindow();
-	wxMessageBox("Map Editor is not implemented yet.");
+	// Check a current archive is selected
+	if (!current_maps)
+		return;
+
+	// Detect maps
+	vector<Archive::mapdesc_t> maps = current_maps->detectMaps();
+
+	// Open selected map
+	theMapEditor->openMap(maps[e.GetIndex()]);
+	theMapEditor->Show();
 }
 
 /* ArchiveManagerPanel::onListArchivesRightClick

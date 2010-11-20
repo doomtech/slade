@@ -32,15 +32,23 @@ struct doom64sector_t
 
 class MapSector {
 private:
+	string	f_tex;
+	string	c_tex;
+
 	vector<MapSide*>	connected_sides;
 
 	PropertyList	udmf_props;
 
 public:
 	MapSector(){}
-	MapSector(doomsector_t s);
-	MapSector(doom64sector_t s);
+	MapSector(string f_tex, string c_tex) { this->f_tex = f_tex; this->c_tex = c_tex; }
 	~MapSector(){}
+
+	string	floorTexture() { return f_tex; }
+	string	ceilingTexture() { return c_tex; }
+
+	PropertyList&	props()				{ return udmf_props; }
+	Property&		prop(string key)	{ return udmf_props[key]; }
 
 	bool parseUDMF(Tokenizer& tz);
 };

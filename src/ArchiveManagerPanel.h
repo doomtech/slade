@@ -39,6 +39,7 @@ private:
 	wxMenu*				menu_context_recent;
 	wxMenu*				menu_context_bookmarks;
 	wxMenu*				menu_recent;
+	Archive*			current_maps;
 
 public:
 	// wxWidgets ID table

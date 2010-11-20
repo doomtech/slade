@@ -2,6 +2,7 @@
 #include "Main.h"
 #include "MapVertex.h"
 
+/*
 MapVertex::MapVertex(doomvertex_t v) {
 	this->x = v.x;
 	this->y = v.y;
@@ -10,6 +11,25 @@ MapVertex::MapVertex(doomvertex_t v) {
 MapVertex::MapVertex(doom64vertex_t v) {
 	this->x = v.x/65536;
 	this->y = v.y/65536;
+}
+*/
+
+void MapVertex::connectLine(MapLine* line) {
+	for (unsigned a = 0; a < connected_lines.size(); a++) {
+		if (connected_lines[a] == line)
+			return;
+	}
+
+	connected_lines.push_back(line);
+}
+
+void MapVertex::disconnectLine(MapLine* line) {
+	for (unsigned a = 0; a < connected_lines.size(); a++) {
+		if (connected_lines[a] == line) {
+			connected_lines.erase(connected_lines.begin() + a);
+			return;
+		}
+	}
 }
 
 bool MapVertex::parseUDMF(Tokenizer& tz) {

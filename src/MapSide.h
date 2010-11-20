@@ -35,9 +35,13 @@ private:
 
 public:
 	MapSide(){}
-	MapSide(doomside_t s);
-	MapSide(doom64side_t s);
+	MapSide(MapSector* sector);
 	~MapSide(){}
+
+	bool	isOk() { return !!sector; }
+
+	PropertyList&	props()				{ return udmf_props; }
+	Property&		prop(string key)	{ return udmf_props[key]; }
 
 	bool parseUDMF(Tokenizer& tz);
 };

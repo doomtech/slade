@@ -5,6 +5,24 @@
 #include "Tokenizer.h"
 #include "PropertyList.h"
 
+// Thing Flags
+#define THING_EASY		0x0001
+#define THING_MEDIUM	0x0002
+#define THING_HARD		0x0004
+#define THING_DEAF		0x0008
+#define THING_MULTI		0x0010
+// Boom
+#define THING_BNOTDM	0x0020
+#define THING_BNOTCOOP	0x0040
+// Hexen
+#define THING_HDORMANT	0x0010
+#define THING_HCLASS1	0x0020
+#define THING_HCLASS2	0x0040
+#define THING_HCLASS3	0x0080
+#define THING_HSP		0x0100
+#define THING_HCOOP		0x0200
+#define THING_HDM		0x0400
+
 struct doomthing_t
 {
 	short	x;
@@ -43,18 +61,16 @@ private:
 	short	type;
 	double	x;
 	double	y;
-	double	z;
-	short	angle;
-	short	tid;
 
 	PropertyList	udmf_props;
 
 public:
 	MapThing(){}
-	MapThing(doomthing_t t);
-	MapThing(hexenthing_t t);
-	MapThing(doom64thing_t t);
+	MapThing(double x, double y, short type) { this->x = x; this->y = y; this->type = type; }
 	~MapThing(){}
+
+	PropertyList&	props()				{ return udmf_props; }
+	Property&		prop(string key)	{ return udmf_props[key]; }
 
 	bool	parseUDMF(Tokenizer& tz);
 

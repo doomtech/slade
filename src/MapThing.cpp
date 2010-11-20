@@ -3,6 +3,7 @@
 #include "Main.h"
 #include "MapThing.h"
 
+/*
 MapThing::MapThing(doomthing_t t) {
 	this->type = t.type;
 	this->angle = t.angle;
@@ -62,6 +63,7 @@ MapThing::MapThing(doom64thing_t t) {
 		udmf_props["skill5"] = "true";
 	}
 }
+*/
 
 bool MapThing::parseUDMF(Tokenizer& tz) {
 	// Skip opening {

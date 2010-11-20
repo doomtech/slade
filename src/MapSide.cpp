@@ -3,12 +3,8 @@
 #include "Main.h"
 #include "MapSide.h"
 
-MapSide::MapSide(doomside_t s) {
-	// TODO: MapSide constructor from doomside_t
-}
-
-MapSide::MapSide(doom64side_t s) {
-	// TODO: MapSide constructor from doom64side_t
+MapSide::MapSide(MapSector* sector) {
+	this->sector = sector;
 }
 
 bool MapSide::parseUDMF(Tokenizer& tz) {

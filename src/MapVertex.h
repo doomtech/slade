@@ -31,12 +31,18 @@ private:
 
 public:
 	MapVertex(){}
-	MapVertex(doomvertex_t v);
-	MapVertex(doom64vertex_t v);
+	MapVertex(double x, double y) { this->x = x; this->y = y; }
 	~MapVertex(){}
 
 	double	xPos() { return x; }
 	double	yPos() { return y; }
+
+	void		connectLine(MapLine* line);
+	void		disconnectLine(MapLine* line);
+	unsigned	nConnectedLines() { return connected_lines.size(); }
+
+	PropertyList&	props()				{ return udmf_props; }
+	Property&		prop(string key)	{ return udmf_props[key]; }
 
 	bool	parseUDMF(Tokenizer& tz);
 };

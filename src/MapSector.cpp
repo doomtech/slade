@@ -3,14 +3,6 @@
 #include "Main.h"
 #include "MapSector.h"
 
-MapSector::MapSector(doomsector_t s) {
-	// TODO: MapSector constructor from doomsector_t
-}
-
-MapSector::MapSector(doom64sector_t s) {
-	// TODO: MapSector constructor from doom64sector_t
-}
-
 bool MapSector::parseUDMF(Tokenizer& tz) {
 	// Skip opening {
 	tz.getToken();

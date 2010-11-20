@@ -20,16 +20,12 @@ private:
 	vector<MapThing*>	things;
 	PropertyList		udmf_props;
 
-public:
-	SLADEMap();
-	~SLADEMap();
-
-	bool	readMap(Archive* map_entries, uint8_t format);
-	void	drawVertices();
-	void	drawLines();
-
 	// Doom format
-	bool	readDoomMap(Archive* map_entries);
+	bool	addVertex(doomvertex_t& v);
+	bool	addSide(doomside_t& s);
+	bool	addLine(doomline_t& l);
+	bool	addSector(doomsector_t& s);
+	bool	addThing(doomthing_t& t);
 	bool	readDoomVertexes(ArchiveEntry* entry);
 	bool	readDoomSidedefs(ArchiveEntry* entry);
 	bool	readDoomLinedefs(ArchiveEntry* entry);
@@ -37,21 +33,45 @@ public:
 	bool	readDoomThings(ArchiveEntry* entry);
 
 	// Hexen format
-	bool	readHexenMap(Archive* map_entries);
+	bool	addLine(hexenline_t& l);
+	bool	addThing(hexenthing_t& t);
 	bool	readHexenLinedefs(ArchiveEntry* entry);
 	bool	readHexenThings(ArchiveEntry* entry);
 
 	// Doom 64 format
-	bool	readDoom64Map(Archive* map_entries);
+	bool	addVertex(doom64vertex_t& v){return true;}
+	bool	addSide(doom64side_t& s){return true;}
+	bool	addLine(doom64line_t& l){return true;}
+	bool	addSector(doom64sector_t& s){return true;}
+	bool	addThing(doom64thing_t& t){return true;}
 	bool	readDoom64Vertexes(ArchiveEntry* entry);
 	bool	readDoom64Sidedefs(ArchiveEntry* entry);
 	bool	readDoom64Linedefs(ArchiveEntry* entry);
 	bool	readDoom64Sectors(ArchiveEntry* entry);
 	bool	readDoom64Things(ArchiveEntry* entry);
 
-	// UDMF
+public:
+	SLADEMap();
+	~SLADEMap();
+
+	MapVertex*	getVertex(unsigned index);
+	MapSide*	getSide(unsigned index);
+	MapLine*	getLine(unsigned index);
+	MapSector*	getSector(unsigned index);
+	MapThing*	getThing(unsigned index);
+
+	bool	readMap(Archive::mapdesc_t map);
+	void	drawVertices();
+	void	drawLines();
+
+	// Map loading
+	bool	readDoomMap(Archive::mapdesc_t map);
+	bool	readHexenMap(Archive::mapdesc_t map);
+	bool	readDoom64Map(Archive::mapdesc_t map);
 	bool	readUDMFMap(ArchiveEntry* map_data);
 
+	// Checks
+	int		removeDetachedVertices();
 };
 
 #endif //__SLADEMAP_H__

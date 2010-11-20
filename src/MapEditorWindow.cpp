@@ -34,6 +34,12 @@
 
 
 /*******************************************************************
+ * VARIABLES
+ *******************************************************************/
+MapEditorWindow* MapEditorWindow::instance = NULL;
+
+
+/*******************************************************************
  * MAPEDITORWINDOW CLASS FUNCTIONS
  *******************************************************************/
 
@@ -63,7 +69,7 @@ void MapEditorWindow::setupLayout() {
 	wxAuiManager *m_mgr = new wxAuiManager(this);
 	wxAuiPaneInfo p_inf;
 
-	CreateToolBar();
+	//CreateToolBar();
 
 	// Map canvas
 	map_canvas = new MapCanvas(this, -1, map);
@@ -77,6 +83,7 @@ void MapEditorWindow::setupLayout() {
 	Layout();
 }
 
-bool MapEditorWindow::openMap(Archive* map_data, uint8_t format) {
-	return map->readMap(map_data, format);
+bool MapEditorWindow::openMap(Archive::mapdesc_t map) {
+	wxLogMessage("Opening map %s", chr(map.name));
+	return this->map->readMap(map);
 }
