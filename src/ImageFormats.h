@@ -1110,9 +1110,11 @@ public:
 			// height should be greater than 0, padding should be null.
 			if (READ_L16(mc, 2) >= 0 && (READ_L16(mc, 4)%8) == 0 && 
 				READ_L16(mc, 6) >= 0 && READ_L16(mc, 10) == 0) {
-				int numchr = READ_L16(mc, 2);
+				size_t numchr = READ_L16(mc, 2);
+				if (size < 16 + numchr)
+					return EDF_FALSE;
 				// Also check that character width never exceeds max width.
-				for (int i = 12; i < 12 + numchr; ++i)
+				for (size_t i = 12; i < 12 + numchr; ++i)
 					if (mc[i] > READ_L16(mc, 4)) return EDF_FALSE;
 				// Check that there are enough data to cover all characters and the header
 				size_t neededbytes = 12 + numchr + ((numchr * READ_L16(mc, 6)) * (READ_L16(mc, 4)>>3));
