@@ -127,6 +127,16 @@ bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry, int index) {
 		return image->loadHeretic2M8(entry->getData(), entry->getSize(), index);
 	else if (s_cmpnocase(format, "img_m32"))
 		return image->loadHeretic2M32(entry->getData(), entry->getSize(), index);
+	else if (s_cmpnocase(format, "img_jedi_bm"))
+		return image->loadJediBM(entry->getData(), entry->getSize(), index);
+	else if (s_cmpnocase(format, "img_jedi_fme"))
+		return image->loadJediFME(entry->getData(), entry->getSize());
+	else if (s_cmpnocase(format, "img_jedi_wax"))
+		return image->loadJediWAX(entry->getData(), entry->getSize(), index);
+	else if (s_cmpnocase(format, "font_jedi_fnt"))
+		return image->loadJediFNT(entry->getData(), entry->getSize());
+	else if (s_cmpnocase(format, "font_jedi_font"))
+		return image->loadJediFONT(entry->getData(), entry->getSize());
 	else {
 		if (!image->loadImage(entry->getData(true), entry->getSize())) {
 			Global::error = "Image format not supported by FreeImage";

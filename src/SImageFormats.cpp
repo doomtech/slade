@@ -186,10 +186,8 @@ bool SImage::loadImage(const uint8_t* img_data, int size) {
 	FreeImage_Unload(rgb);
 	FreeImage_Unload(bm);
 
-	// Announce change
+	// Announce change and return success
 	announce("image_changed");
-
-	// Return success
 	return true;
 }
 
@@ -439,10 +437,8 @@ bool SImage::loadDoomGfx(const uint8_t* gfx_data, int size, uint8_t version) {
 		}
 	}
 
-	// Announce change
+	// Announce change and return success
 	announce("image_changed");
-
-	// Return success
 	return true;
 }
 
@@ -712,9 +708,8 @@ bool SImage::loadDoomFlat(const uint8_t* gfx_data, int size, bool columnmajor) {
 		mirror(true);
 	}
 
-	// Announce change
+	// Announce change and return success
 	announce("image_changed");
-
 	return true;
 }
 
@@ -782,9 +777,8 @@ bool SImage::loadDoomArah(const uint8_t* gfx_data, int size, int transindex) {
 	for (size_t  i = 0; i < (unsigned)(width*height); ++i)
 		if (data[i] == transindex) mask[i] = 0;
 
-	// Announce change
+	// Announce change and return success
 	announce("image_changed");
-
 	return true;
 }
 
@@ -852,9 +846,8 @@ bool SImage::loadDoomSnea(const uint8_t* gfx_data, int size) {
 	mask = new uint8_t[width*height];
 	memset(mask, 255, width*height);
 
-	// Announce change
+	// Announce change and return success
 	announce("image_changed");
-
 	return true;
 }
 
@@ -945,7 +938,8 @@ bool SImage::loadPlanar(const uint8_t* gfx_data, int size) {
 		}
 	}
 
-	// Success
+	// Announce change and return success
+	announce("image_changed");
 	return true;
 }
 
@@ -1066,6 +1060,8 @@ bool SImage::load4bitChunk(const uint8_t* gfx_data, int size) {
 		data[i*2  ] = ((gfx_data[i] & 0xF0)>>4);
 		data[i*2+1] =  (gfx_data[i] & 0x0F);
 	}
+	// Announce change and return success
+	announce("image_changed");
 	return true;
 }
 
@@ -1154,9 +1150,11 @@ bool SImage::loadImgz(const uint8_t* gfx_data, int size) {
 
 	if (!header->compression) {
 		memcpy(mask, gfx_data + sizeof(imgz_header_t), size - sizeof(imgz_header_t));
+
+		// Announce change and return success
+		announce("image_changed");
 		return true;
-	}
-	else {
+	} else {
 		// Since gfx_data is a const pointer, we can't work on it.
 		uint8_t * tempdata = new uint8_t[size];
 		memcpy(tempdata, gfx_data, size);
@@ -1187,6 +1185,8 @@ bool SImage::loadImgz(const uint8_t* gfx_data, int size) {
 		delete[] tempdata;
 	}
 
+	// Announce change and return success
+	announce("image_changed");
 	return true;
 };
 
@@ -1270,9 +1270,8 @@ bool SImage::loadQuake(const uint8_t* gfx_data, int size) {
 		memcpy(data, gfx_data+8, width * height * 4);
 	}
 
-	// Announce change
+	// Announce change and return success
 	announce("image_changed");
-
 	return true;
 }
 
@@ -1287,14 +1286,14 @@ bool SImage::loadSCSprite(const uint8_t* gfx_data, int size) {
 	if (size < 3)
 		return false;
 
-	width = gfx_data[2] + (gfx_data[3]<<8);
+	width = READ_L16(gfx_data, 2);
 	if (width == 0)
 		return false;
 
 	height = 0;
 	for (int j = 0; j < width; ++j)
 	{
-		int colstart = gfx_data[(j<<1)+4]+(gfx_data[(j<<1)+5]<<8);
+		int colstart = READ_L16(gfx_data, ((j<<1)+4));
 		// Columns with a null offset are skipped
 		if (colstart == 0) continue;
 		if (colstart < 0 || size < colstart+2 || colstart < (width*2+4))
@@ -1338,7 +1337,7 @@ bool SImage::loadSCSprite(const uint8_t* gfx_data, int size) {
 	// Read pixel data
 	for (int h = 0, i = 4; h < width; ++h, i+=2)
 	{
-		int colstart = gfx_data[i]+(gfx_data[i+1]<<8);
+		int colstart = READ_L16(gfx_data, i);
 		if (colstart)
 		{
 			int start		= gfx_data[colstart];
@@ -1359,9 +1358,8 @@ bool SImage::loadSCSprite(const uint8_t* gfx_data, int size) {
 		}
 	}
 
-	// Announce change
+	// Announce change and return success
 	announce("image_changed");
-
 	return true;
 }
 
@@ -1404,9 +1402,8 @@ bool SImage::loadSCWall(const uint8_t* gfx_data, int size) {
 		}
 	}
 
-	// Announce change
+	// Announce change and return success
 	announce("image_changed");
-
 	return true;
 }
 
@@ -1419,8 +1416,8 @@ bool SImage::loadAnaMip(const uint8_t* gfx_data, int size) {
 		return false;
 
 	// Setup variables
-	width = gfx_data[0] + (gfx_data[1]<<8);
-	height = gfx_data[2] + (gfx_data[3]<<8);
+	width = READ_L16(gfx_data, 0);
+	height = READ_L16(gfx_data, 2);
 	has_palette = false;
 	format = PALMASK;
 
@@ -1439,6 +1436,9 @@ bool SImage::loadAnaMip(const uint8_t* gfx_data, int size) {
 	memset(mask, 0xFF, width*height);
 
 	memcpy(data, gfx_data + 4, width*height);
+
+	// Announce change and return success
+	announce("image_changed");
 	return true;
 }
 
@@ -1475,8 +1475,8 @@ bool SImage::loadBuildTile(const uint8_t* gfx_data, int size, int index) {
 	{
 		// We can skip these steps if looking at the first tile in the ART file.
 		for (int i = 0; i < index; ++i) {
-			width = gfx_data[x_offs+(i<<1)] + (gfx_data[x_offs+1+(i<<1)]<<8);
-			height = gfx_data[y_offs+(i<<1)] + (gfx_data[y_offs+1+(i<<1)]<<8);
+			width = READ_L16(gfx_data, (x_offs+(i<<1)));
+			height = READ_L16(gfx_data, (y_offs+(i<<1)));
 			datastart += (width * height);
 		}
 
@@ -1492,8 +1492,8 @@ bool SImage::loadBuildTile(const uint8_t* gfx_data, int size, int index) {
 
 	// Little cheat here as they are defined in column-major format,
 	// not row-major. So we'll just call the rotate function.
-	height = gfx_data[x_offs] + (gfx_data[x_offs+1]<<8);
-	width = gfx_data[y_offs] + (gfx_data[y_offs+1]<<8);
+	height = READ_L16(gfx_data, x_offs);
+	width = READ_L16(gfx_data, y_offs);
 	if ((unsigned)size < (datastart+(width*height)))
 		return false;
 
@@ -1525,6 +1525,8 @@ bool SImage::loadBuildTile(const uint8_t* gfx_data, int size, int index) {
 	offset_x += (width>>1);
 	offset_y += height;
 
+	// Announce change and return success
+	announce("image_changed");
 	return true;
 }
 
@@ -1575,6 +1577,8 @@ bool SImage::loadHeretic2M8(const uint8_t* gfx_data, int size, int index) {
 	// Fill data with pixel data
 	memcpy(data, gfx_data + data_offset, width * height);
 
+	// Announce change and return success
+	announce("image_changed");
 	return true;
 }
 
@@ -1616,6 +1620,8 @@ bool SImage::loadHeretic2M32(const uint8_t* gfx_data, int size, int index) {
 	// Fill data with pixel data
 	memcpy(data, gfx_data + data_offset, width * height * 4);
 
+	// Announce change and return success
+	announce("image_changed");
 	return true;
 }
 
@@ -1738,10 +1744,8 @@ bool SImage::loadRottGfx(const uint8_t* gfx_data, int size, bool transparent) {
 		}
 	}
 
-	// Announce change
+	// Announce change and return success
 	announce("image_changed");
-
-	// Return success
 	return true;
 }
 
@@ -1756,8 +1760,8 @@ bool SImage::loadRottLbm(const uint8_t* gfx_data, int size) {
 
 	// Setup variables
 	offset_x = offset_y = 0;
-	width = gfx_data[0] + (gfx_data[1]<<8);
-	height = gfx_data[2] + (gfx_data[3]<<8);
+	width = READ_L16(gfx_data, 0);
+	height = READ_L16(gfx_data, 2);
 	has_palette = true;
 	format = PALMASK;
 	numimages = 1;
@@ -1807,9 +1811,8 @@ bool SImage::loadRottLbm(const uint8_t* gfx_data, int size) {
 		count += length;
 	}
 
-	// Announce change
+	// Announce change and return success
 	announce("image_changed");
-
 	return true;
 }
 
@@ -1843,9 +1846,8 @@ bool SImage::loadRottRaw(const uint8_t* gfx_data, int size) {
 	rotate(90);
 	mirror(true);
 
-	// Announce change
+	// Announce change and return success
 	announce("image_changed");
-
 	return true;
 }
 
@@ -1901,9 +1903,8 @@ bool SImage::loadRottPic(const uint8_t* gfx_data, int size) {
 	for (int i = 0; i < width*height; ++i)
 		if (data[i] == 0xFF) mask[i] = 0;
 
-	// Announce change
+	// Announce change and return success
 	announce("image_changed");
-
 	return true;
 }
 
@@ -1917,8 +1918,8 @@ bool SImage::loadWolfPic(const uint8_t* gfx_data, int size) {
 
 	// Check/setup size
 	offset_x = offset_y = 0;
-	width = gfx_data[0] + (gfx_data[1]<<8);
-	height = gfx_data[2] + (gfx_data[3]<<8);
+	width = READ_L16(gfx_data, 0);
+	height = READ_L16(gfx_data, 2);
 
 	if (size != 4 + width * height)
 		return false;
@@ -1953,9 +1954,8 @@ bool SImage::loadWolfPic(const uint8_t* gfx_data, int size) {
 	for (int i = 0; i < width*height; ++i)
 		if (data[i] == 0xFF) mask[i] = 0;*/
 
-	// Announce change
+	// Announce change and return success
 	announce("image_changed");
-
 	return true;
 }
 
@@ -2007,10 +2007,345 @@ bool SImage::loadWolfSprite(const uint8_t* gfx_data, int size) {
 		}
 	}
 
-	// Announce change
+	// Announce change and return success
 	announce("image_changed");
-
 	return true;
+}
+
+/* JediRLE0
+ * Used by several Jedi Engine formats
+ *******************************************************************/
+bool JediRLE0(const uint8_t* src, int coloffs, int width, int height, uint8_t * data) {
+	for (int x = 0; x < width; ++x) {
+		int p = READ_L32(src, (coloffs + (x<<2)));
+		uint8_t * endcol = data + height;
+		while (data < endcol) {
+			int val = src[p++];
+			if (val < 0x80) {
+				memcpy(data, src + p, val);
+				data += val;
+				p += val;
+			} else {
+				memset(data, 0, val - 0x80);
+				data += (val - 0x80);
+			}
+		}
+	}
+	return true;
+}
+
+/* JediRLE
+ * Used by several Jedi Engine formats
+ *******************************************************************/
+bool JediRLE(const uint8_t* src, int coloffs, int width, int height, uint8_t * data) {
+	for (int x = 0; x < width; ++x) {
+		int p = READ_L32(src, (coloffs + (x<<2)));
+		uint8_t * endcol = data + height;
+		while (data < endcol) {
+			int val = src[p++];
+			if (val < 0x80) {
+				memcpy(data, src + p, val);
+				data += val;
+				p += val;
+			} else {
+				memset(data, src[p++], val - 0x80);
+				data += (val - 0x80);
+			}
+		}
+	}
+	return true;
+}
+
+/* Jedi Engine bitmap header struct
+ *******************************************************************/
+struct JediBMHeader
+{
+	char magic[4];		// "BM "0x1E
+	uint16_t width;		// If 1 and height not 1, multiple BM
+	uint16_t height;	// If height and width both 1, 1x1 bitmap
+	uint16_t wid2;		// Same as width except for multiple BM, then it's 65534
+	uint16_t hei2;		// Same as height except for multiple BM, then it's number of images
+	uint8_t flag;		// Determines transparency among other stuff
+	uint8_t log;		// Worth either log2(height) or 0
+	uint16_t rle;		// 0: not compressed, 1: compressed with RLE, 2: compressed with RLE0
+	uint32_t coloffs;	// Column offsets in compressed bitmaps
+	uint32_t pad[3];	// Padding, should be zero
+};
+struct JediBMSubheader
+{
+	uint16_t width;		// If 1 and height not 1, multiple BM
+	uint16_t height;	// If height and width both 1, 1x1 bitmap
+	uint16_t wid2;		// Unused
+	uint16_t hei2;		// Unused
+	uint32_t size;		// Unused
+	uint8_t log;		// Worth log2(height)
+	uint8_t pad1[11];	// No known use
+	uint8_t flag;		// Determines transparency among other stuff
+	uint8_t pad2[3];	// No known use
+};
+
+/* SImage::loadJediBM
+ * Loads a Jedi Engine bitmap
+ * Returns false if the image data was invalid, true otherwise.
+ *******************************************************************/
+bool SImage::loadJediBM(const uint8_t* gfx_data, int size, int index) {
+	if (size < 32)
+		return false;
+
+	const JediBMHeader * header = (JediBMHeader *) gfx_data;
+	bool multibm = false;
+	bool transparent = !!(header->flag & 8);
+	size_t data_offset = 32;
+
+	// Check for multiple images
+	if (wxINT16_SWAP_ON_BE(header->width) == 1 && wxINT16_SWAP_ON_BE(header->height) != 1) {
+		if (header->rle == 0 && wxINT16_SWAP_ON_BE(header->wid2) == 65534) {
+			numimages = wxINT16_SWAP_ON_BE(header->hei2);
+		} else {
+			Global::error = "Jedi BM file: invalid multi-BM file";
+			return false;
+		}
+		multibm = true;
+	} else numimages = 1;
+
+	// Sanitize index if needed
+	index %= numimages;
+	if (index < 0)
+		index = numimages + index;
+
+	// Setup variables
+	has_palette = false;
+	format = PALMASK;
+	imgindex = index;
+
+	if (multibm) {
+		// 32 for the header, 2 for control data, then four bytes per subimage
+		int offset_offset = 34 + (imgindex<<2);
+		if (offset_offset + 4 > size) {
+			Global::error = "Jedi BM file: invalid multi-BM file";
+			return false;
+		}
+		const uint32_t * header_poffset = (uint32_t *)(gfx_data + offset_offset);
+		uint32_t header_offset = wxINT32_SWAP_ON_BE(*header_poffset)+34;
+		const JediBMSubheader * subheader = (JediBMSubheader *) (gfx_data + header_offset);
+		transparent = !!(subheader->flag & 8);
+		// Little cheat here as they are defined in column-major format,
+		// not row-major. So we'll just call the rotate function.
+		height = wxINT16_SWAP_ON_BE(subheader->width);
+		width = wxINT16_SWAP_ON_BE(subheader->height);
+		data_offset = header_offset + 28;
+	} else {
+		// Same little cheat.
+		height = wxINT16_SWAP_ON_BE(header->width);
+		width = wxINT16_SWAP_ON_BE(header->height);
+	}
+
+	// Create data
+	clearData();
+	data = new uint8_t[width*height];
+
+	// Fill data with pixel data
+	if (header->rle == 0) {
+		memcpy(data, gfx_data + data_offset, width * height);
+	} else if (header->rle == 1) {
+		JediRLE(gfx_data + data_offset, header->coloffs, height, width, data);
+	} else if (header->rle == 2) {
+		JediRLE0(gfx_data + data_offset, header->coloffs, height, width, data);
+	} else {
+		Global::error = "Jedi BM file: Invalid compression scheme";
+		clearData();
+		return false;
+	}
+
+	// Convert from column-major to row-major
+	rotate(90);
+
+	// Manage transparency
+	if (transparent) {
+		mask = new uint8_t[width*height];
+		memset(mask, 0xFF, width*height);
+		for (int i = 0; i < width*height; ++i)
+			if (data[i] == 0)
+				mask[i] = 0;
+	}
+
+	// Announce change and return success
+	announce("image_changed");
+	return true;
+}
+
+/* Jedi Engine frame header struct
+ *******************************************************************/
+struct JediFMEHeader1
+{
+	int32_t offsx;		// X offset (right is positive)
+	int32_t offsy;		// Y offset (down is positive)
+	uint32_t flag;		// Only one flag used: 1 for flipped horizontally
+	uint32_t head2;		// Offset to secondary header
+	uint32_t width;		// Unused; the data from the secondary header is used instead
+	uint32_t height;	// Unused; the data from the secondary header is used instead
+	uint32_t pad[2];	// Padding, should be zero
+};
+struct JediFMEHeader2
+{
+	uint32_t width;		// Used instead of the value in the primary header
+	uint32_t height;	// Used instead of the value in the primary header
+	uint32_t flag;		// Only one flag used: 1 for RLE0 compression
+	uint32_t size;		// Data size for compressed FME, same as file size - 32
+	uint32_t coloffs;	// Offset to column data, practically always 0
+	uint32_t padding;	// No known use
+};
+
+/* SImage::JediFrame
+ * Used by several Jedi Engine formats
+ *******************************************************************/
+bool SImage::JediFrame(const uint8_t* gfx_data, uint32_t hdroffs) {
+	const JediFMEHeader1 * header1 = (JediFMEHeader1 *) (gfx_data + hdroffs);
+	const JediFMEHeader2 * header2 = (JediFMEHeader2 *) (gfx_data + wxINT32_SWAP_ON_BE(header1->head2));
+	bool flip = !!(header1->flag & 1);
+	size_t data_offset = header1->head2;
+
+	// Setup variables
+	offset_x = 0 - wxINT32_SWAP_ON_BE(header1->offsx);
+	offset_y = 0 - wxINT32_SWAP_ON_BE(header1->offsy);
+
+	// Little cheat here as they are defined in column-major format,
+	// not row-major. So we'll just call the rotate function.
+	height = wxINT32_SWAP_ON_BE(header2->width);
+	width = wxINT32_SWAP_ON_BE(header2->height);
+
+	// Create data
+	clearData();
+	data = new uint8_t[width*height];
+
+	// Fill data with pixel data
+	if (header2->flag == 0)
+		memcpy(data, gfx_data + header1->head2 + 24, width * height);
+	else JediRLE0(gfx_data + wxINT32_SWAP_ON_BE(header1->head2), 24,
+		wxINT32_SWAP_ON_BE(header2->width), wxINT32_SWAP_ON_BE(header2->height), data);
+
+	// Convert from column-major to row-major
+	rotate(90);
+
+	// Mirror if needed
+	if (flip) mirror(false);
+
+	// Manage transparency
+	mask = new uint8_t[width*height];
+	memset(mask, 0xFF, width*height);
+	for (int i = 0; i < width*height; ++i)
+		if (data[i] == 0)
+			mask[i] = 0;
+
+	// Announce change and return success
+	announce("image_changed");
+	return true;
+}
+
+/* SImage::loadJediFME
+ * Loads a Jedi Engine frame
+ * Returns false if the image data was invalid, true otherwise.
+ *******************************************************************/
+bool SImage::loadJediFME(const uint8_t* gfx_data, int size) {
+	if (size < 32)
+		return false;
+
+	// Setup variables
+	has_palette = false;
+	format = PALMASK;
+	imgindex = 0;
+	numimages = 1;
+
+	// The image loading code is in a different function
+	// so that it can be used by WAXes too.
+	return JediFrame(gfx_data, 0);
+}
+
+/* Jedi Engine wax header struct
+ *******************************************************************/
+struct JediWAXHeader
+{
+	uint32_t version;	// Constant worth 0x00100100
+	uint32_t numseqs;	// Number of sequences
+	uint32_t numframes;	// Number of frames
+	uint32_t numcells;	// Number of cells
+	uint32_t pad[4];	// Unused values
+	uint32_t waxes[32];	// Offsets to the WAX subheaders
+};
+struct JediWAXSubheader
+{
+	uint32_t width;		// Scaled width, in world units
+	uint32_t height;	// Scaled height, in world units
+	uint32_t fps;		// Frames per second of animation
+	uint32_t pad[4];	// Unused values, must be zero
+	uint32_t seqs[32];	// Offsets to sequences
+};
+
+struct JediWAXSequence
+{
+	uint32_t pad[4];	// Unused values, must be zero
+	uint32_t frames[32];// Offsets to frames
+};
+
+/* SImage::loadJediWAX
+ * Loads a Jedi Engine frame
+ * Returns false if the image data was invalid, true otherwise.
+ *******************************************************************/
+bool SImage::loadJediWAX(const uint8_t* gfx_data, int size, int index) {
+	if (size < 460)
+		return false;
+
+	const JediWAXHeader * header = (JediWAXHeader *) gfx_data;
+	vector<size_t> frameoffs;
+	// This is a recursive nightmare. What were the LucasArt devs smoking when they specced this format?
+	for (int i = 0; i < 32; ++i) {
+		uint32_t waxi = wxINT32_SWAP_ON_BE(header->waxes[i]);
+		if (waxi > sizeof(header) && waxi < size - sizeof(JediWAXSubheader)) {
+			const JediWAXSubheader * subhdr = (JediWAXSubheader *) (gfx_data + waxi);
+			for (int j = 0; j < 32; ++j) {
+				uint32_t seqj = wxINT32_SWAP_ON_BE(subhdr->seqs[j]);
+				if (seqj > sizeof(header) && seqj < size - sizeof(JediWAXSequence)) {
+					const JediWAXSequence * seq = (JediWAXSequence *) (gfx_data + seqj);
+					for (int k = 0; k < 32; ++k) {
+						uint32_t framk = wxINT32_SWAP_ON_BE(seq->frames[k]);
+						if (framk > sizeof(header) && framk < size - sizeof(JediWAXSequence)) {
+							const JediFMEHeader1 * frame = (JediFMEHeader1 *) (gfx_data + framk);
+							uint32_t cell = wxINT32_SWAP_ON_BE(frame->head2);
+							if (cell > sizeof(header) && cell < size - sizeof(JediFMEHeader2)) {
+								bool notfound = true;
+								for (size_t l = 0; l < frameoffs.size(); ++l) {
+									if (frameoffs[l] == framk) {
+										notfound = false;
+										break;
+									}
+								}
+								if (notfound) frameoffs.push_back(framk);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	// Urgh. At least it's over now.
+
+	// Sanitize index if needed
+	numimages = frameoffs.size();
+	if (frameoffs.empty()) {
+		Global::error = "Jedi WAX error: No cell found in wax!"; // What a surreal error message ;)
+		return false;
+	}
+	index %= numimages;
+	if (index < 0)
+		index = numimages + index;
+
+	// Setup variables
+	has_palette = false;
+	format = PALMASK;
+	imgindex = index;
+
+	// The one good thing about this format is that we can reuse the FME code for loading the actual image
+	return JediFrame(gfx_data, frameoffs[imgindex]);
 }
 
 /*******************************************************************
@@ -2038,7 +2373,7 @@ bool SImage::loadFont0(const uint8_t* gfx_data, int size) {
 		return false;
 
 	offset_x = offset_y = 0;
-	height = gfx_data[0] + (gfx_data[1]<<8);
+	height = READ_L16(gfx_data, 0);
 
 	size_t datasize = size - 0x302;
 	if (datasize % height)
@@ -2078,6 +2413,8 @@ bool SImage::loadFont0(const uint8_t* gfx_data, int size) {
 			++p;
 		}
 	}
+	// Announce change and return success
+	announce("image_changed");
 	return true;
 }
 
@@ -2153,9 +2490,8 @@ bool SImage::loadFont1(const uint8_t* gfx_data, int size) {
 		if (data[i] == 0)
 			mask[i] = 0x00;
 
-	// Announce change
+	// Announce change and return success
 	announce("image_changed");
-
 	return true;
 }
 
@@ -2307,7 +2643,8 @@ bool SImage::loadFont2(const uint8_t* gfx_data, int size) {
 		if (data[i] == 0)
 			mask[i] = 0;
 
-	// Yay!
+	// Announce change and return success
+	announce("image_changed");
 	return true;
 }
 
@@ -2405,7 +2742,7 @@ bool SImage::loadBMF(const uint8_t* gfx_data, int size) {
 		mf.info = (char *) ofs+1;
 	}
 	ofs+=mf.info_size+1;
-	mf.num_chars = ofs[0] + (ofs[1]<<8);
+	mf.num_chars = READ_L16(ofs, 0);
 	if (mf.num_chars == 0)
 		return false;
 
@@ -2478,6 +2815,8 @@ bool SImage::loadBMF(const uint8_t* gfx_data, int size) {
 			startx+=(mf.add_space + mc->shift);
 		}
 	}
+	// Announce change and return success
+	announce("image_changed");
 	return true;
 }
 
@@ -2519,6 +2858,8 @@ bool SImage::loadFontM(const uint8_t* gfx_data, int size) {
 		for (size_t p = 0; p < 8; ++p)
 			mask[(i*8)+p] = ((gfx_data[i]>>(7-p)) & 1) * 255;
 	}
+	// Announce change and return success
+	announce("image_changed");
 	return true;
 }
 
@@ -2543,7 +2884,7 @@ bool SImage::loadWolfFont(const uint8_t* gfx_data, int size) {
 		return false;
 
 	offset_x = offset_y = 0;
-	height = gfx_data[0] + (gfx_data[1]<<8);
+	height = READ_L16(gfx_data, 0);
 
 	size_t datasize = size - 0x302;
 	if (datasize % height)
@@ -2573,7 +2914,7 @@ bool SImage::loadWolfFont(const uint8_t* gfx_data, int size) {
 		p += w; // Add previous character width to total
 		w = gfx_data[c + 0x202]; // Get this character's width
 		if (!w) continue;
-		size_t o = gfx_data[(c<<1) + 2] + (gfx_data[(c<<1) + 3]<<8);
+		size_t o = READ_L16(gfx_data, ((c<<1)+2));
 		for (size_t i = 0; i < w * height; ++i) {
 			// Compute source and destination offsets
 			size_t s = o + i;
@@ -2584,5 +2925,139 @@ bool SImage::loadWolfFont(const uint8_t* gfx_data, int size) {
 				mask[d] = 0;
 		}
 	}
+	// Announce change and return success
+	announce("image_changed");
 	return true;
 }
+
+
+/* SImage::loadJediFNT
+ * Loads a Jedi Engine-format bitmap font.
+ * The header tells the height and which are the first and last
+ * characters described. Then the character data consists of a
+ * single byte of data for the width of that character, followed
+ * by a list of columns. The characters are listed in order.
+ * Returns false if the image data was invalid, true otherwise.
+ *******************************************************************/
+bool SImage::loadJediFNT(const uint8_t* gfx_data, int size) {
+	// Check data
+	if (!gfx_data)
+		return false;
+
+	if (size <= 35)
+		return false;
+
+	// The character data is presented as a list of columns
+	// preceded by a byte for 
+	offset_x = offset_y = 0;
+
+	// Since the format is column-major, we'll use our usual cheat of
+	// inverting height and width to build the picture, then rotating it.
+	width = gfx_data[4];
+
+	// First and last characters
+	uint8_t firstc = gfx_data[8];
+	uint8_t lastc  = gfx_data[9];
+	uint8_t numchr = 1 + lastc - firstc;
+
+	// Go through each character to compute the total width (pre-rotation height)
+	height = 0;
+	size_t wo = 32; // Offset to width of next character
+	for (uint8_t i = 0; i < numchr; ++i) {
+		height += gfx_data[wo];
+		wo += 1 + (width * gfx_data[wo]);
+	}
+
+	clearData();
+	has_palette = false;
+	format = PALMASK;
+
+	// Technically each character is its own image, though.
+	numimages = 1;
+	imgindex = 0;
+
+	// Create new picture and mask
+	data = new uint8_t[width * height];
+	mask = new uint8_t[width * height];
+	memset(mask, 0xFF, width * height);
+
+	// Run through each character and add the pixel data
+	wo = 32;
+	size_t col = 0;
+	for (uint8_t i = 0; i < numchr; ++i) {
+		uint8_t numcols = gfx_data[wo++];
+		memcpy(data + (col * width), gfx_data + wo, numcols * width);
+		col += numcols;
+		wo += width * numcols;
+	}
+
+	// Make index 0 transparent
+	for (int i = 0; i < width * height; ++i)
+		if (data[i] == 0)
+			mask[i] = 0;
+
+	// Convert from column-major to row-major
+	rotate(90);
+
+	// Announce change and return success
+	announce("image_changed");
+	return true;
+}
+
+/* SImage::loadJediFONT
+ * Loads a Jedi Engine-format monochrome font.
+ * Contrarily to what the DF specs claim, the first two int16
+ * values are not the first and last characters as in the FNT
+ * format; instead, they are the first character and the number
+ * of characters! They're also mistaken about character width.
+ * Returns false if the image data was invalid, true otherwise.
+ *******************************************************************/
+bool SImage::loadJediFONT(const uint8_t* gfx_data, int size) {
+	// Check data
+	if (size < 16)
+		return false;
+
+	int numchr = READ_L16(gfx_data, 2);
+
+	// Setup variables
+	offset_x = offset_y = 0;
+	height = READ_L16(gfx_data, 6) * numchr;
+	width = READ_L16(gfx_data, 4);
+	has_palette = false;
+	format = PALMASK;
+
+	// reset data
+	clearData();
+	data = new uint8_t[width*height];
+	memset(data, 0xFF, width*height);
+	mask = new uint8_t[width*height];
+	memset(mask, 0x00, width*height);
+
+	// Technically each character is its own image, though.
+	numimages = 1;
+	imgindex = 0;
+
+	// We don't care about the character widths since
+	// technically it's always eight anyway. The offset
+	// to graphic data corresponds to 12 (header size)
+	// plus one byte by character for width.
+	int o = 12 + numchr;
+	int bpc = width / 8;
+
+	//Each pixel is described as a single bit, either on or off
+	for (int i = 0; i < height; ++i) {
+		for (int p = 0; p < width; ++p) {
+			switch (bpc) {
+				case 1: mask[(i*width)+p] = ((gfx_data[o+i]>>(7-p)) & 1) * 255; break;
+				case 2: mask[(i*width)+p] = ((READ_B16(gfx_data, o+(i*2))>>(15-p)) & 1) * 255; break;
+				case 3: mask[(i*width)+p] = ((READ_B24(gfx_data, o+(i*3))>>(23-p)) & 1) * 255; break;
+				case 4: mask[(i*width)+p] = ((READ_B32(gfx_data, o+(i*4))>>(31-p)) & 1) * 255; break;
+				default: clearData(); Global::error = "Jedi FONT: Weird word width"; return false;
+			}
+		}
+	}
+	// Announce change and return success
+	announce("image_changed");
+	return true;
+}
+

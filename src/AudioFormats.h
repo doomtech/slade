@@ -252,7 +252,7 @@ public:
 			// Next is the number of samples (LE uint16_t), and
 			// each sample is a single byte, so the size can be
 			// checked easily.
-			if (mc.getSize() == 4 + (mc[2]+(mc[3]<<8)))
+			if (mc.getSize() == 4 + READ_L16(mc, 2))
 				return EDF_TRUE;
 		}
 		return EDF_FALSE;
@@ -381,7 +381,7 @@ public:
 		if (mc.getSize() > 26) {
 			// Check for header, see specs at http://wiki.multimedia.cx/index.php?title=Creative_Voice
 			if (mc[19] == 26 && mc [20] == 26 && mc[21] == 0) {
-				uint16_t version = (mc[23]<<8) + mc[22];
+				uint16_t version = READ_L16(mc, 22);
 				uint16_t validity = ~version + 0x1234;
 				if ((mc[24] + (mc[25] << 8)) == validity) {
 					// Lastly, check for header text

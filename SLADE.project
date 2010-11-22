@@ -197,6 +197,13 @@
       <File Name="src/GrpArchive.h"/>
       <File Name="src/RffArchive.cpp"/>
       <File Name="src/RffArchive.h"/>
+      <File Name="src/WolfArchive.cpp"/>
+      <File Name="src/WolfArchive.h"/>
+      <File Name="src/GobArchive.cpp"/>
+      <File Name="src/GobArchive.h"/>
+      <File Name="src/LfdArchive.cpp"/>
+      <File Name="src/LfdArchive.h"/>
+      <File Name="src/Archives.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Binary Control Lumps">
       <File Name="src/AnimatedList.cpp"/>

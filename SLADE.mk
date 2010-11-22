@@ -7,13 +7,13 @@ ProjectName            :=SLADE
 ConfigurationName      :=Release
 IntermediateDirectory  :=./Release
 OutDir                 := $(IntermediateDirectory)
-WorkspacePath          := "/home/simon/dev/slade/trunk"
-ProjectPath            := "/home/simon/dev/slade/trunk"
+WorkspacePath          := "/home/simon/dev/slade/branches/map_editor"
+ProjectPath            := "/home/simon/dev/slade/branches/map_editor"
 CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Simon
-Date                   :=07/11/10
+Date                   :=22/11/10
 CodeLitePath           :="/home/simon/.codelite"
 LinkerName             :=g++
 ArchiveTool            :=ar rcus
@@ -55,10 +55,11 @@ Objects=$(IntermediateDirectory)/src_GfxConvDialog$(ObjectSuffix) $(Intermediate
 	$(IntermediateDirectory)/src_PatchTablePanel$(ObjectSuffix) $(IntermediateDirectory)/src_TextureXEditor$(ObjectSuffix) $(IntermediateDirectory)/src_TextureXPanel$(ObjectSuffix) $(IntermediateDirectory)/src_PatchBrowser$(ObjectSuffix) $(IntermediateDirectory)/src_TextureEditorPanel$(ObjectSuffix) $(IntermediateDirectory)/src_ArchivePanel$(ObjectSuffix) $(IntermediateDirectory)/src_BaseResourceChooser$(ObjectSuffix) $(IntermediateDirectory)/src_EntryOperations$(ObjectSuffix) $(IntermediateDirectory)/src_MainWindow$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveOperations$(ObjectSuffix) \
 	$(IntermediateDirectory)/src_Conversions$(ObjectSuffix) $(IntermediateDirectory)/src_MapLine$(ObjectSuffix) $(IntermediateDirectory)/src_MapSector$(ObjectSuffix) $(IntermediateDirectory)/src_MapSide$(ObjectSuffix) $(IntermediateDirectory)/src_MapThing$(ObjectSuffix) $(IntermediateDirectory)/src_MapVertex$(ObjectSuffix) $(IntermediateDirectory)/src_SLADEMap$(ObjectSuffix) $(IntermediateDirectory)/src_MapCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_MapEditorWindow$(ObjectSuffix) $(IntermediateDirectory)/src_Archive$(ObjectSuffix) \
 	$(IntermediateDirectory)/src_ArchiveEntry$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveManager$(ObjectSuffix) $(IntermediateDirectory)/src_WadArchive$(ObjectSuffix) $(IntermediateDirectory)/src_ZipArchive$(ObjectSuffix) $(IntermediateDirectory)/src_EntryType$(ObjectSuffix) $(IntermediateDirectory)/src_EntryDataFormat$(ObjectSuffix) $(IntermediateDirectory)/src_DatArchive$(ObjectSuffix) $(IntermediateDirectory)/src_LibArchive$(ObjectSuffix) $(IntermediateDirectory)/src_ResArchive$(ObjectSuffix) $(IntermediateDirectory)/src_PakArchive$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_Wad2Archive$(ObjectSuffix) $(IntermediateDirectory)/src_WadJArchive$(ObjectSuffix) $(IntermediateDirectory)/src_GrpArchive$(ObjectSuffix) $(IntermediateDirectory)/src_RffArchive$(ObjectSuffix) $(IntermediateDirectory)/src_AnimatedList$(ObjectSuffix) $(IntermediateDirectory)/src_SwitchesList$(ObjectSuffix) $(IntermediateDirectory)/src_PnamesList$(ObjectSuffix) $(IntermediateDirectory)/src_CTexture$(ObjectSuffix) $(IntermediateDirectory)/src_PatchTable$(ObjectSuffix) $(IntermediateDirectory)/src_TextureXList$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_SFont$(ObjectSuffix) $(IntermediateDirectory)/src_SImage$(ObjectSuffix) $(IntermediateDirectory)/src_SImageFormats$(ObjectSuffix) $(IntermediateDirectory)/src_Palette$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteManager$(ObjectSuffix) $(IntermediateDirectory)/src_GLTexture$(ObjectSuffix) $(IntermediateDirectory)/src_Icons$(ObjectSuffix) $(IntermediateDirectory)/src_ColourBox$(ObjectSuffix) $(IntermediateDirectory)/src_GfxCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_OGLCanvas$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_PaletteCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteChooser$(ObjectSuffix) $(IntermediateDirectory)/src_SplashWindow$(ObjectSuffix) $(IntermediateDirectory)/src_BrowserItem$(ObjectSuffix) $(IntermediateDirectory)/src_BrowserWindow$(ObjectSuffix) $(IntermediateDirectory)/src_BrowserCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_CTextureCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_TextEditor$(ObjectSuffix) $(IntermediateDirectory)/src_TextLanguage$(ObjectSuffix) $(IntermediateDirectory)/src_TextStyle$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_ArchiveEntryList$(ObjectSuffix) $(IntermediateDirectory)/src_ListView$(ObjectSuffix) $(IntermediateDirectory)/src_VirtualListView$(ObjectSuffix) $(IntermediateDirectory)/src_ConsolePanel$(ObjectSuffix) $(IntermediateDirectory)/src_HexEditorPanel$(ObjectSuffix) $(IntermediateDirectory)/src_ANSICanvas$(ObjectSuffix) $(IntermediateDirectory)/qmus2mid_qmus2mid$(ObjectSuffix) 
+	$(IntermediateDirectory)/src_Wad2Archive$(ObjectSuffix) $(IntermediateDirectory)/src_WadJArchive$(ObjectSuffix) $(IntermediateDirectory)/src_GrpArchive$(ObjectSuffix) $(IntermediateDirectory)/src_RffArchive$(ObjectSuffix) $(IntermediateDirectory)/src_WolfArchive$(ObjectSuffix) $(IntermediateDirectory)/src_GobArchive$(ObjectSuffix) $(IntermediateDirectory)/src_LfdArchive$(ObjectSuffix) $(IntermediateDirectory)/src_AnimatedList$(ObjectSuffix) $(IntermediateDirectory)/src_SwitchesList$(ObjectSuffix) $(IntermediateDirectory)/src_PnamesList$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_CTexture$(ObjectSuffix) $(IntermediateDirectory)/src_PatchTable$(ObjectSuffix) $(IntermediateDirectory)/src_TextureXList$(ObjectSuffix) $(IntermediateDirectory)/src_SFont$(ObjectSuffix) $(IntermediateDirectory)/src_SImage$(ObjectSuffix) $(IntermediateDirectory)/src_SImageFormats$(ObjectSuffix) $(IntermediateDirectory)/src_Palette$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteManager$(ObjectSuffix) $(IntermediateDirectory)/src_GLTexture$(ObjectSuffix) $(IntermediateDirectory)/src_Icons$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_ColourBox$(ObjectSuffix) $(IntermediateDirectory)/src_GfxCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_OGLCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteChooser$(ObjectSuffix) $(IntermediateDirectory)/src_SplashWindow$(ObjectSuffix) $(IntermediateDirectory)/src_BrowserItem$(ObjectSuffix) $(IntermediateDirectory)/src_BrowserWindow$(ObjectSuffix) $(IntermediateDirectory)/src_BrowserCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_CTextureCanvas$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_TextEditor$(ObjectSuffix) $(IntermediateDirectory)/src_TextLanguage$(ObjectSuffix) $(IntermediateDirectory)/src_TextStyle$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveEntryList$(ObjectSuffix) $(IntermediateDirectory)/src_ListView$(ObjectSuffix) $(IntermediateDirectory)/src_VirtualListView$(ObjectSuffix) $(IntermediateDirectory)/src_ConsolePanel$(ObjectSuffix) $(IntermediateDirectory)/src_HexEditorPanel$(ObjectSuffix) $(IntermediateDirectory)/src_ANSICanvas$(ObjectSuffix) $(IntermediateDirectory)/qmus2mid_qmus2mid$(ObjectSuffix) \
+	
 
 ##
 ## Main Build Targets 
@@ -79,860 +80,884 @@ PreBuild:
 ## Objects
 ##
 $(IntermediateDirectory)/src_GfxConvDialog$(ObjectSuffix): src/GfxConvDialog.cpp $(IntermediateDirectory)/src_GfxConvDialog$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/GfxConvDialog.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_GfxConvDialog$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/GfxConvDialog.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_GfxConvDialog$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_GfxConvDialog$(DependSuffix): src/GfxConvDialog.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_GfxConvDialog$(ObjectSuffix) -MF$(IntermediateDirectory)/src_GfxConvDialog$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/GfxConvDialog.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_GfxConvDialog$(ObjectSuffix) -MF$(IntermediateDirectory)/src_GfxConvDialog$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/GfxConvDialog.cpp"
 
 $(IntermediateDirectory)/src_GfxConvDialog$(PreprocessSuffix): src/GfxConvDialog.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_GfxConvDialog$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/GfxConvDialog.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_GfxConvDialog$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/GfxConvDialog.cpp"
 
 $(IntermediateDirectory)/src_ModifyOffsetsDialog$(ObjectSuffix): src/ModifyOffsetsDialog.cpp $(IntermediateDirectory)/src_ModifyOffsetsDialog$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/ModifyOffsetsDialog.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ModifyOffsetsDialog$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/ModifyOffsetsDialog.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ModifyOffsetsDialog$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_ModifyOffsetsDialog$(DependSuffix): src/ModifyOffsetsDialog.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_ModifyOffsetsDialog$(ObjectSuffix) -MF$(IntermediateDirectory)/src_ModifyOffsetsDialog$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/ModifyOffsetsDialog.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_ModifyOffsetsDialog$(ObjectSuffix) -MF$(IntermediateDirectory)/src_ModifyOffsetsDialog$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/ModifyOffsetsDialog.cpp"
 
 $(IntermediateDirectory)/src_ModifyOffsetsDialog$(PreprocessSuffix): src/ModifyOffsetsDialog.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ModifyOffsetsDialog$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/ModifyOffsetsDialog.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ModifyOffsetsDialog$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/ModifyOffsetsDialog.cpp"
 
 $(IntermediateDirectory)/src_PaletteDialog$(ObjectSuffix): src/PaletteDialog.cpp $(IntermediateDirectory)/src_PaletteDialog$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/PaletteDialog.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_PaletteDialog$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/PaletteDialog.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_PaletteDialog$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_PaletteDialog$(DependSuffix): src/PaletteDialog.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_PaletteDialog$(ObjectSuffix) -MF$(IntermediateDirectory)/src_PaletteDialog$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/PaletteDialog.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_PaletteDialog$(ObjectSuffix) -MF$(IntermediateDirectory)/src_PaletteDialog$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/PaletteDialog.cpp"
 
 $(IntermediateDirectory)/src_PaletteDialog$(PreprocessSuffix): src/PaletteDialog.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_PaletteDialog$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/PaletteDialog.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_PaletteDialog$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/PaletteDialog.cpp"
 
 $(IntermediateDirectory)/src_PreferencesDialog$(ObjectSuffix): src/PreferencesDialog.cpp $(IntermediateDirectory)/src_PreferencesDialog$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/PreferencesDialog.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_PreferencesDialog$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/PreferencesDialog.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_PreferencesDialog$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_PreferencesDialog$(DependSuffix): src/PreferencesDialog.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_PreferencesDialog$(ObjectSuffix) -MF$(IntermediateDirectory)/src_PreferencesDialog$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/PreferencesDialog.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_PreferencesDialog$(ObjectSuffix) -MF$(IntermediateDirectory)/src_PreferencesDialog$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/PreferencesDialog.cpp"
 
 $(IntermediateDirectory)/src_PreferencesDialog$(PreprocessSuffix): src/PreferencesDialog.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_PreferencesDialog$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/PreferencesDialog.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_PreferencesDialog$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/PreferencesDialog.cpp"
 
 $(IntermediateDirectory)/src_BaseResourceArchivesPanel$(ObjectSuffix): src/BaseResourceArchivesPanel.cpp $(IntermediateDirectory)/src_BaseResourceArchivesPanel$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/BaseResourceArchivesPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_BaseResourceArchivesPanel$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/BaseResourceArchivesPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_BaseResourceArchivesPanel$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_BaseResourceArchivesPanel$(DependSuffix): src/BaseResourceArchivesPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_BaseResourceArchivesPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_BaseResourceArchivesPanel$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/BaseResourceArchivesPanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_BaseResourceArchivesPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_BaseResourceArchivesPanel$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/BaseResourceArchivesPanel.cpp"
 
 $(IntermediateDirectory)/src_BaseResourceArchivesPanel$(PreprocessSuffix): src/BaseResourceArchivesPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_BaseResourceArchivesPanel$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/BaseResourceArchivesPanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_BaseResourceArchivesPanel$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/BaseResourceArchivesPanel.cpp"
 
 $(IntermediateDirectory)/src_TextEditorPrefsPanel$(ObjectSuffix): src/TextEditorPrefsPanel.cpp $(IntermediateDirectory)/src_TextEditorPrefsPanel$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/TextEditorPrefsPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_TextEditorPrefsPanel$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/TextEditorPrefsPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_TextEditorPrefsPanel$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_TextEditorPrefsPanel$(DependSuffix): src/TextEditorPrefsPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_TextEditorPrefsPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_TextEditorPrefsPanel$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/TextEditorPrefsPanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_TextEditorPrefsPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_TextEditorPrefsPanel$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/TextEditorPrefsPanel.cpp"
 
 $(IntermediateDirectory)/src_TextEditorPrefsPanel$(PreprocessSuffix): src/TextEditorPrefsPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_TextEditorPrefsPanel$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/TextEditorPrefsPanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_TextEditorPrefsPanel$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/TextEditorPrefsPanel.cpp"
 
 $(IntermediateDirectory)/src_TextStylePrefsPanel$(ObjectSuffix): src/TextStylePrefsPanel.cpp $(IntermediateDirectory)/src_TextStylePrefsPanel$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/TextStylePrefsPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_TextStylePrefsPanel$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/TextStylePrefsPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_TextStylePrefsPanel$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_TextStylePrefsPanel$(DependSuffix): src/TextStylePrefsPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_TextStylePrefsPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_TextStylePrefsPanel$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/TextStylePrefsPanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_TextStylePrefsPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_TextStylePrefsPanel$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/TextStylePrefsPanel.cpp"
 
 $(IntermediateDirectory)/src_TextStylePrefsPanel$(PreprocessSuffix): src/TextStylePrefsPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_TextStylePrefsPanel$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/TextStylePrefsPanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_TextStylePrefsPanel$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/TextStylePrefsPanel.cpp"
 
 $(IntermediateDirectory)/src_GeneralPrefsPanel$(ObjectSuffix): src/GeneralPrefsPanel.cpp $(IntermediateDirectory)/src_GeneralPrefsPanel$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/GeneralPrefsPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_GeneralPrefsPanel$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/GeneralPrefsPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_GeneralPrefsPanel$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_GeneralPrefsPanel$(DependSuffix): src/GeneralPrefsPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_GeneralPrefsPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_GeneralPrefsPanel$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/GeneralPrefsPanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_GeneralPrefsPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_GeneralPrefsPanel$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/GeneralPrefsPanel.cpp"
 
 $(IntermediateDirectory)/src_GeneralPrefsPanel$(PreprocessSuffix): src/GeneralPrefsPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_GeneralPrefsPanel$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/GeneralPrefsPanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_GeneralPrefsPanel$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/GeneralPrefsPanel.cpp"
 
 $(IntermediateDirectory)/src_EditingPrefsPanel$(ObjectSuffix): src/EditingPrefsPanel.cpp $(IntermediateDirectory)/src_EditingPrefsPanel$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/EditingPrefsPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_EditingPrefsPanel$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/EditingPrefsPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_EditingPrefsPanel$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_EditingPrefsPanel$(DependSuffix): src/EditingPrefsPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_EditingPrefsPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_EditingPrefsPanel$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/EditingPrefsPanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_EditingPrefsPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_EditingPrefsPanel$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/EditingPrefsPanel.cpp"
 
 $(IntermediateDirectory)/src_EditingPrefsPanel$(PreprocessSuffix): src/EditingPrefsPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_EditingPrefsPanel$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/EditingPrefsPanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_EditingPrefsPanel$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/EditingPrefsPanel.cpp"
 
 $(IntermediateDirectory)/src_ACSPrefsPanel$(ObjectSuffix): src/ACSPrefsPanel.cpp $(IntermediateDirectory)/src_ACSPrefsPanel$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/ACSPrefsPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ACSPrefsPanel$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/ACSPrefsPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ACSPrefsPanel$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_ACSPrefsPanel$(DependSuffix): src/ACSPrefsPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_ACSPrefsPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_ACSPrefsPanel$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/ACSPrefsPanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_ACSPrefsPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_ACSPrefsPanel$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/ACSPrefsPanel.cpp"
 
 $(IntermediateDirectory)/src_ACSPrefsPanel$(PreprocessSuffix): src/ACSPrefsPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ACSPrefsPanel$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/ACSPrefsPanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ACSPrefsPanel$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/ACSPrefsPanel.cpp"
 
 $(IntermediateDirectory)/src_ExtMessageDialog$(ObjectSuffix): src/ExtMessageDialog.cpp $(IntermediateDirectory)/src_ExtMessageDialog$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/ExtMessageDialog.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ExtMessageDialog$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/ExtMessageDialog.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ExtMessageDialog$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_ExtMessageDialog$(DependSuffix): src/ExtMessageDialog.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_ExtMessageDialog$(ObjectSuffix) -MF$(IntermediateDirectory)/src_ExtMessageDialog$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/ExtMessageDialog.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_ExtMessageDialog$(ObjectSuffix) -MF$(IntermediateDirectory)/src_ExtMessageDialog$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/ExtMessageDialog.cpp"
 
 $(IntermediateDirectory)/src_ExtMessageDialog$(PreprocessSuffix): src/ExtMessageDialog.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ExtMessageDialog$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/ExtMessageDialog.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ExtMessageDialog$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/ExtMessageDialog.cpp"
 
 $(IntermediateDirectory)/src_Clipboard$(ObjectSuffix): src/Clipboard.cpp $(IntermediateDirectory)/src_Clipboard$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/Clipboard.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_Clipboard$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/Clipboard.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_Clipboard$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_Clipboard$(DependSuffix): src/Clipboard.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_Clipboard$(ObjectSuffix) -MF$(IntermediateDirectory)/src_Clipboard$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/Clipboard.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_Clipboard$(ObjectSuffix) -MF$(IntermediateDirectory)/src_Clipboard$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/Clipboard.cpp"
 
 $(IntermediateDirectory)/src_Clipboard$(PreprocessSuffix): src/Clipboard.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_Clipboard$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/Clipboard.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_Clipboard$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/Clipboard.cpp"
 
 $(IntermediateDirectory)/src_CVar$(ObjectSuffix): src/CVar.cpp $(IntermediateDirectory)/src_CVar$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/CVar.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_CVar$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/CVar.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_CVar$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_CVar$(DependSuffix): src/CVar.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_CVar$(ObjectSuffix) -MF$(IntermediateDirectory)/src_CVar$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/CVar.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_CVar$(ObjectSuffix) -MF$(IntermediateDirectory)/src_CVar$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/CVar.cpp"
 
 $(IntermediateDirectory)/src_CVar$(PreprocessSuffix): src/CVar.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_CVar$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/CVar.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_CVar$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/CVar.cpp"
 
 $(IntermediateDirectory)/src_MainApp$(ObjectSuffix): src/MainApp.cpp $(IntermediateDirectory)/src_MainApp$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/MainApp.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_MainApp$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/MainApp.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_MainApp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_MainApp$(DependSuffix): src/MainApp.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_MainApp$(ObjectSuffix) -MF$(IntermediateDirectory)/src_MainApp$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/MainApp.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_MainApp$(ObjectSuffix) -MF$(IntermediateDirectory)/src_MainApp$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/MainApp.cpp"
 
 $(IntermediateDirectory)/src_MainApp$(PreprocessSuffix): src/MainApp.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_MainApp$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/MainApp.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_MainApp$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/MainApp.cpp"
 
 $(IntermediateDirectory)/src_MemChunk$(ObjectSuffix): src/MemChunk.cpp $(IntermediateDirectory)/src_MemChunk$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/MemChunk.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_MemChunk$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/MemChunk.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_MemChunk$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_MemChunk$(DependSuffix): src/MemChunk.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_MemChunk$(ObjectSuffix) -MF$(IntermediateDirectory)/src_MemChunk$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/MemChunk.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_MemChunk$(ObjectSuffix) -MF$(IntermediateDirectory)/src_MemChunk$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/MemChunk.cpp"
 
 $(IntermediateDirectory)/src_MemChunk$(PreprocessSuffix): src/MemChunk.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_MemChunk$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/MemChunk.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_MemChunk$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/MemChunk.cpp"
 
 $(IntermediateDirectory)/src_Misc$(ObjectSuffix): src/Misc.cpp $(IntermediateDirectory)/src_Misc$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/Misc.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_Misc$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/Misc.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_Misc$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_Misc$(DependSuffix): src/Misc.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_Misc$(ObjectSuffix) -MF$(IntermediateDirectory)/src_Misc$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/Misc.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_Misc$(ObjectSuffix) -MF$(IntermediateDirectory)/src_Misc$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/Misc.cpp"
 
 $(IntermediateDirectory)/src_Misc$(PreprocessSuffix): src/Misc.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_Misc$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/Misc.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_Misc$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/Misc.cpp"
 
 $(IntermediateDirectory)/src_WxStuff$(ObjectSuffix): src/WxStuff.cpp $(IntermediateDirectory)/src_WxStuff$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/WxStuff.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_WxStuff$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/WxStuff.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_WxStuff$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_WxStuff$(DependSuffix): src/WxStuff.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_WxStuff$(ObjectSuffix) -MF$(IntermediateDirectory)/src_WxStuff$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/WxStuff.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_WxStuff$(ObjectSuffix) -MF$(IntermediateDirectory)/src_WxStuff$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/WxStuff.cpp"
 
 $(IntermediateDirectory)/src_WxStuff$(PreprocessSuffix): src/WxStuff.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_WxStuff$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/WxStuff.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_WxStuff$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/WxStuff.cpp"
 
 $(IntermediateDirectory)/src_OpenGL$(ObjectSuffix): src/OpenGL.cpp $(IntermediateDirectory)/src_OpenGL$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/OpenGL.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_OpenGL$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/OpenGL.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_OpenGL$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_OpenGL$(DependSuffix): src/OpenGL.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_OpenGL$(ObjectSuffix) -MF$(IntermediateDirectory)/src_OpenGL$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/OpenGL.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_OpenGL$(ObjectSuffix) -MF$(IntermediateDirectory)/src_OpenGL$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/OpenGL.cpp"
 
 $(IntermediateDirectory)/src_OpenGL$(PreprocessSuffix): src/OpenGL.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_OpenGL$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/OpenGL.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_OpenGL$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/OpenGL.cpp"
 
 $(IntermediateDirectory)/src_ListenerAnnouncer$(ObjectSuffix): src/ListenerAnnouncer.cpp $(IntermediateDirectory)/src_ListenerAnnouncer$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/ListenerAnnouncer.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ListenerAnnouncer$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/ListenerAnnouncer.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ListenerAnnouncer$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_ListenerAnnouncer$(DependSuffix): src/ListenerAnnouncer.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_ListenerAnnouncer$(ObjectSuffix) -MF$(IntermediateDirectory)/src_ListenerAnnouncer$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/ListenerAnnouncer.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_ListenerAnnouncer$(ObjectSuffix) -MF$(IntermediateDirectory)/src_ListenerAnnouncer$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/ListenerAnnouncer.cpp"
 
 $(IntermediateDirectory)/src_ListenerAnnouncer$(PreprocessSuffix): src/ListenerAnnouncer.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ListenerAnnouncer$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/ListenerAnnouncer.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ListenerAnnouncer$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/ListenerAnnouncer.cpp"
 
 $(IntermediateDirectory)/src_Property$(ObjectSuffix): src/Property.cpp $(IntermediateDirectory)/src_Property$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/Property.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_Property$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/Property.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_Property$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_Property$(DependSuffix): src/Property.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_Property$(ObjectSuffix) -MF$(IntermediateDirectory)/src_Property$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/Property.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_Property$(ObjectSuffix) -MF$(IntermediateDirectory)/src_Property$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/Property.cpp"
 
 $(IntermediateDirectory)/src_Property$(PreprocessSuffix): src/Property.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_Property$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/Property.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_Property$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/Property.cpp"
 
 $(IntermediateDirectory)/src_PropertyList$(ObjectSuffix): src/PropertyList.cpp $(IntermediateDirectory)/src_PropertyList$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/PropertyList.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_PropertyList$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/PropertyList.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_PropertyList$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_PropertyList$(DependSuffix): src/PropertyList.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_PropertyList$(ObjectSuffix) -MF$(IntermediateDirectory)/src_PropertyList$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/PropertyList.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_PropertyList$(ObjectSuffix) -MF$(IntermediateDirectory)/src_PropertyList$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/PropertyList.cpp"
 
 $(IntermediateDirectory)/src_PropertyList$(PreprocessSuffix): src/PropertyList.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_PropertyList$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/PropertyList.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_PropertyList$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/PropertyList.cpp"
 
 $(IntermediateDirectory)/src_Tokenizer$(ObjectSuffix): src/Tokenizer.cpp $(IntermediateDirectory)/src_Tokenizer$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/Tokenizer.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_Tokenizer$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/Tokenizer.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_Tokenizer$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_Tokenizer$(DependSuffix): src/Tokenizer.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_Tokenizer$(ObjectSuffix) -MF$(IntermediateDirectory)/src_Tokenizer$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/Tokenizer.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_Tokenizer$(ObjectSuffix) -MF$(IntermediateDirectory)/src_Tokenizer$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/Tokenizer.cpp"
 
 $(IntermediateDirectory)/src_Tokenizer$(PreprocessSuffix): src/Tokenizer.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_Tokenizer$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/Tokenizer.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_Tokenizer$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/Tokenizer.cpp"
 
 $(IntermediateDirectory)/src_Tree$(ObjectSuffix): src/Tree.cpp $(IntermediateDirectory)/src_Tree$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/Tree.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_Tree$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/Tree.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_Tree$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_Tree$(DependSuffix): src/Tree.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_Tree$(ObjectSuffix) -MF$(IntermediateDirectory)/src_Tree$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/Tree.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_Tree$(ObjectSuffix) -MF$(IntermediateDirectory)/src_Tree$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/Tree.cpp"
 
 $(IntermediateDirectory)/src_Tree$(PreprocessSuffix): src/Tree.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_Tree$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/Tree.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_Tree$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/Tree.cpp"
 
 $(IntermediateDirectory)/src_Parser$(ObjectSuffix): src/Parser.cpp $(IntermediateDirectory)/src_Parser$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/Parser.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_Parser$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/Parser.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_Parser$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_Parser$(DependSuffix): src/Parser.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_Parser$(ObjectSuffix) -MF$(IntermediateDirectory)/src_Parser$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/Parser.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_Parser$(ObjectSuffix) -MF$(IntermediateDirectory)/src_Parser$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/Parser.cpp"
 
 $(IntermediateDirectory)/src_Parser$(PreprocessSuffix): src/Parser.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_Parser$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/Parser.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_Parser$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/Parser.cpp"
 
 $(IntermediateDirectory)/src_CodePages$(ObjectSuffix): src/CodePages.cpp $(IntermediateDirectory)/src_CodePages$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/CodePages.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_CodePages$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/CodePages.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_CodePages$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_CodePages$(DependSuffix): src/CodePages.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_CodePages$(ObjectSuffix) -MF$(IntermediateDirectory)/src_CodePages$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/CodePages.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_CodePages$(ObjectSuffix) -MF$(IntermediateDirectory)/src_CodePages$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/CodePages.cpp"
 
 $(IntermediateDirectory)/src_CodePages$(PreprocessSuffix): src/CodePages.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_CodePages$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/CodePages.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_CodePages$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/CodePages.cpp"
 
 $(IntermediateDirectory)/src_Console$(ObjectSuffix): src/Console.cpp $(IntermediateDirectory)/src_Console$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/Console.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_Console$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/Console.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_Console$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_Console$(DependSuffix): src/Console.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_Console$(ObjectSuffix) -MF$(IntermediateDirectory)/src_Console$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/Console.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_Console$(ObjectSuffix) -MF$(IntermediateDirectory)/src_Console$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/Console.cpp"
 
 $(IntermediateDirectory)/src_Console$(PreprocessSuffix): src/Console.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_Console$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/Console.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_Console$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/Console.cpp"
 
 $(IntermediateDirectory)/src_MIDIPlayer$(ObjectSuffix): src/MIDIPlayer.cpp $(IntermediateDirectory)/src_MIDIPlayer$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/MIDIPlayer.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_MIDIPlayer$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/MIDIPlayer.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_MIDIPlayer$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_MIDIPlayer$(DependSuffix): src/MIDIPlayer.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_MIDIPlayer$(ObjectSuffix) -MF$(IntermediateDirectory)/src_MIDIPlayer$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/MIDIPlayer.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_MIDIPlayer$(ObjectSuffix) -MF$(IntermediateDirectory)/src_MIDIPlayer$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/MIDIPlayer.cpp"
 
 $(IntermediateDirectory)/src_MIDIPlayer$(PreprocessSuffix): src/MIDIPlayer.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_MIDIPlayer$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/MIDIPlayer.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_MIDIPlayer$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/MIDIPlayer.cpp"
 
 $(IntermediateDirectory)/src_AnimatedEntryPanel$(ObjectSuffix): src/AnimatedEntryPanel.cpp $(IntermediateDirectory)/src_AnimatedEntryPanel$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/AnimatedEntryPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_AnimatedEntryPanel$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/AnimatedEntryPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_AnimatedEntryPanel$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_AnimatedEntryPanel$(DependSuffix): src/AnimatedEntryPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_AnimatedEntryPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_AnimatedEntryPanel$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/AnimatedEntryPanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_AnimatedEntryPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_AnimatedEntryPanel$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/AnimatedEntryPanel.cpp"
 
 $(IntermediateDirectory)/src_AnimatedEntryPanel$(PreprocessSuffix): src/AnimatedEntryPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_AnimatedEntryPanel$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/AnimatedEntryPanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_AnimatedEntryPanel$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/AnimatedEntryPanel.cpp"
 
 $(IntermediateDirectory)/src_EntryPanel$(ObjectSuffix): src/EntryPanel.cpp $(IntermediateDirectory)/src_EntryPanel$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/EntryPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_EntryPanel$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/EntryPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_EntryPanel$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_EntryPanel$(DependSuffix): src/EntryPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_EntryPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_EntryPanel$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/EntryPanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_EntryPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_EntryPanel$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/EntryPanel.cpp"
 
 $(IntermediateDirectory)/src_EntryPanel$(PreprocessSuffix): src/EntryPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_EntryPanel$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/EntryPanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_EntryPanel$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/EntryPanel.cpp"
 
 $(IntermediateDirectory)/src_GfxEntryPanel$(ObjectSuffix): src/GfxEntryPanel.cpp $(IntermediateDirectory)/src_GfxEntryPanel$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/GfxEntryPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_GfxEntryPanel$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/GfxEntryPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_GfxEntryPanel$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_GfxEntryPanel$(DependSuffix): src/GfxEntryPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_GfxEntryPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_GfxEntryPanel$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/GfxEntryPanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_GfxEntryPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_GfxEntryPanel$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/GfxEntryPanel.cpp"
 
 $(IntermediateDirectory)/src_GfxEntryPanel$(PreprocessSuffix): src/GfxEntryPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_GfxEntryPanel$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/GfxEntryPanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_GfxEntryPanel$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/GfxEntryPanel.cpp"
 
 $(IntermediateDirectory)/src_PaletteEntryPanel$(ObjectSuffix): src/PaletteEntryPanel.cpp $(IntermediateDirectory)/src_PaletteEntryPanel$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/PaletteEntryPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_PaletteEntryPanel$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/PaletteEntryPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_PaletteEntryPanel$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_PaletteEntryPanel$(DependSuffix): src/PaletteEntryPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_PaletteEntryPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_PaletteEntryPanel$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/PaletteEntryPanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_PaletteEntryPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_PaletteEntryPanel$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/PaletteEntryPanel.cpp"
 
 $(IntermediateDirectory)/src_PaletteEntryPanel$(PreprocessSuffix): src/PaletteEntryPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_PaletteEntryPanel$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/PaletteEntryPanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_PaletteEntryPanel$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/PaletteEntryPanel.cpp"
 
 $(IntermediateDirectory)/src_SwitchesEntryPanel$(ObjectSuffix): src/SwitchesEntryPanel.cpp $(IntermediateDirectory)/src_SwitchesEntryPanel$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/SwitchesEntryPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_SwitchesEntryPanel$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/SwitchesEntryPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_SwitchesEntryPanel$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_SwitchesEntryPanel$(DependSuffix): src/SwitchesEntryPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_SwitchesEntryPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_SwitchesEntryPanel$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/SwitchesEntryPanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_SwitchesEntryPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_SwitchesEntryPanel$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/SwitchesEntryPanel.cpp"
 
 $(IntermediateDirectory)/src_SwitchesEntryPanel$(PreprocessSuffix): src/SwitchesEntryPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_SwitchesEntryPanel$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/SwitchesEntryPanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_SwitchesEntryPanel$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/SwitchesEntryPanel.cpp"
 
 $(IntermediateDirectory)/src_TextEntryPanel$(ObjectSuffix): src/TextEntryPanel.cpp $(IntermediateDirectory)/src_TextEntryPanel$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/TextEntryPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_TextEntryPanel$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/TextEntryPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_TextEntryPanel$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_TextEntryPanel$(DependSuffix): src/TextEntryPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_TextEntryPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_TextEntryPanel$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/TextEntryPanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_TextEntryPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_TextEntryPanel$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/TextEntryPanel.cpp"
 
 $(IntermediateDirectory)/src_TextEntryPanel$(PreprocessSuffix): src/TextEntryPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_TextEntryPanel$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/TextEntryPanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_TextEntryPanel$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/TextEntryPanel.cpp"
 
 $(IntermediateDirectory)/src_PnamesEntryPanel$(ObjectSuffix): src/PnamesEntryPanel.cpp $(IntermediateDirectory)/src_PnamesEntryPanel$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/PnamesEntryPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_PnamesEntryPanel$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/PnamesEntryPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_PnamesEntryPanel$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_PnamesEntryPanel$(DependSuffix): src/PnamesEntryPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_PnamesEntryPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_PnamesEntryPanel$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/PnamesEntryPanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_PnamesEntryPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_PnamesEntryPanel$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/PnamesEntryPanel.cpp"
 
 $(IntermediateDirectory)/src_PnamesEntryPanel$(PreprocessSuffix): src/PnamesEntryPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_PnamesEntryPanel$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/PnamesEntryPanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_PnamesEntryPanel$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/PnamesEntryPanel.cpp"
 
 $(IntermediateDirectory)/src_DefaultEntryPanel$(ObjectSuffix): src/DefaultEntryPanel.cpp $(IntermediateDirectory)/src_DefaultEntryPanel$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/DefaultEntryPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_DefaultEntryPanel$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/DefaultEntryPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_DefaultEntryPanel$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_DefaultEntryPanel$(DependSuffix): src/DefaultEntryPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_DefaultEntryPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_DefaultEntryPanel$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/DefaultEntryPanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_DefaultEntryPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_DefaultEntryPanel$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/DefaultEntryPanel.cpp"
 
 $(IntermediateDirectory)/src_DefaultEntryPanel$(PreprocessSuffix): src/DefaultEntryPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_DefaultEntryPanel$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/DefaultEntryPanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_DefaultEntryPanel$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/DefaultEntryPanel.cpp"
 
 $(IntermediateDirectory)/src_HexEntryPanel$(ObjectSuffix): src/HexEntryPanel.cpp $(IntermediateDirectory)/src_HexEntryPanel$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/HexEntryPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_HexEntryPanel$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/HexEntryPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_HexEntryPanel$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_HexEntryPanel$(DependSuffix): src/HexEntryPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_HexEntryPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_HexEntryPanel$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/HexEntryPanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_HexEntryPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_HexEntryPanel$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/HexEntryPanel.cpp"
 
 $(IntermediateDirectory)/src_HexEntryPanel$(PreprocessSuffix): src/HexEntryPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_HexEntryPanel$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/HexEntryPanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_HexEntryPanel$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/HexEntryPanel.cpp"
 
 $(IntermediateDirectory)/src_MapEntryPanel$(ObjectSuffix): src/MapEntryPanel.cpp $(IntermediateDirectory)/src_MapEntryPanel$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/MapEntryPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_MapEntryPanel$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/MapEntryPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_MapEntryPanel$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_MapEntryPanel$(DependSuffix): src/MapEntryPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_MapEntryPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_MapEntryPanel$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/MapEntryPanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_MapEntryPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_MapEntryPanel$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/MapEntryPanel.cpp"
 
 $(IntermediateDirectory)/src_MapEntryPanel$(PreprocessSuffix): src/MapEntryPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_MapEntryPanel$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/MapEntryPanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_MapEntryPanel$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/MapEntryPanel.cpp"
 
 $(IntermediateDirectory)/src_AudioEntryPanel$(ObjectSuffix): src/AudioEntryPanel.cpp $(IntermediateDirectory)/src_AudioEntryPanel$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/AudioEntryPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_AudioEntryPanel$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/AudioEntryPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_AudioEntryPanel$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_AudioEntryPanel$(DependSuffix): src/AudioEntryPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_AudioEntryPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_AudioEntryPanel$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/AudioEntryPanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_AudioEntryPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_AudioEntryPanel$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/AudioEntryPanel.cpp"
 
 $(IntermediateDirectory)/src_AudioEntryPanel$(PreprocessSuffix): src/AudioEntryPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_AudioEntryPanel$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/AudioEntryPanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_AudioEntryPanel$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/AudioEntryPanel.cpp"
 
 $(IntermediateDirectory)/src_ANSIEntryPanel$(ObjectSuffix): src/ANSIEntryPanel.cpp $(IntermediateDirectory)/src_ANSIEntryPanel$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/ANSIEntryPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ANSIEntryPanel$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/ANSIEntryPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ANSIEntryPanel$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_ANSIEntryPanel$(DependSuffix): src/ANSIEntryPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_ANSIEntryPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_ANSIEntryPanel$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/ANSIEntryPanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_ANSIEntryPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_ANSIEntryPanel$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/ANSIEntryPanel.cpp"
 
 $(IntermediateDirectory)/src_ANSIEntryPanel$(PreprocessSuffix): src/ANSIEntryPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ANSIEntryPanel$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/ANSIEntryPanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ANSIEntryPanel$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/ANSIEntryPanel.cpp"
 
 $(IntermediateDirectory)/src_ArchiveManagerPanel$(ObjectSuffix): src/ArchiveManagerPanel.cpp $(IntermediateDirectory)/src_ArchiveManagerPanel$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/ArchiveManagerPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ArchiveManagerPanel$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/ArchiveManagerPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ArchiveManagerPanel$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_ArchiveManagerPanel$(DependSuffix): src/ArchiveManagerPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_ArchiveManagerPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_ArchiveManagerPanel$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/ArchiveManagerPanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_ArchiveManagerPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_ArchiveManagerPanel$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/ArchiveManagerPanel.cpp"
 
 $(IntermediateDirectory)/src_ArchiveManagerPanel$(PreprocessSuffix): src/ArchiveManagerPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ArchiveManagerPanel$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/ArchiveManagerPanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ArchiveManagerPanel$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/ArchiveManagerPanel.cpp"
 
 $(IntermediateDirectory)/src_PatchTablePanel$(ObjectSuffix): src/PatchTablePanel.cpp $(IntermediateDirectory)/src_PatchTablePanel$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/PatchTablePanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_PatchTablePanel$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/PatchTablePanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_PatchTablePanel$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_PatchTablePanel$(DependSuffix): src/PatchTablePanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_PatchTablePanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_PatchTablePanel$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/PatchTablePanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_PatchTablePanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_PatchTablePanel$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/PatchTablePanel.cpp"
 
 $(IntermediateDirectory)/src_PatchTablePanel$(PreprocessSuffix): src/PatchTablePanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_PatchTablePanel$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/PatchTablePanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_PatchTablePanel$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/PatchTablePanel.cpp"
 
 $(IntermediateDirectory)/src_TextureXEditor$(ObjectSuffix): src/TextureXEditor.cpp $(IntermediateDirectory)/src_TextureXEditor$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/TextureXEditor.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_TextureXEditor$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/TextureXEditor.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_TextureXEditor$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_TextureXEditor$(DependSuffix): src/TextureXEditor.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_TextureXEditor$(ObjectSuffix) -MF$(IntermediateDirectory)/src_TextureXEditor$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/TextureXEditor.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_TextureXEditor$(ObjectSuffix) -MF$(IntermediateDirectory)/src_TextureXEditor$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/TextureXEditor.cpp"
 
 $(IntermediateDirectory)/src_TextureXEditor$(PreprocessSuffix): src/TextureXEditor.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_TextureXEditor$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/TextureXEditor.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_TextureXEditor$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/TextureXEditor.cpp"
 
 $(IntermediateDirectory)/src_TextureXPanel$(ObjectSuffix): src/TextureXPanel.cpp $(IntermediateDirectory)/src_TextureXPanel$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/TextureXPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_TextureXPanel$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/TextureXPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_TextureXPanel$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_TextureXPanel$(DependSuffix): src/TextureXPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_TextureXPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_TextureXPanel$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/TextureXPanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_TextureXPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_TextureXPanel$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/TextureXPanel.cpp"
 
 $(IntermediateDirectory)/src_TextureXPanel$(PreprocessSuffix): src/TextureXPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_TextureXPanel$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/TextureXPanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_TextureXPanel$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/TextureXPanel.cpp"
 
 $(IntermediateDirectory)/src_PatchBrowser$(ObjectSuffix): src/PatchBrowser.cpp $(IntermediateDirectory)/src_PatchBrowser$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/PatchBrowser.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_PatchBrowser$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/PatchBrowser.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_PatchBrowser$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_PatchBrowser$(DependSuffix): src/PatchBrowser.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_PatchBrowser$(ObjectSuffix) -MF$(IntermediateDirectory)/src_PatchBrowser$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/PatchBrowser.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_PatchBrowser$(ObjectSuffix) -MF$(IntermediateDirectory)/src_PatchBrowser$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/PatchBrowser.cpp"
 
 $(IntermediateDirectory)/src_PatchBrowser$(PreprocessSuffix): src/PatchBrowser.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_PatchBrowser$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/PatchBrowser.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_PatchBrowser$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/PatchBrowser.cpp"
 
 $(IntermediateDirectory)/src_TextureEditorPanel$(ObjectSuffix): src/TextureEditorPanel.cpp $(IntermediateDirectory)/src_TextureEditorPanel$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/TextureEditorPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_TextureEditorPanel$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/TextureEditorPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_TextureEditorPanel$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_TextureEditorPanel$(DependSuffix): src/TextureEditorPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_TextureEditorPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_TextureEditorPanel$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/TextureEditorPanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_TextureEditorPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_TextureEditorPanel$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/TextureEditorPanel.cpp"
 
 $(IntermediateDirectory)/src_TextureEditorPanel$(PreprocessSuffix): src/TextureEditorPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_TextureEditorPanel$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/TextureEditorPanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_TextureEditorPanel$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/TextureEditorPanel.cpp"
 
 $(IntermediateDirectory)/src_ArchivePanel$(ObjectSuffix): src/ArchivePanel.cpp $(IntermediateDirectory)/src_ArchivePanel$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/ArchivePanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ArchivePanel$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/ArchivePanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ArchivePanel$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_ArchivePanel$(DependSuffix): src/ArchivePanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_ArchivePanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_ArchivePanel$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/ArchivePanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_ArchivePanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_ArchivePanel$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/ArchivePanel.cpp"
 
 $(IntermediateDirectory)/src_ArchivePanel$(PreprocessSuffix): src/ArchivePanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ArchivePanel$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/ArchivePanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ArchivePanel$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/ArchivePanel.cpp"
 
 $(IntermediateDirectory)/src_BaseResourceChooser$(ObjectSuffix): src/BaseResourceChooser.cpp $(IntermediateDirectory)/src_BaseResourceChooser$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/BaseResourceChooser.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_BaseResourceChooser$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/BaseResourceChooser.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_BaseResourceChooser$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_BaseResourceChooser$(DependSuffix): src/BaseResourceChooser.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_BaseResourceChooser$(ObjectSuffix) -MF$(IntermediateDirectory)/src_BaseResourceChooser$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/BaseResourceChooser.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_BaseResourceChooser$(ObjectSuffix) -MF$(IntermediateDirectory)/src_BaseResourceChooser$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/BaseResourceChooser.cpp"
 
 $(IntermediateDirectory)/src_BaseResourceChooser$(PreprocessSuffix): src/BaseResourceChooser.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_BaseResourceChooser$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/BaseResourceChooser.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_BaseResourceChooser$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/BaseResourceChooser.cpp"
 
 $(IntermediateDirectory)/src_EntryOperations$(ObjectSuffix): src/EntryOperations.cpp $(IntermediateDirectory)/src_EntryOperations$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/EntryOperations.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_EntryOperations$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/EntryOperations.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_EntryOperations$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_EntryOperations$(DependSuffix): src/EntryOperations.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_EntryOperations$(ObjectSuffix) -MF$(IntermediateDirectory)/src_EntryOperations$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/EntryOperations.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_EntryOperations$(ObjectSuffix) -MF$(IntermediateDirectory)/src_EntryOperations$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/EntryOperations.cpp"
 
 $(IntermediateDirectory)/src_EntryOperations$(PreprocessSuffix): src/EntryOperations.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_EntryOperations$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/EntryOperations.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_EntryOperations$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/EntryOperations.cpp"
 
 $(IntermediateDirectory)/src_MainWindow$(ObjectSuffix): src/MainWindow.cpp $(IntermediateDirectory)/src_MainWindow$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/MainWindow.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_MainWindow$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/MainWindow.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_MainWindow$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_MainWindow$(DependSuffix): src/MainWindow.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_MainWindow$(ObjectSuffix) -MF$(IntermediateDirectory)/src_MainWindow$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/MainWindow.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_MainWindow$(ObjectSuffix) -MF$(IntermediateDirectory)/src_MainWindow$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/MainWindow.cpp"
 
 $(IntermediateDirectory)/src_MainWindow$(PreprocessSuffix): src/MainWindow.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_MainWindow$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/MainWindow.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_MainWindow$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/MainWindow.cpp"
 
 $(IntermediateDirectory)/src_ArchiveOperations$(ObjectSuffix): src/ArchiveOperations.cpp $(IntermediateDirectory)/src_ArchiveOperations$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/ArchiveOperations.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ArchiveOperations$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/ArchiveOperations.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ArchiveOperations$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_ArchiveOperations$(DependSuffix): src/ArchiveOperations.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_ArchiveOperations$(ObjectSuffix) -MF$(IntermediateDirectory)/src_ArchiveOperations$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/ArchiveOperations.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_ArchiveOperations$(ObjectSuffix) -MF$(IntermediateDirectory)/src_ArchiveOperations$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/ArchiveOperations.cpp"
 
 $(IntermediateDirectory)/src_ArchiveOperations$(PreprocessSuffix): src/ArchiveOperations.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ArchiveOperations$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/ArchiveOperations.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ArchiveOperations$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/ArchiveOperations.cpp"
 
 $(IntermediateDirectory)/src_Conversions$(ObjectSuffix): src/Conversions.cpp $(IntermediateDirectory)/src_Conversions$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/Conversions.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_Conversions$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/Conversions.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_Conversions$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_Conversions$(DependSuffix): src/Conversions.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_Conversions$(ObjectSuffix) -MF$(IntermediateDirectory)/src_Conversions$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/Conversions.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_Conversions$(ObjectSuffix) -MF$(IntermediateDirectory)/src_Conversions$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/Conversions.cpp"
 
 $(IntermediateDirectory)/src_Conversions$(PreprocessSuffix): src/Conversions.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_Conversions$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/Conversions.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_Conversions$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/Conversions.cpp"
 
 $(IntermediateDirectory)/src_MapLine$(ObjectSuffix): src/MapLine.cpp $(IntermediateDirectory)/src_MapLine$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/MapLine.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_MapLine$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/MapLine.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_MapLine$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_MapLine$(DependSuffix): src/MapLine.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_MapLine$(ObjectSuffix) -MF$(IntermediateDirectory)/src_MapLine$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/MapLine.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_MapLine$(ObjectSuffix) -MF$(IntermediateDirectory)/src_MapLine$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/MapLine.cpp"
 
 $(IntermediateDirectory)/src_MapLine$(PreprocessSuffix): src/MapLine.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_MapLine$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/MapLine.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_MapLine$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/MapLine.cpp"
 
 $(IntermediateDirectory)/src_MapSector$(ObjectSuffix): src/MapSector.cpp $(IntermediateDirectory)/src_MapSector$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/MapSector.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_MapSector$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/MapSector.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_MapSector$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_MapSector$(DependSuffix): src/MapSector.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_MapSector$(ObjectSuffix) -MF$(IntermediateDirectory)/src_MapSector$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/MapSector.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_MapSector$(ObjectSuffix) -MF$(IntermediateDirectory)/src_MapSector$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/MapSector.cpp"
 
 $(IntermediateDirectory)/src_MapSector$(PreprocessSuffix): src/MapSector.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_MapSector$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/MapSector.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_MapSector$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/MapSector.cpp"
 
 $(IntermediateDirectory)/src_MapSide$(ObjectSuffix): src/MapSide.cpp $(IntermediateDirectory)/src_MapSide$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/MapSide.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_MapSide$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/MapSide.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_MapSide$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_MapSide$(DependSuffix): src/MapSide.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_MapSide$(ObjectSuffix) -MF$(IntermediateDirectory)/src_MapSide$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/MapSide.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_MapSide$(ObjectSuffix) -MF$(IntermediateDirectory)/src_MapSide$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/MapSide.cpp"
 
 $(IntermediateDirectory)/src_MapSide$(PreprocessSuffix): src/MapSide.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_MapSide$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/MapSide.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_MapSide$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/MapSide.cpp"
 
 $(IntermediateDirectory)/src_MapThing$(ObjectSuffix): src/MapThing.cpp $(IntermediateDirectory)/src_MapThing$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/MapThing.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_MapThing$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/MapThing.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_MapThing$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_MapThing$(DependSuffix): src/MapThing.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_MapThing$(ObjectSuffix) -MF$(IntermediateDirectory)/src_MapThing$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/MapThing.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_MapThing$(ObjectSuffix) -MF$(IntermediateDirectory)/src_MapThing$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/MapThing.cpp"
 
 $(IntermediateDirectory)/src_MapThing$(PreprocessSuffix): src/MapThing.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_MapThing$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/MapThing.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_MapThing$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/MapThing.cpp"
 
 $(IntermediateDirectory)/src_MapVertex$(ObjectSuffix): src/MapVertex.cpp $(IntermediateDirectory)/src_MapVertex$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/MapVertex.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_MapVertex$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/MapVertex.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_MapVertex$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_MapVertex$(DependSuffix): src/MapVertex.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_MapVertex$(ObjectSuffix) -MF$(IntermediateDirectory)/src_MapVertex$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/MapVertex.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_MapVertex$(ObjectSuffix) -MF$(IntermediateDirectory)/src_MapVertex$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/MapVertex.cpp"
 
 $(IntermediateDirectory)/src_MapVertex$(PreprocessSuffix): src/MapVertex.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_MapVertex$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/MapVertex.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_MapVertex$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/MapVertex.cpp"
 
 $(IntermediateDirectory)/src_SLADEMap$(ObjectSuffix): src/SLADEMap.cpp $(IntermediateDirectory)/src_SLADEMap$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/SLADEMap.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_SLADEMap$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/SLADEMap.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_SLADEMap$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_SLADEMap$(DependSuffix): src/SLADEMap.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_SLADEMap$(ObjectSuffix) -MF$(IntermediateDirectory)/src_SLADEMap$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/SLADEMap.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_SLADEMap$(ObjectSuffix) -MF$(IntermediateDirectory)/src_SLADEMap$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/SLADEMap.cpp"
 
 $(IntermediateDirectory)/src_SLADEMap$(PreprocessSuffix): src/SLADEMap.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_SLADEMap$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/SLADEMap.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_SLADEMap$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/SLADEMap.cpp"
 
 $(IntermediateDirectory)/src_MapCanvas$(ObjectSuffix): src/MapCanvas.cpp $(IntermediateDirectory)/src_MapCanvas$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/MapCanvas.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_MapCanvas$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/MapCanvas.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_MapCanvas$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_MapCanvas$(DependSuffix): src/MapCanvas.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_MapCanvas$(ObjectSuffix) -MF$(IntermediateDirectory)/src_MapCanvas$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/MapCanvas.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_MapCanvas$(ObjectSuffix) -MF$(IntermediateDirectory)/src_MapCanvas$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/MapCanvas.cpp"
 
 $(IntermediateDirectory)/src_MapCanvas$(PreprocessSuffix): src/MapCanvas.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_MapCanvas$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/MapCanvas.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_MapCanvas$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/MapCanvas.cpp"
 
 $(IntermediateDirectory)/src_MapEditorWindow$(ObjectSuffix): src/MapEditorWindow.cpp $(IntermediateDirectory)/src_MapEditorWindow$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/MapEditorWindow.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_MapEditorWindow$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/MapEditorWindow.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_MapEditorWindow$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_MapEditorWindow$(DependSuffix): src/MapEditorWindow.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_MapEditorWindow$(ObjectSuffix) -MF$(IntermediateDirectory)/src_MapEditorWindow$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/MapEditorWindow.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_MapEditorWindow$(ObjectSuffix) -MF$(IntermediateDirectory)/src_MapEditorWindow$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/MapEditorWindow.cpp"
 
 $(IntermediateDirectory)/src_MapEditorWindow$(PreprocessSuffix): src/MapEditorWindow.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_MapEditorWindow$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/MapEditorWindow.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_MapEditorWindow$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/MapEditorWindow.cpp"
 
 $(IntermediateDirectory)/src_Archive$(ObjectSuffix): src/Archive.cpp $(IntermediateDirectory)/src_Archive$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/Archive.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_Archive$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/Archive.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_Archive$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_Archive$(DependSuffix): src/Archive.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_Archive$(ObjectSuffix) -MF$(IntermediateDirectory)/src_Archive$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/Archive.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_Archive$(ObjectSuffix) -MF$(IntermediateDirectory)/src_Archive$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/Archive.cpp"
 
 $(IntermediateDirectory)/src_Archive$(PreprocessSuffix): src/Archive.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_Archive$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/Archive.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_Archive$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/Archive.cpp"
 
 $(IntermediateDirectory)/src_ArchiveEntry$(ObjectSuffix): src/ArchiveEntry.cpp $(IntermediateDirectory)/src_ArchiveEntry$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/ArchiveEntry.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ArchiveEntry$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/ArchiveEntry.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ArchiveEntry$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_ArchiveEntry$(DependSuffix): src/ArchiveEntry.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_ArchiveEntry$(ObjectSuffix) -MF$(IntermediateDirectory)/src_ArchiveEntry$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/ArchiveEntry.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_ArchiveEntry$(ObjectSuffix) -MF$(IntermediateDirectory)/src_ArchiveEntry$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/ArchiveEntry.cpp"
 
 $(IntermediateDirectory)/src_ArchiveEntry$(PreprocessSuffix): src/ArchiveEntry.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ArchiveEntry$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/ArchiveEntry.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ArchiveEntry$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/ArchiveEntry.cpp"
 
 $(IntermediateDirectory)/src_ArchiveManager$(ObjectSuffix): src/ArchiveManager.cpp $(IntermediateDirectory)/src_ArchiveManager$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/ArchiveManager.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ArchiveManager$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/ArchiveManager.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ArchiveManager$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_ArchiveManager$(DependSuffix): src/ArchiveManager.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_ArchiveManager$(ObjectSuffix) -MF$(IntermediateDirectory)/src_ArchiveManager$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/ArchiveManager.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_ArchiveManager$(ObjectSuffix) -MF$(IntermediateDirectory)/src_ArchiveManager$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/ArchiveManager.cpp"
 
 $(IntermediateDirectory)/src_ArchiveManager$(PreprocessSuffix): src/ArchiveManager.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ArchiveManager$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/ArchiveManager.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ArchiveManager$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/ArchiveManager.cpp"
 
 $(IntermediateDirectory)/src_WadArchive$(ObjectSuffix): src/WadArchive.cpp $(IntermediateDirectory)/src_WadArchive$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/WadArchive.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_WadArchive$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/WadArchive.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_WadArchive$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_WadArchive$(DependSuffix): src/WadArchive.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_WadArchive$(ObjectSuffix) -MF$(IntermediateDirectory)/src_WadArchive$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/WadArchive.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_WadArchive$(ObjectSuffix) -MF$(IntermediateDirectory)/src_WadArchive$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/WadArchive.cpp"
 
 $(IntermediateDirectory)/src_WadArchive$(PreprocessSuffix): src/WadArchive.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_WadArchive$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/WadArchive.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_WadArchive$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/WadArchive.cpp"
 
 $(IntermediateDirectory)/src_ZipArchive$(ObjectSuffix): src/ZipArchive.cpp $(IntermediateDirectory)/src_ZipArchive$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/ZipArchive.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ZipArchive$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/ZipArchive.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ZipArchive$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_ZipArchive$(DependSuffix): src/ZipArchive.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_ZipArchive$(ObjectSuffix) -MF$(IntermediateDirectory)/src_ZipArchive$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/ZipArchive.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_ZipArchive$(ObjectSuffix) -MF$(IntermediateDirectory)/src_ZipArchive$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/ZipArchive.cpp"
 
 $(IntermediateDirectory)/src_ZipArchive$(PreprocessSuffix): src/ZipArchive.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ZipArchive$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/ZipArchive.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ZipArchive$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/ZipArchive.cpp"
 
 $(IntermediateDirectory)/src_EntryType$(ObjectSuffix): src/EntryType.cpp $(IntermediateDirectory)/src_EntryType$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/EntryType.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_EntryType$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/EntryType.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_EntryType$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_EntryType$(DependSuffix): src/EntryType.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_EntryType$(ObjectSuffix) -MF$(IntermediateDirectory)/src_EntryType$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/EntryType.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_EntryType$(ObjectSuffix) -MF$(IntermediateDirectory)/src_EntryType$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/EntryType.cpp"
 
 $(IntermediateDirectory)/src_EntryType$(PreprocessSuffix): src/EntryType.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_EntryType$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/EntryType.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_EntryType$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/EntryType.cpp"
 
 $(IntermediateDirectory)/src_EntryDataFormat$(ObjectSuffix): src/EntryDataFormat.cpp $(IntermediateDirectory)/src_EntryDataFormat$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/EntryDataFormat.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_EntryDataFormat$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/EntryDataFormat.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_EntryDataFormat$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_EntryDataFormat$(DependSuffix): src/EntryDataFormat.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_EntryDataFormat$(ObjectSuffix) -MF$(IntermediateDirectory)/src_EntryDataFormat$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/EntryDataFormat.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_EntryDataFormat$(ObjectSuffix) -MF$(IntermediateDirectory)/src_EntryDataFormat$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/EntryDataFormat.cpp"
 
 $(IntermediateDirectory)/src_EntryDataFormat$(PreprocessSuffix): src/EntryDataFormat.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_EntryDataFormat$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/EntryDataFormat.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_EntryDataFormat$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/EntryDataFormat.cpp"
 
 $(IntermediateDirectory)/src_DatArchive$(ObjectSuffix): src/DatArchive.cpp $(IntermediateDirectory)/src_DatArchive$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/DatArchive.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_DatArchive$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/DatArchive.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_DatArchive$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_DatArchive$(DependSuffix): src/DatArchive.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_DatArchive$(ObjectSuffix) -MF$(IntermediateDirectory)/src_DatArchive$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/DatArchive.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_DatArchive$(ObjectSuffix) -MF$(IntermediateDirectory)/src_DatArchive$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/DatArchive.cpp"
 
 $(IntermediateDirectory)/src_DatArchive$(PreprocessSuffix): src/DatArchive.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_DatArchive$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/DatArchive.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_DatArchive$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/DatArchive.cpp"
 
 $(IntermediateDirectory)/src_LibArchive$(ObjectSuffix): src/LibArchive.cpp $(IntermediateDirectory)/src_LibArchive$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/LibArchive.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_LibArchive$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/LibArchive.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_LibArchive$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_LibArchive$(DependSuffix): src/LibArchive.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_LibArchive$(ObjectSuffix) -MF$(IntermediateDirectory)/src_LibArchive$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/LibArchive.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_LibArchive$(ObjectSuffix) -MF$(IntermediateDirectory)/src_LibArchive$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/LibArchive.cpp"
 
 $(IntermediateDirectory)/src_LibArchive$(PreprocessSuffix): src/LibArchive.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_LibArchive$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/LibArchive.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_LibArchive$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/LibArchive.cpp"
 
 $(IntermediateDirectory)/src_ResArchive$(ObjectSuffix): src/ResArchive.cpp $(IntermediateDirectory)/src_ResArchive$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/ResArchive.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ResArchive$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/ResArchive.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ResArchive$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_ResArchive$(DependSuffix): src/ResArchive.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_ResArchive$(ObjectSuffix) -MF$(IntermediateDirectory)/src_ResArchive$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/ResArchive.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_ResArchive$(ObjectSuffix) -MF$(IntermediateDirectory)/src_ResArchive$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/ResArchive.cpp"
 
 $(IntermediateDirectory)/src_ResArchive$(PreprocessSuffix): src/ResArchive.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ResArchive$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/ResArchive.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ResArchive$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/ResArchive.cpp"
 
 $(IntermediateDirectory)/src_PakArchive$(ObjectSuffix): src/PakArchive.cpp $(IntermediateDirectory)/src_PakArchive$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/PakArchive.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_PakArchive$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/PakArchive.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_PakArchive$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_PakArchive$(DependSuffix): src/PakArchive.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_PakArchive$(ObjectSuffix) -MF$(IntermediateDirectory)/src_PakArchive$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/PakArchive.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_PakArchive$(ObjectSuffix) -MF$(IntermediateDirectory)/src_PakArchive$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/PakArchive.cpp"
 
 $(IntermediateDirectory)/src_PakArchive$(PreprocessSuffix): src/PakArchive.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_PakArchive$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/PakArchive.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_PakArchive$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/PakArchive.cpp"
 
 $(IntermediateDirectory)/src_Wad2Archive$(ObjectSuffix): src/Wad2Archive.cpp $(IntermediateDirectory)/src_Wad2Archive$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/Wad2Archive.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_Wad2Archive$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/Wad2Archive.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_Wad2Archive$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_Wad2Archive$(DependSuffix): src/Wad2Archive.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_Wad2Archive$(ObjectSuffix) -MF$(IntermediateDirectory)/src_Wad2Archive$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/Wad2Archive.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_Wad2Archive$(ObjectSuffix) -MF$(IntermediateDirectory)/src_Wad2Archive$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/Wad2Archive.cpp"
 
 $(IntermediateDirectory)/src_Wad2Archive$(PreprocessSuffix): src/Wad2Archive.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_Wad2Archive$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/Wad2Archive.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_Wad2Archive$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/Wad2Archive.cpp"
 
 $(IntermediateDirectory)/src_WadJArchive$(ObjectSuffix): src/WadJArchive.cpp $(IntermediateDirectory)/src_WadJArchive$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/WadJArchive.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_WadJArchive$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/WadJArchive.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_WadJArchive$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_WadJArchive$(DependSuffix): src/WadJArchive.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_WadJArchive$(ObjectSuffix) -MF$(IntermediateDirectory)/src_WadJArchive$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/WadJArchive.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_WadJArchive$(ObjectSuffix) -MF$(IntermediateDirectory)/src_WadJArchive$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/WadJArchive.cpp"
 
 $(IntermediateDirectory)/src_WadJArchive$(PreprocessSuffix): src/WadJArchive.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_WadJArchive$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/WadJArchive.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_WadJArchive$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/WadJArchive.cpp"
 
 $(IntermediateDirectory)/src_GrpArchive$(ObjectSuffix): src/GrpArchive.cpp $(IntermediateDirectory)/src_GrpArchive$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/GrpArchive.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_GrpArchive$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/GrpArchive.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_GrpArchive$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_GrpArchive$(DependSuffix): src/GrpArchive.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_GrpArchive$(ObjectSuffix) -MF$(IntermediateDirectory)/src_GrpArchive$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/GrpArchive.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_GrpArchive$(ObjectSuffix) -MF$(IntermediateDirectory)/src_GrpArchive$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/GrpArchive.cpp"
 
 $(IntermediateDirectory)/src_GrpArchive$(PreprocessSuffix): src/GrpArchive.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_GrpArchive$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/GrpArchive.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_GrpArchive$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/GrpArchive.cpp"
 
 $(IntermediateDirectory)/src_RffArchive$(ObjectSuffix): src/RffArchive.cpp $(IntermediateDirectory)/src_RffArchive$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/RffArchive.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_RffArchive$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/RffArchive.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_RffArchive$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_RffArchive$(DependSuffix): src/RffArchive.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_RffArchive$(ObjectSuffix) -MF$(IntermediateDirectory)/src_RffArchive$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/RffArchive.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_RffArchive$(ObjectSuffix) -MF$(IntermediateDirectory)/src_RffArchive$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/RffArchive.cpp"
 
 $(IntermediateDirectory)/src_RffArchive$(PreprocessSuffix): src/RffArchive.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_RffArchive$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/RffArchive.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_RffArchive$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/RffArchive.cpp"
+
+$(IntermediateDirectory)/src_WolfArchive$(ObjectSuffix): src/WolfArchive.cpp $(IntermediateDirectory)/src_WolfArchive$(DependSuffix)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/WolfArchive.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_WolfArchive$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_WolfArchive$(DependSuffix): src/WolfArchive.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_WolfArchive$(ObjectSuffix) -MF$(IntermediateDirectory)/src_WolfArchive$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/WolfArchive.cpp"
+
+$(IntermediateDirectory)/src_WolfArchive$(PreprocessSuffix): src/WolfArchive.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_WolfArchive$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/WolfArchive.cpp"
+
+$(IntermediateDirectory)/src_GobArchive$(ObjectSuffix): src/GobArchive.cpp $(IntermediateDirectory)/src_GobArchive$(DependSuffix)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/GobArchive.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_GobArchive$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_GobArchive$(DependSuffix): src/GobArchive.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_GobArchive$(ObjectSuffix) -MF$(IntermediateDirectory)/src_GobArchive$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/GobArchive.cpp"
+
+$(IntermediateDirectory)/src_GobArchive$(PreprocessSuffix): src/GobArchive.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_GobArchive$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/GobArchive.cpp"
+
+$(IntermediateDirectory)/src_LfdArchive$(ObjectSuffix): src/LfdArchive.cpp $(IntermediateDirectory)/src_LfdArchive$(DependSuffix)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/LfdArchive.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_LfdArchive$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_LfdArchive$(DependSuffix): src/LfdArchive.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_LfdArchive$(ObjectSuffix) -MF$(IntermediateDirectory)/src_LfdArchive$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/LfdArchive.cpp"
+
+$(IntermediateDirectory)/src_LfdArchive$(PreprocessSuffix): src/LfdArchive.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_LfdArchive$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/LfdArchive.cpp"
 
 $(IntermediateDirectory)/src_AnimatedList$(ObjectSuffix): src/AnimatedList.cpp $(IntermediateDirectory)/src_AnimatedList$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/AnimatedList.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_AnimatedList$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/AnimatedList.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_AnimatedList$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_AnimatedList$(DependSuffix): src/AnimatedList.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_AnimatedList$(ObjectSuffix) -MF$(IntermediateDirectory)/src_AnimatedList$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/AnimatedList.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_AnimatedList$(ObjectSuffix) -MF$(IntermediateDirectory)/src_AnimatedList$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/AnimatedList.cpp"
 
 $(IntermediateDirectory)/src_AnimatedList$(PreprocessSuffix): src/AnimatedList.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_AnimatedList$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/AnimatedList.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_AnimatedList$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/AnimatedList.cpp"
 
 $(IntermediateDirectory)/src_SwitchesList$(ObjectSuffix): src/SwitchesList.cpp $(IntermediateDirectory)/src_SwitchesList$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/SwitchesList.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_SwitchesList$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/SwitchesList.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_SwitchesList$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_SwitchesList$(DependSuffix): src/SwitchesList.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_SwitchesList$(ObjectSuffix) -MF$(IntermediateDirectory)/src_SwitchesList$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/SwitchesList.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_SwitchesList$(ObjectSuffix) -MF$(IntermediateDirectory)/src_SwitchesList$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/SwitchesList.cpp"
 
 $(IntermediateDirectory)/src_SwitchesList$(PreprocessSuffix): src/SwitchesList.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_SwitchesList$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/SwitchesList.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_SwitchesList$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/SwitchesList.cpp"
 
 $(IntermediateDirectory)/src_PnamesList$(ObjectSuffix): src/PnamesList.cpp $(IntermediateDirectory)/src_PnamesList$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/PnamesList.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_PnamesList$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/PnamesList.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_PnamesList$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_PnamesList$(DependSuffix): src/PnamesList.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_PnamesList$(ObjectSuffix) -MF$(IntermediateDirectory)/src_PnamesList$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/PnamesList.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_PnamesList$(ObjectSuffix) -MF$(IntermediateDirectory)/src_PnamesList$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/PnamesList.cpp"
 
 $(IntermediateDirectory)/src_PnamesList$(PreprocessSuffix): src/PnamesList.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_PnamesList$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/PnamesList.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_PnamesList$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/PnamesList.cpp"
 
 $(IntermediateDirectory)/src_CTexture$(ObjectSuffix): src/CTexture.cpp $(IntermediateDirectory)/src_CTexture$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/CTexture.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_CTexture$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/CTexture.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_CTexture$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_CTexture$(DependSuffix): src/CTexture.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_CTexture$(ObjectSuffix) -MF$(IntermediateDirectory)/src_CTexture$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/CTexture.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_CTexture$(ObjectSuffix) -MF$(IntermediateDirectory)/src_CTexture$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/CTexture.cpp"
 
 $(IntermediateDirectory)/src_CTexture$(PreprocessSuffix): src/CTexture.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_CTexture$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/CTexture.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_CTexture$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/CTexture.cpp"
 
 $(IntermediateDirectory)/src_PatchTable$(ObjectSuffix): src/PatchTable.cpp $(IntermediateDirectory)/src_PatchTable$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/PatchTable.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_PatchTable$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/PatchTable.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_PatchTable$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_PatchTable$(DependSuffix): src/PatchTable.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_PatchTable$(ObjectSuffix) -MF$(IntermediateDirectory)/src_PatchTable$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/PatchTable.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_PatchTable$(ObjectSuffix) -MF$(IntermediateDirectory)/src_PatchTable$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/PatchTable.cpp"
 
 $(IntermediateDirectory)/src_PatchTable$(PreprocessSuffix): src/PatchTable.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_PatchTable$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/PatchTable.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_PatchTable$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/PatchTable.cpp"
 
 $(IntermediateDirectory)/src_TextureXList$(ObjectSuffix): src/TextureXList.cpp $(IntermediateDirectory)/src_TextureXList$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/TextureXList.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_TextureXList$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/TextureXList.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_TextureXList$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_TextureXList$(DependSuffix): src/TextureXList.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_TextureXList$(ObjectSuffix) -MF$(IntermediateDirectory)/src_TextureXList$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/TextureXList.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_TextureXList$(ObjectSuffix) -MF$(IntermediateDirectory)/src_TextureXList$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/TextureXList.cpp"
 
 $(IntermediateDirectory)/src_TextureXList$(PreprocessSuffix): src/TextureXList.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_TextureXList$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/TextureXList.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_TextureXList$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/TextureXList.cpp"
 
 $(IntermediateDirectory)/src_SFont$(ObjectSuffix): src/SFont.cpp $(IntermediateDirectory)/src_SFont$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/SFont.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_SFont$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/SFont.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_SFont$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_SFont$(DependSuffix): src/SFont.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_SFont$(ObjectSuffix) -MF$(IntermediateDirectory)/src_SFont$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/SFont.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_SFont$(ObjectSuffix) -MF$(IntermediateDirectory)/src_SFont$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/SFont.cpp"
 
 $(IntermediateDirectory)/src_SFont$(PreprocessSuffix): src/SFont.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_SFont$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/SFont.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_SFont$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/SFont.cpp"
 
 $(IntermediateDirectory)/src_SImage$(ObjectSuffix): src/SImage.cpp $(IntermediateDirectory)/src_SImage$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/SImage.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_SImage$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/SImage.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_SImage$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_SImage$(DependSuffix): src/SImage.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_SImage$(ObjectSuffix) -MF$(IntermediateDirectory)/src_SImage$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/SImage.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_SImage$(ObjectSuffix) -MF$(IntermediateDirectory)/src_SImage$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/SImage.cpp"
 
 $(IntermediateDirectory)/src_SImage$(PreprocessSuffix): src/SImage.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_SImage$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/SImage.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_SImage$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/SImage.cpp"
 
 $(IntermediateDirectory)/src_SImageFormats$(ObjectSuffix): src/SImageFormats.cpp $(IntermediateDirectory)/src_SImageFormats$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/SImageFormats.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_SImageFormats$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/SImageFormats.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_SImageFormats$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_SImageFormats$(DependSuffix): src/SImageFormats.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_SImageFormats$(ObjectSuffix) -MF$(IntermediateDirectory)/src_SImageFormats$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/SImageFormats.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_SImageFormats$(ObjectSuffix) -MF$(IntermediateDirectory)/src_SImageFormats$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/SImageFormats.cpp"
 
 $(IntermediateDirectory)/src_SImageFormats$(PreprocessSuffix): src/SImageFormats.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_SImageFormats$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/SImageFormats.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_SImageFormats$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/SImageFormats.cpp"
 
 $(IntermediateDirectory)/src_Palette$(ObjectSuffix): src/Palette.cpp $(IntermediateDirectory)/src_Palette$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/Palette.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_Palette$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/Palette.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_Palette$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_Palette$(DependSuffix): src/Palette.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_Palette$(ObjectSuffix) -MF$(IntermediateDirectory)/src_Palette$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/Palette.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_Palette$(ObjectSuffix) -MF$(IntermediateDirectory)/src_Palette$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/Palette.cpp"
 
 $(IntermediateDirectory)/src_Palette$(PreprocessSuffix): src/Palette.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_Palette$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/Palette.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_Palette$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/Palette.cpp"
 
 $(IntermediateDirectory)/src_PaletteManager$(ObjectSuffix): src/PaletteManager.cpp $(IntermediateDirectory)/src_PaletteManager$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/PaletteManager.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_PaletteManager$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/PaletteManager.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_PaletteManager$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_PaletteManager$(DependSuffix): src/PaletteManager.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_PaletteManager$(ObjectSuffix) -MF$(IntermediateDirectory)/src_PaletteManager$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/PaletteManager.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_PaletteManager$(ObjectSuffix) -MF$(IntermediateDirectory)/src_PaletteManager$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/PaletteManager.cpp"
 
 $(IntermediateDirectory)/src_PaletteManager$(PreprocessSuffix): src/PaletteManager.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_PaletteManager$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/PaletteManager.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_PaletteManager$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/PaletteManager.cpp"
 
 $(IntermediateDirectory)/src_GLTexture$(ObjectSuffix): src/GLTexture.cpp $(IntermediateDirectory)/src_GLTexture$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/GLTexture.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_GLTexture$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/GLTexture.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_GLTexture$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_GLTexture$(DependSuffix): src/GLTexture.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_GLTexture$(ObjectSuffix) -MF$(IntermediateDirectory)/src_GLTexture$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/GLTexture.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_GLTexture$(ObjectSuffix) -MF$(IntermediateDirectory)/src_GLTexture$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/GLTexture.cpp"
 
 $(IntermediateDirectory)/src_GLTexture$(PreprocessSuffix): src/GLTexture.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_GLTexture$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/GLTexture.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_GLTexture$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/GLTexture.cpp"
 
 $(IntermediateDirectory)/src_Icons$(ObjectSuffix): src/Icons.cpp $(IntermediateDirectory)/src_Icons$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/Icons.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_Icons$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/Icons.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_Icons$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_Icons$(DependSuffix): src/Icons.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_Icons$(ObjectSuffix) -MF$(IntermediateDirectory)/src_Icons$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/Icons.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_Icons$(ObjectSuffix) -MF$(IntermediateDirectory)/src_Icons$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/Icons.cpp"
 
 $(IntermediateDirectory)/src_Icons$(PreprocessSuffix): src/Icons.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_Icons$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/Icons.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_Icons$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/Icons.cpp"
 
 $(IntermediateDirectory)/src_ColourBox$(ObjectSuffix): src/ColourBox.cpp $(IntermediateDirectory)/src_ColourBox$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/ColourBox.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ColourBox$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/ColourBox.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ColourBox$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_ColourBox$(DependSuffix): src/ColourBox.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_ColourBox$(ObjectSuffix) -MF$(IntermediateDirectory)/src_ColourBox$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/ColourBox.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_ColourBox$(ObjectSuffix) -MF$(IntermediateDirectory)/src_ColourBox$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/ColourBox.cpp"
 
 $(IntermediateDirectory)/src_ColourBox$(PreprocessSuffix): src/ColourBox.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ColourBox$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/ColourBox.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ColourBox$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/ColourBox.cpp"
 
 $(IntermediateDirectory)/src_GfxCanvas$(ObjectSuffix): src/GfxCanvas.cpp $(IntermediateDirectory)/src_GfxCanvas$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/GfxCanvas.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_GfxCanvas$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/GfxCanvas.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_GfxCanvas$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_GfxCanvas$(DependSuffix): src/GfxCanvas.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_GfxCanvas$(ObjectSuffix) -MF$(IntermediateDirectory)/src_GfxCanvas$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/GfxCanvas.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_GfxCanvas$(ObjectSuffix) -MF$(IntermediateDirectory)/src_GfxCanvas$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/GfxCanvas.cpp"
 
 $(IntermediateDirectory)/src_GfxCanvas$(PreprocessSuffix): src/GfxCanvas.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_GfxCanvas$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/GfxCanvas.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_GfxCanvas$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/GfxCanvas.cpp"
 
 $(IntermediateDirectory)/src_OGLCanvas$(ObjectSuffix): src/OGLCanvas.cpp $(IntermediateDirectory)/src_OGLCanvas$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/OGLCanvas.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_OGLCanvas$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/OGLCanvas.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_OGLCanvas$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_OGLCanvas$(DependSuffix): src/OGLCanvas.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_OGLCanvas$(ObjectSuffix) -MF$(IntermediateDirectory)/src_OGLCanvas$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/OGLCanvas.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_OGLCanvas$(ObjectSuffix) -MF$(IntermediateDirectory)/src_OGLCanvas$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/OGLCanvas.cpp"
 
 $(IntermediateDirectory)/src_OGLCanvas$(PreprocessSuffix): src/OGLCanvas.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_OGLCanvas$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/OGLCanvas.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_OGLCanvas$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/OGLCanvas.cpp"
 
 $(IntermediateDirectory)/src_PaletteCanvas$(ObjectSuffix): src/PaletteCanvas.cpp $(IntermediateDirectory)/src_PaletteCanvas$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/PaletteCanvas.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_PaletteCanvas$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/PaletteCanvas.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_PaletteCanvas$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_PaletteCanvas$(DependSuffix): src/PaletteCanvas.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_PaletteCanvas$(ObjectSuffix) -MF$(IntermediateDirectory)/src_PaletteCanvas$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/PaletteCanvas.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_PaletteCanvas$(ObjectSuffix) -MF$(IntermediateDirectory)/src_PaletteCanvas$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/PaletteCanvas.cpp"
 
 $(IntermediateDirectory)/src_PaletteCanvas$(PreprocessSuffix): src/PaletteCanvas.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_PaletteCanvas$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/PaletteCanvas.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_PaletteCanvas$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/PaletteCanvas.cpp"
 
 $(IntermediateDirectory)/src_PaletteChooser$(ObjectSuffix): src/PaletteChooser.cpp $(IntermediateDirectory)/src_PaletteChooser$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/PaletteChooser.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_PaletteChooser$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/PaletteChooser.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_PaletteChooser$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_PaletteChooser$(DependSuffix): src/PaletteChooser.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_PaletteChooser$(ObjectSuffix) -MF$(IntermediateDirectory)/src_PaletteChooser$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/PaletteChooser.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_PaletteChooser$(ObjectSuffix) -MF$(IntermediateDirectory)/src_PaletteChooser$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/PaletteChooser.cpp"
 
 $(IntermediateDirectory)/src_PaletteChooser$(PreprocessSuffix): src/PaletteChooser.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_PaletteChooser$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/PaletteChooser.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_PaletteChooser$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/PaletteChooser.cpp"
 
 $(IntermediateDirectory)/src_SplashWindow$(ObjectSuffix): src/SplashWindow.cpp $(IntermediateDirectory)/src_SplashWindow$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/SplashWindow.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_SplashWindow$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/SplashWindow.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_SplashWindow$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_SplashWindow$(DependSuffix): src/SplashWindow.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_SplashWindow$(ObjectSuffix) -MF$(IntermediateDirectory)/src_SplashWindow$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/SplashWindow.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_SplashWindow$(ObjectSuffix) -MF$(IntermediateDirectory)/src_SplashWindow$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/SplashWindow.cpp"
 
 $(IntermediateDirectory)/src_SplashWindow$(PreprocessSuffix): src/SplashWindow.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_SplashWindow$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/SplashWindow.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_SplashWindow$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/SplashWindow.cpp"
 
 $(IntermediateDirectory)/src_BrowserItem$(ObjectSuffix): src/BrowserItem.cpp $(IntermediateDirectory)/src_BrowserItem$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/BrowserItem.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_BrowserItem$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/BrowserItem.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_BrowserItem$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_BrowserItem$(DependSuffix): src/BrowserItem.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_BrowserItem$(ObjectSuffix) -MF$(IntermediateDirectory)/src_BrowserItem$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/BrowserItem.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_BrowserItem$(ObjectSuffix) -MF$(IntermediateDirectory)/src_BrowserItem$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/BrowserItem.cpp"
 
 $(IntermediateDirectory)/src_BrowserItem$(PreprocessSuffix): src/BrowserItem.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_BrowserItem$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/BrowserItem.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_BrowserItem$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/BrowserItem.cpp"
 
 $(IntermediateDirectory)/src_BrowserWindow$(ObjectSuffix): src/BrowserWindow.cpp $(IntermediateDirectory)/src_BrowserWindow$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/BrowserWindow.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_BrowserWindow$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/BrowserWindow.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_BrowserWindow$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_BrowserWindow$(DependSuffix): src/BrowserWindow.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_BrowserWindow$(ObjectSuffix) -MF$(IntermediateDirectory)/src_BrowserWindow$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/BrowserWindow.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_BrowserWindow$(ObjectSuffix) -MF$(IntermediateDirectory)/src_BrowserWindow$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/BrowserWindow.cpp"
 
 $(IntermediateDirectory)/src_BrowserWindow$(PreprocessSuffix): src/BrowserWindow.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_BrowserWindow$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/BrowserWindow.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_BrowserWindow$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/BrowserWindow.cpp"
 
 $(IntermediateDirectory)/src_BrowserCanvas$(ObjectSuffix): src/BrowserCanvas.cpp $(IntermediateDirectory)/src_BrowserCanvas$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/BrowserCanvas.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_BrowserCanvas$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/BrowserCanvas.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_BrowserCanvas$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_BrowserCanvas$(DependSuffix): src/BrowserCanvas.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_BrowserCanvas$(ObjectSuffix) -MF$(IntermediateDirectory)/src_BrowserCanvas$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/BrowserCanvas.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_BrowserCanvas$(ObjectSuffix) -MF$(IntermediateDirectory)/src_BrowserCanvas$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/BrowserCanvas.cpp"
 
 $(IntermediateDirectory)/src_BrowserCanvas$(PreprocessSuffix): src/BrowserCanvas.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_BrowserCanvas$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/BrowserCanvas.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_BrowserCanvas$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/BrowserCanvas.cpp"
 
 $(IntermediateDirectory)/src_CTextureCanvas$(ObjectSuffix): src/CTextureCanvas.cpp $(IntermediateDirectory)/src_CTextureCanvas$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/CTextureCanvas.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_CTextureCanvas$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/CTextureCanvas.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_CTextureCanvas$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_CTextureCanvas$(DependSuffix): src/CTextureCanvas.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_CTextureCanvas$(ObjectSuffix) -MF$(IntermediateDirectory)/src_CTextureCanvas$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/CTextureCanvas.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_CTextureCanvas$(ObjectSuffix) -MF$(IntermediateDirectory)/src_CTextureCanvas$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/CTextureCanvas.cpp"
 
 $(IntermediateDirectory)/src_CTextureCanvas$(PreprocessSuffix): src/CTextureCanvas.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_CTextureCanvas$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/CTextureCanvas.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_CTextureCanvas$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/CTextureCanvas.cpp"
 
 $(IntermediateDirectory)/src_TextEditor$(ObjectSuffix): src/TextEditor.cpp $(IntermediateDirectory)/src_TextEditor$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/TextEditor.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_TextEditor$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/TextEditor.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_TextEditor$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_TextEditor$(DependSuffix): src/TextEditor.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_TextEditor$(ObjectSuffix) -MF$(IntermediateDirectory)/src_TextEditor$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/TextEditor.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_TextEditor$(ObjectSuffix) -MF$(IntermediateDirectory)/src_TextEditor$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/TextEditor.cpp"
 
 $(IntermediateDirectory)/src_TextEditor$(PreprocessSuffix): src/TextEditor.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_TextEditor$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/TextEditor.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_TextEditor$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/TextEditor.cpp"
 
 $(IntermediateDirectory)/src_TextLanguage$(ObjectSuffix): src/TextLanguage.cpp $(IntermediateDirectory)/src_TextLanguage$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/TextLanguage.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_TextLanguage$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/TextLanguage.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_TextLanguage$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_TextLanguage$(DependSuffix): src/TextLanguage.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_TextLanguage$(ObjectSuffix) -MF$(IntermediateDirectory)/src_TextLanguage$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/TextLanguage.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_TextLanguage$(ObjectSuffix) -MF$(IntermediateDirectory)/src_TextLanguage$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/TextLanguage.cpp"
 
 $(IntermediateDirectory)/src_TextLanguage$(PreprocessSuffix): src/TextLanguage.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_TextLanguage$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/TextLanguage.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_TextLanguage$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/TextLanguage.cpp"
 
 $(IntermediateDirectory)/src_TextStyle$(ObjectSuffix): src/TextStyle.cpp $(IntermediateDirectory)/src_TextStyle$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/TextStyle.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_TextStyle$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/TextStyle.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_TextStyle$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_TextStyle$(DependSuffix): src/TextStyle.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_TextStyle$(ObjectSuffix) -MF$(IntermediateDirectory)/src_TextStyle$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/TextStyle.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_TextStyle$(ObjectSuffix) -MF$(IntermediateDirectory)/src_TextStyle$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/TextStyle.cpp"
 
 $(IntermediateDirectory)/src_TextStyle$(PreprocessSuffix): src/TextStyle.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_TextStyle$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/TextStyle.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_TextStyle$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/TextStyle.cpp"
 
 $(IntermediateDirectory)/src_ArchiveEntryList$(ObjectSuffix): src/ArchiveEntryList.cpp $(IntermediateDirectory)/src_ArchiveEntryList$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/ArchiveEntryList.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ArchiveEntryList$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/ArchiveEntryList.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ArchiveEntryList$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_ArchiveEntryList$(DependSuffix): src/ArchiveEntryList.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_ArchiveEntryList$(ObjectSuffix) -MF$(IntermediateDirectory)/src_ArchiveEntryList$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/ArchiveEntryList.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_ArchiveEntryList$(ObjectSuffix) -MF$(IntermediateDirectory)/src_ArchiveEntryList$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/ArchiveEntryList.cpp"
 
 $(IntermediateDirectory)/src_ArchiveEntryList$(PreprocessSuffix): src/ArchiveEntryList.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ArchiveEntryList$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/ArchiveEntryList.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ArchiveEntryList$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/ArchiveEntryList.cpp"
 
 $(IntermediateDirectory)/src_ListView$(ObjectSuffix): src/ListView.cpp $(IntermediateDirectory)/src_ListView$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/ListView.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ListView$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/ListView.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ListView$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_ListView$(DependSuffix): src/ListView.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_ListView$(ObjectSuffix) -MF$(IntermediateDirectory)/src_ListView$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/ListView.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_ListView$(ObjectSuffix) -MF$(IntermediateDirectory)/src_ListView$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/ListView.cpp"
 
 $(IntermediateDirectory)/src_ListView$(PreprocessSuffix): src/ListView.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ListView$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/ListView.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ListView$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/ListView.cpp"
 
 $(IntermediateDirectory)/src_VirtualListView$(ObjectSuffix): src/VirtualListView.cpp $(IntermediateDirectory)/src_VirtualListView$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/VirtualListView.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_VirtualListView$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/VirtualListView.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_VirtualListView$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_VirtualListView$(DependSuffix): src/VirtualListView.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_VirtualListView$(ObjectSuffix) -MF$(IntermediateDirectory)/src_VirtualListView$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/VirtualListView.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_VirtualListView$(ObjectSuffix) -MF$(IntermediateDirectory)/src_VirtualListView$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/VirtualListView.cpp"
 
 $(IntermediateDirectory)/src_VirtualListView$(PreprocessSuffix): src/VirtualListView.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_VirtualListView$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/VirtualListView.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_VirtualListView$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/VirtualListView.cpp"
 
 $(IntermediateDirectory)/src_ConsolePanel$(ObjectSuffix): src/ConsolePanel.cpp $(IntermediateDirectory)/src_ConsolePanel$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/ConsolePanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ConsolePanel$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/ConsolePanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ConsolePanel$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_ConsolePanel$(DependSuffix): src/ConsolePanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_ConsolePanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_ConsolePanel$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/ConsolePanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_ConsolePanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_ConsolePanel$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/ConsolePanel.cpp"
 
 $(IntermediateDirectory)/src_ConsolePanel$(PreprocessSuffix): src/ConsolePanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ConsolePanel$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/ConsolePanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ConsolePanel$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/ConsolePanel.cpp"
 
 $(IntermediateDirectory)/src_HexEditorPanel$(ObjectSuffix): src/HexEditorPanel.cpp $(IntermediateDirectory)/src_HexEditorPanel$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/HexEditorPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_HexEditorPanel$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/HexEditorPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_HexEditorPanel$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_HexEditorPanel$(DependSuffix): src/HexEditorPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_HexEditorPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_HexEditorPanel$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/HexEditorPanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_HexEditorPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_HexEditorPanel$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/HexEditorPanel.cpp"
 
 $(IntermediateDirectory)/src_HexEditorPanel$(PreprocessSuffix): src/HexEditorPanel.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_HexEditorPanel$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/HexEditorPanel.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_HexEditorPanel$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/HexEditorPanel.cpp"
 
 $(IntermediateDirectory)/src_ANSICanvas$(ObjectSuffix): src/ANSICanvas.cpp $(IntermediateDirectory)/src_ANSICanvas$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/ANSICanvas.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ANSICanvas$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/ANSICanvas.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ANSICanvas$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_ANSICanvas$(DependSuffix): src/ANSICanvas.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_ANSICanvas$(ObjectSuffix) -MF$(IntermediateDirectory)/src_ANSICanvas$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/ANSICanvas.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/src_ANSICanvas$(ObjectSuffix) -MF$(IntermediateDirectory)/src_ANSICanvas$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/ANSICanvas.cpp"
 
 $(IntermediateDirectory)/src_ANSICanvas$(PreprocessSuffix): src/ANSICanvas.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ANSICanvas$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/ANSICanvas.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ANSICanvas$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/ANSICanvas.cpp"
 
 $(IntermediateDirectory)/qmus2mid_qmus2mid$(ObjectSuffix): src/qmus2mid/qmus2mid.cpp $(IntermediateDirectory)/qmus2mid_qmus2mid$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/qmus2mid/qmus2mid.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/qmus2mid_qmus2mid$(ObjectSuffix) $(IncludePath)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/qmus2mid/qmus2mid.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/qmus2mid_qmus2mid$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/qmus2mid_qmus2mid$(DependSuffix): src/qmus2mid/qmus2mid.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/qmus2mid_qmus2mid$(ObjectSuffix) -MF$(IntermediateDirectory)/qmus2mid_qmus2mid$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/qmus2mid/qmus2mid.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/qmus2mid_qmus2mid$(ObjectSuffix) -MF$(IntermediateDirectory)/qmus2mid_qmus2mid$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/qmus2mid/qmus2mid.cpp"
 
 $(IntermediateDirectory)/qmus2mid_qmus2mid$(PreprocessSuffix): src/qmus2mid/qmus2mid.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/qmus2mid_qmus2mid$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/qmus2mid/qmus2mid.cpp"
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/qmus2mid_qmus2mid$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/qmus2mid/qmus2mid.cpp"
 
 
 -include $(IntermediateDirectory)/*$(DependSuffix)
@@ -1162,6 +1187,15 @@ clean:
 	$(RM) $(IntermediateDirectory)/src_RffArchive$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/src_RffArchive$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/src_RffArchive$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/src_WolfArchive$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/src_WolfArchive$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/src_WolfArchive$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/src_GobArchive$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/src_GobArchive$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/src_GobArchive$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/src_LfdArchive$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/src_LfdArchive$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/src_LfdArchive$(PreprocessSuffix)
 	$(RM) $(IntermediateDirectory)/src_AnimatedList$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/src_AnimatedList$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/src_AnimatedList$(PreprocessSuffix)

@@ -618,12 +618,12 @@ bool WolfArchive::openMaps(MemChunk& head, MemChunk& data) {
 		// Add map planes to entry list
 		uint32_t planeofs[3];
 		uint16_t planelen[3];
-		planeofs[0] = data[offset + 0] + (data[offset + 1]<<8) + (data[offset + 2]<<16) + (data[offset + 3]<<24);
-		planeofs[1] = data[offset + 4] + (data[offset + 5]<<8) + (data[offset + 6]<<16) + (data[offset + 7]<<24);
-		planeofs[2] = data[offset + 8] + (data[offset + 9]<<8) + (data[offset +10]<<16) + (data[offset +11]<<24);
-		planelen[0] = data[offset +12] + (data[offset +13]<<8);
-		planelen[1] = data[offset +14] + (data[offset +15]<<8);
-		planelen[2] = data[offset +16] + (data[offset +17]<<8);
+		planeofs[0] = READ_L32(data, offset);
+		planeofs[1] = READ_L32(data, offset + 4);
+		planeofs[2] = READ_L32(data, offset + 8);
+		planelen[0] = READ_L16(data, offset +12);
+		planelen[1] = READ_L16(data, offset +14);
+		planelen[2] = READ_L16(data, offset +16);
 		for (int i = 0; i < 3; ++i) {
 			name = s_fmt("PLANE%d", i);
 			nlump = new ArchiveEntry(name, planelen[i]);
@@ -699,11 +699,11 @@ bool WolfArchive::openGraph(MemChunk& head, MemChunk& data, MemChunk& dict) {
 		theSplashWindow->setProgress(((float)d / (float)num_lumps));
 
 		// Read offset info
-		uint32_t offset = head[d * 3] + (head[d * 3 + 1]<<8) + (head[d * 3 + 2]<<16);
+		uint32_t offset = READ_L24(head, (d * 3));
 
 		// Compute size from next offset
 		uint32_t size = /*((d == num_lumps - 1) ? data.getSize() - offset :*/(
-			head[(d+1) * 3] + (head[(d+1) * 3 + 1]<<8) + (head[(d+1) * 3 + 2]<<16) - offset);
+			READ_L24(head, ((d+1) * 3)) - offset);
 
 		// If the lump data goes before the end of the directory,
 		// the data file is invalid

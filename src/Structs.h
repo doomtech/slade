@@ -568,4 +568,13 @@ struct imgz_header_t {
 	uint8_t  reserved[11];
 };
 
+
+// Platform-independent macros to read values from 8-bit arrays or MemChunks
+#define READ_L16(a, i) (a[i]+(a[i+1]<<8))
+#define READ_L24(a, i) (a[i]+(a[i+1]<<8)+(a[i+2]<<16))
+#define READ_L32(a, i) (a[i]+(a[i+1]<<8)+(a[i+2]<<16)+(a[i+3]<<24))
+#define READ_B16(a, i) (a[i+1]+(a[i]<<8))
+#define READ_B24(a, i) (a[i+2]+(a[i+1]<<8)+(a[i]<<16))
+#define READ_B32(a, i) (a[i+3]+(a[i+2]<<8)+(a[i+1]<<16)+(a[i]<<24))
+
 #endif //__STRUCTS_H__

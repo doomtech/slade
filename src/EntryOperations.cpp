@@ -468,7 +468,7 @@ bool EntryOperations::modifytRNSChunk(ArchiveEntry* entry, bool value) {
 			data[a + 2] == 'N' && data[a + 3] == 'S') {
 			trns_start = a - 4;
 			trans_chunk_t* trns = (trans_chunk_t*)(data + a);
-			trns_size = 12 + data[a-1] | (data[a-2]<<8) | (data[a-3]<<16) | (data[a-4]<<24) ;
+			trns_size = 12 + READ_B32(data, a-4);
 		}
 
 		// Stop when we get to the 'IDAT' chunk

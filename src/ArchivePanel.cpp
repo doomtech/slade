@@ -979,15 +979,15 @@ bool ArchivePanel::basConvert() {
 bool ArchivePanel::palConvert() {
 	// Get the entry index of the last selected list item
 	ArchiveEntry* pal6bit = currentEntry();
-	const uint8_t * mehmeh = pal6bit->getData(true);
-	uint8_t * meh = new uint8_t[pal6bit->getSize()];
-	memcpy(meh, mehmeh, pal6bit->getSize());
+	const uint8_t * source = pal6bit->getData(true);
+	uint8_t * dest = new uint8_t[pal6bit->getSize()];
+	memcpy(dest, source, pal6bit->getSize());
 	for (size_t i = 0; i < pal6bit->getSize(); ++i)
 	{
-		meh[i] = ((meh[i] << 2) | (meh[i] >> 4));
+		dest[i] = ((dest[i] << 2) | (dest[i] >> 4));
 	}
-	pal6bit->importMem(meh, pal6bit->getSize());
-	delete[] meh;
+	pal6bit->importMem(dest, pal6bit->getSize());
+	delete[] dest;
 	return true;
 }
 
