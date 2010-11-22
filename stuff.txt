@@ -5,6 +5,12 @@
 -------------------------------------------------------------------------
 
 
+Major Changes Since Last Version ----------------------------------------
+- New 'Save Map Image' button on map preview
+- Support for more game formats: Wolf3D/SoD, Dark Forces
+- Fixed many problems with the texture editor
+
+
 TODO List ---------------------------------------------------------------
 
 --- Bugs ---

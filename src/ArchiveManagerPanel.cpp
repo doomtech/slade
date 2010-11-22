@@ -350,8 +350,8 @@ void ArchiveManagerPanel::updateRecentListItem(int index) {
 }
 
 /* ArchiveManagerPanel::isArchivePanel
- * Checks if the currently selected tab is an ArchivePanel.
- * Returns true if it is, false if not
+ * Checks if the tab at [tab_index] is an ArchivePanel. Returns true
+ * if it is, false if not
  *******************************************************************/
 bool ArchiveManagerPanel::isArchivePanel(int tab_index) {
 	// Check that tab index is in range
@@ -363,6 +363,24 @@ bool ArchiveManagerPanel::isArchivePanel(int tab_index) {
 		return true;
 	else
 		return false;
+}
+
+/* ArchiveManagerPanel::getArchive
+ * Returns the archive associated with the archive tab at [tab_index]
+ * or NULL if the index is invalid or the tab isn't an archive panel
+ *******************************************************************/
+Archive* ArchiveManagerPanel::getArchive(int tab_index) {
+	// Check the index is valid
+	if (tab_index < 0 || tab_index >= notebook_archives->GetPageCount())
+		return NULL;
+
+	// Check the specified tab is actually an archive tab
+	if (!isArchivePanel(tab_index))
+		return NULL;
+
+	// Get the archive associated with the tab
+	ArchivePanel* ap = (ArchivePanel*)notebook_archives->GetPage(tab_index);
+	return ap->getArchive();
 }
 
 /* ArchiveManagerPanel::currentTabIndex
@@ -1359,8 +1377,8 @@ void ArchiveManagerPanel::onArchiveTabChanged(wxAuiNotebookEvent& e) {
 void ArchiveManagerPanel::onArchiveTabClose(wxAuiNotebookEvent& e) {
 	if (close_archive_with_tab) {
 		tab_closing = true;
-		closeArchive(currentArchive());
-		//theArchiveManager->closeArchive(currentArchive());
+		Archive* archive = getArchive(e.GetId());
+		if (archive) closeArchive(archive);
 		tab_closing = false;
 	}
 }

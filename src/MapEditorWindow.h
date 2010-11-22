@@ -26,8 +26,10 @@ public:
 	}
 
 	void	setupLayout();
-
 	bool	openMap(Archive::mapdesc_t map);
+
+	// Events
+	void	onClose(wxCloseEvent& e);
 };
 
 // Define for less cumbersome MapEditorWindow::getInstance()

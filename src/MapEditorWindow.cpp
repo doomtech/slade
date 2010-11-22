@@ -52,6 +52,9 @@ MapEditorWindow::MapEditorWindow()
 	setupLayout();
 	Show();
 	Maximize();
+
+	// Bind events
+	Bind(wxEVT_CLOSE_WINDOW, &MapEditorWindow::onClose, this);
 }
 
 /* MapEditorWindow::~MapEditorWindow
@@ -86,4 +89,9 @@ void MapEditorWindow::setupLayout() {
 bool MapEditorWindow::openMap(Archive::mapdesc_t map) {
 	wxLogMessage("Opening map %s", chr(map.name));
 	return this->map->readMap(map);
+}
+
+void MapEditorWindow::onClose(wxCloseEvent& e) {
+	this->Show(false);
+	map->clearMap();
 }

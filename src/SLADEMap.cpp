@@ -161,7 +161,7 @@ bool SLADEMap::addThing(doomthing_t& t) {
 
 	// Setup thing properties
 	nt->prop("angle") = t.angle;
-	
+
 	// Flags
 	nt->prop("skill1") = bool(t.flags & THING_EASY);
 	nt->prop("skill2") = bool(t.flags & THING_EASY);
@@ -356,7 +356,7 @@ bool SLADEMap::addThing(hexenthing_t& t) {
 	nt->prop("arg2") = t.args[2];
 	nt->prop("arg3") = t.args[3];
 	nt->prop("arg4") = t.args[4];
-	
+
 	// Flags
 	nt->prop("skill1") = bool(t.flags & THING_EASY);
 	nt->prop("skill2") = bool(t.flags & THING_EASY);
@@ -624,6 +624,33 @@ bool SLADEMap::readUDMFMap(ArchiveEntry* map_data) {
 	return true;
 }
 
+
+void SLADEMap::clearMap() {
+	// Clear vertices
+	for (unsigned a = 0; a < vertices.size(); a++)
+		delete vertices[a];
+	vertices.clear();
+
+	// Clear sides
+	for (unsigned a = 0; a < sides.size(); a++)
+		delete sides[a];
+	sides.clear();
+
+	// Clear lines
+	for (unsigned a = 0; a < lines.size(); a++)
+		delete lines[a];
+	lines.clear();
+
+	// Clear sectors
+	for (unsigned a = 0; a < sectors.size(); a++)
+		delete sectors[a];
+	sectors.clear();
+
+	// Clear things
+	for (unsigned a = 0; a < things.size(); a++)
+		delete things[a];
+	things.clear();
+}
 
 void SLADEMap::drawVertices() {
 	rgba_t(140, 140, 255, 255, 0).set_gl();

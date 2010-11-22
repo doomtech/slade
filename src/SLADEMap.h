@@ -64,6 +64,8 @@ public:
 	void	drawVertices();
 	void	drawLines();
 
+	void	clearMap();
+
 	// Map loading
 	bool	readDoomMap(Archive::mapdesc_t map);
 	bool	readHexenMap(Archive::mapdesc_t map);
