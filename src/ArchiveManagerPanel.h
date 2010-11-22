@@ -74,6 +74,7 @@ public:
 	void			updateRecentListItem(int index);
 	void			updateBookmarkListItem(int index);
 	bool			isArchivePanel(int tab_index);
+	Archive*		getArchive(int tab_index);
 	int				currentTabIndex();
 	Archive*		currentArchive();
 	wxWindow*		currentPanel();
