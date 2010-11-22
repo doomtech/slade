@@ -39,6 +39,7 @@
 #include "EntryDataFormat.h"
 #include "TextLanguage.h"
 #include "TextStyle.h"
+#include "KeyBind.h"
 #include <wx/image.h>
 #include <wx/stdpaths.h>
 #include <wx/ffile.h>
@@ -53,7 +54,6 @@ namespace Global {
 	string error = "";
 	string version = "3.0.0";
 }
-//MainWindow*		main_window = NULL;
 string	dir_data = "";
 string	dir_user = "";
 string	dir_app = "";
@@ -291,6 +291,9 @@ bool MainApp::OnInit() {
 
 	// Init logfile
 	initLogFile();
+
+	// Init keybinds
+	KeyBind::initBinds();
 
 	wxLogMessage("Compiled with wxWidgets %i.%i.%i", wxMAJOR_VERSION, wxMINOR_VERSION, wxRELEASE_NUMBER);
 

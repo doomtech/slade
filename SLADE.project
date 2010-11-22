@@ -75,6 +75,8 @@
     </VirtualDirectory>
     <File Name="src/MIDIPlayer.h"/>
     <File Name="src/MIDIPlayer.cpp"/>
+    <File Name="src/KeyBind.cpp"/>
+    <File Name="src/KeyBind.h"/>
   </VirtualDirectory>
   <VirtualDirectory Name="Main Editor">
     <VirtualDirectory Name="UI Elements">

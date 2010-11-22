@@ -33,7 +33,10 @@ public:
 
 	// Events
 	void	onKeyDown(wxKeyEvent& e);
+	void	onMouseDown(wxMouseEvent& e);
+	void	onMouseUp(wxMouseEvent& e);
 	void	onMouseMotion(wxMouseEvent& e);
+	void	onMouseWheel(wxMouseEvent& e);
 };
 
 #endif //__MAPCANVAS_H__

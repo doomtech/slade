@@ -2,23 +2,23 @@
 /*******************************************************************
  * SLADE - It's a Doom Editor
  * Copyright (C) 2008 Simon Judd
- * 
+ *
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
  * Filename:    MapCanvas.cpp
  * Description: MapCanvas class, the OpenGL canvas widget that the
  *              2d map view is drawn on
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -52,7 +52,18 @@ MapCanvas::MapCanvas(wxWindow *parent, int id, SLADEMap* map)
 
 	// Bind Events
 	Bind(wxEVT_KEY_DOWN, &MapCanvas::onKeyDown, this);
+	Bind(wxEVT_LEFT_DOWN, &MapCanvas::onMouseDown, this);
+	Bind(wxEVT_RIGHT_DOWN, &MapCanvas::onMouseDown, this);
+	Bind(wxEVT_MIDDLE_DOWN, &MapCanvas::onMouseDown, this);
+	Bind(wxEVT_AUX1_DOWN, &MapCanvas::onMouseDown, this);
+	Bind(wxEVT_AUX2_DOWN, &MapCanvas::onMouseDown, this);
+	Bind(wxEVT_LEFT_UP, &MapCanvas::onMouseUp, this);
+	Bind(wxEVT_RIGHT_UP, &MapCanvas::onMouseUp, this);
+	Bind(wxEVT_MIDDLE_UP, &MapCanvas::onMouseUp, this);
+	Bind(wxEVT_AUX1_UP, &MapCanvas::onMouseUp, this);
+	Bind(wxEVT_AUX2_UP, &MapCanvas::onMouseUp, this);
 	Bind(wxEVT_MOTION, &MapCanvas::onMouseMotion, this);
+	Bind(wxEVT_MOUSEWHEEL, &MapCanvas::onMouseWheel, this);
 }
 
 /* MapCanvas::~MapCanvas
@@ -236,9 +247,24 @@ void MapCanvas::onKeyDown(wxKeyEvent& e) {
 	e.Skip();
 }
 
+void MapCanvas::onMouseDown(wxMouseEvent& e) {
+	e.Skip();
+}
+
+void MapCanvas::onMouseUp(wxMouseEvent& e) {
+	e.Skip();
+}
+
 void MapCanvas::onMouseMotion(wxMouseEvent& e) {
 	e.Skip();
 
 	mouse.x = translateX(e.GetPosition().x);
 	mouse.y = translateY(e.GetPosition().y);
+}
+
+void MapCanvas::onMouseWheel(wxMouseEvent& e) {
+	if (e.GetWheelRotation() > 0)
+		zoom(1.2);
+	else if (e.GetWheelRotation() < 0)
+		zoom(0.8);
 }
