@@ -232,10 +232,11 @@ bool ZipArchive::write(MemChunk& mc, bool update) {
  *******************************************************************/
 bool ZipArchive::write(string filename, bool update) {
 	// If we're overwriting the current file, rename it so that it can still be read while writing the 'new' file
-	string current = this->filename;
+	wxFileName current(this->filename);
 	if (!filename.CmpNoCase(this->filename)) {
-		current = appPath("slade-temp-write.zip", DIR_TEMP);
-		wxRenameFile(this->filename, current);
+		current.SetName(current.GetName() + "-slade-temp");
+		wxRemoveFile(current.GetFullPath());
+		wxRenameFile(this->filename, current.GetFullPath());
 	}
 
 	// Open the file
@@ -252,13 +253,10 @@ bool ZipArchive::write(string filename, bool update) {
 		return false;
 	}
 
-	// Don't announce anything while saving
-	//setMuted(true);
-
 	// Open old zip for copying, if it exists. This is used to copy any entries
 	// that have been previously saved/compressed and are unmodified, to greatly
 	// speed up zip file saving by not having to recompress unchanged entries
-	wxFFileInputStream in(current);
+	wxFFileInputStream in(current.GetFullPath());
 	wxZipInputStream inzip(in);
 
 	// Get a list of all entries in the old zip
@@ -272,8 +270,6 @@ bool ZipArchive::write(string filename, bool update) {
 
 	// Go through all entries
 	for (size_t a = 0; a < entries.size(); a++) {
-		//wxLogMessage(entries[a]->getPath(true));
-
 		if (entries[a]->getType() == EntryType::folderType()) {
 			// If the current entry is a folder, just write a directory entry and continue
 			zip.PutNextDirEntry(entries[a]->getPath(true));
@@ -306,8 +302,8 @@ bool ZipArchive::write(string filename, bool update) {
 	delete[] c_entries;
 	zip.Close();
 
-	if (this->filename.Cmp(current))
-		wxRemoveFile(current);
+	if (this->filename.Cmp(current.GetFullPath()))
+		wxRemoveFile(current.GetFullPath());
 
 	return true;
 }

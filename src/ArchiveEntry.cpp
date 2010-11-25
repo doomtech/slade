@@ -80,6 +80,10 @@ ArchiveEntry::ArchiveEntry(ArchiveEntry& copy) {
 	// Copy extra properties
 	copy.exProps().copyTo(ex_props);
 
+	// Clear properties that shouldn't be copied
+	ex_props.removeProperty("ZipIndex");
+	ex_props.removeProperty("Offset");
+
 	// Set entry state
 	state = 2;
 	state_locked = false;
