@@ -224,6 +224,7 @@ void EntryDataFormat::initBuiltinFormats() {
 	new RffDataFormat();
 	new GobDataFormat();
 	new LfdDataFormat();
+	new HogDataFormat();
 	new Wad2DataFormat();
 	new WadJDataFormat();
 	new WolfDataFormat();
@@ -232,6 +233,7 @@ void EntryDataFormat::initBuiltinFormats() {
 	new XMIDataFormat();
 	new HMIDataFormat();
 	new HMPDataFormat();
+	new GMIDDataFormat();
 	new ITModuleDataFormat();
 	new XMModuleDataFormat();
 	new S3MModuleDataFormat();

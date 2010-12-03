@@ -8,6 +8,7 @@
 #include "RffArchive.h"
 #include "GobArchive.h"
 #include "LfdArchive.h"
+#include "HogArchive.h"
 #include "Wad2Archive.h"
 #include "WadJArchive.h"
 #include "WolfArchive.h"

@@ -497,3 +497,34 @@ bool Conversions::bloodToWav(ArchiveEntry * in, MemChunk& out) {
 
 	return true;
 }
+
+/* Conversions::gmidToMidi
+ * Dark Forces GMID file to Standard MIDI File
+ *******************************************************************/
+bool Conversions::gmidToMidi(MemChunk& in, MemChunk& out) {
+	// Skip beginning of file and look for MThd chunk
+	// (the standard MIDI header)
+	size_t size = in.getSize();
+	if (size < 16)
+		return false;
+	if (in[0] != 'M' && in[1] != 'I' && in[2] != 'D' && in[3] != 'I' &&
+		((READ_B32(in, 4) + 8) != size))
+		return false;
+
+	size_t offset = 8;
+	bool notfound = true;
+	while (notfound) {
+		if (offset + 8 >  size)
+			return false;
+		// Look for header
+		if (in[offset] == 'M' && in[offset+1] == 'T' && in[offset+2] == 'h' && in[offset+3] == 'd')
+			notfound = false;
+		else
+			offset += (READ_B32(in, offset+4) + 8);
+	}
+
+	// Write the rest of the file
+	out.write(in.getData() + offset, size - offset);
+
+	return true;
+}

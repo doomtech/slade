@@ -133,6 +133,24 @@ public:
 	}
 };
 
+class GMIDDataFormat : public EntryDataFormat {
+public:
+	GMIDDataFormat() : EntryDataFormat("gmid") {};
+	~GMIDDataFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		// Check size
+		if (mc.getSize() > 8) {
+			// Check for GMID header: MIDI followed by BE data size
+			if (mc[0] == 'M' && mc[1] == 'I' && mc[2] == 'D' && mc[3] == 'I' &&
+				((READ_B32(mc, 4) + 8) == mc.getSize()))
+				return EDF_TRUE;
+		}
+
+		return EDF_FALSE;
+	}
+};
+
 class ITModuleDataFormat : public EntryDataFormat {
 public:
 	ITModuleDataFormat() : EntryDataFormat("mod_it") {};
@@ -201,10 +219,10 @@ public:
 			// Check format
 			if (mc[950] >= 1 && mc[950] <= 128 && (mc[951] & 127) == 127) {
 				if ((mc[1080] == 'M' && mc[1081] == '.' && mc[1082] == 'K' && mc[1083] == '.') ||
-						(mc[1080] == 'M' && mc[1081] == '!' && mc[1082] == 'K' && mc[1083] == '!') ||
-						(mc[1080] == 'F' && mc[1081] == 'L' && mc[1082] == 'T' && mc[1083] == '4') ||
-						(mc[1080] == 'F' && mc[1081] == 'L' && mc[1082] == 'T' && mc[1083] == '8') ||
-						(mc[1081] == 'C' && mc[1082] == 'H' && mc[1083] == 'N')) {
+					(mc[1080] == 'M' && mc[1081] == '!' && mc[1082] == 'K' && mc[1083] == '!') ||
+					(mc[1080] == 'F' && mc[1081] == 'L' && mc[1082] == 'T' && mc[1083] == '4') ||
+					(mc[1080] == 'F' && mc[1081] == 'L' && mc[1082] == 'T' && mc[1083] == '8') ||
+									   (mc[1081] == 'C' && mc[1082] == 'H' && mc[1083] == 'N')) {
 					return EDF_TRUE;
 				}
 			}

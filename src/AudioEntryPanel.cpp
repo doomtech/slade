@@ -161,15 +161,21 @@ bool AudioEntryPanel::loadEntry(ArchiveEntry* entry) {
 		Conversions::musToMidi(mcdata, convdata);
 		path.SetExt("mid");
 		convdata.exportFile(path.GetFullPath());
-	}
-	else
+	} else if (entry->getType()->getFormat() == "gmid") {
+		// GMID -> MIDI
+		MemChunk convdata;
+		Conversions::gmidToMidi(mcdata, convdata);
+		path.SetExt("mid");
+		convdata.exportFile(path.GetFullPath());
+	} else
 		mcdata.exportFile(path.GetFullPath());
 
 	// Reset seek slider
 	slider_seek->SetValue(0);
 
 	// Open it
-	if (entry->getType()->getFormat() == "midi" || entry->getType()->getFormat() == "mus") {
+	if (entry->getType()->getFormat() == "midi" || entry->getType()->getFormat() == "mus" ||
+		entry->getType()->getFormat() == "gmid") {
 		openMidi(path.GetFullPath());
 		midi = true;
 	} else {

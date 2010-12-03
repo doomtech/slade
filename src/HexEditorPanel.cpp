@@ -392,7 +392,7 @@ void HexEditorPanel::onCellSelected(wxGridEvent& e) {
 		vbyte = table_hex->getByteValue(offset);
 
 		label_byte->SetLabel(s_fmt("Signed Byte: %d", vbyte));
-		label_ubyte->SetLabel(s_fmt("Unsigned Byte: %d", vubyte));
+		label_ubyte->SetLabel(s_fmt("Unsigned Byte: %u", vubyte));
 		if (vubyte <= 128)
 			label_ascii->SetLabel(s_fmt("ASCII: %s", chr(CodePages::fromASCII(vubyte))));
 
@@ -402,9 +402,9 @@ void HexEditorPanel::onCellSelected(wxGridEvent& e) {
 			vushort = table_hex->getUShortValue(offset);
 
 			label_short_le->SetLabel(s_fmt("Signed Short: %d", wxINT16_SWAP_ON_BE(vshort)));
-			label_ushort_le->SetLabel(s_fmt("Unsigned Short: %d", wxUINT16_SWAP_ON_BE(vushort)));
+			label_ushort_le->SetLabel(s_fmt("Unsigned Short: %u", wxUINT16_SWAP_ON_BE(vushort)));
 			label_short_be->SetLabel(s_fmt("Signed Short: %d", wxINT16_SWAP_ON_LE(vshort)));
-			label_ushort_be->SetLabel(s_fmt("Unsigned Short: %d", wxUINT16_SWAP_ON_LE(vushort)));
+			label_ushort_be->SetLabel(s_fmt("Unsigned Short: %u", wxUINT16_SWAP_ON_LE(vushort)));
 
 			if (size > 3) {
 				// 4-byte values
@@ -413,9 +413,9 @@ void HexEditorPanel::onCellSelected(wxGridEvent& e) {
 				vfloat = table_hex->getFloatValue(offset);
 
 				label_int32_le->SetLabel(s_fmt("Signed Int (32bit): %d", wxINT32_SWAP_ON_BE(vint32)));
-				label_uint32_le->SetLabel(s_fmt("Unsigned Int (32bit): %d", wxUINT32_SWAP_ON_BE(vuint32)));
+				label_uint32_le->SetLabel(s_fmt("Unsigned Int (32bit): %u", wxUINT32_SWAP_ON_BE(vuint32)));
 				label_int32_be->SetLabel(s_fmt("Signed Int (32bit): %d", wxINT32_SWAP_ON_LE(vint32)));
-				label_uint32_be->SetLabel(s_fmt("Unsigned Int (32bit): %d", wxUINT32_SWAP_ON_LE(vuint32)));
+				label_uint32_be->SetLabel(s_fmt("Unsigned Int (32bit): %u", wxUINT32_SWAP_ON_LE(vuint32)));
 
 				if (size > 7) {
 					// 8-byte values
@@ -424,9 +424,9 @@ void HexEditorPanel::onCellSelected(wxGridEvent& e) {
 					vdouble = table_hex->getDoubleValue(offset);
 
 					//label_int64_le->SetLabel(s_fmt("Signed Int (64bit): %d", wxINT64_SWAP_ON_BE(vint64)));
-					//label_uint64_le->SetLabel(s_fmt("Unsigned Int (64bit): %d", wxUINT64_SWAP_ON_BE(vuint64)));
+					//label_uint64_le->SetLabel(s_fmt("Unsigned Int (64bit): %u", wxUINT64_SWAP_ON_BE(vuint64)));
 					//label_int64_be->SetLabel(s_fmt("Signed Int (64bit): %d", wxINT64_SWAP_ON_LE(vint64)));
-					//label_uint64_be->SetLabel(s_fmt("Unsigned Int (64bit): %d", wxUINT64_SWAP_ON_LE(vuint64)));
+					//label_uint64_be->SetLabel(s_fmt("Unsigned Int (64bit): %u", wxUINT64_SWAP_ON_LE(vuint64)));
 				}
 			}
 		}

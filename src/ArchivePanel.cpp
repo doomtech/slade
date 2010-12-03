@@ -1063,11 +1063,11 @@ bool ArchivePanel::musMidiConvert() {
 
 	// Go through selection
 	for (unsigned a = 0; a < selection.size(); a++) {
-		// Convert MUS -> MIDI if the entry is Doom Sound format
+		// Convert MUS -> MIDI if the entry is Doom MUS format
 		if (selection[a]->getType()->getFormat() == "mus") {
 			MemChunk midi;
 			Conversions::musToMidi(selection[a]->getMCData(), midi);	// Convert
-			selection[a]->importMemChunk(midi);							// Load wav data
+			selection[a]->importMemChunk(midi);							// Load midi data
 			EntryType::detectEntryType(selection[a]);					// Update entry type
 			selection[a]->setExtensionByType();							// Update extension if necessary
 		}

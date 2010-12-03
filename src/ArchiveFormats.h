@@ -122,6 +122,16 @@ public:
 	}
 };
 
+class HogDataFormat : public EntryDataFormat {
+public:
+	HogDataFormat() : EntryDataFormat("archive_hog") {};
+	~HogDataFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		return HogArchive::isHogArchive(mc) ? EDF_TRUE : EDF_FALSE;
+	}
+};
+
 class WolfDataFormat : public EntryDataFormat {
 public:
 	WolfDataFormat() : EntryDataFormat("archive_wolf") {};

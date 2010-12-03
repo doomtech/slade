@@ -186,6 +186,8 @@ Archive* ArchiveManager::openArchive(string filename, bool manage) {
 		new_archive = new GobArchive();
 	else if (LfdArchive::isLfdArchive(filename))
 		new_archive = new LfdArchive();
+	else if (HogArchive::isHogArchive(filename))
+		new_archive = new HogArchive();
 	else if (Wad2Archive::isWad2Archive(filename))
 		new_archive = new Wad2Archive();
 	else if (WadJArchive::isWadJArchive(filename))
@@ -269,6 +271,8 @@ Archive* ArchiveManager::openArchive(ArchiveEntry* entry, bool manage) {
 		new_archive = new GobArchive();
 	else if (LfdArchive::isLfdArchive(entry->getMCData()))
 		new_archive = new LfdArchive();
+	else if (HogArchive::isHogArchive(entry->getMCData()))
+		new_archive = new HogArchive();
 	else if (Wad2Archive::isWad2Archive(entry->getMCData()))
 		new_archive = new Wad2Archive();
 	else if (WadJArchive::isWadJArchive(entry->getMCData()))
@@ -353,6 +357,14 @@ Archive* ArchiveManager::newArchive(uint8_t type) {
 		case ARCHIVE_GOB:
 			new_archive = new GrpArchive();
 			format_str = "gob";
+			break;
+		case ARCHIVE_LFD:
+			new_archive = new LfdArchive();
+			format_str = "lfd";
+			break;
+		case ARCHIVE_HOG:
+			new_archive = new HogArchive();
+			format_str = "hog";
 			break;
 		case ARCHIVE_RFF:
 			new_archive = new RffArchive();
@@ -490,6 +502,7 @@ string ArchiveManager::getArchiveExtensionsString() {
 	string ext_pak = "*.pak;*.PAK;*.Pak";						extensions += ext_pak + ";";
 	string ext_gob = "*.gob;*.GOB;*.Gob";						extensions += ext_gob + ";";
 	string ext_lfd = "*.lfd;*.LFD;*.Lfd";						extensions += ext_lfd + ";";
+	string ext_hog = "*.hob;*.HOG;*.Hog";						extensions += ext_hog + ";";
 	string ext_grp = "*.grp;*.GRP;*.Grp;*.prg;*.PRG;*.Prg";		extensions += ext_grp + ";";
 	string ext_rff = "*.rff;*.RFF;*.Rff";						extensions += ext_rff + ";";
 	string ext_wolf =	"vswap.*;VSWAP.*Vswap.*;"
@@ -513,6 +526,7 @@ string ArchiveManager::getArchiveExtensionsString() {
 	extensions += s_fmt("|Build Grp files (*.grp)|%s",			chr(ext_grp));
 	extensions += s_fmt("|Dark Forces Gob files (*.gob)|%s",	chr(ext_gob));
 	extensions += s_fmt("|Dark Forces Lfd files (*.lfd)|%s",	chr(ext_lfd));
+	extensions += s_fmt("|Descent Hog files (*.hog)|%s",		chr(ext_hog));
 	extensions += s_fmt("|Blood Rff files (*.rff)|%s",			chr(ext_rff));
 	extensions += s_fmt("|Wolfenstein 3D files|%s",				chr(ext_wolf));
 

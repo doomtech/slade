@@ -62,6 +62,8 @@ enum ArchiveTypes {
 	ARCHIVE_LFD,
 	ARCHIVE_HOG,
 	ARCHIVE_HOG2,
+	ARCHIVE_PIG,
+	ARCHIVE_MVL,
 };
 
 // Define map types
