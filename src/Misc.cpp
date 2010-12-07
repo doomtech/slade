@@ -127,6 +127,8 @@ bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry, int index) {
 		return image->loadHeretic2M8(entry->getData(), entry->getSize(), index);
 	else if (s_cmpnocase(format, "img_m32"))
 		return image->loadHeretic2M32(entry->getData(), entry->getSize(), index);
+	else if (s_cmpnocase(format, "img_hlt"))
+		return image->loadHalfLifeTex(entry->getData(), entry->getSize(), index);
 	else if (s_cmpnocase(format, "img_jedi_bm"))
 		return image->loadJediBM(entry->getData(), entry->getSize(), index);
 	else if (s_cmpnocase(format, "img_jedi_fme"))

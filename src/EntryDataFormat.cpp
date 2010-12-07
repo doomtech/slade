@@ -198,6 +198,7 @@ void EntryDataFormat::initBuiltinFormats() {
 	new BuildTileFormat();
 	new Heretic2M8Format();
 	new Heretic2M32Format();
+	new HalfLifeTextureFormat();
 	new IMGZDataFormat();
 	new QuakeGfxDataFormat();
 	new RottGfxDataFormat();

@@ -676,6 +676,40 @@ public:
 	}
 };
 
+class HalfLifeTextureFormat: public EntryDataFormat {
+public:
+	HalfLifeTextureFormat() : EntryDataFormat("img_hlt") {};
+	~HalfLifeTextureFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		size_t size = mc.getSize();
+		if (size < 812)
+			return EDF_FALSE;
+		size_t width = READ_L32(mc, 16);
+		size_t height = READ_L32(mc, 20);
+		for (int m = 0; m < 4; ++m) {
+			size_t offset = READ_L32(mc, (24+(m<<2)));
+			if (width>>m == 0 && height>>m == 0 && offset == 0)
+				break;
+			else if ((width>>m == 0 && (height>>m|offset) != 0) ||
+				(height>>m == 0 && (width>>m|offset) != 0) ||
+				(offset == 0 && (width>>m|height>>m) != 0))
+				return EDF_FALSE;
+			else if (offset + (width>>m * height>>m) > size)
+				return EDF_FALSE;
+		}
+		width>>=3;
+		height>>=3;
+		size_t offset = READ_L32(mc, 36) + (width*height);
+		if (size < offset + 5)
+			return EDF_FALSE;
+		size_t palsize = READ_L16(mc, offset);
+		if (size < offset + 2 + (3*palsize))
+			return EDF_FALSE;
+		return EDF_TRUE;
+	}
+};
+
 class RottGfxDataFormat : public EntryDataFormat {
 public:
 	RottGfxDataFormat() : EntryDataFormat("img_rott") {};

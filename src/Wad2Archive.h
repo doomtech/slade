@@ -18,6 +18,7 @@ typedef struct
 
 class Wad2Archive : public TreelessArchive {
 private:
+	bool	wad3;
 
 public:
 	Wad2Archive();

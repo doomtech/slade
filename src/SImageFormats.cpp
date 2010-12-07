@@ -1625,6 +1625,67 @@ bool SImage::loadHeretic2M32(const uint8_t* gfx_data, int size, int index) {
 	return true;
 }
 
+
+/* SImage::loadHalfLifeTex
+ * Loads a Half-Life mipmapped paletted image.
+ * Returns false if the image data was invalid, true otherwise.
+ *******************************************************************/
+bool SImage::loadHalfLifeTex(const uint8_t* gfx_data, int size, int index) {
+	if (size < 812)
+		return false;
+
+	numimages = 4;
+	has_palette = true;
+	format = PALMASK;
+
+	// Sanitize index if needed
+	index %= numimages;
+	if (index < 0)
+		index = numimages + index;
+		
+
+	// Setup variables
+	imgindex = index;
+	width = READ_L32(gfx_data, 16) >> index;
+	height = READ_L32(gfx_data, 20) >> index;
+	size_t data_offset = READ_L32(gfx_data, 24+(index<<2));
+	if (!width || !height || ! data_offset || size < (int)data_offset + (width*height)) {
+		Global::error = "HLT file: invalid data for mip level";
+		return false;
+	}
+
+	// Let's build the palette now.
+	size_t pal_offset = READ_L32(gfx_data, 36) + ((READ_L32(gfx_data, 16) >> 3) * (READ_L32(gfx_data, 20) >> 3));
+	if (size < (int)pal_offset + 5) {
+		Global::error = "HLT file: invalid palette offset";
+		return false;
+	}
+	size_t palsize = READ_L16(gfx_data, pal_offset);
+	if (palsize == 0 || palsize > 256 || size < (int)(pal_offset + 2 + (palsize*3))) {
+		wxLogMessage("palsize %d, paloffset %d, entry size %d", palsize, pal_offset, size);
+		Global::error = "HLT file: invalid palette size";
+		return false;
+	}
+	for (size_t c = 0; c < palsize; ++c) {
+		rgba_t color;
+		color.r = gfx_data[(c*3)+pal_offset+2];
+		color.g = gfx_data[(c*3)+pal_offset+3];
+		color.b = gfx_data[(c*3)+pal_offset+4];
+		palette.setColour(c, color);
+	}
+
+	// Create data
+	clearData();
+	data = new uint8_t[width*height];
+
+	// Fill data with pixel data
+	memcpy(data, gfx_data + data_offset, width * height);
+
+	// Announce change and return success
+	announce("image_changed");
+	return true;
+}
+
 /* SImage::loadRottGfx
  * Loads a Rise of the Triad Gfx format image, using the image palette.
  * This format, descibed in hacker.txt from the ROTT source code pack,
