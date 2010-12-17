@@ -52,6 +52,12 @@ bool tab_closing = false;	// Hacky workaround to prevent crash on closing a tab 
 
 
 /*******************************************************************
+ * EXTERNAL VARIABLES
+ *******************************************************************/
+EXTERN_CVAR(String, dir_last)
+
+
+/*******************************************************************
  * WMFILEBROWSER CLASS FUNCTIONS
  *******************************************************************/
 
@@ -687,7 +693,7 @@ void ArchiveManagerPanel::saveAll() {
 
 			// Popup file save dialog
 			string formats = archive->getFileExtensionString();
-			string filename = wxFileSelector("Save Archive " + archive->getFilename(false) + " As", "", "", wxEmptyString, formats, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+			string filename = wxFileSelector("Save Archive " + archive->getFilename(false) + " As", dir_last, "", wxEmptyString, formats, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 
 			// Check a filename was selected
 			if (!filename.empty()) {
@@ -696,6 +702,10 @@ void ArchiveManagerPanel::saveAll() {
 					// If there was an error pop up a message box
 					wxMessageBox(s_fmt("Error: %s", Global::error.c_str()), "Error", wxICON_ERROR);
 				}
+
+				// Save 'dir_last'
+				wxFileName fn(filename);
+				dir_last = fn.GetPath(true);
 			}
 		}
 	}
@@ -765,7 +775,7 @@ bool ArchiveManagerPanel::saveArchiveAs(Archive* archive) {
 
 	// Popup file save dialog
 	string formats = archive->getFileExtensionString();
-	string filename = wxFileSelector("Save Archive " + archive->getFilename(false) + " As", "", "", wxEmptyString, formats, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+	string filename = wxFileSelector("Save Archive " + archive->getFilename(false) + " As", dir_last, "", wxEmptyString, formats, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 
 	// Check a filename was selected
 	if (!filename.empty()) {
@@ -775,6 +785,10 @@ bool ArchiveManagerPanel::saveArchiveAs(Archive* archive) {
 			wxMessageBox(s_fmt("Error: %s", Global::error.c_str()), "Error", wxICON_ERROR);
 			return false;
 		}
+
+		// Save 'dir_last'
+		wxFileName fn(filename);
+		dir_last = fn.GetPath(true);
 	}
 
 	return true;
@@ -1093,7 +1107,7 @@ void ArchiveManagerPanel::handleAction(int menu_id) {
 
 		// Open a file browser dialog that allows multiple selection
 		// and filters by wad, zip and pk3 file extensions
-		wxFileDialog dialog_open(this, "Choose file(s) to open", wxEmptyString, wxEmptyString, extensions, wxFD_OPEN|wxFD_MULTIPLE|wxFD_FILE_MUST_EXIST, wxDefaultPosition);
+		wxFileDialog dialog_open(this, "Choose file(s) to open", dir_last, wxEmptyString, extensions, wxFD_OPEN|wxFD_MULTIPLE|wxFD_FILE_MUST_EXIST, wxDefaultPosition);
 
 		// Run the dialog & check that the user didn't cancel
 		if (dialog_open.ShowModal() == wxID_OK) {
@@ -1107,6 +1121,9 @@ void ArchiveManagerPanel::handleAction(int menu_id) {
 			openFiles(files);
 
 			wxEndBusyCursor();
+
+			// Save 'dir_last'
+			dir_last = dialog_open.GetDirectory();
 		}
 	}
 

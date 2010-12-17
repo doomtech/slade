@@ -82,6 +82,12 @@ const int MENU_TEMP_END = 10100;
 
 
 /*******************************************************************
+ * EXTERNAL VARIABLES
+ *******************************************************************/
+EXTERN_CVAR(String, dir_last)
+
+
+/*******************************************************************
  * ARCHIVEPANEL CLASS FUNCTIONS
  *******************************************************************/
 
@@ -261,7 +267,7 @@ bool ArchivePanel::saveAs() {
 
 	// Setup file filters (temporary, should go through all archive types somehow)
 	string formats = archive->getFileExtensionString();
-	string filename = wxFileSelector("Save Archive " + archive->getFilename(false) + " As", "", "", wxEmptyString, formats, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+	string filename = wxFileSelector("Save Archive " + archive->getFilename(false) + " As", dir_last, "", wxEmptyString, formats, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 
 	// Check a filename was selected
 	if (!filename.empty()) {
@@ -271,6 +277,10 @@ bool ArchivePanel::saveAs() {
 			wxMessageBox(s_fmt("Error:\n%s", Global::error.c_str()), "Error", wxICON_ERROR);
 			return false;
 		}
+
+		// Save 'dir_last'
+		wxFileName fn(filename);
+		dir_last = fn.GetPath(true);
 	}
 
 	// Refresh entry list
@@ -352,7 +362,7 @@ bool ArchivePanel::newDirectory() {
  *******************************************************************/
 bool ArchivePanel::importFiles() {
 	// Create open file dialog
-	wxFileDialog dialog_open(this, "Choose files to import", wxEmptyString, wxEmptyString,
+	wxFileDialog dialog_open(this, "Choose files to import", dir_last, wxEmptyString,
 			"Any File (*.*)|*.*", wxFD_OPEN|wxFD_MULTIPLE|wxFD_FILE_MUST_EXIST, wxDefaultPosition);
 
 	// Run the dialog & check that the user didn't cancel
@@ -396,6 +406,9 @@ bool ArchivePanel::importFiles() {
 		}
 		theSplashWindow->hide();
 		entry_list->Show(true);
+
+		// Save 'dir_last'
+		dir_last = dialog_open.GetDirectory();
 
 		return ok;
 	}
@@ -648,13 +661,13 @@ bool ArchivePanel::importEntry() {
 	// Go through the list
 	for (size_t a = 0; a < selection.size(); a++) {
 		// Create open file dialog
-		wxFileDialog *dialog_open = new wxFileDialog(this, s_fmt("Import Entry \"%s\"", selection[a]->getName().c_str()),
-											wxEmptyString, wxEmptyString, "Any File (*.*)|*.*", wxFD_OPEN | wxFD_FILE_MUST_EXIST, wxDefaultPosition);
+		wxFileDialog dialog_open(this, s_fmt("Import Entry \"%s\"", selection[a]->getName().c_str()),
+									dir_last, wxEmptyString, "Any File (*.*)|*.*", wxFD_OPEN | wxFD_FILE_MUST_EXIST, wxDefaultPosition);
 
 		// Run the dialog & check that the user didn't cancel
-		if (dialog_open->ShowModal() == wxID_OK) {
+		if (dialog_open.ShowModal() == wxID_OK) {
 			// If a file was selected, import it
-			selection[a]->importFile(dialog_open->GetPath());
+			selection[a]->importFile(dialog_open.GetPath());
 
 			// Re-detect entry type
 			EntryType::detectEntryType(selection[a]);
@@ -665,6 +678,9 @@ bool ArchivePanel::importEntry() {
 			// If the entry is currently open, refresh the entry panel
 			if (cur_area->getEntry() == selection[a])
 				openEntry(selection[a], true);
+
+			// Save 'dir_last'
+			dir_last = dialog_open.GetDirectory();
 		}
 	}
 
@@ -689,15 +705,17 @@ bool ArchivePanel::exportEntry() {
 		if (fn.GetExt().Len() == 0) fn.SetExt(selection[0]->getType()->getExtension());
 
 		// Create save file dialog
-		wxFileDialog *dialog_save = new wxFileDialog(this, s_fmt("Export Entry \"%s\"", selection[0]->getName().c_str()),
-											wxEmptyString, fn.GetFullName(), "Any File (*.*)|*.*", wxFD_SAVE | wxFD_OVERWRITE_PROMPT, wxDefaultPosition);
+		wxFileDialog dialog_save(this, s_fmt("Export Entry \"%s\"", selection[0]->getName().c_str()),
+									dir_last, fn.GetFullName(), "Any File (*.*)|*.*", wxFD_SAVE | wxFD_OVERWRITE_PROMPT, wxDefaultPosition);
 
 		// Run the dialog & check that the user didn't cancel
-		if (dialog_save->ShowModal() == wxID_OK) {
+		if (dialog_save.ShowModal() == wxID_OK) {
 			// If a filename was selected, export it
-			selection[0]->exportFile(dialog_save->GetPath());
+			selection[0]->exportFile(dialog_save.GetPath());
 		}
-		delete dialog_save;
+
+		// Save 'dir_last'
+		dir_last = dialog_save.GetDirectory();
 
 		return true;
 	}
@@ -718,6 +736,9 @@ bool ArchivePanel::exportEntry() {
 
 				// Do export
 				selection[a]->exportFile(fn.GetFullPath());
+
+				// Save 'dir_last'
+				dir_last = dd.GetPath();
 			}
 		}
 	}
@@ -865,16 +886,19 @@ bool ArchivePanel::gfxExportPNG() {
 		fn.SetExt("png");
 
 		// Create save file dialog
-		wxFileDialog *dialog_save = new wxFileDialog(this, s_fmt("Export Entry \"%s\"", selection[0]->getName().c_str()),
-											wxEmptyString, fn.GetFullName(), "PNG Files (*.png)|*.png", wxFD_SAVE | wxFD_OVERWRITE_PROMPT, wxDefaultPosition);
+		wxFileDialog dialog_save(this, s_fmt("Export Entry \"%s\"", selection[0]->getName().c_str()),
+									dir_last, fn.GetFullName(), "PNG Files (*.png)|*.png", wxFD_SAVE | wxFD_OVERWRITE_PROMPT, wxDefaultPosition);
 
 		// Run the dialog & check that the user didn't cancel
-		if (dialog_save->ShowModal() == wxID_OK) {
+		if (dialog_save.ShowModal() == wxID_OK) {
 			// If a filename was selected, export it
-			if (!EntryOperations::exportAsPNG(selection[0], dialog_save->GetPath())) {
+			if (!EntryOperations::exportAsPNG(selection[0], dialog_save.GetPath())) {
 				wxMessageBox(s_fmt("Error: %s", chr(Global::error)), "Error", wxOK|wxICON_ERROR);
 				return false;
 			}
+
+			// Save 'dir_last'
+			dir_last = dialog_save.GetDirectory();
 		}
 
 		return true;
@@ -893,6 +917,9 @@ bool ArchivePanel::gfxExportPNG() {
 
 				// Do export
 				EntryOperations::exportAsPNG(selection[a], fn.GetFullPath());
+
+				// Save 'dir_last'
+				dir_last = dd.GetPath();
 			}
 		}
 	}

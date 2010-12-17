@@ -38,6 +38,7 @@
  * EXTERNAL VARIABLES
  *******************************************************************/
 EXTERN_CVAR(Int, base_resource)
+EXTERN_CVAR(String, dir_last)
 
 
 /*******************************************************************
@@ -110,7 +111,7 @@ void BaseResourceArchivesPanel::onBtnAdd(wxCommandEvent& e) {
 	string extensions = theArchiveManager->getArchiveExtensionsString();
 
 	// Open a file browser dialog that allows multiple selection
-	wxFileDialog dialog_open(this, "Choose file(s) to open", wxEmptyString, wxEmptyString, extensions, wxFD_OPEN|wxFD_MULTIPLE|wxFD_FILE_MUST_EXIST, wxDefaultPosition);
+	wxFileDialog dialog_open(this, "Choose file(s) to open", dir_last, wxEmptyString, extensions, wxFD_OPEN|wxFD_MULTIPLE|wxFD_FILE_MUST_EXIST, wxDefaultPosition);
 
 	// Run the dialog & check that the user didn't cancel
 	if (dialog_open.ShowModal() == wxID_OK) {
@@ -123,6 +124,9 @@ void BaseResourceArchivesPanel::onBtnAdd(wxCommandEvent& e) {
 			theArchiveManager->addBaseResourcePath(files[a]);
 			list_base_archive_paths->Append(files);
 		}
+
+		// Save 'dir_last'
+		dir_last = dialog_open.GetDirectory();
 	}
 }
 

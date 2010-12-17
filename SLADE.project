@@ -114,9 +114,9 @@
         <File Name="src/TextureXEditor.h"/>
         <File Name="src/TextureXPanel.cpp"/>
         <File Name="src/TextureXPanel.h"/>
-        <File Name="src/PatchBrowser.cpp"/>
         <File Name="src/PatchBrowser.h"/>
         <File Name="src/TextureEditorPanel.cpp"/>
+        <File Name="src/PatchBrowser.cpp"/>
       </VirtualDirectory>
       <File Name="src/ArchivePanel.cpp"/>
       <File Name="src/ArchivePanel.h"/>
@@ -204,6 +204,8 @@
       <File Name="src/LfdArchive.cpp"/>
       <File Name="src/LfdArchive.h"/>
       <File Name="src/Archives.h"/>
+      <File Name="src/HogArchive.cpp"/>
+      <File Name="src/HogArchive.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Binary Control Lumps">
       <File Name="src/AnimatedList.cpp"/>

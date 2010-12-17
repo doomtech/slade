@@ -127,8 +127,6 @@ void MainWindow::setupLayout() {
 	// Setup panel info & add panel
 	p_inf.DefaultPane();
 	p_inf.Left();
-	p_inf.BottomDockable(false);
-	p_inf.TopDockable(false);
 	p_inf.BestSize(192, 480);
 	p_inf.Caption("Archive Manager");
 	p_inf.Name("archive_manager");
@@ -262,10 +260,10 @@ void MainWindow::setupLayout() {
 	tb_pal->Realize();
 
 	// Setup panel info & add toolbar panels
-	m_mgr->AddPane(tb_file, wxAuiPaneInfo().ToolbarPane().Top().Name("tb_file"));				// File toolbar
-	m_mgr->AddPane(tb_entry, wxAuiPaneInfo().ToolbarPane().Top().Name("tb_entry").Position(1));	// Entry toolbar
-	m_mgr->AddPane(tb_bra, wxAuiPaneInfo().ToolbarPane().Top().Name("tb_bra").Position(2));		// Base Resource Archive toolbar
-	m_mgr->AddPane(tb_pal, wxAuiPaneInfo().ToolbarPane().Top().Name("tb_pal").Position(3));		// Palette toolbar
+	m_mgr->AddPane(tb_file, wxAuiPaneInfo().ToolbarPane().Top().Name("tb_file").CloseButton(false));				// File toolbar
+	m_mgr->AddPane(tb_entry, wxAuiPaneInfo().ToolbarPane().Top().Name("tb_entry").Position(1).CloseButton(false));	// Entry toolbar
+	m_mgr->AddPane(tb_bra, wxAuiPaneInfo().ToolbarPane().Top().Name("tb_bra").Position(2).CloseButton(false));		// Base Resource Archive toolbar
+	m_mgr->AddPane(tb_pal, wxAuiPaneInfo().ToolbarPane().Top().Name("tb_pal").Position(3).CloseButton(false));		// Palette toolbar
 
 
 	// -- Status Bar --

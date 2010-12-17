@@ -37,6 +37,12 @@
 
 
 /*******************************************************************
+ * EXTERNAL VARIABLES
+ *******************************************************************/
+EXTERN_CVAR(String, dir_last)
+
+
+/*******************************************************************
  * TEXTUREXLISTVIEW CLASS FUNCTIONS
  *******************************************************************/
 
@@ -396,7 +402,7 @@ void TextureXPanel::onBtnNewTextureFromFile(wxCommandEvent& e) {
 	}
 
 	// Create open file dialog
-	wxFileDialog dialog_open(this, "Choose file(s) to open", wxEmptyString, wxEmptyString,
+	wxFileDialog dialog_open(this, "Choose file(s) to open", dir_last, wxEmptyString,
 			ext_filter, wxFD_OPEN|wxFD_MULTIPLE|wxFD_FILE_MUST_EXIST, wxDefaultPosition);
 
 	// Run the dialog & check that the user didn't cancel
@@ -404,6 +410,9 @@ void TextureXPanel::onBtnNewTextureFromFile(wxCommandEvent& e) {
 		// Get file selection
 		wxArrayString files;
 		dialog_open.GetPaths(files);
+
+		// Save 'dir_last'
+		dir_last = dialog_open.GetDirectory();
 
 		// Go through file selection
 		for (unsigned a = 0; a < files.size(); a++) {

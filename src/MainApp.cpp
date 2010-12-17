@@ -58,7 +58,8 @@ string	dir_data = "";
 string	dir_user = "";
 string	dir_app = "";
 MainApp* MainApp::instance = NULL;
-CVAR(Bool, temp_use_appdir, false, CVAR_SAVE);
+CVAR(Bool, temp_use_appdir, false, CVAR_SAVE)
+CVAR(String, dir_last, "", CVAR_SAVE)
 
 
 /*******************************************************************

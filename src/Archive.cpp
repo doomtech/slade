@@ -263,17 +263,15 @@ bool ArchiveTreeNode::swapEntries(unsigned index1, unsigned index2) {
 	ArchiveEntry* entry1 = entries[index1];
 	ArchiveEntry* entry2 = entries[index2];
 
-	// Swap links
-	ArchiveEntry* e1prev = entry1->prev;
-	ArchiveEntry* e1next = entry1->next;
-	entry1->prev = entry2->prev;
-	entry1->next = entry2->next;
-	entry2->prev = e1prev;
-	entry2->next = e1next;
-
 	// Swap entries
 	entries[index1] = entry2;
 	entries[index2] = entry1;
+
+	// Update links
+	entries[index1]->prev = getEntry(index1-1);
+	entries[index1]->next = getEntry(index1+1);
+	entries[index2]->prev = getEntry(index2-1);
+	entries[index2]->next = getEntry(index2+1);
 
 	return true;
 }

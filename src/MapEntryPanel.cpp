@@ -56,6 +56,12 @@ rgba_t col_save_line_macro(50, 130, 220, 255);
 
 
 /*******************************************************************
+ * EXTERNAL VARIABLES
+ *******************************************************************/
+EXTERN_CVAR(String, dir_last)
+
+
+/*******************************************************************
  * MEPCANVAS CLASS FUNCTIONS
  *******************************************************************/
 
@@ -147,7 +153,7 @@ void MEPCanvas::draw() {
 	glLoadIdentity();
 
 	// Clear
-	glClearColor(((double)col_view_background.r)/255.f, ((double)col_view_background.g)/255.f, 
+	glClearColor(((double)col_view_background.r)/255.f, ((double)col_view_background.g)/255.f,
 				 ((double)col_view_background.b)/255.f, ((double)col_view_background.a)/255.f);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
@@ -227,7 +233,7 @@ void MEPCanvas::createImage(ArchiveEntry& ae, int width, int height) {
 	glLoadIdentity();
 
 	// Clear
-	glClearColor(((double)col_save_background.r)/255.f, ((double)col_save_background.g)/255.f, 
+	glClearColor(((double)col_save_background.r)/255.f, ((double)col_save_background.g)/255.f,
 				 ((double)col_save_background.b)/255.f, ((double)col_save_background.a)/255.f);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
@@ -367,6 +373,9 @@ bool MapEntryPanel::loadEntry(ArchiveEntry* entry) {
 		}
 	}
 
+	// All errors = invalid map
+	Global::error = "Invalid map";
+
 	// Parse UDMF map
 	if (thismap.format == MAP_UDMF) {
 		ArchiveEntry* udmfdata = NULL;
@@ -469,7 +478,7 @@ bool MapEntryPanel::loadEntry(ArchiveEntry* entry) {
 		// Find VERTEXES entry
 		ArchiveEntry* mapentry = thismap.head;
 		ArchiveEntry* vertexes = NULL;
-		while (1) {
+		while (mapentry) {
 			// Check entry type
 			if (mapentry->getType() == EntryType::getType("map_vertexes")) {
 				vertexes = mapentry;
@@ -520,7 +529,7 @@ bool MapEntryPanel::loadEntry(ArchiveEntry* entry) {
 		// Find LINEDEFS entry
 		ArchiveEntry* mapentry = thismap.head;
 		ArchiveEntry* linedefs = NULL;
-		while (1) {
+		while (mapentry) {
 			// Check entry type
 			if (mapentry->getType() == EntryType::getType("map_linedefs")) {
 				linedefs = mapentry;
@@ -619,7 +628,7 @@ bool MapEntryPanel::saveEntry() {
 
 /* MapEntryPanel::createImage
  * Creates a PNG file of the map preview
- * TODO: Preference panel for background and line colors, 
+ * TODO: Preference panel for background and line colors,
  * as well as for image size
  *******************************************************************/
 bool MapEntryPanel::createImage() {
@@ -633,15 +642,18 @@ bool MapEntryPanel::createImage() {
 	wxFileName fn(name);
 
 	// Create save file dialog
-	wxFileDialog *dialog_save = new wxFileDialog(this, s_fmt("Save Map Preview \"%s\"", name.c_str()),
-												wxEmptyString, fn.GetFullName(), "PNG (*.PNG)|*.png",
-												wxFD_SAVE | wxFD_OVERWRITE_PROMPT, wxDefaultPosition);
+	wxFileDialog dialog_save(this, s_fmt("Save Map Preview \"%s\"", name.c_str()),
+								dir_last, fn.GetFullName(), "PNG (*.PNG)|*.png",
+								wxFD_SAVE | wxFD_OVERWRITE_PROMPT, wxDefaultPosition);
 
 	// Run the dialog & check that the user didn't cancel
-	if (dialog_save->ShowModal() == wxID_OK) {
+	if (dialog_save.ShowModal() == wxID_OK) {
 		// If a filename was selected, export it
-		bool ret = temp.exportFile(dialog_save->GetPath());
-		delete dialog_save;
+		bool ret = temp.exportFile(dialog_save.GetPath());
+
+		// Save 'dir_last'
+		dir_last = dialog_save.GetDirectory();
+
 		return ret;
 	}
 	return true;
