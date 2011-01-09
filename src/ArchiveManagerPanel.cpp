@@ -377,7 +377,7 @@ bool ArchiveManagerPanel::isArchivePanel(int tab_index) {
  *******************************************************************/
 Archive* ArchiveManagerPanel::getArchive(int tab_index) {
 	// Check the index is valid
-	if (tab_index < 0 || tab_index >= notebook_archives->GetPageCount())
+	if (tab_index < 0 || (unsigned)tab_index >= notebook_archives->GetPageCount())
 		return NULL;
 
 	// Check the specified tab is actually an archive tab

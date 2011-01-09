@@ -366,15 +366,25 @@ bool MapEntryPanel::loadEntry(ArchiveEntry* entry) {
 	// Find map definition for entry
 	vector<Archive::mapdesc_t> maps = entry->getParent()->detectMaps();
 	Archive::mapdesc_t thismap;
+	bool found = false;
 	for (unsigned a = 0; a < maps.size(); a++) {
 		if (maps[a].head == entry) {
 			thismap = maps[a];
+			found = true;
 			break;
 		}
 	}
 
 	// All errors = invalid map
 	Global::error = "Invalid map";
+
+	// There is no map entry for the map marker.
+	// This may happen if a map marker lump is copy/pasted without the rest of the map lumps.
+	if (!found) {
+		entry->setType(EntryType::unknownType());
+		EntryType::detectEntryType(entry);
+		return false;
+	}
 
 	// Parse UDMF map
 	if (thismap.format == MAP_UDMF) {
