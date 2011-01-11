@@ -517,14 +517,27 @@ ArchiveEntry* WadArchive::addEntry(ArchiveEntry* entry, unsigned position, Archi
 	if (copy)
 		entry = new ArchiveEntry(*entry);
 
-	// Handle renaming if necessary, with the rename function
-	renameEntry(entry, entry->getName());
+	// Duplication of WadArchive::renameEntry logic without checkEntry call.
+	string name = entry->getName();
+
+	// Check for \ character (e.g., from Arch-Viles graphics). They have to be kept.
+	if (name.length() <= 8 && name.find('\\') != wxNOT_FOUND) {
+	} // Don't process as a file name
+
+	// Process name (must be 8 characters max, also cut any extension as wad entries don't usually want them)
+	else {
+		wxFileName fn(name);
+		name = fn.GetName().Truncate(8);
+	}
+	if (wad_force_uppercase) name.MakeUpper();
+
+	// Set new wad-friendly name
+	entry->setName(name);
 
 	// Do default entry addition (to root directory)
 	Archive::addEntry(entry, position);
 
 	// Update namespaces if necessary
-	string name = entry->getName();
 	if (name.Upper().Matches("*_START") ||
 		name.Upper().Matches("*_END"))
 		updateNamespaces();
