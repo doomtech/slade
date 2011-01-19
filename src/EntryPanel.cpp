@@ -53,23 +53,25 @@ EntryPanel::EntryPanel(wxWindow* parent, string id)
 	SetSizer(framesizer);
 	Show(false);
 
-	sizer_main = new wxBoxSizer(wxVERTICAL);
-	framesizer->Add(sizer_main, 1, wxEXPAND|wxALL, 4);
-
 	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
-	framesizer->Add(hbox, 0, wxEXPAND, 0);
-
-	sizer_bottom = new wxBoxSizer(wxHORIZONTAL);
-	hbox->Add(sizer_bottom, 1, wxEXPAND|wxBOTTOM, 4);
+	framesizer->Add(hbox, 0, wxEXPAND|wxTOP, 4);
 
 	// Create generic EntryPanel buttons
 	btn_save = new wxButton(this, -1, "Save Changes");
 	btn_revert = new wxButton(this, -1, "Revert Changes");
 	btn_edit_ext = new wxButton(this, -1, "Edit Externally");
 
-	hbox->Add(btn_edit_ext, 0, wxEXPAND|wxLEFT|wxBOTTOM, 4);
-	hbox->Add(btn_revert, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
-	hbox->Add(btn_save, 0, wxEXPAND|wxRIGHT|wxBOTTOM, 4);
+	hbox->Add(btn_save, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
+	hbox->Add(btn_revert, 0, wxEXPAND|wxRIGHT, 4);
+	hbox->Add(btn_edit_ext, 0, wxEXPAND|wxRIGHT, 4);
+
+	// Sizer for specialised controls
+	sizer_top = new wxBoxSizer(wxHORIZONTAL);
+	hbox->Add(sizer_top, 1, wxEXPAND, 0);
+
+	// Main sizer
+	sizer_main = new wxBoxSizer(wxVERTICAL);
+	framesizer->Add(sizer_main, 1, wxEXPAND|wxALL, 4);
 
 	// Bind button events
 	btn_save->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &EntryPanel::onBtnSave, this);
@@ -176,6 +178,12 @@ bool EntryPanel::revertEntry() {
 void EntryPanel::refreshPanel() {
 	Update();
 	Refresh();
+}
+
+/* EntryPanel::closeEntry
+ * 'Closes' the current entry - clean up, save extra info, etc
+ *******************************************************************/
+void EntryPanel::closeEntry() {
 }
 
 

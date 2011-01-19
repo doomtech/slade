@@ -339,8 +339,7 @@ MapEntryPanel::MapEntryPanel(wxWindow* parent) : EntryPanel(parent, "map") {
 
 	// Add 'Save Map Image' button
 	btn_saveimg = new wxButton(this, -1, "Save Map Image");
-	sizer_bottom->AddStretchSpacer(1);
-	sizer_bottom->Add(btn_saveimg, 0, wxEXPAND, 0);
+	sizer_top->Add(btn_saveimg, 0, wxEXPAND|wxRIGHT, 4);
 
 	// Bind events
 	btn_saveimg->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MapEntryPanel::onBtnSaveImage, this);

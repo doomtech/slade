@@ -86,12 +86,11 @@ DefaultEntryPanel::DefaultEntryPanel(wxWindow* parent)
 
 	// Add 'Edit as Text' button
 	btn_edit_text = new wxButton(this, -1, "Edit as Text");
-	sizer_bottom->AddStretchSpacer(1);
-	sizer_bottom->Add(btn_edit_text, 0, wxEXPAND, 0);
+	sizer_top->Add(btn_edit_text, 0, wxEXPAND|wxRIGHT, 4);
 
 	// Add 'View as Hex' button
 	btn_view_hex = new wxButton(this, -1, "View as Hex");
-	sizer_bottom->Add(btn_view_hex, 0, wxEXPAND|wxLEFT, 4);
+	sizer_top->Add(btn_view_hex, 0, wxEXPAND|wxRIGHT, 4);
 
 	// Bind events
 	btn_gfx_convert->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &DefaultEntryPanel::onBtnGfxConvert, this);

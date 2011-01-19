@@ -56,19 +56,19 @@ PaletteEntryPanel::PaletteEntryPanel(wxWindow* parent)
 	btn_nextpal = new wxButton(this, -1, "Next >");
 	btn_prevpal = new wxButton(this, -1, "< Prev");
 	text_curpal = new wxStaticText(this, -1, "Palette XX/XX");
-	sizer_bottom->Add(btn_prevpal, 0, wxEXPAND|wxRIGHT|wxLEFT, 4);
-	sizer_bottom->Add(btn_nextpal, 0, wxEXPAND|wxRIGHT, 4);
-	sizer_bottom->Add(text_curpal, 0, wxALIGN_CENTER_VERTICAL, 4);
+	sizer_top->Add(btn_prevpal, 0, wxEXPAND|wxRIGHT|wxLEFT, 4);
+	sizer_top->Add(btn_nextpal, 0, wxEXPAND|wxRIGHT, 4);
+	sizer_top->Add(text_curpal, 0, wxALIGN_CENTER_VERTICAL, 4);
 
 	// Add colour info label
 	label_selected_colour = new wxStaticText(this, -1, wxEmptyString);
-	sizer_bottom->AddSpacer(8);
-	sizer_bottom->Add(label_selected_colour, 0, wxALIGN_CENTER_VERTICAL, 4);
+	sizer_top->AddSpacer(8);
+	sizer_top->Add(label_selected_colour, 0, wxALIGN_CENTER_VERTICAL, 4);
 
 	// Add 'Add to Palettes' button
 	btn_exportpal = new wxButton(this, -1, "Add to Palettes");
-	sizer_bottom->AddStretchSpacer();
-	sizer_bottom->Add(btn_exportpal, 0, wxEXPAND);
+	sizer_top->AddStretchSpacer();
+	sizer_top->Add(btn_exportpal, 0, wxEXPAND);
 
 	// Bind events
 	btn_nextpal->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &PaletteEntryPanel::onBtnNextPal, this);

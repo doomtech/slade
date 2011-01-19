@@ -470,6 +470,12 @@ ArchiveEntry* Archive::entryAtPath(string path) {
 bool Archive::save(string filename) {
 	bool success = false;
 
+	// Check if the archive is read-only
+	if (read_only) {
+		Global::error = "Archive is read-only";
+		return false;
+	}
+
 	// If the archive has a parent ArchiveEntry, just write it to that
 	if (parent) {
 		success = write(parent->getMCData());

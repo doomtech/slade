@@ -50,6 +50,13 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 	wxBoxSizer* m_vbox = new wxBoxSizer(wxVERTICAL);
 	sizer_main->Add(m_vbox, 1, wxEXPAND);
 
+	// Add gfx canvas
+	gfx_canvas = new GfxCanvas(this, -1);
+	m_vbox->Add(gfx_canvas->toPanel(this), 1, wxEXPAND|wxALL, 4);
+	gfx_canvas->setViewType(GFXVIEW_DEFAULT);
+	gfx_canvas->allowDrag(true);
+	gfx_canvas->allowScroll(true);
+
 	// Add view controls
 	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
 	m_vbox->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
@@ -88,16 +95,9 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 	// Palette chooser
 	listenTo(theMainWindow->getPaletteChooser());
 
-	// Add gfx canvas
-	gfx_canvas = new GfxCanvas(this, -1);
-	m_vbox->Add(gfx_canvas->toPanel(this), 1, wxEXPAND|wxALL, 4);
-	gfx_canvas->setViewType(GFXVIEW_DEFAULT);
-	gfx_canvas->allowDrag(true);
-	gfx_canvas->allowScroll(true);
-
 	// Add editing/info controls
 	hbox = new wxBoxSizer(wxHORIZONTAL);
-	sizer_bottom->Add(hbox, 1, wxEXPAND|wxLEFT|wxRIGHT, 4);
+	sizer_top->Add(hbox, 1, wxEXPAND|wxLEFT|wxRIGHT, 4);
 
 	// Offsets
 	spin_xoffset = new wxSpinCtrl(this, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, SHRT_MIN, SHRT_MAX, 0);

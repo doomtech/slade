@@ -541,6 +541,14 @@ bool ArchivePanel::deleteEntry() {
 		archive->removeDir(selected_dirs[a]->getName(), entry_list->getCurrentDir());
 	}
 
+	// Switch to blank entry panel
+	wxSizer* sizer = GetSizer();
+	cur_area->Show(false);
+	sizer->Replace(cur_area, entry_area);
+	cur_area = entry_area;
+	cur_area->Show(true);
+	Layout();
+
 	return true;
 }
 
@@ -721,7 +729,7 @@ bool ArchivePanel::exportEntry() {
 	}
 	else {
 		// Open dialog to select folder to export to
-		wxDirDialog dd(this, "Select a Directory to Export Entries to");
+		wxDirDialog dd(this, "Select a Directory to Export Entries to", dir_last);
 
 		if (dd.ShowModal() == wxID_OK) {
 			// Go through the selection
@@ -1158,6 +1166,9 @@ bool ArchivePanel::openEntry(ArchiveEntry* entry, bool force) {
 		}
 		entry_list->setDir(dir);
 	} else {
+		// Close the current entry
+		cur_area->closeEntry();
+
 		// Get the appropriate entry panel for the entry's type
 		EntryPanel* new_area = default_area;
 		if (entry->getType() == EntryType::mapMarkerType())
@@ -1591,9 +1602,9 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 
 	// Add Boom Animations/Switches related menu items if they are selected
 	if (bas_selected) {
-		wxMenu* boom = new wxMenu();
-		context->AppendSubMenu(boom, "Boom");
-		boom->Append(MENU_BAS_CONVERT, "Convert to ANIMDEFS");
+		//wxMenu* boom = new wxMenu();
+		//context->AppendSubMenu(boom, "Boom");
+		context->Append(MENU_BAS_CONVERT, "Convert to ANIMDEFS");
 	}
 	// This is not generally useful
 	//context->Append(MENU_ENTRY_PAL_CONVERT, "Pal 6-bit to 8-bit");
@@ -1612,9 +1623,9 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 
 	// Add script related menu items if needed
 	if (text_selected || unknown_selected) {
-		wxMenu* scripts = new wxMenu();
-		context->AppendSubMenu(scripts, "Scripts");
-		scripts->Append(MENU_SCRIPT_COMPILE_ACS, "Compile ACS");
+		//wxMenu* scripts = new wxMenu();
+		//context->AppendSubMenu(scripts, "Scripts");
+		context->Append(MENU_SCRIPT_COMPILE_ACS, "Compile ACS");
 	}
 
 	// Popup the context menu

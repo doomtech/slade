@@ -169,9 +169,9 @@ void MainWindow::setupLayout() {
 	archiveNewMenu->Append(createMenuItem(archiveNewMenu,	MENU_ARCHIVE_NEWDIRECTORY,		"&Directory",				"Create a new empty directory",	"t_newfolder"));
 	wxMenu* archiveMenu = new wxMenu("");
 	archiveMenu->AppendSubMenu(archiveNewMenu, "&New");
-	archiveMenu->Append(createMenuItem(archiveMenu,			MENU_ARCHIVE_IMPORTFILES,		"&Import Files",			"Import multiple files into the archive"));
+	archiveMenu->Append(createMenuItem(archiveMenu,			MENU_ARCHIVE_IMPORTFILES,		"&Import Files",			"Import multiple files into the archive",	"t_importfiles"));
 	archiveMenu->AppendSeparator();
-	archiveMenu->Append(createMenuItem(archiveMenu,			MENU_ARCHIVE_TEXEDITOR,			"&Texture Editor",			"Open the texture editor for the current archive"));
+	archiveMenu->Append(createMenuItem(archiveMenu,			MENU_ARCHIVE_TEXEDITOR,			"&Texture Editor",			"Open the texture editor for the current archive",	"t_texeditor"));
 	//archiveMenu->Append(createMenuItem(archiveMenu,	MENU_ARCHIVE_CONVERTTO,		"&Convert To...",	"Convert the current archive to a different format"));
 	//archiveMenu->Append(createMenuItem(archiveMenu,	MENU_ARCHIVE_CLEANUP,		"Clean &Up",		"Clean up the current archive by removing unused entries and data"));
 	wxMenu* archiveCleanMenu = new wxMenu("");
@@ -231,10 +231,16 @@ void MainWindow::setupLayout() {
 	tb_file->AddTool(MENU_FILE_CLOSEALL, "Close All", getIcon("t_closeall"), "Close All");
 	tb_file->Realize();
 
+	// Create Archive toolbar
+	wxAuiToolBar* tb_archive = new wxAuiToolBar(this, -1);
+	tb_archive->AddTool(MENU_ARCHIVE_NEWENTRY, "New", getIcon("t_newentry"), "New Entry");
+	tb_archive->AddTool(MENU_ARCHIVE_NEWDIRECTORY, "Directory", getIcon("t_newfolder"), "New Directory");
+	tb_archive->AddTool(MENU_ARCHIVE_IMPORTFILES, "Import Files", getIcon("t_importfiles"), "Import Files to Archive");
+	tb_archive->AddTool(MENU_ARCHIVE_TEXEDITOR, "Texture Editor", getIcon("t_texeditor"), "Open TEXTUREx Editor");
+	tb_archive->Realize();
+
 	// Create Entry toolbar
 	wxAuiToolBar* tb_entry = new wxAuiToolBar(this, -1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
-	tb_entry->AddTool(MENU_ARCHIVE_NEWENTRY, 	"New",			getIcon("t_newentry"),	"New Entry");
-	tb_entry->AddTool(MENU_ARCHIVE_NEWDIRECTORY,"Directory",	getIcon("t_newfolder"),	"New Directory");
 	tb_entry->AddTool(MENU_ENTRY_RENAME,		"Rename",		getIcon("t_rename"),	"Rename");
 	tb_entry->AddTool(MENU_ENTRY_DELETE,		"Delete",		getIcon("t_delete"),	"Delete");
 	tb_entry->AddTool(MENU_ENTRY_IMPORT,		"Import",		getIcon("t_import"),	"Import");
@@ -260,10 +266,11 @@ void MainWindow::setupLayout() {
 	tb_pal->Realize();
 
 	// Setup panel info & add toolbar panels
-	m_mgr->AddPane(tb_file, wxAuiPaneInfo().ToolbarPane().Top().Name("tb_file").CloseButton(false));				// File toolbar
-	m_mgr->AddPane(tb_entry, wxAuiPaneInfo().ToolbarPane().Top().Name("tb_entry").Position(1).CloseButton(false));	// Entry toolbar
-	m_mgr->AddPane(tb_bra, wxAuiPaneInfo().ToolbarPane().Top().Name("tb_bra").Position(2).CloseButton(false));		// Base Resource Archive toolbar
-	m_mgr->AddPane(tb_pal, wxAuiPaneInfo().ToolbarPane().Top().Name("tb_pal").Position(3).CloseButton(false));		// Palette toolbar
+	m_mgr->AddPane(tb_file, wxAuiPaneInfo().ToolbarPane().Top().Name("tb_file").CloseButton(false));					// File toolbar
+	m_mgr->AddPane(tb_archive, wxAuiPaneInfo().ToolbarPane().Top().Name("tb_archive").Position(1).CloseButton(false));	// Archive toolbar
+	m_mgr->AddPane(tb_entry, wxAuiPaneInfo().ToolbarPane().Top().Name("tb_entry").Position(2).CloseButton(false));		// Entry toolbar
+	m_mgr->AddPane(tb_bra, wxAuiPaneInfo().ToolbarPane().Top().Name("tb_bra").Position(3).CloseButton(false));			// Base Resource Archive toolbar
+	m_mgr->AddPane(tb_pal, wxAuiPaneInfo().ToolbarPane().Top().Name("tb_pal").Position(4).CloseButton(false));			// Palette toolbar
 
 
 	// -- Status Bar --

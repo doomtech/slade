@@ -16,7 +16,7 @@ protected:
 	ArchiveEntry*	entry;
 
 	wxSizer*		sizer_main;
-	wxSizer*		sizer_bottom;
+	wxSizer*		sizer_top;
 	wxButton*		btn_save;
 	wxButton*		btn_revert;
 	wxButton*		btn_edit_ext;
@@ -36,6 +36,7 @@ public:
 	virtual bool	saveEntry();
 	virtual bool	revertEntry();
 	virtual void	refreshPanel();
+	virtual void	closeEntry();
 
 	virtual void	onBtnSave(wxCommandEvent& e);
 	virtual void	onBtnRevert(wxCommandEvent& e);

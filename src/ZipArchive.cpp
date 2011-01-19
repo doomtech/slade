@@ -233,10 +233,12 @@ bool ZipArchive::write(MemChunk& mc, bool update) {
 bool ZipArchive::write(string filename, bool update) {
 	// If we're overwriting the current file, rename it so that it can still be read while writing the 'new' file
 	wxFileName current(this->filename);
+	bool temp = false;
 	if (!filename.CmpNoCase(this->filename)) {
 		current.SetName(current.GetName() + "-slade-temp");
 		wxRemoveFile(current.GetFullPath());
 		wxRenameFile(this->filename, current.GetFullPath());
+		temp = true;
 	}
 
 	// Open the file
@@ -302,7 +304,7 @@ bool ZipArchive::write(string filename, bool update) {
 	delete[] c_entries;
 	zip.Close();
 
-	if (this->filename.Cmp(current.GetFullPath()))
+	if (temp)
 		wxRemoveFile(current.GetFullPath());
 
 	return true;

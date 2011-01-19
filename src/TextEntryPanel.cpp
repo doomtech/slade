@@ -48,7 +48,12 @@ wxArrayString languages;
  *******************************************************************/
 TextEntryPanel::TextEntryPanel(wxWindow* parent)
 : EntryPanel(parent, "text") {
-	// Setup top bar sizer
+	// Create the text area
+	text_area = new TextEditor(this, -1);
+	sizer_main->Add(text_area, 1, wxEXPAND | wxALL, 4);
+
+
+	// Setup bottom bar sizer
 	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
 	sizer_main->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
 
@@ -62,15 +67,10 @@ TextEntryPanel::TextEntryPanel(wxWindow* parent)
 	hbox->Add(choice_text_language, 0, wxEXPAND|wxRIGHT, 4);
 
 
-	// Create the text area
-	text_area = new TextEditor(this, -1);
-	sizer_main->Add(text_area, 1, wxEXPAND | wxALL, 4);
-
-
-	// Add 'Find/Replace' button to bottom sizer
-	sizer_bottom->AddStretchSpacer();
+	// Add 'Find/Replace' button to top sizer
+	sizer_top->AddStretchSpacer();
 	btn_find_replace = new wxButton(this, -1, "Find + Replace");
-	sizer_bottom->Add(btn_find_replace, 0, wxEXPAND, 4);
+	sizer_top->Add(btn_find_replace, 0, wxEXPAND, 4);
 
 
 	// Bind events
@@ -101,6 +101,9 @@ bool TextEntryPanel::loadEntry(ArchiveEntry* entry) {
 	else
 		btn_save->Enable(true);
 
+	// Scroll to previous position (if any)
+	if (entry->exProps().propertyExists("TextPosition"))
+		text_area->GotoPos((int)(entry->exProp("TextPosition")));
 
 	// --- Attempt to determine text language ---
 	TextLanguage* tl = NULL;
@@ -115,6 +118,14 @@ bool TextEntryPanel::loadEntry(ArchiveEntry* entry) {
 	if (!tl && entry->getType()->extraProps().propertyExists("text_language")) {
 		string lang_id = entry->getType()->extraProps()["text_language"];
 		tl = TextLanguage::getLanguage(lang_id);
+	}
+
+	// Or, from entry's parent directory
+	if (!tl) {
+		// ZDoom DECORATE (within 'actors' or 'decorate' directories)
+		if (s_cmpnocase(wxString("/actors/"), entry->getPath().Left(8)) ||
+			s_cmpnocase(wxString("/decorate/"), entry->getPath().Left(10)))
+			tl = TextLanguage::getLanguage("decorate");
 	}
 
 	// Load language
@@ -170,6 +181,15 @@ void TextEntryPanel::refreshPanel() {
 
 	Refresh();
 	Update();
+}
+
+void TextEntryPanel::closeEntry() {
+	// Check any entry is open
+	if (!entry)
+		return;
+
+	// Save current caret position
+	entry->exProp("TextPosition") = text_area->GetCurrentPos();
 }
 
 

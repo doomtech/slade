@@ -65,14 +65,20 @@ ArchiveEntry::ArchiveEntry(string name, uint32_t size) {
  * ArchiveEntry class copy constructor
  *******************************************************************/
 ArchiveEntry::ArchiveEntry(ArchiveEntry& copy) {
-	// Copy attributes
-	name = copy.getName();
-	size = copy.getSize();
-	data_loaded = true;
-	type = copy.type;
-	reliability = copy.reliability;
-	locked = false;
-	encrypted = copy.encrypted;
+	// Initialise (copy) attributes
+	this->parent = NULL;
+	this->name = copy.name;
+	this->data = NULL;
+	this->size = copy.size;
+	this->data_loaded = true;
+	this->state = 2;
+	this->type = copy.type;
+	this->locked = false;
+	this->state_locked = false;
+	this->reliability = copy.reliability;
+	this->next = NULL;
+	this->prev = NULL;
+	this->encrypted = copy.encrypted;
 
 	// Copy data
 	data.importMem(copy.getData(true), copy.getSize());
