@@ -417,6 +417,9 @@
     <ClCompile Include="src\LfdArchive.cpp">
       <Filter>Resources\Archive</Filter>
     </ClCompile>
+    <ClCompile Include="src\HogArchive.cpp">
+      <Filter>Resources\Archive</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -776,6 +779,9 @@
     </ClInclude>
     <ClInclude Include="src\LumpFormats.h">
       <Filter>Resources\Archive\EntryType\EntryDataFormat</Filter>
+    </ClInclude>
+    <ClInclude Include="src\HogArchive.h">
+      <Filter>Resources\Archive</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

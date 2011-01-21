@@ -670,7 +670,8 @@ bool ArchivePanel::importEntry() {
 	for (size_t a = 0; a < selection.size(); a++) {
 		// Create open file dialog
 		wxFileDialog dialog_open(this, s_fmt("Import Entry \"%s\"", selection[a]->getName().c_str()),
-									dir_last, wxEmptyString, "Any File (*.*)|*.*", wxFD_OPEN | wxFD_FILE_MUST_EXIST, wxDefaultPosition);
+								dir_last, selection[a]->getName(), "Any File (*.*)|*.*",
+								wxFD_OPEN|wxFD_FILE_MUST_EXIST, wxDefaultPosition);
 
 		// Run the dialog & check that the user didn't cancel
 		if (dialog_open.ShowModal() == wxID_OK) {

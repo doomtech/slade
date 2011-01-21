@@ -127,6 +127,7 @@
     <ClCompile Include="src\GrpArchive.cpp" />
     <ClCompile Include="src\HexEditorPanel.cpp" />
     <ClCompile Include="src\HexEntryPanel.cpp" />
+    <ClCompile Include="src\HogArchive.cpp" />
     <ClCompile Include="src\LfdArchive.cpp" />
     <ClCompile Include="src\LibArchive.cpp" />
     <ClCompile Include="src\MapEntryPanel.cpp" />
@@ -242,6 +243,7 @@
     <ClInclude Include="src\GrpArchive.h" />
     <ClInclude Include="src\HexEditorPanel.h" />
     <ClInclude Include="src\HexEntryPanel.h" />
+    <ClInclude Include="src\HogArchive.h" />
     <ClInclude Include="src\ImageFormats.h" />
     <ClInclude Include="src\LfdArchive.h" />
     <ClInclude Include="src\LibArchive.h" />

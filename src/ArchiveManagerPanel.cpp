@@ -1385,7 +1385,7 @@ void ArchiveManagerPanel::onArchiveTabChanged(wxAuiNotebookEvent& e) {
 void ArchiveManagerPanel::onArchiveTabClose(wxAuiNotebookEvent& e) {
 	if (close_archive_with_tab) {
 		tab_closing = true;
-		Archive* archive = getArchive(e.GetId());
+		Archive* archive = getArchive(e.GetInt());
 		if (archive) closeArchive(archive);
 		tab_closing = false;
 	}
