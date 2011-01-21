@@ -518,6 +518,17 @@ public:
 		size_t size = mc.getSize();
 		if (size < 101)
 			return EDF_FALSE;
+		// Avoid some false positives by looking for "garbage" characters
+		// after the end of the "name"
+		bool nameend = false;
+		for (int i = 0; i < 32; ++i) {
+			if (mc[i] == 0) {
+				if (i == 0) return false;
+				nameend = true;
+			} else if (nameend) {
+				return false;
+			}
+		}
 		size_t width = READ_L32(mc, 32);
 		size_t height = READ_L32(mc, 36);
 		for (int m = 0; m < 4; ++m) {
