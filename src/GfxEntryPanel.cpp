@@ -148,8 +148,10 @@ bool GfxEntryPanel::loadEntry(ArchiveEntry* entry) {
 }
 bool GfxEntryPanel::loadEntry(ArchiveEntry* entry, int index) {
 	// Check entry was given
-	if (entry == NULL)
+	if (entry == NULL) {
+		Global::error = "no entry to load";
 		return false;
+	}
 
 	// Update variables
 	this->entry = entry;

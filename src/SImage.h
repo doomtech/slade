@@ -66,6 +66,7 @@ public:
 	bool	loadDoomFlat(const uint8_t* data, int size, bool columnmajor = false);
 	bool	loadDoomArah(const uint8_t* gfx_data, int size, int transindex = 255);
 	bool	loadQuake(const uint8_t* gfx_data, int size);
+	bool	loadQuakeIIWal(const uint8_t* gfx_data, int size, int index);
 	bool	loadRottGfx(const uint8_t* gfx_data, int size, bool transparent);
 	bool	loadRottLbm(const uint8_t* gfx_data, int size);
 	bool	loadRottRaw(const uint8_t* gfx_data, int size);

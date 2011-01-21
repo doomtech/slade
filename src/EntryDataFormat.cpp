@@ -201,6 +201,7 @@ void EntryDataFormat::initBuiltinFormats() {
 	new HalfLifeTextureFormat();
 	new IMGZDataFormat();
 	new QuakeGfxDataFormat();
+	new QuakeIIWalDataFormat();
 	new RottGfxDataFormat();
 	new RottTransGfxDataFormat();
 	new RottLBMDataFormat();
@@ -243,6 +244,7 @@ void EntryDataFormat::initBuiltinFormats() {
 	new DoomPCSpeakerDataFormat();
 	new Doom64SoundDataFormat();
 	new VocDataFormat();
+	new SPDCDataFormat();
 	new BloodSFXDataFormat();
 	new WAVDataFormat();
 	new OggDataFormat();

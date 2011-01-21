@@ -509,6 +509,33 @@ public:
 	}
 };
 
+class QuakeIIWalDataFormat: public EntryDataFormat {
+public:
+	QuakeIIWalDataFormat() : EntryDataFormat("img_quake2wal") {};
+	~QuakeIIWalDataFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		size_t size = mc.getSize();
+		if (size < 101)
+			return EDF_FALSE;
+		size_t width = READ_L32(mc, 32);
+		size_t height = READ_L32(mc, 36);
+		for (int m = 0; m < 4; ++m) {
+			size_t offset = READ_L32(mc, (40+(m<<2)));
+			if (width>>m == 0 && height>>m == 0 && offset == 0)
+				break;
+			else if ((width>>m == 0 && (height>>m|offset) != 0) ||
+				(height>>m == 0 && (width>>m|offset) != 0) ||
+				(offset == 0 && (width>>m|height>>m) != 0))
+				return EDF_FALSE;
+			else if (offset + (width>>m * height>>m) > size)
+				return EDF_FALSE;
+		}
+		return EDF_TRUE;
+	}
+};
+
+
 class ShadowCasterSpriteFormat: public EntryDataFormat {
 public:
 	ShadowCasterSpriteFormat() : EntryDataFormat("img_scsprite") {};

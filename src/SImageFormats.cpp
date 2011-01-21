@@ -1243,6 +1243,11 @@ bool SImage::loadQuake(const uint8_t* gfx_data, int size) {
 		// Create mask (all opaque)
 		mask = new uint8_t[width*height];
 		memset(mask, 255, width*height);
+
+		// Index 255 is transparent
+		for (int i = 0; i < width*height; ++i)
+			if (data[i] == 255)
+				mask[i] = 0;
 	} else if (mode == QUAKE_INTENSITY) {
 		// Read raw pixel data
 		data = mask = new uint8_t[width*height];
@@ -1625,6 +1630,46 @@ bool SImage::loadHeretic2M32(const uint8_t* gfx_data, int size, int index) {
 	return true;
 }
 
+
+/* SImage::loadQuakeIIWal
+ * Loads a Quake II wal-format texture.
+ * Returns false if the image data was invalid, true otherwise.
+ *******************************************************************/
+bool SImage::loadQuakeIIWal(const uint8_t* gfx_data, int size, int index) {
+	if (size < 101)
+		return false;
+
+	numimages = 4;
+	has_palette = false;
+	format = PALMASK;
+
+	// Sanitize index if needed
+	index %= numimages;
+	if (index < 0)
+		index = numimages + index;
+		
+
+	// Setup variables
+	imgindex = index;
+	width = READ_L32(gfx_data, 32) >> index;
+	height = READ_L32(gfx_data, 36) >> index;
+	size_t data_offset = READ_L32(gfx_data, 40+(index<<2));
+	if (!width || !height || ! data_offset || size < (int)data_offset + (width*height)) {
+		Global::error = "WAL file: invalid data for mip level";
+		return false;
+	}
+
+	// Create data
+	clearData();
+	data = new uint8_t[width*height];
+
+	// Fill data with pixel data
+	memcpy(data, gfx_data + data_offset, width * height);
+
+	// Announce change and return success
+	announce("image_changed");
+	return true;
+}
 
 /* SImage::loadHalfLifeTex
  * Loads a Half-Life mipmapped paletted image.

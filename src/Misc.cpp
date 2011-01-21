@@ -81,6 +81,8 @@ bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry, int index) {
 		return image->loadImgz(entry->getData(), entry->getSize());
 	else if (s_cmpnocase(format, "img_quake"))
 		return image->loadQuake(entry->getData(), entry->getSize());
+	else if (s_cmpnocase(format, "img_quake2wal"))
+		return image->loadQuakeIIWal(entry->getData(), entry->getSize(), index);
 	else if (s_cmpnocase(format, "img_planar"))
 		return image->loadPlanar(entry->getData(), entry->getSize());
 	else if (s_cmpnocase(format, "img_4bitchunk"))

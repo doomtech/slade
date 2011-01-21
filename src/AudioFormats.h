@@ -277,6 +277,8 @@ public:
 	}
 };
 
+// TODO: Eventually remove this since Doom64 now uses OGG sounds
+// Just leave it some time for the next build to come out of alpha.
 class Doom64SoundDataFormat : public EntryDataFormat {
 public:
 	Doom64SoundDataFormat() : EntryDataFormat("snd_doom64") {};
@@ -434,6 +436,24 @@ public:
 				if (mc[i] == 0)
 					return EDF_TRUE;
 			}
+		}
+		return EDF_FALSE;
+	}
+};
+
+// SNES SPC format, supported by ZDoom and Eternity
+class SPDCDataFormat : public EntryDataFormat {
+public:
+	SPDCDataFormat() : EntryDataFormat("snd_spc") {};
+	~SPDCDataFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		// Check size
+		if (mc.getSize() > 35) {
+			// Check for header text using official signature string
+			string header(wxString::FromAscii(mc.getData(), 35));
+			if (header == "SNES-SPC700 Sound File Data v0.30\x1A\x1A")
+				return EDF_TRUE;
 		}
 		return EDF_FALSE;
 	}
