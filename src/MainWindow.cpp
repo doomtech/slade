@@ -274,7 +274,7 @@ void MainWindow::setupLayout() {
 
 
 	// -- Status Bar --
-	CreateStatusBar();
+	CreateStatusBar(2);
 
 
 	// Load previously saved perspective string
@@ -575,8 +575,11 @@ void MainWindow::onTabChanged(wxAuiNotebookEvent& e) {
 	wxWindow* page = notebook_tabs->GetPage(notebook_tabs->GetSelection());
 
 	// If start page is selected, refresh it
-	if (page->GetName() == "startpage")
+	if (page->GetName() == "startpage") {
 		createStartPage();
+		SetStatusText("", 1);
+		SetStatusText("", 2);
+	}
 
 	// Continue
 	e.Skip();

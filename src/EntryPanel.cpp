@@ -31,6 +31,7 @@
 #include "Main.h"
 #include "WxStuff.h"
 #include "EntryPanel.h"
+#include "MainWindow.h"
 
 
 /*******************************************************************
@@ -129,10 +130,14 @@ bool EntryPanel::openEntry(ArchiveEntry* entry) {
 	// Load the entry
 	if (loadEntry(entry)) {
 		this->entry = entry;
+		updateStatus();
 		return true;
 	}
-	else
+	else {
+		theMainWindow->SetStatusText("", 1);
+		theMainWindow->SetStatusText("", 2);
 		return false;
+	}
 }
 
 /* EntryPanel::loadEntry
@@ -184,6 +189,15 @@ void EntryPanel::refreshPanel() {
  * 'Closes' the current entry - clean up, save extra info, etc
  *******************************************************************/
 void EntryPanel::closeEntry() {
+}
+
+void EntryPanel::updateStatus() {
+	theMainWindow->SetStatusText("", 2);
+
+	if (entry)
+		theMainWindow->SetStatusText(s_fmt("%d bytes", entry->getSize()), 1);
+	else
+		theMainWindow->SetStatusText("", 1);
 }
 
 

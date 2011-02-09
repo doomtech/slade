@@ -35,6 +35,7 @@
 #include "Misc.h"
 #include "PaletteManager.h"
 #include "EntryOperations.h"
+#include "Icons.h"
 
 
 /*******************************************************************
@@ -85,12 +86,12 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 	hbox->AddSpacer(8);
 
 	// Image selection buttons
-	btn_nextimg = new wxButton(this, -1, "Next >");
-	btn_previmg = new wxButton(this, -1, "< Prev");
+	btn_nextimg = new wxBitmapButton(this, -1, getIcon("t_right"));
+	btn_previmg = new wxBitmapButton(this, -1, getIcon("t_left"));
 	text_curimg = new wxStaticText(this, -1, "Image XX/XX");
 	hbox->Add(btn_previmg, 0, wxEXPAND|wxRIGHT|wxLEFT, 4);
 	hbox->Add(btn_nextimg, 0, wxEXPAND|wxRIGHT, 4);
-	hbox->Add(text_curimg, 0, wxALIGN_CENTER_VERTICAL, 4);
+	hbox->Add(text_curimg, 0, wxALIGN_CENTER, 4);
 
 	// Palette chooser
 	listenTo(theMainWindow->getPaletteChooser());

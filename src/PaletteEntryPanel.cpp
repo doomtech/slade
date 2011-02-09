@@ -32,6 +32,7 @@
 #include "WxStuff.h"
 #include "PaletteEntryPanel.h"
 #include "PaletteManager.h"
+#include "Icons.h"
 
 
 /*******************************************************************
@@ -53,8 +54,8 @@ PaletteEntryPanel::PaletteEntryPanel(wxWindow* parent)
 	btn_edit_ext->Enable(false);
 
 	// Add palette selection buttons
-	btn_nextpal = new wxButton(this, -1, "Next >");
-	btn_prevpal = new wxButton(this, -1, "< Prev");
+	btn_nextpal = new wxBitmapButton(this, -1, getIcon("t_right"));
+	btn_prevpal = new wxBitmapButton(this, -1, getIcon("t_left"));
 	text_curpal = new wxStaticText(this, -1, "Palette XX/XX");
 	sizer_top->Add(btn_prevpal, 0, wxEXPAND|wxRIGHT|wxLEFT, 4);
 	sizer_top->Add(btn_nextpal, 0, wxEXPAND|wxRIGHT, 4);

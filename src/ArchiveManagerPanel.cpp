@@ -512,7 +512,8 @@ void ArchiveManagerPanel::openTab(Archive* archive) {
 		else if (archive->getType() == ARCHIVE_ZIP)
 			icon = "e_zip";
 
-		notebook_archives->AddPage(wp, archive->getFilename(false), true);
+		notebook_archives->AddPage(wp, archive->getFilename(false), false);
+		notebook_archives->SetSelection(notebook_archives->GetPageCount() - 1);
 		notebook_archives->SetPageBitmap(notebook_archives->GetPageCount() - 1, getIcon(icon));
 		wp->SetName("archive");
 		wp->Show(true);
@@ -1375,6 +1376,11 @@ void ArchiveManagerPanel::onArchiveTabChanged(wxAuiNotebookEvent& e) {
 	else
 		((wxFrame*)GetParent())->SetTitle("SLADE");
 	*/
+
+	if (isArchivePanel(selection)) {
+		ArchivePanel* ap = (ArchivePanel*)notebook_archives->GetPage(selection);
+		ap->currentArea()->updateStatus();
+	}
 
 	e.Skip();
 }

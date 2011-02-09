@@ -37,6 +37,7 @@ public:
 	virtual bool	revertEntry();
 	virtual void	refreshPanel();
 	virtual void	closeEntry();
+	virtual void	updateStatus();
 
 	virtual void	onBtnSave(wxCommandEvent& e);
 	virtual void	onBtnRevert(wxCommandEvent& e);
