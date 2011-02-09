@@ -176,6 +176,7 @@ Other / Notes -----------------------------------------------------------
 
 
 
+
 Completed Feature Requests ----------------------------------------------
 
 - In the image viewer, a drop-down list for display method: automatic (let the program determine), world sprite (with the crossed axes), hud sprite (in the box), graphics (without axes nor box). The automatic selection, based on offset values, isn't always accurate.
