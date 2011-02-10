@@ -290,7 +290,7 @@ public:
 			// Check header values are 'sane'
 			if (header->width > 0 && header->height > 0) {
 				uint16_t col_offsets[255]; // Old format headers do not allow dimensions greater than 255.
-				for (uint8_t a = 0; a < header->width; a++) {
+				for (uint16_t a = 0; a < header->width; a++) {
 					const uint8_t * offsetpos = data + sizeof(oldpatch_header_t) + a * sizeof(uint16_t);
 					const uint16_t * colofsa = (uint16_t *)(offsetpos);
 					col_offsets[a] = wxUINT16_SWAP_ON_BE(*colofsa);
