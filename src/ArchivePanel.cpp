@@ -729,6 +729,29 @@ bool ArchivePanel::exportEntry() {
 		return true;
 	}
 	else {
+		// Create save file dialog
+		wxFileDialog dialog_save(this, "Export Multiple Entries (Filename is ignored)", dir_last, "ignored", "Any File (*.*)|*.*", wxFD_SAVE, wxDefaultPosition);
+
+		if (dialog_save.ShowModal() == wxID_OK) {
+			// Go through the selection
+			for (size_t a = 0; a < selection.size(); a++) {
+				// Setup entry filename
+				wxFileName fn(selection[a]->getName());
+				fn.SetPath(dialog_save.GetDirectory());
+
+				// Add file extension if it doesn't exist
+				if (!fn.HasExt())
+					fn.SetExt(selection[a]->getType()->getExtension());
+
+				// Do export
+				selection[a]->exportFile(fn.GetFullPath());
+
+				// Save 'dir_last'
+				dir_last = dialog_save.GetDirectory();
+			}
+		}
+
+		/*
 		// Open dialog to select folder to export to
 		wxDirDialog dd(this, "Select a Directory to Export Entries to", dir_last);
 
@@ -750,6 +773,7 @@ bool ArchivePanel::exportEntry() {
 				dir_last = dd.GetPath();
 			}
 		}
+		*/
 	}
 
 	return true;
