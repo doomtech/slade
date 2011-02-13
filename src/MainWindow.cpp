@@ -39,6 +39,7 @@
 #include "PreferencesDialog.h"
 #include "Tokenizer.h"
 #include <wx/aboutdlg.h>
+#include <wx/dnd.h>
 
 
 /*******************************************************************
@@ -48,6 +49,25 @@ string main_window_layout = "";
 MainWindow* MainWindow::instance = NULL;
 CVAR(Bool, show_start_page, true, CVAR_SAVE);
 CVAR(String, global_palette, "", CVAR_SAVE);
+
+
+/*******************************************************************
+ * MAINWINDOWDROPTARGET CLASS
+ *******************************************************************
+ Handles drag'n'drop of files on to the SLADE window
+*/
+class MainWindowDropTarget : public wxFileDropTarget {
+public:
+	MainWindowDropTarget(){}
+	~MainWindowDropTarget(){}
+
+	bool OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames) {
+		for (unsigned a = 0; a < filenames.size(); a++)
+			theArchiveManager->openArchive(filenames[a]);
+
+		return true;
+	}
+};
 
 
 /*******************************************************************
@@ -62,6 +82,7 @@ MainWindow::MainWindow()
 	lasttipindex = 0;
 	Maximize();
 	setupLayout();
+	SetDropTarget(new MainWindowDropTarget());
 }
 
 /* MainWindow::~MainWindow

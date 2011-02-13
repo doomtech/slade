@@ -14,7 +14,6 @@ Major Changes Since Last Version ----------------------------------------
 TODO List ---------------------------------------------------------------
 
 --- Bugs ---
-- Close archive with tab not working
 - Audio player issues
 
 --- Minor Problems/Annoyances ---

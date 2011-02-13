@@ -88,6 +88,46 @@ EXTERN_CVAR(String, dir_last)
 
 
 /*******************************************************************
+ * APENTRYLISTDROPTARGET CLASS
+ *******************************************************************
+ Handles drag'n'drop of files on to the entry list
+*/
+class APEntryListDropTarget : public wxFileDropTarget {
+private:
+	ArchivePanel* parent;
+	ArchiveEntryList* list;
+
+public:
+	APEntryListDropTarget(ArchivePanel* parent, ArchiveEntryList* list) { this->parent = parent; this->list = list; }
+	~APEntryListDropTarget(){}
+
+	bool OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames) {
+		// Determine what item the files were dragged onto
+		int flags;
+		long index = list->HitTest(wxPoint(x, y), flags) - list->entriesBegin();
+
+		// Add to end if no item was hit
+		if (index < 0)
+			index = list->GetItemCount() - list->entriesBegin();
+
+		// Import all dragged files, inserting after the item they were dragged onto
+		for (int a = filenames.size()-1; a >= 0; a--) {
+			wxFileName fn(filenames[a]);
+
+			// Create new entry
+			ArchiveEntry* entry = parent->getArchive()->addNewEntry(fn.GetFullName(), index);
+
+			// Import the file to it
+			entry->importFile(filenames[a]);
+			EntryType::detectEntryType(entry);
+		}
+
+		return true;
+	}
+};
+
+
+/*******************************************************************
  * ARCHIVEPANEL CLASS FUNCTIONS
  *******************************************************************/
 
@@ -146,6 +186,7 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 	// Create entry list panel
 	entry_list = new ArchiveEntryList(this);
 	entry_list->setArchive(archive);
+	entry_list->SetDropTarget(new APEntryListDropTarget(this, entry_list));
 	framesizer->Add(entry_list, 1, wxEXPAND | wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
 
