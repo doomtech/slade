@@ -115,7 +115,7 @@ public:
 			wxFileName fn(filenames[a]);
 
 			// Create new entry
-			ArchiveEntry* entry = parent->getArchive()->addNewEntry(fn.GetFullName(), index);
+			ArchiveEntry* entry = parent->getArchive()->addNewEntry(fn.GetFullName(), index, list->getCurrentDir());
 
 			// Import the file to it
 			entry->importFile(filenames[a]);

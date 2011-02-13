@@ -51,9 +51,9 @@
  *******************************************************************/
 namespace Global {
 	string error = "";
-	string version = "3.0.0";
+	string version = "3.0.1";
 }
-//MainWindow*		main_window = NULL;
+
 string	dir_data = "";
 string	dir_user = "";
 string	dir_app = "";
