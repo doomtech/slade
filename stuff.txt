@@ -9,7 +9,7 @@ Major Changes Since Last Version ----------------------------------------
 - Support for more game formats: Wolf3D/SoD, Dark Forces, Descent, Unreal/Half-Life WAD3, Half-Life texture, Quake2 wal
 - Fixed many problems with the texture editor
 - New 'Save Map Image' button on map preview
-- The archive menu now has it's own associated toolbar
+- The archive menu now has its own associated toolbar
 - Swapped the top and bottom bars of controls in the entry viewers
 - Entry names containing / or \ are now valid in wad archives
 - Added the ability to drag files onto the program window: dropping files on the entry list will import them to the archive, dropping them anywhere else will attempt to open them as archives

@@ -348,9 +348,16 @@ bool ArchivePanel::newEntry() {
 	if (name == "")
 		return false;
 
+	// Check for \ character (e.g., from Arch-Viles graphics). They have to be kept.
+	if (archive->getType() == ARCHIVE_WAD && name.length() <= 8 
+		&& (name.find('\\') != wxNOT_FOUND) || (name.find('/') != wxNOT_FOUND)) {
+	} // Don't process as a file name
+
 	// Remove any path from the name, if any (for now)
-	wxFileName fn(name);
-	name = fn.GetFullName();
+	else {
+		wxFileName fn(name);
+		name = fn.GetFullName();
+	}
 
 	// Get the entry index of the last selected list item
 	int index = archive->entryIndex(entry_list->getLastSelectedEntry(), entry_list->getCurrentDir());
@@ -893,9 +900,9 @@ bool ArchivePanel::pasteEntry() {
 		EntryTreeClipboardItem* clip = (EntryTreeClipboardItem*)theClipboard->getItem(a);
 
 		// Merge it in
-		archive->paste(clip->getTree(), index, entry_list->getCurrentDir());
+		if (archive->paste(clip->getTree(), index, entry_list->getCurrentDir()))
 		//entry_list->getCurrentDir()->merge(clip->getTree(), index);
-		pasted = true;
+			pasted = true;
 	}
 
 	if (pasted) {

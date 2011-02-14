@@ -301,12 +301,20 @@ ArchiveTreeNode* ArchiveTreeNode::clone() {
  * true otherwise
  *******************************************************************/
 bool ArchiveTreeNode::merge(ArchiveTreeNode* node, unsigned position) {
-	// Chech node was given to merge
+	// Check node was given to merge
 	if (!node)
 		return false;
 
 	// Merge entries
 	for (unsigned a = 0; a < node->numEntries(); a++) {
+		// Safe substitution of special characters, using the ZDoom
+		// convention of changing folder separators into carets.
+		if (node->getEntry(a)) {
+			string name = node->getEntry(a)->getName();
+			name.Replace("\\", "^");
+			name.Replace("/", "^");
+			node->getEntry(a)->setName(name);
+		}
 		addEntry(new ArchiveEntry(*(node->getEntry(a))), position);
 
 		if (position < entries.size())
