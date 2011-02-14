@@ -506,7 +506,7 @@ void ArchiveManagerPanel::openTab(Archive* archive) {
 		ArchivePanel* wp = new ArchivePanel(notebook_archives, archive);
 
 		// Determine icon
-		string icon = "t_newarchive";
+		string icon = "e_archive";
 		if (archive->getType() == ARCHIVE_WAD)
 			icon = "e_wad";
 		else if (archive->getType() == ARCHIVE_ZIP)
