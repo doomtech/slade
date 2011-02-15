@@ -531,15 +531,13 @@ public:
 		}
 		size_t width = READ_L32(mc, 32);
 		size_t height = READ_L32(mc, 36);
+		if (!width || !height || width % 8 || height % 8)
+			return EDF_FALSE;
 		for (int m = 0; m < 4; ++m) {
 			size_t offset = READ_L32(mc, (40+(m<<2)));
 			if (width>>m == 0 && height>>m == 0 && offset == 0)
 				break;
-			else if ((width>>m == 0 && (height>>m|offset) != 0) ||
-				(height>>m == 0 && (width>>m|offset) != 0) ||
-				(offset == 0 && (width>>m|height>>m) != 0))
-				return EDF_FALSE;
-			else if (offset + (width>>m * height>>m) > size)
+			else if (!offset || size < offset + ((width>>m) * (height>>m)))
 				return EDF_FALSE;
 		}
 		return EDF_TRUE;
@@ -733,9 +731,7 @@ public:
 			size_t offset = READ_L32(mc, (24+(m<<2)));
 			if (width>>m == 0 && height>>m == 0 && offset == 0)
 				break;
-			else if (!width || !height || !offset)
-				return EDF_FALSE;
-			else if (size < offset + ((width>>m) * (height>>m)))
+			else if (!offset || size < offset + ((width>>m) * (height>>m)))
 				return EDF_FALSE;
 		}
 		width>>=3;

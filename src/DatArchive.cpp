@@ -175,7 +175,7 @@ bool DatArchive::open(MemChunk& mc) {
 		// If the lump data goes past the directory,
 		// the data file is invalid
 		if (offset + size > mc.getSize()) {
-			wxLogMessage("DatArchive::open: Dat archive is invalid or corrupt");
+			wxLogMessage("DatArchive::open: Dat archive is invalid or corrupt at entry %i", d);
 			Global::error = "Archive is invalid and/or corrupt";
 			setMuted(false);
 			return false;
@@ -659,7 +659,7 @@ bool DatArchive::isDatArchive(MemChunk& mc) {
 		return false;
 	for (size_t i = start; (mc[i] != 0 && i < mc.getSize()); ++i, ++len) {
 		// Names should not contain garbage characters
-		if (mc[i] < 32)
+		if (mc[i] < 32 || mc[i] > 126)
 			return false;
 	}
 	// Let's be reasonable here. While names aren't limited, if it's too long, it's suspicious.
@@ -735,7 +735,7 @@ bool DatArchive::isDatArchive(string filename) {
 		if (temp == 0)
 			break;
 		// Names should not contain garbage characters
-		if (temp < 32)
+		if (temp < 32 || temp > 126)
 			return false;
 	}
 	// Let's be reasonable here. While names aren't limited, if it's too long, it's suspicious.
