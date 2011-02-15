@@ -1655,7 +1655,6 @@ bool SImage::loadQuakeIIWal(const uint8_t* gfx_data, int size, int index) {
 	height = READ_L32(gfx_data, 36) >> index;
 	size_t data_offset = READ_L32(gfx_data, 40+(index<<2));
 	if (!width || !height || ! data_offset || size < (int)data_offset + (width*height)) {
-		wxLogMessage("width %i height %i offset %i size %i o+w*h %i", width, height, data_offset, size, data_offset + (width*height));
 		Global::error = "WAL file: invalid data for mip level";
 		return false;
 	}
