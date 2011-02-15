@@ -648,6 +648,8 @@ public:
 		size_t xofs = 16;
 		size_t yofs = xofs + (tilecount<<1);
 		for (size_t a = 0; a < tilecount; ++a) {
+			if (size <= xofs+(a<<1) || size <= yofs+(a<<1))
+				return EDF_FALSE;
 			gfxdatasize += (mc[xofs+(a<<1)] * mc[yofs+(a<<1)]);
 		}
 		if (size < (datastart + gfxdatasize))
