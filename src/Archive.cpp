@@ -1008,9 +1008,14 @@ bool Archive::revertEntry(ArchiveEntry* entry) {
 		return true;
 
 	// Reload entry data from the archive on disk
-	entry->setState(0);
 	entry->unloadData();
-	return loadEntryData(entry);
+	if (loadEntryData(entry)) {
+		entry->setState(0);
+		EntryType::detectEntryType(entry);
+		return true;
+	}
+	else
+		return false;
 }
 
 /* Archive::findFirst

@@ -1605,30 +1605,6 @@ void ArchivePanel::onEntryListFocusChange(wxListEvent& e) {
  * Called when the entry list is right clicked
  *******************************************************************/
 void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
-	// Generate context menu
-	wxMenu* context = new wxMenu();
-	context->Append(MainWindow::MENU_ENTRY_RENAME, "Rename");
-	context->Append(MainWindow::MENU_ENTRY_DELETE, "Delete");
-	context->Append(MainWindow::MENU_ENTRY_REVERT, "Revert");
-	context->AppendSeparator();
-	context->Append(MainWindow::MENU_ENTRY_CUT, "Cut");
-	context->Append(MainWindow::MENU_ENTRY_COPY, "Copy");
-	context->Append(MainWindow::MENU_ENTRY_PASTE, "Paste");
-	context->AppendSeparator();
-	context->Append(MainWindow::MENU_ENTRY_IMPORT, "Import");
-	context->Append(MainWindow::MENU_ENTRY_EXPORT, "Export");
-	context->AppendSeparator();
-	context->Append(MainWindow::MENU_ENTRY_MOVEUP, "Move Up");
-	context->Append(MainWindow::MENU_ENTRY_MOVEDOWN, "Move Down");
-	context->AppendSeparator();
-	context->Append(MainWindow::MENU_ENTRY_BOOKMARK, "Bookmark");
-
-	// 'View As' menu
-	wxMenu* viewas = new wxMenu();
-	context->AppendSubMenu(viewas, "View As");
-	viewas->Append(MENU_VIEW_TEXT, "Text", "Opens the selected entry in the text editor, regardless of type");
-	viewas->Append(MENU_VIEW_HEX, "Hex", "Opens the selected entry in the hex editor, regardless of type");
-
 	// Get selected entries
 	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
 
@@ -1642,6 +1618,7 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 	bool text_selected = false;
 	bool unknown_selected = false;
 	bool texturex_selected = false;
+	bool modified_selected = false;
 //	bool rle_selected = false;
 	for (size_t a = 0; a < selection.size(); a++) {
 		// Check for gfx entry
@@ -1681,6 +1658,10 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 			if (selection[a]->getType()->getFormat() == "texturex")
 				texturex_selected = true;
 		}
+		if (!modified_selected) {
+			if (selection[a]->getState() == 1)
+				modified_selected = true;
+		}
 #if 0
 		if (!rle_selected) {
 			if (selection[a]->getType()->getFormat() == "misc_rle0")
@@ -1688,6 +1669,30 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 		}
 #endif
 	}
+
+	// Generate context menu
+	wxMenu* context = new wxMenu();
+	context->Append(MainWindow::MENU_ENTRY_RENAME, "Rename");
+	context->Append(MainWindow::MENU_ENTRY_DELETE, "Delete");
+	if (modified_selected) context->Append(MainWindow::MENU_ENTRY_REVERT, "Revert");
+	context->AppendSeparator();
+	context->Append(MainWindow::MENU_ENTRY_CUT, "Cut");
+	context->Append(MainWindow::MENU_ENTRY_COPY, "Copy");
+	context->Append(MainWindow::MENU_ENTRY_PASTE, "Paste");
+	context->AppendSeparator();
+	context->Append(MainWindow::MENU_ENTRY_IMPORT, "Import");
+	context->Append(MainWindow::MENU_ENTRY_EXPORT, "Export");
+	context->AppendSeparator();
+	context->Append(MainWindow::MENU_ENTRY_MOVEUP, "Move Up");
+	context->Append(MainWindow::MENU_ENTRY_MOVEDOWN, "Move Down");
+	context->AppendSeparator();
+	context->Append(MainWindow::MENU_ENTRY_BOOKMARK, "Bookmark");
+
+	// 'View As' menu
+	wxMenu* viewas = new wxMenu();
+	context->AppendSubMenu(viewas, "View As");
+	viewas->Append(MENU_VIEW_TEXT, "Text", "Opens the selected entry in the text editor, regardless of type");
+	viewas->Append(MENU_VIEW_HEX, "Hex", "Opens the selected entry in the hex editor, regardless of type");
 
 	// Add gfx-related menu items if gfx are selected
 	if (gfx_selected) {

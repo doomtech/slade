@@ -494,6 +494,7 @@ bool WadArchive::loadEntryData(ArchiveEntry* entry) {
 
 	// Set the lump to loaded
 	entry->setLoaded();
+	entry->setState(0);
 
 	return true;
 }
