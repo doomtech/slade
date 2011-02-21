@@ -79,6 +79,7 @@ public:
 	bool	dSndWavConvert();
 	bool	musMidiConvert();
 	bool	compileACS();
+	bool	convertTextures();
 
 	// Needed for some console commands
 	EntryPanel *			currentArea() { return cur_area;}

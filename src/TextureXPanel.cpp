@@ -267,9 +267,9 @@ CTexture* TextureXPanel::newTextureFromPatch(string name, string patch) {
 
 	// Setup texture scale
 	if (texturex.getFormat() == TXF_TEXTURES)
-		tex->setScale(1, 1, false);
+		tex->setScale(1, 1);
 	else
-		tex->setScale(0, 0, true);
+		tex->setScale(0, 0);
 
 	// Add patch
 	tex->addPatch(patch, 0, 0, patch_entry);
@@ -324,9 +324,9 @@ void TextureXPanel::onBtnNewTexture(wxCommandEvent& e) {
 
 	// Setup texture scale
 	if (texturex.getFormat() == TXF_TEXTURES)
-		tex->setScale(1, 1, false);
+		tex->setScale(1, 1);
 	else
-		tex->setScale(0, 0, true);
+		tex->setScale(0, 0);
 
 	// Add it after the last selected item
 	int selected = list_textures->getLastSelected();

@@ -191,8 +191,8 @@ void TextureEditorPanel::updateTextureControls() {
 	text_tex_name->SetValue(tex_current->getName());
 	spin_tex_width->SetValue(tex_current->getWidth());
 	spin_tex_height->SetValue(tex_current->getHeight());
-	spin_tex_scalex->SetValue(tex_current->getScaleX());
-	spin_tex_scaley->SetValue(tex_current->getScaleY());
+	spin_tex_scalex->SetValue(tex_current->getScaleX()*8);
+	spin_tex_scaley->SetValue(tex_current->getScaleY()*8);
 	updateTextureScaleLabel();
 }
 

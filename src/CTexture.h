@@ -3,18 +3,16 @@
 #define __CTEXTURE_H__
 
 #include "Tokenizer.h"
-#include "PropertyList.h"
 #include "ArchiveEntry.h"
 #include "ListenerAnnouncer.h"
 
+// Basic patch
 class CTPatch {
-private:
+protected:
 	string			name;
 	ArchiveEntry*	entry;
 	int16_t			offset_x;
 	int16_t			offset_y;
-
-	PropertyList	ex_props;
 
 public:
 	CTPatch();
@@ -32,16 +30,50 @@ public:
 	void	setOffsetY(int16_t offset) { offset_y = offset; }
 };
 
-class CTexture : public Announcer {
+// Extended patch (for TEXTURES)
+class CTPatchEx : public CTPatch {
 private:
-	string			name;
-	uint16_t		width;
-	uint16_t		height;
-	double			scale_x;
-	double			scale_y;
-	bool			scale_tx;
-	vector<CTPatch>	patches;
-	PropertyList	ex_props;
+	bool			flip_x;
+	bool			flip_y;
+	int16_t			rotation;
+	vector<string>	translation;
+	string			blend;
+	rgba_t			blend_col;
+	float			alpha;
+	string			style;
+	uint8_t			blendtype;	// 0=none, 1=translation, 2=blend(string), 3=blend(rgba)
+
+public:
+	CTPatchEx();
+	CTPatchEx(CTPatch* copy);
+	~CTPatchEx();
+
+	bool	parse(Tokenizer& tz);
+	string	asText();
+};
+
+class TextureXList;
+
+class CTexture : public Announcer {
+friend class TextureXList;
+private:
+	// Basic info
+	string				name;
+	uint16_t			width;
+	uint16_t			height;
+	double				scale_x;
+	double				scale_y;
+	bool				world_panning;
+	vector<CTPatch*>	patches;
+
+	// Extended (TEXTURES) info
+	bool	extended;
+	string	type;
+	bool	optional;
+	bool	no_decals;
+	bool	null_texture;
+	int16_t	offset_x;
+	int16_t	offset_y;
 
 public:
 	CTexture();
@@ -49,21 +81,25 @@ public:
 
 	void	copyTexture(CTexture* copy);
 
-	string			getName() { return name; }
-	uint16_t		getWidth() { return width; }
-	uint16_t		getHeight() { return height; }
-	double			getScaleX() { return scale_x; }
-	double			getScaleY() { return scale_y; }
-	size_t			nPatches() { return patches.size(); }
-	CTPatch*		getPatch(size_t index);
-	PropertyList&	exProps() { return ex_props; }
+	string		getName() { return name; }
+	uint16_t	getWidth() { return width; }
+	uint16_t	getHeight() { return height; }
+	double		getScaleX() { return scale_x; }
+	double		getScaleY() { return scale_y; }
+	bool		worldPanning() { return world_panning; }
+	bool		isExtended() { return extended; }
+	bool		isOptional() { return optional; }
+	bool		noDecals() { return no_decals; }
+	bool		nullTexture() { return null_texture; }
+	size_t		nPatches() { return patches.size(); }
+	CTPatch*	getPatch(size_t index);
 
 	void	setName(string name) { this->name = name; announce("modified"); }
 	void	setWidth(uint16_t width) { this->width = width; announce("modified"); }
 	void	setHeight(uint16_t height) { this->height = height; announce("modified"); }
 	void	setScaleX(double scale) { this->scale_x = scale; announce("modified"); }
 	void	setScaleY(double scale) { this->scale_y = scale; announce("modified"); }
-	void	setScale(double x, double y, bool tx) { this->scale_x = x; this->scale_y = y; this->scale_tx = tx; announce("modified"); }
+	void	setScale(double x, double y) { this->scale_x = x; this->scale_y = y; announce("modified"); }
 
 	void	clear();
 
@@ -73,6 +109,11 @@ public:
 	bool	replacePatch(size_t index, string newpatch, ArchiveEntry* newentry = NULL);
 	bool	duplicatePatch(size_t index, int16_t offset_x = 8, int16_t offset_y = 8);
 	bool	swapPatches(size_t p1, size_t p2);
+
+	bool	parse(Tokenizer& tz, string type);
+	string	asText();
+
+	bool	convertExtended();
 };
 
 #endif//__CTEXTURE_H__

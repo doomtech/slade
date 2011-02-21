@@ -78,6 +78,7 @@ const int MENU_CONV_WAV_DSND = 10009;
 const int MENU_CONV_DSND_WAV = 10010;
 const int MENU_CONV_MUS_MIDI = 10011;
 const int MENU_SCRIPT_COMPILE_ACS = 10012;
+const int MENU_TEXTUREX_CONVERT = 10013;
 const int MENU_TEMP_END = 10100;
 
 
@@ -901,7 +902,6 @@ bool ArchivePanel::pasteEntry() {
 
 		// Merge it in
 		if (archive->paste(clip->getTree(), index, entry_list->getCurrentDir()))
-		//entry_list->getCurrentDir()->merge(clip->getTree(), index);
 			pasted = true;
 	}
 
@@ -1198,6 +1198,26 @@ bool ArchivePanel::compileACS() {
 	}
 
 	return true;
+}
+
+/* ArchivePanel::convertTextures
+ * Converts any selected TEXTUREx entries to a ZDoom TEXTURES entry
+ *******************************************************************/
+bool ArchivePanel::convertTextures() {
+	// Get selected entries
+	long index = entry_list->getSelection()[0];
+	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
+
+	// Do conversion
+	if (EntryOperations::convertTextures(selection)) {
+		// Select new TEXTURES entry
+		entry_list->clearSelection();
+		entry_list->selectItem(index);
+
+		return true;
+	}
+
+	return false;
 }
 
 
@@ -1499,6 +1519,8 @@ void ArchivePanel::handleAction(int menu_id) {
 		musMidiConvert();
 	else if (menu_id == MENU_SCRIPT_COMPILE_ACS)
 		compileACS();
+	else if (menu_id == MENU_TEXTUREX_CONVERT)
+		convertTextures();
 }
 
 /* ArchivePanel::onAnnouncement
@@ -1619,6 +1641,7 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 	bool mus_selected = false;
 	bool text_selected = false;
 	bool unknown_selected = false;
+	bool texturex_selected = false;
 //	bool rle_selected = false;
 	for (size_t a = 0; a < selection.size(); a++) {
 		// Check for gfx entry
@@ -1653,6 +1676,10 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 		if (!unknown_selected) {
 			if (selection[a]->getType() == EntryType::unknownType())
 				unknown_selected = true;
+		}
+		if (!texturex_selected) {
+			if (selection[a]->getType()->getFormat() == "texturex")
+				texturex_selected = true;
 		}
 #if 0
 		if (!rle_selected) {
@@ -1700,6 +1727,10 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 		//context->AppendSubMenu(scripts, "Scripts");
 		context->Append(MENU_SCRIPT_COMPILE_ACS, "Compile ACS");
 	}
+
+	// Add texturex related menu items if needed
+	if (texturex_selected)
+		context->Append(MENU_TEXTUREX_CONVERT, "Convert to TEXTURES");
 
 	// Popup the context menu
 	PopupMenu(context);

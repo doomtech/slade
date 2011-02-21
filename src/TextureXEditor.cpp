@@ -506,7 +506,7 @@ bool TextureXEditor::setupTextureEntries(Archive* archive) {
 						dummytex->addPatch("S3DUMMY", 0, 0, dpatch);
 						dummytex->setWidth(128);
 						dummytex->setHeight(128);
-						dummytex->setScale(0, 0, true);
+						dummytex->setScale(0, 0);
 
 						// Add dummy texture to list
 						// (this serves two purposes - supplies the special 'invalid' texture by default,

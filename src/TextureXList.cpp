@@ -184,13 +184,13 @@ void TextureXList::removePatch(string patch) {
  * Reads in a doom-format TEXTUREx entry. Returns true on success,
  * false otherwise
  *******************************************************************/
-bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_table) {
+bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_table, bool add) {
 	// Check entries were actually given
 	if (!texturex)
 		return false;
 
-	// Clear current textures
-	clear();
+	// Clear current textures if needed
+	if (!add) clear();
 
 	// Update palette
 	theMainWindow->getPaletteChooser()->setGlobalFromArchive(texturex->getParent());
@@ -309,14 +309,15 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_ta
 
 		// Create texture
 		CTexture* tex = new CTexture();
-		tex->setName(wxString::From8BitData(tdef.name, 8));
-		tex->setWidth(tdef.width);
-		tex->setHeight(tdef.height);
-		tex->setScale(tdef.scale[0], tdef.scale[1], true);
+		tex->name = wxString::From8BitData(tdef.name, 8);
+		tex->width = tdef.width;
+		tex->height = tdef.height;
+		tex->scale_x = tdef.scale[0]/8.0;
+		tex->scale_y = tdef.scale[1]/8.0;
 
 		// Set flags
 		if (tdef.flags & TX_WORLDPANNING)
-			tex->exProps().addFlag("WorldPanning");
+			tex->world_panning = true;
 
 		// Read patches
 		int16_t n_patches = 0;
@@ -433,8 +434,8 @@ bool TextureXList::writeTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_t
 				memset(txdef.name, 0, 8); // Set texture name to all 0's (to ensure compatibility with XWE)
 				strncpy(txdef.name, chr(tex->getName().Upper()), tex->getName().Len());
 				txdef.flags			= 0;
-				txdef.scale[0]		= tex->getScaleX();
-				txdef.scale[1]		= tex->getScaleY();
+				txdef.scale[0]		= (tex->getScaleX()*8);
+				txdef.scale[1]		= (tex->getScaleY()*8);
 				txdef.width			= tex->getWidth();
 				txdef.height		= tex->getHeight();
 				txdef.columndir[0]	= 0;
@@ -442,7 +443,7 @@ bool TextureXList::writeTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_t
 				txdef.patchcount	= tex->nPatches();
 
 				// Check for WorldPanning flag
-				if (tex->exProps().propertyExists("WorldPanning"))
+				if (tex->world_panning)
 					txdef.flags |= TX_WORLDPANNING;
 
 				// Write texture definition
@@ -455,8 +456,8 @@ bool TextureXList::writeTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_t
 				// Create nameless texture definition
 				nltdef_t txdef;
 				txdef.flags			= 0;
-				txdef.scale[0]		= tex->getScaleX();
-				txdef.scale[1]		= tex->getScaleY();
+				txdef.scale[0]		= (tex->getScaleX()*8);
+				txdef.scale[1]		= (tex->getScaleY()*8);
 				txdef.width			= tex->getWidth();
 				txdef.height		= tex->getHeight();
 				txdef.columndir[0]	= 0;
@@ -475,14 +476,14 @@ bool TextureXList::writeTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_t
 				memset(txdef.name, 0, 8); // Set texture name to all 0's (to ensure compatibility with XWE)
 				strncpy(txdef.name, chr(tex->getName().Upper()), tex->getName().Len());
 				txdef.flags			= 0;
-				txdef.scale[0]		= tex->getScaleX();
-				txdef.scale[1]		= tex->getScaleY();
+				txdef.scale[0]		= (tex->getScaleX()*8);
+				txdef.scale[1]		= (tex->getScaleY()*8);
 				txdef.width			= tex->getWidth();
 				txdef.height		= tex->getHeight();
 				txdef.patchcount	= tex->nPatches();
 
 				// Check for WorldPanning flag
-				if (tex->exProps().propertyExists("WorldPanning"))
+				if (tex->world_panning)
 					txdef.flags |= TX_WORLDPANNING;
 
 				// Write texture definition
@@ -531,6 +532,78 @@ bool TextureXList::writeTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_t
 	return true;
 }
 
+/* TextureXList::readTEXTURESData
+ * Reads in a ZDoom-format TEXTURES entry. Returns true on success,
+ * false otherwise
+ *******************************************************************/
+bool TextureXList::readTEXTURESData(ArchiveEntry* entry) {
+	// Get text to parse
+	Tokenizer tz;
+	tz.openMem(&(entry->getMCData()), entry->getName());
+
+	// Parsing gogo
+	string token = tz.getToken();
+	while (!token.IsEmpty()) {
+		// Texture definition
+		if (s_cmpnocase(token, "Texture")) {
+			CTexture* tex = new CTexture();
+			if (tex->parse(tz, "Texture"))
+				textures.push_back(tex);
+		}
+
+		// Sprite definition
+		if (s_cmpnocase(token, "Sprite")) {
+			CTexture* tex = new CTexture();
+			if (tex->parse(tz, "Sprite"))
+				textures.push_back(tex);
+		}
+
+		// Graphic definition
+		if (s_cmpnocase(token, "Graphic")) {
+			CTexture* tex = new CTexture();
+			if (tex->parse(tz, "Graphic"))
+				textures.push_back(tex);
+		}
+
+		// WallTexture definition
+		if (s_cmpnocase(token, "WallTexture")) {
+			CTexture* tex = new CTexture();
+			if (tex->parse(tz, "WallTexture"))
+				textures.push_back(tex);
+		}
+
+		// Flat definition
+		if (s_cmpnocase(token, "Flat")) {
+			CTexture* tex = new CTexture();
+			if (tex->parse(tz, "Flat"))
+				textures.push_back(tex);
+		}
+	}
+
+	txformat = TXF_TEXTURES;
+
+	return true;
+}
+
+/* TextureXList::writeTEXTURESData
+ * Writes the texture list in TEXTURES format to [entry] Returns true
+ * on success, false otherwise
+ *******************************************************************/
+bool TextureXList::writeTEXTURESData(ArchiveEntry* entry) {
+	// Check format
+	if (txformat != TXF_TEXTURES)
+		return false;
+
+	// Generate a big string :P
+	string textures_data = "// Texture definitions generated by SLADE3\n// on " + wxNow() + "\n\n";
+	for (unsigned a = 0; a < textures.size(); a++)
+		textures_data += textures[a]->asText();
+	textures_data += "// End of texture definitions\n";
+
+	// Write it to the entry
+	return entry->importMem(textures_data.ToAscii(), textures_data.length());
+}
+
 /* TextureXList::getTextureXFormatString
  * Returns a string representation of the texture list format
  *******************************************************************/
@@ -551,4 +624,27 @@ string TextureXList::getTextureXFormatString() {
 		default:
 			return "Unknown";
 	}
+}
+
+/* TextureXList::convertToTEXTURES
+ * Converts all textures in the list to extended TEXTURES format
+ *******************************************************************/
+bool TextureXList::convertToTEXTURES() {
+	// Check format is appropriate
+	if (txformat == TXF_TEXTURES) {
+		Global::error = "Already TEXTURES format";
+		return false;
+	}
+
+	// Convert all textures to extended format
+	for (unsigned a = 0; a < textures.size(); a++)
+		textures[a]->convertExtended();
+
+	// First texture is null texture
+	textures[0]->null_texture = true;
+
+	// Set new format
+	txformat = TXF_TEXTURES;
+
+	return true;
 }

@@ -757,9 +757,9 @@ bool EntryOperations::createTexture(vector<ArchiveEntry*> entries) {
 
 		// Setup texture scale
 		if (tx.getFormat() == TXF_TEXTURES)
-			ntex->setScale(1, 1, false);
+			ntex->setScale(1, 1);
 		else
-			ntex->setScale(0, 0, true);
+			ntex->setScale(0, 0);
 
 		// Add to texture list
 		tx.addTexture(ntex);
@@ -772,6 +772,55 @@ bool EntryOperations::createTexture(vector<ArchiveEntry*> entries) {
 	tx.writeTEXTUREXData(texturex, ptable);
 
 	return true;
+}
+
+/* EntryOperations::convertTextures
+ * Converts multiple TEXTURE1/2 entries to a single ZDoom text-based
+ * TEXTURES entry
+ *******************************************************************/
+bool EntryOperations::convertTextures(vector<ArchiveEntry*> entries) {
+	// Check any entries were given
+	if (entries.size() == 0)
+		return false;
+
+	// Get parent archive of entries
+	Archive* parent = entries[0]->getParent();
+
+	// Can't do anything if entry isn't in an archive
+	if (!parent)
+		return false;
+
+	// Find patch table in parent archive
+	Archive::search_options_t opt;
+	opt.match_type = EntryType::getType("pnames");
+	ArchiveEntry* pnames = parent->findLast(opt);
+
+	// Check it exists
+	if (!pnames)
+		return false;
+
+	// Load patch table
+	PatchTable ptable;
+	ptable.loadPNAMES(pnames);
+
+	// Read all texture entries to a single list
+	TextureXList tx;
+	for (unsigned a = 0; a < entries.size(); a++)
+		tx.readTEXTUREXData(entries[a], ptable, true);
+
+	// Convert to extended (TEXTURES) format
+	tx.convertToTEXTURES();
+
+	// Create new TEXTURES entry and write to it
+	ArchiveEntry* textures = parent->addNewEntry("TEXTURES", parent->entryIndex(entries[0]));
+	if (textures) {
+		bool ok = tx.writeTEXTURESData(textures);
+		EntryType::detectEntryType(textures);
+		textures->setExtensionByType();
+		return ok;
+	}
+	else
+		return false;
 }
 
 /* EntryOperations::compileACS
