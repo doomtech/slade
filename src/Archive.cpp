@@ -183,6 +183,14 @@ unsigned ArchiveTreeNode::numEntries(bool inc_subdirs) {
 	}
 }
 
+/* ArchiveTreeNode::linkEntries
+ * Links two entries. [first] must come before [second] in the list
+ *******************************************************************/
+void ArchiveTreeNode::linkEntries(ArchiveEntry* first, ArchiveEntry* second) {
+	if (first) first->next = second;
+	if (second) second->prev = first;
+}
+
 /* ArchiveTreeNode::addEntry
  * Adds [entry] to this directory at [index], or at the end if
  * [index] is out of bounds
@@ -268,10 +276,10 @@ bool ArchiveTreeNode::swapEntries(unsigned index1, unsigned index2) {
 	entries[index2] = entry1;
 
 	// Update links
-	entries[index1]->prev = getEntry(index1-1);
-	entries[index1]->next = getEntry(index1+1);
-	entries[index2]->prev = getEntry(index2-1);
-	entries[index2]->next = getEntry(index2+1);
+	linkEntries(getEntry(index1-1), entry2);
+	linkEntries(entry2, getEntry(index1+1));
+	linkEntries(getEntry(index2-1), entry1);
+	linkEntries(entry1, getEntry(index2+1));
 
 	return true;
 }

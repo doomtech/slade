@@ -37,6 +37,7 @@ public:
 
 	void	setName(string name) { dir_entry->name = name; }
 
+	void	linkEntries(ArchiveEntry* first, ArchiveEntry* second);
 	bool	addEntry(ArchiveEntry* entry, unsigned index = 0xFFFFFFFF);
 	bool	removeEntry(unsigned index);
 	bool	swapEntries(unsigned index1, unsigned index2);
