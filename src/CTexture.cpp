@@ -105,7 +105,9 @@ CTPatchEx::~CTPatchEx() {
 bool CTPatchEx::parse(Tokenizer& tz) {
 	// Read basic info
 	name = tz.getToken();
+	tz.getToken();	// Skip ,
 	offset_x = tz.getInteger();
+	tz.getToken();	// Skip ,
 	offset_y = tz.getInteger();
 
 	// Check if there is any extended info
@@ -484,7 +486,9 @@ bool CTexture::parse(Tokenizer& tz, string type) {
 	this->type = type;
 	this->extended = true;
 	name = tz.getToken();
+	tz.getToken();	// Skip ,
 	width = tz.getInteger();
+	tz.getToken();	// Skip ,
 	height = tz.getInteger();
 
 	// Check for extended info

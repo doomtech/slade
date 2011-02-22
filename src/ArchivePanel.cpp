@@ -1816,10 +1816,13 @@ void ArchivePanel::onEntryListActivated(wxListEvent& e) {
 	if (!entry)
 		return;
 
+	// Archive
 	if (entry->getType()->getFormat().substr(0, 8) == "archive_")
 		theArchiveManager->openArchive(entry);
 
-	if (entry->getType()->getFormat() == "texturex")
+	// Texture list
+	if (entry->getType()->getFormat() == "texturex" ||
+		entry->getType() == EntryType::getType("zdtextures"))
 		theMainWindow->openTextureEditor(archive);
 
 	e.Skip();

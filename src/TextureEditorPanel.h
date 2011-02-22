@@ -10,7 +10,7 @@
 class TextureXEditor;
 
 class TextureEditorPanel : public wxPanel, Listener {
-private:
+protected:
 	//PatchTable*		patch_table;
 	TextureXEditor*	tx_editor;
 	CTexture*		tex_current;
@@ -65,12 +65,13 @@ public:
 	CTexture*	getTexture() { return tex_current; }
 
 	// UI Stuff
-	wxPanel*	createTextureControls(wxWindow* parent);
-	void		updateTextureControls();
-	void		updateTextureScaleLabel();
-	wxPanel*	createPatchControls(wxWindow* parent);
-	void		populatePatchList();
-	void		updatePatchControls();
+	virtual void		setupLayout();
+	virtual wxPanel*	createTextureControls(wxWindow* parent);
+	virtual void		updateTextureControls();
+	virtual void		updateTextureScaleLabel();
+	virtual wxPanel*	createPatchControls(wxWindow* parent);
+	virtual void		populatePatchList();
+	virtual void		updatePatchControls();
 
 	bool	openTexture(CTexture* tex);
 	void	setPalette(Palette8bit* pal);

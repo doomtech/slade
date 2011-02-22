@@ -86,7 +86,10 @@ public:
 	uint16_t	getHeight() { return height; }
 	double		getScaleX() { return scale_x; }
 	double		getScaleY() { return scale_y; }
+	int16_t		getOffsetX() { return offset_x; }
+	int16_t		getOffsetY() { return offset_y; }
 	bool		worldPanning() { return world_panning; }
+	string		getType() { return type; }
 	bool		isExtended() { return extended; }
 	bool		isOptional() { return optional; }
 	bool		noDecals() { return no_decals; }

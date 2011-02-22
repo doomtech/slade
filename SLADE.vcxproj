@@ -215,6 +215,7 @@
     <ClCompile Include="src\PaletteChooser.cpp" />
     <ClCompile Include="src\SplashWindow.cpp" />
     <ClCompile Include="src\BaseResourceArchivesPanel.cpp" />
+    <ClCompile Include="src\ZTextureEditorPanel.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ACSPrefsPanel.h" />
@@ -338,6 +339,7 @@
     <ClInclude Include="src\SplashWindow.h" />
     <ClInclude Include="src\BaseResourceArchivesPanel.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="src\ZTextureEditorPanel.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="detect_functions.txt" />

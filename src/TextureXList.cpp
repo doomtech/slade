@@ -578,6 +578,8 @@ bool TextureXList::readTEXTURESData(ArchiveEntry* entry) {
 			if (tex->parse(tz, "Flat"))
 				textures.push_back(tex);
 		}
+
+		token = tz.getToken();
 	}
 
 	txformat = TXF_TEXTURES;

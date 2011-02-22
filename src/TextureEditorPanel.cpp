@@ -53,7 +53,15 @@ TextureEditorPanel::TextureEditorPanel(wxWindow* parent, TextureXEditor* tx_edit
 	// Init variables
 	this->tx_editor = tx_editor;
 	tex_current = NULL;
+}
 
+/* TextureEditorPanel::~TextureEditorPanel
+ * TextureEditorPanel class destructor
+ *******************************************************************/
+TextureEditorPanel::~TextureEditorPanel() {
+}
+
+void TextureEditorPanel::setupLayout() {
 	// Setup sizer
 	wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
 	SetSizer(sizer);
@@ -111,8 +119,6 @@ TextureEditorPanel::TextureEditorPanel(wxWindow* parent, TextureXEditor* tx_edit
 	text_tex_name->Bind(wxEVT_COMMAND_TEXT_UPDATED, &TextureEditorPanel::onTexNameChanged, this);
 	spin_tex_width->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &TextureEditorPanel::onTexWidthChanged, this);
 	spin_tex_height->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &TextureEditorPanel::onTexHeightChanged, this);
-	spin_tex_scalex->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &TextureEditorPanel::onTexScaleXChanged, this);
-	spin_tex_scaley->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &TextureEditorPanel::onTexScaleYChanged, this);
 	list_patches->Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &TextureEditorPanel::onPatchListSelect, this);
 	list_patches->Bind(wxEVT_COMMAND_LIST_ITEM_DESELECTED, &TextureEditorPanel::onPatchListDeSelect, this);
 	btn_patch_add->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureEditorPanel::onBtnPatchAdd, this);
@@ -127,12 +133,6 @@ TextureEditorPanel::TextureEditorPanel(wxWindow* parent, TextureXEditor* tx_edit
 
 	// Init layout
 	Layout();
-}
-
-/* TextureEditorPanel::~TextureEditorPanel
- * TextureEditorPanel class destructor
- *******************************************************************/
-TextureEditorPanel::~TextureEditorPanel() {
 }
 
 /* TextureEditorPanel::createTextureControls
@@ -176,6 +176,11 @@ wxPanel* TextureEditorPanel::createTextureControls(wxWindow* parent) {
 	// Scaled size
 	label_scaled_size = new wxStaticText(panel, -1, "Scaled Size: N/A");
 	gb_sizer->Add(label_scaled_size, wxGBPosition(3, 0), wxGBSpan(1, 3), wxALIGN_CENTER_VERTICAL);
+
+
+	// Bind events
+	spin_tex_scalex->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &TextureEditorPanel::onTexScaleXChanged, this);
+	spin_tex_scaley->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &TextureEditorPanel::onTexScaleYChanged, this);
 
 	return panel;
 }

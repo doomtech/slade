@@ -33,6 +33,7 @@
 #include "TextureXPanel.h"
 #include "Misc.h"
 #include "TextureXEditor.h"
+#include "ZTextureEditorPanel.h"
 #include <wx/filename.h>
 
 
@@ -86,6 +87,8 @@ string TextureXListView::getItemText(long item, long column) const {
 		return tex->getName();
 	else if (column == 1)					// Size column
 		return s_fmt("%dx%d", tex->getWidth(), tex->getHeight());
+	else if (column == 2)					// Type column
+		return tex->getType();
 	else
 		return "INVALID COLUMN";
 }
@@ -163,10 +166,6 @@ TextureXPanel::TextureXPanel(wxWindow* parent, TextureXEditor* tx_editor) : wxPa
 	btn_new_from_file = new wxButton(this, -1, "New From File");
 	framesizer->Add(btn_new_from_file, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
-	// Add texture editor area
-	texture_editor = new TextureEditorPanel(this, tx_editor);
-	sizer->Add(texture_editor, 1, wxEXPAND|wxALL, 4);
-
 	// Bind events
 	list_textures->Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &TextureXPanel::onTextureListSelect, this);
 	btn_new_texture->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureXPanel::onBtnNewTexture, this);
@@ -186,11 +185,17 @@ TextureXPanel::~TextureXPanel() {
 }
 
 /* TextureXPanel::openTEXTUREX
- * Loads a TEXTUREX format texture list into the editor
+ * Loads a TEXTUREx or TEXTURES format texture list into the editor
  *******************************************************************/
 bool TextureXPanel::openTEXTUREX(ArchiveEntry* entry) {
-	if (texturex.readTEXTUREXData(entry, tx_editor->patchTable())) {
-		tx_entry = entry;
+	// Open texture list (check format)
+	if (entry->getType()->getFormat() == "texturex") {
+		// TEXTURE1/2 format
+		if (!texturex.readTEXTUREXData(entry, tx_editor->patchTable()))
+			return false;
+
+		// Create default texture editor
+		texture_editor = new TextureEditorPanel(this, tx_editor);
 
 		// Update patch table usage info
 		for (size_t a = 0; a < texturex.nTextures(); a++) {
@@ -200,17 +205,32 @@ bool TextureXPanel::openTEXTUREX(ArchiveEntry* entry) {
 			for (size_t p = 0; p < tex->nPatches(); p++)
 				tx_editor->patchTable().patch(tex->getPatch(p)->getName()).used_in.push_back(tex->getName());
 		}
-
-		// Update format label
-		label_tx_format->SetLabel("Format: " + texturex.getTextureXFormatString());
-
-		// Update texture list
-		list_textures->updateList();
-
-		return true;
 	}
-	else
-		return false;
+	else {
+		// TEXTURES format
+		if (!texturex.readTEXTURESData(entry))
+			return false;
+
+		// Create extended texture editor
+		texture_editor = new ZTextureEditorPanel(this, tx_editor);
+
+		// Add 'type' column
+		list_textures->InsertColumn(2, "Type");
+	}
+
+	tx_entry = entry;
+
+	// Add texture editor area
+	GetSizer()->Add(texture_editor, 1, wxEXPAND|wxALL, 4);
+	texture_editor->setupLayout();
+
+	// Update format label
+	label_tx_format->SetLabel("Format: " + texturex.getTextureXFormatString());
+
+	// Update texture list
+	list_textures->updateList();
+
+	return true;
 }
 
 /* TextureXPanel::saveTEXTUREX
@@ -220,8 +240,13 @@ bool TextureXPanel::saveTEXTUREX() {
 	// Save any changes to current texture
 	applyChanges();
 
+	// Write list to entry, in the correct format
 	tx_entry->unlock();	// Have to unlock the entry first
-	bool ok = texturex.writeTEXTUREXData(tx_entry, tx_editor->patchTable());
+	bool ok = false;
+	if (texturex.getFormat() == TXF_TEXTURES)
+		ok = texturex.writeTEXTURESData(tx_entry);
+	else
+		ok = texturex.writeTEXTUREXData(tx_entry, tx_editor->patchTable());
 	tx_entry->lock();
 
 	return ok;

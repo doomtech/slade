@@ -268,6 +268,32 @@ bool TextureXEditor::openArchive(Archive* archive) {
 		tabs->AddPage(ptp, "Patch Table (PNAMES)");
 	}
 
+	// Search archive for TEXTURES entries
+	options.match_type = EntryType::getType("zdtextures");
+	vector<ArchiveEntry*> ztx_entries = archive->findAll(options);
+
+	// Open texture editor tabs
+	for (unsigned a = 0; a < ztx_entries.size(); a++) {
+		TextureXPanel* tx_panel = new TextureXPanel(this, this);
+
+		// Init texture panel
+		tx_panel->Show(false);
+
+		// Open TEXTURES entry
+		if (tx_panel->openTEXTUREX(ztx_entries[a])) {
+			// Set palette
+			tx_panel->setPalette(theMainWindow->getPaletteChooser()->getSelectedPalette());
+			// Lock entry
+			ztx_entries[a]->lock();
+
+			// Add it to the list of editors, and a tab
+			texture_editors.push_back(tx_panel);
+			tabs->AddPage(tx_panel, ztx_entries[a]->getName());
+		}
+
+		tx_panel->Show(true);
+	}
+
 	// Update layout
 	Layout();
 
@@ -458,10 +484,19 @@ bool TextureXEditor::setupTextureEntries(Archive* archive) {
 	if (!archive)
 		return false;
 
-	// Search archive for any texture-related entries
+	// Search archive for any ZDoom TEXTURES entries
 	Archive::search_options_t options;
+	options.match_type = EntryType::getType("zdtextures");
+	ArchiveEntry* entry_tx = archive->findFirst(options);	// Find any TEXTURES entry
+
+	// If it's found, we're done
+	if (entry_tx)
+		return true;
+
+
+	// Search archive for any texture-related entries
 	options.match_type = EntryType::getType("texturex");
-	ArchiveEntry* entry_tx = archive->findFirst(options);		// Find any TEXTUREx entry
+	entry_tx = archive->findFirst(options);						// Find any TEXTUREx entry
 	options.match_type = EntryType::getType("pnames");
 	ArchiveEntry* entry_pnames = archive->findFirst(options);	// Find any PNAMES entry
 
