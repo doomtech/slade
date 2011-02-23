@@ -9,7 +9,7 @@
 
 class TextureXEditor;
 
-class TextureEditorPanel : public wxPanel, Listener {
+class TextureEditorPanel : public wxPanel {
 protected:
 	//PatchTable*		patch_table;
 	TextureXEditor*	tx_editor;

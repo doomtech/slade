@@ -26,6 +26,17 @@ public:
 	//wxPanel*	createPatchControls(wxWindow* parent);
 	//void		populatePatchList();
 	//void		updatePatchControls();
+
+	// Events
+	void	onTexScaleXChanged(wxSpinDoubleEvent& e);
+	void	onTexScaleYChanged(wxSpinDoubleEvent& e);
+	void	onTexOffsetXChanged(wxSpinEvent& e);
+	void	onTexOffsetYChanged(wxSpinEvent& e);
+	void	onTexTypeChanged(wxCommandEvent& e);
+	void	onTexOptionalChanged(wxCommandEvent& e);
+	void	onTexWorldPanningChanged(wxCommandEvent& e);
+	void	onTexNoDecalsChanged(wxCommandEvent& e);
+	void	onTexNullTextureChanged(wxCommandEvent& e);
 };
 
 #endif//__ZTEXTURE_EDITOR_PANEL_H__

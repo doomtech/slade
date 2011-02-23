@@ -375,10 +375,8 @@ bool TextureEditorPanel::openTexture(CTexture* tex) {
 	}
 
 	// Set as current texture
-	if (!tex_current) {
+	if (!tex_current)
 		tex_current = new CTexture();
-		listenTo(tex_current);
-	}
 	tex_current->copyTexture(tex);
 
 	// Open texture in canvas
@@ -422,6 +420,8 @@ void TextureEditorPanel::addPatch() {
         populatePatchList();
         updatePatchControls();
     }
+
+	tex_modified = true;
 }
 
 /* TextureEditorPanel::removePatch
@@ -447,6 +447,8 @@ void TextureEditorPanel::removePatch() {
 
 	// Update UI
 	updatePatchControls();
+
+	tex_modified = true;
 }
 
 /* TextureEditorPanel::patchBack
@@ -472,6 +474,8 @@ void TextureEditorPanel::patchBack() {
 	// Update UI
 	updatePatchControls();
 	tex_canvas->Refresh();
+
+	tex_modified = true;
 }
 
 /* TextureEditorPanel::patchForward
@@ -497,6 +501,8 @@ void TextureEditorPanel::patchForward() {
 	// Update UI
 	updatePatchControls();
 	tex_canvas->Refresh();
+
+	tex_modified = true;
 }
 
 /* TextureEditorPanel::replacePatch
@@ -528,6 +534,8 @@ void TextureEditorPanel::replacePatch() {
 
 	// Update UI
 	updatePatchControls();
+
+	tex_modified = true;
 }
 
 /* TextureEditorPanel::duplicatePatch
@@ -560,17 +568,8 @@ void TextureEditorPanel::duplicatePatch() {
 
 	// Update UI
 	updatePatchControls();
-}
 
-/* TextureEditorPanel::onAnnouncement
- * Handles any announcements from the current texture
- *******************************************************************/
-void TextureEditorPanel::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
-	if (announcer != tex_current)
-		return;
-
-	if (event_name == "modified" || event_name == "patches_modified")
-		tex_modified = true;
+	tex_modified = true;
 }
 
 
@@ -832,6 +831,8 @@ void TextureEditorPanel::onTexNameChanged(wxCommandEvent& e) {
 	// Change texture name
 	if (tex_current)
 		tex_current->setName(text_tex_name->GetValue());
+
+	tex_modified = true;
 }
 
 /* TextureEditorPanel::onTexWidthChanged
@@ -845,6 +846,8 @@ void TextureEditorPanel::onTexWidthChanged(wxSpinEvent &e) {
 	// Update UI
 	tex_canvas->Refresh();
 	updateTextureScaleLabel();
+
+	tex_modified = true;
 }
 
 /* TextureEditorPanel::onTexHeightChanged
@@ -858,6 +861,8 @@ void TextureEditorPanel::onTexHeightChanged(wxSpinEvent& e) {
 	// Update UI
 	tex_canvas->Refresh();
 	updateTextureScaleLabel();
+
+	tex_modified = true;
 }
 
 /* TextureEditorPanel::onTexScaleXChanged
@@ -870,6 +875,8 @@ void TextureEditorPanel::onTexScaleXChanged(wxSpinEvent& e) {
 
 	// Update UI
 	updateTextureScaleLabel();
+
+	tex_modified = true;
 }
 
 /* TextureEditorPanel::onTexScaleYChanged
@@ -882,6 +889,8 @@ void TextureEditorPanel::onTexScaleYChanged(wxSpinEvent& e) {
 
 	// Update UI
 	updateTextureScaleLabel();
+
+	tex_modified = true;
 }
 
 /* TextureEditorPanel::onPatchListSelect

@@ -117,6 +117,8 @@
         <File Name="src/PatchBrowser.h"/>
         <File Name="src/TextureEditorPanel.cpp"/>
         <File Name="src/PatchBrowser.cpp"/>
+        <File Name="src/ZTextureEditorPanel.cpp"/>
+        <File Name="src/ZTextureEditorPanel.h"/>
       </VirtualDirectory>
       <File Name="src/ArchivePanel.cpp"/>
       <File Name="src/ArchivePanel.h"/>

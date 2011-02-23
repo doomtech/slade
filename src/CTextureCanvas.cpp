@@ -479,8 +479,8 @@ void CTextureCanvas::onAnnouncement(Announcer* announcer, string event_name, Mem
 		return;
 
 	// Texture modified
-	if (event_name == "modified")
-		Refresh();
+	//if (event_name == "modified")
+	//	Refresh();
 
 	// Patches modified
 	if (event_name == "patches_modified") {

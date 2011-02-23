@@ -79,6 +79,19 @@ CTPatchEx::CTPatchEx() {
 }
 
 /* CTPatchEx::CTPatchEx
+ * CTPatchEx class constructor w/basic initial values
+ *******************************************************************/
+CTPatchEx::CTPatchEx(string name, int16_t offset_x, int16_t offset_y, ArchiveEntry* entry)
+: CTPatch(name, offset_x, offset_y, entry) {
+	flip_x = false;
+	flip_y = false;
+	rotation = 0;
+	alpha = 1.0f;
+	style = "Copy";
+	blendtype = 0;
+}
+
+/* CTPatchEx::CTPatchEx
  * CTPatchEx class constructor copying a regular CTPatch
  *******************************************************************/
 CTPatchEx::CTPatchEx(CTPatch* copy) {
@@ -91,6 +104,25 @@ CTPatchEx::CTPatchEx(CTPatch* copy) {
 	offset_x = copy->xOffset();
 	offset_y = copy->yOffset();
 	name = copy->getName();
+}
+
+/* CTPatchEx::CTPatchEx
+ * CTPatchEx class constructor copying another CTPatchEx
+ *******************************************************************/
+CTPatchEx::CTPatchEx(CTPatchEx* copy) {
+	flip_x = copy->flip_x;
+	flip_y = copy->flip_y;
+	rotation = copy->rotation;
+	alpha = copy->alpha;
+	style = copy->style;
+	blendtype = copy->blendtype;
+	blend_col = copy->blend_col;
+	blend = copy->blend;
+	offset_x = copy->xOffset();
+	offset_y = copy->yOffset();
+	name = copy->getName();
+	for (unsigned a = 0; a < copy->translation.size(); a++)
+		translation.push_back(copy->translation[a]);
 }
 
 /* CTPatchEx::~CTPatchEx
@@ -303,8 +335,14 @@ void CTexture::copyTexture(CTexture* tex) {
 
 	// Copy patches
 	for (unsigned a = 0; a < tex->nPatches(); a++) {
-		CTPatch* patch = tex->getPatch(a);
-		addPatch(patch->getName(), patch->xOffset(), patch->yOffset(), patch->getEntry());
+		if (tex->extended) {
+			CTPatchEx* patch = new CTPatchEx((CTPatchEx*)tex->getPatch(a));
+			patches.push_back(patch);
+		}
+		else {
+			CTPatch* patch = tex->getPatch(a);
+			addPatch(patch->getName(), patch->xOffset(), patch->yOffset(), patch->getEntry());
+		}
 	}
 }
 
@@ -349,7 +387,11 @@ void CTexture::clear() {
  *******************************************************************/
 bool CTexture::addPatch(string patch, int16_t offset_x, int16_t offset_y, ArchiveEntry* entry, int index) {
 	// Create new patch
-	CTPatch* np = new CTPatch(patch, offset_x, offset_y, entry);
+	CTPatch* np;
+	if (extended)
+		np = new CTPatchEx(patch, offset_x, offset_y, entry);
+	else
+		np = new CTPatch(patch, offset_x, offset_y, entry);
 
 	// Add it either after [index] or at the end
 	if (index >= 0 && (unsigned) index < patches.size())

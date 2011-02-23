@@ -45,7 +45,9 @@ private:
 
 public:
 	CTPatchEx();
+	CTPatchEx(string name, int16_t offset_x = 0, int16_t offset_y = 0, ArchiveEntry* entry = NULL);
 	CTPatchEx(CTPatch* copy);
+	CTPatchEx(CTPatchEx* copy);
 	~CTPatchEx();
 
 	bool	parse(Tokenizer& tz);
@@ -97,12 +99,20 @@ public:
 	size_t		nPatches() { return patches.size(); }
 	CTPatch*	getPatch(size_t index);
 
-	void	setName(string name) { this->name = name; announce("modified"); }
-	void	setWidth(uint16_t width) { this->width = width; announce("modified"); }
-	void	setHeight(uint16_t height) { this->height = height; announce("modified"); }
-	void	setScaleX(double scale) { this->scale_x = scale; announce("modified"); }
-	void	setScaleY(double scale) { this->scale_y = scale; announce("modified"); }
-	void	setScale(double x, double y) { this->scale_x = x; this->scale_y = y; announce("modified"); }
+	void	setName(string name) { this->name = name; }
+	void	setWidth(uint16_t width) { this->width = width; }
+	void	setHeight(uint16_t height) { this->height = height; }
+	void	setScaleX(double scale) { this->scale_x = scale; }
+	void	setScaleY(double scale) { this->scale_y = scale; }
+	void	setScale(double x, double y) { this->scale_x = x; this->scale_y = y; }
+	void	setOffsetX(int16_t offset) { this->offset_x = offset; }
+	void	setOffsetY(int16_t offset) { this->offset_y = offset; }
+	void	setWorldPanning(bool wp) { this->world_panning = wp; }
+	void	setType(string type) { this->type = type; }
+	void	setExtended(bool ext) { this->extended = ext; }
+	void	setOptional(bool opt) { this->optional = opt; }
+	void	setNoDecals(bool nd) { this->no_decals = nd; }
+	void	setNullTexture(bool nt) { this->null_texture = nt; }
 
 	void	clear();
 

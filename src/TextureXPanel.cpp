@@ -247,6 +247,9 @@ bool TextureXPanel::saveTEXTUREX() {
 		ok = texturex.writeTEXTURESData(tx_entry);
 	else
 		ok = texturex.writeTEXTUREXData(tx_entry, tx_editor->patchTable());
+
+	// Redetect type and lock it up
+	EntryType::detectEntryType(tx_entry);
 	tx_entry->lock();
 
 	return ok;
@@ -291,8 +294,10 @@ CTexture* TextureXPanel::newTextureFromPatch(string name, string patch) {
 	tex->setHeight(image.getHeight());
 
 	// Setup texture scale
-	if (texturex.getFormat() == TXF_TEXTURES)
+	if (texturex.getFormat() == TXF_TEXTURES) {
 		tex->setScale(1, 1);
+		tex->setExtended(true);
+	}
 	else
 		tex->setScale(0, 0);
 
@@ -348,8 +353,10 @@ void TextureXPanel::onBtnNewTexture(wxCommandEvent& e) {
 	tex->setHeight(128);
 
 	// Setup texture scale
-	if (texturex.getFormat() == TXF_TEXTURES)
+	if (texturex.getFormat() == TXF_TEXTURES) {
 		tex->setScale(1, 1);
+		tex->setExtended(true);
+	}
 	else
 		tex->setScale(0, 0);
 

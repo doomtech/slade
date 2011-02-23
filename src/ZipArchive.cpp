@@ -470,7 +470,7 @@ ArchiveEntry* ZipArchive::findFirst(search_options_t& options) {
 	search_options_t opt = options;
 	opt.dir = dir;
 	opt.match_namespace = "";
-	return Archive::findLast(opt);
+	return Archive::findFirst(opt);
 }
 
 /* ZipArchive::findLast

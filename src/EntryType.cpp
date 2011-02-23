@@ -213,10 +213,10 @@ int EntryType::isThisType(ArchiveEntry* entry) {
 	if (format == EntryDataFormat::textFormat()) {
 		// Text is a special case, as other data formats can sometimes be detected as 'text',
 		// we'll only check for it if text data is specified in the entry type
-		if (memchr(entry->getData(), 0, entry->getSize()-1) != NULL)
+		if (entry->getSize() > 0 && memchr(entry->getData(), 0, entry->getSize()-1) != NULL)
 			return EDF_FALSE;
 	}
-	else if (format != EntryDataFormat::anyFormat()) {
+	else if (format != EntryDataFormat::anyFormat() && entry->getSize() > 0) {
 		r = format->isThisFormat(entry->getMCData());
 		if (r == EDF_FALSE)
 			return EDF_FALSE;

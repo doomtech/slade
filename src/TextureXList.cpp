@@ -537,6 +537,12 @@ bool TextureXList::writeTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_t
  * false otherwise
  *******************************************************************/
 bool TextureXList::readTEXTURESData(ArchiveEntry* entry) {
+	// Check for empty entry
+	if (entry->getSize() == 0) {
+		txformat = TXF_TEXTURES;
+		return true;
+	}
+
 	// Get text to parse
 	Tokenizer tz;
 	tz.openMem(&(entry->getMCData()), entry->getName());

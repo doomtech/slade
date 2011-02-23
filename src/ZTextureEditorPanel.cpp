@@ -75,8 +75,15 @@ wxPanel* ZTextureEditorPanel::createTextureControls(wxWindow* parent) {
 
 
 	// Bind events
-	//spin_tex_scalex->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &TextureEditorPanel::onTexScaleXChanged, this);
-	//spin_tex_scaley->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &TextureEditorPanel::onTexScaleYChanged, this);
+	spin_tex_scalex->Bind(wxEVT_COMMAND_SPINCTRLDOUBLE_UPDATED, &ZTextureEditorPanel::onTexScaleXChanged, this);
+	spin_tex_scaley->Bind(wxEVT_COMMAND_SPINCTRLDOUBLE_UPDATED, &ZTextureEditorPanel::onTexScaleYChanged, this);
+	spin_tex_offsetx->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &ZTextureEditorPanel::onTexOffsetXChanged, this);
+	spin_tex_offsety->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &ZTextureEditorPanel::onTexOffsetYChanged, this);
+	choice_type->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &ZTextureEditorPanel::onTexTypeChanged, this);
+	cb_optional->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &ZTextureEditorPanel::onTexOptionalChanged, this);
+	cb_worldpanning->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &ZTextureEditorPanel::onTexWorldPanningChanged, this);
+	cb_nodecals->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &ZTextureEditorPanel::onTexNoDecalsChanged, this);
+	cb_nulltexture->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &ZTextureEditorPanel::onTexNullTextureChanged, this);
 
 	return panel;
 }
@@ -126,3 +133,80 @@ void ZTextureEditorPanel::populatePatchList() {
 void ZTextureEditorPanel::updatePatchControls() {
 }
 */
+
+
+
+
+void ZTextureEditorPanel::onTexScaleXChanged(wxSpinDoubleEvent& e) {
+	// Set texture's x scale
+	if (tex_current)
+		tex_current->setScaleX(spin_tex_scalex->GetValue());
+
+	// Update UI
+	updateTextureScaleLabel();
+
+	tex_modified = true;
+}
+
+void ZTextureEditorPanel::onTexScaleYChanged(wxSpinDoubleEvent& e) {
+	// Set texture's y scale
+	if (tex_current)
+		tex_current->setScaleY(spin_tex_scaley->GetValue());
+
+	// Update UI
+	updateTextureScaleLabel();
+
+	tex_modified = true;
+}
+
+void ZTextureEditorPanel::onTexOffsetXChanged(wxSpinEvent& e) {
+	// Set texture's x offset
+	if (tex_current)
+		tex_current->setOffsetX(spin_tex_offsetx->GetValue());
+
+	tex_modified = true;
+}
+
+void ZTextureEditorPanel::onTexOffsetYChanged(wxSpinEvent& e) {
+	// Set texture's y offset
+	if (tex_current)
+		tex_current->setOffsetY(spin_tex_offsety->GetValue());
+
+	tex_modified = true;
+}
+
+void ZTextureEditorPanel::onTexTypeChanged(wxCommandEvent& e) {
+	// Set texture's type
+	if (tex_current)
+		tex_current->setType(choice_type->GetStringSelection());
+
+	tex_modified = true;
+}
+
+void ZTextureEditorPanel::onTexOptionalChanged(wxCommandEvent& e) {
+	if (tex_current)
+		tex_current->setOptional(cb_optional->GetValue());
+
+	tex_modified =  true;
+}
+
+void ZTextureEditorPanel::onTexWorldPanningChanged(wxCommandEvent& e) {
+	if (tex_current)
+		tex_current->setWorldPanning(cb_worldpanning->GetValue());
+
+	tex_modified =  true;
+}
+
+void ZTextureEditorPanel::onTexNoDecalsChanged(wxCommandEvent& e) {
+	if (tex_current)
+		tex_current->setNoDecals(cb_nodecals->GetValue());
+
+	tex_modified =  true;
+}
+
+void ZTextureEditorPanel::onTexNullTextureChanged(wxCommandEvent& e) {
+	if (tex_current)
+		tex_current->setNullTexture(cb_nulltexture->GetValue());
+
+	tex_modified =  true;
+}

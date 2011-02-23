@@ -79,7 +79,6 @@ public:
 		// ZDoom TEXTURES format
 		rb_format_textures = new wxRadioButton(this, -1, "ZDoom (TEXTURES)");
 		framesizer->Add(rb_format_textures, 0, wxEXPAND|wxALL, 4);
-		rb_format_textures->Enable(false);
 
 
 		// --- Source options ---
@@ -561,7 +560,15 @@ bool TextureXEditor::setupTextureEntries(Archive* archive) {
 						texturex->setExtensionByType();
 					}
 					else if (ctxd.getSelectedFormat() == TXF_TEXTURES) {
-						wxMessageBox("ZDoom TEXTURES Not Implemented");
+						// Create texture list
+						TextureXList txlist;
+						txlist.setFormat(TXF_TEXTURES);
+
+						// Add empty TEXTURES entry to archive
+						texturex = archive->addNewEntry("TEXTURES");
+						texturex->setType(EntryType::getType("zdtextures"));
+						texturex->setExtensionByType();
+
 						return false;
 					}
 
