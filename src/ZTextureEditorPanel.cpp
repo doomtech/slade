@@ -2,7 +2,9 @@
 #include "Main.h"
 #include "WxStuff.h"
 #include "ZTextureEditorPanel.h"
+#include "Icons.h"
 #include <wx/gbsizer.h>
+#include <wx/statline.h>
 
 ZTextureEditorPanel::ZTextureEditorPanel(wxWindow* parent, TextureXEditor* tx_editor)
 : TextureEditorPanel(parent, tx_editor) {
@@ -12,7 +14,8 @@ ZTextureEditorPanel::~ZTextureEditorPanel() {
 }
 
 wxPanel* ZTextureEditorPanel::createTextureControls(wxWindow* parent) {
-	wxPanel* panel = new wxPanel(parent, -1);
+	wxScrolledWindow* panel = new wxScrolledWindow(parent, -1);
+	panel->SetScrollRate(4, 0);
 
 	// Setup tex controls panel sizer
 	wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
@@ -123,16 +126,252 @@ void ZTextureEditorPanel::updateTextureControls() {
 	cb_nulltexture->SetValue(tex_current->nullTexture());
 }
 
-/*
-wxPanel* ZTextureEditorPanel::createPatchControls(wxWindow* parent) {
-}
 
-void ZTextureEditorPanel::populatePatchList() {
+wxPanel* ZTextureEditorPanel::createPatchControls(wxWindow* parent) {
+	wxScrolledWindow* panel = new wxScrolledWindow(parent, -1);
+	panel->SetScrollRate(0, 4);
+
+	// Setup panel sizer
+	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+	panel->SetSizer(sizer);
+
+	// -- Texture Patches frame --
+	wxStaticBox* frame = new wxStaticBox(panel, -1, "Patches");
+	wxStaticBoxSizer* framesizer = new wxStaticBoxSizer(frame, wxHORIZONTAL);
+	sizer->Add(framesizer, 0, wxEXPAND|wxALL, 4);
+
+	// Add patches list
+	list_patches = new ListView(panel, -1);
+	list_patches->enableSizeUpdate(false);
+	framesizer->Add(list_patches, 1, wxEXPAND|wxALL, 4);
+
+	// Add patch buttons
+	wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
+	framesizer->Add(vbox, 0, wxEXPAND|wxTOP|wxRIGHT|wxBOTTOM, 4);
+
+	// 'Add' button
+	btn_patch_add = new wxBitmapButton(panel, -1, getIcon("t_patch_add"));
+	btn_patch_add->SetToolTip("Add new patch to texture");
+	vbox->Add(btn_patch_add, 0, wxBOTTOM, 4);
+
+	// 'Remove' button
+	btn_patch_remove = new wxBitmapButton(panel, -1, getIcon("t_patch_remove"));
+	btn_patch_remove->SetToolTip("Remove selected patch(es) from texture");
+	vbox->Add(btn_patch_remove, 0, wxBOTTOM, 4);
+
+	// 'Back' button
+	btn_patch_back = new wxBitmapButton(panel, -1, getIcon("t_patch_back"));
+	btn_patch_back->SetToolTip("Send selected patch(es) back");
+	vbox->Add(btn_patch_back, 0, wxBOTTOM, 4);
+
+	// 'Forward' button
+	btn_patch_forward = new wxBitmapButton(panel, -1, getIcon("t_patch_forward"));
+	btn_patch_forward->SetToolTip("Bring selected patch(es) forward");
+	vbox->Add(btn_patch_forward, 0, wxBOTTOM, 4);
+
+	// 'Replace' button
+	btn_patch_replace = new wxBitmapButton(panel, -1, getIcon("t_patch_replace"));
+	btn_patch_replace->SetToolTip("Replace selected patch(es)");
+	vbox->Add(btn_patch_replace, 0, wxBOTTOM, 4);
+
+	// 'Duplicate' button
+	btn_patch_duplicate = new wxBitmapButton(panel, -1, getIcon("t_patch_duplicate"));
+	btn_patch_duplicate->SetToolTip("Duplicate selected patch(es)");
+	vbox->Add(btn_patch_duplicate, 0, wxBOTTOM, 4);
+
+
+
+	// -- Patch Properties frame --
+	frame = new wxStaticBox(panel, -1, "Patch Properties");
+	framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
+	sizer->Add(framesizer, 0, wxEXPAND|wxALL, 4);
+
+	wxGridBagSizer* gb_sizer = new wxGridBagSizer(4, 4);
+	framesizer->Add(gb_sizer, 1, wxEXPAND|wxALL, 4);
+
+	// X Position
+	spin_patch_left = new wxSpinCtrl(panel, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxALIGN_RIGHT, SHRT_MIN, SHRT_MAX);
+	gb_sizer->Add(new wxStaticText(panel, -1, "X Position:"), wxGBPosition(0, 0), wxDefaultSpan, wxALIGN_CENTER_VERTICAL);
+	gb_sizer->Add(spin_patch_left, wxGBPosition(0, 1), wxDefaultSpan, wxEXPAND);
+
+	// Y Position
+	spin_patch_top = new wxSpinCtrl(panel, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxALIGN_RIGHT, SHRT_MIN, SHRT_MAX);
+	gb_sizer->Add(new wxStaticText(panel, -1, "Y Position:"), wxGBPosition(1, 0), wxDefaultSpan, wxALIGN_CENTER_VERTICAL);
+	gb_sizer->Add(spin_patch_top, wxGBPosition(1, 1), wxDefaultSpan, wxEXPAND);
+
+	// Flip X
+	cb_flipx = new wxCheckBox(panel, -1, "Flip X");
+	gb_sizer->Add(cb_flipx, wxGBPosition(2, 0), wxDefaultSpan, wxALIGN_CENTER_VERTICAL);
+
+	// Flip Y
+	cb_flipy = new wxCheckBox(panel, -1, "Flip Y");
+	gb_sizer->Add(cb_flipy, wxGBPosition(2, 1), wxDefaultSpan, wxALIGN_CENTER_VERTICAL);
+
+	// Rotation
+	string rotval[] = { "0", "90", "180", "270" };
+	choice_rotation = new wxChoice(panel, -1, wxDefaultPosition, wxDefaultSize, 4, rotval);
+	choice_rotation->SetSelection(0);
+	gb_sizer->Add(new wxStaticText(panel, -1, "Rotation:"), wxGBPosition(3, 0), wxDefaultSpan, wxALIGN_CENTER_VERTICAL);
+	gb_sizer->Add(choice_rotation, wxGBPosition(3, 1), wxDefaultSpan, wxEXPAND);
+
+	// Alpha
+	spin_alpha = new wxSpinCtrlDouble(panel, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxALIGN_RIGHT, 0, 1, 1, 0.1);
+	gb_sizer->Add(new wxStaticText(panel, -1, "Alpha:"), wxGBPosition(4, 0), wxDefaultSpan, wxALIGN_CENTER_VERTICAL);
+	gb_sizer->Add(spin_alpha, wxGBPosition(4, 1), wxDefaultSpan, wxEXPAND);
+
+	// Alpha Style
+	string styles[] = { "Copy", "Translucent", "Add", "Subtract", "ReverseSubtract", "Modulate", "CopyAlpha" };
+	choice_style = new wxChoice(panel, -1, wxDefaultPosition, wxDefaultSize, 7, styles);
+	choice_style->SetSelection(0);
+	gb_sizer->Add(new wxStaticText(panel, -1, "Alpha Style:"), wxGBPosition(5, 0), wxDefaultSpan, wxALIGN_CENTER_VERTICAL);
+	gb_sizer->Add(choice_style, wxGBPosition(6, 0), wxGBSpan(1, 2), wxEXPAND);
+
+	frame = new wxStaticBox(panel, -1, "Patch Colour");
+	framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
+	sizer->Add(framesizer, 0, wxEXPAND|wxALL, 4);
+
+	gb_sizer = new wxGridBagSizer(4, 4);
+	framesizer->Add(gb_sizer, 1, wxEXPAND|wxALL, 4);
+	gb_sizer->AddGrowableCol(0, 1);
+	gb_sizer->AddGrowableCol(1, 1);
+
+	// 'Normal' colour
+	rb_pc_normal = new wxRadioButton(panel, -1, "Normal", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+	gb_sizer->Add(rb_pc_normal, wxGBPosition(0, 0), wxGBSpan(1, 2), wxALIGN_CENTER_VERTICAL);
+
+	gb_sizer->Add(new wxStaticLine(panel, -1), wxGBPosition(1, 0), wxGBSpan(1, 2), wxEXPAND);
+
+	// Blend
+	rb_pc_blend = new wxRadioButton(panel, -1, "Blend");
+	rb_pc_tint = new wxRadioButton(panel, -1, "Tint");
+	gb_sizer->Add(rb_pc_blend, wxGBPosition(2, 0), wxDefaultSpan, wxALIGN_CENTER_VERTICAL);
+	gb_sizer->Add(rb_pc_tint, wxGBPosition(2, 1), wxDefaultSpan, wxALIGN_CENTER_VERTICAL);
+
+	// Blend/Tint colour
+	cp_blend_col = new wxColourPickerCtrl(panel, -1);
+	gb_sizer->Add(new wxStaticText(panel, -1, "Colour:"), wxGBPosition(3, 0), wxDefaultSpan, wxALIGN_CENTER_VERTICAL);
+	gb_sizer->Add(cp_blend_col, wxGBPosition(3, 1), wxDefaultSpan, wxEXPAND);
+
+	// Tint amount
+	spin_tint_amount = new wxSpinCtrlDouble(panel, 01, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxALIGN_RIGHT, 0, 1, 0, 0.1);
+	gb_sizer->Add(new wxStaticText(panel, -1, "Amount:"), wxGBPosition(4, 0), wxDefaultSpan, wxALIGN_CENTER_VERTICAL);
+	gb_sizer->Add(spin_tint_amount, wxGBPosition(4, 1), wxDefaultSpan, wxEXPAND);
+
+	gb_sizer->Add(new wxStaticLine(panel, -1), wxGBPosition(5, 0), wxGBSpan(1, 2), wxEXPAND);
+
+	// Translation
+	rb_pc_translation = new wxRadioButton(panel, -1, "Translation");
+	gb_sizer->Add(rb_pc_translation, wxGBPosition(6, 0), wxGBSpan(1, 2), wxALIGN_CENTER_VERTICAL);
+
+	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
+	gb_sizer->Add(hbox, wxGBPosition(7, 0), wxGBSpan(1, 2), wxEXPAND);
+
+	// Translation text entry
+	text_translation = new wxTextCtrl(panel, -1);
+	hbox->Add(text_translation, 1, wxEXPAND|wxRIGHT, 4);
+
+	// Translation edit button
+	btn_edit_translation = new wxButton(panel, -1, "Edit", wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT);
+	hbox->Add(btn_edit_translation);
+
+	return panel;
 }
 
 void ZTextureEditorPanel::updatePatchControls() {
+	// Get selected patches
+	wxArrayInt selection = list_patches->selectedItems();
+
+	// If nothing is selected, disable patch controls
+	if (selection.size() == 0) {
+		spin_patch_left->Enable(false);
+		spin_patch_top->Enable(false);
+		cb_flipx->Enable(false);
+		cb_flipy->Enable(false);
+		choice_rotation->Enable(false);
+		spin_alpha->Enable(false);
+		choice_style->Enable(false);
+		rb_pc_normal->Enable(false);
+		rb_pc_blend->Enable(false);
+		rb_pc_tint->Enable(false);
+		cp_blend_col->Enable(false);
+		spin_tint_amount->Enable(false);
+		text_translation->Enable(false);
+		btn_edit_translation->Enable(false);
+	}
+	else {
+		// Something is selected, enable the controls
+		spin_patch_left->Enable(true);
+		spin_patch_top->Enable(true);
+		cb_flipx->Enable(true);
+		cb_flipy->Enable(true);
+		choice_rotation->Enable(true);
+		spin_alpha->Enable(true);
+		choice_style->Enable(true);
+		rb_pc_normal->Enable(true);
+		rb_pc_blend->Enable(true);
+		rb_pc_tint->Enable(true);
+		cp_blend_col->Enable(true);
+		spin_tint_amount->Enable(true);
+		text_translation->Enable(true);
+		btn_edit_translation->Enable(true);
+
+		// If only 1 patch is selected, just set the controls to this patch
+		if (selection.size() == 1) {
+			CTPatchEx* patch = (CTPatchEx*)tex_current->getPatch(selection[0]);
+			if (!patch) {
+				wxLogMessage("Error: Selected patch does not exist in texture");
+				return;
+			}
+
+			spin_patch_left->SetValue(patch->xOffset());
+			spin_patch_top->SetValue(patch->yOffset());
+			cb_flipx->SetValue(patch->flipX());
+			cb_flipy->SetValue(patch->flipY());
+			spin_alpha->SetValue(patch->getAlpha());
+			choice_style->SetStringSelection(patch->getStyle());
+			cp_blend_col->SetColour(WXCOL(patch->getBlendCol()));
+			spin_tint_amount->SetValue((double)patch->getBlendCol().a / 255.0);
+
+			switch (patch->getRotation()) {
+				case 0: choice_rotation->SetSelection(0); break;
+				case 90: choice_rotation->SetSelection(1); break;
+				case 180: choice_rotation->SetSelection(2); break;
+				case -90: choice_rotation->SetSelection(3); break;
+				default: choice_rotation->SetSelection(-1); break;
+			};
+
+			// Update patch colour controls
+			switch (patch->getBlendType()) {
+			case 1:
+				rb_pc_translation->SetValue(true);
+				enableTranslationControls(true);
+				enableBlendControls(false);
+				break;
+			case 2:
+				rb_pc_blend->SetValue(true);
+				enableBlendControls(true);
+				enableTranslationControls(false);
+				break;
+			case 3:
+				rb_pc_tint->SetValue(true);
+				enableBlendControls(true, true);
+				enableTranslationControls(false);
+				break;
+			default:
+				rb_pc_normal->SetValue(true);
+				enableTranslationControls(false);
+				enableBlendControls(false);
+				break;
+			}
+		}
+		else {
+			// Multiple selection, only enable some controls
+			spin_patch_left->Enable(false);
+			spin_patch_top->Enable(false);
+		}
+	}
 }
-*/
+
 
 
 

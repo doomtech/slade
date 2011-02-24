@@ -103,7 +103,7 @@ void TextureEditorPanel::setupLayout() {
 	sizer->Add(vbox, 0, wxEXPAND);
 
 	// Add patch controls
-	vbox->Add(createPatchControls(this), 0, wxEXPAND);
+	vbox->Add(createPatchControls(this), 1, wxEXPAND);
 
 
 	// Bind events

@@ -50,6 +50,15 @@ public:
 	CTPatchEx(CTPatchEx* copy);
 	~CTPatchEx();
 
+	bool	flipX() { return flip_x; }
+	bool	flipY() { return flip_y; }
+	int16_t	getRotation() { return rotation; }
+	string	getBlend() { return blend; }
+	rgba_t	getBlendCol() { return blend_col; }
+	float	getAlpha() { return alpha; }
+	string	getStyle() { return style; }
+	uint8_t	getBlendType() { return blendtype; }
+
 	bool	parse(Tokenizer& tz);
 	string	asText();
 };
