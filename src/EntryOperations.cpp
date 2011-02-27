@@ -877,7 +877,7 @@ bool EntryOperations::compileACS(ArchiveEntry* entry) {
 			ArchiveEntry* prev = entry->prevEntry();
 
 			// Create a new entry there if it isn't BEHAVIOR
-			if (!(s_cmpnocase(prev->getName(), "BEHAVIOR")))
+			if (!prev || !(s_cmpnocase(prev->getName(), "BEHAVIOR")))
 				prev = entry->getParent()->addNewEntry("BEHAVIOR", entry->getParent()->entryIndex(entry));
 
 			// Import compiled script
