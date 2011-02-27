@@ -304,6 +304,7 @@
     <File Name="Makefile"/>
     <File Name="Makefile-debug"/>
     <File Name="README-unix"/>
+    <File Name="Makefile-no_audiere"/>
   </VirtualDirectory>
   <VirtualDirectory Name="External">
     <VirtualDirectory Name="QMus2Mid">
