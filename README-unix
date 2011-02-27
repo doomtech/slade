@@ -42,3 +42,6 @@ Audio support:
 The current release of Audiere is quite old, and can cause some problems. For one, it only supports OSS output
 in linux. If your distro has dropped OSS support (eg ubuntu 10.10), you'll have to get the alsa-oss wrapper,
 and run slade3 like "aoss ./slade3", or no audio playback (except MIDI via fluidsynth) will be available.
+If you cannot get Audiere packages for your distro (and don't try compiling it - it won't), it is possible to
+disable it (and therefore all sound playback) by using Makefile-no_audiere in trunk
+
