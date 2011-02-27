@@ -274,6 +274,20 @@ wxPanel* ZTextureEditorPanel::createPatchControls(wxWindow* parent) {
 	btn_edit_translation = new wxButton(panel, -1, "Edit", wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT);
 	hbox->Add(btn_edit_translation);
 
+
+	// Bind events
+	cb_flipx->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &ZTextureEditorPanel::onPatchFlipXChanged, this);
+	cb_flipy->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &ZTextureEditorPanel::onPatchFlipYChanged, this);
+	choice_rotation->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &ZTextureEditorPanel::onPatchRotationChanged, this);
+	spin_alpha->Bind(wxEVT_COMMAND_SPINCTRLDOUBLE_UPDATED, &ZTextureEditorPanel::onPatchAlphaChanged, this);
+	choice_style->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &ZTextureEditorPanel::onPatchAlphaStyleChanged, this);
+	rb_pc_normal->Bind(wxEVT_COMMAND_RADIOBUTTON_SELECTED, &ZTextureEditorPanel::onPCNormalSelected, this);
+	rb_pc_blend->Bind(wxEVT_COMMAND_RADIOBUTTON_SELECTED, &ZTextureEditorPanel::onPCBlendSelected, this);
+	rb_pc_tint->Bind(wxEVT_COMMAND_RADIOBUTTON_SELECTED, &ZTextureEditorPanel::onPCTintSelected, this);
+	rb_pc_translation->Bind(wxEVT_COMMAND_RADIOBUTTON_SELECTED, &ZTextureEditorPanel::onPCTranslationSelected, this);
+	cp_blend_col->Bind(wxEVT_COMMAND_COLOURPICKER_CHANGED, &ZTextureEditorPanel::onPatchColourChanged, this);
+	spin_tint_amount->Bind(wxEVT_COMMAND_SPINCTRLDOUBLE_UPDATED, &ZTextureEditorPanel::onPatchTintAmountChanged, this);
+
 	return panel;
 }
 
@@ -293,6 +307,7 @@ void ZTextureEditorPanel::updatePatchControls() {
 		rb_pc_normal->Enable(false);
 		rb_pc_blend->Enable(false);
 		rb_pc_tint->Enable(false);
+		rb_pc_translation->Enable(false);
 		cp_blend_col->Enable(false);
 		spin_tint_amount->Enable(false);
 		text_translation->Enable(false);
@@ -310,6 +325,7 @@ void ZTextureEditorPanel::updatePatchControls() {
 		rb_pc_normal->Enable(true);
 		rb_pc_blend->Enable(true);
 		rb_pc_tint->Enable(true);
+		rb_pc_translation->Enable(true);
 		cp_blend_col->Enable(true);
 		spin_tint_amount->Enable(true);
 		text_translation->Enable(true);
@@ -329,8 +345,8 @@ void ZTextureEditorPanel::updatePatchControls() {
 			cb_flipy->SetValue(patch->flipY());
 			spin_alpha->SetValue(patch->getAlpha());
 			choice_style->SetStringSelection(patch->getStyle());
-			cp_blend_col->SetColour(WXCOL(patch->getBlendCol()));
-			spin_tint_amount->SetValue((double)patch->getBlendCol().a / 255.0);
+			cp_blend_col->SetColour(WXCOL(patch->getColour()));
+			spin_tint_amount->SetValue((double)patch->getColour().a / 255.0);
 
 			switch (patch->getRotation()) {
 				case 0: choice_rotation->SetSelection(0); break;
@@ -448,4 +464,198 @@ void ZTextureEditorPanel::onTexNullTextureChanged(wxCommandEvent& e) {
 		tex_current->setNullTexture(cb_nulltexture->GetValue());
 
 	tex_modified =  true;
+}
+
+void ZTextureEditorPanel::onPatchFlipXChanged(wxCommandEvent& e) {
+	// Check texture is open
+	if (!tex_current)
+		return;
+
+	// Go through selected patches
+	for (unsigned a = 0; a < list_patches->selectedItems().size(); a++) {
+		CTPatchEx* patch = (CTPatchEx*)tex_current->getPatch(list_patches->selectedItems()[a]);
+		if (patch)
+			patch->flipX(cb_flipx->GetValue());
+	}
+
+	tex_modified = true;
+}
+
+void ZTextureEditorPanel::onPatchFlipYChanged(wxCommandEvent& e) {
+	// Check texture is open
+	if (!tex_current)
+		return;
+
+	// Go through selected patches
+	for (unsigned a = 0; a < list_patches->selectedItems().size(); a++) {
+		CTPatchEx* patch = (CTPatchEx*)tex_current->getPatch(list_patches->selectedItems()[a]);
+		if (patch)
+			patch->flipY(cb_flipy->GetValue());
+	}
+
+	tex_modified = true;
+}
+
+void ZTextureEditorPanel::onPatchRotationChanged(wxCommandEvent& e) {
+	// Check texture is open
+	if (!tex_current)
+		return;
+
+	// Get rotation value to apply
+	int rot = 0;
+	switch (choice_rotation->GetSelection()) {
+		case 1: rot = 90; break;
+		case 2: rot = 180; break;
+		case 3: rot = -90; break;
+		default: rot = 0; break;
+	};
+
+	// Go through selected patches
+	for (unsigned a = 0; a < list_patches->selectedItems().size(); a++) {
+		CTPatchEx* patch = (CTPatchEx*)tex_current->getPatch(list_patches->selectedItems()[a]);
+		if (patch)
+			patch->setRotation(rot);
+	}
+
+	tex_modified = true;
+}
+
+void ZTextureEditorPanel::onPatchAlphaChanged(wxSpinDoubleEvent& e) {
+	// Check texture is open
+	if (!tex_current)
+		return;
+
+	// Go through selected patches
+	for (unsigned a = 0; a < list_patches->selectedItems().size(); a++) {
+		CTPatchEx* patch = (CTPatchEx*)tex_current->getPatch(list_patches->selectedItems()[a]);
+		if (patch)
+			patch->setAlpha(spin_alpha->GetValue());
+	}
+
+	tex_modified = true;
+}
+
+void ZTextureEditorPanel::onPatchAlphaStyleChanged(wxCommandEvent& e) {
+	// Check texture is open
+	if (!tex_current)
+		return;
+
+	// Go through selected patches
+	for (unsigned a = 0; a < list_patches->selectedItems().size(); a++) {
+		CTPatchEx* patch = (CTPatchEx*)tex_current->getPatch(list_patches->selectedItems()[a]);
+		if (patch)
+			patch->setStyle(choice_style->GetStringSelection());
+	}
+
+	tex_modified = true;
+}
+
+void ZTextureEditorPanel::onPCNormalSelected(wxCommandEvent& e) {
+	// Check texture is open
+	if (!tex_current)
+		return;
+
+	// Go through selected patches
+	for (unsigned a = 0; a < list_patches->selectedItems().size(); a++) {
+		CTPatchEx* patch = (CTPatchEx*)tex_current->getPatch(list_patches->selectedItems()[a]);
+		if (patch)
+			patch->setBlendType(0);
+	}
+
+	// Update UI
+	enableTranslationControls(false);
+	enableBlendControls(false);
+
+	tex_modified = true;
+}
+
+void ZTextureEditorPanel::onPCBlendSelected(wxCommandEvent& e) {
+	// Check texture is open
+	if (!tex_current)
+		return;
+
+	// Go through selected patches
+	for (unsigned a = 0; a < list_patches->selectedItems().size(); a++) {
+		CTPatchEx* patch = (CTPatchEx*)tex_current->getPatch(list_patches->selectedItems()[a]);
+		if (patch)
+			patch->setBlendType(2);
+	}
+
+	// Update UI
+	enableTranslationControls(false);
+	enableBlendControls(true);
+
+	tex_modified = true;
+}
+
+void ZTextureEditorPanel::onPCTintSelected(wxCommandEvent& e) {
+	// Check texture is open
+	if (!tex_current)
+		return;
+
+	// Go through selected patches
+	for (unsigned a = 0; a < list_patches->selectedItems().size(); a++) {
+		CTPatchEx* patch = (CTPatchEx*)tex_current->getPatch(list_patches->selectedItems()[a]);
+		if (patch)
+			patch->setBlendType(3);
+	}
+
+	// Update UI
+	enableTranslationControls(false);
+	enableBlendControls(true, true);
+
+	tex_modified = true;
+}
+
+void ZTextureEditorPanel::onPCTranslationSelected(wxCommandEvent& e) {
+	// Check texture is open
+	if (!tex_current)
+		return;
+
+	// Go through selected patches
+	for (unsigned a = 0; a < list_patches->selectedItems().size(); a++) {
+		CTPatchEx* patch = (CTPatchEx*)tex_current->getPatch(list_patches->selectedItems()[a]);
+		if (patch)
+			patch->setBlendType(1);
+	}
+
+	// Update UI
+	enableTranslationControls(true);
+	enableBlendControls(false);
+
+	tex_modified = true;
+}
+
+void ZTextureEditorPanel::onPatchColourChanged(wxColourPickerEvent& e) {
+	// Check texture is open
+	if (!tex_current)
+		return;
+
+	// Go through selected patches
+	for (unsigned a = 0; a < list_patches->selectedItems().size(); a++) {
+		CTPatchEx* patch = (CTPatchEx*)tex_current->getPatch(list_patches->selectedItems()[a]);
+		if (patch) {
+			wxColour col = cp_blend_col->GetColour();
+			patch->setColour(col.Red(), col.Green(), col.Blue(), spin_tint_amount->GetValue()*255);
+		}
+	}
+
+	tex_modified = true;
+}
+
+void ZTextureEditorPanel::onPatchTintAmountChanged(wxSpinDoubleEvent& e) {
+	// Check texture is open
+	if (!tex_current)
+		return;
+
+	// Go through selected patches
+	for (unsigned a = 0; a < list_patches->selectedItems().size(); a++) {
+		CTPatchEx* patch = (CTPatchEx*)tex_current->getPatch(list_patches->selectedItems()[a]);
+		if (patch) {
+			wxColour col = cp_blend_col->GetColour();
+			patch->setColour(col.Red(), col.Green(), col.Blue(), spin_tint_amount->GetValue()*255);
+		}
+	}
+
+	tex_modified = true;
 }

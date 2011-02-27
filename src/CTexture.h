@@ -37,11 +37,10 @@ private:
 	bool			flip_y;
 	int16_t			rotation;
 	vector<string>	translation;
-	string			blend;
-	rgba_t			blend_col;
+	rgba_t			colour;
 	float			alpha;
 	string			style;
-	uint8_t			blendtype;	// 0=none, 1=translation, 2=blend(string), 3=blend(rgba)
+	uint8_t			blendtype;	// 0=none, 1=translation, 2=blend, 3=tint
 
 public:
 	CTPatchEx();
@@ -53,11 +52,18 @@ public:
 	bool	flipX() { return flip_x; }
 	bool	flipY() { return flip_y; }
 	int16_t	getRotation() { return rotation; }
-	string	getBlend() { return blend; }
-	rgba_t	getBlendCol() { return blend_col; }
+	rgba_t	getColour() { return colour; }
 	float	getAlpha() { return alpha; }
 	string	getStyle() { return style; }
 	uint8_t	getBlendType() { return blendtype; }
+
+	void	flipX(bool flip) { flip_x = flip; }
+	void	flipY(bool flip) { flip_y = flip; }
+	void	setRotation(int16_t rot) { rotation = rot; }
+	void	setColour(uint8_t r, uint8_t g, uint8_t b, uint8_t a) { colour.set(r, g, b, a); }
+	void	setAlpha(float a) { alpha = a; }
+	void	setStyle(string s) { style = s; }
+	void	setBlendType(uint8_t type) { blendtype = type; }
 
 	bool	parse(Tokenizer& tz);
 	string	asText();

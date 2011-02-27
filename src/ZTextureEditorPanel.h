@@ -58,6 +58,17 @@ public:
 	void	onTexWorldPanningChanged(wxCommandEvent& e);
 	void	onTexNoDecalsChanged(wxCommandEvent& e);
 	void	onTexNullTextureChanged(wxCommandEvent& e);
+	void	onPatchFlipXChanged(wxCommandEvent& e);
+	void	onPatchFlipYChanged(wxCommandEvent& e);
+	void	onPatchRotationChanged(wxCommandEvent& e);
+	void	onPatchAlphaChanged(wxSpinDoubleEvent& e);
+	void	onPatchAlphaStyleChanged(wxCommandEvent& e);
+	void	onPCNormalSelected(wxCommandEvent& e);
+	void	onPCBlendSelected(wxCommandEvent& e);
+	void	onPCTintSelected(wxCommandEvent& e);
+	void	onPCTranslationSelected(wxCommandEvent& e);
+	void	onPatchColourChanged(wxColourPickerEvent& e);
+	void	onPatchTintAmountChanged(wxSpinDoubleEvent& e);
 };
 
 #endif//__ZTEXTURE_EDITOR_PANEL_H__

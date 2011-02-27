@@ -30,6 +30,7 @@
  *******************************************************************/
 #include "Main.h"
 #include "CTexture.h"
+#include <wx/colour.h>
 
 
 /*******************************************************************
@@ -116,8 +117,7 @@ CTPatchEx::CTPatchEx(CTPatchEx* copy) {
 	alpha = copy->alpha;
 	style = copy->style;
 	blendtype = copy->blendtype;
-	blend_col = copy->blend_col;
-	blend = copy->blend;
+	colour = copy->colour;
 	offset_x = copy->xOffset();
 	offset_y = copy->yOffset();
 	name = copy->getName();
@@ -178,35 +178,38 @@ bool CTPatchEx::parse(Tokenizer& tz) {
 
 			// Blend
 			if (s_cmpnocase(property, "Blend")) {
-				long val;
+				double val;
+				wxColour col;
 				blendtype = 2;
 
 				// Read first value
 				string first = tz.getToken();
 
 				// If no second value, it's just a colour string
-				if (tz.peekToken() != ",")
-					blend = first;
+				if (tz.peekToken() != ",") {
+					col.Set(first);
+					colour.set(col.Red(), col.Blue(), col.Green());
+				}
 				else {
 					// Second value could be alpha or green
 					tz.getToken();	// Skip ,
-					string second = tz.getToken();
+					double second = tz.getDouble();
 
 					// If no third value, it's an alpha value
 					if (tz.peekToken() != ",") {
-						second.ToLong(&val);
-						blend_col.a = val;
+						col.Set(first);
+						colour.set(col.Red(), col.Blue(), col.Green(), second*255);
+						blendtype = 3;
 					}
 					else {
 						// Third value exists, must be R,G,B,A format
 						tz.getToken();	// Skip ,
-						first.ToLong(&val);
-						blend_col.r = val;
-						second.ToLong(&val);
-						blend_col.g = val;
-						blend_col.b = tz.getInteger();
+						first.ToDouble(&val);
+						colour.r = val*255;
+						colour.g = second*255;
+						colour.b = tz.getDouble()*255;
 						tz.getToken();	// Skip ,
-						blend_col.a = tz.getInteger();
+						colour.a = tz.getDouble()*255;
 						blendtype = 3;
 					}
 				}
@@ -259,15 +262,15 @@ string CTPatchEx::asText() {
 				text += ", ";
 		}
 	}
-	if (blendtype == 2) {
-		text += s_fmt("\t\tBlend %s", chr(blend));
-		if (blend_col.a > 0)
-			text += s_fmt(", %d\n", blend_col.a);
+	if (blendtype >= 2) {
+		wxColour col(colour.r, colour.g, colour.b);
+		text += s_fmt("\t\tBlend \"%s\"", chr(col.GetAsString(wxC2S_HTML_SYNTAX)));
+
+		if (blendtype == 3)
+			text += s_fmt(", %1.1f\n", (double)colour.a / 255.0);
 		else
 			text += "\n";
 	}
-	if (blendtype == 3)
-		text += s_fmt("\t\tBlend %d, %d, %d, %d\n", blend_col.r, blend_col.g, blend_col.b, blend_col.a);
 	if (alpha < 1.0f)
 		text += s_fmt("\t\tAlpha %1.2f\n", alpha);
 	if (!(s_cmpnocase(style, "Copy")))
