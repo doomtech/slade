@@ -369,10 +369,6 @@ bool WadArchive::open(MemChunk& mc) {
 		if (!archive_load_data)
 			entry->unloadData();
 
-		// Lock entry if IWAD
-		if (wad_type[0] == 'I' && iwad_lock)
-			entry->lock();
-
 		// Set entry to unchanged
 		entry->setState(0);
 	}
@@ -384,7 +380,7 @@ bool WadArchive::open(MemChunk& mc) {
 	// Setup variables
 	setMuted(false);
 	setModified(false);
-	if (iwad && iwad_lock) read_only = true;
+	//if (iwad && iwad_lock) read_only = true;
 	announce("opened");
 
 	theSplashWindow->setProgressMessage("");
@@ -410,6 +406,12 @@ bool WadArchive::write(string filename, bool update) {
  * Returns true if successful, false otherwise
  *******************************************************************/
 bool WadArchive::write(MemChunk& mc, bool update) {
+	// Don't write if iwad
+	if (iwad && iwad_lock) {
+		Global::error = "IWAD saving disabled";
+		return false;
+	}
+
 	// Determine directory offset & individual lump offsets
 	uint32_t dir_offset = 12;
 	ArchiveEntry* entry = NULL;

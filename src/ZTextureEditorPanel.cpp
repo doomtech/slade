@@ -250,7 +250,7 @@ wxPanel* ZTextureEditorPanel::createPatchControls(wxWindow* parent) {
 	// Blend/Tint colour
 	cp_blend_col = new wxColourPickerCtrl(panel, -1);
 	gb_sizer->Add(new wxStaticText(panel, -1, "Colour:"), wxGBPosition(3, 0), wxDefaultSpan, wxALIGN_CENTER_VERTICAL);
-	gb_sizer->Add(cp_blend_col, wxGBPosition(3, 1), wxDefaultSpan, wxEXPAND);
+	gb_sizer->Add(cp_blend_col, wxGBPosition(3, 1), wxDefaultSpan, wxALIGN_RIGHT);
 
 	// Tint amount
 	spin_tint_amount = new wxSpinCtrlDouble(panel, 01, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxALIGN_RIGHT, 0, 1, 0, 0.1);
