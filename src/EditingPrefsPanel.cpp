@@ -36,7 +36,6 @@
  * EXTERNAL VARIABLES
  *******************************************************************/
 EXTERN_CVAR(Bool, wad_force_uppercase)
-EXTERN_CVAR(Bool, iwad_lock)
 EXTERN_CVAR(Int, autosave_entry_changes)
 
 
@@ -59,11 +58,7 @@ EditingPrefsPanel::EditingPrefsPanel(wxWindow* parent) : wxPanel(parent, -1) {
 
 	// Force uppercase
 	cb_wad_force_uppercase = new wxCheckBox(this, -1, "Force uppercase entry names in Wad Archives");
-	sizer->Add(cb_wad_force_uppercase, 0, wxEXPAND|wxALL, 4);
-
-	// Lock IWAD
-	cb_wad_lock_iwad = new wxCheckBox(this, -1, "Lock all IWAD entries");
-	sizer->Add(cb_wad_lock_iwad, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
+	sizer->Add(cb_wad_force_uppercase, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
 
 	// Unsaved entry changes
 	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
@@ -75,7 +70,6 @@ EditingPrefsPanel::EditingPrefsPanel(wxWindow* parent) : wxPanel(parent, -1) {
 
 	// Init controls
 	cb_wad_force_uppercase->SetValue(wad_force_uppercase);
-	cb_wad_lock_iwad->SetValue(iwad_lock);
 	choice_entry_mod->SetSelection(autosave_entry_changes);
 }
 
@@ -90,6 +84,5 @@ EditingPrefsPanel::~EditingPrefsPanel() {
  *******************************************************************/
 void EditingPrefsPanel::applyPreferences() {
 	wad_force_uppercase = cb_wad_force_uppercase->GetValue();
-	iwad_lock = cb_wad_lock_iwad->GetValue();
 	autosave_entry_changes = choice_entry_mod->GetSelection();
 }

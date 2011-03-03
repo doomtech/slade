@@ -283,8 +283,10 @@ void CTextureCanvas::drawPatch(int num, rgba_t col) {
 	// Load the patch as an opengl texture if it isn't already
 	if (!patch_textures[num]->isLoaded()) {
 		SImage temp;
-		Misc::loadImageFromEntry(&temp, patch->getEntry());
-		patch_textures[num]->loadImage(&temp, &palette);
+		if (Misc::loadImageFromEntry(&temp, patch->getEntry()))
+			patch_textures[num]->loadImage(&temp, &palette);
+		else
+			patch_textures[num]->genChequeredTexture(8, COL_RED, COL_BLACK);
 	}
 
 	// Enable textures
