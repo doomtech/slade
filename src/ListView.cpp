@@ -133,7 +133,7 @@ bool ListView::deleteItems(wxArrayInt items) {
 }
 
 /* ListView::setItemStatus
- * Sets the 'status' of [item], changing it's text colour. Currently
+ * Sets the 'status' of [item], changing its text colour. Currently
  * there are 5 statuses:
  * LV_STATUS_NORMAL - default colour
  * LV_STATUS_MODIFIED - blue

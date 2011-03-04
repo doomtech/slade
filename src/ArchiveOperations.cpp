@@ -82,7 +82,7 @@ bool ArchiveOperations::removeUnusedPatches(Archive* archive) {
 		if (p.used_in.size() == 0) {
 			// Unused
 
-			// If it's entry is in the archive, flag it to be removed
+			// If its entry is in the archive, flag it to be removed
 			if (p.entry && p.entry->getParent() == archive)
 				to_remove.push_back(p.entry);
 

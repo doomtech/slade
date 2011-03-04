@@ -271,7 +271,7 @@ void BrowserWindow::doSort(unsigned sort_type) {
 }
 
 /* BrowserWindow::openTree
- * 'Opens' the items in [node] and all it's children, adding them
+ * 'Opens' the items in [node] and all its children, adding them
  * to the browser canvas' list of items. If [clear] is true, the
  * current list contents will be cleared
  *******************************************************************/

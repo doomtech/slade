@@ -297,7 +297,7 @@ bool EntryOperations::modifyGfxOffsets(ArchiveEntry* entry, int auto_type, point
 		// Load new png data to the entry
 		entry->importMemChunk(npng);
 
-		// Set it's type back to png
+		// Set its type back to png
 		entry->setType(type);
 	}
 	else
@@ -307,7 +307,7 @@ bool EntryOperations::modifyGfxOffsets(ArchiveEntry* entry, int auto_type, point
 }
 
 /* EntryOperations::openExternal
- * Opens [entry] in the default OS program for it's data type
+ * Opens [entry] in the default OS program for its data type
  *******************************************************************/
 bool EntryOperations::openExternal(ArchiveEntry* entry) {
 	if (!entry)

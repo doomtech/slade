@@ -644,6 +644,14 @@
 						RelativePath=".\src\TextureXPanel.h"
 						>
 					</File>
+					<File
+						RelativePath=".\src\ZTextureEditorPanel.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\ZTextureEditorPanel.h"
+						>
+					</File>
 				</Filter>
 				<Filter
 					Name="TextEditor"

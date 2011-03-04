@@ -538,6 +538,10 @@ bool TextureXList::writeTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_t
  *******************************************************************/
 bool TextureXList::readTEXTURESData(ArchiveEntry* entry) {
 	// Check for empty entry
+	if (!entry) {
+		Global::error = "Attempt to read texture data from NULL entry";
+		return false;
+	}
 	if (entry->getSize() == 0) {
 		txformat = TXF_TEXTURES;
 		return true;
@@ -586,6 +590,13 @@ bool TextureXList::readTEXTURESData(ArchiveEntry* entry) {
 		}
 
 		token = tz.getToken();
+	}
+
+	// Go through each patch of each texture and update them
+	for (uint32_t t = 0; t < textures.size(); ++t) {
+		for (uint32_t p = 0; p < textures[t]->nPatches(); p++) {
+			textures[t]->getPatch(p)->searchEntry(entry->getParent());
+		}
 	}
 
 	txformat = TXF_TEXTURES;

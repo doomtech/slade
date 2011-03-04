@@ -372,7 +372,7 @@ bool TextureXEditor::checkTextures() {
 			// Get texture
 			CTexture* tex = texture_editors[a]->txList().getTexture(t);
 
-			// Check it's patches are all valid
+			// Check its patches are all valid
 			for (unsigned p = 0; p < tex->nPatches(); p++) {
 				if (patch_table.patchIndex(tex->getPatch(p)->getName()) == -1) {
 					problems += s_fmt("Texture %s contains invalid/unknown patch %s\n", chr(tex->getName()), chr(tex->getPatch(p)->getName()));

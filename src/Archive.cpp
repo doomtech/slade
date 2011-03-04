@@ -826,7 +826,7 @@ bool Archive::removeEntry(ArchiveEntry* entry, bool delete_entry) {
 	if (entry->isLocked())
 		return false;
 
-	// Get it's directory
+	// Get its directory
 	ArchiveTreeNode* dir = entry->getParentDir();
 
 	// Error if entry has no parent directory

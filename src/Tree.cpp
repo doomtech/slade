@@ -62,7 +62,7 @@ STreeNode::~STreeNode() {
 }
 
 /* STreeNode::getPath
- * Returns the 'path' to this node, ie, the names of all it's parent
+ * Returns the 'path' to this node, ie, the names of all its parent
  * nodes each separated by a / (including the name of this node)
  *******************************************************************/
 string STreeNode::getPath() {

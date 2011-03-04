@@ -30,6 +30,7 @@
  *******************************************************************/
 #include "Main.h"
 #include "CTexture.h"
+#include "ArchiveManager.h"
 #include <wx/colour.h>
 
 
@@ -62,6 +63,46 @@ CTPatch::CTPatch(string name, int16_t offset_x, int16_t offset_y, ArchiveEntry* 
 CTPatch::~CTPatch() {
 }
 
+/* CTPatch::searchEntry
+ * Search for a patch's entry in the given archive or its parents
+ *******************************************************************/
+void CTPatch::searchEntry(Archive* parent) {
+	// Attempt to find patch entry
+	Archive::search_options_t options;	options.match_name = name;
+
+	// First, search parent archive (patches namespace > global namespace > graphics namespace)
+	// TODO 1: search order should be patches > global for treeless archives, patches > graphics for others.
+	// TODO 2: For ZDoom textures, if the keyword "Graphic" is used instead of "Patch" in the texture
+	// definition, then priority order should be graphics > patches instead.
+	if (parent) {
+		options.match_namespace = "patches";
+		entry = parent->findLast(options);
+
+		if (!entry) {
+			options.match_namespace = "";
+			entry = parent->findLast(options);
+		}
+
+		if (!entry) {
+			options.match_namespace = "graphic";
+			entry = parent->findLast(options);
+		}
+	}
+
+	// Next, search open resource archives + base resource archive
+	if (!entry) {
+		options.match_namespace = "patches";
+		entry = theArchiveManager->findResourceEntry(options, parent);
+	}
+	if (!entry) {
+		options.match_namespace = "";
+		entry = theArchiveManager->findResourceEntry(options, parent);
+	}
+	if (!entry) {
+		options.match_namespace = "graphic";
+		entry = theArchiveManager->findResourceEntry(options, parent);
+	}
+}
 
 /*******************************************************************
  * CTPATCHEX CLASS FUNCTIONS
@@ -105,6 +146,7 @@ CTPatchEx::CTPatchEx(CTPatch* copy) {
 	offset_x = copy->xOffset();
 	offset_y = copy->yOffset();
 	name = copy->getName();
+	entry = copy->getEntry();
 }
 
 /* CTPatchEx::CTPatchEx
@@ -121,6 +163,7 @@ CTPatchEx::CTPatchEx(CTPatchEx* copy) {
 	offset_x = copy->xOffset();
 	offset_y = copy->yOffset();
 	name = copy->getName();
+	entry = copy->getEntry();
 	for (unsigned a = 0; a < copy->translation.size(); a++)
 		translation.push_back(copy->translation[a]);
 }
@@ -578,6 +621,14 @@ bool CTexture::parse(Tokenizer& tz, string type) {
 
 			// Patch
 			if (s_cmpnocase(property, "Patch")) {
+				CTPatchEx* patch = new CTPatchEx();
+				patch->parse(tz);
+				patches.push_back(patch);
+			}
+
+			// Graphic
+			// TODO: Treat them slightly differently from patches
+			if (s_cmpnocase(property, "Graphic")) {
 				CTPatchEx* patch = new CTPatchEx();
 				patch->parse(tz);
 				patches.push_back(patch);

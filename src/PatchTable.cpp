@@ -288,7 +288,7 @@ bool PatchTable::loadPNAMES(ArchiveEntry* pnames, Archive* parent) {
 	uint32_t n_pnames = 0;
 	pnames->seek(0, SEEK_SET);
 	if (!pnames->read(&n_pnames, 4)) {
-		wxLogMessage("Error: PNAMES entry is corrupt");
+		wxLogMessage("Error: PNAMES lump is corrupt");
 		return false;
 	}
 
@@ -299,7 +299,7 @@ bool PatchTable::loadPNAMES(ArchiveEntry* pnames, Archive* parent) {
 
 		// Try to read pname
 		if (!pnames->read(&pname, 8)) {
-			wxLogMessage("Error: PNAMES entry is corrupt");
+			wxLogMessage("Error: PNAMES entry %i is corrupt", a);
 			return false;
 		}
 

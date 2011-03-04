@@ -26,6 +26,7 @@ public:
 
 	void	setName(string name) { this->name = name; }
 	void	setEntry(ArchiveEntry* entry) { this->entry = entry; }
+	void	searchEntry(Archive* parent);
 	void	setOffsetX(int16_t offset) { offset_x = offset; }
 	void	setOffsetY(int16_t offset) { offset_y = offset; }
 };

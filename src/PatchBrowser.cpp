@@ -59,7 +59,7 @@ PatchBrowserItem::~PatchBrowserItem() {
 }
 
 /* PatchBrowserItem::loadImage
- * Loads the item's image from it's associated entry (if any)
+ * Loads the item's image from its associated entry (if any)
  *******************************************************************/
 bool PatchBrowserItem::loadImage() {
 	// Do nothing if no patch entry defined
