@@ -75,8 +75,10 @@ extern string main_window_layout;
 /* SLADEStackTrace class
  * Extension of the wxStackWalker class that formats stack trace
  * information to a multi-line string, that can be retrieved via
- * getTraceString()
+ * getTraceString(). wxStackWalker is currently unimplemented on mac,
+ * so unfortunately it has to be disabled there
  *******************************************************************/
+#ifndef __APPLE__
 class SLADEStackTrace : public wxStackWalker {
 private:
 	string	stack_trace;
@@ -158,7 +160,7 @@ public:
 	~SLADECrashDialog() {
 	}
 };
-
+#endif//__APPLE__
 
 /*******************************************************************
  * FUNCTIONS
@@ -381,11 +383,13 @@ int MainApp::OnExit() {
 }
 
 void MainApp::OnFatalException() {
+#ifndef __APPLE__
 #ifndef _DEBUG
 	SLADEStackTrace st;
 	st.WalkFromException();
 	SLADECrashDialog sd(st);
 	sd.ShowModal();
+#endif
 #endif
 }
 
