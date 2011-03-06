@@ -86,8 +86,10 @@ GeneralPrefsPanel::GeneralPrefsPanel(wxWindow* parent) : wxPanel(parent, -1) {
 	sizer->Add(cb_start_page, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
 	// Use app dir for temp files
+#ifdef WIN32
 	cb_temp_dir = new wxCheckBox(this, -1, "Write temp files to SLADE directory rather than system temp folder");
 	sizer->Add(cb_temp_dir, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+#endif
 
 	// Init controls
 	cb_archive_load->SetValue(archive_load_data);
@@ -115,7 +117,11 @@ void GeneralPrefsPanel::applyPreferences() {
 	size_as_string = cb_size_as_string->GetValue();
 	elist_filter_dirs = !cb_filter_dirs->GetValue();
 	show_start_page = cb_start_page->GetValue();
+#ifdef WIN32
 	temp_use_appdir = cb_temp_dir->GetValue();
+#else
+	temp_use_appdir = false;
+#endif
 
 	// Create temp dir if necessary
 	if (temp_use_appdir) {

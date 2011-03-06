@@ -48,7 +48,6 @@ ArchiveEntry::ArchiveEntry(string name, uint32_t size) {
 	// Initialise attributes
 	this->parent = NULL;
 	this->name = name;
-	this->data = NULL;
 	this->size = size;
 	this->data_loaded = true;
 	this->state = 2;
@@ -68,7 +67,6 @@ ArchiveEntry::ArchiveEntry(ArchiveEntry& copy) {
 	// Initialise (copy) attributes
 	this->parent = NULL;
 	this->name = copy.name;
-	this->data = NULL;
 	this->size = copy.size;
 	this->data_loaded = true;
 	this->state = 2;

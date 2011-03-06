@@ -1,7 +1,7 @@
 
-CXX=g++
-CXXFLAGS=-O2 -DNDEBUG
-LDFLAGS=-lfreeimage -laudiere -lfluidsynth
+CXX?=g++
+CXXFLAGS+=-O2 -DNDEBUG
+LDFLAGS+=-lfreeimage -laudiere -lfluidsynth
 CXXFLAGS+=`wx-config --version=2.9 --debug=no --cxxflags std,aui,gl,stc`
 LDFLAGS+=`wx-config --version=2.9 --debug=no --libs std,aui,gl,stc`
 EXE?=./dist/slade
@@ -21,4 +21,3 @@ slade: ${OBJ}
 
 clean:
 	rm -f src/*.o slade
-

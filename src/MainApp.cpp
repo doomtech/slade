@@ -179,6 +179,7 @@ string appPath(string filename, int dir) {
 	string sep = "\\";
 #else
 	string sep = "/";
+	temp_use_appdir = false;
 #endif
 
 	if (dir == DIR_DATA)
@@ -254,12 +255,14 @@ bool MainApp::initDirectories() {
 	}
 
 	// Create temp dir if necessary
-	string dir_temp = dir_app + sep + "temp";
-	if (!wxDirExists(dir_temp)) {
-		if (!wxMkdir(dir_temp)) {
-			// Unable to create it, just use system temp dir
-			wxMessageBox(s_fmt("Unable to create temp directory \"%s\", using system temp directory instead", dir_temp.c_str()), "Error", wxICON_ERROR);
-			temp_use_appdir = false;
+	if (temp_use_appdir) {
+		string dir_temp = dir_app + sep + "temp";
+		if (!wxDirExists(dir_temp)) {
+			if (!wxMkdir(dir_temp)) {
+				// Unable to create it, just use system temp dir
+				wxMessageBox(s_fmt("Unable to create temp directory \"%s\", using system temp directory instead", dir_temp.c_str()), "Error", wxICON_ERROR);
+				temp_use_appdir = false;
+			}
 		}
 	}
 

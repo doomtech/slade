@@ -1,7 +1,7 @@
 
-CXX=g++
-CXXFLAGS=-g
-LDFLAGS=-lfreeimage
+CXX?=g++
+CXXFLAGS+=-g
+LDFLAGS+=-lfreeimage
 CXXFLAGS+=`wx-config --version=2.9 --debug=yes --cxxflags std,aui,gl,stc`
 LDFLAGS+=`wx-config --version=2.9 --debug=yes --libs std,aui,gl,stc`
 EXE?=./dist/slade-dbg
@@ -20,4 +20,3 @@ slade: ${OBJ}
 
 clean:
 	rm -f src/*.o slade
-
