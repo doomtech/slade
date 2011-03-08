@@ -148,6 +148,7 @@
     <ClCompile Include="src\PreferencesDialog.cpp" />
     <ClCompile Include="src\qmus2mid\qmus2mid.cpp" />
     <ClCompile Include="src\ResArchive.cpp" />
+    <ClCompile Include="src\ResourceManager.cpp" />
     <ClCompile Include="src\RffArchive.cpp" />
     <ClCompile Include="src\SFont.cpp" />
     <ClCompile Include="src\SImageFormats.cpp" />
@@ -270,6 +271,7 @@
     <ClInclude Include="src\PreferencesDialog.h" />
     <ClInclude Include="src\qmus2mid\qmus2mid.h" />
     <ClInclude Include="src\ResArchive.h" />
+    <ClInclude Include="src\ResourceManager.h" />
     <ClInclude Include="src\RffArchive.h" />
     <ClInclude Include="src\Structs.h" />
     <ClInclude Include="src\TextEditorPrefsPanel.h" />
