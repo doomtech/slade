@@ -44,17 +44,15 @@
 CTPatch::CTPatch() {
 	this->offset_x = 0;
 	this->offset_y = 0;
-	this->entry = NULL;
 }
 
 /* CTPatch::CTPatch
  * CTPatch class constructor w/initial values
  *******************************************************************/
-CTPatch::CTPatch(string name, int16_t offset_x, int16_t offset_y, ArchiveEntry* entry) {
+CTPatch::CTPatch(string name, int16_t offset_x, int16_t offset_y) {
 	this->name = name;
 	this->offset_x = offset_x;
 	this->offset_y = offset_y;
-	this->entry = entry;
 }
 
 /* CTPatch::~CTPatch
@@ -67,6 +65,7 @@ CTPatch::~CTPatch() {
  * Search for a patch's entry in the given archive or its parents
  *******************************************************************/
 void CTPatch::searchEntry(Archive* parent) {
+	/*
 	// Attempt to find patch entry
 	Archive::search_options_t options;	options.match_name = name;
 
@@ -102,6 +101,7 @@ void CTPatch::searchEntry(Archive* parent) {
 		options.match_namespace = "graphic";
 		entry = theArchiveManager->findResourceEntry(options, parent);
 	}
+	*/
 }
 
 /*******************************************************************
@@ -123,8 +123,8 @@ CTPatchEx::CTPatchEx() {
 /* CTPatchEx::CTPatchEx
  * CTPatchEx class constructor w/basic initial values
  *******************************************************************/
-CTPatchEx::CTPatchEx(string name, int16_t offset_x, int16_t offset_y, ArchiveEntry* entry)
-: CTPatch(name, offset_x, offset_y, entry) {
+CTPatchEx::CTPatchEx(string name, int16_t offset_x, int16_t offset_y)
+: CTPatch(name, offset_x, offset_y) {
 	flip_x = false;
 	flip_y = false;
 	rotation = 0;
@@ -146,7 +146,6 @@ CTPatchEx::CTPatchEx(CTPatch* copy) {
 	offset_x = copy->xOffset();
 	offset_y = copy->yOffset();
 	name = copy->getName();
-	entry = copy->getEntry();
 }
 
 /* CTPatchEx::CTPatchEx
@@ -163,7 +162,6 @@ CTPatchEx::CTPatchEx(CTPatchEx* copy) {
 	offset_x = copy->xOffset();
 	offset_y = copy->yOffset();
 	name = copy->getName();
-	entry = copy->getEntry();
 	for (unsigned a = 0; a < copy->translation.size(); a++)
 		translation.push_back(copy->translation[a]);
 }
@@ -179,7 +177,7 @@ CTPatchEx::~CTPatchEx() {
  *******************************************************************/
 bool CTPatchEx::parse(Tokenizer& tz) {
 	// Read basic info
-	name = tz.getToken();
+	name = tz.getToken().Upper();
 	tz.getToken();	// Skip ,
 	offset_x = tz.getInteger();
 	tz.getToken();	// Skip ,
@@ -387,7 +385,7 @@ void CTexture::copyTexture(CTexture* tex) {
 		}
 		else {
 			CTPatch* patch = tex->getPatch(a);
-			addPatch(patch->getName(), patch->xOffset(), patch->yOffset(), patch->getEntry());
+			addPatch(patch->getName(), patch->xOffset(), patch->yOffset());//, patch->getEntry());
 		}
 	}
 }
@@ -431,13 +429,13 @@ void CTexture::clear() {
  * Adds a patch to the texture with the given attributes, at [index].
  * If [index] is -1, the patch is added to the end of the list.
  *******************************************************************/
-bool CTexture::addPatch(string patch, int16_t offset_x, int16_t offset_y, ArchiveEntry* entry, int index) {
+bool CTexture::addPatch(string patch, int16_t offset_x, int16_t offset_y, int index) {
 	// Create new patch
 	CTPatch* np;
 	if (extended)
-		np = new CTPatchEx(patch, offset_x, offset_y, entry);
+		np = new CTPatchEx(patch, offset_x, offset_y);
 	else
-		np = new CTPatch(patch, offset_x, offset_y, entry);
+		np = new CTPatch(patch, offset_x, offset_y);
 
 	// Add it either after [index] or at the end
 	if (index >= 0 && (unsigned) index < patches.size())
@@ -499,14 +497,13 @@ bool CTexture::removePatch(string patch) {
  * associated ArchiveEntry with [newentry]. Returns false if [index]
  * is out of bounds, true otherwise
  *******************************************************************/
-bool CTexture::replacePatch(size_t index, string newpatch, ArchiveEntry* newentry) {
+bool CTexture::replacePatch(size_t index, string newpatch) {
 	// Check index
 	if (index >= patches.size())
 		return false;
 
 	// Replace patch at [index] with new
 	patches[index]->setName(newpatch);
-	patches[index]->setEntry(newentry);
 
 	// Announce
 	announce("patches_modified");
@@ -573,7 +570,7 @@ bool CTexture::parse(Tokenizer& tz, string type) {
 	// Read basic info
 	this->type = type;
 	this->extended = true;
-	name = tz.getToken();
+	name = tz.getToken().Upper();
 	tz.getToken();	// Skip ,
 	width = tz.getInteger();
 	tz.getToken();	// Skip ,

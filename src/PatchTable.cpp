@@ -29,7 +29,7 @@
  *******************************************************************/
 #include "Main.h"
 #include "PatchTable.h"
-#include "ArchiveManager.h"
+#include "ResourceManager.h"
 #include "CTexture.h"
 
 
@@ -100,12 +100,8 @@ ArchiveEntry* PatchTable::patchEntry(size_t index) {
 	if (index >= patches.size())
 		return NULL;
 
-	// Update patch entry if needed
-	if (!patches[index].entry)
-		updatePatchEntry(index);
-
 	// Return entry at index
-	return patches[index].entry;
+	return theResourceManager->getPatchEntry(patches[index].name, parent);
 }
 
 /* PatchTable::patchEntry
@@ -115,13 +111,8 @@ ArchiveEntry* PatchTable::patchEntry(size_t index) {
 ArchiveEntry* PatchTable::patchEntry(string name) {
 	// Search for patch by name
 	for (size_t a = 0; a < patches.size(); a++) {
-		if (!patches[a].name.CmpNoCase(name)) {
-			// Update patch entry if needed
-			if (!patches[a].entry)
-				updatePatchEntry(a);
-
-			return patches[a].entry;
-		}
+		if (!patches[a].name.CmpNoCase(name))
+			return theResourceManager->getPatchEntry(patches[a].name, parent);
 	}
 
 	// Not found
@@ -150,7 +141,7 @@ int32_t PatchTable::patchIndex(string name) {
 int32_t PatchTable::patchIndex(ArchiveEntry* entry) {
 	// Search for patch by entry
 	for (size_t a = 0; a < patches.size(); a++) {
-		if (patches[a].entry == entry)
+		if (theResourceManager->getPatchEntry(patches[a].name, parent) == entry)
 			return a;
 	}
 
@@ -190,13 +181,10 @@ bool PatchTable::replacePatch(unsigned index, string newname) {
 	// Change the patch name
 	patches[index].name = newname;
 
-	// Update patch entry
-	updatePatchEntry(index);
-
 	// Announce
 	announce("modified");
 
-	return !!patch(index).entry;
+	return true;
 }
 
 /* PatchTable::addPatch
@@ -221,7 +209,7 @@ bool PatchTable::addPatch(string name, bool allow_dup) {
 	// Announce
 	announce("modified");
 
-	return !!patch.entry;
+	return true;
 }
 
 /* PatchTable::updatePatchEntry
@@ -229,6 +217,7 @@ bool PatchTable::addPatch(string name, bool allow_dup) {
  * Searches the parent archive first, then all resource archives.
  *******************************************************************/
 void PatchTable::updatePatchEntry(unsigned index) {
+	/*
 	// Check index
 	if (index >= patches.size())
 		return;
@@ -264,6 +253,7 @@ void PatchTable::updatePatchEntry(unsigned index) {
 
 	// Set patch entry
 	patch(index).entry = entry;
+	*/
 }
 
 /* PatchTable::loadPNAMES

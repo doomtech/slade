@@ -7,10 +7,7 @@
 
 struct patch_t {
 	string			name;
-	ArchiveEntry*	entry;
 	vector<string>	used_in;
-
-	patch_t() { entry = NULL; }
 
 	void removeTextureUsage(string texture) {
 		vector<string>::iterator i = used_in.begin();

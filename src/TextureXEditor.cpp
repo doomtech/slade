@@ -36,6 +36,7 @@
 #include "Console.h"
 #include "SplashWindow.h"
 #include "ExtMessageDialog.h"
+#include "ResourceManager.h"
 #include <wx/dialog.h>
 #include <wx/radiobut.h>
 
@@ -307,6 +308,7 @@ bool TextureXEditor::openArchive(Archive* archive) {
 	theMainWindow->getPaletteChooser()->setGlobalFromArchive(archive);
 
 	// Find patch entries (this really needs to be faster)
+	/*
 	theSplashWindow->show("Opening Texture List...", true);
 	theSplashWindow->setProgressMessage("Searching for patches");
 	float np = (float)patch_table.nPatches();
@@ -315,6 +317,7 @@ bool TextureXEditor::openArchive(Archive* archive) {
 		patch_table.updatePatchEntry(a);
 	}
 	theSplashWindow->hide();
+	*/
 
 	// Setup patch browser
 	patch_browser->openPatchTable(&patch_table);
@@ -335,8 +338,9 @@ bool TextureXEditor::removePatch(unsigned index, bool delete_entry) {
 		texture_editors[a]->txList().removePatch(p.name);
 
 	// Delete patch entry if it's part of this archive (and delete_entry is true)
-	if (delete_entry && p.entry && p.entry->getParent() == archive)
-		archive->removeEntry(p.entry);
+	ArchiveEntry* entry = theResourceManager->getPatchEntry(p.name, archive);
+	if (delete_entry && entry && entry->getParent() == archive)
+		archive->removeEntry(entry);
 
 	// Remove patch from patch table
 	patch_table.removePatch(index);
@@ -386,15 +390,16 @@ bool TextureXEditor::checkTextures() {
 		// Check patch entry is valid
 		patch_table.updatePatchEntry(a);
 		patch_t& patch = patch_table.patch(a);
+		ArchiveEntry* entry = theResourceManager->getPatchEntry(patch.name, archive);
 
-		if (!patch.entry) {
+		if (!entry) {
 			problems += s_fmt("Patch %s cannot be found in any open archive\n", chr(patch.name));
 		}
 		else {
 			// Check patch entry type
-			if (patch.entry->getType() == EntryType::unknownType())
-				EntryType::detectEntryType(patch.entry);
-			EntryType* type = patch.entry->getType();
+			if (entry->getType() == EntryType::unknownType())
+				EntryType::detectEntryType(entry);
+			EntryType* type = entry->getType();
 
 			if (!type->extraProps().propertyExists("patch"))
 				problems += s_fmt("Patch %s is of type \"%s\", which is not a valid gfx format for patches. Convert it to either Doom Gfx or PNG\n", chr(patch.name), chr(type->getName()));
@@ -537,7 +542,7 @@ bool TextureXEditor::setupTextureEntries(Archive* archive) {
 						// Create dummy texture
 						CTexture* dummytex = new CTexture();
 						dummytex->setName("S3DUMMY");
-						dummytex->addPatch("S3DUMMY", 0, 0, dpatch);
+						dummytex->addPatch("S3DUMMY", 0, 0);
 						dummytex->setWidth(128);
 						dummytex->setHeight(128);
 						dummytex->setScale(0, 0);

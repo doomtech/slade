@@ -10,22 +10,19 @@
 class CTPatch {
 protected:
 	string			name;
-	ArchiveEntry*	entry;
 	int16_t			offset_x;
 	int16_t			offset_y;
 
 public:
 	CTPatch();
-	CTPatch(string name, int16_t offset_x = 0, int16_t offset_y = 0, ArchiveEntry* entry = NULL);
+	CTPatch(string name, int16_t offset_x = 0, int16_t offset_y = 0);
 	~CTPatch();
 
 	string			getName() { return name; }
-	ArchiveEntry*	getEntry() { return entry; }
 	int16_t			xOffset() { return offset_x; }
 	int16_t			yOffset() { return offset_y; }
 
 	void	setName(string name) { this->name = name; }
-	void	setEntry(ArchiveEntry* entry) { this->entry = entry; }
 	void	searchEntry(Archive* parent);
 	void	setOffsetX(int16_t offset) { offset_x = offset; }
 	void	setOffsetY(int16_t offset) { offset_y = offset; }
@@ -45,7 +42,7 @@ private:
 
 public:
 	CTPatchEx();
-	CTPatchEx(string name, int16_t offset_x = 0, int16_t offset_y = 0, ArchiveEntry* entry = NULL);
+	CTPatchEx(string name, int16_t offset_x = 0, int16_t offset_y = 0);
 	CTPatchEx(CTPatch* copy);
 	CTPatchEx(CTPatchEx* copy);
 	~CTPatchEx();
@@ -132,10 +129,10 @@ public:
 
 	void	clear();
 
-	bool	addPatch(string patch, int16_t offset_x = 0, int16_t offset_y = 0, ArchiveEntry* entry = NULL, int index = -1);
+	bool	addPatch(string patch, int16_t offset_x = 0, int16_t offset_y = 0, int index = -1);
 	bool	removePatch(size_t index);
 	bool	removePatch(string patch);
-	bool	replacePatch(size_t index, string newpatch, ArchiveEntry* newentry = NULL);
+	bool	replacePatch(size_t index, string newpatch);
 	bool	duplicatePatch(size_t index, int16_t offset_x = 8, int16_t offset_y = 8);
 	bool	swapPatches(size_t p1, size_t p2);
 

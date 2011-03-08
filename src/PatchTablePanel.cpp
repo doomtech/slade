@@ -35,6 +35,7 @@
 #include "TextureXEditor.h"
 #include "ArchiveEntry.h"
 #include "ArchiveManager.h"
+#include "ResourceManager.h"
 #include <wx/filename.h>
 
 
@@ -97,18 +98,14 @@ string PatchTableListView::getItemText(long item, long column) const {
 	else if (column == 2)					// Usage count column
 		return s_fmt("%d", patch.used_in.size());
 	else if (column == 3) {					// Archive column
-		if (patch.entry)
-			return patch.entry->getParent()->getFilename(false);
-		else {
-			// Attempt to find the patch's entry
-			patch_table->updatePatchEntry(item);
+		// Get patch entry
+		ArchiveEntry* entry = theResourceManager->getPatchEntry(patch.name, patch_table->getParent());
 
-			// If it still can't be found return invalid
-			if (patch.entry)
-				return patch.entry->getParent()->getFilename(false);
-			else
-				return "(!) NOT FOUND";
-		}
+		// If patch entry can't be found return invalid
+		if (entry)
+			return entry->getParent()->getFilename(false);
+		else
+			return "(!) NOT FOUND";
 	}
 	else									// Invalid column
 		return "INVALID COLUMN";
@@ -176,11 +173,11 @@ void PatchTableListView::onAnnouncement(Announcer* announcer, string event_name,
 		updateList();
 
 	if (announcer == theArchiveManager) {
-		if (event_name == "base_resource_changed") {
+		//if (event_name == "base_resource_changed") {
 			// Clear all patch entries
-			for (unsigned a = 0; a < patch_table->nPatches(); a++)
-				patch_table->patch(a).entry = NULL;
-		}
+		//	for (unsigned a = 0; a < patch_table->nPatches(); a++)
+		//		patch_table->patch(a).entry = NULL;
+		//}
 
 		updateList();
 	}
@@ -355,7 +352,6 @@ void PatchTablePanel::onBtnPatchFromFile(wxCommandEvent& e) {
 
 			// Add patch to patch table
 			patch_table->addPatch(name);
-			patch_table->patch(patch_table->nPatches()-1).entry = entry;
 		}
 
 		// Refresh patch list

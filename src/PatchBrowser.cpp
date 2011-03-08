@@ -36,6 +36,7 @@
 #include "WxStuff.h"
 #include "PatchBrowser.h"
 #include "ArchiveManager.h"
+#include "ResourceManager.h"
 #include "Misc.h"
 
 
@@ -62,7 +63,7 @@ PatchBrowserItem::~PatchBrowserItem() {
  * Loads the item's image from its associated entry (if any)
  *******************************************************************/
 bool PatchBrowserItem::loadImage() {
-	// Do nothing if no patch entry defined
+	// Do nothing if no patch entry found
 	if (!entry)
 		return false;
 
@@ -131,10 +132,12 @@ bool PatchBrowser::openPatchTable(PatchTable* table) {
 		// Init position to add
 		string where = "Unknown";
 
+		// Get patch entry
+		ArchiveEntry* entry = theResourceManager->getPatchEntry(patch.name);
+
 		// Check its parent archive
-		//table->updatePatchEntry(a);
-		if (patch.entry) {
-			Archive* parent_archive = patch.entry->getParent();
+		if (entry) {
+			Archive* parent_archive = entry->getParent();
 
 			// If it's the base resource archive, put it under 'IWAD', otherwise 'Custom'
 			if (parent_archive == theArchiveManager->baseResourceArchive())
@@ -144,7 +147,7 @@ bool PatchBrowser::openPatchTable(PatchTable* table) {
 		}
 
 		// Add it
-		PatchBrowserItem* item = new PatchBrowserItem(patch.name, patch.entry, a);
+		PatchBrowserItem* item = new PatchBrowserItem(patch.name, entry, a);
 		item->setPalette(theMainWindow->getPaletteChooser()->getSelectedPalette());
 		addItem(item, where);
 	}
@@ -193,7 +196,7 @@ void PatchBrowser::updateItems(BrowserTreeNode* node) {
 		item->setPalette(theMainWindow->getPaletteChooser()->getSelectedPalette());
 
 		// Update image entry
-		item->setEntry(patch_table->patch(item->getIndex()).entry);
+		item->setEntry(theResourceManager->getPatchEntry(item->getName()));
 	}
 
 	// Go through child nodes and update their items

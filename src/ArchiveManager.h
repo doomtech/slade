@@ -43,6 +43,7 @@ public:
 	}
 
 	bool		init();
+	bool		initBaseResource();
 	bool		resArchiveOK() { return res_archive_open; }
 	bool		addArchive(Archive* archive);
 	Archive*	getArchive(int index);

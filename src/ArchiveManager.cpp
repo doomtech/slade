@@ -33,6 +33,7 @@
 #include "Archives.h"
 #include "Console.h"
 #include "SplashWindow.h"
+#include "ResourceManager.h"
 #include <wx/filename.h>
 
 
@@ -66,8 +67,8 @@ ArchiveManager::~ArchiveManager() {
 }
 
 /* ArchiveManager::init
- * Initialised the ArchiveManager. Opens the program resource archive
- * and the base resource archive
+ * Initialised the ArchiveManager. Finds and opens the program
+ * resource archive
  *******************************************************************/
 bool ArchiveManager::init() {
 	// Find slade3.pk3 directory
@@ -88,10 +89,14 @@ bool ArchiveManager::init() {
 	else
 		res_archive_open = true;
 
-	// Open base resource archive (if any)
-	bool bro = openBaseResource((int)base_resource);
+	return res_archive_open;
+}
 
-	return res_archive_open && bro;
+/* ArchiveManager::initBaseResource
+ * Initialises the base resource archive
+ *******************************************************************/
+bool ArchiveManager::initBaseResource() {
+	return openBaseResource((int)base_resource);
 }
 
 /* ArchiveManager::addArchive
@@ -111,6 +116,9 @@ bool ArchiveManager::addArchive(Archive* archive) {
 
 		// Announce the addition
 		announce("archive_added");
+
+		// Add to resource manager
+		theResourceManager->addArchive(archive);
 
 		return true;
 	} else
@@ -404,6 +412,9 @@ bool ArchiveManager::closeArchive(int index) {
 	// Delete any bookmarked entries contained in the archive
 	deleteBookmarksInArchive(open_archives[index].archive);
 
+	// Remove from resource manager
+	theResourceManager->removeArchive(open_archives[index].archive);
+
 	// Close any open child archives
 	for (size_t a = 0; a < open_archives[index].open_children.size(); a++) {
 		int ci = archiveIndex(open_archives[index].open_children[a]);
@@ -594,6 +605,7 @@ bool ArchiveManager::openBaseResource(int index) {
 
 	// Close/delete current base resource archive
 	if (base_resource_archive) {
+		theResourceManager->removeArchive(base_resource_archive);
 		delete base_resource_archive;
 		base_resource_archive = NULL;
 	}
@@ -619,6 +631,7 @@ bool ArchiveManager::openBaseResource(int index) {
 	if (base_resource_archive->open(filename)) {
 		base_resource = index;
 		theSplashWindow->hide();
+		theResourceManager->addArchive(base_resource_archive);
 		announce("base_resource_changed");
 		return true;
 	}

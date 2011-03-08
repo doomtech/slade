@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Simon
-Date                   :=28/02/11
+Date                   :=09/03/11
 CodeLitePath           :="/home/simon/.codelite"
 LinkerName             :=g++
 ArchiveTool            :=ar rcus
@@ -38,7 +38,7 @@ PreprocessOnlySwitch   :=-E
 MakeDirCommand         :=mkdir -p
 CmpOptions             := -O3 $(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no) $(Preprocessors)
 C_CmpOptions           := -O3 $(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no) $(Preprocessors)
-LinkOptions            :=  -s $(shell wx-config --debug=no --libs std,gl,stc,aui --unicode=yes)
+LinkOptions            :=  -s $(shell wx-config --debug=no --libs std,gl,stc,aui,ribbon --unicode=yes)
 IncludePath            :=  "$(IncludeSwitch)." 
 RcIncludePath          :=
 Libs                   :=$(LibrarySwitch)freeimage $(LibrarySwitch)audiere $(LibrarySwitch)fluidsynth 
@@ -58,9 +58,9 @@ Objects=$(IntermediateDirectory)/src_GfxConvDialog$(ObjectSuffix) $(Intermediate
 	$(IntermediateDirectory)/src_Archive$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveEntry$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveManager$(ObjectSuffix) $(IntermediateDirectory)/src_WadArchive$(ObjectSuffix) $(IntermediateDirectory)/src_ZipArchive$(ObjectSuffix) $(IntermediateDirectory)/src_EntryType$(ObjectSuffix) $(IntermediateDirectory)/src_EntryDataFormat$(ObjectSuffix) $(IntermediateDirectory)/src_DatArchive$(ObjectSuffix) $(IntermediateDirectory)/src_LibArchive$(ObjectSuffix) $(IntermediateDirectory)/src_ResArchive$(ObjectSuffix) \
 	$(IntermediateDirectory)/src_PakArchive$(ObjectSuffix) $(IntermediateDirectory)/src_Wad2Archive$(ObjectSuffix) $(IntermediateDirectory)/src_WadJArchive$(ObjectSuffix) $(IntermediateDirectory)/src_GrpArchive$(ObjectSuffix) $(IntermediateDirectory)/src_RffArchive$(ObjectSuffix) $(IntermediateDirectory)/src_WolfArchive$(ObjectSuffix) $(IntermediateDirectory)/src_GobArchive$(ObjectSuffix) $(IntermediateDirectory)/src_LfdArchive$(ObjectSuffix) $(IntermediateDirectory)/src_HogArchive$(ObjectSuffix) $(IntermediateDirectory)/src_AnimatedList$(ObjectSuffix) \
 	$(IntermediateDirectory)/src_SwitchesList$(ObjectSuffix) $(IntermediateDirectory)/src_PnamesList$(ObjectSuffix) $(IntermediateDirectory)/src_CTexture$(ObjectSuffix) $(IntermediateDirectory)/src_PatchTable$(ObjectSuffix) $(IntermediateDirectory)/src_TextureXList$(ObjectSuffix) $(IntermediateDirectory)/src_SFont$(ObjectSuffix) $(IntermediateDirectory)/src_SImage$(ObjectSuffix) $(IntermediateDirectory)/src_SImageFormats$(ObjectSuffix) $(IntermediateDirectory)/src_Palette$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteManager$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_GLTexture$(ObjectSuffix) $(IntermediateDirectory)/src_Icons$(ObjectSuffix) $(IntermediateDirectory)/src_ColourBox$(ObjectSuffix) $(IntermediateDirectory)/src_GfxCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_OGLCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteChooser$(ObjectSuffix) $(IntermediateDirectory)/src_SplashWindow$(ObjectSuffix) $(IntermediateDirectory)/src_BrowserItem$(ObjectSuffix) $(IntermediateDirectory)/src_BrowserWindow$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_BrowserCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_CTextureCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_TextEditor$(ObjectSuffix) $(IntermediateDirectory)/src_TextLanguage$(ObjectSuffix) $(IntermediateDirectory)/src_TextStyle$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveEntryList$(ObjectSuffix) $(IntermediateDirectory)/src_ListView$(ObjectSuffix) $(IntermediateDirectory)/src_VirtualListView$(ObjectSuffix) $(IntermediateDirectory)/src_ConsolePanel$(ObjectSuffix) $(IntermediateDirectory)/src_HexEditorPanel$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_ANSICanvas$(ObjectSuffix) $(IntermediateDirectory)/qmus2mid_qmus2mid$(ObjectSuffix) 
+	$(IntermediateDirectory)/src_GLTexture$(ObjectSuffix) $(IntermediateDirectory)/src_Icons$(ObjectSuffix) $(IntermediateDirectory)/src_ResourceManager$(ObjectSuffix) $(IntermediateDirectory)/src_ColourBox$(ObjectSuffix) $(IntermediateDirectory)/src_GfxCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_OGLCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteChooser$(ObjectSuffix) $(IntermediateDirectory)/src_SplashWindow$(ObjectSuffix) $(IntermediateDirectory)/src_BrowserItem$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_BrowserWindow$(ObjectSuffix) $(IntermediateDirectory)/src_BrowserCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_CTextureCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_TextEditor$(ObjectSuffix) $(IntermediateDirectory)/src_TextLanguage$(ObjectSuffix) $(IntermediateDirectory)/src_TextStyle$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveEntryList$(ObjectSuffix) $(IntermediateDirectory)/src_ListView$(ObjectSuffix) $(IntermediateDirectory)/src_VirtualListView$(ObjectSuffix) $(IntermediateDirectory)/src_ConsolePanel$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_HexEditorPanel$(ObjectSuffix) $(IntermediateDirectory)/src_ANSICanvas$(ObjectSuffix) $(IntermediateDirectory)/qmus2mid_qmus2mid$(ObjectSuffix) 
 
 ##
 ## Main Build Targets 
@@ -816,6 +816,14 @@ $(IntermediateDirectory)/src_Icons$(DependSuffix): src/Icons.cpp
 $(IntermediateDirectory)/src_Icons$(PreprocessSuffix): src/Icons.cpp
 	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_Icons$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/Icons.cpp"
 
+$(IntermediateDirectory)/src_ResourceManager$(ObjectSuffix): src/ResourceManager.cpp $(IntermediateDirectory)/src_ResourceManager$(DependSuffix)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/ResourceManager.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ResourceManager$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_ResourceManager$(DependSuffix): src/ResourceManager.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_ResourceManager$(ObjectSuffix) -MF$(IntermediateDirectory)/src_ResourceManager$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/ResourceManager.cpp"
+
+$(IntermediateDirectory)/src_ResourceManager$(PreprocessSuffix): src/ResourceManager.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ResourceManager$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/ResourceManager.cpp"
+
 $(IntermediateDirectory)/src_ColourBox$(ObjectSuffix): src/ColourBox.cpp $(IntermediateDirectory)/src_ColourBox$(DependSuffix)
 	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/ColourBox.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ColourBox$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_ColourBox$(DependSuffix): src/ColourBox.cpp
@@ -1258,6 +1266,9 @@ clean:
 	$(RM) $(IntermediateDirectory)/src_Icons$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/src_Icons$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/src_Icons$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/src_ResourceManager$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/src_ResourceManager$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/src_ResourceManager$(PreprocessSuffix)
 	$(RM) $(IntermediateDirectory)/src_ColourBox$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/src_ColourBox$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/src_ColourBox$(PreprocessSuffix)

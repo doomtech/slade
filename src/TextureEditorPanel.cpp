@@ -368,12 +368,6 @@ void TextureEditorPanel::updatePatchControls() {
  * Loads a TEXTUREX format texture into the editor
  *******************************************************************/
 bool TextureEditorPanel::openTexture(CTexture* tex) {
-	// Update patch entries
-	for (unsigned a = 0; a < tex->nPatches(); a++) {
-		CTPatch* patch = tex->getPatch(a);
-		patch->setEntry(tx_editor->patchTable().patchEntry(patch->getName()));
-	}
-
 	// Set as current texture
 	if (!tex_current)
 		tex_current = new CTexture();
@@ -414,7 +408,7 @@ void TextureEditorPanel::addPatch() {
 	int patch = tx_editor->browsePatch();
 	if (patch >= 0) {
         // Add new patch
-		tex_current->addPatch(tx_editor->patchTable().patchName(patch), 0, 0, tx_editor->patchTable().patchEntry(patch));
+		tex_current->addPatch(tx_editor->patchTable().patchName(patch), 0, 0);
 
         // Update UI
         populatePatchList();
@@ -522,7 +516,7 @@ void TextureEditorPanel::replacePatch() {
 	if (patch >= 0) {
 		// Go through selection and replace each patch
 		for (size_t a = 0; a < selection.size(); a++)
-			tex_current->replacePatch(selection[a], tx_editor->patchTable().patchName(patch), tx_editor->patchTable().patchEntry(patch));
+			tex_current->replacePatch(selection[a], tx_editor->patchTable().patchName(patch));
 	}
 
 	// Repopulate patch list

@@ -302,7 +302,7 @@ CTexture* TextureXPanel::newTextureFromPatch(string name, string patch) {
 		tex->setScale(0, 0);
 
 	// Add patch
-	tex->addPatch(patch, 0, 0, patch_entry);
+	tex->addPatch(patch, 0, 0);
 
 	// Return the new texture
 	return tex;

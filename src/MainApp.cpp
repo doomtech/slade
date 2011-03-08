@@ -39,6 +39,7 @@
 #include "EntryDataFormat.h"
 #include "TextLanguage.h"
 #include "TextStyle.h"
+#include "ResourceManager.h"
 #include <wx/image.h>
 #include <wx/stdpaths.h>
 #include <wx/ffile.h>
@@ -331,6 +332,10 @@ bool MainApp::OnInit() {
 	wxLogMessage("Loading text style sets");
 	StyleSet::loadResourceStyles();
 	StyleSet::loadCustomStyles();
+
+	// Init base resource
+	wxLogMessage("Loading base resource");
+	theArchiveManager->initBaseResource();
 
 	// Show the main window
 	theMainWindow->Show(true);

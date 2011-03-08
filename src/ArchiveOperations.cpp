@@ -31,6 +31,7 @@
 #include "WxStuff.h"
 #include "ArchiveOperations.h"
 #include "TextureXList.h"
+#include "ResourceManager.h"
 
 
 /*******************************************************************
@@ -83,8 +84,9 @@ bool ArchiveOperations::removeUnusedPatches(Archive* archive) {
 			// Unused
 
 			// If its entry is in the archive, flag it to be removed
-			if (p.entry && p.entry->getParent() == archive)
-				to_remove.push_back(p.entry);
+			ArchiveEntry* entry = theResourceManager->getPatchEntry(p.name, archive);
+			if (entry && entry->getParent() == archive)
+				to_remove.push_back(entry);
 
 			// Update texturex list patch indices
 			for (unsigned t = 0; t < tx_lists.size(); t++)
