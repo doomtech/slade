@@ -774,6 +774,14 @@
 		<Filter
 			Name="Resources"
 			>
+			<File
+				RelativePath=".\src\ResourceManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\ResourceManager.h"
+				>
+			</File>
 			<Filter
 				Name="Archive"
 				>
