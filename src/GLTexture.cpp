@@ -367,22 +367,34 @@ bool GLTexture::bind() {
  * Draws the texture as a 2d image at [x], [y]. Returns false if the
  * texture isn't loaded, true otherwise
  *******************************************************************/
-bool GLTexture::draw2d(double x, double y) {
+bool GLTexture::draw2d(double x, double y, bool flipx, bool flipy) {
 	// Can't draw if texture not loaded
 	if (!loaded)
 		return false;
+
+	// Flipping?
+	if (flipx)
+		x += width;
+	if (flipy)
+		y += height;
 
 	// If the texture isn't split, just draw it straight
 	if (OpenGL::validTexDimension(width) && OpenGL::validTexDimension(height)) {
 		// Bind the texture
 		glBindTexture(GL_TEXTURE_2D, tex[0].id);
 
+		// Setup metrics
+		double h = (double)width;
+		double v = (double)height;
+		if (flipx) h = -h;
+		if (flipy) v = -v;
+
 		// Draw
 		glBegin(GL_QUADS);
 		glTexCoord2d(0, 0);	glVertex2d(x, y);
-		glTexCoord2d(0, 1);	glVertex2d(x, y+(double)height);
-		glTexCoord2d(1, 1);	glVertex2d(x+(double)width, y+(double)height);
-		glTexCoord2d(1, 0); glVertex2d(x+(double)width, y);
+		glTexCoord2d(0, 1);	glVertex2d(x, y+(double)v);
+		glTexCoord2d(1, 1);	glVertex2d(x+(double)h, y+(double)v);
+		glTexCoord2d(1, 0); glVertex2d(x+(double)h, y);
 		glEnd();
 	}
 
@@ -392,29 +404,34 @@ bool GLTexture::draw2d(double x, double y) {
 		glPushMatrix();
 		glTranslated(x, y, 0);
 
+		double stepx = 128;
+		if (flipx) stepx = -128;
+		double stepy = 128;
+		if (flipy) stepy = -128;
+
 		size_t tex_index = 0;
 		double top = 0;
-		while (top < height) {
+		while (top < height && top >= 0) {
 			double left = 0;
-			while (left < width) {
+			while (left < width && left >= 0) {
 				// Bind the texture
 				glBindTexture(GL_TEXTURE_2D, tex[tex_index].id);
 
 				// Draw
 				glBegin(GL_QUADS);
 				glTexCoord2d(0, 0);	glVertex2d(left, top);
-				glTexCoord2d(0, 1);	glVertex2d(left, top+128);
-				glTexCoord2d(1, 1);	glVertex2d(left+128, top+128);
-				glTexCoord2d(1, 0); glVertex2d(left+128, top);
+				glTexCoord2d(0, 1);	glVertex2d(left, top+stepy);
+				glTexCoord2d(1, 1);	glVertex2d(left+stepx, top+stepy);
+				glTexCoord2d(1, 0); glVertex2d(left+stepx, top);
 				glEnd();
 
 				// Move right 128px
-				left += 128;
+				left += stepx;
 				tex_index++;
 			}
 
 			// Move down 128px
-			top += 128;
+			top += stepy;
 		}
 
 		glPopMatrix();

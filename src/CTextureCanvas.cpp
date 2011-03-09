@@ -293,19 +293,95 @@ void CTextureCanvas::drawPatch(int num, rgba_t col) {
 	// Enable textures
 	glEnable(GL_TEXTURE_2D);
 
+	// Setup rendering options
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	// Setup extended features
+	bool flipx = false;
+	bool flipy = false;
+	double alpha = 1.0;
+	bool shade_select = true;
+	if (texture->isExtended()) {
+		// Get extended patch
+		CTPatchEx* epatch = (CTPatchEx*)patch;
+
+		// Flips
+		if (epatch->flipX())
+			flipx = true;
+		if (epatch->flipY())
+			flipy = true;
+
+		// Translucency
+		if (epatch->getStyle() == "Add") {
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+			alpha = epatch->getAlpha();
+			shade_select = false;
+		}
+		else if (epatch->getStyle() == "Subtract") {
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+			glBlendEquation(GL_FUNC_SUBTRACT);
+			alpha = epatch->getAlpha();
+			shade_select = false;
+		}
+		else if (epatch->getStyle() == "ReverseSubtract") {
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+			glBlendEquation(GL_FUNC_REVERSE_SUBTRACT);
+			alpha = epatch->getAlpha();
+			shade_select = false;
+		}
+		else if (epatch->getStyle() == "Translucent") {
+			alpha = epatch->getAlpha();
+			shade_select = false;
+		}
+
+		// Blending
+		if (epatch->getBlendType() == 2) {
+			col.set(epatch->getColour());
+			shade_select = false;
+		}
+	}
+
+	// Set colour
+	glColor4f(col.fr(), col.fg(), col.fb(), alpha);
+
 	// Draw the patch
-	col.set_gl();
-	patch_textures[num]->draw2d(patch->xOffset(), patch->yOffset());
+	patch_textures[num]->draw2d(patch->xOffset(), patch->yOffset(), flipx, flipy);
+
+	// Draw tint if needed
+	if (texture->isExtended()) {
+		// Get extended patch
+		CTPatchEx* epatch = (CTPatchEx*)patch;
+
+		// Draw tint
+		if (epatch->getBlendType() == 3) {
+			rgba_t tint_col = epatch->getColour();
+			glColor4f(tint_col.fr(), tint_col.fg(), tint_col.fb(), tint_col.fa());
+			glDisable(GL_TEXTURE_2D);
+			glBegin(GL_QUADS);
+			glVertex2d(patch->xOffset(), patch->yOffset());
+			glVertex2d(patch->xOffset(), patch->yOffset()+patch_textures[num]->getHeight());
+			glVertex2d(patch->xOffset()+patch_textures[num]->getWidth(), patch->yOffset()+patch_textures[num]->getHeight());
+			glVertex2d(patch->xOffset()+patch_textures[num]->getWidth(), patch->yOffset());
+			glEnd();
+			glEnable(GL_TEXTURE_2D);
+			shade_select = false;
+		}
+	}
+
+	// Reset blending etc
+	if (texture->isExtended()) {
+		glBlendEquation(GL_FUNC_ADD);
+	}
 
 	// If the patch is hilighted, draw hilight
 	if (hilight_patch == num) {
 		rgba_t(255, 255, 255, 80, 1).set_gl();
-		patch_textures[num]->draw2d(patch->xOffset(), patch->yOffset());
+		patch_textures[num]->draw2d(patch->xOffset(), patch->yOffset(), flipx, flipy);
 	}
 	// If the patch is selected, hilight it also (selection colour)
-	if (selected_patches[num]) {
+	if (selected_patches[num] && shade_select) {
 		rgba_t(100, 150, 255, 140, 1).set_gl();
-		patch_textures[num]->draw2d(patch->xOffset(), patch->yOffset());
+		patch_textures[num]->draw2d(patch->xOffset(), patch->yOffset(), flipx, flipy);
 	}
 
 	// Disable textures

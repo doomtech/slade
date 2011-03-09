@@ -478,6 +478,9 @@ void ZTextureEditorPanel::onPatchFlipXChanged(wxCommandEvent& e) {
 			patch->flipX(cb_flipx->GetValue());
 	}
 
+	// Update UI
+	tex_canvas->Refresh();
+
 	tex_modified = true;
 }
 
@@ -492,6 +495,9 @@ void ZTextureEditorPanel::onPatchFlipYChanged(wxCommandEvent& e) {
 		if (patch)
 			patch->flipY(cb_flipy->GetValue());
 	}
+
+	// Update UI
+	tex_canvas->Refresh();
 
 	tex_modified = true;
 }
@@ -532,6 +538,9 @@ void ZTextureEditorPanel::onPatchAlphaChanged(wxSpinDoubleEvent& e) {
 			patch->setAlpha(spin_alpha->GetValue());
 	}
 
+	// Update UI
+	tex_canvas->Refresh();
+
 	tex_modified = true;
 }
 
@@ -546,6 +555,9 @@ void ZTextureEditorPanel::onPatchAlphaStyleChanged(wxCommandEvent& e) {
 		if (patch)
 			patch->setStyle(choice_style->GetStringSelection());
 	}
+
+	// Update UI
+	tex_canvas->Refresh();
 
 	tex_modified = true;
 }
@@ -565,6 +577,7 @@ void ZTextureEditorPanel::onPCNormalSelected(wxCommandEvent& e) {
 	// Update UI
 	enableTranslationControls(false);
 	enableBlendControls(false);
+	tex_canvas->Refresh();
 
 	tex_modified = true;
 }
@@ -584,6 +597,7 @@ void ZTextureEditorPanel::onPCBlendSelected(wxCommandEvent& e) {
 	// Update UI
 	enableTranslationControls(false);
 	enableBlendControls(true);
+	tex_canvas->Refresh();
 
 	tex_modified = true;
 }
@@ -603,6 +617,7 @@ void ZTextureEditorPanel::onPCTintSelected(wxCommandEvent& e) {
 	// Update UI
 	enableTranslationControls(false);
 	enableBlendControls(true, true);
+	tex_canvas->Refresh();
 
 	tex_modified = true;
 }
@@ -622,6 +637,7 @@ void ZTextureEditorPanel::onPCTranslationSelected(wxCommandEvent& e) {
 	// Update UI
 	enableTranslationControls(true);
 	enableBlendControls(false);
+	tex_canvas->Refresh();
 
 	tex_modified = true;
 }
@@ -640,6 +656,9 @@ void ZTextureEditorPanel::onPatchColourChanged(wxColourPickerEvent& e) {
 		}
 	}
 
+	// Update UI
+	tex_canvas->Refresh();
+
 	tex_modified = true;
 }
 
@@ -656,6 +675,9 @@ void ZTextureEditorPanel::onPatchTintAmountChanged(wxSpinDoubleEvent& e) {
 			patch->setColour(col.Red(), col.Green(), col.Blue(), spin_tint_amount->GetValue()*255);
 		}
 	}
+
+	// Update UI
+	tex_canvas->Refresh();
 
 	tex_modified = true;
 }

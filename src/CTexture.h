@@ -16,6 +16,7 @@ protected:
 public:
 	CTPatch();
 	CTPatch(string name, int16_t offset_x = 0, int16_t offset_y = 0);
+	CTPatch(CTPatch* copy);
 	~CTPatch();
 
 	string			getName() { return name; }

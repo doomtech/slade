@@ -55,6 +55,15 @@ CTPatch::CTPatch(string name, int16_t offset_x, int16_t offset_y) {
 	this->offset_y = offset_y;
 }
 
+/* CTPatch::CTPatch
+ * CTPatch class constructor copying another CTPatch
+ *******************************************************************/
+CTPatch::CTPatch(CTPatch* copy) {
+	name = copy->name;
+	offset_x = copy->offset_x;
+	offset_y = copy->offset_y;
+}
+
 /* CTPatch::~CTPatch
  * CTPatch class destructor
  *******************************************************************/
@@ -525,7 +534,10 @@ bool CTexture::duplicatePatch(size_t index, int16_t offset_x, int16_t offset_y) 
 	CTPatch* dp = patches[index];
 
 	// Add duplicate patch
-	patches.insert(patches.begin() + index, dp);
+	if (extended)
+		patches.insert(patches.begin() + index, new CTPatchEx((CTPatchEx*)patches[index]));
+	else
+		patches.insert(patches.begin() + index, new CTPatch(patches[index]));
 
 	// Offset patch by given amount
 	patches[index+1]->setOffsetX(dp->xOffset() + offset_x);
