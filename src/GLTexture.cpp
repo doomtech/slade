@@ -389,13 +389,19 @@ bool GLTexture::draw2d(double x, double y, bool flipx, bool flipy) {
 		if (flipx) h = -h;
 		if (flipy) v = -v;
 
+		// Translate to position
+		glPushMatrix();
+		glTranslated(x, y, 0);
+
 		// Draw
 		glBegin(GL_QUADS);
-		glTexCoord2d(0, 0);	glVertex2d(x, y);
-		glTexCoord2d(0, 1);	glVertex2d(x, y+(double)v);
-		glTexCoord2d(1, 1);	glVertex2d(x+(double)h, y+(double)v);
-		glTexCoord2d(1, 0); glVertex2d(x+(double)h, y);
+		glTexCoord2d(0, 0);	glVertex2d(0, 0);
+		glTexCoord2d(0, 1);	glVertex2d(0, v);
+		glTexCoord2d(1, 1);	glVertex2d(h, v);
+		glTexCoord2d(1, 0); glVertex2d(h, 0);
 		glEnd();
+
+		glPopMatrix();
 	}
 
 	// Otherwise draw the 128x128 chunks

@@ -249,6 +249,8 @@ void CTextureCanvas::drawTexture() {
 
 	// Now loop through selected patches and draw selection outlines
 	rgba_t(70, 210, 220, 255, 0).set_gl();
+	glEnable(GL_LINE_SMOOTH);
+	glLineWidth(1.5f);
 	for (size_t a = 0; a < selected_patches.size(); a++) {
 		// Skip if not selected
 		if (!selected_patches[a])
@@ -256,15 +258,30 @@ void CTextureCanvas::drawTexture() {
 
 		// Get patch
 		CTPatch* patch = texture->getPatch(a);
+		CTPatchEx* epatch = (CTPatchEx*)patch;
 
-		// Draw outline
-		glBegin(GL_LINE_LOOP);
-		glVertex2i(patch->xOffset(), patch->yOffset());
-		glVertex2i(patch->xOffset(), patch->yOffset() + (int)patch_textures[a]->getHeight());
-		glVertex2i(patch->xOffset() + (int)patch_textures[a]->getWidth(), patch->yOffset() + (int)patch_textures[a]->getHeight());
-		glVertex2i(patch->xOffset() + (int)patch_textures[a]->getWidth(), patch->yOffset());
-		glEnd();
+		// Check for rotation
+		if (texture->isExtended() && (epatch->getRotation() == 90 || epatch->getRotation() == -90)) {
+			// Draw outline, width/height swapped
+			glBegin(GL_LINE_LOOP);
+			glVertex2i(patch->xOffset(), patch->yOffset());
+			glVertex2i(patch->xOffset(), patch->yOffset() + (int)patch_textures[a]->getWidth());
+			glVertex2i(patch->xOffset() + (int)patch_textures[a]->getHeight(), patch->yOffset() + (int)patch_textures[a]->getWidth());
+			glVertex2i(patch->xOffset() + (int)patch_textures[a]->getHeight(), patch->yOffset());
+			glEnd();
+		}
+		else {
+			// Draw outline
+			glBegin(GL_LINE_LOOP);
+			glVertex2i(patch->xOffset(), patch->yOffset());
+			glVertex2i(patch->xOffset(), patch->yOffset() + (int)patch_textures[a]->getHeight());
+			glVertex2i(patch->xOffset() + (int)patch_textures[a]->getWidth(), patch->yOffset() + (int)patch_textures[a]->getHeight());
+			glVertex2i(patch->xOffset() + (int)patch_textures[a]->getWidth(), patch->yOffset());
+			glEnd();
+		}
 	}
+	glDisable(GL_LINE_SMOOTH);
+	glLineWidth(1.0f);
 
 	// Pop matrix
 	glPopMatrix();
@@ -290,11 +307,9 @@ void CTextureCanvas::drawPatch(int num, bool outside) {
 			patch_textures[num]->genChequeredTexture(8, COL_RED, COL_BLACK);
 	}
 
-	// Enable textures
-	glEnable(GL_TEXTURE_2D);
-
-	// Setup rendering options
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	// Translate to position
+	glPushMatrix();
+	glTranslated(patch->xOffset(), patch->yOffset(), 0);
 
 	// Setup extended features
 	bool flipx = false;
@@ -311,6 +326,20 @@ void CTextureCanvas::drawPatch(int num, bool outside) {
 			flipx = true;
 		if (epatch->flipY())
 			flipy = true;
+
+		// Rotation
+		if (epatch->getRotation() == 90) {
+			glTranslated(patch_textures[num]->getHeight(), 0, 0);
+			glRotated(90, 0, 0, 1);
+		}
+		else if (epatch->getRotation() == 180) {
+			glTranslated(patch_textures[num]->getWidth(), patch_textures[num]->getHeight(), 0);
+			glRotated(180, 0, 0, 1);
+		}
+		else if (epatch->getRotation() == -90) {
+			glTranslated(0, patch_textures[num]->getWidth(), 0);
+			glRotated(-90, 0, 0, 1);
+		}
 
 		// Translucency
 		if (!outside) {
@@ -344,6 +373,12 @@ void CTextureCanvas::drawPatch(int num, bool outside) {
 		}
 	}
 
+	// Enable textures
+	glEnable(GL_TEXTURE_2D);
+
+	// Setup rendering options
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	// Set colour
 	if (outside)
 		glColor4f(0.8f, 0.2f, 0.2f, 0.3f);
@@ -351,7 +386,7 @@ void CTextureCanvas::drawPatch(int num, bool outside) {
 		glColor4f(col.fr(), col.fg(), col.fb(), alpha);
 
 	// Draw the patch
-	patch_textures[num]->draw2d(patch->xOffset(), patch->yOffset(), flipx, flipy);
+	patch_textures[num]->draw2d(0, 0, flipx, flipy);
 
 	// Draw tint if needed
 	if (!outside && texture->isExtended()) {
@@ -364,10 +399,10 @@ void CTextureCanvas::drawPatch(int num, bool outside) {
 			glColor4f(tint_col.fr(), tint_col.fg(), tint_col.fb(), tint_col.fa());
 			glDisable(GL_TEXTURE_2D);
 			glBegin(GL_QUADS);
-			glVertex2d(patch->xOffset(), patch->yOffset());
-			glVertex2d(patch->xOffset(), patch->yOffset()+patch_textures[num]->getHeight());
-			glVertex2d(patch->xOffset()+patch_textures[num]->getWidth(), patch->yOffset()+patch_textures[num]->getHeight());
-			glVertex2d(patch->xOffset()+patch_textures[num]->getWidth(), patch->yOffset());
+			glVertex2d(0, 0);
+			glVertex2d(0, patch_textures[num]->getHeight());
+			glVertex2d(patch_textures[num]->getWidth(), patch_textures[num]->getHeight());
+			glVertex2d(patch_textures[num]->getWidth(), 0);
 			glEnd();
 			glEnable(GL_TEXTURE_2D);
 			shade_select = false;
@@ -382,16 +417,18 @@ void CTextureCanvas::drawPatch(int num, bool outside) {
 	// If the patch is hilighted, draw hilight
 	if (hilight_patch == num) {
 		rgba_t(255, 255, 255, 80, 1).set_gl();
-		patch_textures[num]->draw2d(patch->xOffset(), patch->yOffset(), flipx, flipy);
+		patch_textures[num]->draw2d(0, 0, flipx, flipy);
 	}
 	// If the patch is selected, hilight it also (selection colour)
 	if (selected_patches[num] && shade_select) {
 		rgba_t(100, 150, 255, 140, 1).set_gl();
-		patch_textures[num]->draw2d(patch->xOffset(), patch->yOffset(), flipx, flipy);
+		patch_textures[num]->draw2d(0, 0, flipx, flipy);
 	}
 
 	// Disable textures
 	glDisable(GL_TEXTURE_2D);
+
+	glPopMatrix();
 }
 
 /* CTextureCanvas::drawTextureBorder

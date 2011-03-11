@@ -523,6 +523,9 @@ void ZTextureEditorPanel::onPatchRotationChanged(wxCommandEvent& e) {
 			patch->setRotation(rot);
 	}
 
+	// Update UI
+	tex_canvas->Refresh();
+
 	tex_modified = true;
 }
 
