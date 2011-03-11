@@ -100,8 +100,11 @@ ArchiveEntry* PatchTable::patchEntry(size_t index) {
 	if (index >= patches.size())
 		return NULL;
 
-	// Return entry at index
-	return theResourceManager->getPatchEntry(patches[index].name, parent);
+	// Patches namespace > graphics
+	ArchiveEntry* entry = theResourceManager->getPatchEntry(patches[index].name, "patches", parent);
+	if (!entry) entry = theResourceManager->getPatchEntry(patches[index].name, "graphics", parent);
+
+	return entry;
 }
 
 /* PatchTable::patchEntry
@@ -112,7 +115,7 @@ ArchiveEntry* PatchTable::patchEntry(string name) {
 	// Search for patch by name
 	for (size_t a = 0; a < patches.size(); a++) {
 		if (!patches[a].name.CmpNoCase(name))
-			return theResourceManager->getPatchEntry(patches[a].name, parent);
+			return patchEntry(a);
 	}
 
 	// Not found
@@ -141,7 +144,7 @@ int32_t PatchTable::patchIndex(string name) {
 int32_t PatchTable::patchIndex(ArchiveEntry* entry) {
 	// Search for patch by entry
 	for (size_t a = 0; a < patches.size(); a++) {
-		if (theResourceManager->getPatchEntry(patches[a].name, parent) == entry)
+		if (theResourceManager->getPatchEntry(patches[a].name, "patches", parent) == entry)
 			return a;
 	}
 
@@ -210,50 +213,6 @@ bool PatchTable::addPatch(string name, bool allow_dup) {
 	announce("modified");
 
 	return true;
-}
-
-/* PatchTable::updatePatchEntry
- * Updates the ArchiveEntry associated with the patch at [index].
- * Searches the parent archive first, then all resource archives.
- *******************************************************************/
-void PatchTable::updatePatchEntry(unsigned index) {
-	/*
-	// Check index
-	if (index >= patches.size())
-		return;
-
-	// Get patch name
-	string name = patch(index).name;
-
-	// Attempt to find patch entry
-	ArchiveEntry* entry = NULL;
-	Archive::search_options_t options;
-	options.match_name = name;
-
-	// First, search parent archive (patches namespace > global namespace)
-	if (parent) {
-		options.match_namespace = "patches";
-		entry = parent->findLast(options);
-
-		if (!entry) {
-			options.match_namespace = "";
-			entry = parent->findLast(options);
-		}
-	}
-
-	// Next, search open resource archives + base resource archive
-	if (!entry) {
-		options.match_namespace = "patches";
-		entry = theArchiveManager->findResourceEntry(options, parent);
-	}
-	if (!entry) {
-		options.match_namespace = "";
-		entry = theArchiveManager->findResourceEntry(options, parent);
-	}
-
-	// Set patch entry
-	patch(index).entry = entry;
-	*/
 }
 
 /* PatchTable::loadPNAMES

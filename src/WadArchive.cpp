@@ -861,6 +861,10 @@ ArchiveEntry* WadArchive::findFirst(search_options_t& options) {
 	ArchiveEntry* end = NULL;
 	options.match_name = options.match_name.Lower();
 
+	// "graphics" namespace is the global namespace in a wad
+	if (options.match_namespace == "graphics")
+		options.match_namespace = "";
+
 	// Check for namespace to search
 	if (!options.match_namespace.IsEmpty()) {
 		// Find matching namespace
@@ -922,6 +926,10 @@ ArchiveEntry* WadArchive::findLast(search_options_t& options) {
 	ArchiveEntry* end = NULL;
 	options.match_name = options.match_name.Lower();
 
+	// "graphics" namespace is the global namespace in a wad
+	if (options.match_namespace == "graphics")
+		options.match_namespace = "";
+
 	// Check for namespace to search
 	if (!options.match_namespace.IsEmpty()) {
 		// Find matching namespace
@@ -982,6 +990,10 @@ vector<ArchiveEntry*> WadArchive::findAll(search_options_t& options) {
 	ArchiveEntry* end = NULL;
 	options.match_name = options.match_name.Lower();
 	vector<ArchiveEntry*> ret;
+
+	// "graphics" namespace is the global namespace in a wad
+	if (options.match_namespace == "graphics")
+		options.match_namespace = "";
 
 	// Check for namespace to search
 	if (!options.match_namespace.IsEmpty()) {

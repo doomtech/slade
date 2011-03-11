@@ -31,7 +31,6 @@
 #include "Main.h"
 #include "CTextureCanvas.h"
 #include "Misc.h"
-#include "ResourceManager.h"
 
 
 /*******************************************************************
@@ -147,12 +146,13 @@ void CTextureCanvas::updatePatchTextures() {
 /* CTextureCanvas::openTexture
  * Loads a composite texture to be displayed
  *******************************************************************/
-bool CTextureCanvas::openTexture(CTexture* tex, PatchTable& ptable) {
+bool CTextureCanvas::openTexture(CTexture* tex, Archive* parent) {
 	// Clear the current texture
 	clearTexture();
 
 	// Set texture
 	texture = tex;
+	this->parent = parent;
 
 	// Init patches
 	clearPatchTextures();
@@ -233,7 +233,7 @@ void CTextureCanvas::drawTexture() {
 	// But only if we are drawing stuff outside the texture area
 	if (draw_outside) {
 		for (uint32_t a = 0; a < texture->nPatches(); a++)
-			drawPatch(a, rgba_t(200, 50, 50, 80, 0));
+			drawPatch(a, true);
 	}
 
 	// Now, clip to texture boundaries and draw patches fully opaque
@@ -273,7 +273,7 @@ void CTextureCanvas::drawTexture() {
 /* CTextureCanvas::drawPatch
  * Draws the patch at index [num] in the composite texture
  *******************************************************************/
-void CTextureCanvas::drawPatch(int num, rgba_t col) {
+void CTextureCanvas::drawPatch(int num, bool outside) {
 	// Get patch to draw
 	CTPatch* patch = texture->getPatch(num);
 
@@ -284,7 +284,7 @@ void CTextureCanvas::drawPatch(int num, rgba_t col) {
 	// Load the patch as an opengl texture if it isn't already
 	if (!patch_textures[num]->isLoaded()) {
 		SImage temp;
-		if (Misc::loadImageFromEntry(&temp, theResourceManager->getPatchEntry(patch->getName())))
+		if (Misc::loadImageFromEntry(&temp, patch->getPatchEntry(parent)))
 			patch_textures[num]->loadImage(&temp, &palette);
 		else
 			patch_textures[num]->genChequeredTexture(8, COL_RED, COL_BLACK);
@@ -301,6 +301,7 @@ void CTextureCanvas::drawPatch(int num, rgba_t col) {
 	bool flipy = false;
 	double alpha = 1.0;
 	bool shade_select = true;
+	rgba_t col = COL_WHITE;
 	if (texture->isExtended()) {
 		// Get extended patch
 		CTPatchEx* epatch = (CTPatchEx*)patch;
@@ -312,43 +313,48 @@ void CTextureCanvas::drawPatch(int num, rgba_t col) {
 			flipy = true;
 
 		// Translucency
-		if (epatch->getStyle() == "Add") {
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-			alpha = epatch->getAlpha();
-			shade_select = false;
-		}
-		else if (epatch->getStyle() == "Subtract") {
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-			glBlendEquation(GL_FUNC_SUBTRACT);
-			alpha = epatch->getAlpha();
-			shade_select = false;
-		}
-		else if (epatch->getStyle() == "ReverseSubtract") {
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-			glBlendEquation(GL_FUNC_REVERSE_SUBTRACT);
-			alpha = epatch->getAlpha();
-			shade_select = false;
-		}
-		else if (epatch->getStyle() == "Translucent") {
-			alpha = epatch->getAlpha();
-			shade_select = false;
-		}
+		if (!outside) {
+			if (epatch->getStyle() == "Add") {
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+				alpha = epatch->getAlpha();
+				shade_select = false;
+			}
+			else if (epatch->getStyle() == "Subtract") {
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+				glBlendEquation(GL_FUNC_SUBTRACT);
+				alpha = epatch->getAlpha();
+				shade_select = false;
+			}
+			else if (epatch->getStyle() == "ReverseSubtract") {
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+				glBlendEquation(GL_FUNC_REVERSE_SUBTRACT);
+				alpha = epatch->getAlpha();
+				shade_select = false;
+			}
+			else if (epatch->getStyle() == "Translucent") {
+				alpha = epatch->getAlpha();
+				shade_select = false;
+			}
 
-		// Blending
-		if (epatch->getBlendType() == 2) {
-			col.set(epatch->getColour());
-			shade_select = false;
+			// Blending
+			if (epatch->getBlendType() == 2) {
+				col.set(epatch->getColour());
+				shade_select = false;
+			}
 		}
 	}
 
 	// Set colour
-	glColor4f(col.fr(), col.fg(), col.fb(), alpha);
+	if (outside)
+		glColor4f(0.8f, 0.2f, 0.2f, 0.3f);
+	else
+		glColor4f(col.fr(), col.fg(), col.fb(), alpha);
 
 	// Draw the patch
 	patch_textures[num]->draw2d(patch->xOffset(), patch->yOffset(), flipx, flipy);
 
 	// Draw tint if needed
-	if (texture->isExtended()) {
+	if (!outside && texture->isExtended()) {
 		// Get extended patch
 		CTPatchEx* epatch = (CTPatchEx*)patch;
 

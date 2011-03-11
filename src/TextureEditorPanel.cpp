@@ -374,7 +374,7 @@ bool TextureEditorPanel::openTexture(CTexture* tex) {
 	tex_current->copyTexture(tex);
 
 	// Open texture in canvas
-	tex_canvas->openTexture(tex_current, tx_editor->patchTable());
+	tex_canvas->openTexture(tex_current, tx_editor->getArchive());
 
 	// Set control values
 	updateTextureControls();

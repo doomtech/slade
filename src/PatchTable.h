@@ -46,7 +46,6 @@ public:
 	bool			removePatch(unsigned index);
 	bool			replacePatch(unsigned index, string newname);
 	bool			addPatch(string name, bool allow_dup = false);
-	void			updatePatchEntry(unsigned index);
 
 	bool	loadPNAMES(ArchiveEntry* pnames, Archive* parent = NULL);
 	bool	writePNAMES(ArchiveEntry* pnames);

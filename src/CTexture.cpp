@@ -31,6 +31,7 @@
 #include "Main.h"
 #include "CTexture.h"
 #include "ArchiveManager.h"
+#include "ResourceManager.h"
 #include <wx/colour.h>
 
 
@@ -113,6 +114,21 @@ void CTPatch::searchEntry(Archive* parent) {
 	*/
 }
 
+/* CTPatch::getPatchEntry
+ * Returns the entry (if any) associated with this patch via the
+ * resource manager. Entries in [parent] will be prioritised over
+ * entries in any other open archive
+ *******************************************************************/
+ArchiveEntry* CTPatch::getPatchEntry(Archive* parent) {
+	// Default patches should be in patches namespace
+	ArchiveEntry* entry = theResourceManager->getPatchEntry(name, "patches", parent);
+
+	// Not found in patches, check in graphics namespace
+	if (!entry) entry = theResourceManager->getPatchEntry(name, "graphics", parent);
+
+	return entry;
+}
+
 /*******************************************************************
  * CTPATCHEX CLASS FUNCTIONS
  *******************************************************************/
@@ -127,12 +143,13 @@ CTPatchEx::CTPatchEx() {
 	alpha = 1.0f;
 	style = "Copy";
 	blendtype = 0;
+	type = PTYPE_PATCH;
 }
 
 /* CTPatchEx::CTPatchEx
  * CTPatchEx class constructor w/basic initial values
  *******************************************************************/
-CTPatchEx::CTPatchEx(string name, int16_t offset_x, int16_t offset_y)
+CTPatchEx::CTPatchEx(string name, int16_t offset_x, int16_t offset_y, uint8_t type)
 : CTPatch(name, offset_x, offset_y) {
 	flip_x = false;
 	flip_y = false;
@@ -140,6 +157,7 @@ CTPatchEx::CTPatchEx(string name, int16_t offset_x, int16_t offset_y)
 	alpha = 1.0f;
 	style = "Copy";
 	blendtype = 0;
+	this->type = type;
 }
 
 /* CTPatchEx::CTPatchEx
@@ -155,6 +173,7 @@ CTPatchEx::CTPatchEx(CTPatch* copy) {
 	offset_x = copy->xOffset();
 	offset_y = copy->yOffset();
 	name = copy->getName();
+	type = PTYPE_PATCH;
 }
 
 /* CTPatchEx::CTPatchEx
@@ -168,9 +187,10 @@ CTPatchEx::CTPatchEx(CTPatchEx* copy) {
 	style = copy->style;
 	blendtype = copy->blendtype;
 	colour = copy->colour;
-	offset_x = copy->xOffset();
-	offset_y = copy->yOffset();
-	name = copy->getName();
+	offset_x = copy->offset_x;
+	offset_y = copy->offset_y;
+	name = copy->name;
+	type = copy->type;
 	for (unsigned a = 0; a < copy->translation.size(); a++)
 		translation.push_back(copy->translation[a]);
 }
@@ -181,11 +201,33 @@ CTPatchEx::CTPatchEx(CTPatchEx* copy) {
 CTPatchEx::~CTPatchEx() {
 }
 
+/* CTPatchEx::getPatchEntry
+ * Returns the entry (if any) associated with this patch via the
+ * resource manager. Entries in [parent] will be prioritised over
+ * entries in any other open archive
+ *******************************************************************/
+ArchiveEntry* CTPatchEx::getPatchEntry(Archive* parent) {
+	// 'Patch' type: patches > graphics
+	if (type == PTYPE_PATCH) {
+		ArchiveEntry* entry = theResourceManager->getPatchEntry(name, "patches", parent);
+		if (!entry) entry = theResourceManager->getPatchEntry(name, "graphics", parent);
+		return entry;
+	}
+
+	// 'Graphic' type: graphics > patches
+	if (type == PTYPE_GRAPHIC) {
+		ArchiveEntry* entry = theResourceManager->getPatchEntry(name, "graphics", parent);
+		if (!entry) entry = theResourceManager->getPatchEntry(name, "patches", parent);
+		return entry;
+	}
+}
+
 /* CTPatchEx::parse
  * Parses a ZDoom TEXTURES format patch definition
  *******************************************************************/
-bool CTPatchEx::parse(Tokenizer& tz) {
+bool CTPatchEx::parse(Tokenizer& tz, uint8_t type) {
 	// Read basic info
+	this->type = type;
 	name = tz.getToken().Upper();
 	tz.getToken();	// Skip ,
 	offset_x = tz.getInteger();
@@ -287,7 +329,9 @@ bool CTPatchEx::parse(Tokenizer& tz) {
  *******************************************************************/
 string CTPatchEx::asText() {
 	// Init text string
-	string text = s_fmt("\tPatch %s, %d, %d\n", name, offset_x, offset_y);
+	string typestring = "Patch";
+	if (type == PTYPE_GRAPHIC) typestring = "Graphic";
+	string text = s_fmt("\t%s %s, %d, %d\n", chr(typestring), chr(name), offset_x, offset_y);
 
 	// Check if we need to write any extra properties
 	if (!flip_x && !flip_y && rotation == 0 && blendtype == 0 && alpha == 1.0f && s_cmpnocase(style, "Copy"))
@@ -636,10 +680,9 @@ bool CTexture::parse(Tokenizer& tz, string type) {
 			}
 
 			// Graphic
-			// TODO: Treat them slightly differently from patches
 			if (s_cmpnocase(property, "Graphic")) {
 				CTPatchEx* patch = new CTPatchEx();
-				patch->parse(tz);
+				patch->parse(tz, PTYPE_GRAPHIC);
 				patches.push_back(patch);
 			}
 

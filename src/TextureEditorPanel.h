@@ -11,7 +11,6 @@ class TextureXEditor;
 
 class TextureEditorPanel : public wxPanel {
 protected:
-	//PatchTable*		patch_table;
 	TextureXEditor*	tx_editor;
 	CTexture*		tex_current;
 	bool			tex_modified;

@@ -27,11 +27,16 @@ public:
 	void	searchEntry(Archive* parent);
 	void	setOffsetX(int16_t offset) { offset_x = offset; }
 	void	setOffsetY(int16_t offset) { offset_y = offset; }
+
+	virtual ArchiveEntry*	getPatchEntry(Archive* parent = NULL);
 };
 
 // Extended patch (for TEXTURES)
+#define	PTYPE_PATCH		0
+#define PTYPE_GRAPHIC	1
 class CTPatchEx : public CTPatch {
 private:
+	uint8_t			type;			// 0=patch, 1=graphic
 	bool			flip_x;
 	bool			flip_y;
 	int16_t			rotation;
@@ -39,11 +44,11 @@ private:
 	rgba_t			colour;
 	float			alpha;
 	string			style;
-	uint8_t			blendtype;	// 0=none, 1=translation, 2=blend, 3=tint
+	uint8_t			blendtype;		// 0=none, 1=translation, 2=blend, 3=tint
 
 public:
 	CTPatchEx();
-	CTPatchEx(string name, int16_t offset_x = 0, int16_t offset_y = 0);
+	CTPatchEx(string name, int16_t offset_x = 0, int16_t offset_y = 0, uint8_t type = 0);
 	CTPatchEx(CTPatch* copy);
 	CTPatchEx(CTPatchEx* copy);
 	~CTPatchEx();
@@ -64,7 +69,9 @@ public:
 	void	setStyle(string s) { style = s; }
 	void	setBlendType(uint8_t type) { blendtype = type; }
 
-	bool	parse(Tokenizer& tz);
+	ArchiveEntry*	getPatchEntry(Archive* parent = NULL);
+
+	bool	parse(Tokenizer& tz, uint8_t type = 0);
 	string	asText();
 };
 

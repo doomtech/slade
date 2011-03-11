@@ -104,6 +104,7 @@ public:
 	void	stateChanged();
 	void	setExtensionByType();
 	int		getTypeReliability() { return (type ? (getType()->getReliability() * reliability / 255) : 0); }
+	bool	isInNamespace(string ns);
 };
 
 #endif//__ARCHIVEENTRY_H__

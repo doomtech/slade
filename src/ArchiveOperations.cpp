@@ -84,7 +84,7 @@ bool ArchiveOperations::removeUnusedPatches(Archive* archive) {
 			// Unused
 
 			// If its entry is in the archive, flag it to be removed
-			ArchiveEntry* entry = theResourceManager->getPatchEntry(p.name, archive);
+			ArchiveEntry* entry = theResourceManager->getPatchEntry(p.name, "patches", archive);
 			if (entry && entry->getParent() == archive)
 				to_remove.push_back(entry);
 

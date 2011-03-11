@@ -14,6 +14,7 @@ wxDECLARE_EVENT(EVT_DRAG_END, wxCommandEvent);
 class CTextureCanvas : public OGLCanvas, Listener {
 private:
 	CTexture*			texture;
+	Archive*			parent;
 	vector<GLTexture*>	patch_textures;
 	vector<bool>		selected_patches;
 	int					hilight_patch;
@@ -43,10 +44,10 @@ public:
 	void	clearTexture();
 	void	clearPatchTextures();
 	void	updatePatchTextures();
-	bool	openTexture(CTexture* tex, PatchTable& ptable);
+	bool	openTexture(CTexture* tex, Archive* parent);
 	void	draw();
 	void	drawTexture();
-	void	drawPatch(int num, rgba_t col = COL_WHITE);
+	void	drawPatch(int num, bool outside = false);
 	void	drawTextureBorder();
 	void	resetOffsets() { offset.x = offset.y = 0; }
 

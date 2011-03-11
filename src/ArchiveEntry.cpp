@@ -502,3 +502,19 @@ void ArchiveEntry::setExtensionByType() {
 	else
 		rename(fn.GetFullName());
 }
+
+/* ArchiveEntry::isInNamespace
+ * Returns true if the entry is in the [ns] namespace within its
+ * parent, false otherwise
+ *******************************************************************/
+bool ArchiveEntry::isInNamespace(string ns) {
+	// Can't do this without parent archive
+	if (!getParent())
+		return false;
+
+	// Some special cases first
+	if (ns == "graphics" && getParent()->getType() == ARCHIVE_WAD)
+		ns = "global";	// Graphics namespace doesn't exist in wad files, use global instead
+
+	return getParent()->detectNamespace(this) == ns;
+}

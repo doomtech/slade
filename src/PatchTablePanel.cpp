@@ -35,7 +35,6 @@
 #include "TextureXEditor.h"
 #include "ArchiveEntry.h"
 #include "ArchiveManager.h"
-#include "ResourceManager.h"
 #include <wx/filename.h>
 
 
@@ -99,7 +98,7 @@ string PatchTableListView::getItemText(long item, long column) const {
 		return s_fmt("%d", patch.used_in.size());
 	else if (column == 3) {					// Archive column
 		// Get patch entry
-		ArchiveEntry* entry = theResourceManager->getPatchEntry(patch.name, patch_table->getParent());
+		ArchiveEntry* entry = patch_table->patchEntry(item);
 
 		// If patch entry can't be found return invalid
 		if (entry)
@@ -172,15 +171,8 @@ void PatchTableListView::onAnnouncement(Announcer* announcer, string event_name,
 	if (announcer == patch_table)
 		updateList();
 
-	if (announcer == theArchiveManager) {
-		//if (event_name == "base_resource_changed") {
-			// Clear all patch entries
-		//	for (unsigned a = 0; a < patch_table->nPatches(); a++)
-		//		patch_table->patch(a).entry = NULL;
-		//}
-
+	if (announcer == theArchiveManager)
 		updateList();
-	}
 }
 
 
@@ -288,7 +280,6 @@ void PatchTablePanel::onBtnAddPatch(wxCommandEvent& e) {
 
 	// Add to patch table
 	patch_table->addPatch(patch);
-	patch_table->updatePatchEntry(patch_table->nPatches() - 1);
 
 	// Update list
 	list_patches->updateList();

@@ -181,24 +181,29 @@ void ResourceManager::listAllPatches() {
  * Returns the most appropriate managed resource entry for [patch],
  * or NULL if no match found
  *******************************************************************/
-ArchiveEntry* ResourceManager::getPatchEntry(string patch, Archive* priority) {
-	// TODO: Take namespaces into account
-
+ArchiveEntry* ResourceManager::getPatchEntry(string patch, string nspace, Archive* priority) {
+	// Check resource with matching name exists
 	Resource& res = patches[patch];
-
 	if (res.entries.size() == 0)
 		return NULL;
 
+	// Go through resource entries
 	ArchiveEntry* entry = res.entries[0];
 	for (unsigned a = 0; a < res.entries.size(); a++) {
-		if (res.entries[a]->getParent() == priority)
-			return entry;
+		// If the entry is in the correct namespace (if namespace is important)
+		if (nspace.IsEmpty() || res.entries[a]->isInNamespace(nspace)) {
+			// If it's in the 'priority' archive, return it
+			if (priority && res.entries[a]->getParent() == priority)
+				return entry;
 
-		if (theArchiveManager->archiveIndex(entry->getParent()) <
-			theArchiveManager->archiveIndex(res.entries[a]->getParent()))
-			entry = res.entries[a];
+			// Otherwise, if it's in a 'later' archive than the current resource entry, set it
+			if (theArchiveManager->archiveIndex(entry->getParent()) <=
+				theArchiveManager->archiveIndex(res.entries[a]->getParent()))
+				entry = res.entries[a];
+		}
 	}
 
+	// Return most relevant entry
 	return entry;
 }
 

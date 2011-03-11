@@ -338,7 +338,7 @@ bool TextureXEditor::removePatch(unsigned index, bool delete_entry) {
 		texture_editors[a]->txList().removePatch(p.name);
 
 	// Delete patch entry if it's part of this archive (and delete_entry is true)
-	ArchiveEntry* entry = theResourceManager->getPatchEntry(p.name, archive);
+	ArchiveEntry* entry = theResourceManager->getPatchEntry(p.name, "patches", archive);
 	if (delete_entry && entry && entry->getParent() == archive)
 		archive->removeEntry(entry);
 
@@ -388,9 +388,8 @@ bool TextureXEditor::checkTextures() {
 	// Go through patch table
 	for (unsigned a = 0; a < patch_table.nPatches(); a++) {
 		// Check patch entry is valid
-		patch_table.updatePatchEntry(a);
 		patch_t& patch = patch_table.patch(a);
-		ArchiveEntry* entry = theResourceManager->getPatchEntry(patch.name, archive);
+		ArchiveEntry* entry = theResourceManager->getPatchEntry(patch.name, "patches", archive);
 
 		if (!entry) {
 			problems += s_fmt("Patch %s cannot be found in any open archive\n", chr(patch.name));

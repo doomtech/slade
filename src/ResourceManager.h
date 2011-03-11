@@ -52,7 +52,7 @@ public:
 
 	void	listAllPatches();
 
-	ArchiveEntry*	getPatchEntry(string patch, Archive* priority = NULL);
+	ArchiveEntry*	getPatchEntry(string patch, string nspace = "patches", Archive* priority = NULL);
 
 	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 };
