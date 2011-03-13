@@ -311,6 +311,10 @@ void CTextureCanvas::drawPatch(int num, bool outside) {
 	glPushMatrix();
 	glTranslated(patch->xOffset(), patch->yOffset(), 0);
 
+	// Setup rendering options
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBlendEquation(GL_FUNC_ADD);
+
 	// Setup extended features
 	bool flipx = false;
 	bool flipy = false;
@@ -375,9 +379,6 @@ void CTextureCanvas::drawPatch(int num, bool outside) {
 
 	// Enable textures
 	glEnable(GL_TEXTURE_2D);
-
-	// Setup rendering options
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// Set colour
 	if (outside)

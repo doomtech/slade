@@ -51,6 +51,9 @@ typedef wxString string;
 #ifdef __APPLE__
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
+#elif _WINDOWS
+#include "glew/glew.h"
+#include "glew/wglew.h"
 #else
 #include <GL/gl.h>
 #include <GL/glu.h>

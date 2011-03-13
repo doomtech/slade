@@ -88,6 +88,9 @@
     <Filter Include="External\QMus2Mid">
       <UniqueIdentifier>{dda863ce-2d21-48cb-9de4-44e8e63b1326}</UniqueIdentifier>
     </Filter>
+    <Filter Include="External\GLEW">
+      <UniqueIdentifier>{81778842-3a8f-426e-995c-27aac63c0119}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\GfxConvDialog.cpp">
@@ -425,6 +428,9 @@
     </ClCompile>
     <ClCompile Include="src\ResourceManager.cpp">
       <Filter>Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\glew\glew.c">
+      <Filter>External\GLEW</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -794,6 +800,12 @@
     </ClInclude>
     <ClInclude Include="src\ResourceManager.h">
       <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="src\glew\glew.h">
+      <Filter>External\GLEW</Filter>
+    </ClInclude>
+    <ClInclude Include="src\glew\wglew.h">
+      <Filter>External\GLEW</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

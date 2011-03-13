@@ -220,6 +220,8 @@ ArchiveEntry* CTPatchEx::getPatchEntry(Archive* parent) {
 		if (!entry) entry = theResourceManager->getPatchEntry(name, "patches", parent);
 		return entry;
 	}
+
+	return NULL;
 }
 
 /* CTPatchEx::parse
