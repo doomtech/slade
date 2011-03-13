@@ -15,7 +15,7 @@ typedef unsigned __int16 uint16_t;
 typedef __int32 int32_t;
 typedef unsigned __int32 uint32_t;
 typedef __int64 int64_t;
-typedef unsigned __int32 uint64_t;
+typedef unsigned __int64 uint64_t;
 #endif
 
 // String stuff
@@ -52,6 +52,7 @@ typedef wxString string;
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
 #elif _WINDOWS
+#define GLEW_STATIC
 #include "glew/glew.h"
 #include "glew/wglew.h"
 #else

@@ -1266,6 +1266,22 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="GLEW"
+				>
+				<File
+					RelativePath=".\src\glew\glew.c"
+					>
+				</File>
+				<File
+					RelativePath=".\src\glew\glew.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\glew\wglew.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<File
 			RelativePath=".\resource.h"
