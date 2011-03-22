@@ -366,6 +366,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\Math.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Math.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\Parser.cpp"
 					>
 				</File>
@@ -967,6 +975,14 @@
 				</File>
 				<File
 					RelativePath=".\src\Icons.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Translation.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Translation.h"
 					>
 				</File>
 				<Filter

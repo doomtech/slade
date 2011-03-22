@@ -15,7 +15,7 @@ Translation::~Translation() {
 void Translation::parse(string def) {
 	// Open definition string for processing w/tokenizer
 	Tokenizer tz;
-	tz.setSpecialCharacters("[]:\%,=");
+	tz.setSpecialCharacters("[]:%,=");
 	tz.openString(def);
 
 	wxLogMessage("Parse translation \"%s\"", CHR(def));
@@ -63,7 +63,7 @@ void Translation::parse(string def) {
 
 		wxLogMessage("Added colour translation");
 	}
-	else if (tz.peekToken() == "\%") {
+	else if (tz.peekToken() == "%") {
 		// Desat colour translation
 		float sr, sg, sb, er, eg, eb;
 
@@ -148,7 +148,7 @@ string Translation::asText() {
 		// Desaturated colour range translation
 		else if (translations[a]->type == TRANS_DESAT) {
 			TransRangeDesat* tr = (TransRangeDesat*)translations[a];
-			ret += S_FMT("\"%d:%d=\%[%1.2f,%1.2f,%1.2f]:[%1.2f,%1.2f,%1.2f]\", ",
+			ret += S_FMT("\"%d:%d=%%[%1.2f,%1.2f,%1.2f]:[%1.2f,%1.2f,%1.2f]\", ",
 						tr->o_start, tr->o_end,
 						tr->d_sr, tr->d_sg, tr->d_sb,
 						tr->d_er, tr->d_eg, tr->d_eb);

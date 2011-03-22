@@ -180,7 +180,7 @@ void WriteTrack( int tracknum, FILE *file, struct Track track[] )
 	size_t quot, rem ;
 
 	/* Do we risk overflow here ? */
-	size = track[tracknum].current+4 ;
+	size = (int2) track[tracknum].current+4 ;
 	fwrite( "MTrk", 4, 1, file ) ;
 	if( !tracknum ) size += 33 ;
 
@@ -345,7 +345,7 @@ int qmus2mid(const char *mus, const char *mid, int nodisplay, WORD division, int
 		{
 			MIDIchannel = MUS2MIDchannel[MUSchannel ] = 
 				(MUSchannel == 15 ? 9 : FirstChannelAvailable( MUS2MIDchannel)) ;
-			MIDItrack   = MIDIchan2track[MIDIchannel] = TrackCnt++ ;
+			MIDItrack   = MIDIchan2track[MIDIchannel] = (unsigned char) TrackCnt++ ;
 			if( !(track[MIDItrack].data = (char *) malloc( TRACKBUFFERSIZE )) )
 			{
 				FreeTracks( track ) ;
