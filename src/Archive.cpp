@@ -160,7 +160,7 @@ ArchiveEntry* ArchiveTreeNode::getEntry(string name, bool cut_ext) {
 	// Go through entries
 	for (unsigned a = 0; a < entries.size(); a++) {
 		// Check for (non-case-sensitive) name match
-		if (s_cmpnocase(entries[a]->getName(cut_ext), name))
+		if (S_CMPNOCASE(entries[a]->getName(cut_ext), name))
 			return entries[a];
 	}
 
@@ -728,7 +728,7 @@ bool Archive::renameDir(ArchiveTreeNode* dir, string new_name) {
 		return false;
 
 	// Rename the directory if needed
-	if (!(s_cmpnocase(dir->getName(), new_name))) {
+	if (!(S_CMPNOCASE(dir->getName(), new_name))) {
 		dir->setName(new_name);
 		dir->getDirEntry()->setState(1);
 	}
@@ -1058,7 +1058,7 @@ ArchiveEntry* Archive::findFirst(search_options_t& options) {
 
 		// Check namespace
 		if (!options.match_namespace.IsEmpty()) {
-			if (!s_cmpnocase(detectNamespace(entry), options.match_namespace))
+			if (!S_CMPNOCASE(detectNamespace(entry), options.match_namespace))
 				continue;
 		}
 
@@ -1136,7 +1136,7 @@ ArchiveEntry* Archive::findLast(search_options_t& options) {
 
 		// Check namespace
 		if (!options.match_namespace.IsEmpty()) {
-			if (!s_cmpnocase(detectNamespace(entry), options.match_namespace))
+			if (!S_CMPNOCASE(detectNamespace(entry), options.match_namespace))
 				continue;
 		}
 
@@ -1189,7 +1189,7 @@ vector<ArchiveEntry*> Archive::findAll(search_options_t& options) {
 
 		// Check namespace
 		if (!options.match_namespace.IsEmpty()) {
-			if (!s_cmpnocase(detectNamespace(entry), options.match_namespace))
+			if (!S_CMPNOCASE(detectNamespace(entry), options.match_namespace))
 				continue;
 		}
 

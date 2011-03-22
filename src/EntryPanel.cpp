@@ -195,7 +195,7 @@ void EntryPanel::updateStatus() {
 	theMainWindow->SetStatusText("", 2);
 
 	if (entry)
-		theMainWindow->SetStatusText(s_fmt("%d bytes", entry->getSize()), 1);
+		theMainWindow->SetStatusText(S_FMT("%d bytes", entry->getSize()), 1);
 	else
 		theMainWindow->SetStatusText("", 1);
 }

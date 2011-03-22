@@ -237,7 +237,7 @@ bool ZipArchive::write(string filename, bool update) {
 	if (!filename.CmpNoCase(this->filename)) {
 		current.SetName(current.GetName() + "-slade-temp");
 		if (!wxRemoveFile(current.GetFullPath()))
-			wxLogMessage("Warning: temporary file %s was not deleted", chr(current.GetFullPath()));
+			wxLogMessage("Warning: temporary file %s was not deleted", CHR(current.GetFullPath()));
 		wxRenameFile(this->filename, current.GetFullPath());
 		temp = true;
 	}
@@ -307,7 +307,7 @@ bool ZipArchive::write(string filename, bool update) {
 
 	if (temp)
 		if (!wxRemoveFile(current.GetFullPath()))
-			wxLogMessage("Warning: temporary file %s was not cleaned out", chr(current.GetFullPath()));
+			wxLogMessage("Warning: temporary file %s was not cleaned out", CHR(current.GetFullPath()));
 
 	return true;
 }

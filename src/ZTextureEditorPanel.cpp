@@ -347,6 +347,7 @@ void ZTextureEditorPanel::updatePatchControls() {
 			choice_style->SetStringSelection(patch->getStyle());
 			cp_blend_col->SetColour(WXCOL(patch->getColour()));
 			spin_tint_amount->SetValue((double)patch->getColour().a / 255.0);
+			text_translation->SetValue(patch->getTranslation().asText());
 
 			switch (patch->getRotation()) {
 				case 0: choice_rotation->SetSelection(0); break;

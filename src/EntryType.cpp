@@ -102,23 +102,23 @@ void EntryType::addToList() {
  * Dumps entry type info to the log
  *******************************************************************/
 void EntryType::dump() {
-	wxLogMessage(s_fmt("Type %s \"%s\", format %s, extension %s", chr(id), chr(name), chr(format->getId()), chr(extension)));
-	wxLogMessage(s_fmt("Size limit: %d-%d", size_limit[0], size_limit[1]));
+	wxLogMessage(S_FMT("Type %s \"%s\", format %s, extension %s", CHR(id), CHR(name), CHR(format->getId()), CHR(extension)));
+	wxLogMessage(S_FMT("Size limit: %d-%d", size_limit[0], size_limit[1]));
 
 	for (size_t a = 0; a < match_archive.size(); a++)
-		wxLogMessage(s_fmt("Match Archive: \"%s\"", chr(match_archive[a])));
+		wxLogMessage(S_FMT("Match Archive: \"%s\"", CHR(match_archive[a])));
 
 	for (size_t a = 0; a < match_extension.size(); a++)
-		wxLogMessage(s_fmt("Match Extension: \"%s\"", chr(match_extension[a])));
+		wxLogMessage(S_FMT("Match Extension: \"%s\"", CHR(match_extension[a])));
 
 	for (size_t a = 0; a < match_name.size(); a++)
-		wxLogMessage(s_fmt("Match Name: \"%s\"", chr(match_name[a])));
+		wxLogMessage(S_FMT("Match Name: \"%s\"", CHR(match_name[a])));
 
 	for (size_t a = 0; a < match_size.size(); a++)
-		wxLogMessage(s_fmt("Match Size: %d", match_size[a]));
+		wxLogMessage(S_FMT("Match Size: %d", match_size[a]));
 
 	for (size_t a = 0; a < size_multiple.size(); a++)
-		wxLogMessage(s_fmt("Size Multiple: %d", size_multiple[a]));
+		wxLogMessage(S_FMT("Size Multiple: %d", size_multiple[a]));
 
 	wxLogMessage("---");
 }
@@ -326,7 +326,7 @@ bool EntryType::readEntryTypeDefinition(MemChunk& mc) {
 			if (parent_type != EntryType::unknownType())
 				parent_type->copyToType(ntype);
 			else
-				wxLogMessage("Warning: Entry type %s inherits from unknown type %s", chr(ntype->getId()), chr(typenode->getInherit()));
+				wxLogMessage("Warning: Entry type %s inherits from unknown type %s", CHR(ntype->getId()), CHR(typenode->getInherit()));
 		}
 
 		// Go through all parsed fields
@@ -335,74 +335,74 @@ bool EntryType::readEntryTypeDefinition(MemChunk& mc) {
 			ParseTreeNode* fieldnode = (ParseTreeNode*)typenode->getChild(b);
 
 			// Process it
-			if (s_cmpnocase(fieldnode->getName(), "name")) {				// Name field
+			if (S_CMPNOCASE(fieldnode->getName(), "name")) {				// Name field
 				ntype->name = fieldnode->getStringValue();
 			}
-			else if (s_cmpnocase(fieldnode->getName(), "detectable")) {		// Detectable field
+			else if (S_CMPNOCASE(fieldnode->getName(), "detectable")) {		// Detectable field
 				ntype->detectable = fieldnode->getBoolValue();
 			}
-			else if (s_cmpnocase(fieldnode->getName(), "export_ext")) {		// Export Extension field
+			else if (S_CMPNOCASE(fieldnode->getName(), "export_ext")) {		// Export Extension field
 				ntype->extension = fieldnode->getStringValue();
 			}
-			else if (s_cmpnocase(fieldnode->getName(), "format")) {			// Format field
+			else if (S_CMPNOCASE(fieldnode->getName(), "format")) {			// Format field
 				ntype->format = EntryDataFormat::getFormat(fieldnode->getStringValue());
 
 				// Warn if undefined format
 				if (ntype->format == EntryDataFormat::anyFormat())
-					wxLogMessage("Warning: Entry type %s requires undefined format %s", chr(ntype->getId()), chr(ntype->getFormat()));
+					wxLogMessage("Warning: Entry type %s requires undefined format %s", CHR(ntype->getId()), CHR(ntype->getFormat()));
 			}
-			else if (s_cmpnocase(fieldnode->getName(), "icon")) {			// Icon field
+			else if (S_CMPNOCASE(fieldnode->getName(), "icon")) {			// Icon field
 				ntype->icon = fieldnode->getStringValue();
 			}
-			else if (s_cmpnocase(fieldnode->getName(), "editor")) {			// Editor field (to be removed)
+			else if (S_CMPNOCASE(fieldnode->getName(), "editor")) {			// Editor field (to be removed)
 				ntype->editor = fieldnode->getStringValue();
 			}
-			else if (s_cmpnocase(fieldnode->getName(), "section")) {		// Section field
+			else if (S_CMPNOCASE(fieldnode->getName(), "section")) {		// Section field
 				ntype->section = fieldnode->getStringValue();
 			}
-			else if (s_cmpnocase(fieldnode->getName(), "match_ext")) {		// Match Extension field
+			else if (S_CMPNOCASE(fieldnode->getName(), "match_ext")) {		// Match Extension field
 				for (unsigned v = 0; v < fieldnode->nValues(); v++)
 					ntype->match_extension.push_back(fieldnode->getStringValue(v).Lower());
 			}
-			else if (s_cmpnocase(fieldnode->getName(), "match_name")) {		// Match Name field
+			else if (S_CMPNOCASE(fieldnode->getName(), "match_name")) {		// Match Name field
 				for (unsigned v = 0; v < fieldnode->nValues(); v++)
 					ntype->match_name.push_back(fieldnode->getStringValue(v).Lower());
 			}
-			else if (s_cmpnocase(fieldnode->getName(), "match_extorname")) {// Match name or extension
+			else if (S_CMPNOCASE(fieldnode->getName(), "match_extorname")) {// Match name or extension
 					ntype->matchextorname = fieldnode->getBoolValue();
 			}
-			else if (s_cmpnocase(fieldnode->getName(), "size")) {			// Size field
+			else if (S_CMPNOCASE(fieldnode->getName(), "size")) {			// Size field
 				for (unsigned v = 0; v < fieldnode->nValues(); v++)
 					ntype->match_size.push_back(fieldnode->getIntValue(v));
 			}
-			else if (s_cmpnocase(fieldnode->getName(), "min_size")) {		// Min Size field
+			else if (S_CMPNOCASE(fieldnode->getName(), "min_size")) {		// Min Size field
 				ntype->size_limit[0] = fieldnode->getIntValue();
 			}
-			else if (s_cmpnocase(fieldnode->getName(), "max_size")) {		// Max Size field
+			else if (S_CMPNOCASE(fieldnode->getName(), "max_size")) {		// Max Size field
 				ntype->size_limit[1] = fieldnode->getIntValue();
 			}
-			else if (s_cmpnocase(fieldnode->getName(), "size_multiple")) {	// Size Multiple field
+			else if (S_CMPNOCASE(fieldnode->getName(), "size_multiple")) {	// Size Multiple field
 				for (unsigned v = 0; v < fieldnode->nValues(); v++)
 					ntype->size_multiple.push_back(fieldnode->getIntValue(v));
 			}
-			else if (s_cmpnocase(fieldnode->getName(), "reliability")) {	// Reliability field
+			else if (S_CMPNOCASE(fieldnode->getName(), "reliability")) {	// Reliability field
 				ntype->reliability = fieldnode->getIntValue();
 			}
-			else if (s_cmpnocase(fieldnode->getName(), "match_archive")) {		// Archive field
+			else if (S_CMPNOCASE(fieldnode->getName(), "match_archive")) {		// Archive field
 				for (unsigned v = 0; v < fieldnode->nValues(); v++)
 					ntype->match_archive.push_back(fieldnode->getStringValue(v).Lower());
 			}
-			else if (s_cmpnocase(fieldnode->getName(), "extra")) {			// Extra properties
+			else if (S_CMPNOCASE(fieldnode->getName(), "extra")) {			// Extra properties
 				for (unsigned v = 0; v < fieldnode->nValues(); v++)
 					ntype->extra.addFlag(fieldnode->getStringValue(v));
 			}
-			else if (s_cmpnocase(fieldnode->getName(), "category")) {		// Type category
+			else if (S_CMPNOCASE(fieldnode->getName(), "category")) {		// Type category
 				ntype->category = fieldnode->getStringValue();
 
 				// Add to category list if needed
 				bool exists = false;
 				for (unsigned a = 0; a < entry_categories.size(); a++) {
-					if (s_cmpnocase(entry_categories[a], ntype->category)) {
+					if (S_CMPNOCASE(entry_categories[a], ntype->category)) {
 						exists = true;
 						break;
 					}

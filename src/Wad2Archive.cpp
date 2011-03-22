@@ -284,7 +284,7 @@ bool Wad2Archive::write(MemChunk& mc, bool update) {
 		// Setup directory entry
 		wad2entry_t info;
 		memset(info.name, 0, 16);
-		memcpy(info.name, chr(entry->getName()), entry->getName().Len());
+		memcpy(info.name, CHR(entry->getName()), entry->getName().Len());
 		info.cmprs = (bool)entry->exProp("W2Comp");
 		info.dsize = entry->getSize();
 		info.size = entry->getSize();

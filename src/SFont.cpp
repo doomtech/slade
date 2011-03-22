@@ -218,7 +218,7 @@ void SFont::drawString(string str, rgba_t colour, uint8_t align) {
 	int total_width = 0;
 	for (unsigned a = 0; a < str.size(); a++) {
 		// Get character
-		SFontChar* ch = characters[chr(str)[a]];
+		SFontChar* ch = characters[CHR(str)[a]];
 
 		// Increment total width
 		if (ch)
@@ -238,7 +238,7 @@ void SFont::drawString(string str, rgba_t colour, uint8_t align) {
 	unsigned xoff = 0;
 	for (unsigned a = 0; a < str.size(); a++) {
 		// Get character
-		SFontChar* ch = characters[chr(str)[a]];
+		SFontChar* ch = characters[CHR(str)[a]];
 		if (!ch) {
 			xoff += spacing;
 			continue;

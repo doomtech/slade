@@ -288,7 +288,7 @@ bool WadJArchive::open(MemChunk& mc) {
 				if (entry->exProps().propertyExists("FullSize")
 					&& (unsigned)(int)(entry->exProp("FullSize")) >  entry->getSize())
 					edata.reSize((int)(entry->exProp("FullSize")), true);
-				if (!JaguarDecode(edata)) wxLogMessage("%s is screwed up", chr(entry->getName()));
+				if (!JaguarDecode(edata)) wxLogMessage("%s is screwed up", CHR(entry->getName()));
 			}
 			entry->importMemChunk(edata);
 		}

@@ -71,7 +71,7 @@ patch_t& PatchTable::patch(size_t index) {
 patch_t& PatchTable::patch(string name) {
 	// Go through list
 	for (unsigned a = 0; a < patches.size(); a++) {
-		if (s_cmp(patches[a].name, name))
+		if (S_CMP(patches[a].name, name))
 			return patches[a];
 	}
 
@@ -197,7 +197,7 @@ bool PatchTable::addPatch(string name, bool allow_dup) {
 	// Check patch doesn't already exist
 	if (!allow_dup) {
 		for (unsigned a = 0; a < patches.size(); a++) {
-			if (s_cmp(name, patches[a].name))
+			if (S_CMP(name, patches[a].name))
 				return false;
 		}
 	}
@@ -288,7 +288,7 @@ bool PatchTable::writePNAMES(ArchiveEntry* pnames) {
 	// Write patch names
 	for (unsigned a = 0; a < patches.size(); a++) {
 		char name[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };	// Init name to all zeros for XWE compatibility
-		strncpy(name, chr(patches[a].name), patches[a].name.Len());
+		strncpy(name, CHR(patches[a].name), patches[a].name.Len());
 
 		pndata.write(name, 8);
 	}

@@ -71,7 +71,7 @@ void Console::addCommand(ConsoleCommand &c) {
  * Attempts to execute the command line given
  *******************************************************************/
 void Console::execute(string command) {
-	wxLogMessage(s_fmt("> %s", command.c_str()));
+	wxLogMessage(S_FMT("> %s", command.c_str()));
 
 	// Don't bother doing anything else with an empty command
 	if (command.size() == 0)
@@ -109,7 +109,7 @@ void Console::execute(string command) {
 	}
 
 	// Command not found
-	logMessage(s_fmt("Unknown command: \"%s\"", cmd_name.c_str()));
+	logMessage(S_FMT("Unknown command: \"%s\"", cmd_name.c_str()));
 	return;
 }
 
@@ -233,10 +233,10 @@ CONSOLE_COMMAND (echo, 1) {
  * Lists all valid console commands
  *******************************************************************/
 CONSOLE_COMMAND (cmdlist, 0) {
-	theConsole->logMessage(s_fmt("%d Valid Commands:", theConsole->numCommands()));
+	theConsole->logMessage(S_FMT("%d Valid Commands:", theConsole->numCommands()));
 
 	for (int a = 0; a < theConsole->numCommands(); a++)
-		theConsole->logMessage(s_fmt("\"%s\"", theConsole->command(a).getName().c_str()));
+		theConsole->logMessage(S_FMT("\"%s\"", theConsole->command(a).getName().c_str()));
 }
 
 /*

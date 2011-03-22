@@ -223,11 +223,11 @@ void GfxEntryPanel::refresh() {
 	}
 
 	// Set size label
-	label_dimensions->SetLabel(s_fmt("Size: %d x %d", gfx_canvas->getImage()->getWidth(), gfx_canvas->getImage()->getHeight()));
+	label_dimensions->SetLabel(S_FMT("Size: %d x %d", gfx_canvas->getImage()->getWidth(), gfx_canvas->getImage()->getHeight()));
 
 	// Set multi-image format stuff thingies
 	cur_index = gfx_canvas->getImage()->getIndex();
-	text_curimg->SetLabel(s_fmt("Image %d/%d", cur_index+1, gfx_canvas->getImage()->getSize()));
+	text_curimg->SetLabel(S_FMT("Image %d/%d", cur_index+1, gfx_canvas->getImage()->getSize()));
 
 	// Apply offset view type
 	applyViewType();
@@ -351,7 +351,7 @@ void GfxEntryPanel::onZoomChanged(wxCommandEvent& e) {
 	zoom_percent -= remainder;
 
 	// Update zoom label
-	label_current_zoom->SetLabel(s_fmt("%d%%", zoom_percent));
+	label_current_zoom->SetLabel(S_FMT("%d%%", zoom_percent));
 
 	// Zoom gfx canvas and update
 	gfx_canvas->setScale((double)zoom_percent * 0.01);

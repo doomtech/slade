@@ -192,7 +192,7 @@ bool AnimatedList::convertAnimated(ArchiveEntry* entry, MemChunk * animdata) {
 		cursor += sizeof(animated_t);
 
 		// Create animation string
-		conversion = s_fmt("%s\tOptional\t%-8s\tRange\t%-8s\tTics %i%s",
+		conversion = S_FMT("%s\tOptional\t%-8s\tRange\t%-8s\tTics %i%s",
 			(animation->type ? "Texture" : "Flat"),
 			animation->first, animation->last, animation->speed,
 			(animation->type == ANIM_DECALS ? " AllowDecals\n" : "\n"));

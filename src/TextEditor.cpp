@@ -311,7 +311,7 @@ bool TextEditor::loadEntry(ArchiveEntry* entry) {
 	SetText(text);
 
 	// Update line numbers margin width
-	string numlines = s_fmt("0%d", GetNumberOfLines());
+	string numlines = S_FMT("0%d", GetNumberOfLines());
 	SetMarginWidth(0, TextWidth(wxSTC_STYLE_LINENUMBER, numlines));
 
 	return true;
@@ -632,7 +632,7 @@ void TextEditor::onKeyUp(wxKeyEvent& e) {
  *******************************************************************/
 void TextEditor::onCharAdded(wxStyledTextEvent& e) {
 	// Update line numbers margin width
-	string numlines = s_fmt("0%d", GetNumberOfLines());
+	string numlines = S_FMT("0%d", GetNumberOfLines());
 	SetMarginWidth(0, TextWidth(wxSTC_STYLE_LINENUMBER, numlines));
 
 	// Auto indent
@@ -817,7 +817,7 @@ void TextEditor::onFRDBtnFindNext(wxCommandEvent& e) {
 
 	// Do find
 	if (!findNext(find))
-		wxLogMessage(s_fmt("No text matching \"%s\" found.", chr(find)));
+		wxLogMessage(S_FMT("No text matching \"%s\" found.", CHR(find)));
 }
 
 /* TextEditor::onFRDBtnReplace
@@ -848,5 +848,5 @@ void TextEditor::onFRDBtnReplaceAll(wxCommandEvent& e) {
 
 	// Do replace all
 	int replaced = replaceAll(dlg_fr->getFindString(), dlg_fr->getReplaceString());
-	wxMessageBox(s_fmt("Replaced %d occurrences", replaced), "Replace All");
+	wxMessageBox(S_FMT("Replaced %d occurrences", replaced), "Replace All");
 }

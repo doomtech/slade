@@ -36,6 +36,7 @@
 #include "SImage.h"
 #include "FreeImage.h"
 #include "Misc.h"
+#include "Translation.h"
 #include <wx/filefn.h>
 
 
@@ -402,17 +403,6 @@ bool SImage::convertPaletted(Palette8bit* pal_target, Palette8bit* pal_current) 
 	MemChunk rgba_data;
 	getRGBAData(rgba_data, pal_current);
 
-	// Swap red and blue colour information because FreeImage is retarded
-	for (int a = 0; a < width * height * 4; a += 4) {
-		uint8_t red = rgba_data[a];
-		rgba_data[a] = rgba_data[a+2];
-		rgba_data[a+2] = red;
-	}
-
-	// Build FIBITMAP from it
-	FIBITMAP* bm32 = FreeImage_ConvertFromRawBits((uint8_t*)rgba_data.getData(), width, height, width * 4, 32, 0, 0, 0, false);
-	FIBITMAP* bm = FreeImage_ConvertTo24Bits(bm32);
-
 	// Create mask from alpha info (if converting from RGBA)
 	if (format == RGBA) {
 		// Clear current mask
@@ -428,37 +418,28 @@ bool SImage::convertPaletted(Palette8bit* pal_target, Palette8bit* pal_current) 
 			mask[c++] = rgba_data[a];
 	}
 
-	// Create FreeImage palette
-	RGBQUAD fi_pal[256];
-	for (int a = 0; a < 256; a++) {
-		fi_pal[a].rgbRed = pal_target->colour(a).r;
-		fi_pal[a].rgbGreen = pal_target->colour(a).g;
-		fi_pal[a].rgbBlue = pal_target->colour(a).b;
-	}
-
-	// Convert image to palette
-	FIBITMAP* pbm = NULL;
-	pbm = FreeImage_ColorQuantizeEx(bm, FIQ_NNQUANT, 256, 256, fi_pal);
-
 	// Load given palette
 	palette.copyPalette(pal_target);
 
 	// Clear current image data (but not mask)
 	clearData(false);
 
-	// Load pixel data from the FIBITMAP
+	// Do conversion
 	data = new uint8_t[width * height];
-	for (int a = 0; a < height; a++)
-		memcpy(data + a * width, FreeImage_GetScanLine(pbm, a), width);
+	unsigned i = 0;
+	rgba_t col;
+	for (unsigned a = 0; a < width*height; a++) {
+		//col.set(rgba_data[i++], rgba_data[i++], rgba_data[i++]);
+		col.r = rgba_data[i++];
+		col.g = rgba_data[i++];
+		col.b = rgba_data[i++];
+		data[a] = palette.nearestColour(col);
+		i++;	// Skip alpha
+	}
 
 	// Update variables
 	format = PALMASK;
 	has_palette = true;
-
-	// Clean up
-	FreeImage_Unload(bm32);
-	FreeImage_Unload(bm);
-	FreeImage_Unload(pbm);
 
 	// Announce change
 	announce("image_changed");
@@ -829,8 +810,8 @@ bool SImage::resize(int nwidth, int nheight) {
 
 	// Write new image data
 	unsigned offset = 0;
-	unsigned rowlen = min(width, nwidth)*bpp;
-	unsigned nrows = min(height, nheight);
+	unsigned rowlen = MIN(width, nwidth)*bpp;
+	unsigned nrows = MIN(height, nheight);
 	for (unsigned y = 0; y < nrows; y++) {
 		// Copy data row
 		memcpy(newdata + offset, data + (y * width * bpp), rowlen);
@@ -873,4 +854,99 @@ bool SImage::setImageData(uint8_t *ndata, int nwidth, int nheight, SIFormat nfor
 		return true;
 	}
 	return false;
+}
+
+/* SImage::applyTranslation
+ * Applies a palette translation to the image
+ *******************************************************************/
+bool SImage::applyTranslation(Translation* tr, Palette8bit* pal) {
+	// Check image is ok
+	if (!data)
+		return false;
+
+	// Can't apply a translation to a non-paletted image
+	if (format != PALMASK)
+		return false;
+
+	// Get palette to use
+	if (!pal)
+		pal = &palette;
+
+	// Go through pixels
+	for (unsigned p = 0; p < width*height; p++) {
+		uint8_t i = data[p];
+
+		// No need to process transparent pixels
+		if (mask[p] == 0)
+			continue;
+
+		// Go through each translation component
+		for (unsigned a = 0; a < tr->nRanges(); a++) {
+			TransRange* r = tr->getRange(a);
+
+			// Palette range translation
+			if (r->getType() == TRANS_PALETTE) {
+				TransRangePalette* tp = (TransRangePalette*)r;
+
+				// Check pixel is within translation range
+				if (i >= tp->oStart() && i <= tp->oEnd()) {
+					// Figure out how far along the range this colour is
+					double range_frac = double(i - tp->oStart()) / double(tp->oEnd() - tp->oStart());
+
+					// Determine destination palette index
+					uint8_t di = tp->dStart() + range_frac * (tp->dEnd() - tp->dStart());
+
+					// Apply new colour
+					data[p] = di;
+				}
+			}
+
+			// Colour range
+			else if (r->getType() == TRANS_COLOUR) {
+				TransRangeColour* tc = (TransRangeColour*)r;
+
+				// Check pixel is within translation range
+				if (i >= tc->oStart() && i <= tc->oEnd()) {
+					// Figure out how far along the range this colour is
+					double range_frac = double(i - tc->oStart()) / double(tc->oEnd() - tc->oStart());
+
+					// Determine destination colour
+					uint8_t r = tc->dStart().r + range_frac * (tc->dEnd().r - tc->dStart().r);
+					uint8_t g = tc->dStart().g + range_frac * (tc->dEnd().g - tc->dStart().g);
+					uint8_t b = tc->dStart().b + range_frac * (tc->dEnd().b - tc->dStart().b);
+
+					// Find nearest colour in palette
+					uint8_t di = pal->nearestColour(rgba_t(r, g, b));
+
+					// Apply new colour
+					data[p] = di;
+				}
+			}
+
+			// Desaturated colour range
+			else if (r->getType() == TRANS_DESAT) {
+				TransRangeDesat* td = (TransRangeDesat*)r;
+
+				// Check pixel is within translation range
+				if (i >= td->oStart() && i <= td->oEnd()) {
+					// Get greyscale colour
+					rgba_t col = pal->colour(i);
+					float grey = (col.r*0.3f + col.g*0.59f + col.b*0.11f) / 255.0f;
+
+					// Determine destination colour
+					uint8_t r = MIN(255, int((td->dSr() + grey*(td->dEr() - td->dSr()))*255.0f));
+					uint8_t g = MIN(255, int((td->dSg() + grey*(td->dEg() - td->dSg()))*255.0f));
+					uint8_t b = MIN(255, int((td->dSb() + grey*(td->dEb() - td->dSb()))*255.0f));
+
+					// Find nearest colour in palette
+					uint8_t di = pal->nearestColour(rgba_t(r, g, b));
+
+					// Apply new colour
+					data[p] = di;
+				}
+			}
+		}
+	}
+
+	return true;
 }

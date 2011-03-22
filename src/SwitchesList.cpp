@@ -153,7 +153,7 @@ bool SwitchesList::convertSwitches(ArchiveEntry* entry, MemChunk* animdata) {
 		cursor += sizeof(switches_t);
 
 		// Create animation string
-		conversion = s_fmt("Switch\tDoom %d\t\t%-8s\tOn Pic\t%-8s\tTics 0\n",
+		conversion = S_FMT("Switch\tDoom %d\t\t%-8s\tOn Pic\t%-8s\tTics 0\n",
 			switches->type, switches->off, switches->on);
 
 		// Write string to animdata

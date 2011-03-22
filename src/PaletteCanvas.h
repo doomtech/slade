@@ -9,7 +9,8 @@
 class PaletteCanvas : public OGLCanvas {
 private:
 	Palette8bit*	palette;
-	int				selected;
+	int				sel_begin;
+	int				sel_end;
 
 public:
 	PaletteCanvas(wxWindow* parent, int id);
@@ -19,10 +20,12 @@ public:
 
 	void	draw();
 	rgba_t	getSelectedColour();
+	void	setSelection(int begin, int end = -1);
 
 	// Events
-	void	onMouseLeftDown(wxMouseEvent &e);
-	void	onMouseRightDown(wxMouseEvent &e);
+	void	onMouseLeftDown(wxMouseEvent& e);
+	void	onMouseRightDown(wxMouseEvent& e);
+	void	onMouseMotion(wxMouseEvent& e);
 };
 
 #endif //__PALETTECANVAS_H__

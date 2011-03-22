@@ -138,7 +138,7 @@ bool PaletteEntryPanel::showPalette(uint32_t index) {
 	pal_canvas->getPalette().copyPalette(palettes[index]);
 
 	// Set current palette text
-	text_curpal->SetLabel(s_fmt("Palette %d/%d", index+1, palettes.size()));
+	text_curpal->SetLabel(S_FMT("Palette %d/%d", index+1, palettes.size()));
 
 	// Refresh
 	Layout();
@@ -182,7 +182,7 @@ void PaletteEntryPanel::onPalCanvasMouseEvent(wxMouseEvent& e) {
 		rgba_t col = pal_canvas->getSelectedColour();
 
 		// Set label
-		label_selected_colour->SetLabel(s_fmt("R%d G%d B%d", col.r, col.g, col.b));
+		label_selected_colour->SetLabel(S_FMT("R%d G%d B%d", col.r, col.g, col.b));
 	}
 }
 
@@ -196,7 +196,7 @@ void PaletteEntryPanel::onBtnExportPal(wxCommandEvent& e) {
 		return;
 
 	// Write current palette to the user palettes directory
-	string path = appPath(s_fmt("palettes/%s.pal", chr(name)), DIR_USER);
+	string path = appPath(S_FMT("palettes/%s.pal", CHR(name)), DIR_USER);
 	palettes[cur_palette]->saveFile(path);
 
 	// Add to palette manager

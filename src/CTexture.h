@@ -5,6 +5,7 @@
 #include "Tokenizer.h"
 #include "ArchiveEntry.h"
 #include "ListenerAnnouncer.h"
+#include "Translation.h"
 
 // Basic patch
 class CTPatch {
@@ -40,7 +41,7 @@ private:
 	bool			flip_x;
 	bool			flip_y;
 	int16_t			rotation;
-	vector<string>	translation;
+	Translation		translation;
 	rgba_t			colour;
 	float			alpha;
 	string			style;
@@ -53,13 +54,14 @@ public:
 	CTPatchEx(CTPatchEx* copy);
 	~CTPatchEx();
 
-	bool	flipX() { return flip_x; }
-	bool	flipY() { return flip_y; }
-	int16_t	getRotation() { return rotation; }
-	rgba_t	getColour() { return colour; }
-	float	getAlpha() { return alpha; }
-	string	getStyle() { return style; }
-	uint8_t	getBlendType() { return blendtype; }
+	bool			flipX() { return flip_x; }
+	bool			flipY() { return flip_y; }
+	int16_t			getRotation() { return rotation; }
+	rgba_t			getColour() { return colour; }
+	float			getAlpha() { return alpha; }
+	string			getStyle() { return style; }
+	uint8_t			getBlendType() { return blendtype; }
+	Translation&	getTranslation() { return translation; }
 
 	void	flipX(bool flip) { flip_x = flip; }
 	void	flipY(bool flip) { flip_y = flip; }
@@ -76,6 +78,12 @@ public:
 };
 
 class TextureXList;
+
+#define TEXTYPE_TEXTURE		0
+#define TEXTYPE_SPRITE		1
+#define TEXTYPE_GRAPHIC		2
+#define TEXTYPE_WALLTEXTURE	3
+#define TEXTYPE_FLAT		4
 
 class CTexture : public Announcer {
 friend class TextureXList;

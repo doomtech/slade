@@ -160,7 +160,7 @@ Archive* ArchiveManager::getArchive(string filename) {
 Archive* ArchiveManager::openArchive(string filename, bool manage) {
 	Archive* new_archive = getArchive(filename);
 
-	wxLogMessage(s_fmt("Opening archive %s", filename));
+	wxLogMessage(S_FMT("Opening archive %s", filename));
 
 	// If the archive is already open, just return it
 	if (new_archive) {
@@ -386,7 +386,7 @@ Archive* ArchiveManager::newArchive(uint8_t type) {
 
 	// If the archive was created, set its filename and add it to the list
 	if (new_archive) {
-		new_archive->setFilename(s_fmt("UNSAVED (%s)", format_str.c_str()));
+		new_archive->setFilename(S_FMT("UNSAVED (%s)", format_str.c_str()));
 		addArchive(new_archive);
 	}
 
@@ -525,21 +525,21 @@ string ArchiveManager::getArchiveExtensionsString() {
 						"vgahead.*;VGAHEAD.*;Vgahead.*;"
 						"vgadict.*;VGADICT.*;Vgadict.*";		extensions += ext_wolf +";";
 
-	extensions += s_fmt("|Doom Wad files (*.wad)|%s",			chr(ext_wad));
-	extensions += s_fmt("|Zip files (*.zip)|%s",				chr(ext_zip));
-	extensions += s_fmt("|Pk3 (zip) files (*.pk3)|%s",			chr(ext_pk3));
-	extensions += s_fmt("|JDF (zip) files (*.jdf)|%s",			chr(ext_jdf));
-	extensions += s_fmt("|Data (dat) files (*.dat)|%s",			chr(ext_dat));
-	extensions += s_fmt("|CD/HD (cd/hd) files (*.cd; *.hd)|%s",	chr(ext_chd));
-	extensions += s_fmt("|Library (lib) files (*.lib)|%s",		chr(ext_lib));
-	extensions += s_fmt("|Resource (res) files (*.res)|%s",		chr(ext_res));
-	extensions += s_fmt("|Quake Pak files (*.pak)|%s",			chr(ext_pak));
-	extensions += s_fmt("|Build Grp files (*.grp)|%s",			chr(ext_grp));
-	extensions += s_fmt("|Dark Forces Gob files (*.gob)|%s",	chr(ext_gob));
-	extensions += s_fmt("|Dark Forces Lfd files (*.lfd)|%s",	chr(ext_lfd));
-	extensions += s_fmt("|Descent Hog files (*.hog)|%s",		chr(ext_hog));
-	extensions += s_fmt("|Blood Rff files (*.rff)|%s",			chr(ext_rff));
-	extensions += s_fmt("|Wolfenstein 3D files|%s",				chr(ext_wolf));
+	extensions += S_FMT("|Doom Wad files (*.wad)|%s",			CHR(ext_wad));
+	extensions += S_FMT("|Zip files (*.zip)|%s",				CHR(ext_zip));
+	extensions += S_FMT("|Pk3 (zip) files (*.pk3)|%s",			CHR(ext_pk3));
+	extensions += S_FMT("|JDF (zip) files (*.jdf)|%s",			CHR(ext_jdf));
+	extensions += S_FMT("|Data (dat) files (*.dat)|%s",			CHR(ext_dat));
+	extensions += S_FMT("|CD/HD (cd/hd) files (*.cd; *.hd)|%s",	CHR(ext_chd));
+	extensions += S_FMT("|Library (lib) files (*.lib)|%s",		CHR(ext_lib));
+	extensions += S_FMT("|Resource (res) files (*.res)|%s",		CHR(ext_res));
+	extensions += S_FMT("|Quake Pak files (*.pak)|%s",			CHR(ext_pak));
+	extensions += S_FMT("|Build Grp files (*.grp)|%s",			CHR(ext_grp));
+	extensions += S_FMT("|Dark Forces Gob files (*.gob)|%s",	CHR(ext_gob));
+	extensions += S_FMT("|Dark Forces Lfd files (*.lfd)|%s",	CHR(ext_lfd));
+	extensions += S_FMT("|Descent Hog files (*.hog)|%s",		CHR(ext_hog));
+	extensions += S_FMT("|Blood Rff files (*.rff)|%s",			CHR(ext_rff));
+	extensions += S_FMT("|Wolfenstein 3D files|%s",				CHR(ext_wolf));
 
 	return extensions;
 }
@@ -550,7 +550,7 @@ string ArchiveManager::getArchiveExtensionsString() {
 void ArchiveManager::addBaseResourcePath(string path) {
 	// First check the path doesn't already exist
 	for (unsigned a = 0; a < base_resource_paths.size(); a++) {
-		if (s_cmp(base_resource_paths[a], path))
+		if (S_CMP(base_resource_paths[a], path))
 			return;
 	}
 
@@ -627,7 +627,7 @@ bool ArchiveManager::openBaseResource(int index) {
 		return false;
 
 	// Attempt to open the file
-	theSplashWindow->show(s_fmt("Opening %s...", chr(filename)), true);
+	theSplashWindow->show(S_FMT("Opening %s...", CHR(filename)), true);
 	if (base_resource_archive->open(filename)) {
 		base_resource = index;
 		theSplashWindow->hide();
@@ -916,11 +916,11 @@ void ArchiveManager::onAnnouncement(Announcer* announcer, string event_name, Mem
  * Lists the filenames of all open archives
  *******************************************************************/
 CONSOLE_COMMAND (list_archives, 0) {
-	wxLogMessage(s_fmt("%d Open Archives:", theArchiveManager->numArchives()));
+	wxLogMessage(S_FMT("%d Open Archives:", theArchiveManager->numArchives()));
 
 	for (int a = 0; a < theArchiveManager->numArchives(); a++) {
 		Archive* archive = theArchiveManager->getArchive(a);
-		wxLogMessage(s_fmt("%d: \"%s\"", a + 1, archive->getFilename().c_str()));
+		wxLogMessage(S_FMT("%d: \"%s\"", a + 1, archive->getFilename().c_str()));
 	}
 }
 

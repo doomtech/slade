@@ -267,7 +267,7 @@ CONSOLE_COMMAND (splash, 0) {
 		theSplashWindow->show(args[0]);
 	else {
 		theSplashWindow->show(args[0], true);
-		float prog = atof(chr(args[1]));
+		float prog = atof(CHR(args[1]));
 		theSplashWindow->setProgress(prog);
 	}
 }

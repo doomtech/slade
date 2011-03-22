@@ -12,7 +12,7 @@ struct patch_t {
 	void removeTextureUsage(string texture) {
 		vector<string>::iterator i = used_in.begin();
 		while (i != used_in.end()) {
-			if (s_cmp(texture, *i))
+			if (S_CMP(texture, *i))
 				used_in.erase(i);
 			else
 				i++;

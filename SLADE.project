@@ -67,6 +67,8 @@
       <File Name="src/Parser.cpp"/>
       <File Name="src/CodePages.cpp"/>
       <File Name="src/CodePages.h"/>
+      <File Name="src/Math.h"/>
+      <File Name="src/Math.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Console">
       <File Name="src/Console.cpp"/>
@@ -246,6 +248,8 @@
       <File Name="src/GLTexture.h"/>
       <File Name="src/Icons.cpp"/>
       <File Name="src/Icons.h"/>
+      <File Name="src/Translation.h"/>
+      <File Name="src/Translation.cpp"/>
     </VirtualDirectory>
     <File Name="src/ResourceManager.cpp"/>
     <File Name="src/ResourceManager.h"/>

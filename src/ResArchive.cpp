@@ -206,7 +206,7 @@ bool ResArchive::readDirectory(MemChunk& mc, size_t dir_offset, size_t num_lumps
 		if (isResArchive(nlump->getMCData(), d_o, n_l)) {
 			ArchiveTreeNode * ndir = createDir(name, parent);
 			if (ndir) {
-				theSplashWindow->setProgressMessage(s_fmt("Reading res archive data: %s directory", name));
+				theSplashWindow->setProgressMessage(S_FMT("Reading res archive data: %s directory", name));
 				// Save offset to restore it once the recursion is done
 				size_t myoffset = mc.currentPos();
 				readDirectory(mc, d_o, n_l, ndir);

@@ -211,7 +211,7 @@ bool AudioEntryPanel::saveEntry() {
  *******************************************************************/
 bool AudioEntryPanel::openAudio(string filename) {
 #ifndef NO_AUDIERE
-	stream = OpenSound(device, chr(filename), true);
+	stream = OpenSound(device, CHR(filename), true);
 	if (stream) {
 		// Check if the audio is seekable
 		int length = stream->getLength();

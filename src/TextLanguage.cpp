@@ -85,7 +85,7 @@ string TLFunction::generateCallTipString(int arg_set) {
 
 	// Add extra buttons for selection if there is more than one arg set
 	if (arg_sets.size() > 1)
-		calltip += s_fmt("\001 %d of %d \002 ", arg_set+1, arg_sets.size());
+		calltip += S_FMT("\001 %d of %d \002 ", arg_set+1, arg_sets.size());
 
 	// Generate scintilla-format calltip string
 	calltip += name + "(";
@@ -108,7 +108,7 @@ point2_t TLFunction::getArgTextExtent(int arg, int arg_set) {
 	// Get start position of args list
 	int start_pos = name.Length() + 1;
 	if (arg_sets.size() > 1) {
-		string temp = s_fmt("\001 %d of %d \002 ", arg_set+1, arg_sets.size());
+		string temp = S_FMT("\001 %d of %d \002 ", arg_set+1, arg_sets.size());
 		start_pos += temp.Length();
 	}
 
@@ -401,7 +401,7 @@ bool TextLanguage::readLanguageDefinition(MemChunk& mc, string source) {
 			if (inherit)
 				inherit->copyTo(lang);
 			else
-				wxLogMessage("Warning: Language %s inherits from undefined language %s", chr(node->getName()), chr(node->getInherit()));
+				wxLogMessage("Warning: Language %s inherits from undefined language %s", CHR(node->getName()), CHR(node->getInherit()));
 		}
 
 		// Parse language info
@@ -409,49 +409,49 @@ bool TextLanguage::readLanguageDefinition(MemChunk& mc, string source) {
 			ParseTreeNode* child = (ParseTreeNode*)node->getChild(c);
 
 			// Language name
-			if (s_cmpnocase(child->getName(), "name"))
+			if (S_CMPNOCASE(child->getName(), "name"))
 				lang->setName(child->getStringValue());
 
 			// Comment begin
-			else if (s_cmpnocase(child->getName(), "comment_begin"))
+			else if (S_CMPNOCASE(child->getName(), "comment_begin"))
 				lang->setCommentBegin(child->getStringValue());
 
 			// Comment end
-			else if (s_cmpnocase(child->getName(), "comment_end"))
+			else if (S_CMPNOCASE(child->getName(), "comment_end"))
 				lang->setCommentEnd(child->getStringValue());
 
 			// Line comment
-			else if (s_cmpnocase(child->getName(), "line_comment"))
+			else if (S_CMPNOCASE(child->getName(), "line_comment"))
 				lang->setLineComment(child->getStringValue());
 
 			// Preprocessor
-			else if (s_cmpnocase(child->getName(), "preprocessor"))
+			else if (S_CMPNOCASE(child->getName(), "preprocessor"))
 				lang->setPreprocessor(child->getStringValue());
 
 			// Case sensitive
-			else if (s_cmpnocase(child->getName(), "case_sensitive"))
+			else if (S_CMPNOCASE(child->getName(), "case_sensitive"))
 				lang->setCaseSensitive(child->getBoolValue());
 
 			// Keyword lookup link
-			else if (s_cmpnocase(child->getName(), "keyword_link"))
+			else if (S_CMPNOCASE(child->getName(), "keyword_link"))
 				lang->k_lookup_url = child->getStringValue();
 
 			// Constant lookup link
-			else if (s_cmpnocase(child->getName(), "constant_link"))
+			else if (S_CMPNOCASE(child->getName(), "constant_link"))
 				lang->c_lookup_url = child->getStringValue();
 
 			// Function lookup link
-			else if (s_cmpnocase(child->getName(), "function_link"))
+			else if (S_CMPNOCASE(child->getName(), "function_link"))
 				lang->f_lookup_url = child->getStringValue();
 
 			// Keywords
-			else if (s_cmpnocase(child->getName(), "keywords")) {
+			else if (S_CMPNOCASE(child->getName(), "keywords")) {
 				// Go through values
 				for (unsigned v = 0; v < child->nValues(); v++) {
 					string val = child->getStringValue(v);
 
 					// Check for '$override'
-					if (s_cmpnocase(val, "$override")) {
+					if (S_CMPNOCASE(val, "$override")) {
 						// Clear any inherited keywords
 						lang->clearKeywords();
 					}
@@ -463,13 +463,13 @@ bool TextLanguage::readLanguageDefinition(MemChunk& mc, string source) {
 			}
 
 			// Constants
-			else if (s_cmpnocase(child->getName(), "constants")) {
+			else if (S_CMPNOCASE(child->getName(), "constants")) {
 				// Go through values
 				for (unsigned v = 0; v < child->nValues(); v++) {
 					string val = child->getStringValue(v);
 
 					// Check for '$override'
-					if (s_cmpnocase(val, "$override")) {
+					if (S_CMPNOCASE(val, "$override")) {
 						// Clear any inherited constants
 						lang->clearConstants();
 					}
@@ -481,7 +481,7 @@ bool TextLanguage::readLanguageDefinition(MemChunk& mc, string source) {
 			}
 
 			// Functions
-			else if (s_cmpnocase(child->getName(), "functions")) {
+			else if (S_CMPNOCASE(child->getName(), "functions")) {
 				// Go through children (functions)
 				for (unsigned f = 0; f < child->nChildren(); f++) {
 					ParseTreeNode* child_func = (ParseTreeNode*)child->getChild(f);
@@ -559,7 +559,7 @@ TextLanguage* TextLanguage::getLanguage(unsigned index) {
 TextLanguage* TextLanguage::getLanguageByName(string name) {
 	// Find text language matching [name]
 	for (unsigned a = 0; a < text_languages.size(); a++) {
-		if (s_cmpnocase(text_languages[a]->name, name))
+		if (S_CMPNOCASE(text_languages[a]->name, name))
 			return text_languages[a];
 	}
 

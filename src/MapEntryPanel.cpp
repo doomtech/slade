@@ -133,7 +133,7 @@ void MEPCanvas::showMap() {
 	// Zoom to fit whole map
 	double x_scale = ((double)GetClientSize().x) / width;
 	double y_scale = ((double)GetClientSize().y) / height;
-	zoom = min(x_scale, y_scale);
+	zoom = MIN(x_scale, y_scale);
 	zoom *= 0.95;
 }
 
@@ -264,7 +264,7 @@ void MEPCanvas::createImage(ArchiveEntry& ae, int width, int height) {
 	// Zoom to fit whole map
 	double x_scale = ((double)width) / mapwidth;
 	double y_scale = ((double)height) / mapheight;
-	zoom = min(x_scale, y_scale);
+	zoom = MIN(x_scale, y_scale);
 	zoom *= 0.95;
 
 	// Translate to middle of canvas
@@ -647,11 +647,11 @@ bool MapEntryPanel::createImage() {
 	ArchiveEntry temp;
 	// Stupid OpenGL grumble grumble grumble
 	map_canvas->createImage(temp, min<int>(800, map_canvas->GetSize().x), min<int>(600, map_canvas->GetSize().y));
-	string name = s_fmt("%s_%s", chr(entry->getParent()->getFilename(false)), chr(entry->getName()));
+	string name = S_FMT("%s_%s", CHR(entry->getParent()->getFilename(false)), CHR(entry->getName()));
 	wxFileName fn(name);
 
 	// Create save file dialog
-	wxFileDialog dialog_save(this, s_fmt("Save Map Preview \"%s\"", name.c_str()),
+	wxFileDialog dialog_save(this, S_FMT("Save Map Preview \"%s\"", name.c_str()),
 								dir_last, fn.GetFullName(), "PNG (*.PNG)|*.png",
 								wxFD_SAVE | wxFD_OVERWRITE_PROMPT, wxDefaultPosition);
 

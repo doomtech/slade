@@ -259,7 +259,7 @@ bool ArchivePanel::saveEntryChanges() {
 
 	// Ask if needed
 	if (autosave_entry_changes > 1) {
-		int result = wxMessageBox(s_fmt("Save changes to entry \"%s\"?", cur_area->getEntry()->getName().c_str()),
+		int result = wxMessageBox(S_FMT("Save changes to entry \"%s\"?", cur_area->getEntry()->getName().c_str()),
 									"Unsaved Changes", wxYES_NO|wxICON_QUESTION);
 
 		// Stop if user clicked no
@@ -289,7 +289,7 @@ bool ArchivePanel::save() {
 	// Save the archive
 	if (!archive->save()) {
 		// If there was an error pop up a message box
-		wxMessageBox(s_fmt("Error:\n%s", Global::error.c_str()), "Error", wxICON_ERROR);
+		wxMessageBox(S_FMT("Error:\n%s", Global::error.c_str()), "Error", wxICON_ERROR);
 		return false;
 	}
 
@@ -316,7 +316,7 @@ bool ArchivePanel::saveAs() {
 		// Save the archive
 		if (!archive->save(filename)) {
 			// If there was an error pop up a message box
-			wxMessageBox(s_fmt("Error:\n%s", Global::error.c_str()), "Error", wxICON_ERROR);
+			wxMessageBox(S_FMT("Error:\n%s", Global::error.c_str()), "Error", wxICON_ERROR);
 			return false;
 		}
 
@@ -350,7 +350,7 @@ bool ArchivePanel::newEntry() {
 		return false;
 
 	// Check for \ character (e.g., from Arch-Viles graphics). They have to be kept.
-	if (archive->getType() == ARCHIVE_WAD && name.length() <= 8 
+	if (archive->getType() == ARCHIVE_WAD && name.length() <= 8
 		&& (name.find('\\') != wxNOT_FOUND) || (name.find('/') != wxNOT_FOUND)) {
 	} // Don't process as a file name
 
@@ -546,7 +546,7 @@ bool ArchivePanel::renameEntry() {
 		string old_name = selected_dirs[a]->getName();
 
 		// Prompt for a new name
-		string new_name = wxGetTextFromUser("Enter new directory name:", s_fmt("Rename Directory %s", old_name.c_str()), old_name);
+		string new_name = wxGetTextFromUser("Enter new directory name:", S_FMT("Rename Directory %s", old_name.c_str()), old_name);
 
 		// Do nothing if no name was entered
 		if (new_name.IsEmpty())
@@ -718,7 +718,7 @@ bool ArchivePanel::importEntry() {
 	// Go through the list
 	for (size_t a = 0; a < selection.size(); a++) {
 		// Create open file dialog
-		wxFileDialog dialog_open(this, s_fmt("Import Entry \"%s\"", selection[a]->getName().c_str()),
+		wxFileDialog dialog_open(this, S_FMT("Import Entry \"%s\"", selection[a]->getName().c_str()),
 								dir_last, selection[a]->getName(), "Any File (*.*)|*.*",
 								wxFD_OPEN|wxFD_FILE_MUST_EXIST, wxDefaultPosition);
 
@@ -763,7 +763,7 @@ bool ArchivePanel::exportEntry() {
 		if (fn.GetExt().Len() == 0) fn.SetExt(selection[0]->getType()->getExtension());
 
 		// Create save file dialog
-		wxFileDialog dialog_save(this, s_fmt("Export Entry \"%s\"", selection[0]->getName().c_str()),
+		wxFileDialog dialog_save(this, S_FMT("Export Entry \"%s\"", selection[0]->getName().c_str()),
 									dir_last, fn.GetFullName(), "Any File (*.*)|*.*", wxFD_SAVE | wxFD_OVERWRITE_PROMPT, wxDefaultPosition);
 
 		// Run the dialog & check that the user didn't cancel
@@ -967,14 +967,14 @@ bool ArchivePanel::gfxExportPNG() {
 		fn.SetExt("png");
 
 		// Create save file dialog
-		wxFileDialog dialog_save(this, s_fmt("Export Entry \"%s\"", selection[0]->getName().c_str()),
+		wxFileDialog dialog_save(this, S_FMT("Export Entry \"%s\"", selection[0]->getName().c_str()),
 									dir_last, fn.GetFullName(), "PNG Files (*.png)|*.png", wxFD_SAVE | wxFD_OVERWRITE_PROMPT, wxDefaultPosition);
 
 		// Run the dialog & check that the user didn't cancel
 		if (dialog_save.ShowModal() == wxID_OK) {
 			// If a filename was selected, export it
 			if (!EntryOperations::exportAsPNG(selection[0], dialog_save.GetPath())) {
-				wxMessageBox(s_fmt("Error: %s", chr(Global::error)), "Error", wxOK|wxICON_ERROR);
+				wxMessageBox(S_FMT("Error: %s", CHR(Global::error)), "Error", wxOK|wxICON_ERROR);
 				return false;
 			}
 
@@ -1113,7 +1113,7 @@ bool ArchivePanel::wavDSndConvert() {
 			MemChunk dsnd;
 			// Attempt conversion
 			if (!Conversions::wavToDoomSnd(selection[a]->getMCData(), dsnd)) {
-				wxLogMessage("Error: Unable to convert entry %s: %s", chr(selection[a]->getName()), chr(Global::error));
+				wxLogMessage("Error: Unable to convert entry %s: %s", CHR(selection[a]->getName()), CHR(Global::error));
 				continue;
 			}
 			selection[a]->importMemChunk(dsnd);							// Load doom sound data
@@ -1154,7 +1154,7 @@ bool ArchivePanel::dSndWavConvert() {
 			EntryType::detectEntryType(selection[a]);	// Update entry type
 			selection[a]->setExtensionByType();			// Update extension if necessary
 		} else {
-			wxLogMessage("Error: Unable to convert entry %s: %s", chr(selection[a]->getName()), chr(Global::error));
+			wxLogMessage("Error: Unable to convert entry %s: %s", CHR(selection[a]->getName()), CHR(Global::error));
 			continue;
 		}
 	}
@@ -1254,7 +1254,7 @@ bool ArchivePanel::openEntry(ArchiveEntry* entry, bool force) {
 
 		// Check it exists (really should)
 		if (!dir) {
-			wxLogMessage("Error: Trying to open nonexistant directory %s", chr(name));
+			wxLogMessage("Error: Trying to open nonexistant directory %s", CHR(name));
 			return false;
 		}
 		entry_list->setDir(dir);
@@ -1291,7 +1291,7 @@ bool ArchivePanel::openEntry(ArchiveEntry* entry, bool force) {
 
 		// Load the entry into the panel
 		if (!cur_area->openEntry(entry)) {
-			wxMessageBox(s_fmt("Error loading entry:\n%s", Global::error.c_str()), "Error", wxOK|wxICON_ERROR);
+			wxMessageBox(S_FMT("Error loading entry:\n%s", Global::error.c_str()), "Error", wxOK|wxICON_ERROR);
 		}
 	}
 	return true;
@@ -1311,7 +1311,7 @@ bool ArchivePanel::openEntryAsText(ArchiveEntry* entry) {
 
 	// Load the current entry into the panel
 	if (!cur_area->openEntry(entry)) {
-		wxMessageBox(s_fmt("Error loading entry:\n%s", Global::error.c_str()), "Error", wxOK|wxICON_ERROR);
+		wxMessageBox(S_FMT("Error loading entry:\n%s", Global::error.c_str()), "Error", wxOK|wxICON_ERROR);
 	}
 
 	return true;
@@ -1331,7 +1331,7 @@ bool ArchivePanel::openEntryAsHex(ArchiveEntry* entry) {
 
 	// Load the current entry into the panel
 	if (!cur_area->openEntry(entry)) {
-		wxMessageBox(s_fmt("Error loading entry:\n%s", Global::error.c_str()), "Error", wxOK|wxICON_ERROR);
+		wxMessageBox(S_FMT("Error loading entry:\n%s", Global::error.c_str()), "Error", wxOK|wxICON_ERROR);
 	}
 
 	return true;

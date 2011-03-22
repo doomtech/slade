@@ -723,7 +723,7 @@ int main( int argc, char *argv[] )
 	}
 
 #ifdef MSDOG
-	if( (strrchr( argv[1], '*' ) != NULL) || (strrchr( argv[1], '?' ) != NULL) )
+	if( (strrCHR( argv[1], '*' ) != NULL) || (strrCHR( argv[1], '?' ) != NULL) )
 	{
 		PrintHeader() ;
 		printf( "Sorry, there is nothing matching %s...\n", argv[1] ) ;

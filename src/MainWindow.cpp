@@ -366,7 +366,7 @@ void MainWindow::createStartPage() {
 		if (a > 0) recent += "<br/>\n";
 
 		// Add recent file link
-		recent += s_fmt("<a href=\"recent://%d\">%s</a>", a, theArchiveManager->recentFile(a));
+		recent += S_FMT("<a href=\"recent://%d\">%s</a>", a, theArchiveManager->recentFile(a));
 	}
 
 	// Insert tip and recent files into html
@@ -536,7 +536,7 @@ void MainWindow::onMenuItemClicked(wxCommandEvent& e) {
 		wxRemoveFile(icon_filename);
 
 		string year = wxNow().Right(4);
-		info.SetCopyright(s_fmt("(C) 2008-%s Simon Judd <sirjuddington@gmail.com>", year.c_str()));
+		info.SetCopyright(S_FMT("(C) 2008-%s Simon Judd <sirjuddington@gmail.com>", year.c_str()));
 
 		wxAboutBox(info);
 	}

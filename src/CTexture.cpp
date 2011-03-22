@@ -191,8 +191,7 @@ CTPatchEx::CTPatchEx(CTPatchEx* copy) {
 	offset_y = copy->offset_y;
 	name = copy->name;
 	type = copy->type;
-	for (unsigned a = 0; a < copy->translation.size(); a++)
-		translation.push_back(copy->translation[a]);
+	translation.copy(copy->translation);
 }
 
 /* CTPatchEx::~CTPatchEx
@@ -245,33 +244,33 @@ bool CTPatchEx::parse(Tokenizer& tz, uint8_t type) {
 		string property = tz.getToken();
 		while (property != "}") {
 			// FlipX
-			if (s_cmpnocase(property, "FlipX"))
+			if (S_CMPNOCASE(property, "FlipX"))
 				flip_x = true;
 
 			// FlipY
-			if (s_cmpnocase(property, "FlipY"))
+			if (S_CMPNOCASE(property, "FlipY"))
 				flip_y = true;
 
 			// Rotate
-			if (s_cmpnocase(property, "Rotate"))
+			if (S_CMPNOCASE(property, "Rotate"))
 				rotation = tz.getInteger();
 
 			// Translation
-			if (s_cmpnocase(property, "Translation")) {
+			if (S_CMPNOCASE(property, "Translation")) {
 				// Add first translation string
-				translation.push_back(tz.getToken());
+				translation.parse(tz.getToken());
 
 				// Add any subsequent translations (separated by commas)
-				while (tz.peekToken() != ",") {
+				while (tz.peekToken() == ",") {
 					tz.getToken();	// Skip ,
-					translation.push_back(tz.getToken());
+					translation.parse(tz.getToken());
 				}
 
 				blendtype = 1;
 			}
 
 			// Blend
-			if (s_cmpnocase(property, "Blend")) {
+			if (S_CMPNOCASE(property, "Blend")) {
 				double val;
 				wxColour col;
 				blendtype = 2;
@@ -310,11 +309,11 @@ bool CTPatchEx::parse(Tokenizer& tz, uint8_t type) {
 			}
 
 			// Alpha
-			if (s_cmpnocase(property, "Alpha"))
+			if (S_CMPNOCASE(property, "Alpha"))
 				alpha = tz.getFloat();
 
 			// Style
-			if (s_cmpnocase(property, "Style"))
+			if (S_CMPNOCASE(property, "Style"))
 				style = tz.getToken();
 
 			// Read next property name
@@ -333,10 +332,10 @@ string CTPatchEx::asText() {
 	// Init text string
 	string typestring = "Patch";
 	if (type == PTYPE_GRAPHIC) typestring = "Graphic";
-	string text = s_fmt("\t%s %s, %d, %d\n", chr(typestring), chr(name), offset_x, offset_y);
+	string text = S_FMT("\t%s %s, %d, %d\n", CHR(typestring), CHR(name), offset_x, offset_y);
 
 	// Check if we need to write any extra properties
-	if (!flip_x && !flip_y && rotation == 0 && blendtype == 0 && alpha == 1.0f && s_cmpnocase(style, "Copy"))
+	if (!flip_x && !flip_y && rotation == 0 && blendtype == 0 && alpha == 1.0f && S_CMPNOCASE(style, "Copy"))
 		return text;
 	else
 		text += "\t{\n";
@@ -347,30 +346,25 @@ string CTPatchEx::asText() {
 	if (flip_y)
 		text += "\t\tFlipY\n";
 	if (rotation != 0)
-		text += s_fmt("\t\tRotate %d\n", rotation);
-	if (blendtype == 1 && translation.size() > 0) {
+		text += S_FMT("\t\tRotate %d\n", rotation);
+	if (blendtype == 1 && !translation.isEmpty()) {
 		text += "\t\tTranslation ";
-		for (unsigned a = 0; a < translation.size(); a++) {
-			text += translation[a];
-			if (a == translation.size()-1)
-				text += "\n";
-			else
-				text += ", ";
-		}
+		text += translation.asText();
+		text += "\n";
 	}
 	if (blendtype >= 2) {
 		wxColour col(colour.r, colour.g, colour.b);
-		text += s_fmt("\t\tBlend \"%s\"", chr(col.GetAsString(wxC2S_HTML_SYNTAX)));
+		text += S_FMT("\t\tBlend \"%s\"", CHR(col.GetAsString(wxC2S_HTML_SYNTAX)));
 
 		if (blendtype == 3)
-			text += s_fmt(", %1.1f\n", (double)colour.a / 255.0);
+			text += S_FMT(", %1.1f\n", (double)colour.a / 255.0);
 		else
 			text += "\n";
 	}
 	if (alpha < 1.0f)
-		text += s_fmt("\t\tAlpha %1.2f\n", alpha);
-	if (!(s_cmpnocase(style, "Copy")))
-		text += s_fmt("\t\tStyle %s\n", chr(style));
+		text += S_FMT("\t\tAlpha %1.2f\n", alpha);
+	if (!(S_CMPNOCASE(style, "Copy")))
+		text += S_FMT("\t\tStyle %s\n", CHR(style));
 
 	// Write ending
 	text += "\t}\n";
@@ -532,7 +526,7 @@ bool CTexture::removePatch(string patch) {
 	bool removed = false;
 	vector<CTPatch*>::iterator i = patches.begin();
 	while (i != patches.end()) {
-		if (s_cmp((*i)->getName(), patch)) {
+		if (S_CMP((*i)->getName(), patch)) {
 			delete (*i);
 			patches.erase(i);
 			removed = true;
@@ -620,7 +614,7 @@ bool CTexture::swapPatches(size_t p1, size_t p2) {
  *******************************************************************/
 bool CTexture::parse(Tokenizer& tz, string type) {
 	// Check if optional
-	if (s_cmpnocase(tz.peekToken(), "optional")) {
+	if (S_CMPNOCASE(tz.peekToken(), "optional")) {
 		tz.getToken();	// Skip it
 		optional = true;
 	}
@@ -643,46 +637,46 @@ bool CTexture::parse(Tokenizer& tz, string type) {
 		while (property != "}") {
 			// Check if end of text is reached (error)
 			if (property.IsEmpty()) {
-				wxLogMessage("Error parsing texture %s: End of text found, missing } perhaps?", chr(name));
+				wxLogMessage("Error parsing texture %s: End of text found, missing } perhaps?", CHR(name));
 				return false;
 			}
 
 			// XScale
-			if (s_cmpnocase(property, "XScale"))
+			if (S_CMPNOCASE(property, "XScale"))
 				scale_x = tz.getFloat();
 
 			// YScale
-			if (s_cmpnocase(property, "YScale"))
+			if (S_CMPNOCASE(property, "YScale"))
 				scale_y = tz.getFloat();
 
 			// Offset
-			if (s_cmpnocase(property, "Offset")) {
+			if (S_CMPNOCASE(property, "Offset")) {
 				offset_x = tz.getInteger();
 				tz.getToken();	// Skip ,
 				offset_y = tz.getInteger();
 			}
 
 			// WorldPanning
-			if (s_cmpnocase(property, "WorldPanning"))
+			if (S_CMPNOCASE(property, "WorldPanning"))
 				world_panning = true;
 
 			// NoDecals
-			if (s_cmpnocase(property, "NoDecals"))
+			if (S_CMPNOCASE(property, "NoDecals"))
 				no_decals = true;
 
 			// NullTexture
-			if (s_cmpnocase(property, "NullTexture"))
+			if (S_CMPNOCASE(property, "NullTexture"))
 				null_texture = true;
 
 			// Patch
-			if (s_cmpnocase(property, "Patch")) {
+			if (S_CMPNOCASE(property, "Patch")) {
 				CTPatchEx* patch = new CTPatchEx();
 				patch->parse(tz);
 				patches.push_back(patch);
 			}
 
 			// Graphic
-			if (s_cmpnocase(property, "Graphic")) {
+			if (S_CMPNOCASE(property, "Graphic")) {
 				CTPatchEx* patch = new CTPatchEx();
 				patch->parse(tz, PTYPE_GRAPHIC);
 				patches.push_back(patch);
@@ -706,15 +700,15 @@ string CTexture::asText() {
 		return "";
 
 	// Init text string
-	string text = s_fmt("%s %s, %d, %d\n{\n", chr(type), chr(name), width, height);
+	string text = S_FMT("%s %s, %d, %d\n{\n", CHR(type), CHR(name), width, height);
 
 	// Write texture properties
 	if (scale_x != 1.0)
-		text += s_fmt("\tXScale %1.1f\n", scale_x);
+		text += S_FMT("\tXScale %1.1f\n", scale_x);
 	if (scale_y != 1.0)
-		text += s_fmt("\tYScale %1.1f\n", scale_y);
+		text += S_FMT("\tYScale %1.1f\n", scale_y);
 	if (offset_x != 0 || offset_y != 0)
-		text += s_fmt("\tOffset %d, %d\n", offset_x, offset_y);
+		text += S_FMT("\tOffset %d, %d\n", offset_x, offset_y);
 	if (world_panning)
 		text += "\tWorldPanning\n";
 	if (no_decals)

@@ -124,8 +124,8 @@ bool GLTexture::loadRawData(const uint8_t* data, uint32_t w, uint32_t h) {
 			while (left < w) {
 				// Load 128x128 portion of image
 				memset(buf, 0, 128*128*4);
-				size_t rowlen = min(128, int(w - left));
-				size_t collen = min(128, int(h - top));
+				size_t rowlen = MIN(128, int(w - left));
+				size_t collen = MIN(128, int(h - top));
 				for (size_t i = 0; i < collen; ++i) {
 					size_t doffset = (((top + i) * w) + left) * 4;
 					size_t boffset = i * 128 * 4;

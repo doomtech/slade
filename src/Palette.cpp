@@ -30,6 +30,7 @@
  *******************************************************************/
 #include "Main.h"
 #include "Palette.h"
+#include "Misc.h"
 
 
 /*******************************************************************
@@ -43,8 +44,10 @@ Palette8bit::Palette8bit() {
 	index_trans = -1;
 
 	// Init palette (to greyscale)
-	for (int a = 0; a < 256; a++)
+	for (int a = 0; a < 256; a++) {
 		colours[a].set(a, a, a, 255);
+		colours_hsl[a].l = (double)a / 255.0;
+	}
 }
 
 /* Palette8bit::~Palette8bit
@@ -65,11 +68,12 @@ bool Palette8bit::loadMem(MemChunk& mc) {
 	int c = 0;
 	for (size_t a = 0; a < mc.getSize(); a += 3) {
 		uint8_t rgb[3] = {0, 0, 0};
-		
+
 		// Read RGB value
 		if (mc.read(rgb, 3)) {
 			// Set colour in palette
-			colours[c++].set(rgb[0], rgb[1], rgb[2], 255);
+			colours[c].set(rgb[0], rgb[1], rgb[2], 255);
+			colours_hsl[c++] = Misc::rgbToHsl((double)rgb[0]/255.0, (double)rgb[1]/255.0, (double)rgb[2]/255.0);
 		}
 
 		// If we have read 256 colours, finish
@@ -92,7 +96,8 @@ bool Palette8bit::loadMem(const uint8_t* data, uint32_t size) {
 	int c = 0;
 	for (size_t a = 0; a < size; a += 3) {
 		// Set colour in palette
-		colours[c++].set(data[a], data[a+1], data[a+2], 255);
+		colours[c].set(data[a], data[a+1], data[a+2], 255);
+		colours_hsl[c++] = Misc::rgbToHsl((double)data[a]/255.0, (double)data[a+1]/255.0, (double)data[a+2]/255.0);
 
 		// If we have read 256 colours, finish
 		if (c == 256)
@@ -135,6 +140,50 @@ bool Palette8bit::saveFile(string filename) {
 	return true;
 }
 
+/* Palette8bit::setColour
+ * Sets the colour at [index]
+ *******************************************************************/
+void Palette8bit::setColour(uint8_t index, rgba_t col) {
+	if (index > 255)
+		return;
+
+	colours[index].set(col);
+	colours_hsl[index] = Misc::rgbToHsl(col.dr(), col.dg(), col.db());
+}
+
+/* Palette8bit::setColour
+ * Sets the colour at [index]'s red component
+ *******************************************************************/
+void Palette8bit::setColourR(uint8_t index, uint8_t val) {
+	if (index > 255)
+		return;
+
+	colours[index].r = val;
+	colours_hsl[index] = Misc::rgbToHsl(colours[index].dr(), colours[index].dg(), colours[index].db());
+}
+
+/* Palette8bit::setColour
+ * Sets the colour at [index]'s green component
+ *******************************************************************/
+void Palette8bit::setColourG(uint8_t index, uint8_t val) {
+	if (index > 255)
+		return;
+
+	colours[index].g = val;
+	colours_hsl[index] = Misc::rgbToHsl(colours[index].dr(), colours[index].dg(), colours[index].db());
+}
+
+/* Palette8bit::setColour
+ * Sets the colour at [index]'s blue component
+ *******************************************************************/
+void Palette8bit::setColourB(uint8_t index, uint8_t val) {
+	if (index > 255)
+		return;
+
+	colours[index].b = val;
+	colours_hsl[index] = Misc::rgbToHsl(colours[index].dr(), colours[index].dg(), colours[index].db());
+}
+
 /* Palette8bit::copyPalette8bit
  * Copies the given palette into this one
  *******************************************************************/
@@ -159,6 +208,32 @@ short Palette8bit::findColour(rgba_t colour) {
 	}
 
 	return -1;
+}
+
+/* Palette8bit::nearestColour
+ * Returns the index of the closest colour in the palette to [colour]
+ *******************************************************************/
+short Palette8bit::nearestColour(rgba_t colour) {
+	int min_d = 999999;
+	short index = 0;
+
+	int d_r, d_g, d_b, diff;
+	for (short a = 0; a < 256; a++) {
+		d_r = colour.r - colours[a].r;
+		d_g = colour.g - colours[a].g;
+		d_b = colour.b - colours[a].b;
+		diff = (d_r*d_r)+(d_g*d_g)+(d_b*d_b);
+
+		// Exact match?
+		if (diff == 0)
+			return a;
+		else if (diff < min_d) {
+			min_d = diff;
+			index = a;
+		}
+	}
+
+	return index;
 }
 
 /* Palette8bit::countColours

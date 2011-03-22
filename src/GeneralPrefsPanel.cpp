@@ -129,7 +129,7 @@ void GeneralPrefsPanel::applyPreferences() {
 		if (!wxDirExists(dir_temp)) {
 			if (!wxMkdir(dir_temp)) {
 				// Unable to create it, just use system temp dir
-				wxMessageBox(s_fmt("Unable to create temp directory \"%s\"", dir_temp.c_str()), "Error", wxICON_ERROR);
+				wxMessageBox(S_FMT("Unable to create temp directory \"%s\"", dir_temp.c_str()), "Error", wxICON_ERROR);
 				temp_use_appdir = false;
 			}
 		}

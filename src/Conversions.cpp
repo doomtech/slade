@@ -261,7 +261,7 @@ bool Conversions::musToMidi(MemChunk& in, MemChunk& out) {
 	in.exportFile(tempmus);
 
 	// Run qmus2mid
-	qmus2mid(chr(tempmus), chr(tempmidi), 1, 0, 128, 0);
+	qmus2mid(CHR(tempmus), CHR(tempmidi), 1, 0, 128, 0);
 
 	// Read outputted midi to MemChunk
 	out.importFile(tempmidi);
@@ -299,7 +299,7 @@ bool Conversions::vocToWav(MemChunk& in, MemChunk& out) {
 		size_t blocksize = READ_L24(in, i+1);
 		i+=4;
 		if (i + blocksize > e && blocktype != 0) {
-			Global::error = s_fmt("VOC file cut abruptly in block %i", blockcount);
+			Global::error = S_FMT("VOC file cut abruptly in block %i", blockcount);
 			return false;
 		}
 		blockcount++;
@@ -376,10 +376,10 @@ bool Conversions::vocToWav(MemChunk& in, MemChunk& out) {
 		case 6: // alaw
 		case 7: // ulaw
 		case 0x200: // 4 bits to 16 bits Creative ADPCM (only valid in block type 0x09)
-			Global::error = s_fmt("Unsupported codec %i in VOC file", codec);
+			Global::error = S_FMT("Unsupported codec %i in VOC file", codec);
 			return false;
 		default:
-			Global::error = s_fmt("Unknown codec %i in VOC file", codec);
+			Global::error = S_FMT("Unknown codec %i in VOC file", codec);
 			return false;
 	}
 

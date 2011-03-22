@@ -191,7 +191,7 @@ bool DatArchive::open(MemChunk& mc) {
 		}
 		else
 		{
-			myname = s_fmt("%s+%d", lastname, ++namecount);
+			myname = S_FMT("%s+%d", lastname, ++namecount);
 		}
 
 		// Create & setup lump
@@ -346,21 +346,21 @@ ArchiveEntry* DatArchive::addEntry(ArchiveEntry* entry, unsigned position, Archi
  *******************************************************************/
 ArchiveEntry* DatArchive::addEntry(ArchiveEntry* entry, string add_namespace, bool copy) {
 	// Find requested namespace, only three non-global namespaces are valid in this format
-	if (s_cmpnocase(add_namespace, "textures")) {
+	if (S_CMPNOCASE(add_namespace, "textures")) {
 		if (walls[1] >= 0) return addEntry(entry, walls[1], NULL, copy);
 		else {
 			addNewEntry("startwalls");
 			addNewEntry("endwalls");
 			return addEntry(entry, add_namespace, copy);
 		}
-	} else if (s_cmpnocase(add_namespace, "flats")) {
+	} else if (S_CMPNOCASE(add_namespace, "flats")) {
 		if (flats[1] >= 0) return addEntry(entry, flats[1], NULL, copy);
 		else {
 			addNewEntry("startflats");
 			addNewEntry("endflats");
 			return addEntry(entry, add_namespace, copy);
 		}
-	} else if (s_cmpnocase(add_namespace, "sprites")) {
+	} else if (S_CMPNOCASE(add_namespace, "sprites")) {
 		if (sprites[1] >= 0) return addEntry(entry, sprites[1], NULL, copy);
 		else {
 			addNewEntry("startsprites");

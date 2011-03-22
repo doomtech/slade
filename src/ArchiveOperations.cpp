@@ -117,7 +117,7 @@ bool ArchiveOperations::removeUnusedPatches(Archive* archive) {
 		delete tx_lists[a];
 
 	// Notify user
-	wxMessageBox(s_fmt("Removed %d patches and %d entries. See console log for details.", removed, to_remove.size()), "Removed Unused Patches");
+	wxMessageBox(S_FMT("Removed %d patches and %d entries. See console log for details.", removed, to_remove.size()), "Removed Unused Patches");
 
 	return true;
 }

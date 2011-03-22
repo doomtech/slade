@@ -123,8 +123,8 @@ bool TextEntryPanel::loadEntry(ArchiveEntry* entry) {
 	// Or, from entry's parent directory
 	if (!tl) {
 		// ZDoom DECORATE (within 'actors' or 'decorate' directories)
-		if (s_cmpnocase(wxString("/actors/"), entry->getPath().Left(8)) ||
-			s_cmpnocase(wxString("/decorate/"), entry->getPath().Left(10)))
+		if (S_CMPNOCASE(wxString("/actors/"), entry->getPath().Left(8)) ||
+			S_CMPNOCASE(wxString("/decorate/"), entry->getPath().Left(10)))
 			tl = TextLanguage::getLanguage("decorate");
 	}
 
@@ -134,7 +134,7 @@ bool TextEntryPanel::loadEntry(ArchiveEntry* entry) {
 	// Select it in the choice box
 	if (tl) {
 		for (unsigned a = 0; a < languages.size(); a++) {
-			if (s_cmpnocase(tl->getName(), languages[a])) {
+			if (S_CMPNOCASE(tl->getName(), languages[a])) {
 				choice_text_language->Select(a);
 				break;
 			}

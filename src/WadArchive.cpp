@@ -167,7 +167,7 @@ void WadArchive::updateNamespaces() {
 
 			// Check if it's the end of an existing namespace
 			for (unsigned a = 0; a < namespaces.size(); a++) {
-				if (s_cmp(ns_name, namespaces[a].name)) {
+				if (S_CMP(ns_name, namespaces[a].name)) {
 					namespaces[a].end = entry;
 				}
 			}
@@ -199,7 +199,7 @@ void WadArchive::updateNamespaces() {
 
 		// Check namespace name for special cases
 		for (int a = 0; a < n_special_namespaces; a++) {
-			if (s_cmp(ns.name, special_namespaces[a].letter))
+			if (S_CMP(ns.name, special_namespaces[a].letter))
 				ns.name = special_namespaces[a].name;
 		}
 
@@ -207,7 +207,7 @@ void WadArchive::updateNamespaces() {
 		ns.end_index = entryIndex(ns.end);
 
 		// Testing
-		//wxLogMessage("Namespace %s from %s to %s", chr(ns.name), chr(ns.start->getName()), chr(ns.end->getName()));
+		//wxLogMessage("Namespace %s from %s to %s", CHR(ns.name), CHR(ns.start->getName()), CHR(ns.end->getName()));
 	}
 }
 
@@ -556,7 +556,7 @@ ArchiveEntry* WadArchive::addEntry(ArchiveEntry* entry, unsigned position, Archi
 ArchiveEntry* WadArchive::addEntry(ArchiveEntry* entry, string add_namespace, bool copy) {
 	// Find requested namespace
 	for (unsigned a = 0; a < namespaces.size(); a++) {
-		if (s_cmpnocase(namespaces[a].name, add_namespace)) {
+		if (S_CMPNOCASE(namespaces[a].name, add_namespace)) {
 			// Namespace found, add entry before end marker
 			return addEntry(entry, entryIndex(namespaces[a].end), NULL, copy);
 		}
@@ -745,7 +745,7 @@ vector<Archive::mapdesc_t> WadArchive::detectMaps() {
 		bool maplump_found = false;
 		for (int a = 0; a < 5; a++) {
 			// Compare with all base map lump names
-			if (s_cmp(entry->getName(), map_lumps[a])) {
+			if (S_CMP(entry->getName(), map_lumps[a])) {
 				maplump_found = true;
 				existing_map_lumps[a] = 1;
 				break;
@@ -766,7 +766,7 @@ vector<Archive::mapdesc_t> WadArchive::detectMaps() {
 				// Compare with all map lump names
 				for (int a = 0; a < NUMMAPLUMPS; a++) {
 					// Compare with all base map lump names
-					if (s_cmp(entry->getName(), map_lumps[a])) {
+					if (S_CMP(entry->getName(), map_lumps[a])) {
 						existing_map_lumps[a] = 1;
 						done = false;
 						break;

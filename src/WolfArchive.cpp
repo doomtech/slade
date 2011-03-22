@@ -101,7 +101,7 @@ string searchIMFName(MemChunk& mc) {
 		size_t counter = mc.getSize() - 1;
 		size_t stop = counter - 88;
 		while (counter > stop) {
-			if (mc[counter] == 'F' && mc[counter - 1] == 'M' 
+			if (mc[counter] == 'F' && mc[counter - 1] == 'M'
 				&& mc[counter - 2] == 'I' && mc[counter - 3] == '.')
 			{
 				size_t start = counter - 4;
@@ -431,7 +431,7 @@ bool WolfArchive::open(MemChunk& mc) {
 		if (d < spritestart)		name = "WAL";
 		else if (d < soundstart)	name = "SPR";
 		else						name = "SND";
-		name += s_fmt("%05d", d);
+		name += S_FMT("%05d", d);
 
 		// Create & setup lump
 		ArchiveEntry* nlump = new ArchiveEntry(name, size);
@@ -522,7 +522,7 @@ bool WolfArchive::openAudio(MemChunk& head, MemChunk& data) {
 		// the data file is invalid
 		if (offset + size > data.getSize()) {
 			wxLogMessage("WolfArchive::openAudio: Wolf archive is invalid or corrupt");
-			Global::error = s_fmt("Archive is invalid and/or corrupt in entry %d", d);
+			Global::error = S_FMT("Archive is invalid and/or corrupt in entry %d", d);
 			setMuted(false);
 			return false;
 		}
@@ -536,7 +536,7 @@ bool WolfArchive::openAudio(MemChunk& head, MemChunk& data) {
 		// Wolf chunks have no names, so just give them a number
 		string name = searchIMFName(edata);
 		if (name == "")
-			name = s_fmt("LMP%05d", d);
+			name = S_FMT("LMP%05d", d);
 
 		// Create & setup lump
 		ArchiveEntry* nlump = new ArchiveEntry(name, size);
@@ -593,7 +593,7 @@ bool WolfArchive::openMaps(MemChunk& head, MemChunk& data) {
 		// the data file is invalid
 		if (offset + size > data.getSize()) {
 			wxLogMessage("WolfArchive::openMaps: Wolf archive is invalid or corrupt");
-			Global::error = s_fmt("Archive is invalid and/or corrupt in entry %d", d);
+			Global::error = S_FMT("Archive is invalid and/or corrupt in entry %d", d);
 			setMuted(false);
 			return false;
 		}
@@ -625,7 +625,7 @@ bool WolfArchive::openMaps(MemChunk& head, MemChunk& data) {
 		planelen[1] = READ_L16(data, offset +14);
 		planelen[2] = READ_L16(data, offset +16);
 		for (int i = 0; i < 3; ++i) {
-			name = s_fmt("PLANE%d", i);
+			name = S_FMT("PLANE%d", i);
 			nlump = new ArchiveEntry(name, planelen[i]);
 			nlump->setLoaded(false);
 			nlump->exProp("Offset") = (int)planeofs[i];
@@ -679,7 +679,7 @@ bool WolfArchive::openGraph(MemChunk& head, MemChunk& data, MemChunk& dict) {
 		return false;
 
 	if (dict.getSize() != 1024) {
-		Global::error = s_fmt("WolfArchive::openGraph: VGADICT is improperly sized (%d bytes instead of 1024)", dict.getSize());
+		Global::error = S_FMT("WolfArchive::openGraph: VGADICT is improperly sized (%d bytes instead of 1024)", dict.getSize());
 		return false;
 	}
 	huffnode nodes[256];
@@ -709,7 +709,7 @@ bool WolfArchive::openGraph(MemChunk& head, MemChunk& data, MemChunk& dict) {
 		// the data file is invalid
 		if (offset + size > data.getSize()) {
 			wxLogMessage("WolfArchive::openGraph: Wolf archive is invalid or corrupt");
-			Global::error = s_fmt("Archive is invalid and/or corrupt in entry %d", d);
+			Global::error = S_FMT("Archive is invalid and/or corrupt in entry %d", d);
 			setMuted(false);
 			return false;
 		}
@@ -727,7 +727,7 @@ bool WolfArchive::openGraph(MemChunk& head, MemChunk& data, MemChunk& dict) {
 			else														name = "LMP";
 		}
 		else name = "LMP";
-		name += s_fmt("%05d", d);
+		name += S_FMT("%05d", d);
 
 
 		// Create & setup lump

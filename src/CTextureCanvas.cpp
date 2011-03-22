@@ -301,8 +301,17 @@ void CTextureCanvas::drawPatch(int num, bool outside) {
 	// Load the patch as an opengl texture if it isn't already
 	if (!patch_textures[num]->isLoaded()) {
 		SImage temp;
-		if (Misc::loadImageFromEntry(&temp, patch->getPatchEntry(parent)))
+		if (Misc::loadImageFromEntry(&temp, patch->getPatchEntry(parent))) {
+			// Apply translation if needed
+			if (texture->isExtended()) {
+				CTPatchEx* epatch = (CTPatchEx*)patch;
+				if (!epatch->getTranslation().isEmpty())
+					temp.applyTranslation(&(epatch->getTranslation()), &palette);
+			}
+
+			// Load the image as a texture
 			patch_textures[num]->loadImage(&temp, &palette);
+		}
 		else
 			patch_textures[num]->genChequeredTexture(8, COL_RED, COL_BLACK);
 	}
@@ -374,6 +383,10 @@ void CTextureCanvas::drawPatch(int num, bool outside) {
 				col.set(epatch->getColour());
 				shade_select = false;
 			}
+
+			// Translation
+			if (epatch->getBlendType() == 1)
+				shade_select = false;
 		}
 	}
 

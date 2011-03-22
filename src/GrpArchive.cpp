@@ -155,7 +155,7 @@ bool GrpArchive::open(MemChunk& mc) {
 	ken_magic[12] = 0;
 
 	// Check the header
-	if (!(s_cmp(wxString::FromAscii(ken_magic), "KenSilverman"))) {
+	if (!(S_CMP(wxString::FromAscii(ken_magic), "KenSilverman"))) {
 		wxLogMessage("GrpArchive::openFile: File %s has invalid header", filename.c_str());
 		Global::error = "Invalid grp header";
 		return false;
@@ -419,7 +419,7 @@ bool GrpArchive::isGrpArchive(MemChunk& mc) {
 	ken_magic[12] = 0;
 
 	// Check the header
-	if (!(s_cmp(wxString::From8BitData(ken_magic), "KenSilverman")))
+	if (!(S_CMP(wxString::From8BitData(ken_magic), "KenSilverman")))
 		return false;
 
 	// Compute total size
@@ -468,7 +468,7 @@ bool GrpArchive::isGrpArchive(string filename) {
 	ken_magic[12] = 0;
 
 	// Check the header
-	if (!(s_cmp(wxString::From8BitData(ken_magic), "KenSilverman")))
+	if (!(S_CMP(wxString::From8BitData(ken_magic), "KenSilverman")))
 		return false;
 
 	// Compute total size

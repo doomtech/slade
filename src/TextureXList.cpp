@@ -72,7 +72,7 @@ CTexture* TextureXList::getTexture(size_t index) {
 CTexture* TextureXList::getTexture(string name) {
 	// Search for texture by name
 	for (size_t a = 0; a < textures.size(); a++) {
-		if (s_cmpnocase(textures[a]->getName(), name))
+		if (S_CMPNOCASE(textures[a]->getName(), name))
 			return textures[a];
 	}
 
@@ -345,8 +345,8 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_ta
 			// Add it to the texture
 			string patch = patch_table.patchName(pdef.patch);
 			if (patch.IsEmpty()) {
-				wxLogMessage("Warning: Texture %s contains patch %d which is invalid - may be incorrect PNAMES entry", chr(tex->getName()), pdef.patch);
-				patch = s_fmt("INVPATCH%04d", pdef.patch);
+				wxLogMessage("Warning: Texture %s contains patch %d which is invalid - may be incorrect PNAMES entry", CHR(tex->getName()), pdef.patch);
+				patch = S_FMT("INVPATCH%04d", pdef.patch);
 			}
 
 			tex->addPatch(patch, pdef.left, pdef.top);
@@ -432,7 +432,7 @@ bool TextureXList::writeTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_t
 				// Create 'normal' doom format texture definition
 				ftdef_t txdef;
 				memset(txdef.name, 0, 8); // Set texture name to all 0's (to ensure compatibility with XWE)
-				strncpy(txdef.name, chr(tex->getName().Upper()), tex->getName().Len());
+				strncpy(txdef.name, CHR(tex->getName().Upper()), tex->getName().Len());
 				txdef.flags			= 0;
 				txdef.scale[0]		= (tex->getScaleX()*8);
 				txdef.scale[1]		= (tex->getScaleY()*8);
@@ -474,7 +474,7 @@ bool TextureXList::writeTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_t
 				// Create strife format texture definition
 				stdef_t txdef;
 				memset(txdef.name, 0, 8); // Set texture name to all 0's (to ensure compatibility with XWE)
-				strncpy(txdef.name, chr(tex->getName().Upper()), tex->getName().Len());
+				strncpy(txdef.name, CHR(tex->getName().Upper()), tex->getName().Len());
 				txdef.flags			= 0;
 				txdef.scale[0]		= (tex->getScaleX()*8);
 				txdef.scale[1]		= (tex->getScaleY()*8);
@@ -555,35 +555,35 @@ bool TextureXList::readTEXTURESData(ArchiveEntry* entry) {
 	string token = tz.getToken();
 	while (!token.IsEmpty()) {
 		// Texture definition
-		if (s_cmpnocase(token, "Texture")) {
+		if (S_CMPNOCASE(token, "Texture")) {
 			CTexture* tex = new CTexture();
 			if (tex->parse(tz, "Texture"))
 				textures.push_back(tex);
 		}
 
 		// Sprite definition
-		if (s_cmpnocase(token, "Sprite")) {
+		if (S_CMPNOCASE(token, "Sprite")) {
 			CTexture* tex = new CTexture();
 			if (tex->parse(tz, "Sprite"))
 				textures.push_back(tex);
 		}
 
 		// Graphic definition
-		if (s_cmpnocase(token, "Graphic")) {
+		if (S_CMPNOCASE(token, "Graphic")) {
 			CTexture* tex = new CTexture();
 			if (tex->parse(tz, "Graphic"))
 				textures.push_back(tex);
 		}
 
 		// WallTexture definition
-		if (s_cmpnocase(token, "WallTexture")) {
+		if (S_CMPNOCASE(token, "WallTexture")) {
 			CTexture* tex = new CTexture();
 			if (tex->parse(tz, "WallTexture"))
 				textures.push_back(tex);
 		}
 
 		// Flat definition
-		if (s_cmpnocase(token, "Flat")) {
+		if (S_CMPNOCASE(token, "Flat")) {
 			CTexture* tex = new CTexture();
 			if (tex->parse(tz, "Flat"))
 				textures.push_back(tex);

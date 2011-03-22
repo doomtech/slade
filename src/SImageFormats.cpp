@@ -262,7 +262,7 @@ bool SImage::toPNG(MemChunk& out, Palette8bit* pal) {
 	FreeImage_FlipVertical(bm);
 
 	// Write the image to a temp file
-	FreeImage_Save(FIF_PNG, bm, chr(appPath("temp.png", DIR_TEMP)));
+	FreeImage_Save(FIF_PNG, bm, CHR(appPath("temp.png", DIR_TEMP)));
 
 	// Load it into a memchunk
 	MemChunk png;
@@ -608,15 +608,15 @@ bool SImage::toDoomGfx(MemChunk& out, uint8_t alpha_threshold) {
 uint32_t valid_flat_size[][2] = {
 	{	2,	 2 },	// lol Heretic F_SKY1
 	{  10,  12 },	// gnum format
-	{  16,  16 },	// \ 
+	{  16,  16 },	// \
 	{  32,  64 },	// Strife startup sprite
-	{  48,  48 },	// / 
+	{  48,  48 },	// /
 	{  64,  64 },	// standard flat size
 	{  64,	65 },	// Heretic flat size variant
 	{  64, 128 },	// Hexen flat size variant
-	{ 128, 128 },	// \ 
+	{ 128, 128 },	// \
 	{ 256, 256 },	// hires flat size
-	{ 512, 512 },	// / 
+	{ 512, 512 },	// /
 	{ 256, 200 },	// Rise of the Triad sky
 	{ 320, 200 },	// full screen format
 };
@@ -956,7 +956,7 @@ bool SImage::toPlanar(MemChunk& out, Palette8bit* pal) {
 	}
 
 	if (countColours() > 16) {
-		wxLogMessage(s_fmt("Cannot convert to planar format, too many colors (%d)"), countColours());
+		wxLogMessage(S_FMT("Cannot convert to planar format, too many colors (%d)"), countColours());
 		return false;
 	}
 
@@ -1077,7 +1077,7 @@ bool SImage::to4bitChunk(MemChunk& out, Palette8bit* pal) {
 	}
 
 	if (countColours() > 16) {
-		wxLogMessage(s_fmt("Cannot convert to 4-bit format, too many colors (%d)"), countColours());
+		wxLogMessage(S_FMT("Cannot convert to 4-bit format, too many colors (%d)"), countColours());
 		return false;
 	}
 
@@ -1467,7 +1467,7 @@ bool SImage::loadBuildTile(const uint8_t* gfx_data, int size, int index) {
 	index %= numimages;
 	if (index < 0)
 		index = numimages + index;
-		
+
 	// Each tile has a 2-byte width, a 2-byte height, and a 4-byte
 	// picanm struct. The header itself is 16 bytes.
 	size_t x_offs = 16;
@@ -1554,7 +1554,7 @@ bool SImage::loadHeretic2M8(const uint8_t* gfx_data, int size, int index) {
 	index %= numimages;
 	if (index < 0)
 		index = numimages + index;
-		
+
 
 	// Setup variables
 	imgindex = index;
@@ -1606,7 +1606,7 @@ bool SImage::loadHeretic2M32(const uint8_t* gfx_data, int size, int index) {
 	index %= numimages;
 	if (index < 0)
 		index = numimages + index;
-		
+
 
 	// Setup variables
 	imgindex = index;
@@ -1647,7 +1647,7 @@ bool SImage::loadQuakeIIWal(const uint8_t* gfx_data, int size, int index) {
 	index %= numimages;
 	if (index < 0)
 		index = numimages + index;
-		
+
 
 	// Setup variables
 	imgindex = index;
@@ -1687,7 +1687,7 @@ bool SImage::loadHalfLifeTex(const uint8_t* gfx_data, int size, int index) {
 	index %= numimages;
 	if (index < 0)
 		index = numimages + index;
-		
+
 
 	// Setup variables
 	imgindex = index;
@@ -1932,7 +1932,7 @@ bool SImage::loadRottRaw(const uint8_t* gfx_data, int size) {
 
 	// Setup variables
 	patch_header_t* header = (patch_header_t*)gfx_data;
-	height = wxINT16_SWAP_ON_BE(header->width); // Cheat a bit since 
+	height = wxINT16_SWAP_ON_BE(header->width); // Cheat a bit since
 	width = wxINT16_SWAP_ON_BE(header->height); // it's column-major
 	offset_x = wxINT16_SWAP_ON_BE(header->left);
 	offset_y = wxINT16_SWAP_ON_BE(header->top);
@@ -2099,7 +2099,7 @@ bool SImage::loadWolfSprite(const uint8_t* gfx_data, int size) {
 	uint16_t * cmdptr = (uint16_t *)(gfx_data + 4);
 	uint32_t i, x, y;
 	for (x = 0 ; x < (unsigned)width ; ++x )
-	{		
+	{
         int16_t * linecmds = (int16_t *)(gfx_data + wxINT16_SWAP_ON_BE( *cmdptr ));
 		cmdptr++;
 		for (; wxINT16_SWAP_ON_BE(*linecmds); linecmds += 3)
@@ -3054,7 +3054,7 @@ bool SImage::loadJediFNT(const uint8_t* gfx_data, int size) {
 		return false;
 
 	// The character data is presented as a list of columns
-	// preceded by a byte for 
+	// preceded by a byte for
 	offset_x = offset_y = 0;
 
 	// Since the format is column-major, we'll use our usual cheat of

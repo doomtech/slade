@@ -98,7 +98,7 @@ bool EntryOperations::modifyGfxOffsets(ArchiveEntry* entry, int auto_type, point
 	string entryformat = type->getFormat();
 	if (!(entryformat == "img_doom" || entryformat == "img_doom_arah" ||
 		entryformat == "img_doom_alpha" || "img_doom_beta" || entryformat == "img_png")) {
-		wxLogMessage(s_fmt("Entry \"%s\" is of type \"%s\" which does not support offsets", chr(entry->getName()), chr(entry->getType()->getName())));
+		wxLogMessage(S_FMT("Entry \"%s\" is of type \"%s\" which does not support offsets", CHR(entry->getName()), CHR(entry->getType()->getName())));
 		return false;
 	}
 
@@ -342,7 +342,7 @@ bool EntryOperations::modifyalPhChunk(ArchiveEntry* entry, bool value) {
 
 	// Check entry type
 	if (!(entry->getType()->getFormat() == "img_png")) {
-		wxLogMessage(s_fmt("Entry \"%s\" is of type \"%s\" rather than PNG", chr(entry->getName()), chr(entry->getType()->getName())));
+		wxLogMessage(S_FMT("Entry \"%s\" is of type \"%s\" rather than PNG", CHR(entry->getName()), CHR(entry->getType()->getName())));
 		return false;
 	}
 
@@ -447,7 +447,7 @@ bool EntryOperations::modifytRNSChunk(ArchiveEntry* entry, bool value) {
 
 	// Check entry type
 	if (!(entry->getType()->getFormat() == "img_png")) {
-		wxLogMessage(s_fmt("Entry \"%s\" is of type \"%s\" rather than PNG", entry->getName().c_str(), entry->getTypeString().c_str()));
+		wxLogMessage(S_FMT("Entry \"%s\" is of type \"%s\" rather than PNG", entry->getName().c_str(), entry->getTypeString().c_str()));
 		return false;
 	}
 
@@ -560,7 +560,7 @@ bool EntryOperations::getalPhChunk(ArchiveEntry* entry) {
 
 	// Check entry type
 	if (entry->getType()->getFormat() != "img_png") {
-		wxLogMessage(s_fmt("Entry \"%s\" is of type \"%s\" rather than PNG", entry->getName().c_str(), entry->getTypeString().c_str()));
+		wxLogMessage(S_FMT("Entry \"%s\" is of type \"%s\" rather than PNG", entry->getName().c_str(), entry->getTypeString().c_str()));
 		return false;
 	}
 
@@ -590,7 +590,7 @@ bool EntryOperations::gettRNSChunk(ArchiveEntry* entry) {
 
 	// Check entry type
 	if (entry->getType()->getFormat() != "img_png") {
-		wxLogMessage(s_fmt("Entry \"%s\" is of type \"%s\" rather than PNG", entry->getName().c_str(), entry->getTypeString().c_str()));
+		wxLogMessage(S_FMT("Entry \"%s\" is of type \"%s\" rather than PNG", entry->getName().c_str(), entry->getTypeString().c_str()));
 		return false;
 	}
 
@@ -872,12 +872,12 @@ bool EntryOperations::compileACS(ArchiveEntry* entry) {
 	// Check it compiled successfully
 	if (wxFileExists(ofile)) {
 		// Check if the script is a map script (BEHAVIOR)
-		if (s_cmpnocase(entry->getName(), "SCRIPTS")) {
+		if (S_CMPNOCASE(entry->getName(), "SCRIPTS")) {
 			// Get entry before SCRIPTS
 			ArchiveEntry* prev = entry->prevEntry();
 
 			// Create a new entry there if it isn't BEHAVIOR
-			if (!prev || !(s_cmpnocase(prev->getName(), "BEHAVIOR")))
+			if (!prev || !(S_CMPNOCASE(prev->getName(), "BEHAVIOR")))
 				prev = entry->getParent()->addNewEntry("BEHAVIOR", entry->getParent()->entryIndex(entry));
 
 			// Import compiled script
@@ -935,14 +935,14 @@ bool EntryOperations::exportAsPNG(ArchiveEntry* entry, string filename) {
 	// Create image from entry
 	SImage image;
 	if (!Misc::loadImageFromEntry(&image, entry)) {
-		wxLogMessage("Error converting %s: %s", chr(entry->getName()), chr(Global::error));
+		wxLogMessage("Error converting %s: %s", CHR(entry->getName()), CHR(Global::error));
 		return false;
 	}
 
 	// Write png data
 	MemChunk png;
 	if (!image.toPNG(png, theMainWindow->getPaletteChooser()->getSelectedPalette(entry))) {
-		wxLogMessage("Error converting %s", chr(entry->getName()));
+		wxLogMessage("Error converting %s", CHR(entry->getName()));
 		return false;
 	}
 
@@ -963,7 +963,7 @@ CONSOLE_COMMAND (test_ee, 1) {
 			if (entry)
 				EntryOperations::openExternal(entry);
 			else
-				wxLogMessage("Entry %s not found", chr(args[a]));
+				wxLogMessage("Entry %s not found", CHR(args[a]));
 		}
 	}
 }

@@ -278,7 +278,7 @@ void GfxCanvas::updateImageTexture() {
  *******************************************************************/
 void GfxCanvas::zoomToFit(bool mag, float padding) {
 	// Determine padding
-	double pad = (double)min(GetSize().x, GetSize().y) * padding;
+	double pad = (double)MIN(GetSize().x, GetSize().y) * padding;
 
 	// Get image dimensions
 	double x_dim = (double)image->getWidth();
@@ -289,7 +289,7 @@ void GfxCanvas::zoomToFit(bool mag, float padding) {
 	double y_scale = ((double)GetSize().y - pad) / y_dim;
 
 	// Set scale to smallest of the 2 (so that none of the image will be clipped)
-	scale = min(x_scale, y_scale);
+	scale = MIN(x_scale, y_scale);
 
 	// If we don't want to magnify the image, clamp scale to a max of 1.0
 	if (!mag && scale > 1)

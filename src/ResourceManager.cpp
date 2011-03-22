@@ -172,7 +172,7 @@ void ResourceManager::listAllPatches() {
 
 	// Add all properties to given list
 	while (i != patches.end()) {
-		wxLogMessage("%s (%d)", chr(i->first), i->second.length());
+		wxLogMessage("%s (%d)", CHR(i->first), i->second.length());
 		i++;
 	}
 }

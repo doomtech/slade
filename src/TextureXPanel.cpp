@@ -86,7 +86,7 @@ string TextureXListView::getItemText(long item, long column) const {
 	if (column == 0)						// Name column
 		return tex->getName();
 	else if (column == 1)					// Size column
-		return s_fmt("%dx%d", tex->getWidth(), tex->getHeight());
+		return S_FMT("%dx%d", tex->getWidth(), tex->getHeight());
 	else if (column == 2)					// Type column
 		return tex->getType();
 	else
@@ -457,14 +457,14 @@ void TextureXPanel::onBtnNewTextureFromFile(wxCommandEvent& e) {
 
 			// If it's not a valid image type, ignore this file
 			if (!entry->getType()->extraProps().propertyExists("image")) {
-				wxLogMessage("%s is not a valid image file", chr(files[a]));
+				wxLogMessage("%s is not a valid image file", CHR(files[a]));
 				continue;
 			}
 
 			// Ask for name for texture
 			wxFileName fn(files[a]);
 			string name = fn.GetName().Upper().Truncate(8);
-			name = wxGetTextFromUser(s_fmt("Enter a texture name for %s:", chr(fn.GetFullName())), "New Texture", name);
+			name = wxGetTextFromUser(S_FMT("Enter a texture name for %s:", CHR(fn.GetFullName())), "New Texture", name);
 			name = name.Truncate(8);
 
 			// Add patch to archive

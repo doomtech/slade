@@ -147,7 +147,7 @@ void AnimatedEntryPanel::populateEntryList() {
 		AnimatedEntry* ent = animated.getEntry(a);
 		string cols[] = { ent->getType() ? "Texture" : "Flat",
 			ent->getFirst(), ent->getLast(),
-			ent->getSpeed() < 65535 ? s_fmt("%d tics", ent->getSpeed()) : "Swirling",
+			ent->getSpeed() < 65535 ? S_FMT("%d tics", ent->getSpeed()) : "Swirling",
 			ent->getDecals()? "Allowed" : " " };
 		list_entries->addItem(a, wxArrayString(5, cols));
 	}

@@ -140,7 +140,7 @@ bool MemChunk::importFile(string filename, uint32_t offset, uint32_t len) {
 	// Return false if file open failed
 	if (!file.IsOpened()) {
 		wxLogMessage("MemChunk::loadFile: Unable to open file %s", filename.c_str());
-		Global::error = s_fmt("Unable to open file %s", filename.c_str());
+		Global::error = S_FMT("Unable to open file %s", filename.c_str());
 		return false;
 	}
 
@@ -247,7 +247,7 @@ bool MemChunk::exportFile(string filename, uint32_t start, uint32_t size) {
 	// Open file for writing
 	wxFile file(filename, wxFile::write);
 	if (!file.IsOpened()) {
-		wxLogMessage(s_fmt("Unable to write to file %s", filename.c_str()));
+		wxLogMessage(S_FMT("Unable to write to file %s", filename.c_str()));
 		Global::error = "Unable to open file for writing";
 		return false;
 	}

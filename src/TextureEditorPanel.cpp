@@ -221,7 +221,7 @@ void TextureEditorPanel::updateTextureScaleLabel() {
 		scaled_y /= tex_current->getScaleY();
 
 	// Update the label
-	label_scaled_size->SetLabel(s_fmt("Scaled Size: %dx%d", scaled_x, scaled_y));
+	label_scaled_size->SetLabel(S_FMT("Scaled Size: %dx%d", scaled_x, scaled_y));
 }
 
 /* TextureEditorPanel::createPatchControls
@@ -583,7 +583,7 @@ void TextureEditorPanel::onZoomChanged(wxCommandEvent& e) {
 	zoom_percent -= remainder;
 
 	// Update zoom label
-	label_current_zoom->SetLabel(s_fmt("%d%%", zoom_percent));
+	label_current_zoom->SetLabel(S_FMT("%d%%", zoom_percent));
 
 	// Zoom gfx canvas and update
 	tex_canvas->setScale((double)zoom_percent * 0.01);

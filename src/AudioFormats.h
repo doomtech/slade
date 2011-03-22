@@ -180,7 +180,7 @@ public:
 			char temp[18] = "";
 			memcpy(temp, mc.getData(), 18);
 			temp[17] = 0;
-			if (!s_fmt("%s", temp).CmpNoCase("Extended module: ")) {
+			if (!S_FMT("%s", temp).CmpNoCase("Extended module: ")) {
 				if (mc[37] == 0x1a) {
 					return EDF_TRUE;
 				}

@@ -138,7 +138,7 @@ string ArchiveEntryList::getItemText(long item, long column) const {
 				return "INVALID DIRECTORY";
 
 			// Return the number of items in the directory
-			return s_fmt("%d entries", dir->numEntries() + dir->nChildren());
+			return S_FMT("%d entries", dir->numEntries() + dir->nChildren());
 		}
 		else
 			return entry->getSizeString();	// Not a folder, just return the normal size string
@@ -338,7 +338,7 @@ void ArchiveEntryList::applyFilter() {
 			filter.push_back(index);	// If no category specified, just add all entries to the filter
 		else {
 			// Check for category match
-			if (s_cmpnocase(entry->getType()->getCategory(), filter_category))
+			if (S_CMPNOCASE(entry->getType()->getCategory(), filter_category))
 				filter.push_back(index);
 		}
 

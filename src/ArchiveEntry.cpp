@@ -420,7 +420,7 @@ bool ArchiveEntry::exportFile(string filename) {
 
 	// Check it opened ok
 	if (!file.IsOpened()) {
-		Global::error = s_fmt("Unable to open file %s for writing", filename);
+		Global::error = S_FMT("Unable to open file %s for writing", filename);
 		return false;
 	}
 

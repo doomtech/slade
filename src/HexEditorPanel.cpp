@@ -84,7 +84,7 @@ string HexTable::GetValue(int row, int col) {
 		return "";
 	else {
 		uint8_t val = data[row*NUMCOLS + col];
-		return s_fmt("%02X", val);
+		return S_FMT("%02X", val);
 	}
 }
 
@@ -353,7 +353,7 @@ void HexEditorPanel::onCellSelected(wxGridEvent& e) {
 		return;
 
 	// Reset labels
-	label_offset->SetLabel(s_fmt("Offset: %d", offset));
+	label_offset->SetLabel(S_FMT("Offset: %d", offset));
 	label_byte->SetLabel("Signed Byte:");
 	label_ubyte->SetLabel("Unsigned Byte:");
 	label_ascii->SetLabel("ASCII:");
@@ -391,20 +391,20 @@ void HexEditorPanel::onCellSelected(wxGridEvent& e) {
 		vubyte = table_hex->getUByteValue(offset);
 		vbyte = table_hex->getByteValue(offset);
 
-		label_byte->SetLabel(s_fmt("Signed Byte: %d", vbyte));
-		label_ubyte->SetLabel(s_fmt("Unsigned Byte: %u", vubyte));
+		label_byte->SetLabel(S_FMT("Signed Byte: %d", vbyte));
+		label_ubyte->SetLabel(S_FMT("Unsigned Byte: %u", vubyte));
 		if (vubyte <= 128)
-			label_ascii->SetLabel(s_fmt("ASCII: %s", chr(CodePages::fromASCII(vubyte))));
+			label_ascii->SetLabel(S_FMT("ASCII: %s", CHR(CodePages::fromASCII(vubyte))));
 
 		if (size > 1) {
 			// Short values
 			vshort = table_hex->getShortValue(offset);
 			vushort = table_hex->getUShortValue(offset);
 
-			label_short_le->SetLabel(s_fmt("Signed Short: %d", wxINT16_SWAP_ON_BE(vshort)));
-			label_ushort_le->SetLabel(s_fmt("Unsigned Short: %u", wxUINT16_SWAP_ON_BE(vushort)));
-			label_short_be->SetLabel(s_fmt("Signed Short: %d", wxINT16_SWAP_ON_LE(vshort)));
-			label_ushort_be->SetLabel(s_fmt("Unsigned Short: %u", wxUINT16_SWAP_ON_LE(vushort)));
+			label_short_le->SetLabel(S_FMT("Signed Short: %d", wxINT16_SWAP_ON_BE(vshort)));
+			label_ushort_le->SetLabel(S_FMT("Unsigned Short: %u", wxUINT16_SWAP_ON_BE(vushort)));
+			label_short_be->SetLabel(S_FMT("Signed Short: %d", wxINT16_SWAP_ON_LE(vshort)));
+			label_ushort_be->SetLabel(S_FMT("Unsigned Short: %u", wxUINT16_SWAP_ON_LE(vushort)));
 
 			if (size > 3) {
 				// 4-byte values
@@ -412,10 +412,10 @@ void HexEditorPanel::onCellSelected(wxGridEvent& e) {
 				vuint32 = table_hex->getUInt32Value(offset);
 				vfloat = table_hex->getFloatValue(offset);
 
-				label_int32_le->SetLabel(s_fmt("Signed Int (32bit): %d", wxINT32_SWAP_ON_BE(vint32)));
-				label_uint32_le->SetLabel(s_fmt("Unsigned Int (32bit): %u", wxUINT32_SWAP_ON_BE(vuint32)));
-				label_int32_be->SetLabel(s_fmt("Signed Int (32bit): %d", wxINT32_SWAP_ON_LE(vint32)));
-				label_uint32_be->SetLabel(s_fmt("Unsigned Int (32bit): %u", wxUINT32_SWAP_ON_LE(vuint32)));
+				label_int32_le->SetLabel(S_FMT("Signed Int (32bit): %d", wxINT32_SWAP_ON_BE(vint32)));
+				label_uint32_le->SetLabel(S_FMT("Unsigned Int (32bit): %u", wxUINT32_SWAP_ON_BE(vuint32)));
+				label_int32_be->SetLabel(S_FMT("Signed Int (32bit): %d", wxINT32_SWAP_ON_LE(vint32)));
+				label_uint32_be->SetLabel(S_FMT("Unsigned Int (32bit): %u", wxUINT32_SWAP_ON_LE(vuint32)));
 
 				if (size > 7) {
 					// 8-byte values

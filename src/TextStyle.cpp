@@ -84,35 +84,35 @@ bool TextStyle::parse(ParseTreeNode* node) {
 		string name = child->getName();
 
 		// Font name
-		if (s_cmpnocase(name, "font"))
+		if (S_CMPNOCASE(name, "font"))
 			font = child->getStringValue();
 
 		// Font size
-		if (s_cmpnocase(name, "size"))
+		if (S_CMPNOCASE(name, "size"))
 			size = child->getIntValue();
 
 		// Foreground colour
-		if (s_cmpnocase(name, "foreground")) {
+		if (S_CMPNOCASE(name, "foreground")) {
 			foreground.set(child->getIntValue(0), child->getIntValue(1), child->getIntValue(2), 255);
 			fg_defined = true;
 		}
 
 		// Background colour
-		if (s_cmpnocase(name, "background")) {
+		if (S_CMPNOCASE(name, "background")) {
 			background.set(child->getIntValue(0), child->getIntValue(1), child->getIntValue(2), 255);
 			bg_defined = true;
 		}
 
 		// Bold
-		if (s_cmpnocase(name, "bold"))
+		if (S_CMPNOCASE(name, "bold"))
 			bold = (int)child->getBoolValue();
 
 		// Italic
-		if (s_cmpnocase(name, "italic"))
+		if (S_CMPNOCASE(name, "italic"))
 			italic = (int)child->getBoolValue();
 
 		// Underlined
-		if (s_cmpnocase(name, "underlined"))
+		if (S_CMPNOCASE(name, "underlined"))
 			underlined = (int)child->getBoolValue();
 	}
 
@@ -189,43 +189,43 @@ string TextStyle::getDefinition(unsigned tabs) {
 	// Write font
 	if (!font.IsEmpty()) {
 		for (unsigned t = 0; t < tabs; t++) ret += "\t";
-		ret += s_fmt("font = \"%s\";\n", chr(font));
+		ret += S_FMT("font = \"%s\";\n", CHR(font));
 	}
 
 	// Write size
 	if (size >= 0) {
 		for (unsigned t = 0; t < tabs; t++) ret += "\t";
-		ret += s_fmt("size = %d;\n", size);
+		ret += S_FMT("size = %d;\n", size);
 	}
 
 	// Write foreground
 	if (fg_defined) {
 		for (unsigned t = 0; t < tabs; t++) ret += "\t";
-		ret += s_fmt("foreground = %d, %d, %d;\n", foreground.r, foreground.g, foreground.b);
+		ret += S_FMT("foreground = %d, %d, %d;\n", foreground.r, foreground.g, foreground.b);
 	}
 
 	// Write background
 	if (bg_defined) {
 		for (unsigned t = 0; t < tabs; t++) ret += "\t";
-		ret += s_fmt("background = %d, %d, %d;\n", background.r, background.g, background.b);
+		ret += S_FMT("background = %d, %d, %d;\n", background.r, background.g, background.b);
 	}
 
 	// Write bold
 	if (bold >= 0) {
 		for (unsigned t = 0; t < tabs; t++) ret += "\t";
-		ret += s_fmt("bold = %d;\n", bold);
+		ret += S_FMT("bold = %d;\n", bold);
 	}
 
 	// Write italic
 	if (italic >= 0) {
 		for (unsigned t = 0; t < tabs; t++) ret += "\t";
-		ret += s_fmt("italic = %d;\n", italic);
+		ret += S_FMT("italic = %d;\n", italic);
 	}
 
 	// Write underlined
 	if (underlined >= 0) {
 		for (unsigned t = 0; t < tabs; t++) ret += "\t";
-		ret += s_fmt("underlined = %d;\n", underlined);
+		ret += S_FMT("underlined = %d;\n", underlined);
 	}
 
 	return ret;
@@ -341,25 +341,25 @@ bool StyleSet::copySet(StyleSet* copy) {
  *******************************************************************/
 TextStyle* StyleSet::getStyle(string name) {
 	// Return style matching name given
-	if (s_cmpnocase(name, "default"))
+	if (S_CMPNOCASE(name, "default"))
 		return &ts_default;
-	else if (s_cmpnocase(name, "preprocessor"))
+	else if (S_CMPNOCASE(name, "preprocessor"))
 		return &ts_preprocessor;
-	else if (s_cmpnocase(name, "comment"))
+	else if (S_CMPNOCASE(name, "comment"))
 		return &ts_comment;
-	else if (s_cmpnocase(name, "string"))
+	else if (S_CMPNOCASE(name, "string"))
 		return &ts_string;
-	else if (s_cmpnocase(name, "character"))
+	else if (S_CMPNOCASE(name, "character"))
 		return &ts_character;
-	else if (s_cmpnocase(name, "keyword"))
+	else if (S_CMPNOCASE(name, "keyword"))
 		return &ts_keyword;
-	else if (s_cmpnocase(name, "constant"))
+	else if (S_CMPNOCASE(name, "constant"))
 		return &ts_constant;
-	else if (s_cmpnocase(name, "function"))
+	else if (S_CMPNOCASE(name, "function"))
 		return &ts_function;
-	else if (s_cmpnocase(name, "bracematch"))
+	else if (S_CMPNOCASE(name, "bracematch"))
 		return &ts_bracematch;
-	else if (s_cmpnocase(name, "bracebad"))
+	else if (S_CMPNOCASE(name, "bracebad"))
 		return &ts_bracebad;
 
 	// Not a valid style
@@ -380,7 +380,7 @@ bool StyleSet::writeFile(string filename) {
 	file.Write("styleset {\n");
 
 	// Name
-	file.Write(s_fmt("\tname = \"%s\";\n\n", chr(name)));
+	file.Write(S_FMT("\tname = \"%s\";\n\n", CHR(name)));
 
 	// Default style
 	file.Write("\tdefault {\n");
@@ -509,7 +509,7 @@ StyleSet* StyleSet::currentSet() {
 bool StyleSet::loadSet(string name) {
 	// Search for set matching name
 	for (unsigned a = 0; a < style_sets.size(); a++) {
-		if (s_cmpnocase(style_sets[a]->name, name)) {
+		if (S_CMPNOCASE(style_sets[a]->name, name)) {
 			ss_current->copySet(style_sets[a]);
 			return true;
 		}

@@ -10,6 +10,8 @@ enum SIFormat {
 	RGBA,		// 4 bytes per pixel: RGBA
 };
 
+class Translation;
+
 class SImage : public Announcer {
 private:
 	int			width;
@@ -119,6 +121,7 @@ public:
 	bool	crop(long x1, long y1, long x2, long y2);
 	bool	resize(int nwidth, int nheight);
 	bool	setImageData(uint8_t *ndata, int nwidth, int nheight, SIFormat nformat);
+	bool	applyTranslation(Translation* tr, Palette8bit* pal = NULL);
 };
 
 #endif //__SIMAGE_H__

@@ -99,7 +99,7 @@ public:
 	void OnStackFrame(const wxStackFrame& frame) {
 		string location = wxEmptyString;
 		if (frame.HasSourceLocation())
-			location = s_fmt("(%s:%d) ", frame.GetFileName().c_str(), frame.GetLine());
+			location = S_FMT("(%s:%d) ", frame.GetFileName().c_str(), frame.GetLine());
 
 		string parameters = wxEmptyString;
 		/*
@@ -116,7 +116,7 @@ public:
 		}
 		*/
 
-		stack_trace.Append(s_fmt("%d: %s%s(%s)\n", frame.GetLevel(), location.c_str(), frame.GetName().c_str(), parameters.c_str()));
+		stack_trace.Append(S_FMT("%d: %s%s(%s)\n", frame.GetLevel(), location.c_str(), frame.GetName().c_str(), parameters.c_str()));
 	}
 };
 
@@ -250,7 +250,7 @@ bool MainApp::initDirectories() {
 	// Create user dir if necessary
 	if (!wxDirExists(dir_user)) {
 		if (!wxMkdir(dir_user)) {
-			wxMessageBox(s_fmt("Unable to create user directory \"%s\"", dir_user.c_str()), "Error", wxICON_ERROR);
+			wxMessageBox(S_FMT("Unable to create user directory \"%s\"", dir_user.c_str()), "Error", wxICON_ERROR);
 			return false;
 		}
 	}
@@ -261,7 +261,7 @@ bool MainApp::initDirectories() {
 		if (!wxDirExists(dir_temp)) {
 			if (!wxMkdir(dir_temp)) {
 				// Unable to create it, just use system temp dir
-				wxMessageBox(s_fmt("Unable to create temp directory \"%s\", using system temp directory instead", dir_temp.c_str()), "Error", wxICON_ERROR);
+				wxMessageBox(S_FMT("Unable to create temp directory \"%s\", using system temp directory instead", dir_temp.c_str()), "Error", wxICON_ERROR);
 				temp_use_appdir = false;
 			}
 		}
@@ -407,7 +407,7 @@ void MainApp::OnFatalException() {
 void MainApp::initLogFile() {
 	// Set wxLog target(s)
 	wxLog::SetActiveTarget(new SLADELog());
-	FILE* log_file = fopen(chr(appPath("slade3.log", DIR_DATA)), "wt");
+	FILE* log_file = fopen(CHR(appPath("slade3.log", DIR_DATA)), "wt");
 	new wxLogChain(new wxLogStderr(log_file));
 
 	// Write logfile header
@@ -500,19 +500,19 @@ void MainApp::saveConfigFile() {
 	save_cvars(file);
 
 	// Write main window AUI layout
-	string layout = s_fmt("%3d%s", MW_LAYOUT_VERS, main_window_layout.c_str());
-	file.Write(s_fmt("main_window_layout \"%s\"\n", chr(layout)));
+	string layout = S_FMT("%3d%s", MW_LAYOUT_VERS, main_window_layout.c_str());
+	file.Write(S_FMT("main_window_layout \"%s\"\n", CHR(layout)));
 
 	// Write base resource archive paths
 	file.Write("\nbase_resource_paths\n{\n");
 	for (size_t a = 0; a < theArchiveManager->numBaseResourcePaths(); a++)
-		file.Write(s_fmt("\t\"%s\"\n", theArchiveManager->getBaseResourcePath(a)));
+		file.Write(S_FMT("\t\"%s\"\n", theArchiveManager->getBaseResourcePath(a)));
 	file.Write("}\n");
 
 	// Write recent files list (in reverse to keep proper order when reading back)
 	file.Write("\nrecent_files\n{\n");
 	for (int a = theArchiveManager->numRecentFiles()-1; a >= 0; a--)
-		file.Write(s_fmt("\t\"%s\"\n", theArchiveManager->recentFile(a)));
+		file.Write(S_FMT("\t\"%s\"\n", theArchiveManager->recentFile(a)));
 	file.Write("}\n");
 
 	// Close configuration file

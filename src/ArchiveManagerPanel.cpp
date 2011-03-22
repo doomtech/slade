@@ -583,7 +583,7 @@ void ArchiveManagerPanel::openTextureTab(int archive_index) {
 			return;
 		}
 
-		notebook_archives->AddPage(txed, s_fmt("Texture Editor (%s)", archive->getFilename(false).c_str()), true);
+		notebook_archives->AddPage(txed, S_FMT("Texture Editor (%s)", archive->getFilename(false).c_str()), true);
 		notebook_archives->SetPageBitmap(notebook_archives->GetPageCount() - 1, getIcon("e_texturex"));
 		txed->SetName("texture");
 		txed->Show(true);
@@ -646,7 +646,7 @@ void ArchiveManagerPanel::openFile(string filename) {
 	// Check that the archive opened ok
 	if (!new_archive) {
 		// If archive didn't open ok, show error message
-		wxMessageBox(s_fmt("Error opening %s:\n%s", filename.c_str(), Global::error.c_str()), "Error", wxICON_ERROR);
+		wxMessageBox(S_FMT("Error opening %s:\n%s", filename.c_str(), Global::error.c_str()), "Error", wxICON_ERROR);
 	}
 }
 
@@ -686,7 +686,7 @@ void ArchiveManagerPanel::saveAll() {
 			// Save the archive if possible
 			if (!archive->save()) {
 				// If there was an error pop up a message box
-				wxMessageBox(s_fmt("Error: %s", Global::error.c_str()), "Error", wxICON_ERROR);
+				wxMessageBox(S_FMT("Error: %s", Global::error.c_str()), "Error", wxICON_ERROR);
 			}
 		}
 		else {
@@ -701,7 +701,7 @@ void ArchiveManagerPanel::saveAll() {
 				// Save the archive
 				if (!archive->save(filename)) {
 					// If there was an error pop up a message box
-					wxMessageBox(s_fmt("Error: %s", Global::error.c_str()), "Error", wxICON_ERROR);
+					wxMessageBox(S_FMT("Error: %s", Global::error.c_str()), "Error", wxICON_ERROR);
 				}
 
 				// Save 'dir_last'
@@ -756,7 +756,7 @@ bool ArchiveManagerPanel::saveArchive(Archive* archive) {
 		// Save the archive if possible
 		if (!archive->save()) {
 			// If there was an error pop up a message box
-			wxMessageBox(s_fmt("Error: %s", Global::error.c_str()), "Error", wxICON_ERROR);
+			wxMessageBox(S_FMT("Error: %s", Global::error.c_str()), "Error", wxICON_ERROR);
 			return false;
 		}
 
@@ -783,7 +783,7 @@ bool ArchiveManagerPanel::saveArchiveAs(Archive* archive) {
 		// Save the archive
 		if (!archive->save(filename)) {
 			// If there was an error pop up a message box
-			wxMessageBox(s_fmt("Error: %s", Global::error.c_str()), "Error", wxICON_ERROR);
+			wxMessageBox(S_FMT("Error: %s", Global::error.c_str()), "Error", wxICON_ERROR);
 			return false;
 		}
 
@@ -810,7 +810,7 @@ bool ArchiveManagerPanel::closeArchive(Archive* archive) {
 
 	// If the archive has unsaved changes, prompt to save
 	if (archive->isModified()) {
-		wxMessageDialog md(this, s_fmt("Save changes to %s?", archive->getFilename(false)), "Unsaved Changes", wxYES_NO|wxCANCEL);
+		wxMessageDialog md(this, S_FMT("Save changes to %s?", archive->getFilename(false)), "Unsaved Changes", wxYES_NO|wxCANCEL);
 		int result = md.ShowModal();
 		if (result == wxID_YES) {
 			// User selected to save
@@ -1244,7 +1244,7 @@ void ArchiveManagerPanel::goToBookmark(long index) {
 	wxWindow* tab = notebook_archives->GetPage(notebook_archives->GetSelection());
 
 	// Check it's an archive panel
-	if (!(s_cmp(tab->GetName(), "archive")))
+	if (!(S_CMP(tab->GetName(), "archive")))
 		return;
 
 	// Finally, open the entry
@@ -1371,7 +1371,7 @@ void ArchiveManagerPanel::onArchiveTabChanged(wxAuiNotebookEvent& e) {
 	/*
 	if (isArchivePanel(selection)) {
 		Archive* archive = ((ArchivePanel*)notebook_archives->GetPage(selection))->getArchive();
-		((wxFrame*)GetParent())->SetTitle(s_fmt("SLADE - %s", chr(archive->getFilename(false))));
+		((wxFrame*)GetParent())->SetTitle(s_fmt("SLADE - %s", CHR(archive->getFilename(false))));
 	}
 	else
 		((wxFrame*)GetParent())->SetTitle("SLADE");
@@ -1392,7 +1392,10 @@ void ArchiveManagerPanel::onArchiveTabClose(wxAuiNotebookEvent& e) {
 	if (close_archive_with_tab) {
 		tab_closing = true;
 		Archive* archive = getArchive(e.GetInt());
-		if (archive) closeArchive(archive);
+		if (archive) {
+			if (!closeArchive(archive))
+				e.Veto();
+		}
 		tab_closing = false;
 	}
 }
