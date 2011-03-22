@@ -52,7 +52,9 @@ typedef wxString string;
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
 #elif _WINDOWS
+#ifndef GLEW_STATIC	// For some reason vs2010 doesn't like this not being defined in the project settings
 #define GLEW_STATIC
+#endif
 #include "glew/glew.h"
 #include "glew/wglew.h"
 #else

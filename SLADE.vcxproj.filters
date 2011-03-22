@@ -432,6 +432,12 @@
     <ClCompile Include="src\glew\glew.c">
       <Filter>External\GLEW</Filter>
     </ClCompile>
+    <ClCompile Include="src\Translation.cpp">
+      <Filter>Resources\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Math.cpp">
+      <Filter>General\Utility</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -806,6 +812,12 @@
     </ClInclude>
     <ClInclude Include="src\glew\wglew.h">
       <Filter>External\GLEW</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Translation.h">
+      <Filter>Resources\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Math.h">
+      <Filter>General\Utility</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

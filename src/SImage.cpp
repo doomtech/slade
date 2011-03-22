@@ -428,8 +428,7 @@ bool SImage::convertPaletted(Palette8bit* pal_target, Palette8bit* pal_current) 
 	data = new uint8_t[width * height];
 	unsigned i = 0;
 	rgba_t col;
-	for (unsigned a = 0; a < width*height; a++) {
-		//col.set(rgba_data[i++], rgba_data[i++], rgba_data[i++]);
+	for (int a = 0; a < width*height; a++) {
 		col.r = rgba_data[i++];
 		col.g = rgba_data[i++];
 		col.b = rgba_data[i++];
@@ -873,7 +872,7 @@ bool SImage::applyTranslation(Translation* tr, Palette8bit* pal) {
 		pal = &palette;
 
 	// Go through pixels
-	for (unsigned p = 0; p < width*height; p++) {
+	for (int p = 0; p < width*height; p++) {
 		uint8_t i = data[p];
 
 		// No need to process transparent pixels

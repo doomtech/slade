@@ -112,8 +112,8 @@ bool MultiEntryPanel::loadEntries(vector<ArchiveEntry*>& list) {
 	}
 
 	// Update labels
-	label_entries->SetLabel(s_fmt("%d selected entries", entries.size()));
-	label_size->SetLabel(s_fmt("Total size: %s", Misc::sizeAsString(total_size).c_str()));
+	label_entries->SetLabel(S_FMT("%d selected entries", entries.size()));
+	label_size->SetLabel(S_FMT("Total size: %s", Misc::sizeAsString(total_size).c_str()));
 
 	// Update panel layout
 	updateLayout();
