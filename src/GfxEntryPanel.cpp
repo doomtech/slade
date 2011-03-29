@@ -36,6 +36,7 @@
 #include "PaletteManager.h"
 #include "EntryOperations.h"
 #include "Icons.h"
+#include "GfxConvDialog.h"
 #include <wx/dialog.h>
 #include <wx/clrpicker.h>
 
@@ -297,25 +298,15 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 	spin_yoffset = new wxSpinCtrl(this, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, SHRT_MIN, SHRT_MAX, 0);
 	hbox->Add(new wxStaticText(this, -1, "Offsets:"), 0, wxALIGN_CENTER_VERTICAL, 0);
 	hbox->Add(spin_xoffset, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
-	hbox->Add(spin_yoffset, 0, wxEXPAND|wxRIGHT, 4);
-
-	// PNG stuff
-	hbox->AddStretchSpacer();
-	cb_alph_chunk = new wxCheckBox(this, -1, "alPh");
-	hbox->Add(cb_alph_chunk, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
-	cb_trns_chunk = new wxCheckBox(this, -1, "tRNS");
-	hbox->Add(cb_trns_chunk, 0, wxEXPAND, 0);
-	hbox->AddSpacer(8);
+	hbox->Add(spin_yoffset, 0, wxEXPAND|wxRIGHT, 0);
 
 	// Custom menu
 	menu_custom = new wxMenu();
-	menu_custom->Append(MENU_GFXEP_CONVERT, "Convert To...");
-	menu_custom->AppendSeparator();
 	menu_custom->Append(MENU_GFXEP_MIRROR, "Mirror");
 	menu_custom->Append(MENU_GFXEP_FLIP, "Flip");
 	menu_custom->Append(MENU_GFXEP_ROTATE, "Rotate");
 	menu_custom->AppendSeparator();
-	menu_custom->Append(MENU_GFXEP_TRANSLATE, "Colour Translation");
+	menu_custom->Append(MENU_GFXEP_TRANSLATE, "Colour Remap");
 	menu_custom->Append(MENU_GFXEP_COLOURISE, "Colourise");
 	menu_custom->Append(MENU_GFXEP_TINT, "Tint");
 	menu_custom->AppendSeparator();
@@ -329,8 +320,6 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 	spin_yoffset->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &GfxEntryPanel::onYOffsetChanged, this);
 	combo_offset_type->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &GfxEntryPanel::onOffsetTypeChanged, this);
 	cb_tile->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &GfxEntryPanel::onTileChanged, this);
-	cb_alph_chunk->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &GfxEntryPanel::onalPhChanged, this);
-	cb_trns_chunk->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &GfxEntryPanel::ontRNSChanged, this);
 	Bind(wxEVT_GFXCANVAS_OFFSET_CHANGED, &GfxEntryPanel::onGfxOffsetChanged, this, gfx_canvas->GetId());
 	btn_nextimg->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &GfxEntryPanel::onBtnNextImg, this);
 	btn_previmg->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &GfxEntryPanel::onBtnPrevImg, this);
@@ -382,6 +371,7 @@ bool GfxEntryPanel::saveEntry() {
 		SImage* image = gfx_canvas->getImage();
 
 		// Write depending on type
+		// TODO: I really should write a proper SImage format system so this kind of thing isn't needed
 		if (entry->getType()->getFormat() == "img_doom")
 			image->toDoomGfx(entry->getMCData());
 		else if (entry->getType()->getFormat() == "img_png")
@@ -426,26 +416,18 @@ void GfxEntryPanel::refresh() {
 	spin_xoffset->SetValue(gfx_canvas->getImage()->offset().x);
 	spin_yoffset->SetValue(gfx_canvas->getImage()->offset().y);
 
-	// Set PNG check boxes
+	// Set PNG check menus
 	if (this->entry->getType() != NULL && this->entry->getType()->getFormat() == "img_png") {
 		// Check for alph
 		alph = EntryOperations::getalPhChunk(this->entry);
-		cb_alph_chunk->Enable(true);
-		cb_alph_chunk->SetValue(alph);
 		menu_custom->Enable(MENU_GFXEP_ALPH, true);
 		menu_custom->Check(MENU_GFXEP_ALPH, alph);
 
 		// Check for trns
 		trns = EntryOperations::gettRNSChunk(this->entry);
-		cb_trns_chunk->Enable(true);
-		cb_trns_chunk->SetValue(trns);
 		menu_custom->Enable(MENU_GFXEP_TRNS, true);
 		menu_custom->Check(MENU_GFXEP_TRNS, trns);
 	} else {
-		cb_alph_chunk->Enable(false);
-		cb_alph_chunk->SetValue(false);
-		cb_trns_chunk->Enable(false);
-		cb_trns_chunk->SetValue(false);
 		menu_custom->Enable(MENU_GFXEP_ALPH, false);
 		menu_custom->Enable(MENU_GFXEP_TRNS, false);
 		menu_custom->Check(MENU_GFXEP_ALPH, false);
@@ -597,13 +579,8 @@ void GfxEntryPanel::applyViewType() {
 }
 
 void GfxEntryPanel::handleAction(int menu_id) {
-	// Convert To
-	if (menu_id == MENU_GFXEP_CONVERT) {
-		wxMessageBox("Not implemented");
-	}
-
 	// Mirror
-	else if (menu_id == MENU_GFXEP_MIRROR) {
+	if (menu_id == MENU_GFXEP_MIRROR) {
 		// Mirror X
 		gfx_canvas->getImage()->mirror(false);
 
@@ -776,22 +753,6 @@ void GfxEntryPanel::onOffsetTypeChanged(wxCommandEvent& e) {
 void GfxEntryPanel::onTileChanged(wxCommandEvent& e) {
 	combo_offset_type->Enable(!cb_tile->IsChecked());
 	applyViewType();
-}
-
-/* GfxEntryPanel::cbalPhChecked
- * Called when the 'alPh chunk' checkbox is checked/unchecked
- *******************************************************************/
-void GfxEntryPanel::onalPhChanged(wxCommandEvent& e) {
-	// Set changed
-	setModified();
-}
-
-/* GfxEntryPanel::cbtRNSChecked
- * Called when the 'tRNS chunk' checkbox is checked/unchecked
- *******************************************************************/
-void GfxEntryPanel::ontRNSChanged(wxCommandEvent& e) {
-	// Set changed
-	setModified();
 }
 
 /* GfxEntryPanel::gfxOffsetChanged

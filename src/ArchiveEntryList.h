@@ -57,6 +57,7 @@ public:
 	bool	setDir(ArchiveTreeNode* dir);
 
 	ArchiveEntry*				getEntry(int index) const;
+	int							getEntryIndex(int index);
 	ArchiveEntry*				getFocusedEntry();
 	vector<ArchiveEntry*>		getSelectedEntries();
 	ArchiveEntry*				getLastSelectedEntry();

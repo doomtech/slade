@@ -18,8 +18,6 @@ private:
 	wxSpinCtrl*		spin_xoffset;
 	wxSpinCtrl*		spin_yoffset;
 	wxCheckBox*		cb_tile;
-	wxCheckBox*		cb_alph_chunk;
-	wxCheckBox*		cb_trns_chunk;
 
 	wxButton*		btn_nextimg;
 	wxButton*		btn_previmg;
@@ -28,8 +26,7 @@ private:
 
 public:
 	enum {
-		MENU_GFXEP_CONVERT = 2000,
-		MENU_GFXEP_MIRROR,
+		MENU_GFXEP_MIRROR = 300,
 		MENU_GFXEP_FLIP,
 		MENU_GFXEP_ROTATE,
 		MENU_GFXEP_TRANSLATE,
@@ -57,8 +54,6 @@ public:
 	void	onYOffsetChanged(wxSpinEvent& e);
 	void	onOffsetTypeChanged(wxCommandEvent& e);
 	void	onTileChanged(wxCommandEvent& e);
-	void	onalPhChanged(wxCommandEvent& e);
-	void	ontRNSChanged(wxCommandEvent& e);
 	void	onGfxOffsetChanged(wxEvent& e);
 	void	onBtnNextImg(wxCommandEvent& e);
 	void	onBtnPrevImg(wxCommandEvent& e);

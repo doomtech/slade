@@ -863,6 +863,38 @@ bool Archive::removeEntry(ArchiveEntry* entry, bool delete_entry) {
 }
 
 /* Archive::swapEntries
+ * Swaps the entries at [index1] and [index2] in [dir]. If [dir] is
+ * not specified, the root dir is used. Returns true if the swap
+ * succeeded, false otherwise
+ *******************************************************************/
+bool Archive::swapEntries(unsigned index1, unsigned index2, ArchiveTreeNode* dir) {
+	// Get directory
+	if (!dir)
+		dir = dir_root;
+
+	// Do swap
+	if (dir->swapEntries(index1, index2)) {
+		// Announce the swap
+		/* Below shouldn't be needed, and is probably pretty slow when swapping many entries at once
+		MemChunk mc(16);
+		int i1 = index1;
+		int i2 = index2;
+		wxUIntPtr ptr1 = wxPtrToUInt(dir->getEntry(index1));
+		wxUIntPtr ptr2 = wxPtrToUInt(dir->getEntry(index2));
+		mc.write(&i1, sizeof(int));
+		mc.write(&i2, sizeof(int));
+		mc.write(&ptr1, sizeof(wxUIntPtr));
+		mc.write(&ptr2, sizeof(wxUIntPtr));
+		announce("entries_swapped", mc);
+		*/
+		announce("entries_swapped");
+		return true;
+	}
+	else
+		return false;
+}
+
+/* Archive::swapEntries
  * Swaps [entry1] and [entry2]. Returns false if either entry is
  * invalid or if both entries are not in the same directory, true
  * otherwise
@@ -905,6 +937,7 @@ bool Archive::swapEntries(ArchiveEntry* entry1, ArchiveEntry* entry2) {
 	dir->swapEntries(i1, i2);
 
 	// Announce the swap
+	/*
 	MemChunk mc(16);
 	wxUIntPtr ptr1 = wxPtrToUInt(entry1);
 	wxUIntPtr ptr2 = wxPtrToUInt(entry2);
@@ -912,7 +945,8 @@ bool Archive::swapEntries(ArchiveEntry* entry1, ArchiveEntry* entry2) {
 	mc.write(&i2, sizeof(int));
 	mc.write(&ptr1, sizeof(wxUIntPtr));
 	mc.write(&ptr2, sizeof(wxUIntPtr));
-	announce("entries_swapped", mc);
+	*/
+	announce("entries_swapped");
 
 	// Set modified
 	setModified(true);
@@ -979,6 +1013,14 @@ bool Archive::renameEntry(ArchiveEntry* entry, string name) {
 	// Check if entry is locked
 	if (entry->isLocked())
 		return false;
+
+	// Announce (before actually renaming in case old name is still needed)
+	MemChunk mc;
+	int index = entryIndex(entry);
+	wxUIntPtr ptr = wxPtrToUInt(entry);
+	mc.write(&index, sizeof(int));
+	mc.write(&ptr, sizeof(wxUIntPtr));
+	announce("entry_renaming", mc);
 
 	// Rename the entry
 	entry->rename(name);

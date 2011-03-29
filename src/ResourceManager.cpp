@@ -224,8 +224,8 @@ void ResourceManager::onAnnouncement(Announcer* announcer, string event_name, Me
 		addEntry(entry);
 	}
 
-	// An entry is removed
-	if (event_name == "entry_removing") {
+	// An entry is removed or renamed
+	if (event_name == "entry_removing" || event_name == "entry_renaming") {
 		int index;
 		wxUIntPtr ptr;
 		event_data.read(&index, sizeof(int));

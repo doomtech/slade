@@ -48,7 +48,7 @@ public:
 
 	// wxWidgets IDs
 	enum {
-		M_BEGIN,
+		M_BEGIN = 400,
 
 		M_PATCH_ADD,
 		M_PATCH_REMOVE,

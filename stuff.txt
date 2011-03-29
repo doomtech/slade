@@ -7,6 +7,7 @@
 
 Major Changes Since Last Version ----------------------------------------
 - Texture editor now supports ZDoom's enhanced TEXTURES format
+- New 'Graphic' menu for gfx entries, with some basic gfx editing functions
 
 
 TODO List ---------------------------------------------------------------
@@ -171,6 +172,11 @@ Ideas / Possible Features -----------------------------------------------
 
 Other / Notes -----------------------------------------------------------
 
+Menu ids:
+Main Window menubar:				0	->	199
+ArchivePanel context menu items:	200	->	299
+GfxEntryPanel custom menu items:	300	->	399
+TEXTUREx Editor:					400	->	599
 
 
 

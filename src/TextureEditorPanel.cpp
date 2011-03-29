@@ -391,7 +391,8 @@ bool TextureEditorPanel::openTexture(CTexture* tex) {
  *******************************************************************/
 void TextureEditorPanel::setPalette(Palette8bit *pal) {
 	tex_canvas->setPalette(pal);
-	tex_canvas->updatePatchTextures();
+	//tex_canvas->updatePatchTextures();
+	tex_canvas->generateTexture();
 	tex_canvas->Refresh();
 }
 

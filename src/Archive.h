@@ -154,6 +154,7 @@ public:
 	virtual bool			removeEntry(ArchiveEntry* entry, bool delete_entry = true);
 
 	// Entry moving
+	virtual bool	swapEntries(unsigned index1, unsigned index2, ArchiveTreeNode* dir = NULL);
 	virtual bool	swapEntries(ArchiveEntry* entry1, ArchiveEntry* entry2);
 	virtual bool	moveEntry(ArchiveEntry* entry, unsigned position = 0xFFFFFFFF, ArchiveTreeNode* dir = NULL);
 

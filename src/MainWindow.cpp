@@ -481,7 +481,7 @@ void MainWindow::onMenuItemClicked(wxCommandEvent& e) {
 
 	// File->Exit
 	if (e.GetId() == MENU_FILE_EXIT)
-		Destroy();
+		Close();
 
 
 	// *******************************************************

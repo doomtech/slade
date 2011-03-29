@@ -468,6 +468,42 @@ ArchiveEntry* ArchiveEntryList::getEntry(int index) const {
 	return NULL;
 }
 
+/* ArchiveEntryList::getEntryIndex
+ * Returns the ArchiveEntry index associated with the list item at
+ * [index]. Returns -1 if the index is out of bounds or no archive
+ * is open
+ *******************************************************************/
+int ArchiveEntryList::getEntryIndex(int index) {
+	// Check index & archive
+	if (index < 0 || !archive)
+		return -1;
+
+	// Check if filtering is active
+	if (filter_active) {
+		// If it is, modify index for filtered list
+		if (index < 0 || (unsigned) index >= filter.size())
+			return -1;
+
+		index = filter[index];
+	}
+
+	// Index modifier if 'up folder' entry exists
+	if (show_dir_back && current_dir->getParent()) {
+		if (index == 0)
+			return -1;
+		else
+			index--;
+	}
+
+	// Entries
+	int subdirs = current_dir->nChildren();
+	if ((unsigned)index < subdirs + current_dir->numEntries())
+		return index - subdirs;
+
+	// Out of bounds or subdir
+	return -1;
+}
+
 /* ArchiveEntryList::getFocusedEntry
  * Gets the archive entry associated with the currently focused list
  * item. Returns NULL if nothing is focused or no archive is open

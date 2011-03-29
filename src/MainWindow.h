@@ -28,8 +28,6 @@ private:
 
 public:
 	enum {
-		MENU_START,
-
 		MENU_FILE_NEWWAD,
 		MENU_FILE_NEWZIP,
 		MENU_FILE_OPEN,
@@ -78,8 +76,6 @@ public:
 
 		MENU_HELP_ONLINEDOCUMENTATION,
 		MENU_HELP_ABOUT,
-
-		MENU_END,
 	};
 
 	MainWindow();

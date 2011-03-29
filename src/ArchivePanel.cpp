@@ -66,20 +66,22 @@
 CVAR(Int, autosave_entry_changes, 2, CVAR_SAVE)	// 0=no, 1=yes, 2=ask
 
 // Temporary
-const int MENU_GFX_CONVERT = 10001;
-const int MENU_GFX_MODIFY_OFFSETS = 10002;
-const int MENU_BAS_CONVERT = 10003;
-const int MENU_GFX_ADD_PATCH_TABLE = 10004;
-const int MENU_GFX_ADD_TEXTUREX = 10005;
-const int MENU_GFX_EXPORT_PNG = 10006;
-const int MENU_VIEW_TEXT = 10007;
-const int MENU_VIEW_HEX = 10008;
-const int MENU_CONV_WAV_DSND = 10009;
-const int MENU_CONV_DSND_WAV = 10010;
-const int MENU_CONV_MUS_MIDI = 10011;
-const int MENU_SCRIPT_COMPILE_ACS = 10012;
-const int MENU_TEXTUREX_CONVERT = 10013;
-const int MENU_TEMP_END = 10100;
+enum {
+	MENU_GFX_CONVERT = 200,
+	MENU_GFX_MODIFY_OFFSETS,
+	MENU_BAS_CONVERT,
+	MENU_GFX_ADD_PATCH_TABLE,
+	MENU_GFX_ADD_TEXTUREX,
+	MENU_GFX_EXPORT_PNG,
+	MENU_VIEW_TEXT,
+	MENU_VIEW_HEX,
+	MENU_CONV_WAV_DSND,
+	MENU_CONV_DSND_WAV,
+	MENU_CONV_MUS_MIDI,
+	MENU_SCRIPT_COMPILE_ACS,
+	MENU_TEXTUREX_CONVERT,
+	MENU_TEMP_END
+};
 
 
 /*******************************************************************
@@ -633,14 +635,8 @@ bool ArchivePanel::moveUp() {
 		return false;
 
 	// Move each one up by swapping it with the entry above it
-	for (size_t a = 0; a < selection.size(); a++) {
-		// Get the entries to swap
-		ArchiveEntry* entry = entry_list->getEntry(selection[a]);
-		ArchiveEntry* above = entry_list->getEntry(selection[a]-1);
-
-		// Swap them in the archive
-		archive->swapEntries(entry, above);
-	}
+	for (size_t a = 0; a < selection.size(); a++)
+		archive->swapEntries(entry_list->getEntryIndex(selection[a]), entry_list->getEntryIndex(selection[a]-1));
 
 	// Update selection
 	entry_list->clearSelection();
@@ -668,14 +664,8 @@ bool ArchivePanel::moveDown() {
 		return false;
 
 	// Move each one down by swapping it with the entry below it
-	for (int a = selection.size()-1; a >= 0; a--) {
-		// Get the entries to swap
-		ArchiveEntry* entry = entry_list->getEntry(selection[a]);
-		ArchiveEntry* below = entry_list->getEntry(selection[a]+1);
-
-		// Swap them in the archive
-		archive->swapEntries(entry, below);
-	}
+	for (int a = selection.size()-1; a >= 0; a--)
+		archive->swapEntries(entry_list->getEntryIndex(selection[a]), entry_list->getEntryIndex(selection[a]+1));
 
 	// Update selection
 	entry_list->clearSelection();
