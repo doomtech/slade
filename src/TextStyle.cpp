@@ -311,6 +311,9 @@ void StyleSet::applyTo(wxStyledTextCtrl* stc) {
 	ts_function.applyTo(stc, wxSTC_C_WORD2);
 	ts_bracematch.applyTo(stc, wxSTC_STYLE_BRACELIGHT);
 	ts_bracebad.applyTo(stc, wxSTC_STYLE_BRACEBAD);
+
+	// Set caret colour to text foreground colour
+	stc->SetCaretForeground(WXCOL(ts_default.foreground));
 }
 
 /* StyleSet::copySet

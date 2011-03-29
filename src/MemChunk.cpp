@@ -94,6 +94,7 @@ bool MemChunk::clear() {
 		delete[] data;
 		data = NULL;
 		size = 0;
+		cur_ptr = 0;
 		return true;
 	}
 

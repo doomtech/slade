@@ -37,6 +37,7 @@
 #include "FreeImage.h"
 #include "Misc.h"
 #include "Translation.h"
+#include "Math.h"
 #include <wx/filefn.h>
 
 
@@ -47,15 +48,14 @@
 /* SImage::SImage
  * SImage class constructor
  *******************************************************************/
-SImage::SImage() {
+SImage::SImage(SIFormat format) {
 	width = 0;
 	height = 0;
 	data = NULL;
 	mask = NULL;
 	offset_x = 0;
 	offset_y = 0;
-	//has_palette = false;
-	format = RGBA;
+	this->format = format;
 	numimages = 1;
 	imgindex = 0;
 }
@@ -179,6 +179,26 @@ bool SImage::getPalData(MemChunk& mc) {
 	}
 
 	return false;	// Invalid image type
+}
+
+/* SImage::stride
+ * Returns the number of bytes per image row
+ *******************************************************************/
+unsigned SImage::getStride() {
+	if (format == RGBA)
+		return width*4;
+	else
+		return width;
+}
+
+/* SImage::bpp
+ * Returns the number of bytes per image pixel
+ *******************************************************************/
+uint8_t SImage::getBpp() {
+	if (format == RGBA)
+		return 4;
+	else
+		return 1;
 }
 
 /* SImage::setXOffset
@@ -557,20 +577,20 @@ bool SImage::safeConvert(MemChunk& out, Palette8bit* pal) {
 
 /* SImage::setPixel
  * Sets the pixel at [x],[y] to [colour]. Returns false if the
- * position is out of range or the image isn't RGBA format, true
- * otherwise
+ * position is out of range, true otherwise
  *******************************************************************/
-bool SImage::setPixel(int x, int y, rgba_t colour) {
-	// Can't do this on paletted images
-	if (format != RGBA)
-		return false;
-
+bool SImage::setPixel(int x, int y, rgba_t colour, Palette8bit* pal) {
 	// Check position
 	if (x < 0 || x >= width || y < 0 || y >= height)
 		return false;
 
 	// Set the pixel
-	colour.write(data + (y * (width*4) + (x*4)));
+	if (format == RGBA)
+		colour.write(data + (y * (width*4) + (x*4)));
+	else {
+		if (!pal) pal = &palette;
+		data[y * width + x] = pal->nearestColour(colour);
+	}
 
 	// Announce
 	announce("image_changed");
@@ -623,8 +643,9 @@ bool SImage::rotate(int angle) {
 	if (!data)
 		return false;
 
-	if (angle == 0)	return true;				// Nothing to do
-	if (angle < 0 || angle % 90) return false;	// Unsupported angle
+	if (angle == 0)	return true;	// Nothing to do
+	if (angle % 90) return false;	// Unsupported angle
+	while (angle < 0) angle += 360;
 	angle %= 360;
 
 	uint8_t * nd, * nm;
@@ -800,7 +821,7 @@ bool SImage::resize(int nwidth, int nheight) {
 	newdata = new uint8_t[nwidth * nheight * bpp];
 	memset(newdata, 0, nwidth*nheight*bpp);
 	// Create new mask if needed
-	if (format == PALMASK && mask) {
+	if (format == PALMASK) {
 		newmask = new uint8_t[nwidth * nheight];
 		memset(newmask, 0, nwidth*nheight);
 	}
@@ -945,6 +966,233 @@ bool SImage::applyTranslation(Translation* tr, Palette8bit* pal) {
 				}
 			}
 		}
+	}
+
+	return true;
+}
+
+/* SImage::drawPixel
+ * Draws a pixel of [colour] at [x],[y], blending it according to
+ * the options set in [properties]. If the image is paletted, the
+ * resulting pixel colour is converted to it's nearest match in [pal]
+ *******************************************************************/
+bool SImage::drawPixel(int x, int y, rgba_t colour, si_drawprops_t& properties, Palette8bit* pal) {
+	// Check valid coords
+	if (x < 0 || y < 0 || x >= width || y >= height)
+		return false;
+
+	// Setup palette
+	if (!pal)
+		pal = &palette;
+
+	// Setup alpha
+	if (properties.src_alpha)
+		colour.a *= properties.alpha;
+	else
+		colour.a = 255*properties.alpha;
+
+	// Do nothing if completely transparent
+	if (colour.a == 0)
+		return true;
+
+	// Get pixel index
+	unsigned p = y * getStride() + x * getBpp();
+
+	// Check for simple case (normal blending, no transparency involved)
+	if (colour.a == 255 && properties.blend == NORMAL) {
+		if (format == RGBA)
+			colour.write(data+p);
+		else {
+			data[p] = pal->nearestColour(colour);
+			mask[p] = colour.a;
+		}
+
+		return true;
+	}
+
+	// Not-so-simple case, do full processing
+	rgba_t d_colour;
+	if (format == PALMASK)
+		d_colour = pal->colour(data[p]);
+	else
+		d_colour.set(data[p], data[p+1], data[p+2], data[p+3]);
+
+	// Additive blending
+	if (properties.blend == ADD) {
+		d_colour.set(	Math::clamp(d_colour.r+colour.r*properties.alpha, 0, 255),
+						Math::clamp(d_colour.g+colour.g*properties.alpha, 0, 255),
+						Math::clamp(d_colour.b+colour.b*properties.alpha, 0, 255),
+						Math::clamp(d_colour.a + colour.a, 0, 255));
+	}
+
+	// Subtractive blending
+	else if (properties.blend == SUBTRACT) {
+		d_colour.set(	Math::clamp(d_colour.r-colour.r*properties.alpha, 0, 255),
+						Math::clamp(d_colour.g-colour.g*properties.alpha, 0, 255),
+						Math::clamp(d_colour.b-colour.b*properties.alpha, 0, 255),
+						Math::clamp(d_colour.a + colour.a, 0, 255));
+	}
+
+	// Reverse-Subtractive blending
+	else if (properties.blend == REVERSE_SUBTRACT) {
+		d_colour.set(	Math::clamp((-d_colour.r)+colour.r*properties.alpha, 0, 255),
+						Math::clamp((-d_colour.g)+colour.g*properties.alpha, 0, 255),
+						Math::clamp((-d_colour.b)+colour.b*properties.alpha, 0, 255),
+						Math::clamp(d_colour.a + colour.a, 0, 255));
+	}
+
+	// 'Modulate' blending
+	else if (properties.blend == MODULATE) {
+		d_colour.set(	Math::clamp(colour.r*d_colour.r / 255, 0, 255),
+						Math::clamp(colour.g*d_colour.g / 255, 0, 255),
+						Math::clamp(colour.b*d_colour.b / 255, 0, 255),
+						Math::clamp(d_colour.a + colour.a, 0, 255));
+	}
+
+	// Normal blending (or unknown blend type)
+	else {
+		float inv_alpha = 1.0f - properties.alpha;
+		d_colour.set(	d_colour.r*inv_alpha + colour.r*properties.alpha,
+						d_colour.g*inv_alpha + colour.g*properties.alpha,
+						d_colour.b*inv_alpha + colour.b*properties.alpha,
+						Math::clamp(d_colour.a + colour.a, 0, 255));
+	}
+
+	// Apply new colour
+	if (format == PALMASK) {
+		data[p] = pal->nearestColour(d_colour);
+		mask[p] = d_colour.a;
+	}
+	else
+		d_colour.write(data+p);
+
+	return true;
+}
+
+/* SImage::drawImage
+ * Draws an image on to this image at [x],[y], with blending options
+ * set in [properties]. [pal_src] is used for the source image, and
+ * [pal_dest] is used for the destination image, if either is
+ * paletted
+ *******************************************************************/
+bool SImage::drawImage(SImage& img, int x_pos, int y_pos, si_drawprops_t& properties, Palette8bit* pal_src, Palette8bit* pal_dest) {
+	// Check images
+	if (!data || !img.data)
+		return false;
+
+	// Setup palettes
+	if (!pal_src)
+		pal_src = &(img.palette);
+	if (!pal_dest)
+		pal_dest = &palette;
+
+	// Go through pixels
+	unsigned s_stride = img.getStride();
+	uint8_t s_bpp = img.getBpp();
+	unsigned sp = 0;
+	for (int y = y_pos; y < y_pos + img.height; y++) {		// Rows
+		// Skip out-of-bounds rows
+		if (y < 0 || y >= height) {
+			sp += s_stride;
+			continue;
+		}
+
+		for (int x = x_pos; x < x_pos + img.width; x++) {	// Columns
+			// Skip out-of-bounds columns
+			if (x < 0 || x >= width) {
+				sp += s_bpp;
+				continue;
+			}
+
+			// Skip if source pixel is fully transparent
+			if ((img.format == PALMASK && img.mask[sp] == 0) ||
+				(img.format == RGBA && img.data[sp+3] == 0)) {
+				sp += s_bpp;
+				continue;
+			}
+
+			// Draw pixel
+			if (img.format == PALMASK) {
+				rgba_t col = pal_src->colour(img.data[sp]);
+				col.a = img.mask[sp];
+				drawPixel(x, y, col, properties, pal_dest);
+			}
+			else
+				drawPixel(x, y, rgba_t(img.data[sp], img.data[sp+1], img.data[sp+2], img.data[sp+3]), properties, pal_dest);
+
+			// Go to next source pixel
+			sp += s_bpp;
+		}
+	}
+
+	return true;
+}
+
+/* SImage::colourise
+ * Colourises the image to [colour]. If the image is paletted, each
+ * pixel will be set to it's nearest matching colour in [pal]
+ *******************************************************************/
+bool SImage::colourise(rgba_t colour, Palette8bit* pal) {
+	// Setup palette
+	if (!pal)
+		pal = &palette;
+
+	// Go through all pixels
+	uint8_t bpp = getBpp();
+	rgba_t col;
+	for (int a = 0; a < width*height*bpp; a+= bpp) {
+		// Get current pixel colour
+		if (format == RGBA)
+			col.set(data[a], data[a+1], data[a+2], data[a+3]);
+		else
+			col.set(pal->colour(data[a]));
+
+		// Colourise it
+		float grey = (col.r*0.3f + col.g*0.59f + col.b*0.11f) / 255.0f;
+		col.r = grey*colour.r;
+		col.g = grey*colour.g;
+		col.b = grey*colour.b;
+
+		// Set pixel colour
+		if (format == RGBA)
+			col.write(data+a);
+		else
+			data[a] = pal->nearestColour(col);
+	}
+
+	return true;
+}
+
+/* SImage::tint
+ * Tints the image to [colour] by [amount]. If the image is paletted,
+ * each pixel will be set to it's nearest matching colour in [pal]
+ *******************************************************************/
+bool SImage::tint(rgba_t colour, float amount, Palette8bit* pal) {
+	// Setup palette
+	if (!pal)
+		pal = &palette;
+
+	// Go through all pixels
+	uint8_t bpp = getBpp();
+	rgba_t col;
+	for (int a = 0; a < width*height*bpp; a+= bpp) {
+		// Get current pixel colour
+		if (format == RGBA)
+			col.set(data[a], data[a+1], data[a+2], data[a+3]);
+		else
+			col.set(pal->colour(data[a]));
+
+		// Tint it
+		float inv_amt = 1.0f - amount;
+		col.set(col.r*inv_amt + colour.r*amount,
+				col.g*inv_amt + colour.g*amount,
+				col.b*inv_amt + colour.b*amount, col.a);
+
+		// Set pixel colour
+		if (format == RGBA)
+			col.write(data+a);
+		else
+			data[a] = pal->nearestColour(col);
 	}
 
 	return true;

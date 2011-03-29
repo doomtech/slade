@@ -295,7 +295,7 @@ void MainWindow::setupLayout() {
 
 
 	// -- Status Bar --
-	CreateStatusBar(2);
+	CreateStatusBar(3);
 
 
 	// Load previously saved perspective string
@@ -310,7 +310,7 @@ void MainWindow::setupLayout() {
 
 	// Bind events
 	html_startpage->Bind(wxEVT_COMMAND_HTML_LINK_CLICKED, &MainWindow::onHTMLLinkClicked, this);
-	Bind(wxEVT_COMMAND_MENU_SELECTED, &MainWindow::onMenuItemClicked, this, MENU_START, MENU_END);
+	Bind(wxEVT_COMMAND_MENU_SELECTED, &MainWindow::onMenuItemClicked, this);
 	Bind(wxEVT_CLOSE_WINDOW, &MainWindow::onClose, this);
 	Bind(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED, &MainWindow::onTabChanged, this);
 }
@@ -445,6 +445,25 @@ void MainWindow::openTextureEditor(Archive* archive) {
  * archive tab and entry panel
  *******************************************************************/
 void MainWindow::openEntry(ArchiveEntry* entry) {
+}
+
+void MainWindow::addCustomMenu(wxMenu* menu, string title) {
+	// Insert custom menus between 'Entry' and 'View' menus
+	if (GetMenuBar()->FindMenu(title) == wxNOT_FOUND) {
+		GetMenuBar()->Insert(4, menu, title);
+		GetMenuBar()->Refresh();
+	}
+}
+
+void MainWindow::removeCustomMenu(string title) {
+	// Get custom menu index
+	int index = GetMenuBar()->FindMenu(title);
+
+	// Remove it
+	if (index != wxNOT_FOUND) {
+		GetMenuBar()->Remove(index);
+		GetMenuBar()->Refresh();
+	}
 }
 
 

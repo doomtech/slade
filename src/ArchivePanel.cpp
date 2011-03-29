@@ -227,6 +227,7 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 	Bind(wxEVT_COMMAND_MENU_SELECTED, &ArchivePanel::onEntryMenuClick, this, MENU_GFX_CONVERT, MENU_TEMP_END);
 	Bind(EVT_AEL_DIR_CHANGED, &ArchivePanel::onDirChanged, this);
 	btn_updir->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &ArchivePanel::onBtnUpDir, this);
+	Bind(wxEVT_SHOW, &ArchivePanel::onShow, this);
 	((DefaultEntryPanel*)default_area)->getEditTextButton()->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &ArchivePanel::onDEPEditAsText, this);
 	((DefaultEntryPanel*)default_area)->getViewHexButton()->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &ArchivePanel::onDEPViewAsHex, this);
 
@@ -1361,9 +1362,13 @@ bool ArchivePanel::showEntryPanel(EntryPanel* new_area, bool ask_save) {
 	// If the new panel is different than the current, swap them
 	if (new_area != cur_area) {
 		cur_area->Show(false);				// Hide current
+		cur_area->removeCustomMenu();		// Remove current custom menu (if any)
 		sizer->Replace(cur_area, new_area);	// Swap the panels
 		cur_area = new_area;				// Set the new panel to current
 		cur_area->Show(true);				// Show current
+
+		// Add the current panel's custom menu if needed
+		cur_area->addCustomMenu();
 
 		// Update panel layout
 		Layout();
@@ -1521,6 +1526,10 @@ void ArchivePanel::handleAction(int menu_id) {
 		compileACS();
 	else if (menu_id == MENU_TEXTUREX_CONVERT)
 		convertTextures();
+
+	// Not handled here, pass to current entry panel
+	else
+		cur_area->handleAction(menu_id);
 }
 
 /* ArchivePanel::onAnnouncement
@@ -1911,6 +1920,16 @@ void ArchivePanel::onDirChanged(wxCommandEvent& e) {
 void ArchivePanel::onBtnUpDir(wxCommandEvent& e) {
 	// Go up a directory in the entry list
 	entry_list->goUpDir();
+}
+
+/* ArchivePanel::onShow
+ * Called when the panel is shown or hidden
+ *******************************************************************/
+void ArchivePanel::onShow(wxShowEvent& e) {
+	if (e.IsShown())
+		cur_area->addCustomMenu();
+	else
+		cur_area->removeCustomMenu();
 }
 
 

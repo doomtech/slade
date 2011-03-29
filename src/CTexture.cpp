@@ -32,6 +32,8 @@
 #include "CTexture.h"
 #include "ArchiveManager.h"
 #include "ResourceManager.h"
+#include "Misc.h"
+#include "SImage.h"
 #include <wx/colour.h>
 
 
@@ -747,6 +749,90 @@ bool CTexture::convertExtended() {
 
 	// Set extended flag
 	extended = true;
+
+	return true;
+}
+
+/* CTexture::toImage
+ * Generates a SImage representation of this texture, using patches
+ * from [parent] primarily, and the palette [pal]
+ *******************************************************************/
+bool CTexture::toImage(SImage& image, Archive* parent, Palette8bit* pal) {
+	// Init image
+	image.clear();
+	image.resize(width, height);
+
+	// Add patches
+	SImage p_img;
+	si_drawprops_t dp;
+	dp.src_alpha = false;
+	if (extended) {
+		// Extended texture
+
+		// Add each patch to image
+		for (unsigned a = 0; a < patches.size(); a++) {
+			CTPatchEx* patch = (CTPatchEx*)patches[a];
+
+			// Load patch entry
+			if (!Misc::loadImageFromEntry(&p_img, patch->getPatchEntry(parent)))
+				continue;
+
+			// Flip/rotate if needed
+			if (patch->flipX())
+				p_img.mirror(false);
+			if (patch->flipY())
+				p_img.mirror(true);
+			if (patch->getRotation() != 0)
+				p_img.rotate(patch->getRotation());
+
+			// Setup transparency blending
+			dp.blend = NORMAL;
+			dp.alpha = 1.0f;
+			dp.src_alpha = false;
+			if (patch->getStyle() == "CopyAlpha")
+				dp.src_alpha = true;
+			else if (patch->getStyle() == "Translucent")
+				dp.alpha = patch->getAlpha();
+			else if (patch->getStyle() == "Add") {
+				dp.blend = ADD;
+				dp.alpha = patch->getAlpha();
+			}
+			else if (patch->getStyle() == "Subtract") {
+				dp.blend = SUBTRACT;
+				dp.alpha = patch->getAlpha();
+			}
+			else if (patch->getStyle() == "ReverseSubtract") {
+				dp.blend = REVERSE_SUBTRACT;
+				dp.alpha = patch->getAlpha();
+			}
+			else if (patch->getStyle() == "Modulate") {
+				dp.blend = MODULATE;
+				dp.alpha = patch->getAlpha();
+			}
+
+			// Setup patch colour
+			if (patch->getBlendType() == 1)
+				p_img.applyTranslation(&(patch->getTranslation()), pal);
+			else if (patch->getBlendType() == 2)
+				p_img.colourise(patch->getColour(), pal);
+			else if (patch->getBlendType() == 3)
+				p_img.tint(patch->getColour(), patch->getColour().fa(), pal);
+
+
+			// Add patch to texture image
+			image.drawImage(p_img, patch->xOffset(), patch->yOffset(), dp, pal, pal);
+		}
+	}
+	else {
+		// Normal texture
+
+		// Add each patch to image
+		for (unsigned a = 0; a < patches.size(); a++) {
+			CTPatch* patch = patches[a];
+			if (Misc::loadImageFromEntry(&p_img, patch->getPatchEntry(parent)))
+				image.drawImage(p_img, patch->xOffset(), patch->yOffset(), dp, pal, pal);
+		}
+	}
 
 	return true;
 }

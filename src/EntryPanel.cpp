@@ -47,6 +47,7 @@ EntryPanel::EntryPanel(wxWindow* parent, string id)
 	modified = false;
 	entry = NULL;
 	this->id = id;
+	menu_custom = NULL;
 
 	// Create & set sizer & border
 	frame = new wxStaticBox(this, -1, "Entry Contents");
@@ -87,6 +88,7 @@ EntryPanel::EntryPanel(wxWindow* parent, string id)
  * EntryPanel class destructor
  *******************************************************************/
 EntryPanel::~EntryPanel() {
+	removeCustomMenu();
 }
 
 /* EntryPanel::setModified
@@ -192,12 +194,23 @@ void EntryPanel::closeEntry() {
 }
 
 void EntryPanel::updateStatus() {
-	theMainWindow->SetStatusText("", 2);
-
+	// Basic info
 	if (entry)
-		theMainWindow->SetStatusText(S_FMT("%d bytes", entry->getSize()), 1);
+		theMainWindow->SetStatusText(S_FMT("%d bytes, %s", entry->getSize(), CHR(entry->getType()->getName())), 1);
 	else
 		theMainWindow->SetStatusText("", 1);
+
+	// Extended info
+	theMainWindow->SetStatusText(statusString(), 2);
+}
+
+void EntryPanel::addCustomMenu() {
+	if (menu_custom)
+		theMainWindow->addCustomMenu(menu_custom, custom_menu_name);
+}
+
+void EntryPanel::removeCustomMenu() {
+	theMainWindow->removeCustomMenu(custom_menu_name);
 }
 
 

@@ -10,6 +10,23 @@ enum SIFormat {
 	RGBA,		// 4 bytes per pixel: RGBA
 };
 
+enum SIBlendType {
+	NORMAL,				// Normal blend
+	ADD,				// Additive blend
+	SUBTRACT,			// Subtractive blend
+	REVERSE_SUBTRACT,	// Reverse-subtractive blend
+	MODULATE,			// 'Modulate' blend
+};
+
+// Simple struct to hold pixel drawing properties
+struct si_drawprops_t {
+	SIBlendType	blend;		// The blending mode
+	float		alpha;
+	bool		src_alpha;	// Whether to respect source pixel alpha
+
+	si_drawprops_t() { blend = NORMAL; alpha = 1.0f; src_alpha = true; }
+};
+
 class Translation;
 
 class SImage : public Announcer {
@@ -32,7 +49,7 @@ private:
 	void	clearData(bool clear_mask = true);
 
 public:
-	SImage();
+	SImage(SIFormat format = RGBA);
 	virtual ~SImage();
 
 	bool			isValid() { return (width > 0 && height > 0 && data); }
@@ -47,6 +64,8 @@ public:
 	int				getSize() { return numimages; }
 	bool			hasPalette() { return has_palette; }
 	point2_t		offset() { return point2_t(offset_x, offset_y); }
+	unsigned		getStride();
+	uint8_t			getBpp();
 
 	void			setXOffset(int offset);
 	void			setYOffset(int offset);
@@ -113,7 +132,7 @@ public:
 	bool	cutoffMask(uint8_t threshold, bool force_mask = false);
 
 	// Image modification
-	bool	setPixel(int x, int y, rgba_t colour);
+	bool	setPixel(int x, int y, rgba_t colour, Palette8bit* pal = NULL);
 	bool	setPixel(int x, int y, uint8_t pal_index, uint8_t alpha = 255);
 	bool	imgconv();
 	bool	rotate(int angle);
@@ -122,6 +141,10 @@ public:
 	bool	resize(int nwidth, int nheight);
 	bool	setImageData(uint8_t *ndata, int nwidth, int nheight, SIFormat nformat);
 	bool	applyTranslation(Translation* tr, Palette8bit* pal = NULL);
+	bool	drawPixel(int x, int y, rgba_t colour, si_drawprops_t& properties, Palette8bit* pal);
+	bool	drawImage(SImage& img, int x, int y, si_drawprops_t& properties, Palette8bit* pal_src = NULL, Palette8bit* pal_dest = NULL);
+	bool	colourise(rgba_t colour, Palette8bit* pal = NULL);
+	bool	tint(rgba_t colour, float amount, Palette8bit* pal = NULL);
 };
 
 #endif //__SIMAGE_H__

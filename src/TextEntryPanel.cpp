@@ -77,6 +77,7 @@ TextEntryPanel::TextEntryPanel(wxWindow* parent)
 	choice_text_language->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &TextEntryPanel::onChoiceLanguageChanged, this);
 	text_area->Bind(wxEVT_STC_CHANGE, &TextEntryPanel::onTextModified, this);
 	btn_find_replace->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextEntryPanel::onBtnFindReplace, this);
+	text_area->Bind(wxEVT_STC_UPDATEUI, &TextEntryPanel::onUpdateUI, this);
 
 	Layout();
 }
@@ -183,6 +184,9 @@ void TextEntryPanel::refreshPanel() {
 	Update();
 }
 
+/* TextEntryPanel::closeEntry
+ * Performs any actions required on closing the entry
+ *******************************************************************/
 void TextEntryPanel::closeEntry() {
 	// Check any entry is open
 	if (!entry)
@@ -190,6 +194,20 @@ void TextEntryPanel::closeEntry() {
 
 	// Save current caret position
 	entry->exProp("TextPosition") = text_area->GetCurrentPos();
+}
+
+/* TextEntryPanel::statusString
+ * Returns a string with extended editing/entry info for the status
+ * bar
+ *******************************************************************/
+string TextEntryPanel::statusString() {
+	// Setup status string
+	int line = text_area->GetCurrentLine()+1;
+	int pos = text_area->GetCurrentPos();
+	int col = text_area->GetColumn(pos)+1;
+	string status = S_FMT("Ln %d, Col %d, Pos %d", line, col, pos);
+
+	return status;
 }
 
 
@@ -227,4 +245,9 @@ void TextEntryPanel::onChoiceLanguageChanged(wxCommandEvent& e) {
 		entry->exProp("TextLanguage") = tl->getId();
 	else
 		entry->exProps().removeProperty("TextLanguage");
+}
+
+void TextEntryPanel::onUpdateUI(wxStyledTextEvent& e) {
+	updateStatus();
+	e.Skip();
 }

@@ -36,6 +36,198 @@
 #include "PaletteManager.h"
 #include "EntryOperations.h"
 #include "Icons.h"
+#include <wx/dialog.h>
+#include <wx/clrpicker.h>
+
+
+/*******************************************************************
+ * GFXCOLOURISEDIALOG CLASS
+ *******************************************************************
+ A simple dialog for the 'Colourise' function, allows the user to
+ select a colour and shows a preview of the colourised image
+ */
+class GfxColouriseDialog : public wxDialog {
+private:
+	GfxCanvas*			gfx_preview;
+	ArchiveEntry*		entry;
+	Palette8bit*		palette;
+	wxColourPickerCtrl*	cp_colour;
+
+public:
+	GfxColouriseDialog(wxWindow* parent, ArchiveEntry* entry, Palette8bit* pal)
+	: wxDialog(parent, -1, "Colourise", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER) {
+		// Init variables
+		this->entry = entry;
+		this->palette = pal;
+
+		// Setup main sizer
+		wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+		SetSizer(sizer);
+
+		// Add colour chooser
+		wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
+		sizer->Add(hbox, 0, wxEXPAND|wxALL, 4);
+
+		cp_colour = new wxColourPickerCtrl(this, -1, wxColour(255, 0, 0));
+		hbox->Add(new wxStaticText(this, -1, "Colour:"), 1, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
+		hbox->Add(cp_colour, 0, wxEXPAND);
+
+		// Add preview
+		gfx_preview = new GfxCanvas(this, -1);
+		sizer->Add(gfx_preview, 1, wxEXPAND|wxALL, 4);
+
+		// Add buttons
+		sizer->Add(CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+		// Setup preview
+		gfx_preview->setViewType(GFXVIEW_CENTERED);
+		gfx_preview->setPalette(pal);
+		gfx_preview->SetInitialSize(wxSize(192, 192));
+		Misc::loadImageFromEntry(gfx_preview->getImage(), entry);
+		wxColour col = cp_colour->GetColour();
+		gfx_preview->getImage()->colourise(rgba_t(col.Red(), col.Green(), col.Blue()), pal);
+		gfx_preview->updateImageTexture();
+
+		// Init layout
+		Layout();
+
+		// Bind events
+		cp_colour->Bind(wxEVT_COMMAND_COLOURPICKER_CHANGED, &GfxColouriseDialog::onColourChanged, this);
+		Bind(wxEVT_SIZE, &GfxColouriseDialog::onResize, this);
+
+		// Setup dialog size
+		SetInitialSize(wxSize(-1, -1));
+		SetMinSize(GetSize());
+	}
+
+	rgba_t getColour() {
+		wxColour col = cp_colour->GetColour();
+		return rgba_t(col.Red(), col.Green(), col.Blue());
+	}
+
+	// Events
+	void onColourChanged(wxColourPickerEvent& e) {
+		Misc::loadImageFromEntry(gfx_preview->getImage(), entry);
+		wxColour col = cp_colour->GetColour();
+		gfx_preview->getImage()->colourise(rgba_t(col.Red(), col.Green(), col.Blue()), palette);
+		gfx_preview->updateImageTexture();
+		gfx_preview->Refresh();
+	}
+
+	void onResize(wxSizeEvent& e) {
+		wxDialog::OnSize(e);
+		gfx_preview->zoomToFit(true, 0.05f);
+		e.Skip();
+	}
+};
+
+
+/*******************************************************************
+ * GFXTINTDIALOG CLASS
+ *******************************************************************
+ A simple dialog for the 'Tint' function, allows the user to select
+ tint colour+amount and shows a preview of the tinted image
+ */
+class GfxTintDialog : public wxDialog {
+private:
+	GfxCanvas*			gfx_preview;
+	ArchiveEntry*		entry;
+	Palette8bit*		palette;
+	wxColourPickerCtrl*	cp_colour;
+	wxSlider*			slider_amount;
+	wxStaticText*		label_amount;
+
+public:
+	GfxTintDialog(wxWindow* parent, ArchiveEntry* entry, Palette8bit* pal)
+	: wxDialog(parent, -1, "Tint", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER) {
+		// Init variables
+		this->entry = entry;
+		this->palette = pal;
+
+		// Setup main sizer
+		wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+		SetSizer(sizer);
+
+		// Add colour chooser
+		wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
+		sizer->Add(hbox, 0, wxEXPAND|wxALL, 4);
+
+		cp_colour = new wxColourPickerCtrl(this, -1, wxColour(255, 0, 0));
+		hbox->Add(new wxStaticText(this, -1, "Colour:"), 1, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
+		hbox->Add(cp_colour, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 8);
+
+		// Add 'amount' slider
+		hbox = new wxBoxSizer(wxHORIZONTAL);
+		sizer->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+		slider_amount = new wxSlider(this, -1, 50, 0, 100);
+		label_amount = new wxStaticText(this, -1, "100%");
+		hbox->Add(new wxStaticText(this, -1, "Amount (%):"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
+		hbox->Add(slider_amount, 1, wxEXPAND|wxRIGHT, 4);
+		hbox->Add(label_amount, 0, wxALIGN_CENTER_VERTICAL);
+
+		// Add preview
+		gfx_preview = new GfxCanvas(this, -1);
+		sizer->Add(gfx_preview, 1, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+		// Add buttons
+		sizer->Add(CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+		// Setup preview
+		gfx_preview->setViewType(GFXVIEW_CENTERED);
+		gfx_preview->setPalette(pal);
+		gfx_preview->SetInitialSize(wxSize(256, 256));
+		Misc::loadImageFromEntry(gfx_preview->getImage(), entry);
+		wxColour col = cp_colour->GetColour();
+		gfx_preview->getImage()->tint(getColour(), getAmount(), pal);
+		gfx_preview->updateImageTexture();
+
+		// Init layout
+		Layout();
+
+		// Bind events
+		cp_colour->Bind(wxEVT_COMMAND_COLOURPICKER_CHANGED, &GfxTintDialog::onColourChanged, this);
+		slider_amount->Bind(wxEVT_COMMAND_SLIDER_UPDATED, &GfxTintDialog::onAmountChanged, this);
+		Bind(wxEVT_SIZE, &GfxTintDialog::onResize, this);
+
+		// Setup dialog size
+		SetInitialSize(wxSize(-1, -1));
+		SetMinSize(GetSize());
+	}
+
+	rgba_t getColour() {
+		wxColour col = cp_colour->GetColour();
+		return rgba_t(col.Red(), col.Green(), col.Blue());
+	}
+
+	float getAmount() {
+		return (float)slider_amount->GetValue()*0.01f;
+	}
+
+	// Events
+	void onColourChanged(wxColourPickerEvent& e) {
+		Misc::loadImageFromEntry(gfx_preview->getImage(), entry);
+		wxColour col = cp_colour->GetColour();
+		gfx_preview->getImage()->tint(getColour(), getAmount(), palette);
+		gfx_preview->updateImageTexture();
+		gfx_preview->Refresh();
+	}
+
+	void onAmountChanged(wxCommandEvent& e) {
+		Misc::loadImageFromEntry(gfx_preview->getImage(), entry);
+		wxColour col = cp_colour->GetColour();
+		gfx_preview->getImage()->tint(getColour(), getAmount(), palette);
+		gfx_preview->updateImageTexture();
+		gfx_preview->Refresh();
+		label_amount->SetLabel(S_FMT("%d", slider_amount->GetValue()) + "\%");
+	}
+
+	void onResize(wxSizeEvent& e) {
+		wxDialog::OnSize(e);
+		gfx_preview->zoomToFit(true, 0.05f);
+		e.Skip();
+	}
+};
 
 
 /*******************************************************************
@@ -107,10 +299,6 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 	hbox->Add(spin_xoffset, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
 	hbox->Add(spin_yoffset, 0, wxEXPAND|wxRIGHT, 4);
 
-	// Size
-	label_dimensions = new wxStaticText(this, -1, "Size: N/A");
-	hbox->Add(label_dimensions, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT, 4);
-
 	// PNG stuff
 	hbox->AddStretchSpacer();
 	cb_alph_chunk = new wxCheckBox(this, -1, "alPh");
@@ -118,6 +306,22 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 	cb_trns_chunk = new wxCheckBox(this, -1, "tRNS");
 	hbox->Add(cb_trns_chunk, 0, wxEXPAND, 0);
 	hbox->AddSpacer(8);
+
+	// Custom menu
+	menu_custom = new wxMenu();
+	menu_custom->Append(MENU_GFXEP_CONVERT, "Convert To...");
+	menu_custom->AppendSeparator();
+	menu_custom->Append(MENU_GFXEP_MIRROR, "Mirror");
+	menu_custom->Append(MENU_GFXEP_FLIP, "Flip");
+	menu_custom->Append(MENU_GFXEP_ROTATE, "Rotate");
+	menu_custom->AppendSeparator();
+	menu_custom->Append(MENU_GFXEP_TRANSLATE, "Colour Translation");
+	menu_custom->Append(MENU_GFXEP_COLOURISE, "Colourise");
+	menu_custom->Append(MENU_GFXEP_TINT, "Tint");
+	menu_custom->AppendSeparator();
+	menu_custom->AppendCheckItem(MENU_GFXEP_ALPH, "alPh Chunk");
+	menu_custom->AppendCheckItem(MENU_GFXEP_TRNS, "tRNS Chunk");
+	custom_menu_name = "Graphic";
 
 	// Bind Events
 	slider_zoom->Bind(wxEVT_COMMAND_SLIDER_UPDATED, &GfxEntryPanel::onZoomChanged, this);
@@ -172,21 +376,39 @@ bool GfxEntryPanel::loadEntry(ArchiveEntry* entry, int index) {
  * Saves any changes to the entry
  *******************************************************************/
 bool GfxEntryPanel::saveEntry() {
-	// Set gfx entry offsets
-	bool ok = EntryOperations::modifyGfxOffsets(entry, -1, point2_t(spin_xoffset->GetValue(), spin_yoffset->GetValue()), true, true, false);
+	// Write new image data if modified
+	bool ok = true;
+	if (image_data_modified) {
+		SImage* image = gfx_canvas->getImage();
 
-	if (ok && entry->getType()->getFormat() == "img_png") {
-		// Check if we need to modify alph
-		if (cb_alph_chunk->GetValue() != alph) {
-			alph = !alph;
-			ok = EntryOperations::modifyalPhChunk(entry, alph);
+		// Write depending on type
+		if (entry->getType()->getFormat() == "img_doom")
+			image->toDoomGfx(entry->getMCData());
+		else if (entry->getType()->getFormat() == "img_png")
+			image->toPNG(entry->getMCData(), gfx_canvas->getPalette());
+		else if (entry->getType()->getFormat() == "img_raw")
+			image->toDoomFlat(entry->getMCData());
+		else {
+			wxMessageBox("Unable to save changes, unsupported format for writing.\nSupported formats are: Doom Gfx, Doom Flat, PNG");
+			ok = false;
 		}
 
-		// Check if we need to modify trns
-		if (ok && cb_trns_chunk->GetValue() != trns) {
-			trns = !trns;
-			ok = EntryOperations::modifytRNSChunk(entry, trns);
-		}
+		if (ok)
+			entry->setState(1);
+	}
+	// Otherwise just set offsets
+	else
+		EntryOperations::modifyGfxOffsets(entry, -1, point2_t(spin_xoffset->GetValue(), spin_yoffset->GetValue()), true, true, false);
+
+	// Apply alPh/tRNS options
+	if (entry->getType()->getFormat() == "img_png") {
+		bool alph = EntryOperations::getalPhChunk(entry);
+		bool trns = EntryOperations::gettRNSChunk(entry);
+
+		if (alph != menu_custom->IsChecked(MENU_GFXEP_ALPH))
+			EntryOperations::modifyalPhChunk(entry, !alph);
+		if (trns != menu_custom->IsChecked(MENU_GFXEP_TRNS))
+			EntryOperations::modifytRNSChunk(entry, !trns);
 	}
 
 	return ok;
@@ -210,20 +432,25 @@ void GfxEntryPanel::refresh() {
 		alph = EntryOperations::getalPhChunk(this->entry);
 		cb_alph_chunk->Enable(true);
 		cb_alph_chunk->SetValue(alph);
+		menu_custom->Enable(MENU_GFXEP_ALPH, true);
+		menu_custom->Check(MENU_GFXEP_ALPH, alph);
 
 		// Check for trns
 		trns = EntryOperations::gettRNSChunk(this->entry);
 		cb_trns_chunk->Enable(true);
 		cb_trns_chunk->SetValue(trns);
+		menu_custom->Enable(MENU_GFXEP_TRNS, true);
+		menu_custom->Check(MENU_GFXEP_TRNS, trns);
 	} else {
 		cb_alph_chunk->Enable(false);
 		cb_alph_chunk->SetValue(false);
 		cb_trns_chunk->Enable(false);
 		cb_trns_chunk->SetValue(false);
+		menu_custom->Enable(MENU_GFXEP_ALPH, false);
+		menu_custom->Enable(MENU_GFXEP_TRNS, false);
+		menu_custom->Check(MENU_GFXEP_ALPH, false);
+		menu_custom->Check(MENU_GFXEP_TRNS, false);
 	}
-
-	// Set size label
-	label_dimensions->SetLabel(S_FMT("Size: %d x %d", gfx_canvas->getImage()->getWidth(), gfx_canvas->getImage()->getHeight()));
 
 	// Set multi-image format stuff thingies
 	cur_index = gfx_canvas->getImage()->getIndex();
@@ -242,8 +469,43 @@ void GfxEntryPanel::refresh() {
 	if (gfx_canvas->getViewType() != GFXVIEW_SPRITE)
 		gfx_canvas->resetOffsets();
 
+	// Setup custom menu
+	if (gfx_canvas->getImage()->getFormat() == RGBA)
+		menu_custom->Enable(MENU_GFXEP_TRANSLATE, false);
+	else
+		menu_custom->Enable(MENU_GFXEP_TRANSLATE, true);
+
 	// Refresh the canvas
 	gfx_canvas->Refresh();
+}
+
+/* GfxEntryPanel::statusString
+ * Returns a string with extended editing/entry info for the status
+ * bar
+ *******************************************************************/
+string GfxEntryPanel::statusString() {
+	// Setup status string
+	SImage* image = gfx_canvas->getImage();
+	string status = S_FMT("%dx%d", image->getWidth(), image->getHeight());
+
+	// Colour format
+	if (image->getFormat() == RGBA)
+		status += ", 32bpp";
+	else
+		status += ", 8bpp";
+
+	// PNG stuff
+	if (entry->getType()->getFormat() == "img_png") {
+		// alPh
+		if (EntryOperations::getalPhChunk(entry))
+			status += ", alPh";
+
+		// tRNS
+		if (EntryOperations::gettRNSChunk(entry))
+			status += ", tRNS";
+	}
+
+	return status;
 }
 
 /* GfxEntryPanel::updateImagePalette
@@ -332,6 +594,119 @@ void GfxEntryPanel::applyViewType() {
 
 	// Refresh
 	gfx_canvas->Refresh();
+}
+
+void GfxEntryPanel::handleAction(int menu_id) {
+	// Convert To
+	if (menu_id == MENU_GFXEP_CONVERT) {
+		wxMessageBox("Not implemented");
+	}
+
+	// Mirror
+	else if (menu_id == MENU_GFXEP_MIRROR) {
+		// Mirror X
+		gfx_canvas->getImage()->mirror(false);
+
+		// Update UI
+		gfx_canvas->updateImageTexture();
+		gfx_canvas->Refresh();
+
+		// Update variables
+		image_data_modified = true;
+		setModified();
+	}
+
+	// Flip
+	else if (menu_id == MENU_GFXEP_FLIP) {
+		// Mirror Y
+		gfx_canvas->getImage()->mirror(true);
+
+		// Update UI
+		gfx_canvas->updateImageTexture();
+		gfx_canvas->Refresh();
+
+		// Update variables
+		image_data_modified = true;
+		setModified();
+	}
+
+	// Rotate
+	else if (menu_id == MENU_GFXEP_ROTATE) {
+		// Prompt for rotation angle
+		string angles[] = { "90", "180", "270" };
+		int choice = wxGetSingleChoiceIndex("Select rotation angle", "Rotate", 3, angles, 0);
+
+		// Rotate image
+		switch (choice) {
+		case 0:
+			gfx_canvas->getImage()->rotate(90);
+			break;
+		case 1:
+			gfx_canvas->getImage()->rotate(180);
+			break;
+		case 2:
+			gfx_canvas->getImage()->rotate(270);
+			break;
+		default: break;
+		}
+
+		// Update UI
+		gfx_canvas->updateImageTexture();
+		gfx_canvas->Refresh();
+
+		// Update variables
+		image_data_modified = true;
+		setModified();
+	}
+
+	// Translate
+	else if (menu_id == MENU_GFXEP_TRANSLATE) {
+		wxMessageBox("Not implemented");
+	}
+
+	// Colourise
+	else if (menu_id == MENU_GFXEP_COLOURISE) {
+		Palette8bit* pal = theMainWindow->getPaletteChooser()->getSelectedPalette();
+		GfxColouriseDialog gcd(this, entry, pal);
+
+		// Show colourise dialog
+		if (gcd.ShowModal() == wxID_OK) {
+			// Colourise image
+			gfx_canvas->getImage()->colourise(gcd.getColour(), pal);
+
+			// Update UI
+			gfx_canvas->updateImageTexture();
+			gfx_canvas->Refresh();
+
+			// Update variables
+			image_data_modified = true;
+			setModified();
+		}
+	}
+
+	// Tint
+	else if (menu_id == MENU_GFXEP_TINT) {
+		Palette8bit* pal = theMainWindow->getPaletteChooser()->getSelectedPalette();
+		GfxTintDialog gtd(this, entry, pal);
+
+		// Show tint dialog
+		if (gtd.ShowModal() == wxID_OK) {
+			// Tint image
+			gfx_canvas->getImage()->tint(gtd.getColour(), gtd.getAmount(), pal);
+
+			// Update UI
+			gfx_canvas->updateImageTexture();
+			gfx_canvas->Refresh();
+
+			// Update variables
+			image_data_modified = true;
+			setModified();
+		}
+	}
+
+	// alPh/tRNS
+	else if (menu_id == MENU_GFXEP_ALPH || menu_id == MENU_GFXEP_TRNS)
+		setModified();
 }
 
 

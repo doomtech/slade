@@ -107,6 +107,10 @@ public:
 	void	openTextureEditor(Archive* archive);
 	void	openEntry(ArchiveEntry* entry);
 
+	// Custom menu
+	void	addCustomMenu(wxMenu* menu, string title);
+	void	removeCustomMenu(string title);
+
 	// Events
 	void	onMenuItemClicked(wxCommandEvent &e);
 	void	onHTMLLinkClicked(wxHtmlLinkEvent &e);

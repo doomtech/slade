@@ -78,6 +78,8 @@ public:
 };
 
 class TextureXList;
+class SImage;
+class Palette8bit;
 
 #define TEXTYPE_TEXTURE		0
 #define TEXTYPE_SPRITE		1
@@ -156,6 +158,7 @@ public:
 	string	asText();
 
 	bool	convertExtended();
+	bool	toImage(SImage& image, Archive* parent = NULL, Palette8bit* pal = NULL);
 };
 
 #endif//__CTEXTURE_H__

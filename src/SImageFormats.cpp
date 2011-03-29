@@ -276,6 +276,7 @@ bool SImage::toPNG(MemChunk& out, Palette8bit* pal) {
 
 	// Write PNG header and IHDR
 	const uint8_t* png_data = png.getData();
+	out.clear();
 	out.write(png_data, 33);
 
 	// Create grAb chunk with offsets

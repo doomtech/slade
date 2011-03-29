@@ -213,6 +213,8 @@ void CTextureCanvas::draw() {
  * Draws the currently opened composite texture
  *******************************************************************/
 void CTextureCanvas::drawTexture() {
+	// TODO: Change this to use CTexture::toImage
+
 	// Push matrix
 	glPushMatrix();
 
@@ -243,6 +245,18 @@ void CTextureCanvas::drawTexture() {
 		drawPatch(a);
 
 	glDisable(GL_SCISSOR_TEST);
+
+/*
+	// Testing
+	glEnable(GL_TEXTURE_2D);
+	SImage img(RGBA);
+	texture->toImage(img, parent, &palette);
+	GLTexture tex;
+	COL_WHITE.set_gl();
+	tex.loadImage(&img, &palette);
+	tex.draw2d();
+	glDisable(GL_TEXTURE_2D);
+*/
 
 	// Draw the texture border
 	drawTextureBorder();
@@ -305,7 +319,7 @@ void CTextureCanvas::drawPatch(int num, bool outside) {
 			// Apply translation if needed
 			if (texture->isExtended()) {
 				CTPatchEx* epatch = (CTPatchEx*)patch;
-				if (!epatch->getTranslation().isEmpty())
+				if (epatch->getBlendType() == 1)
 					temp.applyTranslation(&(epatch->getTranslation()), &palette);
 			}
 

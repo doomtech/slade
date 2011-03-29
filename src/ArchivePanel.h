@@ -112,6 +112,7 @@ public:
 	void			onChoiceCategoryChanged(wxCommandEvent& e);
 	void			onDirChanged(wxCommandEvent& e);
 	void			onBtnUpDir(wxCommandEvent& e);
+	void			onShow(wxShowEvent& e);
 };
 
 #endif //__ARCHIVEPANEL_H__

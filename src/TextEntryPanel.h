@@ -19,11 +19,13 @@ public:
 	bool	saveEntry();
 	void	refreshPanel();
 	void	closeEntry();
+	string	statusString();
 
 	// Events
 	void	onTextModified(wxStyledTextEvent& e);
 	void	onBtnFindReplace(wxCommandEvent& e);
 	void	onChoiceLanguageChanged(wxCommandEvent& e);
+	void	onUpdateUI(wxStyledTextEvent& e);
 };
 
 

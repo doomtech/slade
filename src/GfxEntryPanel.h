@@ -10,10 +10,10 @@ class GfxEntryPanel : public EntryPanel {
 private:
 	bool			alph;
 	bool			trns;
+	bool			image_data_modified;
 	GfxCanvas*		gfx_canvas;
 	wxSlider*		slider_zoom;
 	wxStaticText*	label_current_zoom;
-	wxStaticText*	label_dimensions;
 	wxComboBox*		combo_offset_type;
 	wxSpinCtrl*		spin_xoffset;
 	wxSpinCtrl*		spin_yoffset;
@@ -27,6 +27,18 @@ private:
 	int				cur_index;
 
 public:
+	enum {
+		MENU_GFXEP_CONVERT = 2000,
+		MENU_GFXEP_MIRROR,
+		MENU_GFXEP_FLIP,
+		MENU_GFXEP_ROTATE,
+		MENU_GFXEP_TRANSLATE,
+		MENU_GFXEP_COLOURISE,
+		MENU_GFXEP_TINT,
+		MENU_GFXEP_ALPH,
+		MENU_GFXEP_TRNS,
+	};
+
 	GfxEntryPanel(wxWindow* parent);
 	~GfxEntryPanel();
 
@@ -37,6 +49,8 @@ public:
 	int		detectOffsetType();
 	void	applyViewType();
 	void	refresh();
+	string	statusString();
+	void	handleAction(int menu_id);
 
 	void	onZoomChanged(wxCommandEvent& e);
 	void	onXOffsetChanged(wxSpinEvent& e);
@@ -48,6 +62,7 @@ public:
 	void	onGfxOffsetChanged(wxEvent& e);
 	void	onBtnNextImg(wxCommandEvent& e);
 	void	onBtnPrevImg(wxCommandEvent& e);
+	void	onCustomMenu(wxCommandEvent& e);
 	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 
 	SImage*	getImage() { if (gfx_canvas) return gfx_canvas->getImage(); else return NULL; }
