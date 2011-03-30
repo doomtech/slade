@@ -1281,6 +1281,101 @@ bool SImage::loadQuake(const uint8_t* gfx_data, int size) {
 	return true;
 }
 
+/* SImage::loadQuakeSprite
+ * Loads a picture in Quake's sprite format.
+ * Returns false if the image data was invalid, true otherwise.
+ *******************************************************************/
+bool SImage::loadQuakeSprite(const uint8_t* gfx_data, int size, int index) {
+	if (size < 64)
+		return false;
+
+	uint32_t maxheight = READ_L32(gfx_data, 16);
+	uint32_t maxwidth  = READ_L32(gfx_data, 20);
+	uint32_t nframes   = READ_L32(gfx_data, 24);
+
+	// Setup variables
+	numimages   = nframes;
+	has_palette = false;
+	format		= PALMASK;
+
+	// Makes sum of frame pictures, not just frames
+	// Also gather offsets in a data structure
+	vector<size_t> pics;
+	uint32_t imgofs = 36;
+	for (size_t a = 0; a < nframes; ++a) {
+		if (READ_L32(gfx_data, imgofs) != 0) {
+			// We have a frame with a group of picture
+			uint32_t grpsz = READ_L32(gfx_data, imgofs + 4);
+			if (grpsz == 0) {
+				Global::error = "Quake sprite data contains empty group";
+				return false;
+			}
+			// Move to end of group header
+			imgofs += (grpsz+2)<<2;
+			for (size_t b = 0; b < grpsz; ++b) {
+				uint32_t pw = READ_L32(gfx_data, imgofs + 8);
+				uint32_t ph = READ_L32(gfx_data, imgofs + 12);
+				// Store image offset
+				pics.push_back(imgofs);
+				// Move to end of picture data
+				imgofs += 16 + pw * ph;
+				if (imgofs > (unsigned) size) {
+					Global::error = "Quake sprite data too short";
+					return false;
+				}
+			}
+			// We must have made it through all the group's picture,
+			// so replace the count for the group (1) by the group's size.
+			numimages += (grpsz - 1);
+		} else {
+			// We have a frame with a single picture
+			imgofs += 4;
+			uint32_t pw = READ_L32(gfx_data, imgofs + 8);
+			uint32_t ph = READ_L32(gfx_data, imgofs + 12);
+			// Store image offset
+			pics.push_back(imgofs);
+			// Move to end of picture data
+			imgofs += 16 + pw * ph;
+		}
+		if (imgofs > (unsigned) size) {
+			Global::error = "Quake sprite data too short";
+			return false;
+		}
+	}
+
+	// Sanitize index if needed
+	index %= numimages;
+	if (index < 0)
+		index = numimages + index;
+	imgindex = index;
+
+	// Setup variables using appropriate image data
+	imgofs = pics[index];
+	offset_x = READ_L32(gfx_data, imgofs + 0);
+	offset_y = READ_L32(gfx_data, imgofs + 4);
+	width	 = READ_L32(gfx_data, imgofs + 8);
+	height	 = READ_L32(gfx_data, imgofs +12);
+	// Horizontal offsets seem computed differently from Doom, so translate them
+	offset_x += width;
+
+	// Clear current data if it exists
+	clearData();
+	pics.clear();
+
+	// Load image data
+	data = new uint8_t[width * height];
+	mask = new uint8_t[width * height];
+	memcpy(data, gfx_data + imgofs + 16, width * height);
+	memset(mask, 0xFF, width * height);
+	for (int a = 0; a < width * height; ++a)
+		if (data[a] == 0xFF)
+			mask[a] = 0;
+
+	// Announce change and return success
+	announce("image_changed");
+	return true;
+}
+
 /* SImage::loadSCSprite
  * Loads a sprite in ShadowCaster's format.
  * Returns false if the image data was invalid, true otherwise.

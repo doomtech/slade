@@ -248,7 +248,7 @@ public:
 			mc.read(&samplerate, 2);
 			mc.read(&samples, 4);
 
-			if (head == 3 && samples <= (mc.getSize() - 8) && samples > 4)
+			if (head == 3 && samples == (mc.getSize() - 8) && samples > 4)
 				return EDF_TRUE;
 		}
 

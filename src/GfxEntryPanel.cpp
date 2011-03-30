@@ -220,7 +220,7 @@ public:
 		gfx_preview->getImage()->tint(getColour(), getAmount(), palette);
 		gfx_preview->updateImageTexture();
 		gfx_preview->Refresh();
-		label_amount->SetLabel(S_FMT("%d", slider_amount->GetValue()) + "\%");
+		label_amount->SetLabel(S_FMT("%d", slider_amount->GetValue()) + "%%");
 	}
 
 	void onResize(wxSizeEvent& e) {
@@ -437,6 +437,9 @@ void GfxEntryPanel::refresh() {
 	// Set multi-image format stuff thingies
 	cur_index = gfx_canvas->getImage()->getIndex();
 	text_curimg->SetLabel(S_FMT("Image %d/%d", cur_index+1, gfx_canvas->getImage()->getSize()));
+
+	// Update status bar in case image dimensions changed
+	updateStatus();
 
 	// Apply offset view type
 	applyViewType();

@@ -974,7 +974,7 @@ bool SImage::applyTranslation(Translation* tr, Palette8bit* pal) {
 /* SImage::drawPixel
  * Draws a pixel of [colour] at [x],[y], blending it according to
  * the options set in [properties]. If the image is paletted, the
- * resulting pixel colour is converted to it's nearest match in [pal]
+ * resulting pixel colour is converted to its nearest match in [pal]
  *******************************************************************/
 bool SImage::drawPixel(int x, int y, rgba_t colour, si_drawprops_t& properties, Palette8bit* pal) {
 	// Check valid coords
@@ -1130,7 +1130,7 @@ bool SImage::drawImage(SImage& img, int x_pos, int y_pos, si_drawprops_t& proper
 
 /* SImage::colourise
  * Colourises the image to [colour]. If the image is paletted, each
- * pixel will be set to it's nearest matching colour in [pal]
+ * pixel will be set to its nearest matching colour in [pal]
  *******************************************************************/
 bool SImage::colourise(rgba_t colour, Palette8bit* pal) {
 	// Setup palette
@@ -1165,7 +1165,7 @@ bool SImage::colourise(rgba_t colour, Palette8bit* pal) {
 
 /* SImage::tint
  * Tints the image to [colour] by [amount]. If the image is paletted,
- * each pixel will be set to it's nearest matching colour in [pal]
+ * each pixel will be set to its nearest matching colour in [pal]
  *******************************************************************/
 bool SImage::tint(rgba_t colour, float amount, Palette8bit* pal) {
 	// Setup palette

@@ -201,6 +201,7 @@ void EntryDataFormat::initBuiltinFormats() {
 	new HalfLifeTextureFormat();
 	new IMGZDataFormat();
 	new QuakeGfxDataFormat();
+	new QuakeSpriteDataFormat();
 	new QuakeIIWalDataFormat();
 	new RottGfxDataFormat();
 	new RottTransGfxDataFormat();

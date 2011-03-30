@@ -509,6 +509,72 @@ public:
 	}
 };
 
+class QuakeSpriteDataFormat : public EntryDataFormat {
+public:
+	QuakeSpriteDataFormat() : EntryDataFormat("img_qspr") {};
+	~QuakeSpriteDataFormat() {}
+
+	// A Quake sprite can contain several frames and each frame may contain several pictures.
+	int isThisFormat(MemChunk& mc) {
+		uint32_t size = mc.getSize();
+		// Minimum size for a sprite with a single frame containing a single 2x2 picture
+		if (size < 64)
+			return EDF_FALSE;
+		// Check magic word
+		if (mc[0] != 'I' || mc[1] != 'D' || mc[2] != 'S' || mc[3] != 'P')
+			return EDF_FALSE;
+		// Check special values, version must be 1 and type must be between 0 and 4
+		if (READ_L32(mc, 4) != 1 || READ_L32(mc, 8) > 4)
+			return EDF_FALSE;
+		// Check maximum image size
+		uint32_t width  = READ_L32(mc, 16);
+		uint32_t height = READ_L32(mc, 20);
+		if (width == 0 || height == 0)
+			return EDF_FALSE;
+
+		// Check amount of frames
+		uint32_t nframes = READ_L32(mc, 24);
+		if (nframes == 0)
+			return EDF_FALSE;
+
+		// Validate frames
+		uint32_t offset = 36; // Offset to start of first frame
+		for (size_t a = 0; a < nframes; ++a) {
+			if (READ_L32(mc, offset) != 0) {
+				// We have a frame with a group of picture
+				uint32_t grpsz = READ_L32(mc, offset + 4);
+				// Move to end of group header
+				offset += (grpsz+2)<<2;
+				for (size_t b = 0; b < grpsz; ++b) {
+					uint32_t pw = READ_L32(mc, offset + 8);
+					uint32_t ph = READ_L32(mc, offset + 12);
+					if (pw > width || ph > height)
+						return EDF_FALSE;
+					// Move to end of picture data
+					offset += 16 + pw * ph;
+					if (offset > (unsigned) size) {
+						return EDF_FALSE;
+					}
+				}
+			} else {
+				// We have a frame with a single picture
+				offset += 4;
+				uint32_t pw = READ_L32(mc, offset + 8);
+				uint32_t ph = READ_L32(mc, offset + 12);
+				if (pw > width || ph > height)
+					return EDF_FALSE;
+				// Move to end of picture data
+				offset += 16 + pw * ph;
+			}
+			if (offset > (unsigned) size) {
+				return EDF_FALSE;
+			}
+		}
+
+		return EDF_TRUE;
+	}
+};
+
 class QuakeIIWalDataFormat: public EntryDataFormat {
 public:
 	QuakeIIWalDataFormat() : EntryDataFormat("img_quake2wal") {};

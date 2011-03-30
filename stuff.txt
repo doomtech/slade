@@ -34,7 +34,6 @@ TODO List ---------------------------------------------------------------
 
 --- Formats ---
 - 7z/bz2
-- Quake .spr (http://www.gamers.org/dEngine/quake/spec/quake-spec31.html#CSPRF)
 
 --- Text Editor ---
 - 'Tabs as Spaces' option

@@ -46,6 +46,10 @@
 #include <wx/stackwalk.h>
 #include <wx/dir.h>
 
+#ifdef UPDATEREVISION
+#include "svnrevision.h"
+#endif
+
 
 /*******************************************************************
  * VARIABLES
@@ -299,8 +303,6 @@ bool MainApp::OnInit() {
 	// Init logfile
 	initLogFile();
 
-	wxLogMessage("Compiled with wxWidgets %i.%i.%i", wxMAJOR_VERSION, wxMINOR_VERSION, wxRELEASE_NUMBER);
-
 	// Load configuration file
 	wxLogMessage("Loading configuration");
 	readConfigFile();
@@ -414,7 +416,11 @@ void MainApp::initLogFile() {
 	string year = wxNow().Right(4);
 	wxLogMessage("SLADE - It's a Doom Editor");
 	wxLogMessage("Version %s", Global::version.c_str());
+#ifdef UPDATEREVISION
+	wxLogMessage("SLADE Revision " SVN_REVISION_STRING); 
+#endif
 	wxLogMessage("Written by Simon Judd, 2008-%s", year.c_str());
+	wxLogMessage("Compiled with wxWidgets %i.%i.%i", wxMAJOR_VERSION, wxMINOR_VERSION, wxRELEASE_NUMBER);
 	wxLogMessage("--------------------------------");
 }
 
