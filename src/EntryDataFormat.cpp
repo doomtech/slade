@@ -202,6 +202,7 @@ void EntryDataFormat::initBuiltinFormats() {
 	new IMGZDataFormat();
 	new QuakeGfxDataFormat();
 	new QuakeSpriteDataFormat();
+	new QuakeTexDataFormat();
 	new QuakeIIWalDataFormat();
 	new RottGfxDataFormat();
 	new RottTransGfxDataFormat();
@@ -223,6 +224,7 @@ void EntryDataFormat::initBuiltinFormats() {
 	new DatDataFormat();
 	new ResDataFormat();
 	new PakDataFormat();
+	new BSPDataFormat();
 	new GrpDataFormat();
 	new RffDataFormat();
 	new GobDataFormat();

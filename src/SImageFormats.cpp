@@ -1376,6 +1376,48 @@ bool SImage::loadQuakeSprite(const uint8_t* gfx_data, int size, int index) {
 	return true;
 }
 
+/* SImage::loadQuakeTex
+ * Loads a picture in Quake's texture format.
+ * Returns false if the image data was invalid, true otherwise.
+ *******************************************************************/
+bool SImage::loadQuakeTex(const uint8_t* gfx_data, int size, int index) {
+	if (size < 125)
+		return false;
+
+	// Setup variables
+	numimages   = 4;
+	has_palette = false;
+	format		= PALMASK;
+	width		= READ_L32(gfx_data, 16);
+	height		= READ_L32(gfx_data, 20);
+
+	// Sanitize index if needed
+	index %= numimages;
+	if (index < 0)
+		index = numimages + index;
+	imgindex = index;
+
+	// Adjust variables according to mip level
+	if (index) {
+		width  >>= index;
+		height >>= index;
+	}
+
+	// Find offset
+	uint32_t imgofs = READ_L32(gfx_data, 24+(index<<2));
+
+	// Clear current data if it exists
+	clearData();
+
+	// Load image data
+	data = new uint8_t[width * height];
+	memcpy(data, gfx_data + imgofs, width * height);
+
+	// Announce change and return success
+	announce("image_changed");
+	return true;
+}
+
 /* SImage::loadSCSprite
  * Loads a sprite in ShadowCaster's format.
  * Returns false if the image data was invalid, true otherwise.

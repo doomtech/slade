@@ -62,6 +62,16 @@ public:
 	}
 };
 
+class BSPDataFormat : public EntryDataFormat {
+public:
+	BSPDataFormat() : EntryDataFormat("archive_bsp") {};
+	~BSPDataFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		return BSPArchive::isBSPArchive(mc) ? EDF_TRUE : EDF_FALSE;
+	}
+};
+
 class Wad2DataFormat : public EntryDataFormat {
 public:
 	Wad2DataFormat() : EntryDataFormat("archive_wad2") {}

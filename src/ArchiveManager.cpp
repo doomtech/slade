@@ -186,6 +186,8 @@ Archive* ArchiveManager::openArchive(string filename, bool manage) {
 		new_archive = new LibArchive();
 	else if (PakArchive::isPakArchive(filename))
 		new_archive = new PakArchive();
+	else if (BSPArchive::isBSPArchive(filename))
+		new_archive = new BSPArchive();
 	else if (GrpArchive::isGrpArchive(filename))
 		new_archive = new GrpArchive();
 	else if (RffArchive::isRffArchive(filename))
@@ -271,6 +273,8 @@ Archive* ArchiveManager::openArchive(ArchiveEntry* entry, bool manage) {
 		new_archive = new DatArchive();
 	else if (PakArchive::isPakArchive(entry->getMCData()))
 		new_archive = new PakArchive();
+	else if (BSPArchive::isBSPArchive(entry->getMCData()))
+		new_archive = new BSPArchive();
 	else if (GrpArchive::isGrpArchive(entry->getMCData()))
 		new_archive = new GrpArchive();
 	else if (RffArchive::isRffArchive(entry->getMCData()))

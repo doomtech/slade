@@ -575,6 +575,29 @@ public:
 	}
 };
 
+class QuakeTexDataFormat: public EntryDataFormat {
+public:
+	QuakeTexDataFormat() : EntryDataFormat("img_quaketex") {};
+	~QuakeTexDataFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		size_t size = mc.getSize();
+		if (size < 125)
+			return EDF_FALSE;
+
+		size_t width = READ_L32(mc, 16);
+		size_t height = READ_L32(mc, 20);
+		if (!width || !height || width % 8 || height % 8)
+			return EDF_FALSE;
+		for (int m = 0; m < 4; ++m) {
+			size_t offset = READ_L32(mc, (24+(m<<2)));
+			if (!offset || size < offset + ((width>>m) * (height>>m)))
+				return EDF_FALSE;
+		}
+		return EDF_TRUE;
+	}
+};
+
 class QuakeIIWalDataFormat: public EntryDataFormat {
 public:
 	QuakeIIWalDataFormat() : EntryDataFormat("img_quake2wal") {};

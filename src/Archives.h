@@ -4,6 +4,7 @@
 #include "DatArchive.h"
 #include "ResArchive.h"
 #include "PakArchive.h"
+#include "BSPArchive.h"
 #include "GrpArchive.h"
 #include "RffArchive.h"
 #include "GobArchive.h"
