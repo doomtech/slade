@@ -66,6 +66,7 @@ public:
 	point2_t		offset() { return point2_t(offset_x, offset_y); }
 	unsigned		getStride();
 	uint8_t			getBpp();
+	rgba_t			getPixel(unsigned x, unsigned y, Palette8bit* pal = NULL);
 
 	void			setXOffset(int offset);
 	void			setYOffset(int offset);

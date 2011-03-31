@@ -58,6 +58,7 @@ SImage::SImage(SIFormat format) {
 	this->format = format;
 	numimages = 1;
 	imgindex = 0;
+	has_palette = false;
 }
 
 /* SImage::~SImage
@@ -88,16 +89,13 @@ bool SImage::getRGBAData(MemChunk& mc, Palette8bit* pal) {
 	// Otherwise convert
 	else if (format == PALMASK) {
 		// Get palette to use
-		Palette8bit usepal;
-		if (has_palette)
-			usepal.copyPalette(&palette);
-		else if (pal)
-			usepal.copyPalette(pal);
+		if (has_palette || !pal)
+			pal = &palette;
 
 		uint8_t rgba[4];
 		for (int a = 0; a < width * height; a++) {
 			// Get colour
-			rgba_t col = usepal.colour(data[a]);
+			rgba_t col = pal->colour(data[a]);
 
 			// Set alpha
 			if (mask)
@@ -138,16 +136,13 @@ bool SImage::getRGBData(MemChunk& mc, Palette8bit* pal) {
 		// Paletted, convert to RGB
 
 		// Get palette to use
-		Palette8bit usepal;
-		if (has_palette)
-			usepal.copyPalette(&palette);
-		else if (pal)
-			usepal.copyPalette(pal);
+		if (has_palette || !pal)
+			pal = &palette;
 
 		// Build RGB data
 		uint8_t rgba[4];
 		for (int a = 0; a < width * height; a ++) {
-			usepal.colour(data[a]).write(rgba);
+			pal->colour(data[a]).write(rgba);
 			mc.write(rgba, 3);
 		}
 
@@ -181,7 +176,7 @@ bool SImage::getPalData(MemChunk& mc) {
 	return false;	// Invalid image type
 }
 
-/* SImage::stride
+/* SImage::getStride
  * Returns the number of bytes per image row
  *******************************************************************/
 unsigned SImage::getStride() {
@@ -191,7 +186,7 @@ unsigned SImage::getStride() {
 		return width;
 }
 
-/* SImage::bpp
+/* SImage::getBpp
  * Returns the number of bytes per image pixel
  *******************************************************************/
 uint8_t SImage::getBpp() {
@@ -199,6 +194,37 @@ uint8_t SImage::getBpp() {
 		return 4;
 	else
 		return 1;
+}
+
+/* SImage::getPixel
+ * Returns the colour of the pixel at [x,y] in the image, or black+
+ * invisible if out of range
+ *******************************************************************/
+rgba_t SImage::getPixel(unsigned x, unsigned y, Palette8bit* pal) {
+	// Get pixel index
+	unsigned index = y * getStride() + x * getBpp();
+
+	// Check it
+	if (index >= unsigned(width*height*getBpp()))
+		return rgba_t(0, 0, 0, 0);
+
+	// Get colour at pixel
+	rgba_t col;
+	if (format == RGBA) {
+		col.r = data[index];
+		col.g = data[index+1];
+		col.b = data[index+2];
+		col.a = data[index+3];
+	}
+	else {
+		// Get palette to use
+		if (has_palette || !pal)
+			pal = &palette;
+
+		col.set(pal->colour(data[index]));
+	}
+
+	return col;
 }
 
 /* SImage::setXOffset
@@ -341,8 +367,8 @@ void SImage::shrinkPalette(Palette8bit* pal) {
 	if (format != PALMASK)
 		return;
 
-	// Check if a palette was given (if not, process the image's palette)
-	if (!pal)
+	// Get palette to use
+	if (has_palette || !pal)
 		pal = &palette;
 
 	// Init variables
@@ -476,15 +502,12 @@ bool SImage::convertPaletted(Palette8bit* pal_target, Palette8bit* pal_current) 
 bool SImage::maskFromColour(rgba_t colour, Palette8bit* pal, bool force_mask) {
 	if (format == PALMASK && mask != NULL) {
 		// Get palette to use
-		Palette8bit usepal;
-		if (has_palette)
-			usepal.copyPalette(&palette);
-		else if (pal)
-			usepal.copyPalette(pal);
+		if (has_palette || !pal)
+			pal = &palette;
 
 		// Palette+Mask format, go through the mask
 		for (int a = 0; a < width * height; a++) {
-			if (usepal.colour(data[a]).equals(colour))
+			if (pal->colour(data[a]).equals(colour))
 				mask[a] = 0;
 			else
 				mask[a] = 255;
@@ -588,7 +611,10 @@ bool SImage::setPixel(int x, int y, rgba_t colour, Palette8bit* pal) {
 	if (format == RGBA)
 		colour.write(data + (y * (width*4) + (x*4)));
 	else {
-		if (!pal) pal = &palette;
+		// Get palette to use
+		if (has_palette || !pal)
+			pal = &palette;
+
 		data[y * width + x] = pal->nearestColour(colour);
 	}
 
@@ -889,7 +915,7 @@ bool SImage::applyTranslation(Translation* tr, Palette8bit* pal) {
 		return false;
 
 	// Get palette to use
-	if (!pal)
+	if (has_palette || !pal)
 		pal = &palette;
 
 	// Go through pixels
@@ -981,8 +1007,8 @@ bool SImage::drawPixel(int x, int y, rgba_t colour, si_drawprops_t& properties, 
 	if (x < 0 || y < 0 || x >= width || y >= height)
 		return false;
 
-	// Setup palette
-	if (!pal)
+	// Get palette to use
+	if (has_palette || !pal)
 		pal = &palette;
 
 	// Setup alpha
@@ -1081,9 +1107,9 @@ bool SImage::drawImage(SImage& img, int x_pos, int y_pos, si_drawprops_t& proper
 		return false;
 
 	// Setup palettes
-	if (!pal_src)
+	if (img.has_palette || !pal_src)
 		pal_src = &(img.palette);
-	if (!pal_dest)
+	if (has_palette || !pal_dest)
 		pal_dest = &palette;
 
 	// Go through pixels
@@ -1133,8 +1159,8 @@ bool SImage::drawImage(SImage& img, int x_pos, int y_pos, si_drawprops_t& proper
  * pixel will be set to its nearest matching colour in [pal]
  *******************************************************************/
 bool SImage::colourise(rgba_t colour, Palette8bit* pal) {
-	// Setup palette
-	if (!pal)
+	// Get palette to use
+	if (has_palette || !pal)
 		pal = &palette;
 
 	// Go through all pixels
@@ -1168,8 +1194,8 @@ bool SImage::colourise(rgba_t colour, Palette8bit* pal) {
  * each pixel will be set to its nearest matching colour in [pal]
  *******************************************************************/
 bool SImage::tint(rgba_t colour, float amount, Palette8bit* pal) {
-	// Setup palette
-	if (!pal)
+	// Get palette to use
+	if (has_palette || !pal)
 		pal = &palette;
 
 	// Go through all pixels
