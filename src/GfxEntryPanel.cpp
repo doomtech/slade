@@ -312,6 +312,8 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 	menu_custom->AppendSeparator();
 	menu_custom->AppendCheckItem(MENU_GFXEP_ALPH, "alPh Chunk");
 	menu_custom->AppendCheckItem(MENU_GFXEP_TRNS, "tRNS Chunk");
+	menu_custom->AppendSeparator();
+	menu_custom->Append(MENU_GFXEP_EXTRACT, "Extract All");
 	custom_menu_name = "Graphic";
 
 	// Bind Events
@@ -352,7 +354,7 @@ bool GfxEntryPanel::loadEntry(ArchiveEntry* entry, int index) {
 	setModified(false);
 
 	// Attempt to load the image
-	if (!Misc::loadImageFromEntry(gfx_canvas->getImage(), this->entry, index))
+	if (!Misc::loadImageFromEntry(getImage(), this->entry, index))
 		return false;
 
 	// Refresh everything
@@ -368,7 +370,7 @@ bool GfxEntryPanel::saveEntry() {
 	// Write new image data if modified
 	bool ok = true;
 	if (image_data_modified) {
-		SImage* image = gfx_canvas->getImage();
+		SImage* image = getImage();
 
 		// Write depending on type
 		// TODO: I really should write a proper SImage format system so this kind of thing isn't needed
@@ -404,6 +406,44 @@ bool GfxEntryPanel::saveEntry() {
 	return ok;
 }
 
+/* GfxEntryPanel::extractAll
+ * Extract all sub-images as individual PNGs
+ *******************************************************************/
+bool GfxEntryPanel::extractAll() {
+	if (getImage()->getSize() < 2)
+		return false;
+
+	// Remember where we are
+	int imgindex = getImage()->getIndex();
+
+	Archive* parent = entry->getParent();
+	if (parent == NULL) return false;
+
+	int index = parent->entryIndex(entry);
+	string name = wxFileName(entry->getName()).GetName();
+
+	// Loop through subimages and get things done
+	int pos = 0;
+	for (int i = 0; i < getImage()->getSize(); ++i) {
+		string newname = S_FMT("%s_%i.png", CHR(name), i);
+		Misc::loadImageFromEntry(getImage(), entry, i);
+
+		// Only process images that actually contain some pixels
+		if (getImage()->getWidth() && getImage()->getHeight()) {
+			ArchiveEntry * newimg = parent->addNewEntry(newname, index+pos+1, entry->getParentDir());
+			if (newimg == NULL) return false;
+			getImage()->toPNG(newimg->getMCData(), gfx_canvas->getPalette());
+			EntryType::detectEntryType(newimg);
+			pos++;
+		}
+	}
+
+	// Reload image of where we were
+	Misc::loadImageFromEntry(getImage(), entry, imgindex);
+
+	return true;
+}
+
 /* GfxEntryPanel::refresh
  * Reloads image data and force refresh
  *******************************************************************/
@@ -413,8 +453,8 @@ void GfxEntryPanel::refresh() {
 	updateImagePalette();
 
 	// Set offset text boxes
-	spin_xoffset->SetValue(gfx_canvas->getImage()->offset().x);
-	spin_yoffset->SetValue(gfx_canvas->getImage()->offset().y);
+	spin_xoffset->SetValue(getImage()->offset().x);
+	spin_yoffset->SetValue(getImage()->offset().y);
 
 	// Set PNG check menus
 	if (this->entry->getType() != NULL && this->entry->getType()->getFormat() == "img_png") {
@@ -435,8 +475,11 @@ void GfxEntryPanel::refresh() {
 	}
 
 	// Set multi-image format stuff thingies
-	cur_index = gfx_canvas->getImage()->getIndex();
-	text_curimg->SetLabel(S_FMT("Image %d/%d", cur_index+1, gfx_canvas->getImage()->getSize()));
+	cur_index = getImage()->getIndex();
+	if (getImage()->getSize() > 1)
+		menu_custom->Enable(MENU_GFXEP_EXTRACT, true);
+	else menu_custom->Enable(MENU_GFXEP_EXTRACT, false);
+	text_curimg->SetLabel(S_FMT("Image %d/%d", cur_index+1, getImage()->getSize()));
 
 	// Update status bar in case image dimensions changed
 	updateStatus();
@@ -455,7 +498,7 @@ void GfxEntryPanel::refresh() {
 		gfx_canvas->resetOffsets();
 
 	// Setup custom menu
-	if (gfx_canvas->getImage()->getFormat() == RGBA)
+	if (getImage()->getFormat() == RGBA)
 		menu_custom->Enable(MENU_GFXEP_TRANSLATE, false);
 	else
 		menu_custom->Enable(MENU_GFXEP_TRANSLATE, true);
@@ -470,7 +513,7 @@ void GfxEntryPanel::refresh() {
  *******************************************************************/
 string GfxEntryPanel::statusString() {
 	// Setup status string
-	SImage* image = gfx_canvas->getImage();
+	SImage* image = getImage();
 	string status = S_FMT("%dx%d", image->getWidth(), image->getHeight());
 
 	// Colour format
@@ -516,7 +559,7 @@ int GfxEntryPanel::detectOffsetType() {
 	string section = entry->getParent()->detectNamespace(entry);
 
 	if (section == "sprites") {
-		SImage* img = gfx_canvas->getImage();
+		SImage* img = getImage();
 		int left = -img->offset().x;
 		int right = -img->offset().x + img->getWidth();
 		int top = -img->offset().y;
@@ -530,11 +573,11 @@ int GfxEntryPanel::detectOffsetType() {
 
 	// Check for png image
 	if (entry->getType()->getFormat() == "img_png") {
-		if (gfx_canvas->getImage()->offset().x == 0 &&
-			gfx_canvas->getImage()->offset().y == 0)
+		if (getImage()->offset().x == 0 &&
+			getImage()->offset().y == 0)
 			return GFXVIEW_DEFAULT;
 		else {
-			SImage* img = gfx_canvas->getImage();
+			SImage* img = getImage();
 			int left = -img->offset().x;
 			int right = -img->offset().x + img->getWidth();
 			int top = -img->offset().y;
@@ -585,7 +628,7 @@ void GfxEntryPanel::handleAction(int menu_id) {
 	// Mirror
 	if (menu_id == MENU_GFXEP_MIRROR) {
 		// Mirror X
-		gfx_canvas->getImage()->mirror(false);
+		getImage()->mirror(false);
 
 		// Update UI
 		gfx_canvas->updateImageTexture();
@@ -599,7 +642,7 @@ void GfxEntryPanel::handleAction(int menu_id) {
 	// Flip
 	else if (menu_id == MENU_GFXEP_FLIP) {
 		// Mirror Y
-		gfx_canvas->getImage()->mirror(true);
+		getImage()->mirror(true);
 
 		// Update UI
 		gfx_canvas->updateImageTexture();
@@ -619,13 +662,13 @@ void GfxEntryPanel::handleAction(int menu_id) {
 		// Rotate image
 		switch (choice) {
 		case 0:
-			gfx_canvas->getImage()->rotate(90);
+			getImage()->rotate(90);
 			break;
 		case 1:
-			gfx_canvas->getImage()->rotate(180);
+			getImage()->rotate(180);
 			break;
 		case 2:
-			gfx_canvas->getImage()->rotate(270);
+			getImage()->rotate(270);
 			break;
 		default: break;
 		}
@@ -652,7 +695,7 @@ void GfxEntryPanel::handleAction(int menu_id) {
 		// Show colourise dialog
 		if (gcd.ShowModal() == wxID_OK) {
 			// Colourise image
-			gfx_canvas->getImage()->colourise(gcd.getColour(), pal);
+			getImage()->colourise(gcd.getColour(), pal);
 
 			// Update UI
 			gfx_canvas->updateImageTexture();
@@ -672,7 +715,7 @@ void GfxEntryPanel::handleAction(int menu_id) {
 		// Show tint dialog
 		if (gtd.ShowModal() == wxID_OK) {
 			// Tint image
-			gfx_canvas->getImage()->tint(gtd.getColour(), gtd.getAmount(), pal);
+			getImage()->tint(gtd.getColour(), gtd.getAmount(), pal);
 
 			// Update UI
 			gfx_canvas->updateImageTexture();
@@ -687,6 +730,11 @@ void GfxEntryPanel::handleAction(int menu_id) {
 	// alPh/tRNS
 	else if (menu_id == MENU_GFXEP_ALPH || menu_id == MENU_GFXEP_TRNS)
 		setModified();
+
+	// Extract all
+	else if (menu_id == MENU_GFXEP_EXTRACT) {
+		extractAll();
+	}
 }
 
 
@@ -719,7 +767,7 @@ void GfxEntryPanel::onZoomChanged(wxCommandEvent& e) {
 void GfxEntryPanel::onXOffsetChanged(wxSpinEvent& e) {
 	// Change the image x-offset
 	int offset = spin_xoffset->GetValue();
-	gfx_canvas->getImage()->setXOffset(offset);
+	getImage()->setXOffset(offset);
 
 	// Update variables
 	setModified();
@@ -734,7 +782,7 @@ void GfxEntryPanel::onXOffsetChanged(wxSpinEvent& e) {
 void GfxEntryPanel::onYOffsetChanged(wxSpinEvent& e) {
 	// Change image y-offset
 	int offset = spin_yoffset->GetValue();
-	gfx_canvas->getImage()->setYOffset(offset);
+	getImage()->setYOffset(offset);
 
 	// Update variables
 	setModified();

@@ -34,6 +34,7 @@ public:
 		MENU_GFXEP_TINT,
 		MENU_GFXEP_ALPH,
 		MENU_GFXEP_TRNS,
+		MENU_GFXEP_EXTRACT,
 	};
 
 	GfxEntryPanel(wxWindow* parent);
@@ -48,6 +49,7 @@ public:
 	void	refresh();
 	string	statusString();
 	void	handleAction(int menu_id);
+	bool	extractAll();
 
 	void	onZoomChanged(wxCommandEvent& e);
 	void	onXOffsetChanged(wxSpinEvent& e);
