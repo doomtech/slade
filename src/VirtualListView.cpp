@@ -56,6 +56,7 @@ VirtualListView::VirtualListView(wxWindow* parent)
 : wxListCtrl(parent, -1, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxLC_VIRTUAL) {
 	item_attr = new wxListItemAttr();
 	last_focus = 0;
+	col_search = 0;
 
 	// Bind events
 #ifdef __WXGTK__
@@ -280,6 +281,8 @@ void VirtualListView::onMouseLeftDown(wxMouseEvent& e) {
 			sendSelectionChangedEvent();
 			e.Skip();
 		}
+
+		search = "";
 	}
 }
 
@@ -311,6 +314,7 @@ void VirtualListView::onKeyDown(wxKeyEvent& e) {
 				sendSelectionChangedEvent();
 			}
 		}
+		search = "";
 	}
 	else if (e.GetKeyCode() == WXK_DOWN) {
 		if (e.GetModifiers() == wxMOD_SHIFT) {
@@ -336,6 +340,7 @@ void VirtualListView::onKeyDown(wxKeyEvent& e) {
 				sendSelectionChangedEvent();
 			}
 		}
+		search = "";
 	}
 	else
 		e.Skip();
@@ -348,9 +353,34 @@ void VirtualListView::onKeyChar(wxKeyEvent& e) {
 	// Check the key pressed is actually a character (a-z, 0-9 etc)
 	if ((e.GetKeyCode() >= 'a' && e.GetKeyCode() <= 'z') ||
 		(e.GetKeyCode() >= 'A' && e.GetKeyCode() <= 'Z') ||
-		(e.GetKeyCode() >= '1' && e.GetKeyCode() <= '0')) {
-		// TODO: jump to match
+		(e.GetKeyCode() >= '0' && e.GetKeyCode() <= '9')) {	// TODO: special characters
+		search += e.GetKeyCode();
+		search = search.Upper();
+
+		// Get currently focused item (or first if nothing is focused)
+		long focus = getFocus();
+		if (focus < 0) focus = 0;
+
+		// Search for match after the current focus
+		long index = focus;
+		while (index < GetItemCount()) {
+			string name = getItemText(index, col_search);
+			if (name.Upper().StartsWith(search)) {
+				// Matches, update selection+focus
+				clearSelection();
+				selectItem(index);
+				focusItem(index);
+				EnsureVisible(index);
+				sendSelectionChangedEvent();
+				break;
+			}
+
+			// No match, next item
+			index++;
+		}
 	}
+	else
+		search = "";
 
 	e.Skip();
 }

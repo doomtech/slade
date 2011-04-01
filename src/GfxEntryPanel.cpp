@@ -163,7 +163,7 @@ public:
 
 		slider_amount = new wxSlider(this, -1, 50, 0, 100);
 		label_amount = new wxStaticText(this, -1, "100%");
-		hbox->Add(new wxStaticText(this, -1, "Amount (%):"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
+		hbox->Add(new wxStaticText(this, -1, "Amount:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
 		hbox->Add(slider_amount, 1, wxEXPAND|wxRIGHT, 4);
 		hbox->Add(label_amount, 0, wxALIGN_CENTER_VERTICAL);
 
@@ -194,6 +194,9 @@ public:
 		// Setup dialog size
 		SetInitialSize(wxSize(-1, -1));
 		SetMinSize(GetSize());
+
+		// Set values
+		label_amount->SetLabel("50% ");
 	}
 
 	rgba_t getColour() {
@@ -220,7 +223,7 @@ public:
 		gfx_preview->getImage()->tint(getColour(), getAmount(), palette);
 		gfx_preview->updateImageTexture();
 		gfx_preview->Refresh();
-		label_amount->SetLabel(S_FMT("%d", slider_amount->GetValue()) + "%%");
+		label_amount->SetLabel(S_FMT("%d", slider_amount->GetValue()) + "% ");
 	}
 
 	void onResize(wxSizeEvent& e) {

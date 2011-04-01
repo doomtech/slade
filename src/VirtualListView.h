@@ -11,6 +11,7 @@ class VirtualListView : public wxListCtrl {
 private:
 	long	last_focus;
 	string	search;
+	int		col_search;
 
 	void	sendSelectionChangedEvent();
 
@@ -29,6 +30,8 @@ protected:
 public:
 	VirtualListView(wxWindow* parent);
 	~VirtualListView();
+
+	void	setSearchColumn(int col) { col_search = col; }
 
 	// Selection
 	void			selectItem(long item, bool select = true);

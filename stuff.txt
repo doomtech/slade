@@ -8,6 +8,7 @@
 Major Changes Since Last Version ----------------------------------------
 - Texture editor now supports ZDoom's enhanced TEXTURES format
 - New 'Graphic' menu for gfx entries, with some basic gfx editing functions
+- Typing the first few characters of an item to jump to it in lists has been re-implemented
 
 
 TODO List ---------------------------------------------------------------
@@ -17,7 +18,6 @@ TODO List ---------------------------------------------------------------
 
 --- Minor Problems/Annoyances ---
 - Long calltips can extend off the edge of the screen
-- Jumping to an entry by typing the first few letters of its name in the entry list does not work if there are too many entries; instead it always jumps to the first entry of the list. It does work, though, when there are but a handful of entries.
 - Incorrect ctrl+tab behaviour with tabs
 
 --- Editor Features ---
@@ -65,7 +65,7 @@ TODO List ---------------------------------------------------------------
 - Gfx Conversion Dialog:
 	- 'Palette' labels w/palette selection dropdowns
 	- Show current format
-- Drag and drop support
+- More drag-and-drop support
 
 
 --- Internal / Dev ---
@@ -110,7 +110,6 @@ Unimplemented Feature Requests ------------------------------------------
 --- Text Editor ---
 
 --- TEXTUREx Editor ---
-- ability to 'search' for patches or textures by clicking in the list and typing the first few letters of the name, like you can in the lumps list
 - list textures and patches in alphabetical order (with non-iwad ones at the bottom of the list)
 - ability to copy/paste textures (with patches), including between different TEXTUREx entries
 - find/replace for patches

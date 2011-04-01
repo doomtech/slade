@@ -199,6 +199,7 @@ PatchTablePanel::PatchTablePanel(wxWindow* parent, PatchTable* patch_table) : wx
 	wxStaticBoxSizer* framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
 	sizer->Add(framesizer, 0, wxEXPAND|wxALL, 4);
 	list_patches = new PatchTableListView(this, patch_table);
+	list_patches->setSearchColumn(1);	// Want to search by patch name not index
 	framesizer->Add(list_patches, 1, wxEXPAND|wxALL, 4);
 
 	// Add editing controls
