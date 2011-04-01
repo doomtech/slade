@@ -64,6 +64,7 @@
  * VARIABLES
  *******************************************************************/
 CVAR(Int, autosave_entry_changes, 2, CVAR_SAVE)	// 0=no, 1=yes, 2=ask
+CVAR(Bool, confirm_entry_delete, true, CVAR_SAVE)
 
 // Temporary
 enum {
@@ -576,6 +577,23 @@ bool ArchivePanel::deleteEntry() {
 
 	// Get a list of selected directories
 	vector<ArchiveTreeNode*> selected_dirs = entry_list->getSelectedDirectories();
+
+	// Confirmation dialog
+	if (confirm_entry_delete) {
+		string item;
+		int num = selected_entries.size() + selected_dirs.size();
+		if (num == 1) {
+			if (selected_entries.size() == 1)
+				item = selected_entries[0]->getName();
+			else
+				item = selected_dirs[0]->getName();
+		}
+		else if (num > 0)
+			item = S_FMT("these %d items", num);
+
+		if (wxMessageBox(S_FMT("Are you sure you want to delete %s?", CHR(item)), "Delete Confirmation", wxYES_NO) == wxNO)
+			return false;
+	}
 
 	// Clear the selection
 	entry_list->clearSelection();
