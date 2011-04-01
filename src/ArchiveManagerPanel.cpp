@@ -1064,6 +1064,11 @@ void ArchiveManagerPanel::removeSelection() {
 	if (selection.size() == 0)
 		return;
 
+	// Remove selected recent files
+	for (unsigned a = 0; a < selection.size(); a++)
+		theArchiveManager->removeRecentFile(theArchiveManager->recentFile(selection[a]));
+
+/*
 	// Prepare list of kept archives
 	int numfiles = theArchiveManager->numRecentFiles();
 	bool * okay = new bool[numfiles];
@@ -1086,6 +1091,7 @@ void ArchiveManagerPanel::removeSelection() {
 
 	// Renew the list of recent files
 	theArchiveManager->addRecentFiles(kept_files);
+*/
 }
 
 void ArchiveManagerPanel::handleAction(int menu_id) {

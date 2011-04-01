@@ -797,6 +797,19 @@ void ArchiveManager::addRecentFiles(vector<string> paths) {
 	announce("recent_files_changed");
 }
 
+/* ArchiveManager::removeRecentFile
+ * Removes the recent file matching [path]
+ *******************************************************************/
+void ArchiveManager::removeRecentFile(string path) {
+	for (unsigned a = 0; a < recent_files.size(); a++) {
+		if (recent_files[a] == path) {
+			recent_files.erase(recent_files.begin() + a);
+			announce("recent_files_changed");
+			return;
+		}
+	}
+}
+
 /* ArchiveManager::addBookmark
  * Adds [entry] to the bookmark list
  *******************************************************************/

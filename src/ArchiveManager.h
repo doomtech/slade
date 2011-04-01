@@ -78,6 +78,7 @@ public:
 	unsigned	numRecentFiles() { return recent_files.size(); }
 	void		addRecentFile(string path);
 	void		addRecentFiles(vector<string> paths);
+	void		removeRecentFile(string path);
 
 	// Bookmarks
 	void			addBookmark(ArchiveEntry* entry);

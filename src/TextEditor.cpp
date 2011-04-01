@@ -70,7 +70,7 @@ FindReplaceDialog::FindReplaceDialog(wxWindow* parent) : wxMiniFrame(parent, -1,
 
 	// 'Find' text entry
 	sizer->Add(new wxStaticText(panel, -1, "Find:"), 0, wxTOP|wxLEFT|wxRIGHT, 4);
-	text_find = new wxTextCtrl(panel, -1);
+	text_find = new wxTextCtrl(panel, -1, "", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
 	sizer->Add(text_find, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
 	// Find options checkboxes
@@ -90,7 +90,7 @@ FindReplaceDialog::FindReplaceDialog(wxWindow* parent) : wxMiniFrame(parent, -1,
 
 	// 'Replace With' text entry
 	sizer->Add(new wxStaticText(panel, -1, "Replace With:"), 0, wxTOP|wxLEFT|wxRIGHT, 4);
-	text_replace = new wxTextCtrl(panel, -1);
+	text_replace = new wxTextCtrl(panel, -1, "", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
 	sizer->Add(text_replace, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
 
@@ -114,6 +114,7 @@ FindReplaceDialog::FindReplaceDialog(wxWindow* parent) : wxMiniFrame(parent, -1,
 
 	// Bind events
 	Bind(wxEVT_CLOSE_WINDOW, &FindReplaceDialog::onClose, this);
+	Bind(wxEVT_KEY_DOWN, &FindReplaceDialog::onKeyDown, this);
 
 
 	// Init layout
@@ -133,6 +134,14 @@ FindReplaceDialog::~FindReplaceDialog() {
  *******************************************************************/
 void FindReplaceDialog::onClose(wxCloseEvent& e) {
 	Show(false);
+}
+
+void FindReplaceDialog::onKeyDown(wxKeyEvent& e) {
+	// Check for ESC key
+	if (e.GetKeyCode() == WXK_ESCAPE)
+		Close();
+	else
+		e.Skip();
 }
 
 
@@ -186,6 +195,8 @@ TextEditor::TextEditor(wxWindow* parent, int id)
 	dlg_fr->getBtnFindNext()->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextEditor::onFRDBtnFindNext, this);
 	dlg_fr->getBtnReplace()->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextEditor::onFRDBtnReplace, this);
 	dlg_fr->getBtnReplaceAll()->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextEditor::onFRDBtnReplaceAll, this);
+	dlg_fr->getTextFind()->Bind(wxEVT_COMMAND_TEXT_ENTER, &TextEditor::onFRDBtnFindNext, this);
+	dlg_fr->getTextReplace()->Bind(wxEVT_COMMAND_TEXT_ENTER, &TextEditor::onFRDBtnReplace, this);
 }
 
 /* TextEditor::~TextEditor
@@ -617,7 +628,18 @@ void TextEditor::onKeyDown(wxKeyEvent& e) {
 			AutoCompShow(word.size(), autocomp_list);
 	}
 
-	e.Skip();
+	// Ctrl+F (find/replace)
+	else if ((e.GetModifiers() == wxMOD_CONTROL) && (e.GetKeyCode() == 'F'))
+		showFindReplaceDialog();
+
+	// F3 (repeat last find operation)
+	else if (e.GetKeyCode() == WXK_F3) {
+		wxCommandEvent e;
+		onFRDBtnFindNext(e);
+	}
+
+	else
+		e.Skip();
 }
 
 /* TextEditor::onKeyUp

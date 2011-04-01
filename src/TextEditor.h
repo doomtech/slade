@@ -25,6 +25,8 @@ public:
 	wxButton*	getBtnFindNext() { return btn_find_next; }
 	wxButton*	getBtnReplace() { return btn_replace; }
 	wxButton*	getBtnReplaceAll() { return btn_replace_all; }
+	wxTextCtrl*	getTextFind() { return text_find; }
+	wxTextCtrl*	getTextReplace() { return text_replace; }
 	string		getFindString() { return text_find->GetValue(); }
 	string		getReplaceString() { return text_replace->GetValue(); }
 	bool		matchCase() { return cb_match_case->GetValue(); }
@@ -32,6 +34,7 @@ public:
 
 	// Events
 	void	onClose(wxCloseEvent& e);
+	void	onKeyDown(wxKeyEvent& e);
 };
 
 class TextEditor : public wxStyledTextCtrl {
