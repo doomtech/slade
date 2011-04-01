@@ -29,6 +29,7 @@ public:
 
 	// Detection
 	virtual vector<mapdesc_t>	detectMaps() { return vector<mapdesc_t>(); }
+	string						detectNamespace(ArchiveEntry* entry);
 
 	// Static functions
 	static bool isPakArchive(MemChunk& mc);

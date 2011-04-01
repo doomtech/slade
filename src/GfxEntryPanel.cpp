@@ -419,7 +419,7 @@ bool GfxEntryPanel::extractAll() {
 	Archive* parent = entry->getParent();
 	if (parent == NULL) return false;
 
-	int index = parent->entryIndex(entry);
+	int index = parent->entryIndex(entry, entry->getParentDir());
 	string name = wxFileName(entry->getName()).GetName();
 
 	// Loop through subimages and get things done

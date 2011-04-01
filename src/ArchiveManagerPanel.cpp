@@ -48,7 +48,7 @@
  *******************************************************************/
 CVAR(Bool, close_archive_with_tab, true, CVAR_SAVE)
 CVAR(Int, am_current_tab, 0, CVAR_SAVE)
-bool tab_closing = false;	// Hacky workaround to prevent crash on closing a tab when close_archive_with_tab is true
+int tab_closing = false;	// Hacky workaround to prevent crash on closing a tab when close_archive_with_tab is true
 
 
 /*******************************************************************
@@ -527,8 +527,8 @@ void ArchiveManagerPanel::openTab(Archive* archive) {
  * in the archive manager
  *******************************************************************/
 void ArchiveManagerPanel::closeTab(int archive_index) {
-	// Don't close if a tab is already closing
-	if (tab_closing)
+	// Don't close if this tab is already closing
+	if (tab_closing - 1 == archive_index)
 		return;
 
 	Archive* archive = theArchiveManager->getArchive(archive_index);
@@ -1396,13 +1396,13 @@ void ArchiveManagerPanel::onArchiveTabChanged(wxAuiNotebookEvent& e) {
  *******************************************************************/
 void ArchiveManagerPanel::onArchiveTabClose(wxAuiNotebookEvent& e) {
 	if (close_archive_with_tab) {
-		tab_closing = true;
 		Archive* archive = getArchive(e.GetInt());
 		if (archive) {
+			tab_closing = theArchiveManager->archiveIndex(archive) + 1;
 			if (!closeArchive(archive))
 				e.Veto();
 		}
-		tab_closing = false;
+		tab_closing = 0;
 	}
 }
 

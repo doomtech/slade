@@ -1056,7 +1056,7 @@ bool ArchivePanel::basConvert() {
 
 	// Create new entry
 	ArchiveEntry * animdef = archive->addNewEntry((archive->getType() == ARCHIVE_WAD ?
-		"ANIMDEFS" : "animdefs.txt"), index);
+		"ANIMDEFS" : "animdefs.txt"), index, entry_list->getCurrentDir());
 
 	if (animdef) {
 		// Create the memory buffer
