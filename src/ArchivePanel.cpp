@@ -80,6 +80,7 @@ enum {
 	MENU_CONV_DSND_WAV,
 	MENU_CONV_MUS_MIDI,
 	MENU_SCRIPT_COMPILE_ACS,
+	MENU_SCRIPT_COMPILE_ACSH,
 	MENU_TEXTUREX_CONVERT,
 	MENU_TEMP_END
 };
@@ -1196,14 +1197,14 @@ bool ArchivePanel::musMidiConvert() {
 /* ArchivePanel::compileACS
  * Compiles any selected text entries as ACS scripts
  *******************************************************************/
-bool ArchivePanel::compileACS() {
+bool ArchivePanel::compileACS(bool hexen) {
 	// Get selected entries
 	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
 
 	// Go through selection
 	for (unsigned a = 0; a < selection.size(); a++) {
 		// Compile ACS script
-		EntryOperations::compileACS(selection[a]);
+		EntryOperations::compileACS(selection[a], hexen);
 	}
 
 	return true;
@@ -1532,6 +1533,8 @@ void ArchivePanel::handleAction(int menu_id) {
 		musMidiConvert();
 	else if (menu_id == MENU_SCRIPT_COMPILE_ACS)
 		compileACS();
+	else if (menu_id == MENU_SCRIPT_COMPILE_ACSH)
+		compileACS(true);
 	else if (menu_id == MENU_TEXTUREX_CONVERT)
 		convertTextures();
 
@@ -1748,6 +1751,7 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 		//wxMenu* scripts = new wxMenu();
 		//context->AppendSubMenu(scripts, "Scripts");
 		context->Append(MENU_SCRIPT_COMPILE_ACS, "Compile ACS");
+		context->Append(MENU_SCRIPT_COMPILE_ACSH, "Compile ACS (Hexen bytecode)");
 	}
 
 	// Add texturex related menu items if needed

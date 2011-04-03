@@ -172,18 +172,81 @@ public:
 	}
 };
 
-class ACSDataFormat : public EntryDataFormat {
+class ACS0DataFormat : public EntryDataFormat {
 public:
-	ACSDataFormat() : EntryDataFormat("acs") {};
-	~ACSDataFormat() {}
+	ACS0DataFormat() : EntryDataFormat("acs0") {};
+	~ACS0DataFormat() {}
 
 	int isThisFormat(MemChunk& mc) {
 		// Check size
-		if (mc.getSize() > 4) {
+		if (mc.getSize() > 32) {
 			// Check for ACS header
-			if (mc[0] == 'A' && mc[1] == 'C' && mc[2] == 'S' && 
-				(mc[3] == 0 || mc[3] == 'E' || mc[3] == 'e'))
+			if (mc[0] == 'A' && mc[1] == 'C' && mc[2] == 'S' && mc[3] == 0) {
+				uint32_t diroffs = READ_L32(mc, 4);
+				if (diroffs > mc.getSize())
+					return EDF_FALSE;
+				else if (mc[diroffs - 4] == 'A' && mc[diroffs - 3] == 'C' &&
+						 mc[diroffs - 2] == 'S' && mc[diroffs - 1] != 0) {
+					return EDF_FALSE;
+				}
 				return EDF_TRUE;
+			}
+		}
+		return EDF_FALSE;
+	}
+};
+
+class ACSeDataFormat : public EntryDataFormat {
+public:
+	ACSeDataFormat() : EntryDataFormat("acsl") {};
+	~ACSeDataFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		// Check size
+		if (mc.getSize() > 32) {
+			// Check for ACS header
+			if (mc[0] == 'A' && mc[1] == 'C' && mc[2] == 'S') {
+				if (mc[3] == 'e') {
+					return EDF_TRUE;
+				} else if (mc[3] == 0) {
+					uint32_t diroffs = READ_L32(mc, 4);
+					if (diroffs > mc.getSize())
+						return EDF_FALSE;
+					else if (mc[diroffs - 4] == 'A' && mc[diroffs - 3] == 'C' &&
+							 mc[diroffs - 2] == 'S' && mc[diroffs - 1] == 'e') {
+						return EDF_TRUE;
+					}
+					return EDF_FALSE;
+				}
+			}
+		}
+		return EDF_FALSE;
+	}
+};
+
+class ACSEDataFormat : public EntryDataFormat {
+public:
+	ACSEDataFormat() : EntryDataFormat("acse") {};
+	~ACSEDataFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		// Check size
+		if (mc.getSize() > 32) {
+			// Check for ACS header
+			if (mc[0] == 'A' && mc[1] == 'C' && mc[2] == 'S') {
+				if (mc[3] == 'E') {
+					return EDF_TRUE;
+				} else if (mc[3] == 0) {
+					uint32_t diroffs = READ_L32(mc, 4);
+					if (diroffs > mc.getSize())
+						return EDF_FALSE;
+					else if (mc[diroffs - 4] == 'A' && mc[diroffs - 3] == 'C' &&
+							 mc[diroffs - 2] == 'S' && mc[diroffs - 1] == 'E') {
+						return EDF_TRUE;
+					}
+					return EDF_FALSE;
+				}
+			}
 		}
 		return EDF_FALSE;
 	}

@@ -829,7 +829,7 @@ bool EntryOperations::convertTextures(vector<ArchiveEntry*> entries) {
  * entry previous to it, otherwise it is imported to a same-name
  * compiled library entry in the acs namespace
  *******************************************************************/
-bool EntryOperations::compileACS(ArchiveEntry* entry) {
+bool EntryOperations::compileACS(ArchiveEntry* entry, bool hexen) {
 	// Check entry was given
 	if (!entry)
 		return false;
@@ -864,6 +864,7 @@ bool EntryOperations::compileACS(ArchiveEntry* entry) {
 
 	// Execute acc
 	string command = path_acc + " \"" + srcfile + "\" \"" + ofile + "\"";
+	if (hexen) command += " -h";
 	wxExecute(command, wxEXEC_SYNC);
 
 	// Delete source file

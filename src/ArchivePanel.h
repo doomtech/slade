@@ -78,7 +78,7 @@ public:
 	bool	wavDSndConvert();
 	bool	dSndWavConvert();
 	bool	musMidiConvert();
-	bool	compileACS();
+	bool	compileACS(bool hexen = false);
 	bool	convertTextures();
 
 	// Needed for some console commands
