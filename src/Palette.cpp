@@ -144,9 +144,6 @@ bool Palette8bit::saveFile(string filename) {
  * Sets the colour at [index]
  *******************************************************************/
 void Palette8bit::setColour(uint8_t index, rgba_t col) {
-	if (index > 255)
-		return;
-
 	colours[index].set(col);
 	colours_hsl[index] = Misc::rgbToHsl(col.dr(), col.dg(), col.db());
 }
@@ -155,9 +152,6 @@ void Palette8bit::setColour(uint8_t index, rgba_t col) {
  * Sets the colour at [index]'s red component
  *******************************************************************/
 void Palette8bit::setColourR(uint8_t index, uint8_t val) {
-	if (index > 255)
-		return;
-
 	colours[index].r = val;
 	colours_hsl[index] = Misc::rgbToHsl(colours[index].dr(), colours[index].dg(), colours[index].db());
 }
@@ -166,9 +160,6 @@ void Palette8bit::setColourR(uint8_t index, uint8_t val) {
  * Sets the colour at [index]'s green component
  *******************************************************************/
 void Palette8bit::setColourG(uint8_t index, uint8_t val) {
-	if (index > 255)
-		return;
-
 	colours[index].g = val;
 	colours_hsl[index] = Misc::rgbToHsl(colours[index].dr(), colours[index].dg(), colours[index].db());
 }
@@ -177,9 +168,6 @@ void Palette8bit::setColourG(uint8_t index, uint8_t val) {
  * Sets the colour at [index]'s blue component
  *******************************************************************/
 void Palette8bit::setColourB(uint8_t index, uint8_t val) {
-	if (index > 255)
-		return;
-
 	colours[index].b = val;
 	colours_hsl[index] = Misc::rgbToHsl(colours[index].dr(), colours[index].dg(), colours[index].db());
 }

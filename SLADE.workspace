@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CodeLite_Workspace Name="SLADE" Database="./SLADE.tags">
-  <Project Name="SLADE" Path="SLADE.project" Active="Yes"/>
+  <Project Name="SLADE" Path="SLADE.project" Active="No"/>
+  <Project Name="SLADE-osx" Path="SLADE-osx.project" Active="Yes"/>
   <BuildMatrix>
     <WorkspaceConfiguration Name="Debug" Selected="no">
       <Project Name="SLADE" ConfigName="Debug"/>
       <Project Name="SLADE" ConfigName="Debug"/>
+      <Project Name="SLADE-osx" ConfigName="Debug"/>
     </WorkspaceConfiguration>
     <WorkspaceConfiguration Name="Release" Selected="yes">
       <Project Name="SLADE" ConfigName="Release"/>
       <Project Name="SLADE" ConfigName="Release"/>
+      <Project Name="SLADE-osx" ConfigName="Release"/>
     </WorkspaceConfiguration>
   </BuildMatrix>
 </CodeLite_Workspace>

@@ -210,6 +210,8 @@
       <File Name="src/Archives.h"/>
       <File Name="src/HogArchive.cpp"/>
       <File Name="src/HogArchive.h"/>
+      <File Name="src/BSPArchive.cpp"/>
+      <File Name="src/BSPArchive.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Binary Control Lumps">
       <File Name="src/AnimatedList.cpp"/>
