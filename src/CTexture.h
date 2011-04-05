@@ -158,7 +158,7 @@ public:
 	string	asText();
 
 	bool	convertExtended();
-	bool	toImage(SImage& image, Archive* parent = NULL, Palette8bit* pal = NULL);
+	bool	toImage(SImage& image, Archive* parent = NULL, Palette8bit* pal = NULL, bool force_rgba = false);
 };
 
 #endif//__CTEXTURE_H__

@@ -37,7 +37,7 @@
 #include "FreeImage.h"
 #include "Misc.h"
 #include "Translation.h"
-#include "Math.h"
+#include "MathStuff.h"
 #include <wx/filefn.h>
 
 
@@ -1045,34 +1045,34 @@ bool SImage::drawPixel(int x, int y, rgba_t colour, si_drawprops_t& properties, 
 
 	// Additive blending
 	if (properties.blend == ADD) {
-		d_colour.set(	Math::clamp(d_colour.r+colour.r*properties.alpha, 0, 255),
-						Math::clamp(d_colour.g+colour.g*properties.alpha, 0, 255),
-						Math::clamp(d_colour.b+colour.b*properties.alpha, 0, 255),
-						Math::clamp(d_colour.a + colour.a, 0, 255));
+		d_colour.set(	MathStuff::clamp(d_colour.r+colour.r*properties.alpha, 0, 255),
+						MathStuff::clamp(d_colour.g+colour.g*properties.alpha, 0, 255),
+						MathStuff::clamp(d_colour.b+colour.b*properties.alpha, 0, 255),
+						MathStuff::clamp(d_colour.a + colour.a, 0, 255));
 	}
 
 	// Subtractive blending
 	else if (properties.blend == SUBTRACT) {
-		d_colour.set(	Math::clamp(d_colour.r-colour.r*properties.alpha, 0, 255),
-						Math::clamp(d_colour.g-colour.g*properties.alpha, 0, 255),
-						Math::clamp(d_colour.b-colour.b*properties.alpha, 0, 255),
-						Math::clamp(d_colour.a + colour.a, 0, 255));
+		d_colour.set(	MathStuff::clamp(d_colour.r-colour.r*properties.alpha, 0, 255),
+						MathStuff::clamp(d_colour.g-colour.g*properties.alpha, 0, 255),
+						MathStuff::clamp(d_colour.b-colour.b*properties.alpha, 0, 255),
+						MathStuff::clamp(d_colour.a + colour.a, 0, 255));
 	}
 
 	// Reverse-Subtractive blending
 	else if (properties.blend == REVERSE_SUBTRACT) {
-		d_colour.set(	Math::clamp((-d_colour.r)+colour.r*properties.alpha, 0, 255),
-						Math::clamp((-d_colour.g)+colour.g*properties.alpha, 0, 255),
-						Math::clamp((-d_colour.b)+colour.b*properties.alpha, 0, 255),
-						Math::clamp(d_colour.a + colour.a, 0, 255));
+		d_colour.set(	MathStuff::clamp((-d_colour.r)+colour.r*properties.alpha, 0, 255),
+						MathStuff::clamp((-d_colour.g)+colour.g*properties.alpha, 0, 255),
+						MathStuff::clamp((-d_colour.b)+colour.b*properties.alpha, 0, 255),
+						MathStuff::clamp(d_colour.a + colour.a, 0, 255));
 	}
 
 	// 'Modulate' blending
 	else if (properties.blend == MODULATE) {
-		d_colour.set(	Math::clamp(colour.r*d_colour.r / 255, 0, 255),
-						Math::clamp(colour.g*d_colour.g / 255, 0, 255),
-						Math::clamp(colour.b*d_colour.b / 255, 0, 255),
-						Math::clamp(d_colour.a + colour.a, 0, 255));
+		d_colour.set(	MathStuff::clamp(colour.r*d_colour.r / 255, 0, 255),
+						MathStuff::clamp(colour.g*d_colour.g / 255, 0, 255),
+						MathStuff::clamp(colour.b*d_colour.b / 255, 0, 255),
+						MathStuff::clamp(d_colour.a + colour.a, 0, 255));
 	}
 
 	// Normal blending (or unknown blend type)
@@ -1081,7 +1081,7 @@ bool SImage::drawPixel(int x, int y, rgba_t colour, si_drawprops_t& properties, 
 		d_colour.set(	d_colour.r*inv_alpha + colour.r*properties.alpha,
 						d_colour.g*inv_alpha + colour.g*properties.alpha,
 						d_colour.b*inv_alpha + colour.b*properties.alpha,
-						Math::clamp(d_colour.a + colour.a, 0, 255));
+						MathStuff::clamp(d_colour.a + colour.a, 0, 255));
 	}
 
 	// Apply new colour
@@ -1175,9 +1175,9 @@ bool SImage::colourise(rgba_t colour, Palette8bit* pal) {
 
 		// Colourise it
 		float grey = (col.r*0.3f + col.g*0.59f + col.b*0.11f) / 255.0f;
-		col.r = grey*colour.r;
-		col.g = grey*colour.g;
-		col.b = grey*colour.b;
+		col.r = colour.r*grey;
+		col.g = colour.g*grey;
+		col.b = colour.b*grey;
 
 		// Set pixel colour
 		if (format == RGBA)

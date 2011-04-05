@@ -28,7 +28,7 @@
  * INCLUDES
  *******************************************************************/
 #include "Main.h"
-#include "Math.h"
+#include "MathStuff.h"
 
 
 /*******************************************************************
@@ -38,7 +38,7 @@
 /* Math::clamp
  * Clamps [val] to be between [min] and [max]
  *******************************************************************/
-double Math::clamp(double val, double min, double max) {
+double MathStuff::clamp(double val, double min, double max) {
 	if (val < min) val = min;
 	if (val > max) val = max;
 	return val;

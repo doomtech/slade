@@ -49,6 +49,7 @@ public:
 	void	enableBlendControls(bool enable, bool tint = false) { cp_blend_col->Enable(enable); spin_tint_amount->Enable(enable && tint); }
 
 	// Events
+	void	onCBBlendRGBAChanged(wxCommandEvent& e);
 	void	onTexScaleXChanged(wxSpinDoubleEvent& e);
 	void	onTexScaleYChanged(wxSpinDoubleEvent& e);
 	void	onTexOffsetXChanged(wxSpinEvent& e);

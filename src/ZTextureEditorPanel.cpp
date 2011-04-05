@@ -88,6 +88,16 @@ wxPanel* ZTextureEditorPanel::createTextureControls(wxWindow* parent) {
 	cb_nodecals->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &ZTextureEditorPanel::onTexNoDecalsChanged, this);
 	cb_nulltexture->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &ZTextureEditorPanel::onTexNullTextureChanged, this);
 
+
+
+	// This stuff should be in the constructor really, but can't (it crashes)
+
+	// Show the 'Truecolour Preview' checkbox
+	cb_blend_rgba->Show(true);
+	// Bind events
+	cb_blend_rgba->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &ZTextureEditorPanel::onCBBlendRGBAChanged, this);
+
+
 	return panel;
 }
 
@@ -393,6 +403,14 @@ void ZTextureEditorPanel::updatePatchControls() {
 
 
 
+void ZTextureEditorPanel::onCBBlendRGBAChanged(wxCommandEvent& e) {
+	// Set rgba blending
+	tex_canvas->blendRGBA(cb_blend_rgba->GetValue());
+
+	// Update UI
+	tex_canvas->redraw(true);
+}
+
 void ZTextureEditorPanel::onTexScaleXChanged(wxSpinDoubleEvent& e) {
 	// Set texture's x scale
 	if (tex_current)
@@ -480,7 +498,7 @@ void ZTextureEditorPanel::onPatchFlipXChanged(wxCommandEvent& e) {
 	}
 
 	// Update UI
-	tex_canvas->Refresh();
+	tex_canvas->redraw(true);
 
 	tex_modified = true;
 }
@@ -498,7 +516,7 @@ void ZTextureEditorPanel::onPatchFlipYChanged(wxCommandEvent& e) {
 	}
 
 	// Update UI
-	tex_canvas->Refresh();
+	tex_canvas->redraw(true);
 
 	tex_modified = true;
 }
@@ -525,7 +543,7 @@ void ZTextureEditorPanel::onPatchRotationChanged(wxCommandEvent& e) {
 	}
 
 	// Update UI
-	tex_canvas->Refresh();
+	tex_canvas->redraw(true);
 
 	tex_modified = true;
 }
@@ -543,7 +561,7 @@ void ZTextureEditorPanel::onPatchAlphaChanged(wxSpinDoubleEvent& e) {
 	}
 
 	// Update UI
-	tex_canvas->Refresh();
+	tex_canvas->redraw(true);
 
 	tex_modified = true;
 }
@@ -561,7 +579,7 @@ void ZTextureEditorPanel::onPatchAlphaStyleChanged(wxCommandEvent& e) {
 	}
 
 	// Update UI
-	tex_canvas->Refresh();
+	tex_canvas->redraw(true);
 
 	tex_modified = true;
 }
@@ -581,7 +599,7 @@ void ZTextureEditorPanel::onPCNormalSelected(wxCommandEvent& e) {
 	// Update UI
 	enableTranslationControls(false);
 	enableBlendControls(false);
-	tex_canvas->Refresh();
+	tex_canvas->redraw(true);
 
 	tex_modified = true;
 }
@@ -601,7 +619,7 @@ void ZTextureEditorPanel::onPCBlendSelected(wxCommandEvent& e) {
 	// Update UI
 	enableTranslationControls(false);
 	enableBlendControls(true);
-	tex_canvas->Refresh();
+	tex_canvas->redraw(true);
 
 	tex_modified = true;
 }
@@ -621,7 +639,7 @@ void ZTextureEditorPanel::onPCTintSelected(wxCommandEvent& e) {
 	// Update UI
 	enableTranslationControls(false);
 	enableBlendControls(true, true);
-	tex_canvas->Refresh();
+	tex_canvas->redraw(true);
 
 	tex_modified = true;
 }
@@ -641,7 +659,7 @@ void ZTextureEditorPanel::onPCTranslationSelected(wxCommandEvent& e) {
 	// Update UI
 	enableTranslationControls(true);
 	enableBlendControls(false);
-	tex_canvas->Refresh();
+	tex_canvas->redraw(true);
 
 	tex_modified = true;
 }
@@ -661,7 +679,7 @@ void ZTextureEditorPanel::onPatchColourChanged(wxColourPickerEvent& e) {
 	}
 
 	// Update UI
-	tex_canvas->Refresh();
+	tex_canvas->redraw(true);
 
 	tex_modified = true;
 }
@@ -681,7 +699,7 @@ void ZTextureEditorPanel::onPatchTintAmountChanged(wxSpinDoubleEvent& e) {
 	}
 
 	// Update UI
-	tex_canvas->Refresh();
+	tex_canvas->redraw(true);
 
 	tex_modified = true;
 }

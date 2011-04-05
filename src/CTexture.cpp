@@ -283,7 +283,7 @@ bool CTPatchEx::parse(Tokenizer& tz, uint8_t type) {
 				// If no second value, it's just a colour string
 				if (tz.peekToken() != ",") {
 					col.Set(first);
-					colour.set(col.Red(), col.Blue(), col.Green());
+					colour.set(col.Red(), col.Green(), col.Blue());
 				}
 				else {
 					// Second value could be alpha or green
@@ -293,7 +293,7 @@ bool CTPatchEx::parse(Tokenizer& tz, uint8_t type) {
 					// If no third value, it's an alpha value
 					if (tz.peekToken() != ",") {
 						col.Set(first);
-						colour.set(col.Red(), col.Blue(), col.Green(), second*255);
+						colour.set(col.Red(), col.Green(), col.Blue(), second*255);
 						blendtype = 3;
 					}
 					else {
@@ -757,7 +757,7 @@ bool CTexture::convertExtended() {
  * Generates a SImage representation of this texture, using patches
  * from [parent] primarily, and the palette [pal]
  *******************************************************************/
-bool CTexture::toImage(SImage& image, Archive* parent, Palette8bit* pal) {
+bool CTexture::toImage(SImage& image, Archive* parent, Palette8bit* pal, bool force_rgba) {
 	// Init image
 	image.clear();
 	image.resize(width, height);
@@ -776,6 +776,10 @@ bool CTexture::toImage(SImage& image, Archive* parent, Palette8bit* pal) {
 			// Load patch entry
 			if (!Misc::loadImageFromEntry(&p_img, patch->getPatchEntry(parent)))
 				continue;
+
+			// Convert to RGBA if forced
+			if (force_rgba)
+				p_img.convertRGBA(pal);
 
 			// Flip/rotate if needed
 			if (patch->flipX())

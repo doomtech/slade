@@ -85,6 +85,12 @@ void TextureEditorPanel::setupLayout() {
 
 	hbox->AddStretchSpacer();
 
+	// 'Truecolour Preview' checkbox
+	cb_blend_rgba = new wxCheckBox(this, -1, "Truecolour Preview");
+	cb_blend_rgba->SetValue(false);
+	hbox->Add(cb_blend_rgba, 0, wxEXPAND|wxRIGHT, 4);
+	cb_blend_rgba->Show(false);	// Only show this on ZTextureEditorPanel
+
 	// 'Show Outside' checkbox
 	cb_draw_outside = new wxCheckBox(this, -1, "Show Outside");
 	cb_draw_outside->SetValue(true);
@@ -130,6 +136,7 @@ void TextureEditorPanel::setupLayout() {
 	spin_patch_left->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &TextureEditorPanel::onPatchPositionXChanged, this);
 	spin_patch_top->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &TextureEditorPanel::onPatchPositionYChanged, this);
 	Bind(wxEVT_COMMAND_MENU_SELECTED, &TextureEditorPanel::onContextMenu, this, M_BEGIN, M_END);
+
 
 	// Init layout
 	Layout();
@@ -392,7 +399,6 @@ bool TextureEditorPanel::openTexture(CTexture* tex) {
 void TextureEditorPanel::setPalette(Palette8bit *pal) {
 	tex_canvas->setPalette(pal);
 	tex_canvas->updatePatchTextures();
-	//tex_canvas->generateTexture();
 	tex_canvas->Refresh();
 }
 
@@ -468,7 +474,7 @@ void TextureEditorPanel::patchBack() {
 
 	// Update UI
 	updatePatchControls();
-	tex_canvas->Refresh();
+	tex_canvas->redraw(true);
 
 	tex_modified = true;
 }
@@ -495,7 +501,7 @@ void TextureEditorPanel::patchForward() {
 
 	// Update UI
 	updatePatchControls();
-	tex_canvas->Refresh();
+	tex_canvas->redraw(true);
 
 	tex_modified = true;
 }
@@ -588,7 +594,7 @@ void TextureEditorPanel::onZoomChanged(wxCommandEvent& e) {
 
 	// Zoom gfx canvas and update
 	tex_canvas->setScale((double)zoom_percent * 0.01);
-	tex_canvas->Refresh();
+	tex_canvas->redraw(false);
 }
 
 /* TextureEditorPanel::onDrawOutsideChanged
@@ -599,7 +605,7 @@ void TextureEditorPanel::onDrawOutsideChanged(wxCommandEvent& e) {
 	tex_canvas->drawOutside(cb_draw_outside->GetValue());
 
 	// Update UI
-	tex_canvas->Refresh();
+	tex_canvas->redraw(false);
 }
 
 /* TextureEditorPanel::onTexCanvasMouseEvent
@@ -654,7 +660,7 @@ void TextureEditorPanel::onTexCanvasMouseEvent(wxMouseEvent& e) {
 		}
 
 		// Redraw texture canvas
-		tex_canvas->Refresh();
+		tex_canvas->redraw(false);
 	}
 
 	// RIGHT MOUSE UP
@@ -697,7 +703,7 @@ void TextureEditorPanel::onTexCanvasMouseEvent(wxMouseEvent& e) {
 
 			// Refresh texture canvas
 			tex_canvas->showGrid(true);
-			tex_canvas->Refresh();
+			tex_canvas->redraw(false);
 		}
 	}
 
@@ -811,7 +817,7 @@ void TextureEditorPanel::onTexCanvasKeyDown(wxKeyEvent& e) {
 			tex_modified = true;
 		}
 
-		tex_canvas->Refresh();
+		tex_canvas->redraw(true);
 		handled = true;
 	}
 
@@ -839,7 +845,7 @@ void TextureEditorPanel::onTexWidthChanged(wxSpinEvent &e) {
 		tex_current->setWidth(spin_tex_width->GetValue());
 
 	// Update UI
-	tex_canvas->Refresh();
+	tex_canvas->redraw(true);
 	updateTextureScaleLabel();
 
 	tex_modified = true;
@@ -854,7 +860,7 @@ void TextureEditorPanel::onTexHeightChanged(wxSpinEvent& e) {
 		tex_current->setHeight(spin_tex_height->GetValue());
 
 	// Update UI
-	tex_canvas->Refresh();
+	tex_canvas->redraw(true);
 	updateTextureScaleLabel();
 
 	tex_modified = true;
@@ -896,7 +902,7 @@ void TextureEditorPanel::onPatchListSelect(wxListEvent &e) {
 	tex_canvas->selectPatch(e.GetIndex());
 
 	// Update UI
-	tex_canvas->Refresh();
+	tex_canvas->redraw(false);
 	updatePatchControls();
 }
 
@@ -908,7 +914,7 @@ void TextureEditorPanel::onPatchListDeSelect(wxListEvent &e) {
 	tex_canvas->deSelectPatch(e.GetIndex());
 
 	// Update UI
-	tex_canvas->Refresh();
+	tex_canvas->redraw(false);
 	updatePatchControls();
 }
 
@@ -970,7 +976,7 @@ void TextureEditorPanel::onPatchPositionXChanged(wxSpinEvent& e) {
 	patch->setOffsetX(spin_patch_left->GetValue());
 
 	// Update UI
-	tex_canvas->Refresh();
+	tex_canvas->redraw(true);
 }
 
 /* TextureEditorPanel::onPatchPositionYChanged
@@ -989,7 +995,7 @@ void TextureEditorPanel::onPatchPositionYChanged(wxSpinEvent& e) {
 	patch->setOffsetY(spin_patch_top->GetValue());
 
 	// Update UI
-	tex_canvas->Refresh();
+	tex_canvas->redraw(true);
 }
 
 /* TextureEditorPanel::onContextMenu

@@ -56,7 +56,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WXDEBUG;WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <MinimalRebuild>true</MinimalRebuild>
+      <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader>
@@ -126,7 +126,6 @@
     <ClCompile Include="src\ExtMessageDialog.cpp" />
     <ClCompile Include="src\GeneralPrefsPanel.cpp" />
     <ClCompile Include="src\GfxConvDialog.cpp" />
-    <ClCompile Include="src\glew\glew.c" />
     <ClCompile Include="src\GobArchive.cpp" />
     <ClCompile Include="src\GrpArchive.cpp" />
     <ClCompile Include="src\HexEditorPanel.cpp" />
@@ -135,7 +134,7 @@
     <ClCompile Include="src\LfdArchive.cpp" />
     <ClCompile Include="src\LibArchive.cpp" />
     <ClCompile Include="src\MapEntryPanel.cpp" />
-    <ClCompile Include="src\Math.cpp" />
+    <ClCompile Include="src\MathStuff.cpp" />
     <ClCompile Include="src\MIDIPlayer.cpp" />
     <ClCompile Include="src\ModifyOffsetsDialog.cpp" />
     <ClCompile Include="src\PakArchive.cpp" />
@@ -248,8 +247,6 @@
     <ClInclude Include="src\ExtMessageDialog.h" />
     <ClInclude Include="src\GeneralPrefsPanel.h" />
     <ClInclude Include="src\GfxConvDialog.h" />
-    <ClInclude Include="src\glew\glew.h" />
-    <ClInclude Include="src\glew\wglew.h" />
     <ClInclude Include="src\GobArchive.h" />
     <ClInclude Include="src\GrpArchive.h" />
     <ClInclude Include="src\HexEditorPanel.h" />
@@ -260,7 +257,7 @@
     <ClInclude Include="src\LibArchive.h" />
     <ClInclude Include="src\LumpFormats.h" />
     <ClInclude Include="src\MapEntryPanel.h" />
-    <ClInclude Include="src\Math.h" />
+    <ClInclude Include="src\MathStuff.h" />
     <ClInclude Include="src\MIDIPlayer.h" />
     <ClInclude Include="src\MiscFormats.h" />
     <ClInclude Include="src\ModelFormats.h" />

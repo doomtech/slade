@@ -16,6 +16,7 @@ private:
 	CTexture*			texture;
 	Archive*			parent;
 	vector<GLTexture*>	patch_textures;
+	GLTexture			tex_preview;
 	vector<bool>		selected_patches;
 	int					hilight_patch;
 	fpoint2_t			offset;
@@ -24,6 +25,7 @@ private:
 	bool				draw_outside;
 	bool				dragging;
 	bool				show_grid;
+	bool				blend_rgba;
 
 public:
 	CTextureCanvas(wxWindow* parent, int id);
@@ -36,6 +38,7 @@ public:
 	bool		isDragging() { return dragging; }
 	bool		showGrid() { return show_grid; }
 	void		showGrid(bool show = true) { show_grid = show; }
+	void		blendRGBA(bool rgba) { blend_rgba = rgba; }
 
 	void	selectPatch(int index);
 	void	deSelectPatch(int index);
@@ -44,12 +47,14 @@ public:
 	void	clearTexture();
 	void	clearPatchTextures();
 	void	updatePatchTextures();
+	void	updateTexturePreview();
 	bool	openTexture(CTexture* tex, Archive* parent);
 	void	draw();
 	void	drawTexture();
 	void	drawPatch(int num, bool outside = false);
 	void	drawTextureBorder();
 	void	resetOffsets() { offset.x = offset.y = 0; }
+	void	redraw(bool update_tex = false);
 
 	point2_t	screenToTexPosition(int x, int y);
 	int			patchAt(int x, int y);

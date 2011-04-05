@@ -19,6 +19,7 @@ protected:
 	wxSlider*		slider_zoom;
 	wxStaticText*	label_current_zoom;
 	wxCheckBox*		cb_draw_outside;
+	wxCheckBox*		cb_blend_rgba;
 	CTextureCanvas*	tex_canvas;
 
 	// Texture controls
