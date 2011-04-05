@@ -13,6 +13,13 @@ Major Changes Since Last Version ----------------------------------------
 
 TODO List ---------------------------------------------------------------
 
+--- Before 3.0.2 ---
+- Finish TEXTURES editing:
+Fix up CTextureCanvas drawing
+Translation editor
+Gfx browser for patches
+(maybe) copy+paste textures
+
 --- Bugs ---
 - Audio player issues
 

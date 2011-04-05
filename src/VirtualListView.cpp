@@ -60,9 +60,9 @@ VirtualListView::VirtualListView(wxWindow* parent)
 
 	// Bind events
 #ifdef __WXGTK__
-	Bind(wxEVT_LEFT_DOWN, &VirtualListView::onMouseLeftDown, this);
 	Bind(wxEVT_KEY_DOWN, &VirtualListView::onKeyDown, this);
 #endif
+	Bind(wxEVT_LEFT_DOWN, &VirtualListView::onMouseLeftDown, this);
 	Bind(wxEVT_COMMAND_LIST_COL_END_DRAG, &VirtualListView::onColumnResize, this);
 	Bind(wxEVT_CHAR, &VirtualListView::onKeyChar, this);
 }
@@ -248,6 +248,7 @@ void VirtualListView::onColumnResize(wxListEvent& e) {
  * Called when the list is left clicked
  *******************************************************************/
 void VirtualListView::onMouseLeftDown(wxMouseEvent& e) {
+#ifdef __WXGTK__
 	// Default handler for double-click
 	if (e.ButtonDClick()) {
 		e.Skip();
@@ -284,6 +285,10 @@ void VirtualListView::onMouseLeftDown(wxMouseEvent& e) {
 
 		search = "";
 	}
+#else
+	search = "";
+	e.Skip();
+#endif
 }
 
 /* VirtualListView::onKeyDown
@@ -346,16 +351,39 @@ void VirtualListView::onKeyDown(wxKeyEvent& e) {
 		e.Skip();
 }
 
+int vlv_chars[] = {
+	'.', ',', '_', '-', '+', '=', '`', '~',
+	'!', '@', '#', '$', '(', ')', '[', ']',
+	'{', '}', ':', ';', '/', '\\', '<', '>',
+	'?', '^', '&', '\'', '\"',
+};
+int n_vlv_chars = 30;
+
 /* VirtualListView::onKeyChar
  * Called when a 'character' key is pressed within the list
  *******************************************************************/
 void VirtualListView::onKeyChar(wxKeyEvent& e) {
 	// Check the key pressed is actually a character (a-z, 0-9 etc)
-	if ((e.GetKeyCode() >= 'a' && e.GetKeyCode() <= 'z') ||
-		(e.GetKeyCode() >= 'A' && e.GetKeyCode() <= 'Z') ||
-		(e.GetKeyCode() >= '0' && e.GetKeyCode() <= '9')) {	// TODO: special characters
+	bool isRealChar = false;
+	if (e.GetKeyCode() >= 'a' && e.GetKeyCode() <= 'z')			// Lowercase
+		isRealChar = true;
+	else if (e.GetKeyCode() >= 'A' && e.GetKeyCode() <= 'Z')	// Uppercase
+		isRealChar = true;
+	else if (e.GetKeyCode() >= '0' && e.GetKeyCode() <= '9')	// Number
+		isRealChar = true;
+	else {
+		for (int a = 0; a < n_vlv_chars; a++) {
+			if (e.GetKeyCode() == vlv_chars[a]) {
+				isRealChar = true;
+				break;
+			}
+		}
+	}
+
+	if (isRealChar) {
 		search += e.GetKeyCode();
 		search = search.Upper();
+		wxLogMessage(search);
 
 		// Get currently focused item (or first if nothing is focused)
 		long focus = getFocus();
@@ -379,10 +407,16 @@ void VirtualListView::onKeyChar(wxKeyEvent& e) {
 			index++;
 		}
 	}
-	else
+	else {
 		search = "";
-
-	e.Skip();
+		
+		// Only want to do default action on navigation key
+		if (e.GetKeyCode() == WXK_UP || e.GetKeyCode() == WXK_DOWN ||
+			e.GetKeyCode() == WXK_PAGEUP || e.GetKeyCode() == WXK_PAGEDOWN ||
+			e.GetKeyCode() == WXK_HOME || e.GetKeyCode() == WXK_END ||
+			e.GetKeyCode() == WXK_TAB)
+			e.Skip();
+	}
 }
 
 
