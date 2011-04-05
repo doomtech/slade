@@ -46,7 +46,7 @@ PaletteEntryPanel::PaletteEntryPanel(wxWindow* parent)
 : EntryPanel(parent, "palette") {
 	// Add palette canvas
 	pal_canvas = new PaletteCanvas(this, -1);
-	sizer_main->Add(pal_canvas->toPanel(this), 1, wxEXPAND|wxALL, 4);
+	sizer_main->Add(pal_canvas->toPanel(this), 1, wxEXPAND, 0);
 
 	// Disable default entry buttons
 	btn_save->Enable(false);
@@ -57,14 +57,9 @@ PaletteEntryPanel::PaletteEntryPanel(wxWindow* parent)
 	btn_nextpal = new wxBitmapButton(this, -1, getIcon("t_right"));
 	btn_prevpal = new wxBitmapButton(this, -1, getIcon("t_left"));
 	text_curpal = new wxStaticText(this, -1, "Palette XX/XX");
-	sizer_top->Add(btn_prevpal, 0, wxEXPAND|wxRIGHT|wxLEFT, 4);
-	sizer_top->Add(btn_nextpal, 0, wxEXPAND|wxRIGHT, 4);
-	sizer_top->Add(text_curpal, 0, wxALIGN_CENTER_VERTICAL, 4);
-
-	// Add colour info label
-	label_selected_colour = new wxStaticText(this, -1, wxEmptyString);
-	sizer_top->AddSpacer(8);
-	sizer_top->Add(label_selected_colour, 0, wxALIGN_CENTER_VERTICAL, 4);
+	sizer_bottom->Add(btn_prevpal, 0, wxEXPAND|wxRIGHT, 4);
+	sizer_bottom->Add(btn_nextpal, 0, wxEXPAND|wxRIGHT, 4);
+	sizer_bottom->Add(text_curpal, 0, wxALIGN_CENTER_VERTICAL, 4);
 
 	// Add 'Add to Palettes' button
 	btn_exportpal = new wxButton(this, -1, "Add to Palettes");
@@ -125,6 +120,17 @@ bool PaletteEntryPanel::loadEntry(ArchiveEntry* entry) {
 	return true;
 }
 
+/* GfxEntryPanel::statusString
+ * Returns a string with extended editing/entry info for the status
+ * bar
+ *******************************************************************/
+string PaletteEntryPanel::statusString() {
+	// Get current colour
+	rgba_t col = pal_canvas->getSelectedColour();
+
+	return S_FMT("R %d, G %d, B %d", col.r, col.g, col.b);
+}
+
 /* PaletteEntryPanel::showPalette
  * Shows the palette at [index]. Returns false if [index] is out of
  * bounds, true otherwise
@@ -178,11 +184,8 @@ void PaletteEntryPanel::onPalCanvasMouseEvent(wxMouseEvent& e) {
 		// Send to palette canvas
 		pal_canvas->onMouseLeftDown(e);
 
-		// Get colour
-		rgba_t col = pal_canvas->getSelectedColour();
-
-		// Set label
-		label_selected_colour->SetLabel(S_FMT("R%d G%d B%d", col.r, col.g, col.b));
+		// Update status bar
+		updateStatus();
 	}
 }
 

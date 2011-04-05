@@ -335,7 +335,7 @@ void MEPCanvas::createImage(ArchiveEntry& ae, int width, int height) {
 MapEntryPanel::MapEntryPanel(wxWindow* parent) : EntryPanel(parent, "map") {
 	// Setup map canvas
 	map_canvas = new MEPCanvas(this);
-	sizer_main->Add(map_canvas->toPanel(this), 1, wxEXPAND|wxALL, 4);
+	sizer_main->Add(map_canvas->toPanel(this), 1, wxEXPAND, 0);
 
 	// Add 'Save Map Image' button
 	btn_saveimg = new wxButton(this, -1, "Save Map Image");

@@ -50,12 +50,7 @@ TextEntryPanel::TextEntryPanel(wxWindow* parent)
 : EntryPanel(parent, "text") {
 	// Create the text area
 	text_area = new TextEditor(this, -1);
-	sizer_main->Add(text_area, 1, wxEXPAND | wxALL, 4);
-
-
-	// Setup bottom bar sizer
-	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
-	sizer_main->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
+	sizer_main->Add(text_area, 1, wxEXPAND, 0);
 
 	// Add 'Text Language' choice
 	languages = TextLanguage::getLanguageNames();
@@ -63,14 +58,14 @@ TextEntryPanel::TextEntryPanel(wxWindow* parent)
 	languages.Insert("None", 0, 1);
 	choice_text_language = new wxChoice(this, -1, wxDefaultPosition, wxDefaultSize, languages);
 	choice_text_language->Select(0);
-	hbox->Add(new wxStaticText(this, -1, "Text Language:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
-	hbox->Add(choice_text_language, 0, wxEXPAND|wxRIGHT, 4);
+	sizer_bottom->Add(new wxStaticText(this, -1, "Text Language:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
+	sizer_bottom->Add(choice_text_language, 0, wxEXPAND);
 
 
 	// Add 'Find/Replace' button to top sizer
 	sizer_top->AddStretchSpacer();
 	btn_find_replace = new wxButton(this, -1, "Find + Replace");
-	sizer_top->Add(btn_find_replace, 0, wxEXPAND, 4);
+	sizer_top->Add(btn_find_replace, 0, wxEXPAND, 0);
 
 
 	// Bind events

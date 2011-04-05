@@ -35,6 +35,12 @@
 
 
 /*******************************************************************
+ * VARIABLES
+ *******************************************************************/
+CVAR(Bool, swap_epanel_bars, false, CVAR_SAVE)
+
+
+/*******************************************************************
  * ENTRYPANEL CLASS FUNCTIONS
  *******************************************************************/
 
@@ -55,25 +61,29 @@ EntryPanel::EntryPanel(wxWindow* parent, string id)
 	SetSizer(framesizer);
 	Show(false);
 
-	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
-	framesizer->Add(hbox, 0, wxEXPAND|wxTOP, 4);
+	// Setup sizer positions
+	sizer_top = new wxBoxSizer(wxHORIZONTAL);
+	sizer_bottom = new wxBoxSizer(wxHORIZONTAL);
+	sizer_main = new wxBoxSizer(wxVERTICAL);
+	if (swap_epanel_bars) {
+		framesizer->Add(sizer_bottom, 0, wxEXPAND|wxALL, 4);
+		framesizer->Add(sizer_main, 1, wxEXPAND|wxLEFT|wxRIGHT, 4);
+		framesizer->Add(sizer_top, 0, wxEXPAND|wxALL, 4);
+	}
+	else {
+		framesizer->Add(sizer_top, 0, wxEXPAND|wxALL, 4);
+		framesizer->Add(sizer_main, 1, wxEXPAND|wxLEFT|wxRIGHT, 4);
+		framesizer->Add(sizer_bottom, 0, wxEXPAND|wxALL, 4);
+	}
 
 	// Create generic EntryPanel buttons
 	btn_save = new wxButton(this, -1, "Save Changes");
 	btn_revert = new wxButton(this, -1, "Revert Changes");
 	btn_edit_ext = new wxButton(this, -1, "Edit Externally");
 
-	hbox->Add(btn_save, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
-	hbox->Add(btn_revert, 0, wxEXPAND|wxRIGHT, 4);
-	hbox->Add(btn_edit_ext, 0, wxEXPAND|wxRIGHT, 4);
-
-	// Sizer for specialised controls
-	sizer_top = new wxBoxSizer(wxHORIZONTAL);
-	hbox->Add(sizer_top, 1, wxEXPAND, 0);
-
-	// Main sizer
-	sizer_main = new wxBoxSizer(wxVERTICAL);
-	framesizer->Add(sizer_main, 1, wxEXPAND|wxALL, 4);
+	sizer_top->Add(btn_save, 0, wxEXPAND|wxRIGHT, 4);
+	sizer_top->Add(btn_revert, 0, wxEXPAND|wxRIGHT, 4);
+	sizer_top->Add(btn_edit_ext, 0, wxEXPAND|wxRIGHT, 4);
 
 	// Bind button events
 	btn_save->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &EntryPanel::onBtnSave, this);

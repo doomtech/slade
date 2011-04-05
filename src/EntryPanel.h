@@ -17,6 +17,7 @@ protected:
 
 	wxSizer*		sizer_main;
 	wxSizer*		sizer_top;
+	wxSizer*		sizer_bottom;
 	wxButton*		btn_save;
 	wxButton*		btn_revert;
 	wxButton*		btn_edit_ext;

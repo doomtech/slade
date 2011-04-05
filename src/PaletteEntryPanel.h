@@ -19,13 +19,12 @@ private:
 	wxStaticText*			text_curpal;
 	wxButton*				btn_exportpal;
 
-	wxStaticText*			label_selected_colour;
-
 public:
 	PaletteEntryPanel(wxWindow* parent);
 	~PaletteEntryPanel();
 
-	bool loadEntry(ArchiveEntry* entry);
+	bool	loadEntry(ArchiveEntry* entry);
+	string	statusString();
 	
 	bool	showPalette(uint32_t index);
 	

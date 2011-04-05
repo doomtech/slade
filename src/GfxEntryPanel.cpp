@@ -243,65 +243,53 @@ public:
  *******************************************************************/
 GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 : EntryPanel(parent, "gfx") {
-	// Create sizer for this panel
-	wxBoxSizer* m_vbox = new wxBoxSizer(wxVERTICAL);
-	sizer_main->Add(m_vbox, 1, wxEXPAND);
-
 	// Add gfx canvas
 	gfx_canvas = new GfxCanvas(this, -1);
-	m_vbox->Add(gfx_canvas->toPanel(this), 1, wxEXPAND|wxALL, 4);
+	sizer_main->Add(gfx_canvas->toPanel(this), 1, wxEXPAND, 0);
 	gfx_canvas->setViewType(GFXVIEW_DEFAULT);
 	gfx_canvas->allowDrag(true);
 	gfx_canvas->allowScroll(true);
-
-	// Add view controls
-	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
-	m_vbox->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
 
 	// Zoom slider
 	slider_zoom = new wxSlider(this, -1, 100, 20, 800);
 	slider_zoom->SetLineSize(10);
 	slider_zoom->SetPageSize(100);
 	label_current_zoom = new wxStaticText(this, -1, "100%");
-	hbox->Add(new wxStaticText(this, -1, "Zoom:"), 0, wxALIGN_CENTER_VERTICAL, 0);
-	hbox->Add(slider_zoom, 1, wxEXPAND, 0);
-	hbox->Add(label_current_zoom, 0, wxALIGN_CENTER_VERTICAL, 0);
+	sizer_bottom->Add(new wxStaticText(this, -1, "Zoom:"), 0, wxALIGN_CENTER_VERTICAL, 0);
+	sizer_bottom->Add(slider_zoom, 1, wxEXPAND, 0);
+	sizer_bottom->Add(label_current_zoom, 0, wxALIGN_CENTER_VERTICAL, 0);
 
-	hbox->AddStretchSpacer();
+	sizer_bottom->AddStretchSpacer();
 
 	// Tile checkbox
 	cb_tile = new wxCheckBox(this, -1, "Tile");
-	hbox->Add(cb_tile, 0, wxEXPAND, 0);
-	hbox->AddSpacer(8);
-
-	// Gfx (offset) type
-	string offset_types[] = { "Auto", "Graphic", "Sprite", "HUD" };
-	combo_offset_type = new wxComboBox(this, -1, offset_types[0], wxDefaultPosition, wxDefaultSize, 4, offset_types, wxCB_READONLY);
-	hbox->Add(new wxStaticText(this, -1, "Type:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
-	hbox->Add(combo_offset_type, 0, wxEXPAND, 0);
-	hbox->AddSpacer(8);
+	sizer_bottom->Add(cb_tile, 0, wxEXPAND, 0);
+	sizer_bottom->AddSpacer(8);
 
 	// Image selection buttons
 	btn_nextimg = new wxBitmapButton(this, -1, getIcon("t_right"));
 	btn_previmg = new wxBitmapButton(this, -1, getIcon("t_left"));
 	text_curimg = new wxStaticText(this, -1, "Image XX/XX");
-	hbox->Add(btn_previmg, 0, wxEXPAND|wxRIGHT|wxLEFT, 4);
-	hbox->Add(btn_nextimg, 0, wxEXPAND|wxRIGHT, 4);
-	hbox->Add(text_curimg, 0, wxALIGN_CENTER, 4);
+	sizer_bottom->Add(btn_previmg, 0, wxEXPAND|wxRIGHT, 4);
+	sizer_bottom->Add(btn_nextimg, 0, wxEXPAND|wxRIGHT, 4);
+	sizer_bottom->Add(text_curimg, 0, wxALIGN_CENTER, 0);
 
 	// Palette chooser
 	listenTo(theMainWindow->getPaletteChooser());
 
-	// Add editing/info controls
-	hbox = new wxBoxSizer(wxHORIZONTAL);
-	sizer_top->Add(hbox, 1, wxEXPAND|wxLEFT|wxRIGHT, 4);
-
 	// Offsets
 	spin_xoffset = new wxSpinCtrl(this, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, SHRT_MIN, SHRT_MAX, 0);
 	spin_yoffset = new wxSpinCtrl(this, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, SHRT_MIN, SHRT_MAX, 0);
-	hbox->Add(new wxStaticText(this, -1, "Offsets:"), 0, wxALIGN_CENTER_VERTICAL, 0);
-	hbox->Add(spin_xoffset, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
-	hbox->Add(spin_yoffset, 0, wxEXPAND|wxRIGHT, 0);
+	sizer_top->AddStretchSpacer();
+	sizer_top->Add(new wxStaticText(this, -1, "Offsets:"), 0, wxALIGN_CENTER_VERTICAL, 0);
+	sizer_top->Add(spin_xoffset, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
+	sizer_top->Add(spin_yoffset, 0, wxEXPAND|wxRIGHT, 4);
+
+	// Gfx (offset) type
+	string offset_types[] = { "Auto", "Graphic", "Sprite", "HUD" };
+	combo_offset_type = new wxComboBox(this, -1, offset_types[0], wxDefaultPosition, wxDefaultSize, 4, offset_types, wxCB_READONLY);
+	//sizer_top->Add(new wxStaticText(this, -1, "Offset Type:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
+	sizer_top->Add(combo_offset_type, 0, wxEXPAND, 0);
 
 	// Custom menu
 	menu_custom = new wxMenu();
