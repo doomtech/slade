@@ -63,6 +63,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <AdditionalDependencies>winmm.lib;rpcrt4.lib;kernel32.lib;user32.lib;gdi32.lib;ole32.lib;oleaut32.lib;comctl32.lib;comdlg32.lib;uuid.lib;advapi32.lib;shell32.lib;wxbase29ud.lib;wxmsw29ud_core.lib;wxmsw29ud_gl.lib;wxmsw29ud_aui.lib;wxmsw29ud_html.lib;wxmsw29ud_adv.lib;wxmsw29ud_stc.lib;wxzlibd.lib;wxpngd.lib;wxtiffd.lib;wxjpegd.lib;wxscintillad.lib;opengl32.lib;glu32.lib;FreeImage.lib;audiere.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -89,6 +90,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <FloatingPointModel>Fast</FloatingPointModel>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <AdditionalDependencies>audiere.lib;FreeImage.lib;wxbase29u.lib;wxmsw29u_core.lib;wxmsw29u_aui.lib;wxmsw29u_gl.lib;wxmsw29u_html.lib;wxmsw29u_adv.lib;wxmsw29u_stc.lib;wxmsw29u_media.lib;wxtiff.lib;wxjpeg.lib;wxpng.lib;wxzlib.lib;wxregexu.lib;wxexpat.lib;wxscintilla.lib;winmm.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -115,6 +117,7 @@
     <ClCompile Include="src\BrowserCanvas.cpp" />
     <ClCompile Include="src\BrowserItem.cpp" />
     <ClCompile Include="src\BrowserWindow.cpp" />
+    <ClCompile Include="src\BSPArchive.cpp" />
     <ClCompile Include="src\CodePages.cpp" />
     <ClCompile Include="src\Conversions.cpp" />
     <ClCompile Include="src\DatArchive.cpp" />
@@ -235,6 +238,7 @@
     <ClInclude Include="src\BrowserCanvas.h" />
     <ClInclude Include="src\BrowserItem.h" />
     <ClInclude Include="src\BrowserWindow.h" />
+    <ClInclude Include="src\BSPArchive.h" />
     <ClInclude Include="src\CodePages.h" />
     <ClInclude Include="src\ConsoleHelpers.h" />
     <ClInclude Include="src\Conversions.h" />

@@ -438,6 +438,9 @@
     <ClCompile Include="src\Math.cpp">
       <Filter>General\Utility</Filter>
     </ClCompile>
+    <ClCompile Include="src\BSPArchive.cpp">
+      <Filter>Resources\Archive</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -818,6 +821,9 @@
     </ClInclude>
     <ClInclude Include="src\Math.h">
       <Filter>General\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BSPArchive.h">
+      <Filter>Resources\Archive</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
