@@ -121,7 +121,7 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				WholeProgramOptimization="false"
-				PreprocessorDefinitions="WIN32;__WXMSW__;_WINDOWS;NOPCH;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;NDEBUG;GLEW_STATIC;UPDATEREVISION"
+				PreprocessorDefinitions="WIN32;__WXMSW__;_WINDOWS;NOPCH;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;NDEBUG;UPDATEREVISION"
 				GeneratePreprocessedFile="0"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -368,11 +368,11 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\Math.cpp"
+					RelativePath=".\src\MathStuff.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\Math.h"
+					RelativePath=".\src\MathStuff.h"
 					>
 				</File>
 				<File
@@ -1289,22 +1289,6 @@
 				</File>
 				<File
 					RelativePath=".\src\qmus2mid\qmus2mid.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="GLEW"
-				>
-				<File
-					RelativePath=".\src\glew\glew.c"
-					>
-				</File>
-				<File
-					RelativePath=".\src\glew\glew.h"
-					>
-				</File>
-				<File
-					RelativePath=".\src\glew\wglew.h"
 					>
 				</File>
 			</Filter>
