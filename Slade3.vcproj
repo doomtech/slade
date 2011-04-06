@@ -252,6 +252,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\InterfacePrefsPanel.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\InterfacePrefsPanel.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\PreferencesDialog.cpp"
 					>
 				</File>

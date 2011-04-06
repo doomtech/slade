@@ -359,6 +359,37 @@ int vlv_chars[] = {
 };
 int n_vlv_chars = 30;
 
+/* VirtualListView::lookForSearchEntryFrom
+ * Used by VirtualListView::onKeyChar, returns true if an entry
+ * matching search is found, false otherwise
+ *******************************************************************/
+bool VirtualListView::lookForSearchEntryFrom(int focus) {
+	long index = focus;
+	bool looped = false;
+	bool gotmatch = false;
+	while ((!looped && index < GetItemCount()) || (looped && index < focus)) {
+		string name = getItemText(index, col_search);
+		if (name.Upper().StartsWith(search)) {
+			// Matches, update selection+focus
+			clearSelection();
+			selectItem(index);
+			focusItem(index);
+			EnsureVisible(index);
+			sendSelectionChangedEvent();
+			return true;
+		}
+
+		// No match, next item; look in the above entries
+		// if no matches were found below.
+		if (++index == GetItemCount() && !looped) {
+			looped = true;
+			index = 0;
+		}
+	}
+	// Didn't get any match
+	return false;
+}
+
 /* VirtualListView::onKeyChar
  * Called when a 'character' key is pressed within the list
  *******************************************************************/
@@ -381,30 +412,20 @@ void VirtualListView::onKeyChar(wxKeyEvent& e) {
 	}
 
 	if (isRealChar) {
-		search += e.GetKeyCode();
-		search = search.Upper();
-		wxLogMessage(search);
-
 		// Get currently focused item (or first if nothing is focused)
 		long focus = getFocus();
 		if (focus < 0) focus = 0;
 
-		// Search for match after the current focus
-		long index = focus;
-		while (index < GetItemCount()) {
-			string name = getItemText(index, col_search);
-			if (name.Upper().StartsWith(search)) {
-				// Matches, update selection+focus
-				clearSelection();
-				selectItem(index);
-				focusItem(index);
-				EnsureVisible(index);
-				sendSelectionChangedEvent();
-				break;
-			}
+		// Build search string
+		search += e.GetKeyCode();
+		search.MakeUpper();
 
-			// No match, next item
-			index++;
+		// Search for match from the current focus, and if failed 
+		// start a new search from after the current focus.
+		if (!lookForSearchEntryFrom(focus)) {
+			search = S_FMT("%c", e.GetKeyCode());
+			search.MakeUpper();
+			lookForSearchEntryFrom(focus+1);
 		}
 	}
 	else {

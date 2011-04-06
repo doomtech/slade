@@ -45,6 +45,7 @@ public:
 	// Focus
 	void			focusItem(long item, bool focus = true);
 	long			getFocus();
+	bool			lookForSearchEntryFrom(int focus);
 
 	// Layout
 	void			updateWidth();
