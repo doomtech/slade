@@ -1359,6 +1359,26 @@ bool ArchivePanel::reloadCurrentPanel() {
 	return openEntry(cur_area->getEntry(), true);
 }
 
+/* ArchivePanel::focusOnEntry
+ * Makes sure the list view display shows the given entry
+ *******************************************************************/
+void ArchivePanel::focusOnEntry(ArchiveEntry* entry) {
+	if (entry) {
+		// Do we need to change directory?
+		if (entry->getParentDir() != entry_list->getCurrentDir())
+			entry_list->setDir(entry->getParentDir());
+
+		// Now focus on the entry if it is listed
+		for (long index = 0; index < entry_list->GetItemCount(); ++index) {
+			if (entry == entry_list->getEntry(index)) {
+				entry_list->focusOnIndex(index);
+				return;
+			}
+		}
+	}
+}
+
+
 /* ArchivePanel::showEntryPanel
  * Show an entry panel appropriate to the current entry
  *******************************************************************/

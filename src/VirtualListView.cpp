@@ -359,11 +359,25 @@ int vlv_chars[] = {
 };
 int n_vlv_chars = 30;
 
+
+/* VirtualListView::focusOnIndex
+ * Selects an entry by its given index and makes sure it is visible
+ *******************************************************************/
+void VirtualListView::focusOnIndex(long index) {
+	if (index < GetItemCount()) {
+		clearSelection();
+		selectItem(index);
+		focusItem(index);
+		EnsureVisible(index);
+		sendSelectionChangedEvent();
+	}
+}
+
 /* VirtualListView::lookForSearchEntryFrom
  * Used by VirtualListView::onKeyChar, returns true if an entry
  * matching search is found, false otherwise
  *******************************************************************/
-bool VirtualListView::lookForSearchEntryFrom(int focus) {
+bool VirtualListView::lookForSearchEntryFrom(long focus) {
 	long index = focus;
 	bool looped = false;
 	bool gotmatch = false;
@@ -371,11 +385,7 @@ bool VirtualListView::lookForSearchEntryFrom(int focus) {
 		string name = getItemText(index, col_search);
 		if (name.Upper().StartsWith(search)) {
 			// Matches, update selection+focus
-			clearSelection();
-			selectItem(index);
-			focusItem(index);
-			EnsureVisible(index);
-			sendSelectionChangedEvent();
+			focusOnIndex(index);
 			return true;
 		}
 

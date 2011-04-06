@@ -1255,6 +1255,8 @@ void ArchiveManagerPanel::goToBookmark(long index) {
 
 	// Finally, open the entry
 	((ArchivePanel*)tab)->openEntry(bookmark, true);
+	if (bookmark->getType() != EntryType::folderType())
+		((ArchivePanel*)tab)->focusOnEntry(bookmark);
 }
 
 

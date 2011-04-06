@@ -91,6 +91,7 @@ public:
 	bool	openEntryAsText(ArchiveEntry* entry);
 	bool	openEntryAsHex(ArchiveEntry* entry);
 	bool	showEntryPanel(EntryPanel* new_area, bool ask_save = true);
+	void	focusOnEntry(ArchiveEntry* entry);
 	void	focusEntryList() { entry_list->SetFocus(); }
 	void	refreshPanel();
 
