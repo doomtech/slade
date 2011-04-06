@@ -435,6 +435,9 @@
     <ClCompile Include="src\MathStuff.cpp">
       <Filter>General\Utility</Filter>
     </ClCompile>
+    <ClCompile Include="src\InterfacePrefsPanel.cpp">
+      <Filter>Dialogs\Preferences</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -812,6 +815,9 @@
     </ClInclude>
     <ClInclude Include="src\MathStuff.h">
       <Filter>General\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="src\InterfacePrefsPanel.h">
+      <Filter>Dialogs\Preferences</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -7,9 +7,6 @@ private:
 	wxCheckBox*	cb_gl_np2;
 	wxCheckBox*	cb_archive_load;
 	wxCheckBox*	cb_archive_close_tab;
-	wxCheckBox*	cb_size_as_string;
-	wxCheckBox* cb_filter_dirs;
-	wxCheckBox*	cb_start_page;
 	wxCheckBox*	cb_temp_dir;
 
 public:

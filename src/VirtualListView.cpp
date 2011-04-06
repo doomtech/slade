@@ -418,21 +418,3 @@ void VirtualListView::onKeyChar(wxKeyEvent& e) {
 			e.Skip();
 	}
 }
-
-
-
-/*
-CONSOLE_COMMAND (test_vlv, 0) {
-	wxDialog dlg(NULL, -1, "VLV!", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
-
-	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
-	dlg.SetSizer(hbox);
-
-	VirtualListView* vlv = new VirtualListView(&dlg);
-	hbox->Add(vlv, 1, wxEXPAND|wxALL, 4);
-	vlv->SetItemCount(100);
-	vlv->InsertColumn(0, "Test");
-
-	dlg.ShowModal();
-}
-*/

@@ -15,10 +15,16 @@ TODO List ---------------------------------------------------------------
 
 --- Before 3.0.2 ---
 - Finish TEXTURES editing:
-Fix up CTextureCanvas drawing
-Translation editor
-Gfx browser for patches
-(maybe) copy+paste textures
+	- Translation editor
+	- Gfx browser for patches
+	- Support for textures-as-patches
+- (maybe) Copy+paste for textures
+- (maybe) Fix up stuff for wxMac (not looking hopeful until the next proper wxwidgets release at least, the current wxwidgets mac support is pretty terrible)
+- Generic DataEntryPanel
+- Clean up sources somewhat
+- AudioEntryPanel improvements
+	- Don't autoload sounds
+	- Autoplay option
 
 --- Bugs ---
 - Audio player issues

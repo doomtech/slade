@@ -65,6 +65,7 @@
  *******************************************************************/
 CVAR(Int, autosave_entry_changes, 2, CVAR_SAVE)	// 0=no, 1=yes, 2=ask
 CVAR(Bool, confirm_entry_delete, true, CVAR_SAVE)
+CVAR(Bool, context_submenus, true, CVAR_SAVE)
 
 // Temporary
 enum {
@@ -1708,16 +1709,39 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 	context->AppendSeparator();
 	context->Append(MainWindow::MENU_ENTRY_BOOKMARK, "Bookmark");
 
+	// Add Boom Animations/Switches related menu items if they are selected
+	if (bas_selected)
+		context->Append(MENU_BAS_CONVERT, "Convert to ANIMDEFS");
+
+	// Add texturex related menu items if needed
+	if (texturex_selected)
+		context->Append(MENU_TEXTUREX_CONVERT, "Convert to TEXTURES");
+
 	// 'View As' menu
-	wxMenu* viewas = new wxMenu();
-	context->AppendSubMenu(viewas, "View As");
-	viewas->Append(MENU_VIEW_TEXT, "Text", "Opens the selected entry in the text editor, regardless of type");
-	viewas->Append(MENU_VIEW_HEX, "Hex", "Opens the selected entry in the hex editor, regardless of type");
+	wxMenu* viewas;
+	if (context_submenus) {
+		viewas = new wxMenu();
+		context->AppendSubMenu(viewas, "View As");
+		viewas->Append(MENU_VIEW_TEXT, "Text", "Opens the selected entry in the text editor, regardless of type");
+		viewas->Append(MENU_VIEW_HEX, "Hex", "Opens the selected entry in the hex editor, regardless of type");
+	}
+	else {
+		context->AppendSeparator();
+		context->Append(MENU_VIEW_TEXT, "View as Text", "Opens the selected entry in the text editor, regardless of type");
+		context->Append(MENU_VIEW_HEX, "View as Hex", "Opens the selected entry in the hex editor, regardless of type");
+	}
 
 	// Add gfx-related menu items if gfx are selected
 	if (gfx_selected) {
-		wxMenu* gfx = new wxMenu();
-		context->AppendSubMenu(gfx, "Gfx");
+		wxMenu* gfx;
+		if (context_submenus) {
+			gfx = new wxMenu();
+			context->AppendSubMenu(gfx, "Gfx");
+		}
+		else {
+			context->AppendSeparator();
+			gfx = context;
+		}
 		gfx->Append(MENU_GFX_CONVERT, "Convert to...");
 		gfx->Append(MENU_GFX_MODIFY_OFFSETS, "Modify Gfx Offsets");
 		gfx->Append(MENU_GFX_ADD_PATCH_TABLE, "Add to Patch Table");
@@ -1725,19 +1749,17 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 		gfx->Append(MENU_GFX_EXPORT_PNG, "Export as PNG");
 	}
 
-	// Add Boom Animations/Switches related menu items if they are selected
-	if (bas_selected) {
-		//wxMenu* boom = new wxMenu();
-		//context->AppendSubMenu(boom, "Boom");
-		context->Append(MENU_BAS_CONVERT, "Convert to ANIMDEFS");
-	}
-	// This is not generally useful
-	//context->Append(MENU_ENTRY_PAL_CONVERT, "Pal 6-bit to 8-bit");
-
 	// Add Audio related menu items if needed
 	if (wav_selected || dsnd_selected || mus_selected) {
-		wxMenu* audio = new wxMenu();
-		context->AppendSubMenu(audio, "Audio");
+		wxMenu* audio;
+		if (context_submenus) {
+			audio = new wxMenu();
+			context->AppendSubMenu(audio, "Audio");
+		}
+		else {
+			context->AppendSeparator();
+			audio = context;
+		}
 		if (wav_selected)
 			audio->Append(MENU_CONV_WAV_DSND, "Convert WAV to Doom Sound");
 		if (dsnd_selected)
@@ -1748,15 +1770,18 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 
 	// Add script related menu items if needed
 	if (text_selected || unknown_selected) {
-		//wxMenu* scripts = new wxMenu();
-		//context->AppendSubMenu(scripts, "Scripts");
-		context->Append(MENU_SCRIPT_COMPILE_ACS, "Compile ACS");
-		context->Append(MENU_SCRIPT_COMPILE_ACSH, "Compile ACS (Hexen bytecode)");
+		wxMenu* scripts;
+		if (context_submenus) {
+			scripts = new wxMenu();
+			context->AppendSubMenu(scripts, "Scripts");
+		}
+		else {
+			context->AppendSeparator();
+			scripts = context;
+		}
+		scripts->Append(MENU_SCRIPT_COMPILE_ACS, "Compile ACS");
+		scripts->Append(MENU_SCRIPT_COMPILE_ACSH, "Compile ACS (Hexen bytecode)");
 	}
-
-	// Add texturex related menu items if needed
-	if (texturex_selected)
-		context->Append(MENU_TEXTUREX_CONVERT, "Convert to TEXTURES");
 
 	// Popup the context menu
 	PopupMenu(context);

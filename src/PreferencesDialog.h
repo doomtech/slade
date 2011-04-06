@@ -6,6 +6,7 @@
 #include "TextEditorPrefsPanel.h"
 #include "TextStylePrefsPanel.h"
 #include "GeneralPrefsPanel.h"
+#include "InterfacePrefsPanel.h"
 #include "EditingPrefsPanel.h"
 #include "ACSPrefsPanel.h"
 #include <wx/treebook.h>
@@ -15,6 +16,7 @@ private:
 	wxTreebook*	tree_prefs;
 
 	GeneralPrefsPanel*		panel_general;
+	InterfacePrefsPanel*	panel_interface;
 	EditingPrefsPanel*		panel_editing;
 	TextEditorPrefsPanel*	panel_text_editor;
 	TextStylePrefsPanel*	panel_text_styles;

@@ -38,9 +38,6 @@
 EXTERN_CVAR(Bool, close_archive_with_tab)
 EXTERN_CVAR(Bool, archive_load_data)
 EXTERN_CVAR(Bool, gl_tex_enable_np2)
-EXTERN_CVAR(Bool, size_as_string)
-EXTERN_CVAR(Bool, elist_filter_dirs)
-EXTERN_CVAR(Bool, show_start_page)
 EXTERN_CVAR(Bool, temp_use_appdir)
 
 
@@ -73,18 +70,6 @@ GeneralPrefsPanel::GeneralPrefsPanel(wxWindow* parent) : wxPanel(parent, -1) {
 	cb_gl_np2 = new wxCheckBox(this, -1, "Enable Non-power-of-two textures if supported");
 	sizer->Add(cb_gl_np2, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
-	// Show entry size as string instead of a number
-	cb_size_as_string = new wxCheckBox(this, -1, "Show entry size as a string with units");
-	sizer->Add(cb_size_as_string, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
-
-	// Filter directories
-	cb_filter_dirs = new wxCheckBox(this, -1, "Ignore directories when filtering by name");
-	sizer->Add(cb_filter_dirs, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
-
-	// Show startpage
-	cb_start_page = new wxCheckBox(this, -1, "Show Start Page on Startup");
-	sizer->Add(cb_start_page, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
-
 	// Use app dir for temp files
 #ifdef WIN32
 	cb_temp_dir = new wxCheckBox(this, -1, "Write temp files to SLADE directory rather than system temp folder");
@@ -96,9 +81,6 @@ GeneralPrefsPanel::GeneralPrefsPanel(wxWindow* parent) : wxPanel(parent, -1) {
 	cb_archive_load->SetValue(archive_load_data);
 	cb_archive_close_tab->SetValue(close_archive_with_tab);
 	cb_gl_np2->SetValue(gl_tex_enable_np2);
-	cb_size_as_string->SetValue(size_as_string);
-	cb_filter_dirs->SetValue(!elist_filter_dirs);
-	cb_start_page->SetValue(show_start_page);
 }
 
 /* GeneralPrefsPanel::~GeneralPrefsPanel
@@ -114,9 +96,6 @@ void GeneralPrefsPanel::applyPreferences() {
 	archive_load_data = cb_archive_load->GetValue();
 	close_archive_with_tab = cb_archive_close_tab->GetValue();
 	gl_tex_enable_np2 = cb_gl_np2->GetValue();
-	size_as_string = cb_size_as_string->GetValue();
-	elist_filter_dirs = !cb_filter_dirs->GetValue();
-	show_start_page = cb_start_page->GetValue();
 #ifdef WIN32
 	temp_use_appdir = cb_temp_dir->GetValue();
 #else
