@@ -55,6 +55,7 @@
 #include "ArchiveOperations.h"
 #include "Icons.h"
 #include "Conversions.h"
+#include "MainWindow.h"
 #include <wx/aui/auibook.h>
 #include <wx/filename.h>
 #include <wx/gbsizer.h>
@@ -1763,7 +1764,7 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 	}
 
 	// Popup the context menu
-	PopupMenu(&context);
+	theMainWindow->PopupMenu(&context);
 }
 
 /* ArchivePanel::onEntryListKeyDown

@@ -24,7 +24,7 @@ public:
 		RADIO,
 	};
 
-	SAction(string id, string text, string icon = "", string helptext = "", string shortcut = "", int type = NORMAL);
+	SAction(string id, string text, string icon = "", string helptext = "", string shortcut = "", int type = NORMAL, int custom_wxid = -1);
 	~SAction();
 
 	string	getId() { return id; }

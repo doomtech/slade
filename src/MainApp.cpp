@@ -298,6 +298,9 @@ void MainApp::initLogFile() {
 	wxLogMessage("--------------------------------");
 }
 
+/* MainApp::initActions
+ * Sets up all menu/toolbar actions
+ *******************************************************************/
 void MainApp::initActions() {
 	// MainWindow
 	new SAction("main_exit", "E&xit", "", "Quit SLADE");
@@ -337,10 +340,10 @@ void MainApp::initActions() {
 	new SAction("arch_newdir", "New Directory", "t_newfolder", "Create a new empty directory");
 	new SAction("arch_importfiles", "&Import Files", "t_importfiles", "Import multiple files into the archive");
 	new SAction("arch_texeditor", "&Texture Editor", "t_texeditor", "Open the texture editor for the current archive");
-	new SAction("arch_clean_patches", "Remove Unused &Patches", "", "Removes any unused patches, and their associated entries");
+	new SAction("arch_clean_patches", "Remove Unused &Patches", "", "Remove any unused patches, and their associated entries");
 	new SAction("arch_entry_rename", "Rename", "t_rename", "Rename the selected entries");
 	new SAction("arch_entry_delete", "Delete", "t_delete", "Delete the selected entries");
-	new SAction("arch_entry_revert", "Revert", "", "Reverts any modifications made to the selected entries since the last save");
+	new SAction("arch_entry_revert", "Revert", "", "Revert any modifications made to the selected entries since the last save");
 	new SAction("arch_entry_cut", "Cut", "", "Cut the selected entries");
 	new SAction("arch_entry_copy", "Copy", "", "Copy the selected entries");
 	new SAction("arch_entry_paste", "Paste", "", "Paste the selected entries");
@@ -349,37 +352,37 @@ void MainApp::initActions() {
 	new SAction("arch_entry_import", "Import", "t_import", "Import a file to the selected entry");
 	new SAction("arch_entry_export", "Export", "t_export", "Export the selected entries to files");
 	new SAction("arch_entry_bookmark", "Bookmark", "", "Bookmark the current entry");
-	new SAction("arch_bas_convert", "Convert to ANIMDEFS", "", "Converts any selected SWITCHES and ANIMATED entries to a single ANIMDEFS entry");
-	new SAction("arch_texturex_convertzd", "Convert to TEXTURES", "", "Converts any selected TEXTUREx entries to ZDoom TEXTURES format");
-	new SAction("arch_view_text", "View as Text", "", "Opens the selected entry in the text editor, regardless of type");
-	new SAction("arch_view_text", "View as Hex", "", "Opens the selected entry in the hex editor, regardless of type");
-	new SAction("arch_gfx_convert", "Convert to...", "", "Opens the Gfx Conversion Dialog for any selected gfx entries");
+	new SAction("arch_bas_convert", "Convert to ANIMDEFS", "", "Convert any selected SWITCHES and ANIMATED entries to a single ANIMDEFS entry");
+	new SAction("arch_texturex_convertzd", "Convert to TEXTURES", "", "Convert any selected TEXTUREx entries to ZDoom TEXTURES format");
+	new SAction("arch_view_text", "View as Text", "", "Open the selected entry in the text editor, regardless of type");
+	new SAction("arch_view_text", "View as Hex", "", "Open the selected entry in the hex editor, regardless of type");
+	new SAction("arch_gfx_convert", "Convert to...", "", "Open the Gfx Conversion Dialog for any selected gfx entries");
 	new SAction("arch_gfx_offsets", "Modify Gfx Offsets", "", "Mass-modify the offsets for any selected gfx entries");
-	new SAction("arch_gfx_addptable", "Add to Patch Table", "", "Adds any selected gfx entries to PNAMES");
-	new SAction("arch_gfx_addtexturex", "Add to TEXTUREx", "", "Creates textures from selected gfx entries and adds them to TEXTUREx");
-	new SAction("arch_gfx_exportpng", "Export as PNG", "", "Exports selected gfx entries to PNG format files");
-	new SAction("arch_audio_convertwd", "Convert WAV to Doom Sound", "", "Converts any selected WAV format entries to Doom Sound format");
-	new SAction("arch_audio_convertdw", "Convert Doom Sound to WAV", "", "Converts any selected Doom Sound format entries to WAV format");
-	new SAction("arch_audio_convertmus", "Convert MUS to MIDI", "", "Converts any selected MUS format entries to MIDI format");
-	new SAction("arch_scripts_compileacs", "Compile ACS", "", "Compiles any selected text entries to ACS bytecode");
-	new SAction("arch_scripts_compilehacs", "Compule ACS (Hexen bytecode)", "", "Compiles any selected text entries to Hexen-compatible ACS bytecode");
+	new SAction("arch_gfx_addptable", "Add to Patch Table", "", "Add selected gfx entries to PNAMES");
+	new SAction("arch_gfx_addtexturex", "Add to TEXTUREx", "", "Create textures from selected gfx entries and add them to TEXTUREx");
+	new SAction("arch_gfx_exportpng", "Export as PNG", "", "Export selected gfx entries to PNG format files");
+	new SAction("arch_audio_convertwd", "Convert WAV to Doom Sound", "", "Convert any selected WAV format entries to Doom Sound format");
+	new SAction("arch_audio_convertdw", "Convert Doom Sound to WAV", "", "Convert any selected Doom Sound format entries to WAV format");
+	new SAction("arch_audio_convertmus", "Convert MUS to MIDI", "", "Convert any selected MUS format entries to MIDI format");
+	new SAction("arch_scripts_compileacs", "Compile ACS", "", "Compile any selected text entries to ACS bytecode");
+	new SAction("arch_scripts_compilehacs", "Compule ACS (Hexen bytecode)", "", "Compile any selected text entries to Hexen-compatible ACS bytecode");
 
 	// GfxEntryPanel
-	new SAction("pgfx_mirror", "Mirror", "", "Mirrors the graphic horizontally");
-	new SAction("pgfx_flip", "Flip", "", "Flips the graphic vertically");
-	new SAction("pgfx_rotate", "Rotate", "", "Rotates the graphic");
+	new SAction("pgfx_mirror", "Mirror", "", "Mirror the graphic horizontally");
+	new SAction("pgfx_flip", "Flip", "", "Flip the graphic vertically");
+	new SAction("pgfx_rotate", "Rotate", "", "Rotate the graphic");
 	new SAction("pgfx_translate", "Colour Remap", "", "Remap a range of colours in the graphic to another range (paletted gfx only)");
-	new SAction("pgfx_colourise", "Colourise", "", "Colourise the graphic");
+	new SAction("pgfx_colourise", "Colourise", "", "Colouris the graphic");
 	new SAction("pgfx_tint", "Tint", "", "Tint the graphic by a colour/amount");
 	new SAction("pgfx_alph", "alPh Chunk", "", "Add/Remove alPh chunk to/from the PNG", "", SAction::CHECK);
 	new SAction("pgfx_trns", "tRNS Chunk", "", "Add/Remove tRNS chunk to/from the PNG", "", SAction::CHECK);
 	new SAction("pgfx_extract", "Extract All", "", "Extract all images in this entry to separate PNGs");
 
 	// ArchiveEntryList
-	new SAction("aelt_sizecol", "Size", "", "Show the size column");
-	new SAction("aelt_typecol", "Type", "", "Show the type column");
-	new SAction("aelt_hrules", "Horizontal Rules", "", "Show horizontal rules between entries");
-	new SAction("aelt_vrules", "Vertical Rules", "", "Show vertical rules between columns");
+	new SAction("aelt_sizecol", "Size", "", "Show the size column", "", SAction::CHECK);
+	new SAction("aelt_typecol", "Type", "", "Show the type column", "", SAction::CHECK);
+	new SAction("aelt_hrules", "Horizontal Rules", "", "Show horizontal rules between entries", "", SAction::CHECK);
+	new SAction("aelt_vrules", "Vertical Rules", "", "Show vertical rules between columns", "", SAction::CHECK);
 
 	// TextureEditorPanel
 	new SAction("txed_patch_add", "Add Patch", "t_patch_add", "Add a patch to the texture");
