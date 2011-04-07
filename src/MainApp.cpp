@@ -349,7 +349,7 @@ void MainApp::initActions() {
 	new SAction("arch_entry_import", "Import", "t_import", "Import a file to the selected entry");
 	new SAction("arch_entry_export", "Export", "t_export", "Export the selected entries to files");
 	new SAction("arch_entry_bookmark", "Bookmark", "", "Bookmark the current entry");
-	new SAction("arch_bas_convert", "<BAS convert>", "", "<insert description here>");
+	new SAction("arch_bas_convert", "Convert to ANIMDEFS", "", "Converts any selected SWITCHES and ANIMATED entries to a single ANIMDEFS entry");
 	new SAction("arch_texturex_convertzd", "Convert to TEXTURES", "", "Converts any selected TEXTUREx entries to ZDoom TEXTURES format");
 	new SAction("arch_view_text", "View as Text", "", "Opens the selected entry in the text editor, regardless of type");
 	new SAction("arch_view_text", "View as Hex", "", "Opens the selected entry in the hex editor, regardless of type");
@@ -374,6 +374,20 @@ void MainApp::initActions() {
 	new SAction("pgfx_alph", "alPh Chunk", "", "Add/Remove alPh chunk to/from the PNG", "", SAction::CHECK);
 	new SAction("pgfx_trns", "tRNS Chunk", "", "Add/Remove tRNS chunk to/from the PNG", "", SAction::CHECK);
 	new SAction("pgfx_extract", "Extract All", "", "Extract all images in this entry to separate PNGs");
+
+	// ArchiveEntryList
+	new SAction("aelt_sizecol", "Size", "", "Show the size column");
+	new SAction("aelt_typecol", "Type", "", "Show the type column");
+	new SAction("aelt_hrules", "Horizontal Rules", "", "Show horizontal rules between entries");
+	new SAction("aelt_vrules", "Vertical Rules", "", "Show vertical rules between columns");
+
+	// TextureEditorPanel
+	new SAction("txed_patch_add", "Add Patch", "t_patch_add", "Add a patch to the texture");
+	new SAction("txed_patch_remove", "Remove Selected Patch(es)", "t_patch_remove", "Remove selected patch(es) from the texture");
+	new SAction("txed_patch_replace", "Replace Selected Patch(es)", "t_patch_replace", "Replace selected patch(es) with a different patch");
+	new SAction("txed_patch_back", "Send Selected Patch(es) Back", "t_patch_back", "Send selected patch(es) toward the back");
+	new SAction("txed_patch_forward", "Bring Selected Patch(es) Forward", "t_patch_forward", "Bring selected patch(es) toward the front");
+	new SAction("txed_patch_duplicate", "Duplicate Selected Patch(es)", "t_patch_duplicate", "Duplicate the selected patch(es)");
 }
 
 /* MainApp::OnInit
@@ -460,6 +474,7 @@ bool MainApp::OnInit() {
 
 	wxLogMessage("SLADE Initialisation OK");
 
+	// Bind events
 	Bind(wxEVT_COMMAND_MENU_SELECTED, &MainApp::onMenu, this);
 
 	return true;

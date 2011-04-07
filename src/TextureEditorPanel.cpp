@@ -135,7 +135,6 @@ void TextureEditorPanel::setupLayout() {
 	btn_patch_duplicate->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureEditorPanel::onBtnPatchDuplicate, this);
 	spin_patch_left->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &TextureEditorPanel::onPatchPositionXChanged, this);
 	spin_patch_top->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &TextureEditorPanel::onPatchPositionYChanged, this);
-	Bind(wxEVT_COMMAND_MENU_SELECTED, &TextureEditorPanel::onContextMenu, this, M_BEGIN, M_END);
 
 
 	// Init layout
@@ -573,6 +572,52 @@ void TextureEditorPanel::duplicatePatch() {
 	tex_modified = true;
 }
 
+/* TextureEditorPanel::handleAction
+ * Handles the action [id]. Returns true if the action was handled,
+ * false otherwise
+ *******************************************************************/
+bool TextureEditorPanel::handleAction(string id) {
+	// Don't handle actions if hidden
+	if (!IsShown())
+		return false;
+
+	// Only interested in actions beginning with txed_
+	if (!id.StartsWith("txed_"))
+		return false;
+
+	// Add Patch
+	if (id == "txed_patch_add")
+		addPatch();
+
+	// Remove Patch
+	else if (id == "txed_patch_remove")
+		removePatch();
+
+	// Send Patch Back
+	else if (id == "txed_patch_back")
+		patchBack();
+
+	// Bring Patch Forward
+	else if (id == "txed_patch_forward")
+		patchForward();
+
+	// Replace Patch
+	else if (id == "txed_patch_replace")
+		replacePatch();
+
+	// Duplicate Patch
+	else if (id == "txed_patch_duplicate")
+		duplicatePatch();
+
+	// Unknown action
+	else
+		return false;
+
+	// Action was handled
+	return true;
+}
+
+
 
 /*******************************************************************
  * TEXTUREEDITORPANEL EVENTS
@@ -666,16 +711,16 @@ void TextureEditorPanel::onTexCanvasMouseEvent(wxMouseEvent& e) {
 	// RIGHT MOUSE UP
 	else if (e.RightUp()) {
 		// Create context menu
-		wxMenu* popup = new wxMenu();
-		popup->Append(M_PATCH_ADD, "Add Patch");
-		popup->Append(M_PATCH_REMOVE, "Remove Selected Patch(es)");
-		popup->Append(M_PATCH_REPLACE, "Replace Selected Patch(es)");
-		popup->Append(M_PATCH_BACK, "Send Selected Patch(es) Back");
-		popup->Append(M_PATCH_FORWARD, "Bring Selected Patch(es) Forward");
-		popup->Append(M_PATCH_DUPLICATE, "Duplicate Selected Patch(es)");
+		wxMenu popup;
+		theApp->getAction("txed_patch_add")->addToMenu(&popup);
+		theApp->getAction("txed_patch_remove")->addToMenu(&popup);
+		theApp->getAction("txed_patch_replace")->addToMenu(&popup);
+		theApp->getAction("txed_patch_back")->addToMenu(&popup);
+		theApp->getAction("txed_patch_forward")->addToMenu(&popup);
+		theApp->getAction("txed_patch_duplicate")->addToMenu(&popup);
 
 		hack_nodrag = true;
-		PopupMenu(popup);
+		PopupMenu(&popup);
 	}
 
 	// MOUSE DRAGGING
@@ -996,38 +1041,4 @@ void TextureEditorPanel::onPatchPositionYChanged(wxSpinEvent& e) {
 
 	// Update UI
 	tex_canvas->redraw(true);
-}
-
-/* TextureEditorPanel::onContextMenu
- * Called when a context menu item is selected
- *******************************************************************/
-void TextureEditorPanel::onContextMenu(wxCommandEvent& e) {
-	switch (e.GetId()) {
-	case M_PATCH_ADD:
-		addPatch();
-		break;
-
-	case M_PATCH_REMOVE:
-		removePatch();
-		break;
-
-	case M_PATCH_BACK:
-		patchBack();
-		break;
-
-	case M_PATCH_FORWARD:
-		patchForward();
-		break;
-
-	case M_PATCH_REPLACE:
-		replacePatch();
-		break;
-
-	case M_PATCH_DUPLICATE:
-		duplicatePatch();
-		break;
-
-	default:
-		break;
-	}
 }

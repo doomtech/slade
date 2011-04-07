@@ -444,6 +444,9 @@ void MainWindow::openTextureEditor(Archive* archive) {
 void MainWindow::openEntry(ArchiveEntry* entry) {
 }
 
+/* MainWindow::addCustomMenu
+ * Adds [menu] to the menu bar after the 'Entry' menu
+ *******************************************************************/
 void MainWindow::addCustomMenu(wxMenu* menu, string title) {
 	// Insert custom menus between 'Entry' and 'View' menus
 	if (GetMenuBar()->FindMenu(title) == wxNOT_FOUND) {
@@ -452,6 +455,9 @@ void MainWindow::addCustomMenu(wxMenu* menu, string title) {
 	}
 }
 
+/* MainWindow::removeCustomMenu
+ * Removes the menu matching [title] from the menu bar
+ *******************************************************************/
 void MainWindow::removeCustomMenu(string title) {
 	// Get custom menu index
 	int index = GetMenuBar()->FindMenu(title);
@@ -463,6 +469,10 @@ void MainWindow::removeCustomMenu(string title) {
 	}
 }
 
+/* MainWindow::handleAction
+ * Handles the action [id]. Returns true if the action was handled,
+ * false otherwise
+ *******************************************************************/
 bool MainWindow::handleAction(string id) {
 	// We're only interested in "main_" actions
 	if (!id.StartsWith("main_"))
@@ -571,8 +581,9 @@ void MainWindow::onHTMLLinkClicked(wxHtmlLinkEvent &e) {
 		string rs = href.Right(1);
 		unsigned long index = 0;
 		rs.ToULong(&index);
+		index++;
 
-		//panel_archivemanager->handleAction(MENU_RECENT_1 + index);
+		panel_archivemanager->handleAction(S_FMT("aman_recent%d", index));
 	}
 	else if (href.StartsWith("action://")) {
 		// Action

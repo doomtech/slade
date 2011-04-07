@@ -67,25 +67,6 @@ CVAR(Int, autosave_entry_changes, 2, CVAR_SAVE)	// 0=no, 1=yes, 2=ask
 CVAR(Bool, confirm_entry_delete, true, CVAR_SAVE)
 CVAR(Bool, context_submenus, true, CVAR_SAVE)
 
-// Temporary
-enum {
-	MENU_GFX_CONVERT = 200,
-	MENU_GFX_MODIFY_OFFSETS,
-	MENU_BAS_CONVERT,
-	MENU_GFX_ADD_PATCH_TABLE,
-	MENU_GFX_ADD_TEXTUREX,
-	MENU_GFX_EXPORT_PNG,
-	MENU_VIEW_TEXT,
-	MENU_VIEW_HEX,
-	MENU_CONV_WAV_DSND,
-	MENU_CONV_DSND_WAV,
-	MENU_CONV_MUS_MIDI,
-	MENU_SCRIPT_COMPILE_ACS,
-	MENU_SCRIPT_COMPILE_ACSH,
-	MENU_TEXTUREX_CONVERT,
-	MENU_TEMP_END
-};
-
 
 /*******************************************************************
  * EXTERNAL VARIABLES
@@ -809,30 +790,6 @@ bool ArchivePanel::exportEntry() {
 				dir_last = dialog_save.GetDirectory();
 			}
 		}
-
-		/*
-		// Open dialog to select folder to export to
-		wxDirDialog dd(this, "Select a Directory to Export Entries to", dir_last);
-
-		if (dd.ShowModal() == wxID_OK) {
-			// Go through the selection
-			for (size_t a = 0; a < selection.size(); a++) {
-				// Setup entry filename
-				wxFileName fn(selection[a]->getName());
-				fn.SetPath(dd.GetPath());
-
-				// Add file extension if it doesn't exist
-				if (!fn.HasExt())
-					fn.SetExt(selection[a]->getType()->getExtension());
-
-				// Do export
-				selection[a]->exportFile(fn.GetFullPath());
-
-				// Save 'dir_last'
-				dir_last = dd.GetPath();
-			}
-		}
-		*/
 	}
 
 	return true;
@@ -1083,10 +1040,6 @@ bool ArchivePanel::basConvert() {
 
 	// Force entrylist width update
 	Layout();
-
-	// Load entry data into the text editor
-	//DefaultEntryPanel * meh = (DefaultEntryPanel *)default_area;
-	//meh->openTextEntry(animdef);
 
 	return true;
 }
@@ -1422,7 +1375,8 @@ void ArchivePanel::refreshPanel() {
 }
 
 /* ArchivePanel::handleAction
- * Handles a menu action from the main window
+ * Handles the action [id]. Returns true if the action was handled,
+ * false otherwise
  *******************************************************************/
 bool ArchivePanel::handleAction(string id) {
 	// Don't handle actions if hidden

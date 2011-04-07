@@ -1052,6 +1052,10 @@ void ArchiveManagerPanel::removeSelection() {
 		theArchiveManager->removeRecentFile(theArchiveManager->recentFile(selection[a]));
 }
 
+/* ArchiveManagerPanel::handleAction
+ * Handles the action [id]. Returns true if the action was handled,
+ * false otherwise
+ *******************************************************************/
 bool ArchiveManagerPanel::handleAction(string id) {
 	// We're only interested in "aman_" actions
 	if (!id.StartsWith("aman_"))

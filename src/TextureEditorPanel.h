@@ -5,11 +5,12 @@
 #include "CTextureCanvas.h"
 #include "PatchTable.h"
 #include "ListView.h"
+#include "MainApp.h"
 #include <wx/spinctrl.h>
 
 class TextureXEditor;
 
-class TextureEditorPanel : public wxPanel {
+class TextureEditorPanel : public wxPanel, SActionHandler {
 protected:
 	TextureXEditor*	tx_editor;
 	CTexture*		tex_current;
@@ -47,20 +48,6 @@ public:
 	TextureEditorPanel(wxWindow* parent, TextureXEditor* tx_editor);
 	~TextureEditorPanel();
 
-	// wxWidgets IDs
-	enum {
-		M_BEGIN = 400,
-
-		M_PATCH_ADD,
-		M_PATCH_REMOVE,
-		M_PATCH_BACK,
-		M_PATCH_FORWARD,
-		M_PATCH_REPLACE,
-		M_PATCH_DUPLICATE,
-
-		M_END,
-	};
-
 	bool		texModified() { return tex_modified; }
 	CTexture*	getTexture() { return tex_current; }
 
@@ -85,6 +72,9 @@ public:
 	void	duplicatePatch();
 
 	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
+
+	// SAction handler
+	bool	handleAction(string id);
 
 	// Events
 	void	onZoomChanged(wxCommandEvent& e);

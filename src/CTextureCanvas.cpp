@@ -632,10 +632,6 @@ void CTextureCanvas::onAnnouncement(Announcer* announcer, string event_name, Mem
 	if (announcer != texture)
 		return;
 
-	// Texture modified
-	//if (event_name == "modified")
-	//	Refresh();
-
 	// Patches modified
 	if (event_name == "patches_modified") {
 		// Reload patches
@@ -649,7 +645,7 @@ void CTextureCanvas::onAnnouncement(Announcer* announcer, string event_name, Mem
 			selected_patches.push_back(false);
 		}
 
-		Refresh();
+		redraw(true);
 	}
 }
 

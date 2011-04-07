@@ -621,6 +621,10 @@ void GfxEntryPanel::applyViewType() {
 	gfx_canvas->Refresh();
 }
 
+/* GfxEntryPanel::handleAction
+ * Handles the action [id]. Returns true if the action was handled,
+ * false otherwise
+ *******************************************************************/
 bool GfxEntryPanel::handleAction(string id) {
 	// Don't handle actions if hidden
 	if (!IsShown())
