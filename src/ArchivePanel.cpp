@@ -229,7 +229,6 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 	entry_list->Bind(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, &ArchivePanel::onEntryListActivated, this);
 	text_filter->Bind(wxEVT_COMMAND_TEXT_UPDATED, &ArchivePanel::onTextFilterChanged, this);
 	choice_category->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &ArchivePanel::onChoiceCategoryChanged, this);
-	Bind(wxEVT_COMMAND_MENU_SELECTED, &ArchivePanel::onEntryMenuClick, this, MENU_GFX_CONVERT, MENU_TEMP_END);
 	Bind(EVT_AEL_DIR_CHANGED, &ArchivePanel::onDirChanged, this);
 	btn_updir->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &ArchivePanel::onBtnUpDir, this);
 	Bind(wxEVT_SHOW, &ArchivePanel::onShow, this);
@@ -1425,17 +1424,25 @@ void ArchivePanel::refreshPanel() {
 /* ArchivePanel::handleAction
  * Handles a menu action from the main window
  *******************************************************************/
-void ArchivePanel::handleAction(int menu_id) {
+bool ArchivePanel::handleAction(string id) {
+	// Don't handle actions if hidden
+	if (!IsShown())
+		return false;
+
+	// We're only interested in "arch_" actions
+	if (!id.StartsWith("arch_"))
+		return false;
+
 	// *************************************************************
 	// FILE MENU
 	// *************************************************************
 
 	// File->Save
-	if (menu_id == MainWindow::MENU_FILE_SAVE)
+	if (id == "arch_save")
 		save();
 
 	// File->Save As
-	else if (menu_id == MainWindow::MENU_FILE_SAVEAS)
+	else if (id == "arch_saveas")
 		saveAs();
 
 
@@ -1444,27 +1451,27 @@ void ArchivePanel::handleAction(int menu_id) {
 	// *************************************************************
 
 	// Archive->New->Entry
-	else if (menu_id == MainWindow::MENU_ARCHIVE_NEWENTRY)
+	else if (id == "arch_newentry")
 		newEntry();
 
 	// Archive->New->Directory
-	else if (menu_id == MainWindow::MENU_ARCHIVE_NEWDIRECTORY)
+	else if (id == "arch_newdir")
 		newDirectory();
 
 	// Archive->Import Files
-	else if (menu_id == MainWindow::MENU_ARCHIVE_IMPORTFILES)
+	else if (id == "arch_importfiles")
 		importFiles();
 
 	// Archive->Texture Editor
-	else if (menu_id == MainWindow::MENU_ARCHIVE_TEXEDITOR)
+	else if (id == "arch_texeditor")
 		theMainWindow->openTextureEditor(archive);
 
 	// Archive->Convert To...
-	else if (menu_id == MainWindow::MENU_ARCHIVE_CONVERTTO)
+	else if (id == "arch_convert")
 		convertArchiveTo();
 
 	// Archive->Clean Up
-	else if (menu_id == MainWindow::MENU_ARCHIVE_CLEAN_PATCHES)
+	else if (id == "arch_clean_patches")
 		ArchiveOperations::removeUnusedPatches(archive);
 
 
@@ -1473,95 +1480,94 @@ void ArchivePanel::handleAction(int menu_id) {
 	// *************************************************************
 
 	// Entry->Rename
-	else if (menu_id == MainWindow::MENU_ENTRY_RENAME)
+	else if (id == "arch_entry_rename")
 		renameEntry();
 
 	// Entry->Delete
-	else if (menu_id == MainWindow::MENU_ENTRY_DELETE)
+	else if (id == "arch_entry_delete")
 		deleteEntry();
 
-	else if (menu_id == MainWindow::MENU_ENTRY_REVERT)
+	else if (id == "arch_entry_revert")
 		revertEntry();
 
 	// Entry->Cut
-	else if (menu_id == MainWindow::MENU_ENTRY_CUT)
+	else if (id == "arch_entry_cut")
 		cutEntry();
 
 	// Entry->Copy
-	else if (menu_id == MainWindow::MENU_ENTRY_COPY)
+	else if (id == "arch_entry_copy")
 		copyEntry();
 
 	// Entry->Paste
-	else if (menu_id == MainWindow::MENU_ENTRY_PASTE)
+	else if (id == "arch_entry_paste")
 		pasteEntry();
 
 	// Entry->Move Up
-	else if (menu_id == MainWindow::MENU_ENTRY_MOVEUP)
+	else if (id == "arch_entry_moveup")
 		moveUp();
 
 	// Entry->Move Down
-	else if (menu_id == MainWindow::MENU_ENTRY_MOVEDOWN)
+	else if (id == "arch_entry_movedown")
 		moveDown();
 
 	// Entry->Bookmark
-	else if (menu_id == MainWindow::MENU_ENTRY_BOOKMARK)
+	else if (id == "arch_entry_bookmark")
 		bookmark();
 
 	// Entry->Convert To...
-	else if (menu_id == MainWindow::MENU_ENTRY_CONVERTTO)
+	else if (id == "arch_entry_convert")
 		convertEntryTo();
 
 	// Entry->Import
-	else if (menu_id == MainWindow::MENU_ENTRY_IMPORT)
+	else if (id == "arch_entry_import")
 		importEntry();
 
 	// Entry->Export
-	else if (menu_id == MainWindow::MENU_ENTRY_EXPORT)
+	else if (id == "arch_entry_export")
 		exportEntry();
 
 	// Entry->Export As...
-	else if (menu_id == MainWindow::MENU_ENTRY_EXPORTAS)
+	else if (id == "arch_entry_exportas")
 		exportEntryAs();
-
-	// Entry->Bookmark
-	else if (menu_id == MainWindow::MENU_ENTRY_BOOKMARK)
-		bookmark();
 
 
 
 	// Temporary ones
-	else if (menu_id == MENU_GFX_CONVERT)
-		gfxConvert();
-	else if (menu_id == MENU_GFX_MODIFY_OFFSETS)
-		gfxModifyOffsets();
-	else if (menu_id == MENU_BAS_CONVERT)
+	else if (id == "arch_bas_convert")
 		basConvert();
-	else if (menu_id == MENU_GFX_ADD_PATCH_TABLE)
+	else if (id == "arch_gfx_convert")
+		gfxConvert();
+	else if (id == "arch_gfx_offsets")
+		gfxModifyOffsets();
+	else if (id == "arch_gfx_addptable")
 		EntryOperations::addToPatchTable(entry_list->getSelectedEntries());
-	else if (menu_id == MENU_GFX_ADD_TEXTUREX)
+	else if (id == "arch_gfx_addtexturex")
 		EntryOperations::createTexture(entry_list->getSelectedEntries());
-	else if (menu_id == MENU_GFX_EXPORT_PNG)
+	else if (id == "arch_gfx_exportpng")
 		gfxExportPNG();
-	else if (menu_id == MENU_VIEW_TEXT)
+	else if (id == "arch_view_text")
 		openEntryAsText(entry_list->getFocusedEntry());
-	else if (menu_id == MENU_VIEW_HEX)
+	else if (id == "arch_view_hex")
 		openEntryAsHex(entry_list->getFocusedEntry());
-	else if (menu_id == MENU_CONV_DSND_WAV)
+	else if (id == "arch_audio_convdw")
 		dSndWavConvert();
-	else if (menu_id == MENU_CONV_WAV_DSND)
+	else if (id == "arch_audio_convwd")
 		wavDSndConvert();
-	else if (menu_id == MENU_CONV_MUS_MIDI)
+	else if (id == "arch_audio_convmus")
 		musMidiConvert();
-	else if (menu_id == MENU_SCRIPT_COMPILE_ACS)
+	else if (id == "arch_script_compileacs")
 		compileACS();
-	else if (menu_id == MENU_SCRIPT_COMPILE_ACSH)
+	else if (id == "arch_script_compilehacs")
 		compileACS(true);
-	else if (menu_id == MENU_TEXTUREX_CONVERT)
+	else if (id == "arch_texturex_convertzd")
 		convertTextures();
 
-	// Not handled here, pass to current entry panel
+	// Unknown action
 	else
-		cur_area->handleAction(menu_id);
+		return false;
+
+	// Action handled, return true
+	return true;
 }
 
 /* ArchivePanel::onAnnouncement
@@ -1712,43 +1718,42 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 	}
 
 	// Generate context menu
-	wxMenu* context = new wxMenu();
-	context->Append(MainWindow::MENU_ENTRY_RENAME, "Rename");
-	context->Append(MainWindow::MENU_ENTRY_DELETE, "Delete");
-	if (modified_selected) context->Append(MainWindow::MENU_ENTRY_REVERT, "Revert");
-	context->AppendSeparator();
-	context->Append(MainWindow::MENU_ENTRY_CUT, "Cut");
-	context->Append(MainWindow::MENU_ENTRY_COPY, "Copy");
-	context->Append(MainWindow::MENU_ENTRY_PASTE, "Paste");
-	context->AppendSeparator();
-	context->Append(MainWindow::MENU_ENTRY_IMPORT, "Import");
-	context->Append(MainWindow::MENU_ENTRY_EXPORT, "Export");
-	context->AppendSeparator();
-	context->Append(MainWindow::MENU_ENTRY_MOVEUP, "Move Up");
-	context->Append(MainWindow::MENU_ENTRY_MOVEDOWN, "Move Down");
-	context->AppendSeparator();
-	context->Append(MainWindow::MENU_ENTRY_BOOKMARK, "Bookmark");
+	wxMenu context;
+	theApp->getAction("arch_entry_rename")->addToMenu(&context);
+	theApp->getAction("arch_entry_delete")->addToMenu(&context);
+	if (modified_selected) theApp->getAction("arch_entry_revert")->addToMenu(&context);
+	context.AppendSeparator();
+	theApp->getAction("arch_entry_cut")->addToMenu(&context);
+	theApp->getAction("arch_entry_copy")->addToMenu(&context);
+	theApp->getAction("arch_entry_paste")->addToMenu(&context);
+	context.AppendSeparator();
+	theApp->getAction("arch_entry_import")->addToMenu(&context);
+	theApp->getAction("arch_entry_export")->addToMenu(&context);
+	context.AppendSeparator();
+	theApp->getAction("arch_entry_moveup")->addToMenu(&context);
+	theApp->getAction("arch_entry_movedown")->addToMenu(&context);
+	context.AppendSeparator();
+	theApp->getAction("arch_entry_bookmark")->addToMenu(&context);
 
 	// Add Boom Animations/Switches related menu items if they are selected
 	if (bas_selected)
-		context->Append(MENU_BAS_CONVERT, "Convert to ANIMDEFS");
+		theApp->getAction("arch_bas_convert")->addToMenu(&context);
 
 	// Add texturex related menu items if needed
 	if (texturex_selected)
-		context->Append(MENU_TEXTUREX_CONVERT, "Convert to TEXTURES");
+		theApp->getAction("arch_texturex_convertzd")->addToMenu(&context);
 
 	// 'View As' menu
-	wxMenu* viewas;
 	if (context_submenus) {
-		viewas = new wxMenu();
-		context->AppendSubMenu(viewas, "View As");
-		viewas->Append(MENU_VIEW_TEXT, "Text", "Opens the selected entry in the text editor, regardless of type");
-		viewas->Append(MENU_VIEW_HEX, "Hex", "Opens the selected entry in the hex editor, regardless of type");
+		wxMenu* viewas = new wxMenu();
+		context.AppendSubMenu(viewas, "View As");
+		theApp->getAction("arch_view_text")->addToMenu(viewas, "Text");
+		theApp->getAction("arch_view_hex")->addToMenu(viewas, "Hex");
 	}
 	else {
-		context->AppendSeparator();
-		context->Append(MENU_VIEW_TEXT, "View as Text", "Opens the selected entry in the text editor, regardless of type");
-		context->Append(MENU_VIEW_HEX, "View as Hex", "Opens the selected entry in the hex editor, regardless of type");
+		context.AppendSeparator();
+		theApp->getAction("arch_view_text")->addToMenu(&context);
+		theApp->getAction("arch_view_hex")->addToMenu(&context);
 	}
 
 	// Add gfx-related menu items if gfx are selected
@@ -1756,17 +1761,17 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 		wxMenu* gfx;
 		if (context_submenus) {
 			gfx = new wxMenu();
-			context->AppendSubMenu(gfx, "Gfx");
+			context.AppendSubMenu(gfx, "Gfx");
 		}
 		else {
-			context->AppendSeparator();
-			gfx = context;
+			context.AppendSeparator();
+			gfx = &context;
 		}
-		gfx->Append(MENU_GFX_CONVERT, "Convert to...");
-		gfx->Append(MENU_GFX_MODIFY_OFFSETS, "Modify Gfx Offsets");
-		gfx->Append(MENU_GFX_ADD_PATCH_TABLE, "Add to Patch Table");
-		gfx->Append(MENU_GFX_ADD_TEXTUREX, "Add to TEXTUREx");
-		gfx->Append(MENU_GFX_EXPORT_PNG, "Export as PNG");
+		theApp->getAction("arch_gfx_convert")->addToMenu(gfx);
+		theApp->getAction("arch_gfx_offsets")->addToMenu(gfx);
+		theApp->getAction("arch_gfx_addptable")->addToMenu(gfx);
+		theApp->getAction("arch_gfx_addtexturex")->addToMenu(gfx);
+		theApp->getAction("arch_gfx_exportpng")->addToMenu(gfx);
 	}
 
 	// Add Audio related menu items if needed
@@ -1774,18 +1779,18 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 		wxMenu* audio;
 		if (context_submenus) {
 			audio = new wxMenu();
-			context->AppendSubMenu(audio, "Audio");
+			context.AppendSubMenu(audio, "Audio");
 		}
 		else {
-			context->AppendSeparator();
-			audio = context;
+			context.AppendSeparator();
+			audio = &context;
 		}
 		if (wav_selected)
-			audio->Append(MENU_CONV_WAV_DSND, "Convert WAV to Doom Sound");
+			theApp->getAction("arch_audio_convertwd")->addToMenu(audio);
 		if (dsnd_selected)
-			audio->Append(MENU_CONV_DSND_WAV, "Convert sounds to WAV");
+			theApp->getAction("arch_audio_convertdw")->addToMenu(audio);
 		if (mus_selected)
-			audio->Append(MENU_CONV_MUS_MIDI, "Convert MUS to MIDI");
+			theApp->getAction("arch_audio_convertmus")->addToMenu(audio);
 	}
 
 	// Add script related menu items if needed
@@ -1793,25 +1798,18 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 		wxMenu* scripts;
 		if (context_submenus) {
 			scripts = new wxMenu();
-			context->AppendSubMenu(scripts, "Scripts");
+			context.AppendSubMenu(scripts, "Scripts");
 		}
 		else {
-			context->AppendSeparator();
-			scripts = context;
+			context.AppendSeparator();
+			scripts = &context;
 		}
-		scripts->Append(MENU_SCRIPT_COMPILE_ACS, "Compile ACS");
-		scripts->Append(MENU_SCRIPT_COMPILE_ACSH, "Compile ACS (Hexen bytecode)");
+		theApp->getAction("arch_scripts_compileacs")->addToMenu(scripts);
+		theApp->getAction("arch_scripts_compilehacs")->addToMenu(scripts);
 	}
 
 	// Popup the context menu
-	PopupMenu(context);
-}
-
-/* ArchivePanel::onEntryMenuClick
- * Called when an entry menu item is selected
- *******************************************************************/
-void ArchivePanel::onEntryMenuClick(wxCommandEvent& e) {
-	handleAction(e.GetId());
+	PopupMenu(&context);
 }
 
 /* ArchivePanel::onEntryListKeyDown
@@ -2000,11 +1998,11 @@ void ArchivePanel::onShow(wxShowEvent& e) {
 #include "Console.h"
 #include "MainApp.h"
 Archive * CH::getCurrentArchive() {
-	if (theApp->getMainWindow())
+	if (theMainWindow)
 	{
-		if (theApp->getMainWindow()->getArchiveManagerPanel())
+		if (theMainWindow->getArchiveManagerPanel())
 		{
-			return theApp->getMainWindow()->getArchiveManagerPanel()->currentArchive();
+			return theMainWindow->getArchiveManagerPanel()->currentArchive();
 		}
 	}
 	return NULL;

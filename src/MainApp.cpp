@@ -62,7 +62,6 @@ namespace Global {
 string	dir_data = "";
 string	dir_user = "";
 string	dir_app = "";
-MainApp* MainApp::instance = NULL;
 CVAR(Bool, temp_use_appdir, false, CVAR_SAVE)
 CVAR(String, dir_last, "", CVAR_SAVE)
 
@@ -278,14 +277,115 @@ bool MainApp::initDirectories() {
 	return true;
 }
 
+/* MainApp::initLogFile
+ * Sets up the SLADE log file
+ *******************************************************************/
+void MainApp::initLogFile() {
+	// Set wxLog target(s)
+	wxLog::SetActiveTarget(new SLADELog());
+	FILE* log_file = fopen(CHR(appPath("slade3.log", DIR_DATA)), "wt");
+	new wxLogChain(new wxLogStderr(log_file));
+
+	// Write logfile header
+	string year = wxNow().Right(4);
+	wxLogMessage("SLADE - It's a Doom Editor");
+	wxLogMessage("Version %s", Global::version.c_str());
+#ifdef UPDATEREVISION
+	wxLogMessage("SLADE Revision " SVN_REVISION_STRING); 
+#endif
+	wxLogMessage("Written by Simon Judd, 2008-%s", year.c_str());
+	wxLogMessage("Compiled with wxWidgets %i.%i.%i", wxMAJOR_VERSION, wxMINOR_VERSION, wxRELEASE_NUMBER);
+	wxLogMessage("--------------------------------");
+}
+
+void MainApp::initActions() {
+	// MainWindow
+	new SAction("main_exit", "E&xit", "", "Quit SLADE");
+	new SAction("main_setbra", "Set &Base Resource Archive", "", "Set the Base Resource Archive, to act as the program 'IWAD'");
+	new SAction("main_preferences", "&Preferences...", "", "Setup SLADE options and preferences");
+	new SAction("main_showam", "&Archive Manager", "", "Toggle the Archive Manager window", "Ctrl+1");
+	new SAction("main_showconsole", "&Console", "", "Toggle the Console window", "Ctrl+2");
+	new SAction("main_onlinedocs", "Online &Documentation", "", "View SLADE documentation online");
+	new SAction("main_about", "&About", "", "Informaton about SLADE");
+
+	// ArchiveManagerPanel
+	new SAction("aman_newwad", "New Wad Archive", "t_newarchive", "Create a new Doom Wad Archive", "Ctrl+Shift+W");
+	new SAction("aman_newzip", "New Zip Archive", "t_newzip", "Create a new Zip Archive", "Ctrl+Shift+Z");
+	new SAction("aman_open", "&Open", "t_open", "Open an existing Archive", "Ctrl+O");
+	new SAction("aman_saveall", "Save All", "t_saveall", "Save all open Archives");
+	new SAction("aman_close", "&Close", "t_close", "Close the currently open Archive", "Ctrl+W");
+	new SAction("aman_closeall", "Close All", "t_closeall", "Close all open Archives");
+	new SAction("aman_recent_open", "Open", "t_open", "Open the selected Archive(s)");
+	new SAction("aman_recent_remove", "Remove", "t_close", "Remove the selected Archive(s) from the recent list");
+	new SAction("aman_bookmark_go", "Go To", "", "Go to the selected bookmark");
+	new SAction("aman_bookmark_remove", "Remove", "", "Remove the selected bookmark(s) from the list");
+
+	// Recent files
+	new SAction("aman_recent1", "<insert recent file name>", "");
+	new SAction("aman_recent2", "<insert recent file name>", "");
+	new SAction("aman_recent3", "<insert recent file name>", "");
+	new SAction("aman_recent4", "<insert recent file name>", "");
+	new SAction("aman_recent5", "<insert recent file name>", "");
+	new SAction("aman_recent6", "<insert recent file name>", "");
+	new SAction("aman_recent7", "<insert recent file name>", "");
+	new SAction("aman_recent8", "<insert recent file name>", "");
+
+	// ArchivePanel
+	new SAction("arch_save", "&Save", "t_save", "Save the currently open Archive", "Ctrl+S");
+	new SAction("arch_saveas", "Save &As", "t_saveas", "Save the currently open Archive to a new file", "Ctrl+Shift+S");
+	new SAction("arch_newentry", "New Entry", "t_newentry", "Create a new empty entry");
+	new SAction("arch_newdir", "New Directory", "t_newfolder", "Create a new empty directory");
+	new SAction("arch_importfiles", "&Import Files", "t_importfiles", "Import multiple files into the archive");
+	new SAction("arch_texeditor", "&Texture Editor", "t_texeditor", "Open the texture editor for the current archive");
+	new SAction("arch_clean_patches", "Remove Unused &Patches", "", "Removes any unused patches, and their associated entries");
+	new SAction("arch_entry_rename", "Rename", "t_rename", "Rename the selected entries");
+	new SAction("arch_entry_delete", "Delete", "t_delete", "Delete the selected entries");
+	new SAction("arch_entry_revert", "Revert", "", "Reverts any modifications made to the selected entries since the last save");
+	new SAction("arch_entry_cut", "Cut", "", "Cut the selected entries");
+	new SAction("arch_entry_copy", "Copy", "", "Copy the selected entries");
+	new SAction("arch_entry_paste", "Paste", "", "Paste the selected entries");
+	new SAction("arch_entry_moveup", "Move Up", "t_up", "Move the selected entries up");
+	new SAction("arch_entry_movedown", "Move Down", "t_down", "Move the selected entries down");
+	new SAction("arch_entry_import", "Import", "t_import", "Import a file to the selected entry");
+	new SAction("arch_entry_export", "Export", "t_export", "Export the selected entries to files");
+	new SAction("arch_entry_bookmark", "Bookmark", "", "Bookmark the current entry");
+	new SAction("arch_bas_convert", "<BAS convert>", "", "<insert description here>");
+	new SAction("arch_texturex_convertzd", "Convert to TEXTURES", "", "Converts any selected TEXTUREx entries to ZDoom TEXTURES format");
+	new SAction("arch_view_text", "View as Text", "", "Opens the selected entry in the text editor, regardless of type");
+	new SAction("arch_view_text", "View as Hex", "", "Opens the selected entry in the hex editor, regardless of type");
+	new SAction("arch_gfx_convert", "Convert to...", "", "Opens the Gfx Conversion Dialog for any selected gfx entries");
+	new SAction("arch_gfx_offsets", "Modify Gfx Offsets", "", "Mass-modify the offsets for any selected gfx entries");
+	new SAction("arch_gfx_addptable", "Add to Patch Table", "", "Adds any selected gfx entries to PNAMES");
+	new SAction("arch_gfx_addtexturex", "Add to TEXTUREx", "", "Creates textures from selected gfx entries and adds them to TEXTUREx");
+	new SAction("arch_gfx_exportpng", "Export as PNG", "", "Exports selected gfx entries to PNG format files");
+	new SAction("arch_audio_convertwd", "Convert WAV to Doom Sound", "", "Converts any selected WAV format entries to Doom Sound format");
+	new SAction("arch_audio_convertdw", "Convert Doom Sound to WAV", "", "Converts any selected Doom Sound format entries to WAV format");
+	new SAction("arch_audio_convertmus", "Convert MUS to MIDI", "", "Converts any selected MUS format entries to MIDI format");
+	new SAction("arch_scripts_compileacs", "Compile ACS", "", "Compiles any selected text entries to ACS bytecode");
+	new SAction("arch_scripts_compilehacs", "Compule ACS (Hexen bytecode)", "", "Compiles any selected text entries to Hexen-compatible ACS bytecode");
+
+	// GfxEntryPanel
+	new SAction("pgfx_mirror", "Mirror", "", "Mirrors the graphic horizontally");
+	new SAction("pgfx_flip", "Flip", "", "Flips the graphic vertically");
+	new SAction("pgfx_rotate", "Rotate", "", "Rotates the graphic");
+	new SAction("pgfx_translate", "Colour Remap", "", "Remap a range of colours in the graphic to another range (paletted gfx only)");
+	new SAction("pgfx_colourise", "Colourise", "", "Colourise the graphic");
+	new SAction("pgfx_tint", "Tint", "", "Tint the graphic by a colour/amount");
+	new SAction("pgfx_alph", "alPh Chunk", "", "Add/Remove alPh chunk to/from the PNG", "", SAction::CHECK);
+	new SAction("pgfx_trns", "tRNS Chunk", "", "Add/Remove tRNS chunk to/from the PNG", "", SAction::CHECK);
+	new SAction("pgfx_extract", "Extract All", "", "Extract all images in this entry to separate PNGs");
+}
+
 /* MainApp::OnInit
  * Application initialization, run when program is started
  *******************************************************************/
 bool MainApp::OnInit() {
 	// Init global variables
-	setInstance(this);
 	Global::error = "";
 	ArchiveManager::getInstance();
+
+	// Init variables
+	action_invalid = new SAction("invalid", "Invalid Action", "", "Something's gone wrong here");
 
 	// Set application name (for wx directory stuff)
 	wxApp::SetAppName("slade3");
@@ -339,6 +439,9 @@ bool MainApp::OnInit() {
 	wxLogMessage("Loading base resource");
 	theArchiveManager->initBaseResource();
 
+	// Init actions
+	initActions();
+
 	// Show the main window
 	theMainWindow->Show(true);
 	theSplashWindow->SetParent(theMainWindow);
@@ -356,6 +459,8 @@ bool MainApp::OnInit() {
 	theSplashWindow->hide();
 
 	wxLogMessage("SLADE Initialisation OK");
+
+	Bind(wxEVT_COMMAND_MENU_SELECTED, &MainApp::onMenu, this);
 
 	return true;
 }
@@ -401,27 +506,6 @@ void MainApp::OnFatalException() {
 	sd.ShowModal();
 #endif
 #endif
-}
-
-/* MainApp::initLogFile
- * Sets up the SLADE log file
- *******************************************************************/
-void MainApp::initLogFile() {
-	// Set wxLog target(s)
-	wxLog::SetActiveTarget(new SLADELog());
-	FILE* log_file = fopen(CHR(appPath("slade3.log", DIR_DATA)), "wt");
-	new wxLogChain(new wxLogStderr(log_file));
-
-	// Write logfile header
-	string year = wxNow().Right(4);
-	wxLogMessage("SLADE - It's a Doom Editor");
-	wxLogMessage("Version %s", Global::version.c_str());
-#ifdef UPDATEREVISION
-	wxLogMessage("SLADE Revision " SVN_REVISION_STRING); 
-#endif
-	wxLogMessage("Written by Simon Judd, 2008-%s", year.c_str());
-	wxLogMessage("Compiled with wxWidgets %i.%i.%i", wxMAJOR_VERSION, wxMINOR_VERSION, wxRELEASE_NUMBER);
-	wxLogMessage("--------------------------------");
 }
 
 /* MainApp::readConfigFile
@@ -523,6 +607,55 @@ void MainApp::saveConfigFile() {
 
 	// Close configuration file
 	file.Write("\n// End Configuration File\n\n");
+}
+
+SAction* MainApp::getAction(string id) {
+	// Find matching action
+	for (unsigned a = 0; a < actions.size(); a++) {
+		if (S_CMP(actions[a]->getId(), id))
+			return actions[a];
+	}
+
+	// Not found
+	return action_invalid;
+}
+
+bool MainApp::doAction(string id) {
+	// Send action to all handlers
+	bool handled = false;
+	for (unsigned a = 0; a < action_handlers.size(); a++) {
+		if (action_handlers[a]->handleAction(id)) {
+			handled = true;
+			break;
+		}
+	}
+
+	// Warn if nothing handled it
+	if (!handled)
+		wxLogMessage("Warning: Action \"%s\" not handled", CHR(id));
+
+	// Return true if handled
+	return handled;
+}
+
+void MainApp::onMenu(wxCommandEvent& e) {
+	// Find applicable action
+	string action = "";
+	for (unsigned a = 0; a < actions.size(); a++) {
+		if (actions[a]->getWxId() == e.GetId()) {
+			action = actions[a]->getId();
+			break;
+		}
+	}
+
+	// Warn if no match found (unknown action)
+	if (action.IsEmpty()) {
+		wxLogMessage("Warning: unknown action id %d", e.GetId());
+		return;
+	}
+
+	// Otherwise, send to all action handlers
+	doAction(action);
 }
 
 

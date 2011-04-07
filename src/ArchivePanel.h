@@ -6,10 +6,11 @@
 #include "EntryPanel.h"
 #include "ListenerAnnouncer.h"
 #include "ArchiveEntryList.h"
+#include "MainApp.h"
 #include <wx/textctrl.h>
 #include <wx/choice.h>
 
-class ArchivePanel : public wxPanel, public Listener {
+class ArchivePanel : public wxPanel, public Listener, SActionHandler {
 protected:
 	Archive*			archive;
 	ArchiveEntryList*	entry_list;
@@ -95,8 +96,8 @@ public:
 	void	focusEntryList() { entry_list->SetFocus(); }
 	void	refreshPanel();
 
-	// Function to handle menu actions from MainWindow
-	void	handleAction(int menu_id);
+	// SAction handler
+	bool	handleAction(string id);
 
 	virtual void onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 
@@ -104,7 +105,6 @@ public:
 	void			onEntryListSelectionChange(wxCommandEvent& e);
 	void			onEntryListFocusChange(wxListEvent& e);
 	void			onEntryListRightClick(wxListEvent& e);
-	void			onEntryMenuClick(wxCommandEvent& e);
 	void			onEntryListKeyDown(wxKeyEvent& e);
 	virtual void	onEntryListActivated(wxListEvent& e);
 	void			onDEPEditAsText(wxCommandEvent& e);

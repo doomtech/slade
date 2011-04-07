@@ -4,9 +4,10 @@
 
 #include "EntryPanel.h"
 #include "GfxCanvas.h"
+#include "MainApp.h"
 #include <wx/spinctrl.h>
 
-class GfxEntryPanel : public EntryPanel {
+class GfxEntryPanel : public EntryPanel, SActionHandler {
 private:
 	bool			alph;
 	bool			trns;
@@ -25,18 +26,6 @@ private:
 	int				cur_index;
 
 public:
-	enum {
-		MENU_GFXEP_MIRROR = 300,
-		MENU_GFXEP_FLIP,
-		MENU_GFXEP_ROTATE,
-		MENU_GFXEP_TRANSLATE,
-		MENU_GFXEP_COLOURISE,
-		MENU_GFXEP_TINT,
-		MENU_GFXEP_ALPH,
-		MENU_GFXEP_TRNS,
-		MENU_GFXEP_EXTRACT,
-	};
-
 	GfxEntryPanel(wxWindow* parent);
 	~GfxEntryPanel();
 
@@ -48,8 +37,10 @@ public:
 	void	applyViewType();
 	void	refresh();
 	string	statusString();
-	void	handleAction(int menu_id);
 	bool	extractAll();
+
+	// SAction handler
+	bool	handleAction(string id);
 
 	void	onZoomChanged(wxCommandEvent& e);
 	void	onXOffsetChanged(wxSpinEvent& e);

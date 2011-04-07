@@ -293,18 +293,18 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 
 	// Custom menu
 	menu_custom = new wxMenu();
-	menu_custom->Append(MENU_GFXEP_MIRROR, "Mirror");
-	menu_custom->Append(MENU_GFXEP_FLIP, "Flip");
-	menu_custom->Append(MENU_GFXEP_ROTATE, "Rotate");
+	theApp->getAction("pgfx_mirror")->addToMenu(menu_custom);
+	theApp->getAction("pgfx_flip")->addToMenu(menu_custom);
+	theApp->getAction("pgfx_rotate")->addToMenu(menu_custom);
 	menu_custom->AppendSeparator();
-	menu_custom->Append(MENU_GFXEP_TRANSLATE, "Colour Remap");
-	menu_custom->Append(MENU_GFXEP_COLOURISE, "Colourise");
-	menu_custom->Append(MENU_GFXEP_TINT, "Tint");
+	theApp->getAction("pgfx_translate")->addToMenu(menu_custom);
+	theApp->getAction("pgfx_colourise")->addToMenu(menu_custom);
+	theApp->getAction("pgfx_tint")->addToMenu(menu_custom);
 	menu_custom->AppendSeparator();
-	menu_custom->AppendCheckItem(MENU_GFXEP_ALPH, "alPh Chunk");
-	menu_custom->AppendCheckItem(MENU_GFXEP_TRNS, "tRNS Chunk");
+	theApp->getAction("pgfx_alph")->addToMenu(menu_custom);
+	theApp->getAction("pgfx_trns")->addToMenu(menu_custom);
 	menu_custom->AppendSeparator();
-	menu_custom->Append(MENU_GFXEP_EXTRACT, "Extract All");
+	theApp->getAction("pgfx_extract")->addToMenu(menu_custom);
 	custom_menu_name = "Graphic";
 
 	// Bind Events
@@ -388,9 +388,9 @@ bool GfxEntryPanel::saveEntry() {
 		bool alph = EntryOperations::getalPhChunk(entry);
 		bool trns = EntryOperations::gettRNSChunk(entry);
 
-		if (alph != menu_custom->IsChecked(MENU_GFXEP_ALPH))
+		if (alph != menu_custom->IsChecked(theApp->getAction("pgfx_alph")->getWxId()))
 			EntryOperations::modifyalPhChunk(entry, !alph);
-		if (trns != menu_custom->IsChecked(MENU_GFXEP_TRNS))
+		if (trns != menu_custom->IsChecked(theApp->getAction("pgfx_trns")->getWxId()))
 			EntryOperations::modifytRNSChunk(entry, !trns);
 	}
 
@@ -446,6 +446,12 @@ void GfxEntryPanel::refresh() {
 	// Set offset text boxes
 	spin_xoffset->SetValue(getImage()->offset().x);
 	spin_yoffset->SetValue(getImage()->offset().y);
+
+	// Get some needed menu ids
+	int MENU_GFXEP_ALPH = theApp->getAction("pgfx_alph")->getWxId();
+	int MENU_GFXEP_TRNS = theApp->getAction("pgfx_trns")->getWxId();
+	int MENU_GFXEP_EXTRACT = theApp->getAction("pgfx_extract")->getWxId();
+	int MENU_GFXEP_TRANSLATE = theApp->getAction("pgfx_translate")->getWxId();
 
 	// Set PNG check menus
 	if (this->entry->getType() != NULL && this->entry->getType()->getFormat() == "img_png") {
@@ -615,9 +621,17 @@ void GfxEntryPanel::applyViewType() {
 	gfx_canvas->Refresh();
 }
 
-void GfxEntryPanel::handleAction(int menu_id) {
+bool GfxEntryPanel::handleAction(string id) {
+	// Don't handle actions if hidden
+	if (!IsShown())
+		return false;
+
+	// We're only interested in "pgfx_" actions
+	if (!id.StartsWith("pgfx_"))
+		return false;
+
 	// Mirror
-	if (menu_id == MENU_GFXEP_MIRROR) {
+	if (id == "pgfx_mirror") {
 		// Mirror X
 		getImage()->mirror(false);
 
@@ -631,7 +645,7 @@ void GfxEntryPanel::handleAction(int menu_id) {
 	}
 
 	// Flip
-	else if (menu_id == MENU_GFXEP_FLIP) {
+	else if (id == "pgfx_flip") {
 		// Mirror Y
 		getImage()->mirror(true);
 
@@ -645,7 +659,7 @@ void GfxEntryPanel::handleAction(int menu_id) {
 	}
 
 	// Rotate
-	else if (menu_id == MENU_GFXEP_ROTATE) {
+	else if (id == "pgfx_rotate") {
 		// Prompt for rotation angle
 		string angles[] = { "90", "180", "270" };
 		int choice = wxGetSingleChoiceIndex("Select rotation angle", "Rotate", 3, angles, 0);
@@ -674,12 +688,12 @@ void GfxEntryPanel::handleAction(int menu_id) {
 	}
 
 	// Translate
-	else if (menu_id == MENU_GFXEP_TRANSLATE) {
+	else if (id == "pgfx_translate") {
 		wxMessageBox("Not implemented");
 	}
 
 	// Colourise
-	else if (menu_id == MENU_GFXEP_COLOURISE) {
+	else if (id == "pgfx_colourise") {
 		Palette8bit* pal = theMainWindow->getPaletteChooser()->getSelectedPalette();
 		GfxColouriseDialog gcd(this, entry, pal);
 
@@ -699,7 +713,7 @@ void GfxEntryPanel::handleAction(int menu_id) {
 	}
 
 	// Tint
-	else if (menu_id == MENU_GFXEP_TINT) {
+	else if (id == "pgfx_tint") {
 		Palette8bit* pal = theMainWindow->getPaletteChooser()->getSelectedPalette();
 		GfxTintDialog gtd(this, entry, pal);
 
@@ -719,13 +733,20 @@ void GfxEntryPanel::handleAction(int menu_id) {
 	}
 
 	// alPh/tRNS
-	else if (menu_id == MENU_GFXEP_ALPH || menu_id == MENU_GFXEP_TRNS)
+	else if (id == "pgfx_alph" || id == "pgfx_trns")
 		setModified();
 
 	// Extract all
-	else if (menu_id == MENU_GFXEP_EXTRACT) {
+	else if (id == "pgfx_extract") {
 		extractAll();
 	}
+
+	// Unknown action
+	else
+		return false;
+
+	// Action handled
+	return true;
 }
 
 

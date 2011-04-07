@@ -2,7 +2,7 @@
 #ifndef __MAINAPP_H__
 #define __MAINAPP_H__
 
-#include "MainWindow.h"
+#include "SAction.h"
 #include <wx/app.h>
 #include <wx/log.h>
 
@@ -24,10 +24,18 @@ public:
 #endif
 };
 
+class MainWindow;
+class SActionHandler;
+
 class MainApp : public wxApp {
+friend class SAction;
+friend class SActionHandler;
 private:
-	MainWindow*		main_window;
-	static MainApp*	instance;
+	MainWindow*				main_window;
+	int						cur_id;
+	SAction*				action_invalid;
+	vector<SAction*>		actions;
+	vector<SActionHandler*>	action_handlers;
 
 public:
 	virtual bool OnInit();
@@ -35,22 +43,41 @@ public:
 	virtual void OnFatalException();
 
 	MainWindow*	getMainWindow() { return main_window; }
-	// Singleton implementation
-	static MainApp*	getInstance() {
-		if (!instance)
-			wxLogMessage("This is fucked up");
-
-		return instance;
-	}
-	static void setInstance(MainApp *app) { instance = app; }
 
 	bool	initDirectories();
 	void	initLogFile();
+	void	initActions();
 	void	readConfigFile();
 	void	saveConfigFile();
+
+	int			newMenuId() { return cur_id++; }
+	SAction*	getAction(string id);
+	bool		doAction(string id);
+
+	void	onMenu(wxCommandEvent& e);
 };
 
-// Define for less cumbersome MainWindow::getInstance()
-#define theApp MainApp::getInstance()
+#define theApp ((MainApp*)wxTheApp)
+
+// Basic 'interface' class for classes that handle SActions (yay multiple inheritance)
+class SActionHandler {
+friend class MainApp;
+protected:
+	virtual bool	handleAction(string id) { return false; }
+
+public:
+	SActionHandler() {
+		theApp->action_handlers.push_back(this);
+	}
+
+	~SActionHandler() {
+		for (unsigned a = 0; a < theApp->action_handlers.size(); a++) {
+			if (theApp->action_handlers[a] == this) {
+				theApp->action_handlers.erase(theApp->action_handlers.begin() + a);
+				a--;
+			}
+		}
+	}
+};
 
 #endif //__MAINAPP_H__

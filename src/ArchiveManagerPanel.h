@@ -10,6 +10,7 @@
 #include "Archive.h"
 #include "ListView.h"
 #include "EntryPanel.h"
+#include "MainApp.h"
 
 class ArchiveManagerPanel;
 
@@ -25,7 +26,7 @@ public:
 	void onItemActivated(wxTreeEvent &e);
 };
 
-class ArchiveManagerPanel : public wxPanel, Listener {
+class ArchiveManagerPanel : public wxPanel, Listener, SActionHandler {
 private:
 	wxAuiNotebook*		notebook_tabs;
 	wxAuiNotebook*		notebook_archives;
@@ -35,35 +36,13 @@ private:
 	wxListCtrl*			list_maps;
 	WMFileBrowser*		file_browser;
 	wxButton*			btn_browser_open;
-	wxMenu*				menu_context_open;
-	wxMenu*				menu_context_recent;
-	wxMenu*				menu_context_bookmarks;
 	wxMenu*				menu_recent;
 
 public:
-	// wxWidgets ID table
-	enum {
-		// Open Achives menu items
-		MENU_SAVE,
-		MENU_SAVEAS,
-		MENU_CLOSE,
-
-		// Recent Files menu items
-		MENU_OPEN,
-		MENU_REMOVE,
-
-		// Bookmarks menu items
-		MENU_GO,
-		MENU_DELETE,
-
-		// End
-		MENU_END,
-	};
-
 	ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_archives);
 	~ArchiveManagerPanel();
 
-	wxMenu*			recentFilesMenu() { return menu_recent; }
+	wxMenu*			getRecentMenu() { return menu_recent; }
 
 	void			refreshArchiveList();
 	void			refreshRecentFileList();
@@ -112,8 +91,8 @@ public:
 	void	deleteSelectedBookmarks();
 	void	goToBookmark(long index = -1);
 
-	// Handler for MainWindow menu actions
-	void	handleAction(int menu_id);
+	// SAction handler
+	bool	handleAction(string id);
 
 	vector<int>	getSelectedArchives();
 	vector<int>	getSelectedBookmarks();
@@ -132,7 +111,6 @@ public:
 	void	onListBookmarksRightClick(wxListEvent& e);
 	void	onListMapsChanged(wxCommandEvent& e);
 	void	onListMapsActivated(wxListEvent& e);
-	void	onMenu(wxCommandEvent& e);
 	void	onArchiveTabChanged(wxAuiNotebookEvent& e);
 	void	onArchiveTabClose(wxAuiNotebookEvent& e);
 	void	onAMTabChanged(wxAuiNotebookEvent& e);

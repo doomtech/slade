@@ -138,12 +138,6 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
 	file_browser = new WMFileBrowser(notebook_tabs, this, -1);
 	notebook_tabs->AddPage(file_browser, _("File Browser"));
 
-	// Create/setup Archive context menu
-	menu_context_open = new wxMenu();
-	menu_context_open->Append(MENU_SAVE, "Save", "Save the selected Archive(s)");
-	menu_context_open->Append(MENU_SAVEAS, "Save As", "Save the selected Archive(s) to a new file(s)");
-	menu_context_open->Append(MENU_CLOSE, "Close", "Close the selected Archive(s)");
-
 	// Create/setup recent files list and menu
 	menu_recent = new wxMenu();
 	wxPanel *panel_rf = new wxPanel(notebook_tabs);
@@ -154,11 +148,6 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
 	box_rf->Add(list_recent, 1, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, 4);
 	refreshRecentFileList();
 	notebook_tabs->AddPage(panel_rf, "Recent Files", true);
-
-	// Create/setup Archive context menu
-	menu_context_recent = new wxMenu();
-	menu_context_recent->Append(MENU_OPEN, "Open", "Open the selected Archive(s)");
-	menu_context_recent->Append(MENU_REMOVE, "Remove", "Remove the selected Archive(s) from the Recent list");
 
 	// Create/setup bookmarks tab
 	wxPanel *panel_bm = new wxPanel(notebook_tabs);
@@ -173,11 +162,6 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
 	// Set current tab
 	notebook_tabs->SetSelection(am_current_tab);
 
-	// Create/setup Archive context menu
-	menu_context_bookmarks = new wxMenu();
-	menu_context_bookmarks->Append(MENU_GO, "Go To", "Go to the chosen bookmark");
-	menu_context_bookmarks->Append(MENU_DELETE, "Remove", "Remove the selected bookmarks from the list");
-
 	// Bind events
 	list_archives->Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &ArchiveManagerPanel::onListArchivesChanged, this);
 	list_archives->Bind(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, &ArchiveManagerPanel::onListArchivesActivated, this);
@@ -191,7 +175,6 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
 	notebook_archives->Bind(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED, &ArchiveManagerPanel::onArchiveTabChanged, this);
 	notebook_archives->Bind(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSE, &ArchiveManagerPanel::onArchiveTabClose, this);
 	notebook_tabs->Bind(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED, &ArchiveManagerPanel::onAMTabChanged, this);
-	Bind(wxEVT_COMMAND_MENU_SELECTED, &ArchiveManagerPanel::onMenu, this, MENU_SAVE, MENU_END);
 
 	// Listen to the ArchiveManager
 	listenTo(theArchiveManager);
@@ -204,9 +187,6 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
  * ArchiveManagerPanel class destructor
  *******************************************************************/
 ArchiveManagerPanel::~ArchiveManagerPanel() {
-	if (menu_context_open) delete menu_context_open;
-	if (menu_context_recent) delete menu_context_recent;
-	if (menu_context_bookmarks) delete menu_context_bookmarks;
 }
 
 /* ArchiveManagerPanel::refreshRecentFileList
@@ -216,10 +196,13 @@ void ArchiveManagerPanel::refreshRecentFileList() {
 	// Clear the list
 	list_recent->ClearAll();
 
+	// Get first recent file menu id
+	int id_recent_start = theApp->getAction("aman_recent1")->getWxId();
+
 	// Clear menu; needs to do with a count down rather than up
 	// otherwise the following elements are not properly removed
 	for (unsigned a = menu_recent->GetMenuItemCount(); a > 0; a--)
-		menu_recent->Destroy(MainWindow::MENU_RECENT_1 + a - 1);
+		menu_recent->Destroy(id_recent_start + a - 1);
 
 	// Add columns
 	list_recent->InsertColumn(0, "Filename");
@@ -232,7 +215,7 @@ void ArchiveManagerPanel::refreshRecentFileList() {
 		updateRecentListItem(a);
 
 		if (a < 8)
-			menu_recent->Append(MainWindow::MENU_RECENT_1+a, theArchiveManager->recentFile(a));
+			menu_recent->Append(id_recent_start + a, theArchiveManager->recentFile(a));
 	}
 
 	// Update size
@@ -1067,48 +1050,23 @@ void ArchiveManagerPanel::removeSelection() {
 	// Remove selected recent files
 	for (unsigned a = 0; a < selection.size(); a++)
 		theArchiveManager->removeRecentFile(theArchiveManager->recentFile(selection[a]));
-
-/*
-	// Prepare list of kept archives
-	int numfiles = theArchiveManager->numRecentFiles();
-	bool * okay = new bool[numfiles];
-	for (int a = 0; a < (signed)numfiles; ++a)
-		okay[a] = true;
-
-	// Deselect the files that are being removed
-	for (int a = 0; a < (signed)selection.size(); ++a) {
-		if (selection[a] < numfiles)
-			okay[selection[a]] = false;
-	}
-
-	// Get the list of kept files
-	vector<string> kept_files;
-	for (int a = 0; a < numfiles; a++)
-		if (okay[a])
-			kept_files.push_back(theArchiveManager->recentFile(a));
-
-	delete[] okay;
-
-	// Renew the list of recent files
-	theArchiveManager->addRecentFiles(kept_files);
-*/
 }
 
-void ArchiveManagerPanel::handleAction(int menu_id) {
-	// *************************************************************
-	// FILE MENU
-	// *************************************************************
+bool ArchiveManagerPanel::handleAction(string id) {
+	// We're only interested in "aman_" actions
+	if (!id.StartsWith("aman_"))
+		return false;
 
 	// File->New Wad
-	if (menu_id == MainWindow::MENU_FILE_NEWWAD)
+	if (id == "aman_newwad")
 		createNewArchive(ARCHIVE_WAD);
 
 	// File->New Zip
-	else if (menu_id == MainWindow::MENU_FILE_NEWZIP)
+	else if (id == "aman_newzip")
 		createNewArchive(ARCHIVE_ZIP);
 
 	// File->Open
-	else if (menu_id == MainWindow::MENU_FILE_OPEN) {
+	else if (id == "aman_open") {
 		// Create extensions string
 		string extensions = theArchiveManager->getArchiveExtensionsString();
 
@@ -1135,32 +1093,46 @@ void ArchiveManagerPanel::handleAction(int menu_id) {
 	}
 
 	// File->Recent
-	else if (menu_id >= MainWindow::MENU_RECENT_1 && menu_id <= MainWindow::MENU_RECENT_8) {
+	else if (id.StartsWith("aman_recent")) {
 		// Get recent file index
-		unsigned index = menu_id - MainWindow::MENU_RECENT_1;
+		unsigned index = theApp->getAction(id)->getWxId() - theApp->getAction("aman_recent1")->getWxId();
 
 		// Open it
 		openFile(theArchiveManager->recentFile(index));
 	}
 
 	// File->Save All
-	else if (menu_id == MainWindow::MENU_FILE_SAVEALL)
+	else if (id == "aman_saveall")
 		saveAll();
 
 	// File->Close All
-	else if (menu_id == MainWindow::MENU_FILE_CLOSEALL)
+	else if (id == "aman_closeall")
 		closeAll();
 
 	// File->Close
-	else if (menu_id == MainWindow::MENU_FILE_CLOSE)
+	else if (id == "aman_close")
 		closeArchive(currentArchive());
 
-	else {
-		// Check if the current tab is an archive tab
-		wxWindow* tab = notebook_archives->GetPage(notebook_archives->GetSelection());
-		if (tab && tab->GetName() == "archive")
-			((ArchivePanel*)tab)->handleAction(menu_id);	// Send action to current ArchivePanel
-	}
+
+	// Bookmarks context menu
+	else if (id == "aman_bookmark_go")
+		goToBookmark();
+	else if (id == "aman_bookmark_remove")
+		deleteSelectedBookmarks();
+
+
+	// Recent files context menu
+	else if (id == "aman_recent_open")
+		openSelection();
+	else if (id == "aman_recent_remove")
+		removeSelection();
+
+	// Unknown action
+	else
+		return false;
+
+	// Action performed, return true
+	return true;
 }
 
 /* ArchiveManagerPanel::updateBookmarkListItem
@@ -1309,7 +1281,14 @@ void ArchiveManagerPanel::onListMapsActivated(wxListEvent& e) {
  * pops up a context menu
  *******************************************************************/
 void ArchiveManagerPanel::onListArchivesRightClick(wxListEvent& e) {
-	PopupMenu(menu_context_open);
+	// Generate context menu
+	wxMenu context;
+	theApp->getAction("arch_save")->addToMenu(&context);
+	theApp->getAction("arch_saveas")->addToMenu(&context);
+	theApp->getAction("aman_close")->addToMenu(&context);
+
+	// Pop it up
+	PopupMenu(&context);
 }
 
 /* ArchiveManagerPanel::onListRecentActivated
@@ -1328,7 +1307,13 @@ void ArchiveManagerPanel::onListRecentActivated(wxListEvent& e) {
  * pops up a context menu
  *******************************************************************/
 void ArchiveManagerPanel::onListRecentRightClick(wxListEvent& e) {
-	PopupMenu(menu_context_recent);
+	// Generate context menu
+	wxMenu context;
+	theApp->getAction("aman_recent_open")->addToMenu(&context);
+	theApp->getAction("aman_recent_remove")->addToMenu(&context);
+
+	// Pop it up
+	PopupMenu(&context);
 }
 
 /* ArchiveManagerPanel::onListBookmarksActivated
@@ -1346,28 +1331,13 @@ void ArchiveManagerPanel::onListBookmarksActivated(wxListEvent& e) {
  * pops up a context menu
  *******************************************************************/
 void ArchiveManagerPanel::onListBookmarksRightClick(wxListEvent& e) {
-	PopupMenu(menu_context_bookmarks);
-}
+	// Generate context menu
+	wxMenu context;
+	theApp->getAction("aman_bookmark_go")->addToMenu(&context);
+	theApp->getAction("aman_bookmark_remove")->addToMenu(&context);
 
-/* ArchiveManagerPanel::onMenu
- * Called when an item on the archive list context menu is selected
- *******************************************************************/
-void ArchiveManagerPanel::onMenu(wxCommandEvent& e) {
-	switch(e.GetId()) {
-
-	// Open Archives menu
-	case MENU_SAVE:		saveSelection();	break;	// Save
-	case MENU_SAVEAS:	saveSelectionAs();	break;	// Save As
-	case MENU_CLOSE:	closeSelection();	break;	// Close
-
-	// Recent Files menu
-	case MENU_OPEN:		openSelection();	break;	// Open
-	case MENU_REMOVE:	removeSelection();	break;	// Remove
-
-	// Bookmarks menu
-	case MENU_GO:		goToBookmark();		break;	// Go To
-	case MENU_DELETE:	deleteSelectedBookmarks();	break;	// Delete
-	}
+	// Pop it up
+	PopupMenu(&context);
 }
 
 /* ArchiveManagerPanel::onArchiveTabChanged

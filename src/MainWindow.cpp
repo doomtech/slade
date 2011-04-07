@@ -38,6 +38,7 @@
 #include "BaseResourceChooser.h"
 #include "PreferencesDialog.h"
 #include "Tokenizer.h"
+#include "SplashWindow.h"
 #include <wx/aboutdlg.h>
 #include <wx/dnd.h>
 
@@ -161,76 +162,72 @@ void MainWindow::setupLayout() {
 
 	// File menu
 	wxMenu* fileNewMenu = new wxMenu("");
-	fileNewMenu->Append(createMenuItem(fileNewMenu, MENU_FILE_NEWWAD,	"&Wad Archive\tCtrl+Shift+W",	"Create a new Doom Wad Archive",					"t_newarchive"));
-	fileNewMenu->Append(createMenuItem(fileNewMenu, MENU_FILE_NEWZIP,	"&Zip Archive\tCtrl+Shift+Z",	"Create a new Zip Archive (zip/pk3/jdf)",			"t_newzip"));
+	theApp->getAction("aman_newwad")->addToMenu(fileNewMenu, "&Wad Archive");
+	theApp->getAction("aman_newzip")->addToMenu(fileNewMenu, "&Zip Archive");
 	wxMenu* fileMenu = new wxMenu("");
-	fileMenu->AppendSubMenu(fileNewMenu,	"&New",				"Create a new Archive");
-	fileMenu->Append(createMenuItem(fileMenu, MENU_FILE_OPEN,		"&Open\tCtrl+O",					"Open an existing Archive",							"t_open"));
+	fileMenu->AppendSubMenu(fileNewMenu, "&New", "Create a new Archive");
+	theApp->getAction("aman_open")->addToMenu(fileMenu);
 	fileMenu->AppendSeparator();
-	fileMenu->Append(createMenuItem(fileMenu, MENU_FILE_SAVE,		"&Save\tCtrl+S",					"Save the currently open Archive",					"t_save"));
-	fileMenu->Append(createMenuItem(fileMenu, MENU_FILE_SAVEAS,		"Save &As...\tCtrl+Shift+S",		"Save the currently open Archive to a new file",	"t_saveas"));
-	fileMenu->Append(createMenuItem(fileMenu, MENU_FILE_SAVEALL,	"Save All",							"Save all open Archives",							"t_saveall"));
-	fileMenu->AppendSubMenu(panel_archivemanager->recentFilesMenu(), "&Recent Files");
+	theApp->getAction("arch_save")->addToMenu(fileMenu);
+	theApp->getAction("arch_saveas")->addToMenu(fileMenu);
+	theApp->getAction("aman_saveall")->addToMenu(fileMenu);
+	fileMenu->AppendSubMenu(panel_archivemanager->getRecentMenu(), "&Recent Files");
 	fileMenu->AppendSeparator();
-	fileMenu->Append(createMenuItem(fileMenu, MENU_FILE_CLOSE,		"&Close\tCtrl+W",					"Close the currently open Archive",					"t_close"));
-	fileMenu->Append(createMenuItem(fileMenu, MENU_FILE_CLOSEALL,	"Close All",						"Close all open Archives",							"t_closeall"));
+	theApp->getAction("aman_close")->addToMenu(fileMenu);
+	theApp->getAction("aman_closeall")->addToMenu(fileMenu);
 	fileMenu->AppendSeparator();
-	fileMenu->Append(createMenuItem(fileMenu, MENU_FILE_EXIT,		"E&xit",							"Quit SLADE"));
+	theApp->getAction("main_exit")->addToMenu(fileMenu);
 	menu->Append(fileMenu, "&File");
 
 	// Editor menu
 	wxMenu* editorMenu = new wxMenu("");
-	editorMenu->Append(createMenuItem(editorMenu, MENU_EDITOR_SETBASERESOURCE,	"Set &Base Resource Archive",	"Set the base resource archive, to act as the 'program IWAD'"));
-	editorMenu->Append(createMenuItem(editorMenu, MENU_EDITOR_PREFERENCES,		"&Preferences...",				"Setup SLADE options and preferences"));
+	theApp->getAction("main_setbra")->addToMenu(editorMenu);
+	theApp->getAction("main_preferences")->addToMenu(editorMenu);
 	menu->Append(editorMenu, "E&ditor");
 
 	// Archive menu
 	wxMenu* archiveNewMenu = new wxMenu("");
-	archiveNewMenu->Append(createMenuItem(archiveNewMenu,	MENU_ARCHIVE_NEWENTRY,			"&Entry",					"Create a new empty entry",		"t_newentry"));
-	archiveNewMenu->Append(createMenuItem(archiveNewMenu,	MENU_ARCHIVE_NEWDIRECTORY,		"&Directory",				"Create a new empty directory",	"t_newfolder"));
+	theApp->getAction("arch_newentry")->addToMenu(archiveNewMenu, "&Entry");
+	theApp->getAction("arch_newdir")->addToMenu(archiveNewMenu, "&Directory");
 	wxMenu* archiveMenu = new wxMenu("");
 	archiveMenu->AppendSubMenu(archiveNewMenu, "&New");
-	archiveMenu->Append(createMenuItem(archiveMenu,			MENU_ARCHIVE_IMPORTFILES,		"&Import Files",			"Import multiple files into the archive",	"t_importfiles"));
+	theApp->getAction("arch_importfiles")->addToMenu(archiveMenu);
 	archiveMenu->AppendSeparator();
-	archiveMenu->Append(createMenuItem(archiveMenu,			MENU_ARCHIVE_TEXEDITOR,			"&Texture Editor",			"Open the texture editor for the current archive",	"t_texeditor"));
-	//archiveMenu->Append(createMenuItem(archiveMenu,	MENU_ARCHIVE_CONVERTTO,		"&Convert To...",	"Convert the current archive to a different format"));
-	//archiveMenu->Append(createMenuItem(archiveMenu,	MENU_ARCHIVE_CLEANUP,		"Clean &Up",		"Clean up the current archive by removing unused entries and data"));
+	theApp->getAction("arch_texeditor")->addToMenu(archiveMenu);
 	wxMenu* archiveCleanMenu = new wxMenu("");
-	archiveCleanMenu->Append(createMenuItem(archiveCleanMenu, MENU_ARCHIVE_CLEAN_PATCHES, 	"Remove Unused &Patches",	"Removes any unused patches, and their associated entries"));
+	theApp->getAction("arch_clean_patches")->addToMenu(archiveCleanMenu);
 	archiveMenu->AppendSubMenu(archiveCleanMenu, "Clean &Up");
 	menu->Append(archiveMenu, "&Archive");
 
 	// Entry menu
 	wxMenu* entryMenu = new wxMenu("");
-	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_RENAME,		"Rename",			"Rename the selected entries",													"t_rename"));
-	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_DELETE,		"Delete",			"Delete the selected entries",													"t_delete"));
-	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_REVERT,		"Revert",			"Reverts any modifications made to the selected entries since the last save"));
+	theApp->getAction("arch_entry_rename")->addToMenu(entryMenu);
+	theApp->getAction("arch_entry_delete")->addToMenu(entryMenu);
+	theApp->getAction("arch_entry_revert")->addToMenu(entryMenu);
 	entryMenu->AppendSeparator();
-	entryMenu->Append(createMenuItem(entryMenu,	MENU_ENTRY_CUT,			"Cut",				"Cut the selected entries"));
-	entryMenu->Append(createMenuItem(entryMenu,	MENU_ENTRY_COPY,		"Copy",				"Copy the selected entries"));
-	entryMenu->Append(createMenuItem(entryMenu,	MENU_ENTRY_PASTE,		"Paste",			"Paste the previously cut/copied entries"));
+	theApp->getAction("arch_entry_cut")->addToMenu(entryMenu);
+	theApp->getAction("arch_entry_copy")->addToMenu(entryMenu);
+	theApp->getAction("arch_entry_paste")->addToMenu(entryMenu);
 	entryMenu->AppendSeparator();
-	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_MOVEUP,		"Move Up",			"Move the selected entries up",													"t_up"));
-	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_MOVEDOWN,	"Move Down",		"Move the selected entries down",												"t_down"));
-	//entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_CONVERTTO,	"Convert To...",	"Convert selected entries to a different format/type"));
+	theApp->getAction("arch_entry_moveup")->addToMenu(entryMenu);
+	theApp->getAction("arch_entry_movedown")->addToMenu(entryMenu);
 	entryMenu->AppendSeparator();
-	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_IMPORT,		"Import",			"Import a file to the selected entry",											"t_import"));
-	entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_EXPORT,		"Export",			"Export the selected entries to files",											"t_export"));
-	//entryMenu->Append(createMenuItem(entryMenu, MENU_ENTRY_EXPORTAS,	"Export As...",		"Export the selected entries to files as a different format/type"));
+	theApp->getAction("arch_entry_import")->addToMenu(entryMenu);
+	theApp->getAction("arch_entry_export")->addToMenu(entryMenu);
 	entryMenu->AppendSeparator();
-	entryMenu->Append(createMenuItem(entryMenu,	MENU_ENTRY_BOOKMARK,	"Bookmark",			"Bookmark the current entry"));
+	theApp->getAction("arch_entry_bookmark")->addToMenu(entryMenu);
 	menu->Append(entryMenu, "&Entry");
 
 	// View menu
 	wxMenu* viewMenu = new wxMenu("");
-	viewMenu->Append(MENU_VIEW_ARCHIVEMANAGER,	"&Archive Manager\tCtrl+1",	"Toggle the archive manager");
-	viewMenu->Append(MENU_VIEW_CONSOLE,			"&Console\tCtrl+2",			"Toggle the console");
+	theApp->getAction("main_showam")->addToMenu(viewMenu);
+	theApp->getAction("main_showconsole")->addToMenu(viewMenu);
 	menu->Append(viewMenu, "&View");
 
 	// Help menu
 	wxMenu* helpMenu = new wxMenu("");
-	helpMenu->Append(MENU_HELP_ONLINEDOCUMENTATION,	"Online &Documentation",	"View SLADE documentation online");
-	helpMenu->Append(MENU_HELP_ABOUT,				"&About",					"Information about SLADE");
+	theApp->getAction("main_onlinedocs")->addToMenu(helpMenu);
+	theApp->getAction("main_about")->addToMenu(helpMenu);
 	menu->Append(helpMenu, "&Help");
 
 	// Set the menu
@@ -242,32 +239,32 @@ void MainWindow::setupLayout() {
 
 	// Create File toolbar
 	wxAuiToolBar* tb_file = new wxAuiToolBar(this, -1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
-	tb_file->AddTool(MENU_FILE_NEWWAD, "New Wad", getIcon("t_newarchive"), "New Wad Archive");
-	tb_file->AddTool(MENU_FILE_NEWZIP, "New Zip", getIcon("t_newzip"), "New Zip Archive");
-	tb_file->AddTool(MENU_FILE_OPEN, "Open", getIcon("t_open"), "Open");
-	tb_file->AddTool(MENU_FILE_SAVE, "Save", getIcon("t_save"), "Save");
-	tb_file->AddTool(MENU_FILE_SAVEAS, "Save As", getIcon("t_saveas"), "Save As");
-	tb_file->AddTool(MENU_FILE_SAVEALL, "Save All", getIcon("t_saveall"), "Save All");
-	tb_file->AddTool(MENU_FILE_CLOSE, "Close", getIcon("t_close"), "Close");
-	tb_file->AddTool(MENU_FILE_CLOSEALL, "Close All", getIcon("t_closeall"), "Close All");
+	theApp->getAction("aman_newwad")->addToToolbar(tb_file);
+	theApp->getAction("aman_newzip")->addToToolbar(tb_file);
+	theApp->getAction("aman_open")->addToToolbar(tb_file);
+	theApp->getAction("arch_save")->addToToolbar(tb_file);
+	theApp->getAction("arch_saveas")->addToToolbar(tb_file);
+	theApp->getAction("aman_saveall")->addToToolbar(tb_file);
+	theApp->getAction("aman_close")->addToToolbar(tb_file);
+	theApp->getAction("aman_closeall")->addToToolbar(tb_file);
 	tb_file->Realize();
 
 	// Create Archive toolbar
 	wxAuiToolBar* tb_archive = new wxAuiToolBar(this, -1);
-	tb_archive->AddTool(MENU_ARCHIVE_NEWENTRY, "New", getIcon("t_newentry"), "New Entry");
-	tb_archive->AddTool(MENU_ARCHIVE_NEWDIRECTORY, "Directory", getIcon("t_newfolder"), "New Directory");
-	tb_archive->AddTool(MENU_ARCHIVE_IMPORTFILES, "Import Files", getIcon("t_importfiles"), "Import Files to Archive");
-	tb_archive->AddTool(MENU_ARCHIVE_TEXEDITOR, "Texture Editor", getIcon("t_texeditor"), "Open TEXTUREx Editor");
+	theApp->getAction("arch_newentry")->addToToolbar(tb_archive);
+	theApp->getAction("arch_newdir")->addToToolbar(tb_archive);
+	theApp->getAction("arch_importfiles")->addToToolbar(tb_archive);
+	theApp->getAction("arch_texeditor")->addToToolbar(tb_archive);
 	tb_archive->Realize();
 
 	// Create Entry toolbar
 	wxAuiToolBar* tb_entry = new wxAuiToolBar(this, -1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
-	tb_entry->AddTool(MENU_ENTRY_RENAME,		"Rename",		getIcon("t_rename"),	"Rename");
-	tb_entry->AddTool(MENU_ENTRY_DELETE,		"Delete",		getIcon("t_delete"),	"Delete");
-	tb_entry->AddTool(MENU_ENTRY_IMPORT,		"Import",		getIcon("t_import"),	"Import");
-	tb_entry->AddTool(MENU_ENTRY_EXPORT,		"Export",		getIcon("t_export"),	"Export");
-	tb_entry->AddTool(MENU_ENTRY_MOVEUP,		"Move Up",		getIcon("t_up"),		"Move Up");
-	tb_entry->AddTool(MENU_ENTRY_MOVEDOWN,		"Move Down",	getIcon("t_down"),		"Move Down");
+	theApp->getAction("arch_entry_rename")->addToToolbar(tb_entry);
+	theApp->getAction("arch_entry_delete")->addToToolbar(tb_entry);
+	theApp->getAction("arch_entry_import")->addToToolbar(tb_entry);
+	theApp->getAction("arch_entry_export")->addToToolbar(tb_entry);
+	theApp->getAction("arch_entry_moveup")->addToToolbar(tb_entry);
+	theApp->getAction("arch_entry_movedown")->addToToolbar(tb_entry);
 	tb_entry->Realize();
 
 	// Create Base Resource Archive toolbar
@@ -275,7 +272,7 @@ void MainWindow::setupLayout() {
 	BaseResourceChooser* brc = new BaseResourceChooser(tb_bra);
 	tb_bra->AddLabel(-1, "Base Resource:");
 	tb_bra->AddControl(brc);
-	tb_bra->AddTool(MENU_EDITOR_SETBASERESOURCE, "...", getIcon("t_settings"), "Setup Base Resource Archive paths");
+	theApp->getAction("main_setbra")->addToToolbar(tb_bra, "t_settings");
 	tb_bra->Realize();
 
 	// Create Palette Chooser toolbar
@@ -310,7 +307,7 @@ void MainWindow::setupLayout() {
 
 	// Bind events
 	html_startpage->Bind(wxEVT_COMMAND_HTML_LINK_CLICKED, &MainWindow::onHTMLLinkClicked, this);
-	Bind(wxEVT_COMMAND_MENU_SELECTED, &MainWindow::onMenuItemClicked, this);
+	//Bind(wxEVT_COMMAND_MENU_SELECTED, &MainWindow::onMenuItemClicked, this);
 	Bind(wxEVT_CLOSE_WINDOW, &MainWindow::onClose, this);
 	Bind(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED, &MainWindow::onTabChanged, this);
 }
@@ -466,30 +463,17 @@ void MainWindow::removeCustomMenu(string title) {
 	}
 }
 
-
-/*******************************************************************
- * MAINWINDOW EVENTS
- *******************************************************************/
-
-/* MainWindow::onMenuItemClicked
- * Called when a menu or toolbar item is clicked
- *******************************************************************/
-void MainWindow::onMenuItemClicked(wxCommandEvent& e) {
-	// *******************************************************
-	// FILE MENU
-	// *******************************************************
+bool MainWindow::handleAction(string id) {
+	// We're only interested in "main_" actions
+	if (!id.StartsWith("main_"))
+		return false;
 
 	// File->Exit
-	if (e.GetId() == MENU_FILE_EXIT)
+	if (id == "main_exit")
 		Close();
 
-
-	// *******************************************************
-	// EDITOR MENU
-	// *******************************************************
-
 	// Editor->Set Base Resource Archive
-	else if (e.GetId() == MENU_EDITOR_SETBASERESOURCE) {
+	if (id == "main_set_bra") {
 		wxDialog dialog_ebr(this, -1, "Edit Base Resource Archives", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
 		BaseResourceArchivesPanel brap(&dialog_ebr);
 
@@ -503,45 +487,41 @@ void MainWindow::onMenuItemClicked(wxCommandEvent& e) {
 		dialog_ebr.SetInitialSize(wxSize(-1, 300));
 		if (dialog_ebr.ShowModal() == wxID_OK)
 			theArchiveManager->openBaseResource(brap.getSelectedPath());
+
+		return true;
 	}
 
 	// Editor->Preferences
-	if (e.GetId() == MENU_EDITOR_PREFERENCES) {
+	if (id == "main_preferences") {
 		PreferencesDialog pd(this);
 		if (pd.ShowModal() == wxID_OK)
 			pd.applyPreferences();
 		panel_archivemanager->refreshAllTabs();
+
+		return true;
 	}
 
-
-	// *******************************************************
-	// VIEW MENU
-	// *******************************************************
-
 	// View->Archive Manager
-	else if (e.GetId() == MENU_VIEW_ARCHIVEMANAGER) {
+	if (id == "main_showam") {
 		wxAuiManager *m_mgr = wxAuiManager::GetManager(panel_archivemanager);
 		wxAuiPaneInfo& p_inf = m_mgr->GetPane("archive_manager");
 		p_inf.Show(!p_inf.IsShown());
 		m_mgr->Update();
+		return true;
 	}
 
 	// View->Console
-	else if (e.GetId() == MENU_VIEW_CONSOLE) {
+	if (id == "main_showconsole") {
 		wxAuiManager *m_mgr = wxAuiManager::GetManager(panel_archivemanager);
 		wxAuiPaneInfo& p_inf = m_mgr->GetPane("console");
 		p_inf.Show(!p_inf.IsShown());
 		p_inf.MinSize(200, 128);
 		m_mgr->Update();
+		return true;
 	}
 
-
-	// *******************************************************
-	// HELP MENU
-	// *******************************************************
-
 	// Help->About
-	else if (e.GetId() == MENU_HELP_ABOUT) {
+	if (id == "main_about") {
 		wxAboutDialogInfo info;
 		info.SetName("SLADE");
 		info.SetVersion("v" + Global::version);
@@ -558,16 +538,24 @@ void MainWindow::onMenuItemClicked(wxCommandEvent& e) {
 		info.SetCopyright(S_FMT("(C) 2008-%s Simon Judd <sirjuddington@gmail.com>", year.c_str()));
 
 		wxAboutBox(info);
+
+		return true;
 	}
 
 	// Help->Online Documentation
-	else if (e.GetId() == MENU_HELP_ONLINEDOCUMENTATION)
+	if (id == "main_onlinedocs") {
 		wxLaunchDefaultBrowser("http://slade-editor.wikia.com");
+		return true;
+	}
 
-	// Not handled here, sent to ArchiveManagerPanel
-	else
-		panel_archivemanager->handleAction(e.GetId());
+	// Unknown action
+	return false;
 }
+
+
+/*******************************************************************
+ * MAINWINDOW EVENTS
+ *******************************************************************/
 
 /* MainWindow::onHTMLLinkClicked
  * Called when a link is clicked on the HTML Window, so that
@@ -584,16 +572,16 @@ void MainWindow::onHTMLLinkClicked(wxHtmlLinkEvent &e) {
 		unsigned long index = 0;
 		rs.ToULong(&index);
 
-		panel_archivemanager->handleAction(MENU_RECENT_1 + index);
+		//panel_archivemanager->handleAction(MENU_RECENT_1 + index);
 	}
 	else if (href.StartsWith("action://")) {
 		// Action
 		if (href.EndsWith("open"))
-			panel_archivemanager->handleAction(MENU_FILE_OPEN);
+			theApp->doAction("aman_open");
 		else if (href.EndsWith("newwad"))
-			panel_archivemanager->handleAction(MENU_FILE_NEWWAD);
+			theApp->doAction("aman_newwad");
 		else if (href.EndsWith("newzip"))
-			panel_archivemanager->handleAction(MENU_FILE_NEWZIP);
+			theApp->doAction("aman_newzip");
 	}
 	else
 		html_startpage->OnLinkClicked(e.GetLinkInfo());
