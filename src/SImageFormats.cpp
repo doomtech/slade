@@ -231,23 +231,26 @@ bool SImage::toPNG(MemChunk& out, Palette8bit* pal) {
 			bm_pal[a].rgbBlue = usepal.colour(a).b;
 		}
 
-		// Find unused colour (for transparency)
-		short unused = findUnusedColour();
+		// Handle transparency if needed
+		if (mask) {
+			// Find unused colour (for transparency)
+			short unused = findUnusedColour();
 
-		// Set any transparent pixels to this colour (if we found an unused colour)
-		if (unused >= 0) {
-			for (int a = 0; a < width * height; a++) {
-				if (mask[a] == 0)
-					data[a] = unused;
+			// Set any transparent pixels to this colour (if we found an unused colour)
+			if (unused >= 0) {
+				for (int a = 0; a < width * height; a++) {
+					if (mask[a] == 0)
+						data[a] = unused;
+				}
+
+				// Set palette transparency
+				usepal.setTransIndex(unused);
 			}
 
-			// Set palette transparency
-			usepal.setTransIndex(unused);
+			// Set freeimage palette transparency if needed
+			if (usepal.transIndex() >= 0)
+				FreeImage_SetTransparentIndex(bm, usepal.transIndex());
 		}
-
-		// Set freeimage palette transparency if needed
-		if (usepal.transIndex() >= 0)
-			FreeImage_SetTransparentIndex(bm, usepal.transIndex());
 
 		// Write image data
 		for (int row = 0; row < height; row++) {
