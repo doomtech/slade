@@ -483,7 +483,7 @@ bool MainWindow::handleAction(string id) {
 		Close();
 
 	// Editor->Set Base Resource Archive
-	if (id == "main_set_bra") {
+	if (id == "main_setbra") {
 		wxDialog dialog_ebr(this, -1, "Edit Base Resource Archives", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
 		BaseResourceArchivesPanel brap(&dialog_ebr);
 

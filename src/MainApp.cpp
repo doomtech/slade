@@ -305,12 +305,12 @@ void MainApp::initLogFile() {
 void MainApp::initActions() {
 	// MainWindow
 	new SAction("main_exit", "E&xit", "", "Quit SLADE");
-	new SAction("main_setbra", "Set &Base Resource Archive", "", "Set the Base Resource Archive, to act as the program 'IWAD'");
-	new SAction("main_preferences", "&Preferences...", "", "Setup SLADE options and preferences");
+	new SAction("main_setbra", "Set &Base Resource Archive", "e_archive", "Set the Base Resource Archive, to act as the program 'IWAD'");
+	new SAction("main_preferences", "&Preferences...", "t_settings", "Setup SLADE options and preferences");
 	new SAction("main_showam", "&Archive Manager", "", "Toggle the Archive Manager window", "Ctrl+1");
 	new SAction("main_showconsole", "&Console", "", "Toggle the Console window", "Ctrl+2");
 	new SAction("main_onlinedocs", "Online &Documentation", "", "View SLADE documentation online");
-	new SAction("main_about", "&About", "", "Informaton about SLADE");
+	new SAction("main_about", "&About", "i_logo", "Informaton about SLADE");
 
 	// ArchiveManagerPanel
 	new SAction("aman_newwad", "New Wad Archive", "t_newarchive", "Create a new Doom Wad Archive", "Ctrl+Shift+W");
@@ -355,13 +355,13 @@ void MainApp::initActions() {
 	new SAction("arch_entry_bookmark", "Bookmark", "", "Bookmark the current entry");
 	new SAction("arch_bas_convert", "Convert to ANIMDEFS", "", "Convert any selected SWITCHES and ANIMATED entries to a single ANIMDEFS entry");
 	new SAction("arch_texturex_convertzd", "Convert to TEXTURES", "", "Convert any selected TEXTUREx entries to ZDoom TEXTURES format");
-	new SAction("arch_view_text", "View as Text", "", "Open the selected entry in the text editor, regardless of type");
-	new SAction("arch_view_text", "View as Hex", "", "Open the selected entry in the hex editor, regardless of type");
+	new SAction("arch_view_text", "View as Text", "e_text", "Open the selected entry in the text editor, regardless of type");
+	new SAction("arch_view_hex", "View as Hex", "e_data", "Open the selected entry in the hex editor, regardless of type");
 	new SAction("arch_gfx_convert", "Convert to...", "", "Open the Gfx Conversion Dialog for any selected gfx entries");
 	new SAction("arch_gfx_offsets", "Modify Gfx Offsets", "", "Mass-modify the offsets for any selected gfx entries");
-	new SAction("arch_gfx_addptable", "Add to Patch Table", "", "Add selected gfx entries to PNAMES");
-	new SAction("arch_gfx_addtexturex", "Add to TEXTUREx", "", "Create textures from selected gfx entries and add them to TEXTUREx");
-	new SAction("arch_gfx_exportpng", "Export as PNG", "", "Export selected gfx entries to PNG format files");
+	new SAction("arch_gfx_addptable", "Add to Patch Table", "e_pnames", "Add selected gfx entries to PNAMES");
+	new SAction("arch_gfx_addtexturex", "Add to TEXTUREx", "e_texturex", "Create textures from selected gfx entries and add them to TEXTUREx");
+	new SAction("arch_gfx_exportpng", "Export as PNG", "t_export", "Export selected gfx entries to PNG format files");
 	new SAction("arch_audio_convertwd", "Convert WAV to Doom Sound", "", "Convert any selected WAV format entries to Doom Sound format");
 	new SAction("arch_audio_convertdw", "Convert Doom Sound to WAV", "", "Convert any selected Doom Sound format entries to WAV format");
 	new SAction("arch_audio_convertmus", "Convert MUS to MIDI", "", "Convert any selected MUS format entries to MIDI format");
@@ -373,7 +373,7 @@ void MainApp::initActions() {
 	new SAction("pgfx_flip", "Flip", "", "Flip the graphic vertically");
 	new SAction("pgfx_rotate", "Rotate", "", "Rotate the graphic");
 	new SAction("pgfx_translate", "Colour Remap", "", "Remap a range of colours in the graphic to another range (paletted gfx only)");
-	new SAction("pgfx_colourise", "Colourise", "", "Colouris the graphic");
+	new SAction("pgfx_colourise", "Colourise", "", "Colourise the graphic");
 	new SAction("pgfx_tint", "Tint", "", "Tint the graphic by a colour/amount");
 	new SAction("pgfx_alph", "alPh Chunk", "", "Add/Remove alPh chunk to/from the PNG", "", SAction::CHECK);
 	new SAction("pgfx_trns", "tRNS Chunk", "", "Add/Remove tRNS chunk to/from the PNG", "", SAction::CHECK);

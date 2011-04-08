@@ -305,8 +305,13 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 	theApp->getAction("pgfx_alph")->addToMenu(menu_custom);
 	theApp->getAction("pgfx_trns")->addToMenu(menu_custom);
 	menu_custom->AppendSeparator();
+	theApp->getAction("arch_gfx_exportpng")->addToMenu(menu_custom);
 	theApp->getAction("pgfx_extract")->addToMenu(menu_custom);
+	menu_custom->AppendSeparator();
+	theApp->getAction("arch_gfx_addptable")->addToMenu(menu_custom);
+	theApp->getAction("arch_gfx_addtexturex")->addToMenu(menu_custom);
 	custom_menu_name = "Graphic";
+	// TODO: Should change the way gfx conversion and offset modification work so I can put them in this menu
 
 	// Bind Events
 	slider_zoom->Bind(wxEVT_COMMAND_SLIDER_UPDATED, &GfxEntryPanel::onZoomChanged, this);
@@ -465,11 +470,15 @@ void GfxEntryPanel::refresh() {
 		trns = EntryOperations::gettRNSChunk(this->entry);
 		menu_custom->Enable(MENU_GFXEP_TRNS, true);
 		menu_custom->Check(MENU_GFXEP_TRNS, trns);
+
+		// Disable 'Export as PNG' (it already is :P)
+		menu_custom->Enable(theApp->getAction("arch_gfx_exportpng")->getWxId(), false);
 	} else {
 		menu_custom->Enable(MENU_GFXEP_ALPH, false);
 		menu_custom->Enable(MENU_GFXEP_TRNS, false);
 		menu_custom->Check(MENU_GFXEP_ALPH, false);
 		menu_custom->Check(MENU_GFXEP_TRNS, false);
+		menu_custom->Enable(theApp->getAction("arch_gfx_exportpng")->getWxId(), true);
 	}
 
 	// Set multi-image format stuff thingies

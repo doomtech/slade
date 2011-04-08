@@ -158,38 +158,47 @@ wxPanel* ZTextureEditorPanel::createPatchControls(wxWindow* parent) {
 	framesizer->Add(list_patches, 1, wxEXPAND|wxALL, 4);
 
 	// Add patch buttons
-	wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
-	framesizer->Add(vbox, 0, wxEXPAND|wxTOP|wxRIGHT|wxBOTTOM, 4);
+	wxGridBagSizer* gb_sizer = new wxGridBagSizer(4, 4);
+	framesizer->Add(gb_sizer, 0, wxEXPAND|wxTOP|wxRIGHT|wxBOTTOM, 4);
+
+	//wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
+	//framesizer->Add(vbox, 0, wxEXPAND|wxTOP|wxRIGHT|wxBOTTOM, 4);
 
 	// 'Add' button
 	btn_patch_add = new wxBitmapButton(panel, -1, getIcon("t_patch_add"));
 	btn_patch_add->SetToolTip("Add new patch to texture");
-	vbox->Add(btn_patch_add, 0, wxBOTTOM, 4);
+	//vbox->Add(btn_patch_add, 0, wxBOTTOM, 4);
+	gb_sizer->Add(btn_patch_add, wxGBPosition(0, 0));
 
 	// 'Remove' button
 	btn_patch_remove = new wxBitmapButton(panel, -1, getIcon("t_patch_remove"));
 	btn_patch_remove->SetToolTip("Remove selected patch(es) from texture");
-	vbox->Add(btn_patch_remove, 0, wxBOTTOM, 4);
+	//vbox->Add(btn_patch_remove, 0, wxBOTTOM, 4);
+	gb_sizer->Add(btn_patch_remove, wxGBPosition(0, 1));
 
 	// 'Back' button
 	btn_patch_back = new wxBitmapButton(panel, -1, getIcon("t_patch_back"));
 	btn_patch_back->SetToolTip("Send selected patch(es) back");
-	vbox->Add(btn_patch_back, 0, wxBOTTOM, 4);
+	//vbox->Add(btn_patch_back, 0, wxBOTTOM, 4);
+	gb_sizer->Add(btn_patch_back, wxGBPosition(1, 0));
 
 	// 'Forward' button
 	btn_patch_forward = new wxBitmapButton(panel, -1, getIcon("t_patch_forward"));
 	btn_patch_forward->SetToolTip("Bring selected patch(es) forward");
-	vbox->Add(btn_patch_forward, 0, wxBOTTOM, 4);
+	//vbox->Add(btn_patch_forward, 0, wxBOTTOM, 4);
+	gb_sizer->Add(btn_patch_forward, wxGBPosition(1, 1));
 
 	// 'Replace' button
 	btn_patch_replace = new wxBitmapButton(panel, -1, getIcon("t_patch_replace"));
 	btn_patch_replace->SetToolTip("Replace selected patch(es)");
-	vbox->Add(btn_patch_replace, 0, wxBOTTOM, 4);
+	//vbox->Add(btn_patch_replace, 0, wxBOTTOM, 4);
+	gb_sizer->Add(btn_patch_replace, wxGBPosition(2, 0));
 
 	// 'Duplicate' button
 	btn_patch_duplicate = new wxBitmapButton(panel, -1, getIcon("t_patch_duplicate"));
 	btn_patch_duplicate->SetToolTip("Duplicate selected patch(es)");
-	vbox->Add(btn_patch_duplicate, 0, wxBOTTOM, 4);
+	//vbox->Add(btn_patch_duplicate, 0, wxBOTTOM, 4);
+	gb_sizer->Add(btn_patch_duplicate, wxGBPosition(2, 1));
 
 
 
@@ -198,7 +207,7 @@ wxPanel* ZTextureEditorPanel::createPatchControls(wxWindow* parent) {
 	framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
 	sizer->Add(framesizer, 0, wxEXPAND|wxALL, 4);
 
-	wxGridBagSizer* gb_sizer = new wxGridBagSizer(4, 4);
+	gb_sizer = new wxGridBagSizer(4, 4);
 	framesizer->Add(gb_sizer, 1, wxEXPAND|wxALL, 4);
 
 	// X Position
