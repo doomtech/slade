@@ -78,6 +78,7 @@ public:
 	bool	validFlatSize();
 	size_t	countColours();
 	void	shrinkPalette(Palette8bit* pal = NULL);
+	bool	copyImage(SImage* image);
 
 	// Image format reading
 	bool	loadImage(const uint8_t* data, int size);

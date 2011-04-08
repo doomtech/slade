@@ -441,6 +441,9 @@
     <ClCompile Include="src\SAction.cpp">
       <Filter>General</Filter>
     </ClCompile>
+    <ClCompile Include="src\TranslationEditorDialog.cpp">
+      <Filter>Dialogs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -824,6 +827,9 @@
     </ClInclude>
     <ClInclude Include="src\SAction.h">
       <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TranslationEditorDialog.h">
+      <Filter>Dialogs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

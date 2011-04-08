@@ -403,6 +403,41 @@ void SImage::shrinkPalette(Palette8bit* pal) {
 	delete[] remap;
 }
 
+/* SImage::copyImage
+ * Copies all data and properties from [image]
+ *******************************************************************/
+bool SImage::copyImage(SImage* image) {
+	// Check image was given
+	if (!image)
+		return false;
+
+	// Clear current data
+	clearData();
+
+	// Copy image properties
+	width = image->width;
+	height = image->height;
+	format = image->format;
+	palette.copyPalette(&image->palette);
+	has_palette = image->has_palette;
+	offset_x = image->offset_x;
+	offset_y = image->offset_y;
+	imgindex = image->imgindex;
+	numimages = image->numimages;
+
+	// Copy image data
+	if (image->data) {
+		data = new uint8_t[width*height*getBpp()];
+		memcpy(data, image->data, width*height*getBpp());
+	}
+	if (image->mask) {
+		mask = new uint8_t[width*height];
+		memcpy(mask, image->mask, width*height);
+	}
+
+	return true;
+}
+
 /* SImage::convertRGBA
  * Converts the image to 32bpp (RGBA). Returns false if the image was
  * already 32bpp, true otherwise.

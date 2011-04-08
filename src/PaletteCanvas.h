@@ -8,19 +8,24 @@
 
 class PaletteCanvas : public OGLCanvas {
 private:
-	Palette8bit*	palette;
 	int				sel_begin;
 	int				sel_end;
+	bool			double_width;
 
 public:
 	PaletteCanvas(wxWindow* parent, int id);
 	~PaletteCanvas();
 
-	Palette8bit& getPalette() { return *palette; }
+	Palette8bit&	getPalette() { return palette; }
+	bool			doubleWidth() { return double_width; }
+	int				getSelectionStart() { return sel_begin; }
+	int				getSelectionEnd() { return sel_end; }
+
+	void	doubleWidth(bool dw) { double_width = dw; }
+	void	setSelection(int begin, int end = -1);
 
 	void	draw();
 	rgba_t	getSelectedColour();
-	void	setSelection(int begin, int end = -1);
 
 	// Events
 	void	onMouseLeftDown(wxMouseEvent& e);

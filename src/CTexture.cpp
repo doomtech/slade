@@ -777,6 +777,10 @@ bool CTexture::toImage(SImage& image, Archive* parent, Palette8bit* pal, bool fo
 			if (!Misc::loadImageFromEntry(&p_img, patch->getPatchEntry(parent)))
 				continue;
 
+			// Apply translation before anything in case we're forcing rgba (can't translate rgba images)
+			if (patch->getBlendType() == 1)
+				p_img.applyTranslation(&(patch->getTranslation()), pal);
+
 			// Convert to RGBA if forced
 			if (force_rgba)
 				p_img.convertRGBA(pal);
@@ -815,9 +819,7 @@ bool CTexture::toImage(SImage& image, Archive* parent, Palette8bit* pal, bool fo
 			}
 
 			// Setup patch colour
-			if (patch->getBlendType() == 1)
-				p_img.applyTranslation(&(patch->getTranslation()), pal);
-			else if (patch->getBlendType() == 2)
+			if (patch->getBlendType() == 2)
 				p_img.colourise(patch->getColour(), pal);
 			else if (patch->getBlendType() == 3)
 				p_img.tint(patch->getColour(), patch->getColour().fa(), pal);

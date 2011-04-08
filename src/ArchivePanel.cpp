@@ -1764,7 +1764,7 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 	}
 
 	// Popup the context menu
-	theMainWindow->PopupMenu(&context);
+	PopupMenu(&context);
 }
 
 /* ArchivePanel::onEntryListKeyDown

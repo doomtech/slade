@@ -15,7 +15,7 @@ TODO List ---------------------------------------------------------------
 
 --- Before 3.0.2 ---
 - Finish TEXTURES editing:
-	- Translation editor
+	- Translation editor preview
 	- Gfx browser for patches
 	- Support for textures-as-patches
 - Make texture editor behave more like archive editor (new/modified colours in tex list, ask to save changes on close, etc)

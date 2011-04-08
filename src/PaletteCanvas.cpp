@@ -42,9 +42,9 @@
  *******************************************************************/
 PaletteCanvas::PaletteCanvas(wxWindow* parent, int id)
 : OGLCanvas(parent, id) {
-	palette = new Palette8bit();
 	sel_begin = -1;
 	sel_end = -1;
+	double_width = false;
 
 	// Bind events
 	Bind(wxEVT_LEFT_DOWN,  &PaletteCanvas::onMouseLeftDown,  this);
@@ -56,8 +56,6 @@ PaletteCanvas::PaletteCanvas(wxWindow* parent, int id)
  * PaletteCanvas class destructor
  *******************************************************************/
 PaletteCanvas::~PaletteCanvas() {
-	if (palette)
-		delete palette;
 }
 
 /* PaletteCanvas::draw
@@ -83,50 +81,89 @@ void PaletteCanvas::draw() {
 	glTranslatef(0.375f, 0.375f, 0);
 
 	// Setup some variables
-	int size = (MIN(GetSize().x, GetSize().y) - 17) / 16;
+	int rows = 16;
+	int cols = 16;
+	if (double_width) {
+		rows = 8;
+		cols = 32;
+	}
+	int x_size = (GetSize().x) / cols;
+	int y_size = (GetSize().y) / rows;
+	int size = MIN(x_size, y_size);
 
 	// Draw palette
 	int c = 0;
-	for (int y = 0; y < 16; y++) {
-		for (int x = 0; x < 16; x++) {
+	for (int y = 0; y < rows; y++) {
+		for (int x = 0; x < cols; x++) {
+			// Set colour
+			palette.colour(c).set_gl();
+
+			// Draw square
+			glBegin(GL_QUADS);
+			glVertex2d(x*size+1, y*size+1);
+			glVertex2d(x*size+1, y*size+size-1);
+			glVertex2d(x*size+size-1, y*size+size-1);
+			glVertex2d(x*size+size-1, y*size+1);
+			glEnd();
+
 			// Draw selection outline if needed
 			if (c >= sel_begin && c <= sel_end) {
 				COL_WHITE.set_gl();
 				glBegin(GL_LINES);
 				glVertex2d(x*size, y*size);
 				glVertex2d(x*size+size, y*size);
-				glVertex2d(x*size, y*size+size);
-				glVertex2d(x*size+size, y*size+size);
+				glVertex2d(x*size, y*size+size-1);
+				glVertex2d(x*size+size, y*size+size-1);
+				glEnd();
+
+				COL_BLACK.set_gl();
+				glBegin(GL_LINES);
+				glVertex2d(x*size+1, y*size+1);
+				glVertex2d(x*size+size-1, y*size+1);
+				glVertex2d(x*size+1, y*size+size-2);
+				glVertex2d(x*size+size-1, y*size+size-2);
 				glEnd();
 
 				// Selection beginning
 				if (c == sel_begin) {
+					COL_WHITE.set_gl();
 					glBegin(GL_LINES);
 					glVertex2d(x*size, y*size);
 					glVertex2d(x*size, y*size+size);
+					glEnd();
+
+					COL_BLACK.set_gl();
+					glBegin(GL_LINES);
+					glVertex2d(x*size+1, y*size+1);
+					glVertex2d(x*size+1, y*size+size-1);
 					glEnd();
 				}
 
 				// Selection ending
 				if (c == sel_end) {
+					COL_WHITE.set_gl();
 					glBegin(GL_LINES);
-					glVertex2d(x*size+size, y*size+size);
-					glVertex2d(x*size+size, y*size);
+					glVertex2d(x*size+size-1, y*size+size-2);
+					glVertex2d(x*size+size-1, y*size);
+					glEnd();
+
+					COL_BLACK.set_gl();
+					glBegin(GL_LINES);
+					glVertex2d(x*size+size-2, y*size+1);
+					glVertex2d(x*size+size-2, y*size+size-1);
 					glEnd();
 				}
 			}
 
-			// Set colour
-			palette->colour(c++).set_gl();
+			// Next colour
+			c++;
 
-			// Draw square
-			glBegin(GL_QUADS);
-			glVertex2d(x*size+1, y*size+1);
-			glVertex2d(x*size+1, y*size+size);
-			glVertex2d(x*size+size, y*size+size);
-			glVertex2d(x*size+size, y*size+1);
-			glEnd();
+			if (c > 255)
+				break;
 		}
+
+		if (c > 255)
+			break;
 	}
 
 	// Swap buffers (ie show what was drawn)
@@ -139,7 +176,7 @@ void PaletteCanvas::draw() {
  *******************************************************************/
 rgba_t PaletteCanvas::getSelectedColour() {
 	if (sel_begin >= 0)
-		return palette->colour(sel_begin);
+		return palette.colour(sel_begin);
 	else
 		return rgba_t(0, 0, 0, 0);
 }
@@ -166,13 +203,21 @@ void PaletteCanvas::setSelection(int begin, int end) {
  *******************************************************************/
 void PaletteCanvas::onMouseLeftDown(wxMouseEvent& e) {
 	// Figure out what 'grid' position was clicked
-	int size = (MIN(GetSize().x, GetSize().y) - 17) / 16;
+	int rows = 16;
+	int cols = 16;
+	if (double_width) {
+		rows = 8;
+		cols = 32;
+	}
+	int x_size = (GetSize().x) / cols;
+	int y_size = (GetSize().y) / rows;
+	int size = MIN(x_size, y_size);
 	int x = e.GetX() / size;
 	int y = e.GetY() / size;
 
 	// If it was within the palette box, select the cell
-	if (x >= 0 && x < 16 && y >= 0 && y < 16)
-		setSelection(y * 16 + x);
+	if (x >= 0 && x < cols && y >= 0 && y < rows)
+		setSelection(y * cols + x);
 	else
 		setSelection(-1);
 
@@ -198,13 +243,26 @@ void PaletteCanvas::onMouseMotion(wxMouseEvent& e) {
 	// Check for dragging selection
 	if (e.LeftIsDown()) {
 		// Figure out what 'grid' position the cursor is over
-		int size = (MIN(GetSize().x, GetSize().y) - 17) / 16;
+		int rows = 16;
+		int cols = 16;
+		if (double_width) {
+			rows = 8;
+			cols = 32;
+		}
+		int x_size = (GetSize().x) / cols;
+		int y_size = (GetSize().y) / rows;
+		int size = MIN(x_size, y_size);
 		int x = e.GetX() / size;
 		int y = e.GetY() / size;
 
 		// Set selection accordingly
-		if (x >= 0 && x < 16 && y >= 0 && y < 16) {
-			setSelection(sel_begin, y * 16 + x);
+		if (x >= 0 && x < cols && y >= 0 && y < rows) {
+			int sel = y * cols + x;
+			if (sel <= sel_begin)
+				setSelection(sel, sel_end);
+			else
+				setSelection(sel_begin, sel);
+
 			Refresh();
 		}
 	}

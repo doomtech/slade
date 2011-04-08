@@ -70,6 +70,7 @@ public:
 	void	onPCTranslationSelected(wxCommandEvent& e);
 	void	onPatchColourChanged(wxColourPickerEvent& e);
 	void	onPatchTintAmountChanged(wxSpinDoubleEvent& e);
+	void	onBtnEditTranslation(wxCommandEvent& e);
 };
 
 #endif//__ZTEXTURE_EDITOR_PANEL_H__

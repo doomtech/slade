@@ -18,7 +18,7 @@ void Translation::parse(string def) {
 	tz.setSpecialCharacters("[]:%,=");
 	tz.openString(def);
 
-	wxLogMessage("Parse translation \"%s\"", CHR(def));
+	//wxLogMessage("Parse translation \"%s\"", CHR(def));
 
 	// Read original range
 	uint8_t o_start = tz.getInteger();
@@ -61,7 +61,7 @@ void Translation::parse(string def) {
 		tr->d_end.set(end);
 		translations.push_back(tr);
 
-		wxLogMessage("Added colour translation");
+		//wxLogMessage("Added colour translation");
 	}
 	else if (tz.peekToken() == "%") {
 		// Desat colour translation
@@ -102,7 +102,7 @@ void Translation::parse(string def) {
 		tr->d_eb = eb;
 		translations.push_back(tr);
 
-		wxLogMessage("Added desat translation");
+		//wxLogMessage("Added desat translation");
 	}
 	else {
 		// Palette range translation
@@ -121,7 +121,7 @@ void Translation::parse(string def) {
 		tr->d_end = d_end;
 		translations.push_back(tr);
 
-		wxLogMessage("Added range translation");
+		//wxLogMessage("Added range translation");
 	}
 }
 
@@ -129,31 +129,8 @@ string Translation::asText() {
 	string ret;
 
 	// Go through translation ranges
-	for (unsigned a = 0; a < translations.size(); a++) {
-		// Palette range translation
-		if (translations[a]->type == TRANS_PALETTE) {
-			TransRangePalette* tr = (TransRangePalette*)translations[a];
-			ret += S_FMT("\"%d:%d=%d:%d\", ", tr->o_start, tr->o_end, tr->d_start, tr->d_end);
-		}
-
-		// Colour range translation
-		else if (translations[a]->type == TRANS_COLOUR) {
-			TransRangeColour* tr = (TransRangeColour*)translations[a];
-			ret += S_FMT("\"%d:%d=[%d,%d,%d]:[%d,%d,%d]\", ",
-						tr->o_start, tr->o_end,
-						tr->d_start.r, tr->d_start.g, tr->d_start.b,
-						tr->d_end.r, tr->d_end.g, tr->d_end.b);
-		}
-
-		// Desaturated colour range translation
-		else if (translations[a]->type == TRANS_DESAT) {
-			TransRangeDesat* tr = (TransRangeDesat*)translations[a];
-			ret += S_FMT("\"%d:%d=%%[%1.2f,%1.2f,%1.2f]:[%1.2f,%1.2f,%1.2f]\", ",
-						tr->o_start, tr->o_end,
-						tr->d_sr, tr->d_sg, tr->d_sb,
-						tr->d_er, tr->d_eg, tr->d_eb);
-		}
-	}
+	for (unsigned a = 0; a < translations.size(); a++)
+		ret += S_FMT("\"%s\", ", CHR(translations[a]->asText()));	// Add range to string
 
 	// If any translations were defined, remove last ", "
 	if (!ret.IsEmpty())
@@ -188,4 +165,48 @@ TransRange* Translation::getRange(unsigned index) {
 		return NULL;
 	else
 		return translations[index];
+}
+
+void Translation::addRange(int type, int pos) {
+	TransRange* tr = NULL;
+
+	// Create range
+	switch (type) {
+	case TRANS_COLOUR:
+		tr = new TransRangeColour();
+		break;
+	case TRANS_DESAT:
+		tr = new TransRangeDesat();
+		break;
+	default:
+		tr = new TransRangePalette();
+		break;
+	};
+
+	// Add to list
+	if (pos < 0 || pos >= (int)translations.size())
+		translations.push_back(tr);
+	else
+		translations.insert(translations.begin() + pos, tr);
+}
+
+void Translation::removeRange(int pos) {
+	// Check position
+	if (pos < 0 || pos >= (int)translations.size())
+		return;
+
+	// Remove it
+	delete translations[pos];
+	translations.erase(translations.begin() + pos);
+}
+
+void Translation::swapRanges(int pos1, int pos2) {
+	// Check positions
+	if (pos1 < 0 || pos2 < 0 || pos1 >= (int)translations.size() || pos2 >= (int)translations.size())
+		return;
+
+	// Swap them
+	TransRange* temp = translations[pos1];
+	translations[pos1] = translations[pos2];
+	translations[pos2] = temp;
 }

@@ -37,6 +37,7 @@
 #include "EntryOperations.h"
 #include "Icons.h"
 #include "GfxConvDialog.h"
+#include "TranslationEditorDialog.h"
 #include <wx/dialog.h>
 #include <wx/clrpicker.h>
 
@@ -693,7 +694,28 @@ bool GfxEntryPanel::handleAction(string id) {
 
 	// Translate
 	else if (id == "pgfx_translate") {
-		wxMessageBox("Not implemented");
+		// Create translation editor dialog
+		Palette8bit* pal = theMainWindow->getPaletteChooser()->getSelectedPalette();
+		TranslationEditorDialog ted(this, pal, "Colour Remap", entry);
+
+		// Create translation to edit
+		Translation trans;
+		trans.addRange(TRANS_PALETTE, 0);
+		ted.openTranslation(trans);
+
+		// Show the dialog
+		if (ted.ShowModal() == wxID_OK) {
+			// Apply translation to image
+			getImage()->applyTranslation(&ted.getTranslation(), pal);
+
+			// Update UI
+			gfx_canvas->updateImageTexture();
+			gfx_canvas->Refresh();
+
+			// Update variables
+			image_data_modified = true;
+			setModified();
+		}
 	}
 
 	// Colourise

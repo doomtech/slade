@@ -3,6 +3,8 @@
 #include "WxStuff.h"
 #include "ZTextureEditorPanel.h"
 #include "Icons.h"
+#include "TranslationEditorDialog.h"
+#include "TextureXEditor.h"
 #include <wx/gbsizer.h>
 #include <wx/statline.h>
 
@@ -297,6 +299,7 @@ wxPanel* ZTextureEditorPanel::createPatchControls(wxWindow* parent) {
 	rb_pc_translation->Bind(wxEVT_COMMAND_RADIOBUTTON_SELECTED, &ZTextureEditorPanel::onPCTranslationSelected, this);
 	cp_blend_col->Bind(wxEVT_COMMAND_COLOURPICKER_CHANGED, &ZTextureEditorPanel::onPatchColourChanged, this);
 	spin_tint_amount->Bind(wxEVT_COMMAND_SPINCTRLDOUBLE_UPDATED, &ZTextureEditorPanel::onPatchTintAmountChanged, this);
+	btn_edit_translation->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &ZTextureEditorPanel::onBtnEditTranslation, this);
 
 	return panel;
 }
@@ -702,4 +705,35 @@ void ZTextureEditorPanel::onPatchTintAmountChanged(wxSpinDoubleEvent& e) {
 	tex_canvas->redraw(true);
 
 	tex_modified = true;
+}
+
+void ZTextureEditorPanel::onBtnEditTranslation(wxCommandEvent& e) {
+	// Get selected patches
+	wxArrayInt selection = list_patches->selectedItems();
+
+	// Do nothing if no patches selected
+	if (selection.size() == 0)
+		return;
+
+	// Get translation from first selected patch
+	Translation trans;
+	CTPatchEx* patch = (CTPatchEx*)tex_current->getPatch(selection[0]);
+	trans.copy(patch->getTranslation());
+
+	// Open translation editor dialog
+	TranslationEditorDialog ted(this, tex_canvas->getPalette(), "Edit Translation", patch->getPatchEntry(tx_editor->getArchive()));
+	ted.openTranslation(trans);
+	if (ted.ShowModal() == wxID_OK) {
+		// Copy updated translation to all selected patches
+		for (unsigned a = 0; a < selection.size(); a++) {
+			CTPatchEx* patch = (CTPatchEx*)tex_current->getPatch(selection[a]);
+			patch->getTranslation().copy(ted.getTranslation());
+		}
+
+		// Update UI
+		updatePatchControls();
+		tex_canvas->redraw(true);
+
+		tex_modified = true;
+	}
 }
