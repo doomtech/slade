@@ -56,7 +56,11 @@
  *******************************************************************/
 namespace Global {
 	string error = "";
-	string version = "3.0.1";
+	string version = "3.0.1"
+#ifdef UPDATEREVISION
+	" r" SVN_REVISION_STRING
+#endif
+	;
 }
 
 string	dir_data = "";
@@ -290,9 +294,6 @@ void MainApp::initLogFile() {
 	string year = wxNow().Right(4);
 	wxLogMessage("SLADE - It's a Doom Editor");
 	wxLogMessage("Version %s", Global::version.c_str());
-#ifdef UPDATEREVISION
-	wxLogMessage("SLADE Revision " SVN_REVISION_STRING); 
-#endif
 	wxLogMessage("Written by Simon Judd, 2008-%s", year.c_str());
 	wxLogMessage("Compiled with wxWidgets %i.%i.%i", wxMAJOR_VERSION, wxMINOR_VERSION, wxRELEASE_NUMBER);
 	wxLogMessage("--------------------------------");
