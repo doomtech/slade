@@ -1171,11 +1171,18 @@ bool ArchivePanel::optimizePNG() {
 	// Get selected entries
 	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
 
+	theSplashWindow->show("Running external programs, please wait...", true);
+
 	// Go through selection
 	for (unsigned a = 0; a < selection.size(); a++) {
+		theSplashWindow->Raise();
+		theSplashWindow->setProgressMessage(selection[a]->getName(true));
+		theSplashWindow->setProgress(float(a) / float(selection.size()));
 		if (selection[a]->getType()->getFormat() == "img_png")
 			EntryOperations::optimizePNG(selection[a]);
 	}
+	theSplashWindow->hide();
+	theMainWindow->Raise();
 
 	return true;
 }
@@ -1528,9 +1535,9 @@ bool ArchivePanel::handleAction(string id) {
 		wavDSndConvert();
 	else if (id == "arch_audio_convmus")
 		musMidiConvert();
-	else if (id == "arch_script_compileacs")
+	else if (id == "arch_scripts_compileacs")
 		compileACS();
-	else if (id == "arch_script_compilehacs")
+	else if (id == "arch_scripts_compilehacs")
 		compileACS(true);
 	else if (id == "arch_texturex_convertzd")
 		convertTextures();

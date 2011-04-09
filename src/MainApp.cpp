@@ -362,7 +362,7 @@ void MainApp::initActions() {
 	new SAction("arch_gfx_addptable", "Add to Patch Table", "e_pnames", "Add selected gfx entries to PNAMES");
 	new SAction("arch_gfx_addtexturex", "Add to TEXTUREx", "e_texturex", "Create textures from selected gfx entries and add them to TEXTUREx");
 	new SAction("arch_gfx_exportpng", "Export as PNG", "t_export", "Export selected gfx entries to PNG format files");
-	new SAction("arch_gfx_pngopt", "Optimize PNG", "t_export", "Optimize PNG entries");
+	new SAction("arch_gfx_pngopt", "Optimize PNG", "t_pngopt", "Optimize PNG entries");
 	new SAction("arch_audio_convertwd", "Convert WAV to Doom Sound", "", "Convert any selected WAV format entries to Doom Sound format");
 	new SAction("arch_audio_convertdw", "Convert Doom Sound to WAV", "", "Convert any selected Doom Sound format entries to WAV format");
 	new SAction("arch_audio_convertmus", "Convert MUS to MIDI", "", "Convert any selected MUS format entries to MIDI format");

@@ -1036,6 +1036,9 @@ bool EntryOperations::optimizePNG(ArchiveEntry* entry) {
 		string command = path_pngcrush + " -brute \"" + pngfile + "\" \"" + optfile + "\"";
 		wxExecute(command, wxEXEC_SYNC);
 
+		// Deal with focus-stealing apps
+		theMainWindow->Raise();
+
 		if (wxFileExists(optfile)) {
 			entry->importFile(optfile);
 			wxRemoveFile(optfile);
@@ -1056,6 +1059,9 @@ bool EntryOperations::optimizePNG(ArchiveEntry* entry) {
 		string command = path_pngout + " /y \"" + pngfile + "\" \"" + optfile + "\"";
 		wxExecute(command, wxEXEC_SYNC);
 
+		// Deal with focus-stealing apps
+		theMainWindow->Raise();
+
 		if (wxFileExists(optfile)) {
 			entry->importFile(optfile);
 			wxRemoveFile(optfile);
@@ -1075,6 +1081,9 @@ bool EntryOperations::optimizePNG(ArchiveEntry* entry) {
 
 		string command = path_deflopt + " /sf \"" + pngfile + "\"";
 		wxExecute(command, wxEXEC_SYNC);
+
+		// Deal with focus-stealing apps
+		theMainWindow->Raise();
 
 		entry->importFile(pngfile);
 		deflsize = entry->getSize();
