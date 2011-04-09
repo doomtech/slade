@@ -45,7 +45,9 @@
  * VARIABLES
  *******************************************************************/
 CVAR(String, path_acc, "", CVAR_SAVE);
-
+CVAR(String, path_pngout, "", CVAR_SAVE);
+CVAR(String, path_pngcrush, "", CVAR_SAVE);
+CVAR(String, path_deflopt, "", CVAR_SAVE);
 
 /*******************************************************************
  * STRUCTS
@@ -613,6 +615,39 @@ bool EntryOperations::gettRNSChunk(ArchiveEntry* entry) {
 	return false;
 }
 
+/* EntryOperations::readgrAbChunk
+ * Tell whether a PNG entry has a grAb chunk or not and loads the
+ * offset values in the given references
+ *******************************************************************/
+bool EntryOperations::readgrAbChunk(ArchiveEntry* entry, point2_t &offsets) {
+	if (!entry || !entry->getType())
+		return false;
+
+	// Check entry type
+	if (entry->getType()->getFormat() != "img_png") {
+		wxLogMessage(S_FMT("Entry \"%s\" is of type \"%s\" rather than PNG", entry->getName().c_str(), entry->getTypeString().c_str()));
+		return false;
+	}
+
+	// Find existing grAb chunk
+	const uint8_t* data = entry->getData(true);
+	for (uint32_t a = 0; a < entry->getSize(); a++) {
+		// Check for 'grAb' header
+		if (data[a] == 'g' && data[a + 1] == 'r' &&
+			data[a + 2] == 'A' && data[a + 3] == 'b') {
+			offsets.x = READ_B32(data, a + 4);
+			offsets.y = READ_B32(data, a + 8);
+			return true;
+		}
+
+		// Stop when we get to the 'IDAT' chunk
+		if (data[a] == 'I' && data[a + 1] == 'D' &&
+			data[a + 2] == 'A' && data[a + 3] == 'T')
+			break;
+	}
+	return false;
+}
+
 /* EntryOperations::addToPatchTable
  * Adds all [entries] to their parent archive's patch table, if it
  * exists. If not, the user is prompted to create or import texturex
@@ -949,6 +984,121 @@ bool EntryOperations::exportAsPNG(ArchiveEntry* entry, string filename) {
 
 	// Export file
 	return png.exportFile(filename);
+}
+
+/* EntryOperations::optimizePNG
+ * Attempts to optimize [entry] using external PNG optimizers.
+ *******************************************************************/
+bool EntryOperations::optimizePNG(ArchiveEntry* entry) {
+	// Check entry was given
+	if (!entry)
+		return false;
+
+	// Check entry has a parent (this is useless otherwise)
+	if (!entry->getParent())
+		return false;
+
+	// Check entry is text
+	if (!EntryDataFormat::getFormat("img_png")->isThisFormat(entry->getMCData())) {
+		wxMessageBox("Error: Entry does not appear to be PNG", "Error", wxOK|wxCENTRE|wxICON_ERROR);
+		return false;
+	}
+
+	// Check if the PNG tools path are set up, at least one of them should be
+	string pngpathc = path_pngcrush;
+	string pngpatho = path_pngout;
+	string pngpathd = path_deflopt;
+	if (pngpathc.IsEmpty() || !wxFileExists(pngpathc) &&
+		pngpatho.IsEmpty() || !wxFileExists(pngpatho) &&
+		pngpathd.IsEmpty() || !wxFileExists(pngpathd)) {
+		wxMessageBox("Error: PNG tools path not defined, please configure in SLADE preferences", "Error", wxOK|wxCENTRE|wxICON_ERROR);
+		return false;
+	}
+
+	// Save special chunks
+	point2_t offsets;
+	bool alphchunk = getalPhChunk(entry);
+	bool grabchunk = readgrAbChunk(entry, offsets);
+	string errormessages = "";
+	size_t oldsize = entry->getSize();
+	size_t crushsize = 0, outsize = 0, deflsize = 0;
+	bool crushed = false, outed = false;
+
+	// Run PNGCrush
+	if (!pngpathc.IsEmpty() && wxFileExists(pngpathc)) {
+		wxFileName fn(pngpathc);
+		fn.SetExt("png");
+		string pngfile = fn.GetFullPath();
+		fn.SetExt("opt");
+		string optfile = fn.GetFullPath();
+		entry->exportFile(pngfile);
+
+		string command = path_pngcrush + " -brute \"" + pngfile + "\" \"" + optfile + "\"";
+		wxExecute(command, wxEXEC_SYNC);
+
+		if (wxFileExists(optfile)) {
+			entry->importFile(optfile);
+			wxRemoveFile(optfile);
+			crushed = true;
+		} else errormessages += "PNGCrush failed to create optimized file.\n";
+		crushsize = entry->getSize();
+	}
+
+	// Run PNGOut
+	if (!pngpatho.IsEmpty() && wxFileExists(pngpatho)) {
+		wxFileName fn(pngpathc);
+		fn.SetExt("png");
+		string pngfile = fn.GetFullPath();
+		fn.SetExt("opt");
+		string optfile = fn.GetFullPath();
+		entry->exportFile(pngfile);
+
+		string command = path_pngout + " /y \"" + pngfile + "\" \"" + optfile + "\"";
+		wxExecute(command, wxEXEC_SYNC);
+
+		if (wxFileExists(optfile)) {
+			entry->importFile(optfile);
+			wxRemoveFile(optfile);
+			outed = true;
+		} else if (!crushed)
+			// Don't treat it as an error if PNGout couldn't create a smaller file than 
+			errormessages += "PNGout failed to create optimized file.\n";
+		outsize = entry->getSize();
+	}
+
+	// Run deflopt
+	if (!pngpathd.IsEmpty() && wxFileExists(pngpathd)) {
+		wxFileName fn(pngpathd);
+		fn.SetExt("png");
+		string pngfile = fn.GetFullPath();
+		entry->exportFile(pngfile);
+
+		string command = path_deflopt + " /sf \"" + pngfile + "\"";
+		wxExecute(command, wxEXEC_SYNC);
+
+		entry->importFile(pngfile);
+		deflsize = entry->getSize();
+
+	}
+
+	// Rewrite special chunks
+	if (alphchunk) modifyalPhChunk(entry, true);
+	if (grabchunk) modifyGfxOffsets(entry, -1, offsets, true, true, false);
+
+	wxLogMessage("PNG %s size %i =PNGCrush=> %i =PNGout=> %i =DeflOpt=> %i =+grAb/alPh=> %i",
+		CHR(entry->getName()), oldsize, crushsize, outsize, deflsize, entry->getSize());
+
+
+	if (!errormessages.IsEmpty()) {
+		ExtMessageDialog dlg(NULL, "Error Optimizing");
+		dlg.setMessage("The following errors were encountered while optimizing:");
+		dlg.setExt(errormessages);
+		dlg.ShowModal();
+
+		return false;
+	}
+
+	return true;
 }
 
 

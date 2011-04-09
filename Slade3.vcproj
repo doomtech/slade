@@ -216,6 +216,14 @@
 				RelativePath=".\src\PaletteDialog.h"
 				>
 			</File>
+			<File
+				RelativePath=".\src\TranslationEditorDialog.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\TranslationEditorDialog.h"
+				>
+			</File>
 			<Filter
 				Name="Preferences"
 				>
@@ -257,6 +265,14 @@
 				</File>
 				<File
 					RelativePath=".\src\InterfacePrefsPanel.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\PNGPrefsPanel.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\PNGPrefsPanel.h"
 					>
 				</File>
 				<File

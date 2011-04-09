@@ -58,6 +58,7 @@ PreferencesDialog::PreferencesDialog(wxWindow* parent) : wxDialog(parent, -1, "S
 	panel_text_editor = new TextEditorPrefsPanel(tree_prefs);
 	panel_text_styles = new TextStylePrefsPanel(tree_prefs);
 	panel_script_acs = new ACSPrefsPanel(tree_prefs);
+	panel_gfx_png = new PNGPrefsPanel(tree_prefs);
 
 	// Setup preferences TreeBook
 	tree_prefs->AddPage(panel_general, "General", true);
@@ -66,6 +67,8 @@ PreferencesDialog::PreferencesDialog(wxWindow* parent) : wxDialog(parent, -1, "S
 	tree_prefs->AddSubPage(setupBaseResourceArchivesPanel(), "Base Resource Archive");
 	tree_prefs->AddPage(panel_text_editor, "Text Editor");
 	tree_prefs->AddSubPage(panel_text_styles, "Fonts & Colours");
+	tree_prefs->AddPage(new wxPanel(tree_prefs, -1), "Graphics");
+	tree_prefs->AddSubPage(panel_gfx_png, "PNG");
 	tree_prefs->AddPage(new wxPanel(tree_prefs, -1), "Scripting");
 	tree_prefs->AddSubPage(panel_script_acs, "ACS");
 
@@ -131,6 +134,7 @@ void PreferencesDialog::applyPreferences() {
 	panel_text_editor->applyPreferences();
 	panel_text_styles->applyPreferences();
 	panel_script_acs->applyPreferences();
+	panel_gfx_png->applyPreferences();
 }
 
 

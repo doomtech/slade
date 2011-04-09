@@ -345,7 +345,7 @@ void TranslationEditorDialog::setStartColour(rgba_t col) {
 	// Get currently selected translation range
 	TransRange* tr = translation.getRange(list_translations->GetSelection());
 
-	// Check it's type
+	// Check its type
 	if (tr->getType() == TRANS_COLOUR) {
 		// Colour range
 		TransRangeColour* tcr = (TransRangeColour*)tr;
@@ -382,7 +382,7 @@ void TranslationEditorDialog::setEndColour(rgba_t col) {
 	// Get currently selected translation range
 	TransRange* tr = translation.getRange(list_translations->GetSelection());
 
-	// Check it's type
+	// Check its type
 	if (tr->getType() == TRANS_COLOUR) {
 		// Colour range
 		TransRangeColour* tcr = (TransRangeColour*)tr;
@@ -558,7 +558,7 @@ void TranslationEditorDialog::onPalOriginLeftUp(wxMouseEvent& e) {
 	// Get current translation range
 	TransRange* tr = translation.getRange(list_translations->GetSelection());
 
-	// Update it's origin range
+	// Update its origin range
 	if (tr) {
 		tr->setOStart(pal_canvas_original->getSelectionStart());
 		tr->setOEnd(pal_canvas_original->getSelectionEnd());
@@ -576,7 +576,7 @@ void TranslationEditorDialog::onPalTargetLeftUp(wxMouseEvent& e) {
 	// Get current translation range
 	TransRange* tr = translation.getRange(list_translations->GetSelection());
 
-	// Update it's target range if it's a palette translation
+	// Update its target range if it's a palette translation
 	if (tr && tr->getType() == TRANS_PALETTE) {
 		TransRangePalette* tpr = (TransRangePalette*)tr;
 		tpr->setDStart(pal_canvas_target->getSelectionStart());

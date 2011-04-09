@@ -79,6 +79,7 @@ public:
 	bool	wavDSndConvert();
 	bool	dSndWavConvert();
 	bool	musMidiConvert();
+	bool	optimizePNG();
 	bool	compileACS(bool hexen = false);
 	bool	convertTextures();
 

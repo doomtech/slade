@@ -1164,6 +1164,22 @@ bool ArchivePanel::compileACS(bool hexen) {
 	return true;
 }
 
+/* ArchivePanel::optimizePNG
+ * Compiles any selected text entries as ACS scripts
+ *******************************************************************/
+bool ArchivePanel::optimizePNG() {
+	// Get selected entries
+	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
+
+	// Go through selection
+	for (unsigned a = 0; a < selection.size(); a++) {
+		if (selection[a]->getType()->getFormat() == "img_png")
+			EntryOperations::optimizePNG(selection[a]);
+	}
+
+	return true;
+}
+
 /* ArchivePanel::convertTextures
  * Converts any selected TEXTUREx entries to a ZDoom TEXTURES entry
  *******************************************************************/
@@ -1500,6 +1516,8 @@ bool ArchivePanel::handleAction(string id) {
 		EntryOperations::createTexture(entry_list->getSelectedEntries());
 	else if (id == "arch_gfx_exportpng")
 		gfxExportPNG();
+	else if (id == "arch_gfx_pngopt")
+		optimizePNG();
 	else if (id == "arch_view_text")
 		openEntryAsText(entry_list->getFocusedEntry());
 	else if (id == "arch_view_hex")
@@ -1613,6 +1631,7 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 	// Check what types exist in the selection
 	// TODO: This stuff is absolutely terrible, nicer system needed
 	bool gfx_selected = false;
+	bool png_selected = false;
 	bool bas_selected = false;
 	bool wav_selected = false;
 	bool dsnd_selected = false;
@@ -1627,6 +1646,10 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 		if (!gfx_selected) {
 			if (selection[a]->getType()->extraProps().propertyExists("image"))
 				gfx_selected = true;
+		}
+		if (!png_selected) {
+			if (selection[a]->getType()->getFormat() == "img_png")
+				png_selected = true;
 		}
 		if (!bas_selected) {
 			if (selection[a]->getType()->getFormat() == "animated" ||
@@ -1727,6 +1750,8 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 		theApp->getAction("arch_gfx_addptable")->addToMenu(gfx);
 		theApp->getAction("arch_gfx_addtexturex")->addToMenu(gfx);
 		theApp->getAction("arch_gfx_exportpng")->addToMenu(gfx);
+		if (png_selected)
+			theApp->getAction("arch_gfx_pngopt")->addToMenu(gfx);
 	}
 
 	// Add Audio related menu items if needed

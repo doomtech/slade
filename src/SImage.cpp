@@ -958,7 +958,7 @@ bool SImage::applyTranslation(Translation* tr, Palette8bit* pal) {
 		uint8_t i = data[p];
 
 		// No need to process transparent pixels
-		if (mask[p] == 0)
+		if (mask && mask[p] == 0)
 			continue;
 
 		// Go through each translation component
