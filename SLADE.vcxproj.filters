@@ -444,6 +444,9 @@
     <ClCompile Include="src\TranslationEditorDialog.cpp">
       <Filter>Dialogs</Filter>
     </ClCompile>
+    <ClCompile Include="src\PNGPrefsPanel.cpp">
+      <Filter>Dialogs\Preferences</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -830,6 +833,9 @@
     </ClInclude>
     <ClInclude Include="src\TranslationEditorDialog.h">
       <Filter>Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PNGPrefsPanel.h">
+      <Filter>Dialogs\Preferences</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

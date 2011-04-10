@@ -361,19 +361,20 @@ bool TextureXEditor::close() {
 	// Check if any texture lists are modified
 	bool modified = false;
 	for (unsigned a = 0; a < texture_editors.size(); a++) {
-		if (texture_editors[a]->isModified()) {
+		texture_editors[a]->applyChanges();
+		if (texture_editors[a]->isModified())
 			modified = true;
-			break;
-		}
 	}
 
 	// Ask to save changes
-	wxMessageDialog md(this, "Save changes to texture entries?", "Unsaved Changes", wxYES_NO|wxCANCEL);
-	int result = md.ShowModal();
-	if (result == wxID_YES)
-		saveChanges();	// User selected to save
-	else if (result == wxID_CANCEL)
-		return false;	// User selected cancel, don't close the archive
+	if (modified) {
+		wxMessageDialog md(this, "Save changes to texture entries?", "Unsaved Changes", wxYES_NO|wxCANCEL);
+		int result = md.ShowModal();
+		if (result == wxID_YES)
+			saveChanges();	// User selected to save
+		else if (result == wxID_CANCEL)
+			return false;	// User selected cancel, don't close the archive
+	}
 
 	return true;
 }

@@ -345,9 +345,9 @@ void MainApp::initActions() {
 	new SAction("arch_entry_rename", "Rename", "t_rename", "Rename the selected entries");
 	new SAction("arch_entry_delete", "Delete", "t_delete", "Delete the selected entries");
 	new SAction("arch_entry_revert", "Revert", "", "Revert any modifications made to the selected entries since the last save");
-	new SAction("arch_entry_cut", "Cut", "", "Cut the selected entries");
-	new SAction("arch_entry_copy", "Copy", "", "Copy the selected entries");
-	new SAction("arch_entry_paste", "Paste", "", "Paste the selected entries");
+	new SAction("arch_entry_cut", "Cut", "t_cut", "Cut the selected entries");
+	new SAction("arch_entry_copy", "Copy", "t_copy", "Copy the selected entries");
+	new SAction("arch_entry_paste", "Paste", "t_paste", "Paste the selected entries");
 	new SAction("arch_entry_moveup", "Move Up", "t_up", "Move the selected entries up");
 	new SAction("arch_entry_movedown", "Move Down", "t_down", "Move the selected entries down");
 	new SAction("arch_entry_import", "Import", "t_import", "Import a file to the selected entry");

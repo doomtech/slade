@@ -217,7 +217,7 @@ bool PatchBrowser::openArchive(Archive* archive) {
 			arch = "Other";
 
 		// Add it
-		PatchBrowserItem* item = new PatchBrowserItem(entry->getName().Truncate(8).Upper(), entry, a);
+		PatchBrowserItem* item = new PatchBrowserItem(entry->getName(true).Truncate(8).Upper(), entry, a);
 		item->setPalette(theMainWindow->getPaletteChooser()->getSelectedPalette());
 		addItem(item, ns + "/" + arch);
 	}

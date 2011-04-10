@@ -160,6 +160,7 @@ TextureXPanel::TextureXPanel(wxWindow* parent, TextureXEditor* tx_editor) : wxPa
 	this->tx_entry = NULL;
 	this->tx_editor = tx_editor;
 	this->tex_current = NULL;
+	this->modified = false;
 
 	// Setup sizer
 	wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
@@ -294,6 +295,9 @@ bool TextureXPanel::saveTEXTUREX() {
 		texturex.getTexture(a)->setState(0);
 	list_textures->updateList();
 
+	// Update variables
+	modified = false;
+
 	return ok;
 }
 
@@ -315,6 +319,7 @@ void TextureXPanel::applyChanges() {
 		tx_editor->patchTable().updatePatchUsage(tex_current);
 		list_textures->updateList();
 		modified = true;
+		texture_editor->openTexture(tex_current);
 	}
 }
 

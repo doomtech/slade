@@ -150,6 +150,7 @@
     <ClCompile Include="src\OpenGL.cpp" />
     <ClCompile Include="src\Parser.cpp" />
     <ClCompile Include="src\PatchBrowser.cpp" />
+    <ClCompile Include="src\PNGPrefsPanel.cpp" />
     <ClCompile Include="src\PreferencesDialog.cpp" />
     <ClCompile Include="src\qmus2mid\qmus2mid.cpp" />
     <ClCompile Include="src\ResArchive.cpp" />
@@ -279,6 +280,7 @@
     <ClInclude Include="src\OpenGL.h" />
     <ClInclude Include="src\Parser.h" />
     <ClInclude Include="src\PatchBrowser.h" />
+    <ClInclude Include="src\PNGPrefsPanel.h" />
     <ClInclude Include="src\PreferencesDialog.h" />
     <ClInclude Include="src\qmus2mid\qmus2mid.h" />
     <ClInclude Include="src\ResArchive.h" />
