@@ -1110,10 +1110,66 @@ bool EntryOperations::optimizePNG(ArchiveEntry* entry) {
 	return true;
 }
 
+void fixpngsrc(ArchiveEntry * entry) {
+	if (!entry)
+		return;
+	const uint8_t * source = entry->getData();
+	uint8_t * data = new uint8_t[entry->getSize()];
+	memcpy(data, source, entry->getSize());
+
+	// Last check that it's a PNG
+	uint32_t header1 = READ_B32(data, 0);
+	uint32_t header2 = READ_B32(data, 4);
+	if (header1 != 0x89504E47 || header2 != 0x0D0A1A0A)
+		return;
+
+	// Loop through each chunk and recompute CRC
+	uint32_t pointer = 8;
+	bool neededchange = false;
+	while (pointer < entry->getSize()) {
+		if (pointer + 12 > entry->getSize()) {
+			wxLogMessage("Entry %s cannot be repaired.", CHR(entry->getName()));
+			return;
+		}
+		uint32_t chsz = READ_B32(data, pointer);
+		if (pointer + 12 + chsz > entry->getSize()) {
+			wxLogMessage("Entry %s cannot be repaired.", CHR(entry->getName()));
+			return;
+		}
+		uint32_t crc = Misc::crc(data + pointer + 4, 4 + chsz);
+		if (crc != READ_B32(data, pointer + 8 + chsz)) {
+			wxLogMessage("Chunk %c%c%c%c has bad CRC", data[pointer+4], data[pointer+5], data[pointer+6], data[pointer+7]);
+			neededchange = true;
+			data[pointer +  8 + chsz] = crc >> 24;
+			data[pointer +  9 + chsz] = (crc & 0x00ffffff) >> 16;
+			data[pointer + 10 + chsz] = (crc & 0x0000ffff) >> 8;
+			data[pointer + 11 + chsz] = (crc & 0x000000ff);
+		}
+		pointer += (chsz + 12);
+	}
+	// Import new data with fixed CRC
+	if (neededchange) {
+		entry->importMem(data, entry->getSize());
+	}
+	delete[] data;
+	return;
+}
 
 /*******************************************************************
  * CONSOLE COMMANDS
  *******************************************************************/
+
+CONSOLE_COMMAND(fixpngcrc, 0) {
+	vector<ArchiveEntry *> selection = theMainWindow->getCurrentEntrySelection();
+	if (selection.size() == 0) {
+		wxLogMessage("No entry selected");
+		return;
+	}
+	for (size_t a = 0; a < selection.size(); ++a) {
+		if (selection[a]->getType()->getFormat() == "img_png")
+			fixpngsrc(selection[a]);
+	}
+}
 
 /*
 CONSOLE_COMMAND (test_ee, 1) {

@@ -9,7 +9,7 @@
 #include "InterfacePrefsPanel.h"
 #include "EditingPrefsPanel.h"
 #include "ACSPrefsPanel.h"
-//#include "PNGPrefsPanel.h"
+#include "PNGPrefsPanel.h"
 #include <wx/treebook.h>
 
 class PreferencesDialog : public wxDialog {
@@ -22,7 +22,7 @@ private:
 	TextEditorPrefsPanel*	panel_text_editor;
 	TextStylePrefsPanel*	panel_text_styles;
 	ACSPrefsPanel*			panel_script_acs;
-	//PNGPrefsPanel*			panel_gfx_png;
+	PNGPrefsPanel*			panel_gfx_png;
 
 	// Base Resource Archive
 	BaseResourceArchivesPanel*	panel_bra;

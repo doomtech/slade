@@ -379,5 +379,5 @@ uint32_t MemChunk::crc() {
 	if (hasData())
 		return Misc::crc(data, size);
 	else
-		return false;
+		return 0;
 }

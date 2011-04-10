@@ -7,6 +7,7 @@ private:
 	wxCheckBox*	cb_size_as_string;
 	wxCheckBox* cb_filter_dirs;
 	wxCheckBox*	cb_start_page;
+	wxCheckBox*	cb_maximize;
 	wxCheckBox*	cb_context_submenus;
 	wxCheckBox*	cb_swap_epanel_bars;
 

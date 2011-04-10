@@ -38,6 +38,7 @@
 EXTERN_CVAR(Bool, size_as_string)
 EXTERN_CVAR(Bool, elist_filter_dirs)
 EXTERN_CVAR(Bool, show_start_page)
+EXTERN_CVAR(Bool, always_maximize)
 EXTERN_CVAR(Bool, swap_epanel_bars)
 EXTERN_CVAR(Bool, context_submenus)
 
@@ -79,10 +80,15 @@ InterfacePrefsPanel::InterfacePrefsPanel(wxWindow* parent) : wxPanel(parent, -1)
 	cb_start_page = new wxCheckBox(this, -1, "Show Start Page on Startup");
 	sizer->Add(cb_start_page, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
+	// Show startpage
+	cb_maximize = new wxCheckBox(this, -1, "Always Maximize on Startup");
+	sizer->Add(cb_maximize, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
 	// Init controls
 	cb_size_as_string->SetValue(size_as_string);
 	cb_filter_dirs->SetValue(!elist_filter_dirs);
 	cb_start_page->SetValue(show_start_page);
+	cb_maximize->SetValue(always_maximize);
 	cb_swap_epanel_bars->SetValue(swap_epanel_bars);
 	cb_context_submenus->SetValue(context_submenus);
 }
@@ -100,6 +106,7 @@ void InterfacePrefsPanel::applyPreferences() {
 	size_as_string = cb_size_as_string->GetValue();
 	elist_filter_dirs = !cb_filter_dirs->GetValue();
 	show_start_page = cb_start_page->GetValue();
+	always_maximize = cb_maximize->GetValue();
 	swap_epanel_bars = cb_swap_epanel_bars->GetValue();
 	context_submenus = cb_context_submenus->GetValue();
 }

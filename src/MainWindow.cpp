@@ -49,6 +49,7 @@
 string main_window_layout = "";
 MainWindow* MainWindow::instance = NULL;
 CVAR(Bool, show_start_page, true, CVAR_SAVE);
+CVAR(Bool, always_maximize, true, CVAR_SAVE);
 CVAR(String, global_palette, "", CVAR_SAVE);
 
 
@@ -81,7 +82,7 @@ public:
 MainWindow::MainWindow()
 : wxFrame((wxFrame *) NULL, -1, "SLADE", wxPoint(0, 0), wxSize(1024, 768)) {
 	lasttipindex = 0;
-	Maximize();
+	if (always_maximize) Maximize();
 	setupLayout();
 	SetDropTarget(new MainWindowDropTarget());
 }
