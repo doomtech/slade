@@ -134,7 +134,7 @@ void PreferencesDialog::applyPreferences() {
 	panel_text_editor->applyPreferences();
 	panel_text_styles->applyPreferences();
 	panel_script_acs->applyPreferences();
-	//panel_gfx_png->applyPreferences();
+	panel_gfx_png->applyPreferences();
 }
 
 
