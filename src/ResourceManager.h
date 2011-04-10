@@ -26,7 +26,7 @@ public:
 // Declare hash map class to hold resources
 WX_DECLARE_STRING_HASH_MAP(Resource, ResourceMap);
 
-class ResourceManager : public Listener {
+class ResourceManager : public Listener, public Announcer {
 private:
 	ResourceMap		patches;
 	ResourceMap		graphics;
@@ -51,6 +51,7 @@ public:
 	void	removeEntry(ArchiveEntry* entry);
 
 	void	listAllPatches();
+	void	getAllPatchEntries(vector<ArchiveEntry*>& list, Archive* priority);
 
 	ArchiveEntry*	getPatchEntry(string patch, string nspace = "patches", Archive* priority = NULL);
 

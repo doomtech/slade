@@ -45,6 +45,10 @@ public:
 	//void		populatePatchList();
 	void		updatePatchControls();
 
+	// Editing
+	void	addPatch();
+	void	replacePatch();
+
 	void	enableTranslationControls(bool enable) { text_translation->Enable(enable); btn_edit_translation->Enable(enable); }
 	void	enableBlendControls(bool enable, bool tint = false) { cp_blend_col->Enable(enable); spin_tint_amount->Enable(enable && tint); }
 

@@ -2,6 +2,8 @@
 #ifndef __PALETTE_H__
 #define	__PALETTE_H__
 
+class Translation;
+
 class Palette8bit {
 private:
 	rgba_t	colours[256];
@@ -31,6 +33,7 @@ public:
 	short	findColour(rgba_t colour);
 	short	nearestColour(rgba_t colour);
 	size_t	countColours();
+	void	applyTranslation(Translation* trans);
 };
 
 #endif //__PALETTE_H__

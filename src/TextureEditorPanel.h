@@ -64,12 +64,12 @@ public:
 	void	setPalette(Palette8bit* pal);
 
 	// Editing
-	void	addPatch();
-	void	removePatch();
-	void	patchBack();
-	void	patchForward();
-	void	replacePatch();
-	void	duplicatePatch();
+	virtual void	addPatch();
+	void			removePatch();
+	void			patchBack();
+	void			patchForward();
+	virtual void	replacePatch();
+	void			duplicatePatch();
 
 	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 

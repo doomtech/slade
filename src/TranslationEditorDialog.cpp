@@ -5,6 +5,7 @@
 #include "Icons.h"
 #include "MathStuff.h"
 #include "Tokenizer.h"
+#include "Misc.h"
 #include <wx/ffile.h>
 #include <wx/gbsizer.h>
 
@@ -68,6 +69,7 @@ TranslationEditorDialog::TranslationEditorDialog(wxWindow* parent, Palette8bit* 
 : wxDialog(parent, -1, title) {
 	// Init variables
 	palette = pal;
+	entry_preview = preview_image;
 
 	// Create sizer
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
@@ -116,7 +118,8 @@ TranslationEditorDialog::TranslationEditorDialog(wxWindow* parent, Palette8bit* 
 	pal_canvas_original = new PaletteCanvas(this, -1);
 	pal_canvas_original->doubleWidth(true);
 	pal_canvas_original->setPalette(palette);
-	pal_canvas_original->SetInitialSize(wxSize(514, 130));
+	pal_canvas_original->SetInitialSize(wxSize(450, 114));
+	pal_canvas_original->allowSelection(2);
 	framesizer->Add(pal_canvas_original, 1, wxEXPAND|wxLEFT|wxBOTTOM|wxRIGHT, 4);
 
 
@@ -158,7 +161,8 @@ TranslationEditorDialog::TranslationEditorDialog(wxWindow* parent, Palette8bit* 
 	pal_canvas_target = new PaletteCanvas(panel_target_palette, -1);
 	pal_canvas_target->doubleWidth(true);
 	pal_canvas_target->setPalette(palette);
-	pal_canvas_target->SetInitialSize(wxSize(514, 130));
+	pal_canvas_target->SetInitialSize(wxSize(450, 114));
+	pal_canvas_target->allowSelection(2);
 	vbox->Add(pal_canvas_target, 1, wxEXPAND);
 
 
@@ -187,6 +191,45 @@ TranslationEditorDialog::TranslationEditorDialog(wxWindow* parent, Palette8bit* 
 	vbox->Add(gb_gradient, 0, wxEXPAND);
 	vbox->AddStretchSpacer();
 
+	// Show initial target panel (palette)
+	framesizer->Add(panel_target_palette, 1, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+	panel_target_gradient->Show(false);
+
+
+	// --- Preview section ---
+	hbox = new wxBoxSizer(wxHORIZONTAL);
+	sizer->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+	// Palette preview
+	frame = new wxStaticBox(this, -1, "Resulting Palette");
+	framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
+	hbox->Add(framesizer, 0, wxEXPAND|wxLEFT|wxBOTTOM|wxRIGHT, 4);
+
+	pal_canvas_preview = new PaletteCanvas(this, -1);
+	pal_canvas_preview->SetInitialSize(wxSize(226, 226));
+	pal_canvas_preview->setPalette(palette);
+	framesizer->Add(pal_canvas_preview, 1, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+	// Image preview
+	frame = new wxStaticBox(this, -1, "Preview");
+	framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
+	hbox->Add(framesizer, 1, wxEXPAND|wxBOTTOM|wxRIGHT, 4);
+
+	gfx_preview = new GfxCanvas(this, -1);
+	gfx_preview->setPalette(palette);
+	gfx_preview->setViewType(GFXVIEW_CENTERED);
+	if (entry_preview) Misc::loadImageFromEntry(gfx_preview->getImage(), entry_preview);
+	framesizer->Add(gfx_preview, 1, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+
+	// --- Translation string ---
+	hbox = new wxBoxSizer(wxHORIZONTAL);
+	sizer->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+	text_string = new wxTextCtrl(this, -1, "", wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
+	hbox->Add(new wxStaticText(this, -1, "Translation String:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT|wxLEFT, 4);
+	hbox->Add(text_string, 1, wxEXPAND|wxRIGHT, 4);
+
 
 	// --- Dialog buttons ---
 	wxSizer* buttonsizer = CreateButtonSizer(wxOK|wxCANCEL);
@@ -195,19 +238,15 @@ TranslationEditorDialog::TranslationEditorDialog(wxWindow* parent, Palette8bit* 
 	// Load button
 	btn_load = new wxButton(this, -1, "Load from File");
 	buttonsizer->InsertStretchSpacer(0);
-	buttonsizer->Insert(0, btn_load, 0, wxRIGHT, 4);
+	buttonsizer->Insert(0, btn_load, 0, wxLEFT|wxRIGHT, 4);
 
 	// Save button
 	btn_save = new wxButton(this, -1, "Save to File");
-	buttonsizer->Insert(1, btn_save, 0);
-
-
-	// Show initial target panel (palette)
-	framesizer->Add(panel_target_palette, 1, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
-	panel_target_gradient->Show(false);
+	buttonsizer->Insert(1, btn_save, 0, wxLEFT, 4);
 
 
 	// Bind events
+	Bind(wxEVT_SIZE, &TranslationEditorDialog::onSize, this);
 	list_translations->Bind(wxEVT_COMMAND_LISTBOX_SELECTED, &TranslationEditorDialog::onTranslationListItemSelected, this);
 	rb_type_palette->Bind(wxEVT_COMMAND_RADIOBUTTON_SELECTED, &TranslationEditorDialog::onRBPaletteSelected, this);
 	rb_type_colour->Bind(wxEVT_COMMAND_RADIOBUTTON_SELECTED, &TranslationEditorDialog::onRBColourSelected, this);
@@ -227,6 +266,7 @@ TranslationEditorDialog::TranslationEditorDialog(wxWindow* parent, Palette8bit* 
 	Layout();
 	SetInitialSize(wxSize(-1, -1));
 	SetMinSize(GetSize());
+	CenterOnParent();
 	list_translations->SetSizeHints(list_translations->GetSize(), list_translations->GetSize());
 }
 
@@ -248,9 +288,8 @@ void TranslationEditorDialog::openTranslation(Translation& trans) {
 		openRange(0);
 	}
 
-	// Update preview
-	//if (frame_preview)
-	//	frame_preview->updatePreview(translation, palette);
+	// Update previews
+	updatePreviews();
 }
 
 void TranslationEditorDialog::openRange(int index) {
@@ -372,10 +411,7 @@ void TranslationEditorDialog::setStartColour(rgba_t col) {
 	// Update UI
 	gb_gradient->Refresh();
 	updateListItem(list_translations->GetSelection());
-
-	// Update preview
-	//if (frame_preview)
-	//	frame_preview->updatePreview(translation, palette);
+	updatePreviews();
 }
 
 void TranslationEditorDialog::setEndColour(rgba_t col) {
@@ -409,10 +445,7 @@ void TranslationEditorDialog::setEndColour(rgba_t col) {
 	// Update UI
 	gb_gradient->Refresh();
 	updateListItem(list_translations->GetSelection());
-
-	// Update preview
-	//if (frame_preview)
-	//	frame_preview->updatePreview(translation, palette);
+	updatePreviews();
 }
 
 void TranslationEditorDialog::showPaletteTarget() {
@@ -443,7 +476,38 @@ void TranslationEditorDialog::showGradientTarget() {
 	}
 }
 
+void TranslationEditorDialog::updatePreviews() {
+	// Update palette preview
+	pal_canvas_preview->setPalette(palette);
+	pal_canvas_preview->getPalette().applyTranslation(&translation);
+	pal_canvas_preview->Refresh();
 
+	// Update image preview
+	if (entry_preview) {
+		// Re-load preview entry
+		Misc::loadImageFromEntry(gfx_preview->getImage(), entry_preview);
+
+		// Apply translation
+		gfx_preview->getImage()->applyTranslation(&translation, palette);
+
+		// Update UI
+		gfx_preview->updateImageTexture();
+		gfx_preview->Refresh();
+	}
+
+	// Update text string
+	text_string->SetValue(translation.asText());
+}
+
+
+
+
+void TranslationEditorDialog::onSize(wxSizeEvent& e) {
+	// Update image preview
+	gfx_preview->zoomToFit(true, 0.05f);
+
+	e.Skip();
+}
 
 void TranslationEditorDialog::onTranslationListItemSelected(wxCommandEvent& e) {
 	// Open what was selected
@@ -471,10 +535,7 @@ void TranslationEditorDialog::onRBPaletteSelected(wxCommandEvent& e) {
 		// Update UI
 		updateListItem(index);
 		openRange(index);
-
-		// Update preview
-		//if (frame_preview)
-		//	frame_preview->updatePreview(translation, palette);
+		updatePreviews();
 	}
 }
 
@@ -501,10 +562,7 @@ void TranslationEditorDialog::onRBColourSelected(wxCommandEvent& e) {
 		// Update UI
 		updateListItem(index);
 		openRange(index);
-
-		// Update preview
-		//if (frame_preview)
-		//	frame_preview->updatePreview(translation, palette);
+		updatePreviews();
 	}
 }
 
@@ -535,10 +593,7 @@ void TranslationEditorDialog::onRBDesaturateSelected(wxCommandEvent& e) {
 		// Update UI
 		updateListItem(index);
 		openRange(index);
-
-		// Update preview
-		//if (frame_preview)
-		//	frame_preview->updatePreview(translation, palette);
+		updatePreviews();
 	}
 }
 
@@ -566,10 +621,7 @@ void TranslationEditorDialog::onPalOriginLeftUp(wxMouseEvent& e) {
 
 	// Update UI
 	updateListItem(list_translations->GetSelection());
-
-	// Update preview
-	//if (frame_preview)
-	//	frame_preview->updatePreview(translation, palette);
+	updatePreviews();
 }
 
 void TranslationEditorDialog::onPalTargetLeftUp(wxMouseEvent& e) {
@@ -585,10 +637,7 @@ void TranslationEditorDialog::onPalTargetLeftUp(wxMouseEvent& e) {
 
 	// Update UI
 	updateListItem(list_translations->GetSelection());
-
-	// Update preview
-	//if (frame_preview)
-	//	frame_preview->updatePreview(translation, palette);
+	updatePreviews();
 }
 
 void TranslationEditorDialog::onBtnAdd(wxCommandEvent& e) {
@@ -609,10 +658,7 @@ void TranslationEditorDialog::onBtnAdd(wxCommandEvent& e) {
 	// Update UI
 	list_translations->SetSelection(index);
 	openRange(index);
-
-	// Update preview
-	//if (frame_preview)
-	//	frame_preview->updatePreview(translation, palette);
+	updatePreviews();
 }
 
 void TranslationEditorDialog::onBtnRemove(wxCommandEvent& e) {
@@ -632,10 +678,7 @@ void TranslationEditorDialog::onBtnRemove(wxCommandEvent& e) {
 		list_translations->SetSelection(index);
 		openRange(index);
 	}
-
-	// Update preview
-	//if (frame_preview)
-	//	frame_preview->updatePreview(translation, palette);
+	updatePreviews();
 }
 
 void TranslationEditorDialog::onBtnUp(wxCommandEvent& e) {
@@ -655,9 +698,8 @@ void TranslationEditorDialog::onBtnUp(wxCommandEvent& e) {
 	list_translations->SetSelection(index-1);
 	openRange(index-1);
 
-	// Update preview
-	//if (frame_preview)
-	//	frame_preview->updatePreview(translation, palette);
+	// Update previews
+	updatePreviews();
 }
 
 void TranslationEditorDialog::onBtnDown(wxCommandEvent& e) {
@@ -677,9 +719,8 @@ void TranslationEditorDialog::onBtnDown(wxCommandEvent& e) {
 	list_translations->SetSelection(index+1);
 	openRange(index+1);
 
-	// Update preview
-	//if (frame_preview)
-	//	frame_preview->updatePreview(translation, palette);
+	// Update previews
+	updatePreviews();
 }
 
 void TranslationEditorDialog::onBtnLoad(wxCommandEvent& e) {

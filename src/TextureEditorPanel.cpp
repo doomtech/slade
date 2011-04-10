@@ -411,7 +411,7 @@ void TextureEditorPanel::addPatch() {
 		return;
 
 	// Browse for patch
-	int patch = tx_editor->browsePatch();
+	int patch = tx_editor->browsePatchTable();
 	if (patch >= 0) {
         // Add new patch
 		tex_current->addPatch(tx_editor->patchTable().patchName(patch), 0, 0);
@@ -518,7 +518,7 @@ void TextureEditorPanel::replacePatch() {
 		return;
 
 	// Browse for patch
-	int patch = tx_editor->browsePatch();
+	int patch = tx_editor->browsePatchTable();
 	if (patch >= 0) {
 		// Go through selection and replace each patch
 		for (size_t a = 0; a < selection.size(); a++)

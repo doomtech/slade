@@ -581,11 +581,7 @@ void ArchiveManagerPanel::openTextureTab(int archive_index) {
 	}
 }
 
-/* ArchiveManagerPanel::closeTextureTab
- * Closes the texture editor tab for the archive at <archive_index>
- * in the archive manager
- *******************************************************************/
-void ArchiveManagerPanel::closeTextureTab(int archive_index) {
+TextureXEditor* ArchiveManagerPanel::getTextureTab(int archive_index) {
 	Archive* archive = theArchiveManager->getArchive(archive_index);
 
 	if (archive) {
@@ -597,14 +593,22 @@ void ArchiveManagerPanel::closeTextureTab(int archive_index) {
 
 			// Check for archive match
 			TextureXEditor* txed = (TextureXEditor*)notebook_archives->GetPage(a);
-			if (txed->getArchive() == archive) {
-				// Close the tab
-				notebook_archives->DeletePage(a);
-
-				return;
-			}
+			if (txed->getArchive() == archive)
+				return txed;
 		}
 	}
+
+	// No texture editor open for that archive
+	return NULL;
+}
+
+/* ArchiveManagerPanel::closeTextureTab
+ * Closes the texture editor tab for the archive at <archive_index>
+ * in the archive manager
+ *******************************************************************/
+void ArchiveManagerPanel::closeTextureTab(int archive_index) {
+	TextureXEditor* txed = getTextureTab(archive_index);
+	if (txed) notebook_archives->DeletePage(notebook_archives->GetPageIndex(txed));
 }
 
 /* ArchiveManagerPanel::openFile
@@ -791,6 +795,15 @@ bool ArchiveManagerPanel::closeArchive(Archive* archive) {
 
 	// Check for unsaved entry changes
 	saveEntryChanges(archive);
+
+	// Check for unsaved texture editor changes
+	int archive_index = theArchiveManager->archiveIndex(archive);
+	TextureXEditor* txed = getTextureTab(archive_index);
+	if (txed) {
+		openTextureTab(archive_index);
+		if (!txed->close())
+			return false;	// User cancelled saving texturex changes, don't close
+	}
 
 	// If the archive has unsaved changes, prompt to save
 	if (archive->isModified()) {
@@ -1380,6 +1393,13 @@ void ArchiveManagerPanel::onArchiveTabClose(wxAuiNotebookEvent& e) {
 				e.Veto();
 		}
 		tab_closing = 0;
+	}
+
+	// Check for texture editor
+	if (notebook_archives->GetPage(e.GetInt())->GetName() == "texture") {
+		TextureXEditor* txed = (TextureXEditor*)(notebook_archives->GetPage(e.GetInt()));
+		if (!txed->close())
+			e.Veto();
 	}
 }
 

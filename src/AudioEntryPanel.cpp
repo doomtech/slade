@@ -43,6 +43,7 @@
  * VARIABLES
  *******************************************************************/
 CVAR(Int, snd_volume, 100, CVAR_SAVE)
+//CVAR(Bool, snd_autoplay, false, CVAR_SAVE) // can't get this to work :/
 #ifndef NO_AUDIERE
 AudioDevicePtr AudioEntryPanel::device = NULL;
 #endif
@@ -119,13 +120,35 @@ AudioEntryPanel::~AudioEntryPanel() {
 	timer_seek->Stop();
 }
 
-
 /* AudioEntryPanel::loadEntry
  * Loads an entry into the audio entry panel
  *******************************************************************/
 bool AudioEntryPanel::loadEntry(ArchiveEntry* entry) {
 	// Stop anything currently playing
 	stopStream();
+	opened = false;
+
+	// Reset seek slider
+	slider_seek->SetValue(0);
+
+	// Delete previous temp file
+	if (wxFileExists(prevfile))
+		wxRemoveFile(prevfile);
+
+	return true;
+}
+
+/* AudioEntryPanel::saveEntry
+ * Saves any changes to the entry (does nothing here)
+ *******************************************************************/
+bool AudioEntryPanel::saveEntry() {
+	return true;
+}
+
+bool AudioEntryPanel::open() {
+	// Check if already opened
+	if (opened)
+		return true;
 
 	// Get entry data
 	MemChunk& mcdata = entry->getMCData();
@@ -176,10 +199,6 @@ bool AudioEntryPanel::loadEntry(ArchiveEntry* entry) {
 	} else
 		mcdata.exportFile(path.GetFullPath());
 
-	// Reset seek slider
-	slider_seek->SetValue(0);
-
-	// Open it
 	if (entry->getType()->getFormat() == "midi" || entry->getType()->getFormat() == "mus" ||
 		entry->getType()->getFormat() == "gmid") {
 		openMidi(path.GetFullPath());
@@ -189,20 +208,10 @@ bool AudioEntryPanel::loadEntry(ArchiveEntry* entry) {
 		midi = false;
 	}
 
-	// Delete previous temp file
-	if (wxFileExists(prevfile))
-		wxRemoveFile(prevfile);
-
 	// Keep filename so we can delete it later
 	prevfile = path.GetFullPath();
 
-	return true;
-}
-
-/* AudioEntryPanel::saveEntry
- * Saves any changes to the entry (does nothing here)
- *******************************************************************/
-bool AudioEntryPanel::saveEntry() {
+	opened = true;
 	return true;
 }
 
@@ -283,6 +292,9 @@ bool AudioEntryPanel::openMidi(string filename) {
  * Begins playback of the current audio or MIDI stream
  *******************************************************************/
 void AudioEntryPanel::startStream() {
+	if (!opened)
+		open();
+
 	if (midi)
 		theMIDIPlayer->play();
 #ifndef NO_AUDIERE

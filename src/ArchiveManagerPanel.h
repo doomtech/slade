@@ -26,6 +26,7 @@ public:
 	void onItemActivated(wxTreeEvent &e);
 };
 
+class TextureXEditor;
 class ArchiveManagerPanel : public wxPanel, Listener, SActionHandler {
 private:
 	wxAuiNotebook*		notebook_tabs;
@@ -62,13 +63,14 @@ public:
 	ArchiveEntry*			currentEntry();
 	vector<ArchiveEntry*>	currentEntrySelection();
 
-	void	openTab(int archive_index);
-	void	openTab(Archive * archive);
-	void	closeTab(int archive_index);
-	void	openTextureTab(int archive_index);
-	void	closeTextureTab(int archive_index);
-	void	openFile(string filename);
-	void	openFiles(wxArrayString& files);
+	void			openTab(int archive_index);
+	void			openTab(Archive * archive);
+	void			closeTab(int archive_index);
+	void			openTextureTab(int archive_index);
+	TextureXEditor*	getTextureTab(int archive_index);
+	void			closeTextureTab(int archive_index);
+	void			openFile(string filename);
+	void			openFiles(wxArrayString& files);
 
 	// Single archive actions
 	bool	saveEntryChanges(Archive* archive);

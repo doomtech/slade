@@ -177,6 +177,42 @@ void ResourceManager::listAllPatches() {
 	}
 }
 
+/* ResourceManager::getAllPatchEntries
+ * Adds all current patch entries to [list]
+ *******************************************************************/
+void ResourceManager::getAllPatchEntries(vector<ArchiveEntry*>& list, Archive* priority) {
+	ResourceMap::iterator i = patches.begin();
+
+	// Add all primary entries to the list
+	while (i != patches.end()) {
+		// Skip if no entries
+		if (i->second.length() == 0) {
+			i++;
+			continue;
+		}
+
+		// Go through resource entries
+		ArchiveEntry* entry = i->second.entries[0];
+		for (int a = 0; a < i->second.length(); a++) {
+			entry = i->second.entries[a];
+
+			// If it's in the 'priority' archive, exit loop
+			if (priority && i->second.entries[a]->getParent() == priority)
+				break;
+
+			// Otherwise, if it's in a 'later' archive than the current resource entry, set it
+			if (theArchiveManager->archiveIndex(entry->getParent()) <=
+				theArchiveManager->archiveIndex(i->second.entries[a]->getParent()))
+				entry = i->second.entries[a];
+		}
+
+		// Add entry to the list
+		list.push_back(entry);
+
+		i++;
+	}
+}
+
 /* ResourceManager::getPatchEntry
  * Returns the most appropriate managed resource entry for [patch],
  * or NULL if no match found
@@ -222,6 +258,7 @@ void ResourceManager::onAnnouncement(Announcer* announcer, string event_name, Me
 		ArchiveEntry* entry = (ArchiveEntry*)wxUIntToPtr(ptr);
 		removeEntry(entry);
 		addEntry(entry);
+		announce("resources_updated");
 	}
 
 	// An entry is removed or renamed
@@ -232,6 +269,7 @@ void ResourceManager::onAnnouncement(Announcer* announcer, string event_name, Me
 		event_data.read(&ptr, sizeof(wxUIntPtr));
 		ArchiveEntry* entry = (ArchiveEntry*)wxUIntToPtr(ptr);
 		removeEntry(entry);
+		announce("resources_updated");
 	}
 }
 

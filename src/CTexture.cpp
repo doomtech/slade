@@ -396,6 +396,7 @@ CTexture::CTexture() {
 	this->offset_x = 0;
 	this->offset_y = 0;
 	this->type = "Texture";
+	this->state = 0;
 }
 
 /* CTexture::~CTexture

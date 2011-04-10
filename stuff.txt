@@ -15,10 +15,7 @@ TODO List ---------------------------------------------------------------
 
 --- Before 3.0.2 ---
 - Finish TEXTURES editing:
-	- Translation editor preview
-	- Gfx browser for patches
 	- Support for textures-as-patches
-- Make texture editor behave more like archive editor (new/modified colours in tex list, ask to save changes on close, etc)
 - (maybe) Copy+paste for textures
 - (maybe) Fix up stuff for wxMac (not looking hopeful until the next proper wxwidgets release at least, the current wxwidgets mac support is pretty terrible)
 - (maybe) Generic DataEntryPanel

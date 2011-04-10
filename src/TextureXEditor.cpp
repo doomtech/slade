@@ -150,6 +150,7 @@ TextureXEditor::TextureXEditor(wxWindow* parent) : wxPanel(parent, -1) {
 	// Init variables
 	this->archive = archive;
 	this->pnames = NULL;
+	SetName("texturex");
 
 	// Create patch browser
 	patch_browser = new PatchBrowser(this);
@@ -181,6 +182,9 @@ TextureXEditor::TextureXEditor(wxWindow* parent) : wxPanel(parent, -1) {
 
 	// Listen to patch table
 	listenTo(&patch_table);
+
+	// Listen to resource manager
+	listenTo(theResourceManager);
 
 	// Update+ layout
 	Layout();
@@ -307,20 +311,69 @@ bool TextureXEditor::openArchive(Archive* archive) {
 	// Set global palette
 	theMainWindow->getPaletteChooser()->setGlobalFromArchive(archive);
 
-	// Find patch entries (this really needs to be faster)
-	/*
-	theSplashWindow->show("Opening Texture List...", true);
-	theSplashWindow->setProgressMessage("Searching for patches");
-	float np = (float)patch_table.nPatches();
-	for (unsigned a = 0; a < patch_table.nPatches(); a++) {
-		theSplashWindow->setProgress((float)a / np);
-		patch_table.updatePatchEntry(a);
-	}
-	theSplashWindow->hide();
-	*/
-
 	// Setup patch browser
-	patch_browser->openPatchTable(&patch_table);
+	if (patch_table.nPatches() > 0)
+		patch_browser->openPatchTable(&patch_table);
+	else
+		patch_browser->openArchive(archive);
+
+	return true;
+}
+
+/* TextureXEditor::updateTexturePalette
+ * Sets the texture panels' palettes to what is selected in the
+ * palette chooser
+ *******************************************************************/
+void TextureXEditor::updateTexturePalette() {
+	// Get palette
+	Palette8bit* pal = theMainWindow->getPaletteChooser()->getSelectedPalette();
+
+	// Send to whatever needs it
+	for (size_t a = 0; a < texture_editors.size(); a++)
+		texture_editors[a]->setPalette(pal);
+}
+
+void TextureXEditor::saveChanges() {
+	// Check for problems
+	checkTextures();
+
+	// Save TEXTUREx entries
+	for (unsigned a = 0; a < texture_editors.size(); a++)
+		texture_editors[a]->saveTEXTUREX();
+
+	// Save PNAMES if it exists
+	if (patch_table.nPatches() > 0) {
+		if (!pnames) {
+			// If no PNAMES entry exists in the archive, create one
+			int index = archive->entryIndex(texture_editors.back()->txEntry()) + 1;
+			pnames = archive->addNewEntry("PNAMES", index);
+			pnames->setType(EntryType::getType("pnames"));
+			pnames->setExtensionByType();
+		}
+
+		pnames->unlock();	// Have to unlock it to write
+		patch_table.writePNAMES(pnames);
+		pnames->lock();
+	}
+}
+
+bool TextureXEditor::close() {
+	// Check if any texture lists are modified
+	bool modified = false;
+	for (unsigned a = 0; a < texture_editors.size(); a++) {
+		if (texture_editors[a]->isModified()) {
+			modified = true;
+			break;
+		}
+	}
+
+	// Ask to save changes
+	wxMessageDialog md(this, "Save changes to texture entries?", "Unsaved Changes", wxYES_NO|wxCANCEL);
+	int result = md.ShowModal();
+	if (result == wxID_YES)
+		saveChanges();	// User selected to save
+	else if (result == wxID_CANCEL)
+		return false;	// User selected cancel, don't close the archive
 
 	return true;
 }
@@ -349,16 +402,21 @@ bool TextureXEditor::removePatch(unsigned index, bool delete_entry) {
 }
 
 /* TextureXEditor::browsePatch
- * Opens the patch browser. Returns the selected patch index, or -1
- * if no patch was selected
+ * Opens the patch table in the patch browser. Returns the selected
+ * patch index, or -1 if no patch was selected
  *******************************************************************/
-int TextureXEditor::browsePatch() {
-	patch_browser->updateItems();
-
+int TextureXEditor::browsePatchTable() {
 	if (patch_browser->ShowModal() == wxID_OK)
 		return patch_browser->getSelectedPatch();
 	else
 		return -1;
+}
+
+string TextureXEditor::browsePatchEntry() {
+	if (patch_browser->ShowModal() == wxID_OK)
+		return patch_browser->getSelectedItem()->getName();
+	else
+		return "";
 }
 
 /* TextureXEditor::checkTextures
@@ -418,24 +476,6 @@ bool TextureXEditor::checkTextures() {
 		return false;
 }
 
-
-/*******************************************************************
- * TEXTUREXEDITOR EVENTS
- *******************************************************************/
-
-/* TextureXEditor::updateTexturePalette
- * Sets the texture panels' palettes to what is selected in the
- * palette chooser
- *******************************************************************/
-void TextureXEditor::updateTexturePalette() {
-	// Get palette
-	Palette8bit* pal = theMainWindow->getPaletteChooser()->getSelectedPalette();
-
-	// Send to whatever needs it
-	for (size_t a = 0; a < texture_editors.size(); a++)
-		texture_editors[a]->setPalette(pal);
-}
-
 /* TextureXEditor::onAnnouncement
  * Handles any announcements from the current texture
  *******************************************************************/
@@ -447,35 +487,27 @@ void TextureXEditor::onAnnouncement(Announcer* announcer, string event_name, Mem
 	if (announcer == &patch_table && event_name == "modified") {
 		patch_browser->openPatchTable(&patch_table);
 	}
+
+	if (announcer == theResourceManager)
+		patch_browser->openArchive(archive);
 }
+
+
+/*******************************************************************
+ * TEXTUREXEDITOR EVENTS
+ *******************************************************************/
 
 /* TextureXEditor::onSaveClicked
  * Called when the 'Save Changes' button is clicked
  *******************************************************************/
 void TextureXEditor::onSaveClicked(wxCommandEvent& e) {
-	// Check for problems
-	checkTextures();
-
-	// Save TEXTUREx entries
-	for (unsigned a = 0; a < texture_editors.size(); a++)
-		texture_editors[a]->saveTEXTUREX();
-
-	// Save PNAMES if it exists
-	if (patch_table.nPatches() > 0) {
-		if (!pnames) {
-			// If no PNAMES entry exists in the archive, create one
-			int index = archive->entryIndex(texture_editors.back()->txEntry()) + 1;
-			pnames = archive->addNewEntry("PNAMES", index);
-			pnames->setType(EntryType::getType("pnames"));
-			pnames->setExtensionByType();
-		}
-
-		pnames->unlock();	// Have to unlock it to write
-		patch_table.writePNAMES(pnames);
-		pnames->lock();
-	}
+	saveChanges();
 }
 
+
+/*******************************************************************
+ * TEXTUREXEDITOR STATIC FUNCTIONS
+ *******************************************************************/
 
 /* TextureXEditor::setupTextureEntries
  * Static function to check if an archive has sufficient texture

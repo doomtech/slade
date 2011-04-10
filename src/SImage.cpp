@@ -972,7 +972,9 @@ bool SImage::applyTranslation(Translation* tr, Palette8bit* pal) {
 				// Check pixel is within translation range
 				if (i >= tp->oStart() && i <= tp->oEnd()) {
 					// Figure out how far along the range this colour is
-					double range_frac = double(i - tp->oStart()) / double(tp->oEnd() - tp->oStart());
+					double range_frac = 0;
+					if (tp->oStart() != tp->oEnd())
+						range_frac = double(i - tp->oStart()) / double(tp->oEnd() - tp->oStart());
 
 					// Determine destination palette index
 					uint8_t di = tp->dStart() + range_frac * (tp->dEnd() - tp->dStart());
@@ -989,7 +991,9 @@ bool SImage::applyTranslation(Translation* tr, Palette8bit* pal) {
 				// Check pixel is within translation range
 				if (i >= tc->oStart() && i <= tc->oEnd()) {
 					// Figure out how far along the range this colour is
-					double range_frac = double(i - tc->oStart()) / double(tc->oEnd() - tc->oStart());
+					double range_frac = 0;
+					if (tc->oStart() != tc->oEnd())
+						range_frac = double(i - tc->oStart()) / double(tc->oEnd() - tc->oStart());
 
 					// Determine destination colour
 					uint8_t r = tc->dStart().r + range_frac * (tc->dEnd().r - tc->dStart().r);

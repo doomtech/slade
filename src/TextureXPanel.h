@@ -14,7 +14,7 @@ private:
 
 protected:
 	string	getItemText(long item, long column) const;
-	//void	updateItemAttr(long item) const;
+	void	updateItemAttr(long item) const;
 
 public:
 	TextureXListView(wxWindow* parent, TextureXList* texturex);
@@ -29,6 +29,7 @@ private:
 	TextureXEditor*		tx_editor;
 	ArchiveEntry*		tx_entry;
 	CTexture*			tex_current;
+	bool				modified;
 
 	TextureXListView*	list_textures;
 	TextureEditorPanel*	texture_editor;
@@ -46,6 +47,7 @@ public:
 
 	TextureXList&	txList() { return texturex; }
 	ArchiveEntry*	txEntry() { return tx_entry; }
+	bool			isModified() { return modified; }
 
 	bool	openTEXTUREX(ArchiveEntry* texturex);
 	bool	saveTEXTUREX();

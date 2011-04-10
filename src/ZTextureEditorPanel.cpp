@@ -5,6 +5,7 @@
 #include "Icons.h"
 #include "TranslationEditorDialog.h"
 #include "TextureXEditor.h"
+#include "MainWindow.h"
 #include <wx/gbsizer.h>
 #include <wx/statline.h>
 
@@ -411,6 +412,62 @@ void ZTextureEditorPanel::updatePatchControls() {
 	}
 }
 
+/* ZTextureEditorPanel::addPatch
+ * Prompts the user to select a patch from any open resources to be
+ * added to the current texture
+ *******************************************************************/
+void ZTextureEditorPanel::addPatch() {
+	// Do nothing if no texture is open
+	if (!tex_current)
+		return;
+
+	// Browse for patch
+	string patch = tx_editor->browsePatchEntry();
+	if (!patch.IsEmpty()) {
+        // Add new patch
+		tex_current->addPatch(patch, 0, 0);
+
+        // Update UI
+        populatePatchList();
+        updatePatchControls();
+    }
+
+	tex_modified = true;
+}
+
+/* ZTextureEditorPanel::replacePatch
+ * Prompts the user to select a patch any open resource to replace
+ * selectes patch(es) with
+ *******************************************************************/
+void ZTextureEditorPanel::replacePatch() {
+	// Get selection
+	wxArrayInt selection = list_patches->selectedItems();
+
+	// Do nothing if no patches are selected
+	if (selection.size() == 0)
+		return;
+
+	// Browse for patch
+	string patch = tx_editor->browsePatchEntry();
+	if (!patch.IsEmpty()) {
+		// Go through selection and replace each patch
+		for (size_t a = 0; a < selection.size(); a++)
+			tex_current->replacePatch(selection[a], patch);
+	}
+
+	// Repopulate patch list
+	populatePatchList();
+
+	// Restore selection
+	for (size_t a = 0; a < selection.size(); a++)
+		list_patches->selectItem(selection[a]);
+
+	// Update UI
+	updatePatchControls();
+
+	tex_modified = true;
+}
+
 
 
 
@@ -729,8 +786,12 @@ void ZTextureEditorPanel::onBtnEditTranslation(wxCommandEvent& e) {
 	CTPatchEx* patch = (CTPatchEx*)tex_current->getPatch(selection[0]);
 	trans.copy(patch->getTranslation());
 
+	// Add palette range if no translation ranges exist
+	if (trans.nRanges() == 0)
+		trans.addRange(TRANS_PALETTE, 0);
+
 	// Open translation editor dialog
-	TranslationEditorDialog ted(this, tex_canvas->getPalette(), "Edit Translation", patch->getPatchEntry(tx_editor->getArchive()));
+	TranslationEditorDialog ted(theMainWindow, tex_canvas->getPalette(), "Edit Translation", patch->getPatchEntry(tx_editor->getArchive()));
 	ted.openTranslation(trans);
 	if (ted.ShowModal() == wxID_OK) {
 		// Copy updated translation to all selected patches

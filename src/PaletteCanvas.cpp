@@ -45,6 +45,7 @@ PaletteCanvas::PaletteCanvas(wxWindow* parent, int id)
 	sel_begin = -1;
 	sel_end = -1;
 	double_width = false;
+	allow_selection = 0;
 
 	// Bind events
 	Bind(wxEVT_LEFT_DOWN,  &PaletteCanvas::onMouseLeftDown,  this);
@@ -202,27 +203,30 @@ void PaletteCanvas::setSelection(int begin, int end) {
  * Called when the palette canvas is left clicked
  *******************************************************************/
 void PaletteCanvas::onMouseLeftDown(wxMouseEvent& e) {
-	// Figure out what 'grid' position was clicked
-	int rows = 16;
-	int cols = 16;
-	if (double_width) {
-		rows = 8;
-		cols = 32;
+	// Handle selection if needed
+	if (allow_selection > 0) {
+		// Figure out what 'grid' position was clicked
+		int rows = 16;
+		int cols = 16;
+		if (double_width) {
+			rows = 8;
+			cols = 32;
+		}
+		int x_size = (GetSize().x) / cols;
+		int y_size = (GetSize().y) / rows;
+		int size = MIN(x_size, y_size);
+		int x = e.GetX() / size;
+		int y = e.GetY() / size;
+
+		// If it was within the palette box, select the cell
+		if (x >= 0 && x < cols && y >= 0 && y < rows)
+			setSelection(y * cols + x);
+		else
+			setSelection(-1);
+
+		// Redraw
+		Refresh();
 	}
-	int x_size = (GetSize().x) / cols;
-	int y_size = (GetSize().y) / rows;
-	int size = MIN(x_size, y_size);
-	int x = e.GetX() / size;
-	int y = e.GetY() / size;
-
-	// If it was within the palette box, select the cell
-	if (x >= 0 && x < cols && y >= 0 && y < rows)
-		setSelection(y * cols + x);
-	else
-		setSelection(-1);
-
-	// Redraw
-	Refresh();
 
 	// Do normal left click stuff
 	e.Skip();
@@ -241,7 +245,7 @@ void PaletteCanvas::onMouseRightDown(wxMouseEvent& e) {
  *******************************************************************/
 void PaletteCanvas::onMouseMotion(wxMouseEvent& e) {
 	// Check for dragging selection
-	if (e.LeftIsDown()) {
+	if (e.LeftIsDown() && allow_selection > 1) {
 		// Figure out what 'grid' position the cursor is over
 		int rows = 16;
 		int cols = 16;
@@ -258,9 +262,7 @@ void PaletteCanvas::onMouseMotion(wxMouseEvent& e) {
 		// Set selection accordingly
 		if (x >= 0 && x < cols && y >= 0 && y < rows) {
 			int sel = y * cols + x;
-			if (sel <= sel_begin)
-				setSelection(sel, sel_end);
-			else
+			if (sel > sel_begin)
 				setSelection(sel_begin, sel);
 
 			Refresh();

@@ -31,6 +31,7 @@
 #include "Main.h"
 #include "Palette.h"
 #include "Misc.h"
+#include "Translation.h"
 
 
 /*******************************************************************
@@ -245,4 +246,90 @@ size_t Palette8bit::countColours() {
 	}
 	delete[] usedcolours;
 	return used;
+}
+
+/* Palette8bit::applyTranslation
+ * Applies the translation [trans] to this palette
+ *******************************************************************/
+void Palette8bit::applyTranslation(Translation* trans) {
+	// Check translation was given
+	if (!trans)
+		return;
+
+	// Duplicate palette (so translation ranges don't interfere with eachother)
+	Palette8bit temp;
+	temp.copyPalette(this);
+
+	// Go through each translation component
+	for (unsigned a = 0; a < trans->nRanges(); a++) {
+		TransRange* r = trans->getRange(a);
+
+		// Palette range translation
+		if (r->getType() == TRANS_PALETTE) {
+			TransRangePalette* tp = (TransRangePalette*)r;
+
+			// Do remap
+			for (unsigned i = tp->oStart(); i <= tp->oEnd(); i++) {
+				// Figure out how far along the range this colour is
+				double range_frac = 0;
+				if (tp->oStart() != tp->oEnd())
+					range_frac = double(i - tp->oStart()) / double(tp->oEnd() - tp->oStart());
+
+				// Determine destination palette index
+				uint8_t di = tp->dStart() + range_frac * (tp->dEnd() - tp->dStart());
+
+				// Apply new colour
+				temp.setColour(i, colours[di]);
+			}
+		}
+
+		// Colour range
+		else if (r->getType() == TRANS_COLOUR) {
+			TransRangeColour* tc = (TransRangeColour*)r;
+
+			// Do remap
+			for (unsigned i = tc->oStart(); i <= tc->oEnd(); i++) {
+				// Figure out how far along the range this colour is
+				double range_frac = 0;
+				if (tc->oStart() != tc->oEnd())
+					range_frac = double(i - tc->oStart()) / double(tc->oEnd() - tc->oStart());
+
+				// Determine destination colour
+				uint8_t r = tc->dStart().r + range_frac * (tc->dEnd().r - tc->dStart().r);
+				uint8_t g = tc->dStart().g + range_frac * (tc->dEnd().g - tc->dStart().g);
+				uint8_t b = tc->dStart().b + range_frac * (tc->dEnd().b - tc->dStart().b);
+
+				// Find nearest colour in palette
+				uint8_t di = nearestColour(rgba_t(r, g, b));
+
+				// Apply new colour
+				temp.setColour(i, colours[di]);
+			}
+		}
+
+		// Desaturated colour range
+		else if (r->getType() == TRANS_DESAT) {
+			TransRangeDesat* td = (TransRangeDesat*)r;
+
+			// Do remap
+			for (unsigned i = td->oStart(); i <= td->oEnd(); i++) {
+				// Get greyscale colour
+				float grey = (colours[i].r*0.3f + colours[i].g*0.59f + colours[i].b*0.11f) / 255.0f;
+
+				// Determine destination colour
+				uint8_t r = MIN(255, int((td->dSr() + grey*(td->dEr() - td->dSr()))*255.0f));
+				uint8_t g = MIN(255, int((td->dSg() + grey*(td->dEg() - td->dSg()))*255.0f));
+				uint8_t b = MIN(255, int((td->dSb() + grey*(td->dEb() - td->dSb()))*255.0f));
+
+				// Find nearest colour in palette
+				uint8_t di = nearestColour(rgba_t(r, g, b));
+
+				// Apply new colour
+				temp.setColour(i, colours[di]);
+			}
+		}
+	}
+
+	// Load translated palette
+	copyPalette(&temp);
 }

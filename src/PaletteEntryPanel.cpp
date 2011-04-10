@@ -46,6 +46,7 @@ PaletteEntryPanel::PaletteEntryPanel(wxWindow* parent)
 : EntryPanel(parent, "palette") {
 	// Add palette canvas
 	pal_canvas = new PaletteCanvas(this, -1);
+	pal_canvas->allowSelection(1);
 	sizer_main->Add(pal_canvas->toPanel(this), 1, wxEXPAND, 0);
 
 	// Disable default entry buttons

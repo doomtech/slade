@@ -30,6 +30,7 @@ class TranslationEditorDialog : public wxDialog {
 private:
 	Palette8bit*	palette;
 	Translation		translation;
+	ArchiveEntry*	entry_preview;
 
 	PaletteCanvas*	pal_canvas_original;
 	wxListBox*		list_translations;
@@ -42,6 +43,7 @@ private:
 	wxRadioButton*	rb_type_palette;
 	wxRadioButton*	rb_type_colour;
 	wxRadioButton*	rb_type_desaturate;
+	wxTextCtrl*		text_string;
 
 	// Paletted target range
 	wxPanel*		panel_target_palette;
@@ -70,8 +72,10 @@ public:
 	void	setEndColour(rgba_t col);
 	void	showPaletteTarget();
 	void	showGradientTarget();
+	void	updatePreviews();
 
 	// Events
+	void	onSize(wxSizeEvent& e);
 	void	onTranslationListItemSelected(wxCommandEvent& e);
 	void	onRBPaletteSelected(wxCommandEvent& e);
 	void	onRBColourSelected(wxCommandEvent& e);

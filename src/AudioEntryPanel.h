@@ -14,8 +14,9 @@ using namespace audiere;
 
 class AudioEntryPanel : public EntryPanel {
 private:
-	string			prevfile;
-	bool			midi;
+	string	prevfile;
+	bool	midi;
+	bool	opened;
 
 #ifndef NO_AUDIERE
 	OutputStreamPtr	stream;
@@ -40,6 +41,7 @@ public:
 	bool	loadEntry(ArchiveEntry* entry);
 	bool	saveEntry();
 
+	bool	open();
 	bool	openAudio(string filename);
 	bool	openMidi(string filename);
 	void	startStream();

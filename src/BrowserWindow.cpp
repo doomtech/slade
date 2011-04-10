@@ -316,7 +316,7 @@ void BrowserWindow::populateItemTree() {
 
 	// Update window layout
 	tree_items->ExpandAll();
-	tree_items->SetInitialSize(wxDefaultSize);
+	tree_items->SetInitialSize(wxSize(130, -1));
 	Layout();
 	tree_items->CollapseAll();
 }

@@ -29,6 +29,7 @@ public:
 	~PatchBrowser();
 
 	bool	openPatchTable(PatchTable* table);
+	bool	openArchive(Archive* archive);
 	int		getSelectedPatch();
 	void	updateItems(BrowserTreeNode* node = NULL);
 

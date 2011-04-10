@@ -108,6 +108,9 @@ private:
 	int16_t	offset_x;
 	int16_t	offset_y;
 
+	// Editor info
+	uint8_t	state;
+
 public:
 	CTexture();
 	~CTexture();
@@ -129,6 +132,7 @@ public:
 	bool		nullTexture() { return null_texture; }
 	size_t		nPatches() { return patches.size(); }
 	CTPatch*	getPatch(size_t index);
+	uint8_t		getState() { return state; }
 
 	void	setName(string name) { this->name = name; }
 	void	setWidth(uint16_t width) { this->width = width; }
@@ -144,6 +148,7 @@ public:
 	void	setOptional(bool opt) { this->optional = opt; }
 	void	setNoDecals(bool nd) { this->no_decals = nd; }
 	void	setNullTexture(bool nt) { this->null_texture = nt; }
+	void	setState(uint8_t state) { this->state = state; }
 
 	void	clear();
 
