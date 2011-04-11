@@ -85,7 +85,7 @@
     <Filter Include="External">
       <UniqueIdentifier>{b8ed0eb6-a1df-4b4b-8a59-d56cf99d842b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="External\QMus2Mid">
+    <Filter Include="External\Mus2Mid">
       <UniqueIdentifier>{dda863ce-2d21-48cb-9de4-44e8e63b1326}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -366,9 +366,6 @@
     <ClCompile Include="src\Conversions.cpp">
       <Filter>Main Editor</Filter>
     </ClCompile>
-    <ClCompile Include="src\qmus2mid\qmus2mid.cpp">
-      <Filter>External\QMus2Mid</Filter>
-    </ClCompile>
     <ClCompile Include="src\TextStylePrefsPanel.cpp">
       <Filter>Dialogs\Preferences</Filter>
     </ClCompile>
@@ -446,6 +443,9 @@
     </ClCompile>
     <ClCompile Include="src\PNGPrefsPanel.cpp">
       <Filter>Dialogs\Preferences</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mus2mid\mus2mid.cpp">
+      <Filter>External\Mus2Mid</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -753,9 +753,6 @@
     <ClInclude Include="src\Conversions.h">
       <Filter>Main Editor</Filter>
     </ClInclude>
-    <ClInclude Include="src\qmus2mid\qmus2mid.h">
-      <Filter>External\QMus2Mid</Filter>
-    </ClInclude>
     <ClInclude Include="src\TextStylePrefsPanel.h">
       <Filter>Dialogs\Preferences</Filter>
     </ClInclude>
@@ -836,6 +833,9 @@
     </ClInclude>
     <ClInclude Include="src\PNGPrefsPanel.h">
       <Filter>Dialogs\Preferences</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mus2mid\mus2mid.h">
+      <Filter>External\Mus2Mid</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
