@@ -1313,14 +1313,32 @@
 			Name="External"
 			>
 			<Filter
-				Name="QMus2Mid"
+				Name="Mus2Mid"
 				>
 				<File
-					RelativePath=".\src\qmus2mid\qmus2mid.cpp"
+					RelativePath=".\src\mus2mid\mus2mid.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)\$(InputName)1.obj"
+							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)\$(InputName)1.obj"
+							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
-					RelativePath=".\src\qmus2mid\qmus2mid.h"
+					RelativePath=".\src\mus2mid\mus2mid.h"
 					>
 				</File>
 			</Filter>

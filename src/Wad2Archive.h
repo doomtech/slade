@@ -5,7 +5,7 @@
 #include "Archive.h"
 
 // From http://www.gamers.org/dEngine/quake/spec/quake-spec31.html#CWADF
-typedef struct
+struct wad2entry_t
 {
 	long offset;                 // Position of the entry in WAD
 	long dsize;                  // Size of the entry in WAD file
@@ -14,7 +14,7 @@ typedef struct
 	char cmprs;                  // Compression. 0 if none.
 	short dummy;                 // Not used
 	char name[16];               // 1 to 16 characters, '\0'-padded
-} wad2entry_t;
+};
 
 class Wad2Archive : public TreelessArchive {
 private:

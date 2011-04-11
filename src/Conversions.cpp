@@ -31,7 +31,7 @@
 #include "Archive.h"
 #include "Conversions.h"
 #include "ArchiveEntry.h"
-#include "qmus2mid/qmus2mid.h"
+#include "mus2mid/mus2mid.h"
 
 
 /*******************************************************************
@@ -254,23 +254,7 @@ bool Conversions::wavToDoomSnd(MemChunk& in, MemChunk& out) {
  * Converts mus data [in] to midi, written to [out]
  *******************************************************************/
 bool Conversions::musToMidi(MemChunk& in, MemChunk& out) {
-	string tempmidi = appPath("sladetemp.mid", DIR_TEMP);
-	string tempmus = appPath("sladetemp.mus", DIR_TEMP);
-
-	// Dump mus to temp file
-	in.exportFile(tempmus);
-
-	// Run qmus2mid
-	qmus2mid(CHR(tempmus), CHR(tempmidi), 1, 0, 128, 0);
-
-	// Read outputted midi to MemChunk
-	out.importFile(tempmidi);
-
-	// Clean up
-	wxRemoveFile(tempmidi);
-	wxRemoveFile(tempmus);
-
-	return true;
+	return mus2mid(in, out);
 }
 
 /* Conversions::vocToWav
