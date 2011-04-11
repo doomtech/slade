@@ -49,8 +49,12 @@
 string main_window_layout = "";
 MainWindow* MainWindow::instance = NULL;
 CVAR(Bool, show_start_page, true, CVAR_SAVE);
-CVAR(Bool, always_maximize, true, CVAR_SAVE);
 CVAR(String, global_palette, "", CVAR_SAVE);
+CVAR(Int, mw_width, 1024, CVAR_SAVE);
+CVAR(Int, mw_height, 768, CVAR_SAVE);
+CVAR(Int, mw_left, -1, CVAR_SAVE);
+CVAR(Int, mw_top, -1, CVAR_SAVE);
+CVAR(Bool, mw_maximized, true, CVAR_SAVE);
 
 
 /*******************************************************************
@@ -80,9 +84,9 @@ public:
  * MainWindow class constructor
  *******************************************************************/
 MainWindow::MainWindow()
-: wxFrame((wxFrame *) NULL, -1, "SLADE", wxPoint(0, 0), wxSize(1024, 768)) {
+: wxFrame((wxFrame *) NULL, -1, "SLADE", wxPoint(mw_left, mw_top), wxSize(mw_width, mw_height)) {
 	lasttipindex = 0;
-	if (always_maximize) Maximize();
+	if (mw_maximized) Maximize();
 	setupLayout();
 	SetDropTarget(new MainWindowDropTarget());
 }
@@ -308,9 +312,10 @@ void MainWindow::setupLayout() {
 
 	// Bind events
 	html_startpage->Bind(wxEVT_COMMAND_HTML_LINK_CLICKED, &MainWindow::onHTMLLinkClicked, this);
-	//Bind(wxEVT_COMMAND_MENU_SELECTED, &MainWindow::onMenuItemClicked, this);
+	Bind(wxEVT_SIZE, &MainWindow::onSize, this);
 	Bind(wxEVT_CLOSE_WINDOW, &MainWindow::onClose, this);
 	Bind(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED, &MainWindow::onTabChanged, this);
+	Bind(wxEVT_MOVE, &MainWindow::onMove, this);
 }
 
 /* MainWindow::createStartPage
@@ -397,6 +402,7 @@ bool MainWindow::exitProgram() {
 
 	// Save current layout
 	main_window_layout = m_mgr->SavePerspective();
+	mw_maximized = IsMaximized();
 
 	// Save selected palette
 	global_palette = palette_chooser->GetStringSelection();
@@ -622,5 +628,29 @@ void MainWindow::onTabChanged(wxAuiNotebookEvent& e) {
 	}
 
 	// Continue
+	e.Skip();
+}
+
+/* MainWindow::onSie
+ * Called when the window is resized
+ *******************************************************************/
+void MainWindow::onSize(wxSizeEvent& e) {
+	// Update window size settings, but only if not maximized
+	if (!IsMaximized()) {
+		mw_width = GetSize().x;
+		mw_height = GetSize().y;
+	}
+}
+
+/* MainWindow::onMove
+ * Called when the window moves
+ *******************************************************************/
+void MainWindow::onMove(wxMoveEvent& e) {
+	// Update window position settings, but only if not maximized
+	if (!IsMaximized()) {
+		mw_left = GetPosition().x;
+		mw_top = GetPosition().y;
+	}
+
 	e.Skip();
 }

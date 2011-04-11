@@ -148,7 +148,7 @@ public:
  *******************************************************************/
 TextureXEditor::TextureXEditor(wxWindow* parent) : wxPanel(parent, -1) {
 	// Init variables
-	this->archive = archive;
+	this->archive = NULL;
 	this->pnames = NULL;
 	SetName("texturex");
 

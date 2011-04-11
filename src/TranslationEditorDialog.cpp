@@ -72,19 +72,18 @@ TranslationEditorDialog::TranslationEditorDialog(wxWindow* parent, Palette8bit* 
 	entry_preview = preview_image;
 
 	// Create sizer
-	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
-	SetSizer(sizer);
+	wxBoxSizer* mainsizer = new wxBoxSizer(wxVERTICAL);
+	wxGridBagSizer* sizer = new wxGridBagSizer(4, 4);
+	mainsizer->Add(sizer, 1, wxEXPAND|wxALL, 4);
+	SetSizer(mainsizer);
 
 
 	// --- Top half (translation origin) ---
 
 	// Translations list
-	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
-	sizer->Add(hbox, 0, wxEXPAND|wxALL, 4);
-
 	wxStaticBox *frame = new wxStaticBox(this, -1, "Translation Ranges");
 	wxStaticBoxSizer *framesizer = new wxStaticBoxSizer(frame, wxHORIZONTAL);
-	hbox->Add(framesizer, 0, wxEXPAND|wxALL, 4);
+	sizer->Add(framesizer, wxGBPosition(0, 0), wxDefaultSpan, wxEXPAND);
 
 	list_translations = new wxListBox(this, -1);
 	framesizer->Add(list_translations, 1, wxEXPAND|wxLEFT|wxBOTTOM|wxRIGHT, 4);
@@ -112,7 +111,7 @@ TranslationEditorDialog::TranslationEditorDialog(wxWindow* parent, Palette8bit* 
 	// Origin range
 	frame = new wxStaticBox(this, -1, "Origin Range");
 	framesizer = new wxStaticBoxSizer(frame, wxHORIZONTAL);
-	hbox->Add(framesizer, 1, wxEXPAND|wxTOP|wxBOTTOM|wxRIGHT, 4);
+	sizer->Add(framesizer, wxGBPosition(0, 1), wxDefaultSpan, wxEXPAND);
 
 	// Origin palette
 	pal_canvas_original = new PaletteCanvas(this, -1);
@@ -120,18 +119,15 @@ TranslationEditorDialog::TranslationEditorDialog(wxWindow* parent, Palette8bit* 
 	pal_canvas_original->setPalette(palette);
 	pal_canvas_original->SetInitialSize(wxSize(450, 114));
 	pal_canvas_original->allowSelection(2);
-	framesizer->Add(pal_canvas_original, 1, wxEXPAND|wxLEFT|wxBOTTOM|wxRIGHT, 4);
+	framesizer->Add(pal_canvas_original->toPanel(this), 0, wxEXPAND|wxLEFT|wxBOTTOM|wxRIGHT, 4);
 
 
 	// --- Bottom half (translation target) ---
 
 	// Target type
-	hbox = new wxBoxSizer(wxHORIZONTAL);
-	sizer->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
-
 	frame = new wxStaticBox(this, -1, "Target Range Type");
 	framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
-	hbox->Add(framesizer, 0, wxEXPAND|wxBOTTOM|wxLEFT|wxRIGHT, 4);
+	sizer->Add(framesizer, wxGBPosition(1, 0), wxDefaultSpan, wxEXPAND);
 
 	// Palette range
 	rb_type_palette = new wxRadioButton(this, -1, "Palette Range", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
@@ -149,7 +145,7 @@ TranslationEditorDialog::TranslationEditorDialog(wxWindow* parent, Palette8bit* 
 	// Target range
 	frame = new wxStaticBox(this, -1, "Target Range");
 	framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
-	hbox->Add(framesizer, 1, wxEXPAND|wxBOTTOM|wxRIGHT, 4);
+	sizer->Add(framesizer, wxGBPosition(1, 1), wxDefaultSpan, wxEXPAND);
 
 
 	// Target palette range panel
@@ -163,7 +159,7 @@ TranslationEditorDialog::TranslationEditorDialog(wxWindow* parent, Palette8bit* 
 	pal_canvas_target->setPalette(palette);
 	pal_canvas_target->SetInitialSize(wxSize(450, 114));
 	pal_canvas_target->allowSelection(2);
-	vbox->Add(pal_canvas_target, 1, wxEXPAND);
+	vbox->Add(pal_canvas_target->toPanel(panel_target_palette), 1, wxEXPAND);
 
 
 	// Target colour gradient panel
@@ -173,7 +169,7 @@ TranslationEditorDialog::TranslationEditorDialog(wxWindow* parent, Palette8bit* 
 
 	// Start colour
 	vbox->AddStretchSpacer();
-	hbox = new wxBoxSizer(wxHORIZONTAL);
+	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
 	vbox->Add(hbox, 0, wxEXPAND|wxBOTTOM, 4);
 
 	cp_range_begin = new wxColourPickerCtrl(panel_target_gradient, -1, WXCOL(COL_BLACK));
@@ -188,7 +184,7 @@ TranslationEditorDialog::TranslationEditorDialog(wxWindow* parent, Palette8bit* 
 
 	// Gradient preview
 	gb_gradient = new GradientBox(panel_target_gradient);
-	vbox->Add(gb_gradient, 0, wxEXPAND);
+	vbox->Add(gb_gradient->toPanel(panel_target_palette), 0, wxEXPAND);
 	vbox->AddStretchSpacer();
 
 	// Show initial target panel (palette)
@@ -198,42 +194,42 @@ TranslationEditorDialog::TranslationEditorDialog(wxWindow* parent, Palette8bit* 
 
 	// --- Preview section ---
 	hbox = new wxBoxSizer(wxHORIZONTAL);
-	sizer->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+	sizer->Add(hbox, wxGBPosition(2, 0), wxGBSpan(1, 2), wxEXPAND);
 
 	// Palette preview
 	frame = new wxStaticBox(this, -1, "Resulting Palette");
 	framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
-	hbox->Add(framesizer, 0, wxEXPAND|wxLEFT|wxBOTTOM|wxRIGHT, 4);
+	hbox->Add(framesizer, 0, wxEXPAND|wxRIGHT, 4);
 
 	pal_canvas_preview = new PaletteCanvas(this, -1);
 	pal_canvas_preview->SetInitialSize(wxSize(226, 226));
 	pal_canvas_preview->setPalette(palette);
-	framesizer->Add(pal_canvas_preview, 1, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+	framesizer->Add(pal_canvas_preview->toPanel(this), 1, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
 	// Image preview
 	frame = new wxStaticBox(this, -1, "Preview");
 	framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
-	hbox->Add(framesizer, 1, wxEXPAND|wxBOTTOM|wxRIGHT, 4);
+	hbox->Add(framesizer, 1, wxEXPAND);
 
 	gfx_preview = new GfxCanvas(this, -1);
 	gfx_preview->setPalette(palette);
 	gfx_preview->setViewType(GFXVIEW_CENTERED);
 	if (entry_preview) Misc::loadImageFromEntry(gfx_preview->getImage(), entry_preview);
-	framesizer->Add(gfx_preview, 1, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+	framesizer->Add(gfx_preview->toPanel(this), 1, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
 
 	// --- Translation string ---
 	hbox = new wxBoxSizer(wxHORIZONTAL);
-	sizer->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+	sizer->Add(hbox, wxGBPosition(3, 0), wxGBSpan(1, 2), wxEXPAND);
 
 	text_string = new wxTextCtrl(this, -1, "", wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
-	hbox->Add(new wxStaticText(this, -1, "Translation String:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT|wxLEFT, 4);
-	hbox->Add(text_string, 1, wxEXPAND|wxRIGHT, 4);
+	hbox->Add(new wxStaticText(this, -1, "Translation String:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
+	hbox->Add(text_string, 1, wxEXPAND);
 
 
 	// --- Dialog buttons ---
 	wxSizer* buttonsizer = CreateButtonSizer(wxOK|wxCANCEL);
-	sizer->Add(buttonsizer, 0, wxEXPAND|wxALL, 4);
+	sizer->Add(buttonsizer, wxGBPosition(4, 0), wxGBSpan(1, 2), wxEXPAND);
 
 	// Load button
 	btn_load = new wxButton(this, -1, "Load from File");

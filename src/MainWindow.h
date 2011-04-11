@@ -63,8 +63,10 @@ public:
 	// Events
 	void	onMenuItemClicked(wxCommandEvent &e);
 	void	onHTMLLinkClicked(wxHtmlLinkEvent &e);
-	void	onClose(wxCloseEvent &e);
+	void	onClose(wxCloseEvent& e);
 	void	onTabChanged(wxAuiNotebookEvent& e);
+	void	onSize(wxSizeEvent& e);
+	void	onMove(wxMoveEvent& e);
 };
 
 // Define for less cumbersome MainWindow::getInstance()
