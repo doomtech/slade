@@ -33,6 +33,7 @@
 #include "PreferencesDialog.h"
 #include "ArchiveManager.h"
 #include "TextEditorPrefsPanel.h"
+#include "Icons.h"
 #include <wx/gbsizer.h>
 
 
@@ -47,6 +48,11 @@ PreferencesDialog::PreferencesDialog(wxWindow* parent) : wxDialog(parent, -1, "S
 	// Setup main sizer
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 	SetSizer(sizer);
+
+	// Set dialog icon
+	wxIcon icon;
+	icon.CopyFromBitmap(getIcon("t_settings"));
+	SetIcon(icon);
 
 	// Create preferences TreeBook
 	tree_prefs = new wxTreebook(this, -1, wxDefaultPosition, wxDefaultSize);

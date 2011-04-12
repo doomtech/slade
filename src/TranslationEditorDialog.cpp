@@ -6,6 +6,7 @@
 #include "MathStuff.h"
 #include "Tokenizer.h"
 #include "Misc.h"
+#include "ArchiveManager.h"
 #include <wx/ffile.h>
 #include <wx/gbsizer.h>
 
@@ -70,6 +71,11 @@ TranslationEditorDialog::TranslationEditorDialog(wxWindow* parent, Palette8bit* 
 	// Init variables
 	palette = pal;
 	entry_preview = preview_image;
+
+	// Set dialog icon
+	wxIcon icon;
+	icon.CopyFromBitmap(getIcon("t_remap"));
+	SetIcon(icon);
 
 	// Create sizer
 	wxBoxSizer* mainsizer = new wxBoxSizer(wxVERTICAL);

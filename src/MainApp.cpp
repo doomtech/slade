@@ -304,12 +304,12 @@ void MainApp::initLogFile() {
  *******************************************************************/
 void MainApp::initActions() {
 	// MainWindow
-	new SAction("main_exit", "E&xit", "", "Quit SLADE");
+	new SAction("main_exit", "E&xit", "t_exit", "Quit SLADE");
 	new SAction("main_setbra", "Set &Base Resource Archive", "e_archive", "Set the Base Resource Archive, to act as the program 'IWAD'");
 	new SAction("main_preferences", "&Preferences...", "t_settings", "Setup SLADE options and preferences");
-	new SAction("main_showam", "&Archive Manager", "", "Toggle the Archive Manager window", "Ctrl+1");
-	new SAction("main_showconsole", "&Console", "", "Toggle the Console window", "Ctrl+2");
-	new SAction("main_onlinedocs", "Online &Documentation", "", "View SLADE documentation online");
+	new SAction("main_showam", "&Archive Manager", "e_archive", "Toggle the Archive Manager window", "Ctrl+1");
+	new SAction("main_showconsole", "&Console", "t_console", "Toggle the Console window", "Ctrl+2");
+	new SAction("main_onlinedocs", "Online &Documentation", "t_wiki", "View SLADE documentation online");
 	new SAction("main_about", "&About", "i_logo", "Informaton about SLADE");
 
 	// ArchiveManagerPanel
@@ -321,8 +321,8 @@ void MainApp::initActions() {
 	new SAction("aman_closeall", "Close All", "t_closeall", "Close all open Archives");
 	new SAction("aman_recent_open", "Open", "t_open", "Open the selected Archive(s)");
 	new SAction("aman_recent_remove", "Remove", "t_close", "Remove the selected Archive(s) from the recent list");
-	new SAction("aman_bookmark_go", "Go To", "", "Go to the selected bookmark");
-	new SAction("aman_bookmark_remove", "Remove", "", "Remove the selected bookmark(s) from the list");
+	new SAction("aman_bookmark_go", "Go To", "t_open", "Go to the selected bookmark");
+	new SAction("aman_bookmark_remove", "Remove", "t_close", "Remove the selected bookmark(s) from the list");
 
 	// Recent files
 	new SAction("aman_recent1", "<insert recent file name>", "");
@@ -344,7 +344,7 @@ void MainApp::initActions() {
 	new SAction("arch_clean_patches", "Remove Unused &Patches", "", "Remove any unused patches, and their associated entries");
 	new SAction("arch_entry_rename", "Rename", "t_rename", "Rename the selected entries");
 	new SAction("arch_entry_delete", "Delete", "t_delete", "Delete the selected entries");
-	new SAction("arch_entry_revert", "Revert", "", "Revert any modifications made to the selected entries since the last save");
+	new SAction("arch_entry_revert", "Revert", "t_revert", "Revert any modifications made to the selected entries since the last save");
 	new SAction("arch_entry_cut", "Cut", "t_cut", "Cut the selected entries");
 	new SAction("arch_entry_copy", "Copy", "t_copy", "Copy the selected entries");
 	new SAction("arch_entry_paste", "Paste", "t_paste", "Paste the selected entries");
@@ -352,30 +352,30 @@ void MainApp::initActions() {
 	new SAction("arch_entry_movedown", "Move Down", "t_down", "Move the selected entries down");
 	new SAction("arch_entry_import", "Import", "t_import", "Import a file to the selected entry");
 	new SAction("arch_entry_export", "Export", "t_export", "Export the selected entries to files");
-	new SAction("arch_entry_bookmark", "Bookmark", "", "Bookmark the current entry");
+	new SAction("arch_entry_bookmark", "Bookmark", "t_bookmark", "Bookmark the current entry");
 	new SAction("arch_bas_convert", "Convert to ANIMDEFS", "", "Convert any selected SWITCHES and ANIMATED entries to a single ANIMDEFS entry");
 	new SAction("arch_texturex_convertzd", "Convert to TEXTURES", "", "Convert any selected TEXTUREx entries to ZDoom TEXTURES format");
 	new SAction("arch_view_text", "View as Text", "e_text", "Open the selected entry in the text editor, regardless of type");
 	new SAction("arch_view_hex", "View as Hex", "e_data", "Open the selected entry in the hex editor, regardless of type");
-	new SAction("arch_gfx_convert", "Convert to...", "", "Open the Gfx Conversion Dialog for any selected gfx entries");
-	new SAction("arch_gfx_offsets", "Modify Gfx Offsets", "", "Mass-modify the offsets for any selected gfx entries");
+	new SAction("arch_gfx_convert", "Convert to...", "t_convert", "Open the Gfx Conversion Dialog for any selected gfx entries");
+	new SAction("arch_gfx_offsets", "Modify Gfx Offsets", "t_offset", "Mass-modify the offsets for any selected gfx entries");
 	new SAction("arch_gfx_addptable", "Add to Patch Table", "e_pnames", "Add selected gfx entries to PNAMES");
 	new SAction("arch_gfx_addtexturex", "Add to TEXTUREx", "e_texturex", "Create textures from selected gfx entries and add them to TEXTUREx");
 	new SAction("arch_gfx_exportpng", "Export as PNG", "t_export", "Export selected gfx entries to PNG format files");
 	new SAction("arch_gfx_pngopt", "Optimize PNG", "t_pngopt", "Optimize PNG entries");
-	new SAction("arch_audio_convertwd", "Convert WAV to Doom Sound", "", "Convert any selected WAV format entries to Doom Sound format");
-	new SAction("arch_audio_convertdw", "Convert Doom Sound to WAV", "", "Convert any selected Doom Sound format entries to WAV format");
-	new SAction("arch_audio_convertmus", "Convert MUS to MIDI", "", "Convert any selected MUS format entries to MIDI format");
-	new SAction("arch_scripts_compileacs", "Compile ACS", "", "Compile any selected text entries to ACS bytecode");
-	new SAction("arch_scripts_compilehacs", "Compile ACS (Hexen bytecode)", "", "Compile any selected text entries to Hexen-compatible ACS bytecode");
+	new SAction("arch_audio_convertwd", "Convert WAV to Doom Sound", "t_convert", "Convert any selected WAV format entries to Doom Sound format");
+	new SAction("arch_audio_convertdw", "Convert Doom Sound to WAV", "t_convert", "Convert any selected Doom Sound format entries to WAV format");
+	new SAction("arch_audio_convertmus", "Convert MUS to MIDI", "t_convert", "Convert any selected MUS format entries to MIDI format");
+	new SAction("arch_scripts_compileacs", "Compile ACS", "t_compile", "Compile any selected text entries to ACS bytecode");
+	new SAction("arch_scripts_compilehacs", "Compile ACS (Hexen bytecode)", "t_compile", "Compile any selected text entries to Hexen-compatible ACS bytecode");
 
 	// GfxEntryPanel
-	new SAction("pgfx_mirror", "Mirror", "", "Mirror the graphic horizontally");
-	new SAction("pgfx_flip", "Flip", "", "Flip the graphic vertically");
-	new SAction("pgfx_rotate", "Rotate", "", "Rotate the graphic");
-	new SAction("pgfx_translate", "Colour Remap", "", "Remap a range of colours in the graphic to another range (paletted gfx only)");
-	new SAction("pgfx_colourise", "Colourise", "", "Colourise the graphic");
-	new SAction("pgfx_tint", "Tint", "", "Tint the graphic by a colour/amount");
+	new SAction("pgfx_mirror", "Mirror", "t_mirror", "Mirror the graphic horizontally");
+	new SAction("pgfx_flip", "Flip", "t_flip", "Flip the graphic vertically");
+	new SAction("pgfx_rotate", "Rotate", "t_rotate", "Rotate the graphic");
+	new SAction("pgfx_translate", "Colour Remap", "t_remap", "Remap a range of colours in the graphic to another range (paletted gfx only)");
+	new SAction("pgfx_colourise", "Colourise", "t_colourise", "Colourise the graphic");
+	new SAction("pgfx_tint", "Tint", "t_tint", "Tint the graphic by a colour/amount");
 	new SAction("pgfx_alph", "alPh Chunk", "", "Add/Remove alPh chunk to/from the PNG", "", SAction::CHECK);
 	new SAction("pgfx_trns", "tRNS Chunk", "", "Add/Remove tRNS chunk to/from the PNG", "", SAction::CHECK);
 	new SAction("pgfx_extract", "Extract All", "", "Extract all images in this entry to separate PNGs");
@@ -402,6 +402,7 @@ bool MainApp::OnInit() {
 	// Init global variables
 	Global::error = "";
 	ArchiveManager::getInstance();
+	init_ok = false;
 
 	// Init variables
 	action_invalid = new SAction("invalid", "Invalid Action", "", "Something's gone wrong here");
@@ -477,6 +478,7 @@ bool MainApp::OnInit() {
 	// Hide splash screen
 	theSplashWindow->hide();
 
+	init_ok = true;
 	wxLogMessage("SLADE Initialisation OK");
 
 	// Bind events

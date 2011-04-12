@@ -36,6 +36,7 @@
 #include "Misc.h"
 #include "PaletteManager.h"
 #include "SplashWindow.h"
+#include "Icons.h"
 
 
 /*******************************************************************
@@ -48,6 +49,12 @@
 GfxConvDialog::GfxConvDialog()
 : wxDialog(NULL, -1, "Graphic Format Conversion", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER) {
 	current_entry = 0;
+
+	// Set dialog icon
+	wxIcon icon;
+	icon.CopyFromBitmap(getIcon("t_convert"));
+	SetIcon(icon);
+
 	setupLayout();
 }
 

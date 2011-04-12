@@ -36,6 +36,7 @@ private:
 	SAction*				action_invalid;
 	vector<SAction*>		actions;
 	vector<SActionHandler*>	action_handlers;
+	bool					init_ok;
 
 public:
 	virtual bool OnInit();
@@ -49,6 +50,7 @@ public:
 	void	initActions();
 	void	readConfigFile();
 	void	saveConfigFile();
+	bool	isInitialised() { return init_ok; }
 
 	int			newMenuId() { return cur_id++; }
 	SAction*	getAction(string id);

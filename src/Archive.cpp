@@ -875,19 +875,11 @@ bool Archive::swapEntries(unsigned index1, unsigned index2, ArchiveTreeNode* dir
 	// Do swap
 	if (dir->swapEntries(index1, index2)) {
 		// Announce the swap
-		/* Below shouldn't be needed, and is probably pretty slow when swapping many entries at once
-		MemChunk mc(16);
-		int i1 = index1;
-		int i2 = index2;
-		wxUIntPtr ptr1 = wxPtrToUInt(dir->getEntry(index1));
-		wxUIntPtr ptr2 = wxPtrToUInt(dir->getEntry(index2));
-		mc.write(&i1, sizeof(int));
-		mc.write(&i2, sizeof(int));
-		mc.write(&ptr1, sizeof(wxUIntPtr));
-		mc.write(&ptr2, sizeof(wxUIntPtr));
-		announce("entries_swapped", mc);
-		*/
 		announce("entries_swapped");
+
+		// Set modified
+		setModified(true);
+		
 		return true;
 	}
 	else

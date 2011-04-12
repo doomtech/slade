@@ -32,6 +32,7 @@
 #include "WxStuff.h"
 #include "ModifyOffsetsDialog.h"
 #include "Console.h"
+#include "Icons.h"
 
 
 /*******************************************************************
@@ -46,6 +47,11 @@ ModifyOffsetsDialog::ModifyOffsetsDialog()
 	// Create main sizer
 	wxBoxSizer *m_vbox = new wxBoxSizer(wxVERTICAL);
 	SetSizer(m_vbox);
+
+	// Set dialog icon
+	wxIcon icon;
+	icon.CopyFromBitmap(getIcon("t_offset"));
+	SetIcon(icon);
 
 	// Setup layout
 	wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);

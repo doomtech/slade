@@ -62,6 +62,11 @@ public:
 		this->entry = entry;
 		this->palette = pal;
 
+		// Set dialog icon
+		wxIcon icon;
+		icon.CopyFromBitmap(getIcon("t_colourise"));
+		SetIcon(icon);
+
 		// Setup main sizer
 		wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 		SetSizer(sizer);
@@ -145,6 +150,11 @@ public:
 		// Init variables
 		this->entry = entry;
 		this->palette = pal;
+
+		// Set dialog icon
+		wxIcon icon;
+		icon.CopyFromBitmap(getIcon("t_tint"));
+		SetIcon(icon);
 
 		// Setup main sizer
 		wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);

@@ -637,7 +637,7 @@ bool ArchivePanel::moveUp() {
 
 	// Move each one up by swapping it with the entry above it
 	for (size_t a = 0; a < selection.size(); a++)
-		archive->swapEntries(entry_list->getEntryIndex(selection[a]), entry_list->getEntryIndex(selection[a]-1));
+		archive->swapEntries(entry_list->getEntryIndex(selection[a]), entry_list->getEntryIndex(selection[a]-1), entry_list->getCurrentDir());
 
 	// Update selection
 	entry_list->clearSelection();
@@ -666,7 +666,7 @@ bool ArchivePanel::moveDown() {
 
 	// Move each one down by swapping it with the entry below it
 	for (int a = selection.size()-1; a >= 0; a--)
-		archive->swapEntries(entry_list->getEntryIndex(selection[a]), entry_list->getEntryIndex(selection[a]+1));
+		archive->swapEntries(entry_list->getEntryIndex(selection[a]), entry_list->getEntryIndex(selection[a]+1), entry_list->getCurrentDir());
 
 	// Update selection
 	entry_list->clearSelection();
