@@ -39,6 +39,9 @@ private:
 	bool					init_ok;
 
 public:
+	MainApp();
+	~MainApp();
+
 	virtual bool OnInit();
 	virtual int OnExit();
 	virtual void OnFatalException();

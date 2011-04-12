@@ -226,6 +226,22 @@ void SLADELog::DoLogText(const wxString& msg) {
  *******************************************************************/
 IMPLEMENT_APP(MainApp)
 
+/* MainApp::MainApp
+ * MainApp class constructor
+ *******************************************************************/
+MainApp::MainApp() {
+	main_window = NULL;
+	cur_id = 0;
+	action_invalid = NULL;
+	init_ok = false;
+}
+
+/* MainApp::~MainApp
+ * MainApp class destructor
+ *******************************************************************/
+MainApp::~MainApp() {
+}
+
 /* MainApp::initDirectories
  * Checks for and creates necessary application directories. Returns
  * true if all directories existed and were created successfully if

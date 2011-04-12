@@ -64,15 +64,16 @@ PaletteCanvas::~PaletteCanvas() {
  *******************************************************************/
 void PaletteCanvas::draw() {
 	// Setup the viewport
-	glViewport(0, 0, GetClientSize().x, GetClientSize().y);
+	glViewport(0, 0, GetSize().x, GetSize().y);
 
 	// Setup the screen projection
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(0, GetClientSize().x, GetClientSize().y, 0, -1, 1);
+	glOrtho(0, GetSize().x, GetSize().y, 0, -1, 1);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
+	glDisable(GL_DEPTH_TEST);
 
 	// Clear
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
