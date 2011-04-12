@@ -29,9 +29,15 @@
       <File Name="src/EditingPrefsPanel.cpp"/>
       <File Name="src/ACSPrefsPanel.h"/>
       <File Name="src/ACSPrefsPanel.cpp"/>
+      <File Name="src/InterfacePrefsPanel.cpp"/>
+      <File Name="src/InterfacePrefsPanel.h"/>
+      <File Name="src/PNGPrefsPanel.cpp"/>
+      <File Name="src/PNGPrefsPanel.h"/>
     </VirtualDirectory>
     <File Name="src/ExtMessageDialog.h"/>
     <File Name="src/ExtMessageDialog.cpp"/>
+    <File Name="src/TranslationEditorDialog.cpp"/>
+    <File Name="src/TranslationEditorDialog.h"/>
   </VirtualDirectory>
   <VirtualDirectory Name="General">
     <File Name="src/Clipboard.cpp"/>
@@ -67,8 +73,8 @@
       <File Name="src/Parser.cpp"/>
       <File Name="src/CodePages.cpp"/>
       <File Name="src/CodePages.h"/>
-      <File Name="src/Math.h"/>
-      <File Name="src/Math.cpp"/>
+      <File Name="src/MathStuff.cpp"/>
+      <File Name="src/MathStuff.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Console">
       <File Name="src/Console.cpp"/>
@@ -77,6 +83,8 @@
     </VirtualDirectory>
     <File Name="src/MIDIPlayer.h"/>
     <File Name="src/MIDIPlayer.cpp"/>
+    <File Name="src/SAction.cpp"/>
+    <File Name="src/SAction.h"/>
   </VirtualDirectory>
   <VirtualDirectory Name="Main Editor">
     <VirtualDirectory Name="UI Elements">
@@ -315,24 +323,12 @@
     <File Name="Makefile-no_audiere"/>
   </VirtualDirectory>
   <VirtualDirectory Name="External">
-    <VirtualDirectory Name="QMus2Mid">
-      <File Name="src/qmus2mid/qmus2mid.cpp"/>
-      <File Name="src/qmus2mid/qmus2mid.h"/>
+    <VirtualDirectory Name="Mus2Mid">
+      <File Name="src/mus2mid/mus2mid.cpp"/>
+      <File Name="src/mus2mid/mus2mid.h"/>
     </VirtualDirectory>
   </VirtualDirectory>
   <Settings Type="Executable">
-    <GlobalSettings>
-      <Compiler Options="" C_Options="">
-        <IncludePath Value="."/>
-      </Compiler>
-      <Linker Options="">
-        <LibraryPath Value="."/>
-        <Library Value="freeimage"/>
-        <Library Value="audiere"/>
-        <Library Value="fluidsynth"/>
-      </Linker>
-      <ResourceCompiler Options=""/>
-    </GlobalSettings>
     <Configuration Name="Debug" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
       <Compiler Options="-g;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=yes)" C_Options="-g;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=yes)" Required="yes" PreCompiledHeader="">
         <Preprocessor Value="__WX__"/>
@@ -392,5 +388,17 @@
         <CustomPreBuild/>
       </AdditionalRules>
     </Configuration>
+    <GlobalSettings>
+      <Compiler Options="">
+        <IncludePath Value="."/>
+        <Preprocessor Value="NO_AUDIERE"/>
+      </Compiler>
+      <Linker Options="">
+        <LibraryPath Value="."/>
+        <Library Value="freeimage"/>
+        <Library Value="fluidsynth"/>
+      </Linker>
+      <ResourceCompiler Options=""/>
+    </GlobalSettings>
   </Settings>
 </CodeLite_Project>

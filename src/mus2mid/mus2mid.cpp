@@ -31,6 +31,10 @@
 
 #include "mus2mid.h"
 
+#ifndef byte
+#define byte uint8_t
+#endif
+
 // MUS event codes
 enum musevent
 {

@@ -463,6 +463,7 @@ bool MainApp::OnInit() {
 	initActions();
 
 	// Show the main window
+	SetTopWindow(theMainWindow);
 	theMainWindow->Show(true);
 	theSplashWindow->SetParent(theMainWindow);
 	theSplashWindow->CentreOnParent();

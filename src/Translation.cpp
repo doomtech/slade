@@ -2,7 +2,6 @@
 #include "Main.h"
 #include "Translation.h"
 #include "Tokenizer.h"
-#include "Math.h"
 
 Translation::Translation() {
 }
