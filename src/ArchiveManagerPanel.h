@@ -113,6 +113,7 @@ public:
 	void	onListBookmarksRightClick(wxListEvent& e);
 	void	onListMapsChanged(wxCommandEvent& e);
 	void	onListMapsActivated(wxListEvent& e);
+	void	onArchiveTabChanging(wxAuiNotebookEvent& e);
 	void	onArchiveTabChanged(wxAuiNotebookEvent& e);
 	void	onArchiveTabClose(wxAuiNotebookEvent& e);
 	void	onAMTabChanged(wxAuiNotebookEvent& e);

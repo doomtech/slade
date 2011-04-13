@@ -41,6 +41,7 @@
 #include "SplashWindow.h"
 #include <wx/aboutdlg.h>
 #include <wx/dnd.h>
+#include <wx/statline.h>
 
 
 /*******************************************************************
@@ -189,39 +190,6 @@ void MainWindow::setupLayout() {
 	theApp->getAction("main_setbra")->addToMenu(editorMenu);
 	theApp->getAction("main_preferences")->addToMenu(editorMenu);
 	menu->Append(editorMenu, "E&ditor");
-
-	// Archive menu
-	wxMenu* archiveNewMenu = new wxMenu("");
-	theApp->getAction("arch_newentry")->addToMenu(archiveNewMenu, "&Entry");
-	theApp->getAction("arch_newdir")->addToMenu(archiveNewMenu, "&Directory");
-	wxMenu* archiveMenu = new wxMenu("");
-	archiveMenu->AppendSubMenu(archiveNewMenu, "&New");
-	theApp->getAction("arch_importfiles")->addToMenu(archiveMenu);
-	archiveMenu->AppendSeparator();
-	theApp->getAction("arch_texeditor")->addToMenu(archiveMenu);
-	wxMenu* archiveCleanMenu = new wxMenu("");
-	theApp->getAction("arch_clean_patches")->addToMenu(archiveCleanMenu);
-	archiveMenu->AppendSubMenu(archiveCleanMenu, "Clean &Up");
-	menu->Append(archiveMenu, "&Archive");
-
-	// Entry menu
-	wxMenu* entryMenu = new wxMenu("");
-	theApp->getAction("arch_entry_rename")->addToMenu(entryMenu);
-	theApp->getAction("arch_entry_delete")->addToMenu(entryMenu);
-	theApp->getAction("arch_entry_revert")->addToMenu(entryMenu);
-	entryMenu->AppendSeparator();
-	theApp->getAction("arch_entry_cut")->addToMenu(entryMenu);
-	theApp->getAction("arch_entry_copy")->addToMenu(entryMenu);
-	theApp->getAction("arch_entry_paste")->addToMenu(entryMenu);
-	entryMenu->AppendSeparator();
-	theApp->getAction("arch_entry_moveup")->addToMenu(entryMenu);
-	theApp->getAction("arch_entry_movedown")->addToMenu(entryMenu);
-	entryMenu->AppendSeparator();
-	theApp->getAction("arch_entry_import")->addToMenu(entryMenu);
-	theApp->getAction("arch_entry_export")->addToMenu(entryMenu);
-	entryMenu->AppendSeparator();
-	theApp->getAction("arch_entry_bookmark")->addToMenu(entryMenu);
-	menu->Append(entryMenu, "&Entry");
 
 	// View menu
 	wxMenu* viewMenu = new wxMenu("");
@@ -405,7 +373,7 @@ bool MainWindow::exitProgram() {
 	mw_maximized = IsMaximized();
 
 	// Save selected palette
-	global_palette = palette_chooser->GetStringSelection();
+	//global_palette = palette_chooser->GetStringSelection();
 
 	// Exit application
 	wxTheApp->Exit();
@@ -455,9 +423,9 @@ void MainWindow::openEntry(ArchiveEntry* entry) {
  * Adds [menu] to the menu bar after the 'Entry' menu
  *******************************************************************/
 void MainWindow::addCustomMenu(wxMenu* menu, string title) {
-	// Insert custom menus between 'Entry' and 'View' menus
+	// Insert custom menus between 'Editor' and 'View' menus
 	if (GetMenuBar()->FindMenu(title) == wxNOT_FOUND) {
-		GetMenuBar()->Insert(4, menu, title);
+		GetMenuBar()->Insert(GetMenuBar()->FindMenu("&View"), menu, title);
 		GetMenuBar()->Refresh();
 	}
 }

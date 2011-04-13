@@ -172,6 +172,7 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
 	list_bookmarks->Bind(wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK, &ArchiveManagerPanel::onListBookmarksRightClick, this);
 	list_maps->Bind(wxEVT_COMMAND_LISTBOX_SELECTED, &ArchiveManagerPanel::onListMapsChanged, this);
 	list_maps->Bind(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, &ArchiveManagerPanel::onListMapsActivated, this);
+	notebook_archives->Bind(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGING, &ArchiveManagerPanel::onArchiveTabChanging, this);
 	notebook_archives->Bind(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED, &ArchiveManagerPanel::onArchiveTabChanged, this);
 	notebook_archives->Bind(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSE, &ArchiveManagerPanel::onArchiveTabClose, this);
 	notebook_tabs->Bind(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED, &ArchiveManagerPanel::onAMTabChanged, this);
@@ -479,8 +480,11 @@ void ArchiveManagerPanel::openTab(Archive* archive) {
 			ArchivePanel* ap = (ArchivePanel*)notebook_archives->GetPage(a);
 			if (ap->getArchive() == archive) {
 				// Selected archive is already open in a tab, so switch to this tab
+
+				// Switch to tab
 				notebook_archives->SetSelection(a);
 				ap->focusEntryList();
+
 				return;
 			}
 		}
@@ -500,6 +504,7 @@ void ArchiveManagerPanel::openTab(Archive* archive) {
 		notebook_archives->SetSelection(notebook_archives->GetPageCount() - 1);
 		notebook_archives->SetPageBitmap(notebook_archives->GetPageCount() - 1, getIcon(icon));
 		wp->SetName("archive");
+		wp->addMenus();
 		wp->Show(true);
 		wp->SetFocus();
 		wp->focusEntryList();
@@ -1358,24 +1363,34 @@ void ArchiveManagerPanel::onListBookmarksRightClick(wxListEvent& e) {
 	PopupMenu(&context);
 }
 
+/* ArchiveManagerPanel::onArchiveTabChanging
+ * Called when the current archive tab is about to change
+ *******************************************************************/
+void ArchiveManagerPanel::onArchiveTabChanging(wxAuiNotebookEvent& e) {
+	// Page is about to change, remove any custom menus if needed
+	int selection = notebook_archives->GetSelection();
+
+	// ArchivePanel
+	if (isArchivePanel(selection)) {
+		ArchivePanel* ap = (ArchivePanel*)notebook_archives->GetPage(selection);
+		ap->removeMenus();
+	}
+
+	e.Skip();
+}
+
 /* ArchiveManagerPanel::onArchiveTabChanged
- * Called when the user switches between archive tabs
+ * Called when the current archive tab has changed
  *******************************************************************/
 void ArchiveManagerPanel::onArchiveTabChanged(wxAuiNotebookEvent& e) {
-	// If an archive tab is selected, set the frame title accordingly
+	// Page has changed, add any custom menus if needed
 	int selection = notebook_archives->GetSelection();
-	/*
-	if (isArchivePanel(selection)) {
-		Archive* archive = ((ArchivePanel*)notebook_archives->GetPage(selection))->getArchive();
-		((wxFrame*)GetParent())->SetTitle(s_fmt("SLADE - %s", CHR(archive->getFilename(false))));
-	}
-	else
-		((wxFrame*)GetParent())->SetTitle("SLADE");
-	*/
 
+	// ArchivePanel
 	if (isArchivePanel(selection)) {
 		ArchivePanel* ap = (ArchivePanel*)notebook_archives->GetPage(selection);
 		ap->currentArea()->updateStatus();
+		ap->addMenus();
 	}
 
 	e.Skip();

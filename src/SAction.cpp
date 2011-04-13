@@ -118,3 +118,24 @@ bool SAction::addToToolbar(wxAuiToolBar* toolbar, string icon_override) {
 
 	return true;
 }
+
+bool SAction::addToToolbar(wxToolBar* toolbar, string icon_override) {
+	// Can't add to nonexistant toolbar
+	if (!toolbar)
+		return false;
+
+	// Setup icon
+	string useicon = icon;
+	if (!(S_CMP(icon_override, "NO")))
+		useicon = icon_override;
+
+	// Append this action to the toolbar
+	if (type == NORMAL)
+		toolbar->AddTool(wx_id, "", getIcon(useicon), helptext);
+	else if (type == CHECK)
+		toolbar->AddTool(wx_id, "", getIcon(useicon), helptext, wxITEM_CHECK);
+	else if (type == RADIO)
+		toolbar->AddTool(wx_id, "", getIcon(useicon), helptext, wxITEM_RADIO);
+
+	return true;
+}

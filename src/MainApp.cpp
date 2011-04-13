@@ -424,7 +424,11 @@ bool MainApp::OnInit() {
 	action_invalid = new SAction("invalid", "Invalid Action", "", "Something's gone wrong here");
 
 	// Set application name (for wx directory stuff)
+#ifdef __WINDOWS__
+	wxApp::SetAppName("SLADE3");
+#else
 	wxApp::SetAppName("slade3");
+#endif
 
 	// Handle exceptions using wxDebug stuff
 	wxHandleFatalExceptions(true);

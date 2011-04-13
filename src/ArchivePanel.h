@@ -42,6 +42,8 @@ public:
 
 	Archive*	getArchive() { return archive; }
 	bool		saveEntryChanges();
+	void		addMenus();
+	void		removeMenus();
 
 	// Editing actions - return success
 

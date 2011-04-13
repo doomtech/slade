@@ -60,6 +60,10 @@ public:
 	void	addCustomMenu(wxMenu* menu, string title);
 	void	removeCustomMenu(string title);
 
+	// Toolbars
+	void	addToolbar(wxAuiToolBar* toolbar, string name, int position);
+	void	removeToolbar(wxAuiToolBar* toolbar);
+
 	// Events
 	void	onMenuItemClicked(wxCommandEvent &e);
 	void	onHTMLLinkClicked(wxHtmlLinkEvent &e);

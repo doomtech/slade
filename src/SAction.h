@@ -4,6 +4,7 @@
 
 class wxMenu;
 class wxAuiToolBar;
+class wxToolBar;
 
 class SAction {
 private:
@@ -32,6 +33,7 @@ public:
 
 	bool	addToMenu(wxMenu* menu, string text_override = "NO");
 	bool	addToToolbar(wxAuiToolBar* toolbar, string icon_override = "NO");
+	bool	addToToolbar(wxToolBar* toolbar, string icon_override = "NO");
 };
 
 #endif//__SACTION_H__

@@ -57,6 +57,7 @@
 #include "Conversions.h"
 #include "MainWindow.h"
 #include <wx/aui/auibook.h>
+#include <wx/aui/auibar.h>
 #include <wx/filename.h>
 #include <wx/gbsizer.h>
 
@@ -67,6 +68,10 @@
 CVAR(Int, autosave_entry_changes, 2, CVAR_SAVE)	// 0=no, 1=yes, 2=ask
 CVAR(Bool, confirm_entry_delete, true, CVAR_SAVE)
 CVAR(Bool, context_submenus, true, CVAR_SAVE)
+wxMenu* menu_archive = NULL;
+wxMenu* menu_entry = NULL;
+wxAuiToolBar* tb_archive = NULL;
+wxAuiToolBar* tb_entry = NULL;
 
 
 /*******************************************************************
@@ -256,6 +261,55 @@ bool ArchivePanel::saveEntryChanges() {
 
 	// Save entry changes
 	return cur_area->saveEntry();
+}
+
+void ArchivePanel::addMenus() {
+	// Create menus if needed
+	if (!menu_archive) {
+		// Archive menu
+		wxMenu* menu_new = new wxMenu("");
+		theApp->getAction("arch_newentry")->addToMenu(menu_new, "&Entry");
+		theApp->getAction("arch_newdir")->addToMenu(menu_new, "&Directory");
+		menu_archive = new wxMenu();
+		menu_archive->AppendSubMenu(menu_new, "&New");
+		theApp->getAction("arch_importfiles")->addToMenu(menu_archive);
+		menu_archive->AppendSeparator();
+		theApp->getAction("arch_texeditor")->addToMenu(menu_archive);
+		wxMenu* menu_clean = new wxMenu("");
+		theApp->getAction("arch_clean_patches")->addToMenu(menu_clean);
+		menu_archive->AppendSubMenu(menu_clean, "Clean &Up");
+	}
+	if (!menu_entry) {
+		// Entry menu
+		menu_entry = new wxMenu();
+		theApp->getAction("arch_entry_rename")->addToMenu(menu_entry);
+		theApp->getAction("arch_entry_delete")->addToMenu(menu_entry);
+		theApp->getAction("arch_entry_revert")->addToMenu(menu_entry);
+		menu_entry->AppendSeparator();
+		theApp->getAction("arch_entry_cut")->addToMenu(menu_entry);
+		theApp->getAction("arch_entry_copy")->addToMenu(menu_entry);
+		theApp->getAction("arch_entry_paste")->addToMenu(menu_entry);
+		menu_entry->AppendSeparator();
+		theApp->getAction("arch_entry_moveup")->addToMenu(menu_entry);
+		theApp->getAction("arch_entry_movedown")->addToMenu(menu_entry);
+		menu_entry->AppendSeparator();
+		theApp->getAction("arch_entry_import")->addToMenu(menu_entry);
+		theApp->getAction("arch_entry_export")->addToMenu(menu_entry);
+		menu_entry->AppendSeparator();
+		theApp->getAction("arch_entry_bookmark")->addToMenu(menu_entry);
+	}
+
+	// Add them to the main window menubar
+	theMainWindow->addCustomMenu(menu_archive, "&Archive");
+	theMainWindow->addCustomMenu(menu_entry, "&Entry");
+	cur_area->addCustomMenu();
+}
+
+void ArchivePanel::removeMenus() {
+	// Remove ArchivePanel menus from the main window menubar
+	theMainWindow->removeCustomMenu("&Archive");
+	theMainWindow->removeCustomMenu("&Entry");
+	cur_area->removeCustomMenu();
 }
 
 /* ArchivePanel::save
@@ -1529,11 +1583,11 @@ bool ArchivePanel::handleAction(string id) {
 		openEntryAsText(entry_list->getFocusedEntry());
 	else if (id == "arch_view_hex")
 		openEntryAsHex(entry_list->getFocusedEntry());
-	else if (id == "arch_audio_convdw")
+	else if (id == "arch_audio_convertdw")
 		dSndWavConvert();
-	else if (id == "arch_audio_convwd")
+	else if (id == "arch_audio_convertwd")
 		wavDSndConvert();
-	else if (id == "arch_audio_convmus")
+	else if (id == "arch_audio_convertmus")
 		musMidiConvert();
 	else if (id == "arch_scripts_compileacs")
 		compileACS();
@@ -1968,10 +2022,18 @@ void ArchivePanel::onBtnUpDir(wxCommandEvent& e) {
  * Called when the panel is shown or hidden
  *******************************************************************/
 void ArchivePanel::onShow(wxShowEvent& e) {
-	if (e.IsShown())
+	/*
+	if (e.IsShown()) {
+		theMainWindow->addCustomMenu(menu_archive, "&Archive");
+		theMainWindow->addCustomMenu(menu_entry, "&Entry");
 		cur_area->addCustomMenu();
-	else
+	}
+	else {
+		theMainWindow->removeCustomMenu("&Archive");
+		theMainWindow->removeCustomMenu("&Entry");
 		cur_area->removeCustomMenu();
+	}
+	*/
 }
 
 
