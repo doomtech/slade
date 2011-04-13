@@ -31,10 +31,6 @@
 
 #include "mus2mid.h"
 
-#ifndef byte
-#define byte uint8_t
-#endif
-
 // MUS event codes
 enum musevent
 {
@@ -62,7 +58,7 @@ enum midievent
 #pragma pack(1)
 struct musheader
 {
-    byte id[4];
+    uint8_t id[4];
     unsigned short scorelength;
     unsigned short scorestart;
     unsigned short primarychannels;
