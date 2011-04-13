@@ -44,6 +44,7 @@ public:
 	bool	draw2dTiled(uint32_t width, uint32_t height);
 
 	static GLTexture&	bgTex();
+	static void			resetBgTex();
 };
 
 #endif//__GLTEXTURE_H__

@@ -260,6 +260,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\GraphicsPrefsPanel.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\GraphicsPrefsPanel.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\InterfacePrefsPanel.cpp"
 					>
 				</File>

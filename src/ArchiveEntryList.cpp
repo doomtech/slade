@@ -306,8 +306,10 @@ void ArchiveEntryList::filterList(string filter, string category) {
 			}
 		}
 
-		if (entry == focus)
+		if (entry == focus) {
 			focusItem(a);
+			EnsureVisible(a);
+		}
 	}
 }
 

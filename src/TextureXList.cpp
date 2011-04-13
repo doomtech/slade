@@ -327,7 +327,7 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_ta
 			return false;
 		}
 
-		wxLogMessage("Texture #%d: %d patch%s", a, n_patches, n_patches == 1 ? "" : "es");
+		//wxLogMessage("Texture #%d: %d patch%s", a, n_patches, n_patches == 1 ? "" : "es");
 
 		for (uint16_t p = 0; p < n_patches; p++) {
 			// Read patch definition

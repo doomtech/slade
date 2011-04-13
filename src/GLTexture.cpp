@@ -36,6 +36,8 @@
  * VARIABLES
  *******************************************************************/
 GLTexture GLTexture::tex_background;
+CVAR(String, bgtx_colour1, "#404050", CVAR_SAVE)
+CVAR(String, bgtx_colour2, "#505060", CVAR_SAVE)
 
 
 /*******************************************************************
@@ -503,8 +505,27 @@ bool GLTexture::draw2dTiled(uint32_t width, uint32_t height) {
  * Returns the global chequered 'background' texture
  *******************************************************************/
 GLTexture& GLTexture::bgTex() {
-	if (!tex_background.isLoaded())
-		tex_background.genChequeredTexture(8, rgba_t(64, 64, 80, 255), rgba_t(80, 80, 96, 255));
-
+	if (!tex_background.isLoaded()) {
+		wxColour col1(bgtx_colour1);
+		wxColour col2(bgtx_colour2);
+		tex_background.genChequeredTexture(8, 
+			rgba_t(col1.Red(), col1.Green(), col1.Blue(), 255), 
+			rgba_t(col2.Red(), col2.Green(), col2.Blue(), 255));
+	}
 	return tex_background;
+}
+
+/* GLTexture::resetBgTex
+ * Resets the global chequered 'background' texture
+ *******************************************************************/
+void GLTexture::resetBgTex() {
+	if (tex_background.isLoaded())
+		tex_background.clear();
+
+	wxColour col1(bgtx_colour1);
+	wxColour col2(bgtx_colour2);
+
+	tex_background.genChequeredTexture(8, 
+		rgba_t(col1.Red(), col1.Green(), col1.Blue(), 255), 
+		rgba_t(col2.Red(), col2.Green(), col2.Blue(), 255));
 }

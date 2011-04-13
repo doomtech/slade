@@ -9,6 +9,7 @@
 #include "InterfacePrefsPanel.h"
 #include "EditingPrefsPanel.h"
 #include "ACSPrefsPanel.h"
+#include "GraphicsPrefsPanel.h"
 #include "PNGPrefsPanel.h"
 #include <wx/treebook.h>
 
@@ -22,6 +23,7 @@ private:
 	TextEditorPrefsPanel*	panel_text_editor;
 	TextStylePrefsPanel*	panel_text_styles;
 	ACSPrefsPanel*			panel_script_acs;
+	GraphicsPrefsPanel*		panel_gfx_prefs;
 	PNGPrefsPanel*			panel_gfx_png;
 
 	// Base Resource Archive
