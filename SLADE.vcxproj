@@ -127,6 +127,7 @@
     <ClCompile Include="src\GeneralPrefsPanel.cpp" />
     <ClCompile Include="src\GfxConvDialog.cpp" />
     <ClCompile Include="src\GobArchive.cpp" />
+    <ClCompile Include="src\GraphicsPrefsPanel.cpp" />
     <ClCompile Include="src\GrpArchive.cpp" />
     <ClCompile Include="src\HexEditorPanel.cpp" />
     <ClCompile Include="src\HexEntryPanel.cpp" />
@@ -252,6 +253,7 @@
     <ClInclude Include="src\GeneralPrefsPanel.h" />
     <ClInclude Include="src\GfxConvDialog.h" />
     <ClInclude Include="src\GobArchive.h" />
+    <ClInclude Include="src\GraphicsPrefsPanel.h" />
     <ClInclude Include="src\GrpArchive.h" />
     <ClInclude Include="src\HexEditorPanel.h" />
     <ClInclude Include="src\HexEntryPanel.h" />

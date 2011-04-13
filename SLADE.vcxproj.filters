@@ -447,6 +447,9 @@
     <ClCompile Include="src\mus2mid\mus2mid.cpp">
       <Filter>External\Mus2Mid</Filter>
     </ClCompile>
+    <ClCompile Include="src\GraphicsPrefsPanel.cpp">
+      <Filter>Dialogs\Preferences</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -836,6 +839,9 @@
     </ClInclude>
     <ClInclude Include="src\mus2mid\mus2mid.h">
       <Filter>External\Mus2Mid</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GraphicsPrefsPanel.h">
+      <Filter>Dialogs\Preferences</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
