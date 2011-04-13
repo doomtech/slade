@@ -69,26 +69,20 @@ GraphicsPrefsPanel::GraphicsPrefsPanel(wxWindow* parent) : wxPanel(parent, -1) {
 
 	// Quick colour presets
 	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
-	b_reset		= new wxButton(this, -1, "Default");
-	b_black		= new wxButton(this, -1, "Black");
-	b_cyan		= new wxButton(this, -1, "Cyan");
-	b_magenta	= new wxButton(this, -1, "Magenta");
-	b_white		= new wxButton(this, -1, "White");
-	hbox->Add(b_reset, 0, wxEXPAND|wxBOTTOM, 4);
-	hbox->Add(b_black, 0, wxEXPAND|wxBOTTOM, 4);
-	hbox->Add(b_cyan, 0, wxEXPAND|wxBOTTOM, 4);
-	hbox->Add(b_magenta, 0, wxEXPAND|wxBOTTOM, 4);
-	hbox->Add(b_white, 0, wxEXPAND|wxBOTTOM, 4);
 	vbox->Add(hbox, 0, wxEXPAND|wxBOTTOM, 4);
+	string schemes[] = { "Default", 
+							"Black", "Black (Checkered)",
+							"Cyan", "Cyan (Checkered)",
+							"Magenta", "Magenta (Checkered)",
+							"White", "White (Checkered)" };
+	choice_presets = new wxChoice(this, -1, wxDefaultPosition, wxDefaultSize, 9, schemes);
+	hbox->Add(new wxStaticText(this, -1, "Presets:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
+	hbox->Add(choice_presets, 1, wxEXPAND);
 
 	sizer->Add(vbox, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
 	// Bind events
-	b_reset->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &GraphicsPrefsPanel::onButtonRClicked, this);
-	b_cyan->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &GraphicsPrefsPanel::onButtonCClicked, this);
-	b_magenta->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &GraphicsPrefsPanel::onButtonMClicked, this);
-	b_black->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &GraphicsPrefsPanel::onButtonBClicked, this);
-	b_white->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &GraphicsPrefsPanel::onButtonWClicked, this);
+	choice_presets->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &GraphicsPrefsPanel::onChoicePresetSelected, this);
 }
 
 /* GraphicsPrefsPanel::~GraphicsPrefsPanel
@@ -109,47 +103,50 @@ void GraphicsPrefsPanel::applyPreferences() {
 	theMainWindow->Refresh();
 }
 
-/* GraphicsPrefsPanel::onButtonRClicked
- * Called when the 'Default' button is clicked
+/* GraphicsPrefsPanel::onChoiceSchemeSelected
+ * Called when the 'preset' dropdown choice is changed
  *******************************************************************/
-void GraphicsPrefsPanel::onButtonRClicked(wxCommandEvent& e) {
-	cp_colour1->SetColour(wxColour(64, 64, 80));
-	cp_colour2->SetColour(wxColour(80, 80, 96));
-	applyPreferences();
-}
+void GraphicsPrefsPanel::onChoicePresetSelected(wxCommandEvent& e) {
+	int preset = choice_presets->GetSelection();
 
-/* GraphicsPrefsPanel::onButtonBClicked
- * Called when the 'Black' button is clicked
- *******************************************************************/
-void GraphicsPrefsPanel::onButtonBClicked(wxCommandEvent& e) {
-	cp_colour1->SetColour(wxColour(0, 0, 0));
-	cp_colour2->SetColour(wxColour(0, 0, 0));
-	applyPreferences();
-}
+	switch (preset) {
+	case 1:		// Black
+		cp_colour1->SetColour(wxColour(0, 0, 0));
+		cp_colour2->SetColour(wxColour(0, 0, 0));
+		break;
+	case 2:		// Black (checkered)
+		cp_colour1->SetColour(wxColour(0, 0, 0));
+		cp_colour2->SetColour(wxColour(30, 30, 30));
+		break;
+	case 3:		// Cyan
+		cp_colour1->SetColour(wxColour(0, 255, 255));
+		cp_colour2->SetColour(wxColour(0, 255, 255));
+		break;
+	case 4:		// Cyan (checkered)
+		cp_colour1->SetColour(wxColour(0, 255, 255));
+		cp_colour2->SetColour(wxColour(20, 225, 225));
+		break;
+	case 5:		// Magenta
+		cp_colour1->SetColour(wxColour(255, 0, 255));
+		cp_colour2->SetColour(wxColour(255, 0, 255));
+		break;
+	case 6:		// Magenta (checkered)
+		cp_colour1->SetColour(wxColour(255, 0, 255));
+		cp_colour2->SetColour(wxColour(225, 20, 225));
+		break;
+	case 7:		// White
+		cp_colour1->SetColour(wxColour(255, 255, 255));
+		cp_colour2->SetColour(wxColour(255, 255, 255));
+		break;
+	case 8:		// White (checkered)
+		cp_colour1->SetColour(wxColour(255, 255, 255));
+		cp_colour2->SetColour(wxColour(225, 225, 225));
+		break;
+	default:	// Default
+		cp_colour1->SetColour(wxColour(64, 64, 80));
+		cp_colour2->SetColour(wxColour(80, 80, 96));
+		break;
+	};
 
-/* GraphicsPrefsPanel::onButtonCClicked
- * Called when the 'Cyan' button is clicked
- *******************************************************************/
-void GraphicsPrefsPanel::onButtonCClicked(wxCommandEvent& e) {
-	cp_colour1->SetColour(wxColour(0, 255, 255));
-	cp_colour2->SetColour(wxColour(0, 255, 255));
-	applyPreferences();
-}
-
-/* GraphicsPrefsPanel::onButtonMClicked
- * Called when the 'Magenta' button is clicked
- *******************************************************************/
-void GraphicsPrefsPanel::onButtonMClicked(wxCommandEvent& e) {
-	cp_colour1->SetColour(wxColour(255, 0, 255));
-	cp_colour2->SetColour(wxColour(255, 0, 255));
-	applyPreferences();
-}
-
-/* GraphicsPrefsPanel::onButtonWClicked
- * Called when the 'White' button is clicked
- *******************************************************************/
-void GraphicsPrefsPanel::onButtonWClicked(wxCommandEvent& e) {
-	cp_colour1->SetColour(wxColour(255, 255, 255));
-	cp_colour2->SetColour(wxColour(255, 255, 255));
 	applyPreferences();
 }
