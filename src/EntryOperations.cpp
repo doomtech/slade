@@ -902,6 +902,9 @@ bool EntryOperations::compileACS(ArchiveEntry* entry, bool hexen) {
 	if (hexen) command += " -h";
 	wxExecute(command, wxEXEC_SYNC);
 
+	// Deal with focus-stealing apps
+	theMainWindow->Raise();
+
 	// Delete source file
 	wxRemoveFile(srcfile);
 
