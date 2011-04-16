@@ -526,22 +526,23 @@ bool ArchivePanel::cleanupArchive() {
  * Opens a dialog to rename the selected entries. If multiple entries
  * are selected, a mass-rename is performed
  *******************************************************************/
-bool ArchivePanel::renameEntry() {
+bool ArchivePanel::renameEntry(bool each) {
 	// Get a list of selected entries
 	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
 
 	// Check any are selected
-	if (selection.size() == 1) {
-		// If only one entry is selected, just do basic rename
+	if (each || selection.size() == 1) {
+		// If only one entry is selected, or "rename each" mode is desired, just do basic rename
+		for (unsigned a = 0; a < selection.size(); a++) {
 
-		// Prompt for a new name
-		string new_name = wxGetTextFromUser("Enter new entry name: (* = unchanged)", "Rename", selection[0]->getName());
+			// Prompt for a new name
+			string new_name = wxGetTextFromUser("Enter new entry name: (* = unchanged)", "Rename", selection[a]->getName());
 
-		// Rename entry (if needed)
-		if (!new_name.IsEmpty() && selection[0]->getName() != new_name)
-			archive->renameEntry(selection[0], new_name);
-	}
-	else if (selection.size() > 1) {
+			// Rename entry (if needed)
+			if (!new_name.IsEmpty() && selection[a]->getName() != new_name)
+				archive->renameEntry(selection[a], new_name);
+		}
+	} else if (selection.size() > 1) {
 		// Get a list of entry names
 		wxArrayString names;
 		for (unsigned a = 0; a < selection.size(); a++)
@@ -1515,6 +1516,10 @@ bool ArchivePanel::handleAction(string id) {
 	else if (id == "arch_entry_rename")
 		renameEntry();
 
+	// Entry->Rename Each
+	else if (id == "arch_entry_rename_each")
+		renameEntry(true);
+
 	// Entry->Delete
 	else if (id == "arch_entry_delete")
 		deleteEntry();
@@ -1759,6 +1764,7 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 	// Generate context menu
 	wxMenu context;
 	theApp->getAction("arch_entry_rename")->addToMenu(&context);
+	if (selection.size() > 1) theApp->getAction("arch_entry_rename_each")->addToMenu(&context);
 	theApp->getAction("arch_entry_delete")->addToMenu(&context);
 	if (modified_selected) theApp->getAction("arch_entry_revert")->addToMenu(&context);
 	context.AppendSeparator();

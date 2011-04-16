@@ -57,7 +57,7 @@ public:
 	bool	cleanupArchive();
 
 	// Entry manipulation actions
-	bool	renameEntry();
+	bool	renameEntry(bool each = false);
 	bool	deleteEntry();
 	bool	revertEntry();
 	bool	moveUp();

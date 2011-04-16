@@ -359,6 +359,7 @@ void MainApp::initActions() {
 	new SAction("arch_texeditor", "&Texture Editor", "t_texeditor", "Open the texture editor for the current archive");
 	new SAction("arch_clean_patches", "Remove Unused &Patches", "", "Remove any unused patches, and their associated entries");
 	new SAction("arch_entry_rename", "Rename", "t_rename", "Rename the selected entries");
+	new SAction("arch_entry_rename_each", "Rename Each", "t_renameeach", "Rename separately all the selected entries");
 	new SAction("arch_entry_delete", "Delete", "t_delete", "Delete the selected entries");
 	new SAction("arch_entry_revert", "Revert", "t_revert", "Revert any modifications made to the selected entries since the last save");
 	new SAction("arch_entry_cut", "Cut", "t_cut", "Cut the selected entries");

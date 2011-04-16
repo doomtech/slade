@@ -106,8 +106,6 @@ Unimplemented Feature Requests ------------------------------------------
 - Fully customisable toolbars
 - Sorting by column (I.E. Name or Type)
 - Duplicate entry name checking
-- Confirm dialog for entry deletion
-- SLumpEd style mass rename option
 - Map browser
 
 --- Archive / Entry Management ---
@@ -199,3 +197,5 @@ Completed Feature Requests ----------------------------------------------
 - Copy/Cut/Paste entries
 - mass rename (XWE)
 - lump name search
+- Confirm dialog for entry deletion
+- SLumpEd style mass rename option
