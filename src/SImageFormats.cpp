@@ -621,10 +621,13 @@ uint32_t valid_flat_size[][2] = {
 	{ 128, 128 },	// \ 
 	{ 256, 256 },	// hires flat size
 	{ 512, 512 },	// /
+	{1024,1024 },	// \ 
+	{2048,2048 },	// super hires flat size (SRB2)
+	{4096,4096 },	// /
 	{ 256, 200 },	// Rise of the Triad sky
 	{ 320, 200 },	// full screen format
 };
-uint32_t	n_valid_flat_sizes = 14;
+uint32_t	n_valid_flat_sizes = 17;
 
 /* SImage::validFlatSize
  * Returns whether the image has dimensions appropriate for a flat
