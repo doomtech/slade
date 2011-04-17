@@ -4,7 +4,7 @@
 <dict>
 
     <key>CFBundleExecutable</key>
-    <string>SLADE-osx</string>
+    <string>SLADE</string>
 
     <key>CFBundleGetInfoString</key>
     <string>SLADE</string>
