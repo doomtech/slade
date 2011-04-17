@@ -191,6 +191,7 @@ TextEditor::TextEditor(wxWindow* parent, int id)
 	Bind(wxEVT_STC_DWELLSTART, &TextEditor::onMouseDwellStart, this);
 	Bind(wxEVT_STC_DWELLEND, &TextEditor::onMouseDwellEnd, this);
 	Bind(wxEVT_LEFT_DOWN, &TextEditor::onMouseDown, this);
+	Bind(wxEVT_RIGHT_UP, &TextEditor::onMouseUp, this);
 	Bind(wxEVT_KILL_FOCUS, &TextEditor::onFocusLoss, this);
 	dlg_fr->getBtnFindNext()->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextEditor::onFRDBtnFindNext, this);
 	dlg_fr->getBtnReplace()->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextEditor::onFRDBtnReplace, this);
@@ -811,6 +812,14 @@ void TextEditor::onMouseDown(wxMouseEvent& e) {
 		}
 	}
 #endif
+}
+
+void TextEditor::onMouseUp(wxMouseEvent& e) {
+	// Do nothing on right click (for now)
+	if (e.GetButton() == wxMOUSE_BTN_RIGHT)
+		return;
+	else
+		e.Skip();
 }
 
 /* TextEditor::onFocusLoss
