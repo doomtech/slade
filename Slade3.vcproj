@@ -1039,6 +1039,14 @@
 					Name="Image"
 					>
 					<File
+						RelativePath=".\src\SIFormat.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\SIFormat.h"
+						>
+					</File>
+					<File
 						RelativePath=".\src\SImage.cpp"
 						>
 					</File>
