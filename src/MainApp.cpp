@@ -45,6 +45,7 @@
 #include <wx/ffile.h>
 #include <wx/stackwalk.h>
 #include <wx/dir.h>
+#include <wx/sysopt.h>
 
 #ifdef UPDATEREVISION
 #include "svnrevision.h"
@@ -423,6 +424,9 @@ bool MainApp::OnInit() {
 
 	// Init variables
 	action_invalid = new SAction("invalid", "Invalid Action", "", "Something's gone wrong here");
+
+	// Setup system options
+	wxSystemOptions::SetOption("mac.listctrl.always_use_generic", 1);
 
 	// Set application name (for wx directory stuff)
 #ifdef __WINDOWS__

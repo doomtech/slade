@@ -1433,6 +1433,9 @@ bool ArchivePanel::showEntryPanel(EntryPanel* new_area, bool ask_save) {
 
 		// Update panel layout
 		Layout();
+		theMainWindow->Update();
+		theMainWindow->Refresh();
+		theMainWindow->Update();
 	}
 
 	return true;

@@ -59,7 +59,7 @@ VirtualListView::VirtualListView(wxWindow* parent)
 	col_search = 0;
 
 	// Bind events
-#ifdef __WXGTK__
+#ifndef __WXMSW__
 	Bind(wxEVT_KEY_DOWN, &VirtualListView::onKeyDown, this);
 #endif
 	Bind(wxEVT_LEFT_DOWN, &VirtualListView::onMouseLeftDown, this);
@@ -248,7 +248,7 @@ void VirtualListView::onColumnResize(wxListEvent& e) {
  * Called when the list is left clicked
  *******************************************************************/
 void VirtualListView::onMouseLeftDown(wxMouseEvent& e) {
-#ifdef __WXGTK__
+#ifndef __WXMSW__
 	// Default handler for double-click
 	if (e.ButtonDClick()) {
 		e.Skip();
