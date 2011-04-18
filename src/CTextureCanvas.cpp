@@ -271,12 +271,12 @@ void CTextureCanvas::drawTexture() {
 	else {
 		// Generate if needed
 		if (!tex_preview.isLoaded()) {
-			// Determine image format
-			SIFormat fmt = PALMASK;
-			if (blend_rgba) fmt = RGBA;
+			// Determine image type
+			SIType type = PALMASK;
+			if (blend_rgba) type = RGBA;
 
 			// CTexture -> temp Image -> GLTexture
-			SImage temp(fmt);
+			SImage temp(type);
 			texture->toImage(temp, parent, &palette, blend_rgba);
 			tex_preview.loadImage(&temp, &palette);
 		}

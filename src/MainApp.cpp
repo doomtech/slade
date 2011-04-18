@@ -40,6 +40,7 @@
 #include "TextLanguage.h"
 #include "TextStyle.h"
 #include "ResourceManager.h"
+#include "SIFormat.h"
 #include <wx/image.h>
 #include <wx/stdpaths.h>
 #include <wx/ffile.h>
@@ -232,7 +233,7 @@ IMPLEMENT_APP(MainApp)
  *******************************************************************/
 MainApp::MainApp() {
 	main_window = NULL;
-	cur_id = 0;
+	cur_id = 87547466;
 	action_invalid = NULL;
 	init_ok = false;
 }
@@ -461,6 +462,9 @@ bool MainApp::OnInit() {
 	// Show splash screen
 	theSplashWindow->init();
 	theSplashWindow->show("Starting up...");
+
+	// Init SImage formats
+	SIFormat::initFormats();
 
 	// Load program icons
 	wxLogMessage("Loading icons");
@@ -696,14 +700,14 @@ void MainApp::onMenu(wxCommandEvent& e) {
 		}
 	}
 
-	// Warn if no match found (unknown action)
-	if (action.IsEmpty()) {
-		wxLogMessage("Warning: unknown action id %d", e.GetId());
-		return;
+	// If action is valid, send to all action handlers
+	if (!action.IsEmpty()) {
+		doAction(action);
 	}
 
-	// Otherwise, send to all action handlers
-	doAction(action);
+	// Otherwise, let something else handle it
+	else
+		e.Skip();
 }
 
 

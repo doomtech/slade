@@ -515,7 +515,7 @@ void GfxEntryPanel::refresh() {
 		gfx_canvas->resetOffsets();
 
 	// Setup custom menu
-	if (getImage()->getFormat() == RGBA)
+	if (getImage()->getType() == RGBA)
 		menu_custom->Enable(MENU_GFXEP_TRANSLATE, false);
 	else
 		menu_custom->Enable(MENU_GFXEP_TRANSLATE, true);
@@ -534,7 +534,7 @@ string GfxEntryPanel::statusString() {
 	string status = S_FMT("%dx%d", image->getWidth(), image->getHeight());
 
 	// Colour format
-	if (image->getFormat() == RGBA)
+	if (image->getType() == RGBA)
 		status += ", 32bpp";
 	else
 		status += ", 8bpp";

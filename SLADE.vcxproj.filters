@@ -450,6 +450,9 @@
     <ClCompile Include="src\GraphicsPrefsPanel.cpp">
       <Filter>Dialogs\Preferences</Filter>
     </ClCompile>
+    <ClCompile Include="src\SIFormat.cpp">
+      <Filter>Resources\Graphics\Image</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -842,6 +845,9 @@
     </ClInclude>
     <ClInclude Include="src\GraphicsPrefsPanel.h">
       <Filter>Dialogs\Preferences</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SIFormat.h">
+      <Filter>Resources\Graphics\Image</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

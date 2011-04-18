@@ -355,6 +355,15 @@ bool MemChunk::seek(uint32_t offset, uint32_t start) {
 	return true;
 }
 
+bool MemChunk::readMC(MemChunk& mc, uint32_t size) {
+	if (mc.write(data + cur_ptr, size)) {
+		cur_ptr += size;
+		return true;
+	}
+	else
+		return false;
+}
+
 /* MemChunk::fillData
  * Overwrites all data bytes with [val] (basically is memset).
  * Returns false if no data exists, true otherwise

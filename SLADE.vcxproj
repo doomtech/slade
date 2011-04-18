@@ -159,6 +159,7 @@
     <ClCompile Include="src\RffArchive.cpp" />
     <ClCompile Include="src\SAction.cpp" />
     <ClCompile Include="src\SFont.cpp" />
+    <ClCompile Include="src\SIFormat.cpp" />
     <ClCompile Include="src\SImageFormats.cpp" />
     <ClCompile Include="src\TextEditorPrefsPanel.cpp" />
     <ClCompile Include="src\TextLanguage.cpp" />
@@ -289,6 +290,7 @@
     <ClInclude Include="src\ResourceManager.h" />
     <ClInclude Include="src\RffArchive.h" />
     <ClInclude Include="src\SAction.h" />
+    <ClInclude Include="src\SIFormat.h" />
     <ClInclude Include="src\Structs.h" />
     <ClInclude Include="src\TextEditorPrefsPanel.h" />
     <ClInclude Include="src\TextLanguage.h" />

@@ -39,6 +39,9 @@ public:
 	bool		seek(uint32_t offset, uint32_t start);
 	uint32_t	currentPos() { return cur_ptr; }
 
+	// Extended C-style reading/writing
+	bool	readMC(MemChunk& mc, uint32_t size);
+
 	// Misc
 	bool		fillData(uint8_t val);
 	uint32_t	crc();

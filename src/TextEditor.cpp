@@ -816,9 +816,9 @@ void TextEditor::onMouseDown(wxMouseEvent& e) {
 
 void TextEditor::onMouseUp(wxMouseEvent& e) {
 	// Do nothing on right click (for now)
-	if (e.GetButton() == wxMOUSE_BTN_RIGHT)
-		return;
-	else
+	//if (e.GetButton() == wxMOUSE_BTN_RIGHT)
+	//	return;
+	//else
 		e.Skip();
 }
 

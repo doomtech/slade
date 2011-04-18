@@ -36,6 +36,7 @@
 #include "SImage.h"
 #include "FreeImage.h"
 #include "Misc.h"
+#include "SIFormat.h"
 #include "Translation.h"
 #include "MathStuff.h"
 #include <wx/filefn.h>
@@ -48,14 +49,14 @@
 /* SImage::SImage
  * SImage class constructor
  *******************************************************************/
-SImage::SImage(SIFormat format) {
+SImage::SImage(SIType type) {
 	width = 0;
 	height = 0;
 	data = NULL;
 	mask = NULL;
 	offset_x = 0;
 	offset_y = 0;
-	this->format = format;
+	this->type = type;
 	numimages = 1;
 	imgindex = 0;
 	has_palette = false;
@@ -81,13 +82,13 @@ bool SImage::getRGBAData(MemChunk& mc, Palette8bit* pal) {
 	mc.reSize(width * height * 4, false);
 
 	// If data is already in RGBA format just return a copy
-	if (format == RGBA) {
+	if (type == RGBA) {
 		mc.importMem(data, width * height * 4);
 		return true;
 	}
 
 	// Otherwise convert
-	else if (format == PALMASK) {
+	else if (type == PALMASK) {
 		// Get palette to use
 		if (has_palette || !pal)
 			pal = &palette;
@@ -125,14 +126,14 @@ bool SImage::getRGBData(MemChunk& mc, Palette8bit* pal) {
 	// Init rgb data
 	mc.reSize(width * height * 3, false);
 
-	if (format == RGBA) {
+	if (type == RGBA) {
 		// RGBA format, remove alpha information
 		for (int a = 0; a < width * height * 4; a += 4)
 			mc.write(&data[a], 3);
 
 		return true;
 	}
-	else if (format == PALMASK) {
+	else if (type == PALMASK) {
 		// Paletted, convert to RGB
 
 		// Get palette to use
@@ -165,10 +166,10 @@ bool SImage::getPalData(MemChunk& mc) {
 	mc.reSize(width * height, false);
 
 	// Cannot do this for trucolor graphics.
-	if (format == RGBA)
+	if (type == RGBA)
 		return false;
 
-	else if (format == PALMASK) {
+	else if (type == PALMASK) {
 		mc.write(data, width * height);
 		return true;
 	}
@@ -180,7 +181,7 @@ bool SImage::getPalData(MemChunk& mc) {
  * Returns the number of bytes per image row
  *******************************************************************/
 unsigned SImage::getStride() {
-	if (format == RGBA)
+	if (type == RGBA)
 		return width*4;
 	else
 		return width;
@@ -190,7 +191,7 @@ unsigned SImage::getStride() {
  * Returns the number of bytes per image pixel
  *******************************************************************/
 uint8_t SImage::getBpp() {
-	if (format == RGBA)
+	if (type == RGBA)
 		return 4;
 	else
 		return 1;
@@ -210,7 +211,7 @@ rgba_t SImage::getPixel(unsigned x, unsigned y, Palette8bit* pal) {
 
 	// Get colour at pixel
 	rgba_t col;
-	if (format == RGBA) {
+	if (type == RGBA) {
 		col.r = data[index];
 		col.g = data[index+1];
 		col.b = data[index+2];
@@ -265,6 +266,42 @@ void SImage::clearData(bool clear_mask) {
 	}
 }
 
+void SImage::create(int width, int height, SIType type, Palette8bit* pal) {
+	// Check valid width/height
+	if (width < 0 || height < 0)
+		return;
+
+	// Clear current image
+	clearData();
+
+	// Create blank image
+	if (type == PALMASK) {
+		data = new uint8_t[width*height];
+		memset(data, 0, width*height);
+		mask = new uint8_t[width*height];
+		memset(mask, 0, width*height);
+	}
+	else {
+		data = new uint8_t[width*height*4];
+		memset(data, 0, width*height*4);
+	}
+
+	// Set image properties
+	this->width = width;
+	this->height = height;
+	this->type = type;
+	offset_x = 0;
+	offset_y = 0;
+	numimages = 1;
+	imgindex = 0;
+	if (pal) {
+		palette.copyPalette(pal);
+		has_palette = true;
+	}
+	else
+		has_palette = false;
+}
+
 /* SImage::clear
  * Deletes/clears any existing image data, and resets the image to
  * zero-sized
@@ -291,12 +328,12 @@ void SImage::fillAlpha(uint8_t alpha) {
 	if (!isValid())
 		return;
 
-	if (format == RGBA) {
+	if (type == RGBA) {
 		// RGBA format, set alpha values to given one
 		for (int a = 3; a < width * height * 4; a += 4)
 			data[a] = alpha;
 	}
-	else if (format == PALMASK) {
+	else if (type == PALMASK) {
 		// Paletted masked format, fill mask with alpha value
 		if (!mask)
 			mask = new uint8_t[width * height];
@@ -314,7 +351,7 @@ void SImage::fillAlpha(uint8_t alpha) {
  *******************************************************************/
 short SImage::findUnusedColour() {
 	// Only for paletted images
-	if (format != PALMASK)
+	if (type != PALMASK)
 		return -1;
 
 	// Init used colours list
@@ -340,7 +377,7 @@ short SImage::findUnusedColour() {
  *******************************************************************/
 size_t SImage::countColours() {
 	// If the picture is not paletted, return 0.
-	if (format != PALMASK)
+	if (type != PALMASK)
 		return 0;
 
 	bool * usedcolours = new bool[256];
@@ -364,7 +401,7 @@ size_t SImage::countColours() {
  *******************************************************************/
 void SImage::shrinkPalette(Palette8bit* pal) {
 	// If the picture is not paletted, stop.
-	if (format != PALMASK)
+	if (type != PALMASK)
 		return;
 
 	// Get palette to use
@@ -417,7 +454,7 @@ bool SImage::copyImage(SImage* image) {
 	// Copy image properties
 	width = image->width;
 	height = image->height;
-	format = image->format;
+	type = image->type;
 	palette.copyPalette(&image->palette);
 	has_palette = image->has_palette;
 	offset_x = image->offset_x;
@@ -444,7 +481,7 @@ bool SImage::copyImage(SImage* image) {
  *******************************************************************/
 bool SImage::convertRGBA(Palette8bit* pal) {
 	// If it's already 32bpp do nothing
-	if (format == RGBA)
+	if (type == RGBA)
 		return false;
 
 	// Get 32bit data
@@ -458,8 +495,8 @@ bool SImage::convertRGBA(Palette8bit* pal) {
 	data = new uint8_t[width * height * 4];
 	memcpy(data, rgba_data.getData(), width * height * 4);
 
-	// Set new format & update variables
-	format = RGBA;
+	// Set new type & update variables
+	type = RGBA;
 	has_palette = false;
 
 	// Announce change
@@ -485,7 +522,7 @@ bool SImage::convertPaletted(Palette8bit* pal_target, Palette8bit* pal_current) 
 	getRGBAData(rgba_data, pal_current);
 
 	// Create mask from alpha info (if converting from RGBA)
-	if (format == RGBA) {
+	if (type == RGBA) {
 		// Clear current mask
 		if (mask)
 			delete[] mask;
@@ -518,7 +555,7 @@ bool SImage::convertPaletted(Palette8bit* pal_target, Palette8bit* pal_current) 
 	}
 
 	// Update variables
-	format = PALMASK;
+	type = PALMASK;
 	has_palette = true;
 
 	// Announce change
@@ -535,12 +572,12 @@ bool SImage::convertPaletted(Palette8bit* pal_target, Palette8bit* pal_current) 
  * is in RGBA format
  *******************************************************************/
 bool SImage::maskFromColour(rgba_t colour, Palette8bit* pal, bool force_mask) {
-	if (format == PALMASK && mask != NULL) {
+	if (type == PALMASK && mask != NULL) {
 		// Get palette to use
 		if (has_palette || !pal)
 			pal = &palette;
 
-		// Palette+Mask format, go through the mask
+		// Palette+Mask type, go through the mask
 		for (int a = 0; a < width * height; a++) {
 			if (pal->colour(data[a]).equals(colour))
 				mask[a] = 0;
@@ -548,12 +585,12 @@ bool SImage::maskFromColour(rgba_t colour, Palette8bit* pal, bool force_mask) {
 				mask[a] = 255;
 		}
 	}
-	else if (format == RGBA) {
+	else if (type == RGBA) {
 		// If we're forcing generation of mask data, create it if it doesn't exist
 		if (force_mask && !mask)
 			mask = new uint8_t[width * height];
 
-		// RGBA format, go through alpha channel
+		// RGBA type, go through alpha channel
 		uint32_t c = 0;
 		for (int a = 0; a < width * height; a++) {
 			rgba_t pix_col(data[c], data[c + 1], data[c + 2], 255);
@@ -587,7 +624,7 @@ bool SImage::maskFromColour(rgba_t colour, Palette8bit* pal, bool force_mask) {
  * will be generated even if the image is in RGBA format
  *******************************************************************/
 bool SImage::cutoffMask(uint8_t threshold, bool force_mask) {
-	if (format == PALMASK && mask != NULL) {
+	if (type == PALMASK && mask != NULL) {
 		for (int a = 0; a < width * height; a++) {
 			if (mask[a] > threshold)
 				mask[a] = 255;
@@ -595,7 +632,7 @@ bool SImage::cutoffMask(uint8_t threshold, bool force_mask) {
 				mask[a] = 0;
 		}
 	}
-	else if (format == RGBA) {
+	else if (type == RGBA) {
 		// If we're forcing generation of mask data, create it if it doesn't exist
 		if (force_mask && !mask)
 			mask = new uint8_t[width * height];
@@ -628,7 +665,7 @@ bool SImage::cutoffMask(uint8_t threshold, bool force_mask) {
  * otherwise -> PNG.
  *******************************************************************/
 bool SImage::safeConvert(MemChunk& out, Palette8bit* pal) {
-	if (format == PALMASK && !has_palette)
+	if (type == PALMASK && !has_palette)
 		return toDoomGfx(out);
 	else return toPNG(out, pal);
 }
@@ -643,7 +680,7 @@ bool SImage::setPixel(int x, int y, rgba_t colour, Palette8bit* pal) {
 		return false;
 
 	// Set the pixel
-	if (format == RGBA)
+	if (type == RGBA)
 		colour.write(data + (y * (width*4) + (x*4)));
 	else {
 		// Get palette to use
@@ -670,7 +707,7 @@ bool SImage::setPixel(int x, int y, uint8_t pal_index, uint8_t alpha) {
 		return false;
 
 	// RGBA (use palette colour, probably don't want this, but it's here anyway :P)
-	if (format == RGBA) {
+	if (type == RGBA) {
 		// Set the pixel
 		rgba_t col = palette.colour(pal_index);
 		col.a = alpha;
@@ -680,7 +717,7 @@ bool SImage::setPixel(int x, int y, uint8_t pal_index, uint8_t alpha) {
 	}
 
 	// Paletted
-	else if (format == PALMASK) {
+	else if (type == PALMASK) {
 		// Set the pixel
 		data[y*width+x] = pal_index;
 		if (mask) mask[y*width+x] = alpha;
@@ -691,7 +728,7 @@ bool SImage::setPixel(int x, int y, uint8_t pal_index, uint8_t alpha) {
 	// Announce
 	announce("image_changed");
 
-	// Invalid format
+	// Invalid type
 	return false;
 }
 
@@ -716,8 +753,8 @@ bool SImage::rotate(int angle) {
 	if (angle % 180) { nw = height; nh = width; }
 	else {	nw = width; nh = height; }
 	int numpixels = width*height; int numbpp = 0;
-	if (format==PALMASK)	numbpp = 1;
-	else if (format==RGBA)	numbpp = 4;
+	if (type==PALMASK)	numbpp = 1;
+	else if (type==RGBA)	numbpp = 4;
 	else return false;
 
 	// Create new data and mask
@@ -763,8 +800,8 @@ bool SImage::mirror(bool vertical) {
 
 	// Compute numbers of pixels and bytes
 	int numpixels = width*height; int numbpp = 0;
-	if (format==PALMASK)	numbpp = 1;
-	else if (format==RGBA)	numbpp = 4;
+	if (type==PALMASK)	numbpp = 1;
+	else if (type==RGBA)	numbpp = 4;
 	else return false;
 
 	// Create new data and mask
@@ -831,8 +868,8 @@ bool SImage::crop(long x1, long y1, long x2, long y2) {
 
 	// Compute numbers of pixels and bytes
 	int numpixels = nw*nh; int numbpp = 0;
-	if (format==PALMASK)	numbpp = 1;
-	else if (format==RGBA)	numbpp = 4;
+	if (type==PALMASK)	numbpp = 1;
+	else if (type==RGBA)	numbpp = 4;
 	else return false;
 
 	// Create new data and mask
@@ -877,12 +914,12 @@ bool SImage::resize(int nwidth, int nheight) {
 	// Init new image data
 	uint8_t* newdata, *newmask;
 	uint8_t bpp = 1;
-	if (format == RGBA) bpp = 4;
+	if (type == RGBA) bpp = 4;
 	// Create new image data
 	newdata = new uint8_t[nwidth * nheight * bpp];
 	memset(newdata, 0, nwidth*nheight*bpp);
 	// Create new mask if needed
-	if (format == PALMASK) {
+	if (type == PALMASK) {
 		newmask = new uint8_t[nwidth * nheight];
 		memset(newmask, 0, nwidth*nheight);
 	}
@@ -919,12 +956,12 @@ bool SImage::resize(int nwidth, int nheight) {
 }
 
 /* SImage::setImageData
- * Sets the image data, size, and format from raw data
+ * Sets the image data, size, and type from raw data
  *******************************************************************/
-bool SImage::setImageData(uint8_t *ndata, int nwidth, int nheight, SIFormat nformat) {
+bool SImage::setImageData(uint8_t *ndata, int nwidth, int nheight, SIType ntype) {
 	if (ndata) {
 		clearData();
-		format = nformat;
+		type = ntype;
 		width = nwidth;
 		height = nheight;
 		data = ndata;
@@ -946,7 +983,7 @@ bool SImage::applyTranslation(Translation* tr, Palette8bit* pal) {
 		return false;
 
 	// Can't apply a translation to a non-paletted image
-	if (format != PALMASK)
+	if (type != PALMASK)
 		return false;
 
 	// Get palette to use
@@ -1065,7 +1102,7 @@ bool SImage::drawPixel(int x, int y, rgba_t colour, si_drawprops_t& properties, 
 
 	// Check for simple case (normal blending, no transparency involved)
 	if (colour.a == 255 && properties.blend == NORMAL) {
-		if (format == RGBA)
+		if (type == RGBA)
 			colour.write(data+p);
 		else {
 			data[p] = pal->nearestColour(colour);
@@ -1077,7 +1114,7 @@ bool SImage::drawPixel(int x, int y, rgba_t colour, si_drawprops_t& properties, 
 
 	// Not-so-simple case, do full processing
 	rgba_t d_colour;
-	if (format == PALMASK)
+	if (type == PALMASK)
 		d_colour = pal->colour(data[p]);
 	else
 		d_colour.set(data[p], data[p+1], data[p+2], data[p+3]);
@@ -1124,7 +1161,7 @@ bool SImage::drawPixel(int x, int y, rgba_t colour, si_drawprops_t& properties, 
 	}
 
 	// Apply new colour
-	if (format == PALMASK) {
+	if (type == PALMASK) {
 		data[p] = pal->nearestColour(d_colour);
 		mask[p] = d_colour.a;
 	}
@@ -1170,14 +1207,14 @@ bool SImage::drawImage(SImage& img, int x_pos, int y_pos, si_drawprops_t& proper
 			}
 
 			// Skip if source pixel is fully transparent
-			if ((img.format == PALMASK && img.mask[sp] == 0) ||
-				(img.format == RGBA && img.data[sp+3] == 0)) {
+			if ((img.type == PALMASK && img.mask[sp] == 0) ||
+				(img.type == RGBA && img.data[sp+3] == 0)) {
 				sp += s_bpp;
 				continue;
 			}
 
 			// Draw pixel
-			if (img.format == PALMASK) {
+			if (img.type == PALMASK) {
 				rgba_t col = pal_src->colour(img.data[sp]);
 				col.a = img.mask[sp];
 				drawPixel(x, y, col, properties, pal_dest);
@@ -1207,7 +1244,7 @@ bool SImage::colourise(rgba_t colour, Palette8bit* pal) {
 	rgba_t col;
 	for (int a = 0; a < width*height*bpp; a+= bpp) {
 		// Get current pixel colour
-		if (format == RGBA)
+		if (type == RGBA)
 			col.set(data[a], data[a+1], data[a+2], data[a+3]);
 		else
 			col.set(pal->colour(data[a]));
@@ -1219,7 +1256,7 @@ bool SImage::colourise(rgba_t colour, Palette8bit* pal) {
 		col.b = colour.b*grey;
 
 		// Set pixel colour
-		if (format == RGBA)
+		if (type == RGBA)
 			col.write(data+a);
 		else
 			data[a] = pal->nearestColour(col);
@@ -1242,7 +1279,7 @@ bool SImage::tint(rgba_t colour, float amount, Palette8bit* pal) {
 	rgba_t col;
 	for (int a = 0; a < width*height*bpp; a+= bpp) {
 		// Get current pixel colour
-		if (format == RGBA)
+		if (type == RGBA)
 			col.set(data[a], data[a+1], data[a+2], data[a+3]);
 		else
 			col.set(pal->colour(data[a]));
@@ -1254,7 +1291,7 @@ bool SImage::tint(rgba_t colour, float amount, Palette8bit* pal) {
 				col.b*inv_amt + colour.b*amount, col.a);
 
 		// Set pixel colour
-		if (format == RGBA)
+		if (type == RGBA)
 			col.write(data+a);
 		else
 			data[a] = pal->nearestColour(col);

@@ -5,7 +5,7 @@
 #include "Palette.h"
 #include "ListenerAnnouncer.h"
 
-enum SIFormat {
+enum SIType {
 	PALMASK,	// 2 bytes per pixel: palette index and alpha value
 	RGBA,		// 4 bytes per pixel: RGBA
 };
@@ -28,14 +28,16 @@ struct si_drawprops_t {
 };
 
 class Translation;
+class SIFormat;
 
 class SImage : public Announcer {
+friend class SIFormat;
 private:
 	int			width;
 	int			height;
 	uint8_t*	data;
 	uint8_t*	mask;
-	SIFormat	format;
+	SIType		type;
 	Palette8bit	palette;
 	bool		has_palette;
 	int			offset_x;
@@ -49,12 +51,12 @@ private:
 	void	clearData(bool clear_mask = true);
 
 public:
-	SImage(SIFormat format = RGBA);
+	SImage(SIType type = RGBA);
 	virtual ~SImage();
 
 	bool			isValid() { return (width > 0 && height > 0 && data); }
 
-	SIFormat		getFormat() { return format; }
+	SIType			getType() { return type; }
 	bool			getRGBAData(MemChunk& mc, Palette8bit* pal = NULL);
 	bool			getRGBData(MemChunk& mc, Palette8bit* pal = NULL);
 	bool			getPalData(MemChunk& mc);
@@ -73,6 +75,7 @@ public:
 
 	// Misc
 	void	clear();
+	void	create(int width, int height, SIType type, Palette8bit* pal);
 	void	fillAlpha(uint8_t alpha = 0);
 	short	findUnusedColour();
 	bool	validFlatSize();
@@ -143,7 +146,7 @@ public:
 	bool	mirror(bool vert);
 	bool	crop(long x1, long y1, long x2, long y2);
 	bool	resize(int nwidth, int nheight);
-	bool	setImageData(uint8_t *ndata, int nwidth, int nheight, SIFormat nformat);
+	bool	setImageData(uint8_t *ndata, int nwidth, int nheight, SIType ntype);
 	bool	applyTranslation(Translation* tr, Palette8bit* pal = NULL);
 	bool	drawPixel(int x, int y, rgba_t colour, si_drawprops_t& properties, Palette8bit* pal);
 	bool	drawImage(SImage& img, int x, int y, si_drawprops_t& properties, Palette8bit* pal_src = NULL, Palette8bit* pal_dest = NULL);
