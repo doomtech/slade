@@ -233,7 +233,7 @@ IMPLEMENT_APP(MainApp)
  *******************************************************************/
 MainApp::MainApp() {
 	main_window = NULL;
-	cur_id = 87547466;
+	cur_id = 26000;
 	action_invalid = NULL;
 	init_ok = false;
 }
@@ -701,9 +701,8 @@ void MainApp::onMenu(wxCommandEvent& e) {
 	}
 
 	// If action is valid, send to all action handlers
-	if (!action.IsEmpty()) {
+	if (!action.IsEmpty())
 		doAction(action);
-	}
 
 	// Otherwise, let something else handle it
 	else
