@@ -249,6 +249,8 @@
         <File Name="src/SImage.cpp"/>
         <File Name="src/SImage.h"/>
         <File Name="src/SImageFormats.cpp"/>
+        <File Name="src/SIFormat.cpp"/>
+        <File Name="src/SIFormat.h"/>
       </VirtualDirectory>
       <VirtualDirectory Name="Palette">
         <File Name="src/Palette.cpp"/>
