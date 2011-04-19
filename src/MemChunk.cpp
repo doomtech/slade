@@ -293,10 +293,8 @@ bool MemChunk::write(const void* data, uint32_t size) {
 
 	// If we're trying to write past the end of the memory chunk,
 	// resize it so we can write at this point
-	if (cur_ptr + size > this->size) {
-		//wxLogMessage("MC::write resize %d > %d", cur_ptr+size, this->size);
+	if (cur_ptr + size > this->size)
 		reSize(cur_ptr + size, true);
-	}
 
 	// Write the data and move to the byte after what was written
 	memcpy(this->data + cur_ptr, data, size);
@@ -305,6 +303,15 @@ bool MemChunk::write(const void* data, uint32_t size) {
 	// Success
 	return true;
 }
+
+/* MemChunk::write
+ * Writes the given data at the [start] position. Expands the memory
+ * chunk if necessary.
+ *******************************************************************/
+ bool MemChunk::write(const void* data, uint32_t size, uint32_t start) {
+	 seek(start, SEEK_SET);
+	 return write(data, size);
+ }
 
 /* MemChunk::read
  * Reads data from the current position into <buf>. Returns false if
@@ -325,6 +332,20 @@ bool MemChunk::read(void* buf, uint32_t size) {
 	cur_ptr += size;
 
 	return true;
+}
+
+/* MemChunk::read
+ * Reads [size] bytes of data from [start] into <buf>. Returns false
+ * if attempting to read data outside of the chunk, true otherwise
+ *******************************************************************/
+bool MemChunk::read(void* buf, uint32_t size, uint32_t start) {
+	// Check options
+	if (start + size >= this->size)
+		return false;
+	
+	// Do read
+	seek(start, SEEK_SET);
+	return read(buf, size);
 }
 
 /* MemChunk::seek
@@ -356,6 +377,9 @@ bool MemChunk::seek(uint32_t offset, uint32_t start) {
 }
 
 bool MemChunk::readMC(MemChunk& mc, uint32_t size) {
+	if (cur_ptr + size >= this->size)
+		return false;
+
 	if (mc.write(data + cur_ptr, size)) {
 		cur_ptr += size;
 		return true;

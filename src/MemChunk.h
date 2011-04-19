@@ -35,7 +35,9 @@ public:
 
 	// C-style reading/writing
 	bool		write(const void* data, uint32_t size);
+	bool		write(const void* data, uint32_t size, uint32_t start);
 	bool		read(void* buf, uint32_t size);
+	bool		read(void* buf, uint32_t size, uint32_t start);
 	bool		seek(uint32_t offset, uint32_t start);
 	uint32_t	currentPos() { return cur_ptr; }
 

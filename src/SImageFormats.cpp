@@ -92,7 +92,6 @@ bool SImage::loadImage(const uint8_t* img_data, int size) {
 	FreeImage_CloseMemory(mem);
 
 	// Testing
-	/*
 	if (fif == FIF_PNG) {
 		MemChunk data(img_data, size);
 		SIFormat* format = SIFormat::getFormat("png");
@@ -101,7 +100,6 @@ bool SImage::loadImage(const uint8_t* img_data, int size) {
 		announce("image_changed");
 		return ok;
 	}
-	*/
 
 	// Check it created/read ok
 	if (!bm) {

@@ -42,6 +42,7 @@ private:
 	bool		has_palette;
 	int			offset_x;
 	int			offset_y;
+	SIFormat*	format;
 
 	// For multi-image files
 	int			imgindex;
@@ -69,6 +70,8 @@ public:
 	unsigned		getStride();
 	uint8_t			getBpp();
 	rgba_t			getPixel(unsigned x, unsigned y, Palette8bit* pal = NULL);
+	uint8_t			getPixelIndex(unsigned x, unsigned y);
+	SIFormat*		getFormat() { return format; }
 
 	void			setXOffset(int offset);
 	void			setYOffset(int offset);

@@ -498,7 +498,7 @@ bool GLTexture::draw2dTiled(uint32_t width, uint32_t height) {
 
 
 /*******************************************************************
- * GLTEXTURE CLASS FUNCTIONS
+ * GLTEXTURE STATIC FUNCTIONS
  *******************************************************************/
 
 /* GLTexture::bgTex
@@ -521,11 +521,4 @@ GLTexture& GLTexture::bgTex() {
 void GLTexture::resetBgTex() {
 	if (tex_background.isLoaded())
 		tex_background.clear();
-
-	wxColour col1(bgtx_colour1);
-	wxColour col2(bgtx_colour2);
-
-	tex_background.genChequeredTexture(8, 
-		rgba_t(col1.Red(), col1.Green(), col1.Blue(), 255), 
-		rgba_t(col2.Red(), col2.Green(), col2.Blue(), 255));
 }

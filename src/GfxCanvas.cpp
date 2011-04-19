@@ -37,6 +37,7 @@
  * VARIABLES
  *******************************************************************/
 DEFINE_EVENT_TYPE(wxEVT_GFXCANVAS_OFFSET_CHANGED)
+CVAR(Bool, gfx_show_border, true, CVAR_SAVE)
 
 
 /*******************************************************************
@@ -184,8 +185,8 @@ void GfxCanvas::drawImage() {
 	glPushMatrix();
 
 	// For mysterious reasons, the top pixels are cut off if the image isn't panned down first.
-	if (view_type == GFXVIEW_DEFAULT)
-		glTranslated(8, 8, 0);
+	//if (view_type == GFXVIEW_DEFAULT)
+	//	glTranslated(8, 8, 0);
 
 	// Zoom
 	glScaled(scale, scale, 1);
@@ -250,13 +251,15 @@ void GfxCanvas::drawImage() {
 	glDisable(GL_TEXTURE_2D);
 
 	// Draw outline
-	rgba_t(0, 0, 0, 64).set_gl();
-	glBegin(GL_LINE_LOOP);
-	glVertex2d(0, 0);
-	glVertex2d(0, y);
-	glVertex2d(x, y);
-	glVertex2d(x, 0);
-	glEnd();
+	if (gfx_show_border) {
+		rgba_t(0, 0, 0, 64).set_gl();
+		glBegin(GL_LINE_LOOP);
+		glVertex2d(0, 0);
+		glVertex2d(0, y);
+		glVertex2d(x, y);
+		glVertex2d(x, 0);
+		glEnd();
+	}
 
 	// Restore previous matrix
 	glPopMatrix();
@@ -300,13 +303,18 @@ void GfxCanvas::zoomToFit(bool mag, float padding) {
  * Returns true if the given coordinates are 'on' top of the image
  *******************************************************************/
 bool GfxCanvas::onImage(int x, int y) {
-	if (view_type == GFXVIEW_DEFAULT || view_type == GFXVIEW_TILED)
+	if (view_type == GFXVIEW_TILED)
 		return false;
 
-	int left = GetSize().x * 0.5 + offset.x;
-	int top = GetSize().y * 0.5 + offset.y;
+	// Determine top-left coordinates of image in screen coords
+	double left = GetSize().x * 0.5 + offset.x;
+	double top = GetSize().y * 0.5 + offset.y;
 
-	if (view_type == GFXVIEW_CENTERED) {
+	if (view_type == GFXVIEW_DEFAULT) {
+		left = 0;
+		top = 0;
+	}
+	else if (view_type == GFXVIEW_CENTERED) {
 		left -= (double)image->getWidth() * 0.5 * scale;
 		top -= (double)image->getHeight() * 0.5 * scale;
 	}
@@ -321,10 +329,57 @@ bool GfxCanvas::onImage(int x, int y) {
 		top -= image->offset().y * scale;
 	}
 
-	int right = left + image->getWidth() * scale;
-	int bottom = top + image->getHeight() * scale;
+	// Determine bottom-right coordinates of image in screen coords
+	double right = left + image->getWidth() * scale;
+	double bottom = top + image->getHeight() * scale;
 
 	return (x >= left && x <= right && y >= top && y <= bottom);
+}
+
+/* GfxCanvas::imageCoords
+ * Returns the image coordinates at [x,y] in screen coordinates, or
+ * [-1, -1] if not on the image
+ *******************************************************************/
+point2_t GfxCanvas::imageCoords(int x, int y) {
+	// Determine top-left coordinates of image in screen coords
+	double left = GetSize().x * 0.5 + offset.x;
+	double top = GetSize().y * 0.5 + offset.y;
+
+	if (view_type == GFXVIEW_DEFAULT) {
+		left = 0;
+		top = 0;
+	}
+	else if (view_type == GFXVIEW_CENTERED) {
+		left -= (double)image->getWidth() * 0.5 * scale;
+		top -= (double)image->getHeight() * 0.5 * scale;
+	}
+	else if (view_type == GFXVIEW_SPRITE) {
+		left -= image->offset().x * scale;
+		top -= image->offset().y * scale;
+	}
+	else if (view_type == GFXVIEW_HUD) {
+		left -= 160 * scale;
+		top -= 100 * scale;
+		left -= image->offset().x * scale;
+		top -= image->offset().y * scale;
+	}
+
+	// Determine bottom-right coordinates of image in screen coords
+	double right = left + image->getWidth() * scale;
+	double bottom = top + image->getHeight() * scale;
+	
+	// Check if the pointer is within the image
+	if (x >= left && x <= right && y >= top && y <= bottom) {
+		// Determine where in the image it is
+		double w = right - left;
+		double h = bottom - top;
+		double xpos = double(x - left) / w;
+		double ypos = double(y - top) / h;
+		
+		return point2_t(xpos * image->getWidth(), ypos * image->getHeight());
+	}
+	else
+		return point2_t(-1, -1);
 }
 
 /* GfxCanvas::endOffsetDrag
@@ -371,7 +426,7 @@ void GfxCanvas::onAnnouncement(Announcer* announcer, string event_name, MemChunk
 void GfxCanvas::onMouseLeftDown(wxMouseEvent& e) {
 	int x = e.GetPosition().x;
 	int y = e.GetPosition().y;
-	bool on_image = onImage(x, y);
+	bool on_image = onImage(x, y-2);
 
 	// Left mouse down
 	if (e.LeftDown()) {
@@ -404,7 +459,7 @@ void GfxCanvas::onMouseMovement(wxMouseEvent& e) {
 	bool refresh = false;
 
 	// Check if the mouse is over the image
-	bool on_image = onImage(e.GetPosition().x, e.GetPosition().y);
+	bool on_image = onImage(e.GetX(), e.GetY()-2);
 	if (on_image != image_hilight) {
 		image_hilight = on_image;
 		refresh = true;

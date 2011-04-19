@@ -92,11 +92,11 @@ TranslationEditorDialog::TranslationEditorDialog(wxWindow* parent, Palette8bit* 
 	sizer->Add(framesizer, wxGBPosition(0, 0), wxDefaultSpan, wxEXPAND);
 
 	list_translations = new wxListBox(this, -1);
-	framesizer->Add(list_translations, 1, wxEXPAND|wxLEFT|wxBOTTOM|wxRIGHT, 4);
+	framesizer->Add(list_translations, 1, wxEXPAND|wxALL, 4);
 
 	// Add translation button
 	wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
-	framesizer->Add(vbox, 0, wxEXPAND|wxBOTTOM|wxRIGHT, 4);
+	framesizer->Add(vbox, 0, wxEXPAND|wxTOP|wxBOTTOM|wxRIGHT, 4);
 
 	btn_add = new wxBitmapButton(this, -1, getIcon("t_plus"));
 	vbox->Add(btn_add, 0, wxEXPAND|wxBOTTOM, 4);
@@ -123,9 +123,9 @@ TranslationEditorDialog::TranslationEditorDialog(wxWindow* parent, Palette8bit* 
 	pal_canvas_original = new PaletteCanvas(this, -1);
 	pal_canvas_original->doubleWidth(true);
 	pal_canvas_original->setPalette(palette);
-	pal_canvas_original->SetInitialSize(wxSize(450, 114));
+	pal_canvas_original->SetInitialSize(wxSize(448, 112));
 	pal_canvas_original->allowSelection(2);
-	framesizer->Add(pal_canvas_original->toPanel(this), 0, wxEXPAND|wxLEFT|wxBOTTOM|wxRIGHT, 4);
+	framesizer->Add(pal_canvas_original->toPanel(this), 1, wxALL, 4);
 
 
 	// --- Bottom half (translation target) ---
@@ -163,7 +163,7 @@ TranslationEditorDialog::TranslationEditorDialog(wxWindow* parent, Palette8bit* 
 	pal_canvas_target = new PaletteCanvas(panel_target_palette, -1);
 	pal_canvas_target->doubleWidth(true);
 	pal_canvas_target->setPalette(palette);
-	pal_canvas_target->SetInitialSize(wxSize(450, 114));
+	pal_canvas_target->SetInitialSize(wxSize(448, 112));
 	pal_canvas_target->allowSelection(2);
 	vbox->Add(pal_canvas_target->toPanel(panel_target_palette), 1, wxEXPAND);
 
@@ -190,11 +190,11 @@ TranslationEditorDialog::TranslationEditorDialog(wxWindow* parent, Palette8bit* 
 
 	// Gradient preview
 	gb_gradient = new GradientBox(panel_target_gradient);
-	vbox->Add(gb_gradient->toPanel(panel_target_palette), 0, wxEXPAND);
+	vbox->Add(gb_gradient->toPanel(panel_target_gradient), 0, wxEXPAND);
 	vbox->AddStretchSpacer();
 
 	// Show initial target panel (palette)
-	framesizer->Add(panel_target_palette, 1, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+	framesizer->Add(panel_target_palette, 1, wxEXPAND|wxALL, 4);
 	panel_target_gradient->Show(false);
 
 
@@ -208,9 +208,9 @@ TranslationEditorDialog::TranslationEditorDialog(wxWindow* parent, Palette8bit* 
 	hbox->Add(framesizer, 0, wxEXPAND|wxRIGHT, 4);
 
 	pal_canvas_preview = new PaletteCanvas(this, -1);
-	pal_canvas_preview->SetInitialSize(wxSize(226, 226));
+	pal_canvas_preview->SetInitialSize(wxSize(224, 224));
 	pal_canvas_preview->setPalette(palette);
-	framesizer->Add(pal_canvas_preview->toPanel(this), 1, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+	framesizer->Add(pal_canvas_preview->toPanel(this), 1, wxEXPAND|wxALL, 4);
 
 	// Image preview
 	frame = new wxStaticBox(this, -1, "Preview");
@@ -221,7 +221,7 @@ TranslationEditorDialog::TranslationEditorDialog(wxWindow* parent, Palette8bit* 
 	gfx_preview->setPalette(palette);
 	gfx_preview->setViewType(GFXVIEW_CENTERED);
 	if (entry_preview) Misc::loadImageFromEntry(gfx_preview->getImage(), entry_preview);
-	framesizer->Add(gfx_preview->toPanel(this), 1, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+	framesizer->Add(gfx_preview->toPanel(this), 1, wxEXPAND|wxALL, 4);
 
 
 	// --- Translation string ---
@@ -263,6 +263,7 @@ TranslationEditorDialog::TranslationEditorDialog(wxWindow* parent, Palette8bit* 
 	btn_down->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TranslationEditorDialog::onBtnDown, this);
 	btn_load->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TranslationEditorDialog::onBtnLoad, this);
 	btn_save->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TranslationEditorDialog::onBtnSave, this);
+	gfx_preview->Bind(wxEVT_MOTION, &TranslationEditorDialog::onGfxPreviewMouseMotion, this);
 
 	// Setup layout
 	Layout();
@@ -785,4 +786,25 @@ void TranslationEditorDialog::onBtnSave(wxCommandEvent& e) {
 		// Close file
 		file.Close();
 	}
+}
+
+void TranslationEditorDialog::onGfxPreviewMouseMotion(wxMouseEvent& e) {
+	// Get the image coordinates at the mouse pointer
+	point2_t pos = gfx_preview->imageCoords(e.GetX(), e.GetY()-2);
+	
+	int index = pal_canvas_preview->getSelectionStart();
+	
+	// Get palette index at position
+	if (pos.x >= 0)
+		index = gfx_preview->getImage()->getPixelIndex(pos.x, pos.y);
+	else
+		index = -1;
+	
+	// Update preview palette if necessary
+	if (index != pal_canvas_preview->getSelectionStart()) {
+		pal_canvas_preview->setSelection(index);
+		pal_canvas_preview->Refresh();
+	}
+	
+	e.Skip();
 }

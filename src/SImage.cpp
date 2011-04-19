@@ -228,6 +228,21 @@ rgba_t SImage::getPixel(unsigned x, unsigned y, Palette8bit* pal) {
 	return col;
 }
 
+/* SImage::getPixel
+ * Returns the palette index of the pixel at [x,y] in the image, or
+ * 0 if the position is out of bounds or the image is not paletted
+ *******************************************************************/
+uint8_t SImage::getPixelIndex(unsigned x, unsigned y) {
+	// Get pixel index
+	unsigned index = y * getStride() + x * getBpp();
+
+	// Check it
+	if (index >= unsigned(width*height*getBpp()) || type == RGBA)
+		return 0;
+		
+	return data[index];
+}
+
 /* SImage::setXOffset
  * Changes the image X offset
  *******************************************************************/

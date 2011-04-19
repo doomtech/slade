@@ -43,5 +43,10 @@ The current release of Audiere is quite old, and can cause some problems. For on
 in linux. If your distro has dropped OSS support (eg ubuntu 10.10), you'll have to get the alsa-oss wrapper,
 and run slade3 like "aoss ./slade3", or no audio playback (except MIDI via fluidsynth) will be available.
 If you cannot get Audiere packages for your distro (and don't try compiling it - it won't), it is possible to
-disable it (and therefore all sound playback) by using Makefile-no_audiere in trunk
+disable it (and therefore all sound playback) by using Makefile-no_audiere in trunk. The CodeLite project currently
+has Audiere disabled in unix.
 
+Ubuntu 11.04:
+wxWidgets 2.9.1 has some issues with Ubuntu 11.04. These are fixed in wxWidgets 2.9.2 on the wx SVN. Instructions
+for checking out the wxWidgets svn can be found here: <http://www.wxwidgets.org/develop/svn.htm>. The compilation
+instructions for 2.9.1 above also apply for 2.9.2.

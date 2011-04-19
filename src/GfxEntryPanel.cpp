@@ -244,6 +244,20 @@ public:
 	}
 };
 
+/*******************************************************************
+ * GFXCROPDIALOG CLASS
+ *******************************************************************
+ A simple dialog for the 'Crop' function, allows the user to select
+ new image bounds to crop to
+ */
+/*
+class GfxTintDialog : public wxDialog {
+private:
+	GfxCanvas*			gfx_preview;
+	ArchiveEntry*		entry;
+	Palette8bit*		palette;
+*/
+
 
 /*******************************************************************
  * GFXENTRYPANEL CLASS FUNCTIONS

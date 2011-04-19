@@ -39,6 +39,8 @@
  *******************************************************************/
 EXTERN_CVAR(String, bgtx_colour1)
 EXTERN_CVAR(String, bgtx_colour2)
+EXTERN_CVAR(Bool, gfx_show_border)
+
 
 /*******************************************************************
  * GRAPHICSPREFSPANEL CLASS FUNCTIONS
@@ -80,7 +82,12 @@ GraphicsPrefsPanel::GraphicsPrefsPanel(wxWindow* parent) : wxPanel(parent, -1) {
 	hbox->Add(choice_presets, 1, wxEXPAND);
 
 	sizer->Add(vbox, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
-
+	
+	// 'Show outline around gfx'
+	cb_show_border = new wxCheckBox(this, -1, "Show outline around graphics");
+	cb_show_border->SetValue(gfx_show_border);
+	sizer->Add(cb_show_border, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+	
 	// Bind events
 	choice_presets->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &GraphicsPrefsPanel::onChoicePresetSelected, this);
 }
@@ -100,6 +107,7 @@ void GraphicsPrefsPanel::applyPreferences() {
 	wxc = cp_colour2->GetColour();
 	bgtx_colour2 = wxc.GetAsString();
 	GLTexture::resetBgTex();
+	gfx_show_border = cb_show_border->GetValue();
 	theMainWindow->Refresh();
 }
 

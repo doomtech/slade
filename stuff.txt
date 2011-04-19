@@ -50,6 +50,9 @@ TODO List ---------------------------------------------------------------
 --- Text Editor ---
 - 'Tabs as Spaces' option
 
+--- Gfx Editor ---
+- Basic pixel-drawing tools
+
 --- General ---
 - Preferences Dialog:
 	- List of entry types, ability to enable/disable detection of certain types

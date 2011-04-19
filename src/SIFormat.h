@@ -17,8 +17,13 @@ protected:
 	string	name;
 	string	extension;
 
-	uint8_t* imageData(SImage& image) { return image.data; }
-	uint8_t* imageMask(SImage& image) { return image.mask; }
+	// Stuff to access protected image data
+	uint8_t*		imageData(SImage& image) { return image.data; }
+	uint8_t*		imageMask(SImage& image) { return image.mask; }
+	Palette8bit&	imagePalette(SImage& image) { return image.palette; }
+	
+	virtual bool	readImage(SImage& image, MemChunk& data) { return false; }
+	virtual bool	writeImage(SImage& image, MemChunk& data, Palette8bit* pal) { return false; }
 
 public:
 	SIFormat(string id);
@@ -28,12 +33,35 @@ public:
 
 	// Reading
 	virtual simginfo_t	getInfo(MemChunk& mc) { return simginfo_t(); }
-	virtual bool		loadImage(SImage& image, MemChunk& data) { return false; }
+	
+	bool loadImage(SImage& image, MemChunk& data) {
+		// Check format
+		if (!isThisFormat(data))
+			return false;
+			
+		// Attempt to read image data
+		bool ok = readImage(image, data);
+		
+		// Set format if successful
+		if (ok)
+			image.format = this;
+		
+		return ok;
+	}
 
 	// Writing
 	virtual bool	canWrite(SImage& image) { return false; }
-	virtual bool	writeImage(SImage& image, MemChunk& data) { return false; }
-
+	
+	bool saveImage(SImage& image, MemChunk& out, Palette8bit* pal = NULL) {
+		// Attempt to write image data
+		bool ok = writeImage(image, out, pal);
+		
+		// Set format if successful
+		if (ok)
+			image.format = this;
+		
+		return ok;
+	}
 
 	static void			initFormats();
 	static SIFormat*	getFormat(string name);

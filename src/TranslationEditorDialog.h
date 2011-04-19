@@ -90,6 +90,7 @@ public:
 	void	onBtnDown(wxCommandEvent& e);
 	void	onBtnLoad(wxCommandEvent& e);
 	void	onBtnSave(wxCommandEvent& e);
+	void	onGfxPreviewMouseMotion(wxMouseEvent& e);
 };
 
 #endif//__TRANSLATION_EDITOR_DIALOG_H__
