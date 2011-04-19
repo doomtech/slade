@@ -500,7 +500,6 @@ void ArchiveManagerPanel::openTab(Archive* archive) {
 			icon = "e_zip";
 
 		notebook_archives->AddPage(wp, archive->getFilename(false), false);
-		wxLogMessage("%s, %s", CHR(archive->getFilename(false)), CHR(archive->getFilename(true)));
 		notebook_archives->SetSelection(notebook_archives->GetPageCount() - 1);
 		notebook_archives->SetPageBitmap(notebook_archives->GetPageCount() - 1, getIcon(icon));
 		wp->SetName("archive");

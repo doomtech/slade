@@ -117,12 +117,15 @@ bool BSPArchive::open(string filename) {
  * Returns true if successful, false otherwise
  *******************************************************************/
 bool BSPArchive::open(ArchiveEntry* entry) {
-	// Check entry was given
-	if (!entry)
+	// Load from entry's data
+	if (entry && open(entry->getMCData())) {
+		// Update variables and return success
+		parent = entry;
+		parent->lock();
+		return true;
+	}
+	else
 		return false;
-
-	// Read archive from entry
-	return open(entry->getMCData());
 }
 
 /* BSPArchive::open
