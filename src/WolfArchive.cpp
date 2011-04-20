@@ -356,22 +356,6 @@ bool WolfArchive::open(string filename) {
 }
 
 /* WolfArchive::open
- * Reads Wolf format data from an ArchiveEntry
- * Returns true if successful, false otherwise
- *******************************************************************/
-bool WolfArchive::open(ArchiveEntry* entry) {
-	// Load from entry's data
-	if (entry && open(entry->getMCData())) {
-		// Update variables and return success
-		parent = entry;
-		parent->lock();
-		return true;
-	}
-	else
-		return false;
-}
-
-/* WolfArchive::open
  * Reads VSWAP Wolf format data from a MemChunk.
  * Returns true if successful, false otherwise
  *******************************************************************/

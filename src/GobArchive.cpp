@@ -93,46 +93,6 @@ string GobArchive::getFormat() {
 }
 
 /* GobArchive::open
- * Reads a gob format file from disk
- * Returns true if successful, false otherwise
- *******************************************************************/
-bool GobArchive::open(string filename) {
-	// Read the file into a MemChunk
-	MemChunk mc;
-	if (!mc.importFile(filename)) {
-		Global::error = "Unable to open file. Make sure it isn't in use by another program.";
-		return false;
-	}
-
-	// Load from MemChunk
-	if (open(mc)) {
-		// Update variables
-		this->filename = filename;
-		this->on_disk = true;
-
-		return true;
-	}
-	else
-		return false;
-}
-
-/* GobArchive::open
- * Reads gob format data from an ArchiveEntry
- * Returns true if successful, false otherwise
- *******************************************************************/
-bool GobArchive::open(ArchiveEntry* entry) {
-	// Load from entry's data
-	if (entry && open(entry->getMCData())) {
-		// Update variables and return success
-		parent = entry;
-		parent->lock();
-		return true;
-	}
-	else
-		return false;
-}
-
-/* GobArchive::open
  * Reads gob format data from a MemChunk
  * Returns true if successful, false otherwise
  *******************************************************************/

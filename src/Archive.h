@@ -67,6 +67,7 @@ enum ArchiveTypes {
 	ARCHIVE_HOG2,
 	ARCHIVE_PIG,
 	ARCHIVE_MVL,
+	ARCHIVE_ADAT,
 };
 
 // Define map types
@@ -124,8 +125,8 @@ public:
 	virtual string	getFormat() = 0;
 
 	// Opening
-	virtual bool	open(string filename) = 0;		// Open from File
-	virtual bool	open(ArchiveEntry* entry) = 0;	// Open from ArchiveEntry
+	virtual bool	open(string filename);			// Open from File
+	virtual bool	open(ArchiveEntry* entry);		// Open from ArchiveEntry
 	virtual bool	open(MemChunk& mc) = 0;			// Open from MemChunk
 
 	// Writing/Saving

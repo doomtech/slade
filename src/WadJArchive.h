@@ -19,8 +19,6 @@ public:
 	~WadJArchive();
 
 	// Wad specific
-	bool	open(string filename);
-	bool	open(ArchiveEntry* entry);
 	bool	open(MemChunk& mc);
 
 	bool	write(MemChunk& mc, bool update = true);

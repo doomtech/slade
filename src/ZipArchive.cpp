@@ -173,22 +173,6 @@ bool ZipArchive::open(string filename) {
 }
 
 /* ZipArchive::open
- * Reads zip format data from an ArchiveEntry
- * Returns true if successful, false otherwise
- *******************************************************************/
-bool ZipArchive::open(ArchiveEntry* entry) {
-	// Load from entry's data
-	if (entry && open(entry->getMCData())) {
-		// Update variables and return success
-		parent = entry;
-		parent->lock();
-		return true;
-	}
-	else
-		return false;
-}
-
-/* ZipArchive::open
  * Reads zip format data from a MemChunk
  * Returns true if successful, false otherwise
  *******************************************************************/

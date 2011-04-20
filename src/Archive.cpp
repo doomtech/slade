@@ -390,6 +390,46 @@ string Archive::getFilename(bool full) {
 	}
 }
 
+/* Archive::open
+ * Reads an archive from disk
+ * Returns true if successful, false otherwise
+ *******************************************************************/
+bool Archive::open(string filename) {
+	// Read the file into a MemChunk
+	MemChunk mc;
+	if (!mc.importFile(filename)) {
+		Global::error = "Unable to open file. Make sure it isn't in use by another program.";
+		return false;
+	}
+
+	// Load from MemChunk
+	if (open(mc)) {
+		// Update variables
+		this->filename = filename;
+		this->on_disk = true;
+
+		return true;
+	}
+	else
+		return false;
+}
+
+/* Archive::open
+ * Reads an archive from an ArchiveEntry
+ * Returns true if successful, false otherwise
+ *******************************************************************/
+bool Archive::open(ArchiveEntry* entry) {
+	// Load from entry's data
+	if (entry && open(entry->getMCData())) {
+		// Update variables and return success
+		parent = entry;
+		parent->lock();
+		return true;
+	}
+	else
+		return false;
+}
+
 /* Archive::setModified
  * Sets the Archive's modified status and announces the change
  *******************************************************************/

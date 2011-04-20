@@ -91,46 +91,6 @@ string ResArchive::getFormat() {
 	return "archive_res";
 }
 
-/* ResArchive::open
- * Reads a res format file from disk
- * Returns true if successful, false otherwise
- *******************************************************************/
-bool ResArchive::open(string filename) {
-	// Read the file into a MemChunk
-	MemChunk mc;
-	if (!mc.importFile(filename)) {
-		Global::error = "Unable to open file. Make sure it isn't in use by another program.";
-		return false;
-	}
-
-	// Load from MemChunk
-	if (open(mc)) {
-		// Update variables
-		this->filename = filename;
-		this->on_disk = true;
-
-		return true;
-	}
-	else
-		return false;
-}
-
-/* ResArchive::open
- * Reads res format data from an ArchiveEntry
- * Returns true if successful, false otherwise
- *******************************************************************/
-bool ResArchive::open(ArchiveEntry* entry) {
-	// Load from entry's data
-	if (entry && open(entry->getMCData())) {
-		// Update variables and return success
-		parent = entry;
-		parent->lock();
-		return true;
-	}
-	else
-		return false;
-}
-
 /* ResArchive::readDirectory
  * Reads a res directory from a MemChunk
  * Returns true if successful, false otherwise
