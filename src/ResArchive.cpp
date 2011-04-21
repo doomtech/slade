@@ -251,19 +251,6 @@ bool ResArchive::open(MemChunk& mc) {
 }
 
 /* ResArchive::write
- * Writes the res archive to a file
- * Returns true if successful, false otherwise
- *******************************************************************/
-bool ResArchive::write(string filename, bool update) {
-	// Write to a MemChunk, then export it to a file
-/*	MemChunk mc;
-	if (write(mc, true))
-		return mc.exportFile(filename);
-	else*/
-		return false;
-}
-
-/* ResArchive::write
  * Writes the res archive to a MemChunk
  * Returns true if successful, false otherwise
  *******************************************************************/

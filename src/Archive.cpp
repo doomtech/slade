@@ -516,6 +516,20 @@ ArchiveEntry* Archive::entryAtPath(string path) {
 	return dir->getEntry(fn.GetFullName());
 }
 
+
+/* Archive::write
+ * Writes the archive to a file
+ * Returns true if successful, false otherwise
+ *******************************************************************/
+bool Archive::write(string filename, bool update) {
+	// Write to a MemChunk, then export it to a file
+	MemChunk mc;
+	if (write(mc, true))
+		return mc.exportFile(filename);
+	else
+		return false;
+}
+
 /* Archive::save
  * This is the general, all-purpose 'save archive' function. Takes
  * into account whether the archive is contained within another,

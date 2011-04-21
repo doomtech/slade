@@ -190,19 +190,6 @@ bool Wad2Archive::open(MemChunk& mc) {
 }
 
 /* Wad2Archive::write
- * Writes the wad archive to a file
- * Returns true if successful, false otherwise
- *******************************************************************/
-bool Wad2Archive::write(string filename, bool update) {
-	// Write to a MemChunk, then export it to a file
-	MemChunk mc;
-	if (write(mc, true))
-		return mc.exportFile(filename);
-	else
-		return false;
-}
-
-/* Wad2Archive::write
  * Writes the wad archive to a MemChunk
  * Returns true if successful, false otherwise
  *******************************************************************/

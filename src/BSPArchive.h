@@ -15,12 +15,9 @@ public:
 	string		getFileExtensionString();
 	string		getFormat();
 
-	// Opening
-	bool		open(MemChunk& mc);			// Open from MemChunk
-
-	// Writing/Saving
-	bool		write(MemChunk& mc, bool update = true);	// Write to MemChunk
-	bool		write(string filename, bool update = true);	// Write to File
+	// Opening/writing
+	bool	open(MemChunk& mc);							// Open from MemChunk
+	bool	write(MemChunk& mc, bool update = true);	// Write to MemChunk
 
 	// Misc
 	bool		loadEntryData(ArchiveEntry* entry);

@@ -285,19 +285,6 @@ bool WadJArchive::open(MemChunk& mc) {
 }
 
 /* WadJArchive::write
- * Writes the wad archive to a file
- * Returns true if successful, false otherwise
- *******************************************************************/
-bool WadJArchive::write(string filename, bool update) {
-	// Write to a MemChunk, then export it to a file
-	MemChunk mc;
-	if (write(mc, true))
-		return mc.exportFile(filename);
-	else
-		return false;
-}
-
-/* WadJArchive::write
  * Writes the wad archive to a MemChunk
  * Returns true if successful, false otherwise
  *******************************************************************/

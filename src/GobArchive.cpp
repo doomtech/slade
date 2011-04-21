@@ -210,19 +210,6 @@ bool GobArchive::open(MemChunk& mc) {
 }
 
 /* GobArchive::write
- * Writes the gob archive to a file
- * Returns true if successful, false otherwise
- *******************************************************************/
-bool GobArchive::write(string filename, bool update) {
-	// Write to a MemChunk, then export it to a file
-	MemChunk mc;
-	if (write(mc, true))
-		return mc.exportFile(filename);
-	else
-		return false;
-}
-
-/* GobArchive::write
  * Writes the gob archive to a MemChunk
  * Returns true if successful, false otherwise
  *******************************************************************/

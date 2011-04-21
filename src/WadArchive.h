@@ -42,7 +42,6 @@ public:
 
 	// Writing/Saving
 	bool	write(MemChunk& mc, bool update = true);	// Write to MemChunk
-	bool	write(string filename, bool update = true);	// Write to File
 
 	// Misc
 	bool		loadEntryData(ArchiveEntry* entry);

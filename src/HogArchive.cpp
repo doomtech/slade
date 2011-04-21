@@ -191,19 +191,6 @@ bool HogArchive::open(MemChunk& mc) {
 }
 
 /* HogArchive::write
- * Writes the hog archive to a file
- * Returns true if successful, false otherwise
- *******************************************************************/
-bool HogArchive::write(string filename, bool update) {
-	// Write to a MemChunk, then export it to a file
-	MemChunk mc;
-	if (write(mc, true))
-		return mc.exportFile(filename);
-	else
-		return false;
-}
-
-/* HogArchive::write
  * Writes the hog archive to a MemChunk
  * Returns true if successful, false otherwise
  *******************************************************************/

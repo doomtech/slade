@@ -296,19 +296,6 @@ bool RffArchive::open(MemChunk& mc) {
 }
 
 /* RffArchive::write
- * Writes the rff archive to a file
- * Returns true if successful, false otherwise
- *******************************************************************/
-bool RffArchive::write(string filename, bool update) {
-	// Write to a MemChunk, then export it to a file
-	MemChunk mc;
-	if (write(mc, true))
-		return mc.exportFile(filename);
-	else
-		return false;
-}
-
-/* RffArchive::write
  * Writes the rff archive to a MemChunk
  * Not implemented because of encrypted directory and unknown stuff.
  *******************************************************************/

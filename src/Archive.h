@@ -131,7 +131,7 @@ public:
 
 	// Writing/Saving
 	virtual bool	write(MemChunk& mc, bool update = true) = 0;	// Write to MemChunk
-	virtual bool	write(string filename, bool update = true) = 0;	// Write to File
+	virtual bool	write(string filename, bool update = true);		// Write to File
 	virtual bool	save(string filename = "");						// Save archive
 
 	// Misc

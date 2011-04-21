@@ -273,19 +273,6 @@ bool PakArchive::write(MemChunk& mc, bool update) {
 	return true;
 }
 
-/* PakArchive::write
- * Writes the pak archive to a file
- * Returns true if successful, false otherwise
- *******************************************************************/
-bool PakArchive::write(string filename, bool update) {
-	// Write to a MemChunk, then export it to a file
-	MemChunk mc;
-	if (write(mc, true))
-		return mc.exportFile(filename);
-	else
-		return false;
-}
-
 /* PakArchive::loadEntryData
  * Loads an entry's data from the pak file
  * Returns true if successful, false otherwise
