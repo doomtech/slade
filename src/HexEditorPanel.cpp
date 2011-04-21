@@ -327,6 +327,7 @@ bool HexEditorPanel::loadData(MemChunk& mc) {
 	if (table_hex->loadData(mc)) {
 		grid_hex->SetTable(table_hex);
 		Layout();
+		grid_hex->Refresh();
 		return true;
 	}
 	else
