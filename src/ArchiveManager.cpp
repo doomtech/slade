@@ -198,12 +198,20 @@ Archive* ArchiveManager::openArchive(string filename, bool manage) {
 		new_archive = new LfdArchive();
 	else if (HogArchive::isHogArchive(filename))
 		new_archive = new HogArchive();
+	else if (ADatArchive::isADatArchive(filename))
+		new_archive = new ADatArchive();
 	else if (Wad2Archive::isWad2Archive(filename))
 		new_archive = new Wad2Archive();
 	else if (WadJArchive::isWadJArchive(filename))
 		new_archive = new WadJArchive();
 	else if (WolfArchive::isWolfArchive(filename))
 		new_archive = new WolfArchive();
+	else if (GZipArchive::isGZipArchive(filename))
+		new_archive = new GZipArchive();
+	else if (BZip2Archive::isBZip2Archive(filename))
+		new_archive = new BZip2Archive();
+	else if (TarArchive::isTarArchive(filename))
+		new_archive = new TarArchive();
 	else {
 		// Unsupported format
 		Global::error = "Unsupported or invalid Archive format";
@@ -284,13 +292,21 @@ Archive* ArchiveManager::openArchive(ArchiveEntry* entry, bool manage) {
 	else if (LfdArchive::isLfdArchive(entry->getMCData()))
 		new_archive = new LfdArchive();
 	else if (HogArchive::isHogArchive(entry->getMCData()))
-		new_archive = new HogArchive();
+			new_archive = new HogArchive();
+	else if (ADatArchive::isADatArchive(entry->getMCData()))
+		new_archive = new ADatArchive();
 	else if (Wad2Archive::isWad2Archive(entry->getMCData()))
 		new_archive = new Wad2Archive();
 	else if (WadJArchive::isWadJArchive(entry->getMCData()))
 		new_archive = new WadJArchive();
 	else if (WolfArchive::isWolfArchive(entry->getMCData()))
 		new_archive = new WolfArchive();
+	else if (GZipArchive::isGZipArchive(entry->getMCData()))
+		new_archive = new GZipArchive();
+	else if (BZip2Archive::isBZip2Archive(entry->getMCData()))
+		new_archive = new BZip2Archive();
+	else if (TarArchive::isTarArchive(entry->getMCData()))
+		new_archive = new TarArchive();
 	else {
 		// Unsupported format
 		Global::error = "Unsupported or invalid Archive format";
@@ -346,51 +362,14 @@ Archive* ArchiveManager::newArchive(uint8_t type) {
 			new_archive = new ZipArchive();
 			format_str = "zip";
 			break;
-		case ARCHIVE_LIB:
-			new_archive = new LibArchive();
-			format_str = "lib";
-			break;
-		case ARCHIVE_DAT:
-			new_archive = new DatArchive();
-			format_str = "dat";
-			break;
-		case ARCHIVE_RES:
-			new_archive = new ResArchive();
-			format_str = "res";
-			break;
-		case ARCHIVE_PAK:
-			new_archive = new PakArchive();
-			format_str = "pak";
-			break;
-		case ARCHIVE_GRP:
-			new_archive = new GrpArchive();
-			format_str = "grp";
-			break;
-		case ARCHIVE_GOB:
-			new_archive = new GrpArchive();
-			format_str = "gob";
-			break;
-		case ARCHIVE_LFD:
-			new_archive = new LfdArchive();
-			format_str = "lfd";
-			break;
-		case ARCHIVE_HOG:
-			new_archive = new HogArchive();
-			format_str = "hog";
-			break;
-		case ARCHIVE_RFF:
-			new_archive = new RffArchive();
-			format_str = "rff";
-			break;
-		case ARCHIVE_WOLF:
-			new_archive = new WolfArchive();
-			format_str = "wlf";
-			break;
+		default:
+			wxLogMessage("This shouldn't happen.");
+			return NULL;
 	}
 
 	// If the archive was created, set its filename and add it to the list
 	if (new_archive) {
-		new_archive->setFilename(S_FMT("UNSAVED (%s)", format_str.c_str()));
+		new_archive->setFilename(S_FMT("UNSAVED (%s)", CHR(format_str)));
 		addArchive(new_archive);
 	}
 

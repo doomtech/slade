@@ -36,6 +36,7 @@
 #include "ZipArchive.h"
 #include "Console.h"
 #include <wx/filename.h>
+#include "zlib/zlib.h"
 
 /*******************************************************************
  * VARIABLES
@@ -398,7 +399,7 @@ hsl_t Misc::rgbToHsl(double r, double g, double b) {
 
 
 
-// CRC stuff
+// CRC-32 stuff
 
 /* Table of CRCs of all 8-bit messages. */
 uint32_t crc_table[256];
@@ -431,7 +432,7 @@ void make_crc_table(void) {
 should be initialized to all 1's, and the transmitted value
 is the 1's complement of the final running CRC (see the
 crc() routine below)). */
-uint32_t update_crc(uint32_t crc, uint8_t *buf, uint32_t len) {
+uint32_t update_crc(uint32_t crc, const uint8_t *buf, uint32_t len) {
 	uint32_t c = crc;
 
 	if (!crc_table_computed)
@@ -444,6 +445,6 @@ uint32_t update_crc(uint32_t crc, uint8_t *buf, uint32_t len) {
 }
 
 /* Return the CRC of the bytes buf[0..len-1]. */
-uint32_t Misc::crc(uint8_t *buf, uint32_t len) {
+uint32_t Misc::crc(const uint8_t *buf, uint32_t len) {
 	return update_crc(0xffffffffL, buf, len) ^ 0xffffffffL;
 }

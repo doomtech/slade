@@ -68,6 +68,10 @@ enum ArchiveTypes {
 	ARCHIVE_PIG,
 	ARCHIVE_MVL,
 	ARCHIVE_ADAT,
+	ARCHIVE_TAR,
+	ARCHIVE_GZIP,
+	ARCHIVE_BZ2,
+	ARCHIVE_7Z,
 };
 
 // Define map types

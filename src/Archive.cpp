@@ -402,16 +402,18 @@ bool Archive::open(string filename) {
 		return false;
 	}
 
+	// Update filename before opening
+	string backupname = this->filename;
+	this->filename = filename;
+
 	// Load from MemChunk
 	if (open(mc)) {
-		// Update variables
-		this->filename = filename;
 		this->on_disk = true;
-
 		return true;
-	}
-	else
+	} else {
+		this->filename = backupname;
 		return false;
+	}
 }
 
 /* Archive::open

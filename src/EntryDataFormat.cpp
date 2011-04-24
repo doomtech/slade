@@ -230,9 +230,13 @@ void EntryDataFormat::initBuiltinFormats() {
 	new GobDataFormat();
 	new LfdDataFormat();
 	new HogDataFormat();
+	new ADatDataFormat();
 	new Wad2DataFormat();
 	new WadJDataFormat();
 	new WolfDataFormat();
+	new GZipDataFormat();
+	new BZip2DataFormat();
+	new TarDataFormat();
 	new MUSDataFormat();
 	new MIDIDataFormat();
 	new XMIDataFormat();

@@ -377,7 +377,7 @@ bool PakArchive::isPakArchive(string filename) {
 	wxFile file(filename);
 
 	// Check it opened ok
-	if (!file.IsOpened())
+	if (!file.IsOpened() || file.Length() < 12)
 		return false;
 
 	// Read pak header

@@ -141,14 +141,19 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions="/NODEFAULTLIB:LIBCMT"
 				AdditionalDependencies="audiere.lib FreeImage.lib wxbase29u.lib wxmsw29u_core.lib wxmsw29u_aui.lib wxmsw29u_gl.lib wxmsw29u_html.lib wxmsw29u_adv.lib wxmsw29u_stc.lib wxmsw29u_media.lib wxtiff.lib wxjpeg.lib wxpng.lib wxzlib.lib wxregexu.lib wxexpat.lib wxscintilla.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib user32.lib shell32.lib advapi32.lib comdlg32.lib gdi32.lib ole32.lib oleaut32.lib"
 				LinkIncremental="1"
 				GenerateManifest="true"
 				GenerateDebugInformation="true"
+				GenerateMapFile="true"
+				MapFileName="$(TargetDir)$(TargetName).map"
+				MapExports="true"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				LinkTimeCodeGeneration="0"
+				SetChecksum="true"
 				TargetMachine="1"
 				AllowIsolation="true"
 			/>
@@ -405,6 +410,14 @@
 				</File>
 				<File
 					RelativePath=".\src\CodePages.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Compression.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Compression.h"
 					>
 				</File>
 				<File
@@ -836,6 +849,14 @@
 				Name="Archive"
 				>
 				<File
+					RelativePath=".\src\ADatArchive.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ADatArchive.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\Archive.cpp"
 					>
 				</File>
@@ -872,6 +893,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\BZip2Archive.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\BZip2Archive.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\DatArchive.cpp"
 					>
 				</File>
@@ -893,6 +922,14 @@
 				</File>
 				<File
 					RelativePath=".\src\GrpArchive.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\GZipArchive.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\GZipArchive.h"
 					>
 				</File>
 				<File
@@ -941,6 +978,14 @@
 				</File>
 				<File
 					RelativePath=".\src\RffArchive.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\TarArchive.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\TarArchive.h"
 					>
 				</File>
 				<File
@@ -1355,6 +1400,42 @@
 				</File>
 				<File
 					RelativePath=".\src\mus2mid\mus2mid.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="ZReaders"
+				>
+				<File
+					RelativePath=".\src\zreaders\ancientzip.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\zreaders\ancientzip.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\zreaders\files.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\zreaders\files.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\zreaders\m_alloc.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\zreaders\m_alloc.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\zreaders\tarray.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\zreaders\templates.h"
 					>
 				</File>
 			</Filter>
