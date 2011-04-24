@@ -1114,13 +1114,21 @@ bool ArchiveManagerPanel::handleAction(string id) {
 		}
 	}
 
-	// File->Recent
+	// File->Recent *and* Recent files context menu
 	else if (id.StartsWith("aman_recent")) {
-		// Get recent file index
-		unsigned index = theApp->getAction(id)->getWxId() - theApp->getAction("aman_recent1")->getWxId();
+		// Deal with those first
+		if (id == "aman_recent_open")
+			openSelection();
+		else if (id == "aman_recent_remove")
+			removeSelection();
+		// Only then is it safe to assume it's a File->Recent stuff
+		else {
+			// Get recent file index
+			unsigned index = theApp->getAction(id)->getWxId() - theApp->getAction("aman_recent1")->getWxId();
 
-		// Open it
-		openFile(theArchiveManager->recentFile(index));
+			// Open it
+			openFile(theArchiveManager->recentFile(index));
+		}
 	}
 
 	// File->Save All
@@ -1142,12 +1150,6 @@ bool ArchiveManagerPanel::handleAction(string id) {
 	else if (id == "aman_bookmark_remove")
 		deleteSelectedBookmarks();
 
-
-	// Recent files context menu
-	else if (id == "aman_recent_open")
-		openSelection();
-	else if (id == "aman_recent_remove")
-		removeSelection();
 
 	// Unknown action
 	else
