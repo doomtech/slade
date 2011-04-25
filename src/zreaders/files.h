@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <zlib.h>
 #include "../bzip2/bzlib.h"
-#include "../lzma/c/LzmaDec.h"
+#include "../lzma/C/LzmaDec.h"
 #include "../Main.h"
 #include "../MemChunk.h"
 #include "templates.h"
@@ -16,6 +16,7 @@
 #define STACK_ARGS
 #endif
 
+#define BYTE uint8_t
 
 class FileReaderBase
 {

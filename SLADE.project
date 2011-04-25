@@ -77,6 +77,8 @@
       <File Name="src/CodePages.h"/>
       <File Name="src/MathStuff.cpp"/>
       <File Name="src/MathStuff.h"/>
+      <File Name="src/Compression.cpp"/>
+      <File Name="src/Compression.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Console">
       <File Name="src/Console.cpp"/>
@@ -136,6 +138,7 @@
       <File Name="src/ArchivePanel.h"/>
       <File Name="src/BaseResourceChooser.h"/>
       <File Name="src/BaseResourceChooser.cpp"/>
+      <File Name="src/lzma/C/Xz.h"/>
     </VirtualDirectory>
     <File Name="src/MainWindow.h"/>
     <File Name="src/EntryOperations.cpp"/>
@@ -222,6 +225,14 @@
       <File Name="src/HogArchive.h"/>
       <File Name="src/BSPArchive.cpp"/>
       <File Name="src/BSPArchive.h"/>
+      <File Name="src/ADatArchive.cpp"/>
+      <File Name="src/ADatArchive.h"/>
+      <File Name="src/BZip2Archive.cpp"/>
+      <File Name="src/BZip2Archive.h"/>
+      <File Name="src/GZipArchive.cpp"/>
+      <File Name="src/GZipArchive.h"/>
+      <File Name="src/TarArchive.cpp"/>
+      <File Name="src/TarArchive.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Binary Control Lumps">
       <File Name="src/AnimatedList.cpp"/>
@@ -331,6 +342,56 @@
       <File Name="src/mus2mid/mus2mid.cpp"/>
       <File Name="src/mus2mid/mus2mid.h"/>
     </VirtualDirectory>
+    <VirtualDirectory Name="ZReaders">
+      <File Name="src/zreaders/ancientzip.cpp"/>
+      <File Name="src/zreaders/ancientzip.h"/>
+      <File Name="src/zreaders/files.cpp"/>
+      <File Name="src/zreaders/files.h"/>
+      <File Name="src/zreaders/m_alloc.cpp"/>
+      <File Name="src/zreaders/m_alloc.h"/>
+      <File Name="src/zreaders/tarray.h"/>
+      <File Name="src/zreaders/templates.h"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="Lzma">
+      <File Name="src/lzma/C/7zBuf.c"/>
+      <File Name="src/lzma/C/7zBuf.h"/>
+      <File Name="src/lzma/C/7zCrc.c"/>
+      <File Name="src/lzma/C/7zCrc.h"/>
+      <File Name="src/lzma/C/7zStream.c"/>
+      <File Name="src/lzma/C/7zVersion.h"/>
+      <File Name="src/lzma/C/Alloc.c"/>
+      <File Name="src/lzma/C/Alloc.h"/>
+      <File Name="src/lzma/C/Bcj2.c"/>
+      <File Name="src/lzma/C/Bcj2.h"/>
+      <File Name="src/lzma/C/Bra.h"/>
+      <File Name="src/lzma/C/Bra86.c"/>
+      <File Name="src/lzma/C/CpuArch.h"/>
+      <File Name="src/lzma/C/LzFind.c"/>
+      <File Name="src/lzma/C/LzFind.h"/>
+      <File Name="src/lzma/C/LzFindMt.c"/>
+      <File Name="src/lzma/C/LzFindMt.h"/>
+      <File Name="src/lzma/C/LzHash.h"/>
+      <File Name="src/lzma/C/LzmaDec.c"/>
+      <File Name="src/lzma/C/LzmaDec.h"/>
+      <File Name="src/lzma/C/LzmaEnc.c"/>
+      <File Name="src/lzma/C/LzmaEnc.h"/>
+      <File Name="src/lzma/C/LzmaLib.c"/>
+      <File Name="src/lzma/C/LzmaLib.h"/>
+      <File Name="src/lzma/C/Threads.c"/>
+      <File Name="src/lzma/C/Threads.h"/>
+      <File Name="src/lzma/C/Types.h"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="BZip2">
+      <File Name="src/bzip2/blocksort.c"/>
+      <File Name="src/bzip2/bzlib.c"/>
+      <File Name="src/bzip2/bzlib.h"/>
+      <File Name="src/bzip2/bzlib_private.h"/>
+      <File Name="src/bzip2/compress.c"/>
+      <File Name="src/bzip2/crctable.c"/>
+      <File Name="src/bzip2/decompress.c"/>
+      <File Name="src/bzip2/huffman.c"/>
+      <File Name="src/bzip2/randtable.c"/>
+    </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="osx">
     <File Name="Info.plist"/>
@@ -341,6 +402,9 @@
       <Compiler Options="" C_Options="">
         <IncludePath Value="."/>
         <Preprocessor Value="NO_AUDIERE"/>
+        <Preprocessor Value="BOOL=int"/>
+        <Preprocessor Value="TRUE=1"/>
+        <Preprocessor Value="FALSE=0"/>
       </Compiler>
       <Linker Options="">
         <LibraryPath Value="."/>

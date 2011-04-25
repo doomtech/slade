@@ -249,7 +249,7 @@ bool Compression::BZip2Compress(MemChunk &in, MemChunk &out) {
 	out.clear();
 
 	// Allocate a work buffer big enough to guarantee success
-	size_t bufferlen = in.getSize() + (in.getSize()>>6) + 1024;
+	unsigned bufferlen = in.getSize() + (in.getSize()>>6) + 1024;
 	char * buffer = new char[bufferlen];
 	int ok = -1;
 	if (buffer) {

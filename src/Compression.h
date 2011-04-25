@@ -21,4 +21,4 @@ namespace Compression {
 	bool LZMADecompress(MemChunk &in, MemChunk &out, size_t size);
 }
 
-#endif __COMPRESSION_H__
+#endif//__COMPRESSION_H__

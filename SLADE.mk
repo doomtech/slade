@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Simon
-Date                   :=19/04/11
+Date                   :=25/04/11
 CodeLitePath           :="/home/simon/.codelite"
 LinkerName             :=g++
 ArchiveTool            :=ar rcus
@@ -31,7 +31,7 @@ SourceSwitch           :=-c
 CompilerName           :=g++
 C_CompilerName         :=gcc
 OutputFile             :=./dist/slade
-Preprocessors          :=$(PreprocessorSwitch)NO_AUDIERE $(PreprocessorSwitch)__WX__ $(PreprocessorSwitch)NDEBUG 
+Preprocessors          :=$(PreprocessorSwitch)NO_AUDIERE $(PreprocessorSwitch)BOOL=int $(PreprocessorSwitch)TRUE=1 $(PreprocessorSwitch)FALSE=0 $(PreprocessorSwitch)__WX__ $(PreprocessorSwitch)NDEBUG 
 ObjectSwitch           :=-o 
 ArchiveOutputSwitch    := 
 PreprocessOnlySwitch   :=-E 
@@ -53,16 +53,18 @@ CodeLiteDir:=/usr/share/codelite
 Objects=$(IntermediateDirectory)/src_GfxConvDialog$(ObjectSuffix) $(IntermediateDirectory)/src_ModifyOffsetsDialog$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteDialog$(ObjectSuffix) $(IntermediateDirectory)/src_PreferencesDialog$(ObjectSuffix) $(IntermediateDirectory)/src_BaseResourceArchivesPanel$(ObjectSuffix) $(IntermediateDirectory)/src_TextEditorPrefsPanel$(ObjectSuffix) $(IntermediateDirectory)/src_TextStylePrefsPanel$(ObjectSuffix) $(IntermediateDirectory)/src_GeneralPrefsPanel$(ObjectSuffix) $(IntermediateDirectory)/src_EditingPrefsPanel$(ObjectSuffix) $(IntermediateDirectory)/src_ACSPrefsPanel$(ObjectSuffix) \
 	$(IntermediateDirectory)/src_InterfacePrefsPanel$(ObjectSuffix) $(IntermediateDirectory)/src_PNGPrefsPanel$(ObjectSuffix) $(IntermediateDirectory)/src_GraphicsPrefsPanel$(ObjectSuffix) $(IntermediateDirectory)/src_ExtMessageDialog$(ObjectSuffix) $(IntermediateDirectory)/src_TranslationEditorDialog$(ObjectSuffix) $(IntermediateDirectory)/src_Clipboard$(ObjectSuffix) $(IntermediateDirectory)/src_CVar$(ObjectSuffix) $(IntermediateDirectory)/src_MainApp$(ObjectSuffix) $(IntermediateDirectory)/src_MemChunk$(ObjectSuffix) $(IntermediateDirectory)/src_Misc$(ObjectSuffix) \
 	$(IntermediateDirectory)/src_WxStuff$(ObjectSuffix) $(IntermediateDirectory)/src_OpenGL$(ObjectSuffix) $(IntermediateDirectory)/src_ListenerAnnouncer$(ObjectSuffix) $(IntermediateDirectory)/src_Property$(ObjectSuffix) $(IntermediateDirectory)/src_PropertyList$(ObjectSuffix) $(IntermediateDirectory)/src_Tokenizer$(ObjectSuffix) $(IntermediateDirectory)/src_Tree$(ObjectSuffix) $(IntermediateDirectory)/src_Parser$(ObjectSuffix) $(IntermediateDirectory)/src_CodePages$(ObjectSuffix) $(IntermediateDirectory)/src_MathStuff$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_Console$(ObjectSuffix) $(IntermediateDirectory)/src_MIDIPlayer$(ObjectSuffix) $(IntermediateDirectory)/src_SAction$(ObjectSuffix) $(IntermediateDirectory)/src_AnimatedEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_EntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_GfxEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_SwitchesEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_TextEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_PnamesEntryPanel$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_DefaultEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_HexEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_MapEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_AudioEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_ANSIEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveManagerPanel$(ObjectSuffix) $(IntermediateDirectory)/src_PatchTablePanel$(ObjectSuffix) $(IntermediateDirectory)/src_TextureXEditor$(ObjectSuffix) $(IntermediateDirectory)/src_TextureXPanel$(ObjectSuffix) $(IntermediateDirectory)/src_TextureEditorPanel$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_PatchBrowser$(ObjectSuffix) $(IntermediateDirectory)/src_ZTextureEditorPanel$(ObjectSuffix) $(IntermediateDirectory)/src_ArchivePanel$(ObjectSuffix) $(IntermediateDirectory)/src_BaseResourceChooser$(ObjectSuffix) $(IntermediateDirectory)/src_EntryOperations$(ObjectSuffix) $(IntermediateDirectory)/src_MainWindow$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveOperations$(ObjectSuffix) $(IntermediateDirectory)/src_Conversions$(ObjectSuffix) $(IntermediateDirectory)/src_MapLine$(ObjectSuffix) $(IntermediateDirectory)/src_MapSector$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_MapSide$(ObjectSuffix) $(IntermediateDirectory)/src_MapThing$(ObjectSuffix) $(IntermediateDirectory)/src_MapVertex$(ObjectSuffix) $(IntermediateDirectory)/src_SLADEMap$(ObjectSuffix) $(IntermediateDirectory)/src_MapCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_MapEditorWindow$(ObjectSuffix) $(IntermediateDirectory)/src_Archive$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveEntry$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveManager$(ObjectSuffix) $(IntermediateDirectory)/src_WadArchive$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_ZipArchive$(ObjectSuffix) $(IntermediateDirectory)/src_EntryType$(ObjectSuffix) $(IntermediateDirectory)/src_EntryDataFormat$(ObjectSuffix) $(IntermediateDirectory)/src_DatArchive$(ObjectSuffix) $(IntermediateDirectory)/src_LibArchive$(ObjectSuffix) $(IntermediateDirectory)/src_ResArchive$(ObjectSuffix) $(IntermediateDirectory)/src_PakArchive$(ObjectSuffix) $(IntermediateDirectory)/src_Wad2Archive$(ObjectSuffix) $(IntermediateDirectory)/src_WadJArchive$(ObjectSuffix) $(IntermediateDirectory)/src_GrpArchive$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_RffArchive$(ObjectSuffix) $(IntermediateDirectory)/src_WolfArchive$(ObjectSuffix) $(IntermediateDirectory)/src_GobArchive$(ObjectSuffix) $(IntermediateDirectory)/src_LfdArchive$(ObjectSuffix) $(IntermediateDirectory)/src_HogArchive$(ObjectSuffix) $(IntermediateDirectory)/src_BSPArchive$(ObjectSuffix) $(IntermediateDirectory)/src_AnimatedList$(ObjectSuffix) $(IntermediateDirectory)/src_SwitchesList$(ObjectSuffix) $(IntermediateDirectory)/src_PnamesList$(ObjectSuffix) $(IntermediateDirectory)/src_CTexture$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_PatchTable$(ObjectSuffix) $(IntermediateDirectory)/src_TextureXList$(ObjectSuffix) $(IntermediateDirectory)/src_SFont$(ObjectSuffix) $(IntermediateDirectory)/src_SImage$(ObjectSuffix) $(IntermediateDirectory)/src_SImageFormats$(ObjectSuffix) $(IntermediateDirectory)/src_SIFormat$(ObjectSuffix) $(IntermediateDirectory)/src_Palette$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteManager$(ObjectSuffix) $(IntermediateDirectory)/src_GLTexture$(ObjectSuffix) $(IntermediateDirectory)/src_Icons$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_Translation$(ObjectSuffix) $(IntermediateDirectory)/src_ResourceManager$(ObjectSuffix) $(IntermediateDirectory)/src_ColourBox$(ObjectSuffix) $(IntermediateDirectory)/src_GfxCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_OGLCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteChooser$(ObjectSuffix) $(IntermediateDirectory)/src_SplashWindow$(ObjectSuffix) $(IntermediateDirectory)/src_BrowserItem$(ObjectSuffix) $(IntermediateDirectory)/src_BrowserWindow$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_BrowserCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_CTextureCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_TextEditor$(ObjectSuffix) $(IntermediateDirectory)/src_TextLanguage$(ObjectSuffix) $(IntermediateDirectory)/src_TextStyle$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveEntryList$(ObjectSuffix) $(IntermediateDirectory)/src_ListView$(ObjectSuffix) $(IntermediateDirectory)/src_VirtualListView$(ObjectSuffix) $(IntermediateDirectory)/src_ConsolePanel$(ObjectSuffix) $(IntermediateDirectory)/src_HexEditorPanel$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_ANSICanvas$(ObjectSuffix) $(IntermediateDirectory)/mus2mid_mus2mid$(ObjectSuffix) 
+	$(IntermediateDirectory)/src_Compression$(ObjectSuffix) $(IntermediateDirectory)/src_Console$(ObjectSuffix) $(IntermediateDirectory)/src_MIDIPlayer$(ObjectSuffix) $(IntermediateDirectory)/src_SAction$(ObjectSuffix) $(IntermediateDirectory)/src_AnimatedEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_EntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_GfxEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_SwitchesEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_TextEntryPanel$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_PnamesEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_DefaultEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_HexEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_MapEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_AudioEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_ANSIEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveManagerPanel$(ObjectSuffix) $(IntermediateDirectory)/src_PatchTablePanel$(ObjectSuffix) $(IntermediateDirectory)/src_TextureXEditor$(ObjectSuffix) $(IntermediateDirectory)/src_TextureXPanel$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_TextureEditorPanel$(ObjectSuffix) $(IntermediateDirectory)/src_PatchBrowser$(ObjectSuffix) $(IntermediateDirectory)/src_ZTextureEditorPanel$(ObjectSuffix) $(IntermediateDirectory)/src_ArchivePanel$(ObjectSuffix) $(IntermediateDirectory)/src_BaseResourceChooser$(ObjectSuffix) $(IntermediateDirectory)/src_EntryOperations$(ObjectSuffix) $(IntermediateDirectory)/src_MainWindow$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveOperations$(ObjectSuffix) $(IntermediateDirectory)/src_Conversions$(ObjectSuffix) $(IntermediateDirectory)/src_MapLine$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_MapSector$(ObjectSuffix) $(IntermediateDirectory)/src_MapSide$(ObjectSuffix) $(IntermediateDirectory)/src_MapThing$(ObjectSuffix) $(IntermediateDirectory)/src_MapVertex$(ObjectSuffix) $(IntermediateDirectory)/src_SLADEMap$(ObjectSuffix) $(IntermediateDirectory)/src_MapCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_MapEditorWindow$(ObjectSuffix) $(IntermediateDirectory)/src_Archive$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveEntry$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveManager$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_WadArchive$(ObjectSuffix) $(IntermediateDirectory)/src_ZipArchive$(ObjectSuffix) $(IntermediateDirectory)/src_EntryType$(ObjectSuffix) $(IntermediateDirectory)/src_EntryDataFormat$(ObjectSuffix) $(IntermediateDirectory)/src_DatArchive$(ObjectSuffix) $(IntermediateDirectory)/src_LibArchive$(ObjectSuffix) $(IntermediateDirectory)/src_ResArchive$(ObjectSuffix) $(IntermediateDirectory)/src_PakArchive$(ObjectSuffix) $(IntermediateDirectory)/src_Wad2Archive$(ObjectSuffix) $(IntermediateDirectory)/src_WadJArchive$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_GrpArchive$(ObjectSuffix) $(IntermediateDirectory)/src_RffArchive$(ObjectSuffix) $(IntermediateDirectory)/src_WolfArchive$(ObjectSuffix) $(IntermediateDirectory)/src_GobArchive$(ObjectSuffix) $(IntermediateDirectory)/src_LfdArchive$(ObjectSuffix) $(IntermediateDirectory)/src_HogArchive$(ObjectSuffix) $(IntermediateDirectory)/src_BSPArchive$(ObjectSuffix) $(IntermediateDirectory)/src_ADatArchive$(ObjectSuffix) $(IntermediateDirectory)/src_BZip2Archive$(ObjectSuffix) $(IntermediateDirectory)/src_GZipArchive$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_TarArchive$(ObjectSuffix) $(IntermediateDirectory)/src_AnimatedList$(ObjectSuffix) $(IntermediateDirectory)/src_SwitchesList$(ObjectSuffix) $(IntermediateDirectory)/src_PnamesList$(ObjectSuffix) $(IntermediateDirectory)/src_CTexture$(ObjectSuffix) $(IntermediateDirectory)/src_PatchTable$(ObjectSuffix) $(IntermediateDirectory)/src_TextureXList$(ObjectSuffix) $(IntermediateDirectory)/src_SFont$(ObjectSuffix) $(IntermediateDirectory)/src_SImage$(ObjectSuffix) $(IntermediateDirectory)/src_SImageFormats$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_SIFormat$(ObjectSuffix) $(IntermediateDirectory)/src_Palette$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteManager$(ObjectSuffix) $(IntermediateDirectory)/src_GLTexture$(ObjectSuffix) $(IntermediateDirectory)/src_Icons$(ObjectSuffix) $(IntermediateDirectory)/src_Translation$(ObjectSuffix) $(IntermediateDirectory)/src_ResourceManager$(ObjectSuffix) $(IntermediateDirectory)/src_ColourBox$(ObjectSuffix) $(IntermediateDirectory)/src_GfxCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_OGLCanvas$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_PaletteCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteChooser$(ObjectSuffix) $(IntermediateDirectory)/src_SplashWindow$(ObjectSuffix) $(IntermediateDirectory)/src_BrowserItem$(ObjectSuffix) $(IntermediateDirectory)/src_BrowserWindow$(ObjectSuffix) $(IntermediateDirectory)/src_BrowserCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_CTextureCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_TextEditor$(ObjectSuffix) $(IntermediateDirectory)/src_TextLanguage$(ObjectSuffix) $(IntermediateDirectory)/src_TextStyle$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_ArchiveEntryList$(ObjectSuffix) $(IntermediateDirectory)/src_ListView$(ObjectSuffix) $(IntermediateDirectory)/src_VirtualListView$(ObjectSuffix) $(IntermediateDirectory)/src_ConsolePanel$(ObjectSuffix) $(IntermediateDirectory)/src_HexEditorPanel$(ObjectSuffix) $(IntermediateDirectory)/src_ANSICanvas$(ObjectSuffix) $(IntermediateDirectory)/mus2mid_mus2mid$(ObjectSuffix) $(IntermediateDirectory)/zreaders_ancientzip$(ObjectSuffix) $(IntermediateDirectory)/zreaders_files$(ObjectSuffix) $(IntermediateDirectory)/zreaders_m_alloc$(ObjectSuffix) \
+	$(IntermediateDirectory)/C_7zBuf$(ObjectSuffix) $(IntermediateDirectory)/C_7zCrc$(ObjectSuffix) $(IntermediateDirectory)/C_7zStream$(ObjectSuffix) $(IntermediateDirectory)/C_Alloc$(ObjectSuffix) $(IntermediateDirectory)/C_Bcj2$(ObjectSuffix) $(IntermediateDirectory)/C_Bra86$(ObjectSuffix) $(IntermediateDirectory)/C_LzFind$(ObjectSuffix) $(IntermediateDirectory)/C_LzFindMt$(ObjectSuffix) $(IntermediateDirectory)/C_LzmaDec$(ObjectSuffix) $(IntermediateDirectory)/C_LzmaEnc$(ObjectSuffix) \
+	$(IntermediateDirectory)/C_LzmaLib$(ObjectSuffix) $(IntermediateDirectory)/C_Threads$(ObjectSuffix) $(IntermediateDirectory)/bzip2_blocksort$(ObjectSuffix) $(IntermediateDirectory)/bzip2_bzlib$(ObjectSuffix) $(IntermediateDirectory)/bzip2_compress$(ObjectSuffix) $(IntermediateDirectory)/bzip2_crctable$(ObjectSuffix) $(IntermediateDirectory)/bzip2_decompress$(ObjectSuffix) $(IntermediateDirectory)/bzip2_huffman$(ObjectSuffix) $(IntermediateDirectory)/bzip2_randtable$(ObjectSuffix) 
 
 ##
 ## Main Build Targets 
@@ -324,6 +326,14 @@ $(IntermediateDirectory)/src_MathStuff$(DependSuffix): src/MathStuff.cpp
 
 $(IntermediateDirectory)/src_MathStuff$(PreprocessSuffix): src/MathStuff.cpp
 	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_MathStuff$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/MathStuff.cpp"
+
+$(IntermediateDirectory)/src_Compression$(ObjectSuffix): src/Compression.cpp $(IntermediateDirectory)/src_Compression$(DependSuffix)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/Compression.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_Compression$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_Compression$(DependSuffix): src/Compression.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_Compression$(ObjectSuffix) -MF$(IntermediateDirectory)/src_Compression$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/Compression.cpp"
+
+$(IntermediateDirectory)/src_Compression$(PreprocessSuffix): src/Compression.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_Compression$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/Compression.cpp"
 
 $(IntermediateDirectory)/src_Console$(ObjectSuffix): src/Console.cpp $(IntermediateDirectory)/src_Console$(DependSuffix)
 	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/Console.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_Console$(ObjectSuffix) $(IncludePath)
@@ -773,6 +783,38 @@ $(IntermediateDirectory)/src_BSPArchive$(DependSuffix): src/BSPArchive.cpp
 $(IntermediateDirectory)/src_BSPArchive$(PreprocessSuffix): src/BSPArchive.cpp
 	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_BSPArchive$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/BSPArchive.cpp"
 
+$(IntermediateDirectory)/src_ADatArchive$(ObjectSuffix): src/ADatArchive.cpp $(IntermediateDirectory)/src_ADatArchive$(DependSuffix)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/ADatArchive.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ADatArchive$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_ADatArchive$(DependSuffix): src/ADatArchive.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_ADatArchive$(ObjectSuffix) -MF$(IntermediateDirectory)/src_ADatArchive$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/ADatArchive.cpp"
+
+$(IntermediateDirectory)/src_ADatArchive$(PreprocessSuffix): src/ADatArchive.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ADatArchive$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/ADatArchive.cpp"
+
+$(IntermediateDirectory)/src_BZip2Archive$(ObjectSuffix): src/BZip2Archive.cpp $(IntermediateDirectory)/src_BZip2Archive$(DependSuffix)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/BZip2Archive.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_BZip2Archive$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_BZip2Archive$(DependSuffix): src/BZip2Archive.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_BZip2Archive$(ObjectSuffix) -MF$(IntermediateDirectory)/src_BZip2Archive$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/BZip2Archive.cpp"
+
+$(IntermediateDirectory)/src_BZip2Archive$(PreprocessSuffix): src/BZip2Archive.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_BZip2Archive$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/BZip2Archive.cpp"
+
+$(IntermediateDirectory)/src_GZipArchive$(ObjectSuffix): src/GZipArchive.cpp $(IntermediateDirectory)/src_GZipArchive$(DependSuffix)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/GZipArchive.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_GZipArchive$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_GZipArchive$(DependSuffix): src/GZipArchive.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_GZipArchive$(ObjectSuffix) -MF$(IntermediateDirectory)/src_GZipArchive$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/GZipArchive.cpp"
+
+$(IntermediateDirectory)/src_GZipArchive$(PreprocessSuffix): src/GZipArchive.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_GZipArchive$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/GZipArchive.cpp"
+
+$(IntermediateDirectory)/src_TarArchive$(ObjectSuffix): src/TarArchive.cpp $(IntermediateDirectory)/src_TarArchive$(DependSuffix)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/TarArchive.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_TarArchive$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_TarArchive$(DependSuffix): src/TarArchive.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_TarArchive$(ObjectSuffix) -MF$(IntermediateDirectory)/src_TarArchive$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/TarArchive.cpp"
+
+$(IntermediateDirectory)/src_TarArchive$(PreprocessSuffix): src/TarArchive.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_TarArchive$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/TarArchive.cpp"
+
 $(IntermediateDirectory)/src_AnimatedList$(ObjectSuffix): src/AnimatedList.cpp $(IntermediateDirectory)/src_AnimatedList$(DependSuffix)
 	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/AnimatedList.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_AnimatedList$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_AnimatedList$(DependSuffix): src/AnimatedList.cpp
@@ -1061,6 +1103,182 @@ $(IntermediateDirectory)/mus2mid_mus2mid$(DependSuffix): src/mus2mid/mus2mid.cpp
 $(IntermediateDirectory)/mus2mid_mus2mid$(PreprocessSuffix): src/mus2mid/mus2mid.cpp
 	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/mus2mid_mus2mid$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/mus2mid/mus2mid.cpp"
 
+$(IntermediateDirectory)/zreaders_ancientzip$(ObjectSuffix): src/zreaders/ancientzip.cpp $(IntermediateDirectory)/zreaders_ancientzip$(DependSuffix)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/zreaders/ancientzip.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/zreaders_ancientzip$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/zreaders_ancientzip$(DependSuffix): src/zreaders/ancientzip.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/zreaders_ancientzip$(ObjectSuffix) -MF$(IntermediateDirectory)/zreaders_ancientzip$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/zreaders/ancientzip.cpp"
+
+$(IntermediateDirectory)/zreaders_ancientzip$(PreprocessSuffix): src/zreaders/ancientzip.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/zreaders_ancientzip$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/zreaders/ancientzip.cpp"
+
+$(IntermediateDirectory)/zreaders_files$(ObjectSuffix): src/zreaders/files.cpp $(IntermediateDirectory)/zreaders_files$(DependSuffix)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/zreaders/files.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/zreaders_files$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/zreaders_files$(DependSuffix): src/zreaders/files.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/zreaders_files$(ObjectSuffix) -MF$(IntermediateDirectory)/zreaders_files$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/zreaders/files.cpp"
+
+$(IntermediateDirectory)/zreaders_files$(PreprocessSuffix): src/zreaders/files.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/zreaders_files$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/zreaders/files.cpp"
+
+$(IntermediateDirectory)/zreaders_m_alloc$(ObjectSuffix): src/zreaders/m_alloc.cpp $(IntermediateDirectory)/zreaders_m_alloc$(DependSuffix)
+	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/zreaders/m_alloc.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/zreaders_m_alloc$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/zreaders_m_alloc$(DependSuffix): src/zreaders/m_alloc.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/zreaders_m_alloc$(ObjectSuffix) -MF$(IntermediateDirectory)/zreaders_m_alloc$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/zreaders/m_alloc.cpp"
+
+$(IntermediateDirectory)/zreaders_m_alloc$(PreprocessSuffix): src/zreaders/m_alloc.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/zreaders_m_alloc$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/zreaders/m_alloc.cpp"
+
+$(IntermediateDirectory)/C_7zBuf$(ObjectSuffix): src/lzma/C/7zBuf.c $(IntermediateDirectory)/C_7zBuf$(DependSuffix)
+	$(C_CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/lzma/C/7zBuf.c" $(C_CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/C_7zBuf$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/C_7zBuf$(DependSuffix): src/lzma/C/7zBuf.c
+	@$(C_CompilerName) $(C_CmpOptions) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/C_7zBuf$(ObjectSuffix) -MF$(IntermediateDirectory)/C_7zBuf$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/lzma/C/7zBuf.c"
+
+$(IntermediateDirectory)/C_7zBuf$(PreprocessSuffix): src/lzma/C/7zBuf.c
+	@$(C_CompilerName) $(C_CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/C_7zBuf$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/lzma/C/7zBuf.c"
+
+$(IntermediateDirectory)/C_7zCrc$(ObjectSuffix): src/lzma/C/7zCrc.c $(IntermediateDirectory)/C_7zCrc$(DependSuffix)
+	$(C_CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/lzma/C/7zCrc.c" $(C_CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/C_7zCrc$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/C_7zCrc$(DependSuffix): src/lzma/C/7zCrc.c
+	@$(C_CompilerName) $(C_CmpOptions) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/C_7zCrc$(ObjectSuffix) -MF$(IntermediateDirectory)/C_7zCrc$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/lzma/C/7zCrc.c"
+
+$(IntermediateDirectory)/C_7zCrc$(PreprocessSuffix): src/lzma/C/7zCrc.c
+	@$(C_CompilerName) $(C_CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/C_7zCrc$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/lzma/C/7zCrc.c"
+
+$(IntermediateDirectory)/C_7zStream$(ObjectSuffix): src/lzma/C/7zStream.c $(IntermediateDirectory)/C_7zStream$(DependSuffix)
+	$(C_CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/lzma/C/7zStream.c" $(C_CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/C_7zStream$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/C_7zStream$(DependSuffix): src/lzma/C/7zStream.c
+	@$(C_CompilerName) $(C_CmpOptions) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/C_7zStream$(ObjectSuffix) -MF$(IntermediateDirectory)/C_7zStream$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/lzma/C/7zStream.c"
+
+$(IntermediateDirectory)/C_7zStream$(PreprocessSuffix): src/lzma/C/7zStream.c
+	@$(C_CompilerName) $(C_CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/C_7zStream$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/lzma/C/7zStream.c"
+
+$(IntermediateDirectory)/C_Alloc$(ObjectSuffix): src/lzma/C/Alloc.c $(IntermediateDirectory)/C_Alloc$(DependSuffix)
+	$(C_CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/lzma/C/Alloc.c" $(C_CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/C_Alloc$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/C_Alloc$(DependSuffix): src/lzma/C/Alloc.c
+	@$(C_CompilerName) $(C_CmpOptions) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/C_Alloc$(ObjectSuffix) -MF$(IntermediateDirectory)/C_Alloc$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/lzma/C/Alloc.c"
+
+$(IntermediateDirectory)/C_Alloc$(PreprocessSuffix): src/lzma/C/Alloc.c
+	@$(C_CompilerName) $(C_CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/C_Alloc$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/lzma/C/Alloc.c"
+
+$(IntermediateDirectory)/C_Bcj2$(ObjectSuffix): src/lzma/C/Bcj2.c $(IntermediateDirectory)/C_Bcj2$(DependSuffix)
+	$(C_CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/lzma/C/Bcj2.c" $(C_CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/C_Bcj2$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/C_Bcj2$(DependSuffix): src/lzma/C/Bcj2.c
+	@$(C_CompilerName) $(C_CmpOptions) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/C_Bcj2$(ObjectSuffix) -MF$(IntermediateDirectory)/C_Bcj2$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/lzma/C/Bcj2.c"
+
+$(IntermediateDirectory)/C_Bcj2$(PreprocessSuffix): src/lzma/C/Bcj2.c
+	@$(C_CompilerName) $(C_CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/C_Bcj2$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/lzma/C/Bcj2.c"
+
+$(IntermediateDirectory)/C_Bra86$(ObjectSuffix): src/lzma/C/Bra86.c $(IntermediateDirectory)/C_Bra86$(DependSuffix)
+	$(C_CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/lzma/C/Bra86.c" $(C_CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/C_Bra86$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/C_Bra86$(DependSuffix): src/lzma/C/Bra86.c
+	@$(C_CompilerName) $(C_CmpOptions) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/C_Bra86$(ObjectSuffix) -MF$(IntermediateDirectory)/C_Bra86$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/lzma/C/Bra86.c"
+
+$(IntermediateDirectory)/C_Bra86$(PreprocessSuffix): src/lzma/C/Bra86.c
+	@$(C_CompilerName) $(C_CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/C_Bra86$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/lzma/C/Bra86.c"
+
+$(IntermediateDirectory)/C_LzFind$(ObjectSuffix): src/lzma/C/LzFind.c $(IntermediateDirectory)/C_LzFind$(DependSuffix)
+	$(C_CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/lzma/C/LzFind.c" $(C_CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/C_LzFind$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/C_LzFind$(DependSuffix): src/lzma/C/LzFind.c
+	@$(C_CompilerName) $(C_CmpOptions) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/C_LzFind$(ObjectSuffix) -MF$(IntermediateDirectory)/C_LzFind$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/lzma/C/LzFind.c"
+
+$(IntermediateDirectory)/C_LzFind$(PreprocessSuffix): src/lzma/C/LzFind.c
+	@$(C_CompilerName) $(C_CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/C_LzFind$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/lzma/C/LzFind.c"
+
+$(IntermediateDirectory)/C_LzFindMt$(ObjectSuffix): src/lzma/C/LzFindMt.c $(IntermediateDirectory)/C_LzFindMt$(DependSuffix)
+	$(C_CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/lzma/C/LzFindMt.c" $(C_CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/C_LzFindMt$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/C_LzFindMt$(DependSuffix): src/lzma/C/LzFindMt.c
+	@$(C_CompilerName) $(C_CmpOptions) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/C_LzFindMt$(ObjectSuffix) -MF$(IntermediateDirectory)/C_LzFindMt$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/lzma/C/LzFindMt.c"
+
+$(IntermediateDirectory)/C_LzFindMt$(PreprocessSuffix): src/lzma/C/LzFindMt.c
+	@$(C_CompilerName) $(C_CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/C_LzFindMt$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/lzma/C/LzFindMt.c"
+
+$(IntermediateDirectory)/C_LzmaDec$(ObjectSuffix): src/lzma/C/LzmaDec.c $(IntermediateDirectory)/C_LzmaDec$(DependSuffix)
+	$(C_CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/lzma/C/LzmaDec.c" $(C_CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/C_LzmaDec$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/C_LzmaDec$(DependSuffix): src/lzma/C/LzmaDec.c
+	@$(C_CompilerName) $(C_CmpOptions) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/C_LzmaDec$(ObjectSuffix) -MF$(IntermediateDirectory)/C_LzmaDec$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/lzma/C/LzmaDec.c"
+
+$(IntermediateDirectory)/C_LzmaDec$(PreprocessSuffix): src/lzma/C/LzmaDec.c
+	@$(C_CompilerName) $(C_CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/C_LzmaDec$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/lzma/C/LzmaDec.c"
+
+$(IntermediateDirectory)/C_LzmaEnc$(ObjectSuffix): src/lzma/C/LzmaEnc.c $(IntermediateDirectory)/C_LzmaEnc$(DependSuffix)
+	$(C_CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/lzma/C/LzmaEnc.c" $(C_CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/C_LzmaEnc$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/C_LzmaEnc$(DependSuffix): src/lzma/C/LzmaEnc.c
+	@$(C_CompilerName) $(C_CmpOptions) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/C_LzmaEnc$(ObjectSuffix) -MF$(IntermediateDirectory)/C_LzmaEnc$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/lzma/C/LzmaEnc.c"
+
+$(IntermediateDirectory)/C_LzmaEnc$(PreprocessSuffix): src/lzma/C/LzmaEnc.c
+	@$(C_CompilerName) $(C_CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/C_LzmaEnc$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/lzma/C/LzmaEnc.c"
+
+$(IntermediateDirectory)/C_LzmaLib$(ObjectSuffix): src/lzma/C/LzmaLib.c $(IntermediateDirectory)/C_LzmaLib$(DependSuffix)
+	$(C_CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/lzma/C/LzmaLib.c" $(C_CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/C_LzmaLib$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/C_LzmaLib$(DependSuffix): src/lzma/C/LzmaLib.c
+	@$(C_CompilerName) $(C_CmpOptions) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/C_LzmaLib$(ObjectSuffix) -MF$(IntermediateDirectory)/C_LzmaLib$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/lzma/C/LzmaLib.c"
+
+$(IntermediateDirectory)/C_LzmaLib$(PreprocessSuffix): src/lzma/C/LzmaLib.c
+	@$(C_CompilerName) $(C_CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/C_LzmaLib$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/lzma/C/LzmaLib.c"
+
+$(IntermediateDirectory)/C_Threads$(ObjectSuffix): src/lzma/C/Threads.c $(IntermediateDirectory)/C_Threads$(DependSuffix)
+	$(C_CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/lzma/C/Threads.c" $(C_CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/C_Threads$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/C_Threads$(DependSuffix): src/lzma/C/Threads.c
+	@$(C_CompilerName) $(C_CmpOptions) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/C_Threads$(ObjectSuffix) -MF$(IntermediateDirectory)/C_Threads$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/lzma/C/Threads.c"
+
+$(IntermediateDirectory)/C_Threads$(PreprocessSuffix): src/lzma/C/Threads.c
+	@$(C_CompilerName) $(C_CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/C_Threads$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/lzma/C/Threads.c"
+
+$(IntermediateDirectory)/bzip2_blocksort$(ObjectSuffix): src/bzip2/blocksort.c $(IntermediateDirectory)/bzip2_blocksort$(DependSuffix)
+	$(C_CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/bzip2/blocksort.c" $(C_CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/bzip2_blocksort$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/bzip2_blocksort$(DependSuffix): src/bzip2/blocksort.c
+	@$(C_CompilerName) $(C_CmpOptions) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/bzip2_blocksort$(ObjectSuffix) -MF$(IntermediateDirectory)/bzip2_blocksort$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/bzip2/blocksort.c"
+
+$(IntermediateDirectory)/bzip2_blocksort$(PreprocessSuffix): src/bzip2/blocksort.c
+	@$(C_CompilerName) $(C_CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/bzip2_blocksort$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/bzip2/blocksort.c"
+
+$(IntermediateDirectory)/bzip2_bzlib$(ObjectSuffix): src/bzip2/bzlib.c $(IntermediateDirectory)/bzip2_bzlib$(DependSuffix)
+	$(C_CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/bzip2/bzlib.c" $(C_CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/bzip2_bzlib$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/bzip2_bzlib$(DependSuffix): src/bzip2/bzlib.c
+	@$(C_CompilerName) $(C_CmpOptions) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/bzip2_bzlib$(ObjectSuffix) -MF$(IntermediateDirectory)/bzip2_bzlib$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/bzip2/bzlib.c"
+
+$(IntermediateDirectory)/bzip2_bzlib$(PreprocessSuffix): src/bzip2/bzlib.c
+	@$(C_CompilerName) $(C_CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/bzip2_bzlib$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/bzip2/bzlib.c"
+
+$(IntermediateDirectory)/bzip2_compress$(ObjectSuffix): src/bzip2/compress.c $(IntermediateDirectory)/bzip2_compress$(DependSuffix)
+	$(C_CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/bzip2/compress.c" $(C_CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/bzip2_compress$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/bzip2_compress$(DependSuffix): src/bzip2/compress.c
+	@$(C_CompilerName) $(C_CmpOptions) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/bzip2_compress$(ObjectSuffix) -MF$(IntermediateDirectory)/bzip2_compress$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/bzip2/compress.c"
+
+$(IntermediateDirectory)/bzip2_compress$(PreprocessSuffix): src/bzip2/compress.c
+	@$(C_CompilerName) $(C_CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/bzip2_compress$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/bzip2/compress.c"
+
+$(IntermediateDirectory)/bzip2_crctable$(ObjectSuffix): src/bzip2/crctable.c $(IntermediateDirectory)/bzip2_crctable$(DependSuffix)
+	$(C_CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/bzip2/crctable.c" $(C_CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/bzip2_crctable$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/bzip2_crctable$(DependSuffix): src/bzip2/crctable.c
+	@$(C_CompilerName) $(C_CmpOptions) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/bzip2_crctable$(ObjectSuffix) -MF$(IntermediateDirectory)/bzip2_crctable$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/bzip2/crctable.c"
+
+$(IntermediateDirectory)/bzip2_crctable$(PreprocessSuffix): src/bzip2/crctable.c
+	@$(C_CompilerName) $(C_CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/bzip2_crctable$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/bzip2/crctable.c"
+
+$(IntermediateDirectory)/bzip2_decompress$(ObjectSuffix): src/bzip2/decompress.c $(IntermediateDirectory)/bzip2_decompress$(DependSuffix)
+	$(C_CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/bzip2/decompress.c" $(C_CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/bzip2_decompress$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/bzip2_decompress$(DependSuffix): src/bzip2/decompress.c
+	@$(C_CompilerName) $(C_CmpOptions) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/bzip2_decompress$(ObjectSuffix) -MF$(IntermediateDirectory)/bzip2_decompress$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/bzip2/decompress.c"
+
+$(IntermediateDirectory)/bzip2_decompress$(PreprocessSuffix): src/bzip2/decompress.c
+	@$(C_CompilerName) $(C_CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/bzip2_decompress$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/bzip2/decompress.c"
+
+$(IntermediateDirectory)/bzip2_huffman$(ObjectSuffix): src/bzip2/huffman.c $(IntermediateDirectory)/bzip2_huffman$(DependSuffix)
+	$(C_CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/bzip2/huffman.c" $(C_CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/bzip2_huffman$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/bzip2_huffman$(DependSuffix): src/bzip2/huffman.c
+	@$(C_CompilerName) $(C_CmpOptions) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/bzip2_huffman$(ObjectSuffix) -MF$(IntermediateDirectory)/bzip2_huffman$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/bzip2/huffman.c"
+
+$(IntermediateDirectory)/bzip2_huffman$(PreprocessSuffix): src/bzip2/huffman.c
+	@$(C_CompilerName) $(C_CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/bzip2_huffman$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/bzip2/huffman.c"
+
+$(IntermediateDirectory)/bzip2_randtable$(ObjectSuffix): src/bzip2/randtable.c $(IntermediateDirectory)/bzip2_randtable$(DependSuffix)
+	$(C_CompilerName) $(SourceSwitch) "/home/simon/dev/slade/trunk/src/bzip2/randtable.c" $(C_CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/bzip2_randtable$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/bzip2_randtable$(DependSuffix): src/bzip2/randtable.c
+	@$(C_CompilerName) $(C_CmpOptions) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/bzip2_randtable$(ObjectSuffix) -MF$(IntermediateDirectory)/bzip2_randtable$(DependSuffix) -MM "/home/simon/dev/slade/trunk/src/bzip2/randtable.c"
+
+$(IntermediateDirectory)/bzip2_randtable$(PreprocessSuffix): src/bzip2/randtable.c
+	@$(C_CompilerName) $(C_CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/bzip2_randtable$(PreprocessSuffix) "/home/simon/dev/slade/trunk/src/bzip2/randtable.c"
+
 
 -include $(IntermediateDirectory)/*$(DependSuffix)
 ##
@@ -1157,6 +1375,9 @@ clean:
 	$(RM) $(IntermediateDirectory)/src_MathStuff$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/src_MathStuff$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/src_MathStuff$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/src_Compression$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/src_Compression$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/src_Compression$(PreprocessSuffix)
 	$(RM) $(IntermediateDirectory)/src_Console$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/src_Console$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/src_Console$(PreprocessSuffix)
@@ -1325,6 +1546,18 @@ clean:
 	$(RM) $(IntermediateDirectory)/src_BSPArchive$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/src_BSPArchive$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/src_BSPArchive$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/src_ADatArchive$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/src_ADatArchive$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/src_ADatArchive$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/src_BZip2Archive$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/src_BZip2Archive$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/src_BZip2Archive$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/src_GZipArchive$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/src_GZipArchive$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/src_GZipArchive$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/src_TarArchive$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/src_TarArchive$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/src_TarArchive$(PreprocessSuffix)
 	$(RM) $(IntermediateDirectory)/src_AnimatedList$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/src_AnimatedList$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/src_AnimatedList$(PreprocessSuffix)
@@ -1433,6 +1666,72 @@ clean:
 	$(RM) $(IntermediateDirectory)/mus2mid_mus2mid$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/mus2mid_mus2mid$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/mus2mid_mus2mid$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/zreaders_ancientzip$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/zreaders_ancientzip$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/zreaders_ancientzip$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/zreaders_files$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/zreaders_files$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/zreaders_files$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/zreaders_m_alloc$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/zreaders_m_alloc$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/zreaders_m_alloc$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_7zBuf$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_7zBuf$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_7zBuf$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_7zCrc$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_7zCrc$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_7zCrc$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_7zStream$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_7zStream$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_7zStream$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_Alloc$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_Alloc$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_Alloc$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_Bcj2$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_Bcj2$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_Bcj2$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_Bra86$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_Bra86$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_Bra86$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_LzFind$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_LzFind$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_LzFind$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_LzFindMt$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_LzFindMt$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_LzFindMt$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_LzmaDec$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_LzmaDec$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_LzmaDec$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_LzmaEnc$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_LzmaEnc$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_LzmaEnc$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_LzmaLib$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_LzmaLib$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_LzmaLib$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_Threads$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_Threads$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_Threads$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/bzip2_blocksort$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/bzip2_blocksort$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/bzip2_blocksort$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/bzip2_bzlib$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/bzip2_bzlib$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/bzip2_bzlib$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/bzip2_compress$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/bzip2_compress$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/bzip2_compress$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/bzip2_crctable$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/bzip2_crctable$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/bzip2_crctable$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/bzip2_decompress$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/bzip2_decompress$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/bzip2_decompress$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/bzip2_huffman$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/bzip2_huffman$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/bzip2_huffman$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/bzip2_randtable$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/bzip2_randtable$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/bzip2_randtable$(PreprocessSuffix)
 	$(RM) $(OutputFile)
 
 
