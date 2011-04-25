@@ -138,7 +138,6 @@
       <File Name="src/ArchivePanel.h"/>
       <File Name="src/BaseResourceChooser.h"/>
       <File Name="src/BaseResourceChooser.cpp"/>
-      <File Name="src/lzma/C/Xz.h"/>
     </VirtualDirectory>
     <File Name="src/MainWindow.h"/>
     <File Name="src/EntryOperations.cpp"/>
