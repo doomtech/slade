@@ -35,6 +35,7 @@
 #include "WadArchive.h"
 #include "ZipArchive.h"
 #include "Console.h"
+#include "SIFormat.h"
 #include <wx/filename.h>
 #include "zlib/zlib.h"
 
@@ -65,8 +66,16 @@ bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry, int index) {
 		return false;
 	}
 
-	// Load depending on format
+	// Firstly try SIFormat system
+	if (image->open(entry->getMCData()))
+		return true;
+
+	// Raw images are a special case (not reliably possible to detect just from data)
 	string format = entry->getType()->getFormat();
+	if (format == "img_raw" && SIFormat::rawFormat()->isThisFormat(entry->getMCData()))
+		return SIFormat::rawFormat()->loadImage(*image, entry->getMCData());
+
+	// Otherwise use old loading stuff
 	if (S_CMPNOCASE(format, "img_doom"))
 		return image->loadDoomGfx(entry->getData(), entry->getSize());
 	else if (S_CMPNOCASE(format, "img_doom_alpha"))

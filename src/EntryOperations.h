@@ -3,9 +3,11 @@
 #define	__ENTRYOPERATIONS_H__
 
 #include "ArchiveEntry.h"
+#include "SIFormat.h"
 
 namespace EntryOperations {
 	bool	openExternal(ArchiveEntry* entry);
+	bool	gfxConvert(ArchiveEntry* entry, string target_format, SIFormat::convert_options_t opt, int target_colformat = -1);
 	bool	modifyGfxOffsets(ArchiveEntry* entry, int auto_type, point2_t offsets, bool xc, bool yc, bool relative);
 	bool	modifyalPhChunk(ArchiveEntry* entry, bool value);
 	bool	modifytRNSChunk(ArchiveEntry* entry, bool value);

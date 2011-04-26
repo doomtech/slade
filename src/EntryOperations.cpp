@@ -87,6 +87,49 @@ struct chunk_size_t {
  * FUNCTIONS
  *******************************************************************/
 
+bool EntryOperations::gfxConvert(ArchiveEntry* entry, string target_format, SIFormat::convert_options_t opt, int target_colformat) {
+	// Init variables
+	SImage image;
+
+	// Get target image format
+	SIFormat* fmt = SIFormat::getFormat(target_format);
+	if (fmt == SIFormat::unknownFormat())
+		return false;
+
+	// Check format and target colour type are compatible
+	if (target_colformat >= 0 && !fmt->canWriteType((SIType)target_colformat)) {
+		if (target_colformat == RGBA)
+			wxLogMessage("Format \"%s\" cannot be written as RGBA data", CHR(fmt->getName()));
+		else if (target_colformat == PALMASK)
+			wxLogMessage("Format \"%s\" cannot be written as paletted data", CHR(fmt->getName()));
+
+		return false;
+	}
+
+	// Load entry to image
+	Misc::loadImageFromEntry(&image, entry);
+
+	// Check if we can write the image to the target format
+	int writable = fmt->canWrite(image);
+	if (writable == SIFormat::NOTWRITABLE) {
+		wxLogMessage("Entry \"%s\" could not be converted to target format \"%s\"", CHR(entry->getName()), CHR(fmt->getName()));
+		return false;
+	}
+	else if (writable == SIFormat::CONVERTIBLE)
+		fmt->convertWritable(image, opt);
+		
+	// Now we apply the target colour format (if any)
+	if (target_colformat == PALMASK)
+		image.convertPaletted(opt.pal_target, opt.pal_current);
+	else if (target_colformat == RGBA)
+		image.convertRGBA(opt.pal_current);
+
+	// Finally, write new image data back to the entry
+	fmt->saveImage(image, entry->getMCData(), opt.pal_target);
+
+	return true;
+}
+
 /* EntryOperations::modifyGfxOffsets
  * Changes the offsets of the given gfx entry. Returns false if the
  * entry is invalid or not an offset-supported format, true otherwise

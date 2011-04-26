@@ -108,6 +108,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\ACSPrefsPanel.cpp" />
+    <ClCompile Include="src\ADatArchive.cpp" />
     <ClCompile Include="src\ANSICanvas.cpp" />
     <ClCompile Include="src\ANSIEntryPanel.cpp" />
     <ClCompile Include="src\ArchiveEntryList.cpp" />
@@ -118,7 +119,16 @@
     <ClCompile Include="src\BrowserItem.cpp" />
     <ClCompile Include="src\BrowserWindow.cpp" />
     <ClCompile Include="src\BSPArchive.cpp" />
+    <ClCompile Include="src\BZip2Archive.cpp" />
+    <ClCompile Include="src\bzip2\blocksort.c" />
+    <ClCompile Include="src\bzip2\bzlib.c" />
+    <ClCompile Include="src\bzip2\compress.c" />
+    <ClCompile Include="src\bzip2\crctable.c" />
+    <ClCompile Include="src\bzip2\decompress.c" />
+    <ClCompile Include="src\bzip2\huffman.c" />
+    <ClCompile Include="src\bzip2\randtable.c" />
     <ClCompile Include="src\CodePages.cpp" />
+    <ClCompile Include="src\Compression.cpp" />
     <ClCompile Include="src\Conversions.cpp" />
     <ClCompile Include="src\DatArchive.cpp" />
     <ClCompile Include="src\EditingPrefsPanel.cpp" />
@@ -129,12 +139,25 @@
     <ClCompile Include="src\GobArchive.cpp" />
     <ClCompile Include="src\GraphicsPrefsPanel.cpp" />
     <ClCompile Include="src\GrpArchive.cpp" />
+    <ClCompile Include="src\GZipArchive.cpp" />
     <ClCompile Include="src\HexEditorPanel.cpp" />
     <ClCompile Include="src\HexEntryPanel.cpp" />
     <ClCompile Include="src\HogArchive.cpp" />
     <ClCompile Include="src\InterfacePrefsPanel.cpp" />
     <ClCompile Include="src\LfdArchive.cpp" />
     <ClCompile Include="src\LibArchive.cpp" />
+    <ClCompile Include="src\lzma\C\7zBuf.c" />
+    <ClCompile Include="src\lzma\C\7zCrc.c" />
+    <ClCompile Include="src\lzma\C\7zStream.c" />
+    <ClCompile Include="src\lzma\C\Alloc.c" />
+    <ClCompile Include="src\lzma\C\Bcj2.c" />
+    <ClCompile Include="src\lzma\C\Bra86.c" />
+    <ClCompile Include="src\lzma\C\LzFind.c" />
+    <ClCompile Include="src\lzma\C\LzFindMt.c" />
+    <ClCompile Include="src\lzma\C\LzmaDec.c" />
+    <ClCompile Include="src\lzma\C\LzmaEnc.c" />
+    <ClCompile Include="src\lzma\C\LzmaLib.c" />
+    <ClCompile Include="src\lzma\C\Threads.c" />
     <ClCompile Include="src\MapEntryPanel.cpp" />
     <ClCompile Include="src\MathStuff.cpp" />
     <ClCompile Include="src\MIDIPlayer.cpp" />
@@ -161,6 +184,7 @@
     <ClCompile Include="src\SFont.cpp" />
     <ClCompile Include="src\SIFormat.cpp" />
     <ClCompile Include="src\SImageFormats.cpp" />
+    <ClCompile Include="src\TarArchive.cpp" />
     <ClCompile Include="src\TextEditorPrefsPanel.cpp" />
     <ClCompile Include="src\TextLanguage.cpp" />
     <ClCompile Include="src\TextStyle.cpp" />
@@ -227,10 +251,25 @@
     <ClCompile Include="src\PaletteChooser.cpp" />
     <ClCompile Include="src\SplashWindow.cpp" />
     <ClCompile Include="src\BaseResourceArchivesPanel.cpp" />
+    <ClCompile Include="src\zlib\adler32.c" />
+    <ClCompile Include="src\zlib\crc32.c" />
+    <ClCompile Include="src\zlib\deflate.c" />
+    <ClCompile Include="src\zlib\gzio.c" />
+    <ClCompile Include="src\zlib\infback.c" />
+    <ClCompile Include="src\zlib\inffast.c" />
+    <ClCompile Include="src\zlib\inflate.c" />
+    <ClCompile Include="src\zlib\inftrees.c" />
+    <ClCompile Include="src\zlib\trees.c" />
+    <ClCompile Include="src\zlib\uncompr.c" />
+    <ClCompile Include="src\zlib\zutil.c" />
+    <ClCompile Include="src\zreaders\ancientzip.cpp" />
+    <ClCompile Include="src\zreaders\files.cpp" />
+    <ClCompile Include="src\zreaders\m_alloc.cpp" />
     <ClCompile Include="src\ZTextureEditorPanel.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ACSPrefsPanel.h" />
+    <ClInclude Include="src\ADatArchive.h" />
     <ClInclude Include="src\ANSICanvas.h" />
     <ClInclude Include="src\ANSIEntryPanel.h" />
     <ClInclude Include="src\ArchiveEntryList.h" />
@@ -244,7 +283,11 @@
     <ClInclude Include="src\BrowserItem.h" />
     <ClInclude Include="src\BrowserWindow.h" />
     <ClInclude Include="src\BSPArchive.h" />
+    <ClInclude Include="src\BZip2Archive.h" />
+    <ClInclude Include="src\bzip2\bzlib.h" />
+    <ClInclude Include="src\bzip2\bzlib_private.h" />
     <ClInclude Include="src\CodePages.h" />
+    <ClInclude Include="src\Compression.h" />
     <ClInclude Include="src\ConsoleHelpers.h" />
     <ClInclude Include="src\Conversions.h" />
     <ClInclude Include="src\DatArchive.h" />
@@ -256,6 +299,7 @@
     <ClInclude Include="src\GobArchive.h" />
     <ClInclude Include="src\GraphicsPrefsPanel.h" />
     <ClInclude Include="src\GrpArchive.h" />
+    <ClInclude Include="src\GZipArchive.h" />
     <ClInclude Include="src\HexEditorPanel.h" />
     <ClInclude Include="src\HexEntryPanel.h" />
     <ClInclude Include="src\HogArchive.h" />
@@ -264,6 +308,21 @@
     <ClInclude Include="src\LfdArchive.h" />
     <ClInclude Include="src\LibArchive.h" />
     <ClInclude Include="src\LumpFormats.h" />
+    <ClInclude Include="src\lzma\C\7zBuf.h" />
+    <ClInclude Include="src\lzma\C\7zCrc.h" />
+    <ClInclude Include="src\lzma\C\7zVersion.h" />
+    <ClInclude Include="src\lzma\C\Alloc.h" />
+    <ClInclude Include="src\lzma\C\Bcj2.h" />
+    <ClInclude Include="src\lzma\C\Bra.h" />
+    <ClInclude Include="src\lzma\C\CpuArch.h" />
+    <ClInclude Include="src\lzma\C\LzFind.h" />
+    <ClInclude Include="src\lzma\C\LzFindMt.h" />
+    <ClInclude Include="src\lzma\C\LzHash.h" />
+    <ClInclude Include="src\lzma\C\LzmaDec.h" />
+    <ClInclude Include="src\lzma\C\LzmaEnc.h" />
+    <ClInclude Include="src\lzma\C\LzmaLib.h" />
+    <ClInclude Include="src\lzma\C\Threads.h" />
+    <ClInclude Include="src\lzma\C\Types.h" />
     <ClInclude Include="src\MapEntryPanel.h" />
     <ClInclude Include="src\MathStuff.h" />
     <ClInclude Include="src\MIDIPlayer.h" />
@@ -290,8 +349,13 @@
     <ClInclude Include="src\ResourceManager.h" />
     <ClInclude Include="src\RffArchive.h" />
     <ClInclude Include="src\SAction.h" />
+    <ClInclude Include="src\SIFDoom.h" />
+    <ClInclude Include="src\SIFHexen.h" />
+    <ClInclude Include="src\SIFImages.h" />
     <ClInclude Include="src\SIFormat.h" />
+    <ClInclude Include="src\SIFZDoom.h" />
     <ClInclude Include="src\Structs.h" />
+    <ClInclude Include="src\TarArchive.h" />
     <ClInclude Include="src\TextEditorPrefsPanel.h" />
     <ClInclude Include="src\TextLanguage.h" />
     <ClInclude Include="src\TextStyle.h" />
@@ -361,6 +425,21 @@
     <ClInclude Include="src\SplashWindow.h" />
     <ClInclude Include="src\BaseResourceArchivesPanel.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="src\zlib\crc32.h" />
+    <ClInclude Include="src\zlib\deflate.h" />
+    <ClInclude Include="src\zlib\inffast.h" />
+    <ClInclude Include="src\zlib\inffixed.h" />
+    <ClInclude Include="src\zlib\inflate.h" />
+    <ClInclude Include="src\zlib\inftrees.h" />
+    <ClInclude Include="src\zlib\trees.h" />
+    <ClInclude Include="src\zlib\zconf.h" />
+    <ClInclude Include="src\zlib\zlib.h" />
+    <ClInclude Include="src\zlib\zutil.h" />
+    <ClInclude Include="src\zreaders\ancientzip.h" />
+    <ClInclude Include="src\zreaders\files.h" />
+    <ClInclude Include="src\zreaders\m_alloc.h" />
+    <ClInclude Include="src\zreaders\tarray.h" />
+    <ClInclude Include="src\zreaders\templates.h" />
     <ClInclude Include="src\ZTextureEditorPanel.h" />
   </ItemGroup>
   <ItemGroup>

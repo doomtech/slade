@@ -340,7 +340,7 @@ bool MemChunk::read(void* buf, uint32_t size) {
  *******************************************************************/
 bool MemChunk::read(void* buf, uint32_t size, uint32_t start) {
 	// Check options
-	if (start + size >= this->size)
+	if (start + size > this->size)
 		return false;
 	
 	// Do read

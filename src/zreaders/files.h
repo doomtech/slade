@@ -2,7 +2,7 @@
 #define FILES_H
 
 #include <stdio.h>
-#include <zlib.h>
+#include "../zlib/zlib.h"
 #include "../bzip2/bzlib.h"
 #include "../lzma/C/LzmaDec.h"
 #include "../Main.h"

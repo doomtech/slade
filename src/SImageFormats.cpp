@@ -91,16 +91,6 @@ bool SImage::loadImage(const uint8_t* img_data, int size) {
 	FIBITMAP *bm = FreeImage_LoadFromMemory(fif, mem, 0);
 	FreeImage_CloseMemory(mem);
 
-	// Testing
-	if (fif == FIF_PNG) {
-		MemChunk data(img_data, size);
-		SIFormat* format = SIFormat::getFormat("png");
-		FreeImage_Unload(bm);
-		bool ok = format->loadImage(*this, data);
-		announce("image_changed");
-		return ok;
-	}
-
 	// Check it created/read ok
 	if (!bm) {
 		Global::error = "Unable to read image data (unsupported format?)";
@@ -626,23 +616,23 @@ bool SImage::toDoomGfx(MemChunk& out, uint8_t alpha_threshold) {
 }
 
 // Define valid flat sizes
-uint32_t valid_flat_size[][2] = {
-	{	2,	 2 },	// lol Heretic F_SKY1
-	{  10,  12 },	// gnum format
-	{  16,  16 },	// \ 
-	{  32,  64 },	// Strife startup sprite
-	{  48,  48 },	// /
-	{  64,  64 },	// standard flat size
-	{  64,	65 },	// Heretic flat size variant
-	{  64, 128 },	// Hexen flat size variant
-	{ 128, 128 },	// \ 
-	{ 256, 256 },	// hires flat size
-	{ 512, 512 },	// /
-	{1024,1024 },	// \ 
-	{2048,2048 },	// super hires flat size (SRB2)
-	{4096,4096 },	// /
-	{ 256, 200 },	// Rise of the Triad sky
-	{ 320, 200 },	// full screen format
+uint32_t valid_flat_size[][3] = {
+	{	2,	 2,	0 },	// lol Heretic F_SKY1
+	{  10,  12,	0 },	// gnum format
+	{  16,  16,	0 },	// |
+	{  32,  64,	0 },	// Strife startup sprite
+	{  48,  48,	0 },	// |
+	{  64,  64,	1 },	// standard flat size
+	{  64,	65,	1 },	// Heretic flat size variant
+	{  64, 128,	1 },	// Hexen flat size variant
+	{ 128, 128,	1 },	// |
+	{ 256, 200,	0 },	// Rise of the Triad sky
+	{ 256, 256,	1 },	// hires flat size
+	{ 320, 200,	1 },	// full screen format
+	{ 512, 512,	1 },	// hires flat size
+	{1024,1024,	1 },	// |
+	{2048,2048,	1 },	// super hires flat size (SRB2)
+	{4096,4096,	1 },	// |
 };
 uint32_t	n_valid_flat_sizes = 17;
 

@@ -88,6 +88,18 @@
     <Filter Include="External\Mus2Mid">
       <UniqueIdentifier>{dda863ce-2d21-48cb-9de4-44e8e63b1326}</UniqueIdentifier>
     </Filter>
+    <Filter Include="External\BZip2">
+      <UniqueIdentifier>{0c79342f-fa5a-4bf9-af74-0a9be8b1fdf6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\Lzma">
+      <UniqueIdentifier>{9bcac562-c222-403d-98d8-186f578a87a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\ZReaders">
+      <UniqueIdentifier>{5e648a80-c228-40a7-9817-b3e2695df54e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\ZLib">
+      <UniqueIdentifier>{1ca86170-39c5-4615-bb20-8f2d2fc14c42}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\GfxConvDialog.cpp">
@@ -452,6 +464,120 @@
     </ClCompile>
     <ClCompile Include="src\SIFormat.cpp">
       <Filter>Resources\Graphics\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bzip2\blocksort.c">
+      <Filter>External\BZip2</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bzip2\bzlib.c">
+      <Filter>External\BZip2</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bzip2\compress.c">
+      <Filter>External\BZip2</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bzip2\crctable.c">
+      <Filter>External\BZip2</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bzip2\decompress.c">
+      <Filter>External\BZip2</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bzip2\huffman.c">
+      <Filter>External\BZip2</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bzip2\randtable.c">
+      <Filter>External\BZip2</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\7zBuf.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\7zCrc.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\7zStream.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\Alloc.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\Bcj2.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\Bra86.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\LzFind.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\LzFindMt.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\LzmaDec.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\LzmaEnc.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\LzmaLib.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\Threads.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ADatArchive.cpp">
+      <Filter>Resources\Archive</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BZip2Archive.cpp">
+      <Filter>Resources\Archive</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GZipArchive.cpp">
+      <Filter>Resources\Archive</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TarArchive.cpp">
+      <Filter>Resources\Archive</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Compression.cpp">
+      <Filter>General\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="src\zreaders\ancientzip.cpp">
+      <Filter>External\ZReaders</Filter>
+    </ClCompile>
+    <ClCompile Include="src\zreaders\files.cpp">
+      <Filter>External\ZReaders</Filter>
+    </ClCompile>
+    <ClCompile Include="src\zreaders\m_alloc.cpp">
+      <Filter>External\ZReaders</Filter>
+    </ClCompile>
+    <ClCompile Include="src\zlib\adler32.c">
+      <Filter>External\ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\zlib\crc32.c">
+      <Filter>External\ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\zlib\deflate.c">
+      <Filter>External\ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\zlib\gzio.c">
+      <Filter>External\ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\zlib\infback.c">
+      <Filter>External\ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\zlib\inffast.c">
+      <Filter>External\ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\zlib\inflate.c">
+      <Filter>External\ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\zlib\inftrees.c">
+      <Filter>External\ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\zlib\trees.c">
+      <Filter>External\ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\zlib\uncompr.c">
+      <Filter>External\ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\zlib\zutil.c">
+      <Filter>External\ZLib</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -848,6 +974,129 @@
     </ClInclude>
     <ClInclude Include="src\SIFormat.h">
       <Filter>Resources\Graphics\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SIFDoom.h">
+      <Filter>Resources\Graphics\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SIFImages.h">
+      <Filter>Resources\Graphics\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SIFHexen.h">
+      <Filter>Resources\Graphics\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SIFZDoom.h">
+      <Filter>Resources\Graphics\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="src\bzip2\bzlib.h">
+      <Filter>External\BZip2</Filter>
+    </ClInclude>
+    <ClInclude Include="src\bzip2\bzlib_private.h">
+      <Filter>External\BZip2</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\7zBuf.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\7zCrc.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\7zVersion.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\Alloc.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\Bcj2.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\Bra.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\CpuArch.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\LzFind.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\LzFindMt.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\LzHash.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\LzmaDec.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\LzmaEnc.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\LzmaLib.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\Threads.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\Types.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ADatArchive.h">
+      <Filter>Resources\Archive</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BZip2Archive.h">
+      <Filter>Resources\Archive</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GZipArchive.h">
+      <Filter>Resources\Archive</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TarArchive.h">
+      <Filter>Resources\Archive</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Compression.h">
+      <Filter>General\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="src\zreaders\ancientzip.h">
+      <Filter>External\ZReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="src\zreaders\files.h">
+      <Filter>External\ZReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="src\zreaders\m_alloc.h">
+      <Filter>External\ZReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="src\zreaders\tarray.h">
+      <Filter>External\ZReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="src\zreaders\templates.h">
+      <Filter>External\ZReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="src\zlib\crc32.h">
+      <Filter>External\ZLib</Filter>
+    </ClInclude>
+    <ClInclude Include="src\zlib\deflate.h">
+      <Filter>External\ZLib</Filter>
+    </ClInclude>
+    <ClInclude Include="src\zlib\inffast.h">
+      <Filter>External\ZLib</Filter>
+    </ClInclude>
+    <ClInclude Include="src\zlib\inffixed.h">
+      <Filter>External\ZLib</Filter>
+    </ClInclude>
+    <ClInclude Include="src\zlib\inflate.h">
+      <Filter>External\ZLib</Filter>
+    </ClInclude>
+    <ClInclude Include="src\zlib\inftrees.h">
+      <Filter>External\ZLib</Filter>
+    </ClInclude>
+    <ClInclude Include="src\zlib\trees.h">
+      <Filter>External\ZLib</Filter>
+    </ClInclude>
+    <ClInclude Include="src\zlib\zconf.h">
+      <Filter>External\ZLib</Filter>
+    </ClInclude>
+    <ClInclude Include="src\zlib\zlib.h">
+      <Filter>External\ZLib</Filter>
+    </ClInclude>
+    <ClInclude Include="src\zlib\zutil.h">
+      <Filter>External\ZLib</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

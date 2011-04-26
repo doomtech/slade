@@ -8,6 +8,7 @@
 enum SIType {
 	PALMASK,	// 2 bytes per pixel: palette index and alpha value
 	RGBA,		// 4 bytes per pixel: RGBA
+	ALPHAMAP,	// 1 byte per pixel: alpha
 };
 
 enum SIBlendType {
@@ -60,7 +61,7 @@ public:
 	SIType			getType() { return type; }
 	bool			getRGBAData(MemChunk& mc, Palette8bit* pal = NULL);
 	bool			getRGBData(MemChunk& mc, Palette8bit* pal = NULL);
-	bool			getPalData(MemChunk& mc);
+	bool			getIndexedData(MemChunk& mc);
 	int				getWidth() { return width; }
 	int				getHeight() { return height; }
 	int				getIndex() { return imgindex; }
@@ -78,7 +79,7 @@ public:
 
 	// Misc
 	void	clear();
-	void	create(int width, int height, SIType type, Palette8bit* pal);
+	void	create(int width, int height, SIType type, Palette8bit* pal = NULL);
 	void	fillAlpha(uint8_t alpha = 0);
 	short	findUnusedColour();
 	bool	validFlatSize();
@@ -87,6 +88,7 @@ public:
 	bool	copyImage(SImage* image);
 
 	// Image format reading
+	bool	open(MemChunk& data);
 	bool	loadImage(const uint8_t* data, int size);
 	bool	loadDoomGfx(const uint8_t* data, int size, uint8_t version = 0);
 	bool	loadDoomGfxA(const uint8_t* data, int size) {return loadDoomGfx(data, size, 2);}
