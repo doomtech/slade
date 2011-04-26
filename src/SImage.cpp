@@ -34,11 +34,13 @@
  *******************************************************************/
 #include "Main.h"
 #include "SImage.h"
-#include "FreeImage.h"
 #include "Misc.h"
 #include "SIFormat.h"
 #include "Translation.h"
 #include "MathStuff.h"
+
+#undef BOOL
+#include <FreeImage.h>
 #include <wx/filefn.h>
 
 

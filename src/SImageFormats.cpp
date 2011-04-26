@@ -33,6 +33,7 @@
  *******************************************************************/
 #include "Main.h"
 #include "SImage.h"
+#undef BOOL
 #include "FreeImage.h"
 #include "Misc.h"
 #include "SIFormat.h"

@@ -1,4 +1,5 @@
 
+#undef BOOL
 #include <FreeImage.h>
 
 class PNGChunk {
