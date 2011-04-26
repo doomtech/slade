@@ -1215,6 +1215,12 @@
     <ClInclude Include="src\lzma\C\XzEnc.h">
       <Filter>External\Lzma</Filter>
     </ClInclude>
+    <ClInclude Include="src\SIFOther.h">
+      <Filter>Resources\Graphics\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SIFQuake.h">
+      <Filter>Resources\Graphics\Image</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="slade.ico" />

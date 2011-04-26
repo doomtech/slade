@@ -1,7 +1,4 @@
 
-#undef BOOL
-#include <FreeImage.h>
-
 class PNGChunk {
 private:
 	uint32_t	size;
@@ -377,7 +374,7 @@ public:
 		return false;
 	}
 
-	imginfo_t getInfo(MemChunk& mc) {
+	imginfo_t getInfo(MemChunk& mc, int index) {
 		imginfo_t inf;
 		inf.format = "png";
 		inf.width = 0;
@@ -388,6 +385,7 @@ public:
 		PNGChunk chunk;
 		chunk.read(mc);
 		// Should be IHDR
+		int bpp = 32;
 		if (chunk.getName() == "IHDR") {
 			// Read IHDR data
 			ihdr_chunk_t ihdr;
@@ -396,11 +394,35 @@ public:
 			// Set info from IHDR
 			inf.width = ihdr.width;
 			inf.height = ihdr.height;
+			bpp = ihdr.bpp;
 			if (ihdr.coltype == 3 && ihdr.bpp == 8)
 				// Only 8bpp 'indexed' pngs are counted as PALMASK for now, all others will be converted to RGBA
 				inf.colformat = PALMASK;
 			else
 				inf.colformat = RGBA;
+		}
+
+		// Look for other info chunks (grAb or alPh)
+		while (1) {
+			chunk.read(mc);
+
+			// Set format to alpha map if alPh present (and 8bpp)
+			if (bpp == 8 && chunk.getName() == "alPh")
+				inf.colformat = ALPHAMAP;
+
+			// Set offsets if grAb present
+			else if (chunk.getName() == "grAb") {
+				// Read offsets
+				int32_t xoff, yoff;
+				chunk.getData().read(&xoff, 4, 0);
+				chunk.getData().read(&yoff, 4);
+				inf.offset_x = wxINT32_SWAP_ON_LE(xoff);
+				inf.offset_y = wxINT32_SWAP_ON_LE(yoff);
+			}
+
+			// Stop on IDAT chunk
+			else if (chunk.getName() == "IDAT")
+				break;
 		}
 
 		return inf;

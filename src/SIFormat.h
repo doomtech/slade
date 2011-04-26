@@ -15,7 +15,7 @@ protected:
 	uint8_t*		imageMask(SImage& image) { return image.mask; }
 	Palette8bit&	imagePalette(SImage& image) { return image.palette; }
 
-	virtual bool	readImage(SImage& image, MemChunk& data, int index) { return false; }
+	virtual bool	readImage(SImage& image, MemChunk& data, int index) = 0;
 	virtual bool	writeImage(SImage& image, MemChunk& data, Palette8bit* pal, int index) { return false; }
 
 public:
@@ -25,6 +25,15 @@ public:
 		int		height;
 		int		colformat;
 		string	format;
+		int		numimages;
+		int		offset_x;
+		int		offset_y;
+
+		imginfo_t() {
+			width = height = offset_x = offset_y = 0;
+			colformat = RGBA;
+			numimages = 1;
+		}
 	};
 
 	// Conversion options stuff
@@ -55,10 +64,10 @@ public:
 	string	getName() { return name; }
 	string	getExtension() { return extension; }
 
-	virtual bool	isThisFormat(MemChunk& mc) { return false; }
+	virtual bool	isThisFormat(MemChunk& mc) = 0;
 
 	// Reading
-	virtual imginfo_t	getInfo(MemChunk& mc) { return imginfo_t(); }
+	virtual imginfo_t	getInfo(MemChunk& mc, int index = 0) = 0;
 
 	bool loadImage(SImage& image, MemChunk& data, int index = 0) {
 		// Check format
@@ -68,9 +77,11 @@ public:
 		// Attempt to read image data
 		bool ok = readImage(image, data, index);
 
-		// Set format if successful
-		if (ok)
+		// Set image properties if successful
+		if (ok) {
 			image.format = this;
+			image.imgindex = index;
+		}
 		else
 			image.clear();
 

@@ -1,5 +1,7 @@
 
 #include "Main.h"
+#undef BOOL
+#include <FreeImage.h>
 #include "Misc.h"
 #include "EntryType.h"
 #include "SIFormat.h"
@@ -7,8 +9,8 @@
 #include "SIFDoom.h"
 #include "SIFHexen.h"
 #include "SIFZDoom.h"
-#undef BOOL
-#include <FreeImage.h>
+#include "SIFQuake.h"
+#include "SIFOther.h"
 
 vector<SIFormat*>	simage_formats;
 SIFormat*			sif_raw = NULL;
@@ -17,6 +19,21 @@ SIFormat*			sif_unknown = NULL;
 // Define valid raw sizes (external for now, until i get rid of SImageFormats.cpp)
 extern uint32_t valid_flat_size[][3];
 extern uint32_t n_valid_flat_sizes;
+
+
+// 'Unknown' format
+class SIFUnknown : public SIFormat {
+protected:
+	bool readImage(SImage& image, MemChunk& data, int index) { return false; }
+
+public:
+	SIFUnknown() : SIFormat("unknown") {}
+	~SIFUnknown() {}
+
+	bool		isThisFormat(MemChunk& mc) { return false; }
+	imginfo_t	getInfo(MemChunk& mc, int index) { return imginfo_t(); }
+};
+
 
 // Raw format is a special case - not detectable
 class SIFRaw : public SIFormat {
@@ -41,7 +58,7 @@ protected:
 
 	bool readImage(SImage& image, MemChunk& data, int index) {
 		// Get info
-		imginfo_t info = getInfo(data);
+		imginfo_t info = getInfo(data, index);
 
 		// Create image from data
 		image.create(info.width, info.height, PALMASK);
@@ -63,7 +80,7 @@ public:
 		return validSize(mc.getSize());
 	}
 
-	imginfo_t getInfo(MemChunk& mc) {
+	imginfo_t getInfo(MemChunk& mc, int index) {
 		imginfo_t info;
 		unsigned size = mc.getSize();
 
@@ -197,7 +214,7 @@ SIFormat::~SIFormat() {
 
 void SIFormat::initFormats() {
 	// Non-detectable formats
-	sif_unknown = new SIFormat("unknown");
+	sif_unknown = new SIFUnknown();
 	sif_raw = new SIFRaw();
 	simage_formats.clear();	// Remove previously created formats from the list
 
@@ -217,6 +234,15 @@ void SIFormat::initFormats() {
 
 	// ZDoom formats
 	new SIFImgz();
+
+	// Quake series formats
+	new SIFQuakeGfx();
+	new SIFQuakeSprite();
+	new SIFQuakeTex();
+	new SIFQuake2Wal();
+
+	// Other game formats
+	new SIFHalfLifeTex();
 }
 
 SIFormat* SIFormat::getFormat(string id) {

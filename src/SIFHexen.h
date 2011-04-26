@@ -170,7 +170,7 @@ public:
 			return false;
 	}
 
-	imginfo_t getInfo(MemChunk& mc) {
+	imginfo_t getInfo(MemChunk& mc, int index) {
 		imginfo_t info;
 
 		// Set info (always the same)
@@ -310,7 +310,7 @@ public:
 			return false;
 	}
 
-	imginfo_t getInfo(MemChunk& mc) {
+	imginfo_t getInfo(MemChunk& mc, int index) {
 		imginfo_t info;
 
 		// Check size

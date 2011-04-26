@@ -320,7 +320,7 @@ void SImage::clearData(bool clear_mask) {
 	}
 }
 
-void SImage::create(int width, int height, SIType type, Palette8bit* pal) {
+void SImage::create(int width, int height, SIType type, Palette8bit* pal, int index, int numimages) {
 	// Check valid width/height
 	if (width < 0 || height < 0)
 		return;
@@ -348,10 +348,10 @@ void SImage::create(int width, int height, SIType type, Palette8bit* pal) {
 	this->width = width;
 	this->height = height;
 	this->type = type;
-	offset_x = 0;
-	offset_y = 0;
-	numimages = 1;
-	imgindex = 0;
+	this->offset_x = 0;
+	this->offset_y = 0;
+	this->numimages = numimages;
+	this->imgindex = index;
 	if (pal) {
 		palette.copyPalette(pal);
 		has_palette = true;
@@ -539,8 +539,8 @@ bool SImage::copyImage(SImage* image) {
  * Detects the format of [data] and, if it's a valid image format,
  * loads it into this image
  *******************************************************************/
-bool SImage::open(MemChunk& data) {
-	return SIFormat::determineFormat(data)->loadImage(*this, data);
+bool SImage::open(MemChunk& data, int index) {
+	return SIFormat::determineFormat(data)->loadImage(*this, data, index);
 }
 
 /* SImage::convertRGBA

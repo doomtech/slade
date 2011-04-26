@@ -67,13 +67,15 @@ bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry, int index) {
 	}
 
 	// Firstly try SIFormat system
-	if (image->open(entry->getMCData()))
+	if (image->open(entry->getMCData(), index))
 		return true;
 
 	// Raw images are a special case (not reliably possible to detect just from data)
 	string format = entry->getType()->getFormat();
 	if (format == "img_raw" && SIFormat::rawFormat()->isThisFormat(entry->getMCData()))
 		return SIFormat::rawFormat()->loadImage(*image, entry->getMCData());
+
+
 
 	// Otherwise use old loading stuff
 	if (S_CMPNOCASE(format, "img_doom"))
@@ -248,8 +250,22 @@ bool Misc::loadPaletteFromArchive(Palette8bit* pal, Archive* archive, int lump) 
 		playpal = archive->getEntry(palname, true);
 		sixbit = true;
 	}
-	if (!playpal || playpal->getSize() < 768)
-		playpal = archive->getEntry("PLAYPAL", true), sixbit = false;
+	if (!playpal || playpal->getSize() < 768) {
+		// Search archive for any palette
+		Archive::search_options_t opt;
+
+		// Search "PLAYPAL" first
+		opt.match_type = EntryType::getType("palette");
+		opt.match_name = "PLAYPAL";
+		opt.search_subdirs = true;
+		playpal = archive->findFirst(opt);
+
+		// Otherwise any palette will do
+		if (!playpal) {
+			opt.match_name = "";
+			playpal = archive->findFirst(opt);
+		}
+	}
 	if (!playpal || playpal->getSize() < 768)
 		playpal = archive->getEntry("PAL", true);
 

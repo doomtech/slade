@@ -298,7 +298,7 @@ public:
 			return false;
 	}
 
-	virtual imginfo_t getInfo(MemChunk& mc) {
+	virtual imginfo_t getInfo(MemChunk& mc, int index) {
 		imginfo_t info;
 
 		// Read header
@@ -308,6 +308,8 @@ public:
 		// Setup info
 		info.width = hdr.width;
 		info.height = hdr.height;
+		info.offset_x = hdr.left;
+		info.offset_y = hdr.top;
 		info.colformat = PALMASK;
 		info.format = id;
 
@@ -354,10 +356,6 @@ protected:
 		return readDoomFormat(image, data, 1);
 	}
 
-	bool writeImage(SImage& image, MemChunk& data, Palette8bit* pal, int index) {
-		return false;
-	}
-
 public:
 	SIFDoomBetaGfx() : SIFDoomGfx("doom_beta") {
 		this->name = "Doom Gfx (Beta)";
@@ -371,25 +369,17 @@ public:
 			return false;
 	}
 
-	imginfo_t getInfo(MemChunk& mc) {
-		imginfo_t info = SIFDoomGfx::getInfo(mc);
+	imginfo_t getInfo(MemChunk& mc, int index) {
+		imginfo_t info = SIFDoomGfx::getInfo(mc, index);
 		info.format = id;
 		return info;
 	}
-
-	// No point writing this format
-	int		canWrite(SImage& image) { return NOTWRITABLE; }
-	bool	convertWritable(SImage& image, convert_options_t opt) { return false; }
 };
 
 class SIFDoomAlphaGfx : public SIFDoomGfx {
 protected:
 	bool readImage(SImage& image, MemChunk& data, int index) {
 		return readDoomFormat(image, data, 2);
-	}
-
-	bool writeImage(SImage& image, MemChunk& data, Palette8bit* pal, int index) {
-		return false;
 	}
 
 public:
@@ -405,27 +395,19 @@ public:
 			return false;
 	}
 
-	imginfo_t getInfo(MemChunk& mc) {
+	imginfo_t getInfo(MemChunk& mc, int index) {
 		imginfo_t info;
 
-		// Read header
-		uint8_t width = 0;
-		uint8_t height = 0;
-		mc.read(&width, 1, 0);
-		mc.read(&height, 1);
-
 		// Setup info
-		info.width = width;
-		info.height = height;
+		info.width = mc[0];
+		info.height = mc[1];
+		info.offset_x = mc[2];
+		info.offset_y = mc[3];
 		info.colformat = PALMASK;
 		info.format = id;
 
 		return info;
 	}
-
-	// No point writing this format
-	int		canWrite(SImage& image) { return NOTWRITABLE; }
-	bool	convertWritable(SImage& image, convert_options_t opt) { return false; }
 };
 
 class SIFDoomArah : public SIFormat {
@@ -475,7 +457,7 @@ public:
 			return false;
 	}
 
-	imginfo_t getInfo(MemChunk& mc) {
+	imginfo_t getInfo(MemChunk& mc, int index) {
 		imginfo_t info;
 
 		// Read header
@@ -483,8 +465,10 @@ public:
 		mc.read(&header, 8, 0);
 
 		// Set info
-		info.width = header.width;
-		info.height = header.height;
+		info.width = wxINT16_SWAP_ON_BE(header.width);
+		info.height = wxINT16_SWAP_ON_BE(header.height);
+		info.offset_x = wxINT16_SWAP_ON_BE(header.left);
+		info.offset_y = wxINT16_SWAP_ON_BE(header.top);
 		info.colformat = PALMASK;
 		info.format = id;
 
@@ -550,8 +534,15 @@ public:
 			return false;
 	}
 
-	imginfo_t getInfo(MemChunk& mc) {
+	imginfo_t getInfo(MemChunk& mc, int index) {
 		imginfo_t info;
+
+		// Get image info
+		uint8_t qwidth = mc[0];
+		info.width = qwidth * 4;
+		info.height = mc[1];
+		info.colformat = PALMASK;
+		info.format = id;
 
 		return info;
 	}

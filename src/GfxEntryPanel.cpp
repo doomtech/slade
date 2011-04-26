@@ -906,7 +906,8 @@ void GfxEntryPanel::onAnnouncement(Announcer* announcer, string event_name, MemC
  * Called when the 'next image' button is clicked
  *******************************************************************/
 void GfxEntryPanel::onBtnNextImg(wxCommandEvent& e) {
-	if (gfx_canvas->getImage()->getSize() > 1){
+	int num = gfx_canvas->getImage()->getSize();
+	if (num > 1 && cur_index < num - 1) {
 		loadEntry(entry, cur_index + 1);
 	}
 }
@@ -915,7 +916,8 @@ void GfxEntryPanel::onBtnNextImg(wxCommandEvent& e) {
  * Called when the 'previous image' button is clicked
  *******************************************************************/
 void GfxEntryPanel::onBtnPrevImg(wxCommandEvent& e) {
-	if (gfx_canvas->getImage()->getSize() > 1){
+	int num = gfx_canvas->getImage()->getSize();
+	if (num > 1 && cur_index > 0) {
 		loadEntry(entry, cur_index - 1);
 	}
 }

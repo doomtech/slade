@@ -76,10 +76,11 @@ public:
 
 	void			setXOffset(int offset);
 	void			setYOffset(int offset);
+	void			setPalette(Palette8bit* pal) { palette.copyPalette(pal); has_palette = true; }
 
 	// Misc
 	void	clear();
-	void	create(int width, int height, SIType type, Palette8bit* pal = NULL);
+	void	create(int width, int height, SIType type, Palette8bit* pal = NULL, int index = 0, int numimages = 1);
 	void	fillAlpha(uint8_t alpha = 0);
 	short	findUnusedColour();
 	bool	validFlatSize();
@@ -88,7 +89,7 @@ public:
 	bool	copyImage(SImage* image);
 
 	// Image format reading
-	bool	open(MemChunk& data);
+	bool	open(MemChunk& data, int index = 0);
 	bool	loadImage(const uint8_t* data, int size);
 	bool	loadDoomGfx(const uint8_t* data, int size, uint8_t version = 0);
 	bool	loadDoomGfxA(const uint8_t* data, int size) {return loadDoomGfx(data, size, 2);}
