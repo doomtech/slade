@@ -1084,11 +1084,27 @@
 					Name="Image"
 					>
 					<File
+						RelativePath=".\src\SIFDoom.h"
+						>
+					</File>
+					<File
+						RelativePath=".\src\SIFHexen.h"
+						>
+					</File>
+					<File
+						RelativePath=".\src\SIFImages.h"
+						>
+					</File>
+					<File
 						RelativePath=".\src\SIFormat.cpp"
 						>
 					</File>
 					<File
 						RelativePath=".\src\SIFormat.h"
+						>
+					</File>
+					<File
+						RelativePath=".\src\SIFZDoom.h"
 						>
 					</File>
 					<File

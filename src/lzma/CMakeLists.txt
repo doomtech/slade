@@ -5,22 +5,36 @@ if( CMAKE_COMPILER_IS_GNUC )
 endif( CMAKE_COMPILER_IS_GNUC )
 
 set( LZMA_FILES
-	C/Archive/7z/7zDecode.c
-	C/Archive/7z/7zExtract.c
-	C/Archive/7z/7zHeader.c
-	C/Archive/7z/7zIn.c
-	C/Archive/7z/7zItem.c
+	C/7zAlloc.c
 	C/7zBuf.c
+	C/7zBuf2.c
 	C/7zCrc.c
+	C/7zCrcOpt.c
+	C/7zDec.c
+	C/7zFile.c
+	C/7zIn.c
 	C/7zStream.c
     C/Alloc.c
     C/Bcj2.c
+	C/Bra.c
     C/Bra86.c
+	C/BraIA64.c
+	C/CpuArch.c
+	C/Delta.c
     C/LzFind.c
     C/LzFindMt.c
     C/LzmaDec.c
     C/LzmaEnc.c
-    C/LzmaLib.c )
+	C/Lzma2Dec.c
+	C/Lzma2Enc.c
+	C/Lzma86Dec.c
+	C/Lzma86Enc.c
+    C/LzmaLib.c
+	C/MtCoder.c
+	C/Ppmd7.c
+	C/Ppmd7Dec.c
+	C/Ppmd7Enc.c
+	C/Sha256.c )
 
 if( WIN32 )
 	set( LZMA_FILES ${LZMA_FILES} C/Threads.c )

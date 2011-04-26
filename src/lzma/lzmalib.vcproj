@@ -286,18 +286,6 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\C\7zBuf.c"
-				>
-			</File>
-			<File
-				RelativePath=".\C\7zCrc.c"
-				>
-			</File>
-			<File
-				RelativePath=".\C\7zStream.c"
-				>
-			</File>
-			<File
 				RelativePath=".\C\Alloc.c"
 				>
 			</File>
@@ -306,7 +294,23 @@
 				>
 			</File>
 			<File
+				RelativePath=".\C\Bra.c"
+				>
+			</File>
+			<File
 				RelativePath=".\C\Bra86.c"
+				>
+			</File>
+			<File
+				RelativePath=".\C\BraIA64.c"
+				>
+			</File>
+			<File
+				RelativePath=".\C\CpuArch.c"
+				>
+			</File>
+			<File
+				RelativePath=".\C\Delta.c"
 				>
 			</File>
 			<File
@@ -315,6 +319,22 @@
 			</File>
 			<File
 				RelativePath=".\C\LzFindMt.c"
+				>
+			</File>
+			<File
+				RelativePath=".\C\Lzma2Dec.c"
+				>
+			</File>
+			<File
+				RelativePath=".\C\Lzma2Enc.c"
+				>
+			</File>
+			<File
+				RelativePath=".\C\Lzma86Dec.c"
+				>
+			</File>
+			<File
+				RelativePath=".\C\Lzma86Enc.c"
 				>
 			</File>
 			<File
@@ -330,7 +350,47 @@
 				>
 			</File>
 			<File
+				RelativePath=".\C\MtCoder.c"
+				>
+			</File>
+			<File
+				RelativePath=".\C\Ppmd7.c"
+				>
+			</File>
+			<File
+				RelativePath=".\C\Ppmd7Dec.c"
+				>
+			</File>
+			<File
+				RelativePath=".\C\Ppmd7Enc.c"
+				>
+			</File>
+			<File
+				RelativePath=".\C\Sha256.c"
+				>
+			</File>
+			<File
 				RelativePath=".\C\Threads.c"
+				>
+			</File>
+			<File
+				RelativePath=".\C\Xz.c"
+				>
+			</File>
+			<File
+				RelativePath=".\C\XzCrc64.c"
+				>
+			</File>
+			<File
+				RelativePath=".\C\XzDec.c"
+				>
+			</File>
+			<File
+				RelativePath=".\C\XzEnc.c"
+				>
+			</File>
+			<File
+				RelativePath=".\C\XzIn.c"
 				>
 			</File>
 		</Filter>
@@ -339,18 +399,6 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
-			<File
-				RelativePath=".\C\7zBuf.h"
-				>
-			</File>
-			<File
-				RelativePath=".\C\7zCrc.h"
-				>
-			</File>
-			<File
-				RelativePath=".\C\7zVersion.h"
-				>
-			</File>
 			<File
 				RelativePath=".\C\Alloc.h"
 				>
@@ -368,6 +416,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\C\Delta.h"
+				>
+			</File>
+			<File
 				RelativePath=".\C\LzFind.h"
 				>
 			</File>
@@ -377,6 +429,18 @@
 			</File>
 			<File
 				RelativePath=".\C\LzHash.h"
+				>
+			</File>
+			<File
+				RelativePath=".\C\Lzma2Dec.h"
+				>
+			</File>
+			<File
+				RelativePath=".\C\Lzma2Enc.h"
+				>
+			</File>
+			<File
+				RelativePath=".\C\Lzma86.h"
 				>
 			</File>
 			<File
@@ -392,6 +456,26 @@
 				>
 			</File>
 			<File
+				RelativePath=".\C\MtCoder.h"
+				>
+			</File>
+			<File
+				RelativePath=".\C\Ppmd.h"
+				>
+			</File>
+			<File
+				RelativePath=".\C\Ppmd7.h"
+				>
+			</File>
+			<File
+				RelativePath=".\C\RotateDefs.h"
+				>
+			</File>
+			<File
+				RelativePath=".\C\Sha256.h"
+				>
+			</File>
+			<File
 				RelativePath=".\C\Threads.h"
 				>
 			</File>
@@ -399,48 +483,98 @@
 				RelativePath=".\C\Types.h"
 				>
 			</File>
+			<File
+				RelativePath=".\C\Xz.h"
+				>
+			</File>
+			<File
+				RelativePath=".\C\XzCrc64.h"
+				>
+			</File>
+			<File
+				RelativePath=".\C\XzEnc.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="7z"
 			>
 			<File
-				RelativePath=".\C\Archive\7z\7zDecode.c"
+				RelativePath=".\C\7z.h"
 				>
 			</File>
 			<File
-				RelativePath=".\C\Archive\7z\7zDecode.h"
+				RelativePath=".\C\7zAlloc.c"
 				>
 			</File>
 			<File
-				RelativePath=".\C\Archive\7z\7zExtract.c"
+				RelativePath=".\C\7zAlloc.h"
 				>
 			</File>
 			<File
-				RelativePath=".\C\Archive\7z\7zExtract.h"
+				RelativePath=".\C\7zBuf.c"
 				>
 			</File>
 			<File
-				RelativePath=".\C\Archive\7z\7zHeader.c"
+				RelativePath=".\C\7zBuf.h"
 				>
 			</File>
 			<File
-				RelativePath=".\C\Archive\7z\7zHeader.h"
+				RelativePath=".\C\7zBuf2.c"
 				>
 			</File>
 			<File
-				RelativePath=".\C\Archive\7z\7zIn.c"
+				RelativePath=".\C\7zCrc.c"
 				>
 			</File>
 			<File
-				RelativePath=".\C\Archive\7z\7zIn.h"
+				RelativePath=".\C\7zCrc.h"
 				>
 			</File>
 			<File
-				RelativePath=".\C\Archive\7z\7zItem.c"
+				RelativePath=".\C\7zCrcOpt.c"
 				>
 			</File>
 			<File
-				RelativePath=".\C\Archive\7z\7zItem.h"
+				RelativePath=".\C\7zDec.c"
+				>
+			</File>
+			<File
+				RelativePath=".\C\7zFile.c"
+				>
+			</File>
+			<File
+				RelativePath=".\C\7zFile.h"
+				>
+			</File>
+			<File
+				RelativePath=".\C\7zIn.c"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\$(InputName)1.obj"
+						XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)\$(InputName)1.obj"
+						XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\C\7zStream.c"
+				>
+			</File>
+			<File
+				RelativePath=".\C\7zVersion.h"
 				>
 			</File>
 		</Filter>
