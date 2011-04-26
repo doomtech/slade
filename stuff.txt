@@ -24,6 +24,7 @@ TODO List ---------------------------------------------------------------
 - Status bar stuff for other EntryPanels and Texture editor
 - AudioEntryPanel improvements
 	- Autoplay option
+- Finish moving SImageFormats.cpp stuff over to SIFormat system
 
 --- Bugs ---
 - Audio player issues
