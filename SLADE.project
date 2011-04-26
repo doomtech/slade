@@ -265,6 +265,8 @@
         <File Name="src/SIFHexen.h"/>
         <File Name="src/SIFImages.h"/>
         <File Name="src/SIFZDoom.h"/>
+        <File Name="src/SIFOther.h"/>
+        <File Name="src/SIFQuake.h"/>
       </VirtualDirectory>
       <VirtualDirectory Name="Palette">
         <File Name="src/Palette.cpp"/>
@@ -356,33 +358,66 @@
       <File Name="src/zreaders/templates.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Lzma">
+      <File Name="src/lzma/C/7z.h"/>
+      <File Name="src/lzma/C/7zAlloc.c"/>
+      <File Name="src/lzma/C/7zAlloc.h"/>
       <File Name="src/lzma/C/7zBuf.c"/>
       <File Name="src/lzma/C/7zBuf.h"/>
+      <File Name="src/lzma/C/7zBuf2.c"/>
       <File Name="src/lzma/C/7zCrc.c"/>
       <File Name="src/lzma/C/7zCrc.h"/>
+      <File Name="src/lzma/C/7zCrcOpt.c"/>
+      <File Name="src/lzma/C/7zDec.c"/>
+      <File Name="src/lzma/C/7zFile.c"/>
+      <File Name="src/lzma/C/7zFile.h"/>
+      <File Name="src/lzma/C/7zIn.c"/>
       <File Name="src/lzma/C/7zStream.c"/>
       <File Name="src/lzma/C/7zVersion.h"/>
       <File Name="src/lzma/C/Alloc.c"/>
       <File Name="src/lzma/C/Alloc.h"/>
       <File Name="src/lzma/C/Bcj2.c"/>
       <File Name="src/lzma/C/Bcj2.h"/>
+      <File Name="src/lzma/C/Bra.c"/>
       <File Name="src/lzma/C/Bra.h"/>
       <File Name="src/lzma/C/Bra86.c"/>
+      <File Name="src/lzma/C/BraIA64.c"/>
+      <File Name="src/lzma/C/CpuArch.c"/>
       <File Name="src/lzma/C/CpuArch.h"/>
+      <File Name="src/lzma/C/Delta.c"/>
+      <File Name="src/lzma/C/Delta.h"/>
       <File Name="src/lzma/C/LzFind.c"/>
       <File Name="src/lzma/C/LzFind.h"/>
-      <File Name="src/lzma/C/LzFindMt.c"/>
-      <File Name="src/lzma/C/LzFindMt.h"/>
       <File Name="src/lzma/C/LzHash.h"/>
+      <File Name="src/lzma/C/Lzma2Dec.c"/>
+      <File Name="src/lzma/C/Lzma2Dec.h"/>
+      <File Name="src/lzma/C/Lzma2Enc.c"/>
+      <File Name="src/lzma/C/Lzma2Enc.h"/>
+      <File Name="src/lzma/C/Lzma86.h"/>
+      <File Name="src/lzma/C/Lzma86Dec.c"/>
+      <File Name="src/lzma/C/Lzma86Enc.c"/>
       <File Name="src/lzma/C/LzmaDec.c"/>
       <File Name="src/lzma/C/LzmaDec.h"/>
       <File Name="src/lzma/C/LzmaEnc.c"/>
       <File Name="src/lzma/C/LzmaEnc.h"/>
       <File Name="src/lzma/C/LzmaLib.c"/>
       <File Name="src/lzma/C/LzmaLib.h"/>
-      <File Name="src/lzma/C/Threads.c"/>
-      <File Name="src/lzma/C/Threads.h"/>
+      <File Name="src/lzma/C/Ppmd.h"/>
+      <File Name="src/lzma/C/Ppmd7.c"/>
+      <File Name="src/lzma/C/Ppmd7.h"/>
+      <File Name="src/lzma/C/Ppmd7Dec.c"/>
+      <File Name="src/lzma/C/Ppmd7Enc.c"/>
+      <File Name="src/lzma/C/RotateDefs.h"/>
+      <File Name="src/lzma/C/Sha256.c"/>
+      <File Name="src/lzma/C/Sha256.h"/>
       <File Name="src/lzma/C/Types.h"/>
+      <File Name="src/lzma/C/Xz.c"/>
+      <File Name="src/lzma/C/Xz.h"/>
+      <File Name="src/lzma/C/XzCrc64.c"/>
+      <File Name="src/lzma/C/XzCrc64.h"/>
+      <File Name="src/lzma/C/XzDec.c"/>
+      <File Name="src/lzma/C/XzEnc.c"/>
+      <File Name="src/lzma/C/XzEnc.h"/>
+      <File Name="src/lzma/C/XzIn.c"/>
     </VirtualDirectory>
     <VirtualDirectory Name="BZip2">
       <File Name="src/bzip2/blocksort.c"/>
@@ -408,6 +443,7 @@
         <Preprocessor Value="BOOL=int"/>
         <Preprocessor Value="TRUE=1"/>
         <Preprocessor Value="FALSE=0"/>
+        <Preprocessor Value="_7ZIP_ST"/>
       </Compiler>
       <Linker Options="">
         <LibraryPath Value="."/>
