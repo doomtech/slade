@@ -2,6 +2,7 @@
 #include "Main.h"
 #include "Misc.h"
 #include "SIFormat.h"
+#undef BOOL
 #include <FreeImage.h>
 
 // Define grAb chunk struct

@@ -295,7 +295,7 @@ bool TarArchive::open(MemChunk& mc) {
 		// Find size
 		size_t size = TarSum(header.size, 12);
 
-		if (header.typeflag == AREGTYPE || header.typeflag == REGTYPE) {
+		if ((int)header.typeflag == AREGTYPE || (int)header.typeflag == REGTYPE) {
 			// Normal entry
 			wxFileName fn(name);
 
@@ -310,7 +310,7 @@ bool TarArchive::open(MemChunk& mc) {
 
 			// Add to directory
 			dir->addEntry(entry);
-		} else if (header.typeflag == DIRTYPE) {
+		} else if ((int)header.typeflag == DIRTYPE) {
 			// Directory
 			ArchiveTreeNode* dir = createDir(name);
 		} else {
