@@ -373,7 +373,7 @@ bool MainWindow::exitProgram() {
 	mw_maximized = IsMaximized();
 
 	// Save selected palette
-	//global_palette = palette_chooser->GetStringSelection();
+	global_palette = palette_chooser->GetStringSelection();
 
 	// Exit application
 	wxTheApp->Exit();
