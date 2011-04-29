@@ -48,6 +48,7 @@ private:
 	// Paletted target range
 	wxPanel*		panel_target_palette;
 	PaletteCanvas*	pal_canvas_target;
+	wxCheckBox*		cb_target_reverse;
 
 	// Colour gradient target range
 	wxPanel*			panel_target_gradient;
@@ -91,6 +92,7 @@ public:
 	void	onBtnLoad(wxCommandEvent& e);
 	void	onBtnSave(wxCommandEvent& e);
 	void	onGfxPreviewMouseMotion(wxMouseEvent& e);
+	void	onCBTargetReverse(wxCommandEvent& e);
 };
 
 #endif//__TRANSLATION_EDITOR_DIALOG_H__

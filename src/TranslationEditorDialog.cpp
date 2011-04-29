@@ -11,8 +11,6 @@
 #include <wx/gbsizer.h>
 
 
-
-
 GradientBox::GradientBox(wxWindow* parent, int steps) : OGLCanvas(parent, -1) {
 	// Init variables
 	col_start = COL_BLACK;
@@ -71,7 +69,7 @@ TranslationEditorDialog::TranslationEditorDialog(wxWindow* parent, Palette8bit* 
 	// Init variables
 	palette = pal;
 	entry_preview = preview_image;
-
+	
 	// Set dialog icon
 	wxIcon icon;
 	icon.CopyFromBitmap(getIcon("t_remap"));
@@ -116,7 +114,7 @@ TranslationEditorDialog::TranslationEditorDialog(wxWindow* parent, Palette8bit* 
 
 	// Origin range
 	frame = new wxStaticBox(this, -1, "Origin Range");
-	framesizer = new wxStaticBoxSizer(frame, wxHORIZONTAL);
+	framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
 	sizer->Add(framesizer, wxGBPosition(0, 1), wxDefaultSpan, wxEXPAND);
 
 	// Origin palette
@@ -125,7 +123,7 @@ TranslationEditorDialog::TranslationEditorDialog(wxWindow* parent, Palette8bit* 
 	pal_canvas_original->setPalette(palette);
 	pal_canvas_original->SetInitialSize(wxSize(448, 112));
 	pal_canvas_original->allowSelection(2);
-	framesizer->Add(pal_canvas_original->toPanel(this), 1, wxALL, 4);
+	framesizer->Add(pal_canvas_original->toPanel(this), 1, wxALL|wxEXPAND, 4);
 
 
 	// --- Bottom half (translation target) ---
@@ -166,6 +164,10 @@ TranslationEditorDialog::TranslationEditorDialog(wxWindow* parent, Palette8bit* 
 	pal_canvas_target->SetInitialSize(wxSize(448, 112));
 	pal_canvas_target->allowSelection(2);
 	vbox->Add(pal_canvas_target->toPanel(panel_target_palette), 1, wxEXPAND);
+
+	// Reverse origin range
+	cb_target_reverse = new wxCheckBox(panel_target_palette, -1, "Reverse Selection");
+	vbox->Add(cb_target_reverse, 0, wxTOP, 4);
 
 
 	// Target colour gradient panel
@@ -264,6 +266,7 @@ TranslationEditorDialog::TranslationEditorDialog(wxWindow* parent, Palette8bit* 
 	btn_load->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TranslationEditorDialog::onBtnLoad, this);
 	btn_save->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TranslationEditorDialog::onBtnSave, this);
 	gfx_preview->Bind(wxEVT_MOTION, &TranslationEditorDialog::onGfxPreviewMouseMotion, this);
+	cb_target_reverse->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &TranslationEditorDialog::onCBTargetReverse, this);
 
 	// Setup layout
 	Layout();
@@ -317,7 +320,14 @@ void TranslationEditorDialog::openRange(int index) {
 		showPaletteTarget();
 
 		// Set target range selection
-		pal_canvas_target->setSelection(tpr->dStart(), tpr->dEnd());
+		if (tpr->dStart() <= tpr->dEnd()) {
+			pal_canvas_target->setSelection(tpr->dStart(), tpr->dEnd());
+			cb_target_reverse->SetValue(false);
+		}
+		else {
+			pal_canvas_target->setSelection(tpr->dEnd(), tpr->dStart());
+			cb_target_reverse->SetValue(true);
+		}
 		pal_canvas_target->Refresh();
 	}
 	else if (tr->getType() == TRANS_COLOUR) {
@@ -530,10 +540,18 @@ void TranslationEditorDialog::onRBPaletteSelected(wxCommandEvent& e) {
 		// Recreate it
 		translation.addRange(TRANS_PALETTE, index);
 		TransRangePalette* tr = (TransRangePalette*)translation.getRange(index);
+		// Origin range
 		tr->setOStart(pal_canvas_original->getSelectionStart());
 		tr->setOEnd(pal_canvas_original->getSelectionEnd());
-		tr->setDStart(pal_canvas_target->getSelectionStart());
-		tr->setDEnd(pal_canvas_target->getSelectionEnd());
+		// Target range
+		if (cb_target_reverse->GetValue()) {
+			tr->setDEnd(pal_canvas_target->getSelectionStart());
+			tr->setDStart(pal_canvas_target->getSelectionEnd());
+		}
+		else {
+			tr->setDStart(pal_canvas_target->getSelectionStart());
+			tr->setDEnd(pal_canvas_target->getSelectionEnd());
+		}
 
 		// Update UI
 		updateListItem(index);
@@ -555,8 +573,10 @@ void TranslationEditorDialog::onRBColourSelected(wxCommandEvent& e) {
 		// Recreate it
 		translation.addRange(TRANS_COLOUR, index);
 		TransRangeColour* tr = (TransRangeColour*)translation.getRange(index);
+		// Origin range
 		tr->setOStart(pal_canvas_original->getSelectionStart());
 		tr->setOEnd(pal_canvas_original->getSelectionEnd());
+		// Target colour gradient
 		wxColour sc = cp_range_begin->GetColour();
 		wxColour ec = cp_range_end->GetColour();
 		tr->setDStart(rgba_t(sc.Red(), sc.Green(), sc.Blue()));
@@ -582,8 +602,10 @@ void TranslationEditorDialog::onRBDesaturateSelected(wxCommandEvent& e) {
 		// Recreate it
 		translation.addRange(TRANS_DESAT, index);
 		TransRangeDesat* tr = (TransRangeDesat*)translation.getRange(index);
+		// Origin range
 		tr->setOStart(pal_canvas_original->getSelectionStart());
 		tr->setOEnd(pal_canvas_original->getSelectionEnd());
+		// Target colour gradient
 		wxColour sc = cp_range_begin->GetColour();
 		wxColour ec = cp_range_end->GetColour();
 		tr->setDStart(MathStuff::clamp(sc.Red() / 127.0f, 0, 2),
@@ -634,8 +656,14 @@ void TranslationEditorDialog::onPalTargetLeftUp(wxMouseEvent& e) {
 	// Update its target range if it's a palette translation
 	if (tr && tr->getType() == TRANS_PALETTE) {
 		TransRangePalette* tpr = (TransRangePalette*)tr;
-		tpr->setDStart(pal_canvas_target->getSelectionStart());
-		tpr->setDEnd(pal_canvas_target->getSelectionEnd());
+		if (cb_target_reverse->GetValue()) {
+			tpr->setDEnd(pal_canvas_target->getSelectionStart());
+			tpr->setDStart(pal_canvas_target->getSelectionEnd());
+		}
+		else {
+			tpr->setDStart(pal_canvas_target->getSelectionStart());
+			tpr->setDEnd(pal_canvas_target->getSelectionEnd());
+		}
 	}
 
 	// Update UI
@@ -807,4 +835,26 @@ void TranslationEditorDialog::onGfxPreviewMouseMotion(wxMouseEvent& e) {
 	}
 	
 	e.Skip();
+}
+
+void TranslationEditorDialog::onCBTargetReverse(wxCommandEvent& e) {
+	// Get current translation range
+	TransRange* tr = translation.getRange(list_translations->GetSelection());
+
+	// Update its target range if it's a palette translation
+	if (tr && tr->getType() == TRANS_PALETTE) {
+		TransRangePalette* tpr = (TransRangePalette*)tr;
+		if (cb_target_reverse->GetValue()) {
+			tpr->setDEnd(pal_canvas_target->getSelectionStart());
+			tpr->setDStart(pal_canvas_target->getSelectionEnd());
+		}
+		else {
+			tpr->setDStart(pal_canvas_target->getSelectionStart());
+			tpr->setDEnd(pal_canvas_target->getSelectionEnd());
+		}
+	}
+
+	// Update UI
+	updateListItem(list_translations->GetSelection());
+	updatePreviews();
 }

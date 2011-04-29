@@ -53,10 +53,11 @@ wxDEFINE_EVENT(EVT_VLV_SELECTION_CHANGED, wxCommandEvent);
  * VirtualListView class constructor
  *******************************************************************/
 VirtualListView::VirtualListView(wxWindow* parent)
-: wxListCtrl(parent, -1, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxLC_VIRTUAL) {
+: wxListCtrl(parent, -1, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxLC_VIRTUAL|wxLC_EDIT_LABELS) {
 	item_attr = new wxListItemAttr();
 	last_focus = 0;
 	col_search = 0;
+	memset(cols_editable, 0, 100);
 
 	// Bind events
 #ifndef __WXMSW__
@@ -65,6 +66,8 @@ VirtualListView::VirtualListView(wxWindow* parent)
 	Bind(wxEVT_LEFT_DOWN, &VirtualListView::onMouseLeftDown, this);
 	Bind(wxEVT_COMMAND_LIST_COL_END_DRAG, &VirtualListView::onColumnResize, this);
 	Bind(wxEVT_CHAR, &VirtualListView::onKeyChar, this);
+	Bind(wxEVT_COMMAND_LIST_BEGIN_LABEL_EDIT, &VirtualListView::onLabelEditBegin, this);
+	Bind(wxEVT_COMMAND_LIST_END_LABEL_EDIT, &VirtualListView::onLabelEditEnd, this);
 }
 
 /* VirtualListView::~VirtualListView
@@ -448,4 +451,22 @@ void VirtualListView::onKeyChar(wxKeyEvent& e) {
 			e.GetKeyCode() == WXK_TAB)
 			e.Skip();
 	}
+}
+
+/* VirtualListView::onLabelEditBegin
+ * Called when an item label is clicked twice to edit it
+ *******************************************************************/
+void VirtualListView::onLabelEditBegin(wxListEvent& e) {
+	if (!cols_editable[e.GetColumn()])
+		e.Veto();
+
+	e.Skip();
+}
+
+/* VirtualListView::onLabelEditEnd
+ * Called when an item label edit event finishes
+ *******************************************************************/
+void VirtualListView::onLabelEditEnd(wxListEvent& e) {
+	if (!e.IsEditCancelled())
+		labelEdited(e.GetColumn(), e.GetIndex(), e.GetLabel());
 }

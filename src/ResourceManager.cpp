@@ -33,6 +33,8 @@
 #include "ResourceManager.h"
 #include "ArchiveManager.h"
 #include "Console.h"
+#include "CTexture.h"
+#include "TextureXList.h"
 
 
 /*******************************************************************
@@ -42,32 +44,32 @@ ResourceManager* ResourceManager::instance = NULL;
 
 
 /*******************************************************************
- * RESOURCE CLASS FUNCTIONS
+ * ENTRYRESOURCE CLASS FUNCTIONS
  *******************************************************************/
 
-/* Resource::Resource
- * Resource class constructor
+/* EntryResource::EntryResource
+ * EntryResource class constructor
  *******************************************************************/
-Resource::Resource(ArchiveEntry* entry) {
+EntryResource::EntryResource(ArchiveEntry* entry) : Resource("entry") {
 }
 
-/* Resource::~Resource
- * Resource class destructor
+/* EntryResource::~EntryResource
+ * EntryResource class destructor
  *******************************************************************/
-Resource::~Resource() {
+EntryResource::~EntryResource() {
 }
 
-/* Resource::add
+/* EntryResource::add
  * Adds matching [entry] to the resource
  *******************************************************************/
-void Resource::add(ArchiveEntry* entry) {
+void EntryResource::add(ArchiveEntry* entry) {
 	entries.push_back(entry);
 }
 
-/* Resource::remove
+/* EntryResource::remove
  * Removes matching [entry] from the resource
  *******************************************************************/
-void Resource::remove(ArchiveEntry* entry) {
+void EntryResource::remove(ArchiveEntry* entry) {
 	unsigned a = 0;
 	while (a < entries.size()) {
 		if (entries[a] == entry)
@@ -77,11 +79,70 @@ void Resource::remove(ArchiveEntry* entry) {
 	}
 }
 
-/* Resource::length
+/* EntryResource::length
  * Returns the number of entries matching this resource
  *******************************************************************/
-int Resource::length() {
+int EntryResource::length() {
 	return entries.size();
+}
+
+
+/*******************************************************************
+ * TEXTURERESOURCE CLASS FUNCTIONS
+ *******************************************************************/
+
+/* TextureResource::TextureResource
+ * TextureResource class constructor
+ *******************************************************************/
+TextureResource::TextureResource() : Resource("texture") {
+}
+
+/* TextureResource::~TextureResource
+ * TextureResource class destructor
+ *******************************************************************/
+TextureResource::~TextureResource() {
+}
+
+/* TextureResource::add
+ * Adds a texture to this resource
+ *******************************************************************/
+void TextureResource::add(CTexture* tex, Archive* parent) {
+	// Check args
+	if (!tex || !parent)
+		return;
+
+	// Create resource
+	tex_res_t res;
+	res.tex = new CTexture();
+	res.tex->copyTexture(tex);
+	res.parent = parent;
+
+	// Add it
+	textures.push_back(res);
+}
+
+/* TextureResource::remove
+ * Removes any textures in this resource that are part of [parent]
+ * archive
+ *******************************************************************/
+void TextureResource::remove(Archive* parent) {
+	// Remove any textures with matching parent
+	unsigned a = 0;
+	while (a < textures.size()) {
+		if (textures[a].parent == parent) {
+			delete textures[a].tex;
+			textures.erase(textures.begin() + a);
+		}
+		else
+			a++;
+	}
+}
+
+/* TextureResource::length
+ * Returns the number of textures matching this resource
+ *******************************************************************/
+int TextureResource::length() {
+	return textures.size();
 }
 
 
@@ -168,7 +229,7 @@ void ResourceManager::removeEntry(ArchiveEntry* entry) {
  * Dumps all patch names and the number of matching entries for each
  *******************************************************************/
 void ResourceManager::listAllPatches() {
-	ResourceMap::iterator i = patches.begin();
+	EntryResourceMap::iterator i = patches.begin();
 
 	// Add all properties to given list
 	while (i != patches.end()) {
@@ -181,7 +242,7 @@ void ResourceManager::listAllPatches() {
  * Adds all current patch entries to [list]
  *******************************************************************/
 void ResourceManager::getAllPatchEntries(vector<ArchiveEntry*>& list, Archive* priority) {
-	ResourceMap::iterator i = patches.begin();
+	EntryResourceMap::iterator i = patches.begin();
 
 	// Add all primary entries to the list
 	while (i != patches.end()) {
@@ -219,7 +280,7 @@ void ResourceManager::getAllPatchEntries(vector<ArchiveEntry*>& list, Archive* p
  *******************************************************************/
 ArchiveEntry* ResourceManager::getPatchEntry(string patch, string nspace, Archive* priority) {
 	// Check resource with matching name exists
-	Resource& res = patches[patch];
+	EntryResource& res = patches[patch];
 	if (res.entries.size() == 0)
 		return NULL;
 

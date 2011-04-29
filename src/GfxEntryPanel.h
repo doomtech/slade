@@ -5,6 +5,7 @@
 #include "EntryPanel.h"
 #include "GfxCanvas.h"
 #include "MainApp.h"
+#include "Translation.h"
 #include <wx/spinctrl.h>
 
 class GfxEntryPanel : public EntryPanel, SActionHandler {
@@ -24,10 +25,13 @@ private:
 	wxButton*		btn_previmg;
 	wxStaticText*	text_curimg;
 	int				cur_index;
+	Translation		prev_translation;
 
 public:
 	GfxEntryPanel(wxWindow* parent);
 	~GfxEntryPanel();
+
+	Translation&	prevTranslation() { return prev_translation; }
 
 	bool	loadEntry(ArchiveEntry* entry); // override for EntryPanel::loadEntry
 	bool	loadEntry(ArchiveEntry* entry, int index);

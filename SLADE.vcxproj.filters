@@ -100,6 +100,12 @@
     <Filter Include="External\ZLib">
       <UniqueIdentifier>{1ca86170-39c5-4615-bb20-8f2d2fc14c42}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resources\Archive\Formats">
+      <UniqueIdentifier>{844561dc-871c-4534-ba8a-768af5269000}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\Graphics\Image\Formats">
+      <UniqueIdentifier>{544047dd-0bbf-43a3-b6ec-6f90661fad4c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\GfxConvDialog.cpp">
@@ -162,9 +168,6 @@
     <ClCompile Include="src\GfxEntryPanel.cpp">
       <Filter>Main Editor\UI Elements\EntryPanel</Filter>
     </ClCompile>
-    <ClCompile Include="src\MultiEntryPanel.cpp">
-      <Filter>Main Editor\UI Elements\EntryPanel</Filter>
-    </ClCompile>
     <ClCompile Include="src\PaletteEntryPanel.cpp">
       <Filter>Main Editor\UI Elements\EntryPanel</Filter>
     </ClCompile>
@@ -214,12 +217,6 @@
       <Filter>Resources\Archive</Filter>
     </ClCompile>
     <ClCompile Include="src\ArchiveManager.cpp">
-      <Filter>Resources\Archive</Filter>
-    </ClCompile>
-    <ClCompile Include="src\WadArchive.cpp">
-      <Filter>Resources\Archive</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ZipArchive.cpp">
       <Filter>Resources\Archive</Filter>
     </ClCompile>
     <ClCompile Include="src\AnimatedList.cpp">
@@ -306,12 +303,6 @@
     <ClCompile Include="src\VirtualListView.cpp">
       <Filter>UI Elements\Lists</Filter>
     </ClCompile>
-    <ClCompile Include="src\DatArchive.cpp">
-      <Filter>Resources\Archive</Filter>
-    </ClCompile>
-    <ClCompile Include="src\LibArchive.cpp">
-      <Filter>Resources\Archive</Filter>
-    </ClCompile>
     <ClCompile Include="src\ArchivePanel.cpp">
       <Filter>Main Editor\UI Elements</Filter>
     </ClCompile>
@@ -330,9 +321,6 @@
     <ClCompile Include="src\Console.cpp">
       <Filter>General\Console</Filter>
     </ClCompile>
-    <ClCompile Include="src\ResArchive.cpp">
-      <Filter>Resources\Archive</Filter>
-    </ClCompile>
     <ClCompile Include="src\SImageFormats.cpp">
       <Filter>Resources\Graphics\Image</Filter>
     </ClCompile>
@@ -350,15 +338,6 @@
     </ClCompile>
     <ClCompile Include="src\ArchiveOperations.cpp">
       <Filter>Main Editor</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Wad2Archive.cpp">
-      <Filter>Resources\Archive</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PakArchive.cpp">
-      <Filter>Resources\Archive</Filter>
-    </ClCompile>
-    <ClCompile Include="src\WadJArchive.cpp">
-      <Filter>Resources\Archive</Filter>
     </ClCompile>
     <ClCompile Include="src\TextStyle.cpp">
       <Filter>UI Elements\TextEditor</Filter>
@@ -393,17 +372,11 @@
     <ClCompile Include="src\BrowserCanvas.cpp">
       <Filter>UI Elements\Browser</Filter>
     </ClCompile>
-    <ClCompile Include="src\GrpArchive.cpp">
-      <Filter>Resources\Archive</Filter>
-    </ClCompile>
     <ClCompile Include="src\CodePages.cpp">
       <Filter>General\Utility</Filter>
     </ClCompile>
     <ClCompile Include="src\ANSIEntryPanel.cpp">
       <Filter>Main Editor\UI Elements\EntryPanel</Filter>
-    </ClCompile>
-    <ClCompile Include="src\RffArchive.cpp">
-      <Filter>Resources\Archive</Filter>
     </ClCompile>
     <ClCompile Include="src\ANSICanvas.cpp">
       <Filter>UI Elements</Filter>
@@ -417,18 +390,6 @@
     <ClCompile Include="src\ExtMessageDialog.cpp">
       <Filter>Dialogs</Filter>
     </ClCompile>
-    <ClCompile Include="src\WolfArchive.cpp">
-      <Filter>Resources\Archive</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GobArchive.cpp">
-      <Filter>Resources\Archive</Filter>
-    </ClCompile>
-    <ClCompile Include="src\LfdArchive.cpp">
-      <Filter>Resources\Archive</Filter>
-    </ClCompile>
-    <ClCompile Include="src\HogArchive.cpp">
-      <Filter>Resources\Archive</Filter>
-    </ClCompile>
     <ClCompile Include="src\ZTextureEditorPanel.cpp">
       <Filter>Main Editor\UI Elements\TextureXEditor</Filter>
     </ClCompile>
@@ -437,9 +398,6 @@
     </ClCompile>
     <ClCompile Include="src\Translation.cpp">
       <Filter>Resources\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="src\BSPArchive.cpp">
-      <Filter>Resources\Archive</Filter>
     </ClCompile>
     <ClCompile Include="src\MathStuff.cpp">
       <Filter>General\Utility</Filter>
@@ -462,9 +420,6 @@
     <ClCompile Include="src\GraphicsPrefsPanel.cpp">
       <Filter>Dialogs\Preferences</Filter>
     </ClCompile>
-    <ClCompile Include="src\SIFormat.cpp">
-      <Filter>Resources\Graphics\Image</Filter>
-    </ClCompile>
     <ClCompile Include="src\bzip2\blocksort.c">
       <Filter>External\BZip2</Filter>
     </ClCompile>
@@ -485,18 +440,6 @@
     </ClCompile>
     <ClCompile Include="src\bzip2\randtable.c">
       <Filter>External\BZip2</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ADatArchive.cpp">
-      <Filter>Resources\Archive</Filter>
-    </ClCompile>
-    <ClCompile Include="src\BZip2Archive.cpp">
-      <Filter>Resources\Archive</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GZipArchive.cpp">
-      <Filter>Resources\Archive</Filter>
-    </ClCompile>
-    <ClCompile Include="src\TarArchive.cpp">
-      <Filter>Resources\Archive</Filter>
     </ClCompile>
     <ClCompile Include="src\Compression.cpp">
       <Filter>General\Utility</Filter>
@@ -651,6 +594,66 @@
     <ClCompile Include="src\lzma\C\XzIn.c">
       <Filter>External\Lzma</Filter>
     </ClCompile>
+    <ClCompile Include="src\ADatArchive.cpp">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BSPArchive.cpp">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BZip2Archive.cpp">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DatArchive.cpp">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GobArchive.cpp">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GrpArchive.cpp">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GZipArchive.cpp">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HogArchive.cpp">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LfdArchive.cpp">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LibArchive.cpp">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PakArchive.cpp">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ResArchive.cpp">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RffArchive.cpp">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TarArchive.cpp">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Wad2Archive.cpp">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WadArchive.cpp">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WadJArchive.cpp">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WolfArchive.cpp">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ZipArchive.cpp">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SIFormat.cpp">
+      <Filter>Resources\Graphics\Image\Formats</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -716,9 +719,6 @@
     <ClInclude Include="src\GfxEntryPanel.h">
       <Filter>Main Editor\UI Elements\EntryPanel</Filter>
     </ClInclude>
-    <ClInclude Include="src\MultiEntryPanel.h">
-      <Filter>Main Editor\UI Elements\EntryPanel</Filter>
-    </ClInclude>
     <ClInclude Include="src\PaletteEntryPanel.h">
       <Filter>Main Editor\UI Elements\EntryPanel</Filter>
     </ClInclude>
@@ -768,12 +768,6 @@
       <Filter>Resources\Archive</Filter>
     </ClInclude>
     <ClInclude Include="src\ArchiveManager.h">
-      <Filter>Resources\Archive</Filter>
-    </ClInclude>
-    <ClInclude Include="src\WadArchive.h">
-      <Filter>Resources\Archive</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ZipArchive.h">
       <Filter>Resources\Archive</Filter>
     </ClInclude>
     <ClInclude Include="src\AnimatedList.h">
@@ -885,12 +879,6 @@
     <ClInclude Include="src\VirtualListView.h">
       <Filter>UI Elements\Lists</Filter>
     </ClInclude>
-    <ClInclude Include="src\DatArchive.h">
-      <Filter>Resources\Archive</Filter>
-    </ClInclude>
-    <ClInclude Include="src\LibArchive.h">
-      <Filter>Resources\Archive</Filter>
-    </ClInclude>
     <ClInclude Include="src\ArchivePanel.h">
       <Filter>Main Editor\UI Elements</Filter>
     </ClInclude>
@@ -912,9 +900,6 @@
     <ClInclude Include="src\ConsoleHelpers.h">
       <Filter>General\Console</Filter>
     </ClInclude>
-    <ClInclude Include="src\ResArchive.h">
-      <Filter>Resources\Archive</Filter>
-    </ClInclude>
     <ClInclude Include="src\PatchBrowser.h">
       <Filter>Main Editor\UI Elements\TextureXEditor</Filter>
     </ClInclude>
@@ -929,15 +914,6 @@
     </ClInclude>
     <ClInclude Include="src\ArchiveOperations.h">
       <Filter>Main Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Wad2Archive.h">
-      <Filter>Resources\Archive</Filter>
-    </ClInclude>
-    <ClInclude Include="src\PakArchive.h">
-      <Filter>Resources\Archive</Filter>
-    </ClInclude>
-    <ClInclude Include="src\WadJArchive.h">
-      <Filter>Resources\Archive</Filter>
     </ClInclude>
     <ClInclude Include="src\TextStyle.h">
       <Filter>UI Elements\TextEditor</Filter>
@@ -972,17 +948,11 @@
     <ClInclude Include="src\BrowserCanvas.h">
       <Filter>UI Elements\Browser</Filter>
     </ClInclude>
-    <ClInclude Include="src\GrpArchive.h">
-      <Filter>Resources\Archive</Filter>
-    </ClInclude>
     <ClInclude Include="src\CodePages.h">
       <Filter>General\Utility</Filter>
     </ClInclude>
     <ClInclude Include="src\ANSIEntryPanel.h">
       <Filter>Main Editor\UI Elements\EntryPanel</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RffArchive.h">
-      <Filter>Resources\Archive</Filter>
     </ClInclude>
     <ClInclude Include="src\ANSICanvas.h">
       <Filter>UI Elements</Filter>
@@ -993,23 +963,8 @@
     <ClInclude Include="src\ExtMessageDialog.h">
       <Filter>Dialogs</Filter>
     </ClInclude>
-    <ClInclude Include="src\WolfArchive.h">
-      <Filter>Resources\Archive</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GobArchive.h">
-      <Filter>Resources\Archive</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Archives.h">
-      <Filter>Resources\Archive</Filter>
-    </ClInclude>
-    <ClInclude Include="src\LfdArchive.h">
-      <Filter>Resources\Archive</Filter>
-    </ClInclude>
     <ClInclude Include="src\LumpFormats.h">
       <Filter>Resources\Archive\EntryType\EntryDataFormat</Filter>
-    </ClInclude>
-    <ClInclude Include="src\HogArchive.h">
-      <Filter>Resources\Archive</Filter>
     </ClInclude>
     <ClInclude Include="src\ZTextureEditorPanel.h">
       <Filter>Main Editor\UI Elements\TextureXEditor</Filter>
@@ -1019,9 +974,6 @@
     </ClInclude>
     <ClInclude Include="src\Translation.h">
       <Filter>Resources\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="src\BSPArchive.h">
-      <Filter>Resources\Archive</Filter>
     </ClInclude>
     <ClInclude Include="src\MathStuff.h">
       <Filter>General\Utility</Filter>
@@ -1044,38 +996,11 @@
     <ClInclude Include="src\GraphicsPrefsPanel.h">
       <Filter>Dialogs\Preferences</Filter>
     </ClInclude>
-    <ClInclude Include="src\SIFormat.h">
-      <Filter>Resources\Graphics\Image</Filter>
-    </ClInclude>
-    <ClInclude Include="src\SIFDoom.h">
-      <Filter>Resources\Graphics\Image</Filter>
-    </ClInclude>
-    <ClInclude Include="src\SIFImages.h">
-      <Filter>Resources\Graphics\Image</Filter>
-    </ClInclude>
-    <ClInclude Include="src\SIFHexen.h">
-      <Filter>Resources\Graphics\Image</Filter>
-    </ClInclude>
-    <ClInclude Include="src\SIFZDoom.h">
-      <Filter>Resources\Graphics\Image</Filter>
-    </ClInclude>
     <ClInclude Include="src\bzip2\bzlib.h">
       <Filter>External\BZip2</Filter>
     </ClInclude>
     <ClInclude Include="src\bzip2\bzlib_private.h">
       <Filter>External\BZip2</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ADatArchive.h">
-      <Filter>Resources\Archive</Filter>
-    </ClInclude>
-    <ClInclude Include="src\BZip2Archive.h">
-      <Filter>Resources\Archive</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GZipArchive.h">
-      <Filter>Resources\Archive</Filter>
-    </ClInclude>
-    <ClInclude Include="src\TarArchive.h">
-      <Filter>Resources\Archive</Filter>
     </ClInclude>
     <ClInclude Include="src\Compression.h">
       <Filter>General\Utility</Filter>
@@ -1215,11 +1140,86 @@
     <ClInclude Include="src\lzma\C\XzEnc.h">
       <Filter>External\Lzma</Filter>
     </ClInclude>
+    <ClInclude Include="src\ADatArchive.h">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BSPArchive.h">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BZip2Archive.h">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DatArchive.h">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GobArchive.h">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GrpArchive.h">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GZipArchive.h">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\HogArchive.h">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LfdArchive.h">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LibArchive.h">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PakArchive.h">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ResArchive.h">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RffArchive.h">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TarArchive.h">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Wad2Archive.h">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\WadArchive.h">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\WadJArchive.h">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\WolfArchive.h">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ZipArchive.h">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Archives.h">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SIFDoom.h">
+      <Filter>Resources\Graphics\Image\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SIFZDoom.h">
+      <Filter>Resources\Graphics\Image\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SIFHexen.h">
+      <Filter>Resources\Graphics\Image\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SIFImages.h">
+      <Filter>Resources\Graphics\Image\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SIFormat.h">
+      <Filter>Resources\Graphics\Image\Formats</Filter>
+    </ClInclude>
     <ClInclude Include="src\SIFOther.h">
-      <Filter>Resources\Graphics\Image</Filter>
+      <Filter>Resources\Graphics\Image\Formats</Filter>
     </ClInclude>
     <ClInclude Include="src\SIFQuake.h">
-      <Filter>Resources\Graphics\Image</Filter>
+      <Filter>Resources\Graphics\Image\Formats</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

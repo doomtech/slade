@@ -7,15 +7,29 @@
 #include <wx/hashmap.h>
 
 class ResourceManager;
+class CTexture;
 
+// This base class is probably not really needed
 class Resource {
+friend class ResourceManager;
+private:
+	string	type;
+
+public:
+	Resource(string type) { this->type = type; }
+	~Resource() {}
+
+	virtual int	length() { return 0; }
+};
+
+class EntryResource : public Resource {
 friend class ResourceManager;
 private:
 	vector<ArchiveEntry*>	entries;
 
 public:
-	Resource(ArchiveEntry* entry = NULL);
-	~Resource();
+	EntryResource(ArchiveEntry* entry = NULL);
+	~EntryResource();
 
 	void	add(ArchiveEntry* entry);
 	void	remove(ArchiveEntry* entry);
@@ -23,13 +37,34 @@ public:
 	int		length();
 };
 
+class TextureResource : public Resource {
+friend class ResourceManager;
+private:
+	struct tex_res_t {
+		CTexture*	tex;
+		Archive*	parent;
+	};
+	vector<tex_res_t>	textures;
+
+public:
+	TextureResource();
+	~TextureResource();
+
+	void	add(CTexture* tex, Archive* parent);
+	void	remove(Archive* parent);
+
+	int		length();
+};
+
 // Declare hash map class to hold resources
-WX_DECLARE_STRING_HASH_MAP(Resource, ResourceMap);
+WX_DECLARE_STRING_HASH_MAP(EntryResource, EntryResourceMap);
+WX_DECLARE_STRING_HASH_MAP(TextureResource, TextureResourceMap);
 
 class ResourceManager : public Listener, public Announcer {
 private:
-	ResourceMap		patches;
-	ResourceMap		graphics;
+	EntryResourceMap	patches;
+	EntryResourceMap	graphics;
+	TextureResourceMap	textures;
 
 	static ResourceManager*	instance;
 

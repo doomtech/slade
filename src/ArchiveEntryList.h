@@ -56,6 +56,9 @@ public:
 	ArchiveEntry*				getLastSelectedEntry();
 	vector<ArchiveTreeNode*>	getSelectedDirectories();
 
+	// Label editing
+	void	labelEdited(int col, int index, string new_label);
+
 	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 
 	// SAction handler

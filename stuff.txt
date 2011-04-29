@@ -18,7 +18,6 @@ TODO List ---------------------------------------------------------------
 	- Support for textures-as-patches
 	- Offsets preview
 - (maybe) Copy+paste for textures
-- (maybe) Fix up stuff for wxMac (not looking hopeful until the next proper wxwidgets release at least, the current wxwidgets mac support is pretty terrible)
 - (maybe) Generic DataEntryPanel
 - Clean up sources somewhat
 - Status bar stuff for other EntryPanels and Texture editor
@@ -28,6 +27,7 @@ TODO List ---------------------------------------------------------------
 
 --- Bugs ---
 - Audio player issues
+- Temp file not deleted on zip save
 
 --- Minor Problems/Annoyances ---
 - Long calltips can extend off the edge of the screen
@@ -73,15 +73,14 @@ TODO List ---------------------------------------------------------------
 	- archive list on archive manager panel could have 'resource' checkboxes for each list item
 - Undo/Redo system
 	- Should be general enough to be used by the map editor also
-- Improved menu/toolbar system
-	- Some kind of dynamic menu/toolbar system, perhaps try to emulate Qt's 'Action' system
-	- Complete icon set
+- Dynamic toolbars
 - Different icon sets (eg. one that has different entry type icons colour-coded)
 - Better backup system
 - Gfx Conversion Dialog:
 	- 'Palette' labels w/palette selection dropdowns
 	- Show current format
 - More drag-and-drop support
+- Rewrite VirtualListView with item filtering/sorting in mind
 
 
 --- Internal / Dev ---

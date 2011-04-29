@@ -235,7 +235,6 @@
     <ClCompile Include="src\DefaultEntryPanel.cpp" />
     <ClCompile Include="src\EntryPanel.cpp" />
     <ClCompile Include="src\GfxEntryPanel.cpp" />
-    <ClCompile Include="src\MultiEntryPanel.cpp" />
     <ClCompile Include="src\PaletteEntryPanel.cpp" />
     <ClCompile Include="src\SwitchesEntryPanel.cpp" />
     <ClCompile Include="src\TextEntryPanel.cpp" />
@@ -423,7 +422,6 @@
     <ClInclude Include="src\DefaultEntryPanel.h" />
     <ClInclude Include="src\EntryPanel.h" />
     <ClInclude Include="src\GfxEntryPanel.h" />
-    <ClInclude Include="src\MultiEntryPanel.h" />
     <ClInclude Include="src\PaletteEntryPanel.h" />
     <ClInclude Include="src\SwitchesEntryPanel.h" />
     <ClInclude Include="src\TextEntryPanel.h" />

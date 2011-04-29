@@ -238,6 +238,9 @@ void ArchiveEntryList::setupColumns() {
 		InsertColumn(col_num, "Type");
 		SetColumnWidth(col_num++, elist_coltype_width);
 	}
+
+	// Set editable
+	setColumnEditable(0);	// Name column
 }
 
 /* ArchiveEntryList::columnType
@@ -589,6 +592,14 @@ vector<ArchiveTreeNode*> ArchiveEntryList::getSelectedDirectories() {
 	}
 
 	return ret;
+}
+
+/* ArchiveEntryList::labelEdited
+ * Called when a label has been edited
+ *******************************************************************/
+void ArchiveEntryList::labelEdited(int col, int index, string new_label) {
+	// Rename the entry
+	getEntry(index)->rename(new_label);
 }
 
 /* ArchiveEntryList::onAnnouncement

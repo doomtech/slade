@@ -268,6 +268,9 @@ private:
  *******************************************************************/
 GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 : EntryPanel(parent, "gfx") {
+	// Init variables
+	prev_translation.addRange(TRANS_PALETTE, 0);
+
 	// Add gfx canvas
 	gfx_canvas = new GfxCanvas(this, -1);
 	sizer_main->Add(gfx_canvas->toPanel(this), 1, wxEXPAND, 0);
@@ -732,9 +735,7 @@ bool GfxEntryPanel::handleAction(string id) {
 		TranslationEditorDialog ted(theMainWindow, pal, "Colour Remap", entry);
 
 		// Create translation to edit
-		Translation trans;
-		trans.addRange(TRANS_PALETTE, 0);
-		ted.openTranslation(trans);
+		ted.openTranslation(prev_translation);
 
 		// Show the dialog
 		if (ted.ShowModal() == wxID_OK) {
@@ -748,6 +749,7 @@ bool GfxEntryPanel::handleAction(string id) {
 			// Update variables
 			image_data_modified = true;
 			setModified();
+			prev_translation.copy(ted.getTranslation());
 		}
 	}
 

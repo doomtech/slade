@@ -243,6 +243,8 @@ void SIFormat::initFormats() {
 
 	// Other game formats
 	new SIFHalfLifeTex();
+	new SIFSCSprite();
+	new SIFSCWall();
 }
 
 SIFormat* SIFormat::getFormat(string id) {

@@ -25,6 +25,11 @@ void Translation::parse(string def) {
 	uint8_t o_end = tz.getInteger();
 	if (!tz.checkToken("=")) return;
 
+	// Check for reverse origin range
+	bool reverse = false;
+	if (o_start > o_end)
+		reverse = true;
+
 	// Type of translation depends on next token
 	if (tz.peekToken() == "[") {
 		// Colour translation
@@ -54,10 +59,18 @@ void Translation::parse(string def) {
 
 		// Add translation
 		TransRangeColour* tr = new TransRangeColour();
-		tr->o_start = o_start;
-		tr->o_end = o_end;
-		tr->d_start.set(start);
-		tr->d_end.set(end);
+		if (reverse) {
+			tr->o_start = o_end;
+			tr->o_end = o_start;
+			tr->d_start.set(end);
+			tr->d_end.set(start);
+		}
+		else {
+			tr->o_start = o_start;
+			tr->o_end = o_end;
+			tr->d_start.set(start);
+			tr->d_end.set(end);
+		}
 		translations.push_back(tr);
 
 		//wxLogMessage("Added colour translation");
@@ -91,14 +104,26 @@ void Translation::parse(string def) {
 
 		// Add translation
 		TransRangeDesat* tr = new TransRangeDesat();
-		tr->o_start = o_start;
-		tr->o_end = o_end;
-		tr->d_sr = sr;
-		tr->d_sg = sg;
-		tr->d_sb = sb;
-		tr->d_er = er;
-		tr->d_eg = eg;
-		tr->d_eb = eb;
+		if (reverse) {
+			tr->o_start = o_end;
+			tr->o_end = o_start;
+			tr->d_sr = er;
+			tr->d_sg = eg;
+			tr->d_sb = eb;
+			tr->d_er = sr;
+			tr->d_eg = sg;
+			tr->d_eb = sb;
+		}
+		else {
+			tr->o_start = o_start;
+			tr->o_end = o_end;
+			tr->d_sr = sr;
+			tr->d_sg = sg;
+			tr->d_sb = sb;
+			tr->d_er = er;
+			tr->d_eg = eg;
+			tr->d_eb = eb;
+		}
 		translations.push_back(tr);
 
 		//wxLogMessage("Added desat translation");
@@ -114,10 +139,18 @@ void Translation::parse(string def) {
 
 		// Add translation
 		TransRangePalette* tr = new TransRangePalette();
-		tr->o_start = o_start;
-		tr->o_end = o_end;
-		tr->d_start = d_start;
-		tr->d_end = d_end;
+		if (reverse) {
+			tr->o_start = o_end;
+			tr->o_end = o_start;
+			tr->d_start = d_end;
+			tr->d_end = d_start;
+		}
+		else {
+			tr->o_start = o_start;
+			tr->o_end = o_end;
+			tr->d_start = d_start;
+			tr->d_end = d_end;
+		}
 		translations.push_back(tr);
 
 		//wxLogMessage("Added range translation");

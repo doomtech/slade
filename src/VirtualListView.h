@@ -12,6 +12,7 @@ private:
 	long	last_focus;
 	string	search;
 	int		col_search;
+	bool	cols_editable[100];	// Never really going to have more than 100 columns
 
 	void	sendSelectionChangedEvent();
 
@@ -32,6 +33,7 @@ public:
 	~VirtualListView();
 
 	void	setSearchColumn(int col) { col_search = col; }
+	void	setColumnEditable(int col, bool edit = true) { if (col >= 0 && col < 100) cols_editable[col] = edit; }
 
 	// Selection
 	void			selectItem(long item, bool select = true);
@@ -52,11 +54,16 @@ public:
 	void			updateWidth();
 	virtual void	updateList(bool clear = false) { SetItemCount(0); }
 
+	// Label editing
+	virtual void	labelEdited(int col, int index, string new_label) {}
+
 	// Events
 	void	onColumnResize(wxListEvent& e);
 	void	onMouseLeftDown(wxMouseEvent& e);
 	void	onKeyDown(wxKeyEvent& e);
 	void	onKeyChar(wxKeyEvent& e);
+	void	onLabelEditBegin(wxListEvent& e);
+	void	onLabelEditEnd(wxListEvent& e);
 };
 
 #endif//__VIRTUAL_LIST_VIEW_H__

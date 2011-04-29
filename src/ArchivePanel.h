@@ -73,6 +73,7 @@ public:
 
 	// Other entry actions
 	bool	gfxConvert();
+	bool	gfxRemap();
 	bool	gfxModifyOffsets();
 	bool	gfxExportPNG();
 	bool	basConvert();

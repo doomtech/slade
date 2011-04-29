@@ -38,7 +38,6 @@
 #include "DefaultEntryPanel.h"
 #include "GfxEntryPanel.h"
 #include "PaletteEntryPanel.h"
-#include "MultiEntryPanel.h"
 #include "AnimatedEntryPanel.h"
 #include "SwitchesEntryPanel.h"
 #include "HexEntryPanel.h"
@@ -56,6 +55,7 @@
 #include "Icons.h"
 #include "Conversions.h"
 #include "MainWindow.h"
+#include "TranslationEditorDialog.h"
 #include <wx/aui/auibook.h>
 #include <wx/aui/auibar.h>
 #include <wx/filename.h>
@@ -955,6 +955,45 @@ bool ArchivePanel::gfxConvert() {
 }
 
 /* ArchivePanel::gfxModifyOffsets
+ * Opens the Translation editor dialog to remap colours on selected
+ * gfx entries
+ *******************************************************************/
+bool ArchivePanel::gfxRemap() {
+	// Get selected entries
+	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
+
+	// Create translation editor dialog
+	Palette8bit* pal = theMainWindow->getPaletteChooser()->getSelectedPalette();
+	TranslationEditorDialog ted(this, pal, "Colour Remap", selection[0]);
+	ted.openTranslation(((GfxEntryPanel*)gfx_area)->prevTranslation());
+
+	// Run dialog
+	if (ted.ShowModal() == wxID_OK) {
+		// Apply translation to all entry images
+		SImage temp;
+		MemChunk mc;
+		for (unsigned a = 0; a < selection.size(); a++) {
+			ArchiveEntry* entry = selection[a];
+			if (Misc::loadImageFromEntry(&temp, entry)) {
+				// Apply translation
+				temp.applyTranslation(&ted.getTranslation(), pal);
+
+				// Write modified image data
+				if (!temp.getFormat()->saveImage(temp, mc, pal))
+					wxLogMessage("Error: Could not write image data to entry %s, unsupported format for writing", CHR(entry->getName()));
+				else
+					entry->importMemChunk(mc);
+			}
+		}
+
+		// Update variables
+		((GfxEntryPanel*)gfx_area)->prevTranslation().copy(ted.getTranslation());
+	}
+
+	return true;
+}
+
+/* ArchivePanel::gfxModifyOffsets
  * Opens the Modify Offsets dialog to mass-modify offsets of any
  * selected, offset-compatible gfx entries
  *******************************************************************/
@@ -1577,6 +1616,8 @@ bool ArchivePanel::handleAction(string id) {
 		basConvert();
 	else if (id == "arch_gfx_convert")
 		gfxConvert();
+	else if (id == "arch_gfx_translate")
+		gfxRemap();
 	else if (id == "arch_gfx_offsets")
 		gfxModifyOffsets();
 	else if (id == "arch_gfx_addptable")
@@ -1816,6 +1857,7 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 			gfx = &context;
 		}
 		theApp->getAction("arch_gfx_convert")->addToMenu(gfx);
+		theApp->getAction("arch_gfx_translate")->addToMenu(gfx);
 		theApp->getAction("arch_gfx_offsets")->addToMenu(gfx);
 		theApp->getAction("arch_gfx_addptable")->addToMenu(gfx);
 		theApp->getAction("arch_gfx_addtexturex")->addToMenu(gfx);
