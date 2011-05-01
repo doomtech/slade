@@ -70,6 +70,18 @@ static void MyCPUID(UInt32 function, UInt32 *a, UInt32 *b, UInt32 *c, UInt32 *d)
   *c = c2;
   *d = d2;
 
+  #elif __ASM_FIX__
+
+  __asm__ __volatile__ (
+    "pushl %%ebx \n\t"
+	"cpuid \n\t"
+	"movl %%ebx, %1 \n\t"
+	"popl %%ebx \n\t"
+	: "=a"(*a), "=r"(*b), "=c"(*c), "=d"(*d)
+	: "a"(function)
+	: "cc"
+  );
+
   #else
 
   __asm__ __volatile__ (
