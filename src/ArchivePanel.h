@@ -6,10 +6,11 @@
 #include "EntryPanel.h"
 #include "ListenerAnnouncer.h"
 #include "ArchiveEntryList.h"
+#include "MainApp.h"
 #include <wx/textctrl.h>
 #include <wx/choice.h>
 
-class ArchivePanel : public wxPanel, public Listener {
+class ArchivePanel : public wxPanel, public Listener, SActionHandler {
 protected:
 	Archive*			archive;
 	ArchiveEntryList*	entry_list;
@@ -41,6 +42,8 @@ public:
 
 	Archive*	getArchive() { return archive; }
 	bool		saveEntryChanges();
+	void		addMenus();
+	void		removeMenus();
 
 	// Editing actions - return success
 
@@ -54,7 +57,7 @@ public:
 	bool	cleanupArchive();
 
 	// Entry manipulation actions
-	bool	renameEntry();
+	bool	renameEntry(bool each = false);
 	bool	deleteEntry();
 	bool	revertEntry();
 	bool	moveUp();
@@ -70,6 +73,7 @@ public:
 
 	// Other entry actions
 	bool	gfxConvert();
+	bool	gfxRemap();
 	bool	gfxModifyOffsets();
 	bool	gfxExportPNG();
 	bool	basConvert();
@@ -78,7 +82,9 @@ public:
 	bool	wavDSndConvert();
 	bool	dSndWavConvert();
 	bool	musMidiConvert();
-	bool	compileACS();
+	bool	optimizePNG();
+	bool	compileACS(bool hexen = false);
+	bool	convertTextures();
 
 	// Needed for some console commands
 	EntryPanel *			currentArea() { return cur_area;}
@@ -90,11 +96,12 @@ public:
 	bool	openEntryAsText(ArchiveEntry* entry);
 	bool	openEntryAsHex(ArchiveEntry* entry);
 	bool	showEntryPanel(EntryPanel* new_area, bool ask_save = true);
+	void	focusOnEntry(ArchiveEntry* entry);
 	void	focusEntryList() { entry_list->SetFocus(); }
 	void	refreshPanel();
 
-	// Function to handle menu actions from MainWindow
-	void	handleAction(int menu_id);
+	// SAction handler
+	bool	handleAction(string id);
 
 	virtual void onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 
@@ -102,7 +109,6 @@ public:
 	void			onEntryListSelectionChange(wxCommandEvent& e);
 	void			onEntryListFocusChange(wxListEvent& e);
 	void			onEntryListRightClick(wxListEvent& e);
-	void			onEntryMenuClick(wxCommandEvent& e);
 	void			onEntryListKeyDown(wxKeyEvent& e);
 	virtual void	onEntryListActivated(wxListEvent& e);
 	void			onDEPEditAsText(wxCommandEvent& e);
@@ -111,6 +117,7 @@ public:
 	void			onChoiceCategoryChanged(wxCommandEvent& e);
 	void			onDirChanged(wxCommandEvent& e);
 	void			onBtnUpDir(wxCommandEvent& e);
+	void			onShow(wxShowEvent& e);
 };
 
 #endif //__ARCHIVEPANEL_H__

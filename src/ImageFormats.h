@@ -289,16 +289,15 @@ public:
 
 			// Check header values are 'sane'
 			if (header->width > 0 && header->height > 0) {
-				uint16_t col_offsets[255]; // Old format headers do not allow dimensions greater than 255.
-				for (uint8_t a = 0; a < header->width; a++) {
-					const uint8_t * offsetpos = data + sizeof(oldpatch_header_t) + a * sizeof(uint16_t);
-					const uint16_t * colofsa = (uint16_t *)(offsetpos);
-					col_offsets[a] = wxUINT16_SWAP_ON_BE(*colofsa);
-				}
-
 				// Check there is room for needed column pointers
 				if (mc.getSize() < sizeof(oldpatch_header_t) + (header->width * sizeof(uint16_t)))
 					return EDF_FALSE;
+
+				uint16_t col_offsets[255]; // Old format headers do not allow dimensions greater than 255.
+				for (uint16_t a = 0; a < header->width; a++) {
+					col_offsets[a] = READ_L16(data, (sizeof(oldpatch_header_t) + a * sizeof(uint16_t)));
+				}
+
 
 				// Check column pointers are within range
 				for (int a = 0; a < header->width; a++) {
@@ -509,6 +508,131 @@ public:
 	}
 };
 
+class QuakeSpriteDataFormat : public EntryDataFormat {
+public:
+	QuakeSpriteDataFormat() : EntryDataFormat("img_qspr") {};
+	~QuakeSpriteDataFormat() {}
+
+	// A Quake sprite can contain several frames and each frame may contain several pictures.
+	int isThisFormat(MemChunk& mc) {
+		uint32_t size = mc.getSize();
+		// Minimum size for a sprite with a single frame containing a single 2x2 picture
+		if (size < 64)
+			return EDF_FALSE;
+		// Check magic word
+		if (mc[0] != 'I' || mc[1] != 'D' || mc[2] != 'S' || mc[3] != 'P')
+			return EDF_FALSE;
+		// Check special values, version must be 1 and type must be between 0 and 4
+		if (READ_L32(mc, 4) != 1 || READ_L32(mc, 8) > 4)
+			return EDF_FALSE;
+		// Check maximum image size
+		uint32_t width  = READ_L32(mc, 16);
+		uint32_t height = READ_L32(mc, 20);
+		if (width == 0 || height == 0)
+			return EDF_FALSE;
+
+		// Check amount of frames
+		uint32_t nframes = READ_L32(mc, 24);
+		if (nframes == 0)
+			return EDF_FALSE;
+
+		// Validate frames
+		uint32_t offset = 36; // Offset to start of first frame
+		for (size_t a = 0; a < nframes; ++a) {
+			if (READ_L32(mc, offset) != 0) {
+				// We have a frame with a group of picture
+				uint32_t grpsz = READ_L32(mc, offset + 4);
+				// Move to end of group header
+				offset += (grpsz+2)<<2;
+				for (size_t b = 0; b < grpsz; ++b) {
+					uint32_t pw = READ_L32(mc, offset + 8);
+					uint32_t ph = READ_L32(mc, offset + 12);
+					if (pw > width || ph > height)
+						return EDF_FALSE;
+					// Move to end of picture data
+					offset += 16 + pw * ph;
+					if (offset > (unsigned) size) {
+						return EDF_FALSE;
+					}
+				}
+			} else {
+				// We have a frame with a single picture
+				offset += 4;
+				uint32_t pw = READ_L32(mc, offset + 8);
+				uint32_t ph = READ_L32(mc, offset + 12);
+				if (pw > width || ph > height)
+					return EDF_FALSE;
+				// Move to end of picture data
+				offset += 16 + pw * ph;
+			}
+			if (offset > (unsigned) size) {
+				return EDF_FALSE;
+			}
+		}
+
+		return EDF_TRUE;
+	}
+};
+
+class QuakeTexDataFormat: public EntryDataFormat {
+public:
+	QuakeTexDataFormat() : EntryDataFormat("img_quaketex") {};
+	~QuakeTexDataFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		size_t size = mc.getSize();
+		if (size < 125)
+			return EDF_FALSE;
+
+		size_t width = READ_L32(mc, 16);
+		size_t height = READ_L32(mc, 20);
+		if (!width || !height || width % 8 || height % 8)
+			return EDF_FALSE;
+		for (int m = 0; m < 4; ++m) {
+			size_t offset = READ_L32(mc, (24+(m<<2)));
+			if (!offset || size < offset + ((width>>m) * (height>>m)))
+				return EDF_FALSE;
+		}
+		return EDF_TRUE;
+	}
+};
+
+class QuakeIIWalDataFormat: public EntryDataFormat {
+public:
+	QuakeIIWalDataFormat() : EntryDataFormat("img_quake2wal") {};
+	~QuakeIIWalDataFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		size_t size = mc.getSize();
+		if (size < 101)
+			return EDF_FALSE;
+		// Avoid some false positives by looking for "garbage" characters
+		// after the end of the "name"
+		bool nameend = false;
+		for (int i = 0; i < 32; ++i) {
+			if (mc[i] == 0) {
+				if (i == 0) return false;
+				nameend = true;
+			} else if (nameend) {
+				return false;
+			}
+		}
+		size_t width = READ_L32(mc, 32);
+		size_t height = READ_L32(mc, 36);
+		if (!width || !height || width % 8 || height % 8)
+			return EDF_FALSE;
+		for (int m = 0; m < 4; ++m) {
+			size_t offset = READ_L32(mc, (40+(m<<2)));
+			if (width>>m == 0 && height>>m == 0 && offset == 0)
+				break;
+			else if (!offset || size < offset + ((width>>m) * (height>>m)))
+				return EDF_FALSE;
+		}
+		return EDF_TRUE;
+	}
+};
+
+
 class ShadowCasterSpriteFormat: public EntryDataFormat {
 public:
 	ShadowCasterSpriteFormat() : EntryDataFormat("img_scsprite") {};
@@ -610,6 +734,8 @@ public:
 		size_t xofs = 16;
 		size_t yofs = xofs + (tilecount<<1);
 		for (size_t a = 0; a < tilecount; ++a) {
+			if (size <= xofs+(a<<1) || size <= yofs+(a<<1))
+				return EDF_FALSE;
 			gfxdatasize += (mc[xofs+(a<<1)] * mc[yofs+(a<<1)]);
 		}
 		if (size < (datastart + gfxdatasize))
@@ -672,6 +798,38 @@ public:
 			else if (offset + (4 * width * height) > size)
 				return EDF_FALSE;
 		}
+		return EDF_TRUE;
+	}
+};
+
+class HalfLifeTextureFormat: public EntryDataFormat {
+public:
+	HalfLifeTextureFormat() : EntryDataFormat("img_hlt") {};
+	~HalfLifeTextureFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		size_t size = mc.getSize();
+		if (size < 812)
+			return EDF_FALSE;
+		size_t width = READ_L32(mc, 16);
+		size_t height = READ_L32(mc, 20);
+		if (!width || !height || width % 8 || height % 8)
+			return EDF_FALSE;
+		for (int m = 0; m < 4; ++m) {
+			size_t offset = READ_L32(mc, (24+(m<<2)));
+			if (width>>m == 0 && height>>m == 0 && offset == 0)
+				break;
+			else if (!offset || size < offset + ((width>>m) * (height>>m)))
+				return EDF_FALSE;
+		}
+		width>>=3;
+		height>>=3;
+		size_t offset = READ_L32(mc, 36) + (width*height);
+		if (size < offset + 5)
+			return EDF_FALSE;
+		size_t palsize = READ_L16(mc, offset);
+		if (size < offset + 2 + (3*palsize))
+			return EDF_FALSE;
 		return EDF_TRUE;
 	}
 };

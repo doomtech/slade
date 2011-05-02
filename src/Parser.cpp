@@ -86,9 +86,9 @@ bool ParseTreeNode::getBoolValue(unsigned index) {
 	if (index >= values.size())
 		return false;
 
-	if (s_cmpnocase(values[index], "false") ||
-		s_cmpnocase(values[index], "0") ||
-		s_cmpnocase(values[index], "no"))
+	if (S_CMPNOCASE(values[index], "false") ||
+		S_CMPNOCASE(values[index], "0") ||
+		S_CMPNOCASE(values[index], "no"))
 		return false;
 	else
 		return true;
@@ -124,10 +124,10 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 	string token = tz.getToken();
 
 	// Keep parsing until final } is reached (or end of file)
-	while (!(s_cmp(token, "}")) && !token.IsEmpty()) {
+	while (!(S_CMP(token, "}")) && !token.IsEmpty()) {
 		// If it's a special character (ie not a valid name), parsing fails
 		if (tz.isSpecialCharacter(token.at(0))) {
-			wxLogMessage("Parsing error: Unexpected special character '%s' in %s", chr(token), chr(tz.getName()));
+			wxLogMessage("Parsing error: Unexpected special character '%s' in %s", CHR(token), CHR(tz.getName()));
 			return false;
 		}
 
@@ -138,7 +138,7 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 		string next = tz.peekToken();
 
 		// Assignment
-		if (s_cmp(next, "=")) {
+		if (S_CMP(next, "=")) {
 			// Skip =
 			tz.getToken();
 
@@ -156,17 +156,17 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 			// Parse until ; or }
 			while (1) {
 				// Check for list end
-				if (s_cmp(token, list_end) && !tz.quotedString())
+				if (S_CMP(token, list_end) && !tz.quotedString())
 					break;
 
 				// Add value
 				child->values.push_back(token);
 
 				// Check for ,
-				if (s_cmp(tz.peekToken(), ","))
+				if (S_CMP(tz.peekToken(), ","))
 					tz.getToken();	// Skip it
-				else if (!(s_cmp(tz.peekToken(), list_end))) {
-					wxLogMessage("Parsing error: Expected \",\" or \"%s\", got \"%s\" in %s", chr(list_end), chr(tz.getToken()), chr(tz.getName()));
+				else if (!(S_CMP(tz.peekToken(), list_end))) {
+					wxLogMessage("Parsing error: Expected \",\" or \"%s\", got \"%s\" in %s", CHR(list_end), CHR(tz.getToken()), CHR(tz.getName()));
 					return false;
 				}
 
@@ -175,7 +175,7 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 		}
 
 		// Child node
-		else if (s_cmp(next, "{")) {
+		else if (S_CMP(next, "{")) {
 			// Add child node
 			ParseTreeNode* child = (ParseTreeNode*)addChild(name);
 
@@ -188,7 +188,7 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 		}
 
 		// Child node (with no values/children)
-		else if (s_cmp(next, ";")) {
+		else if (S_CMP(next, ";")) {
 			// Add child node
 			addChild(name);
 
@@ -197,7 +197,7 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 		}
 
 		// Child node + inheritance
-		else if (s_cmp(next, ":")) {
+		else if (S_CMP(next, ":")) {
 			// Skip :
 			tz.getToken();
 
@@ -220,7 +220,7 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 
 		// Unexpected token
 		else {
-			wxLogMessage("Parsing error: \"%s\" unexpected in %s", chr(next), chr(tz.getName()));
+			wxLogMessage("Parsing error: \"%s\" unexpected in %s", CHR(next), CHR(tz.getName()));
 			return false;
 		}
 
@@ -304,7 +304,7 @@ bool Parser::parseText(MemChunk& mc) {
 CONSOLE_COMMAND (testparse, 0) {
 	string test = "root { item1 = value1; item2 = value1, value2; child1 { item1 = value1, value2, value3; item2 = value4; } child2 : child1 { item1 = value1; child3 { item1 = value1, value2; } } }";
 	Parser tp;
-	MemChunk mc((const uint8_t*)chr(test), test.Length());
+	MemChunk mc((const uint8_t*)CHR(test), test.Length());
 	tp.parseText(mc);
 }
 */

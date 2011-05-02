@@ -209,6 +209,11 @@ struct rgba_t {
 	float fb() { return (float)b / 255.0f; }
 	float fa() { return (float)a / 255.0f; }
 
+	double dr() { return (double)r / 255.0; }
+	double dg() { return (double)g / 255.0; }
+	double db() { return (double)b / 255.0; }
+	double da() { return (double)a / 255.0; }
+
 	bool equals(rgba_t rhs, bool alpha = false) {
 		bool col_equal = (r == rhs.r && g == rhs.g && b == rhs.b);
 
@@ -275,6 +280,12 @@ struct rgba_t {
 			ptr[3] = a;
 		}
 	}
+
+	// Returns a copy of this colour as greyscale (using 'common' component coefficients)
+	rgba_t greyscale() {
+		uint8_t l = r*0.3+g*0.59+b*0.11;
+		return rgba_t(l, l, l, a, blend);
+	}
 };
 
 // Some basic colours
@@ -287,6 +298,17 @@ struct rgba_t {
 #define COL_PURPLE	rgba_t(255, 0, 255, 255, 0)
 #define COL_CYAN	rgba_t(0, 255, 255, 255, 0)
 
+// hsl_t: Represents a colour in HSL format, generally used for calculations
+struct hsl_t {
+	double h, s, l;
+
+	hsl_t() { h = s = l = 0; }
+	hsl_t(double h, double s, double l) {
+		this->h = h;
+		this->s = s;
+		this->l = l;
+	}
+};
 
 // rect_t: A rectangle (int points)
 struct rect_t {

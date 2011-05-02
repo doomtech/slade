@@ -32,10 +32,13 @@ public:
 
 	bool	openArchive(Archive* archive);
 	void	updateTexturePalette();
+	void	saveChanges();
+	bool	close();
 
 	// Editing
 	bool	removePatch(unsigned index, bool delete_entry = false);
-	int		browsePatch();
+	int		browsePatchTable();
+	string	browsePatchEntry();
 
 	// Checks
 	bool	checkTextures();

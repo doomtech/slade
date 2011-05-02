@@ -25,7 +25,8 @@ namespace Misc {
 	int			detectPaletteHack(ArchiveEntry* entry);
 	bool		loadPaletteFromArchive(Palette8bit* pal, Archive* archive, int lump = PAL_NOHACK);
 	string		sizeAsString(uint32_t size);
-	uint32_t	crc(uint8_t *buf, uint32_t len);
+	uint32_t	crc(const uint8_t *buf, uint32_t len);
+	hsl_t		rgbToHsl(double r, double g, double b);
 
 	// Mass Rename
 	string	massRenameFilter(wxArrayString& names);

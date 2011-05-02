@@ -5,7 +5,6 @@
 class EditingPrefsPanel : public wxPanel {
 private:
 	wxCheckBox*	cb_wad_force_uppercase;
-	wxCheckBox*	cb_wad_lock_iwad;
 	wxChoice*	choice_entry_mod;
 
 public:

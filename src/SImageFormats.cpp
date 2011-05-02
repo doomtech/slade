@@ -33,8 +33,10 @@
  *******************************************************************/
 #include "Main.h"
 #include "SImage.h"
+#undef BOOL
 #include "FreeImage.h"
 #include "Misc.h"
+#include "SIFormat.h"
 #include <wx/filefn.h>
 
 /* SETUP:
@@ -115,7 +117,7 @@ bool SImage::loadImage(const uint8_t* img_data, int size) {
 	height = FreeImage_GetHeight(bm);
 
 	// Set format
-	format = RGBA;
+	type = RGBA;
 
 	// Convert to 32bpp & flip vertically
 	FIBITMAP *rgb = FreeImage_ConvertTo32Bits(bm);
@@ -177,8 +179,14 @@ bool SImage::loadImage(const uint8_t* img_data, int size) {
 
 		// If the picture is nothing more than a ZDoom-style alpha map
 		if (alPh_chunk) {
-			for (int a = 0; a < width * height; a++)
-				data[a * 4 + 3] = (data[a * 4 + 2] | data[a * 4 + 1] | data[a * 4]);
+			unsigned c = 0;
+			for (int a = 0; a < width * height; a++) {
+				uint8_t alpha = data[c];
+				data[c++] = 0;
+				data[c++] = 0;
+				data[c++] = 0;
+				data[c++] = alpha;
+			}
 		}
 	}
 
@@ -198,7 +206,7 @@ bool SImage::loadImage(const uint8_t* img_data, int size) {
 bool SImage::toPNG(MemChunk& out, Palette8bit* pal) {
 	FIBITMAP* bm;
 
-	if (format == RGBA) {
+	if (type == RGBA) {
 		// Init 32bpp FIBITMAP
 		bm = FreeImage_Allocate(width, height, 32, 0x0000FF00, 0x00FF0000, 0x000000FF);
 
@@ -212,7 +220,7 @@ bool SImage::toPNG(MemChunk& out, Palette8bit* pal) {
 			bits[c++] = data[a+3];
 		}
 	}
-	else if (format == PALMASK) {
+	else if (type == PALMASK) {
 		// Init 8bpp FIBITMAP
 		bm = FreeImage_Allocate(width, height, 8);
 
@@ -231,23 +239,26 @@ bool SImage::toPNG(MemChunk& out, Palette8bit* pal) {
 			bm_pal[a].rgbBlue = usepal.colour(a).b;
 		}
 
-		// Find unused colour (for transparency)
-		short unused = findUnusedColour();
+		// Handle transparency if needed
+		if (mask) {
+			// Find unused colour (for transparency)
+			short unused = findUnusedColour();
 
-		// Set any transparent pixels to this colour (if we found an unused colour)
-		if (unused >= 0) {
-			for (int a = 0; a < width * height; a++) {
-				if (mask[a] == 0)
-					data[a] = unused;
+			// Set any transparent pixels to this colour (if we found an unused colour)
+			if (unused >= 0) {
+				for (int a = 0; a < width * height; a++) {
+					if (mask[a] == 0)
+						data[a] = unused;
+				}
+
+				// Set palette transparency
+				usepal.setTransIndex(unused);
 			}
 
-			// Set palette transparency
-			usepal.setTransIndex(unused);
+			// Set freeimage palette transparency if needed
+			if (usepal.transIndex() >= 0)
+				FreeImage_SetTransparentIndex(bm, usepal.transIndex());
 		}
-
-		// Set freeimage palette transparency if needed
-		if (usepal.transIndex() >= 0)
-			FreeImage_SetTransparentIndex(bm, usepal.transIndex());
 
 		// Write image data
 		for (int row = 0; row < height; row++) {
@@ -262,7 +273,7 @@ bool SImage::toPNG(MemChunk& out, Palette8bit* pal) {
 	FreeImage_FlipVertical(bm);
 
 	// Write the image to a temp file
-	FreeImage_Save(FIF_PNG, bm, chr(appPath("temp.png", DIR_TEMP)));
+	FreeImage_Save(FIF_PNG, bm, CHR(appPath("temp.png", DIR_TEMP)));
 
 	// Load it into a memchunk
 	MemChunk png;
@@ -276,6 +287,7 @@ bool SImage::toPNG(MemChunk& out, Palette8bit* pal) {
 
 	// Write PNG header and IHDR
 	const uint8_t* png_data = png.getData();
+	out.clear();
 	out.write(png_data, 33);
 
 	// Create grAb chunk with offsets
@@ -330,7 +342,7 @@ bool SImage::loadDoomGfx(const uint8_t* gfx_data, int size, uint8_t version) {
 
 	// Init variables
 	uint32_t* col_offsets = NULL;
-	format = PALMASK;
+	type = PALMASK;
 	has_palette = false;
 	numimages = 1;
 	imgindex = 0;
@@ -448,7 +460,7 @@ bool SImage::loadDoomGfx(const uint8_t* gfx_data, int size, uint8_t version) {
  *******************************************************************/
 bool SImage::toDoomGfx(MemChunk& out, uint8_t alpha_threshold) {
 	// Check if data is paletted
-	if (format != PALMASK) {
+	if (type != PALMASK) {
 		wxLogMessage("Cannot convert truecolour image to doom gfx format - convert to 256-colour first.");
 		return false;
 	}
@@ -605,22 +617,25 @@ bool SImage::toDoomGfx(MemChunk& out, uint8_t alpha_threshold) {
 }
 
 // Define valid flat sizes
-uint32_t valid_flat_size[][2] = {
-	{	2,	 2 },	// lol Heretic F_SKY1
-	{  10,  12 },	// gnum format
-	{  16,  16 },	// \ 
-	{  32,  64 },	// Strife startup sprite
-	{  48,  48 },	// / 
-	{  64,  64 },	// standard flat size
-	{  64,	65 },	// Heretic flat size variant
-	{  64, 128 },	// Hexen flat size variant
-	{ 128, 128 },	// \ 
-	{ 256, 256 },	// hires flat size
-	{ 512, 512 },	// / 
-	{ 256, 200 },	// Rise of the Triad sky
-	{ 320, 200 },	// full screen format
+uint32_t valid_flat_size[][3] = {
+	{	2,	 2,	0 },	// lol Heretic F_SKY1
+	{  10,  12,	0 },	// gnum format
+	{  16,  16,	0 },	// |
+	{  32,  64,	0 },	// Strife startup sprite
+	{  48,  48,	0 },	// |
+	{  64,  64,	1 },	// standard flat size
+	{  64,	65,	1 },	// Heretic flat size variant
+	{  64, 128,	1 },	// Hexen flat size variant
+	{ 128, 128,	1 },	// |
+	{ 256, 200,	0 },	// Rise of the Triad sky
+	{ 256, 256,	1 },	// hires flat size
+	{ 320, 200,	1 },	// full screen format
+	{ 512, 512,	1 },	// hires flat size
+	{1024,1024,	1 },	// |
+	{2048,2048,	1 },	// super hires flat size (SRB2)
+	{4096,4096,	1 },	// |
 };
-uint32_t	n_valid_flat_sizes = 14;
+uint32_t	n_valid_flat_sizes = 17;
 
 /* SImage::validFlatSize
  * Returns whether the image has dimensions appropriate for a flat
@@ -686,7 +701,7 @@ bool SImage::loadDoomFlat(const uint8_t* gfx_data, int size, bool columnmajor) {
 
 
 	// Setup variables
-	format = PALMASK;
+	type = PALMASK;
 	has_palette = false;
 	numimages = 1;
 	imgindex = 0;
@@ -720,7 +735,7 @@ bool SImage::loadDoomFlat(const uint8_t* gfx_data, int size, bool columnmajor) {
  *******************************************************************/
 bool SImage::toDoomFlat(MemChunk& out) {
 	// Check if data is paletted
-	if (format != PALMASK) {
+	if (type != PALMASK) {
 		wxLogMessage("Cannot convert truecolour image to doom flat format - convert to 256-colour first.");
 		return false;
 	}
@@ -757,7 +772,7 @@ bool SImage::loadDoomArah(const uint8_t* gfx_data, int size, int transindex) {
 	height = wxINT16_SWAP_ON_BE(header->height);
 	offset_x = wxINT16_SWAP_ON_BE(header->left);
 	offset_y = wxINT16_SWAP_ON_BE(header->top);
-	format = PALMASK;
+	type = PALMASK;
 	has_palette = false;
 	numimages = 1;
 	imgindex = 0;
@@ -810,7 +825,7 @@ bool SImage::loadDoomSnea(const uint8_t* gfx_data, int size) {
 		return false;
 
 	// Setup variables
-	format = PALMASK;
+	type = PALMASK;
 	has_palette = false;
 	numimages = 1;
 	imgindex = 0;
@@ -875,7 +890,7 @@ bool SImage::loadPlanar(const uint8_t* gfx_data, int size) {
 	// Init some variables
 	width = 640;
 	height = 480;
-	format = PALMASK;
+	type = PALMASK;
 	has_palette = true;
 	numimages = 1;
 	imgindex = 0;
@@ -950,13 +965,13 @@ bool SImage::loadPlanar(const uint8_t* gfx_data, int size) {
  *******************************************************************/
 bool SImage::toPlanar(MemChunk& out, Palette8bit* pal) {
 	// Check if data is paletted
-	if (format != PALMASK) {
+	if (type != PALMASK) {
 		wxLogMessage("Cannot convert truecolour image to planar format - convert to 16-colour first.");
 		return false;
 	}
 
 	if (countColours() > 16) {
-		wxLogMessage(s_fmt("Cannot convert to planar format, too many colors (%d)"), countColours());
+		wxLogMessage(S_FMT("Cannot convert to planar format, too many colors (%d)"), countColours());
 		return false;
 	}
 
@@ -1047,7 +1062,7 @@ bool SImage::load4bitChunk(const uint8_t* gfx_data, int size) {
 		height = 23;
 	} else return false;
 
-	format = PALMASK;
+	type = PALMASK;
 	has_palette = false;
 	numimages = 1;
 	imgindex = 0;
@@ -1071,13 +1086,13 @@ bool SImage::load4bitChunk(const uint8_t* gfx_data, int size) {
  *******************************************************************/
 bool SImage::to4bitChunk(MemChunk& out, Palette8bit* pal) {
 	// Check if data is paletted
-	if (format != PALMASK) {
+	if (type != PALMASK) {
 		wxLogMessage("Cannot convert truecolour image to 4-bit format - convert to 16-colour first.");
 		return false;
 	}
 
 	if (countColours() > 16) {
-		wxLogMessage(s_fmt("Cannot convert to 4-bit format, too many colors (%d)"), countColours());
+		wxLogMessage(S_FMT("Cannot convert to 4-bit format, too many colors (%d)"), countColours());
 		return false;
 	}
 
@@ -1138,7 +1153,7 @@ bool SImage::loadImgz(const uint8_t* gfx_data, int size) {
 	offset_x = wxINT16_SWAP_ON_BE(header->left);
 	offset_y = wxINT16_SWAP_ON_BE(header->top);
 	has_palette = false;
-	format = PALMASK;
+	type = PALMASK;
 	numimages = 1;
 	imgindex = 0;
 
@@ -1220,8 +1235,8 @@ bool SImage::loadQuake(const uint8_t* gfx_data, int size) {
 	numimages = 1;
 	imgindex = 0;
 	if (mode < QUAKE_RGB24)
-		format = PALMASK;
-	else format = RGBA;
+		type = PALMASK;
+	else type = RGBA;
 	if (mode == 0 || mode > QUAKE_ALPHA)
 		has_palette = false;
 	else {
@@ -1243,6 +1258,11 @@ bool SImage::loadQuake(const uint8_t* gfx_data, int size) {
 		// Create mask (all opaque)
 		mask = new uint8_t[width*height];
 		memset(mask, 255, width*height);
+
+		// Index 255 is transparent
+		for (int i = 0; i < width*height; ++i)
+			if (data[i] == 255)
+				mask[i] = 0;
 	} else if (mode == QUAKE_INTENSITY) {
 		// Read raw pixel data
 		data = mask = new uint8_t[width*height];
@@ -1269,6 +1289,143 @@ bool SImage::loadQuake(const uint8_t* gfx_data, int size) {
 		data = new uint8_t[width*height*4];
 		memcpy(data, gfx_data+8, width * height * 4);
 	}
+
+	// Announce change and return success
+	announce("image_changed");
+	return true;
+}
+
+/* SImage::loadQuakeSprite
+ * Loads a picture in Quake's sprite format.
+ * Returns false if the image data was invalid, true otherwise.
+ *******************************************************************/
+bool SImage::loadQuakeSprite(const uint8_t* gfx_data, int size, int index) {
+	if (size < 64)
+		return false;
+
+	uint32_t maxheight = READ_L32(gfx_data, 16);
+	uint32_t maxwidth  = READ_L32(gfx_data, 20);
+	uint32_t nframes   = READ_L32(gfx_data, 24);
+
+	// Setup variables
+	numimages   = nframes;
+	has_palette = false;
+	type		= PALMASK;
+
+	// Makes sum of frame pictures, not just frames
+	// Also gather offsets in a data structure
+	vector<size_t> pics;
+	uint32_t imgofs = 36;
+	for (size_t a = 0; a < nframes; ++a) {
+		if (READ_L32(gfx_data, imgofs) != 0) {
+			// We have a frame with a group of picture
+			uint32_t grpsz = READ_L32(gfx_data, imgofs + 4);
+			if (grpsz == 0) {
+				Global::error = "Quake sprite data contains empty group";
+				return false;
+			}
+			// Move to end of group header
+			imgofs += (grpsz+2)<<2;
+			for (size_t b = 0; b < grpsz; ++b) {
+				uint32_t pw = READ_L32(gfx_data, imgofs + 8);
+				uint32_t ph = READ_L32(gfx_data, imgofs + 12);
+				// Store image offset
+				pics.push_back(imgofs);
+				// Move to end of picture data
+				imgofs += 16 + pw * ph;
+				if (imgofs > (unsigned) size) {
+					Global::error = "Quake sprite data too short";
+					return false;
+				}
+			}
+			// We must have made it through all the group's picture,
+			// so replace the count for the group (1) by the group's size.
+			numimages += (grpsz - 1);
+		} else {
+			// We have a frame with a single picture
+			imgofs += 4;
+			uint32_t pw = READ_L32(gfx_data, imgofs + 8);
+			uint32_t ph = READ_L32(gfx_data, imgofs + 12);
+			// Store image offset
+			pics.push_back(imgofs);
+			// Move to end of picture data
+			imgofs += 16 + pw * ph;
+		}
+		if (imgofs > (unsigned) size) {
+			Global::error = "Quake sprite data too short";
+			return false;
+		}
+	}
+
+	// Sanitize index if needed
+	index %= numimages;
+	if (index < 0)
+		index = numimages + index;
+	imgindex = index;
+
+	// Setup variables using appropriate image data
+	imgofs = pics[index];
+	offset_x = READ_L32(gfx_data, imgofs + 0);
+	offset_y = READ_L32(gfx_data, imgofs + 4);
+	width	 = READ_L32(gfx_data, imgofs + 8);
+	height	 = READ_L32(gfx_data, imgofs +12);
+	// Horizontal offsets seem computed differently from Doom, so translate them
+	offset_x += width;
+
+	// Clear current data if it exists
+	clearData();
+	pics.clear();
+
+	// Load image data
+	data = new uint8_t[width * height];
+	mask = new uint8_t[width * height];
+	memcpy(data, gfx_data + imgofs + 16, width * height);
+	memset(mask, 0xFF, width * height);
+	for (int a = 0; a < width * height; ++a)
+		if (data[a] == 0xFF)
+			mask[a] = 0;
+
+	// Announce change and return success
+	announce("image_changed");
+	return true;
+}
+
+/* SImage::loadQuakeTex
+ * Loads a picture in Quake's texture format.
+ * Returns false if the image data was invalid, true otherwise.
+ *******************************************************************/
+bool SImage::loadQuakeTex(const uint8_t* gfx_data, int size, int index) {
+	if (size < 125)
+		return false;
+
+	// Setup variables
+	numimages   = 4;
+	has_palette = false;
+	type		= PALMASK;
+	width		= READ_L32(gfx_data, 16);
+	height		= READ_L32(gfx_data, 20);
+
+	// Sanitize index if needed
+	index %= numimages;
+	if (index < 0)
+		index = numimages + index;
+	imgindex = index;
+
+	// Adjust variables according to mip level
+	if (index) {
+		width  >>= index;
+		height >>= index;
+	}
+
+	// Find offset
+	uint32_t imgofs = READ_L32(gfx_data, 24+(index<<2));
+
+	// Clear current data if it exists
+	clearData();
+
+	// Load image data
+	data = new uint8_t[width * height];
+	memcpy(data, gfx_data + imgofs, width * height);
 
 	// Announce change and return success
 	announce("image_changed");
@@ -1318,7 +1475,7 @@ bool SImage::loadSCSprite(const uint8_t* gfx_data, int size) {
 	clearData();
 
 	// Setup variables
-	format = PALMASK;
+	type = PALMASK;
 	has_palette = false;
 	numimages = 1;
 	imgindex = 0;
@@ -1385,7 +1542,7 @@ bool SImage::loadSCWall(const uint8_t* gfx_data, int size) {
 	memset(mask, 0xFF, width*height);
 
 	// Setup variables
-	format = PALMASK;
+	type = PALMASK;
 	has_palette = false;
 	numimages = 1;
 	imgindex = 0;
@@ -1419,7 +1576,7 @@ bool SImage::loadAnaMip(const uint8_t* gfx_data, int size) {
 	width = READ_L16(gfx_data, 0);
 	height = READ_L16(gfx_data, 2);
 	has_palette = false;
-	format = PALMASK;
+	type = PALMASK;
 
 	// Technically false, as there are multiple mipmap levels.
 	// May implement them later. Not in any hurry about them.
@@ -1456,13 +1613,13 @@ bool SImage::loadBuildTile(const uint8_t* gfx_data, int size, int index) {
 	// Setup variables
 	numimages = 1 + lasttile - firsttile;
 	has_palette = false;
-	format = PALMASK;
+	type = PALMASK;
 
 	// Sanitize index if needed
 	index %= numimages;
 	if (index < 0)
 		index = numimages + index;
-		
+
 	// Each tile has a 2-byte width, a 2-byte height, and a 4-byte
 	// picanm struct. The header itself is 16 bytes.
 	size_t x_offs = 16;
@@ -1543,13 +1700,13 @@ bool SImage::loadHeretic2M8(const uint8_t* gfx_data, int size, int index) {
 	while (i < 25 && g_data[i] != 0) ++i;
 	numimages = i - 9;
 	has_palette = true;
-	format = PALMASK;
+	type = PALMASK;
 
 	// Sanitize index if needed
 	index %= numimages;
 	if (index < 0)
 		index = numimages + index;
-		
+
 
 	// Setup variables
 	imgindex = index;
@@ -1595,13 +1752,13 @@ bool SImage::loadHeretic2M32(const uint8_t* gfx_data, int size, int index) {
 	while (i < 145 && g_data[i] != 0) ++i;
 	numimages = i - 129;
 	has_palette = false;
-	format = RGBA;
+	type = RGBA;
 
 	// Sanitize index if needed
 	index %= numimages;
 	if (index < 0)
 		index = numimages + index;
-		
+
 
 	// Setup variables
 	imgindex = index;
@@ -1625,6 +1782,107 @@ bool SImage::loadHeretic2M32(const uint8_t* gfx_data, int size, int index) {
 	return true;
 }
 
+
+/* SImage::loadQuakeIIWal
+ * Loads a Quake II wal-format texture.
+ * Returns false if the image data was invalid, true otherwise.
+ *******************************************************************/
+bool SImage::loadQuakeIIWal(const uint8_t* gfx_data, int size, int index) {
+	if (size < 101)
+		return false;
+
+	numimages = 4;
+	has_palette = false;
+	type = PALMASK;
+
+	// Sanitize index if needed
+	index %= numimages;
+	if (index < 0)
+		index = numimages + index;
+
+
+	// Setup variables
+	imgindex = index;
+	width = READ_L32(gfx_data, 32) >> index;
+	height = READ_L32(gfx_data, 36) >> index;
+	size_t data_offset = READ_L32(gfx_data, 40+(index<<2));
+	if (!width || !height || ! data_offset || size < (int)data_offset + (width*height)) {
+		Global::error = "WAL file: invalid data for mip level";
+		return false;
+	}
+
+	// Create data
+	clearData();
+	data = new uint8_t[width*height];
+
+	// Fill data with pixel data
+	memcpy(data, gfx_data + data_offset, width * height);
+
+	// Announce change and return success
+	announce("image_changed");
+	return true;
+}
+
+/* SImage::loadHalfLifeTex
+ * Loads a Half-Life mipmapped paletted image.
+ * Returns false if the image data was invalid, true otherwise.
+ *******************************************************************/
+bool SImage::loadHalfLifeTex(const uint8_t* gfx_data, int size, int index) {
+	if (size < 812)
+		return false;
+
+	numimages = 4;
+	has_palette = true;
+	type = PALMASK;
+
+	// Sanitize index if needed
+	index %= numimages;
+	if (index < 0)
+		index = numimages + index;
+
+
+	// Setup variables
+	imgindex = index;
+	width = READ_L32(gfx_data, 16) >> index;
+	height = READ_L32(gfx_data, 20) >> index;
+	size_t data_offset = READ_L32(gfx_data, 24+(index<<2));
+	if (!width || !height || ! data_offset || size < (int)data_offset + (width*height)) {
+		Global::error = "HLT file: invalid data for mip level";
+		return false;
+	}
+
+	// Let's build the palette now.
+	size_t pal_offset = READ_L32(gfx_data, 36) + ((READ_L32(gfx_data, 16) >> 3) * (READ_L32(gfx_data, 20) >> 3));
+	if (size < (int)pal_offset + 5) {
+		Global::error = "HLT file: invalid palette offset";
+		return false;
+	}
+	size_t palsize = READ_L16(gfx_data, pal_offset);
+	if (palsize == 0 || palsize > 256 || size < (int)(pal_offset + 2 + (palsize*3))) {
+		wxLogMessage("palsize %d, paloffset %d, entry size %d", palsize, pal_offset, size);
+		Global::error = "HLT file: invalid palette size";
+		return false;
+	}
+	for (size_t c = 0; c < palsize; ++c) {
+		rgba_t color;
+		color.r = gfx_data[(c*3)+pal_offset+2];
+		color.g = gfx_data[(c*3)+pal_offset+3];
+		color.b = gfx_data[(c*3)+pal_offset+4];
+		palette.setColour(c, color);
+	}
+
+	// Create data
+	clearData();
+	data = new uint8_t[width*height];
+
+	// Fill data with pixel data
+	memcpy(data, gfx_data + data_offset, width * height);
+
+	// Announce change and return success
+	announce("image_changed");
+	return true;
+}
+
 /* SImage::loadRottGfx
  * Loads a Rise of the Triad Gfx format image, using the image palette.
  * This format, descibed in hacker.txt from the ROTT source code pack,
@@ -1642,7 +1900,7 @@ bool SImage::loadRottGfx(const uint8_t* gfx_data, int size, bool transparent) {
 
 	// Init variables
 	uint16_t* col_offsets = NULL;
-	format = PALMASK;
+	type = PALMASK;
 	has_palette = false;
 	numimages = 1;
 	imgindex = 0;
@@ -1763,7 +2021,7 @@ bool SImage::loadRottLbm(const uint8_t* gfx_data, int size) {
 	width = READ_L16(gfx_data, 0);
 	height = READ_L16(gfx_data, 2);
 	has_palette = true;
-	format = PALMASK;
+	type = PALMASK;
 	numimages = 1;
 	imgindex = 0;
 
@@ -1826,11 +2084,11 @@ bool SImage::loadRottRaw(const uint8_t* gfx_data, int size) {
 
 	// Setup variables
 	patch_header_t* header = (patch_header_t*)gfx_data;
-	height = wxINT16_SWAP_ON_BE(header->width); // Cheat a bit since 
+	height = wxINT16_SWAP_ON_BE(header->width); // Cheat a bit since
 	width = wxINT16_SWAP_ON_BE(header->height); // it's column-major
 	offset_x = wxINT16_SWAP_ON_BE(header->left);
 	offset_y = wxINT16_SWAP_ON_BE(header->top);
-	format = PALMASK;
+	type = PALMASK;
 	has_palette = false;
 	numimages = 1;
 	imgindex = 0;
@@ -1869,7 +2127,7 @@ bool SImage::loadRottPic(const uint8_t* gfx_data, int size) {
 		return false;
 
 	// Setup variables
-	format = PALMASK;
+	type = PALMASK;
 	has_palette = false;
 	numimages = 1;
 	imgindex = 0;
@@ -1925,7 +2183,7 @@ bool SImage::loadWolfPic(const uint8_t* gfx_data, int size) {
 		return false;
 
 	// Setup variables
-	format = PALMASK;
+	type = PALMASK;
 	has_palette = false;
 	numimages = 1;
 	imgindex = 0;
@@ -1977,7 +2235,7 @@ bool SImage::loadWolfSprite(const uint8_t* gfx_data, int size) {
 	offset_y = height;
 
 	// Setup variables
-	format = PALMASK;
+	type = PALMASK;
 	has_palette = false;
 	numimages = 1;
 	imgindex = 0;
@@ -1993,7 +2251,7 @@ bool SImage::loadWolfSprite(const uint8_t* gfx_data, int size) {
 	uint16_t * cmdptr = (uint16_t *)(gfx_data + 4);
 	uint32_t i, x, y;
 	for (x = 0 ; x < (unsigned)width ; ++x )
-	{		
+	{
         int16_t * linecmds = (int16_t *)(gfx_data + wxINT16_SWAP_ON_BE( *cmdptr ));
 		cmdptr++;
 		for (; wxINT16_SWAP_ON_BE(*linecmds); linecmds += 3)
@@ -2115,7 +2373,7 @@ bool SImage::loadJediBM(const uint8_t* gfx_data, int size, int index) {
 
 	// Setup variables
 	has_palette = false;
-	format = PALMASK;
+	type = PALMASK;
 	imgindex = index;
 
 	if (multibm) {
@@ -2252,7 +2510,7 @@ bool SImage::loadJediFME(const uint8_t* gfx_data, int size) {
 
 	// Setup variables
 	has_palette = false;
-	format = PALMASK;
+	type = PALMASK;
 	imgindex = 0;
 	numimages = 1;
 
@@ -2341,7 +2599,7 @@ bool SImage::loadJediWAX(const uint8_t* gfx_data, int size, int index) {
 
 	// Setup variables
 	has_palette = false;
-	format = PALMASK;
+	type = PALMASK;
 	imgindex = index;
 
 	// The one good thing about this format is that we can reuse the FME code for loading the actual image
@@ -2383,7 +2641,7 @@ bool SImage::loadFont0(const uint8_t* gfx_data, int size) {
 
 	clearData();
 	has_palette = false;
-	format = PALMASK;
+	type = PALMASK;
 
 	// Technically each character is its own image, though.
 	numimages = 1;
@@ -2441,7 +2699,7 @@ bool SImage::loadFont1(const uint8_t* gfx_data, int size) {
 	// Setup variables
 	offset_x = offset_y = 0;
 	has_palette = false;
-	format = PALMASK;
+	type = PALMASK;
 
 	// Technically each character is its own image, though.
 	numimages = 1;
@@ -2521,7 +2779,7 @@ bool SImage::loadFont2(const uint8_t* gfx_data, int size) {
 	// Initializes some stuff
 	offset_x = offset_y = 0;
 	has_palette = true;
-	format = PALMASK;
+	type = PALMASK;
 
 	// Technically each character is its own image, though.
 	numimages = 1;
@@ -2714,7 +2972,7 @@ bool SImage::loadBMF(const uint8_t* gfx_data, int size) {
 
 	// Clean up old data and set up variables
 	clearData();
-	format = PALMASK;
+	type = PALMASK;
 	has_palette = true;
 
 	// Technically each character is its own image, though.
@@ -2832,7 +3090,7 @@ bool SImage::loadFontM(const uint8_t* gfx_data, int size) {
 	// Setup variables
 	offset_x = offset_y = 0;
 	has_palette = false;
-	format = PALMASK;
+	type = PALMASK;
 
 	size_t charwidth = 8;
 	size_t charheight = size>>8;
@@ -2894,7 +3152,7 @@ bool SImage::loadWolfFont(const uint8_t* gfx_data, int size) {
 
 	clearData();
 	has_palette = false;
-	format = PALMASK;
+	type = PALMASK;
 
 	// Technically each character is its own image, though.
 	numimages = 1;
@@ -2948,7 +3206,7 @@ bool SImage::loadJediFNT(const uint8_t* gfx_data, int size) {
 		return false;
 
 	// The character data is presented as a list of columns
-	// preceded by a byte for 
+	// preceded by a byte for
 	offset_x = offset_y = 0;
 
 	// Since the format is column-major, we'll use our usual cheat of
@@ -2970,7 +3228,7 @@ bool SImage::loadJediFNT(const uint8_t* gfx_data, int size) {
 
 	clearData();
 	has_palette = false;
-	format = PALMASK;
+	type = PALMASK;
 
 	// Technically each character is its own image, though.
 	numimages = 1;
@@ -3024,7 +3282,7 @@ bool SImage::loadJediFONT(const uint8_t* gfx_data, int size) {
 	height = READ_L16(gfx_data, 6) * numchr;
 	width = READ_L16(gfx_data, 4);
 	has_palette = false;
-	format = PALMASK;
+	type = PALMASK;
 
 	// reset data
 	clearData();

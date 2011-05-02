@@ -133,6 +133,24 @@ public:
 	}
 };
 
+class GMIDDataFormat : public EntryDataFormat {
+public:
+	GMIDDataFormat() : EntryDataFormat("gmid") {};
+	~GMIDDataFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		// Check size
+		if (mc.getSize() > 8) {
+			// Check for GMID header: MIDI followed by BE data size
+			if (mc[0] == 'M' && mc[1] == 'I' && mc[2] == 'D' && mc[3] == 'I' &&
+				((READ_B32(mc, 4) + 8) == mc.getSize()))
+				return EDF_TRUE;
+		}
+
+		return EDF_FALSE;
+	}
+};
+
 class ITModuleDataFormat : public EntryDataFormat {
 public:
 	ITModuleDataFormat() : EntryDataFormat("mod_it") {};
@@ -162,7 +180,7 @@ public:
 			char temp[18] = "";
 			memcpy(temp, mc.getData(), 18);
 			temp[17] = 0;
-			if (!s_fmt("%s", temp).CmpNoCase("Extended module: ")) {
+			if (!S_FMT("%s", temp).CmpNoCase("Extended module: ")) {
 				if (mc[37] == 0x1a) {
 					return EDF_TRUE;
 				}
@@ -201,10 +219,10 @@ public:
 			// Check format
 			if (mc[950] >= 1 && mc[950] <= 128 && (mc[951] & 127) == 127) {
 				if ((mc[1080] == 'M' && mc[1081] == '.' && mc[1082] == 'K' && mc[1083] == '.') ||
-						(mc[1080] == 'M' && mc[1081] == '!' && mc[1082] == 'K' && mc[1083] == '!') ||
-						(mc[1080] == 'F' && mc[1081] == 'L' && mc[1082] == 'T' && mc[1083] == '4') ||
-						(mc[1080] == 'F' && mc[1081] == 'L' && mc[1082] == 'T' && mc[1083] == '8') ||
-						(mc[1081] == 'C' && mc[1082] == 'H' && mc[1083] == 'N')) {
+					(mc[1080] == 'M' && mc[1081] == '!' && mc[1082] == 'K' && mc[1083] == '!') ||
+					(mc[1080] == 'F' && mc[1081] == 'L' && mc[1082] == 'T' && mc[1083] == '4') ||
+					(mc[1080] == 'F' && mc[1081] == 'L' && mc[1082] == 'T' && mc[1083] == '8') ||
+									   (mc[1081] == 'C' && mc[1082] == 'H' && mc[1083] == 'N')) {
 					return EDF_TRUE;
 				}
 			}
@@ -230,7 +248,7 @@ public:
 			mc.read(&samplerate, 2);
 			mc.read(&samples, 4);
 
-			if (head == 3 && samples <= (mc.getSize() - 8) && samples > 4)
+			if (head == 3 && samples == (mc.getSize() - 8) && samples > 4)
 				return EDF_TRUE;
 		}
 
@@ -259,6 +277,8 @@ public:
 	}
 };
 
+// TODO: Eventually remove this since Doom64 now uses OGG sounds
+// Just leave it some time for the next build to come out of alpha.
 class Doom64SoundDataFormat : public EntryDataFormat {
 public:
 	Doom64SoundDataFormat() : EntryDataFormat("snd_doom64") {};
@@ -416,6 +436,24 @@ public:
 				if (mc[i] == 0)
 					return EDF_TRUE;
 			}
+		}
+		return EDF_FALSE;
+	}
+};
+
+// SNES SPC format, supported by ZDoom and Eternity
+class SPDCDataFormat : public EntryDataFormat {
+public:
+	SPDCDataFormat() : EntryDataFormat("snd_spc") {};
+	~SPDCDataFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		// Check size
+		if (mc.getSize() > 35) {
+			// Check for header text using official signature string
+			string header(wxString::FromAscii(mc.getData(), 35));
+			if (header == "SNES-SPC700 Sound File Data v0.30\x1A\x1A")
+				return EDF_TRUE;
 		}
 		return EDF_FALSE;
 	}

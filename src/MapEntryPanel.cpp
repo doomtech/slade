@@ -56,6 +56,12 @@ rgba_t col_save_line_macro(50, 130, 220, 255);
 
 
 /*******************************************************************
+ * EXTERNAL VARIABLES
+ *******************************************************************/
+EXTERN_CVAR(String, dir_last)
+
+
+/*******************************************************************
  * MEPCANVAS CLASS FUNCTIONS
  *******************************************************************/
 
@@ -127,7 +133,7 @@ void MEPCanvas::showMap() {
 	// Zoom to fit whole map
 	double x_scale = ((double)GetClientSize().x) / width;
 	double y_scale = ((double)GetClientSize().y) / height;
-	zoom = min(x_scale, y_scale);
+	zoom = MIN(x_scale, y_scale);
 	zoom *= 0.95;
 }
 
@@ -147,7 +153,7 @@ void MEPCanvas::draw() {
 	glLoadIdentity();
 
 	// Clear
-	glClearColor(((double)col_view_background.r)/255.f, ((double)col_view_background.g)/255.f, 
+	glClearColor(((double)col_view_background.r)/255.f, ((double)col_view_background.g)/255.f,
 				 ((double)col_view_background.b)/255.f, ((double)col_view_background.a)/255.f);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
@@ -227,7 +233,7 @@ void MEPCanvas::createImage(ArchiveEntry& ae, int width, int height) {
 	glLoadIdentity();
 
 	// Clear
-	glClearColor(((double)col_save_background.r)/255.f, ((double)col_save_background.g)/255.f, 
+	glClearColor(((double)col_save_background.r)/255.f, ((double)col_save_background.g)/255.f,
 				 ((double)col_save_background.b)/255.f, ((double)col_save_background.a)/255.f);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
@@ -258,7 +264,7 @@ void MEPCanvas::createImage(ArchiveEntry& ae, int width, int height) {
 	// Zoom to fit whole map
 	double x_scale = ((double)width) / mapwidth;
 	double y_scale = ((double)height) / mapheight;
-	zoom = min(x_scale, y_scale);
+	zoom = MIN(x_scale, y_scale);
 	zoom *= 0.95;
 
 	// Translate to middle of canvas
@@ -329,12 +335,11 @@ void MEPCanvas::createImage(ArchiveEntry& ae, int width, int height) {
 MapEntryPanel::MapEntryPanel(wxWindow* parent) : EntryPanel(parent, "map") {
 	// Setup map canvas
 	map_canvas = new MEPCanvas(this);
-	sizer_main->Add(map_canvas->toPanel(this), 1, wxEXPAND|wxALL, 4);
+	sizer_main->Add(map_canvas->toPanel(this), 1, wxEXPAND, 0);
 
 	// Add 'Save Map Image' button
 	btn_saveimg = new wxButton(this, -1, "Save Map Image");
-	sizer_bottom->AddStretchSpacer(1);
-	sizer_bottom->Add(btn_saveimg, 0, wxEXPAND, 0);
+	sizer_top->Add(btn_saveimg, 0, wxEXPAND|wxRIGHT, 4);
 
 	// Bind events
 	btn_saveimg->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MapEntryPanel::onBtnSaveImage, this);
@@ -360,11 +365,24 @@ bool MapEntryPanel::loadEntry(ArchiveEntry* entry) {
 	// Find map definition for entry
 	vector<Archive::mapdesc_t> maps = entry->getParent()->detectMaps();
 	Archive::mapdesc_t thismap;
+	bool found = false;
 	for (unsigned a = 0; a < maps.size(); a++) {
 		if (maps[a].head == entry) {
 			thismap = maps[a];
+			found = true;
 			break;
 		}
+	}
+
+	// All errors = invalid map
+	Global::error = "Invalid map";
+
+	// There is no map entry for the map marker.
+	// This may happen if a map marker lump is copy/pasted without the rest of the map lumps.
+	if (!found) {
+		entry->setType(EntryType::unknownType());
+		EntryType::detectEntryType(entry);
+		return false;
 	}
 
 	// Parse UDMF map
@@ -469,7 +487,7 @@ bool MapEntryPanel::loadEntry(ArchiveEntry* entry) {
 		// Find VERTEXES entry
 		ArchiveEntry* mapentry = thismap.head;
 		ArchiveEntry* vertexes = NULL;
-		while (1) {
+		while (mapentry) {
 			// Check entry type
 			if (mapentry->getType() == EntryType::getType("map_vertexes")) {
 				vertexes = mapentry;
@@ -520,7 +538,7 @@ bool MapEntryPanel::loadEntry(ArchiveEntry* entry) {
 		// Find LINEDEFS entry
 		ArchiveEntry* mapentry = thismap.head;
 		ArchiveEntry* linedefs = NULL;
-		while (1) {
+		while (mapentry) {
 			// Check entry type
 			if (mapentry->getType() == EntryType::getType("map_linedefs")) {
 				linedefs = mapentry;
@@ -619,7 +637,7 @@ bool MapEntryPanel::saveEntry() {
 
 /* MapEntryPanel::createImage
  * Creates a PNG file of the map preview
- * TODO: Preference panel for background and line colors, 
+ * TODO: Preference panel for background and line colors,
  * as well as for image size
  *******************************************************************/
 bool MapEntryPanel::createImage() {
@@ -629,19 +647,22 @@ bool MapEntryPanel::createImage() {
 	ArchiveEntry temp;
 	// Stupid OpenGL grumble grumble grumble
 	map_canvas->createImage(temp, min<int>(800, map_canvas->GetSize().x), min<int>(600, map_canvas->GetSize().y));
-	string name = s_fmt("%s_%s", chr(entry->getParent()->getFilename(false)), chr(entry->getName()));
+	string name = S_FMT("%s_%s", CHR(entry->getParent()->getFilename(false)), CHR(entry->getName()));
 	wxFileName fn(name);
 
 	// Create save file dialog
-	wxFileDialog *dialog_save = new wxFileDialog(this, s_fmt("Save Map Preview \"%s\"", name.c_str()),
-												wxEmptyString, fn.GetFullName(), "PNG (*.PNG)|*.png",
-												wxFD_SAVE | wxFD_OVERWRITE_PROMPT, wxDefaultPosition);
+	wxFileDialog dialog_save(this, S_FMT("Save Map Preview \"%s\"", name.c_str()),
+								dir_last, fn.GetFullName(), "PNG (*.PNG)|*.png",
+								wxFD_SAVE | wxFD_OVERWRITE_PROMPT, wxDefaultPosition);
 
 	// Run the dialog & check that the user didn't cancel
-	if (dialog_save->ShowModal() == wxID_OK) {
+	if (dialog_save.ShowModal() == wxID_OK) {
 		// If a filename was selected, export it
-		bool ret = temp.exportFile(dialog_save->GetPath());
-		delete dialog_save;
+		bool ret = temp.exportFile(dialog_save.GetPath());
+
+		// Save 'dir_last'
+		dir_last = dialog_save.GetDirectory();
+
 		return ret;
 	}
 	return true;

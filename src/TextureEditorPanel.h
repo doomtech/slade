@@ -5,13 +5,13 @@
 #include "CTextureCanvas.h"
 #include "PatchTable.h"
 #include "ListView.h"
+#include "MainApp.h"
 #include <wx/spinctrl.h>
 
 class TextureXEditor;
 
-class TextureEditorPanel : public wxPanel, Listener {
-private:
-	//PatchTable*		patch_table;
+class TextureEditorPanel : public wxPanel, SActionHandler {
+protected:
 	TextureXEditor*	tx_editor;
 	CTexture*		tex_current;
 	bool			tex_modified;
@@ -20,6 +20,7 @@ private:
 	wxSlider*		slider_zoom;
 	wxStaticText*	label_current_zoom;
 	wxCheckBox*		cb_draw_outside;
+	wxCheckBox*		cb_blend_rgba;
 	CTextureCanvas*	tex_canvas;
 
 	// Texture controls
@@ -47,43 +48,33 @@ public:
 	TextureEditorPanel(wxWindow* parent, TextureXEditor* tx_editor);
 	~TextureEditorPanel();
 
-	// wxWidgets IDs
-	enum {
-		M_BEGIN,
-
-		M_PATCH_ADD,
-		M_PATCH_REMOVE,
-		M_PATCH_BACK,
-		M_PATCH_FORWARD,
-		M_PATCH_REPLACE,
-		M_PATCH_DUPLICATE,
-
-		M_END,
-	};
-
 	bool		texModified() { return tex_modified; }
 	CTexture*	getTexture() { return tex_current; }
 
 	// UI Stuff
-	wxPanel*	createTextureControls(wxWindow* parent);
-	void		updateTextureControls();
-	void		updateTextureScaleLabel();
-	wxPanel*	createPatchControls(wxWindow* parent);
-	void		populatePatchList();
-	void		updatePatchControls();
+	virtual void		setupLayout();
+	virtual wxPanel*	createTextureControls(wxWindow* parent);
+	virtual void		updateTextureControls();
+	virtual void		updateTextureScaleLabel();
+	virtual wxPanel*	createPatchControls(wxWindow* parent);
+	virtual void		populatePatchList();
+	virtual void		updatePatchControls();
 
 	bool	openTexture(CTexture* tex);
 	void	setPalette(Palette8bit* pal);
 
 	// Editing
-	void	addPatch();
-	void	removePatch();
-	void	patchBack();
-	void	patchForward();
-	void	replacePatch();
-	void	duplicatePatch();
+	virtual void	addPatch();
+	void			removePatch();
+	void			patchBack();
+	void			patchForward();
+	virtual void	replacePatch();
+	void			duplicatePatch();
 
 	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
+
+	// SAction handler
+	bool	handleAction(string id);
 
 	// Events
 	void	onZoomChanged(wxCommandEvent& e);

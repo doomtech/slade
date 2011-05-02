@@ -36,6 +36,8 @@
  * VARIABLES
  *******************************************************************/
 GLTexture GLTexture::tex_background;
+CVAR(String, bgtx_colour1, "#404050", CVAR_SAVE)
+CVAR(String, bgtx_colour2, "#505060", CVAR_SAVE)
 
 
 /*******************************************************************
@@ -124,8 +126,8 @@ bool GLTexture::loadRawData(const uint8_t* data, uint32_t w, uint32_t h) {
 			while (left < w) {
 				// Load 128x128 portion of image
 				memset(buf, 0, 128*128*4);
-				size_t rowlen = min(128, int(w - left));
-				size_t collen = min(128, int(h - top));
+				size_t rowlen = MIN(128, int(w - left));
+				size_t collen = MIN(128, int(h - top));
 				for (size_t i = 0; i < collen; ++i) {
 					size_t doffset = (((top + i) * w) + left) * 4;
 					size_t boffset = i * 128 * 4;
@@ -367,23 +369,41 @@ bool GLTexture::bind() {
  * Draws the texture as a 2d image at [x], [y]. Returns false if the
  * texture isn't loaded, true otherwise
  *******************************************************************/
-bool GLTexture::draw2d(double x, double y) {
+bool GLTexture::draw2d(double x, double y, bool flipx, bool flipy) {
 	// Can't draw if texture not loaded
 	if (!loaded)
 		return false;
+
+	// Flipping?
+	if (flipx)
+		x += width;
+	if (flipy)
+		y += height;
 
 	// If the texture isn't split, just draw it straight
 	if (OpenGL::validTexDimension(width) && OpenGL::validTexDimension(height)) {
 		// Bind the texture
 		glBindTexture(GL_TEXTURE_2D, tex[0].id);
 
+		// Setup metrics
+		double h = (double)width;
+		double v = (double)height;
+		if (flipx) h = -h;
+		if (flipy) v = -v;
+
+		// Translate to position
+		glPushMatrix();
+		glTranslated(x, y, 0);
+
 		// Draw
 		glBegin(GL_QUADS);
-		glTexCoord2d(0, 0);	glVertex2d(x, y);
-		glTexCoord2d(0, 1);	glVertex2d(x, y+(double)height);
-		glTexCoord2d(1, 1);	glVertex2d(x+(double)width, y+(double)height);
-		glTexCoord2d(1, 0); glVertex2d(x+(double)width, y);
+		glTexCoord2d(0, 0);	glVertex2d(0, 0);
+		glTexCoord2d(0, 1);	glVertex2d(0, v);
+		glTexCoord2d(1, 1);	glVertex2d(h, v);
+		glTexCoord2d(1, 0); glVertex2d(h, 0);
 		glEnd();
+
+		glPopMatrix();
 	}
 
 	// Otherwise draw the 128x128 chunks
@@ -392,29 +412,34 @@ bool GLTexture::draw2d(double x, double y) {
 		glPushMatrix();
 		glTranslated(x, y, 0);
 
+		double stepx = 128;
+		if (flipx) stepx = -128;
+		double stepy = 128;
+		if (flipy) stepy = -128;
+
 		size_t tex_index = 0;
 		double top = 0;
-		while (top < height) {
+		while (top < height && top >= 0) {
 			double left = 0;
-			while (left < width) {
+			while (left < width && left >= 0) {
 				// Bind the texture
 				glBindTexture(GL_TEXTURE_2D, tex[tex_index].id);
 
 				// Draw
 				glBegin(GL_QUADS);
 				glTexCoord2d(0, 0);	glVertex2d(left, top);
-				glTexCoord2d(0, 1);	glVertex2d(left, top+128);
-				glTexCoord2d(1, 1);	glVertex2d(left+128, top+128);
-				glTexCoord2d(1, 0); glVertex2d(left+128, top);
+				glTexCoord2d(0, 1);	glVertex2d(left, top+stepy);
+				glTexCoord2d(1, 1);	glVertex2d(left+stepx, top+stepy);
+				glTexCoord2d(1, 0); glVertex2d(left+stepx, top);
 				glEnd();
 
 				// Move right 128px
-				left += 128;
+				left += stepx;
 				tex_index++;
 			}
 
 			// Move down 128px
-			top += 128;
+			top += stepy;
 		}
 
 		glPopMatrix();
@@ -473,15 +498,27 @@ bool GLTexture::draw2dTiled(uint32_t width, uint32_t height) {
 
 
 /*******************************************************************
- * GLTEXTURE CLASS FUNCTIONS
+ * GLTEXTURE STATIC FUNCTIONS
  *******************************************************************/
 
 /* GLTexture::bgTex
  * Returns the global chequered 'background' texture
  *******************************************************************/
 GLTexture& GLTexture::bgTex() {
-	if (!tex_background.isLoaded())
-		tex_background.genChequeredTexture(8, rgba_t(64, 64, 80, 255), rgba_t(80, 80, 96, 255));
-
+	if (!tex_background.isLoaded()) {
+		wxColour col1(bgtx_colour1);
+		wxColour col2(bgtx_colour2);
+		tex_background.genChequeredTexture(8, 
+			rgba_t(col1.Red(), col1.Green(), col1.Blue(), 255), 
+			rgba_t(col2.Red(), col2.Green(), col2.Blue(), 255));
+	}
 	return tex_background;
+}
+
+/* GLTexture::resetBgTex
+ * Resets the global chequered 'background' texture
+ *******************************************************************/
+void GLTexture::resetBgTex() {
+	if (tex_background.isLoaded())
+		tex_background.clear();
 }

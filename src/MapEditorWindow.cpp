@@ -87,7 +87,7 @@ void MapEditorWindow::setupLayout() {
 }
 
 bool MapEditorWindow::openMap(Archive::mapdesc_t map) {
-	wxLogMessage("Opening map %s", chr(map.name));
+	wxLogMessage("Opening map %s", CHR(map.name));
 	return this->map->readMap(map);
 }
 

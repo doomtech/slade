@@ -28,7 +28,6 @@ public:
 
 	// Opening
 	bool	open(string filename);		// Open from File
-	bool	open(ArchiveEntry* entry);	// Open from ArchiveEntry
 	bool	open(MemChunk& mc);			// Open from MemChunk
 
 	bool	openAudio(MemChunk& head, MemChunk& data);
@@ -37,7 +36,6 @@ public:
 
 	// Writing/Saving
 	bool	write(MemChunk& mc, bool update = true);	// Write to MemChunk
-	bool	write(string filename, bool update = true);	// Write to File
 
 	// Misc
 	bool		loadEntryData(ArchiveEntry* entry);

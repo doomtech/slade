@@ -48,7 +48,13 @@
  *******************************************************************/
 CVAR(Bool, close_archive_with_tab, true, CVAR_SAVE)
 CVAR(Int, am_current_tab, 0, CVAR_SAVE)
-bool tab_closing = false;	// Hacky workaround to prevent crash on closing a tab when close_archive_with_tab is true
+int tab_closing = false;	// Hacky workaround to prevent crash on closing a tab when close_archive_with_tab is true
+
+
+/*******************************************************************
+ * EXTERNAL VARIABLES
+ *******************************************************************/
+EXTERN_CVAR(String, dir_last)
 
 
 /*******************************************************************
@@ -132,12 +138,6 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
 	file_browser = new WMFileBrowser(notebook_tabs, this, -1);
 	notebook_tabs->AddPage(file_browser, _("File Browser"));
 
-	// Create/setup Archive context menu
-	menu_context_open = new wxMenu();
-	menu_context_open->Append(MENU_SAVE, "Save", "Save the selected Archive(s)");
-	menu_context_open->Append(MENU_SAVEAS, "Save As", "Save the selected Archive(s) to a new file(s)");
-	menu_context_open->Append(MENU_CLOSE, "Close", "Close the selected Archive(s)");
-
 	// Create/setup recent files list and menu
 	menu_recent = new wxMenu();
 	wxPanel *panel_rf = new wxPanel(notebook_tabs);
@@ -148,11 +148,6 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
 	box_rf->Add(list_recent, 1, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, 4);
 	refreshRecentFileList();
 	notebook_tabs->AddPage(panel_rf, "Recent Files", true);
-
-	// Create/setup Archive context menu
-	menu_context_recent = new wxMenu();
-	menu_context_recent->Append(MENU_OPEN, "Open", "Open the selected Archive(s)");
-	menu_context_recent->Append(MENU_REMOVE, "Remove", "Remove the selected Archive(s) from the Recent list");
 
 	// Create/setup bookmarks tab
 	wxPanel *panel_bm = new wxPanel(notebook_tabs);
@@ -167,11 +162,6 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
 	// Set current tab
 	notebook_tabs->SetSelection(am_current_tab);
 
-	// Create/setup Archive context menu
-	menu_context_bookmarks = new wxMenu();
-	menu_context_bookmarks->Append(MENU_GO, "Go To", "Go to the chosen bookmark");
-	menu_context_bookmarks->Append(MENU_DELETE, "Remove", "Remove the selected bookmarks from the list");
-
 	// Bind events
 	list_archives->Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &ArchiveManagerPanel::onListArchivesChanged, this);
 	list_archives->Bind(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, &ArchiveManagerPanel::onListArchivesActivated, this);
@@ -182,10 +172,10 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
 	list_bookmarks->Bind(wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK, &ArchiveManagerPanel::onListBookmarksRightClick, this);
 	list_maps->Bind(wxEVT_COMMAND_LISTBOX_SELECTED, &ArchiveManagerPanel::onListMapsChanged, this);
 	list_maps->Bind(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, &ArchiveManagerPanel::onListMapsActivated, this);
+	notebook_archives->Bind(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGING, &ArchiveManagerPanel::onArchiveTabChanging, this);
 	notebook_archives->Bind(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED, &ArchiveManagerPanel::onArchiveTabChanged, this);
 	notebook_archives->Bind(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSE, &ArchiveManagerPanel::onArchiveTabClose, this);
 	notebook_tabs->Bind(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED, &ArchiveManagerPanel::onAMTabChanged, this);
-	Bind(wxEVT_COMMAND_MENU_SELECTED, &ArchiveManagerPanel::onMenu, this, MENU_SAVE, MENU_END);
 
 	// Listen to the ArchiveManager
 	listenTo(theArchiveManager);
@@ -198,9 +188,6 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
  * ArchiveManagerPanel class destructor
  *******************************************************************/
 ArchiveManagerPanel::~ArchiveManagerPanel() {
-	if (menu_context_open) delete menu_context_open;
-	if (menu_context_recent) delete menu_context_recent;
-	if (menu_context_bookmarks) delete menu_context_bookmarks;
 }
 
 /* ArchiveManagerPanel::refreshRecentFileList
@@ -210,10 +197,13 @@ void ArchiveManagerPanel::refreshRecentFileList() {
 	// Clear the list
 	list_recent->ClearAll();
 
+	// Get first recent file menu id
+	int id_recent_start = theApp->getAction("aman_recent1")->getWxId();
+
 	// Clear menu; needs to do with a count down rather than up
 	// otherwise the following elements are not properly removed
 	for (unsigned a = menu_recent->GetMenuItemCount(); a > 0; a--)
-		menu_recent->Destroy(MainWindow::MENU_RECENT_1 + a - 1);
+		menu_recent->Destroy(id_recent_start + a - 1);
 
 	// Add columns
 	list_recent->InsertColumn(0, "Filename");
@@ -226,7 +216,7 @@ void ArchiveManagerPanel::refreshRecentFileList() {
 		updateRecentListItem(a);
 
 		if (a < 8)
-			menu_recent->Append(MainWindow::MENU_RECENT_1+a, theArchiveManager->recentFile(a));
+			menu_recent->Append(id_recent_start + a, theArchiveManager->recentFile(a));
 	}
 
 	// Update size
@@ -371,7 +361,7 @@ bool ArchiveManagerPanel::isArchivePanel(int tab_index) {
  *******************************************************************/
 Archive* ArchiveManagerPanel::getArchive(int tab_index) {
 	// Check the index is valid
-	if (tab_index < 0 || tab_index >= notebook_archives->GetPageCount())
+	if (tab_index < 0 || (unsigned)tab_index >= notebook_archives->GetPageCount())
 		return NULL;
 
 	// Check the specified tab is actually an archive tab
@@ -490,8 +480,11 @@ void ArchiveManagerPanel::openTab(Archive* archive) {
 			ArchivePanel* ap = (ArchivePanel*)notebook_archives->GetPage(a);
 			if (ap->getArchive() == archive) {
 				// Selected archive is already open in a tab, so switch to this tab
+
+				// Switch to tab
 				notebook_archives->SetSelection(a);
 				ap->focusEntryList();
+
 				return;
 			}
 		}
@@ -500,15 +493,17 @@ void ArchiveManagerPanel::openTab(Archive* archive) {
 		ArchivePanel* wp = new ArchivePanel(notebook_archives, archive);
 
 		// Determine icon
-		string icon = "t_newarchive";
+		string icon = "e_archive";
 		if (archive->getType() == ARCHIVE_WAD)
 			icon = "e_wad";
 		else if (archive->getType() == ARCHIVE_ZIP)
 			icon = "e_zip";
 
-		notebook_archives->AddPage(wp, archive->getFilename(false), true);
+		notebook_archives->AddPage(wp, archive->getFilename(false), false);
+		notebook_archives->SetSelection(notebook_archives->GetPageCount() - 1);
 		notebook_archives->SetPageBitmap(notebook_archives->GetPageCount() - 1, getIcon(icon));
 		wp->SetName("archive");
+		wp->addMenus();
 		wp->Show(true);
 		wp->SetFocus();
 		wp->focusEntryList();
@@ -520,8 +515,8 @@ void ArchiveManagerPanel::openTab(Archive* archive) {
  * in the archive manager
  *******************************************************************/
 void ArchiveManagerPanel::closeTab(int archive_index) {
-	// Don't close if a tab is already closing
-	if (tab_closing)
+	// Don't close if this tab is already closing
+	if (tab_closing - 1 == archive_index)
 		return;
 
 	Archive* archive = theArchiveManager->getArchive(archive_index);
@@ -576,7 +571,7 @@ void ArchiveManagerPanel::openTextureTab(int archive_index) {
 			return;
 		}
 
-		notebook_archives->AddPage(txed, s_fmt("Texture Editor (%s)", archive->getFilename(false).c_str()), true);
+		notebook_archives->AddPage(txed, S_FMT("Texture Editor (%s)", archive->getFilename(false).c_str()), true);
 		notebook_archives->SetPageBitmap(notebook_archives->GetPageCount() - 1, getIcon("e_texturex"));
 		txed->SetName("texture");
 		txed->Show(true);
@@ -590,11 +585,7 @@ void ArchiveManagerPanel::openTextureTab(int archive_index) {
 	}
 }
 
-/* ArchiveManagerPanel::closeTextureTab
- * Closes the texture editor tab for the archive at <archive_index>
- * in the archive manager
- *******************************************************************/
-void ArchiveManagerPanel::closeTextureTab(int archive_index) {
+TextureXEditor* ArchiveManagerPanel::getTextureTab(int archive_index) {
 	Archive* archive = theArchiveManager->getArchive(archive_index);
 
 	if (archive) {
@@ -606,14 +597,22 @@ void ArchiveManagerPanel::closeTextureTab(int archive_index) {
 
 			// Check for archive match
 			TextureXEditor* txed = (TextureXEditor*)notebook_archives->GetPage(a);
-			if (txed->getArchive() == archive) {
-				// Close the tab
-				notebook_archives->DeletePage(a);
-
-				return;
-			}
+			if (txed->getArchive() == archive)
+				return txed;
 		}
 	}
+
+	// No texture editor open for that archive
+	return NULL;
+}
+
+/* ArchiveManagerPanel::closeTextureTab
+ * Closes the texture editor tab for the archive at <archive_index>
+ * in the archive manager
+ *******************************************************************/
+void ArchiveManagerPanel::closeTextureTab(int archive_index) {
+	TextureXEditor* txed = getTextureTab(archive_index);
+	if (txed) notebook_archives->DeletePage(notebook_archives->GetPageIndex(txed));
 }
 
 /* ArchiveManagerPanel::openFile
@@ -639,7 +638,7 @@ void ArchiveManagerPanel::openFile(string filename) {
 	// Check that the archive opened ok
 	if (!new_archive) {
 		// If archive didn't open ok, show error message
-		wxMessageBox(s_fmt("Error opening %s:\n%s", filename.c_str(), Global::error.c_str()), "Error", wxICON_ERROR);
+		wxMessageBox(S_FMT("Error opening %s:\n%s", filename.c_str(), Global::error.c_str()), "Error", wxICON_ERROR);
 	}
 }
 
@@ -679,7 +678,7 @@ void ArchiveManagerPanel::saveAll() {
 			// Save the archive if possible
 			if (!archive->save()) {
 				// If there was an error pop up a message box
-				wxMessageBox(s_fmt("Error: %s", Global::error.c_str()), "Error", wxICON_ERROR);
+				wxMessageBox(S_FMT("Error: %s", Global::error.c_str()), "Error", wxICON_ERROR);
 			}
 		}
 		else {
@@ -687,15 +686,19 @@ void ArchiveManagerPanel::saveAll() {
 
 			// Popup file save dialog
 			string formats = archive->getFileExtensionString();
-			string filename = wxFileSelector("Save Archive " + archive->getFilename(false) + " As", "", "", wxEmptyString, formats, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+			string filename = wxFileSelector("Save Archive " + archive->getFilename(false) + " As", dir_last, "", wxEmptyString, formats, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 
 			// Check a filename was selected
 			if (!filename.empty()) {
 				// Save the archive
 				if (!archive->save(filename)) {
 					// If there was an error pop up a message box
-					wxMessageBox(s_fmt("Error: %s", Global::error.c_str()), "Error", wxICON_ERROR);
+					wxMessageBox(S_FMT("Error: %s", Global::error.c_str()), "Error", wxICON_ERROR);
 				}
+
+				// Save 'dir_last'
+				wxFileName fn(filename);
+				dir_last = fn.GetPath(true);
 			}
 		}
 	}
@@ -745,7 +748,7 @@ bool ArchiveManagerPanel::saveArchive(Archive* archive) {
 		// Save the archive if possible
 		if (!archive->save()) {
 			// If there was an error pop up a message box
-			wxMessageBox(s_fmt("Error: %s", Global::error.c_str()), "Error", wxICON_ERROR);
+			wxMessageBox(S_FMT("Error: %s", Global::error.c_str()), "Error", wxICON_ERROR);
 			return false;
 		}
 
@@ -765,16 +768,20 @@ bool ArchiveManagerPanel::saveArchiveAs(Archive* archive) {
 
 	// Popup file save dialog
 	string formats = archive->getFileExtensionString();
-	string filename = wxFileSelector("Save Archive " + archive->getFilename(false) + " As", "", "", wxEmptyString, formats, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+	string filename = wxFileSelector("Save Archive " + archive->getFilename(false) + " As", dir_last, "", wxEmptyString, formats, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 
 	// Check a filename was selected
 	if (!filename.empty()) {
 		// Save the archive
 		if (!archive->save(filename)) {
 			// If there was an error pop up a message box
-			wxMessageBox(s_fmt("Error: %s", Global::error.c_str()), "Error", wxICON_ERROR);
+			wxMessageBox(S_FMT("Error: %s", Global::error.c_str()), "Error", wxICON_ERROR);
 			return false;
 		}
+
+		// Save 'dir_last'
+		wxFileName fn(filename);
+		dir_last = fn.GetPath(true);
 	}
 
 	return true;
@@ -793,9 +800,18 @@ bool ArchiveManagerPanel::closeArchive(Archive* archive) {
 	// Check for unsaved entry changes
 	saveEntryChanges(archive);
 
+	// Check for unsaved texture editor changes
+	int archive_index = theArchiveManager->archiveIndex(archive);
+	TextureXEditor* txed = getTextureTab(archive_index);
+	if (txed) {
+		openTextureTab(archive_index);
+		if (!txed->close())
+			return false;	// User cancelled saving texturex changes, don't close
+	}
+
 	// If the archive has unsaved changes, prompt to save
 	if (archive->isModified()) {
-		wxMessageDialog md(this, s_fmt("Save changes to %s?", archive->getFilename(false)), "Unsaved Changes", wxYES_NO|wxCANCEL);
+		wxMessageDialog md(this, S_FMT("Save changes to %s?", archive->getFilename(false)), "Unsaved Changes", wxYES_NO|wxCANCEL);
 		int result = md.ShowModal();
 		if (result == wxID_YES) {
 			// User selected to save
@@ -1049,51 +1065,36 @@ void ArchiveManagerPanel::removeSelection() {
 	if (selection.size() == 0)
 		return;
 
-	// Prepare list of kept archives
-	int numfiles = theArchiveManager->numRecentFiles();
-	bool * okay = new bool[numfiles];
-	for (int a = 0; a < (signed)numfiles; ++a)
-		okay[a] = true;
-
-	// Deselect the files that are being removed
-	for (int a = 0; a < (signed)selection.size(); ++a) {
-		if (selection[a] < numfiles)
-			okay[selection[a]] = false;
-	}
-
-	// Get the list of kept files
-	vector<string> kept_files;
-	for (int a = 0; a < numfiles; a++)
-		if (okay[a])
-			kept_files.push_back(theArchiveManager->recentFile(a));
-
-	delete[] okay;
-
-	// Renew the list of recent files
-	theArchiveManager->addRecentFiles(kept_files);
+	// Remove selected recent files
+	for (unsigned a = 0; a < selection.size(); a++)
+		theArchiveManager->removeRecentFile(theArchiveManager->recentFile(selection[a]));
 }
 
-void ArchiveManagerPanel::handleAction(int menu_id) {
-	// *************************************************************
-	// FILE MENU
-	// *************************************************************
+/* ArchiveManagerPanel::handleAction
+ * Handles the action [id]. Returns true if the action was handled,
+ * false otherwise
+ *******************************************************************/
+bool ArchiveManagerPanel::handleAction(string id) {
+	// We're only interested in "aman_" actions
+	if (!id.StartsWith("aman_"))
+		return false;
 
 	// File->New Wad
-	if (menu_id == MainWindow::MENU_FILE_NEWWAD)
+	if (id == "aman_newwad")
 		createNewArchive(ARCHIVE_WAD);
 
 	// File->New Zip
-	else if (menu_id == MainWindow::MENU_FILE_NEWZIP)
+	else if (id == "aman_newzip")
 		createNewArchive(ARCHIVE_ZIP);
 
 	// File->Open
-	else if (menu_id == MainWindow::MENU_FILE_OPEN) {
+	else if (id == "aman_open") {
 		// Create extensions string
 		string extensions = theArchiveManager->getArchiveExtensionsString();
 
 		// Open a file browser dialog that allows multiple selection
 		// and filters by wad, zip and pk3 file extensions
-		wxFileDialog dialog_open(this, "Choose file(s) to open", wxEmptyString, wxEmptyString, extensions, wxFD_OPEN|wxFD_MULTIPLE|wxFD_FILE_MUST_EXIST, wxDefaultPosition);
+		wxFileDialog dialog_open(this, "Choose file(s) to open", dir_last, wxEmptyString, extensions, wxFD_OPEN|wxFD_MULTIPLE|wxFD_FILE_MUST_EXIST, wxDefaultPosition);
 
 		// Run the dialog & check that the user didn't cancel
 		if (dialog_open.ShowModal() == wxID_OK) {
@@ -1107,36 +1108,55 @@ void ArchiveManagerPanel::handleAction(int menu_id) {
 			openFiles(files);
 
 			wxEndBusyCursor();
+
+			// Save 'dir_last'
+			dir_last = dialog_open.GetDirectory();
 		}
 	}
 
-	// File->Recent
-	else if (menu_id >= MainWindow::MENU_RECENT_1 && menu_id <= MainWindow::MENU_RECENT_8) {
-		// Get recent file index
-		unsigned index = menu_id - MainWindow::MENU_RECENT_1;
+	// File->Recent *and* Recent files context menu
+	else if (id.StartsWith("aman_recent")) {
+		// Deal with those first
+		if (id == "aman_recent_open")
+			openSelection();
+		else if (id == "aman_recent_remove")
+			removeSelection();
+		// Only then is it safe to assume it's a File->Recent stuff
+		else {
+			// Get recent file index
+			unsigned index = theApp->getAction(id)->getWxId() - theApp->getAction("aman_recent1")->getWxId();
 
-		// Open it
-		openFile(theArchiveManager->recentFile(index));
+			// Open it
+			openFile(theArchiveManager->recentFile(index));
+		}
 	}
 
 	// File->Save All
-	else if (menu_id == MainWindow::MENU_FILE_SAVEALL)
+	else if (id == "aman_saveall")
 		saveAll();
 
 	// File->Close All
-	else if (menu_id == MainWindow::MENU_FILE_CLOSEALL)
+	else if (id == "aman_closeall")
 		closeAll();
 
 	// File->Close
-	else if (menu_id == MainWindow::MENU_FILE_CLOSE)
+	else if (id == "aman_close")
 		closeArchive(currentArchive());
 
-	else {
-		// Check if the current tab is an archive tab
-		wxWindow* tab = notebook_archives->GetPage(notebook_archives->GetSelection());
-		if (tab && tab->GetName() == "archive")
-			((ArchivePanel*)tab)->handleAction(menu_id);	// Send action to current ArchivePanel
-	}
+
+	// Bookmarks context menu
+	else if (id == "aman_bookmark_go")
+		goToBookmark();
+	else if (id == "aman_bookmark_remove")
+		deleteSelectedBookmarks();
+
+
+	// Unknown action
+	else
+		return false;
+
+	// Action performed, return true
+	return true;
 }
 
 /* ArchiveManagerPanel::updateBookmarkListItem
@@ -1226,11 +1246,13 @@ void ArchiveManagerPanel::goToBookmark(long index) {
 	wxWindow* tab = notebook_archives->GetPage(notebook_archives->GetSelection());
 
 	// Check it's an archive panel
-	if (!(s_cmp(tab->GetName(), "archive")))
+	if (!(S_CMP(tab->GetName(), "archive")))
 		return;
 
 	// Finally, open the entry
 	((ArchivePanel*)tab)->openEntry(bookmark, true);
+	if (bookmark->getType() != EntryType::folderType())
+		((ArchivePanel*)tab)->focusOnEntry(bookmark);
 }
 
 
@@ -1292,7 +1314,14 @@ void ArchiveManagerPanel::onListMapsActivated(wxListEvent& e) {
  * pops up a context menu
  *******************************************************************/
 void ArchiveManagerPanel::onListArchivesRightClick(wxListEvent& e) {
-	PopupMenu(menu_context_open);
+	// Generate context menu
+	wxMenu context;
+	theApp->getAction("arch_save")->addToMenu(&context);
+	theApp->getAction("arch_saveas")->addToMenu(&context);
+	theApp->getAction("aman_close")->addToMenu(&context);
+
+	// Pop it up
+	PopupMenu(&context);
 }
 
 /* ArchiveManagerPanel::onListRecentActivated
@@ -1311,7 +1340,13 @@ void ArchiveManagerPanel::onListRecentActivated(wxListEvent& e) {
  * pops up a context menu
  *******************************************************************/
 void ArchiveManagerPanel::onListRecentRightClick(wxListEvent& e) {
-	PopupMenu(menu_context_recent);
+	// Generate context menu
+	wxMenu context;
+	theApp->getAction("aman_recent_open")->addToMenu(&context);
+	theApp->getAction("aman_recent_remove")->addToMenu(&context);
+
+	// Pop it up
+	PopupMenu(&context);
 }
 
 /* ArchiveManagerPanel::onListBookmarksActivated
@@ -1329,44 +1364,44 @@ void ArchiveManagerPanel::onListBookmarksActivated(wxListEvent& e) {
  * pops up a context menu
  *******************************************************************/
 void ArchiveManagerPanel::onListBookmarksRightClick(wxListEvent& e) {
-	PopupMenu(menu_context_bookmarks);
+	// Generate context menu
+	wxMenu context;
+	theApp->getAction("aman_bookmark_go")->addToMenu(&context);
+	theApp->getAction("aman_bookmark_remove")->addToMenu(&context);
+
+	// Pop it up
+	PopupMenu(&context);
 }
 
-/* ArchiveManagerPanel::onMenu
- * Called when an item on the archive list context menu is selected
+/* ArchiveManagerPanel::onArchiveTabChanging
+ * Called when the current archive tab is about to change
  *******************************************************************/
-void ArchiveManagerPanel::onMenu(wxCommandEvent& e) {
-	switch(e.GetId()) {
+void ArchiveManagerPanel::onArchiveTabChanging(wxAuiNotebookEvent& e) {
+	// Page is about to change, remove any custom menus if needed
+	int selection = notebook_archives->GetSelection();
 
-	// Open Archives menu
-	case MENU_SAVE:		saveSelection();	break;	// Save
-	case MENU_SAVEAS:	saveSelectionAs();	break;	// Save As
-	case MENU_CLOSE:	closeSelection();	break;	// Close
-
-	// Recent Files menu
-	case MENU_OPEN:		openSelection();	break;	// Open
-	case MENU_REMOVE:	removeSelection();	break;	// Remove
-
-	// Bookmarks menu
-	case MENU_GO:		goToBookmark();		break;	// Go To
-	case MENU_DELETE:	deleteSelectedBookmarks();	break;	// Delete
+	// ArchivePanel
+	if (isArchivePanel(selection)) {
+		ArchivePanel* ap = (ArchivePanel*)notebook_archives->GetPage(selection);
+		ap->removeMenus();
 	}
+
+	e.Skip();
 }
 
 /* ArchiveManagerPanel::onArchiveTabChanged
- * Called when the user switches between archive tabs
+ * Called when the current archive tab has changed
  *******************************************************************/
 void ArchiveManagerPanel::onArchiveTabChanged(wxAuiNotebookEvent& e) {
-	// If an archive tab is selected, set the frame title accordingly
+	// Page has changed, add any custom menus if needed
 	int selection = notebook_archives->GetSelection();
-	/*
+
+	// ArchivePanel
 	if (isArchivePanel(selection)) {
-		Archive* archive = ((ArchivePanel*)notebook_archives->GetPage(selection))->getArchive();
-		((wxFrame*)GetParent())->SetTitle(s_fmt("SLADE - %s", chr(archive->getFilename(false))));
+		ArchivePanel* ap = (ArchivePanel*)notebook_archives->GetPage(selection);
+		ap->currentArea()->updateStatus();
+		ap->addMenus();
 	}
-	else
-		((wxFrame*)GetParent())->SetTitle("SLADE");
-	*/
 
 	e.Skip();
 }
@@ -1376,10 +1411,20 @@ void ArchiveManagerPanel::onArchiveTabChanged(wxAuiNotebookEvent& e) {
  *******************************************************************/
 void ArchiveManagerPanel::onArchiveTabClose(wxAuiNotebookEvent& e) {
 	if (close_archive_with_tab) {
-		tab_closing = true;
-		Archive* archive = getArchive(e.GetId());
-		if (archive) closeArchive(archive);
-		tab_closing = false;
+		Archive* archive = getArchive(e.GetInt());
+		if (archive) {
+			tab_closing = theArchiveManager->archiveIndex(archive) + 1;
+			if (!closeArchive(archive))
+				e.Veto();
+		}
+		tab_closing = 0;
+	}
+
+	// Check for texture editor
+	if (notebook_archives->GetPage(e.GetInt())->GetName() == "texture") {
+		TextureXEditor* txed = (TextureXEditor*)(notebook_archives->GetPage(e.GetInt()));
+		if (!txed->close())
+			e.Veto();
 	}
 }
 

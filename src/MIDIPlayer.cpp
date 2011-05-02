@@ -55,7 +55,7 @@ MIDIPlayer::MIDIPlayer() {
 	fs_settings = new_fluid_settings();
 	fluid_settings_setstr(fs_settings, "audio.driver", "alsa");
     fs_synth = new_fluid_synth(fs_settings);
-	fluid_synth_sfload(fs_synth, chr(soundfont), 1);
+	fluid_synth_sfload(fs_synth, CHR(soundfont), 1);
     fs_player = new_fluid_player(fs_synth);
     fs_adriver = new_fluid_audio_driver(fs_settings, fs_synth);
 
@@ -85,7 +85,7 @@ bool MIDIPlayer::openFile(string filename) {
 
 	// Open midi
 	if (fs_player) {
-		fluid_player_add(fs_player, chr(filename));
+		fluid_player_add(fs_player, CHR(filename));
 		return true;
 	}
 	else
@@ -181,7 +181,7 @@ bool MIDIPlayer::openFile(string filename) {
 		return false;
 
 	// Load the midi
-	stream_midi = device_midi->openStream(chr(filename));
+	stream_midi = device_midi->openStream(CHR(filename));
 
 	return !!stream_midi;
 }

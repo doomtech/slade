@@ -94,6 +94,7 @@ bool MemChunk::clear() {
 		delete[] data;
 		data = NULL;
 		size = 0;
+		cur_ptr = 0;
 		return true;
 	}
 
@@ -140,7 +141,7 @@ bool MemChunk::importFile(string filename, uint32_t offset, uint32_t len) {
 	// Return false if file open failed
 	if (!file.IsOpened()) {
 		wxLogMessage("MemChunk::loadFile: Unable to open file %s", filename.c_str());
-		Global::error = s_fmt("Unable to open file %s", filename.c_str());
+		Global::error = S_FMT("Unable to open file %s", filename.c_str());
 		return false;
 	}
 
@@ -247,7 +248,8 @@ bool MemChunk::exportFile(string filename, uint32_t start, uint32_t size) {
 	// Open file for writing
 	wxFile file(filename, wxFile::write);
 	if (!file.IsOpened()) {
-		wxLogMessage(s_fmt("Unable to write to file %s", filename.c_str()));
+		wxLogMessage(S_FMT("Unable to write to file %s", filename.c_str()));
+		Global::error = "Unable to open file for writing";
 		return false;
 	}
 
@@ -291,10 +293,8 @@ bool MemChunk::write(const void* data, uint32_t size) {
 
 	// If we're trying to write past the end of the memory chunk,
 	// resize it so we can write at this point
-	if (cur_ptr + size > this->size) {
-		//wxLogMessage("MC::write resize %d > %d", cur_ptr+size, this->size);
+	if (cur_ptr + size > this->size)
 		reSize(cur_ptr + size, true);
-	}
 
 	// Write the data and move to the byte after what was written
 	memcpy(this->data + cur_ptr, data, size);
@@ -303,6 +303,15 @@ bool MemChunk::write(const void* data, uint32_t size) {
 	// Success
 	return true;
 }
+
+/* MemChunk::write
+ * Writes the given data at the [start] position. Expands the memory
+ * chunk if necessary.
+ *******************************************************************/
+ bool MemChunk::write(const void* data, uint32_t size, uint32_t start) {
+	 seek(start, SEEK_SET);
+	 return write(data, size);
+ }
 
 /* MemChunk::read
  * Reads data from the current position into <buf>. Returns false if
@@ -323,6 +332,20 @@ bool MemChunk::read(void* buf, uint32_t size) {
 	cur_ptr += size;
 
 	return true;
+}
+
+/* MemChunk::read
+ * Reads [size] bytes of data from [start] into <buf>. Returns false
+ * if attempting to read data outside of the chunk, true otherwise
+ *******************************************************************/
+bool MemChunk::read(void* buf, uint32_t size, uint32_t start) {
+	// Check options
+	if (start + size > this->size)
+		return false;
+	
+	// Do read
+	seek(start, SEEK_SET);
+	return read(buf, size);
 }
 
 /* MemChunk::seek
@@ -353,6 +376,18 @@ bool MemChunk::seek(uint32_t offset, uint32_t start) {
 	return true;
 }
 
+bool MemChunk::readMC(MemChunk& mc, uint32_t size) {
+	if (cur_ptr + size >= this->size)
+		return false;
+
+	if (mc.write(data + cur_ptr, size)) {
+		cur_ptr += size;
+		return true;
+	}
+	else
+		return false;
+}
+
 /* MemChunk::fillData
  * Overwrites all data bytes with [val] (basically is memset).
  * Returns false if no data exists, true otherwise
@@ -377,5 +412,5 @@ uint32_t MemChunk::crc() {
 	if (hasData())
 		return Misc::crc(data, size);
 	else
-		return false;
+		return 0;
 }

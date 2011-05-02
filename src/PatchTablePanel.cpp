@@ -39,6 +39,12 @@
 
 
 /*******************************************************************
+ * EXTERNAL VARIABLES
+ *******************************************************************/
+EXTERN_CVAR(String, dir_last)
+
+
+/*******************************************************************
  * PATCHTABLELISTVIEW CLASS FUNCTIONS
  *******************************************************************/
 
@@ -85,24 +91,20 @@ string PatchTableListView::getItemText(long item, long column) const {
 	patch_t& patch = patch_table->patch(item);
 
 	if (column == 0)						// Index column
-		return s_fmt("%04d", item);
+		return S_FMT("%04d", item);
 	else if (column == 1)					// Name column
 		return patch.name;
 	else if (column == 2)					// Usage count column
-		return s_fmt("%d", patch.used_in.size());
+		return S_FMT("%d", patch.used_in.size());
 	else if (column == 3) {					// Archive column
-		if (patch.entry)
-			return patch.entry->getParent()->getFilename(false);
-		else {
-			// Attempt to find the patch's entry
-			patch_table->updatePatchEntry(item);
+		// Get patch entry
+		ArchiveEntry* entry = patch_table->patchEntry(item);
 
-			// If it still can't be found return invalid
-			if (patch.entry)
-				return patch.entry->getParent()->getFilename(false);
-			else
-				return "(!) NOT FOUND";
-		}
+		// If patch entry can't be found return invalid
+		if (entry)
+			return entry->getParent()->getFilename(false);
+		else
+			return "(!) NOT FOUND";
 	}
 	else									// Invalid column
 		return "INVALID COLUMN";
@@ -169,15 +171,8 @@ void PatchTableListView::onAnnouncement(Announcer* announcer, string event_name,
 	if (announcer == patch_table)
 		updateList();
 
-	if (announcer == theArchiveManager) {
-		if (event_name == "base_resource_changed") {
-			// Clear all patch entries
-			for (unsigned a = 0; a < patch_table->nPatches(); a++)
-				patch_table->patch(a).entry = NULL;
-		}
-
+	if (announcer == theArchiveManager)
 		updateList();
-	}
 }
 
 
@@ -204,6 +199,7 @@ PatchTablePanel::PatchTablePanel(wxWindow* parent, PatchTable* patch_table) : wx
 	wxStaticBoxSizer* framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
 	sizer->Add(framesizer, 0, wxEXPAND|wxALL, 4);
 	list_patches = new PatchTableListView(this, patch_table);
+	list_patches->setSearchColumn(1);	// Want to search by patch name not index
 	framesizer->Add(list_patches, 1, wxEXPAND|wxALL, 4);
 
 	// Add editing controls
@@ -285,7 +281,6 @@ void PatchTablePanel::onBtnAddPatch(wxCommandEvent& e) {
 
 	// Add to patch table
 	patch_table->addPatch(patch);
-	patch_table->updatePatchEntry(patch_table->nPatches() - 1);
 
 	// Update list
 	list_patches->updateList();
@@ -309,7 +304,7 @@ void PatchTablePanel::onBtnPatchFromFile(wxCommandEvent& e) {
 	}
 
 	// Create open file dialog
-	wxFileDialog dialog_open(this, "Choose file(s) to open", wxEmptyString, wxEmptyString,
+	wxFileDialog dialog_open(this, "Choose file(s) to open", dir_last, wxEmptyString,
 			ext_filter, wxFD_OPEN|wxFD_MULTIPLE|wxFD_FILE_MUST_EXIST, wxDefaultPosition);
 
 	// Run the dialog & check that the user didn't cancel
@@ -317,6 +312,9 @@ void PatchTablePanel::onBtnPatchFromFile(wxCommandEvent& e) {
 		// Get file selection
 		wxArrayString files;
 		dialog_open.GetPaths(files);
+
+		// Save 'dir_last'
+		dir_last = dialog_open.GetDirectory();
 
 		// Go through file selection
 		for (unsigned a = 0; a < files.size(); a++) {
@@ -329,14 +327,14 @@ void PatchTablePanel::onBtnPatchFromFile(wxCommandEvent& e) {
 
 			// If it's not a valid image type, ignore this file
 			if (!entry->getType()->extraProps().propertyExists("image")) {
-				wxLogMessage("%s is not a valid image file", chr(files[a]));
+				wxLogMessage("%s is not a valid image file", CHR(files[a]));
 				continue;
 			}
 
 			// Ask for name for patch
 			wxFileName fn(files[a]);
 			string name = fn.GetName().Upper().Truncate(8);
-			name = wxGetTextFromUser(s_fmt("Enter a patch name for %s:", chr(fn.GetFullName())), "New Patch", name);
+			name = wxGetTextFromUser(S_FMT("Enter a patch name for %s:", CHR(fn.GetFullName())), "New Patch", name);
 			name = name.Truncate(8);
 
 			// Add patch to archive
@@ -346,7 +344,6 @@ void PatchTablePanel::onBtnPatchFromFile(wxCommandEvent& e) {
 
 			// Add patch to patch table
 			patch_table->addPatch(name);
-			patch_table->patch(patch_table->nPatches()-1).entry = entry;
 		}
 
 		// Refresh patch list
@@ -371,7 +368,7 @@ void PatchTablePanel::onBtnRemovePatch(wxCommandEvent& e) {
 		patch_t& patch = patch_table->patch(selection[a]);
 		if (patch.used_in.size() > 0) {
 			// In use, ask if it's ok to remove the patch
-			int answer = wxMessageBox(s_fmt("The patch \"%s\" is currently used by %d texture(s), are you sure you wish to remove it?", chr(patch.name), patch.used_in.size()), "Confirm Remove Patch", wxYES_NO|wxCANCEL, this);
+			int answer = wxMessageBox(S_FMT("The patch \"%s\" is currently used by %d texture(s), are you sure you wish to remove it?", CHR(patch.name), patch.used_in.size()), "Confirm Remove Patch", wxYES_NO|wxCANCEL, this);
 			if (answer == wxYES) {
 				// Answered yes, remove the patch
 				parent->removePatch(selection[a]);
@@ -432,7 +429,7 @@ void PatchTablePanel::updateDisplay() {
 	if (Misc::loadImageFromEntry(patch_canvas->getImage(), entry)) {
 		theMainWindow->getPaletteChooser()->setGlobalFromArchive(entry->getParent());
 		patch_canvas->setPalette(theMainWindow->getPaletteChooser()->getSelectedPalette());
-		label_dimensions->SetLabel(s_fmt("Size: %d x %d", patch_canvas->getImage()->getWidth(), patch_canvas->getImage()->getHeight()));
+		label_dimensions->SetLabel(S_FMT("Size: %d x %d", patch_canvas->getImage()->getWidth(), patch_canvas->getImage()->getHeight()));
 	}
 	else {
 		patch_canvas->getImage()->clear();
@@ -455,7 +452,7 @@ void PatchTablePanel::updateDisplay() {
 			} else {
 				// First add the count to the previous texture if needed
 				if (count) {
-					alltextures += s_fmt(" (%i)", count + 1);
+					alltextures += S_FMT(" (%i)", count + 1);
 					count = 0;
 				}
 
@@ -464,7 +461,7 @@ void PatchTablePanel::updateDisplay() {
 					alltextures += ';';
 
 				// Then print the new texture's name
-				alltextures += s_fmt(" %s", patch.used_in[a].mb_str());
+				alltextures += S_FMT(" %s", patch.used_in[a].mb_str());
 
 				// And set it for comparison with the next one
 				previous = current;
@@ -472,10 +469,10 @@ void PatchTablePanel::updateDisplay() {
 		}
 		// If count is still non-zero, it's because the patch was repeated in the last texture
 		if (count)
-			alltextures += s_fmt(" (%i)", count + 1);
+			alltextures += S_FMT(" (%i)", count + 1);
 
 		// Finally display the listing
-		label_textures->SetLabel(s_fmt("In Textures:%s", alltextures.mb_str()));
+		label_textures->SetLabel(S_FMT("In Textures:%s", alltextures.mb_str()));
 	}
 	else
 		label_textures->SetLabel("In Textures: -");

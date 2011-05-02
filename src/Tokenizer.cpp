@@ -396,7 +396,7 @@ int Tokenizer::getInteger() {
 	string token = getToken();
 
 	// Return integer value
-	return atoi(chr(token));
+	return atoi(CHR(token));
 }
 
 /* Tokenizer::getFloat
@@ -407,7 +407,7 @@ float Tokenizer::getFloat() {
 	string token = getToken();
 
 	// Return float value
-	return (float) atof(chr(token));
+	return (float) atof(CHR(token));
 }
 
 /* Tokenizer::getDouble
@@ -419,7 +419,7 @@ double Tokenizer::getDouble() {
 	string token = getToken();
 
 	// Return double value
-	return atof(chr(token));
+	return atof(CHR(token));
 }
 
 /* Tokenizer::getBool
@@ -431,10 +431,10 @@ bool Tokenizer::getBool() {
 	string token = getToken();
 
 	// If the token is a string "no" or "false", the value is false
-	//if (!stricmp(chr(token), "no") || !stricmp(chr(token), "false"))
+	//if (!stricmp(CHR(token), "no") || !stricmp(CHR(token), "false"))
 	if (!token.CmpNoCase("no") || !token.CmpNoCase("false"))
 		return false;
 
 	// Returns true ("1") or false ("0")
-	return !!atoi(chr(token));
+	return !!atoi(CHR(token));
 }

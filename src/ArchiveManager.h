@@ -43,6 +43,7 @@ public:
 	}
 
 	bool		init();
+	bool		initBaseResource();
 	bool		resArchiveOK() { return res_archive_open; }
 	bool		addArchive(Archive* archive);
 	Archive*	getArchive(int index);
@@ -77,6 +78,7 @@ public:
 	unsigned	numRecentFiles() { return recent_files.size(); }
 	void		addRecentFile(string path);
 	void		addRecentFiles(vector<string> paths);
+	void		removeRecentFile(string path);
 
 	// Bookmarks
 	void			addBookmark(ArchiveEntry* entry);

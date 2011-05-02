@@ -160,7 +160,7 @@ int Property::getIntValue(bool warn_wrong_type) {
 	else if (type == PROP_FLOAT)
 		return (int)value.Floating;
 	else if (type == PROP_STRING)
-		return atoi(chr(val_string));
+		return atoi(CHR(val_string));
 
 	// Return default integer value
 	return 0;
@@ -188,7 +188,7 @@ double Property::getFloatValue(bool warn_wrong_type) {
 	else if (type == PROP_INT)
 		return (double)value.Integer;
 	else if (type == PROP_STRING)
-		return (double)atof(chr(val_string));
+		return (double)atof(CHR(val_string));
 
 	// Return default float value
 	return 0.0f;
@@ -212,7 +212,7 @@ string Property::getStringValue(bool warn_wrong_type) {
 	if (type == PROP_STRING)
 		return val_string;
 	else if (type == PROP_INT)
-		return s_fmt("%d", value.Integer);
+		return S_FMT("%d", value.Integer);
 	else if (type == PROP_BOOL) {
 		if (value.Boolean)
 			return "1";
@@ -220,7 +220,7 @@ string Property::getStringValue(bool warn_wrong_type) {
 			return "0";
 	}
 	else if (type == PROP_FLOAT)
-		return s_fmt("%f", value.Floating);
+		return S_FMT("%f", value.Floating);
 
 	// Return default string value
 	return wxEmptyString;

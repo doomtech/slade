@@ -35,6 +35,228 @@
 #include "Misc.h"
 #include "PaletteManager.h"
 #include "EntryOperations.h"
+#include "Icons.h"
+#include "GfxConvDialog.h"
+#include "TranslationEditorDialog.h"
+#include <wx/dialog.h>
+#include <wx/clrpicker.h>
+
+
+/*******************************************************************
+ * GFXCOLOURISEDIALOG CLASS
+ *******************************************************************
+ A simple dialog for the 'Colourise' function, allows the user to
+ select a colour and shows a preview of the colourised image
+ */
+class GfxColouriseDialog : public wxDialog {
+private:
+	GfxCanvas*			gfx_preview;
+	ArchiveEntry*		entry;
+	Palette8bit*		palette;
+	wxColourPickerCtrl*	cp_colour;
+
+public:
+	GfxColouriseDialog(wxWindow* parent, ArchiveEntry* entry, Palette8bit* pal)
+	: wxDialog(parent, -1, "Colourise", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER) {
+		// Init variables
+		this->entry = entry;
+		this->palette = pal;
+
+		// Set dialog icon
+		wxIcon icon;
+		icon.CopyFromBitmap(getIcon("t_colourise"));
+		SetIcon(icon);
+
+		// Setup main sizer
+		wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+		SetSizer(sizer);
+
+		// Add colour chooser
+		wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
+		sizer->Add(hbox, 0, wxEXPAND|wxALL, 4);
+
+		cp_colour = new wxColourPickerCtrl(this, -1, wxColour(255, 0, 0));
+		hbox->Add(new wxStaticText(this, -1, "Colour:"), 1, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
+		hbox->Add(cp_colour, 0, wxEXPAND);
+
+		// Add preview
+		gfx_preview = new GfxCanvas(this, -1);
+		sizer->Add(gfx_preview, 1, wxEXPAND|wxALL, 4);
+
+		// Add buttons
+		sizer->Add(CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+		// Setup preview
+		gfx_preview->setViewType(GFXVIEW_CENTERED);
+		gfx_preview->setPalette(pal);
+		gfx_preview->SetInitialSize(wxSize(192, 192));
+		Misc::loadImageFromEntry(gfx_preview->getImage(), entry);
+		wxColour col = cp_colour->GetColour();
+		gfx_preview->getImage()->colourise(rgba_t(col.Red(), col.Green(), col.Blue()), pal);
+		gfx_preview->updateImageTexture();
+
+		// Init layout
+		Layout();
+
+		// Bind events
+		cp_colour->Bind(wxEVT_COMMAND_COLOURPICKER_CHANGED, &GfxColouriseDialog::onColourChanged, this);
+		Bind(wxEVT_SIZE, &GfxColouriseDialog::onResize, this);
+
+		// Setup dialog size
+		SetInitialSize(wxSize(-1, -1));
+		SetMinSize(GetSize());
+	}
+
+	rgba_t getColour() {
+		wxColour col = cp_colour->GetColour();
+		return rgba_t(col.Red(), col.Green(), col.Blue());
+	}
+
+	// Events
+	void onColourChanged(wxColourPickerEvent& e) {
+		Misc::loadImageFromEntry(gfx_preview->getImage(), entry);
+		wxColour col = cp_colour->GetColour();
+		gfx_preview->getImage()->colourise(rgba_t(col.Red(), col.Green(), col.Blue()), palette);
+		gfx_preview->updateImageTexture();
+		gfx_preview->Refresh();
+	}
+
+	void onResize(wxSizeEvent& e) {
+		wxDialog::OnSize(e);
+		gfx_preview->zoomToFit(true, 0.05f);
+		e.Skip();
+	}
+};
+
+
+/*******************************************************************
+ * GFXTINTDIALOG CLASS
+ *******************************************************************
+ A simple dialog for the 'Tint' function, allows the user to select
+ tint colour+amount and shows a preview of the tinted image
+ */
+class GfxTintDialog : public wxDialog {
+private:
+	GfxCanvas*			gfx_preview;
+	ArchiveEntry*		entry;
+	Palette8bit*		palette;
+	wxColourPickerCtrl*	cp_colour;
+	wxSlider*			slider_amount;
+	wxStaticText*		label_amount;
+
+public:
+	GfxTintDialog(wxWindow* parent, ArchiveEntry* entry, Palette8bit* pal)
+	: wxDialog(parent, -1, "Tint", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER) {
+		// Init variables
+		this->entry = entry;
+		this->palette = pal;
+
+		// Set dialog icon
+		wxIcon icon;
+		icon.CopyFromBitmap(getIcon("t_tint"));
+		SetIcon(icon);
+
+		// Setup main sizer
+		wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+		SetSizer(sizer);
+
+		// Add colour chooser
+		wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
+		sizer->Add(hbox, 0, wxEXPAND|wxALL, 4);
+
+		cp_colour = new wxColourPickerCtrl(this, -1, wxColour(255, 0, 0));
+		hbox->Add(new wxStaticText(this, -1, "Colour:"), 1, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
+		hbox->Add(cp_colour, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 8);
+
+		// Add 'amount' slider
+		hbox = new wxBoxSizer(wxHORIZONTAL);
+		sizer->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+		slider_amount = new wxSlider(this, -1, 50, 0, 100);
+		label_amount = new wxStaticText(this, -1, "100%");
+		hbox->Add(new wxStaticText(this, -1, "Amount:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
+		hbox->Add(slider_amount, 1, wxEXPAND|wxRIGHT, 4);
+		hbox->Add(label_amount, 0, wxALIGN_CENTER_VERTICAL);
+
+		// Add preview
+		gfx_preview = new GfxCanvas(this, -1);
+		sizer->Add(gfx_preview, 1, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+		// Add buttons
+		sizer->Add(CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+		// Setup preview
+		gfx_preview->setViewType(GFXVIEW_CENTERED);
+		gfx_preview->setPalette(pal);
+		gfx_preview->SetInitialSize(wxSize(256, 256));
+		Misc::loadImageFromEntry(gfx_preview->getImage(), entry);
+		wxColour col = cp_colour->GetColour();
+		gfx_preview->getImage()->tint(getColour(), getAmount(), pal);
+		gfx_preview->updateImageTexture();
+
+		// Init layout
+		Layout();
+
+		// Bind events
+		cp_colour->Bind(wxEVT_COMMAND_COLOURPICKER_CHANGED, &GfxTintDialog::onColourChanged, this);
+		slider_amount->Bind(wxEVT_COMMAND_SLIDER_UPDATED, &GfxTintDialog::onAmountChanged, this);
+		Bind(wxEVT_SIZE, &GfxTintDialog::onResize, this);
+
+		// Setup dialog size
+		SetInitialSize(wxSize(-1, -1));
+		SetMinSize(GetSize());
+
+		// Set values
+		label_amount->SetLabel("50% ");
+	}
+
+	rgba_t getColour() {
+		wxColour col = cp_colour->GetColour();
+		return rgba_t(col.Red(), col.Green(), col.Blue());
+	}
+
+	float getAmount() {
+		return (float)slider_amount->GetValue()*0.01f;
+	}
+
+	// Events
+	void onColourChanged(wxColourPickerEvent& e) {
+		Misc::loadImageFromEntry(gfx_preview->getImage(), entry);
+		wxColour col = cp_colour->GetColour();
+		gfx_preview->getImage()->tint(getColour(), getAmount(), palette);
+		gfx_preview->updateImageTexture();
+		gfx_preview->Refresh();
+	}
+
+	void onAmountChanged(wxCommandEvent& e) {
+		Misc::loadImageFromEntry(gfx_preview->getImage(), entry);
+		wxColour col = cp_colour->GetColour();
+		gfx_preview->getImage()->tint(getColour(), getAmount(), palette);
+		gfx_preview->updateImageTexture();
+		gfx_preview->Refresh();
+		label_amount->SetLabel(S_FMT("%d", slider_amount->GetValue()) + "% ");
+	}
+
+	void onResize(wxSizeEvent& e) {
+		wxDialog::OnSize(e);
+		gfx_preview->zoomToFit(true, 0.05f);
+		e.Skip();
+	}
+};
+
+/*******************************************************************
+ * GFXCROPDIALOG CLASS
+ *******************************************************************
+ A simple dialog for the 'Crop' function, allows the user to select
+ new image bounds to crop to
+ */
+/*
+class GfxTintDialog : public wxDialog {
+private:
+	GfxCanvas*			gfx_preview;
+	ArchiveEntry*		entry;
+	Palette8bit*		palette;
+*/
 
 
 /*******************************************************************
@@ -46,77 +268,77 @@
  *******************************************************************/
 GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 : EntryPanel(parent, "gfx") {
-	// Create sizer for this panel
-	wxBoxSizer* m_vbox = new wxBoxSizer(wxVERTICAL);
-	sizer_main->Add(m_vbox, 1, wxEXPAND);
+	// Init variables
+	prev_translation.addRange(TRANS_PALETTE, 0);
 
-	// Add view controls
-	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
-	m_vbox->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
+	// Add gfx canvas
+	gfx_canvas = new GfxCanvas(this, -1);
+	sizer_main->Add(gfx_canvas->toPanel(this), 1, wxEXPAND, 0);
+	gfx_canvas->setViewType(GFXVIEW_DEFAULT);
+	gfx_canvas->allowDrag(true);
+	gfx_canvas->allowScroll(true);
 
 	// Zoom slider
 	slider_zoom = new wxSlider(this, -1, 100, 20, 800);
 	slider_zoom->SetLineSize(10);
 	slider_zoom->SetPageSize(100);
 	label_current_zoom = new wxStaticText(this, -1, "100%");
-	hbox->Add(new wxStaticText(this, -1, "Zoom:"), 0, wxALIGN_CENTER_VERTICAL, 0);
-	hbox->Add(slider_zoom, 1, wxEXPAND, 0);
-	hbox->Add(label_current_zoom, 0, wxALIGN_CENTER_VERTICAL, 0);
+	sizer_bottom->Add(new wxStaticText(this, -1, "Zoom:"), 0, wxALIGN_CENTER_VERTICAL, 0);
+	sizer_bottom->Add(slider_zoom, 1, wxEXPAND, 0);
+	sizer_bottom->Add(label_current_zoom, 0, wxALIGN_CENTER_VERTICAL, 0);
 
-	hbox->AddStretchSpacer();
+	sizer_bottom->AddStretchSpacer();
 
 	// Tile checkbox
 	cb_tile = new wxCheckBox(this, -1, "Tile");
-	hbox->Add(cb_tile, 0, wxEXPAND, 0);
-	hbox->AddSpacer(8);
-
-	// Gfx (offset) type
-	string offset_types[] = { "Auto", "Graphic", "Sprite", "HUD" };
-	combo_offset_type = new wxComboBox(this, -1, offset_types[0], wxDefaultPosition, wxDefaultSize, 4, offset_types, wxCB_READONLY);
-	hbox->Add(new wxStaticText(this, -1, "Type:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
-	hbox->Add(combo_offset_type, 0, wxEXPAND, 0);
-	hbox->AddSpacer(8);
+	sizer_bottom->Add(cb_tile, 0, wxEXPAND, 0);
+	sizer_bottom->AddSpacer(8);
 
 	// Image selection buttons
-	btn_nextimg = new wxButton(this, -1, "Next >");
-	btn_previmg = new wxButton(this, -1, "< Prev");
+	btn_nextimg = new wxBitmapButton(this, -1, getIcon("t_right"));
+	btn_previmg = new wxBitmapButton(this, -1, getIcon("t_left"));
 	text_curimg = new wxStaticText(this, -1, "Image XX/XX");
-	hbox->Add(btn_previmg, 0, wxEXPAND|wxRIGHT|wxLEFT, 4);
-	hbox->Add(btn_nextimg, 0, wxEXPAND|wxRIGHT, 4);
-	hbox->Add(text_curimg, 0, wxALIGN_CENTER_VERTICAL, 4);
+	sizer_bottom->Add(btn_previmg, 0, wxEXPAND|wxRIGHT, 4);
+	sizer_bottom->Add(btn_nextimg, 0, wxEXPAND|wxRIGHT, 4);
+	sizer_bottom->Add(text_curimg, 0, wxALIGN_CENTER, 0);
 
 	// Palette chooser
 	listenTo(theMainWindow->getPaletteChooser());
 
-	// Add gfx canvas
-	gfx_canvas = new GfxCanvas(this, -1);
-	m_vbox->Add(gfx_canvas->toPanel(this), 1, wxEXPAND|wxALL, 4);
-	gfx_canvas->setViewType(GFXVIEW_DEFAULT);
-	gfx_canvas->allowDrag(true);
-	gfx_canvas->allowScroll(true);
-
-	// Add editing/info controls
-	hbox = new wxBoxSizer(wxHORIZONTAL);
-	sizer_bottom->Add(hbox, 1, wxEXPAND|wxLEFT|wxRIGHT, 4);
-
 	// Offsets
 	spin_xoffset = new wxSpinCtrl(this, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, SHRT_MIN, SHRT_MAX, 0);
 	spin_yoffset = new wxSpinCtrl(this, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, SHRT_MIN, SHRT_MAX, 0);
-	hbox->Add(new wxStaticText(this, -1, "Offsets:"), 0, wxALIGN_CENTER_VERTICAL, 0);
-	hbox->Add(spin_xoffset, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
-	hbox->Add(spin_yoffset, 0, wxEXPAND|wxRIGHT, 4);
+	sizer_top->AddStretchSpacer();
+	sizer_top->Add(new wxStaticText(this, -1, "Offsets:"), 0, wxALIGN_CENTER_VERTICAL, 0);
+	sizer_top->Add(spin_xoffset, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
+	sizer_top->Add(spin_yoffset, 0, wxEXPAND|wxRIGHT, 4);
 
-	// Size
-	label_dimensions = new wxStaticText(this, -1, "Size: N/A");
-	hbox->Add(label_dimensions, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT, 4);
+	// Gfx (offset) type
+	string offset_types[] = { "Auto", "Graphic", "Sprite", "HUD" };
+	combo_offset_type = new wxComboBox(this, -1, offset_types[0], wxDefaultPosition, wxDefaultSize, 4, offset_types, wxCB_READONLY);
+	//sizer_top->Add(new wxStaticText(this, -1, "Offset Type:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
+	sizer_top->Add(combo_offset_type, 0, wxEXPAND, 0);
 
-	// PNG stuff
-	hbox->AddStretchSpacer();
-	cb_alph_chunk = new wxCheckBox(this, -1, "alPh");
-	hbox->Add(cb_alph_chunk, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
-	cb_trns_chunk = new wxCheckBox(this, -1, "tRNS");
-	hbox->Add(cb_trns_chunk, 0, wxEXPAND, 0);
-	hbox->AddSpacer(8);
+	// Custom menu
+	menu_custom = new wxMenu();
+	theApp->getAction("pgfx_mirror")->addToMenu(menu_custom);
+	theApp->getAction("pgfx_flip")->addToMenu(menu_custom);
+	theApp->getAction("pgfx_rotate")->addToMenu(menu_custom);
+	menu_custom->AppendSeparator();
+	theApp->getAction("pgfx_translate")->addToMenu(menu_custom);
+	theApp->getAction("pgfx_colourise")->addToMenu(menu_custom);
+	theApp->getAction("pgfx_tint")->addToMenu(menu_custom);
+	menu_custom->AppendSeparator();
+	theApp->getAction("pgfx_alph")->addToMenu(menu_custom);
+	theApp->getAction("pgfx_trns")->addToMenu(menu_custom);
+	menu_custom->AppendSeparator();
+	theApp->getAction("arch_gfx_exportpng")->addToMenu(menu_custom);
+	theApp->getAction("pgfx_extract")->addToMenu(menu_custom);
+	menu_custom->AppendSeparator();
+	theApp->getAction("arch_gfx_addptable")->addToMenu(menu_custom);
+	theApp->getAction("arch_gfx_addtexturex")->addToMenu(menu_custom);
+	custom_menu_name = "Graphic";
+	// TODO: Should change the way gfx conversion and offset modification work so I can put them in this menu
 
 	// Bind Events
 	slider_zoom->Bind(wxEVT_COMMAND_SLIDER_UPDATED, &GfxEntryPanel::onZoomChanged, this);
@@ -124,8 +346,6 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 	spin_yoffset->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &GfxEntryPanel::onYOffsetChanged, this);
 	combo_offset_type->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &GfxEntryPanel::onOffsetTypeChanged, this);
 	cb_tile->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &GfxEntryPanel::onTileChanged, this);
-	cb_alph_chunk->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &GfxEntryPanel::onalPhChanged, this);
-	cb_trns_chunk->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &GfxEntryPanel::ontRNSChanged, this);
 	Bind(wxEVT_GFXCANVAS_OFFSET_CHANGED, &GfxEntryPanel::onGfxOffsetChanged, this, gfx_canvas->GetId());
 	btn_nextimg->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &GfxEntryPanel::onBtnNextImg, this);
 	btn_previmg->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &GfxEntryPanel::onBtnPrevImg, this);
@@ -148,15 +368,17 @@ bool GfxEntryPanel::loadEntry(ArchiveEntry* entry) {
 }
 bool GfxEntryPanel::loadEntry(ArchiveEntry* entry, int index) {
 	// Check entry was given
-	if (entry == NULL)
+	if (entry == NULL) {
+		Global::error = "no entry to load";
 		return false;
+	}
 
 	// Update variables
 	this->entry = entry;
 	setModified(false);
 
 	// Attempt to load the image
-	if (!Misc::loadImageFromEntry(gfx_canvas->getImage(), this->entry, index))
+	if (!Misc::loadImageFromEntry(getImage(), this->entry, index))
 		return false;
 
 	// Refresh everything
@@ -169,24 +391,81 @@ bool GfxEntryPanel::loadEntry(ArchiveEntry* entry, int index) {
  * Saves any changes to the entry
  *******************************************************************/
 bool GfxEntryPanel::saveEntry() {
-	// Set gfx entry offsets
-	bool ok = EntryOperations::modifyGfxOffsets(entry, -1, point2_t(spin_xoffset->GetValue(), spin_yoffset->GetValue()), true, true, false);
+	// Write new image data if modified
+	bool ok = true;
+	if (image_data_modified) {
+		SImage* image = getImage();
 
-	if (ok && entry->getType()->getFormat() == "img_png") {
-		// Check if we need to modify alph
-		if (cb_alph_chunk->GetValue() != alph) {
-			alph = !alph;
-			ok = EntryOperations::modifyalPhChunk(entry, alph);
+		// Write depending on type
+		// TODO: I really should write a proper SImage format system so this kind of thing isn't needed
+		if (entry->getType()->getFormat() == "img_doom")
+			image->toDoomGfx(entry->getMCData());
+		else if (entry->getType()->getFormat() == "img_png")
+			image->toPNG(entry->getMCData(), gfx_canvas->getPalette());
+		else if (entry->getType()->getFormat() == "img_raw")
+			image->toDoomFlat(entry->getMCData());
+		else {
+			wxMessageBox("Unable to save changes, unsupported format for writing.\nSupported formats are: Doom Gfx, Doom Flat, PNG");
+			ok = false;
 		}
 
-		// Check if we need to modify trns
-		if (ok && cb_trns_chunk->GetValue() != trns) {
-			trns = !trns;
-			ok = EntryOperations::modifytRNSChunk(entry, trns);
-		}
+		if (ok)
+			entry->setState(1);
+	}
+	// Otherwise just set offsets
+	else
+		EntryOperations::modifyGfxOffsets(entry, -1, point2_t(spin_xoffset->GetValue(), spin_yoffset->GetValue()), true, true, false);
+
+	// Apply alPh/tRNS options
+	if (entry->getType()->getFormat() == "img_png") {
+		bool alph = EntryOperations::getalPhChunk(entry);
+		bool trns = EntryOperations::gettRNSChunk(entry);
+
+		if (alph != menu_custom->IsChecked(theApp->getAction("pgfx_alph")->getWxId()))
+			EntryOperations::modifyalPhChunk(entry, !alph);
+		if (trns != menu_custom->IsChecked(theApp->getAction("pgfx_trns")->getWxId()))
+			EntryOperations::modifytRNSChunk(entry, !trns);
 	}
 
 	return ok;
+}
+
+/* GfxEntryPanel::extractAll
+ * Extract all sub-images as individual PNGs
+ *******************************************************************/
+bool GfxEntryPanel::extractAll() {
+	if (getImage()->getSize() < 2)
+		return false;
+
+	// Remember where we are
+	int imgindex = getImage()->getIndex();
+
+	Archive* parent = entry->getParent();
+	if (parent == NULL) return false;
+
+	int index = parent->entryIndex(entry, entry->getParentDir());
+	string name = wxFileName(entry->getName()).GetName();
+
+	// Loop through subimages and get things done
+	int pos = 0;
+	for (int i = 0; i < getImage()->getSize(); ++i) {
+		string newname = S_FMT("%s_%i.png", CHR(name), i);
+		Misc::loadImageFromEntry(getImage(), entry, i);
+
+		// Only process images that actually contain some pixels
+		if (getImage()->getWidth() && getImage()->getHeight()) {
+			ArchiveEntry * newimg = parent->addNewEntry(newname, index+pos+1, entry->getParentDir());
+			if (newimg == NULL) return false;
+			getImage()->toPNG(newimg->getMCData(), gfx_canvas->getPalette());
+			EntryType::detectEntryType(newimg);
+			pos++;
+		}
+	}
+
+	// Reload image of where we were
+	Misc::loadImageFromEntry(getImage(), entry, imgindex);
+
+	return true;
 }
 
 /* GfxEntryPanel::refresh
@@ -198,33 +477,46 @@ void GfxEntryPanel::refresh() {
 	updateImagePalette();
 
 	// Set offset text boxes
-	spin_xoffset->SetValue(gfx_canvas->getImage()->offset().x);
-	spin_yoffset->SetValue(gfx_canvas->getImage()->offset().y);
+	spin_xoffset->SetValue(getImage()->offset().x);
+	spin_yoffset->SetValue(getImage()->offset().y);
 
-	// Set PNG check boxes
+	// Get some needed menu ids
+	int MENU_GFXEP_ALPH = theApp->getAction("pgfx_alph")->getWxId();
+	int MENU_GFXEP_TRNS = theApp->getAction("pgfx_trns")->getWxId();
+	int MENU_GFXEP_EXTRACT = theApp->getAction("pgfx_extract")->getWxId();
+	int MENU_GFXEP_TRANSLATE = theApp->getAction("pgfx_translate")->getWxId();
+
+	// Set PNG check menus
 	if (this->entry->getType() != NULL && this->entry->getType()->getFormat() == "img_png") {
 		// Check for alph
 		alph = EntryOperations::getalPhChunk(this->entry);
-		cb_alph_chunk->Enable(true);
-		cb_alph_chunk->SetValue(alph);
+		menu_custom->Enable(MENU_GFXEP_ALPH, true);
+		menu_custom->Check(MENU_GFXEP_ALPH, alph);
 
 		// Check for trns
 		trns = EntryOperations::gettRNSChunk(this->entry);
-		cb_trns_chunk->Enable(true);
-		cb_trns_chunk->SetValue(trns);
+		menu_custom->Enable(MENU_GFXEP_TRNS, true);
+		menu_custom->Check(MENU_GFXEP_TRNS, trns);
+
+		// Disable 'Export as PNG' (it already is :P)
+		menu_custom->Enable(theApp->getAction("arch_gfx_exportpng")->getWxId(), false);
 	} else {
-		cb_alph_chunk->Enable(false);
-		cb_alph_chunk->SetValue(false);
-		cb_trns_chunk->Enable(false);
-		cb_trns_chunk->SetValue(false);
+		menu_custom->Enable(MENU_GFXEP_ALPH, false);
+		menu_custom->Enable(MENU_GFXEP_TRNS, false);
+		menu_custom->Check(MENU_GFXEP_ALPH, false);
+		menu_custom->Check(MENU_GFXEP_TRNS, false);
+		menu_custom->Enable(theApp->getAction("arch_gfx_exportpng")->getWxId(), true);
 	}
 
-	// Set size label
-	label_dimensions->SetLabel(s_fmt("Size: %d x %d", gfx_canvas->getImage()->getWidth(), gfx_canvas->getImage()->getHeight()));
-
 	// Set multi-image format stuff thingies
-	cur_index = gfx_canvas->getImage()->getIndex();
-	text_curimg->SetLabel(s_fmt("Image %d/%d", cur_index+1, gfx_canvas->getImage()->getSize()));
+	cur_index = getImage()->getIndex();
+	if (getImage()->getSize() > 1)
+		menu_custom->Enable(MENU_GFXEP_EXTRACT, true);
+	else menu_custom->Enable(MENU_GFXEP_EXTRACT, false);
+	text_curimg->SetLabel(S_FMT("Image %d/%d", cur_index+1, getImage()->getSize()));
+
+	// Update status bar in case image dimensions changed
+	updateStatus();
 
 	// Apply offset view type
 	applyViewType();
@@ -239,8 +531,43 @@ void GfxEntryPanel::refresh() {
 	if (gfx_canvas->getViewType() != GFXVIEW_SPRITE)
 		gfx_canvas->resetOffsets();
 
+	// Setup custom menu
+	if (getImage()->getType() == RGBA)
+		menu_custom->Enable(MENU_GFXEP_TRANSLATE, false);
+	else
+		menu_custom->Enable(MENU_GFXEP_TRANSLATE, true);
+
 	// Refresh the canvas
 	gfx_canvas->Refresh();
+}
+
+/* GfxEntryPanel::statusString
+ * Returns a string with extended editing/entry info for the status
+ * bar
+ *******************************************************************/
+string GfxEntryPanel::statusString() {
+	// Setup status string
+	SImage* image = getImage();
+	string status = S_FMT("%dx%d", image->getWidth(), image->getHeight());
+
+	// Colour format
+	if (image->getType() == RGBA)
+		status += ", 32bpp";
+	else
+		status += ", 8bpp";
+
+	// PNG stuff
+	if (entry->getType()->getFormat() == "img_png") {
+		// alPh
+		if (EntryOperations::getalPhChunk(entry))
+			status += ", alPh";
+
+		// tRNS
+		if (EntryOperations::gettRNSChunk(entry))
+			status += ", tRNS";
+	}
+
+	return status;
 }
 
 /* GfxEntryPanel::updateImagePalette
@@ -266,7 +593,7 @@ int GfxEntryPanel::detectOffsetType() {
 	string section = entry->getParent()->detectNamespace(entry);
 
 	if (section == "sprites") {
-		SImage* img = gfx_canvas->getImage();
+		SImage* img = getImage();
 		int left = -img->offset().x;
 		int right = -img->offset().x + img->getWidth();
 		int top = -img->offset().y;
@@ -280,11 +607,11 @@ int GfxEntryPanel::detectOffsetType() {
 
 	// Check for png image
 	if (entry->getType()->getFormat() == "img_png") {
-		if (gfx_canvas->getImage()->offset().x == 0 &&
-			gfx_canvas->getImage()->offset().y == 0)
+		if (getImage()->offset().x == 0 &&
+			getImage()->offset().y == 0)
 			return GFXVIEW_DEFAULT;
 		else {
-			SImage* img = gfx_canvas->getImage();
+			SImage* img = getImage();
 			int left = -img->offset().x;
 			int right = -img->offset().x + img->getWidth();
 			int top = -img->offset().y;
@@ -331,6 +658,158 @@ void GfxEntryPanel::applyViewType() {
 	gfx_canvas->Refresh();
 }
 
+/* GfxEntryPanel::handleAction
+ * Handles the action [id]. Returns true if the action was handled,
+ * false otherwise
+ *******************************************************************/
+bool GfxEntryPanel::handleAction(string id) {
+	// Don't handle actions if hidden
+	if (!IsShown())
+		return false;
+
+	// We're only interested in "pgfx_" actions
+	if (!id.StartsWith("pgfx_"))
+		return false;
+
+	// Mirror
+	if (id == "pgfx_mirror") {
+		// Mirror X
+		getImage()->mirror(false);
+
+		// Update UI
+		gfx_canvas->updateImageTexture();
+		gfx_canvas->Refresh();
+
+		// Update variables
+		image_data_modified = true;
+		setModified();
+	}
+
+	// Flip
+	else if (id == "pgfx_flip") {
+		// Mirror Y
+		getImage()->mirror(true);
+
+		// Update UI
+		gfx_canvas->updateImageTexture();
+		gfx_canvas->Refresh();
+
+		// Update variables
+		image_data_modified = true;
+		setModified();
+	}
+
+	// Rotate
+	else if (id == "pgfx_rotate") {
+		// Prompt for rotation angle
+		string angles[] = { "90", "180", "270" };
+		int choice = wxGetSingleChoiceIndex("Select rotation angle", "Rotate", 3, angles, 0);
+
+		// Rotate image
+		switch (choice) {
+		case 0:
+			getImage()->rotate(90);
+			break;
+		case 1:
+			getImage()->rotate(180);
+			break;
+		case 2:
+			getImage()->rotate(270);
+			break;
+		default: break;
+		}
+
+		// Update UI
+		gfx_canvas->updateImageTexture();
+		gfx_canvas->Refresh();
+
+		// Update variables
+		image_data_modified = true;
+		setModified();
+	}
+
+	// Translate
+	else if (id == "pgfx_translate") {
+		// Create translation editor dialog
+		Palette8bit* pal = theMainWindow->getPaletteChooser()->getSelectedPalette();
+		TranslationEditorDialog ted(theMainWindow, pal, "Colour Remap", entry);
+
+		// Create translation to edit
+		ted.openTranslation(prev_translation);
+
+		// Show the dialog
+		if (ted.ShowModal() == wxID_OK) {
+			// Apply translation to image
+			getImage()->applyTranslation(&ted.getTranslation(), pal);
+
+			// Update UI
+			gfx_canvas->updateImageTexture();
+			gfx_canvas->Refresh();
+
+			// Update variables
+			image_data_modified = true;
+			setModified();
+			prev_translation.copy(ted.getTranslation());
+		}
+	}
+
+	// Colourise
+	else if (id == "pgfx_colourise") {
+		Palette8bit* pal = theMainWindow->getPaletteChooser()->getSelectedPalette();
+		GfxColouriseDialog gcd(this, entry, pal);
+
+		// Show colourise dialog
+		if (gcd.ShowModal() == wxID_OK) {
+			// Colourise image
+			getImage()->colourise(gcd.getColour(), pal);
+
+			// Update UI
+			gfx_canvas->updateImageTexture();
+			gfx_canvas->Refresh();
+
+			// Update variables
+			image_data_modified = true;
+			setModified();
+		}
+	}
+
+	// Tint
+	else if (id == "pgfx_tint") {
+		Palette8bit* pal = theMainWindow->getPaletteChooser()->getSelectedPalette();
+		GfxTintDialog gtd(this, entry, pal);
+
+		// Show tint dialog
+		if (gtd.ShowModal() == wxID_OK) {
+			// Tint image
+			getImage()->tint(gtd.getColour(), gtd.getAmount(), pal);
+
+			// Update UI
+			gfx_canvas->updateImageTexture();
+			gfx_canvas->Refresh();
+
+			// Update variables
+			image_data_modified = true;
+			setModified();
+		}
+	}
+
+	// alPh/tRNS
+	else if (id == "pgfx_alph" || id == "pgfx_trns")
+		setModified();
+
+	// Extract all
+	else if (id == "pgfx_extract") {
+		extractAll();
+	}
+
+	// Unknown action
+	else
+		return false;
+
+	// Action handled
+	return true;
+}
+
 
 /*******************************************************************
  * GFXENTRYPANEL EVENTS
@@ -348,7 +827,7 @@ void GfxEntryPanel::onZoomChanged(wxCommandEvent& e) {
 	zoom_percent -= remainder;
 
 	// Update zoom label
-	label_current_zoom->SetLabel(s_fmt("%d%%", zoom_percent));
+	label_current_zoom->SetLabel(S_FMT("%d%%", zoom_percent));
 
 	// Zoom gfx canvas and update
 	gfx_canvas->setScale((double)zoom_percent * 0.01);
@@ -361,7 +840,7 @@ void GfxEntryPanel::onZoomChanged(wxCommandEvent& e) {
 void GfxEntryPanel::onXOffsetChanged(wxSpinEvent& e) {
 	// Change the image x-offset
 	int offset = spin_xoffset->GetValue();
-	gfx_canvas->getImage()->setXOffset(offset);
+	getImage()->setXOffset(offset);
 
 	// Update variables
 	setModified();
@@ -376,7 +855,7 @@ void GfxEntryPanel::onXOffsetChanged(wxSpinEvent& e) {
 void GfxEntryPanel::onYOffsetChanged(wxSpinEvent& e) {
 	// Change image y-offset
 	int offset = spin_yoffset->GetValue();
-	gfx_canvas->getImage()->setYOffset(offset);
+	getImage()->setYOffset(offset);
 
 	// Update variables
 	setModified();
@@ -398,22 +877,6 @@ void GfxEntryPanel::onOffsetTypeChanged(wxCommandEvent& e) {
 void GfxEntryPanel::onTileChanged(wxCommandEvent& e) {
 	combo_offset_type->Enable(!cb_tile->IsChecked());
 	applyViewType();
-}
-
-/* GfxEntryPanel::cbalPhChecked
- * Called when the 'alPh chunk' checkbox is checked/unchecked
- *******************************************************************/
-void GfxEntryPanel::onalPhChanged(wxCommandEvent& e) {
-	// Set changed
-	setModified();
-}
-
-/* GfxEntryPanel::cbtRNSChecked
- * Called when the 'tRNS chunk' checkbox is checked/unchecked
- *******************************************************************/
-void GfxEntryPanel::ontRNSChanged(wxCommandEvent& e) {
-	// Set changed
-	setModified();
 }
 
 /* GfxEntryPanel::gfxOffsetChanged
@@ -445,7 +908,8 @@ void GfxEntryPanel::onAnnouncement(Announcer* announcer, string event_name, MemC
  * Called when the 'next image' button is clicked
  *******************************************************************/
 void GfxEntryPanel::onBtnNextImg(wxCommandEvent& e) {
-	if (gfx_canvas->getImage()->getSize() > 1){
+	int num = gfx_canvas->getImage()->getSize();
+	if (num > 1 && cur_index < num - 1) {
 		loadEntry(entry, cur_index + 1);
 	}
 }
@@ -454,7 +918,8 @@ void GfxEntryPanel::onBtnNextImg(wxCommandEvent& e) {
  * Called when the 'previous image' button is clicked
  *******************************************************************/
 void GfxEntryPanel::onBtnPrevImg(wxCommandEvent& e) {
-	if (gfx_canvas->getImage()->getSize() > 1){
+	int num = gfx_canvas->getImage()->getSize();
+	if (num > 1 && cur_index > 0) {
 		loadEntry(entry, cur_index - 1);
 	}
 }

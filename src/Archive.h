@@ -37,6 +37,7 @@ public:
 
 	void	setName(string name) { dir_entry->name = name; }
 
+	void	linkEntries(ArchiveEntry* first, ArchiveEntry* second);
 	bool	addEntry(ArchiveEntry* entry, unsigned index = 0xFFFFFFFF);
 	bool	removeEntry(unsigned index);
 	bool	swapEntries(unsigned index1, unsigned index2);
@@ -54,7 +55,9 @@ enum ArchiveTypes {
 	ARCHIVE_DAT,
 	ARCHIVE_RES,
 	ARCHIVE_WAD2,
+	ARCHIVE_WAD3,
 	ARCHIVE_PAK,
+	ARCHIVE_BSP,
 	ARCHIVE_GRP,
 	ARCHIVE_RFF,
 	ARCHIVE_WOLF,
@@ -62,6 +65,13 @@ enum ArchiveTypes {
 	ARCHIVE_LFD,
 	ARCHIVE_HOG,
 	ARCHIVE_HOG2,
+	ARCHIVE_PIG,
+	ARCHIVE_MVL,
+	ARCHIVE_ADAT,
+	ARCHIVE_TAR,
+	ARCHIVE_GZIP,
+	ARCHIVE_BZ2,
+	ARCHIVE_7Z,
 };
 
 // Define map types
@@ -119,13 +129,13 @@ public:
 	virtual string	getFormat() = 0;
 
 	// Opening
-	virtual bool	open(string filename) = 0;		// Open from File
-	virtual bool	open(ArchiveEntry* entry) = 0;	// Open from ArchiveEntry
+	virtual bool	open(string filename);			// Open from File
+	virtual bool	open(ArchiveEntry* entry);		// Open from ArchiveEntry
 	virtual bool	open(MemChunk& mc) = 0;			// Open from MemChunk
 
 	// Writing/Saving
 	virtual bool	write(MemChunk& mc, bool update = true) = 0;	// Write to MemChunk
-	virtual bool	write(string filename, bool update = true) = 0;	// Write to File
+	virtual bool	write(string filename, bool update = true);		// Write to File
 	virtual bool	save(string filename = "");						// Save archive
 
 	// Misc
@@ -150,6 +160,7 @@ public:
 	virtual bool			removeEntry(ArchiveEntry* entry, bool delete_entry = true);
 
 	// Entry moving
+	virtual bool	swapEntries(unsigned index1, unsigned index2, ArchiveTreeNode* dir = NULL);
 	virtual bool	swapEntries(ArchiveEntry* entry1, ArchiveEntry* entry2);
 	virtual bool	moveEntry(ArchiveEntry* entry, unsigned position = 0xFFFFFFFF, ArchiveTreeNode* dir = NULL);
 

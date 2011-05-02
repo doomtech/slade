@@ -33,6 +33,7 @@
 #include "PreferencesDialog.h"
 #include "ArchiveManager.h"
 #include "TextEditorPrefsPanel.h"
+#include "Icons.h"
 #include <wx/gbsizer.h>
 
 
@@ -48,27 +49,38 @@ PreferencesDialog::PreferencesDialog(wxWindow* parent) : wxDialog(parent, -1, "S
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 	SetSizer(sizer);
 
+	// Set dialog icon
+	wxIcon icon;
+	icon.CopyFromBitmap(getIcon("t_settings"));
+	SetIcon(icon);
+
 	// Create preferences TreeBook
 	tree_prefs = new wxTreebook(this, -1, wxDefaultPosition, wxDefaultSize);
 
 	// Create separate preferences panels
 	panel_general = new GeneralPrefsPanel(tree_prefs);
+	panel_interface = new InterfacePrefsPanel(tree_prefs);
 	panel_editing = new EditingPrefsPanel(tree_prefs);
 	panel_text_editor = new TextEditorPrefsPanel(tree_prefs);
 	panel_text_styles = new TextStylePrefsPanel(tree_prefs);
 	panel_script_acs = new ACSPrefsPanel(tree_prefs);
+	panel_gfx_prefs = new GraphicsPrefsPanel(tree_prefs);
+	panel_gfx_png = new PNGPrefsPanel(tree_prefs);
 
 	// Setup preferences TreeBook
 	tree_prefs->AddPage(panel_general, "General", true);
+	tree_prefs->AddPage(panel_interface, "Interface");
 	tree_prefs->AddPage(panel_editing, "Editing");
 	tree_prefs->AddSubPage(setupBaseResourceArchivesPanel(), "Base Resource Archive");
 	tree_prefs->AddPage(panel_text_editor, "Text Editor");
 	tree_prefs->AddSubPage(panel_text_styles, "Fonts & Colours");
+	tree_prefs->AddPage(panel_gfx_prefs, "Graphics");
+	tree_prefs->AddSubPage(panel_gfx_png, "PNG");
 	tree_prefs->AddPage(new wxPanel(tree_prefs, -1), "Scripting");
 	tree_prefs->AddSubPage(panel_script_acs, "ACS");
 
 	// Expand all tree nodes (so it gets sized properly)
-	tree_prefs->ExpandNode(1);
+	tree_prefs->ExpandNode(2);
 
 	// Add preferences treebook
 	sizer->Add(tree_prefs, 1, wxEXPAND|wxALL, 4);
@@ -81,7 +93,7 @@ PreferencesDialog::PreferencesDialog(wxWindow* parent) : wxDialog(parent, -1, "S
 	Layout();
 
 	// Collapse all tree nodes
-	tree_prefs->CollapseNode(1);
+	tree_prefs->CollapseNode(2);
 }
 
 /* PreferencesDialog::~PreferencesDialog
@@ -119,12 +131,18 @@ wxPanel* PreferencesDialog::setupBaseResourceArchivesPanel() {
 	return panel;
 }
 
+/* PreferencesDialog::applyPreferences
+ * Applies preference values from all preference panels
+ *******************************************************************/
 void PreferencesDialog::applyPreferences() {
 	panel_general->applyPreferences();
+	panel_interface->applyPreferences();
 	panel_editing->applyPreferences();
 	panel_text_editor->applyPreferences();
 	panel_text_styles->applyPreferences();
 	panel_script_acs->applyPreferences();
+	panel_gfx_prefs->applyPreferences();
+	panel_gfx_png->applyPreferences();
 }
 
 

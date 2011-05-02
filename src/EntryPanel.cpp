@@ -31,6 +31,13 @@
 #include "Main.h"
 #include "WxStuff.h"
 #include "EntryPanel.h"
+#include "MainWindow.h"
+
+
+/*******************************************************************
+ * VARIABLES
+ *******************************************************************/
+CVAR(Bool, swap_epanel_bars, false, CVAR_SAVE)
 
 
 /*******************************************************************
@@ -46,6 +53,7 @@ EntryPanel::EntryPanel(wxWindow* parent, string id)
 	modified = false;
 	entry = NULL;
 	this->id = id;
+	menu_custom = NULL;
 
 	// Create & set sizer & border
 	frame = new wxStaticBox(this, -1, "Entry Contents");
@@ -53,23 +61,29 @@ EntryPanel::EntryPanel(wxWindow* parent, string id)
 	SetSizer(framesizer);
 	Show(false);
 
-	sizer_main = new wxBoxSizer(wxVERTICAL);
-	framesizer->Add(sizer_main, 1, wxEXPAND|wxALL, 4);
-
-	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
-	framesizer->Add(hbox, 0, wxEXPAND, 0);
-
+	// Setup sizer positions
+	sizer_top = new wxBoxSizer(wxHORIZONTAL);
 	sizer_bottom = new wxBoxSizer(wxHORIZONTAL);
-	hbox->Add(sizer_bottom, 1, wxEXPAND|wxBOTTOM, 4);
+	sizer_main = new wxBoxSizer(wxVERTICAL);
+	if (swap_epanel_bars) {
+		framesizer->Add(sizer_bottom, 0, wxEXPAND|wxALL, 4);
+		framesizer->Add(sizer_main, 1, wxEXPAND|wxLEFT|wxRIGHT, 4);
+		framesizer->Add(sizer_top, 0, wxEXPAND|wxALL, 4);
+	}
+	else {
+		framesizer->Add(sizer_top, 0, wxEXPAND|wxALL, 4);
+		framesizer->Add(sizer_main, 1, wxEXPAND|wxLEFT|wxRIGHT, 4);
+		framesizer->Add(sizer_bottom, 0, wxEXPAND|wxALL, 4);
+	}
 
 	// Create generic EntryPanel buttons
 	btn_save = new wxButton(this, -1, "Save Changes");
 	btn_revert = new wxButton(this, -1, "Revert Changes");
 	btn_edit_ext = new wxButton(this, -1, "Edit Externally");
 
-	hbox->Add(btn_edit_ext, 0, wxEXPAND|wxLEFT|wxBOTTOM, 4);
-	hbox->Add(btn_revert, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
-	hbox->Add(btn_save, 0, wxEXPAND|wxRIGHT|wxBOTTOM, 4);
+	sizer_top->Add(btn_save, 0, wxEXPAND|wxRIGHT, 4);
+	sizer_top->Add(btn_revert, 0, wxEXPAND|wxRIGHT, 4);
+	sizer_top->Add(btn_edit_ext, 0, wxEXPAND|wxRIGHT, 4);
 
 	// Bind button events
 	btn_save->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &EntryPanel::onBtnSave, this);
@@ -127,10 +141,14 @@ bool EntryPanel::openEntry(ArchiveEntry* entry) {
 	// Load the entry
 	if (loadEntry(entry)) {
 		this->entry = entry;
+		updateStatus();
 		return true;
 	}
-	else
+	else {
+		theMainWindow->SetStatusText("", 1);
+		theMainWindow->SetStatusText("", 2);
 		return false;
+	}
 }
 
 /* EntryPanel::loadEntry
@@ -176,6 +194,32 @@ bool EntryPanel::revertEntry() {
 void EntryPanel::refreshPanel() {
 	Update();
 	Refresh();
+}
+
+/* EntryPanel::closeEntry
+ * 'Closes' the current entry - clean up, save extra info, etc
+ *******************************************************************/
+void EntryPanel::closeEntry() {
+}
+
+void EntryPanel::updateStatus() {
+	// Basic info
+	if (entry)
+		theMainWindow->SetStatusText(S_FMT("%s, %d bytes, %s", CHR(entry->getName()), entry->getSize(), CHR(entry->getType()->getName())), 1);
+	else
+		theMainWindow->SetStatusText("", 1);
+
+	// Extended info
+	theMainWindow->SetStatusText(statusString(), 2);
+}
+
+void EntryPanel::addCustomMenu() {
+	if (menu_custom)
+		theMainWindow->addCustomMenu(menu_custom, custom_menu_name);
+}
+
+void EntryPanel::removeCustomMenu() {
+	theMainWindow->removeCustomMenu(custom_menu_name);
 }
 
 

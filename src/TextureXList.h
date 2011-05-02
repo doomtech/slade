@@ -49,8 +49,13 @@ public:
 	void	clear(bool clear_patches = false);
 	void	removePatch(string patch);
 
-	bool	readTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_table);
+	bool	readTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_table, bool add = false);
 	bool	writeTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_table);
+
+	bool	readTEXTURESData(ArchiveEntry* textures);
+	bool	writeTEXTURESData(ArchiveEntry* textures);
+
+	bool	convertToTEXTURES();
 
 	string	getTextureXFormatString();
 };

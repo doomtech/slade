@@ -36,6 +36,7 @@
 #include "Misc.h"
 #include "PaletteManager.h"
 #include "SplashWindow.h"
+#include "Icons.h"
 
 
 /*******************************************************************
@@ -48,6 +49,12 @@
 GfxConvDialog::GfxConvDialog()
 : wxDialog(NULL, -1, "Graphic Format Conversion", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER) {
 	current_entry = 0;
+
+	// Set dialog icon
+	wxIcon icon;
+	icon.CopyFromBitmap(getIcon("t_convert"));
+	SetIcon(icon);
+
 	setupLayout();
 }
 
@@ -331,7 +338,7 @@ void GfxConvDialog::updateControls() {
 		pal_chooser_target->Enable(true);
 
 	// Set colourbox palette if source image has one
-	if (gfx_current->getImage()->getFormat() == PALMASK) {
+	if (gfx_current->getImage()->getType() == PALMASK) {
 		colbox_transparent->setPalette(gfx_current->getPalette());
 	}
 	else
@@ -340,7 +347,7 @@ void GfxConvDialog::updateControls() {
 	// Disable/enable transparency options depending on transparency checkbox
 	if (cb_enable_transparency->GetValue()) {
 		// Disable/enable alpha threshold slider as needed
-		if (gfx_current->getImage()->getFormat() == RGBA)
+		if (gfx_current->getImage()->getType() == RGBA)
 			slider_alpha_threshold->Enable(true);
 		else
 			slider_alpha_threshold->Enable(false);

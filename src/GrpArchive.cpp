@@ -93,46 +93,6 @@ string GrpArchive::getFormat() {
 }
 
 /* GrpArchive::open
- * Reads a grp format file from disk
- * Returns true if successful, false otherwise
- *******************************************************************/
-bool GrpArchive::open(string filename) {
-	// Read the file into a MemChunk
-	MemChunk mc;
-	if (!mc.importFile(filename)) {
-		Global::error = "Unable to open file. Make sure it isn't in use by another program.";
-		return false;
-	}
-
-	// Load from MemChunk
-	if (open(mc)) {
-		// Update variables
-		this->filename = filename;
-		this->on_disk = true;
-
-		return true;
-	}
-	else
-		return false;
-}
-
-/* GrpArchive::open
- * Reads grp format data from an ArchiveEntry
- * Returns true if successful, false otherwise
- *******************************************************************/
-bool GrpArchive::open(ArchiveEntry* entry) {
-	// Load from entry's data
-	if (entry && open(entry->getMCData())) {
-		// Update variables and return success
-		parent = entry;
-		parent->lock();
-		return true;
-	}
-	else
-		return false;
-}
-
-/* GrpArchive::open
  * Reads grp format data from a MemChunk
  * Returns true if successful, false otherwise
  *******************************************************************/
@@ -155,7 +115,7 @@ bool GrpArchive::open(MemChunk& mc) {
 	ken_magic[12] = 0;
 
 	// Check the header
-	if (!(s_cmp(wxString::FromAscii(ken_magic), "KenSilverman"))) {
+	if (!(S_CMP(wxString::FromAscii(ken_magic), "KenSilverman"))) {
 		wxLogMessage("GrpArchive::openFile: File %s has invalid header", filename.c_str());
 		Global::error = "Invalid grp header";
 		return false;
@@ -247,19 +207,6 @@ bool GrpArchive::open(MemChunk& mc) {
 	theSplashWindow->setProgressMessage("");
 
 	return true;
-}
-
-/* GrpArchive::write
- * Writes the grp archive to a file
- * Returns true if successful, false otherwise
- *******************************************************************/
-bool GrpArchive::write(string filename, bool update) {
-	// Write to a MemChunk, then export it to a file
-	MemChunk mc;
-	if (write(mc, true))
-		return mc.exportFile(filename);
-	else
-		return false;
 }
 
 /* GrpArchive::write
@@ -419,7 +366,7 @@ bool GrpArchive::isGrpArchive(MemChunk& mc) {
 	ken_magic[12] = 0;
 
 	// Check the header
-	if (!(s_cmp(wxString::From8BitData(ken_magic), "KenSilverman")))
+	if (!(S_CMP(wxString::From8BitData(ken_magic), "KenSilverman")))
 		return false;
 
 	// Compute total size
@@ -468,7 +415,7 @@ bool GrpArchive::isGrpArchive(string filename) {
 	ken_magic[12] = 0;
 
 	// Check the header
-	if (!(s_cmp(wxString::From8BitData(ken_magic), "KenSilverman")))
+	if (!(S_CMP(wxString::From8BitData(ken_magic), "KenSilverman")))
 		return false;
 
 	// Compute total size
@@ -507,7 +454,7 @@ CONSOLE_COMMAND(lookupdat, 0) {
 
 	ArchiveEntry * nentry = NULL;
 	uint32_t * data = NULL;
-	int index = entry->getParent()->entryIndex(entry);
+	int index = entry->getParent()->entryIndex(entry, entry->getParentDir());
 	mc.seek(0, SEEK_SET);
 
 	// Create lookup table
@@ -517,7 +464,7 @@ CONSOLE_COMMAND(lookupdat, 0) {
 	if (mc.getSize() < (uint32_t)((numlookup * 256)+(5*768)+1))
 		return;
 
-	nentry = entry->getParent()->addNewEntry("COLORMAP.DAT", index+1);
+	nentry = entry->getParent()->addNewEntry("COLORMAP.DAT", index+1, entry->getParentDir());
 	if (!nentry)
 		return;
 
@@ -531,15 +478,15 @@ CONSOLE_COMMAND(lookupdat, 0) {
 
 	// Create extra palettes
 	data = new uint32_t[768];
-	nentry = entry->getParent()->addNewEntry("WATERPAL.PAL", index+2); if (!nentry) return;
+	nentry = entry->getParent()->addNewEntry("WATERPAL.PAL", index+2, entry->getParentDir()); if (!nentry) return;
 	mc.read(data, 768); nentry->importMem(data, 768);
-	nentry = entry->getParent()->addNewEntry("SLIMEPAL.PAL", index+3); if (!nentry) return;
+	nentry = entry->getParent()->addNewEntry("SLIMEPAL.PAL", index+3, entry->getParentDir()); if (!nentry) return;
 	mc.read(data, 768); nentry->importMem(data, 768);
-	nentry = entry->getParent()->addNewEntry("TITLEPAL.PAL", index+4); if (!nentry) return;
+	nentry = entry->getParent()->addNewEntry("TITLEPAL.PAL", index+4, entry->getParentDir()); if (!nentry) return;
 	mc.read(data, 768); nentry->importMem(data, 768);
-	nentry = entry->getParent()->addNewEntry("3DREALMS.PAL", index+5); if (!nentry) return;
+	nentry = entry->getParent()->addNewEntry("3DREALMS.PAL", index+5, entry->getParentDir()); if (!nentry) return;
 	mc.read(data, 768); nentry->importMem(data, 768);
-	nentry = entry->getParent()->addNewEntry("ENDINPAL.PAL", index+6); if (!nentry) return;
+	nentry = entry->getParent()->addNewEntry("ENDINPAL.PAL", index+6, entry->getParentDir()); if (!nentry) return;
 	mc.read(data, 768); nentry->importMem(data, 768);
 
 	// Clean up and go away
@@ -561,25 +508,25 @@ CONSOLE_COMMAND(palettedat, 0) {
 
 	ArchiveEntry * nentry = NULL;
 	uint32_t * data = NULL;
-	int index = entry->getParent()->entryIndex(entry);
+	int index = entry->getParent()->entryIndex(entry, entry->getParentDir());
 	mc.seek(0, SEEK_SET);
 
 	// Create palette
 	data = new uint32_t[768];
-	nentry = entry->getParent()->addNewEntry("MAINPAL.PAL", index+1); if (!nentry) return;
+	nentry = entry->getParent()->addNewEntry("MAINPAL.PAL", index+1, entry->getParentDir()); if (!nentry) return;
 	mc.read(data, 768); nentry->importMem(data, 768);
 
 	// Create lookup tables
 	uint16_t numlookup = 0; mc.read(&numlookup, 2);
 	numlookup = wxINT16_SWAP_ON_BE(numlookup);
 	delete[] data;
-	nentry = entry->getParent()->addNewEntry("COLORMAP.DAT", index+2); if (!nentry) return;
+	nentry = entry->getParent()->addNewEntry("COLORMAP.DAT", index+2, entry->getParentDir()); if (!nentry) return;
 	data = new uint32_t[numlookup * 256];
 	mc.read(data, numlookup * 256); nentry->importMem(data, numlookup * 256);
 
 	// Create transparency tables
 	delete[] data;
-	nentry = entry->getParent()->addNewEntry("TRANMAP.DAT", index+3); if (!nentry) return;
+	nentry = entry->getParent()->addNewEntry("TRANMAP.DAT", index+3, entry->getParentDir()); if (!nentry) return;
 	data = new uint32_t[65536];
 	mc.read(data, 65536); nentry->importMem(data, 65536);
 
@@ -602,14 +549,14 @@ CONSOLE_COMMAND(tablesdat, 0) {
 
 	ArchiveEntry * nentry = NULL;
 	uint32_t * data = NULL;
-	int index = entry->getParent()->entryIndex(entry);
+	int index = entry->getParent()->entryIndex(entry, entry->getParentDir());
 	mc.seek(5376, SEEK_SET);
 
 	// Create fonts
 	data = new uint32_t[1024];
-	nentry = entry->getParent()->addNewEntry("VGAFONT1.FNT", index+1); if (!nentry) return;
+	nentry = entry->getParent()->addNewEntry("VGAFONT1.FNT", index+1, entry->getParentDir()); if (!nentry) return;
 	mc.read(data, 1024); nentry->importMem(data, 1024);
-	nentry = entry->getParent()->addNewEntry("VGAFONT2.FNT", index+2); if (!nentry) return;
+	nentry = entry->getParent()->addNewEntry("VGAFONT2.FNT", index+2, entry->getParentDir()); if (!nentry) return;
 	mc.read(data, 1024); nentry->importMem(data, 1024);
 
 	// Clean up and go away

@@ -53,17 +53,21 @@ wxDEFINE_EVENT(EVT_VLV_SELECTION_CHANGED, wxCommandEvent);
  * VirtualListView class constructor
  *******************************************************************/
 VirtualListView::VirtualListView(wxWindow* parent)
-: wxListCtrl(parent, -1, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxLC_VIRTUAL) {
+: wxListCtrl(parent, -1, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxLC_VIRTUAL|wxLC_EDIT_LABELS) {
 	item_attr = new wxListItemAttr();
 	last_focus = 0;
+	col_search = 0;
+	memset(cols_editable, 0, 100);
 
 	// Bind events
-#ifdef __WXGTK__
-	Bind(wxEVT_LEFT_DOWN, &VirtualListView::onMouseLeftDown, this);
+#ifndef __WXMSW__
 	Bind(wxEVT_KEY_DOWN, &VirtualListView::onKeyDown, this);
 #endif
+	Bind(wxEVT_LEFT_DOWN, &VirtualListView::onMouseLeftDown, this);
 	Bind(wxEVT_COMMAND_LIST_COL_END_DRAG, &VirtualListView::onColumnResize, this);
 	Bind(wxEVT_CHAR, &VirtualListView::onKeyChar, this);
+	Bind(wxEVT_COMMAND_LIST_BEGIN_LABEL_EDIT, &VirtualListView::onLabelEditBegin, this);
+	Bind(wxEVT_COMMAND_LIST_END_LABEL_EDIT, &VirtualListView::onLabelEditEnd, this);
 }
 
 /* VirtualListView::~VirtualListView
@@ -247,6 +251,7 @@ void VirtualListView::onColumnResize(wxListEvent& e) {
  * Called when the list is left clicked
  *******************************************************************/
 void VirtualListView::onMouseLeftDown(wxMouseEvent& e) {
+#ifndef __WXMSW__
 	// Default handler for double-click
 	if (e.ButtonDClick()) {
 		e.Skip();
@@ -280,7 +285,13 @@ void VirtualListView::onMouseLeftDown(wxMouseEvent& e) {
 			sendSelectionChangedEvent();
 			e.Skip();
 		}
+
+		search = "";
 	}
+#else
+	search = "";
+	e.Skip();
+#endif
 }
 
 /* VirtualListView::onKeyDown
@@ -311,6 +322,7 @@ void VirtualListView::onKeyDown(wxKeyEvent& e) {
 				sendSelectionChangedEvent();
 			}
 		}
+		search = "";
 	}
 	else if (e.GetKeyCode() == WXK_DOWN) {
 		if (e.GetModifiers() == wxMOD_SHIFT) {
@@ -336,9 +348,59 @@ void VirtualListView::onKeyDown(wxKeyEvent& e) {
 				sendSelectionChangedEvent();
 			}
 		}
+		search = "";
 	}
 	else
 		e.Skip();
+}
+
+int vlv_chars[] = {
+	'.', ',', '_', '-', '+', '=', '`', '~',
+	'!', '@', '#', '$', '(', ')', '[', ']',
+	'{', '}', ':', ';', '/', '\\', '<', '>',
+	'?', '^', '&', '\'', '\"',
+};
+int n_vlv_chars = 30;
+
+
+/* VirtualListView::focusOnIndex
+ * Selects an entry by its given index and makes sure it is visible
+ *******************************************************************/
+void VirtualListView::focusOnIndex(long index) {
+	if (index < GetItemCount()) {
+		clearSelection();
+		selectItem(index);
+		focusItem(index);
+		EnsureVisible(index);
+		sendSelectionChangedEvent();
+	}
+}
+
+/* VirtualListView::lookForSearchEntryFrom
+ * Used by VirtualListView::onKeyChar, returns true if an entry
+ * matching search is found, false otherwise
+ *******************************************************************/
+bool VirtualListView::lookForSearchEntryFrom(long focus) {
+	long index = focus;
+	bool looped = false;
+	bool gotmatch = false;
+	while ((!looped && index < GetItemCount()) || (looped && index < focus)) {
+		string name = getItemText(index, col_search);
+		if (name.Upper().StartsWith(search)) {
+			// Matches, update selection+focus
+			focusOnIndex(index);
+			return true;
+		}
+
+		// No match, next item; look in the above entries
+		// if no matches were found below.
+		if (++index == GetItemCount() && !looped) {
+			looped = true;
+			index = 0;
+		}
+	}
+	// Didn't get any match
+	return false;
 }
 
 /* VirtualListView::onKeyChar
@@ -346,29 +408,65 @@ void VirtualListView::onKeyDown(wxKeyEvent& e) {
  *******************************************************************/
 void VirtualListView::onKeyChar(wxKeyEvent& e) {
 	// Check the key pressed is actually a character (a-z, 0-9 etc)
-	if ((e.GetKeyCode() >= 'a' && e.GetKeyCode() <= 'z') ||
-		(e.GetKeyCode() >= 'A' && e.GetKeyCode() <= 'Z') ||
-		(e.GetKeyCode() >= '1' && e.GetKeyCode() <= '0')) {
-		// TODO: jump to match
+	bool isRealChar = false;
+	if (e.GetKeyCode() >= 'a' && e.GetKeyCode() <= 'z')			// Lowercase
+		isRealChar = true;
+	else if (e.GetKeyCode() >= 'A' && e.GetKeyCode() <= 'Z')	// Uppercase
+		isRealChar = true;
+	else if (e.GetKeyCode() >= '0' && e.GetKeyCode() <= '9')	// Number
+		isRealChar = true;
+	else {
+		for (int a = 0; a < n_vlv_chars; a++) {
+			if (e.GetKeyCode() == vlv_chars[a]) {
+				isRealChar = true;
+				break;
+			}
+		}
 	}
+
+	if (isRealChar) {
+		// Get currently focused item (or first if nothing is focused)
+		long focus = getFocus();
+		if (focus < 0) focus = 0;
+
+		// Build search string
+		search += e.GetKeyCode();
+		search.MakeUpper();
+
+		// Search for match from the current focus, and if failed 
+		// start a new search from after the current focus.
+		if (!lookForSearchEntryFrom(focus)) {
+			search = S_FMT("%c", e.GetKeyCode());
+			search.MakeUpper();
+			lookForSearchEntryFrom(focus+1);
+		}
+	}
+	else {
+		search = "";
+		
+		// Only want to do default action on navigation key
+		if (e.GetKeyCode() == WXK_UP || e.GetKeyCode() == WXK_DOWN ||
+			e.GetKeyCode() == WXK_PAGEUP || e.GetKeyCode() == WXK_PAGEDOWN ||
+			e.GetKeyCode() == WXK_HOME || e.GetKeyCode() == WXK_END ||
+			e.GetKeyCode() == WXK_TAB)
+			e.Skip();
+	}
+}
+
+/* VirtualListView::onLabelEditBegin
+ * Called when an item label is clicked twice to edit it
+ *******************************************************************/
+void VirtualListView::onLabelEditBegin(wxListEvent& e) {
+	if (!cols_editable[e.GetColumn()])
+		e.Veto();
 
 	e.Skip();
 }
 
-
-
-/*
-CONSOLE_COMMAND (test_vlv, 0) {
-	wxDialog dlg(NULL, -1, "VLV!", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
-
-	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
-	dlg.SetSizer(hbox);
-
-	VirtualListView* vlv = new VirtualListView(&dlg);
-	hbox->Add(vlv, 1, wxEXPAND|wxALL, 4);
-	vlv->SetItemCount(100);
-	vlv->InsertColumn(0, "Test");
-
-	dlg.ShowModal();
+/* VirtualListView::onLabelEditEnd
+ * Called when an item label edit event finishes
+ *******************************************************************/
+void VirtualListView::onLabelEditEnd(wxListEvent& e) {
+	if (!e.IsEditCancelled())
+		labelEdited(e.GetColumn(), e.GetIndex(), e.GetLabel());
 }
-*/

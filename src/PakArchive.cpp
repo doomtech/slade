@@ -70,43 +70,6 @@ string PakArchive::getFormat() {
 }
 
 /* PakArchive::open
- * Reads a pak format file from disk
- * Returns true if successful, false otherwise
- *******************************************************************/
-bool PakArchive::open(string filename) {
-	// Read the file into a MemChunk
-	MemChunk mc;
-	if (!mc.importFile(filename)) {
-		Global::error = "Unable to open file. Make sure it isn't in use by another program.";
-		return false;
-	}
-
-	// Load from MemChunk
-	if (open(mc)) {
-		// Update variables
-		this->filename = filename;
-		this->on_disk = true;
-
-		return true;
-	}
-	else
-		return false;
-}
-
-/* PakArchive::open
- * Reads pak format data from an ArchiveEntry
- * Returns true if successful, false otherwise
- *******************************************************************/
-bool PakArchive::open(ArchiveEntry* entry) {
-	// Check entry was given
-	if (!entry)
-		return false;
-
-	// Read archive from entry
-	return open(entry->getMCData());
-}
-
-/* PakArchive::open
  * Reads pak format data from a MemChunk
  * Returns true if successful, false otherwise
  *******************************************************************/
@@ -271,7 +234,7 @@ bool PakArchive::write(MemChunk& mc, bool update) {
 		string name = entries[a]->getPath(true);
 		name.Remove(0, 1);	// Remove leading /
 		if (name.Len() > 56) {
-			wxLogMessage("Warning: Entry %s path is too long (> 56 characters), putting it in the root directory", chr(name));
+			wxLogMessage("Warning: Entry %s path is too long (> 56 characters), putting it in the root directory", CHR(name));
 			wxFileName fn(name);
 			name = fn.GetFullName();
 			if (name.Len() > 56)
@@ -282,7 +245,7 @@ bool PakArchive::write(MemChunk& mc, bool update) {
 		// Write entry name
 		char name_data[56];
 		memset(name_data, 0, 56);
-		memcpy(name_data, chr(name), name.Length());
+		memcpy(name_data, CHR(name), name.Length());
 		mc.write(name_data, 56);
 
 		// Write entry offset
@@ -310,19 +273,6 @@ bool PakArchive::write(MemChunk& mc, bool update) {
 	return true;
 }
 
-/* PakArchive::write
- * Writes the pak archive to a file
- * Returns true if successful, false otherwise
- *******************************************************************/
-bool PakArchive::write(string filename, bool update) {
-	// Write to a MemChunk, then export it to a file
-	MemChunk mc;
-	if (write(mc, true))
-		return mc.exportFile(filename);
-	else
-		return false;
-}
-
 /* PakArchive::loadEntryData
  * Loads an entry's data from the pak file
  * Returns true if successful, false otherwise
@@ -344,7 +294,7 @@ bool PakArchive::loadEntryData(ArchiveEntry* entry) {
 	
 	// Check it opened
 	if (!file.IsOpened()) {
-		wxLogMessage("PakArchive::loadEntryData: Unable to open archive file %s", chr(filename));
+		wxLogMessage("PakArchive::loadEntryData: Unable to open archive file %s", CHR(filename));
 		return false;
 	}
 
@@ -358,6 +308,29 @@ bool PakArchive::loadEntryData(ArchiveEntry* entry) {
 	return true;
 }
 
+/* PakArchive::detectNamespace
+ * Returns the namespace that [entry] is within
+ *******************************************************************/
+string PakArchive::detectNamespace(ArchiveEntry* entry) {
+	// Check entry
+	if (!checkEntry(entry))
+		return "global";
+
+	// If the entry is in the root dir, it's in the global namespace
+	if (entry->getParentDir() == getRoot())
+		return "global";
+
+	// Get the entry's *first* parent directory after root (ie <root>/namespace/)
+	ArchiveTreeNode* dir = entry->getParentDir();
+	while (dir && dir->getParent() != getRoot())
+		dir = (ArchiveTreeNode*)dir->getParent();
+
+	// Namespace is the directory's name (in lowercase)
+	if (dir)
+		return dir->getName().Lower();
+	else
+		return "global"; // Error, just return global
+}
 
 /*******************************************************************
  * PAKARCHIVE CLASS STATIC FUNCTIONS
@@ -404,7 +377,7 @@ bool PakArchive::isPakArchive(string filename) {
 	wxFile file(filename);
 
 	// Check it opened ok
-	if (!file.IsOpened())
+	if (!file.IsOpened() || file.Length() < 12)
 		return false;
 
 	// Read pak header

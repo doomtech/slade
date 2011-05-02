@@ -160,7 +160,7 @@ ArchiveEntry* ArchiveTreeNode::getEntry(string name, bool cut_ext) {
 	// Go through entries
 	for (unsigned a = 0; a < entries.size(); a++) {
 		// Check for (non-case-sensitive) name match
-		if (s_cmpnocase(entries[a]->getName(cut_ext), name))
+		if (S_CMPNOCASE(entries[a]->getName(cut_ext), name))
 			return entries[a];
 	}
 
@@ -181,6 +181,14 @@ unsigned ArchiveTreeNode::numEntries(bool inc_subdirs) {
 
 		return count;
 	}
+}
+
+/* ArchiveTreeNode::linkEntries
+ * Links two entries. [first] must come before [second] in the list
+ *******************************************************************/
+void ArchiveTreeNode::linkEntries(ArchiveEntry* first, ArchiveEntry* second) {
+	if (first) first->next = second;
+	if (second) second->prev = first;
 }
 
 /* ArchiveTreeNode::addEntry
@@ -263,17 +271,15 @@ bool ArchiveTreeNode::swapEntries(unsigned index1, unsigned index2) {
 	ArchiveEntry* entry1 = entries[index1];
 	ArchiveEntry* entry2 = entries[index2];
 
-	// Swap links
-	ArchiveEntry* e1prev = entry1->prev;
-	ArchiveEntry* e1next = entry1->next;
-	entry1->prev = entry2->prev;
-	entry1->next = entry2->next;
-	entry2->prev = e1prev;
-	entry2->next = e1next;
-
 	// Swap entries
 	entries[index1] = entry2;
 	entries[index2] = entry1;
+
+	// Update links
+	linkEntries(getEntry(index1-1), entry2);
+	linkEntries(entry2, getEntry(index1+1));
+	linkEntries(getEntry(index2-1), entry1);
+	linkEntries(entry1, getEntry(index2+1));
 
 	return true;
 }
@@ -303,12 +309,20 @@ ArchiveTreeNode* ArchiveTreeNode::clone() {
  * true otherwise
  *******************************************************************/
 bool ArchiveTreeNode::merge(ArchiveTreeNode* node, unsigned position) {
-	// Chech node was given to merge
+	// Check node was given to merge
 	if (!node)
 		return false;
 
 	// Merge entries
 	for (unsigned a = 0; a < node->numEntries(); a++) {
+		// Safe substitution of special characters, using the ZDoom
+		// convention of changing folder separators into carets.
+		if (node->getEntry(a)) {
+			string name = node->getEntry(a)->getName();
+			name.Replace("\\", "^");
+			name.Replace("/", "^");
+			node->getEntry(a)->setName(name);
+		}
 		addEntry(new ArchiveEntry(*(node->getEntry(a))), position);
 
 		if (position < entries.size())
@@ -374,6 +388,48 @@ string Archive::getFilename(bool full) {
 		wxFileName fn(filename);
 		return fn.GetFullName();
 	}
+}
+
+/* Archive::open
+ * Reads an archive from disk
+ * Returns true if successful, false otherwise
+ *******************************************************************/
+bool Archive::open(string filename) {
+	// Read the file into a MemChunk
+	MemChunk mc;
+	if (!mc.importFile(filename)) {
+		Global::error = "Unable to open file. Make sure it isn't in use by another program.";
+		return false;
+	}
+
+	// Update filename before opening
+	string backupname = this->filename;
+	this->filename = filename;
+
+	// Load from MemChunk
+	if (open(mc)) {
+		this->on_disk = true;
+		return true;
+	} else {
+		this->filename = backupname;
+		return false;
+	}
+}
+
+/* Archive::open
+ * Reads an archive from an ArchiveEntry
+ * Returns true if successful, false otherwise
+ *******************************************************************/
+bool Archive::open(ArchiveEntry* entry) {
+	// Load from entry's data
+	if (entry && open(entry->getMCData())) {
+		// Update variables and return success
+		parent = entry;
+		parent->lock();
+		return true;
+	}
+	else
+		return false;
 }
 
 /* Archive::setModified
@@ -462,6 +518,20 @@ ArchiveEntry* Archive::entryAtPath(string path) {
 	return dir->getEntry(fn.GetFullName());
 }
 
+
+/* Archive::write
+ * Writes the archive to a file
+ * Returns true if successful, false otherwise
+ *******************************************************************/
+bool Archive::write(string filename, bool update) {
+	// Write to a MemChunk, then export it to a file
+	MemChunk mc;
+	if (write(mc, true))
+		return mc.exportFile(filename);
+	else
+		return false;
+}
+
 /* Archive::save
  * This is the general, all-purpose 'save archive' function. Takes
  * into account whether the archive is contained within another,
@@ -471,6 +541,12 @@ ArchiveEntry* Archive::entryAtPath(string path) {
  *******************************************************************/
 bool Archive::save(string filename) {
 	bool success = false;
+
+	// Check if the archive is read-only
+	if (read_only) {
+		Global::error = "Archive is read-only";
+		return false;
+	}
 
 	// If the archive has a parent ArchiveEntry, just write it to that
 	if (parent) {
@@ -708,7 +784,7 @@ bool Archive::renameDir(ArchiveTreeNode* dir, string new_name) {
 		return false;
 
 	// Rename the directory if needed
-	if (!(s_cmpnocase(dir->getName(), new_name))) {
+	if (!(S_CMPNOCASE(dir->getName(), new_name))) {
 		dir->setName(new_name);
 		dir->getDirEntry()->setState(1);
 	}
@@ -806,7 +882,7 @@ bool Archive::removeEntry(ArchiveEntry* entry, bool delete_entry) {
 	if (entry->isLocked())
 		return false;
 
-	// Get it's directory
+	// Get its directory
 	ArchiveTreeNode* dir = entry->getParentDir();
 
 	// Error if entry has no parent directory
@@ -840,6 +916,30 @@ bool Archive::removeEntry(ArchiveEntry* entry, bool delete_entry) {
 	}
 
 	return ok;
+}
+
+/* Archive::swapEntries
+ * Swaps the entries at [index1] and [index2] in [dir]. If [dir] is
+ * not specified, the root dir is used. Returns true if the swap
+ * succeeded, false otherwise
+ *******************************************************************/
+bool Archive::swapEntries(unsigned index1, unsigned index2, ArchiveTreeNode* dir) {
+	// Get directory
+	if (!dir)
+		dir = dir_root;
+
+	// Do swap
+	if (dir->swapEntries(index1, index2)) {
+		// Announce the swap
+		announce("entries_swapped");
+
+		// Set modified
+		setModified(true);
+		
+		return true;
+	}
+	else
+		return false;
 }
 
 /* Archive::swapEntries
@@ -885,6 +985,7 @@ bool Archive::swapEntries(ArchiveEntry* entry1, ArchiveEntry* entry2) {
 	dir->swapEntries(i1, i2);
 
 	// Announce the swap
+	/*
 	MemChunk mc(16);
 	wxUIntPtr ptr1 = wxPtrToUInt(entry1);
 	wxUIntPtr ptr2 = wxPtrToUInt(entry2);
@@ -892,7 +993,8 @@ bool Archive::swapEntries(ArchiveEntry* entry1, ArchiveEntry* entry2) {
 	mc.write(&i2, sizeof(int));
 	mc.write(&ptr1, sizeof(wxUIntPtr));
 	mc.write(&ptr2, sizeof(wxUIntPtr));
-	announce("entries_swapped", mc);
+	*/
+	announce("entries_swapped");
 
 	// Set modified
 	setModified(true);
@@ -960,6 +1062,14 @@ bool Archive::renameEntry(ArchiveEntry* entry, string name) {
 	if (entry->isLocked())
 		return false;
 
+	// Announce (before actually renaming in case old name is still needed)
+	MemChunk mc;
+	int index = entryIndex(entry);
+	wxUIntPtr ptr = wxPtrToUInt(entry);
+	mc.write(&index, sizeof(int));
+	mc.write(&ptr, sizeof(wxUIntPtr));
+	announce("entry_renaming", mc);
+
 	// Rename the entry
 	entry->rename(name);
 
@@ -990,7 +1100,12 @@ bool Archive::revertEntry(ArchiveEntry* entry) {
 	// Reload entry data from the archive on disk
 	entry->setState(0);
 	entry->unloadData();
-	return loadEntryData(entry);
+	if (loadEntryData(entry)) {
+		EntryType::detectEntryType(entry);
+		return true;
+	}
+	else
+		return false;
 }
 
 /* Archive::findFirst
@@ -1033,7 +1148,7 @@ ArchiveEntry* Archive::findFirst(search_options_t& options) {
 
 		// Check namespace
 		if (!options.match_namespace.IsEmpty()) {
-			if (!s_cmpnocase(detectNamespace(entry), options.match_namespace))
+			if (!S_CMPNOCASE(detectNamespace(entry), options.match_namespace))
 				continue;
 		}
 
@@ -1111,7 +1226,7 @@ ArchiveEntry* Archive::findLast(search_options_t& options) {
 
 		// Check namespace
 		if (!options.match_namespace.IsEmpty()) {
-			if (!s_cmpnocase(detectNamespace(entry), options.match_namespace))
+			if (!S_CMPNOCASE(detectNamespace(entry), options.match_namespace))
 				continue;
 		}
 
@@ -1164,7 +1279,7 @@ vector<ArchiveEntry*> Archive::findAll(search_options_t& options) {
 
 		// Check namespace
 		if (!options.match_namespace.IsEmpty()) {
-			if (!s_cmpnocase(detectNamespace(entry), options.match_namespace))
+			if (!S_CMPNOCASE(detectNamespace(entry), options.match_namespace))
 				continue;
 		}
 

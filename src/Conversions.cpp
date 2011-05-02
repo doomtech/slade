@@ -31,7 +31,7 @@
 #include "Archive.h"
 #include "Conversions.h"
 #include "ArchiveEntry.h"
-#include "qmus2mid/qmus2mid.h"
+#include "mus2mid/mus2mid.h"
 
 
 /*******************************************************************
@@ -254,23 +254,7 @@ bool Conversions::wavToDoomSnd(MemChunk& in, MemChunk& out) {
  * Converts mus data [in] to midi, written to [out]
  *******************************************************************/
 bool Conversions::musToMidi(MemChunk& in, MemChunk& out) {
-	string tempmidi = appPath("sladetemp.mid", DIR_TEMP);
-	string tempmus = appPath("sladetemp.mus", DIR_TEMP);
-
-	// Dump mus to temp file
-	in.exportFile(tempmus);
-
-	// Run qmus2mid
-	qmus2mid(chr(tempmus), chr(tempmidi), 1, 0, 128, 0);
-
-	// Read outputted midi to MemChunk
-	out.importFile(tempmidi);
-
-	// Clean up
-	wxRemoveFile(tempmidi);
-	wxRemoveFile(tempmus);
-
-	return true;
+	return mus2mid(in, out);
 }
 
 /* Conversions::vocToWav
@@ -299,7 +283,7 @@ bool Conversions::vocToWav(MemChunk& in, MemChunk& out) {
 		size_t blocksize = READ_L24(in, i+1);
 		i+=4;
 		if (i + blocksize > e && blocktype != 0) {
-			Global::error = s_fmt("VOC file cut abruptly in block %i", blockcount);
+			Global::error = S_FMT("VOC file cut abruptly in block %i", blockcount);
 			return false;
 		}
 		blockcount++;
@@ -376,10 +360,10 @@ bool Conversions::vocToWav(MemChunk& in, MemChunk& out) {
 		case 6: // alaw
 		case 7: // ulaw
 		case 0x200: // 4 bits to 16 bits Creative ADPCM (only valid in block type 0x09)
-			Global::error = s_fmt("Unsupported codec %i in VOC file", codec);
+			Global::error = S_FMT("Unsupported codec %i in VOC file", codec);
 			return false;
 		default:
-			Global::error = s_fmt("Unknown codec %i in VOC file", codec);
+			Global::error = S_FMT("Unknown codec %i in VOC file", codec);
 			return false;
 	}
 
@@ -494,6 +478,37 @@ bool Conversions::bloodToWav(ArchiveEntry * in, MemChunk& out) {
 	out.write(&fmtchunk, sizeof(wav_fmtchunk_t));
 	out.write(&wdhdr, 8);
 	out.write(raw->getData(), raw->getSize());
+
+	return true;
+}
+
+/* Conversions::gmidToMidi
+ * Dark Forces GMID file to Standard MIDI File
+ *******************************************************************/
+bool Conversions::gmidToMidi(MemChunk& in, MemChunk& out) {
+	// Skip beginning of file and look for MThd chunk
+	// (the standard MIDI header)
+	size_t size = in.getSize();
+	if (size < 16)
+		return false;
+	if (in[0] != 'M' && in[1] != 'I' && in[2] != 'D' && in[3] != 'I' &&
+		((READ_B32(in, 4) + 8) != size))
+		return false;
+
+	size_t offset = 8;
+	bool notfound = true;
+	while (notfound) {
+		if (offset + 8 >  size)
+			return false;
+		// Look for header
+		if (in[offset] == 'M' && in[offset+1] == 'T' && in[offset+2] == 'h' && in[offset+3] == 'd')
+			notfound = false;
+		else
+			offset += (READ_B32(in, offset+4) + 8);
+	}
+
+	// Write the rest of the file
+	out.write(in.getData() + offset, size - offset);
 
 	return true;
 }

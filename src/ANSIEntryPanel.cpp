@@ -50,7 +50,7 @@ ANSIEntryPanel::ANSIEntryPanel(wxWindow* parent) : EntryPanel(parent, "ansi") {
 
 	ansi_chardata = new uint8_t[DATASIZE];
 	ansi_canvas = new ANSICanvas(this, -1);
-	sizer_main->Add(ansi_canvas->toPanel(this), 1, wxEXPAND|wxALL, 4);
+	sizer_main->Add(ansi_canvas->toPanel(this), 1, wxEXPAND, 0);
 
 	// Disable save/revert buttons
 	btn_save->Enable(false);

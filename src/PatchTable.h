@@ -7,15 +7,12 @@
 
 struct patch_t {
 	string			name;
-	ArchiveEntry*	entry;
 	vector<string>	used_in;
-
-	patch_t() { entry = NULL; }
 
 	void removeTextureUsage(string texture) {
 		vector<string>::iterator i = used_in.begin();
 		while (i != used_in.end()) {
-			if (s_cmp(texture, *i))
+			if (S_CMP(texture, *i))
 				used_in.erase(i);
 			else
 				i++;
@@ -49,7 +46,6 @@ public:
 	bool			removePatch(unsigned index);
 	bool			replacePatch(unsigned index, string newname);
 	bool			addPatch(string name, bool allow_dup = false);
-	void			updatePatchEntry(unsigned index);
 
 	bool	loadPNAMES(ArchiveEntry* pnames, Archive* parent = NULL);
 	bool	writePNAMES(ArchiveEntry* pnames);

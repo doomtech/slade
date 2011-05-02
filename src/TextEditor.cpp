@@ -70,7 +70,7 @@ FindReplaceDialog::FindReplaceDialog(wxWindow* parent) : wxMiniFrame(parent, -1,
 
 	// 'Find' text entry
 	sizer->Add(new wxStaticText(panel, -1, "Find:"), 0, wxTOP|wxLEFT|wxRIGHT, 4);
-	text_find = new wxTextCtrl(panel, -1);
+	text_find = new wxTextCtrl(panel, -1, "", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
 	sizer->Add(text_find, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
 	// Find options checkboxes
@@ -90,7 +90,7 @@ FindReplaceDialog::FindReplaceDialog(wxWindow* parent) : wxMiniFrame(parent, -1,
 
 	// 'Replace With' text entry
 	sizer->Add(new wxStaticText(panel, -1, "Replace With:"), 0, wxTOP|wxLEFT|wxRIGHT, 4);
-	text_replace = new wxTextCtrl(panel, -1);
+	text_replace = new wxTextCtrl(panel, -1, "", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
 	sizer->Add(text_replace, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
 
@@ -114,6 +114,7 @@ FindReplaceDialog::FindReplaceDialog(wxWindow* parent) : wxMiniFrame(parent, -1,
 
 	// Bind events
 	Bind(wxEVT_CLOSE_WINDOW, &FindReplaceDialog::onClose, this);
+	Bind(wxEVT_KEY_DOWN, &FindReplaceDialog::onKeyDown, this);
 
 
 	// Init layout
@@ -133,6 +134,14 @@ FindReplaceDialog::~FindReplaceDialog() {
  *******************************************************************/
 void FindReplaceDialog::onClose(wxCloseEvent& e) {
 	Show(false);
+}
+
+void FindReplaceDialog::onKeyDown(wxKeyEvent& e) {
+	// Check for ESC key
+	if (e.GetKeyCode() == WXK_ESCAPE)
+		Close();
+	else
+		e.Skip();
 }
 
 
@@ -182,10 +191,13 @@ TextEditor::TextEditor(wxWindow* parent, int id)
 	Bind(wxEVT_STC_DWELLSTART, &TextEditor::onMouseDwellStart, this);
 	Bind(wxEVT_STC_DWELLEND, &TextEditor::onMouseDwellEnd, this);
 	Bind(wxEVT_LEFT_DOWN, &TextEditor::onMouseDown, this);
+	Bind(wxEVT_RIGHT_UP, &TextEditor::onMouseUp, this);
 	Bind(wxEVT_KILL_FOCUS, &TextEditor::onFocusLoss, this);
 	dlg_fr->getBtnFindNext()->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextEditor::onFRDBtnFindNext, this);
 	dlg_fr->getBtnReplace()->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextEditor::onFRDBtnReplace, this);
 	dlg_fr->getBtnReplaceAll()->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextEditor::onFRDBtnReplaceAll, this);
+	dlg_fr->getTextFind()->Bind(wxEVT_COMMAND_TEXT_ENTER, &TextEditor::onFRDBtnFindNext, this);
+	dlg_fr->getTextReplace()->Bind(wxEVT_COMMAND_TEXT_ENTER, &TextEditor::onFRDBtnReplace, this);
 }
 
 /* TextEditor::~TextEditor
@@ -311,7 +323,7 @@ bool TextEditor::loadEntry(ArchiveEntry* entry) {
 	SetText(text);
 
 	// Update line numbers margin width
-	string numlines = s_fmt("0%d", GetNumberOfLines());
+	string numlines = S_FMT("0%d", GetNumberOfLines());
 	SetMarginWidth(0, TextWidth(wxSTC_STYLE_LINENUMBER, numlines));
 
 	return true;
@@ -617,7 +629,18 @@ void TextEditor::onKeyDown(wxKeyEvent& e) {
 			AutoCompShow(word.size(), autocomp_list);
 	}
 
-	e.Skip();
+	// Ctrl+F (find/replace)
+	else if ((e.GetModifiers() == wxMOD_CONTROL) && (e.GetKeyCode() == 'F'))
+		showFindReplaceDialog();
+
+	// F3 (repeat last find operation)
+	else if (e.GetKeyCode() == WXK_F3) {
+		wxCommandEvent e;
+		onFRDBtnFindNext(e);
+	}
+
+	else
+		e.Skip();
 }
 
 /* TextEditor::onKeyUp
@@ -632,7 +655,7 @@ void TextEditor::onKeyUp(wxKeyEvent& e) {
  *******************************************************************/
 void TextEditor::onCharAdded(wxStyledTextEvent& e) {
 	// Update line numbers margin width
-	string numlines = s_fmt("0%d", GetNumberOfLines());
+	string numlines = S_FMT("0%d", GetNumberOfLines());
 	SetMarginWidth(0, TextWidth(wxSTC_STYLE_LINENUMBER, numlines));
 
 	// Auto indent
@@ -791,6 +814,14 @@ void TextEditor::onMouseDown(wxMouseEvent& e) {
 #endif
 }
 
+void TextEditor::onMouseUp(wxMouseEvent& e) {
+	// Do nothing on right click (for now)
+	//if (e.GetButton() == wxMOUSE_BTN_RIGHT)
+	//	return;
+	//else
+		e.Skip();
+}
+
 /* TextEditor::onFocusLoss
  * Called when the text editor loses focus
  *******************************************************************/
@@ -817,7 +848,7 @@ void TextEditor::onFRDBtnFindNext(wxCommandEvent& e) {
 
 	// Do find
 	if (!findNext(find))
-		wxLogMessage(s_fmt("No text matching \"%s\" found.", chr(find)));
+		wxLogMessage(S_FMT("No text matching \"%s\" found.", CHR(find)));
 }
 
 /* TextEditor::onFRDBtnReplace
@@ -848,5 +879,5 @@ void TextEditor::onFRDBtnReplaceAll(wxCommandEvent& e) {
 
 	// Do replace all
 	int replaced = replaceAll(dlg_fr->getFindString(), dlg_fr->getReplaceString());
-	wxMessageBox(s_fmt("Replaced %d occurrences", replaced), "Replace All");
+	wxMessageBox(S_FMT("Replaced %d occurrences", replaced), "Replace All");
 }

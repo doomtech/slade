@@ -53,7 +53,15 @@ TextureEditorPanel::TextureEditorPanel(wxWindow* parent, TextureXEditor* tx_edit
 	// Init variables
 	this->tx_editor = tx_editor;
 	tex_current = NULL;
+}
 
+/* TextureEditorPanel::~TextureEditorPanel
+ * TextureEditorPanel class destructor
+ *******************************************************************/
+TextureEditorPanel::~TextureEditorPanel() {
+}
+
+void TextureEditorPanel::setupLayout() {
 	// Setup sizer
 	wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
 	SetSizer(sizer);
@@ -77,6 +85,12 @@ TextureEditorPanel::TextureEditorPanel(wxWindow* parent, TextureXEditor* tx_edit
 
 	hbox->AddStretchSpacer();
 
+	// 'Truecolour Preview' checkbox
+	cb_blend_rgba = new wxCheckBox(this, -1, "Truecolour Preview");
+	cb_blend_rgba->SetValue(false);
+	hbox->Add(cb_blend_rgba, 0, wxEXPAND|wxRIGHT, 4);
+	cb_blend_rgba->Show(false);	// Only show this on ZTextureEditorPanel
+
 	// 'Show Outside' checkbox
 	cb_draw_outside = new wxCheckBox(this, -1, "Show Outside");
 	cb_draw_outside->SetValue(true);
@@ -95,7 +109,7 @@ TextureEditorPanel::TextureEditorPanel(wxWindow* parent, TextureXEditor* tx_edit
 	sizer->Add(vbox, 0, wxEXPAND);
 
 	// Add patch controls
-	vbox->Add(createPatchControls(this), 0, wxEXPAND);
+	vbox->Add(createPatchControls(this), 1, wxEXPAND);
 
 
 	// Bind events
@@ -111,8 +125,6 @@ TextureEditorPanel::TextureEditorPanel(wxWindow* parent, TextureXEditor* tx_edit
 	text_tex_name->Bind(wxEVT_COMMAND_TEXT_UPDATED, &TextureEditorPanel::onTexNameChanged, this);
 	spin_tex_width->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &TextureEditorPanel::onTexWidthChanged, this);
 	spin_tex_height->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &TextureEditorPanel::onTexHeightChanged, this);
-	spin_tex_scalex->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &TextureEditorPanel::onTexScaleXChanged, this);
-	spin_tex_scaley->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &TextureEditorPanel::onTexScaleYChanged, this);
 	list_patches->Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &TextureEditorPanel::onPatchListSelect, this);
 	list_patches->Bind(wxEVT_COMMAND_LIST_ITEM_DESELECTED, &TextureEditorPanel::onPatchListDeSelect, this);
 	btn_patch_add->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureEditorPanel::onBtnPatchAdd, this);
@@ -123,16 +135,10 @@ TextureEditorPanel::TextureEditorPanel(wxWindow* parent, TextureXEditor* tx_edit
 	btn_patch_duplicate->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureEditorPanel::onBtnPatchDuplicate, this);
 	spin_patch_left->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &TextureEditorPanel::onPatchPositionXChanged, this);
 	spin_patch_top->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &TextureEditorPanel::onPatchPositionYChanged, this);
-	Bind(wxEVT_COMMAND_MENU_SELECTED, &TextureEditorPanel::onContextMenu, this, M_BEGIN, M_END);
+
 
 	// Init layout
 	Layout();
-}
-
-/* TextureEditorPanel::~TextureEditorPanel
- * TextureEditorPanel class destructor
- *******************************************************************/
-TextureEditorPanel::~TextureEditorPanel() {
 }
 
 /* TextureEditorPanel::createTextureControls
@@ -177,6 +183,11 @@ wxPanel* TextureEditorPanel::createTextureControls(wxWindow* parent) {
 	label_scaled_size = new wxStaticText(panel, -1, "Scaled Size: N/A");
 	gb_sizer->Add(label_scaled_size, wxGBPosition(3, 0), wxGBSpan(1, 3), wxALIGN_CENTER_VERTICAL);
 
+
+	// Bind events
+	spin_tex_scalex->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &TextureEditorPanel::onTexScaleXChanged, this);
+	spin_tex_scaley->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &TextureEditorPanel::onTexScaleYChanged, this);
+
 	return panel;
 }
 
@@ -191,8 +202,8 @@ void TextureEditorPanel::updateTextureControls() {
 	text_tex_name->SetValue(tex_current->getName());
 	spin_tex_width->SetValue(tex_current->getWidth());
 	spin_tex_height->SetValue(tex_current->getHeight());
-	spin_tex_scalex->SetValue(tex_current->getScaleX());
-	spin_tex_scaley->SetValue(tex_current->getScaleY());
+	spin_tex_scalex->SetValue(tex_current->getScaleX()*8);
+	spin_tex_scaley->SetValue(tex_current->getScaleY()*8);
 	updateTextureScaleLabel();
 }
 
@@ -216,7 +227,7 @@ void TextureEditorPanel::updateTextureScaleLabel() {
 		scaled_y /= tex_current->getScaleY();
 
 	// Update the label
-	label_scaled_size->SetLabel(s_fmt("Scaled Size: %dx%d", scaled_x, scaled_y));
+	label_scaled_size->SetLabel(S_FMT("Scaled Size: %dx%d", scaled_x, scaled_y));
 }
 
 /* TextureEditorPanel::createPatchControls
@@ -363,21 +374,13 @@ void TextureEditorPanel::updatePatchControls() {
  * Loads a TEXTUREX format texture into the editor
  *******************************************************************/
 bool TextureEditorPanel::openTexture(CTexture* tex) {
-	// Update patch entries
-	for (unsigned a = 0; a < tex->nPatches(); a++) {
-		CTPatch* patch = tex->getPatch(a);
-		patch->setEntry(tx_editor->patchTable().patchEntry(patch->getName()));
-	}
-
 	// Set as current texture
-	if (!tex_current) {
+	if (!tex_current)
 		tex_current = new CTexture();
-		listenTo(tex_current);
-	}
 	tex_current->copyTexture(tex);
 
 	// Open texture in canvas
-	tex_canvas->openTexture(tex_current, tx_editor->patchTable());
+	tex_canvas->openTexture(tex_current, tx_editor->getArchive());
 
 	// Set control values
 	updateTextureControls();
@@ -408,15 +411,17 @@ void TextureEditorPanel::addPatch() {
 		return;
 
 	// Browse for patch
-	int patch = tx_editor->browsePatch();
+	int patch = tx_editor->browsePatchTable();
 	if (patch >= 0) {
         // Add new patch
-		tex_current->addPatch(tx_editor->patchTable().patchName(patch), 0, 0, tx_editor->patchTable().patchEntry(patch));
+		tex_current->addPatch(tx_editor->patchTable().patchName(patch), 0, 0);
 
         // Update UI
         populatePatchList();
         updatePatchControls();
     }
+
+	tex_modified = true;
 }
 
 /* TextureEditorPanel::removePatch
@@ -442,6 +447,8 @@ void TextureEditorPanel::removePatch() {
 
 	// Update UI
 	updatePatchControls();
+
+	tex_modified = true;
 }
 
 /* TextureEditorPanel::patchBack
@@ -466,7 +473,9 @@ void TextureEditorPanel::patchBack() {
 
 	// Update UI
 	updatePatchControls();
-	tex_canvas->Refresh();
+	tex_canvas->redraw(true);
+
+	tex_modified = true;
 }
 
 /* TextureEditorPanel::patchForward
@@ -491,7 +500,9 @@ void TextureEditorPanel::patchForward() {
 
 	// Update UI
 	updatePatchControls();
-	tex_canvas->Refresh();
+	tex_canvas->redraw(true);
+
+	tex_modified = true;
 }
 
 /* TextureEditorPanel::replacePatch
@@ -507,11 +518,11 @@ void TextureEditorPanel::replacePatch() {
 		return;
 
 	// Browse for patch
-	int patch = tx_editor->browsePatch();
+	int patch = tx_editor->browsePatchTable();
 	if (patch >= 0) {
 		// Go through selection and replace each patch
 		for (size_t a = 0; a < selection.size(); a++)
-			tex_current->replacePatch(selection[a], tx_editor->patchTable().patchName(patch), tx_editor->patchTable().patchEntry(patch));
+			tex_current->replacePatch(selection[a], tx_editor->patchTable().patchName(patch));
 	}
 
 	// Repopulate patch list
@@ -523,6 +534,8 @@ void TextureEditorPanel::replacePatch() {
 
 	// Update UI
 	updatePatchControls();
+
+	tex_modified = true;
 }
 
 /* TextureEditorPanel::duplicatePatch
@@ -555,18 +568,55 @@ void TextureEditorPanel::duplicatePatch() {
 
 	// Update UI
 	updatePatchControls();
+
+	tex_modified = true;
 }
 
-/* TextureEditorPanel::onAnnouncement
- * Handles any announcements from the current texture
+/* TextureEditorPanel::handleAction
+ * Handles the action [id]. Returns true if the action was handled,
+ * false otherwise
  *******************************************************************/
-void TextureEditorPanel::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
-	if (announcer != tex_current)
-		return;
+bool TextureEditorPanel::handleAction(string id) {
+	// Don't handle actions if hidden
+	if (!IsShown())
+		return false;
 
-	if (event_name == "modified" || event_name == "patches_modified")
-		tex_modified = true;
+	// Only interested in actions beginning with txed_
+	if (!id.StartsWith("txed_"))
+		return false;
+
+	// Add Patch
+	if (id == "txed_patch_add")
+		addPatch();
+
+	// Remove Patch
+	else if (id == "txed_patch_remove")
+		removePatch();
+
+	// Send Patch Back
+	else if (id == "txed_patch_back")
+		patchBack();
+
+	// Bring Patch Forward
+	else if (id == "txed_patch_forward")
+		patchForward();
+
+	// Replace Patch
+	else if (id == "txed_patch_replace")
+		replacePatch();
+
+	// Duplicate Patch
+	else if (id == "txed_patch_duplicate")
+		duplicatePatch();
+
+	// Unknown action
+	else
+		return false;
+
+	// Action was handled
+	return true;
 }
+
 
 
 /*******************************************************************
@@ -585,11 +635,11 @@ void TextureEditorPanel::onZoomChanged(wxCommandEvent& e) {
 	zoom_percent -= remainder;
 
 	// Update zoom label
-	label_current_zoom->SetLabel(s_fmt("%d%%", zoom_percent));
+	label_current_zoom->SetLabel(S_FMT("%d%%", zoom_percent));
 
 	// Zoom gfx canvas and update
 	tex_canvas->setScale((double)zoom_percent * 0.01);
-	tex_canvas->Refresh();
+	tex_canvas->redraw(false);
 }
 
 /* TextureEditorPanel::onDrawOutsideChanged
@@ -600,7 +650,7 @@ void TextureEditorPanel::onDrawOutsideChanged(wxCommandEvent& e) {
 	tex_canvas->drawOutside(cb_draw_outside->GetValue());
 
 	// Update UI
-	tex_canvas->Refresh();
+	tex_canvas->redraw(false);
 }
 
 /* TextureEditorPanel::onTexCanvasMouseEvent
@@ -655,22 +705,22 @@ void TextureEditorPanel::onTexCanvasMouseEvent(wxMouseEvent& e) {
 		}
 
 		// Redraw texture canvas
-		tex_canvas->Refresh();
+		tex_canvas->redraw(false);
 	}
 
 	// RIGHT MOUSE UP
 	else if (e.RightUp()) {
 		// Create context menu
-		wxMenu* popup = new wxMenu();
-		popup->Append(M_PATCH_ADD, "Add Patch");
-		popup->Append(M_PATCH_REMOVE, "Remove Selected Patch(es)");
-		popup->Append(M_PATCH_REPLACE, "Replace Selected Patch(es)");
-		popup->Append(M_PATCH_BACK, "Send Selected Patch(es) Back");
-		popup->Append(M_PATCH_FORWARD, "Bring Selected Patch(es) Forward");
-		popup->Append(M_PATCH_DUPLICATE, "Duplicate Selected Patch(es)");
+		wxMenu popup;
+		theApp->getAction("txed_patch_add")->addToMenu(&popup);
+		theApp->getAction("txed_patch_remove")->addToMenu(&popup);
+		theApp->getAction("txed_patch_replace")->addToMenu(&popup);
+		theApp->getAction("txed_patch_back")->addToMenu(&popup);
+		theApp->getAction("txed_patch_forward")->addToMenu(&popup);
+		theApp->getAction("txed_patch_duplicate")->addToMenu(&popup);
 
 		hack_nodrag = true;
-		PopupMenu(popup);
+		PopupMenu(&popup);
 	}
 
 	// MOUSE DRAGGING
@@ -698,7 +748,7 @@ void TextureEditorPanel::onTexCanvasMouseEvent(wxMouseEvent& e) {
 
 			// Refresh texture canvas
 			tex_canvas->showGrid(true);
-			tex_canvas->Refresh();
+			tex_canvas->redraw(false);
 		}
 	}
 
@@ -812,7 +862,7 @@ void TextureEditorPanel::onTexCanvasKeyDown(wxKeyEvent& e) {
 			tex_modified = true;
 		}
 
-		tex_canvas->Refresh();
+		tex_canvas->redraw(true);
 		handled = true;
 	}
 
@@ -827,6 +877,8 @@ void TextureEditorPanel::onTexNameChanged(wxCommandEvent& e) {
 	// Change texture name
 	if (tex_current)
 		tex_current->setName(text_tex_name->GetValue());
+
+	tex_modified = true;
 }
 
 /* TextureEditorPanel::onTexWidthChanged
@@ -838,8 +890,10 @@ void TextureEditorPanel::onTexWidthChanged(wxSpinEvent &e) {
 		tex_current->setWidth(spin_tex_width->GetValue());
 
 	// Update UI
-	tex_canvas->Refresh();
+	tex_canvas->redraw(true);
 	updateTextureScaleLabel();
+
+	tex_modified = true;
 }
 
 /* TextureEditorPanel::onTexHeightChanged
@@ -851,8 +905,10 @@ void TextureEditorPanel::onTexHeightChanged(wxSpinEvent& e) {
 		tex_current->setHeight(spin_tex_height->GetValue());
 
 	// Update UI
-	tex_canvas->Refresh();
+	tex_canvas->redraw(true);
 	updateTextureScaleLabel();
+
+	tex_modified = true;
 }
 
 /* TextureEditorPanel::onTexScaleXChanged
@@ -865,6 +921,8 @@ void TextureEditorPanel::onTexScaleXChanged(wxSpinEvent& e) {
 
 	// Update UI
 	updateTextureScaleLabel();
+
+	tex_modified = true;
 }
 
 /* TextureEditorPanel::onTexScaleYChanged
@@ -877,6 +935,8 @@ void TextureEditorPanel::onTexScaleYChanged(wxSpinEvent& e) {
 
 	// Update UI
 	updateTextureScaleLabel();
+
+	tex_modified = true;
 }
 
 /* TextureEditorPanel::onPatchListSelect
@@ -887,7 +947,7 @@ void TextureEditorPanel::onPatchListSelect(wxListEvent &e) {
 	tex_canvas->selectPatch(e.GetIndex());
 
 	// Update UI
-	tex_canvas->Refresh();
+	tex_canvas->redraw(false);
 	updatePatchControls();
 }
 
@@ -899,7 +959,7 @@ void TextureEditorPanel::onPatchListDeSelect(wxListEvent &e) {
 	tex_canvas->deSelectPatch(e.GetIndex());
 
 	// Update UI
-	tex_canvas->Refresh();
+	tex_canvas->redraw(false);
 	updatePatchControls();
 }
 
@@ -961,7 +1021,7 @@ void TextureEditorPanel::onPatchPositionXChanged(wxSpinEvent& e) {
 	patch->setOffsetX(spin_patch_left->GetValue());
 
 	// Update UI
-	tex_canvas->Refresh();
+	tex_canvas->redraw(true);
 }
 
 /* TextureEditorPanel::onPatchPositionYChanged
@@ -980,39 +1040,5 @@ void TextureEditorPanel::onPatchPositionYChanged(wxSpinEvent& e) {
 	patch->setOffsetY(spin_patch_top->GetValue());
 
 	// Update UI
-	tex_canvas->Refresh();
-}
-
-/* TextureEditorPanel::onContextMenu
- * Called when a context menu item is selected
- *******************************************************************/
-void TextureEditorPanel::onContextMenu(wxCommandEvent& e) {
-	switch (e.GetId()) {
-	case M_PATCH_ADD:
-		addPatch();
-		break;
-
-	case M_PATCH_REMOVE:
-		removePatch();
-		break;
-
-	case M_PATCH_BACK:
-		patchBack();
-		break;
-
-	case M_PATCH_FORWARD:
-		patchForward();
-		break;
-
-	case M_PATCH_REPLACE:
-		replacePatch();
-		break;
-
-	case M_PATCH_DUPLICATE:
-		duplicatePatch();
-		break;
-
-	default:
-		break;
-	}
+	tex_canvas->redraw(true);
 }

@@ -6,8 +6,11 @@
 #include "TextEditorPrefsPanel.h"
 #include "TextStylePrefsPanel.h"
 #include "GeneralPrefsPanel.h"
+#include "InterfacePrefsPanel.h"
 #include "EditingPrefsPanel.h"
 #include "ACSPrefsPanel.h"
+#include "GraphicsPrefsPanel.h"
+#include "PNGPrefsPanel.h"
 #include <wx/treebook.h>
 
 class PreferencesDialog : public wxDialog {
@@ -15,10 +18,13 @@ private:
 	wxTreebook*	tree_prefs;
 
 	GeneralPrefsPanel*		panel_general;
+	InterfacePrefsPanel*	panel_interface;
 	EditingPrefsPanel*		panel_editing;
 	TextEditorPrefsPanel*	panel_text_editor;
 	TextStylePrefsPanel*	panel_text_styles;
 	ACSPrefsPanel*			panel_script_acs;
+	GraphicsPrefsPanel*		panel_gfx_prefs;
+	PNGPrefsPanel*			panel_gfx_png;
 
 	// Base Resource Archive
 	BaseResourceArchivesPanel*	panel_bra;

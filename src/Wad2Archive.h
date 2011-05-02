@@ -5,7 +5,7 @@
 #include "Archive.h"
 
 // From http://www.gamers.org/dEngine/quake/spec/quake-spec31.html#CWADF
-typedef struct
+struct wad2entry_t
 {
 	long offset;                 // Position of the entry in WAD
 	long dsize;                  // Size of the entry in WAD file
@@ -14,10 +14,11 @@ typedef struct
 	char cmprs;                  // Compression. 0 if none.
 	short dummy;                 // Not used
 	char name[16];               // 1 to 16 characters, '\0'-padded
-} wad2entry_t;
+};
 
 class Wad2Archive : public TreelessArchive {
 private:
+	bool	wad3;
 
 public:
 	Wad2Archive();
@@ -27,14 +28,9 @@ public:
 	string	getFileExtensionString();
 	string	getFormat();
 
-	// Opening
-	bool	open(string filename);		// Open from File
-	bool	open(ArchiveEntry* entry);	// Open from ArchiveEntry
-	bool	open(MemChunk& mc);			// Open from MemChunk
-
-	// Writing/Saving
+	// Opening/writing
+	bool	open(MemChunk& mc);							// Open from MemChunk
 	bool	write(MemChunk& mc, bool update = true);	// Write to MemChunk
-	bool	write(string filename, bool update = true);	// Write to File
 
 	// Misc
 	bool		loadEntryData(ArchiveEntry* entry);

@@ -86,12 +86,11 @@ DefaultEntryPanel::DefaultEntryPanel(wxWindow* parent)
 
 	// Add 'Edit as Text' button
 	btn_edit_text = new wxButton(this, -1, "Edit as Text");
-	sizer_bottom->AddStretchSpacer(1);
-	sizer_bottom->Add(btn_edit_text, 0, wxEXPAND, 0);
+	sizer_top->Add(btn_edit_text, 0, wxEXPAND|wxRIGHT, 4);
 
 	// Add 'View as Hex' button
 	btn_view_hex = new wxButton(this, -1, "View as Hex");
-	sizer_bottom->Add(btn_view_hex, 0, wxEXPAND|wxLEFT, 4);
+	sizer_top->Add(btn_view_hex, 0, wxEXPAND|wxRIGHT, 4);
 
 	// Bind events
 	btn_gfx_convert->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &DefaultEntryPanel::onBtnGfxConvert, this);
@@ -112,8 +111,8 @@ DefaultEntryPanel::~DefaultEntryPanel() {
  *******************************************************************/
 bool DefaultEntryPanel::loadEntry(ArchiveEntry* entry) {
 	// Update labels
-	label_type->SetLabel(s_fmt("Entry Type: %s", chr(entry->getTypeString())));
-	label_size->SetLabel(s_fmt("Entry Size: %d bytes", entry->getSize()));
+	label_type->SetLabel(S_FMT("Entry Type: %s", CHR(entry->getTypeString())));
+	label_size->SetLabel(S_FMT("Entry Size: %d bytes", entry->getSize()));
 
 	// Show edit buttons
 	btn_edit_text->Show(true);
@@ -148,11 +147,11 @@ bool DefaultEntryPanel::loadEntry(ArchiveEntry* entry) {
  *******************************************************************/
 bool DefaultEntryPanel::loadEntries(vector<ArchiveEntry*>& entries) {
 	// Update labels
-	label_type->SetLabel(s_fmt("%d selected entries", entries.size()));
+	label_type->SetLabel(S_FMT("%d selected entries", entries.size()));
 	unsigned size = 0;
 	for (unsigned a = 0; a < entries.size(); a++)
 		size += entries[a]->getSize();
-	label_size->SetLabel(s_fmt("Total Size: %s", chr(Misc::sizeAsString(size))));
+	label_size->SetLabel(S_FMT("Total Size: %s", CHR(Misc::sizeAsString(size))));
 
 	// Hide edit buttons
 	btn_edit_text->Show(false);

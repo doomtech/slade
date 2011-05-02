@@ -6,7 +6,9 @@
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
  * Filename:    Wad2Archive.cpp
- * Description: Wad2Archive, archive class to handle the Quake wad2 format
+ * Description: Wad2Archive, archive class to handle the Quake wad2
+ *				format, which is also the same as the Unreal/Half-Life
+ *				wad3 format except for one character in the header.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -48,6 +50,8 @@ EXTERN_CVAR(Bool, wad_force_uppercase)
  * Wad2Archive class constructor
  *******************************************************************/
 Wad2Archive::Wad2Archive() : TreelessArchive(ARCHIVE_WAD2) {
+	// Init variables
+	wad3 = false;
 }
 
 /* Wad2Archive::~Wad2Archive
@@ -68,46 +72,6 @@ string Wad2Archive::getFileExtensionString() {
  *******************************************************************/
 string Wad2Archive::getFormat() {
 	return "archive_wad2";
-}
-
-/* Wad2Archive::open
- * Reads a wad format file from disk
- * Returns true if successful, false otherwise
- *******************************************************************/
-bool Wad2Archive::open(string filename) {
-	// Read the file into a MemChunk
-	MemChunk mc;
-	if (!mc.importFile(filename)) {
-		Global::error = "Unable to open file. Make sure it isn't in use by another program.";
-		return false;
-	}
-
-	// Load from MemChunk
-	if (open(mc)) {
-		// Update variables
-		this->filename = filename;
-		this->on_disk = true;
-
-		return true;
-	}
-	else
-		return false;
-}
-
-/* Wad2Archive::open
- * Reads wad format data from an ArchiveEntry
- * Returns true if successful, false otherwise
- *******************************************************************/
-bool Wad2Archive::open(ArchiveEntry* entry) {
-	// Load from entry's data
-	if (entry && open(entry->getMCData())) {
-		// Update variables and return success
-		parent = entry;
-		parent->lock();
-		return true;
-	}
-	else
-		return false;
 }
 
 /* Wad2Archive::open
@@ -133,11 +97,14 @@ bool Wad2Archive::open(MemChunk& mc) {
 	dir_offset = wxINT32_SWAP_ON_BE(dir_offset);
 
 	// Check the header
-	if (wad_type[0] != 'W' || wad_type[1] != 'A' || wad_type[2] != 'D' || wad_type[3] != '2') {
+	if (wad_type[0] != 'W' || wad_type[1] != 'A' || wad_type[2] != 'D' ||
+			(wad_type[3] != '2' && wad_type[3] != '3')) {
 		wxLogMessage("Wad2Archive::open: Invalid header");
 		Global::error = "Invalid wad2 header";
 		return false;
 	}
+	if (wad_type[3] == '3')
+		wad3 = true;
 
 	// Stop announcements (don't want to be announcing modification due to entries being added etc)
 	setMuted(true);
@@ -223,19 +190,6 @@ bool Wad2Archive::open(MemChunk& mc) {
 }
 
 /* Wad2Archive::write
- * Writes the wad archive to a file
- * Returns true if successful, false otherwise
- *******************************************************************/
-bool Wad2Archive::write(string filename, bool update) {
-	// Write to a MemChunk, then export it to a file
-	MemChunk mc;
-	if (write(mc, true))
-		return mc.exportFile(filename);
-	else
-		return false;
-}
-
-/* Wad2Archive::write
  * Writes the wad archive to a MemChunk
  * Returns true if successful, false otherwise
  *******************************************************************/
@@ -256,6 +210,7 @@ bool Wad2Archive::write(MemChunk& mc, bool update) {
 
 	// Setup wad type
 	char wad_type[4] = { 'W', 'A', 'D', '2' };
+	if (wad3) wad_type[3] = '3';
 
 	// Write the header
 	uint32_t num_lumps = numEntries();
@@ -276,7 +231,7 @@ bool Wad2Archive::write(MemChunk& mc, bool update) {
 		// Setup directory entry
 		wad2entry_t info;
 		memset(info.name, 0, 16);
-		memcpy(info.name, chr(entry->getName()), entry->getName().Len());
+		memcpy(info.name, CHR(entry->getName()), entry->getName().Len());
 		info.cmprs = (bool)entry->exProp("W2Comp");
 		info.dsize = entry->getSize();
 		info.size = entry->getSize();
@@ -314,7 +269,7 @@ bool Wad2Archive::loadEntryData(ArchiveEntry* entry) {
 
 	// Check if opening the file failed
 	if (!file.IsOpened()) {
-		wxLogMessage("WadArchive::loadEntryData: Failed to open wadfile %s", filename.c_str());
+		wxLogMessage("Wad2Archive::loadEntryData: Failed to open wadfile %s", filename.c_str());
 		return false;
 	}
 
@@ -392,7 +347,7 @@ bool Wad2Archive::isWad2Archive(MemChunk& mc) {
 		return false;
 
 	// Check for IWAD/PWAD header
-	if (mc[0] != 'W' || mc[1] != 'A' || mc[2] != 'D' || mc[3] != '2')
+	if (mc[0] != 'W' || mc[1] != 'A' || mc[2] != 'D' || (mc[3] != '2' && mc[3] != '3'))
 		return false;
 
 	// Get number of lumps and directory offset
@@ -434,7 +389,7 @@ bool Wad2Archive::isWad2Archive(string filename) {
 	file.Read(header, 4);
 
 	// Check for IWAD/PWAD header
-	if (header[0] != 'W' || header[1] != 'A' || header[2] != 'D' || header[3] != '2')
+	if (header[0] != 'W' || header[1] != 'A' || header[2] != 'D' || (header[3] != '2' && header[3] != '3'))
 		return false;
 
 	// Get number of lumps and directory offset

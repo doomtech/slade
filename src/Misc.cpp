@@ -34,7 +34,10 @@
 #include "EntryDataFormat.h"
 #include "WadArchive.h"
 #include "ZipArchive.h"
+#include "Console.h"
+#include "SIFormat.h"
 #include <wx/filename.h>
+#include "zlib/zlib.h"
 
 /*******************************************************************
  * VARIABLES
@@ -63,79 +66,97 @@ bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry, int index) {
 		return false;
 	}
 
-	// Load depending on format
+	// Firstly try SIFormat system
+	if (image->open(entry->getMCData(), index))
+		return true;
+
+	// Raw images are a special case (not reliably possible to detect just from data)
 	string format = entry->getType()->getFormat();
-	if (s_cmpnocase(format, "img_doom"))
+	if (format == "img_raw" && SIFormat::rawFormat()->isThisFormat(entry->getMCData()))
+		return SIFormat::rawFormat()->loadImage(*image, entry->getMCData());
+
+
+
+	// Otherwise use old loading stuff
+	if (S_CMPNOCASE(format, "img_doom"))
 		return image->loadDoomGfx(entry->getData(), entry->getSize());
-	else if (s_cmpnocase(format, "img_doom_alpha"))
+	else if (S_CMPNOCASE(format, "img_doom_alpha"))
 		return image->loadDoomGfxA(entry->getData(), entry->getSize());
-	else if (s_cmpnocase(format, "img_doom_beta"))
+	else if (S_CMPNOCASE(format, "img_doom_beta"))
 		return image->loadDoomGfxB(entry->getData(), entry->getSize());
-	else if (s_cmpnocase(format, "img_doom_snea"))
+	else if (S_CMPNOCASE(format, "img_doom_snea"))
 		return image->loadDoomSnea(entry->getData(), entry->getSize());
-	else if (s_cmpnocase(format, "img_doom_arah")) {
+	else if (S_CMPNOCASE(format, "img_doom_arah")) {
 		int transindex = (entry->getType()->extraProps().propertyExists("zerotransparent")) ?  0 : 255;
 		return image->loadDoomArah(entry->getData(), entry->getSize(), transindex);
 	}
-	else if (s_cmpnocase(format, "img_imgz"))
+	else if (S_CMPNOCASE(format, "img_imgz"))
 		return image->loadImgz(entry->getData(), entry->getSize());
-	else if (s_cmpnocase(format, "img_quake"))
+	else if (S_CMPNOCASE(format, "img_quake"))
 		return image->loadQuake(entry->getData(), entry->getSize());
-	else if (s_cmpnocase(format, "img_planar"))
+	else if (S_CMPNOCASE(format, "img_qspr"))
+		return image->loadQuakeSprite(entry->getData(), entry->getSize(), index);
+	else if (S_CMPNOCASE(format, "img_quaketex"))
+		return image->loadQuakeTex(entry->getData(), entry->getSize(), index);
+	else if (S_CMPNOCASE(format, "img_quake2wal"))
+		return image->loadQuakeIIWal(entry->getData(), entry->getSize(), index);
+	else if (S_CMPNOCASE(format, "img_planar"))
 		return image->loadPlanar(entry->getData(), entry->getSize());
-	else if (s_cmpnocase(format, "img_4bitchunk"))
+	else if (S_CMPNOCASE(format, "img_4bitchunk"))
 		return image->load4bitChunk(entry->getData(), entry->getSize());
-	else if (s_cmpnocase(format, "img_raw"))
+	else if (S_CMPNOCASE(format, "img_raw"))
 		return image->loadDoomFlat(entry->getData(), entry->getSize());
-	else if (s_cmpnocase(format, "font_doom_alpha"))
+	else if (S_CMPNOCASE(format, "font_doom_alpha"))
 		return image->loadFont0(entry->getData(), entry->getSize());
-	else if (s_cmpnocase(format, "font_zd_console"))
+	else if (S_CMPNOCASE(format, "font_zd_console"))
 		return image->loadFont1(entry->getData(), entry->getSize());
-	else if (s_cmpnocase(format, "font_zd_big"))
+	else if (S_CMPNOCASE(format, "font_zd_big"))
 		return image->loadFont2(entry->getData(), entry->getSize());
-	else if (s_cmpnocase(format, "font_bmf"))
+	else if (S_CMPNOCASE(format, "font_bmf"))
 		return image->loadBMF(entry->getData(), entry->getSize());
-	else if (s_cmpnocase(format, "font_mono"))
+	else if (S_CMPNOCASE(format, "font_mono"))
 		return image->loadFontM(entry->getData(), entry->getSize());
-	else if (s_cmpnocase(format, "img_scsprite"))
+	else if (S_CMPNOCASE(format, "img_scsprite"))
 		return image->loadSCSprite(entry->getData(), entry->getSize());
-	else if (s_cmpnocase(format, "img_scwall"))
+	else if (S_CMPNOCASE(format, "img_scwall"))
 		return image->loadSCWall(entry->getData(), entry->getSize());
-	else if (s_cmpnocase(format, "img_rott"))
+	else if (S_CMPNOCASE(format, "img_rott"))
 		return image->loadRottGfx(entry->getData(), entry->getSize(), false);
-	else if (s_cmpnocase(format, "img_rottmask"))
+	else if (S_CMPNOCASE(format, "img_rottmask"))
 		return image->loadRottGfx(entry->getData(), entry->getSize(), true);
-	else if (s_cmpnocase(format, "img_rottwall"))
+	else if (S_CMPNOCASE(format, "img_rottwall"))
 		return image->loadDoomFlat(entry->getData(), entry->getSize(), true);
-	else if (s_cmpnocase(format, "img_rottlbm"))
+	else if (S_CMPNOCASE(format, "img_rottlbm"))
 		return image->loadRottLbm(entry->getData(), entry->getSize());
-	else if (s_cmpnocase(format, "img_rottraw"))
+	else if (S_CMPNOCASE(format, "img_rottraw"))
 		return image->loadRottRaw(entry->getData(), entry->getSize());
-	else if (s_cmpnocase(format, "img_rottpic"))
+	else if (S_CMPNOCASE(format, "img_rottpic"))
 		return image->loadRottPic(entry->getData(), entry->getSize());
-	else if (s_cmpnocase(format, "img_wolfpic"))
+	else if (S_CMPNOCASE(format, "img_wolfpic"))
 		return image->loadWolfPic(entry->getData(), entry->getSize());
-	else if (s_cmpnocase(format, "img_wolfsprite"))
+	else if (S_CMPNOCASE(format, "img_wolfsprite"))
 		return image->loadWolfSprite(entry->getData(), entry->getSize());
-	else if (s_cmpnocase(format, "font_wolf"))
+	else if (S_CMPNOCASE(format, "font_wolf"))
 		return image->loadWolfFont(entry->getData(), entry->getSize());
-	else if (s_cmpnocase(format, "img_mipimage"))
+	else if (S_CMPNOCASE(format, "img_mipimage"))
 		return image->loadAnaMip(entry->getData(), entry->getSize());
-	else if (s_cmpnocase(format, "img_arttile"))
+	else if (S_CMPNOCASE(format, "img_arttile"))
 		return image->loadBuildTile(entry->getData(), entry->getSize(), index);
-	else if (s_cmpnocase(format, "img_m8"))
+	else if (S_CMPNOCASE(format, "img_m8"))
 		return image->loadHeretic2M8(entry->getData(), entry->getSize(), index);
-	else if (s_cmpnocase(format, "img_m32"))
+	else if (S_CMPNOCASE(format, "img_m32"))
 		return image->loadHeretic2M32(entry->getData(), entry->getSize(), index);
-	else if (s_cmpnocase(format, "img_jedi_bm"))
+	else if (S_CMPNOCASE(format, "img_hlt"))
+		return image->loadHalfLifeTex(entry->getData(), entry->getSize(), index);
+	else if (S_CMPNOCASE(format, "img_jedi_bm"))
 		return image->loadJediBM(entry->getData(), entry->getSize(), index);
-	else if (s_cmpnocase(format, "img_jedi_fme"))
+	else if (S_CMPNOCASE(format, "img_jedi_fme"))
 		return image->loadJediFME(entry->getData(), entry->getSize());
-	else if (s_cmpnocase(format, "img_jedi_wax"))
+	else if (S_CMPNOCASE(format, "img_jedi_wax"))
 		return image->loadJediWAX(entry->getData(), entry->getSize(), index);
-	else if (s_cmpnocase(format, "font_jedi_fnt"))
+	else if (S_CMPNOCASE(format, "font_jedi_fnt"))
 		return image->loadJediFNT(entry->getData(), entry->getSize());
-	else if (s_cmpnocase(format, "font_jedi_font"))
+	else if (S_CMPNOCASE(format, "font_jedi_font"))
 		return image->loadJediFONT(entry->getData(), entry->getSize());
 	else {
 		if (!image->loadImage(entry->getData(true), entry->getSize())) {
@@ -225,12 +246,26 @@ bool Misc::loadPaletteFromArchive(Palette8bit* pal, Archive* archive, int lump) 
 	else if (lump >= PAL_SODENDHACK) {
 		int endscreen = lump - PAL_SODENDHACK;
 		endscreen += 154;
-		string palname = s_fmt("PAL%05d", endscreen);
+		string palname = S_FMT("PAL%05d", endscreen);
 		playpal = archive->getEntry(palname, true);
 		sixbit = true;
 	}
-	if (!playpal || playpal->getSize() < 768)
-		playpal = archive->getEntry("PLAYPAL", true), sixbit = false;
+	if (!playpal || playpal->getSize() < 768) {
+		// Search archive for any palette
+		Archive::search_options_t opt;
+
+		// Search "PLAYPAL" first
+		opt.match_type = EntryType::getType("palette");
+		opt.match_name = "PLAYPAL";
+		opt.search_subdirs = true;
+		playpal = archive->findFirst(opt);
+
+		// Otherwise any palette will do
+		if (!playpal) {
+			opt.match_name = "";
+			playpal = archive->findFirst(opt);
+		}
+	}
 	if (!playpal || playpal->getSize() < 768)
 		playpal = archive->getEntry("PAL", true);
 
@@ -266,15 +301,15 @@ bool Misc::loadPaletteFromArchive(Palette8bit* pal, Archive* archive, int lump) 
  *******************************************************************/
 string Misc::sizeAsString(uint32_t size) {
 	if (size < 1024 || !size_as_string) {
-		return s_fmt("%d", size);
+		return S_FMT("%d", size);
 	}
 	else if (size < 1024*1024) {
 		double kb = (double)size / 1024;
-		return s_fmt("%1.2fkb", kb);
+		return S_FMT("%1.2fkb", kb);
 	}
 	else {
 		double mb = (double)size / (1024*1024);
-		return s_fmt("%1.2fmb", mb);
+		return S_FMT("%1.2fmb", mb);
 	}
 }
 
@@ -347,10 +382,49 @@ void Misc::doMassRename(wxArrayString& names, string name_filter) {
 	}
 }
 
+/* Misc::rgbToHsl
+ * Converts a colour from RGB to HSL colourspace
+ *******************************************************************/
+hsl_t Misc::rgbToHsl(double r, double g, double b) {
+	hsl_t ret;
+	double v_min = MIN(r, MIN(g, b));
+	double v_max = MAX(r, MAX(g, b));
+	double delta = v_max - v_min;
+
+	// Determine V
+	ret.l = (v_max + v_min) * 0.5;
+
+	if (delta == 0)
+		ret.h = ret.s = 0;		// Grey (r==g==b)
+	else {
+		// Determine S
+		if (ret.l < 0.5)
+			ret.s = delta / (v_max + v_min);
+		else
+			ret.s = delta / (2.0 - v_max - v_min);
+
+		// Determine H
+		if (r == v_max)
+			ret.h = (g - b) / delta;
+		else if (g == v_max)
+			ret.h = 2.0 + (b - r) / delta;
+		else if (b == v_max)
+			ret.h = 4.0 + (r - g) / delta;
+
+		ret.h /= 6.0;
+
+		if (ret.h < 0)
+			ret.h += 1.0;
+	}
+
+	return ret;
+}
 
 
 
-// CRC stuff
+
+
+// CRC-32 stuff
 
 /* Table of CRCs of all 8-bit messages. */
 uint32_t crc_table[256];
@@ -383,7 +457,7 @@ void make_crc_table(void) {
 should be initialized to all 1's, and the transmitted value
 is the 1's complement of the final running CRC (see the
 crc() routine below)). */
-uint32_t update_crc(uint32_t crc, uint8_t *buf, uint32_t len) {
+uint32_t update_crc(uint32_t crc, const uint8_t *buf, uint32_t len) {
 	uint32_t c = crc;
 
 	if (!crc_table_computed)
@@ -396,6 +470,6 @@ uint32_t update_crc(uint32_t crc, uint8_t *buf, uint32_t len) {
 }
 
 /* Return the CRC of the bytes buf[0..len-1]. */
-uint32_t Misc::crc(uint8_t *buf, uint32_t len) {
+uint32_t Misc::crc(const uint8_t *buf, uint32_t len) {
 	return update_crc(0xffffffffL, buf, len) ^ 0xffffffffL;
 }

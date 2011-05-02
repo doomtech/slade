@@ -91,46 +91,6 @@ string ResArchive::getFormat() {
 	return "archive_res";
 }
 
-/* ResArchive::open
- * Reads a res format file from disk
- * Returns true if successful, false otherwise
- *******************************************************************/
-bool ResArchive::open(string filename) {
-	// Read the file into a MemChunk
-	MemChunk mc;
-	if (!mc.importFile(filename)) {
-		Global::error = "Unable to open file. Make sure it isn't in use by another program.";
-		return false;
-	}
-
-	// Load from MemChunk
-	if (open(mc)) {
-		// Update variables
-		this->filename = filename;
-		this->on_disk = true;
-
-		return true;
-	}
-	else
-		return false;
-}
-
-/* ResArchive::open
- * Reads res format data from an ArchiveEntry
- * Returns true if successful, false otherwise
- *******************************************************************/
-bool ResArchive::open(ArchiveEntry* entry) {
-	// Load from entry's data
-	if (entry && open(entry->getMCData())) {
-		// Update variables and return success
-		parent = entry;
-		parent->lock();
-		return true;
-	}
-	else
-		return false;
-}
-
 /* ResArchive::readDirectory
  * Reads a res directory from a MemChunk
  * Returns true if successful, false otherwise
@@ -206,7 +166,7 @@ bool ResArchive::readDirectory(MemChunk& mc, size_t dir_offset, size_t num_lumps
 		if (isResArchive(nlump->getMCData(), d_o, n_l)) {
 			ArchiveTreeNode * ndir = createDir(name, parent);
 			if (ndir) {
-				theSplashWindow->setProgressMessage(s_fmt("Reading res archive data: %s directory", name));
+				theSplashWindow->setProgressMessage(S_FMT("Reading res archive data: %s directory", name));
 				// Save offset to restore it once the recursion is done
 				size_t myoffset = mc.currentPos();
 				readDirectory(mc, d_o, n_l, ndir);
@@ -288,19 +248,6 @@ bool ResArchive::open(MemChunk& mc) {
 	theSplashWindow->setProgressMessage("");
 
 	return true;
-}
-
-/* ResArchive::write
- * Writes the res archive to a file
- * Returns true if successful, false otherwise
- *******************************************************************/
-bool ResArchive::write(string filename, bool update) {
-	// Write to a MemChunk, then export it to a file
-/*	MemChunk mc;
-	if (write(mc, true))
-		return mc.exportFile(filename);
-	else*/
-		return false;
 }
 
 /* ResArchive::write

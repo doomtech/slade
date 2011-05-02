@@ -82,46 +82,6 @@ string DatArchive::getFormat() {
 }
 
 /* DatArchive::open
- * Reads a wad format file from disk
- * Returns true if successful, false otherwise
- *******************************************************************/
-bool DatArchive::open(string filename) {
-	// Read the file into a MemChunk
-	MemChunk mc;
-	if (!mc.importFile(filename)) {
-		Global::error = "Unable to open file. Make sure it isn't in use by another program.";
-		return false;
-	}
-
-	// Load from MemChunk
-	if (open(mc)) {
-		// Update variables
-		this->filename = filename;
-		this->on_disk = true;
-
-		return true;
-	}
-	else
-		return false;
-}
-
-/* DatArchive::open
- * Reads wad format data from an ArchiveEntry
- * Returns true if successful, false otherwise
- *******************************************************************/
-bool DatArchive::open(ArchiveEntry* entry) {
-	// Load from entry's data
-	if (entry && open(entry->getMCData())) {
-		// Update variables and return success
-		parent = entry;
-		parent->lock();
-		return true;
-	}
-	else
-		return false;
-}
-
-/* DatArchive::open
  * Reads wad format data from a MemChunk
  * Returns true if successful, false otherwise
  *******************************************************************/
@@ -175,7 +135,7 @@ bool DatArchive::open(MemChunk& mc) {
 		// If the lump data goes past the directory,
 		// the data file is invalid
 		if (offset + size > mc.getSize()) {
-			wxLogMessage("DatArchive::open: Dat archive is invalid or corrupt");
+			wxLogMessage("DatArchive::open: Dat archive is invalid or corrupt at entry %i", d);
 			Global::error = "Archive is invalid and/or corrupt";
 			setMuted(false);
 			return false;
@@ -191,7 +151,7 @@ bool DatArchive::open(MemChunk& mc) {
 		}
 		else
 		{
-			myname = s_fmt("%s+%d", lastname, ++namecount);
+			myname = S_FMT("%s+%d", lastname, ++namecount);
 		}
 
 		// Create & setup lump
@@ -346,21 +306,21 @@ ArchiveEntry* DatArchive::addEntry(ArchiveEntry* entry, unsigned position, Archi
  *******************************************************************/
 ArchiveEntry* DatArchive::addEntry(ArchiveEntry* entry, string add_namespace, bool copy) {
 	// Find requested namespace, only three non-global namespaces are valid in this format
-	if (s_cmpnocase(add_namespace, "textures")) {
+	if (S_CMPNOCASE(add_namespace, "textures")) {
 		if (walls[1] >= 0) return addEntry(entry, walls[1], NULL, copy);
 		else {
 			addNewEntry("startwalls");
 			addNewEntry("endwalls");
 			return addEntry(entry, add_namespace, copy);
 		}
-	} else if (s_cmpnocase(add_namespace, "flats")) {
+	} else if (S_CMPNOCASE(add_namespace, "flats")) {
 		if (flats[1] >= 0) return addEntry(entry, flats[1], NULL, copy);
 		else {
 			addNewEntry("startflats");
 			addNewEntry("endflats");
 			return addEntry(entry, add_namespace, copy);
 		}
-	} else if (s_cmpnocase(add_namespace, "sprites")) {
+	} else if (S_CMPNOCASE(add_namespace, "sprites")) {
 		if (sprites[1] >= 0) return addEntry(entry, sprites[1], NULL, copy);
 		else {
 			addNewEntry("startsprites");
@@ -463,19 +423,6 @@ bool DatArchive::moveEntry(ArchiveEntry* entry, unsigned position, ArchiveTreeNo
 
 		return true;
 	}
-	else
-		return false;
-}
-
-/* DatArchive::write
- * Writes the dat archive to a file
- * Returns true if successful, false otherwise
- *******************************************************************/
-bool DatArchive::write(string filename, bool update) {
-	// Write to a MemChunk, then export it to a file
-	MemChunk mc;
-	if (write(mc, true))
-		return mc.exportFile(filename);
 	else
 		return false;
 }
@@ -659,7 +606,7 @@ bool DatArchive::isDatArchive(MemChunk& mc) {
 		return false;
 	for (size_t i = start; (mc[i] != 0 && i < mc.getSize()); ++i, ++len) {
 		// Names should not contain garbage characters
-		if (mc[i] < 32)
+		if (mc[i] < 32 || mc[i] > 126)
 			return false;
 	}
 	// Let's be reasonable here. While names aren't limited, if it's too long, it's suspicious.
@@ -735,7 +682,7 @@ bool DatArchive::isDatArchive(string filename) {
 		if (temp == 0)
 			break;
 		// Names should not contain garbage characters
-		if (temp < 32)
+		if (temp < 32 || temp > 126)
 			return false;
 	}
 	// Let's be reasonable here. While names aren't limited, if it's too long, it's suspicious.

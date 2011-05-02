@@ -62,6 +62,16 @@ public:
 	}
 };
 
+class BSPDataFormat : public EntryDataFormat {
+public:
+	BSPDataFormat() : EntryDataFormat("archive_bsp") {};
+	~BSPDataFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		return BSPArchive::isBSPArchive(mc) ? EDF_TRUE : EDF_FALSE;
+	}
+};
+
 class Wad2DataFormat : public EntryDataFormat {
 public:
 	Wad2DataFormat() : EntryDataFormat("archive_wad2") {}
@@ -122,6 +132,26 @@ public:
 	}
 };
 
+class ADatDataFormat : public EntryDataFormat {
+public:
+	ADatDataFormat() : EntryDataFormat("archive_adat") {};
+	~ADatDataFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		return ADatArchive::isADatArchive(mc) ? EDF_TRUE : EDF_FALSE;
+	}
+};
+
+class HogDataFormat : public EntryDataFormat {
+public:
+	HogDataFormat() : EntryDataFormat("archive_hog") {};
+	~HogDataFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		return HogArchive::isHogArchive(mc) ? EDF_TRUE : EDF_FALSE;
+	}
+};
+
 class WolfDataFormat : public EntryDataFormat {
 public:
 	WolfDataFormat() : EntryDataFormat("archive_wolf") {};
@@ -129,6 +159,36 @@ public:
 
 	int isThisFormat(MemChunk& mc) {
 		return WolfArchive::isWolfArchive(mc) ? EDF_TRUE : EDF_FALSE;
+	}
+};
+
+class GZipDataFormat : public EntryDataFormat {
+public:
+	GZipDataFormat() : EntryDataFormat("archive_gzip") {};
+	~GZipDataFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		return GZipArchive::isGZipArchive(mc) ? EDF_TRUE : EDF_FALSE;
+	}
+};
+
+class BZip2DataFormat : public EntryDataFormat {
+public:
+	BZip2DataFormat() : EntryDataFormat("archive_bz2") {};
+	~BZip2DataFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		return BZip2Archive::isBZip2Archive(mc) ? EDF_TRUE : EDF_FALSE;
+	}
+};
+
+class TarDataFormat : public EntryDataFormat {
+public:
+	TarDataFormat() : EntryDataFormat("archive_tar") {};
+	~TarDataFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		return TarArchive::isTarArchive(mc) ? EDF_TRUE : EDF_FALSE;
 	}
 };
 

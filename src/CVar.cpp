@@ -70,16 +70,16 @@ void dump_cvars() {
 	for (uint16_t c = 0; c < n_cvars; c++) {
 		if (!(cvars[c]->flags & CVAR_SECRET)) {
 			if (cvars[c]->type == CVAR_INTEGER)
-				printf("%s %d\n", chr(cvars[c]->name), cvars[c]->GetValue().Int);
+				printf("%s %d\n", CHR(cvars[c]->name), cvars[c]->GetValue().Int);
 
 			if (cvars[c]->type == CVAR_BOOLEAN)
-				printf("%s %d\n", chr(cvars[c]->name), cvars[c]->GetValue().Bool);
+				printf("%s %d\n", CHR(cvars[c]->name), cvars[c]->GetValue().Bool);
 
 			if (cvars[c]->type == CVAR_FLOAT)
-				printf("%s %1.2f\n", chr(cvars[c]->name), cvars[c]->GetValue().Float);
+				printf("%s %1.2f\n", CHR(cvars[c]->name), cvars[c]->GetValue().Float);
 
 			if (cvars[c]->type == CVAR_STRING)
-				printf("%s \"%s\"\n", chr(cvars[c]->name), chr(((CStringCVar *)cvars[c])->value));
+				printf("%s \"%s\"\n", CHR(cvars[c]->name), CHR(((CStringCVar *)cvars[c])->value));
 		}
 	}
 }
@@ -108,22 +108,22 @@ void save_cvars(wxFile& file) {
 
 	for (uint32_t c = 0; c < n_cvars; c++) {
 		if (cvars[c]->flags & CVAR_SAVE) {
-			file.Write(s_fmt("\t%s ", chr(cvars[c]->name)));
+			file.Write(S_FMT("\t%s ", CHR(cvars[c]->name)));
 
 			int spaces = max_size - cvars[c]->name.size();
 			for (int a = 0; a < spaces; a++) file.Write(" ");
 
 			if (cvars[c]->type == CVAR_INTEGER)
-				file.Write(s_fmt("%d\n", cvars[c]->GetValue().Int));
+				file.Write(S_FMT("%d\n", cvars[c]->GetValue().Int));
 
 			if (cvars[c]->type == CVAR_BOOLEAN)
-				file.Write(s_fmt("%d\n", cvars[c]->GetValue().Bool));
+				file.Write(S_FMT("%d\n", cvars[c]->GetValue().Bool));
 
 			if (cvars[c]->type == CVAR_FLOAT)
-				file.Write(s_fmt("%1.2f\n", cvars[c]->GetValue().Float));
+				file.Write(S_FMT("%1.2f\n", cvars[c]->GetValue().Float));
 
 			if (cvars[c]->type == CVAR_STRING)
-				file.Write(s_fmt("\"%s\"\n", chr(((CStringCVar *)cvars[c])->value)));
+				file.Write(S_FMT("\"%s\"\n", CHR(((CStringCVar *)cvars[c])->value)));
 		}
 	}
 
@@ -138,13 +138,13 @@ void read_cvar(string name, string value) {
 	for (uint16_t c = 0; c < n_cvars; c++) {
 		if (name == cvars[c]->name) {
 			if (cvars[c]->type == CVAR_INTEGER)
-				*((CIntCVar *) cvars[c]) = atoi(chr(value));
+				*((CIntCVar *) cvars[c]) = atoi(CHR(value));
 
 			if (cvars[c]->type == CVAR_BOOLEAN)
-				*((CBoolCVar *) cvars[c]) = !!(atoi(chr(value)));
+				*((CBoolCVar *) cvars[c]) = !!(atoi(CHR(value)));
 
 			if (cvars[c]->type == CVAR_FLOAT)
-				*((CFloatCVar *) cvars[c]) = (float) atof(chr(value));
+				*((CFloatCVar *) cvars[c]) = (float) atof(CHR(value));
 
 			if (cvars[c]->type == CVAR_STRING)
 				*((CStringCVar *) cvars[c]) = value;

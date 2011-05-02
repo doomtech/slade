@@ -33,6 +33,7 @@
 #include "Archives.h"
 #include "Console.h"
 #include "SplashWindow.h"
+#include "ResourceManager.h"
 #include <wx/filename.h>
 
 
@@ -66,8 +67,8 @@ ArchiveManager::~ArchiveManager() {
 }
 
 /* ArchiveManager::init
- * Initialised the ArchiveManager. Opens the program resource archive
- * and the base resource archive
+ * Initialised the ArchiveManager. Finds and opens the program
+ * resource archive
  *******************************************************************/
 bool ArchiveManager::init() {
 	// Find slade3.pk3 directory
@@ -88,10 +89,14 @@ bool ArchiveManager::init() {
 	else
 		res_archive_open = true;
 
-	// Open base resource archive (if any)
-	bool bro = openBaseResource((int)base_resource);
+	return res_archive_open;
+}
 
-	return res_archive_open && bro;
+/* ArchiveManager::initBaseResource
+ * Initialises the base resource archive
+ *******************************************************************/
+bool ArchiveManager::initBaseResource() {
+	return openBaseResource((int)base_resource);
 }
 
 /* ArchiveManager::addArchive
@@ -111,6 +116,9 @@ bool ArchiveManager::addArchive(Archive* archive) {
 
 		// Announce the addition
 		announce("archive_added");
+
+		// Add to resource manager
+		theResourceManager->addArchive(archive);
 
 		return true;
 	} else
@@ -152,7 +160,7 @@ Archive* ArchiveManager::getArchive(string filename) {
 Archive* ArchiveManager::openArchive(string filename, bool manage) {
 	Archive* new_archive = getArchive(filename);
 
-	wxLogMessage(s_fmt("Opening archive %s", filename));
+	wxLogMessage(S_FMT("Opening archive %s", filename));
 
 	// If the archive is already open, just return it
 	if (new_archive) {
@@ -178,6 +186,8 @@ Archive* ArchiveManager::openArchive(string filename, bool manage) {
 		new_archive = new LibArchive();
 	else if (PakArchive::isPakArchive(filename))
 		new_archive = new PakArchive();
+	else if (BSPArchive::isBSPArchive(filename))
+		new_archive = new BSPArchive();
 	else if (GrpArchive::isGrpArchive(filename))
 		new_archive = new GrpArchive();
 	else if (RffArchive::isRffArchive(filename))
@@ -186,12 +196,22 @@ Archive* ArchiveManager::openArchive(string filename, bool manage) {
 		new_archive = new GobArchive();
 	else if (LfdArchive::isLfdArchive(filename))
 		new_archive = new LfdArchive();
+	else if (HogArchive::isHogArchive(filename))
+		new_archive = new HogArchive();
+	else if (ADatArchive::isADatArchive(filename))
+		new_archive = new ADatArchive();
 	else if (Wad2Archive::isWad2Archive(filename))
 		new_archive = new Wad2Archive();
 	else if (WadJArchive::isWadJArchive(filename))
 		new_archive = new WadJArchive();
 	else if (WolfArchive::isWolfArchive(filename))
 		new_archive = new WolfArchive();
+	else if (GZipArchive::isGZipArchive(filename))
+		new_archive = new GZipArchive();
+	else if (BZip2Archive::isBZip2Archive(filename))
+		new_archive = new BZip2Archive();
+	else if (TarArchive::isTarArchive(filename))
+		new_archive = new TarArchive();
 	else {
 		// Unsupported format
 		Global::error = "Unsupported or invalid Archive format";
@@ -261,6 +281,8 @@ Archive* ArchiveManager::openArchive(ArchiveEntry* entry, bool manage) {
 		new_archive = new DatArchive();
 	else if (PakArchive::isPakArchive(entry->getMCData()))
 		new_archive = new PakArchive();
+	else if (BSPArchive::isBSPArchive(entry->getMCData()))
+		new_archive = new BSPArchive();
 	else if (GrpArchive::isGrpArchive(entry->getMCData()))
 		new_archive = new GrpArchive();
 	else if (RffArchive::isRffArchive(entry->getMCData()))
@@ -269,12 +291,22 @@ Archive* ArchiveManager::openArchive(ArchiveEntry* entry, bool manage) {
 		new_archive = new GobArchive();
 	else if (LfdArchive::isLfdArchive(entry->getMCData()))
 		new_archive = new LfdArchive();
+	else if (HogArchive::isHogArchive(entry->getMCData()))
+			new_archive = new HogArchive();
+	else if (ADatArchive::isADatArchive(entry->getMCData()))
+		new_archive = new ADatArchive();
 	else if (Wad2Archive::isWad2Archive(entry->getMCData()))
 		new_archive = new Wad2Archive();
 	else if (WadJArchive::isWadJArchive(entry->getMCData()))
 		new_archive = new WadJArchive();
 	else if (WolfArchive::isWolfArchive(entry->getMCData()))
 		new_archive = new WolfArchive();
+	else if (GZipArchive::isGZipArchive(entry->getMCData()))
+		new_archive = new GZipArchive();
+	else if (BZip2Archive::isBZip2Archive(entry->getMCData()))
+		new_archive = new BZip2Archive();
+	else if (TarArchive::isTarArchive(entry->getMCData()))
+		new_archive = new TarArchive();
 	else {
 		// Unsupported format
 		Global::error = "Unsupported or invalid Archive format";
@@ -330,43 +362,14 @@ Archive* ArchiveManager::newArchive(uint8_t type) {
 			new_archive = new ZipArchive();
 			format_str = "zip";
 			break;
-		case ARCHIVE_LIB:
-			new_archive = new LibArchive();
-			format_str = "lib";
-			break;
-		case ARCHIVE_DAT:
-			new_archive = new DatArchive();
-			format_str = "dat";
-			break;
-		case ARCHIVE_RES:
-			new_archive = new ResArchive();
-			format_str = "res";
-			break;
-		case ARCHIVE_PAK:
-			new_archive = new PakArchive();
-			format_str = "pak";
-			break;
-		case ARCHIVE_GRP:
-			new_archive = new GrpArchive();
-			format_str = "grp";
-			break;
-		case ARCHIVE_GOB:
-			new_archive = new GrpArchive();
-			format_str = "gob";
-			break;
-		case ARCHIVE_RFF:
-			new_archive = new RffArchive();
-			format_str = "rff";
-			break;
-		case ARCHIVE_WOLF:
-			new_archive = new WolfArchive();
-			format_str = "wlf";
-			break;
+		default:
+			wxLogMessage("This shouldn't happen.");
+			return NULL;
 	}
 
 	// If the archive was created, set its filename and add it to the list
 	if (new_archive) {
-		new_archive->setFilename(s_fmt("UNSAVED (%s)", format_str.c_str()));
+		new_archive->setFilename(S_FMT("UNSAVED (%s)", CHR(format_str)));
 		addArchive(new_archive);
 	}
 
@@ -391,6 +394,9 @@ bool ArchiveManager::closeArchive(int index) {
 
 	// Delete any bookmarked entries contained in the archive
 	deleteBookmarksInArchive(open_archives[index].archive);
+
+	// Remove from resource manager
+	theResourceManager->removeArchive(open_archives[index].archive);
 
 	// Close any open child archives
 	for (size_t a = 0; a < open_archives[index].open_children.size(); a++) {
@@ -490,6 +496,7 @@ string ArchiveManager::getArchiveExtensionsString() {
 	string ext_pak = "*.pak;*.PAK;*.Pak";						extensions += ext_pak + ";";
 	string ext_gob = "*.gob;*.GOB;*.Gob";						extensions += ext_gob + ";";
 	string ext_lfd = "*.lfd;*.LFD;*.Lfd";						extensions += ext_lfd + ";";
+	string ext_hog = "*.hob;*.HOG;*.Hog";						extensions += ext_hog + ";";
 	string ext_grp = "*.grp;*.GRP;*.Grp;*.prg;*.PRG;*.Prg";		extensions += ext_grp + ";";
 	string ext_rff = "*.rff;*.RFF;*.Rff";						extensions += ext_rff + ";";
 	string ext_wolf =	"vswap.*;VSWAP.*Vswap.*;"
@@ -501,20 +508,21 @@ string ArchiveManager::getArchiveExtensionsString() {
 						"vgahead.*;VGAHEAD.*;Vgahead.*;"
 						"vgadict.*;VGADICT.*;Vgadict.*";		extensions += ext_wolf +";";
 
-	extensions += s_fmt("|Doom Wad files (*.wad)|%s",			chr(ext_wad));
-	extensions += s_fmt("|Zip files (*.zip)|%s",				chr(ext_zip));
-	extensions += s_fmt("|Pk3 (zip) files (*.pk3)|%s",			chr(ext_pk3));
-	extensions += s_fmt("|JDF (zip) files (*.jdf)|%s",			chr(ext_jdf));
-	extensions += s_fmt("|Data (dat) files (*.dat)|%s",			chr(ext_dat));
-	extensions += s_fmt("|CD/HD (cd/hd) files (*.cd; *.hd)|%s",	chr(ext_chd));
-	extensions += s_fmt("|Library (lib) files (*.lib)|%s",		chr(ext_lib));
-	extensions += s_fmt("|Resource (res) files (*.res)|%s",		chr(ext_res));
-	extensions += s_fmt("|Quake Pak files (*.pak)|%s",			chr(ext_pak));
-	extensions += s_fmt("|Build Grp files (*.grp)|%s",			chr(ext_grp));
-	extensions += s_fmt("|Dark Forces Gob files (*.gob)|%s",	chr(ext_gob));
-	extensions += s_fmt("|Dark Forces Lfd files (*.lfd)|%s",	chr(ext_lfd));
-	extensions += s_fmt("|Blood Rff files (*.rff)|%s",			chr(ext_rff));
-	extensions += s_fmt("|Wolfenstein 3D files|%s",				chr(ext_wolf));
+	extensions += S_FMT("|Doom Wad files (*.wad)|%s",			CHR(ext_wad));
+	extensions += S_FMT("|Zip files (*.zip)|%s",				CHR(ext_zip));
+	extensions += S_FMT("|Pk3 (zip) files (*.pk3)|%s",			CHR(ext_pk3));
+	extensions += S_FMT("|JDF (zip) files (*.jdf)|%s",			CHR(ext_jdf));
+	extensions += S_FMT("|Data (dat) files (*.dat)|%s",			CHR(ext_dat));
+	extensions += S_FMT("|CD/HD (cd/hd) files (*.cd; *.hd)|%s",	CHR(ext_chd));
+	extensions += S_FMT("|Library (lib) files (*.lib)|%s",		CHR(ext_lib));
+	extensions += S_FMT("|Resource (res) files (*.res)|%s",		CHR(ext_res));
+	extensions += S_FMT("|Quake Pak files (*.pak)|%s",			CHR(ext_pak));
+	extensions += S_FMT("|Build Grp files (*.grp)|%s",			CHR(ext_grp));
+	extensions += S_FMT("|Dark Forces Gob files (*.gob)|%s",	CHR(ext_gob));
+	extensions += S_FMT("|Dark Forces Lfd files (*.lfd)|%s",	CHR(ext_lfd));
+	extensions += S_FMT("|Descent Hog files (*.hog)|%s",		CHR(ext_hog));
+	extensions += S_FMT("|Blood Rff files (*.rff)|%s",			CHR(ext_rff));
+	extensions += S_FMT("|Wolfenstein 3D files|%s",				CHR(ext_wolf));
 
 	return extensions;
 }
@@ -525,7 +533,7 @@ string ArchiveManager::getArchiveExtensionsString() {
 void ArchiveManager::addBaseResourcePath(string path) {
 	// First check the path doesn't already exist
 	for (unsigned a = 0; a < base_resource_paths.size(); a++) {
-		if (s_cmp(base_resource_paths[a], path))
+		if (S_CMP(base_resource_paths[a], path))
 			return;
 	}
 
@@ -580,6 +588,7 @@ bool ArchiveManager::openBaseResource(int index) {
 
 	// Close/delete current base resource archive
 	if (base_resource_archive) {
+		theResourceManager->removeArchive(base_resource_archive);
 		delete base_resource_archive;
 		base_resource_archive = NULL;
 	}
@@ -601,10 +610,11 @@ bool ArchiveManager::openBaseResource(int index) {
 		return false;
 
 	// Attempt to open the file
-	theSplashWindow->show(s_fmt("Opening %s...", chr(filename)), true);
+	theSplashWindow->show(S_FMT("Opening %s...", CHR(filename)), true);
 	if (base_resource_archive->open(filename)) {
 		base_resource = index;
 		theSplashWindow->hide();
+		theResourceManager->addArchive(base_resource_archive);
 		announce("base_resource_changed");
 		return true;
 	}
@@ -766,6 +776,19 @@ void ArchiveManager::addRecentFiles(vector<string> paths) {
 	announce("recent_files_changed");
 }
 
+/* ArchiveManager::removeRecentFile
+ * Removes the recent file matching [path]
+ *******************************************************************/
+void ArchiveManager::removeRecentFile(string path) {
+	for (unsigned a = 0; a < recent_files.size(); a++) {
+		if (recent_files[a] == path) {
+			recent_files.erase(recent_files.begin() + a);
+			announce("recent_files_changed");
+			return;
+		}
+	}
+}
+
 /* ArchiveManager::addBookmark
  * Adds [entry] to the bookmark list
  *******************************************************************/
@@ -889,11 +912,11 @@ void ArchiveManager::onAnnouncement(Announcer* announcer, string event_name, Mem
  * Lists the filenames of all open archives
  *******************************************************************/
 CONSOLE_COMMAND (list_archives, 0) {
-	wxLogMessage(s_fmt("%d Open Archives:", theArchiveManager->numArchives()));
+	wxLogMessage(S_FMT("%d Open Archives:", theArchiveManager->numArchives()));
 
 	for (int a = 0; a < theArchiveManager->numArchives(); a++) {
 		Archive* archive = theArchiveManager->getArchive(a);
-		wxLogMessage(s_fmt("%d: \"%s\"", a + 1, archive->getFilename().c_str()));
+		wxLogMessage(S_FMT("%d: \"%s\"", a + 1, archive->getFilename().c_str()));
 	}
 }
 

@@ -52,7 +52,7 @@ SwitchesEntryPanel::SwitchesEntryPanel(wxWindow* parent)
 
 	// Add editing controls
 	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
-	sizer_bottom->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
+	sizer_top->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
 
 	// Add entry list
 	wxStaticBox* frame = new wxStaticBox(this, -1, "Switches");

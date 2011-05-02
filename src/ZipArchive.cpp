@@ -173,22 +173,6 @@ bool ZipArchive::open(string filename) {
 }
 
 /* ZipArchive::open
- * Reads zip format data from an ArchiveEntry
- * Returns true if successful, false otherwise
- *******************************************************************/
-bool ZipArchive::open(ArchiveEntry* entry) {
-	// Load from entry's data
-	if (entry && open(entry->getMCData())) {
-		// Update variables and return success
-		parent = entry;
-		parent->lock();
-		return true;
-	}
-	else
-		return false;
-}
-
-/* ZipArchive::open
  * Reads zip format data from a MemChunk
  * Returns true if successful, false otherwise
  *******************************************************************/
@@ -232,10 +216,14 @@ bool ZipArchive::write(MemChunk& mc, bool update) {
  *******************************************************************/
 bool ZipArchive::write(string filename, bool update) {
 	// If we're overwriting the current file, rename it so that it can still be read while writing the 'new' file
-	string current = this->filename;
+	wxFileName current(this->filename);
+	bool temp = false;
 	if (!filename.CmpNoCase(this->filename)) {
-		current = appPath("slade-temp-write.zip", DIR_TEMP);
-		wxRenameFile(this->filename, current);
+		current.SetName(current.GetName() + "-slade-temp");
+		if (!wxRemoveFile(current.GetFullPath()))
+			wxLogMessage("Warning: temporary file %s was not deleted", CHR(current.GetFullPath()));
+		wxRenameFile(this->filename, current.GetFullPath());
+		temp = true;
 	}
 
 	// Open the file
@@ -252,13 +240,10 @@ bool ZipArchive::write(string filename, bool update) {
 		return false;
 	}
 
-	// Don't announce anything while saving
-	//setMuted(true);
-
 	// Open old zip for copying, if it exists. This is used to copy any entries
 	// that have been previously saved/compressed and are unmodified, to greatly
 	// speed up zip file saving by not having to recompress unchanged entries
-	wxFFileInputStream in(current);
+	wxFFileInputStream in(current.GetFullPath());
 	wxZipInputStream inzip(in);
 
 	// Get a list of all entries in the old zip
@@ -272,8 +257,6 @@ bool ZipArchive::write(string filename, bool update) {
 
 	// Go through all entries
 	for (size_t a = 0; a < entries.size(); a++) {
-		//wxLogMessage(entries[a]->getPath(true));
-
 		if (entries[a]->getType() == EntryType::folderType()) {
 			// If the current entry is a folder, just write a directory entry and continue
 			zip.PutNextDirEntry(entries[a]->getPath(true));
@@ -306,8 +289,9 @@ bool ZipArchive::write(string filename, bool update) {
 	delete[] c_entries;
 	zip.Close();
 
-	if (this->filename.Cmp(current))
-		wxRemoveFile(current);
+	if (temp)
+		if (!wxRemoveFile(current.GetFullPath()))
+			wxLogMessage("Warning: temporary file %s was not cleaned out", CHR(current.GetFullPath()));
 
 	return true;
 }
@@ -470,7 +454,7 @@ ArchiveEntry* ZipArchive::findFirst(search_options_t& options) {
 	search_options_t opt = options;
 	opt.dir = dir;
 	opt.match_namespace = "";
-	return Archive::findLast(opt);
+	return Archive::findFirst(opt);
 }
 
 /* ZipArchive::findLast

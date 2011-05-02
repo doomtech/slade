@@ -45,7 +45,9 @@
  * VARIABLES
  *******************************************************************/
 CVAR(String, path_acc, "", CVAR_SAVE);
-
+CVAR(String, path_pngout, "", CVAR_SAVE);
+CVAR(String, path_pngcrush, "", CVAR_SAVE);
+CVAR(String, path_deflopt, "", CVAR_SAVE);
 
 /*******************************************************************
  * STRUCTS
@@ -85,6 +87,49 @@ struct chunk_size_t {
  * FUNCTIONS
  *******************************************************************/
 
+bool EntryOperations::gfxConvert(ArchiveEntry* entry, string target_format, SIFormat::convert_options_t opt, int target_colformat) {
+	// Init variables
+	SImage image;
+
+	// Get target image format
+	SIFormat* fmt = SIFormat::getFormat(target_format);
+	if (fmt == SIFormat::unknownFormat())
+		return false;
+
+	// Check format and target colour type are compatible
+	if (target_colformat >= 0 && !fmt->canWriteType((SIType)target_colformat)) {
+		if (target_colformat == RGBA)
+			wxLogMessage("Format \"%s\" cannot be written as RGBA data", CHR(fmt->getName()));
+		else if (target_colformat == PALMASK)
+			wxLogMessage("Format \"%s\" cannot be written as paletted data", CHR(fmt->getName()));
+
+		return false;
+	}
+
+	// Load entry to image
+	Misc::loadImageFromEntry(&image, entry);
+
+	// Check if we can write the image to the target format
+	int writable = fmt->canWrite(image);
+	if (writable == SIFormat::NOTWRITABLE) {
+		wxLogMessage("Entry \"%s\" could not be converted to target format \"%s\"", CHR(entry->getName()), CHR(fmt->getName()));
+		return false;
+	}
+	else if (writable == SIFormat::CONVERTIBLE)
+		fmt->convertWritable(image, opt);
+		
+	// Now we apply the target colour format (if any)
+	if (target_colformat == PALMASK)
+		image.convertPaletted(opt.pal_target, opt.pal_current);
+	else if (target_colformat == RGBA)
+		image.convertRGBA(opt.pal_current);
+
+	// Finally, write new image data back to the entry
+	fmt->saveImage(image, entry->getMCData(), opt.pal_target);
+
+	return true;
+}
+
 /* EntryOperations::modifyGfxOffsets
  * Changes the offsets of the given gfx entry. Returns false if the
  * entry is invalid or not an offset-supported format, true otherwise
@@ -98,7 +143,7 @@ bool EntryOperations::modifyGfxOffsets(ArchiveEntry* entry, int auto_type, point
 	string entryformat = type->getFormat();
 	if (!(entryformat == "img_doom" || entryformat == "img_doom_arah" ||
 		entryformat == "img_doom_alpha" || "img_doom_beta" || entryformat == "img_png")) {
-		wxLogMessage(s_fmt("Entry \"%s\" is of type \"%s\" which does not support offsets", chr(entry->getName()), chr(entry->getType()->getName())));
+		wxLogMessage(S_FMT("Entry \"%s\" is of type \"%s\" which does not support offsets", CHR(entry->getName()), CHR(entry->getType()->getName())));
 		return false;
 	}
 
@@ -297,7 +342,7 @@ bool EntryOperations::modifyGfxOffsets(ArchiveEntry* entry, int auto_type, point
 		// Load new png data to the entry
 		entry->importMemChunk(npng);
 
-		// Set it's type back to png
+		// Set its type back to png
 		entry->setType(type);
 	}
 	else
@@ -307,7 +352,7 @@ bool EntryOperations::modifyGfxOffsets(ArchiveEntry* entry, int auto_type, point
 }
 
 /* EntryOperations::openExternal
- * Opens [entry] in the default OS program for it's data type
+ * Opens [entry] in the default OS program for its data type
  *******************************************************************/
 bool EntryOperations::openExternal(ArchiveEntry* entry) {
 	if (!entry)
@@ -342,7 +387,7 @@ bool EntryOperations::modifyalPhChunk(ArchiveEntry* entry, bool value) {
 
 	// Check entry type
 	if (!(entry->getType()->getFormat() == "img_png")) {
-		wxLogMessage(s_fmt("Entry \"%s\" is of type \"%s\" rather than PNG", chr(entry->getName()), chr(entry->getType()->getName())));
+		wxLogMessage(S_FMT("Entry \"%s\" is of type \"%s\" rather than PNG", CHR(entry->getName()), CHR(entry->getType()->getName())));
 		return false;
 	}
 
@@ -447,7 +492,7 @@ bool EntryOperations::modifytRNSChunk(ArchiveEntry* entry, bool value) {
 
 	// Check entry type
 	if (!(entry->getType()->getFormat() == "img_png")) {
-		wxLogMessage(s_fmt("Entry \"%s\" is of type \"%s\" rather than PNG", entry->getName().c_str(), entry->getTypeString().c_str()));
+		wxLogMessage(S_FMT("Entry \"%s\" is of type \"%s\" rather than PNG", entry->getName().c_str(), entry->getTypeString().c_str()));
 		return false;
 	}
 
@@ -560,7 +605,7 @@ bool EntryOperations::getalPhChunk(ArchiveEntry* entry) {
 
 	// Check entry type
 	if (entry->getType()->getFormat() != "img_png") {
-		wxLogMessage(s_fmt("Entry \"%s\" is of type \"%s\" rather than PNG", entry->getName().c_str(), entry->getTypeString().c_str()));
+		wxLogMessage(S_FMT("Entry \"%s\" is of type \"%s\" rather than PNG", entry->getName().c_str(), entry->getTypeString().c_str()));
 		return false;
 	}
 
@@ -590,7 +635,7 @@ bool EntryOperations::gettRNSChunk(ArchiveEntry* entry) {
 
 	// Check entry type
 	if (entry->getType()->getFormat() != "img_png") {
-		wxLogMessage(s_fmt("Entry \"%s\" is of type \"%s\" rather than PNG", entry->getName().c_str(), entry->getTypeString().c_str()));
+		wxLogMessage(S_FMT("Entry \"%s\" is of type \"%s\" rather than PNG", entry->getName().c_str(), entry->getTypeString().c_str()));
 		return false;
 	}
 
@@ -602,6 +647,39 @@ bool EntryOperations::gettRNSChunk(ArchiveEntry* entry) {
 		// Check for 'tRNS' header
 		if (data[a] == 't' && data[a + 1] == 'R' &&
 			data[a + 2] == 'N' && data[a + 3] == 'S') {
+			return true;
+		}
+
+		// Stop when we get to the 'IDAT' chunk
+		if (data[a] == 'I' && data[a + 1] == 'D' &&
+			data[a + 2] == 'A' && data[a + 3] == 'T')
+			break;
+	}
+	return false;
+}
+
+/* EntryOperations::readgrAbChunk
+ * Tell whether a PNG entry has a grAb chunk or not and loads the
+ * offset values in the given references
+ *******************************************************************/
+bool EntryOperations::readgrAbChunk(ArchiveEntry* entry, point2_t &offsets) {
+	if (!entry || !entry->getType())
+		return false;
+
+	// Check entry type
+	if (entry->getType()->getFormat() != "img_png") {
+		wxLogMessage(S_FMT("Entry \"%s\" is of type \"%s\" rather than PNG", entry->getName().c_str(), entry->getTypeString().c_str()));
+		return false;
+	}
+
+	// Find existing grAb chunk
+	const uint8_t* data = entry->getData(true);
+	for (uint32_t a = 0; a < entry->getSize(); a++) {
+		// Check for 'grAb' header
+		if (data[a] == 'g' && data[a + 1] == 'r' &&
+			data[a + 2] == 'A' && data[a + 3] == 'b') {
+			offsets.x = READ_B32(data, a + 4);
+			offsets.y = READ_B32(data, a + 8);
 			return true;
 		}
 
@@ -757,9 +835,9 @@ bool EntryOperations::createTexture(vector<ArchiveEntry*> entries) {
 
 		// Setup texture scale
 		if (tx.getFormat() == TXF_TEXTURES)
-			ntex->setScale(1, 1, false);
+			ntex->setScale(1, 1);
 		else
-			ntex->setScale(0, 0, true);
+			ntex->setScale(0, 0);
 
 		// Add to texture list
 		tx.addTexture(ntex);
@@ -774,13 +852,62 @@ bool EntryOperations::createTexture(vector<ArchiveEntry*> entries) {
 	return true;
 }
 
+/* EntryOperations::convertTextures
+ * Converts multiple TEXTURE1/2 entries to a single ZDoom text-based
+ * TEXTURES entry
+ *******************************************************************/
+bool EntryOperations::convertTextures(vector<ArchiveEntry*> entries) {
+	// Check any entries were given
+	if (entries.size() == 0)
+		return false;
+
+	// Get parent archive of entries
+	Archive* parent = entries[0]->getParent();
+
+	// Can't do anything if entry isn't in an archive
+	if (!parent)
+		return false;
+
+	// Find patch table in parent archive
+	Archive::search_options_t opt;
+	opt.match_type = EntryType::getType("pnames");
+	ArchiveEntry* pnames = parent->findLast(opt);
+
+	// Check it exists
+	if (!pnames)
+		return false;
+
+	// Load patch table
+	PatchTable ptable;
+	ptable.loadPNAMES(pnames);
+
+	// Read all texture entries to a single list
+	TextureXList tx;
+	for (unsigned a = 0; a < entries.size(); a++)
+		tx.readTEXTUREXData(entries[a], ptable, true);
+
+	// Convert to extended (TEXTURES) format
+	tx.convertToTEXTURES();
+
+	// Create new TEXTURES entry and write to it
+	ArchiveEntry* textures = parent->addNewEntry("TEXTURES", parent->entryIndex(entries[0]));
+	if (textures) {
+		bool ok = tx.writeTEXTURESData(textures);
+		EntryType::detectEntryType(textures);
+		textures->setExtensionByType();
+		return ok;
+	}
+	else
+		return false;
+}
+
 /* EntryOperations::compileACS
  * Attempts to compile [entry] as an ACS script. If the entry is
  * named SCRIPTS, the compiled data is imported to the BEHAVIOR
  * entry previous to it, otherwise it is imported to a same-name
  * compiled library entry in the acs namespace
  *******************************************************************/
-bool EntryOperations::compileACS(ArchiveEntry* entry) {
+bool EntryOperations::compileACS(ArchiveEntry* entry, bool hexen) {
 	// Check entry was given
 	if (!entry)
 		return false;
@@ -815,7 +942,11 @@ bool EntryOperations::compileACS(ArchiveEntry* entry) {
 
 	// Execute acc
 	string command = path_acc + " \"" + srcfile + "\" \"" + ofile + "\"";
+	if (hexen) command += " -h";
 	wxExecute(command, wxEXEC_SYNC);
+
+	// Deal with focus-stealing apps
+	theMainWindow->Raise();
 
 	// Delete source file
 	wxRemoveFile(srcfile);
@@ -823,12 +954,12 @@ bool EntryOperations::compileACS(ArchiveEntry* entry) {
 	// Check it compiled successfully
 	if (wxFileExists(ofile)) {
 		// Check if the script is a map script (BEHAVIOR)
-		if (s_cmpnocase(entry->getName(), "SCRIPTS")) {
+		if (S_CMPNOCASE(entry->getName(), "SCRIPTS")) {
 			// Get entry before SCRIPTS
 			ArchiveEntry* prev = entry->prevEntry();
 
 			// Create a new entry there if it isn't BEHAVIOR
-			if (!(s_cmpnocase(prev->getName(), "BEHAVIOR")))
+			if (!prev || !(S_CMPNOCASE(prev->getName(), "BEHAVIOR")))
 				prev = entry->getParent()->addNewEntry("BEHAVIOR", entry->getParent()->entryIndex(entry));
 
 			// Import compiled script
@@ -886,14 +1017,14 @@ bool EntryOperations::exportAsPNG(ArchiveEntry* entry, string filename) {
 	// Create image from entry
 	SImage image;
 	if (!Misc::loadImageFromEntry(&image, entry)) {
-		wxLogMessage("Error converting %s: %s", chr(entry->getName()), chr(Global::error));
+		wxLogMessage("Error converting %s: %s", CHR(entry->getName()), CHR(Global::error));
 		return false;
 	}
 
 	// Write png data
 	MemChunk png;
 	if (!image.toPNG(png, theMainWindow->getPaletteChooser()->getSelectedPalette(entry))) {
-		wxLogMessage("Error converting %s", chr(entry->getName()));
+		wxLogMessage("Error converting %s", CHR(entry->getName()));
 		return false;
 	}
 
@@ -901,10 +1032,190 @@ bool EntryOperations::exportAsPNG(ArchiveEntry* entry, string filename) {
 	return png.exportFile(filename);
 }
 
+/* EntryOperations::optimizePNG
+ * Attempts to optimize [entry] using external PNG optimizers.
+ *******************************************************************/
+bool EntryOperations::optimizePNG(ArchiveEntry* entry) {
+	// Check entry was given
+	if (!entry)
+		return false;
+
+	// Check entry has a parent (this is useless otherwise)
+	if (!entry->getParent())
+		return false;
+
+	// Check entry is text
+	if (!EntryDataFormat::getFormat("img_png")->isThisFormat(entry->getMCData())) {
+		wxMessageBox("Error: Entry does not appear to be PNG", "Error", wxOK|wxCENTRE|wxICON_ERROR);
+		return false;
+	}
+
+	// Check if the PNG tools path are set up, at least one of them should be
+	string pngpathc = path_pngcrush;
+	string pngpatho = path_pngout;
+	string pngpathd = path_deflopt;
+	if (pngpathc.IsEmpty() || !wxFileExists(pngpathc) &&
+		pngpatho.IsEmpty() || !wxFileExists(pngpatho) &&
+		pngpathd.IsEmpty() || !wxFileExists(pngpathd)) {
+		wxMessageBox("Error: PNG tools path not defined, please configure in SLADE preferences", "Error", wxOK|wxCENTRE|wxICON_ERROR);
+		return false;
+	}
+
+	// Save special chunks
+	point2_t offsets;
+	bool alphchunk = getalPhChunk(entry);
+	bool grabchunk = readgrAbChunk(entry, offsets);
+	string errormessages = "";
+	size_t oldsize = entry->getSize();
+	size_t crushsize = 0, outsize = 0, deflsize = 0;
+	bool crushed = false, outed = false;
+
+	// Run PNGCrush
+	if (!pngpathc.IsEmpty() && wxFileExists(pngpathc)) {
+		wxFileName fn(pngpathc);
+		fn.SetExt("png");
+		string pngfile = fn.GetFullPath();
+		fn.SetExt("opt");
+		string optfile = fn.GetFullPath();
+		entry->exportFile(pngfile);
+
+		string command = path_pngcrush + " -brute \"" + pngfile + "\" \"" + optfile + "\"";
+		wxExecute(command, wxEXEC_SYNC);
+
+		// Deal with focus-stealing apps
+		theMainWindow->Raise();
+
+		if (wxFileExists(optfile)) {
+			entry->importFile(optfile);
+			wxRemoveFile(optfile);
+			crushed = true;
+		} else errormessages += "PNGCrush failed to create optimized file.\n";
+		crushsize = entry->getSize();
+	}
+
+	// Run PNGOut
+	if (!pngpatho.IsEmpty() && wxFileExists(pngpatho)) {
+		wxFileName fn(pngpathc);
+		fn.SetExt("png");
+		string pngfile = fn.GetFullPath();
+		fn.SetExt("opt");
+		string optfile = fn.GetFullPath();
+		entry->exportFile(pngfile);
+
+		string command = path_pngout + " /y \"" + pngfile + "\" \"" + optfile + "\"";
+		wxExecute(command, wxEXEC_SYNC);
+
+		// Deal with focus-stealing apps
+		theMainWindow->Raise();
+
+		if (wxFileExists(optfile)) {
+			entry->importFile(optfile);
+			wxRemoveFile(optfile);
+			outed = true;
+		} else if (!crushed)
+			// Don't treat it as an error if PNGout couldn't create a smaller file than 
+			errormessages += "PNGout failed to create optimized file.\n";
+		outsize = entry->getSize();
+	}
+
+	// Run deflopt
+	if (!pngpathd.IsEmpty() && wxFileExists(pngpathd)) {
+		wxFileName fn(pngpathd);
+		fn.SetExt("png");
+		string pngfile = fn.GetFullPath();
+		entry->exportFile(pngfile);
+
+		string command = path_deflopt + " /sf \"" + pngfile + "\"";
+		wxExecute(command, wxEXEC_SYNC);
+
+		// Deal with focus-stealing apps
+		theMainWindow->Raise();
+
+		entry->importFile(pngfile);
+		deflsize = entry->getSize();
+
+	}
+
+	// Rewrite special chunks
+	if (alphchunk) modifyalPhChunk(entry, true);
+	if (grabchunk) modifyGfxOffsets(entry, -1, offsets, true, true, false);
+
+	wxLogMessage("PNG %s size %i =PNGCrush=> %i =PNGout=> %i =DeflOpt=> %i =+grAb/alPh=> %i",
+		CHR(entry->getName()), oldsize, crushsize, outsize, deflsize, entry->getSize());
+
+
+	if (!errormessages.IsEmpty()) {
+		ExtMessageDialog dlg(NULL, "Error Optimizing");
+		dlg.setMessage("The following errors were encountered while optimizing:");
+		dlg.setExt(errormessages);
+		dlg.ShowModal();
+
+		return false;
+	}
+
+	return true;
+}
+
+void fixpngsrc(ArchiveEntry * entry) {
+	if (!entry)
+		return;
+	const uint8_t * source = entry->getData();
+	uint8_t * data = new uint8_t[entry->getSize()];
+	memcpy(data, source, entry->getSize());
+
+	// Last check that it's a PNG
+	uint32_t header1 = READ_B32(data, 0);
+	uint32_t header2 = READ_B32(data, 4);
+	if (header1 != 0x89504E47 || header2 != 0x0D0A1A0A)
+		return;
+
+	// Loop through each chunk and recompute CRC
+	uint32_t pointer = 8;
+	bool neededchange = false;
+	while (pointer < entry->getSize()) {
+		if (pointer + 12 > entry->getSize()) {
+			wxLogMessage("Entry %s cannot be repaired.", CHR(entry->getName()));
+			return;
+		}
+		uint32_t chsz = READ_B32(data, pointer);
+		if (pointer + 12 + chsz > entry->getSize()) {
+			wxLogMessage("Entry %s cannot be repaired.", CHR(entry->getName()));
+			return;
+		}
+		uint32_t crc = Misc::crc(data + pointer + 4, 4 + chsz);
+		if (crc != READ_B32(data, pointer + 8 + chsz)) {
+			wxLogMessage("Chunk %c%c%c%c has bad CRC", data[pointer+4], data[pointer+5], data[pointer+6], data[pointer+7]);
+			neededchange = true;
+			data[pointer +  8 + chsz] = crc >> 24;
+			data[pointer +  9 + chsz] = (crc & 0x00ffffff) >> 16;
+			data[pointer + 10 + chsz] = (crc & 0x0000ffff) >> 8;
+			data[pointer + 11 + chsz] = (crc & 0x000000ff);
+		}
+		pointer += (chsz + 12);
+	}
+	// Import new data with fixed CRC
+	if (neededchange) {
+		entry->importMem(data, entry->getSize());
+	}
+	delete[] data;
+	return;
+}
 
 /*******************************************************************
  * CONSOLE COMMANDS
  *******************************************************************/
+
+CONSOLE_COMMAND(fixpngcrc, 0) {
+	vector<ArchiveEntry *> selection = theMainWindow->getCurrentEntrySelection();
+	if (selection.size() == 0) {
+		wxLogMessage("No entry selected");
+		return;
+	}
+	for (size_t a = 0; a < selection.size(); ++a) {
+		if (selection[a]->getType()->getFormat() == "img_png")
+			fixpngsrc(selection[a]);
+	}
+}
 
 /*
 CONSOLE_COMMAND (test_ee, 1) {
@@ -914,7 +1225,7 @@ CONSOLE_COMMAND (test_ee, 1) {
 			if (entry)
 				EntryOperations::openExternal(entry);
 			else
-				wxLogMessage("Entry %s not found", chr(args[a]));
+				wxLogMessage("Entry %s not found", CHR(args[a]));
 		}
 	}
 }

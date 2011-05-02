@@ -42,7 +42,7 @@
  * OGLCanvas class constructor
  *******************************************************************/
 OGLCanvas::OGLCanvas(wxWindow* parent, int id)
-: wxGLCanvas(parent, id, NULL, wxDefaultPosition, wxDefaultSize, wxBORDER_SIMPLE|wxWANTS_CHARS) {
+: wxGLCanvas(parent, id, NULL, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE|wxWANTS_CHARS) {
 	init_done = false;
 
 	// Bind events
@@ -140,7 +140,7 @@ void OGLCanvas::drawCheckeredBackground() {
  *******************************************************************/
 wxPanel* OGLCanvas::toPanel(wxWindow* parent) {
 	// Create panel
-	wxPanel* panel = new wxPanel(parent, -1);
+	wxPanel* panel = new wxPanel(parent, -1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL|wxBORDER_SIMPLE);
 
 	// Reparent
 	Reparent(panel);

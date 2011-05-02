@@ -85,8 +85,26 @@
     <Filter Include="External">
       <UniqueIdentifier>{b8ed0eb6-a1df-4b4b-8a59-d56cf99d842b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="External\QMus2Mid">
+    <Filter Include="External\Mus2Mid">
       <UniqueIdentifier>{dda863ce-2d21-48cb-9de4-44e8e63b1326}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\BZip2">
+      <UniqueIdentifier>{0c79342f-fa5a-4bf9-af74-0a9be8b1fdf6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\Lzma">
+      <UniqueIdentifier>{9bcac562-c222-403d-98d8-186f578a87a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\ZReaders">
+      <UniqueIdentifier>{5e648a80-c228-40a7-9817-b3e2695df54e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\ZLib">
+      <UniqueIdentifier>{1ca86170-39c5-4615-bb20-8f2d2fc14c42}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\Archive\Formats">
+      <UniqueIdentifier>{844561dc-871c-4534-ba8a-768af5269000}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\Graphics\Image\Formats">
+      <UniqueIdentifier>{544047dd-0bbf-43a3-b6ec-6f90661fad4c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -150,9 +168,6 @@
     <ClCompile Include="src\GfxEntryPanel.cpp">
       <Filter>Main Editor\UI Elements\EntryPanel</Filter>
     </ClCompile>
-    <ClCompile Include="src\MultiEntryPanel.cpp">
-      <Filter>Main Editor\UI Elements\EntryPanel</Filter>
-    </ClCompile>
     <ClCompile Include="src\PaletteEntryPanel.cpp">
       <Filter>Main Editor\UI Elements\EntryPanel</Filter>
     </ClCompile>
@@ -202,12 +217,6 @@
       <Filter>Resources\Archive</Filter>
     </ClCompile>
     <ClCompile Include="src\ArchiveManager.cpp">
-      <Filter>Resources\Archive</Filter>
-    </ClCompile>
-    <ClCompile Include="src\WadArchive.cpp">
-      <Filter>Resources\Archive</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ZipArchive.cpp">
       <Filter>Resources\Archive</Filter>
     </ClCompile>
     <ClCompile Include="src\AnimatedList.cpp">
@@ -294,12 +303,6 @@
     <ClCompile Include="src\VirtualListView.cpp">
       <Filter>UI Elements\Lists</Filter>
     </ClCompile>
-    <ClCompile Include="src\DatArchive.cpp">
-      <Filter>Resources\Archive</Filter>
-    </ClCompile>
-    <ClCompile Include="src\LibArchive.cpp">
-      <Filter>Resources\Archive</Filter>
-    </ClCompile>
     <ClCompile Include="src\ArchivePanel.cpp">
       <Filter>Main Editor\UI Elements</Filter>
     </ClCompile>
@@ -317,9 +320,6 @@
     </ClCompile>
     <ClCompile Include="src\Console.cpp">
       <Filter>General\Console</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ResArchive.cpp">
-      <Filter>Resources\Archive</Filter>
     </ClCompile>
     <ClCompile Include="src\SImageFormats.cpp">
       <Filter>Resources\Graphics\Image</Filter>
@@ -339,15 +339,6 @@
     <ClCompile Include="src\ArchiveOperations.cpp">
       <Filter>Main Editor</Filter>
     </ClCompile>
-    <ClCompile Include="src\Wad2Archive.cpp">
-      <Filter>Resources\Archive</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PakArchive.cpp">
-      <Filter>Resources\Archive</Filter>
-    </ClCompile>
-    <ClCompile Include="src\WadJArchive.cpp">
-      <Filter>Resources\Archive</Filter>
-    </ClCompile>
     <ClCompile Include="src\TextStyle.cpp">
       <Filter>UI Elements\TextEditor</Filter>
     </ClCompile>
@@ -366,9 +357,6 @@
     <ClCompile Include="src\Conversions.cpp">
       <Filter>Main Editor</Filter>
     </ClCompile>
-    <ClCompile Include="src\qmus2mid\qmus2mid.cpp">
-      <Filter>External\QMus2Mid</Filter>
-    </ClCompile>
     <ClCompile Include="src\TextStylePrefsPanel.cpp">
       <Filter>Dialogs\Preferences</Filter>
     </ClCompile>
@@ -384,17 +372,11 @@
     <ClCompile Include="src\BrowserCanvas.cpp">
       <Filter>UI Elements\Browser</Filter>
     </ClCompile>
-    <ClCompile Include="src\GrpArchive.cpp">
-      <Filter>Resources\Archive</Filter>
-    </ClCompile>
     <ClCompile Include="src\CodePages.cpp">
       <Filter>General\Utility</Filter>
     </ClCompile>
     <ClCompile Include="src\ANSIEntryPanel.cpp">
       <Filter>Main Editor\UI Elements\EntryPanel</Filter>
-    </ClCompile>
-    <ClCompile Include="src\RffArchive.cpp">
-      <Filter>Resources\Archive</Filter>
     </ClCompile>
     <ClCompile Include="src\ANSICanvas.cpp">
       <Filter>UI Elements</Filter>
@@ -408,14 +390,269 @@
     <ClCompile Include="src\ExtMessageDialog.cpp">
       <Filter>Dialogs</Filter>
     </ClCompile>
-    <ClCompile Include="src\WolfArchive.cpp">
-      <Filter>Resources\Archive</Filter>
+    <ClCompile Include="src\ZTextureEditorPanel.cpp">
+      <Filter>Main Editor\UI Elements\TextureXEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ResourceManager.cpp">
+      <Filter>Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Translation.cpp">
+      <Filter>Resources\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MathStuff.cpp">
+      <Filter>General\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="src\InterfacePrefsPanel.cpp">
+      <Filter>Dialogs\Preferences</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SAction.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TranslationEditorDialog.cpp">
+      <Filter>Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PNGPrefsPanel.cpp">
+      <Filter>Dialogs\Preferences</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mus2mid\mus2mid.cpp">
+      <Filter>External\Mus2Mid</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsPrefsPanel.cpp">
+      <Filter>Dialogs\Preferences</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bzip2\blocksort.c">
+      <Filter>External\BZip2</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bzip2\bzlib.c">
+      <Filter>External\BZip2</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bzip2\compress.c">
+      <Filter>External\BZip2</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bzip2\crctable.c">
+      <Filter>External\BZip2</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bzip2\decompress.c">
+      <Filter>External\BZip2</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bzip2\huffman.c">
+      <Filter>External\BZip2</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bzip2\randtable.c">
+      <Filter>External\BZip2</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Compression.cpp">
+      <Filter>General\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="src\zreaders\ancientzip.cpp">
+      <Filter>External\ZReaders</Filter>
+    </ClCompile>
+    <ClCompile Include="src\zreaders\files.cpp">
+      <Filter>External\ZReaders</Filter>
+    </ClCompile>
+    <ClCompile Include="src\zreaders\m_alloc.cpp">
+      <Filter>External\ZReaders</Filter>
+    </ClCompile>
+    <ClCompile Include="src\zlib\adler32.c">
+      <Filter>External\ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\zlib\crc32.c">
+      <Filter>External\ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\zlib\deflate.c">
+      <Filter>External\ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\zlib\gzio.c">
+      <Filter>External\ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\zlib\infback.c">
+      <Filter>External\ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\zlib\inffast.c">
+      <Filter>External\ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\zlib\inflate.c">
+      <Filter>External\ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\zlib\inftrees.c">
+      <Filter>External\ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\zlib\trees.c">
+      <Filter>External\ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\zlib\uncompr.c">
+      <Filter>External\ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\zlib\zutil.c">
+      <Filter>External\ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\7zAlloc.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\7zBuf.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\7zBuf2.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\7zCrc.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\7zCrcOpt.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\7zDec.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\7zFile.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\7zIn.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\7zStream.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\Alloc.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\Bcj2.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\Bra.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\Bra86.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\BraIA64.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\CpuArch.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\Delta.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\LzFind.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\LzFindMt.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\Lzma2Dec.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\Lzma2Enc.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\Lzma86Dec.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\Lzma86Enc.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\LzmaDec.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\LzmaEnc.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\LzmaLib.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\MtCoder.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\Ppmd7.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\Ppmd7Dec.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\Ppmd7Enc.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\Sha256.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\Threads.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\Xz.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\XzCrc64.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\XzDec.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\XzEnc.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzma\C\XzIn.c">
+      <Filter>External\Lzma</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ADatArchive.cpp">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BSPArchive.cpp">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BZip2Archive.cpp">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DatArchive.cpp">
+      <Filter>Resources\Archive\Formats</Filter>
     </ClCompile>
     <ClCompile Include="src\GobArchive.cpp">
-      <Filter>Resources\Archive</Filter>
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GrpArchive.cpp">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GZipArchive.cpp">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HogArchive.cpp">
+      <Filter>Resources\Archive\Formats</Filter>
     </ClCompile>
     <ClCompile Include="src\LfdArchive.cpp">
-      <Filter>Resources\Archive</Filter>
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LibArchive.cpp">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PakArchive.cpp">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ResArchive.cpp">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RffArchive.cpp">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TarArchive.cpp">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Wad2Archive.cpp">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WadArchive.cpp">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WadJArchive.cpp">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WolfArchive.cpp">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ZipArchive.cpp">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SIFormat.cpp">
+      <Filter>Resources\Graphics\Image\Formats</Filter>
     </ClCompile>
     <ClCompile Include="src\KeyBind.cpp">
       <Filter>General</Filter>
@@ -485,9 +722,6 @@
     <ClInclude Include="src\GfxEntryPanel.h">
       <Filter>Main Editor\UI Elements\EntryPanel</Filter>
     </ClInclude>
-    <ClInclude Include="src\MultiEntryPanel.h">
-      <Filter>Main Editor\UI Elements\EntryPanel</Filter>
-    </ClInclude>
     <ClInclude Include="src\PaletteEntryPanel.h">
       <Filter>Main Editor\UI Elements\EntryPanel</Filter>
     </ClInclude>
@@ -537,12 +771,6 @@
       <Filter>Resources\Archive</Filter>
     </ClInclude>
     <ClInclude Include="src\ArchiveManager.h">
-      <Filter>Resources\Archive</Filter>
-    </ClInclude>
-    <ClInclude Include="src\WadArchive.h">
-      <Filter>Resources\Archive</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ZipArchive.h">
       <Filter>Resources\Archive</Filter>
     </ClInclude>
     <ClInclude Include="src\AnimatedList.h">
@@ -654,12 +882,6 @@
     <ClInclude Include="src\VirtualListView.h">
       <Filter>UI Elements\Lists</Filter>
     </ClInclude>
-    <ClInclude Include="src\DatArchive.h">
-      <Filter>Resources\Archive</Filter>
-    </ClInclude>
-    <ClInclude Include="src\LibArchive.h">
-      <Filter>Resources\Archive</Filter>
-    </ClInclude>
     <ClInclude Include="src\ArchivePanel.h">
       <Filter>Main Editor\UI Elements</Filter>
     </ClInclude>
@@ -681,9 +903,6 @@
     <ClInclude Include="src\ConsoleHelpers.h">
       <Filter>General\Console</Filter>
     </ClInclude>
-    <ClInclude Include="src\ResArchive.h">
-      <Filter>Resources\Archive</Filter>
-    </ClInclude>
     <ClInclude Include="src\PatchBrowser.h">
       <Filter>Main Editor\UI Elements\TextureXEditor</Filter>
     </ClInclude>
@@ -698,15 +917,6 @@
     </ClInclude>
     <ClInclude Include="src\ArchiveOperations.h">
       <Filter>Main Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Wad2Archive.h">
-      <Filter>Resources\Archive</Filter>
-    </ClInclude>
-    <ClInclude Include="src\PakArchive.h">
-      <Filter>Resources\Archive</Filter>
-    </ClInclude>
-    <ClInclude Include="src\WadJArchive.h">
-      <Filter>Resources\Archive</Filter>
     </ClInclude>
     <ClInclude Include="src\TextStyle.h">
       <Filter>UI Elements\TextEditor</Filter>
@@ -726,9 +936,6 @@
     <ClInclude Include="src\Conversions.h">
       <Filter>Main Editor</Filter>
     </ClInclude>
-    <ClInclude Include="src\qmus2mid\qmus2mid.h">
-      <Filter>External\QMus2Mid</Filter>
-    </ClInclude>
     <ClInclude Include="src\TextStylePrefsPanel.h">
       <Filter>Dialogs\Preferences</Filter>
     </ClInclude>
@@ -744,17 +951,11 @@
     <ClInclude Include="src\BrowserCanvas.h">
       <Filter>UI Elements\Browser</Filter>
     </ClInclude>
-    <ClInclude Include="src\GrpArchive.h">
-      <Filter>Resources\Archive</Filter>
-    </ClInclude>
     <ClInclude Include="src\CodePages.h">
       <Filter>General\Utility</Filter>
     </ClInclude>
     <ClInclude Include="src\ANSIEntryPanel.h">
       <Filter>Main Editor\UI Elements\EntryPanel</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RffArchive.h">
-      <Filter>Resources\Archive</Filter>
     </ClInclude>
     <ClInclude Include="src\ANSICanvas.h">
       <Filter>UI Elements</Filter>
@@ -765,20 +966,263 @@
     <ClInclude Include="src\ExtMessageDialog.h">
       <Filter>Dialogs</Filter>
     </ClInclude>
-    <ClInclude Include="src\WolfArchive.h">
-      <Filter>Resources\Archive</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GobArchive.h">
-      <Filter>Resources\Archive</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Archives.h">
-      <Filter>Resources\Archive</Filter>
-    </ClInclude>
-    <ClInclude Include="src\LfdArchive.h">
-      <Filter>Resources\Archive</Filter>
-    </ClInclude>
     <ClInclude Include="src\LumpFormats.h">
       <Filter>Resources\Archive\EntryType\EntryDataFormat</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ZTextureEditorPanel.h">
+      <Filter>Main Editor\UI Elements\TextureXEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ResourceManager.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Translation.h">
+      <Filter>Resources\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MathStuff.h">
+      <Filter>General\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="src\InterfacePrefsPanel.h">
+      <Filter>Dialogs\Preferences</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SAction.h">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TranslationEditorDialog.h">
+      <Filter>Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PNGPrefsPanel.h">
+      <Filter>Dialogs\Preferences</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mus2mid\mus2mid.h">
+      <Filter>External\Mus2Mid</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GraphicsPrefsPanel.h">
+      <Filter>Dialogs\Preferences</Filter>
+    </ClInclude>
+    <ClInclude Include="src\bzip2\bzlib.h">
+      <Filter>External\BZip2</Filter>
+    </ClInclude>
+    <ClInclude Include="src\bzip2\bzlib_private.h">
+      <Filter>External\BZip2</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Compression.h">
+      <Filter>General\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="src\zreaders\ancientzip.h">
+      <Filter>External\ZReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="src\zreaders\files.h">
+      <Filter>External\ZReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="src\zreaders\m_alloc.h">
+      <Filter>External\ZReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="src\zreaders\tarray.h">
+      <Filter>External\ZReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="src\zreaders\templates.h">
+      <Filter>External\ZReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="src\zlib\crc32.h">
+      <Filter>External\ZLib</Filter>
+    </ClInclude>
+    <ClInclude Include="src\zlib\deflate.h">
+      <Filter>External\ZLib</Filter>
+    </ClInclude>
+    <ClInclude Include="src\zlib\inffast.h">
+      <Filter>External\ZLib</Filter>
+    </ClInclude>
+    <ClInclude Include="src\zlib\inffixed.h">
+      <Filter>External\ZLib</Filter>
+    </ClInclude>
+    <ClInclude Include="src\zlib\inflate.h">
+      <Filter>External\ZLib</Filter>
+    </ClInclude>
+    <ClInclude Include="src\zlib\inftrees.h">
+      <Filter>External\ZLib</Filter>
+    </ClInclude>
+    <ClInclude Include="src\zlib\trees.h">
+      <Filter>External\ZLib</Filter>
+    </ClInclude>
+    <ClInclude Include="src\zlib\zconf.h">
+      <Filter>External\ZLib</Filter>
+    </ClInclude>
+    <ClInclude Include="src\zlib\zlib.h">
+      <Filter>External\ZLib</Filter>
+    </ClInclude>
+    <ClInclude Include="src\zlib\zutil.h">
+      <Filter>External\ZLib</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\7z.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\7zAlloc.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\7zBuf.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\7zCrc.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\7zFile.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\7zVersion.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\Alloc.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\Bcj2.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\Bra.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\CpuArch.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\Delta.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\LzFind.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\LzFindMt.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\LzHash.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\Lzma2Dec.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\Lzma2Enc.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\Lzma86.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\LzmaDec.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\LzmaEnc.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\LzmaLib.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\MtCoder.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\Ppmd.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\Ppmd7.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\RotateDefs.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\Sha256.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\Threads.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\Types.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\Xz.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\XzCrc64.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzma\C\XzEnc.h">
+      <Filter>External\Lzma</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ADatArchive.h">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BSPArchive.h">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BZip2Archive.h">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DatArchive.h">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GobArchive.h">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GrpArchive.h">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GZipArchive.h">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\HogArchive.h">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LfdArchive.h">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LibArchive.h">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PakArchive.h">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ResArchive.h">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RffArchive.h">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TarArchive.h">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Wad2Archive.h">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\WadArchive.h">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\WadJArchive.h">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\WolfArchive.h">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ZipArchive.h">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Archives.h">
+      <Filter>Resources\Archive\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SIFDoom.h">
+      <Filter>Resources\Graphics\Image\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SIFZDoom.h">
+      <Filter>Resources\Graphics\Image\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SIFHexen.h">
+      <Filter>Resources\Graphics\Image\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SIFImages.h">
+      <Filter>Resources\Graphics\Image\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SIFormat.h">
+      <Filter>Resources\Graphics\Image\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SIFOther.h">
+      <Filter>Resources\Graphics\Image\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SIFQuake.h">
+      <Filter>Resources\Graphics\Image\Formats</Filter>
     </ClInclude>
     <ClInclude Include="src\KeyBind.h">
       <Filter>General</Filter>

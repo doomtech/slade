@@ -29,7 +29,7 @@
  *******************************************************************/
 #include "Main.h"
 #include "PatchTable.h"
-#include "ArchiveManager.h"
+#include "ResourceManager.h"
 #include "CTexture.h"
 
 
@@ -71,7 +71,7 @@ patch_t& PatchTable::patch(size_t index) {
 patch_t& PatchTable::patch(string name) {
 	// Go through list
 	for (unsigned a = 0; a < patches.size(); a++) {
-		if (s_cmp(patches[a].name, name))
+		if (S_CMP(patches[a].name, name))
 			return patches[a];
 	}
 
@@ -100,12 +100,11 @@ ArchiveEntry* PatchTable::patchEntry(size_t index) {
 	if (index >= patches.size())
 		return NULL;
 
-	// Update patch entry if needed
-	if (!patches[index].entry)
-		updatePatchEntry(index);
+	// Patches namespace > graphics
+	ArchiveEntry* entry = theResourceManager->getPatchEntry(patches[index].name, "patches", parent);
+	if (!entry) entry = theResourceManager->getPatchEntry(patches[index].name, "graphics", parent);
 
-	// Return entry at index
-	return patches[index].entry;
+	return entry;
 }
 
 /* PatchTable::patchEntry
@@ -115,13 +114,8 @@ ArchiveEntry* PatchTable::patchEntry(size_t index) {
 ArchiveEntry* PatchTable::patchEntry(string name) {
 	// Search for patch by name
 	for (size_t a = 0; a < patches.size(); a++) {
-		if (!patches[a].name.CmpNoCase(name)) {
-			// Update patch entry if needed
-			if (!patches[a].entry)
-				updatePatchEntry(a);
-
-			return patches[a].entry;
-		}
+		if (!patches[a].name.CmpNoCase(name))
+			return patchEntry(a);
 	}
 
 	// Not found
@@ -150,7 +144,7 @@ int32_t PatchTable::patchIndex(string name) {
 int32_t PatchTable::patchIndex(ArchiveEntry* entry) {
 	// Search for patch by entry
 	for (size_t a = 0; a < patches.size(); a++) {
-		if (patches[a].entry == entry)
+		if (theResourceManager->getPatchEntry(patches[a].name, "patches", parent) == entry)
 			return a;
 	}
 
@@ -190,13 +184,10 @@ bool PatchTable::replacePatch(unsigned index, string newname) {
 	// Change the patch name
 	patches[index].name = newname;
 
-	// Update patch entry
-	updatePatchEntry(index);
-
 	// Announce
 	announce("modified");
 
-	return !!patch(index).entry;
+	return true;
 }
 
 /* PatchTable::addPatch
@@ -206,7 +197,7 @@ bool PatchTable::addPatch(string name, bool allow_dup) {
 	// Check patch doesn't already exist
 	if (!allow_dup) {
 		for (unsigned a = 0; a < patches.size(); a++) {
-			if (s_cmp(name, patches[a].name))
+			if (S_CMP(name, patches[a].name))
 				return false;
 		}
 	}
@@ -221,49 +212,7 @@ bool PatchTable::addPatch(string name, bool allow_dup) {
 	// Announce
 	announce("modified");
 
-	return !!patch.entry;
-}
-
-/* PatchTable::updatePatchEntry
- * Updates the ArchiveEntry associated with the patch at [index].
- * Searches the parent archive first, then all resource archives.
- *******************************************************************/
-void PatchTable::updatePatchEntry(unsigned index) {
-	// Check index
-	if (index >= patches.size())
-		return;
-
-	// Get patch name
-	string name = patch(index).name;
-
-	// Attempt to find patch entry
-	ArchiveEntry* entry = NULL;
-	Archive::search_options_t options;
-	options.match_name = name;
-
-	// First, search parent archive (patches namespace > global namespace)
-	if (parent) {
-		options.match_namespace = "patches";
-		entry = parent->findLast(options);
-
-		if (!entry) {
-			options.match_namespace = "";
-			entry = parent->findLast(options);
-		}
-	}
-
-	// Next, search open resource archives + base resource archive
-	if (!entry) {
-		options.match_namespace = "patches";
-		entry = theArchiveManager->findResourceEntry(options, parent);
-	}
-	if (!entry) {
-		options.match_namespace = "";
-		entry = theArchiveManager->findResourceEntry(options, parent);
-	}
-
-	// Set patch entry
-	patch(index).entry = entry;
+	return true;
 }
 
 /* PatchTable::loadPNAMES
@@ -288,7 +237,7 @@ bool PatchTable::loadPNAMES(ArchiveEntry* pnames, Archive* parent) {
 	uint32_t n_pnames = 0;
 	pnames->seek(0, SEEK_SET);
 	if (!pnames->read(&n_pnames, 4)) {
-		wxLogMessage("Error: PNAMES entry is corrupt");
+		wxLogMessage("Error: PNAMES lump is corrupt");
 		return false;
 	}
 
@@ -299,7 +248,7 @@ bool PatchTable::loadPNAMES(ArchiveEntry* pnames, Archive* parent) {
 
 		// Try to read pname
 		if (!pnames->read(&pname, 8)) {
-			wxLogMessage("Error: PNAMES entry is corrupt");
+			wxLogMessage("Error: PNAMES entry %i is corrupt", a);
 			return false;
 		}
 
@@ -339,7 +288,7 @@ bool PatchTable::writePNAMES(ArchiveEntry* pnames) {
 	// Write patch names
 	for (unsigned a = 0; a < patches.size(); a++) {
 		char name[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };	// Init name to all zeros for XWE compatibility
-		strncpy(name, chr(patches[a].name), patches[a].name.Len());
+		strncpy(name, CHR(patches[a].name), patches[a].name.Len());
 
 		pndata.write(name, 8);
 	}

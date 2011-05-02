@@ -204,7 +204,8 @@ bool PaletteManager::loadCustomPalettes() {
 		pal->loadMem(mc);
 
 		// Add the palette
-		addPalette(pal, filename);
+		wxFileName fn(filename);
+		addPalette(pal, fn.GetName());
 
 		// Next file
 		files = res_dir.GetNext(&filename);

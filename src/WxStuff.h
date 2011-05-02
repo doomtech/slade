@@ -2,8 +2,8 @@
 #ifndef __WXSTUFF_H__
 #define __WXSTUFF_H__
 
-#undef min
-#undef max
+#undef MIN
+#undef MAX
 
 #include "wx/wxprec.h"
 
@@ -11,8 +11,8 @@
     #include "wx/wx.h"
 #endif
 
-#define max(a,b) (((a)>(b))?(a):(b))
-#define min(a,b) (((a)<(b))?(a):(b))
+#define MAX(a,b) (((a)>(b))?(a):(b))
+#define MIN(a,b) (((a)<(b))?(a):(b))
 
 // Some misc wx-related defines
 #define WXCOL(rgba) wxColor(rgba.r, rgba.g, rgba.b, rgba.a)

@@ -36,6 +36,7 @@
 #include "Console.h"
 #include "SplashWindow.h"
 #include "ExtMessageDialog.h"
+#include "ResourceManager.h"
 #include <wx/dialog.h>
 #include <wx/radiobut.h>
 
@@ -79,7 +80,6 @@ public:
 		// ZDoom TEXTURES format
 		rb_format_textures = new wxRadioButton(this, -1, "ZDoom (TEXTURES)");
 		framesizer->Add(rb_format_textures, 0, wxEXPAND|wxALL, 4);
-		rb_format_textures->Enable(false);
 
 
 		// --- Source options ---
@@ -148,8 +148,9 @@ public:
  *******************************************************************/
 TextureXEditor::TextureXEditor(wxWindow* parent) : wxPanel(parent, -1) {
 	// Init variables
-	this->archive = archive;
+	this->archive = NULL;
 	this->pnames = NULL;
+	SetName("texturex");
 
 	// Create patch browser
 	patch_browser = new PatchBrowser(this);
@@ -181,6 +182,9 @@ TextureXEditor::TextureXEditor(wxWindow* parent) : wxPanel(parent, -1) {
 
 	// Listen to patch table
 	listenTo(&patch_table);
+
+	// Listen to resource manager
+	listenTo(theResourceManager);
 
 	// Update+ layout
 	Layout();
@@ -268,6 +272,32 @@ bool TextureXEditor::openArchive(Archive* archive) {
 		tabs->AddPage(ptp, "Patch Table (PNAMES)");
 	}
 
+	// Search archive for TEXTURES entries
+	options.match_type = EntryType::getType("zdtextures");
+	vector<ArchiveEntry*> ztx_entries = archive->findAll(options);
+
+	// Open texture editor tabs
+	for (unsigned a = 0; a < ztx_entries.size(); a++) {
+		TextureXPanel* tx_panel = new TextureXPanel(this, this);
+
+		// Init texture panel
+		tx_panel->Show(false);
+
+		// Open TEXTURES entry
+		if (tx_panel->openTEXTUREX(ztx_entries[a])) {
+			// Set palette
+			tx_panel->setPalette(theMainWindow->getPaletteChooser()->getSelectedPalette());
+			// Lock entry
+			ztx_entries[a]->lock();
+
+			// Add it to the list of editors, and a tab
+			texture_editors.push_back(tx_panel);
+			tabs->AddPage(tx_panel, ztx_entries[a]->getName());
+		}
+
+		tx_panel->Show(true);
+	}
+
 	// Update layout
 	Layout();
 
@@ -281,118 +311,14 @@ bool TextureXEditor::openArchive(Archive* archive) {
 	// Set global palette
 	theMainWindow->getPaletteChooser()->setGlobalFromArchive(archive);
 
-	// Find patch entries (this really needs to be faster)
-	theSplashWindow->show("Opening Texture List...", true);
-	theSplashWindow->setProgressMessage("Searching for patches");
-	float np = (float)patch_table.nPatches();
-	for (unsigned a = 0; a < patch_table.nPatches(); a++) {
-		theSplashWindow->setProgress((float)a / np);
-		patch_table.updatePatchEntry(a);
-	}
-	theSplashWindow->hide();
-
 	// Setup patch browser
-	patch_browser->openPatchTable(&patch_table);
+	if (patch_table.nPatches() > 0)
+		patch_browser->openPatchTable(&patch_table);
+	else
+		patch_browser->openArchive(archive);
 
 	return true;
 }
-
-/* TextureXEditor::removePatch
- * Removes the patch at [index] on the patch table from any textures
- * that contain it (and from the patch table itself)
- *******************************************************************/
-bool TextureXEditor::removePatch(unsigned index, bool delete_entry) {
-	// Get patch we're removing
-	patch_t& p = patch_table.patch(index);
-
-	// Update TEXTUREx lists
-	for (unsigned a = 0; a < texture_editors.size(); a++)
-		texture_editors[a]->txList().removePatch(p.name);
-
-	// Delete patch entry if it's part of this archive (and delete_entry is true)
-	if (delete_entry && p.entry && p.entry->getParent() == archive)
-		archive->removeEntry(p.entry);
-
-	// Remove patch from patch table
-	patch_table.removePatch(index);
-
-	return true;
-}
-
-/* TextureXEditor::browsePatch
- * Opens the patch browser. Returns the selected patch index, or -1
- * if no patch was selected
- *******************************************************************/
-int TextureXEditor::browsePatch() {
-	patch_browser->updateItems();
-
-	if (patch_browser->ShowModal() == wxID_OK)
-		return patch_browser->getSelectedPatch();
-	else
-		return -1;
-}
-
-/* TextureXEditor::checkTextures
- * Checks all texture definitions for problems and alerts the user
- * if any are found. Returns true if any problems were found, false
- * otherwise
- *******************************************************************/
-bool TextureXEditor::checkTextures() {
-	string problems = wxEmptyString;
-
-	// Go through all texturex lists
-	for (unsigned a = 0; a < texture_editors.size(); a++) {
-		// Go through all textures
-		for (unsigned t = 0; t < texture_editors[a]->txList().nTextures(); t++) {
-			// Get texture
-			CTexture* tex = texture_editors[a]->txList().getTexture(t);
-
-			// Check it's patches are all valid
-			for (unsigned p = 0; p < tex->nPatches(); p++) {
-				if (patch_table.patchIndex(tex->getPatch(p)->getName()) == -1) {
-					problems += s_fmt("Texture %s contains invalid/unknown patch %s\n", chr(tex->getName()), chr(tex->getPatch(p)->getName()));
-				}
-			}
-		}
-	}
-
-	// Go through patch table
-	for (unsigned a = 0; a < patch_table.nPatches(); a++) {
-		// Check patch entry is valid
-		patch_table.updatePatchEntry(a);
-		patch_t& patch = patch_table.patch(a);
-
-		if (!patch.entry) {
-			problems += s_fmt("Patch %s cannot be found in any open archive\n", chr(patch.name));
-		}
-		else {
-			// Check patch entry type
-			if (patch.entry->getType() == EntryType::unknownType())
-				EntryType::detectEntryType(patch.entry);
-			EntryType* type = patch.entry->getType();
-
-			if (!type->extraProps().propertyExists("patch"))
-				problems += s_fmt("Patch %s is of type \"%s\", which is not a valid gfx format for patches. Convert it to either Doom Gfx or PNG\n", chr(patch.name), chr(type->getName()));
-		}
-	}
-
-	// Display a message box with any problems found
-	if (!problems.IsEmpty()) {
-		ExtMessageDialog dlg(this, "Problems Found");
-		dlg.setMessage("The following problems were found:");
-		dlg.setExt(problems);
-		dlg.ShowModal();
-
-		return true;
-	}
-	else
-		return false;
-}
-
-
-/*******************************************************************
- * TEXTUREXEDITOR EVENTS
- *******************************************************************/
 
 /* TextureXEditor::updateTexturePalette
  * Sets the texture panels' palettes to what is selected in the
@@ -407,23 +333,7 @@ void TextureXEditor::updateTexturePalette() {
 		texture_editors[a]->setPalette(pal);
 }
 
-/* TextureXEditor::onAnnouncement
- * Handles any announcements from the current texture
- *******************************************************************/
-void TextureXEditor::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
-	if (announcer == theMainWindow->getPaletteChooser() && event_name == "main_palette_changed") {
-		updateTexturePalette();
-	}
-
-	if (announcer == &patch_table && event_name == "modified") {
-		patch_browser->openPatchTable(&patch_table);
-	}
-}
-
-/* TextureXEditor::onSaveClicked
- * Called when the 'Save Changes' button is clicked
- *******************************************************************/
-void TextureXEditor::onSaveClicked(wxCommandEvent& e) {
+void TextureXEditor::saveChanges() {
 	// Check for problems
 	checkTextures();
 
@@ -447,6 +357,158 @@ void TextureXEditor::onSaveClicked(wxCommandEvent& e) {
 	}
 }
 
+bool TextureXEditor::close() {
+	// Check if any texture lists are modified
+	bool modified = false;
+	for (unsigned a = 0; a < texture_editors.size(); a++) {
+		texture_editors[a]->applyChanges();
+		if (texture_editors[a]->isModified())
+			modified = true;
+	}
+
+	// Ask to save changes
+	if (modified) {
+		wxMessageDialog md(this, "Save changes to texture entries?", "Unsaved Changes", wxYES_NO|wxCANCEL);
+		int result = md.ShowModal();
+		if (result == wxID_YES)
+			saveChanges();	// User selected to save
+		else if (result == wxID_CANCEL)
+			return false;	// User selected cancel, don't close the archive
+	}
+
+	return true;
+}
+
+/* TextureXEditor::removePatch
+ * Removes the patch at [index] on the patch table from any textures
+ * that contain it (and from the patch table itself)
+ *******************************************************************/
+bool TextureXEditor::removePatch(unsigned index, bool delete_entry) {
+	// Get patch we're removing
+	patch_t& p = patch_table.patch(index);
+
+	// Update TEXTUREx lists
+	for (unsigned a = 0; a < texture_editors.size(); a++)
+		texture_editors[a]->txList().removePatch(p.name);
+
+	// Delete patch entry if it's part of this archive (and delete_entry is true)
+	ArchiveEntry* entry = theResourceManager->getPatchEntry(p.name, "patches", archive);
+	if (delete_entry && entry && entry->getParent() == archive)
+		archive->removeEntry(entry);
+
+	// Remove patch from patch table
+	patch_table.removePatch(index);
+
+	return true;
+}
+
+/* TextureXEditor::browsePatch
+ * Opens the patch table in the patch browser. Returns the selected
+ * patch index, or -1 if no patch was selected
+ *******************************************************************/
+int TextureXEditor::browsePatchTable() {
+	if (patch_browser->ShowModal() == wxID_OK)
+		return patch_browser->getSelectedPatch();
+	else
+		return -1;
+}
+
+string TextureXEditor::browsePatchEntry() {
+	if (patch_browser->ShowModal() == wxID_OK)
+		return patch_browser->getSelectedItem()->getName();
+	else
+		return "";
+}
+
+/* TextureXEditor::checkTextures
+ * Checks all texture definitions for problems and alerts the user
+ * if any are found. Returns true if any problems were found, false
+ * otherwise
+ *******************************************************************/
+bool TextureXEditor::checkTextures() {
+	string problems = wxEmptyString;
+
+	// Go through all texturex lists
+	for (unsigned a = 0; a < texture_editors.size(); a++) {
+		// Go through all textures
+		for (unsigned t = 0; t < texture_editors[a]->txList().nTextures(); t++) {
+			// Get texture
+			CTexture* tex = texture_editors[a]->txList().getTexture(t);
+
+			// Check its patches are all valid
+			for (unsigned p = 0; p < tex->nPatches(); p++) {
+				if (patch_table.patchIndex(tex->getPatch(p)->getName()) == -1) {
+					problems += S_FMT("Texture %s contains invalid/unknown patch %s\n", CHR(tex->getName()), CHR(tex->getPatch(p)->getName()));
+				}
+			}
+		}
+	}
+
+	// Go through patch table
+	for (unsigned a = 0; a < patch_table.nPatches(); a++) {
+		// Check patch entry is valid
+		patch_t& patch = patch_table.patch(a);
+		ArchiveEntry* entry = theResourceManager->getPatchEntry(patch.name, "patches", archive);
+
+		if (!entry) {
+			problems += S_FMT("Patch %s cannot be found in any open archive\n", CHR(patch.name));
+		}
+		else {
+			// Check patch entry type
+			if (entry->getType() == EntryType::unknownType())
+				EntryType::detectEntryType(entry);
+			EntryType* type = entry->getType();
+
+			if (!type->extraProps().propertyExists("patch"))
+				problems += S_FMT("Patch %s is of type \"%s\", which is not a valid gfx format for patches. Convert it to either Doom Gfx or PNG\n", CHR(patch.name), CHR(type->getName()));
+		}
+	}
+
+	// Display a message box with any problems found
+	if (!problems.IsEmpty()) {
+		ExtMessageDialog dlg(this, "Problems Found");
+		dlg.setMessage("The following problems were found:");
+		dlg.setExt(problems);
+		dlg.ShowModal();
+
+		return true;
+	}
+	else
+		return false;
+}
+
+/* TextureXEditor::onAnnouncement
+ * Handles any announcements from the current texture
+ *******************************************************************/
+void TextureXEditor::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
+	if (announcer == theMainWindow->getPaletteChooser() && event_name == "main_palette_changed") {
+		updateTexturePalette();
+	}
+
+	if (announcer == &patch_table && event_name == "modified") {
+		patch_browser->openPatchTable(&patch_table);
+	}
+
+	if (announcer == theResourceManager)
+		patch_browser->openArchive(archive);
+}
+
+
+/*******************************************************************
+ * TEXTUREXEDITOR EVENTS
+ *******************************************************************/
+
+/* TextureXEditor::onSaveClicked
+ * Called when the 'Save Changes' button is clicked
+ *******************************************************************/
+void TextureXEditor::onSaveClicked(wxCommandEvent& e) {
+	saveChanges();
+}
+
+
+/*******************************************************************
+ * TEXTUREXEDITOR STATIC FUNCTIONS
+ *******************************************************************/
 
 /* TextureXEditor::setupTextureEntries
  * Static function to check if an archive has sufficient texture
@@ -458,10 +520,19 @@ bool TextureXEditor::setupTextureEntries(Archive* archive) {
 	if (!archive)
 		return false;
 
-	// Search archive for any texture-related entries
+	// Search archive for any ZDoom TEXTURES entries
 	Archive::search_options_t options;
+	options.match_type = EntryType::getType("zdtextures");
+	ArchiveEntry* entry_tx = archive->findFirst(options);	// Find any TEXTURES entry
+
+	// If it's found, we're done
+	if (entry_tx)
+		return true;
+
+
+	// Search archive for any texture-related entries
 	options.match_type = EntryType::getType("texturex");
-	ArchiveEntry* entry_tx = archive->findFirst(options);		// Find any TEXTUREx entry
+	entry_tx = archive->findFirst(options);						// Find any TEXTUREx entry
 	options.match_type = EntryType::getType("pnames");
 	ArchiveEntry* entry_pnames = archive->findFirst(options);	// Find any PNAMES entry
 
@@ -503,10 +574,10 @@ bool TextureXEditor::setupTextureEntries(Archive* archive) {
 						// Create dummy texture
 						CTexture* dummytex = new CTexture();
 						dummytex->setName("S3DUMMY");
-						dummytex->addPatch("S3DUMMY", 0, 0, dpatch);
+						dummytex->addPatch("S3DUMMY", 0, 0);
 						dummytex->setWidth(128);
 						dummytex->setHeight(128);
-						dummytex->setScale(0, 0, true);
+						dummytex->setScale(0, 0);
 
 						// Add dummy texture to list
 						// (this serves two purposes - supplies the special 'invalid' texture by default,
@@ -526,7 +597,15 @@ bool TextureXEditor::setupTextureEntries(Archive* archive) {
 						texturex->setExtensionByType();
 					}
 					else if (ctxd.getSelectedFormat() == TXF_TEXTURES) {
-						wxMessageBox("ZDoom TEXTURES Not Implemented");
+						// Create texture list
+						TextureXList txlist;
+						txlist.setFormat(TXF_TEXTURES);
+
+						// Add empty TEXTURES entry to archive
+						texturex = archive->addNewEntry("TEXTURES");
+						texturex->setType(EntryType::getType("zdtextures"));
+						texturex->setExtensionByType();
+
 						return false;
 					}
 

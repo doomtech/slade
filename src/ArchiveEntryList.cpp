@@ -90,7 +90,6 @@ ArchiveEntryList::ArchiveEntryList(wxWindow* parent) : VirtualListView(parent) {
 	// Bind events
 	Bind(wxEVT_COMMAND_LIST_COL_RIGHT_CLICK, &ArchiveEntryList::onColumnHeaderRightClick, this);
 	Bind(wxEVT_COMMAND_LIST_COL_END_DRAG, &ArchiveEntryList::onColumnResize, this);
-	Bind(wxEVT_COMMAND_MENU_SELECTED, &ArchiveEntryList::onMenu, this);
 	Bind(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, &ArchiveEntryList::onListItemActivated, this);
 
 	// Setup flags
@@ -118,9 +117,9 @@ string ArchiveEntryList::getItemText(long item, long column) const {
 	// Determine what column we want
 	int col = columnType(column);
 
-	if (col == AEL_COLUMN_NAME)
+	if (col == 0)
 		return entry->getName();	// Name column
-	else if (col == AEL_COLUMN_SIZE) {
+	else if (col == 1) {
 		// Size column
 
 		if (entry->getType() == EntryType::folderType()) {
@@ -138,12 +137,12 @@ string ArchiveEntryList::getItemText(long item, long column) const {
 				return "INVALID DIRECTORY";
 
 			// Return the number of items in the directory
-			return s_fmt("%d entries", dir->numEntries() + dir->nChildren());
+			return S_FMT("%d entries", dir->numEntries() + dir->nChildren());
 		}
 		else
 			return entry->getSizeString();	// Not a folder, just return the normal size string
 	}
-	else if (col == AEL_COLUMN_TYPE)
+	else if (col == 2)
 		return entry->getTypeString();	// Type column
 	else
 		return "INVALID COLUMN";		// Invalid column
@@ -239,6 +238,9 @@ void ArchiveEntryList::setupColumns() {
 		InsertColumn(col_num, "Type");
 		SetColumnWidth(col_num++, elist_coltype_width);
 	}
+
+	// Set editable
+	setColumnEditable(0);	// Name column
 }
 
 /* ArchiveEntryList::columnType
@@ -246,15 +248,15 @@ void ArchiveEntryList::setupColumns() {
  *******************************************************************/
 int ArchiveEntryList::columnType(int column) const {
 	if (column == 0)
-		return AEL_COLUMN_NAME;		// Name column is always 0
+		return 0;		// Name column is always 0
 	else if (column == 1) {			// Column 1 can be either size or type
 		if (elist_colsize_show)
-			return AEL_COLUMN_SIZE;
+			return 1;
 		else
-			return AEL_COLUMN_TYPE;
+			return 2;
 	}
 	else if (column == 2)			// Column 2 is always type (if it exists)
-		return AEL_COLUMN_TYPE;
+		return 2;
 	else
 		return -1;					// Invalid column
 }
@@ -307,8 +309,10 @@ void ArchiveEntryList::filterList(string filter, string category) {
 			}
 		}
 
-		if (entry == focus)
+		if (entry == focus) {
 			focusItem(a);
+			EnsureVisible(a);
+		}
 	}
 }
 
@@ -338,7 +342,7 @@ void ArchiveEntryList::applyFilter() {
 			filter.push_back(index);	// If no category specified, just add all entries to the filter
 		else {
 			// Check for category match
-			if (s_cmpnocase(entry->getType()->getCategory(), filter_category))
+			if (S_CMPNOCASE(entry->getType()->getCategory(), filter_category))
 				filter.push_back(index);
 		}
 
@@ -468,6 +472,42 @@ ArchiveEntry* ArchiveEntryList::getEntry(int index) const {
 	return NULL;
 }
 
+/* ArchiveEntryList::getEntryIndex
+ * Returns the ArchiveEntry index associated with the list item at
+ * [index]. Returns -1 if the index is out of bounds or no archive
+ * is open
+ *******************************************************************/
+int ArchiveEntryList::getEntryIndex(int index) {
+	// Check index & archive
+	if (index < 0 || !archive)
+		return -1;
+
+	// Check if filtering is active
+	if (filter_active) {
+		// If it is, modify index for filtered list
+		if (index < 0 || (unsigned) index >= filter.size())
+			return -1;
+
+		index = filter[index];
+	}
+
+	// Index modifier if 'up folder' entry exists
+	if (show_dir_back && current_dir->getParent()) {
+		if (index == 0)
+			return -1;
+		else
+			index--;
+	}
+
+	// Entries
+	int subdirs = current_dir->nChildren();
+	if ((unsigned)index < subdirs + current_dir->numEntries())
+		return index - subdirs;
+
+	// Out of bounds or subdir
+	return -1;
+}
+
 /* ArchiveEntryList::getFocusedEntry
  * Gets the archive entry associated with the currently focused list
  * item. Returns NULL if nothing is focused or no archive is open
@@ -554,6 +594,14 @@ vector<ArchiveTreeNode*> ArchiveEntryList::getSelectedDirectories() {
 	return ret;
 }
 
+/* ArchiveEntryList::labelEdited
+ * Called when a label has been edited
+ *******************************************************************/
+void ArchiveEntryList::labelEdited(int col, int index, string new_label) {
+	// Rename the entry
+	getEntry(index)->rename(new_label);
+}
+
 /* ArchiveEntryList::onAnnouncement
  * Called when an announcement is recieved from the archive being
  * managed
@@ -567,6 +615,52 @@ void ArchiveEntryList::onAnnouncement(Announcer* announcer, string event_name, M
 	}
 }
 
+/* ArchiveEntryList::handleAction
+ * Handles the action [id]. Returns true if the action was handled,
+ * false otherwise
+ *******************************************************************/
+bool ArchiveEntryList::handleAction(string id) {
+	// Don't handle action if hidden
+	if (!IsShown())
+		return false;
+
+	// Only interested in actions beginning with aelt_
+	if (!id.StartsWith("aelt_"))
+		return false;
+
+	if (id == "aelt_sizecol") {
+		elist_colsize_show = !elist_colsize_show;
+		setupColumns();
+		updateWidth();
+		if (GetParent())
+			GetParent()->Layout();
+	}
+	else if (id == "aelt_typecol") {
+		elist_coltype_show = !elist_coltype_show;
+		setupColumns();
+		updateWidth();
+		if (GetParent())
+			GetParent()->Layout();
+	}
+	else if (id == "aelt_hrules") {
+		elist_hrules = !elist_hrules;
+		SetSingleStyle(wxLC_HRULES, elist_hrules);
+		Refresh();
+	}
+	else if (id == "aelt_vrules") {
+		elist_vrules = !elist_vrules;
+		SetSingleStyle(wxLC_VRULES, elist_vrules);
+		Refresh();
+	}
+
+	// Unknown action
+	else
+		return false;
+
+	// Action handled, return true
+	return true;
+}
+
 
 /*******************************************************************
  * ARCHIVEENTRYLIST EVENTS
@@ -577,18 +671,18 @@ void ArchiveEntryList::onAnnouncement(Announcer* announcer, string event_name, M
  *******************************************************************/
 void ArchiveEntryList::onColumnHeaderRightClick(wxListEvent& e) {
 	// Create simple popup menu with options to toggle columns
-	wxMenu* popup = new wxMenu();
-	popup->AppendCheckItem(AEL_COLUMN_SIZE, "Size", "Show the size column");
-	popup->AppendCheckItem(AEL_COLUMN_TYPE, "Type", "Show the type column");
-	popup->AppendCheckItem(AEL_HRULES, "Horizontal Rules", "Show horizontal rules between entries");
-	popup->AppendCheckItem(AEL_VRULES, "Vertical Rules", "Show vertical rules between columns");
-	popup->Check(AEL_COLUMN_SIZE, elist_colsize_show);
-	popup->Check(AEL_COLUMN_TYPE, elist_coltype_show);
-	popup->Check(AEL_HRULES, elist_hrules);
-	popup->Check(AEL_VRULES, elist_vrules);
+	wxMenu popup;
+	theApp->getAction("aelt_sizecol")->addToMenu(&popup);
+	theApp->getAction("aelt_typecol")->addToMenu(&popup);
+	theApp->getAction("aelt_hrules")->addToMenu(&popup);
+	theApp->getAction("aelt_vrules")->addToMenu(&popup);
+	popup.Check(theApp->getAction("aelt_sizecol")->getWxId(), elist_colsize_show);
+	popup.Check(theApp->getAction("aelt_typecol")->getWxId(), elist_coltype_show);
+	popup.Check(theApp->getAction("aelt_hrules")->getWxId(), elist_hrules);
+	popup.Check(theApp->getAction("aelt_vrules")->getWxId(), elist_vrules);
 
 	// Pop it up
-	PopupMenu(popup);
+	PopupMenu(&popup);
 }
 
 /* ArchiveEntryList::onColumnResize
@@ -604,37 +698,6 @@ void ArchiveEntryList::onColumnResize(wxListEvent& e) {
 		elist_coltype_width = GetColumnWidth(col++);
 
 	e.Skip();
-}
-
-/* ArchiveEntryList::onMenu
- * Called when a menu item is clicked (from the column header context
- * menu)
- *******************************************************************/
-void ArchiveEntryList::onMenu(wxCommandEvent& e) {
-	if (e.GetId() == AEL_COLUMN_SIZE) {
-		elist_colsize_show = !elist_colsize_show;
-		setupColumns();
-		updateWidth();
-		if (GetParent())
-			GetParent()->Layout();
-	}
-	else if (e.GetId() == AEL_COLUMN_TYPE) {
-		elist_coltype_show = !elist_coltype_show;
-		setupColumns();
-		updateWidth();
-		if (GetParent())
-			GetParent()->Layout();
-	}
-	else if (e.GetId() == AEL_HRULES) {
-		elist_hrules = !elist_hrules;
-		SetSingleStyle(wxLC_HRULES, elist_hrules);
-		Refresh();
-	}
-	else if (e.GetId() == AEL_VRULES) {
-		elist_vrules = !elist_vrules;
-		SetSingleStyle(wxLC_VRULES, elist_vrules);
-		Refresh();
-	}
 }
 
 /* ArchiveEntryList::onListItemActivated

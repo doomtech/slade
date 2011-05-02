@@ -32,6 +32,7 @@
 #include "WxStuff.h"
 #include "PaletteEntryPanel.h"
 #include "PaletteManager.h"
+#include "Icons.h"
 
 
 /*******************************************************************
@@ -45,7 +46,8 @@ PaletteEntryPanel::PaletteEntryPanel(wxWindow* parent)
 : EntryPanel(parent, "palette") {
 	// Add palette canvas
 	pal_canvas = new PaletteCanvas(this, -1);
-	sizer_main->Add(pal_canvas->toPanel(this), 1, wxEXPAND|wxALL, 4);
+	pal_canvas->allowSelection(1);
+	sizer_main->Add(pal_canvas->toPanel(this), 1, wxEXPAND, 0);
 
 	// Disable default entry buttons
 	btn_save->Enable(false);
@@ -53,22 +55,17 @@ PaletteEntryPanel::PaletteEntryPanel(wxWindow* parent)
 	btn_edit_ext->Enable(false);
 
 	// Add palette selection buttons
-	btn_nextpal = new wxButton(this, -1, "Next >");
-	btn_prevpal = new wxButton(this, -1, "< Prev");
+	btn_nextpal = new wxBitmapButton(this, -1, getIcon("t_right"));
+	btn_prevpal = new wxBitmapButton(this, -1, getIcon("t_left"));
 	text_curpal = new wxStaticText(this, -1, "Palette XX/XX");
-	sizer_bottom->Add(btn_prevpal, 0, wxEXPAND|wxRIGHT|wxLEFT, 4);
+	sizer_bottom->Add(btn_prevpal, 0, wxEXPAND|wxRIGHT, 4);
 	sizer_bottom->Add(btn_nextpal, 0, wxEXPAND|wxRIGHT, 4);
 	sizer_bottom->Add(text_curpal, 0, wxALIGN_CENTER_VERTICAL, 4);
 
-	// Add colour info label
-	label_selected_colour = new wxStaticText(this, -1, wxEmptyString);
-	sizer_bottom->AddSpacer(8);
-	sizer_bottom->Add(label_selected_colour, 0, wxALIGN_CENTER_VERTICAL, 4);
-
 	// Add 'Add to Palettes' button
 	btn_exportpal = new wxButton(this, -1, "Add to Palettes");
-	sizer_bottom->AddStretchSpacer();
-	sizer_bottom->Add(btn_exportpal, 0, wxEXPAND);
+	sizer_top->AddStretchSpacer();
+	sizer_top->Add(btn_exportpal, 0, wxEXPAND);
 
 	// Bind events
 	btn_nextpal->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &PaletteEntryPanel::onBtnNextPal, this);
@@ -124,6 +121,17 @@ bool PaletteEntryPanel::loadEntry(ArchiveEntry* entry) {
 	return true;
 }
 
+/* GfxEntryPanel::statusString
+ * Returns a string with extended editing/entry info for the status
+ * bar
+ *******************************************************************/
+string PaletteEntryPanel::statusString() {
+	// Get current colour
+	rgba_t col = pal_canvas->getSelectedColour();
+
+	return S_FMT("R %d, G %d, B %d", col.r, col.g, col.b);
+}
+
 /* PaletteEntryPanel::showPalette
  * Shows the palette at [index]. Returns false if [index] is out of
  * bounds, true otherwise
@@ -137,7 +145,7 @@ bool PaletteEntryPanel::showPalette(uint32_t index) {
 	pal_canvas->getPalette().copyPalette(palettes[index]);
 
 	// Set current palette text
-	text_curpal->SetLabel(s_fmt("Palette %d/%d", index+1, palettes.size()));
+	text_curpal->SetLabel(S_FMT("Palette %d/%d", index+1, palettes.size()));
 
 	// Refresh
 	Layout();
@@ -177,11 +185,8 @@ void PaletteEntryPanel::onPalCanvasMouseEvent(wxMouseEvent& e) {
 		// Send to palette canvas
 		pal_canvas->onMouseLeftDown(e);
 
-		// Get colour
-		rgba_t col = pal_canvas->getSelectedColour();
-
-		// Set label
-		label_selected_colour->SetLabel(s_fmt("R%d G%d B%d", col.r, col.g, col.b));
+		// Update status bar
+		updateStatus();
 	}
 }
 
@@ -195,7 +200,7 @@ void PaletteEntryPanel::onBtnExportPal(wxCommandEvent& e) {
 		return;
 
 	// Write current palette to the user palettes directory
-	string path = appPath(s_fmt("palettes/%s.pal", chr(name)), DIR_USER);
+	string path = appPath(S_FMT("palettes/%s.pal", CHR(name)), DIR_USER);
 	palettes[cur_palette]->saveFile(path);
 
 	// Add to palette manager

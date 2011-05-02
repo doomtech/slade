@@ -62,7 +62,7 @@ STreeNode::~STreeNode() {
 }
 
 /* STreeNode::getPath
- * Returns the 'path' to this node, ie, the names of all it's parent
+ * Returns the 'path' to this node, ie, the names of all its parent
  * nodes each separated by a / (including the name of this node)
  *******************************************************************/
 string STreeNode::getPath() {
@@ -104,7 +104,7 @@ STreeNode* STreeNode::getChild(string name) {
 	if (fn.GetDirCount() == 0) {
 		// Find child of this node
 		for (unsigned a = 0; a < children.size(); a++) {
-			if (s_cmpnocase(name, children[a]->getName()))
+			if (S_CMPNOCASE(name, children[a]->getName()))
 				return children[a];
 		}
 
@@ -150,7 +150,7 @@ vector<STreeNode*> STreeNode::getChildren(string name) {
 	if (fn.GetDirCount() == 0) {
 		// Find child of this node
 		for (unsigned a = 0; a < children.size(); a++) {
-			if (s_cmpnocase(name, children[a]->getName()))
+			if (S_CMPNOCASE(name, children[a]->getName()))
 				ret.push_back(children[a]);
 		}
 	}

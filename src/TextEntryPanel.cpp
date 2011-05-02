@@ -48,9 +48,9 @@ wxArrayString languages;
  *******************************************************************/
 TextEntryPanel::TextEntryPanel(wxWindow* parent)
 : EntryPanel(parent, "text") {
-	// Setup top bar sizer
-	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
-	sizer_main->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT, 4);
+	// Create the text area
+	text_area = new TextEditor(this, -1);
+	sizer_main->Add(text_area, 1, wxEXPAND, 0);
 
 	// Add 'Text Language' choice
 	languages = TextLanguage::getLanguageNames();
@@ -58,25 +58,21 @@ TextEntryPanel::TextEntryPanel(wxWindow* parent)
 	languages.Insert("None", 0, 1);
 	choice_text_language = new wxChoice(this, -1, wxDefaultPosition, wxDefaultSize, languages);
 	choice_text_language->Select(0);
-	hbox->Add(new wxStaticText(this, -1, "Text Language:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
-	hbox->Add(choice_text_language, 0, wxEXPAND|wxRIGHT, 4);
+	sizer_bottom->Add(new wxStaticText(this, -1, "Text Language:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
+	sizer_bottom->Add(choice_text_language, 0, wxEXPAND);
 
 
-	// Create the text area
-	text_area = new TextEditor(this, -1);
-	sizer_main->Add(text_area, 1, wxEXPAND | wxALL, 4);
-
-
-	// Add 'Find/Replace' button to bottom sizer
-	sizer_bottom->AddStretchSpacer();
+	// Add 'Find/Replace' button to top sizer
+	sizer_top->AddStretchSpacer();
 	btn_find_replace = new wxButton(this, -1, "Find + Replace");
-	sizer_bottom->Add(btn_find_replace, 0, wxEXPAND, 4);
+	sizer_top->Add(btn_find_replace, 0, wxEXPAND, 0);
 
 
 	// Bind events
 	choice_text_language->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &TextEntryPanel::onChoiceLanguageChanged, this);
 	text_area->Bind(wxEVT_STC_CHANGE, &TextEntryPanel::onTextModified, this);
 	btn_find_replace->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextEntryPanel::onBtnFindReplace, this);
+	text_area->Bind(wxEVT_STC_UPDATEUI, &TextEntryPanel::onUpdateUI, this);
 
 	Layout();
 }
@@ -101,6 +97,9 @@ bool TextEntryPanel::loadEntry(ArchiveEntry* entry) {
 	else
 		btn_save->Enable(true);
 
+	// Scroll to previous position (if any)
+	if (entry->exProps().propertyExists("TextPosition"))
+		text_area->GotoPos((int)(entry->exProp("TextPosition")));
 
 	// --- Attempt to determine text language ---
 	TextLanguage* tl = NULL;
@@ -117,13 +116,21 @@ bool TextEntryPanel::loadEntry(ArchiveEntry* entry) {
 		tl = TextLanguage::getLanguage(lang_id);
 	}
 
+	// Or, from entry's parent directory
+	if (!tl) {
+		// ZDoom DECORATE (within 'actors' or 'decorate' directories)
+		if (S_CMPNOCASE(wxString("/actors/"), entry->getPath().Left(8)) ||
+			S_CMPNOCASE(wxString("/decorate/"), entry->getPath().Left(10)))
+			tl = TextLanguage::getLanguage("decorate");
+	}
+
 	// Load language
 	text_area->setLanguage(tl);
 
 	// Select it in the choice box
 	if (tl) {
 		for (unsigned a = 0; a < languages.size(); a++) {
-			if (s_cmpnocase(tl->getName(), languages[a])) {
+			if (S_CMPNOCASE(tl->getName(), languages[a])) {
 				choice_text_language->Select(a);
 				break;
 			}
@@ -172,6 +179,32 @@ void TextEntryPanel::refreshPanel() {
 	Update();
 }
 
+/* TextEntryPanel::closeEntry
+ * Performs any actions required on closing the entry
+ *******************************************************************/
+void TextEntryPanel::closeEntry() {
+	// Check any entry is open
+	if (!entry)
+		return;
+
+	// Save current caret position
+	entry->exProp("TextPosition") = text_area->GetCurrentPos();
+}
+
+/* TextEntryPanel::statusString
+ * Returns a string with extended editing/entry info for the status
+ * bar
+ *******************************************************************/
+string TextEntryPanel::statusString() {
+	// Setup status string
+	int line = text_area->GetCurrentLine()+1;
+	int pos = text_area->GetCurrentPos();
+	int col = text_area->GetColumn(pos)+1;
+	string status = S_FMT("Ln %d, Col %d, Pos %d", line, col, pos);
+
+	return status;
+}
+
 
 /*******************************************************************
  * TEXTENTRYPANEL CLASS EVENTS
@@ -207,4 +240,9 @@ void TextEntryPanel::onChoiceLanguageChanged(wxCommandEvent& e) {
 		entry->exProp("TextLanguage") = tl->getId();
 	else
 		entry->exProps().removeProperty("TextLanguage");
+}
+
+void TextEntryPanel::onUpdateUI(wxStyledTextEvent& e) {
+	updateStatus();
+	e.Skip();
 }

@@ -36,6 +36,7 @@
 #include "WxStuff.h"
 #include "PatchBrowser.h"
 #include "ArchiveManager.h"
+#include "ResourceManager.h"
 #include "Misc.h"
 
 
@@ -59,10 +60,10 @@ PatchBrowserItem::~PatchBrowserItem() {
 }
 
 /* PatchBrowserItem::loadImage
- * Loads the item's image from it's associated entry (if any)
+ * Loads the item's image from its associated entry (if any)
  *******************************************************************/
 bool PatchBrowserItem::loadImage() {
-	// Do nothing if no patch entry defined
+	// Do nothing if no patch entry found
 	if (!entry)
 		return false;
 
@@ -120,6 +121,11 @@ bool PatchBrowser::openPatchTable(PatchTable* table) {
 	// Clear any existing browser items
 	clearItems();
 
+	// Init browser tree
+	items_root->addChild("Base");
+	items_root->addChild("Archive");
+	items_root->addChild("Unknown");
+
 	// Setup palette chooser
 	theMainWindow->getPaletteChooser()->setGlobalFromArchive(table->getParent());
 
@@ -129,24 +135,26 @@ bool PatchBrowser::openPatchTable(PatchTable* table) {
 		patch_t& patch = table->patch(a);
 
 		// Init position to add
-		string where = "Unknown";
+		string whereis = "Unknown";
+
+		// Get patch entry
+		ArchiveEntry* entry = theResourceManager->getPatchEntry(patch.name);
 
 		// Check its parent archive
-		//table->updatePatchEntry(a);
-		if (patch.entry) {
-			Archive* parent_archive = patch.entry->getParent();
+		if (entry) {
+			Archive* parent_archive = entry->getParent();
 
 			// If it's the base resource archive, put it under 'IWAD', otherwise 'Custom'
 			if (parent_archive == theArchiveManager->baseResourceArchive())
-				where = "Base";
+				whereis = "Base";
 			else
-				where = "Archive";
+				whereis = "Archive";
 		}
 
 		// Add it
-		PatchBrowserItem* item = new PatchBrowserItem(patch.name, patch.entry, a);
+		PatchBrowserItem* item = new PatchBrowserItem(patch.name, entry, a);
 		item->setPalette(theMainWindow->getPaletteChooser()->getSelectedPalette());
-		addItem(item, where);
+		addItem(item, whereis);
 	}
 
 	// Update variables
@@ -156,6 +164,66 @@ bool PatchBrowser::openPatchTable(PatchTable* table) {
 
 	// Open 'all' node
 	openTree(items_root);
+
+	// Update tree control
+	populateItemTree();
+
+	return true;
+}
+
+bool PatchBrowser::openArchive(Archive* archive) {
+	// Check archive was given
+	if (!archive)
+		return false;
+
+	// Clear any existing browser items
+	clearItems();
+
+	// Init browser tree
+	items_root->addChild("Patches");
+	items_root->addChild("Graphics");
+	items_root->addChild("Textures");
+	items_root->addChild("Sprites");
+
+	// Setup palette chooser
+	theMainWindow->getPaletteChooser()->setGlobalFromArchive(archive);
+
+	// Get a list of all available patch entries
+	vector<ArchiveEntry*> patches;
+	theResourceManager->getAllPatchEntries(patches, archive);
+
+	// Go through the list
+	for (unsigned a = 0; a < patches.size(); a++) {
+		ArchiveEntry* entry = patches[a];
+
+		// Skip any without parent archives (shouldn't happen)
+		if (!entry->getParent())
+			continue;
+
+		// Check entry namespace
+		string ns = entry->getParent()->detectNamespace(entry);
+		if (ns == "patches") ns = "Patches";
+		else if (ns == "sprites") ns = "Sprites";
+		else if (ns == "textures") ns = "Textures";
+		else ns = "Graphics";
+
+		// Check entry parent archive
+		string arch = "Unknown";
+		if (entry->getParent() == theArchiveManager->baseResourceArchive())
+			arch = "Base";
+		else if (entry->getParent() == archive)
+			arch = "Archive";
+		else
+			arch = "Other";
+
+		// Add it
+		PatchBrowserItem* item = new PatchBrowserItem(entry->getName(true).Truncate(8).Upper(), entry, a);
+		item->setPalette(theMainWindow->getPaletteChooser()->getSelectedPalette());
+		addItem(item, ns + "/" + arch);
+	}
+
+	// Open 'patches' node
+	openTree((BrowserTreeNode*)items_root->getChild("Patches"));
 
 	// Update tree control
 	populateItemTree();
@@ -193,7 +261,7 @@ void PatchBrowser::updateItems(BrowserTreeNode* node) {
 		item->setPalette(theMainWindow->getPaletteChooser()->getSelectedPalette());
 
 		// Update image entry
-		item->setEntry(patch_table->patch(item->getIndex()).entry);
+		item->setEntry(theResourceManager->getPatchEntry(item->getName()));
 	}
 
 	// Go through child nodes and update their items

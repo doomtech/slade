@@ -22,15 +22,10 @@ public:
 	string	getFileExtensionString();
 	string	getFormat();
 
-	// Opening
-	bool	open(string filename);		// Open from File
-	bool	open(ArchiveEntry* entry);	// Open from ArchiveEntry
-	bool	open(MemChunk& mc);			// Open from MemChunk
+	// Opening/writing
 	bool	readDirectory(MemChunk& mc, size_t dir_offset, size_t num_lumps, ArchiveTreeNode* parent);
-
-	// Writing/Saving
+	bool	open(MemChunk& mc);							// Open from MemChunk
 	bool	write(MemChunk& mc, bool update = true);	// Write to MemChunk
-	bool	write(string filename, bool update = true);	// Write to File
 
 	// Misc
 	bool		loadEntryData(ArchiveEntry* entry);

@@ -144,7 +144,7 @@ bool EntryDataFormat::readDataFormatDefinition(MemChunk& mc) {
 			if (parent_type != EntryType::unknownType())
 				parent_type->copyToType(ntype);
 			else
-				wxLogMessage("Warning: Entry type %s inherits from unknown type %s", chr(ntype->getId()), chr(typenode->getInherit()));
+				wxLogMessage("Warning: Entry type %s inherits from unknown type %s", CHR(ntype->getId()), CHR(typenode->getInherit()));
 			*/
 		}
 	}
@@ -198,8 +198,12 @@ void EntryDataFormat::initBuiltinFormats() {
 	new BuildTileFormat();
 	new Heretic2M8Format();
 	new Heretic2M32Format();
+	new HalfLifeTextureFormat();
 	new IMGZDataFormat();
 	new QuakeGfxDataFormat();
+	new QuakeSpriteDataFormat();
+	new QuakeTexDataFormat();
+	new QuakeIIWalDataFormat();
 	new RottGfxDataFormat();
 	new RottTransGfxDataFormat();
 	new RottLBMDataFormat();
@@ -220,18 +224,25 @@ void EntryDataFormat::initBuiltinFormats() {
 	new DatDataFormat();
 	new ResDataFormat();
 	new PakDataFormat();
+	new BSPDataFormat();
 	new GrpDataFormat();
 	new RffDataFormat();
 	new GobDataFormat();
 	new LfdDataFormat();
+	new HogDataFormat();
+	new ADatDataFormat();
 	new Wad2DataFormat();
 	new WadJDataFormat();
 	new WolfDataFormat();
+	new GZipDataFormat();
+	new BZip2DataFormat();
+	new TarDataFormat();
 	new MUSDataFormat();
 	new MIDIDataFormat();
 	new XMIDataFormat();
 	new HMIDataFormat();
 	new HMPDataFormat();
+	new GMIDDataFormat();
 	new ITModuleDataFormat();
 	new XMModuleDataFormat();
 	new S3MModuleDataFormat();
@@ -240,6 +251,7 @@ void EntryDataFormat::initBuiltinFormats() {
 	new DoomPCSpeakerDataFormat();
 	new Doom64SoundDataFormat();
 	new VocDataFormat();
+	new SPDCDataFormat();
 	new BloodSFXDataFormat();
 	new WAVDataFormat();
 	new OggDataFormat();
@@ -248,7 +260,9 @@ void EntryDataFormat::initBuiltinFormats() {
 	new MP3DataFormat();
 	new TextureXDataFormat();
 	new PNamesDataFormat();
-	new ACSDataFormat();
+	new ACS0DataFormat();
+	new ACSEDataFormat();
+	new ACSeDataFormat();
 	new BoomAnimatedDataFormat();
 	new BoomSwitchesDataFormat();
 	new Font0DataFormat();

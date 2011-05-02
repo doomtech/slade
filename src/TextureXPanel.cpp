@@ -33,7 +33,14 @@
 #include "TextureXPanel.h"
 #include "Misc.h"
 #include "TextureXEditor.h"
+#include "ZTextureEditorPanel.h"
 #include <wx/filename.h>
+
+
+/*******************************************************************
+ * EXTERNAL VARIABLES
+ *******************************************************************/
+EXTERN_CVAR(String, dir_last)
 
 
 /*******************************************************************
@@ -79,9 +86,48 @@ string TextureXListView::getItemText(long item, long column) const {
 	if (column == 0)						// Name column
 		return tex->getName();
 	else if (column == 1)					// Size column
-		return s_fmt("%dx%d", tex->getWidth(), tex->getHeight());
+		return S_FMT("%dx%d", tex->getWidth(), tex->getHeight());
+	else if (column == 2)					// Type column
+		return tex->getType();
 	else
 		return "INVALID COLUMN";
+}
+
+/* TextureXListView::updateItemAttr
+ * Called when widget requests the attributes (text colour /
+ * background colour / font) for [item]
+ *******************************************************************/
+void TextureXListView::updateItemAttr(long item) const {
+	// Check texture list exists
+	if (!texturex)
+		return;
+
+	// Check index is ok
+	if (item < 0 || (unsigned)item > texturex->nTextures())
+		return;
+
+	// Get associated texture
+	CTexture* tex = texturex->getTexture(item);
+
+	// Init attributes
+	item_attr->SetTextColour(ListView::colourError());
+
+	// If texture doesn't exist, return error colour
+	if (!tex)
+		return;
+
+	// Set colour depending on entry state
+	switch (tex->getState()) {
+	case 1:
+		item_attr->SetTextColour(ListView::colourModified());
+		break;
+	case 2:
+		item_attr->SetTextColour(ListView::colourNew());
+		break;
+	default:
+		item_attr->SetTextColour(wxSystemSettings::GetColour(wxSYS_COLOUR_LISTBOXTEXT));
+		break;
+	};
 }
 
 /* TextureXListView::updateList
@@ -114,6 +160,7 @@ TextureXPanel::TextureXPanel(wxWindow* parent, TextureXEditor* tx_editor) : wxPa
 	this->tx_entry = NULL;
 	this->tx_editor = tx_editor;
 	this->tex_current = NULL;
+	this->modified = false;
 
 	// Setup sizer
 	wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
@@ -157,10 +204,6 @@ TextureXPanel::TextureXPanel(wxWindow* parent, TextureXEditor* tx_editor) : wxPa
 	btn_new_from_file = new wxButton(this, -1, "New From File");
 	framesizer->Add(btn_new_from_file, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
-	// Add texture editor area
-	texture_editor = new TextureEditorPanel(this, tx_editor);
-	sizer->Add(texture_editor, 1, wxEXPAND|wxALL, 4);
-
 	// Bind events
 	list_textures->Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &TextureXPanel::onTextureListSelect, this);
 	btn_new_texture->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureXPanel::onBtnNewTexture, this);
@@ -180,11 +223,17 @@ TextureXPanel::~TextureXPanel() {
 }
 
 /* TextureXPanel::openTEXTUREX
- * Loads a TEXTUREX format texture list into the editor
+ * Loads a TEXTUREx or TEXTURES format texture list into the editor
  *******************************************************************/
 bool TextureXPanel::openTEXTUREX(ArchiveEntry* entry) {
-	if (texturex.readTEXTUREXData(entry, tx_editor->patchTable())) {
-		tx_entry = entry;
+	// Open texture list (check format)
+	if (entry->getType()->getFormat() == "texturex") {
+		// TEXTURE1/2 format
+		if (!texturex.readTEXTUREXData(entry, tx_editor->patchTable()))
+			return false;
+
+		// Create default texture editor
+		texture_editor = new TextureEditorPanel(this, tx_editor);
 
 		// Update patch table usage info
 		for (size_t a = 0; a < texturex.nTextures(); a++) {
@@ -194,17 +243,32 @@ bool TextureXPanel::openTEXTUREX(ArchiveEntry* entry) {
 			for (size_t p = 0; p < tex->nPatches(); p++)
 				tx_editor->patchTable().patch(tex->getPatch(p)->getName()).used_in.push_back(tex->getName());
 		}
-
-		// Update format label
-		label_tx_format->SetLabel("Format: " + texturex.getTextureXFormatString());
-
-		// Update texture list
-		list_textures->updateList();
-
-		return true;
 	}
-	else
-		return false;
+	else {
+		// TEXTURES format
+		if (!texturex.readTEXTURESData(entry))
+			return false;
+
+		// Create extended texture editor
+		texture_editor = new ZTextureEditorPanel(this, tx_editor);
+
+		// Add 'type' column
+		list_textures->InsertColumn(2, "Type");
+	}
+
+	tx_entry = entry;
+
+	// Add texture editor area
+	GetSizer()->Add(texture_editor, 1, wxEXPAND|wxALL, 4);
+	texture_editor->setupLayout();
+
+	// Update format label
+	label_tx_format->SetLabel("Format: " + texturex.getTextureXFormatString());
+
+	// Update texture list
+	list_textures->updateList();
+
+	return true;
 }
 
 /* TextureXPanel::saveTEXTUREX
@@ -214,9 +278,25 @@ bool TextureXPanel::saveTEXTUREX() {
 	// Save any changes to current texture
 	applyChanges();
 
+	// Write list to entry, in the correct format
 	tx_entry->unlock();	// Have to unlock the entry first
-	bool ok = texturex.writeTEXTUREXData(tx_entry, tx_editor->patchTable());
+	bool ok = false;
+	if (texturex.getFormat() == TXF_TEXTURES)
+		ok = texturex.writeTEXTURESData(tx_entry);
+	else
+		ok = texturex.writeTEXTUREXData(tx_entry, tx_editor->patchTable());
+
+	// Redetect type and lock it up
+	EntryType::detectEntryType(tx_entry);
 	tx_entry->lock();
+
+	// Set all textures to unmodified
+	for (unsigned a = 0; a < texturex.nTextures(); a++)
+		texturex.getTexture(a)->setState(0);
+	list_textures->updateList();
+
+	// Update variables
+	modified = false;
 
 	return ok;
 }
@@ -235,8 +315,11 @@ void TextureXPanel::setPalette(Palette8bit *pal) {
 void TextureXPanel::applyChanges() {
 	if (texture_editor->texModified() && tex_current) {
 		tex_current->copyTexture(texture_editor->getTexture());
+		tex_current->setState(1);
 		tx_editor->patchTable().updatePatchUsage(tex_current);
 		list_textures->updateList();
+		modified = true;
+		texture_editor->openTexture(tex_current);
 	}
 }
 
@@ -254,19 +337,25 @@ CTexture* TextureXPanel::newTextureFromPatch(string name, string patch) {
 	// Create new texture
 	CTexture* tex = new CTexture();
 	tex->setName(name);
+	tex->setState(2);
 
 	// Set dimensions
 	tex->setWidth(image.getWidth());
 	tex->setHeight(image.getHeight());
 
 	// Setup texture scale
-	if (texturex.getFormat() == TXF_TEXTURES)
-		tex->setScale(1, 1, false);
+	if (texturex.getFormat() == TXF_TEXTURES) {
+		tex->setScale(1, 1);
+		tex->setExtended(true);
+	}
 	else
-		tex->setScale(0, 0, true);
+		tex->setScale(0, 0);
 
 	// Add patch
-	tex->addPatch(patch, 0, 0, patch_entry);
+	tex->addPatch(patch, 0, 0);
+
+	// Update variables
+	modified = true;
 
 	// Return the new texture
 	return tex;
@@ -311,16 +400,19 @@ void TextureXPanel::onBtnNewTexture(wxCommandEvent& e) {
 	// Create new texture
 	CTexture* tex = new CTexture();
 	tex->setName(name);
+	tex->setState(2);
 
 	// Default size = 64x128
 	tex->setWidth(64);
 	tex->setHeight(128);
 
 	// Setup texture scale
-	if (texturex.getFormat() == TXF_TEXTURES)
-		tex->setScale(1, 1, false);
+	if (texturex.getFormat() == TXF_TEXTURES) {
+		tex->setScale(1, 1);
+		tex->setExtended(true);
+	}
 	else
-		tex->setScale(0, 0, true);
+		tex->setScale(0, 0);
 
 	// Add it after the last selected item
 	int selected = list_textures->getLastSelected();
@@ -334,6 +426,9 @@ void TextureXPanel::onBtnNewTexture(wxCommandEvent& e) {
 	list_textures->clearSelection();
 	list_textures->selectItem(selected + 1);
 	list_textures->EnsureVisible(selected + 1);
+
+	// Update variables
+	modified = true;
 }
 
 /* TextureXPanel::onBtnNewTextureFromPatch
@@ -345,10 +440,15 @@ void TextureXPanel::onBtnNewTextureFromPatch(wxCommandEvent& e) {
 		return;
 
 	// Browse for patch
-	int patch = tx_editor->browsePatch();
-	if (patch >= 0) {
+	string patch;
+	if (texturex.getFormat() == TXF_TEXTURES)
+		patch = tx_editor->browsePatchEntry();
+	else
+		patch = tx_editor->patchTable().patchName(tx_editor->browsePatchTable());
+
+	if (!patch.IsEmpty()) {
 		// Prompt for new texture name
-		string name = wxGetTextFromUser("Enter a texture name:", "New Texture", tx_editor->patchTable().patchName(patch));
+		string name = wxGetTextFromUser("Enter a texture name:", "New Texture", patch);
 
 		// Do nothing if no name entered
 		if (name.IsEmpty())
@@ -358,7 +458,7 @@ void TextureXPanel::onBtnNewTextureFromPatch(wxCommandEvent& e) {
 		name = name.Upper().Truncate(8);
 
 		// Create new texture from patch
-		CTexture* tex = newTextureFromPatch(name, tx_editor->patchTable().patchName(patch));
+		CTexture* tex = newTextureFromPatch(name, patch);
 
 		// Add texture after the last selected item
 		int selected = list_textures->getLastSelected();
@@ -396,7 +496,7 @@ void TextureXPanel::onBtnNewTextureFromFile(wxCommandEvent& e) {
 	}
 
 	// Create open file dialog
-	wxFileDialog dialog_open(this, "Choose file(s) to open", wxEmptyString, wxEmptyString,
+	wxFileDialog dialog_open(this, "Choose file(s) to open", dir_last, wxEmptyString,
 			ext_filter, wxFD_OPEN|wxFD_MULTIPLE|wxFD_FILE_MUST_EXIST, wxDefaultPosition);
 
 	// Run the dialog & check that the user didn't cancel
@@ -404,6 +504,9 @@ void TextureXPanel::onBtnNewTextureFromFile(wxCommandEvent& e) {
 		// Get file selection
 		wxArrayString files;
 		dialog_open.GetPaths(files);
+
+		// Save 'dir_last'
+		dir_last = dialog_open.GetDirectory();
 
 		// Go through file selection
 		for (unsigned a = 0; a < files.size(); a++) {
@@ -416,14 +519,14 @@ void TextureXPanel::onBtnNewTextureFromFile(wxCommandEvent& e) {
 
 			// If it's not a valid image type, ignore this file
 			if (!entry->getType()->extraProps().propertyExists("image")) {
-				wxLogMessage("%s is not a valid image file", chr(files[a]));
+				wxLogMessage("%s is not a valid image file", CHR(files[a]));
 				continue;
 			}
 
 			// Ask for name for texture
 			wxFileName fn(files[a]);
 			string name = fn.GetName().Upper().Truncate(8);
-			name = wxGetTextFromUser(s_fmt("Enter a texture name for %s:", chr(fn.GetFullName())), "New Texture", name);
+			name = wxGetTextFromUser(S_FMT("Enter a texture name for %s:", CHR(fn.GetFullName())), "New Texture", name);
 			name = name.Truncate(8);
 
 			// Add patch to archive
@@ -431,8 +534,9 @@ void TextureXPanel::onBtnNewTextureFromFile(wxCommandEvent& e) {
 			entry->setExtensionByType();
 			tx_entry->getParent()->addEntry(entry, "patches");
 
-			// Add patch to patch table
-			tx_editor->patchTable().addPatch(name);
+			// Add patch to patch table if needed
+			if (texturex.getFormat() != TXF_TEXTURES)
+				tx_editor->patchTable().addPatch(name);
 
 
 			// Create new texture from patch
@@ -478,6 +582,9 @@ void TextureXPanel::onBtnRemoveTexture(wxCommandEvent& e) {
 	// Clear selection & refresh
 	list_textures->clearSelection();
 	list_textures->updateList();
+
+	// Update variables
+	modified = true;
 }
 
 /* TextureXPanel::onBtnMoveUp
@@ -504,6 +611,9 @@ void TextureXPanel::onBtnMoveUp(wxCommandEvent& e) {
 
 	// Refresh
 	list_textures->updateList();
+
+	// Update variables
+	modified = true;
 }
 
 /* TextureXPanel::onBtnMoveDown
@@ -530,4 +640,7 @@ void TextureXPanel::onBtnMoveDown(wxCommandEvent& e) {
 
 	// Refresh
 	list_textures->updateList();
+
+	// Update variables
+	modified = true;
 }

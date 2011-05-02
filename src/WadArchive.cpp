@@ -167,7 +167,7 @@ void WadArchive::updateNamespaces() {
 
 			// Check if it's the end of an existing namespace
 			for (unsigned a = 0; a < namespaces.size(); a++) {
-				if (s_cmp(ns_name, namespaces[a].name)) {
+				if (S_CMP(ns_name, namespaces[a].name)) {
 					namespaces[a].end = entry;
 				}
 			}
@@ -199,7 +199,7 @@ void WadArchive::updateNamespaces() {
 
 		// Check namespace name for special cases
 		for (int a = 0; a < n_special_namespaces; a++) {
-			if (s_cmp(ns.name, special_namespaces[a].letter))
+			if (S_CMP(ns.name, special_namespaces[a].letter))
 				ns.name = special_namespaces[a].name;
 		}
 
@@ -207,7 +207,7 @@ void WadArchive::updateNamespaces() {
 		ns.end_index = entryIndex(ns.end);
 
 		// Testing
-		//wxLogMessage("Namespace %s from %s to %s", chr(ns.name), chr(ns.start->getName()), chr(ns.end->getName()));
+		//wxLogMessage("Namespace %s from %s to %s", CHR(ns.name), CHR(ns.start->getName()), CHR(ns.end->getName()));
 	}
 }
 
@@ -223,46 +223,6 @@ string WadArchive::getFileExtensionString() {
  *******************************************************************/
 string WadArchive::getFormat() {
 	return "archive_wad";
-}
-
-/* WadArchive::open
- * Reads a wad format file from disk
- * Returns true if successful, false otherwise
- *******************************************************************/
-bool WadArchive::open(string filename) {
-	// Read the file into a MemChunk
-	MemChunk mc;
-	if (!mc.importFile(filename)) {
-		Global::error = "Unable to open file. Make sure it isn't in use by another program.";
-		return false;
-	}
-
-	// Load from MemChunk
-	if (open(mc)) {
-		// Update variables
-		this->filename = filename;
-		this->on_disk = true;
-
-		return true;
-	}
-	else
-		return false;
-}
-
-/* WadArchive::open
- * Reads wad format data from an ArchiveEntry
- * Returns true if successful, false otherwise
- *******************************************************************/
-bool WadArchive::open(ArchiveEntry* entry) {
-	// Load from entry's data
-	if (entry && open(entry->getMCData())) {
-		// Update variables and return success
-		parent = entry;
-		parent->lock();
-		return true;
-	}
-	else
-		return false;
 }
 
 /* WadArchive::open
@@ -369,10 +329,6 @@ bool WadArchive::open(MemChunk& mc) {
 		if (!archive_load_data)
 			entry->unloadData();
 
-		// Lock entry if IWAD
-		if (wad_type[0] == 'I' && iwad_lock)
-			entry->lock();
-
 		// Set entry to unchanged
 		entry->setState(0);
 	}
@@ -384,7 +340,7 @@ bool WadArchive::open(MemChunk& mc) {
 	// Setup variables
 	setMuted(false);
 	setModified(false);
-	if (iwad && iwad_lock) read_only = true;
+	//if (iwad && iwad_lock) read_only = true;
 	announce("opened");
 
 	theSplashWindow->setProgressMessage("");
@@ -393,23 +349,16 @@ bool WadArchive::open(MemChunk& mc) {
 }
 
 /* WadArchive::write
- * Writes the wad archive to a file
- * Returns true if successful, false otherwise
- *******************************************************************/
-bool WadArchive::write(string filename, bool update) {
-	// Write to a MemChunk, then export it to a file
-	MemChunk mc;
-	if (write(mc, true))
-		return mc.exportFile(filename);
-	else
-		return false;
-}
-
-/* WadArchive::write
  * Writes the wad archive to a MemChunk
  * Returns true if successful, false otherwise
  *******************************************************************/
 bool WadArchive::write(MemChunk& mc, bool update) {
+	// Don't write if iwad
+	if (iwad && iwad_lock) {
+		Global::error = "IWAD saving disabled";
+		return false;
+	}
+
 	// Determine directory offset & individual lump offsets
 	uint32_t dir_offset = 12;
 	ArchiveEntry* entry = NULL;
@@ -494,6 +443,7 @@ bool WadArchive::loadEntryData(ArchiveEntry* entry) {
 
 	// Set the lump to loaded
 	entry->setLoaded();
+	entry->setState(0);
 
 	return true;
 }
@@ -517,9 +467,18 @@ ArchiveEntry* WadArchive::addEntry(ArchiveEntry* entry, unsigned position, Archi
 	if (copy)
 		entry = new ArchiveEntry(*entry);
 
+	// Duplication of WadArchive::renameEntry logic without checkEntry call.
+	string name = entry->getName();
+
+	// Check for \ character (e.g., from Arch-Viles graphics). They have to be kept.
+	if (name.length() <= 8 && name.find('\\') != wxNOT_FOUND) {
+	} // Don't process as a file name
+
 	// Process name (must be 8 characters max, also cut any extension as wad entries don't usually want them)
-	wxFileName fn(entry->getName());
-	string name = fn.GetName().Truncate(8);
+	else {
+		wxFileName fn(name);
+		name = fn.GetName().Truncate(8);
+	}
 	if (wad_force_uppercase) name.MakeUpper();
 
 	// Set new wad-friendly name
@@ -544,7 +503,7 @@ ArchiveEntry* WadArchive::addEntry(ArchiveEntry* entry, unsigned position, Archi
 ArchiveEntry* WadArchive::addEntry(ArchiveEntry* entry, string add_namespace, bool copy) {
 	// Find requested namespace
 	for (unsigned a = 0; a < namespaces.size(); a++) {
-		if (s_cmpnocase(namespaces[a].name, add_namespace)) {
+		if (S_CMPNOCASE(namespaces[a].name, add_namespace)) {
 			// Namespace found, add entry before end marker
 			return addEntry(entry, entryIndex(namespaces[a].end), NULL, copy);
 		}
@@ -599,9 +558,15 @@ bool WadArchive::renameEntry(ArchiveEntry* entry, string name) {
 	if (!checkEntry(entry))
 		return false;
 
+	// Check for \ character (e.g., from Arch-Viles graphics). They have to be kept.
+	if (name.length() <= 8 && name.find('\\') != wxNOT_FOUND) {
+	} // Don't process as a file name
+
 	// Process name (must be 8 characters max, also cut any extension as wad entries don't usually want them)
-	wxFileName fn(name);
-	name = fn.GetName().Truncate(8);
+	else {
+		wxFileName fn(name);
+		name = fn.GetName().Truncate(8);
+	}
 	if (wad_force_uppercase) name.MakeUpper();
 
 	// Do default rename
@@ -727,7 +692,7 @@ vector<Archive::mapdesc_t> WadArchive::detectMaps() {
 		bool maplump_found = false;
 		for (int a = 0; a < 5; a++) {
 			// Compare with all base map lump names
-			if (s_cmp(entry->getName(), map_lumps[a])) {
+			if (S_CMP(entry->getName(), map_lumps[a])) {
 				maplump_found = true;
 				existing_map_lumps[a] = 1;
 				break;
@@ -748,7 +713,7 @@ vector<Archive::mapdesc_t> WadArchive::detectMaps() {
 				// Compare with all map lump names
 				for (int a = 0; a < NUMMAPLUMPS; a++) {
 					// Compare with all base map lump names
-					if (s_cmp(entry->getName(), map_lumps[a])) {
+					if (S_CMP(entry->getName(), map_lumps[a])) {
 						existing_map_lumps[a] = 1;
 						done = false;
 						break;
@@ -790,11 +755,11 @@ vector<Archive::mapdesc_t> WadArchive::detectMaps() {
 
 				// Add map info to the maps list
 				maps.push_back(md);
-			} else {
+			}// else {
 				// If we found a non-map lump before all needed map lumps were found,
 				// it's an invalid map, so just continue the loop
-				continue;
-			}
+			//	continue;
+			//}
 		}
 
 
@@ -842,6 +807,10 @@ ArchiveEntry* WadArchive::findFirst(search_options_t& options) {
 	ArchiveEntry* start = getEntry(0);
 	ArchiveEntry* end = NULL;
 	options.match_name = options.match_name.Lower();
+
+	// "graphics" namespace is the global namespace in a wad
+	if (options.match_namespace == "graphics")
+		options.match_namespace = "";
 
 	// Check for namespace to search
 	if (!options.match_namespace.IsEmpty()) {
@@ -904,6 +873,10 @@ ArchiveEntry* WadArchive::findLast(search_options_t& options) {
 	ArchiveEntry* end = NULL;
 	options.match_name = options.match_name.Lower();
 
+	// "graphics" namespace is the global namespace in a wad
+	if (options.match_namespace == "graphics")
+		options.match_namespace = "";
+
 	// Check for namespace to search
 	if (!options.match_namespace.IsEmpty()) {
 		// Find matching namespace
@@ -964,6 +937,10 @@ vector<ArchiveEntry*> WadArchive::findAll(search_options_t& options) {
 	ArchiveEntry* end = NULL;
 	options.match_name = options.match_name.Lower();
 	vector<ArchiveEntry*> ret;
+
+	// "graphics" namespace is the global namespace in a wad
+	if (options.match_namespace == "graphics")
+		options.match_namespace = "";
 
 	// Check for namespace to search
 	if (!options.match_namespace.IsEmpty()) {

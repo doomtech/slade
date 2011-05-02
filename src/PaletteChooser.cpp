@@ -116,7 +116,7 @@ bool PaletteChooser::globalSelected() {
 void PaletteChooser::selectPalette(string name) {
 	// Go through palettes list
 	for (unsigned a = 0; a < GetCount(); a++) {
-		if (s_cmpnocase(GetString(a), name)) {
+		if (S_CMPNOCASE(GetString(a), name)) {
 			SetSelection(a);
 			return;
 		}

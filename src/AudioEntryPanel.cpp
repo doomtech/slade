@@ -43,7 +43,10 @@
  * VARIABLES
  *******************************************************************/
 CVAR(Int, snd_volume, 100, CVAR_SAVE)
+//CVAR(Bool, snd_autoplay, false, CVAR_SAVE) // can't get this to work :/
+#ifndef NO_AUDIERE
 AudioDevicePtr AudioEntryPanel::device = NULL;
+#endif
 
 
 /*******************************************************************
@@ -84,11 +87,15 @@ AudioEntryPanel::AudioEntryPanel(wxWindow* parent) : EntryPanel(parent, "audio")
 	slider_volume->SetValue(snd_volume);
 	sizer_gb->Add(slider_volume, wxGBPosition(1, 5));
 
+#ifndef NO_AUDIERE
 	// Open audio device
 	if (!device)
 		device = OpenDevice();
 	if (!device)
 		wxLogMessage("Error: Unable to open audio device, sound playback disabled");
+#else
+	wxLogMessage("Audiere disabled - no sound playback");
+#endif
 
 	// Disable general entrypanel buttons
 	btn_save->Disable();
@@ -113,13 +120,35 @@ AudioEntryPanel::~AudioEntryPanel() {
 	timer_seek->Stop();
 }
 
-
 /* AudioEntryPanel::loadEntry
  * Loads an entry into the audio entry panel
  *******************************************************************/
 bool AudioEntryPanel::loadEntry(ArchiveEntry* entry) {
 	// Stop anything currently playing
 	stopStream();
+	opened = false;
+
+	// Reset seek slider
+	slider_seek->SetValue(0);
+
+	// Delete previous temp file
+	if (wxFileExists(prevfile))
+		wxRemoveFile(prevfile);
+
+	return true;
+}
+
+/* AudioEntryPanel::saveEntry
+ * Saves any changes to the entry (does nothing here)
+ *******************************************************************/
+bool AudioEntryPanel::saveEntry() {
+	return true;
+}
+
+bool AudioEntryPanel::open() {
+	// Check if already opened
+	if (opened)
+		return true;
 
 	// Get entry data
 	MemChunk& mcdata = entry->getMCData();
@@ -161,15 +190,17 @@ bool AudioEntryPanel::loadEntry(ArchiveEntry* entry) {
 		Conversions::musToMidi(mcdata, convdata);
 		path.SetExt("mid");
 		convdata.exportFile(path.GetFullPath());
-	}
-	else
+	} else if (entry->getType()->getFormat() == "gmid") {
+		// GMID -> MIDI
+		MemChunk convdata;
+		Conversions::gmidToMidi(mcdata, convdata);
+		path.SetExt("mid");
+		convdata.exportFile(path.GetFullPath());
+	} else
 		mcdata.exportFile(path.GetFullPath());
 
-	// Reset seek slider
-	slider_seek->SetValue(0);
-
-	// Open it
-	if (entry->getType()->getFormat() == "midi" || entry->getType()->getFormat() == "mus") {
+	if (entry->getType()->getFormat() == "midi" || entry->getType()->getFormat() == "mus" ||
+		entry->getType()->getFormat() == "gmid") {
 		openMidi(path.GetFullPath());
 		midi = true;
 	} else {
@@ -177,20 +208,10 @@ bool AudioEntryPanel::loadEntry(ArchiveEntry* entry) {
 		midi = false;
 	}
 
-	// Delete previous temp file
-	if (wxFileExists(prevfile))
-		wxRemoveFile(prevfile);
-
 	// Keep filename so we can delete it later
 	prevfile = path.GetFullPath();
 
-	return true;
-}
-
-/* AudioEntryPanel::saveEntry
- * Saves any changes to the entry (does nothing here)
- *******************************************************************/
-bool AudioEntryPanel::saveEntry() {
+	opened = true;
 	return true;
 }
 
@@ -198,7 +219,8 @@ bool AudioEntryPanel::saveEntry() {
  * Opens an audio file for playback
  *******************************************************************/
 bool AudioEntryPanel::openAudio(string filename) {
-	stream = OpenSound(device, chr(filename), true);
+#ifndef NO_AUDIERE
+	stream = OpenSound(device, CHR(filename), true);
 	if (stream) {
 		// Check if the audio is seekable
 		int length = stream->getLength();
@@ -227,6 +249,9 @@ bool AudioEntryPanel::openAudio(string filename) {
 
 		return false;
 	}
+#else
+	return false;
+#endif
 }
 
 /* AudioEntryPanel::openMidi
@@ -267,10 +292,15 @@ bool AudioEntryPanel::openMidi(string filename) {
  * Begins playback of the current audio or MIDI stream
  *******************************************************************/
 void AudioEntryPanel::startStream() {
+	if (!opened)
+		open();
+
 	if (midi)
 		theMIDIPlayer->play();
+#ifndef NO_AUDIERE
 	else if (stream)
 		stream->play();
+#endif
 }
 
 /* AudioEntryPanel::stopStream
@@ -279,8 +309,10 @@ void AudioEntryPanel::startStream() {
 void AudioEntryPanel::stopStream() {
 	if (midi)
 		theMIDIPlayer->pause();
+#ifndef NO_AUDIERE
 	else if (stream)
 		stream->stop();
+#endif
 }
 
 /* AudioEntryPanel::resetStream
@@ -289,8 +321,10 @@ void AudioEntryPanel::stopStream() {
 void AudioEntryPanel::resetStream() {
 	if (midi)
 		theMIDIPlayer->stop();
+#ifndef NO_AUDIERE
 	else if (stream)
 		stream->reset();
+#endif
 }
 
 
@@ -336,8 +370,10 @@ void AudioEntryPanel::onTimer(wxTimerEvent& e) {
 	int pos = 0;
 	if (midi)
 		pos = theMIDIPlayer->getPosition();
+#ifndef NO_AUDIERE
 	else if (stream && stream->isSeekable())
 		pos = stream->getPosition();
+#endif
 
 	// Set slider
 	slider_seek->SetValue(pos);
@@ -353,8 +389,10 @@ void AudioEntryPanel::onTimer(wxTimerEvent& e) {
 void AudioEntryPanel::onSliderSeekChanged(wxCommandEvent& e) {
 	if (midi)
 		theMIDIPlayer->setPosition(slider_seek->GetValue());
+#ifndef NO_AUDIERE
 	else if (stream && stream->isSeekable())
 		stream->setPosition(slider_seek->GetValue());
+#endif
 }
 
 /* AudioEntryPanel::onSliderVolumeChanged
@@ -362,6 +400,8 @@ void AudioEntryPanel::onSliderSeekChanged(wxCommandEvent& e) {
  *******************************************************************/
 void AudioEntryPanel::onSliderVolumeChanged(wxCommandEvent& e) {
 	snd_volume = slider_volume->GetValue();
+#ifndef NO_AUDIERE
 	if (stream)
 		stream->setVolume((float)snd_volume * 0.01f);
+#endif
 }

@@ -16,10 +16,14 @@ protected:
 	ArchiveEntry*	entry;
 
 	wxSizer*		sizer_main;
+	wxSizer*		sizer_top;
 	wxSizer*		sizer_bottom;
 	wxButton*		btn_save;
 	wxButton*		btn_revert;
 	wxButton*		btn_edit_ext;
+
+	wxMenu*			menu_custom;
+	string			custom_menu_name;
 
 	void	setModified(bool c = true);
 
@@ -36,6 +40,12 @@ public:
 	virtual bool	saveEntry();
 	virtual bool	revertEntry();
 	virtual void	refreshPanel();
+	virtual void	closeEntry();
+	void			updateStatus();
+	virtual string	statusString() { return ""; }
+	virtual void	addCustomMenu();
+	void			removeCustomMenu();
+	virtual void	handleAction(int menu_id) {}
 
 	virtual void	onBtnSave(wxCommandEvent& e);
 	virtual void	onBtnRevert(wxCommandEvent& e);

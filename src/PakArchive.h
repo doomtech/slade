@@ -15,20 +15,16 @@ public:
 	string	getFileExtensionString();
 	string	getFormat();
 
-	// Opening
-	bool	open(string filename);		// Open from File
-	bool	open(ArchiveEntry* entry);	// Open from ArchiveEntry
-	bool	open(MemChunk& mc);			// Open from MemChunk
-
-	// Writing/Saving
+	// Opening/writing
+	bool	open(MemChunk& mc);							// Open from MemChunk
 	bool	write(MemChunk& mc, bool update = true);	// Write to MemChunk
-	bool	write(string filename, bool update = true);	// Write to File
 
 	// Misc
 	bool	loadEntryData(ArchiveEntry* entry);
 
 	// Detection
 	virtual vector<mapdesc_t>	detectMaps() { return vector<mapdesc_t>(); }
+	string						detectNamespace(ArchiveEntry* entry);
 
 	// Static functions
 	static bool isPakArchive(MemChunk& mc);

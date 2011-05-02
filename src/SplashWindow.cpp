@@ -34,6 +34,8 @@
 #include "SplashWindow.h"
 #include "ArchiveManager.h"
 #include "Console.h"
+#include "MainApp.h"
+#include "MainWindow.h"
 #include <wx/dcbuffer.h>
 
 
@@ -135,6 +137,10 @@ void SplashWindow::show(string message, bool progress) {
 	}
 	else
 		show_progress = false;
+
+	// Set parent
+	if (theApp->isInitialised())
+		SetParent(theMainWindow);
 
 	// Show & init window
 #ifndef __WXGTK__
@@ -267,7 +273,7 @@ CONSOLE_COMMAND (splash, 0) {
 		theSplashWindow->show(args[0]);
 	else {
 		theSplashWindow->show(args[0], true);
-		float prog = atof(chr(args[1]));
+		float prog = atof(CHR(args[1]));
 		theSplashWindow->setProgress(prog);
 	}
 }

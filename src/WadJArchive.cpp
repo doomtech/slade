@@ -124,46 +124,6 @@ WadJArchive::~WadJArchive() {
 }
 
 /* WadJArchive::open
- * Reads a wad format file from disk
- * Returns true if successful, false otherwise
- *******************************************************************/
-bool WadJArchive::open(string filename) {
-	// Read the file into a MemChunk
-	MemChunk mc;
-	if (!mc.importFile(filename)) {
-		Global::error = "Unable to open file. Make sure it isn't in use by another program.";
-		return false;
-	}
-
-	// Load from MemChunk
-	if (open(mc)) {
-		// Update variables
-		this->filename = filename;
-		this->on_disk = true;
-
-		return true;
-	}
-	else
-		return false;
-}
-
-/* WadJArchive::open
- * Reads wad format data from an ArchiveEntry
- * Returns true if successful, false otherwise
- *******************************************************************/
-bool WadJArchive::open(ArchiveEntry* entry) {
-	// Load from entry's data
-	if (entry && open(entry->getMCData())) {
-		// Update variables and return success
-		parent = entry;
-		parent->lock();
-		return true;
-	}
-	else
-		return false;
-}
-
-/* WadJArchive::open
  * Reads wad format data from a MemChunk
  * Returns true if successful, false otherwise
  *******************************************************************/
@@ -288,7 +248,7 @@ bool WadJArchive::open(MemChunk& mc) {
 				if (entry->exProps().propertyExists("FullSize")
 					&& (unsigned)(int)(entry->exProp("FullSize")) >  entry->getSize())
 					edata.reSize((int)(entry->exProp("FullSize")), true);
-				if (!JaguarDecode(edata)) wxLogMessage("%s is screwed up", chr(entry->getName()));
+				if (!JaguarDecode(edata)) wxLogMessage("%s is screwed up", CHR(entry->getName()));
 			}
 			entry->importMemChunk(edata);
 		}
@@ -322,19 +282,6 @@ bool WadJArchive::open(MemChunk& mc) {
 	theSplashWindow->setProgressMessage("");
 
 	return true;
-}
-
-/* WadJArchive::write
- * Writes the wad archive to a file
- * Returns true if successful, false otherwise
- *******************************************************************/
-bool WadJArchive::write(string filename, bool update) {
-	// Write to a MemChunk, then export it to a file
-	MemChunk mc;
-	if (write(mc, true))
-		return mc.exportFile(filename);
-	else
-		return false;
 }
 
 /* WadJArchive::write

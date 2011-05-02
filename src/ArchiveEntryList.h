@@ -5,12 +5,13 @@
 #include "VirtualListView.h"
 #include "ListenerAnnouncer.h"
 #include "Archive.h"
+#include "MainApp.h"
 #include <wx/listctrl.h>
 #include <wx/textctrl.h>
 
 wxDECLARE_EVENT(EVT_AEL_DIR_CHANGED, wxCommandEvent);
 
-class ArchiveEntryList : public VirtualListView, public Listener {
+class ArchiveEntryList : public VirtualListView, public Listener, public SActionHandler {
 private:
 	Archive*			archive;
 	vector<unsigned>	filter;
@@ -20,14 +21,6 @@ private:
 	ArchiveTreeNode*	current_dir;
 	ArchiveEntry*		entry_dir_back;
 	bool				show_dir_back;
-
-	enum {
-		AEL_COLUMN_NAME,
-		AEL_COLUMN_SIZE,
-		AEL_COLUMN_TYPE,
-		AEL_HRULES,
-		AEL_VRULES,
-	};
 
 protected:
 	// Virtual wxListCtrl overrides
@@ -57,17 +50,23 @@ public:
 	bool	setDir(ArchiveTreeNode* dir);
 
 	ArchiveEntry*				getEntry(int index) const;
+	int							getEntryIndex(int index);
 	ArchiveEntry*				getFocusedEntry();
 	vector<ArchiveEntry*>		getSelectedEntries();
 	ArchiveEntry*				getLastSelectedEntry();
 	vector<ArchiveTreeNode*>	getSelectedDirectories();
 
+	// Label editing
+	void	labelEdited(int col, int index, string new_label);
+
 	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
+
+	// SAction handler
+	bool	handleAction(string id);
 
 	// Events
 	void	onColumnHeaderRightClick(wxListEvent& e);
 	void	onColumnResize(wxListEvent& e);
-	void	onMenu(wxCommandEvent& e);
 	void	onListItemActivated(wxListEvent& e);
 };
 

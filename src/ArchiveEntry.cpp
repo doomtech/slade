@@ -48,7 +48,6 @@ ArchiveEntry::ArchiveEntry(string name, uint32_t size) {
 	// Initialise attributes
 	this->parent = NULL;
 	this->name = name;
-	this->data = NULL;
 	this->size = size;
 	this->data_loaded = true;
 	this->state = 2;
@@ -65,20 +64,29 @@ ArchiveEntry::ArchiveEntry(string name, uint32_t size) {
  * ArchiveEntry class copy constructor
  *******************************************************************/
 ArchiveEntry::ArchiveEntry(ArchiveEntry& copy) {
-	// Copy attributes
-	name = copy.getName();
-	size = copy.getSize();
-	data_loaded = true;
-	type = copy.type;
-	reliability = copy.reliability;
-	locked = false;
-	encrypted = copy.encrypted;
+	// Initialise (copy) attributes
+	this->parent = NULL;
+	this->name = copy.name;
+	this->size = copy.size;
+	this->data_loaded = true;
+	this->state = 2;
+	this->type = copy.type;
+	this->locked = false;
+	this->state_locked = false;
+	this->reliability = copy.reliability;
+	this->next = NULL;
+	this->prev = NULL;
+	this->encrypted = copy.encrypted;
 
 	// Copy data
 	data.importMem(copy.getData(true), copy.getSize());
 
 	// Copy extra properties
 	copy.exProps().copyTo(ex_props);
+
+	// Clear properties that shouldn't be copied
+	ex_props.removeProperty("ZipIndex");
+	ex_props.removeProperty("Offset");
 
 	// Set entry state
 	state = 2;
@@ -412,7 +420,7 @@ bool ArchiveEntry::exportFile(string filename) {
 
 	// Check it opened ok
 	if (!file.IsOpened()) {
-		Global::error = s_fmt("Unable to open file %s for writing", filename);
+		Global::error = S_FMT("Unable to open file %s for writing", filename);
 		return false;
 	}
 
@@ -493,4 +501,20 @@ void ArchiveEntry::setExtensionByType() {
 		parent_archive->renameEntry(this, fn.GetFullName());
 	else
 		rename(fn.GetFullName());
+}
+
+/* ArchiveEntry::isInNamespace
+ * Returns true if the entry is in the [ns] namespace within its
+ * parent, false otherwise
+ *******************************************************************/
+bool ArchiveEntry::isInNamespace(string ns) {
+	// Can't do this without parent archive
+	if (!getParent())
+		return false;
+
+	// Some special cases first
+	if (ns == "graphics" && getParent()->getType() == ARCHIVE_WAD)
+		ns = "global";	// Graphics namespace doesn't exist in wad files, use global instead
+
+	return getParent()->detectNamespace(this) == ns;
 }

@@ -15,7 +15,6 @@ public:
 
 	// Opening
 	bool	open(string filename);		// Open from File
-	bool	open(ArchiveEntry* entry);	// Open from ArchiveEntry
 	bool	open(MemChunk& mc);			// Open from MemChunk
 
 	// Writing/Saving
