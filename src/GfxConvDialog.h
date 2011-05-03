@@ -4,9 +4,9 @@
 
 #include <wx/dialog.h>
 #include "GfxCanvas.h"
-#include "ArchiveEntry.h"
 #include "PaletteChooser.h"
 #include "ColourBox.h"
+#include "SIFormat.h"
 
 /* Convert from anything to:
  * Doom Gfx
@@ -28,23 +28,39 @@
  *			- Select transparency colour (to 32bit - select colour, to paletted - select from target palette)
  */
 
-enum ConversionFormat {
-	// Paletted first, then 32-bit formats.
-	// GfxConvDialog::doConvert() expects PNG8BIT to be the last of the paletted formats
-	CONV_4BITCHUNKY,
-	CONV_PLANAR,
-	CONV_DOOMFLAT,
-	CONV_DOOMGFX,
-	CONV_PNG8BIT,
-	CONV_PNG32BIT,
+class ArchiveEntry;
 
-	NUMCONVS
+struct gcd_item_t {
+	ArchiveEntry*	entry;
+	SImage			image;
+	bool			modified;
+	SIFormat*		new_format;
+	Palette8bit*	palette;
+
+	gcd_item_t(ArchiveEntry* entry = NULL) {
+		this->entry = entry;
+		this->modified = false;
+		this->new_format = NULL;
+		this->palette = NULL;
+	}
 };
 
 class GfxConvDialog : public wxDialog {
 private:
-	vector<ArchiveEntry*>	entries;
-	size_t					current_entry;
+	struct conv_format_t {
+		SIFormat*	format;
+		int			coltype;
+
+		conv_format_t(SIFormat* format = NULL, int coltype = RGBA) {
+			this->format = format;
+			this->coltype = coltype;
+		}
+	};
+
+	vector<gcd_item_t>		items;
+	size_t					current_item;
+	vector<conv_format_t>	conv_formats;
+	conv_format_t			current_format;
 
 	GfxCanvas*		gfx_current;
 	GfxCanvas*		gfx_target;
@@ -52,13 +68,14 @@ private:
 	wxButton*		btn_convert_all;
 	wxButton*		btn_skip;
 	wxButton*		btn_skip_all;
-	wxComboBox*		combo_target_format;
+	wxChoice*		combo_target_format;
 	PaletteChooser*	pal_chooser_current;
 	PaletteChooser*	pal_chooser_target;
 
 	wxCheckBox*		cb_enable_transparency;
 	wxRadioButton*	rb_transparency_existing;
 	wxRadioButton*	rb_transparency_colour;
+	wxRadioButton*	rb_transparency_brightness;
 	wxSlider*		slider_alpha_threshold;
 	ColourBox*		colbox_transparent;
 
@@ -69,7 +86,7 @@ private:
 	bool			keep_trans;
 	rgba_t			colour_trans;
 
-	void nextEntry();
+	bool		nextItem();
 
 public:
 	GfxConvDialog();
@@ -77,12 +94,18 @@ public:
 
 	void	setupLayout();
 
-	bool	openEntries(vector<ArchiveEntry*> entries);
+	void	openEntry(ArchiveEntry* entry);
+	void	openEntries(vector<ArchiveEntry*> entries);
 	void	updatePreviewGfx();
 	void	updateControls();
-	void	validateTargetFormat();
-	bool	doConvert();
-	bool	writeToEntry();
+	void	getConvertOptions(SIFormat::convert_options_t& opt);
+
+	bool			itemModified(int index);
+	SImage*			getItemImage(int index);
+	SIFormat*		getItemFormat(int index);
+	Palette8bit*	getItemPalette(int index);
+
+	void	applyConversion();
 
 	// Events
 	void	onResize(wxSizeEvent& e);

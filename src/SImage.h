@@ -53,6 +53,12 @@ private:
 	void	clearData(bool clear_mask = true);
 
 public:
+	enum {
+		// Alpha map generation sources
+		BRIGHTNESS = 0,
+		ALPHA,
+	};
+
 	SImage(SIType type = RGBA);
 	virtual ~SImage();
 
@@ -141,8 +147,10 @@ public:
 	// Conversion stuff
 	bool	convertRGBA(Palette8bit* pal = NULL);
 	bool	convertPaletted(Palette8bit* pal_target, Palette8bit* pal_current = NULL);
-	bool	maskFromColour(rgba_t colour, Palette8bit* pal = NULL, bool force_mask = false);
-	bool	cutoffMask(uint8_t threshold, bool force_mask = false);
+	bool	convertAlphaMap(int alpha_source = BRIGHTNESS, Palette8bit* pal = NULL);
+	bool	maskFromColour(rgba_t colour, Palette8bit* pal = NULL);
+	bool	maskFromBrightness(Palette8bit* pal = NULL);
+	bool	cutoffMask(uint8_t threshold);
 
 	// Image modification
 	bool	setPixel(int x, int y, rgba_t colour, Palette8bit* pal = NULL);

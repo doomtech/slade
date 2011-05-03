@@ -945,11 +945,38 @@ bool ArchivePanel::gfxConvert() {
 	// Create gfx conversion dialog
 	GfxConvDialog gcd;
 
-	// Send entries to the gcd
-	gcd.openEntries(entry_list->getSelectedEntries());
+	// Send selection to the gcd
+	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
+	gcd.openEntries(selection);
 
 	// Run the gcd
 	gcd.ShowModal();
+
+	// Show splash window
+	theSplashWindow->show("Writing converted image data...", true);
+
+	// Write any changes
+	for (unsigned a = 0; a < selection.size(); a++) {
+		// Update splash window
+		theSplashWindow->setProgressMessage(selection[a]->getName());
+		theSplashWindow->setProgress((float)a / (float)selection.size());
+
+		// Skip if the image wasn't converted
+		if (!gcd.itemModified(a))
+			continue;
+
+		// Get image and conversion info
+		SImage* image = gcd.getItemImage(a);
+		SIFormat* format = gcd.getItemFormat(a);
+		
+		// Write converted image back to entry
+		MemChunk mc;
+		format->saveImage(*image, mc, gcd.getItemPalette(a));
+		selection[a]->importMemChunk(mc);
+	}
+
+	// Hide splash window
+	theSplashWindow->hide();
 
 	return true;
 }

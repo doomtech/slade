@@ -316,6 +316,7 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 	// Gfx (offset) type
 	string offset_types[] = { "Auto", "Graphic", "Sprite", "HUD" };
 	choice_offset_type = new wxChoice(this, -1, wxDefaultPosition, wxDefaultSize, 4, offset_types);
+	choice_offset_type->SetSelection(0);
 	sizer_top->Add(choice_offset_type, 0, wxEXPAND, 0);
 
 	// Custom menu

@@ -14,6 +14,7 @@
 
 vector<SIFormat*>	simage_formats;
 SIFormat*			sif_raw = NULL;
+SIFormat*			sif_flat = NULL;
 SIFormat*			sif_unknown = NULL;
 
 // Define valid raw sizes (external for now, until i get rid of SImageFormats.cpp)
@@ -166,7 +167,10 @@ public:
 		// Firstly, make image paletted
 		image.convertPaletted(opt.pal_target, opt.pal_current);
 
-		// Secondly, find a suitable flat size and crop to that size
+		// Secondly, remove any alpha information
+		image.fillAlpha(255);
+
+		// And finally, find a suitable flat size and crop to that size
 		int width = 0;
 		int height = 0;
 		for (unsigned a = 1; a < n_valid_flat_sizes; a++) {
@@ -216,6 +220,7 @@ void SIFormat::initFormats() {
 	// Non-detectable formats
 	sif_unknown = new SIFUnknown();
 	sif_raw = new SIFRaw();
+	sif_flat = new SIFRawFlat();
 	simage_formats.clear();	// Remove previously created formats from the list
 
 	// Image formats
@@ -275,4 +280,21 @@ SIFormat* SIFormat::unknownFormat() {
 
 SIFormat* SIFormat::rawFormat() {
 	return sif_raw;
+}
+
+SIFormat* SIFormat::flatFormat() {
+	return sif_flat;
+}
+
+void SIFormat::getAllFormats(vector<SIFormat*>& list) {
+	// Clear list
+	list.clear();
+
+	// Add formats
+	for (unsigned a = 0; a < simage_formats.size(); a++)
+		list.push_back(simage_formats[a]);
+
+	// Add special formats
+	list.push_back(sif_raw);
+	list.push_back(sif_flat);
 }

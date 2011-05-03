@@ -24,6 +24,7 @@ TODO List ---------------------------------------------------------------
 - AudioEntryPanel improvements
 	- Autoplay option
 - Finish moving SImageFormats.cpp stuff over to SIFormat system
+- (maybe) Use SIFormat system to implement generic 'export as' for image entries
 
 --- Bugs ---
 - Audio player issues

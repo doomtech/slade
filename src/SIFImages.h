@@ -439,7 +439,49 @@ public:
 	}
 
 	bool convertWritable(SImage& image, convert_options_t opt) {
-		// Any size/format image can be saved as png, no need for conversion
+		// Just convert to requested colour type
+
+		// Paletted
+		if (opt.col_format == PALMASK) {
+			// Convert colours
+			image.convertPaletted(opt.pal_target, opt.pal_current);
+
+			// Convert mask
+			if (opt.mask_source == MASK_ALPHA)
+				image.cutoffMask(opt.alpha_threshold);
+			else if (opt.mask_source == MASK_COLOUR)
+				image.maskFromColour(opt.mask_colour, opt.pal_current);
+			else
+				image.fillAlpha(255);
+		}
+
+		// RGBA
+		else if (opt.col_format == RGBA) {
+			image.convertRGBA(opt.pal_current);
+
+			// Convert alpha channel
+			if (opt.mask_source == MASK_COLOUR)
+				image.maskFromColour(opt.mask_colour, opt.pal_current);
+			else if (opt.mask_source == MASK_BRIGHTNESS)
+				image.maskFromBrightness(opt.pal_current);
+		}
+
+		// Alpha Map
+		else if (opt.col_format == ALPHAMAP) {
+			if (opt.mask_source == SIFormat::MASK_ALPHA)
+				image.convertAlphaMap(SImage::ALPHA, opt.pal_current);
+			else if (opt.mask_source == SIFormat::MASK_COLOUR) {
+				image.maskFromColour(opt.mask_colour, opt.pal_current);
+				image.convertAlphaMap(SImage::ALPHA, opt.pal_current);
+			}
+			else
+				image.convertAlphaMap(SImage::BRIGHTNESS, opt.pal_current);
+		}
+
+		// If transparency is disabled
+		if (!opt.transparency)
+			image.fillAlpha(255);
+
 		return true;
 	}
 };

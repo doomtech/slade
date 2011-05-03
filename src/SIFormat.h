@@ -38,9 +38,10 @@ public:
 
 	// Conversion options stuff
 	enum {
-		MASK_NONE,
+		MASK_NONE = 0,
 		MASK_COLOUR,
 		MASK_ALPHA,
+		MASK_BRIGHTNESS,
 	};
 	struct convert_options_t {
 		Palette8bit*	pal_current;
@@ -48,12 +49,14 @@ public:
 		int				mask_source;
 		rgba_t			mask_colour;
 		uint8_t			alpha_threshold;
-		bool			force_mask;
+		bool			transparency;
+		int				col_format;
 
 		convert_options_t() {
 			pal_current = pal_target = NULL;
 			mask_source = 0;
-			force_mask = false;
+			transparency = true;
+			col_format = -1;
 		}
 	};
 
@@ -117,6 +120,8 @@ public:
 	static SIFormat*	determineFormat(MemChunk& mc);
 	static SIFormat*	unknownFormat();
 	static SIFormat*	rawFormat();
+	static SIFormat*	flatFormat();
+	static void			getAllFormats(vector<SIFormat*>& list);
 };
 
 #endif//__SIFORMAT_H__

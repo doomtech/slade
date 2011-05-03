@@ -532,6 +532,9 @@ bool SImage::copyImage(SImage* image) {
 		memcpy(mask, image->mask, width*height);
 	}
 
+	// Announce change
+	announce("image_changed");
+
 	return true;
 }
 
@@ -633,14 +636,43 @@ bool SImage::convertPaletted(Palette8bit* pal_target, Palette8bit* pal_current) 
 	return true;
 }
 
+bool SImage::convertAlphaMap(int alpha_source, Palette8bit* pal) {
+	// Get RGBA data
+	MemChunk rgba;
+	getRGBAData(rgba, pal);
+
+	// Recreate image
+	create(width, height, ALPHAMAP);
+
+	// Generate alpha mask
+	unsigned c = 0;
+	for (int a = 0; a < width * height; a++) {
+		// Determine alpha for this pixel
+		uint8_t alpha = 0;
+		if (alpha_source == BRIGHTNESS)	// Pixel brightness
+			alpha = double(rgba[c])*0.3 + double(rgba[c+1])*0.59 + double(rgba[c+2])*0.11;
+		else							// Existing alpha
+			alpha = rgba[c+3];
+
+		// Set pixel
+		data[a] = alpha;
+
+		// Next RGBA pixel
+		c += 4;
+	}
+
+	// Announce change
+	announce("image_changed");
+
+	return true;
+}
+
 /* SImage::maskFromColour
  * Changes the mask/alpha channel so that pixels that match [colour]
- * are fully transparent, and all other pixels fully opaque. If
- * [force_mask] is true, a mask will be generated even if the image
- * is in RGBA format
+ * are fully transparent, and all other pixels fully opaque
  *******************************************************************/
-bool SImage::maskFromColour(rgba_t colour, Palette8bit* pal, bool force_mask) {
-	if (type == PALMASK && mask != NULL) {
+bool SImage::maskFromColour(rgba_t colour, Palette8bit* pal) {
+	if (type == PALMASK) {
 		// Get palette to use
 		if (has_palette || !pal)
 			pal = &palette;
@@ -654,10 +686,6 @@ bool SImage::maskFromColour(rgba_t colour, Palette8bit* pal, bool force_mask) {
 		}
 	}
 	else if (type == RGBA) {
-		// If we're forcing generation of mask data, create it if it doesn't exist
-		if (force_mask && !mask)
-			mask = new uint8_t[width * height];
-
 		// RGBA type, go through alpha channel
 		uint32_t c = 0;
 		for (int a = 0; a < width * height; a++) {
@@ -667,10 +695,6 @@ bool SImage::maskFromColour(rgba_t colour, Palette8bit* pal, bool force_mask) {
 				data[c + 3] = 0;
 			else
 				data[c + 3] = 255;
-
-			// Write the alpha value to the mask also if we're forcing generation of a mask
-			if (force_mask)
-				mask[a] = data[c + 3];
 
 			// Skip to next pixel
 			c += 4;
@@ -685,14 +709,49 @@ bool SImage::maskFromColour(rgba_t colour, Palette8bit* pal, bool force_mask) {
 	return true;
 }
 
+/* SImage::maskFromBrightness
+ * Changes the mask/alpha channel so that each pixel's transparency
+ * matches its brigntness level (where black is fully transparent)
+ *******************************************************************/
+bool SImage::maskFromBrightness(Palette8bit* pal) {
+	if (type == PALMASK) {
+		// Get palette to use
+		if (has_palette || !pal)
+			pal = &palette;
+
+		// Go through pixel data
+		for (int a = 0; a < width * height; a++) {
+			// Set mask from pixel colour brightness value
+			rgba_t col = pal->colour(data[a]);
+			mask[a] = ((double)col.r*0.3)+((double)col.g*0.59)+((double)col.b*0.11);
+		}
+	}
+	else if (type == RGBA) {
+		// Go through pixel data
+		unsigned c = 0;
+		for (int a = 0; a < width * height; a++) {
+			// Set alpha from pixel colour brightness value
+			data[c+3] = (double)data[c++]*0.3 + (double)data[c++]*0.59 + (double)data[c++]*0.11;
+			// Skip alpha
+			c++;
+		}
+	}
+	// ALPHAMASK type is already a brightness mask
+
+	// Announce change
+	announce("image_changed");
+
+	return true;
+}
+
 /* SImage::cutoffMask
  * Changes the mask/alpha channel so that any pixel alpha level
  * currently greater than [threshold] is fully opaque, and all
- * other pixels fully transparent. If [force_mask] is true, a mask
- * will be generated even if the image is in RGBA format
+ * other pixels fully transparent
  *******************************************************************/
-bool SImage::cutoffMask(uint8_t threshold, bool force_mask) {
-	if (type == PALMASK && mask != NULL) {
+bool SImage::cutoffMask(uint8_t threshold) {
+	if (type == PALMASK) {
+		// Paletted, go through mask
 		for (int a = 0; a < width * height; a++) {
 			if (mask[a] > threshold)
 				mask[a] = 255;
@@ -701,10 +760,6 @@ bool SImage::cutoffMask(uint8_t threshold, bool force_mask) {
 		}
 	}
 	else if (type == RGBA) {
-		// If we're forcing generation of mask data, create it if it doesn't exist
-		if (force_mask && !mask)
-			mask = new uint8_t[width * height];
-
 		// RGBA format, go through alpha channel
 		uint32_t c = 0;
 		for (int a = 3; a < width * height * 4; a += 4) {
@@ -712,13 +767,10 @@ bool SImage::cutoffMask(uint8_t threshold, bool force_mask) {
 				data[a] = 255;
 			else
 				data[a] = 0;
-
-			// Write the alpha value to the mask also if we're forcing generation of a mask
-			if (force_mask)
-				mask[c++] = data[a];
 		}
 	}
 	else if (type == ALPHAMAP) {
+		// Alpha map, go through pixels
 		for (int a = 0; a < width * height; a++) {
 			if (data[a] > threshold)
 				data[a] = 255;

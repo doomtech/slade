@@ -324,7 +324,7 @@ public:
 			return CONVERTIBLE;
 	}
 
-	bool canWriteType(SIType type) {
+	virtual bool canWriteType(SIType type) {
 		// Doom format gfx can only be written as paletted
 		if (type == PALMASK)
 			return true;
@@ -333,18 +333,16 @@ public:
 	}
 
 	virtual bool convertWritable(SImage& image, convert_options_t opt) {
-		// Image already paletted, no need for conversion
-		if (image.getType() == PALMASK)
-			return true;
-
 		// Convert to paletted
 		image.convertPaletted(opt.pal_target, opt.pal_current);
 
 		// Do mask conversion
-		if (opt.mask_source == MASK_COLOUR)
-			image.maskFromColour(opt.mask_colour, opt.pal_target, opt.force_mask);
+		if (!opt.transparency)
+			image.fillAlpha(255);
+		else if (opt.mask_source == MASK_COLOUR)
+			image.maskFromColour(opt.mask_colour, opt.pal_target);
 		else if (opt.mask_source == MASK_ALPHA)
-			image.cutoffMask(opt.alpha_threshold, opt.force_mask);
+			image.cutoffMask(opt.alpha_threshold);
 
 		return true;
 	}
@@ -374,6 +372,11 @@ public:
 		info.format = id;
 		return info;
 	}
+
+	// Cannot write this format
+	int		canWrite(SImage& image) { return NOTWRITABLE; }
+	bool	canWriteType(SIType type) { return false; }
+	bool	convertWritable(SImage& image, convert_options_t opt) { return false; }
 };
 
 class SIFDoomAlphaGfx : public SIFDoomGfx {
@@ -408,6 +411,11 @@ public:
 
 		return info;
 	}
+
+	// Cannot write this format
+	int		canWrite(SImage& image) { return NOTWRITABLE; }
+	bool	canWriteType(SIType type) { return false; }
+	bool	convertWritable(SImage& image, convert_options_t opt) { return false; }
 };
 
 class SIFDoomArah : public SIFormat {

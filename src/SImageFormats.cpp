@@ -624,12 +624,12 @@ uint32_t valid_flat_size[][3] = {
 	{  32,  64,	0 },	// Strife startup sprite
 	{  48,  48,	0 },	// |
 	{  64,  64,	1 },	// standard flat size
-	{  64,	65,	1 },	// Heretic flat size variant
-	{  64, 128,	1 },	// Hexen flat size variant
+	{  64,	65,	0 },	// Heretic flat size variant
+	{  64, 128,	0 },	// Hexen flat size variant
 	{ 128, 128,	1 },	// |
 	{ 256, 200,	0 },	// Rise of the Triad sky
 	{ 256, 256,	1 },	// hires flat size
-	{ 320, 200,	1 },	// full screen format
+	{ 320, 200,	0 },	// full screen format
 	{ 512, 512,	1 },	// hires flat size
 	{1024,1024,	1 },	// |
 	{2048,2048,	1 },	// super hires flat size (SRB2)
