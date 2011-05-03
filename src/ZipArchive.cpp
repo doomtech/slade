@@ -216,13 +216,11 @@ bool ZipArchive::write(MemChunk& mc, bool update) {
  *******************************************************************/
 bool ZipArchive::write(string filename, bool update) {
 	// If we're overwriting the current file, rename it so that it can still be read while writing the 'new' file
-	wxFileName current(this->filename);
+	string current = this->filename;
 	bool temp = false;
-	if (!filename.CmpNoCase(this->filename)) {
-		current.SetName(current.GetName() + "-slade-temp");
-		if (!wxRemoveFile(current.GetFullPath()))
-			wxLogMessage("Warning: temporary file %s was not deleted", CHR(current.GetFullPath()));
-		wxRenameFile(this->filename, current.GetFullPath());
+	if (S_CMPNOCASE(filename, this->filename)) {
+		current = appPath("tempzip.zip", DIR_TEMP);
+		wxCopyFile(this->filename, current);
 		temp = true;
 	}
 
@@ -243,7 +241,7 @@ bool ZipArchive::write(string filename, bool update) {
 	// Open old zip for copying, if it exists. This is used to copy any entries
 	// that have been previously saved/compressed and are unmodified, to greatly
 	// speed up zip file saving by not having to recompress unchanged entries
-	wxFFileInputStream in(current.GetFullPath());
+	wxFFileInputStream in(current);
 	wxZipInputStream inzip(in);
 
 	// Get a list of all entries in the old zip
@@ -288,10 +286,6 @@ bool ZipArchive::write(string filename, bool update) {
 	// Clean up
 	delete[] c_entries;
 	zip.Close();
-
-	if (temp)
-		if (!wxRemoveFile(current.GetFullPath()))
-			wxLogMessage("Warning: temporary file %s was not cleaned out", CHR(current.GetFullPath()));
 
 	return true;
 }

@@ -543,7 +543,8 @@ int MainApp::OnExit() {
 	string filename = wxEmptyString;
 	bool files = temp.GetFirst(&filename, wxEmptyString, wxDIR_FILES);
 	while (files) {
-		wxRemoveFile(appPath(filename, DIR_TEMP));
+		if (!wxRemoveFile(appPath(filename, DIR_TEMP)))
+			wxLogMessage("Warning: Could not clean up temporary file \"%s\"", CHR(filename));
 		files = temp.GetNext(&filename);
 	}
 
