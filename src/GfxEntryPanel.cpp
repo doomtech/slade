@@ -315,9 +315,8 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 
 	// Gfx (offset) type
 	string offset_types[] = { "Auto", "Graphic", "Sprite", "HUD" };
-	combo_offset_type = new wxComboBox(this, -1, offset_types[0], wxDefaultPosition, wxDefaultSize, 4, offset_types, wxCB_READONLY);
-	//sizer_top->Add(new wxStaticText(this, -1, "Offset Type:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
-	sizer_top->Add(combo_offset_type, 0, wxEXPAND, 0);
+	choice_offset_type = new wxChoice(this, -1, wxDefaultPosition, wxDefaultSize, 4, offset_types);
+	sizer_top->Add(choice_offset_type, 0, wxEXPAND, 0);
 
 	// Custom menu
 	menu_custom = new wxMenu();
@@ -344,7 +343,7 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 	slider_zoom->Bind(wxEVT_COMMAND_SLIDER_UPDATED, &GfxEntryPanel::onZoomChanged, this);
 	spin_xoffset->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &GfxEntryPanel::onXOffsetChanged, this);
 	spin_yoffset->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &GfxEntryPanel::onYOffsetChanged, this);
-	combo_offset_type->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &GfxEntryPanel::onOffsetTypeChanged, this);
+	choice_offset_type->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &GfxEntryPanel::onOffsetTypeChanged, this);
 	cb_tile->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &GfxEntryPanel::onTileChanged, this);
 	Bind(wxEVT_GFXCANVAS_OFFSET_CHANGED, &GfxEntryPanel::onGfxOffsetChanged, this, gfx_canvas->GetId());
 	btn_nextimg->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &GfxEntryPanel::onBtnNextImg, this);
@@ -637,7 +636,7 @@ void GfxEntryPanel::applyViewType() {
 		gfx_canvas->setViewType(GFXVIEW_TILED);
 	else {
 		// Set gfx canvas view type depending on the offset combobox selection
-		int sel = combo_offset_type->GetSelection();
+		int sel = choice_offset_type->GetSelection();
 		switch (sel) {
 			case 0:
 				gfx_canvas->setViewType(detectOffsetType());
@@ -875,7 +874,7 @@ void GfxEntryPanel::onOffsetTypeChanged(wxCommandEvent& e) {
  * Called when the 'Tile' checkbox is checked/unchecked
  *******************************************************************/
 void GfxEntryPanel::onTileChanged(wxCommandEvent& e) {
-	combo_offset_type->Enable(!cb_tile->IsChecked());
+	choice_offset_type->Enable(!cb_tile->IsChecked());
 	applyViewType();
 }
 

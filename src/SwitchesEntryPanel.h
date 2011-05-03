@@ -14,7 +14,6 @@ private:
 	ListView*		list_entries;
 	wxTextCtrl*		text_offname;
 	wxTextCtrl*		text_onname;
-	wxComboBox*		cbox_range;
 
 public:
 	SwitchesEntryPanel(wxWindow* parent);

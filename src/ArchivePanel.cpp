@@ -307,8 +307,8 @@ void ArchivePanel::addMenus() {
 
 void ArchivePanel::removeMenus() {
 	// Remove ArchivePanel menus from the main window menubar
-	theMainWindow->removeCustomMenu("&Archive");
-	theMainWindow->removeCustomMenu("&Entry");
+	theMainWindow->removeCustomMenu(menu_archive);
+	theMainWindow->removeCustomMenu(menu_entry);
 	cur_area->removeCustomMenu();
 }
 

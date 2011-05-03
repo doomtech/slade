@@ -219,7 +219,7 @@ void EntryPanel::addCustomMenu() {
 }
 
 void EntryPanel::removeCustomMenu() {
-	theMainWindow->removeCustomMenu(custom_menu_name);
+	theMainWindow->removeCustomMenu(menu_custom);
 }
 
 

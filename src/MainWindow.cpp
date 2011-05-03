@@ -424,16 +424,29 @@ void MainWindow::openEntry(ArchiveEntry* entry) {
  *******************************************************************/
 void MainWindow::addCustomMenu(wxMenu* menu, string title) {
 	// Insert custom menus between 'Editor' and 'View' menus
+	/*
 	if (GetMenuBar()->FindMenu(title) == wxNOT_FOUND) {
 		GetMenuBar()->Insert(GetMenuBar()->FindMenu("&View"), menu, title);
 		GetMenuBar()->Refresh();
 	}
+	*/
+	// Check menu doesn't already exist
+	for (unsigned a = 0; a < custom_menus.size(); a++) {
+		if (custom_menus[a] == menu)
+			return;
+	}
+
+	// Insert custom menu after the last existing custom menu
+	GetMenuBar()->Insert(2 + custom_menus.size(), menu, title);
+	GetMenuBar()->Refresh();
+	custom_menus.push_back(menu);
 }
 
 /* MainWindow::removeCustomMenu
  * Removes the menu matching [title] from the menu bar
  *******************************************************************/
-void MainWindow::removeCustomMenu(string title) {
+void MainWindow::removeCustomMenu(wxMenu* menu) {
+	/*
 	// Get custom menu index
 	int index = GetMenuBar()->FindMenu(title);
 
@@ -441,6 +454,15 @@ void MainWindow::removeCustomMenu(string title) {
 	if (index != wxNOT_FOUND) {
 		GetMenuBar()->Remove(index);
 		GetMenuBar()->Refresh();
+	}
+	*/
+
+	for (unsigned a = 0; a < custom_menus.size(); a++) {
+		if (custom_menus[a] == menu) {
+			custom_menus.erase(custom_menus.begin() + a);
+			GetMenuBar()->Remove(2 + a);
+			return;
+		}
 	}
 }
 
