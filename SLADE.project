@@ -449,6 +449,9 @@
         <LibraryPath Value="."/>
         <Library Value="freeimage"/>
         <Library Value="fluidsynth"/>
+        <Library Value="sfml-system"/>
+        <Library Value="sfml-window"/>
+        <Library Value="sfml-audio"/>
       </Linker>
       <ResourceCompiler Options=""/>
     </GlobalSettings>
