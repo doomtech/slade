@@ -449,9 +449,6 @@
         <LibraryPath Value="."/>
         <Library Value="freeimage"/>
         <Library Value="fluidsynth"/>
-        <Library Value="sfml-system"/>
-        <Library Value="sfml-window"/>
-        <Library Value="sfml-audio"/>
       </Linker>
       <ResourceCompiler Options=""/>
     </GlobalSettings>
@@ -489,7 +486,7 @@
         <Preprocessor Value="__WX__"/>
         <Preprocessor Value="__ASM_FIX__"/>
       </Compiler>
-      <Linker Options="$(shell wx-config --debug=yes --libs std,gl,stc,aui,ribbon --unicode=yes)" Required="yes"/>
+      <Linker Options="$(shell wx-config --debug=yes --libs std,gl,stc,aui,ribbon --unicode=yes);-framework SFML;-framework sfml-system;-framework sfml-audio" Required="yes"/>
       <ResourceCompiler Options="$(shell wx-config --rcflags)" Required="no"/>
       <General OutputFile="./dist/slade-dbg" IntermediateDirectory="./Debug" Command="./slade-dbg" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;"/>
@@ -550,7 +547,7 @@
         <Preprocessor Value="NDEBUG"/>
         <Preprocessor Value="__ASM_FIX__"/>
       </Compiler>
-      <Linker Options="-arch i386;-s;$(shell $(WXCONFIG_PATH)wx-config --debug=no --libs std,gl,stc,aui,ribbon --unicode=yes)" Required="yes">
+      <Linker Options="-s;-arch i386;$(shell $(WXCONFIG_PATH)wx-config --debug=no --libs std,gl,stc,aui,ribbon --unicode=yes);-framework SFML;-framework sfml-system;-framework sfml-audio" Required="yes">
         <Library Value="iconv"/>
       </Linker>
       <ResourceCompiler Options="$(shell wx-config --rcflags)" Required="no"/>
