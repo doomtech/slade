@@ -1221,6 +1221,12 @@
     <ClInclude Include="src\SIFQuake.h">
       <Filter>Resources\Graphics\Image\Formats</Filter>
     </ClInclude>
+    <ClInclude Include="src\SIFRott.h">
+      <Filter>Resources\Graphics\Image\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SIFJedi.h">
+      <Filter>Resources\Graphics\Image\Formats</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="slade.ico" />

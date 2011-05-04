@@ -159,10 +159,12 @@ int MIDIPlayer::getLength() {
  * MIDIPlayer class constructor
  *******************************************************************/
 MIDIPlayer::MIDIPlayer() {
+	/*
 	// Setup audiere midi
 	device_midi = OpenMIDIDevice("");
 	if (!device_midi)
 		wxLogMessage("Error: Unable to open Audiere MIDI device, MIDI playback disabled");
+	*/
 }
 
 /* MIDIPlayer::~MIDIPlayer
@@ -176,6 +178,7 @@ MIDIPlayer::~MIDIPlayer() {
  * successful, false otherwise
  *******************************************************************/
 bool MIDIPlayer::openFile(string filename) {
+	/*
 	// Check midi device is ok
 	if (!device_midi)
 		return false;
@@ -184,6 +187,8 @@ bool MIDIPlayer::openFile(string filename) {
 	stream_midi = device_midi->openStream(CHR(filename));
 
 	return !!stream_midi;
+	*/
+	return false;
 }
 
 /* MIDIPlayer::play
@@ -191,56 +196,74 @@ bool MIDIPlayer::openFile(string filename) {
  * if successful, false otherwise
  *******************************************************************/
 bool MIDIPlayer::play() {
+	/*
 	if (stream_midi)
 		stream_midi->play();
 	return true;
+	*/
+	return false;
 }
 
 /* MIDIPlayer::pause
  * Pauses playback of the currently loaded MIDI stream
  *******************************************************************/
 bool MIDIPlayer::pause() {
+	/*
 	if (stream_midi)
 		stream_midi->pause();
 	return true;
+	*/
+	return false;
 }
 
 /* MIDIPlayer::stop
  * Stops playback of the currently loaded MIDI stream
  *******************************************************************/
 bool MIDIPlayer::stop() {
+	/*
 	if (stream_midi)
 		stream_midi->stop();
 	return true;
+	*/
+	return false;
 }
 
 /* MIDIPlayer::isPlaying
  * Returns true if the MIDI stream is currently playing, false if not
  *******************************************************************/
 bool MIDIPlayer::isPlaying() {
+	/*
 	if (stream_midi && stream_midi->isPlaying())
 		return true;
 	else
 		return false;
+	*/
+	return false;
 }
 
 /* MIDIPlayer::getPosition
  * Returns the current position of the playing MIDI stream
  *******************************************************************/
 int MIDIPlayer::getPosition() {
+	/*
 	if (stream_midi)
 		return stream_midi->getPosition();
 	else
 		return 0;
+	*/
+	return 0;
 }
 
 /* MIDIPlayer::setPosition
  * Seeks to [pos] in the currently loaded MIDI stream
  *******************************************************************/
 bool MIDIPlayer::setPosition(int pos) {
+	/*
 	if (stream_midi)
 		stream_midi->setPosition(pos);
 	return true;
+	*/
+	return false;
 }
 
 /* MIDIPlayer::getLength
@@ -248,10 +271,13 @@ bool MIDIPlayer::setPosition(int pos) {
  * MIDI stream
  *******************************************************************/
 int MIDIPlayer::getLength() {
+	/*
 	if (stream_midi)
 		return stream_midi->getLength();
 	else
 		return 0;
+	*/
+	return 0;
 }
 
 #endif

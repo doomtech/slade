@@ -6,12 +6,15 @@
 #ifndef WIN32
 #define MIDI_LIB_FS
 #include <fluidsynth.h>
+#endif
+/*
 #else
 #undef vector
 #include <audiere.h>
 using namespace audiere;
 #define vector std::vector
 #endif
+*/
 
 class MIDIPlayer {
 private:
@@ -23,11 +26,14 @@ private:
 	fluid_synth_t*			fs_synth;
 	fluid_player_t*			fs_player;
 	fluid_audio_driver_t*	fs_adriver;
+#endif
+/*
 #else
 	// Audiere
 	MIDIDevicePtr	device_midi;
 	MIDIStreamPtr	stream_midi;
 #endif
+*/
 
 public:
 	MIDIPlayer();

@@ -437,8 +437,10 @@ bool MainApp::OnInit() {
 	wxApp::SetAppName("slade3");
 #endif
 
-	// Handle exceptions using wxDebug stuff
+	// Handle exceptions using wxDebug stuff, but only in release mode
+#ifdef NDEBUG
 	wxHandleFatalExceptions(true);
+#endif
 
 	// Init application directories
 	if (!initDirectories())

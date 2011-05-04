@@ -17,18 +17,18 @@ TODO List ---------------------------------------------------------------
 - Finish TEXTURES editing:
 	- Support for textures-as-patches
 	- Offsets preview
-- (maybe) Copy+paste for textures
-- (maybe) Generic DataEntryPanel
-- Clean up sources somewhat
+	- Copy+Paste textures
+- Clean up sources, finish commenting, etc
 - Status bar stuff for other EntryPanels and Texture editor
 - AudioEntryPanel improvements
 	- Autoplay option
 - Finish moving SImageFormats.cpp stuff over to SIFormat system
+- Get fluidsynth working for MIDIPlayer in windows
 - (maybe) Use SIFormat system to implement generic 'export as' for image entries
+- (maybe) Generic DataEntryPanel
 
 --- Bugs ---
 - Audio player issues
-- Temp file not deleted on zip save
 
 --- Minor Problems/Annoyances ---
 - Long calltips can extend off the edge of the screen
@@ -54,6 +54,10 @@ TODO List ---------------------------------------------------------------
 
 --- Gfx Editor ---
 - Basic pixel-drawing tools
+
+--- Audio ---
+- Mp3
+- Module formats (DUMB, maybe?)
 
 --- General ---
 - Preferences Dialog:

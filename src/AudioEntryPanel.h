@@ -4,23 +4,14 @@
 
 #include "EntryPanel.h"
 
-// Need to undef some stuff for audiere.h to work
-#ifndef NO_AUDIERE
-#undef vector
-#include <audiere.h>
-using namespace audiere;
-#define vector std::vector
-#endif
+#undef Status
+#include <SFML/Audio.hpp>
 
 class AudioEntryPanel : public EntryPanel {
 private:
 	string	prevfile;
 	bool	midi;
 	bool	opened;
-
-#ifndef NO_AUDIERE
-	OutputStreamPtr	stream;
-#endif
 
 	wxBitmapButton*	btn_play;
 	wxBitmapButton*	btn_pause;
@@ -29,10 +20,10 @@ private:
 	wxSlider*		slider_volume;
 	wxTimer*		timer_seek;
 
-#ifndef NO_AUDIERE
-	// Global audio device
-	static AudioDevicePtr	device;
-#endif
+	bool			audio_music;
+	sf::SoundBuffer	sound_buffer;
+	sf::Sound		sound;
+	sf::Music		music;
 
 public:
 	AudioEntryPanel(wxWindow* parent);
@@ -42,7 +33,7 @@ public:
 	bool	saveEntry();
 
 	bool	open();
-	bool	openAudio(string filename);
+	bool	openAudio(MemChunk& audio, string filename);
 	bool	openMidi(string filename);
 	void	startStream();
 	void	stopStream();
