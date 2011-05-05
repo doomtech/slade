@@ -49,7 +49,7 @@ protected:
 	}
 	
 public:
-	SIFHalfLifeTex() : SIFormat("img_hlt") {
+	SIFHalfLifeTex() : SIFormat("hlt") {
 		name = "Half-Life Texture";
 		extension = "hlt";
 	}
@@ -119,7 +119,7 @@ protected:
 	}
 	
 public:
-	SIFSCSprite() : SIFormat("img_scsprite") {
+	SIFSCSprite() : SIFormat("scsprite") {
 		name = "Shadowcaster Sprite";
 		extension = "dat";
 	}
@@ -200,7 +200,7 @@ protected:
 	}
 	
 public:
-	SIFSCWall() : SIFormat("img_scwall") {
+	SIFSCWall() : SIFormat("scwall") {
 		name = "Shadowcaster Wall";
 		extension = "dat";
 	}
@@ -221,6 +221,35 @@ public:
 		info.width = 64;
 		info.colformat = PALMASK;
 		info.format = id;
+		
+		return info;
+	}
+};
+
+class SIFAnaMip : public SIFormat {
+protected:
+	bool readImage(SImage& image, MemChunk& data, int index) {
+		return false;
+	}
+	
+public:
+	SIFAnaMip() : SIFormat("mipimage") {
+		name = "Example";
+		extension = "exp";
+	}
+	~SIFAnaMip() {}
+	
+	bool isThisFormat(MemChunk& mc) {
+		return false;
+	}
+	
+	imginfo_t getInfo(MemChunk& mc, int index) {
+		imginfo_t info;
+		
+		// Get image info
+		info.width = READ_L16(mc.getData(), 0);
+		info.height = READ_L16(mc.getData(), 2);
+		info.colformat = PALMASK;
 		
 		return info;
 	}

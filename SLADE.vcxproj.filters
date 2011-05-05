@@ -654,6 +654,9 @@
     <ClCompile Include="src\SIFormat.cpp">
       <Filter>Resources\Graphics\Image\Formats</Filter>
     </ClCompile>
+    <ClCompile Include="src\AudioPrefsPanel.cpp">
+      <Filter>Dialogs\Preferences</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -1221,11 +1224,8 @@
     <ClInclude Include="src\SIFQuake.h">
       <Filter>Resources\Graphics\Image\Formats</Filter>
     </ClInclude>
-    <ClInclude Include="src\SIFRott.h">
-      <Filter>Resources\Graphics\Image\Formats</Filter>
-    </ClInclude>
-    <ClInclude Include="src\SIFJedi.h">
-      <Filter>Resources\Graphics\Image\Formats</Filter>
+    <ClInclude Include="src\AudioPrefsPanel.h">
+      <Filter>Dialogs\Preferences</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

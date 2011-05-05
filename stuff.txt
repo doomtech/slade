@@ -20,8 +20,6 @@ TODO List ---------------------------------------------------------------
 	- Copy+Paste textures
 - Clean up sources, finish commenting, etc
 - Status bar stuff for other EntryPanels and Texture editor
-- AudioEntryPanel improvements
-	- Autoplay option
 - Finish moving SImageFormats.cpp stuff over to SIFormat system
 - Get fluidsynth working for MIDIPlayer in windows
 - (maybe) Use SIFormat system to implement generic 'export as' for image entries

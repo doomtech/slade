@@ -2,38 +2,19 @@
 #ifndef __MIDIPLAYER_H__
 #define __MIDIPLAYER_H__
 
-// Determine playback library (windows=audiere, other=fluidsynth)
-#ifndef WIN32
-#define MIDI_LIB_FS
 #include <fluidsynth.h>
-#endif
-/*
-#else
-#undef vector
-#include <audiere.h>
-using namespace audiere;
-#define vector std::vector
-#endif
-*/
 
 class MIDIPlayer {
 private:
 	static MIDIPlayer*	instance;
 
-#ifdef MIDI_LIB_FS
-	// FluidSynth
 	fluid_settings_t*		fs_settings;
 	fluid_synth_t*			fs_synth;
 	fluid_player_t*			fs_player;
 	fluid_audio_driver_t*	fs_adriver;
-#endif
-/*
-#else
-	// Audiere
-	MIDIDevicePtr	device_midi;
-	MIDIStreamPtr	stream_midi;
-#endif
-*/
+
+	bool	fs_initialised;
+	int		fs_soundfont_id;
 
 public:
 	MIDIPlayer();
@@ -47,6 +28,11 @@ public:
 		return instance;
 	}
 
+	bool	isInitialised() { return fs_initialised; }
+	bool	isSoundfontLoaded() { return fs_soundfont_id != FLUID_FAILED; }
+
+	bool	initFluidsynth();
+	bool	reloadSoundfont();
 	bool	openFile(string filename);
 	bool	play();
 	bool	pause();

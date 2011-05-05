@@ -80,7 +80,7 @@ protected:
 	}
 	
 public:
-	SIFQuakeGfx() : SIFormat("img_quake") {
+	SIFQuakeGfx() : SIFormat("quake") {
 		name = "Quake Gfx";
 		extension = "dat";
 	}
@@ -219,7 +219,7 @@ protected:
 	}
 	
 public:
-	SIFQuakeSprite() : SIFormat("img_qspr") {
+	SIFQuakeSprite() : SIFormat("qspr") {
 		name = "Quake Sprite";
 		extension = "dat";
 	}
@@ -265,7 +265,7 @@ protected:
 	}
 	
 public:
-	SIFQuakeTex() : SIFormat("img_quaketex") {
+	SIFQuakeTex() : SIFormat("quaketex") {
 		name = "Quake Texture";
 		extension = "dat";
 	}
@@ -332,7 +332,7 @@ protected:
 	}
 	
 public:
-	SIFQuake2Wal() : SIFormat("img_quake2wal") {
+	SIFQuake2Wal() : SIFormat("quake2wal") {
 		name = "Quake II Wall";
 		extension = "dat";
 	}

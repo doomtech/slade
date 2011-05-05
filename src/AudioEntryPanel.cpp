@@ -250,9 +250,37 @@ bool AudioEntryPanel::openAudio(MemChunk& audio, string filename) {
 /* AudioEntryPanel::openMidi
  * Opens a MIDI file for playback
  *******************************************************************/
+bool nosf_warned = false;	// One-time 'no soundfont loaded' warning
 bool AudioEntryPanel::openMidi(string filename) {
 	// Disable volume control
 	slider_volume->Enable(false);
+
+	// Disable controls if we cannot play the midi
+	if (!theMIDIPlayer->isInitialised()) {
+		btn_play->Enable(false);
+		btn_pause->Enable(false);
+		btn_stop->Enable(false);
+		slider_seek->Enable(false);
+
+		return false;
+	}
+
+	// Warn if no soundfont is loaded
+	if (!theMIDIPlayer->isSoundfontLoaded()) {
+		// Disable play controls
+		btn_play->Enable(false);
+		btn_pause->Enable(false);
+		btn_stop->Enable(false);
+		slider_seek->Enable(false);
+
+		// Popup message
+		if (!nosf_warned) {
+			wxMessageBox("No soundfont is currently set up for playing MIDIs. See the audio settings in Editor->Preferences", "Can't play MIDI", wxICON_ERROR);
+			nosf_warned = true;
+		}
+
+		return false;
+	}
 
 	// Attempt to open midi
 	if (theMIDIPlayer->openFile(filename)) {
