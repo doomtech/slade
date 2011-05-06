@@ -12,15 +12,13 @@
 #include "SIFQuake.h"
 #include "SIFOther.h"
 #include "SIFRott.h"
+#include "SIFJedi.h"
 
 vector<SIFormat*>	simage_formats;
 SIFormat*			sif_raw = NULL;
 SIFormat*			sif_flat = NULL;
+SIFormat*			sif_general = NULL;
 SIFormat*			sif_unknown = NULL;
-
-// Define valid raw sizes (external for now, until i get rid of SImageFormats.cpp)
-extern uint32_t valid_flat_size[][3];
-extern uint32_t n_valid_flat_sizes;
 
 
 // 'Unknown' format
@@ -29,13 +27,142 @@ protected:
 	bool readImage(SImage& image, MemChunk& data, int index) { return false; }
 
 public:
-	SIFUnknown() : SIFormat("unknown") {}
+	SIFUnknown() : SIFormat("unknown") { reliability = 0; }
 	~SIFUnknown() {}
 
 	bool			isThisFormat(MemChunk& mc) { return false; }
 	SImage::info_t	getInfo(MemChunk& mc, int index) { return SImage::info_t(); }
 };
 
+// General image format is a special case, only try if no other formats detected
+class SIFGeneralImage : public SIFormat {
+private:
+	FIBITMAP* getFIInfo(MemChunk& data, SImage::info_t& info) {
+		// Get FreeImage bitmap info from entry data
+		FIMEMORY* mem = FreeImage_OpenMemory((BYTE*)data.getData(), data.getSize());
+		FREE_IMAGE_FORMAT fif = FreeImage_GetFileTypeFromMemory(mem, 0);
+		FIBITMAP *bm = FreeImage_LoadFromMemory(fif, mem, 0);
+		FreeImage_CloseMemory(mem);
+
+		// Check it created/read ok
+		if (!bm)
+			return NULL;
+
+		// Get info from image
+		info.width = FreeImage_GetWidth(bm);
+		info.height = FreeImage_GetHeight(bm);
+		info.colformat = RGBA;	// Generic images always converted to RGBA on loading
+		info.format = id;
+
+		// Check if palette supplied
+		if (FreeImage_GetColorsUsed(bm) > 0)
+			info.has_palette = true;
+
+		return bm;
+	}
+
+protected:
+	bool readImage(SImage& image, MemChunk& data, int index) {
+		// Get image info
+		SImage::info_t info;
+		FIBITMAP* bm = getFIInfo(data, info);
+
+		// Check it created/read ok
+		if (!bm) {
+			Global::error = "Unable to read image data (unsupported format?)";
+			return false;
+		}
+
+		// Get image palette if it exists
+		RGBQUAD* bm_pal = FreeImage_GetPalette(bm);
+		Palette8bit palette;
+		if (bm_pal) {
+			int a = 0;
+			int b = FreeImage_GetColorsUsed(bm);
+			if (b > 256)
+				b = 256;
+			for (; a < b; a++)
+				palette.setColour(a, rgba_t(bm_pal[a].rgbRed, bm_pal[a].rgbGreen, bm_pal[a].rgbBlue, 255));
+		}
+
+		// Create image
+		if (info.has_palette)
+			image.create(info, &palette);
+		else
+			image.create(info);
+		uint8_t* img_data = imageData(image);
+
+		// Convert to 32bpp & flip vertically
+		FIBITMAP *rgba = FreeImage_ConvertTo32Bits(bm);
+		FreeImage_FlipVertical(rgba);
+
+		// Load raw RGBA data
+		uint8_t* bits_rgba = FreeImage_GetBits(rgba);
+		int c = 0;
+		for (int a = 0; a < info.width * info.height; a++) {
+			img_data[c++] = bits_rgba[a * 4 + 2];	// Red
+			img_data[c++] = bits_rgba[a * 4 + 1];	// Green
+			img_data[c++] = bits_rgba[a * 4];		// Blue
+			img_data[c++] = bits_rgba[a * 4 + 3];	// Alpha
+		}
+
+		// Free memory
+		FreeImage_Unload(rgba);
+		FreeImage_Unload(bm);
+
+		return true;
+	}
+	
+	bool writeImage(SImage& image, MemChunk& out, Palette8bit* pal, int index) {
+		return false;
+	}
+	
+public:
+	SIFGeneralImage() : SIFormat("image") {
+		name = "Image";
+		extension = "dat";
+	}
+	~SIFGeneralImage() {}
+	
+	bool isThisFormat(MemChunk& mc) {
+		FIMEMORY* mem = FreeImage_OpenMemory((BYTE*)mc.getData(), mc.getSize());
+		FREE_IMAGE_FORMAT fif = FreeImage_GetFileTypeFromMemory(mem, 0);
+		FreeImage_CloseMemory(mem);
+		if (fif == FIF_UNKNOWN)
+			return false;
+		else
+			return true;
+	}
+	
+	SImage::info_t getInfo(MemChunk& mc, int index) {
+		SImage::info_t info;
+		
+		getFIInfo(mc, info);
+		
+		return info;
+	}
+};
+
+// Define valid raw flat sizes
+uint32_t valid_flat_size[][3] = {
+	{	2,	 2,	0 },	// lol Heretic F_SKY1
+	{  10,  12,	0 },	// gnum format
+	{  16,  16,	0 },	// |
+	{  32,  64,	0 },	// Strife startup sprite
+	{  48,  48,	0 },	// |
+	{  64,  64,	1 },	// standard flat size
+	{  64,	65,	0 },	// Heretic flat size variant
+	{  64, 128,	0 },	// Hexen flat size variant
+	{ 128, 128,	1 },	// |
+	{ 256, 200,	0 },	// Rise of the Triad sky
+	{ 256, 256,	1 },	// hires flat size
+	{ 320, 200,	0 },	// full screen format
+	{ 512, 512,	1 },	// hires flat size
+	{1024,1024,	1 },	// |
+	{2048,2048,	1 },	// super hires flat size (SRB2)
+	{4096,4096,	1 },	// |
+};
+uint32_t	n_valid_flat_sizes = 17;
 
 // Raw format is a special case - not detectable
 class SIFRaw : public SIFormat {
@@ -207,6 +334,7 @@ SIFormat::SIFormat(string id) {
 	this->id = id;
 	this->name = "Unknown";
 	this->extension = "dat";
+	this->reliability = 255;
 
 	// Add to list of formats
 	simage_formats.push_back(this);
@@ -222,6 +350,7 @@ void SIFormat::initFormats() {
 	sif_unknown = new SIFUnknown();
 	sif_raw = new SIFRaw();
 	sif_flat = new SIFRawFlat();
+	sif_general = new SIFGeneralImage();
 	simage_formats.clear();	// Remove previously created formats from the list
 
 	// Image formats
@@ -254,6 +383,11 @@ void SIFormat::initFormats() {
 	new SIFRottRaw();
 	new SIFRottPic();
 
+	// Jedi Knight (Dark Forces) formats
+	new SIFJediBM();
+	new SIFJediFME();
+	new SIFJediWAX();
+
 	// Other game formats
 	new SIFHalfLifeTex();
 	new SIFSCSprite();
@@ -262,6 +396,8 @@ void SIFormat::initFormats() {
 	new SIFBuildTile();
 	new SIFHeretic2M8();
 	new SIFHeretic2M32();
+	new SIFWolfPic();
+	new SIFWolfSprite();
 }
 
 SIFormat* SIFormat::getFormat(string id) {
@@ -277,13 +413,23 @@ SIFormat* SIFormat::getFormat(string id) {
 
 SIFormat* SIFormat::determineFormat(MemChunk& mc) {
 	// Go through all registered formats
+	SIFormat* format = sif_unknown;
 	for (unsigned a = 0; a < simage_formats.size(); a++) {
+		// Don't bother checking if the format is less reliable
+		if (simage_formats[a]->reliability < format->reliability)
+			continue;
+
+		// Check if data matches format
 		if (simage_formats[a]->isThisFormat(mc))
-			return simage_formats[a];
+			format = simage_formats[a];
+
+		// Stop if format detected is 100% reliable
+		if (format->reliability == 255)
+			break;
 	}
 
 	// Not found, return unknown format
-	return sif_unknown;
+	return format;
 }
 
 SIFormat* SIFormat::unknownFormat() {
@@ -298,6 +444,10 @@ SIFormat* SIFormat::flatFormat() {
 	return sif_flat;
 }
 
+SIFormat* SIFormat::generalFormat() {
+	return sif_general;
+}
+
 void SIFormat::getAllFormats(vector<SIFormat*>& list) {
 	// Clear list
 	list.clear();
@@ -307,6 +457,7 @@ void SIFormat::getAllFormats(vector<SIFormat*>& list) {
 		list.push_back(simage_formats[a]);
 
 	// Add special formats
+	list.push_back(sif_general);
 	list.push_back(sif_raw);
 	list.push_back(sif_flat);
 }

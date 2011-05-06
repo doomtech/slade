@@ -9,6 +9,7 @@ protected:
 	string	id;
 	string	name;
 	string	extension;
+	uint8_t	reliability;
 
 	// Stuff to access protected image data
 	uint8_t*		imageData(SImage& image) { return image.data; }
@@ -37,9 +38,10 @@ public:
 
 		convert_options_t() {
 			pal_current = pal_target = NULL;
-			mask_source = 0;
+			mask_source = MASK_ALPHA;
 			transparency = true;
 			col_format = -1;
+			alpha_threshold = 0;
 		}
 	};
 
@@ -107,6 +109,7 @@ public:
 	static SIFormat*	unknownFormat();
 	static SIFormat*	rawFormat();
 	static SIFormat*	flatFormat();
+	static SIFormat*	generalFormat();
 	static void			getAllFormats(vector<SIFormat*>& list);
 };
 

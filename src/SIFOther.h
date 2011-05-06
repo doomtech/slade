@@ -52,6 +52,7 @@ public:
 	SIFHalfLifeTex() : SIFormat("hlt") {
 		name = "Half-Life Texture";
 		extension = "hlt";
+		reliability = 20;
 	}
 	~SIFHalfLifeTex() {}
 
@@ -122,6 +123,7 @@ public:
 	SIFSCSprite() : SIFormat("scsprite") {
 		name = "Shadowcaster Sprite";
 		extension = "dat";
+		reliability = 110;
 	}
 	~SIFSCSprite() {}
 
@@ -203,6 +205,7 @@ public:
 	SIFSCWall() : SIFormat("scwall") {
 		name = "Shadowcaster Wall";
 		extension = "dat";
+		reliability = 101;
 	}
 	~SIFSCWall() {}
 
@@ -233,7 +236,7 @@ protected:
 		SImage::info_t info = getInfo(data, index);
 
 		// Check data
-		if (data.getSize() < (4 + (info.width * info.height)))
+		if (data.getSize() < unsigned(4 + (info.width * info.height)))
 			return false;
 
 		// Create image
@@ -250,6 +253,7 @@ public:
 	SIFAnaMip() : SIFormat("mipimage") {
 		name = "Amulets & Armor";
 		extension = "dat";
+		reliability = 100;
 	}
 	~SIFAnaMip() {}
 
@@ -312,8 +316,8 @@ private:
 			return 0;
 
 		// Get width and height of tile
-		info.height = READ_L16(mc.getData(), x_offs);
-		info.width = READ_L16(mc.getData(), y_offs);
+		info.width = READ_L16(mc.getData(), x_offs);
+		info.height = READ_L16(mc.getData(), y_offs);
 
 		// Setup remaining info
 		info.colformat = PALMASK;
@@ -341,8 +345,8 @@ protected:
 		if (datastart < 16 || datastart >= data.getSize())
 			return false;
 
-		// Create image
-		image.create(info.width, info.height, PALMASK, NULL, index, info.numimages);
+		// Create image (swapped width/height because column-major)
+		image.create(info.height, info.width, PALMASK, NULL, index, info.numimages);
 
 		// Read data
 		uint8_t* img_data = imageData(image);
@@ -354,7 +358,7 @@ protected:
 		image.mirror(true);
 
 		// Create mask
-		for (unsigned a = 0; a < info.width*info.height; a++) {
+		for (int a = 0; a < info.width*info.height; a++) {
 			if (img_data[a] == 0xFF)
 				img_mask[a] = 0;
 			else
@@ -368,6 +372,7 @@ public:
 	SIFBuildTile() : SIFormat("arttile") {
 		name = "Build ART";
 		extension = "art";
+		reliability = 100;
 	}
 	~SIFBuildTile() {}
 
@@ -445,6 +450,7 @@ public:
 	SIFHeretic2M8() : SIFormat("m8") {
 		name = "Heretic 2 8bpp";
 		extension = "dat";
+		reliability = 80;
 	}
 	~SIFHeretic2M8() {}
 
@@ -510,6 +516,7 @@ public:
 	SIFHeretic2M32() : SIFormat("m32") {
 		name = "Heretic 2 32bpp";
 		extension = "dat";
+		reliability = 80;
 	}
 	~SIFHeretic2M32() {}
 
@@ -525,6 +532,131 @@ public:
 
 		getLevelInfo(info, mc, index);
 
+		return info;
+	}
+};
+
+class SIFWolfPic : public SIFormat {
+protected:
+	bool readImage(SImage& image, MemChunk& data, int index) {
+		// Get image info
+		SImage::info_t info = getInfo(data, index);
+
+		// Check data
+		if (data.getSize() != 4 + info.width*info.height)
+			return false;
+
+		// Create image
+		image.create(info);
+		image.fillAlpha(255);
+		uint8_t* img_data = imageData(image);
+
+		// Read image data
+		const uint8_t* pixel = data.getData() + 4;
+		const uint8_t* entryend = data.getData() + data.getSize();
+		uint8_t* brush = img_data;
+		uint8_t* dataend = img_data + data.getSize() - 4;
+
+		while (pixel < entryend) {
+			*brush = *pixel++;
+			brush += 4;
+			if (brush >= dataend)
+				brush -= data.getSize() - 5;
+		}
+
+		return true;
+	}
+	
+public:
+	SIFWolfPic() : SIFormat("wolfpic") {
+		name = "Wolf3d Pic";
+		extension = "dat";
+		reliability = 200;
+	}
+	~SIFWolfPic() {}
+	
+	bool isThisFormat(MemChunk& mc) {
+		if (EntryDataFormat::getFormat("img_wolfpic")->isThisFormat(mc))
+			return true;
+		else
+			return false;
+	}
+	
+	SImage::info_t getInfo(MemChunk& mc, int index) {
+		SImage::info_t info;
+		
+		// Read dimensions
+		info.width = READ_L16(mc.getData(), 0);
+		info.height = READ_L16(mc.getData(), 2);
+
+		// Setup other info
+		info.colformat = PALMASK;
+		info.format = id;
+		
+		return info;
+	}
+};
+
+class SIFWolfSprite : public SIFormat {
+protected:
+	bool readImage(SImage& image, MemChunk& data, int index) {
+		// Get image info
+		SImage::info_t info = getInfo(data, index);
+
+		// Create image
+		image.create(info);
+		uint8_t* img_data = imageData(image);
+		uint8_t* img_mask = imageMask(image);
+
+		// Read data
+		const uint16_t* cmdptr = (const uint16_t *)(data.getData() + 4);
+		uint32_t i, x, y;
+		for (x = 0 ; x < (unsigned)info.width ; ++x ) {
+			const int16_t * linecmds = (const int16_t *)(data.getData() + wxINT16_SWAP_ON_BE( *cmdptr ));
+			cmdptr++;
+			for (; wxINT16_SWAP_ON_BE(*linecmds); linecmds += 3) {
+				i = (wxINT16_SWAP_ON_BE(linecmds[2])>>1) + wxINT16_SWAP_ON_BE(linecmds[1]);
+				for (y = (uint32_t)(wxINT16_SWAP_ON_BE(linecmds[2])>>1); y < (uint32_t)(wxINT16_SWAP_ON_BE(linecmds[0]) / 2); ++y, ++i) {
+					img_data[y * info.width + x] = data[i];
+					img_mask[y * info.width + x] = 255;
+				}
+			}
+		}
+
+		return true;
+	}
+	
+public:
+	SIFWolfSprite() : SIFormat("wolfsprite") {
+		name = "Wolf3d Sprite";
+		extension = "dat";
+		reliability = 200;
+	}
+	~SIFWolfSprite() {}
+	
+	bool isThisFormat(MemChunk& mc) {
+		if (EntryDataFormat::getFormat("img_wolfsprite")->isThisFormat(mc))
+			return true;
+		else
+			return false;
+	}
+	
+	SImage::info_t getInfo(MemChunk& mc, int index) {
+		SImage::info_t info;
+		
+		// Read dimensions
+		uint8_t leftpix, rightpix;
+		leftpix = mc[0];
+		rightpix = mc[2];
+		info.width = 1 + rightpix - leftpix;
+		info.height = 64;
+
+		// Setup other info
+		info.offset_x = 32 - leftpix;
+		info.offset_y = info.height;
+		info.colformat = PALMASK;
+		info.format = id;
+		
 		return info;
 	}
 };

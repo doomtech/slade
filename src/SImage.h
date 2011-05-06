@@ -117,6 +117,16 @@ public:
 
 	// Image format reading
 	bool	open(MemChunk& data, int index = 0);
+	bool	loadFont0(const uint8_t* gfx_data, int size);
+	bool	loadFont1(const uint8_t* gfx_data, int size);
+	bool	loadFont2(const uint8_t* gfx_data, int size);
+	bool	loadFontM(const uint8_t* gfx_data, int size);
+	bool	loadBMF(const uint8_t* gfx_data, int size);
+	bool	loadWolfFont(const uint8_t* gfx_data, int size);
+	bool	loadJediFNT(const uint8_t* gfx_data, int size);
+	bool	loadJediFONT(const uint8_t* gfx_data, int size);
+
+	/*
 	bool	loadImage(const uint8_t* data, int size);
 	bool	loadDoomGfx(const uint8_t* data, int size, uint8_t version = 0);
 	bool	loadDoomGfxA(const uint8_t* data, int size) {return loadDoomGfx(data, size, 2);}
@@ -137,12 +147,6 @@ public:
 	bool	loadPlanar(const uint8_t* gfx_data, int size);
 	bool	load4bitChunk(const uint8_t* gfx_data, int size);
 	bool	loadImgz(const uint8_t* gfx_data, int size);
-	bool	loadFont0(const uint8_t* gfx_data, int size);
-	bool	loadFont1(const uint8_t* gfx_data, int size);
-	bool	loadFont2(const uint8_t* gfx_data, int size);
-	bool	loadFontM(const uint8_t* gfx_data, int size);
-	bool	loadBMF(const uint8_t* gfx_data, int size);
-	bool	loadWolfFont(const uint8_t* gfx_data, int size);
 	bool	loadSCSprite(const uint8_t* data, int size);
 	bool	loadSCWall(const uint8_t* data, int size);
 	bool	loadAnaMip(const uint8_t* data, int size);
@@ -154,16 +158,17 @@ public:
 	bool	JediFrame(const uint8_t* gfx_data, uint32_t hdroffs);
 	bool	loadJediFME(const uint8_t* gfx_data, int size);
 	bool	loadJediWAX(const uint8_t* gfx_data, int size, int index);
-	bool	loadJediFNT(const uint8_t* gfx_data, int size);
-	bool	loadJediFONT(const uint8_t* gfx_data, int size);
+	*/
 
 	// Image format writing
+	/*
 	bool	safeConvert(MemChunk& out, Palette8bit* pal = NULL);
 	bool	toPNG(MemChunk& out, Palette8bit* pal = NULL);
 	bool	toDoomGfx(MemChunk& out, uint8_t alpha_threshold = 0);
 	bool	toDoomFlat(MemChunk& out);
 	bool	toPlanar(MemChunk& out, Palette8bit* pal = NULL);
 	bool	to4bitChunk(MemChunk& out, Palette8bit* pal = NULL);
+	*/
 
 	// Conversion stuff
 	bool	convertRGBA(Palette8bit* pal = NULL);

@@ -85,6 +85,8 @@ protected:
 				}
 			}
 		}
+
+		return true;
 	}
 
 	virtual bool readImage(SImage& image, MemChunk& data, int index) {
@@ -95,6 +97,7 @@ public:
 	SIFRottGfx(string id = "rott") : SIFormat(id) {
 		name = "ROTT Gfx";
 		extension = "dat";
+		reliability = 121;
 	}
 	~SIFRottGfx() {}
 
@@ -132,6 +135,7 @@ protected:
 public:
 	SIFRottGfxMasked() : SIFRottGfx("rottmask") {
 		name = "ROTT Masked Gfx";
+		reliability = 120;
 	}
 	~SIFRottGfxMasked() {}
 
@@ -204,6 +208,7 @@ public:
 	SIFRottLbm() : SIFormat("rottlbm") {
 		name = "ROTT Lbm";
 		extension = "dat";
+		reliability = 80;
 	}
 	~SIFRottLbm() {}
 
@@ -234,8 +239,8 @@ protected:
 		// Get image info
 		SImage::info_t info = getInfo(data, index);
 
-		// Create image
-		image.create(info);
+		// Create image (swapped width/height because column-major)
+		image.create(info.height, info.width, PALMASK); 
 		image.fillAlpha(255);
 
 		// Read raw pixel data
@@ -252,6 +257,7 @@ public:
 	SIFRottRaw() : SIFormat("rottraw") {
 		name = "ROTT Raw";
 		extension = "dat";
+		reliability = 101;
 	}
 	~SIFRottRaw() {}
 
@@ -267,8 +273,8 @@ public:
 
 		// Read header
 		const patch_header_t* header = (const patch_header_t*)mc.getData();
-		info.height = wxINT16_SWAP_ON_BE(header->width); // Cheat a bit since
-		info.width = wxINT16_SWAP_ON_BE(header->height); // it's column-major
+		info.width = wxINT16_SWAP_ON_BE(header->width);
+		info.height = wxINT16_SWAP_ON_BE(header->height);
 		info.offset_x = wxINT16_SWAP_ON_BE(header->left);
 		info.offset_y = wxINT16_SWAP_ON_BE(header->top);
 
@@ -308,7 +314,7 @@ protected:
 		}
 
 		// Create mask (index 255 is transparent)
-		for (unsigned a = 0; a < info.width*info.height; a++) {
+		for (int a = 0; a < info.width*info.height; a++) {
 			if (img_data[a] == 255)
 				img_mask[a] = 0;
 			else
@@ -322,6 +328,7 @@ public:
 	SIFRottPic() : SIFormat("rottpic") {
 		name = "ROTT Picture";
 		extension = "dat";
+		reliability = 60;
 	}
 	~SIFRottPic() {}
 

@@ -1023,7 +1023,8 @@ bool EntryOperations::exportAsPNG(ArchiveEntry* entry, string filename) {
 
 	// Write png data
 	MemChunk png;
-	if (!image.toPNG(png, theMainWindow->getPaletteChooser()->getSelectedPalette(entry))) {
+	SIFormat* fmt_png = SIFormat::getFormat("png");
+	if (!fmt_png->saveImage(image, png, theMainWindow->getPaletteChooser()->getSelectedPalette(entry))) {
 		wxLogMessage("Error converting %s", CHR(entry->getName()));
 		return false;
 	}

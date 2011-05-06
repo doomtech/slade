@@ -268,6 +268,7 @@ public:
 	SIFQuakeTex() : SIFormat("quaketex") {
 		name = "Quake Texture";
 		extension = "dat";
+		reliability = 11;
 	}
 	~SIFQuakeTex() {}
 
@@ -335,6 +336,7 @@ public:
 	SIFQuake2Wal() : SIFormat("quake2wal") {
 		name = "Quake II Wall";
 		extension = "dat";
+		reliability = 21;
 	}
 	~SIFQuake2Wal() {}
 

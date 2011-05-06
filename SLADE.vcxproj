@@ -392,9 +392,11 @@
     <ClInclude Include="src\SIFDoom.h" />
     <ClInclude Include="src\SIFHexen.h" />
     <ClInclude Include="src\SIFImages.h" />
+    <ClInclude Include="src\SIFJedi.h" />
     <ClInclude Include="src\SIFormat.h" />
     <ClInclude Include="src\SIFOther.h" />
     <ClInclude Include="src\SIFQuake.h" />
+    <ClInclude Include="src\SIFRott.h" />
     <ClInclude Include="src\SIFZDoom.h" />
     <ClInclude Include="src\Structs.h" />
     <ClInclude Include="src\TarArchive.h" />

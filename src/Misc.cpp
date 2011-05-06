@@ -75,9 +75,30 @@ bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry, int index) {
 	if (format == "img_raw" && SIFormat::rawFormat()->isThisFormat(entry->getMCData()))
 		return SIFormat::rawFormat()->loadImage(*image, entry->getMCData());
 
+	// Font formats are still manually loaded for now
+	else if (S_CMPNOCASE(format, "font_doom_alpha"))
+		return image->loadFont0(entry->getData(), entry->getSize());
+	else if (S_CMPNOCASE(format, "font_zd_console"))
+		return image->loadFont1(entry->getData(), entry->getSize());
+	else if (S_CMPNOCASE(format, "font_zd_big"))
+		return image->loadFont2(entry->getData(), entry->getSize());
+	else if (S_CMPNOCASE(format, "font_bmf"))
+		return image->loadBMF(entry->getData(), entry->getSize());
+	else if (S_CMPNOCASE(format, "font_mono"))
+		return image->loadFontM(entry->getData(), entry->getSize());
+	else if (S_CMPNOCASE(format, "font_wolf"))
+		return image->loadWolfFont(entry->getData(), entry->getSize());
+	else if (S_CMPNOCASE(format, "font_jedi_fnt"))
+		return image->loadJediFNT(entry->getData(), entry->getSize());
+	else if (S_CMPNOCASE(format, "font_jedi_font"))
+		return image->loadJediFONT(entry->getData(), entry->getSize());
 
+	// Lastly, try detecting/loading via FreeImage
+	else if (SIFormat::generalFormat()->isThisFormat(entry->getMCData()))
+		return SIFormat::generalFormat()->loadImage(*image, entry->getMCData());
 
 	// Otherwise use old loading stuff
+	/*
 	if (S_CMPNOCASE(format, "img_doom"))
 		return image->loadDoomGfx(entry->getData(), entry->getSize());
 	else if (S_CMPNOCASE(format, "img_doom_alpha"))
@@ -106,16 +127,6 @@ bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry, int index) {
 		return image->load4bitChunk(entry->getData(), entry->getSize());
 	else if (S_CMPNOCASE(format, "img_raw"))
 		return image->loadDoomFlat(entry->getData(), entry->getSize());
-	else if (S_CMPNOCASE(format, "font_doom_alpha"))
-		return image->loadFont0(entry->getData(), entry->getSize());
-	else if (S_CMPNOCASE(format, "font_zd_console"))
-		return image->loadFont1(entry->getData(), entry->getSize());
-	else if (S_CMPNOCASE(format, "font_zd_big"))
-		return image->loadFont2(entry->getData(), entry->getSize());
-	else if (S_CMPNOCASE(format, "font_bmf"))
-		return image->loadBMF(entry->getData(), entry->getSize());
-	else if (S_CMPNOCASE(format, "font_mono"))
-		return image->loadFontM(entry->getData(), entry->getSize());
 	else if (S_CMPNOCASE(format, "img_scsprite"))
 		return image->loadSCSprite(entry->getData(), entry->getSize());
 	else if (S_CMPNOCASE(format, "img_scwall"))
@@ -136,8 +147,6 @@ bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry, int index) {
 		return image->loadWolfPic(entry->getData(), entry->getSize());
 	else if (S_CMPNOCASE(format, "img_wolfsprite"))
 		return image->loadWolfSprite(entry->getData(), entry->getSize());
-	else if (S_CMPNOCASE(format, "font_wolf"))
-		return image->loadWolfFont(entry->getData(), entry->getSize());
 	else if (S_CMPNOCASE(format, "img_mipimage"))
 		return image->loadAnaMip(entry->getData(), entry->getSize());
 	else if (S_CMPNOCASE(format, "img_arttile"))
@@ -154,10 +163,7 @@ bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry, int index) {
 		return image->loadJediFME(entry->getData(), entry->getSize());
 	else if (S_CMPNOCASE(format, "img_jedi_wax"))
 		return image->loadJediWAX(entry->getData(), entry->getSize(), index);
-	else if (S_CMPNOCASE(format, "font_jedi_fnt"))
-		return image->loadJediFNT(entry->getData(), entry->getSize());
-	else if (S_CMPNOCASE(format, "font_jedi_font"))
-		return image->loadJediFONT(entry->getData(), entry->getSize());
+	
 	else {
 		if (!image->loadImage(entry->getData(true), entry->getSize())) {
 			Global::error = "Image format not supported by FreeImage";
@@ -166,6 +172,7 @@ bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry, int index) {
 		else
 			return true;
 	}
+	*/
 
 	// Unknown image type
 	Global::error = "Entry is not a known image format";

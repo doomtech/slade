@@ -287,6 +287,7 @@ public:
 	SIFDoomGfx(string id = "doom") : SIFormat(id) {
 		this->name = "Doom Gfx";
 		this->extension = "lmp";
+		this->reliability = 230;
 	}
 
 	~SIFDoomGfx() {}
@@ -358,6 +359,7 @@ protected:
 public:
 	SIFDoomBetaGfx() : SIFDoomGfx("doom_beta") {
 		this->name = "Doom Gfx (Beta)";
+		this->reliability = 160;
 	}
 	~SIFDoomBetaGfx();
 
@@ -389,6 +391,7 @@ protected:
 public:
 	SIFDoomAlphaGfx() : SIFDoomGfx("doom_alpha") {
 		this->name = "Doom Gfx (Alpha)";
+		this->reliability = 100;
 	}
 	~SIFDoomAlphaGfx();
 
@@ -456,6 +459,7 @@ public:
 	SIFDoomArah() : SIFormat("doom_arah") {
 		name = "Doom Arah";
 		extension = "lmp";
+		reliability = 100;
 	}
 	~SIFDoomArah() {}
 

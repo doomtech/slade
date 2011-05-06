@@ -395,22 +395,32 @@ bool GfxEntryPanel::saveEntry() {
 	bool ok = true;
 	if (image_data_modified) {
 		SImage* image = getImage();
+		SIFormat* format = image->getFormat();
 
-		// Write depending on type
-		// TODO: I really should write a proper SImage format system so this kind of thing isn't needed
-		if (entry->getType()->getFormat() == "img_doom")
-			image->toDoomGfx(entry->getMCData());
-		else if (entry->getType()->getFormat() == "img_png")
-			image->toPNG(entry->getMCData(), gfx_canvas->getPalette());
-		else if (entry->getType()->getFormat() == "img_raw")
-			image->toDoomFlat(entry->getMCData());
+		string error = "";
+		ok = false;
+		int writable = format->canWrite(*image);
+		if (format == SIFormat::unknownFormat())
+			error = "Image is of unknown format";
+		else if (writable == SIFormat::NOTWRITABLE)
+			error = S_FMT("Writing unsupported for format \"%s\"", CHR(format->getName()));
 		else {
-			wxMessageBox("Unable to save changes, unsupported format for writing.\nSupported formats are: Doom Gfx, Doom Flat, PNG");
-			ok = false;
+			// Convert image if necessary (using default options)
+			if (writable == SIFormat::CONVERTIBLE) {
+				format->convertWritable(*image, SIFormat::convert_options_t());
+				wxLogMessage("Image converted for writing");
+			}
+
+			if (format->saveImage(*image, entry->getMCData(), gfx_canvas->getPalette()))
+				ok = true;
+			else
+				error = "Error writing image";
 		}
 
 		if (ok)
 			entry->setState(1);
+		else
+			wxMessageBox(wxString("Cannot save changes to image: ") + error, "Error", wxICON_ERROR);
 	}
 	// Otherwise just set offsets
 	else
@@ -456,7 +466,7 @@ bool GfxEntryPanel::extractAll() {
 		if (getImage()->getWidth() && getImage()->getHeight()) {
 			ArchiveEntry * newimg = parent->addNewEntry(newname, index+pos+1, entry->getParentDir());
 			if (newimg == NULL) return false;
-			getImage()->toPNG(newimg->getMCData(), gfx_canvas->getPalette());
+			SIFormat::getFormat("png")->saveImage(*getImage(), newimg->getMCData(), gfx_canvas->getPalette());
 			EntryType::detectEntryType(newimg);
 			pos++;
 		}
@@ -997,8 +1007,8 @@ CONSOLE_COMMAND(rotate, 1) {
 		meep->getImage()->rotate(angle);
 		meep->refresh();
 		MemChunk mc;
-		meep->getImage()->safeConvert(mc);
-		bar->importMemChunk(mc);
+		if (meep->getImage()->getFormat()->saveImage(*meep->getImage(), mc))
+			bar->importMemChunk(mc);
 	}
 }
 
@@ -1035,8 +1045,8 @@ CONSOLE_COMMAND (mirror, 1) {
 		meep->getImage()->mirror(vertical);
 		meep->refresh();
 		MemChunk mc;
-		meep->getImage()->safeConvert(mc);
-		bar->importMemChunk(mc);
+		if (meep->getImage()->getFormat()->saveImage(*meep->getImage(), mc))
+			bar->importMemChunk(mc);
 	}
 }
 
@@ -1064,8 +1074,8 @@ CONSOLE_COMMAND (crop, 4) {
 			meep->getImage()->crop(x1, y1, x2, y2);
 			meep->refresh();
 			MemChunk mc;
-			meep->getImage()->safeConvert(mc);
-			bar->importMemChunk(mc);
+			if (meep->getImage()->getFormat()->saveImage(*meep->getImage(), mc))
+				bar->importMemChunk(mc);
 		}
 	}
 }
@@ -1091,7 +1101,7 @@ CONSOLE_COMMAND(imgconv, 0) {
 		meep->getImage()->imgconv();
 		meep->refresh();
 		MemChunk mc;
-		meep->getImage()->safeConvert(mc);
-		bar->importMemChunk(mc);
+		if (meep->getImage()->getFormat()->saveImage(*meep->getImage(), mc))
+			bar->importMemChunk(mc);
 	}
 }

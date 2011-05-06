@@ -159,6 +159,7 @@ public:
 	SIFPlanar() : SIFormat("planar") {
 		name = "Planar";
 		extension = "lmp";
+		reliability = 240;
 	}
 	~SIFPlanar();
 
@@ -300,6 +301,7 @@ public:
 	SIF4BitChunk() : SIFormat("4bit") {
 		name = "4-bit";
 		extension = "lmp";
+		reliability = 80;
 	}
 	~SIF4BitChunk() {}
 

@@ -822,11 +822,13 @@ bool SImage::cutoffMask(uint8_t threshold) {
  * The rules are simple: use external palette -> Doom Gfx, and
  * otherwise -> PNG.
  *******************************************************************/
+/*
 bool SImage::safeConvert(MemChunk& out, Palette8bit* pal) {
 	if (type == PALMASK && !has_palette)
 		return toDoomGfx(out);
 	else return toPNG(out, pal);
 }
+*/
 
 /* SImage::setPixel
  * Sets the pixel at [x],[y] to [colour]. Returns false if the
