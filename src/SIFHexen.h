@@ -170,13 +170,14 @@ public:
 			return false;
 	}
 
-	imginfo_t getInfo(MemChunk& mc, int index) {
-		imginfo_t info;
+	SImage::info_t getInfo(MemChunk& mc, int index) {
+		SImage::info_t info;
 
 		// Set info (always the same)
 		info.width = 640;
 		info.height = 480;
 		info.colformat = PALMASK;
+		info.has_palette = true;
 		info.format = id;
 
 		return info;
@@ -310,8 +311,8 @@ public:
 			return false;
 	}
 
-	imginfo_t getInfo(MemChunk& mc, int index) {
-		imginfo_t info;
+	SImage::info_t getInfo(MemChunk& mc, int index) {
+		SImage::info_t info;
 
 		// Check size
 		if (mc.getSize() == 32) {

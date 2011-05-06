@@ -63,8 +63,8 @@ public:
 			return false;
 	}
 
-	imginfo_t getInfo(MemChunk& mc, int index) {
-		imginfo_t info;
+	SImage::info_t getInfo(MemChunk& mc, int index) {
+		SImage::info_t info;
 
 		// Get width & height
 		imgz_header_t *header = (imgz_header_t*)mc.getData();

@@ -298,8 +298,8 @@ public:
 			return false;
 	}
 
-	virtual imginfo_t getInfo(MemChunk& mc, int index) {
-		imginfo_t info;
+	virtual SImage::info_t getInfo(MemChunk& mc, int index) {
+		SImage::info_t info;
 
 		// Read header
 		patch_header_t hdr;
@@ -311,6 +311,7 @@ public:
 		info.offset_x = hdr.left;
 		info.offset_y = hdr.top;
 		info.colformat = PALMASK;
+		info.has_palette = false;
 		info.format = id;
 
 		return info;
@@ -367,8 +368,8 @@ public:
 			return false;
 	}
 
-	imginfo_t getInfo(MemChunk& mc, int index) {
-		imginfo_t info = SIFDoomGfx::getInfo(mc, index);
+	SImage::info_t getInfo(MemChunk& mc, int index) {
+		SImage::info_t info = SIFDoomGfx::getInfo(mc, index);
 		info.format = id;
 		return info;
 	}
@@ -398,8 +399,8 @@ public:
 			return false;
 	}
 
-	imginfo_t getInfo(MemChunk& mc, int index) {
-		imginfo_t info;
+	SImage::info_t getInfo(MemChunk& mc, int index) {
+		SImage::info_t info;
 
 		// Setup info
 		info.width = mc[0];
@@ -465,8 +466,8 @@ public:
 			return false;
 	}
 
-	imginfo_t getInfo(MemChunk& mc, int index) {
-		imginfo_t info;
+	SImage::info_t getInfo(MemChunk& mc, int index) {
+		SImage::info_t info;
 
 		// Read header
 		patch_header_t header;
@@ -542,8 +543,8 @@ public:
 			return false;
 	}
 
-	imginfo_t getInfo(MemChunk& mc, int index) {
-		imginfo_t info;
+	SImage::info_t getInfo(MemChunk& mc, int index) {
+		SImage::info_t info;
 
 		// Get image info
 		uint8_t qwidth = mc[0];

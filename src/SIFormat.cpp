@@ -11,6 +11,7 @@
 #include "SIFZDoom.h"
 #include "SIFQuake.h"
 #include "SIFOther.h"
+#include "SIFRott.h"
 
 vector<SIFormat*>	simage_formats;
 SIFormat*			sif_raw = NULL;
@@ -31,8 +32,8 @@ public:
 	SIFUnknown() : SIFormat("unknown") {}
 	~SIFUnknown() {}
 
-	bool		isThisFormat(MemChunk& mc) { return false; }
-	imginfo_t	getInfo(MemChunk& mc, int index) { return imginfo_t(); }
+	bool			isThisFormat(MemChunk& mc) { return false; }
+	SImage::info_t	getInfo(MemChunk& mc, int index) { return SImage::info_t(); }
 };
 
 
@@ -59,7 +60,7 @@ protected:
 
 	bool readImage(SImage& image, MemChunk& data, int index) {
 		// Get info
-		imginfo_t info = getInfo(data, index);
+		SImage::info_t info = getInfo(data, index);
 
 		// Create image from data
 		image.create(info.width, info.height, PALMASK);
@@ -81,8 +82,8 @@ public:
 		return validSize(mc.getSize());
 	}
 
-	imginfo_t getInfo(MemChunk& mc, int index) {
-		imginfo_t info;
+	SImage::info_t getInfo(MemChunk& mc, int index) {
+		SImage::info_t info;
 		unsigned size = mc.getSize();
 
 		// Determine dimensions
@@ -246,10 +247,21 @@ void SIFormat::initFormats() {
 	new SIFQuakeTex();
 	new SIFQuake2Wal();
 
+	// ROTT formats
+	new SIFRottGfx();
+	new SIFRottGfxMasked();
+	new SIFRottLbm();
+	new SIFRottRaw();
+	new SIFRottPic();
+
 	// Other game formats
 	new SIFHalfLifeTex();
 	new SIFSCSprite();
 	new SIFSCWall();
+	new SIFAnaMip();
+	new SIFBuildTile();
+	new SIFHeretic2M8();
+	new SIFHeretic2M32();
 }
 
 SIFormat* SIFormat::getFormat(string id) {

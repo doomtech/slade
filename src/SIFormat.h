@@ -19,23 +19,6 @@ protected:
 	virtual bool	writeImage(SImage& image, MemChunk& data, Palette8bit* pal, int index) { return false; }
 
 public:
-	// Image info struct
-	struct imginfo_t {
-		int		width;
-		int		height;
-		int		colformat;
-		string	format;
-		int		numimages;
-		int		offset_x;
-		int		offset_y;
-
-		imginfo_t() {
-			width = height = offset_x = offset_y = 0;
-			colformat = RGBA;
-			numimages = 1;
-		}
-	};
-
 	// Conversion options stuff
 	enum {
 		MASK_NONE = 0,
@@ -70,7 +53,7 @@ public:
 	virtual bool	isThisFormat(MemChunk& mc) = 0;
 
 	// Reading
-	virtual imginfo_t	getInfo(MemChunk& mc, int index = 0) = 0;
+	virtual SImage::info_t	getInfo(MemChunk& mc, int index = 0) = 0;
 
 	bool loadImage(SImage& image, MemChunk& data, int index = 0) {
 		// Check format
@@ -87,6 +70,9 @@ public:
 		}
 		else
 			image.clear();
+
+		// Announce
+		image.announce("image_changed");
 
 		// Testing
 		wxLogMessage("Loaded image format %s successfully", CHR(name));

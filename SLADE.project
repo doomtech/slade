@@ -261,14 +261,17 @@
         <File Name="src/SImage.cpp"/>
         <File Name="src/SImage.h"/>
         <File Name="src/SImageFormats.cpp"/>
-        <File Name="src/SIFormat.cpp"/>
-        <File Name="src/SIFormat.h"/>
-        <File Name="src/SIFDoom.h"/>
-        <File Name="src/SIFHexen.h"/>
-        <File Name="src/SIFImages.h"/>
-        <File Name="src/SIFZDoom.h"/>
-        <File Name="src/SIFOther.h"/>
-        <File Name="src/SIFQuake.h"/>
+        <VirtualDirectory Name="Formats">
+          <File Name="src/SIFDoom.h"/>
+          <File Name="src/SIFHexen.h"/>
+          <File Name="src/SIFImages.h"/>
+          <File Name="src/SIFormat.cpp"/>
+          <File Name="src/SIFormat.h"/>
+          <File Name="src/SIFOther.h"/>
+          <File Name="src/SIFQuake.h"/>
+          <File Name="src/SIFZDoom.h"/>
+          <File Name="src/SIFRott.h"/>
+        </VirtualDirectory>
       </VirtualDirectory>
       <VirtualDirectory Name="Palette">
         <File Name="src/Palette.cpp"/>

@@ -230,6 +230,26 @@ uint8_t SImage::getBpp() {
 		return 1;
 }
 
+/* SImage::getInfo
+ * Returns an info struct with image information
+ *******************************************************************/
+SImage::info_t SImage::getInfo() {
+	info_t info;
+
+	// Set values
+	info.width = width;
+	info.height = height;
+	info.colformat = type;
+	if (format) info.format = format->getId();
+	info.numimages = numimages;
+	info.imgindex = imgindex;
+	info.offset_x = offset_x;
+	info.offset_y = offset_y;
+	info.has_palette = has_palette;
+
+	return info;
+}
+
 /* SImage::getPixel
  * Returns the colour of the pixel at [x,y] in the image, or black+
  * invisible if out of range
@@ -358,6 +378,16 @@ void SImage::create(int width, int height, SIType type, Palette8bit* pal, int in
 	}
 	else
 		has_palette = false;
+}
+
+void SImage::create(SImage::info_t info, Palette8bit* pal) {
+	// Normal creation
+	create(info.width, info.height, (SIType)info.colformat, pal, info.imgindex, info.numimages);
+
+	// Set other info
+	offset_x = info.offset_x;
+	offset_y = info.offset_y;
+	has_palette = info.has_palette;
 }
 
 /* SImage::clear

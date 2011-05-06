@@ -59,6 +59,25 @@ public:
 		ALPHA,
 	};
 
+	struct info_t {
+		int		width;
+		int		height;
+		int		colformat;
+		string	format;
+		int		numimages;
+		int		imgindex;
+		int		offset_x;
+		int		offset_y;
+		bool	has_palette;
+
+		info_t() {
+			width = height = offset_x = offset_y = imgindex = 0;
+			colformat = RGBA;
+			numimages = 1;
+			has_palette = false;
+		}
+	};
+
 	SImage(SIType type = RGBA);
 	virtual ~SImage();
 
@@ -79,6 +98,7 @@ public:
 	rgba_t			getPixel(unsigned x, unsigned y, Palette8bit* pal = NULL);
 	uint8_t			getPixelIndex(unsigned x, unsigned y);
 	SIFormat*		getFormat() { return format; }
+	info_t			getInfo();
 
 	void			setXOffset(int offset);
 	void			setYOffset(int offset);
@@ -87,6 +107,7 @@ public:
 	// Misc
 	void	clear();
 	void	create(int width, int height, SIType type, Palette8bit* pal = NULL, int index = 0, int numimages = 1);
+	void	create(info_t info, Palette8bit* pal = NULL);
 	void	fillAlpha(uint8_t alpha = 0);
 	short	findUnusedColour();
 	bool	validFlatSize();

@@ -374,8 +374,8 @@ public:
 		return false;
 	}
 
-	imginfo_t getInfo(MemChunk& mc, int index) {
-		imginfo_t inf;
+	SImage::info_t getInfo(MemChunk& mc, int index) {
+		SImage::info_t inf;
 		inf.format = "png";
 		inf.width = 0;
 		inf.height = 0;
@@ -395,9 +395,11 @@ public:
 			inf.width = ihdr.width;
 			inf.height = ihdr.height;
 			bpp = ihdr.bpp;
-			if (ihdr.coltype == 3 && ihdr.bpp == 8)
+			if (ihdr.coltype == 3 && ihdr.bpp == 8) {
 				// Only 8bpp 'indexed' pngs are counted as PALMASK for now, all others will be converted to RGBA
 				inf.colformat = PALMASK;
+				inf.has_palette = true;
+			}
 			else
 				inf.colformat = RGBA;
 		}
