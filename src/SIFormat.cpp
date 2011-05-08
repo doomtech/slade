@@ -172,6 +172,15 @@ protected:
 			if (valid_flat_size[a][0] * valid_flat_size[a][1] == size)
 				return true;
 		}
+		
+		// COLORMAP size
+		if (size == 8776) size = 8704;	// Ignore inkworks signature
+		if (size % 256 == 0)
+			return true;
+			
+		// AUTOPAGE size
+		if (size % 320 == 0)
+			return true;
 
 		return false;
 	}

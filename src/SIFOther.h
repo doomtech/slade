@@ -352,11 +352,7 @@ protected:
 		uint8_t* img_data = imageData(image);
 		uint8_t* img_mask = imageMask(image);
 		data.read(img_data, info.width*info.height, datastart);
-
-		// Convert from column-major to row-major
-		image.rotate(90);
-		image.mirror(true);
-
+		
 		// Create mask
 		for (int a = 0; a < info.width*info.height; a++) {
 			if (img_data[a] == 0xFF)
@@ -364,6 +360,14 @@ protected:
 			else
 				img_mask[a] = 0xFF;
 		}
+
+		// Convert from column-major to row-major
+		image.rotate(90);
+		image.mirror(true);
+		
+		// Set offsets
+		image.setXOffset(info.offset_x);
+		image.setYOffset(info.offset_y);
 
 		return true;
 	}
