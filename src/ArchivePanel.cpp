@@ -205,7 +205,7 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 
 	// Add default entry panel
 	cur_area = entry_area;
-	m_hbox->Add(cur_area, 1, wxEXPAND | wxALL, 4);
+	m_hbox->Add(cur_area, 1, wxEXPAND);
 	cur_area->Show(true);
 
 	// Bind events
@@ -744,6 +744,20 @@ bool ArchivePanel::bookmark() {
 	}
 	else
 		return false;
+}
+
+/* ArchivePanel::openTab
+ * Opens currently selected entries in separate tabs
+ *******************************************************************/
+bool ArchivePanel::openTab() {
+	// Get selected entries
+	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
+
+	// Open each in it's own tab
+	for (unsigned a = 0; a < selection.size(); a++)
+		theMainWindow->openEntry(selection[a]);
+
+	return true;
 }
 
 /* ArchivePanel::convertEntryTo
@@ -1620,6 +1634,10 @@ bool ArchivePanel::handleAction(string id) {
 	else if (id == "arch_entry_bookmark")
 		bookmark();
 
+	// Open in Tab
+	else if (id == "arch_entry_opentab")
+		openTab();
+
 	// Entry->Convert To...
 	else if (id == "arch_entry_convert")
 		convertEntryTo();
@@ -1703,6 +1721,36 @@ void ArchivePanel::onAnnouncement(Announcer* announcer, string event_name, MemCh
 			Layout();
 		}
 	}
+}
+
+
+/*******************************************************************
+ * ARCHIVEPANEL STATIC FUNCTIONS
+ *******************************************************************/
+
+EntryPanel* ArchivePanel::createPanelForEntry(ArchiveEntry* entry, wxWindow* parent) {
+	EntryPanel* entry_panel = NULL;
+
+	if (entry->getType() == EntryType::mapMarkerType())
+		entry_panel = new MapEntryPanel(parent);
+	else if (!entry->getType()->getEditor().Cmp("gfx"))
+		entry_panel = new GfxEntryPanel(parent);
+	else if (!entry->getType()->getEditor().Cmp("palette"))
+		entry_panel = new PaletteEntryPanel(parent);
+	else if (!entry->getType()->getEditor().Cmp("ansi"))
+		entry_panel = new ANSIEntryPanel(parent);
+	else if (!entry->getType()->getEditor().Cmp("text"))
+		entry_panel = new TextEntryPanel(parent);
+	else if (!entry->getType()->getEditor().Cmp("animated"))
+		entry_panel = new AnimatedEntryPanel(parent);
+	else if (!entry->getType()->getEditor().Cmp("switches"))
+		entry_panel = new SwitchesEntryPanel(parent);
+	else if (!entry->getType()->getEditor().Cmp("audio"))
+		entry_panel = new AudioEntryPanel(parent);
+	else
+		entry_panel = new DefaultEntryPanel(parent);
+
+	return entry_panel;
 }
 
 
@@ -1850,6 +1898,7 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 	theApp->getAction("arch_entry_movedown")->addToMenu(&context);
 	context.AppendSeparator();
 	theApp->getAction("arch_entry_bookmark")->addToMenu(&context);
+	theApp->getAction("arch_entry_opentab")->addToMenu(&context);
 
 	// Add Boom Animations/Switches related menu items if they are selected
 	if (bas_selected)
@@ -2004,9 +2053,13 @@ void ArchivePanel::onEntryListActivated(wxListEvent& e) {
 		theArchiveManager->openArchive(entry);
 
 	// Texture list
-	if (entry->getType()->getFormat() == "texturex" ||
-		entry->getType() == EntryType::getType("zdtextures"))
+	else if (entry->getType()->getFormat() == "texturex" ||
+			entry->getType() == EntryType::getType("zdtextures"))
 		theMainWindow->openTextureEditor(archive);
+
+	// Other entry
+	else if (entry->getType() != EntryType::folderType())
+		theMainWindow->openEntry(entry);
 
 	e.Skip();
 }

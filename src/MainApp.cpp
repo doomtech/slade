@@ -372,6 +372,7 @@ void MainApp::initActions() {
 	new SAction("arch_entry_import", "Import", "t_import", "Import a file to the selected entry");
 	new SAction("arch_entry_export", "Export", "t_export", "Export the selected entries to files");
 	new SAction("arch_entry_bookmark", "Bookmark", "t_bookmark", "Bookmark the current entry");
+	new SAction("arch_entry_opentab", "Open in Tab", "t_open", "Open selected entries in separate tabs");
 	new SAction("arch_bas_convert", "Convert to ANIMDEFS", "", "Convert any selected SWITCHES and ANIMATED entries to a single ANIMDEFS entry");
 	new SAction("arch_texturex_convertzd", "Convert to TEXTURES", "", "Convert any selected TEXTUREx entries to ZDoom TEXTURES format");
 	new SAction("arch_view_text", "View as Text", "e_text", "Open the selected entry in the text editor, regardless of type");

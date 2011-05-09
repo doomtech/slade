@@ -63,6 +63,7 @@ public:
 	bool	moveUp();
 	bool	moveDown();
 	bool	bookmark();
+	bool	openTab();
 	bool	convertEntryTo();
 	bool	importEntry();
 	bool	exportEntry();
@@ -103,7 +104,11 @@ public:
 	// SAction handler
 	bool	handleAction(string id);
 
+	// Listener
 	virtual void onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
+
+	// Static functions
+	static EntryPanel*	createPanelForEntry(ArchiveEntry* entry, wxWindow* parent);
 
 	// Events
 	void			onEntryListSelectionChange(wxCommandEvent& e);

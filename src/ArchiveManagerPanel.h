@@ -13,6 +13,7 @@
 #include "MainApp.h"
 
 class ArchiveManagerPanel;
+class ArchivePanel;
 
 class WMFileBrowser : public wxGenericDirCtrl {
 private:
@@ -64,11 +65,14 @@ public:
 	vector<ArchiveEntry*>	currentEntrySelection();
 
 	void			openTab(int archive_index);
-	void			openTab(Archive * archive);
+	ArchivePanel*	getArchiveTab(Archive* archive);
+	void			openTab(Archive* archive);
 	void			closeTab(int archive_index);
 	void			openTextureTab(int archive_index);
 	TextureXEditor*	getTextureTab(int archive_index);
 	void			closeTextureTab(int archive_index);
+	void			openEntryTab(ArchiveEntry* entry);
+	void			closeEntryTabs(Archive* parent);
 	void			openFile(string filename);
 	void			openFiles(wxArrayString& files);
 

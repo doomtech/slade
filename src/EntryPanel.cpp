@@ -55,10 +55,13 @@ EntryPanel::EntryPanel(wxWindow* parent, string id)
 	this->id = id;
 	menu_custom = NULL;
 
+	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+	SetSizer(sizer);
+
 	// Create & set sizer & border
 	frame = new wxStaticBox(this, -1, "Entry Contents");
 	wxStaticBoxSizer *framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
-	SetSizer(framesizer);
+	sizer->Add(framesizer, 1, wxEXPAND|wxALL, 4);
 	Show(false);
 
 	// Setup sizer positions

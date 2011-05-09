@@ -465,32 +465,44 @@ void ArchiveManagerPanel::openTab(int archive_index) {
 	}
 }
 
+ArchivePanel* ArchiveManagerPanel::getArchiveTab(Archive* archive) {
+	// Check archive was given
+	if (!archive)
+		return NULL;
+
+	// Go through all tabs
+	for (size_t a = 0; a < notebook_archives->GetPageCount(); a++) {
+		// Check page type is "archive"
+		if (notebook_archives->GetPage(a)->GetName().CmpNoCase("archive"))
+			continue;
+
+		// Check for archive match
+		ArchivePanel* ap = (ArchivePanel*)notebook_archives->GetPage(a);
+		if (ap->getArchive() == archive)
+			return ap;
+	}
+
+	// No tab currently open for archive
+	return NULL;
+}
+
 /* ArchiveManagerPanel::openTab
  * Opens a new tab for the archive
  *******************************************************************/
 void ArchiveManagerPanel::openTab(Archive* archive) {
 	if (archive) {
-		// Go through all tabs
-		for (size_t a = 0; a < notebook_archives->GetPageCount(); a++) {
-			// Check page type is "archive"
-			if (notebook_archives->GetPage(a)->GetName().CmpNoCase("archive"))
-				continue;
+		// Check if the archive is already open in a tab
+		ArchivePanel* wp = getArchiveTab(archive);
+		if (wp) {
+			// Switch to tab
+			notebook_archives->SetSelection(notebook_archives->GetPageIndex(wp));
+			wp->focusEntryList();
 
-			// Check for archive match
-			ArchivePanel* ap = (ArchivePanel*)notebook_archives->GetPage(a);
-			if (ap->getArchive() == archive) {
-				// Selected archive is already open in a tab, so switch to this tab
-
-				// Switch to tab
-				notebook_archives->SetSelection(a);
-				ap->focusEntryList();
-
-				return;
-			}
+			return;
 		}
 
 		// If tab isn't already open, open a new one
-		ArchivePanel* wp = new ArchivePanel(notebook_archives, archive);
+		wp = new ArchivePanel(notebook_archives, archive);
 
 		// Determine icon
 		string icon = "e_archive";
@@ -613,6 +625,62 @@ TextureXEditor* ArchiveManagerPanel::getTextureTab(int archive_index) {
 void ArchiveManagerPanel::closeTextureTab(int archive_index) {
 	TextureXEditor* txed = getTextureTab(archive_index);
 	if (txed) notebook_archives->DeletePage(notebook_archives->GetPageIndex(txed));
+}
+
+void ArchiveManagerPanel::openEntryTab(ArchiveEntry* entry) {
+	// First check if the entry is already open in a tab
+	for (unsigned a = 0; a < notebook_archives->GetPageCount(); a++) {
+		// Check page type is "entry"
+		if (notebook_archives->GetPage(a)->GetName() != "entry")
+			continue;
+
+		// Check for entry match
+		EntryPanel* ep = (EntryPanel*)notebook_archives->GetPage(a);
+		if (ep->getEntry() == entry) {
+			// Already open, switch to tab
+			notebook_archives->SetSelection(a);
+			return;
+		}
+	}
+
+	// Create an EntryPanel for the entry
+	EntryPanel* ep = ArchivePanel::createPanelForEntry(entry, notebook_archives);
+	ep->openEntry(entry);
+
+	// Create new tab for the EntryPanel
+	notebook_archives->AddPage(ep, S_FMT("%s/%s", CHR(entry->getParent()->getFilename(false)), CHR(entry->getName())), true);
+	notebook_archives->SetPageBitmap(notebook_archives->GetPageCount() - 1, getIcon(entry->getType()->getIcon()));
+	ep->SetName("entry");
+	ep->Show(true);
+
+	// Select the new tab
+	for (size_t a = 0; a < notebook_archives->GetPageCount(); a++) {
+		if (notebook_archives->GetPage(a) == ep) {
+			notebook_archives->SetSelection(a);
+			return;
+		}
+	}
+}
+
+void ArchiveManagerPanel::closeEntryTabs(Archive* parent) {
+	// Check archive was given
+	if (!parent)
+		return;
+
+	// Go through tabs
+	for (unsigned a = 0; a < notebook_archives->GetPageCount(); a++) {
+		// Check page type is "entry"
+		if (notebook_archives->GetPage(a)->GetName() != "entry")
+			continue;
+
+		// Check for entry parent archive match
+		EntryPanel* ep = (EntryPanel*)notebook_archives->GetPage(a);
+		if (ep->getEntry()->getParent() == parent) {
+			// Close tab
+			notebook_archives->DeletePage(a);
+			a--;
+		}
+	}
 }
 
 /* ArchiveManagerPanel::openFile
@@ -909,6 +977,7 @@ void ArchiveManagerPanel::onAnnouncement(Announcer* announcer, string event_name
 
 		// Close any related tabs
 		closeTextureTab(index);
+		closeEntryTabs(theArchiveManager->getArchive(index));
 		closeTab(index);
 	}
 

@@ -413,10 +413,10 @@ void MainWindow::openTextureEditor(Archive* archive) {
 }
 
 /* MainWindow::openEntry
- * (Unimplemented) open [entry] in the editor, opening the correct
- * archive tab and entry panel
+ * Opens [entry] in it's own tab
  *******************************************************************/
 void MainWindow::openEntry(ArchiveEntry* entry) {
+	panel_archivemanager->openEntryTab(entry);
 }
 
 /* MainWindow::addCustomMenu
