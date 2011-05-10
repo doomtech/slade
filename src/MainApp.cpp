@@ -58,7 +58,7 @@
  *******************************************************************/
 namespace Global {
 	string error = "";
-	string version = "3.0.1"
+	string version = "3.0.2 beta 1"
 #ifdef UPDATEREVISION
 	" r" SVN_REVISION_STRING
 #endif
@@ -68,6 +68,7 @@ namespace Global {
 string	dir_data = "";
 string	dir_user = "";
 string	dir_app = "";
+bool	exiting = false;
 CVAR(Bool, temp_use_appdir, false, CVAR_SAVE)
 CVAR(String, dir_last, "", CVAR_SAVE)
 
@@ -219,7 +220,8 @@ void SLADELog::DoLogString(const wxString& msg, time_t time) {
 #else
 void SLADELog::DoLogText(const wxString& msg) {
 #endif
-	theConsole->logMessage(msg);
+	if (!exiting)
+		theConsole->logMessage(msg);
 }
 
 
@@ -525,6 +527,8 @@ bool MainApp::OnInit() {
  * Application shutdown, run when program is closed
  *******************************************************************/
 int MainApp::OnExit() {
+	exiting = true;
+
 	// Save configuration
 	saveConfigFile();
 
