@@ -23,6 +23,8 @@ private:
 	wxAuiNotebook*		tabs;
 	wxButton*			btn_save;
 
+	bool	pb_update;
+
 public:
 	TextureXEditor(wxWindow* parent);
 	~TextureXEditor();

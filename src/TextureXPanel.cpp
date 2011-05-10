@@ -34,6 +34,8 @@
 #include "Misc.h"
 #include "TextureXEditor.h"
 #include "ZTextureEditorPanel.h"
+#include "Clipboard.h"
+#include "ArchiveManager.h"
 #include <wx/filename.h>
 
 
@@ -204,6 +206,16 @@ TextureXPanel::TextureXPanel(wxWindow* parent, TextureXEditor* tx_editor) : wxPa
 	btn_new_from_file = new wxButton(this, -1, "New From File");
 	framesizer->Add(btn_new_from_file, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
+	// Copy button
+	hbox = new wxBoxSizer(wxHORIZONTAL);
+	framesizer->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+	btn_copy = new wxButton(this, -1, "Copy");
+	hbox->Add(btn_copy, 1, wxEXPAND|wxRIGHT, 4);
+
+	// Paste button
+	btn_paste = new wxButton(this, -1, "Paste");
+	hbox->Add(btn_paste, 1, wxEXPAND);
+
 	// Bind events
 	list_textures->Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &TextureXPanel::onTextureListSelect, this);
 	btn_new_texture->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureXPanel::onBtnNewTexture, this);
@@ -212,6 +224,8 @@ TextureXPanel::TextureXPanel(wxWindow* parent, TextureXEditor* tx_editor) : wxPa
 	btn_remove_texture->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureXPanel::onBtnRemoveTexture, this);
 	btn_move_up->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureXPanel::onBtnMoveUp, this);
 	btn_move_down->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureXPanel::onBtnMoveDown, this);
+	btn_copy->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureXPanel::onBtnCopy, this);
+	btn_paste->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureXPanel::onBtnPaste, this);
 }
 
 /* TextureXPanel::~TextureXPanel
@@ -359,6 +373,90 @@ CTexture* TextureXPanel::newTextureFromPatch(string name, string patch) {
 
 	// Return the new texture
 	return tex;
+}
+
+bool TextureXPanel::copy() {
+	// Get selected textures
+	vector<long> selection = list_textures->getSelection();
+
+	// Do nothing if nothing selected
+	if (selection.size() == 0)
+		return false;
+
+	// Create list of textures to copy
+	vector<ClipboardItem*> copy_items;
+	for (unsigned a = 0; a < selection.size(); a++)
+		copy_items.push_back(new TextureClipboardItem(texturex.getTexture(selection[a]), tx_editor->getArchive()));
+
+	// Add list to clipboard
+	theClipboard->addItems(copy_items);
+
+	return true;
+}
+
+bool TextureXPanel::paste() {
+	// Check there is anything on the clipboard
+	if (theClipboard->nItems() == 0)
+		return true;
+
+	// Get last selected index
+	int selected = list_textures->getLastSelected();
+	if (selected == -1) selected = texturex.nTextures() - 1; // Add to end of the list if nothing selected
+
+	// Go through clipboard items
+	for (unsigned a = 0; a < theClipboard->nItems(); a++) {
+		// Skip if not a texture clipboard item
+		if (theClipboard->getItem(a)->getType() != CLIPBOARD_COMPOSITE_TEXTURE)
+			continue;
+
+		// Get texture item
+		TextureClipboardItem* item = (TextureClipboardItem*)(theClipboard->getItem(a));
+
+		// Add new texture after last selected item
+		CTexture* ntex = new CTexture(texturex.getFormat() == TXF_TEXTURES);
+		ntex->copyTexture(item->getTexture(), true);
+		ntex->setState(2);
+		texturex.addTexture(ntex, ++selected);
+
+		// Deal with patches
+		for (unsigned p = 0; p < ntex->nPatches(); p++) {
+			CTPatch* patch = ntex->getPatch(p);
+
+			// Update patch table if necessary
+			if (texturex.getFormat() != TXF_TEXTURES)
+				tx_editor->patchTable().addPatch(patch->getName());
+
+			// Get the entry for this patch
+			ArchiveEntry* entry = patch->getPatchEntry(tx_editor->getArchive());
+
+			// If the entry wasn't found in any open archive, try copying it from the clipboard
+			// (the user may have closed the archive the original patch was in)
+			if (!entry) {
+				entry = item->getPatchEntry(patch->getName());
+
+				// Copy the copied patch entry over to this archive
+				if (entry)
+					tx_editor->getArchive()->addEntry(entry, "patches", true);
+			}
+
+			// If the entry exists in the base resource archive or this archive, do nothing
+			else if (entry->getParent() == theArchiveManager->baseResourceArchive() ||
+					entry->getParent() == tx_editor->getArchive())
+				continue;
+
+			// Otherwise, copy the entry over to this archive
+			else
+				tx_editor->getArchive()->addEntry(entry, "patches", true);
+		}
+	}
+
+	// Refresh
+	list_textures->updateList();
+
+	// Update variables
+	modified = true;
+
+	return true;
 }
 
 
@@ -643,4 +741,18 @@ void TextureXPanel::onBtnMoveDown(wxCommandEvent& e) {
 
 	// Update variables
 	modified = true;
+}
+
+/* TextureXPanel::onBtnCopy
+ * Called when the 'Copy' button is clicked
+ *******************************************************************/
+void TextureXPanel::onBtnCopy(wxCommandEvent& e) {
+	copy();
+}
+
+/* TextureXPanel::onBtnPaste
+ * Called when the 'Paste' button is clicked
+ *******************************************************************/
+void TextureXPanel::onBtnPaste(wxCommandEvent& e) {
+	paste();
 }

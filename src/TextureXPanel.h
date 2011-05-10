@@ -39,6 +39,8 @@ private:
 	wxButton*			btn_new_from_file;
 	wxButton*			btn_move_up;
 	wxButton*			btn_move_down;
+	wxButton*			btn_copy;
+	wxButton*			btn_paste;
 	wxStaticText*		label_tx_format;
 
 public:
@@ -55,6 +57,8 @@ public:
 	void	applyChanges();
 
 	CTexture*	newTextureFromPatch(string name, string patch);
+	bool		copy();
+	bool		paste();
 
 	// Events
 	void	onTextureListSelect(wxListEvent& e);
@@ -64,6 +68,8 @@ public:
 	void	onBtnRemoveTexture(wxCommandEvent& e);
 	void	onBtnMoveUp(wxCommandEvent& e);
 	void	onBtnMoveDown(wxCommandEvent& e);
+	void	onBtnCopy(wxCommandEvent& e);
+	void	onBtnPaste(wxCommandEvent& e);
 };
 
 #endif//__TEXTUREX_PANEL_H__

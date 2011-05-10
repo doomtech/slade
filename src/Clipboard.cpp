@@ -29,7 +29,7 @@
  *******************************************************************/
 #include "Main.h"
 #include "Clipboard.h"
-#include "ZipArchive.h"
+#include "CTexture.h"
 
 
 /*******************************************************************
@@ -85,6 +85,65 @@ EntryTreeClipboardItem::~EntryTreeClipboardItem() {
 
 
 /*******************************************************************
+ * TEXTURECLIPBOARDITEM CLASS FUNCTIONS
+ *******************************************************************/
+
+/* TextureClipboardItem::TextureClipboardItem
+ * TextureClipboardItem class constructor
+ *******************************************************************/
+TextureClipboardItem::TextureClipboardItem(CTexture* texture, Archive* parent) : ClipboardItem(CLIPBOARD_COMPOSITE_TEXTURE) {
+	// Create/copy texture
+	this->texture = new CTexture();
+	this->texture->copyTexture(texture);
+
+	// Copy patch entries if possible
+	for (unsigned a = 0; a < texture->nPatches(); a++) {
+		ArchiveEntry* entry = texture->getPatch(a)->getPatchEntry(parent);
+
+		// Don't copy patch if it has been already
+		bool there = false;
+		for (unsigned b = 0; b < patch_entries.size(); b++) {
+			if (patch_entries[b]->getName() == entry->getName()) {
+				there = true;
+				break;
+			}
+		}
+		if (there) continue;
+
+		// Copy patch entry
+		if (entry)
+			patch_entries.push_back(new ArchiveEntry(*entry));
+	}
+}
+
+/* TextureClipboardItem::~TextureClipboardItem
+ * TextureClipboardItem class destructor
+ *******************************************************************/
+TextureClipboardItem::~TextureClipboardItem() {
+	// Clean up
+	delete texture;
+	for (unsigned a = 0; a < patch_entries.size(); a++) {
+		if (patch_entries[a])
+			delete patch_entries[a];
+	}
+}
+
+/* TextureClipboardItem::getPatchEntry
+ * Returns the entry copy for the patch at [index] in the texture
+ *******************************************************************/
+ArchiveEntry* TextureClipboardItem::getPatchEntry(string patch) {
+	// Find copied patch entry with matching name
+	for (unsigned a = 0; a < patch_entries.size(); a++) {
+		if (S_CMPNOCASE(patch_entries[a]->getName(true).Truncate(8), patch))
+			return patch_entries[a];
+	}
+
+	// Not found
+	return NULL;
+}
+
+
+/*******************************************************************
  * CLIPBOARD CLASS FUNCTIONS
  *******************************************************************/
 
@@ -126,9 +185,27 @@ void Clipboard::clear() {
  * Adds an item to the clipboard. Returns false if item is invalid
  *******************************************************************/
 bool Clipboard::addItem(ClipboardItem* item) {
+	// Clear current clipboard contents
+	clear();
+
 	if (!item)
 		return false;
 
 	items.push_back(item);
+	return true;
+}
+
+/* Clipboard::addItems
+ * Adds multiple items to the clipboard
+ *******************************************************************/
+bool Clipboard::addItems(vector<ClipboardItem*>& items) {
+	// Clear current clipboard contents
+	clear();
+
+	for (unsigned a = 0; a < items.size(); a++) {
+		if (items[a])
+			this->items.push_back(items[a]);
+	}
+
 	return true;
 }

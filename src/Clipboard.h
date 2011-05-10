@@ -6,8 +6,6 @@
 
 enum ClipboardType {
 	CLIPBOARD_ENTRY_TREE,
-	//CLIPBOARD_ENTRY,
-	//CLIPBOARD_ZIPDIR,
 	CLIPBOARD_COMPOSITE_TEXTURE,
 	CLIPBOARD_PATCH,
 
@@ -36,31 +34,19 @@ public:
 	ArchiveTreeNode*	getTree() { return tree; }
 };
 
-/*
-class EntryClipboardItem : public ClipboardItem {
+class CTexture;
+class TextureClipboardItem : public ClipboardItem {
 private:
-	ArchiveEntry*	entry;
+	CTexture*				texture;
+	vector<ArchiveEntry*>	patch_entries;
 
 public:
-	EntryClipboardItem(ArchiveEntry* entry);
-	~EntryClipboardItem();
+	TextureClipboardItem(CTexture* texture, Archive* parent);
+	~TextureClipboardItem();
 
-	ArchiveEntry*	getEntry() { return entry; }
+	CTexture*		getTexture() { return texture; }
+	ArchiveEntry*	getPatchEntry(string patch);
 };
-
-class ZipDirClipboardItem : public ClipboardItem {
-private:
-	vector<ArchiveEntry*>	entries;
-
-public:
-	ZipDirClipboardItem();
-	~ZipDirClipboardItem();
-
-	uint32_t		nEntries() { return entries.size(); }
-	bool			addEntry(ArchiveEntry* entry);
-	ArchiveEntry*	getEntry(uint32_t index);
-};
-*/
 
 class Clipboard {
 private:
@@ -82,6 +68,7 @@ public:
 	uint32_t		nItems() { return items.size(); }
 	ClipboardItem*	getItem(uint32_t index);
 	bool			addItem(ClipboardItem* item);
+	bool			addItems(vector<ClipboardItem*>& items);
 
 	void	clear();
 };

@@ -488,8 +488,8 @@ ArchiveEntry* WadArchive::addEntry(ArchiveEntry* entry, unsigned position, Archi
 	Archive::addEntry(entry, position);
 
 	// Update namespaces if necessary
-	if (name.Upper().Matches("*_START") ||
-		name.Upper().Matches("*_END"))
+	if (name.EndsWith("_START") ||
+		name.EndsWith("_END"))
 		updateNamespaces();
 
 	return entry;
@@ -505,7 +505,7 @@ ArchiveEntry* WadArchive::addEntry(ArchiveEntry* entry, string add_namespace, bo
 	for (unsigned a = 0; a < namespaces.size(); a++) {
 		if (S_CMPNOCASE(namespaces[a].name, add_namespace)) {
 			// Namespace found, add entry before end marker
-			return addEntry(entry, entryIndex(namespaces[a].end), NULL, copy);
+			return addEntry(entry, namespaces[a].end_index++, NULL, copy);
 		}
 	}
 

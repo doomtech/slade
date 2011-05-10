@@ -382,14 +382,14 @@ string CTPatchEx::asText() {
 /* CTexture::CTexture
  * CTexture class constructor
  *******************************************************************/
-CTexture::CTexture() {
+CTexture::CTexture(bool extended) {
 	this->width = 0;
 	this->height = 0;
 	this->name = "";
 	this->scale_x = 1.0;
 	this->scale_y = 1.0;
 	this->world_panning = false;
-	this->extended = false;
+	this->extended = extended;
 	this->optional = false;
 	this->no_decals = false;
 	this->null_texture = false;
@@ -408,9 +408,11 @@ CTexture::~CTexture() {
 }
 
 /* CTexture::copyTexture
- * Copies the texture [tex] to this texture
+ * Copies the texture [tex] to this texture. If keep_type is true,
+ * the current texture type (extended/regular) will be kept,
+ * otherwise it will be converted to the type of [tex]
  *******************************************************************/
-void CTexture::copyTexture(CTexture* tex) {
+void CTexture::copyTexture(CTexture* tex, bool keep_type) {
 	// Clear current texture
 	clear();
 
@@ -421,7 +423,7 @@ void CTexture::copyTexture(CTexture* tex) {
 	this->scale_x = tex->scale_x;
 	this->scale_y = tex->scale_y;
 	this->world_panning = tex->world_panning;
-	this->extended = tex->extended;
+	if (!keep_type) this->extended = tex->extended;
 	this->optional = tex->optional;
 	this->no_decals = tex->no_decals;
 	this->null_texture = tex->null_texture;
@@ -431,13 +433,13 @@ void CTexture::copyTexture(CTexture* tex) {
 
 	// Copy patches
 	for (unsigned a = 0; a < tex->nPatches(); a++) {
-		if (tex->extended) {
+		if ((keep_type && extended) || (!keep_type && tex->extended)) {
 			CTPatchEx* patch = new CTPatchEx((CTPatchEx*)tex->getPatch(a));
 			patches.push_back(patch);
 		}
 		else {
 			CTPatch* patch = tex->getPatch(a);
-			addPatch(patch->getName(), patch->xOffset(), patch->yOffset());//, patch->getEntry());
+			addPatch(patch->getName(), patch->xOffset(), patch->yOffset());
 		}
 	}
 }
@@ -750,6 +752,37 @@ bool CTexture::convertExtended() {
 
 	// Set extended flag
 	extended = true;
+
+	return true;
+}
+
+/* CTexture::convertRegular
+ * Converts the texture to 'regular' (TEXTURE1/2) format
+ *******************************************************************/
+bool CTexture::convertRegular() {
+	// Don't convert if already regular
+	if (!extended)
+		return true;
+
+	// Convert scale
+	if (scale_x == 1)
+		scale_x = 0;
+	else
+		scale_x *= 8;
+	if (scale_y == 1)
+		scale_y = 0;
+	else
+		scale_y *= 8;
+
+	// Convert all patches over to normal format
+	for (unsigned a = 0; a < patches.size(); a++) {
+		CTPatch* npatch = new CTPatch(patches[a]->getName(), patches[a]->xOffset(), patches[a]->yOffset());
+		delete patches[a];
+		patches[a] = npatch;
+	}
+
+	// Unset extended flag
+	extended = false;
 
 	return true;
 }

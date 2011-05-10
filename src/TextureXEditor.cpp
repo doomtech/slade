@@ -150,6 +150,7 @@ TextureXEditor::TextureXEditor(wxWindow* parent) : wxPanel(parent, -1) {
 	// Init variables
 	this->archive = NULL;
 	this->pnames = NULL;
+	this->pb_update = true;
 	SetName("texturex");
 
 	// Create patch browser
@@ -414,6 +415,12 @@ int TextureXEditor::browsePatchTable() {
 }
 
 string TextureXEditor::browsePatchEntry() {
+	// Update patch browser if necessary
+	if (pb_update) {
+		patch_browser->openArchive(archive);
+		pb_update = false;
+	}
+
 	if (patch_browser->ShowModal() == wxID_OK)
 		return patch_browser->getSelectedItem()->getName();
 	else
@@ -489,8 +496,8 @@ void TextureXEditor::onAnnouncement(Announcer* announcer, string event_name, Mem
 		patch_browser->openPatchTable(&patch_table);
 	}
 
-	if (announcer == theResourceManager)
-		patch_browser->openArchive(archive);
+	if (announcer == theResourceManager && event_name == "resources_updated")
+		pb_update = true;
 }
 
 

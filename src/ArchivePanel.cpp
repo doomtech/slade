@@ -883,10 +883,8 @@ bool ArchivePanel::copyEntry() {
 	// Get a list of selected directories
 	vector<ArchiveTreeNode*> dirs = entry_list->getSelectedDirectories();
 
-	// If something is selected, clear the clipboard
-	if (entries.size() > 0 || dirs.size() > 0)
-		theClipboard->clear();
-	else
+	// Do nothing if nothing selected
+	if (entries.size() == 0 && dirs.size() == 0)
 		return false;
 
 	// Create clipboard item from selection

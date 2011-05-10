@@ -112,10 +112,10 @@ private:
 	uint8_t	state;
 
 public:
-	CTexture();
+	CTexture(bool extended = false);
 	~CTexture();
 
-	void	copyTexture(CTexture* copy);
+	void	copyTexture(CTexture* copy, bool keep_type = false);
 
 	string		getName() { return name; }
 	uint16_t	getWidth() { return width; }
@@ -163,6 +163,7 @@ public:
 	string	asText();
 
 	bool	convertExtended();
+	bool	convertRegular();
 	bool	toImage(SImage& image, Archive* parent = NULL, Palette8bit* pal = NULL, bool force_rgba = false);
 };
 

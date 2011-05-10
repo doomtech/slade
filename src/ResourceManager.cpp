@@ -291,7 +291,7 @@ ArchiveEntry* ResourceManager::getPatchEntry(string patch, string nspace, Archiv
 		if (nspace.IsEmpty() || res.entries[a]->isInNamespace(nspace)) {
 			// If it's in the 'priority' archive, return it
 			if (priority && res.entries[a]->getParent() == priority)
-				return entry;
+				return res.entries[a];
 
 			// Otherwise, if it's in a 'later' archive than the current resource entry, set it
 			if (theArchiveManager->archiveIndex(entry->getParent()) <=
@@ -312,10 +312,8 @@ void ResourceManager::onAnnouncement(Announcer* announcer, string event_name, Me
 
 	// An entry is modified
 	if (event_name == "entry_state_changed") {
-		uint32_t index;
 		wxUIntPtr ptr;
-		event_data.read(&index, sizeof(uint32_t));
-		event_data.read(&ptr, sizeof(wxUIntPtr));
+		event_data.read(&ptr, sizeof(wxUIntPtr), 4);
 		ArchiveEntry* entry = (ArchiveEntry*)wxUIntToPtr(ptr);
 		removeEntry(entry);
 		addEntry(entry);
@@ -324,12 +322,19 @@ void ResourceManager::onAnnouncement(Announcer* announcer, string event_name, Me
 
 	// An entry is removed or renamed
 	if (event_name == "entry_removing" || event_name == "entry_renaming") {
-		int index;
 		wxUIntPtr ptr;
-		event_data.read(&index, sizeof(int));
-		event_data.read(&ptr, sizeof(wxUIntPtr));
+		event_data.read(&ptr, sizeof(wxUIntPtr), sizeof(int));
 		ArchiveEntry* entry = (ArchiveEntry*)wxUIntToPtr(ptr);
 		removeEntry(entry);
+		announce("resources_updated");
+	}
+
+	// An entry is added
+	if (event_name == "entry_added") {
+		wxUIntPtr ptr;
+		event_data.read(&ptr, sizeof(wxUIntPtr), 4);
+		ArchiveEntry* entry = (ArchiveEntry*)wxUIntToPtr(ptr);
+		addEntry(entry);
 		announce("resources_updated");
 	}
 }
