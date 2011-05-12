@@ -796,8 +796,8 @@ void ZTextureEditorPanel::onBtnEditTranslation(wxCommandEvent& e) {
 	if (ted.ShowModal() == wxID_OK) {
 		// Copy updated translation to all selected patches
 		for (unsigned a = 0; a < selection.size(); a++) {
-			CTPatchEx* patch = (CTPatchEx*)tex_current->getPatch(selection[a]);
-			patch->getTranslation().copy(ted.getTranslation());
+			CTPatchEx* patchx = (CTPatchEx*)tex_current->getPatch(selection[a]);
+			patchx->getTranslation().copy(ted.getTranslation());
 		}
 
 		// Update UI

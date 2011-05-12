@@ -7,6 +7,7 @@
 
 Major Changes Since Last Version ----------------------------------------
 - Texture editor now supports ZDoom's enhanced TEXTURES format
+- Can now copy+paste textures between different TEXTUREx lists
 - New 'Graphic' menu for gfx entries, with some basic gfx editing functions
 - Typing the first few characters of an item to jump to it in lists has been re-implemented
 
@@ -17,7 +18,6 @@ TODO List ---------------------------------------------------------------
 - Finish TEXTURES editing:
 	- Support for textures-as-patches
 	- Offsets preview
-	- Copy+Paste textures
 - Clean up sources, finish commenting, etc
 - Status bar stuff for other EntryPanels and Texture editor
 - (maybe) Use SIFormat system to implement generic 'export as' for image entries
@@ -125,9 +125,7 @@ Unimplemented Feature Requests ------------------------------------------
 
 --- TEXTUREx Editor ---
 - list textures and patches in alphabetical order (with non-iwad ones at the bottom of the list)
-- ability to copy/paste textures (with patches), including between different TEXTUREx entries
 - find/replace for patches
-- Visual TEXTURES (zdoom format) editor (with the possibility to still edit as text)
 - Ability to convert composite texture to single image
 - Ability to search for a texture containing a specific patch
 

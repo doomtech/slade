@@ -233,8 +233,8 @@ protected:
 			return false;
 
 		image.create(width, height, PALMASK);
-		uint8_t* img_data = new uint8_t[width*height];
-		uint8_t* img_mask = new uint8_t[width*height];
+		uint8_t* img_data = imageData(image);
+		uint8_t* img_mask = imageMask(image);
 		memset(img_mask, 0xFF, width*height);
 
 		for (unsigned i = 0; i < data.getSize(); ++i) {

@@ -1,4 +1,3 @@
-
 /*******************************************************************
  * SLADE - It's a Doom Editor
  * Copyright (C) 2008 Simon Judd
@@ -25,7 +24,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *******************************************************************/
 
-
 /*******************************************************************
  * INCLUDES
  *******************************************************************/
@@ -35,7 +33,6 @@
 #include "Icons.h"
 #include "ListView.h"
 #include <wx/imaglist.h>
-
 
 /*******************************************************************
  * VARIABLES
@@ -49,7 +46,6 @@ CVAR(Bool, elist_hrules, false, CVAR_SAVE)
 CVAR(Bool, elist_vrules, false, CVAR_SAVE)
 CVAR(Bool, elist_filter_dirs, false, CVAR_SAVE)
 wxDEFINE_EVENT(EVT_AEL_DIR_CHANGED, wxCommandEvent);
-
 
 /*******************************************************************
  * ARCHIVEENTRYLIST CLASS FUNCTIONS
@@ -101,6 +97,7 @@ ArchiveEntryList::ArchiveEntryList(wxWindow* parent) : VirtualListView(parent) {
  * ArchiveEntryList class destructor
  *******************************************************************/
 ArchiveEntryList::~ArchiveEntryList() {
+	delete entry_dir_back;
 }
 
 /* ArchiveEntryList::getItemText
@@ -379,7 +376,6 @@ void ArchiveEntryList::applyFilter() {
 	updateList();
 }
 
-
 /* ArchiveEntryList::setDir
  * Opens the given directory (if it exists)
  *******************************************************************/
@@ -607,7 +603,6 @@ void ArchiveEntryList::labelEdited(int col, int index, string new_label) {
  * managed
  *******************************************************************/
 void ArchiveEntryList::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
-
 	if (announcer == archive && event_name != "closed") {
 		// Since refreshing the list is relatively fast, just refresh it on any change
 		updateList();
@@ -660,7 +655,6 @@ bool ArchiveEntryList::handleAction(string id) {
 	// Action handled, return true
 	return true;
 }
-
 
 /*******************************************************************
  * ARCHIVEENTRYLIST EVENTS

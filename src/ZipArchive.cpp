@@ -148,6 +148,7 @@ bool ZipArchive::open(string filename) {
 		}
 
 		// Go to next entry in the zip file
+		delete entry;
 		entry = zip.GetNextEntry();
 		entry_index++;
 	}
@@ -337,8 +338,10 @@ bool ZipArchive::loadEntryData(ArchiveEntry* entry) {
 
 	// Skip to correct entry in zip
 	wxZipEntry* zentry = zip.GetNextEntry();
-	for (long a = 0; a < zip_index; a++)
+	for (long a = 0; a < zip_index; a++) {
+		delete zentry;
 		zentry = zip.GetNextEntry();
+	}
 
 	// Abort if entry doesn't exist in zip (some kind of error)
 	if (!zentry) {
@@ -357,6 +360,7 @@ bool ZipArchive::loadEntryData(ArchiveEntry* entry) {
 
 	// Clean up
 	delete[] data;
+	delete zentry;
 
 	return true;
 }

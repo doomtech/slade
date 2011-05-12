@@ -149,6 +149,7 @@ void GfxCanvas::drawOffsetLines() {
 		double b = 100 * scale;
 		double sb = 68 * scale;
 
+		glLineWidth(1.5f);
 		glBegin(GL_LINES);
 		// Left
 		glVertex2d(l, t);
@@ -162,12 +163,19 @@ void GfxCanvas::drawOffsetLines() {
 		// Top
 		glVertex2d(r, t);
 		glVertex2d(l, t);
+		glEnd();
+
+		glColor4f(0.0f, 0.0f, 0.0f, 0.6f);
+		glLineWidth(1.0f);
+		glBegin(GL_LINES);
 		// Statusbar
 		glVertex2d(l, sb);
 		glVertex2d(r, sb);
 		// Middle
 		glVertex2d(0, t);
 		glVertex2d(0, b);
+		glVertex2d(l, 0);
+		glVertex2d(r, 0);
 		glEnd();
 	}
 }

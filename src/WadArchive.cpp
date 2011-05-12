@@ -166,9 +166,9 @@ void WadArchive::updateNamespaces() {
 				ns_name = "s";
 
 			// Check if it's the end of an existing namespace
-			for (unsigned a = 0; a < namespaces.size(); a++) {
-				if (S_CMP(ns_name, namespaces[a].name)) {
-					namespaces[a].end = entry;
+			for (unsigned b = 0; b < namespaces.size(); b++) {
+				if (S_CMP(ns_name, namespaces[b].name)) {
+					namespaces[b].end = entry;
 				}
 			}
 		}

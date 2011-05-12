@@ -534,7 +534,6 @@ bool TarArchive::isTarArchive(MemChunk& mc) {
 bool TarArchive::isTarArchive(string filename) {
 	// Open file for reading
 	wxFile file(filename);
-	uint32_t size = file.Length();
 
 	// Check it opened ok
 	if (!file.IsOpened() || file.Length() < 512)
