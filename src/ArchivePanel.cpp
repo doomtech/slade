@@ -218,7 +218,6 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 	choice_category->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &ArchivePanel::onChoiceCategoryChanged, this);
 	Bind(EVT_AEL_DIR_CHANGED, &ArchivePanel::onDirChanged, this);
 	btn_updir->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &ArchivePanel::onBtnUpDir, this);
-	Bind(wxEVT_SHOW, &ArchivePanel::onShow, this);
 	((DefaultEntryPanel*)default_area)->getEditTextButton()->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &ArchivePanel::onDEPEditAsText, this);
 	((DefaultEntryPanel*)default_area)->getViewHexButton()->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &ArchivePanel::onDEPViewAsHex, this);
 
@@ -263,6 +262,9 @@ bool ArchivePanel::saveEntryChanges() {
 	return cur_area->saveEntry();
 }
 
+/* ArchivePanel::addMenus
+ * Adds the 'Archive' and 'Entry' menus to the main window menubar
+ *******************************************************************/
 void ArchivePanel::addMenus() {
 	// Create menus if needed
 	if (!menu_archive) {
@@ -305,6 +307,10 @@ void ArchivePanel::addMenus() {
 	cur_area->addCustomMenu();
 }
 
+/* ArchivePanel::removeMenus
+ * Removes the 'Archive' and 'Entry' menus from the main window
+ * menubar
+ *******************************************************************/
 void ArchivePanel::removeMenus() {
 	// Remove ArchivePanel menus from the main window menubar
 	theMainWindow->removeCustomMenu(menu_archive);
@@ -1487,7 +1493,6 @@ void ArchivePanel::focusOnEntry(ArchiveEntry* entry) {
 	}
 }
 
-
 /* ArchivePanel::showEntryPanel
  * Show an entry panel appropriate to the current entry
  *******************************************************************/
@@ -1654,7 +1659,7 @@ bool ArchivePanel::handleAction(string id) {
 
 
 
-	// Temporary ones
+	// Context menu actions
 	else if (id == "arch_bas_convert")
 		basConvert();
 	else if (id == "arch_gfx_convert")
@@ -1726,6 +1731,9 @@ void ArchivePanel::onAnnouncement(Announcer* announcer, string event_name, MemCh
  * ARCHIVEPANEL STATIC FUNCTIONS
  *******************************************************************/
 
+/* ArchivePanel::createPanelForEntry
+ * Creates the appropriate EntryPanel for [entry] and returns it
+ *******************************************************************/
 EntryPanel* ArchivePanel::createPanelForEntry(ArchiveEntry* entry, wxWindow* parent) {
 	EntryPanel* entry_panel = NULL;
 
@@ -2145,24 +2153,6 @@ void ArchivePanel::onDirChanged(wxCommandEvent& e) {
 void ArchivePanel::onBtnUpDir(wxCommandEvent& e) {
 	// Go up a directory in the entry list
 	entry_list->goUpDir();
-}
-
-/* ArchivePanel::onShow
- * Called when the panel is shown or hidden
- *******************************************************************/
-void ArchivePanel::onShow(wxShowEvent& e) {
-	/*
-	if (e.IsShown()) {
-		theMainWindow->addCustomMenu(menu_archive, "&Archive");
-		theMainWindow->addCustomMenu(menu_entry, "&Entry");
-		cur_area->addCustomMenu();
-	}
-	else {
-		theMainWindow->removeCustomMenu("&Archive");
-		theMainWindow->removeCustomMenu("&Entry");
-		cur_area->removeCustomMenu();
-	}
-	*/
 }
 
 

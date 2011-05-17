@@ -196,6 +196,10 @@ void EntryPanel::refreshPanel() {
 void EntryPanel::closeEntry() {
 }
 
+/* EntryPanel::updateStatus
+ * Updates the main window status bar with info about the current
+ * entry
+ *******************************************************************/
 void EntryPanel::updateStatus() {
 	// Basic info
 	if (entry)
@@ -207,11 +211,18 @@ void EntryPanel::updateStatus() {
 	theMainWindow->SetStatusText(statusString(), 2);
 }
 
+/* EntryPanel::addCustomMenu
+ * Adds this EntryPanel's custom menu to the main window menubar
+ * (if it exists)
+ *******************************************************************/
 void EntryPanel::addCustomMenu() {
 	if (menu_custom)
 		theMainWindow->addCustomMenu(menu_custom, custom_menu_name);
 }
 
+/* EntryPanel::removeCustomMenu
+ * Removes this EntryPanel's custom menu from the main window menubar
+ *******************************************************************/
 void EntryPanel::removeCustomMenu() {
 	theMainWindow->removeCustomMenu(menu_custom);
 }

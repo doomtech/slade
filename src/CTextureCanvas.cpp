@@ -542,6 +542,9 @@ void CTextureCanvas::drawTextureBorder() {
 	}
 }
 
+/* CTextureCanvas::drawOffsetLines
+ * Draws the offset center lines
+ *******************************************************************/
 void CTextureCanvas::drawOffsetLines() {
 	if (view_type == 1) {
 		COL_BLACK.set_gl();

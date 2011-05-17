@@ -199,6 +199,9 @@ bool DefaultEntryPanel::saveEntry() {
 }
 
 
+/*******************************************************************
+ * DEFAULTENTRYPANEL CLASS EVENTS
+ *******************************************************************/
 
 /* DefaultEntryPanel::onBtnGfxConvert
  * Called when the 'Convert Gfx To' button is clicked

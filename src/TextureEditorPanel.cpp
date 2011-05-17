@@ -61,6 +61,10 @@ TextureEditorPanel::TextureEditorPanel(wxWindow* parent, TextureXEditor* tx_edit
 TextureEditorPanel::~TextureEditorPanel() {
 }
 
+/* TextureEditorPanel::setupLayout
+ * Initialises the panel layout (must be called after the constructor
+ * to work correctly for ZTextureEditorPanel)
+ *******************************************************************/
 void TextureEditorPanel::setupLayout() {
 	// Setup sizer
 	wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);

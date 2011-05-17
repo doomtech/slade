@@ -457,29 +457,3 @@ void HexEditorPanel::onBtnGoToOffset(wxCommandEvent& e) {
 		grid_hex->SetFocus();
 	}
 }
-
-
-/*******************************************************************
- * CONSOLE COMMANDS
- *******************************************************************/
-
-/*
-CONSOLE_COMMAND(test_hex, 0) {
-	wxDialog dlg(NULL, -1, "HEX!", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
-
-	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
-	dlg.SetSizer(hbox);
-
-	HexEditorPanel* hex = new HexEditorPanel(&dlg);
-	hbox->Add(hex, 1, wxEXPAND|wxALL, 4);
-
-	if (args.size() > 0) {
-		ArchiveEntry* entry = theArchiveManager->getArchive(0)->entryAtPath(args[0]);
-		if (entry)
-			hex->loadData(entry->getMCData());
-	}
-
-	dlg.Layout();
-	dlg.ShowModal();
-}
-*/

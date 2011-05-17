@@ -493,6 +493,9 @@ void ArchiveManagerPanel::openTab(int archive_index) {
 	}
 }
 
+/* ArchiveManagerPanel::getArchiveTab
+ * Returns the ArchivePanel for [archive], or NULL if none is open
+ *******************************************************************/
 ArchivePanel* ArchiveManagerPanel::getArchiveTab(Archive* archive) {
 	// Check archive was given
 	if (!archive)
@@ -625,6 +628,10 @@ void ArchiveManagerPanel::openTextureTab(int archive_index) {
 	}
 }
 
+/* ArchiveManagerPanel::getTextureTab
+ * Returns the TextureXEditor for the archive at [archive_index],
+ * or NULL if none is open for that archive
+ *******************************************************************/
 TextureXEditor* ArchiveManagerPanel::getTextureTab(int archive_index) {
 	Archive* archive = theArchiveManager->getArchive(archive_index);
 
@@ -655,6 +662,9 @@ void ArchiveManagerPanel::closeTextureTab(int archive_index) {
 	if (txed) notebook_archives->DeletePage(notebook_archives->GetPageIndex(txed));
 }
 
+/* ArchiveManagerPanel::openEntryTab
+ * Opens the appropriate EntryPanel for [entry] in a new tab
+ *******************************************************************/
 void ArchiveManagerPanel::openEntryTab(ArchiveEntry* entry) {
 	// First check if the entry is already open in a tab
 	for (unsigned a = 0; a < notebook_archives->GetPageCount(); a++) {
@@ -690,6 +700,9 @@ void ArchiveManagerPanel::openEntryTab(ArchiveEntry* entry) {
 	}
 }
 
+/* ArchiveManagerPanel::closeEntryTab
+ * Closes the EntryPanel tab for [entry]
+ *******************************************************************/
 void ArchiveManagerPanel::closeEntryTabs(Archive* parent) {
 	// Check archive was given
 	if (!parent)

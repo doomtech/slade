@@ -321,7 +321,7 @@ bool MemChunk::write(const void* data, uint32_t size) {
  }
 
 /* MemChunk::read
- * Reads data from the current position into <buf>. Returns false if
+ * Reads data from the current position into [buf]. Returns false if
  * attempting to read data outside of the chunk, true otherwise
  *******************************************************************/
 bool MemChunk::read(void* buf, uint32_t size) {
@@ -342,7 +342,7 @@ bool MemChunk::read(void* buf, uint32_t size) {
 }
 
 /* MemChunk::read
- * Reads [size] bytes of data from [start] into <buf>. Returns false
+ * Reads [size] bytes of data from [start] into [buf]. Returns false
  * if attempting to read data outside of the chunk, true otherwise
  *******************************************************************/
 bool MemChunk::read(void* buf, uint32_t size, uint32_t start) {
@@ -383,6 +383,10 @@ bool MemChunk::seek(uint32_t offset, uint32_t start) {
 	return true;
 }
 
+/* MemChunk::readMC
+ * Reads [size] bytes of data into [mc]. Returns false if attempting
+ * to read outside the chunk, true otherwise
+ *******************************************************************/
 bool MemChunk::readMC(MemChunk& mc, uint32_t size) {
 	if (cur_ptr + size >= this->size)
 		return false;

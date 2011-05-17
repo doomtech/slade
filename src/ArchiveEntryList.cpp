@@ -34,6 +34,7 @@
 #include "ListView.h"
 #include <wx/imaglist.h>
 
+
 /*******************************************************************
  * VARIABLES
  *******************************************************************/
@@ -46,6 +47,7 @@ CVAR(Bool, elist_hrules, false, CVAR_SAVE)
 CVAR(Bool, elist_vrules, false, CVAR_SAVE)
 CVAR(Bool, elist_filter_dirs, false, CVAR_SAVE)
 wxDEFINE_EVENT(EVT_AEL_DIR_CHANGED, wxCommandEvent);
+
 
 /*******************************************************************
  * ARCHIVEENTRYLIST CLASS FUNCTIONS

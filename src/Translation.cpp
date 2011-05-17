@@ -1,16 +1,66 @@
 
+/*******************************************************************
+ * SLADE - It's a Doom Editor
+ * Copyright (C) 2008 Simon Judd
+ *
+ * Email:       veilofsorrow@gmail.com
+ * Web:         http://slade.mancubus.net
+ * Filename:    Translation.cpp
+ * Description: Translation class. Encapsulates a palette translation.
+ *              A translation contains one or more translation ranges,
+ *              where each range has an origin palette range and some kind
+ *              of target range. The target range can be another palette
+ *              range, a colour gradient or a desaturated colour gradient.
+ *              eg:
+ *              Palette range: 0...16 -> 32...48		(in zdoom format: "0:16=32:48")
+ *              Colour gradient: 0...16 -> Red...Black	(in zdoom format: "0:16=[255,0,0]:[0,0,0]")
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *******************************************************************/
+
+
+/*******************************************************************
+ * INCLUDES
+ *******************************************************************/
 #include "Main.h"
 #include "Translation.h"
 #include "Tokenizer.h"
 
+
+/*******************************************************************
+ * TRANSLATION CLASS FUNCTIONS
+ *******************************************************************/
+
+/* Translation::Translation
+ * Translation class constructor
+ *******************************************************************/
 Translation::Translation() {
 }
 
+/* Translation::~Translation
+ * Translation class destructor
+ *******************************************************************/
 Translation::~Translation() {
 	for (unsigned a = 0; a < translations.size(); a++)
 		delete translations[a];
 }
 
+/* Translation::parse
+ * Parses a text definition [def] (in zdoom format, detailed here:
+ * http://zdoom.org/wiki/Translation)
+ *******************************************************************/
 void Translation::parse(string def) {
 	// Open definition string for processing w/tokenizer
 	Tokenizer tz;
@@ -157,6 +207,10 @@ void Translation::parse(string def) {
 	}
 }
 
+/* Translation::asText
+ * Returns a string representation of the translation
+ * (in zdoom format)
+ *******************************************************************/
 string Translation::asText() {
 	string ret;
 
@@ -171,12 +225,18 @@ string Translation::asText() {
 	return ret;
 }
 
+/* Translation::clear
+ * Clears the translation
+ *******************************************************************/
 void Translation::clear() {
 	for (unsigned a = 0; a < translations.size(); a++)
 		delete translations[a];
 	translations.clear();
 }
 
+/* Translation::copy
+ * Copies translation information from [copy]
+ *******************************************************************/
 void Translation::copy(Translation& copy) {
 	// Clear current definitions
 	clear();
@@ -192,6 +252,9 @@ void Translation::copy(Translation& copy) {
 	}
 }
 
+/* Translation::getRange
+ * Returns the translation range at [index]
+ *******************************************************************/
 TransRange* Translation::getRange(unsigned index) {
 	if (index >= translations.size())
 		return NULL;
@@ -199,6 +262,9 @@ TransRange* Translation::getRange(unsigned index) {
 		return translations[index];
 }
 
+/* Translation::addRange
+ * Adds a new translation range of [type] at [pos] in the list
+ *******************************************************************/
 void Translation::addRange(int type, int pos) {
 	TransRange* tr = NULL;
 
@@ -222,6 +288,9 @@ void Translation::addRange(int type, int pos) {
 		translations.insert(translations.begin() + pos, tr);
 }
 
+/* Translation::removeRange
+ * Removes the translation range at [pos]
+ *******************************************************************/
 void Translation::removeRange(int pos) {
 	// Check position
 	if (pos < 0 || pos >= (int)translations.size())
@@ -232,6 +301,9 @@ void Translation::removeRange(int pos) {
 	translations.erase(translations.begin() + pos);
 }
 
+/* Translation::swapRanges
+ * Swaps the translation range at [pos1] with the one at [pos2]
+ *******************************************************************/
 void Translation::swapRanges(int pos1, int pos2) {
 	// Check positions
 	if (pos1 < 0 || pos2 < 0 || pos1 >= (int)translations.size() || pos2 >= (int)translations.size())

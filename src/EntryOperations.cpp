@@ -49,6 +49,7 @@ CVAR(String, path_pngout, "", CVAR_SAVE);
 CVAR(String, path_pngcrush, "", CVAR_SAVE);
 CVAR(String, path_deflopt, "", CVAR_SAVE);
 
+
 /*******************************************************************
  * STRUCTS
  *******************************************************************/
@@ -87,6 +88,12 @@ struct chunk_size_t {
  * FUNCTIONS
  *******************************************************************/
 
+/* EntryOperations::gfxConvert
+ * Converts the image [entry] to [target_format], using conversion
+ * options specified in [opt] and converting to [target_colformat]
+ * colour format if possible. Returns false if the conversion failed,
+ * true otherwise
+ *******************************************************************/
 bool EntryOperations::gfxConvert(ArchiveEntry* entry, string target_format, SIFormat::convert_options_t opt, int target_colformat) {
 	// Init variables
 	SImage image;
@@ -1217,17 +1224,3 @@ CONSOLE_COMMAND(fixpngcrc, 0) {
 			fixpngsrc(selection[a]);
 	}
 }
-
-/*
-CONSOLE_COMMAND (test_ee, 1) {
-	if (theArchiveManager->numArchives() > 0) {
-		for (size_t a = 0; a < args.size(); a++) {
-			ArchiveEntry* entry = theArchiveManager->getArchive(0)->entryAtPath(args[a]);
-			if (entry)
-				EntryOperations::openExternal(entry);
-			else
-				wxLogMessage("Entry %s not found", CHR(args[a]));
-		}
-	}
-}
-*/

@@ -983,15 +983,6 @@ bool Archive::swapEntries(ArchiveEntry* entry1, ArchiveEntry* entry2) {
 	dir->swapEntries(i1, i2);
 
 	// Announce the swap
-	/*
-	MemChunk mc(16);
-	wxUIntPtr ptr1 = wxPtrToUInt(entry1);
-	wxUIntPtr ptr2 = wxPtrToUInt(entry2);
-	mc.write(&i1, sizeof(int));
-	mc.write(&i2, sizeof(int));
-	mc.write(&ptr1, sizeof(wxUIntPtr));
-	mc.write(&ptr2, sizeof(wxUIntPtr));
-	*/
 	announce("entries_swapped");
 
 	// Set modified

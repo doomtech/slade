@@ -325,6 +325,9 @@ void ResourceManager::getAllPatchEntries(vector<ArchiveEntry*>& list, Archive* p
 	}
 }
 
+/* ResourceManager::getAllTextures
+ * Adds all current textures to [list]
+ *******************************************************************/
 void ResourceManager::getAllTextures(vector<TextureResource::tex_res_t>& list, Archive* priority, Archive* ignore) {
 	TextureResourceMap::iterator i = textures.begin();
 

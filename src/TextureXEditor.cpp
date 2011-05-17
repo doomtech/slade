@@ -359,6 +359,9 @@ void TextureXEditor::updateTexturePalette() {
 	patch_browser->setPalette(pal);
 }
 
+/* TextureXEditor::saveChanges
+ * Saves changes to all open TEXTUREx and PNAMES entries
+ *******************************************************************/
 void TextureXEditor::saveChanges() {
 	// Check for problems
 	checkTextures();
@@ -383,6 +386,11 @@ void TextureXEditor::saveChanges() {
 	}
 }
 
+/* TextureXEditor::close
+ * 'Closes' the texture editor, prompting the user to save any
+ * unsaved changes. Returns false if the close operation should be
+ * cancelled, true otherwise
+ *******************************************************************/
 bool TextureXEditor::close() {
 	// Check if any texture lists are modified
 	bool modified = false;
@@ -405,6 +413,9 @@ bool TextureXEditor::close() {
 	return true;
 }
 
+/* TextureXEditor::showTextureMenu
+ * Shows or hides the custom 'Texture' menu
+ *******************************************************************/
 void TextureXEditor::showTextureMenu(bool show) {
 	if (show)
 		theMainWindow->addCustomMenu(menu_texture, "&Texture");
@@ -446,6 +457,10 @@ int TextureXEditor::browsePatchTable() {
 		return -1;
 }
 
+/* TextureXEditor::browsePatchEntry
+ * Opens resource patch entries in the patch browser. Returns the
+ * selected patch name, or "" if no patch was selected
+ *******************************************************************/
 string TextureXEditor::browsePatchEntry() {
 	// Update patch browser if necessary
 	if (pb_update) {

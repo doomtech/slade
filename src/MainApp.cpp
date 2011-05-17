@@ -410,10 +410,10 @@ void MainApp::initActions() {
 	new SAction("aelt_vrules", "Vertical Rules", "", "Show vertical rules between columns", "", SAction::CHECK);
 
 	// TextureEditorPanel
-	new SAction("txed_new", "New Texture", "", "Create a new, empty texture");
-	new SAction("txed_delete", "Delete Texture", "", "Deletes the selected texture(s) from the list");
-	new SAction("txed_new_patch", "New Texture from Patch", "", "Create a new texture from an existing patch");
-	new SAction("txed_new_file", "New Texture from File", "", "Create a new texture from an image file");
+	new SAction("txed_new", "New Texture", "t_tex_new", "Create a new, empty texture");
+	new SAction("txed_delete", "Delete Texture", "t_tex_delete", "Deletes the selected texture(s) from the list");
+	new SAction("txed_new_patch", "New Texture from Patch", "t_tex_newpatch", "Create a new texture from an existing patch");
+	new SAction("txed_new_file", "New Texture from File", "t_tex_newfile", "Create a new texture from an image file");
 	new SAction("txed_up", "Move Up", "t_up", "Move the selected texture(s) up in the list");
 	new SAction("txed_down", "Move Down", "t_down", "Move the selected texture(s) down in the list");
 	new SAction("txed_copy", "Copy", "t_copy", "Copy the selected texture(s)");

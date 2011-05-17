@@ -340,6 +340,9 @@ void SImage::clearData(bool clear_mask) {
 	}
 }
 
+/* SImage::create
+ * Creates an empty image
+ *******************************************************************/
 void SImage::create(int width, int height, SIType type, Palette8bit* pal, int index, int numimages) {
 	// Check valid width/height
 	if (width < 0 || height < 0)
@@ -380,6 +383,9 @@ void SImage::create(int width, int height, SIType type, Palette8bit* pal, int in
 		has_palette = false;
 }
 
+/* SImage::create
+ * Creates an empty image, initialising with properties from [info]
+ *******************************************************************/
 void SImage::create(SImage::info_t info, Palette8bit* pal) {
 	// Normal creation
 	create(info.width, info.height, (SIType)info.colformat, pal, info.imgindex, info.numimages);
@@ -666,6 +672,11 @@ bool SImage::convertPaletted(Palette8bit* pal_target, Palette8bit* pal_current) 
 	return true;
 }
 
+/* SImage::convertAlphaMap
+ * Converts the image to an alpha map, generating alpha values from
+ * either pixel brightness or existing alpha, depending on the value
+ * of [alpha_source]
+ *******************************************************************/
 bool SImage::convertAlphaMap(int alpha_source, Palette8bit* pal) {
 	// Get RGBA data
 	MemChunk rgba;
@@ -816,19 +827,6 @@ bool SImage::cutoffMask(uint8_t threshold) {
 
 	return true;
 }
-
-/* SImage::safeConvert
- * Converts the image to a format that can be written.
- * The rules are simple: use external palette -> Doom Gfx, and
- * otherwise -> PNG.
- *******************************************************************/
-/*
-bool SImage::safeConvert(MemChunk& out, Palette8bit* pal) {
-	if (type == PALMASK && !has_palette)
-		return toDoomGfx(out);
-	else return toPNG(out, pal);
-}
-*/
 
 /* SImage::setPixel
  * Sets the pixel at [x],[y] to [colour]. Returns false if the

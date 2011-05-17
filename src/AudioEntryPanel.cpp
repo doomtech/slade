@@ -146,6 +146,9 @@ bool AudioEntryPanel::saveEntry() {
 	return true;
 }
 
+/* AudioEntryPanel::open
+ * Opens the current entry and performs the appropriate conversions
+ *******************************************************************/
 bool AudioEntryPanel::open() {
 	// Check if already opened
 	if (opened)

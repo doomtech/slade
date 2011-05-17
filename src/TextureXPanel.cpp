@@ -179,17 +179,21 @@ TextureXPanel::TextureXPanel(wxWindow* parent, TextureXEditor* tx_editor) : wxPa
 	framesizer->Add(list_textures, 1, wxEXPAND|wxALL, 4);
 	sizer->Add(framesizer, 0, wxEXPAND|wxALL, 4);
 
-
+	// Add texture operations buttons
 	wxGridBagSizer* gbsizer = new wxGridBagSizer(4, 4);
 	framesizer->Add(gbsizer, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
-
 	btn_move_up = new wxBitmapButton(this, -1, getIcon("t_up"));
+	btn_move_up->SetToolTip("Move Up");
 	btn_move_down = new wxBitmapButton(this, -1, getIcon("t_down"));
-	btn_new_texture = new wxBitmapButton(this, -1, getIcon("t_new"));
-	btn_remove_texture = new wxBitmapButton(this, -1, getIcon("t_delete"));
-	btn_new_from_patch = new wxBitmapButton(this, -1, getIcon("t_import"));
-	btn_new_from_file = new wxBitmapButton(this, -1, getIcon("t_import"));
-
+	btn_move_down->SetToolTip("Move Down");
+	btn_new_texture = new wxBitmapButton(this, -1, getIcon("t_tex_new"));
+	btn_new_texture->SetToolTip("New");
+	btn_remove_texture = new wxBitmapButton(this, -1, getIcon("t_tex_delete"));
+	btn_remove_texture->SetToolTip("Remove");
+	btn_new_from_patch = new wxBitmapButton(this, -1, getIcon("t_tex_newpatch"));
+	btn_new_from_patch->SetToolTip("New from Patch");
+	btn_new_from_file = new wxBitmapButton(this, -1, getIcon("t_tex_newfile"));
+	btn_new_from_file->SetToolTip("New from File");
 	gbsizer->Add(btn_new_texture, wxGBPosition(0, 0), wxDefaultSpan);
 	gbsizer->Add(btn_new_from_patch, wxGBPosition(0, 1), wxDefaultSpan);
 	gbsizer->Add(btn_new_from_file, wxGBPosition(0, 2), wxDefaultSpan);
@@ -357,6 +361,9 @@ CTexture* TextureXPanel::newTextureFromPatch(string name, string patch) {
 	return tex;
 }
 
+/* TextureXPanel::newTexture
+ * Creates a new, empty texture
+ *******************************************************************/
 void TextureXPanel::newTexture() {
 	// Prompt for new texture name
 	string name = wxGetTextFromUser("Enter a texture name:", "New Texture");
@@ -402,6 +409,9 @@ void TextureXPanel::newTexture() {
 	modified = true;
 }
 
+/* TextureXPanel::newTextureFromPatch
+ * Creates a new texture from an existing patch
+ *******************************************************************/
 void TextureXPanel::newTextureFromPatch() {
 	// Do nothing if patch list is empty
 	if (tx_editor->patchTable().nPatches() == 0)
@@ -446,6 +456,10 @@ void TextureXPanel::newTextureFromPatch() {
 	}
 }
 
+/* TextureXPanel::newTextureFromFile
+ * Creates a new texture from an image file. The file will be
+ * imported and added to the patch table if needed
+ *******************************************************************/
 void TextureXPanel::newTextureFromFile() {
 	// Get all entry types
 	vector<EntryType*> etypes = EntryType::allTypes();
@@ -526,6 +540,9 @@ void TextureXPanel::newTextureFromFile() {
 	}
 }
 
+/* TextureXPanel::removeTexture
+ * Removes any selected textures
+ *******************************************************************/
 void TextureXPanel::removeTexture() {
 	// Get selected textures
 	vector<long> selection = list_textures->getSelection();
@@ -549,6 +566,9 @@ void TextureXPanel::removeTexture() {
 	modified = true;
 }
 
+/* TextureXPanel::moveUp
+ * Moves all selected textures up
+ *******************************************************************/
 void TextureXPanel::moveUp() {
 	// Get selected textures
 	vector<long> selection = list_textures->getSelection();
@@ -575,6 +595,9 @@ void TextureXPanel::moveUp() {
 	modified = true;
 }
 
+/* TextureXPanel::moveDown
+ * Moves all selected textures down
+ *******************************************************************/
 void TextureXPanel::moveDown() {
 	// Get selected textures
 	vector<long> selection = list_textures->getSelection();
@@ -601,6 +624,9 @@ void TextureXPanel::moveDown() {
 	modified = true;
 }
 
+/* TextureXPanel::copy
+ * Copies any selected textures to the clipboard
+ *******************************************************************/
 void TextureXPanel::copy() {
 	// Get selected textures
 	vector<long> selection = list_textures->getSelection();
@@ -618,6 +644,10 @@ void TextureXPanel::copy() {
 	theClipboard->addItems(copy_items);
 }
 
+/* TextureXPanel::paste
+ * Pastes any textures on the clipboard after the last selected
+ * texture
+ *******************************************************************/
 void TextureXPanel::paste() {
 	// Check there is anything on the clipboard
 	if (theClipboard->nItems() == 0)
@@ -681,6 +711,10 @@ void TextureXPanel::paste() {
 	modified = true;
 }
 
+/* TextureXPanel::handleAction
+ * Handles the action [id]. Returns true if the action was handled,
+ * false otherwise
+ *******************************************************************/
 bool TextureXPanel::handleAction(string id) {
 	// Don't handle if hidden
 	if (!IsShown())

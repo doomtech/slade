@@ -119,6 +119,10 @@ bool SAction::addToToolbar(wxAuiToolBar* toolbar, string icon_override) {
 	return true;
 }
 
+/* SAction::addToToolbar
+ * Adds this action to [toolbar]. If [icon_override] is not "NO", it
+ * will be used instead of the action's icon as the tool icon
+ *******************************************************************/
 bool SAction::addToToolbar(wxToolBar* toolbar, string icon_override) {
 	// Can't add to nonexistant toolbar
 	if (!toolbar)

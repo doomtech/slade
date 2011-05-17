@@ -177,6 +177,10 @@ bool PatchBrowser::openPatchTable(PatchTable* table) {
 	return true;
 }
 
+/* PatchBrowser::openArchive
+ * Opens all loaded resource patches and textures, prioritising those
+ * from [archive]
+ *******************************************************************/
 bool PatchBrowser::openArchive(Archive* archive) {
 	// Check archive was given
 	if (!archive)
@@ -261,33 +265,6 @@ int PatchBrowser::getSelectedPatch() {
 		return item->getIndex();
 	else
 		return -1;
-}
-
-/* PatchBrowser::updateItems
- * Updates the palette and entry for each browser item
- *******************************************************************/
-void PatchBrowser::updateItems(BrowserTreeNode* node) {
-	/*
-	// Root node if none given
-	if (!node)
-		node = items_root;
-
-	// Go through items
-	for (unsigned a = 0; a < node->nItems(); a++) {
-		PatchBrowserItem* item = (PatchBrowserItem*)node->getItem(a);
-
-		// Update palette
-		
-
-		// Update image entry
-		item->clearImage();
-		//item->setEntry(theResourceManager->getPatchEntry(item->getName()));
-	}
-
-	// Go through child nodes and update their items
-	for (unsigned a = 0; a < node->nChildren(); a++)
-		updateItems((BrowserTreeNode*)node->getChild(a));
-	*/
 }
 
 /* PatchBrowser::onAnnouncement

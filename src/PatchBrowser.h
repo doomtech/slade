@@ -30,7 +30,6 @@ public:
 	bool	openPatchTable(PatchTable* table);
 	bool	openArchive(Archive* archive);
 	int		getSelectedPatch();
-	void	updateItems(BrowserTreeNode* node = NULL);
 
 	// Events
 	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);

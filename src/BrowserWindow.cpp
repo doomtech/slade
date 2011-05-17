@@ -375,19 +375,3 @@ void BrowserWindow::onTextFilterChanged(wxCommandEvent& e) {
 	// Filter canvas items
 	canvas->filterItems(text_filter->GetValue());
 }
-
-/*
-CONSOLE_COMMAND(test_browser, 0) {
-	BrowserWindow* win = new BrowserWindow(NULL);
-
-	// Test
-	BrowserItem* bi = new BrowserItem("test");
-	win->addItem(bi, "Patches");
-	win->addItem(bi, "Patches/IWAD");
-	win->addItem(bi, "Patches/Custom");
-	win->addItem(bi, "Patches/Unknown");
-
-	win->populateItemTree();
-	win->Show(true);
-}
-*/

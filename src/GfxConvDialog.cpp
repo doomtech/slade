@@ -297,6 +297,9 @@ void GfxConvDialog::setupLayout() {
 	SetMinSize(GetSize());
 }
 
+/* GfxConvDialog::openEntry
+ * Opens an image entry to be converted
+ *******************************************************************/
 void GfxConvDialog::openEntry(ArchiveEntry* entry) {
 	// Add item
 	items.push_back(gcd_item_t(entry));
@@ -306,6 +309,9 @@ void GfxConvDialog::openEntry(ArchiveEntry* entry) {
 	nextItem();
 }
 
+/* GfxConvDialog::openEntries
+ * Opens a list of image entries to be converted
+ *******************************************************************/
 void GfxConvDialog::openEntries(vector<ArchiveEntry*> entries) {
 	// Add entries to item list
 	for (unsigned a = 0; a < entries.size(); a++)
@@ -391,6 +397,9 @@ void GfxConvDialog::updateControls() {
 	}
 }
 
+/* GfxConvDialog::getConvertOptions
+ * Writes the state of the conversion option controls to [opt]
+ *******************************************************************/
 void GfxConvDialog::getConvertOptions(SIFormat::convert_options_t& opt) {
 	// Set transparency options
 	opt.transparency = cb_enable_transparency->GetValue();
@@ -413,6 +422,10 @@ void GfxConvDialog::getConvertOptions(SIFormat::convert_options_t& opt) {
 	opt.col_format = current_format.coltype;
 }
 
+/* GfxConvDialog::itemModified
+ * Returns true if the item at [index] has been modified, false
+ * otherwise
+ *******************************************************************/
 bool GfxConvDialog::itemModified(int index) {
 	// Check index
 	if (index < 0 || index >= (int)items.size())
@@ -421,6 +434,9 @@ bool GfxConvDialog::itemModified(int index) {
 	return items[index].modified;
 }
 
+/* GfxConvDialog::getItemImage
+ * Returns the image for the item at [index]
+ *******************************************************************/
 SImage* GfxConvDialog::getItemImage(int index) {
 	// Check index
 	if (index < 0 || index >= (int)items.size())
@@ -429,6 +445,9 @@ SImage* GfxConvDialog::getItemImage(int index) {
 	return &(items[index].image);
 }
 
+/* GfxConvDialog::getItemFormat
+ * Returns the format for the item at [index]
+ *******************************************************************/
 SIFormat* GfxConvDialog::getItemFormat(int index) {
 	// Check index
 	if (index < 0 || index >= (int)items.size())
@@ -437,6 +456,9 @@ SIFormat* GfxConvDialog::getItemFormat(int index) {
 	return items[index].new_format;
 }
 
+/* GfxConvDialog::getItemPalette
+ * Returns the palette for the item at [index]
+ *******************************************************************/
 Palette8bit* GfxConvDialog::getItemPalette(int index) {
 	// Check index
 	if (index < 0 || index >= (int)items.size())
@@ -445,6 +467,9 @@ Palette8bit* GfxConvDialog::getItemPalette(int index) {
 	return items[index].palette;
 }
 
+/* GfxConvDialog::applyConversion
+ * Applies the conversion to the current image
+ *******************************************************************/
 void GfxConvDialog::applyConversion() {
 	// Get current item
 	gcd_item_t& item = items[current_item];

@@ -190,15 +190,3 @@ void ModifyOffsetsDialog::onOptAuto(wxCommandEvent& e) {
 	cbox_relative->Enable(false);
 	combo_aligntype->Enable(true);
 }
-
-
-/*******************************************************************
- * CONSOLE COMMANDS
- *******************************************************************/
-
-/*
-CONSOLE_COMMAND (test_mod, 0) {
-	ModifyOffsetsDialog mod;
-	mod.ShowModal();
-}
-*/
