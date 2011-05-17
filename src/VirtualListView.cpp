@@ -274,7 +274,7 @@ void VirtualListView::onMouseLeftDown(wxMouseEvent& e) {
 			focusItem(item);
 			sendSelectionChangedEvent();
 		}
-		else if (e.GetModifiers() == wxMOD_CONTROL) {
+		else if (e.GetModifiers() == wxMOD_CMD) {
 			// Ctrl+left click: Toggle the selection status of the clicked item
 			bool selected = !!(GetItemState(item, wxLIST_STATE_SELECTED) & wxLIST_STATE_SELECTED);
 			selectItem(item, !selected);

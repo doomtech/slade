@@ -324,13 +324,13 @@ void MainApp::initLogFile() {
  *******************************************************************/
 void MainApp::initActions() {
 	// MainWindow
-	new SAction("main_exit", "E&xit", "t_exit", "Quit SLADE");
+	new SAction("main_exit", "E&xit", "t_exit", "Quit SLADE", "", 0, wxID_EXIT);
 	new SAction("main_setbra", "Set &Base Resource Archive", "e_archive", "Set the Base Resource Archive, to act as the program 'IWAD'");
 	new SAction("main_preferences", "&Preferences...", "t_settings", "Setup SLADE options and preferences");
 	new SAction("main_showam", "&Archive Manager", "e_archive", "Toggle the Archive Manager window", "Ctrl+1");
 	new SAction("main_showconsole", "&Console", "t_console", "Toggle the Console window", "Ctrl+2");
 	new SAction("main_onlinedocs", "Online &Documentation", "t_wiki", "View SLADE documentation online");
-	new SAction("main_about", "&About", "i_logo", "Informaton about SLADE");
+	new SAction("main_about", "&About", "i_logo", "Informaton about SLADE", "", 0, wxID_ABOUT);
 
 	// ArchiveManagerPanel
 	new SAction("aman_newwad", "New Wad Archive", "t_newarchive", "Create a new Doom Wad Archive", "Ctrl+Shift+W");

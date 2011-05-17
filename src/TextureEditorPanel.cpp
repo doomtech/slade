@@ -778,7 +778,7 @@ void TextureEditorPanel::onTexCanvasKeyDown(wxKeyEvent& e) {
 	int y_movement = 0;
 	bool move = false;
 	if (e.GetKeyCode() == WXK_UP) {
-		if (e.GetModifiers() == wxMOD_CONTROL)
+		if (e.GetModifiers() == wxMOD_CMD)
 			y_movement = -1;
 		else
 			y_movement = -8;
@@ -786,7 +786,7 @@ void TextureEditorPanel::onTexCanvasKeyDown(wxKeyEvent& e) {
 		move = true;
 	}
 	else if (e.GetKeyCode() == WXK_DOWN) {
-		if (e.GetModifiers() == wxMOD_CONTROL)
+		if (e.GetModifiers() == wxMOD_CMD)
 			y_movement = 1;
 		else
 			y_movement = 8;
@@ -794,7 +794,7 @@ void TextureEditorPanel::onTexCanvasKeyDown(wxKeyEvent& e) {
 		move = true;
 	}
 	else if (e.GetKeyCode() == WXK_LEFT) {
-		if (e.GetModifiers() == wxMOD_CONTROL)
+		if (e.GetModifiers() == wxMOD_CMD)
 			x_movement = -1;
 		else
 			x_movement = -8;
@@ -802,7 +802,7 @@ void TextureEditorPanel::onTexCanvasKeyDown(wxKeyEvent& e) {
 		move = true;
 	}
 	else if (e.GetKeyCode() == WXK_RIGHT) {
-		if (e.GetModifiers() == wxMOD_CONTROL)
+		if (e.GetModifiers() == wxMOD_CMD)
 			x_movement = 1;
 		else
 			x_movement = 8;
@@ -826,14 +826,14 @@ void TextureEditorPanel::onTexCanvasKeyDown(wxKeyEvent& e) {
 	}
 
 	// Replace patch (Ctrl+R or F2)
-	else if ((e.GetKeyCode() == 'R' && e.GetModifiers() == wxMOD_CONTROL) || (e.GetKeyCode() == WXK_F2)) {
+	else if ((e.GetKeyCode() == 'R' && e.GetModifiers() == wxMOD_CMD) || (e.GetKeyCode() == WXK_F2)) {
 		hack_nodrag = true;
 		replacePatch();
 		handled = true;
 	}
 
 	// Duplicate patch (Ctrl+D)
-	else if (e.GetKeyCode() == 'D' && e.GetModifiers() == wxMOD_CONTROL) {
+	else if (e.GetKeyCode() == 'D' && e.GetModifiers() == wxMOD_CMD) {
 		duplicatePatch();
 		handled = true;
 	}

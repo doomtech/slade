@@ -758,31 +758,31 @@ void TextureXPanel::onTextureListRightClick(wxListEvent& e) {
  *******************************************************************/
 void TextureXPanel::onTextureListKeyDown(wxKeyEvent& e) {
 	// Move texture up (Ctrl+U or Ctrl+Up Arrow)
-	if (e.GetModifiers() == wxMOD_CONTROL && (e.GetKeyCode() == 'U' || e.GetKeyCode() == WXK_UP))
+	if (e.GetModifiers() == wxMOD_CMD && (e.GetKeyCode() == 'U' || e.GetKeyCode() == WXK_UP))
 		moveUp();
 
 	// Move texture down (Ctrl+D or Ctrl+Down Arrow)
-	else if (e.GetModifiers() == wxMOD_CONTROL && (e.GetKeyCode() == 'D' || e.GetKeyCode() == WXK_DOWN))
+	else if (e.GetModifiers() == wxMOD_CMD && (e.GetKeyCode() == 'D' || e.GetKeyCode() == WXK_DOWN))
 		moveDown();
 
 	// Copy (Ctrl+C)
-	else if (e.GetModifiers() == wxMOD_CONTROL && e.GetKeyCode() == 'C')
+	else if (e.GetModifiers() == wxMOD_CMD && e.GetKeyCode() == 'C')
 		copy();
 
 	// Paste (Ctrl+V)
-	else if (e.GetModifiers() == wxMOD_CONTROL && e.GetKeyCode() == 'V')
+	else if (e.GetModifiers() == wxMOD_CMD && e.GetKeyCode() == 'V')
 		paste();
 
 	// New texture (Ctrl+N)
-	else if (e.GetModifiers() == wxMOD_CONTROL && e.GetKeyCode() == 'N')
+	else if (e.GetModifiers() == wxMOD_CMD && e.GetKeyCode() == 'N')
 		newTexture();
 
 	// New texture from patch (Ctrl+Shift+N)
-	else if (e.GetModifiers() == wxMOD_CONTROL|wxMOD_SHIFT && e.GetKeyCode() == 'N')
+	else if (e.GetModifiers() == (wxMOD_CMD|wxMOD_SHIFT) && e.GetKeyCode() == 'N')
 		newTextureFromPatch();
 
 	// New texture from file (Ctrl+Alt+N)
-	else if (e.GetModifiers() == wxMOD_CONTROL|wxMOD_ALT && e.GetKeyCode() == 'N')
+	else if (e.GetModifiers() == (wxMOD_CMD|wxMOD_ALT) && e.GetKeyCode() == 'N')
 		newTextureFromFile();
 
 	// Remove texture (Delete)

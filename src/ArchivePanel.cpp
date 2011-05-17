@@ -1983,7 +1983,7 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
  *******************************************************************/
 void ArchivePanel::onEntryListKeyDown(wxKeyEvent& e) {
 	// Rename entry (Ctrl+R or F2)
-	if ((e.GetKeyCode() == 'R' && e.ControlDown()) || e.GetKeyCode() == WXK_F2)
+	if ((e.GetKeyCode() == 'R' && e.GetModifiers() == wxMOD_CMD) || e.GetKeyCode() == WXK_F2)
 		renameEntry();
 
 	// Delete entry (Delete)
@@ -1991,39 +1991,39 @@ void ArchivePanel::onEntryListKeyDown(wxKeyEvent& e) {
 		deleteEntry();
 
 	// Copy entry (Ctrl+C)
-	else if (e.GetKeyCode() == 'C' && e.ControlDown())
+	else if (e.GetKeyCode() == 'C' && e.GetModifiers() == wxMOD_CMD)
 		copyEntry();
 
 	// Cut entry (Ctrl+X)
-	else if (e.GetKeyCode() == 'X' && e.ControlDown())
+	else if (e.GetKeyCode() == 'X' && e.GetModifiers() == wxMOD_CMD)
 		cutEntry();
 
 	// Paste entry (Ctrl+V)
-	else if (e.GetKeyCode() == 'V' && e.ControlDown())
+	else if (e.GetKeyCode() == 'V' && e.GetModifiers() == wxMOD_CMD)
 		pasteEntry();
 
 	// Import to entry (Ctrl+I)
-	else if (e.GetKeyCode() == 'I' && e.ControlDown())
+	else if (e.GetKeyCode() == 'I' && e.GetModifiers() == wxMOD_CMD)
 		importEntry();
 
 	// Export entry (Ctrl+E)
-	else if (e.GetKeyCode() == 'E' && e.ControlDown() && !e.ShiftDown())
+	else if (e.GetKeyCode() == 'E' && e.GetModifiers() == wxMOD_CMD)
 		exportEntry();
 
 	// Move entry up (Ctrl+U or Ctrl+Up Arrow)
-	else if (e.ControlDown() && (e.GetKeyCode() == 'U' || e.GetKeyCode() == WXK_UP))
+	else if (e.GetModifiers() == wxMOD_CMD && (e.GetKeyCode() == 'U' || e.GetKeyCode() == WXK_UP))
 		moveUp();
 
 	// Move entry down (Ctrl+D or Ctrl+Down Arrow)
-	else if (e.ControlDown() && (e.GetKeyCode() == 'D' || e.GetKeyCode() == WXK_DOWN))
+	else if (e.GetModifiers() == wxMOD_CMD && (e.GetKeyCode() == 'D' || e.GetKeyCode() == WXK_DOWN))
 		moveDown();
 
 	// Select all entries (Ctrl+A)
-	else if (e.GetKeyCode() == 'A' && e.ControlDown())
+	else if (e.GetKeyCode() == 'A' && e.GetModifiers() == wxMOD_CMD)
 		entry_list->selectAll();
 
 	// New entry (Ctrl+N)
-	else if (e.GetKeyCode() == 'N' && e.ControlDown() && !e.ShiftDown())
+	else if (e.GetKeyCode() == 'N' && e.GetModifiers() == wxMOD_CMD)
 		newEntry();
 
 	// Up directory (backspace)

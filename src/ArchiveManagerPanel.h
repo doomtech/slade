@@ -11,6 +11,7 @@
 #include "ListView.h"
 #include "EntryPanel.h"
 #include "MainApp.h"
+#include "DockPanel.h"
 
 class ArchiveManagerPanel;
 class ArchivePanel;
@@ -28,10 +29,13 @@ public:
 };
 
 class TextureXEditor;
-class ArchiveManagerPanel : public wxPanel, Listener, SActionHandler {
+class ArchiveManagerPanel : public DockPanel, Listener, SActionHandler {
 private:
 	wxAuiNotebook*		notebook_tabs;
 	wxAuiNotebook*		notebook_archives;
+	wxPanel*			panel_am;
+	wxPanel*			panel_archives;
+	wxPanel*			panel_maps;
 	ListView*			list_archives;
 	ListView*			list_recent;
 	ListView*			list_bookmarks;
@@ -45,6 +49,10 @@ public:
 	~ArchiveManagerPanel();
 
 	wxMenu*			getRecentMenu() { return menu_recent; }
+
+	// DockPanel layout
+	void	layoutNormal();
+	void	layoutHorizontal();
 
 	void			refreshArchiveList();
 	void			refreshRecentFileList();

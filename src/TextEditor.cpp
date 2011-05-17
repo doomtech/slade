@@ -616,11 +616,11 @@ void TextEditor::updateCalltip() {
  *******************************************************************/
 void TextEditor::onKeyDown(wxKeyEvent& e) {
 	// Check for Ctrl+Shift+Space (invoke calltip)
-	if ((e.GetModifiers() == (wxMOD_SHIFT|wxMOD_CONTROL)) && (e.GetKeyCode() == WXK_SPACE))
+	if ((e.GetModifiers() == (wxMOD_SHIFT|wxMOD_CMD)) && (e.GetKeyCode() == WXK_SPACE))
 		updateCalltip();
 
 	// Check for Ctrl+Space
-	else if ((e.GetModifiers() == wxMOD_CONTROL) && (e.GetKeyCode() == WXK_SPACE)) {
+	else if ((e.GetModifiers() == wxMOD_CMD) && (e.GetKeyCode() == WXK_SPACE)) {
 		// Get word before cursor
 		string word = GetTextRange(WordStartPosition(GetCurrentPos(), true), GetCurrentPos());
 
@@ -630,7 +630,7 @@ void TextEditor::onKeyDown(wxKeyEvent& e) {
 	}
 
 	// Ctrl+F (find/replace)
-	else if ((e.GetModifiers() == wxMOD_CONTROL) && (e.GetKeyCode() == 'F'))
+	else if ((e.GetModifiers() == wxMOD_CMD) && (e.GetKeyCode() == 'F'))
 		showFindReplaceDialog();
 
 	// F3 (repeat last find operation)
@@ -776,7 +776,7 @@ void TextEditor::onMouseDown(wxMouseEvent& e) {
 		return;
 
 	// Check for ctrl+left (web lookup)
-	if (e.LeftDown() && e.GetModifiers() == wxMOD_CONTROL) {
+	if (e.LeftDown() && e.GetModifiers() == wxMOD_CMD) {
 		int pos = CharPositionFromPointClose(e.GetX(), e.GetY());
 		string word = GetTextRange(WordStartPosition(pos, true), WordEndPosition(pos, true));
 

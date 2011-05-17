@@ -181,7 +181,7 @@ bool MIDIPlayer::pause() {
  *******************************************************************/
 bool MIDIPlayer::stop() {
 	fluid_player_stop(fs_player);
-	fluid_synth_all_notes_off(fs_synth, -1);
+	fluid_synth_cc(fs_synth, -1, FLUID_SEQ_ALLNOTESOFF, 0);
 	return true;
 }
 
