@@ -91,6 +91,8 @@
     <File Name="src/MIDIPlayer.cpp"/>
     <File Name="src/SAction.cpp"/>
     <File Name="src/SAction.h"/>
+    <File Name="src/Drawing.cpp"/>
+    <File Name="src/Drawing.h"/>
   </VirtualDirectory>
   <VirtualDirectory Name="Main Editor">
     <VirtualDirectory Name="UI Elements">
