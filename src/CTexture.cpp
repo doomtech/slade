@@ -34,6 +34,7 @@
 #include "ResourceManager.h"
 #include "Misc.h"
 #include "SImage.h"
+#include "TextureXList.h"
 #include <wx/colour.h>
 
 
@@ -130,6 +131,7 @@ ArchiveEntry* CTPatch::getPatchEntry(Archive* parent) {
 
 	return entry;
 }
+
 
 /*******************************************************************
  * CTPATCHEX CLASS FUNCTIONS
@@ -397,6 +399,7 @@ CTexture::CTexture(bool extended) {
 	this->offset_y = 0;
 	this->type = "Texture";
 	this->state = 0;
+	this->in_list = NULL;
 }
 
 /* CTexture::~CTexture
@@ -808,7 +811,7 @@ bool CTexture::toImage(SImage& image, Archive* parent, Palette8bit* pal, bool fo
 			CTPatchEx* patch = (CTPatchEx*)patches[a];
 
 			// Load patch entry
-			if (!Misc::loadImageFromEntry(&p_img, patch->getPatchEntry(parent)))
+			if (!loadPatchImage(a, p_img, parent, pal))
 				continue;
 
 			// Apply translation before anything in case we're forcing rgba (can't translate rgba images)
@@ -875,4 +878,54 @@ bool CTexture::toImage(SImage& image, Archive* parent, Palette8bit* pal, bool fo
 	}
 
 	return true;
+}
+
+/* CTexture::loadPatchImage
+ * Loads the image for the patch at [pindex] into [image]. Can deal
+ * with textures-as-patches
+ *******************************************************************/
+bool CTexture::loadPatchImage(unsigned pindex, SImage& image, Archive* parent, Palette8bit* pal) {
+	// Check patch index
+	if (pindex >= patches.size())
+		return false;
+
+	CTPatch* patch = patches[pindex];
+
+	// If the texture is extended, search for textures-as-patches first
+	// (as long as the patch name is different from this texture's name)
+	if (extended && !(S_CMPNOCASE(patch->getName(), name))) {
+		// Search the texture list we're in first
+		if (in_list) {
+			for (unsigned a = 0; a < in_list->nTextures(); a++) {
+				CTexture* tex = in_list->getTexture(a);
+
+				// Don't look past this texture in the list
+				if (tex->getName() == name)
+					break;
+
+				// Check for name match
+				if (S_CMPNOCASE(tex->getName(), patch->getName())) {
+					// Load texture to image
+					return tex->toImage(image, parent, pal);
+				}
+			}
+		}
+
+		// Otherwise, try the resource manager
+		// TODO: Something has to be ignored here. The entire archive or just the current list?
+		CTexture* tex = theResourceManager->getTexture(patch->getName(), parent);
+		if (tex)
+			return tex->toImage(image, parent, pal);
+
+		// No matching texture found for patch, so default to entry
+	}
+
+	// Get patch entry
+	ArchiveEntry* entry = patch->getPatchEntry(parent);
+
+	// Load entry to image if valid
+	if (entry)
+		return Misc::loadImageFromEntry(&image, entry);
+	else
+		return false;
 }

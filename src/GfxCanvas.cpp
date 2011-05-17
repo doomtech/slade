@@ -192,10 +192,6 @@ void GfxCanvas::drawImage() {
 	// Save current matrix
 	glPushMatrix();
 
-	// For mysterious reasons, the top pixels are cut off if the image isn't panned down first.
-	//if (view_type == GFXVIEW_DEFAULT)
-	//	glTranslated(8, 8, 0);
-
 	// Zoom
 	glScaled(scale, scale, 1);
 

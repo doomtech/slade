@@ -284,8 +284,10 @@ void BrowserWindow::openTree(BrowserTreeNode* node, bool clear) {
 		list.clear();
 
 	// Add all items in the node
-	for (unsigned a = 0; a < node->nItems(); a++)
+	for (unsigned a = 0; a < node->nItems(); a++) {
 		list.push_back(node->getItem(a));
+		node->getItem(a)->parent = this;
+	}
 
 	// Add all child nodes' items
 	for (unsigned a = 0; a < node->nChildren(); a++)

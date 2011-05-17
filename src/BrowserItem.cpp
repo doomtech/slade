@@ -41,9 +41,10 @@
 /* BrowserItem::BrowserItem
  * BrowserItem class constructor
  *******************************************************************/
-BrowserItem::BrowserItem(string name, unsigned index) {
+BrowserItem::BrowserItem(string name, unsigned index, string type) {
 	this->name = name;
 	this->index = index;
+	this->type = type;
 }
 
 /* BrowserItem::~BrowserItem

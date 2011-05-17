@@ -252,8 +252,8 @@ bool AudioEntryPanel::openAudio(MemChunk& audio, string filename) {
  *******************************************************************/
 bool nosf_warned = false;	// One-time 'no soundfont loaded' warning
 bool AudioEntryPanel::openMidi(string filename) {
-	// Disable volume control
-	slider_volume->Enable(false);
+	// Enable volume control
+	slider_volume->Enable(true);
 
 	// Disable controls if we cannot play the midi
 	if (!theMIDIPlayer->isInitialised()) {
@@ -421,5 +421,8 @@ void AudioEntryPanel::onSliderSeekChanged(wxCommandEvent& e) {
  *******************************************************************/
 void AudioEntryPanel::onSliderVolumeChanged(wxCommandEvent& e) {
 	snd_volume = slider_volume->GetValue();
-	sound.SetVolume(snd_volume);
+	if (midi)
+		theMIDIPlayer->setVolume(snd_volume);
+	else
+		sound.SetVolume(snd_volume);
 }

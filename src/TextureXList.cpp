@@ -89,6 +89,8 @@ void TextureXList::addTexture(CTexture* tex, int position) {
 		textures.insert(textures.begin() + position, tex);
 	else
 		textures.push_back(tex);
+
+	tex->in_list = this;
 }
 
 /* TextureXList::removeTexture
@@ -349,7 +351,7 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_ta
 			// Add it to the texture
 			string patch = patch_table.patchName(pdef.patch);
 			if (patch.IsEmpty()) {
-				wxLogMessage("Warning: Texture %s contains patch %d which is invalid - may be incorrect PNAMES entry", CHR(tex->getName()), pdef.patch);
+				//wxLogMessage("Warning: Texture %s contains patch %d which is invalid - may be incorrect PNAMES entry", CHR(tex->getName()), pdef.patch);
 				patch = S_FMT("INVPATCH%04d", pdef.patch);
 			}
 
@@ -357,7 +359,7 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_ta
 		}
 
 		// Add texture to list
-		textures.push_back(tex);
+		addTexture(tex);
 	}
 
 	// Clean up
@@ -562,45 +564,38 @@ bool TextureXList::readTEXTURESData(ArchiveEntry* entry) {
 		if (S_CMPNOCASE(token, "Texture")) {
 			CTexture* tex = new CTexture();
 			if (tex->parse(tz, "Texture"))
-				textures.push_back(tex);
+				addTexture(tex);
 		}
 
 		// Sprite definition
 		if (S_CMPNOCASE(token, "Sprite")) {
 			CTexture* tex = new CTexture();
 			if (tex->parse(tz, "Sprite"))
-				textures.push_back(tex);
+				addTexture(tex);
 		}
 
 		// Graphic definition
 		if (S_CMPNOCASE(token, "Graphic")) {
 			CTexture* tex = new CTexture();
 			if (tex->parse(tz, "Graphic"))
-				textures.push_back(tex);
+				addTexture(tex);
 		}
 
 		// WallTexture definition
 		if (S_CMPNOCASE(token, "WallTexture")) {
 			CTexture* tex = new CTexture();
 			if (tex->parse(tz, "WallTexture"))
-				textures.push_back(tex);
+				addTexture(tex);
 		}
 
 		// Flat definition
 		if (S_CMPNOCASE(token, "Flat")) {
 			CTexture* tex = new CTexture();
 			if (tex->parse(tz, "Flat"))
-				textures.push_back(tex);
+				addTexture(tex);
 		}
 
 		token = tz.getToken();
-	}
-
-	// Go through each patch of each texture and update them
-	for (uint32_t t = 0; t < textures.size(); ++t) {
-		for (uint32_t p = 0; p < textures[t]->nPatches(); p++) {
-			textures[t]->getPatch(p)->searchEntry(entry->getParent());
-		}
 	}
 
 	txformat = TXF_TEXTURES;

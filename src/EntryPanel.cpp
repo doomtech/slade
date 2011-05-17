@@ -101,6 +101,8 @@ EntryPanel::EntryPanel(wxWindow* parent, string id)
  * EntryPanel class destructor
  *******************************************************************/
 EntryPanel::~EntryPanel() {
+	if (menu_custom)
+		delete menu_custom;
 }
 
 /* EntryPanel::setModified
@@ -118,12 +120,6 @@ void EntryPanel::setModified(bool c) {
 		else
 			modified = c;
 	}
-
-	// Set frame label (disabled, causes flicker in windows)
-	//if (modified)
-	//	frame->SetLabel(s_fmt("Entry Contents (%s, unsaved changes)", entry->getName().c_str()));
-	//else
-	//	frame->SetLabel(s_fmt("Entry Contents (%s)", entry->getName().c_str()));
 }
 
 /* EntryPanel::openEntry
@@ -133,9 +129,6 @@ bool EntryPanel::openEntry(ArchiveEntry* entry) {
 	// Check entry was given
 	if (!entry)
 		return false;
-
-	// Set frame label (disabled, causes flicker in windows)
-	//frame->SetLabel(s_fmt("Entry Contents (%s)", entry->getName().c_str()));
 
 	// Copy current entry content
 	entry_data.clear();

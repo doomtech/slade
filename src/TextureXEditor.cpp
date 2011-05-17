@@ -153,6 +153,27 @@ TextureXEditor::TextureXEditor(wxWindow* parent) : wxPanel(parent, -1) {
 	this->pb_update = true;
 	SetName("texturex");
 
+	// Create texture menu
+	menu_texture = new wxMenu();
+	theApp->getAction("txed_new")->addToMenu(menu_texture);
+	theApp->getAction("txed_new_patch")->addToMenu(menu_texture);
+	theApp->getAction("txed_new_file")->addToMenu(menu_texture);
+	theApp->getAction("txed_delete")->addToMenu(menu_texture);
+	menu_texture->AppendSeparator();
+	theApp->getAction("txed_copy")->addToMenu(menu_texture);
+	theApp->getAction("txed_paste")->addToMenu(menu_texture);
+	menu_texture->AppendSeparator();
+	theApp->getAction("txed_up")->addToMenu(menu_texture);
+	theApp->getAction("txed_down")->addToMenu(menu_texture);
+	wxMenu* menu_patch = new wxMenu();
+	theApp->getAction("txed_patch_add")->addToMenu(menu_patch);
+	theApp->getAction("txed_patch_remove")->addToMenu(menu_patch);
+	theApp->getAction("txed_patch_replace")->addToMenu(menu_patch);
+	theApp->getAction("txed_patch_back")->addToMenu(menu_patch);
+	theApp->getAction("txed_patch_forward")->addToMenu(menu_patch);
+	theApp->getAction("txed_patch_duplicate")->addToMenu(menu_patch);
+	menu_texture->AppendSubMenu(menu_patch, "&Patch");
+
 	// Create patch browser
 	patch_browser = new PatchBrowser(this);
 	patch_browser->Show(false);
@@ -176,6 +197,7 @@ TextureXEditor::TextureXEditor(wxWindow* parent) : wxPanel(parent, -1) {
 
 	// Bind events
 	btn_save->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureXEditor::onSaveClicked, this);
+	Bind(wxEVT_SHOW, &TextureXEditor::onShow, this);
 
 	// Palette chooser
 	listenTo(theMainWindow->getPaletteChooser());
@@ -198,6 +220,8 @@ TextureXEditor::TextureXEditor(wxWindow* parent) : wxPanel(parent, -1) {
 TextureXEditor::~TextureXEditor() {
 	if (pnames)
 		pnames->unlock();
+	if (menu_texture)
+		delete menu_texture;
 }
 
 /* TextureXEditor::openArchive
@@ -332,6 +356,7 @@ void TextureXEditor::updateTexturePalette() {
 	// Send to whatever needs it
 	for (size_t a = 0; a < texture_editors.size(); a++)
 		texture_editors[a]->setPalette(pal);
+	patch_browser->setPalette(pal);
 }
 
 void TextureXEditor::saveChanges() {
@@ -378,6 +403,13 @@ bool TextureXEditor::close() {
 	}
 
 	return true;
+}
+
+void TextureXEditor::showTextureMenu(bool show) {
+	if (show)
+		theMainWindow->addCustomMenu(menu_texture, "&Texture");
+	else
+		theMainWindow->removeCustomMenu(menu_texture);
 }
 
 /* TextureXEditor::removePatch
@@ -510,6 +542,30 @@ void TextureXEditor::onAnnouncement(Announcer* announcer, string event_name, Mem
  *******************************************************************/
 void TextureXEditor::onSaveClicked(wxCommandEvent& e) {
 	saveChanges();
+}
+
+/* TextureXEditor::onShow
+ * Called when the panel is shown or hidden
+ *******************************************************************/
+void TextureXEditor::onShow(wxShowEvent& e) {
+	if (!e.IsShown()) {
+		showTextureMenu(false);
+		return;
+	}
+
+	wxWindow* current = tabs->GetPage(tabs->GetSelection());
+
+	// Check if the currently opened tab is a texturex list
+	bool tex = false;
+	for (unsigned a = 0; a < texture_editors.size(); a++) {
+		if (texture_editors[a] == current) {
+			tex = true;
+			break;
+		}
+	}
+
+	// Show/hide texture menu accordingly
+	showTextureMenu(tex);
 }
 
 

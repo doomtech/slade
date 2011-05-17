@@ -60,7 +60,7 @@ public:
 	virtual void		populatePatchList();
 	virtual void		updatePatchControls();
 
-	bool	openTexture(CTexture* tex);
+	bool	openTexture(CTexture* tex, TextureXList* list);
 	void	setPalette(Palette8bit* pal);
 
 	// Editing

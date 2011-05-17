@@ -16,7 +16,6 @@ TODO List ---------------------------------------------------------------
 
 --- Before 3.0.2 ---
 - Finish TEXTURES editing:
-	- Support for textures-as-patches
 	- Offsets preview
 - Clean up sources, finish commenting, etc
 - Status bar stuff for other EntryPanels and Texture editor

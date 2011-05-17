@@ -41,6 +41,7 @@ public:
 	int		getPosition();
 	bool	setPosition(int pos);
 	int		getLength();
+	bool	setVolume(int volume);
 };
 
 // Define for less cumbersome MIDIPlayer::getInstance()

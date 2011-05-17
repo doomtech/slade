@@ -26,6 +26,7 @@ private:
 	bool				dragging;
 	bool				show_grid;
 	bool				blend_rgba;
+	int					view_type;	// 0=normal, 1=sprite offsets, 2=hud offsets
 
 public:
 	CTextureCanvas(wxWindow* parent, int id);

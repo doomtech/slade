@@ -373,11 +373,12 @@ void TextureEditorPanel::updatePatchControls() {
 /* TextureEditorPanel::openTexture
  * Loads a TEXTUREX format texture into the editor
  *******************************************************************/
-bool TextureEditorPanel::openTexture(CTexture* tex) {
+bool TextureEditorPanel::openTexture(CTexture* tex, TextureXList* list) {
 	// Set as current texture
 	if (!tex_current)
 		tex_current = new CTexture();
 	tex_current->copyTexture(tex);
+	tex_current->setList(list);
 
 	// Open texture in canvas
 	tex_canvas->openTexture(tex_current, tx_editor->getArchive());

@@ -56,6 +56,7 @@ CTextureCanvas::CTextureCanvas(wxWindow* parent, int id)
 	texture = NULL;
 	show_grid = false;
 	blend_rgba = false;
+	view_type = 1;
 
 	// Bind events
 	Bind(wxEVT_MOTION, &CTextureCanvas::onMouseEvent, this);
@@ -245,6 +246,12 @@ void CTextureCanvas::drawTexture() {
 	// Translate to top-left of texture
 	glTranslated(texture->getWidth() * -0.5, texture->getHeight() * -0.5, 0);
 
+	// Translate by offsets if needed
+	if (view_type > 1)
+		glTranslated(-160, -100, 0);	// HUD offsets
+	if (view_type > 0)
+		glTranslated(-texture->getOffsetX(), -texture->getOffsetY(), 0);
+
 	// Enable textures
 	glEnable(GL_TEXTURE_2D);
 
@@ -376,26 +383,8 @@ void CTextureCanvas::drawPatch(int num, bool outside) {
 	// Load the patch as an opengl texture if it isn't already
 	if (!patch_textures[num]->isLoaded()) {
 		SImage temp;
-		if (Misc::loadImageFromEntry(&temp, patch->getPatchEntry(parent))) {
-			// Apply colouring
-			/*
-			if (texture->isExtended()) {
-				CTPatchEx* epatch = (CTPatchEx*)patch;
-
-				// Translation
-				if (epatch->getBlendType() == 1)
-					temp.applyTranslation(&(epatch->getTranslation()), &palette);
-
-				// Blend
-				else if (epatch->getBlendType() == 2)
-					temp.colourise(epatch->getColour(), &palette);
-
-				// Tint
-				else if (epatch->getBlendType() == 3)
-					temp.tint(epatch->getColour(), epatch->getColour().a/255.0f, &palette);
-			}
-			*/
-
+		//if (Misc::loadImageFromEntry(&temp, patch->getPatchEntry(parent))) {
+		if (texture->loadPatchImage(num, temp, parent, &palette)) {
 			// Load the image as a texture
 			patch_textures[num]->loadImage(&temp, &palette);
 		}

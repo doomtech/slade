@@ -463,8 +463,8 @@ void VirtualListView::onKeyChar(wxKeyEvent& e) {
 void VirtualListView::onLabelEditBegin(wxListEvent& e) {
 	if (!cols_editable[e.GetColumn()])
 		e.Veto();
-
-	e.Skip();
+	else
+		e.Skip();
 }
 
 /* VirtualListView::onLabelEditEnd

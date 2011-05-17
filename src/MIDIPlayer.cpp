@@ -8,9 +8,7 @@
  * Filename:    MIDIPlayer.cpp
  * Description: MIDIPlayer class, a singleton class that handles
  *              playback of MIDI files. Can only play one MIDI at a
- *              time, and currently contains two separate
- *              implementations: one using audiere for Windows, and
- *              another using fluidsynth for any other OS
+ *              time
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -42,6 +40,12 @@
 MIDIPlayer*	MIDIPlayer::instance = NULL;
 CVAR(String, fs_soundfont_path, "", CVAR_SAVE);
 CVAR(String, fs_driver, "", CVAR_SAVE);
+
+
+/*******************************************************************
+ * EXTERNAL VARIABLES
+ *******************************************************************/
+EXTERN_CVAR(Int, snd_volume)
 
 
 /*******************************************************************
@@ -110,6 +114,7 @@ bool MIDIPlayer::initFluidsynth() {
 	// Check init succeeded
 	if (fs_synth) {
 		if (fs_adriver) {
+			setVolume(snd_volume);
 			fs_initialised = true;
 			return true;
 		}
@@ -176,7 +181,7 @@ bool MIDIPlayer::pause() {
  *******************************************************************/
 bool MIDIPlayer::stop() {
 	fluid_player_stop(fs_player);
-	fluid_synth_stop(fs_synth, 1);
+	fluid_synth_all_notes_off(fs_synth, -1);
 	return true;
 }
 
@@ -210,4 +215,17 @@ bool MIDIPlayer::setPosition(int pos) {
 int MIDIPlayer::getLength() {
 	// Cannot currently get length in fluidsynth
 	return 0;
+}
+
+/* MIDIPlayer::setVolume
+ * Sets the volume of the midi player
+ *******************************************************************/
+bool MIDIPlayer::setVolume(int volume) {
+	// Clamp volume
+	if (volume > 100) volume = 100;
+	if (volume < 0) volume = 0;
+
+	fluid_synth_set_gain(fs_synth, volume*0.01f);
+
+	return true;
 }
