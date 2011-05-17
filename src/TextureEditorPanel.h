@@ -21,6 +21,8 @@ protected:
 	wxStaticText*	label_current_zoom;
 	wxCheckBox*		cb_draw_outside;
 	wxCheckBox*		cb_blend_rgba;
+	wxStaticText*	label_viewtype;
+	wxChoice*		choice_viewtype;
 	CTextureCanvas*	tex_canvas;
 
 	// Texture controls

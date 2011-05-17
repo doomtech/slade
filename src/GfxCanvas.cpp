@@ -31,6 +31,7 @@
 #include "Main.h"
 #include "WxStuff.h"
 #include "GfxCanvas.h"
+#include "Drawing.h"
 
 
 /*******************************************************************
@@ -142,41 +143,12 @@ void GfxCanvas::drawOffsetLines() {
 		glEnd();
 	}
 	else if (view_type == GFXVIEW_HUD) {
-		COL_BLACK.set_gl();
-		double l = -160 * scale;
-		double r = 160 * scale;
-		double t = -100 * scale;
-		double b = 100 * scale;
-		double sb = 68 * scale;
-
-		glLineWidth(1.5f);
-		glBegin(GL_LINES);
-		// Left
-		glVertex2d(l, t);
-		glVertex2d(l, b);
-		// Bottom
-		glVertex2d(l, b);
-		glVertex2d(r, b);
-		// Right
-		glVertex2d(r, b);
-		glVertex2d(r, t);
-		// Top
-		glVertex2d(r, t);
-		glVertex2d(l, t);
-		glEnd();
-
-		glColor4f(0.0f, 0.0f, 0.0f, 0.6f);
-		glLineWidth(1.0f);
-		glBegin(GL_LINES);
-		// Statusbar
-		glVertex2d(l, sb);
-		glVertex2d(r, sb);
-		// Middle
-		glVertex2d(0, t);
-		glVertex2d(0, b);
-		glVertex2d(l, 0);
-		glVertex2d(r, 0);
-		glEnd();
+		glPushMatrix();
+		glEnable(GL_LINE_SMOOTH);
+		glScaled(scale, scale, 1);
+		Drawing::drawHud(true, true, false);
+		glDisable(GL_LINE_SMOOTH);
+		glPopMatrix();
 	}
 }
 
@@ -371,7 +343,7 @@ point2_t GfxCanvas::imageCoords(int x, int y) {
 	// Determine bottom-right coordinates of image in screen coords
 	double right = left + image->getWidth() * scale;
 	double bottom = top + image->getHeight() * scale;
-	
+
 	// Check if the pointer is within the image
 	if (x >= left && x <= right && y >= top && y <= bottom) {
 		// Determine where in the image it is
@@ -379,7 +351,7 @@ point2_t GfxCanvas::imageCoords(int x, int y) {
 		double h = bottom - top;
 		double xpos = double(x - left) / w;
 		double ypos = double(y - top) / h;
-		
+
 		return point2_t(xpos * image->getWidth(), ypos * image->getHeight());
 	}
 	else

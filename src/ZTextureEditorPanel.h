@@ -54,6 +54,7 @@ public:
 
 	// Events
 	void	onCBBlendRGBAChanged(wxCommandEvent& e);
+	void	onChoiceViewTypeSelected(wxCommandEvent& e);
 	void	onTexScaleXChanged(wxSpinDoubleEvent& e);
 	void	onTexScaleYChanged(wxSpinDoubleEvent& e);
 	void	onTexOffsetXChanged(wxSpinEvent& e);

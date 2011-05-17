@@ -101,8 +101,6 @@ EntryPanel::EntryPanel(wxWindow* parent, string id)
  * EntryPanel class destructor
  *******************************************************************/
 EntryPanel::~EntryPanel() {
-	if (menu_custom)
-		delete menu_custom;
 }
 
 /* EntryPanel::setModified

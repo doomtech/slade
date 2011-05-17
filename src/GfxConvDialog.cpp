@@ -142,6 +142,17 @@ bool GfxConvDialog::nextItem() {
 	combo_target_format->SetSelection(current_index);
 	current_format = conv_formats[current_index];
 
+	// Setup current format string
+	string fmt_string = "Current Format: ";
+	fmt_string += items[current_item].image.getFormat()->getName();
+	if (items[current_item].image.getType() == RGBA)
+		fmt_string += " (Truecolour)";
+	else if (items[current_item].image.getType() == PALMASK)
+		fmt_string += " (Paletted)";
+	else if (items[current_item].image.getType() == ALPHAMAP)
+		fmt_string += " (Alpha Map)";
+	label_current_format->SetLabel(fmt_string);
+
 	// Update UI
 	updatePreviewGfx();
 	theSplashWindow->setProgressMessage(S_FMT("%d of %d", current_item, items.size()));
@@ -157,13 +168,14 @@ void GfxConvDialog::setupLayout() {
 	wxBoxSizer* m_vbox = new wxBoxSizer(wxVERTICAL);
 	SetSizer(m_vbox);
 
-	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
-	m_vbox->Add(hbox, 0, wxEXPAND|wxTOP|wxLEFT|wxRIGHT, 4);
+	// Add current format label
+	label_current_format = new wxStaticText(this, -1, "Current Format:");
+	m_vbox->Add(label_current_format, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 8);
 
 	// Add 'Convert To' combo box
+	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
+	m_vbox->Add(hbox, 0, wxEXPAND|wxTOP|wxLEFT|wxRIGHT, 4);
 	hbox->Add(new wxStaticText(this, -1, "Convert to:"), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-
-	// This must remain in sync with the ConversionFormat enum in the header
 	combo_target_format = new wxChoice(this, -1);
 	hbox->Add(combo_target_format, 1, wxEXPAND|wxALL, 4);
 

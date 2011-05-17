@@ -62,6 +62,7 @@ private:
 	vector<conv_format_t>	conv_formats;
 	conv_format_t			current_format;
 
+	wxStaticText*	label_current_format;
 	GfxCanvas*		gfx_current;
 	GfxCanvas*		gfx_target;
 	wxButton*		btn_convert;

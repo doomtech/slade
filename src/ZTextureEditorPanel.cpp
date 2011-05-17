@@ -95,10 +95,13 @@ wxPanel* ZTextureEditorPanel::createTextureControls(wxWindow* parent) {
 
 	// This stuff should be in the constructor really, but can't (it crashes)
 
-	// Show the 'Truecolour Preview' checkbox
+	// Show extra view options
 	cb_blend_rgba->Show(true);
+	choice_viewtype->Show(true);
+	label_viewtype->Show(true);
 	// Bind events
 	cb_blend_rgba->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &ZTextureEditorPanel::onCBBlendRGBAChanged, this);
+	choice_viewtype->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &ZTextureEditorPanel::onChoiceViewTypeSelected, this);
 
 
 	return panel;
@@ -478,6 +481,14 @@ void ZTextureEditorPanel::onCBBlendRGBAChanged(wxCommandEvent& e) {
 
 	// Update UI
 	tex_canvas->redraw(true);
+}
+
+void ZTextureEditorPanel::onChoiceViewTypeSelected(wxCommandEvent& e) {
+	// Set offset type
+	tex_canvas->setViewType(choice_viewtype->GetSelection());
+
+	// Update UI
+	tex_canvas->redraw(false);
 }
 
 void ZTextureEditorPanel::onTexScaleXChanged(wxSpinDoubleEvent& e) {
