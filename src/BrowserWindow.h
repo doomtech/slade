@@ -43,10 +43,14 @@ private:
 protected:
 	BrowserTreeNode*	items_root;
 	wxBoxSizer*			sizer_bottom;
+	Palette8bit			palette;
 
 public:
 	BrowserWindow(wxWindow* parent);
 	~BrowserWindow();
+
+	Palette8bit*	getPalette() { return &palette; }
+	void			setPalette(Palette8bit* pal) { palette.copyPalette(pal); }
 
 	bool			addItem(BrowserItem* item, string where = "");
 	void			clearItems(BrowserTreeNode* node = NULL);

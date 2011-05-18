@@ -284,8 +284,10 @@ void BrowserWindow::openTree(BrowserTreeNode* node, bool clear) {
 		list.clear();
 
 	// Add all items in the node
-	for (unsigned a = 0; a < node->nItems(); a++)
+	for (unsigned a = 0; a < node->nItems(); a++) {
 		list.push_back(node->getItem(a));
+		node->getItem(a)->parent = this;
+	}
 
 	// Add all child nodes' items
 	for (unsigned a = 0; a < node->nChildren(); a++)
@@ -373,19 +375,3 @@ void BrowserWindow::onTextFilterChanged(wxCommandEvent& e) {
 	// Filter canvas items
 	canvas->filterItems(text_filter->GetValue());
 }
-
-/*
-CONSOLE_COMMAND(test_browser, 0) {
-	BrowserWindow* win = new BrowserWindow(NULL);
-
-	// Test
-	BrowserItem* bi = new BrowserItem("test");
-	win->addItem(bi, "Patches");
-	win->addItem(bi, "Patches/IWAD");
-	win->addItem(bi, "Patches/Custom");
-	win->addItem(bi, "Patches/Unknown");
-
-	win->populateItemTree();
-	win->Show(true);
-}
-*/

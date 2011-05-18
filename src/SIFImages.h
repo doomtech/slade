@@ -374,8 +374,8 @@ public:
 		return false;
 	}
 
-	imginfo_t getInfo(MemChunk& mc, int index) {
-		imginfo_t inf;
+	SImage::info_t getInfo(MemChunk& mc, int index) {
+		SImage::info_t inf;
 		inf.format = "png";
 		inf.width = 0;
 		inf.height = 0;
@@ -395,9 +395,11 @@ public:
 			inf.width = ihdr.width;
 			inf.height = ihdr.height;
 			bpp = ihdr.bpp;
-			if (ihdr.coltype == 3 && ihdr.bpp == 8)
+			if (ihdr.coltype == 3 && ihdr.bpp == 8) {
 				// Only 8bpp 'indexed' pngs are counted as PALMASK for now, all others will be converted to RGBA
 				inf.colformat = PALMASK;
+				inf.has_palette = true;
+			}
 			else
 				inf.colformat = RGBA;
 		}
@@ -439,7 +441,49 @@ public:
 	}
 
 	bool convertWritable(SImage& image, convert_options_t opt) {
-		// Any size/format image can be saved as png, no need for conversion
+		// Just convert to requested colour type
+
+		// Paletted
+		if (opt.col_format == PALMASK) {
+			// Convert colours
+			image.convertPaletted(opt.pal_target, opt.pal_current);
+
+			// Convert mask
+			if (opt.mask_source == MASK_ALPHA)
+				image.cutoffMask(opt.alpha_threshold);
+			else if (opt.mask_source == MASK_COLOUR)
+				image.maskFromColour(opt.mask_colour, opt.pal_current);
+			else
+				image.fillAlpha(255);
+		}
+
+		// RGBA
+		else if (opt.col_format == RGBA) {
+			image.convertRGBA(opt.pal_current);
+
+			// Convert alpha channel
+			if (opt.mask_source == MASK_COLOUR)
+				image.maskFromColour(opt.mask_colour, opt.pal_current);
+			else if (opt.mask_source == MASK_BRIGHTNESS)
+				image.maskFromBrightness(opt.pal_current);
+		}
+
+		// Alpha Map
+		else if (opt.col_format == ALPHAMAP) {
+			if (opt.mask_source == SIFormat::MASK_ALPHA)
+				image.convertAlphaMap(SImage::ALPHA, opt.pal_current);
+			else if (opt.mask_source == SIFormat::MASK_COLOUR) {
+				image.maskFromColour(opt.mask_colour, opt.pal_current);
+				image.convertAlphaMap(SImage::ALPHA, opt.pal_current);
+			}
+			else
+				image.convertAlphaMap(SImage::BRIGHTNESS, opt.pal_current);
+		}
+
+		// If transparency is disabled
+		if (!opt.transparency)
+			image.fillAlpha(255);
+
 		return true;
 	}
 };

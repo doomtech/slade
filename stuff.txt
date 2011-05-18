@@ -7,6 +7,7 @@
 
 Major Changes Since Last Version ----------------------------------------
 - Texture editor now supports ZDoom's enhanced TEXTURES format
+- Can now copy+paste textures between different TEXTUREx lists
 - New 'Graphic' menu for gfx entries, with some basic gfx editing functions
 - Typing the first few characters of an item to jump to it in lists has been re-implemented
 
@@ -14,20 +15,11 @@ Major Changes Since Last Version ----------------------------------------
 TODO List ---------------------------------------------------------------
 
 --- Before 3.0.2 ---
-- Finish TEXTURES editing:
-	- Support for textures-as-patches
-	- Offsets preview
-- (maybe) Copy+paste for textures
-- (maybe) Generic DataEntryPanel
-- Clean up sources somewhat
 - Status bar stuff for other EntryPanels and Texture editor
-- AudioEntryPanel improvements
-	- Autoplay option
-- Finish moving SImageFormats.cpp stuff over to SIFormat system
+- (maybe) Use SIFormat system to implement generic 'export as' for image entries
+- (maybe) Generic DataEntryPanel
 
 --- Bugs ---
-- Audio player issues
-- Temp file not deleted on zip save
 
 --- Minor Problems/Annoyances ---
 - Long calltips can extend off the edge of the screen
@@ -46,13 +38,18 @@ TODO List ---------------------------------------------------------------
 - 'Export As' for entries - does conversion+export
 
 --- Formats ---
-- 7z/bz2
+- 7z
+- Lzma/bz2 for zip
 
 --- Text Editor ---
 - 'Tabs as Spaces' option
 
 --- Gfx Editor ---
 - Basic pixel-drawing tools
+
+--- Audio ---
+- Mp3
+- Module formats (DUMB, maybe?)
 
 --- General ---
 - Preferences Dialog:
@@ -74,24 +71,21 @@ TODO List ---------------------------------------------------------------
 - Undo/Redo system
 	- Should be general enough to be used by the map editor also
 - Dynamic toolbars
-- Different icon sets (eg. one that has different entry type icons colour-coded)
+- Different icon sets
 - Better backup system
-- Gfx Conversion Dialog:
-	- 'Palette' labels w/palette selection dropdowns
-	- Show current format
 - More drag-and-drop support
 - Rewrite VirtualListView with item filtering/sorting in mind
 
 
 --- Internal / Dev ---
 - SFont class
-- Graphical browser
 - Ability to set an archive never to read entry data into memory (read data from the file every time)
 - MemChunk subclass that deals with a file rather than a memory block
 - Some lump (sub)formats can only be identified properly from the presence of other lumps; e.g. GL nodes and THINGS/LINEDEFS
-- Needs some kind of proper archive type system, handled by ArchiveManager
+- Needs some kind of proper archive type system, handled by ArchiveManager (similar to SIFormat)
 - Need to do something about keeping ArchiveEntry.data.size and ArchiveEntry.size in sync
   (Still need the size member for entries that don't have their data loaded into memory yet)
+  (could make ArchiveEntry a subclass of MemChunk?)
 - Better SImage format stuff
 	- Needs ability to get an image's properties without actually loading it
 	- Image format detection in SImage class
@@ -99,6 +93,7 @@ TODO List ---------------------------------------------------------------
 - Better way to get the currently selected entries would be nice
 - Should probably write my own lexer for TextEditor since the default cpp/cppnocase ones are somewhat limited
 - Implement custom replacement for wxFileName that allows fast matching against name/extension etc
+- Multithreaded entry type detection?
 
 
 
@@ -124,9 +119,7 @@ Unimplemented Feature Requests ------------------------------------------
 
 --- TEXTUREx Editor ---
 - list textures and patches in alphabetical order (with non-iwad ones at the bottom of the list)
-- ability to copy/paste textures (with patches), including between different TEXTUREx entries
 - find/replace for patches
-- Visual TEXTURES (zdoom format) editor (with the possibility to still edit as text)
 - Ability to convert composite texture to single image
 - Ability to search for a texture containing a specific patch
 
@@ -182,23 +175,3 @@ Ideas / Possible Features -----------------------------------------------
 
 
 Other / Notes -----------------------------------------------------------
-
-Menu ids:
-Main Window menubar:				0	->	199
-ArchivePanel context menu items:	200	->	299
-GfxEntryPanel custom menu items:	300	->	399
-TEXTUREx Editor:					400	->	599
-
-
-
-Completed Feature Requests ----------------------------------------------
-
-- In the image viewer, a drop-down list for display method: automatic (let the program determine), world sprite (with the crossed axes), hud sprite (in the box), graphics (without axes nor box). The automatic selection, based on offset values, isn't always accurate.
-- Still in the image viewer, another drop-down list which lets you select which palette to use, from a list of named palettes that you can create elsewhere. (I imagine a res/palette folder in which we could just export PLAYPAL lumps, giving them names like "Doom.pal", "Heretic.pal", "Simplicity.pal" etc.) With of course a default to use the PLAYPAL from the current file, if any, or that of the selected main iwad. But we'd get to change it if so we want.
-- Palette conversion
-- When converting a picture to PNG, having the choice between indexed colors + alpha or full colors + alpha.- Finish gfx panel (zoom, offset editing)
-- Copy/Cut/Paste entries
-- mass rename (XWE)
-- lump name search
-- Confirm dialog for entry deletion
-- SLumpEd style mass rename option

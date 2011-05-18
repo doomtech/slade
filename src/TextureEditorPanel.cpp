@@ -61,6 +61,10 @@ TextureEditorPanel::TextureEditorPanel(wxWindow* parent, TextureXEditor* tx_edit
 TextureEditorPanel::~TextureEditorPanel() {
 }
 
+/* TextureEditorPanel::setupLayout
+ * Initialises the panel layout (must be called after the constructor
+ * to work correctly for ZTextureEditorPanel)
+ *******************************************************************/
 void TextureEditorPanel::setupLayout() {
 	// Setup sizer
 	wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
@@ -85,6 +89,16 @@ void TextureEditorPanel::setupLayout() {
 
 	hbox->AddStretchSpacer();
 
+	// Offset view type menu
+	string otypes[] = { "None", "Sprite", "HUD" };
+	choice_viewtype = new wxChoice(this, -1, wxDefaultPosition, wxDefaultSize, 3, otypes);
+	label_viewtype = new wxStaticText(this, -1, "Offset Type:");
+	hbox->Add(label_viewtype, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
+	hbox->Add(choice_viewtype, 0, wxEXPAND|wxRIGHT, 8);
+	choice_viewtype->SetSelection(0);
+	choice_viewtype->Show(false); // Only show this on ZTextureEditorPanel
+	label_viewtype->Show(false);
+
 	// 'Truecolour Preview' checkbox
 	cb_blend_rgba = new wxCheckBox(this, -1, "Truecolour Preview");
 	cb_blend_rgba->SetValue(false);
@@ -98,6 +112,7 @@ void TextureEditorPanel::setupLayout() {
 
 	// Add texture canvas
 	tex_canvas = new CTextureCanvas(this, -1);
+	tex_canvas->setViewType(0);
 	vbox->Add(tex_canvas, 1, wxEXPAND|wxALL, 4);
 
 	// Add texture controls
@@ -373,11 +388,12 @@ void TextureEditorPanel::updatePatchControls() {
 /* TextureEditorPanel::openTexture
  * Loads a TEXTUREX format texture into the editor
  *******************************************************************/
-bool TextureEditorPanel::openTexture(CTexture* tex) {
+bool TextureEditorPanel::openTexture(CTexture* tex, TextureXList* list) {
 	// Set as current texture
 	if (!tex_current)
 		tex_current = new CTexture();
 	tex_current->copyTexture(tex);
+	tex_current->setList(list);
 
 	// Open texture in canvas
 	tex_canvas->openTexture(tex_current, tx_editor->getArchive());
@@ -777,7 +793,7 @@ void TextureEditorPanel::onTexCanvasKeyDown(wxKeyEvent& e) {
 	int y_movement = 0;
 	bool move = false;
 	if (e.GetKeyCode() == WXK_UP) {
-		if (e.GetModifiers() == wxMOD_CONTROL)
+		if (e.GetModifiers() == wxMOD_CMD)
 			y_movement = -1;
 		else
 			y_movement = -8;
@@ -785,7 +801,7 @@ void TextureEditorPanel::onTexCanvasKeyDown(wxKeyEvent& e) {
 		move = true;
 	}
 	else if (e.GetKeyCode() == WXK_DOWN) {
-		if (e.GetModifiers() == wxMOD_CONTROL)
+		if (e.GetModifiers() == wxMOD_CMD)
 			y_movement = 1;
 		else
 			y_movement = 8;
@@ -793,7 +809,7 @@ void TextureEditorPanel::onTexCanvasKeyDown(wxKeyEvent& e) {
 		move = true;
 	}
 	else if (e.GetKeyCode() == WXK_LEFT) {
-		if (e.GetModifiers() == wxMOD_CONTROL)
+		if (e.GetModifiers() == wxMOD_CMD)
 			x_movement = -1;
 		else
 			x_movement = -8;
@@ -801,7 +817,7 @@ void TextureEditorPanel::onTexCanvasKeyDown(wxKeyEvent& e) {
 		move = true;
 	}
 	else if (e.GetKeyCode() == WXK_RIGHT) {
-		if (e.GetModifiers() == wxMOD_CONTROL)
+		if (e.GetModifiers() == wxMOD_CMD)
 			x_movement = 1;
 		else
 			x_movement = 8;
@@ -825,14 +841,14 @@ void TextureEditorPanel::onTexCanvasKeyDown(wxKeyEvent& e) {
 	}
 
 	// Replace patch (Ctrl+R or F2)
-	else if ((e.GetKeyCode() == 'R' && e.GetModifiers() == wxMOD_CONTROL) || (e.GetKeyCode() == WXK_F2)) {
+	else if ((e.GetKeyCode() == 'R' && e.GetModifiers() == wxMOD_CMD) || (e.GetKeyCode() == WXK_F2)) {
 		hack_nodrag = true;
 		replacePatch();
 		handled = true;
 	}
 
 	// Duplicate patch (Ctrl+D)
-	else if (e.GetKeyCode() == 'D' && e.GetModifiers() == wxMOD_CONTROL) {
+	else if (e.GetKeyCode() == 'D' && e.GetModifiers() == wxMOD_CMD) {
 		duplicatePatch();
 		handled = true;
 	}

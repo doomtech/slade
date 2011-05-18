@@ -212,6 +212,37 @@ void ResourceManager::addEntry(ArchiveEntry* entry) {
 	// Check for patch entry
 	if (type->extraProps().propertyExists("patch"))
 		patches[name].add(entry);
+
+	// Check for TEXTUREx entry
+	int txentry = 0;
+	if (type->getId() == "texturex")
+		txentry = 1;
+	else if (type->getId() == "zdtextures")
+		txentry = 2;
+	if (txentry > 0) {
+		// Load patch table if needed
+		PatchTable ptable;
+		if (txentry == 1) {
+			Archive::search_options_t opt;
+			opt.match_type = EntryType::getType("pnames");
+			ArchiveEntry* pnames = entry->getParent()->findLast(opt);
+			ptable.loadPNAMES(pnames, entry->getParent());
+		}
+
+		// Read texture list
+		TextureXList tx;
+		if (txentry == 1)
+			tx.readTEXTUREXData(entry, ptable);
+		else
+			tx.readTEXTURESData(entry);
+
+		// Add all textures to resources
+		CTexture* tex = NULL;
+		for (unsigned a = 0; a < tx.nTextures(); a++) {
+			tex = tx.getTexture(a);
+			textures[tex->getName()].add(tex, entry->getParent());
+		}
+	}
 }
 
 /* ResourceManager::removeEntry
@@ -223,6 +254,26 @@ void ResourceManager::removeEntry(ArchiveEntry* entry) {
 
 	// Remove from patches
 	patches[name].remove(entry);
+
+	// Check for TEXTUREx entry
+	int txentry = 0;
+	if (entry->getType()->getId() == "texturex")
+		txentry = 1;
+	else if (entry->getType()->getId() == "zdtextures")
+		txentry = 2;
+	if (txentry > 0) {
+		// Read texture list
+		TextureXList tx;
+		PatchTable ptable;
+		if (txentry == 1)
+			tx.readTEXTUREXData(entry, ptable);
+		else
+			tx.readTEXTURESData(entry);
+
+		// Remove all texture resources
+		for (unsigned a = 0; a < tx.nTextures(); a++)
+			textures[tx.getTexture(a)->getName()].remove(entry->getParent());
+	}
 }
 
 /* ResourceManager::listAllPatches
@@ -274,6 +325,47 @@ void ResourceManager::getAllPatchEntries(vector<ArchiveEntry*>& list, Archive* p
 	}
 }
 
+/* ResourceManager::getAllTextures
+ * Adds all current textures to [list]
+ *******************************************************************/
+void ResourceManager::getAllTextures(vector<TextureResource::tex_res_t>& list, Archive* priority, Archive* ignore) {
+	TextureResourceMap::iterator i = textures.begin();
+
+	// Add all primary textures to the list
+	while (i != textures.end()) {
+		// Skip if no entries
+		if (i->second.length() == 0) {
+			i++;
+			continue;
+		}
+
+		// Go through resource textures
+		//ArchiveEntry* entry = i->second.entries[0];
+		TextureResource::tex_res_t res = i->second.textures[0];
+		for (int a = 0; a < i->second.length(); a++) {
+			res = i->second.textures[a];
+
+			// Skip if it's in the 'ignore' archive
+			if (res.parent == ignore)
+				continue;
+
+			// If it's in the 'priority' archive, exit loop
+			if (priority && i->second.textures[a].parent == priority)
+				break;
+
+			// Otherwise, if it's in a 'later' archive than the current resource, set it
+			if (theArchiveManager->archiveIndex(res.parent) <=
+				theArchiveManager->archiveIndex(i->second.textures[a].parent))
+				res = i->second.textures[a];
+		}
+
+		// Add texture resource to the list
+		list.push_back(res);
+
+		i++;
+	}
+}
+
 /* ResourceManager::getPatchEntry
  * Returns the most appropriate managed resource entry for [patch],
  * or NULL if no match found
@@ -291,7 +383,7 @@ ArchiveEntry* ResourceManager::getPatchEntry(string patch, string nspace, Archiv
 		if (nspace.IsEmpty() || res.entries[a]->isInNamespace(nspace)) {
 			// If it's in the 'priority' archive, return it
 			if (priority && res.entries[a]->getParent() == priority)
-				return entry;
+				return res.entries[a];
 
 			// Otherwise, if it's in a 'later' archive than the current resource entry, set it
 			if (theArchiveManager->archiveIndex(entry->getParent()) <=
@@ -304,6 +396,40 @@ ArchiveEntry* ResourceManager::getPatchEntry(string patch, string nspace, Archiv
 	return entry;
 }
 
+/* ResourceManager::getTexture
+ * Returns the most appropriate managed texture for [texture], or
+ * NULL if no match found
+ *******************************************************************/
+CTexture* ResourceManager::getTexture(string texture, Archive* priority, Archive* ignore) {
+	// Check texture resource with matching name exists
+	TextureResource& res = textures[texture];
+	if (res.length() == 0)
+		return NULL;
+
+	// Go through resource textures
+	CTexture* tex = res.textures[0].tex;
+	Archive* parent = res.textures[0].parent;
+	for (unsigned a = 0; a < res.textures.size(); a++) {
+		// Skip if it's in the 'ignore' archive
+		if (parent == ignore)
+			continue;
+
+		// If it's in the 'priority' archive, return it
+		if (priority && res.textures[a].parent == priority)
+			return res.textures[a].tex;
+
+		// Otherwise, if it's in a 'later' archive than the current resource entry, set it
+		if (theArchiveManager->archiveIndex(parent) <=
+			theArchiveManager->archiveIndex(res.textures[a].parent)) {
+			tex = res.textures[a].tex;
+			parent = res.textures[a].parent;
+		}
+	}
+
+	// Return the most relevant texture
+	return tex;
+}
+
 /* ResourceManager::onAnnouncement
  * Called when an announcement is recieved from any managed archive
  *******************************************************************/
@@ -312,10 +438,8 @@ void ResourceManager::onAnnouncement(Announcer* announcer, string event_name, Me
 
 	// An entry is modified
 	if (event_name == "entry_state_changed") {
-		uint32_t index;
 		wxUIntPtr ptr;
-		event_data.read(&index, sizeof(uint32_t));
-		event_data.read(&ptr, sizeof(wxUIntPtr));
+		event_data.read(&ptr, sizeof(wxUIntPtr), 4);
 		ArchiveEntry* entry = (ArchiveEntry*)wxUIntToPtr(ptr);
 		removeEntry(entry);
 		addEntry(entry);
@@ -324,12 +448,19 @@ void ResourceManager::onAnnouncement(Announcer* announcer, string event_name, Me
 
 	// An entry is removed or renamed
 	if (event_name == "entry_removing" || event_name == "entry_renaming") {
-		int index;
 		wxUIntPtr ptr;
-		event_data.read(&index, sizeof(int));
-		event_data.read(&ptr, sizeof(wxUIntPtr));
+		event_data.read(&ptr, sizeof(wxUIntPtr), sizeof(int));
 		ArchiveEntry* entry = (ArchiveEntry*)wxUIntToPtr(ptr);
 		removeEntry(entry);
+		announce("resources_updated");
+	}
+
+	// An entry is added
+	if (event_name == "entry_added") {
+		wxUIntPtr ptr;
+		event_data.read(&ptr, sizeof(wxUIntPtr), 4);
+		ArchiveEntry* entry = (ArchiveEntry*)wxUIntToPtr(ptr);
+		addEntry(entry);
 		announce("resources_updated");
 	}
 }

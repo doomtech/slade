@@ -38,6 +38,7 @@
 #include "ArchiveManager.h"
 #include "ResourceManager.h"
 #include "Misc.h"
+#include "CTexture.h"
 
 
 /*******************************************************************
@@ -47,10 +48,11 @@
 /* PatchBrowserItem::PatchBrowserItem
  * PatchBrowserItem class constructor
  *******************************************************************/
-PatchBrowserItem::PatchBrowserItem(string name, ArchiveEntry* entry, unsigned index) : BrowserItem(name, index) {
+PatchBrowserItem::PatchBrowserItem(string name, Archive* archive, uint8_t type, string nspace, unsigned index) : BrowserItem(name, index, "patch") {
 	// Init variables
-	this->entry = entry;
-	this->palette = NULL;
+	this->archive = archive;
+	this->type = type;
+	this->nspace = nspace;
 }
 
 /* PatchBrowserItem::~PatchBrowserItem
@@ -63,21 +65,34 @@ PatchBrowserItem::~PatchBrowserItem() {
  * Loads the item's image from its associated entry (if any)
  *******************************************************************/
 bool PatchBrowserItem::loadImage() {
-	// Do nothing if no patch entry found
-	if (!entry)
-		return false;
+	SImage img;
 
-	// Load image from entry if it exists
-	SImage* temp_image = new SImage();
-	Misc::loadImageFromEntry(temp_image, entry);
+	// Load patch image
+	if (type == 0) {
+		// Find patch entry
+		ArchiveEntry* entry = theResourceManager->getPatchEntry(name, nspace, archive);
 
-	// Load texture from image
-	bool ok = image.loadImage(temp_image, palette);
+		// Load entry to image, if it exists
+		if (entry)
+			Misc::loadImageFromEntry(&img, entry);
+		else
+			return false;
+	}
 
-	// Clean up
-	delete temp_image;
+	// Or, load texture image
+	if (type == 1) {
+		// Find texture
+		CTexture* tex = theResourceManager->getTexture(name, archive);
 
-	return ok;
+		// Load texture to image, if it exists
+		if (tex)
+			tex->toImage(img, archive, parent->getPalette());
+		else
+			return false;
+	}
+
+	// Create gl texture from image
+	return image.loadImage(&img, parent->getPalette());
 }
 
 
@@ -121,11 +136,6 @@ bool PatchBrowser::openPatchTable(PatchTable* table) {
 	// Clear any existing browser items
 	clearItems();
 
-	// Init browser tree
-	items_root->addChild("Base");
-	items_root->addChild("Archive");
-	items_root->addChild("Unknown");
-
 	// Setup palette chooser
 	theMainWindow->getPaletteChooser()->setGlobalFromArchive(table->getParent());
 
@@ -144,16 +154,12 @@ bool PatchBrowser::openPatchTable(PatchTable* table) {
 		if (entry) {
 			Archive* parent_archive = entry->getParent();
 
-			// If it's the base resource archive, put it under 'IWAD', otherwise 'Custom'
-			if (parent_archive == theArchiveManager->baseResourceArchive())
-				whereis = "Base";
-			else
-				whereis = "Archive";
+			if (parent_archive)
+				whereis = parent_archive->getFilename(false);
 		}
 
 		// Add it
-		PatchBrowserItem* item = new PatchBrowserItem(patch.name, entry, a);
-		item->setPalette(theMainWindow->getPaletteChooser()->getSelectedPalette());
+		PatchBrowserItem* item = new PatchBrowserItem(patch.name, entry->getParent(), 0, "", a);
 		addItem(item, whereis);
 	}
 
@@ -171,6 +177,10 @@ bool PatchBrowser::openPatchTable(PatchTable* table) {
 	return true;
 }
 
+/* PatchBrowser::openArchive
+ * Opens all loaded resource patches and textures, prioritising those
+ * from [archive]
+ *******************************************************************/
 bool PatchBrowser::openArchive(Archive* archive) {
 	// Check archive was given
 	if (!archive)
@@ -202,25 +212,37 @@ bool PatchBrowser::openArchive(Archive* archive) {
 
 		// Check entry namespace
 		string ns = entry->getParent()->detectNamespace(entry);
-		if (ns == "patches") ns = "Patches";
-		else if (ns == "sprites") ns = "Sprites";
-		else if (ns == "textures") ns = "Textures";
-		else ns = "Graphics";
+		string nspace;
+		if (ns == "patches") nspace = "Patches";
+		else if (ns == "sprites") nspace = "Sprites";
+		else if (ns == "textures") nspace = "Textures";
+		else nspace = "Graphics";
 
 		// Check entry parent archive
 		string arch = "Unknown";
-		if (entry->getParent() == theArchiveManager->baseResourceArchive())
-			arch = "Base";
-		else if (entry->getParent() == archive)
-			arch = "Archive";
-		else
-			arch = "Other";
+		if (entry->getParent())
+			arch = entry->getParent()->getFilename(false);
 
 		// Add it
-		PatchBrowserItem* item = new PatchBrowserItem(entry->getName(true).Truncate(8).Upper(), entry, a);
-		item->setPalette(theMainWindow->getPaletteChooser()->getSelectedPalette());
-		addItem(item, ns + "/" + arch);
+		PatchBrowserItem* item = new PatchBrowserItem(entry->getName(true).Truncate(8).Upper(), archive, 0, ns);
+		addItem(item, nspace + "/" + arch);
 	}
+
+	// Get list of all available textures
+	vector<TextureResource::tex_res_t> textures;
+	theResourceManager->getAllTextures(textures, archive);
+
+	// Go through the list
+	for (unsigned a = 0; a < textures.size(); a++) {
+		TextureResource::tex_res_t& res = textures[a];
+		
+		// Create browser item
+		PatchBrowserItem* item = new PatchBrowserItem(res.tex->getName(), res.parent, 1);
+
+		// Add to textures node (under parent archive name)
+		addItem(item, "Textures/" + res.parent->getFilename(false));
+	}
+	// TODO: Ignore textures in the current list (or archive?)
 
 	// Open 'patches' node
 	openTree((BrowserTreeNode*)items_root->getChild("Patches"));
@@ -245,30 +267,6 @@ int PatchBrowser::getSelectedPatch() {
 		return -1;
 }
 
-/* PatchBrowser::updateItems
- * Updates the palette and entry for each browser item
- *******************************************************************/
-void PatchBrowser::updateItems(BrowserTreeNode* node) {
-	// Root node if none given
-	if (!node)
-		node = items_root;
-
-	// Go through items
-	for (unsigned a = 0; a < node->nItems(); a++) {
-		PatchBrowserItem* item = (PatchBrowserItem*)node->getItem(a);
-
-		// Update palette
-		item->setPalette(theMainWindow->getPaletteChooser()->getSelectedPalette());
-
-		// Update image entry
-		item->setEntry(theResourceManager->getPatchEntry(item->getName()));
-	}
-
-	// Go through child nodes and update their items
-	for (unsigned a = 0; a < node->nChildren(); a++)
-		updateItems((BrowserTreeNode*)node->getChild(a));
-}
-
 /* PatchBrowser::onAnnouncement
  * Handles any announcements
  *******************************************************************/
@@ -277,8 +275,10 @@ void PatchBrowser::onAnnouncement(Announcer* announcer, string event_name, MemCh
 		return;
 
 	if (event_name == "main_palette_changed") {
-		// Update all item palettes and reload them
-		updateItems();
+		// Update palette
+		palette.copyPalette(theMainWindow->getPaletteChooser()->getSelectedPalette());
+
+		// Reload all items
 		reloadItems();
 		Refresh();
 	}

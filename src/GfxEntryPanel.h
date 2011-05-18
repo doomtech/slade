@@ -7,6 +7,7 @@
 #include "MainApp.h"
 #include "Translation.h"
 #include <wx/spinctrl.h>
+#include <wx/choice.h>
 
 class GfxEntryPanel : public EntryPanel, SActionHandler {
 private:
@@ -16,7 +17,7 @@ private:
 	GfxCanvas*		gfx_canvas;
 	wxSlider*		slider_zoom;
 	wxStaticText*	label_current_zoom;
-	wxComboBox*		combo_offset_type;
+	wxChoice*		choice_offset_type;
 	wxSpinCtrl*		spin_xoffset;
 	wxSpinCtrl*		spin_yoffset;
 	wxCheckBox*		cb_tile;

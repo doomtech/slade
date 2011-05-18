@@ -43,13 +43,13 @@ protected:
 					img_mask[i] = 255;
 			}
 		}
-		
+
 		// Intensity map
 		else if (mode == QUAKE_INTENSITY) {
 			// Read raw pixel data
 			memcpy(img_data, data.getData()+8, width * height);
 		}
-		
+
 		// Paletted image + alpha channel (i think?)
 		else if (mode == QUAKE_ALPHA) {
 			// Read raw pixel data
@@ -58,7 +58,7 @@ protected:
 				img_mask[i/2] = data[i+9];
 			}
 		}
-		
+
 		// 24bit (RGB)
 		else if (mode == QUAKE_RGB24) {
 			// Read raw pixel data
@@ -69,7 +69,7 @@ protected:
 				img_data[(i/3)*4+3] = 255;
 			}
 		}
-		
+
 		// 32bit (RGBA)
 		else if (mode == QUAKE_RGB32) {
 			// Read raw pixel data
@@ -78,28 +78,28 @@ protected:
 
 		return true;
 	}
-	
+
 public:
-	SIFQuakeGfx() : SIFormat("img_quake") {
+	SIFQuakeGfx() : SIFormat("quake") {
 		name = "Quake Gfx";
 		extension = "dat";
 	}
 	~SIFQuakeGfx() {}
-	
+
 	bool isThisFormat(MemChunk& mc) {
 		if (EntryDataFormat::getFormat("img_quake")->isThisFormat(mc))
 			return true;
 		else
 			return false;
 	}
-	
-	imginfo_t getInfo(MemChunk& mc, int index) {
-		imginfo_t info;
-		
+
+	SImage::info_t getInfo(MemChunk& mc, int index) {
+		SImage::info_t info;
+
 		// Get image properties
 		info.width = wxINT16_SWAP_ON_BE(*(const uint16_t*)(mc.getData()));
 		info.height = wxINT16_SWAP_ON_BE(*(const uint16_t*)(mc.getData()+4));
-		
+
 		// Determine colour type
 		info.colformat = RGBA;
 		uint8_t mode = mc[3];
@@ -107,16 +107,16 @@ public:
 			info.colformat = PALMASK;
 		else if (mode == QUAKE_INTENSITY)
 			info.colformat = ALPHAMAP;
-		
+
 		info.format = id;
-		
+
 		return info;
 	}
 };
 
 class SIFQuakeSprite : public SIFormat {
 private:
-	unsigned sprInfo(MemChunk& mc, int index, imginfo_t& info) {
+	unsigned sprInfo(MemChunk& mc, int index, SImage::info_t& info) {
 		// Setup variables
 		uint32_t maxheight	= READ_L32(mc.getData(), 16);
 		uint32_t maxwidth	= READ_L32(mc.getData(), 20);
@@ -193,7 +193,7 @@ private:
 protected:
 	bool readImage(SImage& image, MemChunk& data, int index) {
 		// Get image info
-		imginfo_t info;
+		SImage::info_t info;
 		unsigned imgofs = sprInfo(data, index, info);
 
 		// Check data is valid
@@ -217,26 +217,26 @@ protected:
 
 		return true;
 	}
-	
+
 public:
-	SIFQuakeSprite() : SIFormat("img_qspr") {
+	SIFQuakeSprite() : SIFormat("qspr") {
 		name = "Quake Sprite";
 		extension = "dat";
 	}
 	~SIFQuakeSprite() {}
-	
+
 	bool isThisFormat(MemChunk& mc) {
 		if (EntryDataFormat::getFormat("img_qspr")->isThisFormat(mc))
 			return true;
 		else
 			return false;
 	}
-	
-	imginfo_t getInfo(MemChunk& mc, int index) {
+
+	SImage::info_t getInfo(MemChunk& mc, int index) {
 		// Get image info
-		imginfo_t info;
+		SImage::info_t info;
 		sprInfo(mc, index, info);
-		
+
 		return info;
 	}
 };
@@ -245,7 +245,7 @@ class SIFQuakeTex : public SIFormat {
 protected:
 	bool readImage(SImage& image, MemChunk& data, int index) {
 		// Get image info
-		imginfo_t info = getInfo(data, index);
+		SImage::info_t info = getInfo(data, index);
 
 		// Find offset
 		uint32_t imgofs = READ_L32(data.getData(), 24+(index<<2));
@@ -259,28 +259,29 @@ protected:
 
 		return true;
 	}
-	
+
 	bool writeImage(SImage& image, MemChunk& out, Palette8bit* pal, int index) {
 		return false;
 	}
-	
+
 public:
-	SIFQuakeTex() : SIFormat("img_quaketex") {
+	SIFQuakeTex() : SIFormat("quaketex") {
 		name = "Quake Texture";
 		extension = "dat";
+		reliability = 11;
 	}
 	~SIFQuakeTex() {}
-	
+
 	bool isThisFormat(MemChunk& mc) {
 		if (EntryDataFormat::getFormat("img_quaketex")->isThisFormat(mc))
 			return true;
 		else
 			return false;
 	}
-	
-	imginfo_t getInfo(MemChunk& mc, int index) {
-		imginfo_t info;
-		
+
+	SImage::info_t getInfo(MemChunk& mc, int index) {
+		SImage::info_t info;
+
 		// Setup variables
 		info.numimages = 4;
 		info.colformat = PALMASK;
@@ -298,7 +299,7 @@ public:
 			info.width  >>= index;
 			info.height >>= index;
 		}
-		
+
 		return info;
 	}
 };
@@ -307,7 +308,7 @@ class SIFQuake2Wal : public SIFormat {
 protected:
 	bool readImage(SImage& image, MemChunk& data, int index) {
 		// Get image info
-		imginfo_t info = getInfo(data, index);
+		SImage::info_t info = getInfo(data, index);
 
 		// Sanitize index if needed
 		index %= info.numimages;
@@ -330,31 +331,32 @@ protected:
 
 		return true;
 	}
-	
+
 public:
-	SIFQuake2Wal() : SIFormat("img_quake2wal") {
+	SIFQuake2Wal() : SIFormat("quake2wal") {
 		name = "Quake II Wall";
 		extension = "dat";
+		reliability = 21;
 	}
 	~SIFQuake2Wal() {}
-	
+
 	bool isThisFormat(MemChunk& mc) {
 		if (EntryDataFormat::getFormat("img_quake2wal")->isThisFormat(mc))
 			return true;
 		else
 			return false;
 	}
-	
-	imginfo_t getInfo(MemChunk& mc, int index) {
-		imginfo_t info;
-		
+
+	SImage::info_t getInfo(MemChunk& mc, int index) {
+		SImage::info_t info;
+
 		// Get image info
 		info.colformat = PALMASK;
 		info.numimages = 4;
 		info.width = READ_L32(mc.getData(), 32) >> index;
 		info.height = READ_L32(mc.getData(), 36) >> index;
 		info.format = id;
-		
+
 		return info;
 	}
 };

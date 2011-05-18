@@ -205,7 +205,7 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 
 	// Add default entry panel
 	cur_area = entry_area;
-	m_hbox->Add(cur_area, 1, wxEXPAND | wxALL, 4);
+	m_hbox->Add(cur_area, 1, wxEXPAND);
 	cur_area->Show(true);
 
 	// Bind events
@@ -218,7 +218,6 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
 	choice_category->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &ArchivePanel::onChoiceCategoryChanged, this);
 	Bind(EVT_AEL_DIR_CHANGED, &ArchivePanel::onDirChanged, this);
 	btn_updir->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &ArchivePanel::onBtnUpDir, this);
-	Bind(wxEVT_SHOW, &ArchivePanel::onShow, this);
 	((DefaultEntryPanel*)default_area)->getEditTextButton()->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &ArchivePanel::onDEPEditAsText, this);
 	((DefaultEntryPanel*)default_area)->getViewHexButton()->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &ArchivePanel::onDEPViewAsHex, this);
 
@@ -263,6 +262,9 @@ bool ArchivePanel::saveEntryChanges() {
 	return cur_area->saveEntry();
 }
 
+/* ArchivePanel::addMenus
+ * Adds the 'Archive' and 'Entry' menus to the main window menubar
+ *******************************************************************/
 void ArchivePanel::addMenus() {
 	// Create menus if needed
 	if (!menu_archive) {
@@ -305,10 +307,14 @@ void ArchivePanel::addMenus() {
 	cur_area->addCustomMenu();
 }
 
+/* ArchivePanel::removeMenus
+ * Removes the 'Archive' and 'Entry' menus from the main window
+ * menubar
+ *******************************************************************/
 void ArchivePanel::removeMenus() {
 	// Remove ArchivePanel menus from the main window menubar
-	theMainWindow->removeCustomMenu("&Archive");
-	theMainWindow->removeCustomMenu("&Entry");
+	theMainWindow->removeCustomMenu(menu_archive);
+	theMainWindow->removeCustomMenu(menu_entry);
 	cur_area->removeCustomMenu();
 }
 
@@ -746,6 +752,20 @@ bool ArchivePanel::bookmark() {
 		return false;
 }
 
+/* ArchivePanel::openTab
+ * Opens currently selected entries in separate tabs
+ *******************************************************************/
+bool ArchivePanel::openTab() {
+	// Get selected entries
+	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
+
+	// Open each in it's own tab
+	for (unsigned a = 0; a < selection.size(); a++)
+		theMainWindow->openEntry(selection[a]);
+
+	return true;
+}
+
 /* ArchivePanel::convertEntryTo
  * Not implemented
  *******************************************************************/
@@ -869,10 +889,8 @@ bool ArchivePanel::copyEntry() {
 	// Get a list of selected directories
 	vector<ArchiveTreeNode*> dirs = entry_list->getSelectedDirectories();
 
-	// If something is selected, clear the clipboard
-	if (entries.size() > 0 || dirs.size() > 0)
-		theClipboard->clear();
-	else
+	// Do nothing if nothing selected
+	if (entries.size() == 0 && dirs.size() == 0)
 		return false;
 
 	// Create clipboard item from selection
@@ -945,11 +963,38 @@ bool ArchivePanel::gfxConvert() {
 	// Create gfx conversion dialog
 	GfxConvDialog gcd;
 
-	// Send entries to the gcd
-	gcd.openEntries(entry_list->getSelectedEntries());
+	// Send selection to the gcd
+	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
+	gcd.openEntries(selection);
 
 	// Run the gcd
 	gcd.ShowModal();
+
+	// Show splash window
+	theSplashWindow->show("Writing converted image data...", true);
+
+	// Write any changes
+	for (unsigned a = 0; a < selection.size(); a++) {
+		// Update splash window
+		theSplashWindow->setProgressMessage(selection[a]->getName());
+		theSplashWindow->setProgress((float)a / (float)selection.size());
+
+		// Skip if the image wasn't converted
+		if (!gcd.itemModified(a))
+			continue;
+
+		// Get image and conversion info
+		SImage* image = gcd.getItemImage(a);
+		SIFormat* format = gcd.getItemFormat(a);
+		
+		// Write converted image back to entry
+		MemChunk mc;
+		format->saveImage(*image, mc, gcd.getItemPalette(a));
+		selection[a]->importMemChunk(mc);
+	}
+
+	// Hide splash window
+	theSplashWindow->hide();
 
 	return true;
 }
@@ -1448,7 +1493,6 @@ void ArchivePanel::focusOnEntry(ArchiveEntry* entry) {
 	}
 }
 
-
 /* ArchivePanel::showEntryPanel
  * Show an entry panel appropriate to the current entry
  *******************************************************************/
@@ -1593,6 +1637,10 @@ bool ArchivePanel::handleAction(string id) {
 	else if (id == "arch_entry_bookmark")
 		bookmark();
 
+	// Open in Tab
+	else if (id == "arch_entry_opentab")
+		openTab();
+
 	// Entry->Convert To...
 	else if (id == "arch_entry_convert")
 		convertEntryTo();
@@ -1611,7 +1659,7 @@ bool ArchivePanel::handleAction(string id) {
 
 
 
-	// Temporary ones
+	// Context menu actions
 	else if (id == "arch_bas_convert")
 		basConvert();
 	else if (id == "arch_gfx_convert")
@@ -1676,6 +1724,39 @@ void ArchivePanel::onAnnouncement(Announcer* announcer, string event_name, MemCh
 			Layout();
 		}
 	}
+}
+
+
+/*******************************************************************
+ * ARCHIVEPANEL STATIC FUNCTIONS
+ *******************************************************************/
+
+/* ArchivePanel::createPanelForEntry
+ * Creates the appropriate EntryPanel for [entry] and returns it
+ *******************************************************************/
+EntryPanel* ArchivePanel::createPanelForEntry(ArchiveEntry* entry, wxWindow* parent) {
+	EntryPanel* entry_panel = NULL;
+
+	if (entry->getType() == EntryType::mapMarkerType())
+		entry_panel = new MapEntryPanel(parent);
+	else if (!entry->getType()->getEditor().Cmp("gfx"))
+		entry_panel = new GfxEntryPanel(parent);
+	else if (!entry->getType()->getEditor().Cmp("palette"))
+		entry_panel = new PaletteEntryPanel(parent);
+	else if (!entry->getType()->getEditor().Cmp("ansi"))
+		entry_panel = new ANSIEntryPanel(parent);
+	else if (!entry->getType()->getEditor().Cmp("text"))
+		entry_panel = new TextEntryPanel(parent);
+	else if (!entry->getType()->getEditor().Cmp("animated"))
+		entry_panel = new AnimatedEntryPanel(parent);
+	else if (!entry->getType()->getEditor().Cmp("switches"))
+		entry_panel = new SwitchesEntryPanel(parent);
+	else if (!entry->getType()->getEditor().Cmp("audio"))
+		entry_panel = new AudioEntryPanel(parent);
+	else
+		entry_panel = new DefaultEntryPanel(parent);
+
+	return entry_panel;
 }
 
 
@@ -1823,6 +1904,7 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 	theApp->getAction("arch_entry_movedown")->addToMenu(&context);
 	context.AppendSeparator();
 	theApp->getAction("arch_entry_bookmark")->addToMenu(&context);
+	theApp->getAction("arch_entry_opentab")->addToMenu(&context);
 
 	// Add Boom Animations/Switches related menu items if they are selected
 	if (bas_selected)
@@ -1909,7 +1991,7 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
  *******************************************************************/
 void ArchivePanel::onEntryListKeyDown(wxKeyEvent& e) {
 	// Rename entry (Ctrl+R or F2)
-	if ((e.GetKeyCode() == 'R' && e.ControlDown()) || e.GetKeyCode() == WXK_F2)
+	if ((e.GetKeyCode() == 'R' && e.GetModifiers() == wxMOD_CMD) || e.GetKeyCode() == WXK_F2)
 		renameEntry();
 
 	// Delete entry (Delete)
@@ -1917,39 +1999,39 @@ void ArchivePanel::onEntryListKeyDown(wxKeyEvent& e) {
 		deleteEntry();
 
 	// Copy entry (Ctrl+C)
-	else if (e.GetKeyCode() == 'C' && e.ControlDown())
+	else if (e.GetKeyCode() == 'C' && e.GetModifiers() == wxMOD_CMD)
 		copyEntry();
 
 	// Cut entry (Ctrl+X)
-	else if (e.GetKeyCode() == 'X' && e.ControlDown())
+	else if (e.GetKeyCode() == 'X' && e.GetModifiers() == wxMOD_CMD)
 		cutEntry();
 
 	// Paste entry (Ctrl+V)
-	else if (e.GetKeyCode() == 'V' && e.ControlDown())
+	else if (e.GetKeyCode() == 'V' && e.GetModifiers() == wxMOD_CMD)
 		pasteEntry();
 
 	// Import to entry (Ctrl+I)
-	else if (e.GetKeyCode() == 'I' && e.ControlDown())
+	else if (e.GetKeyCode() == 'I' && e.GetModifiers() == wxMOD_CMD)
 		importEntry();
 
 	// Export entry (Ctrl+E)
-	else if (e.GetKeyCode() == 'E' && e.ControlDown() && !e.ShiftDown())
+	else if (e.GetKeyCode() == 'E' && e.GetModifiers() == wxMOD_CMD)
 		exportEntry();
 
 	// Move entry up (Ctrl+U or Ctrl+Up Arrow)
-	else if (e.ControlDown() && (e.GetKeyCode() == 'U' || e.GetKeyCode() == WXK_UP))
+	else if (e.GetModifiers() == wxMOD_CMD && (e.GetKeyCode() == 'U' || e.GetKeyCode() == WXK_UP))
 		moveUp();
 
 	// Move entry down (Ctrl+D or Ctrl+Down Arrow)
-	else if (e.ControlDown() && (e.GetKeyCode() == 'D' || e.GetKeyCode() == WXK_DOWN))
+	else if (e.GetModifiers() == wxMOD_CMD && (e.GetKeyCode() == 'D' || e.GetKeyCode() == WXK_DOWN))
 		moveDown();
 
 	// Select all entries (Ctrl+A)
-	else if (e.GetKeyCode() == 'A' && e.ControlDown())
+	else if (e.GetKeyCode() == 'A' && e.GetModifiers() == wxMOD_CMD)
 		entry_list->selectAll();
 
 	// New entry (Ctrl+N)
-	else if (e.GetKeyCode() == 'N' && e.ControlDown() && !e.ShiftDown())
+	else if (e.GetKeyCode() == 'N' && e.GetModifiers() == wxMOD_CMD)
 		newEntry();
 
 	// Up directory (backspace)
@@ -1977,9 +2059,13 @@ void ArchivePanel::onEntryListActivated(wxListEvent& e) {
 		theArchiveManager->openArchive(entry);
 
 	// Texture list
-	if (entry->getType()->getFormat() == "texturex" ||
-		entry->getType() == EntryType::getType("zdtextures"))
+	else if (entry->getType()->getFormat() == "texturex" ||
+			entry->getType() == EntryType::getType("zdtextures"))
 		theMainWindow->openTextureEditor(archive);
+
+	// Other entry
+	else if (entry->getType() != EntryType::folderType())
+		theMainWindow->openEntry(entry);
 
 	e.Skip();
 }
@@ -2067,24 +2153,6 @@ void ArchivePanel::onDirChanged(wxCommandEvent& e) {
 void ArchivePanel::onBtnUpDir(wxCommandEvent& e) {
 	// Go up a directory in the entry list
 	entry_list->goUpDir();
-}
-
-/* ArchivePanel::onShow
- * Called when the panel is shown or hidden
- *******************************************************************/
-void ArchivePanel::onShow(wxShowEvent& e) {
-	/*
-	if (e.IsShown()) {
-		theMainWindow->addCustomMenu(menu_archive, "&Archive");
-		theMainWindow->addCustomMenu(menu_entry, "&Entry");
-		cur_area->addCustomMenu();
-	}
-	else {
-		theMainWindow->removeCustomMenu("&Archive");
-		theMainWindow->removeCustomMenu("&Entry");
-		cur_area->removeCustomMenu();
-	}
-	*/
 }
 
 

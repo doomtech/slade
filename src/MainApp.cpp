@@ -59,7 +59,7 @@
  *******************************************************************/
 namespace Global {
 	string error = "";
-	string version = "3.0.1"
+	string version = "3.0.2 beta 1"
 #ifdef UPDATEREVISION
 	" r" SVN_REVISION_STRING
 #endif
@@ -69,6 +69,7 @@ namespace Global {
 string	dir_data = "";
 string	dir_user = "";
 string	dir_app = "";
+bool	exiting = false;
 CVAR(Bool, temp_use_appdir, false, CVAR_SAVE)
 CVAR(String, dir_last, "", CVAR_SAVE)
 
@@ -220,7 +221,8 @@ void SLADELog::DoLogString(const wxString& msg, time_t time) {
 #else
 void SLADELog::DoLogText(const wxString& msg) {
 #endif
-	theConsole->logMessage(msg);
+	if (!exiting)
+		theConsole->logMessage(msg);
 }
 
 
@@ -323,13 +325,13 @@ void MainApp::initLogFile() {
  *******************************************************************/
 void MainApp::initActions() {
 	// MainWindow
-	new SAction("main_exit", "E&xit", "t_exit", "Quit SLADE");
+	new SAction("main_exit", "E&xit", "t_exit", "Quit SLADE", "", 0, wxID_EXIT);
 	new SAction("main_setbra", "Set &Base Resource Archive", "e_archive", "Set the Base Resource Archive, to act as the program 'IWAD'");
 	new SAction("main_preferences", "&Preferences...", "t_settings", "Setup SLADE options and preferences");
 	new SAction("main_showam", "&Archive Manager", "e_archive", "Toggle the Archive Manager window", "Ctrl+1");
 	new SAction("main_showconsole", "&Console", "t_console", "Toggle the Console window", "Ctrl+2");
 	new SAction("main_onlinedocs", "Online &Documentation", "t_wiki", "View SLADE documentation online");
-	new SAction("main_about", "&About", "i_logo", "Informaton about SLADE");
+	new SAction("main_about", "&About", "i_logo", "Informaton about SLADE", "", 0, wxID_ABOUT);
 
 	// ArchiveManagerPanel
 	new SAction("aman_newwad", "New Wad Archive", "t_newarchive", "Create a new Doom Wad Archive", "Ctrl+Shift+W");
@@ -373,6 +375,7 @@ void MainApp::initActions() {
 	new SAction("arch_entry_import", "Import", "t_import", "Import a file to the selected entry");
 	new SAction("arch_entry_export", "Export", "t_export", "Export the selected entries to files");
 	new SAction("arch_entry_bookmark", "Bookmark", "t_bookmark", "Bookmark the current entry");
+	new SAction("arch_entry_opentab", "Open in Tab", "t_open", "Open selected entries in separate tabs");
 	new SAction("arch_bas_convert", "Convert to ANIMDEFS", "", "Convert any selected SWITCHES and ANIMATED entries to a single ANIMDEFS entry");
 	new SAction("arch_texturex_convertzd", "Convert to TEXTURES", "", "Convert any selected TEXTUREx entries to ZDoom TEXTURES format");
 	new SAction("arch_view_text", "View as Text", "e_text", "Open the selected entry in the text editor, regardless of type");
@@ -408,6 +411,14 @@ void MainApp::initActions() {
 	new SAction("aelt_vrules", "Vertical Rules", "", "Show vertical rules between columns", "", SAction::CHECK);
 
 	// TextureEditorPanel
+	new SAction("txed_new", "New Texture", "t_tex_new", "Create a new, empty texture");
+	new SAction("txed_delete", "Delete Texture", "t_tex_delete", "Deletes the selected texture(s) from the list");
+	new SAction("txed_new_patch", "New Texture from Patch", "t_tex_newpatch", "Create a new texture from an existing patch");
+	new SAction("txed_new_file", "New Texture from File", "t_tex_newfile", "Create a new texture from an image file");
+	new SAction("txed_up", "Move Up", "t_up", "Move the selected texture(s) up in the list");
+	new SAction("txed_down", "Move Down", "t_down", "Move the selected texture(s) down in the list");
+	new SAction("txed_copy", "Copy", "t_copy", "Copy the selected texture(s)");
+	new SAction("txed_paste", "Paste", "t_paste", "Paste the previously copied texture(s)");
 	new SAction("txed_patch_add", "Add Patch", "t_patch_add", "Add a patch to the texture");
 	new SAction("txed_patch_remove", "Remove Selected Patch(es)", "t_patch_remove", "Remove selected patch(es) from the texture");
 	new SAction("txed_patch_replace", "Replace Selected Patch(es)", "t_patch_replace", "Replace selected patch(es) with a different patch");
@@ -438,8 +449,10 @@ bool MainApp::OnInit() {
 	wxApp::SetAppName("slade3");
 #endif
 
-	// Handle exceptions using wxDebug stuff
+	// Handle exceptions using wxDebug stuff, but only in release mode
+#ifdef NDEBUG
 	wxHandleFatalExceptions(true);
+#endif
 
 	// Init application directories
 	if (!initDirectories())
@@ -491,12 +504,12 @@ bool MainApp::OnInit() {
 	StyleSet::loadResourceStyles();
 	StyleSet::loadCustomStyles();
 
+	// Init actions
+	initActions();
+
 	// Init base resource
 	wxLogMessage("Loading base resource");
 	theArchiveManager->initBaseResource();
-
-	// Init actions
-	initActions();
 
 	// Show the main window
 	SetTopWindow(theMainWindow);
@@ -528,6 +541,8 @@ bool MainApp::OnInit() {
  * Application shutdown, run when program is closed
  *******************************************************************/
 int MainApp::OnExit() {
+	exiting = true;
+
 	// Save configuration
 	saveConfigFile();
 
@@ -549,7 +564,8 @@ int MainApp::OnExit() {
 	string filename = wxEmptyString;
 	bool files = temp.GetFirst(&filename, wxEmptyString, wxDIR_FILES);
 	while (files) {
-		wxRemoveFile(appPath(filename, DIR_TEMP));
+		if (!wxRemoveFile(appPath(filename, DIR_TEMP)))
+			wxLogMessage("Warning: Could not clean up temporary file \"%s\"", CHR(filename));
 		files = temp.GetNext(&filename);
 	}
 

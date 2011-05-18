@@ -530,11 +530,15 @@ string ArchiveManager::getArchiveExtensionsString() {
 /* ArchiveManager::addBaseResourcePath
  * Adds [path] to the list of base resource paths
  *******************************************************************/
-void ArchiveManager::addBaseResourcePath(string path) {
-	// First check the path doesn't already exist
+bool ArchiveManager::addBaseResourcePath(string path) {
+	// Firstly, check the file exists
+	if (!wxFileExists(path))
+		return false;;
+		
+	// Second, check the path doesn't already exist
 	for (unsigned a = 0; a < base_resource_paths.size(); a++) {
 		if (S_CMP(base_resource_paths[a], path))
-			return;
+			return false;
 	}
 
 	// Add it
@@ -542,6 +546,8 @@ void ArchiveManager::addBaseResourcePath(string path) {
 
 	// Announce
 	announce("base_resource_path_added");
+	
+	return true;
 }
 
 /* ArchiveManager::removeBaseResourcePath

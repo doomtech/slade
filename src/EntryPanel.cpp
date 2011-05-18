@@ -55,10 +55,13 @@ EntryPanel::EntryPanel(wxWindow* parent, string id)
 	this->id = id;
 	menu_custom = NULL;
 
+	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+	SetSizer(sizer);
+
 	// Create & set sizer & border
 	frame = new wxStaticBox(this, -1, "Entry Contents");
 	wxStaticBoxSizer *framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
-	SetSizer(framesizer);
+	sizer->Add(framesizer, 1, wxEXPAND|wxALL, 4);
 	Show(false);
 
 	// Setup sizer positions
@@ -115,12 +118,6 @@ void EntryPanel::setModified(bool c) {
 		else
 			modified = c;
 	}
-
-	// Set frame label (disabled, causes flicker in windows)
-	//if (modified)
-	//	frame->SetLabel(s_fmt("Entry Contents (%s, unsaved changes)", entry->getName().c_str()));
-	//else
-	//	frame->SetLabel(s_fmt("Entry Contents (%s)", entry->getName().c_str()));
 }
 
 /* EntryPanel::openEntry
@@ -130,9 +127,6 @@ bool EntryPanel::openEntry(ArchiveEntry* entry) {
 	// Check entry was given
 	if (!entry)
 		return false;
-
-	// Set frame label (disabled, causes flicker in windows)
-	//frame->SetLabel(s_fmt("Entry Contents (%s)", entry->getName().c_str()));
 
 	// Copy current entry content
 	entry_data.clear();
@@ -202,6 +196,10 @@ void EntryPanel::refreshPanel() {
 void EntryPanel::closeEntry() {
 }
 
+/* EntryPanel::updateStatus
+ * Updates the main window status bar with info about the current
+ * entry
+ *******************************************************************/
 void EntryPanel::updateStatus() {
 	// Basic info
 	if (entry)
@@ -213,13 +211,20 @@ void EntryPanel::updateStatus() {
 	theMainWindow->SetStatusText(statusString(), 2);
 }
 
+/* EntryPanel::addCustomMenu
+ * Adds this EntryPanel's custom menu to the main window menubar
+ * (if it exists)
+ *******************************************************************/
 void EntryPanel::addCustomMenu() {
 	if (menu_custom)
 		theMainWindow->addCustomMenu(menu_custom, custom_menu_name);
 }
 
+/* EntryPanel::removeCustomMenu
+ * Removes this EntryPanel's custom menu from the main window menubar
+ *******************************************************************/
 void EntryPanel::removeCustomMenu() {
-	theMainWindow->removeCustomMenu(custom_menu_name);
+	theMainWindow->removeCustomMenu(menu_custom);
 }
 
 

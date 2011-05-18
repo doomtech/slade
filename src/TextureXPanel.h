@@ -5,6 +5,7 @@
 #include "TextureXList.h"
 #include "TextureEditorPanel.h"
 #include "VirtualListView.h"
+#include "MainApp.h"
 
 class TextureXEditor;
 
@@ -23,7 +24,7 @@ public:
 	void	updateList(bool clear = false);
 };
 
-class TextureXPanel : public wxPanel {
+class TextureXPanel : public wxPanel, SActionHandler {
 private:
 	TextureXList		texturex;
 	TextureXEditor*		tx_editor;
@@ -54,16 +55,33 @@ public:
 	void	setPalette(Palette8bit* pal);
 	void	applyChanges();
 
+	// Texture operations
 	CTexture*	newTextureFromPatch(string name, string patch);
+	void		newTexture();
+	void		newTextureFromPatch();
+	void		newTextureFromFile();
+	void		removeTexture();
+	void		moveUp();
+	void		moveDown();
+	void		copy();
+	void		paste();
+
+	// SAction handler
+	bool	handleAction(string id);
 
 	// Events
 	void	onTextureListSelect(wxListEvent& e);
+	void	onTextureListRightClick(wxListEvent& e);
+	void	onTextureListKeyDown(wxKeyEvent& e);
 	void	onBtnNewTexture(wxCommandEvent& e);
 	void	onBtnNewTextureFromPatch(wxCommandEvent& e);
 	void	onBtnNewTextureFromFile(wxCommandEvent& e);
 	void	onBtnRemoveTexture(wxCommandEvent& e);
 	void	onBtnMoveUp(wxCommandEvent& e);
 	void	onBtnMoveDown(wxCommandEvent& e);
+	void	onBtnCopy(wxCommandEvent& e);
+	void	onBtnPaste(wxCommandEvent& e);
+	void	onShow(wxShowEvent& e);
 };
 
 #endif//__TEXTUREX_PANEL_H__

@@ -53,6 +53,31 @@ private:
 	void	clearData(bool clear_mask = true);
 
 public:
+	enum {
+		// Alpha map generation sources
+		BRIGHTNESS = 0,
+		ALPHA,
+	};
+
+	struct info_t {
+		int		width;
+		int		height;
+		int		colformat;
+		string	format;
+		int		numimages;
+		int		imgindex;
+		int		offset_x;
+		int		offset_y;
+		bool	has_palette;
+
+		info_t() {
+			width = height = offset_x = offset_y = imgindex = 0;
+			colformat = RGBA;
+			numimages = 1;
+			has_palette = false;
+		}
+	};
+
 	SImage(SIType type = RGBA);
 	virtual ~SImage();
 
@@ -73,6 +98,7 @@ public:
 	rgba_t			getPixel(unsigned x, unsigned y, Palette8bit* pal = NULL);
 	uint8_t			getPixelIndex(unsigned x, unsigned y);
 	SIFormat*		getFormat() { return format; }
+	info_t			getInfo();
 
 	void			setXOffset(int offset);
 	void			setYOffset(int offset);
@@ -81,6 +107,7 @@ public:
 	// Misc
 	void	clear();
 	void	create(int width, int height, SIType type, Palette8bit* pal = NULL, int index = 0, int numimages = 1);
+	void	create(info_t info, Palette8bit* pal = NULL);
 	void	fillAlpha(uint8_t alpha = 0);
 	short	findUnusedColour();
 	bool	validFlatSize();
@@ -90,6 +117,16 @@ public:
 
 	// Image format reading
 	bool	open(MemChunk& data, int index = 0);
+	bool	loadFont0(const uint8_t* gfx_data, int size);
+	bool	loadFont1(const uint8_t* gfx_data, int size);
+	bool	loadFont2(const uint8_t* gfx_data, int size);
+	bool	loadFontM(const uint8_t* gfx_data, int size);
+	bool	loadBMF(const uint8_t* gfx_data, int size);
+	bool	loadWolfFont(const uint8_t* gfx_data, int size);
+	bool	loadJediFNT(const uint8_t* gfx_data, int size);
+	bool	loadJediFONT(const uint8_t* gfx_data, int size);
+
+	/*
 	bool	loadImage(const uint8_t* data, int size);
 	bool	loadDoomGfx(const uint8_t* data, int size, uint8_t version = 0);
 	bool	loadDoomGfxA(const uint8_t* data, int size) {return loadDoomGfx(data, size, 2);}
@@ -110,12 +147,6 @@ public:
 	bool	loadPlanar(const uint8_t* gfx_data, int size);
 	bool	load4bitChunk(const uint8_t* gfx_data, int size);
 	bool	loadImgz(const uint8_t* gfx_data, int size);
-	bool	loadFont0(const uint8_t* gfx_data, int size);
-	bool	loadFont1(const uint8_t* gfx_data, int size);
-	bool	loadFont2(const uint8_t* gfx_data, int size);
-	bool	loadFontM(const uint8_t* gfx_data, int size);
-	bool	loadBMF(const uint8_t* gfx_data, int size);
-	bool	loadWolfFont(const uint8_t* gfx_data, int size);
 	bool	loadSCSprite(const uint8_t* data, int size);
 	bool	loadSCWall(const uint8_t* data, int size);
 	bool	loadAnaMip(const uint8_t* data, int size);
@@ -127,22 +158,25 @@ public:
 	bool	JediFrame(const uint8_t* gfx_data, uint32_t hdroffs);
 	bool	loadJediFME(const uint8_t* gfx_data, int size);
 	bool	loadJediWAX(const uint8_t* gfx_data, int size, int index);
-	bool	loadJediFNT(const uint8_t* gfx_data, int size);
-	bool	loadJediFONT(const uint8_t* gfx_data, int size);
+	*/
 
 	// Image format writing
+	/*
 	bool	safeConvert(MemChunk& out, Palette8bit* pal = NULL);
 	bool	toPNG(MemChunk& out, Palette8bit* pal = NULL);
 	bool	toDoomGfx(MemChunk& out, uint8_t alpha_threshold = 0);
 	bool	toDoomFlat(MemChunk& out);
 	bool	toPlanar(MemChunk& out, Palette8bit* pal = NULL);
 	bool	to4bitChunk(MemChunk& out, Palette8bit* pal = NULL);
+	*/
 
 	// Conversion stuff
 	bool	convertRGBA(Palette8bit* pal = NULL);
 	bool	convertPaletted(Palette8bit* pal_target, Palette8bit* pal_current = NULL);
-	bool	maskFromColour(rgba_t colour, Palette8bit* pal = NULL, bool force_mask = false);
-	bool	cutoffMask(uint8_t threshold, bool force_mask = false);
+	bool	convertAlphaMap(int alpha_source = BRIGHTNESS, Palette8bit* pal = NULL);
+	bool	maskFromColour(rgba_t colour, Palette8bit* pal = NULL);
+	bool	maskFromBrightness(Palette8bit* pal = NULL);
+	bool	cutoffMask(uint8_t threshold);
 
 	// Image modification
 	bool	setPixel(int x, int y, rgba_t colour, Palette8bit* pal = NULL);

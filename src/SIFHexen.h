@@ -159,6 +159,7 @@ public:
 	SIFPlanar() : SIFormat("planar") {
 		name = "Planar";
 		extension = "lmp";
+		reliability = 240;
 	}
 	~SIFPlanar();
 
@@ -170,13 +171,14 @@ public:
 			return false;
 	}
 
-	imginfo_t getInfo(MemChunk& mc, int index) {
-		imginfo_t info;
+	SImage::info_t getInfo(MemChunk& mc, int index) {
+		SImage::info_t info;
 
 		// Set info (always the same)
 		info.width = 640;
 		info.height = 480;
 		info.colformat = PALMASK;
+		info.has_palette = true;
 		info.format = id;
 
 		return info;
@@ -231,8 +233,8 @@ protected:
 			return false;
 
 		image.create(width, height, PALMASK);
-		uint8_t* img_data = new uint8_t[width*height];
-		uint8_t* img_mask = new uint8_t[width*height];
+		uint8_t* img_data = imageData(image);
+		uint8_t* img_mask = imageMask(image);
 		memset(img_mask, 0xFF, width*height);
 
 		for (unsigned i = 0; i < data.getSize(); ++i) {
@@ -299,6 +301,7 @@ public:
 	SIF4BitChunk() : SIFormat("4bit") {
 		name = "4-bit";
 		extension = "lmp";
+		reliability = 80;
 	}
 	~SIF4BitChunk() {}
 
@@ -310,8 +313,8 @@ public:
 			return false;
 	}
 
-	imginfo_t getInfo(MemChunk& mc, int index) {
-		imginfo_t info;
+	SImage::info_t getInfo(MemChunk& mc, int index) {
+		SImage::info_t info;
 
 		// Check size
 		if (mc.getSize() == 32) {

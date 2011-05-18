@@ -33,7 +33,6 @@
 #include "WxStuff.h"
 #include "DefaultEntryPanel.h"
 #include "Misc.h"
-#include "GfxConvDialog.h"
 #include "ModifyOffsetsDialog.h"
 #include "EntryOperations.h"
 #include "ArchiveManager.h"
@@ -200,26 +199,22 @@ bool DefaultEntryPanel::saveEntry() {
 }
 
 
+/*******************************************************************
+ * DEFAULTENTRYPANEL CLASS EVENTS
+ *******************************************************************/
 
 /* DefaultEntryPanel::onBtnGfxConvert
  * Called when the 'Convert Gfx To' button is clicked
  *******************************************************************/
 void DefaultEntryPanel::onBtnGfxConvert(wxCommandEvent& e) {
-	// Create gfx conversion dialog
-	GfxConvDialog gcd;
-
-	// Send entries to the gcd
-	gcd.openEntries(entries);
-
-	// Run the gcd
-	gcd.ShowModal();
+	theApp->doAction("arch_gfx_convert");
 }
 
 /* DefaultEntryPanel::onBtnGfxModifyOffsets
  * Called when the 'Modify Offsets' button is clicked
  *******************************************************************/
 void DefaultEntryPanel::onBtnGfxModifyOffsets(wxCommandEvent& e) {
-// Create and run modify offsets dialog
+	// Create and run modify offsets dialog
 	ModifyOffsetsDialog mod;
 	if (mod.ShowModal() == wxID_CANCEL)
 		return;

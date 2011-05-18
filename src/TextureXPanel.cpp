@@ -34,7 +34,11 @@
 #include "Misc.h"
 #include "TextureXEditor.h"
 #include "ZTextureEditorPanel.h"
+#include "Clipboard.h"
+#include "ArchiveManager.h"
+#include "Icons.h"
 #include <wx/filename.h>
+#include <wx/gbsizer.h>
 
 
 /*******************************************************************
@@ -175,43 +179,39 @@ TextureXPanel::TextureXPanel(wxWindow* parent, TextureXEditor* tx_editor) : wxPa
 	framesizer->Add(list_textures, 1, wxEXPAND|wxALL, 4);
 	sizer->Add(framesizer, 0, wxEXPAND|wxALL, 4);
 
-
-	// Move Up button
-	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
-	framesizer->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
-	btn_move_up = new wxButton(this, -1, "Move Up");
-	hbox->Add(btn_move_up, 1, wxEXPAND|wxRIGHT, 4);
-
-	// Move Down button
-	btn_move_down = new wxButton(this, -1, "Move Down");
-	hbox->Add(btn_move_down, 1, wxEXPAND);
-
-	// New Texture button
-	hbox = new wxBoxSizer(wxHORIZONTAL);
-	framesizer->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
-	btn_new_texture = new wxButton(this, -1, "New");
-	hbox->Add(btn_new_texture, 1, wxEXPAND|wxRIGHT, 4);
-
-	// Remove Texture button
-	btn_remove_texture = new wxButton(this, -1, "Remove");
-	hbox->Add(btn_remove_texture, 1);
-
-	// New Texture from Patch button
-	btn_new_from_patch = new wxButton(this, -1, "New From Patch");
-	framesizer->Add(btn_new_from_patch, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
-
-	// New Texture from File button
-	btn_new_from_file = new wxButton(this, -1, "New From File");
-	framesizer->Add(btn_new_from_file, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+	// Add texture operations buttons
+	wxGridBagSizer* gbsizer = new wxGridBagSizer(4, 4);
+	framesizer->Add(gbsizer, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+	btn_move_up = new wxBitmapButton(this, -1, getIcon("t_up"));
+	btn_move_up->SetToolTip("Move Up");
+	btn_move_down = new wxBitmapButton(this, -1, getIcon("t_down"));
+	btn_move_down->SetToolTip("Move Down");
+	btn_new_texture = new wxBitmapButton(this, -1, getIcon("t_tex_new"));
+	btn_new_texture->SetToolTip("New");
+	btn_remove_texture = new wxBitmapButton(this, -1, getIcon("t_tex_delete"));
+	btn_remove_texture->SetToolTip("Remove");
+	btn_new_from_patch = new wxBitmapButton(this, -1, getIcon("t_tex_newpatch"));
+	btn_new_from_patch->SetToolTip("New from Patch");
+	btn_new_from_file = new wxBitmapButton(this, -1, getIcon("t_tex_newfile"));
+	btn_new_from_file->SetToolTip("New from File");
+	gbsizer->Add(btn_new_texture, wxGBPosition(0, 0), wxDefaultSpan);
+	gbsizer->Add(btn_new_from_patch, wxGBPosition(0, 1), wxDefaultSpan);
+	gbsizer->Add(btn_new_from_file, wxGBPosition(0, 2), wxDefaultSpan);
+	gbsizer->Add(btn_remove_texture, wxGBPosition(0, 3), wxDefaultSpan);
+	gbsizer->Add(btn_move_up, wxGBPosition(0, 4), wxDefaultSpan);
+	gbsizer->Add(btn_move_down, wxGBPosition(0, 5), wxDefaultSpan);
 
 	// Bind events
 	list_textures->Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &TextureXPanel::onTextureListSelect, this);
+	list_textures->Bind(wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK, &TextureXPanel::onTextureListRightClick, this);
+	list_textures->Bind(wxEVT_KEY_DOWN, &TextureXPanel::onTextureListKeyDown, this);
 	btn_new_texture->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureXPanel::onBtnNewTexture, this);
 	btn_new_from_patch->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureXPanel::onBtnNewTextureFromPatch, this);
 	btn_new_from_file->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureXPanel::onBtnNewTextureFromFile, this);
 	btn_remove_texture->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureXPanel::onBtnRemoveTexture, this);
 	btn_move_up->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureXPanel::onBtnMoveUp, this);
 	btn_move_down->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextureXPanel::onBtnMoveDown, this);
+	Bind(wxEVT_SHOW, &TextureXPanel::onShow, this);
 }
 
 /* TextureXPanel::~TextureXPanel
@@ -319,7 +319,7 @@ void TextureXPanel::applyChanges() {
 		tx_editor->patchTable().updatePatchUsage(tex_current);
 		list_textures->updateList();
 		modified = true;
-		texture_editor->openTexture(tex_current);
+		texture_editor->openTexture(tex_current, &texturex);
 	}
 }
 
@@ -361,32 +361,10 @@ CTexture* TextureXPanel::newTextureFromPatch(string name, string patch) {
 	return tex;
 }
 
-
-/*******************************************************************
- * TEXTUREXPANEL EVENTS
+/* TextureXPanel::newTexture
+ * Creates a new, empty texture
  *******************************************************************/
-
-/* TextureXPanel::onTextureListSelect
- * Called when an item on the texture list is selected
- *******************************************************************/
-void TextureXPanel::onTextureListSelect(wxListEvent& e) {
-	// Get selected texture
-	CTexture* tex = texturex.getTexture(e.GetIndex());
-
-	// Save any changes to previous texture
-	applyChanges();
-
-	// Open texture in editor
-	texture_editor->openTexture(tex);
-
-	// Set current texture
-	tex_current = tex;
-}
-
-/* TextureXPanel::onBtnNewTexture
- * Called when the 'New Texture' button is clicked
- *******************************************************************/
-void TextureXPanel::onBtnNewTexture(wxCommandEvent& e) {
+void TextureXPanel::newTexture() {
 	// Prompt for new texture name
 	string name = wxGetTextFromUser("Enter a texture name:", "New Texture");
 
@@ -431,10 +409,10 @@ void TextureXPanel::onBtnNewTexture(wxCommandEvent& e) {
 	modified = true;
 }
 
-/* TextureXPanel::onBtnNewTextureFromPatch
- * Called when the 'New Texture from Patch' button is clicked
+/* TextureXPanel::newTextureFromPatch
+ * Creates a new texture from an existing patch
  *******************************************************************/
-void TextureXPanel::onBtnNewTextureFromPatch(wxCommandEvent& e) {
+void TextureXPanel::newTextureFromPatch() {
 	// Do nothing if patch list is empty
 	if (tx_editor->patchTable().nPatches() == 0)
 		return;
@@ -478,10 +456,11 @@ void TextureXPanel::onBtnNewTextureFromPatch(wxCommandEvent& e) {
 	}
 }
 
-/* TextureXPanel::onBtnNewTextureFromFile
- * Called when the 'New Texture from File' button is clicked
+/* TextureXPanel::newTextureFromFile
+ * Creates a new texture from an image file. The file will be
+ * imported and added to the patch table if needed
  *******************************************************************/
-void TextureXPanel::onBtnNewTextureFromFile(wxCommandEvent& e) {
+void TextureXPanel::newTextureFromFile() {
 	// Get all entry types
 	vector<EntryType*> etypes = EntryType::allTypes();
 
@@ -561,10 +540,10 @@ void TextureXPanel::onBtnNewTextureFromFile(wxCommandEvent& e) {
 	}
 }
 
-/* TextureXPanel::onBtnRemoveTexture
- * Called when the 'Remove Texture' button is clicked
+/* TextureXPanel::removeTexture
+ * Removes any selected textures
  *******************************************************************/
-void TextureXPanel::onBtnRemoveTexture(wxCommandEvent& e) {
+void TextureXPanel::removeTexture() {
 	// Get selected textures
 	vector<long> selection = list_textures->getSelection();
 
@@ -587,10 +566,10 @@ void TextureXPanel::onBtnRemoveTexture(wxCommandEvent& e) {
 	modified = true;
 }
 
-/* TextureXPanel::onBtnMoveUp
- * Called when the 'Move Up' button is clicked
+/* TextureXPanel::moveUp
+ * Moves all selected textures up
  *******************************************************************/
-void TextureXPanel::onBtnMoveUp(wxCommandEvent& e) {
+void TextureXPanel::moveUp() {
 	// Get selected textures
 	vector<long> selection = list_textures->getSelection();
 
@@ -616,10 +595,10 @@ void TextureXPanel::onBtnMoveUp(wxCommandEvent& e) {
 	modified = true;
 }
 
-/* TextureXPanel::onBtnMoveDown
- * Called when the 'Move Down' button is clicked
+/* TextureXPanel::moveDown
+ * Moves all selected textures down
  *******************************************************************/
-void TextureXPanel::onBtnMoveDown(wxCommandEvent& e) {
+void TextureXPanel::moveDown() {
 	// Get selected textures
 	vector<long> selection = list_textures->getSelection();
 
@@ -643,4 +622,271 @@ void TextureXPanel::onBtnMoveDown(wxCommandEvent& e) {
 
 	// Update variables
 	modified = true;
+}
+
+/* TextureXPanel::copy
+ * Copies any selected textures to the clipboard
+ *******************************************************************/
+void TextureXPanel::copy() {
+	// Get selected textures
+	vector<long> selection = list_textures->getSelection();
+
+	// Do nothing if nothing selected
+	if (selection.size() == 0)
+		return;
+
+	// Create list of textures to copy
+	vector<ClipboardItem*> copy_items;
+	for (unsigned a = 0; a < selection.size(); a++)
+		copy_items.push_back(new TextureClipboardItem(texturex.getTexture(selection[a]), tx_editor->getArchive()));
+
+	// Add list to clipboard
+	theClipboard->addItems(copy_items);
+}
+
+/* TextureXPanel::paste
+ * Pastes any textures on the clipboard after the last selected
+ * texture
+ *******************************************************************/
+void TextureXPanel::paste() {
+	// Check there is anything on the clipboard
+	if (theClipboard->nItems() == 0)
+		return;
+
+	// Get last selected index
+	int selected = list_textures->getLastSelected();
+	if (selected == -1) selected = texturex.nTextures() - 1; // Add to end of the list if nothing selected
+
+	// Go through clipboard items
+	for (unsigned a = 0; a < theClipboard->nItems(); a++) {
+		// Skip if not a texture clipboard item
+		if (theClipboard->getItem(a)->getType() != CLIPBOARD_COMPOSITE_TEXTURE)
+			continue;
+
+		// Get texture item
+		TextureClipboardItem* item = (TextureClipboardItem*)(theClipboard->getItem(a));
+
+		// Add new texture after last selected item
+		CTexture* ntex = new CTexture(texturex.getFormat() == TXF_TEXTURES);
+		ntex->copyTexture(item->getTexture(), true);
+		ntex->setState(2);
+		texturex.addTexture(ntex, ++selected);
+
+		// Deal with patches
+		for (unsigned p = 0; p < ntex->nPatches(); p++) {
+			CTPatch* patch = ntex->getPatch(p);
+
+			// Update patch table if necessary
+			if (texturex.getFormat() != TXF_TEXTURES)
+				tx_editor->patchTable().addPatch(patch->getName());
+
+			// Get the entry for this patch
+			ArchiveEntry* entry = patch->getPatchEntry(tx_editor->getArchive());
+
+			// If the entry wasn't found in any open archive, try copying it from the clipboard
+			// (the user may have closed the archive the original patch was in)
+			if (!entry) {
+				entry = item->getPatchEntry(patch->getName());
+
+				// Copy the copied patch entry over to this archive
+				if (entry)
+					tx_editor->getArchive()->addEntry(entry, "patches", true);
+			}
+
+			// If the entry exists in the base resource archive or this archive, do nothing
+			else if (entry->getParent() == theArchiveManager->baseResourceArchive() ||
+					entry->getParent() == tx_editor->getArchive())
+				continue;
+
+			// Otherwise, copy the entry over to this archive
+			else
+				tx_editor->getArchive()->addEntry(entry, "patches", true);
+		}
+	}
+
+	// Refresh
+	list_textures->updateList();
+
+	// Update variables
+	modified = true;
+}
+
+/* TextureXPanel::handleAction
+ * Handles the action [id]. Returns true if the action was handled,
+ * false otherwise
+ *******************************************************************/
+bool TextureXPanel::handleAction(string id) {
+	// Don't handle if hidden
+	if (!IsShown())
+		return false;
+
+	// Only interested in "txed_" events
+	if (!id.StartsWith("txed_"))
+		return false;
+
+	// Handle action
+	if (id == "txed_new")
+		newTexture();
+	else if (id == "txed_delete")
+		removeTexture();
+	else if (id == "txed_new_patch")
+		newTextureFromPatch();
+	else if (id == "txed_new_file")
+		newTextureFromFile();
+	else if (id == "txed_up")
+		moveUp();
+	else if (id == "txed_down")
+		moveDown();
+	else if (id == "txed_copy")
+		copy();
+	else if (id == "txed_paste")
+		paste();
+	else
+		return false;	// Not handled here
+
+	return true;
+}
+
+
+/*******************************************************************
+ * TEXTUREXPANEL EVENTS
+ *******************************************************************/
+
+/* TextureXPanel::onTextureListSelect
+ * Called when an item on the texture list is selected
+ *******************************************************************/
+void TextureXPanel::onTextureListSelect(wxListEvent& e) {
+	// Get selected texture
+	CTexture* tex = texturex.getTexture(e.GetIndex());
+
+	// Save any changes to previous texture
+	applyChanges();
+
+	// Open texture in editor
+	texture_editor->openTexture(tex, &texturex);
+
+	// Set current texture
+	tex_current = tex;
+}
+
+/* TextureXPanel::onTextureListRightClick
+ * Called when an item on the texture list is right clicked
+ *******************************************************************/
+void TextureXPanel::onTextureListRightClick(wxListEvent& e) {
+	// Create context menu
+	wxMenu context;
+	theApp->getAction("txed_delete")->addToMenu(&context);
+	context.AppendSeparator();
+	theApp->getAction("txed_copy")->addToMenu(&context);
+	theApp->getAction("txed_paste")->addToMenu(&context);
+	context.AppendSeparator();
+	theApp->getAction("txed_up")->addToMenu(&context);
+	theApp->getAction("txed_down")->addToMenu(&context);
+
+	// Pop it up
+	PopupMenu(&context);
+}
+
+/* TextureXPanel::onTextureListKeyDown
+ * Called when a key is pressed in the texture list
+ *******************************************************************/
+void TextureXPanel::onTextureListKeyDown(wxKeyEvent& e) {
+	// Move texture up (Ctrl+U or Ctrl+Up Arrow)
+	if (e.GetModifiers() == wxMOD_CMD && (e.GetKeyCode() == 'U' || e.GetKeyCode() == WXK_UP))
+		moveUp();
+
+	// Move texture down (Ctrl+D or Ctrl+Down Arrow)
+	else if (e.GetModifiers() == wxMOD_CMD && (e.GetKeyCode() == 'D' || e.GetKeyCode() == WXK_DOWN))
+		moveDown();
+
+	// Copy (Ctrl+C)
+	else if (e.GetModifiers() == wxMOD_CMD && e.GetKeyCode() == 'C')
+		copy();
+
+	// Paste (Ctrl+V)
+	else if (e.GetModifiers() == wxMOD_CMD && e.GetKeyCode() == 'V')
+		paste();
+
+	// New texture (Ctrl+N)
+	else if (e.GetModifiers() == wxMOD_CMD && e.GetKeyCode() == 'N')
+		newTexture();
+
+	// New texture from patch (Ctrl+Shift+N)
+	else if (e.GetModifiers() == (wxMOD_CMD|wxMOD_SHIFT) && e.GetKeyCode() == 'N')
+		newTextureFromPatch();
+
+	// New texture from file (Ctrl+Alt+N)
+	else if (e.GetModifiers() == (wxMOD_CMD|wxMOD_ALT) && e.GetKeyCode() == 'N')
+		newTextureFromFile();
+
+	// Remove texture (Delete)
+	else if (e.GetKeyCode() == WXK_DELETE)
+		removeTexture();
+
+	// Not handled here, send off to be handled by a parent window
+	else
+		e.Skip();
+}
+
+/* TextureXPanel::onBtnNewTexture
+ * Called when the 'New Texture' button is clicked
+ *******************************************************************/
+void TextureXPanel::onBtnNewTexture(wxCommandEvent& e) {
+	newTexture();
+}
+
+/* TextureXPanel::onBtnNewTextureFromPatch
+ * Called when the 'New Texture from Patch' button is clicked
+ *******************************************************************/
+void TextureXPanel::onBtnNewTextureFromPatch(wxCommandEvent& e) {
+	newTextureFromPatch();
+}
+
+/* TextureXPanel::onBtnNewTextureFromFile
+ * Called when the 'New Texture from File' button is clicked
+ *******************************************************************/
+void TextureXPanel::onBtnNewTextureFromFile(wxCommandEvent& e) {
+	newTextureFromFile();
+}
+
+/* TextureXPanel::onBtnRemoveTexture
+ * Called when the 'Remove Texture' button is clicked
+ *******************************************************************/
+void TextureXPanel::onBtnRemoveTexture(wxCommandEvent& e) {
+	removeTexture();
+}
+
+/* TextureXPanel::onBtnMoveUp
+ * Called when the 'Move Up' button is clicked
+ *******************************************************************/
+void TextureXPanel::onBtnMoveUp(wxCommandEvent& e) {
+	moveUp();
+}
+
+/* TextureXPanel::onBtnMoveDown
+ * Called when the 'Move Down' button is clicked
+ *******************************************************************/
+void TextureXPanel::onBtnMoveDown(wxCommandEvent& e) {
+	moveDown();
+}
+
+/* TextureXPanel::onBtnCopy
+ * Called when the 'Copy' button is clicked
+ *******************************************************************/
+void TextureXPanel::onBtnCopy(wxCommandEvent& e) {
+	copy();
+}
+
+/* TextureXPanel::onBtnPaste
+ * Called when the 'Paste' button is clicked
+ *******************************************************************/
+void TextureXPanel::onBtnPaste(wxCommandEvent& e) {
+	paste();
+}
+
+/* TextureXPanel::onShow
+ * Called when the panel is shown or hidden
+ *******************************************************************/
+void TextureXPanel::onShow(wxShowEvent& e) {
+	tx_editor->showTextureMenu(e.IsShown());
 }

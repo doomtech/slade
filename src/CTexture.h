@@ -7,6 +7,8 @@
 #include "ListenerAnnouncer.h"
 #include "Translation.h"
 
+class SImage;
+
 // Basic patch
 class CTPatch {
 protected:
@@ -109,13 +111,14 @@ private:
 	int16_t	offset_y;
 
 	// Editor info
-	uint8_t	state;
+	uint8_t			state;
+	TextureXList*	in_list;
 
 public:
-	CTexture();
+	CTexture(bool extended = false);
 	~CTexture();
 
-	void	copyTexture(CTexture* copy);
+	void	copyTexture(CTexture* copy, bool keep_type = false);
 
 	string		getName() { return name; }
 	uint16_t	getWidth() { return width; }
@@ -149,6 +152,7 @@ public:
 	void	setNoDecals(bool nd) { this->no_decals = nd; }
 	void	setNullTexture(bool nt) { this->null_texture = nt; }
 	void	setState(uint8_t state) { this->state = state; }
+	void	setList(TextureXList* list) { this->in_list = list; }
 
 	void	clear();
 
@@ -163,6 +167,8 @@ public:
 	string	asText();
 
 	bool	convertExtended();
+	bool	convertRegular();
+	bool	loadPatchImage(unsigned pindex, SImage& image, Archive* parent = NULL, Palette8bit* pal = NULL);
 	bool	toImage(SImage& image, Archive* parent = NULL, Palette8bit* pal = NULL, bool force_rgba = false);
 };
 

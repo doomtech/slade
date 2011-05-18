@@ -37,6 +37,7 @@
 #include "PaletteManager.h"
 #include "SplashWindow.h"
 #include "Icons.h"
+#include "SIFormat.h"
 
 
 /*******************************************************************
@@ -48,7 +49,7 @@
  *******************************************************************/
 GfxConvDialog::GfxConvDialog()
 : wxDialog(NULL, -1, "Graphic Format Conversion", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER) {
-	current_entry = 0;
+	current_item = 0;
 
 	// Set dialog icon
 	wxIcon icon;
@@ -64,58 +65,100 @@ GfxConvDialog::GfxConvDialog()
 GfxConvDialog::~GfxConvDialog() {
 }
 
-/* GfxConvDialog::nextEntry
- * Opens the next gfx entry in the list
+/* GfxConvDialog::nextItem
+ * Opens the next item to be converted. Returns true if the selected
+ * format was valid for the next image, false otherwise
  *******************************************************************/
-void GfxConvDialog::nextEntry() {
-	current_entry++;
-
-	if (current_entry >= entries.size()) {
+bool GfxConvDialog::nextItem() {
+	// Go to next image
+	current_item++;
+	if (current_item >= items.size()) {
 		this->Close(true);
-		return;
+		return false;
 	}
 
+	// Load image if needed
+	if (!items[current_item].image.isValid()) {
+		if (!Misc::loadImageFromEntry(&(items[current_item].image), items[current_item].entry))
+			return nextItem();	// Skip if not a valid image entry
+	}
+
+	// Update valid formats
+	combo_target_format->Clear();
+	conv_formats.clear();
+	vector<SIFormat*> all_formats;
+	SIFormat::getAllFormats(all_formats);
+	int current_index = -1;
+	int default_index = -1;
+	for (unsigned a = 0; a < all_formats.size(); a++) {
+		// Check if the image can be written to this format
+		if (all_formats[a]->canWrite(items[current_item].image)) {
+			// Add conversion formats depending on what colour types this image format can handle
+			if (all_formats[a]->canWriteType(PALMASK)) {
+				// Add format
+				conv_formats.push_back(conv_format_t(all_formats[a], PALMASK));
+				combo_target_format->Append(all_formats[a]->getName() + " (Paletted)");
+
+				// Check for match with current format
+				if (current_format.format == all_formats[a] && current_format.coltype == PALMASK)
+					current_index = conv_formats.size() - 1;
+
+				// Default format is 'doom gfx'
+				if (all_formats[a]->getId() == "doom")
+					default_index = conv_formats.size() - 1;
+			}
+
+			if (all_formats[a]->canWriteType(RGBA)) {
+				// Add format
+				conv_formats.push_back(conv_format_t(all_formats[a], RGBA));
+				combo_target_format->Append(all_formats[a]->getName() + " (Truecolour)");
+
+				// Check for match with current format
+				if (current_format.format == all_formats[a] && current_format.coltype == RGBA)
+					current_index = conv_formats.size() - 1;
+			}
+
+			if (all_formats[a]->canWriteType(ALPHAMAP)) {
+				// Add format
+				conv_formats.push_back(conv_format_t(all_formats[a], ALPHAMAP));
+				combo_target_format->Append(all_formats[a]->getName() + " (Alpha Map)");
+
+				// Check for match with current format
+				if (current_format.format == all_formats[a] && current_format.coltype == ALPHAMAP)
+					current_index = conv_formats.size() - 1;
+			}
+		}
+	}
+
+	// If the image cannot be converted to the selected format
+	bool ok = true;
+	if (current_index < 0) {
+		// Default to Doom Gfx
+		current_index = default_index;
+		ok = false;
+	}
+
+	// Set current format
+	combo_target_format->SetSelection(current_index);
+	current_format = conv_formats[current_index];
+
+	// Setup current format string
+	string fmt_string = "Current Format: ";
+	fmt_string += items[current_item].image.getFormat()->getName();
+	if (items[current_item].image.getType() == RGBA)
+		fmt_string += " (Truecolour)";
+	else if (items[current_item].image.getType() == PALMASK)
+		fmt_string += " (Paletted)";
+	else if (items[current_item].image.getType() == ALPHAMAP)
+		fmt_string += " (Alpha Map)";
+	label_current_format->SetLabel(fmt_string);
+
+	// Update UI
 	updatePreviewGfx();
-	validateTargetFormat();
+	theSplashWindow->setProgressMessage(S_FMT("%d of %d", current_item, items.size()));
+	theSplashWindow->setProgress((float)current_item / (float)items.size());
 
-	// Update splash window
-	theSplashWindow->setProgressMessage(entries[current_entry]->getName(true));
-	theSplashWindow->setProgress((float)current_entry / (float)entries.size());
-}
-
-/* GfxConvDialog::writeToEntry
- * Writes the converted image data to the entry
- *******************************************************************/
-bool GfxConvDialog::writeToEntry() {
-	// Get current entry
-	ArchiveEntry* entry = entries[current_entry];
-
-	// MemChunk to store image data
-	MemChunk mc;
-
-	// Write target image to selected type
-	int format = combo_target_format->GetCurrentSelection();
-	if (format == CONV_DOOMFLAT)
-		gfx_target->getImage()->toDoomFlat(mc);
-	else if (format == CONV_DOOMGFX)
-		gfx_target->getImage()->toDoomGfx(mc);
-	else if (format == CONV_PLANAR)
-		gfx_target->getImage()->toPlanar(mc);
-	else if (format == CONV_4BITCHUNKY)
-		gfx_target->getImage()->to4bitChunk(mc);
-	else if (format == CONV_PNG8BIT || format == CONV_PNG32BIT)
-		gfx_target->getImage()->toPNG(mc);
-
-	// Write data to the entry
-	entry->importMemChunk(mc);
-
-	// Re-detect entry type
-	EntryType::detectEntryType(entry);
-
-	// Update entry extension
-	entry->setExtensionByType();
-
-	return true;
+	return ok;
 }
 
 /* GfxConvDialog::setupLayout
@@ -125,22 +168,15 @@ void GfxConvDialog::setupLayout() {
 	wxBoxSizer* m_vbox = new wxBoxSizer(wxVERTICAL);
 	SetSizer(m_vbox);
 
-	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
-	m_vbox->Add(hbox, 0, wxEXPAND|wxTOP|wxLEFT|wxRIGHT, 4);
+	// Add current format label
+	label_current_format = new wxStaticText(this, -1, "Current Format:");
+	m_vbox->Add(label_current_format, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 8);
 
 	// Add 'Convert To' combo box
+	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
+	m_vbox->Add(hbox, 0, wxEXPAND|wxTOP|wxLEFT|wxRIGHT, 4);
 	hbox->Add(new wxStaticText(this, -1, "Convert to:"), 0, wxALL|wxALIGN_CENTER_VERTICAL, 5);
-
-	// This must remain in sync with the ConversionFormat enum in the header
-	wxString s_formats[] = {
-		"Hexen 4-bit Chunky Format",
-		"Hexen Planar Format",
-		"Raw Format (Flat, Colormap, etc.)",
-		"Doom Graphic Format",
-		"PNG Format (8bit Paletted)",
-		"PNG Format (32bit Truecolour)" };
-	combo_target_format = new wxComboBox(this, -1, s_formats[CONV_DOOMGFX], wxDefaultPosition, wxDefaultSize, NUMCONVS, s_formats, wxCB_READONLY);
-	combo_target_format->Select(CONV_DOOMGFX);
+	combo_target_format = new wxChoice(this, -1);
 	hbox->Add(combo_target_format, 1, wxEXPAND|wxALL, 4);
 
 
@@ -217,6 +253,12 @@ void GfxConvDialog::setupLayout() {
 	hbox->Add(colbox_transparent, 0, wxEXPAND|wxALL, 4);
 
 
+	// From brightness
+	rb_transparency_brightness = new wxRadioButton(this, 102, "Transparency from Brightness");
+	rb_transparency_brightness->SetValue(false);
+	vbox_ttypes->Add(rb_transparency_brightness, 0, wxEXPAND|wxALL, 4);
+
+
 	// Buttons
 	hbox = new wxBoxSizer(wxHORIZONTAL);
 	m_vbox->Add(hbox, 0, wxEXPAND|wxALL, 4);
@@ -239,13 +281,14 @@ void GfxConvDialog::setupLayout() {
 	btn_convert_all->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &GfxConvDialog::onBtnConvertAll, this);
 	btn_skip->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &GfxConvDialog::onBtnSkip, this);
 	btn_skip_all->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &GfxConvDialog::onBtnSkipAll, this);
-	combo_target_format->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &GfxConvDialog::onTargetFormatChanged, this);
+	combo_target_format->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &GfxConvDialog::onTargetFormatChanged, this);
 	pal_chooser_current->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &GfxConvDialog::onCurrentPaletteChanged, this);
 	pal_chooser_target->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &GfxConvDialog::onTargetPaletteChanged, this);
 	slider_alpha_threshold->Bind(wxEVT_COMMAND_SLIDER_UPDATED, &GfxConvDialog::onAlphaThresholdChanged, this);
 	cb_enable_transparency->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &GfxConvDialog::onEnableTransparencyChanged, this);
 	rb_transparency_colour->Bind(wxEVT_COMMAND_RADIOBUTTON_SELECTED, &GfxConvDialog::onTransTypeChanged, this);
 	rb_transparency_existing->Bind(wxEVT_COMMAND_RADIOBUTTON_SELECTED, &GfxConvDialog::onTransTypeChanged, this);
+	rb_transparency_brightness->Bind(wxEVT_COMMAND_RADIOBUTTON_SELECTED, &GfxConvDialog::onTransTypeChanged, this);
 	Bind(wxEVT_COLOURBOX_CHANGED, &GfxConvDialog::onTransColourChanged, this, colbox_transparent->GetId());
 
 
@@ -254,61 +297,69 @@ void GfxConvDialog::setupLayout() {
 	SetMinSize(GetSize());
 }
 
-/* GfxConvDialog::openEntries
- * Opens gfx archive entries to be converted
+/* GfxConvDialog::openEntry
+ * Opens an image entry to be converted
  *******************************************************************/
-bool GfxConvDialog::openEntries(vector<ArchiveEntry*> entries) {
-	this->entries = entries;
-	current_entry = 0;
+void GfxConvDialog::openEntry(ArchiveEntry* entry) {
+	// Add item
+	items.push_back(gcd_item_t(entry));
 
-	// Check all entries are valid image formats
-	for (unsigned a = 0; a < this->entries.size(); a++) {
-		if (!(this->entries[a]->getType()->extraProps().propertyExists("image"))) {
-			this->entries.erase(this->entries.begin() + a);
-			a--;
-		}
-	}
+	// Open it
+	current_item = -1;
+	nextItem();
+}
 
-	// Return false if no valid image entries were given
-	if (this->entries.size() == 0)
-		return false;
+/* GfxConvDialog::openEntries
+ * Opens a list of image entries to be converted
+ *******************************************************************/
+void GfxConvDialog::openEntries(vector<ArchiveEntry*> entries) {
+	// Add entries to item list
+	for (unsigned a = 0; a < entries.size(); a++)
+		items.push_back(gcd_item_t(entries[a]));
 
-	updatePreviewGfx();
-
-	return true;
+	// Open the first item
+	current_item = -1;
+	nextItem();
 }
 
 /* GfxConvDialog::updatePreviewGfx
  * Updates the current and target preview windows
  *******************************************************************/
 void GfxConvDialog::updatePreviewGfx() {
-	// Check a valid entry is open
-	if (entries.size() <= current_entry)
+	// Check current item is valid
+	if (items.size() <= current_item)
 		return;
 
-	// Get the current entry
-	ArchiveEntry* entry = entries[current_entry];
+	// Get the current image entry
+	gcd_item_t& item = items[current_item];
 
 	// Set palettes
-	gfx_current->setPalette(pal_chooser_current->getSelectedPalette(entry));
-	gfx_target->setPalette(pal_chooser_target->getSelectedPalette(entry));
+	gfx_current->setPalette(pal_chooser_current->getSelectedPalette(item.entry));
+	gfx_target->setPalette(pal_chooser_target->getSelectedPalette(item.entry));
 
 	// Load the image to both gfx canvases
-	Misc::loadImageFromEntry(gfx_current->getImage(), entry);
-	Misc::loadImageFromEntry(gfx_target->getImage(), entry);
-
-	// Set gfx canvas views
-	//gfx_current->zoomToFit(true, 0.05f);
-	//gfx_target->zoomToFit(true, 0.05f);
+	gfx_current->getImage()->copyImage(&item.image);
+	gfx_target->getImage()->copyImage(&item.image);
 
 	// Update controls
 	updateControls();
 
-	// Apply image conversion to target preview
-	doConvert();
+
+	// --- Apply image conversion to target preview ---
+
+	// Get conversion options
+	SIFormat::convert_options_t opt;
+	getConvertOptions(opt);
+
+	// Do conversion
+	wxLogMessage("Converting to %s", CHR(current_format.format->getName()));
+	current_format.format->convertWritable(*(gfx_target->getImage()), opt);
+
 
 	// Refresh
+	gfx_current->zoomToFit(true, 0.05f);
 	gfx_current->Refresh();
+	gfx_target->zoomToFit(true, 0.05f);
 	gfx_target->Refresh();
 }
 
@@ -316,29 +367,13 @@ void GfxConvDialog::updatePreviewGfx() {
  * Disables/enables controls based on what is currently selected
  *******************************************************************/
 void GfxConvDialog::updateControls() {
-	// Check a valid entry is open
-	if (entries.size() <= current_entry)
+	// Check current item is valid
+	if (items.size() <= current_item)
 		return;
 
-	// Get the current entry
-	ArchiveEntry* entry = entries[current_entry];
-
-	// Disable/enable current gfx palette as needed
-	/*
-	uint16_t entryformat = entry->getType()->getFormat();
-	if (entryformat > EDF_PALETTED_START && entryformat < EDF_PALETTED_STOP)
-		pal_chooser_current->Enable(true);
-	else*/
-		pal_chooser_current->Enable(true);
-
-	// Disable/enable target gfx palette as needed
-	if (combo_target_format->GetCurrentSelection() == CONV_PNG32BIT)
-		pal_chooser_target->Enable(false);
-	else
-		pal_chooser_target->Enable(true);
-
 	// Set colourbox palette if source image has one
-	if (gfx_current->getImage()->getType() == PALMASK) {
+	SIType coltype = gfx_current->getImage()->getType();
+	if (coltype == PALMASK) {
 		colbox_transparent->setPalette(gfx_current->getPalette());
 	}
 	else
@@ -347,7 +382,7 @@ void GfxConvDialog::updateControls() {
 	// Disable/enable transparency options depending on transparency checkbox
 	if (cb_enable_transparency->GetValue()) {
 		// Disable/enable alpha threshold slider as needed
-		if (gfx_current->getImage()->getType() == RGBA)
+		if (coltype == RGBA || coltype == ALPHAMAP)
 			slider_alpha_threshold->Enable(true);
 		else
 			slider_alpha_threshold->Enable(false);
@@ -362,47 +397,90 @@ void GfxConvDialog::updateControls() {
 	}
 }
 
-/* GfxConvDialog::doConvert
- * Performs the image conversion
+/* GfxConvDialog::getConvertOptions
+ * Writes the state of the conversion option controls to [opt]
  *******************************************************************/
-bool GfxConvDialog::doConvert() {
-	// Gather conversion information
-	bool transparency = cb_enable_transparency->GetValue();
-	keep_trans = rb_transparency_existing->GetValue();
-	alpha_threshold = 0;
-
-	// Setup transparency options
-	if (transparency) {
-		if (keep_trans)
-			alpha_threshold = slider_alpha_threshold->GetValue();
-		else
-			colour_trans = colbox_transparent->getColour();
+void GfxConvDialog::getConvertOptions(SIFormat::convert_options_t& opt) {
+	// Set transparency options
+	opt.transparency = cb_enable_transparency->GetValue();
+	if (rb_transparency_existing->GetValue()) {
+		opt.mask_source = SIFormat::MASK_ALPHA;
+		opt.alpha_threshold = slider_alpha_threshold->GetValue();
 	}
-
-	// Do transparency conversion
-	if (transparency) {
-		if (keep_trans)
-			gfx_target->getImage()->cutoffMask(alpha_threshold, true);
-		else
-			gfx_target->getImage()->maskFromColour(colour_trans, gfx_current->getPalette(), true);
+	else if (rb_transparency_colour->GetValue()) {
+		opt.mask_source = SIFormat::MASK_COLOUR;
+		opt.mask_colour = colbox_transparent->getColour();
 	}
+	else
+		opt.mask_source = SIFormat::MASK_BRIGHTNESS;
 
-	// Do colour conversion
-	int format = combo_target_format->GetCurrentSelection();
-	if (format <= CONV_PNG8BIT) {
-		// Convert to selected palette
-		gfx_target->getImage()->convertPaletted(gfx_target->getPalette(), gfx_current->getPalette());
-	}
-	else {
-		// Convert to RGBA (32bit)
-		gfx_target->getImage()->convertRGBA(gfx_current->getPalette());
-	}
+	// Set conversion palettes
+	opt.pal_current = pal_chooser_current->getSelectedPalette(items[current_item].entry);
+	opt.pal_target = pal_chooser_target->getSelectedPalette(items[current_item].entry);
 
-	// If doom flat, planar or no transparency is selected, remove any transparency
-	if (format == CONV_DOOMFLAT || format == CONV_PLANAR || format == CONV_4BITCHUNKY || !transparency)
-		gfx_target->getImage()->fillAlpha(255);	// No transparency
+	// Set conversion colour format
+	opt.col_format = current_format.coltype;
+}
 
-	return true;
+/* GfxConvDialog::itemModified
+ * Returns true if the item at [index] has been modified, false
+ * otherwise
+ *******************************************************************/
+bool GfxConvDialog::itemModified(int index) {
+	// Check index
+	if (index < 0 || index >= (int)items.size())
+		return false;
+
+	return items[index].modified;
+}
+
+/* GfxConvDialog::getItemImage
+ * Returns the image for the item at [index]
+ *******************************************************************/
+SImage* GfxConvDialog::getItemImage(int index) {
+	// Check index
+	if (index < 0 || index >= (int)items.size())
+		return NULL;
+
+	return &(items[index].image);
+}
+
+/* GfxConvDialog::getItemFormat
+ * Returns the format for the item at [index]
+ *******************************************************************/
+SIFormat* GfxConvDialog::getItemFormat(int index) {
+	// Check index
+	if (index < 0 || index >= (int)items.size())
+		return NULL;
+
+	return items[index].new_format;
+}
+
+/* GfxConvDialog::getItemPalette
+ * Returns the palette for the item at [index]
+ *******************************************************************/
+Palette8bit* GfxConvDialog::getItemPalette(int index) {
+	// Check index
+	if (index < 0 || index >= (int)items.size())
+		return NULL;
+
+	return items[index].palette;
+}
+
+/* GfxConvDialog::applyConversion
+ * Applies the conversion to the current image
+ *******************************************************************/
+void GfxConvDialog::applyConversion() {
+	// Get current item
+	gcd_item_t& item = items[current_item];
+
+	// Write converted image data to it
+	item.image.copyImage(gfx_target->getImage());
+
+	// Update item info
+	item.modified = true;
+	item.new_format = current_format.format;
+	item.palette = pal_chooser_target->getSelectedPalette(item.entry);
 }
 
 
@@ -426,8 +504,8 @@ void GfxConvDialog::onResize(wxSizeEvent& e) {
  * Called when the 'Convert' button is clicked
  *******************************************************************/
 void GfxConvDialog::onBtnConvert(wxCommandEvent& e) {
-	writeToEntry();
-	nextEntry();
+	applyConversion();
+	nextItem();
 }
 
 /* GfxConvDialog::btnConvertAllClicked
@@ -437,10 +515,11 @@ void GfxConvDialog::onBtnConvertAll(wxCommandEvent& e) {
 	// Show splash window
 	theSplashWindow->show("Converting Gfx...", true);
 
-	// Convert all entries
-	for (size_t a = current_entry; a < entries.size(); a++) {
-		writeToEntry();
-		nextEntry();
+	// Convert all images
+	for (size_t a = current_item; a < items.size(); a++) {
+		applyConversion();
+		if (!nextItem())
+			break;
 	}
 
 	// Hide splash window
@@ -451,56 +530,22 @@ void GfxConvDialog::onBtnConvertAll(wxCommandEvent& e) {
  * Called when the 'Skip' button is clicked
  *******************************************************************/
 void GfxConvDialog::onBtnSkip(wxCommandEvent& e) {
-	nextEntry();
+	nextItem();
 }
 
 /* GfxConvDialog::btnSkipAllClicked
  * Called when the 'Skip All' button is clicked
  *******************************************************************/
 void GfxConvDialog::onBtnSkipAll(wxCommandEvent& e) {
-	for (size_t a = current_entry; a < entries.size(); a++)
-		nextEntry();
+	this->Close(true);
 }
 
 /* GfxConvDialog::comboTargetFormatChanged
  * Called when the 'Convert To' combo box is changed
  *******************************************************************/
 void GfxConvDialog::onTargetFormatChanged(wxCommandEvent& e) {
-	validateTargetFormat();
+	current_format = conv_formats[combo_target_format->GetSelection()];
 	updatePreviewGfx();
-}
-
-/* GfxConvDialog::validateTargetFormat
- * Prevents from selecting invalid target formats if images have
- * incompatible dimensions or color depth.
- *******************************************************************/
-void GfxConvDialog::validateTargetFormat() {
-	if (combo_target_format->GetCurrentSelection() == CONV_DOOMFLAT) {
-		if (!gfx_current->getImage()->validFlatSize()) {
-			wxMessageBox("Raw graphics only support the following formats:\n"
-				"64x64 or 64x128 (Doom and Hexen flats)\n"
-				"128x128, 256x256 or 512x512 (ZDoom Hires flats)\n"
-				"320x200 (fullscreen graphics)\n"
-				"320xSomething (Heretic or Hexen Autopage)\n"
-				"10x12, 16x16, 32x64 or 48x48 (Alpha GNUM and Strife startup sprites)",
-				"Invalid Image Size", wxOK|wxICON_ERROR);
-			combo_target_format->SetSelection(CONV_DOOMGFX);
-		}
-	} else if (combo_target_format->GetCurrentSelection() == CONV_PLANAR) {
-		if (gfx_current->getImage()->getWidth() != 640 || gfx_current->getImage()->getHeight() != 480) {
-			wxMessageBox("Hexen planar format only supports images of size 640x480", "Invalid Image Size", wxOK|wxICON_ERROR);
-			combo_target_format->SetSelection(CONV_DOOMGFX);
-		}
-		else if (gfx_current->getImage()->countColours() > 16) {
-			wxMessageBox("Hexen planar format only supports images with 16 colors or less", "Invalid Palette Size", wxOK|wxICON_ERROR);
-			combo_target_format->SetSelection(CONV_DOOMGFX);
-		}
-	} else if (combo_target_format->GetCurrentSelection() == CONV_4BITCHUNKY) {
-		if (gfx_current->getImage()->countColours() > 16) {
-			wxMessageBox("4-bit formats only supports images with 16 colors or less", "Invalid Palette Size", wxOK|wxICON_ERROR);
-			combo_target_format->SetSelection(CONV_DOOMGFX);
-		}
-	}
 }
 
 /* GfxConvDialog::paletteCurrentChanged
@@ -550,29 +595,3 @@ void GfxConvDialog::onTransTypeChanged(wxCommandEvent& e) {
 void GfxConvDialog::onTransColourChanged(wxEvent& e) {
 	updatePreviewGfx();
 }
-
-
-/*******************************************************************
- * CONSOLE COMMANDS
- *******************************************************************/
-
-/*
-CONSOLE_COMMAND (test_gcd, 0) {
-	GfxConvDialog gcd;
-
-	if (theArchiveManager->numArchives() > 0) {
-		vector<ArchiveEntry*> entries;
-		for (size_t a = 0; a < args.size(); a++) {
-			ArchiveEntry* entry = theArchiveManager->getArchive(0)->getEntry(args[a]);
-			if (entry)
-				entries.push_back(entry);
-			else
-				wxLogMessage(s_fmt("Entry %s not found", args[a].c_str()));
-		}
-
-		gcd.openEntries(entries);
-	}
-
-	gcd.ShowModal();
-}
-*/

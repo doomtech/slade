@@ -11,8 +11,10 @@
 #include "ListView.h"
 #include "EntryPanel.h"
 #include "MainApp.h"
+#include "DockPanel.h"
 
 class ArchiveManagerPanel;
+class ArchivePanel;
 
 class WMFileBrowser : public wxGenericDirCtrl {
 private:
@@ -27,10 +29,13 @@ public:
 };
 
 class TextureXEditor;
-class ArchiveManagerPanel : public wxPanel, Listener, SActionHandler {
+class ArchiveManagerPanel : public DockPanel, Listener, SActionHandler {
 private:
 	wxAuiNotebook*		notebook_tabs;
 	wxAuiNotebook*		notebook_archives;
+	wxPanel*			panel_am;
+	wxPanel*			panel_archives;
+	wxPanel*			panel_maps;
 	ListView*			list_archives;
 	ListView*			list_recent;
 	ListView*			list_bookmarks;
@@ -45,6 +50,10 @@ public:
 	~ArchiveManagerPanel();
 
 	wxMenu*			getRecentMenu() { return menu_recent; }
+
+	// DockPanel layout
+	void	layoutNormal();
+	void	layoutHorizontal();
 
 	void			refreshArchiveList();
 	void			refreshRecentFileList();
@@ -65,11 +74,14 @@ public:
 	vector<ArchiveEntry*>	currentEntrySelection();
 
 	void			openTab(int archive_index);
-	void			openTab(Archive * archive);
+	ArchivePanel*	getArchiveTab(Archive* archive);
+	void			openTab(Archive* archive);
 	void			closeTab(int archive_index);
 	void			openTextureTab(int archive_index);
 	TextureXEditor*	getTextureTab(int archive_index);
 	void			closeTextureTab(int archive_index);
+	void			openEntryTab(ArchiveEntry* entry);
+	void			closeEntryTabs(Archive* parent);
 	void			openFile(string filename);
 	void			openFiles(wxArrayString& files);
 

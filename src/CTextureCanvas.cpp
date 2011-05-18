@@ -31,6 +31,7 @@
 #include "Main.h"
 #include "CTextureCanvas.h"
 #include "Misc.h"
+#include "Drawing.h"
 
 
 /*******************************************************************
@@ -56,6 +57,7 @@ CTextureCanvas::CTextureCanvas(wxWindow* parent, int id)
 	texture = NULL;
 	show_grid = false;
 	blend_rgba = false;
+	view_type = 0;
 
 	// Bind events
 	Bind(wxEVT_MOTION, &CTextureCanvas::onMouseEvent, this);
@@ -242,8 +244,16 @@ void CTextureCanvas::drawTexture() {
 	// Zoom
 	glScaled(scale, scale, 1);
 
-	// Translate to top-left of texture
-	glTranslated(texture->getWidth() * -0.5, texture->getHeight() * -0.5, 0);
+	// Draw offset guides if needed
+	drawOffsetLines();
+
+	// Translate by offsets if needed
+	if (view_type == 0)
+		glTranslated(texture->getWidth() * -0.5, texture->getHeight() * -0.5, 0);	// No offsets
+	if (view_type >= 1)
+		glTranslated(-texture->getOffsetX(), -texture->getOffsetY(), 0);			// Sprite offsets
+	if (view_type == 2)
+		glTranslated(-160, -100, 0);												// HUD offsets
 
 	// Enable textures
 	glEnable(GL_TEXTURE_2D);
@@ -376,26 +386,8 @@ void CTextureCanvas::drawPatch(int num, bool outside) {
 	// Load the patch as an opengl texture if it isn't already
 	if (!patch_textures[num]->isLoaded()) {
 		SImage temp;
-		if (Misc::loadImageFromEntry(&temp, patch->getPatchEntry(parent))) {
-			// Apply colouring
-			/*
-			if (texture->isExtended()) {
-				CTPatchEx* epatch = (CTPatchEx*)patch;
-
-				// Translation
-				if (epatch->getBlendType() == 1)
-					temp.applyTranslation(&(epatch->getTranslation()), &palette);
-
-				// Blend
-				else if (epatch->getBlendType() == 2)
-					temp.colourise(epatch->getColour(), &palette);
-
-				// Tint
-				else if (epatch->getBlendType() == 3)
-					temp.tint(epatch->getColour(), epatch->getColour().a/255.0f, &palette);
-			}
-			*/
-
+		//if (Misc::loadImageFromEntry(&temp, patch->getPatchEntry(parent))) {
+		if (texture->loadPatchImage(num, temp, parent, &palette)) {
 			// Load the image as a texture
 			patch_textures[num]->loadImage(&temp, &palette);
 		}
@@ -550,6 +542,29 @@ void CTextureCanvas::drawTextureBorder() {
 	}
 }
 
+/* CTextureCanvas::drawOffsetLines
+ * Draws the offset center lines
+ *******************************************************************/
+void CTextureCanvas::drawOffsetLines() {
+	if (view_type == 1) {
+		COL_BLACK.set_gl();
+
+		glBegin(GL_LINES);
+		glVertex2d(-9999, 0);
+		glVertex2d(9999, 0);
+		glVertex2d(0, -9999);
+		glVertex2d(0, 9999);
+		glEnd();
+	}
+	else if (view_type == 2) {
+		glPushMatrix();
+		glEnable(GL_LINE_SMOOTH);
+		Drawing::drawHud(true, true, false);
+		glDisable(GL_LINE_SMOOTH);
+		glPopMatrix();
+	}
+}
+
 /* CTextureCanvas::redraw
  * Redraws the texture, updating it if [update_texture] is true
  *******************************************************************/
@@ -572,8 +587,20 @@ point2_t CTextureCanvas::screenToTexPosition(int x, int y) {
 	// Get top-left of texture in screen coordinates (ie relative to the top-left of the canvas)
 	int left = GetSize().x * 0.5 + offset.x;
 	int top = GetSize().y * 0.5 + offset.y;
-	left -= (double)texture->getWidth() * 0.5 * scale;
-	top -= (double)texture->getHeight() * 0.5 * scale;
+
+	// Adjust for view type
+	if (view_type == 0) {
+		left -= (double)texture->getWidth() * 0.5 * scale;
+		top -= (double)texture->getHeight() * 0.5 * scale;
+	}
+	if (view_type >= 1) {
+		left -= (double)texture->getOffsetX() * scale;
+		top -= (double)texture->getOffsetY() * scale;
+	}
+	if (view_type == 2) {
+		left -= 160 * scale;
+		top -= 100 * scale;
+	}
 
 	return point2_t(double(x - left) / scale, double(y - top) / scale);
 }

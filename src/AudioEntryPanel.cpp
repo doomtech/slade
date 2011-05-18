@@ -43,10 +43,7 @@
  * VARIABLES
  *******************************************************************/
 CVAR(Int, snd_volume, 100, CVAR_SAVE)
-//CVAR(Bool, snd_autoplay, false, CVAR_SAVE) // can't get this to work :/
-#ifndef NO_AUDIERE
-AudioDevicePtr AudioEntryPanel::device = NULL;
-#endif
+CVAR(Bool, snd_autoplay, false, CVAR_SAVE)
 
 
 /*******************************************************************
@@ -87,16 +84,6 @@ AudioEntryPanel::AudioEntryPanel(wxWindow* parent) : EntryPanel(parent, "audio")
 	slider_volume->SetValue(snd_volume);
 	sizer_gb->Add(slider_volume, wxGBPosition(1, 5));
 
-#ifndef NO_AUDIERE
-	// Open audio device
-	if (!device)
-		device = OpenDevice();
-	if (!device)
-		wxLogMessage("Error: Unable to open audio device, sound playback disabled");
-#else
-	wxLogMessage("Audiere disabled - no sound playback");
-#endif
-
 	// Disable general entrypanel buttons
 	btn_save->Disable();
 	btn_revert->Disable();
@@ -128,12 +115,26 @@ bool AudioEntryPanel::loadEntry(ArchiveEntry* entry) {
 	stopStream();
 	opened = false;
 
+	// Enable all playback controls initially
+	slider_seek->Enable();
+	btn_play->Enable();
+	btn_pause->Enable();
+	btn_stop->Enable();
+
 	// Reset seek slider
 	slider_seek->SetValue(0);
+	slider_seek->SetRange(0, 0);
 
 	// Delete previous temp file
 	if (wxFileExists(prevfile))
 		wxRemoveFile(prevfile);
+
+	// Autoplay if option is on
+	if (snd_autoplay) {
+		this->entry = entry;
+		startStream();
+		timer_seek->Start(10);
+	}
 
 	return true;
 }
@@ -145,6 +146,9 @@ bool AudioEntryPanel::saveEntry() {
 	return true;
 }
 
+/* AudioEntryPanel::open
+ * Opens the current entry and performs the appropriate conversions
+ *******************************************************************/
 bool AudioEntryPanel::open() {
 	// Check if already opened
 	if (opened)
@@ -160,51 +164,34 @@ bool AudioEntryPanel::open() {
 		path.SetExt(entry->getType()->getExtension());
 
 	// Convert if necessary, then write to file
-	if (entry->getType()->getFormat() == "snd_doom") {
-		// Doom Sound -> WAV
-		MemChunk convdata;
+	MemChunk convdata;
+	if (entry->getType()->getFormat() == "snd_doom")			// Doom Sound -> WAV
 		Conversions::doomSndToWav(mcdata, convdata);
-		path.SetExt("wav");
-		convdata.exportFile(path.GetFullPath());
-	} else if (entry->getType()->getFormat() == "snd_doom64") {
-		// Doom 64 SFX -> WAV
-		MemChunk convdata;
+	else if (entry->getType()->getFormat() == "snd_doom64")		// Doom 64 SFX -> WAV
 		Conversions::d64SfxToWav(mcdata, convdata);
-		path.SetExt("wav");
-		convdata.exportFile(path.GetFullPath());
-	} else if (entry->getType()->getFormat() == "snd_voc") {
-		// Creative Voice File -> WAV
-		MemChunk convdata;
+	else if (entry->getType()->getFormat() == "snd_voc")		// Creative Voice File -> WAV
 		Conversions::vocToWav(mcdata, convdata);
-		path.SetExt("wav");
-		convdata.exportFile(path.GetFullPath());
-	} else if (entry->getType()->getFormat() == "snd_bloodsfx") {
-		// Creative Voice File -> WAV
-		MemChunk convdata;
+	else if (entry->getType()->getFormat() == "snd_bloodsfx")	// Creative Voice File -> WAV
 		Conversions::bloodToWav(entry, convdata);
-		path.SetExt("wav");
-		convdata.exportFile(path.GetFullPath());
-	} else if (entry->getType()->getFormat() == "mus") {
-		// MUS -> MIDI
-		MemChunk convdata;
+	else if (entry->getType()->getFormat() == "mus") {			// MUS -> MIDI
 		Conversions::musToMidi(mcdata, convdata);
 		path.SetExt("mid");
-		convdata.exportFile(path.GetFullPath());
-	} else if (entry->getType()->getFormat() == "gmid") {
-		// GMID -> MIDI
-		MemChunk convdata;
+	}
+	else if (entry->getType()->getFormat() == "gmid") {			// GMID -> MIDI
 		Conversions::gmidToMidi(mcdata, convdata);
 		path.SetExt("mid");
-		convdata.exportFile(path.GetFullPath());
-	} else
-		mcdata.exportFile(path.GetFullPath());
+	}
+	else
+		convdata.importMem(mcdata.getData(), mcdata.getSize());
 
 	if (entry->getType()->getFormat() == "midi" || entry->getType()->getFormat() == "mus" ||
 		entry->getType()->getFormat() == "gmid") {
+		convdata.exportFile(path.GetFullPath());
 		openMidi(path.GetFullPath());
 		midi = true;
-	} else {
-		openAudio(path.GetFullPath());
+	}
+	else {
+		openAudio(convdata, path.GetFullName());
 		midi = false;
 	}
 
@@ -218,48 +205,85 @@ bool AudioEntryPanel::open() {
 /* AudioEntryPanel::openAudio
  * Opens an audio file for playback
  *******************************************************************/
-bool AudioEntryPanel::openAudio(string filename) {
-#ifndef NO_AUDIERE
-	stream = OpenSound(device, CHR(filename), true);
-	if (stream) {
-		// Check if the audio is seekable
-		int length = stream->getLength();
-		if (length == 0)
-			slider_seek->Enable(false);	// Not seekable, disable seek control
-		else {
-			slider_seek->Enable();
-			slider_seek->SetRange(0, length);
-		}
+bool AudioEntryPanel::openAudio(MemChunk& audio, string filename) {
+	// Stop if sound currently playing
+	sound.Stop();
+	sound.ResetBuffer();
+	music.Stop();
+
+	// Load into buffer
+	if (sound_buffer.LoadFromMemory((const char*)audio.getData(), audio.getSize())) {
+		// Bind to sound
+		sound.SetBuffer(sound_buffer);
+		audio_music = false;
 
 		// Enable play controls
+		slider_seek->Enable();
+		slider_seek->SetRange(0, sound_buffer.GetDuration()*100);
 		btn_play->Enable();
 		btn_pause->Enable();
 		btn_stop->Enable();
 
-		// Set volume
-		stream->setVolume((float)snd_volume * 0.01f);
+		return true;
+	}
+	else if (music.OpenFromMemory((const char*)audio.getData(), audio.getSize())) {
+		// Couldn't open the audio as a sf::SoundBuffer, try sf::Music instead
+		audio_music = true;
+
+		// Enable play controls
+		btn_play->Enable();
+		btn_stop->Enable();
+
+		// sf::Music can't seek or pause
+		slider_seek->Enable(false);
+		btn_pause->Enable(false);
 
 		return true;
 	}
-	else {
-		// Unable to open audio, disable play controls
-		btn_play->Enable(false);
-		btn_pause->Enable(false);
-		btn_stop->Enable(false);
+	
+	// Unable to open audio, disable play controls
+	slider_seek->Enable(false);
+	btn_play->Enable(false);
+	btn_pause->Enable(false);
+	btn_stop->Enable(false);
 
-		return false;
-	}
-#else
 	return false;
-#endif
 }
 
 /* AudioEntryPanel::openMidi
  * Opens a MIDI file for playback
  *******************************************************************/
+bool nosf_warned = false;	// One-time 'no soundfont loaded' warning
 bool AudioEntryPanel::openMidi(string filename) {
-	// Disable volume control
-	slider_volume->Enable(false);
+	// Enable volume control
+	slider_volume->Enable(true);
+
+	// Disable controls if we cannot play the midi
+	if (!theMIDIPlayer->isInitialised()) {
+		btn_play->Enable(false);
+		btn_pause->Enable(false);
+		btn_stop->Enable(false);
+		slider_seek->Enable(false);
+
+		return false;
+	}
+
+	// Warn if no soundfont is loaded
+	if (!theMIDIPlayer->isSoundfontLoaded()) {
+		// Disable play controls
+		btn_play->Enable(false);
+		btn_pause->Enable(false);
+		btn_stop->Enable(false);
+		slider_seek->Enable(false);
+
+		// Popup message
+		if (!nosf_warned) {
+			wxMessageBox("No soundfont is currently set up for playing MIDIs. See the audio settings in Editor->Preferences", "Can't play MIDI", wxICON_ERROR);
+			nosf_warned = true;
+		}
+
+		return false;
+	}
 
 	// Attempt to open midi
 	if (theMIDIPlayer->openFile(filename)) {
@@ -297,10 +321,12 @@ void AudioEntryPanel::startStream() {
 
 	if (midi)
 		theMIDIPlayer->play();
-#ifndef NO_AUDIERE
-	else if (stream)
-		stream->play();
-#endif
+	else {
+		if (audio_music)
+			music.Play();
+		else
+			sound.Play();
+	}
 }
 
 /* AudioEntryPanel::stopStream
@@ -309,10 +335,8 @@ void AudioEntryPanel::startStream() {
 void AudioEntryPanel::stopStream() {
 	if (midi)
 		theMIDIPlayer->pause();
-#ifndef NO_AUDIERE
-	else if (stream)
-		stream->stop();
-#endif
+	else if (!audio_music)
+		sound.Pause();
 }
 
 /* AudioEntryPanel::resetStream
@@ -321,10 +345,12 @@ void AudioEntryPanel::stopStream() {
 void AudioEntryPanel::resetStream() {
 	if (midi)
 		theMIDIPlayer->stop();
-#ifndef NO_AUDIERE
-	else if (stream)
-		stream->reset();
-#endif
+	else {
+		if (audio_music)
+			music.Stop();
+		else
+			sound.Stop();
+	}
 }
 
 
@@ -370,16 +396,16 @@ void AudioEntryPanel::onTimer(wxTimerEvent& e) {
 	int pos = 0;
 	if (midi)
 		pos = theMIDIPlayer->getPosition();
-#ifndef NO_AUDIERE
-	else if (stream && stream->isSeekable())
-		pos = stream->getPosition();
-#endif
+	else
+		pos = sound.GetPlayingOffset() * 100;
 
 	// Set slider
 	slider_seek->SetValue(pos);
 
 	// Stop the timer if playback has reached the end
-	if (pos == slider_seek->GetMax())
+	if (pos >= slider_seek->GetMax() || 
+		(!audio_music && sound.GetStatus() == sf::Sound::Stopped) ||
+		(audio_music && music.GetStatus() == sf::Sound::Stopped))
 		timer_seek->Stop();
 }
 
@@ -389,10 +415,8 @@ void AudioEntryPanel::onTimer(wxTimerEvent& e) {
 void AudioEntryPanel::onSliderSeekChanged(wxCommandEvent& e) {
 	if (midi)
 		theMIDIPlayer->setPosition(slider_seek->GetValue());
-#ifndef NO_AUDIERE
-	else if (stream && stream->isSeekable())
-		stream->setPosition(slider_seek->GetValue());
-#endif
+	else
+		sound.SetPlayingOffset(slider_seek->GetValue() * 0.01);
 }
 
 /* AudioEntryPanel::onSliderVolumeChanged
@@ -400,8 +424,8 @@ void AudioEntryPanel::onSliderSeekChanged(wxCommandEvent& e) {
  *******************************************************************/
 void AudioEntryPanel::onSliderVolumeChanged(wxCommandEvent& e) {
 	snd_volume = slider_volume->GetValue();
-#ifndef NO_AUDIERE
-	if (stream)
-		stream->setVolume((float)snd_volume * 0.01f);
-#endif
+	if (midi)
+		theMIDIPlayer->setVolume(snd_volume);
+	else
+		sound.SetVolume(snd_volume);
 }

@@ -136,6 +136,9 @@ void FindReplaceDialog::onClose(wxCloseEvent& e) {
 	Show(false);
 }
 
+/* FindReplaceDialog::onKeyDown
+ * Called when a key is pressed
+ *******************************************************************/
 void FindReplaceDialog::onKeyDown(wxKeyEvent& e) {
 	// Check for ESC key
 	if (e.GetKeyCode() == WXK_ESCAPE)
@@ -191,7 +194,6 @@ TextEditor::TextEditor(wxWindow* parent, int id)
 	Bind(wxEVT_STC_DWELLSTART, &TextEditor::onMouseDwellStart, this);
 	Bind(wxEVT_STC_DWELLEND, &TextEditor::onMouseDwellEnd, this);
 	Bind(wxEVT_LEFT_DOWN, &TextEditor::onMouseDown, this);
-	Bind(wxEVT_RIGHT_UP, &TextEditor::onMouseUp, this);
 	Bind(wxEVT_KILL_FOCUS, &TextEditor::onFocusLoss, this);
 	dlg_fr->getBtnFindNext()->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextEditor::onFRDBtnFindNext, this);
 	dlg_fr->getBtnReplace()->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextEditor::onFRDBtnReplace, this);
@@ -616,11 +618,11 @@ void TextEditor::updateCalltip() {
  *******************************************************************/
 void TextEditor::onKeyDown(wxKeyEvent& e) {
 	// Check for Ctrl+Shift+Space (invoke calltip)
-	if ((e.GetModifiers() == (wxMOD_SHIFT|wxMOD_CONTROL)) && (e.GetKeyCode() == WXK_SPACE))
+	if ((e.GetModifiers() == (wxMOD_SHIFT|wxMOD_CMD)) && (e.GetKeyCode() == WXK_SPACE))
 		updateCalltip();
 
 	// Check for Ctrl+Space
-	else if ((e.GetModifiers() == wxMOD_CONTROL) && (e.GetKeyCode() == WXK_SPACE)) {
+	else if ((e.GetModifiers() == wxMOD_CMD) && (e.GetKeyCode() == WXK_SPACE)) {
 		// Get word before cursor
 		string word = GetTextRange(WordStartPosition(GetCurrentPos(), true), GetCurrentPos());
 
@@ -630,7 +632,7 @@ void TextEditor::onKeyDown(wxKeyEvent& e) {
 	}
 
 	// Ctrl+F (find/replace)
-	else if ((e.GetModifiers() == wxMOD_CONTROL) && (e.GetKeyCode() == 'F'))
+	else if ((e.GetModifiers() == wxMOD_CMD) && (e.GetKeyCode() == 'F'))
 		showFindReplaceDialog();
 
 	// F3 (repeat last find operation)
@@ -776,7 +778,7 @@ void TextEditor::onMouseDown(wxMouseEvent& e) {
 		return;
 
 	// Check for ctrl+left (web lookup)
-	if (e.LeftDown() && e.GetModifiers() == wxMOD_CONTROL) {
+	if (e.LeftDown() && e.GetModifiers() == wxMOD_CMD) {
 		int pos = CharPositionFromPointClose(e.GetX(), e.GetY());
 		string word = GetTextRange(WordStartPosition(pos, true), WordEndPosition(pos, true));
 
@@ -812,14 +814,6 @@ void TextEditor::onMouseDown(wxMouseEvent& e) {
 		}
 	}
 #endif
-}
-
-void TextEditor::onMouseUp(wxMouseEvent& e) {
-	// Do nothing on right click (for now)
-	//if (e.GetButton() == wxMOUSE_BTN_RIGHT)
-	//	return;
-	//else
-		e.Skip();
 }
 
 /* TextEditor::onFocusLoss

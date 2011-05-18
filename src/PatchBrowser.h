@@ -8,15 +8,14 @@
 
 class PatchBrowserItem : public BrowserItem {
 private:
-	ArchiveEntry*	entry;
-	Palette8bit*	palette;
+	Archive*	archive;
+	uint8_t		type;		// 0=patch, 1=ctexture
+	string		nspace;
 
 public:
-	PatchBrowserItem(string name, ArchiveEntry* entry = NULL, unsigned index = 0);
+	PatchBrowserItem(string name, Archive* archive = NULL, uint8_t type = 0, string nspace = "", unsigned index = 0);
 	~PatchBrowserItem();
 
-	void	setPalette(Palette8bit* pal) { this->palette = pal; }
-	void	setEntry(ArchiveEntry* entry) { this->entry = entry; }
 	bool	loadImage();
 };
 
@@ -31,7 +30,6 @@ public:
 	bool	openPatchTable(PatchTable* table);
 	bool	openArchive(Archive* archive);
 	int		getSelectedPatch();
-	void	updateItems(BrowserTreeNode* node = NULL);
 
 	// Events
 	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);

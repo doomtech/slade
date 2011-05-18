@@ -106,7 +106,7 @@ void WMFileBrowser::onItemActivated(wxTreeEvent &e) {
  * ArchiveManagerPanel class constructor
  *******************************************************************/
 ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_archives)
-: wxPanel(parent, -1) {
+: DockPanel(parent) {
 	notebook_archives = nb_archives;
 
 	// Create main sizer
@@ -118,21 +118,25 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
 	vbox->Add(notebook_tabs, 1, wxEXPAND | wxALL, 4);
 
 	// Open archives & maps list
-	wxPanel *panel_am = new wxPanel(notebook_tabs);
+	panel_am = new wxPanel(notebook_tabs);
 	notebook_tabs->AddPage(panel_am, "Archives", true);
 
 	// Create/setup archive list
-	wxBoxSizer *box_am = new wxBoxSizer(wxVERTICAL);
-	panel_am->SetSizer(box_am);
-	box_am->Add(new wxStaticText(panel_am, -1, "Open Archives:"), 0, wxEXPAND | wxALL, 4);
-	list_archives = new ListView(panel_am, -1);
-	box_am->Add(list_archives, 1, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, 4);
+	panel_archives = new wxPanel(panel_am, -1);
+	wxBoxSizer* vbox2 = new wxBoxSizer(wxVERTICAL);
+	panel_archives->SetSizer(vbox2);
+	vbox2->Add(new wxStaticText(panel_archives, -1, "Open Archives:"), 0, wxEXPAND);
+	list_archives = new ListView(panel_archives, -1);
+	vbox2->Add(list_archives, 1, wxEXPAND|wxTOP, 4);
 	refreshArchiveList();
 
 	// Create/setup map list
-	box_am->Add(new wxStaticText(panel_am, -1, "Maps:"), 0, wxEXPAND | wxALL, 4);
-	list_maps = new wxListCtrl(panel_am, -1, wxDefaultPosition, wxSize(-1, 128), wxLC_LIST | wxLC_SINGLE_SEL);
-	box_am->Add(list_maps, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, 4);
+	panel_maps = new wxPanel(panel_am, -1);
+	vbox2 = new wxBoxSizer(wxVERTICAL);
+	panel_maps->SetSizer(vbox2);
+	vbox2->Add(new wxStaticText(panel_maps, -1, "Maps:"), 0, wxEXPAND);
+	list_maps = new wxListCtrl(panel_maps, -1, wxDefaultPosition, wxSize(-1, 128), wxLC_LIST | wxLC_SINGLE_SEL);
+	vbox2->Add(list_maps, 0, wxEXPAND|wxTOP, 4);
 
 	// Create/setup file browser
 	file_browser = new WMFileBrowser(notebook_tabs, this, -1);
@@ -188,6 +192,30 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
  * ArchiveManagerPanel class destructor
  *******************************************************************/
 ArchiveManagerPanel::~ArchiveManagerPanel() {
+}
+
+/* ArchiveManagerPanel::layoutNormal
+ * Layout the panel normally
+ *******************************************************************/
+void ArchiveManagerPanel::layoutNormal() {
+	// Layout archives tab vertically
+	wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
+	panel_am->SetSizer(vbox);
+
+	vbox->Add(panel_archives, 1, wxEXPAND|wxALL, 4);
+	vbox->Add(panel_maps, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+}
+
+/* ArchiveManagerPanel::layoutHorizontal
+ * Layout the panel horizontally
+ *******************************************************************/
+void ArchiveManagerPanel::layoutHorizontal() {
+	// Layout archives tab horizontally
+	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
+	panel_am->SetSizer(hbox);
+
+	hbox->Add(panel_archives, 1, wxEXPAND|wxALL, 4);
+	hbox->Add(panel_maps, 1, wxEXPAND|wxTOP|wxRIGHT|wxBOTTOM, 4);
 }
 
 /* ArchiveManagerPanel::refreshRecentFileList
@@ -465,32 +493,47 @@ void ArchiveManagerPanel::openTab(int archive_index) {
 	}
 }
 
+/* ArchiveManagerPanel::getArchiveTab
+ * Returns the ArchivePanel for [archive], or NULL if none is open
+ *******************************************************************/
+ArchivePanel* ArchiveManagerPanel::getArchiveTab(Archive* archive) {
+	// Check archive was given
+	if (!archive)
+		return NULL;
+
+	// Go through all tabs
+	for (size_t a = 0; a < notebook_archives->GetPageCount(); a++) {
+		// Check page type is "archive"
+		if (notebook_archives->GetPage(a)->GetName().CmpNoCase("archive"))
+			continue;
+
+		// Check for archive match
+		ArchivePanel* ap = (ArchivePanel*)notebook_archives->GetPage(a);
+		if (ap->getArchive() == archive)
+			return ap;
+	}
+
+	// No tab currently open for archive
+	return NULL;
+}
+
 /* ArchiveManagerPanel::openTab
  * Opens a new tab for the archive
  *******************************************************************/
 void ArchiveManagerPanel::openTab(Archive* archive) {
 	if (archive) {
-		// Go through all tabs
-		for (size_t a = 0; a < notebook_archives->GetPageCount(); a++) {
-			// Check page type is "archive"
-			if (notebook_archives->GetPage(a)->GetName().CmpNoCase("archive"))
-				continue;
+		// Check if the archive is already open in a tab
+		ArchivePanel* wp = getArchiveTab(archive);
+		if (wp) {
+			// Switch to tab
+			notebook_archives->SetSelection(notebook_archives->GetPageIndex(wp));
+			wp->focusEntryList();
 
-			// Check for archive match
-			ArchivePanel* ap = (ArchivePanel*)notebook_archives->GetPage(a);
-			if (ap->getArchive() == archive) {
-				// Selected archive is already open in a tab, so switch to this tab
-
-				// Switch to tab
-				notebook_archives->SetSelection(a);
-				ap->focusEntryList();
-
-				return;
-			}
+			return;
 		}
 
 		// If tab isn't already open, open a new one
-		ArchivePanel* wp = new ArchivePanel(notebook_archives, archive);
+		wp = new ArchivePanel(notebook_archives, archive);
 
 		// Determine icon
 		string icon = "e_archive";
@@ -585,6 +628,10 @@ void ArchiveManagerPanel::openTextureTab(int archive_index) {
 	}
 }
 
+/* ArchiveManagerPanel::getTextureTab
+ * Returns the TextureXEditor for the archive at [archive_index],
+ * or NULL if none is open for that archive
+ *******************************************************************/
 TextureXEditor* ArchiveManagerPanel::getTextureTab(int archive_index) {
 	Archive* archive = theArchiveManager->getArchive(archive_index);
 
@@ -613,6 +660,68 @@ TextureXEditor* ArchiveManagerPanel::getTextureTab(int archive_index) {
 void ArchiveManagerPanel::closeTextureTab(int archive_index) {
 	TextureXEditor* txed = getTextureTab(archive_index);
 	if (txed) notebook_archives->DeletePage(notebook_archives->GetPageIndex(txed));
+}
+
+/* ArchiveManagerPanel::openEntryTab
+ * Opens the appropriate EntryPanel for [entry] in a new tab
+ *******************************************************************/
+void ArchiveManagerPanel::openEntryTab(ArchiveEntry* entry) {
+	// First check if the entry is already open in a tab
+	for (unsigned a = 0; a < notebook_archives->GetPageCount(); a++) {
+		// Check page type is "entry"
+		if (notebook_archives->GetPage(a)->GetName() != "entry")
+			continue;
+
+		// Check for entry match
+		EntryPanel* ep = (EntryPanel*)notebook_archives->GetPage(a);
+		if (ep->getEntry() == entry) {
+			// Already open, switch to tab
+			notebook_archives->SetSelection(a);
+			return;
+		}
+	}
+
+	// Create an EntryPanel for the entry
+	EntryPanel* ep = ArchivePanel::createPanelForEntry(entry, notebook_archives);
+	ep->openEntry(entry);
+
+	// Create new tab for the EntryPanel
+	notebook_archives->AddPage(ep, S_FMT("%s/%s", CHR(entry->getParent()->getFilename(false)), CHR(entry->getName())), true);
+	notebook_archives->SetPageBitmap(notebook_archives->GetPageCount() - 1, getIcon(entry->getType()->getIcon()));
+	ep->SetName("entry");
+	ep->Show(true);
+
+	// Select the new tab
+	for (size_t a = 0; a < notebook_archives->GetPageCount(); a++) {
+		if (notebook_archives->GetPage(a) == ep) {
+			notebook_archives->SetSelection(a);
+			return;
+		}
+	}
+}
+
+/* ArchiveManagerPanel::closeEntryTab
+ * Closes the EntryPanel tab for [entry]
+ *******************************************************************/
+void ArchiveManagerPanel::closeEntryTabs(Archive* parent) {
+	// Check archive was given
+	if (!parent)
+		return;
+
+	// Go through tabs
+	for (unsigned a = 0; a < notebook_archives->GetPageCount(); a++) {
+		// Check page type is "entry"
+		if (notebook_archives->GetPage(a)->GetName() != "entry")
+			continue;
+
+		// Check for entry parent archive match
+		EntryPanel* ep = (EntryPanel*)notebook_archives->GetPage(a);
+		if (ep->getEntry()->getParent() == parent) {
+			// Close tab
+			notebook_archives->DeletePage(a);
+			a--;
+		}
+	}
 }
 
 /* ArchiveManagerPanel::openFile
@@ -909,6 +1018,7 @@ void ArchiveManagerPanel::onAnnouncement(Announcer* announcer, string event_name
 
 		// Close any related tabs
 		closeTextureTab(index);
+		closeEntryTabs(theArchiveManager->getArchive(index));
 		closeTab(index);
 	}
 

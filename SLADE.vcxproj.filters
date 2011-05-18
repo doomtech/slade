@@ -654,8 +654,14 @@
     <ClCompile Include="src\SIFormat.cpp">
       <Filter>Resources\Graphics\Image\Formats</Filter>
     </ClCompile>
-    <ClCompile Include="src\KeyBind.cpp">
+    <ClCompile Include="src\AudioPrefsPanel.cpp">
+      <Filter>Dialogs\Preferences</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Drawing.cpp">
       <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DockPanel.cpp">
+      <Filter>UI Elements</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1224,8 +1230,20 @@
     <ClInclude Include="src\SIFQuake.h">
       <Filter>Resources\Graphics\Image\Formats</Filter>
     </ClInclude>
-    <ClInclude Include="src\KeyBind.h">
+    <ClInclude Include="src\AudioPrefsPanel.h">
+      <Filter>Dialogs\Preferences</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SIFJedi.h">
+      <Filter>Resources\Graphics\Image\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SIFRott.h">
+      <Filter>Resources\Graphics\Image\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Drawing.h">
       <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DockPanel.h">
+      <Filter>UI Elements</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

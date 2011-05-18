@@ -85,7 +85,6 @@ public:
 	void	onMouseDwellStart(wxStyledTextEvent& e);
 	void	onMouseDwellEnd(wxStyledTextEvent& e);
 	void	onMouseDown(wxMouseEvent& e);
-	void	onMouseUp(wxMouseEvent& e);
 	void	onFocusLoss(wxFocusEvent& e);
 	void	onFRDBtnFindNext(wxCommandEvent& e);
 	void	onFRDBtnReplace(wxCommandEvent& e);

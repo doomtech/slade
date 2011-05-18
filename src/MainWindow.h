@@ -23,6 +23,7 @@ private:
 	wxAuiManager*			m_mgr;
 	int						lasttipindex;
 	PaletteChooser*			palette_chooser;
+	vector<wxMenu*>			custom_menus;
 
 	// Singleton instance
 	static MainWindow*		instance;
@@ -58,7 +59,7 @@ public:
 
 	// Custom menu
 	void	addCustomMenu(wxMenu* menu, string title);
-	void	removeCustomMenu(string title);
+	void	removeCustomMenu(wxMenu* menu);
 
 	// Toolbars
 	void	addToolbar(wxAuiToolBar* toolbar, string name, int position);

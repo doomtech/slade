@@ -21,6 +21,8 @@ protected:
 	wxStaticText*	label_current_zoom;
 	wxCheckBox*		cb_draw_outside;
 	wxCheckBox*		cb_blend_rgba;
+	wxStaticText*	label_viewtype;
+	wxChoice*		choice_viewtype;
 	CTextureCanvas*	tex_canvas;
 
 	// Texture controls
@@ -60,7 +62,7 @@ public:
 	virtual void		populatePatchList();
 	virtual void		updatePatchControls();
 
-	bool	openTexture(CTexture* tex);
+	bool	openTexture(CTexture* tex, TextureXList* list);
 	void	setPalette(Palette8bit* pal);
 
 	// Editing

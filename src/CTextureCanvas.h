@@ -26,6 +26,7 @@ private:
 	bool				dragging;
 	bool				show_grid;
 	bool				blend_rgba;
+	int					view_type;	// 0=normal, 1=sprite offsets, 2=hud offsets
 
 public:
 	CTextureCanvas(wxWindow* parent, int id);
@@ -33,6 +34,7 @@ public:
 
 	CTexture*	getTexture() { return texture; }
 	void		setScale(double scale) { this->scale = scale; }
+	void		setViewType(int type) { this->view_type = type; }
 	void		drawOutside(bool draw = true) { draw_outside = draw; }
 	point2_t	getMousePrevPos() { return mouse_prev; }
 	bool		isDragging() { return dragging; }
@@ -53,6 +55,7 @@ public:
 	void	drawTexture();
 	void	drawPatch(int num, bool outside = false);
 	void	drawTextureBorder();
+	void	drawOffsetLines();
 	void	resetOffsets() { offset.x = offset.y = 0; }
 	void	redraw(bool update_tex = false);
 

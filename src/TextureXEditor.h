@@ -22,6 +22,9 @@ private:
 	// UI Stuff
 	wxAuiNotebook*		tabs;
 	wxButton*			btn_save;
+	wxMenu*				menu_texture;
+
+	bool	pb_update;
 
 public:
 	TextureXEditor(wxWindow* parent);
@@ -34,6 +37,7 @@ public:
 	void	updateTexturePalette();
 	void	saveChanges();
 	bool	close();
+	void	showTextureMenu(bool show = true);
 
 	// Editing
 	bool	removePatch(unsigned index, bool delete_entry = false);
@@ -46,6 +50,7 @@ public:
 	// Events
 	void	onSaveClicked(wxCommandEvent& e);
 	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
+	void	onShow(wxShowEvent& e);
 
 	// Static
 	static bool	setupTextureEntries(Archive* archive);

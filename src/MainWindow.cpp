@@ -413,34 +413,40 @@ void MainWindow::openTextureEditor(Archive* archive) {
 }
 
 /* MainWindow::openEntry
- * (Unimplemented) open [entry] in the editor, opening the correct
- * archive tab and entry panel
+ * Opens [entry] in it's own tab
  *******************************************************************/
 void MainWindow::openEntry(ArchiveEntry* entry) {
+	panel_archivemanager->openEntryTab(entry);
 }
 
 /* MainWindow::addCustomMenu
  * Adds [menu] to the menu bar after the 'Entry' menu
  *******************************************************************/
 void MainWindow::addCustomMenu(wxMenu* menu, string title) {
-	// Insert custom menus between 'Editor' and 'View' menus
-	if (GetMenuBar()->FindMenu(title) == wxNOT_FOUND) {
-		GetMenuBar()->Insert(GetMenuBar()->FindMenu("&View"), menu, title);
-		GetMenuBar()->Refresh();
+	// Check menu doesn't already exist
+	for (unsigned a = 0; a < custom_menus.size(); a++) {
+		if (custom_menus[a] == menu)
+			return;
 	}
+
+	// Insert custom menu after the last existing custom menu
+	GetMenuBar()->Insert(2 + custom_menus.size(), menu, title);
+	GetMenuBar()->Refresh();
+	custom_menus.push_back(menu);
 }
 
 /* MainWindow::removeCustomMenu
  * Removes the menu matching [title] from the menu bar
  *******************************************************************/
-void MainWindow::removeCustomMenu(string title) {
-	// Get custom menu index
-	int index = GetMenuBar()->FindMenu(title);
-
-	// Remove it
-	if (index != wxNOT_FOUND) {
-		GetMenuBar()->Remove(index);
-		GetMenuBar()->Refresh();
+void MainWindow::removeCustomMenu(wxMenu* menu) {
+	// Go through custom menus
+	for (unsigned a = 0; a < custom_menus.size(); a++) {
+		if (custom_menus[a] == menu) {
+			// Menu found, remove it
+			custom_menus.erase(custom_menus.begin() + a);
+			GetMenuBar()->Remove(2 + a);
+			return;
+		}
 	}
 }
 

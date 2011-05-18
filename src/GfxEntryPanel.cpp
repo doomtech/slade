@@ -244,20 +244,6 @@ public:
 	}
 };
 
-/*******************************************************************
- * GFXCROPDIALOG CLASS
- *******************************************************************
- A simple dialog for the 'Crop' function, allows the user to select
- new image bounds to crop to
- */
-/*
-class GfxTintDialog : public wxDialog {
-private:
-	GfxCanvas*			gfx_preview;
-	ArchiveEntry*		entry;
-	Palette8bit*		palette;
-*/
-
 
 /*******************************************************************
  * GFXENTRYPANEL CLASS FUNCTIONS
@@ -315,9 +301,9 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 
 	// Gfx (offset) type
 	string offset_types[] = { "Auto", "Graphic", "Sprite", "HUD" };
-	combo_offset_type = new wxComboBox(this, -1, offset_types[0], wxDefaultPosition, wxDefaultSize, 4, offset_types, wxCB_READONLY);
-	//sizer_top->Add(new wxStaticText(this, -1, "Offset Type:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
-	sizer_top->Add(combo_offset_type, 0, wxEXPAND, 0);
+	choice_offset_type = new wxChoice(this, -1, wxDefaultPosition, wxDefaultSize, 4, offset_types);
+	choice_offset_type->SetSelection(0);
+	sizer_top->Add(choice_offset_type, 0, wxEXPAND, 0);
 
 	// Custom menu
 	menu_custom = new wxMenu();
@@ -344,7 +330,7 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 	slider_zoom->Bind(wxEVT_COMMAND_SLIDER_UPDATED, &GfxEntryPanel::onZoomChanged, this);
 	spin_xoffset->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &GfxEntryPanel::onXOffsetChanged, this);
 	spin_yoffset->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &GfxEntryPanel::onYOffsetChanged, this);
-	combo_offset_type->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &GfxEntryPanel::onOffsetTypeChanged, this);
+	choice_offset_type->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &GfxEntryPanel::onOffsetTypeChanged, this);
 	cb_tile->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &GfxEntryPanel::onTileChanged, this);
 	Bind(wxEVT_GFXCANVAS_OFFSET_CHANGED, &GfxEntryPanel::onGfxOffsetChanged, this, gfx_canvas->GetId());
 	btn_nextimg->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &GfxEntryPanel::onBtnNextImg, this);
@@ -395,22 +381,32 @@ bool GfxEntryPanel::saveEntry() {
 	bool ok = true;
 	if (image_data_modified) {
 		SImage* image = getImage();
+		SIFormat* format = image->getFormat();
 
-		// Write depending on type
-		// TODO: I really should write a proper SImage format system so this kind of thing isn't needed
-		if (entry->getType()->getFormat() == "img_doom")
-			image->toDoomGfx(entry->getMCData());
-		else if (entry->getType()->getFormat() == "img_png")
-			image->toPNG(entry->getMCData(), gfx_canvas->getPalette());
-		else if (entry->getType()->getFormat() == "img_raw")
-			image->toDoomFlat(entry->getMCData());
+		string error = "";
+		ok = false;
+		int writable = format->canWrite(*image);
+		if (format == SIFormat::unknownFormat())
+			error = "Image is of unknown format";
+		else if (writable == SIFormat::NOTWRITABLE)
+			error = S_FMT("Writing unsupported for format \"%s\"", CHR(format->getName()));
 		else {
-			wxMessageBox("Unable to save changes, unsupported format for writing.\nSupported formats are: Doom Gfx, Doom Flat, PNG");
-			ok = false;
+			// Convert image if necessary (using default options)
+			if (writable == SIFormat::CONVERTIBLE) {
+				format->convertWritable(*image, SIFormat::convert_options_t());
+				wxLogMessage("Image converted for writing");
+			}
+
+			if (format->saveImage(*image, entry->getMCData(), gfx_canvas->getPalette()))
+				ok = true;
+			else
+				error = "Error writing image";
 		}
 
 		if (ok)
 			entry->setState(1);
+		else
+			wxMessageBox(wxString("Cannot save changes to image: ") + error, "Error", wxICON_ERROR);
 	}
 	// Otherwise just set offsets
 	else
@@ -456,7 +452,7 @@ bool GfxEntryPanel::extractAll() {
 		if (getImage()->getWidth() && getImage()->getHeight()) {
 			ArchiveEntry * newimg = parent->addNewEntry(newname, index+pos+1, entry->getParentDir());
 			if (newimg == NULL) return false;
-			getImage()->toPNG(newimg->getMCData(), gfx_canvas->getPalette());
+			SIFormat::getFormat("png")->saveImage(*getImage(), newimg->getMCData(), gfx_canvas->getPalette());
 			EntryType::detectEntryType(newimg);
 			pos++;
 		}
@@ -637,7 +633,7 @@ void GfxEntryPanel::applyViewType() {
 		gfx_canvas->setViewType(GFXVIEW_TILED);
 	else {
 		// Set gfx canvas view type depending on the offset combobox selection
-		int sel = combo_offset_type->GetSelection();
+		int sel = choice_offset_type->GetSelection();
 		switch (sel) {
 			case 0:
 				gfx_canvas->setViewType(detectOffsetType());
@@ -875,7 +871,7 @@ void GfxEntryPanel::onOffsetTypeChanged(wxCommandEvent& e) {
  * Called when the 'Tile' checkbox is checked/unchecked
  *******************************************************************/
 void GfxEntryPanel::onTileChanged(wxCommandEvent& e) {
-	combo_offset_type->Enable(!cb_tile->IsChecked());
+	choice_offset_type->Enable(!cb_tile->IsChecked());
 	applyViewType();
 }
 
@@ -997,8 +993,8 @@ CONSOLE_COMMAND(rotate, 1) {
 		meep->getImage()->rotate(angle);
 		meep->refresh();
 		MemChunk mc;
-		meep->getImage()->safeConvert(mc);
-		bar->importMemChunk(mc);
+		if (meep->getImage()->getFormat()->saveImage(*meep->getImage(), mc))
+			bar->importMemChunk(mc);
 	}
 }
 
@@ -1035,8 +1031,8 @@ CONSOLE_COMMAND (mirror, 1) {
 		meep->getImage()->mirror(vertical);
 		meep->refresh();
 		MemChunk mc;
-		meep->getImage()->safeConvert(mc);
-		bar->importMemChunk(mc);
+		if (meep->getImage()->getFormat()->saveImage(*meep->getImage(), mc))
+			bar->importMemChunk(mc);
 	}
 }
 
@@ -1064,8 +1060,8 @@ CONSOLE_COMMAND (crop, 4) {
 			meep->getImage()->crop(x1, y1, x2, y2);
 			meep->refresh();
 			MemChunk mc;
-			meep->getImage()->safeConvert(mc);
-			bar->importMemChunk(mc);
+			if (meep->getImage()->getFormat()->saveImage(*meep->getImage(), mc))
+				bar->importMemChunk(mc);
 		}
 	}
 }
@@ -1091,7 +1087,7 @@ CONSOLE_COMMAND(imgconv, 0) {
 		meep->getImage()->imgconv();
 		meep->refresh();
 		MemChunk mc;
-		meep->getImage()->safeConvert(mc);
-		bar->importMemChunk(mc);
+		if (meep->getImage()->getFormat()->saveImage(*meep->getImage(), mc))
+			bar->importMemChunk(mc);
 	}
 }

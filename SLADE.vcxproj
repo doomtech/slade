@@ -46,10 +46,10 @@
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</GenerateManifest>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(WXWIN)\lib\vc_lib\mswu;$(WXWIN)\include;$(AUDIERE)\include;$(FREEIMAGE)\Dist;$(IncludePath)</IncludePath>
-    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(AUDIERE)\lib;$(WXWIN)\lib\vc_lib;$(FREEIMAGE)\Dist;$(LibraryPath)</LibraryPath>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(WXWIN)\lib\vc_lib\mswu;$(WXWIN)\include;$(AUDIERE)\include;$(FREEIMAGE)\Dist;$(IncludePath)</IncludePath>
-    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(AUDIERE)\lib;$(WXWIN)\lib\vc_lib;$(FREEIMAGE)\Dist;$(LibraryPath)</LibraryPath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(FLUIDSYNTH)\include;$(WXWIN)\lib\vc_lib\mswu;$(WXWIN)\include;$(FREEIMAGE)\Dist;$(SFML)\include;$(IncludePath)</IncludePath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(FLUIDSYNTH)\lib;$(WXWIN)\lib\vc_lib;$(FREEIMAGE)\Dist;$(SFML)\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(WXWIN)\lib\vc_lib\mswu;$(WXWIN)\include;$(FREEIMAGE)\Dist;$(SFML)\include;$(FLUIDSYNTH)\include;$(IncludePath)</IncludePath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(WXWIN)\lib\vc_lib;$(FREEIMAGE)\Dist;$(SFML)\lib;$(FLUIDSYNTH)\lib;$(LibraryPath)</LibraryPath>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">SLADE-dbg</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -66,7 +66,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>winmm.lib;rpcrt4.lib;kernel32.lib;user32.lib;gdi32.lib;ole32.lib;oleaut32.lib;comctl32.lib;comdlg32.lib;uuid.lib;advapi32.lib;shell32.lib;wxbase29ud.lib;wxmsw29ud_core.lib;wxmsw29ud_gl.lib;wxmsw29ud_aui.lib;wxmsw29ud_html.lib;wxmsw29ud_adv.lib;wxmsw29ud_stc.lib;wxzlib.lib;wxpngd.lib;wxtiffd.lib;wxjpegd.lib;wxscintillad.lib;opengl32.lib;glu32.lib;FreeImage.lib;audiere.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fluidsynth.lib;winmm.lib;rpcrt4.lib;kernel32.lib;user32.lib;gdi32.lib;ole32.lib;oleaut32.lib;comctl32.lib;comdlg32.lib;uuid.lib;advapi32.lib;shell32.lib;wxbase29ud.lib;wxmsw29ud_core.lib;wxmsw29ud_gl.lib;wxmsw29ud_aui.lib;wxmsw29ud_html.lib;wxmsw29ud_adv.lib;wxmsw29ud_stc.lib;wxzlib.lib;wxpngd.lib;wxtiffd.lib;wxjpegd.lib;wxscintillad.lib;opengl32.lib;glu32.lib;FreeImage.lib;sfml-audio-s-d.lib;sfml-system-s-d.lib;sfml-main-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName)-dbg.exe</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -93,7 +93,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>audiere.lib;FreeImage.lib;wxbase29u.lib;wxmsw29u_core.lib;wxmsw29u_aui.lib;wxmsw29u_gl.lib;wxmsw29u_html.lib;wxmsw29u_adv.lib;wxmsw29u_stc.lib;wxmsw29u_media.lib;wxtiff.lib;wxjpeg.lib;wxpng.lib;wxzlib.lib;wxregexu.lib;wxexpat.lib;wxscintilla.lib;winmm.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fluidsynth.lib;FreeImage.lib;wxbase29u.lib;wxmsw29u_core.lib;wxmsw29u_aui.lib;wxmsw29u_gl.lib;wxmsw29u_html.lib;wxmsw29u_adv.lib;wxmsw29u_stc.lib;wxmsw29u_media.lib;wxtiff.lib;wxjpeg.lib;wxpng.lib;wxzlib.lib;wxregexu.lib;wxexpat.lib;wxscintilla.lib;sfml-audio-s.lib;sfml-system-s.lib;sfml-main.lib;winmm.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <EnableUAC>false</EnableUAC>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -114,6 +114,7 @@
     <ClCompile Include="src\ArchiveEntryList.cpp" />
     <ClCompile Include="src\ArchiveOperations.cpp" />
     <ClCompile Include="src\AudioEntryPanel.cpp" />
+    <ClCompile Include="src\AudioPrefsPanel.cpp" />
     <ClCompile Include="src\BaseResourceChooser.cpp" />
     <ClCompile Include="src\BrowserCanvas.cpp" />
     <ClCompile Include="src\BrowserItem.cpp" />
@@ -131,6 +132,8 @@
     <ClCompile Include="src\Compression.cpp" />
     <ClCompile Include="src\Conversions.cpp" />
     <ClCompile Include="src\DatArchive.cpp" />
+    <ClCompile Include="src\DockPanel.cpp" />
+    <ClCompile Include="src\Drawing.cpp" />
     <ClCompile Include="src\EditingPrefsPanel.cpp" />
     <ClCompile Include="src\EntryDataFormat.cpp" />
     <ClCompile Include="src\ExtMessageDialog.cpp" />
@@ -302,6 +305,7 @@
     <ClInclude Include="src\Archives.h" />
     <ClInclude Include="src\AudioEntryPanel.h" />
     <ClInclude Include="src\AudioFormats.h" />
+    <ClInclude Include="src\AudioPrefsPanel.h" />
     <ClInclude Include="src\BaseResourceChooser.h" />
     <ClInclude Include="src\BrowserCanvas.h" />
     <ClInclude Include="src\BrowserItem.h" />
@@ -315,6 +319,8 @@
     <ClInclude Include="src\ConsoleHelpers.h" />
     <ClInclude Include="src\Conversions.h" />
     <ClInclude Include="src\DatArchive.h" />
+    <ClInclude Include="src\DockPanel.h" />
+    <ClInclude Include="src\Drawing.h" />
     <ClInclude Include="src\EditingPrefsPanel.h" />
     <ClInclude Include="src\EntryDataFormat.h" />
     <ClInclude Include="src\ExtMessageDialog.h" />
@@ -392,9 +398,11 @@
     <ClInclude Include="src\SIFDoom.h" />
     <ClInclude Include="src\SIFHexen.h" />
     <ClInclude Include="src\SIFImages.h" />
+    <ClInclude Include="src\SIFJedi.h" />
     <ClInclude Include="src\SIFormat.h" />
     <ClInclude Include="src\SIFOther.h" />
     <ClInclude Include="src\SIFQuake.h" />
+    <ClInclude Include="src\SIFRott.h" />
     <ClInclude Include="src\SIFZDoom.h" />
     <ClInclude Include="src\Structs.h" />
     <ClInclude Include="src\TarArchive.h" />

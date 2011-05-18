@@ -39,14 +39,12 @@ public:
 
 class TextureResource : public Resource {
 friend class ResourceManager;
-private:
+public:
 	struct tex_res_t {
 		CTexture*	tex;
 		Archive*	parent;
 	};
-	vector<tex_res_t>	textures;
 
-public:
 	TextureResource();
 	~TextureResource();
 
@@ -54,6 +52,9 @@ public:
 	void	remove(Archive* parent);
 
 	int		length();
+
+private:
+	vector<tex_res_t>	textures;
 };
 
 // Declare hash map class to hold resources
@@ -88,7 +89,10 @@ public:
 	void	listAllPatches();
 	void	getAllPatchEntries(vector<ArchiveEntry*>& list, Archive* priority);
 
+	void	getAllTextures(vector<TextureResource::tex_res_t>& list, Archive* priority, Archive* ignore = NULL);
+
 	ArchiveEntry*	getPatchEntry(string patch, string nspace = "patches", Archive* priority = NULL);
+	CTexture*		getTexture(string texture, Archive* priority = NULL, Archive* ignore = NULL);
 
 	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 };

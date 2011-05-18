@@ -113,8 +113,15 @@ bool MemChunk::reSize(uint32_t new_size, bool preserve_data) {
 	}
 
 	// Resize data
-	if (preserve_data)
-		data = (uint8_t*)realloc(data, new_size);
+	if (preserve_data) {
+		uint8_t* ndata = (uint8_t*)realloc(data, new_size);
+		if (ndata)
+			data = ndata;
+		else {
+			wxLogMessage("MemChunk::reSize: Realloc of %d bytes failed", new_size);
+			return false;
+		}
+	}
 	else {
 		clear();
 		data = new uint8_t[new_size];
@@ -314,7 +321,7 @@ bool MemChunk::write(const void* data, uint32_t size) {
  }
 
 /* MemChunk::read
- * Reads data from the current position into <buf>. Returns false if
+ * Reads data from the current position into [buf]. Returns false if
  * attempting to read data outside of the chunk, true otherwise
  *******************************************************************/
 bool MemChunk::read(void* buf, uint32_t size) {
@@ -335,7 +342,7 @@ bool MemChunk::read(void* buf, uint32_t size) {
 }
 
 /* MemChunk::read
- * Reads [size] bytes of data from [start] into <buf>. Returns false
+ * Reads [size] bytes of data from [start] into [buf]. Returns false
  * if attempting to read data outside of the chunk, true otherwise
  *******************************************************************/
 bool MemChunk::read(void* buf, uint32_t size, uint32_t start) {
@@ -376,6 +383,10 @@ bool MemChunk::seek(uint32_t offset, uint32_t start) {
 	return true;
 }
 
+/* MemChunk::readMC
+ * Reads [size] bytes of data into [mc]. Returns false if attempting
+ * to read outside the chunk, true otherwise
+ *******************************************************************/
 bool MemChunk::readMC(MemChunk& mc, uint32_t size) {
 	if (cur_ptr + size >= this->size)
 		return false;

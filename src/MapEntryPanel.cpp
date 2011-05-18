@@ -36,6 +36,7 @@
 #include "MapVertex.h"
 #include "Parser.h"
 #include "SImage.h"
+#include "SIFormat.h"
 #include <wx/filename.h>
 
 
@@ -320,7 +321,7 @@ void MEPCanvas::createImage(ArchiveEntry& ae, int width, int height) {
 	img.setImageData(ImageBuffer, width, height, RGBA);
 	img.mirror(true);
 	MemChunk mc;
-	img.toPNG(mc);
+	SIFormat::getFormat("png")->saveImage(img, mc);
 	ae.importMemChunk(mc);
 
 }

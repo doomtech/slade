@@ -39,10 +39,12 @@
 #include <wx/filename.h>
 #include "zlib/zlib.h"
 
+
 /*******************************************************************
  * VARIABLES
  *******************************************************************/
 CVAR(Bool, size_as_string, true, CVAR_SAVE)
+
 
 /*******************************************************************
  * FUNCTIONS
@@ -75,37 +77,7 @@ bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry, int index) {
 	if (format == "img_raw" && SIFormat::rawFormat()->isThisFormat(entry->getMCData()))
 		return SIFormat::rawFormat()->loadImage(*image, entry->getMCData());
 
-
-
-	// Otherwise use old loading stuff
-	if (S_CMPNOCASE(format, "img_doom"))
-		return image->loadDoomGfx(entry->getData(), entry->getSize());
-	else if (S_CMPNOCASE(format, "img_doom_alpha"))
-		return image->loadDoomGfxA(entry->getData(), entry->getSize());
-	else if (S_CMPNOCASE(format, "img_doom_beta"))
-		return image->loadDoomGfxB(entry->getData(), entry->getSize());
-	else if (S_CMPNOCASE(format, "img_doom_snea"))
-		return image->loadDoomSnea(entry->getData(), entry->getSize());
-	else if (S_CMPNOCASE(format, "img_doom_arah")) {
-		int transindex = (entry->getType()->extraProps().propertyExists("zerotransparent")) ?  0 : 255;
-		return image->loadDoomArah(entry->getData(), entry->getSize(), transindex);
-	}
-	else if (S_CMPNOCASE(format, "img_imgz"))
-		return image->loadImgz(entry->getData(), entry->getSize());
-	else if (S_CMPNOCASE(format, "img_quake"))
-		return image->loadQuake(entry->getData(), entry->getSize());
-	else if (S_CMPNOCASE(format, "img_qspr"))
-		return image->loadQuakeSprite(entry->getData(), entry->getSize(), index);
-	else if (S_CMPNOCASE(format, "img_quaketex"))
-		return image->loadQuakeTex(entry->getData(), entry->getSize(), index);
-	else if (S_CMPNOCASE(format, "img_quake2wal"))
-		return image->loadQuakeIIWal(entry->getData(), entry->getSize(), index);
-	else if (S_CMPNOCASE(format, "img_planar"))
-		return image->loadPlanar(entry->getData(), entry->getSize());
-	else if (S_CMPNOCASE(format, "img_4bitchunk"))
-		return image->load4bitChunk(entry->getData(), entry->getSize());
-	else if (S_CMPNOCASE(format, "img_raw"))
-		return image->loadDoomFlat(entry->getData(), entry->getSize());
+	// Font formats are still manually loaded for now
 	else if (S_CMPNOCASE(format, "font_doom_alpha"))
 		return image->loadFont0(entry->getData(), entry->getSize());
 	else if (S_CMPNOCASE(format, "font_zd_console"))
@@ -116,56 +88,16 @@ bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry, int index) {
 		return image->loadBMF(entry->getData(), entry->getSize());
 	else if (S_CMPNOCASE(format, "font_mono"))
 		return image->loadFontM(entry->getData(), entry->getSize());
-	else if (S_CMPNOCASE(format, "img_scsprite"))
-		return image->loadSCSprite(entry->getData(), entry->getSize());
-	else if (S_CMPNOCASE(format, "img_scwall"))
-		return image->loadSCWall(entry->getData(), entry->getSize());
-	else if (S_CMPNOCASE(format, "img_rott"))
-		return image->loadRottGfx(entry->getData(), entry->getSize(), false);
-	else if (S_CMPNOCASE(format, "img_rottmask"))
-		return image->loadRottGfx(entry->getData(), entry->getSize(), true);
-	else if (S_CMPNOCASE(format, "img_rottwall"))
-		return image->loadDoomFlat(entry->getData(), entry->getSize(), true);
-	else if (S_CMPNOCASE(format, "img_rottlbm"))
-		return image->loadRottLbm(entry->getData(), entry->getSize());
-	else if (S_CMPNOCASE(format, "img_rottraw"))
-		return image->loadRottRaw(entry->getData(), entry->getSize());
-	else if (S_CMPNOCASE(format, "img_rottpic"))
-		return image->loadRottPic(entry->getData(), entry->getSize());
-	else if (S_CMPNOCASE(format, "img_wolfpic"))
-		return image->loadWolfPic(entry->getData(), entry->getSize());
-	else if (S_CMPNOCASE(format, "img_wolfsprite"))
-		return image->loadWolfSprite(entry->getData(), entry->getSize());
 	else if (S_CMPNOCASE(format, "font_wolf"))
 		return image->loadWolfFont(entry->getData(), entry->getSize());
-	else if (S_CMPNOCASE(format, "img_mipimage"))
-		return image->loadAnaMip(entry->getData(), entry->getSize());
-	else if (S_CMPNOCASE(format, "img_arttile"))
-		return image->loadBuildTile(entry->getData(), entry->getSize(), index);
-	else if (S_CMPNOCASE(format, "img_m8"))
-		return image->loadHeretic2M8(entry->getData(), entry->getSize(), index);
-	else if (S_CMPNOCASE(format, "img_m32"))
-		return image->loadHeretic2M32(entry->getData(), entry->getSize(), index);
-	else if (S_CMPNOCASE(format, "img_hlt"))
-		return image->loadHalfLifeTex(entry->getData(), entry->getSize(), index);
-	else if (S_CMPNOCASE(format, "img_jedi_bm"))
-		return image->loadJediBM(entry->getData(), entry->getSize(), index);
-	else if (S_CMPNOCASE(format, "img_jedi_fme"))
-		return image->loadJediFME(entry->getData(), entry->getSize());
-	else if (S_CMPNOCASE(format, "img_jedi_wax"))
-		return image->loadJediWAX(entry->getData(), entry->getSize(), index);
 	else if (S_CMPNOCASE(format, "font_jedi_fnt"))
 		return image->loadJediFNT(entry->getData(), entry->getSize());
 	else if (S_CMPNOCASE(format, "font_jedi_font"))
 		return image->loadJediFONT(entry->getData(), entry->getSize());
-	else {
-		if (!image->loadImage(entry->getData(true), entry->getSize())) {
-			Global::error = "Image format not supported by FreeImage";
-			return false;
-		}
-		else
-			return true;
-	}
+
+	// Lastly, try detecting/loading via FreeImage
+	else if (SIFormat::generalFormat()->isThisFormat(entry->getMCData()))
+		return SIFormat::generalFormat()->loadImage(*image, entry->getMCData());
 
 	// Unknown image type
 	Global::error = "Entry is not a known image format";

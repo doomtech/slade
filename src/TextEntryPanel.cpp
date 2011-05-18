@@ -242,6 +242,9 @@ void TextEntryPanel::onChoiceLanguageChanged(wxCommandEvent& e) {
 		entry->exProps().removeProperty("TextLanguage");
 }
 
+/* TextEntryPanel::onUpdateUI
+ * Called when the text editor UI is updated
+ *******************************************************************/
 void TextEntryPanel::onUpdateUI(wxStyledTextEvent& e) {
 	updateStatus();
 	e.Skip();

@@ -12,9 +12,9 @@ ProjectPath            := "/home/simon/dev/slade/branches/map_editor"
 CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
-User                   :=Simon
-Date                   :=23/11/10
-CodeLitePath           :="/home/simon/.codelite"
+User                   :=Simon Judd
+Date                   :=05/18/11
+CodeLitePath           :="/Users/simon/Library/Application Support/codelite"
 LinkerName             :=g++
 ArchiveTool            :=ar rcus
 SharedObjectLinkerName :=g++ -shared -fPIC
@@ -36,9 +36,10 @@ ObjectSwitch           :=-o
 ArchiveOutputSwitch    := 
 PreprocessOnlySwitch   :=-E 
 MakeDirCommand         :=mkdir -p
-CmpOptions             := -O3 $(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no) $(Preprocessors)
-LinkOptions            :=  -s $(shell wx-config --debug=no --libs std,gl,stc,aui --unicode=yes)
-IncludePath            :=  "$(IncludeSwitch)." 
+CmpOptions             := -arch i386 -O3 $(shell $(WXCONFIG_PATH)wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no) $(Preprocessors)
+C_CmpOptions           := -arch i386 -O3 $(shell $(WXCONFIG_PATH)wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no) $(Preprocessors)
+LinkOptions            :=  -s -arch i386 $(shell $(WXCONFIG_PATH)wx-config --debug=no --libs std,gl,stc,aui,ribbon --unicode=yes) -framework SFML -framework sfml-system -framework sfml-audio
+IncludePath            := $(IncludeSwitch)/opt/local/include $(IncludeSwitch)/Users/simon/Downloads/FreeImage/Dist  $(IncludeSwitch). 
 RcIncludePath          :=
 Libs                   :=$(LibrarySwitch)freeimage $(LibrarySwitch)audiere $(LibrarySwitch)fluidsynth 
 LibPath                := "$(LibraryPathSwitch)." 
@@ -49,17 +50,23 @@ LibPath                := "$(LibraryPathSwitch)."
 ##
 CodeLiteDir:=/usr/share/codelite
 Objects=$(IntermediateDirectory)/src_GfxConvDialog$(ObjectSuffix) $(IntermediateDirectory)/src_ModifyOffsetsDialog$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteDialog$(ObjectSuffix) $(IntermediateDirectory)/src_PreferencesDialog$(ObjectSuffix) $(IntermediateDirectory)/src_BaseResourceArchivesPanel$(ObjectSuffix) $(IntermediateDirectory)/src_TextEditorPrefsPanel$(ObjectSuffix) $(IntermediateDirectory)/src_TextStylePrefsPanel$(ObjectSuffix) $(IntermediateDirectory)/src_GeneralPrefsPanel$(ObjectSuffix) $(IntermediateDirectory)/src_EditingPrefsPanel$(ObjectSuffix) $(IntermediateDirectory)/src_ACSPrefsPanel$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_ExtMessageDialog$(ObjectSuffix) $(IntermediateDirectory)/src_Clipboard$(ObjectSuffix) $(IntermediateDirectory)/src_CVar$(ObjectSuffix) $(IntermediateDirectory)/src_MainApp$(ObjectSuffix) $(IntermediateDirectory)/src_MemChunk$(ObjectSuffix) $(IntermediateDirectory)/src_Misc$(ObjectSuffix) $(IntermediateDirectory)/src_WxStuff$(ObjectSuffix) $(IntermediateDirectory)/src_OpenGL$(ObjectSuffix) $(IntermediateDirectory)/src_ListenerAnnouncer$(ObjectSuffix) $(IntermediateDirectory)/src_Property$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_PropertyList$(ObjectSuffix) $(IntermediateDirectory)/src_Tokenizer$(ObjectSuffix) $(IntermediateDirectory)/src_Tree$(ObjectSuffix) $(IntermediateDirectory)/src_Parser$(ObjectSuffix) $(IntermediateDirectory)/src_CodePages$(ObjectSuffix) $(IntermediateDirectory)/src_Console$(ObjectSuffix) $(IntermediateDirectory)/src_MIDIPlayer$(ObjectSuffix) $(IntermediateDirectory)/src_KeyBind$(ObjectSuffix) $(IntermediateDirectory)/src_AnimatedEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_EntryPanel$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_GfxEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_SwitchesEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_TextEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_PnamesEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_DefaultEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_HexEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_MapEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_AudioEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_ANSIEntryPanel$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_ArchiveManagerPanel$(ObjectSuffix) $(IntermediateDirectory)/src_PatchTablePanel$(ObjectSuffix) $(IntermediateDirectory)/src_TextureXEditor$(ObjectSuffix) $(IntermediateDirectory)/src_TextureXPanel$(ObjectSuffix) $(IntermediateDirectory)/src_PatchBrowser$(ObjectSuffix) $(IntermediateDirectory)/src_TextureEditorPanel$(ObjectSuffix) $(IntermediateDirectory)/src_ArchivePanel$(ObjectSuffix) $(IntermediateDirectory)/src_BaseResourceChooser$(ObjectSuffix) $(IntermediateDirectory)/src_EntryOperations$(ObjectSuffix) $(IntermediateDirectory)/src_MainWindow$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_ArchiveOperations$(ObjectSuffix) $(IntermediateDirectory)/src_Conversions$(ObjectSuffix) $(IntermediateDirectory)/src_MapLine$(ObjectSuffix) $(IntermediateDirectory)/src_MapSector$(ObjectSuffix) $(IntermediateDirectory)/src_MapSide$(ObjectSuffix) $(IntermediateDirectory)/src_MapThing$(ObjectSuffix) $(IntermediateDirectory)/src_MapVertex$(ObjectSuffix) $(IntermediateDirectory)/src_SLADEMap$(ObjectSuffix) $(IntermediateDirectory)/src_MapCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_MapEditorWindow$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_Archive$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveEntry$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveManager$(ObjectSuffix) $(IntermediateDirectory)/src_WadArchive$(ObjectSuffix) $(IntermediateDirectory)/src_ZipArchive$(ObjectSuffix) $(IntermediateDirectory)/src_EntryType$(ObjectSuffix) $(IntermediateDirectory)/src_EntryDataFormat$(ObjectSuffix) $(IntermediateDirectory)/src_DatArchive$(ObjectSuffix) $(IntermediateDirectory)/src_LibArchive$(ObjectSuffix) $(IntermediateDirectory)/src_ResArchive$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_PakArchive$(ObjectSuffix) $(IntermediateDirectory)/src_Wad2Archive$(ObjectSuffix) $(IntermediateDirectory)/src_WadJArchive$(ObjectSuffix) $(IntermediateDirectory)/src_GrpArchive$(ObjectSuffix) $(IntermediateDirectory)/src_RffArchive$(ObjectSuffix) $(IntermediateDirectory)/src_WolfArchive$(ObjectSuffix) $(IntermediateDirectory)/src_GobArchive$(ObjectSuffix) $(IntermediateDirectory)/src_LfdArchive$(ObjectSuffix) $(IntermediateDirectory)/src_AnimatedList$(ObjectSuffix) $(IntermediateDirectory)/src_SwitchesList$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_PnamesList$(ObjectSuffix) $(IntermediateDirectory)/src_CTexture$(ObjectSuffix) $(IntermediateDirectory)/src_PatchTable$(ObjectSuffix) $(IntermediateDirectory)/src_TextureXList$(ObjectSuffix) $(IntermediateDirectory)/src_SFont$(ObjectSuffix) $(IntermediateDirectory)/src_SImage$(ObjectSuffix) $(IntermediateDirectory)/src_SImageFormats$(ObjectSuffix) $(IntermediateDirectory)/src_Palette$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteManager$(ObjectSuffix) $(IntermediateDirectory)/src_GLTexture$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_Icons$(ObjectSuffix) $(IntermediateDirectory)/src_ColourBox$(ObjectSuffix) $(IntermediateDirectory)/src_GfxCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_OGLCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteChooser$(ObjectSuffix) $(IntermediateDirectory)/src_SplashWindow$(ObjectSuffix) $(IntermediateDirectory)/src_BrowserItem$(ObjectSuffix) $(IntermediateDirectory)/src_BrowserWindow$(ObjectSuffix) $(IntermediateDirectory)/src_BrowserCanvas$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_CTextureCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_TextEditor$(ObjectSuffix) $(IntermediateDirectory)/src_TextLanguage$(ObjectSuffix) $(IntermediateDirectory)/src_TextStyle$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveEntryList$(ObjectSuffix) $(IntermediateDirectory)/src_ListView$(ObjectSuffix) $(IntermediateDirectory)/src_VirtualListView$(ObjectSuffix) $(IntermediateDirectory)/src_ConsolePanel$(ObjectSuffix) $(IntermediateDirectory)/src_HexEditorPanel$(ObjectSuffix) $(IntermediateDirectory)/src_ANSICanvas$(ObjectSuffix) \
-	$(IntermediateDirectory)/qmus2mid_qmus2mid$(ObjectSuffix) 
+	$(IntermediateDirectory)/src_InterfacePrefsPanel$(ObjectSuffix) $(IntermediateDirectory)/src_PNGPrefsPanel$(ObjectSuffix) $(IntermediateDirectory)/src_GraphicsPrefsPanel$(ObjectSuffix) $(IntermediateDirectory)/src_AudioPrefsPanel$(ObjectSuffix) $(IntermediateDirectory)/src_ExtMessageDialog$(ObjectSuffix) $(IntermediateDirectory)/src_TranslationEditorDialog$(ObjectSuffix) $(IntermediateDirectory)/src_Clipboard$(ObjectSuffix) $(IntermediateDirectory)/src_CVar$(ObjectSuffix) $(IntermediateDirectory)/src_MainApp$(ObjectSuffix) $(IntermediateDirectory)/src_MemChunk$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_Misc$(ObjectSuffix) $(IntermediateDirectory)/src_WxStuff$(ObjectSuffix) $(IntermediateDirectory)/src_OpenGL$(ObjectSuffix) $(IntermediateDirectory)/src_ListenerAnnouncer$(ObjectSuffix) $(IntermediateDirectory)/src_Property$(ObjectSuffix) $(IntermediateDirectory)/src_PropertyList$(ObjectSuffix) $(IntermediateDirectory)/src_Tokenizer$(ObjectSuffix) $(IntermediateDirectory)/src_Tree$(ObjectSuffix) $(IntermediateDirectory)/src_Parser$(ObjectSuffix) $(IntermediateDirectory)/src_CodePages$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_MathStuff$(ObjectSuffix) $(IntermediateDirectory)/src_Compression$(ObjectSuffix) $(IntermediateDirectory)/src_Console$(ObjectSuffix) $(IntermediateDirectory)/src_MIDIPlayer$(ObjectSuffix) $(IntermediateDirectory)/src_SAction$(ObjectSuffix) $(IntermediateDirectory)/src_Drawing$(ObjectSuffix) $(IntermediateDirectory)/src_AnimatedEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_EntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_GfxEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteEntryPanel$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_SwitchesEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_TextEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_PnamesEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_DefaultEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_HexEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_MapEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_AudioEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_ANSIEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveManagerPanel$(ObjectSuffix) $(IntermediateDirectory)/src_PatchTablePanel$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_TextureXEditor$(ObjectSuffix) $(IntermediateDirectory)/src_TextureXPanel$(ObjectSuffix) $(IntermediateDirectory)/src_TextureEditorPanel$(ObjectSuffix) $(IntermediateDirectory)/src_PatchBrowser$(ObjectSuffix) $(IntermediateDirectory)/src_ZTextureEditorPanel$(ObjectSuffix) $(IntermediateDirectory)/src_ArchivePanel$(ObjectSuffix) $(IntermediateDirectory)/src_BaseResourceChooser$(ObjectSuffix) $(IntermediateDirectory)/src_EntryOperations$(ObjectSuffix) $(IntermediateDirectory)/src_MainWindow$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveOperations$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_Conversions$(ObjectSuffix) $(IntermediateDirectory)/src_MapLine$(ObjectSuffix) $(IntermediateDirectory)/src_MapSector$(ObjectSuffix) $(IntermediateDirectory)/src_MapSide$(ObjectSuffix) $(IntermediateDirectory)/src_MapThing$(ObjectSuffix) $(IntermediateDirectory)/src_MapVertex$(ObjectSuffix) $(IntermediateDirectory)/src_SLADEMap$(ObjectSuffix) $(IntermediateDirectory)/src_MapCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_MapEditorWindow$(ObjectSuffix) $(IntermediateDirectory)/src_Archive$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_ArchiveEntry$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveManager$(ObjectSuffix) $(IntermediateDirectory)/src_WadArchive$(ObjectSuffix) $(IntermediateDirectory)/src_ZipArchive$(ObjectSuffix) $(IntermediateDirectory)/src_EntryType$(ObjectSuffix) $(IntermediateDirectory)/src_EntryDataFormat$(ObjectSuffix) $(IntermediateDirectory)/src_DatArchive$(ObjectSuffix) $(IntermediateDirectory)/src_LibArchive$(ObjectSuffix) $(IntermediateDirectory)/src_ResArchive$(ObjectSuffix) $(IntermediateDirectory)/src_PakArchive$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_Wad2Archive$(ObjectSuffix) $(IntermediateDirectory)/src_WadJArchive$(ObjectSuffix) $(IntermediateDirectory)/src_GrpArchive$(ObjectSuffix) $(IntermediateDirectory)/src_RffArchive$(ObjectSuffix) $(IntermediateDirectory)/src_WolfArchive$(ObjectSuffix) $(IntermediateDirectory)/src_GobArchive$(ObjectSuffix) $(IntermediateDirectory)/src_LfdArchive$(ObjectSuffix) $(IntermediateDirectory)/src_HogArchive$(ObjectSuffix) $(IntermediateDirectory)/src_BSPArchive$(ObjectSuffix) $(IntermediateDirectory)/src_ADatArchive$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_BZip2Archive$(ObjectSuffix) $(IntermediateDirectory)/src_GZipArchive$(ObjectSuffix) $(IntermediateDirectory)/src_TarArchive$(ObjectSuffix) $(IntermediateDirectory)/src_AnimatedList$(ObjectSuffix) $(IntermediateDirectory)/src_SwitchesList$(ObjectSuffix) $(IntermediateDirectory)/src_PnamesList$(ObjectSuffix) $(IntermediateDirectory)/src_CTexture$(ObjectSuffix) $(IntermediateDirectory)/src_PatchTable$(ObjectSuffix) $(IntermediateDirectory)/src_TextureXList$(ObjectSuffix) $(IntermediateDirectory)/src_SFont$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_SImage$(ObjectSuffix) $(IntermediateDirectory)/src_SImageFormats$(ObjectSuffix) $(IntermediateDirectory)/src_SIFormat$(ObjectSuffix) $(IntermediateDirectory)/src_Palette$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteManager$(ObjectSuffix) $(IntermediateDirectory)/src_GLTexture$(ObjectSuffix) $(IntermediateDirectory)/src_Icons$(ObjectSuffix) $(IntermediateDirectory)/src_Translation$(ObjectSuffix) $(IntermediateDirectory)/src_ResourceManager$(ObjectSuffix) $(IntermediateDirectory)/src_ColourBox$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_GfxCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_OGLCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteChooser$(ObjectSuffix) $(IntermediateDirectory)/src_SplashWindow$(ObjectSuffix) $(IntermediateDirectory)/src_BrowserItem$(ObjectSuffix) $(IntermediateDirectory)/src_BrowserWindow$(ObjectSuffix) $(IntermediateDirectory)/src_BrowserCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_CTextureCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_TextEditor$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_TextLanguage$(ObjectSuffix) $(IntermediateDirectory)/src_TextStyle$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveEntryList$(ObjectSuffix) $(IntermediateDirectory)/src_ListView$(ObjectSuffix) $(IntermediateDirectory)/src_VirtualListView$(ObjectSuffix) $(IntermediateDirectory)/src_ConsolePanel$(ObjectSuffix) $(IntermediateDirectory)/src_HexEditorPanel$(ObjectSuffix) $(IntermediateDirectory)/src_ANSICanvas$(ObjectSuffix) $(IntermediateDirectory)/src_DockPanel$(ObjectSuffix) $(IntermediateDirectory)/mus2mid_mus2mid$(ObjectSuffix) \
+	$(IntermediateDirectory)/zreaders_ancientzip$(ObjectSuffix) $(IntermediateDirectory)/zreaders_files$(ObjectSuffix) $(IntermediateDirectory)/zreaders_m_alloc$(ObjectSuffix) $(IntermediateDirectory)/C_7zAlloc$(ObjectSuffix) $(IntermediateDirectory)/C_7zBuf$(ObjectSuffix) $(IntermediateDirectory)/C_7zBuf2$(ObjectSuffix) $(IntermediateDirectory)/C_7zCrc$(ObjectSuffix) $(IntermediateDirectory)/C_7zCrcOpt$(ObjectSuffix) $(IntermediateDirectory)/C_7zDec$(ObjectSuffix) $(IntermediateDirectory)/C_7zFile$(ObjectSuffix) \
+	$(IntermediateDirectory)/C_7zIn$(ObjectSuffix) $(IntermediateDirectory)/C_7zStream$(ObjectSuffix) $(IntermediateDirectory)/C_Alloc$(ObjectSuffix) $(IntermediateDirectory)/C_Bcj2$(ObjectSuffix) $(IntermediateDirectory)/C_Bra$(ObjectSuffix) $(IntermediateDirectory)/C_Bra86$(ObjectSuffix) $(IntermediateDirectory)/C_BraIA64$(ObjectSuffix) $(IntermediateDirectory)/C_CpuArch$(ObjectSuffix) $(IntermediateDirectory)/C_Delta$(ObjectSuffix) $(IntermediateDirectory)/C_LzFind$(ObjectSuffix) \
+	$(IntermediateDirectory)/C_Lzma2Dec$(ObjectSuffix) $(IntermediateDirectory)/C_Lzma2Enc$(ObjectSuffix) $(IntermediateDirectory)/C_Lzma86Dec$(ObjectSuffix) $(IntermediateDirectory)/C_Lzma86Enc$(ObjectSuffix) $(IntermediateDirectory)/C_LzmaDec$(ObjectSuffix) $(IntermediateDirectory)/C_LzmaEnc$(ObjectSuffix) $(IntermediateDirectory)/C_LzmaLib$(ObjectSuffix) $(IntermediateDirectory)/C_Ppmd7$(ObjectSuffix) $(IntermediateDirectory)/C_Ppmd7Dec$(ObjectSuffix) $(IntermediateDirectory)/C_Ppmd7Enc$(ObjectSuffix) \
+	$(IntermediateDirectory)/C_Sha256$(ObjectSuffix) $(IntermediateDirectory)/C_Xz$(ObjectSuffix) $(IntermediateDirectory)/C_XzCrc64$(ObjectSuffix) $(IntermediateDirectory)/C_XzDec$(ObjectSuffix) $(IntermediateDirectory)/C_XzEnc$(ObjectSuffix) $(IntermediateDirectory)/C_XzIn$(ObjectSuffix) $(IntermediateDirectory)/bzip2_blocksort$(ObjectSuffix) $(IntermediateDirectory)/bzip2_bzlib$(ObjectSuffix) $(IntermediateDirectory)/bzip2_compress$(ObjectSuffix) $(IntermediateDirectory)/bzip2_crctable$(ObjectSuffix) \
+	$(IntermediateDirectory)/bzip2_decompress$(ObjectSuffix) $(IntermediateDirectory)/bzip2_huffman$(ObjectSuffix) $(IntermediateDirectory)/bzip2_randtable$(ObjectSuffix) 
 
 ##
 ## Main Build Targets 
@@ -158,6 +165,14 @@ $(IntermediateDirectory)/src_ACSPrefsPanel$(DependSuffix): src/ACSPrefsPanel.cpp
 
 $(IntermediateDirectory)/src_ACSPrefsPanel$(PreprocessSuffix): src/ACSPrefsPanel.cpp
 	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ACSPrefsPanel$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/ACSPrefsPanel.cpp"
+
+$(IntermediateDirectory)/src_AudioPrefsPanel$(ObjectSuffix): src/AudioPrefsPanel.cpp $(IntermediateDirectory)/src_AudioPrefsPanel$(DependSuffix)
+	$(CompilerName) $(SourceSwitch) "/Users/simon/dev/slade/trunk/src/AudioPrefsPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_AudioPrefsPanel$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_AudioPrefsPanel$(DependSuffix): src/AudioPrefsPanel.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_AudioPrefsPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_AudioPrefsPanel$(DependSuffix) -MM "/Users/simon/dev/slade/trunk/src/AudioPrefsPanel.cpp"
+
+$(IntermediateDirectory)/src_AudioPrefsPanel$(PreprocessSuffix): src/AudioPrefsPanel.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_AudioPrefsPanel$(PreprocessSuffix) "/Users/simon/dev/slade/trunk/src/AudioPrefsPanel.cpp"
 
 $(IntermediateDirectory)/src_ExtMessageDialog$(ObjectSuffix): src/ExtMessageDialog.cpp $(IntermediateDirectory)/src_ExtMessageDialog$(DependSuffix)
 	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/ExtMessageDialog.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ExtMessageDialog$(ObjectSuffix) $(IncludePath)
@@ -302,6 +317,14 @@ $(IntermediateDirectory)/src_KeyBind$(DependSuffix): src/KeyBind.cpp
 
 $(IntermediateDirectory)/src_KeyBind$(PreprocessSuffix): src/KeyBind.cpp
 	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_KeyBind$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/KeyBind.cpp"
+
+$(IntermediateDirectory)/src_Drawing$(ObjectSuffix): src/Drawing.cpp $(IntermediateDirectory)/src_Drawing$(DependSuffix)
+	$(CompilerName) $(SourceSwitch) "/Users/simon/dev/slade/trunk/src/Drawing.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_Drawing$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_Drawing$(DependSuffix): src/Drawing.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_Drawing$(ObjectSuffix) -MF$(IntermediateDirectory)/src_Drawing$(DependSuffix) -MM "/Users/simon/dev/slade/trunk/src/Drawing.cpp"
+
+$(IntermediateDirectory)/src_Drawing$(PreprocessSuffix): src/Drawing.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_Drawing$(PreprocessSuffix) "/Users/simon/dev/slade/trunk/src/Drawing.cpp"
 
 $(IntermediateDirectory)/src_AnimatedEntryPanel$(ObjectSuffix): src/AnimatedEntryPanel.cpp $(IntermediateDirectory)/src_AnimatedEntryPanel$(DependSuffix)
 	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/AnimatedEntryPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_AnimatedEntryPanel$(ObjectSuffix) $(IncludePath)
@@ -959,10 +982,18 @@ $(IntermediateDirectory)/src_ANSICanvas$(DependSuffix): src/ANSICanvas.cpp
 $(IntermediateDirectory)/src_ANSICanvas$(PreprocessSuffix): src/ANSICanvas.cpp
 	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ANSICanvas$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/ANSICanvas.cpp"
 
-$(IntermediateDirectory)/qmus2mid_qmus2mid$(ObjectSuffix): src/qmus2mid/qmus2mid.cpp $(IntermediateDirectory)/qmus2mid_qmus2mid$(DependSuffix)
-	$(CompilerName) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/qmus2mid/qmus2mid.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/qmus2mid_qmus2mid$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/qmus2mid_qmus2mid$(DependSuffix): src/qmus2mid/qmus2mid.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePath) -MT$(IntermediateDirectory)/qmus2mid_qmus2mid$(ObjectSuffix) -MF$(IntermediateDirectory)/qmus2mid_qmus2mid$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/qmus2mid/qmus2mid.cpp"
+$(IntermediateDirectory)/src_DockPanel$(ObjectSuffix): src/DockPanel.cpp $(IntermediateDirectory)/src_DockPanel$(DependSuffix)
+	$(CompilerName) $(SourceSwitch) "/Users/simon/dev/slade/trunk/src/DockPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_DockPanel$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_DockPanel$(DependSuffix): src/DockPanel.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_DockPanel$(ObjectSuffix) -MF$(IntermediateDirectory)/src_DockPanel$(DependSuffix) -MM "/Users/simon/dev/slade/trunk/src/DockPanel.cpp"
+
+$(IntermediateDirectory)/src_DockPanel$(PreprocessSuffix): src/DockPanel.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_DockPanel$(PreprocessSuffix) "/Users/simon/dev/slade/trunk/src/DockPanel.cpp"
+
+$(IntermediateDirectory)/mus2mid_mus2mid$(ObjectSuffix): src/mus2mid/mus2mid.cpp $(IntermediateDirectory)/mus2mid_mus2mid$(DependSuffix)
+	$(CompilerName) $(SourceSwitch) "/Users/simon/dev/slade/trunk/src/mus2mid/mus2mid.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/mus2mid_mus2mid$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/mus2mid_mus2mid$(DependSuffix): src/mus2mid/mus2mid.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/mus2mid_mus2mid$(ObjectSuffix) -MF$(IntermediateDirectory)/mus2mid_mus2mid$(DependSuffix) -MM "/Users/simon/dev/slade/trunk/src/mus2mid/mus2mid.cpp"
 
 $(IntermediateDirectory)/qmus2mid_qmus2mid$(PreprocessSuffix): src/qmus2mid/qmus2mid.cpp
 	@$(CompilerName) $(CmpOptions) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/qmus2mid_qmus2mid$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/qmus2mid/qmus2mid.cpp"
@@ -1003,6 +1034,9 @@ clean:
 	$(RM) $(IntermediateDirectory)/src_ACSPrefsPanel$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/src_ACSPrefsPanel$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/src_ACSPrefsPanel$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/src_AudioPrefsPanel$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/src_AudioPrefsPanel$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/src_AudioPrefsPanel$(PreprocessSuffix)
 	$(RM) $(IntermediateDirectory)/src_ExtMessageDialog$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/src_ExtMessageDialog$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/src_ExtMessageDialog$(PreprocessSuffix)
@@ -1057,6 +1091,9 @@ clean:
 	$(RM) $(IntermediateDirectory)/src_KeyBind$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/src_KeyBind$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/src_KeyBind$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/src_Drawing$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/src_Drawing$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/src_Drawing$(PreprocessSuffix)
 	$(RM) $(IntermediateDirectory)/src_AnimatedEntryPanel$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/src_AnimatedEntryPanel$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/src_AnimatedEntryPanel$(PreprocessSuffix)
@@ -1303,9 +1340,141 @@ clean:
 	$(RM) $(IntermediateDirectory)/src_ANSICanvas$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/src_ANSICanvas$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/src_ANSICanvas$(PreprocessSuffix)
-	$(RM) $(IntermediateDirectory)/qmus2mid_qmus2mid$(ObjectSuffix)
-	$(RM) $(IntermediateDirectory)/qmus2mid_qmus2mid$(DependSuffix)
-	$(RM) $(IntermediateDirectory)/qmus2mid_qmus2mid$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/src_DockPanel$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/src_DockPanel$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/src_DockPanel$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/mus2mid_mus2mid$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/mus2mid_mus2mid$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/mus2mid_mus2mid$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/zreaders_ancientzip$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/zreaders_ancientzip$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/zreaders_ancientzip$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/zreaders_files$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/zreaders_files$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/zreaders_files$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/zreaders_m_alloc$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/zreaders_m_alloc$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/zreaders_m_alloc$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_7zAlloc$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_7zAlloc$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_7zAlloc$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_7zBuf$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_7zBuf$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_7zBuf$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_7zBuf2$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_7zBuf2$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_7zBuf2$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_7zCrc$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_7zCrc$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_7zCrc$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_7zCrcOpt$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_7zCrcOpt$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_7zCrcOpt$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_7zDec$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_7zDec$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_7zDec$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_7zFile$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_7zFile$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_7zFile$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_7zIn$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_7zIn$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_7zIn$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_7zStream$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_7zStream$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_7zStream$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_Alloc$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_Alloc$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_Alloc$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_Bcj2$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_Bcj2$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_Bcj2$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_Bra$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_Bra$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_Bra$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_Bra86$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_Bra86$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_Bra86$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_BraIA64$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_BraIA64$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_BraIA64$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_CpuArch$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_CpuArch$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_CpuArch$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_Delta$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_Delta$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_Delta$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_LzFind$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_LzFind$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_LzFind$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_Lzma2Dec$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_Lzma2Dec$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_Lzma2Dec$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_Lzma2Enc$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_Lzma2Enc$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_Lzma2Enc$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_Lzma86Dec$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_Lzma86Dec$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_Lzma86Dec$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_Lzma86Enc$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_Lzma86Enc$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_Lzma86Enc$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_LzmaDec$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_LzmaDec$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_LzmaDec$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_LzmaEnc$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_LzmaEnc$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_LzmaEnc$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_LzmaLib$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_LzmaLib$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_LzmaLib$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_Ppmd7$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_Ppmd7$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_Ppmd7$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_Ppmd7Dec$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_Ppmd7Dec$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_Ppmd7Dec$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_Ppmd7Enc$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_Ppmd7Enc$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_Ppmd7Enc$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_Sha256$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_Sha256$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_Sha256$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_Xz$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_Xz$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_Xz$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_XzCrc64$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_XzCrc64$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_XzCrc64$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_XzDec$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_XzDec$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_XzDec$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_XzEnc$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_XzEnc$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_XzEnc$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/C_XzIn$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/C_XzIn$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/C_XzIn$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/bzip2_blocksort$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/bzip2_blocksort$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/bzip2_blocksort$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/bzip2_bzlib$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/bzip2_bzlib$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/bzip2_bzlib$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/bzip2_compress$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/bzip2_compress$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/bzip2_compress$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/bzip2_crctable$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/bzip2_crctable$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/bzip2_crctable$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/bzip2_decompress$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/bzip2_decompress$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/bzip2_decompress$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/bzip2_huffman$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/bzip2_huffman$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/bzip2_huffman$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/bzip2_randtable$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/bzip2_randtable$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/bzip2_randtable$(PreprocessSuffix)
 	$(RM) $(OutputFile)
 
 

@@ -11,6 +11,7 @@
 #include "ACSPrefsPanel.h"
 #include "GraphicsPrefsPanel.h"
 #include "PNGPrefsPanel.h"
+#include "AudioPrefsPanel.h"
 #include <wx/treebook.h>
 
 class PreferencesDialog : public wxDialog {
@@ -25,6 +26,7 @@ private:
 	ACSPrefsPanel*			panel_script_acs;
 	GraphicsPrefsPanel*		panel_gfx_prefs;
 	PNGPrefsPanel*			panel_gfx_png;
+	AudioPrefsPanel*		panel_audio;
 
 	// Base Resource Archive
 	BaseResourceArchivesPanel*	panel_bra;

@@ -53,7 +53,11 @@ wxDEFINE_EVENT(EVT_VLV_SELECTION_CHANGED, wxCommandEvent);
  * VirtualListView class constructor
  *******************************************************************/
 VirtualListView::VirtualListView(wxWindow* parent)
+#ifdef __WXMSW__
 : wxListCtrl(parent, -1, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxLC_VIRTUAL|wxLC_EDIT_LABELS) {
+#else
+: wxListCtrl(parent, -1, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxLC_VIRTUAL) {
+#endif
 	item_attr = new wxListItemAttr();
 	last_focus = 0;
 	col_search = 0;
@@ -270,7 +274,7 @@ void VirtualListView::onMouseLeftDown(wxMouseEvent& e) {
 			focusItem(item);
 			sendSelectionChangedEvent();
 		}
-		else if (e.GetModifiers() == wxMOD_CONTROL) {
+		else if (e.GetModifiers() == wxMOD_CMD) {
 			// Ctrl+left click: Toggle the selection status of the clicked item
 			bool selected = !!(GetItemState(item, wxLIST_STATE_SELECTED) & wxLIST_STATE_SELECTED);
 			selectItem(item, !selected);
@@ -433,7 +437,7 @@ void VirtualListView::onKeyChar(wxKeyEvent& e) {
 		search += e.GetKeyCode();
 		search.MakeUpper();
 
-		// Search for match from the current focus, and if failed 
+		// Search for match from the current focus, and if failed
 		// start a new search from after the current focus.
 		if (!lookForSearchEntryFrom(focus)) {
 			search = S_FMT("%c", e.GetKeyCode());
@@ -443,7 +447,7 @@ void VirtualListView::onKeyChar(wxKeyEvent& e) {
 	}
 	else {
 		search = "";
-		
+
 		// Only want to do default action on navigation key
 		if (e.GetKeyCode() == WXK_UP || e.GetKeyCode() == WXK_DOWN ||
 			e.GetKeyCode() == WXK_PAGEUP || e.GetKeyCode() == WXK_PAGEDOWN ||
@@ -459,8 +463,8 @@ void VirtualListView::onKeyChar(wxKeyEvent& e) {
 void VirtualListView::onLabelEditBegin(wxListEvent& e) {
 	if (!cols_editable[e.GetColumn()])
 		e.Veto();
-
-	e.Skip();
+	else
+		e.Skip();
 }
 
 /* VirtualListView::onLabelEditEnd

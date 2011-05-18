@@ -121,8 +121,8 @@ void BaseResourceArchivesPanel::onBtnAdd(wxCommandEvent& e) {
 
 		// Add each to the paths list
 		for (size_t a = 0; a < files.size(); a++) {
-			theArchiveManager->addBaseResourcePath(files[a]);
-			list_base_archive_paths->Append(files);
+			if (theArchiveManager->addBaseResourcePath(files[a]))
+				list_base_archive_paths->Append(files[a]);
 		}
 
 		// Save 'dir_last'
