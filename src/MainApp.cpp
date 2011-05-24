@@ -1,4 +1,3 @@
-
 /*******************************************************************
  * SLADE - It's a Doom Editor
  * Copyright (C) 2008 Simon Judd
@@ -59,7 +58,7 @@
  *******************************************************************/
 namespace Global {
 	string error = "";
-	string version = "3.0.2 beta 1"
+	string version = "3.0.2 beta 2"
 #ifdef UPDATEREVISION
 	" r" SVN_REVISION_STRING
 #endif

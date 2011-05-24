@@ -31,21 +31,16 @@
 #include "Main.h"
 #include "WxStuff.h"
 #include "MapCanvas.h"
-
-
-/*******************************************************************
- * VARIABLES
- *******************************************************************/
-wxGLContext *glcontext_map;
+#include "MapEditor.h"
 
 
 /* MapCanvas::MapCanvas
  * MapCanvas class constructor
  *******************************************************************/
-MapCanvas::MapCanvas(wxWindow *parent, int id, SLADEMap* map)
+MapCanvas::MapCanvas(wxWindow *parent, int id, MapEditor* editor)
 : OGLCanvas(parent, id) {
 	// Init variables
-	this->map = map;
+	this->editor = editor;
 	view_xoff = 0;
 	view_yoff = 0;
 	view_scale = 1;
@@ -98,7 +93,7 @@ void MapCanvas::pan(double x, double y) {
 	Refresh();
 }
 
-void MapCanvas::zoom(double amount) {
+void MapCanvas::zoom(double amount, bool toward_cursor) {
 	// Zoom view
 	view_scale = view_scale * amount;
 
@@ -115,7 +110,7 @@ void MapCanvas::zoom(double amount) {
 		limit = true;
 	}
 
-	if (!limit) {
+	if (!limit && toward_cursor) {
 		view_xoff = mouse.x + (double(view_xoff - mouse.x) / amount);
 		view_yoff = mouse.y + (double(view_yoff - mouse.y) / amount);
 	}
@@ -137,7 +132,7 @@ void MapCanvas::drawGrid() {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// Determine smallest grid size to bother drawing
-	int grid_hidelevel = 1.0 / view_scale;
+	int grid_hidelevel = 2.0 / view_scale;
 
 	// Determine canvas edges in map coordinates
 	int start_x = translateX(0);
@@ -211,8 +206,7 @@ void MapCanvas::draw() {
 	drawGrid();
 
 	// Draw map
-	map->drawLines();
-	map->drawVertices();
+	editor->drawMap();
 
 	SwapBuffers();
 }
@@ -241,7 +235,7 @@ void MapCanvas::onKeyDown(wxKeyEvent& e) {
 		zoom(0.8);
 
 	// Zoom in
-	if (e.GetKeyCode() == '+')
+	if (e.GetKeyCode() == '=')
 		zoom(1.2);
 
 	e.Skip();
@@ -264,7 +258,7 @@ void MapCanvas::onMouseMotion(wxMouseEvent& e) {
 
 void MapCanvas::onMouseWheel(wxMouseEvent& e) {
 	if (e.GetWheelRotation() > 0)
-		zoom(1.2);
+		zoom(1.2, true);
 	else if (e.GetWheelRotation() < 0)
-		zoom(0.8);
+		zoom(0.8, true);
 }

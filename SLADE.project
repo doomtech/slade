@@ -2,7 +2,7 @@
 <CodeLite_Project Name="SLADE" InternalType="Console">
   <Plugins>
     <Plugin Name="qmake">
-      <![CDATA[00020001N0005Debug0000000000000001N0007Release000000000000]]>
+      <![CDATA[00040001N0005Debug0000000000000001N0009Debug-osx0000000000000001N0007Release0000000000000001N0011Release-osx000000000000]]>
     </Plugin>
   </Plugins>
   <Description/>
@@ -29,11 +29,19 @@
       <File Name="src/EditingPrefsPanel.cpp"/>
       <File Name="src/ACSPrefsPanel.h"/>
       <File Name="src/ACSPrefsPanel.cpp"/>
+      <File Name="src/InterfacePrefsPanel.cpp"/>
+      <File Name="src/InterfacePrefsPanel.h"/>
+      <File Name="src/PNGPrefsPanel.cpp"/>
+      <File Name="src/PNGPrefsPanel.h"/>
+      <File Name="src/GraphicsPrefsPanel.cpp"/>
+      <File Name="src/GraphicsPrefsPanel.h"/>
       <File Name="src/AudioPrefsPanel.cpp"/>
       <File Name="src/AudioPrefsPanel.h"/>
     </VirtualDirectory>
     <File Name="src/ExtMessageDialog.h"/>
     <File Name="src/ExtMessageDialog.cpp"/>
+    <File Name="src/TranslationEditorDialog.cpp"/>
+    <File Name="src/TranslationEditorDialog.h"/>
   </VirtualDirectory>
   <VirtualDirectory Name="General">
     <File Name="src/Clipboard.cpp"/>
@@ -69,6 +77,10 @@
       <File Name="src/Parser.cpp"/>
       <File Name="src/CodePages.cpp"/>
       <File Name="src/CodePages.h"/>
+      <File Name="src/MathStuff.cpp"/>
+      <File Name="src/MathStuff.h"/>
+      <File Name="src/Compression.cpp"/>
+      <File Name="src/Compression.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Console">
       <File Name="src/Console.cpp"/>
@@ -77,10 +89,12 @@
     </VirtualDirectory>
     <File Name="src/MIDIPlayer.h"/>
     <File Name="src/MIDIPlayer.cpp"/>
-    <File Name="src/KeyBind.cpp"/>
-    <File Name="src/KeyBind.h"/>
+    <File Name="src/SAction.cpp"/>
+    <File Name="src/SAction.h"/>
     <File Name="src/Drawing.cpp"/>
     <File Name="src/Drawing.h"/>
+    <File Name="src/KeyBind.cpp"/>
+    <File Name="src/KeyBind.h"/>
   </VirtualDirectory>
   <VirtualDirectory Name="Main Editor">
     <VirtualDirectory Name="UI Elements">
@@ -98,8 +112,6 @@
         <File Name="src/SwitchesEntryPanel.h"/>
         <File Name="src/TextEntryPanel.cpp"/>
         <File Name="src/TextEntryPanel.h"/>
-        <File Name="src/PnamesEntryPanel.cpp"/>
-        <File Name="src/PnamesEntryPanel.h"/>
         <File Name="src/DefaultEntryPanel.cpp"/>
         <File Name="src/HexEntryPanel.h"/>
         <File Name="src/HexEntryPanel.cpp"/>
@@ -120,9 +132,11 @@
         <File Name="src/TextureXEditor.h"/>
         <File Name="src/TextureXPanel.cpp"/>
         <File Name="src/TextureXPanel.h"/>
-        <File Name="src/PatchBrowser.cpp"/>
         <File Name="src/PatchBrowser.h"/>
         <File Name="src/TextureEditorPanel.cpp"/>
+        <File Name="src/PatchBrowser.cpp"/>
+        <File Name="src/ZTextureEditorPanel.cpp"/>
+        <File Name="src/ZTextureEditorPanel.h"/>
       </VirtualDirectory>
       <File Name="src/ArchivePanel.cpp"/>
       <File Name="src/ArchivePanel.h"/>
@@ -150,15 +164,17 @@
       <File Name="src/MapThing.h"/>
       <File Name="src/MapVertex.cpp"/>
       <File Name="src/MapVertex.h"/>
-      <File Name="src/SLADEMap.cpp"/>
       <File Name="src/SLADEMap.h"/>
+      <File Name="src/SLADEMap.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="UI Elements">
       <File Name="src/MapCanvas.cpp"/>
       <File Name="src/MapCanvas.h"/>
     </VirtualDirectory>
-    <File Name="src/MapEditorWindow.cpp"/>
     <File Name="src/MapEditorWindow.h"/>
+    <File Name="src/MapEditorWindow.cpp"/>
+    <File Name="src/MapEditor.cpp"/>
+    <File Name="src/MapEditor.h"/>
   </VirtualDirectory>
   <VirtualDirectory Name="Resources">
     <VirtualDirectory Name="Archive">
@@ -210,6 +226,18 @@
       <File Name="src/LfdArchive.cpp"/>
       <File Name="src/LfdArchive.h"/>
       <File Name="src/Archives.h"/>
+      <File Name="src/HogArchive.cpp"/>
+      <File Name="src/HogArchive.h"/>
+      <File Name="src/BSPArchive.cpp"/>
+      <File Name="src/BSPArchive.h"/>
+      <File Name="src/ADatArchive.cpp"/>
+      <File Name="src/ADatArchive.h"/>
+      <File Name="src/BZip2Archive.cpp"/>
+      <File Name="src/BZip2Archive.h"/>
+      <File Name="src/GZipArchive.cpp"/>
+      <File Name="src/GZipArchive.h"/>
+      <File Name="src/TarArchive.cpp"/>
+      <File Name="src/TarArchive.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Binary Control Lumps">
       <File Name="src/AnimatedList.cpp"/>
@@ -237,6 +265,14 @@
         <File Name="src/SImage.cpp"/>
         <File Name="src/SImage.h"/>
         <File Name="src/SImageFormats.cpp"/>
+        <File Name="src/SIFormat.cpp"/>
+        <File Name="src/SIFormat.h"/>
+        <File Name="src/SIFDoom.h"/>
+        <File Name="src/SIFHexen.h"/>
+        <File Name="src/SIFImages.h"/>
+        <File Name="src/SIFZDoom.h"/>
+        <File Name="src/SIFOther.h"/>
+        <File Name="src/SIFQuake.h"/>
       </VirtualDirectory>
       <VirtualDirectory Name="Palette">
         <File Name="src/Palette.cpp"/>
@@ -248,7 +284,11 @@
       <File Name="src/GLTexture.h"/>
       <File Name="src/Icons.cpp"/>
       <File Name="src/Icons.h"/>
+      <File Name="src/Translation.h"/>
+      <File Name="src/Translation.cpp"/>
     </VirtualDirectory>
+    <File Name="src/ResourceManager.cpp"/>
+    <File Name="src/ResourceManager.h"/>
   </VirtualDirectory>
   <VirtualDirectory Name="UI Elements">
     <File Name="src/ColourBox.cpp"/>
@@ -308,21 +348,125 @@
     <File Name="Makefile"/>
     <File Name="Makefile-debug"/>
     <File Name="README-unix"/>
+    <File Name="Makefile-no_audiere"/>
   </VirtualDirectory>
   <VirtualDirectory Name="External">
-    <VirtualDirectory Name="QMus2Mid">
-      <File Name="src/qmus2mid/qmus2mid.cpp"/>
-      <File Name="src/qmus2mid/qmus2mid.h"/>
+    <VirtualDirectory Name="Mus2Mid">
+      <File Name="src/mus2mid/mus2mid.cpp"/>
+      <File Name="src/mus2mid/mus2mid.h"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="ZReaders">
+      <File Name="src/zreaders/ancientzip.cpp"/>
+      <File Name="src/zreaders/ancientzip.h"/>
+      <File Name="src/zreaders/files.cpp"/>
+      <File Name="src/zreaders/files.h"/>
+      <File Name="src/zreaders/m_alloc.cpp"/>
+      <File Name="src/zreaders/m_alloc.h"/>
+      <File Name="src/zreaders/tarray.h"/>
+      <File Name="src/zreaders/templates.h"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="Lzma">
+      <File Name="src/lzma/C/7z.h"/>
+      <File Name="src/lzma/C/7zAlloc.c"/>
+      <File Name="src/lzma/C/7zAlloc.h"/>
+      <File Name="src/lzma/C/7zBuf.c"/>
+      <File Name="src/lzma/C/7zBuf.h"/>
+      <File Name="src/lzma/C/7zBuf2.c"/>
+      <File Name="src/lzma/C/7zCrc.c"/>
+      <File Name="src/lzma/C/7zCrc.h"/>
+      <File Name="src/lzma/C/7zCrcOpt.c"/>
+      <File Name="src/lzma/C/7zDec.c"/>
+      <File Name="src/lzma/C/7zFile.c"/>
+      <File Name="src/lzma/C/7zFile.h"/>
+      <File Name="src/lzma/C/7zIn.c"/>
+      <File Name="src/lzma/C/7zStream.c"/>
+      <File Name="src/lzma/C/7zVersion.h"/>
+      <File Name="src/lzma/C/Alloc.c"/>
+      <File Name="src/lzma/C/Alloc.h"/>
+      <File Name="src/lzma/C/Bcj2.c"/>
+      <File Name="src/lzma/C/Bcj2.h"/>
+      <File Name="src/lzma/C/Bra.c"/>
+      <File Name="src/lzma/C/Bra.h"/>
+      <File Name="src/lzma/C/Bra86.c"/>
+      <File Name="src/lzma/C/BraIA64.c"/>
+      <File Name="src/lzma/C/CpuArch.c"/>
+      <File Name="src/lzma/C/CpuArch.h"/>
+      <File Name="src/lzma/C/Delta.c"/>
+      <File Name="src/lzma/C/Delta.h"/>
+      <File Name="src/lzma/C/LzFind.c"/>
+      <File Name="src/lzma/C/LzFind.h"/>
+      <File Name="src/lzma/C/LzHash.h"/>
+      <File Name="src/lzma/C/Lzma2Dec.c"/>
+      <File Name="src/lzma/C/Lzma2Dec.h"/>
+      <File Name="src/lzma/C/Lzma2Enc.c"/>
+      <File Name="src/lzma/C/Lzma2Enc.h"/>
+      <File Name="src/lzma/C/Lzma86.h"/>
+      <File Name="src/lzma/C/Lzma86Dec.c"/>
+      <File Name="src/lzma/C/Lzma86Enc.c"/>
+      <File Name="src/lzma/C/LzmaDec.c"/>
+      <File Name="src/lzma/C/LzmaDec.h"/>
+      <File Name="src/lzma/C/LzmaEnc.c"/>
+      <File Name="src/lzma/C/LzmaEnc.h"/>
+      <File Name="src/lzma/C/LzmaLib.c"/>
+      <File Name="src/lzma/C/LzmaLib.h"/>
+      <File Name="src/lzma/C/Ppmd.h"/>
+      <File Name="src/lzma/C/Ppmd7.c"/>
+      <File Name="src/lzma/C/Ppmd7.h"/>
+      <File Name="src/lzma/C/Ppmd7Dec.c"/>
+      <File Name="src/lzma/C/Ppmd7Enc.c"/>
+      <File Name="src/lzma/C/RotateDefs.h"/>
+      <File Name="src/lzma/C/Sha256.c"/>
+      <File Name="src/lzma/C/Sha256.h"/>
+      <File Name="src/lzma/C/Types.h"/>
+      <File Name="src/lzma/C/Xz.c"/>
+      <File Name="src/lzma/C/Xz.h"/>
+      <File Name="src/lzma/C/XzCrc64.c"/>
+      <File Name="src/lzma/C/XzCrc64.h"/>
+      <File Name="src/lzma/C/XzDec.c"/>
+      <File Name="src/lzma/C/XzEnc.c"/>
+      <File Name="src/lzma/C/XzEnc.h"/>
+      <File Name="src/lzma/C/XzIn.c"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="BZip2">
+      <File Name="src/bzip2/blocksort.c"/>
+      <File Name="src/bzip2/bzlib.c"/>
+      <File Name="src/bzip2/bzlib.h"/>
+      <File Name="src/bzip2/bzlib_private.h"/>
+      <File Name="src/bzip2/compress.c"/>
+      <File Name="src/bzip2/crctable.c"/>
+      <File Name="src/bzip2/decompress.c"/>
+      <File Name="src/bzip2/huffman.c"/>
+      <File Name="src/bzip2/randtable.c"/>
     </VirtualDirectory>
   </VirtualDirectory>
+  <VirtualDirectory Name="osx">
+    <File Name="Info.plist"/>
+    <File Name="SLADE-osx.icns"/>
+  </VirtualDirectory>
   <Settings Type="Executable">
+    <GlobalSettings>
+      <Compiler Options="" C_Options="">
+        <IncludePath Value="."/>
+        <Preprocessor Value="NO_AUDIERE"/>
+        <Preprocessor Value="BOOL=int"/>
+        <Preprocessor Value="TRUE=1"/>
+        <Preprocessor Value="FALSE=0"/>
+        <Preprocessor Value="_7ZIP_ST"/>
+      </Compiler>
+      <Linker Options="">
+        <LibraryPath Value="."/>
+        <Library Value="freeimage"/>
+        <Library Value="fluidsynth"/>
+      </Linker>
+      <ResourceCompiler Options=""/>
+    </GlobalSettings>
     <Configuration Name="Debug" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-g;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=yes)" Required="yes" PreCompiledHeader="">
+      <Compiler Options="-g;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=yes)" C_Options="-g;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=yes)" Required="yes" PreCompiledHeader="">
         <Preprocessor Value="__WX__"/>
       </Compiler>
-      <Linker Options="$(shell wx-config --debug=yes --libs std,gl,stc,aui --unicode=yes)" Required="yes"/>
+      <Linker Options="$(shell wx-config --debug=yes --libs std,gl,stc,aui,ribbon --unicode=yes)" Required="yes"/>
       <ResourceCompiler Options="$(shell wx-config --rcflags)" Required="no"/>
-      <General OutputFile="./dist/slade-dbg" IntermediateDirectory="./Debug" Command="./slade-dbg" CommandArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
+      <General OutputFile="./dist/slade-dbg" IntermediateDirectory="./Debug" Command="./slade-dbg" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;"/>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
         <PostConnectCommands/>
@@ -376,7 +520,7 @@
       </AdditionalRules>
     </Configuration>
     <Configuration Name="Release" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-O3;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no)" Required="yes" PreCompiledHeader="">
+      <Compiler Options="-O3;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no)" C_Options="-O3;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no)" Required="yes" PreCompiledHeader="">
         <Preprocessor Value="__WX__"/>
         <Preprocessor Value="NDEBUG"/>
       </Compiler>
@@ -385,7 +529,7 @@
         <Library Value="sfml-audio"/>
       </Linker>
       <ResourceCompiler Options="$(shell wx-config --rcflags)" Required="no"/>
-      <General OutputFile="./dist/slade" IntermediateDirectory="./Release" Command="./slade" CommandArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
+      <General OutputFile="./dist/slade" IntermediateDirectory="./Release" Command="./slade" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;"/>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
         <PostConnectCommands/>
@@ -408,14 +552,42 @@
         <CustomPreBuild/>
       </AdditionalRules>
     </Configuration>
-    <GlobalSettings>
-      <Compiler Options="">
-        <IncludePath Value="."/>
+    <Configuration Name="Release-osx" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="-arch i386;-O3;$(shell $(WXCONFIG_PATH)wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no)" C_Options="-arch i386;-O3;$(shell $(WXCONFIG_PATH)wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no)" Required="yes" PreCompiledHeader="">
+        <Preprocessor Value="__WX__"/>
+        <Preprocessor Value="NDEBUG"/>
+        <Preprocessor Value="__ASM_FIX__"/>
       </Compiler>
       <Linker Options="-s;-arch i386;$(shell $(WXCONFIG_PATH)wx-config --debug=no --libs std,gl,stc,aui,ribbon --unicode=yes);-framework SFML;-framework sfml-system;-framework sfml-audio" Required="yes">
         <Library Value="iconv"/>
       </Linker>
-      <ResourceCompiler Options=""/>
-    </GlobalSettings>
+      <ResourceCompiler Options="$(shell wx-config --rcflags)" Required="no"/>
+      <General OutputFile="./dist/SLADE.app/Contents/MacOS/SLADE" IntermediateDirectory="./Release" Command="./dist/SLADE.app/Contents/MacOS/SLADE" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
+      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;"/>
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
+        <PostConnectCommands/>
+        <StartupCommands/>
+      </Debugger>
+      <PreBuild/>
+      <PostBuild>
+        <Command Enabled="yes">mkdir -p ./dist/SLADE.app/Contents/Resources</Command>
+        <Command Enabled="yes">cp Info.plist ./dist/SLADE.app/Contents/</Command>
+        <Command Enabled="yes">cp SLADE-osx.icns ./dist/SLADE.app/Contents/Resources</Command>
+      </PostBuild>
+      <CustomBuild Enabled="no">
+        <RebuildCommand/>
+        <CleanCommand/>
+        <BuildCommand/>
+        <PreprocessFileCommand/>
+        <SingleFileCommand/>
+        <MakefileGenerationCommand/>
+        <ThirdPartyToolName>None</ThirdPartyToolName>
+        <WorkingDirectory/>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild/>
+        <CustomPreBuild/>
+      </AdditionalRules>
+    </Configuration>
   </Settings>
 </CodeLite_Project>

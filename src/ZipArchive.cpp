@@ -397,6 +397,25 @@ vector<Archive::mapdesc_t> ZipArchive::detectMaps() {
 	if (!mapdir)
 		return ret;
 
+	// Go through entries in map dir
+	for (unsigned a = 0; a < mapdir->numEntries(); a++) {
+		ArchiveEntry* entry = mapdir->getEntry(a);
+
+		// Maps can only be wad archives
+		if (entry->getType()->getFormat() != "archive_wad")
+			continue;
+
+		// Add map description
+		// (not going to detect format, having to open the archive would be slow...
+		//  the way zdoom handles maps in zips is a pretty stupid really)
+		mapdesc_t md;
+		md.head = entry;
+		md.end = entry;
+		md.archive = true;
+		md.name = entry->getName(true).Upper();
+		ret.push_back(md);
+	}
+
 	return ret;
 }
 

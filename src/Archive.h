@@ -76,6 +76,7 @@ enum ArchiveTypes {
 
 // Define map types
 enum MapTypes {
+	MAP_UNKNOWN,	// Needed for maps in zip archives
 	MAP_DOOM,
 	MAP_HEXEN,
 	MAP_DOOM64,
@@ -99,7 +100,14 @@ public:
 		string			name;
 		ArchiveEntry*	head;
 		ArchiveEntry*	end;
-		uint8_t			format;	// See MapTypes enum
+		uint8_t			format;		// See MapTypes enum
+		bool			archive;	// True if head is an archive (for maps in zips)
+
+		mapdesc_t() {
+			head = end = NULL;
+			archive = false;
+			format = MAP_UNKNOWN;
+		}
 	};
 
 	Archive(uint8_t type = ARCHIVE_INVALID);
@@ -169,6 +177,7 @@ public:
 	virtual bool	revertEntry(ArchiveEntry* entry);
 
 	// Detection
+	virtual mapdesc_t			getMapInfo(ArchiveEntry* maphead) { return mapdesc_t(); }
 	virtual vector<mapdesc_t>	detectMaps() = 0;
 	virtual string				detectNamespace(ArchiveEntry* entry) { return "global"; }
 

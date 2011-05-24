@@ -56,6 +56,7 @@
 #include "Conversions.h"
 #include "MainWindow.h"
 #include "TranslationEditorDialog.h"
+#include "MapEditorWindow.h"
 #include <wx/aui/auibook.h>
 #include <wx/aui/auibar.h>
 #include <wx/filename.h>

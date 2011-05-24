@@ -3,12 +3,12 @@
 #define __MAPEDITORWINDOW_H__
 
 #include "MapCanvas.h"
-#include "SLADEMap.h"
+#include "MapEditor.h"
 
 class MapEditorWindow : public wxFrame {
 private:
 	MapCanvas*	map_canvas;
-	SLADEMap*	map;
+	MapEditor	editor;
 
 	// Singleton instance
 	static MapEditorWindow*		instance;
@@ -24,9 +24,13 @@ public:
 
 		return instance;
 	}
+	
+	MapEditor&	mapEditor() { return editor; }
 
 	void	setupLayout();
 	bool	openMap(Archive::mapdesc_t map);
+	
+	void	setPropsPaneCaption(string caption);
 
 	// Events
 	void	onClose(wxCloseEvent& e);

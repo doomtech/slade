@@ -3,11 +3,11 @@
 #define __MAPCANVAS_H__
 
 #include "OGLCanvas.h"
-#include "SLADEMap.h"
 
+class MapEditor;
 class MapCanvas : public OGLCanvas {
 private:
-	SLADEMap*	map;
+	MapEditor*	editor;
 
 	// View properties
 	double	view_xoff;
@@ -19,15 +19,16 @@ private:
 	fpoint2_t	mouse_down;
 
 public:
-	MapCanvas(wxWindow *parent, int id, SLADEMap* map);
+	MapCanvas(wxWindow *parent, int id, MapEditor* editor);
 	~MapCanvas();
 
 	double	translateX(double x);
 	double	translateY(double y);
 
 	void	pan(double x, double y);
-	void	zoom(double amount);
+	void	zoom(double amount, bool toward_cursor = false);
 
+	// Drawing
 	void	drawGrid();
 	void	draw();
 

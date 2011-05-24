@@ -29,6 +29,7 @@
  *******************************************************************/
 #include "Main.h"
 #include "SLADEMap.h"
+#include "Parser.h"
 
 SLADEMap::SLADEMap() {
 }
@@ -577,51 +578,7 @@ bool SLADEMap::readDoom64Map(Archive::mapdesc_t map) {
 }
 
 bool SLADEMap::readUDMFMap(ArchiveEntry* map_data) {
-	Tokenizer udmf_data;
-	udmf_data.openMem((char*)map_data->getData(true), map_data->getSize(), map_data->getName());
-
-	string token = udmf_data.getToken();
-	while (token != "") {
-		// Vertex definition
-		if (token == "vertex") {
-			MapVertex* new_vertex = new MapVertex();
-			if (new_vertex->parseUDMF(udmf_data))
-				vertices.push_back(new_vertex);
-			else
-				delete new_vertex;
-		}
-
-		// Line definition
-		if (token == "linedef") {
-			MapLine* new_line = new MapLine();
-			if (new_line->parseUDMF(udmf_data))
-				lines.push_back(new_line);
-			else
-				delete new_line;
-		}
-
-		// Side definition
-		if (token == "sidedef") {
-			MapSide* new_side = new MapSide();
-			if (new_side->parseUDMF(udmf_data))
-				sides.push_back(new_side);
-			else
-				delete new_side;
-		}
-
-		// Sector definition
-		if (token == "sector") {
-			MapSector* new_sector = new MapSector();
-			if (new_sector->parseUDMF(udmf_data))
-				sectors.push_back(new_sector);
-			else
-				delete new_sector;
-		}
-
-		token = udmf_data.getToken();
-	}
-
-	return true;
+	return false;
 }
 
 
@@ -650,22 +607,6 @@ void SLADEMap::clearMap() {
 	for (unsigned a = 0; a < things.size(); a++)
 		delete things[a];
 	things.clear();
-}
-
-void SLADEMap::drawVertices() {
-	rgba_t(140, 140, 255, 255, 0).set_gl();
-
-	glBegin(GL_POINTS);
-	for (size_t a = 0; a < vertices.size(); a++)
-		glVertex2d(vertices[a]->xPos(), vertices[a]->yPos());
-	glEnd();
-}
-
-void SLADEMap::drawLines() {
-	glEnable(GL_LINE_SMOOTH);
-
-	for (size_t a = 0; a < lines.size(); a++)
-		lines[a]->draw(false);
 }
 
 

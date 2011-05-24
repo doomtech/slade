@@ -33,6 +33,14 @@
 #include "Main.h"
 #include "Parser.h"
 #include "Console.h"
+#include <wx/regex.h>
+
+
+/*******************************************************************
+ * VARIABLES
+ *******************************************************************/
+wxRegEx re_integer("[+-]?[1-9]+[0-9]* | 0[0-9]+ | 0x[0-9A-Fa-f]+");
+wxRegEx re_float("[+-]?[0-9]+'.'[0-9]*([eE][+-]?[0-9]+)?");
 
 
 /*******************************************************************
@@ -60,7 +68,7 @@ string ParseTreeNode::getStringValue(unsigned index) {
 	if (index >= values.size())
 		return wxEmptyString;
 
-	return values[index];
+	return values[index].getStringValue();
 }
 
 /* ParseTreeNode::getStringValue
@@ -72,9 +80,7 @@ int ParseTreeNode::getIntValue(unsigned index) {
 	if (index >= values.size())
 		return 0;
 
-	long val;
-	values[index].ToLong(&val);
-	return val;
+	return (int)values[index];
 }
 
 /* ParseTreeNode::getStringValue
@@ -86,26 +92,19 @@ bool ParseTreeNode::getBoolValue(unsigned index) {
 	if (index >= values.size())
 		return false;
 
-	if (S_CMPNOCASE(values[index], "false") ||
-		S_CMPNOCASE(values[index], "0") ||
-		S_CMPNOCASE(values[index], "no"))
-		return false;
-	else
-		return true;
+	return (bool)values[index];
 }
 
 /* ParseTreeNode::getStringValue
  * Returns the node's value at [index] as a float. If [index] is
  * out of range, returns 0.0f
  *******************************************************************/
-float ParseTreeNode::getFloatValue(unsigned index) {
+double ParseTreeNode::getFloatValue(unsigned index) {
 	// Check index
 	if (index >= values.size())
 		return 0.0f;
 
-	double val;
-	values[index].ToDouble(&val);
-	return (float)val;
+	return (double)values[index];
 }
 
 /* ParseTreeNode::parse
@@ -159,8 +158,31 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 				if (S_CMP(token, list_end) && !tz.quotedString())
 					break;
 
+				// Setup value
+				Property value;
+				
+				// Detect value type
+				if (tz.quotedString())					// Quoted string
+					value = token;
+				else if (S_CMPNOCASE(token, "true"))	// Boolean (true)
+					value = true;
+				else if (S_CMPNOCASE(token, "false"))	// Boolean (false)
+					value = false;
+				else if (re_integer.Matches(token)) {	// Integer
+					long val;
+					token.ToLong(&val);
+					value = (int)val;
+				}
+				else if (re_float.Matches(token)) {		// Floating point
+					double val;
+					token.ToDouble(&val);
+					value = (double)val;
+				}
+				else									// Unknown, just treat as string
+					value = token;
+				
 				// Add value
-				child->values.push_back(token);
+				child->values.push_back(value);
 
 				// Check for ,
 				if (S_CMP(tz.peekToken(), ","))

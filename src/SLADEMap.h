@@ -10,8 +10,15 @@
 #include "Archive.h"
 #include "PropertyList.h"
 
+struct udmf_block_t {
+	string			id;
+	PropertyList	properties;
+};
 
+class MapEditor;
+class ParserTreeNode;
 class SLADEMap {
+friend class MapEditor;
 private:
 	vector<MapLine*>	lines;
 	vector<MapSide*>	sides;
@@ -61,8 +68,6 @@ public:
 	MapThing*	getThing(unsigned index);
 
 	bool	readMap(Archive::mapdesc_t map);
-	void	drawVertices();
-	void	drawLines();
 
 	void	clearMap();
 

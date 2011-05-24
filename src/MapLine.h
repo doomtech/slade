@@ -85,9 +85,6 @@ public:
 	Property&		prop(string key)	{ return udmf_props[key]; }
 
 	bool	parseUDMF(Tokenizer& tz);
-
-	// Drawing
-	void	draw(bool side_indicator);
 };
 
 #endif //__MAPLINE_H__

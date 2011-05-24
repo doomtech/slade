@@ -755,11 +755,7 @@ vector<Archive::mapdesc_t> WadArchive::detectMaps() {
 
 				// Add map info to the maps list
 				maps.push_back(md);
-			}// else {
-				// If we found a non-map lump before all needed map lumps were found,
-				// it's an invalid map, so just continue the loop
-			//	continue;
-			//}
+			}
 		}
 
 

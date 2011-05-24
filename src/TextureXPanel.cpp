@@ -717,7 +717,7 @@ void TextureXPanel::paste() {
  *******************************************************************/
 bool TextureXPanel::handleAction(string id) {
 	// Don't handle if hidden
-	if (!IsShown())
+	if (!tx_editor->IsShown() || !IsShown())
 		return false;
 
 	// Only interested in "txed_" events
