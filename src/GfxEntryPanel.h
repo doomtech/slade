@@ -9,7 +9,7 @@
 #include <wx/spinctrl.h>
 #include <wx/choice.h>
 
-class GfxEntryPanel : public EntryPanel, SActionHandler {
+class GfxEntryPanel : public EntryPanel, public SActionHandler {
 private:
 	bool			alph;
 	bool			trns;

@@ -41,6 +41,7 @@
 #include "SplashWindow.h"
 #include "MainWindow.h"
 #include "Icons.h"
+#include "DefaultEntryPanel.h"
 
 
 /*******************************************************************
@@ -414,16 +415,30 @@ int ArchiveManagerPanel::currentTabIndex() {
  * isn't an ArchivePanel
  *******************************************************************/
 Archive* ArchiveManagerPanel::currentArchive() {
-	// Get current tab index
-	int selected = notebook_archives->GetSelection();
+	// Get current tab
+	wxWindow* page = notebook_archives->GetPage(notebook_archives->GetSelection());
 
-	// Check it's an archive tab
-	if (!isArchivePanel(selected))
+	// ArchivePanel
+	if (page->GetName() == "archive") {
+		ArchivePanel* ap = (ArchivePanel*)page;
+		return ap->getArchive();
+	}
+
+	// EntryPanel
+	else if (page->GetName() == "entry") {
+		EntryPanel* ep = (EntryPanel*)page;
+		return ep->getEntry()->getParent();
+	}
+
+	// TextureXEditor
+	else if (page->GetName() == "texture") {
+		TextureXEditor* tx = (TextureXEditor*)page;
+		return tx->getArchive();
+	}
+
+	// Not an archive-related tab
+	else
 		return NULL;
-
-	// Get the archive associated with the panel
-	ArchivePanel* ap = (ArchivePanel*)notebook_archives->GetPage(selected);
-	return ap->getArchive();
 }
 
 /* ArchiveManagerPanel::currentPanel
@@ -574,6 +589,9 @@ void ArchiveManagerPanel::closeTab(int archive_index) {
 			// Check for archive match
 			ArchivePanel* ap = (ArchivePanel*)notebook_archives->GetPage(a);
 			if (ap->getArchive() == archive) {
+				// Remove custom menu
+				ap->removeMenus();
+
 				// Close the tab
 				notebook_archives->DeletePage(a);
 
@@ -690,6 +708,14 @@ void ArchiveManagerPanel::openEntryTab(ArchiveEntry* entry) {
 	notebook_archives->SetPageBitmap(notebook_archives->GetPageCount() - 1, getIcon(entry->getType()->getIcon()));
 	ep->SetName("entry");
 	ep->Show(true);
+	ep->addCustomMenu();
+
+	// Hide 'Edit as Text' and 'View as Hex' buttons (they won't work if it's not part of an ArchivePanel)
+	if (ep->getName() == "default") {
+		DefaultEntryPanel* dep = (DefaultEntryPanel*)ep;
+		dep->getViewHexButton()->Show(false);
+		dep->getEditTextButton()->Show(false);
+	}
 
 	// Select the new tab
 	for (size_t a = 0; a < notebook_archives->GetPageCount(); a++) {
@@ -718,6 +744,7 @@ void ArchiveManagerPanel::closeEntryTabs(Archive* parent) {
 		EntryPanel* ep = (EntryPanel*)notebook_archives->GetPage(a);
 		if (ep->getEntry()->getParent() == parent) {
 			// Close tab
+			ep->removeCustomMenu();
 			notebook_archives->DeletePage(a);
 			a--;
 		}
@@ -1241,6 +1268,14 @@ bool ArchiveManagerPanel::handleAction(string id) {
 		}
 	}
 
+	// File->Save
+	else if (id == "aman_save")
+		saveArchive(currentArchive());
+
+	// File->Save As
+	else if (id == "aman_saveas")
+		saveArchiveAs(currentArchive());
+
 	// File->Save All
 	else if (id == "aman_saveall")
 		saveAll();
@@ -1417,8 +1452,8 @@ void ArchiveManagerPanel::onListMapsActivated(wxListEvent& e) {
 void ArchiveManagerPanel::onListArchivesRightClick(wxListEvent& e) {
 	// Generate context menu
 	wxMenu context;
-	theApp->getAction("arch_save")->addToMenu(&context);
-	theApp->getAction("arch_saveas")->addToMenu(&context);
+	theApp->getAction("aman_save")->addToMenu(&context);
+	theApp->getAction("aman_saveas")->addToMenu(&context);
 	theApp->getAction("aman_close")->addToMenu(&context);
 
 	// Pop it up
@@ -1487,6 +1522,13 @@ void ArchiveManagerPanel::onArchiveTabChanging(wxAuiNotebookEvent& e) {
 		ap->removeMenus();
 	}
 
+	// EntryPanel
+	wxWindow* page = notebook_archives->GetPage(selection);
+	if (page && page->GetName() == "entry") {
+		EntryPanel* ep = (EntryPanel*)page;
+		ep->removeCustomMenu();
+	}
+
 	e.Skip();
 }
 
@@ -1502,6 +1544,12 @@ void ArchiveManagerPanel::onArchiveTabChanged(wxAuiNotebookEvent& e) {
 		ArchivePanel* ap = (ArchivePanel*)notebook_archives->GetPage(selection);
 		ap->currentArea()->updateStatus();
 		ap->addMenus();
+	}
+
+	// EntryPanel
+	if (notebook_archives->GetPage(selection)->GetName() == "entry") {
+		EntryPanel* ep = (EntryPanel*)notebook_archives->GetPage(selection);
+		ep->addCustomMenu();
 	}
 
 	e.Skip();

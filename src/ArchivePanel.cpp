@@ -234,6 +234,7 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
  * ArchivePanel class destructor
  *******************************************************************/
 ArchivePanel::~ArchivePanel() {
+	removeMenus();
 }
 
 /* ArchivePanel::saveEntryChanges
@@ -1556,6 +1557,7 @@ bool ArchivePanel::handleAction(string id) {
 	// FILE MENU
 	// *************************************************************
 
+	/*
 	// File->Save
 	if (id == "arch_save")
 		save();
@@ -1563,6 +1565,7 @@ bool ArchivePanel::handleAction(string id) {
 	// File->Save As
 	else if (id == "arch_saveas")
 		saveAs();
+	*/
 
 
 	// *************************************************************

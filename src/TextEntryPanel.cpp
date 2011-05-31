@@ -162,6 +162,10 @@ bool TextEntryPanel::saveEntry() {
 	// Re-detect entry type
 	EntryType::detectEntryType(entry);
 
+	// Set text if unknown
+	if (entry->getType() == EntryType::unknownType())
+		entry->setType(EntryType::getType("text"));
+
 	// Update variables
 	setModified(false);
 
