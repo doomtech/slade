@@ -41,7 +41,6 @@
 #include "SplashWindow.h"
 #include "MainWindow.h"
 #include "Icons.h"
-#include "DefaultEntryPanel.h"
 
 
 /*******************************************************************
@@ -703,19 +702,19 @@ void ArchiveManagerPanel::openEntryTab(ArchiveEntry* entry) {
 	EntryPanel* ep = ArchivePanel::createPanelForEntry(entry, notebook_archives);
 	ep->openEntry(entry);
 
+	// Don't bother with the default entry panel
+	// (it's absolutely useless to open in a tab)
+	if (ep->getName() == "default") {
+		delete ep;
+		return;
+	}
+
 	// Create new tab for the EntryPanel
 	notebook_archives->AddPage(ep, S_FMT("%s/%s", CHR(entry->getParent()->getFilename(false)), CHR(entry->getName())), true);
 	notebook_archives->SetPageBitmap(notebook_archives->GetPageCount() - 1, getIcon(entry->getType()->getIcon()));
 	ep->SetName("entry");
 	ep->Show(true);
 	ep->addCustomMenu();
-
-	// Hide 'Edit as Text' and 'View as Hex' buttons (they won't work if it's not part of an ArchivePanel)
-	if (ep->getName() == "default") {
-		DefaultEntryPanel* dep = (DefaultEntryPanel*)ep;
-		dep->getViewHexButton()->Show(false);
-		dep->getEditTextButton()->Show(false);
-	}
 
 	// Select the new tab
 	for (size_t a = 0; a < notebook_archives->GetPageCount(); a++) {
