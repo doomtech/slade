@@ -463,6 +463,7 @@ void TextureEditorPanel::removePatch() {
 
 	// Update UI
 	updatePatchControls();
+	tex_canvas->redraw(true);
 
 	tex_modified = true;
 }

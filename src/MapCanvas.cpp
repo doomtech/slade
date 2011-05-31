@@ -111,8 +111,10 @@ void MapCanvas::zoom(double amount, bool toward_cursor) {
 	}
 
 	if (!limit && toward_cursor) {
-		view_xoff = mouse.x + (double(view_xoff - mouse.x) / amount);
-		view_yoff = mouse.y + (double(view_yoff - mouse.y) / amount);
+		double mx = editor->mousePos().x;
+		double my = editor->mousePos().y;
+		view_xoff = mx + (double(view_xoff - mx) / amount);
+		view_yoff = my + (double(view_yoff - my) / amount);
 	}
 
 	// Refresh
@@ -214,6 +216,8 @@ void MapCanvas::draw() {
 
 
 void MapCanvas::onKeyDown(wxKeyEvent& e) {
+	bool refresh = false;
+
 	// Pan left
 	if (e.GetKeyCode() == WXK_LEFT)
 		pan(-128, 0);
@@ -238,6 +242,33 @@ void MapCanvas::onKeyDown(wxKeyEvent& e) {
 	if (e.GetKeyCode() == '=')
 		zoom(1.2);
 
+	// Vertices mode
+	if (e.GetKeyCode() == 'V') {
+		editor->setEditMode(MapEditor::MODE_VERTICES);
+		refresh = true;
+	}
+
+	// Lines mode
+	if (e.GetKeyCode() == 'L') {
+		editor->setEditMode(MapEditor::MODE_LINES);
+		refresh = true;
+	}
+
+	// Sectors mode
+	if (e.GetKeyCode() == 'S') {
+		editor->setEditMode(MapEditor::MODE_SECTORS);
+		refresh = true;
+	}
+
+	// Things mode
+	if (e.GetKeyCode() == 'T') {
+		editor->setEditMode(MapEditor::MODE_THINGS);
+		refresh = true;
+	}
+
+	if (refresh)
+		Refresh();
+
 	e.Skip();
 }
 
@@ -252,8 +283,10 @@ void MapCanvas::onMouseUp(wxMouseEvent& e) {
 void MapCanvas::onMouseMotion(wxMouseEvent& e) {
 	e.Skip();
 
-	mouse.x = translateX(e.GetPosition().x);
-	mouse.y = translateY(e.GetPosition().y);
+	// Update editor mouse tracking and hilight
+	editor->setMousePos(translateX(e.GetPosition().x), translateY(e.GetPosition().y));
+	if (editor->updateHilight())
+		Refresh();
 }
 
 void MapCanvas::onMouseWheel(wxMouseEvent& e) {

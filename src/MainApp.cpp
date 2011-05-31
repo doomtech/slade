@@ -336,6 +336,8 @@ void MainApp::initActions() {
 	new SAction("aman_newwad", "New Wad Archive", "t_newarchive", "Create a new Doom Wad Archive", "Ctrl+Shift+W");
 	new SAction("aman_newzip", "New Zip Archive", "t_newzip", "Create a new Zip Archive", "Ctrl+Shift+Z");
 	new SAction("aman_open", "&Open", "t_open", "Open an existing Archive", "Ctrl+O");
+	new SAction("aman_save", "&Save", "t_save", "Save the currently open Archive", "Ctrl+S");
+	new SAction("aman_saveas", "Save &As", "t_saveas", "Save the currently open Archive to a new file", "Ctrl+Shift+S");
 	new SAction("aman_saveall", "Save All", "t_saveall", "Save all open Archives");
 	new SAction("aman_close", "&Close", "t_close", "Close the currently open Archive", "Ctrl+W");
 	new SAction("aman_closeall", "Close All", "t_closeall", "Close all open Archives");
@@ -355,13 +357,12 @@ void MainApp::initActions() {
 	new SAction("aman_recent8", "<insert recent file name>", "");
 
 	// ArchivePanel
-	new SAction("arch_save", "&Save", "t_save", "Save the currently open Archive", "Ctrl+S");
-	new SAction("arch_saveas", "Save &As", "t_saveas", "Save the currently open Archive to a new file", "Ctrl+Shift+S");
 	new SAction("arch_newentry", "New Entry", "t_newentry", "Create a new empty entry");
 	new SAction("arch_newdir", "New Directory", "t_newfolder", "Create a new empty directory");
 	new SAction("arch_importfiles", "&Import Files", "t_importfiles", "Import multiple files into the archive");
 	new SAction("arch_texeditor", "&Texture Editor", "t_texeditor", "Open the texture editor for the current archive");
 	new SAction("arch_clean_patches", "Remove Unused &Patches", "", "Remove any unused patches, and their associated entries");
+	new SAction("arch_check_duplicates", "Check Duplicate Entry Names", "", "Checks the archive for any entries sharing the same name");
 	new SAction("arch_entry_rename", "Rename", "t_rename", "Rename the selected entries");
 	new SAction("arch_entry_rename_each", "Rename Each", "t_renameeach", "Rename separately all the selected entries");
 	new SAction("arch_entry_delete", "Delete", "t_delete", "Delete the selected entries");

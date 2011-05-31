@@ -664,6 +664,7 @@ void CTextureCanvas::onAnnouncement(Announcer* announcer, string event_name, Mem
 		// Reload patches
 		selected_patches.clear();
 		clearPatchTextures();
+		hilight_patch = -1;
 		for (uint32_t a = 0; a < texture->nPatches(); a++) {
 			// Create GL texture
 			patch_textures.push_back(new GLTexture());

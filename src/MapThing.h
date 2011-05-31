@@ -59,16 +59,21 @@ struct doom64thing_t
 class MapThing {
 friend class SLADEMap;
 private:
-	short	type;
-	double	x;
-	double	y;
+	// Basic data
+	unsigned	index;
+	short		type;
+	double		x;
+	double		y;
 
+	// Properties
 	PropertyList	udmf_props;
 
 public:
 	MapThing(){}
 	MapThing(double x, double y, short type) { this->x = x; this->y = y; this->type = type; }
 	~MapThing(){}
+
+	unsigned	getIndex() { return index; }
 
 	PropertyList&	props()				{ return udmf_props; }
 	Property&		prop(string key)	{ return udmf_props[key]; }

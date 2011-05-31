@@ -5,13 +5,6 @@
 -------------------------------------------------------------------------
 
 
-Major Changes Since Last Version ----------------------------------------
-- Texture editor now supports ZDoom's enhanced TEXTURES format
-- Can now copy+paste textures between different TEXTUREx lists
-- New 'Graphic' menu for gfx entries, with some basic gfx editing functions
-- Typing the first few characters of an item to jump to it in lists has been re-implemented
-
-
 TODO List ---------------------------------------------------------------
 
 --- Before 3.0.2 ---
@@ -86,10 +79,6 @@ TODO List ---------------------------------------------------------------
 - Need to do something about keeping ArchiveEntry.data.size and ArchiveEntry.size in sync
   (Still need the size member for entries that don't have their data loaded into memory yet)
   (could make ArchiveEntry a subclass of MemChunk?)
-- Better SImage format stuff
-	- Needs ability to get an image's properties without actually loading it
-	- Image format detection in SImage class
-	- General 'loadImage' function to load any supported format
 - Better way to get the currently selected entries would be nice
 - Should probably write my own lexer for TextEditor since the default cpp/cppnocase ones are somewhat limited
 - Implement custom replacement for wxFileName that allows fast matching against name/extension etc
@@ -103,7 +92,6 @@ Unimplemented Feature Requests ------------------------------------------
 - Ability to toggle toolbars, access all toolbar functions from menus
 - Fully customisable toolbars
 - Sorting by column (I.E. Name or Type)
-- Duplicate entry name checking
 - Map browser
 
 --- Archive / Entry Management ---

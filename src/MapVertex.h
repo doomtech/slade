@@ -23,11 +23,15 @@ struct doom64vertex_t
 class MapVertex {
 friend class SLADEMap;
 private:
-	double	x;
-	double	y;
+	// Basic data
+	unsigned	index;
+	double		x;
+	double		y;
 
+	// Internal info
 	vector<MapLine*>	connected_lines;
 
+	// Properties
 	PropertyList	udmf_props;
 
 public:
@@ -35,8 +39,9 @@ public:
 	MapVertex(double x, double y) { this->x = x; this->y = y; }
 	~MapVertex(){}
 
-	double	xPos() { return x; }
-	double	yPos() { return y; }
+	unsigned	getIndex() { return index; }
+	double		xPos() { return x; }
+	double		yPos() { return y; }
 
 	void		connectLine(MapLine* line);
 	void		disconnectLine(MapLine* line);

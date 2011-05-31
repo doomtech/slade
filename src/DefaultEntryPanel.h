@@ -33,7 +33,6 @@ public:
 	void	onBtnGfxConvert(wxCommandEvent& e);
 	void	onBtnGfxModifyOffsets(wxCommandEvent& e);
 	void	onBtnTextureEdit(wxCommandEvent& e);
-	//void	onBtnViewHex(wxCommandEvent& e);
 };
 
 #endif//__DEFAULT_ENTRY_PANEL_H__

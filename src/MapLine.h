@@ -59,6 +59,7 @@ class MapLine {
 friend class SLADEMap;
 private:
 	// Basic data
+	unsigned	index;
 	MapVertex*	vertex1;
 	MapVertex*	vertex2;
 	MapSide*	side1;
@@ -74,6 +75,7 @@ public:
 
 	bool	isOk() { return vertex1 && vertex2; }
 
+	unsigned		getIndex() { return index; }
 	MapVertex*		v1() { return vertex1; }
 	MapVertex*		v2() { return vertex2; }
 	MapSide*		s1() { return side1; }

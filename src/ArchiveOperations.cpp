@@ -32,6 +32,15 @@
 #include "ArchiveOperations.h"
 #include "TextureXList.h"
 #include "ResourceManager.h"
+#include "ExtMessageDialog.h"
+#include "MainWindow.h"
+#include <wx/hashmap.h>
+
+
+/*******************************************************************
+ * VARIABLES
+ *******************************************************************/
+WX_DECLARE_STRING_HASH_MAP(int, StrIntMap);
 
 
 /*******************************************************************
@@ -118,6 +127,51 @@ bool ArchiveOperations::removeUnusedPatches(Archive* archive) {
 
 	// Notify user
 	wxMessageBox(S_FMT("Removed %d patches and %d entries. See console log for details.", removed, to_remove.size()), "Removed Unused Patches");
+
+	return true;
+}
+
+/* ArchiveOperations::checkDuplicateEntryNames
+ * Checks [archive] for multiple entries of the same name, and
+ * displays a list of duplicate entry names if any are found
+ *******************************************************************/
+bool ArchiveOperations::checkDuplicateEntryNames(Archive* archive) {
+	StrIntMap map_namecounts;
+	
+	// Get list of all entries in archive
+	vector<ArchiveEntry*> entries;
+	archive->getEntryTreeAsList(entries);
+
+	// Go through list
+	for (unsigned a = 0; a < entries.size(); a++) {
+		// Skip directory entries
+		if (entries[a]->getType() == EntryType::folderType())
+			continue;
+
+		// Increment count for entry name
+		map_namecounts[entries[a]->getPath(true)] += 1;
+	}
+
+	// Generate string of duplicate entry names
+	string dups;
+	StrIntMap::iterator i = map_namecounts.begin();
+	while (i != map_namecounts.end()) {
+		if (i->second > 1)
+			dups += S_FMT("%s appears %d times\n", CHR(i->first), i->second);
+		i++;
+	}
+
+	// If no duplicates exist, do nothing
+	if (dups.IsEmpty()) {
+		wxMessageBox("No duplicated entry names exist");
+		return false;
+	}
+
+	// Display list of duplicate entry names
+	ExtMessageDialog msg(theMainWindow, "Duplicate Entries");
+	msg.setExt(dups);
+	msg.setMessage("The following entry names are duplicated:");
+	msg.ShowModal();
 
 	return true;
 }

@@ -5,8 +5,6 @@
 #include "Tokenizer.h"
 #include "PropertyList.h"
 
-class MapSide;
-
 struct doomsector_t
 {
 	short	f_height;
@@ -32,12 +30,17 @@ struct doom64sector_t
 
 class MapSector {
 friend class SLADEMap;
+friend class MapSide;
 private:
-	string	f_tex;
-	string	c_tex;
+	// Basic data
+	unsigned	index;
+	string		f_tex;
+	string		c_tex;
 
+	// Internal info
 	vector<MapSide*>	connected_sides;
 
+	// Properties
 	PropertyList	udmf_props;
 
 public:
@@ -45,8 +48,9 @@ public:
 	MapSector(string f_tex, string c_tex) { this->f_tex = f_tex; this->c_tex = c_tex; }
 	~MapSector(){}
 
-	string	floorTexture() { return f_tex; }
-	string	ceilingTexture() { return c_tex; }
+	unsigned	getIndex() { return index; }
+	string		floorTexture() { return f_tex; }
+	string		ceilingTexture() { return c_tex; }
 
 	PropertyList&	props()				{ return udmf_props; }
 	Property&		prop(string key)	{ return udmf_props[key]; }

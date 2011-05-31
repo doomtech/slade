@@ -29,16 +29,23 @@ struct doom64side_t
 
 class MapSide {
 friend class SLADEMap;
+friend class MapLine;
 private:
+	// Basic data
+	unsigned	index;
 	MapSector*	sector;
+	MapLine*	parent;
 
+	// Properties
 	PropertyList	udmf_props;
 
 public:
 	MapSide(MapSector* sector = NULL);
-	~MapSide(){}
+	~MapSide();
 
 	bool	isOk() { return !!sector; }
+
+	unsigned	getIndex() { return index; }
 
 	PropertyList&	props()				{ return udmf_props; }
 	Property&		prop(string key)	{ return udmf_props[key]; }

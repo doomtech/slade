@@ -14,10 +14,6 @@ private:
 	double	view_yoff;
 	double	view_scale;
 
-	// Mouse position info
-	fpoint2_t	mouse;
-	fpoint2_t	mouse_down;
-
 public:
 	MapCanvas(wxWindow *parent, int id, MapEditor* editor);
 	~MapCanvas();

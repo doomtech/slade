@@ -30,8 +30,15 @@
 #include "Main.h"
 #include "SLADEMap.h"
 #include "Parser.h"
+#include "MathStuff.h"
 
 SLADEMap::SLADEMap() {
+	// Init variables
+	this->i_lines = false;
+	this->i_sides = false;
+	this->i_sectors = false;
+	this->i_vertices = false;
+	this->i_things = false;
 }
 
 SLADEMap::~SLADEMap() {
@@ -75,6 +82,138 @@ MapThing* SLADEMap::getThing(unsigned index) {
 		return NULL;
 
 	return things[index];
+}
+
+int	SLADEMap::vertexIndex(MapVertex* v) {
+	// Check vertex was given
+	if (!v)
+		return -1;
+
+	// Check if item index is valid
+	if (i_vertices)
+		return v->index;
+
+	// Find vertex
+	for (unsigned a = 0; a < vertices.size(); a++) {
+		if (vertices[a] == v)
+			return a;
+	}
+
+	// Not found
+	return -1;
+}
+
+int	SLADEMap::sideIndex(MapSide* s) {
+	// Check side was given
+	if (!s)
+		return -1;
+
+	// Check if item index is valid
+	if (i_sides)
+		return s->index;
+
+	// Find side
+	for (unsigned a = 0; a < sides.size(); a++) {
+		if (sides[a] == s)
+			return a;
+	}
+
+	// Not found
+	return -1;
+}
+
+int	SLADEMap::lineIndex(MapLine* l) {
+	// Check line was given
+	if (!l)
+		return -1;
+
+	// Check if item index is valid
+	if (i_lines)
+		return l->index;
+
+	// Find line
+	for (unsigned a = 0; a < lines.size(); a++) {
+		if (lines[a] == l)
+			return a;
+	}
+
+	// Not found
+	return -1;
+}
+
+int	SLADEMap::sectorIndex(MapSector* s) {
+	// Check sector was given
+	if (!s)
+		return -1;
+
+	// Check if item index is valid
+	if (i_sectors)
+		return s->index;
+
+	// Find sector
+	for (unsigned a = 0; a < sectors.size(); a++) {
+		if (sectors[a] == s)
+			return a;
+	}
+
+	// Not found
+	return -1;
+}
+
+int	SLADEMap::thingIndex(MapThing* t) {
+	// Check thing was given
+	if (!t)
+		return -1;
+
+	// Check if item index is valid
+	if (i_things)
+		return t->index;
+
+	// Find thing
+	for (unsigned a = 0; a < things.size(); a++) {
+		if (things[a] == t)
+			return a;
+	}
+
+	// Not found
+	return -1;
+}
+
+void SLADEMap::refreshIndices() {
+	// Vertex indices
+	if (!i_vertices) {
+		i_vertices = true;
+		for (unsigned a = 0; a < vertices.size(); a++)
+			vertices[a]->index = a;
+	}
+
+	// Side indices
+	if (!i_sides) {
+		i_sides = true;
+		for (unsigned a = 0; a < sides.size(); a++)
+			sides[a]->index = a;
+	}
+
+	// Line indices
+	if (!i_lines) {
+		i_lines = true;
+		for (unsigned a = 0; a < lines.size(); a++)
+			lines[a]->index = a;
+	}
+
+	// Sector indices
+	if (!i_sectors) {
+		i_sectors = true;
+		for (unsigned a = 0; a < sectors.size(); a++)
+			sectors[a]->index = a;
+	}
+
+	// Thing indices
+	if (!i_things) {
+		i_things = true;
+		for (unsigned a = 0; a < things.size(); a++)
+			things[a]->index = a;
+	}
 }
 
 bool SLADEMap::readMap(Archive::mapdesc_t map) {
@@ -308,6 +447,9 @@ bool SLADEMap::readDoomMap(Archive::mapdesc_t map) {
 	// Remove detached vertices
 	removeDetachedVertices();
 
+	// Update item indices
+	refreshIndices();
+
 	return true;
 }
 
@@ -453,6 +595,9 @@ bool SLADEMap::readHexenMap(Archive::mapdesc_t map) {
 	// Remove detached vertices
 	removeDetachedVertices();
 
+	// Update item indices
+	refreshIndices();
+
 	return true;
 }
 
@@ -571,6 +716,9 @@ bool SLADEMap::readDoom64Map(Archive::mapdesc_t map) {
 
 	// Remove detached vertices
 	removeDetachedVertices();
+
+	// Update item indices
+	refreshIndices();
 
 	return true;
 }
@@ -752,9 +900,9 @@ bool SLADEMap::readUDMFMap(Archive::mapdesc_t map) {
 
 	// --- Process parsed data ---
 	
-	// First we have to sort each definition block by type
-	// so they can be created in the correct order (verts->sides->lines->sectors->things)
-	// even if they aren't defined in that order
+	// First we have to sort the definition blocks by type so they can
+	// be created in the correct order (verts->sides->lines->sectors->things),
+	// even if they aren't defined in that order.
 	// Unknown definitions are also kept, just in case
 	ParseTreeNode* root = parser.parseTreeRoot();
 	vector<ParseTreeNode*> defs_vertices;
@@ -817,6 +965,9 @@ bool SLADEMap::readUDMFMap(Archive::mapdesc_t map) {
 	for (unsigned a = 0; a < defs_things.size(); a++)
 		addThing(defs_things[a]);
 
+	// Update item indices
+	refreshIndices();
+
 	return true;
 }
 
@@ -848,7 +999,7 @@ void SLADEMap::clearMap() {
 	things.clear();
 }
 
-int SLADEMap::nearestVertex(int x, int y) {
+int SLADEMap::nearestVertex(double x, double y, double min) {
 	// Go through vertices
 	double min_dist = 999999999;
 	MapVertex* v = NULL;
@@ -870,14 +1021,74 @@ int SLADEMap::nearestVertex(int x, int y) {
 		}
 	}
 
+	// Now determine the real distance to the closest vertex,
+	// to check for minimum hilight distance
+	if (index >= 0) {
+		v = vertices[index];
+		double rdist = MathStuff::distance(v->x, v->y, x, y);
+		if (rdist > min)
+			return -1;
+	}
+
 	return index;
 }
 
-int SLADEMap::nearestLine(int x, int y) {
-	return -1;
+int SLADEMap::nearestLine(double x, double y, double min) {
+	// Go through lines
+	double min_dist = 999999999;
+	MapLine* l = NULL;
+	double dist = 0;
+	double x1, y1, x2, y2, len, u, lbound, ix, iy;
+	int index = -1;
+	for (unsigned a = 0; a < lines.size(); a++) {
+		// Get line and some values
+		l = lines[a];
+		x1 = l->vertex1->x;
+		y1 = l->vertex1->y;
+		x2 = l->vertex2->x;
+		y2 = l->vertex2->y;
+
+		// Get line length
+		len = sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1));
+
+		// Calculate intersection distance
+		u = 0;
+		if (len > 0) {
+			u = ((x-x1)*(x2-x1) + (y-y1)*(y2-y1)) / (len*len);
+
+			// Limit intersection distance to the line
+			lbound = 1 / len;
+			if(u < lbound) u = lbound;
+			if(u > (1.0-lbound)) u = 1.0-lbound;
+		}
+
+		// Calculate intersection point
+		ix = x1 + u*(x2 - x1);
+		iy = y1 + u*(y2 - y1);
+
+		// Calculate 'quick' distance to line
+		dist = (ix-x)*(ix-x) + (iy-y)*(iy-y);
+
+		// Check if it's nearer than the previous nearest
+		if (dist < min_dist) {
+			index = a;
+			min_dist = dist;
+		}
+	}
+
+	// Now determine the real distance to the closest line,
+	// to check for minimum hilight distance
+	if (index >= 0) {
+		l = lines[index];
+		double rdist = MathStuff::distanceToLine(x, y, l->vertex1->x, l->vertex1->y, l->vertex2->x, l->vertex2->y);
+		if (rdist > min)
+			return -1;
+	}
+
+	return index;
 }
 
-int SLADEMap::nearestThing(int x, int y) {
+int SLADEMap::nearestThing(double x, double y, double min) {
 	// Go through things
 	double min_dist = 999999999;
 	MapThing* t = NULL;
@@ -899,7 +1110,57 @@ int SLADEMap::nearestThing(int x, int y) {
 		}
 	}
 
+	// Now determine the real distance to the closest thing,
+	// to check for minimum hilight distance
+	if (index >= 0) {
+		t = things[index];
+		double rdist = MathStuff::distance(t->x, t->y, x, y);
+		if (rdist > min)
+			return -1;
+	}
+
 	return index;
+}
+
+int SLADEMap::inSector(double x, double y) {
+	// First, get nearest line
+	int index = nearestLine(x, y, 999999999);
+
+	// If there are no lines there can't be any (selectable) sectors
+	if (index < 0)
+		return -1;
+
+	// Check what side of the line the point is on
+	MapLine* l = lines[index];
+	MapSide* s = NULL;
+	if (MathStuff::lineSide(x, y, l->vertex1->x, l->vertex1->y, l->vertex2->x, l->vertex2->y) >= 0)
+		s = l->side1;
+	else
+		s = l->side2;
+
+	// If no side, not in sector
+	if (!s)
+		return -1;
+
+	return sectorIndex(s->sector);
+}
+
+bool SLADEMap::getLinesOfSector(unsigned index, vector<MapLine*>& list) {
+	// Get sector
+	MapSector* sector = getSector(index);
+	if (!sector) return false;
+
+	// Go through sides in sector
+	MapSide* side = NULL;
+	for (unsigned a = 0; a < sector->connected_sides.size(); a++) {
+		side = sector->connected_sides[a];
+
+		// Add the side's parent line to the list if it doesn't already exist
+		if (std::find(list.begin(), list.end(), side->parent) == list.end())
+			list.push_back(side->parent);
+	}
+
+	return true;
 }
 
 int SLADEMap::removeDetachedVertices() {

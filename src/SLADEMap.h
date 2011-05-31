@@ -10,11 +10,6 @@
 #include "Archive.h"
 #include "PropertyList.h"
 
-struct udmf_block_t {
-	string			id;
-	PropertyList	properties;
-};
-
 class ParseTreeNode;
 class SLADEMap {
 friend class MapEditor;
@@ -26,6 +21,15 @@ private:
 	vector<MapThing*>	things;
 	string				udmf_namespace;
 	PropertyList		udmf_props;
+
+	// Map structure index status
+	// These are true if the per-item index of that type is up-to-date
+	// (used for faster item index lookup in certain cases)
+	bool	i_lines;
+	bool	i_sides;
+	bool	i_sectors;
+	bool	i_vertices;
+	bool	i_things;
 
 	// Doom format
 	bool	addVertex(doomvertex_t& v);
@@ -74,6 +78,14 @@ public:
 	MapSector*	getSector(unsigned index);
 	MapThing*	getThing(unsigned index);
 
+	// Map structure indices
+	int		vertexIndex(MapVertex* v);
+	int		sideIndex(MapSide* s);
+	int		lineIndex(MapLine* l);
+	int		sectorIndex(MapSector* s);
+	int		thingIndex(MapThing* t);
+	void	refreshIndices();
+
 	bool	readMap(Archive::mapdesc_t map);
 
 	void	clearMap();
@@ -85,9 +97,12 @@ public:
 	bool	readUDMFMap(Archive::mapdesc_t map);
 
 	// Geometry
-	int	nearestVertex(int x, int y);
-	int	nearestLine(int x, int y);
-	int	nearestThing(int x, int y);
+	int	nearestVertex(double x, double y, double min = 64);
+	int	nearestLine(double x, double y, double min = 64);
+	int	nearestThing(double x, double y, double min = 64);
+	int	inSector(double x, double y);
+
+	bool	getLinesOfSector(unsigned index, vector<MapLine*>& list);
 
 	// Checks
 	int		removeDetachedVertices();

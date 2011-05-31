@@ -174,8 +174,8 @@ void MainWindow::setupLayout() {
 	fileMenu->AppendSubMenu(fileNewMenu, "&New", "Create a new Archive");
 	theApp->getAction("aman_open")->addToMenu(fileMenu);
 	fileMenu->AppendSeparator();
-	theApp->getAction("arch_save")->addToMenu(fileMenu);
-	theApp->getAction("arch_saveas")->addToMenu(fileMenu);
+	theApp->getAction("aman_save")->addToMenu(fileMenu);
+	theApp->getAction("aman_saveas")->addToMenu(fileMenu);
 	theApp->getAction("aman_saveall")->addToMenu(fileMenu);
 	fileMenu->AppendSubMenu(panel_archivemanager->getRecentMenu(), "&Recent Files");
 	fileMenu->AppendSeparator();
@@ -215,8 +215,8 @@ void MainWindow::setupLayout() {
 	theApp->getAction("aman_newwad")->addToToolbar(tb_file);
 	theApp->getAction("aman_newzip")->addToToolbar(tb_file);
 	theApp->getAction("aman_open")->addToToolbar(tb_file);
-	theApp->getAction("arch_save")->addToToolbar(tb_file);
-	theApp->getAction("arch_saveas")->addToToolbar(tb_file);
+	theApp->getAction("aman_save")->addToToolbar(tb_file);
+	theApp->getAction("aman_saveas")->addToToolbar(tb_file);
 	theApp->getAction("aman_saveall")->addToToolbar(tb_file);
 	theApp->getAction("aman_close")->addToToolbar(tb_file);
 	theApp->getAction("aman_closeall")->addToToolbar(tb_file);
