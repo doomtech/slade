@@ -28,22 +28,20 @@ struct doom64side_t
 };
 
 class MapSide {
+friend class SLADEMap;
 private:
 	MapSector*	sector;
 
 	PropertyList	udmf_props;
 
 public:
-	MapSide(){}
-	MapSide(MapSector* sector);
+	MapSide(MapSector* sector = NULL);
 	~MapSide(){}
 
 	bool	isOk() { return !!sector; }
 
 	PropertyList&	props()				{ return udmf_props; }
 	Property&		prop(string key)	{ return udmf_props[key]; }
-
-	bool parseUDMF(Tokenizer& tz);
 };
 
 #endif //__MAPSIDE_H__

@@ -31,6 +31,7 @@ struct doom64sector_t
 };
 
 class MapSector {
+friend class SLADEMap;
 private:
 	string	f_tex;
 	string	c_tex;
@@ -49,8 +50,6 @@ public:
 
 	PropertyList&	props()				{ return udmf_props; }
 	Property&		prop(string key)	{ return udmf_props[key]; }
-
-	bool parseUDMF(Tokenizer& tz);
 };
 
 #endif //__MAPSECTOR_H__

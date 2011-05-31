@@ -64,6 +64,15 @@ Property::Property(uint8_t type) {
 }
 
 /* Property::Property
+ * Property class copy constructor
+ *******************************************************************/
+Property::Property(const Property& copy) {
+	this->type = copy.type;
+	this->value = copy.value;
+	this->val_string = copy.val_string;
+}
+
+/* Property::Property
  * Property class constructor (boolean)
  *******************************************************************/
 Property::Property(bool value) {

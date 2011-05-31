@@ -25,8 +25,7 @@ class MapSide;
 #define LINE_HMONSTERACT	0x2000
 #define LINE_HBLOCKALL		0x8000
 
-struct doomline_t
-{
+struct doomline_t {
 	short vertex1;
 	short vertex2;
 	short flags;
@@ -36,8 +35,7 @@ struct doomline_t
 	short side2;
 };
 
-struct hexenline_t
-{
+struct hexenline_t {
 	short	vertex1;
 	short	vertex2;
 	short	flags;
@@ -47,8 +45,7 @@ struct hexenline_t
 	short	side2;
 };
 
-struct doom64line_t
-{
+struct doom64line_t {
 	short vertex1;
 	short vertex2;
 	uint32_t flags;
@@ -59,6 +56,7 @@ struct doom64line_t
 };
 
 class MapLine {
+friend class SLADEMap;
 private:
 	// Basic data
 	MapVertex*	vertex1;
@@ -83,8 +81,6 @@ public:
 
 	PropertyList&	props()				{ return udmf_props; }
 	Property&		prop(string key)	{ return udmf_props[key]; }
-
-	bool	parseUDMF(Tokenizer& tz);
 };
 
 #endif //__MAPLINE_H__

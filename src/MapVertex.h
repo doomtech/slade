@@ -21,6 +21,7 @@ struct doom64vertex_t
 };
 
 class MapVertex {
+friend class SLADEMap;
 private:
 	double	x;
 	double	y;
@@ -43,8 +44,6 @@ public:
 
 	PropertyList&	props()				{ return udmf_props; }
 	Property&		prop(string key)	{ return udmf_props[key]; }
-
-	bool	parseUDMF(Tokenizer& tz);
 };
 
 #endif //__MAPVERTEX_H__

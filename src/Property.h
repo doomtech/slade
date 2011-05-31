@@ -20,6 +20,7 @@ private:
 
 public:
 	Property(uint8_t type = PROP_FLAG);	// Default property type is a flag
+	Property(const Property& copy);
 	Property(bool value);
 	Property(int value);
 	Property(float value);

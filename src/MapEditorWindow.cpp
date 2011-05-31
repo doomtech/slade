@@ -77,7 +77,7 @@ void MapEditorWindow::setupLayout() {
 	
 	// Properties panel
 	wxPanel* panel_temp = new wxPanel(this, -1);
-	p_inf.DefaultPane().Dockable().Name("properties").Right().Caption("Properties").BestSize(320, 200).FloatingSize(500, 500);
+	p_inf.DefaultPane().Dockable().Name("properties").Bottom().Caption("Properties").BestSize(320, 200).FloatingSize(500, 500);
 	m_mgr->AddPane(panel_temp, p_inf);
 
 	// Status bar

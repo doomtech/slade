@@ -57,6 +57,7 @@ struct doom64thing_t
 };
 
 class MapThing {
+friend class SLADEMap;
 private:
 	short	type;
 	double	x;
@@ -71,8 +72,6 @@ public:
 
 	PropertyList&	props()				{ return udmf_props; }
 	Property&		prop(string key)	{ return udmf_props[key]; }
-
-	bool	parseUDMF(Tokenizer& tz);
 
 	short	getType() { return type; }
 };

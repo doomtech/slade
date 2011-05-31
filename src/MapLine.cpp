@@ -15,21 +15,3 @@ MapLine::MapLine(MapVertex* v1, MapVertex* v2, MapSide* s1, MapSide* s2) {
 	v1->connectLine(this);
 	v2->connectLine(this);
 }
-
-bool MapLine::parseUDMF(Tokenizer& tz) {
-	// Skip opening {
-	tz.getToken();
-
-	// TODO: Init required line attributes
-
-	// TODO: Read line definition
-	string token = tz.getToken();
-	while (token != "}") {
-
-		token = tz.getToken();
-	}
-
-	// TODO: Check that all required attributes were defined
-
-	return true;
-}

@@ -51,12 +51,21 @@ wxRegEx re_float("[+-]?[0-9]+'.'[0-9]*([eE][+-]?[0-9]+)?");
  * ParseTreeNode class constructor
  *******************************************************************/
 ParseTreeNode::ParseTreeNode(ParseTreeNode* parent) : STreeNode(parent) {
+	allowDup(true);
 }
 
 /* ParseTreeNode::~ParseTreeNode
  * ParseTreeNode class destructor
  *******************************************************************/
 ParseTreeNode::~ParseTreeNode() {
+}
+
+Property ParseTreeNode::getValue(unsigned index) {
+	// Check index
+	if (index >= values.size())
+		return Property(false);
+
+	return values[index];
 }
 
 /* ParseTreeNode::getStringValue

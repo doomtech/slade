@@ -85,9 +85,7 @@ bool SLADEMap::readMap(Archive::mapdesc_t map) {
 	else if (map.format == MAP_DOOM64)
 		return readDoom64Map(map);
 	else if (map.format == MAP_UDMF) {
-		//ArchiveEntry* entry = map->getEntry("TEXTMAP");
-		//return readUDMFMap(entry);
-		return false;
+		return readUDMFMap(map);
 	}
 
 	return false;
@@ -577,8 +575,249 @@ bool SLADEMap::readDoom64Map(Archive::mapdesc_t map) {
 	return true;
 }
 
-bool SLADEMap::readUDMFMap(ArchiveEntry* map_data) {
-	return false;
+bool SLADEMap::addVertex(ParseTreeNode* def) {
+	// Check for required properties
+	ParseTreeNode* prop_x = (ParseTreeNode*)def->getChild("x");
+	ParseTreeNode* prop_y = (ParseTreeNode*)def->getChild("y");
+	if (!prop_x || !prop_y)
+		return false;
+	
+	// Create new vertex
+	MapVertex* nv = new MapVertex(prop_x->getFloatValue(), prop_y->getFloatValue());
+
+	// Add extra vertex info
+	ParseTreeNode* prop = NULL;
+	for (unsigned a = 0; a < def->nChildren(); a++) {
+		prop = (ParseTreeNode*)def->getChild(a);
+
+		// Skip required properties
+		if (prop == prop_x || prop == prop_y)
+			continue;
+
+		nv->prop(prop->getName()) = prop->getValue();
+	}
+
+	// Add vertex to map
+	vertices.push_back(nv);
+
+	return true;
+}
+
+bool SLADEMap::addSide(ParseTreeNode* def) {
+	// Check for required properties
+	ParseTreeNode* prop_sector = (ParseTreeNode*)def->getChild("sector");
+	if (!prop_sector)
+		return false;
+
+	// Check sector index
+	int sector = prop_sector->getIntValue();
+	if (sector < 0 || sector >= (int)sectors.size())
+		return false;
+
+	// Create new side
+	MapSide* ns = new MapSide(sectors[sector]);
+
+	// Add extra side info
+	ParseTreeNode* prop = NULL;
+	for (unsigned a = 0; a < def->nChildren(); a++) {
+		prop = (ParseTreeNode*)def->getChild(a);
+
+		// Skip required properties
+		if (prop == prop_sector)
+			continue;
+
+		ns->prop(prop->getName()) = prop->getValue();
+	}
+
+	// Add side to map
+	sides.push_back(ns);
+
+	return true;
+}
+
+bool SLADEMap::addLine(ParseTreeNode* def) {
+	// Check for required properties
+	ParseTreeNode* prop_v1 = (ParseTreeNode*)def->getChild("v1");
+	ParseTreeNode* prop_v2 = (ParseTreeNode*)def->getChild("v2");
+	ParseTreeNode* prop_s1 = (ParseTreeNode*)def->getChild("sidefront");
+	if (!prop_v1 || !prop_v2 || !prop_s1)
+		return false;
+
+	// Check indices
+	int v1 = prop_v1->getIntValue();
+	int v2 = prop_v2->getIntValue();
+	int s1 = prop_s1->getIntValue();
+	if (v1 < 0 || v1 >= (int)vertices.size())
+		return false;
+	if (v2 < 0 || v2 >= (int)vertices.size())
+		return false;
+	if (s1 < 0 || s1 >= (int)sides.size())
+		return false;
+
+	// Get second side if any
+	MapSide* side2 = NULL;
+	ParseTreeNode* prop_s2 = (ParseTreeNode*)def->getChild("sideback");
+	if (prop_s2) side2 = getSide(prop_s2->getIntValue());
+
+	// Create new line
+	MapLine* nl = new MapLine(vertices[v1], vertices[v2], sides[s1], side2);
+
+	// Set default values
+	// TODO: Nicer way to deal with default udmf values
+	nl->prop("special") = 0;
+
+	// Add extra line info
+	ParseTreeNode* prop = NULL;
+	for (unsigned a = 0; a < def->nChildren(); a++) {
+		prop = (ParseTreeNode*)def->getChild(a);
+
+		// Skip required properties
+		if (prop == prop_v1 || prop == prop_v2 || prop == prop_s1 || prop == prop_s2)
+			continue;
+
+		nl->prop(prop->getName()) = prop->getValue();
+	}
+
+	// Add line to map
+	lines.push_back(nl);
+
+	return true;
+}
+
+bool SLADEMap::addSector(ParseTreeNode* def) {
+	// Check for required properties
+	ParseTreeNode* prop_ftex = (ParseTreeNode*)def->getChild("texturefloor");
+	ParseTreeNode* prop_ctex = (ParseTreeNode*)def->getChild("textureceiling");
+	if (!prop_ftex || !prop_ctex)
+		return false;
+
+	// Create new sector
+	MapSector* ns = new MapSector(prop_ftex->getStringValue(), prop_ctex->getStringValue());
+
+	// Add extra sector info
+	ParseTreeNode* prop = NULL;
+	for (unsigned a = 0; a < def->nChildren(); a++) {
+		prop = (ParseTreeNode*)def->getChild(a);
+
+		// Skip required properties
+		if (prop == prop_ftex || prop == prop_ctex)
+			continue;
+
+		ns->prop(prop->getName()) = prop->getValue();
+	}
+
+	// Add sector to map
+	sectors.push_back(ns);
+
+	return true;
+}
+
+bool SLADEMap::addThing(ParseTreeNode* def) {
+	// Check for required properties
+	ParseTreeNode* prop_x = (ParseTreeNode*)def->getChild("x");
+	ParseTreeNode* prop_y = (ParseTreeNode*)def->getChild("y");
+	ParseTreeNode* prop_type = (ParseTreeNode*)def->getChild("type");
+	if (!prop_x || !prop_y || !prop_type)
+		return false;
+
+	// Create new thing
+	MapThing* nt = new MapThing(prop_x->getFloatValue(), prop_y->getFloatValue(), prop_type->getIntValue());
+
+	// Add extra thing info
+	ParseTreeNode* prop = NULL;
+	for (unsigned a = 0; a < def->nChildren(); a++) {
+		prop = (ParseTreeNode*)def->getChild(a);
+
+		// Skip required properties
+		if (prop == prop_x || prop == prop_y || prop == prop_type)
+			continue;
+
+		nt->prop(prop->getName()) = prop->getValue();
+	}
+
+	// Add thing to map
+	things.push_back(nt);
+
+	return true;
+}
+
+bool SLADEMap::readUDMFMap(Archive::mapdesc_t map) {
+	// Get TEXTMAP entry (will always be after the 'head' entry)
+	ArchiveEntry* textmap = map.head->nextEntry();
+
+	// --- Parse UDMF text ---
+	Parser parser;
+	if (!parser.parseText(textmap->getMCData()))
+		return false;
+
+	// --- Process parsed data ---
+	
+	// First we have to sort each definition block by type
+	// so they can be created in the correct order (verts->sides->lines->sectors->things)
+	// even if they aren't defined in that order
+	// Unknown definitions are also kept, just in case
+	ParseTreeNode* root = parser.parseTreeRoot();
+	vector<ParseTreeNode*> defs_vertices;
+	vector<ParseTreeNode*> defs_lines;
+	vector<ParseTreeNode*> defs_sides;
+	vector<ParseTreeNode*> defs_sectors;
+	vector<ParseTreeNode*> defs_things;
+	vector<ParseTreeNode*> defs_other;
+	for (unsigned a = 0; a < root->nChildren(); a++) {
+		ParseTreeNode* node = (ParseTreeNode*)root->getChild(a);
+
+		// Vertex definition
+		if (S_CMPNOCASE(node->getName(), "vertex"))
+			defs_vertices.push_back(node);
+
+		// Line definition
+		else if (S_CMPNOCASE(node->getName(), "linedef"))
+			defs_lines.push_back(node);
+
+		// Side definition
+		else if (S_CMPNOCASE(node->getName(), "sidedef"))
+			defs_sides.push_back(node);
+
+		// Sector definition
+		else if (S_CMPNOCASE(node->getName(), "sector"))
+			defs_sectors.push_back(node);
+
+		// Thing definition
+		else if (S_CMPNOCASE(node->getName(), "thing"))
+			defs_things.push_back(node);
+
+		// Namespace
+		else if (S_CMPNOCASE(node->getName(), "namespace"))
+			udmf_namespace = node->getStringValue();
+
+		// Unknown
+		else
+			defs_other.push_back(node);
+	}
+
+	// Now create map structures from parsed data, in the right order
+
+	// Create vertices from parsed data
+	for (unsigned a = 0; a < defs_vertices.size(); a++)
+		addVertex(defs_vertices[a]);
+
+	// Create sectors from parsed data
+	for (unsigned a = 0; a < defs_sectors.size(); a++)
+		addSector(defs_sectors[a]);
+	
+	// Create sides from parsed data
+	for (unsigned a = 0; a < defs_sides.size(); a++)
+		addSide(defs_sides[a]);
+
+	// Create lines from parsed data
+	for (unsigned a = 0; a < defs_lines.size(); a++)
+		addLine(defs_lines[a]);
+
+	// Create things from parsed data
+	for (unsigned a = 0; a < defs_things.size(); a++)
+		addThing(defs_things[a]);
+
+	return true;
 }
 
 
@@ -609,6 +848,59 @@ void SLADEMap::clearMap() {
 	things.clear();
 }
 
+int SLADEMap::nearestVertex(int x, int y) {
+	// Go through vertices
+	double min_dist = 999999999;
+	MapVertex* v = NULL;
+	double dist = 0;
+	int index = -1;
+	for (unsigned a = 0; a < vertices.size(); a++) {
+		v = vertices[a];
+
+		// Get 'quick' distance (no need to get real distance)
+		if (v->x < x)	dist = x - v->x;
+		else			dist = v->x - x;
+		if (v->y < y)	dist += y - v->y;
+		else			dist += v->y - y;
+
+		// Check if it's nearer than the previous nearest
+		if (dist < min_dist) {
+			index = a;
+			min_dist = dist;
+		}
+	}
+
+	return index;
+}
+
+int SLADEMap::nearestLine(int x, int y) {
+	return -1;
+}
+
+int SLADEMap::nearestThing(int x, int y) {
+	// Go through things
+	double min_dist = 999999999;
+	MapThing* t = NULL;
+	double dist = 0;
+	int index = -1;
+	for (unsigned a = 0; a < things.size(); a++) {
+		t = things[a];
+
+		// Get 'quick' distance (no need to get real distance)
+		if (t->x < x)	dist = x - t->x;
+		else			dist = t->x - x;
+		if (t->y < y)	dist += y - t->y;
+		else			dist += t->y - y;
+
+		// Check if it's nearer than the previous nearest
+		if (dist < min_dist) {
+			index = a;
+			min_dist = dist;
+		}
+	}
+
+	return index;
+}
 
 int SLADEMap::removeDetachedVertices() {
 	int count = 0;

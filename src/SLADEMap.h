@@ -15,8 +15,7 @@ struct udmf_block_t {
 	PropertyList	properties;
 };
 
-class MapEditor;
-class ParserTreeNode;
+class ParseTreeNode;
 class SLADEMap {
 friend class MapEditor;
 private:
@@ -25,6 +24,7 @@ private:
 	vector<MapSector*>	sectors;
 	vector<MapVertex*>	vertices;
 	vector<MapThing*>	things;
+	string				udmf_namespace;
 	PropertyList		udmf_props;
 
 	// Doom format
@@ -57,6 +57,13 @@ private:
 	bool	readDoom64Sectors(ArchiveEntry* entry);
 	bool	readDoom64Things(ArchiveEntry* entry);
 
+	// UDMF
+	bool	addVertex(ParseTreeNode* def);
+	bool	addSide(ParseTreeNode* def);
+	bool	addLine(ParseTreeNode* def);
+	bool	addSector(ParseTreeNode* def);
+	bool	addThing(ParseTreeNode* def);
+
 public:
 	SLADEMap();
 	~SLADEMap();
@@ -75,7 +82,12 @@ public:
 	bool	readDoomMap(Archive::mapdesc_t map);
 	bool	readHexenMap(Archive::mapdesc_t map);
 	bool	readDoom64Map(Archive::mapdesc_t map);
-	bool	readUDMFMap(ArchiveEntry* map_data);
+	bool	readUDMFMap(Archive::mapdesc_t map);
+
+	// Geometry
+	int	nearestVertex(int x, int y);
+	int	nearestLine(int x, int y);
+	int	nearestThing(int x, int y);
 
 	// Checks
 	int		removeDetachedVertices();

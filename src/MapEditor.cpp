@@ -2,6 +2,7 @@
 #include "Main.h"
 #include "MapEditor.h"
 
+rgba_t col_background(0, 0, 0, 255);
 rgba_t col_vertex(140, 140, 255, 255, 0);
 rgba_t col_line_normal(255, 255, 255, 255);
 rgba_t col_line_special(100, 120, 255, 255);
@@ -36,6 +37,9 @@ void MapEditor::drawLines(bool show_direction) {
 	// Setup opengl line properties
 	glEnable(GL_LINE_SMOOTH);
 	glLineWidth(1.5f);
+
+	// Temp for now
+	float fade_coeff = 0.5f;
 	
 	// Draw all lines
 	rgba_t col;
@@ -51,7 +55,9 @@ void MapEditor::drawLines(bool show_direction) {
 		
 		// Check for two-sided line
 		if (line->s2())
-			col = col.ampf(1.0f, 1.0f, 1.0f, 0.5f);
+			col.set(col.r*fade_coeff+col_background.r*(1.0-fade_coeff),
+					col.g*fade_coeff+col_background.g*(1.0-fade_coeff),
+					col.b*fade_coeff+col_background.b*(1.0-fade_coeff), 255);
 		
 		// Set line colour
 		col.set_gl();

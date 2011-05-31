@@ -23,6 +23,7 @@ public:
 	void		setName(string name) { this->name = name; }
 	string		getInherit() { return inherit; }
 	unsigned	nValues() { return values.size(); }
+	Property	getValue(unsigned index = 0);
 	string		getStringValue(unsigned index = 0);
 	int			getIntValue(unsigned index = 0);
 	bool		getBoolValue(unsigned index = 0);
