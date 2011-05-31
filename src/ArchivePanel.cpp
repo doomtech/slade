@@ -280,7 +280,8 @@ void ArchivePanel::addMenus() {
 		theApp->getAction("arch_texeditor")->addToMenu(menu_archive);
 		wxMenu* menu_clean = new wxMenu("");
 		theApp->getAction("arch_clean_patches")->addToMenu(menu_clean);
-		menu_archive->AppendSubMenu(menu_clean, "Clean &Up");
+		theApp->getAction("arch_check_duplicates")->addToMenu(menu_clean);
+		menu_archive->AppendSubMenu(menu_clean, "&Maintenance");
 	}
 	if (!menu_entry) {
 		// Entry menu
@@ -1592,9 +1593,13 @@ bool ArchivePanel::handleAction(string id) {
 	else if (id == "arch_convert")
 		convertArchiveTo();
 
-	// Archive->Clean Up
+	// Archive->Check or Clean Up->Remove Unused Patches
 	else if (id == "arch_clean_patches")
 		ArchiveOperations::removeUnusedPatches(archive);
+
+	// Archive->Check of Clean Up->Check Duplicate Entry Names
+	else if (id == "arch_check_duplicates")
+		ArchiveOperations::checkDuplicateEntryNames(archive);
 
 
 	// *************************************************************

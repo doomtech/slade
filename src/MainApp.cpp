@@ -361,6 +361,7 @@ void MainApp::initActions() {
 	new SAction("arch_importfiles", "&Import Files", "t_importfiles", "Import multiple files into the archive");
 	new SAction("arch_texeditor", "&Texture Editor", "t_texeditor", "Open the texture editor for the current archive");
 	new SAction("arch_clean_patches", "Remove Unused &Patches", "", "Remove any unused patches, and their associated entries");
+	new SAction("arch_check_duplicates", "Check Duplicate Entry Names", "", "Checks the archive for any entries sharing the same name");
 	new SAction("arch_entry_rename", "Rename", "t_rename", "Rename the selected entries");
 	new SAction("arch_entry_rename_each", "Rename Each", "t_renameeach", "Rename separately all the selected entries");
 	new SAction("arch_entry_delete", "Delete", "t_delete", "Delete the selected entries");
