@@ -424,6 +424,10 @@ void MainApp::initActions() {
 	new SAction("txed_patch_back", "Send Selected Patch(es) Back", "t_patch_back", "Send selected patch(es) toward the back");
 	new SAction("txed_patch_forward", "Bring Selected Patch(es) Forward", "t_patch_forward", "Bring selected patch(es) toward the front");
 	new SAction("txed_patch_duplicate", "Duplicate Selected Patch(es)", "t_patch_duplicate", "Duplicate the selected patch(es)");
+
+	// PaletteEntryPanel
+	new SAction("ppal_addcustom", "Add to Custom Palettes", "t_plus", "Add the current palette to the custom palettes list");
+	new SAction("ppal_exportas", "Export As...", "t_export", "Export the current palette to a file");
 }
 
 /* MainApp::OnInit
@@ -506,8 +510,8 @@ bool MainApp::OnInit() {
 	theArchiveManager->initBaseResource();
 
 	// Show the main window
-	SetTopWindow(theMainWindow);
 	theMainWindow->Show(true);
+	SetTopWindow(theMainWindow);
 	theSplashWindow->SetParent(theMainWindow);
 	theSplashWindow->CentreOnParent();
 

@@ -663,6 +663,9 @@
     <ClCompile Include="src\DockPanel.cpp">
       <Filter>UI Elements</Filter>
     </ClCompile>
+    <ClCompile Include="src\SFileDialog.cpp">
+      <Filter>General\Utility</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -1244,6 +1247,9 @@
     </ClInclude>
     <ClInclude Include="src\DockPanel.h">
       <Filter>UI Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SFileDialog.h">
+      <Filter>General\Utility</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

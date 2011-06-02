@@ -208,6 +208,7 @@
     <ClCompile Include="src\ResourceManager.cpp" />
     <ClCompile Include="src\RffArchive.cpp" />
     <ClCompile Include="src\SAction.cpp" />
+    <ClCompile Include="src\SFileDialog.cpp" />
     <ClCompile Include="src\SFont.cpp" />
     <ClCompile Include="src\SIFormat.cpp" />
     <ClCompile Include="src\SImageFormats.cpp" />
@@ -393,6 +394,7 @@
     <ClInclude Include="src\ResourceManager.h" />
     <ClInclude Include="src\RffArchive.h" />
     <ClInclude Include="src\SAction.h" />
+    <ClInclude Include="src\SFileDialog.h" />
     <ClInclude Include="src\SIFDoom.h" />
     <ClInclude Include="src\SIFHexen.h" />
     <ClInclude Include="src\SIFImages.h" />

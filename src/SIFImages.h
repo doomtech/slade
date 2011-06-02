@@ -262,18 +262,24 @@ protected:
 
 			// Handle transparency if needed
 			if (img_mask) {
-				// Find unused colour (for transparency)
-				short unused = image.findUnusedColour();
+				if (usepal.transIndex() < 0) {
+					// Find unused colour (for transparency)
+					short unused = image.findUnusedColour();
 
-				// Set any transparent pixels to this colour (if we found an unused colour)
-				if (unused >= 0) {
-					for (int a = 0; a < width * height; a++) {
-						if (img_mask[a] == 0)
-							img_data[a] = unused;
+					// Set any transparent pixels to this colour (if we found an unused colour)
+					bool has_trans = false;
+					if (unused >= 0) {
+						for (int a = 0; a < width * height; a++) {
+							if (img_mask[a] == 0) {
+								img_data[a] = unused;
+								has_trans = true;
+							}
+						}
+
+						// Set palette transparency
+						if (has_trans)
+							usepal.setTransIndex(unused);
 					}
-
-					// Set palette transparency
-					usepal.setTransIndex(unused);
 				}
 
 				// Set freeimage palette transparency if needed

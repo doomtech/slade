@@ -11,6 +11,13 @@ private:
 	short	index_trans;
 
 public:
+	enum {
+		FORMAT_RAW,
+		FORMAT_IMAGE,
+		FORMAT_CSV,
+		FORMAT_JASC,
+	};
+
 	Palette8bit();
 	~Palette8bit();
 
@@ -19,8 +26,8 @@ public:
 
 	bool	loadMem(MemChunk& mc);
 	bool	loadMem(const uint8_t* data, uint32_t size);
-	bool	saveMem(MemChunk& mc);
-	bool	saveFile(string filename);
+	bool	saveMem(MemChunk& mc, int format = FORMAT_RAW);
+	bool	saveFile(string filename, int format = FORMAT_RAW);
 
 	void	setColour (uint8_t index, rgba_t  col);
 	void	setColourR(uint8_t index, uint8_t val);
