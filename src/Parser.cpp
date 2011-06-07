@@ -118,11 +118,11 @@ double ParseTreeNode::getFloatValue(unsigned index) {
 
 /* ParseTreeNode::parse
  * Parses formatted text data. Current valid formatting is:
- * child = value;
- * child = value1, value2, ...;
- * child = { value1, value2, ... }
- * child { grandchild = value; etc... }
- * child : inherited { ... }
+ * (type) child = value;
+ * (type) child = value1, value2, ...;
+ * (type) child = { value1, value2, ... }
+ * (type) child { grandchild = value; etc... }
+ * (type) child : inherited { ... }
  * All values are read as strings, but can be retrieved as string,
  * int, bool or float.
  *******************************************************************/
@@ -145,6 +145,14 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 		// Check next token to determine what we're doing
 		string next = tz.peekToken();
 
+		// Check for type+name pair
+		string type = "";
+		if (next != "=" && next != "{" && next != ";" && next != ":") {
+			type = name;
+			name = tz.getToken();
+			next = tz.peekToken();
+		}
+
 		// Assignment
 		if (S_CMP(next, "=")) {
 			// Skip =
@@ -152,6 +160,7 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 
 			// Create item node
 			ParseTreeNode* child = (ParseTreeNode*)addChild(name);
+			child->type = type;
 
 			// Check type of assignment list
 			token = tz.getToken();
@@ -209,6 +218,7 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 		else if (S_CMP(next, "{")) {
 			// Add child node
 			ParseTreeNode* child = (ParseTreeNode*)addChild(name);
+			child->type = type;
 
 			// Skip {
 			tz.getToken();
@@ -221,7 +231,8 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 		// Child node (with no values/children)
 		else if (S_CMP(next, ";")) {
 			// Add child node
-			addChild(name);
+			ParseTreeNode* child = (ParseTreeNode*)addChild(name);
+			child->type = type;
 
 			// Skip ;
 			tz.getToken();
@@ -239,6 +250,7 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 			if (tz.checkToken("{")) {
 				// Add child node
 				ParseTreeNode* child = (ParseTreeNode*)addChild(name);
+				child->type = type;
 
 				// Set its inheritance
 				child->inherit = inherit;

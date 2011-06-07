@@ -10,6 +10,7 @@ class ParseTreeNode : public STreeNode {
 private:
 	string				name;
 	string				inherit;
+	string				type;
 	vector<Property>	values;
 
 protected:
@@ -22,6 +23,7 @@ public:
 	string		getName() { return name; }
 	void		setName(string name) { this->name = name; }
 	string		getInherit() { return inherit; }
+	string		getType() { return type; }
 	unsigned	nValues() { return values.size(); }
 	Property	getValue(unsigned index = 0);
 	string		getStringValue(unsigned index = 0);

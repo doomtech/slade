@@ -1,13 +1,7 @@
 
 #include "Main.h"
 #include "MapEditor.h"
-
-// Entirely temporary
-rgba_t col_background(0, 0, 0, 255, 0);
-rgba_t col_vertex(140, 140, 255, 255, 0);
-rgba_t col_line_normal(255, 255, 255, 255, 0);
-rgba_t col_line_special(100, 120, 255, 255, 0);
-rgba_t col_line_invalid(255, 0, 0, 255, 0);
+#include "ColourConfiguration.h"
 
 MapEditor::MapEditor() {
 	// Init variables
@@ -23,14 +17,22 @@ bool MapEditor::openMap(Archive::mapdesc_t map) {
 	return this->map.readMap(map);
 }
 
-void MapEditor::drawVertices() {
+void MapEditor::drawVertices(double xmin, double ymin, double xmax, double ymax) {
 	// Set to vertex colour
-	col_vertex.set_gl();
+	ColourConfiguration::getColour("map_vertex").set_gl();
 
-	// Draw all vertices for now
+	// Go through vertices
 	glBegin(GL_POINTS);
-	for (unsigned a = 0; a < map.vertices.size(); a++)
-		glVertex2d(map.vertices[a]->xPos(), map.vertices[a]->yPos());
+	double x, y;
+	for (unsigned a = 0; a < map.vertices.size(); a++) {
+		// Get vertex position
+		x = map.vertices[a]->xPos();
+		y = map.vertices[a]->yPos();
+
+		// Draw if within limits
+		if (xmin <= x && x <= xmax && ymin <= y && y <= ymax)
+			glVertex2d(x, y);
+	}
 	glEnd();
 
 	// Draw vertex hilight
@@ -44,19 +46,33 @@ void MapEditor::drawVertices() {
 	}
 }
 
-void MapEditor::drawLines(bool show_direction) {
-	// Setup opengl line properties
-	glEnable(GL_LINE_SMOOTH);
-	glLineWidth(1.5f);
-
+void MapEditor::drawLines(double xmin, double ymin, double xmax, double ymax, bool show_direction) {
 	// Temp for now
 	float fade_coeff = 0.5f;
+
+	// Get line colours
+	rgba_t col_background = ColourConfiguration::getColour("map_background");
+	rgba_t col_line_normal = ColourConfiguration::getColour("map_line_normal");
+	rgba_t col_line_special = ColourConfiguration::getColour("map_line_special");
 	
 	// Draw all lines
 	rgba_t col;
 	MapLine* line = NULL;
+	double x1, y1, x2, y2;
 	for (unsigned a = 0; a < map.lines.size(); a++) {
+		// Get line info
 		line = map.lines[a];
+		x1 = line->v1()->xPos();
+		y1 = line->v1()->yPos();
+		x2 = line->v2()->xPos();
+		y2 = line->v2()->yPos();
+
+		// Skip if outside limits (quick check, will still draw some lines outside the screen)
+		if ((x1 > xmax && x2 > xmax) ||
+			(x1 < xmin && x2 < xmin) ||
+			(y1 > ymax && y2 > ymax) ||
+			(y1 < ymin && y2 < ymin))
+			continue;
 		
 		// Check for special line
 		if ((int)line->prop("special") > 0)
@@ -75,37 +91,37 @@ void MapEditor::drawLines(bool show_direction) {
 		
 		// Draw the line
 		glBegin(GL_LINES);
-		glVertex2d(line->v1()->xPos(), line->v1()->yPos());
-		glVertex2d(line->v2()->xPos(), line->v2()->yPos());
+		glVertex2d(x1, y1);
+		glVertex2d(x2, y2);
 		glEnd();
 
 		// Check for hilight
 		if (edit_mode == MODE_LINES && hilight_item == a) {
 			glLineWidth(3.0f);
-			rgba_t(255, 255, 0, 180, 1).set_gl();
+			ColourConfiguration::getColour("map_hilight").set_gl();
 			glBegin(GL_LINES);
-			glVertex2d(line->v1()->xPos(), line->v1()->yPos());
-			glVertex2d(line->v2()->xPos(), line->v2()->yPos());
+			glVertex2d(x1, y1);
+			glVertex2d(x2, y2);
 			glEnd();
 			glLineWidth(1.5f);
 		}
 	}
 }
 
-void MapEditor::drawThings() {
+void MapEditor::drawThings(double xmin, double ymin, double xmax, double ymax) {
 }
 
-void MapEditor::drawMap() {
+void MapEditor::drawMap(double xmin, double ymin, double xmax, double ymax) {
 	// Draw lines
-	drawLines(edit_mode == MODE_LINES);
+	drawLines(xmin, ymin, xmax, ymax, edit_mode == MODE_LINES);
 	
 	// Draw vertices (if in vertices mode)
 	if (edit_mode == MODE_VERTICES)
-		drawVertices();
+		drawVertices(xmin, ymin, xmax, ymax);
 		
 	// Draw things (if in things mode)
 	if (edit_mode == MODE_THINGS)
-		drawThings();
+		drawThings(xmin, ymin, xmax, ymax);
 
 	// Sectors mode stuff
 	if (edit_mode == MODE_SECTORS) {
@@ -117,7 +133,7 @@ void MapEditor::drawMap() {
 
 			// Set hilight colour etc
 			glLineWidth(3.0f);
-			rgba_t(255, 255, 0, 180, 1).set_gl();
+			ColourConfiguration::getColour("map_hilight").set_gl();
 
 			// Draw hilight
 			MapLine* line = NULL;

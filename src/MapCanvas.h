@@ -10,9 +10,11 @@ private:
 	MapEditor*	editor;
 
 	// View properties
-	double	view_xoff;
-	double	view_yoff;
-	double	view_scale;
+	double		view_xoff;
+	double		view_yoff;
+	double		view_scale;
+	fpoint2_t	view_tl;
+	fpoint2_t	view_br;
 
 public:
 	MapCanvas(wxWindow *parent, int id, MapEditor* editor);

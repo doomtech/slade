@@ -32,6 +32,7 @@
 #include "Palette.h"
 #include "Misc.h"
 #include "Translation.h"
+#include "SIFormat.h"
 
 
 /*******************************************************************
@@ -111,12 +112,65 @@ bool Palette8bit::loadMem(const uint8_t* data, uint32_t size) {
 /* Palette8bit::saveMem
  * Writes colour information to a MemChunk
  *******************************************************************/
-bool Palette8bit::saveMem(MemChunk& mc) {
-	// Write colours to mc
+bool Palette8bit::saveMem(MemChunk& mc, int format) {
+	// Clear memchunk
 	mc.clear();
-	mc.reSize(768);
-	for (unsigned a = 0; a < 256; a++)
-		mc.write(&colours[a], 3);
+
+	// Write to requested format
+
+	// Raw data
+	if (format == FORMAT_RAW) {
+		mc.reSize(768);
+		for (unsigned a = 0; a < 256; a++)
+			mc.write(&colours[a], 3);
+	}
+
+	// CSV
+	else if (format == FORMAT_CSV) {
+		string csv;
+		for (unsigned a = 0; a < 256; a++)
+			csv += S_FMT("%d, %d, %d\n", colours[a].r, colours[a].g, colours[a].b);
+		mc.importMem((const uint8_t*)((const char*)csv.ToAscii()), csv.Length());
+	}
+
+	// JASC palette
+	else if (format == FORMAT_JASC) {
+		string jasc = "JASC-PAL\n0100\n256\n";
+		for (unsigned a = 0; a < 256; a++)
+			jasc += S_FMT("%d %d %d\n", colours[a].r, colours[a].g, colours[a].b);
+		mc.importMem((const uint8_t*)((const char*)jasc.ToAscii()), jasc.Length());
+	}
+
+	// Image
+	else if (format == FORMAT_IMAGE) {
+		SImage image;
+
+		// Generate palette image
+		image.create(128, 128, PALMASK, this);
+		unsigned xoff = 0;
+		unsigned yoff = 0;
+		for (unsigned a = 0; a < 256; a++) {
+			// Draw colour square
+			for (unsigned y = 0; y < 8; y++) {
+				for (unsigned x = 0; x < 8; x++)
+					image.setPixel(xoff+x, yoff+y, a, 255);
+			}
+			
+			// Go to next square
+			xoff += 8;
+			if (xoff >= 128) {
+				xoff = 0;
+				yoff += 8;
+			}
+		}
+
+		// Write PNG format
+		SIFormat::getFormat("png")->saveImage(image, mc, this);
+	}
+
+	// Invalid format
+	else
+		return false;
 
 	return true;
 }
@@ -125,20 +179,14 @@ bool Palette8bit::saveMem(MemChunk& mc) {
  * Writes colour information to a file at [filename]. Returns false
  * if the file could not be opened/created, true otherwise
  *******************************************************************/
-bool Palette8bit::saveFile(string filename) {
-	// Open the file
-	wxFile file(filename, wxFile::write);
-	if (!file.IsOpened())
+bool Palette8bit::saveFile(string filename, int format) {
+	// Write data to MemChunk
+	MemChunk mc;
+	if (!saveMem(mc, format))
 		return false;
 
-	// Write colours
-	for (unsigned a = 0; a < 256; a++) {
-		file.Write(&colours[a], 3);
-	}
-
-	// Close file
-	file.Close();
-	return true;
+	// Write MemChunk to file
+	return mc.exportFile(filename);
 }
 
 /* Palette8bit::setColour

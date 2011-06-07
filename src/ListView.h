@@ -44,13 +44,6 @@ public:
 	bool	swapItems(int item1, int item2);
 
 	bool	updateSize();
-
-
-	// Temporary until i get some kind of colour configuration stuff in
-	static wxColour colourModified();
-	static wxColour colourNew();
-	static wxColour colourLocked();
-	static wxColour colourError();
 };
 
 #endif//__LISTVIEW_H__

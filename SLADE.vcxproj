@@ -129,6 +129,7 @@
     <ClCompile Include="src\bzip2\huffman.c" />
     <ClCompile Include="src\bzip2\randtable.c" />
     <ClCompile Include="src\CodePages.cpp" />
+    <ClCompile Include="src\ColourConfiguration.cpp" />
     <ClCompile Include="src\Compression.cpp" />
     <ClCompile Include="src\Conversions.cpp" />
     <ClCompile Include="src\DatArchive.cpp" />
@@ -210,6 +211,7 @@
     <ClCompile Include="src\ResourceManager.cpp" />
     <ClCompile Include="src\RffArchive.cpp" />
     <ClCompile Include="src\SAction.cpp" />
+    <ClCompile Include="src\SFileDialog.cpp" />
     <ClCompile Include="src\SFont.cpp" />
     <ClCompile Include="src\SIFormat.cpp" />
     <ClCompile Include="src\SImageFormats.cpp" />
@@ -316,6 +318,7 @@
     <ClInclude Include="src\bzip2\bzlib.h" />
     <ClInclude Include="src\bzip2\bzlib_private.h" />
     <ClInclude Include="src\CodePages.h" />
+    <ClInclude Include="src\ColourConfiguration.h" />
     <ClInclude Include="src\Compression.h" />
     <ClInclude Include="src\ConsoleHelpers.h" />
     <ClInclude Include="src\Conversions.h" />
@@ -397,6 +400,7 @@
     <ClInclude Include="src\ResourceManager.h" />
     <ClInclude Include="src\RffArchive.h" />
     <ClInclude Include="src\SAction.h" />
+    <ClInclude Include="src\SFileDialog.h" />
     <ClInclude Include="src\SIFDoom.h" />
     <ClInclude Include="src\SIFHexen.h" />
     <ClInclude Include="src\SIFImages.h" />

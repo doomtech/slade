@@ -41,10 +41,10 @@ public:
 	void	clearMap() { map.clearMap(); }
 	
 	// Drawing
-	void	drawVertices();
-	void	drawLines(bool show_direction = false);
-	void	drawThings();
-	void	drawMap();
+	void	drawVertices(double xmin, double ymin, double xmax, double ymax);
+	void	drawLines(double xmin, double ymin, double xmax, double ymax, bool show_direction = false);
+	void	drawThings(double xmin, double ymin, double xmax, double ymax);
+	void	drawMap(double xmin, double ymin, double xmax, double ymax);
 
 	// Selection/hilight
 	bool	updateHilight();

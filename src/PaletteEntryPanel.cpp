@@ -33,6 +33,7 @@
 #include "PaletteEntryPanel.h"
 #include "PaletteManager.h"
 #include "Icons.h"
+#include "SFileDialog.h"
 
 
 /*******************************************************************
@@ -62,16 +63,16 @@ PaletteEntryPanel::PaletteEntryPanel(wxWindow* parent)
 	sizer_bottom->Add(btn_nextpal, 0, wxEXPAND|wxRIGHT, 4);
 	sizer_bottom->Add(text_curpal, 0, wxALIGN_CENTER_VERTICAL, 4);
 
-	// Add 'Add to Palettes' button
-	btn_exportpal = new wxButton(this, -1, "Add to Palettes");
-	sizer_top->AddStretchSpacer();
-	sizer_top->Add(btn_exportpal, 0, wxEXPAND);
+	// Setup custom menu
+	menu_custom = new wxMenu();
+	theApp->getAction("ppal_addcustom")->addToMenu(menu_custom);
+	theApp->getAction("ppal_exportas")->addToMenu(menu_custom);
+	custom_menu_name = "Palette";
 
 	// Bind events
 	btn_nextpal->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &PaletteEntryPanel::onBtnNextPal, this);
 	btn_prevpal->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &PaletteEntryPanel::onBtnPrevPal, this);
 	pal_canvas->Bind(wxEVT_LEFT_DOWN, &PaletteEntryPanel::onPalCanvasMouseEvent, this);
-	btn_exportpal->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &PaletteEntryPanel::onBtnExportPal, this);
 
 	// Init variables
 	cur_palette = 0;
@@ -154,6 +155,69 @@ bool PaletteEntryPanel::showPalette(uint32_t index) {
 	return true;
 }
 
+/* PaletteEntryPanel::addCustomPalette
+ * Adds the current palette to the custom user palettes folder, so
+ * it can be selected via the palette selector
+ *******************************************************************/
+bool PaletteEntryPanel::addCustomPalette() {
+	// Get name to export as
+	string name = wxGetTextFromUser("Enter name for Palette:", "Add to Palettes");
+	if (name.IsEmpty())
+		return false;
+
+	// Write current palette to the user palettes directory
+	string path = appPath(S_FMT("palettes/%s.pal", CHR(name)), DIR_USER);
+	palettes[cur_palette]->saveFile(path);
+
+	// Add to palette manager
+	Palette8bit* pal = new Palette8bit();
+	pal->copyPalette(palettes[cur_palette]);
+	thePaletteManager->addPalette(pal, name);
+
+	return true;
+}
+
+/* PaletteEntryPanel::exportAs
+ * Exports the current palette to a file, in the selected format
+ *******************************************************************/
+bool PaletteEntryPanel::exportAs() {
+	// Run save file dialog
+	SFileDialog::fd_info_t info;
+	string extensions = "Raw Palette (*.pal)|*.pal|PNG File (*.png)|*.png|CSV Palette (*.csv)|*.csv|JASC Palette (*.pal)|*.pal";
+	if (SFileDialog::saveFile(info, "Export Palette As", extensions, this))
+		return palettes[cur_palette]->saveFile(info.filenames[0], info.ext_index);
+
+	return false;
+}
+
+/* PaletteEntryPanel::handleAction
+ * Handles the action [id]. Returns true if the action was handled,
+ * false otherwise
+ *******************************************************************/
+bool PaletteEntryPanel::handleAction(string id) {
+	// Ignore if hidden
+	if (!IsShown())
+		return false;
+
+	// Only interested in "ppal_" events
+	if (!id.StartsWith("ppal_"))
+		return false;
+
+	// Add to custom palettes
+	if (id == "ppal_addcustom") {
+		addCustomPalette();
+		return true;
+	}
+
+	// Export As
+	else if (id == "ppal_exportas") {
+		exportAs();
+		return true;
+	}
+
+	return false;
+}
+
 
 /*******************************************************************
  * PALETTEENTRYPANEL CLASS EVENTS
@@ -188,23 +252,4 @@ void PaletteEntryPanel::onPalCanvasMouseEvent(wxMouseEvent& e) {
 		// Update status bar
 		updateStatus();
 	}
-}
-
-/* PaletteEntryPanel::onBtnExportPal
- * Called when the 'Add to Palettes' button is clicked
- *******************************************************************/
-void PaletteEntryPanel::onBtnExportPal(wxCommandEvent& e) {
-	// Get name to export as
-	string name = wxGetTextFromUser("Enter name for Palette:", "Add to Palettes");
-	if (name.IsEmpty())
-		return;
-
-	// Write current palette to the user palettes directory
-	string path = appPath(S_FMT("palettes/%s.pal", CHR(name)), DIR_USER);
-	palettes[cur_palette]->saveFile(path);
-
-	// Add to palette manager
-	Palette8bit* pal = new Palette8bit();
-	pal->copyPalette(palettes[cur_palette]);
-	thePaletteManager->addPalette(pal, name);
 }

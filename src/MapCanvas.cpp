@@ -32,6 +32,15 @@
 #include "WxStuff.h"
 #include "MapCanvas.h"
 #include "MapEditor.h"
+#include "ColourConfiguration.h"
+
+
+/*******************************************************************
+ * VARIABLES
+ *******************************************************************/
+CVAR(Bool, vertex_round, true, CVAR_SAVE)
+CVAR(Bool, line_smooth, true, CVAR_SAVE)
+CVAR(Int, vertex_size, 6, CVAR_SAVE)
 
 
 /* MapCanvas::MapCanvas
@@ -88,6 +97,12 @@ void MapCanvas::pan(double x, double y) {
 	view_xoff += x/view_scale;
 	view_yoff += y/view_scale;
 
+	// Update screen limits
+	view_tl.x = translateX(0);
+	view_tl.y = translateY(GetSize().y);
+	view_br.x = translateX(GetSize().x);
+	view_br.y = translateY(0);
+
 	// Refresh
 	Update();
 	Refresh();
@@ -117,6 +132,12 @@ void MapCanvas::zoom(double amount, bool toward_cursor) {
 		view_yoff = my + (double(view_yoff - my) / amount);
 	}
 
+	// Update screen limits
+	view_tl.x = translateX(0);
+	view_tl.y = translateY(GetSize().y);
+	view_br.x = translateX(GetSize().x);
+	view_br.y = translateY(0);
+
 	// Refresh
 	Update();
 	Refresh();
@@ -130,7 +151,7 @@ void MapCanvas::drawGrid() {
 	glDisable(GL_LINE_SMOOTH);
 	glLineWidth(1.0f);
 
-	rgba_t(60, 120, 190, 60, 0).set_gl();
+	ColourConfiguration::getColour("map_grid").set_gl();
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// Determine smallest grid size to bother drawing
@@ -186,12 +207,6 @@ void MapCanvas::draw() {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// Setup options
-	glEnable(GL_POINT_SMOOTH);
-	glEnable(GL_LINE_SMOOTH);
-	glLineWidth(1.5f);
-	glPointSize(6.0f);
-
 	// Translate to middle of pixel (otherwise inaccuracies can occur on certain gl implemenataions)
 	glTranslatef(0.375f, 0.375f, 0);
 
@@ -207,8 +222,20 @@ void MapCanvas::draw() {
 	// Draw grid
 	drawGrid();
 
+	// Setup options
+	if (vertex_round)
+		glEnable(GL_POINT_SMOOTH);
+	else
+		glDisable(GL_POINT_SMOOTH);
+	if (line_smooth)
+		glEnable(GL_LINE_SMOOTH);
+	else
+		glDisable(GL_LINE_SMOOTH);
+	glLineWidth(1.5f);
+	glPointSize((float)vertex_size);
+
 	// Draw map
-	editor->drawMap();
+	editor->drawMap(view_tl.x, view_tl.y, view_br.x, view_br.y);
 
 	SwapBuffers();
 }

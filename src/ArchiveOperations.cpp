@@ -156,8 +156,11 @@ bool ArchiveOperations::checkDuplicateEntryNames(Archive* archive) {
 	string dups;
 	StrIntMap::iterator i = map_namecounts.begin();
 	while (i != map_namecounts.end()) {
-		if (i->second > 1)
-			dups += S_FMT("%s appears %d times\n", CHR(i->first), i->second);
+		if (i->second > 1) {
+			string name = i->first;
+			name.Remove(0, 1);
+			dups += S_FMT("%s appears %d times\n", CHR(name), i->second);
+		}
 		i++;
 	}
 

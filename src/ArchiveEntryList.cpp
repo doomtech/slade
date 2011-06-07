@@ -31,7 +31,7 @@
 #include "WxStuff.h"
 #include "ArchiveEntryList.h"
 #include "Icons.h"
-#include "ListView.h"
+#include "ColourConfiguration.h"
 #include <wx/imaglist.h>
 
 
@@ -170,7 +170,7 @@ void ArchiveEntryList::updateItemAttr(long item) const {
 	ArchiveEntry* entry = getEntry(item);
 
 	// Init attributes
-	item_attr->SetTextColour(ListView::colourError());
+	item_attr->SetTextColour(WXCOL(ColourConfiguration::getColour("error")));
 
 	// If entry doesn't exist, return error colour
 	if (!entry)
@@ -179,10 +179,10 @@ void ArchiveEntryList::updateItemAttr(long item) const {
 	// Set colour depending on entry state
 	switch (entry->getState()) {
 	case 1:
-		item_attr->SetTextColour(ListView::colourModified());
+		item_attr->SetTextColour(WXCOL(ColourConfiguration::getColour("modified")));
 		break;
 	case 2:
-		item_attr->SetTextColour(ListView::colourNew());
+		item_attr->SetTextColour(WXCOL(ColourConfiguration::getColour("new")));
 		break;
 	default:
 		item_attr->SetTextColour(wxSystemSettings::GetColour(wxSYS_COLOUR_LISTBOXTEXT));
@@ -191,7 +191,7 @@ void ArchiveEntryList::updateItemAttr(long item) const {
 
 	// Locked state overrides others
 	if (entry->isLocked())
-		item_attr->SetTextColour(ListView::colourLocked());
+		item_attr->SetTextColour(WXCOL(ColourConfiguration::getColour("locked")));
 }
 
 /* ArchiveEntryList::setArchive

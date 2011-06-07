@@ -8,9 +8,7 @@
 TODO List ---------------------------------------------------------------
 
 --- Before 3.0.2 ---
-- Status bar stuff for other EntryPanels and Texture editor
-- (maybe) Use SIFormat system to implement generic 'export as' for image entries
-- (maybe) Generic DataEntryPanel
+- Fix bugs
 
 --- Bugs ---
 

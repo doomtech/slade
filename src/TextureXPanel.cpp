@@ -37,6 +37,7 @@
 #include "Clipboard.h"
 #include "ArchiveManager.h"
 #include "Icons.h"
+#include "ColourConfiguration.h"
 #include <wx/filename.h>
 #include <wx/gbsizer.h>
 
@@ -114,7 +115,7 @@ void TextureXListView::updateItemAttr(long item) const {
 	CTexture* tex = texturex->getTexture(item);
 
 	// Init attributes
-	item_attr->SetTextColour(ListView::colourError());
+	item_attr->SetTextColour(WXCOL(ColourConfiguration::getColour("error")));
 
 	// If texture doesn't exist, return error colour
 	if (!tex)
@@ -123,10 +124,10 @@ void TextureXListView::updateItemAttr(long item) const {
 	// Set colour depending on entry state
 	switch (tex->getState()) {
 	case 1:
-		item_attr->SetTextColour(ListView::colourModified());
+		item_attr->SetTextColour(WXCOL(ColourConfiguration::getColour("modified")));
 		break;
 	case 2:
-		item_attr->SetTextColour(ListView::colourNew());
+		item_attr->SetTextColour(WXCOL(ColourConfiguration::getColour("new")));
 		break;
 	default:
 		item_attr->SetTextColour(wxSystemSettings::GetColour(wxSYS_COLOUR_LISTBOXTEXT));
