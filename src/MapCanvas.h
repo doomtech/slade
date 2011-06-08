@@ -8,6 +8,7 @@ class MapEditor;
 class MapCanvas : public OGLCanvas {
 private:
 	MapEditor*	editor;
+	wxTimer		timer;
 
 	// View properties
 	double		view_xoff;
@@ -15,6 +16,10 @@ private:
 	double		view_scale;
 	fpoint2_t	view_tl;
 	fpoint2_t	view_br;
+
+	// Animation
+	float	anim_flash_level;
+	bool	anim_flash_inc;
 
 public:
 	MapCanvas(wxWindow *parent, int id, MapEditor* editor);
@@ -36,6 +41,7 @@ public:
 	void	onMouseUp(wxMouseEvent& e);
 	void	onMouseMotion(wxMouseEvent& e);
 	void	onMouseWheel(wxMouseEvent& e);
+	void	onTimer(wxTimerEvent& e);
 };
 
 #endif //__MAPCANVAS_H__

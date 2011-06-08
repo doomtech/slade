@@ -3,6 +3,7 @@
 #define __MAP_EDITOR_H__
 
 #include "SLADEMap.h"
+#include "GLTexture.h"
 
 class MapEditor {
 private:
@@ -16,6 +17,9 @@ private:
 	// Mouse pointer state
 	fpoint2_t	mouse_pos;
 	fpoint2_t	mouse_downpos;
+
+	// Temporary
+	GLTexture	tex_thing;
 	
 public:
 	enum {
@@ -33,7 +37,7 @@ public:
 	fpoint2_t	mousePos() { return mouse_pos; }
 	fpoint2_t	mouseDownPos() { return mouse_downpos; }
 
-	void	setEditMode(int mode) { edit_mode = mode; }
+	void	setEditMode(int mode);
 	void	setMousePos(double x, double y) { mouse_pos.set(x, y); }
 	void	setMouseDownPos(double x, double y) { mouse_downpos.set(x, y); }
 	
@@ -45,6 +49,7 @@ public:
 	void	drawLines(double xmin, double ymin, double xmax, double ymax, bool show_direction = false);
 	void	drawThings(double xmin, double ymin, double xmax, double ymax);
 	void	drawMap(double xmin, double ymin, double xmax, double ymax);
+	void	drawHilight(float flash_level);
 
 	// Selection/hilight
 	bool	updateHilight();

@@ -5,6 +5,8 @@
 #include "Tokenizer.h"
 #include "PropertyList.h"
 
+class MapSide;
+
 struct doomsector_t
 {
 	short	f_height;

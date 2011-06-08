@@ -6,6 +6,7 @@
 #include "PropertyList.h"
 
 class MapSector;
+class MapLine;
 
 struct doomside_t
 {

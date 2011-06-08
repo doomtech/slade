@@ -81,6 +81,8 @@
       <File Name="src/MathStuff.h"/>
       <File Name="src/Compression.cpp"/>
       <File Name="src/Compression.h"/>
+      <File Name="src/SFileDialog.cpp"/>
+      <File Name="src/SFileDialog.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Console">
       <File Name="src/Console.cpp"/>
@@ -95,6 +97,8 @@
     <File Name="src/Drawing.h"/>
     <File Name="src/KeyBind.cpp"/>
     <File Name="src/KeyBind.h"/>
+    <File Name="src/ColourConfiguration.cpp"/>
+    <File Name="src/ColourConfiguration.h"/>
   </VirtualDirectory>
   <VirtualDirectory Name="Main Editor">
     <VirtualDirectory Name="UI Elements">

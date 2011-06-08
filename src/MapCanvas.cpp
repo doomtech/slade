@@ -47,12 +47,15 @@ CVAR(Int, vertex_size, 6, CVAR_SAVE)
  * MapCanvas class constructor
  *******************************************************************/
 MapCanvas::MapCanvas(wxWindow *parent, int id, MapEditor* editor)
-: OGLCanvas(parent, id) {
+: OGLCanvas(parent, id), timer(this) {
 	// Init variables
 	this->editor = editor;
 	view_xoff = 0;
 	view_yoff = 0;
 	view_scale = 1;
+	timer.Start(20);
+	anim_flash_level = 0.5f;
+	anim_flash_inc = true;
 
 	// Bind Events
 	Bind(wxEVT_KEY_DOWN, &MapCanvas::onKeyDown, this);
@@ -68,6 +71,7 @@ MapCanvas::MapCanvas(wxWindow *parent, int id, MapEditor* editor)
 	Bind(wxEVT_AUX2_UP, &MapCanvas::onMouseUp, this);
 	Bind(wxEVT_MOTION, &MapCanvas::onMouseMotion, this);
 	Bind(wxEVT_MOUSEWHEEL, &MapCanvas::onMouseWheel, this);
+	Bind(wxEVT_TIMER, &MapCanvas::onTimer, this);
 }
 
 /* MapCanvas::~MapCanvas
@@ -237,6 +241,9 @@ void MapCanvas::draw() {
 	// Draw map
 	editor->drawMap(view_tl.x, view_tl.y, view_br.x, view_br.y);
 
+	// Draw overlays (hilight etc)
+	editor->drawHilight(anim_flash_level);
+
 	SwapBuffers();
 }
 
@@ -321,4 +328,26 @@ void MapCanvas::onMouseWheel(wxMouseEvent& e) {
 		zoom(1.2, true);
 	else if (e.GetWheelRotation() < 0)
 		zoom(0.8, true);
+}
+
+void MapCanvas::onTimer(wxTimerEvent& e) {
+	// Flashing animation for hilight/selection
+	// Pulsates between 0.5-1.0f (multiplied with hilight/selection alpha)
+	if (anim_flash_inc) {
+		anim_flash_level += 0.03f;
+		if (anim_flash_level >= 1.0f) {
+			anim_flash_inc = false;
+			anim_flash_level = 1.0f;
+		}
+	}
+	else {
+		anim_flash_level -= 0.03f;
+		if (anim_flash_level <= 0.5f) {
+			anim_flash_inc = true;
+			anim_flash_level = 0.6f;
+		}
+	}
+
+	Update();
+	Refresh();
 }

@@ -17,6 +17,7 @@ private:
 	vector<gl_tex_t>	tex;
 	bool				loaded;
 	bool				allow_split;
+	int					filter;
 
 	// Some generic/global textures
 	static GLTexture	tex_background;	// Checkerboard background texture
@@ -26,12 +27,22 @@ private:
 	bool	loadImagePortion(SImage* image, rect_t rect, Palette8bit* pal = NULL, bool add = false);
 
 public:
+	enum {
+		// Filter types
+		NEAREST,
+		LINEAR,
+		MIPMAP,
+	};
+	
 	GLTexture(bool allow_split = true);
 	~GLTexture();
 
 	bool		isLoaded() { return loaded; }
 	uint32_t	getWidth() { return width; }
 	uint32_t	getHeight() { return height; }
+	int			getFilter() { return filter; }
+	
+	void		setFilter(int filter) { this->filter = filter; }
 
 	bool	loadImage(SImage* image, Palette8bit* pal = NULL);
 	bool	loadRawData(const uint8_t* data, uint32_t width, uint32_t height);

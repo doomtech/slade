@@ -2,6 +2,9 @@
 #include "Main.h"
 #include "MapEditor.h"
 #include "ColourConfiguration.h"
+#include "ArchiveManager.h"
+
+EXTERN_CVAR(Int, vertex_size)
 
 MapEditor::MapEditor() {
 	// Init variables
@@ -10,6 +13,11 @@ MapEditor::MapEditor() {
 }
 
 MapEditor::~MapEditor() {
+}
+
+void MapEditor::setEditMode(int mode) {
+	edit_mode = mode;
+	updateHilight();
 }
 
 bool MapEditor::openMap(Archive::mapdesc_t map) {
@@ -34,16 +42,6 @@ void MapEditor::drawVertices(double xmin, double ymin, double xmax, double ymax)
 			glVertex2d(x, y);
 	}
 	glEnd();
-
-	// Draw vertex hilight
-	if (edit_mode == MODE_VERTICES && hilight_item >= 0 && hilight_item < (int)map.vertices.size() - 1) {
-		rgba_t(255, 255, 0, 180, 1).set_gl();
-		glPointSize(10.0f);
-		glBegin(GL_POINTS);
-		glVertex2d(map.vertices[hilight_item]->xPos(), map.vertices[hilight_item]->yPos());
-		glEnd();
-		glPointSize(6.0f);
-	}
 }
 
 void MapEditor::drawLines(double xmin, double ymin, double xmax, double ymax, bool show_direction) {
@@ -94,21 +92,56 @@ void MapEditor::drawLines(double xmin, double ymin, double xmax, double ymax, bo
 		glVertex2d(x1, y1);
 		glVertex2d(x2, y2);
 		glEnd();
-
-		// Check for hilight
-		if (edit_mode == MODE_LINES && hilight_item == a) {
-			glLineWidth(3.0f);
-			ColourConfiguration::getColour("map_hilight").set_gl();
-			glBegin(GL_LINES);
-			glVertex2d(x1, y1);
-			glVertex2d(x2, y2);
-			glEnd();
-			glLineWidth(1.5f);
-		}
 	}
 }
 
 void MapEditor::drawThings(double xmin, double ymin, double xmax, double ymax) {
+	// Enable textures
+	glEnable(GL_TEXTURE_2D);
+	tex_thing.bind();
+	rgba_t(255, 255, 255, 255, 0).set_gl();
+	
+	// Load thing texture
+	// (temporary solution for now)
+	if (!tex_thing.isLoaded()) {
+		Archive* pres = theArchiveManager->programResourceArchive();
+		ArchiveEntry* entry = pres->entryAtPath("images/thing.png");
+		SImage image;
+		image.open(entry->getMCData());
+		tex_thing.setFilter(GLTexture::MIPMAP);
+		tex_thing.loadImage(&image);
+	}
+	
+	// Go through things
+	MapThing* thing = NULL;
+	double x, y;
+	for (unsigned a = 0; a < map.things.size(); a++) {
+		// Get thing info
+		thing = map.things[a];
+		x = thing->xPos();
+		y = thing->yPos();
+		
+		// Ignore if outside of screen
+		if (x < xmin || x > xmax || y < ymin || y > ymax)
+			continue;
+			
+		// Translate to thing position
+		glPushMatrix();
+		glTranslated(x, y, 0);
+		
+		// Draw thing (32x32 for now)
+		glBegin(GL_QUADS);
+		glTexCoord2f(0.0f, 0.0f);	glVertex2d(-16, -16);
+		glTexCoord2f(0.0f, 1.0f);	glVertex2d(-16, 16);
+		glTexCoord2f(1.0f, 1.0f);	glVertex2d(16, 16);
+		glTexCoord2f(1.0f, 0.0f);	glVertex2d(16, -16);
+		glEnd();
+		
+		glPopMatrix();
+	}
+	
+	// Disable textures
+	glDisable(GL_TEXTURE_2D);
 }
 
 void MapEditor::drawMap(double xmin, double ymin, double xmax, double ymax) {
@@ -122,35 +155,71 @@ void MapEditor::drawMap(double xmin, double ymin, double xmax, double ymax) {
 	// Draw things (if in things mode)
 	if (edit_mode == MODE_THINGS)
 		drawThings(xmin, ymin, xmax, ymax);
+}
 
-	// Sectors mode stuff
-	if (edit_mode == MODE_SECTORS) {
-		// Check hilight
-		if (hilight_item >= 0) {
-			// Get all lines belonging to the hilighted sector
-			vector<MapLine*> lines;
-			map.getLinesOfSector(hilight_item, lines);
+void MapEditor::drawHilight(float flash_level) {
+	// Check anything is hilighted
+	if (hilight_item < 0)
+		return;
 
-			// Set hilight colour etc
-			glLineWidth(3.0f);
-			ColourConfiguration::getColour("map_hilight").set_gl();
+	// Set hilight colour
+	rgba_t col = ColourConfiguration::getColour("map_hilight");
+	col.a *= flash_level;
+	col.set_gl();
 
-			// Draw hilight
-			MapLine* line = NULL;
-			for (unsigned a = 0; a < lines.size(); a++) {
-				line = lines[a];
-				if (!line) continue;
+	glLineWidth(4.5f);
+	glPointSize(vertex_size*1.5f);
 
-				// Draw line
-				glBegin(GL_LINES);
-				glVertex2d(line->v1()->xPos(), line->v1()->yPos());
-				glVertex2d(line->v2()->xPos(), line->v2()->yPos());
-				glEnd();
-			}
+	// Draw depending on mode
+	if (edit_mode == MODE_VERTICES) {
+		// Vertex
+		glBegin(GL_POINTS);
+		glVertex2d(map.vertices[hilight_item]->xPos(), map.vertices[hilight_item]->yPos());
+		glEnd();
+	}
+	else if (edit_mode == MODE_LINES) {
+		// Line
+		MapLine* line = map.lines[hilight_item];
+		glBegin(GL_LINES);
+		glVertex2d(line->v1()->xPos(), line->v1()->yPos());
+		glVertex2d(line->v2()->xPos(), line->v2()->yPos());
+		glEnd();
+	}
+	else if (edit_mode == MODE_SECTORS) {
+		// Sector
 
-			glLineWidth(1.5f);
+		// Get all lines belonging to the hilighted sector
+		vector<MapLine*> lines;
+		map.getLinesOfSector(hilight_item, lines);
+
+		// Draw hilight
+		MapLine* line = NULL;
+		for (unsigned a = 0; a < lines.size(); a++) {
+			line = lines[a];
+			if (!line) continue;
+
+			// Draw line
+			glBegin(GL_LINES);
+			glVertex2d(line->v1()->xPos(), line->v1()->yPos());
+			glVertex2d(line->v2()->xPos(), line->v2()->yPos());
+			glEnd();
 		}
 	}
+	else if (edit_mode == MODE_THINGS) {
+		// Thing
+		double x = map.things[hilight_item]->xPos();
+		double y = map.things[hilight_item]->yPos();
+		
+		glBegin(GL_QUADS);
+		glVertex2d(x - 16, y - 16);
+		glVertex2d(x - 16, y + 16);
+		glVertex2d(x + 16, y + 16);
+		glVertex2d(x + 16, y - 16);
+		glEnd();
+	}
+
+	glLineWidth(1.5f);
+	glPointSize(vertex_size);
 }
 
 bool MapEditor::updateHilight() {

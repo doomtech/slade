@@ -73,6 +73,8 @@ public:
 	MapThing(double x, double y, short type) { this->x = x; this->y = y; this->type = type; }
 	~MapThing(){}
 
+	double		xPos() { return x; }
+	double		yPos() { return y; }
 	unsigned	getIndex() { return index; }
 
 	PropertyList&	props()				{ return udmf_props; }
