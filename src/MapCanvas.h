@@ -17,9 +17,15 @@ private:
 	fpoint2_t	view_tl;
 	fpoint2_t	view_br;
 
+	// Mass selection
+	bool		sel_active;
+	fpoint2_t	sel_origin;
+	fpoint2_t	sel_end;
+
 	// Animation
 	float	anim_flash_level;
 	bool	anim_flash_inc;
+	float	anim_selbox_fade;
 
 public:
 	MapCanvas(wxWindow *parent, int id, MapEditor* editor);

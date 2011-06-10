@@ -102,6 +102,7 @@ public:
 	int	nearestThing(double x, double y, double min = 64);
 	int	inSector(double x, double y);
 
+	bool	lineInSector(MapLine* line, MapSector* sector);
 	bool	getLinesOfSector(unsigned index, vector<MapLine*>& list);
 
 	// Checks

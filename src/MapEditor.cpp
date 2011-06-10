@@ -18,6 +18,7 @@ MapEditor::~MapEditor() {
 void MapEditor::setEditMode(int mode) {
 	edit_mode = mode;
 	updateHilight();
+	selection.clear();
 }
 
 bool MapEditor::openMap(Archive::mapdesc_t map) {
@@ -222,6 +223,125 @@ void MapEditor::drawHilight(float flash_level) {
 	glPointSize(vertex_size);
 }
 
+void MapEditor::drawSelection(double xmin, double ymin, double xmax, double ymax) {
+	// Check anything is selected
+	if (selection.size() == 0)
+		return;
+
+	// Set selection colour
+	ColourConfiguration::getColour("map_selection").set_gl();
+
+	glLineWidth(6.0f);
+	glPointSize(vertex_size*1.5f);
+
+	// Draw depending on mode
+	if (edit_mode == MODE_VERTICES) {
+		// Vertices
+		double x, y;
+		glBegin(GL_POINTS);
+		for (unsigned a = 0; a < selection.size(); a++) {
+			x = map.vertices[selection[a]]->xPos();
+			y = map.vertices[selection[a]]->yPos();
+
+			// Draw vertex selection if on screen
+			if (xmin <= x && x <= xmax && ymin <= y && y <= ymax)
+				glVertex2d(x, y);
+		}
+		glEnd();
+	}
+	else if (edit_mode == MODE_LINES) {
+		// Lines
+		MapLine* line;
+		double x1, y1, x2, y2;
+		glBegin(GL_LINES);
+		for (unsigned a = 0; a < selection.size(); a++) {
+			line = map.lines[selection[a]];
+			x1 = line->v1()->xPos();
+			y1 = line->v1()->yPos();
+			x2 = line->v2()->xPos();
+			y2 = line->v2()->yPos();
+
+			// Skip if outside limits (quick check, will still draw some lines outside the screen)
+			if ((x1 > xmax && x2 > xmax) ||
+				(x1 < xmin && x2 < xmin) ||
+				(y1 > ymax && y2 > ymax) ||
+				(y1 < ymin && y2 < ymin))
+				continue;
+
+			// Draw line
+			glVertex2d(x1, y1);
+			glVertex2d(x2, y2);
+		}
+		glEnd();
+	}
+	else if (edit_mode == MODE_SECTORS) {
+		// Sectors
+
+		// Get selected sector(s)
+		vector<MapSector*> selected_sectors;
+		for (unsigned a = 0; a < selection.size(); a++)
+			selected_sectors.push_back(map.sectors[selection[a]]);
+
+		// Go through map lines
+		MapLine* line;
+		double x1, y1, x2, y2;
+		glBegin(GL_LINES);
+		for (unsigned a = 0; a < map.lines.size(); a++) {
+			line = map.lines[a];
+
+			// Check if line is in a selected sector
+			bool selected = false;
+			for (unsigned b = 0; b < selected_sectors.size(); b++) {
+				if (map.lineInSector(line, selected_sectors[b])) {
+					selected = true;
+					break;
+				}
+			}
+
+			// Skip if not selected
+			if (!selected)
+				continue;
+
+			// Skip if outside limits (quick check, will still draw some lines outside the screen)
+			x1 = line->v1()->xPos();
+			y1 = line->v1()->yPos();
+			x2 = line->v2()->xPos();
+			y2 = line->v2()->yPos();
+			if ((x1 > xmax && x2 > xmax) ||
+				(x1 < xmin && x2 < xmin) ||
+				(y1 > ymax && y2 > ymax) ||
+				(y1 < ymin && y2 < ymin))
+				continue;
+
+			// Draw line
+			glVertex2d(x1, y1);
+			glVertex2d(x2, y2);
+		}
+		glEnd();
+	}
+	else if (edit_mode == MODE_THINGS) {
+		// Things
+		double x, y;
+		for (unsigned a = 0; a < selection.size(); a++) {
+			x = map.things[selection[a]]->xPos();
+			y = map.things[selection[a]]->yPos();
+
+			// Draw thing selection if on screen
+			if (xmin <= x && x <= xmax && ymin <= y && y <= ymax) {
+				glBegin(GL_QUADS);
+				glVertex2d(x - 20, y - 20);
+				glVertex2d(x - 20, y + 20);
+				glVertex2d(x + 20, y + 20);
+				glVertex2d(x + 20, y - 20);
+				glEnd();
+			}
+		}
+	}
+
+	glLineWidth(1.5f);
+	glPointSize(vertex_size);
+}
+
 bool MapEditor::updateHilight() {
 	int current = hilight_item;
 
@@ -236,4 +356,108 @@ bool MapEditor::updateHilight() {
 		hilight_item = map.nearestThing(mouse_pos.x, mouse_pos.y);
 
 	return current != hilight_item;
+}
+
+bool MapEditor::selectCurrent(bool clear_none) {
+	// If nothing is hilighted
+	if (hilight_item == -1) {
+		// Clear selection if specified
+		if (clear_none)
+			selection.clear();
+
+		return false;
+	}
+
+	// Otherwise, check if item is in selection
+	for (unsigned a = 0; a < selection.size(); a++) {
+		if (selection[a] == hilight_item) {
+			// Already selected, deselect
+			selection.erase(selection.begin() + a);
+			return true;
+		}
+	}
+
+	// Not already selected, add to selection
+	selection.push_back(hilight_item);
+
+	return true;
+}
+
+bool MapEditor::selectWithin(double xmin, double ymin, double xmax, double ymax) {
+	// Select depending on editing mode
+	bool new_sel = false;
+
+	// Vertices
+	if (edit_mode == MODE_VERTICES) {
+		// Go through vertices
+		double x, y;
+		for (unsigned a = 0; a < map.vertices.size(); a++) {
+			// Skip if vertex is already selected
+			if (std::find(selection.begin(), selection.end(), a) != selection.end())
+				continue;
+
+			// Get position
+			x = map.vertices[a]->xPos();
+			y = map.vertices[a]->yPos();
+
+			// Select if vertex is within bounds
+			if (xmin <= x && x <= xmax && ymin <= y && y <= ymax) {
+				selection.push_back(a);
+				new_sel = true;
+			}
+		}
+	}
+
+	// Lines
+	else if (edit_mode == MODE_LINES) {
+		// Go through lines
+		MapLine* line;
+		double x1, y1, x2, y2;
+		for (unsigned a = 0; a < map.lines.size(); a++) {
+			// Skip if line is already selected
+			if (std::find(selection.begin(), selection.end(), a) != selection.end())
+				continue;
+
+			// Get vertex positions
+			line = map.lines[a];
+			x1 = line->v1()->xPos();
+			y1 = line->v1()->yPos();
+			x2 = line->v2()->xPos();
+			y2 = line->v2()->yPos();
+
+			// Select if both vertices are within bounds
+			if (xmin <= x1 && x1 <= xmax && ymin <= y1 && y1 <= ymax &&
+				xmin <= x2 && x2 <= xmax && ymin <= y2 && y2 <= ymax) {
+				selection.push_back(a);
+				new_sel = true;
+			}
+		}
+	}
+
+	// Sectors
+	else if (edit_mode == MODE_SECTORS) {
+	}
+
+	// Things
+	else if (edit_mode == MODE_THINGS) {
+		// Go through things
+		double x, y;
+		for (unsigned a = 0; a < map.things.size(); a++) {
+			// Skip if thing is already selected
+			if (std::find(selection.begin(), selection.end(), a) != selection.end())
+				continue;
+
+			// Get position
+			x = map.things[a]->xPos();
+			y = map.things[a]->yPos();
+
+			// Select if thing is within bounds
+			if (xmin <= x && x <= xmax && ymin <= y && y <= ymax) {
+				selection.push_back(a);
+				new_sel = true;
+			}
+		}
+	}
+
+	return new_sel;
 }

@@ -40,7 +40,7 @@
  *******************************************************************/
 CVAR(Bool, vertex_round, true, CVAR_SAVE)
 CVAR(Bool, line_smooth, true, CVAR_SAVE)
-CVAR(Int, vertex_size, 6, CVAR_SAVE)
+CVAR(Int, vertex_size, 7, CVAR_SAVE)
 
 
 /* MapCanvas::MapCanvas
@@ -56,6 +56,7 @@ MapCanvas::MapCanvas(wxWindow *parent, int id, MapEditor* editor)
 	timer.Start(20);
 	anim_flash_level = 0.5f;
 	anim_flash_inc = true;
+	anim_selbox_fade = 0.0f;
 
 	// Bind Events
 	Bind(wxEVT_KEY_DOWN, &MapCanvas::onKeyDown, this);
@@ -242,7 +243,37 @@ void MapCanvas::draw() {
 	editor->drawMap(view_tl.x, view_tl.y, view_br.x, view_br.y);
 
 	// Draw overlays (hilight etc)
-	editor->drawHilight(anim_flash_level);
+	editor->drawSelection(view_tl.x, view_tl.y, view_br.x, view_br.y);
+	if (!sel_active) editor->drawHilight(anim_flash_level);
+
+	// Draw selection box if active
+	if (anim_selbox_fade > 0.0f) {
+		// Get selection box map coordinates
+		rgba_t col;
+
+		// Outline
+		col.set(ColourConfiguration::getColour("map_selbox_outline"));
+		col.a *= anim_selbox_fade;
+		col.set_gl();
+		glLineWidth(2.0f);
+		glBegin(GL_LINE_LOOP);
+		glVertex2d(sel_origin.x, sel_origin.y);
+		glVertex2d(sel_origin.x, sel_end.y);
+		glVertex2d(sel_end.x, sel_end.y);
+		glVertex2d(sel_end.x, sel_origin.y);
+		glEnd();
+
+		// Fill
+		col.set(ColourConfiguration::getColour("map_selbox_fill"));
+		col.a *= anim_selbox_fade;
+		col.set_gl();
+		glBegin(GL_QUADS);
+		glVertex2d(sel_origin.x, sel_origin.y);
+		glVertex2d(sel_origin.x, sel_end.y);
+		glVertex2d(sel_end.x, sel_end.y);
+		glVertex2d(sel_end.x, sel_origin.y);
+		glEnd();
+	}
 
 	SwapBuffers();
 }
@@ -307,20 +338,67 @@ void MapCanvas::onKeyDown(wxKeyEvent& e) {
 }
 
 void MapCanvas::onMouseDown(wxMouseEvent& e) {
+	// Get map coordinates of cursor
+	double x = translateX(e.GetX());
+	double y = translateY(e.GetY());
+
+	// Left button down
+	if (e.LeftDown()) {
+		if (e.GetModifiers() == wxMOD_SHIFT) {
+			// Shift held, begin box selection
+			sel_origin.set(x, y);
+			sel_end.set(x, y);
+			sel_active = true;
+			anim_selbox_fade = 1.0f;
+		}
+		else {
+			// No shift, select any current hilight
+			editor->selectCurrent();
+		}
+	}
+
 	e.Skip();
 }
 
 void MapCanvas::onMouseUp(wxMouseEvent& e) {
+	// Left button up
+	if (e.LeftUp()) {
+		if (sel_active) {
+			sel_active = false;
+			editor->selectWithin(min(sel_origin.x, sel_end.x), min(sel_origin.y, sel_end.y),
+								max(sel_origin.x, sel_end.x), max(sel_origin.y, sel_end.y));
+		}
+		
+		editor->updateHilight();
+		Refresh();
+	}
+
 	e.Skip();
 }
 
 void MapCanvas::onMouseMotion(wxMouseEvent& e) {
-	e.Skip();
+	// Get map coordinates of cursor
+	double x = translateX(e.GetX());
+	double y = translateY(e.GetY());
 
-	// Update editor mouse tracking and hilight
-	editor->setMousePos(translateX(e.GetPosition().x), translateY(e.GetPosition().y));
-	if (editor->updateHilight())
+	// Update editor mouse tracking
+	editor->setMousePos(x, y);
+
+	// If dragging left mouse
+	if (e.Dragging() && e.LeftIsDown()) {
+		sel_end.set(x, y);
+		sel_active = true;
 		Refresh();
+	}
+	else {
+		sel_active = false;
+
+		// Update editor mouse hilight
+		if (editor->updateHilight())
+			Refresh();
+	}
+
+	e.Skip();
 }
 
 void MapCanvas::onMouseWheel(wxMouseEvent& e) {
@@ -334,19 +412,23 @@ void MapCanvas::onTimer(wxTimerEvent& e) {
 	// Flashing animation for hilight/selection
 	// Pulsates between 0.5-1.0f (multiplied with hilight/selection alpha)
 	if (anim_flash_inc) {
-		anim_flash_level += 0.03f;
+		anim_flash_level += 0.05f;
 		if (anim_flash_level >= 1.0f) {
 			anim_flash_inc = false;
 			anim_flash_level = 1.0f;
 		}
 	}
 	else {
-		anim_flash_level -= 0.03f;
+		anim_flash_level -= 0.05f;
 		if (anim_flash_level <= 0.5f) {
 			anim_flash_inc = true;
 			anim_flash_level = 0.6f;
 		}
 	}
+
+	// Selection box fadeout
+	if (!sel_active && anim_selbox_fade > 0.0f)
+		anim_selbox_fade -= 0.2f;
 
 	Update();
 	Refresh();

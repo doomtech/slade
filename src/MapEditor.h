@@ -50,9 +50,12 @@ public:
 	void	drawThings(double xmin, double ymin, double xmax, double ymax);
 	void	drawMap(double xmin, double ymin, double xmax, double ymax);
 	void	drawHilight(float flash_level);
+	void	drawSelection(double xmin, double ymin, double xmax, double ymax);
 
 	// Selection/hilight
 	bool	updateHilight();
+	bool	selectCurrent(bool clear_none = true);
+	bool	selectWithin(double xmin, double ymin, double xmax, double ymax);
 };
 
 #endif//__MAP_EDITOR_H__

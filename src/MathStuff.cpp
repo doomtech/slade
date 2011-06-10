@@ -125,6 +125,32 @@ double MathStuff::distanceToLine(double x, double y, double x1, double y1, doubl
 bool MathStuff::linesIntersect(double l1x1, double l1y1, double l1x2, double l1y2,
 								double l2x1, double l2y1, double l2x2, double l2y2,
 								double& x, double& y) {
+	// First, simple check for two parallel horizontal or vertical lines
+	if ((l1x1 == l1x2 && l2x1 == l2x2) || (l1y1 == l1y2 && l2y1 == l2y2))
+		return false;
+
+	// Second, check if the lines share any endpoints
+	if ((l1x1 == l2x1 && l1y1 == l2y1) ||
+		(l1x2 == l2x2 && l1y2 == l2y2) ||
+		(l1x1 == l2x2 && l1y1 == l2y2) ||
+		(l1x2 == l2x1 && l1y2 == l2y1))
+		return false;
+
+	// Third, check for two perpendicular horizontal or vertical lines
+	if (l1x1 == l1x2 && l2y1 == l2y2) {
+		x = l1x1;
+		y = l2y1;
+		return true;
+	}
+	if (l1y1 == l1y2 && l2x1 == l2x2) {
+		x = l2x1;
+		y = l1y1;
+		return true;
+	}
+
+
+	// Not a simple case, do full intersection calculation
+
 	// Calculate some values
 	double a1 = l1y2 - l1y1;
 	double a2 = l2y2 - l2y1;
@@ -142,7 +168,13 @@ bool MathStuff::linesIntersect(double l1x1, double l1y1, double l1x2, double l1y
 	x = (b2*c1 - b1*c2) / det;
 	y = (a1*c2 - a2*c1) / det;
 
-	// TODO: clip to line segments
+	// Check that the intersection point is on both lines
+	if ((min(l1x1, l1x2) < x < max(l1x2, l1x2)) &&
+		(min(l1y1, l1y2) < y < max(l1y1, l1y2)) &&
+		(min(l2x1, l2x2) < x < max(l2x1, l2x2)) &&
+		(min(l2y1, l2y2) < y < max(l2y1, l2y2)))
+		return true;
 
-	return true;
+	// Intersection point does not lie on both lines
+	return false;
 }

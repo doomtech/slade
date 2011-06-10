@@ -1145,6 +1145,14 @@ int SLADEMap::inSector(double x, double y) {
 	return sectorIndex(s->sector);
 }
 
+bool SLADEMap::lineInSector(MapLine* line, MapSector* sector) {
+	if (line->side1 && line->side1->sector == sector ||
+		line->side2 && line->side2->sector == sector)
+		return true;
+	else
+		return false;
+}
+
 bool SLADEMap::getLinesOfSector(unsigned index, vector<MapLine*>& list) {
 	// Get sector
 	MapSector* sector = getSector(index);
