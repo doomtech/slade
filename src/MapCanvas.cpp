@@ -387,7 +387,7 @@ void MapCanvas::onMouseMotion(wxMouseEvent& e) {
 	// If dragging left mouse
 	if (e.Dragging() && e.LeftIsDown()) {
 		sel_end.set(x, y);
-		sel_active = true;
+		//sel_active = true;
 		Refresh();
 	}
 	else {
