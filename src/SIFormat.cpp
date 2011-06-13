@@ -191,6 +191,10 @@ protected:
 				return true;
 		}
 
+		// COLORMAP size special case
+		if (width == 256 && height == 34)
+			return true;
+
 		return false;
 	}
 
@@ -310,6 +314,12 @@ public:
 		// And finally, find a suitable flat size and crop to that size
 		int width = 0;
 		int height = 0;
+
+		// Quick hack for COLORMAP size
+		// TODO: Remove me when a proper COLORMAP editor is implemented
+		if (image.getWidth() == 256 && image.getHeight() == 34)
+			return true;
+
 		for (unsigned a = 1; a < n_valid_flat_sizes; a++) {
 			// Ignore non-writable flat sizes
 			if (valid_flat_size[a][2] == 0)
