@@ -57,7 +57,7 @@ public:
 	~SIFHalfLifeTex() {}
 
 	bool isThisFormat(MemChunk& mc) {
-		if (EntryDataFormat::getFormat("img_hlt")->isThisFormat(mc))
+		if (EntryDataFormat::getFormat("img_hlt")->isThisFormat(mc) >= EDF_PROBABLY)
 			return true;
 		else
 			return false;
@@ -128,7 +128,7 @@ public:
 	~SIFSCSprite() {}
 
 	bool isThisFormat(MemChunk& mc) {
-		if (EntryDataFormat::getFormat("img_scsprite")->isThisFormat(mc))
+		if (EntryDataFormat::getFormat("img_scsprite")->isThisFormat(mc) >= EDF_PROBABLY)
 			return true;
 		else
 			return false;
@@ -210,7 +210,7 @@ public:
 	~SIFSCWall() {}
 
 	bool isThisFormat(MemChunk& mc) {
-		if (EntryDataFormat::getFormat("img_scwall")->isThisFormat(mc))
+		if (EntryDataFormat::getFormat("img_scwall")->isThisFormat(mc) >= EDF_PROBABLY)
 			return true;
 		else
 			return false;
@@ -258,7 +258,7 @@ public:
 	~SIFAnaMip() {}
 
 	bool isThisFormat(MemChunk& mc) {
-		if (EntryDataFormat::getFormat("img_mipimage")->isThisFormat(mc))
+		if (EntryDataFormat::getFormat("img_mipimage")->isThisFormat(mc) >= EDF_PROBABLY)
 			return true;
 		else
 			return false;
@@ -381,7 +381,7 @@ public:
 	~SIFBuildTile() {}
 
 	bool isThisFormat(MemChunk& mc) {
-		if (EntryDataFormat::getFormat("img_arttile")->isThisFormat(mc))
+		if (EntryDataFormat::getFormat("img_arttile")->isThisFormat(mc) >= EDF_PROBABLY)
 			return true;
 		else
 			return false;
@@ -459,7 +459,7 @@ public:
 	~SIFHeretic2M8() {}
 
 	bool isThisFormat(MemChunk& mc) {
-		if (EntryDataFormat::getFormat("img_m8")->isThisFormat(mc))
+		if (EntryDataFormat::getFormat("img_m8")->isThisFormat(mc) >= EDF_PROBABLY)
 			return true;
 		else
 			return false;
@@ -525,7 +525,7 @@ public:
 	~SIFHeretic2M32() {}
 
 	bool isThisFormat(MemChunk& mc) {
-		if (EntryDataFormat::getFormat("img_m32")->isThisFormat(mc))
+		if (EntryDataFormat::getFormat("img_m32")->isThisFormat(mc) >= EDF_PROBABLY)
 			return true;
 		else
 			return false;
@@ -580,7 +580,7 @@ public:
 	~SIFWolfPic() {}
 	
 	bool isThisFormat(MemChunk& mc) {
-		if (EntryDataFormat::getFormat("img_wolfpic")->isThisFormat(mc))
+		if (EntryDataFormat::getFormat("img_wolfpic")->isThisFormat(mc) >= EDF_PROBABLY)
 			return true;
 		else
 			return false;
@@ -639,7 +639,7 @@ public:
 	~SIFWolfSprite() {}
 	
 	bool isThisFormat(MemChunk& mc) {
-		if (EntryDataFormat::getFormat("img_wolfsprite")->isThisFormat(mc))
+		if (EntryDataFormat::getFormat("img_wolfsprite")->isThisFormat(mc) >= EDF_PROBABLY)
 			return true;
 		else
 			return false;

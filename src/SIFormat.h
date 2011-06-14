@@ -77,7 +77,7 @@ public:
 		image.announce("image_changed");
 
 		// Testing
-		//wxLogMessage("Loaded image format %s successfully", CHR(name));
+		wxLogMessage("Loaded image format %s successfully", CHR(name));
 
 		return ok;
 	}
