@@ -151,15 +151,16 @@ bool PatchBrowser::openPatchTable(PatchTable* table) {
 		ArchiveEntry* entry = theResourceManager->getPatchEntry(patch.name);
 
 		// Check its parent archive
+		Archive* parent_archive = NULL;
 		if (entry) {
-			Archive* parent_archive = entry->getParent();
+			parent_archive = entry->getParent();
 
 			if (parent_archive)
 				whereis = parent_archive->getFilename(false);
 		}
 
 		// Add it
-		PatchBrowserItem* item = new PatchBrowserItem(patch.name, entry->getParent(), 0, "", a);
+		PatchBrowserItem* item = new PatchBrowserItem(patch.name, parent_archive, 0, "", a);
 		addItem(item, whereis);
 	}
 
