@@ -524,7 +524,7 @@
         <Preprocessor Value="__WX__"/>
         <Preprocessor Value="NDEBUG"/>
       </Compiler>
-      <Linker Options="-s;$(shell wx-config --debug=no --libs std,gl,stc,aui,ribbon --unicode=yes)" Required="yes">
+      <Linker Options="$(shell wx-config --debug=no --libs std,gl,stc,aui,ribbon --unicode=yes)" Required="yes">
         <Library Value="sfml-system"/>
         <Library Value="sfml-audio"/>
       </Linker>
