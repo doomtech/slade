@@ -20,6 +20,9 @@ private:
 	string		special;	// A string defining the 'special characters'. These will always be parsed as separate tokens
 	string		name;		// What file/entry/chunk is being tokenized
 	bool		qstring;	// True if the last read token was a quoted string
+	uint32_t	line;		// The current line number
+	uint32_t	t_start;	// The starting position of the last-read token
+	uint32_t	t_end;		// The ending position of the last-read token
 
 public:
 	Tokenizer(bool c_comments = true, bool h_comments = true, bool s_comments = false);
@@ -43,7 +46,11 @@ public:
 	string getToken();
 	string peekToken();
 	bool checkToken(string check);
-	bool quotedString() { return qstring; }
+
+	bool		quotedString() { return qstring; }
+	uint32_t	lineNo() { return line; }
+	uint32_t	tokenStart() { return t_start; }
+	uint32_t	tokenEnd() { return t_end; }
 
 	int	getInteger();
 	float getFloat();

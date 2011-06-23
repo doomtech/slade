@@ -950,6 +950,8 @@ bool ArchivePanel::gfxConvert() {
 		MemChunk mc;
 		format->saveImage(*image, mc, gcd.getItemPalette(a));
 		selection[a]->importMemChunk(mc);
+		EntryType::detectEntryType(selection[a]);
+		selection[a]->setExtensionByType();
 	}
 
 	// Hide splash window

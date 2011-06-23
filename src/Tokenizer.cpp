@@ -33,12 +33,6 @@
 
 
 /*******************************************************************
- * VARIABLES
- *******************************************************************/
-//char special_tokens[] = { ';', ',', ':', '|', '=', '{', '}', '/' };
-//int n_special_tokens = 9;
-
-/*******************************************************************
  * TOKENIZER CLASS FUNCTIONS
  *******************************************************************/
 
@@ -54,6 +48,9 @@ Tokenizer::Tokenizer(bool c_comments, bool h_comments, bool s_comments) {
 	debug = false;
 	special = ";,:|={}/";	// Default special characters
 	name = "nothing";
+	line = 1;
+	t_start = 0;
+	t_end = 0;
 }
 
 /* Tokenizer::~Tokenizer
@@ -88,6 +85,9 @@ bool Tokenizer::openFile(string filename, uint32_t offset, uint32_t length) {
 	size = length;
 	position = 0;
 	start = current = (char *) malloc(size);
+	line = 1;
+	t_start = 0;
+	t_end = 0;
 
 	// Read the file portion
 	file.Seek(offset, wxFromStart);
@@ -110,6 +110,9 @@ bool Tokenizer::openString(string text, uint32_t offset, uint32_t length) {
 	// Setup variables & allocate memory
 	size = length;
 	position = 0;
+	line = 1;
+	t_start = 0;
+	t_end = 0;
 	start = current = (char *) malloc(size);
 
 	// Copy the string portion
@@ -133,6 +136,9 @@ bool Tokenizer::openMem(const char* mem, uint32_t length, string source) {
 	// Setup variables & allocate memory
 	size = length;
 	position = 0;
+	line = 1;
+	t_start = 0;
+	t_end = 0;
 	start = current = (char*) malloc(size);
 
 	// Copy the data
@@ -156,6 +162,9 @@ bool Tokenizer::openMem(const uint8_t* mem, uint32_t length, string source) {
 	// Setup variables & allocate memory
 	size = length;
 	position = 0;
+	line = 1;
+	t_start = 0;
+	t_end = 0;
 	start = current = (char*) malloc(size);
 
 	// Copy the data
@@ -179,6 +188,9 @@ bool Tokenizer::openMem(MemChunk * mem, string source) {
 	// Setup variables & allocate memory
 	size = mem->getSize();
 	position = 0;
+	line = 1;
+	t_start = 0;
+	t_end = 0;
 	start = current = (char*) malloc(size);
 
 	// Copy the data
@@ -203,7 +215,6 @@ bool Tokenizer::isWhitespace(char p) {
  * that should always be its own token (;, =, | etc)
  *******************************************************************/
 bool Tokenizer::isSpecialCharacter(char p) {
-
 	// Check through special tokens string
 	for (unsigned a = 0; a < special.size(); a++) {
 		if (special[a] == p)
@@ -222,9 +233,14 @@ bool Tokenizer::incrementCurrent() {
 		position = size;
 		return false;
 	} else {
+		// Check for newline
+		if (current[0] == '\n')
+			line++;
+
 		// Increment position & current pointer
 		position++;
 		current++;
+		t_end++;
 		return true;
 	}
 }
@@ -314,9 +330,14 @@ string Tokenizer::getToken() {
 			return ret_str;
 	}
 
+	// Init token delimiters
+	t_start = position;
+	t_end = position;
+
 	// If we're at a special character, it's our token
 	if (isSpecialCharacter(current[0])) {
 		ret_str += current[0];
+		t_end = position + 1;
 		incrementCurrent();
 		return ret_str;
 	}
@@ -431,8 +452,7 @@ bool Tokenizer::getBool() {
 	string token = getToken();
 
 	// If the token is a string "no" or "false", the value is false
-	//if (!stricmp(CHR(token), "no") || !stricmp(CHR(token), "false"))
-	if (!token.CmpNoCase("no") || !token.CmpNoCase("false"))
+	if (S_CMPNOCASE(token, "no") || S_CMPNOCASE(token, "false"))
 		return false;
 
 	// Returns true ("1") or false ("0")

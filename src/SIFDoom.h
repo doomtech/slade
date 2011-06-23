@@ -335,9 +335,6 @@ public:
 	}
 
 	virtual bool convertWritable(SImage& image, convert_options_t opt) {
-		// Convert to paletted
-		image.convertPaletted(opt.pal_target, opt.pal_current);
-
 		// Do mask conversion
 		if (!opt.transparency)
 			image.fillAlpha(255);
@@ -345,6 +342,9 @@ public:
 			image.maskFromColour(opt.mask_colour, opt.pal_target);
 		else if (opt.mask_source == MASK_ALPHA)
 			image.cutoffMask(opt.alpha_threshold);
+
+		// Convert to paletted
+		image.convertPaletted(opt.pal_target, opt.pal_current);
 
 		return true;
 	}

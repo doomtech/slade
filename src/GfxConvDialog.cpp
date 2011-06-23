@@ -334,7 +334,10 @@ void GfxConvDialog::updatePreviewGfx() {
 	gcd_item_t& item = items[current_item];
 
 	// Set palettes
-	gfx_current->setPalette(pal_chooser_current->getSelectedPalette(item.entry));
+	if (item.image.hasPalette() && pal_chooser_current->globalSelected())
+		gfx_current->setPalette(item.image.getPalette());
+	else
+		gfx_current->setPalette(pal_chooser_current->getSelectedPalette(item.entry));
 	gfx_target->setPalette(pal_chooser_target->getSelectedPalette(item.entry));
 
 	// Load the image to both gfx canvases
@@ -352,7 +355,7 @@ void GfxConvDialog::updatePreviewGfx() {
 	getConvertOptions(opt);
 
 	// Do conversion
-	wxLogMessage("Converting to %s", CHR(current_format.format->getName()));
+	//wxLogMessage("Converting to %s", CHR(current_format.format->getName()));
 	current_format.format->convertWritable(*(gfx_target->getImage()), opt);
 
 

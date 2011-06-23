@@ -320,8 +320,8 @@ public:
 		if (image.getWidth() == 256 && image.getHeight() == 34)
 			return true;
 
-		// Check for fullscreen size
-		if (image.getWidth() == 320 && image.getHeight() == 200)
+		// Check for fullscreen/autopage size
+		if (image.getWidth() == 320)
 			return true;
 
 		// And finally, find a suitable flat size and crop to that size

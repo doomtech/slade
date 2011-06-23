@@ -92,6 +92,7 @@ public:
 	int				getIndex() { return imgindex; }
 	int				getSize() { return numimages; }
 	bool			hasPalette() { return has_palette; }
+	Palette8bit*	getPalette() { return &palette; }
 	point2_t		offset() { return point2_t(offset_x, offset_y); }
 	unsigned		getStride();
 	uint8_t			getBpp();
