@@ -408,6 +408,25 @@ bool TextureEditorPanel::openTexture(CTexture* tex, TextureXList* list) {
 	return true;
 }
 
+/* TextureEditorPanel::clearTexture
+ * Clears the current texture
+ *******************************************************************/
+void TextureEditorPanel::clearTexture() {
+	// Clear texture
+	if (tex_current)
+		delete tex_current;
+	tex_canvas->clearTexture();
+
+	// Update variables
+	tex_current = NULL;
+	tex_modified = false;
+
+	// Set control values
+	updateTextureControls();
+	populatePatchList();
+	updatePatchControls();
+}
+
 /* TextureEditorPanel::setPalette
  * Sets the texture canvas' palette and refreshes it
  *******************************************************************/
