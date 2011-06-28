@@ -117,7 +117,7 @@ public:
 	bool	copyImage(SImage* image);
 
 	// Image format reading
-	bool	open(MemChunk& data, int index = 0);
+	bool	open(MemChunk& data, int index = 0, string type_hint = "");
 	bool	loadFont0(const uint8_t* gfx_data, int size);
 	bool	loadFont1(const uint8_t* gfx_data, int size);
 	bool	loadFont2(const uint8_t* gfx_data, int size);

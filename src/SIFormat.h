@@ -62,6 +62,8 @@ public:
 		if (!isThisFormat(data))
 			return false;
 
+		//wxLogMessage("Reading image of format %s", CHR(name));
+
 		// Attempt to read image data
 		bool ok = readImage(image, data, index);
 
@@ -77,7 +79,7 @@ public:
 		image.announce("image_changed");
 
 		// Testing
-		wxLogMessage("Loaded image format %s successfully", CHR(name));
+		//wxLogMessage("Loaded image format %s successfully", CHR(name));
 
 		return ok;
 	}

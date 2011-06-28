@@ -145,6 +145,9 @@ void EntryType::copyToType(EntryType* target) {
 	target->match_size = match_size;
 	target->match_extension = match_extension;
 	target->match_archive = match_archive;
+
+	// Copy extra properties
+	extra.copyTo(target->extra);
 }
 
 /* EntryType::getFileFilterString
@@ -388,7 +391,7 @@ bool EntryType::readEntryTypeDefinition(MemChunk& mc) {
 			else if (S_CMPNOCASE(fieldnode->getName(), "reliability")) {	// Reliability field
 				ntype->reliability = fieldnode->getIntValue();
 			}
-			else if (S_CMPNOCASE(fieldnode->getName(), "match_archive")) {		// Archive field
+			else if (S_CMPNOCASE(fieldnode->getName(), "match_archive")) {	// Archive field
 				for (unsigned v = 0; v < fieldnode->nValues(); v++)
 					ntype->match_archive.push_back(fieldnode->getStringValue(v).Lower());
 			}
@@ -409,6 +412,8 @@ bool EntryType::readEntryTypeDefinition(MemChunk& mc) {
 				}
 				if (!exists) entry_categories.push_back(ntype->category);
 			}
+			else if (S_CMPNOCASE(fieldnode->getName(), "image_format"))		// Image format hint
+				ntype->extra["image_format"] = fieldnode->getStringValue(0);
 			else {
 				// Unhandled properties can go into 'extra', only their first value is kept
 				ntype->extra[fieldnode->getName()] = fieldnode->getStringValue();

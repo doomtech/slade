@@ -428,6 +428,14 @@ void SIFormat::initFormats() {
 }
 
 SIFormat* SIFormat::getFormat(string id) {
+	// Check for special types
+	if (id == "raw")
+		return sif_raw;
+	else if (id == "raw_flat")
+		return sif_flat;
+	else if (id == "image")
+		return sif_general;
+
 	// Search for format matching id
 	for (unsigned a = 0; a < simage_formats.size(); a++) {
 		if (simage_formats[a]->id == id)

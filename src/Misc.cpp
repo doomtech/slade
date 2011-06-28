@@ -68,8 +68,13 @@ bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry, int index) {
 		return false;
 	}
 
+	// Get image format hint from type, if any
+	string format_hint = "";
+	if (entry->getType()->extraProps().propertyExists("image_format"))
+		format_hint = (string)(entry->getType()->extraProps()["image_format"]);
+
 	// Firstly try SIFormat system
-	if (image->open(entry->getMCData(), index))
+	if (image->open(entry->getMCData(), index, format_hint))
 		return true;
 
 	// Raw images are a special case (not reliably possible to detect just from data)

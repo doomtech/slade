@@ -578,7 +578,15 @@ bool SImage::copyImage(SImage* image) {
  * Detects the format of [data] and, if it's a valid image format,
  * loads it into this image
  *******************************************************************/
-bool SImage::open(MemChunk& data, int index) {
+bool SImage::open(MemChunk& data, int index, string type_hint) {
+	// Check with type hint format first
+	if (!type_hint.IsEmpty()) {
+		SIFormat* format = SIFormat::getFormat(type_hint);
+		if (format != SIFormat::unknownFormat() && format->isThisFormat(data))
+			return format->loadImage(*this, data, index);
+	}
+
+	// No type hint given or didn't match, autodetect format with SIFormat system instead
 	return SIFormat::determineFormat(data)->loadImage(*this, data, index);
 }
 
