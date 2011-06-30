@@ -142,7 +142,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/NODEFAULTLIB:LIBCMT"
-				AdditionalDependencies="audiere.lib FreeImage.lib wxbase29u.lib wxmsw29u_core.lib wxmsw29u_aui.lib wxmsw29u_gl.lib wxmsw29u_html.lib wxmsw29u_adv.lib wxmsw29u_stc.lib wxmsw29u_media.lib wxtiff.lib wxjpeg.lib wxpng.lib wxzlib.lib wxregexu.lib wxexpat.lib wxscintilla.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib user32.lib shell32.lib advapi32.lib comdlg32.lib gdi32.lib ole32.lib oleaut32.lib"
+				AdditionalDependencies="fluidsynth.lib sfml-system.lib sfml-audio-s.lib sfml-main.lib FreeImage.lib wxbase29u.lib wxmsw29u_core.lib wxmsw29u_aui.lib wxmsw29u_gl.lib wxmsw29u_html.lib wxmsw29u_adv.lib wxmsw29u_stc.lib wxmsw29u_media.lib wxtiff.lib wxjpeg.lib wxpng.lib wxzlib.lib wxregexu.lib wxexpat.lib wxscintilla.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib user32.lib shell32.lib advapi32.lib comdlg32.lib gdi32.lib ole32.lib oleaut32.lib"
 				LinkIncremental="1"
 				GenerateManifest="true"
 				GenerateDebugInformation="true"
@@ -241,6 +241,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\AudioPrefsPanel.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\AudioPrefsPanel.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\BaseResourceArchivesPanel.cpp"
 					>
 				</File>
@@ -323,6 +331,14 @@
 			</File>
 			<File
 				RelativePath=".\src\Clipboard.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\Drawing.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\Drawing.h"
 				>
 			</File>
 			<File
@@ -434,6 +450,14 @@
 				</File>
 				<File
 					RelativePath=".\src\Parser.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\SFileDialog.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\SFileDialog.h"
 					>
 				</File>
 				<File
@@ -1255,6 +1279,14 @@
 			</File>
 			<File
 				RelativePath=".\src\CTextureCanvas.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\DockPanel.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\DockPanel.h"
 				>
 			</File>
 			<File
