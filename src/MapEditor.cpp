@@ -469,6 +469,130 @@ bool MapEditor::selectWithin(double xmin, double ymin, double xmax, double ymax)
 	return new_sel;
 }
 
+MapVertex* MapEditor::getHilightedVertex() {
+	// Check edit mode is correct
+	if (edit_mode != MODE_VERTICES)
+		return NULL;
+
+	// Having one item selected counts as a hilight
+	if (hilight_item == -1 && selection.size() == 1)
+		return map.getVertex(selection[0]);
+
+	return map.getVertex(hilight_item);
+}
+
+MapLine* MapEditor::getHilightedLine() {
+	// Check edit mode is correct
+	if (edit_mode != MODE_LINES)
+		return NULL;
+
+	// Having one item selected counts as a hilight
+	if (hilight_item == -1 && selection.size() == 1)
+		return map.getLine(selection[0]);
+
+	return map.getLine(hilight_item);
+}
+
+MapSector* MapEditor::getHilightedSector() {
+	// Check edit mode is correct
+	if (edit_mode != MODE_SECTORS)
+		return NULL;
+
+	// Having one item selected counts as a hilight
+	if (hilight_item == -1 && selection.size() == 1)
+		return map.getSector(selection[0]);
+
+	return map.getSector(hilight_item);
+}
+
+MapThing* MapEditor::getHilightedThing() {
+	// Check edit mode is correct
+	if (edit_mode != MODE_THINGS)
+		return NULL;
+
+	// Having one item selected counts as a hilight
+	if (hilight_item == -1 && selection.size() == 1)
+		return map.getThing(selection[0]);
+
+	return map.getThing(hilight_item);
+}
+
+void MapEditor::getSelectedVertices(vector<MapVertex*>& list) {
+	if (edit_mode != MODE_VERTICES)
+		return;
+
+	// Multiple selection
+	if (selection.size() > 1) {
+		for (unsigned a = 0; a < selection.size(); a++)
+			list.push_back(map.getVertex(selection[a]));
+	}
+
+	// Single selection
+	else if (selection.size() == 1)
+		list.push_back(map.getVertex(selection[0]));
+
+	// No selection (use hilight)
+	else if (hilight_item >= 0)
+		list.push_back(map.getVertex(hilight_item));
+}
+
+void MapEditor::getSelectedLines(vector<MapLine*>& list) {
+	if (edit_mode != MODE_LINES)
+		return;
+
+	// Multiple selection
+	if (selection.size() > 1) {
+		for (unsigned a = 0; a < selection.size(); a++)
+			list.push_back(map.getLine(selection[a]));
+	}
+
+	// Single selection
+	else if (selection.size() == 1)
+		list.push_back(map.getLine(selection[0]));
+
+	// No selection (use hilight)
+	else if (hilight_item >= 0)
+		list.push_back(map.getLine(hilight_item));
+}
+
+void MapEditor::getSelectedSectors(vector<MapSector*>& list) {
+	if (edit_mode != MODE_SECTORS)
+		return;
+
+	// Multiple selection
+	if (selection.size() > 1) {
+		for (unsigned a = 0; a < selection.size(); a++)
+			list.push_back(map.getSector(selection[a]));
+	}
+
+	// Single selection
+	else if (selection.size() == 1)
+		list.push_back(map.getSector(selection[0]));
+
+	// No selection (use hilight)
+	else if (hilight_item >= 0)
+		list.push_back(map.getSector(hilight_item));
+}
+
+void MapEditor::getSelectedThings(vector<MapThing*>& list) {
+	if (edit_mode != MODE_THINGS)
+		return;
+
+	// Multiple selection
+	if (selection.size() > 1) {
+		for (unsigned a = 0; a < selection.size(); a++)
+			list.push_back(map.getThing(selection[a]));
+	}
+
+	// Single selection
+	else if (selection.size() == 1)
+		list.push_back(map.getThing(selection[0]));
+
+	// No selection (use hilight)
+	else if (hilight_item >= 0)
+		list.push_back(map.getThing(hilight_item));
+}
+
 void MapEditor::incrementGrid() {
 	gridsize++;
 	if (gridsize > 18)

@@ -6,12 +6,14 @@
 
 class MapEditor;
 class MCAnimation;
+class MapSide;
 class MapCanvas : public OGLCanvas {
 private:
 	MapEditor*				editor;
 	wxTimer					timer;
 	wxStopWatch				stopwatch;
 	vector<MCAnimation*>	animations;
+	sf::Font				font_small;
 
 	// Rendering
 	bool	redraw;
@@ -45,6 +47,10 @@ public:
 	// Drawing
 	void	drawGrid();
 	void	draw();
+	void	drawVertexOverlay();
+	void	drawLineOverlay();
+	void	drawSideOverlay(MapSide* side, string side_name = "Front", int xstart = 0);
+	void	drawSideTexOverlay(int x, int y, string texture, string pos = "Upper");
 
 	// Events
 	void	onKeyDown(wxKeyEvent& e);

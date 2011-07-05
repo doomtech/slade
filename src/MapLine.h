@@ -83,6 +83,8 @@ public:
 
 	PropertyList&	props()				{ return udmf_props; }
 	Property&		prop(string key)	{ return udmf_props[key]; }
+
+	double	getLength();
 };
 
 #endif //__MAPLINE_H__

@@ -35,9 +35,11 @@ public:
 	MapEditor();
 	~MapEditor();
 
+	uint8_t		editMode() { return edit_mode; }
 	double		gridSize();
 	fpoint2_t	mousePos() { return mouse_pos; }
 	fpoint2_t	mouseDownPos() { return mouse_downpos; }
+	unsigned	selectionSize() { return selection.size(); }
 
 	void	setEditMode(int mode);
 	void	setMousePos(double x, double y) { mouse_pos.set(x, y); }
@@ -55,9 +57,17 @@ public:
 	void	drawSelection(double xmin, double ymin, double xmax, double ymax);
 
 	// Selection/hilight
-	bool	updateHilight();
-	bool	selectCurrent(bool clear_none = true);
-	bool	selectWithin(double xmin, double ymin, double xmax, double ymax);
+	bool		updateHilight();
+	bool		selectCurrent(bool clear_none = true);
+	bool		selectWithin(double xmin, double ymin, double xmax, double ymax);
+	MapVertex*	getHilightedVertex();
+	MapLine*	getHilightedLine();
+	MapSector*	getHilightedSector();
+	MapThing*	getHilightedThing();
+	void		getSelectedVertices(vector<MapVertex*>& list);
+	void		getSelectedLines(vector<MapLine*>& list);
+	void		getSelectedSectors(vector<MapSector*>& list);
+	void		getSelectedThings(vector<MapThing*>& list);
 
 	// Grid
 	void	incrementGrid();

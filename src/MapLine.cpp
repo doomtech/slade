@@ -4,6 +4,7 @@
 #include "MapLine.h"
 #include "MapVertex.h"
 #include "MapSide.h"
+#include "MathStuff.h"
 
 MapLine::MapLine(MapVertex* v1, MapVertex* v2, MapSide* s1, MapSide* s2) {
 	// Init variables
@@ -19,4 +20,11 @@ MapLine::MapLine(MapVertex* v1, MapVertex* v2, MapSide* s1, MapSide* s2) {
 	// Connect to sides
 	if (s1) s1->parent = this;
 	if (s2) s2->parent = this;
+}
+
+double MapLine::getLength() {
+	if (!vertex1 || !vertex2)
+		return -1;
+
+	return MathStuff::distance(vertex1->xPos(), vertex1->yPos(), vertex2->xPos(), vertex2->yPos());
 }

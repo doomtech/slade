@@ -47,6 +47,7 @@ public:
 	bool	isOk() { return !!sector; }
 
 	unsigned	getIndex() { return index; }
+	MapSector*	getSector() { return sector; }
 
 	PropertyList&	props()				{ return udmf_props; }
 	Property&		prop(string key)	{ return udmf_props[key]; }

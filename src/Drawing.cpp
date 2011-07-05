@@ -79,6 +79,30 @@ void Drawing::drawRect(double x1, double y1, double x2, double y2) {
 	glEnd();
 }
 
+/* Drawing::drawFilledRect
+ * Draws a filled rectangle from [tl] to [br]
+ *******************************************************************/
+void Drawing::drawFilledRect(fpoint2_t tl, fpoint2_t br) {
+	glBegin(GL_QUADS);
+	glVertex2d(tl.x, tl.y);
+	glVertex2d(tl.x, br.y);
+	glVertex2d(br.x, br.y);
+	glVertex2d(br.x, tl.y);
+	glEnd();
+}
+
+/* Drawing::drawFilledRect
+ * Draws a filled rectangle from [x1,y1] to [x2,y2]
+ *******************************************************************/
+void Drawing::drawFilledRect(double x1, double y1, double x2, double y2) {
+	glBegin(GL_QUADS);
+	glVertex2d(x1, y1);
+	glVertex2d(x1, y2);
+	glVertex2d(x2, y2);
+	glVertex2d(x2, y1);
+	glEnd();
+}
+
 /* Drawing::drawHud
  * Draws doom hud offset guide lines, from the center
  *******************************************************************/

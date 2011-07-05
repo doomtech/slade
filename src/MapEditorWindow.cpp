@@ -47,7 +47,7 @@ MapEditorWindow* MapEditorWindow::instance = NULL;
  * MapEditorWindow class constructor
  *******************************************************************/
 MapEditorWindow::MapEditorWindow()
-: wxFrame((wxFrame *) NULL, -1, "SLADE", wxPoint(0, 0), wxSize(800, 600)) {
+: wxFrame((wxFrame *) NULL, -1, "SLADE", wxPoint(0, 0), wxSize(1024, 768)) {
 	setupLayout();
 	Show();
 	Maximize();
@@ -76,9 +76,9 @@ void MapEditorWindow::setupLayout() {
 	m_mgr->AddPane(map_canvas, p_inf);
 	
 	// Properties panel
-	wxPanel* panel_temp = new wxPanel(this, -1);
-	p_inf.DefaultPane().Dockable().Name("properties").Bottom().Caption("Properties").BestSize(320, 200).FloatingSize(500, 500);
-	m_mgr->AddPane(panel_temp, p_inf);
+	//wxPanel* panel_temp = new wxPanel(this, -1);
+	//p_inf.DefaultPane().Dockable().Name("properties").Bottom().Caption("Properties").BestSize(320, 200).FloatingSize(500, 500);
+	//m_mgr->AddPane(panel_temp, p_inf);
 
 	// Status bar
 	CreateStatusBar();
@@ -92,9 +92,9 @@ bool MapEditorWindow::openMap(Archive::mapdesc_t map) {
 }
 
 void MapEditorWindow::setPropsPaneCaption(string caption) {
-	wxAuiManager* m_mgr = wxAuiManager::GetManager(this);
-	m_mgr->GetPane("properties").Caption(caption);
-	m_mgr->Update();
+	//wxAuiManager* m_mgr = wxAuiManager::GetManager(this);
+	//m_mgr->GetPane("properties").Caption(caption);
+	//m_mgr->Update();
 }
 
 void MapEditorWindow::onClose(wxCloseEvent& e) {

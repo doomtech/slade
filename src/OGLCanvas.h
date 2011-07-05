@@ -10,7 +10,7 @@
 #include <SFML/Graphics.hpp>
 
 class wxPanel;
-class OGLCanvas : public wxControl, sf::RenderWindow {
+class OGLCanvas : public wxControl, public sf::RenderWindow {
 protected:
 	bool		init_done;
 	Palette8bit	palette;

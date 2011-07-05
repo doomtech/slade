@@ -34,6 +34,9 @@
 #include "MapEditor.h"
 #include "ColourConfiguration.h"
 #include "MCAnimations.h"
+#include "ArchiveManager.h"
+#include "Drawing.h"
+#include "MathStuff.h"
 
 
 /*******************************************************************
@@ -58,6 +61,13 @@ MapCanvas::MapCanvas(wxWindow *parent, int id, MapEditor* editor)
 	timer.Start(10);
 	anim_flash_level = 0.5f;
 	anim_flash_inc = true;
+
+	// Load small font
+	ArchiveEntry* entry = theArchiveManager->programResourceArchive()->entryAtPath("fonts/dejavu_sans.ttf");
+	if (entry)
+		font_small.LoadFromMemory((const char*)entry->getData(), entry->getSize(), 12);
+
+	PreserveOpenGLStates(true);
 
 	// Bind Events
 	Bind(wxEVT_KEY_DOWN, &MapCanvas::onKeyDown, this);
@@ -224,6 +234,7 @@ void MapCanvas::draw() {
 
 	// Setup the viewport
 	glViewport(0, 0, GetSize().x, GetSize().y);
+	SetView(sf::View(sf::FloatRect(0.0f, 0.0f, GetSize().x, GetSize().y)));
 
 	// Setup the screen projection
 	glMatrixMode(GL_PROJECTION);
@@ -299,8 +310,181 @@ void MapCanvas::draw() {
 	for (unsigned a = 0; a < animations.size(); a++)
 		animations[a]->draw();
 
+	// Draw overlay
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0.0f, GetSize().x, GetSize().y, 0.0f, -1.0f, 1.0f);
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+	if (editor->editMode() == MapEditor::MODE_VERTICES)
+		drawVertexOverlay();
+	else if (editor->editMode() == MapEditor::MODE_LINES)
+		drawLineOverlay();
+
 	SwapBuffers();
 	redraw = false;
+}
+
+void MapCanvas::drawVertexOverlay() {
+	// Setup text string
+	sf::String str_vinfo;
+	str_vinfo.SetFont(font_small);
+	str_vinfo.SetSize(12);
+	str_vinfo.SetPosition(2, GetSize().y - 16);
+
+	// Get hilighted vertex
+	MapVertex* vert = editor->getHilightedVertex();
+	if (vert)
+		str_vinfo.SetText(CHR(S_FMT("Vertex #%d: (%d, %d)", vert->getIndex(), (int)vert->xPos(), (int)vert->yPos())));
+	else if (editor->selectionSize() > 0)
+		str_vinfo.SetText(CHR(S_FMT("%d Vertices selected", editor->selectionSize())));
+	else
+		str_vinfo.SetText("No Vertices selected");
+
+	// Draw overlay background
+	rgba_t(0, 0, 0, 190, 0).set_gl();
+	Drawing::drawFilledRect(0, GetSize().y - 16, GetSize().x, GetSize().y);
+	glLineWidth(2.0f);
+	rgba_t(255, 255, 255, 70, 0).set_gl();
+	Drawing::drawLine(0, GetSize().y-16, GetSize().x, GetSize().y-16);
+
+	// Draw text
+	Draw(str_vinfo);
+}
+
+void MapCanvas::drawLineOverlay() {
+	int bottom = GetSize().y;
+
+	// General line info
+	sf::String str_linfo("", font_small, 12);
+	str_linfo.SetPosition(2, bottom - 64);
+
+	// Draw overlay background
+	rgba_t(0, 0, 0, 190, 0).set_gl();
+	Drawing::drawFilledRect(0, bottom - 64, GetSize().x, bottom);
+	rgba_t(255, 255, 255, 70, 0).set_gl();
+	glLineWidth(2.0f);
+	Drawing::drawLine(0, bottom-64, GetSize().x, bottom-64);
+
+	// Get hilighted line
+	MapLine* line = editor->getHilightedLine();
+	if (!line) {
+		// No line is hilighted, just display simple info (# selected, if any)
+		if (editor->selectionSize() > 0)
+			str_linfo.SetText(CHR(S_FMT("%d Lines selected", editor->selectionSize())));
+		else
+			str_linfo.SetText("No Lines selected");
+
+		Draw(str_linfo);
+		return;
+	}
+
+	// Line index
+	str_linfo.SetText(CHR(S_FMT("Line #%d", line->getIndex())));
+	Draw(str_linfo);
+
+	// Line length
+	int len = MathStuff::round(line->getLength());
+	str_linfo.SetText(CHR(S_FMT("Length: %d", len)));
+	str_linfo.SetPosition(2, bottom - 48);
+	Draw(str_linfo);
+
+	// Line special
+	int special = line->prop("special");
+	str_linfo.SetText(CHR(S_FMT("Special: %d", special)));
+	str_linfo.SetPosition(2, bottom - 32);
+	Draw(str_linfo);
+
+	// Line sector tag
+	int tag = line->prop("arg0");
+	str_linfo.SetText(CHR(S_FMT("Sector Tag: %d", tag)));
+	str_linfo.SetPosition(2, bottom - 16);
+	Draw(str_linfo);
+
+	
+	// Side info
+	int x = GetSize().x - 256;
+	if (line->s1()) {
+		drawSideOverlay(line->s1(), "Front", x);
+		x -= 256;
+	}
+	if (line->s2())
+		drawSideOverlay(line->s2(), "Back", x);
+}
+
+void MapCanvas::drawSideOverlay(MapSide* side, string side_name, int xstart) {
+	int bottom = GetSize().y;
+
+	if (!side)
+		return;
+
+	// Side info
+	sf::String str_sinfo("", font_small, 12);
+	str_sinfo.SetColor(sf::Color(255, 255, 255, 255));
+	str_sinfo.SetPosition(xstart + 2, bottom - 32);
+
+	// Index and sector index
+	int sec = -1;
+	if (side->getSector())
+		sec = side->getSector()->getIndex();
+	int index = side->getIndex();
+	str_sinfo.SetText(CHR(S_FMT("%s Side #%d (Sector %d)", CHR(side_name), index, sec)));
+	Draw(str_sinfo);
+
+	// Texture offsets
+	int xoff = side->prop("offsetx");
+	int yoff = side->prop("offsety");
+	str_sinfo.SetText(CHR(S_FMT("Offsets: (%d, %d)", xoff, yoff)));
+	str_sinfo.SetPosition(xstart + 2, bottom - 16);
+	Draw(str_sinfo);
+
+	// Textures
+	drawSideTexOverlay(xstart + 4, bottom - 36, side->prop("texturetop"));
+	drawSideTexOverlay(xstart + 88, bottom - 36, side->prop("texturemiddle"), "Middle");
+	drawSideTexOverlay(xstart + 92 + 80, bottom - 36, side->prop("texturebottom"), "Lower");
+}
+
+void MapCanvas::drawSideTexOverlay(int x, int y, string texture, string pos) {
+	// Init string object
+	sf::String str(CHR(pos), font_small, 12);
+	float diff = 40 - (str.GetRect().GetWidth() * 0.5);
+
+	// Check texture isn't blank
+	if (!(S_CMPNOCASE(texture, "-"))) {
+		// Draw background
+		rgba_t(0, 0, 0, 190, 0).set_gl();
+		Drawing::drawFilledRect(x, y, x + 80, y - 80);
+
+		// Draw texture
+		rgba_t(150, 150, 150, 255, 0).set_gl();
+		Drawing::drawFilledRect(x, y, x + 80, y - 80);
+
+		// Draw position text
+		str.SetPosition(x + diff, y - 80);
+		rgba_t(0, 0, 0, 140, 0).set_gl();
+		Drawing::drawFilledRect(x, y - 80, x + 80, y - 64);
+		Draw(str);
+
+		// Draw border
+		rgba_t(0, 0, 0, 255, 0).set_gl();
+		glEnable(GL_LINE_SMOOTH);
+		glLineWidth(1.5f);
+		Drawing::drawRect(x, y, x+80, y-80);
+		glDisable(GL_LINE_SMOOTH);
+		glLineWidth(1.0f);
+
+		// Draw texture name background
+		rgba_t(0, 0, 0, 140, 0).set_gl();
+		Drawing::drawFilledRect(x, y - 16, x + 80, y);
+	}
+
+	// Draw texture name (even if texture is blank)
+	str.SetText(CHR(texture));
+	diff = 40 - (str.GetRect().GetWidth() * 0.5);
+	str.SetPosition(x + diff, y - 16);
+	Draw(str);
 }
 
 
