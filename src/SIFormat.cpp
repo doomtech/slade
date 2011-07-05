@@ -191,6 +191,14 @@ protected:
 				return true;
 		}
 
+		// COLORMAP size special case
+		if (width == 256 && height == 34)
+			return true;
+
+		// Fullscreen gfx special case
+		if (width == 320 && height == 200)
+			return true;
+
 		return false;
 	}
 
@@ -307,9 +315,19 @@ public:
 		// Secondly, remove any alpha information
 		image.fillAlpha(255);
 
+		// Quick hack for COLORMAP size
+		// TODO: Remove me when a proper COLORMAP editor is implemented
+		if (image.getWidth() == 256 && image.getHeight() == 34)
+			return true;
+
+		// Check for fullscreen/autopage size
+		if (image.getWidth() == 320)
+			return true;
+
 		// And finally, find a suitable flat size and crop to that size
 		int width = 0;
 		int height = 0;
+
 		for (unsigned a = 1; a < n_valid_flat_sizes; a++) {
 			// Ignore non-writable flat sizes
 			if (valid_flat_size[a][2] == 0)
@@ -410,6 +428,14 @@ void SIFormat::initFormats() {
 }
 
 SIFormat* SIFormat::getFormat(string id) {
+	// Check for special types
+	if (id == "raw")
+		return sif_raw;
+	else if (id == "raw_flat")
+		return sif_flat;
+	else if (id == "image")
+		return sif_general;
+
 	// Search for format matching id
 	for (unsigned a = 0; a < simage_formats.size(); a++) {
 		if (simage_formats[a]->id == id)

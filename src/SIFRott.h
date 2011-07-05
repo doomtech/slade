@@ -102,7 +102,7 @@ public:
 	~SIFRottGfx() {}
 
 	virtual bool isThisFormat(MemChunk& mc) {
-		if (EntryDataFormat::getFormat("img_rott")->isThisFormat(mc))
+		if (EntryDataFormat::getFormat("img_rott")->isThisFormat(mc) >= EDF_PROBABLY)
 			return true;
 		else
 			return false;
@@ -213,7 +213,7 @@ public:
 	~SIFRottLbm() {}
 
 	bool isThisFormat(MemChunk& mc) {
-		if (EntryDataFormat::getFormat("img_rottlbm")->isThisFormat(mc))
+		if (EntryDataFormat::getFormat("img_rottlbm")->isThisFormat(mc) >= EDF_PROBABLY)
 			return true;
 		else
 			return false;
@@ -262,7 +262,7 @@ public:
 	~SIFRottRaw() {}
 
 	bool isThisFormat(MemChunk& mc) {
-		if (EntryDataFormat::getFormat("img_rottraw")->isThisFormat(mc))
+		if (EntryDataFormat::getFormat("img_rottraw")->isThisFormat(mc) >= EDF_PROBABLY)
 			return true;
 		else
 			return false;
@@ -333,7 +333,7 @@ public:
 	~SIFRottPic() {}
 
 	bool isThisFormat(MemChunk& mc) {
-		if (EntryDataFormat::getFormat("img_rottpic")->isThisFormat(mc))
+		if (EntryDataFormat::getFormat("img_rottpic")->isThisFormat(mc) >= EDF_PROBABLY)
 			return true;
 		else
 			return false;

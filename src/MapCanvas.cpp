@@ -33,6 +33,7 @@
 #include "MapCanvas.h"
 #include "MapEditor.h"
 #include "ColourConfiguration.h"
+#include "MCAnimations.h"
 
 
 /*******************************************************************
@@ -50,13 +51,13 @@ MapCanvas::MapCanvas(wxWindow *parent, int id, MapEditor* editor)
 : OGLCanvas(parent, id), timer(this) {
 	// Init variables
 	this->editor = editor;
+	redraw = true;
 	view_xoff = 0;
 	view_yoff = 0;
 	view_scale = 1;
-	timer.Start(20);
+	timer.Start(10);
 	anim_flash_level = 0.5f;
 	anim_flash_inc = true;
-	anim_selbox_fade = 0.0f;
 
 	// Bind Events
 	Bind(wxEVT_KEY_DOWN, &MapCanvas::onKeyDown, this);
@@ -149,8 +150,8 @@ void MapCanvas::zoom(double amount, bool toward_cursor) {
 }
 
 void MapCanvas::drawGrid() {
-	// Temp
-	int gridsize = 32;
+	// Get grid size
+	int gridsize = editor->gridSize();
 
 	// Disable line smoothing (not needed for straight, 1.0-sized lines)
 	glDisable(GL_LINE_SMOOTH);
@@ -182,6 +183,29 @@ void MapCanvas::drawGrid() {
 		// Horizontal
 		ofs = start_y % gridsize;
 		for (int y = start_y-ofs; y <= end_y; y += gridsize) {
+			glBegin(GL_LINES);
+			glVertex2d(start_x, y);
+			glVertex2d(end_x, y);
+			glEnd();
+		}
+	}
+
+	// Draw 64 grid if it's not too small and we're not on a larger grid size
+	if (64 > grid_hidelevel && gridsize < 64) {
+		ColourConfiguration::getColour("map_64grid").set_gl();
+
+		// Vertical
+		int ofs = start_x % 64;
+		for (int x = start_x-ofs; x <= end_x; x += 64) {
+			glBegin(GL_LINES);
+			glVertex2d(x, start_y);
+			glVertex2d(x, end_y);
+			glEnd();
+		}
+
+		// Horizontal
+		ofs = start_y % 64;
+		for (int y = start_y-ofs; y <= end_y; y += 64) {
 			glBegin(GL_LINES);
 			glVertex2d(start_x, y);
 			glVertex2d(end_x, y);
@@ -247,14 +271,12 @@ void MapCanvas::draw() {
 	if (!sel_active) editor->drawHilight(anim_flash_level);
 
 	// Draw selection box if active
-	if (anim_selbox_fade > 0.0f) {
+	if (sel_active) {
 		// Get selection box map coordinates
 		rgba_t col;
 
 		// Outline
-		col.set(ColourConfiguration::getColour("map_selbox_outline"));
-		col.a *= anim_selbox_fade;
-		col.set_gl();
+		ColourConfiguration::getColour("map_selbox_outline").set_gl();
 		glLineWidth(2.0f);
 		glBegin(GL_LINE_LOOP);
 		glVertex2d(sel_origin.x, sel_origin.y);
@@ -264,9 +286,7 @@ void MapCanvas::draw() {
 		glEnd();
 
 		// Fill
-		col.set(ColourConfiguration::getColour("map_selbox_fill"));
-		col.a *= anim_selbox_fade;
-		col.set_gl();
+		ColourConfiguration::getColour("map_selbox_fill").set_gl();
 		glBegin(GL_QUADS);
 		glVertex2d(sel_origin.x, sel_origin.y);
 		glVertex2d(sel_origin.x, sel_end.y);
@@ -275,14 +295,17 @@ void MapCanvas::draw() {
 		glEnd();
 	}
 
+	// Draw animations
+	for (unsigned a = 0; a < animations.size(); a++)
+		animations[a]->draw();
+
 	SwapBuffers();
+	redraw = false;
 }
 
 
 
 void MapCanvas::onKeyDown(wxKeyEvent& e) {
-	bool refresh = false;
-
 	// Pan left
 	if (e.GetKeyCode() == WXK_LEFT)
 		pan(-128, 0);
@@ -307,32 +330,41 @@ void MapCanvas::onKeyDown(wxKeyEvent& e) {
 	if (e.GetKeyCode() == '=')
 		zoom(1.2);
 
+	// Increment grid
+	if (e.GetKeyCode() == ']') {
+		editor->incrementGrid();
+		redraw = true;
+	}
+
+	// Decrement grid
+	if (e.GetKeyCode() == '[') {
+		editor->decrementGrid();
+		redraw = true;
+	}
+
 	// Vertices mode
 	if (e.GetKeyCode() == 'V') {
 		editor->setEditMode(MapEditor::MODE_VERTICES);
-		refresh = true;
+		redraw = true;
 	}
 
 	// Lines mode
 	if (e.GetKeyCode() == 'L') {
 		editor->setEditMode(MapEditor::MODE_LINES);
-		refresh = true;
+		redraw = true;
 	}
 
 	// Sectors mode
 	if (e.GetKeyCode() == 'S') {
 		editor->setEditMode(MapEditor::MODE_SECTORS);
-		refresh = true;
+		redraw = true;
 	}
 
 	// Things mode
 	if (e.GetKeyCode() == 'T') {
 		editor->setEditMode(MapEditor::MODE_THINGS);
-		refresh = true;
+		redraw = true;
 	}
-
-	if (refresh)
-		Refresh();
 
 	e.Skip();
 }
@@ -349,7 +381,6 @@ void MapCanvas::onMouseDown(wxMouseEvent& e) {
 			sel_origin.set(x, y);
 			sel_end.set(x, y);
 			sel_active = true;
-			anim_selbox_fade = 1.0f;
 		}
 		else {
 			// No shift, select any current hilight
@@ -367,6 +398,7 @@ void MapCanvas::onMouseUp(wxMouseEvent& e) {
 			sel_active = false;
 			editor->selectWithin(min(sel_origin.x, sel_end.x), min(sel_origin.y, sel_end.y),
 								max(sel_origin.x, sel_end.x), max(sel_origin.y, sel_end.y));
+			animations.push_back(new MCASelboxFader(stopwatch.Time(), sel_origin, sel_end));
 		}
 		
 		editor->updateHilight();
@@ -387,15 +419,14 @@ void MapCanvas::onMouseMotion(wxMouseEvent& e) {
 	// If dragging left mouse
 	if (e.Dragging() && e.LeftIsDown()) {
 		sel_end.set(x, y);
-		//sel_active = true;
-		Refresh();
+		redraw = true;
 	}
 	else {
 		sel_active = false;
 
 		// Update editor mouse hilight
 		if (editor->updateHilight())
-			Refresh();
+			redraw = true;
 	}
 
 	e.Skip();
@@ -409,26 +440,32 @@ void MapCanvas::onMouseWheel(wxMouseEvent& e) {
 }
 
 void MapCanvas::onTimer(wxTimerEvent& e) {
-	// Flashing animation for hilight/selection
-	// Pulsates between 0.5-1.0f (multiplied with hilight/selection alpha)
+	// Flashing animation for hilight
+	// Pulsates between 0.5-1.0f (multiplied with hilight alpha)
 	if (anim_flash_inc) {
-		anim_flash_level += 0.05f;
+		anim_flash_level += 0.03f;
 		if (anim_flash_level >= 1.0f) {
 			anim_flash_inc = false;
 			anim_flash_level = 1.0f;
 		}
 	}
 	else {
-		anim_flash_level -= 0.05f;
+		anim_flash_level -= 0.03f;
 		if (anim_flash_level <= 0.5f) {
 			anim_flash_inc = true;
 			anim_flash_level = 0.6f;
 		}
 	}
 
-	// Selection box fadeout
-	if (!sel_active && anim_selbox_fade > 0.0f)
-		anim_selbox_fade -= 0.2f;
+	// Update animations
+	for (unsigned a = 0; a < animations.size(); a++) {
+		if (!animations[a]->update(stopwatch.Time())) {
+			// If animation is finished, delete and remove from the list
+			delete animations[a];
+			animations.erase(animations.begin() + a);
+			a--;
+		}
+	}
 
 	Update();
 	Refresh();

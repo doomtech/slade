@@ -414,10 +414,6 @@ void TextureXPanel::newTexture() {
  * Creates a new texture from an existing patch
  *******************************************************************/
 void TextureXPanel::newTextureFromPatch() {
-	// Do nothing if patch list is empty
-	if (tx_editor->patchTable().nPatches() == 0)
-		return;
-
 	// Browse for patch
 	string patch;
 	if (texturex.getFormat() == TXF_TEXTURES)
@@ -562,6 +558,7 @@ void TextureXPanel::removeTexture() {
 	// Clear selection & refresh
 	list_textures->clearSelection();
 	list_textures->updateList();
+	texture_editor->clearTexture();
 
 	// Update variables
 	modified = true;

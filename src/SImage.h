@@ -92,6 +92,7 @@ public:
 	int				getIndex() { return imgindex; }
 	int				getSize() { return numimages; }
 	bool			hasPalette() { return has_palette; }
+	Palette8bit*	getPalette() { return &palette; }
 	point2_t		offset() { return point2_t(offset_x, offset_y); }
 	unsigned		getStride();
 	uint8_t			getBpp();
@@ -116,7 +117,7 @@ public:
 	bool	copyImage(SImage* image);
 
 	// Image format reading
-	bool	open(MemChunk& data, int index = 0);
+	bool	open(MemChunk& data, int index = 0, string type_hint = "");
 	bool	loadFont0(const uint8_t* gfx_data, int size);
 	bool	loadFont1(const uint8_t* gfx_data, int size);
 	bool	loadFont2(const uint8_t* gfx_data, int size);

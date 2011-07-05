@@ -675,6 +675,9 @@
     <ClCompile Include="src\ColourConfiguration.cpp">
       <Filter>General</Filter>
     </ClCompile>
+    <ClCompile Include="src\MCAnimations.cpp">
+      <Filter>Map Editor\UI Elements</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -1268,6 +1271,9 @@
     </ClInclude>
     <ClInclude Include="src\ColourConfiguration.h">
       <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MCAnimations.h">
+      <Filter>Map Editor\UI Elements</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

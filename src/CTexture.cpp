@@ -708,7 +708,11 @@ string CTexture::asText() {
 		return "";
 
 	// Init text string
-	string text = S_FMT("%s %s, %d, %d\n{\n", CHR(type), CHR(name), width, height);
+	string text;
+	if (optional)
+		text = S_FMT("%s Optional %s, %d, %d\n{\n", CHR(type), CHR(name), width, height);
+	else
+		text = S_FMT("%s %s, %d, %d\n{\n", CHR(type), CHR(name), width, height);
 
 	// Write texture properties
 	if (scale_x != 1.0)

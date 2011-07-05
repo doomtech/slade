@@ -451,9 +451,6 @@ public:
 
 		// Paletted
 		if (opt.col_format == PALMASK) {
-			// Convert colours
-			image.convertPaletted(opt.pal_target, opt.pal_current);
-
 			// Convert mask
 			if (opt.mask_source == MASK_ALPHA)
 				image.cutoffMask(opt.alpha_threshold);
@@ -461,6 +458,9 @@ public:
 				image.maskFromColour(opt.mask_colour, opt.pal_current);
 			else
 				image.fillAlpha(255);
+
+			// Convert colours
+			image.convertPaletted(opt.pal_target, opt.pal_current);
 		}
 
 		// RGBA

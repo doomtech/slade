@@ -23,6 +23,7 @@ private:
 								// Current recognised properties listed below:
 								// bool "image": Can be loaded into a SImage, therefore can be converted to other supported image formats
 								// bool "patch": Can be used as a TEXTUREx patch
+								// string "image_format": An SIFormat type id 'hint', mostly used for Misc::loadImageFromEntry
 
 	// Type matching criteria
 	EntryDataFormat*	format;				// To be of this type, the entry data must match the specified format*

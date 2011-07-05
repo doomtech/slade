@@ -38,6 +38,7 @@ CVAR(Bool, gl_tex_enable_np2, true, CVAR_SAVE)
 
 namespace OpenGL {
 	wxGLContext*	context = NULL;
+	bool			initialised = false;
 	double			version = 0;
 	unsigned		max_tex_size = 128;
 	unsigned		pow_two[] = { 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768 };
@@ -70,6 +71,9 @@ wxGLContext* OpenGL::getContext(wxGLCanvas* canvas) {
  * Initialises general OpenGL variables and settings
  *******************************************************************/
 bool OpenGL::init() {
+	if (initialised)
+		return true;
+
 	wxLogMessage("Initialising OpenGL...");
 
 	// Get OpenGL version
@@ -84,6 +88,7 @@ bool OpenGL::init() {
 	max_tex_size = val;
 	wxLogMessage("Max Texture Size: %dx%d", max_tex_size, max_tex_size);
 
+	initialised = true;
 	return true;
 }
 

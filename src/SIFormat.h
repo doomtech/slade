@@ -62,6 +62,8 @@ public:
 		if (!isThisFormat(data))
 			return false;
 
+		//wxLogMessage("Reading image of format %s", CHR(name));
+
 		// Attempt to read image data
 		bool ok = readImage(image, data, index);
 

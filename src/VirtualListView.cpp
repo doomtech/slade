@@ -43,6 +43,7 @@
  * VARIABLES
  *******************************************************************/
 wxDEFINE_EVENT(EVT_VLV_SELECTION_CHANGED, wxCommandEvent);
+CVAR(Bool, list_font_monospace, false, CVAR_SAVE)
 
 
 /*******************************************************************
@@ -62,6 +63,12 @@ VirtualListView::VirtualListView(wxWindow* parent)
 	last_focus = 0;
 	col_search = 0;
 	memset(cols_editable, 0, 100);
+
+	if (list_font_monospace) {
+		wxFont lfont = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
+		lfont.SetFamily(wxFONTFAMILY_MODERN);
+		SetFont(lfont);
+	}
 
 	// Bind events
 #ifndef __WXMSW__

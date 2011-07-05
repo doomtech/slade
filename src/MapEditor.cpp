@@ -4,15 +4,22 @@
 #include "ColourConfiguration.h"
 #include "ArchiveManager.h"
 
+double grid_sizes[] = { 0.05, 0.1, 0.25, 0.5, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192 };
+
 EXTERN_CVAR(Int, vertex_size)
 
 MapEditor::MapEditor() {
 	// Init variables
 	edit_mode = MODE_LINES;
 	hilight_item = -1;
+	gridsize = 9;
 }
 
 MapEditor::~MapEditor() {
+}
+
+double MapEditor::gridSize() {
+	return grid_sizes[gridsize];
 }
 
 void MapEditor::setEditMode(int mode) {
@@ -460,4 +467,17 @@ bool MapEditor::selectWithin(double xmin, double ymin, double xmax, double ymax)
 	}
 
 	return new_sel;
+}
+
+void MapEditor::incrementGrid() {
+	gridsize++;
+	if (gridsize > 18)
+		gridsize = 18;
+}
+
+void MapEditor::decrementGrid() {
+	// Non-integral grid size disabled for now
+	gridsize--;
+	if (gridsize < 4)
+		gridsize = 4;
 }

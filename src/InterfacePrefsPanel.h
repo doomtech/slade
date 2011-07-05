@@ -6,6 +6,7 @@ class InterfacePrefsPanel : public wxPanel {
 private:
 	wxCheckBox*	cb_size_as_string;
 	wxCheckBox* cb_filter_dirs;
+	wxCheckBox*	cb_list_monospace;
 	wxCheckBox*	cb_start_page;
 	wxCheckBox*	cb_context_submenus;
 	wxCheckBox*	cb_swap_epanel_bars;

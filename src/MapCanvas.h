@@ -5,10 +5,16 @@
 #include "OGLCanvas.h"
 
 class MapEditor;
+class MCAnimation;
 class MapCanvas : public OGLCanvas {
 private:
-	MapEditor*	editor;
-	wxTimer		timer;
+	MapEditor*				editor;
+	wxTimer					timer;
+	wxStopWatch				stopwatch;
+	vector<MCAnimation*>	animations;
+
+	// Rendering
+	bool	redraw;
 
 	// View properties
 	double		view_xoff;
@@ -25,7 +31,6 @@ private:
 	// Animation
 	float	anim_flash_level;
 	bool	anim_flash_inc;
-	float	anim_selbox_fade;
 
 public:
 	MapCanvas(wxWindow *parent, int id, MapEditor* editor);

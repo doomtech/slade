@@ -13,6 +13,7 @@ private:
 	uint8_t		edit_mode;
 	int			hilight_item;
 	vector<int>	selection;
+	int			gridsize;
 
 	// Mouse pointer state
 	fpoint2_t	mouse_pos;
@@ -34,6 +35,7 @@ public:
 	MapEditor();
 	~MapEditor();
 
+	double		gridSize();
 	fpoint2_t	mousePos() { return mouse_pos; }
 	fpoint2_t	mouseDownPos() { return mouse_downpos; }
 
@@ -56,6 +58,10 @@ public:
 	bool	updateHilight();
 	bool	selectCurrent(bool clear_none = true);
 	bool	selectWithin(double xmin, double ymin, double xmax, double ymax);
+
+	// Grid
+	void	incrementGrid();
+	void	decrementGrid();
 };
 
 #endif//__MAP_EDITOR_H__

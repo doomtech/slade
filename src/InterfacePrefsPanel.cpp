@@ -40,6 +40,7 @@ EXTERN_CVAR(Bool, elist_filter_dirs)
 EXTERN_CVAR(Bool, show_start_page)
 EXTERN_CVAR(Bool, swap_epanel_bars)
 EXTERN_CVAR(Bool, context_submenus)
+EXTERN_CVAR(Bool, list_font_monospace)
 
 
 /*******************************************************************
@@ -67,6 +68,10 @@ InterfacePrefsPanel::InterfacePrefsPanel(wxWindow* parent) : wxPanel(parent, -1)
 	cb_filter_dirs = new wxCheckBox(this, -1, "Ignore directories when filtering by name");
 	sizer->Add(cb_filter_dirs, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
+	// Monospace list font
+	cb_list_monospace = new wxCheckBox(this, -1, "Use monospaced font for lists");
+	sizer->Add(cb_list_monospace, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
 	// Context menu submenus
 	cb_context_submenus = new wxCheckBox(this, -1, "Group related entry context menu items into submenus");
 	sizer->Add(cb_context_submenus, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
@@ -83,6 +88,7 @@ InterfacePrefsPanel::InterfacePrefsPanel(wxWindow* parent) : wxPanel(parent, -1)
 	// Init controls
 	cb_size_as_string->SetValue(size_as_string);
 	cb_filter_dirs->SetValue(!elist_filter_dirs);
+	cb_list_monospace->SetValue(list_font_monospace);
 	cb_start_page->SetValue(show_start_page);
 	cb_swap_epanel_bars->SetValue(swap_epanel_bars);
 	cb_context_submenus->SetValue(context_submenus);
@@ -100,6 +106,7 @@ InterfacePrefsPanel::~InterfacePrefsPanel() {
 void InterfacePrefsPanel::applyPreferences() {
 	size_as_string = cb_size_as_string->GetValue();
 	elist_filter_dirs = !cb_filter_dirs->GetValue();
+	list_font_monospace = cb_list_monospace->GetValue();
 	show_start_page = cb_start_page->GetValue();
 	swap_epanel_bars = cb_swap_epanel_bars->GetValue();
 	context_submenus = cb_context_submenus->GetValue();
