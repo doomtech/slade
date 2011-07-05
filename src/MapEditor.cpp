@@ -3,6 +3,8 @@
 #include "MapEditor.h"
 #include "ColourConfiguration.h"
 #include "ArchiveManager.h"
+#include "WxStuff.h"
+#include "MapEditorWindow.h"
 
 double grid_sizes[] = { 0.05, 0.1, 0.25, 0.5, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192 };
 
@@ -100,6 +102,19 @@ void MapEditor::drawLines(double xmin, double ymin, double xmax, double ymax, bo
 		glVertex2d(x1, y1);
 		glVertex2d(x2, y2);
 		glEnd();
+
+		// Direction tab
+		if (show_direction) {
+			double xmid = x1 + ((x2 - x1) * 0.5);
+			double ymid = y1 + ((y2 - y1) * 0.5);
+			double x = (-(y2 - y1)) * 0.125;
+			double y = (x2 - x1) * 0.125;
+
+			glBegin(GL_LINES);
+			glVertex2d(xmid, ymid);
+			glVertex2d(xmid - x, ymid - y);
+			glEnd();
+		}
 	}
 }
 
@@ -188,9 +203,23 @@ void MapEditor::drawHilight(float flash_level) {
 	else if (edit_mode == MODE_LINES) {
 		// Line
 		MapLine* line = map.lines[hilight_item];
+		double x1 = line->v1()->xPos();
+		double y1 = line->v1()->yPos();
+		double x2 = line->v2()->xPos();
+		double y2 = line->v2()->yPos();
 		glBegin(GL_LINES);
-		glVertex2d(line->v1()->xPos(), line->v1()->yPos());
-		glVertex2d(line->v2()->xPos(), line->v2()->yPos());
+		glVertex2d(x1, y1);
+		glVertex2d(x2, y2);
+		glEnd();
+
+		// Direction tab
+		double xmid = x1 + ((x2 - x1) * 0.5);
+		double ymid = y1 + ((y2 - y1) * 0.5);
+		double x = (-(y2 - y1)) * 0.125;
+		double y = (x2 - x1) * 0.125;
+		glBegin(GL_LINES);
+		glVertex2d(xmid, ymid);
+		glVertex2d(xmid - x, ymid - y);
 		glEnd();
 	}
 	else if (edit_mode == MODE_SECTORS) {
@@ -278,6 +307,14 @@ void MapEditor::drawSelection(double xmin, double ymin, double xmax, double ymax
 			// Draw line
 			glVertex2d(x1, y1);
 			glVertex2d(x2, y2);
+
+			// Direction tab
+			double xmid = x1 + ((x2 - x1) * 0.5);
+			double ymid = y1 + ((y2 - y1) * 0.5);
+			double x = (-(y2 - y1)) * 0.125;
+			double y = (x2 - x1) * 0.125;
+			glVertex2d(xmid, ymid);
+			glVertex2d(xmid - x, ymid - y);
 		}
 		glEnd();
 	}
@@ -353,14 +390,23 @@ bool MapEditor::updateHilight() {
 	int current = hilight_item;
 
 	// Update hilighted object depending on mode
-	if (edit_mode == MODE_VERTICES)
+	string objtype = "";
+	if (edit_mode == MODE_VERTICES) {
 		hilight_item = map.nearestVertex(mouse_pos.x, mouse_pos.y);
-	else if (edit_mode == MODE_LINES)
+		objtype = "Vertex";
+	}
+	else if (edit_mode == MODE_LINES) {
 		hilight_item = map.nearestLine(mouse_pos.x, mouse_pos.y);
-	else if (edit_mode == MODE_SECTORS)
+		objtype = "Line";
+	}
+	else if (edit_mode == MODE_SECTORS) {
 		hilight_item = map.inSector(mouse_pos.x, mouse_pos.y);
-	else if (edit_mode == MODE_THINGS)
+		objtype = "Sector";
+	}
+	else if (edit_mode == MODE_THINGS) {
 		hilight_item = map.nearestThing(mouse_pos.x, mouse_pos.y);
+		objtype = "Thing";
+	}
 
 	return current != hilight_item;
 }
@@ -386,6 +432,7 @@ bool MapEditor::selectCurrent(bool clear_none) {
 
 	// Not already selected, add to selection
 	selection.push_back(hilight_item);
+
 
 	return true;
 }
