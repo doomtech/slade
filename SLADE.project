@@ -174,6 +174,8 @@
     <VirtualDirectory Name="UI Elements">
       <File Name="src/MapCanvas.cpp"/>
       <File Name="src/MapCanvas.h"/>
+      <File Name="src/MCAnimations.cpp"/>
+      <File Name="src/MCAnimations.h"/>
     </VirtualDirectory>
     <File Name="src/MapEditorWindow.h"/>
     <File Name="src/MapEditorWindow.cpp"/>
@@ -465,10 +467,15 @@
       <ResourceCompiler Options=""/>
     </GlobalSettings>
     <Configuration Name="Debug" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-g;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=yes)" C_Options="-g;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=yes)" Required="yes" PreCompiledHeader="">
+      <Compiler Options="-g;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=yes);`pkg-config --cflags gtk+-2.0`" C_Options="-g;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=yes)" Required="yes" PreCompiledHeader="">
         <Preprocessor Value="__WX__"/>
       </Compiler>
-      <Linker Options="$(shell wx-config --debug=yes --libs std,gl,stc,aui,ribbon --unicode=yes)" Required="yes"/>
+      <Linker Options="$(shell wx-config --debug=yes --libs std,gl,stc,aui,ribbon --unicode=yes)" Required="yes">
+        <Library Value="sfml-system"/>
+        <Library Value="sfml-audio"/>
+        <Library Value="sfml-window"/>
+        <Library Value="sfml-graphics"/>
+      </Linker>
       <ResourceCompiler Options="$(shell wx-config --rcflags)" Required="no"/>
       <General OutputFile="./dist/slade-dbg" IntermediateDirectory="./Debug" Command="./slade-dbg" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;"/>
@@ -524,13 +531,15 @@
       </AdditionalRules>
     </Configuration>
     <Configuration Name="Release" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-O3;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no)" C_Options="-O3;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no)" Required="yes" PreCompiledHeader="">
+      <Compiler Options="-g;-O3;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no);`pkg-config --cflags gtk+-2.0`" C_Options="-O3;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no)" Required="yes" PreCompiledHeader="">
         <Preprocessor Value="__WX__"/>
         <Preprocessor Value="NDEBUG"/>
       </Compiler>
       <Linker Options="-s;$(shell wx-config --debug=no --libs std,gl,stc,aui,ribbon --unicode=yes)" Required="yes">
         <Library Value="sfml-system"/>
         <Library Value="sfml-audio"/>
+        <Library Value="sfml-window"/>
+        <Library Value="sfml-graphics"/>
       </Linker>
       <ResourceCompiler Options="$(shell wx-config --rcflags)" Required="no"/>
       <General OutputFile="./dist/slade" IntermediateDirectory="./Release" Command="./slade" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>

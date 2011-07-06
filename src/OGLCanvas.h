@@ -26,7 +26,7 @@ public:
 	void			init();
 	virtual void	draw() = 0;
 	void			drawCheckeredBackground();
-	wxPanel*		toPanel(wxWindow* parent);
+	wxWindow*		toPanel(wxWindow* parent);
 
 	void	SwapBuffers() { Display(); }
 
