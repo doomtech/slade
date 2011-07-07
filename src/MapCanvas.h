@@ -3,6 +3,9 @@
 #define __MAPCANVAS_H__
 
 #include "OGLCanvas.h"
+#include "VertexInfoOverlay.h"
+#include "LineInfoOverlay.h"
+#include "SectorInfoOverlay.h"
 
 class MapEditor;
 class MCAnimation;
@@ -14,6 +17,12 @@ private:
 	wxStopWatch				stopwatch;
 	vector<MCAnimation*>	animations;
 	sf::Font				font_small;
+
+	// Info overlays
+	int						last_hilight;
+	VertexInfoOverlay		info_vertex;
+	LineInfoOverlay			info_line;
+	SectorInfoOverlay		info_sector;
 
 	// Rendering
 	bool	redraw;
@@ -33,6 +42,8 @@ private:
 	// Animation
 	float	anim_flash_level;
 	bool	anim_flash_inc;
+	float	anim_info_fade;
+	bool	anim_info_show;
 
 public:
 	MapCanvas(wxWindow *parent, int id, MapEditor* editor);
@@ -47,10 +58,6 @@ public:
 	// Drawing
 	void	drawGrid();
 	void	draw();
-	void	drawVertexOverlay();
-	void	drawLineOverlay();
-	void	drawSideOverlay(MapSide* side, string side_name = "Front", int xstart = 0);
-	void	drawSideTexOverlay(int x, int y, string texture, string pos = "Upper");
 
 	// Events
 	void	onKeyDown(wxKeyEvent& e);

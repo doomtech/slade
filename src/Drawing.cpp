@@ -29,6 +29,7 @@
  *******************************************************************/
 #include "Main.h"
 #include "Drawing.h"
+#include "GLTexture.h"
 
 
 /*******************************************************************
@@ -101,6 +102,37 @@ void Drawing::drawFilledRect(double x1, double y1, double x2, double y2) {
 	glVertex2d(x2, y2);
 	glVertex2d(x2, y1);
 	glEnd();
+}
+
+void Drawing::drawTextureWithin(GLTexture* tex, double x1, double y1, double x2, double y2, double padding, bool upscale) {
+	// Ignore null texture
+	if (!tex)
+		return;
+
+	double width = x2 - x1;
+	double height = y2 - y1;
+
+	// Get image dimensions
+	double x_dim = (double)tex->getWidth();
+	double y_dim = (double)tex->getHeight();
+
+	// Get max scale for x and y (including padding)
+	double x_scale = ((double)width - padding) / x_dim;
+	double y_scale = ((double)width - padding) / y_dim;
+
+	// Set scale to smallest of the 2 (so that none of the texture will be clipped)
+	double scale = MIN(x_scale, y_scale);
+
+	// If we don't want to magnify the image, clamp scale to a max of 1.0
+	if (!upscale && scale > 1)
+		scale = 1;
+
+	// Now draw the texture
+	glPushMatrix();
+	glTranslated(x1 + width*0.5, y1 + height*0.5, 0);	// Translate to middle of area
+	glScaled(scale, scale, scale);						// Scale to fit within area
+	tex->draw2d(tex->getWidth()*-0.5, tex->getHeight()*-0.5);
+	glPopMatrix();
 }
 
 /* Drawing::drawHud

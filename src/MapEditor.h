@@ -40,6 +40,7 @@ public:
 	fpoint2_t	mousePos() { return mouse_pos; }
 	fpoint2_t	mouseDownPos() { return mouse_downpos; }
 	unsigned	selectionSize() { return selection.size(); }
+	int			hilightItem() { return hilight_item; }
 
 	void	setEditMode(int mode);
 	void	setMousePos(double x, double y) { mouse_pos.set(x, y); }

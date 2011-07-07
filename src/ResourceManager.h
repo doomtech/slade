@@ -65,6 +65,7 @@ class ResourceManager : public Listener, public Announcer {
 private:
 	EntryResourceMap	patches;
 	EntryResourceMap	graphics;
+	EntryResourceMap	flats;
 	TextureResourceMap	textures;
 
 	static ResourceManager*	instance;
@@ -92,6 +93,7 @@ public:
 	void	getAllTextures(vector<TextureResource::tex_res_t>& list, Archive* priority, Archive* ignore = NULL);
 
 	ArchiveEntry*	getPatchEntry(string patch, string nspace = "patches", Archive* priority = NULL);
+	ArchiveEntry*	getFlatEntry(string flat, Archive* priority = NULL);
 	CTexture*		getTexture(string texture, Archive* priority = NULL, Archive* ignore = NULL);
 
 	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);

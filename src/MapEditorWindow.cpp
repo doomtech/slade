@@ -88,6 +88,9 @@ void MapEditorWindow::setupLayout() {
 }
 
 bool MapEditorWindow::openMap(Archive::mapdesc_t map) {
+	// Set texture manager archive
+	tex_man.setArchive(map.head->getParent());
+
 	return editor.openMap(map);
 }
 

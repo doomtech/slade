@@ -213,6 +213,10 @@ void ResourceManager::addEntry(ArchiveEntry* entry) {
 	if (type->extraProps().propertyExists("patch"))
 		patches[name].add(entry);
 
+	// Check for flat entry
+	if (type->getId() == "gfx_flat")
+		flats[name].add(entry);
+
 	// Check for TEXTUREx entry
 	int txentry = 0;
 	if (type->getId() == "texturex")
@@ -254,6 +258,9 @@ void ResourceManager::removeEntry(ArchiveEntry* entry) {
 
 	// Remove from patches
 	patches[name].remove(entry);
+
+	// Remove from flats
+	flats[name].remove(entry);
 
 	// Check for TEXTUREx entry
 	int txentry = 0;
@@ -372,7 +379,7 @@ void ResourceManager::getAllTextures(vector<TextureResource::tex_res_t>& list, A
  *******************************************************************/
 ArchiveEntry* ResourceManager::getPatchEntry(string patch, string nspace, Archive* priority) {
 	// Check resource with matching name exists
-	EntryResource& res = patches[patch];
+	EntryResource& res = patches[patch.Upper()];
 	if (res.entries.size() == 0)
 		return NULL;
 
@@ -396,13 +403,40 @@ ArchiveEntry* ResourceManager::getPatchEntry(string patch, string nspace, Archiv
 	return entry;
 }
 
+/* ResourceManager::getFlatEntry
+ * Returns the most appropriate managed resource entry for [flat],
+ * or NULL if no match found
+ *******************************************************************/
+ArchiveEntry* ResourceManager::getFlatEntry(string flat, Archive* priority) {
+	// Check resource with matching name exists
+	EntryResource& res = flats[flat.Upper()];
+	if (res.entries.size() == 0)
+		return NULL;
+
+	// Go through resource entries
+	ArchiveEntry* entry = res.entries[0];
+	for (unsigned a = 0; a < res.entries.size(); a++) {
+		// If it's in the 'priority' archive, return it
+		if (priority && res.entries[a]->getParent() == priority)
+			return res.entries[a];
+
+		// Otherwise, if it's in a 'later' archive than the current resource entry, set it
+		if (theArchiveManager->archiveIndex(entry->getParent()) <=
+			theArchiveManager->archiveIndex(res.entries[a]->getParent()))
+			entry = res.entries[a];
+	}
+
+	// Return most relevant entry
+	return entry;
+}
+
 /* ResourceManager::getTexture
  * Returns the most appropriate managed texture for [texture], or
  * NULL if no match found
  *******************************************************************/
 CTexture* ResourceManager::getTexture(string texture, Archive* priority, Archive* ignore) {
 	// Check texture resource with matching name exists
-	TextureResource& res = textures[texture];
+	TextureResource& res = textures[texture.Upper()];
 	if (res.length() == 0)
 		return NULL;
 

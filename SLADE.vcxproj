@@ -151,6 +151,7 @@
     <ClCompile Include="src\KeyBind.cpp" />
     <ClCompile Include="src\LfdArchive.cpp" />
     <ClCompile Include="src\LibArchive.cpp" />
+    <ClCompile Include="src\LineInfoOverlay.cpp" />
     <ClCompile Include="src\lzma\C\7zAlloc.c" />
     <ClCompile Include="src\lzma\C\7zBuf.c" />
     <ClCompile Include="src\lzma\C\7zBuf2.c" />
@@ -189,6 +190,7 @@
     <ClCompile Include="src\lzma\C\XzIn.c" />
     <ClCompile Include="src\MapEditor.cpp" />
     <ClCompile Include="src\MapEntryPanel.cpp" />
+    <ClCompile Include="src\MapTextureManager.cpp" />
     <ClCompile Include="src\MathStuff.cpp" />
     <ClCompile Include="src\MCAnimations.cpp" />
     <ClCompile Include="src\MIDIPlayer.cpp" />
@@ -212,6 +214,7 @@
     <ClCompile Include="src\ResourceManager.cpp" />
     <ClCompile Include="src\RffArchive.cpp" />
     <ClCompile Include="src\SAction.cpp" />
+    <ClCompile Include="src\SectorInfoOverlay.cpp" />
     <ClCompile Include="src\SFileDialog.cpp" />
     <ClCompile Include="src\SFont.cpp" />
     <ClCompile Include="src\SIFormat.cpp" />
@@ -226,6 +229,7 @@
     <ClCompile Include="src\Translation.cpp" />
     <ClCompile Include="src\TranslationEditorDialog.cpp" />
     <ClCompile Include="src\Tree.cpp" />
+    <ClCompile Include="src\VertexInfoOverlay.cpp" />
     <ClCompile Include="src\VirtualListView.cpp" />
     <ClCompile Include="src\Wad2Archive.cpp" />
     <ClCompile Include="src\WadJArchive.cpp" />
@@ -343,6 +347,7 @@
     <ClInclude Include="src\KeyBind.h" />
     <ClInclude Include="src\LfdArchive.h" />
     <ClInclude Include="src\LibArchive.h" />
+    <ClInclude Include="src\LineInfoOverlay.h" />
     <ClInclude Include="src\LumpFormats.h" />
     <ClInclude Include="src\lzma\C\7z.h" />
     <ClInclude Include="src\lzma\C\7zAlloc.h" />
@@ -376,6 +381,7 @@
     <ClInclude Include="src\lzma\C\XzEnc.h" />
     <ClInclude Include="src\MapEditor.h" />
     <ClInclude Include="src\MapEntryPanel.h" />
+    <ClInclude Include="src\MapTextureManager.h" />
     <ClInclude Include="src\MathStuff.h" />
     <ClInclude Include="src\MCAnimations.h" />
     <ClInclude Include="src\MIDIPlayer.h" />
@@ -402,6 +408,7 @@
     <ClInclude Include="src\ResourceManager.h" />
     <ClInclude Include="src\RffArchive.h" />
     <ClInclude Include="src\SAction.h" />
+    <ClInclude Include="src\SectorInfoOverlay.h" />
     <ClInclude Include="src\SFileDialog.h" />
     <ClInclude Include="src\SIFDoom.h" />
     <ClInclude Include="src\SIFHexen.h" />
@@ -423,6 +430,7 @@
     <ClInclude Include="src\Translation.h" />
     <ClInclude Include="src\TranslationEditorDialog.h" />
     <ClInclude Include="src\Tree.h" />
+    <ClInclude Include="src\VertexInfoOverlay.h" />
     <ClInclude Include="src\VirtualListView.h" />
     <ClInclude Include="src\Wad2Archive.h" />
     <ClInclude Include="src\WadJArchive.h" />

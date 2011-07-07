@@ -4,11 +4,13 @@
 
 #include "MapCanvas.h"
 #include "MapEditor.h"
+#include "MapTextureManager.h"
 
 class MapEditorWindow : public wxFrame {
 private:
-	MapCanvas*	map_canvas;
-	MapEditor	editor;
+	MapCanvas*			map_canvas;
+	MapEditor			editor;
+	MapTextureManager	tex_man;
 
 	// Singleton instance
 	static MapEditorWindow*		instance;
@@ -25,7 +27,8 @@ public:
 		return instance;
 	}
 	
-	MapEditor&	mapEditor() { return editor; }
+	MapEditor&			mapEditor() { return editor; }
+	MapTextureManager&	textureManager() { return tex_man; }
 
 	void	setupLayout();
 	bool	openMap(Archive::mapdesc_t map);
