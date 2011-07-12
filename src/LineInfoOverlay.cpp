@@ -59,22 +59,15 @@ void LineInfoOverlay::update(MapLine* line) {
 	else side_back.exists = false;
 }
 
-void LineInfoOverlay::draw(sf::RenderWindow* rw, sf::Font& font, float alpha) {
+void LineInfoOverlay::draw(int bottom, int right, float alpha) {
 	// Don't bother if invisible
 	if (alpha <= 0.0f)
 		return;
 
-	int bottom = rw->GetHeight();
-	int right = rw->GetWidth();
-
 	// Get colours
 	rgba_t col_bg = ColourConfiguration::getColour("map_overlay_background");
 	rgba_t col_fg = ColourConfiguration::getColour("map_overlay_foreground");
-
-	// Setup info string
-	sf::String str_linfo("", font, 12);
-	str_linfo.SetPosition(2, bottom - 64);
-	str_linfo.SetColor(sf::Color(col_fg.r, col_fg.g, col_fg.b, 255*alpha));
+	col_fg.a = col_fg.a*alpha;
 
 	// Draw overlay background
 	rgba_t(col_bg.r, col_bg.g, col_bg.b, 80*alpha, 0).set_gl();
@@ -83,69 +76,51 @@ void LineInfoOverlay::draw(sf::RenderWindow* rw, sf::Font& font, float alpha) {
 	Drawing::drawFilledRect(0, bottom - 68, right, bottom);
 
 	// Line index
-	str_linfo.SetText(CHR(index));
-	rw->Draw(str_linfo);
+	Drawing::drawText(index, 2, bottom - 64, col_fg);
 
 	// Line length
-	str_linfo.SetText(CHR(length));
-	str_linfo.SetPosition(2, bottom - 48);
-	rw->Draw(str_linfo);
+	Drawing::drawText(length, 2, bottom - 48, col_fg);
 
 	// Line special
-	str_linfo.SetText(CHR(special));
-	str_linfo.SetPosition(2, bottom - 32);
-	rw->Draw(str_linfo);
+	Drawing::drawText(special, 2, bottom - 32, col_fg);
 
 	// Line args / sector tag
-	str_linfo.SetText(CHR(args));
-	str_linfo.SetPosition(2, bottom - 16);
-	rw->Draw(str_linfo);
+	Drawing::drawText(args, 2, bottom - 16, col_fg);
 
 	// Side info
 	int x = right - 256;
 	if (side_front.exists) {
-		drawSide(rw, font, alpha, side_front, x);
+		//drawSide(rw, font, alpha, side_front, x);
+		drawSide(bottom, right, alpha, side_front, x);
 		x -= 256;
 	}
 	if (side_back.exists)
-		drawSide(rw, font, alpha, side_back, x);
+		//drawSide(rw, font, alpha, side_back, x);
+		drawSide(bottom, right, alpha, side_back, x);
 }
 
-void LineInfoOverlay::drawSide(sf::RenderWindow* rw, sf::Font& font, float alpha, side_t& side, int xstart) {
-	int bottom = rw->GetHeight();
-
+void LineInfoOverlay::drawSide(int bottom, int right, float alpha, side_t& side, int xstart) {
 	// Get colours
 	rgba_t col_fg = ColourConfiguration::getColour("map_overlay_foreground");
-
-	// Setup string
-	sf::String str_sinfo("", font, 12);
-	str_sinfo.SetColor(sf::Color(col_fg.r, col_fg.g, col_fg.b, 255*alpha));
-	str_sinfo.SetPosition(xstart + 2, bottom - 32);
+	col_fg.a = col_fg.a*alpha;
 
 	// Index and sector index
-	str_sinfo.SetText(CHR(side.info));
-	rw->Draw(str_sinfo);
+	Drawing::drawText(side.info, xstart + 2, bottom - 32, col_fg);
 
 	// Texture offsets
-	str_sinfo.SetText(CHR(side.offsets));
-	str_sinfo.SetPosition(xstart + 2, bottom - 16);
-	rw->Draw(str_sinfo);
+	Drawing::drawText(side.offsets, xstart + 2, bottom - 16, col_fg);
 
 	// Textures
-	drawTexture(rw, font, alpha, xstart + 4, bottom - 32, side.tex_upper);
-	drawTexture(rw, font, alpha, xstart + 88, bottom - 32, side.tex_middle, "M");
-	drawTexture(rw, font, alpha, xstart + 92 + 80, bottom - 32, side.tex_lower, "L");
+	drawTexture(alpha, xstart + 4, bottom - 32, side.tex_upper);
+	drawTexture(alpha, xstart + 88, bottom - 32, side.tex_middle, "M");
+	drawTexture(alpha, xstart + 92 + 80, bottom - 32, side.tex_lower, "L");
 }
 
-void LineInfoOverlay::drawTexture(sf::RenderWindow* rw, sf::Font& font, float alpha, int x, int y, string texture, string pos) {
+void LineInfoOverlay::drawTexture(float alpha, int x, int y, string texture, string pos) {
 	// Get colours
 	rgba_t col_bg = ColourConfiguration::getColour("map_overlay_background");
 	rgba_t col_fg = ColourConfiguration::getColour("map_overlay_foreground");
-
-	// Init string object
-	sf::String str(CHR(pos), font, 12);
-	str.SetColor(sf::Color(col_fg.r, col_fg.g, col_fg.b, 255*alpha));
-	float diff = 40 - (str.GetRect().GetWidth() * 0.5);
+	col_fg.a = col_fg.a*alpha;
 
 	// Check texture isn't blank
 	if (!(S_CMPNOCASE(texture, "-"))) {
@@ -178,8 +153,5 @@ void LineInfoOverlay::drawTexture(sf::RenderWindow* rw, sf::Font& font, float al
 	// Draw texture name (even if texture is blank)
 	texture.Prepend(":");
 	texture.Prepend(pos);
-	str.SetText(CHR(texture));
-	diff = 40 - (str.GetRect().GetWidth() * 0.5);
-	str.SetPosition(x + diff, y - 16);
-	rw->Draw(str);
+	Drawing::drawText(texture, x + 40, y - 16, col_fg, Drawing::FONT_SMALL, Drawing::ALIGN_CENTER);
 }

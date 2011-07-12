@@ -32,12 +32,16 @@
 #include "WxStuff.h"
 #include "OGLCanvas.h"
 #include "GLTexture.h"
+#include "MainApp.h"
+#include "Drawing.h"
 
+#ifdef USE_SFML_RENDERWINDOW
 #ifdef __WXGTK__
 #include <gdk/gdkx.h>
 #include <gtk/gtk.h>
 #include <gdk/gdkprivate.h>
 #include <gtk/gtkwidget.h>
+#endif
 #endif
 
 
@@ -45,12 +49,15 @@
  * OGLCANVAS CLASS FUNCTIONS
  *******************************************************************/
 
+#ifdef USE_SFML_RENDERWINDOW
 /* OGLCanvas::OGLCanvas
- * OGLCanvas class constructor
+ * OGLCanvas class constructor, SFML implementation
  *******************************************************************/
 OGLCanvas::OGLCanvas(wxWindow* parent, int id)
 : wxControl(parent, id, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE|wxWANTS_CHARS) {
 	init_done = false;
+	last_time = theApp->runTimer();
+	frame_interval = 100;
 
 	// Code taken from SFML wxWidgets integration example
 	#ifdef __WXGTK__
@@ -70,6 +77,23 @@ OGLCanvas::OGLCanvas(wxWindow* parent, int id)
 	Bind(wxEVT_ERASE_BACKGROUND, &OGLCanvas::onEraseBackground, this);
 	Bind(wxEVT_IDLE, &OGLCanvas::onIdle, this);
 }
+#else
+/* OGLCanvas::OGLCanvas
+ * OGLCanvas class constructor, wxGLCanvas implementation
+ *******************************************************************/
+OGLCanvas::OGLCanvas(wxWindow* parent, int id)
+: wxGLCanvas(parent, id, NULL, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE|wxWANTS_CHARS) {
+	init_done = false;
+	last_time = theApp->runTimer();
+	frame_interval = -1;
+
+	// Bind events
+	Bind(wxEVT_PAINT, &OGLCanvas::onPaint, this);
+	Bind(wxEVT_ERASE_BACKGROUND, &OGLCanvas::onEraseBackground, this);
+	Bind(wxEVT_IDLE, &OGLCanvas::onIdle, this);
+}
+#endif
+
 
 /* OGLCanvas::OGLCanvas
  * OGLCanvas class constructor
@@ -83,7 +107,7 @@ OGLCanvas::~OGLCanvas() {
  * false otherwise
  *******************************************************************/
 bool OGLCanvas::setContext() {
-	/*
+#ifndef USE_SFML_RENDERWINDOW
 	wxGLContext* context = OpenGL::getContext(this);
 
 	if (context) {
@@ -92,9 +116,9 @@ bool OGLCanvas::setContext() {
 	}
 	else
 		return false;
-	*/
-
+#else
 	return true;
+#endif
 }
 
 /* OGLCanvas::init
@@ -102,6 +126,10 @@ bool OGLCanvas::setContext() {
  *******************************************************************/
 void OGLCanvas::init() {
 	OpenGL::init();
+
+#ifdef USE_SFML_RENDERWINDOW
+	PreserveOpenGLStates(true);
+#endif
 
 	glViewport(0, 0, GetSize().x, GetSize().y);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -163,12 +191,14 @@ void OGLCanvas::drawCheckeredBackground() {
  * This is sometimes needed to fix redraw problems in Windows XP
  *******************************************************************/
 wxWindow* OGLCanvas::toPanel(wxWindow* parent) {
+#ifdef USE_SFML_RENDERWINDOW
 #ifdef __WXGTK__
 	// Reparenting the window causes a crash under gtk, so don't do it there
 	// (this was only to fix a bug in winxp anyway)
 	return this;
 #endif
-	
+#endif
+
 	// Create panel
 	wxPanel* panel = new wxPanel(parent, -1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL|wxBORDER_SIMPLE);
 
@@ -197,11 +227,20 @@ void OGLCanvas::onPaint(wxPaintEvent& e) {
 	wxPaintDC(this);
 
 	if (IsShown()) {
+		// Set context to this window
+#ifdef USE_SFML_RENDERWINDOW
 		sf::RenderWindow::SetActive();
+		Drawing::setRenderTarget(this);
+		SetView(sf::View(sf::FloatRect(0.0f, 0.0f, GetSize().x, GetSize().y)));
+#else
+		setContext();
+#endif
 
+		// Init if needed
 		if (!init_done)
 			init();
 
+		// Draw content
 		draw();
 	}
 }
@@ -215,12 +254,22 @@ void OGLCanvas::onEraseBackground(wxEraseEvent& e) {
 }
 
 /* OGLCanvas::onIdle
- * Called when the gfx canvas is doing nothing (will refresh every
- * 20ms)
+ * Called when the gfx canvas is doing nothing
  *******************************************************************/
 void OGLCanvas::onIdle(wxIdleEvent& e) {
-	if (timer.Time() >= 20) {
+	// If frame interval is negative, don't redraw automatically
+	if (frame_interval < 0)
+		return;
+
+	// Get time since last redraw
+	long frametime = theApp->runTimer() - last_time;
+
+	// Update/refresh if needed
+	if (frametime >= frame_interval) {
+		update(frametime);
 		Refresh();
-		timer.Start();
+		last_time = theApp->runTimer();
 	}
+
+	e.Skip();
 }

@@ -37,6 +37,7 @@
 #include "ArchiveManager.h"
 #include "Drawing.h"
 #include "MathStuff.h"
+#include "MainApp.h"
 
 
 /*******************************************************************
@@ -51,25 +52,17 @@ CVAR(Int, vertex_size, 7, CVAR_SAVE)
  * MapCanvas class constructor
  *******************************************************************/
 MapCanvas::MapCanvas(wxWindow *parent, int id, MapEditor* editor)
-: OGLCanvas(parent, id), timer(this) {
+: OGLCanvas(parent, id) {
 	// Init variables
 	this->editor = editor;
-	redraw = true;
 	view_xoff = 0;
 	view_yoff = 0;
 	view_scale = 1;
 	last_hilight = -1;
-	timer.Start(10);
 	anim_flash_level = 0.5f;
 	anim_flash_inc = true;
 	anim_info_fade = 0.0f;
-
-	// Load small font
-	ArchiveEntry* entry = theArchiveManager->programResourceArchive()->entryAtPath("fonts/dejavu_sans.ttf");
-	if (entry)
-		font_small.LoadFromMemory((const char*)entry->getData(), entry->getSize(), 12);
-
-	PreserveOpenGLStates(true);
+	frame_interval = 10;
 
 	// Bind Events
 	Bind(wxEVT_KEY_DOWN, &MapCanvas::onKeyDown, this);
@@ -85,7 +78,6 @@ MapCanvas::MapCanvas(wxWindow *parent, int id, MapEditor* editor)
 	Bind(wxEVT_AUX2_UP, &MapCanvas::onMouseUp, this);
 	Bind(wxEVT_MOTION, &MapCanvas::onMouseMotion, this);
 	Bind(wxEVT_MOUSEWHEEL, &MapCanvas::onMouseWheel, this);
-	Bind(wxEVT_TIMER, &MapCanvas::onTimer, this);
 }
 
 /* MapCanvas::~MapCanvas
@@ -120,10 +112,6 @@ void MapCanvas::pan(double x, double y) {
 	view_tl.y = translateY(GetSize().y);
 	view_br.x = translateX(GetSize().x);
 	view_br.y = translateY(0);
-
-	// Refresh
-	Update();
-	Refresh();
 }
 
 void MapCanvas::zoom(double amount, bool toward_cursor) {
@@ -155,10 +143,6 @@ void MapCanvas::zoom(double amount, bool toward_cursor) {
 	view_tl.y = translateY(GetSize().y);
 	view_br.x = translateX(GetSize().x);
 	view_br.y = translateY(0);
-
-	// Refresh
-	Update();
-	Refresh();
 }
 
 void MapCanvas::drawGrid() {
@@ -230,13 +214,8 @@ void MapCanvas::drawGrid() {
  * Draw the 2d map on the map gl canvas
  *******************************************************************/
 void MapCanvas::draw() {
-	// Set the GL context to point to this window
-	if (!setContext())
-		return;
-
 	// Setup the viewport
 	glViewport(0, 0, GetSize().x, GetSize().y);
-	SetView(sf::View(sf::FloatRect(0.0f, 0.0f, GetSize().x, GetSize().y)));
 
 	// Setup the screen projection
 	glMatrixMode(GL_PROJECTION);
@@ -336,15 +315,56 @@ void MapCanvas::draw() {
 
 	// Draw current info overlay
 	if (editor->editMode() == MapEditor::MODE_VERTICES)
-		info_vertex.draw(this, font_small, anim_info_fade);
+		info_vertex.draw(GetSize().y, GetSize().x, anim_info_fade);
 	else if (editor->editMode() == MapEditor::MODE_LINES)
-		info_line.draw(this, font_small, anim_info_fade);
+		info_line.draw(GetSize().y, GetSize().x, anim_info_fade);
 	else if (editor->editMode() == MapEditor::MODE_SECTORS)
-		info_sector.draw(this, font_small, anim_info_fade);
+		info_sector.draw(GetSize().y, GetSize().x, anim_info_fade);
 
 	SwapBuffers();
-	redraw = false;
 }
+
+void MapCanvas::update(long frametime) {
+	// Flashing animation for hilight
+	// Pulsates between 0.5-1.0f (multiplied with hilight alpha)
+	if (anim_flash_inc) {
+		anim_flash_level += 0.03f;
+		if (anim_flash_level >= 1.0f) {
+			anim_flash_inc = false;
+			anim_flash_level = 1.0f;
+		}
+	}
+	else {
+		anim_flash_level -= 0.03f;
+		if (anim_flash_level <= 0.5f) {
+			anim_flash_inc = true;
+			anim_flash_level = 0.6f;
+		}
+	}
+
+	// Fader for info overlay
+	if (anim_info_show) {
+		anim_info_fade += 0.16f;
+		if (anim_info_fade > 1.0f)
+			anim_info_fade = 1.0f;
+	}
+	else {
+		anim_info_fade -= 0.1f;
+		if (anim_info_fade < 0.0f)
+			anim_info_fade = 0.0f;
+	}
+
+	// Update animations
+	for (unsigned a = 0; a < animations.size(); a++) {
+		if (!animations[a]->update(theApp->runTimer())) {
+			// If animation is finished, delete and remove from the list
+			delete animations[a];
+			animations.erase(animations.begin() + a);
+			a--;
+		}
+	}
+}
+
 
 
 
@@ -374,40 +394,28 @@ void MapCanvas::onKeyDown(wxKeyEvent& e) {
 		zoom(1.2);
 
 	// Increment grid
-	if (e.GetKeyCode() == ']') {
+	if (e.GetKeyCode() == ']')
 		editor->incrementGrid();
-		redraw = true;
-	}
 
 	// Decrement grid
-	if (e.GetKeyCode() == '[') {
+	if (e.GetKeyCode() == '[')
 		editor->decrementGrid();
-		redraw = true;
-	}
 
 	// Vertices mode
-	if (e.GetKeyCode() == 'V') {
+	if (e.GetKeyCode() == 'V')
 		editor->setEditMode(MapEditor::MODE_VERTICES);
-		redraw = true;
-	}
 
 	// Lines mode
-	if (e.GetKeyCode() == 'L') {
+	if (e.GetKeyCode() == 'L')
 		editor->setEditMode(MapEditor::MODE_LINES);
-		redraw = true;
-	}
 
 	// Sectors mode
-	if (e.GetKeyCode() == 'S') {
+	if (e.GetKeyCode() == 'S')
 		editor->setEditMode(MapEditor::MODE_SECTORS);
-		redraw = true;
-	}
 
 	// Things mode
-	if (e.GetKeyCode() == 'T') {
+	if (e.GetKeyCode() == 'T')
 		editor->setEditMode(MapEditor::MODE_THINGS);
-		redraw = true;
-	}
 
 	e.Skip();
 }
@@ -441,11 +449,10 @@ void MapCanvas::onMouseUp(wxMouseEvent& e) {
 			sel_active = false;
 			editor->selectWithin(min(sel_origin.x, sel_end.x), min(sel_origin.y, sel_end.y),
 								max(sel_origin.x, sel_end.x), max(sel_origin.y, sel_end.y));
-			animations.push_back(new MCASelboxFader(stopwatch.Time(), sel_origin, sel_end));
+			animations.push_back(new MCASelboxFader(theApp->runTimer(), sel_origin, sel_end));
 		}
-		
+
 		editor->updateHilight();
-		Refresh();
 	}
 
 	e.Skip();
@@ -460,16 +467,13 @@ void MapCanvas::onMouseMotion(wxMouseEvent& e) {
 	editor->setMousePos(x, y);
 
 	// If dragging left mouse
-	if (e.Dragging() && e.LeftIsDown()) {
+	if (e.Dragging() && e.LeftIsDown())
 		sel_end.set(x, y);
-		redraw = true;
-	}
 	else {
 		sel_active = false;
 
 		// Update editor mouse hilight
-		if (editor->updateHilight())
-			redraw = true;
+		editor->updateHilight();
 	}
 
 	e.Skip();
@@ -480,48 +484,4 @@ void MapCanvas::onMouseWheel(wxMouseEvent& e) {
 		zoom(1.2, true);
 	else if (e.GetWheelRotation() < 0)
 		zoom(0.8, true);
-}
-
-void MapCanvas::onTimer(wxTimerEvent& e) {
-	// Flashing animation for hilight
-	// Pulsates between 0.5-1.0f (multiplied with hilight alpha)
-	if (anim_flash_inc) {
-		anim_flash_level += 0.03f;
-		if (anim_flash_level >= 1.0f) {
-			anim_flash_inc = false;
-			anim_flash_level = 1.0f;
-		}
-	}
-	else {
-		anim_flash_level -= 0.03f;
-		if (anim_flash_level <= 0.5f) {
-			anim_flash_inc = true;
-			anim_flash_level = 0.6f;
-		}
-	}
-
-	// Fader for info overlay
-	if (anim_info_show) {
-		anim_info_fade += 0.16f;
-		if (anim_info_fade > 1.0f)
-			anim_info_fade = 1.0f;
-	}
-	else {
-		anim_info_fade -= 0.1f;
-		if (anim_info_fade < 0.0f)
-			anim_info_fade = 0.0f;
-	}
-
-	// Update animations
-	for (unsigned a = 0; a < animations.size(); a++) {
-		if (!animations[a]->update(stopwatch.Time())) {
-			// If animation is finished, delete and remove from the list
-			delete animations[a];
-			animations.erase(animations.begin() + a);
-			a--;
-		}
-	}
-
-	Update();
-	Refresh();
 }

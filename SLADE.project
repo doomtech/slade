@@ -176,11 +176,19 @@
       <File Name="src/MapCanvas.h"/>
       <File Name="src/MCAnimations.cpp"/>
       <File Name="src/MCAnimations.h"/>
+      <File Name="src/VertexInfoOverlay.h"/>
+      <File Name="src/VertexInfoOverlay.cpp"/>
+      <File Name="src/LineInfoOverlay.cpp"/>
+      <File Name="src/SectorInfoOverlay.h"/>
+      <File Name="src/SectorInfoOverlay.cpp"/>
+      <File Name="src/LineInfoOverlay.h"/>
     </VirtualDirectory>
     <File Name="src/MapEditorWindow.h"/>
     <File Name="src/MapEditorWindow.cpp"/>
     <File Name="src/MapEditor.cpp"/>
     <File Name="src/MapEditor.h"/>
+    <File Name="src/MapTextureManager.h"/>
+    <File Name="src/MapTextureManager.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="Resources">
     <VirtualDirectory Name="Archive">
@@ -463,6 +471,7 @@
         <LibraryPath Value="."/>
         <Library Value="freeimage"/>
         <Library Value="fluidsynth"/>
+        <Library Value="ftgl"/>
       </Linker>
       <ResourceCompiler Options=""/>
     </GlobalSettings>

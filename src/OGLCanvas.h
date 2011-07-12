@@ -5,16 +5,27 @@
 #include "OpenGL.h"
 #include "Palette.h"
 #include <wx/control.h>
-#include <wx/stopwatch.h>
+
+#ifdef USE_SFML_RENDERWINDOW
 #undef None
 #include <SFML/Graphics.hpp>
+#else
+#include <wx/glcanvas.h>
+#endif
 
 class wxPanel;
+#ifdef USE_SFML_RENDERWINDOW
 class OGLCanvas : public wxControl, public sf::RenderWindow {
+#else
+class OGLCanvas : public wxGLCanvas {
+#endif
 protected:
 	bool		init_done;
 	Palette8bit	palette;
-	wxStopWatch	timer;
+
+	// Framerate stuff
+	long	last_time;
+	long	frame_interval;
 
 public:
 	OGLCanvas(wxWindow* parent, int id);
@@ -25,10 +36,13 @@ public:
 	bool			setContext();
 	void			init();
 	virtual void	draw() = 0;
+	virtual void	update(long frametime) {}
 	void			drawCheckeredBackground();
 	wxWindow*		toPanel(wxWindow* parent);
 
+#ifdef USE_SFML_RENDERWINDOW
 	void	SwapBuffers() { Display(); }
+#endif
 
 	void	onPaint(wxPaintEvent& e);
 	void	onEraseBackground(wxEraseEvent& e);

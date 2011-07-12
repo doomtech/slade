@@ -36,17 +36,15 @@ void SectorInfoOverlay::update(MapSector* sector) {
 	ctex = sector->ceilingTexture();
 }
 
-void SectorInfoOverlay::draw(sf::RenderWindow* rw, sf::Font& font, float alpha) {
+void SectorInfoOverlay::draw(int bottom, int right, float alpha) {
 	// Don't bother if invisible
 	if (alpha <= 0.0f)
 		return;
 
-	int bottom = rw->GetHeight();
-	int right = rw->GetWidth();
-
 	// Get colours
 	rgba_t col_bg = ColourConfiguration::getColour("map_overlay_background");
 	rgba_t col_fg = ColourConfiguration::getColour("map_overlay_foreground");
+	col_fg.a = col_fg.a*alpha;
 
 	// Draw overlay background
 	rgba_t(col_bg.r, col_bg.g, col_bg.b, 80*alpha, 0).set_gl();
@@ -54,46 +52,30 @@ void SectorInfoOverlay::draw(sf::RenderWindow* rw, sf::Font& font, float alpha) 
 	Drawing::drawFilledRect(0, bottom - 66, right, bottom);
 	Drawing::drawFilledRect(0, bottom - 68, right, bottom);
 
-	// Setup info string
-	sf::String str_sinfo("", font, 12);
-	str_sinfo.SetColor(sf::Color(col_fg.r, col_fg.g, col_fg.b, 255*alpha));
-
 	// Sector index + type
-	str_sinfo.SetPosition(2, bottom - 64);
-	str_sinfo.SetText(CHR(info));
-	rw->Draw(str_sinfo);
+	Drawing::drawText(info, 2, bottom - 64, col_fg);
 
 	// Height
-	str_sinfo.SetPosition(2, bottom - 48);
-	str_sinfo.SetText(CHR(height));
-	rw->Draw(str_sinfo);
+	Drawing::drawText(height, 2, bottom - 48, col_fg);
 
 	// Brightness
-	str_sinfo.SetPosition(2, bottom - 32);
-	str_sinfo.SetText(CHR(light));
-	rw->Draw(str_sinfo);
+	Drawing::drawText(light, 2, bottom - 32, col_fg);
 
 	// Tag
-	str_sinfo.SetPosition(2, bottom - 16);
-	str_sinfo.SetText(CHR(tag));
-	rw->Draw(str_sinfo);
+	Drawing::drawText(tag, 2, bottom - 16, col_fg);
 
 	// Ceiling texture
-	drawTexture(rw, font, alpha, right - 88, bottom - 4, ctex, "C");
+	drawTexture(alpha, right - 88, bottom - 4, ctex, "C");
 
 	// Floor texture
-	drawTexture(rw, font, alpha, right - 88 - 92, bottom - 4, ftex, "F");
+	drawTexture(alpha, right - 88 - 92, bottom - 4, ftex, "F");
 }
 
-void SectorInfoOverlay::drawTexture(sf::RenderWindow* rw, sf::Font& font, float alpha, int x, int y, string texture, string pos) {
+void SectorInfoOverlay::drawTexture(float alpha, int x, int y, string texture, string pos) {
 	// Get colours
 	rgba_t col_bg = ColourConfiguration::getColour("map_overlay_background");
 	rgba_t col_fg = ColourConfiguration::getColour("map_overlay_foreground");
-
-	// Init string object
-	sf::String str(CHR(pos), font, 12);
-	str.SetColor(sf::Color(col_fg.r, col_fg.g, col_fg.b, 255*alpha));
-	float diff = 40 - (str.GetRect().GetWidth() * 0.5);
+	col_fg.a = col_fg.a*alpha;
 
 	// Check texture isn't blank
 	if (!(S_CMPNOCASE(texture, "-"))) {
@@ -126,8 +108,5 @@ void SectorInfoOverlay::drawTexture(sf::RenderWindow* rw, sf::Font& font, float 
 	// Draw texture name (even if texture is blank)
 	texture.Prepend(":");
 	texture.Prepend(pos);
-	str.SetText(CHR(texture));
-	diff = 40 - (str.GetRect().GetWidth() * 0.5);
-	str.SetPosition(x + diff, y - 16);
-	rw->Draw(str);
+	Drawing::drawText(texture, x + 40, y - 16, col_fg, Drawing::FONT_SMALL, Drawing::ALIGN_CENTER);
 }

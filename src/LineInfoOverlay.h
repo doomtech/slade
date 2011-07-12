@@ -2,8 +2,6 @@
 #ifndef __LINE_INFO_OVERLAY_H__
 #define __LINE_INFO_OVERLAY_H__
 
-#include <SFML/Graphics.hpp>
-
 class MapLine;
 class LineInfoOverlay {
 private:
@@ -28,9 +26,9 @@ public:
 	~LineInfoOverlay();
 
 	void	update(MapLine* line);
-	void	draw(sf::RenderWindow* rw, sf::Font& font, float alpha = 1.0f);
-	void	drawSide(sf::RenderWindow* rw, sf::Font& font, float alpha, side_t& side, int xstart = 0);
-	void	drawTexture(sf::RenderWindow* rw, sf::Font& font, float alpha, int x, int y, string texture, string pos = "U");
+	void	draw(int bottom, int right, float alpha = 1.0f);
+	void	drawSide(int bottom, int right, float alpha, side_t& side, int xstart = 0);
+	void	drawTexture(float alpha, int x, int y, string texture, string pos = "U");
 };
 
 #endif//__LINE_INFO_OVERLAY_H__

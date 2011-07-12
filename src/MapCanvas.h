@@ -13,19 +13,13 @@ class MapSide;
 class MapCanvas : public OGLCanvas {
 private:
 	MapEditor*				editor;
-	wxTimer					timer;
-	wxStopWatch				stopwatch;
 	vector<MCAnimation*>	animations;
-	sf::Font				font_small;
 
 	// Info overlays
 	int						last_hilight;
 	VertexInfoOverlay		info_vertex;
 	LineInfoOverlay			info_line;
 	SectorInfoOverlay		info_sector;
-
-	// Rendering
-	bool	redraw;
 
 	// View properties
 	double		view_xoff;
@@ -58,6 +52,7 @@ public:
 	// Drawing
 	void	drawGrid();
 	void	draw();
+	void	update(long frametime);
 
 	// Events
 	void	onKeyDown(wxKeyEvent& e);

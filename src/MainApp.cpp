@@ -42,6 +42,7 @@
 #include "SIFormat.h"
 #include "KeyBind.h"
 #include "ColourConfiguration.h"
+#include "Drawing.h"
 #include <wx/image.h>
 #include <wx/stdpaths.h>
 #include <wx/ffile.h>
@@ -494,6 +495,9 @@ bool MainApp::OnInit() {
 	// Load program icons
 	wxLogMessage("Loading icons");
 	loadIcons();
+
+	// Load program fonts
+	Drawing::initFonts();
 
 	// Load entry types
 	wxLogMessage("Loading entry types");

@@ -5,6 +5,7 @@
 #include "SAction.h"
 #include <wx/app.h>
 #include <wx/log.h>
+#include <wx/stopwatch.h>
 
 class SLADELog : public wxLog {
 protected:
@@ -37,6 +38,7 @@ private:
 	vector<SAction*>		actions;
 	vector<SActionHandler*>	action_handlers;
 	bool					init_ok;
+	wxStopWatch				timer;
 
 public:
 	MainApp();
@@ -54,6 +56,7 @@ public:
 	void	readConfigFile();
 	void	saveConfigFile();
 	bool	isInitialised() { return init_ok; }
+	long	runTimer() { return timer.Time(); }
 
 	int			newMenuId() { return cur_id++; }
 	SAction*	getAction(string id);
