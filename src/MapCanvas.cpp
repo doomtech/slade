@@ -63,6 +63,7 @@ MapCanvas::MapCanvas(wxWindow *parent, int id, MapEditor* editor)
 	anim_flash_inc = true;
 	anim_info_fade = 0.0f;
 	timer.Start(10);
+	panning = false;
 
 	// Bind Events
 	Bind(wxEVT_KEY_DOWN, &MapCanvas::onKeyDown, this);
@@ -102,16 +103,21 @@ double MapCanvas::translateY(double y) {
 	return double(-y / view_scale) + view_yoff + (double(GetSize().y * 0.5) / view_scale);
 }
 
-void MapCanvas::pan(double x, double y) {
-	// Pan the view
-	view_xoff += x/view_scale;
-	view_yoff += y/view_scale;
+void MapCanvas::setView(double x, double y) {
+	// Set new view
+	view_xoff = x;
+	view_yoff = y;
 
 	// Update screen limits
 	view_tl.x = translateX(0);
 	view_tl.y = translateY(GetSize().y);
 	view_br.x = translateX(GetSize().x);
 	view_br.y = translateY(0);
+}
+
+void MapCanvas::pan(double x, double y) {
+	// Pan the view
+	setView(view_xoff + x, view_yoff + y);
 }
 
 void MapCanvas::zoom(double amount, bool toward_cursor) {
@@ -374,19 +380,19 @@ void MapCanvas::update(long frametime) {
 void MapCanvas::onKeyDown(wxKeyEvent& e) {
 	// Pan left
 	if (e.GetKeyCode() == WXK_LEFT)
-		pan(-128, 0);
+		pan(-128/view_scale, 0);
 
 	// Pan right
 	if (e.GetKeyCode() == WXK_RIGHT)
-		pan(128, 0);
+		pan(128/view_scale, 0);
 
 	// Pan up
 	if (e.GetKeyCode() == WXK_UP)
-		pan(0, 128);
+		pan(0, 128/view_scale);
 
 	// Pan down
 	if (e.GetKeyCode() == WXK_DOWN)
-		pan(0, -128);
+		pan(0, -128/view_scale);
 
 	// Zoom out
 	if (e.GetKeyCode() == '-')
@@ -427,6 +433,7 @@ void MapCanvas::onMouseDown(wxMouseEvent& e) {
 	// Get map coordinates of cursor
 	double x = translateX(e.GetX());
 	double y = translateY(e.GetY());
+	editor->setMouseDownPos(x, y);
 
 	// Left button down
 	if (e.LeftDown()) {
@@ -440,6 +447,13 @@ void MapCanvas::onMouseDown(wxMouseEvent& e) {
 			// No shift, select any current hilight
 			editor->selectCurrent();
 		}
+	}
+
+	// Middle button down
+	if (e.MiddleDown()) {
+		pan_origin.set(e.GetX(), e.GetY());
+		panning = true;
+		editor->clearHilight();
 	}
 
 	e.Skip();
@@ -458,6 +472,10 @@ void MapCanvas::onMouseUp(wxMouseEvent& e) {
 		editor->updateHilight();
 	}
 
+	// Middle button up
+	if (e.MiddleUp())
+		panning = false;
+
 	e.Skip();
 }
 
@@ -472,6 +490,10 @@ void MapCanvas::onMouseMotion(wxMouseEvent& e) {
 	// If dragging left mouse
 	if (e.Dragging() && e.LeftIsDown())
 		sel_end.set(x, y);
+	else if (e.Dragging() && e.MiddleIsDown()) {
+		pan((pan_origin.x - e.GetX()) / view_scale, -((pan_origin.y - e.GetY()) / view_scale));
+		pan_origin.set(e.GetX(), e.GetY());
+	}
 	else {
 		sel_active = false;
 

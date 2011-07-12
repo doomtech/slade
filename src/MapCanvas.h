@@ -28,6 +28,10 @@ private:
 	fpoint2_t	view_tl;
 	fpoint2_t	view_br;
 
+	// Panning
+	fpoint2_t	pan_origin;
+	bool		panning;
+
 	// Mass selection
 	bool		sel_active;
 	fpoint2_t	sel_origin;
@@ -46,6 +50,7 @@ public:
 	double	translateX(double x);
 	double	translateY(double y);
 
+	void	setView(double x, double y);
 	void	pan(double x, double y);
 	void	zoom(double amount, bool toward_cursor = false);
 

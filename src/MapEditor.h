@@ -58,6 +58,7 @@ public:
 	void	drawSelection(double xmin, double ymin, double xmax, double ymax);
 
 	// Selection/hilight
+	void		clearHilight() { hilight_item = -1; }
 	bool		updateHilight();
 	bool		selectCurrent(bool clear_none = true);
 	bool		selectWithin(double xmin, double ymin, double xmax, double ymax);
