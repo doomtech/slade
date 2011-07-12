@@ -6,7 +6,7 @@
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
  * Filename:    VirtualListView.cpp
- * Description: A 'virtual' list control that akes use of the
+ * Description: A 'virtual' list control that makes use of the
  *              wxListCtrl::wxLC_VERTICAL style. With this, the list
  *              works differently to the normal list view. Rather
  *              than containing specific items, the virtual list
@@ -67,7 +67,7 @@ VirtualListView::VirtualListView(wxWindow* parent)
 	if (list_font_monospace) {
 		wxFont lfont = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
 		lfont.SetFamily(wxFONTFAMILY_MODERN);
-		SetFont(lfont);
+		item_attr->SetFont(lfont);
 	}
 
 	// Bind events
