@@ -3,7 +3,7 @@
 #define __DRAWING_H__
 
 #ifdef USE_SFML_RENDERWINDOW
-class sf::RenderWindow;
+#include <SFML/Graphics.hpp>
 #endif
 
 class GLTexture;

@@ -5,6 +5,7 @@
 #include "OpenGL.h"
 #include "Palette.h"
 #include <wx/control.h>
+#include <wx/timer.h>
 
 #ifdef USE_SFML_RENDERWINDOW
 #undef None
@@ -22,10 +23,8 @@ class OGLCanvas : public wxGLCanvas {
 protected:
 	bool		init_done;
 	Palette8bit	palette;
-
-	// Framerate stuff
-	long	last_time;
-	long	frame_interval;
+	wxTimer		timer;
+	long		last_time;
 
 public:
 	OGLCanvas(wxWindow* parent, int id);
@@ -46,7 +45,8 @@ public:
 
 	void	onPaint(wxPaintEvent& e);
 	void	onEraseBackground(wxEraseEvent& e);
-	void	onIdle(wxIdleEvent& e);
+	void	onTimer(wxTimerEvent& e);
+	//void	onIdle(wxIdleEvent& e);
 };
 
 #endif //__OGLCANVAS_H__

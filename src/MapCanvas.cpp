@@ -62,7 +62,7 @@ MapCanvas::MapCanvas(wxWindow *parent, int id, MapEditor* editor)
 	anim_flash_level = 0.5f;
 	anim_flash_inc = true;
 	anim_info_fade = 0.0f;
-	frame_interval = 10;
+	timer.Start(10);
 
 	// Bind Events
 	Bind(wxEVT_KEY_DOWN, &MapCanvas::onKeyDown, this);
@@ -325,17 +325,20 @@ void MapCanvas::draw() {
 }
 
 void MapCanvas::update(long frametime) {
+	// Get frame time multiplier
+	float mult = (float)frametime / 10.0f;
+
 	// Flashing animation for hilight
 	// Pulsates between 0.5-1.0f (multiplied with hilight alpha)
 	if (anim_flash_inc) {
-		anim_flash_level += 0.03f;
+		anim_flash_level += 0.015f*mult;
 		if (anim_flash_level >= 1.0f) {
 			anim_flash_inc = false;
 			anim_flash_level = 1.0f;
 		}
 	}
 	else {
-		anim_flash_level -= 0.03f;
+		anim_flash_level -= 0.015f*mult;
 		if (anim_flash_level <= 0.5f) {
 			anim_flash_inc = true;
 			anim_flash_level = 0.6f;
@@ -344,12 +347,12 @@ void MapCanvas::update(long frametime) {
 
 	// Fader for info overlay
 	if (anim_info_show) {
-		anim_info_fade += 0.16f;
+		anim_info_fade += 0.1f*mult;
 		if (anim_info_fade > 1.0f)
 			anim_info_fade = 1.0f;
 	}
 	else {
-		anim_info_fade -= 0.1f;
+		anim_info_fade -= 0.05f*mult;
 		if (anim_info_fade < 0.0f)
 			anim_info_fade = 0.0f;
 	}

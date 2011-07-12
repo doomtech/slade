@@ -54,10 +54,10 @@
  * OGLCanvas class constructor, SFML implementation
  *******************************************************************/
 OGLCanvas::OGLCanvas(wxWindow* parent, int id)
-: wxControl(parent, id, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE|wxWANTS_CHARS) {
+: wxControl(parent, id, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE|wxWANTS_CHARS), timer(this) {
 	init_done = false;
 	last_time = theApp->runTimer();
-	frame_interval = 100;
+	timer.Start(100);
 
 	// Code taken from SFML wxWidgets integration example
 	#ifdef __WXGTK__
@@ -75,22 +75,23 @@ OGLCanvas::OGLCanvas(wxWindow* parent, int id)
 	// Bind events
 	Bind(wxEVT_PAINT, &OGLCanvas::onPaint, this);
 	Bind(wxEVT_ERASE_BACKGROUND, &OGLCanvas::onEraseBackground, this);
-	Bind(wxEVT_IDLE, &OGLCanvas::onIdle, this);
+	//Bind(wxEVT_IDLE, &OGLCanvas::onIdle, this);
+	Bind(wxEVT_TIMER, &OGLCanvas::onTimer, this);
 }
 #else
 /* OGLCanvas::OGLCanvas
  * OGLCanvas class constructor, wxGLCanvas implementation
  *******************************************************************/
 OGLCanvas::OGLCanvas(wxWindow* parent, int id)
-: wxGLCanvas(parent, id, NULL, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE|wxWANTS_CHARS) {
+: wxGLCanvas(parent, id, NULL, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE|wxWANTS_CHARS), timer(this) {
 	init_done = false;
 	last_time = theApp->runTimer();
-	frame_interval = -1;
 
 	// Bind events
 	Bind(wxEVT_PAINT, &OGLCanvas::onPaint, this);
 	Bind(wxEVT_ERASE_BACKGROUND, &OGLCanvas::onEraseBackground, this);
-	Bind(wxEVT_IDLE, &OGLCanvas::onIdle, this);
+	//Bind(wxEVT_IDLE, &OGLCanvas::onIdle, this);
+	Bind(wxEVT_TIMER, &OGLCanvas::onTimer, this);
 }
 #endif
 
@@ -256,6 +257,7 @@ void OGLCanvas::onEraseBackground(wxEraseEvent& e) {
 /* OGLCanvas::onIdle
  * Called when the gfx canvas is doing nothing
  *******************************************************************/
+/*
 void OGLCanvas::onIdle(wxIdleEvent& e) {
 	// If frame interval is negative, don't redraw automatically
 	if (frame_interval < 0)
@@ -272,4 +274,15 @@ void OGLCanvas::onIdle(wxIdleEvent& e) {
 	}
 
 	e.Skip();
+}
+*/
+
+void OGLCanvas::onTimer(wxTimerEvent& e) {
+	// Get time since last redraw
+	long frametime = theApp->runTimer() - last_time;
+
+	// Update/refresh
+	update(frametime);
+	Refresh();
+	last_time = theApp->runTimer();
 }

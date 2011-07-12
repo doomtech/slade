@@ -208,7 +208,7 @@ void Drawing::drawTextureWithin(GLTexture* tex, double x1, double y1, double x2,
  *******************************************************************/
 void Drawing::drawText(string text, int x, int y, rgba_t colour, int font, int alignment, frect_t* bounds) {
 	// Setup SFML string
-	sf::String sf_str("");
+	sf::String sf_str(CHR(text));
 	sf_str.SetPosition(x, y);
 	sf_str.SetColor(sf::Color(colour.r, colour.g, colour.b, colour.a));
 	if (font == FONT_SMALL) {
