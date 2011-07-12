@@ -474,8 +474,10 @@ bool MainApp::OnInit() {
 	// Check that SLADE.pk3 can be found
 	wxLogMessage("Loading resources");
 	theArchiveManager->init();
-	if (!theArchiveManager->resArchiveOK())
+	if (!theArchiveManager->resArchiveOK()) {
+		wxMessageBox("Unable to find slade.pk3, make sure it exists in the same directory as the SLADE executable", "Error", wxICON_ERROR);
 		return false;
+	}
 
 	// Show splash screen
 	theSplashWindow->init();

@@ -2,10 +2,10 @@ SLADE3 SVN UNIX COMPILATION INSTRUCTIONS
 ----------------------------------------
 1)
 Download the required libraries (most should be available in your distro's package repository):
--wxWidgets *2.9+* from http://wxwidgets.org (most repositories don't currently have 2.9)
--FreeImage from http://freeimage.sourceforge.net
--FluidSynth from http://fluidsynth.org
--Audiere from http://audiere.sourceforge.net
+-wxWidgets *2.9+* from <http://wxwidgets.org> (most repositories don't currently have 2.9)
+-FreeImage from <http://freeimage.sourceforge.net>
+-FluidSynth from <http://fluidsynth.org>
+-SFML from <http://sfml-dev.org>
 
 2)
 Compile/install the required libraries if needed.
@@ -19,18 +19,19 @@ b) FreeImage:
 -Follow the instructions in README.linux (to install normal FreeImage, not FreeImagePlus)
 
 3)
-To compile SLADE3, there are two ways to go about it, either install CodeLite IDE and use that (recommended),
-or build it using the Makefile
+To compile SLADE3, there are two ways to go about it: either install CodeLite IDE and use that, or build it using CMake
 
 a) IDE Compilation
--Download and install CodeLite IDE from http://codelite.org
+-Download and install CodeLite IDE from <http://codelite.org>
 -Run CodeLite
 -Select Workspace->Switch to workspace... and select 'SLADE.workspace' in the trunk directory of the SLADE SVN
 -Select Release configuration from the drop-down box on the workspace view if it isn't already selected
 -Click the 'Build Active Project' button on the toolbar
 
-b) Makefile Compilation
--Just type 'make' to compile the release build, or 'make -f Makefile-debug' to compile the debug build
+b) CMake Compilation
+-Make sure cmake is installed <http://cmake.org>
+-cd to the 'dist' directory
+-Enter the following commands: 'cmake .. -DCMAKE_BUILD_TYPE=Release' then 'make'
 
 And that should be it. If you are having problems I can be contacted via email:
 sirjuddington@gmail.com
@@ -38,14 +39,6 @@ sirjuddington@gmail.com
 
 OTHER SLADE3 UNIX ISSUES
 ------------------------
-Audio support:
-The current release of Audiere is quite old, and can cause some problems. For one, it only supports OSS output
-in linux. If your distro has dropped OSS support (eg ubuntu 10.10), you'll have to get the alsa-oss wrapper,
-and run slade3 like "aoss ./slade3", or no audio playback (except MIDI via fluidsynth) will be available.
-If you cannot get Audiere packages for your distro (and don't try compiling it - it won't), it is possible to
-disable it (and therefore all sound playback) by using Makefile-no_audiere in trunk. The CodeLite project currently
-has Audiere disabled in unix.
-
 Ubuntu 11.04:
 wxWidgets 2.9.1 has some issues with Ubuntu 11.04. These are fixed in wxWidgets 2.9.2 on the wx SVN. Instructions
 for checking out the wxWidgets svn can be found here: <http://www.wxwidgets.org/develop/svn.htm>. The compilation
