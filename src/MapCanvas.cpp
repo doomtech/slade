@@ -66,6 +66,7 @@ MapCanvas::MapCanvas(wxWindow *parent, int id, MapEditor* editor)
 	panning = false;
 
 	// Bind Events
+	Bind(wxEVT_SIZE, &MapCanvas::onSize, this);
 	Bind(wxEVT_KEY_DOWN, &MapCanvas::onKeyDown, this);
 	Bind(wxEVT_LEFT_DOWN, &MapCanvas::onMouseDown, this);
 	Bind(wxEVT_RIGHT_DOWN, &MapCanvas::onMouseDown, this);
@@ -376,6 +377,14 @@ void MapCanvas::update(long frametime) {
 
 
 
+
+void MapCanvas::onSize(wxSizeEvent& e) {
+	// Update screen limits
+	view_tl.x = translateX(0);
+	view_tl.y = translateY(GetSize().y);
+	view_br.x = translateX(GetSize().x);
+	view_br.y = translateY(0);
+}
 
 void MapCanvas::onKeyDown(wxKeyEvent& e) {
 	// Pan left

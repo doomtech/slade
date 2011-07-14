@@ -35,6 +35,11 @@ void VertexInfoOverlay::draw(int bottom, int right, float alpha) {
 	rgba_t col_fg = ColourConfiguration::getColour("map_overlay_foreground");
 	col_fg.a = col_fg.a*alpha;
 
+	// Slide in/out animation
+	glPushMatrix();
+	float alpha_inv = 1.0f - alpha;
+	glTranslated(0, 16*alpha_inv*alpha_inv, 0);
+
 	// Draw overlay background
 	rgba_t(col_bg.r, col_bg.g, col_bg.b, alpha*60, 0).set_gl();
 	Drawing::drawFilledRect(0, bottom - 16, right, bottom);
@@ -43,4 +48,6 @@ void VertexInfoOverlay::draw(int bottom, int right, float alpha) {
 
 	// Draw text
 	Drawing::drawText(info, 2, bottom - 16, col_fg);
+
+	glPopMatrix();
 }

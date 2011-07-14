@@ -59,6 +59,7 @@ public:
 	bool	moveEntry(ArchiveEntry* entry, unsigned position = 0xFFFFFFFF, ArchiveTreeNode* dir = NULL);
 
 	// Detection
+	mapdesc_t			getMapInfo(ArchiveEntry* maphead);
 	vector<mapdesc_t>	detectMaps();
 	string				detectNamespace(ArchiveEntry* entry);
 

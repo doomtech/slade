@@ -60,6 +60,7 @@ public:
 	void	update(long frametime);
 
 	// Events
+	void	onSize(wxSizeEvent& e);
 	void	onKeyDown(wxKeyEvent& e);
 	void	onMouseDown(wxMouseEvent& e);
 	void	onMouseUp(wxMouseEvent& e);

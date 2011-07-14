@@ -46,6 +46,11 @@ void SectorInfoOverlay::draw(int bottom, int right, float alpha) {
 	rgba_t col_fg = ColourConfiguration::getColour("map_overlay_foreground");
 	col_fg.a = col_fg.a*alpha;
 
+	// Slide in/out animation
+	glPushMatrix();
+	float alpha_inv = 1.0f - alpha;
+	glTranslated(0, 64*alpha_inv*alpha_inv, 0);
+
 	// Draw overlay background
 	rgba_t(col_bg.r, col_bg.g, col_bg.b, 80*alpha, 0).set_gl();
 	Drawing::drawFilledRect(0, bottom - 64, right, bottom);
@@ -69,6 +74,8 @@ void SectorInfoOverlay::draw(int bottom, int right, float alpha) {
 
 	// Floor texture
 	drawTexture(alpha, right - 88 - 92, bottom - 4, ftex, "F");
+
+	glPopMatrix();
 }
 
 void SectorInfoOverlay::drawTexture(float alpha, int x, int y, string texture, string pos) {

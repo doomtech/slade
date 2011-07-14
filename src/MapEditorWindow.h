@@ -26,14 +26,12 @@ public:
 
 		return instance;
 	}
-	
+
 	MapEditor&			mapEditor() { return editor; }
 	MapTextureManager&	textureManager() { return tex_man; }
 
 	void	setupLayout();
 	bool	openMap(Archive::mapdesc_t map);
-	
-	void	setPropsPaneCaption(string caption);
 
 	// Events
 	void	onClose(wxCloseEvent& e);

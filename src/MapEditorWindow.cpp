@@ -74,11 +74,6 @@ void MapEditorWindow::setupLayout() {
 	map_canvas = new MapCanvas(this, -1, &editor);
 	p_inf.CenterPane();
 	m_mgr->AddPane(map_canvas, p_inf);
-	
-	// Properties panel
-	//wxPanel* panel_temp = new wxPanel(this, -1);
-	//p_inf.DefaultPane().Dockable().Name("properties").Bottom().Caption("Properties").BestSize(320, 200).FloatingSize(500, 500);
-	//m_mgr->AddPane(panel_temp, p_inf);
 
 	// Status bar
 	CreateStatusBar();
@@ -92,12 +87,6 @@ bool MapEditorWindow::openMap(Archive::mapdesc_t map) {
 	tex_man.setArchive(map.head->getParent());
 
 	return editor.openMap(map);
-}
-
-void MapEditorWindow::setPropsPaneCaption(string caption) {
-	//wxAuiManager* m_mgr = wxAuiManager::GetManager(this);
-	//m_mgr->GetPane("properties").Caption(caption);
-	//m_mgr->Update();
 }
 
 void MapEditorWindow::onClose(wxCloseEvent& e) {

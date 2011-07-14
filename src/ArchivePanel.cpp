@@ -946,7 +946,7 @@ bool ArchivePanel::gfxConvert() {
 		// Get image and conversion info
 		SImage* image = gcd.getItemImage(a);
 		SIFormat* format = gcd.getItemFormat(a);
-		
+
 		// Write converted image back to entry
 		MemChunk mc;
 		format->saveImage(*image, mc, gcd.getItemPalette(a));
@@ -2006,6 +2006,10 @@ void ArchivePanel::onEntryListActivated(wxListEvent& e) {
 	else if (entry->getType()->getFormat() == "texturex" ||
 			entry->getType() == EntryType::getType("zdtextures"))
 		theMainWindow->openTextureEditor(archive);
+
+	// Map
+	else if (entry->getType() == EntryType::mapMarkerType())
+		theMapEditor->openMap(archive->getMapInfo(entry));
 
 	// Other entry
 	else if (entry->getType() != EntryType::folderType())
