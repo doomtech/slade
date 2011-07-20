@@ -6,14 +6,16 @@
 #include "VertexInfoOverlay.h"
 #include "LineInfoOverlay.h"
 #include "SectorInfoOverlay.h"
+#include "KeyBind.h"
 
 class MapEditor;
 class MCAnimation;
 class MapSide;
-class MapCanvas : public OGLCanvas {
+class MapCanvas : public OGLCanvas, public KeyBindHandler {
 private:
 	MapEditor*				editor;
 	vector<MCAnimation*>	animations;
+	point2_t				mouse_relpos;
 
 	// Info overlays
 	int						last_hilight;
@@ -59,9 +61,14 @@ public:
 	void	draw();
 	void	update(long frametime);
 
+	// Keybind handling
+	void onKeyBindPress(string name);
+	void onKeyBindRelease(string name);
+
 	// Events
 	void	onSize(wxSizeEvent& e);
 	void	onKeyDown(wxKeyEvent& e);
+	void	onKeyUp(wxKeyEvent& e);
 	void	onMouseDown(wxMouseEvent& e);
 	void	onMouseUp(wxMouseEvent& e);
 	void	onMouseMotion(wxMouseEvent& e);

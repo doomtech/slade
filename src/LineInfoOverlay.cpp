@@ -65,9 +65,8 @@ void LineInfoOverlay::draw(int bottom, int right, float alpha) {
 		return;
 
 	// Slide in/out animation
-	glPushMatrix();
 	float alpha_inv = 1.0f - alpha;
-	glTranslated(0, 64*alpha_inv*alpha_inv, 0);
+	bottom += 64*alpha_inv*alpha_inv;
 
 	// Get colours
 	rgba_t col_bg = ColourConfiguration::getColour("map_overlay_background");
@@ -102,8 +101,6 @@ void LineInfoOverlay::draw(int bottom, int right, float alpha) {
 	if (side_back.exists)
 		//drawSide(rw, font, alpha, side_back, x);
 		drawSide(bottom, right, alpha, side_back, x);
-
-	glPopMatrix();
 }
 
 void LineInfoOverlay::drawSide(int bottom, int right, float alpha, side_t& side, int xstart) {

@@ -68,6 +68,7 @@ MapCanvas::MapCanvas(wxWindow *parent, int id, MapEditor* editor)
 	// Bind Events
 	Bind(wxEVT_SIZE, &MapCanvas::onSize, this);
 	Bind(wxEVT_KEY_DOWN, &MapCanvas::onKeyDown, this);
+	Bind(wxEVT_KEY_UP, &MapCanvas::onKeyUp, this);
 	Bind(wxEVT_LEFT_DOWN, &MapCanvas::onMouseDown, this);
 	Bind(wxEVT_RIGHT_DOWN, &MapCanvas::onMouseDown, this);
 	Bind(wxEVT_MIDDLE_DOWN, &MapCanvas::onMouseDown, this);
@@ -375,6 +376,80 @@ void MapCanvas::update(long frametime) {
 	}
 }
 
+void MapCanvas::onKeyBindPress(string name) {
+	// Pan left
+	if (name == "me2d_left")
+		pan(-128/view_scale, 0);
+
+	// Pan right
+	else if (name == "me2d_right")
+		pan(128/view_scale, 0);
+
+	// Pan up
+	else if (name == "me2d_up")
+		pan(0, 128/view_scale);
+
+	// Pan down
+	else if (name == "me2d_down")
+		pan(0, -128/view_scale);
+
+	// Zoom out
+	else if (name == "me2d_zoom_out")
+		zoom(0.8);
+
+	// Zoom in
+	else if (name == "me2d_zoom_in")
+		zoom(1.2);
+
+	// Zoom out (follow mouse)
+	else if (name == "me2d_zoom_out_m")
+		zoom(0.8, true);
+
+	// Zoom in (follow mouse)
+	else if (name == "me2d_zoom_in_m")
+		zoom(1.2, true);
+
+	// Increment grid
+	else if (name == "me2d_grid_inc")
+		editor->incrementGrid();
+
+	// Decrement grid
+	else if (name == "me2d_grid_dec")
+		editor->decrementGrid();
+
+	// Vertices mode
+	else if (name == "me2d_mode_vertices")
+		editor->setEditMode(MapEditor::MODE_VERTICES);
+
+	// Lines mode
+	else if (name == "me2d_mode_lines")
+		editor->setEditMode(MapEditor::MODE_LINES);
+
+	// Sectors mode
+	else if (name == "me2d_mode_sectors")
+		editor->setEditMode(MapEditor::MODE_SECTORS);
+
+	// Things mode
+	else if (name == "me2d_mode_things")
+		editor->setEditMode(MapEditor::MODE_THINGS);
+
+	// Pan view
+	else if (name == "me2d_pan_view") {
+		pan_origin.set(mouse_relpos.x, mouse_relpos.y);
+		panning = true;
+		editor->clearHilight();
+		SetCursor(wxCURSOR_SIZING);
+	}
+}
+
+void MapCanvas::onKeyBindRelease(string name) {
+	if (name == "me2d_pan_view") {
+		panning = false;
+		editor->updateHilight();
+		SetCursor(wxNullCursor);
+	}
+}
+
 
 
 
@@ -387,53 +462,15 @@ void MapCanvas::onSize(wxSizeEvent& e) {
 }
 
 void MapCanvas::onKeyDown(wxKeyEvent& e) {
-	// Pan left
-	if (e.GetKeyCode() == WXK_LEFT)
-		pan(-128/view_scale, 0);
+	// Let keybind system handle it
+	KeyBind::keyPressed(KeyBind::keyName(e.GetKeyCode()), e.AltDown(), e.ControlDown(), e.ShiftDown());
 
-	// Pan right
-	if (e.GetKeyCode() == WXK_RIGHT)
-		pan(128/view_scale, 0);
+	e.Skip();
+}
 
-	// Pan up
-	if (e.GetKeyCode() == WXK_UP)
-		pan(0, 128/view_scale);
-
-	// Pan down
-	if (e.GetKeyCode() == WXK_DOWN)
-		pan(0, -128/view_scale);
-
-	// Zoom out
-	if (e.GetKeyCode() == '-')
-		zoom(0.8);
-
-	// Zoom in
-	if (e.GetKeyCode() == '=')
-		zoom(1.2);
-
-	// Increment grid
-	if (e.GetKeyCode() == ']')
-		editor->incrementGrid();
-
-	// Decrement grid
-	if (e.GetKeyCode() == '[')
-		editor->decrementGrid();
-
-	// Vertices mode
-	if (e.GetKeyCode() == 'V')
-		editor->setEditMode(MapEditor::MODE_VERTICES);
-
-	// Lines mode
-	if (e.GetKeyCode() == 'L')
-		editor->setEditMode(MapEditor::MODE_LINES);
-
-	// Sectors mode
-	if (e.GetKeyCode() == 'S')
-		editor->setEditMode(MapEditor::MODE_SECTORS);
-
-	// Things mode
-	if (e.GetKeyCode() == 'T')
-		editor->setEditMode(MapEditor::MODE_THINGS);
+void MapCanvas::onKeyUp(wxKeyEvent& e) {
+	// Let keybind system handle it
+	KeyBind::keyReleased(KeyBind::keyName(e.GetKeyCode()));
 
 	e.Skip();
 }
@@ -458,12 +495,9 @@ void MapCanvas::onMouseDown(wxMouseEvent& e) {
 		}
 	}
 
-	// Middle button down
-	if (e.MiddleDown()) {
-		pan_origin.set(e.GetX(), e.GetY());
-		panning = true;
-		editor->clearHilight();
-	}
+	// Not left or right button (both reserved), let keybind system handle it
+	else if (!e.RightDown())
+		KeyBind::keyPressed(KeyBind::mbName(e.GetButton()), e.AltDown(), e.ControlDown(), e.ShiftDown());
 
 	e.Skip();
 }
@@ -481,14 +515,17 @@ void MapCanvas::onMouseUp(wxMouseEvent& e) {
 		editor->updateHilight();
 	}
 
-	// Middle button up
-	if (e.MiddleUp())
-		panning = false;
+	// Not left or right button (both reserved), let keybind system handle it
+	else if (!e.RightUp())
+		KeyBind::keyReleased(KeyBind::mbName(e.GetButton()));
 
 	e.Skip();
 }
 
 void MapCanvas::onMouseMotion(wxMouseEvent& e) {
+	// Set mouse cursor position
+	mouse_relpos.set(e.GetX(), e.GetY());
+
 	// Get map coordinates of cursor
 	double x = translateX(e.GetX());
 	double y = translateY(e.GetY());
@@ -499,7 +536,7 @@ void MapCanvas::onMouseMotion(wxMouseEvent& e) {
 	// If dragging left mouse
 	if (e.Dragging() && e.LeftIsDown())
 		sel_end.set(x, y);
-	else if (e.Dragging() && e.MiddleIsDown()) {
+	else if (KeyBind::isPressed("me2d_pan_view")) {
 		pan((pan_origin.x - e.GetX()) / view_scale, -((pan_origin.y - e.GetY()) / view_scale));
 		pan_origin.set(e.GetX(), e.GetY());
 	}
@@ -514,8 +551,12 @@ void MapCanvas::onMouseMotion(wxMouseEvent& e) {
 }
 
 void MapCanvas::onMouseWheel(wxMouseEvent& e) {
-	if (e.GetWheelRotation() > 0)
-		zoom(1.2, true);
-	else if (e.GetWheelRotation() < 0)
-		zoom(0.8, true);
+	if (e.GetWheelRotation() > 0) {
+		KeyBind::keyPressed("mwheelup", e.AltDown(), e.ControlDown(), e.ShiftDown());
+		KeyBind::keyReleased("mwheelup");
+	}
+	else if (e.GetWheelRotation() < 0) {
+		KeyBind::keyPressed("mwheeldown", e.AltDown(), e.ControlDown(), e.ShiftDown());
+		KeyBind::keyReleased("mwheeldown");
+	}
 }
