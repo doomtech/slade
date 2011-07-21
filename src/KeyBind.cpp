@@ -292,9 +292,9 @@ bool KeyBind::keyReleased(string key) {
 
 keypress_t KeyBind::asKeyPress(int keycode, int modifiers) {
 	return keypress_t(keyName(keycode),
-						modifiers & wxMOD_ALT,
-						modifiers & wxMOD_CMD,
-						modifiers & wxMOD_SHIFT);
+						((modifiers & wxMOD_ALT) != 0),
+						((modifiers & wxMOD_CMD) != 0),
+						((modifiers & wxMOD_SHIFT) != 0));
 }
 
 void KeyBind::initBinds() {
@@ -425,10 +425,10 @@ bool KeyBind::readBinds(Tokenizer& tz) {
 			else
 				key = keystr;
 
-			// Add the bind
+			// Add the key
 			addBind(name, keypress_t(key, mods.Find('a') >= 0, mods.Find('c') >= 0, mods.Find('s') >= 0));
 
-			// Check for more binds
+			// Check for more keys
 			if (tz.peekToken() == ",")
 				tz.getToken();			// Skip ,
 			else

@@ -261,16 +261,16 @@ bool SLADEMap::addLine(doomline_t& l) {
 	nl->prop("special") = l.type;
 
 	// Flags
-	nl->prop("blocking") = bool(l.flags & LINE_IMPASSIBLE);
-	nl->prop("blockmonsters") = bool(l.flags & LINE_BLOCKMONSTERS);
-	nl->prop("twosided") = bool(l.flags & LINE_TWOSIDED);
-	nl->prop("dontpegtop") = bool(l.flags & LINE_UPPERUNPEGGED);
-	nl->prop("dontpegbottom") = bool(l.flags & LINE_LOWERUNPEGGED);
-	nl->prop("secret") = bool(l.flags & LINE_SECRET);
-	nl->prop("blocksound") = bool(l.flags & LINE_BLOCKSOUND);
-	nl->prop("dontdraw") = bool(l.flags & LINE_NOTONMAP);
-	nl->prop("mapped") = bool(l.flags & LINE_STARTONMAP);
-	nl->prop("passuse") = bool(l.flags & LINE_BPASSTHROUGH);
+	nl->prop("blocking") = ((l.flags & LINE_IMPASSIBLE) != 0);
+	nl->prop("blockmonsters") = ((l.flags & LINE_BLOCKMONSTERS) != 0);
+	nl->prop("twosided") = ((l.flags & LINE_TWOSIDED) != 0);
+	nl->prop("dontpegtop") = ((l.flags & LINE_UPPERUNPEGGED) != 0);
+	nl->prop("dontpegbottom") = ((l.flags & LINE_LOWERUNPEGGED) != 0);
+	nl->prop("secret") = ((l.flags & LINE_SECRET) != 0);
+	nl->prop("blocksound") = ((l.flags & LINE_BLOCKSOUND) != 0);
+	nl->prop("dontdraw") = ((l.flags & LINE_NOTONMAP) != 0);
+	nl->prop("mapped") = ((l.flags & LINE_STARTONMAP) != 0);
+	nl->prop("passuse") = ((l.flags & LINE_BPASSTHROUGH) != 0);
 
 	// Add line
 	lines.push_back(nl);
@@ -301,15 +301,15 @@ bool SLADEMap::addThing(doomthing_t& t) {
 	nt->prop("angle") = t.angle;
 
 	// Flags
-	nt->prop("skill1") = bool(t.flags & THING_EASY);
-	nt->prop("skill2") = bool(t.flags & THING_EASY);
-	nt->prop("skill3") = bool(t.flags & THING_MEDIUM);
-	nt->prop("skill4") = bool(t.flags & THING_HARD);
-	nt->prop("skill5") = bool(t.flags & THING_HARD);
-	nt->prop("ambush") = bool(t.flags & THING_DEAF);
-	nt->prop("single") = !bool(t.flags & THING_MULTI);
-	nt->prop("dm") = !bool(t.flags & THING_BNOTDM);
-	nt->prop("coop") = !bool(t.flags & THING_BNOTCOOP);
+	nt->prop("skill1") = ((t.flags & THING_EASY)!=0);
+	nt->prop("skill2") = ((t.flags & THING_EASY)!=0);
+	nt->prop("skill3") = ((t.flags & THING_MEDIUM)!=0);
+	nt->prop("skill4") = ((t.flags & THING_HARD)!=0);
+	nt->prop("skill5") = ((t.flags & THING_HARD)!=0);
+	nt->prop("ambush") = ((t.flags & THING_DEAF)!=0);
+	nt->prop("single") = !((t.flags & THING_MULTI)!=0);
+	nt->prop("dm") = !((t.flags & THING_BNOTDM)!=0);
+	nt->prop("coop") = !((t.flags & THING_BNOTCOOP)!=0);
 
 	// Add thing
 	things.push_back(nt);
@@ -466,16 +466,16 @@ bool SLADEMap::addLine(hexenline_t& l) {
 	nl->prop("special") = l.type;
 
 	// Flags
-	nl->prop("blocking") = bool(l.flags & LINE_IMPASSIBLE);
-	nl->prop("blockmonsters") = bool(l.flags & LINE_BLOCKMONSTERS);
-	nl->prop("twosided") = bool(l.flags & LINE_TWOSIDED);
-	nl->prop("dontpegtop") = bool(l.flags & LINE_UPPERUNPEGGED);
-	nl->prop("dontpegbottom") = bool(l.flags & LINE_LOWERUNPEGGED);
-	nl->prop("secret") = bool(l.flags & LINE_SECRET);
-	nl->prop("blocksound") = bool(l.flags & LINE_BLOCKSOUND);
-	nl->prop("dontdraw") = bool(l.flags & LINE_NOTONMAP);
-	nl->prop("mapped") = bool(l.flags & LINE_STARTONMAP);
-	nl->prop("repeatspecial") = bool(l.flags & LINE_HREPEATABLE);
+	nl->prop("blocking") = ((l.flags & LINE_IMPASSIBLE)!=0);
+	nl->prop("blockmonsters") = ((l.flags & LINE_BLOCKMONSTERS)!=0);
+	nl->prop("twosided") = ((l.flags & LINE_TWOSIDED)!=0);
+	nl->prop("dontpegtop") = ((l.flags & LINE_UPPERUNPEGGED)!=0);
+	nl->prop("dontpegbottom") = ((l.flags & LINE_LOWERUNPEGGED)!=0);
+	nl->prop("secret") = ((l.flags & LINE_SECRET)!=0);
+	nl->prop("blocksound") = ((l.flags & LINE_BLOCKSOUND)!=0);
+	nl->prop("dontdraw") = ((l.flags & LINE_NOTONMAP)!=0);
+	nl->prop("mapped") = ((l.flags & LINE_STARTONMAP)!=0);
+	nl->prop("repeatspecial") = ((l.flags & LINE_HREPEATABLE)!=0);
 	// TODO: SPAC stuff
 
 	// Add line
@@ -499,19 +499,19 @@ bool SLADEMap::addThing(hexenthing_t& t) {
 	nt->prop("arg4") = t.args[4];
 
 	// Flags
-	nt->prop("skill1") = bool(t.flags & THING_EASY);
-	nt->prop("skill2") = bool(t.flags & THING_EASY);
-	nt->prop("skill3") = bool(t.flags & THING_MEDIUM);
-	nt->prop("skill4") = bool(t.flags & THING_HARD);
-	nt->prop("skill5") = bool(t.flags & THING_HARD);
-	nt->prop("ambush") = bool(t.flags & THING_DEAF);
-	nt->prop("dormant") = bool(t.flags & THING_HDORMANT);
-	nt->prop("class1") = bool(t.flags & THING_HCLASS1);
-	nt->prop("class2") = bool(t.flags & THING_HCLASS2);
-	nt->prop("class3") = bool(t.flags & THING_HCLASS3);
-	nt->prop("single") = bool(t.flags & THING_HSP);
-	nt->prop("dm") = bool(t.flags & THING_HDM);
-	nt->prop("coop") = bool(t.flags & THING_HCOOP);
+	nt->prop("skill1") = ((t.flags & THING_EASY)!=0);
+	nt->prop("skill2") = ((t.flags & THING_EASY)!=0);
+	nt->prop("skill3") = ((t.flags & THING_MEDIUM)!=0);
+	nt->prop("skill4") = ((t.flags & THING_HARD)!=0);
+	nt->prop("skill5") = ((t.flags & THING_HARD)!=0);
+	nt->prop("ambush") = ((t.flags & THING_DEAF)!=0);
+	nt->prop("dormant") = ((t.flags & THING_HDORMANT)!=0);
+	nt->prop("class1") = ((t.flags & THING_HCLASS1)!=0);
+	nt->prop("class2") = ((t.flags & THING_HCLASS2)!=0);
+	nt->prop("class3") = ((t.flags & THING_HCLASS3)!=0);
+	nt->prop("single") = ((t.flags & THING_HSP)!=0);
+	nt->prop("dm") = ((t.flags & THING_HDM)!=0);
+	nt->prop("coop") = ((t.flags & THING_HCOOP)!=0);
 
 	// Add thing
 	things.push_back(nt);

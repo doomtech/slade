@@ -169,10 +169,10 @@ bool MathStuff::linesIntersect(double l1x1, double l1y1, double l1x2, double l1y
 	y = (a1*c2 - a2*c1) / det;
 
 	// Check that the intersection point is on both lines
-	if ((min(l1x1, l1x2) < x < max(l1x2, l1x2)) &&
-		(min(l1y1, l1y2) < y < max(l1y1, l1y2)) &&
-		(min(l2x1, l2x2) < x < max(l2x1, l2x2)) &&
-		(min(l2y1, l2y2) < y < max(l2y1, l2y2)))
+	if ((min(l1x1, l1x2) < x && x < max(l1x2, l1x2)) &&
+		(min(l1y1, l1y2) < y && y < max(l1y1, l1y2)) &&
+		(min(l2x1, l2x2) < x && x < max(l2x1, l2x2)) &&
+		(min(l2y1, l2y2) < y && y < max(l2y1, l2y2)))
 		return true;
 
 	// Intersection point does not lie on both lines
