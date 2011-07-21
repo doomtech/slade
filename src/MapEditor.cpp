@@ -386,17 +386,17 @@ void MapEditor::drawSelection(double xmin, double ymin, double xmax, double ymax
 	glPointSize(vertex_size);
 }
 
-bool MapEditor::updateHilight() {
+bool MapEditor::updateHilight(double dist_scale) {
 	int current = hilight_item;
 
 	// Update hilighted object depending on mode
 	string objtype = "";
 	if (edit_mode == MODE_VERTICES) {
-		hilight_item = map.nearestVertex(mouse_pos.x, mouse_pos.y);
+		hilight_item = map.nearestVertex(mouse_pos.x, mouse_pos.y, 32/dist_scale);
 		objtype = "Vertex";
 	}
 	else if (edit_mode == MODE_LINES) {
-		hilight_item = map.nearestLine(mouse_pos.x, mouse_pos.y);
+		hilight_item = map.nearestLine(mouse_pos.x, mouse_pos.y, 32/dist_scale);
 		objtype = "Line";
 	}
 	else if (edit_mode == MODE_SECTORS) {
@@ -404,7 +404,7 @@ bool MapEditor::updateHilight() {
 		objtype = "Sector";
 	}
 	else if (edit_mode == MODE_THINGS) {
-		hilight_item = map.nearestThing(mouse_pos.x, mouse_pos.y);
+		hilight_item = map.nearestThing(mouse_pos.x, mouse_pos.y, 32/dist_scale);
 		objtype = "Thing";
 	}
 

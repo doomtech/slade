@@ -63,7 +63,8 @@ MapCanvas::MapCanvas(wxWindow *parent, int id, MapEditor* editor)
 	anim_flash_inc = true;
 	anim_info_fade = 0.0f;
 	timer.Start(10);
-	panning = false;
+	mouse_state = MSTATE_NORMAL;
+	mouse_downpos.set(-1, -1);
 
 	// Bind Events
 	Bind(wxEVT_SIZE, &MapCanvas::onSize, this);
@@ -268,12 +269,14 @@ void MapCanvas::draw() {
 
 	// Draw overlays (hilight etc)
 	editor->drawSelection(view_tl.x, view_tl.y, view_br.x, view_br.y);
-	if (!sel_active) editor->drawHilight(anim_flash_level);
+	if (mouse_state == MSTATE_NORMAL) editor->drawHilight(anim_flash_level);
 
 	// Draw selection box if active
-	if (sel_active) {
+	if (mouse_state == MSTATE_SELECTION) {
 		// Get selection box map coordinates
 		rgba_t col;
+		fpoint2_t sel_origin = editor->mouseDownPos();
+		fpoint2_t sel_end = editor->mousePos();
 
 		// Outline
 		ColourConfiguration::getColour("map_selbox_outline").set_gl();
@@ -335,6 +338,10 @@ void MapCanvas::draw() {
 void MapCanvas::update(long frametime) {
 	// Get frame time multiplier
 	float mult = (float)frametime / 10.0f;
+
+	// Update hilight if needed
+	if (mouse_state == MSTATE_NORMAL)
+		editor->updateHilight(view_scale);
 
 	// Flashing animation for hilight
 	// Pulsates between 0.5-1.0f (multiplied with hilight alpha)
@@ -435,8 +442,8 @@ void MapCanvas::onKeyBindPress(string name) {
 
 	// Pan view
 	else if (name == "me2d_pan_view") {
-		pan_origin.set(mouse_relpos.x, mouse_relpos.y);
-		panning = true;
+		mouse_downpos.set(mouse_pos);
+		mouse_state = MSTATE_PANNING;
 		editor->clearHilight();
 		SetCursor(wxCURSOR_SIZING);
 	}
@@ -444,7 +451,7 @@ void MapCanvas::onKeyBindPress(string name) {
 
 void MapCanvas::onKeyBindRelease(string name) {
 	if (name == "me2d_pan_view") {
-		panning = false;
+		mouse_state = MSTATE_NORMAL;
 		editor->updateHilight();
 		SetCursor(wxNullCursor);
 	}
@@ -476,6 +483,34 @@ void MapCanvas::onKeyUp(wxKeyEvent& e) {
 }
 
 void MapCanvas::onMouseDown(wxMouseEvent& e) {
+	// Do nothing if the cursor isn't in the normal state
+	if (mouse_state != MSTATE_NORMAL) {
+		e.Skip();
+		return;
+	}
+
+	// Update mouse variables
+	mouse_downpos.set(e.GetX(), e.GetY());
+	editor->setMouseDownPos(translateX(e.GetX()), translateY(e.GetY()));
+
+	// Left button
+	if (e.LeftDown()) {
+		// Try to select hilighted object
+		if (!editor->selectCurrent(!e.ShiftDown()))
+			mouse_state = MSTATE_SELECTION;	// Nothing hilighted, begin box selection
+	}
+
+	// Right button
+	else if (e.RightDown()) {
+	}
+
+	// Any other mouse button (let keybind system handle it)
+	else
+		KeyBind::keyPressed(keypress_t(KeyBind::mbName(e.GetButton()), e.AltDown(), e.CmdDown(), e.ShiftDown()));
+
+	e.Skip();
+
+	/*
 	// Get map coordinates of cursor
 	double x = translateX(e.GetX());
 	double y = translateY(e.GetY());
@@ -500,9 +535,44 @@ void MapCanvas::onMouseDown(wxMouseEvent& e) {
 		KeyBind::keyPressed(keypress_t(KeyBind::mbName(e.GetButton()), e.AltDown(), e.CmdDown(), e.ShiftDown()));
 
 	e.Skip();
+	*/
 }
 
 void MapCanvas::onMouseUp(wxMouseEvent& e) {
+	// Clear mouse down position
+	mouse_downpos.set(-1, -1);
+
+	// Left button
+	if (e.LeftUp()) {
+		// If we're ending a box selection
+		if (mouse_state == MSTATE_SELECTION) {
+			// Get selection boundary (in map coordinates)
+			fpoint2_t sel_origin = editor->mouseDownPos();
+			fpoint2_t sel_end = editor->mousePos();
+
+			// Reset mouse state
+			mouse_state = MSTATE_NORMAL;
+			
+			// Select
+			editor->selectWithin(min(sel_origin.x, sel_end.x), min(sel_origin.y, sel_end.y),
+								max(sel_origin.x, sel_end.x), max(sel_origin.y, sel_end.y));
+
+			// Begin selection box fade animation
+			animations.push_back(new MCASelboxFader(theApp->runTimer(), sel_origin, sel_end));
+		}
+	}
+
+	// Right button
+	else if (e.RightUp()) {
+	}
+
+	// Any other mouse button (let keybind system handle it)
+	else if (mouse_state != MSTATE_SELECTION)
+		KeyBind::keyReleased(KeyBind::mbName(e.GetButton()));
+
+	e.Skip();
+
+	/*
 	// Left button up
 	if (e.LeftUp()) {
 		if (sel_active) {
@@ -520,9 +590,21 @@ void MapCanvas::onMouseUp(wxMouseEvent& e) {
 		KeyBind::keyReleased(KeyBind::mbName(e.GetButton()));
 
 	e.Skip();
+	*/
 }
 
 void MapCanvas::onMouseMotion(wxMouseEvent& e) {
+	// Panning
+	if (mouse_state == MSTATE_PANNING)
+		pan((mouse_pos.x - e.GetX()) / view_scale, -((mouse_pos.y - e.GetY()) / view_scale));
+
+	// Update mouse variables
+	mouse_pos.set(e.GetX(), e.GetY());
+	editor->setMousePos(translateX(e.GetX()), translateY(e.GetY()));
+
+	e.Skip();
+
+	/*
 	// Set mouse cursor position
 	mouse_relpos.set(e.GetX(), e.GetY());
 
@@ -548,6 +630,7 @@ void MapCanvas::onMouseMotion(wxMouseEvent& e) {
 	}
 
 	e.Skip();
+	*/
 }
 
 void MapCanvas::onMouseWheel(wxMouseEvent& e) {

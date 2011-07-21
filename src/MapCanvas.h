@@ -15,7 +15,17 @@ class MapCanvas : public OGLCanvas, public KeyBindHandler {
 private:
 	MapEditor*				editor;
 	vector<MCAnimation*>	animations;
-	point2_t				mouse_relpos;
+
+	// Mouse stuff
+	enum {
+		MSTATE_NORMAL,
+		MSTATE_SELECTION,
+		MSTATE_PANNING,
+		MSTATE_MOVE,
+	};
+	point2_t	mouse_pos;
+	point2_t	mouse_downpos;
+	uint8_t		mouse_state;
 
 	// Info overlays
 	int						last_hilight;
@@ -29,15 +39,6 @@ private:
 	double		view_scale;
 	fpoint2_t	view_tl;
 	fpoint2_t	view_br;
-
-	// Panning
-	fpoint2_t	pan_origin;
-	bool		panning;
-
-	// Mass selection
-	bool		sel_active;
-	fpoint2_t	sel_origin;
-	fpoint2_t	sel_end;
 
 	// Animation
 	float	anim_flash_level;
