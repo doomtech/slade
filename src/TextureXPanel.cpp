@@ -38,6 +38,7 @@
 #include "ArchiveManager.h"
 #include "Icons.h"
 #include "ColourConfiguration.h"
+#include "KeyBind.h"
 #include <wx/filename.h>
 #include <wx/gbsizer.h>
 
@@ -789,41 +790,71 @@ void TextureXPanel::onTextureListRightClick(wxListEvent& e) {
  * Called when a key is pressed in the texture list
  *******************************************************************/
 void TextureXPanel::onTextureListKeyDown(wxKeyEvent& e) {
-	// Move texture up (Ctrl+U or Ctrl+Up Arrow)
-	if (e.GetModifiers() == wxMOD_CMD && (e.GetKeyCode() == 'U' || e.GetKeyCode() == WXK_UP))
-		moveUp();
+	// Check if keypress matches any keybinds
+	wxArrayString binds = KeyBind::getBinds(KeyBind::asKeyPress(e.GetKeyCode(), e.GetModifiers()));
 
-	// Move texture down (Ctrl+D or Ctrl+Down Arrow)
-	else if (e.GetModifiers() == wxMOD_CMD && (e.GetKeyCode() == 'D' || e.GetKeyCode() == WXK_DOWN))
-		moveDown();
+	// Go through matching binds
+	for (unsigned a = 0; a < binds.size(); a++) {
+		string name = binds[a];
 
-	// Copy (Ctrl+C)
-	else if (e.GetModifiers() == wxMOD_CMD && e.GetKeyCode() == 'C')
-		copy();
+		// Copy
+		if (name == "copy") {
+			copy();
+			return;
+		}
 
-	// Paste (Ctrl+V)
-	else if (e.GetModifiers() == wxMOD_CMD && e.GetKeyCode() == 'V')
-		paste();
+		// Cut
+		else if (name == "cut") {
+			copy();
+			removeTexture();
+			return;
+		}
 
-	// New texture (Ctrl+N)
-	else if (e.GetModifiers() == wxMOD_CMD && e.GetKeyCode() == 'N')
-		newTexture();
+		// Paste
+		else if (name == "paste") {
+			paste();
+			return;
+		}
 
-	// New texture from patch (Ctrl+Shift+N)
-	else if (e.GetModifiers() == (wxMOD_CMD|wxMOD_SHIFT) && e.GetKeyCode() == 'N')
-		newTextureFromPatch();
+		// Move texture up
+		else if (name == "txed_tex_up") {
+			moveUp();
+			return;
+		}
 
-	// New texture from file (Ctrl+Alt+N)
-	else if (e.GetModifiers() == (wxMOD_CMD|wxMOD_ALT) && e.GetKeyCode() == 'N')
-		newTextureFromFile();
+		// Move texture down
+		else if (name == "txed_tex_down") {
+			moveDown();
+			return;
+		}
 
-	// Remove texture (Delete)
-	else if (e.GetKeyCode() == WXK_DELETE)
-		removeTexture();
+		// New texture
+		else if (name == "txed_tex_new") {
+			newTexture();
+			return;
+		}
+
+		// New texture from patch
+		else if (name == "txed_tex_new_patch") {
+			newTextureFromPatch();
+			return;
+		}
+
+		// New texture from file
+		else if (name == "txed_tex_new_file") {
+			newTextureFromFile();
+			return;
+		}
+
+		// Delete texture
+		else if (name == "txed_tex_delete") {
+			removeTexture();
+			return;
+		}
+	}
 
 	// Not handled here, send off to be handled by a parent window
-	else
-		e.Skip();
+	e.Skip();
 }
 
 /* TextureXPanel::onBtnNewTexture

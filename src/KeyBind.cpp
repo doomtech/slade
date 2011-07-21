@@ -51,20 +51,51 @@ KeyBind& KeyBind::getBind(string name) {
 	return keybinds[name];
 }
 
+wxArrayString KeyBind::getBinds(keypress_t key) {
+	wxArrayString matches;
+
+	// Get iterator to first keybind
+	KeyBindMap::iterator i = keybinds.begin();
+
+	// Go through all keybinds
+	bool pressed = false;
+	while (i != keybinds.end()) {
+		// Go through all keys bound to this keybind
+		for (unsigned a = 0; a < i->second.keys.size(); a++) {
+			keypress_t& kp = i->second.keys[a];
+
+			// Check for match with keypress
+			if (kp.shift == key.shift &&
+				kp.alt == key.alt &&
+				kp.ctrl == key.ctrl &&
+				kp.key == key.key)
+				matches.Add(i->first);
+		}
+
+		i++;
+	}
+
+	return matches;
+}
+
 bool KeyBind::isPressed(string name) {
 	return keybinds[name].pressed;
 }
 
-bool KeyBind::addBind(string name, string key, bool alt, bool ctrl, bool shift) {
+bool KeyBind::addBind(string name, keypress_t key, string desc) {
 	// Get keybind
 	KeyBind& bind = keybinds[name];
 
+	// Set keybind description
+	if (!desc.IsEmpty())
+		bind.description = desc;
+
 	// Check if the key is already bound to it
 	for (unsigned a = 0; a < bind.keys.size(); a++) {
-		if (bind.keys[a].alt == alt &&
-			bind.keys[a].ctrl == ctrl &&
-			bind.keys[a].shift == shift &&
-			bind.keys[a].key == key) {
+		if (bind.keys[a].alt == key.alt &&
+			bind.keys[a].ctrl == key.ctrl &&
+			bind.keys[a].shift == key.shift &&
+			bind.keys[a].key == key.key) {
 			// It is, remove the bind
 			bind.keys.erase(bind.keys.begin() + a);
 			return false;
@@ -72,7 +103,7 @@ bool KeyBind::addBind(string name, string key, bool alt, bool ctrl, bool shift) 
 	}
 
 	// Add the keybind
-	bind.addKey(key, alt, ctrl, shift);
+	bind.addKey(key.key, key.alt, key.ctrl, key.shift);
 
 	return true;
 }
@@ -187,21 +218,22 @@ string KeyBind::mbName(int button) {
 	};
 }
 
-void KeyBind::keyPressed(string key, bool alt, bool ctrl, bool shift) {
+bool KeyBind::keyPressed(keypress_t key) {
 	// Get iterator to first keybind
 	KeyBindMap::iterator i = keybinds.begin();
 
 	// Go through all keybinds
+	bool pressed = false;
 	while (i != keybinds.end()) {
 		// Go through all keys bound to this keybind
 		for (unsigned a = 0; a < i->second.keys.size(); a++) {
 			keypress_t& kp = i->second.keys[a];
 
 			// Check for match with keypress
-			if (kp.shift == shift &&
-				kp.alt == alt &&
-				kp.ctrl == ctrl &&
-				kp.key == key) {
+			if (kp.shift == key.shift &&
+				kp.alt == key.alt &&
+				kp.ctrl == key.ctrl &&
+				kp.key == key.key) {
 				// Set bind state
 				i->second.pressed = true;
 
@@ -209,6 +241,7 @@ void KeyBind::keyPressed(string key, bool alt, bool ctrl, bool shift) {
 				for (unsigned b = 0; b < kb_handlers.size(); b++)
 					kb_handlers[b]->onKeyBindPress(i->first);
 
+				pressed = true;
 				break;
 			}
 		}
@@ -216,13 +249,16 @@ void KeyBind::keyPressed(string key, bool alt, bool ctrl, bool shift) {
 		// Next keybind
 		i++;
 	}
+
+	return pressed;
 }
 
-void KeyBind::keyReleased(string key) {
+bool KeyBind::keyReleased(string key) {
 	// Get iterator to first keybind
 	KeyBindMap::iterator i = keybinds.begin();
 
 	// Go through all keybinds
+	bool released = false;
 	while (i != keybinds.end()) {
 		// Go through all keys bound to this keybind
 		for (unsigned a = 0; a < i->second.keys.size(); a++) {
@@ -235,6 +271,7 @@ void KeyBind::keyReleased(string key) {
 				for (unsigned b = 0; b < kb_handlers.size(); b++)
 					kb_handlers[b]->onKeyBindRelease(i->first);
 
+				released = true;
 				break;
 			}
 		}
@@ -242,37 +279,81 @@ void KeyBind::keyReleased(string key) {
 		// Next keybind
 		i++;
 	}
+
+	return released;
 }
 
+keypress_t KeyBind::asKeyPress(int keycode, int modifiers) {
+	return keypress_t(keyName(keycode),
+						modifiers & wxMOD_ALT,
+						modifiers & wxMOD_CMD,
+						modifiers & wxMOD_SHIFT);
+}
 
 void KeyBind::initBinds() {
+	// General
+	addBind("copy", keypress_t("C", false, true), "Copy");
+	addBind("cut", keypress_t("X", false, true), "Cut");
+	addBind("paste", keypress_t("V", false, true), "Paste");
+	addBind("select_all", keypress_t("A", false, true), "Select All");
+
 	// Map Editor 2D (me2d*)
-	addBind("me2d_pan_view", "mouse3");
-	addBind("me2d_pan_view", "space", false, true);
-	addBind("me2d_zoom_in_m", "mwheelup");
-	addBind("me2d_zoom_out_m", "mwheeldown");
-	addBind("me2d_zoom_in", "+");
-	addBind("me2d_zoom_out", "-");
-	addBind("me2d_left", "left");
-	addBind("me2d_right", "right");
-	addBind("me2d_up", "up");
-	addBind("me2d_down", "down");
-	addBind("me2d_grid_inc", "]");
-	addBind("me2d_grid_dec", "[");
-	addBind("me2d_mode_vertices", "V");
-	addBind("me2d_mode_lines", "L");
-	addBind("me2d_mode_sectors", "S");
-	addBind("me2d_mode_things", "T");
+	addBind("me2d_pan_view", keypress_t("mouse3"), "Pan View");
+	addBind("me2d_pan_view", keypress_t("space", false, true));
+	addBind("me2d_zoom_in_m", keypress_t("mwheelup"), "Zoom In (towards mouse)");
+	addBind("me2d_zoom_out_m", keypress_t("mwheeldown"), "Zoom Out (towards mouse)");
+	addBind("me2d_zoom_in", keypress_t("+"), "Zoom in (towards screen center)");
+	addBind("me2d_zoom_out", keypress_t("-"), "Zoom out (towards screen center)");
+	addBind("me2d_left", keypress_t("left"), "Scroll left");
+	addBind("me2d_right", keypress_t("right"), "Scroll right");
+	addBind("me2d_up", keypress_t("up"), "Scroll up");
+	addBind("me2d_down", keypress_t("down"), "Scroll down");
+	addBind("me2d_grid_inc", keypress_t("]"), "Increment Grid level");
+	addBind("me2d_grid_dec", keypress_t("["), "Decrement Grid level");
+	addBind("me2d_mode_vertices", keypress_t("V"), "Vertices mode");
+	addBind("me2d_mode_lines", keypress_t("L"), "Lines mode");
+	addBind("me2d_mode_sectors", keypress_t("S"), "Sectors mode");
+	addBind("me2d_mode_things", keypress_t("T"), "Things mode");
 
 	// Map Editor 3D (me3d*)
 
 	// Entry List (el*)
-	addBind("el_new", "n", false, true);
-	addBind("el_delete", "delete");
-	addBind("el_move_up", "u", false, true);
-	addBind("el_move_down", "d", false, true);
-}
+	addBind("el_new", keypress_t("N", false, true), "New Entry");
+	addBind("el_delete", keypress_t("delete"), "Delete Entry");
+	addBind("el_move_up", keypress_t("U", false, true), "Move Entry up");
+	addBind("el_move_down", keypress_t("D", false, true), "Move Entry down");
+	addBind("el_rename", keypress_t("R", false, true), "Rename Entry");
+	addBind("el_rename", keypress_t("f2"));
+	addBind("el_import", keypress_t("I", false, true), "Import to Entry");
+	addBind("el_import_files", keypress_t("I", false, true, true), "Import Files");
+	addBind("el_export", keypress_t("E", false, true), "Export Entry");
+	addBind("el_up_dir", keypress_t("backspace"), "Up one directory");
 
+	// Texture editor (txed*)
+	addBind("txed_patch_left", keypress_t("left", false, true), "Move Patch left");
+	addBind("txed_patch_left8", keypress_t("left"), "Move Patch left 8");
+	addBind("txed_patch_up", keypress_t("up", false, true), "Move Patch up");
+	addBind("txed_patch_up8", keypress_t("up"), "Move Patch up 8");
+	addBind("txed_patch_right", keypress_t("right", false, true), "Move Patch right");
+	addBind("txed_patch_right8", keypress_t("right"), "Move Patch right 8");
+	addBind("txed_patch_down", keypress_t("down", false, true), "Move Patch down");
+	addBind("txed_patch_down8", keypress_t("down"), "Move Patch down 8");
+	addBind("txed_patch_add", keypress_t("insert"), "Add Patch");
+	addBind("txed_patch_delete", keypress_t("delete"), "Delete Patch");
+	addBind("txed_patch_replace", keypress_t("f2"), "Replace Patch");
+	addBind("txed_patch_replace", keypress_t("R", false, true));
+	addBind("txed_patch_duplicate", keypress_t("D", false, true), "Duplicate Patch");
+	addBind("txed_patch_forward", keypress_t("]"), "Bring Patch forward");
+	addBind("txed_patch_back", keypress_t("["), "Send Patch back");
+	addBind("txed_tex_up", keypress_t("up", false, true), "Move Texture up");
+	addBind("txed_tex_up", keypress_t("U", false, true));
+	addBind("txed_tex_down", keypress_t("down", false, true), "Move Texture down");
+	addBind("txed_tex_down", keypress_t("D", false, true));
+	addBind("txed_tex_new", keypress_t("N", false, true), "New Texture");
+	addBind("txed_tex_new_patch", keypress_t("N", false, true, true), "New Texture from Patch");
+	addBind("txed_tex_new_file", keypress_t("N", true, true), "New Texture from File");
+	addBind("txed_tex_delete", keypress_t("delete"), "Delete Texture");
+}
 
 
 

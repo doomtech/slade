@@ -463,7 +463,7 @@ void MapCanvas::onSize(wxSizeEvent& e) {
 
 void MapCanvas::onKeyDown(wxKeyEvent& e) {
 	// Let keybind system handle it
-	KeyBind::keyPressed(KeyBind::keyName(e.GetKeyCode()), e.AltDown(), e.ControlDown(), e.ShiftDown());
+	KeyBind::keyPressed(KeyBind::asKeyPress(e.GetKeyCode(), e.GetModifiers()));
 
 	e.Skip();
 }
@@ -497,7 +497,7 @@ void MapCanvas::onMouseDown(wxMouseEvent& e) {
 
 	// Not left or right button (both reserved), let keybind system handle it
 	else if (!e.RightDown())
-		KeyBind::keyPressed(KeyBind::mbName(e.GetButton()), e.AltDown(), e.ControlDown(), e.ShiftDown());
+		KeyBind::keyPressed(keypress_t(KeyBind::mbName(e.GetButton()), e.AltDown(), e.CmdDown(), e.ShiftDown()));
 
 	e.Skip();
 }
@@ -552,11 +552,11 @@ void MapCanvas::onMouseMotion(wxMouseEvent& e) {
 
 void MapCanvas::onMouseWheel(wxMouseEvent& e) {
 	if (e.GetWheelRotation() > 0) {
-		KeyBind::keyPressed("mwheelup", e.AltDown(), e.ControlDown(), e.ShiftDown());
+		KeyBind::keyPressed(keypress_t("mwheelup", e.AltDown(), e.CmdDown(), e.ShiftDown()));
 		KeyBind::keyReleased("mwheelup");
 	}
 	else if (e.GetWheelRotation() < 0) {
-		KeyBind::keyPressed("mwheeldown", e.AltDown(), e.ControlDown(), e.ShiftDown());
+		KeyBind::keyPressed(keypress_t("mwheeldown", e.AltDown(), e.CmdDown(), e.ShiftDown()));
 		KeyBind::keyReleased("mwheeldown");
 	}
 }
