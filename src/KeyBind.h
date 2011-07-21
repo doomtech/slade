@@ -20,12 +20,13 @@ struct keypress_t {
 
 class KeyBind {
 private:
+	string				name;
 	vector<keypress_t>	keys;
 	bool				pressed;
 	string				description;
 
 public:
-	KeyBind();
+	KeyBind(string name);
 	~KeyBind();
 
 	void	clear() { keys.clear(); }
@@ -43,6 +44,8 @@ public:
 	static keypress_t		asKeyPress(int keycode, int modifiers);
 
 	static void		initBinds();
+	static string	writeBinds();
+	static bool		readBinds(Tokenizer& tz);
 };
 
 
