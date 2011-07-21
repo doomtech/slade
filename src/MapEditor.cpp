@@ -411,6 +411,29 @@ bool MapEditor::updateHilight(double dist_scale) {
 	return current != hilight_item;
 }
 
+void MapEditor::selectAll() {
+	// Clear selection initially
+	selection.clear();
+
+	// Select all items depending on mode
+	if (edit_mode == MODE_VERTICES) {
+		for (unsigned a = 0; a < map.vertices.size(); a++)
+			selection.push_back(a);
+	}
+	else if (edit_mode == MODE_LINES) {
+		for (unsigned a = 0; a < map.lines.size(); a++)
+			selection.push_back(a);
+	}
+	else if (edit_mode == MODE_SECTORS) {
+		for (unsigned a = 0; a < map.sectors.size(); a++)
+			selection.push_back(a);
+	}
+	else if (edit_mode == MODE_THINGS) {
+		for (unsigned a = 0; a < map.things.size(); a++)
+			selection.push_back(a);
+	}
+}
+
 bool MapEditor::selectCurrent(bool clear_none) {
 	// If nothing is hilighted
 	if (hilight_item == -1) {
@@ -432,7 +455,6 @@ bool MapEditor::selectCurrent(bool clear_none) {
 
 	// Not already selected, add to selection
 	selection.push_back(hilight_item);
-
 
 	return true;
 }

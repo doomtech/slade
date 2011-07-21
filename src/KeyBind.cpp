@@ -305,6 +305,7 @@ void KeyBind::initBinds() {
 	addBind("select_all", keypress_t("A", false, true), "Select All");
 
 	// Map Editor 2D (me2d*)
+	addBind("me2d_clear_selection", keypress_t("C"), "Clear selection");
 	addBind("me2d_pan_view", keypress_t("mouse3"), "Pan View");
 	addBind("me2d_pan_view", keypress_t("space", false, true));
 	addBind("me2d_zoom_in_m", keypress_t("mwheelup"), "Zoom In (towards mouse)");
@@ -405,13 +406,12 @@ string KeyBind::writeBinds() {
 }
 
 bool KeyBind::readBinds(Tokenizer& tz) {
-	// Clear current binds
-	for (unsigned a = 0; a < keybinds.size(); a++)
-		keybinds[a].keys.clear();
-
 	// Parse until ending }
 	string name = tz.getToken();
 	while (name != "}" && !name.IsEmpty()) {
+		// Clear any current binds for the key
+		getBind(name).keys.clear();
+
 		// Read keys
 		while (1) {
 			string keystr = tz.getToken();

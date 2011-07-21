@@ -447,6 +447,14 @@ void MapCanvas::onKeyBindPress(string name) {
 		editor->clearHilight();
 		SetCursor(wxCURSOR_SIZING);
 	}
+
+	// Select all
+	else if (name == "select_all")
+		editor->selectAll();
+
+	// Clear selection
+	else if (name == "me2d_clear_selection")
+		editor->clearSelection();
 }
 
 void MapCanvas::onKeyBindRelease(string name) {
