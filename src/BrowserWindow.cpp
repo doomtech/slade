@@ -35,6 +35,7 @@
 #include "BrowserWindow.h"
 #include "Console.h"
 #include <algorithm>
+#include <wx/splitter.h>
 
 
 /*******************************************************************
@@ -118,47 +119,51 @@ BrowserWindow::BrowserWindow(wxWindow* parent) : wxDialog(parent, -1, "Browser",
 	items_root->setName("All");
 
 	// Setup layout
-	wxBoxSizer* m_hbox = new wxBoxSizer(wxHORIZONTAL);
-	SetSizer(m_hbox);
+	wxBoxSizer* m_vbox = new wxBoxSizer(wxVERTICAL);
+	SetSizer(m_vbox);
+
+	wxSplitterWindow* swin = new wxSplitterWindow(this, -1);
+	m_vbox->Add(swin, 1, wxEXPAND|wxALL, 4);
 
 	// Browser tree
-	tree_items = new wxTreeCtrl(this, -1, wxDefaultPosition, wxDefaultSize, wxTR_DEFAULT_STYLE);
-	tree_items->SetSizeHints(wxSize(100, -1));
-	m_hbox->Add(tree_items, 0, wxEXPAND|wxALL, 4);
+	tree_items = new wxTreeCtrl(swin, -1, wxDefaultPosition, wxDefaultSize, wxTR_DEFAULT_STYLE);
 
 	// Browser area
+	wxPanel* panel_browser_area = new wxPanel(swin, -1);
 	wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
-	m_hbox->Add(vbox, 1, wxEXPAND|wxALL, 4);
+	panel_browser_area->SetSizer(vbox);
 
 	// Sorting
 	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
 	vbox->Add(hbox, 0, wxEXPAND|wxBOTTOM, 4);
-	choice_sort = new wxChoice(this, -1);
+	choice_sort = new wxChoice(panel_browser_area, -1);
 	hbox->AddStretchSpacer();
-	hbox->Add(new wxStaticText(this, -1, "Sort:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 2);
+	hbox->Add(new wxStaticText(panel_browser_area, -1, "Sort:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 2);
 	hbox->Add(choice_sort, 0, wxEXPAND|wxRIGHT, 4);
 
 	// Filter
-	text_filter = new wxTextCtrl(this, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0);
-	hbox->Add(new wxStaticText(this, -1, "Filter:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 2);
+	text_filter = new wxTextCtrl(panel_browser_area, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0);
+	hbox->Add(new wxStaticText(panel_browser_area, -1, "Filter:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 2);
 	hbox->Add(text_filter, 0, wxEXPAND);
 
 	// Browser canvas
 	hbox = new wxBoxSizer(wxHORIZONTAL);
 	vbox->Add(hbox, 1, wxEXPAND|wxBOTTOM, 4);
-	canvas = new BrowserCanvas(this);
+	canvas = new BrowserCanvas(panel_browser_area);
 	hbox->Add(canvas, 1, wxEXPAND);
 	// Canvas scrollbar
-	wxScrollBar* scrollbar = new wxScrollBar(this, -1, wxDefaultPosition, wxDefaultSize, wxSB_VERTICAL);
+	wxScrollBar* scrollbar = new wxScrollBar(panel_browser_area, -1, wxDefaultPosition, wxDefaultSize, wxSB_VERTICAL);
 	hbox->Add(scrollbar, 0, wxEXPAND);
 	canvas->setScrollBar(scrollbar);
+
+	swin->SplitVertically(tree_items, panel_browser_area, 150);
 
 	// Bottom sizer
 	sizer_bottom = new wxBoxSizer(wxHORIZONTAL);
 	vbox->Add(sizer_bottom, 0, wxEXPAND|wxBOTTOM, 4);
 
 	// Buttons
-	vbox->Add(CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND);
+	m_vbox->Add(CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND|wxBOTTOM, 4);
 
 	// Setup sorting options
 	addSortType("Index");
@@ -172,7 +177,8 @@ BrowserWindow::BrowserWindow(wxWindow* parent) : wxDialog(parent, -1, "Browser",
 	text_filter->Bind(wxEVT_COMMAND_TEXT_UPDATED, &BrowserWindow::onTextFilterChanged, this);
 
 	Layout();
-	SetInitialSize(wxSize(610, 400));
+	SetInitialSize(wxSize(768, 600));
+	SetMinSize(wxSize(540, 400));
 	CenterOnScreen();
 }
 

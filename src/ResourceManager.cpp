@@ -340,7 +340,6 @@ void ResourceManager::getAllTextures(vector<TextureResource::tex_res_t>& list, A
 		}
 
 		// Go through resource textures
-		//ArchiveEntry* entry = i->second.entries[0];
 		TextureResource::tex_res_t res = i->second.textures[0];
 		for (int a = 0; a < i->second.length(); a++) {
 			res = i->second.textures[a];
@@ -360,7 +359,8 @@ void ResourceManager::getAllTextures(vector<TextureResource::tex_res_t>& list, A
 		}
 
 		// Add texture resource to the list
-		list.push_back(res);
+		if (res.parent != ignore)
+			list.push_back(res);
 
 		i++;
 	}

@@ -876,6 +876,10 @@ bool ArchiveManagerPanel::saveEntryChanges(Archive* archive) {
  * Saves [archive] to disk, opens a file dialog if necessary
  *******************************************************************/
 bool ArchiveManagerPanel::saveArchive(Archive* archive) {
+	// Check for null pointer
+	if (!archive)
+		return false;
+
 	// Check for unsaved entry changes
 	saveEntryChanges(archive);
 
@@ -898,6 +902,10 @@ bool ArchiveManagerPanel::saveArchive(Archive* archive) {
  * a file dialog to select the new name/path
  *******************************************************************/
 bool ArchiveManagerPanel::saveArchiveAs(Archive* archive) {
+	// Check for null pointer
+	if (!archive)
+		return false;
+
 	// Check for unsaved entry changes
 	saveEntryChanges(archive);
 

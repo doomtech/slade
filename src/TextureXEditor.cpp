@@ -464,7 +464,13 @@ int TextureXEditor::browsePatchTable() {
 string TextureXEditor::browsePatchEntry() {
 	// Update patch browser if necessary
 	if (pb_update) {
+		// Add archive textures (and resource textures)
 		patch_browser->openArchive(archive);
+
+		// Add each texture list from this archive
+		for (unsigned a = 0; a < texture_editors.size(); a++)
+			patch_browser->openTextureXList(&(texture_editors[a]->txList()), archive);
+
 		pb_update = false;
 	}
 
@@ -541,6 +547,7 @@ void TextureXEditor::onAnnouncement(Announcer* announcer, string event_name, Mem
 
 	if (announcer == &patch_table && event_name == "modified") {
 		patch_browser->openPatchTable(&patch_table);
+		pb_update = true;
 	}
 
 	if (announcer == theResourceManager && event_name == "resources_updated")
