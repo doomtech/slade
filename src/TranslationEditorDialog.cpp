@@ -110,11 +110,14 @@ void GradientBox::draw() {
 /* TranslationEditorDialog::TranslationEditorDialog
  * TranslationEditorDialog class constructor
  *******************************************************************/
-TranslationEditorDialog::TranslationEditorDialog(wxWindow* parent, Palette8bit* pal, string title, ArchiveEntry* preview_image)
+TranslationEditorDialog::TranslationEditorDialog(wxWindow* parent, Palette8bit* pal, string title, SImage* preview_image)
 : wxDialog(parent, -1, title) {
 	// Init variables
 	palette = pal;
-	entry_preview = preview_image;
+
+	// Setup preview image
+	if (preview_image)
+		image_preview.copyImage(preview_image);
 	
 	// Set dialog icon
 	wxIcon icon;
@@ -268,7 +271,8 @@ TranslationEditorDialog::TranslationEditorDialog(wxWindow* parent, Palette8bit* 
 	gfx_preview = new GfxCanvas(this, -1);
 	gfx_preview->setPalette(palette);
 	gfx_preview->setViewType(GFXVIEW_CENTERED);
-	if (entry_preview) Misc::loadImageFromEntry(gfx_preview->getImage(), entry_preview);
+	//if (entry_preview) Misc::loadImageFromEntry(gfx_preview->getImage(), entry_preview);
+	gfx_preview->getImage()->copyImage(&image_preview);
 	framesizer->Add(gfx_preview->toPanel(this), 1, wxEXPAND|wxALL, 4);
 
 
@@ -572,6 +576,14 @@ void TranslationEditorDialog::updatePreviews() {
 	pal_canvas_preview->Refresh();
 
 	// Update image preview
+	gfx_preview->getImage()->copyImage(&image_preview);
+	gfx_preview->getImage()->applyTranslation(&translation, palette);
+
+	// Update UI
+	gfx_preview->updateImageTexture();
+	gfx_preview->Refresh();
+
+	/*
 	if (entry_preview) {
 		// Re-load preview entry
 		Misc::loadImageFromEntry(gfx_preview->getImage(), entry_preview);
@@ -583,6 +595,7 @@ void TranslationEditorDialog::updatePreviews() {
 		gfx_preview->updateImageTexture();
 		gfx_preview->Refresh();
 	}
+	*/
 
 	// Update text string
 	text_string->SetValue(translation.asText());

@@ -30,7 +30,8 @@ class TranslationEditorDialog : public wxDialog {
 private:
 	Palette8bit*	palette;
 	Translation		translation;
-	ArchiveEntry*	entry_preview;
+	//ArchiveEntry*	entry_preview;
+	SImage			image_preview;
 
 	PaletteCanvas*	pal_canvas_original;
 	wxListBox*		list_translations;
@@ -61,7 +62,7 @@ private:
 	GfxCanvas*			gfx_preview;
 
 public:
-	TranslationEditorDialog(wxWindow* parent, Palette8bit* pal, string title = "Edit Translation", ArchiveEntry* preview_image = NULL);
+	TranslationEditorDialog(wxWindow* parent, Palette8bit* pal, string title = "Edit Translation", SImage* preview_image = NULL);
 	~TranslationEditorDialog();
 
 	Translation&	getTranslation() { return translation; }

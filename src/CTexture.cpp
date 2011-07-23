@@ -804,7 +804,7 @@ bool CTexture::toImage(SImage& image, Archive* parent, Palette8bit* pal, bool fo
 	image.resize(width, height);
 
 	// Add patches
-	SImage p_img;
+	SImage p_img(PALMASK);
 	si_drawprops_t dp;
 	dp.src_alpha = false;
 	if (extended) {
@@ -920,8 +920,6 @@ bool CTexture::loadPatchImage(unsigned pindex, SImage& image, Archive* parent, P
 		CTexture* tex = theResourceManager->getTexture(patch->getName(), parent);
 		if (tex)
 			return tex->toImage(image, parent, pal);
-
-		// No matching texture found for patch, so default to entry
 	}
 
 	// Get patch entry

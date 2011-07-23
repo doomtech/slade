@@ -385,8 +385,7 @@ void CTextureCanvas::drawPatch(int num, bool outside) {
 
 	// Load the patch as an opengl texture if it isn't already
 	if (!patch_textures[num]->isLoaded()) {
-		SImage temp;
-		//if (Misc::loadImageFromEntry(&temp, patch->getPatchEntry(parent))) {
+		SImage temp(PALMASK);
 		if (texture->loadPatchImage(num, temp, parent, &palette)) {
 			// Load the image as a texture
 			patch_textures[num]->loadImage(&temp, &palette);

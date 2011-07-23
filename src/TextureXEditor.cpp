@@ -496,9 +496,20 @@ bool TextureXEditor::checkTextures() {
 			CTexture* tex = texture_editors[a]->txList().getTexture(t);
 
 			// Check its patches are all valid
-			for (unsigned p = 0; p < tex->nPatches(); p++) {
-				if (patch_table.patchIndex(tex->getPatch(p)->getName()) == -1) {
-					problems += S_FMT("Texture %s contains invalid/unknown patch %s\n", CHR(tex->getName()), CHR(tex->getPatch(p)->getName()));
+			if (tex->isExtended()) {
+				// Extended texture, check if each patch exists in any open archive (or as a composite texture)
+				for (unsigned p = 0; p < tex->nPatches(); p++) {
+					ArchiveEntry* pentry = theResourceManager->getPatchEntry(tex->getPatch(p)->getName());
+					CTexture* ptex = theResourceManager->getTexture(tex->getPatch(p)->getName());
+					if (!pentry && !ptex)
+						problems += S_FMT("Texture %s contains invalid/unknown patch %s\n", CHR(tex->getName()), CHR(tex->getPatch(p)->getName()));
+				}
+			}
+			else {
+				// Regular texture, check the patch table
+				for (unsigned p = 0; p < tex->nPatches(); p++) {
+					if (patch_table.patchIndex(tex->getPatch(p)->getName()) == -1)
+						problems += S_FMT("Texture %s contains invalid/unknown patch %s\n", CHR(tex->getName()), CHR(tex->getPatch(p)->getName()));
 				}
 			}
 		}

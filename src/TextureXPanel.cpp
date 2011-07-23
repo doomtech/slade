@@ -37,6 +37,7 @@
 #include "Clipboard.h"
 #include "ArchiveManager.h"
 #include "Icons.h"
+#include "ResourceManager.h"
 #include <wx/filename.h>
 #include <wx/gbsizer.h>
 
@@ -329,19 +330,10 @@ void TextureXPanel::applyChanges() {
  * at 0,0
  *******************************************************************/
 CTexture* TextureXPanel::newTextureFromPatch(string name, string patch) {
-	// Load patch image to get dimensions (yeah it's not optimal, but at the moment it's the best I can do)
-	SImage image;
-	ArchiveEntry* patch_entry = tx_editor->patchTable().patchEntry(patch);
-	Misc::loadImageFromEntry(&image, patch_entry);
-
 	// Create new texture
 	CTexture* tex = new CTexture();
 	tex->setName(name);
 	tex->setState(2);
-
-	// Set dimensions
-	tex->setWidth(image.getWidth());
-	tex->setHeight(image.getHeight());
 
 	// Setup texture scale
 	if (texturex.getFormat() == TXF_TEXTURES) {
@@ -353,6 +345,14 @@ CTexture* TextureXPanel::newTextureFromPatch(string name, string patch) {
 
 	// Add patch
 	tex->addPatch(patch, 0, 0);
+
+	// Load patch image (to determine dimensions)
+	SImage image;
+	tex->loadPatchImage(0, image);
+
+	// Set dimensions
+	tex->setWidth(image.getWidth());
+	tex->setHeight(image.getHeight());
 
 	// Update variables
 	modified = true;

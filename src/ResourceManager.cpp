@@ -281,8 +281,6 @@ void ResourceManager::removeEntry(ArchiveEntry* entry) {
  *******************************************************************/
 void ResourceManager::listAllPatches() {
 	EntryResourceMap::iterator i = patches.begin();
-
-	// Add all properties to given list
 	while (i != patches.end()) {
 		wxLogMessage("%s (%d)", CHR(i->first), i->second.length());
 		i++;
@@ -403,7 +401,7 @@ ArchiveEntry* ResourceManager::getPatchEntry(string patch, string nspace, Archiv
 CTexture* ResourceManager::getTexture(string texture, Archive* priority, Archive* ignore) {
 	// Check texture resource with matching name exists
 	TextureResource& res = textures[texture];
-	if (res.length() == 0)
+	if (res.textures.size() == 0)
 		return NULL;
 
 	// Go through resource textures
@@ -411,7 +409,7 @@ CTexture* ResourceManager::getTexture(string texture, Archive* priority, Archive
 	Archive* parent = res.textures[0].parent;
 	for (unsigned a = 0; a < res.textures.size(); a++) {
 		// Skip if it's in the 'ignore' archive
-		if (parent == ignore)
+		if (res.textures[a].parent == ignore)
 			continue;
 
 		// If it's in the 'priority' archive, return it
@@ -427,7 +425,10 @@ CTexture* ResourceManager::getTexture(string texture, Archive* priority, Archive
 	}
 
 	// Return the most relevant texture
-	return tex;
+	if (parent != ignore)
+		return tex;
+	else
+		return NULL;
 }
 
 /* ResourceManager::onAnnouncement

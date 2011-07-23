@@ -728,7 +728,7 @@ bool GfxEntryPanel::handleAction(string id) {
 	else if (id == "pgfx_translate") {
 		// Create translation editor dialog
 		Palette8bit* pal = theMainWindow->getPaletteChooser()->getSelectedPalette();
-		TranslationEditorDialog ted(theMainWindow, pal, "Colour Remap", entry);
+		TranslationEditorDialog ted(theMainWindow, pal, "Colour Remap", gfx_canvas->getImage());
 
 		// Create translation to edit
 		ted.openTranslation(prev_translation);

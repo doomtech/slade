@@ -917,8 +917,12 @@ void ZTextureEditorPanel::onBtnEditTranslation(wxCommandEvent& e) {
 	if (trans.nRanges() == 0)
 		trans.addRange(TRANS_PALETTE, 0);
 
+	// Create patch image
+	SImage image(PALMASK);
+	tex_canvas->getTexture()->loadPatchImage(selection[0], image, tx_editor->getArchive(), tex_canvas->getPalette());
+
 	// Open translation editor dialog
-	TranslationEditorDialog ted(theMainWindow, tex_canvas->getPalette(), "Edit Translation", patch->getPatchEntry(tx_editor->getArchive()));
+	TranslationEditorDialog ted(theMainWindow, tex_canvas->getPalette(), "Edit Translation", &image);
 	ted.openTranslation(trans);
 	if (ted.ShowModal() == wxID_OK) {
 		// Copy updated translation to all selected patches

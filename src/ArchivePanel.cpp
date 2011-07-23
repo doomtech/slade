@@ -968,9 +968,13 @@ bool ArchivePanel::gfxRemap() {
 	// Get selected entries
 	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
 
+	// Create preview image (just use first selected entry)
+	SImage image(PALMASK);
+	Misc::loadImageFromEntry(&image, selection[0]);
+
 	// Create translation editor dialog
 	Palette8bit* pal = theMainWindow->getPaletteChooser()->getSelectedPalette();
-	TranslationEditorDialog ted(this, pal, "Colour Remap", selection[0]);
+	TranslationEditorDialog ted(this, pal, "Colour Remap", &image);
 	ted.openTranslation(((GfxEntryPanel*)gfx_area)->prevTranslation());
 
 	// Run dialog
