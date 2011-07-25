@@ -389,6 +389,12 @@ void TextureEditorPanel::updatePatchControls() {
  * Loads a TEXTUREX format texture into the editor
  *******************************************************************/
 bool TextureEditorPanel::openTexture(CTexture* tex, TextureXList* list) {
+	// Check texture was given
+	if (!tex) {
+		clearTexture();
+		return false;
+	}
+
 	// Set as current texture
 	if (!tex_current)
 		tex_current = new CTexture();

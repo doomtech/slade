@@ -468,7 +468,18 @@ void VirtualListView::onKeyChar(wxKeyEvent& e) {
  * Called when an item label is clicked twice to edit it
  *******************************************************************/
 void VirtualListView::onLabelEditBegin(wxListEvent& e) {
+	/*
+	apparently it's only possible to label edit on the first column
+	(e.GetColumn here returns -1)
+
 	if (!cols_editable[e.GetColumn()])
+		e.Veto();
+	else
+		e.Skip();
+	*/
+
+	// For now we'll enable it if editing column 0 is allowed
+	if (!cols_editable[0])
 		e.Veto();
 	else
 		e.Skip();

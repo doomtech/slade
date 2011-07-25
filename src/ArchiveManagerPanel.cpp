@@ -417,6 +417,10 @@ Archive* ArchiveManagerPanel::currentArchive() {
 	// Get current tab
 	wxWindow* page = notebook_archives->GetPage(notebook_archives->GetSelection());
 
+	// Return if no tabs exist
+	if (!page)
+		return NULL;
+
 	// ArchivePanel
 	if (page->GetName() == "archive") {
 		ArchivePanel* ap = (ArchivePanel*)page;

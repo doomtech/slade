@@ -57,7 +57,7 @@
  *******************************************************************/
 namespace Global {
 	string error = "";
-	string version = "3.0.2 beta 2"
+	string version = "3.0.2"
 #ifdef UPDATEREVISION
 	" r" SVN_REVISION_STRING
 #endif
@@ -417,6 +417,7 @@ void MainApp::initActions() {
 	new SAction("txed_up", "Move Up", "t_up", "Move the selected texture(s) up in the list");
 	new SAction("txed_down", "Move Down", "t_down", "Move the selected texture(s) down in the list");
 	new SAction("txed_copy", "Copy", "t_copy", "Copy the selected texture(s)");
+	new SAction("txed_cut", "Cut", "t_cut", "Cut the selected texture(s)");
 	new SAction("txed_paste", "Paste", "t_paste", "Paste the previously copied texture(s)");
 	new SAction("txed_patch_add", "Add Patch", "t_patch_add", "Add a patch to the texture");
 	new SAction("txed_patch_remove", "Remove Selected Patch(es)", "t_patch_remove", "Remove selected patch(es) from the texture");
