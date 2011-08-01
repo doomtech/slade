@@ -148,15 +148,19 @@ public:
 		string message = "SLADE3 has crashed unexpectedly. To help fix the problem that caused this crash,\nplease copy+paste the information from the window below to a text file, and email\nit to <sirjuddington@gmail.com> along with a description of what you were\ndoing at the time of the crash. Sorry for the inconvenience.";
 		sizer->Add(new wxStaticText(this, -1, message), 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 4);
 
+		// Setup stack trace string
+		string trace = S_FMT("Version: %s\n", CHR(Global::version));
+		trace += st.getTraceString();
+
 		// Add stack trace text area
 		text_stack = new wxTextCtrl(this, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxHSCROLL);
-		text_stack->SetValue(st.getTraceString());
+		text_stack->SetValue(trace);
 		text_stack->SetFont(wxFont(8, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
 		sizer->Add(text_stack, 1, wxEXPAND|wxALL, 4);
 
 		// Dump stack trace to a file (just in case)
 		wxFile file(appPath("slade3_crash.log", DIR_APP), wxFile::write);
-		file.Write(st.getTraceString());
+		file.Write(trace);
 		file.Close();
 
 		// Add standard 'OK' button

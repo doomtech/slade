@@ -263,7 +263,12 @@ bool ZipArchive::write(string filename, bool update) {
 			continue;
 		}
 
-		if (!inzip.IsOk() || entries[a]->getState() > 0 || !entries[a]->exProps().propertyExists("ZipIndex")) {
+		// Get entry zip index
+		int index = -1;
+		if (entries[a]->exProps().propertyExists("ZipIndex"))
+			index = entries[a]->exProp("ZipIndex");
+
+		if (!inzip.IsOk() || entries[a]->getState() > 0 || index < 0 || index >= inzip.GetTotalEntries()) {
 			// If the current entry has been changed, or doesn't exist in the old zip,
 			// (re)compress its data and write it to the zip
 			wxZipEntry* zipentry = new wxZipEntry(entries[a]->getPath() + entries[a]->getName());
@@ -271,7 +276,6 @@ bool ZipArchive::write(string filename, bool update) {
 			zip.Write(entries[a]->getData(), entries[a]->getSize());
 		} else {
 			// If the entry is unmodified and exists in the old zip, just copy it over
-			int index = entries[a]->exProp("ZipIndex");
 			c_entries[index]->SetName(entries[a]->getPath() + entries[a]->getName());
 			zip.CopyEntry(c_entries[index], inzip);
 			inzip.Reset();
