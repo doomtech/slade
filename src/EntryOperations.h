@@ -7,6 +7,7 @@
 
 namespace EntryOperations {
 	bool	openExternal(ArchiveEntry* entry);
+	bool	openMapDB2(ArchiveEntry* entry);
 	bool	gfxConvert(ArchiveEntry* entry, string target_format, SIFormat::convert_options_t opt, int target_colformat = -1);
 	bool	modifyGfxOffsets(ArchiveEntry* entry, int auto_type, point2_t offsets, bool xc, bool yc, bool relative);
 	bool	modifyalPhChunk(ArchiveEntry* entry, bool value);

@@ -395,6 +395,7 @@ void MainApp::initActions() {
 	new SAction("arch_audio_convertmus", "Convert MUS to MIDI", "t_convert", "Convert any selected MUS format entries to MIDI format");
 	new SAction("arch_scripts_compileacs", "Compile ACS", "t_compile", "Compile any selected text entries to ACS bytecode");
 	new SAction("arch_scripts_compilehacs", "Compile ACS (Hexen bytecode)", "t_compile", "Compile any selected text entries to Hexen-compatible ACS bytecode");
+	new SAction("arch_map_opendb2", "Open Map in Doom Builder 2", "", "Open the selected map in Doom Builder 2");
 
 	// GfxEntryPanel
 	new SAction("pgfx_mirror", "Mirror", "t_mirror", "Mirror the graphic horizontally");

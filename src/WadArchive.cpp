@@ -632,6 +632,96 @@ bool WadArchive::moveEntry(ArchiveEntry* entry, unsigned position, ArchiveTreeNo
 		return false;
 }
 
+/* WadArchive::getMapInfo
+ * Returns the mapdesc_t information about the map beginning at
+ * [maphead]. If [maphead] is not really a map header entry, an
+ * invalid mapdesc_t will be returned (mapdesc_t::head == NULL)
+ *******************************************************************/
+Archive::mapdesc_t WadArchive::getMapInfo(ArchiveEntry* maphead) {
+	mapdesc_t map;
+
+	if (!maphead)
+		return map;
+
+	// Check for UDMF format map
+	if (S_CMPNOCASE(maphead->nextEntry()->getName(), "TEXTMAP")) {
+		// Get map info
+		map.head = maphead;
+		map.name = maphead->getName();
+		map.format = MAP_UDMF;
+
+		// Skip entries until we find ENDMAP
+		ArchiveEntry* entry = maphead->nextEntry();
+		while (true) {
+			if (!entry || S_CMPNOCASE(entry->getName(), "ENDMAP"))
+				break;
+			entry = entry->nextEntry();
+		}
+
+		// If we got to the end before we found ENDMAP, something is wrong
+		if (!entry)
+			return mapdesc_t();
+
+		// Set end entry
+		map.end = entry;
+
+		return map;
+	}
+
+	// Check for doom/hexen format map
+	uint8_t existing_map_lumps[NUMMAPLUMPS];
+	memset(existing_map_lumps, 0, NUMMAPLUMPS);
+	ArchiveEntry* entry = maphead->nextEntry();
+	while (entry) {
+		// Check that the entry is a valid map-related entry
+		bool mapentry = false;
+		for (unsigned a = 0; a < NUMMAPLUMPS; a++) {
+			if (S_CMPNOCASE(entry->getName(), map_lumps[a])) {
+				mapentry = true;
+				existing_map_lumps[a] = 1;
+				break;
+			}
+		}
+
+		// If it wasn't a map entry, exit this loop
+		if (!mapentry) {
+			entry = entry->prevEntry();
+			break;
+		}
+
+		// If we've reached the end of the archive, exit this loop
+		if (!entry->nextEntry())
+			break;
+
+		// Go to next entry
+		entry = entry->nextEntry();
+	}
+
+	// Check for the required map entries
+	for (unsigned a = 0; a < 5; a++) {
+		if (existing_map_lumps[a] == 0)
+			return mapdesc_t();
+	}
+
+	// Setup map info
+	map.head = maphead;
+	map.end = entry;
+	map.name = maphead->getName();
+
+	// If BEHAVIOR lump exists, it's a hexen format map
+	if (existing_map_lumps[LUMP_BEHAVIOR])
+		map.format = MAP_HEXEN;
+	// If LEAFS, LIGHTS and MACROS exist, it's a doom 64 format map
+	else if (existing_map_lumps[LUMP_LEAFS] && existing_map_lumps[LUMP_LIGHTS]
+				&& existing_map_lumps[LUMP_MACROS])
+		map.format = MAP_DOOM64;
+	// Otherwise it's doom format
+	else
+		map.format = MAP_DOOM;
+
+	return map;
+}
+
 /* WadArchive::detectMaps
  * Searches for any maps in the wad and adds them to the map list
  *******************************************************************/
@@ -755,11 +845,7 @@ vector<Archive::mapdesc_t> WadArchive::detectMaps() {
 
 				// Add map info to the maps list
 				maps.push_back(md);
-			}// else {
-				// If we found a non-map lump before all needed map lumps were found,
-				// it's an invalid map, so just continue the loop
-			//	continue;
-			//}
+			}
 		}
 
 

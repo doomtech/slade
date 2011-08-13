@@ -887,7 +887,7 @@ bool ArchiveManagerPanel::saveArchive(Archive* archive) {
 	// Check for unsaved entry changes
 	saveEntryChanges(archive);
 
-	if (archive->isOnDisk()) {
+	if (archive->canSave()) {
 		// Save the archive if possible
 		if (!archive->save()) {
 			// If there was an error pop up a message box

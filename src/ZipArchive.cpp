@@ -389,6 +389,35 @@ ArchiveEntry* ZipArchive::addEntry(ArchiveEntry* entry, string add_namespace, bo
 	return Archive::addEntry(entry, 0xFFFFFFFF, dir, copy);
 }
 
+/* ZipArchive::getMapInfo
+ * Returns the mapdesc_t information about the map at [entry], if
+ * [entry] is actually a valid map (ie. a wad archive in the maps
+ * folder)
+ *******************************************************************/
+Archive::mapdesc_t ZipArchive::getMapInfo(ArchiveEntry* entry) {
+	mapdesc_t map;
+
+	// Check entry
+	if (!checkEntry(entry))
+		return map;
+
+	// Check entry type
+	if (entry->getType()->getFormat() != "archive_wad")
+		return map;
+
+	// Check entry directory
+	if (entry->getParentDir()->getParent() != getRoot() || entry->getParentDir()->getName() != "maps")
+		return map;
+
+	// Setup map info
+	map.archive = true;
+	map.head = entry;
+	map.end = entry;
+	map.name = entry->getName(true).Upper();
+
+	return map;
+}
+
 /* ZipArchive::detectMaps
  * Detects all the maps in the archive and returns a vector of
  * information about them.
@@ -400,6 +429,25 @@ vector<Archive::mapdesc_t> ZipArchive::detectMaps() {
 	ArchiveTreeNode* mapdir = getDir("maps");
 	if (!mapdir)
 		return ret;
+
+	// Go through entries in map dir
+	for (unsigned a = 0; a < mapdir->numEntries(); a++) {
+		ArchiveEntry* entry = mapdir->getEntry(a);
+
+		// Maps can only be wad archives
+		if (entry->getType()->getFormat() != "archive_wad")
+			continue;
+
+		// Add map description
+		// (not going to detect format, having to open the archive would be slow...
+		//  the way zdoom handles maps in zips is a pretty stupid really)
+		mapdesc_t md;
+		md.head = entry;
+		md.end = entry;
+		md.archive = true;
+		md.name = entry->getName(true).Upper();
+		ret.push_back(md);
+	}
 
 	return ret;
 }

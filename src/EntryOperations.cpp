@@ -37,6 +37,8 @@
 #include "EntryDataFormat.h"
 #include "ExtMessageDialog.h"
 #include "MainWindow.h"
+#include "FileMonitor.h"
+#include "WadArchive.h"
 #include <wx/filename.h>
 #include <wx/utils.h>
 
@@ -377,6 +379,84 @@ bool EntryOperations::openExternal(ArchiveEntry* entry) {
 
 	// Open the file externally
 	wxLaunchDefaultApplication(path);
+
+	return true;
+}
+
+/* EntryOperations::openMapDB2
+ * Opens the map at [entry] with Doom Builder 2, including all open
+ * resource archives. Sets up a FileMonitor to update the map in the
+ * archive if any changes are made to it in DB2
+ *******************************************************************/
+bool EntryOperations::openMapDB2(ArchiveEntry* entry) {
+	// First up, check for DB2 location registry key
+	wxRegKey key(wxRegKey::HKLM, "SOFTWARE\\CodeImp\\Doom Builder");
+	string path;
+	key.QueryValue("Location", path);
+
+	// Can't if DB2 isn't installed
+	if (path.IsEmpty()) {
+		wxMessageBox("Doom Builder 2 must be installed to use this feature.", "Doom Builder 2 Not Found");
+		return false;
+	}
+
+	// Get map info for entry
+	Archive::mapdesc_t map = entry->getParent()->getMapInfo(entry);
+
+	// Check valid map
+	if (map.format == MAP_UNKNOWN)
+		return false;
+
+	// Export the map to a temp .wad file
+	string filename = appPath(entry->getParent()->getFilename(false) + "-" + entry->getName(true) + ".wad", DIR_TEMP);
+	filename.Replace("/", "-");
+	if (map.archive) {
+		entry->exportFile(filename);
+		entry->lock();
+	}
+	else {
+		// Write map entries to temporary wad archive
+		if (map.head) {
+			WadArchive archive;
+
+			// Add map entries to archive
+			ArchiveEntry* e = map.head;
+			while (true) {
+				archive.addEntry(e, "", true);
+				e->lock();
+				if (e == map.end) break;
+				e = e->nextEntry();
+			}
+
+			// Write archive to file
+			archive.save(filename);
+		}
+	}
+
+	// Generate Doom Builder command line
+	string cmd = S_FMT("%s\\Builder.exe \"%s\" -map %s", CHR(path), CHR(filename), CHR(entry->getName()));
+
+	// Add base resource archive to command line
+	Archive* base = theArchiveManager->baseResourceArchive();
+	if (base->getType() == ARCHIVE_WAD)
+		cmd += S_FMT(" -resource wad \"%s\"", CHR(base->getFilename()));
+	else if (base->getType() == ARCHIVE_ZIP)
+		cmd += S_FMT(" -resource pk3 \"%s\"", CHR(base->getFilename()));
+
+	// Add resource archives to command line
+	for (unsigned a = 0; a < theArchiveManager->numArchives(); a++) {
+		Archive* archive = theArchiveManager->getArchive(a);
+
+		// Check archive type (only wad and zip supported by db2)
+		if (archive->getType() == ARCHIVE_WAD)
+			cmd += S_FMT(" -resource wad \"%s\"", CHR(archive->getFilename()));
+		else if (archive->getType() == ARCHIVE_ZIP)
+			cmd += S_FMT(" -resource pk3 \"%s\"", CHR(archive->getFilename()));
+	}
+
+	// Run DB2
+	FileMonitor* fm = new DB2MapFileMonitor(filename, entry->getParent(), CHR(entry->getName(true)));
+	wxExecute(cmd, wxEXEC_ASYNC, fm->getProcess());
 
 	return true;
 }

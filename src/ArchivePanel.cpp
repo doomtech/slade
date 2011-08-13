@@ -595,7 +595,7 @@ bool ArchivePanel::renameEntry(bool each) {
 /* ArchivePanel::deleteEntry
  * Deletes any selected entries from the archive
  *******************************************************************/
-bool ArchivePanel::deleteEntry() {
+bool ArchivePanel::deleteEntry(bool confirm) {
 	// Get a list of selected entries
 	vector<ArchiveEntry*> selected_entries = entry_list->getSelectedEntries();
 
@@ -603,7 +603,7 @@ bool ArchivePanel::deleteEntry() {
 	vector<ArchiveTreeNode*> selected_dirs = entry_list->getSelectedDirectories();
 
 	// Confirmation dialog
-	if (confirm_entry_delete) {
+	if (confirm_entry_delete && confirm) {
 		string item;
 		int num = selected_entries.size() + selected_dirs.size();
 		if (num == 1) {
@@ -864,7 +864,7 @@ bool ArchivePanel::copyEntry() {
  *******************************************************************/
 bool ArchivePanel::cutEntry() {
 	if (copyEntry())
-		return deleteEntry();
+		return deleteEntry(false);
 	else
 		return false;
 }
@@ -1301,6 +1301,18 @@ bool ArchivePanel::convertTextures() {
 	return false;
 }
 
+/* ArchivePanel::mapOpenDb2
+ * Opens the currently selected entry in Doom Builder 2 if it is a
+ * valid map entry (either a map header or archive in maps/)
+ *******************************************************************/
+bool ArchivePanel::mapOpenDb2() {
+	// Get first selected entry
+	ArchiveEntry* entry = entry_list->getEntry(entry_list->getFirstSelected());
+
+	// Do open in db2
+	return EntryOperations::openMapDB2(entry);
+}
+
 
 /* ArchivePanel::openEntry
  * Shows the appropriate entry area and sends the given entry to it.
@@ -1639,6 +1651,8 @@ bool ArchivePanel::handleAction(string id) {
 		compileACS(true);
 	else if (id == "arch_texturex_convertzd")
 		convertTextures();
+	else if (id == "arch_map_opendb2")
+		mapOpenDb2();
 
 	// Unknown action
 	else
@@ -1778,6 +1792,7 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 	bool unknown_selected = false;
 	bool texturex_selected = false;
 	bool modified_selected = false;
+	bool map_selected = false;
 //	bool rle_selected = false;
 	for (size_t a = 0; a < selection.size(); a++) {
 		// Check for gfx entry
@@ -1824,6 +1839,12 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 		if (!modified_selected) {
 			if (selection[a]->getState() == 1)
 				modified_selected = true;
+		}
+		if (!map_selected) {
+			if (selection[a]->getType() == EntryType::mapMarkerType())
+				map_selected = true;
+			else if (selection[a]->getParentDir()->getName() == "maps")
+				map_selected = true;
 		}
 #if 0
 		if (!rle_selected) {
@@ -1927,6 +1948,14 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 		}
 		theApp->getAction("arch_scripts_compileacs")->addToMenu(scripts);
 		theApp->getAction("arch_scripts_compilehacs")->addToMenu(scripts);
+	}
+
+	// Add map related menu items if needed
+	if (map_selected) {
+		// 'Open in Doom Builder 2' (windows-only)
+#ifdef __WXMSW__
+		theApp->getAction("arch_map_opendb2")->addToMenu(&context);
+#endif
 	}
 
 	// Popup the context menu

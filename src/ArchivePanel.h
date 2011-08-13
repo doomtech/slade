@@ -58,7 +58,7 @@ public:
 
 	// Entry manipulation actions
 	bool	renameEntry(bool each = false);
-	bool	deleteEntry();
+	bool	deleteEntry(bool confirm = true);
 	bool	revertEntry();
 	bool	moveUp();
 	bool	moveDown();
@@ -86,6 +86,7 @@ public:
 	bool	optimizePNG();
 	bool	compileACS(bool hexen = false);
 	bool	convertTextures();
+	bool	mapOpenDb2();
 
 	// Needed for some console commands
 	EntryPanel *			currentArea() { return cur_area;}
