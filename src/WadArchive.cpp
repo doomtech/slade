@@ -634,11 +634,14 @@ bool WadArchive::moveEntry(ArchiveEntry* entry, unsigned position, ArchiveTreeNo
 
 /* WadArchive::getMapInfo
  * Returns the mapdesc_t information about the map beginning at
- * <maphead>. If <maphead> is not really a map header entry, an
+ * [maphead]. If [maphead] is not really a map header entry, an
  * invalid mapdesc_t will be returned (mapdesc_t::head == NULL)
  *******************************************************************/
 Archive::mapdesc_t WadArchive::getMapInfo(ArchiveEntry* maphead) {
 	mapdesc_t map;
+
+	if (!maphead)
+		return map;
 
 	// Check for UDMF format map
 	if (S_CMPNOCASE(maphead->nextEntry()->getName(), "TEXTMAP")) {
@@ -666,9 +669,10 @@ Archive::mapdesc_t WadArchive::getMapInfo(ArchiveEntry* maphead) {
 	}
 
 	// Check for doom/hexen format map
-	uint8_t existing_map_lumps[NUMMAPLUMPS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	uint8_t existing_map_lumps[NUMMAPLUMPS];
+	memset(existing_map_lumps, 0, NUMMAPLUMPS);
 	ArchiveEntry* entry = maphead->nextEntry();
-	while (true) {
+	while (entry) {
 		// Check that the entry is a valid map-related entry
 		bool mapentry = false;
 		for (unsigned a = 0; a < NUMMAPLUMPS; a++) {

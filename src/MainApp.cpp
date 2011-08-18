@@ -60,7 +60,7 @@
  *******************************************************************/
 namespace Global {
 	string error = "";
-	string version = "3.0.2 beta 2"
+	string version = "3.0.2"
 #ifdef UPDATEREVISION
 	" r" SVN_REVISION_STRING
 #endif
@@ -151,15 +151,19 @@ public:
 		string message = "SLADE3 has crashed unexpectedly. To help fix the problem that caused this crash,\nplease copy+paste the information from the window below to a text file, and email\nit to <sirjuddington@gmail.com> along with a description of what you were\ndoing at the time of the crash. Sorry for the inconvenience.";
 		sizer->Add(new wxStaticText(this, -1, message), 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 4);
 
+		// Setup stack trace string
+		string trace = S_FMT("Version: %s\n", CHR(Global::version));
+		trace += st.getTraceString();
+
 		// Add stack trace text area
 		text_stack = new wxTextCtrl(this, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxHSCROLL);
-		text_stack->SetValue(st.getTraceString());
+		text_stack->SetValue(trace);
 		text_stack->SetFont(wxFont(8, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
 		sizer->Add(text_stack, 1, wxEXPAND|wxALL, 4);
 
 		// Dump stack trace to a file (just in case)
 		wxFile file(appPath("slade3_crash.log", DIR_APP), wxFile::write);
-		file.Write(st.getTraceString());
+		file.Write(trace);
 		file.Close();
 
 		// Add standard 'OK' button
@@ -394,6 +398,7 @@ void MainApp::initActions() {
 	new SAction("arch_audio_convertmus", "Convert MUS to MIDI", "t_convert", "Convert any selected MUS format entries to MIDI format");
 	new SAction("arch_scripts_compileacs", "Compile ACS", "t_compile", "Compile any selected text entries to ACS bytecode");
 	new SAction("arch_scripts_compilehacs", "Compile ACS (Hexen bytecode)", "t_compile", "Compile any selected text entries to Hexen-compatible ACS bytecode");
+	new SAction("arch_map_opendb2", "Open Map in Doom Builder 2", "", "Open the selected map in Doom Builder 2");
 
 	// GfxEntryPanel
 	new SAction("pgfx_mirror", "Mirror", "t_mirror", "Mirror the graphic horizontally");
@@ -420,6 +425,7 @@ void MainApp::initActions() {
 	new SAction("txed_up", "Move Up", "t_up", "Move the selected texture(s) up in the list");
 	new SAction("txed_down", "Move Down", "t_down", "Move the selected texture(s) down in the list");
 	new SAction("txed_copy", "Copy", "t_copy", "Copy the selected texture(s)");
+	new SAction("txed_cut", "Cut", "t_cut", "Cut the selected texture(s)");
 	new SAction("txed_paste", "Paste", "t_paste", "Paste the previously copied texture(s)");
 	new SAction("txed_patch_add", "Add Patch", "t_patch_add", "Add a patch to the texture");
 	new SAction("txed_patch_remove", "Remove Selected Patch(es)", "t_patch_remove", "Remove selected patch(es) from the texture");
@@ -482,8 +488,10 @@ bool MainApp::OnInit() {
 	// Check that SLADE.pk3 can be found
 	wxLogMessage("Loading resources");
 	theArchiveManager->init();
-	if (!theArchiveManager->resArchiveOK())
+	if (!theArchiveManager->resArchiveOK()) {
+		wxMessageBox("Unable to find slade.pk3, make sure it exists in the same directory as the SLADE executable", "Error", wxICON_ERROR);
 		return false;
+	}
 
 	// Show splash screen
 	theSplashWindow->init();

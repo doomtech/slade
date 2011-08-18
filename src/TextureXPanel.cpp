@@ -37,6 +37,7 @@
 #include "Clipboard.h"
 #include "ArchiveManager.h"
 #include "Icons.h"
+#include "ResourceManager.h"
 #include "ColourConfiguration.h"
 #include "KeyBind.h"
 #include <wx/filename.h>
@@ -331,19 +332,10 @@ void TextureXPanel::applyChanges() {
  * at 0,0
  *******************************************************************/
 CTexture* TextureXPanel::newTextureFromPatch(string name, string patch) {
-	// Load patch image to get dimensions (yeah it's not optimal, but at the moment it's the best I can do)
-	SImage image;
-	ArchiveEntry* patch_entry = tx_editor->patchTable().patchEntry(patch);
-	Misc::loadImageFromEntry(&image, patch_entry);
-
 	// Create new texture
 	CTexture* tex = new CTexture();
 	tex->setName(name);
 	tex->setState(2);
-
-	// Set dimensions
-	tex->setWidth(image.getWidth());
-	tex->setHeight(image.getHeight());
 
 	// Setup texture scale
 	if (texturex.getFormat() == TXF_TEXTURES) {
@@ -355,6 +347,14 @@ CTexture* TextureXPanel::newTextureFromPatch(string name, string patch) {
 
 	// Add patch
 	tex->addPatch(patch, 0, 0);
+
+	// Load patch image (to determine dimensions)
+	SImage image;
+	tex->loadPatchImage(0, image);
+
+	// Set dimensions
+	tex->setWidth(image.getWidth());
+	tex->setHeight(image.getHeight());
 
 	// Update variables
 	modified = true;
@@ -666,7 +666,7 @@ void TextureXPanel::paste() {
 		TextureClipboardItem* item = (TextureClipboardItem*)(theClipboard->getItem(a));
 
 		// Add new texture after last selected item
-		CTexture* ntex = new CTexture(texturex.getFormat() == TXF_TEXTURES);
+		CTexture* ntex = new CTexture((texturex.getFormat() == TXF_TEXTURES));
 		ntex->copyTexture(item->getTexture(), true);
 		ntex->setState(2);
 		texturex.addTexture(ntex, ++selected);
@@ -738,6 +738,10 @@ bool TextureXPanel::handleAction(string id) {
 		moveDown();
 	else if (id == "txed_copy")
 		copy();
+	else if (id == "txed_cut") {
+		copy();
+		removeTexture();
+	}
 	else if (id == "txed_paste")
 		paste();
 	else
@@ -777,6 +781,7 @@ void TextureXPanel::onTextureListRightClick(wxListEvent& e) {
 	theApp->getAction("txed_delete")->addToMenu(&context);
 	context.AppendSeparator();
 	theApp->getAction("txed_copy")->addToMenu(&context);
+	theApp->getAction("txed_cut")->addToMenu(&context);
 	theApp->getAction("txed_paste")->addToMenu(&context);
 	context.AppendSeparator();
 	theApp->getAction("txed_up")->addToMenu(&context);
@@ -809,6 +814,15 @@ void TextureXPanel::onTextureListKeyDown(wxKeyEvent& e) {
 			removeTexture();
 			return;
 		}
+	// Cut (Ctrl+X)
+	else if (e.GetModifiers() == wxMOD_CMD && e.GetKeyCode() == 'X') {
+		copy();
+		removeTexture();
+	}
+
+	// Paste (Ctrl+V)
+	else if (e.GetModifiers() == wxMOD_CMD && e.GetKeyCode() == 'V')
+		paste();
 
 		// Paste
 		else if (name == "paste") {

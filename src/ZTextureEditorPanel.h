@@ -76,6 +76,7 @@ public:
 	void	onPatchColourChanged(wxColourPickerEvent& e);
 	void	onPatchTintAmountChanged(wxSpinDoubleEvent& e);
 	void	onBtnEditTranslation(wxCommandEvent& e);
+	void	onTextTranslationEnter(wxCommandEvent& e);
 };
 
 #endif//__ZTEXTURE_EDITOR_PANEL_H__

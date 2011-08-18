@@ -418,6 +418,10 @@ Archive* ArchiveManagerPanel::currentArchive() {
 	// Get current tab
 	wxWindow* page = notebook_archives->GetPage(notebook_archives->GetSelection());
 
+	// Return if no tabs exist
+	if (!page)
+		return NULL;
+
 	// ArchivePanel
 	if (page->GetName() == "archive") {
 		ArchivePanel* ap = (ArchivePanel*)page;
@@ -877,10 +881,14 @@ bool ArchiveManagerPanel::saveEntryChanges(Archive* archive) {
  * Saves [archive] to disk, opens a file dialog if necessary
  *******************************************************************/
 bool ArchiveManagerPanel::saveArchive(Archive* archive) {
+	// Check for null pointer
+	if (!archive)
+		return false;
+
 	// Check for unsaved entry changes
 	saveEntryChanges(archive);
 
-	if (archive->isOnDisk()) {
+	if (archive->canSave()) {
 		// Save the archive if possible
 		if (!archive->save()) {
 			// If there was an error pop up a message box
@@ -899,6 +907,10 @@ bool ArchiveManagerPanel::saveArchive(Archive* archive) {
  * a file dialog to select the new name/path
  *******************************************************************/
 bool ArchiveManagerPanel::saveArchiveAs(Archive* archive) {
+	// Check for null pointer
+	if (!archive)
+		return false;
+
 	// Check for unsaved entry changes
 	saveEntryChanges(archive);
 

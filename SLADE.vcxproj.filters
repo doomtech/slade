@@ -693,6 +693,9 @@
     <ClCompile Include="src\MapTextureManager.cpp">
       <Filter>Map Editor</Filter>
     </ClCompile>
+    <ClCompile Include="src\FileMonitor.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -1301,6 +1304,9 @@
     </ClInclude>
     <ClInclude Include="src\MapTextureManager.h">
       <Filter>Map Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FileMonitor.h">
+      <Filter>General</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

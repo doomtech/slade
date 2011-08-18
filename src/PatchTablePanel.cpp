@@ -368,7 +368,7 @@ void PatchTablePanel::onBtnRemovePatch(wxCommandEvent& e) {
 		patch_t& patch = patch_table->patch(selection[a]);
 		if (patch.used_in.size() > 0) {
 			// In use, ask if it's ok to remove the patch
-			int answer = wxMessageBox(S_FMT("The patch \"%s\" is currently used by %d texture(s), are you sure you wish to remove it?", CHR(patch.name), patch.used_in.size()), "Confirm Remove Patch", wxYES_NO|wxCANCEL, this);
+			int answer = wxMessageBox(S_FMT("The patch \"%s\" is currently used by %d texture(s), are you sure you wish to remove it?", CHR(patch.name), patch.used_in.size()), "Confirm Remove Patch", wxYES_NO|wxCANCEL|wxICON_QUESTION, this);
 			if (answer == wxYES) {
 				// Answered yes, remove the patch
 				parent->removePatch(selection[a]);

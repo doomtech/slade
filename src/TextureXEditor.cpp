@@ -161,6 +161,7 @@ TextureXEditor::TextureXEditor(wxWindow* parent) : wxPanel(parent, -1) {
 	theApp->getAction("txed_delete")->addToMenu(menu_texture);
 	menu_texture->AppendSeparator();
 	theApp->getAction("txed_copy")->addToMenu(menu_texture);
+	theApp->getAction("txed_cut")->addToMenu(menu_texture);
 	theApp->getAction("txed_paste")->addToMenu(menu_texture);
 	menu_texture->AppendSeparator();
 	theApp->getAction("txed_up")->addToMenu(menu_texture);
@@ -464,7 +465,13 @@ int TextureXEditor::browsePatchTable() {
 string TextureXEditor::browsePatchEntry() {
 	// Update patch browser if necessary
 	if (pb_update) {
+		// Add archive textures (and resource textures)
 		patch_browser->openArchive(archive);
+
+		// Add each texture list from this archive
+		for (unsigned a = 0; a < texture_editors.size(); a++)
+			patch_browser->openTextureXList(&(texture_editors[a]->txList()), archive);
+
 		pb_update = false;
 	}
 
@@ -490,9 +497,20 @@ bool TextureXEditor::checkTextures() {
 			CTexture* tex = texture_editors[a]->txList().getTexture(t);
 
 			// Check its patches are all valid
-			for (unsigned p = 0; p < tex->nPatches(); p++) {
-				if (patch_table.patchIndex(tex->getPatch(p)->getName()) == -1) {
-					problems += S_FMT("Texture %s contains invalid/unknown patch %s\n", CHR(tex->getName()), CHR(tex->getPatch(p)->getName()));
+			if (tex->isExtended()) {
+				// Extended texture, check if each patch exists in any open archive (or as a composite texture)
+				for (unsigned p = 0; p < tex->nPatches(); p++) {
+					ArchiveEntry* pentry = theResourceManager->getPatchEntry(tex->getPatch(p)->getName());
+					CTexture* ptex = theResourceManager->getTexture(tex->getPatch(p)->getName());
+					if (!pentry && !ptex)
+						problems += S_FMT("Texture %s contains invalid/unknown patch %s\n", CHR(tex->getName()), CHR(tex->getPatch(p)->getName()));
+				}
+			}
+			else {
+				// Regular texture, check the patch table
+				for (unsigned p = 0; p < tex->nPatches(); p++) {
+					if (patch_table.patchIndex(tex->getPatch(p)->getName()) == -1)
+						problems += S_FMT("Texture %s contains invalid/unknown patch %s\n", CHR(tex->getName()), CHR(tex->getPatch(p)->getName()));
 				}
 			}
 		}
@@ -541,6 +559,7 @@ void TextureXEditor::onAnnouncement(Announcer* announcer, string event_name, Mem
 
 	if (announcer == &patch_table && event_name == "modified") {
 		patch_browser->openPatchTable(&patch_table);
+		pb_update = true;
 	}
 
 	if (announcer == theResourceManager && event_name == "resources_updated")

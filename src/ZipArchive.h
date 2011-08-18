@@ -28,6 +28,7 @@ public:
 	ArchiveEntry*	addEntry(ArchiveEntry* entry, string add_namespace, bool copy = false);
 
 	// Detection
+	mapdesc_t			getMapInfo(ArchiveEntry* maphead);
 	vector<mapdesc_t>	detectMaps();
 	string				detectNamespace(ArchiveEntry* entry);
 

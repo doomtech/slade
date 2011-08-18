@@ -138,6 +138,7 @@
     <ClCompile Include="src\EditingPrefsPanel.cpp" />
     <ClCompile Include="src\EntryDataFormat.cpp" />
     <ClCompile Include="src\ExtMessageDialog.cpp" />
+    <ClCompile Include="src\FileMonitor.cpp" />
     <ClCompile Include="src\GeneralPrefsPanel.cpp" />
     <ClCompile Include="src\GfxConvDialog.cpp" />
     <ClCompile Include="src\GobArchive.cpp" />
@@ -333,6 +334,7 @@
     <ClInclude Include="src\EditingPrefsPanel.h" />
     <ClInclude Include="src\EntryDataFormat.h" />
     <ClInclude Include="src\ExtMessageDialog.h" />
+    <ClInclude Include="src\FileMonitor.h" />
     <ClInclude Include="src\GeneralPrefsPanel.h" />
     <ClInclude Include="src\GfxConvDialog.h" />
     <ClInclude Include="src\GobArchive.h" />

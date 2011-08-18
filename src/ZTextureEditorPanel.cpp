@@ -331,7 +331,7 @@ wxPanel* ZTextureEditorPanel::createPatchControls(wxWindow* parent) {
 	gb_sizer->Add(hbox, wxGBPosition(7, 0), wxGBSpan(1, 2), wxEXPAND);
 
 	// Translation text entry
-	text_translation = new wxTextCtrl(panel, -1);
+	text_translation = new wxTextCtrl(panel, -1, "", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
 	hbox->Add(text_translation, 1, wxEXPAND|wxRIGHT, 4);
 
 	// Translation edit button
@@ -352,6 +352,7 @@ wxPanel* ZTextureEditorPanel::createPatchControls(wxWindow* parent) {
 	cp_blend_col->Bind(wxEVT_COMMAND_COLOURPICKER_CHANGED, &ZTextureEditorPanel::onPatchColourChanged, this);
 	spin_tint_amount->Bind(wxEVT_COMMAND_SPINCTRLDOUBLE_UPDATED, &ZTextureEditorPanel::onPatchTintAmountChanged, this);
 	btn_edit_translation->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &ZTextureEditorPanel::onBtnEditTranslation, this);
+	text_translation->Bind(wxEVT_COMMAND_TEXT_ENTER, &ZTextureEditorPanel::onTextTranslationEnter, this);
 
 	return panel;
 }
@@ -917,8 +918,12 @@ void ZTextureEditorPanel::onBtnEditTranslation(wxCommandEvent& e) {
 	if (trans.nRanges() == 0)
 		trans.addRange(TRANS_PALETTE, 0);
 
+	// Create patch image
+	SImage image(PALMASK);
+	tex_canvas->getTexture()->loadPatchImage(selection[0], image, tx_editor->getArchive(), tex_canvas->getPalette());
+
 	// Open translation editor dialog
-	TranslationEditorDialog ted(theMainWindow, tex_canvas->getPalette(), "Edit Translation", patch->getPatchEntry(tx_editor->getArchive()));
+	TranslationEditorDialog ted(theMainWindow, tex_canvas->getPalette(), "Edit Translation", &image);
 	ted.openTranslation(trans);
 	if (ted.ShowModal() == wxID_OK) {
 		// Copy updated translation to all selected patches
@@ -933,4 +938,40 @@ void ZTextureEditorPanel::onBtnEditTranslation(wxCommandEvent& e) {
 
 		tex_modified = true;
 	}
+}
+
+/* ZTextureEditorPanel::onTextTranslationEnter
+ * Called when the enter key is pressed in the translation text box
+ *******************************************************************/
+void ZTextureEditorPanel::onTextTranslationEnter(wxCommandEvent& e) {
+	// Parse translation text line
+	Tokenizer tz;
+	tz.openString(text_translation->GetValue());
+	Translation trans;
+
+	string token = tz.getToken();
+	while (!token.IsEmpty()) {
+		// Parse the translation component
+		trans.parse(token);
+
+		// Skip ,
+		if (tz.peekToken() == ",")
+			tz.getToken();
+
+		// Next component
+		token = tz.getToken();
+	}
+
+	// Copy updated translation to all selected patches
+	wxArrayInt selection = list_patches->selectedItems();
+	for (unsigned a = 0; a < selection.size(); a++) {
+		CTPatchEx* patchx = (CTPatchEx*)tex_current->getPatch(selection[a]);
+		patchx->getTranslation().copy(trans);
+	}
+
+	// Update UI
+	updatePatchControls();
+	tex_canvas->redraw(true);
+
+	tex_modified = true;
 }

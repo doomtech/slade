@@ -288,8 +288,6 @@ void ResourceManager::removeEntry(ArchiveEntry* entry) {
  *******************************************************************/
 void ResourceManager::listAllPatches() {
 	EntryResourceMap::iterator i = patches.begin();
-
-	// Add all properties to given list
 	while (i != patches.end()) {
 		wxLogMessage("%s (%d)", CHR(i->first), i->second.length());
 		i++;
@@ -347,7 +345,6 @@ void ResourceManager::getAllTextures(vector<TextureResource::tex_res_t>& list, A
 		}
 
 		// Go through resource textures
-		//ArchiveEntry* entry = i->second.entries[0];
 		TextureResource::tex_res_t res = i->second.textures[0];
 		for (int a = 0; a < i->second.length(); a++) {
 			res = i->second.textures[a];
@@ -367,7 +364,8 @@ void ResourceManager::getAllTextures(vector<TextureResource::tex_res_t>& list, A
 		}
 
 		// Add texture resource to the list
-		list.push_back(res);
+		if (res.parent != ignore)
+			list.push_back(res);
 
 		i++;
 	}
@@ -437,7 +435,7 @@ ArchiveEntry* ResourceManager::getFlatEntry(string flat, Archive* priority) {
 CTexture* ResourceManager::getTexture(string texture, Archive* priority, Archive* ignore) {
 	// Check texture resource with matching name exists
 	TextureResource& res = textures[texture.Upper()];
-	if (res.length() == 0)
+	if (res.textures.size() == 0)
 		return NULL;
 
 	// Go through resource textures
@@ -445,7 +443,7 @@ CTexture* ResourceManager::getTexture(string texture, Archive* priority, Archive
 	Archive* parent = res.textures[0].parent;
 	for (unsigned a = 0; a < res.textures.size(); a++) {
 		// Skip if it's in the 'ignore' archive
-		if (parent == ignore)
+		if (res.textures[a].parent == ignore)
 			continue;
 
 		// If it's in the 'priority' archive, return it
@@ -461,7 +459,10 @@ CTexture* ResourceManager::getTexture(string texture, Archive* priority, Archive
 	}
 
 	// Return the most relevant texture
-	return tex;
+	if (parent != ignore)
+		return tex;
+	else
+		return NULL;
 }
 
 /* ResourceManager::onAnnouncement

@@ -312,7 +312,7 @@ bool TextureXList::readTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_ta
 
 		// Create texture
 		CTexture* tex = new CTexture();
-		tex->name = wxString::From8BitData(tdef.name, 8);
+		tex->name = wxString::FromAscii(tdef.name, 8);
 		tex->width = tdef.width;
 		tex->height = tdef.height;
 		tex->scale_x = tdef.scale[0]/8.0;

@@ -63,9 +63,11 @@ CTPatch::CTPatch(string name, int16_t offset_x, int16_t offset_y) {
  * CTPatch class constructor copying another CTPatch
  *******************************************************************/
 CTPatch::CTPatch(CTPatch* copy) {
-	name = copy->name;
-	offset_x = copy->offset_x;
-	offset_y = copy->offset_y;
+	if (copy) {
+		name = copy->name;
+		offset_x = copy->offset_x;
+		offset_y = copy->offset_y;
+	}
 }
 
 /* CTPatch::~CTPatch
@@ -168,34 +170,38 @@ CTPatchEx::CTPatchEx(string name, int16_t offset_x, int16_t offset_y, uint8_t ty
  * CTPatchEx class constructor copying a regular CTPatch
  *******************************************************************/
 CTPatchEx::CTPatchEx(CTPatch* copy) {
-	flip_x = false;
-	flip_y = false;
-	rotation = 0;
-	alpha = 1.0f;
-	style = "Copy";
-	blendtype = 0;
-	offset_x = copy->xOffset();
-	offset_y = copy->yOffset();
-	name = copy->getName();
-	type = PTYPE_PATCH;
+	if (copy) {
+		flip_x = false;
+		flip_y = false;
+		rotation = 0;
+		alpha = 1.0f;
+		style = "Copy";
+		blendtype = 0;
+		offset_x = copy->xOffset();
+		offset_y = copy->yOffset();
+		name = copy->getName();
+		type = PTYPE_PATCH;
+	}
 }
 
 /* CTPatchEx::CTPatchEx
  * CTPatchEx class constructor copying another CTPatchEx
  *******************************************************************/
 CTPatchEx::CTPatchEx(CTPatchEx* copy) {
-	flip_x = copy->flip_x;
-	flip_y = copy->flip_y;
-	rotation = copy->rotation;
-	alpha = copy->alpha;
-	style = copy->style;
-	blendtype = copy->blendtype;
-	colour = copy->colour;
-	offset_x = copy->offset_x;
-	offset_y = copy->offset_y;
-	name = copy->name;
-	type = copy->type;
-	translation.copy(copy->translation);
+	if (copy) {
+		flip_x = copy->flip_x;
+		flip_y = copy->flip_y;
+		rotation = copy->rotation;
+		alpha = copy->alpha;
+		style = copy->style;
+		blendtype = copy->blendtype;
+		colour = copy->colour;
+		offset_x = copy->offset_x;
+		offset_y = copy->offset_y;
+		name = copy->name;
+		type = copy->type;
+		translation.copy(copy->translation);
+	}
 }
 
 /* CTPatchEx::~CTPatchEx
@@ -416,9 +422,13 @@ CTexture::~CTexture() {
  * otherwise it will be converted to the type of [tex]
  *******************************************************************/
 void CTexture::copyTexture(CTexture* tex, bool keep_type) {
+	// Check texture was given
+	if (!tex)
+		return;
+
 	// Clear current texture
 	clear();
-
+	
 	// Copy texture info
 	this->name = tex->name;
 	this->width = tex->width;
@@ -436,14 +446,16 @@ void CTexture::copyTexture(CTexture* tex, bool keep_type) {
 
 	// Copy patches
 	for (unsigned a = 0; a < tex->nPatches(); a++) {
-		if ((keep_type && extended) || (!keep_type && tex->extended)) {
-			CTPatchEx* patch = new CTPatchEx((CTPatchEx*)tex->getPatch(a));
-			patches.push_back(patch);
+		CTPatch* patch = tex->getPatch(a);
+
+		if (extended) {
+			if (tex->extended)
+				patches.push_back(new CTPatchEx((CTPatchEx*)patch));
+			else
+				patches.push_back(new CTPatchEx(patch));
 		}
-		else {
-			CTPatch* patch = tex->getPatch(a);
+		else
 			addPatch(patch->getName(), patch->xOffset(), patch->yOffset());
-		}
 	}
 }
 
@@ -469,7 +481,6 @@ void CTexture::clear() {
 	this->scale_x = 1.0;
 	this->scale_y = 1.0;
 	this->world_panning = false;
-	this->extended = false;
 	this->optional = false;
 	this->no_decals = false;
 	this->null_texture = false;
@@ -804,7 +815,7 @@ bool CTexture::toImage(SImage& image, Archive* parent, Palette8bit* pal, bool fo
 	image.resize(width, height);
 
 	// Add patches
-	SImage p_img;
+	SImage p_img(PALMASK);
 	si_drawprops_t dp;
 	dp.src_alpha = false;
 	if (extended) {
@@ -920,8 +931,6 @@ bool CTexture::loadPatchImage(unsigned pindex, SImage& image, Archive* parent, P
 		CTexture* tex = theResourceManager->getTexture(patch->getName(), parent);
 		if (tex)
 			return tex->toImage(image, parent, pal);
-
-		// No matching texture found for patch, so default to entry
 	}
 
 	// Get patch entry

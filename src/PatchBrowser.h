@@ -19,6 +19,7 @@ public:
 	bool	loadImage();
 };
 
+class TextureXList;
 class PatchBrowser : public BrowserWindow, Listener {
 private:
 	PatchTable*		patch_table;
@@ -29,6 +30,7 @@ public:
 
 	bool	openPatchTable(PatchTable* table);
 	bool	openArchive(Archive* archive);
+	bool	openTextureXList(TextureXList* texturex, Archive* parent);
 	int		getSelectedPatch();
 
 	// Events

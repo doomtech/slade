@@ -39,6 +39,7 @@
 #include "ResourceManager.h"
 #include "Misc.h"
 #include "CTexture.h"
+#include "TextureXList.h"
 
 
 /*******************************************************************
@@ -180,7 +181,8 @@ bool PatchBrowser::openPatchTable(PatchTable* table) {
 
 /* PatchBrowser::openArchive
  * Opens all loaded resource patches and textures, prioritising those
- * from [archive]
+ * from [archive], except for the case of composite textures, which
+ * are ignored if in [archive]
  *******************************************************************/
 bool PatchBrowser::openArchive(Archive* archive) {
 	// Check archive was given
@@ -229,9 +231,9 @@ bool PatchBrowser::openArchive(Archive* archive) {
 		addItem(item, nspace + "/" + arch);
 	}
 
-	// Get list of all available textures
+	// Get list of all available textures (that aren't in the given archive)
 	vector<TextureResource::tex_res_t> textures;
-	theResourceManager->getAllTextures(textures, archive);
+	theResourceManager->getAllTextures(textures, NULL, archive);
 
 	// Go through the list
 	for (unsigned a = 0; a < textures.size(); a++) {
@@ -243,13 +245,38 @@ bool PatchBrowser::openArchive(Archive* archive) {
 		// Add to textures node (under parent archive name)
 		addItem(item, "Textures/" + res.parent->getFilename(false));
 	}
-	// TODO: Ignore textures in the current list (or archive?)
 
 	// Open 'patches' node
 	openTree((BrowserTreeNode*)items_root->getChild("Patches"));
 
 	// Update tree control
 	populateItemTree();
+
+	return true;
+}
+
+/* PatchBrowser::openTextureXList
+ * Adds all textures in [texturex] to the browser, in the tree at
+ * 'Textures/[parent archive filename]'
+ *******************************************************************/
+bool PatchBrowser::openTextureXList(TextureXList* texturex, Archive* parent) {
+	// Check tx list was given
+	if (!texturex)
+		return false;
+
+	// Go through all textures in the list
+	for (unsigned a = 0; a < texturex->nTextures(); a++) {
+		// Create browser item
+		PatchBrowserItem* item = new PatchBrowserItem(texturex->getTexture(a)->getName(), parent, 1);
+
+		// Set archive name
+		string arch = "Unknown";
+		if (parent)
+			arch = parent->getFilename(false);
+
+		// Add to textures node (under parent archive name)
+		addItem(item, "Textures/" + arch);
+	}
 
 	return true;
 }

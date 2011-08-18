@@ -404,7 +404,7 @@ bool MapEditor::updateHilight(double dist_scale) {
 		objtype = "Sector";
 	}
 	else if (edit_mode == MODE_THINGS) {
-		hilight_item = map.nearestThing(mouse_pos.x, mouse_pos.y, 32/dist_scale);
+		hilight_item = map.nearestThing(mouse_pos.x, mouse_pos.y, 32);
 		objtype = "Thing";
 	}
 
