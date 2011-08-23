@@ -389,6 +389,7 @@ bool EntryOperations::openExternal(ArchiveEntry* entry) {
  * archive if any changes are made to it in DB2
  *******************************************************************/
 bool EntryOperations::openMapDB2(ArchiveEntry* entry) {
+#ifdef __WXMSW__	// Windows only
 	// First up, check for DB2 location registry key
 	wxRegKey key(wxRegKey::HKLM, "SOFTWARE\\CodeImp\\Doom Builder");
 	string path;
@@ -459,6 +460,9 @@ bool EntryOperations::openMapDB2(ArchiveEntry* entry) {
 	wxExecute(cmd, wxEXEC_ASYNC, fm->getProcess());
 
 	return true;
+#else
+	return false;
+#endif//__WXMSW__
 }
 
 /* EntryOperations::modifyalPhChunk
