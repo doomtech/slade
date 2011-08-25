@@ -445,7 +445,7 @@ bool EntryOperations::openMapDB2(ArchiveEntry* entry) {
 		cmd += S_FMT(" -resource pk3 \"%s\"", CHR(base->getFilename()));
 
 	// Add resource archives to command line
-	for (unsigned a = 0; a < theArchiveManager->numArchives(); a++) {
+	for (int a = 0; a < theArchiveManager->numArchives(); ++a) {
 		Archive* archive = theArchiveManager->getArchive(a);
 
 		// Check archive type (only wad and zip supported by db2)

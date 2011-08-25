@@ -61,6 +61,8 @@ public:
 	void		newTextureFromPatch();
 	void		newTextureFromFile();
 	void		removeTexture();
+	void		renameTexture();
+	void		exportTexture();
 	void		moveUp();
 	void		moveDown();
 	void		copy();

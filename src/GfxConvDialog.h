@@ -7,6 +7,7 @@
 #include "PaletteChooser.h"
 #include "ColourBox.h"
 #include "SIFormat.h"
+#include "CTexture.h"
 
 /* Convert from anything to:
  * Doom Gfx
@@ -32,16 +33,32 @@ class ArchiveEntry;
 
 struct gcd_item_t {
 	ArchiveEntry*	entry;
+	CTexture*		texture;
 	SImage			image;
 	bool			modified;
 	SIFormat*		new_format;
 	Palette8bit*	palette;
+	Archive*		archive;
+	bool			force_rgba;
 
 	gcd_item_t(ArchiveEntry* entry = NULL) {
 		this->entry = entry;
+		this->texture = NULL;
 		this->modified = false;
 		this->new_format = NULL;
 		this->palette = NULL;
+		this->archive = NULL;
+		this->force_rgba = false;
+	}
+
+	gcd_item_t(CTexture* texture, Palette8bit* palette = NULL, Archive* archive = NULL, bool force_rgba = false) {
+		this->entry = NULL;
+		this->texture = texture;
+		this->modified = false;
+		this->new_format = NULL;
+		this->palette = palette;
+		this->archive = archive;
+		this->force_rgba = false;
 	}
 };
 
@@ -97,6 +114,7 @@ public:
 
 	void	openEntry(ArchiveEntry* entry);
 	void	openEntries(vector<ArchiveEntry*> entries);
+	void	openTextures(vector<CTexture*> textures, Palette8bit* palette = NULL, Archive* archive = NULL, bool force_rgba = false);
 	void	updatePreviewGfx();
 	void	updateControls();
 	void	getConvertOptions(SIFormat::convert_options_t& opt);

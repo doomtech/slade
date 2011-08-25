@@ -38,6 +38,8 @@
 #include "ArchiveManager.h"
 #include "Icons.h"
 #include "ResourceManager.h"
+#include "GfxConvDialog.h"
+#include "SplashWindow.h"
 #include <wx/filename.h>
 #include <wx/gbsizer.h>
 
@@ -46,6 +48,7 @@
  * EXTERNAL VARIABLES
  *******************************************************************/
 EXTERN_CVAR(String, dir_last)
+EXTERN_CVAR(Bool, wad_force_uppercase)
 
 
 /*******************************************************************
@@ -708,6 +711,126 @@ void TextureXPanel::paste() {
 	modified = true;
 }
 
+/* TextureXPanel::renameTexture
+ * Create standalone image entries of any selected textures
+ *******************************************************************/
+void TextureXPanel::renameTexture() {
+	// Get selected textures
+	vector<long> selec_num = list_textures->getSelection();
+	vector<CTexture*> selection;
+
+	if (!tx_entry) return;
+
+	saveTEXTUREX();
+
+	Archive * archive = tx_entry->getParent();
+
+	// Go through selection
+	for (unsigned a = 0; a < selec_num.size(); ++a) {
+		selection.push_back(texturex.getTexture(selec_num[a]));
+	}
+
+	// Check any are selected
+	if (selection.size() == 1) {
+		// If only one entry is selected, or "rename each" mode is desired, just do basic rename
+		for (unsigned a = 0; a < selection.size(); a++) {
+
+			// Prompt for a new name
+			string new_name = wxGetTextFromUser("Enter new texture name: (* = unchanged)", "Rename", selection[a]->getName());
+			if (wad_force_uppercase) new_name.MakeUpper();
+
+			// Rename entry (if needed)
+			if (!new_name.IsEmpty() && selection[a]->getName() != new_name)
+				selection[a]->setName(new_name);
+		}
+	} else if (selection.size() > 1) {
+		// Get a list of entry names
+		wxArrayString names;
+		for (unsigned a = 0; a < selection.size(); a++)
+			names.push_back(selection[a]->getName());
+
+		// Get filter string
+		string filter = Misc::massRenameFilter(names);
+
+		// Prompt for a new name
+		string new_name = wxGetTextFromUser("Enter new texture name: (* = unchanged)", "Rename", filter);
+		if (wad_force_uppercase) new_name.MakeUpper();
+
+		// Apply mass rename to list of names
+		if (!new_name.IsEmpty()) {
+			Misc::doMassRename(names, new_name);
+
+			// Go through the list
+			for (size_t a = 0; a < selection.size(); a++) {
+				// Rename the entry (if needed)
+				if (selection[a]->getName() != names[a])
+					selection[a]->setName(names[a]);		// Change name
+			}
+		}
+	}
+	Refresh();
+}
+
+/* TextureXPanel::exportTexture
+ * Create standalone image entries of any selected textures
+ *******************************************************************/
+void TextureXPanel::exportTexture() {
+	// Get selected textures
+	vector<long> selec_num = list_textures->getSelection();
+	vector<CTexture*> selection;
+
+	if (!tx_entry) return;
+
+	saveTEXTUREX();
+
+	Archive * archive = tx_entry->getParent();
+
+	// Go through selection
+	for (unsigned a = 0; a < selec_num.size(); ++a) {
+		selection.push_back(texturex.getTexture(selec_num[a]));
+	}
+
+	// Create gfx conversion dialog
+	GfxConvDialog gcd;
+
+	// Send selection to the gcd
+	gcd.openTextures(selection, texture_editor->getPalette(), archive, texture_editor->getBlendRGBA());
+
+	// Run the gcd
+	gcd.ShowModal();
+
+	// Show splash window
+	theSplashWindow->show("Writing converted image data...", true);
+
+	// Write any changes
+	for (unsigned a = 0; a < selection.size(); a++) {
+		// Update splash window
+		theSplashWindow->setProgressMessage(selection[a]->getName());
+		theSplashWindow->setProgress((float)a / (float)selection.size());
+
+		// Skip if the image wasn't converted
+		if (!gcd.itemModified(a))
+			continue;
+
+		// Get image and conversion info
+		SImage* image = gcd.getItemImage(a);
+		SIFormat* format = gcd.getItemFormat(a);
+		
+		// Write converted image back to entry
+		MemChunk mc;
+		format->saveImage(*image, mc, gcd.getItemPalette(a));
+		ArchiveEntry * lump = new ArchiveEntry;
+		lump->importMemChunk(mc);
+		lump->rename(selection[a]->getName());
+		archive->addEntry(lump, "textures");
+		EntryType::detectEntryType(lump);
+		lump->setExtensionByType();
+	}
+
+	// Hide splash window
+	theSplashWindow->hide();
+}
+
 /* TextureXPanel::handleAction
  * Handles the action [id]. Returns true if the action was handled,
  * false otherwise
@@ -742,6 +865,10 @@ bool TextureXPanel::handleAction(string id) {
 	}
 	else if (id == "txed_paste")
 		paste();
+	else if (id == "txed_export")
+		exportTexture();
+	else if (id == "txed_rename")
+		renameTexture();
 	else
 		return false;	// Not handled here
 
@@ -777,6 +904,9 @@ void TextureXPanel::onTextureListRightClick(wxListEvent& e) {
 	// Create context menu
 	wxMenu context;
 	theApp->getAction("txed_delete")->addToMenu(&context);
+	context.AppendSeparator();
+	theApp->getAction("txed_rename")->addToMenu(&context);
+	theApp->getAction("txed_export")->addToMenu(&context);
 	context.AppendSeparator();
 	theApp->getAction("txed_copy")->addToMenu(&context);
 	theApp->getAction("txed_cut")->addToMenu(&context);

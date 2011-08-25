@@ -255,6 +255,9 @@ void CTextureCanvas::drawTexture() {
 	if (view_type == 2)
 		glTranslated(-160, -100, 0);												// HUD offsets
 
+	// Draw the texture border
+	drawTextureBorder();
+
 	// Enable textures
 	glEnable(GL_TEXTURE_2D);
 
@@ -297,9 +300,6 @@ void CTextureCanvas::drawTexture() {
 
 	// Disable textures
 	glDisable(GL_TEXTURE_2D);
-
-	// Draw the texture border
-	drawTextureBorder();
 
 	// Now loop through selected patches and draw selection outlines
 	rgba_t(70, 210, 220, 255, 0).set_gl();

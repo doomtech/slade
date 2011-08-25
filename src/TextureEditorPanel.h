@@ -66,6 +66,9 @@ public:
 	void	clearTexture();
 	void	setPalette(Palette8bit* pal);
 
+	Palette8bit*		getPalette();
+	bool				getBlendRGBA();
+
 	// Editing
 	virtual void	addPatch();
 	void			removePatch();

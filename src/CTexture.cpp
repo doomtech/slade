@@ -5,7 +5,7 @@
  *
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
- * Filename:    CompositeTexture.cpp
+ * Filename:    CTexture.cpp
  * Description: C(omposite)Texture class, represents a composite
  *              texture as described in TEXTUREx entries
  *

@@ -70,7 +70,7 @@ PaletteChooser::PaletteChooser(wxWindow* parent, int id)
 PaletteChooser::~PaletteChooser() {
 }
 
-/* GfxConvDialog::paletteCurrentChanged
+/* PaletteChooser::onPaletteChanged
  * Called when the current image palette chooser is changed
  *******************************************************************/
 void PaletteChooser::onPaletteChanged(wxCommandEvent& e) {

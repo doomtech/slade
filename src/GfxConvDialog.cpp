@@ -79,8 +79,16 @@ bool GfxConvDialog::nextItem() {
 
 	// Load image if needed
 	if (!items[current_item].image.isValid()) {
-		if (!Misc::loadImageFromEntry(&(items[current_item].image), items[current_item].entry))
-			return nextItem();	// Skip if not a valid image entry
+		// If loading images from entries
+		if (items[current_item].entry != NULL) {
+			if (!Misc::loadImageFromEntry(&(items[current_item].image), items[current_item].entry))
+				return nextItem();	// Skip if not a valid image entry
+		}
+		else if (items[current_item].texture != NULL) {
+			if (!items[current_item].texture->toImage(items[current_item].image, items[current_item].archive, items[current_item].palette, items[current_item].force_rgba))
+				return nextItem();	// Skip if not a valid image entry
+		}
+		else return nextItem();	// Skip if not a valid image entry
 	}
 
 	// Update valid formats
@@ -144,7 +152,10 @@ bool GfxConvDialog::nextItem() {
 
 	// Setup current format string
 	string fmt_string = "Current Format: ";
-	fmt_string += items[current_item].image.getFormat()->getName();
+	if (items[current_item].texture == NULL)
+		fmt_string += items[current_item].image.getFormat()->getName();
+	else 
+		fmt_string += "Texture";
 	if (items[current_item].image.getType() == RGBA)
 		fmt_string += " (Truecolour)";
 	else if (items[current_item].image.getType() == PALMASK)
@@ -316,6 +327,19 @@ void GfxConvDialog::openEntries(vector<ArchiveEntry*> entries) {
 	// Add entries to item list
 	for (unsigned a = 0; a < entries.size(); a++)
 		items.push_back(gcd_item_t(entries[a]));
+
+	// Open the first item
+	current_item = -1;
+	nextItem();
+}
+
+/* GfxConvDialog::openTextures
+ * Opens a list of composite textures to be converted
+ *******************************************************************/
+void GfxConvDialog::openTextures(vector<CTexture*> textures, Palette8bit* palette, Archive* archive, bool force_rgba) {
+	// Add entries to item list
+	for (unsigned a = 0; a < textures.size(); a++)
+		items.push_back(gcd_item_t(textures[a], palette, archive, force_rgba));
 
 	// Open the first item
 	current_item = -1;
