@@ -37,7 +37,8 @@
 /*******************************************************************
  * VARIABLES
  *******************************************************************/
- wxDEFINE_EVENT(EVT_DRAG_END, wxCommandEvent);
+wxDEFINE_EVENT(EVT_DRAG_END, wxCommandEvent);
+EXTERN_CVAR(Bool, gfx_show_border)
 
 
 /*******************************************************************
@@ -256,7 +257,8 @@ void CTextureCanvas::drawTexture() {
 		glTranslated(-160, -100, 0);												// HUD offsets
 
 	// Draw the texture border
-	drawTextureBorder();
+	if (gfx_show_border)
+		drawTextureBorder();
 
 	// Enable textures
 	glEnable(GL_TEXTURE_2D);
@@ -686,8 +688,8 @@ void CTextureCanvas::onMouseEvent(wxMouseEvent& e) {
 	if (e.Moving() || e.Dragging()) {
 		dragging = false;
 
-		// Pan if right button is down
-		if (e.RightIsDown()) {
+		// Pan if middle button is down
+		if (e.MiddleIsDown()) {
 			offset = offset + point2_t(e.GetPosition().x - mouse_prev.x, e.GetPosition().y - mouse_prev.y);
 			refresh = true;
 			dragging = true;
