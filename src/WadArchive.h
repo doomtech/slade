@@ -29,6 +29,7 @@ public:
 
 	// Wad specific
 	bool		isIWAD() { return iwad; }
+	bool		isWritable();
 	uint32_t	getEntryOffset(ArchiveEntry* entry);
 	void		setEntryOffset(ArchiveEntry* entry, uint32_t offset);
 	void		updateNamespaces();

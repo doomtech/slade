@@ -121,6 +121,7 @@ public:
 	bool				isModified() { return modified; }
 	bool				isOnDisk() { return on_disk; }
 	bool				isReadOnly() { return read_only; }
+	virtual bool		isWritable() { return true; }
 
 	void	setModified(bool modified);
 	void	setFilename(string filename) { this->filename = filename; }

@@ -99,6 +99,10 @@ WadArchive::WadArchive() : TreelessArchive(ARCHIVE_WAD) {
 WadArchive::~WadArchive() {
 }
 
+bool WadArchive::isWritable() {
+	return !(iwad && iwad_lock);
+}
+
 /* WadArchive::getEntryOffset
  * Returns the file byte offset for [entry]
  *******************************************************************/
