@@ -451,13 +451,16 @@ void CTextureCanvas::drawPatch(int num, bool outside) {
  *******************************************************************/
 void CTextureCanvas::drawTextureBorder() {
 	// Draw the texture border
+	double ext = 0.11;
+	glLineWidth(2.0f);
 	COL_BLACK.set_gl();
 	glBegin(GL_LINE_LOOP);
-	glVertex2i(0, 0);
-	glVertex2i(0, texture->getHeight());
-	glVertex2i(texture->getWidth(), texture->getHeight());
-	glVertex2i(texture->getWidth(), 0);
+	glVertex2d(-ext, -ext);
+	glVertex2d(-ext, texture->getHeight()+ext);
+	glVertex2d(texture->getWidth()+ext, texture->getHeight()+ext);
+	glVertex2d(texture->getWidth()+ext, -ext);
 	glEnd();
+	glLineWidth(1.0f);
 
 	// Draw vertical ticks
 	int y = 0;
