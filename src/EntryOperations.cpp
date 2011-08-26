@@ -1146,9 +1146,9 @@ bool EntryOperations::optimizePNG(ArchiveEntry* entry) {
 	string pngpathc = path_pngcrush;
 	string pngpatho = path_pngout;
 	string pngpathd = path_deflopt;
-	if (pngpathc.IsEmpty() || !wxFileExists(pngpathc) &&
-		pngpatho.IsEmpty() || !wxFileExists(pngpatho) &&
-		pngpathd.IsEmpty() || !wxFileExists(pngpathd)) {
+	if ((pngpathc.IsEmpty() || !wxFileExists(pngpathc)) &&
+		(pngpatho.IsEmpty() || !wxFileExists(pngpatho)) &&
+		(pngpathd.IsEmpty() || !wxFileExists(pngpathd))) {
 		wxMessageBox("Error: PNG tools path not defined, please configure in SLADE preferences", "Error", wxOK|wxCENTRE|wxICON_ERROR);
 		return false;
 	}
@@ -1205,7 +1205,7 @@ bool EntryOperations::optimizePNG(ArchiveEntry* entry) {
 			wxRemoveFile(optfile);
 			outed = true;
 		} else if (!crushed)
-			// Don't treat it as an error if PNGout couldn't create a smaller file than 
+			// Don't treat it as an error if PNGout couldn't create a smaller file than PNGCrush
 			errormessages += "PNGout failed to create optimized file.\n";
 		outsize = entry->getSize();
 	}
@@ -1237,8 +1237,8 @@ bool EntryOperations::optimizePNG(ArchiveEntry* entry) {
 
 
 	if (!errormessages.IsEmpty()) {
-		ExtMessageDialog dlg(NULL, "Error Optimizing");
-		dlg.setMessage("The following errors were encountered while optimizing:");
+		ExtMessageDialog dlg(NULL, "Optimizing Report");
+		dlg.setMessage("The following issues were encountered while optimizing:");
 		dlg.setExt(errormessages);
 		dlg.ShowModal();
 
