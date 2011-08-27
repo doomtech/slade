@@ -1165,9 +1165,9 @@ bool EntryOperations::optimizePNG(ArchiveEntry* entry) {
 	// Run PNGCrush
 	if (!pngpathc.IsEmpty() && wxFileExists(pngpathc)) {
 		wxFileName fn(pngpathc);
-		fn.SetExt("png");
-		string pngfile = fn.GetFullPath();
 		fn.SetExt("opt");
+		string pngfile = fn.GetFullPath();
+		fn.SetExt("png");
 		string optfile = fn.GetFullPath();
 		entry->exportFile(pngfile);
 
@@ -1180,6 +1180,7 @@ bool EntryOperations::optimizePNG(ArchiveEntry* entry) {
 		if (wxFileExists(optfile)) {
 			entry->importFile(optfile);
 			wxRemoveFile(optfile);
+			wxRemoveFile(pngfile);
 			crushed = true;
 		} else errormessages += "PNGCrush failed to create optimized file.\n";
 		crushsize = entry->getSize();
@@ -1187,10 +1188,10 @@ bool EntryOperations::optimizePNG(ArchiveEntry* entry) {
 
 	// Run PNGOut
 	if (!pngpatho.IsEmpty() && wxFileExists(pngpatho)) {
-		wxFileName fn(pngpathc);
-		fn.SetExt("png");
-		string pngfile = fn.GetFullPath();
+		wxFileName fn(pngpatho);
 		fn.SetExt("opt");
+		string pngfile = fn.GetFullPath();
+		fn.SetExt("png");
 		string optfile = fn.GetFullPath();
 		entry->exportFile(pngfile);
 
@@ -1203,6 +1204,7 @@ bool EntryOperations::optimizePNG(ArchiveEntry* entry) {
 		if (wxFileExists(optfile)) {
 			entry->importFile(optfile);
 			wxRemoveFile(optfile);
+			wxRemoveFile(pngfile);
 			outed = true;
 		} else if (!crushed)
 			// Don't treat it as an error if PNGout couldn't create a smaller file than PNGCrush
@@ -1224,6 +1226,7 @@ bool EntryOperations::optimizePNG(ArchiveEntry* entry) {
 		theMainWindow->Raise();
 
 		entry->importFile(pngfile);
+		wxRemoveFile(pngfile);
 		deflsize = entry->getSize();
 
 	}
@@ -1236,7 +1239,7 @@ bool EntryOperations::optimizePNG(ArchiveEntry* entry) {
 		CHR(entry->getName()), oldsize, crushsize, outsize, deflsize, entry->getSize());
 
 
-	if (!errormessages.IsEmpty()) {
+	if (!crushed && !outed && !errormessages.IsEmpty()) {
 		ExtMessageDialog dlg(NULL, "Optimizing Report");
 		dlg.setMessage("The following issues were encountered while optimizing:");
 		dlg.setExt(errormessages);
