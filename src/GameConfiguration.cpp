@@ -162,6 +162,11 @@ bool GameConfiguration::readConfiguration(string& cfg) {
 	MemChunk mc;
 	mc.write(CHR(cfg), cfg.Length());
 	mc.exportFile("gctest.txt");
+
+	// Clear current configuration
+	name = "Invalid Configuration";
+	action_specials.clear();
+	map_names.clear();
 	
 	// Parse the full configuration
 	Parser parser;
@@ -183,7 +188,11 @@ bool GameConfiguration::readConfiguration(string& cfg) {
 		if (S_CMPNOCASE(node->getName(), "name"))
 			this->name = node->getStringValue();
 			
-		// TODO: Valid map names
+		// Valid map names
+		if (S_CMPNOCASE(node->getName(), "map_names")) {
+			for (unsigned n = 0; n < node->nValues(); n++)
+				map_names.push_back(node->getStringValue(n));
+		}
 	}
 	
 	// Action specials
@@ -214,6 +223,16 @@ bool GameConfiguration::open(ArchiveEntry* entry) {
 	return readConfiguration(cfg);
 }
 
+string GameConfiguration::actionSpecialName(int special) {
+	// Check special id is valid
+	if (special < 0)
+		return "Unknown";
+	else if (special == 0)
+		return "None";
+
+	return action_specials[special].getName();
+}
+
 void GameConfiguration::dumpActionSpecials() {
 	ASpecialMap::iterator i = action_specials.begin();
 	
@@ -225,10 +244,17 @@ void GameConfiguration::dumpActionSpecials() {
 	}
 }
 
+void GameConfiguration::dumpValidMapNames() {
+	wxLogMessage("Valid Map Names:");
+	for (unsigned a = 0; a < map_names.size(); a++)
+		wxLogMessage(map_names[a]);
+}
+
 
 #include "ArchiveManager.h"
 CONSOLE_COMMAND(testgc, 0) {
 	Archive* slade_pk3 = theArchiveManager->programResourceArchive();
 	theGameConfiguration->open(slade_pk3->entryAtPath("config/games/doom1.cfg"));
 	theGameConfiguration->dumpActionSpecials();
+	theGameConfiguration->dumpValidMapNames();
 }

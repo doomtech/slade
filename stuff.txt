@@ -7,17 +7,20 @@
 
 TODO List ---------------------------------------------------------------
 
---- Before 3.0.2 ---
-- Fix bugs
-
 --- Bugs ---
+
+--- Map Editor ---
+- Checks:
+	- Missing textures
+	- Specials with 0 tag that require a tag
+	- Invalid sector references (maybe not, shouldn't really happen)
+
 
 --- Minor Problems/Annoyances ---
 - Long calltips can extend off the edge of the screen
 - Incorrect ctrl+tab behaviour with tabs
 
 --- Editor Features ---
-- Map editor (!)
 - Generic entry data view (for VERTEXES, LINEDEFS, SIDEDEFS, SECTORS, THINGS, DEMO*, TEXTUREX/PNAMES, ...)
 - ANSI screen editor
 - Proper font viewer

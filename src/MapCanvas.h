@@ -7,11 +7,12 @@
 #include "LineInfoOverlay.h"
 #include "SectorInfoOverlay.h"
 #include "KeyBind.h"
+#include "MainApp.h"
 
 class MapEditor;
 class MCAnimation;
 class MapSide;
-class MapCanvas : public OGLCanvas, public KeyBindHandler {
+class MapCanvas : public OGLCanvas, public KeyBindHandler, public SActionHandler {
 private:
 	MapEditor*				editor;
 	vector<MCAnimation*>	animations;
@@ -63,8 +64,11 @@ public:
 	void	update(long frametime);
 
 	// Keybind handling
-	void onKeyBindPress(string name);
-	void onKeyBindRelease(string name);
+	void	onKeyBindPress(string name);
+	void	onKeyBindRelease(string name);
+
+	// SAction handler
+	bool	handleAction(string id);
 
 	// Events
 	void	onSize(wxSizeEvent& e);

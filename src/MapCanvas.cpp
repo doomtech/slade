@@ -465,6 +465,39 @@ void MapCanvas::onKeyBindRelease(string name) {
 	}
 }
 
+bool MapCanvas::handleAction(string id) {
+	// Skip if not shown
+	if (!IsShown())
+		return false;
+
+	// Vertices mode
+	if (id == "mapw_mode_vertices") {
+		editor->setEditMode(MapEditor::MODE_VERTICES);
+		return true;
+	}
+
+	// Lines mode
+	else if (id == "mapw_mode_lines") {
+		editor->setEditMode(MapEditor::MODE_LINES);
+		return true;
+	}
+
+	// Sectors mode
+	else if (id == "mapw_mode_sectors") {
+		editor->setEditMode(MapEditor::MODE_SECTORS);
+		return true;
+	}
+
+	// Things mode
+	else if (id == "mapw_mode_things") {
+		editor->setEditMode(MapEditor::MODE_THINGS);
+		return true;
+	}
+
+	// Not handled
+	return false;
+}
+
 
 
 
@@ -517,33 +550,6 @@ void MapCanvas::onMouseDown(wxMouseEvent& e) {
 		KeyBind::keyPressed(keypress_t(KeyBind::mbName(e.GetButton()), e.AltDown(), e.CmdDown(), e.ShiftDown()));
 
 	e.Skip();
-
-	/*
-	// Get map coordinates of cursor
-	double x = translateX(e.GetX());
-	double y = translateY(e.GetY());
-	editor->setMouseDownPos(x, y);
-
-	// Left button down
-	if (e.LeftDown()) {
-		if (e.GetModifiers() == wxMOD_SHIFT) {
-			// Shift held, begin box selection
-			sel_origin.set(x, y);
-			sel_end.set(x, y);
-			sel_active = true;
-		}
-		else {
-			// No shift, select any current hilight
-			editor->selectCurrent();
-		}
-	}
-
-	// Not left or right button (both reserved), let keybind system handle it
-	else if (!e.RightDown())
-		KeyBind::keyPressed(keypress_t(KeyBind::mbName(e.GetButton()), e.AltDown(), e.CmdDown(), e.ShiftDown()));
-
-	e.Skip();
-	*/
 }
 
 void MapCanvas::onMouseUp(wxMouseEvent& e) {
@@ -579,26 +585,6 @@ void MapCanvas::onMouseUp(wxMouseEvent& e) {
 		KeyBind::keyReleased(KeyBind::mbName(e.GetButton()));
 
 	e.Skip();
-
-	/*
-	// Left button up
-	if (e.LeftUp()) {
-		if (sel_active) {
-			sel_active = false;
-			editor->selectWithin(min(sel_origin.x, sel_end.x), min(sel_origin.y, sel_end.y),
-								max(sel_origin.x, sel_end.x), max(sel_origin.y, sel_end.y));
-			animations.push_back(new MCASelboxFader(theApp->runTimer(), sel_origin, sel_end));
-		}
-
-		editor->updateHilight();
-	}
-
-	// Not left or right button (both reserved), let keybind system handle it
-	else if (!e.RightUp())
-		KeyBind::keyReleased(KeyBind::mbName(e.GetButton()));
-
-	e.Skip();
-	*/
 }
 
 void MapCanvas::onMouseMotion(wxMouseEvent& e) {
@@ -611,34 +597,6 @@ void MapCanvas::onMouseMotion(wxMouseEvent& e) {
 	editor->setMousePos(translateX(e.GetX()), translateY(e.GetY()));
 
 	e.Skip();
-
-	/*
-	// Set mouse cursor position
-	mouse_relpos.set(e.GetX(), e.GetY());
-
-	// Get map coordinates of cursor
-	double x = translateX(e.GetX());
-	double y = translateY(e.GetY());
-
-	// Update editor mouse tracking
-	editor->setMousePos(x, y);
-
-	// If dragging left mouse
-	if (e.Dragging() && e.LeftIsDown())
-		sel_end.set(x, y);
-	else if (KeyBind::isPressed("me2d_pan_view")) {
-		pan((pan_origin.x - e.GetX()) / view_scale, -((pan_origin.y - e.GetY()) / view_scale));
-		pan_origin.set(e.GetX(), e.GetY());
-	}
-	else {
-		sel_active = false;
-
-		// Update editor mouse hilight
-		editor->updateHilight();
-	}
-
-	e.Skip();
-	*/
 }
 
 void MapCanvas::onMouseWheel(wxMouseEvent& e) {

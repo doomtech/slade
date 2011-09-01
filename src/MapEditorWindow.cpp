@@ -30,6 +30,7 @@
 #include "Main.h"
 #include "WxStuff.h"
 #include "MapEditorWindow.h"
+#include "MainApp.h"
 #include <wx/aui/aui.h>
 
 
@@ -74,6 +75,46 @@ void MapEditorWindow::setupLayout() {
 	map_canvas = new MapCanvas(this, -1, &editor);
 	p_inf.CenterPane();
 	m_mgr->AddPane(map_canvas, p_inf);
+
+	// --- Menus ---
+	wxMenuBar *menu = new wxMenuBar();
+
+	// Map menu
+	wxMenu* menu_map = new wxMenu("");
+	theApp->getAction("mapw_save")->addToMenu(menu_map);
+	theApp->getAction("mapw_rename")->addToMenu(menu_map);
+	menu->Append(menu_map, "&Map");
+
+	// Mode menu
+	wxMenu* menu_mode = new wxMenu("");
+	theApp->getAction("mapw_mode_vertices")->addToMenu(menu_mode);
+	theApp->getAction("mapw_mode_lines")->addToMenu(menu_mode);
+	theApp->getAction("mapw_mode_sectors")->addToMenu(menu_mode);
+	theApp->getAction("mapw_mode_things")->addToMenu(menu_mode);
+	menu->Append(menu_mode, "Mode");
+
+	SetMenuBar(menu);
+
+
+	// --- Toolbars ---
+
+	// Map toolbar
+	wxAuiToolBar* tb_map = new wxAuiToolBar(this, -1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
+	theApp->getAction("mapw_save")->addToToolbar(tb_map);
+	theApp->getAction("mapw_rename")->addToToolbar(tb_map);
+	tb_map->Realize();
+
+	// Mode toolbar
+	wxAuiToolBar* tb_mode = new wxAuiToolBar(this, -1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
+	theApp->getAction("mapw_mode_vertices")->addToToolbar(tb_mode);
+	theApp->getAction("mapw_mode_lines")->addToToolbar(tb_mode);
+	theApp->getAction("mapw_mode_sectors")->addToToolbar(tb_mode);
+	theApp->getAction("mapw_mode_things")->addToToolbar(tb_mode);
+	tb_mode->Realize();
+
+	// Add toolbar panels
+	m_mgr->AddPane(tb_map, wxAuiPaneInfo().ToolbarPane().Top().Name("tb_map").CloseButton(false));		// Map toolbar
+	m_mgr->AddPane(tb_mode, wxAuiPaneInfo().ToolbarPane().Top().Name("tb_mode").CloseButton(false));	// Mode toolbar
 
 	// Status bar
 	CreateStatusBar();

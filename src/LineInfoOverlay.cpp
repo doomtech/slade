@@ -9,6 +9,7 @@
 #include "MathStuff.h"
 #include "MapEditorWindow.h"
 #include "ColourConfiguration.h"
+#include "GameConfiguration.h"
 
 LineInfoOverlay::LineInfoOverlay() {
 }
@@ -25,7 +26,8 @@ void LineInfoOverlay::update(MapLine* line) {
 	length = S_FMT("Length: %d", MathStuff::round(line->getLength()));
 
 	// Line special
-	special = S_FMT("Special: %d", line->prop("special").getIntValue());
+	int as_id = line->prop("special").getIntValue();
+	special = S_FMT("Special: %d (%s)", as_id, CHR(theGameConfiguration->actionSpecialName(as_id)));
 
 	// Line args (or sector tag)
 	args = S_FMT("Sector Tag: %d", line->prop("arg0").getIntValue());

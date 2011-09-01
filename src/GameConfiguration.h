@@ -27,8 +27,9 @@ class ParseTreeNode;
 class ArchiveEntry;
 class GameConfiguration {
 private:
-	string		name;
-	ASpecialMap	action_specials;
+	string			name;
+	ASpecialMap		action_specials;
+	vector<string>	map_names;
 	
 	// Singleton instance
 	static GameConfiguration*	instance;
@@ -54,9 +55,13 @@ public:
 	bool	readConfiguration(string& cfg);
 	bool 	open(string filename);
 	bool	open(ArchiveEntry* entry);
+
+	// Action specials
+	string	actionSpecialName(int special);
 	
 	// Testing
 	void	dumpActionSpecials();
+	void	dumpValidMapNames();
 };
 
 // Define for less cumbersome GameConfiguration::getInstance()

@@ -437,6 +437,14 @@ void MainApp::initActions() {
 	// PaletteEntryPanel
 	new SAction("ppal_addcustom", "Add to Custom Palettes", "t_plus", "Add the current palette to the custom palettes list");
 	new SAction("ppal_exportas", "Export As...", "t_export", "Export the current palette to a file");
+
+	// Map Editor Window
+	new SAction("mapw_save", "Save Map Changes", "t_save", "Save any changes to the current map");
+	new SAction("mapw_rename", "Rename Map", "t_rename", "Rename the current map");
+	new SAction("mapw_mode_vertices", "Vertices Mode", "t_verts", "Change to vertices editing mode", "", SAction::RADIO);
+	new SAction("mapw_mode_lines", "Lines Mode", "t_lines", "Change to lines editing mode", "", SAction::RADIO);
+	new SAction("mapw_mode_sectors", "Sectors Mode", "t_sectors", "Change to sectors editing mode", "", SAction::RADIO);
+	new SAction("mapw_mode_things", "Things Mode", "t_things", "Change to things editing mode", "", SAction::RADIO);
 }
 
 /* MainApp::OnInit

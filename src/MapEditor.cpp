@@ -190,7 +190,7 @@ void MapEditor::drawHilight(float flash_level) {
 	col.a *= flash_level;
 	col.set_gl();
 
-	glLineWidth(4.5f);
+	glLineWidth(3.0f);
 	glPointSize(vertex_size*1.5f);
 
 	// Draw depending on mode
@@ -267,7 +267,7 @@ void MapEditor::drawSelection(double xmin, double ymin, double xmax, double ymax
 	// Set selection colour
 	ColourConfiguration::getColour("map_selection").set_gl();
 
-	glLineWidth(6.0f);
+	glLineWidth(4.0f);
 	glPointSize(vertex_size*1.5f);
 
 	// Draw depending on mode
