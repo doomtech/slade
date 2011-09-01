@@ -338,6 +338,17 @@ bool Parser::parseText(MemChunk& mc) {
 	// Do parsing
 	return pt_root->parse(tz);
 }
+bool Parser::parseText(string& text) {
+	// Open the given text data
+	Tokenizer tz;
+	if (!tz.openString(text)) {
+		wxLogMessage("Unable to open text data for parsing");
+		return false;
+	}
+
+	// Do parsing
+	return pt_root->parse(tz);
+}
 
 
 

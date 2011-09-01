@@ -45,6 +45,7 @@ public:
 	ParseTreeNode*	parseTreeRoot() { return pt_root; }
 
 	bool	parseText(MemChunk& mc);
+	bool	parseText(string& text);
 };
 
 #endif//__PARSER_H__
