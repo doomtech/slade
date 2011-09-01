@@ -389,6 +389,7 @@ bool EntryOperations::openExternal(ArchiveEntry* entry) {
  * archive if any changes are made to it in DB2
  *******************************************************************/
 bool EntryOperations::openMapDB2(ArchiveEntry* entry) {
+#ifdef __WXMSW__	// Windows only
 	// First up, check for DB2 location registry key
 	wxRegKey key(wxRegKey::HKLM, "SOFTWARE\\CodeImp\\Doom Builder");
 	string path;
@@ -444,7 +445,7 @@ bool EntryOperations::openMapDB2(ArchiveEntry* entry) {
 		cmd += S_FMT(" -resource pk3 \"%s\"", CHR(base->getFilename()));
 
 	// Add resource archives to command line
-	for (unsigned a = 0; a < theArchiveManager->numArchives(); a++) {
+	for (int a = 0; a < theArchiveManager->numArchives(); ++a) {
 		Archive* archive = theArchiveManager->getArchive(a);
 
 		// Check archive type (only wad and zip supported by db2)
@@ -459,6 +460,9 @@ bool EntryOperations::openMapDB2(ArchiveEntry* entry) {
 	wxExecute(cmd, wxEXEC_ASYNC, fm->getProcess());
 
 	return true;
+#else
+	return false;
+#endif//__WXMSW__
 }
 
 /* EntryOperations::modifyalPhChunk
@@ -1142,9 +1146,9 @@ bool EntryOperations::optimizePNG(ArchiveEntry* entry) {
 	string pngpathc = path_pngcrush;
 	string pngpatho = path_pngout;
 	string pngpathd = path_deflopt;
-	if (pngpathc.IsEmpty() || !wxFileExists(pngpathc) &&
-		pngpatho.IsEmpty() || !wxFileExists(pngpatho) &&
-		pngpathd.IsEmpty() || !wxFileExists(pngpathd)) {
+	if ((pngpathc.IsEmpty() || !wxFileExists(pngpathc)) &&
+		(pngpatho.IsEmpty() || !wxFileExists(pngpatho)) &&
+		(pngpathd.IsEmpty() || !wxFileExists(pngpathd))) {
 		wxMessageBox("Error: PNG tools path not defined, please configure in SLADE preferences", "Error", wxOK|wxCENTRE|wxICON_ERROR);
 		return false;
 	}
@@ -1161,9 +1165,9 @@ bool EntryOperations::optimizePNG(ArchiveEntry* entry) {
 	// Run PNGCrush
 	if (!pngpathc.IsEmpty() && wxFileExists(pngpathc)) {
 		wxFileName fn(pngpathc);
-		fn.SetExt("png");
-		string pngfile = fn.GetFullPath();
 		fn.SetExt("opt");
+		string pngfile = fn.GetFullPath();
+		fn.SetExt("png");
 		string optfile = fn.GetFullPath();
 		entry->exportFile(pngfile);
 
@@ -1176,6 +1180,7 @@ bool EntryOperations::optimizePNG(ArchiveEntry* entry) {
 		if (wxFileExists(optfile)) {
 			entry->importFile(optfile);
 			wxRemoveFile(optfile);
+			wxRemoveFile(pngfile);
 			crushed = true;
 		} else errormessages += "PNGCrush failed to create optimized file.\n";
 		crushsize = entry->getSize();
@@ -1183,10 +1188,10 @@ bool EntryOperations::optimizePNG(ArchiveEntry* entry) {
 
 	// Run PNGOut
 	if (!pngpatho.IsEmpty() && wxFileExists(pngpatho)) {
-		wxFileName fn(pngpathc);
-		fn.SetExt("png");
-		string pngfile = fn.GetFullPath();
+		wxFileName fn(pngpatho);
 		fn.SetExt("opt");
+		string pngfile = fn.GetFullPath();
+		fn.SetExt("png");
 		string optfile = fn.GetFullPath();
 		entry->exportFile(pngfile);
 
@@ -1199,9 +1204,10 @@ bool EntryOperations::optimizePNG(ArchiveEntry* entry) {
 		if (wxFileExists(optfile)) {
 			entry->importFile(optfile);
 			wxRemoveFile(optfile);
+			wxRemoveFile(pngfile);
 			outed = true;
 		} else if (!crushed)
-			// Don't treat it as an error if PNGout couldn't create a smaller file than 
+			// Don't treat it as an error if PNGout couldn't create a smaller file than PNGCrush
 			errormessages += "PNGout failed to create optimized file.\n";
 		outsize = entry->getSize();
 	}
@@ -1220,6 +1226,7 @@ bool EntryOperations::optimizePNG(ArchiveEntry* entry) {
 		theMainWindow->Raise();
 
 		entry->importFile(pngfile);
+		wxRemoveFile(pngfile);
 		deflsize = entry->getSize();
 
 	}
@@ -1232,9 +1239,9 @@ bool EntryOperations::optimizePNG(ArchiveEntry* entry) {
 		CHR(entry->getName()), oldsize, crushsize, outsize, deflsize, entry->getSize());
 
 
-	if (!errormessages.IsEmpty()) {
-		ExtMessageDialog dlg(NULL, "Error Optimizing");
-		dlg.setMessage("The following errors were encountered while optimizing:");
+	if (!crushed && !outed && !errormessages.IsEmpty()) {
+		ExtMessageDialog dlg(NULL, "Optimizing Report");
+		dlg.setMessage("The following issues were encountered while optimizing:");
 		dlg.setExt(errormessages);
 		dlg.ShowModal();
 
