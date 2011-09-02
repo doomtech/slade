@@ -2,24 +2,7 @@
 #ifndef __GAME_CONFIGURATION_H__
 #define __GAME_CONFIGURATION_H__
 
-class ActionSpecial {
-private:
-	string	name;
-	string	group;
-	bool	tagged;
-	
-public:
-	ActionSpecial(string name = "Unknown", string group = "") { this->name = name; this->group = group; tagged = false; }
-	~ActionSpecial() {}
-	
-	string	getName() { return name; }
-	string	getGroup() { return group; }
-	bool	needsTag() { return tagged; }
-	
-	void	setName(string name) { this->name = name; }
-	void	setGroup(string group) { this->group = group; }
-	void	setTagged(bool tagged) { this->tagged = tagged; }
-};
+#include "ActionSpecial.h"
 
 WX_DECLARE_HASH_MAP(int, ActionSpecial, wxIntegerHash, wxIntegerEqual, ASpecialMap);
 

@@ -153,6 +153,48 @@ void GameConfiguration::readActionSpecials(ParseTreeNode* node) {
 				action_specials[special].setGroup(groupname);
 				action_specials[special].setTagged(tagged);
 			}
+			else {
+				// Extended definition
+				ActionSpecial& as = action_specials[special];
+				as.setGroup(groupname);
+				as.setTagged(tagged);
+				
+				// Name
+				ParseTreeNode* val_name = (ParseTreeNode*)child->getChild("name");
+				if (val_name)
+					as.setName(val_name->getStringValue());
+
+				// Args
+				for (unsigned arg = 0; arg < 5; arg++) {
+					// Get arg value if it exists
+					ParseTreeNode* val_arg = (ParseTreeNode*)child->getChild(S_FMT("arg%d", arg+1));
+					if (val_arg) {
+						// Check for simple definition
+						if (val_arg->isLeaf())
+							as.getArg(arg).name = val_arg->getStringValue();
+						else {
+							// Extended definition
+							
+							// Name
+							ParseTreeNode* val = (ParseTreeNode*)val_arg->getChild("name");
+							if (val) as.getArg(arg).name = val->getStringValue();
+
+							// Type
+							val = (ParseTreeNode*)val_arg->getChild("type");
+							string atype;
+							if (val) atype = val->getStringValue();
+							if (S_CMPNOCASE(atype, "yesno"))
+								as.getArg(arg).type = ARGT_YESNO;
+							else if (S_CMPNOCASE(atype, "noyes"))
+								as.getArg(arg).type = ARGT_NOYES;
+							else if (S_CMPNOCASE(atype, "angle"))
+								as.getArg(arg).type = ARGT_ANGLE;
+							else
+								as.getArg(arg).type = ARGT_NUMBER;
+						}
+					}
+				}
+			}
 		}
 	}
 }
@@ -237,9 +279,7 @@ void GameConfiguration::dumpActionSpecials() {
 	ASpecialMap::iterator i = action_specials.begin();
 	
 	while (i != action_specials.end()) {
-		string tagged = "not tagged";
-		if (i->second.needsTag()) tagged = "tagged";
-		wxLogMessage("Action special %d = \"%s\" in group \"%s\" (%s)", i->first, CHR(i->second.getName()), CHR(i->second.getGroup()), CHR(tagged));
+		wxLogMessage("Action special %d = %s", i->first, CHR(i->second.stringDesc()));
 		i++;
 	}
 }
@@ -254,7 +294,7 @@ void GameConfiguration::dumpValidMapNames() {
 #include "ArchiveManager.h"
 CONSOLE_COMMAND(testgc, 0) {
 	Archive* slade_pk3 = theArchiveManager->programResourceArchive();
-	theGameConfiguration->open(slade_pk3->entryAtPath("config/games/doom1.cfg"));
+	theGameConfiguration->open(slade_pk3->entryAtPath("config/games/doom1_zd_hexen.cfg"));
 	theGameConfiguration->dumpActionSpecials();
 	theGameConfiguration->dumpValidMapNames();
 }
