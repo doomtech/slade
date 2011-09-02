@@ -4,10 +4,30 @@
 #include "ResourceManager.h"
 #include "CTexture.h"
 #include "MainWindow.h"
+#include "ArchiveManager.h"
 
 MapTextureManager::MapTextureManager(Archive* archive) {
 	// Init variables
 	this->archive = archive;
+
+	// Load all thing images to textures
+	Archive* slade_pk3 = theArchiveManager->programResourceArchive();
+	ArchiveTreeNode* dir = slade_pk3->getDir("images/thing");
+	if (dir) {
+		SImage image;
+		for (unsigned a = 0; a < dir->numEntries(); a++) {
+			ArchiveEntry* entry = dir->getEntry(a);
+
+			// Load entry to image
+			if (image.open(entry->getMCData())) {
+				// Create texture in hashmap
+				map_tex_t& mtex = thing_images[entry->getName(true)];
+				mtex.texture = new GLTexture(false);
+				mtex.texture->setFilter(GLTexture::MIPMAP);
+				mtex.texture->loadImage(&image);
+			}
+		}
+	}
 }
 
 MapTextureManager::~MapTextureManager() {
@@ -61,4 +81,8 @@ GLTexture* MapTextureManager::getFlat(string name) {
 	// TODO: mixed flats+textures
 
 	return NULL;
+}
+
+GLTexture* MapTextureManager::getThingImage(string name) {
+	return thing_images[name].texture;
 }

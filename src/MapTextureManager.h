@@ -20,6 +20,7 @@ private:
 	Archive*		archive;
 	MapTexHashMap	textures;
 	MapTexHashMap	flats;
+	MapTexHashMap	thing_images;
 
 public:
 	MapTextureManager(Archive* archive = NULL);
@@ -29,6 +30,7 @@ public:
 
 	GLTexture*	getTexture(string name);
 	GLTexture*	getFlat(string name);
+	GLTexture*	getThingImage(string name);
 };
 
 #endif//__MAP_TEXTURE_MANAGER_H__

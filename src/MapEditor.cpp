@@ -122,22 +122,11 @@ void MapEditor::drawLines(double xmin, double ymin, double xmax, double ymax, bo
 void MapEditor::drawThings(double xmin, double ymin, double xmax, double ymax) {
 	// Enable textures
 	glEnable(GL_TEXTURE_2D);
-	tex_thing.bind();
 	rgba_t(255, 255, 255, 255, 0).set_gl();
-	
-	// Load thing texture
-	// (temporary solution for now)
-	if (!tex_thing.isLoaded()) {
-		Archive* pres = theArchiveManager->programResourceArchive();
-		ArchiveEntry* entry = pres->entryAtPath("images/thing/normal_n.png");
-		SImage image;
-		image.open(entry->getMCData());
-		tex_thing.setFilter(GLTexture::MIPMAP);
-		tex_thing.loadImage(&image);
-	}
 	
 	// Go through things
 	MapThing* thing = NULL;
+	GLTexture* tex_last = NULL;
 	double x, y;
 	for (unsigned a = 0; a < map.things.size(); a++) {
 		// Get thing info
@@ -159,6 +148,26 @@ void MapEditor::drawThings(double xmin, double ymin, double xmax, double ymax) {
 		// Translate to thing position
 		glPushMatrix();
 		glTranslated(x, y, 0);
+
+		// Rotate to angle (if needed)
+		if (tt.isAngled()) {
+			glRotated(thing->prop("angle").getIntValue(), 0, 0, 1);
+
+			// Set thing+angle indicator texture
+			GLTexture* tex = theMapEditor->textureManager().getThingImage("normal_d");
+			if (tex && tex != tex_last) {
+				tex->bind();
+				tex_last = tex;	// Avoid unnecessary texture binding
+			}
+		}
+		else {
+			// Set no arrow indicator texture
+			GLTexture* tex = theMapEditor->textureManager().getThingImage("normal_n");
+			if (tex && tex != tex_last) {
+				tex->bind();
+				tex_last = tex;
+			}
+		}
 		
 		// Draw thing (32x32 for now)
 		glBegin(GL_QUADS);
@@ -257,14 +266,24 @@ void MapEditor::drawHilight(float flash_level) {
 		double y = thing->yPos();
 
 		// Get thing radius
-		int radius = theGameConfiguration->thingType(thing->getType()).getRadius();
+		double radius = theGameConfiguration->thingType(thing->getType()).getRadius();
+		radius *= 1.1 + (0.2 * flash_level);
+
+		// Setup hilight thing texture
+		GLTexture* tex = theMapEditor->textureManager().getThingImage("hilight");
+		if (tex) {
+			glEnable(GL_TEXTURE_2D);
+			tex->bind();
+		}
 		
 		glBegin(GL_QUADS);
-		glVertex2d(x - radius, y - radius);
-		glVertex2d(x - radius, y + radius);
-		glVertex2d(x + radius, y + radius);
-		glVertex2d(x + radius, y - radius);
+		glTexCoord2f(0.0f, 0.0f);	glVertex2d(x - radius, y - radius);
+		glTexCoord2f(0.0f, 1.0f);	glVertex2d(x - radius, y + radius);
+		glTexCoord2f(1.0f, 1.0f);	glVertex2d(x + radius, y + radius);
+		glTexCoord2f(1.0f, 0.0f);	glVertex2d(x + radius, y - radius);
 		glEnd();
+
+		glDisable(GL_TEXTURE_2D);
 	}
 
 	glLineWidth(1.5f);
@@ -385,17 +404,26 @@ void MapEditor::drawSelection(double xmin, double ymin, double xmax, double ymax
 			y = thing->yPos();
 
 			// Get thing radius
-			double radius = theGameConfiguration->thingType(thing->getType()).getRadius() * 1.2;
+			double radius = theGameConfiguration->thingType(thing->getType()).getRadius() + 8;
 
+			// Setup hilight thing texture
+			GLTexture* tex = theMapEditor->textureManager().getThingImage("hilight");
+			if (tex) {
+				glEnable(GL_TEXTURE_2D);
+				tex->bind();
+			}
+		
 			// Draw thing selection if on screen
 			if (xmin <= x && x <= xmax && ymin <= y && y <= ymax) {
 				glBegin(GL_QUADS);
-				glVertex2d(x - radius, y - radius);
-				glVertex2d(x - radius, y + radius);
-				glVertex2d(x + radius, y + radius);
-				glVertex2d(x + radius, y - radius);
+				glTexCoord2f(0.0f, 0.0f);	glVertex2d(x - radius, y - radius);
+				glTexCoord2f(0.0f, 1.0f);	glVertex2d(x - radius, y + radius);
+				glTexCoord2f(1.0f, 1.0f);	glVertex2d(x + radius, y + radius);
+				glTexCoord2f(1.0f, 0.0f);	glVertex2d(x + radius, y - radius);
 				glEnd();
 			}
+
+			glDisable(GL_TEXTURE_2D);
 		}
 	}
 
