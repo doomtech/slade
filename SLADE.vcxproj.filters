@@ -702,6 +702,12 @@
     <ClCompile Include="src\GameConfiguration.cpp">
       <Filter>Map Editor\GameConfiguration</Filter>
     </ClCompile>
+    <ClCompile Include="src\ActionSpecial.cpp">
+      <Filter>Map Editor\GameConfiguration</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ThingType.cpp">
+      <Filter>Map Editor\GameConfiguration</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -1315,6 +1321,15 @@
       <Filter>General</Filter>
     </ClInclude>
     <ClInclude Include="src\GameConfiguration.h">
+      <Filter>Map Editor\GameConfiguration</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ActionSpecial.h">
+      <Filter>Map Editor\GameConfiguration</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Args.h">
+      <Filter>Map Editor\GameConfiguration</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThingType.h">
       <Filter>Map Editor\GameConfiguration</Filter>
     </ClInclude>
   </ItemGroup>

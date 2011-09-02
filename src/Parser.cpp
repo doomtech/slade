@@ -205,7 +205,9 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 				if (S_CMP(tz.peekToken(), ","))
 					tz.getToken();	// Skip it
 				else if (!(S_CMP(tz.peekToken(), list_end))) {
-					wxLogMessage("Parsing error: Expected \",\" or \"%s\", got \"%s\" in %s (line %d)", CHR(list_end), CHR(tz.getToken()), CHR(tz.getName()), tz.lineNo());
+					string token = tz.getToken();
+					string name = tz.getName();
+					wxLogMessage("Parsing error: Expected \",\" or \"%s\", got \"%s\" in %s (line %d)", CHR(list_end), CHR(token), CHR(name), tz.lineNo());
 					return false;
 				}
 
@@ -324,10 +326,8 @@ Parser::~Parser() {
  * 		</base>
  * 	</root>
  *******************************************************************/
-bool Parser::parseText(MemChunk& mc) {
+bool Parser::parseText(MemChunk& mc, string source) {
 	Tokenizer tz;
-
-	string source = "memory chunk";
 
 	// Open the given text data
 	if (!tz.openMem(&mc, source)) {
@@ -338,10 +338,10 @@ bool Parser::parseText(MemChunk& mc) {
 	// Do parsing
 	return pt_root->parse(tz);
 }
-bool Parser::parseText(string& text) {
+bool Parser::parseText(string& text, string source) {
 	// Open the given text data
 	Tokenizer tz;
-	if (!tz.openString(text)) {
+	if (!tz.openString(text, 0, 0, source)) {
 		wxLogMessage("Unable to open text data for parsing");
 		return false;
 	}

@@ -108,6 +108,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\ACSPrefsPanel.cpp" />
+    <ClCompile Include="src\ActionSpecial.cpp" />
     <ClCompile Include="src\ADatArchive.cpp" />
     <ClCompile Include="src\ANSICanvas.cpp" />
     <ClCompile Include="src\ANSIEntryPanel.cpp" />
@@ -227,6 +228,7 @@
     <ClCompile Include="src\TextStyle.cpp" />
     <ClCompile Include="src\TextStylePrefsPanel.cpp" />
     <ClCompile Include="src\TextureXPanel.cpp" />
+    <ClCompile Include="src\ThingType.cpp" />
     <ClCompile Include="src\Tokenizer.cpp" />
     <ClCompile Include="src\Translation.cpp" />
     <ClCompile Include="src\TranslationEditorDialog.cpp" />
@@ -306,6 +308,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ACSPrefsPanel.h" />
+    <ClInclude Include="src\ActionSpecial.h" />
     <ClInclude Include="src\ADatArchive.h" />
     <ClInclude Include="src\ANSICanvas.h" />
     <ClInclude Include="src\ANSIEntryPanel.h" />
@@ -313,6 +316,7 @@
     <ClInclude Include="src\ArchiveFormats.h" />
     <ClInclude Include="src\ArchiveOperations.h" />
     <ClInclude Include="src\Archives.h" />
+    <ClInclude Include="src\Args.h" />
     <ClInclude Include="src\AudioEntryPanel.h" />
     <ClInclude Include="src\AudioFormats.h" />
     <ClInclude Include="src\AudioPrefsPanel.h" />
@@ -430,6 +434,7 @@
     <ClInclude Include="src\TextStyle.h" />
     <ClInclude Include="src\TextStylePrefsPanel.h" />
     <ClInclude Include="src\TextureXPanel.h" />
+    <ClInclude Include="src\ThingType.h" />
     <ClInclude Include="src\Tokenizer.h" />
     <ClInclude Include="src\Translation.h" />
     <ClInclude Include="src\TranslationEditorDialog.h" />

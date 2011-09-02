@@ -5,6 +5,7 @@
 #include "ArchiveManager.h"
 #include "WxStuff.h"
 #include "MapEditorWindow.h"
+#include "GameConfiguration.h"
 
 double grid_sizes[] = { 0.05, 0.1, 0.25, 0.5, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192 };
 
@@ -128,7 +129,7 @@ void MapEditor::drawThings(double xmin, double ymin, double xmax, double ymax) {
 	// (temporary solution for now)
 	if (!tex_thing.isLoaded()) {
 		Archive* pres = theArchiveManager->programResourceArchive();
-		ArchiveEntry* entry = pres->entryAtPath("images/thing.png");
+		ArchiveEntry* entry = pres->entryAtPath("images/thing/normal_n.png");
 		SImage image;
 		image.open(entry->getMCData());
 		tex_thing.setFilter(GLTexture::MIPMAP);
@@ -147,6 +148,13 @@ void MapEditor::drawThings(double xmin, double ymin, double xmax, double ymax) {
 		// Ignore if outside of screen
 		if (x < xmin || x > xmax || y < ymin || y > ymax)
 			continue;
+
+		// Get thing type properties from game configuration
+		ThingType& tt = theGameConfiguration->thingType(thing->getType());
+
+		// Setup rendering options
+		int radius = tt.getRadius();
+		tt.getColour().set_gl();
 			
 		// Translate to thing position
 		glPushMatrix();
@@ -154,10 +162,10 @@ void MapEditor::drawThings(double xmin, double ymin, double xmax, double ymax) {
 		
 		// Draw thing (32x32 for now)
 		glBegin(GL_QUADS);
-		glTexCoord2f(0.0f, 0.0f);	glVertex2d(-16, -16);
-		glTexCoord2f(0.0f, 1.0f);	glVertex2d(-16, 16);
-		glTexCoord2f(1.0f, 1.0f);	glVertex2d(16, 16);
-		glTexCoord2f(1.0f, 0.0f);	glVertex2d(16, -16);
+		glTexCoord2f(0.0f, 0.0f);	glVertex2d(-radius, -radius);
+		glTexCoord2f(0.0f, 1.0f);	glVertex2d(-radius, radius);
+		glTexCoord2f(1.0f, 1.0f);	glVertex2d(radius, radius);
+		glTexCoord2f(1.0f, 0.0f);	glVertex2d(radius, -radius);
 		glEnd();
 		
 		glPopMatrix();
@@ -244,14 +252,18 @@ void MapEditor::drawHilight(float flash_level) {
 	}
 	else if (edit_mode == MODE_THINGS) {
 		// Thing
-		double x = map.things[hilight_item]->xPos();
-		double y = map.things[hilight_item]->yPos();
+		MapThing* thing = map.things[hilight_item];
+		double x = thing->xPos();
+		double y = thing->yPos();
+
+		// Get thing radius
+		int radius = theGameConfiguration->thingType(thing->getType()).getRadius();
 		
 		glBegin(GL_QUADS);
-		glVertex2d(x - 16, y - 16);
-		glVertex2d(x - 16, y + 16);
-		glVertex2d(x + 16, y + 16);
-		glVertex2d(x + 16, y - 16);
+		glVertex2d(x - radius, y - radius);
+		glVertex2d(x - radius, y + radius);
+		glVertex2d(x + radius, y + radius);
+		glVertex2d(x + radius, y - radius);
 		glEnd();
 	}
 
@@ -366,17 +378,22 @@ void MapEditor::drawSelection(double xmin, double ymin, double xmax, double ymax
 	else if (edit_mode == MODE_THINGS) {
 		// Things
 		double x, y;
+		MapThing* thing = NULL;
 		for (unsigned a = 0; a < selection.size(); a++) {
-			x = map.things[selection[a]]->xPos();
-			y = map.things[selection[a]]->yPos();
+			thing = map.things[selection[a]];
+			x = thing->xPos();
+			y = thing->yPos();
+
+			// Get thing radius
+			double radius = theGameConfiguration->thingType(thing->getType()).getRadius() * 1.2;
 
 			// Draw thing selection if on screen
 			if (xmin <= x && x <= xmax && ymin <= y && y <= ymax) {
 				glBegin(GL_QUADS);
-				glVertex2d(x - 20, y - 20);
-				glVertex2d(x - 20, y + 20);
-				glVertex2d(x + 20, y + 20);
-				glVertex2d(x + 20, y - 20);
+				glVertex2d(x - radius, y - radius);
+				glVertex2d(x - radius, y + radius);
+				glVertex2d(x + radius, y + radius);
+				glVertex2d(x + radius, y - radius);
 				glEnd();
 			}
 		}

@@ -133,7 +133,7 @@ void GameConfiguration::readActionSpecials(ParseTreeNode* node) {
 	if (node->getChild("tagged"))
 		tagged = ((ParseTreeNode*)node->getChild("tagged"))->getBoolValue();
 	
-	// Go through all child nodes
+	// --- Go through all child nodes ---
 	for (unsigned a = 0; a < node->nChildren(); a++) {
 		ParseTreeNode* child = (ParseTreeNode*)node->getChild(a);
 		
@@ -146,60 +146,98 @@ void GameConfiguration::readActionSpecials(ParseTreeNode* node) {
 			// Get special id as integer
 			long special;
 			child->getName().ToLong(&special);
+
+			// Reset the action special (in case it's being redefined for whatever reason)
+			action_specials[special].reset();
+
+			// Apply group defaults
+			action_specials[special].group = groupname;
+			action_specials[special].tagged = tagged;
 			
 			// Check for simple definition
-			if (child->isLeaf()) {
-				action_specials[special].setName(child->getStringValue());
-				action_specials[special].setGroup(groupname);
-				action_specials[special].setTagged(tagged);
-			}
-			else {
-				// Extended definition
-				ActionSpecial& as = action_specials[special];
-				as.setGroup(groupname);
-				as.setTagged(tagged);
-				
-				// Name
-				ParseTreeNode* val_name = (ParseTreeNode*)child->getChild("name");
-				if (val_name)
-					as.setName(val_name->getStringValue());
-
-				// Args
-				for (unsigned arg = 0; arg < 5; arg++) {
-					// Get arg value if it exists
-					ParseTreeNode* val_arg = (ParseTreeNode*)child->getChild(S_FMT("arg%d", arg+1));
-					if (val_arg) {
-						// Check for simple definition
-						if (val_arg->isLeaf())
-							as.getArg(arg).name = val_arg->getStringValue();
-						else {
-							// Extended definition
-							
-							// Name
-							ParseTreeNode* val = (ParseTreeNode*)val_arg->getChild("name");
-							if (val) as.getArg(arg).name = val->getStringValue();
-
-							// Type
-							val = (ParseTreeNode*)val_arg->getChild("type");
-							string atype;
-							if (val) atype = val->getStringValue();
-							if (S_CMPNOCASE(atype, "yesno"))
-								as.getArg(arg).type = ARGT_YESNO;
-							else if (S_CMPNOCASE(atype, "noyes"))
-								as.getArg(arg).type = ARGT_NOYES;
-							else if (S_CMPNOCASE(atype, "angle"))
-								as.getArg(arg).type = ARGT_ANGLE;
-							else
-								as.getArg(arg).type = ARGT_NUMBER;
-						}
-					}
-				}
-			}
+			if (child->isLeaf())
+				action_specials[special].name = child->getStringValue();
+			else
+				action_specials[special].parse(child);	// Extended definition
 		}
 	}
 }
 
-bool GameConfiguration::readConfiguration(string& cfg) {
+void GameConfiguration::readThingTypes(ParseTreeNode* node) {
+	// --- Determine current 'group' ---
+	ParseTreeNode* group = node;
+	string groupname = "";
+	while (true) {
+		if (group->getName() == "thing_types" || !group)
+			break;
+		else {
+			// Add current node name to group path
+			groupname.Prepend(group->getName() + "/");
+			group = (ParseTreeNode*)group->getParent();
+		}
+	}
+	if (groupname.EndsWith("/"))
+		groupname.RemoveLast();	// Remove last '/'
+
+
+	// --- Set up group default properties ---
+	ParseTreeNode* child = NULL;
+
+	// Colour
+	rgba_t col_default = COL_WHITE;
+	child = (ParseTreeNode*)node->getChild("colour");
+	if (child && child->nValues() > 2) col_default.set(child->getIntValue(0), child->getIntValue(1), child->getIntValue(2));
+
+	// Radius
+	int radius_default = 16;
+	child = (ParseTreeNode*)node->getChild("radius");
+	if (child) radius_default = child->getIntValue();
+
+	// Show angle
+	bool angle = true;
+	child = (ParseTreeNode*)node->getChild("angle");
+	if (child) angle = child->getBoolValue();
+
+	// Hanging object
+	bool hanging = false;
+	child = (ParseTreeNode*)node->getChild("hanging");
+	if (child) hanging = child->getBoolValue();
+
+
+	// --- Go through all child nodes ---
+	for (unsigned a = 0; a < node->nChildren(); a++) {
+		child = (ParseTreeNode*)node->getChild(a);
+		
+		// Check for 'group'
+		if (S_CMPNOCASE(child->getType(), "group"))
+			readThingTypes(child);
+			
+		// Thing type
+		else if (S_CMPNOCASE(child->getType(), "thing")) {
+			// Get thing type as integer
+			long type;
+			child->getName().ToLong(&type);
+
+			// Reset the thing type (in case it's being redefined for whatever reason)
+			thing_types[type].reset();
+
+			// Apply group defaults
+			thing_types[type].colour = col_default;
+			thing_types[type].radius = radius_default;
+			thing_types[type].angled = angle;
+			thing_types[type].hanging = hanging;
+			thing_types[type].group = groupname;
+			
+			// Check for simple definition
+			if (child->isLeaf())
+				thing_types[type].name = child->getStringValue();
+			else
+				thing_types[type].parse(child);	// Extended definition
+		}
+	}
+}
+
+bool GameConfiguration::readConfiguration(string& cfg, string source) {
 	// Testing
 	MemChunk mc;
 	mc.write(CHR(cfg), cfg.Length());
@@ -208,11 +246,12 @@ bool GameConfiguration::readConfiguration(string& cfg) {
 	// Clear current configuration
 	name = "Invalid Configuration";
 	action_specials.clear();
+	thing_types.clear();
 	map_names.clear();
 	
 	// Parse the full configuration
 	Parser parser;
-	parser.parseText(cfg);
+	parser.parseText(cfg, source);
 	
 	// Process parsed data
 	ParseTreeNode* base = parser.parseTreeRoot();
@@ -241,6 +280,11 @@ bool GameConfiguration::readConfiguration(string& cfg) {
 	ParseTreeNode* node_specials = (ParseTreeNode*)base->getChild("action_specials");
 	if (node_specials)
 		readActionSpecials(node_specials);
+
+	// Thing types
+	ParseTreeNode* node_things = (ParseTreeNode*)base->getChild("thing_types");
+	if (node_things)
+		readThingTypes(node_things);
 	
 	return true;
 }
@@ -250,7 +294,7 @@ bool GameConfiguration::open(string filename) {
 	string cfg;
 	buildConfig(filename, cfg);
 
-	return readConfiguration(cfg);
+	return readConfiguration(cfg, filename);
 }
 
 bool GameConfiguration::open(ArchiveEntry* entry) {
@@ -262,7 +306,7 @@ bool GameConfiguration::open(ArchiveEntry* entry) {
 	string cfg;
 	buildConfig(entry, cfg);
 
-	return readConfiguration(cfg);
+	return readConfiguration(cfg, entry->getName());
 }
 
 string GameConfiguration::actionSpecialName(int special) {
@@ -284,6 +328,15 @@ void GameConfiguration::dumpActionSpecials() {
 	}
 }
 
+void GameConfiguration::dumpThingTypes() {
+	ThingTypeMap::iterator i = thing_types.begin();
+	
+	while (i != thing_types.end()) {
+		wxLogMessage("Thing type %d = %s", i->first, CHR(i->second.stringDesc()));
+		i++;
+	}
+}
+
 void GameConfiguration::dumpValidMapNames() {
 	wxLogMessage("Valid Map Names:");
 	for (unsigned a = 0; a < map_names.size(); a++)
@@ -294,7 +347,8 @@ void GameConfiguration::dumpValidMapNames() {
 #include "ArchiveManager.h"
 CONSOLE_COMMAND(testgc, 0) {
 	Archive* slade_pk3 = theArchiveManager->programResourceArchive();
-	theGameConfiguration->open(slade_pk3->entryAtPath("config/games/doom1_zd_hexen.cfg"));
+	theGameConfiguration->open(slade_pk3->entryAtPath("config/games/doom1.cfg"));
 	theGameConfiguration->dumpActionSpecials();
+	theGameConfiguration->dumpThingTypes();
 	theGameConfiguration->dumpValidMapNames();
 }
