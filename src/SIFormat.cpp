@@ -196,7 +196,7 @@ protected:
 			return true;
 
 		// Fullscreen gfx special case
-		if (width == 320 && height == 200)
+		if (width == 320) // autopage, too && height == 200) 
 			return true;
 
 		return false;

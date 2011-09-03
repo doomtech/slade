@@ -443,6 +443,20 @@ void TextureEditorPanel::setPalette(Palette8bit *pal) {
 	tex_canvas->Refresh();
 }
 
+/* TextureEditorPanel::getPalette
+ * Returns the texture canvas' palette
+ *******************************************************************/
+Palette8bit * TextureEditorPanel::getPalette() {
+	return tex_canvas->getPalette();
+}
+
+/* TextureEditorPanel::getPalette
+ * Returns true if the texture uses RGBA blending
+ *******************************************************************/
+bool TextureEditorPanel::getBlendRGBA() {
+	return tex_canvas->getBlendRGBA();
+}
+
 /* TextureEditorPanel::addPatch
  * Prompts the user to select a patch from the patch table to be
  * added to the current texture

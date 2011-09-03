@@ -84,7 +84,7 @@ GraphicsPrefsPanel::GraphicsPrefsPanel(wxWindow* parent) : wxPanel(parent, -1) {
 	sizer->Add(vbox, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 	
 	// 'Show outline around gfx'
-	cb_show_border = new wxCheckBox(this, -1, "Show outline around graphics");
+	cb_show_border = new wxCheckBox(this, -1, "Show outline around graphics and textures");
 	cb_show_border->SetValue(gfx_show_border);
 	sizer->Add(cb_show_border, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 	

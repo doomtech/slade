@@ -309,7 +309,7 @@ void MainWindow::createStartPage() {
 	string html = wxString::FromAscii((const char*)(entry_html->getData()), entry_html->getSize());
 
 	// Generate tip of the day string
-	string tip = "Tip";
+	string tip = "It seems tips.txt is missing from your slade.pk3";
 	if (entry_tips) {
 		Tokenizer tz;
 		tz.openMem((const char*)entry_tips->getData(), entry_tips->getSize(), entry_tips->getName());
@@ -574,6 +574,8 @@ void MainWindow::onHTMLLinkClicked(wxHtmlLinkEvent &e) {
 			theApp->doAction("aman_newwad");
 		else if (href.EndsWith("newzip"))
 			theApp->doAction("aman_newzip");
+		else if (href.EndsWith("reloadstartpage"))
+			createStartPage();
 	}
 	else
 		html_startpage->OnLinkClicked(e.GetLinkInfo());

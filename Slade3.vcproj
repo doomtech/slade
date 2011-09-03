@@ -287,6 +287,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\FileMonitor.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\FileMonitor.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\ListenerAnnouncer.cpp"
 				>
 			</File>

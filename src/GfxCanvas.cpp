@@ -446,7 +446,7 @@ void GfxCanvas::onMouseMovement(wxMouseEvent& e) {
 		drag_pos.set(e.GetPosition().x, e.GetPosition().y);
 		refresh = true;
 	}
-	else if (e.RightIsDown()) {
+	else if (e.MiddleIsDown()) {
 		offset = offset + point2_t(e.GetPosition().x - mouse_prev.x, e.GetPosition().y - mouse_prev.y);
 		refresh = true;
 	}

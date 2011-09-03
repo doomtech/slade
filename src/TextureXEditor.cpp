@@ -160,6 +160,9 @@ TextureXEditor::TextureXEditor(wxWindow* parent) : wxPanel(parent, -1) {
 	theApp->getAction("txed_new_file")->addToMenu(menu_texture);
 	theApp->getAction("txed_delete")->addToMenu(menu_texture);
 	menu_texture->AppendSeparator();
+	theApp->getAction("txed_rename")->addToMenu(menu_texture);
+	theApp->getAction("txed_export")->addToMenu(menu_texture);
+	menu_texture->AppendSeparator();
 	theApp->getAction("txed_copy")->addToMenu(menu_texture);
 	theApp->getAction("txed_cut")->addToMenu(menu_texture);
 	theApp->getAction("txed_paste")->addToMenu(menu_texture);

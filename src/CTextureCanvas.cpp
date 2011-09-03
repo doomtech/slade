@@ -37,7 +37,8 @@
 /*******************************************************************
  * VARIABLES
  *******************************************************************/
- wxDEFINE_EVENT(EVT_DRAG_END, wxCommandEvent);
+wxDEFINE_EVENT(EVT_DRAG_END, wxCommandEvent);
+EXTERN_CVAR(Bool, gfx_show_border)
 
 
 /*******************************************************************
@@ -255,6 +256,10 @@ void CTextureCanvas::drawTexture() {
 	if (view_type == 2)
 		glTranslated(-160, -100, 0);												// HUD offsets
 
+	// Draw the texture border
+	if (gfx_show_border)
+		drawTextureBorder();
+
 	// Enable textures
 	glEnable(GL_TEXTURE_2D);
 
@@ -297,9 +302,6 @@ void CTextureCanvas::drawTexture() {
 
 	// Disable textures
 	glDisable(GL_TEXTURE_2D);
-
-	// Draw the texture border
-	drawTextureBorder();
 
 	// Now loop through selected patches and draw selection outlines
 	rgba_t(70, 210, 220, 255, 0).set_gl();
@@ -449,13 +451,16 @@ void CTextureCanvas::drawPatch(int num, bool outside) {
  *******************************************************************/
 void CTextureCanvas::drawTextureBorder() {
 	// Draw the texture border
+	double ext = 0.11;
+	glLineWidth(2.0f);
 	COL_BLACK.set_gl();
 	glBegin(GL_LINE_LOOP);
-	glVertex2i(0, 0);
-	glVertex2i(0, texture->getHeight());
-	glVertex2i(texture->getWidth(), texture->getHeight());
-	glVertex2i(texture->getWidth(), 0);
+	glVertex2d(-ext, -ext);
+	glVertex2d(-ext, texture->getHeight()+ext);
+	glVertex2d(texture->getWidth()+ext, texture->getHeight()+ext);
+	glVertex2d(texture->getWidth()+ext, -ext);
 	glEnd();
+	glLineWidth(1.0f);
 
 	// Draw vertical ticks
 	int y = 0;
@@ -686,8 +691,8 @@ void CTextureCanvas::onMouseEvent(wxMouseEvent& e) {
 	if (e.Moving() || e.Dragging()) {
 		dragging = false;
 
-		// Pan if right button is down
-		if (e.RightIsDown()) {
+		// Pan if middle button is down
+		if (e.MiddleIsDown()) {
 			offset = offset + point2_t(e.GetPosition().x - mouse_prev.x, e.GetPosition().y - mouse_prev.y);
 			refresh = true;
 			dragging = true;

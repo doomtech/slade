@@ -41,6 +41,7 @@ public:
 	bool		showGrid() { return show_grid; }
 	void		showGrid(bool show = true) { show_grid = show; }
 	void		blendRGBA(bool rgba) { blend_rgba = rgba; }
+	bool		getBlendRGBA() { return blend_rgba; }
 
 	void	selectPatch(int index);
 	void	deSelectPatch(int index);

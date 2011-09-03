@@ -940,7 +940,7 @@ GfxEntryPanel * CH::getCurrentGfxPanel() {
 	{
 		EntryPanel* panie = archie->currentArea();
 		if (panie) {
-			if (!(panie->GetName().CmpNoCase("gfx"))) {
+			if (!(panie->getName().CmpNoCase("gfx"))) {
 				return (GfxEntryPanel *)panie;
 			}
 		}
