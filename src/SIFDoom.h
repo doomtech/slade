@@ -122,6 +122,9 @@ protected:
 		image.setXOffset(offset_x);
 		image.setYOffset(offset_y);
 
+		// Clean up
+		delete[] col_offsets;
+
 		return true;
 	}
 
@@ -279,6 +282,9 @@ protected:
 		// Now we write column offsets
 		out.seek(8, SEEK_SET);
 		out.write(col_offsets, columns.size() * 4);
+
+		// Clean up
+		delete[] col_offsets;
 
 		return true;
 	}
