@@ -241,9 +241,9 @@ bool SLADEMap::addSide(doomside_t& s) {
 	MapSide* ns = new MapSide(getSector(s.sector));
 
 	// Setup side properties
-	ns->prop("texturetop") = wxString::From8BitData(s.tex_upper, 8);
-	ns->prop("texturebottom") = wxString::From8BitData(s.tex_lower, 8);
-	ns->prop("texturemiddle") = wxString::From8BitData(s.tex_middle, 8);
+	ns->prop("texturetop") = wxString::FromAscii(s.tex_upper, 8);
+	ns->prop("texturebottom") = wxString::FromAscii(s.tex_lower, 8);
+	ns->prop("texturemiddle") = wxString::FromAscii(s.tex_middle, 8);
 	ns->prop("offsetx") = s.x_offset;
 	ns->prop("offsety") = s.y_offset;
 

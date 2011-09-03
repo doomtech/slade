@@ -129,7 +129,7 @@ void LineInfoOverlay::drawTexture(float alpha, int x, int y, string texture, str
 	col_fg.a = col_fg.a*alpha;
 
 	// Check texture isn't blank
-	if (!(S_CMPNOCASE(texture, "-"))) {
+	if (texture != "-") {
 		// Draw background
 		glEnable(GL_TEXTURE_2D);
 		rgba_t(255, 255, 255, 255*alpha, 0).set_gl();

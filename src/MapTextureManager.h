@@ -21,6 +21,7 @@ private:
 	MapTexHashMap	textures;
 	MapTexHashMap	flats;
 	MapTexHashMap	thing_images;
+	bool			thing_images_loaded;
 
 public:
 	MapTextureManager(Archive* archive = NULL);
