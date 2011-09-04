@@ -1122,6 +1122,34 @@ int SLADEMap::nearestThing(double x, double y, double min) {
 	return index;
 }
 
+vector<int> SLADEMap::nearestThingMulti(double x, double y) {
+	// Go through things
+	vector<int> ret;
+	double min_dist = 999999999;
+	MapThing* t = NULL;
+	double dist = 0;
+	for (unsigned a = 0; a < things.size(); a++) {
+		t = things[a];
+
+		// Get 'quick' distance (no need to get real distance)
+		if (t->x < x)	dist = x - t->x;
+		else			dist = t->x - x;
+		if (t->y < y)	dist += y - t->y;
+		else			dist += t->y - y;
+
+		// Check if it's nearer than the previous nearest
+		if (dist < min_dist) {
+			ret.clear();
+			ret.push_back(a);
+			min_dist = dist;
+		}
+		else if (dist == min_dist)
+			ret.push_back(a);
+	}
+
+	return ret;
+}
+
 int SLADEMap::inSector(double x, double y) {
 	// First, get nearest line
 	int index = nearestLine(x, y, 999999999);

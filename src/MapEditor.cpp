@@ -6,6 +6,7 @@
 #include "WxStuff.h"
 #include "MapEditorWindow.h"
 #include "GameConfiguration.h"
+#include "MathStuff.h"
 
 double grid_sizes[] = { 0.05, 0.1, 0.25, 0.5, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192 };
 
@@ -267,7 +268,8 @@ void MapEditor::drawHilight(float flash_level) {
 
 		// Get thing radius
 		double radius = theGameConfiguration->thingType(thing->getType()).getRadius();
-		radius *= 1.1 + (0.2 * flash_level);
+		//radius += 8 * flash_level;
+		radius *= 1.1 + (0.2*flash_level);
 
 		// Setup hilight thing texture
 		GLTexture* tex = theMapEditor->textureManager().getThingImage("hilight");
@@ -435,22 +437,33 @@ bool MapEditor::updateHilight(double dist_scale) {
 	int current = hilight_item;
 
 	// Update hilighted object depending on mode
-	string objtype = "";
-	if (edit_mode == MODE_VERTICES) {
+	if (edit_mode == MODE_VERTICES)
 		hilight_item = map.nearestVertex(mouse_pos.x, mouse_pos.y, 32/dist_scale);
-		objtype = "Vertex";
-	}
-	else if (edit_mode == MODE_LINES) {
+	else if (edit_mode == MODE_LINES)
 		hilight_item = map.nearestLine(mouse_pos.x, mouse_pos.y, 32/dist_scale);
-		objtype = "Line";
-	}
-	else if (edit_mode == MODE_SECTORS) {
+	else if (edit_mode == MODE_SECTORS)
 		hilight_item = map.inSector(mouse_pos.x, mouse_pos.y);
-		objtype = "Sector";
-	}
 	else if (edit_mode == MODE_THINGS) {
-		hilight_item = map.nearestThing(mouse_pos.x, mouse_pos.y, 32);
-		objtype = "Thing";
+		hilight_item = -1;
+
+		// Get (possibly multiple) nearest-thing(s)
+		vector<int> nearest = map.nearestThingMulti(mouse_pos.x, mouse_pos.y);
+		if (nearest.size() == 1) {
+			MapThing* t = map.getThing(nearest[0]);
+			ThingType& type = theGameConfiguration->thingType(t->getType());
+			double dist = MathStuff::distance(mouse_pos.x, mouse_pos.y, t->xPos(), t->yPos());
+			if (dist <= type.getRadius() + (32/dist_scale))
+				hilight_item = nearest[0];
+		}
+		else {
+			for (unsigned a = 0; a < nearest.size(); a++) {
+				MapThing* t = map.getThing(nearest[a]);
+				ThingType& type = theGameConfiguration->thingType(t->getType());
+				double dist = MathStuff::distance(mouse_pos.x, mouse_pos.y, t->xPos(), t->yPos());
+				if (dist <= type.getRadius() + (32/dist_scale))
+					hilight_item = nearest[a];
+			}
+		}
 	}
 
 	return current != hilight_item;
