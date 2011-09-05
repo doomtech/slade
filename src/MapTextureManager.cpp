@@ -38,7 +38,6 @@ GLTexture* MapTextureManager::getTexture(string name) {
 
 	// TODO: TX_ textures, mixed flats+textures
 
-	wxLogMessage("Map Texture %s not found", CHR(name));
 	return NULL;
 }
 
@@ -62,6 +61,29 @@ GLTexture* MapTextureManager::getFlat(string name) {
 	}
 
 	// TODO: mixed flats+textures
+
+	return NULL;
+}
+
+GLTexture* MapTextureManager::getSprite(string name) {
+	// Get sprite matching name
+	map_tex_t& mtex = sprites[name.Upper()];
+
+	// Return it if found
+	if (mtex.texture)
+		return mtex.texture;
+
+	// Sprite not found, look for it
+	Palette8bit* pal = theMainWindow->getPaletteChooser()->getSelectedPalette();
+	ArchiveEntry* entry = theResourceManager->getPatchEntry(name, "sprites", archive);
+	if (!entry) entry = theResourceManager->getPatchEntry(name, "", archive);
+	if (entry) {
+		SImage image;
+		Misc::loadImageFromEntry(&image, entry);
+		mtex.texture = new GLTexture(false);
+		mtex.texture->loadImage(&image, pal);
+		return mtex.texture;
+	}
 
 	return NULL;
 }

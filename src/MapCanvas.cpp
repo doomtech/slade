@@ -321,6 +321,7 @@ void MapCanvas::draw() {
 		case MapEditor::MODE_VERTICES:	info_vertex.update(editor->getHilightedVertex()); break;
 		case MapEditor::MODE_LINES:		info_line.update(editor->getHilightedLine()); break;
 		case MapEditor::MODE_SECTORS:	info_sector.update(editor->getHilightedSector()); break;
+		case MapEditor::MODE_THINGS:	info_thing.update(editor->getHilightedThing()); break;
 		}
 	}
 
@@ -331,6 +332,8 @@ void MapCanvas::draw() {
 		info_line.draw(GetSize().y, GetSize().x, anim_info_fade);
 	else if (editor->editMode() == MapEditor::MODE_SECTORS)
 		info_sector.draw(GetSize().y, GetSize().x, anim_info_fade);
+	else if (editor->editMode() == MapEditor::MODE_THINGS)
+		info_thing.draw(GetSize().y, GetSize().x, anim_info_fade);
 
 	SwapBuffers();
 }

@@ -708,6 +708,9 @@
     <ClCompile Include="src\ThingType.cpp">
       <Filter>Map Editor\GameConfiguration</Filter>
     </ClCompile>
+    <ClCompile Include="src\ThingInfoOverlay.cpp">
+      <Filter>Map Editor\UI Elements\InfoOverlay</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -1331,6 +1334,9 @@
     </ClInclude>
     <ClInclude Include="src\ThingType.h">
       <Filter>Map Editor\GameConfiguration</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThingInfoOverlay.h">
+      <Filter>Map Editor\UI Elements\InfoOverlay</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

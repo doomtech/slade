@@ -17,19 +17,21 @@ void SectorInfoOverlay::update(MapSector* sector) {
 	if (!sector)
 		return;
 
+	info.clear();
+
 	// Info (index + type)
-	info = S_FMT("Sector #%d (Type %d)", sector->getIndex(), sector->prop("special").getIntValue());
+	info.push_back(S_FMT("Sector #%d (Type %d)", sector->getIndex(), sector->prop("special").getIntValue()));
 
 	// Height
 	int fh = sector->prop("heightfloor");
 	int ch = sector->prop("heightceiling");
-	height = S_FMT("Height: %d to %d (%d total)", fh, ch, ch - fh);
+	info.push_back(S_FMT("Height: %d to %d (%d total)", fh, ch, ch - fh));
 
 	// Brightness
-	light = S_FMT("Brightness: %d", sector->prop("lightlevel").getIntValue());
+	info.push_back(S_FMT("Brightness: %d", sector->prop("lightlevel").getIntValue()));
 
 	// Tag
-	tag = S_FMT("Tag: %d", sector->prop("id").getIntValue());
+	info.push_back(S_FMT("Tag: %d", sector->prop("id").getIntValue()));
 
 	// Textures
 	ftex = sector->floorTexture();
@@ -41,6 +43,32 @@ void SectorInfoOverlay::draw(int bottom, int right, float alpha) {
 	if (alpha <= 0.0f)
 		return;
 
+	// Determine overlay height
+	int height = info.size() * 16;
+
+	// Slide in/out animation
+	float alpha_inv = 1.0f - alpha;
+	bottom += height*alpha_inv*alpha_inv;
+
+	// Get colours
+	rgba_t col_bg = ColourConfiguration::getColour("map_overlay_background");
+	rgba_t col_fg = ColourConfiguration::getColour("map_overlay_foreground");
+	col_fg.a = col_fg.a*alpha;
+
+	// Draw overlay background
+	rgba_t(col_bg.r, col_bg.g, col_bg.b, 80*alpha, 0).set_gl();
+	Drawing::drawFilledRect(0, bottom - height, right, bottom);
+	Drawing::drawFilledRect(0, bottom - height+2, right, bottom);
+	Drawing::drawFilledRect(0, bottom - height+4, right, bottom);
+
+	// Draw info text lines
+	int y = height;
+	for (unsigned a = 0; a < info.size(); a++) {
+		Drawing::drawText(info[a], 2, bottom - y, col_fg);
+		y -= 16;
+	}
+
+	/*
 	// Get colours
 	rgba_t col_bg = ColourConfiguration::getColour("map_overlay_background");
 	rgba_t col_fg = ColourConfiguration::getColour("map_overlay_foreground");
@@ -67,6 +95,7 @@ void SectorInfoOverlay::draw(int bottom, int right, float alpha) {
 
 	// Tag
 	Drawing::drawText(tag, 2, bottom - 16, col_fg);
+	*/
 
 	// Ceiling texture
 	drawTexture(alpha, right - 88, bottom - 4, ctex, "C");

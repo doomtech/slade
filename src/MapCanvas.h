@@ -6,6 +6,7 @@
 #include "VertexInfoOverlay.h"
 #include "LineInfoOverlay.h"
 #include "SectorInfoOverlay.h"
+#include "ThingInfoOverlay.h"
 #include "KeyBind.h"
 #include "MainApp.h"
 
@@ -29,10 +30,11 @@ private:
 	uint8_t		mouse_state;
 
 	// Info overlays
-	int						last_hilight;
-	VertexInfoOverlay		info_vertex;
-	LineInfoOverlay			info_line;
-	SectorInfoOverlay		info_sector;
+	int					last_hilight;
+	VertexInfoOverlay	info_vertex;
+	LineInfoOverlay		info_line;
+	SectorInfoOverlay	info_sector;
+	ThingInfoOverlay	info_thing;
 
 	// View properties
 	double		view_xoff;

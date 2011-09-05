@@ -228,6 +228,7 @@
     <ClCompile Include="src\TextStyle.cpp" />
     <ClCompile Include="src\TextStylePrefsPanel.cpp" />
     <ClCompile Include="src\TextureXPanel.cpp" />
+    <ClCompile Include="src\ThingInfoOverlay.cpp" />
     <ClCompile Include="src\ThingType.cpp" />
     <ClCompile Include="src\Tokenizer.cpp" />
     <ClCompile Include="src\Translation.cpp" />
@@ -434,6 +435,7 @@
     <ClInclude Include="src\TextStyle.h" />
     <ClInclude Include="src\TextStylePrefsPanel.h" />
     <ClInclude Include="src\TextureXPanel.h" />
+    <ClInclude Include="src\ThingInfoOverlay.h" />
     <ClInclude Include="src\ThingType.h" />
     <ClInclude Include="src\Tokenizer.h" />
     <ClInclude Include="src\Translation.h" />

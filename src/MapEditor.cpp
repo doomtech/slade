@@ -9,6 +9,7 @@
 #include "MathStuff.h"
 
 double grid_sizes[] = { 0.05, 0.1, 0.25, 0.5, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192 };
+CVAR(Bool, things_sprites, false, CVAR_SAVE)
 
 EXTERN_CVAR(Int, vertex_size)
 
@@ -128,7 +129,9 @@ void MapEditor::drawThings(double xmin, double ymin, double xmax, double ymax) {
 	// Go through things
 	MapThing* thing = NULL;
 	GLTexture* tex_last = NULL;
-	double x, y;
+	GLTexture* tex = NULL;
+	double x, y, radius;
+	bool flip, sprite;
 	for (unsigned a = 0; a < map.things.size(); a++) {
 		// Get thing info
 		thing = map.things[a];
@@ -141,41 +144,72 @@ void MapEditor::drawThings(double xmin, double ymin, double xmax, double ymax) {
 
 		// Get thing type properties from game configuration
 		ThingType& tt = theGameConfiguration->thingType(thing->getType());
+		radius = tt.getRadius();
 
-		// Setup rendering options
-		int radius = tt.getRadius();
-		tt.getColour().set_gl();
-			
 		// Translate to thing position
 		glPushMatrix();
 		glTranslated(x, y, 0);
+		flip = false;
+		sprite = false;
+		tex = NULL;
 
-		// Rotate to angle (if needed)
-		if (tt.isAngled()) {
-			glRotated(thing->prop("angle").getIntValue(), 0, 0, 1);
+		// Check for unknown type
+		if (tt.getName() == "Unknown") {
+			tex = theMapEditor->textureManager().getThingImage("unknown");
+			flip = true;
+		}
 
-			// Set thing+angle indicator texture
-			GLTexture* tex = theMapEditor->textureManager().getThingImage("normal_d");
-			if (tex && tex != tex_last) {
-				tex->bind();
-				tex_last = tex;	// Avoid unnecessary texture binding
+		// Check for 'things as sprites' option
+		if (!tex && things_sprites) {
+			tex = theMapEditor->textureManager().getSprite(tt.getSprite());
+			if (tex) {
+				sprite = true;
+				COL_WHITE.set_gl();
 			}
+		}
+
+		// Normal thing image
+		if (!tex) {
+			tt.getColour().set_gl();
+
+			// Rotate to angle (if needed)
+			if (tt.isAngled()) {
+				glRotated(thing->prop("angle").getIntValue(), 0, 0, 1);
+				tex = theMapEditor->textureManager().getThingImage("normal_d");	// Set thing+angle indicator texture
+			}
+			else
+				tex = theMapEditor->textureManager().getThingImage("normal_n");	// Set no arrow indicator texture
+		}
+
+		// Bind texture
+		if (tex && tex != tex_last) {
+			tex->bind();
+			tex_last = tex;	// Avoid unnecessary texture binding
+		}
+
+		// Draw thing
+		glBegin(GL_QUADS);
+		if (sprite) {
+			double hw = tex->getWidth()*0.5;
+			double hh = tex->getHeight()*0.5;
+			glTexCoord2f(0.0f, 1.0f);	glVertex2d(-hw, -hh);
+			glTexCoord2f(0.0f, 0.0f);	glVertex2d(-hw, hh);
+			glTexCoord2f(1.0f, 0.0f);	glVertex2d(hw, hh);
+			glTexCoord2f(1.0f, 1.0f);	glVertex2d(hw, -hh);
+		}
+		else if (flip) {
+			// Thing texture is drawn upside-down normally, so flip on y axis for things with icons
+			glTexCoord2f(0.0f, 1.0f);	glVertex2d(-radius, -radius);
+			glTexCoord2f(0.0f, 0.0f);	glVertex2d(-radius, radius);
+			glTexCoord2f(1.0f, 0.0f);	glVertex2d(radius, radius);
+			glTexCoord2f(1.0f, 1.0f);	glVertex2d(radius, -radius);
 		}
 		else {
-			// Set no arrow indicator texture
-			GLTexture* tex = theMapEditor->textureManager().getThingImage("normal_n");
-			if (tex && tex != tex_last) {
-				tex->bind();
-				tex_last = tex;
-			}
+			glTexCoord2f(0.0f, 0.0f);	glVertex2d(-radius, -radius);
+			glTexCoord2f(0.0f, 1.0f);	glVertex2d(-radius, radius);
+			glTexCoord2f(1.0f, 1.0f);	glVertex2d(radius, radius);
+			glTexCoord2f(1.0f, 0.0f);	glVertex2d(radius, -radius);
 		}
-		
-		// Draw thing (32x32 for now)
-		glBegin(GL_QUADS);
-		glTexCoord2f(0.0f, 0.0f);	glVertex2d(-radius, -radius);
-		glTexCoord2f(0.0f, 1.0f);	glVertex2d(-radius, radius);
-		glTexCoord2f(1.0f, 1.0f);	glVertex2d(radius, radius);
-		glTexCoord2f(1.0f, 0.0f);	glVertex2d(radius, -radius);
 		glEnd();
 		
 		glPopMatrix();

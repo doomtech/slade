@@ -21,16 +21,18 @@ void LineInfoOverlay::update(MapLine* line) {
 	if (!line)
 		return;
 
+	info.clear();
+
 	// General line info
-	index = S_FMT("Line #%d", line->getIndex());
-	length = S_FMT("Length: %d", MathStuff::round(line->getLength()));
+	info.push_back(S_FMT("Line #%d", line->getIndex()));
+	info.push_back(S_FMT("Length: %d", MathStuff::round(line->getLength())));
 
 	// Line special
 	int as_id = line->prop("special").getIntValue();
-	special = S_FMT("Special: %d (%s)", as_id, CHR(theGameConfiguration->actionSpecialName(as_id)));
+	info.push_back(S_FMT("Special: %d (%s)", as_id, CHR(theGameConfiguration->actionSpecialName(as_id))));
 
 	// Line args (or sector tag)
-	args = S_FMT("Sector Tag: %d", line->prop("arg0").getIntValue());
+	info.push_back(S_FMT("Sector Tag: %d", line->prop("arg0").getIntValue()));
 
 	// Front side
 	MapSide* s = line->s1();
@@ -66,9 +68,12 @@ void LineInfoOverlay::draw(int bottom, int right, float alpha) {
 	if (alpha <= 0.0f)
 		return;
 
+	// Determine overlay height
+	int height = info.size() * 16;
+
 	// Slide in/out animation
 	float alpha_inv = 1.0f - alpha;
-	bottom += 64*alpha_inv*alpha_inv;
+	bottom += height*alpha_inv*alpha_inv;
 
 	// Get colours
 	rgba_t col_bg = ColourConfiguration::getColour("map_overlay_background");
@@ -77,21 +82,16 @@ void LineInfoOverlay::draw(int bottom, int right, float alpha) {
 
 	// Draw overlay background
 	rgba_t(col_bg.r, col_bg.g, col_bg.b, 80*alpha, 0).set_gl();
-	Drawing::drawFilledRect(0, bottom - 64, right, bottom);
-	Drawing::drawFilledRect(0, bottom - 66, right, bottom);
-	Drawing::drawFilledRect(0, bottom - 68, right, bottom);
+	Drawing::drawFilledRect(0, bottom - height, right, bottom);
+	Drawing::drawFilledRect(0, bottom - height+2, right, bottom);
+	Drawing::drawFilledRect(0, bottom - height+4, right, bottom);
 
-	// Line index
-	Drawing::drawText(index, 2, bottom - 64, col_fg);
-
-	// Line length
-	Drawing::drawText(length, 2, bottom - 48, col_fg);
-
-	// Line special
-	Drawing::drawText(special, 2, bottom - 32, col_fg);
-
-	// Line args / sector tag
-	Drawing::drawText(args, 2, bottom - 16, col_fg);
+	// Draw info text lines
+	int y = height;
+	for (unsigned a = 0; a < info.size(); a++) {
+		Drawing::drawText(info[a], 2, bottom - y, col_fg);
+		y -= 16;
+	}
 
 	// Side info
 	int x = right - 256;

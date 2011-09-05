@@ -5,12 +5,13 @@
 class MapSector;
 class SectorInfoOverlay {
 private:
-	string	info;
-	string	height;
-	string	light;
-	string	tag;
-	string	ftex;
-	string	ctex;
+	//string	info;
+	//string	height;
+	//string	light;
+	//string	tag;
+	vector<string>	info;
+	string			ftex;
+	string			ctex;
 
 public:
 	SectorInfoOverlay();

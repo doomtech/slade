@@ -5,10 +5,11 @@
 class MapLine;
 class LineInfoOverlay {
 private:
-	string	index;
-	string	length;
-	string	special;
-	string	args;
+	//string	index;
+	//string	length;
+	//string	special;
+	//string	args;
+	vector<string>	info;
 
 	struct side_t {
 		bool	exists;

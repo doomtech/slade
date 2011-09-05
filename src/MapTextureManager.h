@@ -20,6 +20,7 @@ private:
 	Archive*		archive;
 	MapTexHashMap	textures;
 	MapTexHashMap	flats;
+	MapTexHashMap	sprites;
 	MapTexHashMap	thing_images;
 	bool			thing_images_loaded;
 
@@ -31,6 +32,7 @@ public:
 
 	GLTexture*	getTexture(string name);
 	GLTexture*	getFlat(string name);
+	GLTexture*	getSprite(string name);
 	GLTexture*	getThingImage(string name);
 };
 
