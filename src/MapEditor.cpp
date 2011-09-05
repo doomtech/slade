@@ -157,6 +157,7 @@ void MapEditor::drawThings(double xmin, double ymin, double xmax, double ymax) {
 		if (tt.getName() == "Unknown") {
 			tex = theMapEditor->textureManager().getThingImage("unknown");
 			flip = true;
+			COL_WHITE.set_gl();
 		}
 
 		// Check for 'things as sprites' option

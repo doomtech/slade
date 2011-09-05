@@ -27,6 +27,27 @@ void ThingInfoOverlay::update(MapThing* thing) {
 		type = tt.getName();
 	info.push_back(S_FMT("Thing #%d: %s", thing->getIndex(), CHR(type)));
 
+	// Direction
+	int angle = thing->prop("angle");
+	string dir = S_FMT("%d (Unknown)", angle);
+	if (angle == 0)
+		dir = "East";
+	else if (angle == 45)
+		dir = "Northeast";
+	else if (angle == 90)
+		dir = "North";
+	else if (angle == 135)
+		dir = "Northwest";
+	else if (angle == 180)
+		dir = "West";
+	else if (angle == 225)
+		dir = "Southwest";
+	else if (angle == 270)
+		dir = "South";
+	else if (angle == 315)
+		dir = "Southeast";
+	info.push_back(S_FMT("Direction: %s", CHR(dir)));
+
 	// Flags
 	info.push_back("Flags: Unimplemented");
 
@@ -83,10 +104,10 @@ void ThingInfoOverlay::draw(int bottom, int right, float alpha) {
 		if (tex) {
 			tex->bind();
 			glBegin(GL_QUADS);
-			glTexCoord2f(0.0f, 0.0f);	glVertex2d(right - 88, bottom - 88);
-			glTexCoord2f(0.0f, 1.0f);	glVertex2d(right - 88, bottom - 8);
+			glTexCoord2f(0.0f, 0.0f);	glVertex2d(right - 72, bottom - 72);
+			glTexCoord2f(0.0f, 1.0f);	glVertex2d(right - 72, bottom - 8);
 			glTexCoord2f(1.0f, 1.0f);	glVertex2d(right - 8, bottom - 8);
-			glTexCoord2f(1.0f, 0.0f);	glVertex2d(right - 8, bottom - 88);
+			glTexCoord2f(1.0f, 0.0f);	glVertex2d(right - 8, bottom - 72);
 			glEnd();
 		}
 	}
