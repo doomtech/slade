@@ -32,6 +32,9 @@ public:
 		NEAREST,
 		LINEAR,
 		MIPMAP,
+		LINEAR_MIPMAP,	// (same as MIPMAP)
+		NEAREST_LINEAR_MIN,
+		NEAREST_MIPMAP,
 	};
 	
 	GLTexture(bool allow_split = true);

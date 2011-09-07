@@ -248,6 +248,8 @@ bool GameConfiguration::readConfiguration(string& cfg, string source) {
 	action_specials.clear();
 	thing_types.clear();
 	map_names.clear();
+	flags_thing.clear();
+	flags_line.clear();
 	
 	// Parse the full configuration
 	Parser parser;
@@ -270,21 +272,107 @@ bool GameConfiguration::readConfiguration(string& cfg, string source) {
 			this->name = node->getStringValue();
 			
 		// Valid map names
-		if (S_CMPNOCASE(node->getName(), "map_names")) {
+		else if (S_CMPNOCASE(node->getName(), "map_names")) {
 			for (unsigned n = 0; n < node->nValues(); n++)
 				map_names.push_back(node->getStringValue(n));
 		}
-	}
-	
-	// Action specials
-	ParseTreeNode* node_specials = (ParseTreeNode*)base->getChild("action_specials");
-	if (node_specials)
-		readActionSpecials(node_specials);
 
-	// Thing types
-	ParseTreeNode* node_things = (ParseTreeNode*)base->getChild("thing_types");
-	if (node_things)
-		readThingTypes(node_things);
+		// Map format
+		else if (S_CMPNOCASE(node->getName(), "map_format")) {
+			if (S_CMPNOCASE(node->getStringValue(), "doom"))
+				map_format = 0;
+			else if (S_CMPNOCASE(node->getStringValue(), "hexen"))
+				map_format = 1;
+			else if (S_CMPNOCASE(node->getStringValue(), "doom64"))
+				map_format = 2;
+			else if (S_CMPNOCASE(node->getStringValue(), "udmf"))
+				map_format = 3;
+			else {
+				wxLogMessage("Warning: Unknown/unsupported map format \"%s\", defaulting to doom format", CHR(node->getStringValue()));
+				map_format = 0;
+			}
+		}
+	}
+
+	// Go through all other config sections
+	ParseTreeNode* node = NULL;
+	for (unsigned a = 0; a < base->nChildren(); a++) {
+		node = (ParseTreeNode*)base->getChild(a);
+
+		// Skip game section
+		if (node == node_game)
+			continue;
+
+		// Action specials section
+		if (S_CMPNOCASE(node->getName(), "action_specials"))
+			readActionSpecials(node);
+
+		// Thing types section
+		else if (S_CMPNOCASE(node->getName(), "thing_types"))
+			readThingTypes(node);
+
+		// Line flags section
+		else if (S_CMPNOCASE(node->getName(), "line_flags")) {
+			for (unsigned c = 0; c < node->nChildren(); c++) {
+				ParseTreeNode* value = (ParseTreeNode*)node->getChild(c);
+
+				// Check for 'flag' type
+				if (!(S_CMPNOCASE(value->getType(), "flag")))
+					continue;
+
+				long flag_val;
+				value->getName().ToLong(&flag_val);
+
+				// Check if the flag value already exists
+				bool exists = false;
+				for (unsigned f = 0; f < flags_line.size(); f++) {
+					if (flags_line[f].flag == flag_val) {
+						exists = true;
+						flags_line[f].name = value->getStringValue();
+						break;
+					}
+				}
+
+				// Add flag otherwise
+				if (!exists)
+					flags_line.push_back(flag_t(flag_val, value->getStringValue()));
+			}
+		}
+
+		// Thing flags section
+		else if (S_CMPNOCASE(node->getName(), "thing_flags")) {
+			for (unsigned c = 0; c < node->nChildren(); c++) {
+				ParseTreeNode* value = (ParseTreeNode*)node->getChild(c);
+
+				// Check for 'flag' type
+				if (!(S_CMPNOCASE(value->getType(), "flag")))
+					continue;
+
+				long flag_val;
+				value->getName().ToLong(&flag_val);
+
+				// Check if the flag value already exists
+				bool exists = false;
+				for (unsigned f = 0; f < flags_thing.size(); f++) {
+					if (flags_thing[f].flag == flag_val) {
+						exists = true;
+						flags_thing[f].name = value->getStringValue();
+						break;
+					}
+				}
+
+				// Add flag otherwise
+				if (!exists)
+					flags_thing.push_back(flag_t(flag_val, value->getStringValue()));
+			}
+		}
+
+
+
+		// Unknown/unexpected section
+		else
+			wxLogMessage("Warning: Unexpected game configuration section \"%s\", skipping", CHR(node->getName()));
+	}
 	
 	return true;
 }
@@ -319,6 +407,45 @@ string GameConfiguration::actionSpecialName(int special) {
 	return action_specials[special].getName();
 }
 
+string GameConfiguration::thingFlagsString(int flags) {
+	// Check against all flags
+	string ret = "";
+	for (unsigned a = 0; a < flags_thing.size(); a++) {
+		if (flags & flags_thing[a].flag) {
+			// Add flag name to string
+			ret += flags_thing[a].name;
+			ret += ", ";
+		}
+	}
+
+	// Remove ending ', ' if needed
+	if (ret.Length() > 0)
+		ret.RemoveLast(2);
+
+	return ret;
+}
+
+string GameConfiguration::lineFlagsString(int flags) {
+	// Check against all flags
+	string ret = "";
+	for (unsigned a = 0; a < flags_line.size(); a++) {
+		if (flags & flags_line[a].flag) {
+			// Add flag name to string
+			ret += flags_line[a].name;
+			ret += ", ";
+		}
+	}
+
+	// Remove ending ', ' if needed
+	if (ret.Length() > 0)
+		ret.RemoveLast(2);
+
+	return ret;
+}
+
+
+
+
 void GameConfiguration::dumpActionSpecials() {
 	ASpecialMap::iterator i = action_specials.begin();
 	
@@ -346,8 +473,15 @@ void GameConfiguration::dumpValidMapNames() {
 
 #include "ArchiveManager.h"
 CONSOLE_COMMAND(testgc, 0) {
+	string game = "doom1";
+
+	if (args.size() > 0)
+		game = args[0];
+
+	string epath = S_FMT("config/games/%s.cfg", CHR(game));
+
 	Archive* slade_pk3 = theArchiveManager->programResourceArchive();
-	theGameConfiguration->open(slade_pk3->entryAtPath("config/games/doom1.cfg"));
+	theGameConfiguration->open(slade_pk3->entryAtPath(epath));
 	theGameConfiguration->dumpActionSpecials();
 	theGameConfiguration->dumpThingTypes();
 	theGameConfiguration->dumpValidMapNames();

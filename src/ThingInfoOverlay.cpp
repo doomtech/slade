@@ -27,9 +27,12 @@ void ThingInfoOverlay::update(MapThing* thing) {
 		type = tt.getName();
 	info.push_back(S_FMT("Thing #%d: %s", thing->getIndex(), CHR(type)));
 
+	// Position
+	info.push_back(S_FMT("Position: %d, %d", (int)thing->xPos(), (int)thing->yPos()));
+
 	// Direction
 	int angle = thing->prop("angle");
-	string dir = S_FMT("%d (Unknown)", angle);
+	string dir = S_FMT("%d degrees", angle);
 	if (angle == 0)
 		dir = "East";
 	else if (angle == 45)
@@ -49,7 +52,7 @@ void ThingInfoOverlay::update(MapThing* thing) {
 	info.push_back(S_FMT("Direction: %s", CHR(dir)));
 
 	// Flags
-	info.push_back("Flags: Unimplemented");
+	info.push_back(S_FMT("Flags: %s", CHR(theGameConfiguration->thingFlagsString(thing->prop("flags")))));
 
 	// Set sprite
 	sprite = NULL;

@@ -34,6 +34,9 @@ void LineInfoOverlay::update(MapLine* line) {
 	// Line args (or sector tag)
 	info.push_back(S_FMT("Sector Tag: %d", line->prop("arg0").getIntValue()));
 
+	// Line flags
+	//info.push_back(S_FMT("Flags: %s", CHR(theGameConfiguration->lineFlagsString(line->prop("flags")))));
+
 	// Front side
 	MapSide* s = line->s1();
 	if (s) {

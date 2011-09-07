@@ -234,7 +234,8 @@ void MapCanvas::draw() {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	rgba_t col_bg = ColourConfiguration::getColour("map_background");
+	glClearColor(col_bg.fr(), col_bg.fg(), col_bg.fb(), 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Translate to middle of pixel (otherwise inaccuracies can occur on certain gl implemenataions)

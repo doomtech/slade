@@ -81,6 +81,7 @@ GLTexture* MapTextureManager::getSprite(string name) {
 		SImage image;
 		Misc::loadImageFromEntry(&image, entry);
 		mtex.texture = new GLTexture(false);
+		mtex.texture->setFilter(GLTexture::NEAREST_LINEAR_MIN);
 		mtex.texture->loadImage(&image, pal);
 		return mtex.texture;
 	}

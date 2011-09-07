@@ -13,9 +13,20 @@ class ArchiveEntry;
 class GameConfiguration {
 private:
 	string			name;
+	int				map_format;
 	ASpecialMap		action_specials;
 	ThingTypeMap	thing_types;
 	vector<string>	map_names;
+
+	// Flags
+	struct flag_t {
+		int		flag;
+		string	name;
+		flag_t() { flag = 0; name = ""; }
+		flag_t(int flag, string name) { this->flag = flag; this->name = name; }
+	};
+	vector<flag_t>	flags_thing;
+	vector<flag_t>	flags_line;
 	
 	// Singleton instance
 	static GameConfiguration*	instance;
@@ -49,6 +60,10 @@ public:
 
 	// Thing types
 	ThingType&		thingType(unsigned type) { return thing_types[type]; }
+
+	// Flags
+	string		thingFlagsString(int flags);
+	string		lineFlagsString(int flags);
 	
 	// Testing
 	void	dumpActionSpecials();
