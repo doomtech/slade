@@ -266,7 +266,7 @@ void MapCanvas::draw() {
 	glPointSize((float)vertex_size);
 
 	// Draw map
-	editor->drawMap(view_tl.x, view_tl.y, view_br.x, view_br.y);
+	editor->drawMap(view_tl.x, view_tl.y, view_br.x, view_br.y, view_scale);
 
 	// Draw overlays (hilight etc)
 	editor->drawSelection(view_tl.x, view_tl.y, view_br.x, view_br.y);
@@ -570,7 +570,7 @@ void MapCanvas::onMouseUp(wxMouseEvent& e) {
 
 			// Reset mouse state
 			mouse_state = MSTATE_NORMAL;
-			
+
 			// Select
 			editor->selectWithin(min(sel_origin.x, sel_end.x), min(sel_origin.y, sel_end.y),
 								max(sel_origin.x, sel_end.x), max(sel_origin.y, sel_end.y));

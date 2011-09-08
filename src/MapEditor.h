@@ -8,7 +8,7 @@
 class MapEditor {
 private:
 	SLADEMap	map;
-	
+
 	// Editor state
 	uint8_t		edit_mode;
 	int			hilight_item;
@@ -21,7 +21,7 @@ private:
 
 	// Temporary
 	GLTexture	tex_thing;
-	
+
 public:
 	enum {
 		// Editor modes
@@ -31,7 +31,7 @@ public:
 		MODE_THINGS,
 		MODE_3D,
 	};
-	
+
 	MapEditor();
 	~MapEditor();
 
@@ -45,15 +45,15 @@ public:
 	void	setEditMode(int mode);
 	void	setMousePos(double x, double y) { mouse_pos.set(x, y); }
 	void	setMouseDownPos(double x, double y) { mouse_downpos.set(x, y); }
-	
+
 	bool	openMap(Archive::mapdesc_t map);
 	void	clearMap() { map.clearMap(); }
-	
+
 	// Drawing
 	void	drawVertices(double xmin, double ymin, double xmax, double ymax);
 	void	drawLines(double xmin, double ymin, double xmax, double ymax, bool show_direction = false);
-	void	drawThings(double xmin, double ymin, double xmax, double ymax);
-	void	drawMap(double xmin, double ymin, double xmax, double ymax);
+	void	drawThings(double xmin, double ymin, double xmax, double ymax, double view_scale = 1.0);
+	void	drawMap(double xmin, double ymin, double xmax, double ymax, double view_scale = 1.0);
 	void	drawHilight(float flash_level);
 	void	drawSelection(double xmin, double ymin, double xmax, double ymax);
 

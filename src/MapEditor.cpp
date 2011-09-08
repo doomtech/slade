@@ -11,6 +11,7 @@
 double grid_sizes[] = { 0.05, 0.1, 0.25, 0.5, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192 };
 CVAR(Bool, things_sprites, false, CVAR_SAVE)
 CVAR(Bool, things_force_dir, false, CVAR_SAVE)
+CVAR(Bool, things_square, false, CVAR_SAVE)
 
 EXTERN_CVAR(Int, vertex_size)
 
@@ -66,7 +67,7 @@ void MapEditor::drawLines(double xmin, double ymin, double xmax, double ymax, bo
 	rgba_t col_background = ColourConfiguration::getColour("map_background");
 	rgba_t col_line_normal = ColourConfiguration::getColour("map_line_normal");
 	rgba_t col_line_special = ColourConfiguration::getColour("map_line_special");
-	
+
 	// Draw all lines
 	rgba_t col;
 	MapLine* line = NULL;
@@ -85,22 +86,22 @@ void MapEditor::drawLines(double xmin, double ymin, double xmax, double ymax, bo
 			(y1 > ymax && y2 > ymax) ||
 			(y1 < ymin && y2 < ymin))
 			continue;
-		
+
 		// Check for special line
 		if ((int)line->prop("special") > 0)
 			col.set(col_line_special);
 		else
 			col.set(col_line_normal);
-		
+
 		// Check for two-sided line
 		if (line->s2())
 			col.set(col.r*fade_coeff+col_background.r*(1.0-fade_coeff),
 					col.g*fade_coeff+col_background.g*(1.0-fade_coeff),
 					col.b*fade_coeff+col_background.b*(1.0-fade_coeff), 255, 0);
-		
+
 		// Set line colour
 		col.set_gl();
-		
+
 		// Draw the line
 		glBegin(GL_LINES);
 		glVertex2d(x1, y1);
@@ -122,11 +123,13 @@ void MapEditor::drawLines(double xmin, double ymin, double xmax, double ymax, bo
 	}
 }
 
-void MapEditor::drawThings(double xmin, double ymin, double xmax, double ymax) {
+void MapEditor::drawThings(double xmin, double ymin, double xmax, double ymax, double view_scale) {
 	// Enable textures
-	glEnable(GL_TEXTURE_2D);
+	if (!things_square)
+		glEnable(GL_TEXTURE_2D);
 	rgba_t(255, 255, 255, 255, 0).set_gl();
-	
+	glLineWidth(2.0f);
+
 	// Go through things
 	MapThing* thing = NULL;
 	GLTexture* tex_last = NULL;
@@ -139,14 +142,18 @@ void MapEditor::drawThings(double xmin, double ymin, double xmax, double ymax) {
 		thing = map.things[a];
 		x = thing->xPos();
 		y = thing->yPos();
-		
-		// Ignore if outside of screen
-		if (x < xmin || x > xmax || y < ymin || y > ymax)
-			continue;
 
 		// Get thing type properties from game configuration
 		ThingType& tt = theGameConfiguration->thingType(thing->getType());
 		radius = tt.getRadius();
+
+		// Ignore if outside of screen
+		if (x+radius < xmin || x-radius > xmax || y+radius < ymin || y-radius > ymax)
+			continue;
+
+		// Check if the thing is worth drawing
+		if (radius*view_scale < 1)
+			continue;
 
 		// Translate to thing position
 		glPushMatrix();
@@ -155,119 +162,157 @@ void MapEditor::drawThings(double xmin, double ymin, double xmax, double ymax) {
 		sprite = false;
 		tex = NULL;
 
-		// Check for unknown type
-		if (tt.getName() == "Unknown") {
-			tex = theMapEditor->textureManager().getThingImage("unknown");
-			flip = true;
-			COL_WHITE.set_gl();
-		}
+		if (!things_square) {
+			// Round or sprite things
 
-		// Check for 'things as sprites' option
-		if (!tex && things_sprites) {
-			tex = theMapEditor->textureManager().getSprite(tt.getSprite());
-			if (tex) {
-				sprite = true;
+			// Check for unknown type
+			if (tt.getName() == "Unknown") {
+				tex = theMapEditor->textureManager().getThingImage("unknown");
+				flip = true;
 				COL_WHITE.set_gl();
-
-				// Add to list if we need to draw the direction arrow later
-				if (tt.isAngled() || things_force_dir)
-					things_arrows.push_back(a);
 			}
-		}
 
-		// Normal thing image
-		if (!tex) {
-			tt.getColour().set_gl();
+			// Check for 'things as sprites' option
+			if (!tex && things_sprites) {
+				tex = theMapEditor->textureManager().getSprite(tt.getSprite());
+				if (tex) {
+					sprite = true;
+					COL_WHITE.set_gl();
 
-			// Rotate to angle (if needed)
-			if (tt.isAngled() || things_force_dir) {
-				glRotated(thing->prop("angle").getIntValue(), 0, 0, 1);
-				tex = theMapEditor->textureManager().getThingImage("normal_d");	// Set thing+angle indicator texture
+					// Add to list if we need to draw the direction arrow later
+					if (tt.isAngled() || things_force_dir)
+						things_arrows.push_back(a);
+				}
 			}
-			else
-				tex = theMapEditor->textureManager().getThingImage("normal_n");	// Set no arrow indicator texture
-		}
 
-		// Bind texture
-		if (tex && tex != tex_last) {
-			tex->bind();
-			tex_last = tex;	// Avoid unnecessary texture binding
-		}
+			// Normal thing image
+			if (!tex) {
+				tt.getColour().set_gl();
 
-		// Draw thing
-		
-		if (sprite) {
-			double hw = tex->getWidth()*0.5;
-			double hh = tex->getHeight()*0.5;
-			glBegin(GL_QUADS);
-			glTexCoord2f(0.0f, 1.0f);	glVertex2d(-hw, -hh);
-			glTexCoord2f(0.0f, 0.0f);	glVertex2d(-hw, hh);
-			glTexCoord2f(1.0f, 0.0f);	glVertex2d(hw, hh);
-			glTexCoord2f(1.0f, 1.0f);	glVertex2d(hw, -hh);
-			glEnd();
-		}
-		else if (flip) {
-			// Thing texture is drawn upside-down normally, so flip on y axis for things with icons
-			glBegin(GL_QUADS);
-			glTexCoord2f(0.0f, 1.0f);	glVertex2d(-radius, -radius);
-			glTexCoord2f(0.0f, 0.0f);	glVertex2d(-radius, radius);
-			glTexCoord2f(1.0f, 0.0f);	glVertex2d(radius, radius);
-			glTexCoord2f(1.0f, 1.0f);	glVertex2d(radius, -radius);
-			glEnd();
+				// Rotate to angle (if needed)
+				if (tt.isAngled() || things_force_dir) {
+					glRotated(thing->prop("angle").getIntValue(), 0, 0, 1);
+					tex = theMapEditor->textureManager().getThingImage("normal_d");	// Set thing+angle indicator texture
+				}
+				else
+					tex = theMapEditor->textureManager().getThingImage("normal_n");	// Set no arrow indicator texture
+			}
+
+			// Bind texture
+			if (tex && tex != tex_last) {
+				tex->bind();
+				tex_last = tex;	// Avoid unnecessary texture binding
+			}
+
+			// Draw thing
+			if (sprite) {
+				double hw = tex->getWidth()*0.5;
+				double hh = tex->getHeight()*0.5;
+				glBegin(GL_QUADS);
+				glTexCoord2f(0.0f, 1.0f);	glVertex2d(-hw, -hh);
+				glTexCoord2f(0.0f, 0.0f);	glVertex2d(-hw, hh);
+				glTexCoord2f(1.0f, 0.0f);	glVertex2d(hw, hh);
+				glTexCoord2f(1.0f, 1.0f);	glVertex2d(hw, -hh);
+				glEnd();
+			}
+			else if (flip) {
+				// Thing texture is drawn upside-down normally, so flip on y axis for things with icons
+				glBegin(GL_QUADS);
+				glTexCoord2f(0.0f, 1.0f);	glVertex2d(-radius, -radius);
+				glTexCoord2f(0.0f, 0.0f);	glVertex2d(-radius, radius);
+				glTexCoord2f(1.0f, 0.0f);	glVertex2d(radius, radius);
+				glTexCoord2f(1.0f, 1.0f);	glVertex2d(radius, -radius);
+				glEnd();
+			}
+			else {
+				glBegin(GL_QUADS);
+				glTexCoord2f(0.0f, 0.0f);	glVertex2d(-radius, -radius);
+				glTexCoord2f(0.0f, 1.0f);	glVertex2d(-radius, radius);
+				glTexCoord2f(1.0f, 1.0f);	glVertex2d(radius, radius);
+				glTexCoord2f(1.0f, 0.0f);	glVertex2d(radius, -radius);
+				glEnd();
+			}
 		}
 		else {
+			// Square things
+
+			// Draw background
+			COL_BLACK.set_gl();
 			glBegin(GL_QUADS);
-			glTexCoord2f(0.0f, 0.0f);	glVertex2d(-radius, -radius);
-			glTexCoord2f(0.0f, 1.0f);	glVertex2d(-radius, radius);
-			glTexCoord2f(1.0f, 1.0f);	glVertex2d(radius, radius);
-			glTexCoord2f(1.0f, 0.0f);	glVertex2d(radius, -radius);
+			glVertex2d(-radius-2, -radius-2);
+			glVertex2d(-radius-2, radius+2);
+			glVertex2d(radius+2, radius+2);
+			glVertex2d(radius+2, -radius-2);
 			glEnd();
+
+			// Draw base
+			tt.getColour().set_gl();
+			glBegin(GL_QUADS);
+			glVertex2d(-radius, -radius);
+			glVertex2d(-radius, radius);
+			glVertex2d(radius, radius);
+			glVertex2d(radius, -radius);
+			glEnd();
+
+			// Draw angle indicator (if needed)
+			if (tt.isAngled() || things_force_dir) {
+				COL_BLACK.set_gl();
+				glRotated(thing->prop("angle").getIntValue(), 0, 0, 1);
+				glBegin(GL_LINES);
+				glVertex2d(0, 0);
+				glVertex2d(radius, 0);
+				glEnd();
+			}
 		}
-		
+
 		glPopMatrix();
 	}
 
 	// Draw any thing direction arrows needed
-	GLTexture* tex_arrow = theMapEditor->textureManager().getThingImage("arrow");
-	if (tex_arrow) {
-		tex_arrow->bind();
+	if (things_sprites && !things_square) {
+		GLTexture* tex_arrow = theMapEditor->textureManager().getThingImage("arrow");
+		if (tex_arrow) {
+			tex_arrow->bind();
 
-		for (unsigned a = 0; a < things_arrows.size(); a++) {
-			MapThing* thing = map.getThing(things_arrows[a]);
-			x = thing->xPos();
-			y = thing->yPos();
+			for (unsigned a = 0; a < things_arrows.size(); a++) {
+				MapThing* thing = map.getThing(things_arrows[a]);
+				x = thing->xPos();
+				y = thing->yPos();
 
-			glPushMatrix();
-			glTranslated(x, y, 0);
-			glRotated(thing->prop("angle").getIntValue(), 0, 0, 1);
+				glPushMatrix();
+				glTranslated(x, y, 0);
+				glRotated(thing->prop("angle").getIntValue(), 0, 0, 1);
 
-			COL_WHITE.set_gl();
-			glBegin(GL_QUADS);
-			glTexCoord2f(0.0f, 1.0f);	glVertex2d(-32, -32);
-			glTexCoord2f(0.0f, 0.0f);	glVertex2d(-32, 32);
-			glTexCoord2f(1.0f, 0.0f);	glVertex2d(32, 32);
-			glTexCoord2f(1.0f, 1.0f);	glVertex2d(32, -32);
-			glEnd();
-		
-			glPopMatrix();
+				COL_WHITE.set_gl();
+				glBegin(GL_QUADS);
+				glTexCoord2f(0.0f, 1.0f);	glVertex2d(-32, -32);
+				glTexCoord2f(0.0f, 0.0f);	glVertex2d(-32, 32);
+				glTexCoord2f(1.0f, 0.0f);	glVertex2d(32, 32);
+				glTexCoord2f(1.0f, 1.0f);	glVertex2d(32, -32);
+				glEnd();
+
+				glPopMatrix();
+			}
 		}
 	}
-	
+
 	// Disable textures
-	glDisable(GL_TEXTURE_2D);
+	if (!things_square)
+		glDisable(GL_TEXTURE_2D);
+	glLineWidth(1.0f);
 }
 
-void MapEditor::drawMap(double xmin, double ymin, double xmax, double ymax) {
+void MapEditor::drawMap(double xmin, double ymin, double xmax, double ymax, double view_scale) {
 	// Draw lines
 	drawLines(xmin, ymin, xmax, ymax, edit_mode == MODE_LINES);
-	
+
 	// Draw vertices (if in vertices mode)
 	if (edit_mode == MODE_VERTICES)
 		drawVertices(xmin, ymin, xmax, ymax);
-		
+
 	// Draw things (if in things mode)
 	if (edit_mode == MODE_THINGS)
-		drawThings(xmin, ymin, xmax, ymax);
+		drawThings(xmin, ymin, xmax, ymax, view_scale);
 }
 
 void MapEditor::drawHilight(float flash_level) {
@@ -340,24 +385,36 @@ void MapEditor::drawHilight(float flash_level) {
 
 		// Get thing radius
 		double radius = theGameConfiguration->thingType(thing->getType()).getRadius();
-		//radius += 8 * flash_level;
-		radius *= 1.1 + (0.2*flash_level);
+		if (things_square)
+			radius += 6;
+		else
+			radius *= 1.1 + (0.2*flash_level);
 
-		// Setup hilight thing texture
-		GLTexture* tex = theMapEditor->textureManager().getThingImage("hilight");
-		if (tex) {
-			glEnable(GL_TEXTURE_2D);
-			tex->bind();
+		if (things_square) {
+			glBegin(GL_QUADS);
+			glVertex2d(x - radius, y - radius);
+			glVertex2d(x - radius, y + radius);
+			glVertex2d(x + radius, y + radius);
+			glVertex2d(x + radius, y - radius);
+			glEnd();
 		}
-		
-		glBegin(GL_QUADS);
-		glTexCoord2f(0.0f, 0.0f);	glVertex2d(x - radius, y - radius);
-		glTexCoord2f(0.0f, 1.0f);	glVertex2d(x - radius, y + radius);
-		glTexCoord2f(1.0f, 1.0f);	glVertex2d(x + radius, y + radius);
-		glTexCoord2f(1.0f, 0.0f);	glVertex2d(x + radius, y - radius);
-		glEnd();
+		else {
+			// Setup hilight thing texture
+			GLTexture* tex = theMapEditor->textureManager().getThingImage("hilight");
+			if (tex) {
+				glEnable(GL_TEXTURE_2D);
+				tex->bind();
+			}
 
-		glDisable(GL_TEXTURE_2D);
+			glBegin(GL_QUADS);
+			glTexCoord2f(0.0f, 0.0f);	glVertex2d(x - radius, y - radius);
+			glTexCoord2f(0.0f, 1.0f);	glVertex2d(x - radius, y + radius);
+			glTexCoord2f(1.0f, 1.0f);	glVertex2d(x + radius, y + radius);
+			glTexCoord2f(1.0f, 0.0f);	glVertex2d(x + radius, y - radius);
+			glEnd();
+
+			glDisable(GL_TEXTURE_2D);
+		}
 	}
 
 	glLineWidth(1.5f);
@@ -480,24 +537,34 @@ void MapEditor::drawSelection(double xmin, double ymin, double xmax, double ymax
 			// Get thing radius
 			double radius = theGameConfiguration->thingType(thing->getType()).getRadius() + 8;
 
-			// Setup hilight thing texture
-			GLTexture* tex = theMapEditor->textureManager().getThingImage("hilight");
-			if (tex) {
-				glEnable(GL_TEXTURE_2D);
-				tex->bind();
-			}
-		
-			// Draw thing selection if on screen
-			if (xmin <= x && x <= xmax && ymin <= y && y <= ymax) {
+			if (things_square) {
 				glBegin(GL_QUADS);
-				glTexCoord2f(0.0f, 0.0f);	glVertex2d(x - radius, y - radius);
-				glTexCoord2f(0.0f, 1.0f);	glVertex2d(x - radius, y + radius);
-				glTexCoord2f(1.0f, 1.0f);	glVertex2d(x + radius, y + radius);
-				glTexCoord2f(1.0f, 0.0f);	glVertex2d(x + radius, y - radius);
+				glVertex2d(x - radius, y - radius);
+				glVertex2d(x - radius, y + radius);
+				glVertex2d(x + radius, y + radius);
+				glVertex2d(x + radius, y - radius);
 				glEnd();
 			}
+			else {
+				// Setup hilight thing texture
+				GLTexture* tex = theMapEditor->textureManager().getThingImage("hilight");
+				if (tex) {
+					glEnable(GL_TEXTURE_2D);
+					tex->bind();
+				}
 
-			glDisable(GL_TEXTURE_2D);
+				// Draw thing selection if on screen
+				if (xmin <= x && x <= xmax && ymin <= y && y <= ymax) {
+					glBegin(GL_QUADS);
+					glTexCoord2f(0.0f, 0.0f);	glVertex2d(x - radius, y - radius);
+					glTexCoord2f(0.0f, 1.0f);	glVertex2d(x - radius, y + radius);
+					glTexCoord2f(1.0f, 1.0f);	glVertex2d(x + radius, y + radius);
+					glTexCoord2f(1.0f, 0.0f);	glVertex2d(x + radius, y - radius);
+					glEnd();
+				}
+
+				glDisable(GL_TEXTURE_2D);
+			}
 		}
 	}
 

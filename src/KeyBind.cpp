@@ -211,7 +211,9 @@ string KeyBind::keyName(int key) {
 	case WXK_WINDOWS_LEFT:		return "win_left";
 	case WXK_WINDOWS_RIGHT:		return "win_right";
 	case WXK_WINDOWS_MENU:		return "win_menu";
+#ifdef __APPLE__
 	case WXK_COMMAND:			return "command";
+#endif
 	default: break;
 	};
 
