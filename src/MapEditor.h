@@ -47,7 +47,7 @@ public:
 	void	setMouseDownPos(double x, double y) { mouse_downpos.set(x, y); }
 
 	bool	openMap(Archive::mapdesc_t map);
-	void	clearMap() { map.clearMap(); }
+	void	clearMap();
 
 	// Drawing
 	void	drawVertices(double xmin, double ymin, double xmax, double ymax);

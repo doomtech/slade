@@ -127,7 +127,17 @@ bool MapEditorWindow::openMap(Archive::mapdesc_t map) {
 	// Set texture manager archive
 	tex_man.setArchive(map.head->getParent());
 
-	return editor.openMap(map);
+	// Clear current map
+	editor.clearMap();
+
+	// Attempt to open map
+	bool ok = editor.openMap(map);
+
+	// Show window if opened ok
+	if (ok)
+		this->Show(true);
+
+	return ok;
 }
 
 void MapEditorWindow::onClose(wxCloseEvent& e) {

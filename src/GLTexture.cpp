@@ -380,7 +380,7 @@ bool GLTexture::genChequeredTexture(uint8_t block_size, rgba_t col1, rgba_t col2
  *******************************************************************/
 bool GLTexture::bind() {
 	// Check texture is loaded
-	if (!loaded)
+	if (!loaded || tex.size() == 0)
 		return false;
 
 	// Bind the texture
@@ -532,8 +532,8 @@ GLTexture& GLTexture::bgTex() {
 	if (!tex_background.isLoaded()) {
 		wxColour col1(bgtx_colour1);
 		wxColour col2(bgtx_colour2);
-		tex_background.genChequeredTexture(8, 
-			rgba_t(col1.Red(), col1.Green(), col1.Blue(), 255), 
+		tex_background.genChequeredTexture(8,
+			rgba_t(col1.Red(), col1.Green(), col1.Blue(), 255),
 			rgba_t(col2.Red(), col2.Green(), col2.Blue(), 255));
 	}
 	return tex_background;

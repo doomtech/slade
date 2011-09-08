@@ -121,12 +121,14 @@ void ConsolePanel::onCommandEnter(wxCommandEvent& e) {
 void ConsolePanel::onCommandKeyDown(wxKeyEvent& e) {
 	if (e.GetKeyCode() == WXK_UP) {
 		text_command->SetValue(theConsole->prevCommand(cmd_log_index));
+		text_command->SetInsertionPointEnd();
 		if (cmd_log_index < theConsole->numPrevCommands()-1)
 			cmd_log_index++;
 	}
 	else if (e.GetKeyCode() == WXK_DOWN) {
 		cmd_log_index--;
 		text_command->SetValue(theConsole->prevCommand(cmd_log_index));
+		text_command->SetInsertionPointEnd();
 		if (cmd_log_index < 0)
 			cmd_log_index = 0;
 	}

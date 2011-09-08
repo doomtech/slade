@@ -181,39 +181,29 @@ int	SLADEMap::thingIndex(MapThing* t) {
 
 void SLADEMap::refreshIndices() {
 	// Vertex indices
-	if (!i_vertices) {
-		i_vertices = true;
-		for (unsigned a = 0; a < vertices.size(); a++)
-			vertices[a]->index = a;
-	}
+	i_vertices = true;
+	for (unsigned a = 0; a < vertices.size(); a++)
+		vertices[a]->index = a;
 
 	// Side indices
-	if (!i_sides) {
-		i_sides = true;
-		for (unsigned a = 0; a < sides.size(); a++)
-			sides[a]->index = a;
-	}
+	i_sides = true;
+	for (unsigned a = 0; a < sides.size(); a++)
+		sides[a]->index = a;
 
 	// Line indices
-	if (!i_lines) {
-		i_lines = true;
-		for (unsigned a = 0; a < lines.size(); a++)
-			lines[a]->index = a;
-	}
+	i_lines = true;
+	for (unsigned a = 0; a < lines.size(); a++)
+		lines[a]->index = a;
 
 	// Sector indices
-	if (!i_sectors) {
-		i_sectors = true;
-		for (unsigned a = 0; a < sectors.size(); a++)
-			sectors[a]->index = a;
-	}
+	i_sectors = true;
+	for (unsigned a = 0; a < sectors.size(); a++)
+		sectors[a]->index = a;
 
 	// Thing indices
-	if (!i_things) {
-		i_things = true;
-		for (unsigned a = 0; a < things.size(); a++)
-			things[a]->index = a;
-	}
+	i_things = true;
+	for (unsigned a = 0; a < things.size(); a++)
+		things[a]->index = a;
 }
 
 bool SLADEMap::readMap(Archive::mapdesc_t map) {
@@ -743,7 +733,7 @@ bool SLADEMap::addVertex(ParseTreeNode* def) {
 	ParseTreeNode* prop_y = (ParseTreeNode*)def->getChild("y");
 	if (!prop_x || !prop_y)
 		return false;
-	
+
 	// Create new vertex
 	MapVertex* nv = new MapVertex(prop_x->getFloatValue(), prop_y->getFloatValue());
 
@@ -913,7 +903,7 @@ bool SLADEMap::readUDMFMap(Archive::mapdesc_t map) {
 		return false;
 
 	// --- Process parsed data ---
-	
+
 	// First we have to sort the definition blocks by type so they can
 	// be created in the correct order (verts->sides->lines->sectors->things),
 	// even if they aren't defined in that order.
@@ -966,7 +956,7 @@ bool SLADEMap::readUDMFMap(Archive::mapdesc_t map) {
 	// Create sectors from parsed data
 	for (unsigned a = 0; a < defs_sectors.size(); a++)
 		addSector(defs_sectors[a]);
-	
+
 	// Create sides from parsed data
 	for (unsigned a = 0; a < defs_sides.size(); a++)
 		addSide(defs_sides[a]);

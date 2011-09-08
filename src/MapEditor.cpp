@@ -40,6 +40,15 @@ bool MapEditor::openMap(Archive::mapdesc_t map) {
 	return this->map.readMap(map);
 }
 
+void MapEditor::clearMap() {
+	// Clear map
+	map.clearMap();
+
+	// Clear selection
+	selection.clear();
+	hilight_item = -1;
+}
+
 void MapEditor::drawVertices(double xmin, double ymin, double xmax, double ymax) {
 	// Set to vertex colour
 	ColourConfiguration::getColour("map_vertex").set_gl();

@@ -30,6 +30,7 @@
 #include "Main.h"
 #include "Console.h"
 #include "Tokenizer.h"
+#include "CVar.h"
 #include <wx/log.h>
 #include <algorithm>
 
@@ -106,6 +107,45 @@ void Console::execute(string command) {
 			commands[a].execute(args);
 			return;
 		}
+	}
+
+	// Check if it is a cvar
+	CVar* cvar = get_cvar(cmd_name);
+	if (cvar) {
+		// Arg(s) given, set cvar value
+		if (args.size() > 0) {
+			if (cvar->type == CVAR_BOOLEAN) {
+				if (args[0] == "0" || args[0] == "false")
+					*((CBoolCVar*)cvar) = false;
+				else
+					*((CBoolCVar*)cvar) = true;
+			}
+			else if (cvar->type == CVAR_INTEGER)
+				*((CIntCVar*)cvar) = atoi(CHR(args[0]));
+			else if (cvar->type == CVAR_FLOAT)
+				*((CFloatCVar*)cvar) = (float)atof(CHR(args[0]));
+			else if (cvar->type == CVAR_STRING)
+				*((CStringCVar*)cvar) = args[0];
+		}
+
+		// Print cvar value
+		string value = "";
+		if (cvar->type == CVAR_BOOLEAN) {
+			if (cvar->GetValue().Bool)
+				value = "true";
+			else
+				value = "false";
+		}
+		else if (cvar->type == CVAR_INTEGER)
+			value = S_FMT("%d", cvar->GetValue().Int);
+		else if (cvar->type == CVAR_FLOAT)
+			value = S_FMT("%1.4f", cvar->GetValue().Float);
+		else
+			value = cvar->GetValue().String;
+
+		logMessage(S_FMT("\"%s\" = \"%s\"", CHR(cmd_name), CHR(value)));
+
+		return;
 	}
 
 	// Command not found
@@ -237,6 +277,22 @@ CONSOLE_COMMAND (cmdlist, 0) {
 
 	for (int a = 0; a < theConsole->numCommands(); a++)
 		theConsole->logMessage(S_FMT("\"%s\"", theConsole->command(a).getName().c_str()));
+}
+
+/* Console Command - "cvarlist"
+ * Lists all cvars
+ *******************************************************************/
+CONSOLE_COMMAND (cvarlist, 0) {
+	// Get sorted list of cvars
+	vector<string> list;
+	get_cvar_list(list);
+	sort(list.begin(), list.end());
+
+	theConsole->logMessage(S_FMT("%d CVars:", list.size()));
+
+	// Write list to console
+	for (unsigned a = 0; a < list.size(); a++)
+		theConsole->logMessage(list[a]);
 }
 
 /*
