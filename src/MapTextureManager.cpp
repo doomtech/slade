@@ -10,6 +10,9 @@ MapTextureManager::MapTextureManager(Archive* archive) {
 	// Init variables
 	this->archive = archive;
 	thing_images_loaded = false;
+
+	// Listen to the resource manager
+	listenTo(theResourceManager);
 }
 
 MapTextureManager::~MapTextureManager() {
@@ -115,4 +118,19 @@ GLTexture* MapTextureManager::getThingImage(string name) {
 	}
 
 	return thing_images[name].texture;
+}
+
+void MapTextureManager::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
+	// Only interested in the resource manager
+	if (announcer != theResourceManager)
+		return;
+
+	// If the resources have been updated
+	if (event_name == "resources_updated") {
+		// Just clear all cached textures
+		textures.clear();
+		flats.clear();
+		sprites.clear();
+		wxLogMessage("texture manager cleared");
+	}
 }

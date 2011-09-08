@@ -178,6 +178,9 @@ void ResourceManager::addArchive(Archive* archive) {
 
 	// Listen to the archive
 	listenTo(archive);
+
+	// Announce resource update
+	announce("resources_updated");
 }
 
 /* ResourceManager::removeArchive
@@ -193,6 +196,9 @@ void ResourceManager::removeArchive(Archive* archive) {
 	archive->getEntryTreeAsList(entries);
 	for (unsigned a = 0; a < entries.size(); a++)
 		removeEntry(entries[a]);
+
+	// Announce resource update
+	announce("resources_updated");
 }
 
 /* ResourceManager::addEntry

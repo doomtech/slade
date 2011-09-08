@@ -3,6 +3,7 @@
 #define __MAP_TEXTURE_MANAGER_H__
 
 #include "GLTexture.h"
+#include "ListenerAnnouncer.h"
 #include <wx/hashmap.h>
 
 struct map_tex_t {
@@ -15,7 +16,7 @@ struct map_tex_t {
 WX_DECLARE_STRING_HASH_MAP(map_tex_t, MapTexHashMap);
 
 class Archive;
-class MapTextureManager {
+class MapTextureManager : public Listener {
 private:
 	Archive*		archive;
 	MapTexHashMap	textures;
@@ -34,6 +35,8 @@ public:
 	GLTexture*	getFlat(string name);
 	GLTexture*	getSprite(string name);
 	GLTexture*	getThingImage(string name);
+
+	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 };
 
 #endif//__MAP_TEXTURE_MANAGER_H__
