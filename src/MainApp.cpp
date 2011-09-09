@@ -43,6 +43,7 @@
 #include "KeyBind.h"
 #include "ColourConfiguration.h"
 #include "Drawing.h"
+#include "MapEditorWindow.h"
 #include <wx/image.h>
 #include <wx/stdpaths.h>
 #include <wx/ffile.h>
@@ -79,6 +80,7 @@ CVAR(String, dir_last, "", CVAR_SAVE)
  * EXTERNAL VARIABLES
  *******************************************************************/
 extern string main_window_layout;
+extern string map_window_layout;
 
 
 /*******************************************************************
@@ -447,6 +449,7 @@ void MainApp::initActions() {
 	new SAction("mapw_mode_lines", "Lines Mode", "t_lines", "Change to lines editing mode", "", SAction::RADIO);
 	new SAction("mapw_mode_sectors", "Sectors Mode", "t_sectors", "Change to sectors editing mode", "", SAction::RADIO);
 	new SAction("mapw_mode_things", "Things Mode", "t_things", "Change to things editing mode", "", SAction::RADIO);
+	new SAction("mapw_showconsole", "&Console", "t_console", "Toggle the Console window", "Ctrl+2");
 }
 
 /* MainApp::OnInit
@@ -644,6 +647,11 @@ void MainApp::readConfigFile() {
 			main_window_layout = tz.getToken();
 		}
 
+		// Read saved map window AUI layout
+		if (!token.Cmp("map_window_layout")) {
+			map_window_layout = tz.getToken();
+		}
+
 		// Read base resource archive paths
 		if (!token.Cmp("base_resource_paths")) {
 			// Skip {
@@ -704,6 +712,10 @@ void MainApp::saveConfigFile() {
 	// Write main window AUI layout
 	string layout = S_FMT("%3d%s", MW_LAYOUT_VERS, main_window_layout.c_str());
 	file.Write(S_FMT("main_window_layout \"%s\"\n", CHR(layout)));
+
+	// Write map window AUI layout
+	layout = S_FMT("%3d%s", MEW_LAYOUT_VERS, map_window_layout.c_str());
+	file.Write(S_FMT("map_window_layout \"%s\"\n", CHR(layout)));
 
 	// Write base resource archive paths
 	file.Write("\nbase_resource_paths\n{\n");

@@ -31,6 +31,7 @@
 #include "WxStuff.h"
 #include "MapEditorWindow.h"
 #include "MainApp.h"
+#include "ConsolePanel.h"
 #include <wx/aui/aui.h>
 
 
@@ -38,6 +39,12 @@
  * VARIABLES
  *******************************************************************/
 MapEditorWindow* MapEditorWindow::instance = NULL;
+string map_window_layout = "";
+CVAR(Int, mew_width, 1024, CVAR_SAVE);
+CVAR(Int, mew_height, 768, CVAR_SAVE);
+CVAR(Int, mew_left, -1, CVAR_SAVE);
+CVAR(Int, mew_top, -1, CVAR_SAVE);
+CVAR(Bool, mew_maximized, true, CVAR_SAVE);
 
 
 /*******************************************************************
@@ -48,13 +55,15 @@ MapEditorWindow* MapEditorWindow::instance = NULL;
  * MapEditorWindow class constructor
  *******************************************************************/
 MapEditorWindow::MapEditorWindow()
-: wxFrame((wxFrame *) NULL, -1, "SLADE", wxPoint(0, 0), wxSize(1024, 768)) {
+: wxFrame((wxFrame *) NULL, -1, "SLADE", wxPoint(mew_left, mew_top), wxSize(mew_width, mew_height)) {
+	if (mew_maximized) Maximize();
 	setupLayout();
 	Show();
-	Maximize();
 
 	// Bind events
 	Bind(wxEVT_CLOSE_WINDOW, &MapEditorWindow::onClose, this);
+	Bind(wxEVT_MOVE, &MapEditorWindow::onMove, this);
+	Bind(wxEVT_SIZE, &MapEditorWindow::onSize, this);
 }
 
 /* MapEditorWindow::~MapEditorWindow
@@ -93,6 +102,11 @@ void MapEditorWindow::setupLayout() {
 	theApp->getAction("mapw_mode_things")->addToMenu(menu_mode);
 	menu->Append(menu_mode, "Mode");
 
+	// View menu
+	wxMenu* menu_view = new wxMenu("");
+	theApp->getAction("mapw_showconsole")->addToMenu(menu_view);
+	menu->Append(menu_view, "View");
+
 	SetMenuBar(menu);
 
 
@@ -119,6 +133,29 @@ void MapEditorWindow::setupLayout() {
 	// Status bar
 	CreateStatusBar();
 
+	// -- Console Panel --
+	ConsolePanel *panel_console = new ConsolePanel(this, -1);
+
+	// Setup panel info & add panel
+	p_inf.DefaultPane();
+	p_inf.Bottom();
+	p_inf.Dock();
+	p_inf.BestSize(480, 192);
+	p_inf.FloatingSize(600, 400);
+	p_inf.FloatingPosition(100, 100);
+	p_inf.MinSize(-1, 192);
+	p_inf.Show(false);
+	p_inf.Caption("Console");
+	p_inf.Name("console");
+	m_mgr->AddPane(panel_console, p_inf);
+
+	// Load previously saved perspective string
+	// Doesn't play nice for whatever reason (god I hate wxAUI, it's terrible)
+	//long vers = 0;
+	//map_window_layout.Left(3).ToLong(&vers);
+	//if (vers == MEW_LAYOUT_VERS)
+	//	m_mgr->LoadPerspective(map_window_layout.Right(map_window_layout.Length() - 3));
+
 	m_mgr->Update();
 	Layout();
 }
@@ -140,7 +177,62 @@ bool MapEditorWindow::openMap(Archive::mapdesc_t map) {
 	return ok;
 }
 
+/* MapEditorWindow::handleAction
+ * Handles the action [id]. Returns true if the action was handled,
+ * false otherwise
+ *******************************************************************/
+bool MapEditorWindow::handleAction(string id) {
+	// Don't handle actions if hidden
+	if (!IsShown())
+		return false;
+
+	// Only interested in mapw_ actions
+	if (!id.StartsWith("mapw_"))
+		return false;
+
+	// View->Console
+	if (id == "mapw_showconsole") {
+		wxAuiManager *m_mgr = wxAuiManager::GetManager(this);
+		wxAuiPaneInfo& p_inf = m_mgr->GetPane("console");
+		p_inf.Show(!p_inf.IsShown());
+		p_inf.MinSize(200, 128);
+		m_mgr->Update();
+		return true;
+	}
+
+	return false;
+}
+
 void MapEditorWindow::onClose(wxCloseEvent& e) {
+	// Save current layout
+	wxAuiManager *m_mgr = wxAuiManager::GetManager(this);
+	map_window_layout = m_mgr->SavePerspective();
+	mew_maximized = IsMaximized();
+
 	this->Show(false);
 	editor.clearMap();
+}
+
+/* MapEditorWindow::onSie
+ * Called when the window is resized
+ *******************************************************************/
+void MapEditorWindow::onSize(wxSizeEvent& e) {
+	// Update window size settings, but only if not maximized
+	if (!IsMaximized()) {
+		mew_width = GetSize().x;
+		mew_height = GetSize().y;
+	}
+}
+
+/* MapEditorWindow::onMove
+ * Called when the window moves
+ *******************************************************************/
+void MapEditorWindow::onMove(wxMoveEvent& e) {
+	// Update window position settings, but only if not maximized
+	if (!IsMaximized()) {
+		mew_left = GetPosition().x;
+		mew_top = GetPosition().y;
+	}
+
+	e.Skip();
 }

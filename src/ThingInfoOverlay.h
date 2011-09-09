@@ -7,7 +7,7 @@ class GLTexture;
 class ThingInfoOverlay {
 private:
 	vector<string>	info;
-	GLTexture*		sprite;
+	string			sprite;
 
 public:
 	ThingInfoOverlay();

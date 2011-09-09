@@ -39,6 +39,7 @@
 #include "PreferencesDialog.h"
 #include "Tokenizer.h"
 #include "SplashWindow.h"
+#include "MapEditorWindow.h"
 #include <wx/aboutdlg.h>
 #include <wx/dnd.h>
 #include <wx/statline.h>
@@ -367,6 +368,9 @@ bool MainWindow::exitProgram() {
 	// Close all archives
 	if (!panel_archivemanager->closeAll())
 		return false;
+
+	// Close map editor window (if open)
+	theMapEditor->Close();
 
 	// Save current layout
 	main_window_layout = m_mgr->SavePerspective();

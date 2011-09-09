@@ -5,8 +5,15 @@
 #include "MapCanvas.h"
 #include "MapEditor.h"
 #include "MapTextureManager.h"
+#include "MainApp.h"
 
-class MapEditorWindow : public wxFrame {
+// The below is needed because, if I add a toolbar or dockable window to the main window,
+// then a previously saved perspective is loaded from slade3.cfg, the new item won't show
+// up at all. So when saving the perspective, add this number to the start of the string,
+// and check against it when loading. In other words, wxAUI is silly.
+#define MEW_LAYOUT_VERS 001
+
+class MapEditorWindow : public wxFrame, public SActionHandler {
 private:
 	MapCanvas*			map_canvas;
 	MapEditor			editor;
@@ -33,8 +40,13 @@ public:
 	void	setupLayout();
 	bool	openMap(Archive::mapdesc_t map);
 
+	// SAction handler
+	bool	handleAction(string id);
+
 	// Events
 	void	onClose(wxCloseEvent& e);
+	void	onSize(wxSizeEvent& e);
+	void	onMove(wxMoveEvent& e);
 };
 
 // Define for less cumbersome MapEditorWindow::getInstance()

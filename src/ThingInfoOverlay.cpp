@@ -19,6 +19,7 @@ void ThingInfoOverlay::update(MapThing* thing) {
 		return;
 
 	info.clear();
+	sprite = "";
 
 	// Index + type
 	string type = S_FMT("Type %d (Unknown)", thing->getType());
@@ -55,9 +56,7 @@ void ThingInfoOverlay::update(MapThing* thing) {
 	info.push_back(S_FMT("Flags: %s", CHR(theGameConfiguration->thingFlagsString(thing->prop("flags")))));
 
 	// Set sprite
-	sprite = NULL;
-	if (!tt.getSprite().IsEmpty())
-		sprite = theMapEditor->textureManager().getSprite(tt.getSprite());
+	sprite = tt.getSprite();
 }
 
 void ThingInfoOverlay::draw(int bottom, int right, float alpha) {
@@ -91,19 +90,20 @@ void ThingInfoOverlay::draw(int bottom, int right, float alpha) {
 	}
 
 	// Draw sprite
+	GLTexture* tex = theMapEditor->textureManager().getSprite(sprite);
 	glEnable(GL_TEXTURE_2D);
 	rgba_t(255, 255, 255, 255*alpha, 0).set_gl();
-	if (sprite) {
-		sprite->bind();
+	if (tex) {
+		tex->bind();
 		glBegin(GL_QUADS);
-		glTexCoord2f(0.0f, 0.0f);	glVertex2d(right - 8 - sprite->getWidth(), bottom - 8 - sprite->getHeight());
-		glTexCoord2f(0.0f, 1.0f);	glVertex2d(right - 8 - sprite->getWidth(), bottom - 8);
+		glTexCoord2f(0.0f, 0.0f);	glVertex2d(right - 8 - tex->getWidth(), bottom - 8 - tex->getHeight());
+		glTexCoord2f(0.0f, 1.0f);	glVertex2d(right - 8 - tex->getWidth(), bottom - 8);
 		glTexCoord2f(1.0f, 1.0f);	glVertex2d(right - 8, bottom - 8);
-		glTexCoord2f(1.0f, 0.0f);	glVertex2d(right - 8, bottom - 8 - sprite->getHeight());
+		glTexCoord2f(1.0f, 0.0f);	glVertex2d(right - 8, bottom - 8 - tex->getHeight());
 		glEnd();
 	}
 	else {
-		GLTexture* tex = theMapEditor->textureManager().getThingImage("unknown");
+		tex = theMapEditor->textureManager().getThingImage("unknown");
 		if (tex) {
 			tex->bind();
 			glBegin(GL_QUADS);
