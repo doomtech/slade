@@ -65,13 +65,7 @@ MapCanvas::MapCanvas(wxWindow *parent, int id, MapEditor* editor)
 	mouse_state = MSTATE_NORMAL;
 	mouse_downpos.set(-1, -1);
 	fr_idle = 0;
-
-//#ifdef USE_SFML_RENDERWINDOW
-//	timer.Stop();
-//	UseVerticalSync(false);
-//#else
-//	timer.Start(2);
-//#endif
+	last_time = 0;
 
 	timer.Start(2);
 #ifdef USE_SFML_RENDERWINDOW
@@ -98,12 +92,6 @@ MapCanvas::MapCanvas(wxWindow *parent, int id, MapEditor* editor)
 #ifdef USE_SFML_RENDERWINDOW
 	Bind(wxEVT_IDLE, &MapCanvas::onIdle, this);
 #endif
-
-//#ifdef USE_SFML_RENDERWINDOW
-//	Bind(wxEVT_IDLE, &MapCanvas::onIdle, this);
-//#else
-//	Bind(wxEVT_TIMER, &MapCanvas::onTimer, this);
-//#endif
 }
 
 /* MapCanvas::~MapCanvas
@@ -430,7 +418,7 @@ void MapCanvas::update(long frametime) {
 
 	// Determine the framerate limit
 	if (mouse_state == MSTATE_SELECTION || mouse_state == MSTATE_PANNING || anim_running || fade_anim)
-		fr_idle = 5;
+		fr_idle = 2;
 	else {
 		// No high-priority animations running, throttle framerate
 		fr_idle = 30;
@@ -668,24 +656,24 @@ void MapCanvas::onMouseWheel(wxMouseEvent& e) {
 
 void MapCanvas::onIdle(wxIdleEvent& e) {
 	// Get time since last redraw
-	long frametime = theApp->runTimer() - last_time;
+	long frametime = (sfclock.GetElapsedTime() * 1000) - last_time;
 
 	if (frametime < fr_idle)
 		return;
 
-	last_time = theApp->runTimer();
+	last_time = (sfclock.GetElapsedTime() * 1000);
 	update(frametime);
 	Refresh();
 }
 
 void MapCanvas::onTimer(wxTimerEvent& e) {
 	// Get time since last redraw
-	long frametime = theApp->runTimer() - last_time;
+	long frametime = (sfclock.GetElapsedTime() * 1000) - last_time;
 
 	if (frametime < fr_idle)
 		return;
 
-	last_time = theApp->runTimer();
+	last_time = (sfclock.GetElapsedTime() * 1000);
 	update(frametime);
 	Refresh();
 }

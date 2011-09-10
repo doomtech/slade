@@ -20,6 +20,7 @@ private:
 	int						frametime_last;
 	vector<int>				fps_avg;
 	int						fr_idle;
+	sf::Clock				sfclock;
 
 	// Mouse stuff
 	enum {
