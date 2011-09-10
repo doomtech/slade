@@ -3,10 +3,15 @@
 #define __GAME_CONFIGURATION_H__
 
 #include "ActionSpecial.h"
-WX_DECLARE_HASH_MAP(int, ActionSpecial, wxIntegerHash, wxIntegerEqual, ASpecialMap);
-
 #include "ThingType.h"
-WX_DECLARE_HASH_MAP(int, ThingType, wxIntegerHash, wxIntegerEqual, ThingTypeMap);
+struct tt_t {
+	ThingType* type;
+	tt_t(ThingType* type = NULL) { this->type = type; }
+	~tt_t() { if (type) delete type; }
+};
+
+WX_DECLARE_HASH_MAP(int, ActionSpecial, wxIntegerHash, wxIntegerEqual, ASpecialMap);
+WX_DECLARE_HASH_MAP(int, tt_t, wxIntegerHash, wxIntegerEqual, ThingTypeMap);
 
 class ParseTreeNode;
 class ArchiveEntry;
@@ -16,6 +21,7 @@ private:
 	int				map_format;
 	ASpecialMap		action_specials;
 	ThingTypeMap	thing_types;
+	ThingType		ttype_unknown;
 	vector<string>	map_names;
 
 	// Flags
@@ -59,7 +65,8 @@ public:
 	string			actionSpecialName(int special);
 
 	// Thing types
-	ThingType&		thingType(unsigned type) { return thing_types[type]; }
+	ThingType*		thingType(unsigned type);
+	//ThingType&		thingType(unsigned type) { return thing_types[type]; }
 
 	// Flags
 	string		thingFlagsString(int flags);

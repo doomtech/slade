@@ -23,9 +23,9 @@ void ThingInfoOverlay::update(MapThing* thing) {
 
 	// Index + type
 	string type = S_FMT("Type %d (Unknown)", thing->getType());
-	ThingType& tt = theGameConfiguration->thingType(thing->getType());
-	if (tt.getName() != "Unknown")
-		type = tt.getName();
+	ThingType* tt = theGameConfiguration->thingType(thing->getType());
+	if (tt->getName() != "Unknown")
+		type = tt->getName();
 	info.push_back(S_FMT("Thing #%d: %s", thing->getIndex(), CHR(type)));
 
 	// Position
@@ -56,7 +56,7 @@ void ThingInfoOverlay::update(MapThing* thing) {
 	info.push_back(S_FMT("Flags: %s", CHR(theGameConfiguration->thingFlagsString(thing->prop("flags")))));
 
 	// Set sprite
-	sprite = tt.getSprite();
+	sprite = tt->getSprite();
 }
 
 void ThingInfoOverlay::draw(int bottom, int right, float alpha) {

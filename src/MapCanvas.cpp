@@ -62,9 +62,15 @@ MapCanvas::MapCanvas(wxWindow *parent, int id, MapEditor* editor)
 	anim_flash_level = 0.5f;
 	anim_flash_inc = true;
 	anim_info_fade = 0.0f;
-	timer.Start(10);
 	mouse_state = MSTATE_NORMAL;
 	mouse_downpos.set(-1, -1);
+
+#ifdef USE_SFML_RENDERWINDOW
+	timer.Stop();
+	UseVerticalSync(false);
+#else
+	timer.Start(10);
+#endif
 
 	// Bind Events
 	Bind(wxEVT_SIZE, &MapCanvas::onSize, this);
@@ -82,6 +88,9 @@ MapCanvas::MapCanvas(wxWindow *parent, int id, MapEditor* editor)
 	Bind(wxEVT_AUX2_UP, &MapCanvas::onMouseUp, this);
 	Bind(wxEVT_MOTION, &MapCanvas::onMouseMotion, this);
 	Bind(wxEVT_MOUSEWHEEL, &MapCanvas::onMouseWheel, this);
+#ifdef USE_SFML_RENDERWINDOW
+	Bind(wxEVT_IDLE, &MapCanvas::onIdle, this);
+#endif
 }
 
 /* MapCanvas::~MapCanvas
@@ -336,6 +345,18 @@ void MapCanvas::draw() {
 	else if (editor->editMode() == MapEditor::MODE_THINGS)
 		info_thing.draw(GetSize().y, GetSize().x, anim_info_fade);
 
+	// FPS counter
+	if (frametime_last > 0) {
+		int fps = 1.0 / (frametime_last/1000.0);
+		fps_avg.push_back(fps);
+		if (fps_avg.size() > 20) fps_avg.erase(fps_avg.begin());
+	}
+	int afps = 0;
+	for (unsigned a = 0; a < fps_avg.size(); a++)
+		afps += fps_avg[a];
+	afps /= fps_avg.size();
+	Drawing::drawText(S_FMT("FPS: %d", afps));
+
 	SwapBuffers();
 }
 
@@ -385,6 +406,8 @@ void MapCanvas::update(long frametime) {
 			a--;
 		}
 	}
+
+	frametime_last = frametime;
 }
 
 void MapCanvas::onKeyBindPress(string name) {
@@ -612,4 +635,13 @@ void MapCanvas::onMouseWheel(wxMouseEvent& e) {
 		KeyBind::keyPressed(keypress_t("mwheeldown", e.AltDown(), e.CmdDown(), e.ShiftDown()));
 		KeyBind::keyReleased("mwheeldown");
 	}
+}
+
+void MapCanvas::onIdle(wxIdleEvent& e) {
+	// Get time since last redraw
+	long frametime = theApp->runTimer() - last_time;
+	last_time = theApp->runTimer();
+
+	update(frametime);
+	Refresh();
 }

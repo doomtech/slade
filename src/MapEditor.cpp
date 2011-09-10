@@ -153,8 +153,8 @@ void MapEditor::drawThings(double xmin, double ymin, double xmax, double ymax, d
 		y = thing->yPos();
 
 		// Get thing type properties from game configuration
-		ThingType& tt = theGameConfiguration->thingType(thing->getType());
-		radius = tt.getRadius();
+		ThingType* tt = theGameConfiguration->thingType(thing->getType());
+		radius = tt->getRadius();
 
 		// Ignore if outside of screen
 		if (x+radius < xmin || x-radius > xmax || y+radius < ymin || y-radius > ymax)
@@ -175,7 +175,7 @@ void MapEditor::drawThings(double xmin, double ymin, double xmax, double ymax, d
 			// Round or sprite things
 
 			// Check for unknown type
-			if (tt.getName() == "Unknown") {
+			if (tt->getName() == "Unknown") {
 				tex = theMapEditor->textureManager().getThingImage("unknown");
 				flip = true;
 				COL_WHITE.set_gl();
@@ -183,23 +183,23 @@ void MapEditor::drawThings(double xmin, double ymin, double xmax, double ymax, d
 
 			// Check for 'things as sprites' option
 			if (!tex && things_sprites) {
-				tex = theMapEditor->textureManager().getSprite(tt.getSprite());
+				tex = theMapEditor->textureManager().getSprite(tt->getSprite());
 				if (tex) {
 					sprite = true;
 					COL_WHITE.set_gl();
 
 					// Add to list if we need to draw the direction arrow later
-					if (tt.isAngled() || things_force_dir)
+					if (tt->isAngled() || things_force_dir)
 						things_arrows.push_back(a);
 				}
 			}
 
 			// Normal thing image
 			if (!tex) {
-				tt.getColour().set_gl();
+				tt->getColour().set_gl();
 
 				// Rotate to angle (if needed)
-				if (tt.isAngled() || things_force_dir) {
+				if (tt->isAngled() || things_force_dir) {
 					glRotated(thing->prop("angle").getIntValue(), 0, 0, 1);
 					tex = theMapEditor->textureManager().getThingImage("normal_d");	// Set thing+angle indicator texture
 				}
@@ -256,7 +256,7 @@ void MapEditor::drawThings(double xmin, double ymin, double xmax, double ymax, d
 			glEnd();
 
 			// Draw base
-			tt.getColour().set_gl();
+			tt->getColour().set_gl();
 			glBegin(GL_QUADS);
 			glVertex2d(-radius+radius2, -radius+radius2);
 			glVertex2d(-radius+radius2, radius-radius2);
@@ -265,7 +265,7 @@ void MapEditor::drawThings(double xmin, double ymin, double xmax, double ymax, d
 			glEnd();
 
 			// Draw angle indicator (if needed)
-			if (tt.isAngled() || things_force_dir) {
+			if (tt->isAngled() || things_force_dir) {
 				COL_BLACK.set_gl();
 				glRotated(thing->prop("angle").getIntValue(), 0, 0, 1);
 				glBegin(GL_LINES);
@@ -394,7 +394,7 @@ void MapEditor::drawHilight(float flash_level) {
 		double y = thing->yPos();
 
 		// Get thing radius
-		double radius = theGameConfiguration->thingType(thing->getType()).getRadius();
+		double radius = theGameConfiguration->thingType(thing->getType())->getRadius();
 		if (things_square)
 			radius += 6;
 		else
@@ -545,7 +545,7 @@ void MapEditor::drawSelection(double xmin, double ymin, double xmax, double ymax
 			y = thing->yPos();
 
 			// Get thing radius
-			double radius = theGameConfiguration->thingType(thing->getType()).getRadius() + 8;
+			double radius = theGameConfiguration->thingType(thing->getType())->getRadius() + 8;
 
 			if (things_square) {
 				glBegin(GL_QUADS);
@@ -599,17 +599,17 @@ bool MapEditor::updateHilight(double dist_scale) {
 		vector<int> nearest = map.nearestThingMulti(mouse_pos.x, mouse_pos.y);
 		if (nearest.size() == 1) {
 			MapThing* t = map.getThing(nearest[0]);
-			ThingType& type = theGameConfiguration->thingType(t->getType());
+			ThingType* type = theGameConfiguration->thingType(t->getType());
 			double dist = MathStuff::distance(mouse_pos.x, mouse_pos.y, t->xPos(), t->yPos());
-			if (dist <= type.getRadius() + (32/dist_scale))
+			if (dist <= type->getRadius() + (32/dist_scale))
 				hilight_item = nearest[0];
 		}
 		else {
 			for (unsigned a = 0; a < nearest.size(); a++) {
 				MapThing* t = map.getThing(nearest[a]);
-				ThingType& type = theGameConfiguration->thingType(t->getType());
+				ThingType* type = theGameConfiguration->thingType(t->getType());
 				double dist = MathStuff::distance(mouse_pos.x, mouse_pos.y, t->xPos(), t->yPos());
-				if (dist <= type.getRadius() + (32/dist_scale))
+				if (dist <= type->getRadius() + (32/dist_scale))
 					hilight_item = nearest[a];
 			}
 		}

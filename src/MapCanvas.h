@@ -17,6 +17,8 @@ class MapCanvas : public OGLCanvas, public KeyBindHandler, public SActionHandler
 private:
 	MapEditor*				editor;
 	vector<MCAnimation*>	animations;
+	int						frametime_last;
+	vector<int>				fps_avg;
 
 	// Mouse stuff
 	enum {
@@ -80,7 +82,7 @@ public:
 	void	onMouseUp(wxMouseEvent& e);
 	void	onMouseMotion(wxMouseEvent& e);
 	void	onMouseWheel(wxMouseEvent& e);
-	void	onTimer(wxTimerEvent& e);
+	void	onIdle(wxIdleEvent& e);
 };
 
 #endif //__MAPCANVAS_H__

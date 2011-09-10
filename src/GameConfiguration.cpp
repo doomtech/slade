@@ -218,21 +218,25 @@ void GameConfiguration::readThingTypes(ParseTreeNode* node) {
 			long type;
 			child->getName().ToLong(&type);
 
+			// Create thing type object if needed
+			if (!thing_types[type].type)
+				thing_types[type].type = new ThingType();
+
 			// Reset the thing type (in case it's being redefined for whatever reason)
-			thing_types[type].reset();
+			thing_types[type].type->reset();
 
 			// Apply group defaults
-			thing_types[type].colour = col_default;
-			thing_types[type].radius = radius_default;
-			thing_types[type].angled = angle;
-			thing_types[type].hanging = hanging;
-			thing_types[type].group = groupname;
+			thing_types[type].type->colour = col_default;
+			thing_types[type].type->radius = radius_default;
+			thing_types[type].type->angled = angle;
+			thing_types[type].type->hanging = hanging;
+			thing_types[type].type->group = groupname;
 			
 			// Check for simple definition
 			if (child->isLeaf())
-				thing_types[type].name = child->getStringValue();
+				thing_types[type].type->name = child->getStringValue();
 			else
-				thing_types[type].parse(child);	// Extended definition
+				thing_types[type].type->parse(child);	// Extended definition
 		}
 	}
 }
@@ -407,6 +411,14 @@ string GameConfiguration::actionSpecialName(int special) {
 	return action_specials[special].getName();
 }
 
+ThingType* GameConfiguration::thingType(unsigned type) {
+	tt_t& ttype = thing_types[type];
+	if (ttype.type)
+		return ttype.type;
+	else
+		return &ttype_unknown;
+}
+
 string GameConfiguration::thingFlagsString(int flags) {
 	// Check against all flags
 	string ret = "";
@@ -459,7 +471,7 @@ void GameConfiguration::dumpThingTypes() {
 	ThingTypeMap::iterator i = thing_types.begin();
 	
 	while (i != thing_types.end()) {
-		wxLogMessage("Thing type %d = %s", i->first, CHR(i->second.stringDesc()));
+		wxLogMessage("Thing type %d = %s", i->first, CHR(i->second.type->stringDesc()));
 		i++;
 	}
 }

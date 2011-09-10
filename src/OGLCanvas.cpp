@@ -280,9 +280,9 @@ void OGLCanvas::onIdle(wxIdleEvent& e) {
 void OGLCanvas::onTimer(wxTimerEvent& e) {
 	// Get time since last redraw
 	long frametime = theApp->runTimer() - last_time;
+	last_time = theApp->runTimer();
 
 	// Update/refresh
 	update(frametime);
 	Refresh();
-	last_time = theApp->runTimer();
 }
