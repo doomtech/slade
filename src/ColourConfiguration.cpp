@@ -149,3 +149,13 @@ CONSOLE_COMMAND(ccfg, 1) {
 		theConsole->logMessage(S_FMT("Colour \"%s\" = %d %d %d %d %d", CHR(args[0]), col.r, col.g, col.b, col.a, col.blend));
 	}
 }
+
+CONSOLE_COMMAND(load_ccfg, 1) {
+	// Determine full path string to entry
+	string path = S_FMT("config/colours/%s.txt", CHR(args[0]));
+	Archive* pres = theArchiveManager->programResourceArchive();
+	ArchiveEntry* entry_cc = pres->entryAtPath(path);
+
+	if (entry_cc)
+		ColourConfiguration::readConfiguration(entry_cc->getMCData());
+}

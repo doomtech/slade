@@ -64,12 +64,18 @@ MapCanvas::MapCanvas(wxWindow *parent, int id, MapEditor* editor)
 	anim_info_fade = 0.0f;
 	mouse_state = MSTATE_NORMAL;
 	mouse_downpos.set(-1, -1);
+	fr_idle = 0;
 
+//#ifdef USE_SFML_RENDERWINDOW
+//	timer.Stop();
+//	UseVerticalSync(false);
+//#else
+//	timer.Start(2);
+//#endif
+
+	timer.Start(2);
 #ifdef USE_SFML_RENDERWINDOW
-	timer.Stop();
 	UseVerticalSync(false);
-#else
-	timer.Start(10);
 #endif
 
 	// Bind Events
@@ -88,9 +94,16 @@ MapCanvas::MapCanvas(wxWindow *parent, int id, MapEditor* editor)
 	Bind(wxEVT_AUX2_UP, &MapCanvas::onMouseUp, this);
 	Bind(wxEVT_MOTION, &MapCanvas::onMouseMotion, this);
 	Bind(wxEVT_MOUSEWHEEL, &MapCanvas::onMouseWheel, this);
+	Bind(wxEVT_TIMER, &MapCanvas::onTimer, this);
 #ifdef USE_SFML_RENDERWINDOW
 	Bind(wxEVT_IDLE, &MapCanvas::onIdle, this);
 #endif
+
+//#ifdef USE_SFML_RENDERWINDOW
+//	Bind(wxEVT_IDLE, &MapCanvas::onIdle, this);
+//#else
+//	Bind(wxEVT_TIMER, &MapCanvas::onTimer, this);
+//#endif
 }
 
 /* MapCanvas::~MapCanvas
@@ -354,7 +367,7 @@ void MapCanvas::draw() {
 	int afps = 0;
 	for (unsigned a = 0; a < fps_avg.size(); a++)
 		afps += fps_avg[a];
-	afps /= fps_avg.size();
+	if (fps_avg.size() > 0) afps /= fps_avg.size();
 	Drawing::drawText(S_FMT("FPS: %d", afps));
 
 	SwapBuffers();
@@ -386,18 +399,24 @@ void MapCanvas::update(long frametime) {
 	}
 
 	// Fader for info overlay
+	bool fade_anim = true;
 	if (anim_info_show) {
 		anim_info_fade += 0.1f*mult;
-		if (anim_info_fade > 1.0f)
+		if (anim_info_fade > 1.0f) {
 			anim_info_fade = 1.0f;
+			fade_anim = false;
+		}
 	}
 	else {
 		anim_info_fade -= 0.05f*mult;
-		if (anim_info_fade < 0.0f)
+		if (anim_info_fade < 0.0f) {
 			anim_info_fade = 0.0f;
+			fade_anim = false;
+		}
 	}
 
 	// Update animations
+	bool anim_running = false;
 	for (unsigned a = 0; a < animations.size(); a++) {
 		if (!animations[a]->update(theApp->runTimer())) {
 			// If animation is finished, delete and remove from the list
@@ -405,6 +424,16 @@ void MapCanvas::update(long frametime) {
 			animations.erase(animations.begin() + a);
 			a--;
 		}
+		else
+			anim_running = true;
+	}
+
+	// Determine the framerate limit
+	if (mouse_state == MSTATE_SELECTION || mouse_state == MSTATE_PANNING || anim_running || fade_anim)
+		fr_idle = 5;
+	else {
+		// No high-priority animations running, throttle framerate
+		fr_idle = 30;
 	}
 
 	frametime_last = frametime;
@@ -640,8 +669,23 @@ void MapCanvas::onMouseWheel(wxMouseEvent& e) {
 void MapCanvas::onIdle(wxIdleEvent& e) {
 	// Get time since last redraw
 	long frametime = theApp->runTimer() - last_time;
-	last_time = theApp->runTimer();
 
+	if (frametime < fr_idle)
+		return;
+
+	last_time = theApp->runTimer();
+	update(frametime);
+	Refresh();
+}
+
+void MapCanvas::onTimer(wxTimerEvent& e) {
+	// Get time since last redraw
+	long frametime = theApp->runTimer() - last_time;
+
+	if (frametime < fr_idle)
+		return;
+
+	last_time = theApp->runTimer();
 	update(frametime);
 	Refresh();
 }

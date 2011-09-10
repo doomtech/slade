@@ -19,6 +19,7 @@ private:
 	vector<MCAnimation*>	animations;
 	int						frametime_last;
 	vector<int>				fps_avg;
+	int						fr_idle;
 
 	// Mouse stuff
 	enum {
@@ -83,6 +84,7 @@ public:
 	void	onMouseMotion(wxMouseEvent& e);
 	void	onMouseWheel(wxMouseEvent& e);
 	void	onIdle(wxIdleEvent& e);
+	void	onTimer(wxTimerEvent& e);
 };
 
 #endif //__MAPCANVAS_H__
