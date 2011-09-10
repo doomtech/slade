@@ -143,7 +143,7 @@ void MapEditor::drawThings(double xmin, double ymin, double xmax, double ymax, d
 	MapThing* thing = NULL;
 	GLTexture* tex_last = NULL;
 	GLTexture* tex = NULL;
-	double x, y, radius, rad2;
+	double x, y, radius, radius2;
 	bool flip, sprite;
 	vector<int> things_arrows;
 	for (unsigned a = 0; a < map.things.size(); a++) {
@@ -244,7 +244,7 @@ void MapEditor::drawThings(double xmin, double ymin, double xmax, double ymax, d
 		}
 		else {
 			// Square things
-			rad2 = radius * 0.1;
+			radius2 = radius * 0.1;
 
 			// Draw background
 			COL_BLACK.set_gl();
@@ -258,10 +258,10 @@ void MapEditor::drawThings(double xmin, double ymin, double xmax, double ymax, d
 			// Draw base
 			tt.getColour().set_gl();
 			glBegin(GL_QUADS);
-			glVertex2d(-radius+rad2, -radius+rad2);
-			glVertex2d(-radius+rad2, radius-rad2);
-			glVertex2d(radius-rad2, radius-rad2);
-			glVertex2d(radius-rad2, -radius+rad2);
+			glVertex2d(-radius+radius2, -radius+radius2);
+			glVertex2d(-radius+radius2, radius-radius2);
+			glVertex2d(radius-radius2, radius-radius2);
+			glVertex2d(radius-radius2, -radius+radius2);
 			glEnd();
 
 			// Draw angle indicator (if needed)
