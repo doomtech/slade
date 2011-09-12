@@ -77,6 +77,11 @@ public:
 	MapLine*	getLine(unsigned index);
 	MapSector*	getSector(unsigned index);
 	MapThing*	getThing(unsigned index);
+	int			nVertices() { return vertices.size(); }
+	int			nLines() { return lines.size(); }
+	int			nSides() { return sides.size(); }
+	int			nSectors() { return sectors.size(); }
+	int			nThings() { return things.size(); }
 
 	// Map structure indices
 	int		vertexIndex(MapVertex* v);

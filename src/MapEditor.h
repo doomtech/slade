@@ -72,6 +72,7 @@ public:
 	void		getSelectedLines(vector<MapLine*>& list);
 	void		getSelectedSectors(vector<MapSector*>& list);
 	void		getSelectedThings(vector<MapThing*>& list);
+	void		showItem(int index);
 
 	// Grid
 	void	incrementGrid();

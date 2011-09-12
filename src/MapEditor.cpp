@@ -7,6 +7,7 @@
 #include "MapEditorWindow.h"
 #include "GameConfiguration.h"
 #include "MathStuff.h"
+#include "Console.h"
 
 double grid_sizes[] = { 0.05, 0.1, 0.25, 0.5, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192 };
 CVAR(Bool, things_sprites, false, CVAR_SAVE)
@@ -869,6 +870,21 @@ void MapEditor::getSelectedThings(vector<MapThing*>& list) {
 		list.push_back(map.getThing(hilight_item));
 }
 
+void MapEditor::showItem(int index) {
+	selection.clear();
+	int max = 0;
+	switch (edit_mode) {
+	case MODE_VERTICES: max = map.nVertices(); break;
+	case MODE_LINES: max = map.nLines(); break;
+	case MODE_SECTORS: max = map.nSectors(); break;
+	case MODE_THINGS: max = map.nThings(); break;
+	default: max = 0; break;
+	}
+
+	if (index < max)
+		selection.push_back(index);
+}
+
 void MapEditor::incrementGrid() {
 	gridsize++;
 	if (gridsize > 18)
@@ -880,4 +896,9 @@ void MapEditor::decrementGrid() {
 	gridsize--;
 	if (gridsize < 4)
 		gridsize = 4;
+}
+
+CONSOLE_COMMAND(m_show_item, 1) {
+	int index = atoi(CHR(args[0]));
+	theMapEditor->mapEditor().showItem(index);
 }
