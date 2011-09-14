@@ -13,6 +13,7 @@ double grid_sizes[] = { 0.05, 0.1, 0.25, 0.5, 1, 2, 4, 8, 16, 32, 64, 128, 256, 
 CVAR(Bool, things_sprites, false, CVAR_SAVE)
 CVAR(Bool, things_force_dir, false, CVAR_SAVE)
 CVAR(Bool, things_square, false, CVAR_SAVE)
+CVAR(Float, line_width, 1.5f, CVAR_SAVE)
 
 EXTERN_CVAR(Int, vertex_size)
 
@@ -72,6 +73,9 @@ void MapEditor::drawVertices(double xmin, double ymin, double xmax, double ymax)
 void MapEditor::drawLines(double xmin, double ymin, double xmax, double ymax, bool show_direction) {
 	// Temp for now
 	float fade_coeff = 0.5f;
+
+	// Set line width
+	glLineWidth(line_width);
 
 	// Get line colours
 	rgba_t col_background = ColourConfiguration::getColour("map_background");
@@ -347,6 +351,9 @@ void MapEditor::drawHilight(float flash_level) {
 		glEnd();
 	}
 	else if (edit_mode == MODE_LINES) {
+		// Set line width
+		glLineWidth(line_width*3);
+
 		// Line
 		MapLine* line = map.lines[hilight_item];
 		double x1 = line->v1()->xPos();
@@ -370,6 +377,9 @@ void MapEditor::drawHilight(float flash_level) {
 	}
 	else if (edit_mode == MODE_SECTORS) {
 		// Sector
+
+		// Set line width
+		glLineWidth(line_width*3);
 
 		// Get all lines belonging to the hilighted sector
 		vector<MapLine*> lines;
@@ -459,6 +469,9 @@ void MapEditor::drawSelection(double xmin, double ymin, double xmax, double ymax
 		glEnd();
 	}
 	else if (edit_mode == MODE_LINES) {
+		// Set line width
+		glLineWidth(line_width*4);
+
 		// Lines
 		MapLine* line;
 		double x1, y1, x2, y2;
@@ -493,6 +506,9 @@ void MapEditor::drawSelection(double xmin, double ymin, double xmax, double ymax
 	}
 	else if (edit_mode == MODE_SECTORS) {
 		// Sectors
+
+		// Set line width
+		glLineWidth(line_width*4);
 
 		// Get selected sector(s)
 		vector<MapSector*> selected_sectors;
@@ -720,6 +736,14 @@ bool MapEditor::selectWithin(double xmin, double ymin, double xmax, double ymax)
 
 	// Sectors
 	else if (edit_mode == MODE_SECTORS) {
+		// Go through sectors
+		fpoint2_t pmin(xmin, ymin);
+		fpoint2_t pmax(xmax, ymax);
+		for (unsigned a = 0; a < map.sectors.size(); a++) {
+			// Check if sector's bbox fits within the selection box
+			if (map.sectors[a]->boundingBox().is_within(pmin, pmax))
+				selection.push_back(a);
+		}
 	}
 
 	// Things

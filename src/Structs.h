@@ -552,6 +552,55 @@ struct plane_t {
 };
 
 
+// bbox_t: A simple bounding box with related functions
+struct bbox_t {
+	fpoint2_t	min;
+	fpoint2_t	max;
+
+	bbox_t() { reset(); }
+
+	void reset() {
+		min.set(0, 0);
+		max.set(0, 0);
+	}
+
+	void extend(double x, double y) {
+		// Init bbox if it has been reset last
+		if (min.x == 0 && min.y == 0 && max.x == 0 && max.y == 0) {
+			min.set(x, y);
+			max.set(x, y);
+			return;
+		}
+
+		// Extend to fit the point [x,y]
+		if (x < min.x)
+			min.x = x;
+		if (x > max.x)
+			max.x = x;
+		if (y < min.y)
+			min.y = y;
+		if (y > max.y)
+			max.y = y;
+	}
+
+	bool point_within(double x, double y) {
+		return (x >= min.x && x <= max.x && y >= min.y && y <= max.y);
+	}
+
+	bool is_within(fpoint2_t bmin, fpoint2_t bmax) {
+		return (min.x >= bmin.x && max.x <= bmax.x && min.y >= bmin.y && max.y <= bmax.y);
+	}
+
+	bool is_valid() {
+		return ((max.x - min.x > 0) && (max.y - min.y) > 0);
+	}
+
+	fpoint2_t size() {
+		return fpoint2_t(max.x - min.x, max.y - min.y);
+	}
+};
+
+
 // patch_header_t: The header of a doom-format gfx image
 struct patch_header_t
 {

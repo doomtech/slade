@@ -46,6 +46,7 @@
 CVAR(Bool, vertex_round, true, CVAR_SAVE)
 CVAR(Bool, line_smooth, true, CVAR_SAVE)
 CVAR(Int, vertex_size, 7, CVAR_SAVE)
+CVAR(Bool, grid_dashed, false, CVAR_SAVE)
 
 
 /* MapCanvas::MapCanvas
@@ -172,6 +173,12 @@ void MapCanvas::drawGrid() {
 	glDisable(GL_LINE_SMOOTH);
 	glLineWidth(1.0f);
 
+	// Enable dashed lines if needed
+	if (grid_dashed) {
+		glLineStipple(2, 0xAAAA);
+		glEnable(GL_LINE_STIPPLE);
+	}
+
 	ColourConfiguration::getColour("map_grid").set_gl();
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -227,6 +234,8 @@ void MapCanvas::drawGrid() {
 			glEnd();
 		}
 	}
+
+	glDisable(GL_LINE_STIPPLE);
 }
 
 /* MapCanvas::draw

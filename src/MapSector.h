@@ -41,6 +41,7 @@ private:
 
 	// Internal info
 	vector<MapSide*>	connected_sides;
+	bbox_t				bbox;
 
 	// Properties
 	PropertyList	udmf_props;
@@ -56,6 +57,10 @@ public:
 
 	PropertyList&	props()				{ return udmf_props; }
 	Property&		prop(string key)	{ return udmf_props[key]; }
+
+	bbox_t	boundingBox() { return bbox; }
+
+	void	updateBBox();
 };
 
 #endif //__MAPSECTOR_H__

@@ -48,6 +48,7 @@ public:
 
 	unsigned	getIndex() { return index; }
 	MapSector*	getSector() { return sector; }
+	MapLine*	getParentLine() { return parent; }
 
 	PropertyList&	props()				{ return udmf_props; }
 	Property&		prop(string key)	{ return udmf_props[key]; }

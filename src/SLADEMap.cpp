@@ -447,6 +447,10 @@ bool SLADEMap::readDoomMap(Archive::mapdesc_t map) {
 	// Update item indices
 	refreshIndices();
 
+	// Update sector bounding boxes
+	for (unsigned a = 0; a < sectors.size(); a++)
+		sectors[a]->updateBBox();
+
 	return true;
 }
 
@@ -602,6 +606,10 @@ bool SLADEMap::readHexenMap(Archive::mapdesc_t map) {
 	// Update item indices
 	refreshIndices();
 
+	// Update sector bounding boxes
+	for (unsigned a = 0; a < sectors.size(); a++)
+		sectors[a]->updateBBox();
+
 	return true;
 }
 
@@ -723,6 +731,10 @@ bool SLADEMap::readDoom64Map(Archive::mapdesc_t map) {
 
 	// Update item indices
 	refreshIndices();
+
+	// Update sector bounding boxes
+	for (unsigned a = 0; a < sectors.size(); a++)
+		sectors[a]->updateBBox();
 
 	return true;
 }
@@ -971,6 +983,10 @@ bool SLADEMap::readUDMFMap(Archive::mapdesc_t map) {
 
 	// Update item indices
 	refreshIndices();
+
+	// Update sector bounding boxes
+	for (unsigned a = 0; a < sectors.size(); a++)
+		sectors[a]->updateBBox();
 
 	return true;
 }
