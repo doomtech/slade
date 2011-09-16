@@ -82,6 +82,9 @@ void MapEditor::drawLines(double xmin, double ymin, double xmax, double ymax, bo
 	rgba_t col_line_normal = ColourConfiguration::getColour("map_line_normal");
 	rgba_t col_line_special = ColourConfiguration::getColour("map_line_special");
 
+	// Set line width
+	glLineWidth(line_width);
+
 	// Draw all lines
 	rgba_t col;
 	MapLine* line = NULL;
@@ -314,7 +317,6 @@ void MapEditor::drawThings(double xmin, double ymin, double xmax, double ymax, d
 	// Disable textures
 	if (!things_square)
 		glDisable(GL_TEXTURE_2D);
-	glLineWidth(1.0f);
 }
 
 void MapEditor::drawMap(double xmin, double ymin, double xmax, double ymax, double view_scale) {
@@ -340,7 +342,7 @@ void MapEditor::drawHilight(float flash_level) {
 	col.a *= flash_level;
 	col.set_gl();
 
-	glLineWidth(3.0f);
+	glLineWidth(line_width*3);
 	glPointSize(vertex_size*1.5f);
 
 	// Draw depending on mode
@@ -438,7 +440,6 @@ void MapEditor::drawHilight(float flash_level) {
 		}
 	}
 
-	glLineWidth(1.5f);
 	glPointSize(vertex_size);
 }
 
@@ -450,7 +451,7 @@ void MapEditor::drawSelection(double xmin, double ymin, double xmax, double ymax
 	// Set selection colour
 	ColourConfiguration::getColour("map_selection").set_gl();
 
-	glLineWidth(4.0f);
+	glLineWidth(line_width*4);
 	glPointSize(vertex_size*1.5f);
 
 	// Draw depending on mode
@@ -595,7 +596,6 @@ void MapEditor::drawSelection(double xmin, double ymin, double xmax, double ymax
 		}
 	}
 
-	glLineWidth(1.5f);
 	glPointSize(vertex_size);
 }
 

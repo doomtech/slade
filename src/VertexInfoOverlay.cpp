@@ -40,10 +40,16 @@ void VertexInfoOverlay::draw(int bottom, int right, float alpha) {
 	bottom += 16*alpha_inv*alpha_inv;
 
 	// Draw overlay background
-	rgba_t(col_bg.r, col_bg.g, col_bg.b, alpha*60, 0).set_gl();
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glColor4f(col_bg.fr(), col_bg.fg(), col_bg.fb(), col_bg.fa()*alpha);
 	Drawing::drawFilledRect(0, bottom - 16, right, bottom);
-	Drawing::drawFilledRect(0, bottom - 18, right, bottom);
-	Drawing::drawFilledRect(0, bottom - 20, right, bottom);
+	glBegin(GL_QUADS);
+	glVertex2d(0, bottom - 16);
+	glVertex2d(right, bottom - 16);
+	glColor4f(col_bg.fr(), col_bg.fg(), col_bg.fb(), 0.0f);
+	glVertex2d(right, bottom - 32);
+	glVertex2d(0, bottom - 32);
+	glEnd();
 
 	// Draw text
 	Drawing::drawText(info, 2, bottom - 16, col_fg);

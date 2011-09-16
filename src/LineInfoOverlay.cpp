@@ -74,20 +74,43 @@ void LineInfoOverlay::draw(int bottom, int right, float alpha) {
 	// Determine overlay height
 	int height = info.size() * 16;
 
-	// Slide in/out animation
-	float alpha_inv = 1.0f - alpha;
-	bottom += height*alpha_inv*alpha_inv;
-
 	// Get colours
 	rgba_t col_bg = ColourConfiguration::getColour("map_overlay_background");
 	rgba_t col_fg = ColourConfiguration::getColour("map_overlay_foreground");
 	col_fg.a = col_fg.a*alpha;
 
+	// Slide in/out animation
+	float alpha_inv = 1.0f - alpha;
+	int bottom2 = bottom;
+	bottom += height*alpha_inv*alpha_inv;
+
 	// Draw overlay background
-	rgba_t(col_bg.r, col_bg.g, col_bg.b, 80*alpha, 0).set_gl();
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glColor4f(col_bg.fr(), col_bg.fg(), col_bg.fb(), col_bg.fa()*alpha);
 	Drawing::drawFilledRect(0, bottom - height, right, bottom);
-	Drawing::drawFilledRect(0, bottom - height+2, right, bottom);
-	Drawing::drawFilledRect(0, bottom - height+4, right, bottom);
+	glBegin(GL_QUADS);
+	glVertex2d(0, bottom - height);
+	glVertex2d(right, bottom - height);
+	glColor4f(col_bg.fr(), col_bg.fg(), col_bg.fb(), 0.0f);
+	glVertex2d(right, bottom - height - 16);
+	glVertex2d(0, bottom - height - 16);
+	glEnd();
+
+	// Test
+	/*
+	double twidth = right*0.3;
+	glLineWidth(1.0f);
+	glBegin(GL_LINES);
+	col_fg.set_gl();
+	glVertex2d(0, bottom2 - height);
+	glColor4f(col_fg.fr(), col_fg.fg(), col_fg.fb(), 0.0f);
+	glVertex2d(twidth*alpha, bottom2 - height);
+	glVertex2d(right-(twidth*alpha), bottom2 - height);
+	//glColor4f(col_fg.fr(), col_fg.fg(), col_fg.fb(), 1.0f);
+	col_fg.set_gl();
+	glVertex2d(right, bottom2 - height);
+	glEnd();
+	*/
 
 	// Draw info text lines
 	int y = height;

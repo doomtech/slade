@@ -9,6 +9,7 @@
 #include "ThingInfoOverlay.h"
 #include "KeyBind.h"
 #include "MainApp.h"
+#include <SFML/System.hpp>
 
 class MapEditor;
 class MCAnimation;

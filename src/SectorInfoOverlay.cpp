@@ -56,10 +56,16 @@ void SectorInfoOverlay::draw(int bottom, int right, float alpha) {
 	col_fg.a = col_fg.a*alpha;
 
 	// Draw overlay background
-	rgba_t(col_bg.r, col_bg.g, col_bg.b, 80*alpha, 0).set_gl();
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glColor4f(col_bg.fr(), col_bg.fg(), col_bg.fb(), col_bg.fa()*alpha);
 	Drawing::drawFilledRect(0, bottom - height, right, bottom);
-	Drawing::drawFilledRect(0, bottom - height+2, right, bottom);
-	Drawing::drawFilledRect(0, bottom - height+4, right, bottom);
+	glBegin(GL_QUADS);
+	glVertex2d(0, bottom - height);
+	glVertex2d(right, bottom - height);
+	glColor4f(col_bg.fr(), col_bg.fg(), col_bg.fb(), 0.0f);
+	glVertex2d(right, bottom - height - 16);
+	glVertex2d(0, bottom - height - 16);
+	glEnd();
 
 	// Draw info text lines
 	int y = height;

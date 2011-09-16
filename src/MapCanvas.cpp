@@ -405,7 +405,8 @@ void MapCanvas::update(long frametime) {
 		}
 	}
 	else {
-		anim_info_fade -= 0.05f*mult;
+		//anim_info_fade -= 0.05f*mult;
+		anim_info_fade -= 0.04f*mult;
 		if (anim_info_fade < 0.0f) {
 			anim_info_fade = 0.0f;
 			fade_anim = false;
@@ -426,8 +427,13 @@ void MapCanvas::update(long frametime) {
 	}
 
 	// Determine the framerate limit
-	if (mouse_state == MSTATE_SELECTION || mouse_state == MSTATE_PANNING || anim_running || fade_anim)
-		fr_idle = 2;
+	if (mouse_state == MSTATE_SELECTION || mouse_state == MSTATE_PANNING || anim_running || fade_anim) {
+#ifdef USE_SFML_RENDERWINDOW
+		fr_idle = 2;	// SFML RenderWindow can handle high framerates better than wxGLCanvas, or something like that
+#else
+		fr_idle = 5;
+#endif
+	}
 	else {
 		// No high-priority animations running, throttle framerate
 		fr_idle = 30;
