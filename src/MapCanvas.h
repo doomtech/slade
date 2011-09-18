@@ -85,6 +85,8 @@ public:
 	void	onMouseUp(wxMouseEvent& e);
 	void	onMouseMotion(wxMouseEvent& e);
 	void	onMouseWheel(wxMouseEvent& e);
+	void	onMouseLeave(wxMouseEvent& e);
+	void	onMouseEnter(wxMouseEvent& e);
 	void	onIdle(wxIdleEvent& e);
 	void	onTimer(wxTimerEvent& e);
 };

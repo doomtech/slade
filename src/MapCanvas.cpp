@@ -89,6 +89,8 @@ MapCanvas::MapCanvas(wxWindow *parent, int id, MapEditor* editor)
 	Bind(wxEVT_AUX2_UP, &MapCanvas::onMouseUp, this);
 	Bind(wxEVT_MOTION, &MapCanvas::onMouseMotion, this);
 	Bind(wxEVT_MOUSEWHEEL, &MapCanvas::onMouseWheel, this);
+	Bind(wxEVT_LEAVE_WINDOW, &MapCanvas::onMouseLeave, this);
+	Bind(wxEVT_ENTER_WINDOW, &MapCanvas::onMouseEnter, this);
 	Bind(wxEVT_TIMER, &MapCanvas::onTimer, this);
 #ifdef USE_SFML_RENDERWINDOW
 	Bind(wxEVT_IDLE, &MapCanvas::onIdle, this);
@@ -667,6 +669,23 @@ void MapCanvas::onMouseWheel(wxMouseEvent& e) {
 		KeyBind::keyPressed(keypress_t("mwheeldown", e.AltDown(), e.CmdDown(), e.ShiftDown()));
 		KeyBind::keyReleased("mwheeldown");
 	}
+}
+
+void MapCanvas::onMouseLeave(wxMouseEvent& e) {
+	// Stop panning
+	if (mouse_state == MSTATE_PANNING) {
+		mouse_state = MSTATE_NORMAL;
+		SetCursor(wxNullCursor);
+	}
+
+	e.Skip();
+}
+
+void MapCanvas::onMouseEnter(wxMouseEvent& e) {
+	// Set focus
+	SetFocus();
+
+	e.Skip();
 }
 
 void MapCanvas::onIdle(wxIdleEvent& e) {
