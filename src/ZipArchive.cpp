@@ -35,6 +35,7 @@
 #include <wx/zipstrm.h>
 #include <wx/ptr_scpd.h>
 #include <wx/filename.h>
+#include <wx/msgdlg.h>
 #include <algorithm>
 
 
@@ -125,21 +126,29 @@ bool ZipArchive::open(string filename) {
 			//zipdir_t* ndir = addDirectory(fn.GetPath(true, wxPATH_UNIX));
 			//ndir->entries.push_back(new_entry);
 
-			// Read the data
-			uint8_t* data = new uint8_t[entry->GetSize()];
-			zip.Read(data, entry->GetSize());
-			new_entry->importMem(data, entry->GetSize());
-			new_entry->setLoaded(true);
+			// Read the data, if possible
+			if (entry->GetSize() < 250 * 1024 * 1024)
+			{
+				uint8_t* data = new uint8_t[entry->GetSize()];
+				zip.Read(data, entry->GetSize());	// Note: this is where exceedingly large files cause an exception.
+				new_entry->importMem(data, entry->GetSize());
+				new_entry->setLoaded(true);
 
-			// Determine its type
-			EntryType::detectEntryType(new_entry);
+				// Determine its type
+				EntryType::detectEntryType(new_entry);
 
-			// Unload data if needed
-			if (!archive_load_data)
-				new_entry->unloadData();
+				// Unload data if needed
+				if (!archive_load_data)
+					new_entry->unloadData();
 
-			// Clean up
-			delete[] data;
+				// Clean up
+				delete[] data;
+			} else {
+				Global::error = S_FMT("Entry too large: %s is %u mb", 
+					CHR(entry->GetName(wxPATH_UNIX)), entry->GetSize() / (1<<20));
+				setMuted(false);
+				return false;
+			}
 		} else {
 			// Zip entry is a directory, add it to the directory tree
 			wxFileName fn(entry->GetName(wxPATH_UNIX), wxPATH_UNIX);

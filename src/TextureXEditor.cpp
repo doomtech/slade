@@ -329,6 +329,7 @@ bool TextureXEditor::openArchive(Archive* archive) {
 
 	// Update layout
 	Layout();
+	tabs->Refresh();
 
 	// Update variables
 	this->archive = archive;

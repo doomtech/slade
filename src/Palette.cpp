@@ -33,6 +33,8 @@
 #include "Misc.h"
 #include "Translation.h"
 #include "SIFormat.h"
+#include "Tokenizer.h"
+#include <wx/filename.h>
 
 
 /*******************************************************************
@@ -109,10 +111,122 @@ bool Palette8bit::loadMem(const uint8_t* data, uint32_t size) {
 	return true;
 }
 
+/* Palette8bit::loadMem
+ * Reads colour information from a palette format (MemChunk)
+ *******************************************************************/
+bool Palette8bit::loadMem(MemChunk& mc, int format) {
+
+	// Raw data
+	if (format == FORMAT_RAW) {
+		return loadMem(mc);
+	}
+
+	// Image
+	else if (format == FORMAT_IMAGE) {
+		SImage image;
+		image.open(mc);
+		// Verify validity and only accept square images
+		if (!image.isValid()) {
+			wxLogMessage("Palette information cannot be loaded from an invalid image");
+			return false;
+		}
+		int side = image.getHeight();
+		if (side != image.getWidth() || side%16) {
+			wxLogMessage("Palette information cannot be loaded from a non-square image");
+			return false;
+		}
+		// Find color cell size
+		int cell = side / 16;
+
+		// Add colors to the palette
+		for (size_t a = 0; a < 256; ++a) {
+			// Find position in grid
+			int x = (a % 16) * cell;
+			int y = (a / 16) * cell;
+			// Ignore possible borders
+			if (cell > 3)
+				++x, ++y;
+			// Get color from image
+			rgba_t col = image.getPixel(x, y);
+			// Validate color cell
+			for (int b = x; b < (x + (cell > 3 ? cell - 1 : cell)); ++b)
+				for (int c = y; c < (y + (cell > 3 ? cell - 1 : cell)); ++c)
+					if (!col.equals(image.getPixel(b, c))) {
+						wxLogMessage("Image does not seem to be a valid palette, color discrepancy in cell %u at [%u, %u]", a, b, c);
+						return false;
+					}
+
+					// Color is validated, so add it
+					setColour(a, col);
+		}
+		return true;
+	}
+
+	// Text formats
+	else if (format == FORMAT_CSV || format == FORMAT_JASC || format == FORMAT_GIMP) {
+
+		if (memchr(mc.getData(), 0, mc.getSize() -1))
+			return false; // Not text
+
+		Tokenizer tz;
+		tz.setSpecialCharacters(",:#");
+		tz.openMem(&mc, "Palette Import");
+
+		// Parse headers
+		if (format == FORMAT_JASC) {
+			if (!tz.checkToken("JASC-PAL") || !tz.checkToken("0100")) {
+				wxLogMessage("Invalid JASC palette (unknown header)");
+				return false;
+			}
+			int count = tz.getInteger();
+			if (count > 256 || count < 0) {
+				wxLogMessage("Invalid JASC palette (wrong count)");
+				return false;
+			}
+		} else if (format == FORMAT_GIMP) {
+			if (!tz.checkToken("GIMP") || !tz.checkToken("Palette")) {
+				wxLogMessage("Invalid GIMP palette (unknown header)");
+				return false;
+			}
+		}
+		// Now, parse
+		string s1, s2, s3;
+		rgba_t col(0, 0, 0, 255, -1);
+		int c = 0;
+		do {
+			// Get the first token. If it begins with #, it's a comment in GIMP. Ignore.
+			// Since the lexer expects ## for comments, not just #, tell it explicitly to skip.
+			s1 = tz.getToken(); if (format == FORMAT_CSV) tz.checkToken(",");
+			else if (format == FORMAT_GIMP && !s1.Cmp("#")) { tz.skipLineComment(); continue; }
+
+			// Get the second token. If it is :, then that means the first word was a field name.
+			// Since we're ignoring them, skip the line.
+			s2 = tz.getToken(); if (format == FORMAT_CSV) tz.checkToken(",");
+			else if (format == FORMAT_GIMP && !s2.Cmp(":")) { tz.skipLineComment(); continue; }
+
+			// Get the third token. In GIMP, the RGB values are followed by the color name, which
+			// can include spaces and is unquoted, so just skip the whole rest of the line.
+			s3 = tz.getToken(); if (format == FORMAT_CSV) tz.checkToken(",");
+			if (format == FORMAT_GIMP) tz.skipLineComment();
+
+			// If we haven't skipped this part from a continue, then we have a colour triplet.
+			col.r = atoi(CHR(s1)); col.g = atoi(CHR(s2)); col.b = atoi(CHR(s3));
+			setColour(c++, col);
+		} while (c < 256 && !tz.peekToken().IsEmpty());
+
+		return true;
+
+	}
+
+	else wxLogMessage("Sorry, palette couldn't be imported, this format is not supported yet for import.");
+
+	return false;
+}
+
 /* Palette8bit::saveMem
  * Writes colour information to a MemChunk
  *******************************************************************/
-bool Palette8bit::saveMem(MemChunk& mc, int format) {
+bool Palette8bit::saveMem(MemChunk& mc, int format, string name) {
 	// Clear memchunk
 	mc.clear();
 
@@ -139,6 +253,14 @@ bool Palette8bit::saveMem(MemChunk& mc, int format) {
 		for (unsigned a = 0; a < 256; a++)
 			jasc += S_FMT("%d %d %d\n", colours[a].r, colours[a].g, colours[a].b);
 		mc.importMem((const uint8_t*)((const char*)jasc.ToAscii()), jasc.Length());
+	}
+
+	// GIMP palette
+	else if (format == FORMAT_GIMP) {
+		string gimp = S_FMT("GIMP Palette\nName: %s\n#\n", CHR(name));
+		for (unsigned a = 0; a < 256; a++)
+			gimp += S_FMT("%d\t%d\t%d\tIndex %u\n", colours[a].r, colours[a].g, colours[a].b, a);
+		mc.importMem((const uint8_t*)((const char*)gimp.ToAscii()), gimp.Length());
 	}
 
 	// Image
@@ -180,13 +302,45 @@ bool Palette8bit::saveMem(MemChunk& mc, int format) {
  * if the file could not be opened/created, true otherwise
  *******************************************************************/
 bool Palette8bit::saveFile(string filename, int format) {
+	// Get palette name
+	wxFileName fn(filename);
+	string name = fn.GetName();
+
 	// Write data to MemChunk
 	MemChunk mc;
-	if (!saveMem(mc, format))
+	if (!saveMem(mc, format, name))
 		return false;
 
 	// Write MemChunk to file
 	return mc.exportFile(filename);
+}
+
+/* Palette8bit::loadFile
+ * Reads colour information from a file at [filename]. Returns false
+ * if the file could not be opened/parsed, true otherwise
+ *******************************************************************/
+bool Palette8bit::loadFile(string filename, int format) {
+	// Get palette name
+	wxFileName fn(filename);
+	string name = fn.GetName();
+
+	// Open the file
+	wxFile file(filename);
+
+	// Check that it opened ok
+	if (!file.IsOpened())
+		return false;
+
+	// The file should contain some actual data
+	if (file.Length() == 0)
+		return false;
+
+	// Write data to MemChunk
+	MemChunk mc;
+	mc.importFile(filename, 0, file.Length());
+
+	// Now load it
+	return loadMem(mc, format);
 }
 
 /* Palette8bit::setColour
@@ -381,3 +535,175 @@ void Palette8bit::applyTranslation(Translation* trans) {
 	// Load translated palette
 	copyPalette(&temp);
 }
+
+/* Palette8bit::colourise
+ * Colourises the palette to [colour]
+ *******************************************************************/
+void Palette8bit::colourise(rgba_t colour, int start, int end) {
+	// Handle default values: a range of (-1, -1) means the entire palette
+	if (start < 0 || start > 255)
+		start = 0;
+	if (end < 0 || end > 255)
+		end = 255;
+
+	// Colourise all colours in the range
+	for (int i = start; i <= end; ++i) {
+		rgba_t ncol(colours[i].r, colours[i].g, colours[i].b, colours[i].a, colours[i].blend);
+		double grey = (ncol.r*0.3f + ncol.g*0.59f + ncol.b*0.11f) / 255.0f;
+		ncol.r = (uint8_t)(colour.r * grey);
+		ncol.g = (uint8_t)(colour.g * grey);
+		ncol.b = (uint8_t)(colour.b * grey);
+		setColour(i, ncol);
+	}
+}
+
+/* Palette8bit::tint
+ * Tints the palette to [colour] by [amount]
+ *******************************************************************/
+void Palette8bit::tint(rgba_t colour, float amount, int start, int end) {
+	// Handle default values: a range of (-1, -1) means the entire palette
+	if (start < 0 || start > 255)
+		start = 0;
+	if (end < 0 || end > 255)
+		end = 255;
+
+	// Sanitize values just in case
+	if (amount < 0.)
+		amount = 0.;
+	if (amount > 1.)
+		amount = 1.;
+
+	// Tint all colours in the range
+	for (int i = start; i <= end; ++i) {
+		float inv_amt = 1.0f - amount;
+		// Might want to do something about the precision loss here and elsewhere:
+		// it's possible for 0xFFFFFF shifting to 0xFF0000 to become 0xFExxxx...
+		// I'll leave this working exactly the same as the SImage function for now.
+		float round_delta = /*roundup ? 0.4999999 :*/ 0.0;
+		rgba_t ncol(colours[i].r*inv_amt + colour.r*amount + round_delta,
+					colours[i].g*inv_amt + colour.g*amount + round_delta,
+					colours[i].b*inv_amt + colour.b*amount + round_delta,
+					colours[i].a, colours[i].blend);
+		setColour(i, ncol);
+	}
+}
+
+/* Palette8bit::idtint
+ * Tints the palette to [colour] by [amount]
+ * This one uses a different method to tint the colours, which is
+ * apparently perfectly accurate to what Id's palette tool generated.
+ * Contrarily to normal tint, it can use oversaturated colours, such
+ * as the green tint of 256 from the radsuit palette, which cannot be
+ * expressed through an rgba_t.
+ *******************************************************************/
+void Palette8bit::idtint(int r, int g, int b, double amount) {
+	// Tint all colours in the range
+	for (int i = 0; i <= 255; ++i) {
+		// Compute the colour deltas and round them down
+		int rd = (int)((double)(colours[i].r - r) * amount);
+		int gd = (int)((double)(colours[i].g - g) * amount);
+		int bd = (int)((double)(colours[i].b - b) * amount);
+		// Then the final colours and clamp them
+		int fr = colours[i].r - rd; if (fr < 0) fr = 0; else if (fr > 255) fr = 255;
+		int fg = colours[i].g - gd; if (fg < 0) fg = 0; else if (fg > 255) fg = 255;
+		int fb = colours[i].b - bd; if (fb < 0) fb = 0; else if (fb > 255) fb = 255;
+		// Set the result in the palette
+		rgba_t col(fr, fg, fb, colours[i].a, colours[i].blend);
+		setColour(i, col);
+	}
+}
+
+/* Palette8bit::saturate
+ * Saturate the palette by [amount] (in range 0--2)
+ *******************************************************************/
+void Palette8bit::saturate(float amount, int start, int end) {
+	// Handle default values: a range of (-1, -1) means the entire palette
+	if (start < 0 || start > 255)
+		start = 0;
+	if (end < 0 || end > 255)
+		end = 255;
+
+	// Sanitize values just in case
+	if (amount < 0.)
+		amount = 0.;
+	if (amount > 2.)
+		amount = 2.;
+
+	// Saturate all colours in the range
+	for (int i = start; i <= end; ++i) {
+		colours_hsl[i].s *= amount;
+		if (colours_hsl[i].s > 1.)
+			colours_hsl[i].s = 1.;
+		setColour(i, Misc::hslToRgb(colours_hsl[i]));
+	}
+}
+
+/* Palette8bit::illuminate
+ * Darken or brighten the palette by [amount] (in range 0--2)
+ *******************************************************************/
+void Palette8bit::illuminate(float amount, int start, int end) {
+	// Handle default values: a range of (-1, -1) means the entire palette
+	if (start < 0 || start > 255)
+		start = 0;
+	if (end < 0 || end > 255)
+		end = 255;
+
+	// Sanitize values just in case
+	if (amount < 0.)
+		amount = 0.;
+	if (amount > 2.)
+		amount = 2.;
+
+	// Illuminate all colours in the range
+	for (int i = start; i <= end; ++i) {
+		colours_hsl[i].l *= amount;
+		if (colours_hsl[i].l > 1.)
+			colours_hsl[i].l = 1.;
+		setColour(i, Misc::hslToRgb(colours_hsl[i]));
+	}
+}
+
+/* Palette8bit::shift
+ * Shift the hue of the palette by [amount] (in range 0--1)
+ *******************************************************************/
+void Palette8bit::shift(float amount, int start, int end) {
+	// Handle default values: a range of (-1, -1) means the entire palette
+	if (start < 0 || start > 255)
+		start = 0;
+	if (end < 0 || end > 255)
+		end = 255;
+
+	// Sanitize values just in case
+	if (amount < 0.)
+		amount = 0.;
+	if (amount > 1.)
+		amount = 1.;
+
+	// Shift all colours in the range
+	for (int i = start; i <= end; ++i) {
+		colours_hsl[i].h += amount;
+		if (colours_hsl[i].h >= 1.)
+			colours_hsl[i].h -= 1.;
+		setColour(i, Misc::hslToRgb(colours_hsl[i]));
+	}
+}
+
+/* Palette8bit::invert
+ * Inverts the colours of the palette
+ *******************************************************************/
+void Palette8bit::invert(int start, int end) {
+	// Handle default values: a range of (-1, -1) means the entire palette
+	if (start < 0 || start > 255)
+		start = 0;
+	if (end < 0 || end > 255)
+		end = 255;
+
+	// Inverts all colours in the range
+	for (int i = start; i <= end; ++i) {
+		colours[i].r = 255 - colours[i].r;
+		colours[i].g = 255 - colours[i].g;
+		colours[i].b = 255 - colours[i].b;
+		setColour(i, colours[i]);	// Just to update the HSL values
+	}
+}
+

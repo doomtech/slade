@@ -79,6 +79,6 @@ string appPath(string filename, int dir);
 // Random useful defines
 #define MAX(a,b) (((a)>(b))?(a):(b))
 #define MIN(a,b) (((a)<(b))?(a):(b))
-
+#define DPrintf wxLogMessage
 
 #endif //__MAIN_H__

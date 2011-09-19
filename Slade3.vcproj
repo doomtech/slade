@@ -817,6 +817,14 @@
 				Name="SLADEMap"
 				>
 				<File
+					RelativePath=".\src\MapElement.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\MapElement.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\MapLine.cpp"
 					>
 				</File>
@@ -1128,11 +1136,27 @@
 						>
 					</File>
 					<File
+						RelativePath=".\src\SIFJedi.h"
+						>
+					</File>
+					<File
 						RelativePath=".\src\SIFormat.cpp"
 						>
 					</File>
 					<File
 						RelativePath=".\src\SIFormat.h"
+						>
+					</File>
+					<File
+						RelativePath=".\src\SIFOther.h"
+						>
+					</File>
+					<File
+						RelativePath=".\src\SIFQuake.h"
+						>
+					</File>
+					<File
+						RelativePath=".\src\SIFRott.h"
 						>
 					</File>
 					<File

@@ -311,6 +311,10 @@ bool CTPatchEx::parse(Tokenizer& tz, uint8_t type) {
 						colour.r = val*255;
 						colour.g = second*255;
 						colour.b = tz.getDouble()*255;
+						if (tz.peekToken() != ",") {
+							wxLogMessage("Invalid TEXTURES definition, expected ',', got '%s'", CHR(tz.getToken()));
+							return false;
+						}
 						tz.getToken();	// Skip ,
 						colour.a = tz.getDouble()*255;
 						blendtype = 3;

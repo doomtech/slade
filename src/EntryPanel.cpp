@@ -229,6 +229,16 @@ void EntryPanel::removeCustomMenu() {
 }
 
 
+/* EntryPanel::isActivePanel
+ * Returns true if the entry panel is the Archive Manager Panel's
+ * current area. This is needed because the wx function IsShown() 
+ * is not enough, it will return true if the panel is shown on any
+ * tab, even if it is not on the one that is selected...
+ *******************************************************************/
+bool EntryPanel::isActivePanel() {
+	return (IsShown() && theActivePanel == this);
+}
+
 /*******************************************************************
  * ENTRYPANEL CLASS EVENTS
  *******************************************************************/

@@ -125,3 +125,16 @@ void PaletteChooser::selectPalette(string name) {
 	// No match found, set to default
 	SetSelection(0);
 }
+
+/* PaletteChooser::addPalette
+ * Appends another palette choice to the list. This is needed
+ * for the "Add Custom Palette" action, since the MainWindow's
+ * palette chooser is only initialized at startup and the new
+ * custom palette, without this function, requires exiting and
+ * restarting the app to appear in the list.
+ *******************************************************************/
+void PaletteChooser::addPalette(string name) {
+	// We want it to be just before the "Greyscale" choice
+	if (GetCount() > 2)
+		Insert(name, GetCount() - 1);
+}

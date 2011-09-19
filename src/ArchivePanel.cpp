@@ -638,6 +638,7 @@ bool ArchivePanel::deleteEntry(bool confirm) {
 	// Switch to blank entry panel
 	wxSizer* sizer = GetSizer();
 	cur_area->Show(false);
+	cur_area->nullEntry();
 	sizer->Replace(cur_area, entry_area);
 	cur_area = entry_area;
 	cur_area->Show(true);
@@ -656,6 +657,15 @@ bool ArchivePanel::revertEntry() {
 	// Go through selection
 	for (unsigned a = 0; a < selected_entries.size(); a++)
 		archive->revertEntry(selected_entries[a]);
+
+	// If the entries reverted were the only modified entries in the
+	// archive, the archive is no longer modified.
+	archive->findModifiedEntries();
+
+	// If there was only one selected entry, chances are its content
+	// were displayed, so this should be updated
+	if (theActivePanel) 
+		theActivePanel->callRefresh();
 
 	return true;
 }
@@ -739,9 +749,28 @@ bool ArchivePanel::openTab() {
 	// Get selected entries
 	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
 
-	// Open each in it's own tab
+	// Open each in its own tab
 	for (unsigned a = 0; a < selection.size(); a++)
 		theMainWindow->openEntry(selection[a]);
+
+	return true;
+}
+
+/* ArchivePanel::crc32
+ * Computes the CRC-32 checksums of the selected entries
+ *******************************************************************/
+bool ArchivePanel::crc32() {
+	// Get selected entries
+	vector<ArchiveEntry*> selection = entry_list->getSelectedEntries();
+
+	// Compute CRC-32 checksums for each
+	string checksums = "\nCRC-32:\n";
+	for (unsigned a = 0; a < selection.size(); a++) {
+		uint32_t crc = selection[a]->getMCData().crc();
+		checksums += S_FMT("%s:\t%x\n", CHR(selection[a]->getName()), crc);
+	}
+	wxLogMessage(checksums);
+	wxMessageBox(checksums);
 
 	return true;
 }
@@ -767,11 +796,48 @@ bool ArchivePanel::importEntry() {
 		// Run open file dialog
 		SFileDialog::fd_info_t info;
 		if (SFileDialog::openFile(info, "Import Entry \"" + selection[a]->getName() + "\"", "Any File (*.*)|*.*", this)) {
+
+			// Preserve gfx offset if needed
+			point2_t offset;
+			if (!selection[a]->getType()->getEditor().Cmp("gfx")) {
+				// We have an image
+				SImage si;
+				si.open(selection[a]->getMCData());
+				offset = si.offset();
+			}
+
 			// If a file was selected, import it
 			selection[a]->importFile(info.filenames[0]);
 
 			// Re-detect entry type
 			EntryType::detectEntryType(selection[a]);
+
+			// Restore offsets if needed
+			if (!selection[a]->getType()->getEditor().Cmp("gfx")) {
+				SImage si;
+				si.open(selection[a]->getMCData());
+
+				point2_t noffset = si.offset();
+				bool ok = true;
+				// Don't bother if the same offsets are reimported
+				if (offset == noffset) ok = false;
+				// Ask for confirmation if there actually are offsets but they are different
+				else if (noffset.x | noffset.y) {
+					wxMessageDialog md(this,
+						S_FMT("Image %s had offset [%d, %d], imported file has offset [%d, %d]. "
+						"Do you want to keep the old offset and override the new?", 
+						CHR(selection[a]->getName()), offset.x, offset.y, noffset.x, noffset.y), 
+						"Conflicting Offsets", wxYES_NO);
+					int result = md.ShowModal();
+					if (result != wxID_YES)
+						ok = false;
+				}
+				// Warn if the offsets couldn't be written
+				if (ok && !si.getFormat()->writeOffset(si, selection[a], offset))
+					wxLogMessage("Old offset information [%d, %d] couldn't be "
+					"preserved in the new image format for image %s.",
+					offset.x, offset.y, CHR(selection[a]->getName()));
+			}
 
 			// Set extension by type
 			selection[a]->setExtensionByType();
@@ -1600,6 +1666,10 @@ bool ArchivePanel::handleAction(string id) {
 	else if (id == "arch_entry_opentab")
 		openTab();
 
+	// CRC-32
+	else if (id == "arch_entry_crc32")
+		crc32();
+
 	// Entry->Convert To...
 	else if (id == "arch_entry_convert")
 		convertEntryTo();
@@ -1873,6 +1943,18 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 	context.AppendSeparator();
 	theApp->getAction("arch_entry_bookmark")->addToMenu(&context);
 	theApp->getAction("arch_entry_opentab")->addToMenu(&context);
+	theApp->getAction("arch_entry_crc32")->addToMenu(&context);
+
+	// Add custom menu items
+	wxMenu* custom;
+	if (context_submenus) {
+		wxMenu* custom = new wxMenu();
+	} else custom = &context;
+	bool ok = cur_area->fillCustomMenu(custom);
+	if (context_submenus) {
+		if (ok) context.AppendSubMenu(custom, cur_area->getCustomMenuName());
+		else delete custom;
+	}
 
 	// Add Boom Animations/Switches related menu items if they are selected
 	if (bas_selected)

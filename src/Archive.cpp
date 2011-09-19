@@ -1293,6 +1293,38 @@ vector<ArchiveEntry*> Archive::findAll(search_options_t& options) {
 }
 
 
+/* Archive::findModifiedEntries
+ * Returns a list of modified entries, and set archive to unmodified
+ * status if the list is empty
+ *******************************************************************/
+vector<ArchiveEntry*> Archive::findModifiedEntries(ArchiveTreeNode* dir) {
+	// Init search variables
+	if (dir == NULL) dir = dir_root;
+	vector<ArchiveEntry*> ret;
+
+	// Search entries
+	for (unsigned a = 0; a < dir->numEntries(); a++) {
+		ArchiveEntry* entry = dir->getEntry(a);
+
+		// Add new and modified entries
+		if (entry->getState() != 0)
+			ret.push_back(entry);
+	}
+
+	// Search subdirectories
+	for (unsigned a = 0; a < dir->nChildren(); a++) {
+		vector<ArchiveEntry*> vec = findModifiedEntries((ArchiveTreeNode*)dir->getChild(a));
+		ret.insert(ret.end(), vec.begin(), vec.end());
+	}
+
+	// If there aren't actually any, set archive to be unmodified
+	if (ret.size() == 0)
+		setModified(false);
+
+	// Return matches
+	return ret;
+}
+
 /*******************************************************************
  * TREELESSARCHIVE CLASS FUNCTIONS
  *******************************************************************/

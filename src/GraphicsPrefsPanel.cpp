@@ -40,6 +40,7 @@
 EXTERN_CVAR(String, bgtx_colour1)
 EXTERN_CVAR(String, bgtx_colour2)
 EXTERN_CVAR(Bool, gfx_show_border)
+EXTERN_CVAR(Bool, gfx_extraconv)
 
 
 /*******************************************************************
@@ -88,6 +89,11 @@ GraphicsPrefsPanel::GraphicsPrefsPanel(wxWindow* parent) : wxPanel(parent, -1) {
 	cb_show_border->SetValue(gfx_show_border);
 	sizer->Add(cb_show_border, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 	
+	// 'Extra image conversion options'
+	cb_extra_gfxconv = new wxCheckBox(this, -1, "Offer additional conversion options");
+	cb_extra_gfxconv->SetValue(gfx_extraconv);
+	sizer->Add(cb_extra_gfxconv, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+	
 	// Bind events
 	choice_presets->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &GraphicsPrefsPanel::onChoicePresetSelected, this);
 }
@@ -108,6 +114,7 @@ void GraphicsPrefsPanel::applyPreferences() {
 	bgtx_colour2 = wxc.GetAsString();
 	GLTexture::resetBgTex();
 	gfx_show_border = cb_show_border->GetValue();
+	gfx_extraconv = cb_extra_gfxconv->GetValue();
 	theMainWindow->Refresh();
 }
 

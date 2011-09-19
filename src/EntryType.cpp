@@ -214,9 +214,13 @@ int EntryType::isThisType(ArchiveEntry* entry) {
 	// Check for data format match if needed
 	int r = EDF_TRUE;
 	if (format == EntryDataFormat::textFormat()) {
+		// Hack for identifying ACS script sources despite DB2 apparently appending
+		// two null bytes to them, which make the memchr test fail.
+		size_t end = entry->getSize() - 1;
+		if (end > 3) end -= 2;
 		// Text is a special case, as other data formats can sometimes be detected as 'text',
 		// we'll only check for it if text data is specified in the entry type
-		if (entry->getSize() > 0 && memchr(entry->getData(), 0, entry->getSize()-1) != NULL)
+		if (entry->getSize() > 0 && memchr(entry->getData(), 0, end) != NULL)
 			return EDF_FALSE;
 	}
 	else if (format != EntryDataFormat::anyFormat() && entry->getSize() > 0) {

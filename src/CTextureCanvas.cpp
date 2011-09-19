@@ -211,7 +211,7 @@ void CTextureCanvas::draw() {
 	glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-	// Translate to middle of pixel (otherwise inaccuracies can occur on certain gl implemenataions)
+	// Translate to inside of pixel (otherwise inaccuracies can occur on certain gl implementations)
 	glTranslatef(0.375f, 0.375f, 0);
 
 	// Draw background

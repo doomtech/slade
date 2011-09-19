@@ -203,6 +203,7 @@ public:
 	virtual ArchiveEntry*			findFirst(search_options_t& options);
 	virtual ArchiveEntry*			findLast(search_options_t& options);
 	virtual vector<ArchiveEntry*>	findAll(search_options_t& options);
+	virtual vector<ArchiveEntry*>	findModifiedEntries(ArchiveTreeNode* dir = NULL);
 };
 
 // Base class for list-based archive formats

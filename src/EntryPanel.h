@@ -34,6 +34,7 @@ public:
 	string			getName() { return id; }
 	ArchiveEntry*	getEntry() { return entry; }
 	bool			isModified() { return modified; }
+	bool			isActivePanel();
 
 	bool			openEntry(ArchiveEntry* entry);
 	virtual bool	loadEntry(ArchiveEntry* entry);
@@ -45,6 +46,10 @@ public:
 	virtual string	statusString() { return ""; }
 	virtual void	addCustomMenu();
 	void			removeCustomMenu();
+	virtual bool	fillCustomMenu(wxMenu* custom) { return false; }
+	string			getCustomMenuName() { return custom_menu_name; }
+	void			callRefresh() { refreshPanel(); }
+	void			nullEntry() { entry = NULL; }
 	virtual void	handleAction(int menu_id) {}
 
 	virtual void	onBtnSave(wxCommandEvent& e);

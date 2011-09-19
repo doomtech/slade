@@ -147,7 +147,7 @@ bool MemChunk::importFile(string filename, uint32_t offset, uint32_t len) {
 
 	// Return false if file open failed
 	if (!file.IsOpened()) {
-		wxLogMessage("MemChunk::loadFile: Unable to open file %s", filename.c_str());
+		wxLogMessage("MemChunk::importFile: Unable to open file %s", filename.c_str());
 		Global::error = S_FMT("Unable to open file %s", filename.c_str());
 		return false;
 	}
@@ -169,7 +169,14 @@ bool MemChunk::importFile(string filename, uint32_t offset, uint32_t len) {
 
 		// Read the file
 		file.Seek(offset, wxFromStart);
-		file.Read(data, size);
+		size_t count = file.Read(data, size);
+		if (count != size) {
+			delete[] data;
+			wxLogMessage("MemChunk::importFile: Unable to read full file %s, read %u out of %u",
+				filename.c_str(), count, size);
+			Global::error = S_FMT("Unable to read file %s", filename.c_str());
+			return false;
+		}
 
 		file.Close();
 	}

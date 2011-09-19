@@ -379,6 +379,7 @@ void MainApp::initActions() {
 	new SAction("arch_entry_export", "Export", "t_export", "Export the selected entries to files");
 	new SAction("arch_entry_bookmark", "Bookmark", "t_bookmark", "Bookmark the current entry");
 	new SAction("arch_entry_opentab", "Open in Tab", "t_open", "Open selected entries in separate tabs");
+	new SAction("arch_entry_crc32", "Compute CRC-32 Checksum", "e_text", "Compute the CRC-32 checksums of the selected entries");
 	new SAction("arch_bas_convert", "Convert to ANIMDEFS", "", "Convert any selected SWITCHES and ANIMATED entries to a single ANIMDEFS entry");
 	new SAction("arch_texturex_convertzd", "Convert to TEXTURES", "", "Convert any selected TEXTUREx entries to ZDoom TEXTURES format");
 	new SAction("arch_view_text", "View as Text", "e_text", "Open the selected entry in the text editor, regardless of type");
@@ -435,13 +436,30 @@ void MainApp::initActions() {
 
 	// PaletteEntryPanel
 	new SAction("ppal_addcustom", "Add to Custom Palettes", "t_plus", "Add the current palette to the custom palettes list");
+	new SAction("ppal_test", "Test Palette", "t_palette_test", "Temporarily add the current palette to the palette chooser");
 	new SAction("ppal_exportas", "Export As...", "t_export", "Export the current palette to a file");
+	new SAction("ppal_importfrom", "Import From...", "t_import", "Import data from a file in the current palette");
+	new SAction("ppal_colourise", "Colourise", "t_palette_colourise", "Colourise the palette");
+	new SAction("ppal_tint", "Tint", "t_palette_tint", "Tint the palette");
+	new SAction("ppal_tweak", "Tweak", "t_palette_tweak", "Tweak the palette");
+	new SAction("ppal_invert", "Invert", "t_palette_invert", "Invert the palette");
+	new SAction("ppal_moveup", "Pull Ahead", "t_palette_pull", "Move this palette one rank towards the first");
+	new SAction("ppal_movedown", "Push Back", "t_palette_push", "Move this palette one rank towards the last");
+	new SAction("ppal_duplicate", "Duplicate", "t_palette_duplicate", "Create a copy of this palette at the end");
+	new SAction("ppal_remove", "Remove", "t_palette_delete", "Erase this palette");
+	new SAction("ppal_removeothers", "Remove Others", "t_palette_deleteothers", "Keep only this palette and erase all others");
+	new SAction("ppal_report", "Write Report", "e_text", "Write an info report on this palette");
+	new SAction("ppal_generate", "Generate Palettes", "e_palette", "Generate full range of palettes from the first");
 }
 
 /* MainApp::OnInit
  * Application initialization, run when program is started
  *******************************************************************/
 bool MainApp::OnInit() {
+	// Set locale to C so that the tokenizer will work properly
+	// even in locales where the decimal separator is a comma.
+	setlocale (LC_ALL, "C");
+
 	// Init global variables
 	Global::error = "";
 	ArchiveManager::getInstance();

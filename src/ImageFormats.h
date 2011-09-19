@@ -633,6 +633,36 @@ public:
 };
 
 
+class ShadowCasterGfxFormat: public EntryDataFormat {
+public:
+	ShadowCasterGfxFormat() : EntryDataFormat("img_scgfx") {};
+	~ShadowCasterGfxFormat() {}
+
+	int isThisFormat(MemChunk& mc) {
+		// If those were static functions, then I could
+		// just do this instead of such copypasta:
+		//	return DoomArahDataFormat::isThisFormat(mc);
+		if (mc.getSize() < sizeof(patch_header_t))
+			return EDF_FALSE;
+
+		const uint8_t* data = mc.getData();
+		const patch_header_t *header = (const patch_header_t *)data;
+
+		// Check header values are 'sane'
+		if (!(header->height > 0 && header->height < 4096 &&
+			header->width > 0 && header->width < 4096 &&
+			header->top > -2000 && header->top < 2000 &&
+			header->left > -2000 && header->left < 2000))
+			return EDF_FALSE;
+
+		// Check the size matches
+		if (mc.getSize() != (sizeof(patch_header_t) + (header->width * header->height)))
+			return EDF_FALSE;
+
+		return EDF_TRUE;
+	}
+}; 
+
 class ShadowCasterSpriteFormat: public EntryDataFormat {
 public:
 	ShadowCasterSpriteFormat() : EntryDataFormat("img_scsprite") {};

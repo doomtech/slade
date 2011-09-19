@@ -354,6 +354,14 @@ public:
 
 		return true;
 	}
+
+	virtual bool writeOffset(SImage& image, ArchiveEntry * entry, point2_t offset) {
+		MemChunk mc;
+		image.setXOffset(offset.x);
+		image.setYOffset(offset.y);
+		return (writeImage(image, mc, NULL, 0) && entry->importMemChunk(mc));
+	}
+
 };
 
 class SIFDoomBetaGfx : public SIFDoomGfx {

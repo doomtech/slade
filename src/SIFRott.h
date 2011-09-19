@@ -353,3 +353,55 @@ public:
 		return info;
 	}
 };
+
+class SIFRottWall : public SIFormat {
+protected:
+	bool readImage(SImage& image, MemChunk& data, int index) {
+		// Get image info
+		SImage::info_t info = getInfo(data, index);
+
+		// Create image (swapped width/height because column-major)
+		image.create(info.height, info.width, PALMASK); 
+		image.fillAlpha(255);
+
+		// Read raw pixel data
+		data.seek(0, SEEK_SET);
+		data.read(imageData(image), info.height * info.width);
+
+		// Convert from column-major to row-major
+		image.rotate(90);
+		image.mirror(true);
+
+		return true;
+	}
+
+public:
+	SIFRottWall() : SIFormat("rottwall") {
+		name = "ROTT Flat";
+		extension = "dat";
+		reliability = 10;
+	}
+	~SIFRottWall() {}
+
+	bool isThisFormat(MemChunk& mc) {
+		if (mc.getSize() == 4096 || mc.getSize() == 51200)
+			return true;
+		else
+			return false;
+	}
+
+	SImage::info_t getInfo(MemChunk& mc, int index) {
+		SImage::info_t info;
+
+		// Always the same thing
+		info.width = mc.getSize() == 4096 ? 64 : 256;
+		info.height = mc.getSize() == 4096 ? 64 : 200;
+		info.offset_x = 0;
+		info.offset_y = 0;
+		info.colformat = PALMASK;
+		info.format = id;
+
+		return info;
+	}
+};
+

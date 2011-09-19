@@ -216,8 +216,14 @@ bool Misc::loadPaletteFromArchive(Palette8bit* pal, Archive* archive, int lump) 
 
 	// Read palette colours
 	const uint8_t* playpal_dat = playpal->getData(true);
+	uint8_t max = 0;
+	for (int a = 0; a < 768; ++a)
+		if (playpal_dat[a] > max)
+			max = playpal_dat[a];
+	if (max < 64) sixbit = true;
+
 	int c = 0;
-	for (int a = 0; a < 256; a++) {
+	for (int a = 0; a < 256; ++a) {
 		uint8_t r = playpal_dat[c++];
 		uint8_t g = playpal_dat[c++];
 		uint8_t b = playpal_dat[c++];
@@ -356,10 +362,80 @@ hsl_t Misc::rgbToHsl(double r, double g, double b) {
 
 	return ret;
 }
+hsl_t Misc::rgbToHsl(rgba_t rgba) {
+	return Misc::rgbToHsl(rgba.dr(), rgba.dg(), rgba.db());
+}
 
+/* Misc::hslToRgb
+ * Converts a colour from HSL to RGB colourspace
+ *******************************************************************/
+rgba_t Misc::hslToRgb(double h, double s, double l) {
+	rgba_t ret(0, 0, 0, 255, -1);
 
+	// No saturation means grey
+	if (s == 0.) {
+		ret.r = ret.g = ret.b = (uint8_t) (255. * l);
+		return ret;
+	}
 
+	// Find the rough values at given H with mid L and max S.
+	double hue = (6. * h);
+	uint8_t sector = (uint8_t) hue;
+	double factor = hue - sector;
+	double dr, dg, db;
+	switch (sector) {
+		// RGB 0xFF0000 to 0xFFFF00, increasingly green
+		case 0: dr = 1.; dg = factor; db = 0.; break;
+		// RGB 0xFFFF00 to 0x00FF00, decreasingly red
+		case 1: dr = 1. - factor; dg = 1.; db = 0.; break;
+		// RGB 0x00FF00 to 0x00FFFF, increasingly blue
+		case 2: dr = 0.; dg = 1.; db = factor; break;
+		// RGB 0x00FFFF to 0x0000FF, decreasingly green
+		case 3: dr = 0.; dg = 1. - factor; db = 1.; break;
+		// RGB 0x0000FF to 0xFF00FF, increasingly red
+		case 4: dr = factor; dg = 0.; db = 1.; break;
+		// RGB 0xFF00FF to 0xFF0000, decreasingly blue
+		case 5: dr = 1.; dg = 0.; db = 1. - factor; break;
+	}
 
+	// Now apply desaturation
+	double ds = (1. - s) * 0.5;
+	dr = ds + (dr * s);
+	dg = ds + (dg * s);
+	db = ds + (db * s);
+
+	// Finally apply luminosity
+	double dl = l * 2.;
+	double sr, sg, sb, sl;
+	if (dl > 1.) {
+		// Make brighter
+		sl = dl - 1.;
+		sr = sl * (1. - dr); dr += sr;
+		sg = sl * (1. - dg); dg += sg;
+		sb = sl * (1. - db); db += sb;
+	} else if (dl < 1.) {
+		// Make darker
+		sl = 1. - dl;
+		sr = sl * dr; dr -= sr;
+		sg = sl * dg; dg -= sg;
+		sb = sl * db; db -= sb;
+	}
+
+	// Clamping (shouldn't actually be needed)
+	if (dr > 1.) dr = 1.; if (dr < 0.) dr = 0.;
+	if (dg > 1.) dg = 1.; if (dg < 0.) dg = 0.;
+	if (db > 1.) db = 1.; if (db < 0.) db = 0.;
+
+	// Now convert from 0f--1f to 0i--255i, rounding up
+	ret.r = (uint8_t) (dr * 255. + 0.499999999);
+	ret.g = (uint8_t) (dg * 255. + 0.499999999);
+	ret.b = (uint8_t) (db * 255. + 0.499999999);
+
+	return ret;
+}
+rgba_t Misc::hslToRgb(hsl_t hsl) {
+	return Misc::hslToRgb(hsl.h, hsl.s, hsl.l);
+}
 
 // CRC-32 stuff
 

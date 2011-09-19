@@ -77,4 +77,8 @@ public:
 // Define for less cumbersome MainWindow::getInstance()
 #define theMainWindow MainWindow::getInstance()
 
+// Define for much less cumbersome way to get the active entry panel and palette chooser
+#define theActivePanel (theMainWindow ? (theMainWindow->getArchiveManagerPanel() ? theMainWindow->getArchiveManagerPanel()->currentArea() : NULL) : NULL)
+#define thePaletteChooser (theMainWindow ? theMainWindow->getPaletteChooser() : NULL)
+
 #endif //__MAINWINDOW_H__

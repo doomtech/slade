@@ -9,6 +9,7 @@ private:
 	wxColourPickerCtrl*	cp_colour2;
 	wxChoice*			choice_presets;
 	wxCheckBox*			cb_show_border;
+	wxCheckBox*			cb_extra_gfxconv;
 
 public:
 	GraphicsPrefsPanel(wxWindow* parent);
