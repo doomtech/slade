@@ -77,8 +77,10 @@ GraphicsPrefsPanel::GraphicsPrefsPanel(wxWindow* parent) : wxPanel(parent, -1) {
 							"Black", "Black (Checkered)",
 							"Cyan", "Cyan (Checkered)",
 							"Magenta", "Magenta (Checkered)",
-							"White", "White (Checkered)" };
-	choice_presets = new wxChoice(this, -1, wxDefaultPosition, wxDefaultSize, 9, schemes);
+							"White", "White (Checkered)",
+							"Yellow", "Yellow (Checkered)",
+							"Vintage Id Software" };
+	choice_presets = new wxChoice(this, -1, wxDefaultPosition, wxDefaultSize, 12, schemes);
 	hbox->Add(new wxStaticText(this, -1, "Presets:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
 	hbox->Add(choice_presets, 1, wxEXPAND);
 
@@ -156,6 +158,18 @@ void GraphicsPrefsPanel::onChoicePresetSelected(wxCommandEvent& e) {
 	case 8:		// White (checkered)
 		cp_colour1->SetColour(wxColour(255, 255, 255));
 		cp_colour2->SetColour(wxColour(225, 225, 225));
+		break;
+	case 9:		// Yellow
+		cp_colour1->SetColour(wxColour(255, 255, 0));
+		cp_colour2->SetColour(wxColour(255, 255, 0));
+		break;
+	case 10:	// Yellow (checkered)
+		cp_colour1->SetColour(wxColour(255, 255, 0));
+		cp_colour2->SetColour(wxColour(225, 225, 20));
+		break;
+	case 11:	// Vintage Id Software (aka Doom PLAYPAL index 255)
+		cp_colour1->SetColour(wxColour(167, 107, 107));
+		cp_colour2->SetColour(wxColour(167, 107, 107));
 		break;
 	default:	// Default
 		cp_colour1->SetColour(wxColour(64, 64, 80));

@@ -817,14 +817,6 @@
 				Name="SLADEMap"
 				>
 				<File
-					RelativePath=".\src\MapElement.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\MapElement.h"
-					>
-				</File>
-				<File
 					RelativePath=".\src\MapLine.cpp"
 					>
 				</File>
