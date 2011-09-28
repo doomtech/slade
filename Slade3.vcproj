@@ -121,7 +121,7 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				WholeProgramOptimization="false"
-				PreprocessorDefinitions="WIN32;__WXMSW__;_WINDOWS;NOPCH;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;NDEBUG;UPDATEREVISION"
+				PreprocessorDefinitions="WIN32;USE_SFML_RENDERWINDOW;__WXMSW__;_WINDOWS;NOPCH;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;NDEBUG;UPDATEREVISION"
 				GeneratePreprocessedFile="0"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -142,7 +142,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/NODEFAULTLIB:LIBCMT"
-				AdditionalDependencies="fluidsynth.lib sfml-graphics-s.lib sfml-window-s.lib sfml-system-s.lib sfml-audio-s.lib sfml-main.lib FreeImage.lib wxbase29u.lib wxmsw29u_core.lib wxmsw29u_aui.lib wxmsw29u_gl.lib wxmsw29u_html.lib wxmsw29u_adv.lib wxmsw29u_stc.lib wxmsw29u_media.lib wxtiff.lib wxjpeg.lib wxpng.lib wxzlib.lib wxregexu.lib wxexpat.lib wxscintilla.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib user32.lib shell32.lib advapi32.lib comdlg32.lib gdi32.lib ole32.lib oleaut32.lib"
+				AdditionalDependencies="winmm.lib comctl32.lib rpcrt4.lib wsock32.lib user32.lib shell32.lib advapi32.lib comdlg32.lib gdi32.lib ole32.lib oleaut32.lib fluidsynth.lib FreeImage.lib wxbase29u.lib wxmsw29u_core.lib wxmsw29u_aui.lib wxmsw29u_gl.lib wxmsw29u_html.lib wxmsw29u_adv.lib wxmsw29u_stc.lib wxmsw29u_media.lib wxtiff.lib wxjpeg.lib wxpng.lib wxzlib.lib wxregexu.lib wxexpat.lib wxscintilla.lib sfml-graphics-s.lib sfml-window-s.lib sfml-audio-s.lib sfml-system-s.lib sfml-main.lib"
 				LinkIncremental="1"
 				GenerateManifest="true"
 				GenerateDebugInformation="true"
