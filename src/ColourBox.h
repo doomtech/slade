@@ -12,6 +12,7 @@ private:
 
 public:
 	ColourBox(wxWindow* parent, int id = -1, bool enable_alpha = false);
+	ColourBox(wxWindow* parent, int id, rgba_t col, bool enable_alpha = false);
 	~ColourBox();
 
 	rgba_t	getColour() { return colour; }

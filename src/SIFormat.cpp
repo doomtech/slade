@@ -4,6 +4,9 @@
 #include <FreeImage.h>
 #include "Misc.h"
 #include "EntryType.h"
+
+EXTERN_CVAR(Bool, gfx_extraconv)
+
 #include "SIFormat.h"
 #include "SIFImages.h"
 #include "SIFDoom.h"
@@ -192,7 +195,7 @@ protected:
 		}
 
 		// COLORMAP size special case
-		if (width == 256 && height == 34)
+		if (width == 256 && height >= 32 && height <= 34)
 			return true;
 
 		// Fullscreen gfx special case
@@ -317,7 +320,7 @@ public:
 
 		// Quick hack for COLORMAP size
 		// TODO: Remove me when a proper COLORMAP editor is implemented
-		if (image.getWidth() == 256 && image.getHeight() == 34)
+		if (image.getWidth() == 256 && image.getHeight() >= 32 && image.getHeight() <= 34)
 			return true;
 
 		// Check for fullscreen/autopage size
@@ -409,8 +412,9 @@ void SIFormat::initFormats() {
 	new SIFRottLbm();
 	new SIFRottRaw();
 	new SIFRottPic();
+	new SIFRottWall();
 
-	// Jedi Knight (Dark Forces) formats
+	// Jedi Engine (Dark Forces) formats
 	new SIFJediBM();
 	new SIFJediFME();
 	new SIFJediWAX();
@@ -419,6 +423,7 @@ void SIFormat::initFormats() {
 	new SIFHalfLifeTex();
 	new SIFSCSprite();
 	new SIFSCWall();
+	new SIFSCGfx();
 	new SIFAnaMip();
 	new SIFBuildTile();
 	new SIFHeretic2M8();

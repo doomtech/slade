@@ -20,6 +20,7 @@ public:
 	bool			globalSelected();
 	void			selectPalette(string name);
 	void			onPaletteChanged(wxCommandEvent& e);
+	void			addPalette(string name);
 };
 
 #endif//__PALETTECHOOSER_H__

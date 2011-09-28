@@ -194,6 +194,7 @@ void EntryDataFormat::initBuiltinFormats() {
 	new DoomArahDataFormat();
 	new ShadowCasterSpriteFormat();
 	new ShadowCasterWallFormat();
+	new ShadowCasterGfxFormat();
 	new AnaMipImageFormat();
 	new BuildTileFormat();
 	new Heretic2M8Format();

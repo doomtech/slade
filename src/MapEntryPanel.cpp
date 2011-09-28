@@ -158,7 +158,7 @@ void MEPCanvas::draw() {
 				 ((double)col_view_background.b)/255.f, ((double)col_view_background.a)/255.f);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-	// Translate to middle of pixel (otherwise inaccuracies can occur on certain gl implemenataions)
+	// Translate to inside of pixel (otherwise inaccuracies can occur on certain gl implementations)
 	glTranslatef(0.375f, 0.375f, 0);
 
 	// Zoom/offset to show full map
@@ -238,7 +238,7 @@ void MEPCanvas::createImage(ArchiveEntry& ae, int width, int height) {
 				 ((double)col_save_background.b)/255.f, ((double)col_save_background.a)/255.f);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-	// Translate to middle of pixel (otherwise inaccuracies can occur on certain gl implemenataions)
+	// Translate to inside of pixel (otherwise inaccuracies can occur on certain gl implementations)
 	glTranslatef(0.375f, 0.375f, 0);
 
 	// Zoom/offset to show full map

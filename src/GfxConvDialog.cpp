@@ -39,6 +39,10 @@
 #include "Icons.h"
 #include "SIFormat.h"
 
+/*******************************************************************
+ * VARIABLES
+ *******************************************************************/
+CVAR(Bool, gfx_extraconv, false, CVAR_SAVE)
 
 /*******************************************************************
  * GFXCONVDIALOG CLASS FUNCTINOS
@@ -84,7 +88,10 @@ bool GfxConvDialog::nextItem() {
 			if (!Misc::loadImageFromEntry(&(items[current_item].image), items[current_item].entry))
 				return nextItem();	// Skip if not a valid image entry
 		}
+		// If loading images from textures
 		else if (items[current_item].texture != NULL) {
+			if (items[current_item].force_rgba)
+				items[current_item].image.convertRGBA(items[current_item].palette);
 			if (!items[current_item].texture->toImage(items[current_item].image, items[current_item].archive, items[current_item].palette, items[current_item].force_rgba))
 				return nextItem();	// Skip if not a valid image entry
 		}
@@ -158,8 +165,12 @@ bool GfxConvDialog::nextItem() {
 		fmt_string += "Texture";
 	if (items[current_item].image.getType() == RGBA)
 		fmt_string += " (Truecolour)";
-	else if (items[current_item].image.getType() == PALMASK)
-		fmt_string += " (Paletted)";
+	else if (items[current_item].image.getType() == PALMASK) {
+		fmt_string += " (Paletted - ";
+		if (items[current_item].image.hasPalette())
+			fmt_string += "Internally)";
+		else fmt_string += "Externally)";
+	}
 	else if (items[current_item].image.getType() == ALPHAMAP)
 		fmt_string += " (Alpha Map)";
 	label_current_format->SetLabel(fmt_string);
@@ -362,7 +373,10 @@ void GfxConvDialog::updatePreviewGfx() {
 		gfx_current->setPalette(item.image.getPalette());
 	else
 		gfx_current->setPalette(pal_chooser_current->getSelectedPalette(item.entry));
-	gfx_target->setPalette(pal_chooser_target->getSelectedPalette(item.entry));
+	if (pal_chooser_target->globalSelected())
+		gfx_target->setPalette(gfx_current->getPalette());
+	else
+		gfx_target->setPalette(pal_chooser_target->getSelectedPalette(item.entry));
 
 	// Load the image to both gfx canvases
 	gfx_current->getImage()->copyImage(&item.image);
@@ -442,6 +456,9 @@ void GfxConvDialog::getConvertOptions(SIFormat::convert_options_t& opt) {
 		opt.mask_source = SIFormat::MASK_BRIGHTNESS;
 
 	// Set conversion palettes
+	//opt.pal_current = gfx_current->getPalette();
+	//opt.pal_target = gfx_target->getPalette();
+	// Palettes were already set
 	opt.pal_current = pal_chooser_current->getSelectedPalette(items[current_item].entry);
 	opt.pal_target = pal_chooser_target->getSelectedPalette(items[current_item].entry);
 

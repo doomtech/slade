@@ -786,6 +786,7 @@ void TextureXPanel::exportTexture() {
 	saveTEXTUREX();
 
 	Archive * archive = tx_entry->getParent();
+	bool force_rgba = texture_editor->getBlendRGBA();
 
 	// Go through selection
 	for (unsigned a = 0; a < selec_num.size(); ++a) {
@@ -796,7 +797,7 @@ void TextureXPanel::exportTexture() {
 	GfxConvDialog gcd;
 
 	// Send selection to the gcd
-	gcd.openTextures(selection, texture_editor->getPalette(), archive, texture_editor->getBlendRGBA());
+	gcd.openTextures(selection, texture_editor->getPalette(), archive, force_rgba);
 
 	// Run the gcd
 	gcd.ShowModal();
@@ -820,7 +821,7 @@ void TextureXPanel::exportTexture() {
 		
 		// Write converted image back to entry
 		MemChunk mc;
-		format->saveImage(*image, mc, gcd.getItemPalette(a));
+		format->saveImage(*image, mc, force_rgba ? NULL : gcd.getItemPalette(a));
 		ArchiveEntry * lump = new ArchiveEntry;
 		lump->importMemChunk(mc);
 		lump->rename(selection[a]->getName());

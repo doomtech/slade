@@ -62,8 +62,6 @@ public:
 		if (!isThisFormat(data))
 			return false;
 
-		//wxLogMessage("Reading image of format %s", CHR(name));
-
 		// Attempt to read image data
 		bool ok = readImage(image, data, index);
 
@@ -78,9 +76,6 @@ public:
 		// Announce
 		image.announce("image_changed");
 
-		// Testing
-		//wxLogMessage("Loaded image format %s successfully", CHR(name));
-
 		return ok;
 	}
 
@@ -93,6 +88,7 @@ public:
 	virtual int		canWrite(SImage& image) { return NOTWRITABLE; }
 	virtual bool	canWriteType(SIType type) { return false; }
 	virtual bool	convertWritable(SImage& image, convert_options_t opt) { return false; }
+	virtual bool	writeOffset(SImage& image, ArchiveEntry * entry, point2_t offset) { return false; }
 
 	bool saveImage(SImage& image, MemChunk& out, Palette8bit* pal = NULL, int index = 0) {
 		// Attempt to write image data

@@ -58,7 +58,7 @@ struct gcd_item_t {
 		this->new_format = NULL;
 		this->palette = palette;
 		this->archive = archive;
-		this->force_rgba = false;
+		this->force_rgba = force_rgba;
 	}
 };
 

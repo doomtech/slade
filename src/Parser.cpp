@@ -199,7 +199,7 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 					value = token;
 				
 				// Add value
-				child->values.push_back(value);
+				child->values.push_back(token);
 
 				// Check for ,
 				if (S_CMP(tz.peekToken(), ","))

@@ -102,21 +102,18 @@ Unimplemented Feature Requests ------------------------------------------
 - SBARINFO viewer/editor
 
 --- Gfx ---
-- Keep existing gfx offsets on import
 
 --- Text Editor ---
 
 --- TEXTUREx Editor ---
 - list textures and patches in alphabetical order (with non-iwad ones at the bottom of the list)
 - find/replace for patches
-- Ability to convert composite texture to single image
 - Ability to search for a texture containing a specific patch
 
 --- General ---
 - in-editor generation and editing of boom's binary animated/switches lumps. ("generation" in this case just meaning "stick the default one in there as a new lump", with the standard switches and animations from boom's default one, sort of like how a new texture1 lump gets the iwad stuff as a base)
 - Support for LZMA, Bzip2 and zip formats other than store and deflate
 - Mass research & replace of map elements (thing numbers, texture or flat names) across a map or all the maps of an archive
-- option to preserve sprite offsets when replacing a sprite from a file
 
 
 
@@ -161,6 +158,8 @@ Ideas / Possible Features -----------------------------------------------
 		- Extra properties
 		- Entry type
 - Model viewer
+- The 'findModifiedEntries()' function could be used to create an 'Export Changes in New File' feature as an alternative to saving the archive, useful especially for IWADs.
+
 
 
 Other / Notes -----------------------------------------------------------

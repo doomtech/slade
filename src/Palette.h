@@ -16,6 +16,7 @@ public:
 		FORMAT_IMAGE,
 		FORMAT_CSV,
 		FORMAT_JASC,
+		FORMAT_GIMP,
 	};
 
 	Palette8bit();
@@ -26,7 +27,9 @@ public:
 
 	bool	loadMem(MemChunk& mc);
 	bool	loadMem(const uint8_t* data, uint32_t size);
-	bool	saveMem(MemChunk& mc, int format = FORMAT_RAW);
+	bool	loadMem(MemChunk& mc, int format);
+	bool	loadFile(string filename, int format = FORMAT_RAW);
+	bool	saveMem(MemChunk& mc, int format = FORMAT_RAW, string name = "");
 	bool	saveFile(string filename, int format = FORMAT_RAW);
 
 	void	setColour (uint8_t index, rgba_t  col);
@@ -41,6 +44,17 @@ public:
 	short	nearestColour(rgba_t colour);
 	size_t	countColours();
 	void	applyTranslation(Translation* trans);
+
+	// Advanced palette modification
+	void	colourise(rgba_t col, int start, int end);
+	void	tint(rgba_t col, float amount, int start, int end);
+	void	saturate(float amount, int start, int end);
+	void	illuminate(float amount, int start, int end);
+	void	shift(float amount, int start, int end);
+	void	invert(int start, int end);
+
+	// For automated palette generation
+	void	idtint(int r, int g, int b, double amount);
 };
 
 #endif //__PALETTE_H__

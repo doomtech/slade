@@ -65,6 +65,21 @@ ColourBox::ColourBox(wxWindow* parent, int id, bool enable_alpha)
 	Bind(wxEVT_RIGHT_DOWN, &ColourBox::onMouseRightDown, this);
 }
 
+/* ColourBox::ColourBox
+ * Alternate ColourBox class constructor
+ *******************************************************************/
+ColourBox::ColourBox(wxWindow* parent, int id, rgba_t col, bool enable_alpha)
+: wxPanel(parent, id, wxDefaultPosition, wxSize(32, 24), wxSUNKEN_BORDER){
+	alpha = enable_alpha;
+	palette = NULL;
+	colour = col;
+
+	// Bind events
+	Bind(wxEVT_PAINT, &ColourBox::onPaint, this);
+	Bind(wxEVT_LEFT_DOWN, &ColourBox::onMouseLeftDown, this);
+	Bind(wxEVT_RIGHT_DOWN, &ColourBox::onMouseRightDown, this);
+}
+
 /* ColourBox::~ColourBox
  * ColourBox class destructor
  *******************************************************************/

@@ -101,6 +101,8 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				Description="Checking svnrevision.h..."
+				CommandLine="&quot;$(OutDir)\updaterevision.exe&quot; src src/svnrevision.h"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -119,7 +121,7 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				WholeProgramOptimization="false"
-				PreprocessorDefinitions="WIN32;__WXMSW__;_WINDOWS;NOPCH;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;NDEBUG"
+				PreprocessorDefinitions="WIN32;__WXMSW__;_WINDOWS;NOPCH;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;NDEBUG;UPDATEREVISION"
 				GeneratePreprocessedFile="0"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -139,14 +141,19 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="audiere.lib FreeImage.lib wxbase29u.lib wxmsw29u_core.lib wxmsw29u_aui.lib wxmsw29u_gl.lib wxmsw29u_html.lib wxmsw29u_adv.lib wxmsw29u_stc.lib wxmsw29u_media.lib wxtiff.lib wxjpeg.lib wxpng.lib wxzlib.lib wxregexu.lib wxexpat.lib wxscintilla.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib user32.lib shell32.lib advapi32.lib comdlg32.lib gdi32.lib ole32.lib oleaut32.lib"
+				AdditionalOptions="/NODEFAULTLIB:LIBCMT"
+				AdditionalDependencies="fluidsynth.lib sfml-graphics-s.lib sfml-window-s.lib sfml-system-s.lib sfml-audio-s.lib sfml-main.lib FreeImage.lib wxbase29u.lib wxmsw29u_core.lib wxmsw29u_aui.lib wxmsw29u_gl.lib wxmsw29u_html.lib wxmsw29u_adv.lib wxmsw29u_stc.lib wxmsw29u_media.lib wxtiff.lib wxjpeg.lib wxpng.lib wxzlib.lib wxregexu.lib wxexpat.lib wxscintilla.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib user32.lib shell32.lib advapi32.lib comdlg32.lib gdi32.lib ole32.lib oleaut32.lib"
 				LinkIncremental="1"
 				GenerateManifest="true"
 				GenerateDebugInformation="true"
+				GenerateMapFile="true"
+				MapFileName="$(TargetDir)$(TargetName).map"
+				MapExports="true"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				LinkTimeCodeGeneration="0"
+				SetChecksum="true"
 				TargetMachine="1"
 				AllowIsolation="true"
 			/>
@@ -214,6 +221,14 @@
 				RelativePath=".\src\PaletteDialog.h"
 				>
 			</File>
+			<File
+				RelativePath=".\src\TranslationEditorDialog.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\TranslationEditorDialog.h"
+				>
+			</File>
 			<Filter
 				Name="Preferences"
 				>
@@ -223,6 +238,14 @@
 				</File>
 				<File
 					RelativePath=".\src\ACSPrefsPanel.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\AudioPrefsPanel.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\AudioPrefsPanel.h"
 					>
 				</File>
 				<File
@@ -247,6 +270,30 @@
 				</File>
 				<File
 					RelativePath=".\src\GeneralPrefsPanel.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\GraphicsPrefsPanel.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\GraphicsPrefsPanel.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\InterfacePrefsPanel.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\InterfacePrefsPanel.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\PNGPrefsPanel.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\PNGPrefsPanel.h"
 					>
 				</File>
 				<File
@@ -287,11 +334,35 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\ColourConfiguration.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\ColourConfiguration.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\Drawing.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\Drawing.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\FileMonitor.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\src\FileMonitor.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\KeyBind.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\KeyBind.h"
 				>
 			</File>
 			<File
@@ -347,6 +418,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\SAction.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\SAction.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\Tree.cpp"
 				>
 			</File>
@@ -374,11 +453,35 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\Compression.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Compression.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\MathStuff.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\MathStuff.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\Parser.cpp"
 					>
 				</File>
 				<File
 					RelativePath=".\src\Parser.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\SFileDialog.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\SFileDialog.h"
 					>
 				</File>
 				<File
@@ -652,6 +755,14 @@
 						RelativePath=".\src\TextureXPanel.h"
 						>
 					</File>
+					<File
+						RelativePath=".\src\ZTextureEditorPanel.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\ZTextureEditorPanel.h"
+						>
+					</File>
 				</Filter>
 				<Filter
 					Name="TextEditor"
@@ -699,11 +810,27 @@
 			Name="Map Editor"
 			>
 			<File
+				RelativePath=".\src\MapEditor.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\MapEditor.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\MapEditorWindow.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\src\MapEditorWindow.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\MapTextureManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\MapTextureManager.h"
 				>
 			</File>
 			<Filter
@@ -717,6 +844,50 @@
 					RelativePath=".\src\MapCanvas.h"
 					>
 				</File>
+				<File
+					RelativePath=".\src\MCAnimations.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\MCAnimations.h"
+					>
+				</File>
+				<Filter
+					Name="InfoOverlay"
+					>
+					<File
+						RelativePath=".\src\LineInfoOverlay.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\LineInfoOverlay.h"
+						>
+					</File>
+					<File
+						RelativePath=".\src\SectorInfoOverlay.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\SectorInfoOverlay.h"
+						>
+					</File>
+					<File
+						RelativePath=".\src\ThingInfoOverlay.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\ThingInfoOverlay.h"
+						>
+					</File>
+					<File
+						RelativePath=".\src\VertexInfoOverlay.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\VertexInfoOverlay.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="SLADEMap"
@@ -770,13 +941,57 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="GameConfiguration"
+				>
+				<File
+					RelativePath=".\src\ActionSpecial.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ActionSpecial.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\GameConfiguration.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\GameConfiguration.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ThingType.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ThingType.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Resources"
 			>
+			<File
+				RelativePath=".\src\ResourceManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\ResourceManager.h"
+				>
+			</File>
 			<Filter
 				Name="Archive"
 				>
+				<File
+					RelativePath=".\src\ADatArchive.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ADatArchive.h"
+					>
+				</File>
 				<File
 					RelativePath=".\src\Archive.cpp"
 					>
@@ -806,6 +1021,22 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\BSPArchive.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\BSPArchive.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\BZip2Archive.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\BZip2Archive.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\DatArchive.cpp"
 					>
 				</File>
@@ -827,6 +1058,22 @@
 				</File>
 				<File
 					RelativePath=".\src\GrpArchive.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\GZipArchive.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\GZipArchive.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\HogArchive.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\HogArchive.h"
 					>
 				</File>
 				<File
@@ -867,6 +1114,14 @@
 				</File>
 				<File
 					RelativePath=".\src\RffArchive.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\TarArchive.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\TarArchive.h"
 					>
 				</File>
 				<File
@@ -953,9 +1208,57 @@
 					RelativePath=".\src\Icons.h"
 					>
 				</File>
+				<File
+					RelativePath=".\src\Translation.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Translation.h"
+					>
+				</File>
 				<Filter
 					Name="Image"
 					>
+					<File
+						RelativePath=".\src\SIFDoom.h"
+						>
+					</File>
+					<File
+						RelativePath=".\src\SIFHexen.h"
+						>
+					</File>
+					<File
+						RelativePath=".\src\SIFImages.h"
+						>
+					</File>
+					<File
+						RelativePath=".\src\SIFJedi.h"
+						>
+					</File>
+					<File
+						RelativePath=".\src\SIFormat.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\SIFormat.h"
+						>
+					</File>
+					<File
+						RelativePath=".\src\SIFOther.h"
+						>
+					</File>
+					<File
+						RelativePath=".\src\SIFQuake.h"
+						>
+					</File>
+					<File
+						RelativePath=".\src\SIFRott.h"
+						>
+					</File>
+					<File
+						RelativePath=".\src\SIFZDoom.h"
+						>
+					</File>
 					<File
 						RelativePath=".\src\SImage.cpp"
 						>
@@ -1107,6 +1410,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\DockPanel.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\DockPanel.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\GfxCanvas.cpp"
 				>
 			</File>
@@ -1239,14 +1550,68 @@
 			Name="External"
 			>
 			<Filter
-				Name="QMus2Mid"
+				Name="Mus2Mid"
 				>
 				<File
-					RelativePath=".\src\qmus2mid\qmus2mid.cpp"
+					RelativePath=".\src\mus2mid\mus2mid.cpp"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)\$(InputName)1.obj"
+							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)\$(InputName)1.obj"
+							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\src\mus2mid\mus2mid.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="ZReaders"
+				>
+				<File
+					RelativePath=".\src\zreaders\ancientzip.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\src\qmus2mid\qmus2mid.h"
+					RelativePath=".\src\zreaders\ancientzip.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\zreaders\files.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\zreaders\files.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\zreaders\m_alloc.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\zreaders\m_alloc.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\zreaders\tarray.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\zreaders\templates.h"
 					>
 				</File>
 			</Filter>

@@ -87,6 +87,7 @@ public:
 	bool	compileACS(bool hexen = false);
 	bool	convertTextures();
 	bool	mapOpenDb2();
+	bool	crc32();
 
 	// Needed for some console commands
 	EntryPanel *			currentArea() { return cur_area;}

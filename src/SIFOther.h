@@ -171,6 +171,76 @@ public:
 	}
 };
 
+// The same as Doom_Arah, except for the value of the transparent
+// index. Since the zerotransparent hack didn't survive the SIF
+// rewrite, here it is in all its copy/pasted glory.
+class SIFSCGfx : public SIFormat {
+protected:
+	bool readImage(SImage& image, MemChunk& data, int index) {
+		// Setup variables
+		patch_header_t header;
+		data.read(&header, 8, 0);
+		int width = wxINT16_SWAP_ON_BE(header.width);
+		int height = wxINT16_SWAP_ON_BE(header.height);
+		int offset_x = wxINT16_SWAP_ON_BE(header.left);
+		int offset_y = wxINT16_SWAP_ON_BE(header.top);
+
+		// Create image
+		image.create(width, height, PALMASK);
+		uint8_t* img_data = imageData(image);
+		uint8_t* img_mask = imageMask(image);
+
+		// Read raw pixel data
+		data.read(img_data, width*height, 8);
+
+		// Create mask (all opaque)
+		memset(img_mask, 255, width*height);
+
+		// Mark as transparent all pixels that are index 0
+		for (size_t  i = 0; i < (unsigned)(width*height); ++i)
+			if (img_data[i] == 0) img_mask[i] = 0;
+
+		// Setup other image properties
+		image.setXOffset(offset_x);
+		image.setYOffset(offset_y);
+
+		return true;
+	}
+
+public:
+	SIFSCGfx() : SIFormat("scgfx") {
+		name = "Shadowcaster Gfx";
+		extension = "dat";
+		reliability = 100;
+	}
+	~SIFSCGfx() {}
+
+	bool isThisFormat(MemChunk& mc) {
+		if (EntryDataFormat::getFormat("img_scgfx")->isThisFormat(mc) >= EDF_PROBABLY)
+			return true;
+		else
+			return false;
+	}
+
+	SImage::info_t getInfo(MemChunk& mc, int index) {
+		SImage::info_t info;
+
+		// Read header
+		patch_header_t header;
+		mc.read(&header, 8, 0);
+
+		// Set info
+		info.width = wxINT16_SWAP_ON_BE(header.width);
+		info.height = wxINT16_SWAP_ON_BE(header.height);
+		info.offset_x = wxINT16_SWAP_ON_BE(header.left);
+		info.offset_y = wxINT16_SWAP_ON_BE(header.top);
+		info.colformat = PALMASK;
+		info.format = id;
+
+		return info;
+	}
+};
+
 #define SCWALLOFFSET 130 // Headers contain 129 bytes of junk.
 class SIFSCWall : public SIFormat {
 protected:
@@ -187,14 +257,21 @@ protected:
 		// Read pixel data
 		uint8_t* img_data = imageData(image);
 		uint8_t* img_mask = imageMask(image);
+		memset(img_mask, 255, height<<6);
 		int pixelreader = SCWALLOFFSET;
 		int brush = 0;
 		for (int x = 0; x < width; ++x) {
 			for (int y = 0; y < height; ++y, ++pixelreader) {
 				brush = (y*64)+x;
 				img_data[brush] = data[pixelreader];
+				/* Problem: not all textures ought to be transparent.
+					There's no flag hidden in the header that would
+					determine whether it's opaque or transparent. It
+					seems to be a property of the map block rather
+					than the texture... Black pixels in an empty area
+					look less glitchy than transparency in undue places.
 				if (img_data[brush] == 0)
-					img_mask[brush] = 0;
+					img_mask[brush] = 0;*/
 			}
 		}
 

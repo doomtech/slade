@@ -41,11 +41,13 @@ public:
 	int		detectOffsetType();
 	void	applyViewType();
 	void	refresh();
+	void	refreshPanel();
 	string	statusString();
 	bool	extractAll();
 
 	// SAction handler
 	bool	handleAction(string id);
+	bool	fillCustomMenu(wxMenu * custom);
 
 	void	onZoomChanged(wxCommandEvent& e);
 	void	onXOffsetChanged(wxSpinEvent& e);

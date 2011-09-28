@@ -110,7 +110,7 @@ void ANSICanvas::draw() {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-	// Translate to middle of pixel (otherwise inaccuracies can occur on certain gl implemenataions)
+	// Translate to inside of pixel (otherwise inaccuracies can occur on certain gl implementations)
 	glTranslatef(0.375f, 0.375f, 0);
 
 	// Draw background
@@ -147,9 +147,6 @@ void ANSICanvas::drawImage() {
 	double x = (double)width;
 	double y = (double)height;
 
-	// Move in by 4
-	glTranslated(4, 4, 0);
-
 	// Draw the image
 	COL_WHITE.set_gl();
 	tex_image->draw2d();
@@ -171,8 +168,8 @@ void ANSICanvas::drawImage() {
 	delete[] RGBAData;
 }
 
-/* ANSICanvas::drawImage
- * Draws a single character
+/* ANSICanvas::drawCharacter
+ * Draws a single character. This is called from the parent ANSIPanel
  *******************************************************************/
 void ANSICanvas::drawCharacter(size_t index) {
 	if (!ansidata)

@@ -417,7 +417,7 @@ void MainWindow::openTextureEditor(Archive* archive) {
 }
 
 /* MainWindow::openEntry
- * Opens [entry] in it's own tab
+ * Opens [entry] in its own tab
  *******************************************************************/
 void MainWindow::openEntry(ArchiveEntry* entry) {
 	panel_archivemanager->openEntryTab(entry);

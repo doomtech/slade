@@ -138,7 +138,7 @@ void PnamesEntryPanel::populateEntryList() {
 	// Add each graphic to the list
 	list_entries->enableSizeUpdate(false);
 	for (uint32_t a = 0; a < names.size(); a++) {
-		string cols[] = { s_fmt("%d", a), s_fmt("%s", names[a]) };
+		string cols[] = { S_FMT("%d", a), S_FMT("%s", names[a]) };
 		list_entries->addItem(a, wxArrayString(2, cols));
 	}
 

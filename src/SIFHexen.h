@@ -70,38 +70,43 @@ protected:
 
 	bool writeImage(SImage& image, MemChunk& out, Palette8bit* pal, int index) {
 		// Is there really any point to being able to write this format?
+		// Answer: yeah, no other tool can do it. :p
 
-		/*
+		if (!gfx_extraconv)
+			return false;
+
 		// Check if data is paletted
-		if (type != PALMASK) {
+		if (image.getType() != PALMASK) {
 			wxLogMessage("Cannot convert truecolour image to planar format - convert to 16-colour first.");
 			return false;
 		}
 
-		if (countColours() > 16) {
-			wxLogMessage(S_FMT("Cannot convert to planar format, too many colors (%d)"), countColours());
+		if (image.countColours() > 16) {
+			wxLogMessage(S_FMT("Cannot convert to planar format, too many colors (%d)"), image.countColours());
 			return false;
 		}
 
 		// Check image size
-		if (!(width == 640 && height == 480)) {
+		if (!(image.getWidth() == 640 && image.getHeight() == 480)) {
 			wxLogMessage("Cannot convert to planar format, invalid size (must be 640x480)");
 			return false;
 		}
 
 		// Get palette to use
 		Palette8bit usepal;
-		if (has_palette)
-			usepal.copyPalette(&palette);
+		if (image.hasPalette())
+			usepal.copyPalette(image.getPalette());
 		else if (pal)
 			usepal.copyPalette(pal);
 
-		// Backup current image data (since shrinpPalette remaps the image colours)
-		MemChunk backup(width*height);
-		backup.write(data, width*height);
+		// Backup current image data (since shrinkPalette remaps the image colours)
+		MemChunk backup(640*480);
+		backup.write(imageData(image), 640*480);
 
 		// Make sure all used colors are in the first 16 entries of the palette
-		shrinkPalette(&usepal);
+		image.shrinkPalette(&usepal);
+		// Re-read shrunk palette from image
+		usepal.copyPalette(image.getPalette());
 
 		// Create planar palette
 		uint8_t * mycolors = new uint8_t[3];
@@ -119,14 +124,14 @@ protected:
 		uint8_t *pln1, *pln2, *pln3, *pln4, *read;
 		size_t plane_size = 153600/4;
 
-		read = data;
+		read = imageData(image);
 		pln1 = planes;				// 80: 10000000	08: 00001000
 		pln2 = pln1 + plane_size;	// 40: 01000000 04: 00000100
 		pln3 = pln2 + plane_size;	// 20: 00100000 02: 00000010
 		pln4 = pln3 + plane_size;	// 10: 00010000 01: 00000001
 
-		for (int y = height; y > 0; --y) {
-			for (int x = width; x > 0; x -= 8) {
+		for (int y = 480; y > 0; --y) {
+			for (int x = 640; x > 0; x -= 8) {
 				*pln1 = ((read[0] & 0x01) << 7 | (read[1] & 0x01) << 6 | (read[2] & 0x01) << 5 | (read[3] & 0x01) << 4
 						|(read[4] & 0x01) << 3 | (read[5] & 0x01) << 2 | (read[6] & 0x01) << 1 | (read[7] & 0x01)     );
 				*pln2 = ((read[0] & 0x02) << 6 | (read[1] & 0x02) << 5 | (read[2] & 0x02) << 4 | (read[3] & 0x02) << 3
@@ -147,12 +152,9 @@ protected:
 		out.write(planes, 153600);
 		delete[] planes;
 		backup.seek(0, SEEK_SET);
-		backup.read(data, width*height);
+		backup.read(imageData(image), image.getWidth()*image.getHeight());
 
 		return true;
-		*/
-
-		return false;
 	}
 
 public:
@@ -184,14 +186,18 @@ public:
 		return info;
 	}
 
-	/*
+
 	int canWrite(SImage& image) {
+		if (!gfx_extraconv)
+			return NOTWRITABLE;
 		// Can write paletted images of size 640x480
 		if (image.getWidth() == 640 && image.getHeight() == 480 && image.getType() == PALMASK)
 			return WRITABLE;
 		// Otherwise it's possible to convert the image as long as it's at least 640x480
 		else if (image.getWidth() >= 640 && image.getHeight() >= 480)
 			return CONVERTIBLE;
+		// If it wouldn't work, it wouldn't work
+		return NOTWRITABLE;
 	}
 
 	bool canWriteType(SIType type) {
@@ -212,7 +218,6 @@ public:
 
 		return true;
 	}
-	*/
 };
 
 class SIF4BitChunk : public SIFormat {
@@ -247,54 +252,54 @@ protected:
 
 	bool writeImage(SImage& image, MemChunk& out, Palette8bit* pal, int index) {
 		// Again, don't see much point
+		if (!gfx_extraconv)
+			return false;
 
-		/*
 		// Check if data is paletted
-		if (type != PALMASK) {
+		if (image.getType() != PALMASK) {
 			wxLogMessage("Cannot convert truecolour image to 4-bit format - convert to 16-colour first.");
 			return false;
 		}
 
-		if (countColours() > 16) {
-			wxLogMessage(S_FMT("Cannot convert to 4-bit format, too many colors (%d)"), countColours());
+		if (image.countColours() > 16) {
+			wxLogMessage(S_FMT("Cannot convert to 4-bit format, too many colors (%d)"), image.countColours());
 			return false;
 		}
 
 		// Check image size
-		if (!((width == 4 && height == 16) || (width == 16 && height == 23))) {
+		if (!((image.getWidth() == 4 && image.getHeight() == 16) || (image.getWidth() == 16 && image.getHeight() == 23))) {
 			wxLogMessage("No point in converting to 4-bit format, image isn't a valid Hexen size (4x16 or 16x23)");
 			return false;
 		}
 
 		// Get palette to use
 		Palette8bit usepal;
-		if (has_palette)
-			usepal.copyPalette(&palette);
+		if (image.hasPalette())
+			usepal.copyPalette(image.getPalette());
 		else if (pal)
 			usepal.copyPalette(pal);
 
-		// Backup current image data (since shrinpPalette remaps the image colours)
-		MemChunk backup(width*height);
-		backup.write(data, width*height);
+		// Backup current image data (since shrinkPalette remaps the image colours)
+		MemChunk backup(image.getWidth()*image.getHeight());
+		backup.write(imageData(image), image.getWidth()*image.getHeight());
 
 		// Make sure all used colors are in the first 16 entries of the palette
-		shrinkPalette();
+		image.shrinkPalette();
 
-		size_t filesize = width * height / 2;
+		size_t filesize = image.getWidth() * image.getHeight() / 2;
 		uint8_t * temp = new uint8_t[filesize];
 
-		for (int i = 0; i < width * height; i+=2) {
-			temp[i/2] = data[i]<<4 | data[i+1];
+		for (int i = 0; i < image.getWidth()*image.getHeight(); i+=2) {
+			temp[i/2] = imageData(image)[i]<<4 | imageData(image)[i+1];
 		}
 
 		// Write image and cleanup
 		out.write(temp, filesize);
 		delete[] temp;
 		backup.seek(0, SEEK_SET);
-		backup.read(data, width*height);
-		*/
+		backup.read(imageData(image), image.getWidth()*image.getHeight());
 
-		return false;
+		return true;
 	}
 
 public:

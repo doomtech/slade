@@ -40,6 +40,7 @@
 #include "TranslationEditorDialog.h"
 #include <wx/dialog.h>
 #include <wx/clrpicker.h>
+#include "ConsoleHelpers.h"
 
 
 /*******************************************************************
@@ -234,7 +235,7 @@ public:
 		gfx_preview->getImage()->tint(getColour(), getAmount(), palette);
 		gfx_preview->updateImageTexture();
 		gfx_preview->Refresh();
-		label_amount->SetLabel(S_FMT("%d", slider_amount->GetValue()) + "% ");
+		label_amount->SetLabel(S_FMT("%d%% ", slider_amount->GetValue()));
 	}
 
 	void onResize(wxSizeEvent& e) {
@@ -307,24 +308,8 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 
 	// Custom menu
 	menu_custom = new wxMenu();
-	theApp->getAction("pgfx_mirror")->addToMenu(menu_custom);
-	theApp->getAction("pgfx_flip")->addToMenu(menu_custom);
-	theApp->getAction("pgfx_rotate")->addToMenu(menu_custom);
-	menu_custom->AppendSeparator();
-	theApp->getAction("pgfx_translate")->addToMenu(menu_custom);
-	theApp->getAction("pgfx_colourise")->addToMenu(menu_custom);
-	theApp->getAction("pgfx_tint")->addToMenu(menu_custom);
-	menu_custom->AppendSeparator();
-	theApp->getAction("pgfx_alph")->addToMenu(menu_custom);
-	theApp->getAction("pgfx_trns")->addToMenu(menu_custom);
-	menu_custom->AppendSeparator();
-	theApp->getAction("arch_gfx_exportpng")->addToMenu(menu_custom);
-	theApp->getAction("pgfx_extract")->addToMenu(menu_custom);
-	menu_custom->AppendSeparator();
-	theApp->getAction("arch_gfx_addptable")->addToMenu(menu_custom);
-	theApp->getAction("arch_gfx_addtexturex")->addToMenu(menu_custom);
+	fillCustomMenu(menu_custom);
 	custom_menu_name = "Graphic";
-	// TODO: Should change the way gfx conversion and offset modification work so I can put them in this menu
 
 	// Bind Events
 	slider_zoom->Bind(wxEVT_COMMAND_SLIDER_UPDATED, &GfxEntryPanel::onZoomChanged, this);
@@ -566,6 +551,16 @@ string GfxEntryPanel::statusString() {
 	return status;
 }
 
+/* GfxEntryPanel::refreshPanel
+ * Redraws the panel
+ *******************************************************************/
+void GfxEntryPanel::refreshPanel() {
+	if (entry && getImage())
+		loadEntry(entry, getImage()->getIndex());
+	Update();
+	Refresh();
+}
+
 /* GfxEntryPanel::updateImagePalette
  * Sets the gfx canvas' palette to what is selected in the palette
  * chooser, and refreshes the gfx canvas
@@ -660,7 +655,7 @@ void GfxEntryPanel::applyViewType() {
  *******************************************************************/
 bool GfxEntryPanel::handleAction(string id) {
 	// Don't handle actions if hidden
-	if (!IsShown())
+	if (!isActivePanel())
 		return false;
 
 	// We're only interested in "pgfx_" actions
@@ -806,6 +801,33 @@ bool GfxEntryPanel::handleAction(string id) {
 	return true;
 }
 
+/* GfxEntryPanel::fillCustomMenu
+ * Fills the given menu with the panel's custom actions. Used by
+ * both the constructor to create the main window's custom menu,
+ * and ArchivePanel::onEntryListRightClick to fill the context
+ * menu with context-appropriate stuff
+ *******************************************************************/
+bool GfxEntryPanel::fillCustomMenu(wxMenu * custom) {
+	theApp->getAction("pgfx_mirror")->addToMenu(custom);
+	theApp->getAction("pgfx_flip")->addToMenu(custom);
+	theApp->getAction("pgfx_rotate")->addToMenu(custom);
+	custom->AppendSeparator();
+	theApp->getAction("pgfx_translate")->addToMenu(custom);
+	theApp->getAction("pgfx_colourise")->addToMenu(custom);
+	theApp->getAction("pgfx_tint")->addToMenu(custom);
+	custom->AppendSeparator();
+	theApp->getAction("pgfx_alph")->addToMenu(custom);
+	theApp->getAction("pgfx_trns")->addToMenu(custom);
+	custom->AppendSeparator();
+	theApp->getAction("arch_gfx_exportpng")->addToMenu(custom);
+	theApp->getAction("pgfx_extract")->addToMenu(custom);
+	custom->AppendSeparator();
+	theApp->getAction("arch_gfx_addptable")->addToMenu(custom);
+	theApp->getAction("arch_gfx_addtexturex")->addToMenu(custom);
+	// TODO: Should change the way gfx conversion and offset modification work so I can put them in this menu
+
+	return true;
+}
 
 /*******************************************************************
  * GFXENTRYPANEL EVENTS
@@ -928,21 +950,16 @@ void GfxEntryPanel::onBtnPrevImg(wxCommandEvent& e) {
 
 // I'd love to put them in their own file, but attempting to do so
 // results in a circular include nightmare and nothing works anymore.
-#include "ConsoleHelpers.h"
 #include "Console.h"
 #include "MainApp.h"
 #include "ArchivePanel.h"
 #include "MainWindow.h"
 
 GfxEntryPanel * CH::getCurrentGfxPanel() {
-	ArchiveManagerPanel * archie = theMainWindow->getArchiveManagerPanel();
-	if (archie)
-	{
-		EntryPanel* panie = archie->currentArea();
-		if (panie) {
-			if (!(panie->getName().CmpNoCase("gfx"))) {
-				return (GfxEntryPanel *)panie;
-			}
+	EntryPanel* panel = theActivePanel;
+	if (panel) {
+		if (!(panel->getName().CmpNoCase("gfx"))) {
+			return (GfxEntryPanel *)panel;
 		}
 	}
 	return NULL;

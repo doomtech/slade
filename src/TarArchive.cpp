@@ -495,7 +495,7 @@ string TarArchive::detectNamespace(ArchiveEntry* entry) {
 bool TarArchive::isTarArchive(MemChunk& mc) {
 	mc.seek(0, SEEK_SET);
 	int blankcount = 0;
-	while ((mc.currentPos() + 512) <= mc.getSize() && blankcount < 2) {
+	while ((mc.currentPos() + 512) <= mc.getSize() && blankcount < 3) {
 		// Read tar header
 		tar_header header;
 		mc.read(&header, 512);
@@ -540,7 +540,7 @@ bool TarArchive::isTarArchive(string filename) {
 		return false;
 
 	int blankcount = 0;
-	while ((file.Tell() + 512) <= file.Length() && blankcount < 2) {
+	while ((file.Tell() + 512) <= file.Length() && blankcount < 3) {
 
 		// Read tar header
 		tar_header header;

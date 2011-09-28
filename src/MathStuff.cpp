@@ -5,7 +5,7 @@
  *
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
- * Filename:    Math.cpp
+ * Filename:    MathStuff.cpp
  * Description: Contains various useful math related functions
  *
  * This program is free software; you can redistribute it and/or

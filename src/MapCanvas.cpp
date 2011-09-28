@@ -259,7 +259,7 @@ void MapCanvas::draw() {
 	glClearColor(col_bg.fr(), col_bg.fg(), col_bg.fb(), 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// Translate to middle of pixel (otherwise inaccuracies can occur on certain gl implemenataions)
+	// Translate to inside of pixel (otherwise inaccuracies can occur on certain gl implemenataions)
 	glTranslatef(0.375f, 0.375f, 0);
 
 	// Translate to middle of screen

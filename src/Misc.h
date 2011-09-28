@@ -27,6 +27,9 @@ namespace Misc {
 	string		sizeAsString(uint32_t size);
 	uint32_t	crc(const uint8_t *buf, uint32_t len);
 	hsl_t		rgbToHsl(double r, double g, double b);
+	rgba_t		hslToRgb(double h, double s, double t);
+	hsl_t		rgbToHsl(rgba_t rgba);
+	rgba_t		hslToRgb(hsl_t hsl);
 
 	// Mass Rename
 	string	massRenameFilter(wxArrayString& names);
