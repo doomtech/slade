@@ -14,6 +14,8 @@
 class MapEditor;
 class MCAnimation;
 class MapSide;
+class ThingType;
+class GLTexture;
 class MapCanvas : public OGLCanvas, public KeyBindHandler, public SActionHandler {
 private:
 	MapEditor*				editor;
@@ -30,8 +32,10 @@ private:
 		MSTATE_PANNING,
 		MSTATE_MOVE,
 	};
-	point2_t	mouse_pos;
+	point2_t	mouse_pos;			// 'Raw' mouse position
 	point2_t	mouse_downpos;
+	fpoint2_t	mouse_pos_m;		// 'Map' mouse position (translated)
+	fpoint2_t	mouse_downpos_m;
 	uint8_t		mouse_state;
 
 	// Info overlays
@@ -47,6 +51,17 @@ private:
 	double		view_scale;
 	fpoint2_t	view_tl;
 	fpoint2_t	view_br;
+
+	// Visibility
+	enum {
+		VIS_LEFT	= 1,
+		VIS_RIGHT	= 2,
+		VIS_ABOVE	= 4,
+		VIS_BELOW	= 8,
+	};
+	vector<uint8_t>	vis_v;
+	vector<uint8_t>	vis_l;
+	vector<uint8_t>	vis_t;
 
 	// Animation
 	float	anim_flash_level;
@@ -67,8 +82,17 @@ public:
 
 	// Drawing
 	void	drawGrid();
+	void	drawVertices();
+	void	drawLines(bool show_direction = false);
+	void	drawRoundThing(double x, double y, double angle, ThingType* type);
+	bool	drawSpriteThing(double x, double y, double angle, ThingType* type);
+	void	drawSquareThing(double x, double y, double angle, ThingType* type);
+	void	drawThings();
+	void	drawHilight();
+	void	drawSelection();
 	void	draw();
 	void	update(long frametime);
+	void	updateVisibility();
 
 	// Keybind handling
 	void	onKeyBindPress(string name);

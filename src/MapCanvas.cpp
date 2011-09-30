@@ -38,14 +38,18 @@
 #include "Drawing.h"
 #include "MathStuff.h"
 #include "MainApp.h"
+#include "MapEditorWindow.h"
 
 
 /*******************************************************************
  * VARIABLES
  *******************************************************************/
 CVAR(Bool, vertex_round, true, CVAR_SAVE)
-CVAR(Bool, line_smooth, true, CVAR_SAVE)
 CVAR(Int, vertex_size, 7, CVAR_SAVE)
+CVAR(Float, line_width, 1.5f, CVAR_SAVE)
+CVAR(Bool, line_smooth, true, CVAR_SAVE)
+CVAR(Int, things_drawtype, 1, CVAR_SAVE)
+CVAR(Bool, things_force_dir, false, CVAR_SAVE)
 CVAR(Bool, grid_dashed, false, CVAR_SAVE)
 
 
@@ -129,6 +133,9 @@ void MapCanvas::setView(double x, double y) {
 	view_tl.y = translateY(GetSize().y);
 	view_br.x = translateX(GetSize().x);
 	view_br.y = translateY(0);
+
+	// Update object visibility
+	updateVisibility();
 }
 
 void MapCanvas::pan(double x, double y) {
@@ -154,8 +161,8 @@ void MapCanvas::zoom(double amount, bool toward_cursor) {
 	}
 
 	if (!limit && toward_cursor) {
-		double mx = editor->mousePos().x;
-		double my = editor->mousePos().y;
+		double mx = translateX(mouse_pos.x);
+		double my = translateY(mouse_pos.y);
 		view_xoff = mx + (double(view_xoff - mx) / amount);
 		view_yoff = my + (double(view_yoff - my) / amount);
 	}
@@ -165,6 +172,9 @@ void MapCanvas::zoom(double amount, bool toward_cursor) {
 	view_tl.y = translateY(GetSize().y);
 	view_br.x = translateX(GetSize().x);
 	view_br.y = translateY(0);
+
+	// Update object visibility
+	updateVisibility();
 }
 
 void MapCanvas::drawGrid() {
@@ -240,6 +250,579 @@ void MapCanvas::drawGrid() {
 	glDisable(GL_LINE_STIPPLE);
 }
 
+void MapCanvas::drawVertices() {
+	// Set to vertex colour
+	ColourConfiguration::getColour("map_vertex").set_gl();
+
+	// Go through vertices
+	glBegin(GL_POINTS);
+	for (unsigned a = 0; a < editor->getMap().nVertices(); a++) {
+		// Skip if outside of screen
+		if (vis_v[a] > 0)
+			continue;
+
+		// Draw vertex
+		glVertex2d(editor->getMap().getVertex(a)->xPos(), editor->getMap().getVertex(a)->yPos());
+	}
+	glEnd();
+}
+
+void MapCanvas::drawLines(bool show_direction) {
+	// Temp for now
+	float fade_coeff = 0.5f;
+
+	// Get line colours
+	rgba_t col_background = ColourConfiguration::getColour("map_background");
+	rgba_t col_line_normal = ColourConfiguration::getColour("map_line_normal");
+	rgba_t col_line_special = ColourConfiguration::getColour("map_line_special");
+
+	// Set line width
+	glLineWidth(line_width);
+
+	// Draw all lines
+	rgba_t col;
+	MapLine* line = NULL;
+	double x1, y1, x2, y2;
+	for (unsigned a = 0; a < editor->getMap().nLines(); a++) {
+		// Skip if outside of screen
+		if (vis_l[a] > 0)
+			continue;
+
+		// Get line info
+		line = editor->getMap().getLine(a);
+		x1 = line->v1()->xPos();
+		y1 = line->v1()->yPos();
+		x2 = line->v2()->xPos();
+		y2 = line->v2()->yPos();
+
+		// Check for special line
+		if ((int)line->prop("special") > 0)
+			col.set(col_line_special);
+		else
+			col.set(col_line_normal);
+
+		// Check for two-sided line
+		if (line->s2())
+			col.set(col.r*fade_coeff+col_background.r*(1.0-fade_coeff),
+					col.g*fade_coeff+col_background.g*(1.0-fade_coeff),
+					col.b*fade_coeff+col_background.b*(1.0-fade_coeff), 255, 0);
+
+		// Set line colour
+		col.set_gl();
+
+		// Draw the line
+		glBegin(GL_LINES);
+		glVertex2d(x1, y1);
+		glVertex2d(x2, y2);
+		glEnd();
+
+		// Direction tab
+		if (show_direction) {
+			double xmid = x1 + ((x2 - x1) * 0.5);
+			double ymid = y1 + ((y2 - y1) * 0.5);
+			double x = (-(y2 - y1)) * 0.125;
+			double y = (x2 - x1) * 0.125;
+
+			glBegin(GL_LINES);
+			glVertex2d(xmid, ymid);
+			glVertex2d(xmid - x, ymid - y);
+			glEnd();
+		}
+	}
+}
+
+void MapCanvas::drawRoundThing(double x, double y, double angle, ThingType* tt) {
+	// Ignore if no type given (shouldn't happen)
+	if (!tt)
+		return;
+
+	// --- Determine texture to use ---
+	GLTexture* tex = NULL;
+	bool rotate = false;
+
+	// Check for unknown type
+	if (tt->getName() == "Unknown") {
+		tex = theMapEditor->textureManager().getThingImage("unknown");
+		COL_WHITE.set_gl();
+	}
+
+	else {
+		// Otherwise, normal thing image (for now)
+		tt->getColour().set_gl();
+
+		// Check if we want an angle indicator
+		if (tt->isAngled() || things_force_dir) {
+			rotate = true;	// Also rotate to angle
+			tex = theMapEditor->textureManager().getThingImage("normal_d");
+		}
+		else
+			tex = theMapEditor->textureManager().getThingImage("normal_n");
+	}
+
+	// If for whatever reason the thing texture doesn't exist, just draw a basic, square thing
+	if (!tex) {
+		drawSquareThing(x, y, angle, tt);
+		return;
+	}
+
+	// Bind texture
+	tex->bind();
+
+	// Move to thing position
+	glPushMatrix();
+	glTranslated(x, y, 0);
+
+	// Rotate if needed
+	if (rotate)
+		glRotated(angle, 0, 0, 1);
+
+	// Draw thing
+	double radius = tt->getRadius();
+	glBegin(GL_QUADS);
+	glTexCoord2f(0.0f, 1.0f);	glVertex2d(-radius, -radius);
+	glTexCoord2f(0.0f, 0.0f);	glVertex2d(-radius, radius);
+	glTexCoord2f(1.0f, 0.0f);	glVertex2d(radius, radius);
+	glTexCoord2f(1.0f, 1.0f);	glVertex2d(radius, -radius);
+	glEnd();
+
+	// Restore previous matrix
+	glPopMatrix();
+}
+
+bool MapCanvas::drawSpriteThing(double x, double y, double angle, ThingType* tt) {
+	// Ignore if no type given (shouldn't happen)
+	if (!tt)
+		return false;
+
+	// --- Determine texture to use ---
+	bool show_angle = false;
+	GLTexture* tex = NULL;
+
+	// Check for unknown type
+	if (tt->getName() == "Unknown")
+		tex = theMapEditor->textureManager().getThingImage("unknown");
+	else {
+		// Attempt to get sprite texture
+		tex = theMapEditor->textureManager().getSprite(tt->getSprite());
+
+		// If sprite not found, just draw as a normal, round thing
+		if (!tex) {
+			drawRoundThing(x, y, angle, tt);
+			return false;
+		}
+
+		// Check if we have to draw the angle arrow later
+		if (tt->isAngled() || things_force_dir)
+			show_angle = true;
+	}
+
+	// If for whatever reason the thing texture doesn't exist, just draw a basic, square thing
+	if (!tex) {
+		drawSquareThing(x, y, angle, tt);
+		return false;
+	}
+
+	// Move to thing position
+	glPushMatrix();
+	glTranslated(x, y, 0);
+
+	// Bind texture
+	tex->bind();
+
+	// Draw thing
+	double hw = tex->getWidth()*0.5;
+	double hh = tex->getHeight()*0.5;
+	glBegin(GL_QUADS);
+	glTexCoord2f(0.0f, 1.0f);	glVertex2d(-hw, -hh);
+	glTexCoord2f(0.0f, 0.0f);	glVertex2d(-hw, hh);
+	glTexCoord2f(1.0f, 0.0f);	glVertex2d(hw, hh);
+	glTexCoord2f(1.0f, 1.0f);	glVertex2d(hw, -hh);
+	glEnd();
+
+	// Restore previous matrix
+	glPopMatrix();
+
+	return show_angle;
+}
+
+void MapCanvas::drawSquareThing(double x, double y, double angle, ThingType* tt) {
+	// Ignore if no type given (shouldn't happen)
+	if (!tt)
+		return;
+
+	// Get thing info
+	double radius = tt->getRadius();
+	double radius2 = radius * 0.1;
+
+	// Move to thing position
+	glPushMatrix();
+	glTranslated(x, y, 0);
+
+	// Draw background
+	COL_BLACK.set_gl();
+	glBegin(GL_QUADS);
+	glVertex2d(-radius, -radius);
+	glVertex2d(-radius, radius);
+	glVertex2d(radius, radius);
+	glVertex2d(radius, -radius);
+	glEnd();
+
+	// Draw base
+	tt->getColour().set_gl();
+	glBegin(GL_QUADS);
+	glVertex2d(-radius+radius2, -radius+radius2);
+	glVertex2d(-radius+radius2, radius-radius2);
+	glVertex2d(radius-radius2, radius-radius2);
+	glVertex2d(radius-radius2, -radius+radius2);
+	glEnd();
+
+	// Draw angle indicator (if needed)
+	if (tt->isAngled() || things_force_dir) {
+		COL_BLACK.set_gl();
+		glRotated(angle, 0, 0, 1);
+		glBegin(GL_LINES);
+		glVertex2d(0, 0);
+		glVertex2d(radius, 0);
+		glEnd();
+	}
+
+	// Restore previous matrix
+	glPopMatrix();
+}
+
+void MapCanvas::drawThings() {
+	// Enable textures
+	if (things_drawtype > 0)
+		glEnable(GL_TEXTURE_2D);
+	rgba_t(255, 255, 255, 255, 0).set_gl();
+	glLineWidth(2.0f);
+
+	// Go through things
+	MapThing* thing = NULL;
+	double x, y;
+	vector<int> things_arrows;
+	for (unsigned a = 0; a < editor->getMap().nThings(); a++) {
+		// Skip if outside of screen
+		if (vis_t[a] > 0)
+			continue;
+
+		// Get thing info
+		thing = editor->getMap().getThing(a);
+		x = thing->xPos();
+		y = thing->yPos();
+
+		// Get thing type properties from game configuration
+		ThingType* tt = theGameConfiguration->thingType(thing->getType());
+
+		// Draw thing depending on 'things_drawtype' cvar
+		if (things_drawtype == 2) {		// Drawtype 2: Sprites
+			// Check if we need to draw the direction arrow for this thing
+			if (drawSpriteThing(x, y, thing->prop("angle").getFloatValue(), tt))
+				things_arrows.push_back(a);
+		}
+		else if (things_drawtype == 1)	// Drawtype 1: Round
+			drawRoundThing(x, y, thing->prop("angle").getFloatValue(), tt);
+		else							// Drawtype 0 (or other): Square
+			drawSquareThing(x, y, thing->prop("angle").getFloatValue(), tt);
+	}
+
+	// Draw any thing direction arrows needed
+	if (things_drawtype == 2) {
+		GLTexture* tex_arrow = theMapEditor->textureManager().getThingImage("arrow");
+		if (tex_arrow) {
+			tex_arrow->bind();
+
+			for (unsigned a = 0; a < things_arrows.size(); a++) {
+				MapThing* thing = editor->getMap().getThing(things_arrows[a]);
+				x = thing->xPos();
+				y = thing->yPos();
+
+				glPushMatrix();
+				glTranslated(x, y, 0);
+				glRotated(thing->prop("angle").getIntValue(), 0, 0, 1);
+
+				COL_WHITE.set_gl();
+				glBegin(GL_QUADS);
+				glTexCoord2f(0.0f, 1.0f);	glVertex2d(-32, -32);
+				glTexCoord2f(0.0f, 0.0f);	glVertex2d(-32, 32);
+				glTexCoord2f(1.0f, 0.0f);	glVertex2d(32, 32);
+				glTexCoord2f(1.0f, 1.0f);	glVertex2d(32, -32);
+				glEnd();
+
+				glPopMatrix();
+			}
+		}
+	}
+
+	// Disable textures
+	if (things_drawtype > 0)
+		glDisable(GL_TEXTURE_2D);
+}
+
+void MapCanvas::drawHilight() {
+	int hilight_item = editor->hilightItem();
+
+	// Check anything is hilighted
+	if (hilight_item < 0)
+		return;
+
+	// Set hilight colour
+	rgba_t col = ColourConfiguration::getColour("map_hilight");
+	col.a *= anim_flash_level;
+	col.set_gl();
+
+	glLineWidth(line_width*3);
+	glPointSize(vertex_size*1.5f);
+
+	// Draw depending on mode
+	if (editor->editMode() == MapEditor::MODE_VERTICES) {
+		// Vertex
+		glBegin(GL_POINTS);
+		glVertex2d(editor->getMap().getVertex(hilight_item)->xPos(),
+					editor->getMap().getVertex(hilight_item)->yPos());
+		glEnd();
+	}
+	else if (editor->editMode() == MapEditor::MODE_LINES) {
+		// Set line width
+		glLineWidth(line_width*3);
+
+		// Line
+		MapLine* line = editor->getMap().getLine(hilight_item);
+		double x1 = line->v1()->xPos();
+		double y1 = line->v1()->yPos();
+		double x2 = line->v2()->xPos();
+		double y2 = line->v2()->yPos();
+		glBegin(GL_LINES);
+		glVertex2d(x1, y1);
+		glVertex2d(x2, y2);
+		glEnd();
+
+		// Direction tab
+		double xmid = x1 + ((x2 - x1) * 0.5);
+		double ymid = y1 + ((y2 - y1) * 0.5);
+		double x = (-(y2 - y1)) * 0.125;
+		double y = (x2 - x1) * 0.125;
+		glBegin(GL_LINES);
+		glVertex2d(xmid, ymid);
+		glVertex2d(xmid - x, ymid - y);
+		glEnd();
+	}
+	else if (editor->editMode() == MapEditor::MODE_SECTORS) {
+		// Sector
+
+		// Set line width
+		glLineWidth(line_width*3);
+
+		// Get all lines belonging to the hilighted sector
+		vector<MapLine*> lines;
+		editor->getMap().getLinesOfSector(hilight_item, lines);
+
+		// Draw hilight
+		MapLine* line = NULL;
+		for (unsigned a = 0; a < lines.size(); a++) {
+			line = lines[a];
+			if (!line) continue;
+
+			// Draw line
+			glBegin(GL_LINES);
+			glVertex2d(line->v1()->xPos(), line->v1()->yPos());
+			glVertex2d(line->v2()->xPos(), line->v2()->yPos());
+			glEnd();
+		}
+	}
+	else if (editor->editMode() == MapEditor::MODE_THINGS) {
+		// Thing
+		MapThing* thing = editor->getMap().getThing(hilight_item);
+		double x = thing->xPos();
+		double y = thing->yPos();
+
+		// Get thing radius
+		double radius = theGameConfiguration->thingType(thing->getType())->getRadius();
+		if (things_drawtype == 0)
+			radius += 6;
+		else
+			radius *= 1.1 + (0.2*anim_flash_level);
+
+		if (things_drawtype == 0) {
+			glBegin(GL_QUADS);
+			glVertex2d(x - radius, y - radius);
+			glVertex2d(x - radius, y + radius);
+			glVertex2d(x + radius, y + radius);
+			glVertex2d(x + radius, y - radius);
+			glEnd();
+		}
+		else {
+			// Setup hilight thing texture
+			GLTexture* tex = theMapEditor->textureManager().getThingImage("hilight");
+			if (tex) {
+				glEnable(GL_TEXTURE_2D);
+				tex->bind();
+			}
+
+			glBegin(GL_QUADS);
+			glTexCoord2f(0.0f, 0.0f);	glVertex2d(x - radius, y - radius);
+			glTexCoord2f(0.0f, 1.0f);	glVertex2d(x - radius, y + radius);
+			glTexCoord2f(1.0f, 1.0f);	glVertex2d(x + radius, y + radius);
+			glTexCoord2f(1.0f, 0.0f);	glVertex2d(x + radius, y - radius);
+			glEnd();
+
+			glDisable(GL_TEXTURE_2D);
+		}
+	}
+
+	glPointSize(vertex_size);
+}
+
+void MapCanvas::drawSelection() {
+	vector<int>& selection = editor->getSelection();
+	SLADEMap& map = editor->getMap();
+
+	// Check anything is selected
+	if (selection.size() == 0)
+		return;
+
+	// Set selection colour
+	ColourConfiguration::getColour("map_selection").set_gl();
+
+	glLineWidth(line_width*4);
+	glPointSize(vertex_size*1.5f);
+
+	// Draw depending on mode
+	if (editor->editMode() == MapEditor::MODE_VERTICES) {
+		// Vertices
+		double x, y;
+		glBegin(GL_POINTS);
+		for (unsigned a = 0; a < selection.size(); a++) {
+			// Skip if not on screen
+			if (vis_v[selection[a]] > 0)
+				continue;
+
+			// Draw vertex selection
+			glVertex2d(map.getVertex(selection[a])->xPos(), map.getVertex(selection[a])->yPos());
+		}
+		glEnd();
+	}
+	else if (editor->editMode() == MapEditor::MODE_LINES) {
+		// Set line width
+		glLineWidth(line_width*4);
+
+		// Lines
+		MapLine* line;
+		double x1, y1, x2, y2;
+		glBegin(GL_LINES);
+		for (unsigned a = 0; a < selection.size(); a++) {
+			// Skip if not on screen
+			if (vis_l[selection[a]] > 0)
+				continue;
+
+			line = map.getLine(selection[a]);
+			x1 = line->v1()->xPos();
+			y1 = line->v1()->yPos();
+			x2 = line->v2()->xPos();
+			y2 = line->v2()->yPos();
+
+			// Draw line
+			glVertex2d(x1, y1);
+			glVertex2d(x2, y2);
+
+			// Direction tab
+			double xmid = x1 + ((x2 - x1) * 0.5);
+			double ymid = y1 + ((y2 - y1) * 0.5);
+			double x = (-(y2 - y1)) * 0.125;
+			double y = (x2 - x1) * 0.125;
+			glVertex2d(xmid, ymid);
+			glVertex2d(xmid - x, ymid - y);
+		}
+		glEnd();
+	}
+	else if (editor->editMode() == MapEditor::MODE_SECTORS) {
+		// Sectors
+
+		// Set line width
+		glLineWidth(line_width*4);
+
+		// Get selected sector(s)
+		vector<MapSector*> selected_sectors;
+		for (unsigned a = 0; a < selection.size(); a++)
+			selected_sectors.push_back(map.getSector(selection[a]));
+
+		// Go through map lines
+		MapLine* line;
+		double x1, y1, x2, y2;
+		glBegin(GL_LINES);
+		for (unsigned a = 0; a < map.nLines(); a++) {
+			// Skip if not on screen
+			if (vis_l[a] > 0)
+				continue;
+
+			// Check if line is in a selected sector
+			line = map.getLine(a);
+			bool selected = false;
+			for (unsigned b = 0; b < selected_sectors.size(); b++) {
+				if (map.lineInSector(line, selected_sectors[b])) {
+					selected = true;
+					break;
+				}
+			}
+
+			// Skip if not selected
+			if (!selected)
+				continue;
+
+			// Draw line
+			glVertex2d(line->v1()->xPos(), line->v1()->yPos());
+			glVertex2d(line->v2()->xPos(), line->v2()->yPos());
+		}
+		glEnd();
+	}
+	else if (editor->editMode() == MapEditor::MODE_THINGS) {
+		// Things
+		double x, y;
+		MapThing* thing = NULL;
+		for (unsigned a = 0; a < selection.size(); a++) {
+			// Skip if not on screen
+			if (vis_t[selection[a]] > 0)
+				continue;
+
+			thing = map.getThing(selection[a]);
+			x = thing->xPos();
+			y = thing->yPos();
+
+			// Get thing radius
+			double radius = theGameConfiguration->thingType(thing->getType())->getRadius() + 8;
+
+			if (things_drawtype == 0) {
+				glBegin(GL_QUADS);
+				glVertex2d(x - radius, y - radius);
+				glVertex2d(x - radius, y + radius);
+				glVertex2d(x + radius, y + radius);
+				glVertex2d(x + radius, y - radius);
+				glEnd();
+			}
+			else {
+				// Setup hilight thing texture
+				GLTexture* tex = theMapEditor->textureManager().getThingImage("hilight");
+				if (tex) {
+					glEnable(GL_TEXTURE_2D);
+					tex->bind();
+				}
+
+				// Draw thing selection if on screen
+				glBegin(GL_QUADS);
+				glTexCoord2f(0.0f, 0.0f);	glVertex2d(x - radius, y - radius);
+				glTexCoord2f(0.0f, 1.0f);	glVertex2d(x - radius, y + radius);
+				glTexCoord2f(1.0f, 1.0f);	glVertex2d(x + radius, y + radius);
+				glTexCoord2f(1.0f, 0.0f);	glVertex2d(x + radius, y - radius);
+				glEnd();
+
+				glDisable(GL_TEXTURE_2D);
+			}
+		}
+	}
+
+	glPointSize(vertex_size);
+}
+
 /* MapCanvas::draw
  * Draw the 2d map on the map gl canvas
  *******************************************************************/
@@ -286,37 +869,48 @@ void MapCanvas::draw() {
 	glLineWidth(1.5f);
 	glPointSize((float)vertex_size);
 
-	// Draw map
-	editor->drawMap(view_tl.x, view_tl.y, view_br.x, view_br.y, view_scale);
+	// --- Draw map ---
+
+	// Check if we need to update visibility
+	if (vis_v.size() != editor->getMap().nVertices() ||
+		vis_l.size() != editor->getMap().nLines() ||
+		vis_t.size() != editor->getMap().nThings())
+		updateVisibility();
+
+	// Lines always (show direction only in lines mode)
+	drawLines(editor->editMode() == MapEditor::MODE_LINES);
+
+	// Vertices if in vertex mode
+	if (editor->editMode() == MapEditor::MODE_VERTICES)
+		drawVertices();
+
+	// Things if in things mode
+	if (editor->editMode() == MapEditor::MODE_THINGS)
+		drawThings();
 
 	// Draw overlays (hilight etc)
-	editor->drawSelection(view_tl.x, view_tl.y, view_br.x, view_br.y);
-	if (mouse_state == MSTATE_NORMAL) editor->drawHilight(anim_flash_level);
+	if (mouse_state == MSTATE_NORMAL) drawHilight();
+	drawSelection();
 
 	// Draw selection box if active
 	if (mouse_state == MSTATE_SELECTION) {
-		// Get selection box map coordinates
-		rgba_t col;
-		fpoint2_t sel_origin = editor->mouseDownPos();
-		fpoint2_t sel_end = editor->mousePos();
-
 		// Outline
 		ColourConfiguration::getColour("map_selbox_outline").set_gl();
 		glLineWidth(2.0f);
 		glBegin(GL_LINE_LOOP);
-		glVertex2d(sel_origin.x, sel_origin.y);
-		glVertex2d(sel_origin.x, sel_end.y);
-		glVertex2d(sel_end.x, sel_end.y);
-		glVertex2d(sel_end.x, sel_origin.y);
+		glVertex2d(mouse_downpos_m.x, mouse_downpos_m.y);
+		glVertex2d(mouse_downpos_m.x, mouse_pos_m.y);
+		glVertex2d(mouse_pos_m.x, mouse_pos_m.y);
+		glVertex2d(mouse_pos_m.x, mouse_downpos_m.y);
 		glEnd();
 
 		// Fill
 		ColourConfiguration::getColour("map_selbox_fill").set_gl();
 		glBegin(GL_QUADS);
-		glVertex2d(sel_origin.x, sel_origin.y);
-		glVertex2d(sel_origin.x, sel_end.y);
-		glVertex2d(sel_end.x, sel_end.y);
-		glVertex2d(sel_end.x, sel_origin.y);
+		glVertex2d(mouse_downpos_m.x, mouse_downpos_m.y);
+		glVertex2d(mouse_downpos_m.x, mouse_pos_m.y);
+		glVertex2d(mouse_pos_m.x, mouse_pos_m.y);
+		glVertex2d(mouse_pos_m.x, mouse_downpos_m.y);
 		glEnd();
 	}
 
@@ -378,7 +972,7 @@ void MapCanvas::update(long frametime) {
 
 	// Update hilight if needed
 	if (mouse_state == MSTATE_NORMAL)
-		editor->updateHilight(view_scale);
+		editor->updateHilight(mouse_pos_m, view_scale);
 
 	// Flashing animation for hilight
 	// Pulsates between 0.5-1.0f (multiplied with hilight alpha)
@@ -442,6 +1036,80 @@ void MapCanvas::update(long frametime) {
 	}
 
 	frametime_last = frametime;
+}
+
+void MapCanvas::updateVisibility() {
+	SLADEMap& map = editor->getMap();
+
+	// Vertex visibility
+	if (map.nVertices() != vis_v.size()) {
+		// Number of vertices changed, reset array
+		vis_v.clear();
+		for (unsigned a = 0; a < map.nVertices(); a++)
+			vis_v.push_back(0);
+	}
+	double x, y;
+	for (unsigned a = 0; a < vis_v.size(); a++) {
+		x = map.getVertex(a)->xPos();
+		y = map.getVertex(a)->yPos();
+		vis_v[a] = 0;
+		if (x < view_tl.x)
+			vis_v[a] |= VIS_LEFT;
+		if (x > view_br.x)
+			vis_v[a] |= VIS_RIGHT;
+		if (y < view_tl.y)
+			vis_v[a] |= VIS_BELOW;
+		if (y > view_br.y)
+			vis_v[a] |= VIS_ABOVE;
+	}
+
+	// Line visibility
+	if (map.nLines() != vis_l.size()) {
+		// Number of lines changed, reset array
+		vis_l.clear();
+		for (unsigned a = 0; a < map.nLines(); a++)
+			vis_l.push_back(0);
+	}
+	uint8_t vis_v1, vis_v2;
+	for (unsigned a = 0; a < vis_l.size(); a++) {
+		vis_v1 = vis_v[map.getLine(a)->v1()->getIndex()];
+		vis_v2 = vis_v[map.getLine(a)->v2()->getIndex()];
+		vis_l[a] = 0;
+		if (vis_v1 & VIS_LEFT && vis_v2 & VIS_LEFT)
+			vis_l[a] |= VIS_LEFT;
+		if (vis_v1 & VIS_RIGHT && vis_v2 & VIS_RIGHT)
+			vis_l[a] |= VIS_RIGHT;
+		if (vis_v1 & VIS_BELOW && vis_v2 & VIS_BELOW)
+			vis_l[a] |= VIS_BELOW;
+		if (vis_v1 & VIS_ABOVE && vis_v2 & VIS_ABOVE)
+			vis_l[a] |= VIS_ABOVE;
+	}
+
+	// Thing visibility
+	if (map.nThings() != vis_t.size()) {
+		// Number of things changed, reset array
+		vis_t.clear();
+		for (unsigned a = 0; a < map.nThings(); a++)
+			vis_t.push_back(0);
+	}
+	double radius;
+	for (unsigned a = 0; a < vis_t.size(); a++) {
+		vis_t[a] = 0;
+		x = map.getThing(a)->xPos();
+		y = map.getThing(a)->yPos();
+
+		// Get thing type properties from game configuration
+		ThingType* tt = theGameConfiguration->thingType(map.getThing(a)->getType());
+		radius = tt->getRadius();
+
+		// Ignore if outside of screen
+		if (x+radius < view_tl.x || x-radius > view_br.x || y+radius < view_tl.y || y-radius > view_br.y)
+			vis_t[a] = 1;
+
+		// Check if the thing is worth drawing
+		else if (radius*view_scale < 1)
+			vis_t[a] = 1;
+	}
 }
 
 void MapCanvas::onKeyBindPress(string name) {
@@ -521,7 +1189,7 @@ void MapCanvas::onKeyBindPress(string name) {
 void MapCanvas::onKeyBindRelease(string name) {
 	if (name == "me2d_pan_view") {
 		mouse_state = MSTATE_NORMAL;
-		editor->updateHilight();
+		editor->updateHilight(mouse_pos_m);
 		SetCursor(wxNullCursor);
 	}
 }
@@ -568,6 +1236,9 @@ void MapCanvas::onSize(wxSizeEvent& e) {
 	view_tl.y = translateY(GetSize().y);
 	view_br.x = translateX(GetSize().x);
 	view_br.y = translateY(0);
+
+	// Update map item visibility
+	updateVisibility();
 }
 
 void MapCanvas::onKeyDown(wxKeyEvent& e) {
@@ -593,7 +1264,7 @@ void MapCanvas::onMouseDown(wxMouseEvent& e) {
 
 	// Update mouse variables
 	mouse_downpos.set(e.GetX(), e.GetY());
-	editor->setMouseDownPos(translateX(e.GetX()), translateY(e.GetY()));
+	mouse_downpos_m.set(translateX(e.GetX()), translateY(e.GetY()));
 
 	// Left button
 	if (e.LeftDown()) {
@@ -621,19 +1292,15 @@ void MapCanvas::onMouseUp(wxMouseEvent& e) {
 	if (e.LeftUp()) {
 		// If we're ending a box selection
 		if (mouse_state == MSTATE_SELECTION) {
-			// Get selection boundary (in map coordinates)
-			fpoint2_t sel_origin = editor->mouseDownPos();
-			fpoint2_t sel_end = editor->mousePos();
-
 			// Reset mouse state
 			mouse_state = MSTATE_NORMAL;
 
 			// Select
-			editor->selectWithin(min(sel_origin.x, sel_end.x), min(sel_origin.y, sel_end.y),
-								max(sel_origin.x, sel_end.x), max(sel_origin.y, sel_end.y));
+			editor->selectWithin(min(mouse_downpos_m.x, mouse_pos_m.x), min(mouse_downpos_m.y, mouse_pos_m.y),
+								max(mouse_downpos_m.x, mouse_pos_m.x), max(mouse_downpos_m.y, mouse_pos_m.y));
 
 			// Begin selection box fade animation
-			animations.push_back(new MCASelboxFader(theApp->runTimer(), sel_origin, sel_end));
+			animations.push_back(new MCASelboxFader(theApp->runTimer(), mouse_downpos_m, mouse_pos_m));
 		}
 	}
 
@@ -655,7 +1322,7 @@ void MapCanvas::onMouseMotion(wxMouseEvent& e) {
 
 	// Update mouse variables
 	mouse_pos.set(e.GetX(), e.GetY());
-	editor->setMousePos(translateX(e.GetX()), translateY(e.GetY()));
+	mouse_pos_m.set(translateX(e.GetX()), translateY(e.GetY()));
 
 	e.Skip();
 }
