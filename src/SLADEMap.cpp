@@ -243,8 +243,34 @@ bool SLADEMap::addSide(doomside_t& s) {
 }
 
 bool SLADEMap::addLine(doomline_t& l) {
+	// Get relevant sides
+	MapSide* s1 = NULL;
+	MapSide* s2 = NULL;
+	if (sides.size() > 32767) {
+		// Support for > 32768 sides
+		s1 = getSide(static_cast<unsigned short>(l.side1));
+		s2 = getSide(static_cast<unsigned short>(l.side2));
+	}
+	else {
+		s1 = getSide(l.side1);
+		s2 = getSide(l.side2);
+	}
+
+	// Check if side1 already belongs to a line
+	if (s1 && s1->parent) {
+		// Duplicate side
+		s1 = new MapSide(*s1);
+		sides.push_back(s1);
+	}
+
+	// Check if side2 already belongs to a line
+	if (s2 && s2->parent) {
+		s2 = new MapSide(*s2);
+		sides.push_back(s2);
+	}
+
 	// Create line
-	MapLine* nl = new MapLine(getVertex(l.vertex1), getVertex(l.vertex2), getSide(l.side1), getSide(l.side2));
+	MapLine* nl = new MapLine(getVertex(l.vertex1), getVertex(l.vertex2), s1, s2);
 
 	// Setup line properties
 	nl->prop("arg0") = l.sector_tag;
@@ -455,8 +481,34 @@ bool SLADEMap::readDoomMap(Archive::mapdesc_t map) {
 }
 
 bool SLADEMap::addLine(hexenline_t& l) {
+	// Get relevant sides
+	MapSide* s1 = NULL;
+	MapSide* s2 = NULL;
+	if (sides.size() > 32767) {
+		// Support for > 32768 sides
+		s1 = getSide(static_cast<unsigned short>(l.side1));
+		s2 = getSide(static_cast<unsigned short>(l.side2));
+	}
+	else {
+		s1 = getSide(l.side1);
+		s2 = getSide(l.side2);
+	}
+
+	// Check if side1 already belongs to a line
+	if (s1 && s1->parent) {
+		// Duplicate side
+		s1 = new MapSide(*s1);
+		sides.push_back(s1);
+	}
+
+	// Check if side2 already belongs to a line
+	if (s2 && s2->parent) {
+		s2 = new MapSide(*s2);
+		sides.push_back(s2);
+	}
+
 	// Create line
-	MapLine* nl = new MapLine(getVertex(l.vertex1), getVertex(l.vertex2), getSide(l.side1), getSide(l.side2));
+	MapLine* nl = new MapLine(getVertex(l.vertex1), getVertex(l.vertex2), s1, s2);
 
 	// Setup line properties
 	nl->prop("arg0") = l.args[0];

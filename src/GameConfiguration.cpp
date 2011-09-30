@@ -9,6 +9,7 @@
 #include "Misc.h"
 #include "Console.h"
 #include "Archive.h"
+#include "ArchiveManager.h"
 #include <wx/textfile.h>
 #include <wx/filename.h>
 
@@ -17,6 +18,7 @@
  * VARIABLES
  *******************************************************************/
 GameConfiguration* GameConfiguration::instance = NULL;
+CVAR(String, game_configuration, "", CVAR_SAVE)
 
 
 /*******************************************************************
@@ -27,6 +29,12 @@ GameConfiguration::GameConfiguration() {
 }
 
 GameConfiguration::~GameConfiguration() {
+}
+
+void GameConfiguration::init() {
+	// Load last configuration if any
+	if (!string(game_configuration).IsEmpty())
+		openConfig(game_configuration);
 }
 
 /* GameConfiguration::buildConfig
@@ -378,6 +386,7 @@ bool GameConfiguration::readConfiguration(string& cfg, string source) {
 			wxLogMessage("Warning: Unexpected game configuration section \"%s\", skipping", CHR(node->getName()));
 	}
 	
+	wxLogMessage("Read game configuration \"%s\"", CHR(this->name));
 	return true;
 }
 
@@ -399,6 +408,32 @@ bool GameConfiguration::open(ArchiveEntry* entry) {
 	buildConfig(entry, cfg);
 
 	return readConfiguration(cfg, entry->getName());
+}
+
+bool GameConfiguration::openConfig(string name) {
+	// Check for file in user config directory
+	string fn = appPath("games/", DIR_USER) + name + ".cfg";
+	if (wxFileExists(fn)) {
+		if (open(fn)) {
+			game_configuration = name;
+			return true;
+		}
+		else
+			return false;
+	}
+
+	// No user config exists, check slade.pk3
+	string epath = S_FMT("config/games/%s.cfg", CHR(name));
+
+	Archive* slade_pk3 = theArchiveManager->programResourceArchive();
+	ArchiveEntry* entry = slade_pk3->entryAtPath(epath);
+	if (open(entry)) {
+		game_configuration = name;
+		return true;
+	}
+	
+	// Not found anywhere
+	return false;
 }
 
 string GameConfiguration::actionSpecialName(int special) {
@@ -483,18 +518,11 @@ void GameConfiguration::dumpValidMapNames() {
 }
 
 
-#include "ArchiveManager.h"
 CONSOLE_COMMAND(testgc, 0) {
 	string game = "doom1";
 
 	if (args.size() > 0)
 		game = args[0];
 
-	string epath = S_FMT("config/games/%s.cfg", CHR(game));
-
-	Archive* slade_pk3 = theArchiveManager->programResourceArchive();
-	theGameConfiguration->open(slade_pk3->entryAtPath(epath));
-	theGameConfiguration->dumpActionSpecials();
-	theGameConfiguration->dumpThingTypes();
-	theGameConfiguration->dumpValidMapNames();
+	theGameConfiguration->openConfig(game);
 }

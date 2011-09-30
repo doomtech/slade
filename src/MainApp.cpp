@@ -44,6 +44,7 @@
 #include "ColourConfiguration.h"
 #include "Drawing.h"
 #include "MapEditorWindow.h"
+#include "GameConfiguration.h"
 #include <wx/image.h>
 #include <wx/stdpaths.h>
 #include <wx/ffile.h>
@@ -580,6 +581,9 @@ bool MainApp::OnInit() {
 
 	init_ok = true;
 	wxLogMessage("SLADE Initialisation OK");
+
+	// Init game configuration
+	theGameConfiguration->init();
 
 	// Bind events
 	Bind(wxEVT_COMMAND_MENU_SELECTED, &MainApp::onMenu, this);

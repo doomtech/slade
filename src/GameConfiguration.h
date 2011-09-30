@@ -49,6 +49,8 @@ public:
 		return instance;
 	}
 
+	void	init();
+
 	// Config #include handling
 	void	buildConfig(string filename, string& out);
 	void	buildConfig(ArchiveEntry* entry, string& out);
@@ -59,6 +61,7 @@ public:
 	bool	readConfiguration(string& cfg, string source = "");
 	bool 	open(string filename);
 	bool	open(ArchiveEntry* entry);
+	bool	openConfig(string name);
 
 	// Action specials
 	ActionSpecial&	actionSpecial(unsigned id) { return action_specials[id]; }
