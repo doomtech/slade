@@ -201,6 +201,11 @@ void GameConfiguration::readThingTypes(ParseTreeNode* node) {
 	child = (ParseTreeNode*)node->getChild("radius");
 	if (child) radius_default = child->getIntValue();
 
+	// Height
+	int height_default = 16;
+	child = (ParseTreeNode*)node->getChild("height");
+	if (child) height_default = child->getIntValue();
+
 	// Show angle
 	bool angle = true;
 	child = (ParseTreeNode*)node->getChild("angle");
@@ -210,6 +215,11 @@ void GameConfiguration::readThingTypes(ParseTreeNode* node) {
 	bool hanging = false;
 	child = (ParseTreeNode*)node->getChild("hanging");
 	if (child) hanging = child->getBoolValue();
+
+	// Sprite
+	string sprite = "";
+	child = (ParseTreeNode*)node->getChild("sprite");
+	if (child) sprite = child->getStringValue();
 
 
 	// --- Go through all child nodes ---
@@ -236,9 +246,11 @@ void GameConfiguration::readThingTypes(ParseTreeNode* node) {
 			// Apply group defaults
 			thing_types[type].type->colour = col_default;
 			thing_types[type].type->radius = radius_default;
+			thing_types[type].type->height = height_default;
 			thing_types[type].type->angled = angle;
 			thing_types[type].type->hanging = hanging;
 			thing_types[type].type->group = groupname;
+			thing_types[type].type->sprite = sprite;
 			
 			// Check for simple definition
 			if (child->isLeaf())

@@ -22,10 +22,8 @@ void ThingInfoOverlay::update(MapThing* thing) {
 	sprite = "";
 
 	// Index + type
-	string type = S_FMT("Type %d (Unknown)", thing->getType());
 	ThingType* tt = theGameConfiguration->thingType(thing->getType());
-	if (tt->getName() != "Unknown")
-		type = tt->getName();
+	string type = S_FMT("%s (Type %d)", CHR(tt->getName()), thing->getType());
 	info.push_back(S_FMT("Thing #%d: %s", thing->getIndex(), CHR(type)));
 
 	// Position
@@ -55,8 +53,9 @@ void ThingInfoOverlay::update(MapThing* thing) {
 	// Flags
 	info.push_back(S_FMT("Flags: %s", CHR(theGameConfiguration->thingFlagsString(thing->prop("flags")))));
 
-	// Set sprite
+	// Set sprite and translation
 	sprite = tt->getSprite();
+	translation = tt->getTranslation();
 }
 
 void ThingInfoOverlay::draw(int bottom, int right, float alpha) {
@@ -96,7 +95,7 @@ void ThingInfoOverlay::draw(int bottom, int right, float alpha) {
 	}
 
 	// Draw sprite
-	GLTexture* tex = theMapEditor->textureManager().getSprite(sprite);
+	GLTexture* tex = theMapEditor->textureManager().getSprite(sprite, translation);
 	glEnable(GL_TEXTURE_2D);
 	rgba_t(255, 255, 255, 255*alpha, 0).set_gl();
 	if (tex) {

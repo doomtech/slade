@@ -16,7 +16,7 @@ namespace ColourConfiguration {
 	void	setColour(string name, int red = -1, int green = -1, int blue = -1, int alpha = -1, int blend = -1);
 
 	bool	readConfiguration(MemChunk& mc);
-	bool	writeConfigration(MemChunk& mc);
+	bool	writeConfiguration(MemChunk& mc);
 	bool	init();
 
 	void	getColourNames(vector<string>& list);

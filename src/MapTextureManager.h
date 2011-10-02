@@ -33,7 +33,7 @@ public:
 
 	GLTexture*	getTexture(string name);
 	GLTexture*	getFlat(string name);
-	GLTexture*	getSprite(string name);
+	GLTexture*	getSprite(string name, string translation = "");
 	GLTexture*	getThingImage(string name);
 
 	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);

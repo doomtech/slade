@@ -29,6 +29,7 @@ void ColourConfiguration::setColour(string name, int red, int green, int blue, i
 		col.colour.a = alpha;
 	if (blend >= 0)
 		col.colour.blend = blend;
+	col.exists = true;
 }
 
 bool ColourConfiguration::readConfiguration(MemChunk& mc) {
@@ -83,7 +84,7 @@ bool ColourConfiguration::readConfiguration(MemChunk& mc) {
 	return true;
 }
 
-bool ColourConfiguration::writeConfigration(MemChunk& mc) {
+bool ColourConfiguration::writeConfiguration(MemChunk& mc) {
 	return false;
 }
 

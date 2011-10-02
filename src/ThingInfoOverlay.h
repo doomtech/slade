@@ -8,6 +8,7 @@ class ThingInfoOverlay {
 private:
 	vector<string>	info;
 	string			sprite;
+	string			translation;
 
 public:
 	ThingInfoOverlay();

@@ -12,9 +12,11 @@ private:
 	string	group;
 	rgba_t	colour;
 	int		radius;
+	int		height;
 	bool	angled;
 	bool	hanging;
 	string	sprite;
+	string	translation;
 	arg_t	args[5];
 	
 public:
@@ -27,6 +29,7 @@ public:
 	int		getRadius() { return radius; }
 	bool	isAngled() { return angled; }
 	string	getSprite() { return sprite; }
+	string	getTranslation() { return translation; }
 	arg_t&	getArg(int index) { if (index >= 0 && index < 5) return args[index]; else return args[0]; }
 
 	void	reset();

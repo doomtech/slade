@@ -68,9 +68,12 @@ GLTexture* MapTextureManager::getFlat(string name) {
 	return NULL;
 }
 
-GLTexture* MapTextureManager::getSprite(string name) {
+GLTexture* MapTextureManager::getSprite(string name, string translation) {
 	// Get sprite matching name
-	map_tex_t& mtex = sprites[name.Upper()];
+	string hashname = name.Upper();
+	if (!translation.IsEmpty())
+		hashname += translation.Lower();
+	map_tex_t& mtex = sprites[hashname];
 
 	// Return it if found
 	if (mtex.texture)
@@ -83,6 +86,8 @@ GLTexture* MapTextureManager::getSprite(string name) {
 	if (entry) {
 		SImage image;
 		Misc::loadImageFromEntry(&image, entry);
+		// Apply translation
+		if (!translation.IsEmpty()) image.applyTranslation(translation, pal);
 		mtex.texture = new GLTexture(false);
 		mtex.texture->setFilter(GLTexture::NEAREST_LINEAR_MIN);
 		mtex.texture->loadImage(&image, pal);

@@ -9,7 +9,8 @@ ThingType::ThingType(string name) {
 	this->angled = true;
 	this->hanging = false;
 	this->colour = COL_WHITE;
-	this->radius = 16;
+	this->radius = 20;
+	this->height = 16;
 	
 	// Init args
 	args[0].name = "Arg1";
@@ -27,7 +28,8 @@ void ThingType::reset() {
 	this->angled = true;
 	this->hanging = false;
 	this->colour = COL_WHITE;
-	this->radius = 16;
+	this->radius = 20;
+	this->height = 16;
 	
 	// Reset args
 	for (unsigned a = 0; a < 5; a++) {
@@ -70,6 +72,10 @@ void ThingType::parse(ParseTreeNode* node) {
 		else if (S_CMPNOCASE(name, "radius"))
 			this->radius = child->getIntValue();
 
+		// Height
+		else if (S_CMPNOCASE(name, "height"))
+			this->height = child->getIntValue();
+
 		// Colour
 		else if (S_CMPNOCASE(name, "colour"))
 			this->colour.set(child->getIntValue(0), child->getIntValue(1), child->getIntValue(2));
@@ -82,6 +88,17 @@ void ThingType::parse(ParseTreeNode* node) {
 		else if (S_CMPNOCASE(name, "hanging"))
 			this->hanging = child->getBoolValue();
 
+		// Translation
+		else if (S_CMPNOCASE(name, "translation"))
+		{
+			this->translation += "\"";
+			size_t v = 0;
+			do {
+				this->translation += child->getStringValue(v++);
+			} while ((v < child->nValues()) && ((this->translation += "\", \""), true));
+			this->translation += "\"";
+		}
+			
 
 
 		// Parse arg definition if it was one
