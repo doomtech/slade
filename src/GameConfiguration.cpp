@@ -391,6 +391,15 @@ bool GameConfiguration::readConfiguration(string& cfg, string source) {
 			}
 		}
 
+		// Sector flags section
+		else if (S_CMPNOCASE(node->getName(), "sector_flags")) {
+			for (unsigned c = 0; c < node->nChildren(); c++) {
+				ParseTreeNode* value = (ParseTreeNode*)node->getChild(c);
+
+				// TODO: stuff
+			}
+		}
+
 
 
 		// Unknown/unexpected section

@@ -403,7 +403,7 @@ bool MapCanvas::drawSpriteThing(double x, double y, double angle, ThingType* tt)
 		tex = theMapEditor->textureManager().getThingImage("unknown");
 	else {
 		// Attempt to get sprite texture
-		tex = theMapEditor->textureManager().getSprite(tt->getSprite(), tt->getTranslation());
+		tex = theMapEditor->textureManager().getSprite(tt->getSprite(), tt->getTranslation(), tt->getPalette());
 
 		// If sprite not found, just draw as a normal, round thing
 		if (!tex) {

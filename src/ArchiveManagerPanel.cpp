@@ -1462,8 +1462,12 @@ void ArchiveManagerPanel::onListMapsActivated(wxListEvent& e) {
 	vector<Archive::mapdesc_t> maps = current_maps->detectMaps();
 
 	// Open selected map
-	theMapEditor->openMap(maps[e.GetIndex()]);
-	theMapEditor->Show();
+	if (theMapEditor->openMap(maps[e.GetIndex()]))
+		theMapEditor->Show();
+	else {
+		theMapEditor->Hide();
+		wxMessageBox(S_FMT("Unable to open map %s: %s", CHR(maps[e.GetIndex()].head->getName()), CHR(Global::error)), "Invalid map error", wxICON_ERROR);
+	}
 }
 
 /* ArchiveManagerPanel::onListArchivesRightClick

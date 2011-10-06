@@ -98,6 +98,10 @@ void ThingType::parse(ParseTreeNode* node) {
 			} while ((v < child->nValues()) && ((this->translation += "\", \""), true));
 			this->translation += "\"";
 		}
+
+		// Palette override
+		else if (S_CMPNOCASE(name, "palette"))
+			this->palette = child->getStringValue();
 			
 
 

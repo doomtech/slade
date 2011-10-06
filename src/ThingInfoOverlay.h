@@ -9,6 +9,7 @@ private:
 	vector<string>	info;
 	string			sprite;
 	string			translation;
+	string			palette;
 
 public:
 	ThingInfoOverlay();

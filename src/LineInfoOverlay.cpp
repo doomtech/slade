@@ -29,7 +29,11 @@ void LineInfoOverlay::update(MapLine* line) {
 
 	// Line special
 	int as_id = line->prop("special").getIntValue();
-	info.push_back(S_FMT("Special: %d (%s)", as_id, CHR(theGameConfiguration->actionSpecialName(as_id))));
+	if (line->props().propertyExists("macro")) {
+		int macro = line->prop("macro").getIntValue();
+		info.push_back(S_FMT("Macro: #%d", macro));
+	} else 
+		info.push_back(S_FMT("Special: %d (%s)", as_id, CHR(theGameConfiguration->actionSpecialName(as_id))));
 
 	// Line args (or sector tag)
 	info.push_back(S_FMT("Sector Tag: %d", line->prop("arg0").getIntValue()));
@@ -155,7 +159,7 @@ void LineInfoOverlay::drawTexture(float alpha, int x, int y, string texture, str
 	col_fg.a = col_fg.a*alpha;
 
 	// Check texture isn't blank
-	if (texture != "-") {
+	if (texture != "-" && !texture.IsEmpty()) {
 		// Draw background
 		glEnable(GL_TEXTURE_2D);
 		rgba_t(255, 255, 255, 255*alpha, 0).set_gl();

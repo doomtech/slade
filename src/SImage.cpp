@@ -182,7 +182,7 @@ bool SImage::getRGBData(MemChunk& mc, Palette8bit* pal) {
 	return false;	// Invalid image type
 }
 
-/* SImage::getPalData
+/* SImage::getIndexedData
  * Loads the image as index data into <mc>. Returns false if image is
  * invalid, true otherwise
  *******************************************************************/

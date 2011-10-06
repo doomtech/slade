@@ -31,6 +31,7 @@
 #include "SLADEMap.h"
 #include "Parser.h"
 #include "MathStuff.h"
+#include "ResourceManager.h"
 
 SLADEMap::SLADEMap() {
 	// Init variables
@@ -226,6 +227,12 @@ bool SLADEMap::addVertex(doomvertex_t& v) {
 	return true;
 }
 
+bool SLADEMap::addVertex(doom64vertex_t& v) {
+	MapVertex* nv = new MapVertex((double)v.x/65536, (double)v.y/65536);
+	vertices.push_back(nv);
+	return true;
+}
+
 bool SLADEMap::addSide(doomside_t& s) {
 	// Create side
 	MapSide* ns = new MapSide(getSector(s.sector));
@@ -234,6 +241,22 @@ bool SLADEMap::addSide(doomside_t& s) {
 	ns->prop("texturetop") = wxString::FromAscii(s.tex_upper, 8);
 	ns->prop("texturebottom") = wxString::FromAscii(s.tex_lower, 8);
 	ns->prop("texturemiddle") = wxString::FromAscii(s.tex_middle, 8);
+	ns->prop("offsetx") = s.x_offset;
+	ns->prop("offsety") = s.y_offset;
+
+	// Add side
+	sides.push_back(ns);
+	return true;
+}
+
+bool SLADEMap::addSide(doom64side_t& s) {
+	// Create side
+	MapSide* ns = new MapSide(getSector(s.sector));
+
+	// Setup side properties
+	ns->prop("texturetop") = theResourceManager->getTextureName(s.tex_upper);
+	ns->prop("texturebottom") = theResourceManager->getTextureName(s.tex_lower);
+	ns->prop("texturemiddle") = theResourceManager->getTextureName(s.tex_middle);
 	ns->prop("offsetx") = s.x_offset;
 	ns->prop("offsety") = s.y_offset;
 
@@ -296,6 +319,55 @@ bool SLADEMap::addLine(doomline_t& l) {
 	return true;
 }
 
+bool SLADEMap::addLine(doom64line_t& l) {
+	// Get relevant sides
+	MapSide* s1 = NULL;
+	MapSide* s2 = NULL;
+	if (sides.size() > 32767) {
+		// Support for > 32768 sides
+		s1 = getSide(static_cast<unsigned short>(l.side1));
+		s2 = getSide(static_cast<unsigned short>(l.side2));
+	}
+	else {
+		s1 = getSide(l.side1);
+		s2 = getSide(l.side2);
+	}
+
+	// Check if side1 already belongs to a line
+	if (s1 && s1->parent) {
+		// Duplicate side
+		s1 = new MapSide(*s1);
+		sides.push_back(s1);
+	}
+
+	// Check if side2 already belongs to a line
+	if (s2 && s2->parent) {
+		s2 = new MapSide(*s2);
+		sides.push_back(s2);
+	}
+
+	// Create line
+	MapLine* nl = new MapLine(getVertex(l.vertex1), getVertex(l.vertex2), s1, s2);
+
+	// Setup line properties
+	nl->prop("arg0") = l.sector_tag;
+	if (l.type & 0x100)
+		nl->prop("macro") = l.type & 0xFF;
+	else
+		nl->prop("special") = l.type & 0xFF;
+	nl->prop("flags") = (int)l.flags;
+	nl->prop("extraflags") = l.type >> 9;
+
+	// Flags
+	/*
+	later
+	*/
+
+	// Add line
+	lines.push_back(nl);
+	return true;
+}
+
 bool SLADEMap::addSector(doomsector_t& s) {
 	// Create sector
 	MapSector* ns = new MapSector(wxString::FromAscii(s.f_tex, 8), wxString::FromAscii(s.c_tex, 8));
@@ -306,6 +378,30 @@ bool SLADEMap::addSector(doomsector_t& s) {
 	ns->prop("lightlevel") = s.light;
 	ns->prop("special") = s.special;
 	ns->prop("id") = s.tag;
+
+	// Add sector
+	sectors.push_back(ns);
+	return true;
+}
+
+bool SLADEMap::addSector(doom64sector_t& s) {
+	// Create sector
+	// We need to retrieve the texture name from the hash value
+	MapSector* ns = new MapSector(theResourceManager->getTextureName(s.f_tex), 
+		theResourceManager->getTextureName(s.c_tex));
+
+	// Setup sector properties
+	ns->prop("heightfloor") = s.f_height;
+	ns->prop("heightceiling") = s.c_height;
+	ns->prop("lightlevel") = 255;
+	ns->prop("special") = s.special;
+	ns->prop("id") = s.tag;
+	ns->prop("flags") = s.flags;
+	ns->prop("color_things") = s.color[0];
+	ns->prop("color_floor") = s.color[1];
+	ns->prop("color_ceiling") = s.color[2];
+	ns->prop("color_upper") = s.color[3];
+	ns->prop("color_lower") = s.color[4];
 
 	// Add sector
 	sectors.push_back(ns);
@@ -332,6 +428,26 @@ bool SLADEMap::addThing(doomthing_t& t) {
 	nt->prop("dm") = !((t.flags & THING_BNOTDM)!=0);
 	nt->prop("coop") = !((t.flags & THING_BNOTCOOP)!=0);
 	nt->prop("raw_flags") = t.flags;
+	*/
+
+	// Add thing
+	things.push_back(nt);
+	return true;
+}
+
+bool SLADEMap::addThing(doom64thing_t& t) {
+	// Create thing
+	MapThing* nt = new MapThing(t.x, t.y, t.type);
+
+	// Setup thing properties
+	nt->prop("angle") = t.angle;
+	nt->prop("z") = (double)t.z;
+	nt->prop("flags") = t.flags;
+	nt->prop("id") = t.tid;
+
+	// Flags
+	/*
+	later
 	*/
 
 	// Add thing
@@ -675,6 +791,8 @@ bool SLADEMap::readDoom64Vertexes(ArchiveEntry * entry) {
 	for (size_t a = 0; a < entry->getSize() / sizeof(doom64vertex_t); a++)
 		addVertex(vert_data[a]);
 
+	wxLogMessage("Read %d vertices", vertices.size());
+
 	return true;
 }
 
@@ -687,6 +805,8 @@ bool SLADEMap::readDoom64Sidedefs(ArchiveEntry * entry) {
 	doom64side_t* side_data = (doom64side_t*)entry->getData(true);
 	for (size_t a = 0; a < entry->getSize() / sizeof(doom64side_t); a++)
 		addSide(side_data[a]);
+
+	wxLogMessage("Read %d sides", sides.size());
 
 	return true;
 }
@@ -701,6 +821,8 @@ bool SLADEMap::readDoom64Linedefs(ArchiveEntry * entry) {
 	for (size_t a = 0; a < entry->getSize() / sizeof(doom64line_t); a++)
 		addLine(line_data[a]);
 
+	wxLogMessage("Read %d lines", lines.size());
+
 	return true;
 }
 
@@ -713,6 +835,8 @@ bool SLADEMap::readDoom64Sectors(ArchiveEntry * entry) {
 	doom64sector_t* sect_data = (doom64sector_t*)entry->getData(true);
 	for (size_t a = 0; a < entry->getSize() / sizeof(doom64sector_t); a++)
 		addSector(sect_data[a]);
+
+	wxLogMessage("Read %d sectors", sectors.size());
 
 	return true;
 }
@@ -727,11 +851,13 @@ bool SLADEMap::readDoom64Things(ArchiveEntry * entry) {
 	for (size_t a = 0; a < entry->getSize() / sizeof(doom64thing_t); a++)
 		addThing(thng_data[a]);
 
+	wxLogMessage("Read %d things", things.size());
+
 	return true;
 }
 
 bool SLADEMap::readDoom64Map(Archive::mapdesc_t map) {
-	wxLogMessage("Reading Doom format map");
+	wxLogMessage("Reading Doom 64 format map");
 
 	// Find map entries
 	ArchiveEntry* v = NULL;
@@ -759,23 +885,23 @@ bool SLADEMap::readDoom64Map(Archive::mapdesc_t map) {
 	}
 
 	// ---- Read vertices ----
-	if (!readDoomVertexes(v))
+	if (!readDoom64Vertexes(v))
 		return false;
 
 	// ---- Read sectors ----
-	if (!readDoomSectors(se))
+	if (!readDoom64Sectors(se))
 		return false;
 
 	// ---- Read sides ----
-	if (!readDoomSidedefs(si))
+	if (!readDoom64Sidedefs(si))
 		return false;
 
 	// ---- Read lines ----
-	if (!readDoomLinedefs(l))
+	if (!readDoom64Linedefs(l))
 		return false;
 
 	// ---- Read things ----
-	if (!readDoomThings(t))
+	if (!readDoom64Things(t))
 		return false;
 
 	// Remove detached vertices

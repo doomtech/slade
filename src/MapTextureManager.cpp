@@ -29,19 +29,41 @@ GLTexture* MapTextureManager::getTexture(string name) {
 	// Texture not found, look for it
 	Palette8bit* pal = theMainWindow->getPaletteChooser()->getSelectedPalette();
 
-	// Try composite textures first
-	CTexture* ctex = theResourceManager->getTexture(name, archive);
-	if (ctex) {
+	// Look for stand-alone textures first
+	ArchiveEntry * etex = theResourceManager->getTextureEntry(name, "hires", archive);
+	int textypefound = TEXTYPE_HIRES;
+	if (etex == NULL) {
+		etex = theResourceManager->getTextureEntry(name, "textures", archive);
+		textypefound = TEXTYPE_TEXTURE;
+	}
+	if (etex == NULL) {
+		etex = theResourceManager->getTextureEntry(name, "flats", archive);
+		textypefound = TEXTYPE_FLAT;
+	}
+	if (etex) {
 		SImage image;
-		ctex->toImage(image, archive, pal);
-		mtex.texture = new GLTexture(false);
-		mtex.texture->loadImage(&image, pal);
-		return mtex.texture;
+		// Get image format hint from type, if any
+		string format_hint = "";
+		if (etex->getType()->extraProps().propertyExists("image_format"))
+			format_hint = etex->getType()->extraProps()["image_format"].getStringValue();
+		if (image.open(etex->getMCData(), 0, format_hint)) {
+			mtex.texture = new GLTexture(false);
+			mtex.texture->loadImage(&image, pal);
+		}
 	}
 
-	// TODO: TX_ textures, mixed flats+textures
+	// Try composite textures then
+	CTexture* ctex = theResourceManager->getTexture(name, archive);
+	if (ctex && (!mtex.texture || textypefound == TEXTYPE_FLAT)) {
+		textypefound = TEXTYPE_WALLTEXTURE;
+		SImage image;
+		if (ctex->toImage(image, archive, pal)) {
+			mtex.texture = new GLTexture(false);
+			mtex.texture->loadImage(&image, pal);
+		}
+	}
+	return mtex.texture;
 
-	return NULL;
 }
 
 GLTexture* MapTextureManager::getFlat(string name) {
@@ -54,32 +76,46 @@ GLTexture* MapTextureManager::getFlat(string name) {
 
 	// Flat not found, look for it
 	Palette8bit* pal = theMainWindow->getPaletteChooser()->getSelectedPalette();
-	ArchiveEntry* entry = theResourceManager->getFlatEntry(name, archive);
+	ArchiveEntry * entry = theResourceManager->getTextureEntry(name, "hires", archive);
+	if (entry == NULL)
+		entry = theResourceManager->getTextureEntry(name, "textures", archive);
+	if (entry == NULL)
+		entry = theResourceManager->getFlatEntry(name, archive);
 	if (entry) {
 		SImage image;
-		Misc::loadImageFromEntry(&image, entry);
-		mtex.texture = new GLTexture(false);
-		mtex.texture->loadImage(&image, pal);
-		return mtex.texture;
+		if (Misc::loadImageFromEntry(&image, entry)) {
+			mtex.texture = new GLTexture(false);
+			mtex.texture->loadImage(&image, pal);
+		}
 	}
 
-	// TODO: mixed flats+textures
+	// Try composite textures then
+	CTexture* ctex = theResourceManager->getTexture(name, archive);
+	if (ctex && !mtex.texture) {
+		SImage image;
+		if (ctex->toImage(image, archive, pal)) {
+			mtex.texture = new GLTexture(false);
+			mtex.texture->loadImage(&image, pal);
+		}
+	}
 
-	return NULL;
+	return mtex.texture;
 }
 
-GLTexture* MapTextureManager::getSprite(string name, string translation) {
+GLTexture* MapTextureManager::getSprite(string name, string translation, string palette) {
 	// Get sprite matching name
 	string hashname = name.Upper();
 	if (!translation.IsEmpty())
 		hashname += translation.Lower();
+	if (!palette.IsEmpty())
+		hashname += palette.Upper();
 	map_tex_t& mtex = sprites[hashname];
 
 	// Return it if found
 	if (mtex.texture)
 		return mtex.texture;
 
-	// Sprite not found, look for it
+	// Sprite not found, look for it 
 	Palette8bit* pal = theMainWindow->getPaletteChooser()->getSelectedPalette();
 	ArchiveEntry* entry = theResourceManager->getPatchEntry(name, "sprites", archive);
 	if (!entry) entry = theResourceManager->getPatchEntry(name, "", archive);
@@ -88,6 +124,16 @@ GLTexture* MapTextureManager::getSprite(string name, string translation) {
 		Misc::loadImageFromEntry(&image, entry);
 		// Apply translation
 		if (!translation.IsEmpty()) image.applyTranslation(translation, pal);
+		// Apply palette override
+		if (!palette.IsEmpty()) {
+			ArchiveEntry * newpal = theResourceManager->getPaletteEntry(palette, archive);
+			if (newpal && newpal->getSize() == 768) {
+				pal = image.getPalette();
+				MemChunk mc = newpal->getMCData();
+				mc.seek(0, SEEK_SET);
+				pal->loadMem(mc);
+			}
+		}
 		mtex.texture = new GLTexture(false);
 		mtex.texture->setFilter(GLTexture::NEAREST_LINEAR_MIN);
 		mtex.texture->loadImage(&image, pal);

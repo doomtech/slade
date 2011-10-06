@@ -20,6 +20,8 @@ void ThingInfoOverlay::update(MapThing* thing) {
 
 	info.clear();
 	sprite = "";
+	translation = "";
+	palette = "";
 
 	// Index + type
 	ThingType* tt = theGameConfiguration->thingType(thing->getType());
@@ -56,6 +58,7 @@ void ThingInfoOverlay::update(MapThing* thing) {
 	// Set sprite and translation
 	sprite = tt->getSprite();
 	translation = tt->getTranslation();
+	palette = tt->getPalette();
 }
 
 void ThingInfoOverlay::draw(int bottom, int right, float alpha) {
@@ -95,7 +98,7 @@ void ThingInfoOverlay::draw(int bottom, int right, float alpha) {
 	}
 
 	// Draw sprite
-	GLTexture* tex = theMapEditor->textureManager().getSprite(sprite, translation);
+	GLTexture* tex = theMapEditor->textureManager().getSprite(sprite, translation, palette);
 	glEnable(GL_TEXTURE_2D);
 	rgba_t(255, 255, 255, 255*alpha, 0).set_gl();
 	if (tex) {

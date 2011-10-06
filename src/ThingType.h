@@ -17,6 +17,7 @@ private:
 	bool	hanging;
 	string	sprite;
 	string	translation;
+	string	palette;
 	arg_t	args[5];
 	
 public:
@@ -30,6 +31,7 @@ public:
 	bool	isAngled() { return angled; }
 	string	getSprite() { return sprite; }
 	string	getTranslation() { return translation; }
+	string	getPalette() { return palette; }
 	arg_t&	getArg(int index) { if (index >= 0 && index < 5) return args[index]; else return args[0]; }
 
 	void	reset();

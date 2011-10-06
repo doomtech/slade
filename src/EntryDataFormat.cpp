@@ -250,7 +250,6 @@ void EntryDataFormat::initBuiltinFormats() {
 	new MODModuleDataFormat();
 	new DoomSoundDataFormat();
 	new DoomPCSpeakerDataFormat();
-	new Doom64SoundDataFormat();
 	new VocDataFormat();
 	new SPDCDataFormat();
 	new BloodSFXDataFormat();

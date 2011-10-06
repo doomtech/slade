@@ -1265,9 +1265,6 @@ bool ArchivePanel::dSndWavConvert() {
 		// Convert Doom Sound -> WAV if the entry is Doom Sound format
 		if (selection[a]->getType()->getFormat() == "snd_doom")
 			worked = Conversions::doomSndToWav(selection[a]->getMCData(), wav);
-		// Or Doom 64 SFX format
-		else if (selection[a]->getType()->getFormat() == "snd_doom64")
-			worked = Conversions::d64SfxToWav(selection[a]->getMCData(), wav);
 		// Or Creative Voice File format
 		else if (selection[a]->getType()->getFormat() == "snd_voc")
 			worked = Conversions::vocToWav(selection[a]->getMCData(), wav);
@@ -2165,8 +2162,14 @@ void ArchivePanel::onEntryListActivated(wxListEvent& e) {
 		theMainWindow->openTextureEditor(archive);
 
 	// Map
-	else if (entry->getType() == EntryType::mapMarkerType())
-		theMapEditor->openMap(archive->getMapInfo(entry));
+	else if (entry->getType() == EntryType::mapMarkerType()) {
+		if (theMapEditor->openMap(archive->getMapInfo(entry)))
+			theMapEditor->Show();
+		else {
+			theMapEditor->Hide();
+			wxMessageBox(S_FMT("Unable to open map %s: %s", CHR(entry->getName()), CHR(Global::error)), "Invalid map error", wxICON_ERROR);
+		}
+	}
 
 	// Other entry
 	else if (entry->getType() != EntryType::folderType())

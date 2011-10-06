@@ -50,11 +50,11 @@ private:
 	bool	readHexenThings(ArchiveEntry* entry);
 
 	// Doom 64 format
-	bool	addVertex(doom64vertex_t& v){return true;}
-	bool	addSide(doom64side_t& s){return true;}
-	bool	addLine(doom64line_t& l){return true;}
-	bool	addSector(doom64sector_t& s){return true;}
-	bool	addThing(doom64thing_t& t){return true;}
+	bool	addVertex(doom64vertex_t& v);
+	bool	addSide(doom64side_t& s);
+	bool	addLine(doom64line_t& l);
+	bool	addSector(doom64sector_t& s);
+	bool	addThing(doom64thing_t& t);
 	bool	readDoom64Vertexes(ArchiveEntry* entry);
 	bool	readDoom64Sidedefs(ArchiveEntry* entry);
 	bool	readDoom64Linedefs(ArchiveEntry* entry);

@@ -73,6 +73,7 @@ ns_special_t special_namespaces[] = {
 	{ "acs",		"a"		},
 	{ "voices",		"v"		},
 	{ "voxels",		"vx"	},
+	{ "music",		"ds"	}, // Doom 64 puts music and sound effects here
 };
 const int n_special_namespaces = 10;
 
@@ -151,6 +152,8 @@ void WadArchive::updateNamespaces() {
 				ns.name = "f";
 			if (ns.name == "ss")
 				ns.name = "s";
+			if (ns.name == "tt")
+				ns.name = "t";
 
 			// Add to namespace list
 			namespaces.push_back(ns);
@@ -168,6 +171,8 @@ void WadArchive::updateNamespaces() {
 				ns_name = "f";
 			if (ns_name == "ss")
 				ns_name = "s";
+			if (ns_name == "tt")
+				ns_name = "t";
 
 			// Check if it's the end of an existing namespace
 			for (unsigned b = 0; b < namespaces.size(); b++) {

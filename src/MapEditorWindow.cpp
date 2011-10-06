@@ -213,7 +213,7 @@ void MapEditorWindow::onClose(wxCloseEvent& e) {
 	editor.clearMap();
 }
 
-/* MapEditorWindow::onSie
+/* MapEditorWindow::onSize
  * Called when the window is resized
  *******************************************************************/
 void MapEditorWindow::onSize(wxSizeEvent& e) {
