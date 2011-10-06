@@ -73,10 +73,6 @@ public:
 
 	// Drawing
 	void	drawGrid();
-	//void	drawRoundThing(double x, double y, double angle, ThingType* type);
-	//bool	drawSpriteThing(double x, double y, double angle, ThingType* type);
-	//void	drawSquareThing(double x, double y, double angle, ThingType* type);
-	//void	drawThings();
 	void	drawHilight();
 	void	drawSelection();
 	void	draw();

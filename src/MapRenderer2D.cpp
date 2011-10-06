@@ -11,6 +11,8 @@
 CVAR(Bool, use_dlist, true, CVAR_SAVE)
 CVAR(Bool, things_force_dir, false, CVAR_SAVE)
 
+#define FORCE_NO_VBO 0
+
 MapRenderer2D::MapRenderer2D(SLADEMap* map) {
 	// Init variables
 	this->map = map;
@@ -31,7 +33,7 @@ MapRenderer2D::~MapRenderer2D() {
 }
 
 void MapRenderer2D::renderVertices() {
-	if (GLEW_ARB_vertex_buffer_object)
+	if (GLEW_ARB_vertex_buffer_object && !FORCE_NO_VBO)
 		renderVerticesVBO();
 	else
 		renderVerticesImmediate();
@@ -84,7 +86,7 @@ void MapRenderer2D::renderVerticesVBO() {
 }
 
 void MapRenderer2D::renderLines(bool show_direction) {
-	if (GLEW_ARB_vertex_buffer_object)
+	if (GLEW_ARB_vertex_buffer_object && !FORCE_NO_VBO)
 		renderLinesVBO(show_direction);
 	else
 		renderLinesImmediate(show_direction);
@@ -197,7 +199,7 @@ void MapRenderer2D::renderLinesVBO(bool show_direction) {
 	lines_dirs = show_direction;
 }
 
-void MapRenderer2D::renderRoundThing(double x, double y, double angle, ThingType* tt) {
+void MapRenderer2D::renderRoundThing(double x, double y, double angle, ThingType* tt, float alpha) {
 	// Ignore if no type given (shouldn't happen)
 	if (!tt)
 		return;
@@ -209,12 +211,13 @@ void MapRenderer2D::renderRoundThing(double x, double y, double angle, ThingType
 	// Check for unknown type
 	if (tt->getName() == "Unknown") {
 		tex = theMapEditor->textureManager().getThingImage("unknown");
-		COL_WHITE.set_gl();
+		glColor4f(1.0f, 1.0f, 1.0f, alpha);
 	}
 
 	else {
 		// Otherwise, normal thing image (for now)
-		tt->getColour().set_gl();
+		//tt->getColour().set_gl(false);
+		glColor4f(tt->getColour().fr(), tt->getColour().fg(), tt->getColour().fb(), alpha);
 
 		// Check if we want an angle indicator
 		if (tt->isAngled() || things_force_dir) {
@@ -227,7 +230,7 @@ void MapRenderer2D::renderRoundThing(double x, double y, double angle, ThingType
 
 	// If for whatever reason the thing texture doesn't exist, just draw a basic, square thing
 	if (!tex) {
-		renderSquareThing(x, y, angle, tt);
+		renderSquareThing(x, y, angle, tt, alpha);
 		return;
 	}
 
@@ -258,7 +261,7 @@ void MapRenderer2D::renderRoundThing(double x, double y, double angle, ThingType
 	glPopMatrix();
 }
 
-bool MapRenderer2D::renderSpriteThing(double x, double y, double angle, ThingType* tt) {
+bool MapRenderer2D::renderSpriteThing(double x, double y, double angle, ThingType* tt, float alpha) {
 	// Ignore if no type given (shouldn't happen)
 	if (!tt)
 		return false;
@@ -267,27 +270,22 @@ bool MapRenderer2D::renderSpriteThing(double x, double y, double angle, ThingTyp
 	bool show_angle = false;
 	GLTexture* tex = NULL;
 
-	// Check for unknown type
-	if (tt->getName() == "Unknown")
-		tex = theMapEditor->textureManager().getThingImage("unknown");
-	else {
-		// Attempt to get sprite texture
-		tex = theMapEditor->textureManager().getSprite(tt->getSprite(), tt->getTranslation());
+	// Attempt to get sprite texture
+	tex = theMapEditor->textureManager().getSprite(tt->getSprite(), tt->getTranslation());
 
-		// If sprite not found, just draw as a normal, round thing
-		if (!tex) {
-			renderRoundThing(x, y, angle, tt);
-			return false;
-		}
-
-		// Check if we have to draw the angle arrow later
-		if (tt->isAngled() || things_force_dir)
-			show_angle = true;
+	// If sprite not found, just draw as a normal, round thing
+	if (!tex) {
+		renderRoundThing(x, y, angle, tt, alpha);
+		return false;
 	}
+
+	// Check if we have to draw the angle arrow later
+	if (tt->isAngled() || things_force_dir)
+		show_angle = true;
 
 	// If for whatever reason the thing texture doesn't exist, just draw a basic, square thing
 	if (!tex) {
-		renderSquareThing(x, y, angle, tt);
+		renderSquareThing(x, y, angle, tt, alpha);
 		return false;
 	}
 
@@ -304,6 +302,7 @@ bool MapRenderer2D::renderSpriteThing(double x, double y, double angle, ThingTyp
 	// Draw thing
 	double hw = tex->getWidth()*0.5;
 	double hh = tex->getHeight()*0.5;
+	glColor4f(1.0f, 1.0f, 1.0f, alpha);
 	glBegin(GL_QUADS);
 	glTexCoord2f(0.0f, 1.0f);	glVertex2d(-hw, -hh);
 	glTexCoord2f(0.0f, 0.0f);	glVertex2d(-hw, hh);
@@ -317,7 +316,7 @@ bool MapRenderer2D::renderSpriteThing(double x, double y, double angle, ThingTyp
 	return show_angle;
 }
 
-void MapRenderer2D::renderSquareThing(double x, double y, double angle, ThingType* tt) {
+void MapRenderer2D::renderSquareThing(double x, double y, double angle, ThingType* tt, float alpha) {
 	// Ignore if no type given (shouldn't happen)
 	if (!tt)
 		return;
@@ -331,7 +330,7 @@ void MapRenderer2D::renderSquareThing(double x, double y, double angle, ThingTyp
 	glTranslated(x, y, 0);
 
 	// Draw background
-	COL_BLACK.set_gl();
+	glColor4f(0.0f, 0.0f, 0.0f, alpha);
 	glBegin(GL_QUADS);
 	glVertex2d(-radius, -radius);
 	glVertex2d(-radius, radius);
@@ -340,7 +339,8 @@ void MapRenderer2D::renderSquareThing(double x, double y, double angle, ThingTyp
 	glEnd();
 
 	// Draw base
-	tt->getColour().set_gl();
+	//tt->getColour().set_gl(false);
+	glColor4f(tt->getColour().fr(), tt->getColour().fg(), tt->getColour().fb(), alpha);
 	glBegin(GL_QUADS);
 	glVertex2d(-radius+radius2, -radius+radius2);
 	glVertex2d(-radius+radius2, radius-radius2);
@@ -350,7 +350,7 @@ void MapRenderer2D::renderSquareThing(double x, double y, double angle, ThingTyp
 
 	// Draw angle indicator (if needed)
 	if (tt->isAngled() || things_force_dir) {
-		COL_BLACK.set_gl();
+		glColor3f(0.0f, 0.0f, 0.0f);
 		glRotated(angle, 0, 0, 1);
 		glBegin(GL_LINES);
 		glVertex2d(0, 0);
@@ -362,18 +362,19 @@ void MapRenderer2D::renderSquareThing(double x, double y, double angle, ThingTyp
 	glPopMatrix();
 }
 
-void MapRenderer2D::renderThings(int mode) {
-	renderThingsImmediate(mode);
+void MapRenderer2D::renderThings(int mode, float alpha) {
+	renderThingsImmediate(mode, alpha);
 }
 
-void MapRenderer2D::renderThingsImmediate(int mode) {
+void MapRenderer2D::renderThingsImmediate(int mode, float alpha) {
 	// Display lists aren't really good for this, better to check for
 	// visibility and just render things in immediate mode
 
 	// Enable textures
 	if (mode > 0)
 		glEnable(GL_TEXTURE_2D);
-	rgba_t(255, 255, 255, 255, 0).set_gl();
+	glColor4f(1.0f, 1.0f, 1.0f, alpha);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	tex_last = NULL;
 
 	// Go through things
@@ -395,17 +396,18 @@ void MapRenderer2D::renderThingsImmediate(int mode) {
 		// Draw thing depending on 'things_drawtype' cvar
 		if (mode == 2) {		// Drawtype 2: Sprites
 			// Check if we need to draw the direction arrow for this thing
-			if (renderSpriteThing(x, y, thing->prop("angle").getFloatValue(), tt))
+			if (renderSpriteThing(x, y, thing->prop("angle").getFloatValue(), tt, alpha))
 				things_arrows.push_back(a);
 		}
 		else if (mode == 1)	// Drawtype 1: Round
-			renderRoundThing(x, y, thing->prop("angle").getFloatValue(), tt);
+			renderRoundThing(x, y, thing->prop("angle").getFloatValue(), tt, alpha);
 		else							// Drawtype 0 (or other): Square
-			renderSquareThing(x, y, thing->prop("angle").getFloatValue(), tt);
+			renderSquareThing(x, y, thing->prop("angle").getFloatValue(), tt, alpha);
 	}
 
 	// Draw any thing direction arrows needed
 	if (mode == 2) {
+		glColor4f(1.0f, 1.0f, 1.0f, alpha);
 		GLTexture* tex_arrow = theMapEditor->textureManager().getThingImage("arrow");
 		if (tex_arrow) {
 			tex_arrow->bind();
@@ -419,7 +421,6 @@ void MapRenderer2D::renderThingsImmediate(int mode) {
 				glTranslated(x, y, 0);
 				glRotated(thing->prop("angle").getIntValue(), 0, 0, 1);
 
-				COL_WHITE.set_gl();
 				glBegin(GL_QUADS);
 				glTexCoord2f(0.0f, 1.0f);	glVertex2d(-32, -32);
 				glTexCoord2f(0.0f, 0.0f);	glVertex2d(-32, 32);
@@ -602,7 +603,7 @@ void MapRenderer2D::updateVisibility(fpoint2_t view_tl, fpoint2_t view_br, doubl
 			vis_t[a] = 1;
 
 		// Check if the thing is worth drawing
-		else if (radius*view_scale < 1)
+		else if (radius*view_scale < 2)
 			vis_t[a] = 1;
 	}
 }

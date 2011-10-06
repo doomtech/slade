@@ -50,6 +50,7 @@ CVAR(Int, vertex_size, 7, CVAR_SAVE)
 CVAR(Float, line_width, 1.5f, CVAR_SAVE)
 CVAR(Bool, line_smooth, true, CVAR_SAVE)
 CVAR(Int, things_drawtype, 1, CVAR_SAVE)
+CVAR(Bool, things_always, 1, CVAR_SAVE)
 CVAR(Bool, grid_dashed, false, CVAR_SAVE)
 
 
@@ -495,7 +496,10 @@ void MapCanvas::drawHilight() {
 	col.set_gl();
 
 	glLineWidth(line_width*3);
-	glPointSize(vertex_size*1.5f);
+	float vs = vertex_size*1.5f;
+	if (view_scale < 1.0) vs *= view_scale;
+	if (vs < 4.0f) vs = 4.0f;
+	glPointSize(vs);
 
 	// Draw depending on mode
 	if (editor->editMode() == MapEditor::MODE_VERTICES) {
@@ -608,7 +612,10 @@ void MapCanvas::drawSelection() {
 	ColourConfiguration::getColour("map_selection").set_gl();
 
 	glLineWidth(line_width*4);
-	glPointSize(vertex_size*1.5f);
+	float vs = vertex_size*1.5f;
+	if (view_scale < 1.0) vs *= view_scale;
+	if (vs < 3.0f) vs = 3.0f;
+	glPointSize(vs);
 
 	// Draw depending on mode
 	if (editor->editMode() == MapEditor::MODE_VERTICES) {
@@ -765,18 +772,25 @@ void MapCanvas::draw() {
 	drawGrid();
 
 	// Setup options
-	if (vertex_round)
-		glEnable(GL_POINT_SMOOTH);
-	else
-		glDisable(GL_POINT_SMOOTH);
 	if (line_smooth)
 		glEnable(GL_LINE_SMOOTH);
 	else
 		glDisable(GL_LINE_SMOOTH);
 	glLineWidth(1.5f);
-	glPointSize((float)vertex_size);
+
+	if (vertex_round)
+		glEnable(GL_POINT_SMOOTH);
+	else
+		glDisable(GL_POINT_SMOOTH);
+	float vs = vertex_size;
+	if (view_scale < 1.0) vs *= view_scale;
+	glPointSize(vs);
 
 	// --- Draw map ---
+
+	// Things if always shown (and not in things mode
+	if (things_always && editor->editMode() != MapEditor::MODE_THINGS)
+		renderer_2d->renderThings(things_drawtype, 0.5f);
 
 	// Lines always (show direction only in lines mode)
 	renderer_2d->renderLines(editor->editMode() == MapEditor::MODE_LINES);

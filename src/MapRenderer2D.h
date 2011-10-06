@@ -54,11 +54,11 @@ public:
 	void	renderLines(bool show_direction);
 	void	renderLinesVBO(bool show_direction);
 	void	renderLinesImmediate(bool show_direction);
-	void	renderRoundThing(double x, double y, double angle, ThingType* type);
-	bool	renderSpriteThing(double x, double y, double angle, ThingType* type);
-	void	renderSquareThing(double x, double y, double angle, ThingType* type);
-	void	renderThings(int mode);
-	void	renderThingsImmediate(int mode);
+	void	renderRoundThing(double x, double y, double angle, ThingType* type, float alpha = 1.0f);
+	bool	renderSpriteThing(double x, double y, double angle, ThingType* type, float alpha = 1.0f);
+	void	renderSquareThing(double x, double y, double angle, ThingType* type, float alpha = 1.0f);
+	void	renderThings(int mode, float alpha = 1.0f);
+	void	renderThingsImmediate(int mode, float alpha);
 
 	// VBOs
 	void	updateVerticesVBO();

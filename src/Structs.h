@@ -223,15 +223,17 @@ struct rgba_t {
 			return col_equal;
 	}
 
-	void set_gl() {
+	void set_gl(bool set_blend = true) {
 		// Colour
-		glColor4f(fr(), fg(), fb(), fa());
+		glColor4ub(r, g, b, a);
 
 		// Blend
-		if (blend == 0)
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		else if (blend == 1)
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+		if (set_blend) {
+			if (blend == 0)
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			else if (blend == 1)
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+		}
 	}
 
 	// Amplify/fade colour components by absolute amounts
