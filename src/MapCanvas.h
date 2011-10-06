@@ -16,6 +16,7 @@ class MCAnimation;
 class MapSide;
 class ThingType;
 class GLTexture;
+class MapRenderer2D;
 class MapCanvas : public OGLCanvas, public KeyBindHandler, public SActionHandler {
 private:
 	MapEditor*				editor;
@@ -24,6 +25,7 @@ private:
 	vector<int>				fps_avg;
 	int						fr_idle;
 	sf::Clock				sfclock;
+	MapRenderer2D*			renderer_2d;
 
 	// Mouse stuff
 	enum {
@@ -52,17 +54,6 @@ private:
 	fpoint2_t	view_tl;
 	fpoint2_t	view_br;
 
-	// Visibility
-	enum {
-		VIS_LEFT	= 1,
-		VIS_RIGHT	= 2,
-		VIS_ABOVE	= 4,
-		VIS_BELOW	= 8,
-	};
-	vector<uint8_t>	vis_v;
-	vector<uint8_t>	vis_l;
-	vector<uint8_t>	vis_t;
-
 	// Animation
 	float	anim_flash_level;
 	bool	anim_flash_inc;
@@ -82,17 +73,14 @@ public:
 
 	// Drawing
 	void	drawGrid();
-	void	drawVertices();
-	void	drawLines(bool show_direction = false);
-	void	drawRoundThing(double x, double y, double angle, ThingType* type);
-	bool	drawSpriteThing(double x, double y, double angle, ThingType* type);
-	void	drawSquareThing(double x, double y, double angle, ThingType* type);
-	void	drawThings();
+	//void	drawRoundThing(double x, double y, double angle, ThingType* type);
+	//bool	drawSpriteThing(double x, double y, double angle, ThingType* type);
+	//void	drawSquareThing(double x, double y, double angle, ThingType* type);
+	//void	drawThings();
 	void	drawHilight();
 	void	drawSelection();
 	void	draw();
 	void	update(long frametime);
-	void	updateVisibility();
 
 	// Keybind handling
 	void	onKeyBindPress(string name);

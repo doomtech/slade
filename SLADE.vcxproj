@@ -143,6 +143,7 @@
     <ClCompile Include="src\GameConfiguration.cpp" />
     <ClCompile Include="src\GeneralPrefsPanel.cpp" />
     <ClCompile Include="src\GfxConvDialog.cpp" />
+    <ClCompile Include="src\glew\glew.c" />
     <ClCompile Include="src\GobArchive.cpp" />
     <ClCompile Include="src\GraphicsPrefsPanel.cpp" />
     <ClCompile Include="src\GrpArchive.cpp" />
@@ -193,6 +194,7 @@
     <ClCompile Include="src\lzma\C\XzIn.c" />
     <ClCompile Include="src\MapEditor.cpp" />
     <ClCompile Include="src\MapEntryPanel.cpp" />
+    <ClCompile Include="src\MapRenderer2D.cpp" />
     <ClCompile Include="src\MapTextureManager.cpp" />
     <ClCompile Include="src\MathStuff.cpp" />
     <ClCompile Include="src\MCAnimations.cpp" />
@@ -344,6 +346,9 @@
     <ClInclude Include="src\GameConfiguration.h" />
     <ClInclude Include="src\GeneralPrefsPanel.h" />
     <ClInclude Include="src\GfxConvDialog.h" />
+    <ClInclude Include="src\glew\glew.h" />
+    <ClInclude Include="src\glew\glxew.h" />
+    <ClInclude Include="src\glew\wglew.h" />
     <ClInclude Include="src\GobArchive.h" />
     <ClInclude Include="src\GraphicsPrefsPanel.h" />
     <ClInclude Include="src\GrpArchive.h" />
@@ -390,6 +395,7 @@
     <ClInclude Include="src\lzma\C\XzEnc.h" />
     <ClInclude Include="src\MapEditor.h" />
     <ClInclude Include="src\MapEntryPanel.h" />
+    <ClInclude Include="src\MapRenderer2D.h" />
     <ClInclude Include="src\MapTextureManager.h" />
     <ClInclude Include="src\MathStuff.h" />
     <ClInclude Include="src\MCAnimations.h" />

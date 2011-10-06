@@ -48,10 +48,19 @@ using std::vector;
 #include <wx/log.h>
 
 // OpenGL
-#ifdef __APPLE__
+#ifdef __WXMSW__
+// Windows GL headers
+#include "glew/glew.h"	// Use built-in GLEW so we don't need any extra dlls
+#include <gl/GL.h>
+#include <gl/GLU.h>
+#elif __APPLE__
+// OSX GL headers
+#include <OpenGL/glew.h>
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
 #else
+// Unix GL headers
+#include <GL/glew.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
 #endif

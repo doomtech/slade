@@ -112,6 +112,9 @@
     <Filter Include="Map Editor\GameConfiguration">
       <UniqueIdentifier>{d3422c45-1960-43b3-b586-6baffde25566}</UniqueIdentifier>
     </Filter>
+    <Filter Include="External\GLEW">
+      <UniqueIdentifier>{a00649c9-b965-468e-8890-7338d43e5e39}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\GfxConvDialog.cpp">
@@ -710,6 +713,12 @@
     </ClCompile>
     <ClCompile Include="src\ThingInfoOverlay.cpp">
       <Filter>Map Editor\UI Elements\InfoOverlay</Filter>
+    </ClCompile>
+    <ClCompile Include="src\glew\glew.c">
+      <Filter>External\GLEW</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MapRenderer2D.cpp">
+      <Filter>Map Editor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1337,6 +1346,18 @@
     </ClInclude>
     <ClInclude Include="src\ThingInfoOverlay.h">
       <Filter>Map Editor\UI Elements\InfoOverlay</Filter>
+    </ClInclude>
+    <ClInclude Include="src\glew\glew.h">
+      <Filter>External\GLEW</Filter>
+    </ClInclude>
+    <ClInclude Include="src\glew\glxew.h">
+      <Filter>External\GLEW</Filter>
+    </ClInclude>
+    <ClInclude Include="src\glew\wglew.h">
+      <Filter>External\GLEW</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MapRenderer2D.h">
+      <Filter>Map Editor</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

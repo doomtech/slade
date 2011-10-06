@@ -39,6 +39,7 @@
 #include "MathStuff.h"
 #include "MainApp.h"
 #include "MapEditorWindow.h"
+#include "MapRenderer2D.h"
 
 
 /*******************************************************************
@@ -49,7 +50,6 @@ CVAR(Int, vertex_size, 7, CVAR_SAVE)
 CVAR(Float, line_width, 1.5f, CVAR_SAVE)
 CVAR(Bool, line_smooth, true, CVAR_SAVE)
 CVAR(Int, things_drawtype, 1, CVAR_SAVE)
-CVAR(Bool, things_force_dir, false, CVAR_SAVE)
 CVAR(Bool, grid_dashed, false, CVAR_SAVE)
 
 
@@ -71,6 +71,7 @@ MapCanvas::MapCanvas(wxWindow *parent, int id, MapEditor* editor)
 	mouse_downpos.set(-1, -1);
 	fr_idle = 0;
 	last_time = 0;
+	renderer_2d = new MapRenderer2D(&editor->getMap());
 
 	timer.Start(2);
 #ifdef USE_SFML_RENDERWINDOW
@@ -105,6 +106,7 @@ MapCanvas::MapCanvas(wxWindow *parent, int id, MapEditor* editor)
  * MapCanvas class destructor
  *******************************************************************/
 MapCanvas::~MapCanvas() {
+	delete renderer_2d;
 }
 
 /* MapCanvas::translateX
@@ -135,7 +137,7 @@ void MapCanvas::setView(double x, double y) {
 	view_br.y = translateY(0);
 
 	// Update object visibility
-	updateVisibility();
+	renderer_2d->updateVisibility(view_tl, view_br, view_scale);
 }
 
 void MapCanvas::pan(double x, double y) {
@@ -174,7 +176,7 @@ void MapCanvas::zoom(double amount, bool toward_cursor) {
 	view_br.y = translateY(0);
 
 	// Update object visibility
-	updateVisibility();
+	renderer_2d->updateVisibility(view_tl, view_br, view_scale);
 }
 
 void MapCanvas::drawGrid() {
@@ -250,87 +252,7 @@ void MapCanvas::drawGrid() {
 	glDisable(GL_LINE_STIPPLE);
 }
 
-void MapCanvas::drawVertices() {
-	// Set to vertex colour
-	ColourConfiguration::getColour("map_vertex").set_gl();
-
-	// Go through vertices
-	glBegin(GL_POINTS);
-	for (unsigned a = 0; a < editor->getMap().nVertices(); a++) {
-		// Skip if outside of screen
-		if (vis_v[a] > 0)
-			continue;
-
-		// Draw vertex
-		glVertex2d(editor->getMap().getVertex(a)->xPos(), editor->getMap().getVertex(a)->yPos());
-	}
-	glEnd();
-}
-
-void MapCanvas::drawLines(bool show_direction) {
-	// Temp for now
-	float fade_coeff = 0.5f;
-
-	// Get line colours
-	rgba_t col_background = ColourConfiguration::getColour("map_background");
-	rgba_t col_line_normal = ColourConfiguration::getColour("map_line_normal");
-	rgba_t col_line_special = ColourConfiguration::getColour("map_line_special");
-
-	// Set line width
-	glLineWidth(line_width);
-
-	// Draw all lines
-	rgba_t col;
-	MapLine* line = NULL;
-	double x1, y1, x2, y2;
-	for (unsigned a = 0; a < editor->getMap().nLines(); a++) {
-		// Skip if outside of screen
-		if (vis_l[a] > 0)
-			continue;
-
-		// Get line info
-		line = editor->getMap().getLine(a);
-		x1 = line->v1()->xPos();
-		y1 = line->v1()->yPos();
-		x2 = line->v2()->xPos();
-		y2 = line->v2()->yPos();
-
-		// Check for special line
-		if ((int)line->prop("special") > 0)
-			col.set(col_line_special);
-		else
-			col.set(col_line_normal);
-
-		// Check for two-sided line
-		if (line->s2())
-			col.set(col.r*fade_coeff+col_background.r*(1.0-fade_coeff),
-					col.g*fade_coeff+col_background.g*(1.0-fade_coeff),
-					col.b*fade_coeff+col_background.b*(1.0-fade_coeff), 255, 0);
-
-		// Set line colour
-		col.set_gl();
-
-		// Draw the line
-		glBegin(GL_LINES);
-		glVertex2d(x1, y1);
-		glVertex2d(x2, y2);
-		glEnd();
-
-		// Direction tab
-		if (show_direction) {
-			double xmid = x1 + ((x2 - x1) * 0.5);
-			double ymid = y1 + ((y2 - y1) * 0.5);
-			double x = (-(y2 - y1)) * 0.125;
-			double y = (x2 - x1) * 0.125;
-
-			glBegin(GL_LINES);
-			glVertex2d(xmid, ymid);
-			glVertex2d(xmid - x, ymid - y);
-			glEnd();
-		}
-	}
-}
-
+/*
 void MapCanvas::drawRoundThing(double x, double y, double angle, ThingType* tt) {
 	// Ignore if no type given (shouldn't happen)
 	if (!tt)
@@ -503,8 +425,8 @@ void MapCanvas::drawThings() {
 	vector<int> things_arrows;
 	for (unsigned a = 0; a < editor->getMap().nThings(); a++) {
 		// Skip if outside of screen
-		if (vis_t[a] > 0)
-			continue;
+		//if (vis_t[a] > 0)
+		//	continue;
 
 		// Get thing info
 		thing = editor->getMap().getThing(a);
@@ -558,6 +480,7 @@ void MapCanvas::drawThings() {
 	if (things_drawtype > 0)
 		glDisable(GL_TEXTURE_2D);
 }
+*/
 
 void MapCanvas::drawHilight() {
 	int hilight_item = editor->hilightItem();
@@ -690,16 +613,9 @@ void MapCanvas::drawSelection() {
 	// Draw depending on mode
 	if (editor->editMode() == MapEditor::MODE_VERTICES) {
 		// Vertices
-		double x, y;
 		glBegin(GL_POINTS);
-		for (unsigned a = 0; a < selection.size(); a++) {
-			// Skip if not on screen
-			if (vis_v[selection[a]] > 0)
-				continue;
-
-			// Draw vertex selection
+		for (unsigned a = 0; a < selection.size(); a++)
 			glVertex2d(map.getVertex(selection[a])->xPos(), map.getVertex(selection[a])->yPos());
-		}
 		glEnd();
 	}
 	else if (editor->editMode() == MapEditor::MODE_LINES) {
@@ -712,8 +628,8 @@ void MapCanvas::drawSelection() {
 		glBegin(GL_LINES);
 		for (unsigned a = 0; a < selection.size(); a++) {
 			// Skip if not on screen
-			if (vis_l[selection[a]] > 0)
-				continue;
+			//if (vis_l[selection[a]] > 0)
+			//	continue;
 
 			line = map.getLine(selection[a]);
 			x1 = line->v1()->xPos();
@@ -748,13 +664,8 @@ void MapCanvas::drawSelection() {
 
 		// Go through map lines
 		MapLine* line;
-		double x1, y1, x2, y2;
 		glBegin(GL_LINES);
 		for (unsigned a = 0; a < map.nLines(); a++) {
-			// Skip if not on screen
-			if (vis_l[a] > 0)
-				continue;
-
 			// Check if line is in a selected sector
 			line = map.getLine(a);
 			bool selected = false;
@@ -780,10 +691,6 @@ void MapCanvas::drawSelection() {
 		double x, y;
 		MapThing* thing = NULL;
 		for (unsigned a = 0; a < selection.size(); a++) {
-			// Skip if not on screen
-			if (vis_t[selection[a]] > 0)
-				continue;
-
 			thing = map.getThing(selection[a]);
 			x = thing->xPos();
 			y = thing->yPos();
@@ -871,22 +778,16 @@ void MapCanvas::draw() {
 
 	// --- Draw map ---
 
-	// Check if we need to update visibility
-	if (vis_v.size() != editor->getMap().nVertices() ||
-		vis_l.size() != editor->getMap().nLines() ||
-		vis_t.size() != editor->getMap().nThings())
-		updateVisibility();
-
 	// Lines always (show direction only in lines mode)
-	drawLines(editor->editMode() == MapEditor::MODE_LINES);
+	renderer_2d->renderLines(editor->editMode() == MapEditor::MODE_LINES);
 
 	// Vertices if in vertex mode
 	if (editor->editMode() == MapEditor::MODE_VERTICES)
-		drawVertices();
+		renderer_2d->renderVertices();
 
 	// Things if in things mode
 	if (editor->editMode() == MapEditor::MODE_THINGS)
-		drawThings();
+		renderer_2d->renderThings(things_drawtype);
 
 	// Draw overlays (hilight etc)
 	if (mouse_state == MSTATE_NORMAL) drawHilight();
@@ -1038,80 +939,6 @@ void MapCanvas::update(long frametime) {
 	frametime_last = frametime;
 }
 
-void MapCanvas::updateVisibility() {
-	SLADEMap& map = editor->getMap();
-
-	// Vertex visibility
-	if (map.nVertices() != vis_v.size()) {
-		// Number of vertices changed, reset array
-		vis_v.clear();
-		for (unsigned a = 0; a < map.nVertices(); a++)
-			vis_v.push_back(0);
-	}
-	double x, y;
-	for (unsigned a = 0; a < vis_v.size(); a++) {
-		x = map.getVertex(a)->xPos();
-		y = map.getVertex(a)->yPos();
-		vis_v[a] = 0;
-		if (x < view_tl.x)
-			vis_v[a] |= VIS_LEFT;
-		if (x > view_br.x)
-			vis_v[a] |= VIS_RIGHT;
-		if (y < view_tl.y)
-			vis_v[a] |= VIS_BELOW;
-		if (y > view_br.y)
-			vis_v[a] |= VIS_ABOVE;
-	}
-
-	// Line visibility
-	if (map.nLines() != vis_l.size()) {
-		// Number of lines changed, reset array
-		vis_l.clear();
-		for (unsigned a = 0; a < map.nLines(); a++)
-			vis_l.push_back(0);
-	}
-	uint8_t vis_v1, vis_v2;
-	for (unsigned a = 0; a < vis_l.size(); a++) {
-		vis_v1 = vis_v[map.getLine(a)->v1()->getIndex()];
-		vis_v2 = vis_v[map.getLine(a)->v2()->getIndex()];
-		vis_l[a] = 0;
-		if (vis_v1 & VIS_LEFT && vis_v2 & VIS_LEFT)
-			vis_l[a] |= VIS_LEFT;
-		if (vis_v1 & VIS_RIGHT && vis_v2 & VIS_RIGHT)
-			vis_l[a] |= VIS_RIGHT;
-		if (vis_v1 & VIS_BELOW && vis_v2 & VIS_BELOW)
-			vis_l[a] |= VIS_BELOW;
-		if (vis_v1 & VIS_ABOVE && vis_v2 & VIS_ABOVE)
-			vis_l[a] |= VIS_ABOVE;
-	}
-
-	// Thing visibility
-	if (map.nThings() != vis_t.size()) {
-		// Number of things changed, reset array
-		vis_t.clear();
-		for (unsigned a = 0; a < map.nThings(); a++)
-			vis_t.push_back(0);
-	}
-	double radius;
-	for (unsigned a = 0; a < vis_t.size(); a++) {
-		vis_t[a] = 0;
-		x = map.getThing(a)->xPos();
-		y = map.getThing(a)->yPos();
-
-		// Get thing type properties from game configuration
-		ThingType* tt = theGameConfiguration->thingType(map.getThing(a)->getType());
-		radius = tt->getRadius();
-
-		// Ignore if outside of screen
-		if (x+radius < view_tl.x || x-radius > view_br.x || y+radius < view_tl.y || y-radius > view_br.y)
-			vis_t[a] = 1;
-
-		// Check if the thing is worth drawing
-		else if (radius*view_scale < 1)
-			vis_t[a] = 1;
-	}
-}
-
 void MapCanvas::onKeyBindPress(string name) {
 	// Pan left
 	if (name == "me2d_left")
@@ -1238,7 +1065,7 @@ void MapCanvas::onSize(wxSizeEvent& e) {
 	view_br.y = translateY(0);
 
 	// Update map item visibility
-	updateVisibility();
+	renderer_2d->updateVisibility(view_tl, view_br, view_scale);
 }
 
 void MapCanvas::onKeyDown(wxKeyEvent& e) {
