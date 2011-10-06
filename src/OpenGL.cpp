@@ -88,6 +88,9 @@ bool OpenGL::init() {
 	max_tex_size = val;
 	wxLogMessage("Max Texture Size: %dx%d", max_tex_size, max_tex_size);
 
+	// Initialise GLEW
+	glewInit();
+
 	initialised = true;
 	return true;
 }
