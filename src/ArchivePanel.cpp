@@ -664,7 +664,7 @@ bool ArchivePanel::revertEntry() {
 
 	// If there was only one selected entry, chances are its content
 	// were displayed, so this should be updated
-	if (theActivePanel) 
+	if (theActivePanel)
 		theActivePanel->callRefresh();
 
 	return true;
@@ -825,8 +825,8 @@ bool ArchivePanel::importEntry() {
 				else if (noffset.x | noffset.y) {
 					wxMessageDialog md(this,
 						S_FMT("Image %s had offset [%d, %d], imported file has offset [%d, %d]. "
-						"Do you want to keep the old offset and override the new?", 
-						CHR(selection[a]->getName()), offset.x, offset.y, noffset.x, noffset.y), 
+						"Do you want to keep the old offset and override the new?",
+						CHR(selection[a]->getName()), offset.x, offset.y, noffset.x, noffset.y),
 						"Conflicting Offsets", wxYES_NO);
 					int result = md.ShowModal();
 					if (result != wxID_YES)
@@ -1011,7 +1011,7 @@ bool ArchivePanel::gfxConvert() {
 		// Get image and conversion info
 		SImage* image = gcd.getItemImage(a);
 		SIFormat* format = gcd.getItemFormat(a);
-		
+
 		// Write converted image back to entry
 		MemChunk mc;
 		format->saveImage(*image, mc, gcd.getItemPalette(a));
@@ -1948,7 +1948,7 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
 	// Add custom menu items
 	wxMenu* custom;
 	if (context_submenus) {
-		wxMenu* custom = new wxMenu();
+		custom = new wxMenu();
 	} else custom = &context;
 	bool ok = cur_area->fillCustomMenu(custom);
 	if (context_submenus) {
