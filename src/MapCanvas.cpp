@@ -237,7 +237,6 @@ void MapCanvas::viewShowObject() {
 		}
 	}
 	else if (editor->editMode() == MapEditor::MODE_SECTORS) {
-		MapSector* sector;
 		bbox = map.getSector(objects[0])->boundingBox();
 		for (unsigned a = 1; a < objects.size(); a++) {
 			bbox_t sbb = map.getSector(objects[a])->boundingBox();
@@ -297,7 +296,7 @@ void MapCanvas::drawGrid() {
 		glEnable(GL_LINE_STIPPLE);
 	}
 
-	ColourConfiguration::getColour("map_grid").set_gl();
+	ColourConfiguration::getColour("map_grid").set_gl(false);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// Determine smallest grid size to bother drawing
@@ -411,6 +410,7 @@ void MapCanvas::draw() {
 	if (mouse_state == MSTATE_NORMAL)
 		renderer_2d->renderHilight(editor->hilightItem(), editor->editMode(), anim_flash_level, view_scale);
 	renderer_2d->renderSelection(editor->getSelection(), editor->editMode(), view_scale);
+
 
 	// Draw selection box if active
 	if (mouse_state == MSTATE_SELECTION) {

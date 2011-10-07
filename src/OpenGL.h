@@ -9,6 +9,7 @@ namespace OpenGL {
 	bool			init();
 	bool			np2TexSupport();
 	bool			validTexDimension(unsigned dim);
+	float			maxPointSize();
 }
 
 #endif//__OPENGL_H__

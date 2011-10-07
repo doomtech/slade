@@ -43,6 +43,7 @@ namespace OpenGL {
 	unsigned		max_tex_size = 128;
 	unsigned		pow_two[] = { 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768 };
 	uint8_t			n_pow_two = 16;
+	float			max_point_size = -1.0f;
 }
 
 
@@ -120,4 +121,14 @@ bool OpenGL::validTexDimension(unsigned dim) {
 	}
 	else
 		return true;
+}
+
+float OpenGL::maxPointSize() {
+	if (max_point_size < 0) {
+		GLfloat sizes[2];
+		glGetFloatv(GL_ALIASED_POINT_SIZE_RANGE, sizes);
+		max_point_size = sizes[1];
+	}
+
+	return max_point_size;
 }

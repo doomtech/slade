@@ -111,7 +111,7 @@ void ThingInfoOverlay::draw(int bottom, int right, float alpha) {
 		glEnd();
 	}
 	else {
-		tex = theMapEditor->textureManager().getThingImage("unknown");
+		tex = theMapEditor->textureManager().getEditorImage("thing/unknown");
 		if (tex) {
 			tex->bind();
 			glBegin(GL_QUADS);

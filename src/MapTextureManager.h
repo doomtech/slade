@@ -22,8 +22,8 @@ private:
 	MapTexHashMap	textures;
 	MapTexHashMap	flats;
 	MapTexHashMap	sprites;
-	MapTexHashMap	thing_images;
-	bool			thing_images_loaded;
+	MapTexHashMap	editor_images;
+	bool			editor_images_loaded;
 
 public:
 	MapTextureManager(Archive* archive = NULL);
@@ -34,7 +34,7 @@ public:
 	GLTexture*	getTexture(string name);
 	GLTexture*	getFlat(string name);
 	GLTexture*	getSprite(string name, string translation = "", string palette = "");
-	GLTexture*	getThingImage(string name);
+	GLTexture*	getEditorImage(string name);
 
 	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 };

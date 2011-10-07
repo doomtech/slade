@@ -39,19 +39,44 @@ MapRenderer2D::~MapRenderer2D() {
 
 void MapRenderer2D::renderVertices(float view_scale) {
 	// Setup rendering properties
-	if (vertex_round)
-		glEnable(GL_POINT_SMOOTH);
-	else
-		glDisable(GL_POINT_SMOOTH);
 	float vs = vertex_size;
 	if (view_scale < 1.0) vs *= view_scale;
 	glPointSize(vs);
+
+	// Setup point sprites if supported
+	bool point = false;
+	if (GLEW_ARB_point_sprite) {
+		// Get appropriate vertex texture
+		GLTexture* tex;
+		if (vertex_round) tex = theMapEditor->textureManager().getEditorImage("vertex_r");
+		else tex = theMapEditor->textureManager().getEditorImage("vertex_s");
+
+		// If it was found, enable point sprites
+		if (tex) {
+			glEnable(GL_TEXTURE_2D);
+			tex->bind();
+			glEnable(GL_POINT_SPRITE);
+			glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
+			point = true;
+		}
+	}
+
+	// No point sprites, use regular points
+	if (!point) {
+		if (vertex_round)	glEnable(GL_POINT_SMOOTH);
+		else				glDisable(GL_POINT_SMOOTH);
+	}
 
 	// Render the vertices depending on what features are supported
 	if (GLEW_ARB_vertex_buffer_object && !FORCE_NO_VBO)
 		renderVerticesVBO();
 	else
 		renderVerticesImmediate();
+
+	if (point) {
+		glDisable(GL_POINT_SPRITE);
+		glDisable(GL_TEXTURE_2D);
+	}
 }
 
 void MapRenderer2D::renderVerticesImmediate() {
@@ -233,7 +258,7 @@ void MapRenderer2D::renderRoundThing(double x, double y, double angle, ThingType
 
 	// Check for unknown type
 	if (tt->getName() == "Unknown") {
-		tex = theMapEditor->textureManager().getThingImage("unknown");
+		tex = theMapEditor->textureManager().getEditorImage("thing/unknown");
 		glColor4f(1.0f, 1.0f, 1.0f, alpha);
 	}
 
@@ -244,10 +269,10 @@ void MapRenderer2D::renderRoundThing(double x, double y, double angle, ThingType
 		// Check if we want an angle indicator
 		if (tt->isAngled() || thing_force_dir) {
 			if (angle != 0) rotate = true;	// Also rotate to angle
-			tex = theMapEditor->textureManager().getThingImage("normal_d");
+			tex = theMapEditor->textureManager().getEditorImage("thing/normal_d");
 		}
 		else
-			tex = theMapEditor->textureManager().getThingImage("normal_n");
+			tex = theMapEditor->textureManager().getEditorImage("thing/normal_n");
 	}
 
 	// If for whatever reason the thing texture doesn't exist, just draw a basic, square thing
@@ -431,7 +456,7 @@ void MapRenderer2D::renderThingsImmediate(float alpha) {
 	// Draw any thing direction arrows needed
 	if (thing_drawtype == 2) {
 		glColor4f(1.0f, 1.0f, 1.0f, alpha);
-		GLTexture* tex_arrow = theMapEditor->textureManager().getThingImage("arrow");
+		GLTexture* tex_arrow = theMapEditor->textureManager().getEditorImage("arrow");
 		if (tex_arrow) {
 			tex_arrow->bind();
 
@@ -480,11 +505,34 @@ void MapRenderer2D::renderHilight(int hilight_item, int mode, float fade, float 
 
 	// Draw depending on mode
 	if (mode == MapEditor::MODE_VERTICES) {
-		// Vertex
+		// Setup point sprites if supported
+		bool point = false;
+		if (GLEW_ARB_point_sprite) {
+			// Get appropriate vertex texture
+			GLTexture* tex;
+			if (vertex_round) tex = theMapEditor->textureManager().getEditorImage("vertex_r");
+			else tex = theMapEditor->textureManager().getEditorImage("vertex_s");
+
+			// If it was found, enable point sprites
+			if (tex) {
+				glEnable(GL_TEXTURE_2D);
+				tex->bind();
+				glEnable(GL_POINT_SPRITE);
+				glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
+				point = true;
+			}
+		}
+
+		// Draw vertex
 		glBegin(GL_POINTS);
 		glVertex2d(map->getVertex(hilight_item)->xPos(),
 					map->getVertex(hilight_item)->yPos());
 		glEnd();
+
+		if (point) {
+			glDisable(GL_POINT_SPRITE);
+			glDisable(GL_TEXTURE_2D);
+		}
 	}
 	else if (mode == MapEditor::MODE_LINES) {
 		// Line
@@ -574,7 +622,7 @@ void MapRenderer2D::renderHilight(int hilight_item, int mode, float fade, float 
 		}
 		else {
 			// Setup hilight thing texture
-			GLTexture* tex = theMapEditor->textureManager().getThingImage("hilight");
+			GLTexture* tex = theMapEditor->textureManager().getEditorImage("thing/hilight");
 			if (tex) {
 				glEnable(GL_TEXTURE_2D);
 				tex->bind();
@@ -609,11 +657,34 @@ void MapRenderer2D::renderSelection(vector<int>& selection, int mode, float view
 
 	// Draw depending on mode
 	if (mode == MapEditor::MODE_VERTICES) {
-		// Vertices
+		// Setup point sprites if supported
+		bool point = false;
+		if (GLEW_ARB_point_sprite) {
+			// Get appropriate vertex texture
+			GLTexture* tex;
+			if (vertex_round) tex = theMapEditor->textureManager().getEditorImage("vertex_r");
+			else tex = theMapEditor->textureManager().getEditorImage("vertex_s");
+
+			// If it was found, enable point sprites
+			if (tex) {
+				glEnable(GL_TEXTURE_2D);
+				tex->bind();
+				glEnable(GL_POINT_SPRITE);
+				glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
+				point = true;
+			}
+		}
+
+		// Draw selected vertices
 		glBegin(GL_POINTS);
 		for (unsigned a = 0; a < selection.size(); a++)
 			glVertex2d(map->getVertex(selection[a])->xPos(), map->getVertex(selection[a])->yPos());
 		glEnd();
+
+		if (point) {
+			glDisable(GL_POINT_SPRITE);
+			glDisable(GL_TEXTURE_2D);
+		}
 	}
 	else if (mode == MapEditor::MODE_LINES) {
 		// Lines
@@ -679,27 +750,24 @@ void MapRenderer2D::renderSelection(vector<int>& selection, int mode, float view
 		double x, y;
 		MapThing* thing = NULL;
 
-		// Setup texture
-		if (!thing_overlay_square && thing_drawtype > 0) {
-			GLTexture* tex = theMapEditor->textureManager().getThingImage("hilight");
-			if (tex) {
-				glEnable(GL_TEXTURE_2D);
-				tex->bind();
-			}
-		}
-		else
+		// Get hilight texture
+		GLTexture* tex = theMapEditor->textureManager().getEditorImage("thing/hilight");
+
+		// Simplest case, thing_overlay_square is true or thing_drawtype is 0 (squares)
+		// or if the hilight circle texture isn't found for some reason
+		if (thing_overlay_square || thing_drawtype == 0 || !tex) {
 			glDisable(GL_TEXTURE_2D);
 
-		for (unsigned a = 0; a < selection.size(); a++) {
-			thing = map->getThing(selection[a]);
-			x = thing->xPos();
-			y = thing->yPos();
+			for (unsigned a = 0; a < selection.size(); a++) {
+				thing = map->getThing(selection[a]);
+				x = thing->xPos();
+				y = thing->yPos();
 
-			// Get thing radius
-			double radius = theGameConfiguration->thingType(thing->getType())->getRadius();
+				// Get thing radius
+				double radius = theGameConfiguration->thingType(thing->getType())->getRadius();
+				if (!thing_overlay_square) radius += 8;
 
-			// Check if we want radius-accurate square overlays
-			if (thing_overlay_square) {
+				// Check if we want radius-accurate square overlays
 				glDisable(GL_TEXTURE_2D);
 				glBegin(GL_QUADS);
 				glVertex2d(x - radius, y - radius);
@@ -707,20 +775,43 @@ void MapRenderer2D::renderSelection(vector<int>& selection, int mode, float view
 				glVertex2d(x + radius, y + radius);
 				glVertex2d(x + radius, y - radius);
 				glEnd();
-				continue;
 			}
 
-			radius += 8;
-			if (thing_drawtype == 0) {
-				glBegin(GL_QUADS);
-				glVertex2d(x - radius, y - radius);
-				glVertex2d(x - radius, y + radius);
-				glVertex2d(x + radius, y + radius);
-				glVertex2d(x + radius, y - radius);
+			return;
+		}
+
+		// Otherwise, we want the circle selection overlay
+		glEnable(GL_TEXTURE_2D);
+		tex->bind();
+
+		// Setup point sprites if supported
+		bool point = false;
+		if (GLEW_ARB_point_sprite) {
+			glEnable(GL_POINT_SPRITE);
+			glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
+			point = true;
+		}
+
+		// Draw thing selection
+		for (unsigned a = 0; a < selection.size(); a++) {
+			thing = map->getThing(selection[a]);
+			x = thing->xPos();
+			y = thing->yPos();
+
+			// Get thing radius
+			double radius = theGameConfiguration->thingType(thing->getType())->getRadius() + 8;
+			double ps = radius*2*view_scale;
+
+			// Draw it
+			if (point && ps <= OpenGL::maxPointSize()) {
+				// Point sprite
+				glPointSize(ps);
+				glBegin(GL_POINTS);
+				glVertex2d(x, y);
 				glEnd();
 			}
 			else {
-				// Draw thing selection if on screen
+				// Textured quad
 				glBegin(GL_QUADS);
 				glTexCoord2f(0.0f, 0.0f);	glVertex2d(x - radius, y - radius);
 				glTexCoord2f(0.0f, 1.0f);	glVertex2d(x - radius, y + radius);
@@ -729,6 +820,9 @@ void MapRenderer2D::renderSelection(vector<int>& selection, int mode, float view
 				glEnd();
 			}
 		}
+
+		if (point)
+			glDisable(GL_POINT_SPRITE);
 
 		glDisable(GL_TEXTURE_2D);
 	}

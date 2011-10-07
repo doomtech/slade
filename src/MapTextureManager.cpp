@@ -9,7 +9,7 @@
 MapTextureManager::MapTextureManager(Archive* archive) {
 	// Init variables
 	this->archive = archive;
-	thing_images_loaded = false;
+	editor_images_loaded = false;
 
 	// Listen to the resource manager
 	listenTo(theResourceManager);
@@ -143,32 +143,45 @@ GLTexture* MapTextureManager::getSprite(string name, string translation, string 
 	return NULL;
 }
 
-GLTexture* MapTextureManager::getThingImage(string name) {
-	// Load thing image textures if they haven't already
-	if (!thing_images_loaded) {
-		// Load all thing images to textures
-		Archive* slade_pk3 = theArchiveManager->programResourceArchive();
-		ArchiveTreeNode* dir = slade_pk3->getDir("images/thing");
-		if (dir) {
-			SImage image;
-			for (unsigned a = 0; a < dir->numEntries(); a++) {
-				ArchiveEntry* entry = dir->getEntry(a);
+void importEditorImages(MapTexHashMap& map, ArchiveTreeNode* dir, string path) {
+	SImage image;
 
-				// Load entry to image
-				if (image.open(entry->getMCData())) {
-					// Create texture in hashmap
-					map_tex_t& mtex = thing_images[entry->getName(true)];
-					mtex.texture = new GLTexture(false);
-					mtex.texture->setFilter(GLTexture::MIPMAP);
-					mtex.texture->loadImage(&image);
-				}
-			}
+	// Go through entries
+	for (unsigned a = 0; a < dir->numEntries(); a++) {
+		ArchiveEntry* entry = dir->getEntry(a);
+
+		// Load entry to image
+		if (image.open(entry->getMCData())) {
+			// Create texture in hashmap
+			string name = path + entry->getName(true);
+			//wxLogMessage("Loading editor texture %s", CHR(name));
+			map_tex_t& mtex = map[name];
+			mtex.texture = new GLTexture(false);
+			mtex.texture->setFilter(GLTexture::MIPMAP);
+			mtex.texture->loadImage(&image);
 		}
-
-		thing_images_loaded = true;
 	}
 
-	return thing_images[name].texture;
+	// Go through subdirs
+	for (unsigned a = 0; a < dir->nChildren(); a++) {
+		ArchiveTreeNode* subdir = (ArchiveTreeNode*)dir->getChild(a);
+		importEditorImages(map, subdir, path + subdir->getName() + "/");
+	}
+}
+
+GLTexture* MapTextureManager::getEditorImage(string name) {
+	// Load thing image textures if they haven't already
+	if (!editor_images_loaded) {
+		// Load all thing images to textures
+		Archive* slade_pk3 = theArchiveManager->programResourceArchive();
+		ArchiveTreeNode* dir = slade_pk3->getDir("images");
+		if (dir)
+			importEditorImages(editor_images, dir, "");
+
+		editor_images_loaded = true;
+	}
+
+	return editor_images[name].texture;
 }
 
 void MapTextureManager::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
