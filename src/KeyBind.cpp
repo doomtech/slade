@@ -310,10 +310,14 @@ void KeyBind::initBinds() {
 	addBind("me2d_clear_selection", keypress_t("C"), "Clear selection");
 	addBind("me2d_pan_view", keypress_t("mouse3"), "Pan View");
 	addBind("me2d_pan_view", keypress_t("space", false, true));
-	addBind("me2d_zoom_in_m", keypress_t("mwheelup"), "Zoom In (towards mouse)");
-	addBind("me2d_zoom_out_m", keypress_t("mwheeldown"), "Zoom Out (towards mouse)");
+	addBind("me2d_zoom_in_m", keypress_t("mwheelup"), "Zoom in (towards mouse)");
+	addBind("me2d_zoom_out_m", keypress_t("mwheeldown"), "Zoom out (towards mouse)");
 	addBind("me2d_zoom_in", keypress_t("+"), "Zoom in (towards screen center)");
 	addBind("me2d_zoom_out", keypress_t("-"), "Zoom out (towards screen center)");
+	addBind("me2d_show_object", keypress_t("+", false, false, true), "Zoom in, show current object");
+	addBind("me2d_show_object", keypress_t("mwheelup", false, false, true));
+	addBind("me2d_show_all", keypress_t("-", false, false, true), "Zoom out, show full map");
+	addBind("me2d_show_all", keypress_t("mwheeldown", false, false, true));
 	addBind("me2d_left", keypress_t("left"), "Scroll left");
 	addBind("me2d_right", keypress_t("right"), "Scroll right");
 	addBind("me2d_up", keypress_t("up"), "Scroll up");

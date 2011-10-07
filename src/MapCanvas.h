@@ -70,11 +70,11 @@ public:
 	void	setView(double x, double y);
 	void	pan(double x, double y);
 	void	zoom(double amount, bool toward_cursor = false);
+	void	viewFitToMap();
+	void	viewShowObject();
 
 	// Drawing
 	void	drawGrid();
-	void	drawHilight();
-	void	drawSelection();
 	void	draw();
 	void	update(long frametime);
 

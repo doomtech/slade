@@ -387,7 +387,7 @@ bool SLADEMap::addSector(doomsector_t& s) {
 bool SLADEMap::addSector(doom64sector_t& s) {
 	// Create sector
 	// We need to retrieve the texture name from the hash value
-	MapSector* ns = new MapSector(theResourceManager->getTextureName(s.f_tex), 
+	MapSector* ns = new MapSector(theResourceManager->getTextureName(s.f_tex),
 		theResourceManager->getTextureName(s.c_tex));
 
 	// Setup sector properties
@@ -1369,6 +1369,32 @@ int SLADEMap::inSector(double x, double y) {
 		return -1;
 
 	return sectorIndex(s->sector);
+}
+
+bbox_t SLADEMap::getMapBBox() {
+	bbox_t bbox;
+
+	// Return invalid bbox if no sectors
+	if (sectors.size() == 0)
+		return bbox;
+
+	// Go through sectors
+	// This is quicker than generating it from vertices,
+	// but relies on sector bboxes being up-to-date (which they should be)
+	bbox = sectors[0]->boundingBox();
+	for (unsigned a = 1; a < sectors.size(); a++) {
+		bbox_t sbb = sectors[a]->boundingBox();
+		if (sbb.min.x < bbox.min.x)
+			bbox.min.x = sbb.min.x;
+		if (sbb.min.y < bbox.min.y)
+			bbox.min.y = sbb.min.y;
+		if (sbb.max.x > bbox.max.x)
+			bbox.max.x = sbb.max.x;
+		if (sbb.max.y > bbox.max.y)
+			bbox.max.y = sbb.max.y;
+	}
+
+	return bbox;
 }
 
 bool SLADEMap::lineInSector(MapLine* line, MapSector* sector) {

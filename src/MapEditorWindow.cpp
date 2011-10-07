@@ -171,8 +171,10 @@ bool MapEditorWindow::openMap(Archive::mapdesc_t map) {
 	bool ok = editor.openMap(map);
 
 	// Show window if opened ok
-	if (ok)
+	if (ok) {
 		this->Show(true);
+		map_canvas->viewFitToMap();
+	}
 
 	return ok;
 }

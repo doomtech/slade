@@ -107,6 +107,7 @@ public:
 	int			nearestThing(double x, double y, double min = 64);
 	vector<int>	nearestThingMulti(double x, double y);
 	int			inSector(double x, double y);
+	bbox_t		getMapBBox();
 
 	bool	lineInSector(MapLine* line, MapSector* sector);
 	bool	getLinesOfSector(unsigned index, vector<MapLine*>& list);

@@ -48,7 +48,7 @@ public:
 	~MapRenderer2D();
 
 	// Main drawing stuff
-	void	renderVertices();
+	void	renderVertices(float view_scale);
 	void	renderVerticesVBO();
 	void	renderVerticesImmediate();
 	void	renderLines(bool show_direction);
@@ -57,8 +57,10 @@ public:
 	void	renderRoundThing(double x, double y, double angle, ThingType* type, float alpha = 1.0f);
 	bool	renderSpriteThing(double x, double y, double angle, ThingType* type, float alpha = 1.0f);
 	void	renderSquareThing(double x, double y, double angle, ThingType* type, float alpha = 1.0f);
-	void	renderThings(int mode, float alpha = 1.0f);
-	void	renderThingsImmediate(int mode, float alpha);
+	void	renderThings(float alpha = 1.0f);
+	void	renderThingsImmediate(float alpha);
+	void	renderHilight(int item, int type, float fade, float view_scale);
+	void	renderSelection(vector<int>& selection, int type, float view_scale);
 
 	// VBOs
 	void	updateVerticesVBO();
