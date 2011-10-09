@@ -7,6 +7,7 @@
 #include "ColourConfiguration.h"
 #include "MapEditorWindow.h"
 #include "GLTexture.h"
+#include "Polygon2D.h"
 
 CVAR(Bool, vertex_round, true, CVAR_SAVE)
 CVAR(Int, vertex_size, 7, CVAR_SAVE)
@@ -558,6 +559,10 @@ void MapRenderer2D::renderHilight(int hilight_item, int mode, float fade, float 
 	}
 	else if (mode == MapEditor::MODE_SECTORS) {
 		// Sector
+
+		// Draw sector polygon
+		glColor4f(col.fr(), col.fg(), col.fb(), col.fa() * 0.5f);
+		map->getSector(hilight_item)->getPolygon()->render();
 
 		// Get all lines belonging to the hilighted sector
 		vector<MapLine*> lines;

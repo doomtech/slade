@@ -214,6 +214,7 @@
     <ClCompile Include="src\Parser.cpp" />
     <ClCompile Include="src\PatchBrowser.cpp" />
     <ClCompile Include="src\PNGPrefsPanel.cpp" />
+    <ClCompile Include="src\Polygon2D.cpp" />
     <ClCompile Include="src\PreferencesDialog.cpp" />
     <ClCompile Include="src\ResArchive.cpp" />
     <ClCompile Include="src\ResourceManager.cpp" />
@@ -418,6 +419,7 @@
     <ClInclude Include="src\Parser.h" />
     <ClInclude Include="src\PatchBrowser.h" />
     <ClInclude Include="src\PNGPrefsPanel.h" />
+    <ClInclude Include="src\Polygon2D.h" />
     <ClInclude Include="src\PreferencesDialog.h" />
     <ClInclude Include="src\ResArchive.h" />
     <ClInclude Include="src\ResourceManager.h" />

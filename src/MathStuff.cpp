@@ -29,10 +29,19 @@
  *******************************************************************/
 #include "Main.h"
 #include "MathStuff.h"
+#include "Console.h"
 
 
 /*******************************************************************
- * MATH NAMESPACE FUNCTIONS
+ * MATHSTUFF NAMESPACE VARIABLES
+ *******************************************************************/
+namespace MathStuff {
+	double rad2deg = 180 / PI;
+}
+
+
+/*******************************************************************
+ * MATHSTUFF NAMESPACE FUNCTIONS
  *******************************************************************/
 
 /* MathStuff::clamp
@@ -136,7 +145,14 @@ bool MathStuff::linesIntersect(double l1x1, double l1y1, double l1x2, double l1y
 		(l1x2 == l2x1 && l1y2 == l2y1))
 		return false;
 
-	// Third, check for two perpendicular horizontal or vertical lines
+	// Third, check bounding boxes
+	if (max(l1x1, l1x2) < min(l2x1, l2x2) ||
+		max(l2x1, l2x2) < min(l1x1, l1x2) ||
+		max(l1y1, l1y2) < min(l2y1, l2y2) ||
+		max(l2y1, l2y2) < min(l1y1, l1y2))
+		return false;
+
+	// Fourth, check for two perpendicular horizontal or vertical lines
 	if (l1x1 == l1x2 && l2y1 == l2y2) {
 		x = l1x1;
 		y = l2y1;
@@ -147,7 +163,6 @@ bool MathStuff::linesIntersect(double l1x1, double l1y1, double l1x2, double l1y
 		y = l1y1;
 		return true;
 	}
-
 
 	// Not a simple case, do full intersection calculation
 
@@ -169,12 +184,99 @@ bool MathStuff::linesIntersect(double l1x1, double l1y1, double l1x2, double l1y
 	y = (a1*c2 - a2*c1) / det;
 
 	// Check that the intersection point is on both lines
-	if ((min(l1x1, l1x2) < x && x < max(l1x2, l1x2)) &&
-		(min(l1y1, l1y2) < y && y < max(l1y1, l1y2)) &&
-		(min(l2x1, l2x2) < x && x < max(l2x1, l2x2)) &&
-		(min(l2y1, l2y2) < y && y < max(l2y1, l2y2)))
+	if (min(l1x1, l1x2) <= x && x <= max(l1x1, l1x2) &&
+		min(l1y1, l1y2) <= y && y <= max(l1y1, l1y2) &&
+		min(l2x1, l2x2) <= x && x <= max(l2x1, l2x2) &&
+		min(l2y1, l2y2) <= y && y <= max(l2y1, l2y2))
 		return true;
 
 	// Intersection point does not lie on both lines
 	return false;
+}
+
+double MathStuff::distanceRayLine(fpoint2_t ray_origin, fpoint2_t ray2, double x1, double y1, double x2, double y2) {
+	//fpoint2_t ray2 = ray_origin+ray_dir;
+
+	double u_ray = ((x2 - x1) * (ray_origin.y - y1) - (y2 - y1) * (ray_origin.x - x1)) /
+				  ((y2 - y1) * (ray2.x - ray_origin.x) - (x2 - x1) * (ray2.y - ray_origin.y));
+	double u_line = ((ray2.x - ray_origin.x) * (ray_origin.y - y1) - (ray2.y - ray_origin.y) * (ray_origin.x - x1)) /
+				   ((y2 - y1) * (ray2.x - ray_origin.x) - (x2 - x1) * (ray2.y - ray_origin.y));
+
+	if (u_ray >= 0 && u_line >= 0 && u_line <= 1)
+		return u_ray;
+	else
+		return -1;
+}
+
+double MathStuff::angle2DRad(fpoint2_t p1, fpoint2_t p2, fpoint2_t p3) {
+	/*
+	double dot = (p1.x - p2.x) * (p3.x - p2.x) + (p1.y - p2.y) * (p3.y - p2.y);
+	double cross = (p1.x - p2.x) * (p3.y - p2.y) - (p1.y - p2.y) * (p3.x - p2.x);
+
+	if (dot == 0 && cross == 0)
+		return 0;
+	else {
+		double angle = atan2(dot, cross);
+		//if (angle < 0) angle += (2*PI);
+		return angle*rad2deg;
+	}
+	*/
+
+	// From: http://stackoverflow.com/questions/3486172/angle-between-3-points
+	// modified not to bother converting to degrees
+	fpoint2_t ab(p2.x - p1.x, p2.y - p1.y);
+	fpoint2_t cb(p2.x - p3.x, p2.y - p3.y);
+
+	// dot product
+	double dot = (ab.x * cb.x + ab.y * cb.y);
+
+	// length square of both vectors
+	double abSqr = ab.x * ab.x + ab.y * ab.y;
+	double cbSqr = cb.x * cb.x + cb.y * cb.y;
+
+	// square of cosine of the needed angle
+	double cosSqr = dot * dot / abSqr / cbSqr;
+
+	// this is a known trigonometric equality:
+	// cos(alpha * 2) = [ cos(alpha) ]^2 * 2 - 1
+	double cos2 = 2 * cosSqr - 1;
+
+	// Here's the only invocation of the heavy function.
+	// It's a good idea to check explicitly if cos2 is within [-1 .. 1] range
+	double alpha2 =
+		(cos2 <= -1) ? PI :
+		(cos2 >= 1) ? 0 :
+		acosf(cos2);
+
+	//double rslt = alpha2 / 2;
+	//double rs = rslt * rad2deg;
+	double rs = alpha2 / 2;
+
+	// Now revolve the ambiguities.
+	// 1. If dot product of two vectors is negative - the angle is definitely
+	// above 90 degrees. Still we have no information regarding the sign of the angle.
+
+	// NOTE: This ambiguity is the consequence of our method: calculating the cosine
+	// of the double angle. This allows us to get rid of calling sqrt.
+	if (dot < 0)
+		rs = PI - rs;
+
+	// 2. Determine the sign. For this we'll use the Determinant of two vectors.
+	double det = (ab.x * cb.y - ab.y * cb.x);
+	if (det < 0)
+		rs = (2*PI) - rs;
+
+	return rs;
+}
+
+
+
+CONSOLE_COMMAND(angle2d, 6) {
+	double vals[6];
+	for (unsigned a = 0; a < args.size(); a++) {
+		args[a].ToDouble(&vals[a]);
+	}
+
+	double ang = MathStuff::angle2DRad(fpoint2_t(vals[0], vals[1]), fpoint2_t(vals[2], vals[3]), fpoint2_t(vals[4], vals[5]));
+	wxLogMessage("Angle = %1.4f", ang);
 }

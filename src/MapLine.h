@@ -85,6 +85,7 @@ public:
 	Property&		prop(string key)	{ return udmf_props[key]; }
 
 	double	getLength();
+	bool	doubleSector();
 };
 
 #endif //__MAPLINE_H__

@@ -56,6 +56,7 @@ public:
 	void			clearItems(BrowserTreeNode* node = NULL);
 	void			reloadItems(BrowserTreeNode* node = NULL);
 	BrowserItem*	getSelectedItem() { return canvas->getSelectedItem(); }
+	bool			selectItem(string name, BrowserTreeNode* root = NULL);
 
 	unsigned		addSortType(string name);
 	virtual void	doSort(unsigned sort_type = 0);

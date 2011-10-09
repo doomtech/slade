@@ -123,6 +123,9 @@ bool OpenGL::validTexDimension(unsigned dim) {
 		return true;
 }
 
+/* OpenGL::maxPointSize
+ * Returns the implementation-dependant maximum size for GL_POINTS
+ *******************************************************************/
 float OpenGL::maxPointSize() {
 	if (max_point_size < 0) {
 		GLfloat sizes[2];

@@ -17,3 +17,10 @@ void MapSector::updateBBox() {
 		bbox.extend(line->v2()->xPos(), line->v2()->yPos());
 	}
 }
+
+Polygon2D* MapSector::getPolygon() {
+	if (!polygon.hasPolygon())
+		polygon.openSector(this);
+
+	return &polygon;
+}

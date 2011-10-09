@@ -4,6 +4,7 @@
 
 #include "Tokenizer.h"
 #include "PropertyList.h"
+#include "Polygon2D.h"
 
 class MapSide;
 
@@ -42,6 +43,7 @@ private:
 	// Internal info
 	vector<MapSide*>	connected_sides;
 	bbox_t				bbox;
+	Polygon2D			polygon;
 
 	// Properties
 	PropertyList	udmf_props;
@@ -58,7 +60,9 @@ public:
 	PropertyList&	props()				{ return udmf_props; }
 	Property&		prop(string key)	{ return udmf_props[key]; }
 
-	bbox_t	boundingBox() { return bbox; }
+	bbox_t				boundingBox() { return bbox; }
+	vector<MapSide*>&	connectedSides() { return connected_sides; }
+	Polygon2D*			getPolygon();
 
 	void	updateBBox();
 };

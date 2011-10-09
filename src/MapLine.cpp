@@ -28,3 +28,11 @@ double MapLine::getLength() {
 
 	return MathStuff::distance(vertex1->xPos(), vertex1->yPos(), vertex2->xPos(), vertex2->yPos());
 }
+
+bool MapLine::doubleSector() {
+	// Check both sides exist
+	if (!side1 || !side2)
+		return false;
+
+	return (side1->getSector() == side2->getSector());
+}

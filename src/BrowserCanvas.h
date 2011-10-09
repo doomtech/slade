@@ -10,6 +10,7 @@ private:
 	vector<BrowserItem*>	items;
 	vector<int>				items_filter;
 	wxScrollBar*			scrollbar;
+	string					search;
 
 	// Display
 	int	yoff;
@@ -31,7 +32,10 @@ public:
 	int						fullItemSize() { return item_size + (item_border*2); }
 	void					updateScrollBar();
 	BrowserItem*			getSelectedItem();
+	void					selectItem(int index);
 	void					filterItems(string filter);
+	void					showItem(int item, bool top = true);
+	bool					searchItemFrom(int from);
 
 	// Events
 	void	onSize(wxSizeEvent& e);
@@ -41,6 +45,8 @@ public:
 	void	onScrollPageUp(wxScrollEvent& e);
 	void	onScrollPageDown(wxScrollEvent& e);
 	void	onMouseEvent(wxMouseEvent& e);
+	void	onKeyDown(wxKeyEvent& e);
+	void	onKeyChar(wxKeyEvent& e);
 };
 
 #endif//__BROWSER_CANVAS_H__

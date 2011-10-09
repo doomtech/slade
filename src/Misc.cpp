@@ -73,17 +73,9 @@ bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry, int index) {
 	if (entry->getType()->extraProps().propertyExists("image_format"))
 		format_hint = entry->getType()->extraProps()["image_format"].getStringValue();
 
-	// Firstly try SIFormat system
-	if (image->open(entry->getMCData(), index, format_hint))
-		return true;
-
-	// Raw images are a special case (not reliably possible to detect just from data)
-	string format = entry->getType()->getFormat();
-	if (format == "img_raw" && SIFormat::rawFormat()->isThisFormat(entry->getMCData()))
-		return SIFormat::rawFormat()->loadImage(*image, entry->getMCData());
-
 	// Font formats are still manually loaded for now
-	else if (S_CMPNOCASE(format, "font_doom_alpha"))
+	string format = entry->getType()->getFormat();
+	if (S_CMPNOCASE(format, "font_doom_alpha"))
 		return image->loadFont0(entry->getData(), entry->getSize());
 	else if (S_CMPNOCASE(format, "font_zd_console"))
 		return image->loadFont1(entry->getData(), entry->getSize());
@@ -99,6 +91,14 @@ bool Misc::loadImageFromEntry(SImage* image, ArchiveEntry* entry, int index) {
 		return image->loadJediFNT(entry->getData(), entry->getSize());
 	else if (S_CMPNOCASE(format, "font_jedi_font"))
 		return image->loadJediFONT(entry->getData(), entry->getSize());
+
+	// Firstly try SIFormat system
+	if (image->open(entry->getMCData(), index, format_hint))
+		return true;
+
+	// Raw images are a special case (not reliably possible to detect just from data)
+	if (format == "img_raw" && SIFormat::rawFormat()->isThisFormat(entry->getMCData()))
+		return SIFormat::rawFormat()->loadImage(*image, entry->getMCData());
 
 	// Lastly, try detecting/loading via FreeImage
 	else if (SIFormat::generalFormat()->isThisFormat(entry->getMCData()))

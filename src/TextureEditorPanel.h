@@ -46,6 +46,9 @@ protected:
 	wxSpinCtrl*		spin_patch_left;
 	wxSpinCtrl*		spin_patch_top;
 
+	// Input
+	bool			alt_press;
+
 public:
 	TextureEditorPanel(wxWindow* parent, TextureXEditor* tx_editor);
 	~TextureEditorPanel();
@@ -75,7 +78,7 @@ public:
 	void			patchBack();
 	void			patchForward();
 	virtual void	replacePatch();
-	void			duplicatePatch();
+	void			duplicatePatch(int xoff = 8, int yoff = 8);
 
 	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 

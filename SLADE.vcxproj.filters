@@ -720,6 +720,9 @@
     <ClCompile Include="src\MapRenderer2D.cpp">
       <Filter>Map Editor</Filter>
     </ClCompile>
+    <ClCompile Include="src\Polygon2D.cpp">
+      <Filter>General\Utility</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -1358,6 +1361,9 @@
     </ClInclude>
     <ClInclude Include="src\MapRenderer2D.h">
       <Filter>Map Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Polygon2D.h">
+      <Filter>General\Utility</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
