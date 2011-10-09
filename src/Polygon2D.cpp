@@ -250,17 +250,16 @@ bool PolygonSplitter::detectUnclosed() {
 }
 
 bool PolygonSplitter::splitFromEdge(int splitter_edge) {
-	// Get edge to split by
-	edge_t& edge_s = edges[splitter_edge];
-	vertex_t& v1 = vertices[edge_s.v1];
-	vertex_t& v2 = vertices[edge_s.v2];
+	// Get vertices
+	int v1 = edges[splitter_edge].v1;
+	int v2 = edges[splitter_edge].v2;
 
 	// First up, find the closest vertex on the front side of the edge
 	double min_dist = 999999;
 	int closest = -1;
 	for (unsigned a = 0; a < vertices.size(); a++) {
-		if (MathStuff::lineSide(vertices[a].x, vertices[a].y, v1.x, v1.y, v2.x, v2.y) > 0) {
-			vertex_distances[a] = MathStuff::distance(v2.x, v2.y, vertices[a].x, vertices[a].y);
+		if (MathStuff::lineSide(vertices[a].x, vertices[a].y, vertices[v1].x, vertices[v1].y, vertices[v2].x, vertices[v2].y) > 0) {
+			vertex_distances[a] = MathStuff::distance(vertices[v2].x, vertices[v2].y, vertices[a].x, vertices[a].y);
 			if (vertex_distances[a] < min_dist) {
 				min_dist = vertex_distances[a];
 				closest = a;
@@ -280,20 +279,19 @@ bool PolygonSplitter::splitFromEdge(int splitter_edge) {
 	double xi, yi;
 	for (unsigned a = 0; a < edges.size(); a++) {
 		// Ignore edge if adjacent to the vertices we are looking at
-		edge_t& edge = edges[a];
-		if (edge.v1 == closest || edge.v2 == closest || edge.v1 == edge_s.v2 || edge.v2 == edge_s.v2)
+		if (edges[a].v1 == closest || edges[a].v2 == closest || edges[a].v1 == v2 || edges[a].v2 == v2)
 			continue;
 
 		// Intersection test
-		if (MathStuff::linesIntersect(v2.x, v2.y, vertices[closest].x, vertices[closest].y, vertices[edge.v1].x, vertices[edge.v1].y, vertices[edge.v2].x, vertices[edge.v2].y, xi, yi)) {
+		if (MathStuff::linesIntersect(vertices[v2].x, vertices[v2].y, vertices[closest].x, vertices[closest].y, vertices[edges[a].v1].x, vertices[edges[a].v1].y, vertices[edges[a].v2].x, vertices[edges[a].v2].y, xi, yi)) {
 			intersect = true;
 			break;
 		}
 	}
 	if (!intersect) {
 		// No edge intersections, create split
-		addEdge(edge_s.v2, closest);
-		addEdge(closest, edge_s.v2);
+		addEdge(v2, closest);
+		addEdge(closest, v2);
 
 		return true;
 	}
@@ -318,12 +316,11 @@ bool PolygonSplitter::splitFromEdge(int splitter_edge) {
 		intersect = false;
 		for (unsigned a = 0; a < edges.size(); a++) {
 			// Ignore edge if adjacent to the vertices we are looking at
-			edge_t& edge = edges[a];
-			if (edge.v1 == index || edge.v2 == index || edge.v1 == edge_s.v2 || edge.v2 == edge_s.v2)
+			if (edges[a].v1 == index || edges[a].v2 == index || edges[a].v1 == v2 || edges[a].v2 == v2)
 				continue;
 
 			// Intersection test
-			if (MathStuff::linesIntersect(v2.x, v2.y, vert.x, vert.y, vertices[edge.v1].x, vertices[edge.v1].y, vertices[edge.v2].x, vertices[edge.v2].y, xi, yi)) {
+			if (MathStuff::linesIntersect(vertices[v2].x, vertices[v2].y, vert.x, vert.y, vertices[edges[a].v1].x, vertices[edges[a].v1].y, vertices[edges[a].v2].x, vertices[edges[a].v2].y, xi, yi)) {
 				intersect = true;
 				break;
 			}
@@ -331,8 +328,8 @@ bool PolygonSplitter::splitFromEdge(int splitter_edge) {
 
 		if (!intersect) {
 			// No edge intersections, create split
-			addEdge(edge_s.v2, index);
-			addEdge(index, edge_s.v2);
+			addEdge(v2, index);
+			addEdge(index, v2);
 
 			return true;
 		}

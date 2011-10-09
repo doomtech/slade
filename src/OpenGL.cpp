@@ -92,6 +92,17 @@ bool OpenGL::init() {
 	// Initialise GLEW
 	glewInit();
 
+	// Test extensions
+	wxLogMessage("Checking extensions...");
+	if (GLEW_ARB_vertex_buffer_object)
+		wxLogMessage("Vertex Buffer Objects supported");
+	else
+		wxLogMessage("Vertex Buffer Objects not supported");
+	if (GLEW_ARB_point_sprite)
+		wxLogMessage("Point Sprites supported");
+	else
+		wxLogMessage("Point Sprites not supported");
+
 	initialised = true;
 	return true;
 }
