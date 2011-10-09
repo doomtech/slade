@@ -699,6 +699,17 @@ void MapCanvas::onKeyDown(wxKeyEvent& e) {
 	// Let keybind system handle it
 	KeyBind::keyPressed(KeyBind::asKeyPress(e.GetKeyCode(), e.GetModifiers()));
 
+	// Testing
+	if (e.GetKeyCode() == WXK_F6) {
+		Polygon2D poly;
+		sf::Clock clock;
+		wxLogMessage("Generating polygons...");
+		for (unsigned a = 0; a < editor->getMap().nSectors(); a++)
+			poly.openSector(editor->getMap().getSector(a));
+		int ms = clock.GetElapsedTime() * 1000;
+		wxLogMessage("Polygon generation took %dms", ms);
+	}
+
 	e.Skip();
 }
 

@@ -77,6 +77,7 @@ int PolygonSplitter::addVertex(double x, double y) {
 
 	// Add vertex
 	vertices.push_back(vertex_t(x, y));
+	vertex_distances.push_back(999999);
 	return vertices.size() - 1;
 }
 
@@ -253,27 +254,68 @@ bool PolygonSplitter::splitFromEdge(int splitter_edge) {
 	edge_t& edge_s = edges[splitter_edge];
 	vertex_t& v1 = vertices[edge_s.v1];
 	vertex_t& v2 = vertices[edge_s.v2];
+
+	// First up, find the closest vertex on the front side of the edge
+	double min_dist = 999999;
+	int closest = -1;
+	for (unsigned a = 0; a < vertices.size(); a++) {
+		if (MathStuff::lineSide(vertices[a].x, vertices[a].y, v1.x, v1.y, v2.x, v2.y) > 0) {
+			vertex_distances[a] = MathStuff::distance(v2.x, v2.y, vertices[a].x, vertices[a].y);
+			if (vertex_distances[a] < min_dist) {
+				min_dist = vertex_distances[a];
+				closest = a;
+			}
+		}
+		else
+			vertex_distances[a] = 999999;
+	}
+
+	// If there's nothing on the front side, something is wrong
+	if (closest == -1)
+		return false;
+
+	// See if we can split to here without crossing anything
+	// (this will be the case most of the time)
+	bool intersect = false;
+	double xi, yi;
+	for (unsigned a = 0; a < edges.size(); a++) {
+		// Ignore edge if adjacent to the vertices we are looking at
+		edge_t& edge = edges[a];
+		if (edge.v1 == closest || edge.v2 == closest || edge.v1 == edge_s.v2 || edge.v2 == edge_s.v2)
+			continue;
+
+		// Intersection test
+		if (MathStuff::linesIntersect(v2.x, v2.y, vertices[closest].x, vertices[closest].y, vertices[edge.v1].x, vertices[edge.v1].y, vertices[edge.v2].x, vertices[edge.v2].y, xi, yi)) {
+			intersect = true;
+			break;
+		}
+	}
+	if (!intersect) {
+		// No edge intersections, create split
+		addEdge(edge_s.v2, closest);
+		addEdge(closest, edge_s.v2);
+
+		return true;
+	}
+
+
+	// Otherwise, we'll have to find the next closest vertex
 	vert_link_t pv_list(-1, -1);
 
-	// Find closest vertex on front side of edge
-	double min_dist = 99999999;
-	//int cvertex = -1;
+	// Build a list of potential vertices, ordered by distance
 	for (unsigned a = 0; a < vertices.size(); a++) {
-		// Check what side it is on
-		double side = MathStuff::lineSide(vertices[a].x, vertices[a].y, v1.x, v1.y, v2.x, v2.y);
-		if (side > 0)
-			pv_list.add(new vert_link_t(a, MathStuff::distance(v2.x, v2.y, vertices[a].x, vertices[a].y)));
+		if (vertex_distances[a] < 999999)
+			pv_list.add(new vert_link_t(a, vertex_distances[a]));
 	}
 
 	// Go through potential split vertices, closest first
-	double xi, yi;
 	vert_link_t* pv = pv_list.next;
 	while (pv) {
 		int index = pv->vertex;
 		vertex_t& vert = vertices[index];
 
 		// Check if a split from the edge to this vertex would cross any other edges
-		bool intersect = false;
+		intersect = false;
 		for (unsigned a = 0; a < edges.size(); a++) {
 			// Ignore edge if adjacent to the vertices we are looking at
 			edge_t& edge = edges[a];

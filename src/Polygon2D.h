@@ -83,6 +83,7 @@ private:
 	vector<int>			concave_edges;
 	int					split_edges_start;
 	vector<bool>		edge_valid;
+	vector<double>		vertex_distances;
 
 public:
 	PolygonSplitter();
