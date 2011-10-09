@@ -41,8 +41,8 @@ public:
 
 	// Editing
 	bool	removePatch(unsigned index, bool delete_entry = false);
-	int		browsePatchTable();
-	string	browsePatchEntry();
+	int		browsePatchTable(string first = "");
+	string	browsePatchEntry(string first = "");
 
 	// Checks
 	bool	checkTextures();

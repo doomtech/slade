@@ -53,6 +53,8 @@ BrowserCanvas::BrowserCanvas(wxWindow* parent) : OGLCanvas(parent, -1) {
 	Bind(wxEVT_SIZE, &BrowserCanvas::onSize, this);
 	Bind(wxEVT_MOUSEWHEEL, &BrowserCanvas::onMouseEvent, this);
 	Bind(wxEVT_LEFT_DOWN, &BrowserCanvas::onMouseEvent, this);
+	Bind(wxEVT_KEY_DOWN, &BrowserCanvas::onKeyDown, this);
+	Bind(wxEVT_CHAR, &BrowserCanvas::onKeyChar, this);
 }
 
 /* BrowserCanvas::~BrowserCanvas
@@ -212,6 +214,16 @@ BrowserItem* BrowserCanvas::getSelectedItem() {
 	return items[items_filter[item_selected]];
 }
 
+/* BrowserCanvas::selectItem
+ * Selects the item at [index]
+ *******************************************************************/
+void BrowserCanvas::selectItem(int index) {
+	if (index < 0 || index >= (int)items_filter.size())
+		return;
+
+	item_selected = index;
+}
+
 /* BrowserCanvas::filterItems
  * Filters the visible items by [filter], by name
  *******************************************************************/
@@ -240,6 +252,64 @@ void BrowserCanvas::filterItems(string filter) {
 	// Update scrollbar and refresh
 	updateScrollBar();
 	Refresh();
+}
+
+/* BrowserCanvas::showItem
+ * Scrolls the view to show [item] if it is currently off-screen. If
+ * [top] is true, the item will be shown on the top row, otherwise,
+ * the item will be shown on the bottom row
+ *******************************************************************/
+void BrowserCanvas::showItem(int item, bool top) {
+	// Check item index
+	if (item < 0 || item >= (int)items_filter.size())
+		return;
+
+	// Determine y-position of item
+	int num_cols = GetSize().x / fullItemSize();
+	int y_top = (item / num_cols) * fullItemSize();
+	int y_bottom = y_top + fullItemSize();
+
+	// Check if item is above current view
+	if (y_top < yoff || y_bottom > yoff + GetSize().y) {
+		if (top) {
+			// Scroll view to show the item on the top row
+			yoff = y_top;
+			if (scrollbar) scrollbar->SetThumbPosition(yoff);
+		}
+		else {
+			// Scroll view to show the item on the bottom row
+			yoff = y_bottom - GetSize().y;
+			if (scrollbar) scrollbar->SetThumbPosition(yoff);
+		}
+	}
+}
+
+/* BrowserCanvas::lookForSearchEntryFrom
+ * Used by BrowserCanvas::onKeyChar, returns true if an item matching
+ * [search] is found (starting from [from]), false otherwise
+ *******************************************************************/
+bool BrowserCanvas::searchItemFrom(int from) {
+	int index = from;
+	bool looped = false;
+	bool gotmatch = false;
+	while ((!looped && index < (int)items_filter.size()) || (looped && index < from)) {
+		string name = items[items_filter[index]]->getName();
+		if (name.Upper().StartsWith(search)) {
+			// Matches, update selection
+			item_selected = index;
+			showItem(index);
+			return true;
+		}
+
+		// No match, next item; look in the above entries
+		// if no matches were found below.
+		if (++index == items_filter.size() && !looped) {
+			looped = true;
+			index = 0;
+		}
+	}
+	// Didn't get any match
+	return false;
 }
 
 
@@ -356,4 +426,106 @@ void BrowserCanvas::onMouseEvent(wxMouseEvent& e) {
 	}
 
 	e.Skip();
+}
+
+/* BrowserCanvas::onMouseEvent
+ * Called when a key is pressed within the canvas
+ *******************************************************************/
+void BrowserCanvas::onKeyDown(wxKeyEvent& e) {
+	bool handled = true;
+	int num_cols = GetSize().x / fullItemSize();
+
+	// Down arrow
+	if (e.GetKeyCode() == WXK_DOWN) {
+		item_selected += num_cols;
+		showItem(item_selected, false);
+	}
+
+	// Up arrow
+	else if (e.GetKeyCode() == WXK_UP) {
+		item_selected -= num_cols;
+		showItem(item_selected);
+	}
+
+	// Left arrow
+	else if (e.GetKeyCode() == WXK_LEFT) {
+		item_selected--;
+		showItem(item_selected);
+	}
+
+	// Right arrow
+	else if (e.GetKeyCode() == WXK_RIGHT) {
+		item_selected++;
+		showItem(item_selected, false);
+	}
+
+	else {
+		e.Skip();
+		handled = false;
+	}
+
+	if (handled) {
+		// Clamp selection
+		if (item_selected >= (int)items_filter.size())
+			item_selected = (int)items_filter.size() - 1;
+		if (item_selected < 0)
+			item_selected = 0;
+
+		// Refresh canvas
+		Refresh();
+	}
+}
+
+/* BrowserCanvas::onKeyChar
+ * Called when a 'character' key is pressed within the canvas
+ *******************************************************************/
+int bc_chars[] = {
+	'.', ',', '_', '-', '+', '=', '`', '~',
+	'!', '@', '#', '$', '(', ')', '[', ']',
+	'{', '}', ':', ';', '/', '\\', '<', '>',
+	'?', '^', '&', '\'', '\"',
+};
+int n_bc_chars = 30;
+void BrowserCanvas::onKeyChar(wxKeyEvent& e) {
+	// Check the key pressed is actually a character (a-z, 0-9 etc)
+	bool isRealChar = false;
+	if (e.GetKeyCode() >= 'a' && e.GetKeyCode() <= 'z')			// Lowercase
+		isRealChar = true;
+	else if (e.GetKeyCode() >= 'A' && e.GetKeyCode() <= 'Z')	// Uppercase
+		isRealChar = true;
+	else if (e.GetKeyCode() >= '0' && e.GetKeyCode() <= '9')	// Number
+		isRealChar = true;
+	else {
+		for (int a = 0; a < n_bc_chars; a++) {
+			if (e.GetKeyCode() == bc_chars[a]) {
+				isRealChar = true;
+				break;
+			}
+		}
+	}
+
+	if (isRealChar) {
+		// Get currently selected item (or first if nothing is focused)
+		int selected = item_selected;
+		if (selected < 0) selected = 0;
+
+		// Build search string
+		search += e.GetKeyCode();
+		search.MakeUpper();
+
+		// Search for match from the current focus, and if failed
+		// start a new search from after the current focus.
+		if (!searchItemFrom(selected)) {
+			search = S_FMT("%c", e.GetKeyCode());
+			search.MakeUpper();
+			searchItemFrom(selected+1);
+		}
+
+		// Refresh canvas
+		Refresh();
+	}
+	else {
+		search = "";
+		e.Skip();
+	}
 }

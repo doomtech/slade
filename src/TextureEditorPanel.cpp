@@ -53,6 +53,7 @@ TextureEditorPanel::TextureEditorPanel(wxWindow* parent, TextureXEditor* tx_edit
 	// Init variables
 	this->tx_editor = tx_editor;
 	tex_current = NULL;
+	alt_press = false;
 }
 
 /* TextureEditorPanel::~TextureEditorPanel
@@ -518,6 +519,10 @@ void TextureEditorPanel::patchBack() {
 	if (selection.size() == 0)
 		return;
 
+	// Do nothing if first patch is selected
+	if (selection[0] == 0)
+		return;
+
 	// Go through selection
 	for (size_t a = 0; a < selection.size(); a++) {
 		// Swap in list
@@ -530,6 +535,11 @@ void TextureEditorPanel::patchBack() {
 	// Update UI
 	updatePatchControls();
 	tex_canvas->redraw(true);
+
+	// Restore selection in texture canvas
+	selection = list_patches->selectedItems();
+	for (unsigned a = 0; a < selection.size(); a++)
+		tex_canvas->selectPatch(selection[a]);
 
 	tex_modified = true;
 }
@@ -545,6 +555,10 @@ void TextureEditorPanel::patchForward() {
 	if (selection.size() == 0)
 		return;
 
+	// Do nothing if last patch is selected
+	if (selection.back() == list_patches->GetItemCount()-1)
+		return;
+
 	// Go through selection from bottom up
 	for (int a = selection.size() - 1; a >= 0; a--) {
 		// Swap in list
@@ -557,6 +571,11 @@ void TextureEditorPanel::patchForward() {
 	// Update UI
 	updatePatchControls();
 	tex_canvas->redraw(true);
+
+	// Restore selection in texture canvas
+	selection = list_patches->selectedItems();
+	for (unsigned a = 0; a < selection.size(); a++)
+		tex_canvas->selectPatch(selection[a]);
 
 	tex_modified = true;
 }
@@ -573,8 +592,11 @@ void TextureEditorPanel::replacePatch() {
 	if (selection.size() == 0)
 		return;
 
+	// Get first selected patch name (for browser)
+	string pname = tex_canvas->getTexture()->getPatch(selection[0])->getName();
+
 	// Browse for patch
-	int patch = tx_editor->browsePatchTable();
+	int patch = tx_editor->browsePatchTable(pname);
 	if (patch >= 0) {
 		// Go through selection and replace each patch
 		for (size_t a = 0; a < selection.size(); a++)
@@ -598,7 +620,7 @@ void TextureEditorPanel::replacePatch() {
  * Duplicates selected patch(es) in the current texture (each
  * duplication is placed 8 units right+down from its original patch)
  *******************************************************************/
-void TextureEditorPanel::duplicatePatch() {
+void TextureEditorPanel::duplicatePatch(int xoff, int yoff) {
 	// Get selection
 	wxArrayInt selection = list_patches->selectedItems();
 
@@ -609,7 +631,7 @@ void TextureEditorPanel::duplicatePatch() {
 	// Go through selection backwards
 	for (int a = selection.size()-1; a >= 0; a--) {
 		// Duplicate selected patch
-		tex_current->duplicatePatch(selection[a]);
+		tex_current->duplicatePatch(selection[a], xoff, yoff);
 	}
 
 	// Repopulate patch list
@@ -828,6 +850,10 @@ void TextureEditorPanel::onTexCanvasDragEnd(wxCommandEvent& e) {
 void TextureEditorPanel::onTexCanvasKeyDown(wxKeyEvent& e) {
 	bool handled = false;
 
+	// Check for alt key
+	if (e.GetKeyCode() == WXK_ALT)
+		alt_press = true;
+
 	// Check for movement keys
 	int x_movement = 0;
 	int y_movement = 0;
@@ -907,6 +933,12 @@ void TextureEditorPanel::onTexCanvasKeyDown(wxKeyEvent& e) {
 
 	// Move patches if needed
 	if (move) {
+		// Do patch duplicate if alt is pressed
+		if (e.GetModifiers() == wxMOD_ALT && alt_press) {
+			duplicatePatch(0, 0);
+			alt_press = false;
+		}
+
 		wxArrayInt selected_patches = list_patches->selectedItems();
 		for (size_t a = 0; a < selected_patches.size(); a++) {
 			CTPatch* patch = tex_current->getPatch(selected_patches[a]);
@@ -921,6 +953,9 @@ void TextureEditorPanel::onTexCanvasKeyDown(wxKeyEvent& e) {
 		tex_canvas->redraw(true);
 		handled = true;
 	}
+
+	if (!e.AltDown())
+		alt_press = false;
 
 	if (!handled)
 		e.Skip();

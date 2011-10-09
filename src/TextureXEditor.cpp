@@ -455,7 +455,11 @@ bool TextureXEditor::removePatch(unsigned index, bool delete_entry) {
  * Opens the patch table in the patch browser. Returns the selected
  * patch index, or -1 if no patch was selected
  *******************************************************************/
-int TextureXEditor::browsePatchTable() {
+int TextureXEditor::browsePatchTable(string first) {
+	// Select initial patch if specified
+	if (!first.IsEmpty())
+		patch_browser->selectPatch(first);
+
 	if (patch_browser->ShowModal() == wxID_OK)
 		return patch_browser->getSelectedPatch();
 	else
@@ -466,7 +470,7 @@ int TextureXEditor::browsePatchTable() {
  * Opens resource patch entries in the patch browser. Returns the
  * selected patch name, or "" if no patch was selected
  *******************************************************************/
-string TextureXEditor::browsePatchEntry() {
+string TextureXEditor::browsePatchEntry(string first) {
 	// Update patch browser if necessary
 	if (pb_update) {
 		// Add archive textures (and resource textures)
@@ -478,6 +482,10 @@ string TextureXEditor::browsePatchEntry() {
 
 		pb_update = false;
 	}
+
+	// Select initial patch if specified
+	if (!first.IsEmpty())
+		patch_browser->selectPatch(first);
 
 	if (patch_browser->ShowModal() == wxID_OK && patch_browser->getSelectedItem())
 		return patch_browser->getSelectedItem()->getName();

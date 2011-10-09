@@ -236,6 +236,38 @@ void BrowserWindow::reloadItems(BrowserTreeNode* node) {
 		reloadItems((BrowserTreeNode*)node->getChild(a));
 }
 
+/* BrowserWindow::selectItem
+ * Finds the item matching [name] in the tree, starting from [node].
+ * If the item is found, its parent node is opened in the browser
+ * and the item is selected
+ *******************************************************************/
+bool BrowserWindow::selectItem(string name, BrowserTreeNode* node) {
+	// Check node was given, if not start from root
+	if (!node)
+		node = items_root;
+
+	// Go through all items in this node
+	for (unsigned a = 0;  a < node->nItems(); a++) {
+		// Check for name match (not case-sensitive)
+		if (S_CMPNOCASE(node->getItem(a)->getName(), name)) {
+			// Open this node in the browser and select the item
+			openTree(node);
+			canvas->selectItem(a);
+			canvas->showItem(a);
+			return true;
+		}
+	}
+
+	// Item not found in this one, try its child nodes
+	for (unsigned a = 0; a < node->nChildren(); a++) {
+		if (selectItem(name, (BrowserTreeNode*)node->getChild(a)))
+			return true;
+	}
+
+	// Item not found
+	return false;
+}
+
 // Sorting functions
 bool sortBIIndex(BrowserItem* left, BrowserItem* right) {
 	return left->getIndex() < right->getIndex();

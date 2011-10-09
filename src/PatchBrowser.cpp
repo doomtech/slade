@@ -295,6 +295,29 @@ int PatchBrowser::getSelectedPatch() {
 		return -1;
 }
 
+/* PatchBrowser::selectPatch
+ * Selects the patch at [pt_index] in the patch table
+ *******************************************************************/
+void PatchBrowser::selectPatch(int pt_index) {
+	// Can't without a patch table
+	if (!patch_table)
+		return;
+
+	// Check index
+	if (pt_index < 0 || pt_index >= (int)patch_table->nPatches())
+		return;
+
+	// Select by patch name
+	selectPatch(patch_table->patchName(pt_index));
+}
+
+/* PatchBrowser::selectPatch
+ * Selects the patch matching [name]
+ *******************************************************************/
+void PatchBrowser::selectPatch(string name) {
+	selectItem(name);
+}
+
 /* PatchBrowser::onAnnouncement
  * Handles any announcements
  *******************************************************************/

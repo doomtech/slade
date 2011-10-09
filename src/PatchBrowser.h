@@ -32,6 +32,8 @@ public:
 	bool	openArchive(Archive* archive);
 	bool	openTextureXList(TextureXList* texturex, Archive* parent);
 	int		getSelectedPatch();
+	void	selectPatch(int pt_index);
+	void	selectPatch(string name);
 
 	// Events
 	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);

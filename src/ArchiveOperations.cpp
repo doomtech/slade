@@ -34,6 +34,7 @@
 #include "ResourceManager.h"
 #include "ExtMessageDialog.h"
 #include "MainWindow.h"
+#include "MapSide.h"
 #include <wx/hashmap.h>
 
 
@@ -177,4 +178,67 @@ bool ArchiveOperations::checkDuplicateEntryNames(Archive* archive) {
 	msg.ShowModal();
 
 	return true;
+}
+
+
+struct texused_t {
+	bool used;
+	texused_t() { used = false; }
+};
+WX_DECLARE_STRING_HASH_MAP(texused_t, TexUsedMap);
+void ArchiveOperations::removeUnusedTextures(Archive* archive) {
+	// Check archive was given
+	if (!archive)
+		return;
+
+	// --- Build list of used textures ---
+	TexUsedMap used_textures;
+
+	// Get all SIDEDEFS entries
+	Archive::search_options_t opt;
+	opt.match_type = EntryType::getType("map_sidedefs");
+	vector<ArchiveEntry*> sidedefs = archive->findAll(opt);
+
+	// Go through and add used textures to list
+	doomside_t sdef;
+	string tex_lower, tex_middle, tex_upper;
+	for (unsigned a = 0; a < sidedefs.size(); a++) {
+		int nsides = sidedefs[a]->getSize() / 30;
+		sidedefs[a]->seek(0, SEEK_SET);
+		for (unsigned s = 0; s < nsides; s++) {
+			// Read side data
+			sidedefs[a]->read(&sdef, 30);
+
+			// Get textures
+			tex_lower = wxString::FromAscii(sdef.tex_lower, 8);
+			tex_middle = wxString::FromAscii(sdef.tex_middle, 8);
+			tex_upper = wxString::FromAscii(sdef.tex_upper, 8);
+
+			// Add to used textures list
+			used_textures[tex_lower].used = true;
+			used_textures[tex_middle].used = true;
+			used_textures[tex_upper].used = true;
+		}
+	}
+
+	// Find all TEXTUREx entries
+	opt.match_type = EntryType::getType("texturex");
+	vector<ArchiveEntry*> tx_entries = archive->findAll(opt);
+
+	// Go through texture lists
+	PatchTable ptable;	// Dummy patch table, patch info not needed here
+	for (unsigned a = 0; a < tx_entries.size(); a++) {
+		TextureXList txlist;
+		txlist.readTEXTUREXData(tx_entries[a], ptable);
+
+		// Go through textures
+		for (unsigned t = 0; t < txlist.nTextures(); t++) {
+			// Remove texture if unused
+			if (!used_textures[txlist.getTexture(a)->getName()].used) {
+				wxLogMessage("Removed unused texture %s", CHR(txlist.getTexture(a)->getName()));
+				txlist.removeTexture(a);
+				a--;
+			}
+		}
+	}
 }
