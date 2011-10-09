@@ -17,6 +17,8 @@ CVAR(Int, thing_drawtype, 1, CVAR_SAVE)
 CVAR(Bool, thing_force_dir, false, CVAR_SAVE)
 CVAR(Bool, thing_overlay_square, false, CVAR_SAVE)
 
+CVAR(Bool, test_ssplit, false, CVAR_SAVE)
+
 #define FORCE_NO_VBO 0
 
 MapRenderer2D::MapRenderer2D(SLADEMap* map) {
@@ -28,6 +30,9 @@ MapRenderer2D::MapRenderer2D(SLADEMap* map) {
 	this->list_vertices = 0;
 	this->list_lines = 0;
 	this->lines_dirs = false;
+	this->n_vertices = 0;
+	this->n_lines = 0;
+	this->n_things = 0;
 }
 
 MapRenderer2D::~MapRenderer2D() {
@@ -81,7 +86,7 @@ void MapRenderer2D::renderVertices(float view_scale) {
 }
 
 void MapRenderer2D::renderVerticesImmediate() {
-	if (list_vertices > 0)
+	if (list_vertices > 0 && map->nVertices() == n_vertices)
 		glCallList(list_vertices);
 	else {
 		list_vertices = glGenLists(1);
@@ -106,7 +111,7 @@ void MapRenderer2D::renderVerticesVBO() {
 		return;
 
 	// Update vertices VBO if required
-	if (vbo_vertices == 0)
+	if (vbo_vertices == 0 || map->nVertices() != n_vertices)
 		updateVerticesVBO();
 
 	// Set to vertex colour
@@ -143,7 +148,7 @@ void MapRenderer2D::renderLines(bool show_direction) {
 
 void MapRenderer2D::renderLinesImmediate(bool show_direction) {
 	// Use display list if it's built
-	if (list_lines > 0 && show_direction == lines_dirs) {
+	if (list_lines > 0 && show_direction == lines_dirs && map->nLines() == n_lines) {
 		glCallList(list_lines);
 		return;
 	}
@@ -221,7 +226,7 @@ void MapRenderer2D::renderLinesVBO(bool show_direction) {
 		return;
 
 	// Update lines VBO if required
-	if (vbo_lines == 0 || show_direction != lines_dirs)
+	if (vbo_lines == 0 || show_direction != lines_dirs || map->nLines() != n_lines)
 		updateLinesVBO(show_direction);
 
 	// Disable any blending
@@ -560,10 +565,6 @@ void MapRenderer2D::renderHilight(int hilight_item, int mode, float fade, float 
 	else if (mode == MapEditor::MODE_SECTORS) {
 		// Sector
 
-		// Draw sector polygon
-		glColor4f(col.fr(), col.fg(), col.fb(), col.fa() * 0.5f);
-		map->getSector(hilight_item)->getPolygon()->render();
-
 		// Get all lines belonging to the hilighted sector
 		vector<MapLine*> lines;
 		map->getLinesOfSector(hilight_item, lines);
@@ -579,6 +580,13 @@ void MapRenderer2D::renderHilight(int hilight_item, int mode, float fade, float 
 			glVertex2d(line->v1()->xPos(), line->v1()->yPos());
 			glVertex2d(line->v2()->xPos(), line->v2()->yPos());
 			glEnd();
+		}
+
+		// Draw sector split lines
+		if (test_ssplit) {
+			glColor4f(col.fr(), col.fg(), col.fb(), col.fa() * 0.5f);
+			glLineWidth(1.0f);
+			map->getSector(hilight_item)->getPolygon()->renderWireframe();
 		}
 	}
 	else if (mode == MapEditor::MODE_THINGS) {
@@ -651,7 +659,8 @@ void MapRenderer2D::renderSelection(vector<int>& selection, int mode, float view
 		return;
 
 	// Set selection colour
-	ColourConfiguration::getColour("map_selection").set_gl();
+	rgba_t col = ColourConfiguration::getColour("map_selection");
+	col.set_gl();
 
 	// Setup rendering properties
 	glLineWidth(line_width*4);
@@ -721,34 +730,29 @@ void MapRenderer2D::renderSelection(vector<int>& selection, int mode, float view
 	else if (mode == MapEditor::MODE_SECTORS) {
 		// Sectors
 
-		// Get selected sector(s)
-		vector<MapSector*> selected_sectors;
-		for (unsigned a = 0; a < selection.size(); a++)
-			selected_sectors.push_back(map->getSector(selection[a]));
+		// Draw selection
+		glColor4f(col.fr(), col.fg(), col.fb(), col.fa() * 0.6f);
+		for (unsigned a = 0; a < selection.size(); a++) {
+			// Get the sector's polygon
+			Polygon2D* poly = map->getSector(selection[a])->getPolygon();
 
-		// Go through map lines
-		MapLine* line;
-		glBegin(GL_LINES);
-		for (unsigned a = 0; a < map->nLines(); a++) {
-			// Check if line is in a selected sector
-			line = map->getLine(a);
-			bool selected = false;
-			for (unsigned b = 0; b < selected_sectors.size(); b++) {
-				if (map->lineInSector(line, selected_sectors[b])) {
-					selected = true;
-					break;
+			if (poly->hasPolygon())
+				map->getSector(selection[a])->getPolygon()->render();
+			else {
+				// Something went wrong with the polygon, just draw sector outline instead
+				vector<MapSide*>& sides = map->getSector(selection[a])->connectedSides();
+				glColor4f(col.fr(), col.fg(), col.fb(), col.fa());
+				glBegin(GL_LINES);
+				for (unsigned s = 0; s < sides.size(); s++) {
+					MapLine* line = sides[s]->getParentLine();
+					glVertex2d(line->v1()->xPos(), line->v1()->yPos());
+					glVertex2d(line->v2()->xPos(), line->v2()->yPos());
 				}
+				glEnd();
+
+				glColor4f(col.fr(), col.fg(), col.fb(), col.fa() * 0.6f);
 			}
-
-			// Skip if not selected
-			if (!selected)
-				continue;
-
-			// Draw line
-			glVertex2d(line->v1()->xPos(), line->v1()->yPos());
-			glVertex2d(line->v2()->xPos(), line->v2()->yPos());
 		}
-		glEnd();
 	}
 	else if (mode == MapEditor::MODE_THINGS) {
 		// Things
@@ -852,6 +856,8 @@ void MapRenderer2D::updateVerticesVBO() {
 	// Clean up
 	delete[] verts;
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	n_vertices = map->nVertices();
 }
 
 void MapRenderer2D::updateLinesVBO(bool show_direction) {
@@ -926,6 +932,8 @@ void MapRenderer2D::updateLinesVBO(bool show_direction) {
 	// Clean up
 	delete[] lines;
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	n_lines = map->nLines();
 }
 
 void MapRenderer2D::updateVisibility(fpoint2_t view_tl, fpoint2_t view_br, double view_scale) {

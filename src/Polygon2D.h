@@ -28,6 +28,7 @@ public:
 
 	bool	openSector(MapSector* sector);
 	void	render();
+	void	renderWireframe();
 
 private:
 	// Polygon data

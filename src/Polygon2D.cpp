@@ -29,7 +29,7 @@ bool Polygon2D::openSector(MapSector* sector) {
 		line = sides[a]->getParentLine();
 
 		// Ignore this side if its parent line has the same sector on both sides
-		if (line->doubleSector())
+		if (!line || line->doubleSector())
 			continue;
 
 		// Add the edge to the splitter (direction depends on what side of the line this is)
@@ -48,6 +48,19 @@ void Polygon2D::render() {
 	for (unsigned a = 0; a < subpolys.size(); a++) {
 		subpoly_t& poly = subpolys[a];
 		glBegin(GL_POLYGON);
+		for (unsigned v = 0; v < poly.points.size(); v++) {
+			glTexCoord2f(poly.points[v].tx, poly.points[v].ty);
+			glVertex2d(poly.points[v].x, poly.points[v].y);
+		}
+		glEnd();
+	}
+}
+
+void Polygon2D::renderWireframe() {
+	// Go through sub-polys
+	for (unsigned a = 0; a < subpolys.size(); a++) {
+		subpoly_t& poly = subpolys[a];
+		glBegin(GL_LINE_LOOP);
 		for (unsigned v = 0; v < poly.points.size(); v++) {
 			glTexCoord2f(poly.points[v].tx, poly.points[v].ty);
 			glVertex2d(poly.points[v].x, poly.points[v].y);
@@ -101,9 +114,6 @@ int PolygonSplitter::addEdge(int v1, int v2) {
 	edge_t edge;
 	edge.v1 = v1;
 	edge.v2 = v2;
-
-	// Determine edge vector (from v1->v2)
-	//edge.vector = fpoint2_t(vertices[v2].x - vertices[v1].x, vertices[v2].y - vertices[v1].y).normalize();
 
 	// Add edge to list
 	edges.push_back(edge);
@@ -241,6 +251,15 @@ bool PolygonSplitter::detectUnclosed() {
 		}
 	}
 
+	// Re-check vertices
+	for (unsigned a = 0; a < vertices.size(); a++) {
+		// If the vertex has no outgoing edges, we have an unclosed polygon
+		if (vertices[a].edges_out.size() == 0)
+			end_verts.push_back(a);
+		else if (vertices[a].edges_in.size() == 0)
+			start_verts.push_back(a);
+	}
+
 	// If there are no end/start vertices, the polygon is closed
 	if (end_verts.size() == 0 && start_verts.size() == 0)
 		return false;
@@ -343,49 +362,35 @@ bool PolygonSplitter::splitFromEdge(int splitter_edge) {
 }
 
 bool PolygonSplitter::buildSubPoly(int edge_start, Polygon2D::subpoly_t& polygon) {
-	vector<int> used_edges;
-
-	// Add first vertex
-	polygon.points.push_back(Polygon2D::glvert_t(vertices[edges[edge_start].v1].x, vertices[edges[edge_start].v1].y));
-
-	// Begin loop of death
+	// Loop of death
 	int edge = edge_start;
-	while (true) {
-		// Add next vertex
-		used_edges.push_back(edge);
-		polygon.points.push_back(Polygon2D::glvert_t(vertices[edges[edge].v2].x, vertices[edges[edge].v2].y));
+	for (unsigned a = 0; a < 1000; a++) {
+		// Add vertex
+		polygon.points.push_back(Polygon2D::glvert_t(vertices[edges[edge].v1].x, vertices[edges[edge].v1].y));
 
+		// Add edge to 'valid' edges list, so it is ignored when building further polygons
+		if (edge != edge_start) edge_valid[edge] = true;
+		
 		// Get 'next' edge
-		int next = findNextEdge(edge);
+		edge = findNextEdge(edge);
 
-		// None found, abort building polygon
-		if (next < 0) {
-			// If the polygon is valid, create an edge to patch up the structure
-			// (the edges used to build this polygon will be 'cut')
-			if (polygon.points.size() >= 3)
-				addEdge(edges[edge_start].v1, edges[edge].v2);
+		// If no next edge is found, something is wrong, so abort building the polygon
+		if (edge < 0)
+			return false;
 
+		// If we're back at the start, finish
+		if (edge == edge_start)
 			break;
-		}
-
-		// Also abort if we're back to the start
-		if (next == edge_start) {
-			polygon.points.pop_back();
-			break;
-		}
-
-		// Go to next edge
-		edge = next;
 	}
 
-	// If the polygon is valid, 'cut' the edges used and add it to the polygon list
-	if (polygon.points.size() >= 3) {
-		for (unsigned a = 0; a < used_edges.size(); a++)
-			edge_valid[used_edges[a]] = true;
+	// Set starting edge to valid
+	edge_valid[edge_start] = true;
+
+	// Check if the polygon is valid
+	if (polygon.points.size() >= 3)
 		return true;
-	}
 	else
-		return false;	// Invalid polygon
+		return false;
 }
 
 bool PolygonSplitter::doSplitting(vector<Polygon2D::subpoly_t>& polygons) {

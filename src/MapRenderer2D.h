@@ -42,6 +42,9 @@ private:
 
 	// Other
 	bool	lines_dirs;
+	int		n_vertices;
+	int		n_lines;
+	int		n_things;
 
 public:
 	MapRenderer2D(SLADEMap* map);
