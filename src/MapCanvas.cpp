@@ -47,6 +47,7 @@
  *******************************************************************/
 CVAR(Bool, things_always, 1, CVAR_SAVE)
 CVAR(Bool, grid_dashed, false, CVAR_SAVE)
+CVAR(Bool, scroll_smooth, false, CVAR_SAVE)
 
 
 /* MapCanvas::MapCanvas
@@ -68,6 +69,9 @@ MapCanvas::MapCanvas(wxWindow *parent, int id, MapEditor* editor)
 	fr_idle = 0;
 	last_time = 0;
 	renderer_2d = new MapRenderer2D(&editor->getMap());
+	view_xoff_inter = 0;
+	view_yoff_inter = 0;
+	view_scale_inter = 1;
 
 	timer.Start(2);
 #ifdef USE_SFML_RENDERWINDOW
@@ -109,16 +113,22 @@ MapCanvas::~MapCanvas() {
  * Translates an x position on the canvas to the corresponding x
  * position on the map itself
  *******************************************************************/
-double MapCanvas::translateX(double x) {
-	return double(x / view_scale) + view_xoff - (double(GetSize().x * 0.5) / view_scale);
+double MapCanvas::translateX(double x, bool inter) {
+	if (inter)
+		return double(x / view_scale_inter) + view_xoff_inter - (double(GetSize().x * 0.5) / view_scale_inter);
+	else
+		return double(x / view_scale) + view_xoff - (double(GetSize().x * 0.5) / view_scale);
 }
 
 /* MapCanvas::translateY
  * Translates a y position on the canvas to the corresponding y
  * position on the map itself
  *******************************************************************/
-double MapCanvas::translateY(double y) {
-	return double(-y / view_scale) + view_yoff + (double(GetSize().y * 0.5) / view_scale);
+double MapCanvas::translateY(double y, bool inter) {
+	if (inter)
+		return double(-y / view_scale_inter) + view_yoff_inter + (double(GetSize().y * 0.5) / view_scale_inter);
+	else
+		return double(-y / view_scale) + view_yoff + (double(GetSize().y * 0.5) / view_scale);
 }
 
 void MapCanvas::setView(double x, double y) {
@@ -142,28 +152,22 @@ void MapCanvas::pan(double x, double y) {
 }
 
 void MapCanvas::zoom(double amount, bool toward_cursor) {
-	// Zoom view
-	view_scale = view_scale * amount;
-
-	// Check for zoom limits
-	bool limit = false;
-	if (view_scale < 0.005) {
-		// Min scale
-		view_scale = 0.005;
-		limit = true;
-	}
-	if (view_scale > 10.0) {
-		// Max scale
-		view_scale = 10.0;
-		limit = true;
-	}
-
-	if (!limit && toward_cursor) {
+	// Do 'zoom towards cursor' offset
+	if (view_scale > 0.005 && view_scale < 10 && toward_cursor) {
 		double mx = translateX(mouse_pos.x);
 		double my = translateY(mouse_pos.y);
 		view_xoff = mx + (double(view_xoff - mx) / amount);
 		view_yoff = my + (double(view_yoff - my) / amount);
 	}
+
+	// Zoom view
+	view_scale = view_scale * amount;
+
+	// Check for zoom limits
+	if (view_scale < 0.005)	// Min scale
+		view_scale = 0.005;
+	if (view_scale > 10.0) // Max scale
+		view_scale = 10.0;
 
 	// Update screen limits
 	view_tl.x = translateX(0);
@@ -303,10 +307,10 @@ void MapCanvas::drawGrid() {
 	int grid_hidelevel = 2.0 / view_scale;
 
 	// Determine canvas edges in map coordinates
-	int start_x = translateX(0);
-	int end_x = translateX(GetSize().x);
-	int start_y = translateY(GetSize().y);
-	int end_y = translateY(0);
+	int start_x = translateX(0, true);
+	int end_x = translateX(GetSize().x, true);
+	int start_y = translateY(GetSize().y, true);
+	int end_y = translateY(0, true);
 
 	// Draw regular grid if it's not too small
 	if (gridsize > grid_hidelevel) {
@@ -381,10 +385,10 @@ void MapCanvas::draw() {
 	glTranslated(GetSize().x * 0.5, GetSize().y * 0.5, 0);
 
 	// Zoom
-	glScaled(view_scale, view_scale, 1);
+	glScaled(view_scale_inter, view_scale_inter, 1);
 
 	// Translate to offsets
-	glTranslated(-view_xoff, -view_yoff, 0);
+	glTranslated(-view_xoff_inter, -view_yoff_inter, 0);
 
 	// Draw grid
 	drawGrid();
@@ -529,6 +533,47 @@ void MapCanvas::update(long frametime) {
 		}
 	}
 
+	// View pan/zoom animation
+	bool view_anim = false;
+	if (scroll_smooth) {
+		double diff_xoff = view_xoff - view_xoff_inter;		// X offset
+		if (diff_xoff < -0.05 || diff_xoff > 0.05) {
+			view_xoff_inter += diff_xoff*anim_view_speed*mult;
+			view_anim = true;
+		}
+		else
+			view_xoff_inter = view_xoff;
+
+		double diff_yoff = view_yoff - view_yoff_inter;		// Y offset
+		if (diff_yoff < -0.05 || diff_yoff > 0.05) {
+			view_yoff_inter += diff_yoff*anim_view_speed*mult;
+			view_anim = true;
+		}
+		else
+			view_yoff_inter = view_yoff;
+
+		double diff_scale = view_scale - view_scale_inter;	// Scale
+		if (diff_scale < -0.0001 || diff_scale > 0.0001) {
+			view_scale_inter += diff_scale*anim_view_speed*mult;
+			view_anim = true;
+		}
+		else
+			view_scale_inter = view_scale;
+
+		if (!view_anim)
+			anim_view_speed = 0.05;
+		else {
+			anim_view_speed += 0.05*mult;
+			if (anim_view_speed > 0.4)
+				anim_view_speed = 0.4;
+		}
+	}
+	else {
+		view_xoff_inter = view_xoff;
+		view_yoff_inter = view_yoff;
+		view_scale_inter = view_scale;
+	}
+
 	// Update animations
 	bool anim_running = false;
 	for (unsigned a = 0; a < animations.size(); a++) {
@@ -543,17 +588,18 @@ void MapCanvas::update(long frametime) {
 	}
 
 	// Determine the framerate limit
-	if (mouse_state == MSTATE_SELECTION || mouse_state == MSTATE_PANNING || anim_running || fade_anim) {
 #ifdef USE_SFML_RENDERWINDOW
-		fr_idle = 2;	// SFML RenderWindow can handle high framerates better than wxGLCanvas, or something like that
+	// SFML RenderWindow can handle high framerates better than wxGLCanvas, or something like that
+	if (mouse_state == MSTATE_SELECTION || mouse_state == MSTATE_PANNING || anim_running || fade_anim || view_anim)
+		fr_idle = 2;
+	else	// No high-priority animations running, throttle framerate
+		fr_idle = 25;
 #else
+	if (mouse_state == MSTATE_SELECTION || mouse_state == MSTATE_PANNING || anim_running || fade_anim || view_anim)
 		fr_idle = 5;
-#endif
-	}
-	else {
-		// No high-priority animations running, throttle framerate
+	else	// No high-priority animations running, throttle framerate
 		fr_idle = 30;
-	}
+#endif
 
 	frametime_last = frametime;
 }

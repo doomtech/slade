@@ -59,13 +59,17 @@ private:
 	bool	anim_flash_inc;
 	float	anim_info_fade;
 	bool	anim_info_show;
+	double	view_xoff_inter;
+	double	view_yoff_inter;
+	double	view_scale_inter;
+	double	anim_view_speed;
 
 public:
 	MapCanvas(wxWindow *parent, int id, MapEditor* editor);
 	~MapCanvas();
 
-	double	translateX(double x);
-	double	translateY(double y);
+	double	translateX(double x, bool inter = false);
+	double	translateY(double y, bool inter = false);
 
 	void	setView(double x, double y);
 	void	pan(double x, double y);
