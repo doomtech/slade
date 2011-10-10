@@ -42,13 +42,24 @@ friend class Polygon2D;
 private:
 	// Structs
 	struct edge_t {
-		int			v1, v2;
+		int		v1, v2;
+		bool	ok;
+		bool	done;
+		bool	inpoly;
 	};
 	struct vertex_t {
 		double 			x, y;
 		vector<int>		edges_in;
 		vector<int>		edges_out;
-		vertex_t(double x=0, double y=0) { this->x = x; this->y = y; }
+		bool			ok;
+		double			distance;
+		vertex_t(double x=0, double y=0) { this->x = x; this->y = y; ok = true; }
+	};
+	struct poly_outline_t {
+		vector<int>	edges;
+		bbox_t		bbox;
+		bool		clockwise;
+		bool		convex;
 	};
 	struct vert_link_t {
 		int				vertex;
@@ -79,27 +90,40 @@ private:
 	};
 
 	// Splitter data
-	vector<vertex_t>	vertices;
-	vector<edge_t>		edges;
-	vector<int>			concave_edges;
-	int					split_edges_start;
-	vector<bool>		edge_valid;
-	vector<double>		vertex_distances;
+	vector<vertex_t>		vertices;
+	vector<edge_t>			edges;
+	vector<int>				concave_edges;
+	vector<poly_outline_t>	polygon_outlines;
+	int						split_edges_start;
+	bool					verbose;
+	double					last_angle;
 
 public:
 	PolygonSplitter();
 	~PolygonSplitter();
 
+	void	clear();
+	void	setVerbose(bool v) { verbose = v; }
+
 	int		addVertex(double x, double y);
 	int		addEdge(double x1, double y1, double x2, double y2);
 	int		addEdge(int v1, int v2);
+
 	int		findNextEdge(int edge, bool ignore_valid = true, bool only_convex = true);
 	void	flipEdge(int edge);
+
 	void	detectConcavity();
 	bool	detectUnclosed();
+
+	bool	tracePolyOutline(int edge_start);
+
 	bool	splitFromEdge(int splitter_edge);
-	bool	buildSubPoly(int start_edge, Polygon2D::subpoly_t& polygon);
+	bool	buildSubPoly(int edge_start, Polygon2D::subpoly_t& polygon);
 	bool	doSplitting(vector<Polygon2D::subpoly_t>& polygons);
+
+	// Testing
+	void	openSector(MapSector* sector);
+	void	testRender();
 };
 
 #endif//__POLYGON_2D_H__

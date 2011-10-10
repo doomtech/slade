@@ -76,9 +76,16 @@ void Polygon2D::renderWireframe() {
 
 
 PolygonSplitter::PolygonSplitter() {
+	verbose = false;
 }
 
 PolygonSplitter::~PolygonSplitter() {
+}
+
+void PolygonSplitter::clear() {
+	vertices.clear();
+	edges.clear();
+	polygon_outlines.clear();
 }
 
 int PolygonSplitter::addVertex(double x, double y) {
@@ -90,7 +97,7 @@ int PolygonSplitter::addVertex(double x, double y) {
 
 	// Add vertex
 	vertices.push_back(vertex_t(x, y));
-	vertex_distances.push_back(999999);
+	vertices.back().distance = 999999;
 	return vertices.size() - 1;
 }
 
@@ -114,10 +121,12 @@ int PolygonSplitter::addEdge(int v1, int v2) {
 	edge_t edge;
 	edge.v1 = v1;
 	edge.v2 = v2;
+	edge.ok = true;
+	edge.done = false;
+	edge.inpoly = false;
 
 	// Add edge to list
 	edges.push_back(edge);
-	edge_valid.push_back(false);
 
 	// Add edge to its vertices' edge lists (heh)
 	int index = edges.size() - 1;
@@ -128,7 +137,7 @@ int PolygonSplitter::addEdge(int v1, int v2) {
 	return index;
 }
 
-int PolygonSplitter::findNextEdge(int edge, bool ignore_valid, bool only_convex) {
+int PolygonSplitter::findNextEdge(int edge, bool ignore_done, bool only_convex) {
 	edge_t& e = edges[edge];
 	vertex_t& v2 = vertices[e.v2];
 	vertex_t& v1 = vertices[e.v1];
@@ -139,12 +148,16 @@ int PolygonSplitter::findNextEdge(int edge, bool ignore_valid, bool only_convex)
 	for (unsigned a = 0; a < v2.edges_out.size(); a++) {
 		edge_t& out = edges[v2.edges_out[a]];
 
-		// Ignore 'valid' edges
-		if (ignore_valid && edge_valid[v2.edges_out[a]])
+		// Ignore 'done' edges
+		if (ignore_done && edges[v2.edges_out[a]].done)
 			continue;
 
 		// Ignore edges on the reverse-side of this
 		if (out.v1 == e.v2 && out.v2 == e.v1)
+			continue;
+
+		// Ignore invalid edges
+		if (!out.ok)
 			continue;
 
 		// Determine angle between edges
@@ -155,6 +168,7 @@ int PolygonSplitter::findNextEdge(int edge, bool ignore_valid, bool only_convex)
 		}
 	}
 
+	last_angle = min_angle;
 	if (only_convex && min_angle > PI)
 		return -1;
 	else
@@ -195,6 +209,9 @@ void PolygonSplitter::detectConcavity() {
 
 	// Go through all edges
 	for (unsigned a = 0; a < edges.size(); a++) {
+		if (!edges[a].ok)
+			continue;
+
 		// Find the next edge with the lowest angle (ignore edges with angle > 180)
 		int next = findNextEdge(a, false);
 		if (next < 0) {
@@ -213,6 +230,7 @@ bool PolygonSplitter::detectUnclosed() {
 		// If the vertex has no outgoing edges, we have an unclosed polygon
 		if (vertices[a].edges_out.size() == 0)
 			end_verts.push_back(a);
+		// Same if it has no incoming
 		else if (vertices[a].edges_in.size() == 0)
 			start_verts.push_back(a);
 	}
@@ -220,6 +238,25 @@ bool PolygonSplitter::detectUnclosed() {
 	// If there are no end/start vertices, the polygon is closed
 	if (end_verts.size() == 0 && start_verts.size() == 0)
 		return false;
+	else if (verbose) {
+		// Print invalid vertices info if verbose
+		string info = "Vertices with no outgoing edges: ";
+		for (unsigned a = 0; a < end_verts.size(); a++) {
+			info += S_FMT("%1.2f", vertices[end_verts[a]].x);
+			info += ",";
+			info += S_FMT("%1.2f", vertices[end_verts[a]].y);
+			info += " ";
+		}
+		wxLogMessage(info);
+		info = "Vertices with no incoming edges: ";
+		for (unsigned a = 0; a < start_verts.size(); a++) {
+			info += S_FMT("%1.2f", vertices[start_verts[a]].x);
+			info += ",";
+			info += S_FMT("%1.2f", vertices[start_verts[a]].y);
+			info += " ";
+		}
+		wxLogMessage(info);
+	}
 
 	// Check if any of this is caused by flipped edges
 	for (unsigned a = 0; a < end_verts.size(); a++) {
@@ -234,25 +271,50 @@ bool PolygonSplitter::detectUnclosed() {
 			for (unsigned b = 0; b < start_verts.size(); b++) {
 				vertex_t& sv = vertices[start_verts[b]];
 
-				if (edge.v1 == start_verts[b] && edge.v2 == end_verts[a]) {
-					// Flip the edge
-					flipEdge(ev.edges_in[e]);
-
-					// Remove vertices from unattached lists
-					end_verts.erase(end_verts.begin() + a);
-					start_verts.erase(start_verts.begin() + b);
-					a--;
-					flipped = true;
-					break;
-				}
+				if (edge.v1 == start_verts[b] && edge.v2 == end_verts[a])
+					flipEdge(ev.edges_in[e]);	// Flip the edge
 			}
-			if (flipped)
-				break;
 		}
 	}
 
 	// Re-check vertices
+	end_verts.clear();
+	start_verts.clear();
 	for (unsigned a = 0; a < vertices.size(); a++) {
+		if (!vertices[a].ok)
+			continue;
+
+		// If the vertex has no outgoing edges, we have an unclosed polygon
+		if (vertices[a].edges_out.size() == 0)
+			end_verts.push_back(a);
+		else if (vertices[a].edges_in.size() == 0)
+			start_verts.push_back(a);
+	}
+
+	// If there are no end/start vertices, the polygon is closed
+	if (end_verts.size() == 0 && start_verts.size() == 0)
+		return false;
+
+	// If it still isn't closed, check for completely detached edges and 'remove' them
+	for (unsigned a = 0; a < edges.size(); a++) {
+		if (vertices[edges[a].v1].edges_in.size() == 0 &&
+			vertices[edges[a].v2].edges_out.size() == 0) {
+			// Invalidate edge
+			edges[a].ok = false;
+
+			// Invalidate vertices
+			vertices[edges[a].v1].ok = false;
+			vertices[edges[a].v2].ok = false;
+		}
+	}
+
+	// Re-check vertices
+	end_verts.clear();
+	start_verts.clear();
+	for (unsigned a = 0; a < vertices.size(); a++) {
+		if (!vertices[a].ok)
+			continue;
+
 		// If the vertex has no outgoing edges, we have an unclosed polygon
 		if (vertices[a].edges_out.size() == 0)
 			end_verts.push_back(a);
@@ -268,6 +330,73 @@ bool PolygonSplitter::detectUnclosed() {
 	return true;
 }
 
+bool PolygonSplitter::tracePolyOutline(int edge_start) {
+	polygon_outlines.push_back(poly_outline_t());
+	poly_outline_t& poly = polygon_outlines.back();
+	poly.convex = true;
+	double edge_sum = 0;
+
+	int edge = edge_start;
+	int v1, v2, next;
+	//while (true) {
+	unsigned a = 0;
+	for (a = 0; a < 1000; a++) {
+		v1 = edges[edge].v1;
+		v2 = edges[edge].v2;
+		next = -1;
+
+		// Add current edge
+		poly.edges.push_back(edge);
+		if (edge == edge_start) poly.bbox.extend(vertices[v1].x, vertices[v1].y);
+		poly.bbox.extend(vertices[v2].x, vertices[v2].y);
+		edge_sum += vertices[v1].x*vertices[v2].y - vertices[v2].x*vertices[v1].y;
+
+		// Find the next edge with the lowest angle
+		next = findNextEdge(edge, true, false);
+
+		// Abort if no next edge was found
+		if (next < 0) {
+			polygon_outlines.pop_back();
+			return false;
+		}
+
+		// Check for concavity
+		if (last_angle > PI)
+			poly.convex = false;
+
+		// Stop if we're back at the start
+		if (next == edge_start)
+			break;
+
+		// Continue loop
+		edge = next;
+	}
+
+	if (a >= 999) {
+		if (verbose) wxLogMessage("Possible infinite loop in tracePolyOutline");
+		return false;
+	}
+
+	// Determine if this is an 'outer' (clockwise) or 'inner' (anti-clockwise) polygon
+	poly.clockwise = (edge_sum < 0);
+
+	// Set all polygon edges 'inpoly' to true (so they are ignored when tracing future polylines
+	for (unsigned a = 0; a < poly.edges.size(); a++)
+		edges[poly.edges[a]].inpoly = true;
+
+	if (verbose) {
+		string info = "Traced polygon outline: ";
+		info += S_FMT("%d edges, ", poly.edges.size());
+		if (poly.convex) info += "convex, ";
+		else info += "concave, ";
+		if (poly.clockwise) info += "clockwise";
+		else info += "anticlockwise";
+		wxLogMessage(info);
+	}
+
+	return true;
+}
+
 bool PolygonSplitter::splitFromEdge(int splitter_edge) {
 	// Get vertices
 	int v1 = edges[splitter_edge].v1;
@@ -277,15 +406,15 @@ bool PolygonSplitter::splitFromEdge(int splitter_edge) {
 	double min_dist = 999999;
 	int closest = -1;
 	for (unsigned a = 0; a < vertices.size(); a++) {
-		if (MathStuff::lineSide(vertices[a].x, vertices[a].y, vertices[v1].x, vertices[v1].y, vertices[v2].x, vertices[v2].y) > 0) {
-			vertex_distances[a] = MathStuff::distance(vertices[v2].x, vertices[v2].y, vertices[a].x, vertices[a].y);
-			if (vertex_distances[a] < min_dist) {
-				min_dist = vertex_distances[a];
+		if (MathStuff::lineSide(vertices[a].x, vertices[a].y, vertices[v1].x, vertices[v1].y, vertices[v2].x, vertices[v2].y) > 0 && vertices[a].ok) {
+			vertices[a].distance = MathStuff::distance(vertices[v2].x, vertices[v2].y, vertices[a].x, vertices[a].y);
+			if (vertices[a].distance < min_dist) {
+				min_dist = vertices[a].distance;
 				closest = a;
 			}
 		}
 		else
-			vertex_distances[a] = 999999;
+			vertices[a].distance = 999999;
 	}
 
 	// If there's nothing on the front side, something is wrong
@@ -298,7 +427,7 @@ bool PolygonSplitter::splitFromEdge(int splitter_edge) {
 	double xi, yi;
 	for (unsigned a = 0; a < edges.size(); a++) {
 		// Ignore edge if adjacent to the vertices we are looking at
-		if (edges[a].v1 == closest || edges[a].v2 == closest || edges[a].v1 == v2 || edges[a].v2 == v2)
+		if (edges[a].v1 == closest || edges[a].v2 == closest || edges[a].v1 == v2 || edges[a].v2 == v2 || !edges[a].ok)
 			continue;
 
 		// Intersection test
@@ -321,8 +450,8 @@ bool PolygonSplitter::splitFromEdge(int splitter_edge) {
 
 	// Build a list of potential vertices, ordered by distance
 	for (unsigned a = 0; a < vertices.size(); a++) {
-		if (vertex_distances[a] < 999999)
-			pv_list.add(new vert_link_t(a, vertex_distances[a]));
+		if (vertices[a].distance < 999999)
+			pv_list.add(new vert_link_t(a, vertices[a].distance));
 	}
 
 	// Go through potential split vertices, closest first
@@ -335,7 +464,7 @@ bool PolygonSplitter::splitFromEdge(int splitter_edge) {
 		intersect = false;
 		for (unsigned a = 0; a < edges.size(); a++) {
 			// Ignore edge if adjacent to the vertices we are looking at
-			if (edges[a].v1 == index || edges[a].v2 == index || edges[a].v1 == v2 || edges[a].v2 == v2)
+			if (edges[a].v1 == index || edges[a].v2 == index || edges[a].v1 == v2 || edges[a].v2 == v2 || !edges[a].ok)
 				continue;
 
 			// Intersection test
@@ -369,7 +498,7 @@ bool PolygonSplitter::buildSubPoly(int edge_start, Polygon2D::subpoly_t& polygon
 		polygon.points.push_back(Polygon2D::glvert_t(vertices[edges[edge].v1].x, vertices[edges[edge].v1].y));
 
 		// Add edge to 'valid' edges list, so it is ignored when building further polygons
-		if (edge != edge_start) edge_valid[edge] = true;
+		if (edge != edge_start) edges[edge].done = true;
 		
 		// Get 'next' edge
 		edge = findNextEdge(edge);
@@ -384,7 +513,7 @@ bool PolygonSplitter::buildSubPoly(int edge_start, Polygon2D::subpoly_t& polygon
 	}
 
 	// Set starting edge to valid
-	edge_valid[edge_start] = true;
+	edges[edge_start].done = true;
 
 	// Check if the polygon is valid
 	if (polygon.points.size() >= 3)
@@ -397,9 +526,71 @@ bool PolygonSplitter::doSplitting(vector<Polygon2D::subpoly_t>& polygons) {
 	// Init
 	split_edges_start = edges.size();
 
-	// Detect if the polygon is unclosed
-	if (detectUnclosed())
-		return false;
+	// Trace polygon outlines
+	for (unsigned a = 0; a < edges.size(); a++) {
+		if (edges[a].inpoly || !edges[a].ok)
+			continue;
+		tracePolyOutline(a);
+	}
+	if (verbose) wxLogMessage("%d Polygon outlines detected", polygon_outlines.size());
+
+	// Check if any edges are not part of a polygon outline
+	for (unsigned a = 0; a < edges.size(); a++) {
+		if (!edges[a].inpoly)
+			edges[a].ok = false;	// Invalidate it
+	}
+
+	// Let's check for some cases where we can 'throw away' edges/vertices from further consideration
+	for (unsigned a = 0; a < polygon_outlines.size(); a++) {
+		// Check if this polygon intersects with any others
+		bool separate = true;
+		for (unsigned b = 0; b < polygon_outlines.size(); b++) {
+			if (b == a) continue;
+			bbox_t& bb1 = polygon_outlines[a].bbox;
+			bbox_t& bb2 = polygon_outlines[b].bbox;
+			if (!(bb2.min.x > bb1.max.x || bb2.max.x < bb1.min.x ||
+				bb2.min.y > bb1.max.y || bb2.max.y < bb1.min.y)) {
+				separate = false;
+				break;
+			}
+		}
+
+		// If the polygon didn't intersect, and is convex and clockwise ('outer')
+		if (separate && polygon_outlines[a].clockwise && polygon_outlines[a].convex) {
+			if (verbose) wxLogMessage("Separate, convex polygon exists, cutting (valid)");
+			for (unsigned b = 0; b < polygon_outlines[a].edges.size(); b++) {
+				// Set the edge to 'done' so it is ignored, but still used to build polygons
+				edges[polygon_outlines[a].edges[b]].done = true;
+
+				// If the edge's vertices aren't attached to anything else, also preclude these from later calculations
+				int v1 = edges[polygon_outlines[a].edges[b]].v1;
+				if (vertices[v1].edges_in.size() == 1 && vertices[v1].edges_out.size() == 1)
+					vertices[v1].ok = false;
+
+				int v2 = edges[polygon_outlines[a].edges[b]].v2;
+				if (vertices[v2].edges_in.size() == 1 && vertices[v2].edges_out.size() == 1)
+					vertices[v2].ok = false;
+			}
+		}
+
+		// If the polygon didn't intersect, and is anticlockwise (inner), it is invalid
+		else if (separate && !polygon_outlines[a].clockwise) {
+			if (verbose) wxLogMessage("Separate, anticlockwise polygon exists, cutting (invalid)");
+			for (unsigned b = 0; b < polygon_outlines[a].edges.size(); b++) {
+				// Set the edge to 'done' so it is ignored, but still used to build polygons
+				edges[polygon_outlines[a].edges[b]].ok = false;
+
+				// If the edge's vertices aren't attached to anything else, also preclude these from later calculations
+				int v1 = edges[polygon_outlines[a].edges[b]].v1;
+				if (vertices[v1].edges_in.size() == 1 && vertices[v1].edges_out.size() == 1)
+					vertices[v1].ok = false;
+
+				int v2 = edges[polygon_outlines[a].edges[b]].v2;
+				if (vertices[v2].edges_in.size() == 1 && vertices[v2].edges_out.size() == 1)
+					vertices[v2].ok = false;
+			}
+		}
+	}
 
 	// Detect concave edges/vertices
 	detectConcavity();
@@ -415,9 +606,13 @@ bool PolygonSplitter::doSplitting(vector<Polygon2D::subpoly_t>& polygons) {
 			break;
 	}
 
+	// Reset edge 'done' status
+	for (unsigned a = 0; a < edges.size(); a++)
+		edges[a].done = false;
+
 	// Build polygons
 	for (unsigned a = 0; a < edges.size(); a++) {
-		if (edge_valid[a])
+		if (edges[a].done || !edges[a].ok)
 			continue;
 
 		polygons.push_back(Polygon2D::subpoly_t());
@@ -426,4 +621,60 @@ bool PolygonSplitter::doSplitting(vector<Polygon2D::subpoly_t>& polygons) {
 	}
 
 	return true;
+}
+
+void PolygonSplitter::openSector(MapSector* sector) {
+	// Check sector was given
+	if (!sector)
+		return;
+
+	// Init
+	clear();
+
+	// Get list of sides connected to this sector
+	vector<MapSide*>& sides = sector->connectedSides();
+
+	// Go through sides
+	MapLine* line;
+	for (unsigned a = 0; a < sides.size(); a++) {
+		line = sides[a]->getParentLine();
+
+		// Ignore this side if its parent line has the same sector on both sides
+		if (!line || line->doubleSector())
+			continue;
+
+		// Add the edge to the splitter (direction depends on what side of the line this is)
+		if (line->s1() == sides[a])
+			addEdge(line->v1()->xPos(), line->v1()->yPos(), line->v2()->xPos(), line->v2()->yPos());
+		else
+			addEdge(line->v2()->xPos(), line->v2()->yPos(), line->v1()->xPos(), line->v1()->yPos());
+	}
+}
+
+void PolygonSplitter::testRender() {
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	// Draw vertices
+	rgba_t(255, 255, 255, 255, 0).set_gl();
+	glBegin(GL_POINTS);
+	for (unsigned a = 0; a < vertices.size(); a++)
+		glVertex2d(vertices[a].x, vertices[a].y);
+	glEnd();
+
+	// Draw original edges
+	glColor3f(0.0f, 0.0f, 1.0f);
+	glBegin(GL_LINES);
+	for (unsigned a = 0; a < split_edges_start; a++) {
+		glVertex2d(vertices[edges[a].v1].x, vertices[edges[a].v1].y);
+		glVertex2d(vertices[edges[a].v2].x, vertices[edges[a].v2].y);
+	}
+	glEnd();
+
+	// Draw split edges
+	glColor3f(0.0f, 1.0f, 0.0f);
+	glBegin(GL_LINES);
+	for (unsigned a = split_edges_start; a < edges.size(); a++) {
+		glVertex2d(vertices[edges[a].v1].x, vertices[edges[a].v1].y);
+		glVertex2d(vertices[edges[a].v2].x, vertices[edges[a].v2].y);
+	}
+	glEnd();
 }

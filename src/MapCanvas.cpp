@@ -46,8 +46,10 @@
  * VARIABLES
  *******************************************************************/
 CVAR(Bool, things_always, 1, CVAR_SAVE)
+CVAR(Bool, vertices_always, 1, CVAR_SAVE)
 CVAR(Bool, grid_dashed, false, CVAR_SAVE)
 CVAR(Bool, scroll_smooth, false, CVAR_SAVE)
+PolygonSplitter splitter;	// for testing
 
 
 /* MapCanvas::MapCanvas
@@ -393,27 +395,42 @@ void MapCanvas::draw() {
 	// Draw grid
 	drawGrid();
 
-	// --- Draw map ---
+	// --- Draw map (depending on mode) ---
 
-	// Things if always shown (and not in things mode
-	if (things_always && editor->editMode() != MapEditor::MODE_THINGS)
-		renderer_2d->renderThings(0.5f);
+	if (editor->editMode() == MapEditor::MODE_VERTICES) {
+		// Vertices mode
+		if (things_always) renderer_2d->renderThings(0.5f);										// Things (faded)
+		renderer_2d->renderLines(false);														// Lines (no direction tabs)
+		renderer_2d->renderVertices(view_scale);												// Vertices
+		renderer_2d->renderSelection(editor->getSelection(), editor->editMode(), view_scale);	// Selection
+	}
+	else if (editor->editMode() == MapEditor::MODE_LINES) {
+		// Lines mode
+		if (things_always) renderer_2d->renderThings(0.5f);										// Things (faded)
+		if (vertices_always) renderer_2d->renderVertices(view_scale);							// Vertices
+		renderer_2d->renderLines(true);															// Lines
+		renderer_2d->renderSelection(editor->getSelection(), editor->editMode(), view_scale);	// Selection
+	}
+	else if (editor->editMode() == MapEditor::MODE_SECTORS) {
+		// Sectors mode
+		if (things_always) renderer_2d->renderThings(0.5f);										// Things (faded)
+		if (vertices_always) renderer_2d->renderVertices(view_scale);							// Vertices
+		renderer_2d->renderSelection(editor->getSelection(), editor->editMode(), view_scale);	// Selection
+		renderer_2d->renderLines(false);														// Lines (no direction tabs)
+		splitter.testRender();	// Testing
+	}
+	else if (editor->editMode() == MapEditor::MODE_THINGS) {
+		// Things mode
+		renderer_2d->renderLines(false);														// Lines (no direction tabs)
+		if (vertices_always) renderer_2d->renderVertices(view_scale);							// Vertices
+		renderer_2d->renderThings();															// Things
+		renderer_2d->renderSelection(editor->getSelection(), editor->editMode(), view_scale);	// Selection
+	}
 
-	// Lines always (show direction only in lines mode)
-	renderer_2d->renderLines(editor->editMode() == MapEditor::MODE_LINES);
-
-	// Vertices if in vertex mode
-	if (editor->editMode() == MapEditor::MODE_VERTICES)
-		renderer_2d->renderVertices(view_scale);
-
-	// Things if in things mode
-	if (editor->editMode() == MapEditor::MODE_THINGS)
-		renderer_2d->renderThings();
-
-	// Draw overlays (hilight etc)
+	// Draw hilight
 	if (mouse_state == MSTATE_NORMAL)
 		renderer_2d->renderHilight(editor->hilightItem(), editor->editMode(), anim_flash_level, view_scale);
-	renderer_2d->renderSelection(editor->getSelection(), editor->editMode(), view_scale);
+	
 
 
 	// Draw selection box if active
@@ -750,10 +767,20 @@ void MapCanvas::onKeyDown(wxKeyEvent& e) {
 		Polygon2D poly;
 		sf::Clock clock;
 		wxLogMessage("Generating polygons...");
-		for (unsigned a = 0; a < editor->getMap().nSectors(); a++)
-			poly.openSector(editor->getMap().getSector(a));
+		for (unsigned a = 0; a < editor->getMap().nSectors(); a++) {
+			if (!poly.openSector(editor->getMap().getSector(a)))
+				wxLogMessage("Splitting failed for sector %d", a);
+		}
 		int ms = clock.GetElapsedTime() * 1000;
 		wxLogMessage("Polygon generation took %dms", ms);
+	}
+
+	if (e.GetKeyCode() == WXK_F5 && editor->editMode() == MapEditor::MODE_SECTORS) {
+		splitter.setVerbose(true);
+		splitter.clear();
+		splitter.openSector(editor->getHilightedSector());
+		vector<Polygon2D::subpoly_t> temp;
+		splitter.doSplitting(temp);
 	}
 
 	e.Skip();
