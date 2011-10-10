@@ -5,14 +5,17 @@
 #include "CTexture.h"
 #include "MainWindow.h"
 #include "ArchiveManager.h"
+#include "MapEditorWindow.h"
 
 MapTextureManager::MapTextureManager(Archive* archive) {
 	// Init variables
 	this->archive = archive;
 	editor_images_loaded = false;
 
-	// Listen to the resource manager
+	// Listen to the various managers
 	listenTo(theResourceManager);
+	listenTo(theArchiveManager);
+	listenTo(thePaletteChooser);
 }
 
 MapTextureManager::~MapTextureManager() {
@@ -184,17 +187,45 @@ GLTexture* MapTextureManager::getEditorImage(string name) {
 	return editor_images[name].texture;
 }
 
+void MapTextureManager::refreshResources() {
+	// Just clear all cached textures
+	textures.clear();
+	flats.clear();
+	sprites.clear();
+	thePaletteChooser->setGlobalFromArchive(archive);
+	wxLogMessage("texture manager cleared");
+}
+
+void MapTextureManager::setArchive(Archive* archive) {
+	this->archive = archive;
+	refreshResources();
+}
+
 void MapTextureManager::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
-	// Only interested in the resource manager
-	if (announcer != theResourceManager)
+	// Only interested in the resource manager, 
+	// archive manager and palette chooser.
+	if (announcer != theResourceManager
+		&& announcer != thePaletteChooser
+		&& announcer != theArchiveManager)
 		return;
 
-	// If the resources have been updated
-	if (event_name == "resources_updated") {
-		// Just clear all cached textures
-		textures.clear();
-		flats.clear();
-		sprites.clear();
-		wxLogMessage("texture manager cleared");
+	// If the map's archive is being closed,
+	// we need to close the map editor
+	if (event_name == "archive_closing") {
+		event_data.seek(0, SEEK_SET);
+		int32_t ac_index;
+		event_data.read(&ac_index, 4);
+		if (theArchiveManager->getArchive(ac_index) == archive) {
+			theMapEditor->Hide();
+			theMapEditor->mapEditor().clearMap();
+			archive = NULL;
+		}
 	}
+
+	// If the resources have been updated
+	if (event_name == "resources_updated")
+		refreshResources();
+
+	if (event_name == "main_palette_changed")
+		refreshResources();
 }

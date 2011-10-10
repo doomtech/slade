@@ -121,7 +121,7 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				WholeProgramOptimization="false"
-				PreprocessorDefinitions="WIN32;USE_SFML_RENDERWINDOW;__WXMSW__;_WINDOWS;NOPCH;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;NDEBUG;UPDATEREVISION"
+				PreprocessorDefinitions="WIN32;USE_SFML_RENDERWINDOW;__WXMSW__;_WINDOWS;NOPCH;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;GLEW_STATIC;NDEBUG;UPDATEREVISION"
 				GeneratePreprocessedFile="0"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -477,6 +477,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\Polygon2D.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Polygon2D.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\SFileDialog.cpp"
 					>
 				</File>
@@ -823,6 +831,14 @@
 			</File>
 			<File
 				RelativePath=".\src\MapEditorWindow.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\MapRenderer2D.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\MapRenderer2D.h"
 				>
 			</File>
 			<File
@@ -1612,6 +1628,26 @@
 				</File>
 				<File
 					RelativePath=".\src\zreaders\templates.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="GLEW"
+				>
+				<File
+					RelativePath=".\src\glew\glew.c"
+					>
+				</File>
+				<File
+					RelativePath=".\src\glew\glew.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\glew\glxew.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\glew\wglew.h"
 					>
 				</File>
 			</Filter>

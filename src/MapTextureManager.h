@@ -29,7 +29,8 @@ public:
 	MapTextureManager(Archive* archive = NULL);
 	~MapTextureManager();
 
-	void	setArchive(Archive* archive) { this->archive = archive; }
+	void	setArchive(Archive* archive);
+	void	refreshResources();
 
 	GLTexture*	getTexture(string name);
 	GLTexture*	getFlat(string name);

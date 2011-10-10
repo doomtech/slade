@@ -681,7 +681,7 @@ void PolygonSplitter::testRender() {
 	// Draw original edges
 	glColor3f(0.0f, 0.0f, 1.0f);
 	glBegin(GL_LINES);
-	for (unsigned a = 0; a < split_edges_start; a++) {
+	for (int a = 0; a < split_edges_start; a++) {
 		glVertex2d(vertices[edges[a].v1].x, vertices[edges[a].v1].y);
 		glVertex2d(vertices[edges[a].v2].x, vertices[edges[a].v2].y);
 	}

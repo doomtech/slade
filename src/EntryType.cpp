@@ -352,11 +352,12 @@ bool EntryType::readEntryTypeDefinition(MemChunk& mc) {
 				ntype->extension = fieldnode->getStringValue();
 			}
 			else if (S_CMPNOCASE(fieldnode->getName(), "format")) {			// Format field
-				ntype->format = EntryDataFormat::getFormat(fieldnode->getStringValue());
+				string format_string = fieldnode->getStringValue();
+				ntype->format = EntryDataFormat::getFormat(format_string);
 
 				// Warn if undefined format
 				if (ntype->format == EntryDataFormat::anyFormat())
-					wxLogMessage("Warning: Entry type %s requires undefined format %s", CHR(ntype->getId()), CHR(ntype->getFormat()));
+					wxLogMessage("Warning: Entry type %s requires undefined format %s", CHR(ntype->getId()), CHR(format_string));
 			}
 			else if (S_CMPNOCASE(fieldnode->getName(), "icon")) {			// Icon field
 				ntype->icon = fieldnode->getStringValue();

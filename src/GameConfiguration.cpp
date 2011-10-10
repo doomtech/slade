@@ -304,16 +304,16 @@ bool GameConfiguration::readConfiguration(string& cfg, string source) {
 		// Map format
 		else if (S_CMPNOCASE(node->getName(), "map_format")) {
 			if (S_CMPNOCASE(node->getStringValue(), "doom"))
-				map_format = 0;
+				map_format = MAP_DOOM;
 			else if (S_CMPNOCASE(node->getStringValue(), "hexen"))
-				map_format = 1;
+				map_format = MAP_HEXEN;
 			else if (S_CMPNOCASE(node->getStringValue(), "doom64"))
-				map_format = 2;
+				map_format = MAP_DOOM64;
 			else if (S_CMPNOCASE(node->getStringValue(), "udmf"))
-				map_format = 3;
+				map_format = MAP_UDMF;
 			else {
 				wxLogMessage("Warning: Unknown/unsupported map format \"%s\", defaulting to doom format", CHR(node->getStringValue()));
-				map_format = 0;
+				map_format = MAP_DOOM;
 			}
 		}
 	}

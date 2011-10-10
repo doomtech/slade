@@ -210,6 +210,7 @@ void MapCanvas::viewFitToMap() {
 	}
 
 	// Update object visibility
+	renderer_2d->forceUpdate(view_scale);
 	renderer_2d->updateVisibility(view_tl, view_br, view_scale);
 }
 

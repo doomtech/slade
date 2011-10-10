@@ -205,7 +205,7 @@ void ArchiveOperations::removeUnusedTextures(Archive* archive) {
 	for (unsigned a = 0; a < sidedefs.size(); a++) {
 		int nsides = sidedefs[a]->getSize() / 30;
 		sidedefs[a]->seek(0, SEEK_SET);
-		for (unsigned s = 0; s < nsides; s++) {
+		for (int s = 0; s < nsides; s++) {
 			// Read side data
 			sidedefs[a]->read(&sdef, 30);
 

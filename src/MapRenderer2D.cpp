@@ -1133,3 +1133,22 @@ void MapRenderer2D::updateVisibility(fpoint2_t view_tl, fpoint2_t view_br, doubl
 			vis_t[a] = 1;
 	}
 }
+
+
+void MapRenderer2D::forceUpdate(float view_scale) {
+	if (GLEW_ARB_vertex_buffer_object && !FORCE_NO_VBO) {
+		updateVerticesVBO();
+		updateLinesVBO(lines_dirs);
+	} else {
+		if (list_lines > 0) {
+			glDeleteLists(list_lines, 1);
+			list_lines = 0;
+		}
+		if (list_vertices > 0) {
+			glDeleteLists(list_vertices, 1);
+			list_vertices = 0;
+		}
+	}
+	renderVertices(view_scale);
+	renderLines(lines_dirs);
+}

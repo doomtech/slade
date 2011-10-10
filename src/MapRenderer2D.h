@@ -71,6 +71,7 @@ public:
 	void	updateLinesVBO(bool show_direction);
 
 	void	updateVisibility(fpoint2_t view_tl, fpoint2_t view_br, double view_scale);
+	void	forceUpdate(float view_scale);
 };
 
 #endif//__MAP_RENDERER_2D__
