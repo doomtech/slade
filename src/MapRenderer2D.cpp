@@ -16,6 +16,7 @@ CVAR(Bool, line_smooth, true, CVAR_SAVE)
 CVAR(Int, thing_drawtype, 1, CVAR_SAVE)
 CVAR(Bool, thing_force_dir, false, CVAR_SAVE)
 CVAR(Bool, thing_overlay_square, false, CVAR_SAVE)
+CVAR(Float, flat_brightness, 0.8, CVAR_SAVE)
 
 CVAR(Bool, test_ssplit, false, CVAR_SAVE)
 
@@ -44,9 +45,14 @@ MapRenderer2D::~MapRenderer2D() {
 }
 
 void MapRenderer2D::renderVertices(float view_scale) {
+	// Check there are any vertices to render
+	if (map->nVertices() == 0)
+		return;
+
 	// Setup rendering properties
 	float vs = vertex_size;
 	if (view_scale < 1.0) vs *= view_scale;
+	if (vs < 2.0) vs = 2.0;
 	glPointSize(vs);
 
 	// Setup point sprites if supported
@@ -132,6 +138,10 @@ void MapRenderer2D::renderVerticesVBO() {
 }
 
 void MapRenderer2D::renderLines(bool show_direction) {
+	// Check there are any lines to render
+	if (map->nLines() == 0)
+		return;
+
 	// Setup rendering properties
 	glLineWidth(line_width);
 	if (line_smooth)
@@ -731,7 +741,7 @@ void MapRenderer2D::renderSelection(vector<int>& selection, int mode, float view
 		// Sectors
 
 		// Draw selection
-		glColor4f(col.fr(), col.fg(), col.fb(), col.fa() * 0.6f);
+		glColor4f(col.fr(), col.fg(), col.fb(), col.fa() * 0.75f);
 		for (unsigned a = 0; a < selection.size(); a++) {
 			// Get the sector's polygon
 			Polygon2D* poly = map->getSector(selection[a])->getPolygon();
@@ -835,6 +845,48 @@ void MapRenderer2D::renderSelection(vector<int>& selection, int mode, float view
 
 		glDisable(GL_TEXTURE_2D);
 	}
+}
+
+void MapRenderer2D::renderFlats(int type) {
+	// Completely unoptimised for now
+
+	if (type > 0)
+		glEnable(GL_TEXTURE_2D);
+
+	GLTexture* tex_last = NULL;
+	GLTexture* tex = NULL;
+	for (unsigned a = 0; a < map->nSectors(); a++) {
+		MapSector* sector = map->getSector(a);
+
+		if (type > 0) {
+			// Get the sector texture
+			if (type == 1)
+				tex = theMapEditor->textureManager().getFlat(sector->floorTexture());
+			else
+				tex = theMapEditor->textureManager().getFlat(sector->ceilingTexture());
+
+			// Bind the texture if needed
+			if (tex && tex != tex_last) {
+				tex->bind();
+				tex_last = tex;
+			}
+		}
+
+		// Setup polygon texture info if needed
+		Polygon2D* poly = sector->getPolygon();
+		if (type > 0) {
+			poly->setTexture(tex);
+			poly->updateTextureCoords();
+		}
+
+		// Render the polygon
+		float light = ((int)sector->prop("lightlevel") / 255.0f) * flat_brightness;
+		glColor4f(light, light, light, 1.0f);
+		poly->render();
+	}
+
+	if (type > 0)
+		glDisable(GL_TEXTURE_2D);
 }
 
 void MapRenderer2D::updateVerticesVBO() {

@@ -24,9 +24,12 @@ public:
 	Polygon2D();
 	~Polygon2D();
 
+	void	setTexture(GLTexture* tex) { this->texture = tex; }
 	bool	hasPolygon() { return (subpolys.size() != 0); }
 
 	bool	openSector(MapSector* sector);
+	void	updateTextureCoords(double scale_x = 1, double scale_y = 1, double offset_x = 0, double offset_y = 0);
+
 	void	render();
 	void	renderWireframe();
 

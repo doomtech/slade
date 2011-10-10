@@ -49,6 +49,7 @@ CVAR(Bool, things_always, 1, CVAR_SAVE)
 CVAR(Bool, vertices_always, 1, CVAR_SAVE)
 CVAR(Bool, grid_dashed, false, CVAR_SAVE)
 CVAR(Bool, scroll_smooth, false, CVAR_SAVE)
+CVAR(Int, flat_drawtype, 2, CVAR_SAVE)
 PolygonSplitter splitter;	// for testing
 
 
@@ -392,6 +393,12 @@ void MapCanvas::draw() {
 	// Translate to offsets
 	glTranslated(-view_xoff_inter, -view_yoff_inter, 0);
 
+	// Draw flats if needed
+	if (flat_drawtype > 0) {
+		COL_WHITE.set_gl();
+		renderer_2d->renderFlats(flat_drawtype-1);
+	}
+
 	// Draw grid
 	drawGrid();
 
@@ -430,7 +437,7 @@ void MapCanvas::draw() {
 	// Draw hilight
 	if (mouse_state == MSTATE_NORMAL)
 		renderer_2d->renderHilight(editor->hilightItem(), editor->editMode(), anim_flash_level, view_scale);
-	
+
 
 
 	// Draw selection box if active

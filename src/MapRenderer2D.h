@@ -64,6 +64,7 @@ public:
 	void	renderThingsImmediate(float alpha);
 	void	renderHilight(int item, int type, float fade, float view_scale);
 	void	renderSelection(vector<int>& selection, int type, float view_scale);
+	void	renderFlats(int type = 0);
 
 	// VBOs
 	void	updateVerticesVBO();

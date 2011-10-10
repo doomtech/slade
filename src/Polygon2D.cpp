@@ -43,6 +43,24 @@ bool Polygon2D::openSector(MapSector* sector) {
 	return splitter.doSplitting(subpolys);
 }
 
+void Polygon2D::updateTextureCoords(double scale_x, double scale_y, double offset_x, double offset_y) {
+	// Can't do this if there is no texture
+	if (!texture)
+		return;
+
+	// Get texture info
+	double owidth = 1.0 / ((double)texture->getWidth() * scale_x);
+	double oheight = 1.0 / ((double)texture->getHeight() * scale_y);
+
+	// Set texture coordinates
+	for (unsigned p = 0; p < subpolys.size(); p++) {
+		for (unsigned a = 0; a < subpolys[p].points.size(); a++) {
+			subpolys[p].points[a].tx = (offset_x + subpolys[p].points[a].x) * owidth;
+			subpolys[p].points[a].ty = (offset_y - subpolys[p].points[a].y) * oheight;
+		}
+	}
+}
+
 void Polygon2D::render() {
 	// Go through sub-polys
 	for (unsigned a = 0; a < subpolys.size(); a++) {
@@ -499,7 +517,7 @@ bool PolygonSplitter::buildSubPoly(int edge_start, Polygon2D::subpoly_t& polygon
 
 		// Add edge to 'valid' edges list, so it is ignored when building further polygons
 		if (edge != edge_start) edges[edge].done = true;
-		
+
 		// Get 'next' edge
 		edge = findNextEdge(edge);
 
