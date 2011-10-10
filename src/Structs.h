@@ -59,12 +59,24 @@ struct fpoint2_t {
 		return sqrt((x * x) + (y * y));
 	}
 
-	fpoint2_t normalize() {
+	fpoint2_t normalized() {
 		float mag = magnitude();
 		if (mag == 0.0f)
 			return fpoint2_t(0.0f, 0.0f);
 		else
 			return fpoint2_t(x / mag, y / mag);
+	}
+
+	void normalize() {
+		double mag = magnitude();
+		if (mag == 0) {
+			x = 0;
+			y = 0;
+		}
+		else {
+			x /= mag;
+			y /= mag;
+		}
 	}
 
 	double dot(fpoint2_t vec) {

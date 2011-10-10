@@ -16,7 +16,8 @@ CVAR(Bool, line_smooth, true, CVAR_SAVE)
 CVAR(Int, thing_drawtype, 1, CVAR_SAVE)
 CVAR(Bool, thing_force_dir, false, CVAR_SAVE)
 CVAR(Bool, thing_overlay_square, false, CVAR_SAVE)
-CVAR(Float, flat_brightness, 0.8, CVAR_SAVE)
+CVAR(Float, flat_brightness, 0.8f, CVAR_SAVE)
+CVAR(Float, thing_shadow, 0.5f, CVAR_SAVE)
 
 CVAR(Bool, test_ssplit, false, CVAR_SAVE)
 
@@ -216,12 +217,12 @@ void MapRenderer2D::renderLinesImmediate(bool show_direction) {
 		if (show_direction) {
 			double xmid = x1 + ((x2 - x1) * 0.5);
 			double ymid = y1 + ((y2 - y1) * 0.5);
-			double x = (-(y2 - y1)) * 0.125;
-			double y = (x2 - x1) * 0.125;
+			fpoint2_t invdir(-(y2 - y1), x2 - x1);
+			invdir.normalize();
 
 			glBegin(GL_LINES);
 			glVertex2d(xmid, ymid);
-			glVertex2d(xmid - x, ymid - y);
+			glVertex2d(xmid - invdir.x*8, ymid - invdir.y*8);
 			glEnd();
 		}
 	}
@@ -353,10 +354,6 @@ bool MapRenderer2D::renderSpriteThing(double x, double y, double angle, ThingTyp
 		return false;
 	}
 
-	// Move to thing position
-	glPushMatrix();
-	glTranslated(x, y, 0);
-
 	// Bind texture
 	if (tex_last != tex) {
 		tex->bind();
@@ -366,16 +363,34 @@ bool MapRenderer2D::renderSpriteThing(double x, double y, double angle, ThingTyp
 	// Draw thing
 	double hw = tex->getWidth()*0.5;
 	double hh = tex->getHeight()*0.5;
+
+	// Shadow if needed
+	if (thing_shadow > 0.01f && alpha >= 0.9) {
+		double sz = (min(hw, hh))*0.1;
+		if (sz < 1) sz = 1;
+		glColor4f(0.0f, 0.0f, 0.0f, alpha*(thing_shadow*0.7));
+		glBegin(GL_QUADS);
+		glTexCoord2f(0.0f, 1.0f);	glVertex2d(x-hw-sz, y-hh-sz);
+		glTexCoord2f(0.0f, 0.0f);	glVertex2d(x-hw-sz, y+hh+sz);
+		glTexCoord2f(1.0f, 0.0f);	glVertex2d(x+hw+sz, y+hh+sz);
+		glTexCoord2f(1.0f, 1.0f);	glVertex2d(x+hw+sz, y-hh-sz);
+		glEnd();
+		glBegin(GL_QUADS);
+		glTexCoord2f(0.0f, 1.0f);	glVertex2d(x-hw-sz, y-hh-sz-sz);
+		glTexCoord2f(0.0f, 0.0f);	glVertex2d(x-hw-sz, y+hh+sz);
+		glTexCoord2f(1.0f, 0.0f);	glVertex2d(x+hw+sz+sz, y+hh+sz);
+		glTexCoord2f(1.0f, 1.0f);	glVertex2d(x+hw+sz+sz, y-hh-sz-sz);
+		glEnd();
+	}
+	// Draw thing
 	glColor4f(1.0f, 1.0f, 1.0f, alpha);
 	glBegin(GL_QUADS);
-	glTexCoord2f(0.0f, 1.0f);	glVertex2d(-hw, -hh);
-	glTexCoord2f(0.0f, 0.0f);	glVertex2d(-hw, hh);
-	glTexCoord2f(1.0f, 0.0f);	glVertex2d(hw, hh);
-	glTexCoord2f(1.0f, 1.0f);	glVertex2d(hw, -hh);
+	glTexCoord2f(0.0f, 1.0f);	glVertex2d(x-hw, y-hh);
+	glTexCoord2f(0.0f, 0.0f);	glVertex2d(x-hw, y+hh);
+	glTexCoord2f(1.0f, 0.0f);	glVertex2d(x+hw, y+hh);
+	glTexCoord2f(1.0f, 1.0f);	glVertex2d(x+hw, y-hh);
 	glEnd();
 
-	// Restore previous matrix
-	glPopMatrix();
 
 	return show_angle;
 }
@@ -426,11 +441,11 @@ void MapRenderer2D::renderSquareThing(double x, double y, double angle, ThingTyp
 	glPopMatrix();
 }
 
-void MapRenderer2D::renderThings(float alpha) {
-	renderThingsImmediate(alpha);
+void MapRenderer2D::renderThings(double view_scale, float alpha) {
+	renderThingsImmediate(view_scale, alpha);
 }
 
-void MapRenderer2D::renderThingsImmediate(float alpha) {
+void MapRenderer2D::renderThingsImmediate(double view_scale, float alpha) {
 	// Display lists aren't really good for this, better to check for
 	// visibility and just render things in immediate mode
 
@@ -445,6 +460,59 @@ void MapRenderer2D::renderThingsImmediate(float alpha) {
 	MapThing* thing = NULL;
 	double x, y;
 	vector<int> things_arrows;
+
+	// Draw thing shadows if round things is on
+	if (thing_drawtype == 1 && thing_shadow > 0.01f && alpha >= 0.9) {
+		glEnable(GL_TEXTURE_2D);
+		GLTexture* tex_shadow = theMapEditor->textureManager().getEditorImage("thing/shadow");
+		if (tex_shadow) {
+			tex_shadow->bind();
+			glColor4f(0.0f, 0.0f, 0.0f, alpha*thing_shadow);
+
+			// Setup point sprites if supported
+			bool point = false;
+			if (GLEW_ARB_point_sprite) {
+				glEnable(GL_POINT_SPRITE);
+				glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
+				point = true;
+			}
+
+			for (unsigned a = 0; a < map->nThings(); a++) {
+				if (vis_t[a] > 0)
+					continue;
+
+				// Get thing info
+				thing = map->getThing(a);
+				x = thing->xPos();
+				y = thing->yPos();
+				ThingType* tt = theGameConfiguration->thingType(thing->getType());
+				double radius = (tt->getRadius()+1) * 1.3;
+
+				// Draw shadow
+				if (point && radius*2*view_scale <= OpenGL::maxPointSize()) {
+					// Point sprite
+					glPointSize(radius*2*view_scale);
+					glBegin(GL_POINTS);
+					glVertex2d(x, y);
+					glEnd();
+				}
+				else {
+					// Textured quad
+					glBegin(GL_QUADS);
+					glTexCoord2f(0.0f, 1.0f);	glVertex2d(x-radius, y-radius);
+					glTexCoord2f(0.0f, 0.0f);	glVertex2d(x-radius, y+radius);
+					glTexCoord2f(1.0f, 0.0f);	glVertex2d(x+radius, y+radius);
+					glTexCoord2f(1.0f, 1.0f);	glVertex2d(x+radius, y-radius);
+					glEnd();
+				}
+			}
+
+			if (point)
+				glDisable(GL_POINT_SPRITE);
+		}
+	}
+
+	// Draw things
 	for (unsigned a = 0; a < map->nThings(); a++) {
 		if (vis_t[a] > 0)
 			continue;
@@ -565,11 +633,12 @@ void MapRenderer2D::renderHilight(int hilight_item, int mode, float fade, float 
 		// Direction tab
 		double xmid = x1 + ((x2 - x1) * 0.5);
 		double ymid = y1 + ((y2 - y1) * 0.5);
-		double x = (-(y2 - y1)) * 0.125;
-		double y = (x2 - x1) * 0.125;
+		fpoint2_t invdir(-(y2 - y1), x2 - x1);
+		invdir.normalize();
+
 		glBegin(GL_LINES);
 		glVertex2d(xmid, ymid);
-		glVertex2d(xmid - x, ymid - y);
+		glVertex2d(xmid - invdir.x*8, ymid - invdir.y*8);
 		glEnd();
 	}
 	else if (mode == MapEditor::MODE_SECTORS) {
@@ -715,7 +784,7 @@ void MapRenderer2D::renderSelection(vector<int>& selection, int mode, float view
 		MapLine* line;
 		double x1, y1, x2, y2;
 		glBegin(GL_LINES);
-		for (unsigned a = 0; a < selection.size(); a++) {
+		for (unsigned a = 0; a < selection.size(); a++) { 
 			// Get line properties
 			line = map->getLine(selection[a]);
 			x1 = line->v1()->xPos();
@@ -730,10 +799,10 @@ void MapRenderer2D::renderSelection(vector<int>& selection, int mode, float view
 			// Direction tab
 			double xmid = x1 + ((x2 - x1) * 0.5);
 			double ymid = y1 + ((y2 - y1) * 0.5);
-			double x = (-(y2 - y1)) * 0.125;
-			double y = (x2 - x1) * 0.125;
+			fpoint2_t invdir(-(y2 - y1), x2 - x1);
+			invdir.normalize();
 			glVertex2d(xmid, ymid);
-			glVertex2d(xmid - x, ymid - y);
+			glVertex2d(xmid - invdir.x*8, ymid - invdir.y*8);
 		}
 		glEnd();
 	}
@@ -966,8 +1035,10 @@ void MapRenderer2D::updateLinesVBO(bool show_direction) {
 			y2 = line->v2()->yPos();
 			lines[v+2].x = x1 + ((x2 - x1) * 0.5);
 			lines[v+2].y = y1 + ((y2 - y1) * 0.5);
-			lines[v+3].x = lines[v+2].x - ((-(y2 - y1)) * 0.125);
-			lines[v+3].y = lines[v+2].y - ((x2 - x1) * 0.125);
+			fpoint2_t invdir(-(y2 - y1), x2 - x1);
+			invdir.normalize();
+			lines[v+3].x = lines[v+2].x - invdir.x*8;
+			lines[v+3].y = lines[v+2].y - invdir.y*8;
 
 			// Colours
 			lines[v+2].r = lines[v+3].r = col.fr();

@@ -60,8 +60,8 @@ public:
 	void	renderRoundThing(double x, double y, double angle, ThingType* type, float alpha = 1.0f);
 	bool	renderSpriteThing(double x, double y, double angle, ThingType* type, float alpha = 1.0f);
 	void	renderSquareThing(double x, double y, double angle, ThingType* type, float alpha = 1.0f);
-	void	renderThings(float alpha = 1.0f);
-	void	renderThingsImmediate(float alpha);
+	void	renderThings(double view_scale = 1, float alpha = 1.0f);
+	void	renderThingsImmediate(double view_scale, float alpha);
 	void	renderHilight(int item, int type, float fade, float view_scale);
 	void	renderSelection(vector<int>& selection, int type, float view_scale);
 	void	renderFlats(int type = 0);

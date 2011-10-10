@@ -406,21 +406,21 @@ void MapCanvas::draw() {
 
 	if (editor->editMode() == MapEditor::MODE_VERTICES) {
 		// Vertices mode
-		if (things_always) renderer_2d->renderThings(0.5f);										// Things (faded)
+		if (things_always) renderer_2d->renderThings(view_scale, 0.5f);							// Things (faded)
 		renderer_2d->renderLines(false);														// Lines (no direction tabs)
 		renderer_2d->renderVertices(view_scale);												// Vertices
 		renderer_2d->renderSelection(editor->getSelection(), editor->editMode(), view_scale);	// Selection
 	}
 	else if (editor->editMode() == MapEditor::MODE_LINES) {
 		// Lines mode
-		if (things_always) renderer_2d->renderThings(0.5f);										// Things (faded)
+		if (things_always) renderer_2d->renderThings(view_scale, 0.5f);							// Things (faded)
 		if (vertices_always) renderer_2d->renderVertices(view_scale);							// Vertices
 		renderer_2d->renderLines(true);															// Lines
 		renderer_2d->renderSelection(editor->getSelection(), editor->editMode(), view_scale);	// Selection
 	}
 	else if (editor->editMode() == MapEditor::MODE_SECTORS) {
 		// Sectors mode
-		if (things_always) renderer_2d->renderThings(0.5f);										// Things (faded)
+		if (things_always) renderer_2d->renderThings(view_scale, 0.5f);							// Things (faded)
 		if (vertices_always) renderer_2d->renderVertices(view_scale);							// Vertices
 		renderer_2d->renderSelection(editor->getSelection(), editor->editMode(), view_scale);	// Selection
 		renderer_2d->renderLines(false);														// Lines (no direction tabs)
@@ -430,7 +430,7 @@ void MapCanvas::draw() {
 		// Things mode
 		renderer_2d->renderLines(false);														// Lines (no direction tabs)
 		if (vertices_always) renderer_2d->renderVertices(view_scale);							// Vertices
-		renderer_2d->renderThings();															// Things
+		renderer_2d->renderThings(view_scale);													// Things
 		renderer_2d->renderSelection(editor->getSelection(), editor->editMode(), view_scale);	// Selection
 	}
 
