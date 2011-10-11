@@ -36,7 +36,21 @@ void LineInfoOverlay::update(MapLine* line) {
 		info.push_back(S_FMT("Special: %d (%s)", as_id, CHR(theGameConfiguration->actionSpecialName(as_id))));
 
 	// Line args (or sector tag)
-	info.push_back(S_FMT("Sector Tag: %d", line->prop("arg0").getIntValue()));
+	if (theGameConfiguration->getMapFormat() == MAP_HEXEN || theGameConfiguration->getMapFormat() == MAP_UDMF) {
+		int args[5];
+		args[0] = line->prop("arg0");
+		args[1] = line->prop("arg1");
+		args[2] = line->prop("arg2");
+		args[3] = line->prop("arg3");
+		args[4] = line->prop("arg4");
+		string argstr = theGameConfiguration->actionSpecial(as_id).getArgsString(args);
+		if (!argstr.IsEmpty())
+			info.push_back(S_FMT("%s", CHR(argstr)));
+		else
+			info.push_back("No Args");
+	}
+	else
+		info.push_back(S_FMT("Sector Tag: %d", line->prop("arg0").getIntValue()));
 
 	// Line flags
 	//info.push_back(S_FMT("Flags: %s", CHR(theGameConfiguration->lineFlagsString(line->prop("flags")))));

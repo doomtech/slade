@@ -135,6 +135,28 @@ void ActionSpecial::parse(ParseTreeNode* node) {
 	*/
 }
 
+string ActionSpecial::getArgsString(int args[5]) {
+	string ret;
+
+	// Add each arg to the string
+	for (unsigned a = 0; a < 5; a++) {
+		// Skip if the arg name is undefined and the arg value is 0
+		if (args[a] == 0 && this->args[a].name.StartsWith("Arg"))
+			continue;
+
+		ret += this->args[a].name;
+		ret += ": ";
+		ret += this->args[a].valueString(args[a]);
+		ret += ", ";
+	}
+
+	// Cut ending ", "
+	if (!ret.IsEmpty())
+		ret.RemoveLast(2);
+
+	return ret;
+}
+
 string ActionSpecial::stringDesc() {
 	// Init string
 	string ret = S_FMT("\"%s\" in group \"%s\"", CHR(name), CHR(group));

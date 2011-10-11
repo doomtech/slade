@@ -483,10 +483,10 @@ void MapRenderer2D::renderThingsImmediate(double view_scale, float alpha) {
 
 				// Get thing info
 				thing = map->getThing(a);
-				x = thing->xPos();
-				y = thing->yPos();
 				ThingType* tt = theGameConfiguration->thingType(thing->getType());
 				double radius = (tt->getRadius()+1) * 1.3;
+				x = thing->xPos()+(radius*0.05);
+				y = thing->yPos()-(radius*0.05);
 
 				// Draw shadow
 				if (point && radius*2*view_scale <= OpenGL::maxPointSize()) {
@@ -917,8 +917,11 @@ void MapRenderer2D::renderSelection(vector<int>& selection, int mode, float view
 }
 
 void MapRenderer2D::renderFlats(int type) {
-	// Completely unoptimised for now
+	renderFlatsImmediate(type);
+}
 
+void MapRenderer2D::renderFlatsImmediate(int type) {
+	// Completely unoptimised for now
 	if (type > 0)
 		glEnable(GL_TEXTURE_2D);
 
@@ -926,6 +929,10 @@ void MapRenderer2D::renderFlats(int type) {
 	GLTexture* tex = NULL;
 	for (unsigned a = 0; a < map->nSectors(); a++) {
 		MapSector* sector = map->getSector(a);
+
+		// Skip if sector is out of view
+		if (vis_s[a] > 0)
+			continue;
 
 		if (type > 0) {
 			// Get the sector texture
@@ -1105,6 +1112,23 @@ void MapRenderer2D::updateVisibility(fpoint2_t view_tl, fpoint2_t view_br, doubl
 			vis_l[a] |= VIS_ABOVE;
 	}
 	*/
+
+	// Sector visibility
+	if (map->nSectors() != vis_s.size()) {
+		// Number of sectors changed, reset array
+		vis_s.clear();
+		for (unsigned a = 0; a < map->nSectors(); a++)
+			vis_s.push_back(0);
+	}
+	for (unsigned a = 0; a < map->nSectors(); a++) {
+		// Check against sector bounding box
+		bbox_t bbox = map->getSector(a)->boundingBox();
+		vis_s[a] = 0;
+		if (bbox.max.x < view_tl.x) vis_s[a] = VIS_LEFT;
+		if (bbox.max.y < view_tl.y) vis_s[a] = VIS_ABOVE;
+		if (bbox.min.x > view_br.x) vis_s[a] = VIS_RIGHT;
+		if (bbox.min.y > view_br.y) vis_s[a] = VIS_BELOW;
+	}
 
 	// Thing visibility
 	if (map->nThings() != vis_t.size()) {

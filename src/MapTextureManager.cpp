@@ -7,6 +7,8 @@
 #include "ArchiveManager.h"
 #include "MapEditorWindow.h"
 
+CVAR(Int, map_tex_filter, 0, CVAR_SAVE)
+
 MapTextureManager::MapTextureManager(Archive* archive) {
 	// Init variables
 	this->archive = archive;
@@ -25,11 +27,28 @@ GLTexture* MapTextureManager::getTexture(string name) {
 	// Get texture matching name
 	map_tex_t& mtex = textures[name.Upper()];
 
-	// Return it if found
-	if (mtex.texture)
-		return mtex.texture;
+	// Get desired filter type
+	int filter = 1;
+	if (map_tex_filter == 0)
+		filter = GLTexture::NEAREST_LINEAR_MIN;
+	else if (map_tex_filter == 1)
+		filter = GLTexture::LINEAR;
+	else if (map_tex_filter == 2)
+		filter = GLTexture::LINEAR_MIPMAP;
 
-	// Texture not found, look for it
+	// If the texture is loaded
+	if (mtex.texture) {
+		// If the texture filter matches the desired one, return it
+		if (mtex.texture->getFilter() == filter)
+			return mtex.texture;
+		else {
+			// Otherwise, reload the texture
+			delete mtex.texture;
+			mtex.texture = NULL;
+		}
+	}
+
+	// Texture not found or unloaded, look for it
 	Palette8bit* pal = theMainWindow->getPaletteChooser()->getSelectedPalette();
 
 	// Look for stand-alone textures first
@@ -51,6 +70,7 @@ GLTexture* MapTextureManager::getTexture(string name) {
 			format_hint = etex->getType()->extraProps()["image_format"].getStringValue();
 		if (image.open(etex->getMCData(), 0, format_hint)) {
 			mtex.texture = new GLTexture(false);
+			mtex.texture->setFilter(filter);
 			mtex.texture->loadImage(&image, pal);
 		}
 	}
@@ -62,6 +82,7 @@ GLTexture* MapTextureManager::getTexture(string name) {
 		SImage image;
 		if (ctex->toImage(image, archive, pal)) {
 			mtex.texture = new GLTexture(false);
+			mtex.texture->setFilter(filter);
 			mtex.texture->loadImage(&image, pal);
 		}
 	}
@@ -73,9 +94,26 @@ GLTexture* MapTextureManager::getFlat(string name) {
 	// Get flat matching name
 	map_tex_t& mtex = flats[name.Upper()];
 
-	// Return it if found
-	if (mtex.texture)
-		return mtex.texture;
+	// Get desired filter type
+	int filter = 1;
+	if (map_tex_filter == 0)
+		filter = GLTexture::NEAREST_LINEAR_MIN;
+	else if (map_tex_filter == 1)
+		filter = GLTexture::LINEAR;
+	else if (map_tex_filter == 2)
+		filter = GLTexture::LINEAR_MIPMAP;
+
+	// If the texture is loaded
+	if (mtex.texture) {
+		// If the texture filter matches the desired one, return it
+		if (mtex.texture->getFilter() == filter)
+			return mtex.texture;
+		else {
+			// Otherwise, reload the texture
+			delete mtex.texture;
+			mtex.texture = NULL;
+		}
+	}
 
 	// Flat not found, look for it
 	Palette8bit* pal = theMainWindow->getPaletteChooser()->getSelectedPalette();
@@ -88,6 +126,7 @@ GLTexture* MapTextureManager::getFlat(string name) {
 		SImage image;
 		if (Misc::loadImageFromEntry(&image, entry)) {
 			mtex.texture = new GLTexture(false);
+			mtex.texture->setFilter(filter);
 			mtex.texture->loadImage(&image, pal);
 		}
 	}
@@ -98,6 +137,7 @@ GLTexture* MapTextureManager::getFlat(string name) {
 		SImage image;
 		if (ctex->toImage(image, archive, pal)) {
 			mtex.texture = new GLTexture(false);
+			mtex.texture->setFilter(filter);
 			mtex.texture->loadImage(&image, pal);
 		}
 	}
@@ -114,9 +154,26 @@ GLTexture* MapTextureManager::getSprite(string name, string translation, string 
 		hashname += palette.Upper();
 	map_tex_t& mtex = sprites[hashname];
 
-	// Return it if found
-	if (mtex.texture)
-		return mtex.texture;
+	// Get desired filter type
+	int filter = 1;
+	if (map_tex_filter == 0)
+		filter = GLTexture::NEAREST_LINEAR_MIN;
+	else if (map_tex_filter == 1)
+		filter = GLTexture::LINEAR;
+	else if (map_tex_filter == 2)
+		filter = GLTexture::LINEAR;
+
+	// If the texture is loaded
+	if (mtex.texture) {
+		// If the texture filter matches the desired one, return it
+		if (mtex.texture->getFilter() == filter)
+			return mtex.texture;
+		else {
+			// Otherwise, reload the texture
+			delete mtex.texture;
+			mtex.texture = NULL;
+		}
+	}
 
 	// Sprite not found, look for it 
 	Palette8bit* pal = theMainWindow->getPaletteChooser()->getSelectedPalette();
@@ -138,7 +195,8 @@ GLTexture* MapTextureManager::getSprite(string name, string translation, string 
 			}
 		}
 		mtex.texture = new GLTexture(false);
-		mtex.texture->setFilter(GLTexture::NEAREST_LINEAR_MIN);
+		mtex.texture->setFilter(filter);
+		mtex.texture->setTiling(false);
 		mtex.texture->loadImage(&image, pal);
 		return mtex.texture;
 	}

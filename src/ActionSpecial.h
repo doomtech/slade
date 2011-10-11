@@ -26,6 +26,8 @@ public:
 	void	setGroup(string group) { this->group = group; }
 	void	setTagged(bool tagged) { this->tagged = tagged; }
 
+	string	getArgsString(int args[5]);
+
 	void	reset();
 	void	parse(ParseTreeNode* node);
 	string	stringDesc();

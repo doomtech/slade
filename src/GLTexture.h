@@ -18,6 +18,7 @@ private:
 	bool				loaded;
 	bool				allow_split;
 	int					filter;
+	bool				tiling;
 
 	// Some generic/global textures
 	static GLTexture	tex_background;	// Checkerboard background texture
@@ -44,8 +45,10 @@ public:
 	uint32_t	getWidth() { return width; }
 	uint32_t	getHeight() { return height; }
 	int			getFilter() { return filter; }
+	bool		isTiling() { return tiling; }
 	
 	void		setFilter(int filter) { this->filter = filter; }
+	void		setTiling(bool tiling) { this->tiling = tiling; }
 
 	bool	loadImage(SImage* image, Palette8bit* pal = NULL);
 	bool	loadRawData(const uint8_t* data, uint32_t width, uint32_t height);

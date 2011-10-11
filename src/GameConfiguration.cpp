@@ -547,3 +547,7 @@ CONSOLE_COMMAND(testgc, 0) {
 
 	theGameConfiguration->openConfig(game);
 }
+
+CONSOLE_COMMAND(dumpactionspecials, 0) {
+	theGameConfiguration->dumpActionSpecials();
+}

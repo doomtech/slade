@@ -29,6 +29,7 @@ private:
 	vector<uint8_t>	vis_v;
 	vector<uint8_t>	vis_l;
 	vector<uint8_t>	vis_t;
+	vector<uint8_t>	vis_s;
 
 	// Structs
 	struct glvert_t {
@@ -65,6 +66,7 @@ public:
 	void	renderHilight(int item, int type, float fade, float view_scale);
 	void	renderSelection(vector<int>& selection, int type, float view_scale);
 	void	renderFlats(int type = 0);
+	void	renderFlatsImmediate(int type);
 
 	// VBOs
 	void	updateVerticesVBO();

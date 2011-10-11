@@ -51,6 +51,7 @@ GLTexture::GLTexture(bool allow_split) {
 	this->loaded = false;
 	this->allow_split = allow_split;
 	this->filter = NEAREST;
+	this->tiling = true;
 }
 
 /* GLTexture::~GLTexture
@@ -84,6 +85,16 @@ bool GLTexture::loadData(const uint8_t* data, uint32_t width, uint32_t height, b
 	// Generate the texture id
 	glGenTextures(1, &ntex.id);
 	glBindTexture(GL_TEXTURE_2D, ntex.id);
+
+	// Set texture params
+	if (tiling) {
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	}
+	else {
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	}
 
 	// Generate the texture
 	if (filter == LINEAR) {

@@ -49,6 +49,9 @@ public:
 		return instance;
 	}
 
+	string	getName() { return name; }
+	int		getMapFormat() { return map_format; }
+
 	void	init();
 
 	// Config #include handling
@@ -69,7 +72,6 @@ public:
 
 	// Thing types
 	ThingType*		thingType(unsigned type);
-	//ThingType&		thingType(unsigned type) { return thing_types[type]; }
 
 	// Flags
 	string		thingFlagsString(int flags);
