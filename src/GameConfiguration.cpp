@@ -26,6 +26,7 @@ CVAR(String, game_configuration, "", CVAR_SAVE)
  *******************************************************************/
 
 GameConfiguration::GameConfiguration() {
+	game_filter = "";
 }
 
 GameConfiguration::~GameConfiguration() {
@@ -221,6 +222,23 @@ void GameConfiguration::readThingTypes(ParseTreeNode* node) {
 	child = (ParseTreeNode*)node->getChild("sprite");
 	if (child) sprite = child->getStringValue();
 
+	// Args
+	string arg1 = "Arg1";
+	child = (ParseTreeNode*)node->getChild("arg1");
+	if (child) arg1 = child->getStringValue();
+	string arg2 = "Arg2";
+	child = (ParseTreeNode*)node->getChild("arg2");
+	if (child) arg2 = child->getStringValue();
+	string arg3 = "Arg3";
+	child = (ParseTreeNode*)node->getChild("arg3");
+	if (child) arg3 = child->getStringValue();
+	string arg4 = "Arg4";
+	child = (ParseTreeNode*)node->getChild("arg4");
+	if (child) arg4 = child->getStringValue();
+	string arg5 = "Arg5";
+	child = (ParseTreeNode*)node->getChild("arg5");
+	if (child) arg5 = child->getStringValue();
+
 
 	// --- Go through all child nodes ---
 	for (unsigned a = 0; a < node->nChildren(); a++) {
@@ -244,13 +262,18 @@ void GameConfiguration::readThingTypes(ParseTreeNode* node) {
 			thing_types[type].type->reset();
 
 			// Apply group defaults
-			thing_types[type].type->colour = col_default;
-			thing_types[type].type->radius = radius_default;
-			thing_types[type].type->height = height_default;
-			thing_types[type].type->angled = angle;
-			thing_types[type].type->hanging = hanging;
-			thing_types[type].type->group = groupname;
-			thing_types[type].type->sprite = sprite;
+			thing_types[type].type->colour	= col_default;
+			thing_types[type].type->radius	= radius_default;
+			thing_types[type].type->height	= height_default;
+			thing_types[type].type->angled	= angle;
+			thing_types[type].type->hanging	= hanging;
+			thing_types[type].type->group	= groupname;
+			thing_types[type].type->sprite	= sprite;
+			thing_types[type].type->args[0].name = arg1;
+			thing_types[type].type->args[1].name = arg2;
+			thing_types[type].type->args[2].name = arg3;
+			thing_types[type].type->args[3].name = arg4;
+			thing_types[type].type->args[4].name = arg5;
 			
 			// Check for simple definition
 			if (child->isLeaf())
@@ -316,6 +339,10 @@ bool GameConfiguration::readConfiguration(string& cfg, string source) {
 				map_format = MAP_DOOM;
 			}
 		}
+
+		// Game filter
+		else if (S_CMPNOCASE(node->getName(), "game_filter"))
+			game_filter = node->getStringValue();
 	}
 
 	// Go through all other config sections

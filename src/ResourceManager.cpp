@@ -462,6 +462,11 @@ ArchiveEntry* ResourceManager::getPatchEntry(string patch, string nspace, Archiv
 				res.entries[a]->getParent() == priority->getParentArchive()))
 				return res.entries[a];
 
+			// Regardless of priority, if the first entry is not in the chosen namespace but
+			// the current entry is, then set it so that we'll be able to return something valid
+			if (!nspace.IsEmpty() && !entry->isInNamespace(nspace) && res.entries[a]->isInNamespace(nspace))
+				entry = res.entries[a];
+
 			// Otherwise, if it's in a 'later' archive than the current resource entry, set it
 			if (theArchiveManager->archiveIndex(entry->getParent()) <=
 				theArchiveManager->archiveIndex(res.entries[a]->getParent()))

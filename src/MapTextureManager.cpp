@@ -146,6 +146,10 @@ GLTexture* MapTextureManager::getFlat(string name) {
 }
 
 GLTexture* MapTextureManager::getSprite(string name, string translation, string palette) {
+	// Don't bother looking for nameless sprites
+	if (name.IsEmpty())
+		return NULL;
+
 	// Get sprite matching name
 	string hashname = name.Upper();
 	if (!translation.IsEmpty())

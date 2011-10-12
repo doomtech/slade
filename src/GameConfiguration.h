@@ -19,6 +19,7 @@ class GameConfiguration {
 private:
 	string			name;
 	int				map_format;
+	string			game_filter;
 	ASpecialMap		action_specials;
 	ThingTypeMap	thing_types;
 	ThingType		ttype_unknown;
