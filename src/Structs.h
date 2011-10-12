@@ -59,12 +59,24 @@ struct fpoint2_t {
 		return sqrt((x * x) + (y * y));
 	}
 
-	fpoint2_t normalize() {
+	fpoint2_t normalized() {
 		float mag = magnitude();
 		if (mag == 0.0f)
 			return fpoint2_t(0.0f, 0.0f);
 		else
 			return fpoint2_t(x / mag, y / mag);
+	}
+
+	void normalize() {
+		double mag = magnitude();
+		if (mag == 0) {
+			x = 0;
+			y = 0;
+		}
+		else {
+			x /= mag;
+			y /= mag;
+		}
 	}
 
 	double dot(fpoint2_t vec) {
@@ -223,15 +235,17 @@ struct rgba_t {
 			return col_equal;
 	}
 
-	void set_gl() {
+	void set_gl(bool set_blend = true) {
 		// Colour
-		glColor4f(fr(), fg(), fb(), fa());
+		glColor4ub(r, g, b, a);
 
 		// Blend
-		if (blend == 0)
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		else if (blend == 1)
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+		if (set_blend) {
+			if (blend == 0)
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			else if (blend == 1)
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+		}
 	}
 
 	// Amplify/fade colour components by absolute amounts
@@ -548,6 +562,55 @@ struct plane_t {
 		b = b / mag;
 		c = c / mag;
 		d = d / mag;
+	}
+};
+
+
+// bbox_t: A simple bounding box with related functions
+struct bbox_t {
+	fpoint2_t	min;
+	fpoint2_t	max;
+
+	bbox_t() { reset(); }
+
+	void reset() {
+		min.set(0, 0);
+		max.set(0, 0);
+	}
+
+	void extend(double x, double y) {
+		// Init bbox if it has been reset last
+		if (min.x == 0 && min.y == 0 && max.x == 0 && max.y == 0) {
+			min.set(x, y);
+			max.set(x, y);
+			return;
+		}
+
+		// Extend to fit the point [x,y]
+		if (x < min.x)
+			min.x = x;
+		if (x > max.x)
+			max.x = x;
+		if (y < min.y)
+			min.y = y;
+		if (y > max.y)
+			max.y = y;
+	}
+
+	bool point_within(double x, double y) {
+		return (x >= min.x && x <= max.x && y >= min.y && y <= max.y);
+	}
+
+	bool is_within(fpoint2_t bmin, fpoint2_t bmax) {
+		return (min.x >= bmin.x && max.x <= bmax.x && min.y >= bmin.y && max.y <= bmax.y);
+	}
+
+	bool is_valid() {
+		return ((max.x - min.x > 0) && (max.y - min.y) > 0);
+	}
+
+	fpoint2_t size() {
+		return fpoint2_t(max.x - min.x, max.y - min.y);
 	}
 };
 

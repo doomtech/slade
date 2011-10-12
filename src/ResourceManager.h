@@ -63,11 +63,15 @@ WX_DECLARE_STRING_HASH_MAP(TextureResource, TextureResourceMap);
 
 class ResourceManager : public Listener, public Announcer {
 private:
+	EntryResourceMap	palettes;
 	EntryResourceMap	patches;
 	EntryResourceMap	graphics;
-	TextureResourceMap	textures;
+	EntryResourceMap	flats;
+	EntryResourceMap	satextures;	// Stand Alone textures (e.g., between TX_ or T_ markers)
+	TextureResourceMap	textures;	// Composite textures (defined in a TEXTUREx/TEXTURES lump)
 
 	static ResourceManager*	instance;
+	static string Doom64HashTable[65536];
 
 public:
 	ResourceManager();
@@ -91,8 +95,12 @@ public:
 
 	void	getAllTextures(vector<TextureResource::tex_res_t>& list, Archive* priority, Archive* ignore = NULL);
 
+	ArchiveEntry*	getPaletteEntry(string palette, Archive* priority = NULL);
 	ArchiveEntry*	getPatchEntry(string patch, string nspace = "patches", Archive* priority = NULL);
+	ArchiveEntry*	getFlatEntry(string flat, Archive* priority = NULL);
+	ArchiveEntry*	getTextureEntry(string texture, string nspace = "textures", Archive* priority = NULL);
 	CTexture*		getTexture(string texture, Archive* priority = NULL, Archive* ignore = NULL);
+	string			getTextureName(uint16_t hash) { return Doom64HashTable[hash]; }
 
 	void	onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data);
 };

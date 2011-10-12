@@ -314,6 +314,7 @@ void ArchiveManagerPanel::populateMapList(Archive* archive) {
 			case MAP_HEXEN:		name = "(H) "; break;
 			case MAP_DOOM64:	name = "(K) "; break;
 			case MAP_UDMF:		name = "(U) "; break;
+			default:			name = "(?) "; break;
 		}
 
 		// Add map name to string
@@ -1430,6 +1431,7 @@ void ArchiveManagerPanel::onListArchivesChanged(wxListEvent& e) {
 		return;
 
 	populateMapList(selected_archive);
+	current_maps = selected_archive;
 }
 
 /* ArchiveManagerPanel::onListArchivesActivated

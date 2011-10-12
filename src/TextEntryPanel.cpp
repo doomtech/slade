@@ -61,18 +61,21 @@ TextEntryPanel::TextEntryPanel(wxWindow* parent)
 	sizer_bottom->Add(new wxStaticText(this, -1, "Text Language:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
 	sizer_bottom->Add(choice_text_language, 0, wxEXPAND);
 
+	// Add 'Word Wrap' checkbox to top sizer
+	sizer_top->AddStretchSpacer();
+	cb_wordwrap = new wxCheckBox(this, -1, "Word Wrapping");
+	sizer_top->Add(cb_wordwrap, 0, wxEXPAND, 0);
 
 	// Add 'Find/Replace' button to top sizer
-	sizer_top->AddStretchSpacer();
 	btn_find_replace = new wxButton(this, -1, "Find + Replace");
 	sizer_top->Add(btn_find_replace, 0, wxEXPAND, 0);
-
 
 	// Bind events
 	choice_text_language->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &TextEntryPanel::onChoiceLanguageChanged, this);
 	text_area->Bind(wxEVT_STC_CHANGE, &TextEntryPanel::onTextModified, this);
 	btn_find_replace->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &TextEntryPanel::onBtnFindReplace, this);
 	text_area->Bind(wxEVT_STC_UPDATEUI, &TextEntryPanel::onUpdateUI, this);
+	cb_wordwrap->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &TextEntryPanel::onWordWrapChanged, this);
 
 	Layout();
 }
@@ -244,6 +247,17 @@ void TextEntryPanel::onChoiceLanguageChanged(wxCommandEvent& e) {
 		entry->exProp("TextLanguage") = tl->getId();
 	else
 		entry->exProps().removeProperty("TextLanguage");
+}
+
+/* TextEntryPanel::onWordWrapChanged
+ * Called when the "Word Wrap" checkbox is clicked
+ *******************************************************************/
+void TextEntryPanel::onWordWrapChanged(wxCommandEvent& e) {
+	if (cb_wordwrap->IsChecked())
+		text_area->SetWrapMode(wxSTC_WRAP_WORD);
+	else
+		text_area->SetWrapMode(wxSTC_WRAP_NONE);
+	setModified(false);
 }
 
 /* TextEntryPanel::onUpdateUI

@@ -84,11 +84,10 @@ void PaletteChooser::onPaletteChanged(wxCommandEvent& e) {
  *******************************************************************/
 void PaletteChooser::setGlobalFromArchive(Archive* archive, int lump) {
 	if (!archive)
-		return;
-
-	if (!Misc::loadPaletteFromArchive(&pal_global, archive, lump) &&
-		!(archive->getParentArchive() && Misc::loadPaletteFromArchive(&pal_global, archive->getParentArchive(), lump)))
 		pal_global.copyPalette(thePaletteManager->globalPalette());
+
+	else if (!Misc::loadPaletteFromArchive(&pal_global, archive, lump))
+		setGlobalFromArchive(archive->getParentArchive(), lump);
 }
 
 /* PaletteChooser::getSelectedPalette

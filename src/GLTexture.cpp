@@ -50,6 +50,8 @@ CVAR(String, bgtx_colour2, "#505060", CVAR_SAVE)
 GLTexture::GLTexture(bool allow_split) {
 	this->loaded = false;
 	this->allow_split = allow_split;
+	this->filter = NEAREST;
+	this->tiling = true;
 }
 
 /* GLTexture::~GLTexture
@@ -84,10 +86,43 @@ bool GLTexture::loadData(const uint8_t* data, uint32_t width, uint32_t height, b
 	glGenTextures(1, &ntex.id);
 	glBindTexture(GL_TEXTURE_2D, ntex.id);
 
+	// Set texture params
+	if (tiling) {
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	}
+	else {
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	}
+
 	// Generate the texture
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D, 0, 4, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	if (filter == LINEAR) {
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexImage2D(GL_TEXTURE_2D, 0, 4, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	}
+	else if (filter == MIPMAP || filter == LINEAR_MIPMAP) {
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	}
+	else if (filter == NEAREST_MIPMAP) {
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	}
+	else if (filter == NEAREST_LINEAR_MIN) {
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexImage2D(GL_TEXTURE_2D, 0, 4, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	}
+	else {
+		// Default to NEAREST
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexImage2D(GL_TEXTURE_2D, 0, 4, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	}
 
 	// Update variables
 	loaded = true;
@@ -356,7 +391,7 @@ bool GLTexture::genChequeredTexture(uint8_t block_size, rgba_t col1, rgba_t col2
  *******************************************************************/
 bool GLTexture::bind() {
 	// Check texture is loaded
-	if (!loaded)
+	if (!loaded || tex.size() == 0)
 		return false;
 
 	// Bind the texture
@@ -508,8 +543,8 @@ GLTexture& GLTexture::bgTex() {
 	if (!tex_background.isLoaded()) {
 		wxColour col1(bgtx_colour1);
 		wxColour col2(bgtx_colour2);
-		tex_background.genChequeredTexture(8, 
-			rgba_t(col1.Red(), col1.Green(), col1.Blue(), 255), 
+		tex_background.genChequeredTexture(8,
+			rgba_t(col1.Red(), col1.Green(), col1.Blue(), 255),
 			rgba_t(col2.Red(), col2.Green(), col2.Blue(), 255));
 	}
 	return tex_background;

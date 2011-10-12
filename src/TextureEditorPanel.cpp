@@ -32,6 +32,7 @@
 #include "TextureEditorPanel.h"
 #include "Icons.h"
 #include "TextureXEditor.h"
+#include "KeyBind.h"
 #include <wx/gbsizer.h>
 
 
@@ -848,91 +849,85 @@ void TextureEditorPanel::onTexCanvasDragEnd(wxCommandEvent& e) {
  * Called when a key is pressed within the texture canvas
  *******************************************************************/
 void TextureEditorPanel::onTexCanvasKeyDown(wxKeyEvent& e) {
-	bool handled = false;
+	// Check if keypress matches any keybinds
+	wxArrayString binds = KeyBind::getBinds(KeyBind::asKeyPress(e.GetKeyCode(), e.GetModifiers()));
 
 	// Check for alt key
 	if (e.GetKeyCode() == WXK_ALT)
 		alt_press = true;
 
-	// Check for movement keys
+	// Go through matching binds
 	int x_movement = 0;
 	int y_movement = 0;
-	bool move = false;
-	if (e.GetKeyCode() == WXK_UP) {
-		if (e.GetModifiers() == wxMOD_CMD)
-			y_movement = -1;
-		else
-			y_movement = -8;
+	bool handled = false;
+	for (unsigned a = 0; a < binds.size(); a++) {
+		string name = binds[a];
 
-		move = true;
-	}
-	else if (e.GetKeyCode() == WXK_DOWN) {
-		if (e.GetModifiers() == wxMOD_CMD)
-			y_movement = 1;
-		else
-			y_movement = 8;
-
-		move = true;
-	}
-	else if (e.GetKeyCode() == WXK_LEFT) {
-		if (e.GetModifiers() == wxMOD_CMD)
+		// Move patch left
+		if (name == "txed_patch_left")
 			x_movement = -1;
-		else
+		else if (name == "txed_patch_left8")
 			x_movement = -8;
 
-		move = true;
-	}
-	else if (e.GetKeyCode() == WXK_RIGHT) {
-		if (e.GetModifiers() == wxMOD_CMD)
+		// Move patch up
+		else if (name == "txed_patch_up")
+			y_movement = -1;
+		else if (name == "txed_patch_up8")
+			y_movement = -8;
+
+		// Move patch right
+		else if (name == "txed_patch_right")
 			x_movement = 1;
-		else
+		else if (name == "txed_patch_right8")
 			x_movement = 8;
 
-		move = true;
-	}
+		// Move patch down
+		else if (name == "txed_patch_down")
+			y_movement = 1;
+		else if (name == "txed_patch_down8")
+			y_movement = 8;
 
-	// --- Shortcut keys ---
+		// Add patch
+		else if (name == "txed_patch_add") {
+			hack_nodrag = true;
+			addPatch();
+			handled = true;
+		}
 
-	// Add patch (INS)
-	else if (e.GetKeyCode() == WXK_INSERT) {
-		hack_nodrag = true;
-		addPatch();
-		handled = true;
-	}
+		// Delete patch
+		else if (name == "txed_patch_delete") {
+			removePatch();
+			handled = true;
+		}
 
-	// Delete patch (DEL)
-	else if (e.GetKeyCode() == WXK_DELETE) {
-		removePatch();
-		handled = true;
-	}
+		// Replace patch
+		else if (name == "txed_patch_replace") {
+			hack_nodrag = true;
+			replacePatch();
+			handled = true;
+		}
 
-	// Replace patch (Ctrl+R or F2)
-	else if ((e.GetKeyCode() == 'R' && e.GetModifiers() == wxMOD_CMD) || (e.GetKeyCode() == WXK_F2)) {
-		hack_nodrag = true;
-		replacePatch();
-		handled = true;
-	}
+		// Duplicate patch
+		else if (name == "txed_patch_duplicate") {
+			duplicatePatch();
+			handled = true;
+		}
 
-	// Duplicate patch (Ctrl+D)
-	else if (e.GetKeyCode() == 'D' && e.GetModifiers() == wxMOD_CMD) {
-		duplicatePatch();
-		handled = true;
-	}
+		// Bring patch forward
+		else if (name == "txed_patch_forward") {
+			patchForward();
+			handled = true;
+		}
 
-	// Bring patch forward (])
-	else if (e.GetKeyCode() == ']') {
-		patchForward();
-		handled = true;
-	}
-
-	// Send patch back ([)
-	else if (e.GetKeyCode() == '[') {
-		patchBack();
-		handled = true;
+		// Send patch back
+		else if (name == "txed_patch_back") {
+			patchBack();
+			handled = true;
+		}
 	}
 
 	// Move patches if needed
-	if (move) {
+	if (x_movement != 0 || y_movement != 0) {
 		// Do patch duplicate if alt is pressed
 		if (e.GetModifiers() == wxMOD_ALT && alt_press) {
 			duplicatePatch(0, 0);

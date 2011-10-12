@@ -43,6 +43,7 @@ private:
 	WMFileBrowser*		file_browser;
 	wxButton*			btn_browser_open;
 	wxMenu*				menu_recent;
+	Archive*			current_maps;
 
 public:
 	ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_archives);

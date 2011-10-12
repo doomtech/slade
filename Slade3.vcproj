@@ -437,11 +437,27 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\ColourConfiguration.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ColourConfiguration.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\Compression.cpp"
 					>
 				</File>
 				<File
 					RelativePath=".\src\Compression.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\KeyBind.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\KeyBind.h"
 					>
 				</File>
 				<File

@@ -35,16 +35,7 @@
 #include "Main.h"
 #include "WxStuff.h"
 #include "ListView.h"
-
-
-/*******************************************************************
- * VARIABLES
- *******************************************************************/
-// Eventually these should go into the global colour configuration
-wxColor col_new(0, 150, 0);
-wxColor col_modified(0, 80, 180);
-wxColor col_locked(180, 50, 0);
-wxColor col_error(230, 30, 0);
+#include "ColourConfiguration.h"
 
 
 /*******************************************************************
@@ -160,16 +151,16 @@ bool ListView::setItemStatus(int item, int status) {
 			SetItemTextColour(item, wxSystemSettings::GetColour(wxSYS_COLOUR_LISTBOXTEXT));
 			break;
 		case LV_STATUS_MODIFIED:
-			SetItemTextColour(item, col_modified);
+			SetItemTextColour(item, WXCOL(ColourConfiguration::getColour("modified")));
 			break;
 		case LV_STATUS_NEW:
-			SetItemTextColour(item, col_new);
+			SetItemTextColour(item, WXCOL(ColourConfiguration::getColour("new")));
 			break;
 		case LV_STATUS_LOCKED:
-			SetItemTextColour(item, col_locked);
+			SetItemTextColour(item, WXCOL(ColourConfiguration::getColour("locked")));
 			break;
 		case LV_STATUS_ERROR:
-			SetItemTextColour(item, col_error);
+			SetItemTextColour(item, WXCOL(ColourConfiguration::getColour("error")));
 	}
 
 	return true;
@@ -378,37 +369,4 @@ bool ListView::updateSize() {
 	SetSizeHints(width, -1);
 
 	return true;
-}
-
-
-/*******************************************************************
- * LISTVIEW STATIC FUNCTIONS
- *******************************************************************/
-
-/* ListView::colourModified
- * Returns the 'modified' colour
- *******************************************************************/
-wxColour ListView::colourModified() {
-	return col_modified;
-}
-
-/* ListView::colourNew
- * Returns the 'new' colour
- *******************************************************************/
-wxColour ListView::colourNew() {
-	return col_new;
-}
-
-/* ListView::colourLocked
- * Returns the 'locked' colour
- *******************************************************************/
-wxColour ListView::colourLocked() {
-	return col_locked;
-}
-
-/* ListView::colourError
- * Returns the 'error' colour
- *******************************************************************/
-wxColour ListView::colourError() {
-	return col_error;
 }

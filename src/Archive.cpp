@@ -500,6 +500,10 @@ int	Archive::entryIndex(ArchiveEntry* entry, ArchiveTreeNode* dir) {
  * doesn't exist
  *******************************************************************/
 ArchiveEntry* Archive::entryAtPath(string path) {
+	// Remove leading / from path if needed
+	if (path.StartsWith("/"))
+		path.Remove(0, 1);
+
 	// Get path as wxFileName for processing
 	wxFileName fn(path);
 

@@ -33,6 +33,14 @@
 #include "Main.h"
 #include "Parser.h"
 #include "Console.h"
+#include <wx/regex.h>
+
+
+/*******************************************************************
+ * VARIABLES
+ *******************************************************************/
+wxRegEx re_integer("[+-]?[1-9]+[0-9]* | 0[0-9]+ | 0x[0-9A-Fa-f]+");
+wxRegEx re_float("[+-]?[0-9]+'.'[0-9]*([eE][+-]?[0-9]+)?");
 
 
 /*******************************************************************
@@ -43,12 +51,21 @@
  * ParseTreeNode class constructor
  *******************************************************************/
 ParseTreeNode::ParseTreeNode(ParseTreeNode* parent) : STreeNode(parent) {
+	allowDup(true);
 }
 
 /* ParseTreeNode::~ParseTreeNode
  * ParseTreeNode class destructor
  *******************************************************************/
 ParseTreeNode::~ParseTreeNode() {
+}
+
+Property ParseTreeNode::getValue(unsigned index) {
+	// Check index
+	if (index >= values.size())
+		return Property(false);
+
+	return values[index];
 }
 
 /* ParseTreeNode::getStringValue
@@ -60,7 +77,7 @@ string ParseTreeNode::getStringValue(unsigned index) {
 	if (index >= values.size())
 		return wxEmptyString;
 
-	return values[index];
+	return values[index].getStringValue();
 }
 
 /* ParseTreeNode::getStringValue
@@ -72,9 +89,7 @@ int ParseTreeNode::getIntValue(unsigned index) {
 	if (index >= values.size())
 		return 0;
 
-	long val;
-	values[index].ToLong(&val);
-	return val;
+	return (int)values[index];
 }
 
 /* ParseTreeNode::getStringValue
@@ -86,35 +101,28 @@ bool ParseTreeNode::getBoolValue(unsigned index) {
 	if (index >= values.size())
 		return false;
 
-	if (S_CMPNOCASE(values[index], "false") ||
-		S_CMPNOCASE(values[index], "0") ||
-		S_CMPNOCASE(values[index], "no"))
-		return false;
-	else
-		return true;
+	return (bool)values[index];
 }
 
 /* ParseTreeNode::getStringValue
  * Returns the node's value at [index] as a float. If [index] is
  * out of range, returns 0.0f
  *******************************************************************/
-float ParseTreeNode::getFloatValue(unsigned index) {
+double ParseTreeNode::getFloatValue(unsigned index) {
 	// Check index
 	if (index >= values.size())
 		return 0.0f;
 
-	double val;
-	values[index].ToDouble(&val);
-	return (float)val;
+	return (double)values[index];
 }
 
 /* ParseTreeNode::parse
  * Parses formatted text data. Current valid formatting is:
- * child = value;
- * child = value1, value2, ...;
- * child = { value1, value2, ... }
- * child { grandchild = value; etc... }
- * child : inherited { ... }
+ * (type) child = value;
+ * (type) child = value1, value2, ...;
+ * (type) child = { value1, value2, ... }
+ * (type) child { grandchild = value; etc... }
+ * (type) child : inherited { ... }
  * All values are read as strings, but can be retrieved as string,
  * int, bool or float.
  *******************************************************************/
@@ -136,6 +144,14 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 		// Check next token to determine what we're doing
 		string next = tz.peekToken();
 
+		// Check for type+name pair
+		string type = "";
+		if (next != "=" && next != "{" && next != ";" && next != ":") {
+			type = name;
+			name = tz.getToken();
+			next = tz.peekToken();
+		}
+
 		// Assignment
 		if (S_CMP(next, "=")) {
 			// Skip =
@@ -143,6 +159,7 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 
 			// Create item node
 			ParseTreeNode* child = (ParseTreeNode*)addChild(name);
+			child->type = type;
 
 			// Check type of assignment list
 			token = tz.getToken();
@@ -158,6 +175,29 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 				if (S_CMP(token, list_end) && !tz.quotedString())
 					break;
 
+				// Setup value
+				Property value;
+				
+				// Detect value type
+				if (tz.quotedString())					// Quoted string
+					value = token;
+				else if (S_CMPNOCASE(token, "true"))	// Boolean (true)
+					value = true;
+				else if (S_CMPNOCASE(token, "false"))	// Boolean (false)
+					value = false;
+				else if (re_integer.Matches(token)) {	// Integer
+					long val;
+					token.ToLong(&val);
+					value = (int)val;
+				}
+				else if (re_float.Matches(token)) {		// Floating point
+					double val;
+					token.ToDouble(&val);
+					value = (double)val;
+				}
+				else									// Unknown, just treat as string
+					value = token;
+				
 				// Add value
 				child->values.push_back(token);
 
@@ -165,7 +205,9 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 				if (S_CMP(tz.peekToken(), ","))
 					tz.getToken();	// Skip it
 				else if (!(S_CMP(tz.peekToken(), list_end))) {
-					wxLogMessage("Parsing error: Expected \",\" or \"%s\", got \"%s\" in %s (line %d)", CHR(list_end), CHR(tz.getToken()), CHR(tz.getName()), tz.lineNo());
+					string token = tz.getToken();
+					string name = tz.getName();
+					wxLogMessage("Parsing error: Expected \",\" or \"%s\", got \"%s\" in %s (line %d)", CHR(list_end), CHR(token), CHR(name), tz.lineNo());
 					return false;
 				}
 
@@ -177,6 +219,7 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 		else if (S_CMP(next, "{")) {
 			// Add child node
 			ParseTreeNode* child = (ParseTreeNode*)addChild(name);
+			child->type = type;
 
 			// Skip {
 			tz.getToken();
@@ -189,7 +232,8 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 		// Child node (with no values/children)
 		else if (S_CMP(next, ";")) {
 			// Add child node
-			addChild(name);
+			ParseTreeNode* child = (ParseTreeNode*)addChild(name);
+			child->type = type;
 
 			// Skip ;
 			tz.getToken();
@@ -207,6 +251,7 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 			if (tz.checkToken("{")) {
 				// Add child node
 				ParseTreeNode* child = (ParseTreeNode*)addChild(name);
+				child->type = type;
 
 				// Set its inheritance
 				child->inherit = inherit;
@@ -281,13 +326,22 @@ Parser::~Parser() {
  * 		</base>
  * 	</root>
  *******************************************************************/
-bool Parser::parseText(MemChunk& mc) {
+bool Parser::parseText(MemChunk& mc, string source) {
 	Tokenizer tz;
-
-	string source = "memory chunk";
 
 	// Open the given text data
 	if (!tz.openMem(&mc, source)) {
+		wxLogMessage("Unable to open text data for parsing");
+		return false;
+	}
+
+	// Do parsing
+	return pt_root->parse(tz);
+}
+bool Parser::parseText(string& text, string source) {
+	// Open the given text data
+	Tokenizer tz;
+	if (!tz.openString(text, 0, 0, source)) {
 		wxLogMessage("Unable to open text data for parsing");
 		return false;
 	}

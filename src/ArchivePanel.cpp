@@ -57,6 +57,7 @@
 #include "MainWindow.h"
 #include "TranslationEditorDialog.h"
 #include "SFileDialog.h"
+#include "KeyBind.h"
 #include <wx/aui/auibook.h>
 #include <wx/aui/auibar.h>
 #include <wx/filename.h>
@@ -1263,9 +1264,6 @@ bool ArchivePanel::dSndWavConvert() {
 		// Convert Doom Sound -> WAV if the entry is Doom Sound format
 		if (selection[a]->getType()->getFormat() == "snd_doom")
 			worked = Conversions::doomSndToWav(selection[a]->getMCData(), wav);
-		// Or Doom 64 SFX format
-		else if (selection[a]->getType()->getFormat() == "snd_doom64")
-			worked = Conversions::d64SfxToWav(selection[a]->getMCData(), wav);
 		// Or Creative Voice File format
 		else if (selection[a]->getType()->getFormat() == "snd_voc")
 			worked = Conversions::vocToWav(selection[a]->getMCData(), wav);
@@ -2048,58 +2046,99 @@ void ArchivePanel::onEntryListRightClick(wxListEvent& e) {
  * Called when a key is pressed on the entry list
  *******************************************************************/
 void ArchivePanel::onEntryListKeyDown(wxKeyEvent& e) {
-	// Rename entry (Ctrl+R or F2)
-	if ((e.GetKeyCode() == 'R' && e.GetModifiers() == wxMOD_CMD) || e.GetKeyCode() == WXK_F2)
-		renameEntry();
+	// Check if keypress matches any keybinds
+	wxArrayString binds = KeyBind::getBinds(KeyBind::asKeyPress(e.GetKeyCode(), e.GetModifiers()));
 
-	// Delete entry (Delete)
-	else if (e.GetKeyCode() == WXK_DELETE)
-		deleteEntry();
+	// Go through matching binds
+	for (unsigned a = 0; a < binds.size(); a++) {
+		string name = binds[a];
 
-	// Copy entry (Ctrl+C)
-	else if (e.GetKeyCode() == 'C' && e.GetModifiers() == wxMOD_CMD)
-		copyEntry();
+		// --- General ---
 
-	// Cut entry (Ctrl+X)
-	else if (e.GetKeyCode() == 'X' && e.GetModifiers() == wxMOD_CMD)
-		cutEntry();
+		// Copy
+		if (name == "copy") {
+			copyEntry();
+			return;
+		}
 
-	// Paste entry (Ctrl+V)
-	else if (e.GetKeyCode() == 'V' && e.GetModifiers() == wxMOD_CMD)
-		pasteEntry();
+		// Cut
+		else if (name == "cut") {
+			cutEntry();
+			return;
+		}
 
-	// Import to entry (Ctrl+I)
-	else if (e.GetKeyCode() == 'I' && e.GetModifiers() == wxMOD_CMD)
-		importEntry();
+		// Paste
+		else if (name == "paste") {
+			pasteEntry();
+			return;
+		}
 
-	// Export entry (Ctrl+E)
-	else if (e.GetKeyCode() == 'E' && e.GetModifiers() == wxMOD_CMD)
-		exportEntry();
-
-	// Move entry up (Ctrl+U or Ctrl+Up Arrow)
-	else if (e.GetModifiers() == wxMOD_CMD && (e.GetKeyCode() == 'U' || e.GetKeyCode() == WXK_UP))
-		moveUp();
-
-	// Move entry down (Ctrl+D or Ctrl+Down Arrow)
-	else if (e.GetModifiers() == wxMOD_CMD && (e.GetKeyCode() == 'D' || e.GetKeyCode() == WXK_DOWN))
-		moveDown();
-
-	// Select all entries (Ctrl+A)
-	else if (e.GetKeyCode() == 'A' && e.GetModifiers() == wxMOD_CMD)
-		entry_list->selectAll();
-
-	// New entry (Ctrl+N)
-	else if (e.GetKeyCode() == 'N' && e.GetModifiers() == wxMOD_CMD)
-		newEntry();
-
-	// Up directory (backspace)
-	else if (e.GetKeyCode() == WXK_BACK)
-		entry_list->goUpDir();
+		// Select All
+		else if (name == "select_all") {
+			entry_list->selectAll();
+			return;
+		}
 
 
-	// Not handled here, send off to be handled by a parent window
-	else
-		e.Skip();
+		// --- Entry list specific ---
+
+		// New Entry
+		else if (name == "el_new") {
+			newEntry();
+			return;
+		}
+
+		// Rename Entry
+		else if (name == "el_rename") {
+			renameEntry();
+			return;
+		}
+
+		// Delete Entry
+		else if (name == "el_delete") {
+			deleteEntry();
+			return;
+		}
+
+		// Move Entry up
+		else if (name == "el_move_up") {
+			moveUp();
+			return;
+		}
+
+		// Move Entry down
+		else if (name == "el_move_down") {
+			moveDown();
+			return;
+		}
+
+		// Import to Entry
+		else if (name == "el_import") {
+			importEntry();
+			return;
+		}
+
+		// Import Files
+		else if (name == "el_import_files") {
+			importFiles();
+			return;
+		}
+
+		// Export Entry
+		else if (name == "el_export") {
+			exportEntry();
+			return;
+		}
+
+		// Up directory
+		else if (name == "el_up_dir") {
+			entry_list->goUpDir();
+			return;
+		}
+	}
+
+	// Not handled, send to parent
+	e.Skip();
 }
 
 /* ArchivePanel::onEntryListActivated

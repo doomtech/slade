@@ -167,8 +167,6 @@ bool AudioEntryPanel::open() {
 	MemChunk convdata;
 	if (entry->getType()->getFormat() == "snd_doom")			// Doom Sound -> WAV
 		Conversions::doomSndToWav(mcdata, convdata);
-	else if (entry->getType()->getFormat() == "snd_doom64")		// Doom 64 SFX -> WAV
-		Conversions::d64SfxToWav(mcdata, convdata);
 	else if (entry->getType()->getFormat() == "snd_voc")		// Creative Voice File -> WAV
 		Conversions::vocToWav(mcdata, convdata);
 	else if (entry->getType()->getFormat() == "snd_bloodsfx")	// Creative Voice File -> WAV

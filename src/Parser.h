@@ -4,12 +4,14 @@
 
 #include "Tree.h"
 #include "Tokenizer.h"
+#include "Property.h"
 
 class ParseTreeNode : public STreeNode {
 private:
-	string			name;
-	string			inherit;
-	vector<string>	values;
+	string				name;
+	string				inherit;
+	string				type;
+	vector<Property>	values;
 
 protected:
 	STreeNode*	createChild(string name) { ParseTreeNode* ret = new ParseTreeNode(); ret->setName(name); return ret; }
@@ -21,11 +23,13 @@ public:
 	string		getName() { return name; }
 	void		setName(string name) { this->name = name; }
 	string		getInherit() { return inherit; }
+	string		getType() { return type; }
 	unsigned	nValues() { return values.size(); }
+	Property	getValue(unsigned index = 0);
 	string		getStringValue(unsigned index = 0);
 	int			getIntValue(unsigned index = 0);
 	bool		getBoolValue(unsigned index = 0);
-	float		getFloatValue(unsigned index = 0);
+	double		getFloatValue(unsigned index = 0);
 
 	bool	parse(Tokenizer& tz);
 };
@@ -40,7 +44,8 @@ public:
 
 	ParseTreeNode*	parseTreeRoot() { return pt_root; }
 
-	bool	parseText(MemChunk& mc);
+	bool	parseText(MemChunk& mc, string source = "memory chunk");
+	bool	parseText(string& text, string source = "string");
 };
 
 #endif//__PARSER_H__

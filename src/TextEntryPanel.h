@@ -4,12 +4,14 @@
 
 #include "EntryPanel.h"
 #include "TextEditor.h"
+#include <wx/choice.h>
 
 class TextEntryPanel : public EntryPanel {
 private:
 	TextEditor*	text_area;
 	wxButton*	btn_find_replace;
 	wxChoice*	choice_text_language;
+	wxCheckBox*	cb_wordwrap;
 
 public:
 	TextEntryPanel(wxWindow* parent);
@@ -26,6 +28,7 @@ public:
 	void	onBtnFindReplace(wxCommandEvent& e);
 	void	onChoiceLanguageChanged(wxCommandEvent& e);
 	void	onUpdateUI(wxStyledTextEvent& e);
+	void	onWordWrapChanged(wxCommandEvent& e);
 };
 
 

@@ -40,6 +40,9 @@
 #include "TextStyle.h"
 #include "ResourceManager.h"
 #include "SIFormat.h"
+#include "KeyBind.h"
+#include "ColourConfiguration.h"
+#include "Drawing.h"
 #include <wx/image.h>
 #include <wx/stdpaths.h>
 #include <wx/ffile.h>
@@ -493,6 +496,9 @@ bool MainApp::OnInit() {
 	// Init logfile
 	initLogFile();
 
+	// Init keybinds
+	KeyBind::initBinds();
+
 	// Load configuration file
 	wxLogMessage("Loading configuration");
 	readConfigFile();
@@ -529,6 +535,10 @@ bool MainApp::OnInit() {
 	wxLogMessage("Loading text style sets");
 	StyleSet::loadResourceStyles();
 	StyleSet::loadCustomStyles();
+
+	// Init colour configuration
+	wxLogMessage("Loading colour configuration");
+	ColourConfiguration::init();
 
 	// Init actions
 	initActions();
@@ -659,10 +669,16 @@ void MainApp::readConfigFile() {
 
 			// Read files until closing brace found
 			token = tz.getToken();
-			while (token != "") {
+			while (token != "}") {
 				theArchiveManager->addRecentFile(token);
 				token = tz.getToken();
 			}
+		}
+
+		// Read keybinds
+		if (token == "keys") {
+			token = tz.getToken();	// Skip {
+			KeyBind::readBinds(tz);
 		}
 
 		// Get next token
@@ -704,6 +720,11 @@ void MainApp::saveConfigFile() {
 	file.Write("\nrecent_files\n{\n");
 	for (int a = theArchiveManager->numRecentFiles()-1; a >= 0; a--)
 		file.Write(S_FMT("\t\"%s\"\n", theArchiveManager->recentFile(a)));
+	file.Write("}\n");
+
+	// Write keybinds
+	file.Write("\nkeys\n{\n");
+	file.Write(KeyBind::writeBinds());
 	file.Write("}\n");
 
 	// Close configuration file

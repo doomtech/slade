@@ -38,6 +38,7 @@
 #include "SIFormat.h"
 #include "Translation.h"
 #include "MathStuff.h"
+#include "Tokenizer.h"
 
 #undef BOOL
 #include <FreeImage.h>
@@ -181,7 +182,7 @@ bool SImage::getRGBData(MemChunk& mc, Palette8bit* pal) {
 	return false;	// Invalid image type
 }
 
-/* SImage::getPalData
+/* SImage::getIndexedData
  * Loads the image as index data into <mc>. Returns false if image is
  * invalid, true otherwise
  *******************************************************************/
@@ -1250,6 +1251,47 @@ bool SImage::applyTranslation(Translation* tr, Palette8bit* pal) {
 	}
 
 	return true;
+}
+
+/* SImage::applyTranslation
+ * Applies a palette translation to the image
+ *******************************************************************/
+bool SImage::applyTranslation(string tr, Palette8bit* pal) {
+	// Some hardcoded translations
+	if (!tr.CmpNoCase("\"doom0\""))			tr = "\"112:127=96:111\"";
+	else if (!tr.CmpNoCase("\"doom1\""))	tr = "\"112:127=64:79\"";
+	else if (!tr.CmpNoCase("\"doom2\""))	tr = "\"112:127=32:47\"";
+	else if (!tr.CmpNoCase("\"doom3\""))	tr = "\"112:127=88:103\"";
+	else if (!tr.CmpNoCase("\"doom4\""))	tr = "\"112:127=56:71\"";
+	else if (!tr.CmpNoCase("\"doom5\""))	tr = "\"112:127=176:191\"";
+	else if (!tr.CmpNoCase("\"doom6\""))	tr = "\"112:127=192:207\"";
+	else if (!tr.CmpNoCase("\"heretic0\""))	tr = "\"225:240=114:129\"";
+	else if (!tr.CmpNoCase("\"heretic1\""))	tr = "\"225:240=145:160\"";
+	else if (!tr.CmpNoCase("\"heretic2\""))	tr = "\"225:240=190:205\"";
+	else if (!tr.CmpNoCase("\"heretic3\""))	tr = "\"225:240=67:82\"";
+	else if (!tr.CmpNoCase("\"heretic4\""))	tr = "\"225:240=9:24\"";
+	else if (!tr.CmpNoCase("\"heretic5\""))	tr = "\"225:240=74:89\"";
+	else if (!tr.CmpNoCase("\"heretic6\""))	tr = "\"225:240=150:165\"";
+	else if (!tr.CmpNoCase("\"heretic7\""))	tr = "\"225:240=192:207\"";
+	else if (!tr.CmpNoCase("\"heretic8\""))	tr = "\"225:240=95:110\"";
+	else if (!tr.CmpNoCase("\"strife0\""))	tr = "\"32:63=0:31\", \"128:143=64:79\", \"241:246=224:229\", \"247:251=241:245\"";
+	else if (!tr.CmpNoCase("\"strife1\""))	tr = "\"32:63=0:31\", \"128:143=176:191\"";
+	else if (!tr.CmpNoCase("\"strife2\""))	tr = "\"32:47=208:223\", \"48:63=208:223\", \"128:143=16:31\"";
+	else if (!tr.CmpNoCase("\"strife3\""))	tr = "\"32:47=208:223\", \"48:63=208:223\", \"128:143=48:63\"";
+	else if (!tr.CmpNoCase("\"strife4\""))	tr = "\"32:63=0:31\", \"80:95=128:143\", \"128:143=80:95\", \"192:223=160:191\"";
+	else if (!tr.CmpNoCase("\"strife5\""))	tr = "\"32:63=0:31\", \"80:95=16:31\", \"128:143=96:111\", \"192:223=32:63\"";
+	else if (!tr.CmpNoCase("\"strife6\""))	tr = "\"32:63=0:31\", \"80:95=64:79\", \"128:143=144:159\", \"192=1\", \"193:223=1:31\"";
+	Translation trans;
+	trans.clear();
+	Tokenizer tz;
+	tz.openString(tr);
+	string token = tz.getToken();
+	while (!token.IsEmpty()) {
+		trans.parse(token);
+		tz.getToken();
+		token = tz.getToken();
+	}
+	return applyTranslation(&trans, pal);
 }
 
 /* SImage::drawPixel

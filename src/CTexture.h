@@ -88,6 +88,7 @@ class Palette8bit;
 #define TEXTYPE_GRAPHIC		2
 #define TEXTYPE_WALLTEXTURE	3
 #define TEXTYPE_FLAT		4
+#define TEXTYPE_HIRES		5
 
 class CTexture : public Announcer {
 friend class TextureXList;

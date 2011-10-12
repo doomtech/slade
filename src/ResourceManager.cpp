@@ -41,6 +41,7 @@
  * VARIABLES
  *******************************************************************/
 ResourceManager* ResourceManager::instance = NULL;
+string ResourceManager::Doom64HashTable[65536];
 
 
 /*******************************************************************
@@ -178,6 +179,9 @@ void ResourceManager::addArchive(Archive* archive) {
 
 	// Listen to the archive
 	listenTo(archive);
+
+	// Announce resource update
+	announce("resources_updated");
 }
 
 /* ResourceManager::removeArchive
@@ -193,6 +197,9 @@ void ResourceManager::removeArchive(Archive* archive) {
 	archive->getEntryTreeAsList(entries);
 	for (unsigned a = 0; a < entries.size(); a++)
 		removeEntry(entries[a]);
+
+	// Announce resource update
+	announce("resources_updated");
 }
 
 /* ResourceManager::addEntry
@@ -209,9 +216,37 @@ void ResourceManager::addEntry(ArchiveEntry* entry) {
 	// Get resource name (extension cut, uppercase)
 	string name = entry->getName(true).Upper();
 
+	// Check for palette entry
+	if (type->getId() == "palette")
+		palettes[name].add(entry);
+
 	// Check for patch entry
 	if (type->extraProps().propertyExists("patch"))
 		patches[name].add(entry);
+
+	// Check for flat entry
+	if (type->getId() == "gfx_flat" || entry->isInNamespace("flats"))
+		flats[name].add(entry);
+
+	// Check for stand-alone texture entry
+	if (entry->isInNamespace("textures") || entry->isInNamespace("hires")) {
+		satextures[name].add(entry);
+
+		// Compute Doom64 EX hash value, using the same hash algorithm as
+		// Doom64 EX itself
+		char str[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+		for (size_t c = 0; c < name.length() && c < 8; c++)
+			str[c] = name[c];
+
+		uint32_t hash = 1315423911;
+		for(uint32_t i = 0; i < 8 && str[i] != '\0'; ++i)
+			hash ^= ((hash << 5) + toupper((int)str[i]) + (hash >> 2));
+		hash %= 65536;
+
+		// Add name to hash table
+		ResourceManager::Doom64HashTable[hash] = name;
+
+	}
 
 	// Check for TEXTUREx entry
 	int txentry = 0;
@@ -252,8 +287,17 @@ void ResourceManager::removeEntry(ArchiveEntry* entry) {
 	// Get resource name (extension cut, uppercase)
 	string name = entry->getName(true).Upper();
 
+	// Remove from palettes
+	palettes[name].remove(entry);
+
 	// Remove from patches
 	patches[name].remove(entry);
+
+	// Remove from flats
+	flats[name].remove(entry);
+
+	// Remove from stand-alone textures
+	satextures[name].remove(entry);
 
 	// Check for TEXTUREx entry
 	int txentry = 0;
@@ -364,13 +408,44 @@ void ResourceManager::getAllTextures(vector<TextureResource::tex_res_t>& list, A
 	}
 }
 
+/* ResourceManager::getPaletteEntry
+ * Returns the most appropriate managed resource entry for [palette],
+ * or NULL if no match found
+ *******************************************************************/
+ArchiveEntry* ResourceManager::getPaletteEntry(string palette, Archive* priority) {
+	// Check resource with matching name exists
+	EntryResource& res = palettes[palette.Upper()];
+	if (res.entries.size() == 0)
+		return NULL;
+
+	// Go through resource entries
+	ArchiveEntry* entry = res.entries[0];
+	for (unsigned a = 0; a < res.entries.size(); a++) {
+		// If it's in the 'priority' archive, return it
+			if (priority && (res.entries[a]->getParent() == priority ||
+				// PK3 and Doom64 maps are contained in an embedded .wad,
+				// so for them the real priority archive is their parent 
+				// archive's own parent archive.
+				res.entries[a]->getParent() == priority->getParentArchive()))
+			return res.entries[a];
+
+		// Otherwise, if it's in a 'later' archive than the current resource entry, set it
+		if (theArchiveManager->archiveIndex(entry->getParent()) <=
+			theArchiveManager->archiveIndex(res.entries[a]->getParent()))
+			entry = res.entries[a];
+	}
+
+	// Return most relevant entry
+	return entry;
+}
+
 /* ResourceManager::getPatchEntry
  * Returns the most appropriate managed resource entry for [patch],
  * or NULL if no match found
  *******************************************************************/
 ArchiveEntry* ResourceManager::getPatchEntry(string patch, string nspace, Archive* priority) {
 	// Check resource with matching name exists
-	EntryResource& res = patches[patch];
+	EntryResource& res = patches[patch.Upper()];
 	if (res.entries.size() == 0)
 		return NULL;
 
@@ -380,11 +455,86 @@ ArchiveEntry* ResourceManager::getPatchEntry(string patch, string nspace, Archiv
 		// If the entry is in the correct namespace (if namespace is important)
 		if (nspace.IsEmpty() || res.entries[a]->isInNamespace(nspace)) {
 			// If it's in the 'priority' archive, return it
-			if (priority && res.entries[a]->getParent() == priority)
+			if (priority && (res.entries[a]->getParent() == priority ||
+				// PK3 and Doom64 maps are contained in an embedded .wad,
+				// so for them the real priority archive is their parent 
+				// archive's own parent archive.
+				res.entries[a]->getParent() == priority->getParentArchive()))
 				return res.entries[a];
+
+			// Regardless of priority, if the first entry is not in the chosen namespace but
+			// the current entry is, then set it so that we'll be able to return something valid
+			if (!nspace.IsEmpty() && !entry->isInNamespace(nspace) && res.entries[a]->isInNamespace(nspace))
+				entry = res.entries[a];
 
 			// Otherwise, if it's in a 'later' archive than the current resource entry, set it
 			if (theArchiveManager->archiveIndex(entry->getParent()) <=
+				theArchiveManager->archiveIndex(res.entries[a]->getParent()))
+				entry = res.entries[a];
+		}
+	}
+
+	// Return most relevant entry
+	return entry;
+}
+
+/* ResourceManager::getFlatEntry
+ * Returns the most appropriate managed resource entry for [flat],
+ * or NULL if no match found
+ *******************************************************************/
+ArchiveEntry* ResourceManager::getFlatEntry(string flat, Archive* priority) {
+	// Check resource with matching name exists
+	EntryResource& res = flats[flat.Upper()];
+	if (res.entries.size() == 0)
+		return NULL;
+
+	// Go through resource entries
+	ArchiveEntry* entry = res.entries[0];
+	for (unsigned a = 0; a < res.entries.size(); a++) {
+		// If it's in the 'priority' archive, return it
+			if (priority && (res.entries[a]->getParent() == priority ||
+				// PK3 and Doom64 maps are contained in an embedded .wad,
+				// so for them the real priority archive is their parent 
+				// archive's own parent archive.
+				res.entries[a]->getParent() == priority->getParentArchive()))
+			return res.entries[a];
+
+		// Otherwise, if it's in a 'later' archive than the current resource entry, set it
+		if (theArchiveManager->archiveIndex(entry->getParent()) <=
+			theArchiveManager->archiveIndex(res.entries[a]->getParent()))
+			entry = res.entries[a];
+	}
+
+	// Return most relevant entry
+	return entry;
+}
+
+/* ResourceManager::getTextureEntry
+ * Returns the most appropriate managed resource entry for [texture],
+ * or NULL if no match found
+ *******************************************************************/
+ArchiveEntry* ResourceManager::getTextureEntry(string texture, string nspace, Archive* priority) {
+	// Check resource with matching name exists
+	EntryResource& res = satextures[texture.Upper()];
+	if (res.entries.size() == 0)
+		return NULL;
+
+	// Go through resource entries
+	ArchiveEntry* entry = NULL;
+	for (unsigned a = 0; a < res.entries.size(); a++) {
+		// If the entry is in the correct namespace (if namespace is important)
+		// namespace ought to be either "textures" or "hires"
+		if (nspace.IsEmpty() || res.entries[a]->isInNamespace(nspace)) {
+			// If it's in the 'priority' archive, return it
+			if (priority && (res.entries[a]->getParent() == priority ||
+				// PK3 and Doom64 maps are contained in an embedded .wad,
+				// so for them the real priority archive is their parent 
+				// archive's own parent archive.
+				res.entries[a]->getParent() == priority->getParentArchive()))
+				return res.entries[a];
+
+			// Otherwise, if it's in a 'later' archive than the current resource entry, set it
+			if (!entry || theArchiveManager->archiveIndex(entry->getParent()) <=
 				theArchiveManager->archiveIndex(res.entries[a]->getParent()))
 				entry = res.entries[a];
 		}
@@ -400,7 +550,7 @@ ArchiveEntry* ResourceManager::getPatchEntry(string patch, string nspace, Archiv
  *******************************************************************/
 CTexture* ResourceManager::getTexture(string texture, Archive* priority, Archive* ignore) {
 	// Check texture resource with matching name exists
-	TextureResource& res = textures[texture];
+	TextureResource& res = textures[texture.Upper()];
 	if (res.textures.size() == 0)
 		return NULL;
 
