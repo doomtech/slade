@@ -39,6 +39,7 @@ private:
 	fpoint2_t	mouse_pos_m;		// 'Map' mouse position (translated)
 	fpoint2_t	mouse_downpos_m;
 	uint8_t		mouse_state;
+	bool		zooming_cursor;
 
 	// Info overlays
 	int					last_hilight;
@@ -59,10 +60,10 @@ private:
 	bool	anim_flash_inc;
 	float	anim_info_fade;
 	bool	anim_info_show;
+	double	anim_view_speed;
 	double	view_xoff_inter;
 	double	view_yoff_inter;
 	double	view_scale_inter;
-	double	anim_view_speed;
 
 public:
 	MapCanvas(wxWindow *parent, int id, MapEditor* editor);
@@ -74,8 +75,9 @@ public:
 	void	setView(double x, double y);
 	void	pan(double x, double y);
 	void	zoom(double amount, bool toward_cursor = false);
-	void	viewFitToMap();
+	void	viewFitToMap(bool snap = false);
 	void	viewShowObject();
+	void	viewMatchSpot(double mx, double my, double sx, double sy);
 
 	// Drawing
 	void	drawGrid();

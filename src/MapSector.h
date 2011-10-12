@@ -44,13 +44,14 @@ private:
 	vector<MapSide*>	connected_sides;
 	bbox_t				bbox;
 	Polygon2D			polygon;
+	bool				poly_needsupdate;
 
 	// Properties
 	PropertyList	udmf_props;
 
 public:
-	MapSector(){}
-	MapSector(string f_tex, string c_tex) { this->f_tex = f_tex; this->c_tex = c_tex; }
+	MapSector() { poly_needsupdate = true; }
+	MapSector(string f_tex, string c_tex) { this->f_tex = f_tex; this->c_tex = c_tex; poly_needsupdate = true; }
 	~MapSector(){}
 
 	unsigned	getIndex() { return index; }

@@ -14,6 +14,7 @@ private:
 	GLuint	vbo_vertices;
 	GLuint	vbo_lines;
 	GLuint	ibo_selection;
+	GLuint	vbo_flats;
 
 	// Display lists
 	GLuint	list_vertices;
@@ -67,10 +68,12 @@ public:
 	void	renderSelection(vector<int>& selection, int type, float view_scale);
 	void	renderFlats(int type = 0);
 	void	renderFlatsImmediate(int type);
+	void	renderFlatsVBO(int type);
 
 	// VBOs
 	void	updateVerticesVBO();
 	void	updateLinesVBO(bool show_direction);
+	void	updateFlatsVBO();
 
 	void	updateVisibility(fpoint2_t view_tl, fpoint2_t view_br, double view_scale);
 	void	forceUpdate(float view_scale);

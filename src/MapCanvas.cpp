@@ -48,7 +48,7 @@
 CVAR(Bool, things_always, 1, CVAR_SAVE)
 CVAR(Bool, vertices_always, 1, CVAR_SAVE)
 CVAR(Bool, grid_dashed, false, CVAR_SAVE)
-CVAR(Bool, scroll_smooth, false, CVAR_SAVE)
+CVAR(Bool, scroll_smooth, true, CVAR_SAVE)
 CVAR(Int, flat_drawtype, 2, CVAR_SAVE)
 PolygonSplitter splitter;	// for testing
 
@@ -75,6 +75,8 @@ MapCanvas::MapCanvas(wxWindow *parent, int id, MapEditor* editor)
 	view_xoff_inter = 0;
 	view_yoff_inter = 0;
 	view_scale_inter = 1;
+	anim_view_speed = 0.05;
+	zooming_cursor = false;
 
 	timer.Start(2);
 #ifdef USE_SFML_RENDERWINDOW
@@ -155,13 +157,9 @@ void MapCanvas::pan(double x, double y) {
 }
 
 void MapCanvas::zoom(double amount, bool toward_cursor) {
-	// Do 'zoom towards cursor' offset
-	if (view_scale > 0.005 && view_scale < 10 && toward_cursor) {
-		double mx = translateX(mouse_pos.x);
-		double my = translateY(mouse_pos.y);
-		view_xoff = mx + (double(view_xoff - mx) / amount);
-		view_yoff = my + (double(view_yoff - my) / amount);
-	}
+	// Get current mouse map coordinates
+	double mx = translateX(mouse_pos.x);
+	double my = translateY(mouse_pos.y);
 
 	// Zoom view
 	view_scale = view_scale * amount;
@@ -171,6 +169,12 @@ void MapCanvas::zoom(double amount, bool toward_cursor) {
 		view_scale = 0.005;
 	if (view_scale > 10.0) // Max scale
 		view_scale = 10.0;
+
+	// Do 'zoom towards cursor' stuff
+	if (toward_cursor) {
+		view_xoff += mx - translateX(mouse_pos.x);
+		view_yoff += my - translateY(mouse_pos.y);
+	}
 
 	// Update screen limits
 	view_tl.x = translateX(0);
@@ -182,12 +186,12 @@ void MapCanvas::zoom(double amount, bool toward_cursor) {
 	renderer_2d->updateVisibility(view_tl, view_br, view_scale);
 }
 
-void MapCanvas::viewFitToMap() {
+void MapCanvas::viewFitToMap(bool snap) {
 	// Get the map bbox
 	bbox_t map_bbox = editor->getMap().getMapBBox();
 
 	// Reset zoom and set offsets to the middle of the map
-	view_scale = 1;
+	view_scale = 2;
 	view_xoff = map_bbox.min.x + ((map_bbox.max.x - map_bbox.min.x) * 0.5);
 	view_yoff = map_bbox.min.y + ((map_bbox.max.y - map_bbox.min.y) * 0.5);
 
@@ -207,6 +211,13 @@ void MapCanvas::viewFitToMap() {
 			done = true;
 		else
 			view_scale *= 0.8;
+	}
+
+	// Don't animate if specified
+	if (snap) {
+		view_xoff_inter = view_xoff;
+		view_yoff_inter = view_yoff;
+		view_scale_inter = view_scale;
 	}
 
 	// Update object visibility
@@ -264,7 +275,7 @@ void MapCanvas::viewShowObject() {
 	}
 
 	// Reset zoom and set offsets to the middle of the object(s)
-	view_scale = 1;
+	view_scale = 2;
 	view_xoff = bbox.min.x + ((bbox.max.x - bbox.min.x) * 0.5);
 	view_yoff = bbox.min.y + ((bbox.max.y - bbox.min.y) * 0.5);
 
@@ -288,6 +299,10 @@ void MapCanvas::viewShowObject() {
 
 	// Update object visibility
 	renderer_2d->updateVisibility(view_tl, view_br, view_scale);
+}
+
+void MapCanvas::viewMatchSpot(double mx, double my, double sx, double sy) {
+	setView(view_xoff_inter + mx - translateX(sx, true), view_yoff_inter + my - translateY(sy, true));
 }
 
 void MapCanvas::drawGrid() {
@@ -407,21 +422,21 @@ void MapCanvas::draw() {
 
 	if (editor->editMode() == MapEditor::MODE_VERTICES) {
 		// Vertices mode
-		if (things_always) renderer_2d->renderThings(view_scale, 0.5f);							// Things (faded)
+		if (things_always) renderer_2d->renderThings(view_scale, 0.4f);							// Things (faded)
 		renderer_2d->renderLines(false);														// Lines (no direction tabs)
 		renderer_2d->renderVertices(view_scale);												// Vertices
 		renderer_2d->renderSelection(editor->getSelection(), editor->editMode(), view_scale);	// Selection
 	}
 	else if (editor->editMode() == MapEditor::MODE_LINES) {
 		// Lines mode
-		if (things_always) renderer_2d->renderThings(view_scale, 0.5f);							// Things (faded)
+		if (things_always) renderer_2d->renderThings(view_scale, 0.4f);							// Things (faded)
 		if (vertices_always) renderer_2d->renderVertices(view_scale);							// Vertices
 		renderer_2d->renderLines(true);															// Lines
 		renderer_2d->renderSelection(editor->getSelection(), editor->editMode(), view_scale);	// Selection
 	}
 	else if (editor->editMode() == MapEditor::MODE_SECTORS) {
 		// Sectors mode
-		if (things_always) renderer_2d->renderThings(view_scale, 0.5f);							// Things (faded)
+		if (things_always) renderer_2d->renderThings(view_scale, 0.4f);							// Things (faded)
 		if (vertices_always) renderer_2d->renderVertices(view_scale);							// Vertices
 		renderer_2d->renderSelection(editor->getSelection(), editor->editMode(), view_scale);	// Selection
 		renderer_2d->renderLines(false);														// Lines (no direction tabs)
@@ -550,7 +565,6 @@ void MapCanvas::update(long frametime) {
 		}
 	}
 	else {
-		//anim_info_fade -= 0.05f*mult;
 		anim_info_fade -= 0.04f*mult;
 		if (anim_info_fade < 0.0f) {
 			anim_info_fade = 0.0f;
@@ -561,29 +575,64 @@ void MapCanvas::update(long frametime) {
 	// View pan/zoom animation
 	bool view_anim = false;
 	if (scroll_smooth) {
-		double diff_xoff = view_xoff - view_xoff_inter;		// X offset
-		if (diff_xoff < -0.05 || diff_xoff > 0.05) {
-			view_xoff_inter += diff_xoff*anim_view_speed*mult;
-			view_anim = true;
-		}
-		else
-			view_xoff_inter = view_xoff;
+		// Scale
+		double diff_scale = view_scale - view_scale_inter;
+		if (diff_scale < -0.0000001 || diff_scale > 0.0000001) {
+			// Get current mouse position in map coordinates (for zdooming towards cursor)
+			double mx = translateX(mouse_pos.x, true);
+			double my = translateY(mouse_pos.y, true);
 
-		double diff_yoff = view_yoff - view_yoff_inter;		// Y offset
-		if (diff_yoff < -0.05 || diff_yoff > 0.05) {
-			view_yoff_inter += diff_yoff*anim_view_speed*mult;
-			view_anim = true;
-		}
-		else
-			view_yoff_inter = view_yoff;
-
-		double diff_scale = view_scale - view_scale_inter;	// Scale
-		if (diff_scale < -0.0001 || diff_scale > 0.0001) {
+			// Interpolate zoom
 			view_scale_inter += diff_scale*anim_view_speed*mult;
-			view_anim = true;
+
+			// Check for zoom finish
+			if (diff_scale < 0 && view_scale_inter < view_scale ||
+				diff_scale > 0 && view_scale_inter > view_scale)
+				view_scale_inter = view_scale;
+			else
+				view_anim = true;
+
+			if (zooming_cursor) {
+				viewMatchSpot(mx, my, mouse_pos.x, mouse_pos.y);
+				view_xoff_inter = view_xoff;
+				view_yoff_inter = view_yoff;
+			}
 		}
 		else
 			view_scale_inter = view_scale;
+
+		if (!zooming_cursor) {
+			// X offset
+			double diff_xoff = view_xoff - view_xoff_inter;
+			if (diff_xoff < -0.05 || diff_xoff > 0.05) {
+				// Interpolate offset
+				view_xoff_inter += diff_xoff*anim_view_speed*mult;
+
+				// Check stuff
+				if (diff_xoff < 0 && view_xoff_inter < view_xoff ||
+					diff_xoff > 0 && view_xoff_inter > view_xoff)
+					view_xoff_inter = view_xoff;
+				else
+					view_anim = true;
+			}
+			else
+				view_xoff_inter = view_xoff;
+
+			// Y offset
+			double diff_yoff = view_yoff - view_yoff_inter;
+			if (diff_yoff < -0.05 || diff_yoff > 0.05) {
+				// Interpolate offset
+				view_yoff_inter += diff_yoff*anim_view_speed*mult;
+
+				if (diff_yoff < 0 && view_yoff_inter < view_yoff ||
+					diff_yoff > 0 && view_yoff_inter > view_yoff)
+					view_yoff_inter = view_yoff;
+				else
+					view_anim = true;
+			}
+			else
+				view_yoff_inter = view_yoff;
+		}
 
 		if (!view_anim)
 			anim_view_speed = 0.05;
@@ -598,6 +647,9 @@ void MapCanvas::update(long frametime) {
 		view_yoff_inter = view_yoff;
 		view_scale_inter = view_scale;
 	}
+
+	if (!view_anim)
+		zooming_cursor = false;
 
 	// Update animations
 	bool anim_running = false;
@@ -655,12 +707,16 @@ void MapCanvas::onKeyBindPress(string name) {
 		zoom(1.2);
 
 	// Zoom out (follow mouse)
-	else if (name == "me2d_zoom_out_m")
+	else if (name == "me2d_zoom_out_m") {
 		zoom(0.8, true);
+		zooming_cursor = true;
+	}
 
 	// Zoom in (follow mouse)
-	else if (name == "me2d_zoom_in_m")
+	else if (name == "me2d_zoom_in_m") {
 		zoom(1.2, true);
+		zooming_cursor = true;
+	}
 
 	// Zoom in (show object)
 	else if (name == "me2d_show_object")
@@ -787,8 +843,8 @@ void MapCanvas::onKeyDown(wxKeyEvent& e) {
 		splitter.setVerbose(true);
 		splitter.clear();
 		splitter.openSector(editor->getHilightedSector());
-		vector<Polygon2D::subpoly_t> temp;
-		splitter.doSplitting(temp);
+		Polygon2D temp;
+		splitter.doSplitting(&temp);
 	}
 
 	e.Skip();

@@ -2,41 +2,77 @@
 #ifndef __POLYGON_2D_H__
 #define __POLYGON_2D_H__
 
+struct gl_vertex_t {
+	float x, y, z;
+	float tx, ty;
+	float r, g, b, a;
+	gl_vertex_t(float x = 0.0f, float y = 0.0f, float z = 0.0f) {
+		this->x = x;
+		this->y = y;
+		this->z = z;
+		this->tx = 0.0f;
+		this->ty = 0.0f;
+		this->r = 1.0f;
+		this->g = 1.0f;
+		this->b = 1.0f;
+		this->a = 1.0f;
+	}
+};
+
+struct gl_polygon_t {
+	gl_vertex_t*	vertices;
+	unsigned		n_vertices;
+	unsigned		vbo_offset;
+	unsigned		vbo_index;
+
+	gl_polygon_t() { vertices = NULL; n_vertices = 0; vbo_offset = 0; }
+	~gl_polygon_t() { if (vertices) delete[] vertices; }
+};
+
 class GLTexture;
 class MapSector;
 class Polygon2D {
-public:
-	// Structs
-	struct glvert_t {
-		double	x, y;
-		float	tx, ty;
-		glvert_t(double x, double y, float tx = 0.0f, float ty = 0.0f) {
-			this->x = x;
-			this->y = y;
-			this->tx = tx;
-			this->ty = ty;
-		}
-	};
-	struct subpoly_t {
-		vector<glvert_t> points;
-	};
+private:
+	// Polygon data
+	vector<gl_polygon_t*>	subpolys;
+	GLTexture*				texture;
+	float					colour[4];
 
+	int		vbo_update;
+
+public:
 	Polygon2D();
 	~Polygon2D();
 
-	void	setTexture(GLTexture* tex) { this->texture = tex; }
-	bool	hasPolygon() { return (subpolys.size() != 0); }
+	GLTexture*	getTexture() { return texture; }
+	float		colRed() { return colour[0]; }
+	float		colGreen() { return colour[1]; }
+	float		colBlue() { return colour[2]; }
+	float		colAlpha() { return colour[3]; }
+
+	void		setTexture(GLTexture* tex) { this->texture = tex; }
+	void		setColour(float r, float g, float b, float a);
+	bool		hasPolygon() { return (subpolys.size() != 0); }
+	int			vboUpdate() { return vbo_update; }
+
+	unsigned		nSubPolys() { return subpolys.size(); }
+	void			addSubPoly();
+	gl_polygon_t*	getSubPoly(unsigned index);
+	void			removeSubPoly(unsigned index);
+	void			clear();
+	unsigned		totalVertices();
 
 	bool	openSector(MapSector* sector);
 	void	updateTextureCoords(double scale_x = 1, double scale_y = 1, double offset_x = 0, double offset_y = 0);
 
+	unsigned	vboDataSize();
+	unsigned	writeToVBO(unsigned offset, unsigned index);
+	void		updateVBOData();
+
 	void	render();
 	void	renderWireframe();
-
-private:
-	// Polygon data
-	vector<subpoly_t>	subpolys;
-	GLTexture*			texture;
+	void	renderVBO(bool colour = true);
+	void	renderWireframeVBO(bool colour = true);
 };
 
 
@@ -63,33 +99,6 @@ private:
 		bbox_t		bbox;
 		bool		clockwise;
 		bool		convex;
-	};
-	struct vert_link_t {
-		int				vertex;
-		double			distance;
-		vert_link_t*	next;
-
-		vert_link_t(int vertex, double distance) {
-			this->vertex = vertex;
-			this->distance = distance;
-			next = NULL;
-		}
-
-		~vert_link_t() { if (next) delete next; }
-
-		void add(vert_link_t* vl) {
-			if (!next) {
-				next = vl;
-				return;
-			}
-
-			if (vl->distance < next->distance) {
-				vl->next = next;
-				next = vl;
-			}
-			else
-				next->add(vl);
-		}
 	};
 
 	// Splitter data
@@ -121,8 +130,8 @@ public:
 	bool	tracePolyOutline(int edge_start);
 
 	bool	splitFromEdge(int splitter_edge);
-	bool	buildSubPoly(int edge_start, Polygon2D::subpoly_t& polygon);
-	bool	doSplitting(vector<Polygon2D::subpoly_t>& polygons);
+	bool	buildSubPoly(int edge_start, gl_polygon_t* poly);
+	bool	doSplitting(Polygon2D* poly);
 
 	// Testing
 	void	openSector(MapSector* sector);

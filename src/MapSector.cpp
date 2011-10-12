@@ -19,8 +19,10 @@ void MapSector::updateBBox() {
 }
 
 Polygon2D* MapSector::getPolygon() {
-	if (!polygon.hasPolygon())
+	if (poly_needsupdate) {
 		polygon.openSector(this);
+		poly_needsupdate = false;
+	}
 
 	return &polygon;
 }

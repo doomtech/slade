@@ -6,9 +6,58 @@
 #include "MathStuff.h"
 
 Polygon2D::Polygon2D() {
+	vbo_update = 2;
+	colour[0] = 1.0f;
+	colour[1] = 1.0f;
+	colour[2] = 1.0f;
+	colour[3] = 1.0f;
 }
 
 Polygon2D::~Polygon2D() {
+	clear();
+}
+
+void Polygon2D::setColour(float r, float g, float b, float a) {
+	colour[0] = r;
+	colour[1] = g;
+	colour[2] = b;
+	colour[3] = a;
+}
+
+void Polygon2D::addSubPoly() {
+	subpolys.push_back(new gl_polygon_t());
+	vbo_update = 2;
+}
+
+gl_polygon_t* Polygon2D::getSubPoly(unsigned index) {
+	if (index >= subpolys.size())
+		return NULL;
+	else
+		return subpolys[index];
+}
+
+void Polygon2D::removeSubPoly(unsigned index) {
+	if (index >= subpolys.size())
+		return;
+
+	delete subpolys[index];
+	subpolys.erase(subpolys.begin() + index);
+
+	vbo_update = 2;
+}
+
+void Polygon2D::clear() {
+	for (unsigned a = 0; a < subpolys.size(); a++)
+		delete subpolys[a];
+	subpolys.clear();
+	vbo_update = 2;
+}
+
+unsigned Polygon2D::totalVertices() {
+	unsigned total = 0;
+	for (unsigned a = 0; a < subpolys.size(); a++)
+		total += subpolys[a]->n_vertices;
+	return total;
 }
 
 bool Polygon2D::openSector(MapSector* sector) {
@@ -16,9 +65,9 @@ bool Polygon2D::openSector(MapSector* sector) {
 	if (!sector)
 		return false;
 
-	// Init polygon splitter
+	// Init
 	PolygonSplitter splitter;
-	subpolys.clear();
+	clear();
 
 	// Get list of sides connected to this sector
 	vector<MapSide*>& sides = sector->connectedSides();
@@ -40,7 +89,7 @@ bool Polygon2D::openSector(MapSector* sector) {
 	}
 
 	// Split the polygon into convex sub-polygons
-	return splitter.doSplitting(subpolys);
+	return splitter.doSplitting(this);
 }
 
 void Polygon2D::updateTextureCoords(double scale_x, double scale_y, double offset_x, double offset_y) {
@@ -54,21 +103,62 @@ void Polygon2D::updateTextureCoords(double scale_x, double scale_y, double offse
 
 	// Set texture coordinates
 	for (unsigned p = 0; p < subpolys.size(); p++) {
-		for (unsigned a = 0; a < subpolys[p].points.size(); a++) {
-			subpolys[p].points[a].tx = (offset_x + subpolys[p].points[a].x) * owidth;
-			subpolys[p].points[a].ty = (offset_y - subpolys[p].points[a].y) * oheight;
+		for (unsigned a = 0; a < subpolys[p]->n_vertices; a++) {
+			subpolys[p]->vertices[a].tx = (offset_x + subpolys[p]->vertices[a].x) * owidth;
+			subpolys[p]->vertices[a].ty = (offset_y - subpolys[p]->vertices[a].y) * oheight;
 		}
 	}
+
+	// Update variables
+	vbo_update = 1;
+}
+
+unsigned Polygon2D::vboDataSize() {
+	unsigned total = 0;
+	for (unsigned a = 0; a < subpolys.size(); a++)
+		total += subpolys[a]->n_vertices * 36;
+	return total;
+}
+
+unsigned Polygon2D::writeToVBO(unsigned offset, unsigned index) {
+	// Go through subpolys
+	unsigned ofs = offset;
+	unsigned i = index;
+	for (unsigned a = 0; a < subpolys.size(); a++) {
+		// Write subpoly data to VBO at the correct offset
+		glBufferSubData(GL_ARRAY_BUFFER, ofs, subpolys[a]->n_vertices*36, subpolys[a]->vertices);
+
+		// Update the subpoly vbo offset
+		subpolys[a]->vbo_offset = ofs;
+		subpolys[a]->vbo_index = i;
+		ofs += subpolys[a]->n_vertices*36;
+		i += subpolys[a]->n_vertices;
+	}
+
+	// Update variables
+	vbo_update = 0;
+
+	// Return the offset to the end of the data
+	return ofs;
+}
+
+void Polygon2D::updateVBOData() {
+	// Go through subpolys
+	for (unsigned a = 0; a < subpolys.size(); a++)
+		glBufferSubData(GL_ARRAY_BUFFER, subpolys[a]->vbo_offset, subpolys[a]->n_vertices*36, subpolys[a]->vertices);
+
+	// Update variables
+	vbo_update = 0;
 }
 
 void Polygon2D::render() {
 	// Go through sub-polys
 	for (unsigned a = 0; a < subpolys.size(); a++) {
-		subpoly_t& poly = subpolys[a];
+		gl_polygon_t* poly = subpolys[a];
 		glBegin(GL_POLYGON);
-		for (unsigned v = 0; v < poly.points.size(); v++) {
-			glTexCoord2f(poly.points[v].tx, poly.points[v].ty);
-			glVertex2d(poly.points[v].x, poly.points[v].y);
+		for (unsigned v = 0; v < poly->n_vertices; v++) {
+			glTexCoord2f(poly->vertices[v].tx, poly->vertices[v].ty);
+			glVertex2d(poly->vertices[v].x, poly->vertices[v].y);
 		}
 		glEnd();
 	}
@@ -77,14 +167,39 @@ void Polygon2D::render() {
 void Polygon2D::renderWireframe() {
 	// Go through sub-polys
 	for (unsigned a = 0; a < subpolys.size(); a++) {
-		subpoly_t& poly = subpolys[a];
+		gl_polygon_t* poly = subpolys[a];
 		glBegin(GL_LINE_LOOP);
-		for (unsigned v = 0; v < poly.points.size(); v++) {
-			glTexCoord2f(poly.points[v].tx, poly.points[v].ty);
-			glVertex2d(poly.points[v].x, poly.points[v].y);
+		for (unsigned v = 0; v < poly->n_vertices; v++) {
+			glTexCoord2f(poly->vertices[v].tx, poly->vertices[v].ty);
+			glVertex2d(poly->vertices[v].x, poly->vertices[v].y);
 		}
 		glEnd();
 	}
+}
+
+void Polygon2D::renderVBO(bool colour) {
+	// Setup VBO pointers
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glVertexPointer(3, GL_FLOAT, 36, 0);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	glTexCoordPointer(2, GL_FLOAT, 36, ((char*)NULL + 12));
+	if (colour) {
+		glEnableClientState(GL_COLOR_ARRAY);
+		glColorPointer(4, GL_FLOAT, 36, ((char*)NULL + 20));
+	}
+
+	// Render
+	glColor4f(this->colour[0], this->colour[1], this->colour[2], this->colour[3]);
+	for (unsigned a = 0; a < subpolys.size(); a++)
+		glDrawArrays(GL_POLYGON, subpolys[a]->vbo_index, subpolys[a]->n_vertices);
+
+	// Clean state
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	if (colour) glDisableClientState(GL_COLOR_ARRAY);
+}
+
+void Polygon2D::renderWireframeVBO(bool colour) {
 }
 
 
@@ -415,6 +530,13 @@ bool PolygonSplitter::tracePolyOutline(int edge_start) {
 	return true;
 }
 
+
+struct vdist_t {
+	int		index;
+	double	distance;
+	vdist_t(int index, double distance) { this->index = index; this->distance = distance; }
+	bool operator<(const vdist_t& right) const { return distance < right.distance; }
+};
 bool PolygonSplitter::splitFromEdge(int splitter_edge) {
 	// Get vertices
 	int v1 = edges[splitter_edge].v1;
@@ -464,18 +586,18 @@ bool PolygonSplitter::splitFromEdge(int splitter_edge) {
 
 
 	// Otherwise, we'll have to find the next closest vertex
-	vert_link_t pv_list(-1, -1);
+	vector<vdist_t> sorted_verts;
 
 	// Build a list of potential vertices, ordered by distance
 	for (unsigned a = 0; a < vertices.size(); a++) {
 		if (vertices[a].distance < 999999)
-			pv_list.add(new vert_link_t(a, vertices[a].distance));
+			sorted_verts.push_back(vdist_t(a, vertices[a].distance));
 	}
 
 	// Go through potential split vertices, closest first
-	vert_link_t* pv = pv_list.next;
-	while (pv) {
-		int index = pv->vertex;
+	std::sort(sorted_verts.begin(), sorted_verts.end());
+	for (unsigned a = 0; a < sorted_verts.size(); a++) {
+		int index = sorted_verts[a].index;
 		vertex_t& vert = vertices[index];
 
 		// Check if a split from the edge to this vertex would cross any other edges
@@ -499,21 +621,23 @@ bool PolygonSplitter::splitFromEdge(int splitter_edge) {
 
 			return true;
 		}
-
-		// Next closest vertex
-		pv = pv->next;
 	}
 
 	// No split created
 	return false;
 }
 
-bool PolygonSplitter::buildSubPoly(int edge_start, Polygon2D::subpoly_t& polygon) {
+bool PolygonSplitter::buildSubPoly(int edge_start, gl_polygon_t* poly) {
+	// Check polygon was given
+	if (!poly)
+		return false;
+
 	// Loop of death
 	int edge = edge_start;
+	vector<int> verts;
 	for (unsigned a = 0; a < 1000; a++) {
 		// Add vertex
-		polygon.points.push_back(Polygon2D::glvert_t(vertices[edges[edge].v1].x, vertices[edges[edge].v1].y));
+		verts.push_back(edges[edge].v1);
 
 		// Add edge to 'valid' edges list, so it is ignored when building further polygons
 		if (edge != edge_start) edges[edge].done = true;
@@ -534,13 +658,24 @@ bool PolygonSplitter::buildSubPoly(int edge_start, Polygon2D::subpoly_t& polygon
 	edges[edge_start].done = true;
 
 	// Check if the polygon is valid
-	if (polygon.points.size() >= 3)
+	if (verts.size() >= 3) {
+		// Allocate polygon vertex data
+		poly->n_vertices = verts.size();
+		poly->vertices = new gl_vertex_t[poly->n_vertices];
+
+		// Add vertex data to polygon
+		for (unsigned a = 0; a < verts.size(); a++) {
+			poly->vertices[a].x = vertices[verts[a]].x;
+			poly->vertices[a].y = vertices[verts[a]].y;
+		}
+
 		return true;
+	}
 	else
 		return false;
 }
 
-bool PolygonSplitter::doSplitting(vector<Polygon2D::subpoly_t>& polygons) {
+bool PolygonSplitter::doSplitting(Polygon2D* poly) {
 	// Init
 	split_edges_start = edges.size();
 
@@ -633,9 +768,9 @@ bool PolygonSplitter::doSplitting(vector<Polygon2D::subpoly_t>& polygons) {
 		if (edges[a].done || !edges[a].ok)
 			continue;
 
-		polygons.push_back(Polygon2D::subpoly_t());
-		if (!buildSubPoly(a, polygons.back()))
-			polygons.pop_back();
+		poly->addSubPoly();
+		if (!buildSubPoly(a, poly->getSubPoly(poly->nSubPolys() - 1)))
+			poly->removeSubPoly(poly->nSubPolys() - 1);
 	}
 
 	return true;
