@@ -257,6 +257,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\ColourPrefsPanel.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ColourPrefsPanel.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\EditingPrefsPanel.cpp"
 					>
 				</File>

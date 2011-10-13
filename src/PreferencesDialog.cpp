@@ -67,10 +67,12 @@ PreferencesDialog::PreferencesDialog(wxWindow* parent) : wxDialog(parent, -1, "S
 	panel_gfx_prefs = new GraphicsPrefsPanel(tree_prefs);
 	panel_gfx_png = new PNGPrefsPanel(tree_prefs);
 	panel_audio = new AudioPrefsPanel(tree_prefs);
+	panel_colours = new ColourPrefsPanel(tree_prefs);
 
 	// Setup preferences TreeBook
 	tree_prefs->AddPage(panel_general, "General", true);
 	tree_prefs->AddPage(panel_interface, "Interface");
+	tree_prefs->AddSubPage(panel_colours, "Colours");
 	tree_prefs->AddPage(panel_editing, "Editing");
 	tree_prefs->AddSubPage(setupBaseResourceArchivesPanel(), "Base Resource Archive");
 	tree_prefs->AddPage(panel_text_editor, "Text Editor");
@@ -146,6 +148,7 @@ void PreferencesDialog::applyPreferences() {
 	panel_gfx_prefs->applyPreferences();
 	panel_gfx_png->applyPreferences();
 	panel_audio->applyPreferences();
+	panel_colours->applyPreferences();
 }
 
 

@@ -12,6 +12,7 @@
 #include "GraphicsPrefsPanel.h"
 #include "PNGPrefsPanel.h"
 #include "AudioPrefsPanel.h"
+#include "ColourPrefsPanel.h"
 #include <wx/treebook.h>
 
 class PreferencesDialog : public wxDialog {
@@ -27,6 +28,7 @@ private:
 	GraphicsPrefsPanel*		panel_gfx_prefs;
 	PNGPrefsPanel*			panel_gfx_png;
 	AudioPrefsPanel*		panel_audio;
+	ColourPrefsPanel*		panel_colours;
 
 	// Base Resource Archive
 	BaseResourceArchivesPanel*	panel_bra;
