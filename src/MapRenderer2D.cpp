@@ -498,12 +498,14 @@ void MapRenderer2D::renderThingsImmediate(double view_scale, float alpha) {
 				}
 				else {
 					// Textured quad
+					if (point) glDisable(GL_POINT_SPRITE);
 					glBegin(GL_QUADS);
 					glTexCoord2f(0.0f, 1.0f);	glVertex2d(x-radius, y-radius);
 					glTexCoord2f(0.0f, 0.0f);	glVertex2d(x-radius, y+radius);
 					glTexCoord2f(1.0f, 0.0f);	glVertex2d(x+radius, y+radius);
 					glTexCoord2f(1.0f, 1.0f);	glVertex2d(x+radius, y-radius);
 					glEnd();
+					if (point) glEnable(GL_POINT_SPRITE);
 				}
 			}
 
@@ -811,15 +813,23 @@ void MapRenderer2D::renderSelection(vector<int>& selection, int mode, float view
 
 		// Draw selection
 		glColor4f(col.fr(), col.fg(), col.fb(), col.fa() * 0.75f);
+		vector<MapSide*> sides_selected;
 		for (unsigned a = 0; a < selection.size(); a++) {
+			// Don't draw if outside screen
+			if (vis_s[selection[a]] > 0)
+				continue;
+
 			// Get the sector's polygon
 			Polygon2D* poly = map->getSector(selection[a])->getPolygon();
+			vector<MapSide*>& sides = map->getSector(selection[a])->connectedSides();
 
-			if (poly->hasPolygon())
+			if (poly->hasPolygon()) {
 				map->getSector(selection[a])->getPolygon()->render();
+				for (unsigned a = 0; a < sides.size(); a++)
+					sides_selected.push_back(sides[a]);
+			}
 			else {
 				// Something went wrong with the polygon, just draw sector outline instead
-				vector<MapSide*>& sides = map->getSector(selection[a])->connectedSides();
 				glColor4f(col.fr(), col.fg(), col.fb(), col.fa());
 				glBegin(GL_LINES);
 				for (unsigned s = 0; s < sides.size(); s++) {
@@ -832,6 +842,24 @@ void MapRenderer2D::renderSelection(vector<int>& selection, int mode, float view
 				glColor4f(col.fr(), col.fg(), col.fb(), col.fa() * 0.6f);
 			}
 		}
+
+		// Draw selection outline
+		glColor4f(col.fr(), col.fg(), col.fb(), col.fa());
+		glLineWidth(line_width * 2);
+		bool* lines_drawn = new bool[map->nLines()];
+		memset(lines_drawn, 0, map->nLines());
+		glBegin(GL_LINES);
+		for (unsigned a = 0; a < sides_selected.size(); a++) {
+			MapLine* line = sides_selected[a]->getParentLine();
+			if (lines_drawn[line->getIndex()])
+				continue;
+
+			glVertex2d(line->v1()->xPos(), line->v1()->yPos());
+			glVertex2d(line->v2()->xPos(), line->v2()->yPos());
+			lines_drawn[line->getIndex()] = true;
+		}
+		glEnd();
+		delete[] lines_drawn;
 	}
 	else if (mode == MapEditor::MODE_THINGS) {
 		// Things
@@ -900,12 +928,14 @@ void MapRenderer2D::renderSelection(vector<int>& selection, int mode, float view
 			}
 			else {
 				// Textured quad
+				if (point) glDisable(GL_POINT_SPRITE);
 				glBegin(GL_QUADS);
 				glTexCoord2f(0.0f, 0.0f);	glVertex2d(x - radius, y - radius);
 				glTexCoord2f(0.0f, 1.0f);	glVertex2d(x - radius, y + radius);
 				glTexCoord2f(1.0f, 1.0f);	glVertex2d(x + radius, y + radius);
 				glTexCoord2f(1.0f, 0.0f);	glVertex2d(x + radius, y - radius);
 				glEnd();
+				if (point) glEnable(GL_POINT_SPRITE);
 			}
 		}
 

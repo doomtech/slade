@@ -142,6 +142,7 @@ float OpenGL::maxPointSize() {
 		GLfloat sizes[2];
 		glGetFloatv(GL_ALIASED_POINT_SIZE_RANGE, sizes);
 		max_point_size = sizes[1];
+		//wxLogMessage("Max GL point size %1.2f", max_point_size);
 	}
 
 	return max_point_size;

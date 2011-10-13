@@ -5,6 +5,8 @@
 #include "ColourConfiguration.h"
 #include "MapEditorWindow.h"
 
+EXTERN_CVAR(Bool, thing_overlay_square)
+
 MCASelboxFader::MCASelboxFader(long start, fpoint2_t tl, fpoint2_t br) : MCAnimation(start) {
 	// Init variables
 	this->tl = tl;
@@ -61,6 +63,10 @@ MCAThingSelection::MCAThingSelection(long start, double x, double y, double radi
 	this->radius = radius;
 	this->select = select;
 	this->fade = 1.0f;
+
+	// Adjust radius
+	if (!thing_overlay_square)
+		this->radius += 8;
 }
 
 MCAThingSelection::~MCAThingSelection() {
@@ -85,16 +91,19 @@ void MCAThingSelection::draw() {
 	col.set_gl();
 	glColor4f(col.fr(), col.fg(), col.fb(), fade);
 
-	// Get thing selection texture
-	GLTexture* tex = theMapEditor->textureManager().getEditorImage("thing/hilight");
-	if (!tex)
-		return;
+	if (!thing_overlay_square) {
+		// Get thing selection texture
+		GLTexture* tex = theMapEditor->textureManager().getEditorImage("thing/hilight");
+		if (!tex)
+			return;
 
-	// Bind the texture
-	glEnable(GL_TEXTURE_2D);
-	tex->bind();
+		// Bind the texture
+		glEnable(GL_TEXTURE_2D);
+		tex->bind();
+	}
 
 	double r = radius + (radius * 0.5 * (1.0-fade));
+
 	glBegin(GL_QUADS);
 	glTexCoord2f(0.0f, 0.0f);	glVertex2d(x - r, y - r);
 	glTexCoord2f(0.0f, 1.0f);	glVertex2d(x - r, y + r);

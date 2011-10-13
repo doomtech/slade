@@ -439,8 +439,8 @@ void MapCanvas::draw() {
 		// Sectors mode
 		if (things_always) renderer_2d->renderThings(view_scale, 0.4f);								// Things (faded)
 		if (vertices_always) renderer_2d->renderVertices(view_scale);								// Vertices
-		renderer_2d->renderSelection(editor->getSelection(), editor->editMode(), view_scale_inter);	// Selection
 		renderer_2d->renderLines(false);															// Lines (no direction tabs)
+		renderer_2d->renderSelection(editor->getSelection(), editor->editMode(), view_scale_inter);	// Selection
 		splitter.testRender();	// Testing
 	}
 	else if (editor->editMode() == MapEditor::MODE_THINGS) {
@@ -694,7 +694,7 @@ void MapCanvas::itemSelected(int index, bool selected) {
 		ThingType* tt = theGameConfiguration->thingType(t->getType());
 
 		// Start animation
-		animations.push_back(new MCAThingSelection(theApp->runTimer(), t->xPos(), t->yPos(), tt->getRadius()+8, selected));
+		animations.push_back(new MCAThingSelection(theApp->runTimer(), t->xPos(), t->yPos(), tt->getRadius(), selected));
 	}
 }
 
