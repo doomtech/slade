@@ -429,30 +429,30 @@ void MapCanvas::draw() {
 
 	if (editor->editMode() == MapEditor::MODE_VERTICES) {
 		// Vertices mode
-		if (things_always) renderer_2d->renderThings(view_scale, 0.4f);								// Things (faded)
+		if (things_always) renderer_2d->renderThings(view_scale, 0.5f);								// Things (faded)
 		renderer_2d->renderLines(false);															// Lines (no direction tabs)
 		renderer_2d->renderVertices(view_scale);													// Vertices
 		renderer_2d->renderSelection(editor->getSelection(), editor->editMode(), view_scale_inter);	// Selection
 	}
 	else if (editor->editMode() == MapEditor::MODE_LINES) {
 		// Lines mode
-		if (things_always) renderer_2d->renderThings(view_scale, 0.4f);								// Things (faded)
-		if (vertices_always) renderer_2d->renderVertices(view_scale);								// Vertices
+		if (things_always) renderer_2d->renderThings(view_scale, 0.5f);								// Things (faded)
+		if (vertices_always) renderer_2d->renderVertices(view_scale, 0.5f);							// Vertices (faded)
 		renderer_2d->renderLines(true);																// Lines
 		renderer_2d->renderSelection(editor->getSelection(), editor->editMode(), view_scale_inter);	// Selection
 	}
 	else if (editor->editMode() == MapEditor::MODE_SECTORS) {
 		// Sectors mode
-		if (things_always) renderer_2d->renderThings(view_scale, 0.4f);								// Things (faded)
-		if (vertices_always) renderer_2d->renderVertices(view_scale);								// Vertices
+		if (things_always) renderer_2d->renderThings(view_scale, 0.5f);								// Things (faded)
+		if (vertices_always) renderer_2d->renderVertices(view_scale, 0.5f);							// Vertices (faded)
 		renderer_2d->renderLines(false);															// Lines (no direction tabs)
 		renderer_2d->renderSelection(editor->getSelection(), editor->editMode(), view_scale_inter);	// Selection
 		splitter.testRender();	// Testing
 	}
 	else if (editor->editMode() == MapEditor::MODE_THINGS) {
 		// Things mode
+		if (vertices_always) renderer_2d->renderVertices(view_scale, 0.5f);							// Vertices (faded)
 		renderer_2d->renderLines(false);															// Lines (no direction tabs)
-		if (vertices_always) renderer_2d->renderVertices(view_scale);								// Vertices
 		renderer_2d->renderThings(view_scale);														// Things
 		renderer_2d->renderSelection(editor->getSelection(), editor->editMode(), view_scale_inter);	// Selection
 	}

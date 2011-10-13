@@ -45,7 +45,7 @@ MapRenderer2D::~MapRenderer2D() {
 	if (list_lines > 0)			glDeleteLists(list_lines, 1);
 }
 
-void MapRenderer2D::renderVertices(float view_scale) {
+void MapRenderer2D::renderVertices(float view_scale, float alpha) {
 	// Check there are any vertices to render
 	if (map->nVertices() == 0)
 		return;
@@ -80,6 +80,11 @@ void MapRenderer2D::renderVertices(float view_scale) {
 		else				glDisable(GL_POINT_SMOOTH);
 	}
 
+	// Set to vertex colour
+	rgba_t col = ColourConfiguration::getColour("map_vertex");
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glColor4f(col.fr(), col.fg(), col.fb(), col.fa()*alpha);
+
 	// Render the vertices depending on what features are supported
 	if (GLEW_ARB_vertex_buffer_object && !FORCE_NO_VBO)
 		renderVerticesVBO();
@@ -99,9 +104,6 @@ void MapRenderer2D::renderVerticesImmediate() {
 		list_vertices = glGenLists(1);
 		glNewList(list_vertices, GL_COMPILE_AND_EXECUTE);
 
-		// Set to vertex colour
-		ColourConfiguration::getColour("map_vertex").set_gl();
-
 		// Draw all vertices
 		glBegin(GL_POINTS);
 		for (unsigned a = 0; a < map->nVertices(); a++)
@@ -120,10 +122,6 @@ void MapRenderer2D::renderVerticesVBO() {
 	// Update vertices VBO if required
 	if (vbo_vertices == 0 || map->nVertices() != n_vertices)
 		updateVerticesVBO();
-
-	// Set to vertex colour
-	ColourConfiguration::getColour("map_vertex").set_gl();
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// Setup VBO pointers
 	glBindBuffer(GL_ARRAY_BUFFER, vbo_vertices);
@@ -488,8 +486,8 @@ void MapRenderer2D::renderThingsImmediate(double view_scale, float alpha) {
 				thing = map->getThing(a);
 				ThingType* tt = theGameConfiguration->thingType(thing->getType());
 				double radius = (tt->getRadius()+1) * 1.3;
-				x = thing->xPos()+(radius*0.05);
-				y = thing->yPos()-(radius*0.05);
+				x = thing->xPos();
+				y = thing->yPos();
 
 				// Draw shadow
 				if (point && radius*2*view_scale <= OpenGL::maxPointSize()) {

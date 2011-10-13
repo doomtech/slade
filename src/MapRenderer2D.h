@@ -53,7 +53,7 @@ public:
 	~MapRenderer2D();
 
 	// Main drawing stuff
-	void	renderVertices(float view_scale);
+	void	renderVertices(float view_scale, float alpha = 1.0f);
 	void	renderVerticesVBO();
 	void	renderVerticesImmediate();
 	void	renderLines(bool show_direction);
