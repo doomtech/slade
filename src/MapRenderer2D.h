@@ -25,6 +25,7 @@ private:
 		VIS_RIGHT	= 2,
 		VIS_ABOVE	= 4,
 		VIS_BELOW	= 8,
+		VIS_SMALL	= 16,
 	};
 	vector<uint8_t>	vis_v;
 	vector<uint8_t>	vis_l;
@@ -34,7 +35,7 @@ private:
 	// Structs
 	struct glvert_t {
 		GLfloat x, y;
-		GLfloat r, g, b;
+		GLfloat r, g, b, a;
 	};
 	struct glline_t {
 		glvert_t v1, v2;	// The line itself

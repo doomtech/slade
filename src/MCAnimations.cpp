@@ -4,8 +4,12 @@
 #include "MCAnimations.h"
 #include "ColourConfiguration.h"
 #include "MapEditorWindow.h"
+#include "MapLine.h"
+#include "MapVertex.h"
 
 EXTERN_CVAR(Bool, thing_overlay_square)
+EXTERN_CVAR(Bool, vertex_round)
+EXTERN_CVAR(Float, line_width)
 
 MCASelboxFader::MCASelboxFader(long start, fpoint2_t tl, fpoint2_t br) : MCAnimation(start) {
 	// Init variables
@@ -74,10 +78,7 @@ MCAThingSelection::~MCAThingSelection() {
 
 bool MCAThingSelection::update(long time) {
 	// Determine fade amount (0.0-1.0 over 150ms)
-	fade = ((time - starttime) * 0.006f);
-
-	// Reverse if deselecting
-	if (!select) fade = 1.0f - fade;
+	fade = 1.0f - ((time - starttime) * 0.004f);
 
 	// Check if animation is finished
 	if (fade < 0.0f || fade > 1.0f)
@@ -87,10 +88,17 @@ bool MCAThingSelection::update(long time) {
 }
 
 void MCAThingSelection::draw() {
-	rgba_t col = ColourConfiguration::getColour("map_selection");
+	// Setup colour
+	rgba_t col;
+	if (select)
+		col.set(255, 255, 255, 255*fade, 1);
+	else {
+		col = ColourConfiguration::getColour("map_selection");
+		col.a *= fade;
+	}
 	col.set_gl();
-	glColor4f(col.fr(), col.fg(), col.fb(), fade);
 
+	// Get texture if needed
 	if (!thing_overlay_square) {
 		// Get thing selection texture
 		GLTexture* tex = theMapEditor->textureManager().getEditorImage("thing/hilight");
@@ -102,12 +110,200 @@ void MCAThingSelection::draw() {
 		tex->bind();
 	}
 
-	double r = radius + (radius * 0.5 * (1.0-fade));
-
+	// Draw
 	glBegin(GL_QUADS);
-	glTexCoord2f(0.0f, 0.0f);	glVertex2d(x - r, y - r);
-	glTexCoord2f(0.0f, 1.0f);	glVertex2d(x - r, y + r);
-	glTexCoord2f(1.0f, 1.0f);	glVertex2d(x + r, y + r);
-	glTexCoord2f(1.0f, 0.0f);	glVertex2d(x + r, y - r);
+	glTexCoord2f(0.0f, 0.0f);	glVertex2d(x - radius, y - radius);
+	glTexCoord2f(0.0f, 1.0f);	glVertex2d(x - radius, y + radius);
+	glTexCoord2f(1.0f, 1.0f);	glVertex2d(x + radius, y + radius);
+	glTexCoord2f(1.0f, 0.0f);	glVertex2d(x + radius, y - radius);
 	glEnd();
+}
+
+
+
+MCALineSelection::MCALineSelection(long start, vector<MapLine*>& lines, bool select) : MCAnimation(start) {
+	// Init variables
+	this->select = select;
+	this->fade = 1.0f;
+
+	// Go through list of lines
+	double xmid, ymid;
+	for (unsigned a = 0; a < lines.size(); a++) {
+		if (!lines[a]) continue;
+
+		// Add line
+		this->lines.push_back(frect_t(lines[a]->v1()->xPos(), lines[a]->v1()->yPos(), lines[a]->v2()->xPos(), lines[a]->v2()->yPos()));
+
+		// Calculate line direction tab
+		frect_t& rect = this->lines.back();
+		xmid = rect.tl.x + ((rect.br.x - rect.tl.x) * 0.5);
+		ymid = rect.tl.y + ((rect.br.y - rect.tl.y) * 0.5);
+		double tablen = rect.length() * 0.2;
+		if (tablen > 8) tablen = 8;
+		if (tablen < 2) tablen = 2;
+		fpoint2_t invdir(-(rect.br.y - rect.tl.y), rect.br.x - rect.tl.x);
+		invdir.normalize();
+		
+		this->tabs.push_back(frect_t(xmid, ymid, xmid - invdir.x*tablen, ymid - invdir.y*tablen));
+	}
+}
+
+MCALineSelection::~MCALineSelection() {
+}
+
+bool MCALineSelection::update(long time) {
+	// Determine fade amount (0.0-1.0 over 150ms)
+	fade = 1.0f - ((time - starttime) * 0.004f);
+
+	// Check if animation is finished
+	if (fade < 0.0f || fade > 1.0f)
+		return false;
+	else
+		return true;
+}
+
+void MCALineSelection::draw() {
+	// Setup colour
+	rgba_t col;
+	if (select)
+		col.set(255, 255, 255, 255*fade, 1);
+	else {
+		col = ColourConfiguration::getColour("map_selection");
+		col.a *= fade;
+	}
+	col.set_gl();
+
+	// Draw lines
+	glLineWidth(line_width*5);
+	glBegin(GL_LINES);
+	for (unsigned a = 0; a < lines.size(); a++) {
+		glVertex2d(lines[a].tl.x, lines[a].tl.y);
+		glVertex2d(lines[a].br.x, lines[a].br.y);
+		glVertex2d(tabs[a].tl.x, tabs[a].tl.y);
+		glVertex2d(tabs[a].br.x, tabs[a].br.y);
+	}
+	glEnd();
+}
+
+
+
+MCAVertexSelection::MCAVertexSelection(long start, vector<MapVertex*>& verts, double size, bool select) : MCAnimation(start) {
+	// Init variables
+	this->size = size;
+	this->select = select;
+	this->fade = 1.0f;
+
+	// Setup vertices list
+	for (unsigned a = 0; a < verts.size(); a++) {
+		if (!verts[a]) continue;
+		vertices.push_back(fpoint2_t(verts[a]->xPos(), verts[a]->yPos()));
+	}
+}
+
+MCAVertexSelection::~MCAVertexSelection() {
+}
+
+bool MCAVertexSelection::update(long time) {
+	// Determine fade amount (0.0-1.0 over 150ms)
+	fade = 1.0f - ((time - starttime) * 0.004f);
+
+	// Check if animation is finished
+	if (fade < 0.0f || fade > 1.0f)
+		return false;
+	else
+		return true;
+}
+
+void MCAVertexSelection::draw() {
+	// Setup colour
+	rgba_t col;
+	if (select)
+		col.set(255, 255, 255, 255*fade, 1);
+	else {
+		col = ColourConfiguration::getColour("map_selection");
+		col.a *= fade;
+	}
+	col.set_gl();
+
+	// Setup point sprites if supported
+	bool point = false;
+	if (GLEW_ARB_point_sprite) {
+		// Get appropriate vertex texture
+		GLTexture* tex;
+		if (vertex_round) tex = theMapEditor->textureManager().getEditorImage("vertex_r");
+		else tex = theMapEditor->textureManager().getEditorImage("vertex_s");
+
+		// If it was found, enable point sprites
+		if (tex) {
+			glEnable(GL_TEXTURE_2D);
+			tex->bind();
+			glEnable(GL_POINT_SPRITE);
+			glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
+			point = true;
+		}
+	}
+
+	// No point sprites, use regular points
+	if (!point) {
+		if (vertex_round)	glEnable(GL_POINT_SMOOTH);
+		else				glDisable(GL_POINT_SMOOTH);
+	}
+
+	// Draw points
+	if (select)
+		glPointSize(size+(size*fade));
+	else
+		glPointSize(size);
+	glBegin(GL_POINTS);
+	for (unsigned a = 0; a < vertices.size(); a++)
+		glVertex2d(vertices[a].x, vertices[a].y);
+	glEnd();
+
+	if (point) {
+		glDisable(GL_POINT_SPRITE);
+		glDisable(GL_TEXTURE_2D);
+	}
+}
+
+
+
+
+MCASectorSelection::MCASectorSelection(long start, vector<Polygon2D*>& polys, bool select) : MCAnimation(start) {
+	// Init variables
+	this->select = select;
+	this->fade = 1.0f;
+
+	// Copy polygon list
+	for (unsigned a = 0; a < polys.size(); a++)
+		this->polygons.push_back(polys[a]);
+}
+
+MCASectorSelection::~MCASectorSelection() {
+}
+
+bool MCASectorSelection::update(long time) {
+	// Determine fade amount (0.0-1.0 over 150ms)
+	fade = 1.0f - ((time - starttime) * 0.004f);
+
+	// Check if animation is finished
+	if (fade < 0.0f || fade > 1.0f)
+		return false;
+	else
+		return true;
+}
+
+void MCASectorSelection::draw() {
+	// Setup colour
+	rgba_t col;
+	if (select)
+		col.set(255, 255, 255, 180*fade, 1);
+	else {
+		col = ColourConfiguration::getColour("map_selection");
+		col.a *= fade*0.75;
+	}
+	col.set_gl();
+
+	// Draw polygons
+	for (unsigned a = 0; a < polygons.size(); a++)
+		polygons[a]->render();
 }

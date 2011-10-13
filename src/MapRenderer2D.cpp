@@ -149,6 +149,7 @@ void MapRenderer2D::renderLines(bool show_direction) {
 		glEnable(GL_LINE_SMOOTH);
 	else
 		glDisable(GL_LINE_SMOOTH);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// Render the lines depending on what features are supported
 	if (GLEW_ARB_vertex_buffer_object && !FORCE_NO_VBO)
@@ -183,7 +184,7 @@ void MapRenderer2D::renderLinesImmediate(bool show_direction) {
 	// Draw all lines
 	rgba_t col;
 	MapLine* line = NULL;
-	double x1, y1, x2, y2;
+	double x1, y1, x2, y2, tablen;
 	for (unsigned a = 0; a < map->nLines(); a++) {
 		// Get line info
 		line = map->getLine(a);
@@ -200,12 +201,11 @@ void MapRenderer2D::renderLinesImmediate(bool show_direction) {
 
 		// Check for two-sided line
 		if (line->s2())
-			col.set(col.r*fade_coeff+col_background.r*(1.0-fade_coeff),
-					col.g*fade_coeff+col_background.g*(1.0-fade_coeff),
-					col.b*fade_coeff+col_background.b*(1.0-fade_coeff), 255, 0);
+			col.a *= 0.5f;
 
 		// Set line colour
-		col.set_gl();
+		glColor4f(col.fr(), col.fg(), col.fb(), col.fa());
+		//col.set_gl();
 
 		// Draw the line
 		glBegin(GL_LINES);
@@ -217,12 +217,15 @@ void MapRenderer2D::renderLinesImmediate(bool show_direction) {
 		if (show_direction) {
 			double xmid = x1 + ((x2 - x1) * 0.5);
 			double ymid = y1 + ((y2 - y1) * 0.5);
+			tablen = line->getLength() * 0.2;
+			if (tablen > 8) tablen = 8;
+			if (tablen < 2) tablen = 2;
 			fpoint2_t invdir(-(y2 - y1), x2 - x1);
 			invdir.normalize();
 
 			glBegin(GL_LINES);
 			glVertex2d(xmid, ymid);
-			glVertex2d(xmid - invdir.x*8, ymid - invdir.y*8);
+			glVertex2d(xmid - invdir.x*tablen, ymid - invdir.y*tablen);
 			glEnd();
 		}
 	}
@@ -246,9 +249,9 @@ void MapRenderer2D::renderLinesVBO(bool show_direction) {
 	// Setup VBO pointers
 	glBindBuffer(GL_ARRAY_BUFFER, vbo_lines);
 	glEnableClientState(GL_VERTEX_ARRAY);
-	glVertexPointer(2, GL_FLOAT, 20, 0);
+	glVertexPointer(2, GL_FLOAT, 24, 0);
 	glEnableClientState(GL_COLOR_ARRAY);
-	glColorPointer(3, GL_FLOAT, 20, ((char*)NULL + 8));
+	glColorPointer(4, GL_FLOAT, 24, ((char*)NULL + 8));
 
 	// Render the VBO
 	if (show_direction)
@@ -635,12 +638,15 @@ void MapRenderer2D::renderHilight(int hilight_item, int mode, float fade, float 
 		// Direction tab
 		double xmid = x1 + ((x2 - x1) * 0.5);
 		double ymid = y1 + ((y2 - y1) * 0.5);
+		double tablen = line->getLength() * 0.2;
+		if (tablen > 8) tablen = 8;
+		if (tablen < 2) tablen = 2;
 		fpoint2_t invdir(-(y2 - y1), x2 - x1);
 		invdir.normalize();
 
 		glBegin(GL_LINES);
 		glVertex2d(xmid, ymid);
-		glVertex2d(xmid - invdir.x*8, ymid - invdir.y*8);
+		glVertex2d(xmid - invdir.x*tablen, ymid - invdir.y*tablen);
 		glEnd();
 	}
 	else if (mode == MapEditor::MODE_SECTORS) {
@@ -801,10 +807,13 @@ void MapRenderer2D::renderSelection(vector<int>& selection, int mode, float view
 			// Direction tab
 			double xmid = x1 + ((x2 - x1) * 0.5);
 			double ymid = y1 + ((y2 - y1) * 0.5);
+			double tablen = line->getLength() * 0.2;
+			if (tablen > 8) tablen = 8;
+			if (tablen < 2) tablen = 2;
 			fpoint2_t invdir(-(y2 - y1), x2 - x1);
 			invdir.normalize();
 			glVertex2d(xmid, ymid);
-			glVertex2d(xmid - invdir.x*8, ymid - invdir.y*8);
+			glVertex2d(xmid - invdir.x*tablen, ymid - invdir.y*tablen);
 		}
 		glEnd();
 	}
@@ -815,8 +824,8 @@ void MapRenderer2D::renderSelection(vector<int>& selection, int mode, float view
 		glColor4f(col.fr(), col.fg(), col.fb(), col.fa() * 0.75f);
 		vector<MapSide*> sides_selected;
 		for (unsigned a = 0; a < selection.size(); a++) {
-			// Don't draw if outside screen
-			if (vis_s[selection[a]] > 0)
+			// Don't draw if outside screen (but still draw if it's small)
+			if (vis_s[selection[a]] > 0 && vis_s[selection[a]] != VIS_SMALL)
 				continue;
 
 			// Get the sector's polygon
@@ -1126,6 +1135,8 @@ void MapRenderer2D::updateLinesVBO(bool show_direction) {
 	unsigned v = 0;
 	rgba_t col;
 	float x1, y1, x2, y2;
+	float alpha;
+	double tablen;
 	for (unsigned a = 0; a < map->nLines(); a++) {
 		MapLine* line = map->getLine(a);
 
@@ -1137,9 +1148,9 @@ void MapRenderer2D::updateLinesVBO(bool show_direction) {
 
 		// Check for two-sided line
 		if (line->s2())
-			col.set(col.r*0.5+col_background.r*(1.0-0.5),
-					col.g*0.5+col_background.g*(1.0-0.5),
-					col.b*0.5+col_background.b*(1.0-0.5), 255, 0);
+			alpha = 0.5f;
+		else
+			alpha = 1.0f;
 
 		// Set line vertices
 		lines[v].x = line->v1()->xPos();
@@ -1151,6 +1162,7 @@ void MapRenderer2D::updateLinesVBO(bool show_direction) {
 		lines[v].r = lines[v+1].r = col.fr();
 		lines[v].g = lines[v+1].g = col.fg();
 		lines[v].b = lines[v+1].b = col.fb();
+		lines[v].a = lines[v+1].a = alpha;
 
 		// Direction tab if needed
 		if (show_direction) {
@@ -1158,17 +1170,21 @@ void MapRenderer2D::updateLinesVBO(bool show_direction) {
 			y1 = line->v1()->yPos();
 			x2 = line->v2()->xPos();
 			y2 = line->v2()->yPos();
+			tablen = line->getLength() * 0.2;
+			if (tablen > 8) tablen = 8;
+			if (tablen < 2) tablen = 2;
 			lines[v+2].x = x1 + ((x2 - x1) * 0.5);
 			lines[v+2].y = y1 + ((y2 - y1) * 0.5);
 			fpoint2_t invdir(-(y2 - y1), x2 - x1);
 			invdir.normalize();
-			lines[v+3].x = lines[v+2].x - invdir.x*8;
-			lines[v+3].y = lines[v+2].y - invdir.y*8;
+			lines[v+3].x = lines[v+2].x - invdir.x*tablen;
+			lines[v+3].y = lines[v+2].y - invdir.y*tablen;
 
 			// Colours
 			lines[v+2].r = lines[v+3].r = col.fr();
 			lines[v+2].g = lines[v+3].g = col.fg();
 			lines[v+2].b = lines[v+3].b = col.fb();
+			lines[v+2].a = lines[v+3].a = alpha*0.6f;
 		}
 
 		// Next line
@@ -1279,7 +1295,7 @@ void MapRenderer2D::updateVisibility(fpoint2_t view_tl, fpoint2_t view_br, doubl
 		// Check if the sector is worth drawing
 		if ((bbox.max.x - bbox.min.x) * view_scale < 4 ||
 			(bbox.max.y - bbox.min.y) * view_scale < 4)
-			vis_s[a] = 1;
+			vis_s[a] = VIS_SMALL;
 	}
 
 	// Thing visibility
@@ -1306,7 +1322,7 @@ void MapRenderer2D::updateVisibility(fpoint2_t view_tl, fpoint2_t view_br, doubl
 
 		// Check if the thing is worth drawing
 		else if (radius*view_scale < 2)
-			vis_t[a] = 1;
+			vis_t[a] = VIS_SMALL;
 	}
 }
 

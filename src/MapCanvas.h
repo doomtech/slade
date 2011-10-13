@@ -85,6 +85,7 @@ public:
 	void	update(long frametime);
 
 	void	itemSelected(int index, bool selected = true);
+	void	itemsSelected(vector<int>& items, bool selected = true);
 
 	// Keybind handling
 	void	onKeyBindPress(string name);

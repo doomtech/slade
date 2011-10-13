@@ -53,6 +53,12 @@ CVAR(Int, flat_drawtype, 2, CVAR_SAVE)
 PolygonSplitter splitter;	// for testing
 
 
+/*******************************************************************
+ * EXTERNAL VARIABLES
+ *******************************************************************/
+EXTERN_CVAR(Int, vertex_size)
+
+
 /* MapCanvas::MapCanvas
  * MapCanvas class constructor
  *******************************************************************/
@@ -684,17 +690,98 @@ void MapCanvas::update(long frametime) {
 }
 
 void MapCanvas::itemSelected(int index, bool selected) {
+	// Things mode
 	if (editor->editMode() == MapEditor::MODE_THINGS) {
 		// Get thing
 		MapThing* t = editor->getMap().getThing(index);
-		if (!t)
-			return;
+		if (!t) return;
 
 		// Get thing type
 		ThingType* tt = theGameConfiguration->thingType(t->getType());
 
 		// Start animation
 		animations.push_back(new MCAThingSelection(theApp->runTimer(), t->xPos(), t->yPos(), tt->getRadius(), selected));
+	}
+
+	// Lines mode
+	else if (editor->editMode() == MapEditor::MODE_LINES) {
+		// Get line
+		vector<MapLine*> vec;
+		vec.push_back(editor->getMap().getLine(index));
+
+		// Start animation
+		animations.push_back(new MCALineSelection(theApp->runTimer(), vec, selected));
+	}
+
+	// Vertices mode
+	else if (editor->editMode() == MapEditor::MODE_VERTICES) {
+		// Get vertex
+		vector<MapVertex*> verts;
+		verts.push_back(editor->getMap().getVertex(index));
+
+		// Determine current vertex size
+		float vs = vertex_size;
+		if (view_scale < 1.0) vs *= view_scale;
+		if (vs < 2.0) vs = 2.0;
+
+		// Start animation
+		animations.push_back(new MCAVertexSelection(theApp->runTimer(), verts, vs, selected));
+	}
+
+	// Sectors mode
+	else if (editor->editMode() == MapEditor::MODE_SECTORS) {
+		// Get sector polygon
+		vector<Polygon2D*> polys;
+		polys.push_back(editor->getMap().getSector(index)->getPolygon());
+
+		// Start animation
+		animations.push_back(new MCASectorSelection(theApp->runTimer(), polys, selected));
+	}
+}
+
+void MapCanvas::itemsSelected(vector<int>& items, bool selected) {
+	// Things mode
+	if (editor->editMode() == MapEditor::MODE_THINGS) {
+		// Go through selection
+		for (unsigned a = 0; a < items.size(); a++)
+			itemSelected(items[a], selected);
+	}
+
+	// Lines mode
+	else if (editor->editMode() == MapEditor::MODE_LINES) {
+		vector<MapLine*> lines;
+		for (unsigned a = 0; a < items.size(); a++)
+			lines.push_back(editor->getMap().getLine(items[a]));
+
+		// Start animation
+		animations.push_back(new MCALineSelection(theApp->runTimer(), lines, selected));
+	}
+
+	// Vertices mode
+	else if (editor->editMode() == MapEditor::MODE_VERTICES) {
+		// Get list of vertices
+		vector<MapVertex*> verts;
+		for (unsigned a = 0; a < items.size(); a++)
+			verts.push_back(editor->getMap().getVertex(items[a]));
+
+		// Determine current vertex size
+		float vs = vertex_size;
+		if (view_scale < 1.0) vs *= view_scale;
+		if (vs < 2.0) vs = 2.0;
+
+		// Start animation
+		animations.push_back(new MCAVertexSelection(theApp->runTimer(), verts, vs, selected));
+	}
+
+	// Sectors mode
+	else if (editor->editMode() == MapEditor::MODE_SECTORS) {
+		// Get list of sector polygons
+		vector<Polygon2D*> polys;
+		for (unsigned a = 0; a < items.size(); a++)
+			polys.push_back(editor->getMap().getSector(items[a])->getPolygon());
+
+		// Start animation
+		animations.push_back(new MCASectorSelection(theApp->runTimer(), polys, selected));
 	}
 }
 

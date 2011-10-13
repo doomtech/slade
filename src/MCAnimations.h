@@ -44,4 +44,51 @@ public:
 	void draw();
 };
 
+class MapLine;
+class MCALineSelection : public MCAnimation {
+private:
+	vector<frect_t>	lines;
+	vector<frect_t>	tabs;
+	bool	select;
+	float	fade;
+
+public:
+	MCALineSelection(long start, vector<MapLine*>& lines, bool select = true);
+	~MCALineSelection();
+
+	bool update(long time);
+	void draw();
+};
+
+class MapVertex;
+class MCAVertexSelection : public MCAnimation {
+private:
+	vector<fpoint2_t>	vertices;
+	double				size;
+	bool				select;
+	float				fade;
+
+public:
+	MCAVertexSelection(long start, vector<MapVertex*>& verts, double size, bool select = true);
+	~MCAVertexSelection();
+
+	bool update(long time);
+	void draw();
+};
+
+class Polygon2D;
+class MCASectorSelection : public MCAnimation {
+private:
+	vector<Polygon2D*>	polygons;
+	bool				select;
+	float				fade;
+
+public:
+	MCASectorSelection(long start, vector<Polygon2D*>& polys, bool select = true);
+	~MCASectorSelection();
+
+	bool update(long time);
+	void draw();
+};
+
 #endif//__MC_ANIMATIONS_H__
