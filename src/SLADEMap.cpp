@@ -283,12 +283,14 @@ bool SLADEMap::addLine(doomline_t& l) {
 	if (s1 && s1->parent) {
 		// Duplicate side
 		s1 = new MapSide(*s1);
+		s1->setSector(s1->getSector());
 		sides.push_back(s1);
 	}
 
 	// Check if side2 already belongs to a line
 	if (s2 && s2->parent) {
 		s2 = new MapSide(*s2);
+		s2->setSector(s2->getSector());
 		sides.push_back(s2);
 	}
 
@@ -337,12 +339,14 @@ bool SLADEMap::addLine(doom64line_t& l) {
 	if (s1 && s1->parent) {
 		// Duplicate side
 		s1 = new MapSide(*s1);
+		s1->setSector(s1->getSector());
 		sides.push_back(s1);
 	}
 
 	// Check if side2 already belongs to a line
 	if (s2 && s2->parent) {
 		s2 = new MapSide(*s2);
+		s2->setSector(s2->getSector());
 		sides.push_back(s2);
 	}
 

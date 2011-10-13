@@ -8,6 +8,7 @@
 #include "GameConfiguration.h"
 #include "MathStuff.h"
 #include "Console.h"
+#include "MapCanvas.h"
 
 double grid_sizes[] = { 0.05, 0.1, 0.25, 0.5, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192 };
 
@@ -16,6 +17,7 @@ MapEditor::MapEditor() {
 	edit_mode = MODE_LINES;
 	hilight_item = -1;
 	gridsize = 9;
+	canvas = NULL;
 }
 
 MapEditor::~MapEditor() {
@@ -108,8 +110,13 @@ bool MapEditor::selectCurrent(bool clear_none) {
 	// If nothing is hilighted
 	if (hilight_item == -1) {
 		// Clear selection if specified
-		if (clear_none)
+		if (clear_none) {
+			if (canvas) {
+				for (unsigned a = 0; a < selection.size(); a++)
+					canvas->itemSelected(selection[a], false);
+			}
 			selection.clear();
+		}
 
 		return false;
 	}
@@ -119,12 +126,14 @@ bool MapEditor::selectCurrent(bool clear_none) {
 		if (selection[a] == hilight_item) {
 			// Already selected, deselect
 			selection.erase(selection.begin() + a);
+			if (canvas) canvas->itemSelected(hilight_item, false);
 			return true;
 		}
 	}
 
 	// Not already selected, add to selection
 	selection.push_back(hilight_item);
+	if (canvas) canvas->itemSelected(hilight_item, true);
 
 	return true;
 }
@@ -208,6 +217,7 @@ bool MapEditor::selectWithin(double xmin, double ymin, double xmax, double ymax)
 			// Select if thing is within bounds
 			if (xmin <= x && x <= xmax && ymin <= y && y <= ymax) {
 				selection.push_back(a);
+				if (canvas) canvas->itemSelected(a);
 				new_sel = true;
 			}
 		}
@@ -351,8 +361,10 @@ void MapEditor::showItem(int index) {
 	default: max = 0; break;
 	}
 
-	if (index < max)
+	if (index < max) {
 		selection.push_back(index);
+		if (canvas) canvas->viewShowObject();
+	}
 }
 
 void MapEditor::incrementGrid() {

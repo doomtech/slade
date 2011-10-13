@@ -178,25 +178,10 @@ void Polygon2D::renderWireframe() {
 }
 
 void Polygon2D::renderVBO(bool colour) {
-	// Setup VBO pointers
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glVertexPointer(3, GL_FLOAT, 36, 0);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	glTexCoordPointer(2, GL_FLOAT, 36, ((char*)NULL + 12));
-	if (colour) {
-		glEnableClientState(GL_COLOR_ARRAY);
-		glColorPointer(4, GL_FLOAT, 36, ((char*)NULL + 20));
-	}
-
 	// Render
-	glColor4f(this->colour[0], this->colour[1], this->colour[2], this->colour[3]);
+	//glColor4f(this->colour[0], this->colour[1], this->colour[2], this->colour[3]);
 	for (unsigned a = 0; a < subpolys.size(); a++)
 		glDrawArrays(GL_POLYGON, subpolys[a]->vbo_index, subpolys[a]->n_vertices);
-
-	// Clean state
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	if (colour) glDisableClientState(GL_COLOR_ARRAY);
 }
 
 void Polygon2D::renderWireframeVBO(bool colour) {

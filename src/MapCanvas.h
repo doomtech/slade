@@ -84,6 +84,8 @@ public:
 	void	draw();
 	void	update(long frametime);
 
+	void	itemSelected(int index, bool selected = true);
+
 	// Keybind handling
 	void	onKeyBindPress(string name);
 	void	onKeyBindRelease(string name);

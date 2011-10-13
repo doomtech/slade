@@ -15,3 +15,19 @@ MapSide::MapSide(MapSector* sector) {
 
 MapSide::~MapSide() {
 }
+
+void MapSide::setSector(MapSector* sector) {
+	// Remove side from current sector, if any
+	if (this->sector) {
+		for (unsigned a = 0; a < sector->connected_sides.size(); a++) {
+			if (sector->connected_sides[a] == this) {
+				sector->connected_sides.erase(sector->connected_sides.begin() + a);
+				break;
+			}
+		}
+	}
+
+	// Add side to new sector
+	this->sector = sector;
+	sector->connected_sides.push_back(this);
+}

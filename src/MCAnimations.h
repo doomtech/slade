@@ -28,4 +28,20 @@ public:
 	void draw();
 };
 
+class MCAThingSelection : public MCAnimation {
+private:
+	double	x;
+	double	y;
+	double	radius;
+	bool	select;
+	float	fade;
+
+public:
+	MCAThingSelection(long start, double x, double y, double radius, bool select = true);
+	~MCAThingSelection();
+
+	bool update(long time);
+	void draw();
+};
+
 #endif//__MC_ANIMATIONS_H__

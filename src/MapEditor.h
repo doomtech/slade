@@ -5,10 +5,12 @@
 #include "SLADEMap.h"
 #include "GameConfiguration.h"
 
+class MapCanvas;
 class MapEditor {
 private:
 	SLADEMap			map;
-	GameConfiguration	game;
+	MapCanvas*			canvas;
+	//GameConfiguration	game;
 
 	// Editor state
 	uint8_t		edit_mode;
@@ -30,7 +32,7 @@ public:
 	~MapEditor();
 
 	SLADEMap&			getMap() { return map; }
-	GameConfiguration&	gameConfiguration() { return game; }
+	//GameConfiguration&	gameConfiguration() { return game; }
 	uint8_t				editMode() { return edit_mode; }
 	double				gridSize();
 	unsigned			selectionSize() { return selection.size(); }
@@ -38,6 +40,7 @@ public:
 	int					hilightItem() { return hilight_item; }
 
 	void	setEditMode(int mode);
+	void	setCanvas(MapCanvas* canvas) { this->canvas = canvas; }
 
 	// Map loading
 	bool	openMap(Archive::mapdesc_t map);

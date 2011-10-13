@@ -60,6 +60,7 @@ MapCanvas::MapCanvas(wxWindow *parent, int id, MapEditor* editor)
 : OGLCanvas(parent, id) {
 	// Init variables
 	this->editor = editor;
+	editor->setCanvas(this);
 	view_xoff = 0;
 	view_yoff = 0;
 	view_scale = 1;
@@ -422,37 +423,37 @@ void MapCanvas::draw() {
 
 	if (editor->editMode() == MapEditor::MODE_VERTICES) {
 		// Vertices mode
-		if (things_always) renderer_2d->renderThings(view_scale, 0.4f);							// Things (faded)
-		renderer_2d->renderLines(false);														// Lines (no direction tabs)
-		renderer_2d->renderVertices(view_scale);												// Vertices
-		renderer_2d->renderSelection(editor->getSelection(), editor->editMode(), view_scale);	// Selection
+		if (things_always) renderer_2d->renderThings(view_scale, 0.4f);								// Things (faded)
+		renderer_2d->renderLines(false);															// Lines (no direction tabs)
+		renderer_2d->renderVertices(view_scale);													// Vertices
+		renderer_2d->renderSelection(editor->getSelection(), editor->editMode(), view_scale_inter);	// Selection
 	}
 	else if (editor->editMode() == MapEditor::MODE_LINES) {
 		// Lines mode
-		if (things_always) renderer_2d->renderThings(view_scale, 0.4f);							// Things (faded)
-		if (vertices_always) renderer_2d->renderVertices(view_scale);							// Vertices
-		renderer_2d->renderLines(true);															// Lines
-		renderer_2d->renderSelection(editor->getSelection(), editor->editMode(), view_scale);	// Selection
+		if (things_always) renderer_2d->renderThings(view_scale, 0.4f);								// Things (faded)
+		if (vertices_always) renderer_2d->renderVertices(view_scale);								// Vertices
+		renderer_2d->renderLines(true);																// Lines
+		renderer_2d->renderSelection(editor->getSelection(), editor->editMode(), view_scale_inter);	// Selection
 	}
 	else if (editor->editMode() == MapEditor::MODE_SECTORS) {
 		// Sectors mode
-		if (things_always) renderer_2d->renderThings(view_scale, 0.4f);							// Things (faded)
-		if (vertices_always) renderer_2d->renderVertices(view_scale);							// Vertices
-		renderer_2d->renderSelection(editor->getSelection(), editor->editMode(), view_scale);	// Selection
-		renderer_2d->renderLines(false);														// Lines (no direction tabs)
+		if (things_always) renderer_2d->renderThings(view_scale, 0.4f);								// Things (faded)
+		if (vertices_always) renderer_2d->renderVertices(view_scale);								// Vertices
+		renderer_2d->renderSelection(editor->getSelection(), editor->editMode(), view_scale_inter);	// Selection
+		renderer_2d->renderLines(false);															// Lines (no direction tabs)
 		splitter.testRender();	// Testing
 	}
 	else if (editor->editMode() == MapEditor::MODE_THINGS) {
 		// Things mode
-		renderer_2d->renderLines(false);														// Lines (no direction tabs)
-		if (vertices_always) renderer_2d->renderVertices(view_scale);							// Vertices
-		renderer_2d->renderThings(view_scale);													// Things
-		renderer_2d->renderSelection(editor->getSelection(), editor->editMode(), view_scale);	// Selection
+		renderer_2d->renderLines(false);															// Lines (no direction tabs)
+		if (vertices_always) renderer_2d->renderVertices(view_scale);								// Vertices
+		renderer_2d->renderThings(view_scale);														// Things
+		renderer_2d->renderSelection(editor->getSelection(), editor->editMode(), view_scale_inter);	// Selection
 	}
 
 	// Draw hilight
 	if (mouse_state == MSTATE_NORMAL)
-		renderer_2d->renderHilight(editor->hilightItem(), editor->editMode(), anim_flash_level, view_scale);
+		renderer_2d->renderHilight(editor->hilightItem(), editor->editMode(), anim_flash_level, view_scale_inter);
 
 
 
@@ -506,6 +507,7 @@ void MapCanvas::draw() {
 	}
 
 	// Draw current info overlay
+	glDisable(GL_TEXTURE_2D);
 	if (editor->editMode() == MapEditor::MODE_VERTICES)
 		info_vertex.draw(GetSize().y, GetSize().x, anim_info_fade);
 	else if (editor->editMode() == MapEditor::MODE_LINES)
@@ -679,6 +681,21 @@ void MapCanvas::update(long frametime) {
 #endif
 
 	frametime_last = frametime;
+}
+
+void MapCanvas::itemSelected(int index, bool selected) {
+	if (editor->editMode() == MapEditor::MODE_THINGS) {
+		// Get thing
+		MapThing* t = editor->getMap().getThing(index);
+		if (!t)
+			return;
+
+		// Get thing type
+		ThingType* tt = theGameConfiguration->thingType(t->getType());
+
+		// Start animation
+		animations.push_back(new MCAThingSelection(theApp->runTimer(), t->xPos(), t->yPos(), tt->getRadius()+8, selected));
+	}
 }
 
 void MapCanvas::onKeyBindPress(string name) {

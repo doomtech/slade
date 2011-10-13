@@ -50,6 +50,8 @@ public:
 	MapSector*	getSector() { return sector; }
 	MapLine*	getParentLine() { return parent; }
 
+	void	setSector(MapSector* sector);
+
 	PropertyList&	props()				{ return udmf_props; }
 	Property&		prop(string key)	{ return udmf_props[key]; }
 };

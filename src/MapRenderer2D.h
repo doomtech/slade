@@ -13,7 +13,6 @@ private:
 	// VBOs etc
 	GLuint	vbo_vertices;
 	GLuint	vbo_lines;
-	GLuint	ibo_selection;
 	GLuint	vbo_flats;
 
 	// Display lists

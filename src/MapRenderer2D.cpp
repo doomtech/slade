@@ -29,7 +29,6 @@ MapRenderer2D::MapRenderer2D(SLADEMap* map) {
 	this->vbo_vertices = 0;
 	this->vbo_lines = 0;
 	this->vbo_flats = 0;
-	this->ibo_selection = 0;
 	this->list_vertices = 0;
 	this->list_lines = 0;
 	this->lines_dirs = false;
@@ -42,7 +41,6 @@ MapRenderer2D::~MapRenderer2D() {
 	if (vbo_vertices > 0)		glDeleteBuffers(1, &vbo_vertices);
 	if (vbo_lines > 0)			glDeleteBuffers(1, &vbo_lines);
 	if (vbo_flats > 0)			glDeleteBuffers(1, &vbo_flats);
-	if (ibo_selection > 0)		glDeleteBuffers(1, &ibo_selection);
 	if (list_vertices > 0)		glDeleteLists(list_vertices, 1);
 	if (list_lines > 0)			glDeleteLists(list_lines, 1);
 }
@@ -786,7 +784,7 @@ void MapRenderer2D::renderSelection(vector<int>& selection, int mode, float view
 		MapLine* line;
 		double x1, y1, x2, y2;
 		glBegin(GL_LINES);
-		for (unsigned a = 0; a < selection.size(); a++) { 
+		for (unsigned a = 0; a < selection.size(); a++) {
 			// Get line properties
 			line = map->getLine(selection[a]);
 			x1 = line->v1()->xPos();
@@ -1000,10 +998,16 @@ void MapRenderer2D::renderFlatsVBO(int type) {
 	if (type > 0) glEnable(GL_TEXTURE_2D);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo_flats);
 
-	// Build list of polygons to render
+	// Setup VBO pointers
+	glVertexPointer(3, GL_FLOAT, 36, 0);
+	glTexCoordPointer(2, GL_FLOAT, 36, ((char*)NULL + 12));
+	//glColorPointer(4, GL_FLOAT, 36, ((char*)NULL + 20));
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+	// Go through sectors
 	GLTexture* tex_last = NULL;
 	GLTexture* tex = NULL;
-	//vector<Polygon2D*> polys;
 	for (unsigned a = 0; a < map->nSectors(); a++) {
 		MapSector* sector = map->getSector(a);
 
@@ -1038,29 +1042,11 @@ void MapRenderer2D::renderFlatsVBO(int type) {
 
 		// Render the polygon
 		float light = ((int)sector->prop("lightlevel") / 255.0f) * flat_brightness;
-		poly->setColour(light, light, light, 1.0f);
+		glColor4f(light, light, light, 1.0f);
 		poly->renderVBO(false);
-		//polys.push_back(poly);
 	}
-
-	/*
-	// Sort the polygon list by texture id
-	// (this way seems to be slower, I guess the reduced glBindTexture calls doesn't make up for the need to create+sort this array each frame)
-	std::sort(polys.begin(), polys.end(), sortPolyByTex);
-
-	// Render polygons
-	for (unsigned a = 0; a < polys.size(); a++) {
-		// Bind the texture if needed
-		GLTexture* tex = polys[a]->getTexture();
-		if (tex && tex != tex_last) {
-			tex->bind();
-			tex_last = tex;
-		}
-
-		// Render
-		polys[a]->renderVBO(false);
-	}
-	*/
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
 	// Clean up opengl state
 	if (type > 0) glDisable(GL_TEXTURE_2D);
@@ -1259,6 +1245,11 @@ void MapRenderer2D::updateVisibility(fpoint2_t view_tl, fpoint2_t view_br, doubl
 		if (bbox.max.y < view_tl.y) vis_s[a] = VIS_ABOVE;
 		if (bbox.min.x > view_br.x) vis_s[a] = VIS_RIGHT;
 		if (bbox.min.y > view_br.y) vis_s[a] = VIS_BELOW;
+
+		// Check if the sector is worth drawing
+		if ((bbox.max.x - bbox.min.x) * view_scale < 4 ||
+			(bbox.max.y - bbox.min.y) * view_scale < 4)
+			vis_s[a] = 1;
 	}
 
 	// Thing visibility
