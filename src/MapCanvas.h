@@ -40,6 +40,7 @@ private:
 	fpoint2_t	mouse_downpos_m;
 	uint8_t		mouse_state;
 	bool		zooming_cursor;
+	bool		mouse_selbegin;
 
 	// Info overlays
 	int					last_hilight;

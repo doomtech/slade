@@ -83,6 +83,11 @@ bool MapEditor::updateHilight(fpoint2_t mouse_pos, double dist_scale) {
 	return current != hilight_item;
 }
 
+void MapEditor::clearSelection() {
+	if (canvas) canvas->itemsSelected(selection, false);
+	selection.clear();
+}
+
 void MapEditor::selectAll() {
 	// Clear selection initially
 	selection.clear();
@@ -104,6 +109,9 @@ void MapEditor::selectAll() {
 		for (unsigned a = 0; a < map.things.size(); a++)
 			selection.push_back(a);
 	}
+
+	if (canvas)
+		canvas->itemsSelected(selection);
 }
 
 bool MapEditor::selectCurrent(bool clear_none) {

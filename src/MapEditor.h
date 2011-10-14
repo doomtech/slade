@@ -49,7 +49,7 @@ public:
 	// Selection/hilight
 	void		clearHilight() { hilight_item = -1; }
 	bool		updateHilight(fpoint2_t mouse_pos, double dist_scale = 1.0);
-	void		clearSelection() { selection.clear(); }
+	void		clearSelection();
 	void		selectAll();
 	bool		selectCurrent(bool clear_none = true);
 	bool		selectWithin(double xmin, double ymin, double xmax, double ymax);

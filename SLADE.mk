@@ -44,7 +44,7 @@ LinkOptions            :=  $(shell wx-config --debug=no --libs std,gl,stc,aui,ri
 IncludePath            :=  $(IncludeSwitch). 
 IncludePCH             := 
 RcIncludePath          := 
-Libs                   := $(LibrarySwitch)freeimage $(LibrarySwitch)fluidsynth $(LibrarySwitch)ftgl $(LibrarySwitch)sfml-system $(LibrarySwitch)sfml-audio $(LibrarySwitch)sfml-window $(LibrarySwitch)sfml-graphics 
+Libs                   := $(LibrarySwitch)freeimage $(LibrarySwitch)fluidsynth $(LibrarySwitch)ftgl $(LibrarySwitch)GLEW $(LibrarySwitch)sfml-system $(LibrarySwitch)sfml-audio $(LibrarySwitch)sfml-window $(LibrarySwitch)sfml-graphics 
 LibPath                := $(LibraryPathSwitch). 
 
 

@@ -50,6 +50,7 @@ CVAR(Bool, vertices_always, 1, CVAR_SAVE)
 CVAR(Bool, grid_dashed, false, CVAR_SAVE)
 CVAR(Bool, scroll_smooth, true, CVAR_SAVE)
 CVAR(Int, flat_drawtype, 2, CVAR_SAVE)
+CVAR(Bool, selection_clear_click, false, CVAR_SAVE)
 PolygonSplitter splitter;	// for testing
 
 
@@ -84,6 +85,7 @@ MapCanvas::MapCanvas(wxWindow *parent, int id, MapEditor* editor)
 	view_scale_inter = 1;
 	anim_view_speed = 0.05;
 	zooming_cursor = false;
+	mouse_selbegin = false;
 
 	timer.Start(2);
 #ifdef USE_SFML_RENDERWINDOW
@@ -974,9 +976,11 @@ void MapCanvas::onMouseDown(wxMouseEvent& e) {
 
 	// Left button
 	if (e.LeftDown()) {
-		// Try to select hilighted object
-		if (!editor->selectCurrent(!e.ShiftDown()))
-			mouse_state = MSTATE_SELECTION;	// Nothing hilighted, begin box selection
+		// Begin box selection if shift is held down, otherwise toggle selection on hilighted object
+		if (e.ShiftDown())
+			mouse_state = MSTATE_SELECTION;
+		else
+			mouse_selbegin = !editor->selectCurrent(selection_clear_click);
 	}
 
 	// Right button
@@ -996,10 +1000,16 @@ void MapCanvas::onMouseUp(wxMouseEvent& e) {
 
 	// Left button
 	if (e.LeftUp()) {
+		mouse_selbegin = false;
+
 		// If we're ending a box selection
 		if (mouse_state == MSTATE_SELECTION) {
 			// Reset mouse state
 			mouse_state = MSTATE_NORMAL;
+
+			// Clear current selection if shift isn't held
+			if (!e.ShiftDown())
+				editor->clearSelection();
 
 			// Select
 			editor->selectWithin(min(mouse_downpos_m.x, mouse_pos_m.x), min(mouse_downpos_m.y, mouse_pos_m.y),
@@ -1029,6 +1039,10 @@ void MapCanvas::onMouseMotion(wxMouseEvent& e) {
 	// Update mouse variables
 	mouse_pos.set(e.GetX(), e.GetY());
 	mouse_pos_m.set(translateX(e.GetX()), translateY(e.GetY()));
+
+	// Check if we want to start a selection box
+	if (mouse_selbegin && fpoint2_t(mouse_pos.x - mouse_downpos.x, mouse_pos.y - mouse_downpos.y).magnitude() > 16)
+		mouse_state = MSTATE_SELECTION;
 
 	e.Skip();
 }
