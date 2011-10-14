@@ -37,6 +37,8 @@
       <File Name="src/GraphicsPrefsPanel.h"/>
       <File Name="src/AudioPrefsPanel.cpp"/>
       <File Name="src/AudioPrefsPanel.h"/>
+      <File Name="src/ColourPrefsPanel.cpp"/>
+      <File Name="src/ColourPrefsPanel.h"/>
     </VirtualDirectory>
     <File Name="src/ExtMessageDialog.h"/>
     <File Name="src/ExtMessageDialog.cpp"/>
@@ -95,6 +97,10 @@
     <File Name="src/SAction.h"/>
     <File Name="src/Drawing.cpp"/>
     <File Name="src/Drawing.h"/>
+    <File Name="src/ColourConfiguration.cpp"/>
+    <File Name="src/ColourConfiguration.h"/>
+    <File Name="src/KeyBind.cpp"/>
+    <File Name="src/KeyBind.h"/>
   </VirtualDirectory>
   <VirtualDirectory Name="Main Editor">
     <VirtualDirectory Name="UI Elements">

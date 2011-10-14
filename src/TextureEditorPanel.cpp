@@ -1108,6 +1108,8 @@ void TextureEditorPanel::onPatchPositionXChanged(wxSpinEvent& e) {
 
 	// Update UI
 	tex_canvas->redraw(true);
+
+	tex_modified = true;
 }
 
 /* TextureEditorPanel::onPatchPositionYChanged
@@ -1127,4 +1129,6 @@ void TextureEditorPanel::onPatchPositionYChanged(wxSpinEvent& e) {
 
 	// Update UI
 	tex_canvas->redraw(true);
+
+	tex_modified = true;
 }
