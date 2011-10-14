@@ -708,6 +708,8 @@ bool SLADEMap::readHexenLinedefs(ArchiveEntry * entry) {
 	for (size_t a = 0; a < entry->getSize() / sizeof(hexenline_t); a++)
 		addLine(line_data[a]);
 
+	wxLogMessage("Read %d lines", lines.size());
+
 	return true;
 }
 
@@ -720,6 +722,8 @@ bool SLADEMap::readHexenThings(ArchiveEntry * entry) {
 	hexenthing_t* thng_data = (hexenthing_t*)entry->getData(true);
 	for (size_t a = 0; a < entry->getSize() / sizeof(hexenthing_t); a++)
 		addThing(thng_data[a]);
+
+	wxLogMessage("Read %d things", things.size());
 
 	return true;
 }
