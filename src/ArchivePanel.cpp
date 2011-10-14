@@ -1107,7 +1107,7 @@ bool ArchivePanel::gfxExportPNG() {
 
 		// Run save file dialog
 		SFileDialog::fd_info_t info;
-		if (SFileDialog::saveFile(info, "Export Entry \"" + selection[0]->getName() + "\" as PNG", "PNG Files (*.png)|*.png", this)) {
+		if (SFileDialog::saveFile(info, "Export Entry \"" + selection[0]->getName() + "\" as PNG", "PNG Files (*.png)|*.png", this, fn.GetFullName())) {
 			// If a filename was selected, export it
 			if (!EntryOperations::exportAsPNG(selection[0], info.filenames[0])) {
 				wxMessageBox(S_FMT("Error: %s", CHR(Global::error)), "Error", wxOK|wxICON_ERROR);
