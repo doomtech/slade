@@ -337,7 +337,7 @@ bool MapRenderer2D::renderSpriteThing(double x, double y, double angle, ThingTyp
 	GLTexture* tex = NULL;
 
 	// Attempt to get sprite texture
-	tex = theMapEditor->textureManager().getSprite(tt->getSprite(), tt->getTranslation());
+	tex = theMapEditor->textureManager().getSprite(tt->getSprite(), tt->getTranslation(), tt->getPalette());
 
 	// If sprite not found, just draw as a normal, round thing
 	if (!tex) {
