@@ -216,6 +216,24 @@ wxWindow* OGLCanvas::toPanel(wxWindow* parent) {
 	return panel;
 }
 
+void OGLCanvas::doPaint() {
+	// Set context to this window
+#ifdef USE_SFML_RENDERWINDOW
+	sf::RenderWindow::SetActive();
+	Drawing::setRenderTarget(this);
+	SetView(sf::View(sf::FloatRect(0.0f, 0.0f, GetSize().x, GetSize().y)));
+#else
+	setContext();
+#endif
+
+	// Init if needed
+	if (!init_done)
+		init();
+
+	// Draw content
+	draw();
+}
+
 
 /*******************************************************************
  * OGLCANVAS EVENTS
@@ -227,23 +245,8 @@ wxWindow* OGLCanvas::toPanel(wxWindow* parent) {
 void OGLCanvas::onPaint(wxPaintEvent& e) {
 	wxPaintDC(this);
 
-	if (IsShown()) {
-		// Set context to this window
-#ifdef USE_SFML_RENDERWINDOW
-		sf::RenderWindow::SetActive();
-		Drawing::setRenderTarget(this);
-		SetView(sf::View(sf::FloatRect(0.0f, 0.0f, GetSize().x, GetSize().y)));
-#else
-		setContext();
-#endif
-
-		// Init if needed
-		if (!init_done)
-			init();
-
-		// Draw content
-		draw();
-	}
+	if (IsShown())
+		doPaint();
 }
 
 /* OGLCanvas::onEraseBackground
