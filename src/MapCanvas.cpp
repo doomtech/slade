@@ -405,6 +405,7 @@ void MapCanvas::draw() {
 	rgba_t col_bg = ColourConfiguration::getColour("map_background");
 	glClearColor(col_bg.fr(), col_bg.fg(), col_bg.fb(), 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//glEnable(GL_COLOR_MATERIAL);
 
 	// Translate to inside of pixel (otherwise inaccuracies can occur on certain gl implemenataions)
 	glTranslatef(0.375f, 0.375f, 0);
@@ -1007,13 +1008,9 @@ void MapCanvas::onMouseUp(wxMouseEvent& e) {
 			// Reset mouse state
 			mouse_state = MSTATE_NORMAL;
 
-			// Clear current selection if shift isn't held
-			if (!e.ShiftDown())
-				editor->clearSelection();
-
 			// Select
 			editor->selectWithin(min(mouse_downpos_m.x, mouse_pos_m.x), min(mouse_downpos_m.y, mouse_pos_m.y),
-								max(mouse_downpos_m.x, mouse_pos_m.x), max(mouse_downpos_m.y, mouse_pos_m.y));
+								max(mouse_downpos_m.x, mouse_pos_m.x), max(mouse_downpos_m.y, mouse_pos_m.y), e.ShiftDown());
 
 			// Begin selection box fade animation
 			animations.push_back(new MCASelboxFader(theApp->runTimer(), mouse_downpos_m, mouse_pos_m));

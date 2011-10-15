@@ -39,6 +39,10 @@
       <File Name="src/AudioPrefsPanel.h"/>
       <File Name="src/ColourPrefsPanel.cpp"/>
       <File Name="src/ColourPrefsPanel.h"/>
+      <File Name="src/MapEditorPrefsPanel.h"/>
+      <File Name="src/MapEditorPrefsPanel.cpp"/>
+      <File Name="src/MapDisplayPrefsPanel.h"/>
+      <File Name="src/MapDisplayPrefsPanel.cpp"/>
     </VirtualDirectory>
     <File Name="src/ExtMessageDialog.h"/>
     <File Name="src/ExtMessageDialog.cpp"/>
@@ -513,6 +517,7 @@
       
       
       
+      
       ]]>
       </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
@@ -551,6 +556,7 @@
       <General OutputFile="./dist/slade-dbg" IntermediateDirectory="./Debug" Command="./slade-dbg" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[
+      
       
       
       
@@ -599,7 +605,8 @@
       <ResourceCompiler Options="$(shell wx-config --rcflags)" Required="no"/>
       <General OutputFile="./dist/slade" IntermediateDirectory="./Release" Command="./slade" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
-        <![CDATA[]]>
+        <![CDATA[
+      ]]>
       </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
         <PostConnectCommands/>
@@ -640,6 +647,7 @@
       <General OutputFile="./dist/SLADE.app/Contents/MacOS/SLADE" IntermediateDirectory="./Release" Command="./dist/SLADE.app/Contents/MacOS/SLADE" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[
+      
       
       
       

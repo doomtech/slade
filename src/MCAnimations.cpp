@@ -8,6 +8,7 @@
 #include "MapVertex.h"
 
 EXTERN_CVAR(Bool, thing_overlay_square)
+EXTERN_CVAR(Int, thing_drawtype)
 EXTERN_CVAR(Bool, vertex_round)
 EXTERN_CVAR(Float, line_width)
 
@@ -69,7 +70,7 @@ MCAThingSelection::MCAThingSelection(long start, double x, double y, double radi
 	this->fade = 1.0f;
 
 	// Adjust radius
-	if (!thing_overlay_square)
+	if (!thing_overlay_square && thing_drawtype > 0 && thing_drawtype < 3)
 		this->radius += 8;
 }
 
@@ -99,7 +100,7 @@ void MCAThingSelection::draw() {
 	col.set_gl();
 
 	// Get texture if needed
-	if (!thing_overlay_square) {
+	if (!thing_overlay_square && thing_drawtype > 0 && thing_drawtype < 3) {
 		// Get thing selection texture
 		GLTexture* tex = theMapEditor->textureManager().getEditorImage("thing/hilight");
 		if (!tex)
@@ -143,7 +144,7 @@ MCALineSelection::MCALineSelection(long start, vector<MapLine*>& lines, bool sel
 		if (tablen < 2) tablen = 2;
 		fpoint2_t invdir(-(rect.br.y - rect.tl.y), rect.br.x - rect.tl.x);
 		invdir.normalize();
-		
+
 		this->tabs.push_back(frect_t(xmid, ymid, xmid - invdir.x*tablen, ymid - invdir.y*tablen));
 	}
 }

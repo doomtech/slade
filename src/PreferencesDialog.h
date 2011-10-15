@@ -2,18 +2,21 @@
 #ifndef __PREFERENCES_DIALOG_H__
 #define __PREFERENCES_DIALOG_H__
 
-#include "BaseResourceArchivesPanel.h"
-#include "TextEditorPrefsPanel.h"
-#include "TextStylePrefsPanel.h"
-#include "GeneralPrefsPanel.h"
-#include "InterfacePrefsPanel.h"
-#include "EditingPrefsPanel.h"
-#include "ACSPrefsPanel.h"
-#include "GraphicsPrefsPanel.h"
-#include "PNGPrefsPanel.h"
-#include "AudioPrefsPanel.h"
-#include "ColourPrefsPanel.h"
 #include <wx/treebook.h>
+
+class BaseResourceArchivesPanel;
+class GeneralPrefsPanel;
+class InterfacePrefsPanel;
+class EditingPrefsPanel;
+class TextEditorPrefsPanel;
+class TextStylePrefsPanel;
+class ACSPrefsPanel;
+class GraphicsPrefsPanel;
+class PNGPrefsPanel;
+class AudioPrefsPanel;
+class ColourPrefsPanel;
+class MapEditorPrefsPanel;
+class MapDisplayPrefsPanel;
 
 class PreferencesDialog : public wxDialog {
 private:
@@ -29,6 +32,8 @@ private:
 	PNGPrefsPanel*			panel_gfx_png;
 	AudioPrefsPanel*		panel_audio;
 	ColourPrefsPanel*		panel_colours;
+	MapEditorPrefsPanel*	panel_maped;
+	MapDisplayPrefsPanel*	panel_map_display;
 
 	// Base Resource Archive
 	BaseResourceArchivesPanel*	panel_bra;
@@ -45,6 +50,7 @@ public:
 
 	// Events
 	void	onBtnBRAOpenClicked(wxCommandEvent& e);
+	void	onButtonClicked(wxCommandEvent& e);
 };
 
 #endif//__PREFERENCES_DIALOG_H__

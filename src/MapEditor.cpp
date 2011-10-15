@@ -143,7 +143,7 @@ bool MapEditor::selectCurrent(bool clear_none) {
 	return true;
 }
 
-bool MapEditor::selectWithin(double xmin, double ymin, double xmax, double ymax) {
+bool MapEditor::selectWithin(double xmin, double ymin, double xmax, double ymax, bool add) {
 	// Select depending on editing mode
 	bool new_sel = false;
 	vector<int> nsel;
@@ -163,7 +163,7 @@ bool MapEditor::selectWithin(double xmin, double ymin, double xmax, double ymax)
 
 			// Select if vertex is within bounds
 			if (xmin <= x && x <= xmax && ymin <= y && y <= ymax) {
-				selection.push_back(a);
+				//selection.push_back(a);
 				nsel.push_back(a);
 				new_sel = true;
 			}
@@ -190,7 +190,7 @@ bool MapEditor::selectWithin(double xmin, double ymin, double xmax, double ymax)
 			// Select if both vertices are within bounds
 			if (xmin <= x1 && x1 <= xmax && ymin <= y1 && y1 <= ymax &&
 				xmin <= x2 && x2 <= xmax && ymin <= y2 && y2 <= ymax) {
-				selection.push_back(a);
+				//selection.push_back(a);
 				nsel.push_back(a);
 				new_sel = true;
 			}
@@ -205,7 +205,7 @@ bool MapEditor::selectWithin(double xmin, double ymin, double xmax, double ymax)
 		for (unsigned a = 0; a < map.sectors.size(); a++) {
 			// Check if sector's bbox fits within the selection box
 			if (map.sectors[a]->boundingBox().is_within(pmin, pmax)) {
-				selection.push_back(a);
+				//selection.push_back(a);
 				nsel.push_back(a);
 			}
 		}
@@ -226,16 +226,25 @@ bool MapEditor::selectWithin(double xmin, double ymin, double xmax, double ymax)
 
 			// Select if thing is within bounds
 			if (xmin <= x && x <= xmax && ymin <= y && y <= ymax) {
-				selection.push_back(a);
+				//selection.push_back(a);
 				nsel.push_back(a);
 				new_sel = true;
 			}
 		}
 	}
 
-	// Animate
-	if (canvas && nsel.size() > 0)
-		canvas->itemsSelected(nsel);
+	// Clear selection if something was within the box
+	if (nsel.size() > 0 && !add)
+		clearSelection();
+
+	// Update selection
+	if (nsel.size() > 0) {
+		for (unsigned a = 0; a < nsel.size(); a++)
+			selection.push_back(nsel[a]);
+
+		// Animate
+		if (canvas) canvas->itemsSelected(nsel);
+	}
 
 	return new_sel;
 }

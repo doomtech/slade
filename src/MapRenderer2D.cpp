@@ -17,7 +17,9 @@ CVAR(Int, thing_drawtype, 1, CVAR_SAVE)
 CVAR(Bool, thing_force_dir, false, CVAR_SAVE)
 CVAR(Bool, thing_overlay_square, false, CVAR_SAVE)
 CVAR(Float, flat_brightness, 0.8f, CVAR_SAVE)
+CVAR(Bool, flat_ignore_light, false, CVAR_SAVE)
 CVAR(Float, thing_shadow, 0.5f, CVAR_SAVE)
+CVAR(Bool, sector_hilight_fill, true, CVAR_SAVE)
 
 CVAR(Bool, test_ssplit, false, CVAR_SAVE)
 
@@ -327,7 +329,7 @@ void MapRenderer2D::renderRoundThing(double x, double y, double angle, ThingType
 		glPopMatrix();
 }
 
-bool MapRenderer2D::renderSpriteThing(double x, double y, double angle, ThingType* tt, float alpha) {
+bool MapRenderer2D::renderSpriteThing(double x, double y, double angle, ThingType* tt, float alpha, bool fitradius) {
 	// Ignore if no type given (shouldn't happen)
 	if (!tt)
 		return false;
@@ -365,8 +367,15 @@ bool MapRenderer2D::renderSpriteThing(double x, double y, double angle, ThingTyp
 	double hw = tex->getWidth()*0.5;
 	double hh = tex->getHeight()*0.5;
 
+	// Fit to radius if needed
+	if (fitradius) {
+		double scale = ((double)tt->getRadius()*0.85) / max(hw, hh);
+		hw *= scale;
+		hh *= scale;
+	}
+
 	// Shadow if needed
-	if (thing_shadow > 0.01f && alpha >= 0.9) {
+	if (thing_shadow > 0.01f && alpha >= 0.9 && !fitradius) {
 		double sz = (min(hw, hh))*0.1;
 		if (sz < 1) sz = 1;
 		glColor4f(0.0f, 0.0f, 0.0f, alpha*(thing_shadow*0.7));
@@ -396,7 +405,7 @@ bool MapRenderer2D::renderSpriteThing(double x, double y, double angle, ThingTyp
 	return show_angle;
 }
 
-void MapRenderer2D::renderSquareThing(double x, double y, double angle, ThingType* tt, float alpha) {
+void MapRenderer2D::renderSquareThing(double x, double y, double angle, ThingType* tt, float alpha, bool showang) {
 	// Ignore if no type given (shouldn't happen)
 	if (!tt)
 		return;
@@ -429,7 +438,7 @@ void MapRenderer2D::renderSquareThing(double x, double y, double angle, ThingTyp
 	glEnd();
 
 	// Draw angle indicator (if needed)
-	if (tt->isAngled() || thing_force_dir) {
+	if (showang && (tt->isAngled() || thing_force_dir)) {
 		glColor3f(0.0f, 0.0f, 0.0f);
 		glRotated(angle, 0, 0, 1);
 		glBegin(GL_LINES);
@@ -451,7 +460,7 @@ void MapRenderer2D::renderThingsImmediate(double view_scale, float alpha) {
 	// visibility and just render things in immediate mode
 
 	// Enable textures
-	if (thing_drawtype > 0)
+	if (thing_drawtype > 0 && thing_drawtype < 3)
 		glEnable(GL_TEXTURE_2D);
 	glColor4f(1.0f, 1.0f, 1.0f, alpha);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -459,7 +468,7 @@ void MapRenderer2D::renderThingsImmediate(double view_scale, float alpha) {
 
 	// Go through things
 	MapThing* thing = NULL;
-	double x, y;
+	double x, y, angle;
 	vector<int> things_arrows;
 
 	// Draw thing shadows if round things is on
@@ -524,6 +533,7 @@ void MapRenderer2D::renderThingsImmediate(double view_scale, float alpha) {
 		thing = map->getThing(a);
 		x = thing->xPos();
 		y = thing->yPos();
+		angle = thing->prop("angle").getFloatValue();
 
 		// Get thing type properties from game configuration
 		ThingType* tt = theGameConfiguration->thingType(thing->getType());
@@ -531,20 +541,41 @@ void MapRenderer2D::renderThingsImmediate(double view_scale, float alpha) {
 		// Draw thing depending on 'things_drawtype' cvar
 		if (thing_drawtype == 2) {		// Drawtype 2: Sprites
 			// Check if we need to draw the direction arrow for this thing
-			if (renderSpriteThing(x, y, thing->prop("angle").getFloatValue(), tt, alpha))
+			if (renderSpriteThing(x, y, angle, tt, alpha))
 				things_arrows.push_back(a);
 		}
 		else if (thing_drawtype == 1)	// Drawtype 1: Round
-			renderRoundThing(x, y, thing->prop("angle").getFloatValue(), tt, alpha);
+			renderRoundThing(x, y, angle, tt, alpha);
 		else							// Drawtype 0 (or other): Square
-			renderSquareThing(x, y, thing->prop("angle").getFloatValue(), tt, alpha);
+			renderSquareThing(x, y, angle, tt, alpha, thing_drawtype != 3);
+	}
+
+	// Draw thing sprites within squares if that drawtype is set
+	if (thing_drawtype > 2) {
+		glEnable(GL_TEXTURE_2D);
+
+		for (unsigned a = 0; a < map->nThings(); a++) {
+			if (vis_t[a] > 0)
+				continue;
+
+			// Get thing info
+			thing = map->getThing(a);
+			ThingType* tt = theGameConfiguration->thingType(thing->getType());
+			x = thing->xPos();
+			y = thing->yPos();
+			angle = thing->prop("angle").getFloatValue();
+
+			if (renderSpriteThing(x, y, angle, tt, alpha, true))
+				things_arrows.push_back(a);
+		}
 	}
 
 	// Draw any thing direction arrows needed
-	if (thing_drawtype == 2) {
+	if (thing_drawtype >= 2) {
 		glColor4f(1.0f, 1.0f, 1.0f, alpha);
 		GLTexture* tex_arrow = theMapEditor->textureManager().getEditorImage("arrow");
 		if (tex_arrow) {
+			glEnable(GL_TEXTURE_2D);
 			tex_arrow->bind();
 
 			for (unsigned a = 0; a < things_arrows.size(); a++) {
@@ -650,6 +681,12 @@ void MapRenderer2D::renderHilight(int hilight_item, int mode, float fade, float 
 	else if (mode == MapEditor::MODE_SECTORS) {
 		// Sector
 
+		// Fill if cvar is set
+		if (sector_hilight_fill) {
+			glColor4f(col.fr(), col.fg(), col.fb(), col.fa()*0.5f);
+			map->getSector(hilight_item)->getPolygon()->render();
+		}
+
 		// Get all lines belonging to the hilighted sector
 		vector<MapLine*> lines;
 		map->getLinesOfSector(hilight_item, lines);
@@ -683,8 +720,8 @@ void MapRenderer2D::renderHilight(int hilight_item, int mode, float fade, float 
 		// Get thing radius
 		double radius = theGameConfiguration->thingType(thing->getType())->getRadius();
 
-		// Check if we want radius-accurate square overlays
-		if (thing_overlay_square) {
+		// Check if we want square overlays
+		if (thing_overlay_square || thing_drawtype == 0 || thing_drawtype > 2) {
 			glDisable(GL_TEXTURE_2D);
 			glLineWidth(3.0f);
 			glBegin(GL_LINE_LOOP);
@@ -705,36 +742,26 @@ void MapRenderer2D::renderHilight(int hilight_item, int mode, float fade, float 
 		}
 
 		// Adjust radius
-		if (thing_drawtype == 0)
+		if (thing_drawtype == 0 || thing_drawtype > 2)
 			radius += 6;
 		else
 			radius *= 1.1 + (0.2*fade);
 
-		if (thing_drawtype == 0) {
-			glBegin(GL_QUADS);
-			glVertex2d(x - radius, y - radius);
-			glVertex2d(x - radius, y + radius);
-			glVertex2d(x + radius, y + radius);
-			glVertex2d(x + radius, y - radius);
-			glEnd();
+		// Setup hilight thing texture
+		GLTexture* tex = theMapEditor->textureManager().getEditorImage("thing/hilight");
+		if (tex) {
+			glEnable(GL_TEXTURE_2D);
+			tex->bind();
 		}
-		else {
-			// Setup hilight thing texture
-			GLTexture* tex = theMapEditor->textureManager().getEditorImage("thing/hilight");
-			if (tex) {
-				glEnable(GL_TEXTURE_2D);
-				tex->bind();
-			}
 
-			glBegin(GL_QUADS);
-			glTexCoord2f(0.0f, 0.0f);	glVertex2d(x - radius, y - radius);
-			glTexCoord2f(0.0f, 1.0f);	glVertex2d(x - radius, y + radius);
-			glTexCoord2f(1.0f, 1.0f);	glVertex2d(x + radius, y + radius);
-			glTexCoord2f(1.0f, 0.0f);	glVertex2d(x + radius, y - radius);
-			glEnd();
+		glBegin(GL_QUADS);
+		glTexCoord2f(0.0f, 0.0f);	glVertex2d(x - radius, y - radius);
+		glTexCoord2f(0.0f, 1.0f);	glVertex2d(x - radius, y + radius);
+		glTexCoord2f(1.0f, 1.0f);	glVertex2d(x + radius, y + radius);
+		glTexCoord2f(1.0f, 0.0f);	glVertex2d(x + radius, y - radius);
+		glEnd();
 
-			glDisable(GL_TEXTURE_2D);
-		}
+		glDisable(GL_TEXTURE_2D);
 	}
 }
 
@@ -876,9 +903,9 @@ void MapRenderer2D::renderSelection(vector<int>& selection, int mode, float view
 		// Get hilight texture
 		GLTexture* tex = theMapEditor->textureManager().getEditorImage("thing/hilight");
 
-		// Simplest case, thing_overlay_square is true or thing_drawtype is 0 (squares)
+		// Simplest case, thing_overlay_square is true or thing_drawtype is 0 or 3+ (squares)
 		// or if the hilight circle texture isn't found for some reason
-		if (thing_overlay_square || thing_drawtype == 0 || !tex) {
+		if (thing_overlay_square || thing_drawtype == 0 || thing_drawtype > 2 || !tex) {
 			glDisable(GL_TEXTURE_2D);
 
 			for (unsigned a = 0; a < selection.size(); a++) {
@@ -888,7 +915,6 @@ void MapRenderer2D::renderSelection(vector<int>& selection, int mode, float view
 
 				// Get thing radius
 				double radius = theGameConfiguration->thingType(thing->getType())->getRadius();
-				if (!thing_overlay_square) radius += 8;
 
 				// Check if we want radius-accurate square overlays
 				glDisable(GL_TEXTURE_2D);
@@ -968,6 +994,9 @@ void MapRenderer2D::renderFlatsImmediate(int type) {
 	if (type > 0)
 		glEnable(GL_TEXTURE_2D);
 
+	if (flat_ignore_light)
+		glColor4f(flat_brightness, flat_brightness, flat_brightness, 1.0f);
+
 	// Go through sectors
 	GLTexture* tex_last = NULL;
 	GLTexture* tex = NULL;
@@ -1000,8 +1029,10 @@ void MapRenderer2D::renderFlatsImmediate(int type) {
 		}
 
 		// Render the polygon
-		float light = ((int)sector->prop("lightlevel") / 255.0f) * flat_brightness;
-		glColor4f(light, light, light, 1.0f);
+		if (!flat_ignore_light) {
+			float light = ((int)sector->prop("lightlevel") / 255.0f) * flat_brightness;
+			glColor4f(light, light, light, 1.0f);
+		}
 		poly->render();
 	}
 
@@ -1011,6 +1042,9 @@ void MapRenderer2D::renderFlatsImmediate(int type) {
 
 void MapRenderer2D::renderFlatsVBO(int type) {
 	bool vbo_updated = false;
+
+	if (flat_ignore_light)
+		glColor4f(flat_brightness, flat_brightness, flat_brightness, 1.0f);
 
 	// First, check if any polygon vertex data has changed (in this case we need to refresh the entire vbo)
 	for (unsigned a = 0; a < map->nSectors(); a++) {
@@ -1078,8 +1112,10 @@ void MapRenderer2D::renderFlatsVBO(int type) {
 		}
 
 		// Render the polygon
-		float light = ((int)sector->prop("lightlevel") / 255.0f) * flat_brightness;
-		glColor4f(light, light, light, 1.0f);
+		if (!flat_ignore_light) {
+			float light = ((int)sector->prop("lightlevel") / 255.0f) * flat_brightness;
+			glColor4f(light, light, light, 1.0f);
+		}
 		poly->renderVBO(false);
 	}
 	glDisableClientState(GL_VERTEX_ARRAY);

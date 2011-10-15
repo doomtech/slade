@@ -52,7 +52,7 @@ public:
 	void		clearSelection();
 	void		selectAll();
 	bool		selectCurrent(bool clear_none = true);
-	bool		selectWithin(double xmin, double ymin, double xmax, double ymax);
+	bool		selectWithin(double xmin, double ymin, double xmax, double ymax, bool add = false);
 	MapVertex*	getHilightedVertex();
 	MapLine*	getHilightedLine();
 	MapSector*	getHilightedSector();

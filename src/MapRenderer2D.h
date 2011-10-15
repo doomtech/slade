@@ -60,8 +60,8 @@ public:
 	void	renderLinesVBO(bool show_direction);
 	void	renderLinesImmediate(bool show_direction);
 	void	renderRoundThing(double x, double y, double angle, ThingType* type, float alpha = 1.0f);
-	bool	renderSpriteThing(double x, double y, double angle, ThingType* type, float alpha = 1.0f);
-	void	renderSquareThing(double x, double y, double angle, ThingType* type, float alpha = 1.0f);
+	bool	renderSpriteThing(double x, double y, double angle, ThingType* type, float alpha = 1.0f, bool fitradius = false);
+	void	renderSquareThing(double x, double y, double angle, ThingType* type, float alpha = 1.0f, bool showang = true);
 	void	renderThings(double view_scale = 1, float alpha = 1.0f);
 	void	renderThingsImmediate(double view_scale, float alpha);
 	void	renderHilight(int item, int type, float fade, float view_scale);
