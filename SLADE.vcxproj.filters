@@ -708,6 +708,9 @@
     <ClCompile Include="src\ActionSpecial.cpp">
       <Filter>Map Editor\GameConfiguration</Filter>
     </ClCompile>
+    <ClCompile Include="src\ColourPrefsPanel.cpp">
+      <Filter>Dialogs\Preferences</Filter>
+    </ClCompile>
     <ClCompile Include="src\ThingType.cpp">
       <Filter>Map Editor\GameConfiguration</Filter>
     </ClCompile>
@@ -1343,6 +1346,9 @@
     </ClInclude>
     <ClInclude Include="src\Args.h">
       <Filter>Map Editor\GameConfiguration</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ColourPrefsPanel.h">
+      <Filter>Dialogs\Preferences</Filter>
     </ClInclude>
     <ClInclude Include="src\ThingType.h">
       <Filter>Map Editor\GameConfiguration</Filter>

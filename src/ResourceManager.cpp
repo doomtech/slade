@@ -220,32 +220,36 @@ void ResourceManager::addEntry(ArchiveEntry* entry) {
 	if (type->getId() == "palette")
 		palettes[name].add(entry);
 
-	// Check for patch entry
-	if (type->extraProps().propertyExists("patch"))
-		patches[name].add(entry);
+	// Check for various image entries, so only accept images
+	if (type->getEditor() == "gfx") {
 
-	// Check for flat entry
-	if (type->getId() == "gfx_flat" || entry->isInNamespace("flats"))
-		flats[name].add(entry);
+		// Check for patch entry
+		if (type->extraProps().propertyExists("patch") || entry->isInNamespace("patches"))
+			patches[name].add(entry);
 
-	// Check for stand-alone texture entry
-	if (entry->isInNamespace("textures") || entry->isInNamespace("hires")) {
-		satextures[name].add(entry);
+		// Check for flat entry
+		if (type->getId() == "gfx_flat" || entry->isInNamespace("flats"))
+			flats[name].add(entry);
 
-		// Compute Doom64 EX hash value, using the same hash algorithm as
-		// Doom64 EX itself
-		char str[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-		for (size_t c = 0; c < name.length() && c < 8; c++)
-			str[c] = name[c];
+		// Check for stand-alone texture entry
+		if (entry->isInNamespace("textures") || entry->isInNamespace("hires")) {
+			satextures[name].add(entry);
 
-		uint32_t hash = 1315423911;
-		for(uint32_t i = 0; i < 8 && str[i] != '\0'; ++i)
-			hash ^= ((hash << 5) + toupper((int)str[i]) + (hash >> 2));
-		hash %= 65536;
+			// Compute Doom64 EX hash value, using the same hash algorithm as
+			// Doom64 EX itself
+			char str[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+			for (size_t c = 0; c < name.length() && c < 8; c++)
+				str[c] = name[c];
 
-		// Add name to hash table
-		ResourceManager::Doom64HashTable[hash] = name;
+			uint32_t hash = 1315423911;
+			for(uint32_t i = 0; i < 8 && str[i] != '\0'; ++i)
+				hash ^= ((hash << 5) + toupper((int)str[i]) + (hash >> 2));
+			hash %= 65536;
 
+			// Add name to hash table
+			ResourceManager::Doom64HashTable[hash] = name;
+
+		}
 	}
 
 	// Check for TEXTUREx entry
