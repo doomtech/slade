@@ -26,10 +26,132 @@ MapDisplayPrefsPanel::MapDisplayPrefsPanel(wxWindow* parent) : wxPanel(parent, -
 
 	// Create frame+sizer
 	wxStaticBox *frame = new wxStaticBox(this, -1, "Map Editor Display Preferences");
-	wxStaticBoxSizer *sizer = new wxStaticBoxSizer(frame, wxVERTICAL);
-	psizer->Add(sizer, 1, wxEXPAND|wxALL, 4);
+	wxStaticBoxSizer *fsizer = new wxStaticBoxSizer(frame, wxVERTICAL);
+	psizer->Add(fsizer, 1, wxEXPAND|wxALL, 4);
+
+	// Create notebook
+	nb_pages = new wxNotebook(this, -1);
+	fsizer->Add(nb_pages, 1, wxEXPAND|wxALL, 4);
 
 
+	// General tab
+	wxPanel* panel = new wxPanel(nb_pages, -1);
+	nb_pages->AddPage(panel, "General", true);
+	wxBoxSizer* sz_border = new wxBoxSizer(wxVERTICAL);
+	panel->SetSizer(sz_border);
+	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+	sz_border->Add(sizer, 1, wxEXPAND|wxALL, 4);
+
+	// Dashed grid
+	cb_grid_dashed = new wxCheckBox(panel, -1, "Dashed grid");
+	cb_grid_dashed->SetValue(grid_dashed);
+	sizer->Add(cb_grid_dashed, 0, wxEXPAND|wxALL, 4);
+
+	// Always show vertices
+	cb_vertices_always = new wxCheckBox(panel, -1, "Always show vertices");
+	sizer->Add(cb_vertices_always, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+	// Always show things
+	cb_things_always = new wxCheckBox(panel, -1, "Always show things");
+	sizer->Add(cb_things_always, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+	
+	// Vertices tab
+	panel = new wxPanel(nb_pages, -1);
+	nb_pages->AddPage(panel, "Vertices");
+	sz_border = new wxBoxSizer(wxVERTICAL);
+	panel->SetSizer(sz_border);
+	sizer = new wxBoxSizer(wxVERTICAL);
+	sz_border->Add(sizer, 1, wxEXPAND|wxALL, 4);
+
+	// Vertex size
+	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
+	sizer->Add(hbox, 0, wxEXPAND|wxALL, 4);
+	hbox->Add(new wxStaticText(panel, -1, "Vertex size: "), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 2);
+	slider_vertex_size = new wxSlider(panel, -1, vertex_size, 2, 16, wxDefaultPosition, wxDefaultSize, wxSL_AUTOTICKS);
+	hbox->Add(slider_vertex_size, 1, wxEXPAND);
+
+	// Round vertices
+	cb_vertex_round = new wxCheckBox(panel, -1, "Round vertices");
+	sizer->Add(cb_vertex_round, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+
+	// Lines tab
+	panel = new wxPanel(nb_pages, -1);
+	nb_pages->AddPage(panel, "Lines");
+	sz_border = new wxBoxSizer(wxVERTICAL);
+	panel->SetSizer(sz_border);
+	sizer = new wxBoxSizer(wxVERTICAL);
+	sz_border->Add(sizer, 1, wxEXPAND|wxALL, 4);
+
+	// Line width
+	hbox = new wxBoxSizer(wxHORIZONTAL);
+	sizer->Add(hbox, 0, wxEXPAND|wxALL, 4);
+	hbox->Add(new wxStaticText(panel, -1, "Line width: "), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 2);
+	slider_line_width = new wxSlider(panel, -1, line_width*10, 10, 30, wxDefaultPosition, wxDefaultSize, wxSL_AUTOTICKS);
+	hbox->Add(slider_line_width, 1, wxEXPAND);
+
+	// Smooth lines
+	cb_line_smooth = new wxCheckBox(panel, -1, "Smooth lines");
+	sizer->Add(cb_line_smooth, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+
+	// Things tab
+	panel = new wxPanel(nb_pages, -1);
+	nb_pages->AddPage(panel, "Things");
+	sz_border = new wxBoxSizer(wxVERTICAL);
+	panel->SetSizer(sz_border);
+	sizer = new wxBoxSizer(wxVERTICAL);
+	sz_border->Add(sizer, 1, wxEXPAND|wxALL, 4);
+
+	// Thing style
+	hbox = new wxBoxSizer(wxHORIZONTAL);
+	sizer->Add(hbox, 0, wxEXPAND|wxALL, 4);
+	hbox->Add(new wxStaticText(panel, -1, "Thing style: "), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 2);
+	string t_types[] = { "Square", "Round", "Sprite", "Square + Sprite" };
+	choice_thing_drawtype = new wxChoice(panel, -1, wxDefaultPosition, wxDefaultSize, 4, t_types);
+	hbox->Add(choice_thing_drawtype, 1, wxEXPAND);
+
+	// Always show angles
+	cb_thing_force_dir = new wxCheckBox(panel, -1, "Always show thing angles");
+	sizer->Add(cb_thing_force_dir, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+	// Force square hilight/selection
+	cb_thing_overlay_square = new wxCheckBox(panel, -1, "Force square thing hilight/selection overlay");
+	sizer->Add(cb_thing_overlay_square, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+	// Shadow opacity
+	hbox = new wxBoxSizer(wxHORIZONTAL);
+	sizer->Add(hbox, 0, wxEXPAND|wxALL, 4);
+	hbox->Add(new wxStaticText(panel, -1, "Thing shadow opacity: "), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 2);
+	slider_thing_shadow = new wxSlider(panel, -1, thing_shadow*10, 0, 10, wxDefaultPosition, wxDefaultSize, wxSL_AUTOTICKS);
+	hbox->Add(slider_thing_shadow, 1, wxEXPAND);
+
+
+	// Sectors tab
+	panel = new wxPanel(nb_pages, -1);
+	nb_pages->AddPage(panel, "Sectors");
+	sz_border = new wxBoxSizer(wxVERTICAL);
+	panel->SetSizer(sz_border);
+	sizer = new wxBoxSizer(wxVERTICAL);
+	sz_border->Add(sizer, 1, wxEXPAND|wxALL, 4);
+
+	// Flat brightness
+	hbox = new wxBoxSizer(wxHORIZONTAL);
+	sizer->Add(hbox, 0, wxEXPAND|wxALL, 4);
+	hbox->Add(new wxStaticText(panel, -1, "Flat brightness: "), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 2);
+	slider_flat_brightness = new wxSlider(panel, -1, flat_brightness*10, 0, 10, wxDefaultPosition, wxDefaultSize, wxSL_AUTOTICKS);
+	hbox->Add(slider_flat_brightness, 1, wxEXPAND);
+
+	// Ignore sector light
+	cb_flat_ignore_light = new wxCheckBox(panel, -1, "Flats ignore sector brightness");
+	sizer->Add(cb_flat_ignore_light, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+	// Fill sector hilight
+	cb_sector_hilight_fill = new wxCheckBox(panel, -1, "Filled sector hilight");
+	sizer->Add(cb_sector_hilight_fill, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+	/*
 	// Dashed grid
 	cb_grid_dashed = new wxCheckBox(this, -1, "Dashed grid");
 	cb_grid_dashed->SetValue(grid_dashed);
@@ -120,6 +242,7 @@ MapDisplayPrefsPanel::MapDisplayPrefsPanel(wxWindow* parent) : wxPanel(parent, -
 	// Fill sector hilight
 	cb_sector_hilight_fill = new wxCheckBox(this, -1, "Filled sector hilight");
 	hbox->Add(cb_sector_hilight_fill, 1, wxEXPAND);
+	*/
 
 
 	// Init values

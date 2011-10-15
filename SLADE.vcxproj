@@ -193,7 +193,9 @@
     <ClCompile Include="src\lzma\C\XzDec.c" />
     <ClCompile Include="src\lzma\C\XzEnc.c" />
     <ClCompile Include="src\lzma\C\XzIn.c" />
+    <ClCompile Include="src\MapDisplayPrefsPanel.cpp" />
     <ClCompile Include="src\MapEditor.cpp" />
+    <ClCompile Include="src\MapEditorPrefsPanel.cpp" />
     <ClCompile Include="src\MapEntryPanel.cpp" />
     <ClCompile Include="src\MapRenderer2D.cpp" />
     <ClCompile Include="src\MapTextureManager.cpp" />
@@ -396,7 +398,9 @@
     <ClInclude Include="src\lzma\C\Xz.h" />
     <ClInclude Include="src\lzma\C\XzCrc64.h" />
     <ClInclude Include="src\lzma\C\XzEnc.h" />
+    <ClInclude Include="src\MapDisplayPrefsPanel.h" />
     <ClInclude Include="src\MapEditor.h" />
+    <ClInclude Include="src\MapEditorPrefsPanel.h" />
     <ClInclude Include="src\MapEntryPanel.h" />
     <ClInclude Include="src\MapRenderer2D.h" />
     <ClInclude Include="src\MapTextureManager.h" />

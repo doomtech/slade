@@ -145,17 +145,20 @@ bool MapEditor::selectCurrent(bool clear_none) {
 
 bool MapEditor::selectWithin(double xmin, double ymin, double xmax, double ymax, bool add) {
 	// Select depending on editing mode
-	bool new_sel = false;
+	bool selected;
 	vector<int> nsel;
+	vector<int> asel;
 
 	// Vertices
 	if (edit_mode == MODE_VERTICES) {
 		// Go through vertices
 		double x, y;
 		for (unsigned a = 0; a < map.vertices.size(); a++) {
-			// Skip if vertex is already selected
+			// Check if already selected
 			if (std::find(selection.begin(), selection.end(), a) != selection.end())
-				continue;
+				selected = true;
+			else
+				selected = false;
 
 			// Get position
 			x = map.vertices[a]->xPos();
@@ -163,9 +166,10 @@ bool MapEditor::selectWithin(double xmin, double ymin, double xmax, double ymax,
 
 			// Select if vertex is within bounds
 			if (xmin <= x && x <= xmax && ymin <= y && y <= ymax) {
-				//selection.push_back(a);
-				nsel.push_back(a);
-				new_sel = true;
+				if (selected)
+					asel.push_back(a);
+				else
+					nsel.push_back(a);
 			}
 		}
 	}
@@ -176,9 +180,11 @@ bool MapEditor::selectWithin(double xmin, double ymin, double xmax, double ymax,
 		MapLine* line;
 		double x1, y1, x2, y2;
 		for (unsigned a = 0; a < map.lines.size(); a++) {
-			// Skip if line is already selected
+			// Check if already selected
 			if (std::find(selection.begin(), selection.end(), a) != selection.end())
-				continue;
+				selected = true;
+			else
+				selected = false;
 
 			// Get vertex positions
 			line = map.lines[a];
@@ -190,9 +196,10 @@ bool MapEditor::selectWithin(double xmin, double ymin, double xmax, double ymax,
 			// Select if both vertices are within bounds
 			if (xmin <= x1 && x1 <= xmax && ymin <= y1 && y1 <= ymax &&
 				xmin <= x2 && x2 <= xmax && ymin <= y2 && y2 <= ymax) {
-				//selection.push_back(a);
-				nsel.push_back(a);
-				new_sel = true;
+				if (selected)
+					asel.push_back(a);
+				else
+					nsel.push_back(a);
 			}
 		}
 	}
@@ -203,10 +210,18 @@ bool MapEditor::selectWithin(double xmin, double ymin, double xmax, double ymax,
 		fpoint2_t pmin(xmin, ymin);
 		fpoint2_t pmax(xmax, ymax);
 		for (unsigned a = 0; a < map.sectors.size(); a++) {
+			// Check if already selected
+			if (std::find(selection.begin(), selection.end(), a) != selection.end())
+				selected = true;
+			else
+				selected = false;
+
 			// Check if sector's bbox fits within the selection box
 			if (map.sectors[a]->boundingBox().is_within(pmin, pmax)) {
-				//selection.push_back(a);
-				nsel.push_back(a);
+				if (selected)
+					asel.push_back(a);
+				else
+					nsel.push_back(a);
 			}
 		}
 	}
@@ -216,9 +231,11 @@ bool MapEditor::selectWithin(double xmin, double ymin, double xmax, double ymax,
 		// Go through things
 		double x, y;
 		for (unsigned a = 0; a < map.things.size(); a++) {
-			// Skip if thing is already selected
+			// Check if already selected
 			if (std::find(selection.begin(), selection.end(), a) != selection.end())
-				continue;
+				selected = true;
+			else
+				selected = false;
 
 			// Get position
 			x = map.things[a]->xPos();
@@ -226,27 +243,31 @@ bool MapEditor::selectWithin(double xmin, double ymin, double xmax, double ymax,
 
 			// Select if thing is within bounds
 			if (xmin <= x && x <= xmax && ymin <= y && y <= ymax) {
-				//selection.push_back(a);
-				nsel.push_back(a);
-				new_sel = true;
+				if (selected)
+					asel.push_back(a);
+				else
+					nsel.push_back(a);
 			}
 		}
 	}
 
-	// Clear selection if something was within the box
-	if (nsel.size() > 0 && !add)
+
+	// Clear selection if anything was within the box
+	if (!add && (nsel.size() > 0 || asel.size() > 0))
 		clearSelection();
 
 	// Update selection
-	if (nsel.size() > 0) {
-		for (unsigned a = 0; a < nsel.size(); a++)
-			selection.push_back(nsel[a]);
-
-		// Animate
-		if (canvas) canvas->itemsSelected(nsel);
+	if (!add) {
+		for (unsigned a = 0; a < asel.size(); a++)
+			selection.push_back(asel[a]);
 	}
+	for (unsigned a = 0; a < nsel.size(); a++)
+		selection.push_back(nsel[a]);
 
-	return new_sel;
+	// Animate newly selected items
+	if (canvas && nsel.size() > 0) canvas->itemsSelected(nsel);
+
+	return (nsel.size() > 0);
 }
 
 MapVertex* MapEditor::getHilightedVertex() {

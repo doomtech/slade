@@ -2,8 +2,12 @@
 #ifndef __MAP_DISPLAY_PREFS_PANEL_H__
 #define __MAP_DISPLAY_PREFS_PANEL_H__
 
+#include <wx/notebook.h>
+
 class MapDisplayPrefsPanel : public wxPanel {
 private:
+	wxNotebook*	nb_pages;
+
 	wxCheckBox*	cb_grid_dashed;
 	wxSlider*	slider_vertex_size;
 	wxCheckBox*	cb_vertex_round;

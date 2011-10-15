@@ -726,6 +726,15 @@
     <ClCompile Include="src\Polygon2D.cpp">
       <Filter>General\Utility</Filter>
     </ClCompile>
+    <ClCompile Include="src\ColourPrefsPanel.cpp">
+      <Filter>Dialogs\Preferences</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MapDisplayPrefsPanel.cpp">
+      <Filter>Dialogs\Preferences</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MapEditorPrefsPanel.cpp">
+      <Filter>Dialogs\Preferences</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -1370,6 +1379,15 @@
     </ClInclude>
     <ClInclude Include="src\Polygon2D.h">
       <Filter>General\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ColourPrefsPanel.h">
+      <Filter>Dialogs\Preferences</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MapDisplayPrefsPanel.h">
+      <Filter>Dialogs\Preferences</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MapEditorPrefsPanel.h">
+      <Filter>Dialogs\Preferences</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
