@@ -61,6 +61,7 @@ GfxConvDialog::GfxConvDialog()
 	SetIcon(icon);
 
 	setupLayout();
+	CenterOnParent();
 }
 
 /* GfxConvDialog::~GfxConvDialog

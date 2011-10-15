@@ -669,6 +669,15 @@
     <ClCompile Include="src\FileMonitor.cpp">
       <Filter>General</Filter>
     </ClCompile>
+    <ClCompile Include="src\KeyBind.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ColourConfiguration.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ColourPrefsPanel.cpp">
+      <Filter>Dialogs\Preferences</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -1256,6 +1265,15 @@
     </ClInclude>
     <ClInclude Include="src\FileMonitor.h">
       <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="src\KeyBind.h">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ColourConfiguration.h">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ColourPrefsPanel.h">
+      <Filter>Dialogs\Preferences</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -825,6 +825,10 @@ void TranslationEditorDialog::onBtnAdd(wxCommandEvent& e) {
  * Called when the 'Remove Translation' button is clicked
  *******************************************************************/
 void TranslationEditorDialog::onBtnRemove(wxCommandEvent& e) {
+	// Do nothing if there is only one translation
+	if (translation.nRanges() == 1)
+		return;
+
 	// Get index of range to remove
 	int index = list_translations->GetSelection();
 
