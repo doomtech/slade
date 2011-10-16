@@ -48,11 +48,11 @@ void GameConfiguration::buildConfig(string filename, string& out) {
 	wxTextFile file;
 	if (!file.Open(filename))
 		return;
-	
+
 	// Get file path
 	wxFileName fn(filename);
 	string path = fn.GetPath(true);
-	
+
 	// Go through line-by-line
 	string line = file.GetNextLine();
 	while (!file.Eof()) {
@@ -63,13 +63,13 @@ void GameConfiguration::buildConfig(string filename, string& out) {
 			tz.openString(line);
 			tz.getToken();	// Skip #include
 			string file = tz.getToken();
-			
+
 			// Process the file
 			buildConfig(path + file, out);
 		}
 		else
 			out.Append(line + "\n");
-		
+
 		line = file.GetNextLine();
 	}
 }
@@ -103,7 +103,7 @@ void GameConfiguration::buildConfig(ArchiveEntry* entry, string& out) {
 			tz.openString(line);
 			tz.getToken();	// Skip #include
 			string name = entry->getPath() + tz.getToken();
-			
+
 			// Get the entry
 			ArchiveEntry* entry_inc = entry->getParent()->entryAtPath(name);
 			if (entry_inc)
@@ -113,7 +113,7 @@ void GameConfiguration::buildConfig(ArchiveEntry* entry, string& out) {
 		}
 		else
 			out.Append(line + "\n");
-		
+
 		line = file.GetNextLine();
 	}
 
@@ -136,20 +136,20 @@ void GameConfiguration::readActionSpecials(ParseTreeNode* node) {
 	}
 	if (groupname.EndsWith("/"))
 		groupname.RemoveLast();	// Remove last '/'
-	
+
 	// Check if this group's action specials require a tag
 	bool tagged = false;
 	if (node->getChild("tagged"))
 		tagged = ((ParseTreeNode*)node->getChild("tagged"))->getBoolValue();
-	
+
 	// --- Go through all child nodes ---
 	for (unsigned a = 0; a < node->nChildren(); a++) {
 		ParseTreeNode* child = (ParseTreeNode*)node->getChild(a);
-		
+
 		// Check for 'group'
 		if (S_CMPNOCASE(child->getType(), "group"))
 			readActionSpecials(child);
-			
+
 		// Action special
 		else if (S_CMPNOCASE(child->getType(), "special")) {
 			// Get special id as integer
@@ -162,7 +162,7 @@ void GameConfiguration::readActionSpecials(ParseTreeNode* node) {
 			// Apply group defaults
 			action_specials[special].group = groupname;
 			action_specials[special].tagged = tagged;
-			
+
 			// Check for simple definition
 			if (child->isLeaf())
 				action_specials[special].name = child->getStringValue();
@@ -224,30 +224,50 @@ void GameConfiguration::readThingTypes(ParseTreeNode* node) {
 
 	// Args
 	string arg1 = "Arg1";
+	string arg1d = "";
 	child = (ParseTreeNode*)node->getChild("arg1");
-	if (child) arg1 = child->getStringValue();
+	if (child) {
+		arg1 = child->getStringValue();
+		if (child->nValues() > 1) arg1d = child->getStringValue(1);
+	}
 	string arg2 = "Arg2";
+	string arg2d = "";
 	child = (ParseTreeNode*)node->getChild("arg2");
-	if (child) arg2 = child->getStringValue();
+	if (child) {
+		arg2 = child->getStringValue();
+		if (child->nValues() > 1) arg2d = child->getStringValue(1);
+	}
 	string arg3 = "Arg3";
+	string arg3d = "";
 	child = (ParseTreeNode*)node->getChild("arg3");
-	if (child) arg3 = child->getStringValue();
+	if (child) {
+		arg3 = child->getStringValue();
+		if (child->nValues() > 1) arg3d = child->getStringValue(1);
+	}
 	string arg4 = "Arg4";
+	string arg4d = "";
 	child = (ParseTreeNode*)node->getChild("arg4");
-	if (child) arg4 = child->getStringValue();
+	if (child) {
+		arg4 = child->getStringValue();
+		if (child->nValues() > 1) arg4d = child->getStringValue(1);
+	}
 	string arg5 = "Arg5";
+	string arg5d = "";
 	child = (ParseTreeNode*)node->getChild("arg5");
-	if (child) arg5 = child->getStringValue();
+	if (child) {
+		arg5 = child->getStringValue();
+		if (child->nValues() > 1) arg5d = child->getStringValue(1);
+	}
 
 
 	// --- Go through all child nodes ---
 	for (unsigned a = 0; a < node->nChildren(); a++) {
 		child = (ParseTreeNode*)node->getChild(a);
-		
+
 		// Check for 'group'
 		if (S_CMPNOCASE(child->getType(), "group"))
 			readThingTypes(child);
-			
+
 		// Thing type
 		else if (S_CMPNOCASE(child->getType(), "thing")) {
 			// Get thing type as integer
@@ -270,11 +290,16 @@ void GameConfiguration::readThingTypes(ParseTreeNode* node) {
 			thing_types[type].type->group	= groupname;
 			thing_types[type].type->sprite	= sprite;
 			thing_types[type].type->args[0].name = arg1;
+			thing_types[type].type->args[0].desc = arg1d;
 			thing_types[type].type->args[1].name = arg2;
+			thing_types[type].type->args[1].desc = arg2d;
 			thing_types[type].type->args[2].name = arg3;
+			thing_types[type].type->args[2].desc = arg3d;
 			thing_types[type].type->args[3].name = arg4;
+			thing_types[type].type->args[3].desc = arg4d;
 			thing_types[type].type->args[4].name = arg5;
-			
+			thing_types[type].type->args[4].desc = arg5d;
+
 			// Check for simple definition
 			if (child->isLeaf())
 				thing_types[type].type->name = child->getStringValue();
@@ -297,14 +322,14 @@ bool GameConfiguration::readConfiguration(string& cfg, string source) {
 	map_names.clear();
 	flags_thing.clear();
 	flags_line.clear();
-	
+
 	// Parse the full configuration
 	Parser parser;
 	parser.parseText(cfg, source);
-	
+
 	// Process parsed data
 	ParseTreeNode* base = parser.parseTreeRoot();
-	
+
 	// 'Game' section (this is required for it to be a valid game configuration)
 	ParseTreeNode* node_game = (ParseTreeNode*)base->getChild("game");
 	if (!node_game) {
@@ -313,11 +338,11 @@ bool GameConfiguration::readConfiguration(string& cfg, string source) {
 	}
 	for (unsigned a = 0; a < node_game->nChildren(); a++) {
 		ParseTreeNode* node = (ParseTreeNode*)node_game->getChild(a);
-		
+
 		// Game name
 		if (S_CMPNOCASE(node->getName(), "name"))
 			this->name = node->getStringValue();
-			
+
 		// Valid map names
 		else if (S_CMPNOCASE(node->getName(), "map_names")) {
 			for (unsigned n = 0; n < node->nValues(); n++)
@@ -433,7 +458,7 @@ bool GameConfiguration::readConfiguration(string& cfg, string source) {
 		else
 			wxLogMessage("Warning: Unexpected game configuration section \"%s\", skipping", CHR(node->getName()));
 	}
-	
+
 	wxLogMessage("Read game configuration \"%s\"", CHR(this->name));
 	return true;
 }
@@ -479,7 +504,7 @@ bool GameConfiguration::openConfig(string name) {
 		game_configuration = name;
 		return true;
 	}
-	
+
 	// Not found anywhere
 	return false;
 }
@@ -543,7 +568,7 @@ string GameConfiguration::lineFlagsString(int flags) {
 
 void GameConfiguration::dumpActionSpecials() {
 	ASpecialMap::iterator i = action_specials.begin();
-	
+
 	while (i != action_specials.end()) {
 		wxLogMessage("Action special %d = %s", i->first, CHR(i->second.stringDesc()));
 		i++;
@@ -552,7 +577,7 @@ void GameConfiguration::dumpActionSpecials() {
 
 void GameConfiguration::dumpThingTypes() {
 	ThingTypeMap::iterator i = thing_types.begin();
-	
+
 	while (i != thing_types.end()) {
 		wxLogMessage("Thing type %d = %s", i->first, CHR(i->second.type->stringDesc()));
 		i++;

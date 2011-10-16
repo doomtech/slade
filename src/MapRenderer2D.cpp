@@ -1264,52 +1264,6 @@ void MapRenderer2D::updateFlatsVBO() {
 }
 
 void MapRenderer2D::updateVisibility(fpoint2_t view_tl, fpoint2_t view_br, double view_scale) {
-	/*
-	// Vertex visibility
-	if (map->nVertices() != vis_v.size()) {
-		// Number of vertices changed, reset array
-		vis_v.clear();
-		for (unsigned a = 0; a < map->nVertices(); a++)
-			vis_v.push_back(0);
-	}
-	double x, y;
-	for (unsigned a = 0; a < vis_v.size(); a++) {
-		x = map->getVertex(a)->xPos();
-		y = map->getVertex(a)->yPos();
-		vis_v[a] = 0;
-		if (x < view_tl.x)
-			vis_v[a] |= VIS_LEFT;
-		if (x > view_br.x)
-			vis_v[a] |= VIS_RIGHT;
-		if (y < view_tl.y)
-			vis_v[a] |= VIS_BELOW;
-		if (y > view_br.y)
-			vis_v[a] |= VIS_ABOVE;
-	}
-
-	// Line visibility
-	if (map->nLines() != vis_l.size()) {
-		// Number of lines changed, reset array
-		vis_l.clear();
-		for (unsigned a = 0; a < map->nLines(); a++)
-			vis_l.push_back(0);
-	}
-	uint8_t vis_v1, vis_v2;
-	for (unsigned a = 0; a < vis_l.size(); a++) {
-		vis_v1 = vis_v[map->getLine(a)->v1()->getIndex()];
-		vis_v2 = vis_v[map->getLine(a)->v2()->getIndex()];
-		vis_l[a] = 0;
-		if (vis_v1 & VIS_LEFT && vis_v2 & VIS_LEFT)
-			vis_l[a] |= VIS_LEFT;
-		if (vis_v1 & VIS_RIGHT && vis_v2 & VIS_RIGHT)
-			vis_l[a] |= VIS_RIGHT;
-		if (vis_v1 & VIS_BELOW && vis_v2 & VIS_BELOW)
-			vis_l[a] |= VIS_BELOW;
-		if (vis_v1 & VIS_ABOVE && vis_v2 & VIS_ABOVE)
-			vis_l[a] |= VIS_ABOVE;
-	}
-	*/
-
 	// Sector visibility
 	if (map->nSectors() != vis_s.size()) {
 		// Number of sectors changed, reset array

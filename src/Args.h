@@ -17,6 +17,7 @@ struct arg_val_t {
 
 struct arg_t {
 	string				name;
+	string				desc;
 	int					type;
 	vector<arg_val_t>	custom_values;
 	vector<arg_val_t>	custom_flags;

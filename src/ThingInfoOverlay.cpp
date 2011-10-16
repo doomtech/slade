@@ -55,6 +55,21 @@ void ThingInfoOverlay::update(MapThing* thing) {
 	// Flags
 	info.push_back(S_FMT("Flags: %s", CHR(theGameConfiguration->thingFlagsString(thing->prop("flags")))));
 
+	// Args (if in hexen/udmf format)
+	if (theGameConfiguration->getMapFormat() == MAP_HEXEN || theGameConfiguration->getMapFormat() == MAP_UDMF) {
+		int args[5];
+		args[0] = thing->prop("arg0");
+		args[1] = thing->prop("arg1");
+		args[2] = thing->prop("arg2");
+		args[3] = thing->prop("arg3");
+		args[4] = thing->prop("arg4");
+		string argstr = tt->getArgsString(args);
+		if (!argstr.IsEmpty())
+			info.push_back(S_FMT("%s", CHR(argstr)));
+		else
+			info.push_back("No Args");
+	}
+
 	// Set sprite and translation
 	sprite = tt->getSprite();
 	translation = tt->getTranslation();

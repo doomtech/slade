@@ -64,7 +64,7 @@ namespace Drawing {
  *******************************************************************/
 void Drawing::initFonts() {
 	// Load general fonts
-	ArchiveEntry* entry = theArchiveManager->programResourceArchive()->entryAtPath("fonts/dejavu_sans.ttf");
+	ArchiveEntry* entry = theArchiveManager->programResourceArchive()->entryAtPath("fonts/dejavu_sans_c.ttf");
 	if (entry) {
 		font_small.LoadFromMemory((const char*)entry->getData(), entry->getSize(), 12);
 		font_large.LoadFromMemory((const char*)entry->getData(), entry->getSize(), 30);
@@ -76,7 +76,7 @@ void Drawing::initFonts() {
  *******************************************************************/
 void Drawing::initFonts() {
 	// Load general fonts
-	ArchiveEntry* entry = theArchiveManager->programResourceArchive()->entryAtPath("fonts/dejavu_sans.ttf");
+	ArchiveEntry* entry = theArchiveManager->programResourceArchive()->entryAtPath("fonts/dejavu_sans_c.ttf");
 	if (entry) {
 		// Small font
 		font_small = new FTTextureFont(entry->getData(), entry->getSize());

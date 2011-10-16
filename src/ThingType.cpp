@@ -11,13 +11,35 @@ ThingType::ThingType(string name) {
 	this->colour = COL_WHITE;
 	this->radius = 20;
 	this->height = 16;
-	
+
 	// Init args
 	args[0].name = "Arg1";
 	args[1].name = "Arg2";
 	args[2].name = "Arg3";
 	args[3].name = "Arg4";
 	args[4].name = "Arg5";
+}
+
+string ThingType::getArgsString(int args[5]) {
+	string ret;
+
+	// Add each arg to the string
+	for (unsigned a = 0; a < 5; a++) {
+		// Skip if the arg name is undefined and the arg value is 0
+		if (args[a] == 0 && this->args[a].name.StartsWith("Arg"))
+			continue;
+
+		ret += this->args[a].name;
+		ret += ": ";
+		ret += this->args[a].valueString(args[a]);
+		ret += ", ";
+	}
+
+	// Cut ending ", "
+	if (!ret.IsEmpty())
+		ret.RemoveLast(2);
+
+	return ret;
 }
 
 void ThingType::reset() {
@@ -30,7 +52,7 @@ void ThingType::reset() {
 	this->colour = COL_WHITE;
 	this->radius = 20;
 	this->height = 16;
-	
+
 	// Reset args
 	for (unsigned a = 0; a < 5; a++) {
 		args[a].name = S_FMT("Arg%d", a+1);
@@ -102,20 +124,29 @@ void ThingType::parse(ParseTreeNode* node) {
 		// Palette override
 		else if (S_CMPNOCASE(name, "palette"))
 			this->palette = child->getStringValue();
-			
+
 
 
 		// Parse arg definition if it was one
 		if (arg >= 0) {
 			// Check for simple definition
-			if (child->isLeaf())
+			if (child->isLeaf()) {
+				// Set name
 				args[arg].name = child->getStringValue();
+
+				// Set description (if specified)
+				if (child->nValues() > 1) args[arg].desc = child->getStringValue(1);
+			}
 			else {
 				// Extended arg definition
 
 				// Name
 				ParseTreeNode* val = (ParseTreeNode*)child->getChild("name");
 				if (val) args[arg].name = val->getStringValue();
+
+				// Description
+				val = (ParseTreeNode*)child->getChild("desc");
+				if (val) args[arg].desc = val->getStringValue();
 
 				// Type
 				val = (ParseTreeNode*)child->getChild("type");
