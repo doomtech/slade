@@ -121,7 +121,7 @@ public:
 	int		addEdge(double x1, double y1, double x2, double y2);
 	int		addEdge(int v1, int v2);
 
-	int		findNextEdge(int edge, bool ignore_valid = true, bool only_convex = true);
+	int		findNextEdge(int edge, bool ignore_valid = true, bool only_convex = true, bool ignore_inpoly = false);
 	void	flipEdge(int edge);
 
 	void	detectConcavity();

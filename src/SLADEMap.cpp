@@ -271,13 +271,21 @@ bool SLADEMap::addLine(doomline_t& l) {
 	MapSide* s2 = NULL;
 	if (sides.size() > 32767) {
 		// Support for > 32768 sides
-		s1 = getSide(static_cast<unsigned short>(l.side1));
-		s2 = getSide(static_cast<unsigned short>(l.side2));
+		if (l.side1 != -1) s1 = getSide(static_cast<unsigned short>(l.side1));
+		if (l.side2 != -1) s2 = getSide(static_cast<unsigned short>(l.side2));
 	}
 	else {
 		s1 = getSide(l.side1);
 		s2 = getSide(l.side2);
 	}
+
+	// Get relevant vertices
+	MapVertex* v1 = getVertex(l.vertex1);
+	MapVertex* v2 = getVertex(l.vertex2);
+
+	// Check everything is valid
+	if (!v1 || !v2)
+		return false;
 
 	// Check if side1 already belongs to a line
 	if (s1 && s1->parent) {
@@ -295,7 +303,7 @@ bool SLADEMap::addLine(doomline_t& l) {
 	}
 
 	// Create line
-	MapLine* nl = new MapLine(getVertex(l.vertex1), getVertex(l.vertex2), s1, s2);
+	MapLine* nl = new MapLine(v1, v2, s1, s2);
 
 	// Setup line properties
 	nl->prop("arg0") = l.sector_tag;
@@ -335,6 +343,14 @@ bool SLADEMap::addLine(doom64line_t& l) {
 		s2 = getSide(l.side2);
 	}
 
+	// Get relevant vertices
+	MapVertex* v1 = getVertex(l.vertex1);
+	MapVertex* v2 = getVertex(l.vertex2);
+
+	// Check everything is valid
+	if (!v1 || !v2)
+		return false;
+
 	// Check if side1 already belongs to a line
 	if (s1 && s1->parent) {
 		// Duplicate side
@@ -351,7 +367,7 @@ bool SLADEMap::addLine(doom64line_t& l) {
 	}
 
 	// Create line
-	MapLine* nl = new MapLine(getVertex(l.vertex1), getVertex(l.vertex2), s1, s2);
+	MapLine* nl = new MapLine(v1, v2, s1, s2);
 
 	// Setup line properties
 	nl->prop("arg0") = l.sector_tag;
@@ -499,8 +515,10 @@ bool SLADEMap::readDoomLinedefs(ArchiveEntry * entry) {
 	}
 
 	doomline_t* line_data = (doomline_t*)entry->getData(true);
-	for (size_t a = 0; a < entry->getSize() / sizeof(doomline_t); a++)
-		addLine(line_data[a]);
+	for (size_t a = 0; a < entry->getSize() / sizeof(doomline_t); a++) {
+		if (!addLine(line_data[a]))
+			wxLogMessage("Line %d invalid, not added", a);
+	}
 
 	wxLogMessage("Read %d lines", lines.size());
 
@@ -614,6 +632,14 @@ bool SLADEMap::addLine(hexenline_t& l) {
 		s2 = getSide(l.side2);
 	}
 
+	// Get relevant vertices
+	MapVertex* v1 = getVertex(l.vertex1);
+	MapVertex* v2 = getVertex(l.vertex2);
+
+	// Check everything is valid
+	if (!v1 || !v2)
+		return false;
+
 	// Check if side1 already belongs to a line
 	if (s1 && s1->parent) {
 		// Duplicate side
@@ -630,7 +656,7 @@ bool SLADEMap::addLine(hexenline_t& l) {
 	}
 
 	// Create line
-	MapLine* nl = new MapLine(getVertex(l.vertex1), getVertex(l.vertex2), s1, s2);
+	MapLine* nl = new MapLine(v1, v2, s1, s2);
 
 	// Setup line properties
 	nl->prop("arg0") = l.args[0];

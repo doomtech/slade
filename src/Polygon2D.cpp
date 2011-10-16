@@ -255,7 +255,7 @@ int PolygonSplitter::addEdge(int v1, int v2) {
 	return index;
 }
 
-int PolygonSplitter::findNextEdge(int edge, bool ignore_done, bool only_convex) {
+int PolygonSplitter::findNextEdge(int edge, bool ignore_done, bool only_convex, bool ignore_inpoly) {
 	edge_t& e = edges[edge];
 	vertex_t& v2 = vertices[e.v2];
 	vertex_t& v1 = vertices[e.v1];
@@ -268,6 +268,10 @@ int PolygonSplitter::findNextEdge(int edge, bool ignore_done, bool only_convex) 
 
 		// Ignore 'done' edges
 		if (ignore_done && edges[v2.edges_out[a]].done)
+			continue;
+
+		// Ignore 'inpoly' edges
+		if (ignore_inpoly && edges[v2.edges_out[a]].inpoly)
 			continue;
 
 		// Ignore edges on the reverse-side of this
@@ -458,7 +462,7 @@ bool PolygonSplitter::tracePolyOutline(int edge_start) {
 	int v1, v2, next;
 	//while (true) {
 	unsigned a = 0;
-	for (a = 0; a < 1000; a++) {
+	for (a = 0; a < 100000; a++) {
 		v1 = edges[edge].v1;
 		v2 = edges[edge].v2;
 		next = -1;
@@ -466,14 +470,18 @@ bool PolygonSplitter::tracePolyOutline(int edge_start) {
 		// Add current edge
 		poly.edges.push_back(edge);
 		if (edge == edge_start) poly.bbox.extend(vertices[v1].x, vertices[v1].y);
+		else edges[edge].inpoly = true;
 		poly.bbox.extend(vertices[v2].x, vertices[v2].y);
 		edge_sum += vertices[v1].x*vertices[v2].y - vertices[v2].x*vertices[v1].y;
 
 		// Find the next edge with the lowest angle
-		next = findNextEdge(edge, true, false);
+		next = findNextEdge(edge, true, false, true);
 
 		// Abort if no next edge was found
 		if (next < 0) {
+			for (unsigned a = 0; a < poly.edges.size(); a++)
+				edges[poly.edges[a]].inpoly = false;
+
 			polygon_outlines.pop_back();
 			return false;
 		}
@@ -490,7 +498,7 @@ bool PolygonSplitter::tracePolyOutline(int edge_start) {
 		edge = next;
 	}
 
-	if (a >= 999) {
+	if (a >= 99999) {
 		if (verbose) wxLogMessage("Possible infinite loop in tracePolyOutline");
 		return false;
 	}
@@ -499,8 +507,9 @@ bool PolygonSplitter::tracePolyOutline(int edge_start) {
 	poly.clockwise = (edge_sum < 0);
 
 	// Set all polygon edges 'inpoly' to true (so they are ignored when tracing future polylines
-	for (unsigned a = 0; a < poly.edges.size(); a++)
-		edges[poly.edges[a]].inpoly = true;
+	edges[edge_start].inpoly = true;
+	//for (unsigned a = 0; a < poly.edges.size(); a++)
+	//	edges[poly.edges[a]].inpoly = true;
 
 	if (verbose) {
 		string info = "Traced polygon outline: ";

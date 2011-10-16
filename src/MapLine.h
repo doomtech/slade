@@ -26,8 +26,8 @@ class MapSide;
 #define LINE_HBLOCKALL		0x8000
 
 struct doomline_t {
-	short vertex1;
-	short vertex2;
+	unsigned short vertex1;
+	unsigned short vertex2;
 	short flags;
 	short type;
 	short sector_tag;
@@ -36,8 +36,8 @@ struct doomline_t {
 };
 
 struct hexenline_t {
-	short	vertex1;
-	short	vertex2;
+	unsigned short	vertex1;
+	unsigned short	vertex2;
 	short	flags;
 	uint8_t	type;
 	uint8_t	args[5];
@@ -46,8 +46,8 @@ struct hexenline_t {
 };
 
 struct doom64line_t {
-	short vertex1;
-	short vertex2;
+	unsigned short vertex1;
+	unsigned short vertex2;
 	uint32_t flags;
 	short type;
 	short sector_tag;
