@@ -8,6 +8,8 @@
 TODO List ---------------------------------------------------------------
 
 --- Bugs ---
+- Gfx doesn't update after being converted
+- Random crash on view/convert of invalid gfx
 
 --- Map Editor ---
 - Checks:
@@ -102,6 +104,13 @@ Unimplemented Feature Requests ------------------------------------------
 - SBARINFO viewer/editor
 
 --- Gfx ---
+- Save offset type between sessions
+Translation dialog:
+- Source/destination palette selectable
+- Scroll through multiple preview gfx
+- Allow use with truecolour gfx
+Conversion dialog:
+- Enter and esc mapped to convert all and skip all
 
 --- Text Editor ---
 

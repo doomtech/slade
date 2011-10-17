@@ -38,7 +38,6 @@ public:
 	virtual void	update(long frametime) {}
 	void			drawCheckeredBackground();
 	wxWindow*		toPanel(wxWindow* parent);
-	void			doPaint();
 
 #ifdef USE_SFML_RENDERWINDOW
 	void	SwapBuffers() { Display(); }
