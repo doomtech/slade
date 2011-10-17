@@ -47,13 +47,15 @@ private:
 	int		n_vertices;
 	int		n_lines;
 	int		n_things;
+	double	view_scale;
+	double	view_scale_inv;
 
 public:
 	MapRenderer2D(SLADEMap* map);
 	~MapRenderer2D();
 
 	// Main drawing stuff
-	void	renderVertices(float view_scale, float alpha = 1.0f);
+	void	renderVertices(float alpha = 1.0f);
 	void	renderVerticesVBO();
 	void	renderVerticesImmediate();
 	void	renderLines(bool show_direction);
@@ -62,10 +64,10 @@ public:
 	void	renderRoundThing(double x, double y, double angle, ThingType* type, float alpha = 1.0f);
 	bool	renderSpriteThing(double x, double y, double angle, ThingType* type, float alpha = 1.0f, bool fitradius = false);
 	void	renderSquareThing(double x, double y, double angle, ThingType* type, float alpha = 1.0f, bool showang = true);
-	void	renderThings(double view_scale = 1, float alpha = 1.0f);
-	void	renderThingsImmediate(double view_scale, float alpha);
-	void	renderHilight(int item, int type, float fade, float view_scale);
-	void	renderSelection(vector<int>& selection, int type, float view_scale);
+	void	renderThings(float alpha = 1.0f);
+	void	renderThingsImmediate(float alpha);
+	void	renderHilight(int item, int type, float fade);
+	void	renderSelection(vector<int>& selection, int type);
 	void	renderFlats(int type = 0);
 	void	renderFlatsImmediate(int type);
 	void	renderFlatsVBO(int type);
@@ -75,8 +77,11 @@ public:
 	void	updateLinesVBO(bool show_direction);
 	void	updateFlatsVBO();
 
+	void	setScale(double scale) { view_scale = scale; view_scale_inv = 1.0 / scale; }
 	void	updateVisibility(fpoint2_t view_tl, fpoint2_t view_br, double view_scale);
 	void	forceUpdate(float view_scale);
+
+	double	scaledRadius(int radius);
 };
 
 #endif//__MAP_RENDERER_2D__

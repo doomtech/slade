@@ -47,7 +47,7 @@ MapRenderer2D::~MapRenderer2D() {
 	if (list_lines > 0)			glDeleteLists(list_lines, 1);
 }
 
-void MapRenderer2D::renderVertices(float view_scale, float alpha) {
+void MapRenderer2D::renderVertices(float alpha) {
 	// Check there are any vertices to render
 	if (map->nVertices() == 0)
 		return;
@@ -276,15 +276,21 @@ void MapRenderer2D::renderRoundThing(double x, double y, double angle, ThingType
 	GLTexture* tex = NULL;
 	bool rotate = false;
 
+	// Set colour
+	glColor4f(tt->getColour().fr()*alpha, tt->getColour().fg()*alpha, tt->getColour().fb()*alpha, alpha);
+
 	// Check for unknown type
 	if (tt->getName() == "Unknown") {
 		tex = theMapEditor->textureManager().getEditorImage("thing/unknown");
 		glColor4f(1.0f, 1.0f, 1.0f, alpha);
 	}
 
-	else {
-		// Otherwise, normal thing image (for now)
-		glColor4f(tt->getColour().fr()*alpha, tt->getColour().fg()*alpha, tt->getColour().fb()*alpha, alpha);
+	// Check for custom thing icon
+	else if (!tt->getIcon().IsEmpty())
+		tex = theMapEditor->textureManager().getEditorImage(S_FMT("thing/%s", CHR(tt->getIcon())));
+
+	if (!tex) {
+		// Otherwise, normal thing image
 
 		// Check if we want an angle indicator
 		if (tt->isAngled() || thing_force_dir) {
@@ -317,6 +323,7 @@ void MapRenderer2D::renderRoundThing(double x, double y, double angle, ThingType
 
 	// Draw thing
 	double radius = tt->getRadius();
+	if (tt->shrinkOnZoom()) radius = scaledRadius(radius);
 	glBegin(GL_QUADS);
 	glTexCoord2f(0.0f, 1.0f);	glVertex2d(x-radius, y-radius);
 	glTexCoord2f(0.0f, 0.0f);	glVertex2d(x-radius, y+radius);
@@ -412,6 +419,7 @@ void MapRenderer2D::renderSquareThing(double x, double y, double angle, ThingTyp
 
 	// Get thing info
 	double radius = tt->getRadius();
+	if (tt->shrinkOnZoom()) radius = scaledRadius(radius);
 	double radius2 = radius * 0.1;
 
 	// Move to thing position
@@ -451,11 +459,11 @@ void MapRenderer2D::renderSquareThing(double x, double y, double angle, ThingTyp
 	glPopMatrix();
 }
 
-void MapRenderer2D::renderThings(double view_scale, float alpha) {
-	renderThingsImmediate(view_scale, alpha);
+void MapRenderer2D::renderThings(float alpha) {
+	renderThingsImmediate(alpha);
 }
 
-void MapRenderer2D::renderThingsImmediate(double view_scale, float alpha) {
+void MapRenderer2D::renderThingsImmediate(float alpha) {
 	// Display lists aren't really good for this, better to check for
 	// visibility and just render things in immediate mode
 
@@ -494,7 +502,9 @@ void MapRenderer2D::renderThingsImmediate(double view_scale, float alpha) {
 				// Get thing info
 				thing = map->getThing(a);
 				ThingType* tt = theGameConfiguration->thingType(thing->getType());
-				double radius = (tt->getRadius()+1) * 1.3;
+				double radius = (tt->getRadius()+1);
+				if (tt->shrinkOnZoom()) radius = scaledRadius(radius);
+				radius *= 1.3;
 				x = thing->xPos();
 				y = thing->yPos();
 
@@ -604,7 +614,7 @@ void MapRenderer2D::renderThingsImmediate(double view_scale, float alpha) {
 		glDisable(GL_TEXTURE_2D);
 }
 
-void MapRenderer2D::renderHilight(int hilight_item, int mode, float fade, float view_scale) {
+void MapRenderer2D::renderHilight(int hilight_item, int mode, float fade) {
 	// Check anything is hilighted
 	if (hilight_item < 0)
 		return;
@@ -714,11 +724,12 @@ void MapRenderer2D::renderHilight(int hilight_item, int mode, float fade, float 
 	else if (mode == MapEditor::MODE_THINGS) {
 		// Thing
 		MapThing* thing = map->getThing(hilight_item);
+		ThingType* tt = theGameConfiguration->thingType(thing->getType());
 		double x = thing->xPos();
 		double y = thing->yPos();
 
 		// Get thing radius
-		double radius = theGameConfiguration->thingType(thing->getType())->getRadius();
+		double radius = tt->getRadius();
 
 		// Check if we want square overlays
 		if (thing_overlay_square || thing_drawtype == 0 || thing_drawtype > 2) {
@@ -738,6 +749,7 @@ void MapRenderer2D::renderHilight(int hilight_item, int mode, float fade, float 
 			glVertex2d(x + radius, y + radius);
 			glVertex2d(x + radius, y - radius);
 			glEnd();
+
 			return;
 		}
 
@@ -765,7 +777,7 @@ void MapRenderer2D::renderHilight(int hilight_item, int mode, float fade, float 
 	}
 }
 
-void MapRenderer2D::renderSelection(vector<int>& selection, int mode, float view_scale) {
+void MapRenderer2D::renderSelection(vector<int>& selection, int mode) {
 	// Check anything is selected
 	if (selection.size() == 0)
 		return;
@@ -1264,6 +1276,10 @@ void MapRenderer2D::updateFlatsVBO() {
 }
 
 void MapRenderer2D::updateVisibility(fpoint2_t view_tl, fpoint2_t view_br, double view_scale) {
+	// Update variables
+	this->view_scale = view_scale;
+	this->view_scale_inv = 1.0 / view_scale;
+
 	// Sector visibility
 	if (map->nSectors() != vis_s.size()) {
 		// Number of sectors changed, reset array
@@ -1302,7 +1318,7 @@ void MapRenderer2D::updateVisibility(fpoint2_t view_tl, fpoint2_t view_br, doubl
 
 		// Get thing type properties from game configuration
 		ThingType* tt = theGameConfiguration->thingType(map->getThing(a)->getType());
-		radius = tt->getRadius();
+		radius = scaledRadius(tt->getRadius());
 
 		// Ignore if outside of screen
 		if (x+radius < view_tl.x || x-radius > view_br.x || y+radius < view_tl.y || y-radius > view_br.y)
@@ -1316,6 +1332,10 @@ void MapRenderer2D::updateVisibility(fpoint2_t view_tl, fpoint2_t view_br, doubl
 
 
 void MapRenderer2D::forceUpdate(float view_scale) {
+	// Update variables
+	this->view_scale = view_scale;
+	this->view_scale_inv = 1.0 / view_scale;
+
 	if (GLEW_ARB_vertex_buffer_object && !FORCE_NO_VBO) {
 		updateVerticesVBO();
 		updateLinesVBO(lines_dirs);
@@ -1331,4 +1351,14 @@ void MapRenderer2D::forceUpdate(float view_scale) {
 	}
 	renderVertices(view_scale);
 	renderLines(lines_dirs);
+}
+
+double MapRenderer2D::scaledRadius(int radius) {
+	if (radius > 16)
+		radius = 16;
+
+	if (view_scale > 1.0)
+		return radius * view_scale_inv;
+	else
+		return (double)radius;
 }

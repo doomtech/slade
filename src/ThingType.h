@@ -15,7 +15,9 @@ private:
 	int		height;
 	bool	angled;
 	bool	hanging;
+	bool	shrink;
 	string	sprite;
+	string	icon;
 	string	translation;
 	string	palette;
 	arg_t	args[5];
@@ -29,7 +31,9 @@ public:
 	rgba_t	getColour() { return colour; }
 	int		getRadius() { return radius; }
 	bool	isAngled() { return angled; }
+	bool	shrinkOnZoom() { return shrink; }
 	string	getSprite() { return sprite; }
+	string	getIcon() { return icon; }
 	string	getTranslation() { return translation; }
 	string	getPalette() { return palette; }
 	arg_t&	getArg(int index) { if (index >= 0 && index < 5) return args[index]; else return args[0]; }

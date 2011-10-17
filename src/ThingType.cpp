@@ -8,7 +8,8 @@ ThingType::ThingType(string name) {
 	this->name = name;
 	this->angled = true;
 	this->hanging = false;
-	this->colour = COL_WHITE;
+	this->shrink = false;
+	this->colour = rgba_t(170, 170, 180, 255, 0);
 	this->radius = 20;
 	this->height = 16;
 
@@ -47,8 +48,12 @@ void ThingType::reset() {
 	this->name = "Unknown";
 	this->group = "";
 	this->sprite = "";
+	this->icon = "";
+	this->translation = "";
+	this->palette = "";
 	this->angled = true;
 	this->hanging = false;
+	this->shrink = false;
 	this->colour = COL_WHITE;
 	this->radius = 20;
 	this->height = 16;
@@ -90,6 +95,10 @@ void ThingType::parse(ParseTreeNode* node) {
 		else if (S_CMPNOCASE(name, "sprite"))
 			this->sprite = child->getStringValue();
 
+		// Icon
+		else if (S_CMPNOCASE(name, "icon"))
+			this->icon = child->getStringValue();
+
 		// Radius
 		else if (S_CMPNOCASE(name, "radius"))
 			this->radius = child->getIntValue();
@@ -109,6 +118,10 @@ void ThingType::parse(ParseTreeNode* node) {
 		// Hanging object
 		else if (S_CMPNOCASE(name, "hanging"))
 			this->hanging = child->getBoolValue();
+
+		// Shrink on zoom
+		else if (S_CMPNOCASE(name, "shrink"))
+			this->shrink = child->getBoolValue();
 
 		// Translation
 		else if (S_CMPNOCASE(name, "translation"))
