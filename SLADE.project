@@ -463,17 +463,21 @@
         <LibraryPath Value="."/>
         <Library Value="freeimage"/>
         <Library Value="fluidsynth"/>
+        <Library Value="GL"/>
+        <Library Value="GLU"/>
       </Linker>
       <ResourceCompiler Options=""/>
     </GlobalSettings>
     <Configuration Name="Debug" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-g;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=yes)" C_Options="-g;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=yes)" Required="yes" PreCompiledHeader="">
+      <Compiler Options="-g;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=yes)" C_Options="-g;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=yes)" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
         <Preprocessor Value="__WX__"/>
       </Compiler>
       <Linker Options="$(shell wx-config --debug=yes --libs std,gl,stc,aui,ribbon --unicode=yes)" Required="yes"/>
       <ResourceCompiler Options="$(shell wx-config --rcflags)" Required="no"/>
       <General OutputFile="./dist/slade-dbg" IntermediateDirectory="./Debug" Command="./slade-dbg" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
-      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;"/>
+      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
+        <![CDATA[]]>
+      </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
         <PostConnectCommands/>
         <StartupCommands/>
@@ -494,16 +498,23 @@
         <CustomPostBuild/>
         <CustomPreBuild/>
       </AdditionalRules>
+      <Completion>
+        <ClangCmpFlags/>
+        <ClangPP/>
+        <SearchPaths/>
+      </Completion>
     </Configuration>
     <Configuration Name="Debug-osx" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-g;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=yes)" C_Options="-g;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=yes)" Required="yes" PreCompiledHeader="">
+      <Compiler Options="-g;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=yes)" C_Options="-g;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=yes)" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
         <Preprocessor Value="__WX__"/>
         <Preprocessor Value="__ASM_FIX__"/>
       </Compiler>
       <Linker Options="$(shell wx-config --debug=yes --libs std,gl,stc,aui,ribbon --unicode=yes);-framework SFML;-framework sfml-system;-framework sfml-audio" Required="yes"/>
       <ResourceCompiler Options="$(shell wx-config --rcflags)" Required="no"/>
       <General OutputFile="./dist/slade-dbg" IntermediateDirectory="./Debug" Command="./slade-dbg" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
-      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;"/>
+      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
+        <![CDATA[]]>
+      </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
         <PostConnectCommands/>
         <StartupCommands/>
@@ -524,9 +535,14 @@
         <CustomPostBuild/>
         <CustomPreBuild/>
       </AdditionalRules>
+      <Completion>
+        <ClangCmpFlags/>
+        <ClangPP/>
+        <SearchPaths/>
+      </Completion>
     </Configuration>
     <Configuration Name="Release" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-O3;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no)" C_Options="-O3;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no)" Required="yes" PreCompiledHeader="">
+      <Compiler Options="-O3;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no)" C_Options="-O3;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no)" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
         <Preprocessor Value="__WX__"/>
         <Preprocessor Value="NDEBUG"/>
       </Compiler>
@@ -536,7 +552,9 @@
       </Linker>
       <ResourceCompiler Options="$(shell wx-config --rcflags)" Required="no"/>
       <General OutputFile="./dist/slade" IntermediateDirectory="./Release" Command="./slade" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
-      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;"/>
+      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
+        <![CDATA[]]>
+      </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
         <PostConnectCommands/>
         <StartupCommands/>
@@ -557,9 +575,14 @@
         <CustomPostBuild/>
         <CustomPreBuild/>
       </AdditionalRules>
+      <Completion>
+        <ClangCmpFlags/>
+        <ClangPP/>
+        <SearchPaths/>
+      </Completion>
     </Configuration>
     <Configuration Name="Release-osx" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-arch i386;-O3;$(shell $(WXCONFIG_PATH)wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no)" C_Options="-arch i386;-O3;$(shell $(WXCONFIG_PATH)wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no)" Required="yes" PreCompiledHeader="">
+      <Compiler Options="-arch i386;-O3;$(shell $(WXCONFIG_PATH)wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no)" C_Options="-arch i386;-O3;$(shell $(WXCONFIG_PATH)wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no)" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
         <Preprocessor Value="__WX__"/>
         <Preprocessor Value="NDEBUG"/>
         <Preprocessor Value="__ASM_FIX__"/>
@@ -569,7 +592,9 @@
       </Linker>
       <ResourceCompiler Options="$(shell wx-config --rcflags)" Required="no"/>
       <General OutputFile="./dist/SLADE.app/Contents/MacOS/SLADE" IntermediateDirectory="./Release" Command="./dist/SLADE.app/Contents/MacOS/SLADE" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
-      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;"/>
+      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
+        <![CDATA[]]>
+      </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
         <PostConnectCommands/>
         <StartupCommands/>
@@ -595,6 +620,11 @@
         <CustomPostBuild/>
         <CustomPreBuild/>
       </AdditionalRules>
+      <Completion>
+        <ClangCmpFlags/>
+        <ClangPP/>
+        <SearchPaths/>
+      </Completion>
     </Configuration>
   </Settings>
 </CodeLite_Project>

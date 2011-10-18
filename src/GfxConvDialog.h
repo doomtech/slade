@@ -139,6 +139,7 @@ public:
 	void	onEnableTransparencyChanged(wxCommandEvent& e);
 	void	onTransTypeChanged(wxCommandEvent& e);
 	void	onTransColourChanged(wxEvent& e);
+	void	onPreviewCurrentMouseDown(wxMouseEvent& e);
 };
 
 #endif //__GFXCONVDIALOG_H__
