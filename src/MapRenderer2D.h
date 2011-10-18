@@ -5,6 +5,7 @@
 class SLADEMap;
 class ThingType;
 class GLTexture;
+class MapSector;
 class MapRenderer2D {
 private:
 	SLADEMap*	map;
@@ -55,32 +56,48 @@ public:
 	~MapRenderer2D();
 
 	// Main drawing stuff
+
+	// Vertices
 	void	renderVertices(float alpha = 1.0f);
 	void	renderVerticesVBO();
 	void	renderVerticesImmediate();
+	void	renderVertexHilight(int index, float fade);
+	void	renderVertexSelection(vector<int>& selection);
+
+	// Lines
 	void	renderLines(bool show_direction);
 	void	renderLinesVBO(bool show_direction);
 	void	renderLinesImmediate(bool show_direction);
+	void	renderLineHilight(int index, float fade);
+	void	renderLineSelection(vector<int>& selection);
+
+	// Things
 	void	renderRoundThing(double x, double y, double angle, ThingType* type, float alpha = 1.0f);
 	bool	renderSpriteThing(double x, double y, double angle, ThingType* type, float alpha = 1.0f, bool fitradius = false);
 	void	renderSquareThing(double x, double y, double angle, ThingType* type, float alpha = 1.0f, bool showang = true);
 	void	renderThings(float alpha = 1.0f);
 	void	renderThingsImmediate(float alpha);
-	void	renderHilight(int item, int type, float fade);
-	void	renderSelection(vector<int>& selection, int type);
+	void	renderThingHilight(int index, float fade);
+	void	renderThingSelection(vector<int>& selection);
+
+	// Flats (sectors)
 	void	renderFlats(int type = 0);
 	void	renderFlatsImmediate(int type);
 	void	renderFlatsVBO(int type);
+	void	renderFlatHilight(int index, float fade);
+	void	renderFlatSelection(vector<int>& selection);
+	void	renderTaggedFlats(vector<MapSector*>& sectors, float fade);
+
 
 	// VBOs
 	void	updateVerticesVBO();
 	void	updateLinesVBO(bool show_direction);
 	void	updateFlatsVBO();
 
+	// Misc
 	void	setScale(double scale) { view_scale = scale; view_scale_inv = 1.0 / scale; }
 	void	updateVisibility(fpoint2_t view_tl, fpoint2_t view_br, double view_scale);
 	void	forceUpdate(float view_scale);
-
 	double	scaledRadius(int radius);
 };
 

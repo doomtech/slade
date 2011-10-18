@@ -138,9 +138,18 @@ void GameConfiguration::readActionSpecials(ParseTreeNode* node) {
 		groupname.RemoveLast();	// Remove last '/'
 
 	// Check if this group's action specials require a tag
-	bool tagged = false;
-	if (node->getChild("tagged"))
-		tagged = ((ParseTreeNode*)node->getChild("tagged"))->getBoolValue();
+	int tagged = 0;
+	ParseTreeNode* child = (ParseTreeNode*)node->getChild("tagged");
+	if (child) {
+		string str = child->getStringValue();
+		if (S_CMPNOCASE(str, "no")) tagged = 0;
+		else if (S_CMPNOCASE(str, "sector")) tagged = 1;
+		else if (S_CMPNOCASE(str, "line")) tagged = 2;
+		else if (S_CMPNOCASE(str, "thing")) tagged = 3;
+		else if (S_CMPNOCASE(str, "sector_back")) tagged = 4;
+		else
+			tagged = child->getIntValue();
+	}
 
 	// --- Go through all child nodes ---
 	for (unsigned a = 0; a < node->nChildren(); a++) {

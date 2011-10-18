@@ -60,7 +60,7 @@ void MapRenderer2D::renderVertices(float alpha) {
 
 	// Setup point sprites if supported
 	bool point = false;
-	if (GLEW_ARB_point_sprite) {
+	if (OpenGL::pointSpriteSupport()) {
 		// Get appropriate vertex texture
 		GLTexture* tex;
 		if (vertex_round) tex = theMapEditor->textureManager().getEditorImage("vertex_r");
@@ -136,6 +136,97 @@ void MapRenderer2D::renderVerticesVBO() {
 	// Cleanup state
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void MapRenderer2D::renderVertexHilight(int index, float fade) {
+	// Check hilight
+	if (index < 0)
+		return;
+
+	// Set hilight colour
+	rgba_t col = ColourConfiguration::getColour("map_hilight");
+	col.a *= fade;
+	col.set_gl();
+
+	// Setup rendering properties
+	float vs = vertex_size*1.5f;
+	if (view_scale < 1.0) vs *= view_scale;
+	if (vs < 4.0f) vs = 4.0f;
+	glPointSize(vs);
+
+	// Setup point sprites if supported
+	bool point = false;
+	if (OpenGL::pointSpriteSupport()) {
+		// Get appropriate vertex texture
+		GLTexture* tex;
+		if (vertex_round) tex = theMapEditor->textureManager().getEditorImage("vertex_r");
+		else tex = theMapEditor->textureManager().getEditorImage("vertex_s");
+
+		// If it was found, enable point sprites
+		if (tex) {
+			glEnable(GL_TEXTURE_2D);
+			tex->bind();
+			glEnable(GL_POINT_SPRITE);
+			glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
+			point = true;
+		}
+	}
+
+	// Draw vertex
+	glBegin(GL_POINTS);
+	glVertex2d(map->getVertex(index)->xPos(),
+				map->getVertex(index)->yPos());
+	glEnd();
+
+	if (point) {
+		glDisable(GL_POINT_SPRITE);
+		glDisable(GL_TEXTURE_2D);
+	}
+}
+
+void MapRenderer2D::renderVertexSelection(vector<int>& selection) {
+	// Check anything is selected
+	if (selection.size() == 0)
+		return;
+
+	// Set selection colour
+	rgba_t col = ColourConfiguration::getColour("map_selection");
+	col.set_gl();
+
+	// Setup rendering properties
+	float vs = vertex_size*1.5f;
+	if (view_scale < 1.0) vs *= view_scale;
+	if (vs < 3.0f) vs = 3.0f;
+	glPointSize(vs);
+
+	// Setup point sprites if supported
+	bool point = false;
+	if (OpenGL::pointSpriteSupport()) {
+		// Get appropriate vertex texture
+		GLTexture* tex;
+		if (vertex_round) tex = theMapEditor->textureManager().getEditorImage("vertex_r");
+		else tex = theMapEditor->textureManager().getEditorImage("vertex_s");
+
+		// If it was found, enable point sprites
+		if (tex) {
+			glEnable(GL_TEXTURE_2D);
+			tex->bind();
+			glEnable(GL_POINT_SPRITE);
+			glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
+			point = true;
+		}
+	}
+
+	// Draw selected vertices
+	glBegin(GL_POINTS);
+	for (unsigned a = 0; a < selection.size(); a++)
+		glVertex2d(map->getVertex(selection[a])->xPos(), map->getVertex(selection[a])->yPos());
+	glEnd();
+	
+	if (point) {
+		glDisable(GL_POINT_SPRITE);
+		glDisable(GL_TEXTURE_2D);
+	}
 }
 
 void MapRenderer2D::renderLines(bool show_direction) {
@@ -265,6 +356,87 @@ void MapRenderer2D::renderLinesVBO(bool show_direction) {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	lines_dirs = show_direction;
+}
+
+void MapRenderer2D::renderLineHilight(int index, float fade) {
+	// Check hilight
+	if (index < 0)
+		return;
+
+	// Set hilight colour
+	rgba_t col = ColourConfiguration::getColour("map_hilight");
+	col.a *= fade;
+	col.set_gl();
+
+	// Setup rendering properties
+	glLineWidth(line_width*3);
+
+	// Render line
+	MapLine* line = map->getLine(index);
+	double x1 = line->v1()->xPos();
+	double y1 = line->v1()->yPos();
+	double x2 = line->v2()->xPos();
+	double y2 = line->v2()->yPos();
+	glBegin(GL_LINES);
+	glVertex2d(x1, y1);
+	glVertex2d(x2, y2);
+	glEnd();
+
+	// Direction tab
+	double xmid = x1 + ((x2 - x1) * 0.5);
+	double ymid = y1 + ((y2 - y1) * 0.5);
+	double tablen = line->getLength() * 0.2;
+	if (tablen > 8) tablen = 8;
+	if (tablen < 2) tablen = 2;
+	fpoint2_t invdir(-(y2 - y1), x2 - x1);
+	invdir.normalize();
+
+	glBegin(GL_LINES);
+	glVertex2d(xmid, ymid);
+	glVertex2d(xmid - invdir.x*tablen, ymid - invdir.y*tablen);
+	glEnd();
+}
+
+void MapRenderer2D::renderLineSelection(vector<int>& selection) {
+	// Check anything is selected
+	if (selection.size() == 0)
+		return;
+
+	// Set selection colour
+	rgba_t col = ColourConfiguration::getColour("map_selection");
+	col.set_gl();
+
+	// Setup rendering properties
+	glLineWidth(line_width*4);
+
+	// Render selected lines
+	MapLine* line;
+	double x1, y1, x2, y2;
+	glBegin(GL_LINES);
+	for (unsigned a = 0; a < selection.size(); a++) {
+		// Get line properties
+		line = map->getLine(selection[a]);
+		x1 = line->v1()->xPos();
+		y1 = line->v1()->yPos();
+		x2 = line->v2()->xPos();
+		y2 = line->v2()->yPos();
+
+		// Draw line
+		glVertex2d(x1, y1);
+		glVertex2d(x2, y2);
+
+		// Direction tab
+		double xmid = x1 + ((x2 - x1) * 0.5);
+		double ymid = y1 + ((y2 - y1) * 0.5);
+		double tablen = line->getLength() * 0.2;
+		if (tablen > 8) tablen = 8;
+		if (tablen < 2) tablen = 2;
+		fpoint2_t invdir(-(y2 - y1), x2 - x1);
+		invdir.normalize();
+		glVertex2d(xmid, ymid);
+		glVertex2d(xmid - invdir.x*tablen, ymid - invdir.y*tablen);
+	}
+	glEnd();
 }
 
 void MapRenderer2D::renderRoundThing(double x, double y, double angle, ThingType* tt, float alpha) {
@@ -489,7 +661,7 @@ void MapRenderer2D::renderThingsImmediate(float alpha) {
 
 			// Setup point sprites if supported
 			bool point = false;
-			if (GLEW_ARB_point_sprite) {
+			if (OpenGL::pointSpriteSupport()) {
 				glEnable(GL_POINT_SPRITE);
 				glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
 				point = true;
@@ -614,9 +786,9 @@ void MapRenderer2D::renderThingsImmediate(float alpha) {
 		glDisable(GL_TEXTURE_2D);
 }
 
-void MapRenderer2D::renderHilight(int hilight_item, int mode, float fade) {
-	// Check anything is hilighted
-	if (hilight_item < 0)
+void MapRenderer2D::renderThingHilight(int index, float fade) {
+	// Check hilight
+	if (index < 0)
 		return;
 
 	// Set hilight colour
@@ -624,160 +796,61 @@ void MapRenderer2D::renderHilight(int hilight_item, int mode, float fade) {
 	col.a *= fade;
 	col.set_gl();
 
-	// Setup rendering properties
-	glLineWidth(line_width*3);
-	float vs = vertex_size*1.5f;
-	if (view_scale < 1.0) vs *= view_scale;
-	if (vs < 4.0f) vs = 4.0f;
-	glPointSize(vs);
+	// Render thing hilight
+	MapThing* thing = map->getThing(index);
+	ThingType* tt = theGameConfiguration->thingType(thing->getType());
+	double x = thing->xPos();
+	double y = thing->yPos();
 
-	// Draw depending on mode
-	if (mode == MapEditor::MODE_VERTICES) {
-		// Setup point sprites if supported
-		bool point = false;
-		if (GLEW_ARB_point_sprite) {
-			// Get appropriate vertex texture
-			GLTexture* tex;
-			if (vertex_round) tex = theMapEditor->textureManager().getEditorImage("vertex_r");
-			else tex = theMapEditor->textureManager().getEditorImage("vertex_s");
+	// Get thing radius
+	double radius = tt->getRadius();
 
-			// If it was found, enable point sprites
-			if (tex) {
-				glEnable(GL_TEXTURE_2D);
-				tex->bind();
-				glEnable(GL_POINT_SPRITE);
-				glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
-				point = true;
-			}
-		}
-
-		// Draw vertex
-		glBegin(GL_POINTS);
-		glVertex2d(map->getVertex(hilight_item)->xPos(),
-					map->getVertex(hilight_item)->yPos());
-		glEnd();
-
-		if (point) {
-			glDisable(GL_POINT_SPRITE);
-			glDisable(GL_TEXTURE_2D);
-		}
-	}
-	else if (mode == MapEditor::MODE_LINES) {
-		// Line
-		MapLine* line = map->getLine(hilight_item);
-		double x1 = line->v1()->xPos();
-		double y1 = line->v1()->yPos();
-		double x2 = line->v2()->xPos();
-		double y2 = line->v2()->yPos();
-		glBegin(GL_LINES);
-		glVertex2d(x1, y1);
-		glVertex2d(x2, y2);
-		glEnd();
-
-		// Direction tab
-		double xmid = x1 + ((x2 - x1) * 0.5);
-		double ymid = y1 + ((y2 - y1) * 0.5);
-		double tablen = line->getLength() * 0.2;
-		if (tablen > 8) tablen = 8;
-		if (tablen < 2) tablen = 2;
-		fpoint2_t invdir(-(y2 - y1), x2 - x1);
-		invdir.normalize();
-
-		glBegin(GL_LINES);
-		glVertex2d(xmid, ymid);
-		glVertex2d(xmid - invdir.x*tablen, ymid - invdir.y*tablen);
-		glEnd();
-	}
-	else if (mode == MapEditor::MODE_SECTORS) {
-		// Sector
-
-		// Fill if cvar is set
-		if (sector_hilight_fill) {
-			glColor4f(col.fr(), col.fg(), col.fb(), col.fa()*0.5f);
-			map->getSector(hilight_item)->getPolygon()->render();
-		}
-
-		// Get all lines belonging to the hilighted sector
-		vector<MapLine*> lines;
-		map->getLinesOfSector(hilight_item, lines);
-
-		// Draw hilight
-		MapLine* line = NULL;
-		for (unsigned a = 0; a < lines.size(); a++) {
-			line = lines[a];
-			if (!line) continue;
-
-			// Draw line
-			glBegin(GL_LINES);
-			glVertex2d(line->v1()->xPos(), line->v1()->yPos());
-			glVertex2d(line->v2()->xPos(), line->v2()->yPos());
-			glEnd();
-		}
-
-		// Draw sector split lines
-		if (test_ssplit) {
-			glColor4f(col.fr(), col.fg(), col.fb(), col.fa() * 0.5f);
-			glLineWidth(1.0f);
-			map->getSector(hilight_item)->getPolygon()->renderWireframe();
-		}
-	}
-	else if (mode == MapEditor::MODE_THINGS) {
-		// Thing
-		MapThing* thing = map->getThing(hilight_item);
-		ThingType* tt = theGameConfiguration->thingType(thing->getType());
-		double x = thing->xPos();
-		double y = thing->yPos();
-
-		// Get thing radius
-		double radius = tt->getRadius();
-
-		// Check if we want square overlays
-		if (thing_overlay_square || thing_drawtype == 0 || thing_drawtype > 2) {
-			glDisable(GL_TEXTURE_2D);
-			glLineWidth(3.0f);
-			glBegin(GL_LINE_LOOP);
-			glVertex2d(x - radius, y - radius);
-			glVertex2d(x - radius, y + radius);
-			glVertex2d(x + radius, y + radius);
-			glVertex2d(x + radius, y - radius);
-			glEnd();
-			col.a *= 0.5;
-			col.set_gl(false);
-			glBegin(GL_QUADS);
-			glVertex2d(x - radius, y - radius);
-			glVertex2d(x - radius, y + radius);
-			glVertex2d(x + radius, y + radius);
-			glVertex2d(x + radius, y - radius);
-			glEnd();
-
-			return;
-		}
-
-		// Adjust radius
-		if (thing_drawtype == 0 || thing_drawtype > 2)
-			radius += 6;
-		else
-			radius *= 1.1 + (0.2*fade);
-
-		// Setup hilight thing texture
-		GLTexture* tex = theMapEditor->textureManager().getEditorImage("thing/hilight");
-		if (tex) {
-			glEnable(GL_TEXTURE_2D);
-			tex->bind();
-		}
-
-		glBegin(GL_QUADS);
-		glTexCoord2f(0.0f, 0.0f);	glVertex2d(x - radius, y - radius);
-		glTexCoord2f(0.0f, 1.0f);	glVertex2d(x - radius, y + radius);
-		glTexCoord2f(1.0f, 1.0f);	glVertex2d(x + radius, y + radius);
-		glTexCoord2f(1.0f, 0.0f);	glVertex2d(x + radius, y - radius);
-		glEnd();
-
+	// Check if we want square overlays
+	if (thing_overlay_square || thing_drawtype == 0 || thing_drawtype > 2) {
 		glDisable(GL_TEXTURE_2D);
+		glLineWidth(3.0f);
+		glBegin(GL_LINE_LOOP);
+		glVertex2d(x - radius, y - radius);
+		glVertex2d(x - radius, y + radius);
+		glVertex2d(x + radius, y + radius);
+		glVertex2d(x + radius, y - radius);
+		glEnd();
+		col.a *= 0.5;
+		col.set_gl(false);
+		glBegin(GL_QUADS);
+		glVertex2d(x - radius, y - radius);
+		glVertex2d(x - radius, y + radius);
+		glVertex2d(x + radius, y + radius);
+		glVertex2d(x + radius, y - radius);
+		glEnd();
+
+		return;
 	}
+
+	// Adjust radius
+	if (thing_drawtype == 0 || thing_drawtype > 2)
+		radius += 6;
+	else
+		radius *= 1.1 + (0.2*fade);
+
+	// Setup hilight thing texture
+	GLTexture* tex = theMapEditor->textureManager().getEditorImage("thing/hilight");
+	if (tex) {
+		glEnable(GL_TEXTURE_2D);
+		tex->bind();
+	}
+
+	glBegin(GL_QUADS);
+	glTexCoord2f(0.0f, 0.0f);	glVertex2d(x - radius, y - radius);
+	glTexCoord2f(0.0f, 1.0f);	glVertex2d(x - radius, y + radius);
+	glTexCoord2f(1.0f, 1.0f);	glVertex2d(x + radius, y + radius);
+	glTexCoord2f(1.0f, 0.0f);	glVertex2d(x + radius, y - radius);
+	glEnd();
+
+	glDisable(GL_TEXTURE_2D);
 }
 
-void MapRenderer2D::renderSelection(vector<int>& selection, int mode) {
+void MapRenderer2D::renderThingSelection(vector<int>& selection) {
 	// Check anything is selected
 	if (selection.size() == 0)
 		return;
@@ -786,209 +859,84 @@ void MapRenderer2D::renderSelection(vector<int>& selection, int mode) {
 	rgba_t col = ColourConfiguration::getColour("map_selection");
 	col.set_gl();
 
-	// Setup rendering properties
-	glLineWidth(line_width*4);
-	float vs = vertex_size*1.5f;
-	if (view_scale < 1.0) vs *= view_scale;
-	if (vs < 3.0f) vs = 3.0f;
-	glPointSize(vs);
+	// Get hilight texture
+	GLTexture* tex = theMapEditor->textureManager().getEditorImage("thing/hilight");
 
-	// Draw depending on mode
-	if (mode == MapEditor::MODE_VERTICES) {
-		// Setup point sprites if supported
-		bool point = false;
-		if (GLEW_ARB_point_sprite) {
-			// Get appropriate vertex texture
-			GLTexture* tex;
-			if (vertex_round) tex = theMapEditor->textureManager().getEditorImage("vertex_r");
-			else tex = theMapEditor->textureManager().getEditorImage("vertex_s");
+	// Simplest case, thing_overlay_square is true or thing_drawtype is 0 or 3+ (squares)
+	// or if the hilight circle texture isn't found for some reason
+	double x, y;
+	MapThing* thing = NULL;
+	if (thing_overlay_square || thing_drawtype == 0 || thing_drawtype > 2 || !tex) {
+		glDisable(GL_TEXTURE_2D);
 
-			// If it was found, enable point sprites
-			if (tex) {
-				glEnable(GL_TEXTURE_2D);
-				tex->bind();
-				glEnable(GL_POINT_SPRITE);
-				glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
-				point = true;
-			}
-		}
-
-		// Draw selected vertices
-		glBegin(GL_POINTS);
-		for (unsigned a = 0; a < selection.size(); a++)
-			glVertex2d(map->getVertex(selection[a])->xPos(), map->getVertex(selection[a])->yPos());
-		glEnd();
-
-		if (point) {
-			glDisable(GL_POINT_SPRITE);
-			glDisable(GL_TEXTURE_2D);
-		}
-	}
-	else if (mode == MapEditor::MODE_LINES) {
-		// Lines
-		MapLine* line;
-		double x1, y1, x2, y2;
-		glBegin(GL_LINES);
-		for (unsigned a = 0; a < selection.size(); a++) {
-			// Get line properties
-			line = map->getLine(selection[a]);
-			x1 = line->v1()->xPos();
-			y1 = line->v1()->yPos();
-			x2 = line->v2()->xPos();
-			y2 = line->v2()->yPos();
-
-			// Draw line
-			glVertex2d(x1, y1);
-			glVertex2d(x2, y2);
-
-			// Direction tab
-			double xmid = x1 + ((x2 - x1) * 0.5);
-			double ymid = y1 + ((y2 - y1) * 0.5);
-			double tablen = line->getLength() * 0.2;
-			if (tablen > 8) tablen = 8;
-			if (tablen < 2) tablen = 2;
-			fpoint2_t invdir(-(y2 - y1), x2 - x1);
-			invdir.normalize();
-			glVertex2d(xmid, ymid);
-			glVertex2d(xmid - invdir.x*tablen, ymid - invdir.y*tablen);
-		}
-		glEnd();
-	}
-	else if (mode == MapEditor::MODE_SECTORS) {
-		// Sectors
-
-		// Draw selection
-		glColor4f(col.fr(), col.fg(), col.fb(), col.fa() * 0.75f);
-		vector<MapSide*> sides_selected;
-		for (unsigned a = 0; a < selection.size(); a++) {
-			// Don't draw if outside screen (but still draw if it's small)
-			if (vis_s[selection[a]] > 0 && vis_s[selection[a]] != VIS_SMALL)
-				continue;
-
-			// Get the sector's polygon
-			Polygon2D* poly = map->getSector(selection[a])->getPolygon();
-			vector<MapSide*>& sides = map->getSector(selection[a])->connectedSides();
-
-			if (poly->hasPolygon()) {
-				map->getSector(selection[a])->getPolygon()->render();
-				for (unsigned a = 0; a < sides.size(); a++)
-					sides_selected.push_back(sides[a]);
-			}
-			else {
-				// Something went wrong with the polygon, just draw sector outline instead
-				glColor4f(col.fr(), col.fg(), col.fb(), col.fa());
-				glBegin(GL_LINES);
-				for (unsigned s = 0; s < sides.size(); s++) {
-					MapLine* line = sides[s]->getParentLine();
-					glVertex2d(line->v1()->xPos(), line->v1()->yPos());
-					glVertex2d(line->v2()->xPos(), line->v2()->yPos());
-				}
-				glEnd();
-
-				glColor4f(col.fr(), col.fg(), col.fb(), col.fa() * 0.6f);
-			}
-		}
-
-		// Draw selection outline
-		glColor4f(col.fr(), col.fg(), col.fb(), col.fa());
-		glLineWidth(line_width * 2);
-		bool* lines_drawn = new bool[map->nLines()];
-		memset(lines_drawn, 0, map->nLines());
-		glBegin(GL_LINES);
-		for (unsigned a = 0; a < sides_selected.size(); a++) {
-			MapLine* line = sides_selected[a]->getParentLine();
-			if (lines_drawn[line->getIndex()])
-				continue;
-
-			glVertex2d(line->v1()->xPos(), line->v1()->yPos());
-			glVertex2d(line->v2()->xPos(), line->v2()->yPos());
-			lines_drawn[line->getIndex()] = true;
-		}
-		glEnd();
-		delete[] lines_drawn;
-	}
-	else if (mode == MapEditor::MODE_THINGS) {
-		// Things
-		double x, y;
-		MapThing* thing = NULL;
-
-		// Get hilight texture
-		GLTexture* tex = theMapEditor->textureManager().getEditorImage("thing/hilight");
-
-		// Simplest case, thing_overlay_square is true or thing_drawtype is 0 or 3+ (squares)
-		// or if the hilight circle texture isn't found for some reason
-		if (thing_overlay_square || thing_drawtype == 0 || thing_drawtype > 2 || !tex) {
-			glDisable(GL_TEXTURE_2D);
-
-			for (unsigned a = 0; a < selection.size(); a++) {
-				thing = map->getThing(selection[a]);
-				x = thing->xPos();
-				y = thing->yPos();
-
-				// Get thing radius
-				double radius = theGameConfiguration->thingType(thing->getType())->getRadius();
-
-				// Check if we want radius-accurate square overlays
-				glDisable(GL_TEXTURE_2D);
-				glBegin(GL_QUADS);
-				glVertex2d(x - radius, y - radius);
-				glVertex2d(x - radius, y + radius);
-				glVertex2d(x + radius, y + radius);
-				glVertex2d(x + radius, y - radius);
-				glEnd();
-			}
-
-			return;
-		}
-
-		// Otherwise, we want the circle selection overlay
-		glEnable(GL_TEXTURE_2D);
-		tex->bind();
-
-		// Setup point sprites if supported
-		bool point = false;
-		if (GLEW_ARB_point_sprite) {
-			glEnable(GL_POINT_SPRITE);
-			glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
-			point = true;
-		}
-
-		// Draw thing selection
 		for (unsigned a = 0; a < selection.size(); a++) {
 			thing = map->getThing(selection[a]);
 			x = thing->xPos();
 			y = thing->yPos();
 
 			// Get thing radius
-			double radius = theGameConfiguration->thingType(thing->getType())->getRadius() + 8;
-			double ps = radius*2*view_scale;
+			double radius = theGameConfiguration->thingType(thing->getType())->getRadius();
 
-			// Draw it
-			if (point && ps <= OpenGL::maxPointSize()) {
-				// Point sprite
-				glPointSize(ps);
-				glBegin(GL_POINTS);
-				glVertex2d(x, y);
-				glEnd();
-			}
-			else {
-				// Textured quad
-				if (point) glDisable(GL_POINT_SPRITE);
-				glBegin(GL_QUADS);
-				glTexCoord2f(0.0f, 0.0f);	glVertex2d(x - radius, y - radius);
-				glTexCoord2f(0.0f, 1.0f);	glVertex2d(x - radius, y + radius);
-				glTexCoord2f(1.0f, 1.0f);	glVertex2d(x + radius, y + radius);
-				glTexCoord2f(1.0f, 0.0f);	glVertex2d(x + radius, y - radius);
-				glEnd();
-				if (point) glEnable(GL_POINT_SPRITE);
-			}
+			// Check if we want radius-accurate square overlays
+			glDisable(GL_TEXTURE_2D);
+			glBegin(GL_QUADS);
+			glVertex2d(x - radius, y - radius);
+			glVertex2d(x - radius, y + radius);
+			glVertex2d(x + radius, y + radius);
+			glVertex2d(x + radius, y - radius);
+			glEnd();
 		}
 
-		if (point)
-			glDisable(GL_POINT_SPRITE);
-
-		glDisable(GL_TEXTURE_2D);
+		return;
 	}
+
+	// Otherwise, we want the circle selection overlay
+	glEnable(GL_TEXTURE_2D);
+	tex->bind();
+
+	// Setup point sprites if supported
+	bool point = false;
+	if (OpenGL::pointSpriteSupport()) {
+		glEnable(GL_POINT_SPRITE);
+		glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
+		point = true;
+	}
+
+	// Draw thing selection
+	for (unsigned a = 0; a < selection.size(); a++) {
+		thing = map->getThing(selection[a]);
+		x = thing->xPos();
+		y = thing->yPos();
+
+		// Get thing radius
+		double radius = theGameConfiguration->thingType(thing->getType())->getRadius() + 8;
+		double ps = radius*2*view_scale;
+
+		// Draw it
+		if (point && ps <= OpenGL::maxPointSize()) {
+			// Point sprite
+			glPointSize(ps);
+			glBegin(GL_POINTS);
+			glVertex2d(x, y);
+			glEnd();
+		}
+		else {
+			// Textured quad
+			if (point) glDisable(GL_POINT_SPRITE);
+			glBegin(GL_QUADS);
+			glTexCoord2f(0.0f, 0.0f);	glVertex2d(x - radius, y - radius);
+			glTexCoord2f(0.0f, 1.0f);	glVertex2d(x - radius, y + radius);
+			glTexCoord2f(1.0f, 1.0f);	glVertex2d(x + radius, y + radius);
+			glTexCoord2f(1.0f, 0.0f);	glVertex2d(x + radius, y - radius);
+			glEnd();
+			if (point) glEnable(GL_POINT_SPRITE);
+		}
+	}
+
+	if (point)
+		glDisable(GL_POINT_SPRITE);
+
+	glDisable(GL_TEXTURE_2D);
 }
 
 void MapRenderer2D::renderFlats(int type) {
@@ -1136,6 +1084,117 @@ void MapRenderer2D::renderFlatsVBO(int type) {
 	// Clean up opengl state
 	if (type > 0) glDisable(GL_TEXTURE_2D);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void MapRenderer2D::renderFlatHilight(int index, float fade) {
+	// Check hilight
+	if (index < 0)
+		return;
+
+	// Set hilight colour
+	rgba_t col = ColourConfiguration::getColour("map_hilight");
+	col.a *= fade;
+	col.set_gl();
+
+	// Fill if cvar is set
+	if (sector_hilight_fill) {
+		glColor4f(col.fr(), col.fg(), col.fb(), col.fa()*0.5f);
+		map->getSector(index)->getPolygon()->render();
+	}
+
+	// Get all lines belonging to the hilighted sector
+	vector<MapLine*> lines;
+	map->getLinesOfSector(index, lines);
+
+	// Draw hilight
+	MapLine* line = NULL;
+	for (unsigned a = 0; a < lines.size(); a++) {
+		line = lines[a];
+		if (!line) continue;
+
+		// Draw line
+		glBegin(GL_LINES);
+		glVertex2d(line->v1()->xPos(), line->v1()->yPos());
+		glVertex2d(line->v2()->xPos(), line->v2()->yPos());
+		glEnd();
+	}
+
+	// Draw sector split lines
+	if (test_ssplit) {
+		glColor4f(col.fr(), col.fg(), col.fb(), col.fa() * 0.5f);
+		glLineWidth(1.0f);
+		map->getSector(index)->getPolygon()->renderWireframe();
+	}
+}
+
+void MapRenderer2D::renderFlatSelection(vector<int>& selection) {
+	// Check anything is selected
+	if (selection.size() == 0)
+		return;
+
+	// Set selection colour
+	rgba_t col = ColourConfiguration::getColour("map_selection");
+	col.set_gl();
+
+	// Draw selection
+	glColor4f(col.fr(), col.fg(), col.fb(), col.fa() * 0.75f);
+	vector<MapSide*> sides_selected;
+	for (unsigned a = 0; a < selection.size(); a++) {
+		// Don't draw if outside screen (but still draw if it's small)
+		if (vis_s[selection[a]] > 0 && vis_s[selection[a]] != VIS_SMALL)
+			continue;
+
+		// Get the sector's polygon
+		Polygon2D* poly = map->getSector(selection[a])->getPolygon();
+		vector<MapSide*>& sides = map->getSector(selection[a])->connectedSides();
+
+		if (poly->hasPolygon()) {
+			map->getSector(selection[a])->getPolygon()->render();
+			for (unsigned a = 0; a < sides.size(); a++)
+				sides_selected.push_back(sides[a]);
+		}
+		else {
+			// Something went wrong with the polygon, just draw sector outline instead
+			glColor4f(col.fr(), col.fg(), col.fb(), col.fa());
+			glBegin(GL_LINES);
+			for (unsigned s = 0; s < sides.size(); s++) {
+				MapLine* line = sides[s]->getParentLine();
+				glVertex2d(line->v1()->xPos(), line->v1()->yPos());
+				glVertex2d(line->v2()->xPos(), line->v2()->yPos());
+			}
+			glEnd();
+
+			glColor4f(col.fr(), col.fg(), col.fb(), col.fa() * 0.6f);
+		}
+	}
+
+	// Draw selection outline
+	glColor4f(col.fr(), col.fg(), col.fb(), col.fa());
+	glLineWidth(line_width * 2);
+	bool* lines_drawn = new bool[map->nLines()];
+	memset(lines_drawn, 0, map->nLines());
+	glBegin(GL_LINES);
+	for (unsigned a = 0; a < sides_selected.size(); a++) {
+		MapLine* line = sides_selected[a]->getParentLine();
+		if (lines_drawn[line->getIndex()])
+			continue;
+
+		glVertex2d(line->v1()->xPos(), line->v1()->yPos());
+		glVertex2d(line->v2()->xPos(), line->v2()->yPos());
+		lines_drawn[line->getIndex()] = true;
+	}
+	glEnd();
+	delete[] lines_drawn;
+}
+
+void MapRenderer2D::renderTaggedFlats(vector<MapSector*>& sectors, float fade) {
+	// Set colour
+	ColourConfiguration::getColour("map_tagged").set_gl();
+
+	// Render each sector polygon
+	glDisable(GL_TEXTURE_2D);
+	for (unsigned a = 0; a < sectors.size(); a++)
+		sectors[a]->getPolygon()->render();
 }
 
 void MapRenderer2D::updateVerticesVBO() {

@@ -432,38 +432,74 @@ void MapCanvas::draw() {
 
 	if (editor->editMode() == MapEditor::MODE_VERTICES) {
 		// Vertices mode
-		if (things_always) renderer_2d->renderThings(0.5f);							// Things (faded)
-		renderer_2d->renderLines(false);											// Lines (no direction tabs)
-		renderer_2d->renderVertices(view_scale);									// Vertices
-		renderer_2d->renderSelection(editor->getSelection(), editor->editMode());	// Selection
+		if (things_always) renderer_2d->renderThings(0.5f);			// Things (faded)
+		renderer_2d->renderLines(false);							// Lines (no direction tabs)
+		renderer_2d->renderVertices(view_scale);					// Vertices
+		renderer_2d->renderVertexSelection(editor->getSelection());	// Selection
+
+		// Hilight if needed
+		if (mouse_state == MSTATE_NORMAL)
+			renderer_2d->renderVertexHilight(editor->hilightItem(), anim_flash_level);
 	}
 	else if (editor->editMode() == MapEditor::MODE_LINES) {
 		// Lines mode
-		if (things_always) renderer_2d->renderThings(0.5f);							// Things (faded)
-		if (vertices_always) renderer_2d->renderVertices(0.5f);						// Vertices (faded)
-		renderer_2d->renderLines(true);												// Lines
-		renderer_2d->renderSelection(editor->getSelection(), editor->editMode());	// Selection
+		if (things_always) renderer_2d->renderThings(0.5f);			// Things (faded)
+		if (vertices_always) renderer_2d->renderVertices(0.5f);		// Vertices (faded)
+		renderer_2d->renderLines(true);								// Lines
+		renderer_2d->renderLineSelection(editor->getSelection());	// Selection
+
+		// Hilight if needed
+		if (mouse_state == MSTATE_NORMAL)
+			renderer_2d->renderLineHilight(editor->hilightItem(), anim_flash_level);
 	}
 	else if (editor->editMode() == MapEditor::MODE_SECTORS) {
 		// Sectors mode
-		if (things_always) renderer_2d->renderThings(0.5f);							// Things (faded)
-		if (vertices_always) renderer_2d->renderVertices(0.5f);						// Vertices (faded)
-		renderer_2d->renderLines(false);											// Lines (no direction tabs)
-		renderer_2d->renderSelection(editor->getSelection(), editor->editMode());	// Selection
+		if (things_always) renderer_2d->renderThings(0.5f);			// Things (faded)
+		if (vertices_always) renderer_2d->renderVertices(0.5f);		// Vertices (faded)
+		renderer_2d->renderLines(false);							// Lines (no direction tabs)
+		renderer_2d->renderFlatSelection(editor->getSelection());	// Selection
 		splitter.testRender();	// Testing
+
+		// Hilight if needed
+		if (mouse_state == MSTATE_NORMAL)
+			renderer_2d->renderFlatHilight(editor->hilightItem(), anim_flash_level);
 	}
 	else if (editor->editMode() == MapEditor::MODE_THINGS) {
 		// Things mode
-		if (vertices_always) renderer_2d->renderVertices(0.5f);						// Vertices (faded)
-		renderer_2d->renderLines(false);											// Lines (no direction tabs)
-		renderer_2d->renderThings();												// Things
-		renderer_2d->renderSelection(editor->getSelection(), editor->editMode());	// Selection
+		if (vertices_always) renderer_2d->renderVertices(0.5f);		// Vertices (faded)
+		renderer_2d->renderLines(false);							// Lines (no direction tabs)
+		renderer_2d->renderThings();								// Things
+		renderer_2d->renderThingSelection(editor->getSelection());	// Selection
+
+		// Hilight if needed
+		if (mouse_state == MSTATE_NORMAL)
+			renderer_2d->renderThingHilight(editor->hilightItem(), anim_flash_level);
 	}
 
-	// Draw hilight
-	if (mouse_state == MSTATE_NORMAL)
-		renderer_2d->renderHilight(editor->hilightItem(), editor->editMode(), anim_flash_level);
+	
+	// Draw tagged sectors/lines/things if needed
+	if (editor->editMode() == MapEditor::MODE_LINES && mouse_state == MSTATE_NORMAL && editor->hilightItem() >= 0) {
+		MapLine* line = editor->getHilightedLine();
+		int special = line->prop("special").getIntValue();
+		int tag = line->prop("arg0").getIntValue();
+		if (special > 0) {
+			// Get ActionSpecial
+			ActionSpecial& as = theGameConfiguration->actionSpecial(special);
 
+			// Sector tag
+			if (as.needsTag() == 1 && tag > 0) {
+				vector<MapSector*> tagged_sectors = editor->getMap().getSectorsByTag(tag);
+				renderer_2d->renderTaggedFlats(tagged_sectors, anim_flash_level);
+			}
+
+			// Backside sector (for local doors)
+			else if (as.needsTag() == 4 && line->s2()) {
+				vector<MapSector*> bsec;
+				bsec.push_back(line->s2()->getSector());
+				renderer_2d->renderTaggedFlats(bsec, anim_flash_level);
+			}
+		}
+	}
 
 
 	// Draw selection box if active

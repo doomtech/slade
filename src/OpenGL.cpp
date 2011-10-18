@@ -35,6 +35,7 @@
  * VARIABLES
  *******************************************************************/
 CVAR(Bool, gl_tex_enable_np2, true, CVAR_SAVE)
+CVAR(Bool, gl_point_sprite, true, CVAR_SAVE)
 
 namespace OpenGL {
 	wxGLContext*	context = NULL;
@@ -112,7 +113,15 @@ bool OpenGL::init() {
  * of-two textures, false otherwise
  *******************************************************************/
 bool OpenGL::np2TexSupport() {
-	return version >= 2 && gl_tex_enable_np2;
+	return GLEW_ARB_texture_non_power_of_two && gl_tex_enable_np2;
+}
+
+/* OpenGL::np2TexSupport
+ * Returns true if the installed OpenGL version supports point
+ * sprites, false otherwise
+ *******************************************************************/
+bool OpenGL::pointSpriteSupport() {
+	return GLEW_ARB_point_sprite && gl_point_sprite;
 }
 
 /* OpenGL::validTexDimension

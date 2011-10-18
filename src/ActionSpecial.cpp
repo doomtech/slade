@@ -62,23 +62,38 @@ void ActionSpecial::parse(ParseTreeNode* node) {
 		else if (S_CMPNOCASE(name, "arg5"))
 			arg = 4;
 
-		// Tagged (group default override)
-		else if (S_CMPNOCASE(name, "tagged"))
-			this->tagged = child->getBoolValue();
-
-
+		// Tagged
+		else if (S_CMPNOCASE(name, "tagged")) {
+			string str = child->getStringValue();
+			if (S_CMPNOCASE(str, "no")) this->tagged = 0;
+			else if (S_CMPNOCASE(str, "sector")) this->tagged = 1;
+			else if (S_CMPNOCASE(str, "line")) this->tagged = 2;
+			else if (S_CMPNOCASE(str, "thing")) this->tagged = 3;
+			else if (S_CMPNOCASE(str, "sector_back")) this->tagged = 4;
+			else
+				this->tagged = child->getIntValue();
+		}
 
 		// Parse arg definition if it was one
 		if (arg >= 0) {
 			// Check for simple definition
-			if (child->isLeaf())
+			if (child->isLeaf()) {
+				// Set name
 				args[arg].name = child->getStringValue();
+
+				// Set description (if specified)
+				if (child->nValues() > 1) args[arg].desc = child->getStringValue(1);
+			}
 			else {
 				// Extended arg definition
 
 				// Name
 				ParseTreeNode* val = (ParseTreeNode*)child->getChild("name");
 				if (val) args[arg].name = val->getStringValue();
+
+				// Description
+				val = (ParseTreeNode*)child->getChild("desc");
+				if (val) args[arg].desc = val->getStringValue();
 
 				// Type
 				val = (ParseTreeNode*)child->getChild("type");
@@ -95,44 +110,6 @@ void ActionSpecial::parse(ParseTreeNode* node) {
 			}
 		}
 	}
-
-	/*
-	// Name
-	ParseTreeNode* val_name = (ParseTreeNode*)node->getChild("name");
-	if (val_name)
-		name = val_name->getStringValue();
-
-	// Args
-	for (unsigned arg = 0; arg < 5; arg++) {
-		// Get arg value if it exists
-		ParseTreeNode* val_arg = (ParseTreeNode*)node->getChild(S_FMT("arg%d", arg+1));
-		if (val_arg) {
-			// Check for simple definition
-			if (val_arg->isLeaf())
-				args[arg].name = val_arg->getStringValue();
-			else {
-				// Extended arg definition
-
-				// Name
-				ParseTreeNode* val = (ParseTreeNode*)val_arg->getChild("name");
-				if (val) args[arg].name = val->getStringValue();
-
-				// Type
-				val = (ParseTreeNode*)val_arg->getChild("type");
-				string atype;
-				if (val) atype = val->getStringValue();
-				if (S_CMPNOCASE(atype, "yesno"))
-					args[arg].type = ARGT_YESNO;
-				else if (S_CMPNOCASE(atype, "noyes"))
-					args[arg].type = ARGT_NOYES;
-				else if (S_CMPNOCASE(atype, "angle"))
-					args[arg].type = ARGT_ANGLE;
-				else
-					args[arg].type = ARGT_NUMBER;
-			}
-		}
-	}
-	*/
 }
 
 string ActionSpecial::getArgsString(int args[5]) {

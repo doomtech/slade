@@ -10,7 +10,7 @@ friend class GameConfiguration;
 private:
 	string	name;
 	string	group;
-	bool	tagged;
+	int		tagged;	// 0=no, 1=sector, 2=line, 3=thing, 4=sector_back
 	arg_t	args[5];
 	
 public:
@@ -19,12 +19,12 @@ public:
 	
 	string	getName() { return name; }
 	string	getGroup() { return group; }
-	bool	needsTag() { return tagged; }
+	int		needsTag() { return tagged; }
 	arg_t&	getArg(int index) { if (index >= 0 && index < 5) return args[index]; else return args[0]; }
 	
 	void	setName(string name) { this->name = name; }
 	void	setGroup(string group) { this->group = group; }
-	void	setTagged(bool tagged) { this->tagged = tagged; }
+	void	setTagged(int tagged) { this->tagged = tagged; }
 
 	string	getArgsString(int args[5]);
 

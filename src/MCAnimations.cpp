@@ -111,12 +111,15 @@ void MCAThingSelection::draw() {
 		tex->bind();
 	}
 
+	double r = radius;
+	if (select) r += radius*0.2*fade;
+
 	// Draw
 	glBegin(GL_QUADS);
-	glTexCoord2f(0.0f, 0.0f);	glVertex2d(x - radius, y - radius);
-	glTexCoord2f(0.0f, 1.0f);	glVertex2d(x - radius, y + radius);
-	glTexCoord2f(1.0f, 1.0f);	glVertex2d(x + radius, y + radius);
-	glTexCoord2f(1.0f, 0.0f);	glVertex2d(x + radius, y - radius);
+	glTexCoord2f(0.0f, 0.0f);	glVertex2d(x - r, y - r);
+	glTexCoord2f(0.0f, 1.0f);	glVertex2d(x - r, y + r);
+	glTexCoord2f(1.0f, 1.0f);	glVertex2d(x + r, y + r);
+	glTexCoord2f(1.0f, 0.0f);	glVertex2d(x + r, y - r);
 	glEnd();
 }
 
@@ -228,7 +231,7 @@ void MCAVertexSelection::draw() {
 
 	// Setup point sprites if supported
 	bool point = false;
-	if (GLEW_ARB_point_sprite) {
+	if (OpenGL::pointSpriteSupport()) {
 		// Get appropriate vertex texture
 		GLTexture* tex;
 		if (vertex_round) tex = theMapEditor->textureManager().getEditorImage("vertex_r");

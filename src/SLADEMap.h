@@ -112,6 +112,11 @@ public:
 	bool	lineInSector(MapLine* line, MapSector* sector);
 	bool	getLinesOfSector(unsigned index, vector<MapLine*>& list);
 
+	// Tags/Ids
+	vector<MapSector*>	getSectorsByTag(int tag);
+	vector<MapThing*>	getThingsById(int id);
+	vector<MapLine*>	getLinesById(int id);
+
 	// Checks
 	int		removeDetachedVertices();
 };

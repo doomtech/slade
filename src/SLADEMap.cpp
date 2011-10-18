@@ -1459,6 +1459,42 @@ bool SLADEMap::getLinesOfSector(unsigned index, vector<MapLine*>& list) {
 	return true;
 }
 
+vector<MapSector*> SLADEMap::getSectorsByTag(int tag) {
+	vector<MapSector*> ret;
+
+	// Find sectors with matching tag
+	for (unsigned a = 0; a < sectors.size(); a++) {
+		if (sectors[a]->prop("id").getIntValue() == tag)
+			ret.push_back(sectors[a]);
+	}
+
+	return ret;
+}
+
+vector<MapThing*> SLADEMap::getThingsById(int id) {
+	vector<MapThing*> ret;
+
+	// Find things with matching id
+	for (unsigned a = 0; a < things.size(); a++) {
+		if (things[a]->prop("id").getIntValue() == id)
+			ret.push_back(things[a]);
+	}
+
+	return ret;
+}
+
+vector<MapLine*> SLADEMap::getLinesById(int id) {
+	vector<MapLine*> ret;
+
+	// Find lines with matching id
+	for (unsigned a = 0; a < lines.size(); a++) {
+		if (lines[a]->prop("id").getIntValue() == id)
+			ret.push_back(lines[a]);
+	}
+
+	return ret;
+}
+
 int SLADEMap::removeDetachedVertices() {
 	int count = 0;
 
