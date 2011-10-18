@@ -60,7 +60,7 @@ public:
 	void	buildConfig(ArchiveEntry* entry, string& out);
 	
 	// Configuration reading
-	void	readActionSpecials(ParseTreeNode* node);
+	void	readActionSpecials(ParseTreeNode* node, ActionSpecial* group_defaults = NULL);
 	void	readThingTypes(ParseTreeNode* node, ThingType* group_defaults = NULL);
 	bool	readConfiguration(string& cfg, string source = "");
 	bool 	open(string filename);

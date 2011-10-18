@@ -1189,7 +1189,9 @@ void MapRenderer2D::renderFlatSelection(vector<int>& selection) {
 
 void MapRenderer2D::renderTaggedFlats(vector<MapSector*>& sectors, float fade) {
 	// Set colour
-	ColourConfiguration::getColour("map_tagged").set_gl();
+	rgba_t col = ColourConfiguration::getColour("map_tagged");
+	col.a *= fade;
+	col.set_gl();
 
 	// Render each sector polygon
 	glDisable(GL_TEXTURE_2D);

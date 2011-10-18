@@ -15,6 +15,7 @@ ActionSpecial::ActionSpecial(string name, string group) {
 	// Init variables
 	this->name = name;
 	this->group = group;
+	this->tagged = 0;
 
 	// Init args
 	args[0].name = "Arg1";
@@ -24,10 +25,25 @@ ActionSpecial::ActionSpecial(string name, string group) {
 	args[4].name = "Arg5";
 }
 
+void ActionSpecial::copy(ActionSpecial* copy) {
+	// Check AS to copy was given
+	if (!copy) return;
+
+	// Copy properties
+	this->name = copy->name;
+	this->group = copy->group;
+	this->tagged = copy->tagged;
+
+	// Copy args
+	for (unsigned a = 0; a < 5; a++)
+		this->args[a] = copy->args[a];
+}
+
 void ActionSpecial::reset() {
 	// Reset variables
 	name = "Unknown";
 	group = "";
+	tagged = 0;
 
 	// Reset args
 	for (unsigned a = 0; a < 5; a++) {
@@ -70,6 +86,7 @@ void ActionSpecial::parse(ParseTreeNode* node) {
 			else if (S_CMPNOCASE(str, "line")) this->tagged = 2;
 			else if (S_CMPNOCASE(str, "thing")) this->tagged = 3;
 			else if (S_CMPNOCASE(str, "sector_back")) this->tagged = 4;
+			else if (S_CMPNOCASE(str, "sector_or_back")) this->tagged = 5;
 			else
 				this->tagged = child->getIntValue();
 		}

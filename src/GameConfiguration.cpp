@@ -121,7 +121,7 @@ void GameConfiguration::buildConfig(ArchiveEntry* entry, string& out) {
 	wxRemoveFile(filename);
 }
 
-void GameConfiguration::readActionSpecials(ParseTreeNode* node) {
+void GameConfiguration::readActionSpecials(ParseTreeNode* node, ActionSpecial* group_defaults) {
 	// Determine current 'group'
 	ParseTreeNode* group = node;
 	string groupname = "";
@@ -137,19 +137,11 @@ void GameConfiguration::readActionSpecials(ParseTreeNode* node) {
 	if (groupname.EndsWith("/"))
 		groupname.RemoveLast();	// Remove last '/'
 
-	// Check if this group's action specials require a tag
-	int tagged = 0;
-	ParseTreeNode* child = (ParseTreeNode*)node->getChild("tagged");
-	if (child) {
-		string str = child->getStringValue();
-		if (S_CMPNOCASE(str, "no")) tagged = 0;
-		else if (S_CMPNOCASE(str, "sector")) tagged = 1;
-		else if (S_CMPNOCASE(str, "line")) tagged = 2;
-		else if (S_CMPNOCASE(str, "thing")) tagged = 3;
-		else if (S_CMPNOCASE(str, "sector_back")) tagged = 4;
-		else
-			tagged = child->getIntValue();
-	}
+	// --- Set up group default properties ---
+	ActionSpecial* as_defaults = NULL;
+	if (group_defaults) as_defaults = new ActionSpecial(*group_defaults);
+	else as_defaults = new ActionSpecial();
+	as_defaults->parse(node);
 
 	// --- Go through all child nodes ---
 	for (unsigned a = 0; a < node->nChildren(); a++) {
@@ -157,7 +149,7 @@ void GameConfiguration::readActionSpecials(ParseTreeNode* node) {
 
 		// Check for 'group'
 		if (S_CMPNOCASE(child->getType(), "group"))
-			readActionSpecials(child);
+			readActionSpecials(child, as_defaults);
 
 		// Action special
 		else if (S_CMPNOCASE(child->getType(), "special")) {
@@ -169,8 +161,8 @@ void GameConfiguration::readActionSpecials(ParseTreeNode* node) {
 			action_specials[special].reset();
 
 			// Apply group defaults
+			action_specials[special].copy(as_defaults);
 			action_specials[special].group = groupname;
-			action_specials[special].tagged = tagged;
 
 			// Check for simple definition
 			if (child->isLeaf())
@@ -179,6 +171,8 @@ void GameConfiguration::readActionSpecials(ParseTreeNode* node) {
 				action_specials[special].parse(child);	// Extended definition
 		}
 	}
+
+	delete as_defaults;
 }
 
 void GameConfiguration::readThingTypes(ParseTreeNode* node, ThingType* group_defaults) {
@@ -203,65 +197,7 @@ void GameConfiguration::readThingTypes(ParseTreeNode* node, ThingType* group_def
 	ThingType* tt_defaults = NULL;
 	if (group_defaults) tt_defaults = new ThingType(*group_defaults);
 	else tt_defaults = new ThingType();
-
-	// Colour
-	child = (ParseTreeNode*)node->getChild("colour");
-	if (child && child->nValues() > 2) tt_defaults->colour.set(child->getIntValue(0), child->getIntValue(1), child->getIntValue(2));
-
-	// Radius
-	child = (ParseTreeNode*)node->getChild("radius");
-	if (child) tt_defaults->radius = child->getIntValue();
-
-	// Height
-	child = (ParseTreeNode*)node->getChild("height");
-	if (child) tt_defaults->height = child->getIntValue();
-
-	// Show angle
-	child = (ParseTreeNode*)node->getChild("angle");
-	if (child) tt_defaults->angled = child->getBoolValue();
-
-	// Hanging object
-	child = (ParseTreeNode*)node->getChild("hanging");
-	if (child) tt_defaults->hanging = child->getBoolValue();
-
-	// Shrink
-	child = (ParseTreeNode*)node->getChild("shrink");
-	if (child) tt_defaults->shrink = child->getBoolValue();
-
-	// Sprite
-	child = (ParseTreeNode*)node->getChild("sprite");
-	if (child) tt_defaults->sprite = child->getStringValue();
-
-	// Icon
-	child = (ParseTreeNode*)node->getChild("icon");
-	if (child) tt_defaults->icon = child->getStringValue();
-
-	// Args
-	child = (ParseTreeNode*)node->getChild("arg1");
-	if (child) {
-		tt_defaults->args[0].name = child->getStringValue();
-		if (child->nValues() > 1) tt_defaults->args[0].desc = child->getStringValue(1);
-	}
-	child = (ParseTreeNode*)node->getChild("arg2");
-	if (child) {
-		tt_defaults->args[1].name = child->getStringValue();
-		if (child->nValues() > 1) tt_defaults->args[1].desc = child->getStringValue(1);
-	}
-	child = (ParseTreeNode*)node->getChild("arg3");
-	if (child) {
-		tt_defaults->args[2].name = child->getStringValue();
-		if (child->nValues() > 1) tt_defaults->args[2].desc = child->getStringValue(1);
-	}
-	child = (ParseTreeNode*)node->getChild("arg4");
-	if (child) {
-		tt_defaults->args[3].name = child->getStringValue();
-		if (child->nValues() > 1) tt_defaults->args[3].desc = child->getStringValue(1);
-	}
-	child = (ParseTreeNode*)node->getChild("arg5");
-	if (child) {
-		tt_defaults->args[4].name = child->getStringValue();
-		if (child->nValues() > 1) tt_defaults->args[4].desc = child->getStringValue(1);
-	}
+	tt_defaults->parse(node);
 
 
 	// --- Go through all child nodes ---
@@ -286,25 +222,8 @@ void GameConfiguration::readThingTypes(ParseTreeNode* node, ThingType* group_def
 			thing_types[type].type->reset();
 
 			// Apply group defaults
-			thing_types[type].type->colour	= tt_defaults->colour;
-			thing_types[type].type->radius	= tt_defaults->radius;
-			thing_types[type].type->height	= tt_defaults->height;
-			thing_types[type].type->angled	= tt_defaults->angled;
-			thing_types[type].type->hanging	= tt_defaults->hanging;
-			thing_types[type].type->shrink	= tt_defaults->shrink;
-			thing_types[type].type->group	= groupname;
-			thing_types[type].type->sprite	= tt_defaults->sprite;
-			thing_types[type].type->icon	= tt_defaults->icon;
-			thing_types[type].type->args[0].name = tt_defaults->args[0].name;
-			thing_types[type].type->args[0].desc = tt_defaults->args[0].desc;
-			thing_types[type].type->args[1].name = tt_defaults->args[1].name;
-			thing_types[type].type->args[1].desc = tt_defaults->args[1].desc;
-			thing_types[type].type->args[2].name = tt_defaults->args[2].name;
-			thing_types[type].type->args[2].desc = tt_defaults->args[2].desc;
-			thing_types[type].type->args[3].name = tt_defaults->args[3].name;
-			thing_types[type].type->args[3].desc = tt_defaults->args[3].desc;
-			thing_types[type].type->args[4].name = tt_defaults->args[4].name;
-			thing_types[type].type->args[4].desc = tt_defaults->args[4].desc;
+			thing_types[type].type->copy(tt_defaults);
+			thing_types[type].type->group = groupname;
 
 			// Check for simple definition
 			if (child->isLeaf())

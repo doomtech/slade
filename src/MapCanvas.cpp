@@ -498,6 +498,16 @@ void MapCanvas::draw() {
 				bsec.push_back(line->s2()->getSector());
 				renderer_2d->renderTaggedFlats(bsec, anim_flash_level);
 			}
+
+			// Sector tag *or* backside sector (for zdoom local doors)
+			else if (as.needsTag() == 5) {
+				vector<MapSector*> tagged_sectors;
+				if (tag > 0)
+					tagged_sectors = editor->getMap().getSectorsByTag(tag);
+				else if (line->s2())
+					tagged_sectors.push_back(line->s2()->getSector());
+				renderer_2d->renderTaggedFlats(tagged_sectors, anim_flash_level);
+			}
 		}
 	}
 

@@ -26,6 +26,8 @@ public:
 	ThingType(string name = "Unknown");
 	~ThingType() {}
 
+	void	copy(ThingType* copy);
+
 	string	getName() { return name; }
 	string	getGroup() { return group; }
 	rgba_t	getColour() { return colour; }

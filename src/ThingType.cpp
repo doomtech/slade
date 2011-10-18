@@ -21,6 +21,29 @@ ThingType::ThingType(string name) {
 	args[4].name = "Arg5";
 }
 
+void ThingType::copy(ThingType* copy) {
+	// Check TT was given
+	if (!copy) return;
+
+	// Copy properties
+	this->name = copy->name;
+	this->group = copy->group;
+	this->colour = copy->colour;
+	this->radius = copy->radius;
+	this->height = copy->height;
+	this->angled = copy->angled;
+	this->hanging = copy->hanging;
+	this->shrink = copy->shrink;
+	this->sprite = copy->sprite;
+	this->icon = copy->icon;
+	this->translation = copy->translation;
+	this->palette = copy->palette;
+	
+	// Copy args
+	for (unsigned a = 0; a < 5; a++)
+		this->args[a] = copy->args[a];
+}
+
 string ThingType::getArgsString(int args[5]) {
 	string ret;
 

@@ -10,12 +10,14 @@ friend class GameConfiguration;
 private:
 	string	name;
 	string	group;
-	int		tagged;	// 0=no, 1=sector, 2=line, 3=thing, 4=sector_back
+	int		tagged;	// 0=no, 1=sector, 2=line, 3=thing, 4=sector_back, 5=sector_or_back
 	arg_t	args[5];
 	
 public:
 	ActionSpecial(string name = "Unknown", string group = "");
 	~ActionSpecial() {}
+
+	void	copy(ActionSpecial* copy);
 	
 	string	getName() { return name; }
 	string	getGroup() { return group; }
