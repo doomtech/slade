@@ -1415,8 +1415,8 @@ void MapRenderer2D::forceUpdate(float view_scale) {
 }
 
 double MapRenderer2D::scaledRadius(int radius) {
-	if (radius > 16)
-		radius = 16;
+	if (radius > 20)
+		radius = 20;
 
 	if (view_scale > 1.0)
 		return radius * view_scale_inv;
