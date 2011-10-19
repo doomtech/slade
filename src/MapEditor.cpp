@@ -31,6 +31,11 @@ void MapEditor::setEditMode(int mode) {
 	edit_mode = mode;
 	hilight_item = -1;
 	selection.clear();
+
+	// Clear tagged lists
+	tagged_sectors.clear();
+	tagged_lines.clear();
+	tagged_things.clear();
 }
 
 bool MapEditor::openMap(Archive::mapdesc_t map) {
@@ -77,6 +82,47 @@ bool MapEditor::updateHilight(fpoint2_t mouse_pos, double dist_scale) {
 				if (dist <= type->getRadius() + (32/dist_scale))
 					hilight_item = nearest[a];
 			}
+		}
+	}
+
+	// Update tagged lists if the hilight changed
+	if (current != hilight_item) {
+		// Clear tagged lists
+		tagged_sectors.clear();
+		tagged_lines.clear();
+		tagged_things.clear();
+
+		// Line special
+		if (edit_mode == MODE_LINES && hilight_item >= 0) {
+			MapLine* line = map.getLine(hilight_item);
+			int needs_tag = theGameConfiguration->actionSpecial((int)line->prop("special")).needsTag();
+			int tag = line->prop("arg0");
+
+			// Sector tag
+			if (needs_tag == AS_TT_SECTOR ||
+				needs_tag == AS_TT_SECTOR_AND_BACK && tag > 0)
+				map.getSectorsByTag(tag, tagged_sectors);
+
+			// Backside sector (for local doors)
+			else if (needs_tag == AS_TT_SECTOR_BACK || needs_tag == AS_TT_SECTOR_AND_BACK && line->s2())
+				tagged_sectors.push_back(line->s2()->getSector());
+
+			// Sector tag *or* backside sector (for zdoom local doors)
+			else if (needs_tag == AS_TT_SECTOR_OR_BACK) {
+				vector<MapSector*> tagged_sectors;
+				if (tag > 0)
+					map.getSectorsByTag(tag, tagged_sectors);
+				else if (line->s2())
+					tagged_sectors.push_back(line->s2()->getSector());
+			}
+
+			// Thing ID
+			else if (needs_tag == AS_TT_THING)
+				map.getThingsById(tag, tagged_things);
+
+			// Line ID
+			else if (needs_tag == AS_TT_LINE)
+				map.getLinesById(tag, tagged_lines);
 		}
 	}
 

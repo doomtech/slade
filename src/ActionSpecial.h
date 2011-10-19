@@ -4,13 +4,24 @@
 
 #include "Args.h"
 
+// Tag types
+enum {
+	AS_TT_NO = 0,
+	AS_TT_SECTOR,
+	AS_TT_LINE,
+	AS_TT_THING,
+	AS_TT_SECTOR_BACK,
+	AS_TT_SECTOR_OR_BACK,
+	AS_TT_SECTOR_AND_BACK,
+};
+
 class ParseTreeNode;
 class ActionSpecial {
 friend class GameConfiguration;
 private:
 	string	name;
 	string	group;
-	int		tagged;	// 0=no, 1=sector, 2=line, 3=thing, 4=sector_back, 5=sector_or_back
+	int		tagged;
 	arg_t	args[5];
 	
 public:

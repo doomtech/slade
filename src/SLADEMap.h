@@ -113,9 +113,9 @@ public:
 	bool	getLinesOfSector(unsigned index, vector<MapLine*>& list);
 
 	// Tags/Ids
-	vector<MapSector*>	getSectorsByTag(int tag);
-	vector<MapThing*>	getThingsById(int id);
-	vector<MapLine*>	getLinesById(int id);
+	void	getSectorsByTag(int tag, vector<MapSector*>& list);
+	void	getThingsById(int id, vector<MapThing*>& list);
+	void	getLinesById(int id, vector<MapLine*>& list);
 
 	// Checks
 	int		removeDetachedVertices();

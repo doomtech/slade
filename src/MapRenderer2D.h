@@ -6,6 +6,8 @@ class SLADEMap;
 class ThingType;
 class GLTexture;
 class MapSector;
+class MapLine;
+class MapThing;
 class MapRenderer2D {
 private:
 	SLADEMap*	map;
@@ -70,6 +72,7 @@ public:
 	void	renderLinesImmediate(bool show_direction);
 	void	renderLineHilight(int index, float fade);
 	void	renderLineSelection(vector<int>& selection);
+	void	renderTaggedLines(vector<MapLine*>& lines, float fade);
 
 	// Things
 	void	renderRoundThing(double x, double y, double angle, ThingType* type, float alpha = 1.0f);
@@ -79,6 +82,7 @@ public:
 	void	renderThingsImmediate(float alpha);
 	void	renderThingHilight(int index, float fade);
 	void	renderThingSelection(vector<int>& selection);
+	void	renderTaggedThings(vector<MapThing*>& things, float fade);
 
 	// Flats (sectors)
 	void	renderFlats(int type = 0);

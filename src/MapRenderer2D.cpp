@@ -439,6 +439,44 @@ void MapRenderer2D::renderLineSelection(vector<int>& selection) {
 	glEnd();
 }
 
+void MapRenderer2D::renderTaggedLines(vector<MapLine*>& lines, float fade) {
+	// Set hilight colour
+	rgba_t col = ColourConfiguration::getColour("map_tagged");
+	col.a *= fade;
+	col.set_gl();
+
+	// Setup rendering properties
+	glLineWidth(line_width*3);
+
+	// Go through tagged lines
+	double x1, y1, x2, y2, xmid, ymid, tablen;
+	for (unsigned a = 0; a < lines.size(); a++) {
+		// Render line
+		MapLine* line = lines[a];
+		x1 = line->v1()->xPos();
+		y1 = line->v1()->yPos();
+		x2 = line->v2()->xPos();
+		y2 = line->v2()->yPos();
+		glBegin(GL_LINES);
+		glVertex2d(x1, y1);
+		glVertex2d(x2, y2);
+		glEnd();
+
+		// Direction tab
+		xmid = x1 + ((x2 - x1) * 0.5);
+		ymid = y1 + ((y2 - y1) * 0.5);
+		tablen = line->getLength() * 0.2;
+		if (tablen > 8) tablen = 8;
+		if (tablen < 2) tablen = 2;
+		fpoint2_t invdir(-(y2 - y1), x2 - x1);
+		invdir.normalize();
+		glBegin(GL_LINES);
+		glVertex2d(xmid, ymid);
+		glVertex2d(xmid - invdir.x*tablen, ymid - invdir.y*tablen);
+		glEnd();
+	}
+}
+
 void MapRenderer2D::renderRoundThing(double x, double y, double angle, ThingType* tt, float alpha) {
 	// Ignore if no type given (shouldn't happen)
 	if (!tt)
@@ -935,6 +973,69 @@ void MapRenderer2D::renderThingSelection(vector<int>& selection) {
 
 	if (point)
 		glDisable(GL_POINT_SPRITE);
+
+	glDisable(GL_TEXTURE_2D);
+}
+
+void MapRenderer2D::renderTaggedThings(vector<MapThing*>& things, float fade) {
+	// Set hilight colour
+	rgba_t col = ColourConfiguration::getColour("map_tagged");
+	col.a *= fade;
+	col.set_gl();
+
+	// Go through tagged things
+	for (unsigned a = 0; a < things.size(); a++) {
+		// Render thing hilight
+		MapThing* thing = things[a];
+		ThingType* tt = theGameConfiguration->thingType(thing->getType());
+		double x = thing->xPos();
+		double y = thing->yPos();
+
+		// Get thing radius
+		double radius = tt->getRadius();
+
+		// Check if we want square overlays
+		if (thing_overlay_square || thing_drawtype == 0 || thing_drawtype > 2) {
+			glDisable(GL_TEXTURE_2D);
+			glLineWidth(3.0f);
+			glBegin(GL_LINE_LOOP);
+			glVertex2d(x - radius, y - radius);
+			glVertex2d(x - radius, y + radius);
+			glVertex2d(x + radius, y + radius);
+			glVertex2d(x + radius, y - radius);
+			glEnd();
+			col.a *= 0.5;
+			col.set_gl(false);
+			glBegin(GL_QUADS);
+			glVertex2d(x - radius, y - radius);
+			glVertex2d(x - radius, y + radius);
+			glVertex2d(x + radius, y + radius);
+			glVertex2d(x + radius, y - radius);
+			glEnd();
+
+			continue;
+		}
+
+		// Adjust radius
+		if (thing_drawtype == 0 || thing_drawtype > 2)
+			radius += 6;
+		else
+			radius *= 1.1 + (0.2*fade);
+
+		// Setup hilight thing texture
+		GLTexture* tex = theMapEditor->textureManager().getEditorImage("thing/hilight");
+		if (tex) {
+			glEnable(GL_TEXTURE_2D);
+			tex->bind();
+		}
+
+		glBegin(GL_QUADS);
+		glTexCoord2f(0.0f, 0.0f);	glVertex2d(x - radius, y - radius);
+		glTexCoord2f(0.0f, 1.0f);	glVertex2d(x - radius, y + radius);
+		glTexCoord2f(1.0f, 1.0f);	glVertex2d(x + radius, y + radius);
+		glTexCoord2f(1.0f, 0.0f);	glVertex2d(x + radius, y - radius);
+		glEnd();
+	}
 
 	glDisable(GL_TEXTURE_2D);
 }

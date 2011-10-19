@@ -478,38 +478,8 @@ void MapCanvas::draw() {
 
 	
 	// Draw tagged sectors/lines/things if needed
-	if (editor->editMode() == MapEditor::MODE_LINES && mouse_state == MSTATE_NORMAL && editor->hilightItem() >= 0) {
-		MapLine* line = editor->getHilightedLine();
-		int special = line->prop("special").getIntValue();
-		int tag = line->prop("arg0").getIntValue();
-		if (special > 0) {
-			// Get ActionSpecial
-			ActionSpecial& as = theGameConfiguration->actionSpecial(special);
-
-			// Sector tag
-			if (as.needsTag() == 1 && tag > 0) {
-				vector<MapSector*> tagged_sectors = editor->getMap().getSectorsByTag(tag);
-				renderer_2d->renderTaggedFlats(tagged_sectors, anim_flash_level);
-			}
-
-			// Backside sector (for local doors)
-			else if (as.needsTag() == 4 && line->s2()) {
-				vector<MapSector*> bsec;
-				bsec.push_back(line->s2()->getSector());
-				renderer_2d->renderTaggedFlats(bsec, anim_flash_level);
-			}
-
-			// Sector tag *or* backside sector (for zdoom local doors)
-			else if (as.needsTag() == 5) {
-				vector<MapSector*> tagged_sectors;
-				if (tag > 0)
-					tagged_sectors = editor->getMap().getSectorsByTag(tag);
-				else if (line->s2())
-					tagged_sectors.push_back(line->s2()->getSector());
-				renderer_2d->renderTaggedFlats(tagged_sectors, anim_flash_level);
-			}
-		}
-	}
+	if (editor->taggedSectors().size() > 0)
+		renderer_2d->renderTaggedFlats(editor->taggedSectors(), anim_flash_level);
 
 
 	// Draw selection box if active

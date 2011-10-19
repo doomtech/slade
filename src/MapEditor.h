@@ -18,6 +18,11 @@ private:
 	vector<int>	selection;
 	int			gridsize;
 
+	// Tagged items
+	vector<MapSector*>	tagged_sectors;
+	vector<MapLine*>	tagged_lines;
+	vector<MapThing*>	tagged_things;
+
 public:
 	enum {
 		// Editor modes
@@ -38,6 +43,9 @@ public:
 	unsigned			selectionSize() { return selection.size(); }
 	vector<int>&		getSelection() { return selection; }
 	int					hilightItem() { return hilight_item; }
+	vector<MapSector*>&	taggedSectors() { return tagged_sectors; }
+	vector<MapLine*>&	taggedLines() { return tagged_lines; }
+	vector<MapThing*>&	taggedThings() { return tagged_things; }
 
 	void	setEditMode(int mode);
 	void	setCanvas(MapCanvas* canvas) { this->canvas = canvas; }

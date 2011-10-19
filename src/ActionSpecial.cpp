@@ -81,12 +81,14 @@ void ActionSpecial::parse(ParseTreeNode* node) {
 		// Tagged
 		else if (S_CMPNOCASE(name, "tagged")) {
 			string str = child->getStringValue();
-			if (S_CMPNOCASE(str, "no")) this->tagged = 0;
-			else if (S_CMPNOCASE(str, "sector")) this->tagged = 1;
-			else if (S_CMPNOCASE(str, "line")) this->tagged = 2;
-			else if (S_CMPNOCASE(str, "thing")) this->tagged = 3;
-			else if (S_CMPNOCASE(str, "sector_back")) this->tagged = 4;
-			else if (S_CMPNOCASE(str, "sector_or_back")) this->tagged = 5;
+			if (S_CMPNOCASE(str, "no")) this->tagged = AS_TT_NO;
+			else if (S_CMPNOCASE(str, "sector")) this->tagged = AS_TT_SECTOR;
+			else if (S_CMPNOCASE(str, "line")) this->tagged = AS_TT_LINE;
+			else if (S_CMPNOCASE(str, "thing")) this->tagged = AS_TT_THING;
+			else if (S_CMPNOCASE(str, "sector_back")) this->tagged = AS_TT_SECTOR_BACK;
+			else if (S_CMPNOCASE(str, "sector_or_back")) this->tagged = AS_TT_SECTOR_OR_BACK;
+			else if (S_CMPNOCASE(str, "sector_and_back")) this->tagged = AS_TT_SECTOR_AND_BACK;
+			else if (S_CMPNOCASE(str, "line_or_self")) this->tagged = AS_TT_LINE_OR_SELF;
 			else
 				this->tagged = child->getIntValue();
 		}
