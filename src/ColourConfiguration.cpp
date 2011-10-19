@@ -17,6 +17,10 @@ rgba_t ColourConfiguration::getColour(string name) {
 		return COL_WHITE;
 }
 
+cc_col_t ColourConfiguration::getColDef(string name) {
+	return cc_colours[name];
+}
+
 void ColourConfiguration::setColour(string name, int red, int green, int blue, int alpha, int blend) {
 	cc_col_t& col = cc_colours[name];
 	if (red >= 0)
@@ -98,6 +102,30 @@ bool ColourConfiguration::init() {
 		return readConfiguration(entry_default_cc->getMCData());
 }
 
+bool ColourConfiguration::readConfiguration(string name) {
+	// TODO: search custom folder
+
+	// Search resource pk3
+	Archive* res = theArchiveManager->programResourceArchive();
+	ArchiveTreeNode* dir = res->getDir("config/colours");
+	for (unsigned a = 0; a < dir->numEntries(); a++) {
+		if (S_CMPNOCASE(dir->getEntry(a)->getName(true), name))
+			return readConfiguration(dir->getEntry(a)->getMCData());
+	}
+
+	return false;
+}
+
+void ColourConfiguration::getConfigurationNames(vector<string>& names) {
+	// TODO: search custom folder
+
+	// Search resource pk3
+	Archive* res = theArchiveManager->programResourceArchive();
+	ArchiveTreeNode* dir = res->getDir("config/colours");
+	for (unsigned a = 0; a < dir->numEntries(); a++)
+		names.push_back(dir->getEntry(a)->getName(true));
+}
+
 void ColourConfiguration::getColourNames(vector<string>& list) {
 	ColourHashMap::iterator i = cc_colours.begin();
 	while (i != cc_colours.end()) {
@@ -152,11 +180,5 @@ CONSOLE_COMMAND(ccfg, 1) {
 }
 
 CONSOLE_COMMAND(load_ccfg, 1) {
-	// Determine full path string to entry
-	string path = S_FMT("config/colours/%s.txt", CHR(args[0]));
-	Archive* pres = theArchiveManager->programResourceArchive();
-	ArchiveEntry* entry_cc = pres->entryAtPath(path);
-
-	if (entry_cc)
-		ColourConfiguration::readConfiguration(entry_cc->getMCData());
+	ColourConfiguration::readConfiguration(args[0]);
 }

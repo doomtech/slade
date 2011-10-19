@@ -88,7 +88,6 @@ void ActionSpecial::parse(ParseTreeNode* node) {
 			else if (S_CMPNOCASE(str, "sector_back")) this->tagged = AS_TT_SECTOR_BACK;
 			else if (S_CMPNOCASE(str, "sector_or_back")) this->tagged = AS_TT_SECTOR_OR_BACK;
 			else if (S_CMPNOCASE(str, "sector_and_back")) this->tagged = AS_TT_SECTOR_AND_BACK;
-			else if (S_CMPNOCASE(str, "line_or_self")) this->tagged = AS_TT_LINE_OR_SELF;
 			else
 				this->tagged = child->getIntValue();
 		}
