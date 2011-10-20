@@ -22,6 +22,7 @@ void ThingInfoOverlay::update(MapThing* thing) {
 	sprite = "";
 	translation = "";
 	palette = "";
+	icon = "";
 
 	// Index + type
 	ThingType* tt = theGameConfiguration->thingType(thing->getType());
@@ -52,9 +53,6 @@ void ThingInfoOverlay::update(MapThing* thing) {
 		dir = "Southeast";
 	info.push_back(S_FMT("Direction: %s", CHR(dir)));
 
-	// Flags
-	info.push_back(S_FMT("Flags: %s", CHR(theGameConfiguration->thingFlagsString(thing->prop("flags")))));
-
 	// Args (if in hexen/udmf format)
 	if (theGameConfiguration->getMapFormat() == MAP_HEXEN || theGameConfiguration->getMapFormat() == MAP_UDMF) {
 		int args[5];
@@ -70,10 +68,14 @@ void ThingInfoOverlay::update(MapThing* thing) {
 			info.push_back("No Args");
 	}
 
+	// Flags
+	info.push_back(S_FMT("Flags: %s", CHR(theGameConfiguration->thingFlagsString(thing->prop("flags")))));
+
 	// Set sprite and translation
 	sprite = tt->getSprite();
 	translation = tt->getTranslation();
 	palette = tt->getPalette();
+	icon = tt->getIcon();
 }
 
 void ThingInfoOverlay::draw(int bottom, int right, float alpha) {
@@ -113,29 +115,28 @@ void ThingInfoOverlay::draw(int bottom, int right, float alpha) {
 	}
 
 	// Draw sprite
+	bool isicon = false;
 	GLTexture* tex = theMapEditor->textureManager().getSprite(sprite, translation, palette);
+	if (!tex) {
+		tex = theMapEditor->textureManager().getEditorImage(S_FMT("thing/%s", CHR(icon)));
+		isicon = true;
+	}
 	glEnable(GL_TEXTURE_2D);
 	rgba_t(255, 255, 255, 255*alpha, 0).set_gl();
 	if (tex) {
+		double width = tex->getWidth();
+		double height = tex->getHeight();
+		if (isicon) {
+			width = 64;
+			height = 64;
+		}
 		tex->bind();
 		glBegin(GL_QUADS);
-		glTexCoord2f(0.0f, 0.0f);	glVertex2d(right - 8 - tex->getWidth(), bottom - 8 - tex->getHeight());
-		glTexCoord2f(0.0f, 1.0f);	glVertex2d(right - 8 - tex->getWidth(), bottom - 8);
+		glTexCoord2f(0.0f, 0.0f);	glVertex2d(right - 8 - width, bottom - 8 - height);
+		glTexCoord2f(0.0f, 1.0f);	glVertex2d(right - 8 - width, bottom - 8);
 		glTexCoord2f(1.0f, 1.0f);	glVertex2d(right - 8, bottom - 8);
-		glTexCoord2f(1.0f, 0.0f);	glVertex2d(right - 8, bottom - 8 - tex->getHeight());
+		glTexCoord2f(1.0f, 0.0f);	glVertex2d(right - 8, bottom - 8 - height);
 		glEnd();
-	}
-	else {
-		tex = theMapEditor->textureManager().getEditorImage("thing/unknown");
-		if (tex) {
-			tex->bind();
-			glBegin(GL_QUADS);
-			glTexCoord2f(0.0f, 0.0f);	glVertex2d(right - 72, bottom - 72);
-			glTexCoord2f(0.0f, 1.0f);	glVertex2d(right - 72, bottom - 8);
-			glTexCoord2f(1.0f, 1.0f);	glVertex2d(right - 8, bottom - 8);
-			glTexCoord2f(1.0f, 0.0f);	glVertex2d(right - 8, bottom - 72);
-			glEnd();
-		}
 	}
 	glDisable(GL_TEXTURE_2D);
 }

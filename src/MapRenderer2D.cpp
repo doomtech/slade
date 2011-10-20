@@ -490,13 +490,13 @@ void MapRenderer2D::renderRoundThing(double x, double y, double angle, ThingType
 	glColor4f(tt->getColour().fr()*alpha, tt->getColour().fg()*alpha, tt->getColour().fb()*alpha, alpha);
 
 	// Check for unknown type
-	if (tt->getName() == "Unknown") {
-		tex = theMapEditor->textureManager().getEditorImage("thing/unknown");
-		glColor4f(1.0f, 1.0f, 1.0f, alpha);
-	}
+	//if (tt->getName() == "Unknown") {
+	//	tex = theMapEditor->textureManager().getEditorImage("thing/unknown");
+	//	glColor4f(1.0f, 1.0f, 1.0f, alpha);
+	//}
 
 	// Check for custom thing icon
-	else if (!tt->getIcon().IsEmpty())
+	if (!tt->getIcon().IsEmpty())
 		tex = theMapEditor->textureManager().getEditorImage(S_FMT("thing/%s", CHR(tt->getIcon())));
 
 	if (!tex) {

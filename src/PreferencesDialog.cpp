@@ -44,6 +44,7 @@
 #include "ColourPrefsPanel.h"
 #include "MapEditorPrefsPanel.h"
 #include "MapDisplayPrefsPanel.h"
+#include "AdvancedPrefsPanel.h"
 #include "ArchiveManager.h"
 #include "TextEditorPrefsPanel.h"
 #include "Icons.h"
@@ -83,6 +84,7 @@ PreferencesDialog::PreferencesDialog(wxWindow* parent) : wxDialog(parent, -1, "S
 	panel_colours = new ColourPrefsPanel(tree_prefs);
 	panel_maped = new MapEditorPrefsPanel(tree_prefs);
 	panel_map_display = new MapDisplayPrefsPanel(tree_prefs);
+	panel_advanced = new AdvancedPrefsPanel(tree_prefs);
 
 	// Setup preferences TreeBook
 	tree_prefs->AddPage(panel_general, "General", true);
@@ -99,6 +101,7 @@ PreferencesDialog::PreferencesDialog(wxWindow* parent) : wxDialog(parent, -1, "S
 	tree_prefs->AddSubPage(panel_script_acs, "ACS");
 	tree_prefs->AddPage(panel_maped, "Map Editor");
 	tree_prefs->AddSubPage(panel_map_display, "Display");
+	tree_prefs->AddPage(panel_advanced, "Advanced");
 
 	// Expand all tree nodes (so it gets sized properly)
 	tree_prefs->ExpandNode(2);
@@ -171,6 +174,7 @@ void PreferencesDialog::applyPreferences() {
 	panel_colours->applyPreferences();
 	panel_maped->applyPreferences();
 	panel_map_display->applyPreferences();
+	panel_advanced->applyPreferences();
 }
 
 

@@ -110,6 +110,7 @@
     <ClCompile Include="src\ACSPrefsPanel.cpp" />
     <ClCompile Include="src\ActionSpecial.cpp" />
     <ClCompile Include="src\ADatArchive.cpp" />
+    <ClCompile Include="src\AdvancedPrefsPanel.cpp" />
     <ClCompile Include="src\ANSICanvas.cpp" />
     <ClCompile Include="src\ANSIEntryPanel.cpp" />
     <ClCompile Include="src\ArchiveEntryList.cpp" />
@@ -317,6 +318,7 @@
     <ClInclude Include="src\ACSPrefsPanel.h" />
     <ClInclude Include="src\ActionSpecial.h" />
     <ClInclude Include="src\ADatArchive.h" />
+    <ClInclude Include="src\AdvancedPrefsPanel.h" />
     <ClInclude Include="src\ANSICanvas.h" />
     <ClInclude Include="src\ANSIEntryPanel.h" />
     <ClInclude Include="src\ArchiveEntryList.h" />

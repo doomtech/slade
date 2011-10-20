@@ -27,6 +27,8 @@ CVAR(String, game_configuration, "", CVAR_SAVE)
 
 GameConfiguration::GameConfiguration() {
 	game_filter = "";
+	ttype_unknown.icon = "unknown";
+	ttype_unknown.shrink = true;
 }
 
 GameConfiguration::~GameConfiguration() {

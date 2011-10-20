@@ -1,8 +1,7 @@
 
 #ifndef __COL_PREFS_PANEL_H__
 #define __COL_PREFS_PANEL_H__
-#include <wx/clrpicker.h>
-#include <wx/button.h>
+
 #include <wx/propgrid/propgrid.h>
 
 class ColourPrefsPanel : public wxPanel {

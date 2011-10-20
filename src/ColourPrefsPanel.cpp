@@ -23,6 +23,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *******************************************************************/
 
+
 /*******************************************************************
  * INCLUDES
  *******************************************************************/
@@ -108,9 +109,13 @@ void ColourPrefsPanel::refreshPropGrid() {
 		wxPGProperty* colour = pg_colours->AppendIn(group, new wxColourProperty(cdef.name, colours[a], WXCOL(cdef.colour)));
 
 		// Add extra colour properties
-		pg_colours->AppendIn(colour, new wxIntProperty("Opacity (0-255)", "alpha", cdef.colour.a));
+		wxPGProperty* opacity = pg_colours->AppendIn(colour, new wxIntProperty("Opacity (0-255)", "alpha", cdef.colour.a));
 		pg_colours->AppendIn(colour, new wxBoolProperty("Additive", "additive", (cdef.colour.blend == 1)));
 		pg_colours->Collapse(colour);
+
+		// Set opacity limits
+		opacity->SetAttribute("Max", 255);
+		opacity->SetAttribute("Min", 0);
 	}
 }
 
@@ -150,10 +155,18 @@ void ColourPrefsPanel::applyPreferences() {
 			if (p_add->GetValue().GetBool())
 				blend = 1;
 
+			// Set the colour
 			ColourConfiguration::setColour(colours[a], col.Red(), col.Green(), col.Blue(), alpha, blend);
+
+			// Clear modified status
+			pg_colours->GetProperty(cdef_path)->SetModifiedStatus(false);
+			p_alpha->SetModifiedStatus(false);
+			p_add->SetModifiedStatus(false);
 		}
 	}
 
+	pg_colours->Refresh();
+	pg_colours->RefreshEditor();
 	theMainWindow->Refresh();
 }
 

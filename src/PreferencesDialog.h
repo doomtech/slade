@@ -17,6 +17,7 @@ class AudioPrefsPanel;
 class ColourPrefsPanel;
 class MapEditorPrefsPanel;
 class MapDisplayPrefsPanel;
+class AdvancedPrefsPanel;
 
 class PreferencesDialog : public wxDialog {
 private:
@@ -34,6 +35,7 @@ private:
 	ColourPrefsPanel*		panel_colours;
 	MapEditorPrefsPanel*	panel_maped;
 	MapDisplayPrefsPanel*	panel_map_display;
+	AdvancedPrefsPanel*		panel_advanced;
 
 	// Base Resource Archive
 	BaseResourceArchivesPanel*	panel_bra;

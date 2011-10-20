@@ -735,6 +735,9 @@
     <ClCompile Include="src\MapEditorPrefsPanel.cpp">
       <Filter>Dialogs\Preferences</Filter>
     </ClCompile>
+    <ClCompile Include="src\AdvancedPrefsPanel.cpp">
+      <Filter>Dialogs\Preferences</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -1387,6 +1390,9 @@
       <Filter>Dialogs\Preferences</Filter>
     </ClInclude>
     <ClInclude Include="src\MapEditorPrefsPanel.h">
+      <Filter>Dialogs\Preferences</Filter>
+    </ClInclude>
+    <ClInclude Include="src\AdvancedPrefsPanel.h">
       <Filter>Dialogs\Preferences</Filter>
     </ClInclude>
   </ItemGroup>

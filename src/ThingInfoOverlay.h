@@ -10,6 +10,7 @@ private:
 	string			sprite;
 	string			translation;
 	string			palette;
+	string			icon;
 
 public:
 	ThingInfoOverlay();
