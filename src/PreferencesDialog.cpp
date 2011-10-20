@@ -31,6 +31,18 @@
 #include "Main.h"
 #include "WxStuff.h"
 #include "PreferencesDialog.h"
+#include "BaseResourceArchivesPanel.h"
+#include "TextEditorPrefsPanel.h"
+#include "TextStylePrefsPanel.h"
+#include "GeneralPrefsPanel.h"
+#include "InterfacePrefsPanel.h"
+#include "EditingPrefsPanel.h"
+#include "ACSPrefsPanel.h"
+#include "GraphicsPrefsPanel.h"
+#include "PNGPrefsPanel.h"
+#include "AudioPrefsPanel.h"
+#include "ColourPrefsPanel.h"
+#include "AdvancedPrefsPanel.h"
 #include "ArchiveManager.h"
 #include "TextEditorPrefsPanel.h"
 #include "Icons.h"
@@ -68,6 +80,7 @@ PreferencesDialog::PreferencesDialog(wxWindow* parent) : wxDialog(parent, -1, "S
 	panel_gfx_png = new PNGPrefsPanel(tree_prefs);
 	panel_audio = new AudioPrefsPanel(tree_prefs);
 	panel_colours = new ColourPrefsPanel(tree_prefs);
+	panel_advanced = new AdvancedPrefsPanel(tree_prefs);
 
 	// Setup preferences TreeBook
 	tree_prefs->AddPage(panel_general, "General", true);
@@ -82,6 +95,7 @@ PreferencesDialog::PreferencesDialog(wxWindow* parent) : wxDialog(parent, -1, "S
 	tree_prefs->AddPage(panel_audio, "Audio");
 	tree_prefs->AddPage(new wxPanel(tree_prefs, -1), "Scripting");
 	tree_prefs->AddSubPage(panel_script_acs, "ACS");
+	tree_prefs->AddPage(panel_advanced, "Advanced");
 
 	// Expand all tree nodes (so it gets sized properly)
 	tree_prefs->ExpandNode(2);
@@ -90,7 +104,10 @@ PreferencesDialog::PreferencesDialog(wxWindow* parent) : wxDialog(parent, -1, "S
 	sizer->Add(tree_prefs, 1, wxEXPAND|wxALL, 4);
 
 	// Add buttons
-	sizer->Add(CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND|wxALL, 4);
+	sizer->Add(CreateButtonSizer(wxOK|wxCANCEL|wxAPPLY), 0, wxEXPAND|wxALL, 4);
+
+	// Bind events
+	Bind(wxEVT_COMMAND_BUTTON_CLICKED, &PreferencesDialog::onButtonClicked, this);
 
 	// Setup layout
 	SetInitialSize(wxSize(-1, -1));
@@ -149,6 +166,7 @@ void PreferencesDialog::applyPreferences() {
 	panel_gfx_png->applyPreferences();
 	panel_audio->applyPreferences();
 	panel_colours->applyPreferences();
+	panel_advanced->applyPreferences();
 }
 
 
@@ -161,4 +179,15 @@ void PreferencesDialog::applyPreferences() {
  *******************************************************************/
 void PreferencesDialog::onBtnBRAOpenClicked(wxCommandEvent& e) {
 	theArchiveManager->openBaseResource(panel_bra->getSelectedPath());
+}
+
+/* PreferencesDialog::onButtonClicked
+ * Called when a button is clicked
+ *******************************************************************/
+void PreferencesDialog::onButtonClicked(wxCommandEvent& e) {
+	// Check if it was the apply button
+	if (e.GetId() == wxID_APPLY)
+		applyPreferences();
+	else
+		e.Skip();
 }
