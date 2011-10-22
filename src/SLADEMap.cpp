@@ -1358,33 +1358,41 @@ int SLADEMap::inSector(double x, double y) {
 		if (!sectors[a]->boundingBox().point_within(x, y))
 			continue;
 
-		// Go through sector sides
+		// Find nearest line in the sector
+		double mdist = min_dist;
+		int lindex = -1;
+		MapSide* cside = NULL;
 		for (unsigned s = 0; s < sectors[a]->connected_sides.size(); s++) {
 			// Determine distance to side's parent line
-			int line_index = sectors[a]->connected_sides[s]->parent->index;
-			double dist = fastDistanceToLine(x, y, line_index, min_dist);
+			double dist = fastDistanceToLine(x, y, sectors[a]->connected_sides[s]->parent->index, min_dist);
 
 			// Check if it's the closest line so far
-			if (dist < min_dist) {
-				min_dist = dist;
-				index = line_index;
+			if (dist < mdist) {
+				mdist = dist;
+				cside = sectors[a]->connected_sides[s];
+				lindex = cside->parent->index;
+			}
+		}
+
+		// Check that the point is on the correct side of the line
+		if (lindex >= 0) {
+			MapLine* line = lines[lindex];
+			if (MathStuff::lineSide(x, y, line->vertex1->x, line->vertex1->y, line->vertex2->x, line->vertex2->y) >= 0) {
+				if (line->side1 == cside) {
+					min_dist = mdist;
+					index = a;
+				}
+			}
+			else {
+				if (line->side2 == cside) {
+					min_dist = mdist;
+					index = a;
+				}
 			}
 		}
 	}
 
-	// Check what side of the line the point is on
-	MapLine* l = lines[index];
-	MapSide* s = NULL;
-	if (MathStuff::lineSide(x, y, l->vertex1->x, l->vertex1->y, l->vertex2->x, l->vertex2->y) >= 0)
-		s = l->side1;
-	else
-		s = l->side2;
-
-	// If no side, not in sector
-	if (!s)
-		return -1;
-
-	return sectorIndex(s->sector);
+	return index;
 }
 
 bbox_t SLADEMap::getMapBBox() {
@@ -1460,6 +1468,39 @@ void SLADEMap::getLinesById(int id, vector<MapLine*>& list) {
 	for (unsigned a = 0; a < lines.size(); a++) {
 		if (lines[a]->prop("id").getIntValue() == id)
 			list.push_back(lines[a]);
+	}
+}
+
+void SLADEMap::moveVertex(unsigned vertex, double nx, double ny) {
+	// Check index
+	if (vertex > vertices.size())
+		return;
+
+	// Move the vertex
+	MapVertex* v = vertices[vertex];
+	v->x = nx;
+	v->y = ny;
+
+	// Go through attached lines
+	for (unsigned a = 0; a < v->connected_lines.size(); a++) {
+		MapLine* line = v->connected_lines[a];
+		MapSector* s1 = line->frontSector();
+		MapSector* s2 = line->backSector();
+
+		// Reset line internals
+		line->length = -1;
+
+		// Reset front sector internals
+		if (s1) {
+			s1->resetPolygon();
+			s1->resetBBox();
+		}
+
+		// Reset back sector internals
+		if (s2) {
+			s2->resetPolygon();
+			s2->resetBBox();
+		}
 	}
 }
 

@@ -7,6 +7,7 @@
 
 class MapVertex;
 class MapSide;
+class MapSector;
 
 // Line flags
 #define	LINE_IMPASSIBLE		0x0001
@@ -88,6 +89,9 @@ public:
 
 	PropertyList&	props()				{ return udmf_props; }
 	Property&		prop(string key)	{ return udmf_props[key]; }
+
+	MapSector*	frontSector();
+	MapSector*	backSector();
 
 	double	getLength();
 	bool	doubleSector();

@@ -61,8 +61,10 @@ public:
 	PropertyList&	props()				{ return udmf_props; }
 	Property&		prop(string key)	{ return udmf_props[key]; }
 
-	bbox_t				boundingBox() { return bbox; }
+	void				resetBBox() { bbox.reset(); }
+	bbox_t				boundingBox();
 	vector<MapSide*>&	connectedSides() { return connected_sides; }
+	void				resetPolygon() { poly_needsupdate = true; }
 	Polygon2D*			getPolygon();
 
 	void	updateBBox();

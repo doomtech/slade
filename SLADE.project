@@ -43,7 +43,6 @@
       <File Name="src/MapEditorPrefsPanel.cpp"/>
       <File Name="src/MapDisplayPrefsPanel.h"/>
       <File Name="src/MapDisplayPrefsPanel.cpp"/>
-      <File Name="src/Drawing.cpp"/>
       <File Name="src/AdvancedPrefsPanel.cpp"/>
       <File Name="src/AdvancedPrefsPanel.h"/>
     </VirtualDirectory>
@@ -109,6 +108,7 @@
     <File Name="src/KeyBind.h"/>
     <File Name="src/ColourConfiguration.cpp"/>
     <File Name="src/ColourConfiguration.h"/>
+    <File Name="src/Drawing.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="Main Editor">
     <VirtualDirectory Name="UI Elements">

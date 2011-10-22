@@ -10,7 +10,6 @@ class MapEditor {
 private:
 	SLADEMap			map;
 	MapCanvas*			canvas;
-	//GameConfiguration	game;
 
 	// Editor state
 	uint8_t		edit_mode;
@@ -22,6 +21,9 @@ private:
 	vector<MapSector*>	tagged_sectors;
 	vector<MapLine*>	tagged_lines;
 	vector<MapThing*>	tagged_things;
+
+	// Moving
+	fpoint2_t			move_origin;
 
 public:
 	enum {
@@ -37,7 +39,6 @@ public:
 	~MapEditor();
 
 	SLADEMap&			getMap() { return map; }
-	//GameConfiguration&	gameConfiguration() { return game; }
 	uint8_t				editMode() { return edit_mode; }
 	double				gridSize();
 	unsigned			selectionSize() { return selection.size(); }
@@ -74,6 +75,11 @@ public:
 	// Grid
 	void	incrementGrid();
 	void	decrementGrid();
+
+	// Item moving
+	bool	beginMove(fpoint2_t mouse_pos);
+	void	doMove(fpoint2_t mouse_pos);
+	void	endMove();
 };
 
 #endif//__MAP_EDITOR_H__

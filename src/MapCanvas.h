@@ -65,6 +65,7 @@ private:
 	double	view_xoff_inter;
 	double	view_yoff_inter;
 	double	view_scale_inter;
+	float	anim_move_fade;
 
 public:
 	MapCanvas(wxWindow *parent, int id, MapEditor* editor);

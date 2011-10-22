@@ -508,6 +508,26 @@ void MapCanvas::draw() {
 	for (unsigned a = 0; a < animations.size(); a++)
 		animations[a]->draw();
 
+	// Draw moving stuff if needed
+	if (anim_move_fade > 0.0f) {
+		// Draw background fader
+		glDisable(GL_TEXTURE_2D);
+		rgba_t col = ColourConfiguration::getColour("map_background");
+		col.a = 140*anim_move_fade;
+		col.blend = 0;
+		col.set_gl();
+		glBegin(GL_QUADS);
+		glVertex2d(view_tl.x, view_tl.y);
+		glVertex2d(view_tl.x, view_br.y);
+		glVertex2d(view_br.x, view_br.y);
+		glVertex2d(view_br.x, view_tl.y);
+		glEnd();
+
+		if (mouse_state == MSTATE_MOVE) {
+			// Stuff
+		}
+	}
+
 	// Draw info overlay
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -564,6 +584,23 @@ void MapCanvas::update(long frametime) {
 	// Update hilight if needed
 	if (mouse_state == MSTATE_NORMAL)
 		editor->updateHilight(mouse_pos_m, view_scale);
+
+	// Do item moving if needed
+	if (mouse_state == MSTATE_MOVE) {
+		editor->doMove(mouse_pos_m);
+
+		// Fadeout animation
+		if (anim_move_fade < 1.0f)
+			anim_move_fade += 0.1f*mult;
+		if (anim_move_fade > 1.0f)
+			anim_move_fade = 1.0f;
+	}
+	else if (anim_move_fade > 0.0f) {
+		// Fadeout animation
+		anim_move_fade -= 0.1f*mult;
+		if (anim_move_fade < 0.0f)
+			anim_move_fade = 0.0f;
+	}
 
 	// Flashing animation for hilight
 	// Pulsates between 0.5-1.0f (multiplied with hilight alpha)
@@ -1005,6 +1042,8 @@ void MapCanvas::onMouseDown(wxMouseEvent& e) {
 
 	// Right button
 	else if (e.RightDown()) {
+		if (editor->beginMove(mouse_downpos_m))
+			mouse_state = MSTATE_MOVE;
 	}
 
 	// Any other mouse button (let keybind system handle it)
@@ -1038,6 +1077,10 @@ void MapCanvas::onMouseUp(wxMouseEvent& e) {
 
 	// Right button
 	else if (e.RightUp()) {
+		if (mouse_state == MSTATE_MOVE) {
+			editor->endMove();
+			mouse_state = MSTATE_NORMAL;
+		}
 	}
 
 	// Any other mouse button (let keybind system handle it)

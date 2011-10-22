@@ -23,6 +23,20 @@ MapLine::MapLine(MapVertex* v1, MapVertex* v2, MapSide* s1, MapSide* s2) {
 	if (s2) s2->parent = this;
 }
 
+MapSector* MapLine::frontSector() {
+	if (side1)
+		return side1->sector;
+	else
+		return NULL;
+}
+
+MapSector* MapLine::backSector() {
+	if (side2)
+		return side2->sector;
+	else
+		return NULL;
+}
+
 double MapLine::getLength() {
 	if (!vertex1 || !vertex2)
 		return -1;

@@ -647,11 +647,11 @@ string GameConfiguration::sectorTypeName(int type) {
 		if (map_format == MAP_DOOM && type >= 32) {
 			// Damage flags
 			if (type & 96)
-				gen_flags.push_back("10/20% Damage");
+				gen_flags.push_back("20% Damage");
 			else if (type & 32)
-				gen_flags.push_back("2/5% Damage");
+				gen_flags.push_back("5% Damage");
 			else if (type & 64)
-				gen_flags.push_back("5/10% Damage");
+				gen_flags.push_back("10% Damage");
 
 			// Secret
 			if (type & 128)
@@ -671,11 +671,11 @@ string GameConfiguration::sectorTypeName(int type) {
 		else if (type >= 256) {
 			// Damage flags
 			if (type & 768)
-				gen_flags.push_back("10/20% Damage");
+				gen_flags.push_back("20% Damage");
 			else if (type & 256)
-				gen_flags.push_back("2/5% Damage");
+				gen_flags.push_back("5% Damage");
 			else if (type & 512)
-				gen_flags.push_back("5/10% Damage");
+				gen_flags.push_back("10% Damage");
 
 			// Secret
 			if (type & 1024)

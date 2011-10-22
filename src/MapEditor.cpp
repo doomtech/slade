@@ -469,6 +469,26 @@ void MapEditor::decrementGrid() {
 		gridsize = 4;
 }
 
+bool MapEditor::beginMove(fpoint2_t mouse_pos) {
+	// Check if we have any selection or hilight
+	if (selection.size() == 0 && hilight_item == -1)
+		return false;
+
+	// Begin move operation
+	move_origin = mouse_pos;
+	if (edit_mode == MODE_VERTICES) {
+
+	}
+
+	return true;
+}
+
+void MapEditor::doMove(fpoint2_t mouse_pos) {
+}
+
+void MapEditor::endMove() {
+}
+
 CONSOLE_COMMAND(m_show_item, 1) {
 	int index = atoi(CHR(args[0]));
 	theMapEditor->mapEditor().showItem(index);

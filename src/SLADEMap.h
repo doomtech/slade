@@ -118,6 +118,9 @@ public:
 	void	getThingsById(int id, vector<MapThing*>& list);
 	void	getLinesById(int id, vector<MapLine*>& list);
 
+	// Editing
+	void	moveVertex(unsigned vertex, double nx, double ny);
+
 	// Checks
 	int		removeDetachedVertices();
 };

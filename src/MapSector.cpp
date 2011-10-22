@@ -18,6 +18,14 @@ void MapSector::updateBBox() {
 	}
 }
 
+bbox_t MapSector::boundingBox() {
+	// Update bbox if needed
+	if (!bbox.is_valid())
+		updateBBox();
+
+	return bbox;
+}
+
 Polygon2D* MapSector::getPolygon() {
 	if (poly_needsupdate) {
 		polygon.openSector(this);

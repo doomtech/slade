@@ -53,10 +53,10 @@ LibPath                := $(LibraryPathSwitch).
 ##
 CodeLiteDir:=/usr/share/codelite
 Objects=$(IntermediateDirectory)/src_GfxConvDialog$(ObjectSuffix) $(IntermediateDirectory)/src_ModifyOffsetsDialog$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteDialog$(ObjectSuffix) $(IntermediateDirectory)/src_PreferencesDialog$(ObjectSuffix) $(IntermediateDirectory)/src_BaseResourceArchivesPanel$(ObjectSuffix) $(IntermediateDirectory)/src_TextEditorPrefsPanel$(ObjectSuffix) $(IntermediateDirectory)/src_TextStylePrefsPanel$(ObjectSuffix) $(IntermediateDirectory)/src_GeneralPrefsPanel$(ObjectSuffix) $(IntermediateDirectory)/src_EditingPrefsPanel$(ObjectSuffix) $(IntermediateDirectory)/src_ACSPrefsPanel$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_InterfacePrefsPanel$(ObjectSuffix) $(IntermediateDirectory)/src_PNGPrefsPanel$(ObjectSuffix) $(IntermediateDirectory)/src_GraphicsPrefsPanel$(ObjectSuffix) $(IntermediateDirectory)/src_AudioPrefsPanel$(ObjectSuffix) $(IntermediateDirectory)/src_ColourPrefsPanel$(ObjectSuffix) $(IntermediateDirectory)/src_MapEditorPrefsPanel$(ObjectSuffix) $(IntermediateDirectory)/src_MapDisplayPrefsPanel$(ObjectSuffix) $(IntermediateDirectory)/src_Drawing$(ObjectSuffix) $(IntermediateDirectory)/src_AdvancedPrefsPanel$(ObjectSuffix) $(IntermediateDirectory)/src_ExtMessageDialog$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_TranslationEditorDialog$(ObjectSuffix) $(IntermediateDirectory)/src_Clipboard$(ObjectSuffix) $(IntermediateDirectory)/src_CVar$(ObjectSuffix) $(IntermediateDirectory)/src_MainApp$(ObjectSuffix) $(IntermediateDirectory)/src_MemChunk$(ObjectSuffix) $(IntermediateDirectory)/src_Misc$(ObjectSuffix) $(IntermediateDirectory)/src_WxStuff$(ObjectSuffix) $(IntermediateDirectory)/src_OpenGL$(ObjectSuffix) $(IntermediateDirectory)/src_ListenerAnnouncer$(ObjectSuffix) $(IntermediateDirectory)/src_Property$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_PropertyList$(ObjectSuffix) $(IntermediateDirectory)/src_Tokenizer$(ObjectSuffix) $(IntermediateDirectory)/src_Tree$(ObjectSuffix) $(IntermediateDirectory)/src_Parser$(ObjectSuffix) $(IntermediateDirectory)/src_CodePages$(ObjectSuffix) $(IntermediateDirectory)/src_MathStuff$(ObjectSuffix) $(IntermediateDirectory)/src_Compression$(ObjectSuffix) $(IntermediateDirectory)/src_SFileDialog$(ObjectSuffix) $(IntermediateDirectory)/src_Polygon2D$(ObjectSuffix) $(IntermediateDirectory)/src_Console$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_MIDIPlayer$(ObjectSuffix) $(IntermediateDirectory)/src_SAction$(ObjectSuffix) $(IntermediateDirectory)/src_KeyBind$(ObjectSuffix) $(IntermediateDirectory)/src_ColourConfiguration$(ObjectSuffix) $(IntermediateDirectory)/src_AnimatedEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_EntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_GfxEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_SwitchesEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_TextEntryPanel$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_InterfacePrefsPanel$(ObjectSuffix) $(IntermediateDirectory)/src_PNGPrefsPanel$(ObjectSuffix) $(IntermediateDirectory)/src_GraphicsPrefsPanel$(ObjectSuffix) $(IntermediateDirectory)/src_AudioPrefsPanel$(ObjectSuffix) $(IntermediateDirectory)/src_ColourPrefsPanel$(ObjectSuffix) $(IntermediateDirectory)/src_MapEditorPrefsPanel$(ObjectSuffix) $(IntermediateDirectory)/src_MapDisplayPrefsPanel$(ObjectSuffix) $(IntermediateDirectory)/src_AdvancedPrefsPanel$(ObjectSuffix) $(IntermediateDirectory)/src_ExtMessageDialog$(ObjectSuffix) $(IntermediateDirectory)/src_TranslationEditorDialog$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_Clipboard$(ObjectSuffix) $(IntermediateDirectory)/src_CVar$(ObjectSuffix) $(IntermediateDirectory)/src_MainApp$(ObjectSuffix) $(IntermediateDirectory)/src_MemChunk$(ObjectSuffix) $(IntermediateDirectory)/src_Misc$(ObjectSuffix) $(IntermediateDirectory)/src_WxStuff$(ObjectSuffix) $(IntermediateDirectory)/src_OpenGL$(ObjectSuffix) $(IntermediateDirectory)/src_ListenerAnnouncer$(ObjectSuffix) $(IntermediateDirectory)/src_Property$(ObjectSuffix) $(IntermediateDirectory)/src_PropertyList$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_Tokenizer$(ObjectSuffix) $(IntermediateDirectory)/src_Tree$(ObjectSuffix) $(IntermediateDirectory)/src_Parser$(ObjectSuffix) $(IntermediateDirectory)/src_CodePages$(ObjectSuffix) $(IntermediateDirectory)/src_MathStuff$(ObjectSuffix) $(IntermediateDirectory)/src_Compression$(ObjectSuffix) $(IntermediateDirectory)/src_SFileDialog$(ObjectSuffix) $(IntermediateDirectory)/src_Polygon2D$(ObjectSuffix) $(IntermediateDirectory)/src_Console$(ObjectSuffix) $(IntermediateDirectory)/src_MIDIPlayer$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_SAction$(ObjectSuffix) $(IntermediateDirectory)/src_KeyBind$(ObjectSuffix) $(IntermediateDirectory)/src_ColourConfiguration$(ObjectSuffix) $(IntermediateDirectory)/src_Drawing$(ObjectSuffix) $(IntermediateDirectory)/src_AnimatedEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_EntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_GfxEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_SwitchesEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_TextEntryPanel$(ObjectSuffix) \
 	$(IntermediateDirectory)/src_DefaultEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_HexEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_MapEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_AudioEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_ANSIEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveManagerPanel$(ObjectSuffix) $(IntermediateDirectory)/src_PatchTablePanel$(ObjectSuffix) $(IntermediateDirectory)/src_TextureXEditor$(ObjectSuffix) $(IntermediateDirectory)/src_TextureXPanel$(ObjectSuffix) $(IntermediateDirectory)/src_TextureEditorPanel$(ObjectSuffix) \
 	$(IntermediateDirectory)/src_PatchBrowser$(ObjectSuffix) $(IntermediateDirectory)/src_ZTextureEditorPanel$(ObjectSuffix) $(IntermediateDirectory)/src_ArchivePanel$(ObjectSuffix) $(IntermediateDirectory)/src_BaseResourceChooser$(ObjectSuffix) $(IntermediateDirectory)/src_EntryOperations$(ObjectSuffix) $(IntermediateDirectory)/src_MainWindow$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveOperations$(ObjectSuffix) $(IntermediateDirectory)/src_Conversions$(ObjectSuffix) $(IntermediateDirectory)/src_MapLine$(ObjectSuffix) $(IntermediateDirectory)/src_MapSector$(ObjectSuffix) \
 	$(IntermediateDirectory)/src_MapSide$(ObjectSuffix) $(IntermediateDirectory)/src_MapThing$(ObjectSuffix) $(IntermediateDirectory)/src_MapVertex$(ObjectSuffix) $(IntermediateDirectory)/src_SLADEMap$(ObjectSuffix) $(IntermediateDirectory)/src_MapCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_MCAnimations$(ObjectSuffix) $(IntermediateDirectory)/src_VertexInfoOverlay$(ObjectSuffix) $(IntermediateDirectory)/src_LineInfoOverlay$(ObjectSuffix) $(IntermediateDirectory)/src_SectorInfoOverlay$(ObjectSuffix) $(IntermediateDirectory)/src_ThingInfoOverlay$(ObjectSuffix) \
@@ -229,14 +229,6 @@ $(IntermediateDirectory)/src_MapDisplayPrefsPanel$(DependSuffix): src/MapDisplay
 
 $(IntermediateDirectory)/src_MapDisplayPrefsPanel$(PreprocessSuffix): src/MapDisplayPrefsPanel.cpp
 	@$(CompilerName) $(CmpOptions) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_MapDisplayPrefsPanel$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/MapDisplayPrefsPanel.cpp"
-
-$(IntermediateDirectory)/src_Drawing$(ObjectSuffix): src/Drawing.cpp $(IntermediateDirectory)/src_Drawing$(DependSuffix)
-	$(CompilerName) $(IncludePCH) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/Drawing.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_Drawing$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/src_Drawing$(DependSuffix): src/Drawing.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_Drawing$(ObjectSuffix) -MF$(IntermediateDirectory)/src_Drawing$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/Drawing.cpp"
-
-$(IntermediateDirectory)/src_Drawing$(PreprocessSuffix): src/Drawing.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_Drawing$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/Drawing.cpp"
 
 $(IntermediateDirectory)/src_AdvancedPrefsPanel$(ObjectSuffix): src/AdvancedPrefsPanel.cpp $(IntermediateDirectory)/src_AdvancedPrefsPanel$(DependSuffix)
 	$(CompilerName) $(IncludePCH) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/AdvancedPrefsPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_AdvancedPrefsPanel$(ObjectSuffix) $(IncludePath)
@@ -445,6 +437,14 @@ $(IntermediateDirectory)/src_ColourConfiguration$(DependSuffix): src/ColourConfi
 
 $(IntermediateDirectory)/src_ColourConfiguration$(PreprocessSuffix): src/ColourConfiguration.cpp
 	@$(CompilerName) $(CmpOptions) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ColourConfiguration$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/ColourConfiguration.cpp"
+
+$(IntermediateDirectory)/src_Drawing$(ObjectSuffix): src/Drawing.cpp $(IntermediateDirectory)/src_Drawing$(DependSuffix)
+	$(CompilerName) $(IncludePCH) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/Drawing.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_Drawing$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_Drawing$(DependSuffix): src/Drawing.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_Drawing$(ObjectSuffix) -MF$(IntermediateDirectory)/src_Drawing$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/Drawing.cpp"
+
+$(IntermediateDirectory)/src_Drawing$(PreprocessSuffix): src/Drawing.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_Drawing$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/Drawing.cpp"
 
 $(IntermediateDirectory)/src_AnimatedEntryPanel$(ObjectSuffix): src/AnimatedEntryPanel.cpp $(IntermediateDirectory)/src_AnimatedEntryPanel$(DependSuffix)
 	$(CompilerName) $(IncludePCH) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/AnimatedEntryPanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_AnimatedEntryPanel$(ObjectSuffix) $(IncludePath)
@@ -1687,9 +1687,6 @@ clean:
 	$(RM) $(IntermediateDirectory)/src_MapDisplayPrefsPanel$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/src_MapDisplayPrefsPanel$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/src_MapDisplayPrefsPanel$(PreprocessSuffix)
-	$(RM) $(IntermediateDirectory)/src_Drawing$(ObjectSuffix)
-	$(RM) $(IntermediateDirectory)/src_Drawing$(DependSuffix)
-	$(RM) $(IntermediateDirectory)/src_Drawing$(PreprocessSuffix)
 	$(RM) $(IntermediateDirectory)/src_AdvancedPrefsPanel$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/src_AdvancedPrefsPanel$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/src_AdvancedPrefsPanel$(PreprocessSuffix)
@@ -1768,6 +1765,9 @@ clean:
 	$(RM) $(IntermediateDirectory)/src_ColourConfiguration$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/src_ColourConfiguration$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/src_ColourConfiguration$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/src_Drawing$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/src_Drawing$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/src_Drawing$(PreprocessSuffix)
 	$(RM) $(IntermediateDirectory)/src_AnimatedEntryPanel$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/src_AnimatedEntryPanel$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/src_AnimatedEntryPanel$(PreprocessSuffix)
