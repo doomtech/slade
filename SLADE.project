@@ -43,6 +43,9 @@
       <File Name="src/MapEditorPrefsPanel.cpp"/>
       <File Name="src/MapDisplayPrefsPanel.h"/>
       <File Name="src/MapDisplayPrefsPanel.cpp"/>
+      <File Name="src/Drawing.cpp"/>
+      <File Name="src/AdvancedPrefsPanel.cpp"/>
+      <File Name="src/AdvancedPrefsPanel.h"/>
     </VirtualDirectory>
     <File Name="src/ExtMessageDialog.h"/>
     <File Name="src/ExtMessageDialog.cpp"/>
@@ -101,7 +104,6 @@
     <File Name="src/MIDIPlayer.cpp"/>
     <File Name="src/SAction.cpp"/>
     <File Name="src/SAction.h"/>
-    <File Name="src/Drawing.cpp"/>
     <File Name="src/Drawing.h"/>
     <File Name="src/KeyBind.cpp"/>
     <File Name="src/KeyBind.h"/>
@@ -501,7 +503,7 @@
       <Compiler Options="-g;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=yes);`pkg-config --cflags gtk+-2.0`" C_Options="-g;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=yes)" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
         <Preprocessor Value="__WX__"/>
       </Compiler>
-      <Linker Options="$(shell wx-config --debug=yes --libs std,gl,stc,aui,ribbon --unicode=yes)" Required="yes">
+      <Linker Options="$(shell wx-config --debug=yes --libs std,gl,stc,aui,propgrid --unicode=yes)" Required="yes">
         <Library Value="sfml-system"/>
         <Library Value="sfml-audio"/>
         <Library Value="sfml-window"/>
@@ -510,15 +512,7 @@
       <ResourceCompiler Options="$(shell wx-config --rcflags)" Required="no"/>
       <General OutputFile="./dist/slade-dbg" IntermediateDirectory="./Debug" Command="./slade-dbg" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
-        <![CDATA[
-      
-      
-      
-      
-      
-      
-      
-      ]]>
+        <![CDATA[]]>
       </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
         <PostConnectCommands/>
@@ -563,6 +557,8 @@
       
       
       
+      
+      
       ]]>
       </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
@@ -596,7 +592,7 @@
         <Preprocessor Value="__WX__"/>
         <Preprocessor Value="NDEBUG"/>
       </Compiler>
-      <Linker Options="$(shell wx-config --debug=no --libs std,gl,stc,aui,ribbon --unicode=yes)" Required="yes">
+      <Linker Options="$(shell wx-config --debug=no --libs std,gl,stc,aui,propgrid --unicode=yes)" Required="yes">
         <Library Value="sfml-system"/>
         <Library Value="sfml-audio"/>
         <Library Value="sfml-window"/>
@@ -647,6 +643,8 @@
       <General OutputFile="./dist/SLADE.app/Contents/MacOS/SLADE" IntermediateDirectory="./Release" Command="./dist/SLADE.app/Contents/MacOS/SLADE" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[
+      
+      
       
       
       

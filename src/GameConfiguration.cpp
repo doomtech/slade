@@ -10,6 +10,7 @@
 #include "Console.h"
 #include "Archive.h"
 #include "ArchiveManager.h"
+#include "SLADEMap.h"
 #include <wx/textfile.h>
 #include <wx/filename.h>
 
@@ -297,6 +298,10 @@ bool GameConfiguration::readConfiguration(string& cfg, string source) {
 		// Game filter
 		else if (S_CMPNOCASE(node->getName(), "game_filter"))
 			game_filter = node->getStringValue();
+
+		// Boom extensions
+		else if (S_CMPNOCASE(node->getName(), "boom"))
+			boom = node->getBoolValue();
 	}
 
 	// Go through all other config sections
@@ -344,6 +349,34 @@ bool GameConfiguration::readConfiguration(string& cfg, string source) {
 			}
 		}
 
+		// Line triggers section
+		else if (S_CMPNOCASE(node->getName(), "line_triggers")) {
+			for (unsigned c = 0; c < node->nChildren(); c++) {
+				ParseTreeNode* value = (ParseTreeNode*)node->getChild(c);
+
+				// Check for 'trigger' type
+				if (!(S_CMPNOCASE(value->getType(), "trigger")))
+					continue;
+
+				long flag_val;
+				value->getName().ToLong(&flag_val);
+
+				// Check if the flag value already exists
+				bool exists = false;
+				for (unsigned f = 0; f < triggers_line.size(); f++) {
+					if (triggers_line[f].flag == flag_val) {
+						exists = true;
+						triggers_line[f].name = value->getStringValue();
+						break;
+					}
+				}
+
+				// Add flag otherwise
+				if (!exists)
+					triggers_line.push_back(flag_t(flag_val, value->getStringValue()));
+			}
+		}
+
 		// Thing flags section
 		else if (S_CMPNOCASE(node->getName(), "thing_flags")) {
 			for (unsigned c = 0; c < node->nChildren(); c++) {
@@ -372,16 +405,33 @@ bool GameConfiguration::readConfiguration(string& cfg, string source) {
 			}
 		}
 
-		// Sector flags section
-		else if (S_CMPNOCASE(node->getName(), "sector_flags")) {
+		// Sector types section
+		else if (S_CMPNOCASE(node->getName(), "sector_types")) {
 			for (unsigned c = 0; c < node->nChildren(); c++) {
 				ParseTreeNode* value = (ParseTreeNode*)node->getChild(c);
 
-				// TODO: stuff
+				// Check for 'type'
+				if (!(S_CMPNOCASE(value->getType(), "type")))
+					continue;
+
+				long type_val;
+				value->getName().ToLong(&type_val);
+
+				// Check if the sector type already exists
+				bool exists = false;
+				for (unsigned t = 0; t < sector_types.size(); t++) {
+					if (sector_types[t].type == type_val) {
+						exists = true;
+						sector_types[t].name = value->getStringValue();
+						break;
+					}
+				}
+
+				// Add type otherwise
+				if (!exists)
+					sector_types.push_back(sectype_t(type_val, value->getStringValue()));
 			}
 		}
-
-
 
 		// Unknown/unexpected section
 		else
@@ -474,7 +524,14 @@ string GameConfiguration::thingFlagsString(int flags) {
 	return ret;
 }
 
-string GameConfiguration::lineFlagsString(int flags) {
+string GameConfiguration::lineFlagsString(MapLine* line) {
+	if (!line)
+		return "";
+
+	// Get raw flags
+	int flags = line->prop("flags");
+	// TODO: UDMF flags
+
 	// Check against all flags
 	string ret = "";
 	for (unsigned a = 0; a < flags_line.size(); a++) {
@@ -490,6 +547,112 @@ string GameConfiguration::lineFlagsString(int flags) {
 		ret.RemoveLast(2);
 
 	return ret;
+}
+
+string GameConfiguration::spacTriggerString(MapLine* line) {
+	if (!line)
+		return "";
+
+	// Get raw flags
+	int flags = line->prop("flags");
+	// TODO: UDMF flags
+
+	// Get SPAC trigger value from flags
+	int trigger = ((flags & 0x1c00) >> 10);
+
+	// Find matching trigger name
+	for (unsigned a = 0; a < triggers_line.size(); a++) {
+		if (triggers_line[a].flag == trigger)
+			return triggers_line[a].name;
+	}
+
+	// Unknown trigger
+	return "Unknown";
+}
+
+string GameConfiguration::sectorTypeName(int type) {
+	// Check for zero type
+	if (type == 0)
+		return "Normal";
+
+	// Deal with generalised flags
+	vector<string> gen_flags;
+	if (boom) {
+		// Check what the map format is (the flag bits differ between doom/hexen format)
+		if (map_format == MAP_DOOM && type >= 32) {
+			// Damage flags
+			if (type & 96)
+				gen_flags.push_back("10/20% Damage");
+			else if (type & 32)
+				gen_flags.push_back("2/5% Damage");
+			else if (type & 64)
+				gen_flags.push_back("5/10% Damage");
+
+			// Secret
+			if (type & 128)
+				gen_flags.push_back("Secret");
+
+			// Friction
+			if (type & 256)
+				gen_flags.push_back("Friction Enabled");
+
+			// Pushers/Pullers
+			if (type & 512)
+				gen_flags.push_back("Pushers/Pullers Enabled");
+
+			// Remove flag bits from type value
+			type = type & 31;
+		}
+		else if (type >= 256) {
+			// Damage flags
+			if (type & 768)
+				gen_flags.push_back("10/20% Damage");
+			else if (type & 256)
+				gen_flags.push_back("2/5% Damage");
+			else if (type & 512)
+				gen_flags.push_back("5/10% Damage");
+
+			// Secret
+			if (type & 1024)
+				gen_flags.push_back("Secret");
+
+			// Friction
+			if (type & 2056)
+				gen_flags.push_back("Friction Enabled");
+
+			// Pushers/Pullers
+			if (type & 4096)
+				gen_flags.push_back("Pushers/Pullers Enabled");
+
+			// Remove flag bits from type value
+			type = type & 255;
+		}
+	}
+
+	// Check if the type only has generalised flags
+	if (type == 0 && gen_flags.size() > 0) {
+		// Just return flags in this case
+		string name = gen_flags[0];
+		for (unsigned a = 1; a < gen_flags.size(); a++)
+			name += S_FMT(" + %s", CHR(gen_flags[a]));
+
+		return name;
+	}
+
+	// Go through sector types
+	string name = "Unknown";
+	for (unsigned a = 0; a < sector_types.size(); a++) {
+		if (sector_types[a].type == type) {
+			name = sector_types[a].name;
+			break;
+		}
+	}
+
+	// Add generalised flags to type name
+	for (unsigned a = 0; a < gen_flags.size(); a++)
+		name += S_FMT(" + %s", CHR(gen_flags[a]));
+
+	return name;
 }
 
 

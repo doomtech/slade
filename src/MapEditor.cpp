@@ -104,12 +104,11 @@ bool MapEditor::updateHilight(fpoint2_t mouse_pos, double dist_scale) {
 				map.getSectorsByTag(tag, tagged_sectors);
 
 			// Backside sector (for local doors)
-			else if (needs_tag == AS_TT_SECTOR_BACK || needs_tag == AS_TT_SECTOR_AND_BACK && line->s2())
+			else if ((needs_tag == AS_TT_SECTOR_BACK || needs_tag == AS_TT_SECTOR_AND_BACK) && line->s2())
 				tagged_sectors.push_back(line->s2()->getSector());
 
 			// Sector tag *or* backside sector (for zdoom local doors)
 			else if (needs_tag == AS_TT_SECTOR_OR_BACK) {
-				vector<MapSector*> tagged_sectors;
 				if (tag > 0)
 					map.getSectorsByTag(tag, tagged_sectors);
 				else if (line->s2())

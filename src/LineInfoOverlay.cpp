@@ -32,8 +32,12 @@ void LineInfoOverlay::update(MapLine* line) {
 	if (line->props().propertyExists("macro")) {
 		int macro = line->prop("macro").getIntValue();
 		info.push_back(S_FMT("Macro: #%d", macro));
-	} else 
+	} else
 		info.push_back(S_FMT("Special: %d (%s)", as_id, CHR(theGameConfiguration->actionSpecialName(as_id))));
+
+	// Line trigger
+	if (theGameConfiguration->getMapFormat() == MAP_HEXEN || theGameConfiguration->getMapFormat() == MAP_UDMF)
+		info.push_back(S_FMT("Trigger: %s", CHR(theGameConfiguration->spacTriggerString(line))));
 
 	// Line args (or sector tag)
 	if (theGameConfiguration->getMapFormat() == MAP_HEXEN || theGameConfiguration->getMapFormat() == MAP_UDMF) {
@@ -53,7 +57,7 @@ void LineInfoOverlay::update(MapLine* line) {
 		info.push_back(S_FMT("Sector Tag: %d", line->prop("arg0").getIntValue()));
 
 	// Line flags
-	info.push_back(S_FMT("Flags: %s", CHR(theGameConfiguration->lineFlagsString(line->prop("flags")))));
+	//info.push_back(S_FMT("Flags: %s", CHR(theGameConfiguration->lineFlagsString(line))));
 
 	// Front side
 	MapSide* s = line->s1();

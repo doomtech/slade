@@ -267,17 +267,8 @@ bool SLADEMap::addSide(doom64side_t& s) {
 
 bool SLADEMap::addLine(doomline_t& l) {
 	// Get relevant sides
-	MapSide* s1 = NULL;
-	MapSide* s2 = NULL;
-	if (sides.size() > 32767) {
-		// Support for > 32768 sides
-		if (l.side1 != -1) s1 = getSide(static_cast<unsigned short>(l.side1));
-		if (l.side2 != -1) s2 = getSide(static_cast<unsigned short>(l.side2));
-	}
-	else {
-		s1 = getSide(l.side1);
-		s2 = getSide(l.side2);
-	}
+	MapSide* s1 = getSide(l.side1);
+	MapSide* s2 = getSide(l.side2);
 
 	// Get relevant vertices
 	MapVertex* v1 = getVertex(l.vertex1);
@@ -287,6 +278,7 @@ bool SLADEMap::addLine(doomline_t& l) {
 	if (!v1 || !v2)
 		return false;
 
+/*
 	// Check if side1 already belongs to a line
 	if (s1 && s1->parent) {
 		// Duplicate side
@@ -301,6 +293,7 @@ bool SLADEMap::addLine(doomline_t& l) {
 		s2->setSector(s2->getSector());
 		sides.push_back(s2);
 	}
+*/
 
 	// Create line
 	MapLine* nl = new MapLine(v1, v2, s1, s2);
@@ -309,20 +302,6 @@ bool SLADEMap::addLine(doomline_t& l) {
 	nl->prop("arg0") = l.sector_tag;
 	nl->prop("special") = l.type;
 	nl->prop("flags") = l.flags;
-
-	// Flags
-	/*
-	nl->prop("blocking") = ((l.flags & LINE_IMPASSIBLE) != 0);
-	nl->prop("blockmonsters") = ((l.flags & LINE_BLOCKMONSTERS) != 0);
-	nl->prop("twosided") = ((l.flags & LINE_TWOSIDED) != 0);
-	nl->prop("dontpegtop") = ((l.flags & LINE_UPPERUNPEGGED) != 0);
-	nl->prop("dontpegbottom") = ((l.flags & LINE_LOWERUNPEGGED) != 0);
-	nl->prop("secret") = ((l.flags & LINE_SECRET) != 0);
-	nl->prop("blocksound") = ((l.flags & LINE_BLOCKSOUND) != 0);
-	nl->prop("dontdraw") = ((l.flags & LINE_NOTONMAP) != 0);
-	nl->prop("mapped") = ((l.flags & LINE_STARTONMAP) != 0);
-	nl->prop("passuse") = ((l.flags & LINE_BPASSTHROUGH) != 0);
-	*/
 
 	// Add line
 	lines.push_back(nl);
@@ -377,11 +356,6 @@ bool SLADEMap::addLine(doom64line_t& l) {
 		nl->prop("special") = l.type & 0xFF;
 	nl->prop("flags") = (int)l.flags;
 	nl->prop("extraflags") = l.type >> 9;
-
-	// Flags
-	/*
-	later
-	*/
 
 	// Add line
 	lines.push_back(nl);

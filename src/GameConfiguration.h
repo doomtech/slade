@@ -15,10 +15,12 @@ WX_DECLARE_HASH_MAP(int, tt_t, wxIntegerHash, wxIntegerEqual, ThingTypeMap);
 
 class ParseTreeNode;
 class ArchiveEntry;
+class MapLine;
 class GameConfiguration {
 private:
 	string			name;
 	int				map_format;
+	bool			boom;
 	string			game_filter;
 	ASpecialMap		action_specials;
 	ThingTypeMap	thing_types;
@@ -34,14 +36,24 @@ private:
 	};
 	vector<flag_t>	flags_thing;
 	vector<flag_t>	flags_line;
-	
+	vector<flag_t>	triggers_line;
+
+	// Sector types
+	struct sectype_t {
+		int		type;
+		string	name;
+		sectype_t() { type = -1; name = "Unknown"; }
+		sectype_t(int type, string name) { this->type = type; this->name = name; }
+	};
+	vector<sectype_t>	sector_types;
+
 	// Singleton instance
 	static GameConfiguration*	instance;
-	
+
 public:
 	GameConfiguration();
 	~GameConfiguration();
-	
+
 	// Singleton implementation
 	static GameConfiguration* getInstance() {
 		if (!instance)
@@ -58,7 +70,7 @@ public:
 	// Config #include handling
 	void	buildConfig(string filename, string& out);
 	void	buildConfig(ArchiveEntry* entry, string& out);
-	
+
 	// Configuration reading
 	void	readActionSpecials(ParseTreeNode* node, ActionSpecial* group_defaults = NULL);
 	void	readThingTypes(ParseTreeNode* node, ThingType* group_defaults = NULL);
@@ -72,12 +84,16 @@ public:
 	string			actionSpecialName(int special);
 
 	// Thing types
-	ThingType*		thingType(unsigned type);
+	ThingType*	thingType(unsigned type);
 
 	// Flags
-	string		thingFlagsString(int flags);
-	string		lineFlagsString(int flags);
-	
+	string	thingFlagsString(int flags);
+	string	lineFlagsString(MapLine* line);
+	string	spacTriggerString(MapLine* line);
+
+	// Sector types
+	string	sectorTypeName(int type);
+
 	// Testing
 	void	dumpActionSpecials();
 	void	dumpThingTypes();

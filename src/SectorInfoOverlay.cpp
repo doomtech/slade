@@ -6,6 +6,7 @@
 #include "Drawing.h"
 #include "MapEditorWindow.h"
 #include "ColourConfiguration.h"
+#include "GameConfiguration.h"
 
 SectorInfoOverlay::SectorInfoOverlay() {
 }
@@ -20,7 +21,9 @@ void SectorInfoOverlay::update(MapSector* sector) {
 	info.clear();
 
 	// Info (index + type)
-	info.push_back(S_FMT("Sector #%d (Type %d)", sector->getIndex(), sector->prop("special").getIntValue()));
+	int t = sector->prop("special").getIntValue();
+	string type = S_FMT("%s (Type %d)", CHR(theGameConfiguration->sectorTypeName(t)), t);
+	info.push_back(S_FMT("Sector #%d: %s", sector->getIndex(), CHR(type)));
 
 	// Height
 	int fh = sector->prop("heightfloor");
