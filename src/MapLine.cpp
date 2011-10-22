@@ -12,6 +12,7 @@ MapLine::MapLine(MapVertex* v1, MapVertex* v2, MapSide* s1, MapSide* s2) {
 	vertex2 = v2;
 	side1 = s1;
 	side2 = s2;
+	length = -1;
 
 	// Connect to vertices
 	if (v1) v1->connectLine(this);
@@ -26,7 +27,13 @@ double MapLine::getLength() {
 	if (!vertex1 || !vertex2)
 		return -1;
 
-	return MathStuff::distance(vertex1->xPos(), vertex1->yPos(), vertex2->xPos(), vertex2->yPos());
+	if (length < 0) {
+		length = MathStuff::distance(vertex1->xPos(), vertex1->yPos(), vertex2->xPos(), vertex2->yPos());
+		ca = (vertex2->xPos() - vertex1->xPos()) / length;
+		sa = (vertex2->yPos() - vertex1->yPos()) / length;
+	}
+
+	return length;
 }
 
 bool MapLine::doubleSector() {

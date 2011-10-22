@@ -476,7 +476,7 @@ void MapCanvas::draw() {
 			renderer_2d->renderThingHilight(editor->hilightItem(), anim_flash_level);
 	}
 
-	
+
 	// Draw tagged sectors/lines/things if needed
 	if (editor->taggedSectors().size() > 0)
 		renderer_2d->renderTaggedFlats(editor->taggedSectors(), anim_flash_level);

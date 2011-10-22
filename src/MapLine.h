@@ -65,6 +65,11 @@ private:
 	MapSide*	side1;
 	MapSide*	side2;
 
+	// Internally used info
+	double	length;
+	double	ca;
+	double	sa;
+
 	// Properties
 	PropertyList	udmf_props;
 

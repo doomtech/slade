@@ -278,7 +278,6 @@ bool SLADEMap::addLine(doomline_t& l) {
 	if (!v1 || !v2)
 		return false;
 
-/*
 	// Check if side1 already belongs to a line
 	if (s1 && s1->parent) {
 		// Duplicate side
@@ -293,7 +292,6 @@ bool SLADEMap::addLine(doomline_t& l) {
 		s2->setSector(s2->getSector());
 		sides.push_back(s2);
 	}
-*/
 
 	// Create line
 	MapLine* nl = new MapLine(v1, v2, s1, s2);
@@ -1241,56 +1239,49 @@ int SLADEMap::nearestVertex(double x, double y, double min) {
 	return index;
 }
 
-int SLADEMap::nearestLine(double x, double y, double min) {
+double SLADEMap::fastDistanceToLine(double x, double y, unsigned line, double mindist) {
+	MapLine* l = lines[line];
+
+	// Check with line bounding box first (since we have a minimum distance)
+	if (x < min(l->vertex1->x, l->vertex2->x) - mindist || x > max(l->vertex1->x, l->vertex2->x) + mindist ||
+		y < min(l->vertex1->y, l->vertex2->y) - mindist || y > max(l->vertex1->y, l->vertex2->y) + mindist)
+		return mindist+1;
+
+	// Calculate intersection point
+	double len = l->getLength();
+	double mx, ix, iy;
+	mx = (-l->vertex1->x+x)*l->ca + (-l->vertex1->y+y)*l->sa;
+	if (mx <= 0) {
+		ix = l->vertex1->x;
+		iy = l->vertex1->y;
+	}
+	else if (mx >= len) {
+		ix = l->vertex2->x;
+		iy = l->vertex2->y;
+	}
+	else {
+		ix = l->vertex1->x + mx*l->ca;
+		iy = l->vertex1->y + mx*l->sa;
+	}
+
+	// Calculate distance to line
+	return sqrt((ix-x)*(ix-x) + (iy-y)*(iy-y));
+}
+
+int SLADEMap::nearestLine(double x, double y, double mindist) {
 	// Go through lines
-	double min_dist = 999999999;
-	MapLine* l = NULL;
+	double min_dist = mindist;
 	double dist = 0;
-	double x1, y1, x2, y2, len, u, lbound, ix, iy;
 	int index = -1;
 	for (unsigned a = 0; a < lines.size(); a++) {
-		// Get line and some values
-		l = lines[a];
-		x1 = l->vertex1->x;
-		y1 = l->vertex1->y;
-		x2 = l->vertex2->x;
-		y2 = l->vertex2->y;
-
-		// Get line length
-		len = sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1));
-
-		// Calculate intersection distance
-		u = 0;
-		if (len > 0) {
-			u = ((x-x1)*(x2-x1) + (y-y1)*(y2-y1)) / (len*len);
-
-			// Limit intersection distance to the line
-			lbound = 1 / len;
-			if(u < lbound) u = lbound;
-			if(u > (1.0-lbound)) u = 1.0-lbound;
-		}
-
-		// Calculate intersection point
-		ix = x1 + u*(x2 - x1);
-		iy = y1 + u*(y2 - y1);
-
-		// Calculate 'quick' distance to line
-		dist = (ix-x)*(ix-x) + (iy-y)*(iy-y);
+		// Calculate distance to line (fast)
+		dist = fastDistanceToLine(x, y, a, min_dist);
 
 		// Check if it's nearer than the previous nearest
-		if (dist < min_dist) {
+		if (dist < min_dist && dist < mindist) {
 			index = a;
 			min_dist = dist;
 		}
-	}
-
-	// Now determine the real distance to the closest line,
-	// to check for minimum hilight distance
-	if (index >= 0) {
-		l = lines[index];
-		double rdist = MathStuff::distanceToLine(x, y, l->vertex1->x, l->vertex1->y, l->vertex2->x, l->vertex2->y);
-		if (rdist > min)
-			return -1;
 	}
 
 	return index;
@@ -1359,12 +1350,27 @@ vector<int> SLADEMap::nearestThingMulti(double x, double y) {
 }
 
 int SLADEMap::inSector(double x, double y) {
-	// First, get nearest line
-	int index = nearestLine(x, y, 999999999);
+	// Go through sectors
+	double min_dist = 9999999999;
+	int index = -1;
+	for (unsigned a = 0; a < sectors.size(); a++) {
+		// Check with sector bbox
+		if (!sectors[a]->boundingBox().point_within(x, y))
+			continue;
 
-	// If there are no lines there can't be any (selectable) sectors
-	if (index < 0)
-		return -1;
+		// Go through sector sides
+		for (unsigned s = 0; s < sectors[a]->connected_sides.size(); s++) {
+			// Determine distance to side's parent line
+			int line_index = sectors[a]->connected_sides[s]->parent->index;
+			double dist = fastDistanceToLine(x, y, line_index, min_dist);
+
+			// Check if it's the closest line so far
+			if (dist < min_dist) {
+				min_dist = dist;
+				index = line_index;
+			}
+		}
+	}
 
 	// Check what side of the line the point is on
 	MapLine* l = lines[index];

@@ -28,6 +28,7 @@ CVAR(String, game_configuration, "", CVAR_SAVE)
 
 GameConfiguration::GameConfiguration() {
 	game_filter = "";
+	udmf_namespace = "";
 	ttype_unknown.icon = "unknown";
 	ttype_unknown.shrink = true;
 }
@@ -239,6 +240,43 @@ void GameConfiguration::readThingTypes(ParseTreeNode* node, ThingType* group_def
 	delete tt_defaults;
 }
 
+void GameConfiguration::readUDMFProperties(ParseTreeNode* block, vector<UDMFProperty>& plist) {
+	// Read block properties
+	for (unsigned a = 0; a < block->nChildren(); a++) {
+		ParseTreeNode* group = (ParseTreeNode*)block->getChild(a);
+
+		// Group definition
+		if (S_CMPNOCASE(group->getType(), "group")) {
+			string groupname = group->getName();
+
+			// Go through the group
+			for (unsigned b = 0; b < group->nChildren(); b++) {
+				ParseTreeNode* def = (ParseTreeNode*)group->getChild(b);
+
+				if (S_CMPNOCASE(def->getType(), "property")) {
+					// Check if the property already exists
+					bool exists = false;
+					for (unsigned p = 0; p < plist.size(); p++) {
+						if (plist[p].getProperty() == def->getName()) {
+							plist[p].parse(group, groupname);	// Parse group defaults
+							plist[p].parse(def, groupname);		// Parse property definition
+							exists = true;
+							break;
+						}
+					}
+
+					// Create property if it didn't exist
+					if (!exists) {
+						plist.push_back(UDMFProperty());
+						plist.back().parse(group, groupname);
+						plist.back().parse(def, groupname);
+					}
+				}
+			}
+		}
+	}
+}
+
 bool GameConfiguration::readConfiguration(string& cfg, string source) {
 	// Testing
 	MemChunk mc;
@@ -302,6 +340,10 @@ bool GameConfiguration::readConfiguration(string& cfg, string source) {
 		// Boom extensions
 		else if (S_CMPNOCASE(node->getName(), "boom"))
 			boom = node->getBoolValue();
+
+		// UDMF namespace
+		else if (S_CMPNOCASE(node->getName(), "udmf_namespace"))
+			udmf_namespace = node->getStringValue();
 	}
 
 	// Go through all other config sections
@@ -431,6 +473,29 @@ bool GameConfiguration::readConfiguration(string& cfg, string source) {
 				if (!exists)
 					sector_types.push_back(sectype_t(type_val, value->getStringValue()));
 			}
+		}
+
+		// UDMF properties section
+		else if (S_CMPNOCASE(node->getName(), "udmf_properties")) {
+			// Parse vertex block properties (if any)
+			ParseTreeNode* block = (ParseTreeNode*)node->getChild("vertex");
+			if (block) readUDMFProperties(block, udmf_vertex_props);
+
+			// Parse linedef block properties (if any)
+			block = (ParseTreeNode*)node->getChild("linedef");
+			if (block) readUDMFProperties(block, udmf_linedef_props);
+
+			// Parse sidedef block properties (if any)
+			block = (ParseTreeNode*)node->getChild("sidedef");
+			if (block) readUDMFProperties(block, udmf_sidedef_props);
+
+			// Parse sector block properties (if any)
+			block = (ParseTreeNode*)node->getChild("sector");
+			if (block) readUDMFProperties(block, udmf_sector_props);
+
+			// Parse thing block properties (if any)
+			block = (ParseTreeNode*)node->getChild("thing");
+			if (block) readUDMFProperties(block, udmf_thing_props);
 		}
 
 		// Unknown/unexpected section
@@ -682,6 +747,28 @@ void GameConfiguration::dumpValidMapNames() {
 		wxLogMessage(map_names[a]);
 }
 
+void GameConfiguration::dumpUDMFProperties() {
+	// Vertex
+	for (unsigned a = 0; a < udmf_vertex_props.size(); a++)
+		wxLogMessage(udmf_vertex_props[a].getStringRep());
+
+	// Line
+	for (unsigned a = 0; a < udmf_linedef_props.size(); a++)
+		wxLogMessage(udmf_linedef_props[a].getStringRep());
+
+	// Side
+	for (unsigned a = 0; a < udmf_sidedef_props.size(); a++)
+		wxLogMessage(udmf_sidedef_props[a].getStringRep());
+
+	// Sector
+	for (unsigned a = 0; a < udmf_sector_props.size(); a++)
+		wxLogMessage(udmf_sector_props[a].getStringRep());
+
+	// Thing
+	for (unsigned a = 0; a < udmf_thing_props.size(); a++)
+		wxLogMessage(udmf_thing_props[a].getStringRep());
+}
+
 
 CONSOLE_COMMAND(testgc, 0) {
 	string game = "doom1";
@@ -694,4 +781,8 @@ CONSOLE_COMMAND(testgc, 0) {
 
 CONSOLE_COMMAND(dumpactionspecials, 0) {
 	theGameConfiguration->dumpActionSpecials();
+}
+
+CONSOLE_COMMAND(dumpudmfprops, 0) {
+	theGameConfiguration->dumpUDMFProperties();
 }

@@ -4,6 +4,8 @@
 
 #include "ActionSpecial.h"
 #include "ThingType.h"
+#include "UDMFProperty.h"
+
 struct tt_t {
 	ThingType* type;
 	tt_t(ThingType* type = NULL) { this->type = type; }
@@ -20,6 +22,7 @@ class GameConfiguration {
 private:
 	string			name;
 	int				map_format;
+	string			udmf_namespace;
 	bool			boom;
 	string			game_filter;
 	ASpecialMap		action_specials;
@@ -46,6 +49,13 @@ private:
 		sectype_t(int type, string name) { this->type = type; this->name = name; }
 	};
 	vector<sectype_t>	sector_types;
+
+	// UDMF properties
+	vector<UDMFProperty>	udmf_vertex_props;
+	vector<UDMFProperty>	udmf_linedef_props;
+	vector<UDMFProperty>	udmf_sidedef_props;
+	vector<UDMFProperty>	udmf_sector_props;
+	vector<UDMFProperty>	udmf_thing_props;
 
 	// Singleton instance
 	static GameConfiguration*	instance;
@@ -74,6 +84,7 @@ public:
 	// Configuration reading
 	void	readActionSpecials(ParseTreeNode* node, ActionSpecial* group_defaults = NULL);
 	void	readThingTypes(ParseTreeNode* node, ThingType* group_defaults = NULL);
+	void	readUDMFProperties(ParseTreeNode* node, vector<UDMFProperty>& plist);
 	bool	readConfiguration(string& cfg, string source = "");
 	bool 	open(string filename);
 	bool	open(ArchiveEntry* entry);
@@ -98,6 +109,7 @@ public:
 	void	dumpActionSpecials();
 	void	dumpThingTypes();
 	void	dumpValidMapNames();
+	void	dumpUDMFProperties();
 };
 
 // Define for less cumbersome GameConfiguration::getInstance()

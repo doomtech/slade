@@ -102,6 +102,7 @@ public:
 	bool	readUDMFMap(Archive::mapdesc_t map);
 
 	// Geometry
+	double		fastDistanceToLine(double x, double y, unsigned line, double mindist = 64);
 	int			nearestVertex(double x, double y, double min = 64);
 	int			nearestLine(double x, double y, double min = 64);
 	int			nearestThing(double x, double y, double min = 64);

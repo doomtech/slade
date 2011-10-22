@@ -209,6 +209,8 @@
       <File Name="src/ThingType.h"/>
       <File Name="src/ThingType.cpp"/>
       <File Name="src/Args.h"/>
+      <File Name="src/UDMFProperty.h"/>
+      <File Name="src/UDMFProperty.cpp"/>
     </VirtualDirectory>
     <File Name="src/MapRenderer2D.cpp"/>
     <File Name="src/MapRenderer2D.h"/>
