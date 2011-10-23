@@ -32,6 +32,7 @@
 #include "Parser.h"
 #include "MathStuff.h"
 #include "ResourceManager.h"
+#include "MainApp.h"
 
 SLADEMap::SLADEMap() {
 	// Init variables
@@ -40,6 +41,7 @@ SLADEMap::SLADEMap() {
 	this->i_sectors = false;
 	this->i_vertices = false;
 	this->i_things = false;
+	this->geometry_updated = 0;
 }
 
 SLADEMap::~SLADEMap() {
@@ -408,20 +410,6 @@ bool SLADEMap::addThing(doomthing_t& t) {
 	nt->prop("angle") = t.angle;
 	nt->prop("flags") = t.flags;
 
-	// Flags
-	/*
-	nt->prop("skill1") = ((t.flags & THING_EASY)!=0);
-	nt->prop("skill2") = ((t.flags & THING_EASY)!=0);
-	nt->prop("skill3") = ((t.flags & THING_MEDIUM)!=0);
-	nt->prop("skill4") = ((t.flags & THING_HARD)!=0);
-	nt->prop("skill5") = ((t.flags & THING_HARD)!=0);
-	nt->prop("ambush") = ((t.flags & THING_DEAF)!=0);
-	nt->prop("single") = !((t.flags & THING_MULTI)!=0);
-	nt->prop("dm") = !((t.flags & THING_BNOTDM)!=0);
-	nt->prop("coop") = !((t.flags & THING_BNOTCOOP)!=0);
-	nt->prop("raw_flags") = t.flags;
-	*/
-
 	// Add thing
 	things.push_back(nt);
 	return true;
@@ -436,11 +424,6 @@ bool SLADEMap::addThing(doom64thing_t& t) {
 	nt->prop("z") = (double)t.z;
 	nt->prop("flags") = t.flags;
 	nt->prop("id") = t.tid;
-
-	// Flags
-	/*
-	later
-	*/
 
 	// Add thing
 	things.push_back(nt);
@@ -587,6 +570,9 @@ bool SLADEMap::readDoomMap(Archive::mapdesc_t map) {
 	for (unsigned a = 0; a < sectors.size(); a++)
 		sectors[a]->updateBBox();
 
+	// Update variables
+	geometry_updated = theApp->runTimer();
+
 	return true;
 }
 
@@ -638,21 +624,6 @@ bool SLADEMap::addLine(hexenline_t& l) {
 	nl->prop("arg4") = l.args[4];
 	nl->prop("special") = l.type;
 	nl->prop("flags") = l.flags;
-
-	// Flags
-	/*
-	nl->prop("blocking") = ((l.flags & LINE_IMPASSIBLE)!=0);
-	nl->prop("blockmonsters") = ((l.flags & LINE_BLOCKMONSTERS)!=0);
-	nl->prop("twosided") = ((l.flags & LINE_TWOSIDED)!=0);
-	nl->prop("dontpegtop") = ((l.flags & LINE_UPPERUNPEGGED)!=0);
-	nl->prop("dontpegbottom") = ((l.flags & LINE_LOWERUNPEGGED)!=0);
-	nl->prop("secret") = ((l.flags & LINE_SECRET)!=0);
-	nl->prop("blocksound") = ((l.flags & LINE_BLOCKSOUND)!=0);
-	nl->prop("dontdraw") = ((l.flags & LINE_NOTONMAP)!=0);
-	nl->prop("mapped") = ((l.flags & LINE_STARTONMAP)!=0);
-	nl->prop("repeatspecial") = ((l.flags & LINE_HREPEATABLE)!=0);
-	// TODO: SPAC stuff
-	*/
 
 	// Add line
 	lines.push_back(nl);
@@ -1502,6 +1473,8 @@ void SLADEMap::moveVertex(unsigned vertex, double nx, double ny) {
 			s2->resetBBox();
 		}
 	}
+
+	geometry_updated = theApp->runTimer();
 }
 
 int SLADEMap::removeDetachedVertices() {

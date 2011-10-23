@@ -646,7 +646,7 @@ string GameConfiguration::sectorTypeName(int type) {
 		// Check what the map format is (the flag bits differ between doom/hexen format)
 		if (map_format == MAP_DOOM && type >= 32) {
 			// Damage flags
-			if (type & 96)
+			if ((type & 96) == 96)
 				gen_flags.push_back("20% Damage");
 			else if (type & 32)
 				gen_flags.push_back("5% Damage");
@@ -670,7 +670,7 @@ string GameConfiguration::sectorTypeName(int type) {
 		}
 		else if (type >= 256) {
 			// Damage flags
-			if (type & 768)
+			if ((type & 768) == 768)
 				gen_flags.push_back("20% Damage");
 			else if (type & 256)
 				gen_flags.push_back("5% Damage");

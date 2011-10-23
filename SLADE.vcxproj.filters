@@ -738,6 +738,9 @@
     <ClCompile Include="src\AdvancedPrefsPanel.cpp">
       <Filter>Dialogs\Preferences</Filter>
     </ClCompile>
+    <ClCompile Include="src\UDMFProperty.cpp">
+      <Filter>Map Editor\GameConfiguration</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -1394,6 +1397,9 @@
     </ClInclude>
     <ClInclude Include="src\AdvancedPrefsPanel.h">
       <Filter>Dialogs\Preferences</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UDMFProperty.h">
+      <Filter>Map Editor\GameConfiguration</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

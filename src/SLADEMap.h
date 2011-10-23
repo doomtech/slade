@@ -10,6 +10,24 @@
 #include "Archive.h"
 #include "PropertyList.h"
 
+struct move_vertex_t {
+	double		x, y;
+	MapVertex*	vertex;
+	bool		moving;
+
+	move_vertex_t(MapVertex* vertex, bool moving) {
+		x = vertex->xPos();
+		y = vertex->yPos();
+		this->moving = moving;
+		this->vertex = vertex;
+	}
+};
+struct move_line_t {
+	int v1, v2;
+	rgba_t colour;
+	bool selected;
+};
+
 class ParseTreeNode;
 class SLADEMap {
 friend class MapEditor;
@@ -30,6 +48,9 @@ private:
 	bool	i_sectors;
 	bool	i_vertices;
 	bool	i_things;
+
+	// The last time the map geometry was updated
+	long	geometry_updated;
 
 	// Doom format
 	bool	addVertex(doomvertex_t& v);
@@ -82,6 +103,7 @@ public:
 	size_t		nSides() { return sides.size(); }
 	size_t		nSectors() { return sectors.size(); }
 	size_t		nThings() { return things.size(); }
+	long		geometryUpdated() { return geometry_updated; }
 
 	// Map structure indices
 	int		vertexIndex(MapVertex* v);

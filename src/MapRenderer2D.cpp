@@ -47,13 +47,9 @@ MapRenderer2D::~MapRenderer2D() {
 	if (list_lines > 0)			glDeleteLists(list_lines, 1);
 }
 
-void MapRenderer2D::renderVertices(float alpha) {
-	// Check there are any vertices to render
-	if (map->nVertices() == 0)
-		return;
-
+bool MapRenderer2D::setupVertexRendering(float size_scale) {
 	// Setup rendering properties
-	float vs = vertex_size;
+	float vs = vertex_size*size_scale;
 	if (view_scale < 1.0) vs *= view_scale;
 	if (vs < 2.0) vs = 2.0;
 	glPointSize(vs);
@@ -82,6 +78,17 @@ void MapRenderer2D::renderVertices(float alpha) {
 		else				glDisable(GL_POINT_SMOOTH);
 	}
 
+	return point;
+}
+
+void MapRenderer2D::renderVertices(float alpha) {
+	// Check there are any vertices to render
+	if (map->nVertices() == 0)
+		return;
+
+	// Setup rendering properties
+	bool point = setupVertexRendering(1.0f);
+
 	// Set to vertex colour
 	rgba_t col = ColourConfiguration::getColour("map_vertex");
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -100,7 +107,7 @@ void MapRenderer2D::renderVertices(float alpha) {
 }
 
 void MapRenderer2D::renderVerticesImmediate() {
-	if (list_vertices > 0 && map->nVertices() == n_vertices)
+	if (list_vertices > 0 && map->nVertices() == n_vertices && map->geometryUpdated() <= vertices_updated)
 		glCallList(list_vertices);
 	else {
 		list_vertices = glGenLists(1);
@@ -113,6 +120,8 @@ void MapRenderer2D::renderVerticesImmediate() {
 		glEnd();
 
 		glEndList();
+
+		vertices_updated = theApp->runTimer();
 	}
 }
 
@@ -122,7 +131,7 @@ void MapRenderer2D::renderVerticesVBO() {
 		return;
 
 	// Update vertices VBO if required
-	if (vbo_vertices == 0 || map->nVertices() != n_vertices)
+	if (vbo_vertices == 0 || map->nVertices() != n_vertices || map->geometryUpdated() > vertices_updated)
 		updateVerticesVBO();
 
 	// Setup VBO pointers
@@ -149,28 +158,7 @@ void MapRenderer2D::renderVertexHilight(int index, float fade) {
 	col.set_gl();
 
 	// Setup rendering properties
-	float vs = vertex_size*1.5f;
-	if (view_scale < 1.0) vs *= view_scale;
-	if (vs < 4.0f) vs = 4.0f;
-	glPointSize(vs);
-
-	// Setup point sprites if supported
-	bool point = false;
-	if (OpenGL::pointSpriteSupport()) {
-		// Get appropriate vertex texture
-		GLTexture* tex;
-		if (vertex_round) tex = theMapEditor->textureManager().getEditorImage("vertex_r");
-		else tex = theMapEditor->textureManager().getEditorImage("vertex_s");
-
-		// If it was found, enable point sprites
-		if (tex) {
-			glEnable(GL_TEXTURE_2D);
-			tex->bind();
-			glEnable(GL_POINT_SPRITE);
-			glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
-			point = true;
-		}
-	}
+	bool point = setupVertexRendering(2.0f);
 
 	// Draw vertex
 	glBegin(GL_POINTS);
@@ -194,28 +182,7 @@ void MapRenderer2D::renderVertexSelection(vector<int>& selection) {
 	col.set_gl();
 
 	// Setup rendering properties
-	float vs = vertex_size*1.5f;
-	if (view_scale < 1.0) vs *= view_scale;
-	if (vs < 3.0f) vs = 3.0f;
-	glPointSize(vs);
-
-	// Setup point sprites if supported
-	bool point = false;
-	if (OpenGL::pointSpriteSupport()) {
-		// Get appropriate vertex texture
-		GLTexture* tex;
-		if (vertex_round) tex = theMapEditor->textureManager().getEditorImage("vertex_r");
-		else tex = theMapEditor->textureManager().getEditorImage("vertex_s");
-
-		// If it was found, enable point sprites
-		if (tex) {
-			glEnable(GL_TEXTURE_2D);
-			tex->bind();
-			glEnable(GL_POINT_SPRITE);
-			glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
-			point = true;
-		}
-	}
+	bool point = setupVertexRendering(1.5f);
 
 	// Draw selected vertices
 	glBegin(GL_POINTS);
@@ -251,7 +218,7 @@ void MapRenderer2D::renderLines(bool show_direction) {
 
 void MapRenderer2D::renderLinesImmediate(bool show_direction) {
 	// Use display list if it's built
-	if (list_lines > 0 && show_direction == lines_dirs && map->nLines() == n_lines) {
+	if (list_lines > 0 && show_direction == lines_dirs && map->nLines() == n_lines && map->geometryUpdated() <= lines_updated) {
 		glCallList(list_lines);
 		return;
 	}
@@ -323,6 +290,7 @@ void MapRenderer2D::renderLinesImmediate(bool show_direction) {
 
 	glEndList();
 	lines_dirs = show_direction;
+	lines_updated = theApp->runTimer();
 }
 
 void MapRenderer2D::renderLinesVBO(bool show_direction) {
@@ -331,7 +299,7 @@ void MapRenderer2D::renderLinesVBO(bool show_direction) {
 		return;
 
 	// Update lines VBO if required
-	if (vbo_lines == 0 || show_direction != lines_dirs || map->nLines() != n_lines)
+	if (vbo_lines == 0 || show_direction != lines_dirs || map->nLines() != n_lines || map->geometryUpdated() > lines_updated)
 		updateLinesVBO(show_direction);
 
 	// Disable any blending
@@ -1300,6 +1268,41 @@ void MapRenderer2D::renderTaggedFlats(vector<MapSector*>& sectors, float fade) {
 		sectors[a]->getPolygon()->render();
 }
 
+void MapRenderer2D::renderMovingVertices(vector<move_vertex_t>& vertices, vector<move_line_t>& lines, bool show_verts) {
+	// Set colour
+	ColourConfiguration::getColour("map_moving").set_gl();
+
+	// Render all moving lines
+	glLineWidth(line_width);
+	glBegin(GL_LINES);
+	for (unsigned a = 0; a < lines.size(); a++) {
+		glVertex2d(vertices[lines[a].v1].x, vertices[lines[a].v1].y);
+		glVertex2d(vertices[lines[a].v2].x, vertices[lines[a].v2].y);
+	}
+	glEnd();
+
+
+	// Render moving vertices if specified
+	if (show_verts) {
+		// Setup rendering properties
+		bool point = setupVertexRendering(1.2f);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		// Draw selected vertices
+		glBegin(GL_POINTS);
+		for (unsigned a = 0; a < vertices.size(); a++) {
+			if (vertices[a].moving)
+				glVertex2d(vertices[a].x, vertices[a].y);
+		}
+		glEnd();
+	
+		if (point) {
+			glDisable(GL_POINT_SPRITE);
+			glDisable(GL_TEXTURE_2D);
+		}
+	}
+}
+
 void MapRenderer2D::updateVerticesVBO() {
 	// Create VBO if needed
 	if (vbo_vertices == 0)
@@ -1321,6 +1324,7 @@ void MapRenderer2D::updateVerticesVBO() {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	n_vertices = map->nVertices();
+	vertices_updated = theApp->runTimer();
 }
 
 void MapRenderer2D::updateLinesVBO(bool show_direction) {
@@ -1406,6 +1410,7 @@ void MapRenderer2D::updateLinesVBO(bool show_direction) {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	n_lines = map->nLines();
+	lines_updated = theApp->runTimer();
 }
 
 void MapRenderer2D::updateFlatsVBO() {
@@ -1435,6 +1440,8 @@ void MapRenderer2D::updateFlatsVBO() {
 
 	// Clean up
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	flats_updated = theApp->runTimer();
 }
 
 void MapRenderer2D::updateVisibility(fpoint2_t view_tl, fpoint2_t view_br, double view_scale) {

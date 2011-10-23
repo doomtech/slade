@@ -51,6 +51,7 @@ void Polygon2D::clear() {
 		delete subpolys[a];
 	subpolys.clear();
 	vbo_update = 2;
+	texture = NULL;
 }
 
 unsigned Polygon2D::totalVertices() {

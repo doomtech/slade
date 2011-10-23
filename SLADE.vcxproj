@@ -241,6 +241,7 @@
     <ClCompile Include="src\Translation.cpp" />
     <ClCompile Include="src\TranslationEditorDialog.cpp" />
     <ClCompile Include="src\Tree.cpp" />
+    <ClCompile Include="src\UDMFProperty.cpp" />
     <ClCompile Include="src\VertexInfoOverlay.cpp" />
     <ClCompile Include="src\VirtualListView.cpp" />
     <ClCompile Include="src\Wad2Archive.cpp" />
@@ -457,6 +458,7 @@
     <ClInclude Include="src\Translation.h" />
     <ClInclude Include="src\TranslationEditorDialog.h" />
     <ClInclude Include="src\Tree.h" />
+    <ClInclude Include="src\UDMFProperty.h" />
     <ClInclude Include="src\VertexInfoOverlay.h" />
     <ClInclude Include="src\VirtualListView.h" />
     <ClInclude Include="src\Wad2Archive.h" />

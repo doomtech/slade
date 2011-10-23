@@ -23,7 +23,15 @@ private:
 	vector<MapThing*>	tagged_things;
 
 	// Moving
-	fpoint2_t			move_origin;
+	fpoint2_t				move_origin;
+	vector<move_vertex_t>	move_vertices;
+	vector<move_line_t>		move_lines;
+	int						move_vertex_closest;
+
+	// Filtering
+	vector<int>	filter_vertices;
+	vector<int> filter_lines;
+	vector<int> filter_things;
 
 public:
 	enum {
@@ -75,11 +83,14 @@ public:
 	// Grid
 	void	incrementGrid();
 	void	decrementGrid();
+	double	snapToGrid(double position);
 
 	// Item moving
-	bool	beginMove(fpoint2_t mouse_pos);
-	void	doMove(fpoint2_t mouse_pos);
-	void	endMove();
+	bool					beginMove(fpoint2_t mouse_pos);
+	void					doMove(fpoint2_t mouse_pos);
+	void					endMove();
+	vector<move_vertex_t>&	movingVertices() { return move_vertices; }
+	vector<move_line_t>&	movingLines() { return move_lines; }
 };
 
 #endif//__MAP_EDITOR_H__

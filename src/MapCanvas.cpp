@@ -435,7 +435,10 @@ void MapCanvas::draw() {
 		if (things_always) renderer_2d->renderThings(0.5f);			// Things (faded)
 		renderer_2d->renderLines(false);							// Lines (no direction tabs)
 		renderer_2d->renderVertices(view_scale);					// Vertices
-		renderer_2d->renderVertexSelection(editor->getSelection());	// Selection
+
+		// Selection if needed
+		if (mouse_state != MSTATE_MOVE)
+			renderer_2d->renderVertexSelection(editor->getSelection());
 
 		// Hilight if needed
 		if (mouse_state == MSTATE_NORMAL)
@@ -446,7 +449,10 @@ void MapCanvas::draw() {
 		if (things_always) renderer_2d->renderThings(0.5f);			// Things (faded)
 		if (vertices_always) renderer_2d->renderVertices(0.5f);		// Vertices (faded)
 		renderer_2d->renderLines(true);								// Lines
-		renderer_2d->renderLineSelection(editor->getSelection());	// Selection
+		
+		// Selection if needed
+		if (mouse_state != MSTATE_MOVE)
+			renderer_2d->renderLineSelection(editor->getSelection());
 
 		// Hilight if needed
 		if (mouse_state == MSTATE_NORMAL)
@@ -457,7 +463,11 @@ void MapCanvas::draw() {
 		if (things_always) renderer_2d->renderThings(0.5f);			// Things (faded)
 		if (vertices_always) renderer_2d->renderVertices(0.5f);		// Vertices (faded)
 		renderer_2d->renderLines(false);							// Lines (no direction tabs)
-		renderer_2d->renderFlatSelection(editor->getSelection());	// Selection
+
+		// Selection if needed
+		if (mouse_state != MSTATE_MOVE)
+			renderer_2d->renderFlatSelection(editor->getSelection());
+
 		splitter.testRender();	// Testing
 
 		// Hilight if needed
@@ -469,7 +479,10 @@ void MapCanvas::draw() {
 		if (vertices_always) renderer_2d->renderVertices(0.5f);		// Vertices (faded)
 		renderer_2d->renderLines(false);							// Lines (no direction tabs)
 		renderer_2d->renderThings();								// Things
-		renderer_2d->renderThingSelection(editor->getSelection());	// Selection
+
+		// Selection if needed
+		if (mouse_state != MSTATE_MOVE)
+			renderer_2d->renderThingSelection(editor->getSelection());
 
 		// Hilight if needed
 		if (mouse_state == MSTATE_NORMAL)
@@ -478,7 +491,7 @@ void MapCanvas::draw() {
 
 
 	// Draw tagged sectors/lines/things if needed
-	if (editor->taggedSectors().size() > 0)
+	if (editor->taggedSectors().size() > 0 && mouse_state == MSTATE_NORMAL)
 		renderer_2d->renderTaggedFlats(editor->taggedSectors(), anim_flash_level);
 
 
@@ -523,9 +536,9 @@ void MapCanvas::draw() {
 		glVertex2d(view_br.x, view_tl.y);
 		glEnd();
 
-		if (mouse_state == MSTATE_MOVE) {
-			// Stuff
-		}
+		// Render moving objects
+		if (mouse_state == MSTATE_MOVE)
+			renderer_2d->renderMovingVertices(editor->movingVertices(), editor->movingLines(), editor->editMode() == MapEditor::MODE_VERTICES);
 	}
 
 	// Draw info overlay

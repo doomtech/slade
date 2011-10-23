@@ -46,6 +46,7 @@ public:
 	void		connectLine(MapLine* line);
 	void		disconnectLine(MapLine* line);
 	unsigned	nConnectedLines() { return connected_lines.size(); }
+	MapLine*	connectedLine(unsigned index);
 
 	PropertyList&	props()				{ return udmf_props; }
 	Property&		prop(string key)	{ return udmf_props[key]; }

@@ -2,16 +2,17 @@
 #ifndef __MAP_RENDERER_2D__
 #define __MAP_RENDERER_2D__
 
-class SLADEMap;
+#include "SLADEMap.h"
+
 class ThingType;
 class GLTexture;
-class MapSector;
-class MapLine;
-class MapThing;
 class MapRenderer2D {
 private:
 	SLADEMap*	map;
 	GLTexture*	tex_last;
+	long		vertices_updated;
+	long		lines_updated;
+	long		flats_updated;
 
 	// VBOs etc
 	GLuint	vbo_vertices;
@@ -60,6 +61,7 @@ public:
 	// Main drawing stuff
 
 	// Vertices
+	bool	setupVertexRendering(float size_scale);
 	void	renderVertices(float alpha = 1.0f);
 	void	renderVerticesVBO();
 	void	renderVerticesImmediate();
@@ -91,6 +93,9 @@ public:
 	void	renderFlatHilight(int index, float fade);
 	void	renderFlatSelection(vector<int>& selection);
 	void	renderTaggedFlats(vector<MapSector*>& sectors, float fade);
+
+	// Moving
+	void	renderMovingVertices(vector<move_vertex_t>& vertices, vector<move_line_t>& lines, bool show_verts);
 
 
 	// VBOs
