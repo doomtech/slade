@@ -23,6 +23,12 @@ CVAR(Bool, sector_hilight_fill, true, CVAR_SAVE)
 
 CVAR(Bool, test_ssplit, false, CVAR_SAVE)
 
+// Texture coordinates for rendering square things (since we can't just rotate these)
+float sq_thing_tc[] = { 0.0f, 1.0f,
+						0.0f, 0.0f,
+						1.0f, 0.0f,
+						1.0f, 1.0f };
+
 #define FORCE_NO_VBO 0
 
 MapRenderer2D::MapRenderer2D(SLADEMap* map) {
@@ -545,7 +551,7 @@ void MapRenderer2D::renderRoundThing(double x, double y, double angle, ThingType
 
 	// If for whatever reason the thing texture doesn't exist, just draw a basic, square thing
 	if (!tex) {
-		renderSquareThing(x, y, angle, tt, alpha);
+		renderSimpleSquareThing(x, y, angle, tt, alpha);
 		return;
 	}
 
@@ -654,7 +660,101 @@ bool MapRenderer2D::renderSpriteThing(double x, double y, double angle, ThingTyp
 	return show_angle;
 }
 
-void MapRenderer2D::renderSquareThing(double x, double y, double angle, ThingType* tt, float alpha, bool showang) {
+bool MapRenderer2D::renderSquareThing(double x, double y, double angle, ThingType* tt, float alpha, bool showicon) {
+	// Ignore if no type given (shouldn't happen)
+	if (!tt)
+		return false;
+
+	// --- Determine texture to use ---
+	GLTexture* tex = NULL;
+
+	// Set colour
+	glColor4f(tt->getColour().fr(), tt->getColour().fg(), tt->getColour().fb(), alpha);
+
+	// Check for custom thing icon
+	if (!tt->getIcon().IsEmpty() && showicon)
+		tex = theMapEditor->textureManager().getEditorImage(S_FMT("thing/square/%s", CHR(tt->getIcon())));
+
+	// Otherwise, no icon
+	int tc_start = 0;
+	if (!tex) {
+		tex = theMapEditor->textureManager().getEditorImage("thing/square/normal_n");
+
+		if (tt->isAngled() && showicon) {
+			tex = theMapEditor->textureManager().getEditorImage("thing/square/normal_d1");
+
+			// Setup variables depending on angle
+			switch ((int)angle) {
+			case 0:		// East: normal, texcoord 0
+				break;
+			case 45:	// Northeast: diagonal, texcoord 0
+				tex = theMapEditor->textureManager().getEditorImage("thing/square/normal_d2");
+				break;
+			case 90:	// North: normal, texcoord 2
+				tc_start = 2;
+				break;
+			case 135:	// Northwest: diagonal, texcoord 2
+				tex = theMapEditor->textureManager().getEditorImage("thing/square/normal_d2");
+				tc_start = 2;
+				break;
+			case 180:	// West: normal, texcoord 4
+				tc_start = 4;
+				break;
+			case 225:	// Southwest: diagonal, texcoord 4
+				tex = theMapEditor->textureManager().getEditorImage("thing/square/normal_d2");
+				tc_start = 4;
+				break;
+			case 270:	// South: normal, texcoord 6
+				tc_start = 6;
+				break;
+			case 315:	// Southeast: diagonal, texcoord 6
+				tex = theMapEditor->textureManager().getEditorImage("thing/square/normal_d2");
+				tc_start = 6;
+				break;
+			default:	// Unsupported angle, don't draw arrow
+				tex = theMapEditor->textureManager().getEditorImage("thing/square/normal_n");
+				break;
+			};
+		}
+	}
+
+	// If for whatever reason the thing texture doesn't exist, just draw a basic, square thing
+	if (!tex) {
+		renderSimpleSquareThing(x, y, angle, tt, alpha);
+		return false;
+	}
+
+	// Bind texture
+	if (tex_last != tex) {
+		tex->bind();
+		tex_last = tex;
+	}
+
+	// Draw thing
+	double radius = tt->getRadius();
+	if (tt->shrinkOnZoom()) radius = scaledRadius(radius);
+	glBegin(GL_QUADS);
+	int tc = tc_start;
+	glTexCoord2f(sq_thing_tc[tc], sq_thing_tc[tc+1]);
+	tc += 2;
+	if (tc == 8) tc = 0;
+	glVertex2d(x-radius, y-radius);
+	glTexCoord2f(sq_thing_tc[tc], sq_thing_tc[tc+1]);
+	tc += 2;
+	if (tc == 8) tc = 0;
+	glVertex2d(x-radius, y+radius);
+	glTexCoord2f(sq_thing_tc[tc], sq_thing_tc[tc+1]);
+	tc += 2;
+	if (tc == 8) tc = 0;
+	glVertex2d(x+radius, y+radius);
+	glTexCoord2f(sq_thing_tc[tc], sq_thing_tc[tc+1]);
+	glVertex2d(x+radius, y-radius);
+	glEnd();
+
+	return false;
+}
+
+void MapRenderer2D::renderSimpleSquareThing(double x, double y, double angle, ThingType* tt, float alpha) {
 	// Ignore if no type given (shouldn't happen)
 	if (!tt)
 		return;
@@ -688,8 +788,8 @@ void MapRenderer2D::renderSquareThing(double x, double y, double angle, ThingTyp
 	glEnd();
 
 	// Draw angle indicator (if needed)
-	if (showang && (tt->isAngled() || thing_force_dir)) {
-		glColor3f(0.0f, 0.0f, 0.0f);
+	if (tt->isAngled() || thing_force_dir) {
+		glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
 		glRotated(angle, 0, 0, 1);
 		glBegin(GL_LINES);
 		glVertex2d(0, 0);
@@ -710,8 +810,7 @@ void MapRenderer2D::renderThingsImmediate(float alpha) {
 	// visibility and just render things in immediate mode
 
 	// Enable textures
-	if (thing_drawtype > 0 && thing_drawtype < 3)
-		glEnable(GL_TEXTURE_2D);
+	glEnable(GL_TEXTURE_2D);
 	glColor4f(1.0f, 1.0f, 1.0f, alpha);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	tex_last = NULL;
@@ -809,8 +908,10 @@ void MapRenderer2D::renderThingsImmediate(float alpha) {
 		}
 		else if (thing_drawtype == 1)	// Drawtype 1: Round
 			renderRoundThing(x, y, angle, tt, talpha);
-		else							// Drawtype 0 (or other): Square
-			renderSquareThing(x, y, angle, tt, talpha, thing_drawtype != 3);
+		else {							// Drawtype 0 (or other): Square
+			if (renderSquareThing(x, y, angle, tt, talpha, thing_drawtype != 3))
+				things_arrows.push_back(a);
+		}
 	}
 
 	// Draw thing sprites within squares if that drawtype is set
@@ -840,7 +941,7 @@ void MapRenderer2D::renderThingsImmediate(float alpha) {
 	}
 
 	// Draw any thing direction arrows needed
-	if (thing_drawtype >= 2) {
+	if (things_arrows.size() > 0) {
 		glColor4f(1.0f, 1.0f, 1.0f, alpha);
 		GLTexture* tex_arrow = theMapEditor->textureManager().getEditorImage("arrow");
 		if (tex_arrow) {
@@ -869,8 +970,7 @@ void MapRenderer2D::renderThingsImmediate(float alpha) {
 	}
 
 	// Disable textures
-	if (thing_drawtype > 0)
-		glDisable(GL_TEXTURE_2D);
+	glDisable(GL_TEXTURE_2D);
 }
 
 void MapRenderer2D::renderThingHilight(int index, float fade) {

@@ -82,7 +82,8 @@ public:
 	void	renderThingOverlay(double x, double y, double radius, bool point);
 	void	renderRoundThing(double x, double y, double angle, ThingType* type, float alpha = 1.0f);
 	bool	renderSpriteThing(double x, double y, double angle, ThingType* type, float alpha = 1.0f, bool fitradius = false);
-	void	renderSquareThing(double x, double y, double angle, ThingType* type, float alpha = 1.0f, bool showang = true);
+	void	renderSimpleSquareThing(double x, double y, double angle, ThingType* type, float alpha = 1.0f);
+	bool	renderSquareThing(double x, double y, double angle, ThingType* type, float alpha = 1.0f, bool showicon = true);
 	void	renderThings(float alpha = 1.0f);
 	void	renderThingsImmediate(float alpha);
 	void	renderThingHilight(int index, float fade);
@@ -102,7 +103,6 @@ public:
 	void	renderMovingLines(vector<int>& lines, fpoint2_t move_vec);
 	void	renderMovingSectors(vector<int>& sectors, fpoint2_t move_vec);
 	void	renderMovingThings(vector<int>& things, fpoint2_t move_vec);
-	//void	renderMovingVertices(vector<move_vertex_t>& vertices, vector<move_line_t>& lines, bool show_verts);
 
 
 	// VBOs
