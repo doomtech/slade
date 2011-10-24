@@ -502,193 +502,136 @@ bool MapEditor::beginMove(fpoint2_t mouse_pos) {
 
 	// Begin move operation
 	move_origin = mouse_pos;
+	
+	// Create list of objects to move
+	if (selection.size() == 0)
+		move_items.push_back(hilight_item);
+	else {
+		for (unsigned a = 0; a < selection.size(); a++)
+			move_items.push_back(selection[a]);
+	}
 
-	// Thing move operation is a bit simpler
+	// Get list of vertices being moved (if any)
+	vector<MapVertex*> move_verts;
+	if (edit_mode != MODE_THINGS) {
+		// Vertices mode
+		if (edit_mode == MODE_VERTICES) {
+			for (unsigned a = 0; a < move_items.size(); a++)
+				move_verts.push_back(map.getVertex(move_items[a]));
+		}
+
+		// Lines mode
+		else if (edit_mode == MODE_LINES) {
+			for (unsigned a = 0; a < move_items.size(); a++) {
+				// Duplicate vertices shouldn't matter here
+				move_verts.push_back(map.getLine(move_items[a])->v1());
+				move_verts.push_back(map.getLine(move_items[a])->v2());
+			}
+		}
+
+		// Sectors mode
+		else if (edit_mode == MODE_SECTORS) {
+			for (unsigned a = 0; a < move_items.size(); a++)
+				map.getVerticesOfSector(move_items[a], move_verts);
+		}
+	}
+
+	// Filter out map objects being moved
 	if (edit_mode == MODE_THINGS) {
-		// TODO: stuff
-		return true;
+		// Filter moving things
+		for (unsigned a = 0; a < move_items.size(); a++)
+			map.getThing(move_items[a])->filter(true);
 	}
-
-	// Get vertices to move
-	int* verts_moving = new int[map.nVertices()];
-	memset(verts_moving, 0, map.nVertices()*sizeof(int));
-	if (edit_mode == MODE_VERTICES) {
-		if (selection.size() == 0) {
-			move_vertices.push_back(move_vertex_t(map.getVertex(hilight_item), true));
-			verts_moving[hilight_item] = move_vertices.size();
-		}
-		else {
-			for (unsigned a = 0; a < selection.size(); a++) {
-				move_vertices.push_back(move_vertex_t(map.getVertex(selection[a]), true));
-				verts_moving[selection[a]] = move_vertices.size();
-			}
+	else {
+		// Filter moving lines
+		for (unsigned a = 0; a < move_verts.size(); a++) {
+			for (unsigned l = 0; l < move_verts[a]->nConnectedLines(); l++)
+				move_verts[a]->connectedLine(l)->filter(true);
 		}
 	}
-	else if (edit_mode == MODE_LINES) {
-		if (selection.size() == 0) {
-			MapVertex* v1 = map.getLine(hilight_item)->v1();
-			MapVertex* v2 = map.getLine(hilight_item)->v2();
-
-			// Add hilighted line vertices
-			move_vertices.push_back(move_vertex_t(v1, true));
-			verts_moving[v1->getIndex()] = move_vertices.size();
-			move_vertices.push_back(move_vertex_t(v2, true));
-			verts_moving[v2->getIndex()] = move_vertices.size();
-		}
-		else {
-			// Add all selected line vertices
-			for (unsigned a = 0; a < selection.size(); a++) {
-				MapVertex* v1 = map.getLine(selection[a])->v1();
-				MapVertex* v2 = map.getLine(selection[a])->v2();
-
-				// Add to vertex list if not already in it
-				if (verts_moving[v1->getIndex()] == 0) {
-					move_vertices.push_back(move_vertex_t(v1, true));
-					verts_moving[v1->getIndex()] = move_vertices.size();
-				}
-				if (verts_moving[v2->getIndex()] == 0) {
-					move_vertices.push_back(move_vertex_t(v2, true));
-					verts_moving[v2->getIndex()] = move_vertices.size();
-				}
-			}
-		}
-	}
-	else if (edit_mode == MODE_SECTORS) {
-		// Get a list of all the lines of the selected/hilighted sectors
-		vector<MapLine*> lines;
-		if (selection.size() == 0) {
-			for (unsigned a = 0; a < map.getSector(hilight_item)->connectedSides().size(); a++)
-				lines.push_back(map.getSector(hilight_item)->connectedSides()[a]->getParentLine());
-		}
-		else {
-			// Go through selection
-			for (unsigned a = 0; a < selection.size(); a++) {
-				vector<MapSide*>& sides = map.getSector(selection[a])->connectedSides();
-
-				// Go through sides
-				for (unsigned s = 0; s < sides.size(); s++) {
-					MapLine* line = sides[s]->getParentLine();
-
-					// First check that the parent line isn't already in the list
-					bool in = false;
-					for (unsigned l = 0; l < lines.size(); l++) {
-						if (lines[a] == line) {
-							in = true;
-							break;
-						}
-					}
-
-					// Add the parent line
-					if (!in) lines.push_back(line);
-				}
-			}
-		}
-
-		// Now add each line's vertices to the list
-		for (unsigned a = 0; a < lines.size(); a++) {
-			MapVertex* v1 = lines[a]->v1();
-			MapVertex* v2 = lines[a]->v2();
-
-			// Add to vertex list if not already in it
-			if (verts_moving[v1->getIndex()] == 0) {
-				move_vertices.push_back(move_vertex_t(v1, true));
-				verts_moving[v1->getIndex()] = move_vertices.size();
-			}
-			if (verts_moving[v2->getIndex()] == 0) {
-				move_vertices.push_back(move_vertex_t(v2, true));
-				verts_moving[v2->getIndex()] = move_vertices.size();
-			}
-		}
-	}
-
-	// Get any attached lines
-	for (unsigned a = 0; a < map.nLines(); a++) {
-		int v1 = verts_moving[map.getLine(a)->v1()->getIndex()];
-		int v2 = verts_moving[map.getLine(a)->v2()->getIndex()];
-		bool mv1, mv2;
-		if (v1 == 0) mv1 = false;
-		else mv1 = move_vertices[v1-1].moving;
-		if (v2 == 0) mv2 = false;
-		else mv2 = move_vertices[v2-1].moving;
-
-		// Skip if neither the line's vertices are being moved
-		if (!mv1 && !mv2)
-			continue;
-
-		// If only the first vertex is being moved
-		else if (mv1 && !mv2) {
-			// Add second vertex to moving list if needed
-			if (v2 == 0) {
-				move_vertices.push_back(move_vertex_t(map.getLine(a)->v2(), false));
-				verts_moving[map.getLine(a)->v2()->getIndex()] = move_vertices.size();
-				v2 = move_vertices.size();
-			}
-		}
-
-		// If only the second vertex is being moved
-		else if (mv2 && !mv1) {
-			// Add first vertex to moving list if needed
-			if (v1 == 0) {
-				move_vertices.push_back(move_vertex_t(map.getLine(a)->v1(), false));
-				verts_moving[map.getLine(a)->v1()->getIndex()] = move_vertices.size();
-				v1 = move_vertices.size();
-			}
-		}
-
-		// Add line to list
-		move_line_t ml;
-		ml.v1 = v1 - 1;
-		ml.v2 = v2 - 1;
-		move_lines.push_back(ml);
-	}
-
-	// Find closest vertex to the cursor (used for grid snapping)
-	double mindist = 99999999;
-	move_vertex_closest = 0;
-	for (unsigned a = 0; a < move_vertices.size(); a++) {
-		double dist = MathStuff::distance(mouse_pos.x, mouse_pos.y, move_vertices[a].x, move_vertices[a].y);
-		if (dist < mindist) {
-			mindist = dist;
-			move_vertex_closest = a;
-		}
-	}
-
-	// Clean up
-	delete[] verts_moving;
 
 	return true;
 }
 
 void MapEditor::doMove(fpoint2_t mouse_pos) {
-	// Get 'closest' vertex original position
-	double vx = move_vertices[move_vertex_closest].vertex->xPos();
-	double vy = move_vertices[move_vertex_closest].vertex->yPos();
+	// Special case: single vertex or thing
+	if (move_items.size() == 1 && (edit_mode == MODE_VERTICES || edit_mode == MODE_THINGS)) {
+		// Get new position
+		double nx = snapToGrid(mouse_pos.x);
+		double ny = snapToGrid(mouse_pos.y);
 
-	// Move 'closest' vertex
-	double nx = snapToGrid(vx + (mouse_pos.x - move_origin.x));
-	double ny = snapToGrid(vy + (mouse_pos.y - move_origin.y));
+		// Update move vector
+		if (edit_mode == MODE_VERTICES)
+			move_vec.set(nx - map.getVertex(move_items[0])->xPos(), ny - map.getVertex(move_items[0])->yPos());
+		else if (edit_mode == MODE_THINGS)
+			move_vec.set(nx - map.getThing(move_items[0])->xPos(), ny - map.getThing(move_items[0])->yPos());
 
-	// Get difference vector
-	double diffx = nx - vx;
-	double diffy = ny - vy;
-
-	// Move all vertices by this amount
-	for (unsigned a = 0; a < move_vertices.size(); a++) {
-		if (!move_vertices[a].moving) continue;
-
-		move_vertices[a].x = move_vertices[a].vertex->xPos() + diffx;
-		move_vertices[a].y = move_vertices[a].vertex->yPos() + diffy;
+		return;
 	}
+
+	// Get amount moved
+	double dx = mouse_pos.x - move_origin.x;
+	double dy = mouse_pos.y - move_origin.y;
+
+	// Update move vector
+	move_vec.set(snapToGrid(dx), snapToGrid(dy));
 }
 
 void MapEditor::endMove() {
-	// Move vertices for reals
-	for (unsigned a = 0; a < move_vertices.size(); a++)
-		map.moveVertex(move_vertices[a].vertex->getIndex(), move_vertices[a].x, move_vertices[a].y);
+	// Move depending on edit mode
+	if (edit_mode == MODE_THINGS) {
+		// Move things
+		for (unsigned a = 0; a < move_items.size(); a++) {
+			MapThing* t = map.getThing(move_items[a]);
+			map.moveThing(move_items[a], t->xPos() + move_vec.x, t->yPos() + move_vec.y);
+		}
+	}
+	else {
+		// Any other edit mode we're technically moving vertices
 
-	move_vertices.clear();
-	move_lines.clear();
+		// Get list of vertices being moved
+		bool* move_verts = new bool[map.nVertices()];
+		memset(move_verts, 0, map.nVertices());
+
+		if (edit_mode == MODE_VERTICES) {
+			for (unsigned a = 0; a < move_items.size(); a++)
+				move_verts[move_items[a]] = true;
+		}
+		else if (edit_mode == MODE_LINES) {
+			for (unsigned a = 0; a < move_items.size(); a++) {
+				MapLine* line = map.getLine(move_items[a]);
+				if (line->v1()) move_verts[map.vertexIndex(line->v1())] = true;
+				if (line->v2()) move_verts[map.vertexIndex(line->v2())] = true;
+			}
+		}
+		else if (edit_mode == MODE_SECTORS) {
+			vector<MapVertex*> sv;
+			for (unsigned a = 0; a < move_items.size(); a++)
+				map.getVerticesOfSector(move_items[a], sv);
+
+			for (unsigned a = 0; a < sv.size(); a++)
+				move_verts[map.vertexIndex(sv[a])] = true;
+		}
+
+		// Move vertices
+		for (unsigned a = 0; a < map.nVertices(); a++) {
+			if (!move_verts[a])
+				continue;
+			map.moveVertex(a, map.getVertex(a)->xPos() + move_vec.x, map.getVertex(a)->yPos() + move_vec.y);
+		}
+	}
+
+	// Un-filter objects
+	for (unsigned a = 0; a < map.nLines(); a++)
+		map.getLine(a)->filter(false);
+	for (unsigned a = 0; a < map.nThings(); a++)
+		map.getThing(a)->filter(false);
+
+	move_items.clear();
 }
+
+
+
 
 CONSOLE_COMMAND(m_show_item, 1) {
 	int index = atoi(CHR(args[0]));

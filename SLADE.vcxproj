@@ -198,6 +198,7 @@
     <ClCompile Include="src\MapEditor.cpp" />
     <ClCompile Include="src\MapEditorPrefsPanel.cpp" />
     <ClCompile Include="src\MapEntryPanel.cpp" />
+    <ClCompile Include="src\MapObject.cpp" />
     <ClCompile Include="src\MapRenderer2D.cpp" />
     <ClCompile Include="src\MapTextureManager.cpp" />
     <ClCompile Include="src\MathStuff.cpp" />
@@ -405,6 +406,7 @@
     <ClInclude Include="src\MapEditor.h" />
     <ClInclude Include="src\MapEditorPrefsPanel.h" />
     <ClInclude Include="src\MapEntryPanel.h" />
+    <ClInclude Include="src\MapObject.h" />
     <ClInclude Include="src\MapRenderer2D.h" />
     <ClInclude Include="src\MapTextureManager.h" />
     <ClInclude Include="src\MathStuff.h" />

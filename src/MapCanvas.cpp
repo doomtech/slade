@@ -432,9 +432,14 @@ void MapCanvas::draw() {
 
 	if (editor->editMode() == MapEditor::MODE_VERTICES) {
 		// Vertices mode
-		if (things_always) renderer_2d->renderThings(0.5f);			// Things (faded)
-		renderer_2d->renderLines(false);							// Lines (no direction tabs)
-		renderer_2d->renderVertices(view_scale);					// Vertices
+		if (things_always) renderer_2d->renderThings(0.5f);	// Things (faded)
+		renderer_2d->renderLines(false);					// Lines (no direction tabs)
+		
+		// Vertices
+		if (mouse_state == MSTATE_MOVE)
+			renderer_2d->renderVertices(0.25f);
+		else
+			renderer_2d->renderVertices();
 
 		// Selection if needed
 		if (mouse_state != MSTATE_MOVE)
@@ -522,23 +527,18 @@ void MapCanvas::draw() {
 		animations[a]->draw();
 
 	// Draw moving stuff if needed
-	if (anim_move_fade > 0.0f) {
-		// Draw background fader
-		glDisable(GL_TEXTURE_2D);
-		rgba_t col = ColourConfiguration::getColour("map_background");
-		col.a = 140*anim_move_fade;
-		col.blend = 0;
-		col.set_gl();
-		glBegin(GL_QUADS);
-		glVertex2d(view_tl.x, view_tl.y);
-		glVertex2d(view_tl.x, view_br.y);
-		glVertex2d(view_br.x, view_br.y);
-		glVertex2d(view_br.x, view_tl.y);
-		glEnd();
-
-		// Render moving objects
-		if (mouse_state == MSTATE_MOVE)
-			renderer_2d->renderMovingVertices(editor->movingVertices(), editor->movingLines(), editor->editMode() == MapEditor::MODE_VERTICES);
+	if (mouse_state == MSTATE_MOVE) {
+		switch (editor->editMode()) {
+		case MapEditor::MODE_VERTICES:
+			renderer_2d->renderMovingVertices(editor->movingItems(), editor->moveVector()); break;
+		case MapEditor::MODE_LINES:
+			renderer_2d->renderMovingLines(editor->movingItems(), editor->moveVector()); break;
+		case MapEditor::MODE_SECTORS:
+			renderer_2d->renderMovingSectors(editor->movingItems(), editor->moveVector()); break;
+		case MapEditor::MODE_THINGS:
+			renderer_2d->renderMovingThings(editor->movingItems(), editor->moveVector()); break;
+		default: break;
+		};
 	}
 
 	// Draw info overlay
@@ -599,21 +599,8 @@ void MapCanvas::update(long frametime) {
 		editor->updateHilight(mouse_pos_m, view_scale);
 
 	// Do item moving if needed
-	if (mouse_state == MSTATE_MOVE) {
+	if (mouse_state == MSTATE_MOVE)
 		editor->doMove(mouse_pos_m);
-
-		// Fadeout animation
-		if (anim_move_fade < 1.0f)
-			anim_move_fade += 0.1f*mult;
-		if (anim_move_fade > 1.0f)
-			anim_move_fade = 1.0f;
-	}
-	else if (anim_move_fade > 0.0f) {
-		// Fadeout animation
-		anim_move_fade -= 0.1f*mult;
-		if (anim_move_fade < 0.0f)
-			anim_move_fade = 0.0f;
-	}
 
 	// Flashing animation for hilight
 	// Pulsates between 0.5-1.0f (multiplied with hilight alpha)
@@ -1055,8 +1042,10 @@ void MapCanvas::onMouseDown(wxMouseEvent& e) {
 
 	// Right button
 	else if (e.RightDown()) {
-		if (editor->beginMove(mouse_downpos_m))
+		if (editor->beginMove(mouse_downpos_m)) {
 			mouse_state = MSTATE_MOVE;
+			renderer_2d->forceUpdate(view_scale_inter);
+		}
 	}
 
 	// Any other mouse button (let keybind system handle it)
@@ -1093,6 +1082,7 @@ void MapCanvas::onMouseUp(wxMouseEvent& e) {
 		if (mouse_state == MSTATE_MOVE) {
 			editor->endMove();
 			mouse_state = MSTATE_NORMAL;
+			renderer_2d->forceUpdate(view_scale_inter);
 		}
 	}
 

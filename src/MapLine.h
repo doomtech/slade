@@ -2,8 +2,7 @@
 #ifndef __MAPLINE_H__
 #define __MAPLINE_H__
 
-#include "Tokenizer.h"
-#include "PropertyList.h"
+#include "MapObject.h"
 
 class MapVertex;
 class MapSide;
@@ -56,11 +55,10 @@ struct doom64line_t {
 	uint16_t side2;
 };
 
-class MapLine {
+class MapLine : public MapObject {
 friend class SLADEMap;
 private:
 	// Basic data
-	unsigned	index;
 	MapVertex*	vertex1;
 	MapVertex*	vertex2;
 	MapSide*	side1;
@@ -71,27 +69,25 @@ private:
 	double	ca;
 	double	sa;
 
-	// Properties
-	PropertyList	udmf_props;
-
 public:
-	MapLine(){}
-	MapLine(MapVertex* v1, MapVertex* v2, MapSide* s1, MapSide* s2);
-	~MapLine(){}
+	MapLine(SLADEMap* parent = NULL);
+	MapLine(MapVertex* v1, MapVertex* v2, MapSide* s1, MapSide* s2, SLADEMap* parent = NULL);
+	~MapLine();
 
 	bool	isOk() { return vertex1 && vertex2; }
 
-	unsigned		getIndex() { return index; }
 	MapVertex*		v1() { return vertex1; }
 	MapVertex*		v2() { return vertex2; }
 	MapSide*		s1() { return side1; }
 	MapSide*		s2() { return side2; }
 
-	PropertyList&	props()				{ return udmf_props; }
-	Property&		prop(string key)	{ return udmf_props[key]; }
-
 	MapSector*	frontSector();
 	MapSector*	backSector();
+
+	double	x1();
+	double	y1();
+	double	x2();
+	double	y2();
 
 	double	getLength();
 	bool	doubleSector();

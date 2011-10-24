@@ -136,7 +136,7 @@ MCALineSelection::MCALineSelection(long start, vector<MapLine*>& lines, bool sel
 		if (!lines[a]) continue;
 
 		// Add line
-		this->lines.push_back(frect_t(lines[a]->v1()->xPos(), lines[a]->v1()->yPos(), lines[a]->v2()->xPos(), lines[a]->v2()->yPos()));
+		this->lines.push_back(frect_t(lines[a]->x1(), lines[a]->y1(), lines[a]->x2(), lines[a]->y2()));
 
 		// Calculate line direction tab
 		frect_t& rect = this->lines.back();

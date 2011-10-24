@@ -1,10 +1,24 @@
 
-
 #include "Main.h"
 #include "MapSector.h"
 #include "MapLine.h"
 #include "MapSide.h"
 #include "MapVertex.h"
+
+MapSector::MapSector(SLADEMap* parent) : MapObject(MOBJ_SECTOR, parent) {
+	// Init variables
+	poly_needsupdate = true;
+}
+
+MapSector::MapSector(string f_tex, string c_tex, SLADEMap* parent) : MapObject(MOBJ_SECTOR, parent) {
+	// Init variables
+	this->f_tex = f_tex;
+	this->c_tex = c_tex;
+	poly_needsupdate = true;
+}
+
+MapSector::~MapSector() {
+}
 
 void MapSector::updateBBox() {
 	// Reset bounding box

@@ -69,6 +69,7 @@ public:
 	void	renderVertexSelection(vector<int>& selection);
 
 	// Lines
+	rgba_t	lineColour(MapLine* line, bool ignore_filter = false);
 	void	renderLines(bool show_direction);
 	void	renderLinesVBO(bool show_direction);
 	void	renderLinesImmediate(bool show_direction);
@@ -77,6 +78,8 @@ public:
 	void	renderTaggedLines(vector<MapLine*>& lines, float fade);
 
 	// Things
+	bool	setupThingOverlay();
+	void	renderThingOverlay(double x, double y, double radius, bool point);
 	void	renderRoundThing(double x, double y, double angle, ThingType* type, float alpha = 1.0f);
 	bool	renderSpriteThing(double x, double y, double angle, ThingType* type, float alpha = 1.0f, bool fitradius = false);
 	void	renderSquareThing(double x, double y, double angle, ThingType* type, float alpha = 1.0f, bool showang = true);
@@ -95,7 +98,11 @@ public:
 	void	renderTaggedFlats(vector<MapSector*>& sectors, float fade);
 
 	// Moving
-	void	renderMovingVertices(vector<move_vertex_t>& vertices, vector<move_line_t>& lines, bool show_verts);
+	void	renderMovingVertices(vector<int>& vertices, fpoint2_t move_vec);
+	void	renderMovingLines(vector<int>& lines, fpoint2_t move_vec);
+	void	renderMovingSectors(vector<int>& sectors, fpoint2_t move_vec);
+	void	renderMovingThings(vector<int>& things, fpoint2_t move_vec);
+	//void	renderMovingVertices(vector<move_vertex_t>& vertices, vector<move_line_t>& lines, bool show_verts);
 
 
 	// VBOs

@@ -2,8 +2,7 @@
 #ifndef __MAPSECTOR_H__
 #define __MAPSECTOR_H__
 
-#include "Tokenizer.h"
-#include "PropertyList.h"
+#include "MapObject.h"
 #include "Polygon2D.h"
 
 class MapSide;
@@ -31,12 +30,11 @@ struct doom64sector_t
 	uint16_t	flags;
 };
 
-class MapSector {
+class MapSector : public MapObject {
 friend class SLADEMap;
 friend class MapSide;
 private:
 	// Basic data
-	unsigned	index;
 	string		f_tex;
 	string		c_tex;
 
@@ -46,20 +44,13 @@ private:
 	Polygon2D			polygon;
 	bool				poly_needsupdate;
 
-	// Properties
-	PropertyList	udmf_props;
-
 public:
-	MapSector() { poly_needsupdate = true; }
-	MapSector(string f_tex, string c_tex) { this->f_tex = f_tex; this->c_tex = c_tex; poly_needsupdate = true; }
-	~MapSector(){}
+	MapSector(SLADEMap* parent = NULL);
+	MapSector(string f_tex, string c_tex, SLADEMap* parent = NULL);
+	~MapSector();
 
-	unsigned	getIndex() { return index; }
 	string		floorTexture() { return f_tex; }
 	string		ceilingTexture() { return c_tex; }
-
-	PropertyList&	props()				{ return udmf_props; }
-	Property&		prop(string key)	{ return udmf_props[key]; }
 
 	void				resetBBox() { bbox.reset(); }
 	bbox_t				boundingBox();

@@ -1,12 +1,20 @@
 
-
 #include "Main.h"
 #include "MapLine.h"
 #include "MapVertex.h"
 #include "MapSide.h"
 #include "MathStuff.h"
 
-MapLine::MapLine(MapVertex* v1, MapVertex* v2, MapSide* s1, MapSide* s2) {
+MapLine::MapLine(SLADEMap* parent) : MapObject(MOBJ_LINE, parent) {
+	// Init variables
+	vertex1 = NULL;
+	vertex2 = NULL;
+	side1 = NULL;
+	side2 = NULL;
+	length = -1;
+}
+
+MapLine::MapLine(MapVertex* v1, MapVertex* v2, MapSide* s1, MapSide* s2, SLADEMap* parent) : MapObject(MOBJ_LINE, parent) {
 	// Init variables
 	vertex1 = v1;
 	vertex2 = v2;
@@ -23,6 +31,9 @@ MapLine::MapLine(MapVertex* v1, MapVertex* v2, MapSide* s1, MapSide* s2) {
 	if (s2) s2->parent = this;
 }
 
+MapLine::~MapLine() {
+}
+
 MapSector* MapLine::frontSector() {
 	if (side1)
 		return side1->sector;
@@ -35,6 +46,22 @@ MapSector* MapLine::backSector() {
 		return side2->sector;
 	else
 		return NULL;
+}
+
+double MapLine::x1() {
+	return vertex1->xPos();
+}
+
+double MapLine::y1() {
+	return vertex1->yPos();
+}
+
+double MapLine::x2() {
+	return vertex2->xPos();
+}
+
+double MapLine::y2() {
+	return vertex2->yPos();
 }
 
 double MapLine::getLength() {

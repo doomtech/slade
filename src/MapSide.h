@@ -2,8 +2,7 @@
 #ifndef __MAPSIDE_H__
 #define __MAPSIDE_H__
 
-#include "Tokenizer.h"
-#include "PropertyList.h"
+#include "MapObject.h"
 
 class MapSector;
 class MapLine;
@@ -28,32 +27,24 @@ struct doom64side_t
 	short		sector;
 };
 
-class MapSide {
+class MapSide : public MapObject {
 friend class SLADEMap;
 friend class MapLine;
 private:
 	// Basic data
-	unsigned	index;
 	MapSector*	sector;
 	MapLine*	parent;
 
-	// Properties
-	PropertyList	udmf_props;
-
 public:
-	MapSide(MapSector* sector = NULL);
+	MapSide(MapSector* sector = NULL, SLADEMap* parent = NULL);
 	~MapSide();
 
 	bool	isOk() { return !!sector; }
 
-	unsigned	getIndex() { return index; }
 	MapSector*	getSector() { return sector; }
 	MapLine*	getParentLine() { return parent; }
 
 	void	setSector(MapSector* sector);
-
-	PropertyList&	props()				{ return udmf_props; }
-	Property&		prop(string key)	{ return udmf_props[key]; }
 };
 
 #endif //__MAPSIDE_H__

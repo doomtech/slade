@@ -4,7 +4,7 @@
 #include "MapSide.h"
 #include "MapSector.h"
 
-MapSide::MapSide(MapSector* sector) {
+MapSide::MapSide(MapSector* sector, SLADEMap* parent) : MapObject(MOBJ_SIDE, parent) {
 	// Init variables
 	this->sector = sector;
 	this->parent = NULL;

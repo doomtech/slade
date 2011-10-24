@@ -322,8 +322,8 @@ void KeyBind::initBinds() {
 	addBind("me2d_right", keypress_t("right"), "Scroll right");
 	addBind("me2d_up", keypress_t("up"), "Scroll up");
 	addBind("me2d_down", keypress_t("down"), "Scroll down");
-	addBind("me2d_grid_inc", keypress_t("]"), "Increment Grid level");
-	addBind("me2d_grid_dec", keypress_t("["), "Decrement Grid level");
+	addBind("me2d_grid_inc", keypress_t("["), "Increment Grid level");
+	addBind("me2d_grid_dec", keypress_t("]"), "Decrement Grid level");
 	addBind("me2d_mode_vertices", keypress_t("V"), "Vertices mode");
 	addBind("me2d_mode_lines", keypress_t("L"), "Lines mode");
 	addBind("me2d_mode_sectors", keypress_t("S"), "Sectors mode");

@@ -158,7 +158,7 @@ void MapRenderer2D::renderVertexHilight(int index, float fade) {
 	col.set_gl();
 
 	// Setup rendering properties
-	bool point = setupVertexRendering(2.0f);
+	bool point = setupVertexRendering(1.7f);
 
 	// Draw vertex
 	glBegin(GL_POINTS);
@@ -196,6 +196,28 @@ void MapRenderer2D::renderVertexSelection(vector<int>& selection) {
 	}
 }
 
+rgba_t MapRenderer2D::lineColour(MapLine* line, bool ignore_filter) {
+	rgba_t col;
+
+	if (line) {
+		// Check for special line
+		if ((int)line->prop("special") > 0)
+			col.set(ColourConfiguration::getColour("map_line_special"));
+		else
+			col.set(ColourConfiguration::getColour("map_line_normal"));
+
+		// Check for two-sided line
+		if (line->s2())
+			col.a *= 0.5f;
+
+		// Check if filtered
+		if (line->isFiltered() && !ignore_filter)
+			col.a *= 0.25f;
+	}
+
+	return col;
+}
+
 void MapRenderer2D::renderLines(bool show_direction) {
 	// Check there are any lines to render
 	if (map->nLines() == 0)
@@ -231,14 +253,6 @@ void MapRenderer2D::renderLinesImmediate(bool show_direction) {
 	list_lines = glGenLists(1);
 	glNewList(list_lines, GL_COMPILE_AND_EXECUTE);
 
-	// Temp for now
-	float fade_coeff = 0.5f;
-
-	// Get line colours
-	rgba_t col_background = ColourConfiguration::getColour("map_background");
-	rgba_t col_line_normal = ColourConfiguration::getColour("map_line_normal");
-	rgba_t col_line_special = ColourConfiguration::getColour("map_line_special");
-
 	// Draw all lines
 	rgba_t col;
 	MapLine* line = NULL;
@@ -251,19 +265,11 @@ void MapRenderer2D::renderLinesImmediate(bool show_direction) {
 		x2 = line->v2()->xPos();
 		y2 = line->v2()->yPos();
 
-		// Check for special line
-		if ((int)line->prop("special") > 0)
-			col.set(col_line_special);
-		else
-			col.set(col_line_normal);
-
-		// Check for two-sided line
-		if (line->s2())
-			col.a *= 0.5f;
+		// Get line colour
+		col = lineColour(line);
 
 		// Set line colour
 		glColor4f(col.fr(), col.fg(), col.fb(), col.fa());
-		//col.set_gl();
 
 		// Draw the line
 		glBegin(GL_LINES);
@@ -445,6 +451,70 @@ void MapRenderer2D::renderTaggedLines(vector<MapLine*>& lines, float fade) {
 	}
 }
 
+bool MapRenderer2D::setupThingOverlay() {
+	// Get hilight texture
+	GLTexture* tex = theMapEditor->textureManager().getEditorImage("thing/hilight");
+
+	// Nothing to do if thing_overlay_square is true or thing_drawtype is 0 or 3+ (squares)
+	// or if the hilight circle texture isn't found for some reason
+	if (thing_overlay_square || thing_drawtype == 0 || thing_drawtype > 2 || !tex) {
+		glDisable(GL_TEXTURE_2D);
+		return false;
+	}
+
+	// Otherwise, we want the circle selection overlay
+	glEnable(GL_TEXTURE_2D);
+	tex->bind();
+
+	// Setup point sprites if supported
+	bool point = false;
+	if (OpenGL::pointSpriteSupport()) {
+		glEnable(GL_POINT_SPRITE);
+		glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
+		point = true;
+	}
+
+	return point;
+}
+
+void MapRenderer2D::renderThingOverlay(double x, double y, double radius, bool point) {
+	// Simplest case, thing_overlay_square is true or thing_drawtype is 0 or 3+ (squares)
+	if (thing_overlay_square || thing_drawtype == 0 || thing_drawtype > 2) {
+		// Draw square
+		glBegin(GL_QUADS);
+		glVertex2d(x - radius, y - radius);
+		glVertex2d(x - radius, y + radius);
+		glVertex2d(x + radius, y + radius);
+		glVertex2d(x + radius, y - radius);
+		glEnd();
+
+		return;
+	}
+
+	// Otherwise, we want the circle selection overlay
+	double ps = radius*2*view_scale;
+
+	// Draw it
+	if (point && ps <= OpenGL::maxPointSize()) {
+		// Point sprite
+		glPointSize(ps);
+		glBegin(GL_POINTS);
+		glVertex2d(x, y);
+		glEnd();
+	}
+	else {
+		// Textured quad
+		if (point) glDisable(GL_POINT_SPRITE);
+		glBegin(GL_QUADS);
+		glTexCoord2f(0.0f, 0.0f);	glVertex2d(x - radius, y - radius);
+		glTexCoord2f(0.0f, 1.0f);	glVertex2d(x - radius, y + radius);
+		glTexCoord2f(1.0f, 1.0f);	glVertex2d(x + radius, y + radius);
+		glTexCoord2f(1.0f, 0.0f);	glVertex2d(x + radius, y - radius);
+		glEnd();
+		if (point) glEnable(GL_POINT_SPRITE);
+	}
+}
+
 void MapRenderer2D::renderRoundThing(double x, double y, double angle, ThingType* tt, float alpha) {
 	// Ignore if no type given (shouldn't happen)
 	if (!tt)
@@ -455,13 +525,7 @@ void MapRenderer2D::renderRoundThing(double x, double y, double angle, ThingType
 	bool rotate = false;
 
 	// Set colour
-	glColor4f(tt->getColour().fr()*alpha, tt->getColour().fg()*alpha, tt->getColour().fb()*alpha, alpha);
-
-	// Check for unknown type
-	//if (tt->getName() == "Unknown") {
-	//	tex = theMapEditor->textureManager().getEditorImage("thing/unknown");
-	//	glColor4f(1.0f, 1.0f, 1.0f, alpha);
-	//}
+	glColor4f(tt->getColour().fr(), tt->getColour().fg(), tt->getColour().fb(), alpha);
 
 	// Check for custom thing icon
 	if (!tt->getIcon().IsEmpty())
@@ -676,9 +740,13 @@ void MapRenderer2D::renderThingsImmediate(float alpha) {
 			for (unsigned a = 0; a < map->nThings(); a++) {
 				if (vis_t[a] > 0)
 					continue;
+				
+				// No shadow if filtered
+				thing = map->getThing(a);
+				if (thing->isFiltered())
+					continue;
 
 				// Get thing info
-				thing = map->getThing(a);
 				ThingType* tt = theGameConfiguration->thingType(thing->getType());
 				double radius = (tt->getRadius()+1);
 				if (tt->shrinkOnZoom()) radius = scaledRadius(radius);
@@ -713,6 +781,7 @@ void MapRenderer2D::renderThingsImmediate(float alpha) {
 	}
 
 	// Draw things
+	double talpha;
 	for (unsigned a = 0; a < map->nThings(); a++) {
 		if (vis_t[a] > 0)
 			continue;
@@ -723,19 +792,25 @@ void MapRenderer2D::renderThingsImmediate(float alpha) {
 		y = thing->yPos();
 		angle = thing->prop("angle").getFloatValue();
 
+		// Set alpha
+		if (thing->isFiltered())
+			talpha = alpha*0.25;
+		else
+			talpha = alpha;
+
 		// Get thing type properties from game configuration
 		ThingType* tt = theGameConfiguration->thingType(thing->getType());
 
 		// Draw thing depending on 'things_drawtype' cvar
 		if (thing_drawtype == 2) {		// Drawtype 2: Sprites
 			// Check if we need to draw the direction arrow for this thing
-			if (renderSpriteThing(x, y, angle, tt, alpha))
+			if (renderSpriteThing(x, y, angle, tt, talpha))
 				things_arrows.push_back(a);
 		}
 		else if (thing_drawtype == 1)	// Drawtype 1: Round
-			renderRoundThing(x, y, angle, tt, alpha);
+			renderRoundThing(x, y, angle, tt, talpha);
 		else							// Drawtype 0 (or other): Square
-			renderSquareThing(x, y, angle, tt, alpha, thing_drawtype != 3);
+			renderSquareThing(x, y, angle, tt, talpha, thing_drawtype != 3);
 	}
 
 	// Draw thing sprites within squares if that drawtype is set
@@ -753,7 +828,13 @@ void MapRenderer2D::renderThingsImmediate(float alpha) {
 			y = thing->yPos();
 			angle = thing->prop("angle").getFloatValue();
 
-			if (renderSpriteThing(x, y, angle, tt, alpha, true))
+			// Set alpha
+			if (thing->isFiltered())
+				talpha = alpha*0.25;
+			else
+				talpha = alpha;
+
+			if (renderSpriteThing(x, y, angle, tt, talpha, true))
 				things_arrows.push_back(a);
 		}
 	}
@@ -865,83 +946,25 @@ void MapRenderer2D::renderThingSelection(vector<int>& selection) {
 	rgba_t col = ColourConfiguration::getColour("map_selection");
 	col.set_gl();
 
-	// Get hilight texture
-	GLTexture* tex = theMapEditor->textureManager().getEditorImage("thing/hilight");
+	// Setup overlay rendering
+	bool point = setupThingOverlay();
 
-	// Simplest case, thing_overlay_square is true or thing_drawtype is 0 or 3+ (squares)
-	// or if the hilight circle texture isn't found for some reason
-	double x, y;
-	MapThing* thing = NULL;
-	if (thing_overlay_square || thing_drawtype == 0 || thing_drawtype > 2 || !tex) {
-		glDisable(GL_TEXTURE_2D);
-
-		for (unsigned a = 0; a < selection.size(); a++) {
-			thing = map->getThing(selection[a]);
-			x = thing->xPos();
-			y = thing->yPos();
-
-			// Get thing radius
-			double radius = theGameConfiguration->thingType(thing->getType())->getRadius();
-
-			// Check if we want radius-accurate square overlays
-			glDisable(GL_TEXTURE_2D);
-			glBegin(GL_QUADS);
-			glVertex2d(x - radius, y - radius);
-			glVertex2d(x - radius, y + radius);
-			glVertex2d(x + radius, y + radius);
-			glVertex2d(x + radius, y - radius);
-			glEnd();
-		}
-
-		return;
-	}
-
-	// Otherwise, we want the circle selection overlay
-	glEnable(GL_TEXTURE_2D);
-	tex->bind();
-
-	// Setup point sprites if supported
-	bool point = false;
-	if (OpenGL::pointSpriteSupport()) {
-		glEnable(GL_POINT_SPRITE);
-		glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
-		point = true;
-	}
-
-	// Draw thing selection
+	// Draw all selection overlays
 	for (unsigned a = 0; a < selection.size(); a++) {
-		thing = map->getThing(selection[a]);
-		x = thing->xPos();
-		y = thing->yPos();
+		MapThing* thing = map->getThing(selection[a]);
+		double radius = theGameConfiguration->thingType(thing->getType())->getRadius();
 
-		// Get thing radius
-		double radius = theGameConfiguration->thingType(thing->getType())->getRadius() + 8;
-		double ps = radius*2*view_scale;
+		// Adjust radius if the overlay isn't square
+		if ((thing_drawtype == 1 || thing_drawtype == 2) && !thing_overlay_square)
+			radius += 8;
 
 		// Draw it
-		if (point && ps <= OpenGL::maxPointSize()) {
-			// Point sprite
-			glPointSize(ps);
-			glBegin(GL_POINTS);
-			glVertex2d(x, y);
-			glEnd();
-		}
-		else {
-			// Textured quad
-			if (point) glDisable(GL_POINT_SPRITE);
-			glBegin(GL_QUADS);
-			glTexCoord2f(0.0f, 0.0f);	glVertex2d(x - radius, y - radius);
-			glTexCoord2f(0.0f, 1.0f);	glVertex2d(x - radius, y + radius);
-			glTexCoord2f(1.0f, 1.0f);	glVertex2d(x + radius, y + radius);
-			glTexCoord2f(1.0f, 0.0f);	glVertex2d(x + radius, y - radius);
-			glEnd();
-			if (point) glEnable(GL_POINT_SPRITE);
-		}
+		renderThingOverlay(thing->xPos(), thing->yPos(), radius, point);
 	}
 
+	// Clean up gl state
 	if (point)
 		glDisable(GL_POINT_SPRITE);
-
 	glDisable(GL_TEXTURE_2D);
 }
 
@@ -951,60 +974,25 @@ void MapRenderer2D::renderTaggedThings(vector<MapThing*>& things, float fade) {
 	col.a *= fade;
 	col.set_gl();
 
-	// Go through tagged things
+	// Setup overlay rendering
+	bool point = setupThingOverlay();
+
+	// Draw all tagged overlays
 	for (unsigned a = 0; a < things.size(); a++) {
-		// Render thing hilight
 		MapThing* thing = things[a];
-		ThingType* tt = theGameConfiguration->thingType(thing->getType());
-		double x = thing->xPos();
-		double y = thing->yPos();
+		double radius = theGameConfiguration->thingType(thing->getType())->getRadius();
 
-		// Get thing radius
-		double radius = tt->getRadius();
+		// Adjust radius if the overlay isn't square
+		if ((thing_drawtype == 1 || thing_drawtype == 2) && !thing_overlay_square)
+			radius += 8;
 
-		// Check if we want square overlays
-		if (thing_overlay_square || thing_drawtype == 0 || thing_drawtype > 2) {
-			glDisable(GL_TEXTURE_2D);
-			glLineWidth(3.0f);
-			glBegin(GL_LINE_LOOP);
-			glVertex2d(x - radius, y - radius);
-			glVertex2d(x - radius, y + radius);
-			glVertex2d(x + radius, y + radius);
-			glVertex2d(x + radius, y - radius);
-			glEnd();
-			col.a *= 0.5;
-			col.set_gl(false);
-			glBegin(GL_QUADS);
-			glVertex2d(x - radius, y - radius);
-			glVertex2d(x - radius, y + radius);
-			glVertex2d(x + radius, y + radius);
-			glVertex2d(x + radius, y - radius);
-			glEnd();
-
-			continue;
-		}
-
-		// Adjust radius
-		if (thing_drawtype == 0 || thing_drawtype > 2)
-			radius += 6;
-		else
-			radius *= 1.1 + (0.2*fade);
-
-		// Setup hilight thing texture
-		GLTexture* tex = theMapEditor->textureManager().getEditorImage("thing/hilight");
-		if (tex) {
-			glEnable(GL_TEXTURE_2D);
-			tex->bind();
-		}
-
-		glBegin(GL_QUADS);
-		glTexCoord2f(0.0f, 0.0f);	glVertex2d(x - radius, y - radius);
-		glTexCoord2f(0.0f, 1.0f);	glVertex2d(x - radius, y + radius);
-		glTexCoord2f(1.0f, 1.0f);	glVertex2d(x + radius, y + radius);
-		glTexCoord2f(1.0f, 0.0f);	glVertex2d(x + radius, y - radius);
-		glEnd();
+		// Draw it
+		renderThingOverlay(thing->xPos(), thing->yPos(), radius, point);
 	}
 
+	// Clean up gl state
+	if (point)
+		glDisable(GL_POINT_SPRITE);
 	glDisable(GL_TEXTURE_2D);
 }
 
@@ -1268,38 +1256,222 @@ void MapRenderer2D::renderTaggedFlats(vector<MapSector*>& sectors, float fade) {
 		sectors[a]->getPolygon()->render();
 }
 
-void MapRenderer2D::renderMovingVertices(vector<move_vertex_t>& vertices, vector<move_line_t>& lines, bool show_verts) {
-	// Set colour
-	ColourConfiguration::getColour("map_moving").set_gl();
+void MapRenderer2D::renderMovingVertices(vector<int>& vertices, fpoint2_t move_vec) {
+	uint8_t* lines_drawn = new uint8_t[map->nLines()];
+	memset(lines_drawn, 0, map->nLines());
 
-	// Render all moving lines
+	// Determine what lines need drawing (and which of their vertices are being moved)
+	for (unsigned a = 0; a < vertices.size(); a++) {
+		MapVertex* v = map->getVertex(vertices[a]);
+		for (unsigned l = 0; l < v->nConnectedLines(); l++) {
+			MapLine* line = v->connectedLine(l);
+
+			if (line->v1() == v) lines_drawn[map->lineIndex(line)] |= 1;
+			if (line->v2() == v) lines_drawn[map->lineIndex(line)] |= 2;
+		}
+	}
+
+	// Draw any lines attached to the moving vertices
 	glLineWidth(line_width);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glBegin(GL_LINES);
-	for (unsigned a = 0; a < lines.size(); a++) {
-		glVertex2d(vertices[lines[a].v1].x, vertices[lines[a].v1].y);
-		glVertex2d(vertices[lines[a].v2].x, vertices[lines[a].v2].y);
+	for (unsigned a = 0; a < map->nLines(); a++) {
+		MapLine* line = map->getLine(a);
+		uint8_t drawn = lines_drawn[map->lineIndex(line)];
+
+		// Skip if not attached to any moving vertices
+		if (drawn == 0)
+			continue;
+
+		// Set line colour
+		lineColour(line, true).set_gl(false);
+
+		// First vertex
+		if (drawn & 1)
+			glVertex2d(line->x1() + move_vec.x, line->y1() + move_vec.y);
+		else
+			glVertex2d(line->x1(), line->y1());
+
+		// Second vertex
+		if (drawn & 2)
+			glVertex2d(line->x2() + move_vec.x, line->y2() + move_vec.y);
+		else
+			glVertex2d(line->x2(), line->y2());
 	}
 	glEnd();
 
+	// Set 'moving' colour
+	ColourConfiguration::getColour("map_moving").set_gl();
 
-	// Render moving vertices if specified
-	if (show_verts) {
-		// Setup rendering properties
-		bool point = setupVertexRendering(1.2f);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	// Draw moving vertex overlays
+	setupVertexRendering(1.5f);
+	glBegin(GL_POINTS);
+	for (unsigned a = 0; a < vertices.size(); a++) {
+		glVertex2d(map->getVertex(vertices[a])->xPos() + move_vec.x,
+					map->getVertex(vertices[a])->yPos() + move_vec.y);
+	}
+	glEnd();
 
-		// Draw selected vertices
-		glBegin(GL_POINTS);
-		for (unsigned a = 0; a < vertices.size(); a++) {
-			if (vertices[a].moving)
-				glVertex2d(vertices[a].x, vertices[a].y);
+	// Clean up
+	delete[] lines_drawn;
+}
+
+void MapRenderer2D::renderMovingLines(vector<int>& lines, fpoint2_t move_vec) {
+	uint8_t* lines_drawn = new uint8_t[map->nLines()];
+	memset(lines_drawn, 0, map->nLines());
+
+	// Determine what lines need drawing (and which of their vertices are being moved)
+	for (unsigned a = 0; a < lines.size(); a++) {
+		// Check first vertex
+		MapVertex* v = map->getLine(lines[a])->v1();
+		for (unsigned l = 0; l < v->nConnectedLines(); l++) {
+			MapLine* line = v->connectedLine(l);
+
+			if (line->v1() == v) lines_drawn[map->lineIndex(line)] |= 1;
+			if (line->v2() == v) lines_drawn[map->lineIndex(line)] |= 2;
 		}
-		glEnd();
-	
-		if (point) {
-			glDisable(GL_POINT_SPRITE);
-			glDisable(GL_TEXTURE_2D);
+
+		// Check second vertex
+		v = map->getLine(lines[a])->v2();
+		for (unsigned l = 0; l < v->nConnectedLines(); l++) {
+			MapLine* line = v->connectedLine(l);
+
+			if (line->v1() == v) lines_drawn[map->lineIndex(line)] |= 1;
+			if (line->v2() == v) lines_drawn[map->lineIndex(line)] |= 2;
 		}
+	}
+
+	// Draw any lines attached to the moving vertices
+	glLineWidth(line_width);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBegin(GL_LINES);
+	for (unsigned a = 0; a < map->nLines(); a++) {
+		MapLine* line = map->getLine(a);
+		uint8_t drawn = lines_drawn[map->lineIndex(line)];
+
+		// Skip if not attached to any moving vertices
+		if (drawn == 0)
+			continue;
+
+		// Set line colour
+		lineColour(line, true).set_gl(false);
+
+		// First vertex
+		if (drawn & 1)
+			glVertex2d(line->x1() + move_vec.x, line->y1() + move_vec.y);
+		else
+			glVertex2d(line->x1(), line->y1());
+
+		// Second vertex
+		if (drawn & 2)
+			glVertex2d(line->x2() + move_vec.x, line->y2() + move_vec.y);
+		else
+			glVertex2d(line->x2(), line->y2());
+	}
+	glEnd();
+
+	// Set 'moving' colour
+	ColourConfiguration::getColour("map_moving").set_gl();
+
+	// Draw moving line overlays
+	glLineWidth(line_width*3);
+	glBegin(GL_LINES);
+	for (unsigned a = 0; a < lines.size(); a++) {
+		MapLine* line = map->getLine(lines[a]);
+		glVertex2d(line->x1() + move_vec.x, line->y1() + move_vec.y);
+		glVertex2d(line->x2() + move_vec.x, line->y2() + move_vec.y);
+	}
+	glEnd();
+
+	// Clean up
+	delete[] lines_drawn;
+}
+
+void MapRenderer2D::renderMovingSectors(vector<int>& sectors, fpoint2_t move_vec) {
+	// Determine what lines are being moved
+	uint8_t* lines_moved = new uint8_t[map->nLines()];
+	memset(lines_moved, 0, map->nLines());
+	for (unsigned a = 0; a < sectors.size(); a++) {
+		// Go through connected sides
+		vector<MapSide*>& sides = map->getSector(sectors[a])->connectedSides();
+		for (unsigned s = 0; s < sides.size(); s++)
+			lines_moved[map->lineIndex(sides[s]->getParentLine())] = 1;	// Mark parent line as moved
+	}
+
+	// Build list of moving lines
+	vector<int> lines;
+	for (unsigned a = 0; a < map->nLines(); a++) {
+		if (lines_moved[a] > 0)
+			lines.push_back(a);
+	}
+
+	// Draw moving lines
+	renderMovingLines(lines, move_vec);
+
+	// Clean up
+	delete[] lines_moved;
+}
+
+void MapRenderer2D::renderMovingThings(vector<int>& things, fpoint2_t move_vec) {
+	// Enable textures
+	if (thing_drawtype > 0 && thing_drawtype < 3)
+		glEnable(GL_TEXTURE_2D);
+	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	tex_last = NULL;
+
+	// Draw things
+	MapThing* thing = NULL;
+	double x, y, angle;
+	for (unsigned a = 0; a < things.size(); a++) {
+		// Get thing info
+		thing = map->getThing(things[a]);
+		x = thing->xPos() + move_vec.x;
+		y = thing->yPos() + move_vec.y;
+		angle = thing->prop("angle").getFloatValue();
+
+		// Get thing type properties from game configuration
+		ThingType* tt = theGameConfiguration->thingType(thing->getType());
+
+		// Draw thing depending on 'things_drawtype' cvar
+		if (thing_drawtype == 2)		// Drawtype 2: Sprites
+			renderSpriteThing(x, y, angle, tt, 1.0f);
+		else if (thing_drawtype == 1)	// Drawtype 1: Round
+			renderRoundThing(x, y, angle, tt, 1.0f);
+		else							// Drawtype 0 (or other): Square
+			renderSquareThing(x, y, angle, tt, 1.0f, thing_drawtype != 3);
+	}
+
+	// Draw thing sprites within squares if that drawtype is set
+	if (thing_drawtype > 2) {
+		glEnable(GL_TEXTURE_2D);
+
+		for (unsigned a = 0; a < things.size(); a++) {
+			// Get thing info
+			thing = map->getThing(things[a]);
+			ThingType* tt = theGameConfiguration->thingType(thing->getType());
+			x = thing->xPos() + move_vec.x;
+			y = thing->yPos() + move_vec.y;
+			angle = thing->prop("angle").getFloatValue();
+
+			renderSpriteThing(x, y, angle, tt, 1.0f, true);
+		}
+	}
+
+	// Set 'moving' colour
+	ColourConfiguration::getColour("map_moving").set_gl();
+
+	// Draw moving thing overlays
+	bool point = setupThingOverlay();
+	for (unsigned a = 0; a < things.size(); a++) {
+		MapThing* thing = map->getThing(things[a]);
+		double radius = theGameConfiguration->thingType(thing->getType())->getRadius();
+
+		// Adjust radius if the overlay isn't square
+		if ((thing_drawtype == 1 || thing_drawtype == 2) && !thing_overlay_square)
+			radius += 8;
+
+		renderThingOverlay(thing->xPos() + move_vec.x, thing->yPos() + move_vec.y, radius, point);
 	}
 }
 
@@ -1332,11 +1504,6 @@ void MapRenderer2D::updateLinesVBO(bool show_direction) {
 	if (vbo_lines == 0)
 		glGenBuffers(1, &vbo_lines);
 
-	// Get line colours
-	rgba_t col_background = ColourConfiguration::getColour("map_background");
-	rgba_t col_line_normal = ColourConfiguration::getColour("map_line_normal");
-	rgba_t col_line_special = ColourConfiguration::getColour("map_line_special");
-
 	// Determine the number of vertices per line
 	int vpl = 2;
 	if (show_direction) vpl = 4;
@@ -1352,17 +1519,9 @@ void MapRenderer2D::updateLinesVBO(bool show_direction) {
 	for (unsigned a = 0; a < map->nLines(); a++) {
 		MapLine* line = map->getLine(a);
 
-		// Check for special line
-		if ((int)line->prop("special") > 0)
-			col.set(col_line_special);
-		else
-			col.set(col_line_normal);
-
-		// Check for two-sided line
-		if (line->s2())
-			alpha = 0.5f;
-		else
-			alpha = 1.0f;
+		// Get line colour
+		col = lineColour(line);
+		alpha = col.fa();
 
 		// Set line vertices
 		lines[v].x = line->v1()->xPos();

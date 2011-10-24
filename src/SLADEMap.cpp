@@ -1418,6 +1418,28 @@ bool SLADEMap::getLinesOfSector(unsigned index, vector<MapLine*>& list) {
 	return true;
 }
 
+bool SLADEMap::getVerticesOfSector(unsigned index, vector<MapVertex*>& list) {
+	// Get sector
+	MapSector* sector = getSector(index);
+	if (!sector) return false;
+
+	// Go through sides in sector
+	MapSide* side = NULL;
+	MapLine* line = NULL;
+	for (unsigned a = 0; a < sector->connected_sides.size(); a++) {
+		side = sector->connected_sides[a];
+		line = side->getParentLine();
+
+		// Add the side's parent line's vertices to the list if they doesn't already exist
+		if (line->v1() && std::find(list.begin(), list.end(), line->v1()) == list.end())
+			list.push_back(line->v1());
+		if (line->v2() && std::find(list.begin(), list.end(), line->v2()) == list.end())
+			list.push_back(line->v2());
+	}
+
+	return true;
+}
+
 void SLADEMap::getSectorsByTag(int tag, vector<MapSector*>& list) {
 	// Find sectors with matching tag
 	for (unsigned a = 0; a < sectors.size(); a++) {
@@ -1444,7 +1466,7 @@ void SLADEMap::getLinesById(int id, vector<MapLine*>& list) {
 
 void SLADEMap::moveVertex(unsigned vertex, double nx, double ny) {
 	// Check index
-	if (vertex > vertices.size())
+	if (vertex >= vertices.size())
 		return;
 
 	// Move the vertex
@@ -1475,6 +1497,17 @@ void SLADEMap::moveVertex(unsigned vertex, double nx, double ny) {
 	}
 
 	geometry_updated = theApp->runTimer();
+}
+
+void SLADEMap::moveThing(unsigned thing, double nx, double ny) {
+	// Check index
+	if (thing >= things.size())
+		return;
+
+	// Move the thing
+	MapThing* t = things[thing];
+	t->x = nx;
+	t->y = ny;
 }
 
 int SLADEMap::removeDetachedVertices() {

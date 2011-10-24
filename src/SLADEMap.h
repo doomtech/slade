@@ -10,24 +10,6 @@
 #include "Archive.h"
 #include "PropertyList.h"
 
-struct move_vertex_t {
-	double		x, y;
-	MapVertex*	vertex;
-	bool		moving;
-
-	move_vertex_t(MapVertex* vertex, bool moving) {
-		x = vertex->xPos();
-		y = vertex->yPos();
-		this->moving = moving;
-		this->vertex = vertex;
-	}
-};
-struct move_line_t {
-	int v1, v2;
-	rgba_t colour;
-	bool selected;
-};
-
 class ParseTreeNode;
 class SLADEMap {
 friend class MapEditor;
@@ -134,6 +116,7 @@ public:
 
 	bool	lineInSector(MapLine* line, MapSector* sector);
 	bool	getLinesOfSector(unsigned index, vector<MapLine*>& list);
+	bool	getVerticesOfSector(unsigned index, vector<MapVertex*>& list);
 
 	// Tags/Ids
 	void	getSectorsByTag(int tag, vector<MapSector*>& list);
@@ -142,6 +125,7 @@ public:
 
 	// Editing
 	void	moveVertex(unsigned vertex, double nx, double ny);
+	void	moveThing(unsigned thing, double nx, double ny);
 
 	// Checks
 	int		removeDetachedVertices();
