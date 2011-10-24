@@ -189,7 +189,7 @@ void MapRenderer2D::renderVertexSelection(vector<int>& selection) {
 	for (unsigned a = 0; a < selection.size(); a++)
 		glVertex2d(map->getVertex(selection[a])->xPos(), map->getVertex(selection[a])->yPos());
 	glEnd();
-	
+
 	if (point) {
 		glDisable(GL_POINT_SPRITE);
 		glDisable(GL_TEXTURE_2D);
@@ -740,7 +740,7 @@ void MapRenderer2D::renderThingsImmediate(float alpha) {
 			for (unsigned a = 0; a < map->nThings(); a++) {
 				if (vis_t[a] > 0)
 					continue;
-				
+
 				// No shadow if filtered
 				thing = map->getThing(a);
 				if (thing->isFiltered())
@@ -1304,7 +1304,7 @@ void MapRenderer2D::renderMovingVertices(vector<int>& vertices, fpoint2_t move_v
 	ColourConfiguration::getColour("map_moving").set_gl();
 
 	// Draw moving vertex overlays
-	setupVertexRendering(1.5f);
+	bool point = setupVertexRendering(1.5f);
 	glBegin(GL_POINTS);
 	for (unsigned a = 0; a < vertices.size(); a++) {
 		glVertex2d(map->getVertex(vertices[a])->xPos() + move_vec.x,
@@ -1314,6 +1314,10 @@ void MapRenderer2D::renderMovingVertices(vector<int>& vertices, fpoint2_t move_v
 
 	// Clean up
 	delete[] lines_drawn;
+	if (point) {
+		glDisable(GL_POINT_SPRITE);
+		glDisable(GL_TEXTURE_2D);
+	}
 }
 
 void MapRenderer2D::renderMovingLines(vector<int>& lines, fpoint2_t move_vec) {
@@ -1472,6 +1476,12 @@ void MapRenderer2D::renderMovingThings(vector<int>& things, fpoint2_t move_vec) 
 			radius += 8;
 
 		renderThingOverlay(thing->xPos() + move_vec.x, thing->yPos() + move_vec.y, radius, point);
+	}
+
+	// Clean up gl state
+	if (point) {
+		glDisable(GL_POINT_SPRITE);
+		glDisable(GL_TEXTURE_2D);
 	}
 }
 
