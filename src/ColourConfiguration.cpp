@@ -89,17 +89,72 @@ bool ColourConfiguration::readConfiguration(MemChunk& mc) {
 }
 
 bool ColourConfiguration::writeConfiguration(MemChunk& mc) {
-	return false;
+	string cfgstring = "colours\n{\n";
+
+	ColourHashMap::iterator i = cc_colours.begin();
+
+	// Go through all properties
+	while (i != cc_colours.end()) {
+		// Skip if it doesn't 'exist'
+		cc_col_t cc = i->second;
+		if (!cc.exists) {
+			i++;
+			continue;
+		}
+
+		// Colour definition name
+		cfgstring += S_FMT("\t%s\n\t{\n", CHR(i->first));
+
+		// Full name
+		cfgstring += S_FMT("\t\tname = \"%s\";\n", CHR(cc.name));
+
+		// Group
+		cfgstring += S_FMT("\t\tgroup = \"%s\";\n", CHR(cc.group));
+
+		// Colour values
+		cfgstring += S_FMT("\t\trgb = %d, %d, %d;\n", cc.colour.r, cc.colour.g, cc.colour.b);
+
+		// Alpha
+		if (cc.colour.a < 255)
+			cfgstring += S_FMT("\t\talpha = %d;\n", cc.colour.a);
+
+		// Additive
+		if (cc.colour.blend == 1)
+			cfgstring += "\t\tadditive = true;\n";
+
+		cfgstring += "\t}\n\n";
+
+		// Next colour
+		i++;
+	}
+
+	cfgstring += "}\n";
+
+	mc.write(cfgstring.ToAscii(), cfgstring.size());
+
+	return true;
 }
 
 bool ColourConfiguration::init() {
+	// Load default configuration
+	loadDefaults();
+
+	// Check for saved colour configuration
+	if (wxFileExists(appPath("colours.cfg", DIR_USER))) {
+		MemChunk ccfg;
+		ccfg.importFile(appPath("colours.cfg", DIR_USER));
+		readConfiguration(ccfg);
+	}
+
+	return true;
+}
+
+void ColourConfiguration::loadDefaults() {
+	// Read default colours
 	Archive* pres = theArchiveManager->programResourceArchive();
 	ArchiveEntry* entry_default_cc = pres->entryAtPath("config/colours/default.txt");
-
-	if (!entry_default_cc)
-		return false;
-	else
-		return readConfiguration(entry_default_cc->getMCData());
+	if (entry_default_cc)
+		readConfiguration(entry_default_cc->getMCData());
 }
 
 bool ColourConfiguration::readConfiguration(string name) {

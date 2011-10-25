@@ -399,7 +399,7 @@ void MapCanvas::drawEditorMessages() {
 			continue;
 
 		// Setup message colour
-		rgba_t col(255, 200, 100, 255);
+		rgba_t col = ColourConfiguration::getColour("map_editor_message");
 		if (time < 200) {
 			float flash = 1.0f - (time / 200.0f);
 			col.r += (255-col.r)*flash;
@@ -413,7 +413,7 @@ void MapCanvas::drawEditorMessages() {
 
 		// Draw message 'shadow'
 		Drawing::drawText(editor->getEditorMessage(a), 1, yoff+1, rgba_t(0, 0, 0, col.a), Drawing::FONT_BOLD);
-		
+
 		// Draw message
 		Drawing::drawText(editor->getEditorMessage(a), 0, yoff, col, Drawing::FONT_BOLD);
 		yoff += 16;
@@ -467,7 +467,7 @@ void MapCanvas::draw() {
 		// Vertices mode
 		if (things_always) renderer_2d->renderThings(0.5f);	// Things (faded)
 		renderer_2d->renderLines(false);					// Lines (no direction tabs)
-		
+
 		// Vertices
 		if (mouse_state == MSTATE_MOVE)
 			renderer_2d->renderVertices(0.25f);
@@ -487,7 +487,7 @@ void MapCanvas::draw() {
 		if (things_always) renderer_2d->renderThings(0.5f);			// Things (faded)
 		if (vertices_always) renderer_2d->renderVertices(0.5f);		// Vertices (faded)
 		renderer_2d->renderLines(true);								// Lines
-		
+
 		// Selection if needed
 		if (mouse_state != MSTATE_MOVE)
 			renderer_2d->renderLineSelection(editor->getSelection());

@@ -603,6 +603,11 @@ int MainApp::OnExit() {
 	// Save text style configuration
 	StyleSet::saveCurrent();
 
+	// Save colour configuration
+	MemChunk ccfg;
+	ColourConfiguration::writeConfiguration(ccfg);
+	ccfg.exportFile(appPath("colours.cfg", DIR_USER));
+
 	// Close all open archives
 	theArchiveManager->closeAll();
 

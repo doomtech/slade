@@ -188,14 +188,16 @@
       <File Name="src/MapCanvas.h"/>
       <File Name="src/MCAnimations.cpp"/>
       <File Name="src/MCAnimations.h"/>
-      <File Name="src/VertexInfoOverlay.h"/>
-      <File Name="src/VertexInfoOverlay.cpp"/>
-      <File Name="src/LineInfoOverlay.cpp"/>
-      <File Name="src/SectorInfoOverlay.h"/>
-      <File Name="src/SectorInfoOverlay.cpp"/>
-      <File Name="src/LineInfoOverlay.h"/>
-      <File Name="src/ThingInfoOverlay.cpp"/>
-      <File Name="src/ThingInfoOverlay.h"/>
+      <VirtualDirectory Name="Info Overlays">
+        <File Name="src/LineInfoOverlay.cpp"/>
+        <File Name="src/LineInfoOverlay.h"/>
+        <File Name="src/SectorInfoOverlay.cpp"/>
+        <File Name="src/SectorInfoOverlay.h"/>
+        <File Name="src/ThingInfoOverlay.cpp"/>
+        <File Name="src/ThingInfoOverlay.h"/>
+        <File Name="src/VertexInfoOverlay.cpp"/>
+        <File Name="src/VertexInfoOverlay.h"/>
+      </VirtualDirectory>
     </VirtualDirectory>
     <File Name="src/MapEditorWindow.h"/>
     <File Name="src/MapEditorWindow.cpp"/>
@@ -517,6 +519,8 @@
       <General OutputFile="./dist/slade-dbg" IntermediateDirectory="./Debug" Command="./slade-dbg" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[
+      
+      
       ]]>
       </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
@@ -555,6 +559,8 @@
       <General OutputFile="./dist/slade-dbg" IntermediateDirectory="./Debug" Command="./slade-dbg" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[
+      
+      
       
       
       
@@ -609,6 +615,8 @@
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[
       
+      
+      
       ]]>
       </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
@@ -650,6 +658,8 @@
       <General OutputFile="./dist/SLADE.app/Contents/MacOS/SLADE" IntermediateDirectory="./Release" Command="./dist/SLADE.app/Contents/MacOS/SLADE" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[
+      
+      
       
       
       

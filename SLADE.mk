@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Simon
-Date                   :=10/24/2011
+Date                   :=10/25/2011
 CodeLitePath           :="/home/simon/.codelite"
 LinkerName             :=g++
 ArchiveTool            :=ar rcus
@@ -59,8 +59,8 @@ Objects=$(IntermediateDirectory)/src_GfxConvDialog$(ObjectSuffix) $(Intermediate
 	$(IntermediateDirectory)/src_SAction$(ObjectSuffix) $(IntermediateDirectory)/src_KeyBind$(ObjectSuffix) $(IntermediateDirectory)/src_ColourConfiguration$(ObjectSuffix) $(IntermediateDirectory)/src_Drawing$(ObjectSuffix) $(IntermediateDirectory)/src_AnimatedEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_EntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_GfxEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_SwitchesEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_TextEntryPanel$(ObjectSuffix) \
 	$(IntermediateDirectory)/src_DefaultEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_HexEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_MapEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_AudioEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_ANSIEntryPanel$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveManagerPanel$(ObjectSuffix) $(IntermediateDirectory)/src_PatchTablePanel$(ObjectSuffix) $(IntermediateDirectory)/src_TextureXEditor$(ObjectSuffix) $(IntermediateDirectory)/src_TextureXPanel$(ObjectSuffix) $(IntermediateDirectory)/src_TextureEditorPanel$(ObjectSuffix) \
 	$(IntermediateDirectory)/src_PatchBrowser$(ObjectSuffix) $(IntermediateDirectory)/src_ZTextureEditorPanel$(ObjectSuffix) $(IntermediateDirectory)/src_ArchivePanel$(ObjectSuffix) $(IntermediateDirectory)/src_BaseResourceChooser$(ObjectSuffix) $(IntermediateDirectory)/src_EntryOperations$(ObjectSuffix) $(IntermediateDirectory)/src_MainWindow$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveOperations$(ObjectSuffix) $(IntermediateDirectory)/src_Conversions$(ObjectSuffix) $(IntermediateDirectory)/src_MapLine$(ObjectSuffix) $(IntermediateDirectory)/src_MapSector$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_MapSide$(ObjectSuffix) $(IntermediateDirectory)/src_MapThing$(ObjectSuffix) $(IntermediateDirectory)/src_MapVertex$(ObjectSuffix) $(IntermediateDirectory)/src_SLADEMap$(ObjectSuffix) $(IntermediateDirectory)/src_MapObject$(ObjectSuffix) $(IntermediateDirectory)/src_MapCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_MCAnimations$(ObjectSuffix) $(IntermediateDirectory)/src_VertexInfoOverlay$(ObjectSuffix) $(IntermediateDirectory)/src_LineInfoOverlay$(ObjectSuffix) $(IntermediateDirectory)/src_SectorInfoOverlay$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_ThingInfoOverlay$(ObjectSuffix) $(IntermediateDirectory)/src_MapEditorWindow$(ObjectSuffix) $(IntermediateDirectory)/src_MapEditor$(ObjectSuffix) $(IntermediateDirectory)/src_MapTextureManager$(ObjectSuffix) $(IntermediateDirectory)/src_GameConfiguration$(ObjectSuffix) $(IntermediateDirectory)/src_ActionSpecial$(ObjectSuffix) $(IntermediateDirectory)/src_ThingType$(ObjectSuffix) $(IntermediateDirectory)/src_UDMFProperty$(ObjectSuffix) $(IntermediateDirectory)/src_MapRenderer2D$(ObjectSuffix) $(IntermediateDirectory)/src_Archive$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_MapSide$(ObjectSuffix) $(IntermediateDirectory)/src_MapThing$(ObjectSuffix) $(IntermediateDirectory)/src_MapVertex$(ObjectSuffix) $(IntermediateDirectory)/src_SLADEMap$(ObjectSuffix) $(IntermediateDirectory)/src_MapObject$(ObjectSuffix) $(IntermediateDirectory)/src_MapCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_MCAnimations$(ObjectSuffix) $(IntermediateDirectory)/src_LineInfoOverlay$(ObjectSuffix) $(IntermediateDirectory)/src_SectorInfoOverlay$(ObjectSuffix) $(IntermediateDirectory)/src_ThingInfoOverlay$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_VertexInfoOverlay$(ObjectSuffix) $(IntermediateDirectory)/src_MapEditorWindow$(ObjectSuffix) $(IntermediateDirectory)/src_MapEditor$(ObjectSuffix) $(IntermediateDirectory)/src_MapTextureManager$(ObjectSuffix) $(IntermediateDirectory)/src_GameConfiguration$(ObjectSuffix) $(IntermediateDirectory)/src_ActionSpecial$(ObjectSuffix) $(IntermediateDirectory)/src_ThingType$(ObjectSuffix) $(IntermediateDirectory)/src_UDMFProperty$(ObjectSuffix) $(IntermediateDirectory)/src_MapRenderer2D$(ObjectSuffix) $(IntermediateDirectory)/src_Archive$(ObjectSuffix) \
 	$(IntermediateDirectory)/src_ArchiveEntry$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveManager$(ObjectSuffix) $(IntermediateDirectory)/src_WadArchive$(ObjectSuffix) $(IntermediateDirectory)/src_ZipArchive$(ObjectSuffix) $(IntermediateDirectory)/src_EntryType$(ObjectSuffix) $(IntermediateDirectory)/src_EntryDataFormat$(ObjectSuffix) $(IntermediateDirectory)/src_DatArchive$(ObjectSuffix) $(IntermediateDirectory)/src_LibArchive$(ObjectSuffix) $(IntermediateDirectory)/src_ResArchive$(ObjectSuffix) $(IntermediateDirectory)/src_PakArchive$(ObjectSuffix) \
 	$(IntermediateDirectory)/src_Wad2Archive$(ObjectSuffix) $(IntermediateDirectory)/src_WadJArchive$(ObjectSuffix) $(IntermediateDirectory)/src_GrpArchive$(ObjectSuffix) $(IntermediateDirectory)/src_RffArchive$(ObjectSuffix) $(IntermediateDirectory)/src_WolfArchive$(ObjectSuffix) $(IntermediateDirectory)/src_GobArchive$(ObjectSuffix) $(IntermediateDirectory)/src_LfdArchive$(ObjectSuffix) $(IntermediateDirectory)/src_HogArchive$(ObjectSuffix) $(IntermediateDirectory)/src_BSPArchive$(ObjectSuffix) $(IntermediateDirectory)/src_ADatArchive$(ObjectSuffix) \
 	$(IntermediateDirectory)/src_BZip2Archive$(ObjectSuffix) $(IntermediateDirectory)/src_GZipArchive$(ObjectSuffix) $(IntermediateDirectory)/src_TarArchive$(ObjectSuffix) $(IntermediateDirectory)/src_AnimatedList$(ObjectSuffix) $(IntermediateDirectory)/src_SwitchesList$(ObjectSuffix) $(IntermediateDirectory)/src_PnamesList$(ObjectSuffix) $(IntermediateDirectory)/src_CTexture$(ObjectSuffix) $(IntermediateDirectory)/src_PatchTable$(ObjectSuffix) $(IntermediateDirectory)/src_TextureXList$(ObjectSuffix) $(IntermediateDirectory)/src_SFont$(ObjectSuffix) \
@@ -710,14 +710,6 @@ $(IntermediateDirectory)/src_MCAnimations$(DependSuffix): src/MCAnimations.cpp
 $(IntermediateDirectory)/src_MCAnimations$(PreprocessSuffix): src/MCAnimations.cpp
 	@$(CompilerName) $(CmpOptions) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_MCAnimations$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/MCAnimations.cpp"
 
-$(IntermediateDirectory)/src_VertexInfoOverlay$(ObjectSuffix): src/VertexInfoOverlay.cpp $(IntermediateDirectory)/src_VertexInfoOverlay$(DependSuffix)
-	$(CompilerName) $(IncludePCH) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/VertexInfoOverlay.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_VertexInfoOverlay$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/src_VertexInfoOverlay$(DependSuffix): src/VertexInfoOverlay.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_VertexInfoOverlay$(ObjectSuffix) -MF$(IntermediateDirectory)/src_VertexInfoOverlay$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/VertexInfoOverlay.cpp"
-
-$(IntermediateDirectory)/src_VertexInfoOverlay$(PreprocessSuffix): src/VertexInfoOverlay.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_VertexInfoOverlay$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/VertexInfoOverlay.cpp"
-
 $(IntermediateDirectory)/src_LineInfoOverlay$(ObjectSuffix): src/LineInfoOverlay.cpp $(IntermediateDirectory)/src_LineInfoOverlay$(DependSuffix)
 	$(CompilerName) $(IncludePCH) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/LineInfoOverlay.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_LineInfoOverlay$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_LineInfoOverlay$(DependSuffix): src/LineInfoOverlay.cpp
@@ -741,6 +733,14 @@ $(IntermediateDirectory)/src_ThingInfoOverlay$(DependSuffix): src/ThingInfoOverl
 
 $(IntermediateDirectory)/src_ThingInfoOverlay$(PreprocessSuffix): src/ThingInfoOverlay.cpp
 	@$(CompilerName) $(CmpOptions) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ThingInfoOverlay$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/ThingInfoOverlay.cpp"
+
+$(IntermediateDirectory)/src_VertexInfoOverlay$(ObjectSuffix): src/VertexInfoOverlay.cpp $(IntermediateDirectory)/src_VertexInfoOverlay$(DependSuffix)
+	$(CompilerName) $(IncludePCH) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/VertexInfoOverlay.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_VertexInfoOverlay$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_VertexInfoOverlay$(DependSuffix): src/VertexInfoOverlay.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_VertexInfoOverlay$(ObjectSuffix) -MF$(IntermediateDirectory)/src_VertexInfoOverlay$(DependSuffix) -MM "/home/simon/dev/slade/branches/map_editor/src/VertexInfoOverlay.cpp"
+
+$(IntermediateDirectory)/src_VertexInfoOverlay$(PreprocessSuffix): src/VertexInfoOverlay.cpp
+	@$(CompilerName) $(CmpOptions) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_VertexInfoOverlay$(PreprocessSuffix) "/home/simon/dev/slade/branches/map_editor/src/VertexInfoOverlay.cpp"
 
 $(IntermediateDirectory)/src_MapEditorWindow$(ObjectSuffix): src/MapEditorWindow.cpp $(IntermediateDirectory)/src_MapEditorWindow$(DependSuffix)
 	$(CompilerName) $(IncludePCH) $(SourceSwitch) "/home/simon/dev/slade/branches/map_editor/src/MapEditorWindow.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_MapEditorWindow$(ObjectSuffix) $(IncludePath)
@@ -1875,9 +1875,6 @@ clean:
 	$(RM) $(IntermediateDirectory)/src_MCAnimations$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/src_MCAnimations$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/src_MCAnimations$(PreprocessSuffix)
-	$(RM) $(IntermediateDirectory)/src_VertexInfoOverlay$(ObjectSuffix)
-	$(RM) $(IntermediateDirectory)/src_VertexInfoOverlay$(DependSuffix)
-	$(RM) $(IntermediateDirectory)/src_VertexInfoOverlay$(PreprocessSuffix)
 	$(RM) $(IntermediateDirectory)/src_LineInfoOverlay$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/src_LineInfoOverlay$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/src_LineInfoOverlay$(PreprocessSuffix)
@@ -1887,6 +1884,9 @@ clean:
 	$(RM) $(IntermediateDirectory)/src_ThingInfoOverlay$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/src_ThingInfoOverlay$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/src_ThingInfoOverlay$(PreprocessSuffix)
+	$(RM) $(IntermediateDirectory)/src_VertexInfoOverlay$(ObjectSuffix)
+	$(RM) $(IntermediateDirectory)/src_VertexInfoOverlay$(DependSuffix)
+	$(RM) $(IntermediateDirectory)/src_VertexInfoOverlay$(PreprocessSuffix)
 	$(RM) $(IntermediateDirectory)/src_MapEditorWindow$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/src_MapEditorWindow$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/src_MapEditorWindow$(PreprocessSuffix)

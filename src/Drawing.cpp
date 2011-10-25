@@ -51,8 +51,11 @@ namespace Drawing {
 	sf::Font			font_mono;
 	sf::RenderWindow*	render_target = NULL;
 #else
-	FTFont*	font_small = NULL;
-	FTFont* font_large = NULL;
+	FTFont*	font_normal;
+	FTFont*	font_condensed;
+	FTFont*	font_bold;
+	FTFont*	font_boldcondensed;
+	FTFont*	font_mono;
 #endif
 };
 
@@ -93,22 +96,70 @@ void Drawing::initFonts() {
  * Loads all needed fonts for rendering. Non-SFML implementation
  *******************************************************************/
 void Drawing::initFonts() {
-	// Load general fonts
-	ArchiveEntry* entry = theArchiveManager->programResourceArchive()->entryAtPath("fonts/dejavu_sans_c.ttf");
+	// --- Load general fonts ---
+
+	// Normal
+	ArchiveEntry* entry = theArchiveManager->programResourceArchive()->entryAtPath("fonts/dejavu_sans.ttf");
 	if (entry) {
-		// Small font
-		font_small = new FTTextureFont(entry->getData(), entry->getSize());
-		font_small->FaceSize(12);
+		font_normal = new FTTextureFont(entry->getData(), entry->getSize());
+		font_normal->FaceSize(12);
 
-		// Large font
-		font_large = new FTTextureFont(entry->getData(), entry->getSize());
-		font_large->FaceSize(30);
+		// Check it loaded ok
+		if (font_normal->Error()) {
+			delete font_normal;
+			font_normal = NULL;
+		}
+	}
 
-		// Check they loaded ok
-		if (font_small->Error()) {
-			delete font_small;
-			delete font_large;
-			font_small = font_large = NULL;
+	// Condensed
+	entry = theArchiveManager->programResourceArchive()->entryAtPath("fonts/dejavu_sans_c.ttf");
+	if (entry) {
+		font_condensed = new FTTextureFont(entry->getData(), entry->getSize());
+		font_condensed->FaceSize(12);
+
+		// Check it loaded ok
+		if (font_condensed->Error()) {
+			delete font_condensed;
+			font_condensed = NULL;
+		}
+	}
+
+	// Bold
+	entry = theArchiveManager->programResourceArchive()->entryAtPath("fonts/dejavu_sans_b.ttf");
+	if (entry) {
+		font_bold = new FTTextureFont(entry->getData(), entry->getSize());
+		font_bold->FaceSize(12);
+
+		// Check it loaded ok
+		if (font_bold->Error()) {
+			delete font_bold;
+			font_bold = NULL;
+		}
+	}
+
+	// Condensed bold
+	entry = theArchiveManager->programResourceArchive()->entryAtPath("fonts/dejavu_sans_cb.ttf");
+	if (entry) {
+		font_boldcondensed = new FTTextureFont(entry->getData(), entry->getSize());
+		font_boldcondensed->FaceSize(12);
+
+		// Check it loaded ok
+		if (font_boldcondensed->Error()) {
+			delete font_boldcondensed;
+			font_boldcondensed = NULL;
+		}
+	}
+
+	// Monospace
+	entry = theArchiveManager->programResourceArchive()->entryAtPath("fonts/dejavu_mono.ttf");
+	if (entry) {
+		font_mono = new FTTextureFont(entry->getData(), entry->getSize());
+		font_mono->FaceSize(12);
+
+		// Check it loaded ok
+		if (font_mono->Error()) {
+			delete font_mono;
+			font_mono = NULL;
 		}
 	}
 }
@@ -270,10 +321,15 @@ void Drawing::drawText(string text, int x, int y, rgba_t colour, int font, int a
 void Drawing::drawText(string text, int x, int y, rgba_t colour, int font, int alignment, frect_t* bounds) {
 	// Get desired font
 	FTFont* ftgl_font;
-	if (font == FONT_SMALL)
-		ftgl_font = font_small;
-	else
-		ftgl_font = font_large;
+	// Set font
+	switch (font) {
+	case FONT_NORMAL:			ftgl_font = font_normal; break;
+	case FONT_CONDENSED:		ftgl_font = font_condensed; break;
+	case FONT_BOLD:				ftgl_font = font_bold; break;
+	case FONT_BOLDCONDENSED:	ftgl_font = font_boldcondensed; break;
+	case FONT_MONOSPACE:		ftgl_font = font_mono; break;
+	default:					ftgl_font = font_normal; break;
+	};
 
 	// If FTGL font is invalid, do nothing
 	if (!ftgl_font)
