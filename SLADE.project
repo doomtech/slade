@@ -39,6 +39,8 @@
       <File Name="src/AudioPrefsPanel.h"/>
       <File Name="src/ColourPrefsPanel.cpp"/>
       <File Name="src/ColourPrefsPanel.h"/>
+      <File Name="src/AdvancedPrefsPanel.cpp"/>
+      <File Name="src/AdvancedPrefsPanel.h"/>
     </VirtualDirectory>
     <File Name="src/ExtMessageDialog.h"/>
     <File Name="src/ExtMessageDialog.cpp"/>
@@ -463,8 +465,6 @@
         <LibraryPath Value="."/>
         <Library Value="freeimage"/>
         <Library Value="fluidsynth"/>
-        <Library Value="GL"/>
-        <Library Value="GLU"/>
       </Linker>
       <ResourceCompiler Options=""/>
     </GlobalSettings>
@@ -476,7 +476,8 @@
       <ResourceCompiler Options="$(shell wx-config --rcflags)" Required="no"/>
       <General OutputFile="./dist/slade-dbg" IntermediateDirectory="./Debug" Command="./slade-dbg" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
-        <![CDATA[]]>
+        <![CDATA[
+      ]]>
       </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
         <PostConnectCommands/>
@@ -513,7 +514,8 @@
       <ResourceCompiler Options="$(shell wx-config --rcflags)" Required="no"/>
       <General OutputFile="./dist/slade-dbg" IntermediateDirectory="./Debug" Command="./slade-dbg" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
-        <![CDATA[]]>
+        <![CDATA[
+      ]]>
       </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
         <PostConnectCommands/>
@@ -549,6 +551,8 @@
       <Linker Options="$(shell wx-config --debug=no --libs std,gl,stc,aui,ribbon --unicode=yes)" Required="yes">
         <Library Value="sfml-system"/>
         <Library Value="sfml-audio"/>
+        <Library Value="GL"/>
+        <Library Value="GLU"/>
       </Linker>
       <ResourceCompiler Options="$(shell wx-config --rcflags)" Required="no"/>
       <General OutputFile="./dist/slade" IntermediateDirectory="./Release" Command="./slade" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
@@ -587,7 +591,7 @@
         <Preprocessor Value="NDEBUG"/>
         <Preprocessor Value="__ASM_FIX__"/>
       </Compiler>
-      <Linker Options="-s;-arch i386;$(shell $(WXCONFIG_PATH)wx-config --debug=no --libs std,gl,stc,aui,ribbon --unicode=yes);-framework SFML;-framework sfml-system;-framework sfml-audio" Required="yes">
+      <Linker Options="-s;-arch i386;$(shell $(WXCONFIG_PATH)wx-config --debug=no --libs std,gl,stc,aui,propgrid --unicode=yes);-framework SFML;-framework sfml-system;-framework sfml-audio" Required="yes">
         <Library Value="iconv"/>
       </Linker>
       <ResourceCompiler Options="$(shell wx-config --rcflags)" Required="no"/>
