@@ -110,7 +110,7 @@ void ThingInfoOverlay::draw(int bottom, int right, float alpha) {
 	// Draw info text lines
 	int y = height;
 	for (unsigned a = 0; a < info.size(); a++) {
-		Drawing::drawText(info[a], 2, bottom - y, col_fg);
+		Drawing::drawText(info[a], 2, bottom - y, col_fg, Drawing::FONT_CONDENSED);
 		y -= 16;
 	}
 

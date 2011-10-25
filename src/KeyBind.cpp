@@ -328,6 +328,7 @@ void KeyBind::initBinds() {
 	addBind("me2d_mode_lines", keypress_t("L"), "Lines mode");
 	addBind("me2d_mode_sectors", keypress_t("S"), "Sectors mode");
 	addBind("me2d_mode_things", keypress_t("T"), "Things mode");
+	addBind("me2d_flat_type", keypress_t("F", false, true), "Cycle Flat Type");
 
 	// Map Editor 3D (me3d*)
 

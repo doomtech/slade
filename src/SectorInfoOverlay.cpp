@@ -73,7 +73,7 @@ void SectorInfoOverlay::draw(int bottom, int right, float alpha) {
 	// Draw info text lines
 	int y = height;
 	for (unsigned a = 0; a < info.size(); a++) {
-		Drawing::drawText(info[a], 2, bottom - y, col_fg);
+		Drawing::drawText(info[a], 2, bottom - y, col_fg, Drawing::FONT_CONDENSED);
 		y -= 16;
 	}
 
@@ -150,5 +150,5 @@ void SectorInfoOverlay::drawTexture(float alpha, int x, int y, string texture, s
 	// Draw texture name (even if texture is blank)
 	texture.Prepend(":");
 	texture.Prepend(pos);
-	Drawing::drawText(texture, x + 40, y - 16, col_fg, Drawing::FONT_SMALL, Drawing::ALIGN_CENTER);
+	Drawing::drawText(texture, x + 40, y - 16, col_fg, Drawing::FONT_CONDENSED, Drawing::ALIGN_CENTER);
 }

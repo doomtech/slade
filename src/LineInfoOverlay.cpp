@@ -118,26 +118,10 @@ void LineInfoOverlay::draw(int bottom, int right, float alpha) {
 	glVertex2d(0, bottom - height - 16);
 	glEnd();
 
-	// Test
-	/*
-	double twidth = right*0.3;
-	glLineWidth(1.0f);
-	glBegin(GL_LINES);
-	col_fg.set_gl();
-	glVertex2d(0, bottom2 - height);
-	glColor4f(col_fg.fr(), col_fg.fg(), col_fg.fb(), 0.0f);
-	glVertex2d(twidth*alpha, bottom2 - height);
-	glVertex2d(right-(twidth*alpha), bottom2 - height);
-	//glColor4f(col_fg.fr(), col_fg.fg(), col_fg.fb(), 1.0f);
-	col_fg.set_gl();
-	glVertex2d(right, bottom2 - height);
-	glEnd();
-	*/
-
 	// Draw info text lines
 	int y = height;
 	for (unsigned a = 0; a < info.size(); a++) {
-		Drawing::drawText(info[a], 2, bottom - y, col_fg);
+		Drawing::drawText(info[a], 2, bottom - y, col_fg, Drawing::FONT_CONDENSED);
 		y -= 16;
 	}
 
@@ -159,10 +143,10 @@ void LineInfoOverlay::drawSide(int bottom, int right, float alpha, side_t& side,
 	col_fg.a = col_fg.a*alpha;
 
 	// Index and sector index
-	Drawing::drawText(side.info, xstart + 2, bottom - 32, col_fg);
+	Drawing::drawText(side.info, xstart + 2, bottom - 32, col_fg, Drawing::FONT_CONDENSED);
 
 	// Texture offsets
-	Drawing::drawText(side.offsets, xstart + 2, bottom - 16, col_fg);
+	Drawing::drawText(side.offsets, xstart + 2, bottom - 16, col_fg, Drawing::FONT_CONDENSED);
 
 	// Textures
 	drawTexture(alpha, xstart + 4, bottom - 32, side.tex_upper);
@@ -207,5 +191,5 @@ void LineInfoOverlay::drawTexture(float alpha, int x, int y, string texture, str
 	// Draw texture name (even if texture is blank)
 	texture.Prepend(":");
 	texture.Prepend(pos);
-	Drawing::drawText(texture, x + 40, y - 16, col_fg, Drawing::FONT_SMALL, Drawing::ALIGN_CENTER);
+	Drawing::drawText(texture, x + 40, y - 16, col_fg, Drawing::FONT_CONDENSED, Drawing::ALIGN_CENTER);
 }

@@ -44,8 +44,11 @@
  *******************************************************************/
 namespace Drawing {
 #ifdef USE_SFML_RENDERWINDOW
-	sf::Font			font_small;
-	sf::Font			font_large;
+	sf::Font			font_normal;
+	sf::Font			font_condensed;
+	sf::Font			font_bold;
+	sf::Font			font_boldcondensed;
+	sf::Font			font_mono;
 	sf::RenderWindow*	render_target = NULL;
 #else
 	FTFont*	font_small = NULL;
@@ -63,12 +66,27 @@ namespace Drawing {
  * Loads all needed fonts for rendering. SFML implementation
  *******************************************************************/
 void Drawing::initFonts() {
-	// Load general fonts
-	ArchiveEntry* entry = theArchiveManager->programResourceArchive()->entryAtPath("fonts/dejavu_sans_c.ttf");
-	if (entry) {
-		font_small.LoadFromMemory((const char*)entry->getData(), entry->getSize(), 12);
-		font_large.LoadFromMemory((const char*)entry->getData(), entry->getSize(), 30);
-	}
+	// --- Load general fonts ---
+
+	// Normal
+	ArchiveEntry* entry = theArchiveManager->programResourceArchive()->entryAtPath("fonts/dejavu_sans.ttf");
+	if (entry) font_normal.LoadFromMemory((const char*)entry->getData(), entry->getSize(), 12);
+
+	// Condensed
+	entry = theArchiveManager->programResourceArchive()->entryAtPath("fonts/dejavu_sans_c.ttf");
+	if (entry) font_condensed.LoadFromMemory((const char*)entry->getData(), entry->getSize(), 12);
+
+	// Bold
+	entry = theArchiveManager->programResourceArchive()->entryAtPath("fonts/dejavu_sans_b.ttf");
+	if (entry) font_bold.LoadFromMemory((const char*)entry->getData(), entry->getSize(), 12);
+
+	// Condensed Bold
+	entry = theArchiveManager->programResourceArchive()->entryAtPath("fonts/dejavu_sans_cb.ttf");
+	if (entry) font_boldcondensed.LoadFromMemory((const char*)entry->getData(), entry->getSize(), 12);
+
+	// Monospace
+	entry = theArchiveManager->programResourceArchive()->entryAtPath("fonts/dejavu_mono.ttf");
+	if (entry) font_mono.LoadFromMemory((const char*)entry->getData(), entry->getSize(), 12);
 }
 #else
 /* Drawing::initFonts
@@ -211,14 +229,17 @@ void Drawing::drawText(string text, int x, int y, rgba_t colour, int font, int a
 	sf::String sf_str(CHR(text));
 	sf_str.SetPosition(x, y);
 	sf_str.SetColor(sf::Color(colour.r, colour.g, colour.b, colour.a));
-	if (font == FONT_SMALL) {
-		sf_str.SetFont(font_small);
-		sf_str.SetSize(font_small.GetCharacterSize());
-	}
-	else {
-		sf_str.SetFont(font_large);
-		sf_str.SetSize(font_large.GetCharacterSize());
-	}
+
+	// Set font
+	switch (font) {
+	case FONT_NORMAL:			sf_str.SetFont(font_normal); break;
+	case FONT_CONDENSED:		sf_str.SetFont(font_condensed); break;
+	case FONT_BOLD:				sf_str.SetFont(font_bold); break;
+	case FONT_BOLDCONDENSED:	sf_str.SetFont(font_boldcondensed); break;
+	case FONT_MONOSPACE:		sf_str.SetFont(font_mono); break;
+	default:					sf_str.SetFont(font_normal); break;
+	};
+	sf_str.SetSize(sf_str.GetFont().GetCharacterSize());
 
 	// Setup alignment
 	if (alignment != ALIGN_LEFT) {

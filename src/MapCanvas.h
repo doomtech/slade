@@ -83,6 +83,7 @@ public:
 
 	// Drawing
 	void	drawGrid();
+	void	drawEditorMessages();
 	void	draw();
 	void	update(long frametime);
 

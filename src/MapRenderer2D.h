@@ -112,8 +112,8 @@ public:
 
 	// Misc
 	void	setScale(double scale) { view_scale = scale; view_scale_inv = 1.0 / scale; }
-	void	updateVisibility(fpoint2_t view_tl, fpoint2_t view_br, double view_scale);
-	void	forceUpdate(float view_scale);
+	void	updateVisibility(fpoint2_t view_tl, fpoint2_t view_br);
+	void	forceUpdate();
 	double	scaledRadius(int radius);
 };
 

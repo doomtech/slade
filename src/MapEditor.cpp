@@ -36,6 +36,15 @@ void MapEditor::setEditMode(int mode) {
 	tagged_sectors.clear();
 	tagged_lines.clear();
 	tagged_things.clear();
+
+	// Add editor message
+	switch (edit_mode) {
+	case MODE_VERTICES: addEditorMessage("Vertices mode"); break;
+	case MODE_LINES:	addEditorMessage("Lines mode"); break;
+	case MODE_SECTORS:	addEditorMessage("Sectors mode"); break;
+	case MODE_THINGS:	addEditorMessage("Things mode"); break;
+	default: break;
+	};
 }
 
 bool MapEditor::openMap(Archive::mapdesc_t map) {
@@ -154,6 +163,8 @@ void MapEditor::selectAll() {
 		for (unsigned a = 0; a < map.things.size(); a++)
 			selection.push_back(a);
 	}
+
+	addEditorMessage(S_FMT("Selected all %d items", selection.size()));
 
 	if (canvas)
 		canvas->itemsSelected(selection);
@@ -460,6 +471,8 @@ void MapEditor::incrementGrid() {
 	gridsize++;
 	if (gridsize > 18)
 		gridsize = 18;
+
+	addEditorMessage(S_FMT("Grid Size: %dx%d", (int)gridSize(), (int)gridSize()));
 }
 
 void MapEditor::decrementGrid() {
@@ -467,6 +480,8 @@ void MapEditor::decrementGrid() {
 	gridsize--;
 	if (gridsize < 4)
 		gridsize = 4;
+
+	addEditorMessage(S_FMT("Grid Size: %dx%d", (int)gridSize(), (int)gridSize()));
 }
 
 double MapEditor::snapToGrid(double position) {
@@ -628,6 +643,38 @@ void MapEditor::endMove() {
 		map.getThing(a)->filter(false);
 
 	move_items.clear();
+}
+
+unsigned MapEditor::numEditorMessages() {
+	return editor_messages.size();
+}
+
+string MapEditor::getEditorMessage(int index) {
+	// Check index
+	if (index < 0 || index >= editor_messages.size())
+		return "";
+
+	return editor_messages[index].message;
+}
+
+long MapEditor::getEditorMessageTime(int index) {
+	// Check index
+	if (index < 0 || index >= editor_messages.size())
+		return -1;
+
+	return theApp->runTimer() - editor_messages[index].act_time;
+}
+
+void MapEditor::addEditorMessage(string message) {
+	// Remove oldest message if there are too many active
+	if (editor_messages.size() >= 4)
+		editor_messages.erase(editor_messages.begin());
+
+	// Add message to list
+	editor_msg_t msg;
+	msg.message = message;
+	msg.act_time = theApp->runTimer();
+	editor_messages.push_back(msg);
 }
 
 

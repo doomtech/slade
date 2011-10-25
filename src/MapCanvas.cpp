@@ -51,6 +51,7 @@ CVAR(Bool, grid_dashed, false, CVAR_SAVE)
 CVAR(Bool, scroll_smooth, true, CVAR_SAVE)
 CVAR(Int, flat_drawtype, 2, CVAR_SAVE)
 CVAR(Bool, selection_clear_click, false, CVAR_SAVE)
+CVAR(Bool, map_showfps, false, CVAR_SAVE)
 PolygonSplitter splitter;	// for testing
 
 
@@ -157,7 +158,7 @@ void MapCanvas::setView(double x, double y) {
 	view_br.y = translateY(0);
 
 	// Update object visibility
-	renderer_2d->updateVisibility(view_tl, view_br, view_scale);
+	renderer_2d->updateVisibility(view_tl, view_br);
 }
 
 void MapCanvas::pan(double x, double y) {
@@ -192,7 +193,7 @@ void MapCanvas::zoom(double amount, bool toward_cursor) {
 	view_br.y = translateY(0);
 
 	// Update object visibility
-	renderer_2d->updateVisibility(view_tl, view_br, view_scale);
+	renderer_2d->updateVisibility(view_tl, view_br);
 }
 
 void MapCanvas::viewFitToMap(bool snap) {
@@ -230,8 +231,8 @@ void MapCanvas::viewFitToMap(bool snap) {
 	}
 
 	// Update object visibility
-	renderer_2d->forceUpdate(view_scale);
-	renderer_2d->updateVisibility(view_tl, view_br, view_scale);
+	renderer_2d->forceUpdate();
+	renderer_2d->updateVisibility(view_tl, view_br);
 }
 
 void MapCanvas::viewShowObject() {
@@ -307,7 +308,7 @@ void MapCanvas::viewShowObject() {
 	}
 
 	// Update object visibility
-	renderer_2d->updateVisibility(view_tl, view_br, view_scale);
+	renderer_2d->updateVisibility(view_tl, view_br);
 }
 
 void MapCanvas::viewMatchSpot(double mx, double my, double sx, double sy) {
@@ -385,6 +386,38 @@ void MapCanvas::drawGrid() {
 	}
 
 	glDisable(GL_LINE_STIPPLE);
+}
+
+void MapCanvas::drawEditorMessages() {
+	// Go through editor messages
+	int yoff = 0;
+	if (map_showfps) yoff = 16;
+	for (unsigned a = 0; a < editor->numEditorMessages(); a++) {
+		// Check message time
+		long time = editor->getEditorMessageTime(a);
+		if (time > 2000)
+			continue;
+
+		// Setup message colour
+		rgba_t col(255, 200, 100, 255);
+		if (time < 200) {
+			float flash = 1.0f - (time / 200.0f);
+			col.r += (255-col.r)*flash;
+			col.g += (255-col.g)*flash;
+			col.b += (255-col.b)*flash;
+		}
+
+		// Setup message alpha
+		if (time > 1500)
+			col.a = 255 - (double((time - 1500) / 500.0) * 255);
+
+		// Draw message 'shadow'
+		Drawing::drawText(editor->getEditorMessage(a), 1, yoff+1, rgba_t(0, 0, 0, col.a), Drawing::FONT_BOLD);
+		
+		// Draw message
+		Drawing::drawText(editor->getEditorMessage(a), 0, yoff, col, Drawing::FONT_BOLD);
+		yoff += 16;
+	}
 }
 
 /* MapCanvas::draw
@@ -576,16 +609,21 @@ void MapCanvas::draw() {
 		info_thing.draw(GetSize().y, GetSize().x, anim_info_fade);
 
 	// FPS counter
-	if (frametime_last > 0) {
-		int fps = 1.0 / (frametime_last/1000.0);
-		fps_avg.push_back(fps);
-		if (fps_avg.size() > 20) fps_avg.erase(fps_avg.begin());
+	if (map_showfps) {
+		if (frametime_last > 0) {
+			int fps = 1.0 / (frametime_last/1000.0);
+			fps_avg.push_back(fps);
+			if (fps_avg.size() > 20) fps_avg.erase(fps_avg.begin());
+		}
+		int afps = 0;
+		for (unsigned a = 0; a < fps_avg.size(); a++)
+			afps += fps_avg[a];
+		if (fps_avg.size() > 0) afps /= fps_avg.size();
+		Drawing::drawText(S_FMT("FPS: %d", afps));
 	}
-	int afps = 0;
-	for (unsigned a = 0; a < fps_avg.size(); a++)
-		afps += fps_avg[a];
-	if (fps_avg.size() > 0) afps /= fps_avg.size();
-	Drawing::drawText(S_FMT("FPS: %d", afps));
+
+	// Editor messages
+	drawEditorMessages();
 
 	SwapBuffers();
 }
@@ -928,6 +966,22 @@ void MapCanvas::onKeyBindPress(string name) {
 	// Clear selection
 	else if (name == "me2d_clear_selection")
 		editor->clearSelection();
+
+	// Cycle flat type
+	else if (name == "me2d_flat_type") {
+		flat_drawtype = flat_drawtype + 1;
+		if (flat_drawtype > 3)
+			flat_drawtype = 0;
+
+		// Editor message
+		switch (flat_drawtype) {
+		case 0: editor->addEditorMessage("Flats: None"); break;
+		case 1: editor->addEditorMessage("Flats: Light Level"); break;
+		case 2: editor->addEditorMessage("Flats: Floor Texture"); break;
+		case 3: editor->addEditorMessage("Flats: Ceiling Texture"); break;
+		default: break;
+		};
+	}
 }
 
 void MapCanvas::onKeyBindRelease(string name) {
@@ -982,7 +1036,7 @@ void MapCanvas::onSize(wxSizeEvent& e) {
 	view_br.y = translateY(0);
 
 	// Update map item visibility
-	renderer_2d->updateVisibility(view_tl, view_br, view_scale);
+	renderer_2d->updateVisibility(view_tl, view_br);
 }
 
 void MapCanvas::onKeyDown(wxKeyEvent& e) {
@@ -1044,7 +1098,7 @@ void MapCanvas::onMouseDown(wxMouseEvent& e) {
 	else if (e.RightDown()) {
 		if (editor->beginMove(mouse_downpos_m)) {
 			mouse_state = MSTATE_MOVE;
-			renderer_2d->forceUpdate(view_scale_inter);
+			renderer_2d->forceUpdate();
 		}
 	}
 
@@ -1082,7 +1136,7 @@ void MapCanvas::onMouseUp(wxMouseEvent& e) {
 		if (mouse_state == MSTATE_MOVE) {
 			editor->endMove();
 			mouse_state = MSTATE_NORMAL;
-			renderer_2d->forceUpdate(view_scale_inter);
+			renderer_2d->forceUpdate();
 		}
 	}
 

@@ -52,5 +52,5 @@ void VertexInfoOverlay::draw(int bottom, int right, float alpha) {
 	glEnd();
 
 	// Draw text
-	Drawing::drawText(info, 2, bottom - 16, col_fg);
+	Drawing::drawText(info, 2, bottom - 16, col_fg, Drawing::FONT_CONDENSED);
 }

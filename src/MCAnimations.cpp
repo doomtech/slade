@@ -70,7 +70,7 @@ MCAThingSelection::MCAThingSelection(long start, double x, double y, double radi
 	this->fade = 1.0f;
 
 	// Adjust radius
-	if (!thing_overlay_square && thing_drawtype > 0 && thing_drawtype < 3)
+	if (!thing_overlay_square)
 		this->radius += 8;
 }
 
@@ -100,9 +100,14 @@ void MCAThingSelection::draw() {
 	col.set_gl();
 
 	// Get texture if needed
-	if (!thing_overlay_square && thing_drawtype > 0 && thing_drawtype < 3) {
+	if (!thing_overlay_square) {
 		// Get thing selection texture
-		GLTexture* tex = theMapEditor->textureManager().getEditorImage("thing/hilight");
+		GLTexture* tex = NULL;
+		if (thing_drawtype == 1 || thing_drawtype == 2)
+			tex = theMapEditor->textureManager().getEditorImage("thing/hilight");
+		else
+			tex = theMapEditor->textureManager().getEditorImage("thing/square/hilight");
+
 		if (!tex)
 			return;
 
@@ -111,6 +116,7 @@ void MCAThingSelection::draw() {
 		tex->bind();
 	}
 
+	// Animate radius
 	double r = radius;
 	if (select) r += radius*0.2*fade;
 

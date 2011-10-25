@@ -10,8 +10,11 @@ class GLTexture;
 namespace Drawing {
 	enum {
 		// Text fonts
-		FONT_SMALL = 0,
-		FONT_LARGE = 1,
+		FONT_NORMAL = 0,
+		FONT_CONDENSED,
+		FONT_BOLD,
+		FONT_BOLDCONDENSED,
+		FONT_MONOSPACE,
 
 		// Text alignment
 		ALIGN_LEFT = 0,
@@ -34,7 +37,7 @@ namespace Drawing {
 	void drawTextureWithin(GLTexture* tex, double x1, double y1, double x2, double y2, double padding, bool upscale = false);
 
 	// Text drawing
-	void drawText(string text, int x = 0, int y = 0, rgba_t colour = COL_WHITE, int font = FONT_SMALL, int alignment = ALIGN_LEFT, frect_t* bounds = NULL);
+	void drawText(string text, int x = 0, int y = 0, rgba_t colour = COL_WHITE, int font = FONT_NORMAL, int alignment = ALIGN_LEFT, frect_t* bounds = NULL);
 
 	// Specific
 	void drawHud(bool statusbar, bool center, bool wide);

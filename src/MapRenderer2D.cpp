@@ -460,15 +460,17 @@ void MapRenderer2D::renderTaggedLines(vector<MapLine*>& lines, float fade) {
 bool MapRenderer2D::setupThingOverlay() {
 	// Get hilight texture
 	GLTexture* tex = theMapEditor->textureManager().getEditorImage("thing/hilight");
+	if (thing_drawtype == 0 || thing_drawtype == 3)
+		tex = theMapEditor->textureManager().getEditorImage("thing/square/hilight");
 
-	// Nothing to do if thing_overlay_square is true or thing_drawtype is 0 or 3+ (squares)
+	// Nothing to do if thing_overlay_square is true and thing_drawtype is 1 or 2 (circles or sprites)
 	// or if the hilight circle texture isn't found for some reason
-	if (thing_overlay_square || thing_drawtype == 0 || thing_drawtype > 2 || !tex) {
+	if (!tex || (thing_overlay_square && (thing_drawtype == 1 || thing_drawtype == 2))) {
 		glDisable(GL_TEXTURE_2D);
 		return false;
 	}
 
-	// Otherwise, we want the circle selection overlay
+	// Otherwise, we want the textured selection overlay
 	glEnable(GL_TEXTURE_2D);
 	tex->bind();
 
@@ -484,8 +486,8 @@ bool MapRenderer2D::setupThingOverlay() {
 }
 
 void MapRenderer2D::renderThingOverlay(double x, double y, double radius, bool point) {
-	// Simplest case, thing_overlay_square is true or thing_drawtype is 0 or 3+ (squares)
-	if (thing_overlay_square || thing_drawtype == 0 || thing_drawtype > 2) {
+	// Simplest case, thing_overlay_square is true and thing_drawtype is 1 or 2 (circles or sprites)
+	if (thing_overlay_square && (thing_drawtype == 1 || thing_drawtype == 2)) {
 		// Draw square
 		glBegin(GL_QUADS);
 		glVertex2d(x - radius, y - radius);
@@ -983,7 +985,7 @@ void MapRenderer2D::renderThingHilight(int index, float fade) {
 	col.a *= fade;
 	col.set_gl();
 
-	// Render thing hilight
+	// Get thing info
 	MapThing* thing = map->getThing(index);
 	ThingType* tt = theGameConfiguration->thingType(thing->getType());
 	double x = thing->xPos();
@@ -993,7 +995,7 @@ void MapRenderer2D::renderThingHilight(int index, float fade) {
 	double radius = tt->getRadius();
 
 	// Check if we want square overlays
-	if (thing_overlay_square || thing_drawtype == 0 || thing_drawtype > 2) {
+	if (thing_overlay_square) {
 		glDisable(GL_TEXTURE_2D);
 		glLineWidth(3.0f);
 		glBegin(GL_LINE_LOOP);
@@ -1021,7 +1023,11 @@ void MapRenderer2D::renderThingHilight(int index, float fade) {
 		radius *= 1.1 + (0.2*fade);
 
 	// Setup hilight thing texture
-	GLTexture* tex = theMapEditor->textureManager().getEditorImage("thing/hilight");
+	GLTexture* tex = NULL;
+	if (thing_drawtype == 0 || thing_drawtype == 3)
+		tex = theMapEditor->textureManager().getEditorImage("thing/square/hilight");
+	else
+		tex = theMapEditor->textureManager().getEditorImage("thing/hilight");
 	if (tex) {
 		glEnable(GL_TEXTURE_2D);
 		tex->bind();
@@ -1055,7 +1061,7 @@ void MapRenderer2D::renderThingSelection(vector<int>& selection) {
 		double radius = theGameConfiguration->thingType(thing->getType())->getRadius();
 
 		// Adjust radius if the overlay isn't square
-		if ((thing_drawtype == 1 || thing_drawtype == 2) && !thing_overlay_square)
+		if (!thing_overlay_square)
 			radius += 8;
 
 		// Draw it
@@ -1083,7 +1089,7 @@ void MapRenderer2D::renderTaggedThings(vector<MapThing*>& things, float fade) {
 		double radius = theGameConfiguration->thingType(thing->getType())->getRadius();
 
 		// Adjust radius if the overlay isn't square
-		if ((thing_drawtype == 1 || thing_drawtype == 2) && !thing_overlay_square)
+		if (!thing_overlay_square)
 			radius += 8;
 
 		// Draw it
@@ -1518,8 +1524,7 @@ void MapRenderer2D::renderMovingSectors(vector<int>& sectors, fpoint2_t move_vec
 
 void MapRenderer2D::renderMovingThings(vector<int>& things, fpoint2_t move_vec) {
 	// Enable textures
-	if (thing_drawtype > 0 && thing_drawtype < 3)
-		glEnable(GL_TEXTURE_2D);
+	glEnable(GL_TEXTURE_2D);
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	tex_last = NULL;
@@ -1572,7 +1577,7 @@ void MapRenderer2D::renderMovingThings(vector<int>& things, fpoint2_t move_vec) 
 		double radius = theGameConfiguration->thingType(thing->getType())->getRadius();
 
 		// Adjust radius if the overlay isn't square
-		if ((thing_drawtype == 1 || thing_drawtype == 2) && !thing_overlay_square)
+		if (!thing_overlay_square)
 			radius += 8;
 
 		renderThingOverlay(thing->xPos() + move_vec.x, thing->yPos() + move_vec.y, radius, point);
@@ -1713,11 +1718,7 @@ void MapRenderer2D::updateFlatsVBO() {
 	flats_updated = theApp->runTimer();
 }
 
-void MapRenderer2D::updateVisibility(fpoint2_t view_tl, fpoint2_t view_br, double view_scale) {
-	// Update variables
-	this->view_scale = view_scale;
-	this->view_scale_inv = 1.0 / view_scale;
-
+void MapRenderer2D::updateVisibility(fpoint2_t view_tl, fpoint2_t view_br) {
 	// Sector visibility
 	if (map->nSectors() != vis_s.size()) {
 		// Number of sectors changed, reset array
@@ -1769,7 +1770,7 @@ void MapRenderer2D::updateVisibility(fpoint2_t view_tl, fpoint2_t view_br, doubl
 }
 
 
-void MapRenderer2D::forceUpdate(float view_scale) {
+void MapRenderer2D::forceUpdate() {
 	// Update variables
 	this->view_scale = view_scale;
 	this->view_scale_inv = 1.0 / view_scale;

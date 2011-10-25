@@ -28,6 +28,13 @@ private:
 	vector<int>	move_items;
 	int			move_item_closest;
 
+	// Editor messages
+	struct editor_msg_t {
+		string	message;
+		long	act_time;
+	};
+	vector<editor_msg_t>	editor_messages;
+
 public:
 	enum {
 		// Editor modes
@@ -86,6 +93,12 @@ public:
 	bool			beginMove(fpoint2_t mouse_pos);
 	void			doMove(fpoint2_t mouse_pos);
 	void			endMove();
+
+	// Editor messages
+	unsigned	numEditorMessages();
+	string		getEditorMessage(int index);
+	long		getEditorMessageTime(int index);
+	void		addEditorMessage(string message);
 };
 
 #endif//__MAP_EDITOR_H__
