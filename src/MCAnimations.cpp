@@ -34,6 +34,8 @@ bool MCASelboxFader::update(long time) {
 }
 
 void MCASelboxFader::draw() {
+	glDisable(GL_TEXTURE_2D);
+
 	rgba_t col;
 
 	// Outline
