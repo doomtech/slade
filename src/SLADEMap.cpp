@@ -1322,7 +1322,7 @@ vector<int> SLADEMap::nearestThingMulti(double x, double y) {
 
 int SLADEMap::inSector(double x, double y) {
 	// Go through sectors
-	double min_dist = 9999999999;
+	double min_dist = 999999999;
 	int index = -1;
 	for (unsigned a = 0; a < sectors.size(); a++) {
 		// Check with sector bbox

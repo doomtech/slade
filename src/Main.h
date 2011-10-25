@@ -55,7 +55,7 @@ using std::vector;
 #include <gl/GLU.h>
 #elif __APPLE__
 // OSX GL headers
-#include <OpenGL/glew.h>
+#include <GL/glew.h>
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
 #else

@@ -521,6 +521,8 @@
         <![CDATA[
       
       
+      
+      
       ]]>
       </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
@@ -559,6 +561,8 @@
       <General OutputFile="./dist/slade-dbg" IntermediateDirectory="./Debug" Command="./slade-dbg" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[
+      
+      
       
       
       
@@ -617,6 +621,8 @@
       
       
       
+      
+      
       ]]>
       </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
@@ -646,31 +652,18 @@
       </Completion>
     </Configuration>
     <Configuration Name="Release-osx" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-arch i386;-O3;$(shell $(WXCONFIG_PATH)wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no)" C_Options="-arch i386;-O3;$(shell $(WXCONFIG_PATH)wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no)" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
+      <Compiler Options="-O3;-arch i386;$(shell $(WXCONFIG_PATH)wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no);$(shell $(PKGCONFIG_PATH)pkg-config --cflags ftgl)" C_Options="-O3;-arch i386;$(shell $(WXCONFIG_PATH)wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no)" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
         <Preprocessor Value="__WX__"/>
         <Preprocessor Value="NDEBUG"/>
         <Preprocessor Value="__ASM_FIX__"/>
       </Compiler>
-      <Linker Options="-s;-arch i386;$(shell $(WXCONFIG_PATH)wx-config --debug=no --libs std,gl,stc,aui,ribbon --unicode=yes);-framework SFML;-framework sfml-system;-framework sfml-audio" Required="yes">
+      <Linker Options="-s;-arch i386;$(shell $(WXCONFIG_PATH)wx-config --debug=no --libs std,gl,stc,aui,propgrid --unicode=yes);-framework SFML;-framework sfml-system;-framework sfml-audio;$(shell $(PKGCONFIG_PATH)pkg-config --libs ftgl)" Required="yes">
         <Library Value="iconv"/>
       </Linker>
       <ResourceCompiler Options="$(shell wx-config --rcflags)" Required="no"/>
       <General OutputFile="./dist/SLADE.app/Contents/MacOS/SLADE" IntermediateDirectory="./Release" Command="./dist/SLADE.app/Contents/MacOS/SLADE" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
-        <![CDATA[
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      ]]>
+        <![CDATA[]]>
       </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
         <PostConnectCommands/>

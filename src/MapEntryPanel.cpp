@@ -570,7 +570,7 @@ bool MapEntryPanel::loadEntry(ArchiveEntry* entry) {
 				// Check properties
 				bool special = false;
 				bool twosided = false;
-				if (l.side2 >= 0)
+				if (l.side2 > 0)
 					twosided = true;
 				if (l.type > 0)
 					special = true;
@@ -590,7 +590,7 @@ bool MapEntryPanel::loadEntry(ArchiveEntry* entry) {
 				bool macro = false;
 				bool special = false;
 				bool twosided = false;
-				if (l.side2 >= 0)
+				if (l.side2 > 0)
 					twosided = true;
 				if (l.type > 0) {
 					if (l.type & 0x100)
@@ -612,7 +612,7 @@ bool MapEntryPanel::loadEntry(ArchiveEntry* entry) {
 				// Check properties
 				bool special = false;
 				bool twosided = false;
-				if (l.side2 >= 0)
+				if (l.side2 > 0)
 					twosided = true;
 				if (l.type > 0)
 					special = true;
