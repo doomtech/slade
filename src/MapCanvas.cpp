@@ -797,7 +797,9 @@ void MapCanvas::itemSelected(int index, bool selected) {
 		ThingType* tt = theGameConfiguration->thingType(t->getType());
 
 		// Start animation
-		animations.push_back(new MCAThingSelection(theApp->runTimer(), t->xPos(), t->yPos(), tt->getRadius(), selected));
+		double radius = tt->getRadius();
+		if (tt->shrinkOnZoom()) radius = renderer_2d->scaledRadius(radius);
+		animations.push_back(new MCAThingSelection(theApp->runTimer(), t->xPos(), t->yPos(), radius, selected));
 	}
 
 	// Lines mode

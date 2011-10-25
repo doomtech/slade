@@ -823,9 +823,11 @@ void MapRenderer2D::renderThingsImmediate(float alpha) {
 	vector<int> things_arrows;
 
 	// Draw thing shadows if round things is on
-	if (thing_drawtype == 1 && thing_shadow > 0.01f && alpha >= 0.9) {
+	if (thing_shadow > 0.01f && alpha >= 0.9) {
 		glEnable(GL_TEXTURE_2D);
 		GLTexture* tex_shadow = theMapEditor->textureManager().getEditorImage("thing/shadow");
+		if (thing_drawtype == 0 || thing_drawtype == 3)
+			tex_shadow = theMapEditor->textureManager().getEditorImage("thing/square/shadow");
 		if (tex_shadow) {
 			tex_shadow->bind();
 			glColor4f(0.0f, 0.0f, 0.0f, alpha*thing_shadow);
@@ -1016,6 +1018,9 @@ void MapRenderer2D::renderThingHilight(int index, float fade) {
 		return;
 	}
 
+	// Shrink if needed
+	if (tt->shrinkOnZoom()) radius = scaledRadius(radius);
+
 	// Adjust radius
 	if (thing_drawtype == 0 || thing_drawtype > 2)
 		radius += 6;
@@ -1058,7 +1063,9 @@ void MapRenderer2D::renderThingSelection(vector<int>& selection) {
 	// Draw all selection overlays
 	for (unsigned a = 0; a < selection.size(); a++) {
 		MapThing* thing = map->getThing(selection[a]);
-		double radius = theGameConfiguration->thingType(thing->getType())->getRadius();
+		ThingType* tt = theGameConfiguration->thingType(thing->getType());
+		double radius = tt->getRadius();
+		if (tt->shrinkOnZoom()) radius = scaledRadius(radius);
 
 		// Adjust radius if the overlay isn't square
 		if (!thing_overlay_square)
@@ -1086,7 +1093,9 @@ void MapRenderer2D::renderTaggedThings(vector<MapThing*>& things, float fade) {
 	// Draw all tagged overlays
 	for (unsigned a = 0; a < things.size(); a++) {
 		MapThing* thing = things[a];
-		double radius = theGameConfiguration->thingType(thing->getType())->getRadius();
+		ThingType* tt = theGameConfiguration->thingType(thing->getType());
+		double radius = tt->getRadius();
+		if (tt->shrinkOnZoom()) radius = scaledRadius(radius);
 
 		// Adjust radius if the overlay isn't square
 		if (!thing_overlay_square)
@@ -1574,7 +1583,9 @@ void MapRenderer2D::renderMovingThings(vector<int>& things, fpoint2_t move_vec) 
 	bool point = setupThingOverlay();
 	for (unsigned a = 0; a < things.size(); a++) {
 		MapThing* thing = map->getThing(things[a]);
-		double radius = theGameConfiguration->thingType(thing->getType())->getRadius();
+		ThingType* tt = theGameConfiguration->thingType(thing->getType());
+		double radius = tt->getRadius();
+		if (tt->shrinkOnZoom()) radius = scaledRadius(radius);
 
 		// Adjust radius if the overlay isn't square
 		if (!thing_overlay_square)
@@ -1793,8 +1804,8 @@ void MapRenderer2D::forceUpdate() {
 }
 
 double MapRenderer2D::scaledRadius(int radius) {
-	if (radius > 20)
-		radius = 20;
+	if (radius > 16)
+		radius = 16;
 
 	if (view_scale > 1.0)
 		return radius * view_scale_inv;
