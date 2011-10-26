@@ -1,0 +1,173 @@
+// Gfx entry types, Doom and port formats
+
+entry_types
+{
+	gfx_raw // The base type for the various raw graphic formats
+	{
+		name = "(gfx raw base)";
+		format = img_raw;
+		export_ext = "raw";
+		editor = gfx;
+		icon = "e_gfx";
+		detectable = 0;
+		extra = image;
+		category = "Graphics";
+		image_format = "raw";
+	}
+
+	gfx_flat : gfx_raw
+	{
+		name = "Graphic (Flat)";
+		size = 4, 4096, 4160, 8192, 16384, 65536, 64000, 1048576, 4194304, 16777216;
+		section = "flats";
+		extra = image;
+		image_format = "raw_flat";
+	}
+
+	gfx_autopage : gfx_raw
+	{
+		name = "Graphic (Autopage)";
+		size_multiple = 320;
+		//format = autopage;
+		match_name = "autopage";
+		extra = image;
+		image_format = "raw_flat";
+	}
+
+	gfx_strifestartup : gfx_raw
+	{
+		name = "Graphic (Startup)";
+		size = 256, 2048, 2304;
+		//format = strifestart;
+		match_name = "strtpa1", "strtpb1", "strtpc1", "strtpd1", "strtlz1", "strtlz2", "strtbot";
+		extra = image;
+	}
+
+	gfx_raw_screen : gfx_raw
+	{
+		name = "Graphic (Raw Screen)";
+		size = 64000;
+		//format = fullscreen;
+		match_name = "title", "help1", "help2", "credit", "interpic", "finale1", "finale2", "finale3", "e2end", "final1", "final2", "startup0";
+		extra = image;
+		image_format = "raw_flat";
+	}
+
+	gfx_doom
+	{
+		name = "Graphic (Doom)";
+		format = img_doom;
+		editor = gfx;
+		icon = "e_gfx";
+		reliability = 230;
+		extra = image, patch;
+		export_ext = "lmp";
+		category = "Graphics";
+		image_format = "doom";
+	}
+
+	gfx_doom_beta
+	{
+		name = "Graphic (Beta)";
+		format = img_doom_beta;
+		editor = gfx;
+		icon = "e_gfx";
+		reliability = 160;
+		extra = image, patch;
+		export_ext = "lmp";
+		category = "Graphics";
+		image_format = "doom_beta";
+	}
+
+	gfx_doom_snea
+	{
+		name = "Graphic (Snea)";
+		format = img_doom_snea;
+		editor = gfx;
+		icon = "e_gfx";
+		extra = image;
+		export_ext = "lmp";
+		category = "Graphics";
+		image_format = "doom_snea";
+	}
+
+	gfx_doom_gnum
+	{
+		name = "Graphic (Gnum)";
+		format = img_raw;
+		size = 120;
+		match_name = "gnum?";
+		editor = gfx;
+		icon = "e_gfx";
+		extra = image;
+		category = "Graphics";
+		image_format = "raw";
+	}
+
+	gfx_doom_arah
+	{
+		name = "Graphic (Arah)";
+		format = img_doom_arah;
+		editor = gfx;
+		icon = "e_gfx";
+		extra = image;
+		reliability = 100;
+		export_ext = "lmp";
+		category = "Graphics";
+		image_format = "doom_arah";
+	}
+
+	gfx_doom_alpha
+	{
+		name = "Graphic (Alpha)";
+		format = img_doom_alpha;
+		editor = gfx;
+		icon = "e_gfx";
+		reliability = 100;
+		extra = image, patch;
+		export_ext = "lmp";
+		category = "Graphics";
+		image_format = "doom_alpha";
+	}
+
+	gfx_4bitchunk
+	{
+		name = "Graphic (4-bit)";
+		size = 32, 184;
+		match_name = "notch", "netnotch";
+		format = img_4bitchunk;
+		editor = gfx;
+		icon = "e_gfx";
+		reliability = 80;
+		extra = image;
+		export_ext = "lmp";
+		category = "Graphics";
+		image_format = "4bitchunk";
+	}
+
+	gfx_planar
+	{
+		name = "Graphic (Planar)";
+		size = 153648;
+		editor = gfx;
+		format = img_planar;
+		icon = "e_gfx";
+		match_name = "startup";
+		reliability = 240;
+		extra = image;
+		category = "Graphics";
+		image_format = "planar";
+	}
+
+	imgz
+	{
+		name = "Graphic (IMGZ)";
+		format = img_imgz;
+		export_ext = "imgz";
+		editor = gfx;
+		icon = "e_gfx";
+		extra = image;
+		category = "Graphics";
+		image_format = "imgz";
+	}
+}

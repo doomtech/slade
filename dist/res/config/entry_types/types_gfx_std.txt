@@ -1,0 +1,101 @@
+// Gfx entry types, standard formats
+
+entry_types
+{
+	png
+	{
+		name = "Graphic (PNG)";
+		format = img_png;
+		export_ext = "png";
+		editor = gfx;
+		icon = "e_png";
+		extra = image, patch;
+		category = "Graphics";
+		image_format = "png";
+	}
+
+	bmp
+	{
+		name = "Graphic (BMP)";
+		format = img_bmp;
+		export_ext = "bmp";
+		editor = gfx;
+		icon = "e_bmp";
+		extra = image;
+		category = "Graphics";
+		image_format = "image";
+	}
+
+	gif
+	{
+		name = "Graphic (GIF)";
+		format = img_gif;
+		export_ext = "gif";
+		editor = gfx;
+		icon = "e_gfx";
+		extra = image;
+		category = "Graphics";
+		image_format = "image";
+	}
+
+	pcx
+	{
+		name = "Graphic (PCX)";
+		format = img_pcx;
+		export_ext = "pcx";
+		editor = gfx;
+		icon = "e_gfx";
+		extra = image;
+		category = "Graphics";
+		image_format = "image";
+	}
+
+	tga
+	{
+		name = "Graphic (TGA)";
+		format = img_tga;
+		export_ext = "tga";
+		editor = gfx;
+		icon = "e_gfx";
+		extra = image;
+		reliability = 225;
+		category = "Graphics";
+		image_format = "image";
+	}
+
+	tiff
+	{
+		name = "Graphic (TIFF)";
+		format = img_tiff;
+		export_ext = "tif";
+		editor = gfx;
+		icon = "e_gfx";
+		extra = image;
+		category = "Graphics";
+		image_format = "image";
+	}
+
+	jpeg
+	{
+		name = "Graphic (JPEG)";
+		format = img_jpeg;
+		export_ext = "jpg";
+		editor = gfx;
+		icon = "e_gfx";
+		extra = image;
+		category = "Graphics";
+		image_format = "image";
+	}
+
+	icon
+	{
+		name = "Graphic (ICO)";
+		match_ext = "ico";
+		editor = "gfx";
+		icon = "e_gfx";
+		extra = image;
+		category = "Graphics";
+		image_format = "image";
+	}
+
+}

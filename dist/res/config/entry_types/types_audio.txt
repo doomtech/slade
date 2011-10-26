@@ -1,0 +1,211 @@
+// Audio entry types
+
+entry_types
+{
+	mus
+	{
+		name = "Music (MUS)";
+		format = mus;
+		export_ext = "mus";
+		icon = "e_music";
+		category = "Audio";
+		editor = audio;
+	}
+
+	midi
+	{
+		name = "Music (MIDI)";
+		format = midi;
+		export_ext = "mid";
+		icon = "e_music";
+		category = "Audio";
+		editor = audio;
+	}
+
+	xmi
+	{
+		name = "Music (XMI)";
+		format = xmi;
+		export_ext = "xmi";
+		icon = "e_music";
+		reliability = 100;
+		category = "Audio";
+		editor = audio;
+	}
+
+	hmi
+	{
+		name = "Music (HMI)";
+		format = hmi;
+		export_ext = "hmi";
+		icon = "e_music";
+		reliability = 100;
+		category = "Audio";
+		editor = audio;
+	}
+
+	hmp
+	{
+		name = "Music (HMP)";
+		format = hmp;
+		export_ext = "hmp";
+		icon = "e_music";
+		reliability = 100;
+		category = "Audio";
+		editor = audio;
+	}
+
+	gmid
+	{
+		name = "Music (GMID)";
+		format = gmid;
+		export_ext = "gmd";
+		icon = "e_music";
+		reliability = 75;
+		category = "Audio";
+		editor = audio;
+	}
+
+	mod_it
+	{
+		name = "Music (IT Module)";
+		format = mod_it;
+		export_ext = "it";
+		icon = "e_music";
+		category = "Audio";
+		//editor = audio;
+	}
+
+	mod_xm
+	{
+		name = "Music (XM Module)";
+		format = mod_xm;
+		export_ext = "xm";
+		icon = "e_music";
+		category = "Audio";
+		//editor = audio;
+	}
+
+	mod_s3m
+	{
+		name = "Music (S3M Module)";
+		format = mod_s3m;
+		export_ext = "s3m";
+		icon = "e_music";
+		category = "Audio";
+		//editor = audio;
+	}
+
+	mod_mod
+	{
+		name = "Music (MOD Module)";
+		format = mod_mod;
+		export_ext = "mod";
+		icon = "e_music";
+		category = "Audio";
+		//editor = audio;
+	}
+
+	snd_doom
+	{
+		name = "Sound (Doom Format)";
+		format = snd_doom;
+		icon = "e_sound";
+		reliability = 200;
+		export_ext = "lmp";
+		category = "Audio";
+		editor = audio;
+	}
+
+	// This is used to interpret a raw sample
+	snd_bloodsfx
+	{
+		name = "Sound (Blood Format)";
+		format = snd_bloodsfx;
+		match_ext = "SFX";
+		icon = "e_sound";
+		export_ext = "sfx";
+		category = "Audio";
+		editor = audio;
+	}
+
+	snd_speaker
+	{
+		name = "Sound (PC Speaker)";
+		format = snd_speaker;
+		icon = "e_sound";
+		export_ext = "lmp";
+		category = "Audio";
+		reliability = 100;
+	}
+
+	snd_wav
+	{
+		name = "Sound (Wav Format)";
+		format = snd_wav;
+		export_ext = "wav";
+		icon = "e_sound";
+		category = "Audio";
+		editor = audio;
+	}
+
+	snd_voc
+	{
+		name = "Sound (Creative)";
+		format = snd_voc;
+		export_ext = "voc";
+		icon = "e_sound";
+		category = "Audio";
+		editor = audio;
+	}
+
+	snd_ogg
+	{
+		name = "Sound (Ogg Vorbis)";
+		format = snd_ogg;
+		export_ext = "ogg";
+		icon = "e_sound";
+		category = "Audio";
+		editor = audio;
+	}
+
+	snd_flac
+	{
+		name = "Sound (FLAC)";
+		format = snd_flac;
+		export_ext = "flac";
+		icon = "e_sound";
+		category = "Audio";
+		editor = audio;
+	}
+
+	snd_mp2
+	{
+		name = "Sound (MP2)";
+		format = snd_mp2;
+		export_ext = "mp2";
+		icon = "e_sound";
+		category = "Audio";
+		//editor = audio;
+	}
+
+	snd_mp3
+	{
+		name = "Sound (MP3)";
+		format = snd_mp3;
+		export_ext = "mp3";
+		icon = "e_sound";
+		category = "Audio";
+		//editor = audio;
+	}
+
+	snd_spc
+	{
+		name = "Sound (SPC)";
+		format = snd_spc;
+		match_ext = "spc";
+		icon = "e_sound";
+		category = "Audio";
+		//editor = audio;
+	}
+}
