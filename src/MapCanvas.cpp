@@ -966,8 +966,10 @@ void MapCanvas::onKeyBindPress(string name) {
 		editor->selectAll();
 
 	// Clear selection
-	else if (name == "me2d_clear_selection")
+	else if (name == "me2d_clear_selection") {
 		editor->clearSelection();
+		editor->addEditorMessage("Selection cleared");
+	}
 
 	// Cycle flat type
 	else if (name == "me2d_flat_type") {

@@ -1,0 +1,371 @@
+
+decorate : cstyle {
+	name = "ZDoom Decorate";
+	keyword_link = "http://zdoom.org/wiki/Special:Search/%s";
+	constant_link = "http://zdoom.org/wiki/Special:Search/%s";
+	function_link = "http://zdoom.org/wiki/%s";
+	case_sensitive = false;
+
+	keywords = {
+		$override,
+
+		// General keywords
+		Actor, States, Spawn, See, Melee, Missile, Pain, Death, XDeath, Burn, Ice, Disintegrate,
+		Raise, Heal, Crash, Crush, Wound, Greetings, Yes, No, Loop, Stop, Wait, Fail, Goto, Ready,
+		Deselect, Select, Fire, AltFire, Hold, AltHold, Flash, AltFlash, Pickup, Use, Drop, Bright,
+		Idle, Active, Inactive, Light, Offset, Native,
+
+		// Actor properties
+		Game, SpawnID, ConversationID, Tag, Health, GibHealth, WoundHealth, ReactionTime,
+		PainChance, PainThreshold, Damage, DamageFactor, PoisonDamage, RadiusDamageFactor, Speed, VSpeed,
+		FastSpeed, FloatSpeed, Species, Activation, Radius, Height, DeathHeight, BurnHeight, ProjectilePassHeight,
+		CameraHeight, Gravity, Mass, MaxStepHeight, MaxDropOffHeight, BounceFactor, BounceCount, WallBounceFactor,
+		PushFactor, WeaveIndexXY, WeaveIndexZ, SeeSound, AttackSound, PainSound, BounceSound, CrushPainSound,
+		DeathSound, ActiveSound, MeleeSound, HowlSound, PainSound, WallBounceSound, RenderStyle, None, Normal,
+		Fuzzy, Translucent, SoulTrans, Stencil, StencilColor, Shaded, Add, Alpha, XScale, YScale, Scale, Translation,
+		BloodColor, BloodType, Decal, Obituary, HitObituary, DontHurtShooter, ExplosionRadius, ExplosionDamage,
+		MeleeDamage, MeleeThreshold, MeleeRange, MissileType, MissileHeight, MinMissileChance, DamageType,
+		ClearFlags, DropItem, Skip_Super, Args, DynamicLight,
+
+		// Specific actor properties
+		Inventory, Amount, DefMaxAmount, MaxAmount, InterHubAmount, Icon, PickupMessage, PickupSound, PickupFlash, UseSound, RespawnTics,
+		GiveQuest, Respawns, Powerup, Color, InverseMap, GoldMap, RedMap, BlueMap, GreenMap, Duration, Type, Armor, SaveAmount, SavePercent,
+		MaxSaveAmount, MaxAbsorb, MaxBonus, MaxBonusMax, MaxFullAbsorb, Ammo, BackPackAmount, BackPackMaxAmount, DropAmount, Weapon, AmmoGive, AmmoGive1, AmmoGive2,
+		AmmoType, AmmoType1, AmmoType2, AmmoUse, AmmoUse1, AmmoUse2, KickBack, ReadySound, SelectionOrder,
+		SisterWeapon, SlotNumber, SlotPriority, UpSound, YAdjust, PuzzleItem, Number, WeaponPiece, Weapon, LowMessage,
+		FailMessage, AttackZOffset, ColorRange, ColorSet, ColorSetFile, ClearColorSet, CrouchSprite, DamageScreenColor,
+		DisplayName, Face, ForwardMove, HealRadiusType, HexenArmor, InvulnerabilityMode, JumpZ, MaxHealth, RunHealth, ScoreIcon,
+		SideMove, SpawnClass, SoundClass, StartItem, WeaponSlot, ViewHeight, MorphWeapon, MugShotMaxHealth, Mode, Type, AutoUse,
+
+		// Combos
+		Monster, Projectile,
+
+		// DECORATE expressions
+		x, y, z, angle, momx, momy, momz, velx, vely, velz, pitch, tid, tidtohate, ceilingz, floorz, special, waterlevel, var, int
+	}
+
+	constants = {
+		//ZDoom 2.5.0 update by Michaelis
+		//auto-parsed through ZDoom Wiki > Actor flags, so nevermind duplicate entries
+		ACTIVATEIMPACT, ACTIVATEMCROSS, ACTIVATEPCROSS, ACTLIKEBRIDGE, ADDITIVEPOISONDAMAGE,
+		ADDITIVEPOISONDURATION, ALLOWBOUNCEONACTORS, ALLOWPARTICLES, ALWAYSFAST,
+		ALWAYSPUFF, ALWAYSRESPAWN, AMBUSH, AVOIDMELEE, BLASTED, BLOCKEDBYSOLIDACTORS,
+		BLOODLESSIMPACT, BLOODSPLATTER, BOSS, BOSSDEATH, BOUNCEAUTOOFF, BOUNCELIKEHERETIC,
+		BOUNCEONACTORS, BOUNCEONCEILINGS, BOUNCEONFLOORS, BOUNCEONWALLS, BRIGHT, BUMPSPECIAL,
+		CANBLAST, CANBOUNCEWATER, CANNOTPUSH, CANPASS, CANPASS, CANPUSHWALLS, CANTLEAVEFLOORPIC,
+		CANTSEEK, CANUSEWALLS, CEILINGHUGGER, CORPSE, COUNTITEM, COUNTKILL, DEFLECT, DEHEXPLOSION,
+		DONTBLAST, DONTFALL, DONTGIB, DONTHARMCLASS, DONTHURTSPECIES, DONTMORPH, DONTOVERLAP,
+		DONTREFLECT, DONTRIP, DONTSEEKINVISIBLE, DONTSPLASH, DONTSQUASH, DONTTRANSLATE, DOOMBOUNCE,
+		DORMANT, DROPOFF, DROPPED, EXPLOCOUNT, EXPLODEONWATER, EXTREMEDEATH, FASTER, FASTMELEE,
+		FIREDAMAGE, FIRERESIST, FIXMAPTHINGPOS, FLOAT, FLOATBOB, FLOORCLIP, FLOORHUGGER, FOILINVUL,
+		FORCEPAIN, FORCERADIUSDMG, FORCEXYBILLBOARD, FORCEYBILLBOARD, FRIENDLY, FRIGHTENED,
+		FULLVOLACTIVE, FULLVOLDEATH, GHOST, GRENADETRAIL, HERETICBOUNCE, HEXENBOUNCE, ICECORPSE,
+		ICEDAMAGE, INCOMBAT, INVISIBLE, INVULNERABLE, ISMONSTER, JUSTATTACKED, JUSTHIT, LONGMELEERANGE,
+		LOOKALLAROUND, LOWGRAVITY, MBFBOUNCER, MISSILE, MISSILEEVENMORE, MISSILEMORE, MOVEWITHSECTOR,
+		MTHRUSPECIES, NEVERFAST, NEVERRESPAWN, NOBLOCKMAP, NOBLOCKMONST, NOBLOOD, NOBLOODDECALS,
+		NOBOSSRIP, NOBOUNCESOUND, NOCLIP, NODAMAGE, NODAMAGETHRUST, NODROPOFF, NOEXPLODEFLOOR,
+		NOEXTREMEDEATH, NOFEAR, NOGRAVITY, NOICEDEATH, NOINFIGHTING, NOINTERACTION, NOLIFTDROP,
+		NONSHOOTABLE, NOPAIN, NORADIUSDMG, NOSECTOR, NOSKIN, NOSPLASHALERT, NOTARGET, NOTARGETSWITCH,
+		NOTDMATCH, NOTELEFRAG, NOTELEOTHER, NOTELEPORT, NOTIMEFREEZE, NOTRIGGER, NOVERTICALMELEERANGE,
+		NOWALLBOUNCESND, OLDRADIUSDMG, PAINLESS, PICKUP, PIERCEARMOR, PUFFGETSOWNER, PUFFONACTORS,
+		PUSHABLE, QUARTERGRAVITY, QUICKTORETALIATE, RANDOMIZE, REFLECTIVE, RIPPER, ROCKETTRAIL,
+		SCREENSEEKER, SEEKERMISSILE, SEESDAGGERS, SHADOW, SHIELDREFLECT, SHOOTABLE, SHORTMISSILERANGE,
+		SKYEXPLODE, SLIDESONWALLS, SOLID, SPAWNCEILING, SPAWNFLOAT, SPAWNSOUNDSOURCE, SPECTRAL,
+		STANDSTILL, STAYMORPHED, STEALTH, STEPMISSILE, STRIFEDAMAGE, SYNCHRONIZED, TELEPORT, TELESTOMP,
+		TERRAIN, THRUACTORS, THRUGHOST, THRUSPECIES, TOUCHY, USESPECIAL, VISIBILITYPULSE, VULNERABLE,
+		WINDTHRUST,
+
+		// INVENTORY.
+		INVENTORY,
+		QUIET, AUTOACTIVATE, UNDROPPABLE, INVBAR,
+		HUBPOWER, PERSISTENTPOWER, INTERHUBSTRIP,
+		PICKUPFLASH, ALWAYSPICKUP, FANCYPICKUPSOUND, BIGPOWERUP,
+		KEEPDEPLETED, IGNORESKILL, ADDITIVETIME,
+
+		// WEAPON.
+		WEAPON,
+		NOAUTOFIRE, READYSNDHALF, DONTBOB, AXEBLOOD, NOALERT,
+		AMMO_OPTIONAL, ALT_AMMO_OPTIONAL, AMMO_CHECKBOTH, PRIMARY_USES_BOTH,
+		WIMPY_WEAPON, POWERED_UP, STAFF2_KICKBACK, EXPLOSIVE,
+		MELEEWEAPON, BFG, CHEATNOTWEAPON, NO_AUTO_SWITCH, NOAUTOAIM,
+
+		//thing activation
+		THINGSPEC_Default, THINGSPEC_ThingActs, THINGSPEC_TriggerActs, THINGSPEC_ThingTargets, THINGSPEC_TriggerTargets,
+		THINGSPEC_MonsterTrigger, THINGSPEC_MissileTrigger, THINGSPEC_ClearSpecial, THINGSPEC_NoDeathSpecial, THINGSPEC_Activate,
+		THINGSPEC_Deactivate, THINGSPEC_Switch,
+		AF_Default, AF_ThingActs, AF_ThingTargets, AF_TriggerTargets, AF_MonsterTrigger, AF_MissileTrigger, AF_ClearSpecial, AF_NoDeathSpecial, AF_TriggerActs,
+
+		//both bouncetype and game constants
+		Doom, Heretic, Hexen, Chex, Raven, Strife, Classic, Grenade, DoomCompat, HereticCompat, HexenCompat,
+
+		//constants, source: gzdoom.pk3
+	    SF_NORANDOM, SF_RANDOMLIGHTMISS, SF_RANDOMLIGHTHIT, SF_RANDOMLIGHTBOTH, SF_NOUSEAMMOMISS, SF_NOUSEAMMO,
+		CMF_AIMOFFSET, CMF_AIMDIRECTION, CMF_TRACKOWNER, CMF_CHECKTARGETDEAD,
+		CBAF_AIMFACING, CBAF_NORANDOM, CBAF_EXPLICITANGLE, FBF_USEAMMO, FBF_NORANDOM, FBF_EXPLICITANGLE,
+		SXF_TRANSFERTRANSLATION, SXF_ABSOLUTEPOSITION, SXF_ABSOLUTEANGLE, SXF_ABSOLUTEMOMENTUM, SXF_ABSOLUTEVELOCITY,
+		SXF_SETMASTER, SXF_NOCHECKPOSITION, SXF_TELEFRAG, SXF_CLIENTSIDE, SXF_TRANSFERAMBUSHFLAG, SXF_TRANSFERPITCH, SXF_TRANSFERPOINTERS,
+		CHF_FASTCHASE, CHF_NOPLAYACTIVE, CHF_NIGHTMAREFAST, CHF_RESURRECT, CHF_DONTMOVE,
+		LOF_NOSIGHTCHECK, LOF_NOSOUNDCHECK, LOF_DONTCHASEGOAL, LOF_NOSEESOUND, LOF_FULLVOLSEESOUND,
+		RSF_FOG, RSF_KEEPTARGET, RSF_TELEFRAG, CVF_RELATIVE, CVF_REPLACE,
+		JLOSF_PROJECTILE, JLOSF_NOSIGHT, JLOSF_CLOSENOFOV, JLOSF_CLOSENOSIGHT, JLOSF_CLOSENOJUMP, JLOSF_DEADNOJUMP, JLOSF_CHECKMASTER,
+		WRF_NOBOB, WRF_NOFIRE, WRF_NOSWITCH, WRF_NOPRIMARY, WRF_NOSECONDARY,
+		MRF_ADDSTAMINA, MRF_FULLHEALTH, MRF_UNDOBYTOMEOFPOWER, MRF_UNDOBYCHAOSDEVICE, MRF_FAILNOTELEFRAG,
+		MRF_FAILNOLAUGH, MRF_WHENINVULNERABLE, MRF_LOSEACTUALWEAPON, MRF_NEWTIDBEHAVIOUR,
+		MRF_UNDOBYDEATH, MRF_UNDOBYDEATHFORCED, MRF_UNDOBYDEATHSAVES,
+		RGF_SILENT, RGF_NOPIERCING, RGF_EXPLICITANGLE, MSF_Standard, MSF_Classic, MSF_DontHurt,
+		BF_USEAMMO, BF_DONTWARN, BF_AFFECTBOSSES, SMF_LOOK, SMF_PRECISE, CPF_USEAMMO, CPF_DAGGER, CPF_PULLIN,
+		TF_TELEFRAG, TF_RANDOMDECIDE, TIF_NOTAKEINFINITE,
+		CHAN_AUTO, CHAN_WEAPON, CHAN_VOICE, CHAN_ITEM, CHAN_BODY, CHAN_LISTENERZ, CHAN_MAYBE_LOCAL, CHAN_UI, CHAN_NOPAUSE,
+		ATTN_NONE, ATTN_NORM, ATTN_IDLE, ATTN_STATIC
+	}
+
+	functions {
+		A_AlertMonsters;
+		A_Burst = "string classname";
+		A_CentaurDefend;
+		A_Chase = "[string MeleeState], [string RangedState], [int Flags]";
+		A_ClearSoundTarget;
+		A_ClearTarget;
+		A_DamageChildren = "int amount, [string type]";
+		A_DamageMaster = "int amount, [string type]";
+		A_DamageSiblings = "int amount, [string type]";
+		A_Die = "[string DamageType]";
+		A_ExtChase = "bool domelee, bool domissile, bool playactive, bool nightmarefast";
+		A_FaceTarget = "[float max_turn_allowed]";
+		A_FastChase;
+		A_KillChildren = "string damagetype";
+		A_KillMaster = "string damagetype";
+		A_KillSiblings = "string damagetype";
+		A_Look;
+		A_Look2;
+		A_LookEx = "int flags, fixed minseedist, fixed maxseedist, fixed maxheardist, fixed fov, state seestate";
+		A_RaiseChildren;
+		A_RaiseMaster;
+		A_RaiseSiblings;
+		A_RemoveChildren = "[bool remove_alive_too]";
+		A_RemoveMaster;
+		A_RemoveSiblings = "[bool remove_alive_too]";
+		A_SentinelBob;
+		A_Teleport;
+		A_TurretLook;
+		A_VileChase;
+		A_Wander;
+
+		A_CustomMissile = "string missiletype, [float spawnheight], [int spawnofs_horiz], [angle angle], [int aimflags], [angle pitch]";
+		A_CustomBulletAttack = "float horz_spread, float vert_spread, int numbullets, int dmgperbullet, string pufftype, [float range], [int flags]";
+		A_CustomRailgun = "int dmg, [int offset], [color ringcol], [color corecol], [int flags], [bool aim], [float maxdiff], [string pufftype], [float spread_xy], [float spread_z]";
+		A_CustomMeleeAttack = "int damage, [string meleesound], [string misssound], [string damagetype], [bool bleed]";
+		A_CustomComboAttack = "string missiletype, float spawnheight, int damage, string meleesound, string damagetype, bool bleed";
+		A_MeleeAttack;
+		A_MissileAttack;
+		A_MonsterRefire = "int chancecontinue, string abortstate";
+		A_ComboAttack;
+		A_BasicAttack = "int meleedamage, string meleesound, string missiletype, float missileheight";
+		A_BulletAttack;
+		A_MonsterRail;
+		A_Explode = "[int dmg], [int radius], [bool hurtshooter], [bool alert], [int fulldmgradius], [int nails], [int naildmg]";
+		A_RadiusThrust = "int thrust, int radius, bool hurtshooter";
+		A_Detonate;
+		A_ThrowGrenade = "string spawntype, [float spawnheight], [float throwspeed_horz], [float throwspeed_vert], [bool useammo]";
+
+		A_FreezeDeath;
+		A_GenericFreezeDeath;
+		A_FreezeDeathChunks;
+		A_IceGuyDie;
+
+		A_PlaySound = "string soundname, [int slot], [float volume], [bool looping], [float attenuation]";
+		A_PlaySoundEx = "string soundname, string channel, [bool loop], [int attenuation]";
+		A_PlayWeaponSound = "string soundname";
+		A_ActiveSound;
+		A_LoopActiveSound;
+		A_FLoopActiveSound;
+		A_StopSound = "[int slot]";
+		A_StopSoundEx = "string channel";
+		A_Pain;
+		A_Scream;
+		A_XScream;
+		A_PlayerScream;
+		A_VileStart;
+		A_BrainPain;
+		A_BrainAwake;
+		A_BFGSound;
+
+		A_Print = "string text";
+		A_PrintBold = "string text_to_all_players";
+		A_Log = "string text";
+		A_LogInt = "int number";
+
+		A_BossDeath;
+		A_KeenDie = "[int tag]";
+		A_BrainDie;
+		A_GetHurt;
+		A_KlaxonBlare;
+		A_CheckTerrain;
+		A_SetBlend = "color blendcolor, float alpha, int duration";
+		A_CheckPlayerDone = "string state";
+		A_PlayerSkinCheck;
+		A_SkullPop = "string className";
+
+		A_TossGib;
+		A_SpawnDebris = "string type, bool translation";
+		A_SpawnItem = "string type, int distance, float zpos, bool useammo, bool translation";
+		A_SpawnItemEx = "string type, float xoffset, float yoffset, float zoffset, float xvelocity, float yvelocity, float zvelocity, float angle, int flags, int failchance";
+
+		A_CheckCeiling = "string state", "int offset";
+		A_CheckFloor =	"string state", "int offset";
+		A_CheckSight = "string state", "int offset";
+		A_CheckSightOrRange = "float distance, string state", "float distance, int offset";
+
+		A_Jump = "int chance, string state, [...]", "int chance, int offset, [...]";
+		A_JumpIf = "condition, string state", "condition, int offset";
+		A_JumpIfArmorType = "string armortype, string state, [int minimum]", "string armortype, int offset, [int minimum]";
+		A_JumpIfCloser = "int distance, string state", "int distance, int offset";
+		A_JumpIfHealthLower = "int health, string state", "int health, int offset";
+		A_JumpIfInventory = "string inventorytype, int amount, string state", "string inventorytype, int amount, int offset";
+		A_JumpIfInTargetInventory = "string item, int count, string state", "string item, int count, int offset";
+		A_JumpIfMasterCloser = "int distance, string state", "int distance, int offset";
+		A_JumpIfNoAmmo = "string state", "int offset";
+		A_JumpIfTargetInLOS = "string state, [float fov], [int flags], [float dist_max], [float dist_close]", "int offset, [float fov], [int flags], [float dist_max], [float dist_close]";
+		A_JumpIfTracerCloser = "int distance, string state", "int distance, int offset";
+
+		A_ChangeFlag = "string flagname, bool value";
+		A_SetFloorClip;
+		A_UnSetFloorClip;
+		A_HideThing;
+		A_UnHideThing;
+		A_SetInvulnerable;
+		A_UnSetInvulnerable;
+		A_SetReflective;
+		A_UnSetReflective;
+		A_SetReflectiveInvulnerable;
+		A_UnSetReflectiveInvulnerable;
+		A_SetShootable;
+		A_UnSetShootable;
+		A_NoGravity;
+		A_Gravity;
+		A_LowGravity;
+		A_NoBlocking;
+		A_Fall;
+		A_SetSolid;
+		A_UnsetSolid;
+		A_SetFloat;
+		A_UnsetFloat;
+		A_ScreamAndUnblock;
+		A_ActiveAndUnblock;
+		A_SetShadow;
+		A_ClearShadow;
+		A_SetTranslucent = "float alpha, int mode";
+		A_FadeIn = "[float increase_amount]";
+		A_FadeOut = "[float reduce_amount], [bool remove_when_zero]";
+		A_FadeTo = "float target, [float amount], [bool remove_when_target]";
+		A_QueueCorpse;
+		A_DeQueueCorpse;
+		A_Respawn = "[bool fog]";
+		A_SetAngle = "float angle";
+		A_SetArg = "int position, int value";
+		A_SetPitch = "float pitch";
+		A_SetSpecial = "int special, int arg0, int arg1, int arg2, int arg3, int arg4";
+		A_SetUserVar = "string name, int value";
+		A_ScaleVelocity = "float scale";
+		A_ChangeVelocity = "float x, float y, float z, int flags";
+
+		A_SeekerMissile = "angle threshold, angle maxturnangle, [int flags], [int chance_to_reacquire], [int max_acquiring_distance]";
+		A_Tracer;
+		A_Tracer2;
+		A_Fire;
+		A_BishopMissileWeave;
+		A_CStaffMissileSlither;
+		A_Weave = "int horzspeed, int vertspeed, float horzdist, float vertdist";
+		A_Countdown;
+		A_CountdownArg = "int arg, [string target_state]";
+		A_Stop;
+
+		A_GiveInventory = "string type, int count";
+		A_GiveToTarget = "string type, int count";
+		A_TakeInventory = "string type, int count, [int flags]";
+		A_TakeFromTarget = "string type, int count, [int flags]";
+		A_DropInventory = "string type";
+		A_SelectWeapon = "string type";
+
+		A_WeaponReady = "[int flags]";
+		A_Lower;
+		A_Raise;
+		A_ReFire = "[string state]";
+		A_ClearReFire;
+		A_GunFlash = "[string flashstate]";
+		A_CheckReload;
+		A_CheckForReload = "int counter, string state, [bool dontincrement]";
+		A_CheckRailReload;
+		A_ResetReloadCounter;
+		A_Light = "int intensity";
+		A_Light0;
+		A_Light1;
+		A_Light2;
+		A_LightInverse;
+		A_Recoil = "float force";
+		A_ZoomFactor = "float zoom, [int flags]";
+		A_SetCrosshair = "int number";
+		A_Punch;
+		A_Saw = "[string fullsound], [string hitsound], [int damage], [string pufftype], [int flags], [float range], [float spread_xy], [float spread_z], [float lifesteal]";
+		A_CustomPunch = "int damage, [bool norandom], [int flags], [string pufftype], [float range], [float lifesteal]";
+		A_FireBullets = "angle spread_horz, angle spread_vert, int numbullets, int damage, [string pufftype], [int flags], [float range]";
+		A_FireCustomMissile = "string missiletype, [angle angle], [bool useammo], [int spawnofs_horz], [int spawnheight], [int aim], [angle pitch]";
+		A_RailAttack = "int damage, [int spawnofs_horz], [bool useammo], [color ringcolor], [color corecolor], [int flags], [int maxdiff], [string pufftype], [float spread_xy], [float spread_z]";
+		A_FireAssaultGun;
+		A_FireBFG;
+		A_FireOldBFG;
+		A_FireShotgun;
+		A_FireShotgun2;
+		A_FireCGun;
+		A_FireMissile;
+		A_FirePlasma;
+		A_FireSTGrenade = "[string missiletype]";
+
+		A_PosAttack;
+		A_SPosAttack;
+		A_CPosAttack;
+		A_CPosRefire;
+		A_SpidRefire;
+		A_TroopAttack;
+		A_SargAttack;
+		A_HeadAttack;
+		A_BruisAttack;
+		A_SkullAttack = "[int speed]";
+		A_BspiAttack;
+		A_CyberAttack;
+		A_PainAttack = "[string spawntype]";
+		A_DualPainAttack = "[string spawntype]";
+		A_PainDie = "[string spawntype]";
+		A_SkelFist;
+		A_SkelMissile;
+		A_FatAttack1 = "[string spawntype]";
+		A_FatAttack2 = "[string spawntype]";
+		A_FatAttack3 = "[string spawntype]";
+		A_VileTarget = "[string type]";
+		A_VileAttack = "string sound, int initialdamage, int blastdamage, int blastradius, float thrustfactor, string damagetype";
+		A_BrainSpit = "[string Actor]";
+		A_SpawnFly = "[string FogActor]";
+		A_SpawnSound;
+		A_BrainScream;
+		A_BrainExplode;
+		A_Mushroom = "[string spawntype], [int amount], [int flags], [float vrange], [float hrange]";
+		A_M_Saw = "[string fullsound], [string hitsound], [int damage], [string pufftype]";
+		A_SentinelRefire;
+		A_BetaSkullAttack;
+
+		A_Hoof;
+		A_Metal;
+		A_BabyMetal;
+		A_FatRaise;
+		A_SkelWhoosh;
+		A_StartFire;
+		A_FireCrackle;
+		A_BFGSpray = "[string flashtype], [int numrays], [int damage]";
+		A_BarrelDestroy;
+		
+		cos = "angle degrees";
+		sin = "angle degrees";
+		random = "int min, int max";
+		frandom = "float min, float max";
+	}
+}

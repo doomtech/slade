@@ -24,6 +24,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *******************************************************************/
 
+
 /*******************************************************************
  * INCLUDES
  *******************************************************************/
@@ -350,8 +351,17 @@ void ArchiveEntryList::applyFilter() {
 
 	// Now filter by name if needed
 	if (!filter_name.IsEmpty()) {
-		// Convert filter to lowercase (to avoid case-sensitivity)
-		string filterstring = filter_name.Lower() + "*";
+		// Split filter by ,
+		wxArrayString terms = wxSplit(filter_name, ',');
+
+		// Process filter strings
+		for (unsigned a = 0; a < terms.size(); a++) {
+			// Remove spaces
+			terms[a].Replace(" ", "");
+
+			// Set to lowercase and add * to the end
+			if (!terms[a].IsEmpty()) terms[a] = terms[a].Lower() + "*";
+		}
 
 		// Go through filtered list
 		for (unsigned a = 0; a < filter.size(); a++) {
@@ -362,7 +372,14 @@ void ArchiveEntryList::applyFilter() {
 				continue;
 
 			// Check for name match with filter
-			if (entry == entry_dir_back || entry->getName().Lower().Matches(filterstring))
+			bool match = false;
+			for (unsigned b = 0; b < terms.size(); b++) {
+				if (entry == entry_dir_back || entry->getName().Lower().Matches(terms[b])) {
+					match = true;
+					continue;
+				}
+			}
+			if (match)
 				continue;
 
 			// No match, remove from filtered list

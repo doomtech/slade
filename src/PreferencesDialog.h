@@ -2,6 +2,7 @@
 #ifndef __PREFERENCES_DIALOG_H__
 #define __PREFERENCES_DIALOG_H__
 
+#include "ColourPrefsPanel.h"
 #include <wx/treebook.h>
 
 class BaseResourceArchivesPanel;

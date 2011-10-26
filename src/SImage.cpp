@@ -922,6 +922,7 @@ bool SImage::rotate(int angle) {
 	if (angle % 90) return false;	// Unsupported angle
 	while (angle < 0) angle += 360;
 	angle %= 360;
+	angle = 360-angle;
 
 	uint8_t * nd, * nm;
 	int nw, nh;

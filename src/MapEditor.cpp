@@ -164,7 +164,7 @@ void MapEditor::selectAll() {
 			selection.push_back(a);
 	}
 
-	addEditorMessage(S_FMT("Selected all %d items", selection.size()));
+	addEditorMessage(S_FMT("Selected all %d %s", selection.size(), CHR(getModeString())));
 
 	if (canvas)
 		canvas->itemsSelected(selection);
@@ -177,6 +177,7 @@ bool MapEditor::selectCurrent(bool clear_none) {
 		if (clear_none) {
 			if (canvas) canvas->itemsSelected(selection, false);
 			selection.clear();
+			addEditorMessage("Selection cleared");
 		}
 
 		return false;
@@ -319,6 +320,11 @@ bool MapEditor::selectWithin(double xmin, double ymin, double xmax, double ymax,
 	}
 	for (unsigned a = 0; a < nsel.size(); a++)
 		selection.push_back(nsel[a]);
+
+	if (add)
+		addEditorMessage(S_FMT("Selected %d %s", asel.size(), CHR(getModeString())));
+	else
+		addEditorMessage(S_FMT("Selected %d %s", selection.size(), CHR(getModeString())));
 
 	// Animate newly selected items
 	if (canvas && nsel.size() > 0) canvas->itemsSelected(nsel);
@@ -675,6 +681,16 @@ void MapEditor::addEditorMessage(string message) {
 	msg.message = message;
 	msg.act_time = theApp->runTimer();
 	editor_messages.push_back(msg);
+}
+
+string MapEditor::getModeString() {
+	switch (edit_mode) {
+	case MODE_VERTICES: return "Vertices";
+	case MODE_LINES: return "Lines";
+	case MODE_SECTORS: return "Sectors";
+	case MODE_THINGS: return "Things";
+	default: return "Items";
+	};
 }
 
 

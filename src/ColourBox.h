@@ -18,7 +18,7 @@ public:
 	rgba_t	getColour() { return colour; }
 
 	void	setPalette(Palette8bit* pal)	{ palette = pal; }
-	void	setColour(rgba_t col)			{ colour = col; }
+	void	setColour(rgba_t col)			{ colour = col; Refresh(); }
 
 	// Events
 	void	onPaint(wxPaintEvent& e);

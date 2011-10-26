@@ -109,6 +109,10 @@
     <File Name="src/ColourConfiguration.cpp"/>
     <File Name="src/ColourConfiguration.h"/>
     <File Name="src/Drawing.cpp"/>
+    <File Name="src/ColourConfiguration.cpp"/>
+    <File Name="src/ColourConfiguration.h"/>
+    <File Name="src/KeyBind.cpp"/>
+    <File Name="src/KeyBind.h"/>
   </VirtualDirectory>
   <VirtualDirectory Name="Main Editor">
     <VirtualDirectory Name="UI Elements">

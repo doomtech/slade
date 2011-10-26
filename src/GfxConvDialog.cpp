@@ -162,7 +162,7 @@ bool GfxConvDialog::nextItem() {
 	string fmt_string = "Current Format: ";
 	if (items[current_item].texture == NULL)
 		fmt_string += items[current_item].image.getFormat()->getName();
-	else 
+	else
 		fmt_string += "Texture";
 	if (items[current_item].image.getType() == RGBA)
 		fmt_string += " (Truecolour)";
@@ -313,6 +313,7 @@ void GfxConvDialog::setupLayout() {
 	rb_transparency_existing->Bind(wxEVT_COMMAND_RADIOBUTTON_SELECTED, &GfxConvDialog::onTransTypeChanged, this);
 	rb_transparency_brightness->Bind(wxEVT_COMMAND_RADIOBUTTON_SELECTED, &GfxConvDialog::onTransTypeChanged, this);
 	Bind(wxEVT_COLOURBOX_CHANGED, &GfxConvDialog::onTransColourChanged, this, colbox_transparent->GetId());
+	gfx_current->Bind(wxEVT_LEFT_DOWN, &GfxConvDialog::onPreviewCurrentMouseDown, this);
 
 
 	// Autosize to fit contents (and set this as the minimum size)
@@ -638,5 +639,19 @@ void GfxConvDialog::onTransTypeChanged(wxCommandEvent& e) {
  * Called when the transparent colour box is changed
  *******************************************************************/
 void GfxConvDialog::onTransColourChanged(wxEvent& e) {
+	updatePreviewGfx();
+}
+
+void GfxConvDialog::onPreviewCurrentMouseDown(wxMouseEvent& e) {
+	// Get image coordinates of the point clicked
+	point2_t imgcoord = gfx_current->imageCoords(e.GetX(), e.GetY());
+	if (imgcoord.x < 0)
+		return;
+
+	// Get the colour at that point
+	rgba_t col = gfx_current->getImage()->getPixel(imgcoord.x, imgcoord.y, gfx_current->getPalette());
+
+	// Set the background colour
+	colbox_transparent->setColour(col);
 	updatePreviewGfx();
 }

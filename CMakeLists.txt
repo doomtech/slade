@@ -5,6 +5,10 @@ if(COMMAND cmake_policy)
 	cmake_policy( SET CMP0012 NEW )
 endif(COMMAND cmake_policy)
 
+if (NOT CMAKE_BUILD_TYPE)
+	set(CMAKE_BUILD_TYPE "Release")
+endif()
+
 set(SLADE_OUTPUT_DIR ${CMAKE_BINARY_DIR} CACHE PATH "Directory where slade will be created.")
 
 find_package(ZLIB)

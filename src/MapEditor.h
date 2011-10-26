@@ -99,6 +99,9 @@ public:
 	string		getEditorMessage(int index);
 	long		getEditorMessageTime(int index);
 	void		addEditorMessage(string message);
+
+	// Misc
+	string	getModeString();
 };
 
 #endif//__MAP_EDITOR_H__
