@@ -74,8 +74,14 @@ bool ArchiveManager::init() {
 	program_resource_archive = new ZipArchive();
 
 	// Check for 'res' folder first
-	if (wxDirExists(appPath("res", DIR_APP))) {
-		program_resource_archive->importDir(appPath("res", DIR_APP));
+#ifdef __APPLE__
+	string resdir = appPath("../Resources", DIR_APP);	// Use Resources dir within bundle on mac
+#else
+	string resdir = appPath("res", DIR_APP);
+#endif
+
+	if (wxDirExists(resdir)) {
+		program_resource_archive->importDir(resdir);
 		res_archive_open = (program_resource_archive->numEntries() > 0);
 		return res_archive_open;
 	}

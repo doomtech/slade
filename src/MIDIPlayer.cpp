@@ -61,7 +61,7 @@ MIDIPlayer::MIDIPlayer() {
 	fs_soundfont_id = FLUID_FAILED;
 
 	// Set fluidsynth driver to alsa in linux (no idea why it defaults to jack)
-#ifdef __WXGTK__
+#ifndef __WXMSW__
 	if (fs_driver == "")
 		fs_driver = "alsa";
 #endif
@@ -132,6 +132,10 @@ bool MIDIPlayer::initFluidsynth() {
  * Reloads the current soundfont
  *******************************************************************/
 bool MIDIPlayer::reloadSoundfont() {
+	// Can't do anything if fluidsynth isn't initialised for whatever reason
+	if (!fs_initialised)
+		return false;
+
 	// Unload any current soundfont
 	if (fs_soundfont_id != FLUID_FAILED)
 		fluid_synth_sfunload(fs_synth, fs_soundfont_id, 1);

@@ -104,10 +104,6 @@
     <File Name="src/SAction.cpp"/>
     <File Name="src/SAction.h"/>
     <File Name="src/Drawing.h"/>
-    <File Name="src/KeyBind.cpp"/>
-    <File Name="src/KeyBind.h"/>
-    <File Name="src/ColourConfiguration.cpp"/>
-    <File Name="src/ColourConfiguration.h"/>
     <File Name="src/Drawing.cpp"/>
     <File Name="src/ColourConfiguration.cpp"/>
     <File Name="src/ColourConfiguration.h"/>
@@ -527,6 +523,9 @@
       
       
       
+      
+      
+      
       ]]>
       </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
@@ -556,37 +555,28 @@
       </Completion>
     </Configuration>
     <Configuration Name="Debug-osx" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-g;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=yes)" C_Options="-g;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=yes)" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
+      <Compiler Options="-g;-arch i386;$(shell $(WXCONFIG_PATH)wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=yes);$(shell $(PKGCONFIG_PATH)pkg-config --cflags ftgl)" C_Options="-g;-arch i386;$(shell $(WXCONFIG_PATH)wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=yes);$(shell $(PKGCONFIG_PATH)pkg-config --cflags ftgl)" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
         <Preprocessor Value="__WX__"/>
         <Preprocessor Value="__ASM_FIX__"/>
       </Compiler>
-      <Linker Options="$(shell wx-config --debug=yes --libs std,gl,stc,aui,ribbon --unicode=yes);-framework SFML;-framework sfml-system;-framework sfml-audio" Required="yes"/>
+      <Linker Options="-arch i386;$(shell $(WXCONFIG_PATH)wx-config --debug=yes --libs std,gl,stc,aui,propgrid --unicode=yes);-framework SFML;-framework sfml-system;-framework sfml-audio;$(shell $(PKGCONFIG_PATH)pkg-config --libs ftgl)" Required="yes"/>
       <ResourceCompiler Options="$(shell wx-config --rcflags)" Required="no"/>
-      <General OutputFile="./dist/slade-dbg" IntermediateDirectory="./Debug" Command="./slade-dbg" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
+      <General OutputFile="./dist/SLADE-dbg.app/Contents/MacOS/SLADE" IntermediateDirectory="./Debug" Command="./dist/SLADE-dbg.app/Contents/MacOS/SLADE" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
-        <![CDATA[
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      ]]>
+        <![CDATA[]]>
       </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
         <PostConnectCommands/>
         <StartupCommands/>
       </Debugger>
       <PreBuild/>
-      <PostBuild/>
+      <PostBuild>
+        <Command Enabled="yes">mkdir -p ./dist/SLADE-dbg.app/Contents/Resources</Command>
+        <Command Enabled="yes">mkdir -p ./dist/SLADE-dbg.app/Contents/MacOS/res</Command>
+        <Command Enabled="yes">cp Info.plist ./dist/SLADE-dbg.app/Contents/</Command>
+        <Command Enabled="yes">cp SLADE-osx.icns ./dist/SLADE-dbg.app/Contents/Resources</Command>
+        <Command Enabled="yes">rsync -aC ./dist/res/ ./dist/SLADE-dbg.app/Contents/Resources</Command>
+      </PostBuild>
       <CustomBuild Enabled="no">
         <RebuildCommand/>
         <CleanCommand/>
@@ -627,6 +617,9 @@
       
       
       
+      
+      
+      
       ]]>
       </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
@@ -661,9 +654,7 @@
         <Preprocessor Value="NDEBUG"/>
         <Preprocessor Value="__ASM_FIX__"/>
       </Compiler>
-      <Linker Options="-s;-arch i386;$(shell $(WXCONFIG_PATH)wx-config --debug=no --libs std,gl,stc,aui,propgrid --unicode=yes);-framework SFML;-framework sfml-system;-framework sfml-audio;$(shell $(PKGCONFIG_PATH)pkg-config --libs ftgl)" Required="yes">
-        <Library Value="iconv"/>
-      </Linker>
+      <Linker Options="-s;-arch i386;$(shell $(WXCONFIG_PATH)wx-config --debug=no --libs std,gl,stc,aui,propgrid --unicode=yes);-framework SFML;-framework sfml-system;-framework sfml-audio;$(shell $(PKGCONFIG_PATH)pkg-config --libs ftgl)" Required="yes"/>
       <ResourceCompiler Options="$(shell wx-config --rcflags)" Required="no"/>
       <General OutputFile="./dist/SLADE.app/Contents/MacOS/SLADE" IntermediateDirectory="./Release" Command="./dist/SLADE.app/Contents/MacOS/SLADE" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
@@ -676,9 +667,10 @@
       <PreBuild/>
       <PostBuild>
         <Command Enabled="yes">mkdir -p ./dist/SLADE.app/Contents/Resources</Command>
+        <Command Enabled="yes">mkdir -p ./dist/SLADE.app/Contents/MacOS/res</Command>
         <Command Enabled="yes">cp Info.plist ./dist/SLADE.app/Contents/</Command>
         <Command Enabled="yes">cp SLADE-osx.icns ./dist/SLADE.app/Contents/Resources</Command>
-        <Command Enabled="yes">cp ./dist/slade.pk3 ./dist/SLADE.app/Contents/MacOS</Command>
+        <Command Enabled="yes">rsync -aC ./dist/res/ ./dist/SLADE.app/Contents/Resources</Command>
       </PostBuild>
       <CustomBuild Enabled="no">
         <RebuildCommand/>
