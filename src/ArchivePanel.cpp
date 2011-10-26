@@ -276,6 +276,8 @@ void ArchivePanel::addMenus() {
 		theApp->getAction("arch_texeditor")->addToMenu(menu_archive);
 		wxMenu* menu_clean = new wxMenu("");
 		theApp->getAction("arch_clean_patches")->addToMenu(menu_clean);
+		theApp->getAction("arch_clean_textures")->addToMenu(menu_clean);
+		theApp->getAction("arch_clean_flats")->addToMenu(menu_clean);
 		theApp->getAction("arch_check_duplicates")->addToMenu(menu_clean);
 		menu_archive->AppendSubMenu(menu_clean, "&Maintenance");
 	}
@@ -1608,11 +1610,19 @@ bool ArchivePanel::handleAction(string id) {
 	else if (id == "arch_convert")
 		convertArchiveTo();
 
-	// Archive->Check or Clean Up->Remove Unused Patches
+	// Archive->Maintenance->Remove Unused Patches
 	else if (id == "arch_clean_patches")
 		ArchiveOperations::removeUnusedPatches(archive);
 
-	// Archive->Check of Clean Up->Check Duplicate Entry Names
+	// Archive->Maintenance->Remove Unused Textures
+	else if (id == "arch_clean_textures")
+		ArchiveOperations::removeUnusedTextures(archive);
+
+	// Archive->Maintenance->Remove Unused Flats
+	else if (id == "arch_clean_flats")
+		ArchiveOperations::removeUnusedFlats(archive);
+
+	// Archive->Maintenance->Check Duplicate Entry Names
 	else if (id == "arch_check_duplicates")
 		ArchiveOperations::checkDuplicateEntryNames(archive);
 

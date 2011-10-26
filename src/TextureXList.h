@@ -39,6 +39,7 @@ public:
 	CTexture*	getTexture(size_t index);
 	CTexture*	getTexture(string name);
 	uint8_t		getFormat() { return txformat; }
+	int			textureIndex(string name);
 
 	void	setFormat(uint8_t format) { txformat = format; }
 

@@ -7,9 +7,6 @@
 
 TODO List ---------------------------------------------------------------
 
---- Before 3.0.2 ---
-- Fix bugs
-
 --- Bugs ---
 
 --- Minor Problems/Annoyances ---
