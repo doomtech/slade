@@ -1176,6 +1176,90 @@ void SLADEMap::clearMap() {
 	things.clear();
 }
 
+bool SLADEMap::removeVertex(MapVertex* vertex) {
+	// Check line was given
+	if (!vertex)
+		return false;
+
+	// Get line index
+	int index = vertexIndex(vertex);
+
+	if (index >= 0) {
+		// Remove all connected lines
+		for (unsigned a = 0; a < vertex->connected_lines.size(); a++)
+			removeLine(vertex->connectedLine(a));
+
+		// Remove the vertex
+		delete vertex;
+		vertices.erase(vertices.begin() + index);
+
+		// Vertex indices are now invalid
+		i_vertices = false;
+
+		return true;
+	}
+	else
+		return false;
+}
+
+bool SLADEMap::removeVertex(unsigned index) {
+	// Check index
+	if (index > vertices.size())
+		return false;
+
+	// Remove all connected lines
+	for (unsigned a = 0; a < vertices[index]->connected_lines.size(); a++)
+		removeLine(vertices[index]->connectedLine(a));
+
+	// Remove the vertex
+	delete vertices[index];
+	vertices.erase(vertices.begin() + index);
+
+	// Vertex indices are now invalid
+	i_vertices = false;
+
+	return true;
+}
+
+bool SLADEMap::removeLine(MapLine* line) {
+	// Check line was given
+	if (!line)
+		return false;
+
+	return removeLine(lineIndex(line));
+}
+
+bool SLADEMap::removeLine(unsigned index) {
+	// Check index
+	if (index > lines.size())
+		return false;
+
+	// Detach line from its vertices
+	lines[index]->vertex1->disconnectLine(lines[index]);
+	lines[index]->vertex2->disconnectLine(lines[index]);
+
+	// Delete the line's sides
+	if (lines[index]->side1) {
+		sides.erase(sides.begin() + sideIndex(lines[index]->side1));
+		delete lines[index]->side1;
+		i_sides = false;
+	}
+	if (lines[index]->side2) {
+		sides.erase(sides.begin() + sideIndex(lines[index]->side2));
+		delete lines[index]->side2;
+		i_sides = false;
+	}
+
+	// Remove the line
+	delete lines[index];
+	lines.erase(lines.begin() + index);
+
+	// Line indices are now invalid
+	i_lines = false;
+
+	return true;
+}
+
 int SLADEMap::nearestVertex(double x, double y, double min) {
 	// Go through vertices
 	double min_dist = 999999999;
@@ -1499,6 +1583,70 @@ void SLADEMap::moveVertex(unsigned vertex, double nx, double ny) {
 	geometry_updated = theApp->runTimer();
 }
 
+void SLADEMap::mergeVertices(unsigned vertex1, unsigned vertex2) {
+	// Check indices
+	if (vertex1 >= vertices.size() || vertex2 >= vertices.size() || vertex1 == vertex2)
+		return;
+
+	// Go through lines of second vertex
+	MapVertex* v1 = vertices[vertex1];
+	MapVertex* v2 = vertices[vertex2];
+	vector<MapLine*> zlines;
+	for (unsigned a = 0; a < v2->connected_lines.size(); a++) {
+		MapLine* line = v2->connected_lines[a];
+
+		// Change first vertex if needed
+		if (line->vertex1 == v2) {
+			line->vertex1 = v1;
+			line->length = -1;
+			v1->connectLine(line);
+		}
+
+		// Change second vertex if needed
+		if (line->vertex2 == v2) {
+			line->vertex2 = v1;
+			line->length = -1;
+			v1->connectLine(line);
+		}
+
+		if (lines[a]->vertex1 == v1 && lines[a]->vertex2 == v1)
+			zlines.push_back(lines[a]);
+	}
+
+	// Delete the vertex
+	delete v2;
+	vertices.erase(vertices.begin() + vertex2);
+	i_vertices = false;
+
+	// Delete any resulting zero-length lines
+	for (unsigned a = 0; a < zlines.size(); a++)
+		removeLine(zlines[a]);
+
+	geometry_updated = theApp->runTimer();
+}
+
+void SLADEMap::mergeVerticesPoint(double x, double y) {
+	// Go through all vertices
+	int merge = -1;
+	for (unsigned a = 0; a < vertices.size(); a++) {
+		// Skip if vertex isn't on the point
+		if (vertices[a]->x != x || vertices[a]->y != y)
+			continue;
+
+		// Set as the merge target vertex if we don't have one already
+		if (merge < 0) {
+			merge = a;
+			continue;
+		}
+
+		// Otherwise, merge this vertex with the merge target
+		mergeVertices(merge, a);
+		a--;
+	}
+
+	geometry_updated = theApp->runTimer();
+}
+
 void SLADEMap::moveThing(unsigned thing, double nx, double ny) {
 	// Check index
 	if (thing >= things.size())
@@ -1513,6 +1661,15 @@ void SLADEMap::moveThing(unsigned thing, double nx, double ny) {
 int SLADEMap::removeDetachedVertices() {
 	int count = 0;
 
+	for (int a = vertices.size() - 1; a >= 0; a--) {
+		if (vertices[a]->nConnectedLines() == 0) {
+			delete vertices[a];
+			vertices.erase(vertices.begin() + a);
+			count++;
+		}
+	}
+
+	/*
 	vector<MapVertex*>::iterator i = vertices.begin();
 	while (i != vertices.end()) {
 		if ((*i)->nConnectedLines() == 0) {
@@ -1523,6 +1680,7 @@ int SLADEMap::removeDetachedVertices() {
 		else
 			i++;
 	}
+	*/
 
 	return count;
 }

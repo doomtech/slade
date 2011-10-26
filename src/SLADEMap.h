@@ -105,6 +105,12 @@ public:
 	bool	readDoom64Map(Archive::mapdesc_t map);
 	bool	readUDMFMap(Archive::mapdesc_t map);
 
+	// Item removal
+	bool	removeVertex(MapVertex* vertex);
+	bool	removeVertex(unsigned index);
+	bool	removeLine(MapLine* line);
+	bool	removeLine(unsigned index);
+
 	// Geometry
 	double		fastDistanceToLine(double x, double y, unsigned line, double mindist = 64);
 	int			nearestVertex(double x, double y, double min = 64);
@@ -125,6 +131,8 @@ public:
 
 	// Editing
 	void	moveVertex(unsigned vertex, double nx, double ny);
+	void	mergeVertices(unsigned vertex1, unsigned vertex2);
+	void	mergeVerticesPoint(double x, double y);
 	void	moveThing(unsigned thing, double nx, double ny);
 
 	// Checks

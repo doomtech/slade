@@ -4,6 +4,7 @@
 #include "MapVertex.h"
 #include "MapSide.h"
 #include "MathStuff.h"
+#include "SLADEMap.h"
 
 MapLine::MapLine(SLADEMap* parent) : MapObject(MOBJ_LINE, parent) {
 	// Init variables

@@ -14,6 +14,15 @@ MapSide::MapSide(MapSector* sector, SLADEMap* parent) : MapObject(MOBJ_SIDE, par
 }
 
 MapSide::~MapSide() {
+	// Remove side from current sector, if any
+	if (this->sector) {
+		for (unsigned a = 0; a < sector->connected_sides.size(); a++) {
+			if (sector->connected_sides[a] == this) {
+				sector->connected_sides.erase(sector->connected_sides.begin() + a);
+				break;
+			}
+		}
+	}
 }
 
 void MapSide::setSector(MapSector* sector) {

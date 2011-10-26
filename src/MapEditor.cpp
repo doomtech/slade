@@ -635,11 +635,18 @@ void MapEditor::endMove() {
 		}
 
 		// Move vertices
+		vector<fpoint2_t> merge_points;
 		for (unsigned a = 0; a < map.nVertices(); a++) {
 			if (!move_verts[a])
 				continue;
-			map.moveVertex(a, map.getVertex(a)->xPos() + move_vec.x, map.getVertex(a)->yPos() + move_vec.y);
+			fpoint2_t np(map.getVertex(a)->xPos() + move_vec.x, map.getVertex(a)->yPos() + move_vec.y);
+			map.moveVertex(a, np.x, np.y);
+			merge_points.push_back(np);
 		}
+
+		// Merge vertices
+		for (unsigned a = 0; a < merge_points.size(); a++)
+			map.mergeVerticesPoint(merge_points[a].x, merge_points[a].y);
 	}
 
 	// Un-filter objects
@@ -648,7 +655,11 @@ void MapEditor::endMove() {
 	for (unsigned a = 0; a < map.nThings(); a++)
 		map.getThing(a)->filter(false);
 
+	// Clear moving items
 	move_items.clear();
+
+	// Update map item indices
+	map.refreshIndices();
 }
 
 unsigned MapEditor::numEditorMessages() {
