@@ -71,6 +71,15 @@ ArchiveManager::~ArchiveManager() {
  * resource archive
  *******************************************************************/
 bool ArchiveManager::init() {
+	program_resource_archive = new ZipArchive();
+
+	// Check for 'res' folder first
+	if (wxDirExists(appPath("res", DIR_APP))) {
+		program_resource_archive->importDir(appPath("res", DIR_APP));
+		res_archive_open = (program_resource_archive->numEntries() > 0);
+		return res_archive_open;
+	}
+
 	// Find slade3.pk3 directory
 	string dir_slade_pk3 = appPath("slade.pk3", DIR_DATA);
 	if (!wxFileExists(dir_slade_pk3))
@@ -81,7 +90,6 @@ bool ArchiveManager::init() {
 		dir_slade_pk3 = "slade.pk3";
 
 	// Open slade.pk3
-	program_resource_archive = new ZipArchive();
 	if (!program_resource_archive->open(dir_slade_pk3)) {
 		wxLogMessage("Unable to find slade.pk3!");
 		res_archive_open = false;

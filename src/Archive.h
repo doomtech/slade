@@ -148,13 +148,14 @@ public:
 	virtual bool	save(string filename = "");						// Save archive
 
 	// Misc
-	virtual bool			loadEntryData(ArchiveEntry* entry) = 0;
-	virtual unsigned		numEntries();
-	virtual void			close();
-	void					entryStateChanged(ArchiveEntry* entry);
-	void					getEntryTreeAsList(vector<ArchiveEntry*>& list, ArchiveTreeNode* start = NULL);
-	bool					canSave() { return parent || on_disk; }
-	virtual bool			paste(ArchiveTreeNode* tree, unsigned position = 0xFFFFFFFF, ArchiveTreeNode* base = NULL);
+	virtual bool		loadEntryData(ArchiveEntry* entry) = 0;
+	virtual unsigned	numEntries();
+	virtual void		close();
+	void				entryStateChanged(ArchiveEntry* entry);
+	void				getEntryTreeAsList(vector<ArchiveEntry*>& list, ArchiveTreeNode* start = NULL);
+	bool				canSave() { return parent || on_disk; }
+	virtual bool		paste(ArchiveTreeNode* tree, unsigned position = 0xFFFFFFFF, ArchiveTreeNode* base = NULL);
+	virtual bool		importDir(string directory);
 
 	// Directory stuff
 	virtual ArchiveTreeNode*	getDir(string path, ArchiveTreeNode* base = NULL);

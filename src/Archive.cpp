@@ -31,6 +31,7 @@
 #include "Archive.h"
 #include "MainApp.h"
 #include <wx/filename.h>
+#include <wx/dir.h>
 
 /* Archive Directory Layout:
  * ---------------------
@@ -1068,6 +1069,44 @@ bool Archive::renameEntry(ArchiveEntry* entry, string name) {
 
 	// Announce modification
 	entryStateChanged(entry);
+
+	return true;
+}
+
+/* Archive::importDir
+ * Imports all files (including subdirectories) from [directory] into
+ * the archive
+ *******************************************************************/
+bool Archive::importDir(string directory) {
+	// Get a list of all files in the directory
+	wxArrayString files;
+	wxDir::GetAllFiles(directory, &files);
+
+	// Go through files
+	for (unsigned a = 0; a < files.size(); a++) {
+		string name = files[a];
+		name.Replace(directory, "", false);	// Remove directory from entry name
+
+		// Split filename into dir+name
+		wxFileName fn(name);
+		string ename = fn.GetFullName();
+		string edir = fn.GetPath();
+
+		// Remove beginning \ or / from dir
+		if (edir.StartsWith("\\") || edir.StartsWith("/"))
+			edir.Remove(0, 1);
+
+		// Add the entry
+		ArchiveTreeNode* dir = createDir(edir);
+		ArchiveEntry* entry = addNewEntry(ename, dir->numEntries()+1, dir);
+
+		// Load data
+		entry->importFile(files[a]);
+
+		// Set unmodified
+		entry->setState(0);
+		dir->getDirEntry()->setState(0);
+	}
 
 	return true;
 }
