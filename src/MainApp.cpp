@@ -62,11 +62,11 @@
  *******************************************************************/
 namespace Global {
 	string error = "";
-	string version = "3.0.2"
-#ifdef UPDATEREVISION
-	" r" SVN_REVISION_STRING
+	string version = "3.1.0"
+#ifdef SVN_REVISION_STRING
+	" (r" SVN_REVISION_STRING
 #endif
-	;
+	")";
 }
 
 string	dir_data = "";
@@ -335,7 +335,7 @@ void MainApp::initActions() {
 	// MainWindow
 	new SAction("main_exit", "E&xit", "t_exit", "Quit SLADE", "", 0, wxID_EXIT);
 	new SAction("main_setbra", "Set &Base Resource Archive", "e_archive", "Set the Base Resource Archive, to act as the program 'IWAD'");
-	new SAction("main_preferences", "&Preferences...", "t_settings", "Setup SLADE options and preferences");
+	new SAction("main_preferences", "&Preferences...", "t_settings", "Setup SLADE options and preferences", "", NORMAL, wxID_PREFERENCES);
 	new SAction("main_showam", "&Archive Manager", "e_archive", "Toggle the Archive Manager window", "Ctrl+1");
 	new SAction("main_showconsole", "&Console", "t_console", "Toggle the Console window", "Ctrl+2");
 	new SAction("main_onlinedocs", "Online &Documentation", "t_wiki", "View SLADE documentation online");
@@ -371,6 +371,8 @@ void MainApp::initActions() {
 	new SAction("arch_importfiles", "&Import Files", "t_importfiles", "Import multiple files into the archive");
 	new SAction("arch_texeditor", "&Texture Editor", "t_texeditor", "Open the texture editor for the current archive");
 	new SAction("arch_clean_patches", "Remove Unused &Patches", "", "Remove any unused patches, and their associated entries");
+	new SAction("arch_clean_textures", "Remove Unused &Textures", "", "Remove any unused textures");
+	new SAction("arch_clean_flats", "Remove Unused &Flats", "", "Remove any unused flats");
 	new SAction("arch_check_duplicates", "Check Duplicate Entry Names", "", "Checks the archive for any entries sharing the same name");
 	new SAction("arch_entry_rename", "Rename", "t_rename", "Rename the selected entries");
 	new SAction("arch_entry_rename_each", "Rename Each", "t_renameeach", "Rename separately all the selected entries");

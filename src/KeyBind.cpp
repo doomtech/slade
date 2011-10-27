@@ -300,6 +300,14 @@ keypress_t KeyBind::asKeyPress(int keycode, int modifiers) {
 						((modifiers & wxMOD_SHIFT) != 0));
 }
 
+// The + key char is different between windows and unix/mac
+#ifdef __WXMSW__
+#define PLUSKEY "+"
+#else
+#define PLUSKEY "="
+#endif
+
+
 void KeyBind::initBinds() {
 	// General
 	addBind("copy", keypress_t("C", false, true), "Copy");
@@ -314,9 +322,9 @@ void KeyBind::initBinds() {
 	addBind("me2d_move", keypress_t("Z"), "Toggle item move mode");
 	addBind("me2d_zoom_in_m", keypress_t("mwheelup"), "Zoom in (towards mouse)");
 	addBind("me2d_zoom_out_m", keypress_t("mwheeldown"), "Zoom out (towards mouse)");
-	addBind("me2d_zoom_in", keypress_t("+"), "Zoom in (towards screen center)");
+	addBind("me2d_zoom_in", keypress_t(PLUSKEY), "Zoom in (towards screen center)");
 	addBind("me2d_zoom_out", keypress_t("-"), "Zoom out (towards screen center)");
-	addBind("me2d_show_object", keypress_t("+", false, false, true), "Zoom in, show current object");
+	addBind("me2d_show_object", keypress_t(PLUSKEY, false, false, true), "Zoom in, show current object");
 	addBind("me2d_show_object", keypress_t("mwheelup", false, false, true));
 	addBind("me2d_show_all", keypress_t("-", false, false, true), "Zoom out, show full map");
 	addBind("me2d_show_all", keypress_t("mwheeldown", false, false, true));

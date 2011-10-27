@@ -990,7 +990,7 @@ void MapCanvas::onKeyBindPress(string name) {
 	// Move items (toggle)
 	else if (name == "me2d_move") {
 		if (mouse_state == MSTATE_NORMAL) {
-			if (editor->beginMove(mouse_downpos_m)) {
+			if (editor->beginMove(mouse_pos_m)) {
 				mouse_state = MSTATE_MOVE;
 				renderer_2d->forceUpdate();
 			}
@@ -1124,7 +1124,7 @@ void MapCanvas::onMouseDown(wxMouseEvent& e) {
 			renderer_2d->forceUpdate();
 		}
 		else if (editor->editMode() == MapEditor::MODE_VERTICES)
-			editor->splitLine(mouse_pos_m.x, mouse_pos_m.y, 2);
+			editor->splitLine(mouse_pos_m.x, mouse_pos_m.y, 16/view_scale);
 	}
 
 	// Any other mouse button (let keybind system handle it)

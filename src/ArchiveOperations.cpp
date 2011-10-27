@@ -35,6 +35,8 @@
 #include "ExtMessageDialog.h"
 #include "MainWindow.h"
 #include "MapSide.h"
+#include "MapSector.h"
+#include "Console.h"
 #include <wx/hashmap.h>
 
 
@@ -181,6 +183,64 @@ bool ArchiveOperations::checkDuplicateEntryNames(Archive* archive) {
 }
 
 
+
+// Hardcoded doom defaults for now
+int n_tex_anim = 13;
+string tex_anim_start[] = {
+	"BLODGR1",
+	"SLADRIP1",
+	"BLODRIP1",
+	"FIREWALA",
+	"GSTFONT1",
+	"FIRELAV3",
+	"FIREMAG1",
+	"FIREBLU1",
+	"ROCKRED1",
+	"BFALL1",
+	"SFALL1",
+	"WFALL1",
+	"DBRAIN1",
+};
+string tex_anim_end[] = {
+	"BLODGR4",
+	"SLADRIP3",
+	"BLODRIP4",
+	"FIREWALL",
+	"GSTFONT3",
+	"FIRELAVA",
+	"FIREMAG3",
+	"FIREBLU2",
+	"ROCKRED3",
+	"BFALL4",
+	"SFALL4",
+	"WFALL4",
+	"DBRAIN4",
+};
+
+int n_flat_anim = 9;
+string flat_anim_start[] = {
+	"NUKAGE1",
+	"FWATER1",
+	"SWATER1",
+	"LAVA1",
+	"BLOOD1",
+	"RROCK05",
+	"SLIME01",
+	"SLIME05",
+	"SLIME09",
+};
+string flat_anim_end[] = {
+	"NUKAGE3",
+	"FWATER4",
+	"SWATER4",
+	"LAVA4",
+	"BLOOD3",
+	"RROCK08",
+	"SLIME04",
+	"SLIME08",
+	"SLIME12",
+};
+
 struct texused_t {
 	bool used;
 	texused_t() { used = false; }
@@ -193,11 +253,13 @@ void ArchiveOperations::removeUnusedTextures(Archive* archive) {
 
 	// --- Build list of used textures ---
 	TexUsedMap used_textures;
+	int total_maps = 0;
 
 	// Get all SIDEDEFS entries
 	Archive::search_options_t opt;
 	opt.match_type = EntryType::getType("map_sidedefs");
 	vector<ArchiveEntry*> sidedefs = archive->findAll(opt);
+	total_maps += sidedefs.size();
 
 	// Go through and add used textures to list
 	doomside_t sdef;
@@ -221,24 +283,299 @@ void ArchiveOperations::removeUnusedTextures(Archive* archive) {
 		}
 	}
 
+	// Get all TEXTMAP entries
+	opt.match_name = "TEXTMAP";
+	opt.match_type = EntryType::getType("udmf_textmap");
+	vector<ArchiveEntry*> udmfmaps = archive->findAll(opt);
+	total_maps += udmfmaps.size();
+
+	// Go through and add used textures to list
+	Tokenizer tz;
+	tz.setSpecialCharacters("{};=");
+	for (unsigned a = 0; a < udmfmaps.size(); a++) {
+		// Open in tokenizer
+		tz.openMem(udmfmaps[a]->getData(), udmfmaps[a]->getSize(), "UDMF TEXTMAP");
+
+		// Go through text tokens
+		string token = tz.getToken();
+		while (!token.IsEmpty()) {
+			// Check for sidedef definition
+			if (token == "sidedef") {
+				tz.getToken();	// Skip {
+
+				token = tz.getToken();
+				while (token != "}") {
+					// Check for texture property
+					if (token == "texturetop" || token == "texturemiddle" || token == "texturebottom") {
+						tz.getToken();	// Skip =
+						used_textures[tz.getToken()].used = true;
+					}
+
+					token = tz.getToken();
+				}
+			}
+
+			// Next token
+			token = tz.getToken();
+		}
+	}
+
+	// Check if any maps were found
+	if (total_maps == 0)
+		return;
+
 	// Find all TEXTUREx entries
+	opt.match_name = "";
 	opt.match_type = EntryType::getType("texturex");
 	vector<ArchiveEntry*> tx_entries = archive->findAll(opt);
 
 	// Go through texture lists
 	PatchTable ptable;	// Dummy patch table, patch info not needed here
+	wxArrayString unused_tex;
 	for (unsigned a = 0; a < tx_entries.size(); a++) {
 		TextureXList txlist;
 		txlist.readTEXTUREXData(tx_entries[a], ptable);
 
 		// Go through textures
-		for (unsigned t = 0; t < txlist.nTextures(); t++) {
-			// Remove texture if unused
-			if (!used_textures[txlist.getTexture(a)->getName()].used) {
-				wxLogMessage("Removed unused texture %s", CHR(txlist.getTexture(a)->getName()));
-				txlist.removeTexture(a);
-				a--;
+		bool anim = false;
+		for (unsigned t = 1; t < txlist.nTextures(); t++) {
+			string texname = txlist.getTexture(t)->getName();
+
+			// Check for animation start
+			for (unsigned b = 0; b < n_tex_anim; b++) {
+				if (texname == tex_anim_start[b]) {
+					anim = true;
+					break;
+				}
 			}
+
+			// Check for animation end
+			bool thisend = false;
+			for (unsigned b = 0; b < n_tex_anim; b++) {
+				if (texname == tex_anim_end[b]) {
+					anim = false;
+					thisend = true;
+					break;
+				}
+			}
+
+			// Mark if unused and not part of an animation
+			if (!used_textures[texname].used && !anim && !thisend)
+				unused_tex.Add(CHR(txlist.getTexture(t)->getName()));
 		}
 	}
+
+	// Pop up a dialog with a checkbox list of unused textures
+	wxMultiChoiceDialog dialog(theMainWindow, "The following textures are not used in any map,\nselect which textures to delete", "Delete Unused Textures", unused_tex);
+	
+	// Determine which textures to check initially
+	wxArrayInt selection;
+	for (unsigned a = 0; a < unused_tex.size(); a++) {
+		bool swtex = false;
+
+		// Check for switch texture
+		if (unused_tex[a].StartsWith("SW1")) {
+			// Get counterpart switch name
+			string swname = unused_tex[a];
+			swname.Replace("SW1", "SW2", false);
+
+			// Check if it's counterpart is used
+			if (used_textures[swname].used)
+				swtex = true;
+		}
+		else if (unused_tex[a].StartsWith("SW2")) {
+			// Get counterpart switch name
+			string swname = unused_tex[a];
+			swname.Replace("SW2", "SW1", false);
+
+			// Check if it's counterpart is used
+			if (used_textures[swname].used)
+				swtex = true;
+		}
+
+		if (!swtex)
+			selection.Add(a);
+	}
+	dialog.SetSelections(selection);
+	
+	int n_removed = 0;
+	if (dialog.ShowModal() == wxID_OK) {
+		// Get selected textures
+		selection = dialog.GetSelections();
+
+		// Go through texture lists
+		for (unsigned a = 0; a < tx_entries.size(); a++) {
+			TextureXList txlist;
+			txlist.readTEXTUREXData(tx_entries[a], ptable);
+
+			// Go through selected textures to delete
+			for (unsigned t = 0; t < selection.size(); t++) {
+				// Get texture index
+				int index = txlist.textureIndex(unused_tex[selection[t]]);
+
+				// Delete it from the list (if found)
+				if (index >= 0) {
+					txlist.removeTexture(index);
+					n_removed++;
+				}
+			}
+
+			// Write texture list data back to entry
+			txlist.writeTEXTUREXData(tx_entries[a], ptable);
+		}
+	}
+
+	wxMessageBox(S_FMT("Removed %d unused textures", n_removed));
+}
+
+void ArchiveOperations::removeUnusedFlats(Archive* archive) {
+	// Check archive was given
+	if (!archive)
+		return;
+
+	// --- Build list of used flats ---
+	TexUsedMap used_textures;
+	int total_maps = 0;
+
+	// Get all SECTORS entries
+	Archive::search_options_t opt;
+	opt.match_type = EntryType::getType("map_sectors");
+	vector<ArchiveEntry*> sectors = archive->findAll(opt);
+	total_maps += sectors.size();
+
+	// Go through and add used flats to list
+	doomsector_t sec;
+	string tex_floor, tex_ceil;
+	for (unsigned a = 0; a < sectors.size(); a++) {
+		int nsec = sectors[a]->getSize() / 26;
+		sectors[a]->seek(0, SEEK_SET);
+		for (int s = 0; s < nsec; s++) {
+			// Read sector data
+			sectors[a]->read(&sec, 26);
+
+			// Get textures
+			tex_floor = wxString::FromAscii(sec.f_tex, 8);
+			tex_ceil = wxString::FromAscii(sec.c_tex, 8);
+
+			// Add to used textures list
+			used_textures[tex_floor].used = true;
+			used_textures[tex_ceil].used = true;
+		}
+	}
+
+	// Get all TEXTMAP entries
+	opt.match_name = "TEXTMAP";
+	opt.match_type = EntryType::getType("udmf_textmap");
+	vector<ArchiveEntry*> udmfmaps = archive->findAll(opt);
+	total_maps += udmfmaps.size();
+
+	// Go through and add used flats to list
+	Tokenizer tz;
+	tz.setSpecialCharacters("{};=");
+	for (unsigned a = 0; a < udmfmaps.size(); a++) {
+		// Open in tokenizer
+		tz.openMem(udmfmaps[a]->getData(), udmfmaps[a]->getSize(), "UDMF TEXTMAP");
+
+		// Go through text tokens
+		string token = tz.getToken();
+		while (!token.IsEmpty()) {
+			// Check for sector definition
+			if (token == "sector") {
+				tz.getToken();	// Skip {
+
+				token = tz.getToken();
+				while (token != "}") {
+					// Check for texture property
+					if (token == "texturefloor" || token == "textureceiling") {
+						tz.getToken();	// Skip =
+						used_textures[tz.getToken()].used = true;
+					}
+
+					token = tz.getToken();
+				}
+			}
+
+			// Next token
+			token = tz.getToken();
+		}
+	}
+
+	// Check if any maps were found
+	if (total_maps == 0)
+		return;
+
+	// Find all flats
+	opt.match_name = "";
+	opt.match_namespace = "flats";
+	opt.match_type = NULL;
+	vector<ArchiveEntry*> flats = archive->findAll(opt);
+
+	// Create list of all unused flats
+	wxArrayString unused_tex;
+	bool anim = false;
+	for (unsigned a = 0; a < flats.size(); a++) {
+		// Skip markers
+		if (flats[a]->getSize() == 0)
+			continue;
+
+		// Check for animation start
+		string flatname = flats[a]->getName(true);
+		for (unsigned b = 0; b < n_flat_anim; b++) {
+			if (flatname == flat_anim_start[b]) {
+				anim = true;
+				wxLogMessage("%s anim start", CHR(flatname));
+				break;
+			}
+		}
+
+		// Check for animation end
+		bool thisend = false;
+		for (unsigned b = 0; b < n_flat_anim; b++) {
+			if (flatname == flat_anim_end[b]) {
+				anim = false;
+				thisend = true;
+				wxLogMessage("%s anim end", CHR(flatname));
+				break;
+			}
+		}
+
+		// Add if not animated
+		if (!used_textures[flatname].used && !anim && !thisend)
+			unused_tex.Add(flatname);
+	}
+
+	// Pop up a dialog with a checkbox list of unused textures
+	wxMultiChoiceDialog dialog(theMainWindow, "The following textures are not used in any map,\nselect which textures to delete", "Delete Unused Textures", unused_tex);
+	
+	// Select all flats initially
+	wxArrayInt selection;
+	for (unsigned a = 0; a < unused_tex.size(); a++)
+		selection.push_back(a);
+	dialog.SetSelections(selection);
+
+	int n_removed = 0;
+	if (dialog.ShowModal() == wxID_OK) {
+		// Go through selected flats
+		selection = dialog.GetSelections();
+		opt.match_namespace = "flats";
+		for (unsigned a = 0; a < selection.size(); a++) {
+			opt.match_name = unused_tex[selection[a]];
+			ArchiveEntry* entry = archive->findFirst(opt);
+			archive->removeEntry(entry);
+			n_removed++;
+		}
+	}
+
+	wxMessageBox(S_FMT("Removed %d unused flats", n_removed));
+}
+
+
+CONSOLE_COMMAND(test_cleantex, 0) {
+	Archive* current = theMainWindow->getCurrentArchive();
+	if (current) ArchiveOperations::removeUnusedTextures(current);
+}
+
+CONSOLE_COMMAND(test_cleanflats, 0) {
+	Archive* current = theMainWindow->getCurrentArchive();
+	if (current) ArchiveOperations::removeUnusedFlats(current);
 }

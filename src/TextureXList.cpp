@@ -80,6 +80,21 @@ CTexture* TextureXList::getTexture(string name) {
 	return &tex_invalid;
 }
 
+/* TextureXList::textureIndex
+ * Returns the index of the texture matching [name], or -1 if no
+ * match was found
+ *******************************************************************/
+int TextureXList::textureIndex(string name) {
+	// Search for texture by name
+	for (unsigned a = 0; a < textures.size(); a++) {
+		if (S_CMPNOCASE(textures[a]->getName(), name))
+			return a;
+	}
+
+	// Not found
+	return -1;
+}
+
 /* TextureXList::addTexture
  * Adds [tex] to the texture list at [position]
  *******************************************************************/
@@ -509,7 +524,18 @@ bool TextureXList::writeTEXTUREXData(ArchiveEntry* texturex, PatchTable& patch_t
 			tx_patch_t pdef;
 			pdef.left = patch->xOffset();
 			pdef.top = patch->yOffset();
-			pdef.patch = patch_table.patchIndex(patch->getName());	// Note this will be -1 if the patch doesn't exist in the patch table. This should never happen with the texture editor, though.
+
+			// Check for 'invalid' patch
+			if (patch->getName().StartsWith("INVPATCH")) {
+				// Get raw patch index from name
+				string number = patch->getName();
+				number.Replace("INVPATCH", "");
+				long index;
+				number.ToLong(&index);
+				pdef.patch = index;
+			}
+			else
+				pdef.patch = patch_table.patchIndex(patch->getName());	// Note this will be -1 if the patch doesn't exist in the patch table. This should never happen with the texture editor, though.
 
 			// Write common data
 			SAFEFUNC(txdata.write(&pdef, 6));

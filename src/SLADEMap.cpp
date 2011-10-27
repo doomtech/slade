@@ -1680,8 +1680,8 @@ void SLADEMap::splitLine(unsigned line, unsigned vertex) {
 
 	// Shorten line
 	MapVertex* v2 = l->vertex2;
-	l->vertex2 = v;
 	v2->disconnectLine(l);
+	l->vertex2 = v;
 	v->connectLine(l);
 	l->length = -1;
 
@@ -1708,6 +1708,7 @@ void SLADEMap::splitLine(unsigned line, unsigned vertex) {
 	// Create and add new line
 	MapLine* nl = new MapLine(v, v2, s1, s2, this);
 	nl->copy(l);
+	nl->index = lines.size();
 	lines.push_back(nl);
 
 	geometry_updated = theApp->runTimer();
