@@ -42,6 +42,7 @@ SLADEMap::SLADEMap() {
 	this->i_vertices = false;
 	this->i_things = false;
 	this->geometry_updated = 0;
+	this->position_frac = false;
 }
 
 SLADEMap::~SLADEMap() {
@@ -1548,6 +1549,27 @@ void SLADEMap::getLinesById(int id, vector<MapLine*>& list) {
 	}
 }
 
+MapVertex* SLADEMap::createVertex(double x, double y) {
+	// Round position to integral if fractional positions are disabled
+	if (!position_frac) {
+		x = MathStuff::round(x);
+		y = MathStuff::round(y);
+	}
+
+	// First check that it won't overlap any other vertex
+	for (unsigned a = 0; a < vertices.size(); a++) {
+		if (vertices[a]->x == x && vertices[a]->y == y)
+			return vertices[a];
+	}
+
+	// Create the vertex
+	MapVertex* nv = new MapVertex(x, y, this);
+	nv->index = vertices.size();
+	vertices.push_back(nv);
+
+	return nv;
+}
+
 void SLADEMap::moveVertex(unsigned vertex, double nx, double ny) {
 	// Check index
 	if (vertex >= vertices.size())
@@ -1643,6 +1665,50 @@ void SLADEMap::mergeVerticesPoint(double x, double y) {
 		mergeVertices(merge, a);
 		a--;
 	}
+
+	geometry_updated = theApp->runTimer();
+}
+
+void SLADEMap::splitLine(unsigned line, unsigned vertex) {
+	// Check indices
+	if (line >= lines.size() || vertex >= vertices.size())
+		return;
+
+	// Get objects
+	MapLine* l = lines[line];
+	MapVertex* v = vertices[vertex];
+
+	// Shorten line
+	MapVertex* v2 = l->vertex2;
+	l->vertex2 = v;
+	v2->disconnectLine(l);
+	v->connectLine(l);
+	l->length = -1;
+
+	// Create new sides
+	MapSide* s1 = NULL;
+	MapSide* s2 = NULL;
+	if (l->side1) {
+		s1 = new MapSide(*l->side1);
+		s1->setSector(l->side1->sector);
+		if (s1->sector) {
+			s1->sector->resetBBox();
+			s1->sector->resetPolygon();
+		}
+	}
+	if (l->side2) {
+		s2 = new MapSide(*l->side2);
+		s2->setSector(l->side2->sector);
+		if (s2->sector) {
+			s2->sector->resetBBox();
+			s2->sector->resetPolygon();
+		}
+	}
+
+	// Create and add new line
+	MapLine* nl = new MapLine(v, v2, s1, s2, this);
+	nl->copy(l);
+	lines.push_back(nl);
 
 	geometry_updated = theApp->runTimer();
 }

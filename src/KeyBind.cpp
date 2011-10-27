@@ -311,6 +311,7 @@ void KeyBind::initBinds() {
 	addBind("me2d_clear_selection", keypress_t("C"), "Clear selection");
 	addBind("me2d_pan_view", keypress_t("mouse3"), "Pan View");
 	addBind("me2d_pan_view", keypress_t("space", false, true));
+	addBind("me2d_move", keypress_t("Z"), "Toggle item move mode");
 	addBind("me2d_zoom_in_m", keypress_t("mwheelup"), "Zoom in (towards mouse)");
 	addBind("me2d_zoom_out_m", keypress_t("mwheeldown"), "Zoom out (towards mouse)");
 	addBind("me2d_zoom_in", keypress_t("+"), "Zoom in (towards screen center)");
@@ -330,6 +331,7 @@ void KeyBind::initBinds() {
 	addBind("me2d_mode_sectors", keypress_t("S"), "Sectors mode");
 	addBind("me2d_mode_things", keypress_t("T"), "Things mode");
 	addBind("me2d_flat_type", keypress_t("F", false, true), "Cycle Flat Type");
+	addBind("me2d_line_split", keypress_t("S", true, false, true), "Split nearest line");
 
 	// Map Editor 3D (me3d*)
 

@@ -94,6 +94,9 @@ public:
 	void			doMove(fpoint2_t mouse_pos);
 	void			endMove();
 
+	// Editing
+	void	splitLine(double x, double y, double min_dist = 64);
+
 	// Editor messages
 	unsigned	numEditorMessages();
 	string		getEditorMessage(int index);

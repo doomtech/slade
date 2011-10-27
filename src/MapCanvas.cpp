@@ -986,6 +986,25 @@ void MapCanvas::onKeyBindPress(string name) {
 		default: break;
 		};
 	}
+
+	// Move items (toggle)
+	else if (name == "me2d_move") {
+		if (mouse_state == MSTATE_NORMAL) {
+			if (editor->beginMove(mouse_downpos_m)) {
+				mouse_state = MSTATE_MOVE;
+				renderer_2d->forceUpdate();
+			}
+		}
+		else if (mouse_state == MSTATE_MOVE) {
+			editor->endMove();
+			mouse_state = MSTATE_NORMAL;
+			renderer_2d->forceUpdate();
+		}
+	}
+
+	// Split line
+	else if (name == "me2d_line_split" && editor->editMode() == MapEditor::MODE_LINES)
+		editor->splitLine(mouse_pos_m.x, mouse_pos_m.y);
 }
 
 void MapCanvas::onKeyBindRelease(string name) {
@@ -1104,6 +1123,8 @@ void MapCanvas::onMouseDown(wxMouseEvent& e) {
 			mouse_state = MSTATE_MOVE;
 			renderer_2d->forceUpdate();
 		}
+		else if (editor->editMode() == MapEditor::MODE_VERTICES)
+			editor->splitLine(mouse_pos_m.x, mouse_pos_m.y, 2);
 	}
 
 	// Any other mouse button (let keybind system handle it)

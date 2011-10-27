@@ -662,6 +662,26 @@ void MapEditor::endMove() {
 	map.refreshIndices();
 }
 
+void MapEditor::splitLine(double x, double y, double min_dist) {
+	// Get the closest line
+	int lindex = map.nearestLine(x, y, min_dist);
+	MapLine* line = map.getLine(lindex);
+
+	// Do nothing if no line is close enough
+	if (!line)
+		return;
+
+	// Get closest point on the line
+	fpoint2_t closest = MathStuff::closestPointOnLine(x, y, line->x1(), line->y1(), line->x2(), line->y2());
+
+	// Create vertex there
+	MapVertex* vertex = map.createVertex(closest.x, closest.y);
+	int vindex = map.vertexIndex(vertex);
+
+	// Do line split
+	map.splitLine(lindex, vindex);
+}
+
 unsigned MapEditor::numEditorMessages() {
 	return editor_messages.size();
 }

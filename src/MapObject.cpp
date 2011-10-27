@@ -17,3 +17,17 @@ MapObject::~MapObject() {
 unsigned MapObject::getIndex() {
 	return index;
 }
+
+void MapObject::copy(MapObject* c) {
+	// Can't copy an object of a different type
+	if (c->type != type)
+		return;
+
+	// Reset properties
+	properties.clear();
+
+	// Copy object properties
+	c->properties.copyTo(properties);
+	this->parent_map = c->parent_map;
+	this->filtered = c->filtered;
+}

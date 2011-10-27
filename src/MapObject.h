@@ -38,6 +38,8 @@ public:
 	Property&		prop(string key)	{ return properties[key]; }
 
 	void	filter(bool f = true) { filtered = f; }
+
+	virtual void	copy(MapObject* c);
 };
 
 #endif//__MAP_OBJECT_H__

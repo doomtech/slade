@@ -21,6 +21,7 @@ private:
 	vector<MapThing*>	things;
 	string				udmf_namespace;
 	PropertyList		udmf_props;
+	bool				position_frac;
 
 	// Map structure index status
 	// These are true if the per-item index of that type is up-to-date
@@ -129,10 +130,14 @@ public:
 	void	getThingsById(int id, vector<MapThing*>& list);
 	void	getLinesById(int id, vector<MapLine*>& list);
 
+	// Creation
+	MapVertex*	createVertex(double x, double y);
+
 	// Editing
 	void	moveVertex(unsigned vertex, double nx, double ny);
 	void	mergeVertices(unsigned vertex1, unsigned vertex2);
 	void	mergeVerticesPoint(double x, double y);
+	void	splitLine(unsigned line, unsigned vertex);
 	void	moveThing(unsigned thing, double nx, double ny);
 
 	// Checks
