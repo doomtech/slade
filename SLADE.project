@@ -198,6 +198,8 @@
         <File Name="src/VertexInfoOverlay.cpp"/>
         <File Name="src/VertexInfoOverlay.h"/>
       </VirtualDirectory>
+      <File Name="src/MapObjectPropsPanel.cpp"/>
+      <File Name="src/MapObjectPropsPanel.h"/>
     </VirtualDirectory>
     <File Name="src/MapEditorWindow.h"/>
     <File Name="src/MapEditorWindow.cpp"/>
@@ -527,6 +529,7 @@
       
       
       
+      
       ]]>
       </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
@@ -565,6 +568,7 @@
       <General OutputFile="./dist/SLADE-dbg.app/Contents/MacOS/SLADE" IntermediateDirectory="./Debug" Command="./dist/SLADE-dbg.app/Contents/MacOS/SLADE" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[
+      
       ]]>
       </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
@@ -623,6 +627,7 @@
       
       
       
+      
       ]]>
       </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
@@ -661,7 +666,8 @@
       <ResourceCompiler Options="$(shell wx-config --rcflags)" Required="no"/>
       <General OutputFile="./dist/SLADE.app/Contents/MacOS/SLADE" IntermediateDirectory="./Release" Command="./dist/SLADE.app/Contents/MacOS/SLADE" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
-        <![CDATA[]]>
+        <![CDATA[
+      ]]>
       </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
         <PostConnectCommands/>

@@ -265,7 +265,7 @@ void MapObjectPropsPanel::openLine(MapObject* object, bool add) {
 		pg_properties->GetProperty("arg4")->SetValue((int)line->prop("arg4"));
 	}
 
-	
+
 	// Front side
 	if (line->s1()) {
 		wxPGProperty* g_side = pg_properties->GetProperty("side1");
@@ -310,15 +310,15 @@ void MapObjectPropsPanel::openSide(MapObject* object, wxPGProperty* group, bool 
 
 	// Get object as side
 	MapSide* side = (MapSide*)object;
-	
+
 	// Just check properties if we're 'adding' this line
 	// (mismatched values will be set to unspecified)
 	string gname = group->GetName() + ".";
 	if (add && !refresh) {
 		checkIntProperty(pg_properties->GetProperty(gname+"sector"), (int)side->getSector()->getIndex());
-		checkStringProperty(pg_properties->GetProperty(gname+"texturetop"), (string)side->prop("texturetop"));
-		checkStringProperty(pg_properties->GetProperty(gname+"texturemiddle"), (string)side->prop("texturemiddle"));
-		checkStringProperty(pg_properties->GetProperty(gname+"texturebottom"), (string)side->prop("texturebottom"));
+		checkStringProperty(pg_properties->GetProperty(gname+"texturetop"), side->prop("texturetop").getStringValue());
+		checkStringProperty(pg_properties->GetProperty(gname+"texturemiddle"), side->prop("texturemiddle").getStringValue());
+		checkStringProperty(pg_properties->GetProperty(gname+"texturebottom"), side->prop("texturebottom").getStringValue());
 		checkIntProperty(pg_properties->GetProperty(gname+"offsetx"), (int)side->prop("offsetx"));
 		checkIntProperty(pg_properties->GetProperty(gname+"offsety"), (int)side->prop("offsety"));
 
@@ -336,7 +336,7 @@ void MapObjectPropsPanel::openSide(MapObject* object, wxPGProperty* group, bool 
 		pg_properties->AppendIn(subgroup, new wxStringProperty("Upper Texture", gname+"texturetop"));
 		pg_properties->AppendIn(subgroup, new wxStringProperty("Middle Texture", gname+"texturemiddle"));
 		pg_properties->AppendIn(subgroup, new wxStringProperty("Lower Texture", gname+"texturebottom"));
-		
+
 		// 'Offsets' group
 		subgroup = pg_properties->AppendIn(group, new wxPropertyCategory("Offsets", gname+"offsets"));
 		pg_properties->AppendIn(subgroup, new wxIntProperty("X Offset", gname+"offsetx"));
@@ -347,9 +347,9 @@ void MapObjectPropsPanel::openSide(MapObject* object, wxPGProperty* group, bool 
 	pg_properties->GetProperty(gname+"sector")->SetValue((int)side->getSector()->getIndex());
 
 	// Set textures
-	pg_properties->GetProperty(gname+"texturetop")->SetValue((string)side->prop("texturetop"));
-	pg_properties->GetProperty(gname+"texturemiddle")->SetValue((string)side->prop("texturemiddle"));
-	pg_properties->GetProperty(gname+"texturebottom")->SetValue((string)side->prop("texturebottom"));
+	pg_properties->GetProperty(gname+"texturetop")->SetValue(side->prop("texturetop").getStringValue());
+	pg_properties->GetProperty(gname+"texturemiddle")->SetValue(side->prop("texturemiddle").getStringValue());
+	pg_properties->GetProperty(gname+"texturebottom")->SetValue(side->prop("texturebottom").getStringValue());
 
 	// Set offsets
 	pg_properties->GetProperty(gname+"offsetx")->SetValue((int)side->prop("offsetx"));
