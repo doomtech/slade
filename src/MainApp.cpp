@@ -64,9 +64,9 @@ namespace Global {
 	string error = "";
 	string version = "3.1.0"
 #ifdef SVN_REVISION_STRING
-	" (r" SVN_REVISION_STRING
+	" (r" SVN_REVISION_STRING ")"
 #endif
-	")";
+	"";
 }
 
 string	dir_data = "";
@@ -467,6 +467,7 @@ void MainApp::initActions() {
 	new SAction("mapw_mode_sectors", "Sectors Mode", "t_sectors", "Change to sectors editing mode", "", SAction::RADIO);
 	new SAction("mapw_mode_things", "Things Mode", "t_things", "Change to things editing mode", "", SAction::RADIO);
 	new SAction("mapw_showconsole", "&Console", "t_console", "Toggle the Console window", "Ctrl+2");
+	new SAction("mapw_showproperties", "&Item Properties", "", "Toggle the Item Properties window", "Ctrl+1");
 }
 
 /* MainApp::OnInit

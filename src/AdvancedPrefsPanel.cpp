@@ -96,6 +96,9 @@ void AdvancedPrefsPanel::refreshPropGrid() {
 		else if (cvar->type == CVAR_STRING)
 			pg_cvars->Append(new wxStringProperty(cvars[a], cvars[a], S_FMT("%s", CHR(((CStringCVar *)cvar)->value))));
 	}
+
+	// Set all bool properties to use checkboxes
+	pg_cvars->SetPropertyAttributeAll(wxPG_BOOL_USE_CHECKBOX, true);
 }
 
 /* AdvancedPrefsPanel::applyPreferences

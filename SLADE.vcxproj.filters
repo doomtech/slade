@@ -744,6 +744,9 @@
     <ClCompile Include="src\MapObject.cpp">
       <Filter>Map Editor\SLADEMap</Filter>
     </ClCompile>
+    <ClCompile Include="src\MapObjectPropsPanel.cpp">
+      <Filter>Map Editor\UI Elements</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -1406,6 +1409,9 @@
     </ClInclude>
     <ClInclude Include="src\MapObject.h">
       <Filter>Map Editor\SLADEMap</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MapObjectPropsPanel.h">
+      <Filter>Map Editor\UI Elements</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

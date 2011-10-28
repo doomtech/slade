@@ -16,6 +16,7 @@ enum {
 };
 
 class MapObject {
+friend class SLADEMap;
 private:
 	int			type;
 

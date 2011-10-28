@@ -134,12 +134,48 @@ bool MapEditor::updateHilight(fpoint2_t mouse_pos, double dist_scale) {
 		}
 	}
 
+	// Update map object properties panel is the hilight changed
+	if (current != hilight_item && selection.size() == 0) {
+		switch (edit_mode) {
+		case MODE_VERTICES: theMapEditor->openMapObject(map.getVertex(hilight_item)); break;
+		case MODE_LINES: theMapEditor->openMapObject(map.getLine(hilight_item)); break;
+		case MODE_SECTORS: theMapEditor->openMapObject(map.getSector(hilight_item)); break;
+		case MODE_THINGS: theMapEditor->openMapObject(map.getThing(hilight_item)); break;
+		default: break;
+		}
+	}
+
 	return current != hilight_item;
+}
+
+void MapEditor::selectionUpdated() {
+	// Open selected objects in properties panel
+	vector<MapObject*> objects;
+
+	if (edit_mode == MODE_VERTICES) {
+		for (unsigned a = 0; a < selection.size(); a++)
+			objects.push_back(map.getVertex(selection[a]));
+	}
+	else if (edit_mode == MODE_LINES) {
+		for (unsigned a = 0; a < selection.size(); a++)
+			objects.push_back(map.getLine(selection[a]));
+	}
+	else if (edit_mode == MODE_SECTORS) {
+		for (unsigned a = 0; a < selection.size(); a++)
+			objects.push_back(map.getSector(selection[a]));
+	}
+	else if (edit_mode == MODE_THINGS) {
+		for (unsigned a = 0; a < selection.size(); a++)
+			objects.push_back(map.getThing(selection[a]));
+	}
+
+	theMapEditor->openMapObjects(objects);
 }
 
 void MapEditor::clearSelection() {
 	if (canvas) canvas->itemsSelected(selection, false);
 	selection.clear();
+	theMapEditor->openMapObject(NULL);
 }
 
 void MapEditor::selectAll() {
@@ -168,6 +204,8 @@ void MapEditor::selectAll() {
 
 	if (canvas)
 		canvas->itemsSelected(selection);
+
+	selectionUpdated();
 }
 
 bool MapEditor::selectCurrent(bool clear_none) {
@@ -177,6 +215,7 @@ bool MapEditor::selectCurrent(bool clear_none) {
 		if (clear_none) {
 			if (canvas) canvas->itemsSelected(selection, false);
 			selection.clear();
+			selectionUpdated();
 			addEditorMessage("Selection cleared");
 		}
 
@@ -189,6 +228,7 @@ bool MapEditor::selectCurrent(bool clear_none) {
 			// Already selected, deselect
 			selection.erase(selection.begin() + a);
 			if (canvas) canvas->itemSelected(hilight_item, false);
+			selectionUpdated();
 			return true;
 		}
 	}
@@ -196,6 +236,8 @@ bool MapEditor::selectCurrent(bool clear_none) {
 	// Not already selected, add to selection
 	selection.push_back(hilight_item);
 	if (canvas) canvas->itemSelected(hilight_item, true);
+
+	selectionUpdated();
 
 	return true;
 }
@@ -328,6 +370,8 @@ bool MapEditor::selectWithin(double xmin, double ymin, double xmax, double ymax,
 
 	// Animate newly selected items
 	if (canvas && nsel.size() > 0) canvas->itemsSelected(nsel);
+
+	selectionUpdated();
 
 	return (nsel.size() > 0);
 }

@@ -65,6 +65,34 @@ double MapLine::y2() {
 	return vertex2->yPos();
 }
 
+int MapLine::v1Index() {
+	if (vertex1)
+		return vertex1->getIndex();
+	else
+		return -1;
+}
+
+int MapLine::v2Index() {
+	if (vertex2)
+		return vertex2->getIndex();
+	else
+		return -1;
+}
+
+int MapLine::s1Index() {
+	if (side1)
+		return side1->getIndex();
+	else
+		return -1;
+}
+
+int MapLine::s2Index() {
+	if (side2)
+		return side2->getIndex();
+	else
+		return -1;
+}
+
 double MapLine::getLength() {
 	if (!vertex1 || !vertex2)
 		return -1;

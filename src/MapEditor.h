@@ -68,6 +68,7 @@ public:
 	// Selection/hilight
 	void		clearHilight() { hilight_item = -1; }
 	bool		updateHilight(fpoint2_t mouse_pos, double dist_scale = 1.0);
+	void		selectionUpdated();
 	void		clearSelection();
 	void		selectAll();
 	bool		selectCurrent(bool clear_none = true);

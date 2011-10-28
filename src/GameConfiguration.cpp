@@ -571,6 +571,27 @@ ThingType* GameConfiguration::thingType(unsigned type) {
 		return &ttype_unknown;
 }
 
+string GameConfiguration::thingFlag(unsigned index) {
+	// Check index
+	if (index >= flags_thing.size())
+		return "";
+
+	return flags_thing[index].name;
+}
+
+bool GameConfiguration::thingFlagSet(unsigned index, MapThing* thing) {
+	// Check index
+	if (index >= flags_thing.size())
+		return false;
+
+	// Check if flag is set
+	int flags = thing->prop("flags");
+	if (flags & flags_thing[index].flag)
+		return true;
+	else
+		return false;
+}
+
 string GameConfiguration::thingFlagsString(int flags) {
 	// Check against all flags
 	string ret = "";
@@ -587,6 +608,27 @@ string GameConfiguration::thingFlagsString(int flags) {
 		ret.RemoveLast(2);
 
 	return ret;
+}
+
+string GameConfiguration::lineFlag(unsigned index) {
+	// Check index
+	if (index >= flags_line.size())
+		return "";
+
+	return flags_line[index].name;
+}
+
+bool GameConfiguration::lineFlagSet(unsigned index, MapLine* line) {
+	// Check index
+	if (index >= flags_line.size())
+		return false;
+
+	// Check if flag is set
+	int flags = line->prop("flags");
+	if (flags & flags_line[index].flag)
+		return true;
+	else
+		return false;
 }
 
 string GameConfiguration::lineFlagsString(MapLine* line) {

@@ -13,11 +13,14 @@
 // and check against it when loading. In other words, wxAUI is silly.
 #define MEW_LAYOUT_VERS 001
 
+class MapObject;
+class MapObjectPropsPanel;
 class MapEditorWindow : public wxFrame, public SActionHandler {
 private:
-	MapCanvas*			map_canvas;
-	MapEditor			editor;
-	MapTextureManager	tex_man;
+	MapCanvas*				map_canvas;
+	MapEditor				editor;
+	MapTextureManager		tex_man;
+	MapObjectPropsPanel*	panel_obj_props;
 
 	// Singleton instance
 	static MapEditorWindow*		instance;
@@ -39,6 +42,9 @@ public:
 
 	void	setupLayout();
 	bool	openMap(Archive::mapdesc_t map);
+
+	void	openMapObject(MapObject* object);
+	void	openMapObjects(vector<MapObject*>& objects);
 
 	// SAction handler
 	bool	handleAction(string id);

@@ -94,6 +94,7 @@ public:
 	int		lineIndex(MapLine* l);
 	int		sectorIndex(MapSector* s);
 	int		thingIndex(MapThing* t);
+	int		objectIndex(MapObject* o);
 	void	refreshIndices();
 
 	bool	readMap(Archive::mapdesc_t map);

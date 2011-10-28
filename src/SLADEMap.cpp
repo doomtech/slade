@@ -183,6 +183,24 @@ int	SLADEMap::thingIndex(MapThing* t) {
 	return -1;
 }
 
+int SLADEMap::objectIndex(MapObject* o) {
+	// Check object was given
+	if (!o)
+		return -1;
+
+	// Get index depending on type
+	switch (o->getObjType()) {
+	case MOBJ_VERTEX: return vertexIndex((MapVertex*)o); break;
+	case MOBJ_LINE: return lineIndex((MapLine*)o); break;
+	case MOBJ_SIDE: return sideIndex((MapSide*)o); break;
+	case MOBJ_SECTOR: return sectorIndex((MapSector*)o); break;
+	case MOBJ_THING: return thingIndex((MapThing*)o); break;
+	default: return o->index; break;
+	}
+
+	return -1;
+}
+
 void SLADEMap::refreshIndices() {
 	// Vertex indices
 	i_vertices = true;
@@ -225,20 +243,20 @@ bool SLADEMap::readMap(Archive::mapdesc_t map) {
 }
 
 bool SLADEMap::addVertex(doomvertex_t& v) {
-	MapVertex* nv = new MapVertex(v.x, v.y);
+	MapVertex* nv = new MapVertex(v.x, v.y, this);
 	vertices.push_back(nv);
 	return true;
 }
 
 bool SLADEMap::addVertex(doom64vertex_t& v) {
-	MapVertex* nv = new MapVertex((double)v.x/65536, (double)v.y/65536);
+	MapVertex* nv = new MapVertex((double)v.x/65536, (double)v.y/65536, this);
 	vertices.push_back(nv);
 	return true;
 }
 
 bool SLADEMap::addSide(doomside_t& s) {
 	// Create side
-	MapSide* ns = new MapSide(getSector(s.sector));
+	MapSide* ns = new MapSide(getSector(s.sector), this);
 
 	// Setup side properties
 	ns->prop("texturetop") = wxString::FromAscii(s.tex_upper, 8);
@@ -254,7 +272,7 @@ bool SLADEMap::addSide(doomside_t& s) {
 
 bool SLADEMap::addSide(doom64side_t& s) {
 	// Create side
-	MapSide* ns = new MapSide(getSector(s.sector));
+	MapSide* ns = new MapSide(getSector(s.sector), this);
 
 	// Setup side properties
 	ns->prop("texturetop") = theResourceManager->getTextureName(s.tex_upper);
@@ -297,7 +315,7 @@ bool SLADEMap::addLine(doomline_t& l) {
 	}
 
 	// Create line
-	MapLine* nl = new MapLine(v1, v2, s1, s2);
+	MapLine* nl = new MapLine(v1, v2, s1, s2, this);
 
 	// Setup line properties
 	nl->prop("arg0") = l.sector_tag;
@@ -347,7 +365,7 @@ bool SLADEMap::addLine(doom64line_t& l) {
 	}
 
 	// Create line
-	MapLine* nl = new MapLine(v1, v2, s1, s2);
+	MapLine* nl = new MapLine(v1, v2, s1, s2, this);
 
 	// Setup line properties
 	nl->prop("arg0") = l.sector_tag;
@@ -365,7 +383,7 @@ bool SLADEMap::addLine(doom64line_t& l) {
 
 bool SLADEMap::addSector(doomsector_t& s) {
 	// Create sector
-	MapSector* ns = new MapSector(wxString::FromAscii(s.f_tex, 8), wxString::FromAscii(s.c_tex, 8));
+	MapSector* ns = new MapSector(wxString::FromAscii(s.f_tex, 8), wxString::FromAscii(s.c_tex, 8), this);
 
 	// Setup sector properties
 	ns->prop("heightfloor") = s.f_height;
@@ -383,7 +401,7 @@ bool SLADEMap::addSector(doom64sector_t& s) {
 	// Create sector
 	// We need to retrieve the texture name from the hash value
 	MapSector* ns = new MapSector(theResourceManager->getTextureName(s.f_tex),
-		theResourceManager->getTextureName(s.c_tex));
+		theResourceManager->getTextureName(s.c_tex), this);
 
 	// Setup sector properties
 	ns->prop("heightfloor") = s.f_height;
@@ -405,7 +423,7 @@ bool SLADEMap::addSector(doom64sector_t& s) {
 
 bool SLADEMap::addThing(doomthing_t& t) {
 	// Create thing
-	MapThing* nt = new MapThing(t.x, t.y, t.type);
+	MapThing* nt = new MapThing(t.x, t.y, t.type, this);
 
 	// Setup thing properties
 	nt->prop("angle") = t.angle;
@@ -418,7 +436,7 @@ bool SLADEMap::addThing(doomthing_t& t) {
 
 bool SLADEMap::addThing(doom64thing_t& t) {
 	// Create thing
-	MapThing* nt = new MapThing(t.x, t.y, t.type);
+	MapThing* nt = new MapThing(t.x, t.y, t.type, this);
 
 	// Setup thing properties
 	nt->prop("angle") = t.angle;
@@ -615,7 +633,7 @@ bool SLADEMap::addLine(hexenline_t& l) {
 	}
 
 	// Create line
-	MapLine* nl = new MapLine(v1, v2, s1, s2);
+	MapLine* nl = new MapLine(v1, v2, s1, s2, this);
 
 	// Setup line properties
 	nl->prop("arg0") = l.args[0];
@@ -633,7 +651,7 @@ bool SLADEMap::addLine(hexenline_t& l) {
 
 bool SLADEMap::addThing(hexenthing_t& t) {
 	// Create thing
-	MapThing* nt = new MapThing(t.x, t.y, t.type);
+	MapThing* nt = new MapThing(t.x, t.y, t.type, this);
 
 	// Setup thing properties
 	nt->prop("angle") = t.angle;
@@ -905,7 +923,7 @@ bool SLADEMap::addVertex(ParseTreeNode* def) {
 		return false;
 
 	// Create new vertex
-	MapVertex* nv = new MapVertex(prop_x->getFloatValue(), prop_y->getFloatValue());
+	MapVertex* nv = new MapVertex(prop_x->getFloatValue(), prop_y->getFloatValue(), this);
 
 	// Add extra vertex info
 	ParseTreeNode* prop = NULL;
@@ -937,7 +955,7 @@ bool SLADEMap::addSide(ParseTreeNode* def) {
 		return false;
 
 	// Create new side
-	MapSide* ns = new MapSide(sectors[sector]);
+	MapSide* ns = new MapSide(sectors[sector], this);
 
 	// Add extra side info
 	ParseTreeNode* prop = NULL;
@@ -982,7 +1000,7 @@ bool SLADEMap::addLine(ParseTreeNode* def) {
 	if (prop_s2) side2 = getSide(prop_s2->getIntValue());
 
 	// Create new line
-	MapLine* nl = new MapLine(vertices[v1], vertices[v2], sides[s1], side2);
+	MapLine* nl = new MapLine(vertices[v1], vertices[v2], sides[s1], side2, this);
 
 	// Set default values
 	// TODO: Nicer way to deal with default udmf values
@@ -1014,7 +1032,7 @@ bool SLADEMap::addSector(ParseTreeNode* def) {
 		return false;
 
 	// Create new sector
-	MapSector* ns = new MapSector(prop_ftex->getStringValue(), prop_ctex->getStringValue());
+	MapSector* ns = new MapSector(prop_ftex->getStringValue(), prop_ctex->getStringValue(), this);
 
 	// Add extra sector info
 	ParseTreeNode* prop = NULL;
@@ -1043,7 +1061,7 @@ bool SLADEMap::addThing(ParseTreeNode* def) {
 		return false;
 
 	// Create new thing
-	MapThing* nt = new MapThing(prop_x->getFloatValue(), prop_y->getFloatValue(), prop_type->getIntValue());
+	MapThing* nt = new MapThing(prop_x->getFloatValue(), prop_y->getFloatValue(), prop_type->getIntValue(), this);
 
 	// Add extra thing info
 	ParseTreeNode* prop = NULL;

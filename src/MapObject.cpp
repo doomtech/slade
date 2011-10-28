@@ -15,7 +15,10 @@ MapObject::~MapObject() {
 }
 
 unsigned MapObject::getIndex() {
-	return index;
+	if (parent_map)
+		return parent_map->objectIndex(this);
+	else
+		return index;
 }
 
 void MapObject::copy(MapObject* c) {

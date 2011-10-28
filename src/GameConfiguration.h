@@ -18,6 +18,7 @@ WX_DECLARE_HASH_MAP(int, tt_t, wxIntegerHash, wxIntegerEqual, ThingTypeMap);
 class ParseTreeNode;
 class ArchiveEntry;
 class MapLine;
+class MapThing;
 class GameConfiguration {
 private:
 	string			name;
@@ -74,6 +75,7 @@ public:
 
 	string	getName() { return name; }
 	int		getMapFormat() { return map_format; }
+	bool	isBoom() { return boom; }
 
 	void	init();
 
@@ -98,7 +100,13 @@ public:
 	ThingType*	thingType(unsigned type);
 
 	// Flags
+	int		nThingFlags() { return flags_thing.size(); }
+	string	thingFlag(unsigned index);
+	bool	thingFlagSet(unsigned index, MapThing* thing);
 	string	thingFlagsString(int flags);
+	int		nLineFlags() { return flags_line.size(); }
+	string	lineFlag(unsigned index);
+	bool	lineFlagSet(unsigned index, MapLine* line);
 	string	lineFlagsString(MapLine* line);
 	string	spacTriggerString(MapLine* line);
 

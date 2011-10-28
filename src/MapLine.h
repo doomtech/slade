@@ -89,6 +89,11 @@ public:
 	double	x2();
 	double	y2();
 
+	int	v1Index();
+	int	v2Index();
+	int	s1Index();
+	int	s2Index();
+
 	double	getLength();
 	bool	doubleSector();
 };

@@ -35,6 +35,7 @@
 #include "BaseResourceArchivesPanel.h"
 #include "PreferencesDialog.h"
 #include "ArchiveManager.h"
+#include "MapObjectPropsPanel.h"
 #include <wx/aui/aui.h>
 
 
@@ -114,6 +115,7 @@ void MapEditorWindow::setupLayout() {
 	// View menu
 	wxMenu* menu_view = new wxMenu("");
 	theApp->getAction("mapw_showconsole")->addToMenu(menu_view);
+	theApp->getAction("mapw_showproperties")->addToMenu(menu_view);
 	menu->Append(menu_view, "View");
 
 	SetMenuBar(menu);
@@ -158,6 +160,22 @@ void MapEditorWindow::setupLayout() {
 	p_inf.Name("console");
 	m_mgr->AddPane(panel_console, p_inf);
 
+
+	// -- Map Object Properties Panel --
+	panel_obj_props = new MapObjectPropsPanel(this);
+
+	// Setup panel info & add panel
+	p_inf.Right();
+	p_inf.BestSize(256, 256);
+	p_inf.FloatingSize(400, 600);
+	p_inf.FloatingPosition(120, 120);
+	p_inf.MinSize(256, 256);
+	p_inf.Show(true);
+	p_inf.Caption("Item Properties");
+	p_inf.Name("item_props");
+	m_mgr->AddPane(panel_obj_props, p_inf);
+
+
 	// Load previously saved perspective string
 	// Doesn't play nice for whatever reason (god I hate wxAUI, it's terrible)
 	//long vers = 0;
@@ -186,6 +204,14 @@ bool MapEditorWindow::openMap(Archive::mapdesc_t map) {
 	}
 
 	return ok;
+}
+
+void MapEditorWindow::openMapObject(MapObject* object) {
+	panel_obj_props->openObject(object);
+}
+
+void MapEditorWindow::openMapObjects(vector<MapObject*>& objects) {
+	panel_obj_props->openObjects(objects);
 }
 
 /* MapEditorWindow::handleAction
@@ -227,11 +253,40 @@ bool MapEditorWindow::handleAction(string id) {
 	}
 	 */
 
+	// View->Item Properties
+	if (id == "mapw_showproperties") {
+		wxAuiManager *m_mgr = wxAuiManager::GetManager(this);
+		wxAuiPaneInfo& p_inf = m_mgr->GetPane("item_props");
+		
+		// Toggle window and focus
+		if (p_inf.IsShown()) {
+			p_inf.Show(false);
+			map_canvas->SetFocus();
+		}
+		else {
+			p_inf.Show(true);
+			p_inf.window->SetFocus();
+		}
+
+		m_mgr->Update();
+		return true;
+	}
+
 	// View->Console
 	else if (id == "mapw_showconsole") {
 		wxAuiManager *m_mgr = wxAuiManager::GetManager(this);
 		wxAuiPaneInfo& p_inf = m_mgr->GetPane("console");
-		p_inf.Show(!p_inf.IsShown());
+		
+		// Toggle window and focus
+		if (p_inf.IsShown()) {
+			p_inf.Show(false);
+			map_canvas->SetFocus();
+		}
+		else {
+			p_inf.Show(true);
+			p_inf.window->SetFocus();
+		}
+
 		p_inf.MinSize(200, 128);
 		m_mgr->Update();
 		return true;
