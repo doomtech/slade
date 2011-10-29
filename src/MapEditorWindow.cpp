@@ -206,14 +206,6 @@ bool MapEditorWindow::openMap(Archive::mapdesc_t map) {
 	return ok;
 }
 
-void MapEditorWindow::openMapObject(MapObject* object) {
-	panel_obj_props->openObject(object);
-}
-
-void MapEditorWindow::openMapObjects(vector<MapObject*>& objects) {
-	panel_obj_props->openObjects(objects);
-}
-
 /* MapEditorWindow::handleAction
  * Handles the action [id]. Returns true if the action was handled,
  * false otherwise

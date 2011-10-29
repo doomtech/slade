@@ -9,6 +9,7 @@
 #include "MathStuff.h"
 #include "Console.h"
 #include "MapCanvas.h"
+#include "MapObjectPropsPanel.h"
 
 double grid_sizes[] = { 0.05, 0.1, 0.25, 0.5, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192 };
 
@@ -137,10 +138,10 @@ bool MapEditor::updateHilight(fpoint2_t mouse_pos, double dist_scale) {
 	// Update map object properties panel is the hilight changed
 	if (current != hilight_item && selection.size() == 0) {
 		switch (edit_mode) {
-		case MODE_VERTICES: theMapEditor->openMapObject(map.getVertex(hilight_item)); break;
-		case MODE_LINES: theMapEditor->openMapObject(map.getLine(hilight_item)); break;
-		case MODE_SECTORS: theMapEditor->openMapObject(map.getSector(hilight_item)); break;
-		case MODE_THINGS: theMapEditor->openMapObject(map.getThing(hilight_item)); break;
+		case MODE_VERTICES: theMapEditor->propsPanel()->openObject(map.getVertex(hilight_item)); break;
+		case MODE_LINES: theMapEditor->propsPanel()->openObject(map.getLine(hilight_item)); break;
+		case MODE_SECTORS: theMapEditor->propsPanel()->openObject(map.getSector(hilight_item)); break;
+		case MODE_THINGS: theMapEditor->propsPanel()->openObject(map.getThing(hilight_item)); break;
 		default: break;
 		}
 	}
@@ -169,13 +170,13 @@ void MapEditor::selectionUpdated() {
 			objects.push_back(map.getThing(selection[a]));
 	}
 
-	theMapEditor->openMapObjects(objects);
+	theMapEditor->propsPanel()->openObjects(objects);
 }
 
 void MapEditor::clearSelection() {
 	if (canvas) canvas->itemsSelected(selection, false);
 	selection.clear();
-	theMapEditor->openMapObject(NULL);
+	theMapEditor->propsPanel()->openObject(NULL);
 }
 
 void MapEditor::selectAll() {

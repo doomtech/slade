@@ -43,8 +43,7 @@ public:
 	void	setupLayout();
 	bool	openMap(Archive::mapdesc_t map);
 
-	void	openMapObject(MapObject* object);
-	void	openMapObjects(vector<MapObject*>& objects);
+	MapObjectPropsPanel*	propsPanel() { return panel_obj_props; }
 
 	// SAction handler
 	bool	handleAction(string id);
