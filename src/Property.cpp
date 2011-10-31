@@ -44,6 +44,7 @@
 Property::Property(uint8_t type) {
 	// Set property type
 	this->type = type;
+	this->has_value = false;
 
 	// Set default value depending on type
 	if (type == PROP_BOOL)
@@ -70,6 +71,7 @@ Property::Property(const Property& copy) {
 	this->type = copy.type;
 	this->value = copy.value;
 	this->val_string = copy.val_string;
+	this->has_value = copy.has_value;
 }
 
 /* Property::Property
@@ -79,6 +81,7 @@ Property::Property(bool value) {
 	// Init boolean property
 	this->type = PROP_BOOL;
 	this->value.Boolean = value;
+	this->has_value = true;
 }
 
 /* Property::Property
@@ -88,6 +91,7 @@ Property::Property(int value) {
 	// Init integer property
 	this->type = PROP_INT;
 	this->value.Integer = value;
+	this->has_value = true;
 }
 
 /* Property::Property
@@ -97,6 +101,7 @@ Property::Property(double value) {
 	// Init float property
 	this->type = PROP_FLOAT;
 	this->value.Floating = value;
+	this->has_value = true;
 }
 
 /* Property::Property
@@ -106,6 +111,7 @@ Property::Property(string value) {
 	// Init string property
 	this->type = PROP_STRING;
 	this->val_string = value;
+	this->has_value = true;
 }
 
 /* Property::~Property
@@ -246,6 +252,7 @@ void Property::setValue(bool val) {
 
 	// Set value
 	value.Boolean = val;
+	has_value = true;
 }
 
 /* Property::setValue
@@ -259,6 +266,7 @@ void Property::setValue(int val) {
 
 	// Set value
 	value.Integer = val;
+	has_value = true;
 }
 
 /* Property::setValue
@@ -272,6 +280,7 @@ void Property::setValue(double val) {
 
 	// Set value
 	value.Floating = val;
+	has_value = true;
 }
 
 /* Property::setValue
@@ -285,6 +294,7 @@ void Property::setValue(string val) {
 
 	// Set value
 	val_string = val;
+	has_value = true;
 }
 
 /* Property::changeType

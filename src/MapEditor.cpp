@@ -105,7 +105,7 @@ bool MapEditor::updateHilight(fpoint2_t mouse_pos, double dist_scale) {
 		// Line special
 		if (edit_mode == MODE_LINES && hilight_item >= 0) {
 			MapLine* line = map.getLine(hilight_item);
-			int needs_tag = theGameConfiguration->actionSpecial((int)line->prop("special")).needsTag();
+			int needs_tag = theGameConfiguration->actionSpecial((int)line->prop("special"))->needsTag();
 			int tag = line->prop("arg0");
 
 			// Sector tag

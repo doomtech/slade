@@ -8,9 +8,10 @@ class MapObject;
 class MapObjectPropsPanel : public wxPanel {
 private:
 	wxPropertyGrid*	pg_properties;
-	int				last_type;
-	string			last_config;
-	wxStaticText*	label_item;
+	int					last_type;
+	string				last_config;
+	wxStaticText*		label_item;
+	vector<MapObject*>	objects;
 
 public:
 	MapObjectPropsPanel(wxWindow* parent);
@@ -30,13 +31,7 @@ public:
 	void	openSectors(vector<MapObject*>& objects);
 	void	openThings(vector<MapObject*>& objects);
 
-	/*
-	void	openVertex(MapObject* object, bool add = false);
-	void	openLine(MapObject* object, bool add = false);
-	void	openSide(MapObject* object, wxPGProperty* group, bool refresh = false, bool add = false);
-	void	openSector(MapObject* object, bool add = false);
-	void	openThing(MapObject* object, bool add = false);
-	*/
+	void	setObjectProperty(wxPGProperty* prop, wxVariant value);
 };
 
 #endif//__MAP_OBJECT_PROPS_PANEL_H__

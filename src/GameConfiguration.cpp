@@ -34,6 +34,18 @@ GameConfiguration::GameConfiguration() {
 }
 
 GameConfiguration::~GameConfiguration() {
+	// Clean up stuff
+	ASpecialMap::iterator as = action_specials.begin();
+	while (as != action_specials.end()) {
+		if (as->second.special) delete as->second.special;
+		as++;
+	}
+
+	ThingTypeMap::iterator tt = thing_types.begin();
+	while (tt != thing_types.end()) {
+		if (tt->second.type) delete tt->second.type;
+		tt++;
+	}
 }
 
 void GameConfiguration::init() {
@@ -161,18 +173,24 @@ void GameConfiguration::readActionSpecials(ParseTreeNode* node, ActionSpecial* g
 			long special;
 			child->getName().ToLong(&special);
 
+			// Create action special object if needed
+			if (!action_specials[special].special) {
+				action_specials[special].special = new ActionSpecial();
+				action_specials[special].index = action_specials.size();
+			}
+
 			// Reset the action special (in case it's being redefined for whatever reason)
-			action_specials[special].reset();
+			action_specials[special].special->reset();
 
 			// Apply group defaults
-			action_specials[special].copy(as_defaults);
-			action_specials[special].group = groupname;
+			action_specials[special].special->copy(as_defaults);
+			action_specials[special].special->group = groupname;
 
 			// Check for simple definition
 			if (child->isLeaf())
-				action_specials[special].name = child->getStringValue();
+				action_specials[special].special->name = child->getStringValue();
 			else
-				action_specials[special].parse(child);	// Extended definition
+				action_specials[special].special->parse(child);	// Extended definition
 		}
 	}
 
@@ -219,8 +237,10 @@ void GameConfiguration::readThingTypes(ParseTreeNode* node, ThingType* group_def
 			child->getName().ToLong(&type);
 
 			// Create thing type object if needed
-			if (!thing_types[type].type)
+			if (!thing_types[type].type) {
 				thing_types[type].type = new ThingType();
+				thing_types[type].index = thing_types.size();
+			}
 
 			// Reset the thing type (in case it's being redefined for whatever reason)
 			thing_types[type].type->reset();
@@ -553,6 +573,14 @@ bool GameConfiguration::openConfig(string name) {
 	return false;
 }
 
+ActionSpecial* GameConfiguration::actionSpecial(unsigned id) {
+	as_t& as = action_specials[id];
+	if (as.special)
+		return as.special;
+	else
+		return &as_unknown;
+}
+
 string GameConfiguration::actionSpecialName(int special) {
 	// Check special id is valid
 	if (special < 0)
@@ -560,7 +588,28 @@ string GameConfiguration::actionSpecialName(int special) {
 	else if (special == 0)
 		return "None";
 
-	return action_specials[special].getName();
+	if (action_specials[special].special)
+		return action_specials[special].special->getName();
+	else
+		return "Unknown";
+}
+
+vector<as_t> GameConfiguration::allActionSpecials() {
+	vector<as_t> ret;
+
+	// Build list
+	ASpecialMap::iterator i = action_specials.begin();
+	while (i != action_specials.end()) {
+		if (i->second.special) {
+			as_t as(i->second.special);
+			as.number = i->first;
+			ret.push_back(as);
+		}
+
+		i++;
+	}
+
+	return ret;
 }
 
 ThingType* GameConfiguration::thingType(unsigned type) {
@@ -569,6 +618,23 @@ ThingType* GameConfiguration::thingType(unsigned type) {
 		return ttype.type;
 	else
 		return &ttype_unknown;
+}
+
+vector<tt_t> GameConfiguration::allThingTypes() {
+	vector<tt_t> ret;
+
+	ThingTypeMap::iterator i = thing_types.begin();
+	while (i != thing_types.end()) {
+		if (i->second.type) {
+			tt_t tt(i->second.type);
+			tt.number = i->first;
+			ret.push_back(tt);
+		}
+
+		i++;
+	}
+
+	return ret;
 }
 
 string GameConfiguration::thingFlag(unsigned index) {
@@ -769,7 +835,7 @@ void GameConfiguration::dumpActionSpecials() {
 	ASpecialMap::iterator i = action_specials.begin();
 
 	while (i != action_specials.end()) {
-		wxLogMessage("Action special %d = %s", i->first, CHR(i->second.stringDesc()));
+		wxLogMessage("Action special %d = %s", i->first, CHR(i->second.special->stringDesc()));
 		i++;
 	}
 }

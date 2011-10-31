@@ -47,7 +47,7 @@ void LineInfoOverlay::update(MapLine* line) {
 		args[2] = line->prop("arg2");
 		args[3] = line->prop("arg3");
 		args[4] = line->prop("arg4");
-		string argstr = theGameConfiguration->actionSpecial(as_id).getArgsString(args);
+		string argstr = theGameConfiguration->actionSpecial(as_id)->getArgsString(args);
 		if (!argstr.IsEmpty())
 			info.push_back(S_FMT("%s", CHR(argstr)));
 		else

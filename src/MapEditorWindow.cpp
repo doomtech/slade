@@ -251,14 +251,8 @@ bool MapEditorWindow::handleAction(string id) {
 		wxAuiPaneInfo& p_inf = m_mgr->GetPane("item_props");
 		
 		// Toggle window and focus
-		if (p_inf.IsShown()) {
-			p_inf.Show(false);
-			map_canvas->SetFocus();
-		}
-		else {
-			p_inf.Show(true);
-			p_inf.window->SetFocus();
-		}
+		p_inf.Show(!p_inf.IsShown());
+		map_canvas->SetFocus();
 
 		m_mgr->Update();
 		return true;

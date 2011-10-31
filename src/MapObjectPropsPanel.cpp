@@ -4,7 +4,68 @@
 #include "MapObjectPropsPanel.h"
 #include "GameConfiguration.h"
 #include "SLADEMap.h"
+#include "ActionSpecialTreeView.h"
+#include "ThingTypeTreeView.h"
 #include <wx/propgrid/propgrid.h>
+
+
+class ActionSpecialPGProperty : public wxIntProperty {
+public:
+	ActionSpecialPGProperty(const wxString& label = wxPG_LABEL, const wxString& name = wxPG_LABEL, long value = 0) : wxIntProperty(label, name, value) {
+		// Set to text+button editor
+		SetEditor(wxPGEditor_TextCtrlAndButton);
+	}
+	~ActionSpecialPGProperty() {}
+
+	wxString ValueToString(wxVariant &value, int argFlags = 0) const {
+		// Get value as integer
+		int special = value.GetInteger();
+
+		if (special == 0)
+			return "0: None";
+		else {
+			ActionSpecial* as = theGameConfiguration->actionSpecial(special);
+			return S_FMT("%d: %s", special, CHR(as->getName()));
+		}
+	}
+
+	bool OnEvent(wxPropertyGrid* propgrid, wxWindow* window, wxEvent& e) {
+		if (e.GetEventType() == wxEVT_COMMAND_BUTTON_CLICKED) {
+			int special = ActionSpecialTreeView::showDialog(window, GetValue().GetInteger());
+			if (special >= 0) SetValue(special);
+		}
+
+		return wxIntProperty::OnEvent(propgrid, window, e);
+	}
+};
+
+class ThingTypePGProperty : public wxIntProperty {
+public:
+	ThingTypePGProperty(const wxString& label = wxPG_LABEL, const wxString& name = wxPG_LABEL, long value = 0) : wxIntProperty(label, name, value) {
+		// Set to text+button editor
+		SetEditor(wxPGEditor_TextCtrlAndButton);
+	}
+	~ThingTypePGProperty() {}
+
+	wxString ValueToString(wxVariant& value, int argFlags = 0) const {
+		// Get value as integer
+		int type = value.GetInteger();
+
+		ThingType* tt = theGameConfiguration->thingType(type);
+		return S_FMT("%d: %s", type, CHR(tt->getName()));
+	}
+
+	bool OnEvent(wxPropertyGrid* propgrid, wxWindow* window, wxEvent& e) {
+		if (e.GetEventType() == wxEVT_COMMAND_BUTTON_CLICKED) {
+			int type = ThingTypeTreeView::showDialog(window, GetValue().GetInteger());
+			if (type >= 0) SetValue(type);
+		}
+
+		return wxIntProperty::OnEvent(propgrid, window, e);
+	}
+};
+
+
 
 MapObjectPropsPanel::MapObjectPropsPanel(wxWindow* parent) : wxPanel(parent, -1) {
 	// Init variables
@@ -22,6 +83,10 @@ MapObjectPropsPanel::MapObjectPropsPanel(wxWindow* parent) : wxPanel(parent, -1)
 	// Add property grid
 	pg_properties = new wxPropertyGrid(this, -1, wxDefaultPosition, wxDefaultSize, wxPG_TOOLTIPS|wxPG_SPLITTER_AUTO_CENTER);
 	sizer->Add(pg_properties, 1, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+	wxPGCell cell;
+	cell.SetText("<multiple values>");
+	pg_properties->SetUnspecifiedValueAppearance(cell);
 
 	Layout();
 }
@@ -142,7 +207,7 @@ void MapObjectPropsPanel::setupType(int objtype) {
 		wxPGProperty* g_special = pg_properties->Append(new wxPropertyCategory("Special"));
 
 		// Add special
-		pg_properties->AppendIn(g_special, new wxIntProperty("Special", "special"));
+		pg_properties->AppendIn(g_special, new ActionSpecialPGProperty("Special", "special"));
 
 		// Add args
 		for (unsigned a = 0; a < 5; a++)
@@ -266,7 +331,7 @@ void MapObjectPropsPanel::setupType(int objtype) {
 		pg_properties->AppendIn(g_basic, new wxIntProperty("Angle", "angle"));
 
 		// Add type
-		pg_properties->AppendIn(g_basic, new wxIntProperty("Type", "type"));
+		pg_properties->AppendIn(g_basic, new ThingTypePGProperty("Type", "type"));
 
 		// Add id
 		pg_properties->AppendIn(g_basic, new wxIntProperty("ID", "id"));
@@ -285,7 +350,7 @@ void MapObjectPropsPanel::setupType(int objtype) {
 
 		// Add 'Scripting Special' group
 		wxPGProperty* g_special = pg_properties->Append(new wxPropertyCategory("Scripting Special"));
-		pg_properties->AppendIn(g_special, new wxIntProperty("Special", "special"));
+		pg_properties->AppendIn(g_special, new ActionSpecialPGProperty("Special", "special"));
 
 		// Hide hexen extras if in doom format
 		if (theGameConfiguration->getMapFormat() == MAP_DOOM) {
@@ -304,9 +369,9 @@ void MapObjectPropsPanel::setupType(int objtype) {
 
 void MapObjectPropsPanel::openObject(MapObject* object) {
 	// Do open multiple objects
-	vector<MapObject*> list;
-	if (object) list.push_back(object);
-	openObjects(list);
+	objects.clear();
+	if (object) objects.push_back(object);
+	openObjects(objects);
 }
 
 void MapObjectPropsPanel::openObjects(vector<MapObject*>& objects) {
@@ -319,6 +384,10 @@ void MapObjectPropsPanel::openObjects(vector<MapObject*>& objects) {
 	}
 	else
 		pg_properties->EnableProperty(pg_properties->GetRoot());
+
+	this->objects.clear();
+	for (unsigned a = 0; a < objects.size(); a++)
+		this->objects.push_back(objects[a]);
 
 	// TODO: UDMF
 	if (theGameConfiguration->getMapFormat() == MAP_UDMF)
@@ -378,10 +447,13 @@ void MapObjectPropsPanel::openLines(vector<MapObject*>& objects) {
 	}
 
 	// Set special
+	bool special_same = true;
 	prop = pg_properties->GetProperty("special");
 	for (unsigned a = 0; a < objects.size(); a++) {
-		if (setIntProperty(prop, ((MapLine*)objects[a])->prop("special"), a == 0))
+		if (setIntProperty(prop, ((MapLine*)objects[a])->prop("special"), a == 0)) {
+			special_same = false;
 			break;
+		}
 	}
 
 	// Set args
@@ -393,6 +465,22 @@ void MapObjectPropsPanel::openLines(vector<MapObject*>& objects) {
 		for (unsigned b = 0; b < objects.size(); b++) {
 			if (setIntProperty(prop, ((MapLine*)objects[b])->prop(argname), b == 0))
 				break;
+		}
+	}
+
+	// Set arg names
+	if (theGameConfiguration->getMapFormat() == MAP_HEXEN) {
+		ActionSpecial* as = theGameConfiguration->actionSpecial((int)((MapLine*)objects[0])->prop("special"));
+		for (unsigned a = 0; a < 5; a++) {
+			wxPGProperty* prop = pg_properties->GetProperty(S_FMT("arg%d", a));
+			if (special_same) {
+				prop->SetLabel(as->getArg(a).name);
+				prop->SetHelpString(as->getArg(a).desc);
+			}
+			else {
+				prop->SetLabel(S_FMT("Arg %d", a));
+				prop->SetHelpString("");
+			}
 		}
 	}
 
@@ -606,10 +694,13 @@ void MapObjectPropsPanel::openThings(vector<MapObject*>& objects) {
 	}
 
 	// Set type
+	bool type_same = true;
 	prop = pg_properties->GetProperty("type");
 	for (unsigned a = 0; a < objects.size(); a++) {
-		if (setIntProperty(prop, ((MapThing*)objects[a])->getType(), a == 0))
+		if (setIntProperty(prop, ((MapThing*)objects[a])->getType(), a == 0)) {
+			type_same = false;
 			break;
+		}
 	}
 
 	// Set flags
@@ -653,5 +744,22 @@ void MapObjectPropsPanel::openThings(vector<MapObject*>& objects) {
 					break;
 			}
 		}
+
+		// Set arg names
+		ThingType* tt = theGameConfiguration->thingType(((MapThing*)objects[0])->getType());
+		for (unsigned a = 0; a < 5; a++) {
+			wxPGProperty* prop = pg_properties->GetProperty(S_FMT("arg%d", a));
+			if (type_same) {
+				prop->SetLabel(tt->getArg(a).name);
+				prop->SetHelpString(tt->getArg(a).desc);
+			}
+			else {
+				prop->SetLabel(S_FMT("Arg %d", a));
+				prop->SetHelpString("");
+			}
+		}
 	}
+}
+
+void MapObjectPropsPanel::setObjectProperty(wxPGProperty* prop, wxVariant value) {
 }

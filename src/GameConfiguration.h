@@ -7,12 +7,26 @@
 #include "UDMFProperty.h"
 
 struct tt_t {
-	ThingType* type;
-	tt_t(ThingType* type = NULL) { this->type = type; }
-	~tt_t() { if (type) delete type; }
+	ThingType*	type;
+	int			number;
+	int			index;
+	tt_t(ThingType* type = NULL) { this->type = type; index = 0; }
+
+	bool operator< (tt_t& right) { return (index < right.index); }
+	bool operator> (tt_t& right) { return (index > right.index); }
 };
 
-WX_DECLARE_HASH_MAP(int, ActionSpecial, wxIntegerHash, wxIntegerEqual, ASpecialMap);
+struct as_t {
+	ActionSpecial*	special;
+	int				number;
+	int				index;
+	as_t(ActionSpecial* special = NULL) { this->special = special; index = 0; }
+
+	bool operator< (as_t& right) { return (index < right.index); }
+	bool operator> (as_t& right) { return (index > right.index); }
+};
+
+WX_DECLARE_HASH_MAP(int, as_t, wxIntegerHash, wxIntegerEqual, ASpecialMap);
 WX_DECLARE_HASH_MAP(int, tt_t, wxIntegerHash, wxIntegerEqual, ThingTypeMap);
 
 class ParseTreeNode;
@@ -27,6 +41,7 @@ private:
 	bool			boom;
 	string			game_filter;
 	ASpecialMap		action_specials;
+	ActionSpecial	as_unknown;
 	ThingTypeMap	thing_types;
 	ThingType		ttype_unknown;
 	vector<string>	map_names;
@@ -93,11 +108,13 @@ public:
 	bool	openConfig(string name);
 
 	// Action specials
-	ActionSpecial&	actionSpecial(unsigned id) { return action_specials[id]; }
+	ActionSpecial*	actionSpecial(unsigned id);
 	string			actionSpecialName(int special);
+	vector<as_t>	allActionSpecials();
 
 	// Thing types
-	ThingType*	thingType(unsigned type);
+	ThingType*		thingType(unsigned type);
+	vector<tt_t>	allThingTypes();
 
 	// Flags
 	int		nThingFlags() { return flags_thing.size(); }

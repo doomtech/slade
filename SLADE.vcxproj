@@ -109,6 +109,7 @@
   <ItemGroup>
     <ClCompile Include="src\ACSPrefsPanel.cpp" />
     <ClCompile Include="src\ActionSpecial.cpp" />
+    <ClCompile Include="src\ActionSpecialTreeView.cpp" />
     <ClCompile Include="src\ADatArchive.cpp" />
     <ClCompile Include="src\AdvancedPrefsPanel.cpp" />
     <ClCompile Include="src\ANSICanvas.cpp" />
@@ -239,6 +240,7 @@
     <ClCompile Include="src\TextureXPanel.cpp" />
     <ClCompile Include="src\ThingInfoOverlay.cpp" />
     <ClCompile Include="src\ThingType.cpp" />
+    <ClCompile Include="src\ThingTypeTreeView.cpp" />
     <ClCompile Include="src\Tokenizer.cpp" />
     <ClCompile Include="src\Translation.cpp" />
     <ClCompile Include="src\TranslationEditorDialog.cpp" />
@@ -320,6 +322,7 @@
   <ItemGroup>
     <ClInclude Include="src\ACSPrefsPanel.h" />
     <ClInclude Include="src\ActionSpecial.h" />
+    <ClInclude Include="src\ActionSpecialTreeView.h" />
     <ClInclude Include="src\ADatArchive.h" />
     <ClInclude Include="src\AdvancedPrefsPanel.h" />
     <ClInclude Include="src\ANSICanvas.h" />
@@ -458,6 +461,7 @@
     <ClInclude Include="src\TextureXPanel.h" />
     <ClInclude Include="src\ThingInfoOverlay.h" />
     <ClInclude Include="src\ThingType.h" />
+    <ClInclude Include="src\ThingTypeTreeView.h" />
     <ClInclude Include="src\Tokenizer.h" />
     <ClInclude Include="src\Translation.h" />
     <ClInclude Include="src\TranslationEditorDialog.h" />

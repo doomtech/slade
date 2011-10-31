@@ -655,7 +655,7 @@ bool SLADEMap::addThing(hexenthing_t& t) {
 
 	// Setup thing properties
 	nt->prop("angle") = t.angle;
-	nt->prop("z") = (double)t.z;
+	nt->prop("height") = (double)t.z;
 	nt->prop("special") = t.special;
 	nt->prop("flags") = t.flags;
 	nt->prop("id") = t.tid;
@@ -664,24 +664,6 @@ bool SLADEMap::addThing(hexenthing_t& t) {
 	nt->prop("arg2") = t.args[2];
 	nt->prop("arg3") = t.args[3];
 	nt->prop("arg4") = t.args[4];
-
-	// Flags
-	/*
-	nt->prop("skill1") = ((t.flags & THING_EASY)!=0);
-	nt->prop("skill2") = ((t.flags & THING_EASY)!=0);
-	nt->prop("skill3") = ((t.flags & THING_MEDIUM)!=0);
-	nt->prop("skill4") = ((t.flags & THING_HARD)!=0);
-	nt->prop("skill5") = ((t.flags & THING_HARD)!=0);
-	nt->prop("ambush") = ((t.flags & THING_DEAF)!=0);
-	nt->prop("dormant") = ((t.flags & THING_HDORMANT)!=0);
-	nt->prop("class1") = ((t.flags & THING_HCLASS1)!=0);
-	nt->prop("class2") = ((t.flags & THING_HCLASS2)!=0);
-	nt->prop("class3") = ((t.flags & THING_HCLASS3)!=0);
-	nt->prop("single") = ((t.flags & THING_HSP)!=0);
-	nt->prop("dm") = ((t.flags & THING_HDM)!=0);
-	nt->prop("coop") = ((t.flags & THING_HCOOP)!=0);
-	nt->prop("raw_flags") = t.flags;
-	*/
 
 	// Add thing
 	things.push_back(nt);
