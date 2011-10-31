@@ -939,6 +939,13 @@ bool SLADEMap::addSide(ParseTreeNode* def) {
 	// Create new side
 	MapSide* ns = new MapSide(sectors[sector], this);
 
+	// Set some reasonable defaults
+	ns->prop("texturetop").setValue(string("-"));
+	ns->prop("texturemiddle").setValue(string("-"));
+	ns->prop("texturebottom").setValue(string("-"));
+	ns->prop("offsetx") = 0;
+	ns->prop("offsety") = 0;
+
 	// Add extra side info
 	ParseTreeNode* prop = NULL;
 	for (unsigned a = 0; a < def->nChildren(); a++) {
@@ -984,9 +991,13 @@ bool SLADEMap::addLine(ParseTreeNode* def) {
 	// Create new line
 	MapLine* nl = new MapLine(vertices[v1], vertices[v2], sides[s1], side2, this);
 
-	// Set default values
-	// TODO: Nicer way to deal with default udmf values
+	// Set some reasonable defaults
 	nl->prop("special") = 0;
+	nl->prop("arg0") = 0;
+	nl->prop("arg1") = 0;
+	nl->prop("arg2") = 0;
+	nl->prop("arg3") = 0;
+	nl->prop("arg4") = 0;
 
 	// Add extra line info
 	ParseTreeNode* prop = NULL;
@@ -1016,6 +1027,9 @@ bool SLADEMap::addSector(ParseTreeNode* def) {
 	// Create new sector
 	MapSector* ns = new MapSector(prop_ftex->getStringValue(), prop_ctex->getStringValue(), this);
 
+	// Set some reasonable defaults
+	ns->prop("id") = 0;
+
 	// Add extra sector info
 	ParseTreeNode* prop = NULL;
 	for (unsigned a = 0; a < def->nChildren(); a++) {
@@ -1044,6 +1058,17 @@ bool SLADEMap::addThing(ParseTreeNode* def) {
 
 	// Create new thing
 	MapThing* nt = new MapThing(prop_x->getFloatValue(), prop_y->getFloatValue(), prop_type->getIntValue(), this);
+
+	// Set some reasonable defaults
+	nt->prop("height") = 0;
+	nt->prop("angle") = 0;
+	nt->prop("id") = 0;
+	nt->prop("special") = 0;
+	nt->prop("arg0") = 0;
+	nt->prop("arg1") = 0;
+	nt->prop("arg2") = 0;
+	nt->prop("arg3") = 0;
+	nt->prop("arg4") = 0;
 
 	// Add extra thing info
 	ParseTreeNode* prop = NULL;
@@ -1138,6 +1163,9 @@ bool SLADEMap::readUDMFMap(Archive::mapdesc_t map) {
 	// Create things from parsed data
 	for (unsigned a = 0; a < defs_things.size(); a++)
 		addThing(defs_things[a]);
+
+	// Remove detached vertices
+	removeDetachedVertices();
 
 	// Update item indices
 	refreshIndices();

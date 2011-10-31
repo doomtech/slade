@@ -21,10 +21,12 @@ public:
 	UDMFProperty();
 	~UDMFProperty();
 
-	string	getProperty() { return property; }
-	string	getName() { return name; }
-	string	getGroup() { return group; }
-	int		getType() { return type; }
+	string		getProperty() { return property; }
+	string		getName() { return name; }
+	string		getGroup() { return group; }
+	int			getType() { return type; }
+	Property	getDefaultValue() { return default_value; }
+	bool		hasDefaultValue() { return has_default; }
 
 	void	parse(ParseTreeNode* node, string group);
 

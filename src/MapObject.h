@@ -37,6 +37,11 @@ public:
 
 	PropertyList&	props()				{ return properties; }
 	Property&		prop(string key)	{ return properties[key]; }
+	bool			hasProp(string key)	{ return properties.propertyExists(key); }
+	virtual bool	boolProperty(string key);
+	virtual int		intProperty(string key);
+	virtual double	floatProperty(string key);
+	virtual string	stringProperty(string key);
 
 	void	filter(bool f = true) { filtered = f; }
 

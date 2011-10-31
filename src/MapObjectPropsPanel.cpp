@@ -7,6 +7,7 @@
 #include "ActionSpecialTreeView.h"
 #include "ThingTypeTreeView.h"
 #include <wx/propgrid/propgrid.h>
+#include <wx/propgrid/advprops.h>
 
 
 class ActionSpecialPGProperty : public wxIntProperty {
@@ -172,6 +173,29 @@ bool MapObjectPropsPanel::setStringProperty(wxPGProperty* prop, string value, bo
 	}
 
 	return false;
+}
+
+void MapObjectPropsPanel::addUDMFProperty(UDMFProperty* prop) {
+	// Check property was given
+	if (!prop)
+		return;
+
+	// Get group to add
+	wxPGProperty* group = pg_properties->GetProperty(prop->getGroup());
+	if (!group)
+		group = pg_properties->Append(new wxPropertyCategory(prop->getGroup()));
+
+	// Add property depending on type
+	if (prop->getType() == UDMFProperty::TYPE_BOOL)
+		pg_properties->AppendIn(group, new wxBoolProperty(prop->getName(), prop->getProperty()));
+	else if (prop->getType() == UDMFProperty::TYPE_INT)
+		pg_properties->AppendIn(group, new wxIntProperty(prop->getName(), prop->getProperty()));
+	else if (prop->getType() == UDMFProperty::TYPE_FLOAT)
+		pg_properties->AppendIn(group, new wxFloatProperty(prop->getName(), prop->getProperty()));
+	else if (prop->getType() == UDMFProperty::TYPE_STRING)
+		pg_properties->AppendIn(group, new wxStringProperty(prop->getName(), prop->getProperty()));
+	else if (prop->getType() == UDMFProperty::TYPE_COLOUR)
+		pg_properties->AppendIn(group, new wxColourProperty(prop->getName(), prop->getProperty()));
 }
 
 void MapObjectPropsPanel::setupType(int objtype) {
@@ -367,6 +391,26 @@ void MapObjectPropsPanel::setupType(int objtype) {
 	last_type = objtype;
 }
 
+void MapObjectPropsPanel::setupTypeUDMF(int objtype) {
+	// Nothing to do if it was already this type
+	if (last_type == objtype)
+		return;
+
+	// Clear property grid
+	pg_properties->Clear();
+
+	// Go through all possible properties for this type
+	vector<udmfp_t> props = theGameConfiguration->allUDMFProperties(objtype);
+	sort(props.begin(), props.end());
+	for (unsigned a = 0; a < props.size(); a++)
+		addUDMFProperty(props[a].property);
+
+	// Set all bool properties to use checkboxes
+	pg_properties->SetPropertyAttributeAll(wxPG_BOOL_USE_CHECKBOX, true);
+
+	last_type = objtype;
+}
+
 void MapObjectPropsPanel::openObject(MapObject* object) {
 	// Do open multiple objects
 	objects.clear();
@@ -385,13 +429,34 @@ void MapObjectPropsPanel::openObjects(vector<MapObject*>& objects) {
 	else
 		pg_properties->EnableProperty(pg_properties->GetRoot());
 
-	this->objects.clear();
-	for (unsigned a = 0; a < objects.size(); a++)
-		this->objects.push_back(objects[a]);
-
-	// TODO: UDMF
-	if (theGameConfiguration->getMapFormat() == MAP_UDMF)
-		return;
+	// UDMF
+	if (theGameConfiguration->getMapFormat() == MAP_UDMF) {
+		setupTypeUDMF(objects[0]->getObjType());
+		vector<udmfp_t> properties = theGameConfiguration->allUDMFProperties(objects[0]->getObjType());
+		for (unsigned a = 0; a < properties.size(); a++) {
+			int proptype = properties[a].property->getType();
+			string propname = properties[a].property->getProperty();
+			wxPGProperty* prop = pg_properties->GetProperty(propname);
+			for (unsigned b = 0; b < objects.size(); b++) {
+				if (proptype == UDMFProperty::TYPE_BOOL) {
+					if (setBoolProperty(prop, objects[b]->boolProperty(propname), (b == 0)))
+						break;
+				}
+				else if (proptype == UDMFProperty::TYPE_INT) {
+					if (setIntProperty(prop, objects[b]->intProperty(propname), (b == 0)))
+						break;
+				}
+				else if (proptype == UDMFProperty::TYPE_FLOAT) {
+					if (setFloatProperty(prop, objects[b]->floatProperty(propname), (b == 0)))
+						break;
+				}
+				else if (proptype == UDMFProperty::TYPE_STRING) {
+					if (setStringProperty(prop, objects[b]->stringProperty(propname), (b == 0)))
+						break;
+				}
+			}
+		}
+	}
 
 	// Setup property grid for the object type
 	setupType(objects[0]->getObjType());
@@ -404,6 +469,11 @@ void MapObjectPropsPanel::openObjects(vector<MapObject*>& objects) {
 	case MOBJ_THING: openThings(objects); break;
 	default: break;
 	}
+
+	// Update internal objects list
+	this->objects.clear();
+	for (unsigned a = 0; a < objects.size(); a++)
+		this->objects.push_back(objects[a]);
 }
 
 void MapObjectPropsPanel::openVertices(vector<MapObject*>& objects) {

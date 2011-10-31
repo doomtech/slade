@@ -26,13 +26,24 @@ struct as_t {
 	bool operator> (const as_t& right) const { return (index > right.index); }
 };
 
+struct udmfp_t {
+	UDMFProperty*	property;
+	int				index;
+	udmfp_t(UDMFProperty* property = NULL) { this->property = property; index = 0; }
+
+	bool operator< (const udmfp_t& right) const { return (index < right.index); }
+	bool operator> (const udmfp_t& right) const { return (index > right.index); }
+};
+
 WX_DECLARE_HASH_MAP(int, as_t, wxIntegerHash, wxIntegerEqual, ASpecialMap);
 WX_DECLARE_HASH_MAP(int, tt_t, wxIntegerHash, wxIntegerEqual, ThingTypeMap);
+WX_DECLARE_STRING_HASH_MAP(udmfp_t, UDMFPropMap);
 
 class ParseTreeNode;
 class ArchiveEntry;
 class MapLine;
 class MapThing;
+class MapObject;
 class GameConfiguration {
 private:
 	string			name;
@@ -67,11 +78,11 @@ private:
 	vector<sectype_t>	sector_types;
 
 	// UDMF properties
-	vector<UDMFProperty>	udmf_vertex_props;
-	vector<UDMFProperty>	udmf_linedef_props;
-	vector<UDMFProperty>	udmf_sidedef_props;
-	vector<UDMFProperty>	udmf_sector_props;
-	vector<UDMFProperty>	udmf_thing_props;
+	UDMFPropMap	udmf_vertex_props;
+	UDMFPropMap	udmf_linedef_props;
+	UDMFPropMap	udmf_sidedef_props;
+	UDMFPropMap	udmf_sector_props;
+	UDMFPropMap	udmf_thing_props;
 
 	// Singleton instance
 	static GameConfiguration*	instance;
@@ -101,7 +112,7 @@ public:
 	// Configuration reading
 	void	readActionSpecials(ParseTreeNode* node, ActionSpecial* group_defaults = NULL);
 	void	readThingTypes(ParseTreeNode* node, ThingType* group_defaults = NULL);
-	void	readUDMFProperties(ParseTreeNode* node, vector<UDMFProperty>& plist);
+	void	readUDMFProperties(ParseTreeNode* node, UDMFPropMap& plist);
 	bool	readConfiguration(string& cfg, string source = "");
 	bool 	open(string filename);
 	bool	open(ArchiveEntry* entry);
@@ -126,6 +137,10 @@ public:
 	bool	lineFlagSet(unsigned index, MapLine* line);
 	string	lineFlagsString(MapLine* line);
 	string	spacTriggerString(MapLine* line);
+
+	// UDMF properties
+	UDMFProperty*	getUDMFProperty(string name, int type);
+	vector<udmfp_t>	allUDMFProperties(int type);
 
 	// Sector types
 	string	sectorTypeName(int type);

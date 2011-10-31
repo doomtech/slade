@@ -260,7 +260,7 @@ void GameConfiguration::readThingTypes(ParseTreeNode* node, ThingType* group_def
 	delete tt_defaults;
 }
 
-void GameConfiguration::readUDMFProperties(ParseTreeNode* block, vector<UDMFProperty>& plist) {
+void GameConfiguration::readUDMFProperties(ParseTreeNode* block, UDMFPropMap& plist) {
 	// Read block properties
 	for (unsigned a = 0; a < block->nChildren(); a++) {
 		ParseTreeNode* group = (ParseTreeNode*)block->getChild(a);
@@ -274,23 +274,18 @@ void GameConfiguration::readUDMFProperties(ParseTreeNode* block, vector<UDMFProp
 				ParseTreeNode* def = (ParseTreeNode*)group->getChild(b);
 
 				if (S_CMPNOCASE(def->getType(), "property")) {
-					// Check if the property already exists
-					bool exists = false;
-					for (unsigned p = 0; p < plist.size(); p++) {
-						if (plist[p].getProperty() == def->getName()) {
-							plist[p].parse(group, groupname);	// Parse group defaults
-							plist[p].parse(def, groupname);		// Parse property definition
-							exists = true;
-							break;
-						}
-					}
+					// Create property if needed
+					if (!plist[def->getName()].property)
+						plist[def->getName()].property = new UDMFProperty();
 
-					// Create property if it didn't exist
-					if (!exists) {
-						plist.push_back(UDMFProperty());
-						plist.back().parse(group, groupname);
-						plist.back().parse(def, groupname);
-					}
+					// Parse group defaults
+					plist[def->getName()].property->parse(group, groupname);
+
+					// Parse definition
+					plist[def->getName()].property->parse(def, groupname);
+					
+					// Set index
+					plist[def->getName()].index = plist.size();
 				}
 			}
 		}
@@ -310,6 +305,11 @@ bool GameConfiguration::readConfiguration(string& cfg, string source) {
 	map_names.clear();
 	flags_thing.clear();
 	flags_line.clear();
+	udmf_vertex_props.clear();
+	udmf_linedef_props.clear();
+	udmf_sidedef_props.clear();
+	udmf_sector_props.clear();
+	udmf_thing_props.clear();
 
 	// Parse the full configuration
 	Parser parser;
@@ -743,6 +743,53 @@ string GameConfiguration::spacTriggerString(MapLine* line) {
 	return "Unknown";
 }
 
+UDMFProperty* GameConfiguration::getUDMFProperty(string name, int type) {
+	if (type == MOBJ_VERTEX)
+		return udmf_vertex_props[name].property;
+	else if (type == MOBJ_LINE)
+		return udmf_linedef_props[name].property;
+	else if (type == MOBJ_SIDE)
+		return udmf_sidedef_props[name].property;
+	else if (type == MOBJ_SECTOR)
+		return udmf_sector_props[name].property;
+	else if (type == MOBJ_THING)
+		return udmf_thing_props[name].property;
+	else
+		return NULL;
+}
+
+vector<udmfp_t> GameConfiguration::allUDMFProperties(int type) {
+	vector<udmfp_t> ret;
+
+	// Build list depending on type
+	UDMFPropMap* map = NULL;
+	if (type == MOBJ_VERTEX)
+		map = &udmf_vertex_props;
+	else if (type == MOBJ_LINE)
+		map = &udmf_linedef_props;
+	else if (type == MOBJ_SIDE)
+		map = &udmf_sidedef_props;
+	else if (type == MOBJ_SECTOR)
+		map = &udmf_sector_props;
+	else if (type == MOBJ_THING)
+		map = &udmf_thing_props;
+	else
+		return ret;
+
+	UDMFPropMap::iterator i = map->begin();
+	while (i != map->end()) {
+		if (i->second.property) {
+			udmfp_t up(i->second.property);
+			up.index = i->second.index;
+			ret.push_back(up);
+		}
+
+		i++;
+	}
+
+	return ret;
+}
+
 string GameConfiguration::sectorTypeName(int type) {
 	// Check for zero type
 	if (type == 0)
@@ -856,9 +903,10 @@ void GameConfiguration::dumpValidMapNames() {
 }
 
 void GameConfiguration::dumpUDMFProperties() {
+	/*
 	// Vertex
 	for (unsigned a = 0; a < udmf_vertex_props.size(); a++)
-		wxLogMessage(udmf_vertex_props[a].getStringRep());
+		wxLogMessage(udmf_vertex_props[a].property->getStringRep());
 
 	// Line
 	for (unsigned a = 0; a < udmf_linedef_props.size(); a++)
@@ -875,6 +923,7 @@ void GameConfiguration::dumpUDMFProperties() {
 	// Thing
 	for (unsigned a = 0; a < udmf_thing_props.size(); a++)
 		wxLogMessage(udmf_thing_props[a].getStringRep());
+	*/
 }
 
 

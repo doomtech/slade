@@ -5,6 +5,7 @@
 class wxPropertyGrid;
 class wxPGProperty;
 class MapObject;
+class UDMFProperty;
 class MapObjectPropsPanel : public wxPanel {
 private:
 	wxPropertyGrid*	pg_properties;
@@ -22,7 +23,10 @@ public:
 	bool	setBoolProperty(wxPGProperty* prop, bool value, bool force_set = false);
 	bool	setStringProperty(wxPGProperty* prop, string value, bool force_set = false);
 
+	void	addUDMFProperty(UDMFProperty* prop);
+
 	void	setupType(int objtype);
+	void	setupTypeUDMF(int objtype);
 	void	openObject(MapObject* object);
 	void	openObjects(vector<MapObject*>& objects);
 

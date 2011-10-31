@@ -20,7 +20,7 @@ private:
 	bool		has_value;
 
 public:
-	Property(uint8_t type = PROP_FLAG);	// Default property type is a flag
+	Property(uint8_t type = PROP_BOOL);	// Default property type is bool
 	Property(const Property& copy);
 	Property(bool value);
 	Property(int value);
