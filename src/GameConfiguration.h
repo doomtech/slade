@@ -12,8 +12,8 @@ struct tt_t {
 	int			index;
 	tt_t(ThingType* type = NULL) { this->type = type; index = 0; }
 
-	bool operator< (tt_t& right) { return (index < right.index); }
-	bool operator> (tt_t& right) { return (index > right.index); }
+	bool operator< (const tt_t& right) const { return (index < right.index); }
+	bool operator> (const tt_t& right) const { return (index > right.index); }
 };
 
 struct as_t {
@@ -22,8 +22,8 @@ struct as_t {
 	int				index;
 	as_t(ActionSpecial* special = NULL) { this->special = special; index = 0; }
 
-	bool operator< (as_t& right) { return (index < right.index); }
-	bool operator> (as_t& right) { return (index > right.index); }
+	bool operator< (const as_t& right) const { return (index < right.index); }
+	bool operator> (const as_t& right) const { return (index > right.index); }
 };
 
 WX_DECLARE_HASH_MAP(int, as_t, wxIntegerHash, wxIntegerEqual, ASpecialMap);
