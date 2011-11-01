@@ -5,6 +5,7 @@
 #include "BaseResourceChooser.h"
 #include "GameConfiguration.h"
 #include "ArchiveManager.h"
+#include "WadArchive.h"
 #include <wx/statline.h>
 
 MapEditorConfigDialog::MapEditorConfigDialog(wxWindow* parent, Archive* archive) : wxDialog(parent, -1, "Map Editor Configuration") {
@@ -98,7 +99,7 @@ Archive::mapdesc_t MapEditorConfigDialog::selectedMap() {
 		selection = sel[0];
 
 	// Check if a map is selected
-	if (selection < 0 || selection >= choice_game_config->GetCount())
+	if (selection < 0 || selection >= maps.size())
 		return Archive::mapdesc_t();
 	else
 		return maps[selection];

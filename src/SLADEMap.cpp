@@ -33,6 +33,8 @@
 #include "MathStuff.h"
 #include "ResourceManager.h"
 #include "MainApp.h"
+#include "Archive.h"
+#include "WadArchive.h"
 
 SLADEMap::SLADEMap() {
 	// Init variables
@@ -229,17 +231,35 @@ void SLADEMap::refreshIndices() {
 }
 
 bool SLADEMap::readMap(Archive::mapdesc_t map) {
-	if (map.format == MAP_DOOM)
-		return readDoomMap(map);
-	else if (map.format == MAP_HEXEN)
-		return readHexenMap(map);
-	else if (map.format == MAP_DOOM64)
-		return readDoom64Map(map);
-	else if (map.format == MAP_UDMF) {
-		return readUDMFMap(map);
+	Archive::mapdesc_t omap = map;
+
+	// Check for map archive
+	Archive* tempwad = NULL;
+	if (map.archive && map.head) {
+		tempwad = new WadArchive();
+		tempwad->open(map.head);
+		vector<Archive::mapdesc_t> amaps = tempwad->detectMaps();
+		if (amaps.size() > 0)
+			omap = amaps[0];
+		else
+			return false;
 	}
 
-	return false;
+	bool ok = false;
+	if (omap.format == MAP_DOOM)
+		ok = readDoomMap(omap);
+	else if (omap.format == MAP_HEXEN)
+		ok = readHexenMap(omap);
+	else if (omap.format == MAP_DOOM64)
+		ok = readDoom64Map(omap);
+	else if (omap.format == MAP_UDMF) {
+		ok = readUDMFMap(omap);
+	}
+
+	if (tempwad)
+		delete tempwad;
+
+	return ok;
 }
 
 bool SLADEMap::addVertex(doomvertex_t& v) {
