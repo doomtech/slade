@@ -13,6 +13,7 @@
 #include "SLADEMap.h"
 #include <wx/textfile.h>
 #include <wx/filename.h>
+#include <wx/dir.h>
 
 
 /*******************************************************************
@@ -48,10 +49,102 @@ GameConfiguration::~GameConfiguration() {
 	}
 }
 
+string GameConfiguration::readConfigName(MemChunk& mc) {
+	Tokenizer tz;
+	tz.openMem(&mc, "gameconfig");
+
+	// Parse text
+	string token = tz.getToken();
+	while (!token.IsEmpty()) {
+		// Game section
+		if (S_CMPNOCASE(token, "game")) {
+			tz.getToken();	// Skip {
+
+			token = tz.getToken();
+			while (token != "}") {
+				// Config name
+				if (S_CMPNOCASE(token, "name")) {
+					tz.getToken();	// Skip =
+					return tz.getToken();
+				}
+
+				token = tz.getToken();
+			}
+		}
+
+		token = tz.getToken();
+	}
+
+	// Name not found (invalid config?)
+	return "";
+}
+
 void GameConfiguration::init() {
 	// Load last configuration if any
 	if (!string(game_configuration).IsEmpty())
 		openConfig(game_configuration);
+
+	// Add game configurations from user dir
+	wxArrayString allfiles;
+	wxDir::GetAllFiles(appPath("games", DIR_USER), &allfiles);
+	for (unsigned a = 0; a < allfiles.size(); a++) {
+		// Read config name
+		MemChunk mc;
+		mc.importFile(allfiles[a]);
+		string name = readConfigName(mc);
+
+		// Add to list if valid
+		if (!name.IsEmpty()) {
+			gconf_t gc;
+			gc.filename = wxFileName(allfiles[a]).GetName();
+			gc.title = name;
+			game_configs.push_back(gc);
+		}
+	}
+
+	// Add game configurations from program resource
+	ArchiveTreeNode* dir = theArchiveManager->programResourceArchive()->getDir("config/games");
+	if (dir) {
+		for (unsigned a = 0; a < dir->numEntries(); a++) {
+			// Check this game doesn't already exist
+			bool exists = false;
+			string filename = dir->getEntry(a)->getName(true);
+			for (unsigned b = 0; b < game_configs.size(); b++) {
+				if (game_configs[b].filename == filename) {
+					exists = true;
+					break;
+				}
+			}
+
+			if (exists)
+				continue;
+
+			// Read config name
+			string name = readConfigName(dir->getEntry(a)->getMCData());
+
+			// Add to list if valid
+			if (!name.IsEmpty()) {
+				gconf_t gc;
+				gc.filename = dir->getEntry(a)->getName(true);
+				gc.title = name;
+				game_configs.push_back(gc);
+			}
+		}
+	}
+}
+
+string GameConfiguration::configTitle(unsigned index) {
+	if (index >= game_configs.size())
+		return "";
+	else
+		return game_configs[index].title;
+}
+
+string GameConfiguration::configName(unsigned index) {
+	if (index >= game_configs.size())
+		return "";
+	else
+		return game_configs[index].filename;
 }
 
 /* GameConfiguration::buildConfig
@@ -283,7 +376,7 @@ void GameConfiguration::readUDMFProperties(ParseTreeNode* block, UDMFPropMap& pl
 
 					// Parse definition
 					plist[def->getName()].property->parse(def, groupname);
-					
+
 					// Set index
 					plist[def->getName()].index = plist.size();
 				}

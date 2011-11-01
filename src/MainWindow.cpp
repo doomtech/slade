@@ -40,6 +40,7 @@
 #include "Tokenizer.h"
 #include "SplashWindow.h"
 #include "MapEditorWindow.h"
+#include "MapEditorConfigDialog.h"
 #include <wx/aboutdlg.h>
 #include <wx/dnd.h>
 #include <wx/statline.h>
@@ -229,6 +230,7 @@ void MainWindow::setupLayout() {
 	theApp->getAction("arch_newdir")->addToToolbar(tb_archive);
 	theApp->getAction("arch_importfiles")->addToToolbar(tb_archive);
 	theApp->getAction("arch_texeditor")->addToToolbar(tb_archive);
+	theApp->getAction("arch_mapeditor")->addToToolbar(tb_archive);
 	tb_archive->Realize();
 
 	// Create Entry toolbar
@@ -414,6 +416,18 @@ vector<ArchiveEntry*> MainWindow::getCurrentEntrySelection() {
  *******************************************************************/
 void MainWindow::openTextureEditor(Archive* archive) {
 	panel_archivemanager->openTextureTab(theArchiveManager->archiveIndex(archive));
+}
+
+/* MainWindow::openMapEditor
+ * Opens the map editor for the current archive tab
+ *******************************************************************/
+void MainWindow::openMapEditor(Archive* archive) {
+	MapEditorConfigDialog dlg(this, archive);
+	if (dlg.ShowModal() == wxID_OK) {
+		Archive::mapdesc_t md = dlg.selectedMap();
+		if (md.head)
+			theMapEditor->openMap(md);
+	}
 }
 
 /* MainWindow::openEntry

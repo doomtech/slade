@@ -1607,6 +1607,9 @@ bool ArchivePanel::handleAction(string id) {
 	else if (id == "arch_texeditor")
 		theMainWindow->openTextureEditor(archive);
 
+	else if (id == "arch_mapeditor")
+		theMainWindow->openMapEditor(archive);
+
 	// Archive->Convert To...
 	else if (id == "arch_convert")
 		convertArchiveTo();

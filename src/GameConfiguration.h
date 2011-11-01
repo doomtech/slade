@@ -57,6 +57,12 @@ private:
 	ThingType		ttype_unknown;
 	vector<string>	map_names;
 
+	struct gconf_t {
+		string	title;
+		string	filename;
+	};
+	vector<gconf_t>	game_configs;
+
 	// Flags
 	struct flag_t {
 		int		flag;
@@ -103,7 +109,11 @@ public:
 	int		getMapFormat() { return map_format; }
 	bool	isBoom() { return boom; }
 
-	void	init();
+	string			readConfigName(MemChunk& mc);
+	void			init();
+	unsigned		nConfigs() { return game_configs.size(); }
+	string			configTitle(unsigned index);
+	string			configName(unsigned index);
 
 	// Config #include handling
 	void	buildConfig(string filename, string& out);

@@ -10,11 +10,11 @@
       <Project Name="SLADE" ConfigName="Release"/>
       <Project Name="SLADE" ConfigName="Release"/>
     </WorkspaceConfiguration>
-    <WorkspaceConfiguration Name="Release-osx" Selected="no">
+    <WorkspaceConfiguration Name="Release-osx" Selected="yes">
       <Project Name="SLADE-osx" ConfigName="Release"/>
       <Project Name="SLADE" ConfigName="Release-osx"/>
     </WorkspaceConfiguration>
-    <WorkspaceConfiguration Name="Debug-osx" Selected="yes">
+    <WorkspaceConfiguration Name="Debug-osx" Selected="no">
       <Project Name="SLADE-osx" ConfigName="Release"/>
       <Project Name="SLADE" ConfigName="Debug-osx"/>
     </WorkspaceConfiguration>

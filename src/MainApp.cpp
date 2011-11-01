@@ -370,6 +370,7 @@ void MainApp::initActions() {
 	new SAction("arch_newdir", "New Directory", "t_newfolder", "Create a new empty directory");
 	new SAction("arch_importfiles", "&Import Files", "t_importfiles", "Import multiple files into the archive");
 	new SAction("arch_texeditor", "&Texture Editor", "t_texeditor", "Open the texture editor for the current archive");
+	new SAction("arch_mapeditor", "&Map Editor", "e_map", "Open the map editor");
 	new SAction("arch_clean_patches", "Remove Unused &Patches", "", "Remove any unused patches, and their associated entries");
 	new SAction("arch_clean_textures", "Remove Unused &Textures", "", "Remove any unused textures");
 	new SAction("arch_clean_flats", "Remove Unused &Flats", "", "Remove any unused flats");
