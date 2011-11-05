@@ -43,6 +43,8 @@ public:
 	virtual double	floatProperty(string key);
 	virtual string	stringProperty(string key);
 
+	virtual fpoint2_t	midPoint() { return fpoint2_t(0,0); }
+
 	void	filter(bool f = true) { filtered = f; }
 
 	virtual void	copy(MapObject* c);

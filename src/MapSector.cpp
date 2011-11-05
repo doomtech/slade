@@ -20,6 +20,12 @@ MapSector::MapSector(string f_tex, string c_tex, SLADEMap* parent) : MapObject(M
 MapSector::~MapSector() {
 }
 
+fpoint2_t MapSector::midPoint() {
+	bbox_t bbox = boundingBox();
+	return fpoint2_t(bbox.min.x + ((bbox.max.x-bbox.min.x)*0.5),
+						bbox.min.y + ((bbox.max.y-bbox.min.y)*0.5));
+}
+
 void MapSector::updateBBox() {
 	// Reset bounding box
 	bbox.reset();

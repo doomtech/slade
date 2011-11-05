@@ -65,9 +65,10 @@ private:
 	MapSide*	side2;
 
 	// Internally used info
-	double	length;
-	double	ca;
-	double	sa;
+	double		length;
+	double		ca;	// Used for intersection calculations
+	double		sa;	// ^^
+	fpoint2_t	tab_point;
 
 public:
 	MapLine(SLADEMap* parent = NULL);
@@ -94,8 +95,10 @@ public:
 	int	s1Index();
 	int	s2Index();
 
-	double	getLength();
-	bool	doubleSector();
+	fpoint2_t	midPoint();
+	double		getLength();
+	bool		doubleSector();
+	fpoint2_t	dirTabPoint();
 };
 
 #endif //__MAPLINE_H__

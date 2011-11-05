@@ -110,6 +110,10 @@ void AdvancedPrefsPanel::applyPreferences() {
 	get_cvar_list(cvars);
 
 	for (unsigned a = 0; a < cvars.size(); a++) {
+		// Check if cvar value was even modified
+		if (!pg_cvars->GetProperty(cvars[a])->HasFlag(wxPG_PROP_MODIFIED))
+			continue;
+
 		// Get cvar
 		CVar* cvar = get_cvar(cvars[a]);
 

@@ -139,7 +139,6 @@ MCALineSelection::MCALineSelection(long start, vector<MapLine*>& lines, bool sel
 	this->fade = 1.0f;
 
 	// Go through list of lines
-	double xmid, ymid;
 	for (unsigned a = 0; a < lines.size(); a++) {
 		if (!lines[a]) continue;
 
@@ -147,16 +146,10 @@ MCALineSelection::MCALineSelection(long start, vector<MapLine*>& lines, bool sel
 		this->lines.push_back(frect_t(lines[a]->x1(), lines[a]->y1(), lines[a]->x2(), lines[a]->y2()));
 
 		// Calculate line direction tab
-		frect_t& rect = this->lines.back();
-		xmid = rect.tl.x + ((rect.br.x - rect.tl.x) * 0.5);
-		ymid = rect.tl.y + ((rect.br.y - rect.tl.y) * 0.5);
-		double tablen = rect.length() * 0.2;
-		if (tablen > 8) tablen = 8;
-		if (tablen < 2) tablen = 2;
-		fpoint2_t invdir(-(rect.br.y - rect.tl.y), rect.br.x - rect.tl.x);
-		invdir.normalize();
+		fpoint2_t mid = lines[a]->midPoint();
+		fpoint2_t tab = lines[a]->dirTabPoint();
 
-		this->tabs.push_back(frect_t(xmid, ymid, xmid - invdir.x*tablen, ymid - invdir.y*tablen));
+		this->tabs.push_back(frect_t(mid.x, mid.y, tab.x, tab.y));
 	}
 }
 

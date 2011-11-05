@@ -46,7 +46,8 @@
  * VARIABLES
  *******************************************************************/
 CVAR(Bool, things_always, 1, CVAR_SAVE)
-CVAR(Bool, vertices_always, 1, CVAR_SAVE)
+CVAR(Bool, vertices_always, 0, CVAR_SAVE)
+CVAR(Bool, line_tabs_always, 0, CVAR_SAVE)
 CVAR(Bool, grid_dashed, false, CVAR_SAVE)
 CVAR(Bool, scroll_smooth, true, CVAR_SAVE)
 CVAR(Int, flat_drawtype, 2, CVAR_SAVE)
@@ -466,7 +467,7 @@ void MapCanvas::draw() {
 	if (editor->editMode() == MapEditor::MODE_VERTICES) {
 		// Vertices mode
 		if (things_always) renderer_2d->renderThings(0.5f);	// Things (faded)
-		renderer_2d->renderLines(false);					// Lines (no direction tabs)
+		renderer_2d->renderLines(line_tabs_always);			// Lines (no direction tabs)
 
 		// Vertices
 		if (mouse_state == MSTATE_MOVE)
@@ -500,7 +501,7 @@ void MapCanvas::draw() {
 		// Sectors mode
 		if (things_always) renderer_2d->renderThings(0.5f);			// Things (faded)
 		if (vertices_always) renderer_2d->renderVertices(0.5f);		// Vertices (faded)
-		renderer_2d->renderLines(false);							// Lines (no direction tabs)
+		renderer_2d->renderLines(line_tabs_always);					// Lines (no direction tabs)
 
 		// Selection if needed
 		if (mouse_state != MSTATE_MOVE)
@@ -515,7 +516,7 @@ void MapCanvas::draw() {
 	else if (editor->editMode() == MapEditor::MODE_THINGS) {
 		// Things mode
 		if (vertices_always) renderer_2d->renderVertices(0.5f);		// Vertices (faded)
-		renderer_2d->renderLines(false);							// Lines (no direction tabs)
+		renderer_2d->renderLines(line_tabs_always);					// Lines (no direction tabs)
 		renderer_2d->renderThings();								// Things
 
 		// Selection if needed

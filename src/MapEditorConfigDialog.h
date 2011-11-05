@@ -6,11 +6,16 @@
 #include "Archive.h"
 
 class BaseResourceChooser;
+class ArchiveListView;
 class MapEditorConfigDialog : public wxDialog {
 private:
 	wxChoice*					choice_game_config;
 	BaseResourceChooser*		choice_base_resource;
 	ListView*					list_maps;
+	ArchiveListView*			list_resources;
+	wxButton*					btn_open_resource;
+	wxButton*					btn_new_map;
+
 	Archive*					archive;
 	vector<Archive::mapdesc_t>	maps;
 
@@ -24,6 +29,8 @@ public:
 	// Events
 	void	onChoiceGameConfigChanged(wxCommandEvent& e);
 	void	onMapActivated(wxListEvent& e);
+	void	onBtnNewMap(wxCommandEvent& e);
+	void	onBtnOpenResource(wxCommandEvent& e);
 };
 
 #endif//__MAP_EDITOR_CONFIG_DIALOG_H__

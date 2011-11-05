@@ -215,36 +215,6 @@ bool MapEditorWindow::handleAction(string id) {
 	if (!IsShown())
 		return false;
 
-	// Editor->Set Base Resource Archive
-	/*
-	if (id == "main_setbra") {
-		wxDialog dialog_ebr(this, -1, "Edit Base Resource Archives", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
-		BaseResourceArchivesPanel brap(&dialog_ebr);
-
-		wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
-		sizer->Add(&brap, 1, wxEXPAND|wxALL, 4);
-
-		sizer->Add(dialog_ebr.CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND|wxLEFT|wxRIGHT|wxDOWN, 4);
-
-		dialog_ebr.SetSizer(sizer);
-		dialog_ebr.Layout();
-		dialog_ebr.SetInitialSize(wxSize(-1, 300));
-		if (dialog_ebr.ShowModal() == wxID_OK)
-			theArchiveManager->openBaseResource(brap.getSelectedPath());
-
-		return true;
-	}
-
-	// Editor->Preferences
-	else if (id == "main_preferences") {
-		PreferencesDialog pd(this);
-		if (pd.ShowModal() == wxID_OK)
-			pd.applyPreferences();
-
-		return true;
-	}
-	 */
-
 	// View->Item Properties
 	if (id == "mapw_showproperties") {
 		wxAuiManager *m_mgr = wxAuiManager::GetManager(this);

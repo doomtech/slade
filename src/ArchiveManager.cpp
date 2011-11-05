@@ -122,7 +122,7 @@ bool ArchiveManager::addArchive(Archive* archive) {
 		// Add to the list
 		archive_t n_archive;
 		n_archive.archive = archive;
-		n_archive.resource = false;
+		n_archive.resource = true;
 		open_archives.push_back(n_archive);
 
 		// Listen to the archive
@@ -541,6 +541,27 @@ string ArchiveManager::getArchiveExtensionsString() {
 	return extensions;
 }
 
+/* ArchiveManager::archiveIsResource
+ * Returns true if [archive] is set to be used as a resource, false
+ * otherwise
+ *******************************************************************/
+bool ArchiveManager::archiveIsResource(Archive* archive) {
+	int index = archiveIndex(archive);
+	if (index < 0)
+		return false;
+	else
+		return open_archives[index].resource;
+}
+
+/* ArchiveManager::setArchiveResource
+ * Sets/unsets [archive] to be used as a resource
+ *******************************************************************/
+void ArchiveManager::setArchiveResource(Archive* archive, bool resource) {
+	int index = archiveIndex(archive);
+	if (index >= 0)
+		open_archives[index].resource = resource;
+}
+
 /* ArchiveManager::addBaseResourcePath
  * Adds [path] to the list of base resource paths
  *******************************************************************/
@@ -548,7 +569,7 @@ bool ArchiveManager::addBaseResourcePath(string path) {
 	// Firstly, check the file exists
 	if (!wxFileExists(path))
 		return false;;
-		
+
 	// Second, check the path doesn't already exist
 	for (unsigned a = 0; a < base_resource_paths.size(); a++) {
 		if (S_CMP(base_resource_paths[a], path))
@@ -560,7 +581,7 @@ bool ArchiveManager::addBaseResourcePath(string path) {
 
 	// Announce
 	announce("base_resource_path_added");
-	
+
 	return true;
 }
 

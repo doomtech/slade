@@ -14,6 +14,7 @@ private:
 	wxCheckBox*	cb_vertices_always;
 	wxSlider*	slider_line_width;
 	wxCheckBox*	cb_line_smooth;
+	wxCheckBox*	cb_line_tabs_always;
 	wxChoice*	choice_thing_drawtype;
 	wxCheckBox*	cb_things_always;
 	wxCheckBox*	cb_thing_force_dir;

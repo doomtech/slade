@@ -11,6 +11,7 @@ namespace OpenGL {
 	bool			pointSpriteSupport();
 	bool			validTexDimension(unsigned dim);
 	float			maxPointSize();
+	bool			isInitialised();
 }
 
 #endif//__OPENGL_H__

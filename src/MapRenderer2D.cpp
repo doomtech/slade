@@ -263,6 +263,7 @@ void MapRenderer2D::renderLinesImmediate(bool show_direction) {
 	rgba_t col;
 	MapLine* line = NULL;
 	double x1, y1, x2, y2, tablen;
+	glBegin(GL_LINES);
 	for (unsigned a = 0; a < map->nLines(); a++) {
 		// Get line info
 		line = map->getLine(a);
@@ -278,27 +279,18 @@ void MapRenderer2D::renderLinesImmediate(bool show_direction) {
 		glColor4f(col.fr(), col.fg(), col.fb(), col.fa());
 
 		// Draw the line
-		glBegin(GL_LINES);
 		glVertex2d(x1, y1);
 		glVertex2d(x2, y2);
-		glEnd();
 
 		// Direction tab
 		if (show_direction) {
-			double xmid = x1 + ((x2 - x1) * 0.5);
-			double ymid = y1 + ((y2 - y1) * 0.5);
-			tablen = line->getLength() * 0.2;
-			if (tablen > 8) tablen = 8;
-			if (tablen < 2) tablen = 2;
-			fpoint2_t invdir(-(y2 - y1), x2 - x1);
-			invdir.normalize();
-
-			glBegin(GL_LINES);
-			glVertex2d(xmid, ymid);
-			glVertex2d(xmid - invdir.x*tablen, ymid - invdir.y*tablen);
-			glEnd();
+			fpoint2_t mid = line->midPoint();
+			fpoint2_t tab = line->dirTabPoint();
+			glVertex2d(mid.x, mid.y);
+			glVertex2d(tab.x, tab.y);
 		}
 	}
+	glEnd();
 
 	glEndList();
 	lines_dirs = show_direction;
@@ -363,17 +355,11 @@ void MapRenderer2D::renderLineHilight(int index, float fade) {
 	glEnd();
 
 	// Direction tab
-	double xmid = x1 + ((x2 - x1) * 0.5);
-	double ymid = y1 + ((y2 - y1) * 0.5);
-	double tablen = line->getLength() * 0.2;
-	if (tablen > 8) tablen = 8;
-	if (tablen < 2) tablen = 2;
-	fpoint2_t invdir(-(y2 - y1), x2 - x1);
-	invdir.normalize();
-
+	fpoint2_t mid = line->midPoint();
+	fpoint2_t tab = line->dirTabPoint();
 	glBegin(GL_LINES);
-	glVertex2d(xmid, ymid);
-	glVertex2d(xmid - invdir.x*tablen, ymid - invdir.y*tablen);
+	glVertex2d(mid.x, mid.y);
+	glVertex2d(tab.x, tab.y);
 	glEnd();
 }
 
@@ -406,15 +392,10 @@ void MapRenderer2D::renderLineSelection(vector<int>& selection) {
 		glVertex2d(x2, y2);
 
 		// Direction tab
-		double xmid = x1 + ((x2 - x1) * 0.5);
-		double ymid = y1 + ((y2 - y1) * 0.5);
-		double tablen = line->getLength() * 0.2;
-		if (tablen > 8) tablen = 8;
-		if (tablen < 2) tablen = 2;
-		fpoint2_t invdir(-(y2 - y1), x2 - x1);
-		invdir.normalize();
-		glVertex2d(xmid, ymid);
-		glVertex2d(xmid - invdir.x*tablen, ymid - invdir.y*tablen);
+		fpoint2_t mid = line->midPoint();
+		fpoint2_t tab = line->dirTabPoint();
+		glVertex2d(mid.x, mid.y);
+		glVertex2d(tab.x, tab.y);
 	}
 	glEnd();
 }
@@ -443,16 +424,11 @@ void MapRenderer2D::renderTaggedLines(vector<MapLine*>& lines, float fade) {
 		glEnd();
 
 		// Direction tab
-		xmid = x1 + ((x2 - x1) * 0.5);
-		ymid = y1 + ((y2 - y1) * 0.5);
-		tablen = line->getLength() * 0.2;
-		if (tablen > 8) tablen = 8;
-		if (tablen < 2) tablen = 2;
-		fpoint2_t invdir(-(y2 - y1), x2 - x1);
-		invdir.normalize();
+		fpoint2_t mid = line->midPoint();
+		fpoint2_t tab = line->dirTabPoint();
 		glBegin(GL_LINES);
-		glVertex2d(xmid, ymid);
-		glVertex2d(xmid - invdir.x*tablen, ymid - invdir.y*tablen);
+		glVertex2d(mid.x, mid.y);
+		glVertex2d(tab.x, tab.y);
 		glEnd();
 	}
 }
@@ -1147,10 +1123,15 @@ void MapRenderer2D::renderFlatsImmediate(int type) {
 				tex = theMapEditor->textureManager().getFlat(sector->ceilingTexture());
 
 			// Bind the texture if needed
-			if (tex && tex != tex_last) {
-				tex->bind();
-				tex_last = tex;
+			if (tex) {
+				if (!tex_last)
+					glEnable(GL_TEXTURE_2D);
+				if (tex != tex_last)
+					tex->bind();
 			}
+			else if (tex_last)
+				glDisable(GL_TEXTURE_2D);
+			tex_last = tex;
 		}
 
 		// Setup polygon texture info if needed
@@ -1211,6 +1192,7 @@ void MapRenderer2D::renderFlatsVBO(int type) {
 	// Go through sectors
 	GLTexture* tex_last = NULL;
 	GLTexture* tex = NULL;
+	bool first = true;
 	for (unsigned a = 0; a < map->nSectors(); a++) {
 		MapSector* sector = map->getSector(a);
 
@@ -1218,6 +1200,7 @@ void MapRenderer2D::renderFlatsVBO(int type) {
 		if (vis_s[a] > 0)
 			continue;
 
+		first = false;
 		if (type > 0) {
 			// Get the sector texture
 			if (type == 1)
@@ -1238,10 +1221,15 @@ void MapRenderer2D::renderFlatsVBO(int type) {
 			poly->updateVBOData();
 
 		// Bind the texture if needed
-		if (tex && tex != tex_last) {
-			tex->bind();
-			tex_last = tex;
+		if (tex) {
+			if (!tex_last || first)
+				glEnable(GL_TEXTURE_2D);
+			if (tex != tex_last)
+				tex->bind();
 		}
+		else if (!tex_last || first)
+			glDisable(GL_TEXTURE_2D);
+		tex_last = tex;
 
 		// Render the polygon
 		if (!flat_ignore_light) {
@@ -1663,19 +1651,12 @@ void MapRenderer2D::updateLinesVBO(bool show_direction) {
 
 		// Direction tab if needed
 		if (show_direction) {
-			x1 = line->v1()->xPos();
-			y1 = line->v1()->yPos();
-			x2 = line->v2()->xPos();
-			y2 = line->v2()->yPos();
-			tablen = line->getLength() * 0.2;
-			if (tablen > 8) tablen = 8;
-			if (tablen < 2) tablen = 2;
-			lines[v+2].x = x1 + ((x2 - x1) * 0.5);
-			lines[v+2].y = y1 + ((y2 - y1) * 0.5);
-			fpoint2_t invdir(-(y2 - y1), x2 - x1);
-			invdir.normalize();
-			lines[v+3].x = lines[v+2].x - invdir.x*tablen;
-			lines[v+3].y = lines[v+2].y - invdir.y*tablen;
+			fpoint2_t mid = line->midPoint();
+			fpoint2_t tab = line->dirTabPoint();
+			lines[v+2].x = mid.x;
+			lines[v+2].y = mid.y;
+			lines[v+3].x = tab.x;
+			lines[v+3].y = tab.y;
 
 			// Colours
 			lines[v+2].r = lines[v+3].r = col.fr();

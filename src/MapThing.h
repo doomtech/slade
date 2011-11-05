@@ -53,6 +53,8 @@ public:
 	double		xPos() { return x; }
 	double		yPos() { return y; }
 
+	fpoint2_t	midPoint() { return fpoint2_t(x, y); }
+
 	short	getType() { return type; }
 };
 

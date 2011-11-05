@@ -52,6 +52,7 @@ public:
 	string		floorTexture() { return f_tex; }
 	string		ceilingTexture() { return c_tex; }
 
+	fpoint2_t			midPoint();
 	void				resetBBox() { bbox.reset(); }
 	bbox_t				boundingBox();
 	vector<MapSide*>&	connectedSides() { return connected_sides; }

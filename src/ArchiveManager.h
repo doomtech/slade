@@ -59,6 +59,8 @@ public:
 	int			archiveIndex(Archive* archive);
 	Archive*	programResourceArchive() { return program_resource_archive; }
 	string		getArchiveExtensionsString();
+	bool		archiveIsResource(Archive* archive);
+	void		setArchiveResource(Archive* archive, bool resource = true);
 
 	// Base resource archive stuff
 	Archive*	baseResourceArchive() { return base_resource_archive; }

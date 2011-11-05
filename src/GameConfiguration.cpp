@@ -32,6 +32,7 @@ GameConfiguration::GameConfiguration() {
 	udmf_namespace = "";
 	ttype_unknown.icon = "unknown";
 	ttype_unknown.shrink = true;
+	any_map_name = false;
 }
 
 GameConfiguration::~GameConfiguration() {
@@ -429,6 +430,10 @@ bool GameConfiguration::readConfiguration(string& cfg, string source) {
 			for (unsigned n = 0; n < node->nValues(); n++)
 				map_names.push_back(node->getStringValue(n));
 		}
+
+		// Allow any map name
+		else if (S_CMPNOCASE(node->getName(), "map_name_any"))
+			any_map_name = node->getBoolValue();
 
 		// Map format
 		else if (S_CMPNOCASE(node->getName(), "map_format")) {

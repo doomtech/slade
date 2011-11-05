@@ -18,6 +18,7 @@ EXTERN_CVAR(Float, thing_shadow)
 EXTERN_CVAR(Float, flat_brightness)
 EXTERN_CVAR(Bool, sector_hilight_fill)
 EXTERN_CVAR(Bool, flat_ignore_light)
+EXTERN_CVAR(Bool, line_tabs_always)
 
 MapDisplayPrefsPanel::MapDisplayPrefsPanel(wxWindow* parent) : wxPanel(parent, -1) {
 	// Create sizer
@@ -54,6 +55,10 @@ MapDisplayPrefsPanel::MapDisplayPrefsPanel(wxWindow* parent) : wxPanel(parent, -
 	// Always show things
 	cb_things_always = new wxCheckBox(panel, -1, "Always show things");
 	sizer->Add(cb_things_always, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+	// Always show line direction tabs
+	cb_line_tabs_always = new wxCheckBox(panel, -1, "Always show line direction tabs");
+	sizer->Add(cb_line_tabs_always, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
 	
 	// Vertices tab
@@ -155,6 +160,7 @@ MapDisplayPrefsPanel::MapDisplayPrefsPanel(wxWindow* parent) : wxPanel(parent, -
 	// Init values
 	cb_vertex_round->SetValue(vertex_round);
 	cb_line_smooth->SetValue(line_smooth);
+	cb_line_tabs_always->SetValue(line_tabs_always);
 	cb_vertices_always->SetValue(vertices_always);
 	choice_thing_drawtype->SetSelection(thing_drawtype);
 	cb_things_always->SetValue(things_always);
@@ -177,6 +183,7 @@ void MapDisplayPrefsPanel::applyPreferences() {
 	vertices_always = cb_vertices_always->GetValue();
 	line_width = (float)slider_line_width->GetValue() * 0.1f;
 	line_smooth = cb_line_smooth->GetValue();
+	line_tabs_always = cb_line_tabs_always->GetValue();
 	thing_drawtype = choice_thing_drawtype->GetSelection();
 	things_always = cb_things_always->GetValue();
 	thing_force_dir = cb_thing_force_dir->GetValue();

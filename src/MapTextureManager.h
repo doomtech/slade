@@ -9,7 +9,7 @@
 struct map_tex_t {
 	GLTexture*	texture;
 	map_tex_t() { texture = NULL; }
-	~map_tex_t() { if (texture) delete texture; }
+	~map_tex_t() { if (texture && texture != &(GLTexture::missingTex())) delete texture; }
 };
 
 // Declare hash map class to hold textures

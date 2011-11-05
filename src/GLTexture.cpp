@@ -36,6 +36,7 @@
  * VARIABLES
  *******************************************************************/
 GLTexture GLTexture::tex_background;
+GLTexture GLTexture::tex_missing;
 CVAR(String, bgtx_colour1, "#404050", CVAR_SAVE)
 CVAR(String, bgtx_colour2, "#505060", CVAR_SAVE)
 
@@ -71,6 +72,10 @@ GLTexture::~GLTexture() {
 bool GLTexture::loadData(const uint8_t* data, uint32_t width, uint32_t height, bool add) {
 	// Check data was given
 	if (!data)
+		return false;
+
+	// Check OpenGL is initialised
+	if (!OpenGL::isInitialised())
 		return false;
 
 	// Delete current textures if they exist
@@ -548,6 +553,12 @@ GLTexture& GLTexture::bgTex() {
 			rgba_t(col2.Red(), col2.Green(), col2.Blue(), 255));
 	}
 	return tex_background;
+}
+
+GLTexture& GLTexture::missingTex() {
+	if (!tex_missing.isLoaded())
+		tex_missing.genChequeredTexture(8, rgba_t(0, 0, 0), rgba_t(255, 0, 0));
+	return tex_missing;
 }
 
 /* GLTexture::resetBgTex

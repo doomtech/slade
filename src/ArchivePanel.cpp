@@ -275,6 +275,7 @@ void ArchivePanel::addMenus() {
 		theApp->getAction("arch_importfiles")->addToMenu(menu_archive);
 		menu_archive->AppendSeparator();
 		theApp->getAction("arch_texeditor")->addToMenu(menu_archive);
+		theApp->getAction("arch_mapeditor")->addToMenu(menu_archive);
 		wxMenu* menu_clean = new wxMenu("");
 		theApp->getAction("arch_clean_patches")->addToMenu(menu_clean);
 		theApp->getAction("arch_clean_textures")->addToMenu(menu_clean);

@@ -93,6 +93,10 @@ int MapLine::s2Index() {
 		return -1;
 }
 
+fpoint2_t MapLine::midPoint() {
+	return fpoint2_t(x1() + ((x2() - x1()) * 0.5), y1() + ((y2() - y1()) * 0.5));
+}
+
 double MapLine::getLength() {
 	if (!vertex1 || !vertex2)
 		return -1;
@@ -112,4 +116,19 @@ bool MapLine::doubleSector() {
 		return false;
 
 	return (side1->getSector() == side2->getSector());
+}
+
+fpoint2_t MapLine::dirTabPoint() {
+	// Calculate midpoint
+	fpoint2_t mid = midPoint();
+
+	// Calculate tab length
+	double tablen = getLength() * 0.1;
+	if (tablen > 16) tablen = 16;
+	if (tablen < 2) tablen = 2;
+
+	// Calculate tab endpoint
+	fpoint2_t invdir(-(vertex2->yPos() - vertex1->yPos()), vertex2->xPos() - vertex1->xPos());
+	invdir.normalize();
+	return fpoint2_t(mid.x - invdir.x*tablen, mid.y - invdir.y*tablen);
 }

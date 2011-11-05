@@ -16,6 +16,16 @@ TODO List ---------------------------------------------------------------
 	- Missing textures
 	- Specials with 0 tag that require a tag
 	- Invalid sector references (maybe not, shouldn't really happen)
+- Non-power-of-two textures (where simply expanding the texture canvas to 128x128 won't work)
+- 3d mode
+- Editing:
+	- Object creation
+	- Line drawing
+	- Object modification
+	- Map saving
+- Texture browser
+- Thing type browser
+- Better UDMF property handling
 
 
 --- Minor Problems/Annoyances ---

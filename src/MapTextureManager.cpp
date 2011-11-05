@@ -43,7 +43,7 @@ GLTexture* MapTextureManager::getTexture(string name) {
 			return mtex.texture;
 		else {
 			// Otherwise, reload the texture
-			delete mtex.texture;
+			if (mtex.texture != &(GLTexture::missingTex())) delete mtex.texture;
 			mtex.texture = NULL;
 		}
 	}
@@ -86,8 +86,11 @@ GLTexture* MapTextureManager::getTexture(string name) {
 			mtex.texture->loadImage(&image, pal);
 		}
 	}
-	return mtex.texture;
 
+	if (!mtex.texture)
+		mtex.texture = &(GLTexture::missingTex());
+
+	return mtex.texture;
 }
 
 GLTexture* MapTextureManager::getFlat(string name) {
@@ -110,37 +113,44 @@ GLTexture* MapTextureManager::getFlat(string name) {
 			return mtex.texture;
 		else {
 			// Otherwise, reload the texture
-			delete mtex.texture;
+			if (mtex.texture != &(GLTexture::missingTex())) delete mtex.texture;
 			mtex.texture = NULL;
 		}
 	}
 
 	// Flat not found, look for it
 	Palette8bit* pal = theMainWindow->getPaletteChooser()->getSelectedPalette();
-	ArchiveEntry * entry = theResourceManager->getTextureEntry(name, "hires", archive);
-	if (entry == NULL)
-		entry = theResourceManager->getTextureEntry(name, "textures", archive);
-	if (entry == NULL)
-		entry = theResourceManager->getFlatEntry(name, archive);
-	if (entry) {
-		SImage image;
-		if (Misc::loadImageFromEntry(&image, entry)) {
-			mtex.texture = new GLTexture(false);
-			mtex.texture->setFilter(filter);
-			mtex.texture->loadImage(&image, pal);
+	if (!mtex.texture) {
+		ArchiveEntry * entry = theResourceManager->getTextureEntry(name, "hires", archive);
+		if (entry == NULL)
+			entry = theResourceManager->getTextureEntry(name, "textures", archive);
+		if (entry == NULL)
+			entry = theResourceManager->getFlatEntry(name, archive);
+		if (entry) {
+			SImage image;
+			if (Misc::loadImageFromEntry(&image, entry)) {
+				mtex.texture = new GLTexture(false);
+				mtex.texture->setFilter(filter);
+				mtex.texture->loadImage(&image, pal);
+			}
 		}
 	}
 
 	// Try composite textures then
-	CTexture* ctex = theResourceManager->getTexture(name, archive);
-	if (ctex && !mtex.texture) {
-		SImage image;
-		if (ctex->toImage(image, archive, pal)) {
-			mtex.texture = new GLTexture(false);
-			mtex.texture->setFilter(filter);
-			mtex.texture->loadImage(&image, pal);
+	if (!mtex.texture) {
+		CTexture* ctex = theResourceManager->getTexture(name, archive);
+		if (ctex) {
+			SImage image;
+			if (ctex->toImage(image, archive, pal)) {
+				mtex.texture = new GLTexture(false);
+				mtex.texture->setFilter(filter);
+				mtex.texture->loadImage(&image, pal);
+			}
 		}
 	}
+
+	if (!mtex.texture)
+		mtex.texture = &(GLTexture::missingTex());
 
 	return mtex.texture;
 }
@@ -179,7 +189,7 @@ GLTexture* MapTextureManager::getSprite(string name, string translation, string 
 		}
 	}
 
-	// Sprite not found, look for it 
+	// Sprite not found, look for it
 	Palette8bit* pal = theMainWindow->getPaletteChooser()->getSelectedPalette();
 	ArchiveEntry* entry = theResourceManager->getPatchEntry(name, "sprites", archive);
 	if (!entry) entry = theResourceManager->getPatchEntry(name, "", archive);
@@ -235,6 +245,9 @@ void importEditorImages(MapTexHashMap& map, ArchiveTreeNode* dir, string path) {
 }
 
 GLTexture* MapTextureManager::getEditorImage(string name) {
+	if (!OpenGL::isInitialised())
+		return NULL;
+
 	// Load thing image textures if they haven't already
 	if (!editor_images_loaded) {
 		// Load all thing images to textures
@@ -264,7 +277,7 @@ void MapTextureManager::setArchive(Archive* archive) {
 }
 
 void MapTextureManager::onAnnouncement(Announcer* announcer, string event_name, MemChunk& event_data) {
-	// Only interested in the resource manager, 
+	// Only interested in the resource manager,
 	// archive manager and palette chooser.
 	if (announcer != theResourceManager
 		&& announcer != thePaletteChooser

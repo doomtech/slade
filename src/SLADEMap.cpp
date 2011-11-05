@@ -476,6 +476,12 @@ bool SLADEMap::readDoomVertexes(ArchiveEntry * entry) {
 		return false;
 	}
 
+	// Check for empty entry
+	if (entry->getSize() < sizeof(doomvertex_t)) {
+		wxLogMessage("Read 0 vertices");
+		return true;
+	}
+
 	doomvertex_t* vert_data = (doomvertex_t*)entry->getData(true);
 	for (size_t a = 0; a < entry->getSize() / sizeof(doomvertex_t); a++)
 		addVertex(vert_data[a]);
@@ -492,6 +498,12 @@ bool SLADEMap::readDoomSidedefs(ArchiveEntry * entry) {
 		return false;
 	}
 
+	// Check for empty entry
+	if (entry->getSize() < sizeof(doomside_t)) {
+		wxLogMessage("Read 0 sides");
+		return true;
+	}
+
 	doomside_t* side_data = (doomside_t*)entry->getData(true);
 	for (size_t a = 0; a < entry->getSize() / sizeof(doomside_t); a++)
 		addSide(side_data[a]);
@@ -506,6 +518,12 @@ bool SLADEMap::readDoomLinedefs(ArchiveEntry * entry) {
 		Global::error = "Map has no LINEDEFS entry!";
 		wxLogMessage(Global::error);
 		return false;
+	}
+
+	// Check for empty entry
+	if (entry->getSize() < sizeof(doomline_t)) {
+		wxLogMessage("Read 0 lines");
+		return true;
 	}
 
 	doomline_t* line_data = (doomline_t*)entry->getData(true);
@@ -526,6 +544,12 @@ bool SLADEMap::readDoomSectors(ArchiveEntry * entry) {
 		return false;
 	}
 
+	// Check for empty entry
+	if (entry->getSize() < sizeof(doomsector_t)) {
+		wxLogMessage("Read 0 sectors");
+		return true;
+	}
+
 	doomsector_t* sect_data = (doomsector_t*)entry->getData(true);
 	for (size_t a = 0; a < entry->getSize() / sizeof(doomsector_t); a++)
 		addSector(sect_data[a]);
@@ -540,6 +564,12 @@ bool SLADEMap::readDoomThings(ArchiveEntry * entry) {
 		Global::error = "Map has no THINGS entry!";
 		wxLogMessage(Global::error);
 		return false;
+	}
+
+	// Check for empty entry
+	if (entry->getSize() < sizeof(doomthing_t)) {
+		wxLogMessage("Read 0 things");
+		return true;
 	}
 
 	doomthing_t* thng_data = (doomthing_t*)entry->getData(true);
@@ -562,17 +592,15 @@ bool SLADEMap::readDoomMap(Archive::mapdesc_t map) {
 	ArchiveEntry* t = NULL;
 	ArchiveEntry* entry = map.head;
 	while (entry != map.end->nextEntry()) {
-		EntryType* type = entry->getType();
-
-		if (!v && type->getId() == "map_vertexes")
+		if (!v && entry->getName() == "VERTEXES")
 			v = entry;
-		else if (!si && type->getId() == "map_sidedefs")
+		else if (!si && entry->getName() == "SIDEDEFS")
 			si = entry;
-		else if (!l && type->getId() == "map_linedefs")
+		else if (!l && entry->getName() == "LINEDEFS")
 			l = entry;
-		else if (!se && type->getId() == "map_sectors")
+		else if (!se && entry->getName() == "SECTORS")
 			se = entry;
-		else if (!t && type->getId() == "map_things")
+		else if (!t && entry->getName() == "THINGS")
 			t = entry;
 
 		// Next entry
@@ -696,6 +724,12 @@ bool SLADEMap::readHexenLinedefs(ArchiveEntry * entry) {
 		return false;
 	}
 
+	// Check for empty entry
+	if (entry->getSize() < sizeof(hexenline_t)) {
+		wxLogMessage("Read 0 lines");
+		return true;
+	}
+
 	hexenline_t* line_data = (hexenline_t*)entry->getData(true);
 	for (size_t a = 0; a < entry->getSize() / sizeof(hexenline_t); a++)
 		addLine(line_data[a]);
@@ -709,6 +743,12 @@ bool SLADEMap::readHexenThings(ArchiveEntry * entry) {
 	if (!entry) {
 		Global::error = "Map has no THINGS entry!";
 		return false;
+	}
+
+	// Check for empty entry
+	if (entry->getSize() < sizeof(hexenthing_t)) {
+		wxLogMessage("Read 0 things");
+		return true;
 	}
 
 	hexenthing_t* thng_data = (hexenthing_t*)entry->getData(true);
@@ -731,17 +771,15 @@ bool SLADEMap::readHexenMap(Archive::mapdesc_t map) {
 	ArchiveEntry* t = NULL;
 	ArchiveEntry* entry = map.head;
 	while (entry != map.end->nextEntry()) {
-		EntryType* type = entry->getType();
-
-		if (!v && type->getId() == "map_vertexes")
+		if (!v && entry->getName() == "VERTEXES")
 			v = entry;
-		else if (!si && type->getId() == "map_sidedefs")
+		else if (!si && entry->getName() == "SIDEDEFS")
 			si = entry;
-		else if (!l && type->getId() == "map_linedefs")
+		else if (!l && entry->getName() == "LINEDEFS")
 			l = entry;
-		else if (!se && type->getId() == "map_sectors")
+		else if (!se && entry->getName() == "SECTORS")
 			se = entry;
-		else if (!t && type->getId() == "map_things")
+		else if (!t && entry->getName() == "THINGS")
 			t = entry;
 
 		// Next entry
@@ -787,6 +825,12 @@ bool SLADEMap::readDoom64Vertexes(ArchiveEntry * entry) {
 		return false;
 	}
 
+	// Check for empty entry
+	if (entry->getSize() < sizeof(doom64vertex_t)) {
+		wxLogMessage("Read 0 vertices");
+		return true;
+	}
+
 	doom64vertex_t* vert_data = (doom64vertex_t*)entry->getData(true);
 	for (size_t a = 0; a < entry->getSize() / sizeof(doom64vertex_t); a++)
 		addVertex(vert_data[a]);
@@ -800,6 +844,12 @@ bool SLADEMap::readDoom64Sidedefs(ArchiveEntry * entry) {
 	if (!entry) {
 		Global::error = "Map has no SIDEDEFS entry!";
 		return false;
+	}
+
+	// Check for empty entry
+	if (entry->getSize() < sizeof(doom64side_t)) {
+		wxLogMessage("Read 0 sides");
+		return true;
 	}
 
 	doom64side_t* side_data = (doom64side_t*)entry->getData(true);
@@ -817,6 +867,12 @@ bool SLADEMap::readDoom64Linedefs(ArchiveEntry * entry) {
 		return false;
 	}
 
+	// Check for empty entry
+	if (entry->getSize() < sizeof(doom64line_t)) {
+		wxLogMessage("Read 0 lines");
+		return true;
+	}
+
 	doom64line_t* line_data = (doom64line_t*)entry->getData(true);
 	for (size_t a = 0; a < entry->getSize() / sizeof(doom64line_t); a++)
 		addLine(line_data[a]);
@@ -832,6 +888,12 @@ bool SLADEMap::readDoom64Sectors(ArchiveEntry * entry) {
 		return false;
 	}
 
+	// Check for empty entry
+	if (entry->getSize() < sizeof(doom64sector_t)) {
+		wxLogMessage("Read 0 sectors");
+		return true;
+	}
+
 	doom64sector_t* sect_data = (doom64sector_t*)entry->getData(true);
 	for (size_t a = 0; a < entry->getSize() / sizeof(doom64sector_t); a++)
 		addSector(sect_data[a]);
@@ -845,6 +907,12 @@ bool SLADEMap::readDoom64Things(ArchiveEntry * entry) {
 	if (!entry) {
 		Global::error = "Map has no THINGS entry!";
 		return false;
+	}
+
+	// Check for empty entry
+	if (entry->getSize() < sizeof(doom64thing_t)) {
+		wxLogMessage("Read 0 things");
+		return true;
 	}
 
 	doom64thing_t* thng_data = (doom64thing_t*)entry->getData(true);
@@ -867,17 +935,15 @@ bool SLADEMap::readDoom64Map(Archive::mapdesc_t map) {
 	ArchiveEntry* t = NULL;
 	ArchiveEntry* entry = map.head;
 	while (entry != map.end->nextEntry()) {
-		EntryType* type = entry->getType();
-
-		if (!v && type->getId() == "map_vertexes")
+		if (!v && entry->getName() == "VERTEXES")
 			v = entry;
-		else if (!si && type->getId() == "map_sidedefs")
+		else if (!si && entry->getName() == "SIDEDEFS")
 			si = entry;
-		else if (!l && type->getId() == "map_linedefs")
+		else if (!l && entry->getName() == "LINEDEFS")
 			l = entry;
-		else if (!se && type->getId() == "map_sectors")
+		else if (!se && entry->getName() == "SECTORS")
 			se = entry;
-		else if (!t && type->getId() == "map_things")
+		else if (!t && entry->getName() == "THINGS")
 			t = entry;
 
 		// Next entry

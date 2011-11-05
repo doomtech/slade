@@ -115,6 +115,7 @@
     <ClCompile Include="src\ANSICanvas.cpp" />
     <ClCompile Include="src\ANSIEntryPanel.cpp" />
     <ClCompile Include="src\ArchiveEntryList.cpp" />
+    <ClCompile Include="src\ArchiveListView.cpp" />
     <ClCompile Include="src\ArchiveOperations.cpp" />
     <ClCompile Include="src\AudioEntryPanel.cpp" />
     <ClCompile Include="src\AudioPrefsPanel.cpp" />
@@ -197,6 +198,7 @@
     <ClCompile Include="src\lzma\C\XzIn.c" />
     <ClCompile Include="src\MapDisplayPrefsPanel.cpp" />
     <ClCompile Include="src\MapEditor.cpp" />
+    <ClCompile Include="src\MapEditorConfigDialog.cpp" />
     <ClCompile Include="src\MapEditorPrefsPanel.cpp" />
     <ClCompile Include="src\MapEntryPanel.cpp" />
     <ClCompile Include="src\MapObject.cpp" />
@@ -329,6 +331,7 @@
     <ClInclude Include="src\ANSIEntryPanel.h" />
     <ClInclude Include="src\ArchiveEntryList.h" />
     <ClInclude Include="src\ArchiveFormats.h" />
+    <ClInclude Include="src\ArchiveListView.h" />
     <ClInclude Include="src\ArchiveOperations.h" />
     <ClInclude Include="src\Archives.h" />
     <ClInclude Include="src\Args.h" />
@@ -408,6 +411,7 @@
     <ClInclude Include="src\lzma\C\XzEnc.h" />
     <ClInclude Include="src\MapDisplayPrefsPanel.h" />
     <ClInclude Include="src\MapEditor.h" />
+    <ClInclude Include="src\MapEditorConfigDialog.h" />
     <ClInclude Include="src\MapEditorPrefsPanel.h" />
     <ClInclude Include="src\MapEntryPanel.h" />
     <ClInclude Include="src\MapObject.h" />

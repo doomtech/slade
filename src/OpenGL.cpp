@@ -156,3 +156,10 @@ float OpenGL::maxPointSize() {
 
 	return max_point_size;
 }
+
+/* OpenGL::isInitialised
+ * Returns true if OpenGL has been initialised
+ *******************************************************************/
+bool OpenGL::isInitialised() {
+	return initialised;
+}

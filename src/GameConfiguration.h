@@ -56,6 +56,7 @@ private:
 	ThingTypeMap	thing_types;
 	ThingType		ttype_unknown;
 	vector<string>	map_names;
+	bool			any_map_name;
 
 	struct gconf_t {
 		string	title;
@@ -108,12 +109,15 @@ public:
 	string	getName() { return name; }
 	int		getMapFormat() { return map_format; }
 	bool	isBoom() { return boom; }
+	bool	anyMapName() { return any_map_name; }
 
 	string			readConfigName(MemChunk& mc);
 	void			init();
 	unsigned		nConfigs() { return game_configs.size(); }
 	string			configTitle(unsigned index);
 	string			configName(unsigned index);
+	unsigned		nMapNames() { return map_names.size(); }
+	string			mapName(unsigned index) { return map_names[index]; }
 
 	// Config #include handling
 	void	buildConfig(string filename, string& out);
