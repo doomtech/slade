@@ -9,7 +9,7 @@ ArchiveListView::ArchiveListView(wxWindow* parent, Archive* ignore) : wxDataView
 	this->ignore = ignore;
 
 	// Add columns
-	SetExpanderColumn(NULL);
+	//SetExpanderColumn(NULL);
 	AppendToggleColumn("Resource");
 	AppendTextColumn("Archive", wxDATAVIEW_CELL_INERT, -1);
 	GetColumn(1)->SetWidth(200);
