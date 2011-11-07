@@ -1,4 +1,4 @@
-find_package(wxWidgets COMPONENTS aui gl stc richtext propgrid REQUIRED)
+find_package(wxWidgets COMPONENTS std aui gl stc richtext propgrid REQUIRED)
 include(${wxWidgets_USE_FILE})
 
 set(SFML_FIND_COMPONENTS system audio)
@@ -30,5 +30,5 @@ add_executable(slade WIN32
 	${SLADE_SOURCES}
 )
 
-target_link_libraries(slade ${ZLIB_LIBRARY} ${BZIP2_LIBRARIES} ${wxWidgets_LIBRARIES} ${FLUIDSYNTH_LIBRARIES} ${FREEIMAGE_LIBRARIES} ${SFML_LIBRARY})
+target_link_libraries(slade ${ZLIB_LIBRARY} ${BZIP2_LIBRARIES} ${wxWidgets_LIBRARIES} ${FLUIDSYNTH_LIBRARIES} ${FREEIMAGE_LIBRARIES} ${SFML_LIBRARY} ${OPENGL_LIBRARIES})
 set_target_properties(slade PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${SLADE_OUTPUT_DIR})

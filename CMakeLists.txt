@@ -13,6 +13,7 @@ set(SLADE_OUTPUT_DIR ${CMAKE_BINARY_DIR} CACHE PATH "Directory where slade will 
 
 find_package(ZLIB)
 find_package(BZip2)
+find_package(OpenGL)
 
 if(NOT ZLIB_FOUND)
 	set(ZLIB_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/zlib)
