@@ -73,9 +73,15 @@ ArchiveManager::~ArchiveManager() {
 bool ArchiveManager::init() {
 	program_resource_archive = new ZipArchive();
 
+#ifdef __WXOSX__
+	string resdir = appPath("../Resources", DIR_APP);
+#else
+	string resdir = appPath("res", DIR_APP);
+#endif
+
 	// Check for 'res' folder first
-	if (wxDirExists(appPath("res", DIR_APP))) {
-		program_resource_archive->importDir(appPath("res", DIR_APP));
+	if (wxDirExists(resdir)) {
+		program_resource_archive->importDir(resdir);
 		res_archive_open = (program_resource_archive->numEntries() > 0);
 		return res_archive_open;
 	}
@@ -542,7 +548,7 @@ bool ArchiveManager::addBaseResourcePath(string path) {
 	// Firstly, check the file exists
 	if (!wxFileExists(path))
 		return false;;
-		
+
 	// Second, check the path doesn't already exist
 	for (unsigned a = 0; a < base_resource_paths.size(); a++) {
 		if (S_CMP(base_resource_paths[a], path))
@@ -554,7 +560,7 @@ bool ArchiveManager::addBaseResourcePath(string path) {
 
 	// Announce
 	announce("base_resource_path_added");
-	
+
 	return true;
 }
 

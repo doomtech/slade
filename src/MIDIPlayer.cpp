@@ -132,6 +132,9 @@ bool MIDIPlayer::initFluidsynth() {
  * Reloads the current soundfont
  *******************************************************************/
 bool MIDIPlayer::reloadSoundfont() {
+	if (!fs_initialised)
+		return false;
+
 	// Unload any current soundfont
 	if (fs_soundfont_id != FLUID_FAILED)
 		fluid_synth_sfunload(fs_synth, fs_soundfont_id, 1);
@@ -147,6 +150,9 @@ bool MIDIPlayer::reloadSoundfont() {
  * successful, false otherwise
  *******************************************************************/
 bool MIDIPlayer::openFile(string filename) {
+	if (!fs_initialised)
+		return false;
+
 	// Delete+Recreate player
 	delete_fluid_player(fs_player);
 	fs_player = NULL;
@@ -166,6 +172,9 @@ bool MIDIPlayer::openFile(string filename) {
  * if successful, false otherwise
  *******************************************************************/
 bool MIDIPlayer::play() {
+	if (!fs_initialised)
+		return false;
+
 	return (fluid_player_play(fs_player) == FLUID_OK);
 }
 
@@ -173,6 +182,9 @@ bool MIDIPlayer::play() {
  * Pauses playback of the currently loaded MIDI stream
  *******************************************************************/
 bool MIDIPlayer::pause() {
+	if (!fs_initialised)
+		return false;
+
 	return stop();
 }
 
@@ -180,6 +192,9 @@ bool MIDIPlayer::pause() {
  * Stops playback of the currently loaded MIDI stream
  *******************************************************************/
 bool MIDIPlayer::stop() {
+	if (!fs_initialised)
+		return false;
+
 	fluid_player_stop(fs_player);
 	fluid_synth_system_reset(fs_synth);
 	return true;
@@ -189,6 +204,9 @@ bool MIDIPlayer::stop() {
  * Returns true if the MIDI stream is currently playing, false if not
  *******************************************************************/
 bool MIDIPlayer::isPlaying() {
+	if (!fs_initialised)
+		return false;
+
 	return (fluid_player_get_status(fs_player) == FLUID_PLAYER_PLAYING);
 }
 
@@ -221,6 +239,9 @@ int MIDIPlayer::getLength() {
  * Sets the volume of the midi player
  *******************************************************************/
 bool MIDIPlayer::setVolume(int volume) {
+	if (!fs_initialised)
+		return false;
+
 	// Clamp volume
 	if (volume > 100) volume = 100;
 	if (volume < 0) volume = 0;

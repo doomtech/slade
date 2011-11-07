@@ -1,4 +1,4 @@
-find_package(wxWidgets COMPONENTS aui gl stc richtext REQUIRED)
+find_package(wxWidgets COMPONENTS aui gl stc richtext propgrid REQUIRED)
 include(${wxWidgets_USE_FILE})
 
 set(SFML_FIND_COMPONENTS system audio)
@@ -17,7 +17,7 @@ if(NOT ${SFML_FOUND})
 endif()
 include_directories(${FLUIDSYNTH_INCLUDE_DIR} ${FREEIMAGE_INCLUDE_DIR} ${SFML_INCLUDE_DIR})
 
-set(SLADE_SOURCES 
+set(SLADE_SOURCES
 )
 file(GLOB SLADE_SOURCES *.cpp)
 
