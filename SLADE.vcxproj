@@ -209,6 +209,7 @@
     <ClCompile Include="src\MCAnimations.cpp" />
     <ClCompile Include="src\MIDIPlayer.cpp" />
     <ClCompile Include="src\ModifyOffsetsDialog.cpp" />
+    <ClCompile Include="src\MOPGProperty.cpp" />
     <ClCompile Include="src\mus2mid\mus2mid.cpp" />
     <ClCompile Include="src\PakArchive.cpp" />
     <ClCompile Include="src\PaletteDialog.cpp" />
@@ -424,6 +425,7 @@
     <ClInclude Include="src\MiscFormats.h" />
     <ClInclude Include="src\ModelFormats.h" />
     <ClInclude Include="src\ModifyOffsetsDialog.h" />
+    <ClInclude Include="src\MOPGProperty.h" />
     <ClInclude Include="src\mus2mid\mus2mid.h" />
     <ClInclude Include="src\PakArchive.h" />
     <ClInclude Include="src\PaletteDialog.h" />

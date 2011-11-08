@@ -10,17 +10,12 @@
 
 void MOPGProperty::openObjects(vector<MapObject*>* objects) {
 	this->objects = objects;
-	//for (unsigned a = 0; a < objects.size(); a++)
-	//	this->objects.push_back(objects[a]);
 	onObjectsOpened();
 }
 
 
 MOPGBoolProperty::MOPGBoolProperty(const wxString& label, const wxString& name)
 : wxBoolProperty(label, name, false), MOPGProperty(MOPGProperty::TYPE_BOOL) {
-}
-
-MOPGBoolProperty::~MOPGBoolProperty() {
 }
 
 void MOPGBoolProperty::onObjectsOpened() {
@@ -51,9 +46,6 @@ MOPGIntProperty::MOPGIntProperty(const wxString& label, const wxString& name)
 : wxIntProperty(label, name, 0), MOPGProperty(MOPGProperty::TYPE_INT) {
 }
 
-MOPGIntProperty::~MOPGIntProperty() {
-}
-
 void MOPGIntProperty::onObjectsOpened() {
 	// Set unspecified if no objects are associated
 	if (objects->size() == 0) {
@@ -82,9 +74,6 @@ MOPGFloatProperty::MOPGFloatProperty(const wxString& label, const wxString& name
 : wxFloatProperty(label, name, 0), MOPGProperty(MOPGProperty::TYPE_FLOAT) {
 }
 
-MOPGFloatProperty::~MOPGFloatProperty() {
-}
-
 void MOPGFloatProperty::onObjectsOpened() {
 	// Set unspecified if no objects are associated
 	if (objects->size() == 0) {
@@ -111,9 +100,6 @@ void MOPGFloatProperty::onObjectsOpened() {
 
 MOPGStringProperty::MOPGStringProperty(const wxString& label, const wxString& name)
 : wxStringProperty(label, name, ""), MOPGProperty(MOPGProperty::TYPE_STRING) {
-}
-
-MOPGStringProperty::~MOPGStringProperty() {
 }
 
 void MOPGStringProperty::onObjectsOpened() {
@@ -153,14 +139,11 @@ MOPGActionSpecialProperty::MOPGActionSpecialProperty(const wxString& label, cons
 	SetEditor(wxPGEditor_TextCtrlAndButton);
 }
 
-MOPGActionSpecialProperty::~MOPGActionSpecialProperty() {
-}
-
 void MOPGActionSpecialProperty::onObjectsOpened() {
 	// Reset arg property names
 	for (unsigned a = 0; a < 5; a++) {
 		if (args[a]) {
-			args[a]->SetLabel(S_FMT("Arg %d", a));
+			args[a]->SetLabel(S_FMT("Arg%d", a+1));
 			args[a]->SetHelpString("");
 		}
 	}
@@ -237,14 +220,11 @@ MOPGThingTypeProperty::MOPGThingTypeProperty(const wxString& label, const wxStri
 	SetEditor(wxPGEditor_TextCtrlAndButton);
 }
 
-MOPGThingTypeProperty::~MOPGThingTypeProperty() {
-}
-
 void MOPGThingTypeProperty::onObjectsOpened() {
 	// Reset arg property names
 	for (unsigned a = 0; a < 5; a++) {
 		if (args[a]) {
-			args[a]->SetLabel(S_FMT("Arg %d", a));
+			args[a]->SetLabel(S_FMT("Arg%d", a+1));
 			args[a]->SetHelpString("");
 		}
 	}
@@ -301,4 +281,31 @@ bool MOPGThingTypeProperty::OnEvent(wxPropertyGrid* propgrid, wxWindow* window, 
 	}
 
 	return wxIntProperty::OnEvent(propgrid, window, e);
+}
+
+
+MOPGLineFlagProperty::MOPGLineFlagProperty(const wxString& label, const wxString& name, int value)
+: wxBoolProperty(label, name, false), MOPGProperty(MOPGProperty::TYPE_LFLAG) {
+	// Init variables
+	this->value = value;
+}
+
+void MOPGLineFlagProperty::onObjectsOpened() {
+	// Set unspecified if no objects are associated
+	if (objects->size() == 0) {
+		SetValueToUnspecified();
+		return;
+	}
+
+	// Check flag against first object
+	bool first = theGameConfiguration->lineFlagSet(value, (MapLine*)(*objects)[0]);
+
+	// Check whether all objects share the same flag setting
+	for (unsigned a = 1; a < objects->size(); a++) {
+		if (theGameConfiguration->lineFlagSet(value, (MapLine*)(*objects)[a]) != first) {
+			// Different value found, set unspecified
+			SetValueToUnspecified();
+			return;
+		}
+	}
 }

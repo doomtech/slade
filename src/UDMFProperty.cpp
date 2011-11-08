@@ -41,6 +41,12 @@ void UDMFProperty::parse(ParseTreeNode* node, string group) {
 				type = TYPE_STRING;
 			else if (S_CMPNOCASE(prop->getStringValue(), "colour"))
 				type = TYPE_COLOUR;
+			else if (S_CMPNOCASE(prop->getStringValue(), "actionspecial"))
+				type = TYPE_ASPECIAL;
+			else if (S_CMPNOCASE(prop->getStringValue(), "sectorspecial"))
+				type = TYPE_SSPECIAL;
+			else if (S_CMPNOCASE(prop->getStringValue(), "thingtype"))
+				type = TYPE_TTYPE;
 		}
 
 		// Property name
@@ -55,6 +61,9 @@ void UDMFProperty::parse(ParseTreeNode* node, string group) {
 			case TYPE_FLOAT:	default_value = prop->getFloatValue(); break;
 			case TYPE_STRING:	default_value = prop->getStringValue(); break;
 			case TYPE_COLOUR:	default_value = prop->getStringValue(); break;
+			case TYPE_ASPECIAL:	default_value = prop->getIntValue(); break;
+			case TYPE_SSPECIAL:	default_value = prop->getIntValue(); break;
+			case TYPE_TTYPE:	default_value = prop->getIntValue(); break;
 			default:			default_value = prop->getStringValue(); break;
 			}
 
@@ -75,7 +84,7 @@ void UDMFProperty::parse(ParseTreeNode* node, string group) {
 				for (unsigned b = 0; b < prop->nValues(); b++)
 					values.push_back(prop->getBoolValue(b));
 			}
-			else if (type == TYPE_INT) {
+			else if (type == TYPE_INT || type == TYPE_ASPECIAL || type == TYPE_SSPECIAL || type == TYPE_TTYPE) {
 				for (unsigned b = 0; b < prop->nValues(); b++)
 					values.push_back(prop->getIntValue(b));
 			}
@@ -100,6 +109,9 @@ string UDMFProperty::getStringRep() {
 	case TYPE_FLOAT: ret += ", type = float"; break;
 	case TYPE_STRING: ret += ", type = string"; break;
 	case TYPE_COLOUR: ret += ", type = colour"; break;
+	case TYPE_ASPECIAL: ret += ", type = actionspecial"; break;
+	case TYPE_SSPECIAL: ret += ", type = sectorspecial"; break;
+	case TYPE_TTYPE: ret += ", type = thingtype"; break;
 	default: ret += ", ******unknown type********"; break;
 	};
 
@@ -110,7 +122,7 @@ string UDMFProperty::getStringRep() {
 			else
 				ret += ", default = false";
 		}
-		else if (type == TYPE_INT)
+		else if (type == TYPE_INT || type == TYPE_ASPECIAL || type == TYPE_SSPECIAL || type == TYPE_TTYPE)
 			ret += S_FMT(", default = %d", (int)default_value);
 		else if (type == TYPE_FLOAT)
 			ret += S_FMT(", default = %1.2f", (double)default_value);

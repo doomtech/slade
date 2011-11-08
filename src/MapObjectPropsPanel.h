@@ -30,7 +30,7 @@ public:
 	bool	setBoolProperty(wxPGProperty* prop, bool value, bool force_set = false);
 	bool	setStringProperty(wxPGProperty* prop, string value, bool force_set = false);
 
-	void	addUDMFProperty(UDMFProperty* prop);
+	void	addUDMFProperty(UDMFProperty* prop, int objtype, wxPGProperty* basegroup = NULL);
 
 	void	setupType(int objtype);
 	void	setupTypeUDMF(int objtype);
