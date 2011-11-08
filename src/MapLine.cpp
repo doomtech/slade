@@ -93,6 +93,86 @@ int MapLine::s2Index() {
 		return -1;
 }
 
+bool MapLine::boolProperty(string key) {
+	if (key.StartsWith("side1.") && side1)
+		return side1->boolProperty(key.Mid(6));
+	else if (key.StartsWith("side2.") && side2)
+		return side2->boolProperty(key.Mid(6));
+	else
+		return MapObject::boolProperty(key);
+}
+
+int MapLine::intProperty(string key) {
+	if (key.StartsWith("side1.") && side1)
+		return side1->intProperty(key.Mid(6));
+	else if (key.StartsWith("side2.") && side2)
+		return side2->intProperty(key.Mid(6));
+	else if (key == "v1")
+		return v1Index();
+	else if (key == "v2")
+		return v2Index();
+	else if (key == "sidefront")
+		return s1Index();
+	else if (key == "sideback")
+		return s2Index();
+	else
+		return MapObject::intProperty(key);
+}
+
+double MapLine::floatProperty(string key) {
+	if (key.StartsWith("side1.") && side1)
+		return side1->floatProperty(key.Mid(6));
+	else if (key.StartsWith("side2.") && side2)
+		return side2->floatProperty(key.Mid(6));
+	else
+		return MapObject::floatProperty(key);
+}
+
+string MapLine::stringProperty(string key) {
+	if (key.StartsWith("side1.") && side1)
+		return side1->stringProperty(key.Mid(6));
+	else if (key.StartsWith("side2.") && side2)
+		return side2->stringProperty(key.Mid(6));
+	else
+		return MapObject::stringProperty(key);
+}
+
+void MapLine::setBoolProperty(string key, bool value) {
+	if (key.StartsWith("side1.") && side1)
+		return side1->setBoolProperty(key.Mid(6), value);
+	else if (key.StartsWith("side1.") && side1)
+		return side1->setBoolProperty(key.Mid(6), value);
+	else
+		MapObject::setBoolProperty(key, value);
+}
+
+void MapLine::setIntProperty(string key, int value) {
+	if (key.StartsWith("side1.") && side1)
+		return side1->setIntProperty(key.Mid(6), value);
+	else if (key.StartsWith("side1.") && side1)
+		return side1->setIntProperty(key.Mid(6), value);
+	else
+		MapObject::setIntProperty(key, value);
+}
+
+void MapLine::setFloatProperty(string key, double value) {
+	if (key.StartsWith("side1.") && side1)
+		return side1->setFloatProperty(key.Mid(6), value);
+	else if (key.StartsWith("side1.") && side1)
+		return side1->setFloatProperty(key.Mid(6), value);
+	else
+		MapObject::setFloatProperty(key, value);
+}
+
+void MapLine::setStringProperty(string key, string value) {
+	if (key.StartsWith("side1.") && side1)
+		return side1->setStringProperty(key.Mid(6), value);
+	else if (key.StartsWith("side1.") && side1)
+		return side1->setStringProperty(key.Mid(6), value);
+	else
+		MapObject::setStringProperty(key, value);
+}
+
 fpoint2_t MapLine::midPoint() {
 	return fpoint2_t(x1() + ((x2() - x1()) * 0.5), y1() + ((y2() - y1()) * 0.5));
 }

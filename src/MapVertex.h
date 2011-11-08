@@ -39,6 +39,11 @@ public:
 
 	fpoint2_t	midPoint() { return fpoint2_t(x, y); }
 
+	int		intProperty(string key);
+	double	floatProperty(string key);
+	void	setIntProperty(string key, int value);
+	void	setFloatProperty(string key, double value);
+
 	void		connectLine(MapLine* line);
 	void		disconnectLine(MapLine* line);
 	unsigned	nConnectedLines() { return connected_lines.size(); }

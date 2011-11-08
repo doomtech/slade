@@ -6,17 +6,24 @@ class wxPropertyGrid;
 class wxPGProperty;
 class MapObject;
 class UDMFProperty;
+class MOPGProperty;
 class MapObjectPropsPanel : public wxPanel {
 private:
-	wxPropertyGrid*	pg_properties;
-	int					last_type;
-	string				last_config;
-	wxStaticText*		label_item;
-	vector<MapObject*>	objects;
+	wxPropertyGrid*			pg_properties;
+	int						last_type;
+	string					last_config;
+	wxStaticText*			label_item;
+	vector<MapObject*>		objects;
+	vector<MOPGProperty*>	properties;
 
 public:
 	MapObjectPropsPanel(wxWindow* parent);
 	~MapObjectPropsPanel();
+
+	MOPGProperty*	addBoolProperty(wxPGProperty* group, string label, string propname, bool readonly = false);
+	MOPGProperty*	addIntProperty(wxPGProperty* group, string label, string propname, bool readonly = false);
+	MOPGProperty*	addFloatProperty(wxPGProperty* group, string label, string propname, bool readonly = false);
+	MOPGProperty*	addStringProperty(wxPGProperty* group, string label, string propname, bool readonly = false);
 
 	bool	setIntProperty(wxPGProperty* prop, int value, bool force_set = false);
 	bool	setFloatProperty(wxPGProperty* prop, double value, bool force_set = false);

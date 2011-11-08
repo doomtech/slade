@@ -20,6 +20,24 @@ MapSector::MapSector(string f_tex, string c_tex, SLADEMap* parent) : MapObject(M
 MapSector::~MapSector() {
 }
 
+string MapSector::stringProperty(string key) {
+	if (key == "texturefloor")
+		return f_tex;
+	else if (key == "textureceiling")
+		return c_tex;
+	else
+		return MapObject::stringProperty(key);
+}
+
+void MapSector::setStringProperty(string key, string value) {
+	if (key == "texturefloor")
+		f_tex = value;
+	else if (key == "textureceiling")
+		c_tex = value;
+	else
+		MapObject::setStringProperty(key, value);
+}
+
 fpoint2_t MapSector::midPoint() {
 	bbox_t bbox = boundingBox();
 	return fpoint2_t(bbox.min.x + ((bbox.max.x-bbox.min.x)*0.5),

@@ -8,23 +8,6 @@ class MapVertex;
 class MapSide;
 class MapSector;
 
-// Line flags
-#define	LINE_IMPASSIBLE		0x0001
-#define LINE_BLOCKMONSTERS	0x0002
-#define	LINE_TWOSIDED		0x0004
-#define	LINE_UPPERUNPEGGED	0x0008
-#define	LINE_LOWERUNPEGGED	0x0010
-#define	LINE_SECRET			0x0020
-#define	LINE_BLOCKSOUND		0x0040
-#define	LINE_NOTONMAP		0x0080
-#define	LINE_STARTONMAP		0x0100
-// Boom
-#define LINE_BPASSTHROUGH	0x0200
-// Hexen
-#define LINE_HREPEATABLE	0x0200
-#define LINE_HMONSTERACT	0x2000
-#define LINE_HBLOCKALL		0x8000
-
 struct doomline_t {
 	uint16_t vertex1;
 	uint16_t vertex2;
@@ -94,6 +77,15 @@ public:
 	int	v2Index();
 	int	s1Index();
 	int	s2Index();
+
+	bool	boolProperty(string key);
+	int		intProperty(string key);
+	double	floatProperty(string key);
+	string	stringProperty(string key);
+	void	setBoolProperty(string key, bool value);
+	void	setIntProperty(string key, int value);
+	void	setFloatProperty(string key, double value);
+	void	setStringProperty(string key, string value);
 
 	fpoint2_t	midPoint();
 	double		getLength();

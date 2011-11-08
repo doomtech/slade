@@ -45,6 +45,9 @@ public:
 	MapLine*	getParentLine() { return parent; }
 
 	void	setSector(MapSector* sector);
+
+	int		intProperty(string key);
+	void	setIntProperty(string key, int value);
 };
 
 #endif //__MAPSIDE_H__

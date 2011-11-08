@@ -3,6 +3,7 @@
 #include "Main.h"
 #include "MapSide.h"
 #include "MapSector.h"
+#include "SLADEMap.h"
 
 MapSide::MapSide(MapSector* sector, SLADEMap* parent) : MapObject(MOBJ_SIDE, parent) {
 	// Init variables
@@ -39,4 +40,18 @@ void MapSide::setSector(MapSector* sector) {
 	// Add side to new sector
 	this->sector = sector;
 	sector->connected_sides.push_back(this);
+}
+
+int MapSide::intProperty(string key) {
+	if (key == "sector")
+		return sector->getIndex();
+	else
+		return MapObject::intProperty(key);
+}
+
+void MapSide::setIntProperty(string key, int value) {
+	if (key == "sector" && parent_map)
+		sector = parent_map->getSector(value);
+	else
+		MapObject::setIntProperty(key, value);
 }

@@ -37,8 +37,11 @@ void MapObject::copy(MapObject* c) {
 }
 
 bool MapObject::boolProperty(string key) {
+	// If the property exists already, return it
 	if (properties.propertyExists(key))
 		return properties[key].getBoolValue();
+
+	// Otherwise check the game configuration for a default value
 	else {
 		UDMFProperty* prop = theGameConfiguration->getUDMFProperty(key, type);
 		if (prop)
@@ -49,8 +52,11 @@ bool MapObject::boolProperty(string key) {
 }
 
 int MapObject::intProperty(string key) {
+	// If the property exists already, return it
 	if (properties.propertyExists(key))
 		return properties[key].getIntValue();
+
+	// Otherwise check the game configuration for a default value
 	else {
 		UDMFProperty* prop = theGameConfiguration->getUDMFProperty(key, type);
 		if (prop)
@@ -61,8 +67,11 @@ int MapObject::intProperty(string key) {
 }
 
 double MapObject::floatProperty(string key) {
+	// If the property exists already, return it
 	if (properties.propertyExists(key))
 		return properties[key].getFloatValue();
+
+	// Otherwise check the game configuration for a default value
 	else {
 		UDMFProperty* prop = theGameConfiguration->getUDMFProperty(key, type);
 		if (prop)
@@ -73,8 +82,11 @@ double MapObject::floatProperty(string key) {
 }
 
 string MapObject::stringProperty(string key) {
+	// If the property exists already, return it
 	if (properties.propertyExists(key))
 		return properties[key].getStringValue();
+
+	// Otherwise check the game configuration for a default value
 	else {
 		UDMFProperty* prop = theGameConfiguration->getUDMFProperty(key, type);
 		if (prop)

@@ -4,68 +4,9 @@
 #include "MapObjectPropsPanel.h"
 #include "GameConfiguration.h"
 #include "SLADEMap.h"
-#include "ActionSpecialTreeView.h"
-#include "ThingTypeTreeView.h"
+#include "MOPGProperty.h"
 #include <wx/propgrid/propgrid.h>
 #include <wx/propgrid/advprops.h>
-
-
-class ActionSpecialPGProperty : public wxIntProperty {
-public:
-	ActionSpecialPGProperty(const wxString& label = wxPG_LABEL, const wxString& name = wxPG_LABEL, long value = 0) : wxIntProperty(label, name, value) {
-		// Set to text+button editor
-		SetEditor(wxPGEditor_TextCtrlAndButton);
-	}
-	~ActionSpecialPGProperty() {}
-
-	wxString ValueToString(wxVariant &value, int argFlags = 0) const {
-		// Get value as integer
-		int special = value.GetInteger();
-
-		if (special == 0)
-			return "0: None";
-		else {
-			ActionSpecial* as = theGameConfiguration->actionSpecial(special);
-			return S_FMT("%d: %s", special, CHR(as->getName()));
-		}
-	}
-
-	bool OnEvent(wxPropertyGrid* propgrid, wxWindow* window, wxEvent& e) {
-		if (e.GetEventType() == wxEVT_COMMAND_BUTTON_CLICKED) {
-			int special = ActionSpecialTreeView::showDialog(window, GetValue().GetInteger());
-			if (special >= 0) SetValue(special);
-		}
-
-		return wxIntProperty::OnEvent(propgrid, window, e);
-	}
-};
-
-class ThingTypePGProperty : public wxIntProperty {
-public:
-	ThingTypePGProperty(const wxString& label = wxPG_LABEL, const wxString& name = wxPG_LABEL, long value = 0) : wxIntProperty(label, name, value) {
-		// Set to text+button editor
-		SetEditor(wxPGEditor_TextCtrlAndButton);
-	}
-	~ThingTypePGProperty() {}
-
-	wxString ValueToString(wxVariant& value, int argFlags = 0) const {
-		// Get value as integer
-		int type = value.GetInteger();
-
-		ThingType* tt = theGameConfiguration->thingType(type);
-		return S_FMT("%d: %s", type, CHR(tt->getName()));
-	}
-
-	bool OnEvent(wxPropertyGrid* propgrid, wxWindow* window, wxEvent& e) {
-		if (e.GetEventType() == wxEVT_COMMAND_BUTTON_CLICKED) {
-			int type = ThingTypeTreeView::showDialog(window, GetValue().GetInteger());
-			if (type >= 0) SetValue(type);
-		}
-
-		return wxIntProperty::OnEvent(propgrid, window, e);
-	}
-};
-
 
 
 MapObjectPropsPanel::MapObjectPropsPanel(wxWindow* parent) : wxPanel(parent, -1) {
@@ -93,6 +34,66 @@ MapObjectPropsPanel::MapObjectPropsPanel(wxWindow* parent) : wxPanel(parent, -1)
 }
 
 MapObjectPropsPanel::~MapObjectPropsPanel() {
+}
+
+MOPGProperty* MapObjectPropsPanel::addBoolProperty(wxPGProperty* group, string label, string propname, bool readonly) {
+	// Create property
+	MOPGBoolProperty* prop = new MOPGBoolProperty(label, propname);
+
+	// Add it
+	properties.push_back(prop);
+	pg_properties->AppendIn(group, prop);
+
+	// Set read-only if specified
+	if (readonly)
+		prop->ChangeFlag(wxPG_PROP_READONLY, true);
+
+	return prop;
+}
+
+MOPGProperty* MapObjectPropsPanel::addIntProperty(wxPGProperty* group, string label, string propname, bool readonly) {
+	// Create property
+	MOPGIntProperty* prop = new MOPGIntProperty(label, propname);
+
+	// Add it
+	properties.push_back(prop);
+	pg_properties->AppendIn(group, prop);
+
+	// Set read-only if specified
+	if (readonly)
+		prop->ChangeFlag(wxPG_PROP_READONLY, true);
+
+	return prop;
+}
+
+MOPGProperty* MapObjectPropsPanel::addFloatProperty(wxPGProperty* group, string label, string propname, bool readonly) {
+	// Create property
+	MOPGFloatProperty* prop = new MOPGFloatProperty(label, propname);
+
+	// Add it
+	properties.push_back(prop);
+	pg_properties->AppendIn(group, prop);
+
+	// Set read-only if specified
+	if (readonly)
+		prop->ChangeFlag(wxPG_PROP_READONLY, true);
+
+	return prop;
+}
+
+MOPGProperty* MapObjectPropsPanel::addStringProperty(wxPGProperty* group, string label, string propname, bool readonly) {
+	// Create property
+	MOPGStringProperty* prop = new MOPGStringProperty(label, propname);
+
+	// Add it
+	properties.push_back(prop);
+	pg_properties->AppendIn(group, prop);
+
+	// Set read-only if specified
+	if (readonly)
+		prop->ChangeFlag(wxPG_PROP_READONLY, true);
+
+	return prop;
 }
 
 bool MapObjectPropsPanel::setIntProperty(wxPGProperty* prop, int value, bool force_set) {
@@ -187,15 +188,20 @@ void MapObjectPropsPanel::addUDMFProperty(UDMFProperty* prop) {
 
 	// Add property depending on type
 	if (prop->getType() == UDMFProperty::TYPE_BOOL)
-		pg_properties->AppendIn(group, new wxBoolProperty(prop->getName(), prop->getProperty()));
+		//pg_properties->AppendIn(group, new wxBoolProperty(prop->getName(), prop->getProperty()));
+		addBoolProperty(group, prop->getName(), prop->getProperty());
 	else if (prop->getType() == UDMFProperty::TYPE_INT)
-		pg_properties->AppendIn(group, new wxIntProperty(prop->getName(), prop->getProperty()));
+		//pg_properties->AppendIn(group, new wxIntProperty(prop->getName(), prop->getProperty()));
+		addIntProperty(group, prop->getName(), prop->getProperty());
 	else if (prop->getType() == UDMFProperty::TYPE_FLOAT)
-		pg_properties->AppendIn(group, new wxFloatProperty(prop->getName(), prop->getProperty()));
+		//pg_properties->AppendIn(group, new wxFloatProperty(prop->getName(), prop->getProperty()));
+		addFloatProperty(group, prop->getName(), prop->getProperty());
 	else if (prop->getType() == UDMFProperty::TYPE_STRING)
-		pg_properties->AppendIn(group, new wxStringProperty(prop->getName(), prop->getProperty()));
+		//pg_properties->AppendIn(group, new wxStringProperty(prop->getName(), prop->getProperty()));
+		addStringProperty(group, prop->getName(), prop->getProperty());
 	else if (prop->getType() == UDMFProperty::TYPE_COLOUR)
-		pg_properties->AppendIn(group, new wxColourProperty(prop->getName(), prop->getProperty()));
+		addIntProperty(group, prop->getName(), prop->getProperty());
+		//pg_properties->AppendIn(group, new wxColourProperty(prop->getName(), prop->getProperty()));
 }
 
 void MapObjectPropsPanel::setupType(int objtype) {
@@ -205,6 +211,7 @@ void MapObjectPropsPanel::setupType(int objtype) {
 
 	// Clear property grid
 	pg_properties->Clear();
+	properties.clear();
 
 	// Vertex properties
 	if (objtype == MOBJ_VERTEX) {
@@ -212,8 +219,8 @@ void MapObjectPropsPanel::setupType(int objtype) {
 		wxPGProperty* g_basic = pg_properties->Append(new wxPropertyCategory("General"));
 
 		// Add X and Y position
-		pg_properties->AppendIn(g_basic, new wxIntProperty("X Position", "x"));
-		pg_properties->AppendIn(g_basic, new wxIntProperty("Y Position", "y"));
+		addIntProperty(g_basic, "X Position", "x");
+		addIntProperty(g_basic, "Y Position", "y");
 
 		last_type = MOBJ_VERTEX;
 	}
@@ -224,18 +231,22 @@ void MapObjectPropsPanel::setupType(int objtype) {
 		wxPGProperty* g_basic = pg_properties->Append(new wxPropertyCategory("General"));
 
 		// Add side indices
-		pg_properties->AppendIn(g_basic, new wxIntProperty("Front Side", "sidefront"));
-		pg_properties->AppendIn(g_basic, new wxIntProperty("Back Side", "sideback"));
+		addIntProperty(g_basic, "Front Side", "sidefront");
+		addIntProperty(g_basic, "Back Side", "sideback");
 
 		// Add 'Special' group
 		wxPGProperty* g_special = pg_properties->Append(new wxPropertyCategory("Special"));
 
 		// Add special
-		pg_properties->AppendIn(g_special, new ActionSpecialPGProperty("Special", "special"));
+		MOPGActionSpecialProperty* prop_as = new MOPGActionSpecialProperty("Special", "special");
+		properties.push_back(prop_as);
+		pg_properties->AppendIn(g_special, prop_as);
 
 		// Add args
-		for (unsigned a = 0; a < 5; a++)
-			pg_properties->AppendIn(g_special, new wxIntProperty(S_FMT("Arg %d", a), S_FMT("arg%d", a)));
+		for (unsigned a = 0; a < 5; a++) {
+			MOPGIntProperty* prop = (MOPGIntProperty*)addIntProperty(g_special, S_FMT("Arg %d", a), S_FMT("arg%d", a));
+			prop_as->addArgProperty(prop, a);
+		}
 
 		// Add 'Flags' group
 		wxPGProperty* g_flags = pg_properties->Append(new wxPropertyCategory("Flags"));
@@ -259,33 +270,33 @@ void MapObjectPropsPanel::setupType(int objtype) {
 
 		// 'General' group 1
 		wxPGProperty* subgroup = pg_properties->AppendIn(g_side1, new wxPropertyCategory("General", "side1.general"));
-		pg_properties->AppendIn(subgroup, new wxIntProperty("Sector", "side1.sector"));
+		addIntProperty(subgroup, "Sector", "side1.sector");
 
 		// 'Textures' group 1
 		subgroup = pg_properties->AppendIn(g_side1, new wxPropertyCategory("Textures", "side1.textures"));
-		pg_properties->AppendIn(subgroup, new wxStringProperty("Upper Texture", "side1.texturetop"));
-		pg_properties->AppendIn(subgroup, new wxStringProperty("Middle Texture", "side1.texturemiddle"));
-		pg_properties->AppendIn(subgroup, new wxStringProperty("Lower Texture", "side1.texturebottom"));
+		addStringProperty(subgroup, "Upper Texture", "side1.texturetop");
+		addStringProperty(subgroup, "Middle Texture", "side1.texturemiddle");
+		addStringProperty(subgroup, "Lower Texture", "side1.texturebottom");
 
 		// 'Offsets' group 1
 		subgroup = pg_properties->AppendIn(g_side1, new wxPropertyCategory("Offsets", "side1.offsets"));
-		pg_properties->AppendIn(subgroup, new wxIntProperty("X Offset", "side1.offsetx"));
-		pg_properties->AppendIn(subgroup, new wxIntProperty("Y Offset", "side1.offsety"));
+		addIntProperty(subgroup, "X Offset", "side1.offsetx");
+		addIntProperty(subgroup, "Y Offset", "side1.offsety");
 
 		// 'General' group 2
 		subgroup = pg_properties->AppendIn(g_side2, new wxPropertyCategory("General", "side2.general"));
-		pg_properties->AppendIn(subgroup, new wxIntProperty("Sector", "side2.sector"));
+		addIntProperty(subgroup, "Sector", "side2.sector");
 
 		// 'Textures' group 2
 		subgroup = pg_properties->AppendIn(g_side2, new wxPropertyCategory("Textures", "side2.textures"));
-		pg_properties->AppendIn(subgroup, new wxStringProperty("Upper Texture", "side2.texturetop"));
-		pg_properties->AppendIn(subgroup, new wxStringProperty("Middle Texture", "side2.texturemiddle"));
-		pg_properties->AppendIn(subgroup, new wxStringProperty("Lower Texture", "side2.texturebottom"));
+		addStringProperty(subgroup, "Upper Texture", "side2.texturetop");
+		addStringProperty(subgroup, "Middle Texture", "side2.texturemiddle");
+		addStringProperty(subgroup, "Lower Texture", "side2.texturebottom");
 
 		// 'Offsets' group 2
 		subgroup = pg_properties->AppendIn(g_side2, new wxPropertyCategory("Offsets", "side2.offsets"));
-		pg_properties->AppendIn(subgroup, new wxIntProperty("X Offset", "side2.offsetx"));
-		pg_properties->AppendIn(subgroup, new wxIntProperty("Y Offset", "side2.offsety"));
+		addIntProperty(subgroup, "X Offset", "side2.offsetx");
+		addIntProperty(subgroup, "Y Offset", "side2.offsety");
 	}
 
 	// Sector properties
@@ -294,49 +305,30 @@ void MapObjectPropsPanel::setupType(int objtype) {
 		wxPGProperty* g_basic = pg_properties->Append(new wxPropertyCategory("General"));
 
 		// Add heights
-		pg_properties->AppendIn(g_basic, new wxIntProperty("Floor Height", "heightfloor"));
-		pg_properties->AppendIn(g_basic, new wxIntProperty("Ceiling Height", "heightceiling"));
+		addIntProperty(g_basic, "Floor Height", "heightfloor");
+		addIntProperty(g_basic, "Ceiling Height", "heightceiling");
 
 		// Add tag
-		pg_properties->AppendIn(g_basic, new wxIntProperty("Tag/ID", "id"));
+		addIntProperty(g_basic, "Tag/ID", "id");
 
 		// Add 'Lighting' group
 		wxPGProperty* g_light = pg_properties->Append(new wxPropertyCategory("Lighting"));
 
 		// Add light level
-		pg_properties->AppendIn(g_light, new wxIntProperty("Light Level", "lightlevel"));
+		addIntProperty(g_light, "Light Level", "lightlevel");
 
 		// Add 'Textures' group
 		wxPGProperty* g_textures = pg_properties->Append(new wxPropertyCategory("Textures"));
 
 		// Add textures
-		pg_properties->AppendIn(g_textures, new wxStringProperty("Floor Texture", "texturefloor"));
-		pg_properties->AppendIn(g_textures, new wxStringProperty("Ceiling Texture", "textureceiling"));
+		addStringProperty(g_textures, "Floor Texture", "texturefloor");
+		addStringProperty(g_textures, "Ceiling Texture", "textureceiling");
 
 		// Add 'Special' group
 		wxPGProperty* g_special = pg_properties->Append(new wxPropertyCategory("Special"));
 
 		// Add special
-		pg_properties->AppendIn(g_special, new wxIntProperty("Special", "special"));
-
-		// Add Boom generalised effects
-		wxArrayString dmg;
-		dmg.Add("None");
-		dmg.Add("5%");
-		dmg.Add("10%");
-		dmg.Add("20%");
-		pg_properties->AppendIn(g_special, new wxEnumProperty("Damage", "bg_damage", dmg));
-		pg_properties->AppendIn(g_special, new wxBoolProperty("Secret", "bg_secret"));
-		pg_properties->AppendIn(g_special, new wxBoolProperty("Friction Enabled", "bg_friction"));
-		pg_properties->AppendIn(g_special, new wxBoolProperty("Pushers/Pullers Enabled", "bg_pushpull"));
-
-		// Hide boom generalised effects if disabled
-		if (!theGameConfiguration->isBoom()) {
-			pg_properties->GetProperty("bg_damage")->Hide(true);
-			pg_properties->GetProperty("bg_secret")->Hide(true);
-			pg_properties->GetProperty("bg_friction")->Hide(true);
-			pg_properties->GetProperty("bg_pushpull")->Hide(true);
-		}
+		addIntProperty(g_special, "Special", "special");
 	}
 
 	// Thing properties
@@ -345,25 +337,29 @@ void MapObjectPropsPanel::setupType(int objtype) {
 		wxPGProperty* g_basic = pg_properties->Append(new wxPropertyCategory("General"));
 
 		// Add position
-		pg_properties->AppendIn(g_basic, new wxIntProperty("X Position", "x"));
-		pg_properties->AppendIn(g_basic, new wxIntProperty("Y Position", "y"));
+		addIntProperty(g_basic, "X Position", "x");
+		addIntProperty(g_basic, "Y Position", "y");
 
 		// Add z height
-		pg_properties->AppendIn(g_basic, new wxIntProperty("Z Height", "height"));
+		addIntProperty(g_basic, "Z Height", "height");
 
 		// Add angle
-		pg_properties->AppendIn(g_basic, new wxIntProperty("Angle", "angle"));
+		addIntProperty(g_basic, "Angle", "angle");
 
 		// Add type
-		pg_properties->AppendIn(g_basic, new ThingTypePGProperty("Type", "type"));
+		MOPGThingTypeProperty* prop_tt = new MOPGThingTypeProperty("Type", "type");
+		properties.push_back(prop_tt);
+		pg_properties->AppendIn(g_basic, prop_tt);
 
 		// Add id
-		pg_properties->AppendIn(g_basic, new wxIntProperty("ID", "id"));
+		addIntProperty(g_basic, "ID", "id");
 
 		// Add 'Args' group
 		wxPGProperty* g_args = pg_properties->Append(new wxPropertyCategory("Args"));
-		for (unsigned a = 0; a < 5; a++)
-			pg_properties->AppendIn(g_args, new wxIntProperty(S_FMT("Arg %d", a), S_FMT("arg%d", a)));
+		for (unsigned a = 0; a < 5; a++) {
+			MOPGIntProperty* prop = (MOPGIntProperty*)addIntProperty(g_args, S_FMT("Arg %d", a), S_FMT("arg%d", a));
+			prop_tt->addArgProperty(prop, a);
+		}
 
 		// Add 'Flags' group
 		wxPGProperty* g_flags = pg_properties->Append(new wxPropertyCategory("Flags"));
@@ -374,7 +370,11 @@ void MapObjectPropsPanel::setupType(int objtype) {
 
 		// Add 'Scripting Special' group
 		wxPGProperty* g_special = pg_properties->Append(new wxPropertyCategory("Scripting Special"));
-		pg_properties->AppendIn(g_special, new ActionSpecialPGProperty("Special", "special"));
+
+		// Add special
+		MOPGActionSpecialProperty* prop_as = new MOPGActionSpecialProperty("Special", "special");
+		properties.push_back(prop_as);
+		pg_properties->AppendIn(g_special, prop_as);
 
 		// Hide hexen extras if in doom format
 		if (theGameConfiguration->getMapFormat() == MAP_DOOM) {
@@ -398,6 +398,7 @@ void MapObjectPropsPanel::setupTypeUDMF(int objtype) {
 
 	// Clear property grid
 	pg_properties->Clear();
+	properties.clear();
 
 	// Go through all possible properties for this type
 	vector<udmfp_t> props = theGameConfiguration->allUDMFProperties(objtype);
@@ -432,10 +433,10 @@ void MapObjectPropsPanel::openObjects(vector<MapObject*>& objects) {
 	// UDMF
 	if (theGameConfiguration->getMapFormat() == MAP_UDMF) {
 		setupTypeUDMF(objects[0]->getObjType());
-		vector<udmfp_t> properties = theGameConfiguration->allUDMFProperties(objects[0]->getObjType());
-		for (unsigned a = 0; a < properties.size(); a++) {
-			int proptype = properties[a].property->getType();
-			string propname = properties[a].property->getProperty();
+		vector<udmfp_t> udmfprops = theGameConfiguration->allUDMFProperties(objects[0]->getObjType());
+		for (unsigned a = 0; a < udmfprops.size(); a++) {
+			int proptype = udmfprops[a].property->getType();
+			string propname = udmfprops[a].property->getProperty();
 			wxPGProperty* prop = pg_properties->GetProperty(propname);
 			for (unsigned b = 0; b < objects.size(); b++) {
 				if (proptype == UDMFProperty::TYPE_BOOL) {
@@ -461,6 +462,19 @@ void MapObjectPropsPanel::openObjects(vector<MapObject*>& objects) {
 	// Setup property grid for the object type
 	setupType(objects[0]->getObjType());
 
+	// Generic properties
+	for (unsigned a = 0; a < properties.size(); a++) {
+		switch (properties[a]->getType()) {
+		case MOPGProperty::TYPE_BOOL: ((MOPGBoolProperty*)properties[a])->openObjects(&objects); break;
+		case MOPGProperty::TYPE_INT: ((MOPGIntProperty*)properties[a])->openObjects(&objects); break;
+		case MOPGProperty::TYPE_FLOAT: ((MOPGFloatProperty*)properties[a])->openObjects(&objects); break;
+		case MOPGProperty::TYPE_STRING: ((MOPGStringProperty*)properties[a])->openObjects(&objects); break;
+		case MOPGProperty::TYPE_ASPECIAL: ((MOPGActionSpecialProperty*)properties[a])->openObjects(&objects); break;
+		case MOPGProperty::TYPE_TTYPE: ((MOPGThingTypeProperty*)properties[a])->openObjects(&objects); break;
+		default: break;
+		}
+	}
+
 	// Populate values
 	switch (objects[0]->getObjType()) {
 	case MOBJ_VERTEX: openVertices(objects); break;
@@ -477,344 +491,63 @@ void MapObjectPropsPanel::openObjects(vector<MapObject*>& objects) {
 }
 
 void MapObjectPropsPanel::openVertices(vector<MapObject*>& objects) {
-	// Set X position
-	wxPGProperty* prop = pg_properties->GetProperty("x");
-	for (unsigned a = 0; a < objects.size(); a++) {
-		if (setIntProperty(prop, ((MapVertex*)objects[a])->xPos(), a == 0))
-			break;
-	}
-
-	// Set Y position
-	prop = pg_properties->GetProperty("y");
-	for (unsigned a = 0; a < objects.size(); a++) {
-		if (setIntProperty(prop, ((MapVertex*)objects[a])->yPos(), a == 0))
-			break;
-	}
 }
 
 void MapObjectPropsPanel::openLines(vector<MapObject*>& objects) {
-	// Set front side index
-	wxPGProperty* prop = pg_properties->GetProperty("sidefront");
-	for (unsigned a = 0; a < objects.size(); a++) {
-		if (setIntProperty(prop, ((MapLine*)objects[a])->s1Index(), a == 0))
-			break;
-	}
-
-	// Set back side index
-	prop = pg_properties->GetProperty("sideback");
-	for (unsigned a = 0; a < objects.size(); a++) {
-		if (setIntProperty(prop, ((MapLine*)objects[a])->s2Index(), a == 0))
-			break;
-	}
-
 	// Set flags
 	for (unsigned a = 0; a < theGameConfiguration->nLineFlags(); a++) {
-		prop = pg_properties->GetProperty(S_FMT("flag%d", a));
+		wxPGProperty* prop = pg_properties->GetProperty(S_FMT("flag%d", a));
 		for (unsigned b = 0; b < objects.size(); b++) {
 			if (setBoolProperty(prop, theGameConfiguration->lineFlagSet(a, (MapLine*)objects[b]), b == 0))
 				break;
 		}
 	}
 
-	// Set special
-	bool special_same = true;
-	prop = pg_properties->GetProperty("special");
-	for (unsigned a = 0; a < objects.size(); a++) {
-		if (setIntProperty(prop, ((MapLine*)objects[a])->prop("special"), a == 0)) {
-			special_same = false;
-			break;
-		}
-	}
-
-	// Set args
-	unsigned nargs = 5;
-	if (theGameConfiguration->getMapFormat() == MAP_DOOM) nargs = 1;
-	for (unsigned a = 0; a < nargs; a++) {
-		string argname = S_FMT("arg%d", a);
-		prop = pg_properties->GetProperty(argname);
-		for (unsigned b = 0; b < objects.size(); b++) {
-			if (setIntProperty(prop, ((MapLine*)objects[b])->prop(argname), b == 0))
-				break;
-		}
-	}
-
-	// Set arg names
-	if (theGameConfiguration->getMapFormat() == MAP_HEXEN) {
-		ActionSpecial* as = theGameConfiguration->actionSpecial((int)((MapLine*)objects[0])->prop("special"));
-		for (unsigned a = 0; a < 5; a++) {
-			wxPGProperty* prop = pg_properties->GetProperty(S_FMT("arg%d", a));
-			if (special_same) {
-				prop->SetLabel(as->getArg(a).name);
-				prop->SetHelpString(as->getArg(a).desc);
-			}
-			else {
-				prop->SetLabel(S_FMT("Arg %d", a));
-				prop->SetHelpString("");
-			}
-		}
-	}
-
-	// --- Front Side ---
-	prop = pg_properties->GetProperty("sidefront");
-	if (prop->GetValue().GetInteger() >= 0 || prop->IsValueUnspecified()) {
+	// Enable/disable side properties
+	wxPGProperty* prop = pg_properties->GetProperty("sidefront");
+	if (prop->GetValue().GetInteger() >= 0 || prop->IsValueUnspecified())
 		pg_properties->EnableProperty("side1");
-
-		// Set sector
-		int ffs = -1;	// Index of the first line with a front side
-		prop = pg_properties->GetProperty("side1.sector");
-		for (unsigned a = 0; a < objects.size(); a++) {
-			if (!((MapLine*)objects[a])->frontSector())
-				continue;
-			if (ffs < 0) ffs = a;
-			if (setIntProperty(prop, ((MapLine*)objects[a])->frontSector()->getIndex(), a == ffs))
-				break;
-		}
-
-		// Set upper texture
-		prop = pg_properties->GetProperty("side1.texturetop");
-		for (unsigned a = 0; a < objects.size(); a++) {
-			if (!((MapLine*)objects[a])->s1())
-				continue;
-			if (setStringProperty(prop, ((MapLine*)objects[a])->s1()->prop("texturetop").getStringValue(), a == ffs))
-				break;
-		}
-
-		// Set middle texture
-		prop = pg_properties->GetProperty("side1.texturemiddle");
-		for (unsigned a = 0; a < objects.size(); a++) {
-			if (!((MapLine*)objects[a])->s1())
-				continue;
-			if (setStringProperty(prop, ((MapLine*)objects[a])->s1()->prop("texturemiddle").getStringValue(), a == ffs))
-				break;
-		}
-
-		// Set lower texture
-		prop = pg_properties->GetProperty("side1.texturebottom");
-		for (unsigned a = 0; a < objects.size(); a++) {
-			if (!((MapLine*)objects[a])->s1())
-				continue;
-			if (setStringProperty(prop, ((MapLine*)objects[a])->s1()->prop("texturebottom").getStringValue(), a == ffs))
-				break;
-		}
-
-		// Set x offset
-		prop = pg_properties->GetProperty("side1.offsetx");
-		for (unsigned a = 0; a < objects.size(); a++) {
-			if (!((MapLine*)objects[a])->s1())
-				continue;
-			if (setIntProperty(prop, ((MapLine*)objects[a])->s1()->prop("offsetx"), a == ffs))
-				break;
-		}
-
-		// Set y offset
-		prop = pg_properties->GetProperty("side1.offsety");
-		for (unsigned a = 0; a < objects.size(); a++) {
-			if (!((MapLine*)objects[a])->s1())
-				continue;
-			if (setIntProperty(prop, ((MapLine*)objects[a])->s1()->prop("offsety"), a == ffs))
-				break;
-		}
-	}
 	else {
-		pg_properties->SetPropertyValueUnspecified("side1");
 		pg_properties->DisableProperty("side1");
+		pg_properties->SetPropertyValueUnspecified("side1");
 	}
-
-
-	// --- Back Side ---
 	prop = pg_properties->GetProperty("sideback");
-	if (prop->GetValue().GetInteger() >= 0 || prop->IsValueUnspecified()) {
+	if (prop->GetValue().GetInteger() >= 0 || prop->IsValueUnspecified())
 		pg_properties->EnableProperty("side2");
-
-		// Set sector
-		int ffs = -1;	// Index of the first line with a back side
-		prop = pg_properties->GetProperty("side2.sector");
-		for (unsigned a = 0; a < objects.size(); a++) {
-			if (!((MapLine*)objects[a])->backSector())
-				continue;
-			if (ffs < 0) ffs = a;
-			if (setIntProperty(prop, ((MapLine*)objects[a])->backSector()->getIndex(), a == ffs))
-				break;
-		}
-
-		// Set upper texture
-		prop = pg_properties->GetProperty("side2.texturetop");
-		for (unsigned a = 0; a < objects.size(); a++) {
-			if (!((MapLine*)objects[a])->s2())
-				continue;
-			if (setStringProperty(prop, ((MapLine*)objects[a])->s2()->prop("texturetop").getStringValue(), a == ffs))
-				break;
-		}
-
-		// Set middle texture
-		prop = pg_properties->GetProperty("side2.texturemiddle");
-		for (unsigned a = 0; a < objects.size(); a++) {
-			if (!((MapLine*)objects[a])->s2())
-				continue;
-			if (setStringProperty(prop, ((MapLine*)objects[a])->s2()->prop("texturemiddle").getStringValue(), a == ffs))
-				break;
-		}
-
-		// Set lower texture
-		prop = pg_properties->GetProperty("side2.texturebottom");
-		for (unsigned a = 0; a < objects.size(); a++) {
-			if (!((MapLine*)objects[a])->s2())
-				continue;
-			if (setStringProperty(prop, ((MapLine*)objects[a])->s2()->prop("texturebottom").getStringValue(), a == ffs))
-				break;
-		}
-
-		// Set x offset
-		prop = pg_properties->GetProperty("side2.offsetx");
-		for (unsigned a = 0; a < objects.size(); a++) {
-			if (!((MapLine*)objects[a])->s2())
-				continue;
-			if (setIntProperty(prop, ((MapLine*)objects[a])->s2()->prop("offsetx"), a == ffs))
-				break;
-		}
-
-		// Set y offset
-		prop = pg_properties->GetProperty("side2.offsety");
-		for (unsigned a = 0; a < objects.size(); a++) {
-			if (!((MapLine*)objects[a])->s2())
-				continue;
-			if (setIntProperty(prop, ((MapLine*)objects[a])->s2()->prop("offsety"), a == ffs))
-				break;
-		}
-	}
 	else {
-		pg_properties->SetPropertyValueUnspecified("side2");
 		pg_properties->DisableProperty("side2");
+		pg_properties->SetPropertyValueUnspecified("side2");
 	}
 }
 
 void MapObjectPropsPanel::openSectors(vector<MapObject*>& objects) {
-	// Set floor height
-	wxPGProperty* prop = pg_properties->GetProperty("heightfloor");
-	for (unsigned a = 0; a < objects.size(); a++) {
-		if (setIntProperty(prop, ((MapSector*)objects[a])->prop("heightfloor"), a == 0))
-			break;
-	}
-
-	// Set ceiling height
-	prop = pg_properties->GetProperty("heightceiling");
-	for (unsigned a = 0; a < objects.size(); a++) {
-		if (setIntProperty(prop, ((MapSector*)objects[a])->prop("heightceiling"), a == 0))
-			break;
-	}
-
-	// Set tag
-	prop = pg_properties->GetProperty("id");
-	for (unsigned a = 0; a < objects.size(); a++) {
-		if (setIntProperty(prop, ((MapSector*)objects[a])->prop("id"), a == 0))
-			break;
-	}
-
-	// Set light level
-	prop = pg_properties->GetProperty("lightlevel");
-	for (unsigned a = 0; a < objects.size(); a++) {
-		if (setIntProperty(prop, ((MapSector*)objects[a])->prop("lightlevel"), a == 0))
-			break;
-	}
-
-	// Set special
-	prop = pg_properties->GetProperty("special");
-	for (unsigned a = 0; a < objects.size(); a++) {
-		if (setIntProperty(prop, ((MapSector*)objects[a])->prop("special"), a == 0))
-			break;
-	}
-
-	// Set floor texture
-	prop = pg_properties->GetProperty("texturefloor");
-	for (unsigned a = 0; a < objects.size(); a++) {
-		if (setStringProperty(prop, ((MapSector*)objects[a])->floorTexture(), a == 0))
-			break;
-	}
-
-	// Set ceiling texture
-	prop = pg_properties->GetProperty("textureceiling");
-	for (unsigned a = 0; a < objects.size(); a++) {
-		if (setStringProperty(prop, ((MapSector*)objects[a])->ceilingTexture(), a == 0))
-			break;
-	}
-
-	// TODO: Boom generalised effects
 }
 
 void MapObjectPropsPanel::openThings(vector<MapObject*>& objects) {
-	// Set x position
-	wxPGProperty* prop = pg_properties->GetProperty("x");
-	for (unsigned a = 0; a < objects.size(); a++) {
-		if (setIntProperty(prop, ((MapThing*)objects[a])->xPos(), a == 0))
-			break;
-	}
-
-	// Set y position
-	prop = pg_properties->GetProperty("y");
-	for (unsigned a = 0; a < objects.size(); a++) {
-		if (setIntProperty(prop, ((MapThing*)objects[a])->yPos(), a == 0))
-			break;
-	}
-
-	// Set angle
-	prop = pg_properties->GetProperty("angle");
-	for (unsigned a = 0; a < objects.size(); a++) {
-		if (setIntProperty(prop, ((MapThing*)objects[a])->prop("angle"), a == 0))
-			break;
-	}
-
+	/*
 	// Set type
 	bool type_same = true;
-	prop = pg_properties->GetProperty("type");
+	wxPGProperty* prop = pg_properties->GetProperty("type");
 	for (unsigned a = 0; a < objects.size(); a++) {
 		if (setIntProperty(prop, ((MapThing*)objects[a])->getType(), a == 0)) {
 			type_same = false;
 			break;
 		}
 	}
+	*/
 
 	// Set flags
 	for (unsigned a = 0; a < theGameConfiguration->nThingFlags(); a++) {
-		prop = pg_properties->GetProperty(S_FMT("flag%d", a));
+		wxPGProperty* prop = pg_properties->GetProperty(S_FMT("flag%d", a));
 		for (unsigned b = 0; b < objects.size(); b++) {
 			if (setBoolProperty(prop, theGameConfiguration->thingFlagSet(a, (MapThing*)objects[b]), b == 0))
 				break;
 		}
 	}
 
+/*
 	// Hexen format
 	if (theGameConfiguration->getMapFormat() == MAP_HEXEN) {
-		// Set z height
-		prop = pg_properties->GetProperty("height");
-		for (unsigned a = 0; a < objects.size(); a++) {
-			if (setIntProperty(prop, ((MapThing*)objects[a])->prop("height"), a == 0))
-				break;
-		}
-
-		// Set id
-		prop = pg_properties->GetProperty("id");
-		for (unsigned a = 0; a < objects.size(); a++) {
-			if (setIntProperty(prop, ((MapThing*)objects[a])->prop("id"), a == 0))
-				break;
-		}
-
-		// Set special
-		prop = pg_properties->GetProperty("special");
-		for (unsigned a = 0; a < objects.size(); a++) {
-			if (setIntProperty(prop, ((MapThing*)objects[a])->prop("special"), a == 0))
-				break;
-		}
-
-		// Set args
-		for (unsigned a = 0; a < 5; a++) {
-			string argname = S_FMT("arg%d", a);
-			prop = pg_properties->GetProperty(argname);
-			for (unsigned b = 0; b < objects.size(); b++) {
-				if (setIntProperty(prop, ((MapThing*)objects[b])->prop(argname), b == 0))
-					break;
-			}
-		}
-
 		// Set arg names
 		ThingType* tt = theGameConfiguration->thingType(((MapThing*)objects[0])->getType());
 		for (unsigned a = 0; a < 5; a++) {
@@ -829,6 +562,7 @@ void MapObjectPropsPanel::openThings(vector<MapObject*>& objects) {
 			}
 		}
 	}
+*/
 }
 
 void MapObjectPropsPanel::setObjectProperty(wxPGProperty* prop, wxVariant value) {

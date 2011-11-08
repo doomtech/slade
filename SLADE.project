@@ -200,12 +200,16 @@
         <File Name="src/VertexInfoOverlay.cpp"/>
         <File Name="src/VertexInfoOverlay.h"/>
       </VirtualDirectory>
-      <File Name="src/MapObjectPropsPanel.cpp"/>
-      <File Name="src/MapObjectPropsPanel.h"/>
       <File Name="src/ActionSpecialTreeView.cpp"/>
       <File Name="src/ActionSpecialTreeView.h"/>
       <File Name="src/ThingTypeTreeView.cpp"/>
       <File Name="src/ThingTypeTreeView.h"/>
+      <VirtualDirectory Name="MapObjectPropsPanel">
+        <File Name="src/MapObjectPropsPanel.cpp"/>
+        <File Name="src/MapObjectPropsPanel.h"/>
+        <File Name="src/MOPGProperty.h"/>
+        <File Name="src/MOPGProperty.cpp"/>
+      </VirtualDirectory>
     </VirtualDirectory>
     <File Name="src/MapEditorWindow.h"/>
     <File Name="src/MapEditorWindow.cpp"/>
@@ -542,6 +546,7 @@
       
       
       
+      
       ]]>
       </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
@@ -580,6 +585,7 @@
       <General OutputFile="./dist/SLADE-dbg.app/Contents/MacOS/SLADE" IntermediateDirectory="./Debug" Command="./dist/SLADE-dbg.app/Contents/MacOS/SLADE" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[
+      
       
       
       
@@ -648,6 +654,7 @@
       
       
       
+      
       ]]>
       </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
@@ -687,6 +694,7 @@
       <General OutputFile="./dist/SLADE.app/Contents/MacOS/SLADE" IntermediateDirectory="./Release" Command="./dist/SLADE.app/Contents/MacOS/SLADE" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[
+      
       
       
       

@@ -38,10 +38,16 @@ public:
 	PropertyList&	props()				{ return properties; }
 	Property&		prop(string key)	{ return properties[key]; }
 	bool			hasProp(string key)	{ return properties.propertyExists(key); }
+
+	// Generic property modification
 	virtual bool	boolProperty(string key);
 	virtual int		intProperty(string key);
 	virtual double	floatProperty(string key);
 	virtual string	stringProperty(string key);
+	virtual void	setBoolProperty(string key, bool value) { properties[key] = value; }
+	virtual void	setIntProperty(string key, int value) { properties[key] = value; }
+	virtual void	setFloatProperty(string key, double value) { properties[key] = value; }
+	virtual void	setStringProperty(string key, string value) { properties[key] = value; }
 
 	virtual fpoint2_t	midPoint() { return fpoint2_t(0,0); }
 

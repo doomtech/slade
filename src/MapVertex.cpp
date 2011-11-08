@@ -17,6 +17,42 @@ MapVertex::MapVertex(double x, double y, SLADEMap* parent) : MapObject(MOBJ_VERT
 MapVertex::~MapVertex() {
 }
 
+int MapVertex::intProperty(string key) {
+	if (key == "x")
+		return (int)x;
+	else if (key == "y")
+		return (int)y;
+	else
+		return MapObject::intProperty(key);
+}
+
+double MapVertex::floatProperty(string key) {
+	if (key == "x")
+		return x;
+	else if (key == "y")
+		return y;
+	else
+		return MapObject::floatProperty(key);
+}
+
+void MapVertex::setIntProperty(string key, int value) {
+	if (key == "x")
+		x = value;
+	else if (key == "y")
+		y = value;
+	else
+		MapObject::setIntProperty(key, value);
+}
+
+void MapVertex::setFloatProperty(string key, double value) {
+	if (key == "x")
+		x = value;
+	else if (key == "y")
+		y = value;
+	else
+		MapObject::setFloatProperty(key, value);
+}
+
 void MapVertex::connectLine(MapLine* line) {
 	for (unsigned a = 0; a < connected_lines.size(); a++) {
 		if (connected_lines[a] == line)

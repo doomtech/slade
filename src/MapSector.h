@@ -52,6 +52,9 @@ public:
 	string		floorTexture() { return f_tex; }
 	string		ceilingTexture() { return c_tex; }
 
+	string	stringProperty(string key);
+	void	setStringProperty(string key, string value);
+
 	fpoint2_t			midPoint();
 	void				resetBBox() { bbox.reset(); }
 	bbox_t				boundingBox();

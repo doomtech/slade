@@ -56,6 +56,11 @@ public:
 	fpoint2_t	midPoint() { return fpoint2_t(x, y); }
 
 	short	getType() { return type; }
+
+	int		intProperty(string key);
+	double	floatProperty(string key);
+	void	setIntProperty(string key, int value);
+	void	setFloatProperty(string key, double value);
 };
 
 #endif //__MAPTHING_H__
