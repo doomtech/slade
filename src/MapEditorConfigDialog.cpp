@@ -6,11 +6,11 @@
 #include "GameConfiguration.h"
 #include "ArchiveManager.h"
 #include "WadArchive.h"
-#include "ArchiveListView.h"
 #include "SFileDialog.h"
+#include "SplashWindow.h"
 #include <wx/statline.h>
 
-MapEditorConfigDialog::MapEditorConfigDialog(wxWindow* parent, Archive* archive) : wxDialog(parent, -1, "Map Editor") {
+MapEditorConfigDialog::MapEditorConfigDialog(wxWindow* parent, Archive* archive, bool show_maplist) : wxDialog(parent, -1, "Map Editor") {
 	// Init variables
 	this->archive = archive;
 
@@ -35,18 +35,27 @@ MapEditorConfigDialog::MapEditorConfigDialog(wxWindow* parent, Archive* archive)
 	choice_game_config->SetSelection(game_current);
 	hbox->Add(choice_game_config, 1, wxEXPAND);
 
+	wxStaticBox* frame;
+	wxStaticBoxSizer* framesizer;
+
 	// Map section
-	wxStaticBox* frame = new wxStaticBox(this, -1, "Maps");
-	wxStaticBoxSizer* framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
-	sizer->Add(framesizer, 1, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+	if (show_maplist) {
+		frame = new wxStaticBox(this, -1, "Maps");
+		framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
+		sizer->Add(framesizer, 1, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
-	// Map list
-	list_maps = new ListView(this, -1, wxLC_LIST|wxLC_SINGLE_SEL);
-	framesizer->Add(list_maps, 1, wxEXPAND|wxALL, 4);
+		// Map list
+		list_maps = new ListView(this, -1, wxLC_LIST|wxLC_SINGLE_SEL);
+		framesizer->Add(list_maps, 1, wxEXPAND|wxALL, 4);
 
-	// New map button
-	//btn_new_map = new wxButton(this, -1, "New Map");
-	//framesizer->Add(btn_new_map, 0, wxLEFT|wxRIGHT|wxBOTTOM, 4);
+		// New map button
+		//btn_new_map = new wxButton(this, -1, "New Map");
+		//framesizer->Add(btn_new_map, 0, wxLEFT|wxRIGHT|wxBOTTOM, 4);
+	}
+	else {
+		list_maps = NULL;
+		btn_new_map = NULL;
+	}
 
 	// Resources section
 	frame = new wxStaticBox(this, -1, "Resources");
@@ -61,8 +70,20 @@ MapEditorConfigDialog::MapEditorConfigDialog(wxWindow* parent, Archive* archive)
 	hbox->Add(choice_base_resource, 1, wxEXPAND, 0);
 
 	// Resource archive list
-	list_resources = new ArchiveListView(this, archive);
+	list_resources = new wxCheckListBox(this, -1);
 	framesizer->Add(list_resources, 1, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+	// Populate resource archive list
+	int index = 0;
+	for (unsigned a = 0; a < theArchiveManager->numArchives(); a++) {
+		Archive* arch = theArchiveManager->getArchive(a);
+		if (arch != archive) {
+			list_resources->Append(arch->getFilename(false));
+			if (theArchiveManager->archiveIsResource(arch))
+				list_resources->Check(index);
+			index++;
+		}
+	}
 
 	// 'Open Resource' button
 	hbox = new wxBoxSizer(wxHORIZONTAL);
@@ -78,11 +99,18 @@ MapEditorConfigDialog::MapEditorConfigDialog(wxWindow* parent, Archive* archive)
 
 	// Bind events
 	choice_game_config->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &MapEditorConfigDialog::onChoiceGameConfigChanged, this);
-	list_maps->Bind(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, &MapEditorConfigDialog::onMapActivated, this);
-	//btn_new_map->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MapEditorConfigDialog::onBtnNewMap, this);
+	if (show_maplist) {
+		list_maps->Bind(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, &MapEditorConfigDialog::onMapActivated, this);
+		//btn_new_map->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MapEditorConfigDialog::onBtnNewMap, this);
+	}
 	btn_open_resource->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MapEditorConfigDialog::onBtnOpenResource, this);
 
-	SetSize(400, 500);
+	// Determine dialog height
+	int height = 500;
+	if (!show_maplist)
+		height = 300;
+
+	SetSize(400, height);
 	CenterOnParent();
 	Layout();
 }
@@ -91,6 +119,10 @@ MapEditorConfigDialog::~MapEditorConfigDialog() {
 }
 
 void MapEditorConfigDialog::populateMapList() {
+	// Do nothing if map list isn't active
+	if (!list_maps)
+		return;
+
 	// Clear list
 	list_maps->ClearAll();
 	maps.clear();
@@ -126,6 +158,13 @@ Archive::mapdesc_t MapEditorConfigDialog::selectedMap() {
 		return Archive::mapdesc_t();
 	else
 		return maps[selection];
+}
+
+bool MapEditorConfigDialog::configMatchesMap(Archive::mapdesc_t map) {
+	if (theGameConfiguration->getMapFormat() == map.format)
+		return true;
+	else
+		return false;
 }
 
 
@@ -192,6 +231,13 @@ void MapEditorConfigDialog::onBtnNewMap(wxCommandEvent& e) {
 
 void MapEditorConfigDialog::onBtnOpenResource(wxCommandEvent& e) {
 	SFileDialog::fd_info_t info;
-	if (SFileDialog::openFile(info, "Open Resource Archive", theArchiveManager->getArchiveExtensionsString(), this))
-		theArchiveManager->openArchive(info.filenames[0]);
+	if (SFileDialog::openFile(info, "Open Resource Archive", theArchiveManager->getArchiveExtensionsString(), this)) {
+		theSplashWindow->show("Opening Resource Archive", true);
+		Archive* na = theArchiveManager->openArchive(info.filenames[0], true, true);
+		theSplashWindow->hide();
+		if (na) {
+			list_resources->Append(na->getFilename(false));
+			list_resources->Check(list_resources->GetCount()-1);
+		}
+	}
 }

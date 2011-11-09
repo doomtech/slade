@@ -55,6 +55,7 @@ ArchiveManager::ArchiveManager() {
 	// Init variables
 	res_archive_open = false;
 	base_resource_archive = NULL;
+	open_silent = false;
 }
 
 /* ArchiveManager::~ArchiveManager
@@ -171,7 +172,9 @@ Archive* ArchiveManager::getArchive(string filename) {
  * Opens and adds a archive to the list, returns a pointer to the
  * newly opened and added archive, or NULL if an error occurred
  *******************************************************************/
-Archive* ArchiveManager::openArchive(string filename, bool manage) {
+Archive* ArchiveManager::openArchive(string filename, bool manage, bool silent) {
+	open_silent = silent;
+
 	Archive* new_archive = getArchive(filename);
 
 	wxLogMessage(S_FMT("Opening archive %s", filename));
@@ -262,7 +265,8 @@ Archive* ArchiveManager::openArchive(string filename, bool manage) {
 /* ArchiveManager::openArchive
  * Same as the above function, except it opens from an ArchiveEntry
  *******************************************************************/
-Archive* ArchiveManager::openArchive(ArchiveEntry* entry, bool manage) {
+Archive* ArchiveManager::openArchive(ArchiveEntry* entry, bool manage, bool silent) {
+	open_silent = silent;
 	Archive* new_archive = NULL;
 
 	// Check entry was given

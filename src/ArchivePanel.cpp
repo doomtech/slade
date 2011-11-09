@@ -59,6 +59,7 @@
 #include "SFileDialog.h"
 #include "MapEditorWindow.h"
 #include "KeyBind.h"
+#include "MapEditorConfigDialog.h"
 #include <wx/aui/auibook.h>
 #include <wx/aui/auibar.h>
 #include <wx/filename.h>
@@ -2177,11 +2178,23 @@ void ArchivePanel::onEntryListActivated(wxListEvent& e) {
 
 	// Map
 	else if (entry->getType() == EntryType::mapMarkerType()) {
-		if (theMapEditor->openMap(archive->getMapInfo(entry)))
-			theMapEditor->Show();
-		else {
-			theMapEditor->Hide();
-			wxMessageBox(S_FMT("Unable to open map %s: %s", CHR(entry->getName()), CHR(Global::error)), "Invalid map error", wxICON_ERROR);
+		// Open map editor config dialog
+		MapEditorConfigDialog dlg(this, archive, false);
+		if (dlg.ShowModal() == wxID_OK) {
+			Archive::mapdesc_t info = archive->getMapInfo(entry);
+
+			// Check selected game configuration is ok
+			if (!dlg.configMatchesMap(info))
+				wxMessageBox("Selected Game Configuration does not match the map format", "Error", wxICON_ERROR);
+			else {
+				// Attempt to open map
+				if (theMapEditor->openMap(info))
+					theMapEditor->Show();
+				else {
+					theMapEditor->Hide();
+					wxMessageBox(S_FMT("Unable to open map %s: %s", CHR(entry->getName()), CHR(Global::error)), "Invalid map error", wxICON_ERROR);
+				}
+			}
 		}
 	}
 

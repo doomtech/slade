@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Simon Judd
-Date                   :=11/08/11
+Date                   :=11/09/11
 CodeLitePath           :="/Users/simon/Library/Application Support/codelite"
 LinkerName             :=g++
 ArchiveTool            :=ar rcus
@@ -69,11 +69,11 @@ Objects=$(IntermediateDirectory)/src_GfxConvDialog$(ObjectSuffix) $(Intermediate
 	$(IntermediateDirectory)/src_PnamesList$(ObjectSuffix) $(IntermediateDirectory)/src_CTexture$(ObjectSuffix) $(IntermediateDirectory)/src_PatchTable$(ObjectSuffix) $(IntermediateDirectory)/src_TextureXList$(ObjectSuffix) $(IntermediateDirectory)/src_SFont$(ObjectSuffix) $(IntermediateDirectory)/src_SImage$(ObjectSuffix) $(IntermediateDirectory)/src_SImageFormats$(ObjectSuffix) $(IntermediateDirectory)/src_SIFormat$(ObjectSuffix) $(IntermediateDirectory)/src_Palette$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteManager$(ObjectSuffix) \
 	$(IntermediateDirectory)/src_GLTexture$(ObjectSuffix) $(IntermediateDirectory)/src_Icons$(ObjectSuffix) $(IntermediateDirectory)/src_Translation$(ObjectSuffix) $(IntermediateDirectory)/src_ResourceManager$(ObjectSuffix) $(IntermediateDirectory)/src_ColourBox$(ObjectSuffix) $(IntermediateDirectory)/src_GfxCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_OGLCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_PaletteChooser$(ObjectSuffix) $(IntermediateDirectory)/src_SplashWindow$(ObjectSuffix) \
 	$(IntermediateDirectory)/src_BrowserItem$(ObjectSuffix) $(IntermediateDirectory)/src_BrowserWindow$(ObjectSuffix) $(IntermediateDirectory)/src_BrowserCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_CTextureCanvas$(ObjectSuffix) $(IntermediateDirectory)/src_TextEditor$(ObjectSuffix) $(IntermediateDirectory)/src_TextLanguage$(ObjectSuffix) $(IntermediateDirectory)/src_TextStyle$(ObjectSuffix) $(IntermediateDirectory)/src_ArchiveEntryList$(ObjectSuffix) $(IntermediateDirectory)/src_ListView$(ObjectSuffix) $(IntermediateDirectory)/src_VirtualListView$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_ArchiveListView$(ObjectSuffix) $(IntermediateDirectory)/src_ConsolePanel$(ObjectSuffix) $(IntermediateDirectory)/src_HexEditorPanel$(ObjectSuffix) $(IntermediateDirectory)/src_ANSICanvas$(ObjectSuffix) $(IntermediateDirectory)/src_DockPanel$(ObjectSuffix) $(IntermediateDirectory)/mus2mid_mus2mid$(ObjectSuffix) $(IntermediateDirectory)/zreaders_ancientzip$(ObjectSuffix) $(IntermediateDirectory)/zreaders_files$(ObjectSuffix) $(IntermediateDirectory)/zreaders_m_alloc$(ObjectSuffix) $(IntermediateDirectory)/C_7zAlloc$(ObjectSuffix) \
-	$(IntermediateDirectory)/C_7zBuf$(ObjectSuffix) $(IntermediateDirectory)/C_7zBuf2$(ObjectSuffix) $(IntermediateDirectory)/C_7zCrc$(ObjectSuffix) $(IntermediateDirectory)/C_7zCrcOpt$(ObjectSuffix) $(IntermediateDirectory)/C_7zDec$(ObjectSuffix) $(IntermediateDirectory)/C_7zFile$(ObjectSuffix) $(IntermediateDirectory)/C_7zIn$(ObjectSuffix) $(IntermediateDirectory)/C_7zStream$(ObjectSuffix) $(IntermediateDirectory)/C_Alloc$(ObjectSuffix) $(IntermediateDirectory)/C_Bcj2$(ObjectSuffix) \
-	$(IntermediateDirectory)/C_Bra$(ObjectSuffix) $(IntermediateDirectory)/C_Bra86$(ObjectSuffix) $(IntermediateDirectory)/C_BraIA64$(ObjectSuffix) $(IntermediateDirectory)/C_CpuArch$(ObjectSuffix) $(IntermediateDirectory)/C_Delta$(ObjectSuffix) $(IntermediateDirectory)/C_LzFind$(ObjectSuffix) $(IntermediateDirectory)/C_Lzma2Dec$(ObjectSuffix) $(IntermediateDirectory)/C_Lzma2Enc$(ObjectSuffix) $(IntermediateDirectory)/C_Lzma86Dec$(ObjectSuffix) $(IntermediateDirectory)/C_Lzma86Enc$(ObjectSuffix) \
-	$(IntermediateDirectory)/C_LzmaDec$(ObjectSuffix) $(IntermediateDirectory)/C_LzmaEnc$(ObjectSuffix) $(IntermediateDirectory)/C_LzmaLib$(ObjectSuffix) $(IntermediateDirectory)/C_Ppmd7$(ObjectSuffix) $(IntermediateDirectory)/C_Ppmd7Dec$(ObjectSuffix) $(IntermediateDirectory)/C_Ppmd7Enc$(ObjectSuffix) $(IntermediateDirectory)/C_Sha256$(ObjectSuffix) $(IntermediateDirectory)/C_Xz$(ObjectSuffix) $(IntermediateDirectory)/C_XzCrc64$(ObjectSuffix) $(IntermediateDirectory)/C_XzDec$(ObjectSuffix) \
-	$(IntermediateDirectory)/C_XzEnc$(ObjectSuffix) $(IntermediateDirectory)/C_XzIn$(ObjectSuffix) $(IntermediateDirectory)/bzip2_blocksort$(ObjectSuffix) $(IntermediateDirectory)/bzip2_bzlib$(ObjectSuffix) $(IntermediateDirectory)/bzip2_compress$(ObjectSuffix) $(IntermediateDirectory)/bzip2_crctable$(ObjectSuffix) $(IntermediateDirectory)/bzip2_decompress$(ObjectSuffix) $(IntermediateDirectory)/bzip2_huffman$(ObjectSuffix) $(IntermediateDirectory)/bzip2_randtable$(ObjectSuffix) 
+	$(IntermediateDirectory)/src_ConsolePanel$(ObjectSuffix) $(IntermediateDirectory)/src_HexEditorPanel$(ObjectSuffix) $(IntermediateDirectory)/src_ANSICanvas$(ObjectSuffix) $(IntermediateDirectory)/src_DockPanel$(ObjectSuffix) $(IntermediateDirectory)/mus2mid_mus2mid$(ObjectSuffix) $(IntermediateDirectory)/zreaders_ancientzip$(ObjectSuffix) $(IntermediateDirectory)/zreaders_files$(ObjectSuffix) $(IntermediateDirectory)/zreaders_m_alloc$(ObjectSuffix) $(IntermediateDirectory)/C_7zAlloc$(ObjectSuffix) $(IntermediateDirectory)/C_7zBuf$(ObjectSuffix) \
+	$(IntermediateDirectory)/C_7zBuf2$(ObjectSuffix) $(IntermediateDirectory)/C_7zCrc$(ObjectSuffix) $(IntermediateDirectory)/C_7zCrcOpt$(ObjectSuffix) $(IntermediateDirectory)/C_7zDec$(ObjectSuffix) $(IntermediateDirectory)/C_7zFile$(ObjectSuffix) $(IntermediateDirectory)/C_7zIn$(ObjectSuffix) $(IntermediateDirectory)/C_7zStream$(ObjectSuffix) $(IntermediateDirectory)/C_Alloc$(ObjectSuffix) $(IntermediateDirectory)/C_Bcj2$(ObjectSuffix) $(IntermediateDirectory)/C_Bra$(ObjectSuffix) \
+	$(IntermediateDirectory)/C_Bra86$(ObjectSuffix) $(IntermediateDirectory)/C_BraIA64$(ObjectSuffix) $(IntermediateDirectory)/C_CpuArch$(ObjectSuffix) $(IntermediateDirectory)/C_Delta$(ObjectSuffix) $(IntermediateDirectory)/C_LzFind$(ObjectSuffix) $(IntermediateDirectory)/C_Lzma2Dec$(ObjectSuffix) $(IntermediateDirectory)/C_Lzma2Enc$(ObjectSuffix) $(IntermediateDirectory)/C_Lzma86Dec$(ObjectSuffix) $(IntermediateDirectory)/C_Lzma86Enc$(ObjectSuffix) $(IntermediateDirectory)/C_LzmaDec$(ObjectSuffix) \
+	$(IntermediateDirectory)/C_LzmaEnc$(ObjectSuffix) $(IntermediateDirectory)/C_LzmaLib$(ObjectSuffix) $(IntermediateDirectory)/C_Ppmd7$(ObjectSuffix) $(IntermediateDirectory)/C_Ppmd7Dec$(ObjectSuffix) $(IntermediateDirectory)/C_Ppmd7Enc$(ObjectSuffix) $(IntermediateDirectory)/C_Sha256$(ObjectSuffix) $(IntermediateDirectory)/C_Xz$(ObjectSuffix) $(IntermediateDirectory)/C_XzCrc64$(ObjectSuffix) $(IntermediateDirectory)/C_XzDec$(ObjectSuffix) $(IntermediateDirectory)/C_XzEnc$(ObjectSuffix) \
+	$(IntermediateDirectory)/C_XzIn$(ObjectSuffix) $(IntermediateDirectory)/bzip2_blocksort$(ObjectSuffix) $(IntermediateDirectory)/bzip2_bzlib$(ObjectSuffix) $(IntermediateDirectory)/bzip2_compress$(ObjectSuffix) $(IntermediateDirectory)/bzip2_crctable$(ObjectSuffix) $(IntermediateDirectory)/bzip2_decompress$(ObjectSuffix) $(IntermediateDirectory)/bzip2_huffman$(ObjectSuffix) $(IntermediateDirectory)/bzip2_randtable$(ObjectSuffix) 
 
 ##
 ## Main Build Targets 
@@ -1305,14 +1305,6 @@ $(IntermediateDirectory)/src_VirtualListView$(DependSuffix): src/VirtualListView
 $(IntermediateDirectory)/src_VirtualListView$(PreprocessSuffix): src/VirtualListView.cpp
 	@$(CompilerName) $(CmpOptions) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_VirtualListView$(PreprocessSuffix) "/Users/simon/dev/slade/branches/map_editor/src/VirtualListView.cpp"
 
-$(IntermediateDirectory)/src_ArchiveListView$(ObjectSuffix): src/ArchiveListView.cpp $(IntermediateDirectory)/src_ArchiveListView$(DependSuffix)
-	$(CompilerName) $(IncludePCH) $(SourceSwitch) "/Users/simon/dev/slade/branches/map_editor/src/ArchiveListView.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ArchiveListView$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/src_ArchiveListView$(DependSuffix): src/ArchiveListView.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_ArchiveListView$(ObjectSuffix) -MF$(IntermediateDirectory)/src_ArchiveListView$(DependSuffix) -MM "/Users/simon/dev/slade/branches/map_editor/src/ArchiveListView.cpp"
-
-$(IntermediateDirectory)/src_ArchiveListView$(PreprocessSuffix): src/ArchiveListView.cpp
-	@$(CompilerName) $(CmpOptions) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_ArchiveListView$(PreprocessSuffix) "/Users/simon/dev/slade/branches/map_editor/src/ArchiveListView.cpp"
-
 $(IntermediateDirectory)/src_ConsolePanel$(ObjectSuffix): src/ConsolePanel.cpp $(IntermediateDirectory)/src_ConsolePanel$(DependSuffix)
 	$(CompilerName) $(IncludePCH) $(SourceSwitch) "/Users/simon/dev/slade/branches/map_editor/src/ConsolePanel.cpp" $(CmpOptions) $(ObjectSwitch)$(IntermediateDirectory)/src_ConsolePanel$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_ConsolePanel$(DependSuffix): src/ConsolePanel.cpp
@@ -2153,9 +2145,6 @@ clean:
 	$(RM) $(IntermediateDirectory)/src_VirtualListView$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/src_VirtualListView$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/src_VirtualListView$(PreprocessSuffix)
-	$(RM) $(IntermediateDirectory)/src_ArchiveListView$(ObjectSuffix)
-	$(RM) $(IntermediateDirectory)/src_ArchiveListView$(DependSuffix)
-	$(RM) $(IntermediateDirectory)/src_ArchiveListView$(PreprocessSuffix)
 	$(RM) $(IntermediateDirectory)/src_ConsolePanel$(ObjectSuffix)
 	$(RM) $(IntermediateDirectory)/src_ConsolePanel$(DependSuffix)
 	$(RM) $(IntermediateDirectory)/src_ConsolePanel$(PreprocessSuffix)
