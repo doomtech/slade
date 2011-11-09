@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Simon Judd
-Date                   :=11/09/11
+Date                   :=11/10/11
 CodeLitePath           :="/Users/simon/Library/Application Support/codelite"
 LinkerName             :=g++
 ArchiveTool            :=ar rcus
@@ -38,8 +38,8 @@ PreprocessOnlySwitch   :=-E
 ObjectsFileList        :="/Users/simon/dev/slade/branches/map_editor/SLADE.txt"
 PCHCompileFlags        :=
 MakeDirCommand         :=mkdir -p
-CmpOptions             := -O3 -arch i386 $(shell $(WXCONFIG_PATH)wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no) $(shell $(PKGCONFIG_PATH)pkg-config --cflags ftgl)  -DSVN_REVISION_STRING=\"1142\"  $(Preprocessors)
-C_CmpOptions           := -O3 -arch i386 $(shell $(WXCONFIG_PATH)wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no)  -DSVN_REVISION_STRING=\"1142\"  $(Preprocessors)
+CmpOptions             := -O3 -arch i386 $(shell $(WXCONFIG_PATH)wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no) $(shell $(PKGCONFIG_PATH)pkg-config --cflags ftgl)  -DSVN_REVISION_STRING=\"1144\"  $(Preprocessors)
+C_CmpOptions           := -O3 -arch i386 $(shell $(WXCONFIG_PATH)wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no)  -DSVN_REVISION_STRING=\"1144\"  $(Preprocessors)
 LinkOptions            :=  -s -arch i386 $(shell $(WXCONFIG_PATH)wx-config --debug=no --libs std,gl,stc,aui,propgrid --unicode=yes) -framework SFML -framework sfml-system -framework sfml-audio $(shell $(PKGCONFIG_PATH)pkg-config --libs ftgl)
 IncludePath            := $(IncludeSwitch)/opt/local/include $(IncludeSwitch)/Users/simon/Downloads/FreeImage/Dist  $(IncludeSwitch). 
 IncludePCH             := 

@@ -88,8 +88,12 @@ MapEditorConfigDialog::MapEditorConfigDialog(wxWindow* parent, Archive* archive,
 	// 'Open Resource' button
 	hbox = new wxBoxSizer(wxHORIZONTAL);
 	framesizer->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
-	btn_open_resource = new wxButton(this, -1, "Add Resource Archive");
+	btn_open_resource = new wxButton(this, -1, "Open Archive");
 	hbox->Add(btn_open_resource, 0, wxEXPAND|wxRIGHT, 4);
+
+	// 'Open Recent' button
+	btn_recent = new wxButton(this, -1, "Open Recent");
+	hbox->Add(btn_recent, 0, wxEXPAND, 0);
 
 	// Dialog buttons
 	sizer->Add(CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND|wxBOTTOM, 4);
@@ -104,6 +108,7 @@ MapEditorConfigDialog::MapEditorConfigDialog(wxWindow* parent, Archive* archive,
 		//btn_new_map->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MapEditorConfigDialog::onBtnNewMap, this);
 	}
 	btn_open_resource->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MapEditorConfigDialog::onBtnOpenResource, this);
+	btn_recent->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MapEditorConfigDialog::onBtnRecent, this);
 
 	// Determine dialog height
 	int height = 500;
@@ -235,6 +240,23 @@ void MapEditorConfigDialog::onBtnOpenResource(wxCommandEvent& e) {
 		theSplashWindow->show("Opening Resource Archive", true);
 		Archive* na = theArchiveManager->openArchive(info.filenames[0], true, true);
 		theSplashWindow->hide();
+		if (na) {
+			list_resources->Append(na->getFilename(false));
+			list_resources->Check(list_resources->GetCount()-1);
+		}
+	}
+}
+
+void MapEditorConfigDialog::onBtnRecent(wxCommandEvent& e) {
+	// Build list of recent wad filename strings
+	wxArrayString recent;
+	for (unsigned a = 0; a < theArchiveManager->numRecentFiles(); a++)
+		recent.Add(theArchiveManager->recentFile(a));
+
+	// Show dialog
+	wxSingleChoiceDialog dlg(this, "Select a recent Archive to open", "Open Recent", recent);
+	if (dlg.ShowModal() == wxID_OK) {
+		Archive* na = theArchiveManager->openArchive(theArchiveManager->recentFile(dlg.GetSelection()), true, true);
 		if (na) {
 			list_resources->Append(na->getFilename(false));
 			list_resources->Check(list_resources->GetCount()-1);
