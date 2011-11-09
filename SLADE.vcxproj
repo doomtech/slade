@@ -115,7 +115,6 @@
     <ClCompile Include="src\ANSICanvas.cpp" />
     <ClCompile Include="src\ANSIEntryPanel.cpp" />
     <ClCompile Include="src\ArchiveEntryList.cpp" />
-    <ClCompile Include="src\ArchiveListView.cpp" />
     <ClCompile Include="src\ArchiveOperations.cpp" />
     <ClCompile Include="src\AudioEntryPanel.cpp" />
     <ClCompile Include="src\AudioPrefsPanel.cpp" />
@@ -332,7 +331,6 @@
     <ClInclude Include="src\ANSIEntryPanel.h" />
     <ClInclude Include="src\ArchiveEntryList.h" />
     <ClInclude Include="src\ArchiveFormats.h" />
-    <ClInclude Include="src\ArchiveListView.h" />
     <ClInclude Include="src\ArchiveOperations.h" />
     <ClInclude Include="src\Archives.h" />
     <ClInclude Include="src\Args.h" />

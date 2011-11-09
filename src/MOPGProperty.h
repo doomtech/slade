@@ -8,8 +8,6 @@ class MapObject;
 class MOPGProperty {
 protected:
 	int					type;
-	vector<MapObject*>*	objects;
-	virtual void		onObjectsOpened() {}
 
 public:
 	MOPGProperty(int type) { this->type = type; }
@@ -27,36 +25,36 @@ public:
 		TYPE_TFLAG,
 	};
 
-	int		getType() { return type; }
-	void	openObjects(vector<MapObject*>* objects);
+	int				getType() { return type; }
+	virtual void	openObjects(vector<MapObject*>& objects) = 0;
 };
 
 class MOPGBoolProperty : public MOPGProperty, public wxBoolProperty {
 public:
 	MOPGBoolProperty(const wxString& label = wxPG_LABEL, const wxString& name = wxPG_LABEL);
 
-	void	onObjectsOpened();
+	void	openObjects(vector<MapObject*>& objects);
 };
 
 class MOPGIntProperty : public MOPGProperty, public wxIntProperty {
 public:
 	MOPGIntProperty(const wxString& label = wxPG_LABEL, const wxString& name = wxPG_LABEL);
 
-	void	onObjectsOpened();
+	void	openObjects(vector<MapObject*>& objects);
 };
 
 class MOPGFloatProperty : public MOPGProperty, public wxFloatProperty {
 public:
 	MOPGFloatProperty(const wxString& label = wxPG_LABEL, const wxString& name = wxPG_LABEL);
 
-	void	onObjectsOpened();
+	void	openObjects(vector<MapObject*>& objects);
 };
 
 class MOPGStringProperty : public MOPGProperty, public wxStringProperty {
 public:
 	MOPGStringProperty(const wxString& label = wxPG_LABEL, const wxString& name = wxPG_LABEL);
 
-	void	onObjectsOpened();
+	void	openObjects(vector<MapObject*>& objects);
 };
 
 class MOPGActionSpecialProperty : public MOPGProperty, public wxIntProperty {
@@ -66,7 +64,7 @@ private:
 public:
 	MOPGActionSpecialProperty(const wxString& label = wxPG_LABEL, const wxString& name = wxPG_LABEL);
 
-	void	onObjectsOpened();
+	void	openObjects(vector<MapObject*>& objects);
 	void	addArgProperty(wxPGProperty* prop, int index);
 
 	// wxPGProperty overrides
@@ -81,7 +79,7 @@ private:
 public:
 	MOPGThingTypeProperty(const wxString& label = wxPG_LABEL, const wxString& name = wxPG_LABEL);
 
-	void	onObjectsOpened();
+	void	openObjects(vector<MapObject*>& objects);
 	void	addArgProperty(wxPGProperty* prop, int index);
 
 	// wxPGProperty overrides
@@ -96,7 +94,7 @@ private:
 public:
 	MOPGLineFlagProperty(const wxString& label = wxPG_LABEL, const wxString& name = wxPG_LABEL, int value = 0);
 
-	void	onObjectsOpened();
+	void	openObjects(vector<MapObject*>& objects);
 };
 
 

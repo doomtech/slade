@@ -36,13 +36,6 @@ public:
 	void	setupTypeUDMF(int objtype);
 	void	openObject(MapObject* object);
 	void	openObjects(vector<MapObject*>& objects);
-
-	void	openVertices(vector<MapObject*>& objects);
-	void	openLines(vector<MapObject*>& objects);
-	void	openSectors(vector<MapObject*>& objects);
-	void	openThings(vector<MapObject*>& objects);
-
-	void	setObjectProperty(wxPGProperty* prop, wxVariant value);
 };
 
 #endif//__MAP_OBJECT_PROPS_PANEL_H__

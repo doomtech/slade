@@ -8,29 +8,23 @@
 #include "GameConfiguration.h"
 
 
-void MOPGProperty::openObjects(vector<MapObject*>* objects) {
-	this->objects = objects;
-	onObjectsOpened();
-}
-
-
 MOPGBoolProperty::MOPGBoolProperty(const wxString& label, const wxString& name)
 : wxBoolProperty(label, name, false), MOPGProperty(MOPGProperty::TYPE_BOOL) {
 }
 
-void MOPGBoolProperty::onObjectsOpened() {
-	// Set unspecified if no objects are associated
-	if (objects->size() == 0) {
+void MOPGBoolProperty::openObjects(vector<MapObject*>& objects) {
+	// Set unspecified if no objects given
+	if (objects.size() == 0) {
 		SetValueToUnspecified();
 		return;
 	}
 
 	// Get property of first object
-	bool first = (*objects)[0]->boolProperty(GetName());
+	bool first = objects[0]->boolProperty(GetName());
 
 	// Check whether all objects share the same value
-	for (unsigned a = 1; a < objects->size(); a++) {
-		if ((*objects)[a]->boolProperty(GetName()) != first) {
+	for (unsigned a = 1; a < objects.size(); a++) {
+		if (objects[a]->boolProperty(GetName()) != first) {
 			// Different value found, set unspecified
 			SetValueToUnspecified();
 			return;
@@ -46,19 +40,19 @@ MOPGIntProperty::MOPGIntProperty(const wxString& label, const wxString& name)
 : wxIntProperty(label, name, 0), MOPGProperty(MOPGProperty::TYPE_INT) {
 }
 
-void MOPGIntProperty::onObjectsOpened() {
-	// Set unspecified if no objects are associated
-	if (objects->size() == 0) {
+void MOPGIntProperty::openObjects(vector<MapObject*>& objects) {
+	// Set unspecified if no objects given
+	if (objects.size() == 0) {
 		SetValueToUnspecified();
 		return;
 	}
 
 	// Get property of first object
-	int first = (*objects)[0]->intProperty(GetName());
+	int first = objects[0]->intProperty(GetName());
 
 	// Check whether all objects share the same value
-	for (unsigned a = 1; a < objects->size(); a++) {
-		if ((*objects)[a]->intProperty(GetName()) != first) {
+	for (unsigned a = 1; a < objects.size(); a++) {
+		if (objects[a]->intProperty(GetName()) != first) {
 			// Different value found, set unspecified
 			SetValueToUnspecified();
 			return;
@@ -74,19 +68,19 @@ MOPGFloatProperty::MOPGFloatProperty(const wxString& label, const wxString& name
 : wxFloatProperty(label, name, 0), MOPGProperty(MOPGProperty::TYPE_FLOAT) {
 }
 
-void MOPGFloatProperty::onObjectsOpened() {
-	// Set unspecified if no objects are associated
-	if (objects->size() == 0) {
+void MOPGFloatProperty::openObjects(vector<MapObject*>& objects) {
+	// Set unspecified if no objects given
+	if (objects.size() == 0) {
 		SetValueToUnspecified();
 		return;
 	}
 
 	// Get property of first object
-	double first = (*objects)[0]->floatProperty(GetName());
+	double first = objects[0]->floatProperty(GetName());
 
 	// Check whether all objects share the same value
-	for (unsigned a = 1; a < objects->size(); a++) {
-		if ((*objects)[a]->floatProperty(GetName()) != first) {
+	for (unsigned a = 1; a < objects.size(); a++) {
+		if (objects[a]->floatProperty(GetName()) != first) {
 			// Different value found, set unspecified
 			SetValueToUnspecified();
 			return;
@@ -102,19 +96,19 @@ MOPGStringProperty::MOPGStringProperty(const wxString& label, const wxString& na
 : wxStringProperty(label, name, ""), MOPGProperty(MOPGProperty::TYPE_STRING) {
 }
 
-void MOPGStringProperty::onObjectsOpened() {
-	// Set unspecified if no objects are associated
-	if (objects->size() == 0) {
+void MOPGStringProperty::openObjects(vector<MapObject*>& objects) {
+	// Set unspecified if no objects given
+	if (objects.size() == 0) {
 		SetValueToUnspecified();
 		return;
 	}
 
 	// Get property of first object
-	string first = (*objects)[0]->stringProperty(GetName());
+	string first = objects[0]->stringProperty(GetName());
 
 	// Check whether all objects share the same value
-	for (unsigned a = 1; a < objects->size(); a++) {
-		if ((*objects)[a]->stringProperty(GetName()) != first) {
+	for (unsigned a = 1; a < objects.size(); a++) {
+		if (objects[a]->stringProperty(GetName()) != first) {
 			// Different value found, set unspecified
 			SetValueToUnspecified();
 			return;
@@ -139,7 +133,7 @@ MOPGActionSpecialProperty::MOPGActionSpecialProperty(const wxString& label, cons
 	SetEditor(wxPGEditor_TextCtrlAndButton);
 }
 
-void MOPGActionSpecialProperty::onObjectsOpened() {
+void MOPGActionSpecialProperty::openObjects(vector<MapObject*>& objects) {
 	// Reset arg property names
 	for (unsigned a = 0; a < 5; a++) {
 		if (args[a]) {
@@ -148,18 +142,18 @@ void MOPGActionSpecialProperty::onObjectsOpened() {
 		}
 	}
 
-	// Set unspecified if no objects are associated
-	if (objects->size() == 0) {
+	// Set unspecified if no objects given
+	if (objects.size() == 0) {
 		SetValueToUnspecified();
 		return;
 	}
 
 	// Get property of first object
-	int first = (*objects)[0]->intProperty(GetName());
+	int first = objects[0]->intProperty(GetName());
 
 	// Check whether all objects share the same value
-	for (unsigned a = 1; a < objects->size(); a++) {
-		if ((*objects)[a]->intProperty(GetName()) != first) {
+	for (unsigned a = 1; a < objects.size(); a++) {
+		if (objects[a]->intProperty(GetName()) != first) {
 			// Different value found, set unspecified
 			SetValueToUnspecified();
 			return;
@@ -220,7 +214,7 @@ MOPGThingTypeProperty::MOPGThingTypeProperty(const wxString& label, const wxStri
 	SetEditor(wxPGEditor_TextCtrlAndButton);
 }
 
-void MOPGThingTypeProperty::onObjectsOpened() {
+void MOPGThingTypeProperty::openObjects(vector<MapObject*>& objects) {
 	// Reset arg property names
 	for (unsigned a = 0; a < 5; a++) {
 		if (args[a]) {
@@ -229,18 +223,18 @@ void MOPGThingTypeProperty::onObjectsOpened() {
 		}
 	}
 
-	// Set unspecified if no objects are associated
-	if (objects->size() == 0) {
+	// Set unspecified if no objects given
+	if (objects.size() == 0) {
 		SetValueToUnspecified();
 		return;
 	}
 
 	// Get property of first object
-	int first = (*objects)[0]->intProperty(GetName());
+	int first = objects[0]->intProperty(GetName());
 
 	// Check whether all objects share the same value
-	for (unsigned a = 1; a < objects->size(); a++) {
-		if ((*objects)[a]->intProperty(GetName()) != first) {
+	for (unsigned a = 1; a < objects.size(); a++) {
+		if (objects[a]->intProperty(GetName()) != first) {
 			// Different value found, set unspecified
 			SetValueToUnspecified();
 			return;
@@ -290,19 +284,19 @@ MOPGLineFlagProperty::MOPGLineFlagProperty(const wxString& label, const wxString
 	this->value = value;
 }
 
-void MOPGLineFlagProperty::onObjectsOpened() {
-	// Set unspecified if no objects are associated
-	if (objects->size() == 0) {
+void MOPGLineFlagProperty::openObjects(vector<MapObject*>& objects) {
+	// Set unspecified if no objects given
+	if (objects.size() == 0) {
 		SetValueToUnspecified();
 		return;
 	}
 
 	// Check flag against first object
-	bool first = theGameConfiguration->lineFlagSet(value, (MapLine*)(*objects)[0]);
+	bool first = theGameConfiguration->lineFlagSet(value, (MapLine*)objects[0]);
 
 	// Check whether all objects share the same flag setting
-	for (unsigned a = 1; a < objects->size(); a++) {
-		if (theGameConfiguration->lineFlagSet(value, (MapLine*)(*objects)[a]) != first) {
+	for (unsigned a = 1; a < objects.size(); a++) {
+		if (theGameConfiguration->lineFlagSet(value, (MapLine*)objects[a]) != first) {
 			// Different value found, set unspecified
 			SetValueToUnspecified();
 			return;

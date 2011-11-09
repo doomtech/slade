@@ -471,14 +471,15 @@ void MapObjectPropsPanel::setupTypeUDMF(int objtype) {
 
 void MapObjectPropsPanel::openObject(MapObject* object) {
 	// Do open multiple objects
-	objects.clear();
-	if (object) objects.push_back(object);
-	openObjects(objects);
+	vector<MapObject*> list;
+	if (object) list.push_back(object);
+	openObjects(list);
 }
 
 void MapObjectPropsPanel::openObjects(vector<MapObject*>& objects) {
 	// Check any objects were given
 	if (objects.size() == 0) {
+		this->objects.clear();
 		pg_properties->DisableProperty(pg_properties->GetGrid()->GetRoot());
 		pg_properties->SetPropertyValueUnspecified(pg_properties->GetGrid()->GetRoot());
 		pg_properties->Refresh();
@@ -520,76 +521,51 @@ void MapObjectPropsPanel::openObjects(vector<MapObject*>& objects) {
 	setupType(objects[0]->getObjType());
 
 	// Generic properties
-	for (unsigned a = 0; a < properties.size(); a++) {
-		switch (properties[a]->getType()) {
-		case MOPGProperty::TYPE_BOOL: ((MOPGBoolProperty*)properties[a])->openObjects(&objects); break;
-		case MOPGProperty::TYPE_INT: ((MOPGIntProperty*)properties[a])->openObjects(&objects); break;
-		case MOPGProperty::TYPE_FLOAT: ((MOPGFloatProperty*)properties[a])->openObjects(&objects); break;
-		case MOPGProperty::TYPE_STRING: ((MOPGStringProperty*)properties[a])->openObjects(&objects); break;
-		case MOPGProperty::TYPE_ASPECIAL: ((MOPGActionSpecialProperty*)properties[a])->openObjects(&objects); break;
-		case MOPGProperty::TYPE_TTYPE: ((MOPGThingTypeProperty*)properties[a])->openObjects(&objects); break;
-		default: break;
+	for (unsigned a = 0; a < properties.size(); a++)
+		properties[a]->openObjects(objects);
+
+	// Handle line sides and flags (temporary)
+	if (objects[0]->getObjType() == MOBJ_LINE) {
+		// Set flags
+		for (unsigned a = 0; a < theGameConfiguration->nLineFlags(); a++) {
+			wxPGProperty* prop = pg_properties->GetProperty(S_FMT("flag%d", a));
+			for (unsigned b = 0; b < objects.size(); b++) {
+				if (setBoolProperty(prop, theGameConfiguration->lineFlagSet(a, (MapLine*)objects[b]), b == 0))
+					break;
+			}
+		}
+
+		// Enable/disable side properties
+		wxPGProperty* prop = pg_properties->GetProperty("sidefront");
+		if (prop->GetValue().GetInteger() >= 0 || prop->IsValueUnspecified())
+			pg_properties->EnableProperty("side1");
+		else {
+			pg_properties->DisableProperty("side1");
+			pg_properties->SetPropertyValueUnspecified("side1");
+		}
+		prop = pg_properties->GetProperty("sideback");
+		if (prop->GetValue().GetInteger() >= 0 || prop->IsValueUnspecified())
+			pg_properties->EnableProperty("side2");
+		else {
+			pg_properties->DisableProperty("side2");
+			pg_properties->SetPropertyValueUnspecified("side2");
 		}
 	}
 
-	// Populate values
-	switch (objects[0]->getObjType()) {
-	case MOBJ_VERTEX: openVertices(objects); break;
-	case MOBJ_LINE: openLines(objects); break;
-	case MOBJ_SECTOR: openSectors(objects); break;
-	case MOBJ_THING: openThings(objects); break;
-	default: break;
+	// Handle thing flags (temporary)
+	if (objects[0]->getObjType() == MOBJ_THING) {
+		// Set flags
+		for (unsigned a = 0; a < theGameConfiguration->nThingFlags(); a++) {
+			wxPGProperty* prop = pg_properties->GetProperty(S_FMT("flag%d", a));
+			for (unsigned b = 0; b < objects.size(); b++) {
+				if (setBoolProperty(prop, theGameConfiguration->thingFlagSet(a, (MapThing*)objects[b]), b == 0))
+					break;
+			}
+		}
 	}
 
 	// Update internal objects list
 	this->objects.clear();
 	for (unsigned a = 0; a < objects.size(); a++)
 		this->objects.push_back(objects[a]);
-}
-
-void MapObjectPropsPanel::openVertices(vector<MapObject*>& objects) {
-}
-
-void MapObjectPropsPanel::openLines(vector<MapObject*>& objects) {
-	// Set flags
-	for (unsigned a = 0; a < theGameConfiguration->nLineFlags(); a++) {
-		wxPGProperty* prop = pg_properties->GetProperty(S_FMT("flag%d", a));
-		for (unsigned b = 0; b < objects.size(); b++) {
-			if (setBoolProperty(prop, theGameConfiguration->lineFlagSet(a, (MapLine*)objects[b]), b == 0))
-				break;
-		}
-	}
-
-	// Enable/disable side properties
-	wxPGProperty* prop = pg_properties->GetProperty("sidefront");
-	if (prop->GetValue().GetInteger() >= 0 || prop->IsValueUnspecified())
-		pg_properties->EnableProperty("side1");
-	else {
-		pg_properties->DisableProperty("side1");
-		pg_properties->SetPropertyValueUnspecified("side1");
-	}
-	prop = pg_properties->GetProperty("sideback");
-	if (prop->GetValue().GetInteger() >= 0 || prop->IsValueUnspecified())
-		pg_properties->EnableProperty("side2");
-	else {
-		pg_properties->DisableProperty("side2");
-		pg_properties->SetPropertyValueUnspecified("side2");
-	}
-}
-
-void MapObjectPropsPanel::openSectors(vector<MapObject*>& objects) {
-}
-
-void MapObjectPropsPanel::openThings(vector<MapObject*>& objects) {
-	// Set flags
-	for (unsigned a = 0; a < theGameConfiguration->nThingFlags(); a++) {
-		wxPGProperty* prop = pg_properties->GetProperty(S_FMT("flag%d", a));
-		for (unsigned b = 0; b < objects.size(); b++) {
-			if (setBoolProperty(prop, theGameConfiguration->thingFlagSet(a, (MapThing*)objects[b]), b == 0))
-				break;
-		}
-	}
-}
-
-void MapObjectPropsPanel::setObjectProperty(wxPGProperty* prop, wxVariant value) {
 }

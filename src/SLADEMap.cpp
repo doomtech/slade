@@ -1421,18 +1421,10 @@ double SLADEMap::fastDistanceToLine(double x, double y, unsigned line, double mi
 	double len = l->getLength();
 	double mx, ix, iy;
 	mx = (-l->vertex1->x+x)*l->ca + (-l->vertex1->y+y)*l->sa;
-	if (mx <= 0) {
-		ix = l->vertex1->x;
-		iy = l->vertex1->y;
-	}
-	else if (mx >= len) {
-		ix = l->vertex2->x;
-		iy = l->vertex2->y;
-	}
-	else {
-		ix = l->vertex1->x + mx*l->ca;
-		iy = l->vertex1->y + mx*l->sa;
-	}
+	if (mx <= 0)		mx = 0.00001;		// Clip intersection to line (but not exactly on endpoints)
+	else if (mx >= len)	mx = len - 0.00001;	// ^^
+	ix = l->vertex1->x + mx*l->ca;
+	iy = l->vertex1->y + mx*l->sa;
 
 	// Calculate distance to line
 	return sqrt((ix-x)*(ix-x) + (iy-y)*(iy-y));
@@ -1520,49 +1512,19 @@ vector<int> SLADEMap::nearestThingMulti(double x, double y) {
 }
 
 int SLADEMap::inSector(double x, double y) {
-	// Go through sectors
-	double min_dist = 999999999;
-	int index = -1;
-	for (unsigned a = 0; a < sectors.size(); a++) {
-		// Check with sector bbox
-		if (!sectors[a]->boundingBox().point_within(x, y))
-			continue;
+	// Find nearest line
+	int nline = nearestLine(x, y, 999999);
+	if (nline < 0) return -1;
 
-		// Find nearest line in the sector
-		double mdist = min_dist;
-		int lindex = -1;
-		MapSide* cside = NULL;
-		for (unsigned s = 0; s < sectors[a]->connected_sides.size(); s++) {
-			// Determine distance to side's parent line
-			double dist = fastDistanceToLine(x, y, sectors[a]->connected_sides[s]->parent->index, min_dist);
+	// Check what side of the line the point is on
+	MapLine* line = lines[nline];
+	double side = MathStuff::lineSide(x, y, line->x1(), line->y1(), line->x2(), line->y2());
 
-			// Check if it's the closest line so far
-			if (dist < mdist) {
-				mdist = dist;
-				cside = sectors[a]->connected_sides[s];
-				lindex = cside->parent->index;
-			}
-		}
-
-		// Check that the point is on the correct side of the line
-		if (lindex >= 0) {
-			MapLine* line = lines[lindex];
-			if (MathStuff::lineSide(x, y, line->vertex1->x, line->vertex1->y, line->vertex2->x, line->vertex2->y) >= 0) {
-				if (line->side1 == cside) {
-					min_dist = mdist;
-					index = a;
-				}
-			}
-			else {
-				if (line->side2 == cside) {
-					min_dist = mdist;
-					index = a;
-				}
-			}
-		}
-	}
-
-	return index;
+	// Return the sector on that side
+	if (side >= 0)
+		return sectorIndex(line->frontSector());
+	else
+		return sectorIndex(line->backSector());
 }
 
 bbox_t SLADEMap::getMapBBox() {
