@@ -927,8 +927,11 @@ void GfxEntryPanel::onAnnouncement(Announcer* announcer, string event_name, MemC
  *******************************************************************/
 void GfxEntryPanel::onBtnNextImg(wxCommandEvent& e) {
 	int num = gfx_canvas->getImage()->getSize();
-	if (num > 1 && cur_index < num - 1) {
-		loadEntry(entry, cur_index + 1);
+	if (num > 1) { 
+		if (cur_index < num - 1)
+			loadEntry(entry, cur_index + 1);
+		else
+			loadEntry(entry, 0);
 	}
 }
 
@@ -937,8 +940,11 @@ void GfxEntryPanel::onBtnNextImg(wxCommandEvent& e) {
  *******************************************************************/
 void GfxEntryPanel::onBtnPrevImg(wxCommandEvent& e) {
 	int num = gfx_canvas->getImage()->getSize();
-	if (num > 1 && cur_index > 0) {
-		loadEntry(entry, cur_index - 1);
+	if (num > 1) {
+		if (cur_index > 0)
+			loadEntry(entry, cur_index - 1);
+		else
+			loadEntry(entry, num - 1);
 	}
 }
 

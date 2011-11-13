@@ -439,7 +439,7 @@ protected:
 		}
 
 		// Convert from column-major to row-major
-		image.rotate(90);
+		image.rotate(270);
 		image.mirror(true);
 		
 		// Set offsets

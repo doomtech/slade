@@ -206,6 +206,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\MapEditorConfigDialog.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\MapEditorConfigDialog.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\ModifyOffsetsDialog.cpp"
 				>
 			</File>
@@ -238,6 +246,14 @@
 				</File>
 				<File
 					RelativePath=".\src\ACSPrefsPanel.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\AdvancedPrefsPanel.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\AdvancedPrefsPanel.h"
 					>
 				</File>
 				<File
@@ -294,6 +310,22 @@
 				</File>
 				<File
 					RelativePath=".\src\InterfacePrefsPanel.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\MapDisplayPrefsPanel.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\MapDisplayPrefsPanel.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\MapEditorPrefsPanel.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\MapEditorPrefsPanel.h"
 					>
 				</File>
 				<File
@@ -877,6 +909,14 @@
 				Name="UI Elements"
 				>
 				<File
+					RelativePath=".\src\ActionSpecialTreeView.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ActionSpecialTreeView.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\MapCanvas.cpp"
 					>
 				</File>
@@ -890,6 +930,14 @@
 				</File>
 				<File
 					RelativePath=".\src\MCAnimations.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ThingTypeTreeView.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ThingTypeTreeView.h"
 					>
 				</File>
 				<Filter
@@ -928,6 +976,26 @@
 						>
 					</File>
 				</Filter>
+				<Filter
+					Name="MapObjectPropsPanel"
+					>
+					<File
+						RelativePath=".\src\MapObjectPropsPanel.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\MapObjectPropsPanel.h"
+						>
+					</File>
+					<File
+						RelativePath=".\src\MOPGProperty.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\MOPGProperty.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="SLADEMap"
@@ -938,6 +1006,14 @@
 				</File>
 				<File
 					RelativePath=".\src\MapLine.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\MapObject.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\MapObject.h"
 					>
 				</File>
 				<File
@@ -993,6 +1069,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\Args.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\GameConfiguration.cpp"
 					>
 				</File>
@@ -1006,6 +1086,14 @@
 				</File>
 				<File
 					RelativePath=".\src\ThingType.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\UDMFProperty.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\UDMFProperty.h"
 					>
 				</File>
 			</Filter>
