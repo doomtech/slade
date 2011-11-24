@@ -818,7 +818,7 @@ void TextureXPanel::exportTexture() {
 		// Get image and conversion info
 		SImage* image = gcd.getItemImage(a);
 		SIFormat* format = gcd.getItemFormat(a);
-		
+
 		// Write converted image back to entry
 		MemChunk mc;
 		format->saveImage(*image, mc, force_rgba ? NULL : gcd.getItemPalette(a));
@@ -887,6 +887,13 @@ bool TextureXPanel::handleAction(string id) {
  * Called when an item on the texture list is selected
  *******************************************************************/
 void TextureXPanel::onTextureListSelect(wxListEvent& e) {
+	// Do nothing if multiple textures are selected
+	if (list_textures->GetSelectedItemCount() > 1) {
+		tex_current = NULL;
+		texture_editor->openTexture(tex_current, &texturex);
+		return;
+	}
+
 	// Get selected texture
 	CTexture* tex = texturex.getTexture(e.GetIndex());
 

@@ -131,6 +131,9 @@ void CTextureCanvas::clearTexture() {
 
 	// Clear full preview
 	tex_preview.clear();
+
+	// Refresh canvas
+	Refresh();
 }
 
 /* CTextureCanvas::clearPatchTextures
@@ -140,6 +143,9 @@ void CTextureCanvas::clearPatchTextures() {
 	for (size_t a = 0; a < patch_textures.size(); a++)
 		delete patch_textures[a];
 	patch_textures.clear();
+
+	// Refresh canvas
+	Refresh();
 }
 
 /* CTextureCanvas::updatePatchTextures
