@@ -247,6 +247,12 @@ entry_types
 		icon = "e_texturex";
 		text_language = "z_textures";
 	}
+	
+	palvers : text
+	{
+		name = "Paletted Texture Substitutions";
+		match_name = "palvers";
+	}
 
 	udmf_textmap : text
 	{
