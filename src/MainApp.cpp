@@ -206,8 +206,20 @@ string appPath(string filename, int dir) {
 	else if (dir == DIR_APP)
 		return dir_app + sep + filename;
 	else if (dir == DIR_TEMP) {
-		if (temp_use_appdir)
+		if (temp_use_appdir) {
+			// Create temp dir if necessary
+			string dir_temp = dir_app + sep + "temp";
+			if (!wxDirExists(dir_temp)) {
+				if (!wxMkdir(dir_temp)) {
+					// Unable to create it, just use system temp dir
+					wxMessageBox(S_FMT("Unable to create temp directory \"%s\", using system temp directory instead", dir_temp.c_str()), "Error", wxICON_ERROR);
+					temp_use_appdir = false;
+					return wxStandardPaths::Get().GetTempDir().Append(sep).Append(filename);
+				}
+			}
+
 			return dir_app + sep + "temp" + sep + filename;
+		}
 		else
 			return wxStandardPaths::Get().GetTempDir().Append(sep).Append(filename);
 	}
@@ -285,18 +297,6 @@ bool MainApp::initDirectories() {
 		if (!wxMkdir(dir_user)) {
 			wxMessageBox(S_FMT("Unable to create user directory \"%s\"", dir_user.c_str()), "Error", wxICON_ERROR);
 			return false;
-		}
-	}
-
-	// Create temp dir if necessary
-	if (temp_use_appdir) {
-		string dir_temp = dir_app + sep + "temp";
-		if (!wxDirExists(dir_temp)) {
-			if (!wxMkdir(dir_temp)) {
-				// Unable to create it, just use system temp dir
-				wxMessageBox(S_FMT("Unable to create temp directory \"%s\", using system temp directory instead", dir_temp.c_str()), "Error", wxICON_ERROR);
-				temp_use_appdir = false;
-			}
 		}
 	}
 
