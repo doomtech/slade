@@ -799,7 +799,7 @@ vector<Archive::mapdesc_t> WadArchive::detectMaps() {
 		}
 
 		// If we've found what might be a map
-		if (maplump_found) {
+		if (maplump_found && entry->prevEntry()) {
 			// Save map header entry
 			ArchiveEntry* header_entry = entry->prevEntry();
 
