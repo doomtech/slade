@@ -241,6 +241,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\AdvancedPrefsPanel.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\AdvancedPrefsPanel.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\AudioPrefsPanel.cpp"
 					>
 				</File>
