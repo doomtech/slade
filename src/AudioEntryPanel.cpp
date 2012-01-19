@@ -56,6 +56,7 @@ CVAR(Bool, snd_autoplay, false, CVAR_SAVE)
 AudioEntryPanel::AudioEntryPanel(wxWindow* parent) : EntryPanel(parent, "audio") {
 	// Init variables
 	timer_seek = new wxTimer(this);
+	sound_buffer = NULL;
 
 	// Setup sizer
 	wxGridBagSizer* sizer_gb = new wxGridBagSizer(4, 4);
@@ -206,18 +207,22 @@ bool AudioEntryPanel::open() {
 bool AudioEntryPanel::openAudio(MemChunk& audio, string filename) {
 	// Stop if sound currently playing
 	sound.Stop();
-	sound.ResetBuffer();
 	music.Stop();
 
+	// (Re)create sound buffer
+	if (sound_buffer)
+		delete sound_buffer;
+	sound_buffer = new sf::SoundBuffer();
+
 	// Load into buffer
-	if (sound_buffer.LoadFromMemory((const char*)audio.getData(), audio.getSize())) {
+	if (sound_buffer->LoadFromMemory((const char*)audio.getData(), audio.getSize())) {
 		// Bind to sound
-		sound.SetBuffer(sound_buffer);
+		sound.SetBuffer(*sound_buffer);
 		audio_music = false;
 
 		// Enable play controls
 		slider_seek->Enable();
-		slider_seek->SetRange(0, sound_buffer.GetDuration()*100);
+		slider_seek->SetRange(0, sound_buffer->GetDuration()*100);
 		btn_play->Enable();
 		btn_pause->Enable();
 		btn_stop->Enable();

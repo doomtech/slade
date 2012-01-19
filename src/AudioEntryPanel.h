@@ -20,10 +20,10 @@ private:
 	wxSlider*		slider_volume;
 	wxTimer*		timer_seek;
 
-	bool			audio_music;
-	sf::SoundBuffer	sound_buffer;
-	sf::Sound		sound;
-	sf::Music		music;
+	bool				audio_music;
+	sf::SoundBuffer*	sound_buffer;
+	sf::Sound			sound;
+	sf::Music			music;
 
 public:
 	AudioEntryPanel(wxWindow* parent);
