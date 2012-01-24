@@ -75,7 +75,7 @@ MapEditorConfigDialog::MapEditorConfigDialog(wxWindow* parent, Archive* archive,
 
 	// Populate resource archive list
 	int index = 0;
-	for (unsigned a = 0; a < theArchiveManager->numArchives(); a++) {
+	for (int a = 0; a < theArchiveManager->numArchives(); a++) {
 		Archive* arch = theArchiveManager->getArchive(a);
 		if (arch != archive) {
 			list_resources->Append(arch->getFilename(false));
@@ -159,7 +159,7 @@ Archive::mapdesc_t MapEditorConfigDialog::selectedMap() {
 		selection = sel[0];
 
 	// Check if a map is selected
-	if (selection < 0 || selection >= maps.size())
+	if (selection < 0 || selection >= (int)maps.size())
 		return Archive::mapdesc_t();
 	else
 		return maps[selection];

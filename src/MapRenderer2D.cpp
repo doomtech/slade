@@ -262,7 +262,7 @@ void MapRenderer2D::renderLinesImmediate(bool show_direction) {
 	// Draw all lines
 	rgba_t col;
 	MapLine* line = NULL;
-	double x1, y1, x2, y2, tablen;
+	double x1, y1, x2, y2;
 	glBegin(GL_LINES);
 	for (unsigned a = 0; a < map->nLines(); a++) {
 		// Get line info
@@ -410,7 +410,7 @@ void MapRenderer2D::renderTaggedLines(vector<MapLine*>& lines, float fade) {
 	glLineWidth(line_width*3);
 
 	// Go through tagged lines
-	double x1, y1, x2, y2, xmid, ymid, tablen;
+	double x1, y1, x2, y2;
 	for (unsigned a = 0; a < lines.size(); a++) {
 		// Render line
 		MapLine* line = lines[a];
@@ -1627,9 +1627,7 @@ void MapRenderer2D::updateLinesVBO(bool show_direction) {
 	glvert_t* lines = new glvert_t[nverts];
 	unsigned v = 0;
 	rgba_t col;
-	float x1, y1, x2, y2;
 	float alpha;
-	double tablen;
 	for (unsigned a = 0; a < map->nLines(); a++) {
 		MapLine* line = map->getLine(a);
 

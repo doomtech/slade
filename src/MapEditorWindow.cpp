@@ -206,6 +206,10 @@ bool MapEditorWindow::openMap(Archive::mapdesc_t map) {
 	return ok;
 }
 
+void MapEditorWindow::forceRefresh() {
+	map_canvas->Refresh();
+}
+
 /* MapEditorWindow::handleAction
  * Handles the action [id]. Returns true if the action was handled,
  * false otherwise
@@ -219,7 +223,7 @@ bool MapEditorWindow::handleAction(string id) {
 	if (id == "mapw_showproperties") {
 		wxAuiManager *m_mgr = wxAuiManager::GetManager(this);
 		wxAuiPaneInfo& p_inf = m_mgr->GetPane("item_props");
-		
+
 		// Toggle window and focus
 		p_inf.Show(!p_inf.IsShown());
 		map_canvas->SetFocus();
@@ -232,7 +236,7 @@ bool MapEditorWindow::handleAction(string id) {
 	else if (id == "mapw_showconsole") {
 		wxAuiManager *m_mgr = wxAuiManager::GetManager(this);
 		wxAuiPaneInfo& p_inf = m_mgr->GetPane("console");
-		
+
 		// Toggle window and focus
 		if (p_inf.IsShown()) {
 			p_inf.Show(false);

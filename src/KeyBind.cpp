@@ -318,7 +318,7 @@ void KeyBind::initBinds() {
 	// Map Editor 2D (me2d*)
 	addBind("me2d_clear_selection", keypress_t("C"), "Clear selection");
 	addBind("me2d_pan_view", keypress_t("mouse3"), "Pan View");
-	addBind("me2d_pan_view", keypress_t("space", false, true));
+	addBind("me2d_pan_view", keypress_t("space", true));
 	addBind("me2d_move", keypress_t("Z"), "Toggle item move mode");
 	addBind("me2d_zoom_in_m", keypress_t("mwheelup"), "Zoom in (towards mouse)");
 	addBind("me2d_zoom_out_m", keypress_t("mwheeldown"), "Zoom out (towards mouse)");

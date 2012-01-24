@@ -15,10 +15,14 @@ private:
 	wxStaticText*			label_item;
 	vector<MapObject*>		objects;
 	vector<MOPGProperty*>	properties;
+	wxButton*				btn_reset;
+	wxButton*				btn_apply;
 
 public:
 	MapObjectPropsPanel(wxWindow* parent);
 	~MapObjectPropsPanel();
+
+	vector<MapObject*>&	getObjects() { return objects; }
 
 	MOPGProperty*	addBoolProperty(wxPGProperty* group, string label, string propname, bool readonly = false);
 	MOPGProperty*	addIntProperty(wxPGProperty* group, string label, string propname, bool readonly = false);
@@ -36,6 +40,10 @@ public:
 	void	setupTypeUDMF(int objtype);
 	void	openObject(MapObject* object);
 	void	openObjects(vector<MapObject*>& objects);
+
+	// Events
+	void	onBtnApply(wxCommandEvent& e);
+	void	onBtnReset(wxCommandEvent& e);
 };
 
 #endif//__MAP_OBJECT_PROPS_PANEL_H__

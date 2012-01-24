@@ -342,7 +342,7 @@ void ArchiveOperations::removeUnusedTextures(Archive* archive) {
 			string texname = txlist.getTexture(t)->getName();
 
 			// Check for animation start
-			for (unsigned b = 0; b < n_tex_anim; b++) {
+			for (int b = 0; b < n_tex_anim; b++) {
 				if (texname == tex_anim_start[b]) {
 					anim = true;
 					break;
@@ -351,7 +351,7 @@ void ArchiveOperations::removeUnusedTextures(Archive* archive) {
 
 			// Check for animation end
 			bool thisend = false;
-			for (unsigned b = 0; b < n_tex_anim; b++) {
+			for (int b = 0; b < n_tex_anim; b++) {
 				if (texname == tex_anim_end[b]) {
 					anim = false;
 					thisend = true;
@@ -520,7 +520,7 @@ void ArchiveOperations::removeUnusedFlats(Archive* archive) {
 
 		// Check for animation start
 		string flatname = flats[a]->getName(true);
-		for (unsigned b = 0; b < n_flat_anim; b++) {
+		for (int b = 0; b < n_flat_anim; b++) {
 			if (flatname == flat_anim_start[b]) {
 				anim = true;
 				wxLogMessage("%s anim start", CHR(flatname));
@@ -530,7 +530,7 @@ void ArchiveOperations::removeUnusedFlats(Archive* archive) {
 
 		// Check for animation end
 		bool thisend = false;
-		for (unsigned b = 0; b < n_flat_anim; b++) {
+		for (int b = 0; b < n_flat_anim; b++) {
 			if (flatname == flat_anim_end[b]) {
 				anim = false;
 				thisend = true;

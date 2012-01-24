@@ -43,7 +43,7 @@ void ActionSpecialTreeView::showSpecial(int special) {
 	// Go through item groups
 	for (unsigned a = 0; a < groups.size(); a++) {
 		// Go through group items
-		for (unsigned b = 0; b < GetChildCount(groups[a].item); b++) {
+		for (int b = 0; b < GetChildCount(groups[a].item); b++) {
 			wxDataViewItem item = GetNthChild(groups[a].item, b);
 
 			// Select+show if match

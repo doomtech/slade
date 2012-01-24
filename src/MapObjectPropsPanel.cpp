@@ -5,9 +5,9 @@
 #include "GameConfiguration.h"
 #include "SLADEMap.h"
 #include "MOPGProperty.h"
+#include "MapEditorWindow.h"
 #include <wx/propgrid/propgrid.h>
 #include <wx/propgrid/advprops.h>
-#include <wx/propgrid/manager.h>
 
 
 MapObjectPropsPanel::MapObjectPropsPanel(wxWindow* parent) : wxPanel(parent, -1) {
@@ -21,15 +21,32 @@ MapObjectPropsPanel::MapObjectPropsPanel(wxWindow* parent) : wxPanel(parent, -1)
 	// Add item label
 	//label_item = new wxStaticText(this, -1, "");
 	//sizer->Add(label_item, 0, wxEXPAND|wxALL, 4);
-	sizer->AddSpacer(4);
+	//sizer->AddSpacer(4);
 
 	// Add property grid
 	pg_properties = new wxPropertyGrid(this, -1, wxDefaultPosition, wxDefaultSize, wxPG_TOOLTIPS|wxPG_SPLITTER_AUTO_CENTER);
 	sizer->Add(pg_properties, 1, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
+	// Add buttons
+	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
+	sizer->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+	hbox->AddStretchSpacer(1);
+
+	// Reset button
+	btn_reset = new wxButton(this, -1, "Reset");
+	hbox->Add(btn_reset, 0, wxEXPAND|wxRIGHT, 4);
+
+	// Apply button
+	btn_apply = new wxButton(this, -1, "Apply Changes");
+	hbox->Add(btn_apply, 0, wxEXPAND);
+
 	wxPGCell cell;
 	cell.SetText("<multiple values>");
 	pg_properties->GetGrid()->SetUnspecifiedValueAppearance(cell);
+
+	// Bind events
+	btn_apply->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MapObjectPropsPanel::onBtnApply, this);
+	btn_reset->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MapObjectPropsPanel::onBtnReset, this);
 
 	Layout();
 }
@@ -40,6 +57,7 @@ MapObjectPropsPanel::~MapObjectPropsPanel() {
 MOPGProperty* MapObjectPropsPanel::addBoolProperty(wxPGProperty* group, string label, string propname, bool readonly) {
 	// Create property
 	MOPGBoolProperty* prop = new MOPGBoolProperty(label, propname);
+	prop->setParent(this);
 
 	// Add it
 	properties.push_back(prop);
@@ -55,6 +73,7 @@ MOPGProperty* MapObjectPropsPanel::addBoolProperty(wxPGProperty* group, string l
 MOPGProperty* MapObjectPropsPanel::addIntProperty(wxPGProperty* group, string label, string propname, bool readonly) {
 	// Create property
 	MOPGIntProperty* prop = new MOPGIntProperty(label, propname);
+	prop->setParent(this);
 
 	// Add it
 	properties.push_back(prop);
@@ -70,6 +89,7 @@ MOPGProperty* MapObjectPropsPanel::addIntProperty(wxPGProperty* group, string la
 MOPGProperty* MapObjectPropsPanel::addFloatProperty(wxPGProperty* group, string label, string propname, bool readonly) {
 	// Create property
 	MOPGFloatProperty* prop = new MOPGFloatProperty(label, propname);
+	prop->setParent(this);
 
 	// Add it
 	properties.push_back(prop);
@@ -85,6 +105,7 @@ MOPGProperty* MapObjectPropsPanel::addFloatProperty(wxPGProperty* group, string 
 MOPGProperty* MapObjectPropsPanel::addStringProperty(wxPGProperty* group, string label, string propname, bool readonly) {
 	// Create property
 	MOPGStringProperty* prop = new MOPGStringProperty(label, propname);
+	prop->setParent(this);
 
 	// Add it
 	properties.push_back(prop);
@@ -216,6 +237,7 @@ void MapObjectPropsPanel::addUDMFProperty(UDMFProperty* prop, int objtype, wxPGP
 		addIntProperty(group, prop->getName(), propname);
 	else if (prop->getType() == UDMFProperty::TYPE_ASPECIAL) {
 		MOPGActionSpecialProperty* prop_as = new MOPGActionSpecialProperty("Special", propname);
+		prop_as->setParent(this);
 		properties.push_back(prop_as);
 		pg_properties->AppendIn(group, prop_as);
 	}
@@ -225,6 +247,7 @@ void MapObjectPropsPanel::addUDMFProperty(UDMFProperty* prop, int objtype, wxPGP
 	}
 	else if (prop->getType() == UDMFProperty::TYPE_TTYPE) {
 		MOPGThingTypeProperty* prop_tt = new MOPGThingTypeProperty("Type", propname);
+		prop_tt->setParent(this);
 		properties.push_back(prop_tt);
 		pg_properties->AppendIn(group, prop_tt);
 	}
@@ -265,6 +288,7 @@ void MapObjectPropsPanel::setupType(int objtype) {
 
 		// Add special
 		MOPGActionSpecialProperty* prop_as = new MOPGActionSpecialProperty("Special", "special");
+		prop_as->setParent(this);
 		properties.push_back(prop_as);
 		pg_properties->AppendIn(g_special, prop_as);
 
@@ -278,7 +302,7 @@ void MapObjectPropsPanel::setupType(int objtype) {
 		wxPGProperty* g_flags = pg_properties->Append(new wxPropertyCategory("Flags"));
 
 		// Add flags
-		for (unsigned a = 0; a < theGameConfiguration->nLineFlags(); a++)
+		for (int a = 0; a < theGameConfiguration->nLineFlags(); a++)
 			pg_properties->AppendIn(g_flags, new wxBoolProperty(theGameConfiguration->lineFlag(a), S_FMT("flag%d", a)));
 
 		// Hide args if doom format
@@ -374,6 +398,7 @@ void MapObjectPropsPanel::setupType(int objtype) {
 
 		// Add type
 		MOPGThingTypeProperty* prop_tt = new MOPGThingTypeProperty("Type", "type");
+		prop_tt->setParent(this);
 		properties.push_back(prop_tt);
 		pg_properties->AppendIn(g_basic, prop_tt);
 
@@ -391,7 +416,7 @@ void MapObjectPropsPanel::setupType(int objtype) {
 		wxPGProperty* g_flags = pg_properties->Append(new wxPropertyCategory("Flags"));
 
 		// Add flags
-		for (unsigned a = 0; a < theGameConfiguration->nThingFlags(); a++)
+		for (int a = 0; a < theGameConfiguration->nThingFlags(); a++)
 			pg_properties->AppendIn(g_flags, new wxBoolProperty(theGameConfiguration->thingFlag(a), S_FMT("flag%d", a)));
 
 		// Add 'Scripting Special' group
@@ -399,6 +424,7 @@ void MapObjectPropsPanel::setupType(int objtype) {
 
 		// Add special
 		MOPGActionSpecialProperty* prop_as = new MOPGActionSpecialProperty("Special", "special");
+		prop_as->setParent(this);
 		properties.push_back(prop_as);
 		pg_properties->AppendIn(g_special, prop_as);
 
@@ -443,6 +469,7 @@ void MapObjectPropsPanel::setupTypeUDMF(int objtype) {
 		for (unsigned a = 0; a < sprops.size(); a++)
 			addUDMFProperty(sprops[a].property, objtype, g_side1);
 
+		// Back side
 		wxPGProperty* g_side2 = pg_properties->Append(new wxPropertyCategory("Back Side", "side2"));
 		for (unsigned a = 0; a < sprops.size(); a++)
 			addUDMFProperty(sprops[a].property, objtype, g_side2);
@@ -483,42 +510,45 @@ void MapObjectPropsPanel::openObjects(vector<MapObject*>& objects) {
 		pg_properties->DisableProperty(pg_properties->GetGrid()->GetRoot());
 		pg_properties->SetPropertyValueUnspecified(pg_properties->GetGrid()->GetRoot());
 		pg_properties->Refresh();
+		//label_item->SetLabel("Nothing selected");
 		return;
 	}
 	else
 		pg_properties->EnableProperty(pg_properties->GetGrid()->GetRoot());
 
-	// UDMF
-	if (theGameConfiguration->getMapFormat() == MAP_UDMF) {
-		setupTypeUDMF(objects[0]->getObjType());
-		vector<udmfp_t> udmfprops = theGameConfiguration->allUDMFProperties(objects[0]->getObjType());
-		for (unsigned a = 0; a < udmfprops.size(); a++) {
-			int proptype = udmfprops[a].property->getType();
-			string propname = udmfprops[a].property->getProperty();
-			wxPGProperty* prop = pg_properties->GetProperty(propname);
-			for (unsigned b = 0; b < objects.size(); b++) {
-				if (proptype == UDMFProperty::TYPE_BOOL) {
-					if (setBoolProperty(prop, objects[b]->boolProperty(propname), (b == 0)))
-						break;
-				}
-				else if (proptype == UDMFProperty::TYPE_INT) {
-					if (setIntProperty(prop, objects[b]->intProperty(propname), (b == 0)))
-						break;
-				}
-				else if (proptype == UDMFProperty::TYPE_FLOAT) {
-					if (setFloatProperty(prop, objects[b]->floatProperty(propname), (b == 0)))
-						break;
-				}
-				else if (proptype == UDMFProperty::TYPE_STRING) {
-					if (setStringProperty(prop, objects[b]->stringProperty(propname), (b == 0)))
-						break;
-				}
-			}
-		}
-	}
-
 	// Setup property grid for the object type
-	setupType(objects[0]->getObjType());
+	if (theGameConfiguration->getMapFormat() == MAP_UDMF)
+		setupTypeUDMF(objects[0]->getObjType());
+	else
+		setupType(objects[0]->getObjType());
+
+	// Set item label
+	/*
+	if (objects.size() == 1) {
+		if (last_type == MOBJ_VERTEX)
+			label_item->SetLabel(S_FMT("Vertex #%d properties", objects[0]->getIndex()));
+		else if (last_type == MOBJ_LINE)
+			label_item->SetLabel(S_FMT("Line #%d properties", objects[0]->getIndex()));
+		else if (last_type == MOBJ_SECTOR)
+			label_item->SetLabel(S_FMT("Sector #%d properties", objects[0]->getIndex()));
+		else if (last_type == MOBJ_THING)
+			label_item->SetLabel(S_FMT("Thing #%d properties", objects[0]->getIndex()));
+		else
+			label_item->SetLabel(S_FMT("Object #%d properties", objects[0]->getIndex()));
+	}
+	else {
+		if (last_type == MOBJ_VERTEX)
+			label_item->SetLabel(S_FMT("%d Vertices selected", objects.size()));
+		else if (last_type == MOBJ_LINE)
+			label_item->SetLabel(S_FMT("%d Lines selected", objects.size()));
+		else if (last_type == MOBJ_SECTOR)
+			label_item->SetLabel(S_FMT("%d Sectors selected", objects.size()));
+		else if (last_type == MOBJ_THING)
+			label_item->SetLabel(S_FMT("%d Things selected", objects.size()));
+		else
+			label_item->SetLabel(S_FMT("%d Objects selected", objects.size()));
+	}
+	*/
 
 	// Generic properties
 	for (unsigned a = 0; a < properties.size(); a++)
@@ -527,7 +557,7 @@ void MapObjectPropsPanel::openObjects(vector<MapObject*>& objects) {
 	// Handle line sides and flags (temporary)
 	if (objects[0]->getObjType() == MOBJ_LINE) {
 		// Set flags
-		for (unsigned a = 0; a < theGameConfiguration->nLineFlags(); a++) {
+		for (int a = 0; a < theGameConfiguration->nLineFlags(); a++) {
 			wxPGProperty* prop = pg_properties->GetProperty(S_FMT("flag%d", a));
 			for (unsigned b = 0; b < objects.size(); b++) {
 				if (setBoolProperty(prop, theGameConfiguration->lineFlagSet(a, (MapLine*)objects[b]), b == 0))
@@ -555,7 +585,7 @@ void MapObjectPropsPanel::openObjects(vector<MapObject*>& objects) {
 	// Handle thing flags (temporary)
 	if (objects[0]->getObjType() == MOBJ_THING) {
 		// Set flags
-		for (unsigned a = 0; a < theGameConfiguration->nThingFlags(); a++) {
+		for (int a = 0; a < theGameConfiguration->nThingFlags(); a++) {
 			wxPGProperty* prop = pg_properties->GetProperty(S_FMT("flag%d", a));
 			for (unsigned b = 0; b < objects.size(); b++) {
 				if (setBoolProperty(prop, theGameConfiguration->thingFlagSet(a, (MapThing*)objects[b]), b == 0))
@@ -568,4 +598,22 @@ void MapObjectPropsPanel::openObjects(vector<MapObject*>& objects) {
 	this->objects.clear();
 	for (unsigned a = 0; a < objects.size(); a++)
 		this->objects.push_back(objects[a]);
+
+	pg_properties->Refresh();
+}
+
+
+void MapObjectPropsPanel::onBtnApply(wxCommandEvent& e) {
+	// Go through all current properties and apply the current value
+	for (unsigned a = 0; a < properties.size(); a++)
+		properties[a]->applyValue();
+
+	// Refresh map view
+	theMapEditor->forceRefresh();
+}
+
+void MapObjectPropsPanel::onBtnReset(wxCommandEvent& e) {
+	// Go through all current properties and reset the value
+	for (unsigned a = 0; a < properties.size(); a++)
+		properties[a]->resetValue();
 }

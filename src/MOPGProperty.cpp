@@ -6,6 +6,17 @@
 #include "ActionSpecialTreeView.h"
 #include "ThingTypeTreeView.h"
 #include "GameConfiguration.h"
+#include "MapObjectPropsPanel.h"
+
+
+void MOPGProperty::resetValue() {
+	// Do nothing if no parent (and thus no object list)
+	if (!parent || noupdate)
+		return;
+
+	// Read value from selection
+	openObjects(parent->getObjects());
+}
 
 
 MOPGBoolProperty::MOPGBoolProperty(const wxString& label, const wxString& name)
@@ -32,7 +43,24 @@ void MOPGBoolProperty::openObjects(vector<MapObject*>& objects) {
 	}
 
 	// Set to common value
+	noupdate = true;
 	SetValue(first);
+	noupdate = false;
+}
+
+void MOPGBoolProperty::applyValue() {
+	// Do nothing if no parent (and thus no object list)
+	if (!parent || noupdate)
+		return;
+
+	// Do nothing if the value is unspecified
+	if (IsValueUnspecified())
+		return;
+
+	// Go through objects and set this value
+	vector<MapObject*>& objects = parent->getObjects();
+	for (unsigned a = 0; a < objects.size(); a++)
+		objects[a]->setBoolProperty(GetName(), m_value.GetBool());
 }
 
 
@@ -60,7 +88,24 @@ void MOPGIntProperty::openObjects(vector<MapObject*>& objects) {
 	}
 
 	// Set to common value
+	noupdate = true;
 	SetValue(first);
+	noupdate = false;
+}
+
+void MOPGIntProperty::applyValue() {
+	// Do nothing if no parent (and thus no object list)
+	if (!parent || noupdate)
+		return;
+
+	// Do nothing if the value is unspecified
+	if (IsValueUnspecified())
+		return;
+
+	// Go through objects and set this value
+	vector<MapObject*>& objects = parent->getObjects();
+	for (unsigned a = 0; a < objects.size(); a++)
+		objects[a]->setIntProperty(GetName(), m_value.GetInteger());
 }
 
 
@@ -88,7 +133,24 @@ void MOPGFloatProperty::openObjects(vector<MapObject*>& objects) {
 	}
 
 	// Set to common value
+	noupdate = true;
 	SetValue(first);
+	noupdate = false;
+}
+
+void MOPGFloatProperty::applyValue() {
+	// Do nothing if no parent (and thus no object list)
+	if (!parent || noupdate)
+		return;
+
+	// Do nothing if the value is unspecified
+	if (IsValueUnspecified())
+		return;
+
+	// Go through objects and set this value
+	vector<MapObject*>& objects = parent->getObjects();
+	for (unsigned a = 0; a < objects.size(); a++)
+		objects[a]->setFloatProperty(GetName(), m_value.GetDouble());
 }
 
 
@@ -116,7 +178,24 @@ void MOPGStringProperty::openObjects(vector<MapObject*>& objects) {
 	}
 
 	// Set to common value
+	noupdate = true;
 	SetValue(first);
+	noupdate = false;
+}
+
+void MOPGStringProperty::applyValue() {
+	// Do nothing if no parent (and thus no object list)
+	if (!parent || noupdate)
+		return;
+
+	// Do nothing if the value is unspecified
+	if (IsValueUnspecified())
+		return;
+
+	// Go through objects and set this value
+	vector<MapObject*>& objects = parent->getObjects();
+	for (unsigned a = 0; a < objects.size(); a++)
+		objects[a]->setStringProperty(GetName(), m_value.GetString());
 }
 
 
@@ -161,7 +240,9 @@ void MOPGActionSpecialProperty::openObjects(vector<MapObject*>& objects) {
 	}
 
 	// Set to common value
+	noupdate = true;
 	SetValue(first);
+	noupdate = false;
 
 	// Set arg property names
 	ActionSpecial* as = theGameConfiguration->actionSpecial(first);
@@ -177,6 +258,21 @@ void MOPGActionSpecialProperty::openObjects(vector<MapObject*>& objects) {
 void MOPGActionSpecialProperty::addArgProperty(wxPGProperty* prop, int index) {
 	if (index < 5)
 		args[index] = prop;
+}
+
+void MOPGActionSpecialProperty::applyValue() {
+	// Do nothing if no parent (and thus no object list)
+	if (!parent || noupdate)
+		return;
+
+	// Do nothing if the value is unspecified
+	if (IsValueUnspecified())
+		return;
+
+	// Go through objects and set this value
+	vector<MapObject*>& objects = parent->getObjects();
+	for (unsigned a = 0; a < objects.size(); a++)
+		objects[a]->setIntProperty(GetName(), m_value.GetInteger());
 }
 
 wxString MOPGActionSpecialProperty::ValueToString(wxVariant &value, int argFlags) const {
@@ -242,7 +338,9 @@ void MOPGThingTypeProperty::openObjects(vector<MapObject*>& objects) {
 	}
 
 	// Set to common value
+	noupdate = true;
 	SetValue(first);
+	noupdate = false;
 
 	// Set arg property names
 	ThingType* tt = theGameConfiguration->thingType(first);
@@ -258,6 +356,21 @@ void MOPGThingTypeProperty::openObjects(vector<MapObject*>& objects) {
 void MOPGThingTypeProperty::addArgProperty(wxPGProperty* prop, int index) {
 	if (index < 5)
 		args[index] = prop;
+}
+
+void MOPGThingTypeProperty::applyValue() {
+	// Do nothing if no parent (and thus no object list)
+	if (!parent || noupdate)
+		return;
+
+	// Do nothing if the value is unspecified
+	if (IsValueUnspecified())
+		return;
+
+	// Go through objects and set this value
+	vector<MapObject*>& objects = parent->getObjects();
+	for (unsigned a = 0; a < objects.size(); a++)
+		objects[a]->setIntProperty(GetName(), m_value.GetInteger());
 }
 
 wxString MOPGThingTypeProperty::ValueToString(wxVariant &value, int argFlags) const {
@@ -302,4 +415,8 @@ void MOPGLineFlagProperty::openObjects(vector<MapObject*>& objects) {
 			return;
 		}
 	}
+}
+
+void MOPGLineFlagProperty::applyValue() {
+
 }

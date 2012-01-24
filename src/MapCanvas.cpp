@@ -1212,7 +1212,7 @@ void MapCanvas::onMouseLeave(wxMouseEvent& e) {
 
 void MapCanvas::onMouseEnter(wxMouseEvent& e) {
 	// Set focus
-	SetFocus();
+	//SetFocus();
 
 	e.Skip();
 }

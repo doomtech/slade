@@ -733,7 +733,7 @@ unsigned MapEditor::numEditorMessages() {
 
 string MapEditor::getEditorMessage(int index) {
 	// Check index
-	if (index < 0 || index >= editor_messages.size())
+	if (index < 0 || index >= (int)editor_messages.size())
 		return "";
 
 	return editor_messages[index].message;
@@ -741,7 +741,7 @@ string MapEditor::getEditorMessage(int index) {
 
 long MapEditor::getEditorMessageTime(int index) {
 	// Check index
-	if (index < 0 || index >= editor_messages.size())
+	if (index < 0 || index >= (int)editor_messages.size())
 		return -1;
 
 	return theApp->runTimer() - editor_messages[index].act_time;
