@@ -130,6 +130,7 @@ public:
 	void	getSectorsByTag(int tag, vector<MapSector*>& list);
 	void	getThingsById(int id, vector<MapThing*>& list);
 	void	getLinesById(int id, vector<MapLine*>& list);
+	void	getThingsByIdInSectorTag(int id, int tag, vector<MapThing*>& list);
 
 	// Creation
 	MapVertex*	createVertex(double x, double y);

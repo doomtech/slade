@@ -70,15 +70,15 @@ void Translation::parse(string def) {
 	//wxLogMessage("Parse translation \"%s\"", CHR(def));
 
 	// Read original range
-	uint8_t o_start = tz.getInteger();
-	if (!tz.checkToken(":")) return;
-	uint8_t o_end = tz.getInteger();
+	uint8_t o_start, o_end;
+	o_start = tz.getInteger();
+	if (tz.peekToken() == "=") o_end = o_start;
+	else if (!tz.checkToken(":")) return;
+	else o_end = tz.getInteger();
 	if (!tz.checkToken("=")) return;
 
 	// Check for reverse origin range
-	bool reverse = false;
-	if (o_start > o_end)
-		reverse = true;
+	bool reverse = (o_start > o_end);
 
 	// Type of translation depends on next token
 	if (tz.peekToken() == "[") {
@@ -184,8 +184,8 @@ void Translation::parse(string def) {
 
 		// Read range values
 		d_start = tz.getInteger();
-		if (!tz.checkToken(":")) return;
-		d_end = tz.getInteger();
+		if (!tz.checkToken(":")) d_end = d_start;
+		else d_end = tz.getInteger();
 
 		// Add translation
 		TransRangePalette* tr = new TransRangePalette();

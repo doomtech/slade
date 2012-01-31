@@ -162,6 +162,7 @@ wxPanel* PreferencesDialog::setupBaseResourceArchivesPanel() {
  * Applies preference values from all preference panels
  *******************************************************************/
 void PreferencesDialog::applyPreferences() {
+	panel_advanced->applyPreferences();
 	panel_general->applyPreferences();
 	panel_interface->applyPreferences();
 	panel_editing->applyPreferences();
@@ -174,7 +175,6 @@ void PreferencesDialog::applyPreferences() {
 	panel_colours->applyPreferences();
 	panel_maped->applyPreferences();
 	panel_map_display->applyPreferences();
-	panel_advanced->applyPreferences();
 }
 
 

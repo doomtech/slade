@@ -532,6 +532,10 @@ void MapCanvas::draw() {
 	// Draw tagged sectors/lines/things if needed
 	if (editor->taggedSectors().size() > 0 && mouse_state == MSTATE_NORMAL)
 		renderer_2d->renderTaggedFlats(editor->taggedSectors(), anim_flash_level);
+	else if (editor->taggedLines().size() > 0 && mouse_state == MSTATE_NORMAL)
+		renderer_2d->renderTaggedLines(editor->taggedLines(), anim_flash_level);
+	else if (editor->taggedThings().size() > 0 && mouse_state == MSTATE_NORMAL)
+		renderer_2d->renderTaggedThings(editor->taggedThings(), anim_flash_level);
 
 
 	// Draw selection box if active

@@ -161,8 +161,17 @@ Archive::mapdesc_t MapEditorConfigDialog::selectedMap() {
 	// Check if a map is selected
 	if (selection < 0 || selection >= (int)maps.size())
 		return Archive::mapdesc_t();
-	else
-		return maps[selection];
+	// Return map corresponding to selection
+	// The selection is made from a subset of the maps vector,
+	// if several different formats are mixed in the archive
+	// they will not be equivalent sets.
+	else {
+		unsigned a = 0; 
+		for (; a < maps.size() && selection; ++a)
+			if (maps[a].format == theGameConfiguration->getMapFormat())
+				--selection;
+		return maps[a];
+	}
 }
 
 bool MapEditorConfigDialog::configMatchesMap(Archive::mapdesc_t map) {

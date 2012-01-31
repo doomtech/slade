@@ -32,6 +32,7 @@
 #include "Parser.h"
 #include "MathStuff.h"
 #include "ResourceManager.h"
+#include "GameConfiguration.h"
 #include "MainApp.h"
 #include "Archive.h"
 #include "WadArchive.h"
@@ -339,6 +340,7 @@ bool SLADEMap::addLine(doomline_t& l) {
 
 	// Setup line properties
 	nl->prop("arg0") = l.sector_tag;
+	nl->prop("id") = l.sector_tag;
 	nl->prop("special") = l.type;
 	nl->prop("flags") = l.flags;
 
@@ -691,6 +693,16 @@ bool SLADEMap::addLine(hexenline_t& l) {
 	nl->prop("arg4") = l.args[4];
 	nl->prop("special") = l.type;
 	nl->prop("flags") = l.flags;
+
+	// Handle some special cases
+	if (l.type) {
+		int needs_tag = theGameConfiguration->actionSpecial(l.type)->needsTag();
+		if (needs_tag == AS_TT_LINEID || needs_tag == AS_TT_1LINEID_2LINE) {
+			nl->prop("id") = l.args[0];
+		} else if (needs_tag == AS_TT_LINEID_HI5) {
+			nl->prop("id") = (l.args[0] + (l.args[4]<<8));
+		}
+	}
 
 	// Add line
 	lines.push_back(nl);
@@ -1614,6 +1626,18 @@ void SLADEMap::getThingsById(int id, vector<MapThing*>& list) {
 	for (unsigned a = 0; a < things.size(); a++) {
 		if (things[a]->prop("id").getIntValue() == id)
 			list.push_back(things[a]);
+	}
+}
+
+void SLADEMap::getThingsByIdInSectorTag(int id, int tag, vector<MapThing*>& list) {
+	// Find things with matching id contained in sector with matching tag
+	for (unsigned a = 0; a < things.size(); a++) {
+		if (things[a]->prop("id").getIntValue() == id) {
+			int si = inSector(things[a]->xPos(), things[a]->yPos());
+			if (si > -1 && (unsigned)si < sectors.size() && sectors[si]->prop("id").getIntValue() == tag) {
+				list.push_back(things[a]);
+			}
+		}
 	}
 }
 

@@ -1003,22 +1003,27 @@ void GameConfiguration::dumpValidMapNames() {
 void GameConfiguration::dumpUDMFProperties() {
 	/*
 	// Vertex
+	wxLogMessage("\nVertex properties:");
 	for (unsigned a = 0; a < udmf_vertex_props.size(); a++)
 		wxLogMessage(udmf_vertex_props[a].property->getStringRep());
 
 	// Line
+	wxLogMessage("\nLine properties:");
 	for (unsigned a = 0; a < udmf_linedef_props.size(); a++)
 		wxLogMessage(udmf_linedef_props[a].getStringRep());
 
 	// Side
+	wxLogMessage("\nSide properties:");
 	for (unsigned a = 0; a < udmf_sidedef_props.size(); a++)
 		wxLogMessage(udmf_sidedef_props[a].getStringRep());
 
 	// Sector
+	wxLogMessage("\nSector properties:");
 	for (unsigned a = 0; a < udmf_sector_props.size(); a++)
 		wxLogMessage(udmf_sector_props[a].getStringRep());
 
 	// Thing
+	wxLogMessage("\nThing properties:");
 	for (unsigned a = 0; a < udmf_thing_props.size(); a++)
 		wxLogMessage(udmf_thing_props[a].getStringRep());
 	*/
@@ -1026,7 +1031,7 @@ void GameConfiguration::dumpUDMFProperties() {
 
 
 CONSOLE_COMMAND(testgc, 0) {
-	string game = "doom1";
+	string game = "doomu";
 
 	if (args.size() > 0)
 		game = args[0];

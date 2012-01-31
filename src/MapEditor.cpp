@@ -102,11 +102,33 @@ bool MapEditor::updateHilight(fpoint2_t mouse_pos, double dist_scale) {
 		tagged_lines.clear();
 		tagged_things.clear();
 
-		// Line special
-		if (edit_mode == MODE_LINES && hilight_item >= 0) {
-			MapLine* line = map.getLine(hilight_item);
-			int needs_tag = theGameConfiguration->actionSpecial((int)line->prop("special"))->needsTag();
-			int tag = line->prop("arg0");
+		// Special
+		if (hilight_item >= 0 && (edit_mode == MODE_LINES || edit_mode == MODE_THINGS)) {
+			MapSector* back = NULL;
+			MapSector* front = NULL;
+			int needs_tag, tag, arg2, arg3, arg4, arg5;
+			// Line specials have front and possibly back sectors
+			if (edit_mode == MODE_LINES) {
+				MapLine* line = map.getLine(hilight_item);
+				if (line->s2()) back = line->s2()->getSector();
+				if (line->s1()) front = line->s1()->getSector();
+				needs_tag = theGameConfiguration->actionSpecial((int)line->prop("special"))->needsTag();
+				tag = line->prop("arg0");
+				arg2 = line->prop("arg1");
+				arg3 = line->prop("arg2");
+				arg4 = line->prop("arg3");
+				arg5 = line->prop("arg4");
+
+			// Hexen and UDMF things can have specials too
+			} else /* edit_mode == MODE_THINGS */ {
+				MapThing* thing = map.getThing(hilight_item);
+				needs_tag = theGameConfiguration->actionSpecial((int)thing->prop("special"))->needsTag();
+				tag = thing->prop("arg0");
+				arg2 = thing->prop("arg1");
+				arg3 = thing->prop("arg2");
+				arg4 = thing->prop("arg3");
+				arg5 = thing->prop("arg4");
+			}
 
 			// Sector tag
 			if (needs_tag == AS_TT_SECTOR ||
@@ -114,15 +136,15 @@ bool MapEditor::updateHilight(fpoint2_t mouse_pos, double dist_scale) {
 				map.getSectorsByTag(tag, tagged_sectors);
 
 			// Backside sector (for local doors)
-			else if ((needs_tag == AS_TT_SECTOR_BACK || needs_tag == AS_TT_SECTOR_AND_BACK) && line->s2())
-				tagged_sectors.push_back(line->s2()->getSector());
+			else if ((needs_tag == AS_TT_SECTOR_BACK || needs_tag == AS_TT_SECTOR_AND_BACK) && back)
+				tagged_sectors.push_back(back);
 
 			// Sector tag *or* backside sector (for zdoom local doors)
 			else if (needs_tag == AS_TT_SECTOR_OR_BACK) {
 				if (tag > 0)
 					map.getSectorsByTag(tag, tagged_sectors);
-				else if (line->s2())
-					tagged_sectors.push_back(line->s2()->getSector());
+				else if (back)
+					tagged_sectors.push_back(back);
 			}
 
 			// Thing ID
@@ -132,6 +154,67 @@ bool MapEditor::updateHilight(fpoint2_t mouse_pos, double dist_scale) {
 			// Line ID
 			else if (needs_tag == AS_TT_LINE)
 				map.getLinesById(tag, tagged_lines);
+
+			// ZDoom quirkiness
+			else if (needs_tag) {
+				switch (needs_tag) {
+					case AS_TT_1THING_2SECTOR:
+					case AS_TT_1THING_3SECTOR:
+					case AS_TT_1SECTOR_2THING:
+					{
+						int thingtag = (needs_tag == AS_TT_1THING_2SECTOR) ? arg2 : tag;
+						int sectag = (needs_tag == AS_TT_1THING_2SECTOR) ? tag :
+							(needs_tag == AS_TT_1THING_2SECTOR) ? arg2 : arg3;
+						if ((thingtag | sectag) == 0)
+							break;
+						else if (thingtag == 0)
+							map.getSectorsByTag(sectag, tagged_sectors);
+						else if (sectag == 0)
+							map.getThingsById(thingtag, tagged_things);
+						else // neither thingtag nor sectag are 0
+							map.getThingsByIdInSectorTag(thingtag, sectag, tagged_things);
+					}	break;
+					case AS_TT_1THING_2THING_3THING:
+						map.getThingsById(arg3, tagged_things);
+					case AS_TT_1THING_2THING:
+						map.getThingsById(arg2, tagged_things);
+					case AS_TT_1THING_4THING:
+						map.getThingsById(tag, tagged_things);
+					case AS_TT_4THING:
+						if (needs_tag == AS_TT_1THING_4THING || needs_tag == AS_TT_4THING)
+							map.getThingsById(arg4, tagged_things);
+						break;
+					case AS_TT_5THING:
+						map.getThingsById(arg5, tagged_things);
+						break;
+					case AS_TT_LINE_NEGATIVE:
+						map.getLinesById(abs(tag), tagged_lines);
+						break;
+					case AS_TT_1LINEID_2LINE:
+						map.getLinesById(arg2, tagged_lines);
+						break;
+					case AS_TT_1LINE_2SECTOR:
+						map.getLinesById(tag, tagged_lines);
+						map.getSectorsByTag(arg2, tagged_sectors);
+						break;
+					case AS_TT_1SECTOR_2THING_3THING_5THING:
+						if (arg5) map.getThingsById(arg5, tagged_things);
+						map.getThingsById(arg3, tagged_things);
+					case AS_TT_1SECTOR_2SECTOR_3SECTOR_4SECTOR:
+						if (arg4) map.getSectorsByTag(arg4, tagged_sectors);
+						if (arg3) map.getSectorsByTag(arg3, tagged_sectors);
+					case AS_TT_1SECTOR_2SECTOR:
+						if (arg2) map.getSectorsByTag(arg2, tagged_sectors);
+						if (tag ) map.getSectorsByTag(tag , tagged_sectors);
+						break;
+					case AS_TT_SECTOR_2IS3_LINE:
+						if (arg2 == 3) map.getLinesById(tag, tagged_lines);
+						else map.getSectorsByTag(tag, tagged_sectors);
+						break;
+					default:
+						break;
+				}
+			}
 		}
 	}
 

@@ -30,7 +30,9 @@ void ThingInfoOverlay::update(MapThing* thing) {
 	info.push_back(S_FMT("Thing #%d: %s", thing->getIndex(), CHR(type)));
 
 	// Position
-	info.push_back(S_FMT("Position: %d, %d", (int)thing->xPos(), (int)thing->yPos()));
+	if (theGameConfiguration->getMapFormat() != MAP_DOOM)
+		info.push_back(S_FMT("Position: %d, %d, %d", (int)thing->xPos(), (int)thing->yPos(), (int)((double)thing->prop("z"))));
+	else info.push_back(S_FMT("Position: %d, %d", (int)thing->xPos(), (int)thing->yPos()));
 
 	// Direction
 	int angle = thing->prop("angle");
@@ -53,8 +55,10 @@ void ThingInfoOverlay::update(MapThing* thing) {
 		dir = "Southeast";
 	info.push_back(S_FMT("Direction: %s", CHR(dir)));
 
-	// Args (if in hexen/udmf format)
+	// Special and Args (if in hexen/udmf format)
 	if (theGameConfiguration->getMapFormat() == MAP_HEXEN || theGameConfiguration->getMapFormat() == MAP_UDMF) {
+		int as_id = thing->prop("special").getIntValue();
+		info.push_back(S_FMT("Special: %d (%s)", as_id, CHR(theGameConfiguration->actionSpecialName(as_id))));
 		int args[5];
 		args[0] = thing->prop("arg0");
 		args[1] = thing->prop("arg1");
@@ -70,6 +74,11 @@ void ThingInfoOverlay::update(MapThing* thing) {
 
 	// Flags
 	info.push_back(S_FMT("Flags: %s", CHR(theGameConfiguration->thingFlagsString(thing->prop("flags")))));
+
+	// TID (if in doom64/hexen/udmf format)
+	if (theGameConfiguration->getMapFormat() != MAP_DOOM) {
+		info.push_back(S_FMT("TID: %i", (int)thing->prop("id")));
+	}
 
 	// Set sprite and translation
 	sprite = tt->getSprite();

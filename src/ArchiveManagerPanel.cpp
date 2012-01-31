@@ -1214,9 +1214,10 @@ void ArchiveManagerPanel::removeSelection() {
 	if (selection.size() == 0)
 		return;
 
-	// Remove selected recent files
-	for (unsigned a = 0; a < selection.size(); a++)
-		theArchiveManager->removeRecentFile(theArchiveManager->recentFile(selection[a]));
+	// Remove selected recent files (starting from the last and going backward,
+	// because the list reorders itself whenever an item is removed)
+	for (unsigned a = selection.size(); a > 0; --a)
+		theArchiveManager->removeRecentFile(theArchiveManager->recentFile(selection[a - 1]));
 }
 
 /* ArchiveManagerPanel::handleAction
