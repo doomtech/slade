@@ -43,17 +43,20 @@
 /*******************************************************************
  * VARIABLES
  *******************************************************************/
-// Some temporary colours (these will eventually be setup in some kind of global colour configuration)
-rgba_t col_view_background(0, 0, 0, 255);
-rgba_t col_view_line_1s(255, 255, 255, 255);
-rgba_t col_view_line_2s(170, 170, 170, 255);
-rgba_t col_view_line_special(130, 140, 255, 255);
-rgba_t col_view_line_macro(255, 170, 130, 255);
-rgba_t col_save_background(255, 255, 255, 0);
-rgba_t col_save_line_1s(0, 0, 0, 255);
-rgba_t col_save_line_2s(144, 144, 144, 255);
-rgba_t col_save_line_special(220, 130, 50, 255);
-rgba_t col_save_line_macro(50, 130, 220, 255);
+CVAR(Int, map_image_width,  800, CVAR_SAVE)
+CVAR(Int, map_image_height, 600, CVAR_SAVE)
+CVAR(Float, map_image_thickness, 1.5, CVAR_SAVE)
+CVAR(String, map_view_col_background, "rgb(0, 0, 0)", CVAR_SAVE)
+CVAR(String, map_view_col_line_1s, "rgb(255, 255, 255)", CVAR_SAVE)
+CVAR(String, map_view_col_line_2s, "rgb(170, 170, 170)", CVAR_SAVE)
+CVAR(String, map_view_col_line_special, "rgb(130, 140, 255)", CVAR_SAVE)
+CVAR(String, map_view_col_line_macro, "rgb(255, 170, 130)", CVAR_SAVE)
+CVAR(String, map_image_col_background, "rgb(255, 255, 255)", CVAR_SAVE)
+CVAR(Int, map_image_alpha_background, 0, CVAR_SAVE)
+CVAR(String, map_image_col_line_1s, "rgb(0, 0, 0)", CVAR_SAVE)
+CVAR(String, map_image_col_line_2s, "rgb(144, 144, 144)", CVAR_SAVE)
+CVAR(String, map_image_col_line_special, "rgb(220, 130, 50)", CVAR_SAVE)
+CVAR(String, map_image_col_line_macro, "rgb(50, 130, 220)", CVAR_SAVE)
 
 
 /*******************************************************************
@@ -142,6 +145,14 @@ void MEPCanvas::showMap() {
  * Draws the map
  *******************************************************************/
 void MEPCanvas::draw() {
+	// Setup colours
+	wxColour wxc;
+	wxc.Set(map_view_col_background);	rgba_t col_view_background(wxc.Red(), wxc.Green(), wxc.Blue(), 255);
+	wxc.Set(map_view_col_line_1s);		rgba_t col_view_line_1s(wxc.Red(), wxc.Green(), wxc.Blue(), 255);
+	wxc.Set(map_view_col_line_2s);		rgba_t col_view_line_2s(wxc.Red(), wxc.Green(), wxc.Blue(), 255);
+	wxc.Set(map_view_col_line_special);	rgba_t col_view_line_special(wxc.Red(), wxc.Green(), wxc.Blue(), 255);
+	wxc.Set(map_view_col_line_macro);	rgba_t col_view_line_macro(wxc.Red(), wxc.Green(), wxc.Blue(), 255);
+
 	// Setup the viewport
 	glViewport(0, 0, GetSize().x, GetSize().y);
 
@@ -223,6 +234,32 @@ void MEPCanvas::draw() {
  * tiled rendering.
  *******************************************************************/
 void MEPCanvas::createImage(ArchiveEntry& ae, int width, int height) {
+	// Setup colours
+	wxColour wxc;
+	wxc.Set(map_image_col_background);	rgba_t col_save_background(wxc.Red(), wxc.Green(), wxc.Blue(), 255);
+	wxc.Set(map_image_col_line_1s);		rgba_t col_save_line_1s(wxc.Red(), wxc.Green(), wxc.Blue(), 255);
+	wxc.Set(map_image_col_line_2s);		rgba_t col_save_line_2s(wxc.Red(), wxc.Green(), wxc.Blue(), 255);
+	wxc.Set(map_image_col_line_special);rgba_t col_save_line_special(wxc.Red(), wxc.Green(), wxc.Blue(), 255);
+	wxc.Set(map_image_col_line_macro);	rgba_t col_save_line_macro(wxc.Red(), wxc.Green(), wxc.Blue(), 255);
+	col_save_background.a = map_image_alpha_background;
+
+	// Setup OpenGL rigmarole
+	GLuint texID, fboID;
+	if (GLEW_ARB_framebuffer_object) {
+		glGenTextures(1, &texID);
+		glBindTexture(GL_TEXTURE_2D, texID);
+		// We don't use mipmaps, but OpenGL will refuse to attach
+		// the texture to the framebuffer if they are not present
+		glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glGenFramebuffersEXT(1, &fboID);
+		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboID);
+		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, texID, 0);
+		GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+		if(status != GL_FRAMEBUFFER_COMPLETE_EXT) DPrintf("Framebuffer not used: %x", status);
+	}
+
 	glViewport(0, 0, width, height);
 
 	// Setup the screen projection
@@ -280,7 +317,7 @@ void MEPCanvas::createImage(ArchiveEntry& ae, int width, int height) {
 	// Setup drawing
 	glDisable(GL_TEXTURE_2D);
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-	glLineWidth(1.5f);
+	glLineWidth(map_image_thickness);
 	glEnable(GL_LINE_SMOOTH);
 
 	// Draw lines
@@ -317,6 +354,12 @@ void MEPCanvas::createImage(ArchiveEntry& ae, int width, int height) {
 
 	uint8_t * ImageBuffer = new uint8_t[width * height * 4];
 	glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, ImageBuffer);
+
+	if (GLEW_ARB_framebuffer_object) {
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glDeleteTextures( 1, &texID );
+		glDeleteFramebuffersEXT( 1, &fboID );
+	}
 	SImage img;
 	img.setImageData(ImageBuffer, width, height, RGBA);
 	img.mirror(true);
@@ -647,7 +690,11 @@ bool MapEntryPanel::createImage() {
 
 	ArchiveEntry temp;
 	// Stupid OpenGL grumble grumble grumble
-	map_canvas->createImage(temp, min<int>(800, map_canvas->GetSize().x), min<int>(600, map_canvas->GetSize().y));
+	if (GLEW_ARB_framebuffer_object)
+		map_canvas->createImage(temp, map_image_width, map_image_height);
+	else
+		map_canvas->createImage(temp, min<int>(map_image_width, map_canvas->GetSize().x), 
+									  min<int>(map_image_height, map_canvas->GetSize().y));
 	string name = S_FMT("%s_%s", CHR(entry->getParent()->getFilename(false)), CHR(entry->getName()));
 	wxFileName fn(name);
 

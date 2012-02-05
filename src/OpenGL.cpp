@@ -103,6 +103,10 @@ bool OpenGL::init() {
 		wxLogMessage("Point Sprites supported");
 	else
 		wxLogMessage("Point Sprites not supported");
+	if (GLEW_ARB_framebuffer_object)
+		wxLogMessage("Framebuffer Objects supported");
+	else
+		wxLogMessage("Framebuffer Objects not supported");
 
 	initialised = true;
 	return true;

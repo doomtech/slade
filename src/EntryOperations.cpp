@@ -1136,7 +1136,7 @@ bool EntryOperations::optimizePNG(ArchiveEntry* entry) {
 	if (!entry->getParent())
 		return false;
 
-	// Check entry is text
+	// Check entry is PNG
 	if (!EntryDataFormat::getFormat("img_png")->isThisFormat(entry->getMCData())) {
 		wxMessageBox("Error: Entry does not appear to be PNG", "Error", wxOK|wxCENTRE|wxICON_ERROR);
 		return false;
@@ -1158,6 +1158,8 @@ bool EntryOperations::optimizePNG(ArchiveEntry* entry) {
 	bool alphchunk = getalPhChunk(entry);
 	bool grabchunk = readgrAbChunk(entry, offsets);
 	string errormessages = "";
+	wxArrayString output;
+	wxArrayString errors;
 	size_t oldsize = entry->getSize();
 	size_t crushsize = 0, outsize = 0, deflsize = 0;
 	bool crushed = false, outed = false;
@@ -1172,10 +1174,8 @@ bool EntryOperations::optimizePNG(ArchiveEntry* entry) {
 		entry->exportFile(pngfile);
 
 		string command = path_pngcrush + " -brute \"" + pngfile + "\" \"" + optfile + "\"";
-		wxExecute(command, wxEXEC_SYNC);
-
-		// Deal with focus-stealing apps
-		theMainWindow->Raise();
+		output.Empty(); errors.Empty();
+		wxExecute(command, output, errors, wxEXEC_SYNC);
 
 		if (wxFileExists(optfile)) {
 			entry->importFile(optfile);
@@ -1184,6 +1184,23 @@ bool EntryOperations::optimizePNG(ArchiveEntry* entry) {
 			crushed = true;
 		} else errormessages += "PNGCrush failed to create optimized file.\n";
 		crushsize = entry->getSize();
+
+		// send app output to console if wanted
+		if (0) {
+			string crushlog = "";
+			if (errors.GetCount()) {
+				crushlog += "PNGCrush error messages:\n";
+				for (size_t i = 0; i < errors.GetCount(); ++i)
+					crushlog += errors[i] + "\n";
+				errormessages += crushlog;
+			}
+			if (output.GetCount()) {
+				crushlog += "PNGCrush output messages:\n";
+				for (size_t i = 0; i < output.GetCount(); ++i)
+					crushlog += output[i] + "\n";
+			}
+			wxLogMessage(crushlog);
+		}
 	}
 
 	// Run PNGOut
@@ -1196,10 +1213,8 @@ bool EntryOperations::optimizePNG(ArchiveEntry* entry) {
 		entry->exportFile(pngfile);
 
 		string command = path_pngout + " /y \"" + pngfile + "\" \"" + optfile + "\"";
-		wxExecute(command, wxEXEC_SYNC);
-
-		// Deal with focus-stealing apps
-		theMainWindow->Raise();
+		output.Empty(); errors.Empty();
+		wxExecute(command, output, errors, wxEXEC_SYNC);
 
 		if (wxFileExists(optfile)) {
 			entry->importFile(optfile);
@@ -1210,6 +1225,23 @@ bool EntryOperations::optimizePNG(ArchiveEntry* entry) {
 			// Don't treat it as an error if PNGout couldn't create a smaller file than PNGCrush
 			errormessages += "PNGout failed to create optimized file.\n";
 		outsize = entry->getSize();
+
+		// send app output to console if wanted
+		if (0) {
+			string pngoutlog = "";
+			if (errors.GetCount()) {
+				pngoutlog += "PNGOut error messages:\n";
+				for (size_t i = 0; i < errors.GetCount(); ++i)
+					pngoutlog += errors[i] + "\n";
+				errormessages += pngoutlog;
+			}
+			if (output.GetCount()) {
+				pngoutlog += "PNGOut output messages:\n";
+				for (size_t i = 0; i < output.GetCount(); ++i)
+					pngoutlog += output[i] + "\n";
+			}
+			wxLogMessage(pngoutlog);
+		}
 	}
 
 	// Run deflopt
@@ -1220,16 +1252,31 @@ bool EntryOperations::optimizePNG(ArchiveEntry* entry) {
 		entry->exportFile(pngfile);
 
 		string command = path_deflopt + " /sf \"" + pngfile + "\"";
-		wxExecute(command, wxEXEC_SYNC);
-
-		// Deal with focus-stealing apps
-		theMainWindow->Raise();
+		output.Empty(); errors.Empty();
+		wxExecute(command, output, errors, wxEXEC_SYNC);
 
 		entry->importFile(pngfile);
 		wxRemoveFile(pngfile);
 		deflsize = entry->getSize();
 
+		// send app output to console if wanted
+		if (0) {
+			string defloptlog = "";
+			if (errors.GetCount()) {
+				defloptlog += "DeflOpt error messages:\n";
+				for (size_t i = 0; i < errors.GetCount(); ++i)
+					defloptlog += errors[i] + "\n";
+				errormessages += defloptlog;
+			}
+			if (output.GetCount()) {
+				defloptlog += "DeflOpt output messages:\n";
+				for (size_t i = 0; i < output.GetCount(); ++i)
+					defloptlog += output[i] + "\n";
+			}
+			wxLogMessage(defloptlog);
+		}
 	}
+	output.Clear(); errors.Clear();
 
 	// Rewrite special chunks
 	if (alphchunk) modifyalPhChunk(entry, true);

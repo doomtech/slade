@@ -59,7 +59,17 @@ public:
 
 		// Update variables
 		this->size = size;
-		crc = this->data.crc();
+
+		// Note that the CRC is not computed just from 
+		// the chunk data, but also the chunk name! So
+		// we need to write all that in a temporary MC
+		MemChunk fulldata;
+		fulldata.reSize(4 + size);
+		fulldata.seek(0, SEEK_SET);
+		fulldata.write(name, 4);
+		fulldata.write(data, size);
+		crc = fulldata.crc();
+		fulldata.clear();
 	}
 
 	void setData(MemChunk& mc) {
