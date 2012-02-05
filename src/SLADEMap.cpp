@@ -1576,6 +1576,10 @@ bool SLADEMap::lineInSector(MapLine* line, MapSector* sector) {
 bool SLADEMap::getLinesOfSector(unsigned index, vector<MapLine*>& list) {
 	// Get sector
 	MapSector* sector = getSector(index);
+	return getLinesOfSector(sector, list);
+}
+
+bool SLADEMap::getLinesOfSector(MapSector* sector, vector<MapLine*>& list) {
 	if (!sector) return false;
 
 	// Go through sides in sector

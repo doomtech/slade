@@ -124,6 +124,7 @@ public:
 
 	bool	lineInSector(MapLine* line, MapSector* sector);
 	bool	getLinesOfSector(unsigned index, vector<MapLine*>& list);
+	bool	getLinesOfSector(MapSector* sector, vector<MapLine*>& list);
 	bool	getVerticesOfSector(unsigned index, vector<MapVertex*>& list);
 
 	// Tags/Ids

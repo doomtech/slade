@@ -1355,8 +1355,26 @@ void MapRenderer2D::renderTaggedFlats(vector<MapSector*>& sectors, float fade) {
 
 	// Render each sector polygon
 	glDisable(GL_TEXTURE_2D);
-	for (unsigned a = 0; a < sectors.size(); a++)
+	for (unsigned a = 0; a < sectors.size(); a++) {
 		sectors[a]->getPolygon()->render();
+
+		// Get all lines belonging to the tagged sector
+		vector<MapLine*> lines;
+		map->getLinesOfSector(sectors[a], lines);
+
+		// Draw hilight
+		MapLine* line = NULL;
+		for (unsigned a = 0; a < lines.size(); a++) {
+			line = lines[a];
+			if (!line) continue;
+
+			// Draw line
+			glBegin(GL_LINES);
+			glVertex2d(line->v1()->xPos(), line->v1()->yPos());
+			glVertex2d(line->v2()->xPos(), line->v2()->yPos());
+			glEnd();
+		}
+	}
 }
 
 void MapRenderer2D::renderMovingVertices(vector<int>& vertices, fpoint2_t move_vec) {

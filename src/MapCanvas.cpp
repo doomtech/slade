@@ -912,7 +912,7 @@ void MapCanvas::onKeyBindPress(string name) {
 
 	// Zoom in
 	else if (name == "me2d_zoom_in")
-		zoom(1.2);
+		zoom(1.25);
 
 	// Zoom out (follow mouse)
 	else if (name == "me2d_zoom_out_m") {
@@ -922,7 +922,7 @@ void MapCanvas::onKeyBindPress(string name) {
 
 	// Zoom in (follow mouse)
 	else if (name == "me2d_zoom_in_m") {
-		zoom(1.2, true);
+		zoom(1.25, true);
 		zooming_cursor = true;
 	}
 
