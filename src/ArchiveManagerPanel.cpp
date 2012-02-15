@@ -1172,9 +1172,9 @@ bool ArchiveManagerPanel::closeSelection() {
 	for (size_t a = 0; a < selection.size(); a++)
 		selected_archives.push_back(theArchiveManager->getArchive(selection[a]));
 
-	// Close all selected archives
+	// Close all selected archives, starting from the last
 	bool all_closed = true;
-	for (size_t a = 0; a < selected_archives.size(); a++) {
+	for (size_t a = selected_archives.size() - 1; (signed)a >= 0; --a) {
 		if (!closeArchive(selected_archives[a]))
 			all_closed = false;
 	}
@@ -1301,6 +1301,13 @@ bool ArchiveManagerPanel::handleAction(string id) {
 	else if (id == "aman_close")
 		closeArchive(currentArchive());
 
+	// Archives context menu cannot needs its own functions!
+	else if (id == "aman_save_a")
+		saveSelection();
+	else if (id == "aman_saveas_a")
+		saveSelectionAs();
+	else if (id == "aman_close_a")
+		closeSelection();
 
 	// Bookmarks context menu
 	else if (id == "aman_bookmark_go")
@@ -1478,9 +1485,9 @@ void ArchiveManagerPanel::onListMapsActivated(wxListEvent& e) {
 void ArchiveManagerPanel::onListArchivesRightClick(wxListEvent& e) {
 	// Generate context menu
 	wxMenu context;
-	theApp->getAction("aman_save")->addToMenu(&context);
-	theApp->getAction("aman_saveas")->addToMenu(&context);
-	theApp->getAction("aman_close")->addToMenu(&context);
+	theApp->getAction("aman_save_a")->addToMenu(&context);
+	theApp->getAction("aman_saveas_a")->addToMenu(&context);
+	theApp->getAction("aman_close_a")->addToMenu(&context);
 
 	// Pop it up
 	PopupMenu(&context);

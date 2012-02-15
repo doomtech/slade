@@ -462,7 +462,7 @@ bool SLADEMap::addThing(doom64thing_t& t) {
 
 	// Setup thing properties
 	nt->prop("angle") = t.angle;
-	nt->prop("z") = (double)t.z;
+	nt->prop("height") = (double)t.z;
 	nt->prop("flags") = t.flags;
 	nt->prop("id") = t.tid;
 

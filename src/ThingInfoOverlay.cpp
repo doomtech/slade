@@ -31,7 +31,7 @@ void ThingInfoOverlay::update(MapThing* thing) {
 
 	// Position
 	if (theGameConfiguration->getMapFormat() != MAP_DOOM)
-		info.push_back(S_FMT("Position: %d, %d, %d", (int)thing->xPos(), (int)thing->yPos(), (int)((double)thing->prop("z"))));
+		info.push_back(S_FMT("Position: %d, %d, %d", (int)thing->xPos(), (int)thing->yPos(), (int)((double)thing->prop("height"))));
 	else info.push_back(S_FMT("Position: %d, %d", (int)thing->xPos(), (int)thing->yPos()));
 
 	// Direction

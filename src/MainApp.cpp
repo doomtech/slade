@@ -354,6 +354,9 @@ void MainApp::initActions() {
 	new SAction("aman_recent_remove", "Remove", "t_close", "Remove the selected Archive(s) from the recent list");
 	new SAction("aman_bookmark_go", "Go To", "t_open", "Go to the selected bookmark");
 	new SAction("aman_bookmark_remove", "Remove", "t_close", "Remove the selected bookmark(s) from the list");
+	new SAction("aman_save_a", "&Save", "t_save", "Save the selected Archive", "Ctrl+S");
+	new SAction("aman_saveas_a", "Save &As", "t_saveas", "Save the selected Archive to a new file", "Ctrl+Shift+S");
+	new SAction("aman_close_a", "&Close", "t_close", "Close the selected Archive", "Ctrl+W");
 
 	// Recent files
 	new SAction("aman_recent1", "<insert recent file name>", "");
