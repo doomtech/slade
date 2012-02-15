@@ -38,6 +38,7 @@ public:
 	double		yPos() { return y; }
 
 	fpoint2_t	midPoint() { return fpoint2_t(x, y); }
+	fpoint2_t	textPoint() { return fpoint2_t(x, y); }
 
 	int		intProperty(string key);
 	double	floatProperty(string key);

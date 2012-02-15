@@ -251,6 +251,12 @@ void MapObjectPropsPanel::addUDMFProperty(UDMFProperty* prop, int objtype, wxPGP
 		properties.push_back(prop_tt);
 		pg_properties->AppendIn(group, prop_tt);
 	}
+	else if (prop->getType() == UDMFProperty::TYPE_ANGLE) {
+		MOPGAngleProperty* prop_angle = new MOPGAngleProperty(prop->getName(), propname);
+		prop_angle->setParent(this);
+		properties.push_back(prop_angle);
+		pg_properties->AppendIn(group, prop_angle);
+	}
 }
 
 void MapObjectPropsPanel::setupType(int objtype) {
@@ -394,7 +400,11 @@ void MapObjectPropsPanel::setupType(int objtype) {
 		addIntProperty(g_basic, "Z Height", "height");
 
 		// Add angle
-		addIntProperty(g_basic, "Angle", "angle");
+		//addIntProperty(g_basic, "Angle", "angle");
+		MOPGAngleProperty* prop_angle = new MOPGAngleProperty("Angle", "angle");
+		prop_angle->setParent(this);
+		properties.push_back(prop_angle);
+		pg_properties->AppendIn(g_basic, prop_angle);
 
 		// Add type
 		MOPGThingTypeProperty* prop_tt = new MOPGThingTypeProperty("Type", "type");

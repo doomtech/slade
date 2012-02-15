@@ -47,6 +47,8 @@ void UDMFProperty::parse(ParseTreeNode* node, string group) {
 				type = TYPE_SSPECIAL;
 			else if (S_CMPNOCASE(prop->getStringValue(), "thingtype"))
 				type = TYPE_TTYPE;
+			else if (S_CMPNOCASE(prop->getStringValue(), "angle"))
+				type = TYPE_ANGLE;
 		}
 
 		// Property name
@@ -64,6 +66,7 @@ void UDMFProperty::parse(ParseTreeNode* node, string group) {
 			case TYPE_ASPECIAL:	default_value = prop->getIntValue(); break;
 			case TYPE_SSPECIAL:	default_value = prop->getIntValue(); break;
 			case TYPE_TTYPE:	default_value = prop->getIntValue(); break;
+			case TYPE_ANGLE:	default_value = prop->getIntValue(); break;
 			default:			default_value = prop->getStringValue(); break;
 			}
 
@@ -112,6 +115,7 @@ string UDMFProperty::getStringRep() {
 	case TYPE_ASPECIAL: ret += ", type = actionspecial"; break;
 	case TYPE_SSPECIAL: ret += ", type = sectorspecial"; break;
 	case TYPE_TTYPE: ret += ", type = thingtype"; break;
+	case TYPE_ANGLE: ret += ", type = angle"; break;
 	default: ret += ", ******unknown type********"; break;
 	};
 

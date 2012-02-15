@@ -84,6 +84,7 @@ public:
 	// Drawing
 	void	drawGrid();
 	void	drawEditorMessages();
+	void	drawSelectionNumbers();
 	void	draw();
 	void	update(long frametime);
 

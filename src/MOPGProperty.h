@@ -26,6 +26,7 @@ public:
 		TYPE_TTYPE,
 		TYPE_LFLAG,
 		TYPE_TFLAG,
+		TYPE_ANGLE,
 	};
 
 	int		getType() { return type; }
@@ -109,6 +110,17 @@ public:
 
 	void	openObjects(vector<MapObject*>& objects);
 	void	applyValue();
+};
+
+class MOPGAngleProperty : public MOPGProperty, public wxEditEnumProperty {
+public:
+	MOPGAngleProperty(const wxString& label = wxPG_LABEL, const wxString& name = wxPG_LABEL);
+
+	void	openObjects(vector<MapObject*>& objects);
+	void	applyValue();
+
+	// wxPGProperty overrides
+	wxString	ValueToString(wxVariant &value, int argFlags = 0) const;
 };
 
 

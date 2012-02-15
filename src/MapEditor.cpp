@@ -508,6 +508,19 @@ MapThing* MapEditor::getHilightedThing() {
 	return map.getThing(hilight_item);
 }
 
+MapObject* MapEditor::getHilightedObject() {
+	if (edit_mode == MODE_VERTICES)
+		return getHilightedVertex();
+	else if (edit_mode == MODE_LINES)
+		return getHilightedLine();
+	else if (edit_mode == MODE_SECTORS)
+		return getHilightedSector();
+	else if (edit_mode == MODE_THINGS)
+		return getHilightedThing();
+	else
+		return NULL;
+}
+
 void MapEditor::getSelectedVertices(vector<MapVertex*>& list) {
 	if (edit_mode != MODE_VERTICES)
 		return;
@@ -582,6 +595,20 @@ void MapEditor::getSelectedThings(vector<MapThing*>& list) {
 	// No selection (use hilight)
 	else if (hilight_item >= 0)
 		list.push_back(map.getThing(hilight_item));
+}
+
+void MapEditor::getSelectedObjects(vector<MapObject*>& list) {
+	// Go through selection
+	for (unsigned a = 0; a < selection.size(); a++) {
+		if (edit_mode == MODE_VERTICES)
+			list.push_back(map.getVertex(selection[a]));
+		else if (edit_mode == MODE_LINES)
+			list.push_back(map.getLine(selection[a]));
+		else if (edit_mode == MODE_SECTORS)
+			list.push_back(map.getSector(selection[a]));
+		else if (edit_mode == MODE_THINGS)
+			list.push_back(map.getThing(selection[a]));
+	}
 }
 
 void MapEditor::showItem(int index) {

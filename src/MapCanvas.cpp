@@ -421,6 +421,30 @@ void MapCanvas::drawEditorMessages() {
 	}
 }
 
+void MapCanvas::drawSelectionNumbers() {
+	// Check if any selection exists
+	vector<MapObject*> selection;
+	editor->getSelectedObjects(selection);
+	if (selection.size() == 0)
+		return;
+
+	// Get editor message text colour
+	rgba_t col = ColourConfiguration::getColour("map_editor_message");
+
+	// Go through selection
+	for (unsigned a = 0; a < selection.size(); a++) {
+		fpoint2_t tp = selection[a]->textPoint();
+		tp.x = (GetSize().x * 0.5) + ((tp.x - view_xoff_inter) * view_scale_inter);
+		tp.y = (GetSize().y * 0.5) - ((tp.y - view_yoff_inter) * view_scale_inter);
+
+		// Draw text 'shadow'
+		Drawing::drawText(S_FMT("%d", a+1), tp.x+3, tp.y+3, rgba_t(0, 0, 0, 255), Drawing::FONT_BOLD);
+
+		// Draw text
+		Drawing::drawText(S_FMT("%d", a+1), tp.x+2, tp.y+2, col, Drawing::FONT_BOLD);
+	}
+}
+
 /* MapCanvas::draw
  * Draw the 2d map on the map gl canvas
  *******************************************************************/
@@ -536,6 +560,11 @@ void MapCanvas::draw() {
 		renderer_2d->renderTaggedLines(editor->taggedLines(), anim_flash_level);
 	else if (editor->taggedThings().size() > 0 && mouse_state == MSTATE_NORMAL)
 		renderer_2d->renderTaggedThings(editor->taggedThings(), anim_flash_level);
+
+
+	// Draw selection numbers if needed
+	//if (editor->selectionSize() > 0)
+	//	drawSelectionNumbers();
 
 
 	// Draw selection box if active

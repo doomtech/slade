@@ -161,6 +161,13 @@ float OpenGL::maxPointSize() {
 	return max_point_size;
 }
 
+/* OpenGL::maxTextureSize
+ * Returns the maximum texture size
+ *******************************************************************/
+unsigned OpenGL::maxTextureSize() {
+	return max_tex_size;
+}
+
 /* OpenGL::isInitialised
  * Returns true if OpenGL has been initialised
  *******************************************************************/

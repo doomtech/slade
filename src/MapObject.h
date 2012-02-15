@@ -50,6 +50,7 @@ public:
 	virtual void	setStringProperty(string key, string value) { properties[key] = value; }
 
 	virtual fpoint2_t	midPoint() { return fpoint2_t(0,0); }
+	virtual fpoint2_t	textPoint() { return fpoint2_t(0,0); }
 
 	void	filter(bool f = true) { filtered = f; }
 

@@ -41,6 +41,7 @@ public:
 		TYPE_ASPECIAL,
 		TYPE_SSPECIAL,
 		TYPE_TTYPE,
+		TYPE_ANGLE,
 	};
 };
 

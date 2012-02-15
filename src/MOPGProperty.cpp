@@ -420,3 +420,88 @@ void MOPGLineFlagProperty::openObjects(vector<MapObject*>& objects) {
 void MOPGLineFlagProperty::applyValue() {
 
 }
+
+
+MOPGAngleProperty::MOPGAngleProperty(const wxString& label, const wxString& name)
+: wxEditEnumProperty(label, name), MOPGProperty(MOPGProperty::TYPE_ANGLE) {
+	// Set to combo box editor
+	SetEditor(wxPGEditor_ComboBox);
+
+	// Setup combo box choices
+	wxArrayString labels;
+	wxArrayInt values;
+	labels.Add("0: East");
+	values.Add(0);
+	labels.Add("45: Northeast");
+	values.Add(45);
+	labels.Add("90: North");
+	values.Add(90);
+	labels.Add("135: Northwest");
+	values.Add(135);
+	labels.Add("180: West");
+	values.Add(180);
+	labels.Add("225: Southwest");
+	values.Add(225);
+	labels.Add("270: South");
+	values.Add(270);
+	labels.Add("315: Southeast");
+	values.Add(315);
+	
+	SetChoices(wxPGChoices(labels, values));
+}
+
+void MOPGAngleProperty::openObjects(vector<MapObject*>& objects) {
+	// Set unspecified if no objects given
+	if (objects.size() == 0) {
+		SetValueToUnspecified();
+		return;
+	}
+
+	// Get property of first object
+	int first = objects[0]->intProperty(GetName());
+
+	// Check whether all objects share the same value
+	for (unsigned a = 1; a < objects.size(); a++) {
+		if (objects[a]->intProperty(GetName()) != first) {
+			// Different value found, set unspecified
+			SetValueToUnspecified();
+			return;
+		}
+	}
+
+	// Set to common value
+	noupdate = true;
+	SetValue(first);
+	noupdate = false;
+}
+
+void MOPGAngleProperty::applyValue() {
+	// Do nothing if no parent (and thus no object list)
+	if (!parent || noupdate)
+		return;
+
+	// Do nothing if the value is unspecified
+	if (IsValueUnspecified())
+		return;
+
+	// Go through objects and set this value
+	vector<MapObject*>& objects = parent->getObjects();
+	for (unsigned a = 0; a < objects.size(); a++)
+		objects[a]->setIntProperty(GetName(), m_value.GetInteger());
+}
+
+wxString MOPGAngleProperty::ValueToString(wxVariant &value, int argFlags) const {
+	int angle = value.GetInteger();
+
+	switch (angle) {
+	case 0:		return "0: East"; break;
+	case 45:	return "45: Northeast"; break;
+	case 90:	return "90: North"; break;
+	case 135:	return "135: Northwest"; break;
+	case 180:	return "180: West"; break;
+	case 225:	return "225: Southwest"; break;
+	case 270:	return "270: South"; break;
+	case 315:	return "315: Southeast"; break;
+	default:	return S_FMT("%d", angle); break;
+	}
+}

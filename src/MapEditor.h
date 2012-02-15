@@ -77,10 +77,12 @@ public:
 	MapLine*	getHilightedLine();
 	MapSector*	getHilightedSector();
 	MapThing*	getHilightedThing();
+	MapObject*	getHilightedObject();
 	void		getSelectedVertices(vector<MapVertex*>& list);
 	void		getSelectedLines(vector<MapLine*>& list);
 	void		getSelectedSectors(vector<MapSector*>& list);
 	void		getSelectedThings(vector<MapThing*>& list);
+	void		getSelectedObjects(vector<MapObject*>& list);
 	void		showItem(int index);
 
 	// Grid
