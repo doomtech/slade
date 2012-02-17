@@ -701,6 +701,9 @@ bool ArchivePanel::moveUp() {
 	for (unsigned a = 0; a < selection.size(); a++)
 		entry_list->selectItem(selection[a] - 1);
 
+	// Ensure top-most entry is visible
+	entry_list->EnsureVisible(entry_list->getEntryIndex(selection[0]) - 4);
+
 	// Return success
 	return true;
 }
@@ -729,6 +732,9 @@ bool ArchivePanel::moveDown() {
 	entry_list->clearSelection();
 	for (unsigned a = 0; a < selection.size(); a++)
 		entry_list->selectItem(selection[a] + 1);
+
+	// Ensure bottom-most entry is visible
+	entry_list->EnsureVisible(entry_list->getEntryIndex(selection[selection.size() - 1]) + 4);
 
 	// Return success
 	return true;
