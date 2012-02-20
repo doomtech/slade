@@ -60,6 +60,7 @@ PatchBrowserItem::PatchBrowserItem(string name, Archive* archive, uint8_t type, 
  * PatchBrowserItem class destructor
  *******************************************************************/
 PatchBrowserItem::~PatchBrowserItem() {
+	if (image) delete image;
 }
 
 /* PatchBrowserItem::loadImage
@@ -93,7 +94,9 @@ bool PatchBrowserItem::loadImage() {
 	}
 
 	// Create gl texture from image
-	return image.loadImage(&img, parent->getPalette());
+	if (image) delete image;
+	image = new GLTexture();
+	return image->loadImage(&img, parent->getPalette());
 }
 
 

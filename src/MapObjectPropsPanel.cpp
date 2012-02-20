@@ -492,14 +492,14 @@ void MapObjectPropsPanel::setupTypeUDMF(int objtype) {
 	for (unsigned a = 0; a < properties.size(); a++) {
 		// Action special
 		if (properties[a]->getType() == MOPGProperty::TYPE_ASPECIAL) {
-			for (unsigned a = 0; a < 5; a++)
-				((MOPGActionSpecialProperty*)properties[a])->addArgProperty(pg_properties->GetProperty(S_FMT("arg%d", a)), a);
+			for (unsigned arg = 0; arg < 5; arg++)
+				((MOPGActionSpecialProperty*)properties[a])->addArgProperty(pg_properties->GetProperty(S_FMT("arg%d", arg)), arg);
 		}
 
 		// Thing type
 		else if (properties[a]->getType() == MOPGProperty::TYPE_TTYPE) {
-			for (unsigned a = 0; a < 5; a++)
-				((MOPGThingTypeProperty*)properties[a])->addArgProperty(pg_properties->GetProperty(S_FMT("arg%d", a)), a);
+			for (unsigned arg = 0; arg < 5; arg++)
+				((MOPGThingTypeProperty*)properties[a])->addArgProperty(pg_properties->GetProperty(S_FMT("arg%d", arg)), arg);
 		}
 	}
 

@@ -118,6 +118,24 @@
     <Filter Include="Map Editor\UI Elements\MapObjectPropsPanel">
       <UniqueIdentifier>{682d8ffc-a877-4ad6-9fda-704467efe0da}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Map Editor\GameConfiguration\Configurations">
+      <UniqueIdentifier>{22412251-8001-4a47-b40f-114f27e933b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Map Editor\GameConfiguration\Configurations\Flags">
+      <UniqueIdentifier>{dec21309-a65a-4b2b-aa87-c144b5549fb4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Map Editor\GameConfiguration\Configurations\Sectors">
+      <UniqueIdentifier>{c0ee3eb0-cad5-486e-8f43-9051db206f4b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Map Editor\GameConfiguration\Configurations\Specials">
+      <UniqueIdentifier>{918424dc-c308-4af4-9123-07aeca0c0c90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Map Editor\GameConfiguration\Configurations\Things">
+      <UniqueIdentifier>{2b193306-2f53-4478-ba07-9669202c69a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Map Editor\GameConfiguration\Configurations\UDMF">
+      <UniqueIdentifier>{4946e66b-2faa-41e9-810b-823a748a22f0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\GfxConvDialog.cpp">
@@ -761,6 +779,9 @@
     </ClCompile>
     <ClCompile Include="src\MOPGProperty.cpp">
       <Filter>Map Editor\UI Elements\MapObjectPropsPanel</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MapTextureBrowser.cpp">
+      <Filter>Map Editor\UI Elements</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1440,11 +1461,179 @@
     <ClInclude Include="src\MOPGProperty.h">
       <Filter>Map Editor\UI Elements\MapObjectPropsPanel</Filter>
     </ClInclude>
+    <ClInclude Include="src\MapTextureBrowser.h">
+      <Filter>Map Editor\UI Elements</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="slade.ico" />
     <None Include="stuff.txt" />
     <None Include="detect_functions.txt" />
+    <None Include="dist\res\config\games\doom1.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations</Filter>
+    </None>
+    <None Include="dist\res\config\games\doom2.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations</Filter>
+    </None>
+    <None Include="dist\res\config\games\doom2_boom.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations</Filter>
+    </None>
+    <None Include="dist\res\config\games\doom2_zd_hexen.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations</Filter>
+    </None>
+    <None Include="dist\res\config\games\doom2_zd_udmf.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations</Filter>
+    </None>
+    <None Include="dist\res\config\games\doom64.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations</Filter>
+    </None>
+    <None Include="dist\res\config\games\doomu.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations</Filter>
+    </None>
+    <None Include="dist\res\config\games\doomu_boom.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations</Filter>
+    </None>
+    <None Include="dist\res\config\games\doomu_zd_hexen.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations</Filter>
+    </None>
+    <None Include="dist\res\config\games\doomu_zd_udmf.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations</Filter>
+    </None>
+    <None Include="dist\res\config\games\heretic.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations</Filter>
+    </None>
+    <None Include="dist\res\config\games\heretic_zd_hexen.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations</Filter>
+    </None>
+    <None Include="dist\res\config\games\heretic_zd_udmf.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations</Filter>
+    </None>
+    <None Include="dist\res\config\games\hexen.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations</Filter>
+    </None>
+    <None Include="dist\res\config\games\strife.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations</Filter>
+    </None>
+    <None Include="dist\res\config\games\include\flags\boom_flags.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\Flags</Filter>
+    </None>
+    <None Include="dist\res\config\games\include\flags\doom_flags.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\Flags</Filter>
+    </None>
+    <None Include="dist\res\config\games\include\flags\doom64_flags.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\Flags</Filter>
+    </None>
+    <None Include="dist\res\config\games\include\flags\eternity_flags.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\Flags</Filter>
+    </None>
+    <None Include="dist\res\config\games\include\flags\hexen_flags.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\Flags</Filter>
+    </None>
+    <None Include="dist\res\config\games\include\flags\mbf_flags.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\Flags</Filter>
+    </None>
+    <None Include="dist\res\config\games\include\flags\strife_flags.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\Flags</Filter>
+    </None>
+    <None Include="dist\res\config\games\include\flags\zdoom_flags.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\Flags</Filter>
+    </None>
+    <None Include="dist\res\config\games\include\udmf\props_all.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\UDMF</Filter>
+    </None>
+    <None Include="dist\res\config\games\include\udmf\props_base.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\UDMF</Filter>
+    </None>
+    <None Include="dist\res\config\games\include\udmf\props_boom.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\UDMF</Filter>
+    </None>
+    <None Include="dist\res\config\games\include\udmf\props_hexen.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\UDMF</Filter>
+    </None>
+    <None Include="dist\res\config\games\include\udmf\props_zdoom.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\UDMF</Filter>
+    </None>
+    <None Include="dist\res\config\games\include\things\boom_things.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\Things</Filter>
+    </None>
+    <None Include="dist\res\config\games\include\things\common_things.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\Things</Filter>
+    </None>
+    <None Include="dist\res\config\games\include\things\doom1_things.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\Things</Filter>
+    </None>
+    <None Include="dist\res\config\games\include\things\doom2_things.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\Things</Filter>
+    </None>
+    <None Include="dist\res\config\games\include\things\doom64_things.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\Things</Filter>
+    </None>
+    <None Include="dist\res\config\games\include\things\heretic_things.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\Things</Filter>
+    </None>
+    <None Include="dist\res\config\games\include\things\hexen_things.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\Things</Filter>
+    </None>
+    <None Include="dist\res\config\games\include\things\mbf_things.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\Things</Filter>
+    </None>
+    <None Include="dist\res\config\games\include\things\strife_things.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\Things</Filter>
+    </None>
+    <None Include="dist\res\config\games\include\things\zdoom_things.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\Things</Filter>
+    </None>
+    <None Include="dist\res\config\games\include\things\zdoom_things_doom.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\Things</Filter>
+    </None>
+    <None Include="dist\res\config\games\include\things\zdoom_things_heretic.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\Things</Filter>
+    </None>
+    <None Include="dist\res\config\games\include\things\zdoom_things_hexen.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\Things</Filter>
+    </None>
+    <None Include="dist\res\config\games\include\things\zdoom_things_strife.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\Things</Filter>
+    </None>
+    <None Include="dist\res\config\games\include\specials\boom_specials.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\Specials</Filter>
+    </None>
+    <None Include="dist\res\config\games\include\specials\doom1_specials.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\Specials</Filter>
+    </None>
+    <None Include="dist\res\config\games\include\specials\doom2_specials.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\Specials</Filter>
+    </None>
+    <None Include="dist\res\config\games\include\specials\doom64_specials.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\Specials</Filter>
+    </None>
+    <None Include="dist\res\config\games\include\specials\heretic_specials.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\Specials</Filter>
+    </None>
+    <None Include="dist\res\config\games\include\specials\hexen_specials.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\Specials</Filter>
+    </None>
+    <None Include="dist\res\config\games\include\specials\strife_specials.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\Specials</Filter>
+    </None>
+    <None Include="dist\res\config\games\include\specials\zdoom_specials.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\Specials</Filter>
+    </None>
+    <None Include="dist\res\config\games\include\sectors\doom_sectors.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\Sectors</Filter>
+    </None>
+    <None Include="dist\res\config\games\include\sectors\doom64_sectors.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\Sectors</Filter>
+    </None>
+    <None Include="dist\res\config\games\include\sectors\heretic_sectors.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\Sectors</Filter>
+    </None>
+    <None Include="dist\res\config\games\include\sectors\hexen_sectors.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\Sectors</Filter>
+    </None>
+    <None Include="dist\res\config\games\include\sectors\zdoom_sectors.cfg">
+      <Filter>Map Editor\GameConfiguration\Configurations\Sectors</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SLADE.rc" />

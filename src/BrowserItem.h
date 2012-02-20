@@ -11,7 +11,7 @@ protected:
 	string			type;
 	string			name;
 	unsigned		index;
-	GLTexture		image;
+	GLTexture*		image;
 	BrowserWindow*	parent;
 
 public:

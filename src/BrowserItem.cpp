@@ -45,6 +45,7 @@ BrowserItem::BrowserItem(string name, unsigned index, string type) {
 	this->name = name;
 	this->index = index;
 	this->type = type;
+	this->image = NULL;
 }
 
 /* BrowserItem::~BrowserItem
@@ -67,11 +68,11 @@ bool BrowserItem::loadImage() {
  *******************************************************************/
 void BrowserItem::draw(int size) {
 	// Try to load image if it isn't already
-	if (!image.isLoaded())
+	if (!image || (image && !image->isLoaded()))
 		loadImage();
 
 	// If it still isn't just draw a red box with an X
-	if (!image.isLoaded()) {
+	if (!image || (image && !image->isLoaded())) {
 		glPushAttrib(GL_ENABLE_BIT|GL_CURRENT_BIT);
 
 		glColor3f(1, 0, 0);
@@ -109,8 +110,8 @@ void BrowserItem::draw(int size) {
 	}
 
 	// Determine texture dimensions
-	double width = image.getWidth();
-	double height = image.getHeight();
+	double width = image->getWidth();
+	double height = image->getHeight();
 	if (width > height) {
 		// Scale down by width
 		if (width > size) {
@@ -133,7 +134,7 @@ void BrowserItem::draw(int size) {
 	double left = ((double)size * 0.5) - (width * 0.5);
 
 	// Draw
-	image.bind();
+	image->bind();
 
 	glBegin(GL_QUADS);
 	glTexCoord2f(0.0f, 0.0f);	glVertex2d(left, top);
@@ -156,5 +157,5 @@ void BrowserItem::draw(int size) {
  * Clears the item image
  *******************************************************************/
 void BrowserItem::clearImage() {
-	image.clear();
+	if (image) image->clear();
 }
