@@ -337,4 +337,24 @@ public:
 
 		return info;
 	}
+
+	int canWrite(SImage& image) {
+		if (!gfx_extraconv)
+			return NOTWRITABLE;
+		// Can write paletted images of size 4x16 or 16x23
+		if (image.getType() == PALMASK && (
+			(image.getWidth() == 4 && image.getHeight() == 16)  || 
+			(image.getWidth() == 16 && image.getHeight() == 23)))
+			return WRITABLE;
+		// If it wouldn't work, it wouldn't work
+		return NOTWRITABLE;
+	}
+
+	bool canWriteType(SIType type) {
+		// Only writable as paletted
+		if (type == PALMASK)
+			return true;
+		else
+			return false;
+	}
 };
