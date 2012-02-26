@@ -186,7 +186,7 @@ entry_types
 		export_ext = "mp2";
 		icon = "e_sound";
 		category = "Audio";
-		//editor = audio;
+		editor = audio;
 	}
 
 	snd_mp3
@@ -196,7 +196,7 @@ entry_types
 		export_ext = "mp3";
 		icon = "e_sound";
 		category = "Audio";
-		//editor = audio;
+		editor = audio;
 	}
 
 	snd_spc

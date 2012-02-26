@@ -3,6 +3,7 @@
 #define __AUDIO_ENTRY_PANEL_H__
 
 #include "EntryPanel.h"
+#include <wx/mediactrl.h>
 
 #undef Status
 #include <SFML/Audio.hpp>
@@ -10,7 +11,8 @@
 class AudioEntryPanel : public EntryPanel {
 private:
 	string	prevfile;
-	bool	midi;
+	int		audio_type;
+	//bool	midi;
 	bool	opened;
 
 	wxBitmapButton*	btn_play;
@@ -19,11 +21,20 @@ private:
 	wxSlider*		slider_seek;
 	wxSlider*		slider_volume;
 	wxTimer*		timer_seek;
+	wxMediaCtrl*	media_ctrl;
 
-	bool				audio_music;
+	//bool				audio_music;
 	sf::SoundBuffer*	sound_buffer;
 	sf::Sound			sound;
 	sf::Music			music;
+
+	enum {
+		AUTYPE_INVALID,
+		AUTYPE_SOUND,
+		AUTYPE_MUSIC,
+		AUTYPE_MIDI,
+		AUTYPE_MEDIA,
+	};
 
 public:
 	AudioEntryPanel(wxWindow* parent);
