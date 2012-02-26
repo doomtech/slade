@@ -30,6 +30,12 @@ public:
 
 	bool	isInitialised() { return fs_initialised; }
 	bool	isSoundfontLoaded() { return fs_soundfont_id != FLUID_FAILED; }
+	void	resetPlayer() {
+		if (instance) {
+			delete instance;
+			instance = new MIDIPlayer();
+		}
+	}
 
 	bool	initFluidsynth();
 	bool	reloadSoundfont();

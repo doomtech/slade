@@ -17,6 +17,10 @@ rgba_t ColourConfiguration::getColour(string name) {
 		return COL_WHITE;
 }
 
+cc_col_t ColourConfiguration::getColDef(string name) {
+	return cc_colours[name];
+}
+
 void ColourConfiguration::setColour(string name, int red, int green, int blue, int alpha, int blend) {
 	cc_col_t& col = cc_colours[name];
 	if (red >= 0)
@@ -85,17 +89,96 @@ bool ColourConfiguration::readConfiguration(MemChunk& mc) {
 }
 
 bool ColourConfiguration::writeConfiguration(MemChunk& mc) {
-	return false;
+	string cfgstring = "colours\n{\n";
+
+	ColourHashMap::iterator i = cc_colours.begin();
+
+	// Go through all properties
+	while (i != cc_colours.end()) {
+		// Skip if it doesn't 'exist'
+		cc_col_t cc = i->second;
+		if (!cc.exists) {
+			i++;
+			continue;
+		}
+
+		// Colour definition name
+		cfgstring += S_FMT("\t%s\n\t{\n", CHR(i->first));
+
+		// Full name
+		cfgstring += S_FMT("\t\tname = \"%s\";\n", CHR(cc.name));
+
+		// Group
+		cfgstring += S_FMT("\t\tgroup = \"%s\";\n", CHR(cc.group));
+
+		// Colour values
+		cfgstring += S_FMT("\t\trgb = %d, %d, %d;\n", cc.colour.r, cc.colour.g, cc.colour.b);
+
+		// Alpha
+		if (cc.colour.a < 255)
+			cfgstring += S_FMT("\t\talpha = %d;\n", cc.colour.a);
+
+		// Additive
+		if (cc.colour.blend == 1)
+			cfgstring += "\t\tadditive = true;\n";
+
+		cfgstring += "\t}\n\n";
+
+		// Next colour
+		i++;
+	}
+
+	cfgstring += "}\n";
+
+	mc.write(cfgstring.ToAscii(), cfgstring.size());
+
+	return true;
 }
 
 bool ColourConfiguration::init() {
+	// Load default configuration
+	loadDefaults();
+
+	// Check for saved colour configuration
+	if (wxFileExists(appPath("colours.cfg", DIR_USER))) {
+		MemChunk ccfg;
+		ccfg.importFile(appPath("colours.cfg", DIR_USER));
+		readConfiguration(ccfg);
+	}
+
+	return true;
+}
+
+void ColourConfiguration::loadDefaults() {
+	// Read default colours
 	Archive* pres = theArchiveManager->programResourceArchive();
 	ArchiveEntry* entry_default_cc = pres->entryAtPath("config/colours/default.txt");
+	if (entry_default_cc)
+		readConfiguration(entry_default_cc->getMCData());
+}
 
-	if (!entry_default_cc)
-		return false;
-	else
-		return readConfiguration(entry_default_cc->getMCData());
+bool ColourConfiguration::readConfiguration(string name) {
+	// TODO: search custom folder
+
+	// Search resource pk3
+	Archive* res = theArchiveManager->programResourceArchive();
+	ArchiveTreeNode* dir = res->getDir("config/colours");
+	for (unsigned a = 0; a < dir->numEntries(); a++) {
+		if (S_CMPNOCASE(dir->getEntry(a)->getName(true), name))
+			return readConfiguration(dir->getEntry(a)->getMCData());
+	}
+
+	return false;
+}
+
+void ColourConfiguration::getConfigurationNames(vector<string>& names) {
+	// TODO: search custom folder
+
+	// Search resource pk3
+	Archive* res = theArchiveManager->programResourceArchive();
+	ArchiveTreeNode* dir = res->getDir("config/colours");
+	for (unsigned a = 0; a < dir->numEntries(); a++)
+		names.push_back(dir->getEntry(a)->getName(true));
 }
 
 void ColourConfiguration::getColourNames(vector<string>& list) {
@@ -152,11 +235,5 @@ CONSOLE_COMMAND(ccfg, 1) {
 }
 
 CONSOLE_COMMAND(load_ccfg, 1) {
-	// Determine full path string to entry
-	string path = S_FMT("config/colours/%s.txt", CHR(args[0]));
-	Archive* pres = theArchiveManager->programResourceArchive();
-	ArchiveEntry* entry_cc = pres->entryAtPath(path);
-
-	if (entry_cc)
-		ColourConfiguration::readConfiguration(entry_cc->getMCData());
+	ColourConfiguration::readConfiguration(args[0]);
 }

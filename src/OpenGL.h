@@ -8,7 +8,11 @@ namespace OpenGL {
 	wxGLContext*	getContext(wxGLCanvas* canvas);
 	bool			init();
 	bool			np2TexSupport();
+	bool			pointSpriteSupport();
 	bool			validTexDimension(unsigned dim);
+	float			maxPointSize();
+	unsigned		maxTextureSize();
+	bool			isInitialised();
 }
 
 #endif//__OPENGL_H__

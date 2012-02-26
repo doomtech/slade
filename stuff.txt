@@ -8,13 +8,31 @@
 TODO List ---------------------------------------------------------------
 
 --- Bugs ---
+- Gfx doesn't update after being converted
+- Random crash on view/convert of invalid gfx
+
+--- Map Editor ---
+- Checks:
+	- Missing textures
+	- Specials with 0 tag that require a tag
+	- Invalid sector references (maybe not, shouldn't really happen)
+- Non-power-of-two textures (where simply expanding the texture canvas to 128x128 won't work)
+- 3d mode
+- Editing:
+	- Object creation
+	- Line drawing
+	- Object modification
+	- Map saving
+- Texture browser
+- Thing type browser
+- Better UDMF property handling
+
 
 --- Minor Problems/Annoyances ---
 - Long calltips can extend off the edge of the screen
 - Incorrect ctrl+tab behaviour with tabs
 
 --- Editor Features ---
-- Map editor (!)
 - Generic entry data view (for VERTEXES, LINEDEFS, SIDEDEFS, SECTORS, THINGS, DEMO*, TEXTUREX/PNAMES, ...)
 - ANSI screen editor
 - Proper font viewer
@@ -96,6 +114,13 @@ Unimplemented Feature Requests ------------------------------------------
 - SBARINFO viewer/editor
 
 --- Gfx ---
+- Save offset type between sessions
+Translation dialog:
+- Source/destination palette selectable
+- Scroll through multiple preview gfx
+- Allow use with truecolour gfx
+Conversion dialog:
+- Enter and esc mapped to convert all and skip all
 
 --- Text Editor ---
 

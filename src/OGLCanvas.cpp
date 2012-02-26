@@ -1,7 +1,7 @@
 
 /*******************************************************************
  * SLADE - It's a Doom Editor
- * Copyright (C) 2008 Simon Judd
+ * Copyright (C) 2008-2012 Simon Judd
  *
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
@@ -32,23 +32,69 @@
 #include "WxStuff.h"
 #include "OGLCanvas.h"
 #include "GLTexture.h"
+#include "MainApp.h"
+#include "Drawing.h"
+
+#ifdef USE_SFML_RENDERWINDOW
+#ifdef __WXGTK__
+#include <gdk/gdkx.h>
+#include <gtk/gtk.h>
+#include <gdk/gdkprivate.h>
+#include <gtk/gtkwidget.h>
+#endif
+#endif
 
 
 /*******************************************************************
  * OGLCANVAS CLASS FUNCTIONS
  *******************************************************************/
 
+#ifdef USE_SFML_RENDERWINDOW
 /* OGLCanvas::OGLCanvas
- * OGLCanvas class constructor
+ * OGLCanvas class constructor, SFML implementation
  *******************************************************************/
 OGLCanvas::OGLCanvas(wxWindow* parent, int id)
-: wxGLCanvas(parent, id, NULL, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE|wxWANTS_CHARS) {
+: wxControl(parent, id, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE|wxWANTS_CHARS), timer(this) {
 	init_done = false;
+	last_time = theApp->runTimer();
+	timer.Start(100);
+
+	// Code taken from SFML wxWidgets integration example
+	#ifdef __WXGTK__
+		// GTK implementation requires to go deeper to find the
+		// low-level X11 identifier of the widget
+		gtk_widget_realize(m_wxwindow);
+        gtk_widget_set_double_buffered(m_wxwindow, false);
+        GdkWindow* Win = gtk_widget_get_window(m_wxwindow);
+        XFlush(GDK_WINDOW_XDISPLAY(Win));
+        sf::RenderWindow::Create(GDK_WINDOW_XWINDOW(Win));
+    #else
+		sf::RenderWindow::Create(GetHandle());
+    #endif
 
 	// Bind events
 	Bind(wxEVT_PAINT, &OGLCanvas::onPaint, this);
 	Bind(wxEVT_ERASE_BACKGROUND, &OGLCanvas::onEraseBackground, this);
+	//Bind(wxEVT_IDLE, &OGLCanvas::onIdle, this);
+	Bind(wxEVT_TIMER, &OGLCanvas::onTimer, this);
 }
+#else
+/* OGLCanvas::OGLCanvas
+ * OGLCanvas class constructor, wxGLCanvas implementation
+ *******************************************************************/
+OGLCanvas::OGLCanvas(wxWindow* parent, int id)
+: wxGLCanvas(parent, id, NULL, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE|wxWANTS_CHARS), timer(this) {
+	init_done = false;
+	last_time = theApp->runTimer();
+
+	// Bind events
+	Bind(wxEVT_PAINT, &OGLCanvas::onPaint, this);
+	Bind(wxEVT_ERASE_BACKGROUND, &OGLCanvas::onEraseBackground, this);
+	//Bind(wxEVT_IDLE, &OGLCanvas::onIdle, this);
+	Bind(wxEVT_TIMER, &OGLCanvas::onTimer, this);
+}
+#endif
+
 
 /* OGLCanvas::OGLCanvas
  * OGLCanvas class constructor
@@ -62,6 +108,7 @@ OGLCanvas::~OGLCanvas() {
  * false otherwise
  *******************************************************************/
 bool OGLCanvas::setContext() {
+#ifndef USE_SFML_RENDERWINDOW
 	wxGLContext* context = OpenGL::getContext(this);
 
 	if (context) {
@@ -70,14 +117,20 @@ bool OGLCanvas::setContext() {
 	}
 	else
 		return false;
+#else
+	return true;
+#endif
 }
 
 /* OGLCanvas::init
  * Initialises OpenGL settings for the GL canvas
  *******************************************************************/
 void OGLCanvas::init() {
-	if (!setContext())
-		return;
+	OpenGL::init();
+
+#ifdef USE_SFML_RENDERWINDOW
+	PreserveOpenGLStates(true);
+#endif
 
 	glViewport(0, 0, GetSize().x, GetSize().y);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -138,7 +191,15 @@ void OGLCanvas::drawCheckeredBackground() {
  * Places the canvas on top of a new wxPanel and returns the panel.
  * This is sometimes needed to fix redraw problems in Windows XP
  *******************************************************************/
-wxPanel* OGLCanvas::toPanel(wxWindow* parent) {
+wxWindow* OGLCanvas::toPanel(wxWindow* parent) {
+#ifdef USE_SFML_RENDERWINDOW
+#ifdef __WXGTK__
+	// Reparenting the window causes a crash under gtk, so don't do it there
+	// (this was only to fix a bug in winxp anyway)
+	return this;
+#endif
+#endif
+
 	// Create panel
 	wxPanel* panel = new wxPanel(parent, -1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL|wxBORDER_SIMPLE);
 
@@ -160,19 +221,29 @@ wxPanel* OGLCanvas::toPanel(wxWindow* parent) {
  * OGLCANVAS EVENTS
  *******************************************************************/
 
-/* OGLCanvas::paint
+/* OGLCanvas::onPaint
  * Called when the gfx canvas has to be redrawn
  *******************************************************************/
 void OGLCanvas::onPaint(wxPaintEvent& e) {
 	wxPaintDC(this);
 
-	if (!init_done)
-		init();
+	if (IsShown()) {
+		// Set context to this window
+#ifdef USE_SFML_RENDERWINDOW
+		sf::RenderWindow::SetActive();
+		Drawing::setRenderTarget(this);
+		SetView(sf::View(sf::FloatRect(0.0f, 0.0f, GetSize().x, GetSize().y)));
+#else
+		setContext();
+#endif
 
-	if (!setContext())
-		return;
+		// Init if needed
+		if (!init_done)
+			init();
 
-	draw();
+		// Draw content
+		draw();
+	}
 }
 
 /* OGLCanvas::onEraseBackground
@@ -181,4 +252,37 @@ void OGLCanvas::onPaint(wxPaintEvent& e) {
  *******************************************************************/
 void OGLCanvas::onEraseBackground(wxEraseEvent& e) {
 	// Do nothing
+}
+
+/* OGLCanvas::onIdle
+ * Called when the gfx canvas is doing nothing
+ *******************************************************************/
+/*
+void OGLCanvas::onIdle(wxIdleEvent& e) {
+	// If frame interval is negative, don't redraw automatically
+	if (frame_interval < 0)
+		return;
+
+	// Get time since last redraw
+	long frametime = theApp->runTimer() - last_time;
+
+	// Update/refresh if needed
+	if (frametime >= frame_interval) {
+		update(frametime);
+		Refresh();
+		last_time = theApp->runTimer();
+	}
+
+	e.Skip();
+}
+*/
+
+void OGLCanvas::onTimer(wxTimerEvent& e) {
+	// Get time since last redraw
+	long frametime = theApp->runTimer() - last_time;
+	last_time = theApp->runTimer();
+
+	// Update/refresh
+	update(frametime);
+	Refresh();
 }

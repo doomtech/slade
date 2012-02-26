@@ -1,7 +1,7 @@
 
 /*******************************************************************
  * SLADE - It's a Doom Editor
- * Copyright (C) 2008 Simon Judd
+ * Copyright (C) 2008-2012 Simon Judd
  *
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
@@ -35,13 +35,16 @@
  * VARIABLES
  *******************************************************************/
 CVAR(Bool, gl_tex_enable_np2, true, CVAR_SAVE)
+CVAR(Bool, gl_point_sprite, true, CVAR_SAVE)
 
 namespace OpenGL {
 	wxGLContext*	context = NULL;
+	bool			initialised = false;
 	double			version = 0;
 	unsigned		max_tex_size = 128;
 	unsigned		pow_two[] = { 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768 };
 	uint8_t			n_pow_two = 16;
+	float			max_point_size = -1.0f;
 }
 
 
@@ -70,6 +73,9 @@ wxGLContext* OpenGL::getContext(wxGLCanvas* canvas) {
  * Initialises general OpenGL variables and settings
  *******************************************************************/
 bool OpenGL::init() {
+	if (initialised)
+		return true;
+
 	wxLogMessage("Initialising OpenGL...");
 
 	// Get OpenGL version
@@ -84,6 +90,25 @@ bool OpenGL::init() {
 	max_tex_size = val;
 	wxLogMessage("Max Texture Size: %dx%d", max_tex_size, max_tex_size);
 
+	// Initialise GLEW
+	glewInit();
+
+	// Test extensions
+	wxLogMessage("Checking extensions...");
+	if (GLEW_ARB_vertex_buffer_object)
+		wxLogMessage("Vertex Buffer Objects supported");
+	else
+		wxLogMessage("Vertex Buffer Objects not supported");
+	if (GLEW_ARB_point_sprite)
+		wxLogMessage("Point Sprites supported");
+	else
+		wxLogMessage("Point Sprites not supported");
+	if (GLEW_ARB_framebuffer_object)
+		wxLogMessage("Framebuffer Objects supported");
+	else
+		wxLogMessage("Framebuffer Objects not supported");
+
+	initialised = true;
 	return true;
 }
 
@@ -92,7 +117,15 @@ bool OpenGL::init() {
  * of-two textures, false otherwise
  *******************************************************************/
 bool OpenGL::np2TexSupport() {
-	return version >= 2 && gl_tex_enable_np2;
+	return GLEW_ARB_texture_non_power_of_two && gl_tex_enable_np2;
+}
+
+/* OpenGL::np2TexSupport
+ * Returns true if the installed OpenGL version supports point
+ * sprites, false otherwise
+ *******************************************************************/
+bool OpenGL::pointSpriteSupport() {
+	return GLEW_ARB_point_sprite && gl_point_sprite;
 }
 
 /* OpenGL::validTexDimension
@@ -112,4 +145,32 @@ bool OpenGL::validTexDimension(unsigned dim) {
 	}
 	else
 		return true;
+}
+
+/* OpenGL::maxPointSize
+ * Returns the implementation-dependant maximum size for GL_POINTS
+ *******************************************************************/
+float OpenGL::maxPointSize() {
+	if (max_point_size < 0) {
+		GLfloat sizes[2];
+		glGetFloatv(GL_ALIASED_POINT_SIZE_RANGE, sizes);
+		max_point_size = sizes[1];
+		//wxLogMessage("Max GL point size %1.2f", max_point_size);
+	}
+
+	return max_point_size;
+}
+
+/* OpenGL::maxTextureSize
+ * Returns the maximum texture size
+ *******************************************************************/
+unsigned OpenGL::maxTextureSize() {
+	return max_tex_size;
+}
+
+/* OpenGL::isInitialised
+ * Returns true if OpenGL has been initialised
+ *******************************************************************/
+bool OpenGL::isInitialised() {
+	return initialised;
 }

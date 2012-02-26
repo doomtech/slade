@@ -1,7 +1,7 @@
 
 /*******************************************************************
  * SLADE - It's a Doom Editor
- * Copyright (C) 2008 Simon Judd
+ * Copyright (C) 2008-2012 Simon Judd
  *
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
@@ -98,11 +98,31 @@ double MathStuff::lineSide(double x, double y, double x1, double y1, double x2, 
 	return -((y-y1)*(x2-x1) - (x-x1)*(y2-y1));
 }
 
+fpoint2_t MathStuff::closestPointOnLine(double x, double y, double x1, double y1, double x2, double y2) {
+	// Get line length
+	double len = sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1));
+
+	// Calculate intersection distance
+	double u = 0;
+	if (len > 0) {
+		u = ((x-x1)*(x2-x1) + (y-y1)*(y2-y1)) / (len*len);
+
+		// Limit intersection distance to the line
+		double lbound = 1 / len;
+		if(u < lbound) u = lbound;
+		if(u > (1.0-lbound)) u = 1.0-lbound;
+	}
+
+	// Return intersection point
+	return fpoint2_t(x1 + u*(x2 - x1), y1 + u*(y2 - y1));
+}
+
 /* MathStuff::distanceToLine
  * Returns the shortest distance between the point at [x,y] and the
  * line from [x1,y1] to [x2,y2]
  *******************************************************************/
 double MathStuff::distanceToLine(double x, double y, double x1, double y1, double x2, double y2) {
+	/*
 	// Get line length
 	double len = sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1));
 
@@ -120,10 +140,14 @@ double MathStuff::distanceToLine(double x, double y, double x1, double y1, doubl
 	// Calculate intersection point
 	double ix = x1 + u*(x2 - x1);
 	double iy = y1 + u*(y2 - y1);
+	*/
+
+	// Calculate intersection point
+	fpoint2_t i = closestPointOnLine(x, y, x1, y1, x2, y2);
 
 	// Return distance between intersection and point
 	// which is the shortest distance to the line
-	return sqrt((ix-x)*(ix-x) + (iy-y)*(iy-y));
+	return sqrt((i.x-x)*(i.x-x) + (i.y-y)*(i.y-y));
 }
 
 /* MathStuff::linesIntersect

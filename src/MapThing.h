@@ -2,8 +2,7 @@
 #ifndef __MAPTHING_H__
 #define __MAPTHING_H__
 
-#include "Tokenizer.h"
-#include "PropertyList.h"
+#include "MapObject.h"
 
 struct doomthing_t
 {
@@ -38,27 +37,30 @@ struct doom64thing_t
 	short	tid;
 };
 
-class MapThing {
+class MapThing : public MapObject {
+friend class SLADEMap;
 private:
-	short	type;
-	double	x;
-	double	y;
-	double	z;
-	short	angle;
-	short	tid;
-
-	PropertyList	udmf_props;
+	// Basic data
+	short		type;
+	double		x;
+	double		y;
 
 public:
-	MapThing(){}
-	MapThing(doomthing_t t);
-	MapThing(hexenthing_t t);
-	MapThing(doom64thing_t t);
-	~MapThing(){}
+	MapThing(SLADEMap* parent = NULL);
+	MapThing(double x, double y, short type, SLADEMap* parent = NULL);
+	~MapThing();
 
-	bool	parseUDMF(Tokenizer& tz);
+	double		xPos() { return x; }
+	double		yPos() { return y; }
+
+	fpoint2_t	midPoint() { return fpoint2_t(x, y); }
 
 	short	getType() { return type; }
+
+	int		intProperty(string key);
+	double	floatProperty(string key);
+	void	setIntProperty(string key, int value);
+	void	setFloatProperty(string key, double value);
 };
 
 #endif //__MAPTHING_H__

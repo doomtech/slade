@@ -17,9 +17,10 @@ private:
 	uint8_t		type;
 	prop_value	value;
 	string		val_string;	// I *would* put this in the union but i'm not sure about using const char* there
+	bool		has_value;
 
 public:
-	Property(uint8_t type = PROP_FLAG);	// Default property type is a flag
+	Property(uint8_t type = PROP_BOOL);	// Default property type is bool
 	Property(const Property& copy);
 	Property(bool value);
 	Property(int value);
@@ -30,8 +31,10 @@ public:
 
 	uint8_t		getType() { return type; }
 	bool		isType(uint8_t type) { return this->type == type; }
+	bool		hasValue() { return has_value; }
 
 	void	changeType(uint8_t newtype);
+	void	setHasValue(bool hv) { has_value = hv; }
 
 	inline operator bool () { return getBoolValue(); }
 	inline operator int () { return getIntValue(); }

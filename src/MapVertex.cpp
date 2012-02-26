@@ -2,50 +2,78 @@
 #include "Main.h"
 #include "MapVertex.h"
 
-MapVertex::MapVertex(doomvertex_t v) {
-	this->x = v.x;
-	this->y = v.y;
+MapVertex::MapVertex(SLADEMap* parent) : MapObject(MOBJ_VERTEX, parent) {
+	// Init variables
+	this->x = 0;
+	this->y = 0;
 }
 
-MapVertex::MapVertex(doom64vertex_t v) {
-	this->x = v.x/65536;
-	this->y = v.y/65536;
+MapVertex::MapVertex(double x, double y, SLADEMap* parent) : MapObject(MOBJ_VERTEX, parent) {
+	// Init variables
+	this->x = x;
+	this->y = y;
 }
 
-bool MapVertex::parseUDMF(Tokenizer& tz) {
-	// Skip opening {
-	tz.getToken();
+MapVertex::~MapVertex() {
+}
 
-	// Init required attributes
-	bool x_set = false;
-	bool y_set = false;
+int MapVertex::intProperty(string key) {
+	if (key == "x")
+		return (int)x;
+	else if (key == "y")
+		return (int)y;
+	else
+		return MapObject::intProperty(key);
+}
 
-	// Read definition
-	string token = tz.getToken();
-	while (token != "}") {
-		// X position
-		if (token == "x" && tz.peekToken() == "=") {
-			tz.getToken();	// Skip =
-			x = tz.getFloat();
-			x_set = true;
-		}
+double MapVertex::floatProperty(string key) {
+	if (key == "x")
+		return x;
+	else if (key == "y")
+		return y;
+	else
+		return MapObject::floatProperty(key);
+}
 
-		// Y position
-		if (token == "y" && tz.peekToken() == "=") {
-			// Skip =
-			tz.getToken();
-			y = tz.getFloat();
-			y_set = true;
-		}
+void MapVertex::setIntProperty(string key, int value) {
+	if (key == "x")
+		x = value;
+	else if (key == "y")
+		y = value;
+	else
+		MapObject::setIntProperty(key, value);
+}
 
-		token = tz.getToken();
+void MapVertex::setFloatProperty(string key, double value) {
+	if (key == "x")
+		x = value;
+	else if (key == "y")
+		y = value;
+	else
+		MapObject::setFloatProperty(key, value);
+}
+
+void MapVertex::connectLine(MapLine* line) {
+	for (unsigned a = 0; a < connected_lines.size(); a++) {
+		if (connected_lines[a] == line)
+			return;
 	}
 
-	// Check that all required attributes were defined
-	if (x_set && y_set)
-		return true;
-	else {
-		Global::error = "UDMF Vertex definition missing x or y value";
-		return false;
+	connected_lines.push_back(line);
+}
+
+void MapVertex::disconnectLine(MapLine* line) {
+	for (unsigned a = 0; a < connected_lines.size(); a++) {
+		if (connected_lines[a] == line) {
+			connected_lines.erase(connected_lines.begin() + a);
+			return;
+		}
 	}
+}
+
+MapLine* MapVertex::connectedLine(unsigned index) {
+	if (index > connected_lines.size())
+		return NULL;
+
+	return connected_lines[index];
 }

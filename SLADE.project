@@ -39,6 +39,10 @@
       <File Name="src/AudioPrefsPanel.h"/>
       <File Name="src/ColourPrefsPanel.cpp"/>
       <File Name="src/ColourPrefsPanel.h"/>
+      <File Name="src/MapEditorPrefsPanel.h"/>
+      <File Name="src/MapEditorPrefsPanel.cpp"/>
+      <File Name="src/MapDisplayPrefsPanel.h"/>
+      <File Name="src/MapDisplayPrefsPanel.cpp"/>
       <File Name="src/AdvancedPrefsPanel.cpp"/>
       <File Name="src/AdvancedPrefsPanel.h"/>
     </VirtualDirectory>
@@ -46,6 +50,8 @@
     <File Name="src/ExtMessageDialog.cpp"/>
     <File Name="src/TranslationEditorDialog.cpp"/>
     <File Name="src/TranslationEditorDialog.h"/>
+    <File Name="src/MapEditorConfigDialog.h"/>
+    <File Name="src/MapEditorConfigDialog.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="General">
     <File Name="src/Clipboard.cpp"/>
@@ -87,6 +93,8 @@
       <File Name="src/Compression.h"/>
       <File Name="src/SFileDialog.cpp"/>
       <File Name="src/SFileDialog.h"/>
+      <File Name="src/Polygon2D.cpp"/>
+      <File Name="src/Polygon2D.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Console">
       <File Name="src/Console.cpp"/>
@@ -97,8 +105,8 @@
     <File Name="src/MIDIPlayer.cpp"/>
     <File Name="src/SAction.cpp"/>
     <File Name="src/SAction.h"/>
-    <File Name="src/Drawing.cpp"/>
     <File Name="src/Drawing.h"/>
+    <File Name="src/Drawing.cpp"/>
     <File Name="src/ColourConfiguration.cpp"/>
     <File Name="src/ColourConfiguration.h"/>
     <File Name="src/KeyBind.cpp"/>
@@ -120,8 +128,6 @@
         <File Name="src/SwitchesEntryPanel.h"/>
         <File Name="src/TextEntryPanel.cpp"/>
         <File Name="src/TextEntryPanel.h"/>
-        <File Name="src/PnamesEntryPanel.cpp"/>
-        <File Name="src/PnamesEntryPanel.h"/>
         <File Name="src/DefaultEntryPanel.cpp"/>
         <File Name="src/HexEntryPanel.h"/>
         <File Name="src/HexEntryPanel.cpp"/>
@@ -174,15 +180,56 @@
       <File Name="src/MapThing.h"/>
       <File Name="src/MapVertex.cpp"/>
       <File Name="src/MapVertex.h"/>
-      <File Name="src/SLADEMap.cpp"/>
       <File Name="src/SLADEMap.h"/>
+      <File Name="src/SLADEMap.cpp"/>
+      <File Name="src/MapObject.cpp"/>
+      <File Name="src/MapObject.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="UI Elements">
       <File Name="src/MapCanvas.cpp"/>
       <File Name="src/MapCanvas.h"/>
+      <File Name="src/MCAnimations.cpp"/>
+      <File Name="src/MCAnimations.h"/>
+      <VirtualDirectory Name="Info Overlays">
+        <File Name="src/LineInfoOverlay.cpp"/>
+        <File Name="src/LineInfoOverlay.h"/>
+        <File Name="src/SectorInfoOverlay.cpp"/>
+        <File Name="src/SectorInfoOverlay.h"/>
+        <File Name="src/ThingInfoOverlay.cpp"/>
+        <File Name="src/ThingInfoOverlay.h"/>
+        <File Name="src/VertexInfoOverlay.cpp"/>
+        <File Name="src/VertexInfoOverlay.h"/>
+      </VirtualDirectory>
+      <File Name="src/ActionSpecialTreeView.cpp"/>
+      <File Name="src/ActionSpecialTreeView.h"/>
+      <File Name="src/ThingTypeTreeView.cpp"/>
+      <File Name="src/ThingTypeTreeView.h"/>
+      <VirtualDirectory Name="MapObjectPropsPanel">
+        <File Name="src/MapObjectPropsPanel.cpp"/>
+        <File Name="src/MapObjectPropsPanel.h"/>
+        <File Name="src/MOPGProperty.h"/>
+        <File Name="src/MOPGProperty.cpp"/>
+      </VirtualDirectory>
     </VirtualDirectory>
-    <File Name="src/MapEditorWindow.cpp"/>
     <File Name="src/MapEditorWindow.h"/>
+    <File Name="src/MapEditorWindow.cpp"/>
+    <File Name="src/MapEditor.cpp"/>
+    <File Name="src/MapEditor.h"/>
+    <File Name="src/MapTextureManager.h"/>
+    <File Name="src/MapTextureManager.cpp"/>
+    <VirtualDirectory Name="GameConfiguration">
+      <File Name="src/GameConfiguration.cpp"/>
+      <File Name="src/GameConfiguration.h"/>
+      <File Name="src/ActionSpecial.h"/>
+      <File Name="src/ActionSpecial.cpp"/>
+      <File Name="src/ThingType.h"/>
+      <File Name="src/ThingType.cpp"/>
+      <File Name="src/Args.h"/>
+      <File Name="src/UDMFProperty.h"/>
+      <File Name="src/UDMFProperty.cpp"/>
+    </VirtualDirectory>
+    <File Name="src/MapRenderer2D.cpp"/>
+    <File Name="src/MapRenderer2D.h"/>
   </VirtualDirectory>
   <VirtualDirectory Name="Resources">
     <VirtualDirectory Name="Archive">
@@ -465,55 +512,39 @@
         <LibraryPath Value="."/>
         <Library Value="freeimage"/>
         <Library Value="fluidsynth"/>
+        <Library Value="ftgl"/>
+        <Library Value="GLEW"/>
       </Linker>
       <ResourceCompiler Options=""/>
     </GlobalSettings>
     <Configuration Name="Debug" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-g;$(shell wx-config --cxxflags std,gl,stc,aui,propgrid --unicode=yes --debug=yes)" C_Options="-g;$(shell wx-config --cxxflags std,gl,stc,aui,propgrid --unicode=yes --debug=yes)" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
+      <Compiler Options="-g;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=yes);`pkg-config --cflags gtk+-2.0`" C_Options="-g;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=yes)" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
         <Preprocessor Value="__WX__"/>
       </Compiler>
-      <Linker Options="$(shell wx-config --debug=yes --libs std,gl,stc,aui,propgrid --unicode=yes)" Required="yes"/>
-      <ResourceCompiler Options="$(shell wx-config --rcflags)" Required="no"/>
-      <General OutputFile="./dist/slade-dbg" IntermediateDirectory="./Debug" Command="./slade-dbg" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
-      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
-        <![CDATA[]]>
-      </Environment>
-      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
-        <PostConnectCommands/>
-        <StartupCommands/>
-      </Debugger>
-      <PreBuild/>
-      <PostBuild/>
-      <CustomBuild Enabled="no">
-        <RebuildCommand/>
-        <CleanCommand/>
-        <BuildCommand/>
-        <PreprocessFileCommand/>
-        <SingleFileCommand/>
-        <MakefileGenerationCommand/>
-        <ThirdPartyToolName>None</ThirdPartyToolName>
-        <WorkingDirectory/>
-      </CustomBuild>
-      <AdditionalRules>
-        <CustomPostBuild/>
-        <CustomPreBuild/>
-      </AdditionalRules>
-      <Completion>
-        <ClangCmpFlags/>
-        <ClangPP/>
-        <SearchPaths/>
-      </Completion>
-    </Configuration>
-    <Configuration Name="Debug-osx" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-g;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=yes)" C_Options="-g;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=yes)" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
-        <Preprocessor Value="__WX__"/>
-        <Preprocessor Value="__ASM_FIX__"/>
-      </Compiler>
-      <Linker Options="$(shell wx-config --debug=yes --libs std,gl,stc,aui,ribbon --unicode=yes);-framework SFML;-framework sfml-system;-framework sfml-audio" Required="yes"/>
+      <Linker Options="$(shell wx-config --debug=yes --libs std,gl,stc,aui,propgrid --unicode=yes)" Required="yes">
+        <Library Value="sfml-system"/>
+        <Library Value="sfml-audio"/>
+        <Library Value="sfml-window"/>
+        <Library Value="sfml-graphics"/>
+      </Linker>
       <ResourceCompiler Options="$(shell wx-config --rcflags)" Required="no"/>
       <General OutputFile="./dist/slade-dbg" IntermediateDirectory="./Debug" Command="./slade-dbg" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
       
       ]]>
       </Environment>
@@ -543,21 +574,89 @@
         <SearchPaths/>
       </Completion>
     </Configuration>
+    <Configuration Name="Debug-osx" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="-g;-arch i386;$(shell $(WXCONFIG_PATH)wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=yes);$(shell $(PKGCONFIG_PATH)pkg-config --cflags ftgl)" C_Options="-g;-arch i386;$(shell $(WXCONFIG_PATH)wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=yes);$(shell $(PKGCONFIG_PATH)pkg-config --cflags ftgl)" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
+        <Preprocessor Value="__WX__"/>
+        <Preprocessor Value="__ASM_FIX__"/>
+      </Compiler>
+      <Linker Options="-arch i386;$(shell $(WXCONFIG_PATH)wx-config --debug=yes --libs std,gl,stc,aui,propgrid --unicode=yes);-framework SFML;-framework sfml-system;-framework sfml-audio;$(shell $(PKGCONFIG_PATH)pkg-config --libs ftgl)" Required="yes"/>
+      <ResourceCompiler Options="$(shell wx-config --rcflags)" Required="no"/>
+      <General OutputFile="./dist/SLADE-dbg.app/Contents/MacOS/SLADE" IntermediateDirectory="./Debug" Command="./dist/SLADE-dbg.app/Contents/MacOS/SLADE" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
+      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
+        <![CDATA[
+      
+      
+      
+      
+      
+      
+      
+      ]]>
+      </Environment>
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
+        <PostConnectCommands/>
+        <StartupCommands/>
+      </Debugger>
+      <PreBuild/>
+      <PostBuild>
+        <Command Enabled="yes">mkdir -p ./dist/SLADE-dbg.app/Contents/Resources</Command>
+        <Command Enabled="yes">mkdir -p ./dist/SLADE-dbg.app/Contents/MacOS/res</Command>
+        <Command Enabled="yes">cp Info.plist ./dist/SLADE-dbg.app/Contents/</Command>
+        <Command Enabled="yes">cp SLADE-osx.icns ./dist/SLADE-dbg.app/Contents/Resources</Command>
+        <Command Enabled="yes">rsync -aC ./dist/res/ ./dist/SLADE-dbg.app/Contents/Resources</Command>
+      </PostBuild>
+      <CustomBuild Enabled="no">
+        <RebuildCommand/>
+        <CleanCommand/>
+        <BuildCommand/>
+        <PreprocessFileCommand/>
+        <SingleFileCommand/>
+        <MakefileGenerationCommand/>
+        <ThirdPartyToolName>None</ThirdPartyToolName>
+        <WorkingDirectory/>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild/>
+        <CustomPreBuild/>
+      </AdditionalRules>
+      <Completion>
+        <ClangCmpFlags/>
+        <ClangPP/>
+        <SearchPaths/>
+      </Completion>
+    </Configuration>
     <Configuration Name="Release" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-O3;$(shell wx-config --cxxflags std,gl,stc,aui,propgrid --unicode=yes --debug=no)" C_Options="-O3;$(shell wx-config --cxxflags std,gl,stc,aui,propgrid --unicode=yes --debug=no)" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
+      <Compiler Options="-O3;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no);`pkg-config --cflags gtk+-2.0`" C_Options="-O3;$(shell wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no)" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
         <Preprocessor Value="__WX__"/>
         <Preprocessor Value="NDEBUG"/>
       </Compiler>
       <Linker Options="$(shell wx-config --debug=no --libs std,gl,stc,aui,propgrid --unicode=yes)" Required="yes">
         <Library Value="sfml-system"/>
         <Library Value="sfml-audio"/>
-        <Library Value="GL"/>
-        <Library Value="GLU"/>
+        <Library Value="sfml-window"/>
+        <Library Value="sfml-graphics"/>
       </Linker>
       <ResourceCompiler Options="$(shell wx-config --rcflags)" Required="no"/>
       <General OutputFile="./dist/slade" IntermediateDirectory="./Release" Command="./slade" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
-        <![CDATA[]]>
+        <![CDATA[
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ]]>
       </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
         <PostConnectCommands/>
@@ -586,18 +685,22 @@
       </Completion>
     </Configuration>
     <Configuration Name="Release-osx" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-arch i386;-O3;$(shell $(WXCONFIG_PATH)wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no)" C_Options="-arch i386;-O3;$(shell $(WXCONFIG_PATH)wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no)" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
+      <Compiler Options="-O3;-arch i386;$(shell $(WXCONFIG_PATH)wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no);$(shell $(PKGCONFIG_PATH)pkg-config --cflags ftgl)" C_Options="-O3;-arch i386;$(shell $(WXCONFIG_PATH)wx-config --cxxflags std,gl,stc,aui --unicode=yes --debug=no)" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
         <Preprocessor Value="__WX__"/>
         <Preprocessor Value="NDEBUG"/>
         <Preprocessor Value="__ASM_FIX__"/>
       </Compiler>
-      <Linker Options="-s;-arch i386;$(shell $(WXCONFIG_PATH)wx-config --debug=no --libs std,gl,stc,aui,propgrid --unicode=yes);-framework SFML;-framework sfml-system;-framework sfml-audio" Required="yes">
-        <Library Value="iconv"/>
-      </Linker>
+      <Linker Options="-s;-arch i386;$(shell $(WXCONFIG_PATH)wx-config --debug=no --libs std,gl,stc,aui,propgrid --unicode=yes);-framework SFML;-framework sfml-system;-framework sfml-audio;$(shell $(PKGCONFIG_PATH)pkg-config --libs ftgl)" Required="yes"/>
       <ResourceCompiler Options="$(shell wx-config --rcflags)" Required="no"/>
       <General OutputFile="./dist/SLADE.app/Contents/MacOS/SLADE" IntermediateDirectory="./Release" Command="./dist/SLADE.app/Contents/MacOS/SLADE" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[
+      
+      
+      
+      
+      
+      
       ]]>
       </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
@@ -607,9 +710,10 @@
       <PreBuild/>
       <PostBuild>
         <Command Enabled="yes">mkdir -p ./dist/SLADE.app/Contents/Resources</Command>
+        <Command Enabled="yes">mkdir -p ./dist/SLADE.app/Contents/MacOS/res</Command>
         <Command Enabled="yes">cp Info.plist ./dist/SLADE.app/Contents/</Command>
         <Command Enabled="yes">cp SLADE-osx.icns ./dist/SLADE.app/Contents/Resources</Command>
-        <Command Enabled="yes">cp ./dist/slade.pk3 ./dist/SLADE.app/Contents/MacOS</Command>
+        <Command Enabled="yes">rsync -aC ./dist/res/ ./dist/SLADE.app/Contents/Resources</Command>
       </PostBuild>
       <CustomBuild Enabled="no">
         <RebuildCommand/>

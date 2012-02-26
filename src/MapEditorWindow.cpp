@@ -1,7 +1,7 @@
 
 /*******************************************************************
  * SLADE - It's a Doom Editor
- * Copyright (C) 2008 Simon Judd
+ * Copyright (C) 2008-2012 Simon Judd
  *
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
@@ -30,7 +30,25 @@
 #include "Main.h"
 #include "WxStuff.h"
 #include "MapEditorWindow.h"
+#include "MainApp.h"
+#include "ConsolePanel.h"
+#include "BaseResourceArchivesPanel.h"
+#include "PreferencesDialog.h"
+#include "ArchiveManager.h"
+#include "MapObjectPropsPanel.h"
 #include <wx/aui/aui.h>
+
+
+/*******************************************************************
+ * VARIABLES
+ *******************************************************************/
+MapEditorWindow* MapEditorWindow::instance = NULL;
+string map_window_layout = "";
+CVAR(Int, mew_width, 1024, CVAR_SAVE);
+CVAR(Int, mew_height, 768, CVAR_SAVE);
+CVAR(Int, mew_left, -1, CVAR_SAVE);
+CVAR(Int, mew_top, -1, CVAR_SAVE);
+CVAR(Bool, mew_maximized, true, CVAR_SAVE);
 
 
 /*******************************************************************
@@ -41,18 +59,21 @@
  * MapEditorWindow class constructor
  *******************************************************************/
 MapEditorWindow::MapEditorWindow()
-: wxFrame((wxFrame *) NULL, -1, "SLADE", wxPoint(0, 0), wxSize(800, 600)) {
-	map = new SLADEMap();
+: wxFrame((wxFrame *) NULL, -1, "SLADE", wxPoint(mew_left, mew_top), wxSize(mew_width, mew_height)) {
+	if (mew_maximized) Maximize();
 	setupLayout();
 	Show();
-	Maximize();
+
+	// Bind events
+	Bind(wxEVT_CLOSE_WINDOW, &MapEditorWindow::onClose, this);
+	Bind(wxEVT_MOVE, &MapEditorWindow::onMove, this);
+	Bind(wxEVT_SIZE, &MapEditorWindow::onSize, this);
 }
 
 /* MapEditorWindow::~MapEditorWindow
  * MapEditorWindow class destructor
  *******************************************************************/
 MapEditorWindow::~MapEditorWindow() {
-	delete map;
 }
 
 /* MapEditorWindow::setupLayout
@@ -60,23 +81,210 @@ MapEditorWindow::~MapEditorWindow() {
  *******************************************************************/
 void MapEditorWindow::setupLayout() {
 	// Create the wxAUI manager & related things
-	wxAuiManager *m_mgr = new wxAuiManager(this);
+	wxAuiManager* m_mgr = new wxAuiManager(this);
 	wxAuiPaneInfo p_inf;
 
-	CreateToolBar();
-
 	// Map canvas
-	map_canvas = new MapCanvas(this, -1, map);
+	map_canvas = new MapCanvas(this, -1, &editor);
 	p_inf.CenterPane();
-	//m_mgr->AddPane(new wxTextCtrl(this, -1), p_inf);
 	m_mgr->AddPane(map_canvas, p_inf);
 
+	// --- Menus ---
+	wxMenuBar *menu = new wxMenuBar();
+
+	// Map menu
+	wxMenu* menu_map = new wxMenu("");
+	theApp->getAction("mapw_save")->addToMenu(menu_map);
+	theApp->getAction("mapw_rename")->addToMenu(menu_map);
+	menu->Append(menu_map, "&Map");
+
+	// Editor menu
+	wxMenu* menu_editor = new wxMenu("");
+	theApp->getAction("main_preferences")->addToMenu(menu_editor);
+	theApp->getAction("main_setbra")->addToMenu(menu_editor);
+	menu->Append(menu_editor, "&Editor");
+
+	// Mode menu
+	wxMenu* menu_mode = new wxMenu("");
+	theApp->getAction("mapw_mode_vertices")->addToMenu(menu_mode);
+	theApp->getAction("mapw_mode_lines")->addToMenu(menu_mode);
+	theApp->getAction("mapw_mode_sectors")->addToMenu(menu_mode);
+	theApp->getAction("mapw_mode_things")->addToMenu(menu_mode);
+	menu->Append(menu_mode, "Mode");
+
+	// View menu
+	wxMenu* menu_view = new wxMenu("");
+	theApp->getAction("mapw_showconsole")->addToMenu(menu_view);
+	theApp->getAction("mapw_showproperties")->addToMenu(menu_view);
+	menu->Append(menu_view, "View");
+
+	SetMenuBar(menu);
+
+
+	// --- Toolbars ---
+
+	// Map toolbar
+	wxAuiToolBar* tb_map = new wxAuiToolBar(this, -1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
+	theApp->getAction("mapw_save")->addToToolbar(tb_map);
+	theApp->getAction("mapw_rename")->addToToolbar(tb_map);
+	tb_map->Realize();
+
+	// Mode toolbar
+	wxAuiToolBar* tb_mode = new wxAuiToolBar(this, -1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
+	theApp->getAction("mapw_mode_vertices")->addToToolbar(tb_mode);
+	theApp->getAction("mapw_mode_lines")->addToToolbar(tb_mode);
+	theApp->getAction("mapw_mode_sectors")->addToToolbar(tb_mode);
+	theApp->getAction("mapw_mode_things")->addToToolbar(tb_mode);
+	tb_mode->Realize();
+
+	// Add toolbar panels
+	m_mgr->AddPane(tb_map, wxAuiPaneInfo().ToolbarPane().Top().Name("tb_map").CloseButton(false));		// Map toolbar
+	m_mgr->AddPane(tb_mode, wxAuiPaneInfo().ToolbarPane().Top().Name("tb_mode").CloseButton(false));	// Mode toolbar
+
+	// Status bar
 	CreateStatusBar();
+
+	// -- Console Panel --
+	ConsolePanel *panel_console = new ConsolePanel(this, -1);
+
+	// Setup panel info & add panel
+	p_inf.DefaultPane();
+	p_inf.Bottom();
+	p_inf.Dock();
+	p_inf.BestSize(480, 192);
+	p_inf.FloatingSize(600, 400);
+	p_inf.FloatingPosition(100, 100);
+	p_inf.MinSize(-1, 192);
+	p_inf.Show(false);
+	p_inf.Caption("Console");
+	p_inf.Name("console");
+	m_mgr->AddPane(panel_console, p_inf);
+
+
+	// -- Map Object Properties Panel --
+	panel_obj_props = new MapObjectPropsPanel(this);
+
+	// Setup panel info & add panel
+	p_inf.Right();
+	p_inf.BestSize(256, 256);
+	p_inf.FloatingSize(400, 600);
+	p_inf.FloatingPosition(120, 120);
+	p_inf.MinSize(256, 256);
+	p_inf.Show(true);
+	p_inf.Caption("Item Properties");
+	p_inf.Name("item_props");
+	m_mgr->AddPane(panel_obj_props, p_inf);
+
+
+	// Load previously saved perspective string
+	// Doesn't play nice for whatever reason (god I hate wxAUI, it's terrible)
+	//long vers = 0;
+	//map_window_layout.Left(3).ToLong(&vers);
+	//if (vers == MEW_LAYOUT_VERS)
+	//	m_mgr->LoadPerspective(map_window_layout.Right(map_window_layout.Length() - 3));
 
 	m_mgr->Update();
 	Layout();
 }
 
-bool MapEditorWindow::openMap(Archive* map_data, uint8_t format) {
-	return map->readMap(map_data, format);
+bool MapEditorWindow::openMap(Archive::mapdesc_t map) {
+	// Set texture manager archive
+	tex_man.setArchive(map.head->getParent());
+
+	// Clear current map
+	editor.clearMap();
+
+	// Attempt to open map
+	bool ok = editor.openMap(map);
+
+	// Show window if opened ok
+	if (ok) {
+		this->Show(true);
+		map_canvas->viewFitToMap();
+	}
+
+	return ok;
+}
+
+void MapEditorWindow::forceRefresh() {
+	map_canvas->Refresh();
+}
+
+/* MapEditorWindow::handleAction
+ * Handles the action [id]. Returns true if the action was handled,
+ * false otherwise
+ *******************************************************************/
+bool MapEditorWindow::handleAction(string id) {
+	// Don't handle actions if hidden
+	if (!IsShown())
+		return false;
+
+	// View->Item Properties
+	if (id == "mapw_showproperties") {
+		wxAuiManager *m_mgr = wxAuiManager::GetManager(this);
+		wxAuiPaneInfo& p_inf = m_mgr->GetPane("item_props");
+
+		// Toggle window and focus
+		p_inf.Show(!p_inf.IsShown());
+		map_canvas->SetFocus();
+
+		m_mgr->Update();
+		return true;
+	}
+
+	// View->Console
+	else if (id == "mapw_showconsole") {
+		wxAuiManager *m_mgr = wxAuiManager::GetManager(this);
+		wxAuiPaneInfo& p_inf = m_mgr->GetPane("console");
+
+		// Toggle window and focus
+		if (p_inf.IsShown()) {
+			p_inf.Show(false);
+			map_canvas->SetFocus();
+		}
+		else {
+			p_inf.Show(true);
+			p_inf.window->SetFocus();
+		}
+
+		p_inf.MinSize(200, 128);
+		m_mgr->Update();
+		return true;
+	}
+
+	return false;
+}
+
+void MapEditorWindow::onClose(wxCloseEvent& e) {
+	// Save current layout
+	wxAuiManager *m_mgr = wxAuiManager::GetManager(this);
+	map_window_layout = m_mgr->SavePerspective();
+	mew_maximized = IsMaximized();
+
+	this->Show(false);
+	editor.clearMap();
+}
+
+/* MapEditorWindow::onSize
+ * Called when the window is resized
+ *******************************************************************/
+void MapEditorWindow::onSize(wxSizeEvent& e) {
+	// Update window size settings, but only if not maximized
+	if (!IsMaximized()) {
+		mew_width = GetSize().x;
+		mew_height = GetSize().y;
+	}
+}
+
+/* MapEditorWindow::onMove
+ * Called when the window moves
+ *******************************************************************/
+void MapEditorWindow::onMove(wxMoveEvent& e) {
+	// Update window position settings, but only if not maximized
+	if (!IsMaximized()) {
+		mew_left = GetPosition().x;
+		mew_top = GetPosition().y;
+	}
+
+	e.Skip();
 }

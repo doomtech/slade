@@ -1,7 +1,7 @@
 
 /*******************************************************************
  * SLADE - It's a Doom Editor
- * Copyright (C) 2008 Simon Judd
+ * Copyright (C) 2008-2012 Simon Judd
  *
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
@@ -1080,7 +1080,7 @@ void ArchiveManagerPanel::onAnnouncement(Announcer* announcer, string event_name
 	if (event_name == "archive_opened") {
 		uint32_t index = -1;
 		event_data.read(&index, 4);
-		openTab(index);
+		if (!theArchiveManager->openSilent()) openTab(index);
 	}
 
 	// If an archive was saved
@@ -1172,9 +1172,9 @@ bool ArchiveManagerPanel::closeSelection() {
 	for (size_t a = 0; a < selection.size(); a++)
 		selected_archives.push_back(theArchiveManager->getArchive(selection[a]));
 
-	// Close all selected archives
+	// Close all selected archives, starting from the last
 	bool all_closed = true;
-	for (size_t a = 0; a < selected_archives.size(); a++) {
+	for (size_t a = selected_archives.size() - 1; (signed)a >= 0; --a) {
 		if (!closeArchive(selected_archives[a]))
 			all_closed = false;
 	}
@@ -1214,9 +1214,10 @@ void ArchiveManagerPanel::removeSelection() {
 	if (selection.size() == 0)
 		return;
 
-	// Remove selected recent files
-	for (unsigned a = 0; a < selection.size(); a++)
-		theArchiveManager->removeRecentFile(theArchiveManager->recentFile(selection[a]));
+	// Remove selected recent files (starting from the last and going backward,
+	// because the list reorders itself whenever an item is removed)
+	for (unsigned a = selection.size(); a > 0; --a)
+		theArchiveManager->removeRecentFile(theArchiveManager->recentFile(selection[a - 1]));
 }
 
 /* ArchiveManagerPanel::handleAction
@@ -1300,6 +1301,13 @@ bool ArchiveManagerPanel::handleAction(string id) {
 	else if (id == "aman_close")
 		closeArchive(currentArchive());
 
+	// Archives context menu cannot needs its own functions!
+	else if (id == "aman_save_a")
+		saveSelection();
+	else if (id == "aman_saveas_a")
+		saveSelectionAs();
+	else if (id == "aman_close_a")
+		closeSelection();
 
 	// Bookmarks context menu
 	else if (id == "aman_bookmark_go")
@@ -1454,8 +1462,20 @@ void ArchiveManagerPanel::onListMapsChanged(wxCommandEvent& e) {
  * Opens the map in a new map editor window
  *******************************************************************/
 void ArchiveManagerPanel::onListMapsActivated(wxListEvent& e) {
-	//new MapEditorWindow();
-	wxMessageBox("Map Editor is not implemented yet.");
+	// Check a current archive is selected
+	if (!current_maps)
+		return;
+
+	// Detect maps
+	vector<Archive::mapdesc_t> maps = current_maps->detectMaps();
+
+	// Open selected map
+	if (theMapEditor->openMap(maps[e.GetIndex()]))
+		theMapEditor->Show();
+	else {
+		theMapEditor->Hide();
+		wxMessageBox(S_FMT("Unable to open map %s: %s", CHR(maps[e.GetIndex()].head->getName()), CHR(Global::error)), "Invalid map error", wxICON_ERROR);
+	}
 }
 
 /* ArchiveManagerPanel::onListArchivesRightClick
@@ -1465,9 +1485,9 @@ void ArchiveManagerPanel::onListMapsActivated(wxListEvent& e) {
 void ArchiveManagerPanel::onListArchivesRightClick(wxListEvent& e) {
 	// Generate context menu
 	wxMenu context;
-	theApp->getAction("aman_save")->addToMenu(&context);
-	theApp->getAction("aman_saveas")->addToMenu(&context);
-	theApp->getAction("aman_close")->addToMenu(&context);
+	theApp->getAction("aman_save_a")->addToMenu(&context);
+	theApp->getAction("aman_saveas_a")->addToMenu(&context);
+	theApp->getAction("aman_close_a")->addToMenu(&context);
 
 	// Pop it up
 	PopupMenu(&context);

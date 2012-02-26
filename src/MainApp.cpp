@@ -1,6 +1,6 @@
 /*******************************************************************
  * SLADE - It's a Doom Editor
- * Copyright (C) 2008 Simon Judd
+ * Copyright (C) 2008-2012 Simon Judd
  *
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
@@ -43,6 +43,8 @@
 #include "KeyBind.h"
 #include "ColourConfiguration.h"
 #include "Drawing.h"
+#include "MapEditorWindow.h"
+#include "GameConfiguration.h"
 #include <wx/image.h>
 #include <wx/stdpaths.h>
 #include <wx/ffile.h>
@@ -60,11 +62,11 @@
  *******************************************************************/
 namespace Global {
 	string error = "";
-	string version = "3.0.2"
-#ifdef UPDATEREVISION
-	" r" SVN_REVISION_STRING
+	string version = "3.1.0 alpha"
+#ifdef SVN_REVISION_STRING
+	" (r" SVN_REVISION_STRING ")"
 #endif
-	;
+	"";
 }
 
 string	dir_data = "";
@@ -79,6 +81,7 @@ CVAR(String, dir_last, "", CVAR_SAVE)
  * EXTERNAL VARIABLES
  *******************************************************************/
 extern string main_window_layout;
+extern string map_window_layout;
 
 
 /*******************************************************************
@@ -332,7 +335,7 @@ void MainApp::initActions() {
 	// MainWindow
 	new SAction("main_exit", "E&xit", "t_exit", "Quit SLADE", "", 0, wxID_EXIT);
 	new SAction("main_setbra", "Set &Base Resource Archive", "e_archive", "Set the Base Resource Archive, to act as the program 'IWAD'");
-	new SAction("main_preferences", "&Preferences...", "t_settings", "Setup SLADE options and preferences");
+	new SAction("main_preferences", "&Preferences...", "t_settings", "Setup SLADE options and preferences", "", NORMAL, wxID_PREFERENCES);
 	new SAction("main_showam", "&Archive Manager", "e_archive", "Toggle the Archive Manager window", "Ctrl+1");
 	new SAction("main_showconsole", "&Console", "t_console", "Toggle the Console window", "Ctrl+2");
 	new SAction("main_onlinedocs", "Online &Documentation", "t_wiki", "View SLADE documentation online");
@@ -351,6 +354,9 @@ void MainApp::initActions() {
 	new SAction("aman_recent_remove", "Remove", "t_close", "Remove the selected Archive(s) from the recent list");
 	new SAction("aman_bookmark_go", "Go To", "t_open", "Go to the selected bookmark");
 	new SAction("aman_bookmark_remove", "Remove", "t_close", "Remove the selected bookmark(s) from the list");
+	new SAction("aman_save_a", "&Save", "t_save", "Save the selected Archive", "Ctrl+S");
+	new SAction("aman_saveas_a", "Save &As", "t_saveas", "Save the selected Archive to a new file", "Ctrl+Shift+S");
+	new SAction("aman_close_a", "&Close", "t_close", "Close the selected Archive", "Ctrl+W");
 
 	// Recent files
 	new SAction("aman_recent1", "<insert recent file name>", "");
@@ -367,6 +373,7 @@ void MainApp::initActions() {
 	new SAction("arch_newdir", "New Directory", "t_newfolder", "Create a new empty directory");
 	new SAction("arch_importfiles", "&Import Files", "t_importfiles", "Import multiple files into the archive");
 	new SAction("arch_texeditor", "&Texture Editor", "t_texeditor", "Open the texture editor for the current archive");
+	new SAction("arch_mapeditor", "&Map Editor", "e_map", "Open the map editor");
 	new SAction("arch_clean_patches", "Remove Unused &Patches", "", "Remove any unused patches, and their associated entries");
 	new SAction("arch_clean_textures", "Remove Unused &Textures", "", "Remove any unused textures");
 	new SAction("arch_clean_flats", "Remove Unused &Flats", "", "Remove any unused flats");
@@ -455,6 +462,16 @@ void MainApp::initActions() {
 	new SAction("ppal_removeothers", "Remove Others", "t_palette_deleteothers", "Keep only this palette and erase all others");
 	new SAction("ppal_report", "Write Report", "e_text", "Write an info report on this palette");
 	new SAction("ppal_generate", "Generate Palettes", "e_palette", "Generate full range of palettes from the first");
+
+	// Map Editor Window
+	new SAction("mapw_save", "Save Map Changes", "t_save", "Save any changes to the current map");
+	new SAction("mapw_rename", "Rename Map", "t_rename", "Rename the current map");
+	new SAction("mapw_mode_vertices", "Vertices Mode", "t_verts", "Change to vertices editing mode", "", SAction::RADIO);
+	new SAction("mapw_mode_lines", "Lines Mode", "t_lines", "Change to lines editing mode", "", SAction::RADIO);
+	new SAction("mapw_mode_sectors", "Sectors Mode", "t_sectors", "Change to sectors editing mode", "", SAction::RADIO);
+	new SAction("mapw_mode_things", "Things Mode", "t_things", "Change to things editing mode", "", SAction::RADIO);
+	new SAction("mapw_showconsole", "&Console", "t_console", "Toggle the Console window", "Ctrl+2");
+	new SAction("mapw_showproperties", "&Item Properties", "", "Toggle the Item Properties window", "Ctrl+1");
 }
 
 /* MainApp::OnInit
@@ -524,6 +541,9 @@ bool MainApp::OnInit() {
 	wxLogMessage("Loading icons");
 	loadIcons();
 
+	// Load program fonts
+	Drawing::initFonts();
+
 	// Load entry types
 	wxLogMessage("Loading entry types");
 	EntryDataFormat::initBuiltinFormats();
@@ -569,6 +589,9 @@ bool MainApp::OnInit() {
 	init_ok = true;
 	wxLogMessage("SLADE Initialisation OK");
 
+	// Init game configuration
+	theGameConfiguration->init();
+
 	// Bind events
 	Bind(wxEVT_COMMAND_MENU_SELECTED, &MainApp::onMenu, this);
 
@@ -586,6 +609,11 @@ int MainApp::OnExit() {
 
 	// Save text style configuration
 	StyleSet::saveCurrent();
+
+	// Save colour configuration
+	MemChunk ccfg;
+	ColourConfiguration::writeConfiguration(ccfg);
+	ccfg.exportFile(appPath("colours.cfg", DIR_USER));
 
 	// Close all open archives
 	theArchiveManager->closeAll();
@@ -651,6 +679,11 @@ void MainApp::readConfigFile() {
 			main_window_layout = tz.getToken();
 		}
 
+		// Read saved map window AUI layout
+		if (!token.Cmp("map_window_layout")) {
+			map_window_layout = tz.getToken();
+		}
+
 		// Read base resource archive paths
 		if (!token.Cmp("base_resource_paths")) {
 			// Skip {
@@ -711,6 +744,10 @@ void MainApp::saveConfigFile() {
 	// Write main window AUI layout
 	string layout = S_FMT("%3d%s", MW_LAYOUT_VERS, main_window_layout.c_str());
 	file.Write(S_FMT("main_window_layout \"%s\"\n", CHR(layout)));
+
+	// Write map window AUI layout
+	layout = S_FMT("%3d%s", MEW_LAYOUT_VERS, map_window_layout.c_str());
+	file.Write(S_FMT("map_window_layout \"%s\"\n", CHR(layout)));
 
 	// Write base resource archive paths
 	file.Write("\nbase_resource_paths\n{\n");

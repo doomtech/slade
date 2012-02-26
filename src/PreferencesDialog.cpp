@@ -1,7 +1,7 @@
 
 /*******************************************************************
  * SLADE - It's a Doom Editor
- * Copyright (C) 2008 Simon Judd
+ * Copyright (C) 2008-2012 Simon Judd
  *
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
@@ -42,6 +42,8 @@
 #include "PNGPrefsPanel.h"
 #include "AudioPrefsPanel.h"
 #include "ColourPrefsPanel.h"
+#include "MapEditorPrefsPanel.h"
+#include "MapDisplayPrefsPanel.h"
 #include "AdvancedPrefsPanel.h"
 #include "ArchiveManager.h"
 #include "TextEditorPrefsPanel.h"
@@ -80,6 +82,8 @@ PreferencesDialog::PreferencesDialog(wxWindow* parent) : wxDialog(parent, -1, "S
 	panel_gfx_png = new PNGPrefsPanel(tree_prefs);
 	panel_audio = new AudioPrefsPanel(tree_prefs);
 	panel_colours = new ColourPrefsPanel(tree_prefs);
+	panel_maped = new MapEditorPrefsPanel(tree_prefs);
+	panel_map_display = new MapDisplayPrefsPanel(tree_prefs);
 	panel_advanced = new AdvancedPrefsPanel(tree_prefs);
 
 	// Setup preferences TreeBook
@@ -95,6 +99,8 @@ PreferencesDialog::PreferencesDialog(wxWindow* parent) : wxDialog(parent, -1, "S
 	tree_prefs->AddPage(panel_audio, "Audio");
 	tree_prefs->AddPage(new wxPanel(tree_prefs, -1), "Scripting");
 	tree_prefs->AddSubPage(panel_script_acs, "ACS");
+	tree_prefs->AddPage(panel_maped, "Map Editor");
+	tree_prefs->AddSubPage(panel_map_display, "Display");
 	tree_prefs->AddPage(panel_advanced, "Advanced");
 
 	// Expand all tree nodes (so it gets sized properly)
@@ -156,6 +162,7 @@ wxPanel* PreferencesDialog::setupBaseResourceArchivesPanel() {
  * Applies preference values from all preference panels
  *******************************************************************/
 void PreferencesDialog::applyPreferences() {
+	panel_advanced->applyPreferences();
 	panel_general->applyPreferences();
 	panel_interface->applyPreferences();
 	panel_editing->applyPreferences();
@@ -166,7 +173,8 @@ void PreferencesDialog::applyPreferences() {
 	panel_gfx_png->applyPreferences();
 	panel_audio->applyPreferences();
 	panel_colours->applyPreferences();
-	panel_advanced->applyPreferences();
+	panel_maped->applyPreferences();
+	panel_map_display->applyPreferences();
 }
 
 

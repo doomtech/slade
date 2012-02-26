@@ -1,82 +1,60 @@
 
-
 #include "Main.h"
 #include "MapThing.h"
 
-MapThing::MapThing(doomthing_t t) {
-	this->type = t.type;
-	this->angle = t.angle;
-	this->x = t.x;
-	this->y = t.y;
-	this->z = 0;
-	this->tid = 0;
-	if (t.flags & 1) {
-		udmf_props["skill1"] = "true";
-		udmf_props["skill2"] = "true";
-	}
-	if (t.flags & 2) {
-		udmf_props["skill3"] = "true";
-	}
-	if (t.flags & 4) {
-		udmf_props["skill4"] = "true";
-		udmf_props["skill5"] = "true";
-	}
+MapThing::MapThing(SLADEMap* parent) : MapObject(MOBJ_THING, parent) {
+	// Init variables
+	this->x = 0;
+	this->y = 0;
+	this->type = 1;
 }
 
-MapThing::MapThing(hexenthing_t t) {
-	this->type = t.type;
-	this->angle = t.angle;
-	this->x = t.x;
-	this->y = t.y;
-	this->z = t.z;
-	this->tid = t.tid;
-	if (t.flags & 1) {
-		udmf_props["skill1"] = "true";
-		udmf_props["skill2"] = "true";
-	}
-	if (t.flags & 2) {
-		udmf_props["skill3"] = "true";
-	}
-	if (t.flags & 4) {
-		udmf_props["skill4"] = "true";
-		udmf_props["skill5"] = "true";
-	}
+MapThing::MapThing(double x, double y, short type, SLADEMap* parent) : MapObject(MOBJ_THING, parent) {
+	// Init variables
+	this->x = x;
+	this->y = y;
+	this->type = type;
 }
 
-MapThing::MapThing(doom64thing_t t) {
-	this->type = t.type;
-	this->angle = t.angle;
-	this->x = t.x;
-	this->y = t.y;
-	this->z = t.z;
-	this->tid = t.tid;
-	if (t.flags & 1) {
-		udmf_props["skill1"] = "true";
-		udmf_props["skill2"] = "true";
-	}
-	if (t.flags & 2) {
-		udmf_props["skill3"] = "true";
-	}
-	if (t.flags & 4) {
-		udmf_props["skill4"] = "true";
-		udmf_props["skill5"] = "true";
-	}
+MapThing::~MapThing() {
 }
 
-bool MapThing::parseUDMF(Tokenizer& tz) {
-	// Skip opening {
-	tz.getToken();
+int MapThing::intProperty(string key) {
+	if (key == "type")
+		return type;
+	else if (key == "x")
+		return (int)x;
+	else if (key == "y")
+		return (int)y;
+	else
+		return MapObject::intProperty(key);
+}
 
-	// TODO: Init required thing attributes
+double MapThing::floatProperty(string key) {
+	if (key == "x")
+		return x;
+	else if (key == "y")
+		return y;
+	else
+		return MapObject::floatProperty(key);
+}
 
-	// TODO: Read thing definition
-	string token = tz.getToken();
-	while (token != "}") {
+void MapThing::setIntProperty(string key, int value) {
+	if (key == "type")
+		type = value;
+	else if (key == "x")
+		x = value;
+	else if (key == "y")
+		y = value;
+	else
+		MapObject::setIntProperty(key, value);
+}
 
-		token = tz.getToken();
-	}
-
-	// TODO: Check that all required attributes were defined
-
-	return true;
+void MapThing::setFloatProperty(string key, double value) {
+	if (key == "x")
+		x = value;
+	else if (key == "y")
+		y = value;
+	else
+		MapObject::setFloatProperty(key, value);
 }

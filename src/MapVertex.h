@@ -2,8 +2,7 @@
 #ifndef __MAPVERTEX_H__
 #define __MAPVERTEX_H__
 
-#include "Tokenizer.h"
-#include "PropertyList.h"
+#include "MapObject.h"
 
 class MapLine;
 
@@ -20,25 +19,36 @@ struct doom64vertex_t
 	int32_t y;
 };
 
-class MapVertex {
+class MapVertex : public MapObject {
+friend class SLADEMap;
 private:
-	double	x;
-	double	y;
+	// Basic data
+	double		x;
+	double		y;
 
+	// Internal info
 	vector<MapLine*>	connected_lines;
 
-	PropertyList	udmf_props;
-
 public:
-	MapVertex(){}
-	MapVertex(doomvertex_t v);
-	MapVertex(doom64vertex_t v);
-	~MapVertex(){}
+	MapVertex(SLADEMap* parent = NULL);
+	MapVertex(double x, double y, SLADEMap* parent = NULL);
+	~MapVertex();
 
-	double	xPos() { return x; }
-	double	yPos() { return y; }
+	double		xPos() { return x; }
+	double		yPos() { return y; }
 
-	bool	parseUDMF(Tokenizer& tz);
+	fpoint2_t	midPoint() { return fpoint2_t(x, y); }
+	fpoint2_t	textPoint() { return fpoint2_t(x, y); }
+
+	int		intProperty(string key);
+	double	floatProperty(string key);
+	void	setIntProperty(string key, int value);
+	void	setFloatProperty(string key, double value);
+
+	void		connectLine(MapLine* line);
+	void		disconnectLine(MapLine* line);
+	unsigned	nConnectedLines() { return connected_lines.size(); }
+	MapLine*	connectedLine(unsigned index);
 };
 
 #endif //__MAPVERTEX_H__

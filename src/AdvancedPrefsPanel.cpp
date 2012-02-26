@@ -1,7 +1,7 @@
 
 /*******************************************************************
  * SLADE - It's a Doom Editor
- * Copyright (C) 2008 Simon Judd
+ * Copyright (C) 2008-2012 Simon Judd
  *
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
@@ -96,6 +96,9 @@ void AdvancedPrefsPanel::refreshPropGrid() {
 		else if (cvar->type == CVAR_STRING)
 			pg_cvars->Append(new wxStringProperty(cvars[a], cvars[a], S_FMT("%s", CHR(((CStringCVar *)cvar)->value))));
 	}
+
+	// Set all bool properties to use checkboxes
+	pg_cvars->SetPropertyAttributeAll(wxPG_BOOL_USE_CHECKBOX, true);
 }
 
 /* AdvancedPrefsPanel::applyPreferences
@@ -107,6 +110,10 @@ void AdvancedPrefsPanel::applyPreferences() {
 	get_cvar_list(cvars);
 
 	for (unsigned a = 0; a < cvars.size(); a++) {
+		// Check if cvar value was even modified
+		if (!pg_cvars->GetProperty(cvars[a])->HasFlag(wxPG_PROP_MODIFIED))
+			continue;
+
 		// Get cvar
 		CVar* cvar = get_cvar(cvars[a]);
 

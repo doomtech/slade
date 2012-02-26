@@ -22,6 +22,7 @@ private:
 	vector<string>			base_resource_paths;
 	vector<string>			recent_files;
 	vector<ArchiveEntry*>	bookmarks;
+	bool					open_silent;
 	static ArchiveManager*	instance;
 
 public:
@@ -48,8 +49,8 @@ public:
 	bool		addArchive(Archive* archive);
 	Archive*	getArchive(int index);
 	Archive*	getArchive(string filename);
-	Archive*	openArchive(string filename, bool manage = true);
-	Archive*	openArchive(ArchiveEntry* entry, bool manage = true);
+	Archive*	openArchive(string filename, bool manage = true, bool silent = false);
+	Archive*	openArchive(ArchiveEntry* entry, bool manage = true, bool silent = false);
 	Archive*	newArchive(uint8_t type);
 	bool		closeArchive(int index);
 	bool		closeArchive(string filename);
@@ -59,6 +60,9 @@ public:
 	int			archiveIndex(Archive* archive);
 	Archive*	programResourceArchive() { return program_resource_archive; }
 	string		getArchiveExtensionsString();
+	bool		archiveIsResource(Archive* archive);
+	void		setArchiveResource(Archive* archive, bool resource = true);
+	bool		openSilent() { return open_silent; }
 
 	// Base resource archive stuff
 	Archive*	baseResourceArchive() { return base_resource_archive; }

@@ -300,6 +300,14 @@ keypress_t KeyBind::asKeyPress(int keycode, int modifiers) {
 						((modifiers & wxMOD_SHIFT) != 0));
 }
 
+// The + key char is different between windows and unix/mac
+#ifdef __WXMSW__
+#define PLUSKEY "+"
+#else
+#define PLUSKEY "="
+#endif
+
+
 void KeyBind::initBinds() {
 	// General
 	addBind("copy", keypress_t("C", false, true), "Copy");
@@ -310,12 +318,13 @@ void KeyBind::initBinds() {
 	// Map Editor 2D (me2d*)
 	addBind("me2d_clear_selection", keypress_t("C"), "Clear selection");
 	addBind("me2d_pan_view", keypress_t("mouse3"), "Pan View");
-	addBind("me2d_pan_view", keypress_t("space", false, true));
+	addBind("me2d_pan_view", keypress_t("space", true));
+	addBind("me2d_move", keypress_t("Z"), "Toggle item move mode");
 	addBind("me2d_zoom_in_m", keypress_t("mwheelup"), "Zoom in (towards mouse)");
 	addBind("me2d_zoom_out_m", keypress_t("mwheeldown"), "Zoom out (towards mouse)");
-	addBind("me2d_zoom_in", keypress_t("+"), "Zoom in (towards screen center)");
+	addBind("me2d_zoom_in", keypress_t(PLUSKEY), "Zoom in (towards screen center)");
 	addBind("me2d_zoom_out", keypress_t("-"), "Zoom out (towards screen center)");
-	addBind("me2d_show_object", keypress_t("+", false, false, true), "Zoom in, show current object");
+	addBind("me2d_show_object", keypress_t(PLUSKEY, false, false, true), "Zoom in, show current object");
 	addBind("me2d_show_object", keypress_t("mwheelup", false, false, true));
 	addBind("me2d_show_all", keypress_t("-", false, false, true), "Zoom out, show full map");
 	addBind("me2d_show_all", keypress_t("mwheeldown", false, false, true));
@@ -323,12 +332,14 @@ void KeyBind::initBinds() {
 	addBind("me2d_right", keypress_t("right"), "Scroll right");
 	addBind("me2d_up", keypress_t("up"), "Scroll up");
 	addBind("me2d_down", keypress_t("down"), "Scroll down");
-	addBind("me2d_grid_inc", keypress_t("]"), "Increment Grid level");
-	addBind("me2d_grid_dec", keypress_t("["), "Decrement Grid level");
+	addBind("me2d_grid_inc", keypress_t("["), "Increment Grid level");
+	addBind("me2d_grid_dec", keypress_t("]"), "Decrement Grid level");
 	addBind("me2d_mode_vertices", keypress_t("V"), "Vertices mode");
 	addBind("me2d_mode_lines", keypress_t("L"), "Lines mode");
 	addBind("me2d_mode_sectors", keypress_t("S"), "Sectors mode");
 	addBind("me2d_mode_things", keypress_t("T"), "Things mode");
+	addBind("me2d_flat_type", keypress_t("F", false, true), "Cycle Flat Type");
+	addBind("me2d_line_split", keypress_t("S", true, false, true), "Split nearest line");
 
 	// Map Editor 3D (me3d*)
 

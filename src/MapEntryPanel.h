@@ -18,6 +18,7 @@ struct mep_line_t {
 	bool		twosided;
 	bool		special;
 	bool		macro;
+	bool		segment;
 	mep_line_t(unsigned v1, unsigned v2) { this->v1 = v1; this->v2 = v2; }
 };
 

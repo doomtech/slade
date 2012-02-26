@@ -1,7 +1,7 @@
 
 /*******************************************************************
  * SLADE - It's a Doom Editor
- * Copyright (C) 2008 Simon Judd
+ * Copyright (C) 2008-2012 Simon Judd
  *
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
@@ -55,6 +55,7 @@ ArchiveManager::ArchiveManager() {
 	// Init variables
 	res_archive_open = false;
 	base_resource_archive = NULL;
+	open_silent = false;
 }
 
 /* ArchiveManager::~ArchiveManager
@@ -74,12 +75,11 @@ bool ArchiveManager::init() {
 	program_resource_archive = new ZipArchive();
 
 #ifdef __WXOSX__
-	string resdir = appPath("../Resources", DIR_APP);
+	string resdir = appPath("../Resources", DIR_APP);	// Use Resources dir within bundle on mac
 #else
 	string resdir = appPath("res", DIR_APP);
 #endif
 
-	// Check for 'res' folder first
 	if (wxDirExists(resdir)) {
 		program_resource_archive->importDir(resdir);
 		res_archive_open = (program_resource_archive->numEntries() > 0);
@@ -122,7 +122,7 @@ bool ArchiveManager::addArchive(Archive* archive) {
 		// Add to the list
 		archive_t n_archive;
 		n_archive.archive = archive;
-		n_archive.resource = false;
+		n_archive.resource = true;
 		open_archives.push_back(n_archive);
 
 		// Listen to the archive
@@ -171,7 +171,9 @@ Archive* ArchiveManager::getArchive(string filename) {
  * Opens and adds a archive to the list, returns a pointer to the
  * newly opened and added archive, or NULL if an error occurred
  *******************************************************************/
-Archive* ArchiveManager::openArchive(string filename, bool manage) {
+Archive* ArchiveManager::openArchive(string filename, bool manage, bool silent) {
+	open_silent = silent;
+
 	Archive* new_archive = getArchive(filename);
 
 	wxLogMessage(S_FMT("Opening archive %s", filename));
@@ -262,7 +264,8 @@ Archive* ArchiveManager::openArchive(string filename, bool manage) {
 /* ArchiveManager::openArchive
  * Same as the above function, except it opens from an ArchiveEntry
  *******************************************************************/
-Archive* ArchiveManager::openArchive(ArchiveEntry* entry, bool manage) {
+Archive* ArchiveManager::openArchive(ArchiveEntry* entry, bool manage, bool silent) {
+	open_silent = silent;
 	Archive* new_archive = NULL;
 
 	// Check entry was given
@@ -539,6 +542,27 @@ string ArchiveManager::getArchiveExtensionsString() {
 	extensions += S_FMT("|Wolfenstein 3D files|%s",				CHR(ext_wolf));
 
 	return extensions;
+}
+
+/* ArchiveManager::archiveIsResource
+ * Returns true if [archive] is set to be used as a resource, false
+ * otherwise
+ *******************************************************************/
+bool ArchiveManager::archiveIsResource(Archive* archive) {
+	int index = archiveIndex(archive);
+	if (index < 0)
+		return false;
+	else
+		return open_archives[index].resource;
+}
+
+/* ArchiveManager::setArchiveResource
+ * Sets/unsets [archive] to be used as a resource
+ *******************************************************************/
+void ArchiveManager::setArchiveResource(Archive* archive, bool resource) {
+	int index = archiveIndex(archive);
+	if (index >= 0)
+		open_archives[index].resource = resource;
 }
 
 /* ArchiveManager::addBaseResourcePath

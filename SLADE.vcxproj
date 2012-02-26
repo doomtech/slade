@@ -55,7 +55,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;USE_SFML_RENDERWINDOW;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -66,7 +66,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>fluidsynth.lib;winmm.lib;rpcrt4.lib;kernel32.lib;user32.lib;gdi32.lib;ole32.lib;oleaut32.lib;comctl32.lib;comdlg32.lib;uuid.lib;advapi32.lib;shell32.lib;wxbase29ud.lib;wxmsw29ud_core.lib;wxmsw29ud_gl.lib;wxmsw29ud_aui.lib;wxmsw29ud_html.lib;wxmsw29ud_adv.lib;wxmsw29ud_stc.lib;wxmsw29ud_propgrid.lib;wxzlib.lib;wxpngd.lib;wxtiffd.lib;wxjpegd.lib;wxscintillad.lib;wxregexud.lib;opengl32.lib;glu32.lib;FreeImage.lib;sfml-audio-s-d.lib;sfml-system-s-d.lib;sfml-main-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fluidsynth.lib;winmm.lib;rpcrt4.lib;kernel32.lib;user32.lib;gdi32.lib;ole32.lib;oleaut32.lib;comctl32.lib;comdlg32.lib;uuid.lib;advapi32.lib;shell32.lib;wxbase29ud.lib;wxmsw29ud_core.lib;wxmsw29ud_gl.lib;wxmsw29ud_aui.lib;wxmsw29ud_html.lib;wxmsw29ud_adv.lib;wxmsw29ud_stc.lib;wxmsw29ud_propgrid.lib;wxregexud.lib;wxzlibd.lib;wxpngd.lib;wxtiffd.lib;wxjpegd.lib;wxscintillad.lib;opengl32.lib;glu32.lib;FreeImage.lib;sfml-graphics-s-d.lib;sfml-audio-s-d.lib;sfml-window-s-d.lib;sfml-system-s-d.lib;sfml-main-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName)-dbg.exe</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -78,7 +78,7 @@
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <PreprocessorDefinitions>WIN32;__WXMSW__;_WINDOWS;NOPCH;_CRT_SECURE_NO_WARNINGS;NDEBUG;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;USE_SFML_RENDERWINDOW;__WXMSW__;_WINDOWS;NOPCH;_CRT_SECURE_NO_WARNINGS;NDEBUG;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
       <StringPooling>true</StringPooling>
@@ -93,7 +93,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>fluidsynth.lib;FreeImage.lib;wxbase29u.lib;wxmsw29u_core.lib;wxmsw29u_aui.lib;wxmsw29u_gl.lib;wxmsw29u_html.lib;wxmsw29u_adv.lib;wxmsw29u_stc.lib;wxmsw29u_propgrid.lib;wxtiff.lib;wxjpeg.lib;wxpng.lib;wxzlib.lib;wxregexu.lib;wxexpat.lib;wxscintilla.lib;sfml-audio-s.lib;sfml-system-s.lib;sfml-main.lib;winmm.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fluidsynth.lib;FreeImage.lib;wxbase29u.lib;wxmsw29u_core.lib;wxmsw29u_aui.lib;wxmsw29u_gl.lib;wxmsw29u_html.lib;wxmsw29u_adv.lib;wxmsw29u_stc.lib;wxmsw29u_propgrid.lib;wxtiff.lib;wxjpeg.lib;wxpng.lib;wxzlib.lib;wxregexu.lib;wxexpat.lib;wxscintilla.lib;sfml-graphics-s.lib;sfml-window-s.lib;sfml-audio-s.lib;sfml-system-s.lib;sfml-main.lib;winmm.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <EnableUAC>false</EnableUAC>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -108,6 +108,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\ACSPrefsPanel.cpp" />
+    <ClCompile Include="src\ActionSpecial.cpp" />
+    <ClCompile Include="src\ActionSpecialTreeView.cpp" />
     <ClCompile Include="src\ADatArchive.cpp" />
     <ClCompile Include="src\AdvancedPrefsPanel.cpp" />
     <ClCompile Include="src\ANSICanvas.cpp" />
@@ -141,8 +143,10 @@
     <ClCompile Include="src\EntryDataFormat.cpp" />
     <ClCompile Include="src\ExtMessageDialog.cpp" />
     <ClCompile Include="src\FileMonitor.cpp" />
+    <ClCompile Include="src\GameConfiguration.cpp" />
     <ClCompile Include="src\GeneralPrefsPanel.cpp" />
     <ClCompile Include="src\GfxConvDialog.cpp" />
+    <ClCompile Include="src\glew\glew.c" />
     <ClCompile Include="src\GobArchive.cpp" />
     <ClCompile Include="src\GraphicsPrefsPanel.cpp" />
     <ClCompile Include="src\GrpArchive.cpp" />
@@ -154,6 +158,7 @@
     <ClCompile Include="src\KeyBind.cpp" />
     <ClCompile Include="src\LfdArchive.cpp" />
     <ClCompile Include="src\LibArchive.cpp" />
+    <ClCompile Include="src\LineInfoOverlay.cpp" />
     <ClCompile Include="src\lzma\C\7zAlloc.c" />
     <ClCompile Include="src\lzma\C\7zBuf.c" />
     <ClCompile Include="src\lzma\C\7zBuf2.c" />
@@ -190,10 +195,21 @@
     <ClCompile Include="src\lzma\C\XzDec.c" />
     <ClCompile Include="src\lzma\C\XzEnc.c" />
     <ClCompile Include="src\lzma\C\XzIn.c" />
+    <ClCompile Include="src\MapDisplayPrefsPanel.cpp" />
+    <ClCompile Include="src\MapEditor.cpp" />
+    <ClCompile Include="src\MapEditorConfigDialog.cpp" />
+    <ClCompile Include="src\MapEditorPrefsPanel.cpp" />
     <ClCompile Include="src\MapEntryPanel.cpp" />
+    <ClCompile Include="src\MapObject.cpp" />
+    <ClCompile Include="src\MapObjectPropsPanel.cpp" />
+    <ClCompile Include="src\MapRenderer2D.cpp" />
+    <ClCompile Include="src\MapTextureBrowser.cpp" />
+    <ClCompile Include="src\MapTextureManager.cpp" />
     <ClCompile Include="src\MathStuff.cpp" />
+    <ClCompile Include="src\MCAnimations.cpp" />
     <ClCompile Include="src\MIDIPlayer.cpp" />
     <ClCompile Include="src\ModifyOffsetsDialog.cpp" />
+    <ClCompile Include="src\MOPGProperty.cpp" />
     <ClCompile Include="src\mus2mid\mus2mid.cpp" />
     <ClCompile Include="src\PakArchive.cpp" />
     <ClCompile Include="src\PaletteDialog.cpp" />
@@ -208,11 +224,13 @@
     <ClCompile Include="src\Parser.cpp" />
     <ClCompile Include="src\PatchBrowser.cpp" />
     <ClCompile Include="src\PNGPrefsPanel.cpp" />
+    <ClCompile Include="src\Polygon2D.cpp" />
     <ClCompile Include="src\PreferencesDialog.cpp" />
     <ClCompile Include="src\ResArchive.cpp" />
     <ClCompile Include="src\ResourceManager.cpp" />
     <ClCompile Include="src\RffArchive.cpp" />
     <ClCompile Include="src\SAction.cpp" />
+    <ClCompile Include="src\SectorInfoOverlay.cpp" />
     <ClCompile Include="src\SFileDialog.cpp" />
     <ClCompile Include="src\SFont.cpp" />
     <ClCompile Include="src\SIFormat.cpp" />
@@ -223,10 +241,15 @@
     <ClCompile Include="src\TextStyle.cpp" />
     <ClCompile Include="src\TextStylePrefsPanel.cpp" />
     <ClCompile Include="src\TextureXPanel.cpp" />
+    <ClCompile Include="src\ThingInfoOverlay.cpp" />
+    <ClCompile Include="src\ThingType.cpp" />
+    <ClCompile Include="src\ThingTypeTreeView.cpp" />
     <ClCompile Include="src\Tokenizer.cpp" />
     <ClCompile Include="src\Translation.cpp" />
     <ClCompile Include="src\TranslationEditorDialog.cpp" />
     <ClCompile Include="src\Tree.cpp" />
+    <ClCompile Include="src\UDMFProperty.cpp" />
+    <ClCompile Include="src\VertexInfoOverlay.cpp" />
     <ClCompile Include="src\VirtualListView.cpp" />
     <ClCompile Include="src\Wad2Archive.cpp" />
     <ClCompile Include="src\WadJArchive.cpp" />
@@ -301,6 +324,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ACSPrefsPanel.h" />
+    <ClInclude Include="src\ActionSpecial.h" />
+    <ClInclude Include="src\ActionSpecialTreeView.h" />
     <ClInclude Include="src\ADatArchive.h" />
     <ClInclude Include="src\AdvancedPrefsPanel.h" />
     <ClInclude Include="src\ANSICanvas.h" />
@@ -309,6 +334,7 @@
     <ClInclude Include="src\ArchiveFormats.h" />
     <ClInclude Include="src\ArchiveOperations.h" />
     <ClInclude Include="src\Archives.h" />
+    <ClInclude Include="src\Args.h" />
     <ClInclude Include="src\AudioEntryPanel.h" />
     <ClInclude Include="src\AudioFormats.h" />
     <ClInclude Include="src\AudioPrefsPanel.h" />
@@ -333,8 +359,12 @@
     <ClInclude Include="src\EntryDataFormat.h" />
     <ClInclude Include="src\ExtMessageDialog.h" />
     <ClInclude Include="src\FileMonitor.h" />
+    <ClInclude Include="src\GameConfiguration.h" />
     <ClInclude Include="src\GeneralPrefsPanel.h" />
     <ClInclude Include="src\GfxConvDialog.h" />
+    <ClInclude Include="src\glew\glew.h" />
+    <ClInclude Include="src\glew\glxew.h" />
+    <ClInclude Include="src\glew\wglew.h" />
     <ClInclude Include="src\GobArchive.h" />
     <ClInclude Include="src\GraphicsPrefsPanel.h" />
     <ClInclude Include="src\GrpArchive.h" />
@@ -347,6 +377,7 @@
     <ClInclude Include="src\KeyBind.h" />
     <ClInclude Include="src\LfdArchive.h" />
     <ClInclude Include="src\LibArchive.h" />
+    <ClInclude Include="src\LineInfoOverlay.h" />
     <ClInclude Include="src\LumpFormats.h" />
     <ClInclude Include="src\lzma\C\7z.h" />
     <ClInclude Include="src\lzma\C\7zAlloc.h" />
@@ -378,12 +409,23 @@
     <ClInclude Include="src\lzma\C\Xz.h" />
     <ClInclude Include="src\lzma\C\XzCrc64.h" />
     <ClInclude Include="src\lzma\C\XzEnc.h" />
+    <ClInclude Include="src\MapDisplayPrefsPanel.h" />
+    <ClInclude Include="src\MapEditor.h" />
+    <ClInclude Include="src\MapEditorConfigDialog.h" />
+    <ClInclude Include="src\MapEditorPrefsPanel.h" />
     <ClInclude Include="src\MapEntryPanel.h" />
+    <ClInclude Include="src\MapObject.h" />
+    <ClInclude Include="src\MapObjectPropsPanel.h" />
+    <ClInclude Include="src\MapRenderer2D.h" />
+    <ClInclude Include="src\MapTextureBrowser.h" />
+    <ClInclude Include="src\MapTextureManager.h" />
     <ClInclude Include="src\MathStuff.h" />
+    <ClInclude Include="src\MCAnimations.h" />
     <ClInclude Include="src\MIDIPlayer.h" />
     <ClInclude Include="src\MiscFormats.h" />
     <ClInclude Include="src\ModelFormats.h" />
     <ClInclude Include="src\ModifyOffsetsDialog.h" />
+    <ClInclude Include="src\MOPGProperty.h" />
     <ClInclude Include="src\mus2mid\mus2mid.h" />
     <ClInclude Include="src\PakArchive.h" />
     <ClInclude Include="src\PaletteDialog.h" />
@@ -399,11 +441,13 @@
     <ClInclude Include="src\Parser.h" />
     <ClInclude Include="src\PatchBrowser.h" />
     <ClInclude Include="src\PNGPrefsPanel.h" />
+    <ClInclude Include="src\Polygon2D.h" />
     <ClInclude Include="src\PreferencesDialog.h" />
     <ClInclude Include="src\ResArchive.h" />
     <ClInclude Include="src\ResourceManager.h" />
     <ClInclude Include="src\RffArchive.h" />
     <ClInclude Include="src\SAction.h" />
+    <ClInclude Include="src\SectorInfoOverlay.h" />
     <ClInclude Include="src\SFileDialog.h" />
     <ClInclude Include="src\SIFDoom.h" />
     <ClInclude Include="src\SIFHexen.h" />
@@ -421,10 +465,15 @@
     <ClInclude Include="src\TextStyle.h" />
     <ClInclude Include="src\TextStylePrefsPanel.h" />
     <ClInclude Include="src\TextureXPanel.h" />
+    <ClInclude Include="src\ThingInfoOverlay.h" />
+    <ClInclude Include="src\ThingType.h" />
+    <ClInclude Include="src\ThingTypeTreeView.h" />
     <ClInclude Include="src\Tokenizer.h" />
     <ClInclude Include="src\Translation.h" />
     <ClInclude Include="src\TranslationEditorDialog.h" />
     <ClInclude Include="src\Tree.h" />
+    <ClInclude Include="src\UDMFProperty.h" />
+    <ClInclude Include="src\VertexInfoOverlay.h" />
     <ClInclude Include="src\VirtualListView.h" />
     <ClInclude Include="src\Wad2Archive.h" />
     <ClInclude Include="src\WadJArchive.h" />
@@ -503,6 +552,61 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="detect_functions.txt" />
+    <None Include="dist\res\config\games\doom1.cfg" />
+    <None Include="dist\res\config\games\doom2.cfg" />
+    <None Include="dist\res\config\games\doom2_boom.cfg" />
+    <None Include="dist\res\config\games\doom2_zd_hexen.cfg" />
+    <None Include="dist\res\config\games\doom2_zd_udmf.cfg" />
+    <None Include="dist\res\config\games\doom64.cfg" />
+    <None Include="dist\res\config\games\doomu.cfg" />
+    <None Include="dist\res\config\games\doomu_boom.cfg" />
+    <None Include="dist\res\config\games\doomu_zd_hexen.cfg" />
+    <None Include="dist\res\config\games\doomu_zd_udmf.cfg" />
+    <None Include="dist\res\config\games\heretic.cfg" />
+    <None Include="dist\res\config\games\heretic_zd_hexen.cfg" />
+    <None Include="dist\res\config\games\heretic_zd_udmf.cfg" />
+    <None Include="dist\res\config\games\hexen.cfg" />
+    <None Include="dist\res\config\games\include\flags\boom_flags.cfg" />
+    <None Include="dist\res\config\games\include\flags\doom64_flags.cfg" />
+    <None Include="dist\res\config\games\include\flags\doom_flags.cfg" />
+    <None Include="dist\res\config\games\include\flags\eternity_flags.cfg" />
+    <None Include="dist\res\config\games\include\flags\hexen_flags.cfg" />
+    <None Include="dist\res\config\games\include\flags\mbf_flags.cfg" />
+    <None Include="dist\res\config\games\include\flags\strife_flags.cfg" />
+    <None Include="dist\res\config\games\include\flags\zdoom_flags.cfg" />
+    <None Include="dist\res\config\games\include\sectors\doom64_sectors.cfg" />
+    <None Include="dist\res\config\games\include\sectors\doom_sectors.cfg" />
+    <None Include="dist\res\config\games\include\sectors\heretic_sectors.cfg" />
+    <None Include="dist\res\config\games\include\sectors\hexen_sectors.cfg" />
+    <None Include="dist\res\config\games\include\sectors\zdoom_sectors.cfg" />
+    <None Include="dist\res\config\games\include\specials\boom_specials.cfg" />
+    <None Include="dist\res\config\games\include\specials\doom1_specials.cfg" />
+    <None Include="dist\res\config\games\include\specials\doom2_specials.cfg" />
+    <None Include="dist\res\config\games\include\specials\doom64_specials.cfg" />
+    <None Include="dist\res\config\games\include\specials\heretic_specials.cfg" />
+    <None Include="dist\res\config\games\include\specials\hexen_specials.cfg" />
+    <None Include="dist\res\config\games\include\specials\strife_specials.cfg" />
+    <None Include="dist\res\config\games\include\specials\zdoom_specials.cfg" />
+    <None Include="dist\res\config\games\include\things\boom_things.cfg" />
+    <None Include="dist\res\config\games\include\things\common_things.cfg" />
+    <None Include="dist\res\config\games\include\things\doom1_things.cfg" />
+    <None Include="dist\res\config\games\include\things\doom2_things.cfg" />
+    <None Include="dist\res\config\games\include\things\doom64_things.cfg" />
+    <None Include="dist\res\config\games\include\things\heretic_things.cfg" />
+    <None Include="dist\res\config\games\include\things\hexen_things.cfg" />
+    <None Include="dist\res\config\games\include\things\mbf_things.cfg" />
+    <None Include="dist\res\config\games\include\things\strife_things.cfg" />
+    <None Include="dist\res\config\games\include\things\zdoom_things.cfg" />
+    <None Include="dist\res\config\games\include\things\zdoom_things_doom.cfg" />
+    <None Include="dist\res\config\games\include\things\zdoom_things_heretic.cfg" />
+    <None Include="dist\res\config\games\include\things\zdoom_things_hexen.cfg" />
+    <None Include="dist\res\config\games\include\things\zdoom_things_strife.cfg" />
+    <None Include="dist\res\config\games\include\udmf\props_all.cfg" />
+    <None Include="dist\res\config\games\include\udmf\props_base.cfg" />
+    <None Include="dist\res\config\games\include\udmf\props_boom.cfg" />
+    <None Include="dist\res\config\games\include\udmf\props_hexen.cfg" />
+    <None Include="dist\res\config\games\include\udmf\props_zdoom.cfg" />
+    <None Include="dist\res\config\games\strife.cfg" />
     <None Include="slade.ico" />
     <None Include="stuff.txt" />
   </ItemGroup>

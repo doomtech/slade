@@ -22,6 +22,7 @@ private:
 
 	// Some generic/global textures
 	static GLTexture	tex_background;	// Checkerboard background texture
+	static GLTexture	tex_missing;	// Checkerboard 'missing' texture
 
 	// Stuff used internally
 	bool	loadData(const uint8_t* data, uint32_t width, uint32_t height, bool add = false);
@@ -37,7 +38,7 @@ public:
 		NEAREST_LINEAR_MIN,
 		NEAREST_MIPMAP,
 	};
-	
+
 	GLTexture(bool allow_split = true);
 	~GLTexture();
 
@@ -46,7 +47,8 @@ public:
 	uint32_t	getHeight() { return height; }
 	int			getFilter() { return filter; }
 	bool		isTiling() { return tiling; }
-	
+	GLuint		glId() { if (tex.size()>0) return tex[0].id; else return 0; }
+
 	void		setFilter(int filter) { this->filter = filter; }
 	void		setTiling(bool tiling) { this->tiling = tiling; }
 
@@ -61,6 +63,7 @@ public:
 	bool	draw2dTiled(uint32_t width, uint32_t height);
 
 	static GLTexture&	bgTex();
+	static GLTexture&	missingTex();
 	static void			resetBgTex();
 };
 

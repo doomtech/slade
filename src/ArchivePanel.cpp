@@ -1,7 +1,7 @@
 
 /*******************************************************************
  * SLADE - It's a Doom Editor
- * Copyright (C) 2008 Simon Judd
+ * Copyright (C) 2008-2012 Simon Judd
  *
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
@@ -57,7 +57,9 @@
 #include "MainWindow.h"
 #include "TranslationEditorDialog.h"
 #include "SFileDialog.h"
+#include "MapEditorWindow.h"
 #include "KeyBind.h"
+#include "MapEditorConfigDialog.h"
 #include <wx/aui/auibook.h>
 #include <wx/aui/auibar.h>
 #include <wx/filename.h>
@@ -274,6 +276,7 @@ void ArchivePanel::addMenus() {
 		theApp->getAction("arch_importfiles")->addToMenu(menu_archive);
 		menu_archive->AppendSeparator();
 		theApp->getAction("arch_texeditor")->addToMenu(menu_archive);
+		theApp->getAction("arch_mapeditor")->addToMenu(menu_archive);
 		wxMenu* menu_clean = new wxMenu("");
 		theApp->getAction("arch_clean_patches")->addToMenu(menu_clean);
 		theApp->getAction("arch_clean_textures")->addToMenu(menu_clean);
@@ -698,6 +701,9 @@ bool ArchivePanel::moveUp() {
 	for (unsigned a = 0; a < selection.size(); a++)
 		entry_list->selectItem(selection[a] - 1);
 
+	// Ensure top-most entry is visible
+	entry_list->EnsureVisible(entry_list->getEntryIndex(selection[0]) - 4);
+
 	// Return success
 	return true;
 }
@@ -726,6 +732,9 @@ bool ArchivePanel::moveDown() {
 	entry_list->clearSelection();
 	for (unsigned a = 0; a < selection.size(); a++)
 		entry_list->selectItem(selection[a] + 1);
+
+	// Ensure bottom-most entry is visible
+	entry_list->EnsureVisible(entry_list->getEntryIndex(selection[selection.size() - 1]) + 4);
 
 	// Return success
 	return true;
@@ -1606,6 +1615,9 @@ bool ArchivePanel::handleAction(string id) {
 	else if (id == "arch_texeditor")
 		theMainWindow->openTextureEditor(archive);
 
+	else if (id == "arch_mapeditor")
+		theMainWindow->openMapEditor(archive);
+
 	// Archive->Convert To...
 	else if (id == "arch_convert")
 		convertArchiveTo();
@@ -2169,6 +2181,28 @@ void ArchivePanel::onEntryListActivated(wxListEvent& e) {
 	else if (entry->getType()->getFormat() == "texturex" ||
 			entry->getType() == EntryType::getType("zdtextures"))
 		theMainWindow->openTextureEditor(archive);
+
+	// Map
+	else if (entry->getType() == EntryType::mapMarkerType()) {
+		// Open map editor config dialog
+		MapEditorConfigDialog dlg(this, archive, false);
+		if (dlg.ShowModal() == wxID_OK) {
+			Archive::mapdesc_t info = archive->getMapInfo(entry);
+
+			// Check selected game configuration is ok
+			if (!dlg.configMatchesMap(info))
+				wxMessageBox("Selected Game Configuration does not match the map format", "Error", wxICON_ERROR);
+			else {
+				// Attempt to open map
+				if (theMapEditor->openMap(info))
+					theMapEditor->Show();
+				else {
+					theMapEditor->Hide();
+					wxMessageBox(S_FMT("Unable to open map %s: %s", CHR(entry->getName()), CHR(Global::error)), "Invalid map error", wxICON_ERROR);
+				}
+			}
+		}
+	}
 
 	// Other entry
 	else if (entry->getType() != EntryType::folderType())

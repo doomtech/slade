@@ -1,7 +1,7 @@
 
 /*******************************************************************
  * SLADE - It's a Doom Editor
- * Copyright (C) 2008 Simon Judd
+ * Copyright (C) 2008-2012 Simon Judd
  *
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
@@ -39,6 +39,8 @@
 #include "PreferencesDialog.h"
 #include "Tokenizer.h"
 #include "SplashWindow.h"
+#include "MapEditorWindow.h"
+#include "MapEditorConfigDialog.h"
 #include <wx/aboutdlg.h>
 #include <wx/dnd.h>
 #include <wx/statline.h>
@@ -228,6 +230,7 @@ void MainWindow::setupLayout() {
 	theApp->getAction("arch_newdir")->addToToolbar(tb_archive);
 	theApp->getAction("arch_importfiles")->addToToolbar(tb_archive);
 	theApp->getAction("arch_texeditor")->addToToolbar(tb_archive);
+	theApp->getAction("arch_mapeditor")->addToToolbar(tb_archive);
 	tb_archive->Realize();
 
 	// Create Entry toolbar
@@ -368,6 +371,9 @@ bool MainWindow::exitProgram() {
 	if (!panel_archivemanager->closeAll())
 		return false;
 
+	// Close map editor window (if open)
+	theMapEditor->Close();
+
 	// Save current layout
 	main_window_layout = m_mgr->SavePerspective();
 	mw_maximized = IsMaximized();
@@ -410,6 +416,18 @@ vector<ArchiveEntry*> MainWindow::getCurrentEntrySelection() {
  *******************************************************************/
 void MainWindow::openTextureEditor(Archive* archive) {
 	panel_archivemanager->openTextureTab(theArchiveManager->archiveIndex(archive));
+}
+
+/* MainWindow::openMapEditor
+ * Opens the map editor for the current archive tab
+ *******************************************************************/
+void MainWindow::openMapEditor(Archive* archive) {
+	MapEditorConfigDialog dlg(this, archive);
+	if (dlg.ShowModal() == wxID_OK) {
+		Archive::mapdesc_t md = dlg.selectedMap();
+		if (md.head)
+			theMapEditor->openMap(md);
+	}
 }
 
 /* MainWindow::openEntry

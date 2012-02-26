@@ -1,7 +1,7 @@
 
 /*******************************************************************
  * SLADE - It's a Doom Editor
- * Copyright (C) 2008 Simon Judd
+ * Copyright (C) 2008-2012 Simon Judd
  *
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
@@ -23,6 +23,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *******************************************************************/
 
+
 /*******************************************************************
  * INCLUDES
  *******************************************************************/
@@ -31,6 +32,7 @@
 #include "ColourPrefsPanel.h"
 #include "ColourConfiguration.h"
 #include "MainWindow.h"
+#include <wx/propgrid/advprops.h>
 
 
 /*******************************************************************
@@ -50,43 +52,29 @@ ColourPrefsPanel::ColourPrefsPanel(wxWindow* parent) : wxPanel(parent, -1) {
 	wxStaticBoxSizer *sizer = new wxStaticBoxSizer(frame, wxVERTICAL);
 	psizer->Add(sizer, 1, wxEXPAND|wxALL, 4);
 
-	// Colours for entry lists
-	sizer->Add(new wxStaticText(this, -1, "Entry list colours:"), 0, wxALL, 4);
-	wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
+	// Configurations list
+	vector<string> cnames;
+	ColourConfiguration::getConfigurationNames(cnames);
+	choice_configs = new wxChoice(this, -1);
+	for (unsigned a = 0; a < cnames.size(); a++)
+		choice_configs->Append(cnames[a]);
 
-	// Error
-	vbox->Add(new wxStaticText(this, -1, "Error:"), 1, wxALIGN_CENTER_VERTICAL);
-	cp_err = new wxColourPickerCtrl(this, -1, wxColour(230, 30, 0), wxDefaultPosition, wxDefaultSize, wxCLRP_SHOW_LABEL|wxCLRP_USE_TEXTCTRL);
-	cp_err->SetColour(WXCOL(ColourConfiguration::getColour("error")));
-	vbox->Add(cp_err, 0, wxEXPAND|wxBOTTOM, 4);
+	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
+	sizer->Add(hbox, 0, wxEXPAND|wxALL, 4);
+	hbox->Add(new wxStaticText(this, -1, "Preset:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
+	hbox->Add(choice_configs, 1, wxEXPAND, 0);
 
-	// Locked
-	vbox->Add(new wxStaticText(this, -1, "Locked:"), 1, wxALIGN_CENTER_VERTICAL);
-	cp_loc = new wxColourPickerCtrl(this, -1, wxColour(180, 50, 0), wxDefaultPosition, wxDefaultSize, wxCLRP_SHOW_LABEL|wxCLRP_USE_TEXTCTRL);
-	cp_loc->SetColour(WXCOL(ColourConfiguration::getColour("locked")));
-	vbox->Add(cp_loc, 0, wxEXPAND|wxBOTTOM, 4);
+	// Create property grid
+	pg_colours = new wxPropertyGrid(this, -1, wxDefaultPosition, wxDefaultSize, wxPG_BOLD_MODIFIED|wxPG_SPLITTER_AUTO_CENTER|wxPG_TOOLTIPS);
+	sizer->Add(pg_colours, 1, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
-	// Modified
-	vbox->Add(new wxStaticText(this, -1, "Modified:"), 1, wxALIGN_CENTER_VERTICAL);
-	cp_mod = new wxColourPickerCtrl(this, -1, wxColour(0, 80, 180), wxDefaultPosition, wxDefaultSize, wxCLRP_SHOW_LABEL|wxCLRP_USE_TEXTCTRL);
-	cp_mod->SetColour(WXCOL(ColourConfiguration::getColour("modified")));
-	vbox->Add(cp_mod, 0, wxEXPAND|wxBOTTOM, 4);
+	// Load colour config into grid
+	refreshPropGrid();
 
-	// New
-	vbox->Add(new wxStaticText(this, -1, "New:"), 1, wxALIGN_CENTER_VERTICAL);
-	cp_new = new wxColourPickerCtrl(this, -1, wxColour(0, 150,  0), wxDefaultPosition, wxDefaultSize, wxCLRP_SHOW_LABEL|wxCLRP_USE_TEXTCTRL);
-	cp_new->SetColour(WXCOL(ColourConfiguration::getColour("new")));
-	vbox->Add(cp_new, 0, wxEXPAND|wxBOTTOM, 4);
-
-	// Reset button
-	button_reset = new wxButton(this, -1, "Reset to Default");
-	vbox->Add(button_reset, 0, wxEXPAND|wxBOTTOM, 4);
-
-	// Complete the sizer
-	sizer->Add(vbox, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
-		
 	// Bind events
-	button_reset->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &ColourPrefsPanel::onReset, this);
+	choice_configs->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &ColourPrefsPanel::onChoicePresetSelected, this);
+
+	Layout();
 }
 
 /* ColourPrefsPanel::~ColourPrefsPanel
@@ -95,30 +83,103 @@ ColourPrefsPanel::ColourPrefsPanel(wxWindow* parent) : wxPanel(parent, -1) {
 ColourPrefsPanel::~ColourPrefsPanel() {
 }
 
+/* ColourPrefsPanel::refreshPropGrid
+ * Refreshes the colour configuration wxPropertyGrid
+ *******************************************************************/
+void ColourPrefsPanel::refreshPropGrid() {
+	// Clear grid
+	pg_colours->Clear();
+
+	// Get (sorted) list of colours
+	vector<string> colours;
+	ColourConfiguration::getColourNames(colours);
+	std::sort(colours.begin(), colours.end());
+
+	// Add colours to property grid
+	for (unsigned a = 0; a < colours.size(); a++) {
+		// Get colour definition
+		cc_col_t cdef = ColourConfiguration::getColDef(colours[a]);
+
+		// Get/create group
+		wxPGProperty* group = pg_colours->GetProperty(cdef.group);
+		if (!group)
+			group = pg_colours->Append(new wxPropertyCategory(cdef.group));
+
+		// Add colour
+		wxPGProperty* colour = pg_colours->AppendIn(group, new wxColourProperty(cdef.name, colours[a], WXCOL(cdef.colour)));
+
+		// Add extra colour properties
+		wxPGProperty* opacity = pg_colours->AppendIn(colour, new wxIntProperty("Opacity (0-255)", "alpha", cdef.colour.a));
+		pg_colours->AppendIn(colour, new wxBoolProperty("Additive", "additive", (cdef.colour.blend == 1)));
+		pg_colours->Collapse(colour);
+
+		// Set opacity limits
+		opacity->SetAttribute("Max", 255);
+		opacity->SetAttribute("Min", 0);
+	}
+}
+
 /* ColourPrefsPanel::applyPreferences
  * Applies preferences from the panel controls
  *******************************************************************/
 void ColourPrefsPanel::applyPreferences() {
-	wxColour wxc = cp_err->GetColour();
-	ColourConfiguration::setColour("error", wxc.Red(), wxc.Green(), wxc.Blue(), wxc.Alpha());
-	wxc = cp_loc->GetColour();
-	ColourConfiguration::setColour("locked", wxc.Red(), wxc.Green(), wxc.Blue(), wxc.Alpha());
-	wxc = cp_mod->GetColour();
-	ColourConfiguration::setColour("modified", wxc.Red(), wxc.Green(), wxc.Blue(), wxc.Alpha());
-	wxc = cp_new->GetColour();
-	ColourConfiguration::setColour("new", wxc.Red(), wxc.Green(), wxc.Blue(), wxc.Alpha());
+	// Get list of all colours
+	vector<string> colours;
+	ColourConfiguration::getColourNames(colours);
 
+	for (unsigned a = 0; a < colours.size(); a++) {
+		// Get colour definition
+		cc_col_t cdef = ColourConfiguration::getColDef(colours[a]);
+
+		string cdef_path = cdef.group;
+		cdef_path += ".";
+		cdef_path += colours[a];
+
+		// Get properties from grid
+		wxIntProperty* p_alpha = (wxIntProperty*)pg_colours->GetProperty(cdef_path + ".alpha");
+		wxBoolProperty* p_add = (wxBoolProperty*)pg_colours->GetProperty(cdef_path + ".additive");
+
+		if (p_alpha && p_add) {
+			// Getting the colour out of a wxColourProperty is retarded
+			wxVariant v = pg_colours->GetPropertyValue(cdef_path);
+			wxColour col;
+			col << v; // wut?
+
+			// Get alpha
+			int alpha = p_alpha->GetValue().GetInteger();
+			if (alpha > 255) a = 255;
+			if (alpha < 0) a = 0;
+
+			// Get blend
+			int blend = 0;
+			if (p_add->GetValue().GetBool())
+				blend = 1;
+
+			// Set the colour
+			ColourConfiguration::setColour(colours[a], col.Red(), col.Green(), col.Blue(), alpha, blend);
+
+			// Clear modified status
+			pg_colours->GetProperty(cdef_path)->SetModifiedStatus(false);
+			p_alpha->SetModifiedStatus(false);
+			p_add->SetModifiedStatus(false);
+		}
+	}
+
+	pg_colours->Refresh();
+	pg_colours->RefreshEditor();
 	theMainWindow->Refresh();
 }
 
-/* ColourPrefsPanel::onReset
- * Called when the 'reset' button is clicked
- *******************************************************************/
-void ColourPrefsPanel::onReset(wxCommandEvent& e) {
-	cp_err->SetColour(wxColour(230, 30, 0));
-	cp_loc->SetColour(wxColour(180, 50, 0));
-	cp_mod->SetColour(wxColour(0, 80, 180));
-	cp_new->SetColour(wxColour(0, 150,  0));
 
-	applyPreferences();
+/*******************************************************************
+ * COLOURPREFSPANEL CLASS EVENTS
+ *******************************************************************/
+
+/* ColourPrefsPanel::onChoicePresetSelected
+ * Called when the 'preset' dropdown choice is changed
+ *******************************************************************/
+void ColourPrefsPanel::onChoicePresetSelected(wxCommandEvent& e) {
+	string config = choice_configs->GetStringSelection();
+	ColourConfiguration::readConfiguration(config);
+	refreshPropGrid();
 }

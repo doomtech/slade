@@ -1,7 +1,7 @@
 
 /*******************************************************************
  * SLADE - It's a Doom Editor
- * Copyright (C) 2008 Simon Judd
+ * Copyright (C) 2008-2012 Simon Judd
  *
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
@@ -39,10 +39,12 @@
 #include "Icons.h"
 #include "SIFormat.h"
 
+
 /*******************************************************************
  * VARIABLES
  *******************************************************************/
 CVAR(Bool, gfx_extraconv, false, CVAR_SAVE)
+
 
 /*******************************************************************
  * GFXCONVDIALOG CLASS FUNCTINOS

@@ -1,7 +1,7 @@
 
 /*******************************************************************
  * SLADE - It's a Doom Editor
- * Copyright (C) 2008 Simon Judd
+ * Copyright (C) 2008-2012 Simon Judd
  *
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
@@ -44,10 +44,11 @@
 Property::Property(uint8_t type) {
 	// Set property type
 	this->type = type;
+	this->has_value = false;
 
 	// Set default value depending on type
 	if (type == PROP_BOOL)
-		value.Boolean = true;
+		value.Boolean = false;
 	else if (type == PROP_INT)
 		value.Integer = 0;
 	else if (type == PROP_FLOAT)
@@ -70,6 +71,7 @@ Property::Property(const Property& copy) {
 	this->type = copy.type;
 	this->value = copy.value;
 	this->val_string = copy.val_string;
+	this->has_value = copy.has_value;
 }
 
 /* Property::Property
@@ -79,6 +81,7 @@ Property::Property(bool value) {
 	// Init boolean property
 	this->type = PROP_BOOL;
 	this->value.Boolean = value;
+	this->has_value = true;
 }
 
 /* Property::Property
@@ -88,6 +91,7 @@ Property::Property(int value) {
 	// Init integer property
 	this->type = PROP_INT;
 	this->value.Integer = value;
+	this->has_value = true;
 }
 
 /* Property::Property
@@ -97,6 +101,7 @@ Property::Property(double value) {
 	// Init float property
 	this->type = PROP_FLOAT;
 	this->value.Floating = value;
+	this->has_value = true;
 }
 
 /* Property::Property
@@ -106,6 +111,7 @@ Property::Property(string value) {
 	// Init string property
 	this->type = PROP_STRING;
 	this->val_string = value;
+	this->has_value = true;
 }
 
 /* Property::~Property
@@ -123,6 +129,10 @@ bool Property::getBoolValue(bool warn_wrong_type) {
 	// If this is a flag, just return boolean 'true' (or equivalent)
 	if (type == PROP_FLAG)
 		return true;
+
+	// If the value is undefined, default to false
+	if (!has_value)
+		return false;
 
 	// Write warning to log if needed
 	if (warn_wrong_type && type != PROP_BOOL)
@@ -157,6 +167,10 @@ int Property::getIntValue(bool warn_wrong_type) {
 	if (type == PROP_FLAG)
 		return 1;
 
+	// If the value is undefined, default to 0
+	if (!has_value)
+		return 0;
+
 	// Write warning to log if needed
 	if (warn_wrong_type && type != PROP_INT)
 		wxLogMessage("Warning: Requested Integer value of a %s Property", typeString().c_str());
@@ -185,6 +199,10 @@ double Property::getFloatValue(bool warn_wrong_type) {
 	if (type == PROP_FLAG)
 		return 1;
 
+	// If the value is undefined, default to 0
+	if (!has_value)
+		return 0;
+
 	// Write warning to log if needed
 	if (warn_wrong_type && type != PROP_FLOAT)
 		wxLogMessage("Warning: Requested Float value of a %s Property", typeString().c_str());
@@ -212,6 +230,10 @@ string Property::getStringValue(bool warn_wrong_type) {
 	// If this is a flag, just return boolean 'true' (or equivalent)
 	if (type == PROP_FLAG)
 		return "1";
+
+	// If the value is undefined, default to null
+	if (!has_value)
+		return "";
 
 	// Write warning to log if needed
 	if (warn_wrong_type && type != PROP_STRING)
@@ -246,6 +268,7 @@ void Property::setValue(bool val) {
 
 	// Set value
 	value.Boolean = val;
+	has_value = true;
 }
 
 /* Property::setValue
@@ -259,6 +282,7 @@ void Property::setValue(int val) {
 
 	// Set value
 	value.Integer = val;
+	has_value = true;
 }
 
 /* Property::setValue
@@ -272,6 +296,7 @@ void Property::setValue(double val) {
 
 	// Set value
 	value.Floating = val;
+	has_value = true;
 }
 
 /* Property::setValue
@@ -285,6 +310,7 @@ void Property::setValue(string val) {
 
 	// Set value
 	val_string = val;
+	has_value = true;
 }
 
 /* Property::changeType

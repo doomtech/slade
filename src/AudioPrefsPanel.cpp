@@ -1,7 +1,7 @@
 
 /*******************************************************************
  * SLADE - It's a Doom Editor
- * Copyright (C) 2008 Simon Judd
+ * Copyright (C) 2008-2012 Simon Judd
  *
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
@@ -73,8 +73,14 @@ AudioPrefsPanel::AudioPrefsPanel(wxWindow* parent) : wxPanel(parent, -1) {
 	hbox->Add(btn_browse_soundfont, 0, wxEXPAND);
 	sizer->Add(hbox, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
+	// Reset
+	sizer->Add(new wxStaticText(this, -1, "Reset MIDI Player"), 0, wxALL, 4);
+	btn_reset_player = new wxButton(this, -1, "Reset");
+	sizer->Add(btn_reset_player, 0, wxEXPAND, 4);
+
 	// Bind events
 	btn_browse_soundfont->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &AudioPrefsPanel::onBtnBrowseSoundfont, this);
+	btn_reset_player->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &AudioPrefsPanel::onBtnResetPlayer, this);
 
 	Layout();
 }
@@ -110,4 +116,11 @@ void AudioPrefsPanel::onBtnBrowseSoundfont(wxCommandEvent& e) {
 		text_soundfont_path->SetValue(fd.GetPath());
 		dir_last = fd.GetDirectory();
 	}
+}
+
+/* AudioPrefsPanel::onBtnResetPlayer
+ * Called for resetting the MIDI player
+ *******************************************************************/
+void AudioPrefsPanel::onBtnResetPlayer(wxCommandEvent& e) {
+	theMIDIPlayer->resetPlayer();
 }

@@ -1,7 +1,7 @@
 
 /*******************************************************************
  * SLADE - It's a Doom Editor
- * Copyright (C) 2008 Simon Judd
+ * Copyright (C) 2008-2012 Simon Judd
  *
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
@@ -30,6 +30,7 @@
  *******************************************************************/
 #include "Main.h"
 #include "ZipArchive.h"
+#include "WadArchive.h"
 #include "SplashWindow.h"
 #include <wx/wfstream.h>
 #include <wx/zipstrm.h>
@@ -144,7 +145,7 @@ bool ZipArchive::open(string filename) {
 				// Clean up
 				delete[] data;
 			} else {
-				Global::error = S_FMT("Entry too large: %s is %u mb", 
+				Global::error = S_FMT("Entry too large: %s is %u mb",
 					CHR(entry->GetName(wxPATH_UNIX)), entry->GetSize() / (1<<20));
 				setMuted(false);
 				return false;
@@ -447,14 +448,22 @@ vector<Archive::mapdesc_t> ZipArchive::detectMaps() {
 		if (entry->getType()->getFormat() != "archive_wad")
 			continue;
 
+		// Detect map format (probably kinda slow but whatever, no better way to do it really)
+		int format = MAP_UNKNOWN;
+		Archive* tempwad = new WadArchive();
+		tempwad->open(entry);
+		vector<mapdesc_t> emaps = tempwad->detectMaps();
+		if (emaps.size() > 0)
+			format = emaps[0].format;
+		delete tempwad;
+
 		// Add map description
-		// (not going to detect format, having to open the archive would be slow...
-		//  the way zdoom handles maps in zips is a pretty stupid really)
 		mapdesc_t md;
 		md.head = entry;
 		md.end = entry;
 		md.archive = true;
 		md.name = entry->getName(true).Upper();
+		md.format = format;
 		ret.push_back(md);
 	}
 

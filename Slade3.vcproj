@@ -121,7 +121,7 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				WholeProgramOptimization="false"
-				PreprocessorDefinitions="WIN32;__WXMSW__;_WINDOWS;NOPCH;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;NDEBUG;UPDATEREVISION"
+				PreprocessorDefinitions="WIN32;USE_SFML_RENDERWINDOW;__WXMSW__;_WINDOWS;NOPCH;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;GLEW_STATIC;NDEBUG;UPDATEREVISION"
 				GeneratePreprocessedFile="0"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -142,7 +142,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/NODEFAULTLIB:LIBCMT"
-				AdditionalDependencies="fluidsynth.lib sfml-system-s.lib sfml-audio-s.lib sfml-main.lib FreeImage.lib wxbase29u.lib wxmsw29u_core.lib wxmsw29u_aui.lib wxmsw29u_gl.lib wxmsw29u_html.lib wxmsw29u_adv.lib wxmsw29u_stc.lib wxmsw29u_media.lib wxtiff.lib wxjpeg.lib wxpng.lib wxzlib.lib wxregexu.lib wxexpat.lib wxscintilla.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib user32.lib shell32.lib advapi32.lib comdlg32.lib gdi32.lib ole32.lib oleaut32.lib"
+				AdditionalDependencies="winmm.lib comctl32.lib rpcrt4.lib wsock32.lib user32.lib shell32.lib advapi32.lib comdlg32.lib gdi32.lib ole32.lib oleaut32.lib fluidsynth.lib FreeImage.lib wxbase29u.lib wxmsw29u_core.lib wxmsw29u_aui.lib wxmsw29u_gl.lib wxmsw29u_html.lib wxmsw29u_adv.lib wxmsw29u_stc.lib wxmsw29u_media.lib wxtiff.lib wxjpeg.lib wxpng.lib wxzlib.lib wxregexu.lib wxexpat.lib wxscintilla.lib sfml-graphics-s.lib sfml-window-s.lib sfml-audio-s.lib sfml-system-s.lib sfml-main.lib"
 				LinkIncremental="1"
 				GenerateManifest="true"
 				GenerateDebugInformation="true"
@@ -203,6 +203,14 @@
 			</File>
 			<File
 				RelativePath=".\src\GfxConvDialog.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\MapEditorConfigDialog.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\MapEditorConfigDialog.h"
 				>
 			</File>
 			<File
@@ -305,6 +313,22 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\MapDisplayPrefsPanel.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\MapDisplayPrefsPanel.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\MapEditorPrefsPanel.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\MapEditorPrefsPanel.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\PNGPrefsPanel.cpp"
 					>
 				</File>
@@ -350,6 +374,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\ColourConfiguration.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\ColourConfiguration.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\Drawing.cpp"
 				>
 			</File>
@@ -363,6 +395,14 @@
 			</File>
 			<File
 				RelativePath=".\src\FileMonitor.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\KeyBind.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\KeyBind.h"
 				>
 			</File>
 			<File
@@ -490,6 +530,14 @@
 				</File>
 				<File
 					RelativePath=".\src\Parser.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Polygon2D.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Polygon2D.h"
 					>
 				</File>
 				<File
@@ -826,6 +874,14 @@
 			Name="Map Editor"
 			>
 			<File
+				RelativePath=".\src\MapEditor.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\MapEditor.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\MapEditorWindow.cpp"
 				>
 			</File>
@@ -833,9 +889,33 @@
 				RelativePath=".\src\MapEditorWindow.h"
 				>
 			</File>
+			<File
+				RelativePath=".\src\MapRenderer2D.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\MapRenderer2D.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\MapTextureManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\MapTextureManager.h"
+				>
+			</File>
 			<Filter
 				Name="UI Elements"
 				>
+				<File
+					RelativePath=".\src\ActionSpecialTreeView.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ActionSpecialTreeView.h"
+					>
+				</File>
 				<File
 					RelativePath=".\src\MapCanvas.cpp"
 					>
@@ -844,6 +924,86 @@
 					RelativePath=".\src\MapCanvas.h"
 					>
 				</File>
+				<File
+					RelativePath=".\src\MapTextureBrowser.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\MapTextureBrowser.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\MCAnimations.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\MCAnimations.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ThingTypeTreeView.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ThingTypeTreeView.h"
+					>
+				</File>
+				<Filter
+					Name="InfoOverlay"
+					>
+					<File
+						RelativePath=".\src\LineInfoOverlay.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\LineInfoOverlay.h"
+						>
+					</File>
+					<File
+						RelativePath=".\src\SectorInfoOverlay.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\SectorInfoOverlay.h"
+						>
+					</File>
+					<File
+						RelativePath=".\src\ThingInfoOverlay.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\ThingInfoOverlay.h"
+						>
+					</File>
+					<File
+						RelativePath=".\src\VertexInfoOverlay.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\VertexInfoOverlay.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="MapObjectPropsPanel"
+					>
+					<File
+						RelativePath=".\src\MapObjectPropsPanel.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\MapObjectPropsPanel.h"
+						>
+					</File>
+					<File
+						RelativePath=".\src\MOPGProperty.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\MOPGProperty.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="SLADEMap"
@@ -854,6 +1014,14 @@
 				</File>
 				<File
 					RelativePath=".\src\MapLine.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\MapObject.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\MapObject.h"
 					>
 				</File>
 				<File
@@ -896,6 +1064,290 @@
 					RelativePath=".\src\SLADEMap.h"
 					>
 				</File>
+			</Filter>
+			<Filter
+				Name="GameConfiguration"
+				>
+				<File
+					RelativePath=".\src\ActionSpecial.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ActionSpecial.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\Args.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\GameConfiguration.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\GameConfiguration.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ThingType.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ThingType.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\UDMFProperty.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\UDMFProperty.h"
+					>
+				</File>
+				<Filter
+					Name="Configurations"
+					>
+					<File
+						RelativePath=".\dist\res\config\games\doom1.cfg"
+						>
+					</File>
+					<File
+						RelativePath=".\dist\res\config\games\doom2.cfg"
+						>
+					</File>
+					<File
+						RelativePath=".\dist\res\config\games\doom2_boom.cfg"
+						>
+					</File>
+					<File
+						RelativePath=".\dist\res\config\games\doom2_zd_hexen.cfg"
+						>
+					</File>
+					<File
+						RelativePath=".\dist\res\config\games\doom2_zd_udmf.cfg"
+						>
+					</File>
+					<File
+						RelativePath=".\dist\res\config\games\doom64.cfg"
+						>
+					</File>
+					<File
+						RelativePath=".\dist\res\config\games\doomu.cfg"
+						>
+					</File>
+					<File
+						RelativePath=".\dist\res\config\games\doomu_boom.cfg"
+						>
+					</File>
+					<File
+						RelativePath=".\dist\res\config\games\doomu_zd_hexen.cfg"
+						>
+					</File>
+					<File
+						RelativePath=".\dist\res\config\games\doomu_zd_udmf.cfg"
+						>
+					</File>
+					<File
+						RelativePath=".\dist\res\config\games\heretic.cfg"
+						>
+					</File>
+					<File
+						RelativePath=".\dist\res\config\games\heretic_zd_hexen.cfg"
+						>
+					</File>
+					<File
+						RelativePath=".\dist\res\config\games\heretic_zd_udmf.cfg"
+						>
+					</File>
+					<File
+						RelativePath=".\dist\res\config\games\hexen.cfg"
+						>
+					</File>
+					<File
+						RelativePath=".\dist\res\config\games\strife.cfg"
+						>
+					</File>
+					<Filter
+						Name="Specials"
+						>
+						<File
+							RelativePath=".\dist\res\config\games\include\specials\boom_specials.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\specials\doom1_specials.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\specials\doom2_specials.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\specials\doom64_specials.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\specials\heretic_specials.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\specials\hexen_specials.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\specials\strife_specials.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\specials\zdoom_specials.cfg"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="Things"
+						>
+						<File
+							RelativePath=".\dist\res\config\games\include\things\boom_things.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\things\common_things.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\things\doom1_things.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\things\doom2_things.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\things\doom64_things.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\things\heretic_things.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\things\hexen_things.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\things\mbf_things.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\things\strife_things.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\things\zdoom_things.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\things\zdoom_things_doom.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\things\zdoom_things_heretic.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\things\zdoom_things_hexen.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\things\zdoom_things_strife.cfg"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="UDMF"
+						>
+						<File
+							RelativePath=".\dist\res\config\games\include\udmf\props_all.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\udmf\props_base.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\udmf\props_boom.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\udmf\props_hexen.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\udmf\props_zdoom.cfg"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="Flags"
+						>
+						<File
+							RelativePath=".\dist\res\config\games\include\flags\boom_flags.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\flags\doom64_flags.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\flags\doom_flags.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\flags\eternity_flags.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\flags\hexen_flags.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\flags\mbf_flags.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\flags\strife_flags.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\flags\zdoom_flags.cfg"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="Sectors"
+						>
+						<File
+							RelativePath=".\dist\res\config\games\include\sectors\doom64_sectors.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\sectors\doom_sectors.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\sectors\heretic_sectors.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\sectors\hexen_sectors.cfg"
+							>
+						</File>
+						<File
+							RelativePath=".\dist\res\config\games\include\sectors\zdoom_sectors.cfg"
+							>
+						</File>
+					</Filter>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter
@@ -1308,6 +1760,50 @@
 					RelativePath=".\src\ModelFormats.h"
 					>
 				</File>
+				<Filter
+					Name="EntryTypes"
+					>
+					<File
+						RelativePath=".\dist\res\config\entry_types\types_archives.txt"
+						>
+					</File>
+					<File
+						RelativePath=".\dist\res\config\entry_types\types_audio.txt"
+						>
+					</File>
+					<File
+						RelativePath=".\dist\res\config\entry_types\types_fonts.txt"
+						>
+					</File>
+					<File
+						RelativePath=".\dist\res\config\entry_types\types_gfx_doom.txt"
+						>
+					</File>
+					<File
+						RelativePath=".\dist\res\config\entry_types\types_gfx_others.txt"
+						>
+					</File>
+					<File
+						RelativePath=".\dist\res\config\entry_types\types_gfx_std.txt"
+						>
+					</File>
+					<File
+						RelativePath=".\dist\res\config\entry_types\types_map.txt"
+						>
+					</File>
+					<File
+						RelativePath=".\dist\res\config\entry_types\types_misc.txt"
+						>
+					</File>
+					<File
+						RelativePath=".\dist\res\config\entry_types\types_model.txt"
+						>
+					</File>
+					<File
+						RelativePath=".\dist\res\config\entry_types\types_text.txt"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter
@@ -1540,6 +2036,26 @@
 				</File>
 				<File
 					RelativePath=".\src\zreaders\templates.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="GLEW"
+				>
+				<File
+					RelativePath=".\src\glew\glew.c"
+					>
+				</File>
+				<File
+					RelativePath=".\src\glew\glew.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\glew\glxew.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\glew\wglew.h"
 					>
 				</File>
 			</Filter>

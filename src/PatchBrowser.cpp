@@ -1,7 +1,7 @@
 
 /*******************************************************************
  * SLADE - It's a Doom Editor
- * Copyright (C) 2008 Simon Judd
+ * Copyright (C) 2008-2012 Simon Judd
  *
  * Email:       veilofsorrow@gmail.com
  * Web:         http://slade.mancubus.net
@@ -60,6 +60,7 @@ PatchBrowserItem::PatchBrowserItem(string name, Archive* archive, uint8_t type, 
  * PatchBrowserItem class destructor
  *******************************************************************/
 PatchBrowserItem::~PatchBrowserItem() {
+	if (image) delete image;
 }
 
 /* PatchBrowserItem::loadImage
@@ -93,7 +94,9 @@ bool PatchBrowserItem::loadImage() {
 	}
 
 	// Create gl texture from image
-	return image.loadImage(&img, parent->getPalette());
+	if (image) delete image;
+	image = new GLTexture();
+	return image->loadImage(&img, parent->getPalette());
 }
 
 

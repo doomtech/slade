@@ -1,25 +1,24 @@
 
 #ifndef __COL_PREFS_PANEL_H__
 #define __COL_PREFS_PANEL_H__
-#include <wx/clrpicker.h>
-#include <wx/button.h>
+
+#include <wx/propgrid/propgrid.h>
 
 class ColourPrefsPanel : public wxPanel {
 private:
-	wxColourPickerCtrl*	cp_err;
-	wxColourPickerCtrl*	cp_loc;
-	wxColourPickerCtrl*	cp_mod;
-	wxColourPickerCtrl*	cp_new;
-	wxButton*			button_reset;
+	wxChoice*			choice_configs;
+	wxButton*			btn_saveconfig;
+	wxPropertyGrid*		pg_colours;
 
 public:
 	ColourPrefsPanel(wxWindow* parent);
 	~ColourPrefsPanel();
 
+	void	refreshPropGrid();
 	void	applyPreferences();
 
 	// Events
-	void	onReset(wxCommandEvent& e);
+	void	onChoicePresetSelected(wxCommandEvent& e);
 };
 
 #endif//__COL_PREFS_PANEL_H__
