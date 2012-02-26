@@ -61,11 +61,12 @@ AudioEntryPanel::AudioEntryPanel(wxWindow* parent) : EntryPanel(parent, "audio")
 
 	// Create wxMediaCtrl
 	media_ctrl = new wxMediaCtrl(this, -1);
+	media_ctrl->Show(false);
 
 	// Setup sizer
 	wxGridBagSizer* sizer_gb = new wxGridBagSizer(4, 4);
-	//sizer_main->AddStretchSpacer();
-	sizer_main->Add(media_ctrl, 1, wxBOTTOM|wxALIGN_CENTER, 4);
+	sizer_main->AddStretchSpacer();
+	sizer_main->Add(media_ctrl, 0);
 	sizer_main->Add(sizer_gb, 0, wxALIGN_CENTER);
 	sizer_main->AddStretchSpacer();
 
@@ -270,7 +271,7 @@ bool AudioEntryPanel::openAudio(MemChunk& audio, string filename) {
 			return true;
 		}
 	}
-	
+
 	// Unable to open audio, disable play controls
 	slider_seek->Enable(false);
 	btn_play->Enable(false);
@@ -482,7 +483,7 @@ void AudioEntryPanel::onTimer(wxTimerEvent& e) {
 	slider_seek->SetValue(pos);
 
 	// Stop the timer if playback has reached the end
-	if (pos >= slider_seek->GetMax() || 
+	if (pos >= slider_seek->GetMax() ||
 		(audio_type == AUTYPE_SOUND && sound.GetStatus() == sf::Sound::Stopped) ||
 		(audio_type == AUTYPE_MUSIC && music.GetStatus() == sf::Sound::Stopped) ||
 		(audio_type == AUTYPE_MEDIA && media_ctrl->GetState() == wxMEDIASTATE_STOPPED))

@@ -1,4 +1,4 @@
-find_package(wxWidgets COMPONENTS std aui gl stc richtext propgrid REQUIRED)
+find_package(wxWidgets COMPONENTS std aui gl stc richtext propgrid media REQUIRED)
 include(${wxWidgets_USE_FILE})
 
 set(SFML_FIND_COMPONENTS system audio)
