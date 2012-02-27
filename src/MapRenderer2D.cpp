@@ -798,8 +798,8 @@ void MapRenderer2D::renderThingsImmediate(float alpha) {
 	double x, y, angle;
 	vector<int> things_arrows;
 
-	// Draw thing shadows if round things is on
-	if (thing_shadow > 0.01f && alpha >= 0.9) {
+	// Draw thing shadows if needed
+	if (thing_shadow > 0.01f && alpha >= 0.9 && thing_drawtype != 2) {
 		glEnable(GL_TEXTURE_2D);
 		GLTexture* tex_shadow = theMapEditor->textureManager().getEditorImage("thing/shadow");
 		if (thing_drawtype == 0 || thing_drawtype == 3)

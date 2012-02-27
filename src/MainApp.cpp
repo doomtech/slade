@@ -466,6 +466,8 @@ void MainApp::initActions() {
 	// Map Editor Window
 	new SAction("mapw_save", "Save Map Changes", "t_save", "Save any changes to the current map");
 	new SAction("mapw_rename", "Rename Map", "t_rename", "Rename the current map");
+	new SAction("mapw_setbra", "Set &Base Resource Archive", "e_archive", "Set the Base Resource Archive, to act as the program 'IWAD'");
+	new SAction("mapw_preferences", "&Preferences...", "t_settings", "Setup SLADE options and preferences");
 	new SAction("mapw_mode_vertices", "Vertices Mode", "t_verts", "Change to vertices editing mode", "", SAction::RADIO);
 	new SAction("mapw_mode_lines", "Lines Mode", "t_lines", "Change to lines editing mode", "", SAction::RADIO);
 	new SAction("mapw_mode_sectors", "Sectors Mode", "t_sectors", "Change to sectors editing mode", "", SAction::RADIO);

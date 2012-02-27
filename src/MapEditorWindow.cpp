@@ -36,6 +36,7 @@
 #include "PreferencesDialog.h"
 #include "ArchiveManager.h"
 #include "MapObjectPropsPanel.h"
+#include "MainWindow.h"
 #include <wx/aui/aui.h>
 
 
@@ -100,8 +101,8 @@ void MapEditorWindow::setupLayout() {
 
 	// Editor menu
 	wxMenu* menu_editor = new wxMenu("");
-	theApp->getAction("main_preferences")->addToMenu(menu_editor);
-	theApp->getAction("main_setbra")->addToMenu(menu_editor);
+	theApp->getAction("mapw_preferences")->addToMenu(menu_editor);
+	theApp->getAction("mapw_setbra")->addToMenu(menu_editor);
 	menu->Append(menu_editor, "&Editor");
 
 	// Mode menu
@@ -218,6 +219,35 @@ bool MapEditorWindow::handleAction(string id) {
 	// Don't handle actions if hidden
 	if (!IsShown())
 		return false;
+
+	// Editor->Set Base Resource Archive
+	if (id == "mapw_setbra") {
+		wxDialog dialog_ebr(this, -1, "Edit Base Resource Archives", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
+		BaseResourceArchivesPanel brap(&dialog_ebr);
+
+		wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+		sizer->Add(&brap, 1, wxEXPAND|wxALL, 4);
+
+		sizer->Add(dialog_ebr.CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND|wxLEFT|wxRIGHT|wxDOWN, 4);
+
+		dialog_ebr.SetSizer(sizer);
+		dialog_ebr.Layout();
+		dialog_ebr.SetInitialSize(wxSize(-1, 300));
+		if (dialog_ebr.ShowModal() == wxID_OK)
+			theArchiveManager->openBaseResource(brap.getSelectedPath());
+
+		return true;
+	}
+
+	// Editor->Preferences
+	if (id == "mapw_preferences") {
+		PreferencesDialog pd(this);
+		if (pd.ShowModal() == wxID_OK)
+			pd.applyPreferences();
+		theMainWindow->getArchiveManagerPanel()->refreshAllTabs();
+
+		return true;
+	}
 
 	// View->Item Properties
 	if (id == "mapw_showproperties") {

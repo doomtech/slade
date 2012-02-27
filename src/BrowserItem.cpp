@@ -31,7 +31,7 @@
  *******************************************************************/
 #include "Main.h"
 #include "BrowserItem.h"
-#include "SFont.h"
+#include "Drawing.h"
 
 
 /*******************************************************************
@@ -96,13 +96,8 @@ void BrowserItem::draw(int size) {
 
 		// Item name
 		glEnable(GL_TEXTURE_2D);
-		SFont& fnt = SFont::vgaFont();
-		glPushMatrix();
-		glTranslated(size*0.5 + 1, size - fnt.lineHeight()*0.5 + 1, 0);
-		fnt.drawString(name, COL_BLACK, SF_ALIGN_CENTER);
-		glTranslated(-1, -1, 0);
-		fnt.drawString(name, COL_WHITE, SF_ALIGN_CENTER);
-		glPopMatrix();
+		Drawing::drawText(name, size*0.5+1, size - 7, COL_BLACK, Drawing::FONT_BOLD, Drawing::ALIGN_CENTER);
+		Drawing::drawText(name, size*0.5, size - 8, COL_WHITE, Drawing::FONT_BOLD, Drawing::ALIGN_CENTER);
 
 		glPopAttrib();
 
@@ -144,13 +139,8 @@ void BrowserItem::draw(int size) {
 	glEnd();
 
 	// Item name
-	SFont& fnt = SFont::vgaFont();
-	glPushMatrix();
-	glTranslated(size*0.5 + 1, size - fnt.lineHeight()*0.5 + 1, 0);
-	fnt.drawString(name, COL_BLACK, SF_ALIGN_CENTER);
-	glTranslated(-1, -1, 0);
-	fnt.drawString(name, COL_WHITE, SF_ALIGN_CENTER);
-	glPopMatrix();
+	Drawing::drawText(name, size*0.5+1, size - 7, COL_BLACK, Drawing::FONT_BOLD, Drawing::ALIGN_CENTER);
+	Drawing::drawText(name, size*0.5, size - 8, COL_WHITE, Drawing::FONT_BOLD, Drawing::ALIGN_CENTER);
 }
 
 /* BrowserItem::clearImage

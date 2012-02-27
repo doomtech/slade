@@ -343,7 +343,7 @@ void Drawing::drawText(string text, int x, int y, rgba_t colour, int font, int a
 	float height = bbox.Upper().Y() - bbox.Lower().Y();
 	if (alignment != ALIGN_LEFT) {
 		if (alignment == ALIGN_CENTER)
-			xpos -= width*0.5;
+			xpos -= int(width*0.5);
 		else
 			xpos -= width;
 	}
