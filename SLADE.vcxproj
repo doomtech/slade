@@ -207,7 +207,6 @@
     <ClCompile Include="src\MapTextureManager.cpp" />
     <ClCompile Include="src\MathStuff.cpp" />
     <ClCompile Include="src\MCAnimations.cpp" />
-    <ClCompile Include="src\MediaEntryPanel.cpp" />
     <ClCompile Include="src\MIDIPlayer.cpp" />
     <ClCompile Include="src\ModifyOffsetsDialog.cpp" />
     <ClCompile Include="src\MOPGProperty.cpp" />
@@ -422,7 +421,6 @@
     <ClInclude Include="src\MapTextureManager.h" />
     <ClInclude Include="src\MathStuff.h" />
     <ClInclude Include="src\MCAnimations.h" />
-    <ClInclude Include="src\MediaEntryPanel.h" />
     <ClInclude Include="src\MIDIPlayer.h" />
     <ClInclude Include="src\MiscFormats.h" />
     <ClInclude Include="src\ModelFormats.h" />
