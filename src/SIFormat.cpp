@@ -416,9 +416,11 @@ void SIFormat::initFormats() {
 	new SIFRottWall();
 
 	// Jedi Engine (Dark Forces) formats
+#if 0
 	new SIFJediBM();
 	new SIFJediFME();
 	new SIFJediWAX();
+#endif
 
 	// Other game formats
 	new SIFHalfLifeTex();

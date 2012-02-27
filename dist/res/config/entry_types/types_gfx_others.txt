@@ -288,7 +288,7 @@ entry_types
 		name = "Graphic (Jedi BM)";
 		format = img_jedi_bm;
 		export_ext = "bm";
-		editor = "gfx";
+		//editor = "gfx";
 		icon = "e_gfx";
 		reliability = 80;
 		extra = image;
@@ -301,7 +301,7 @@ entry_types
 		name = "Graphic (Jedi FME)";
 		format = img_jedi_fme;
 		export_ext = "fme";
-		editor = "gfx";
+		//editor = "gfx";
 		icon = "e_gfx";
 		reliability = 80;
 		extra = image;
@@ -314,7 +314,7 @@ entry_types
 		name = "Graphic (Jedi WAX)";
 		format = img_jedi_wax;
 		export_ext = "wax";
-		editor = "gfx";
+		//editor = "gfx";
 		icon = "e_gfx";
 		reliability = 60;
 		extra = image;
@@ -327,7 +327,7 @@ entry_types
 		name = "Graphic (Jedi DELT)";
 		format = img_jedi_delt;
 		export_ext = "dlt";
-		editor = "gfx";
+		//editor = "gfx";
 		icon = "e_gfx";
 		reliability = 20;
 		extra = image;

@@ -1,4 +1,7 @@
-
+// So apparently this all got completely broken by the transition to SIFormat.
+// I don't have the energy to find out what's wrong exactly, so I'll just remove
+// it entirely for the time being.
+#if 0
 /* JediRLE0
  * Used by several Jedi Engine formats
  *******************************************************************/
@@ -222,6 +225,7 @@ protected:
 		// Setup variables
 		info.offset_x = 0 - wxINT32_SWAP_ON_BE(header1->offsx);
 		info.offset_y = 0 - wxINT32_SWAP_ON_BE(header1->offsy);
+		info.colformat= PALMASK;
 
 		// Little cheat here as they are defined in column-major format,
 		// not row-major. So we'll just call the rotate function.
@@ -419,3 +423,4 @@ public:
 		return info;
 	}
 };
+#endif
