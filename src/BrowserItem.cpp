@@ -67,7 +67,7 @@ bool BrowserItem::loadImage() {
  * Draws the item in a [size]x[size] box, keeping the correct aspect
  * ratio of it's image
  *******************************************************************/
-void BrowserItem::draw(int size) {
+void BrowserItem::draw(int size, int x, int y) {
 	// Try to load image if it isn't already
 	if (!image || (image && !image->isLoaded()))
 		loadImage();
@@ -81,34 +81,23 @@ void BrowserItem::draw(int size) {
 
 		// Outline
 		glBegin(GL_LINE_LOOP);
-		glVertex2i(0, 0);
-		glVertex2i(0, size);
+		glVertex2i(x, y);
+		glVertex2i(x, size);
 		glVertex2i(size, size);
-		glVertex2i(size, 0);
+		glVertex2i(size, y);
 		glEnd();
 
 		// X
 		glBegin(GL_LINES);
-		glVertex2i(0, 0);
+		glVertex2i(x, y);
 		glVertex2i(size, size);
-		glVertex2i(0, size);
-		glVertex2i(size, 0);
+		glVertex2i(x, size);
+		glVertex2i(size, y);
 		glEnd();
 
 		// Item name
-#ifdef USE_SFML_RENDERWINDOW
-		glEnable(GL_TEXTURE_2D);
-		SFont& fnt = SFont::vgaFont();
-		glPushMatrix();
-		glTranslated(size*0.5 + 1, size - fnt.lineHeight()*0.5 + 1, 0);
-		fnt.drawString(name, COL_BLACK, SF_ALIGN_CENTER);
-		glTranslated(-1, -1, 0);
-		fnt.drawString(name, COL_WHITE, SF_ALIGN_CENTER);
-		glPopMatrix();
-#else
-		Drawing::drawText(name, size*0.5+1, size - 7, COL_BLACK, Drawing::FONT_BOLD, Drawing::ALIGN_CENTER);
-		Drawing::drawText(name, size*0.5, size - 8, COL_WHITE, Drawing::FONT_BOLD, Drawing::ALIGN_CENTER);
-#endif
+		Drawing::drawText(name, x+(size*0.5+1), y+size+5, COL_BLACK, Drawing::FONT_BOLD, Drawing::ALIGN_CENTER);
+		Drawing::drawText(name, x+(size*0.5), y+size+4, COL_WHITE, Drawing::FONT_BOLD, Drawing::ALIGN_CENTER);
 
 		glPopAttrib();
 
@@ -136,8 +125,8 @@ void BrowserItem::draw(int size) {
 	}
 
 	// Determine draw coords
-	double top = ((double)size * 0.5) - (height * 0.5);
-	double left = ((double)size * 0.5) - (width * 0.5);
+	double top = y + ((double)size * 0.5) - (height * 0.5);
+	double left = x + ((double)size * 0.5) - (width * 0.5);
 
 	// Draw
 	image->bind();
@@ -150,18 +139,8 @@ void BrowserItem::draw(int size) {
 	glEnd();
 
 	// Item name
-#ifdef USE_SFML_RENDERWINDOW
-	SFont& fnt = SFont::vgaFont();
-	glPushMatrix();
-	glTranslated(size*0.5 + 1, size - fnt.lineHeight()*0.5 + 1, 0);
-	fnt.drawString(name, COL_BLACK, SF_ALIGN_CENTER);
-	glTranslated(-1, -1, 0);
-	fnt.drawString(name, COL_WHITE, SF_ALIGN_CENTER);
-	glPopMatrix();
-#else
-	Drawing::drawText(name, size*0.5+1, size - 7, COL_BLACK, Drawing::FONT_BOLD, Drawing::ALIGN_CENTER);
-	Drawing::drawText(name, size*0.5, size - 8, COL_WHITE, Drawing::FONT_BOLD, Drawing::ALIGN_CENTER);
-#endif
+	Drawing::drawText(name, x+(size*0.5+1), y+size+5, COL_BLACK, Drawing::FONT_BOLD, Drawing::ALIGN_CENTER);
+	Drawing::drawText(name, x+(size*0.5), y+size+4, COL_WHITE, Drawing::FONT_BOLD, Drawing::ALIGN_CENTER);
 }
 
 /* BrowserItem::clearImage

@@ -297,7 +297,7 @@ void Drawing::drawText(string text, int x, int y, rgba_t colour, int font, int a
 		float width = sf_str.GetRect().GetWidth();
 
 		if (alignment == ALIGN_CENTER)
-			sf_str.Move(-(width*0.5), 0.0f);
+			sf_str.Move(-int(width*0.5), 0.0f);
 		else
 			sf_str.Move(-width, 0.0f);
 	}

@@ -29,7 +29,8 @@ public:
 	vector<BrowserItem*>&	itemList() { return items; }
 	void					draw();
 	void					setScrollBar(wxScrollBar* scrollbar);
-	int						fullItemSize() { return item_size + (item_border*2); }
+	int						fullItemSizeX() { return item_size + (item_border*2); }
+	int						fullItemSizeY() { return item_size + (item_border*2) + 16; }
 	void					updateScrollBar();
 	BrowserItem*			getSelectedItem();
 	void					selectItem(int index);

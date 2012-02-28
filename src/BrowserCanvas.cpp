@@ -95,11 +95,11 @@ void BrowserCanvas::draw() {
 	top_index = -1;
 	for (unsigned a = 0; a < items_filter.size(); a++) {
 		// If we're not yet into the viewable area, skip
-		if (y < yoff - fullItemSize()) {
-			x += fullItemSize();
-			if (x - item_border > GetSize().x - fullItemSize()) {
+		if (y < yoff - fullItemSizeY()) {
+			x += fullItemSizeX();
+			if (x - item_border > GetSize().x - fullItemSizeX()) {
 				x = item_border;
-				y += fullItemSize();
+				y += fullItemSizeY();
 
 				// Canvas is filled, stop drawing
 				if (y > yoff + GetSize().y)
@@ -115,9 +115,7 @@ void BrowserCanvas::draw() {
 		}
 
 		// Draw item
-		glPushMatrix();
-		glTranslated(x, y - yoff, 0);
-		items[items_filter[a]]->draw(item_size);
+		items[items_filter[a]]->draw(item_size, x, y - yoff);
 
 		// Draw selection box if selected
 		if (item_selected == a) {
@@ -125,23 +123,24 @@ void BrowserCanvas::draw() {
 			glDisable(GL_TEXTURE_2D);
 			glColor4f(0.3f, 0.5f, 1.0f, 0.3f);
 			glPushMatrix();
+			glTranslated(x, y - yoff, 0);
 			glTranslated(-item_border, -item_border, 0);
 
 			// Selection background
 			glBegin(GL_QUADS);
 			glVertex2i(2, 2);
-			glVertex2i(2, fullItemSize()-3);
-			glVertex2i(fullItemSize()-3, fullItemSize()-3);
-			glVertex2i(fullItemSize()-3, 2);
+			glVertex2i(2, fullItemSizeY()-3);
+			glVertex2i(fullItemSizeX()-3, fullItemSizeY()-3);
+			glVertex2i(fullItemSizeX()-3, 2);
 			glEnd();
 
 			// Selection border
 			glColor4f(0.6f, 0.8f, 1.0f, 1.0f);
 			glBegin(GL_LINE_LOOP);
 			glVertex2i(2, 2);
-			glVertex2i(2, fullItemSize()-3);
-			glVertex2i(fullItemSize()-3, fullItemSize()-3);
-			glVertex2i(fullItemSize()-3, 2);
+			glVertex2i(2, fullItemSizeY()-3);
+			glVertex2i(fullItemSizeX()-3, fullItemSizeY()-3);
+			glVertex2i(fullItemSizeX()-3, 2);
 			glEnd();
 
 			// Finish
@@ -150,13 +149,11 @@ void BrowserCanvas::draw() {
 			glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		}
 
-		glPopMatrix();
-
 		// Move over for next item
-		x += fullItemSize();
-		if (x - item_border > GetSize().x - fullItemSize()) {
+		x += fullItemSizeX();
+		if (x - item_border > GetSize().x - fullItemSizeX()) {
 			x = item_border;
-			y += fullItemSize();
+			y += fullItemSizeY();
 
 			// Canvas is filled, stop drawing
 			if (y > yoff + GetSize().y)
@@ -193,9 +190,9 @@ void BrowserCanvas::updateScrollBar() {
 		return;
 
 	// Determine total height of all items
-	int items_row = GetSize().x / fullItemSize();
+	int items_row = GetSize().x / fullItemSizeX();
 	int rows = (double)items_filter.size() / (double)items_row + 0.9999;
-	int total_height = rows * fullItemSize();
+	int total_height = rows * fullItemSizeY();
 
 	// Setup scrollbar
 	scrollbar->SetScrollbar(scrollbar->GetThumbPosition(), GetSize().y, total_height, GetSize().y);
@@ -265,9 +262,9 @@ void BrowserCanvas::showItem(int item, bool top) {
 		return;
 
 	// Determine y-position of item
-	int num_cols = GetSize().x / fullItemSize();
-	int y_top = (item / num_cols) * fullItemSize();
-	int y_bottom = y_top + fullItemSize();
+	int num_cols = GetSize().x / fullItemSizeX();
+	int y_top = (item / num_cols) * fullItemSizeY();
+	int y_bottom = y_top + fullItemSizeY();
 
 	// Check if item is above current view
 	if (y_top < yoff || y_bottom > yoff + GetSize().y) {
@@ -342,7 +339,7 @@ void BrowserCanvas::onScrollThumbTrack(wxScrollEvent& e) {
  *******************************************************************/
 void BrowserCanvas::onScrollLineUp(wxScrollEvent& e) {
 	// Scroll up by one row
-	scrollbar->SetThumbPosition(yoff - fullItemSize());
+	scrollbar->SetThumbPosition(yoff - fullItemSizeY());
 
 	// Update y-offset and refresh
 	yoff = scrollbar->GetThumbPosition();
@@ -355,7 +352,7 @@ void BrowserCanvas::onScrollLineUp(wxScrollEvent& e) {
  *******************************************************************/
 void BrowserCanvas::onScrollLineDown(wxScrollEvent& e) {
 	// Scroll down by one row
-	scrollbar->SetThumbPosition(yoff + fullItemSize());
+	scrollbar->SetThumbPosition(yoff + fullItemSizeY());
 
 	// Update y-offset and refresh
 	yoff = scrollbar->GetThumbPosition();
@@ -398,7 +395,7 @@ void BrowserCanvas::onMouseEvent(wxMouseEvent& e) {
 		float scroll_mult = (float)e.GetWheelRotation() / (float)e.GetWheelDelta();
 
 		// Scrolling by 1.0 means by 1 row
-		int scroll_amount = (fullItemSize()) * -scroll_mult;
+		int scroll_amount = (fullItemSizeY()) * -scroll_mult;
 
 		// Do scroll
 		scrollbar->SetThumbPosition(yoff + scroll_amount);
@@ -414,11 +411,11 @@ void BrowserCanvas::onMouseEvent(wxMouseEvent& e) {
 		item_selected = -1;
 
 		// Get column clicked & number of columns
-		int col = e.GetPosition().x / fullItemSize();
-		int num_cols = GetSize().x / fullItemSize();
+		int col = e.GetPosition().x / fullItemSizeX();
+		int num_cols = GetSize().x / fullItemSizeX();
 
 		// Get row clicked
-		int row = (e.GetPosition().y - top_y) / (fullItemSize());
+		int row = (e.GetPosition().y - top_y) / (fullItemSizeY());
 
 		// Select item
 		item_selected = top_index + (row * num_cols) + col;
@@ -433,7 +430,7 @@ void BrowserCanvas::onMouseEvent(wxMouseEvent& e) {
  *******************************************************************/
 void BrowserCanvas::onKeyDown(wxKeyEvent& e) {
 	bool handled = true;
-	int num_cols = GetSize().x / fullItemSize();
+	int num_cols = GetSize().x / fullItemSizeX();
 
 	// Down arrow
 	if (e.GetKeyCode() == WXK_DOWN) {
