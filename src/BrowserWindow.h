@@ -38,6 +38,7 @@ private:
 	wxTreeCtrl*			tree_items;
 	wxChoice*			choice_sort;
 	wxTextCtrl*			text_filter;
+	wxSlider*			slider_zoom;
 	BrowserCanvas*		canvas;
 
 protected:
@@ -71,6 +72,7 @@ public:
 	void	onChoiceSortChanged(wxCommandEvent& e);
 	void	onCanvasDClick(wxMouseEvent& e);
 	void	onTextFilterChanged(wxCommandEvent& e);
+	void	onZoomChanged(wxCommandEvent& e);
 };
 
 #endif//__BROWSER_WINDOW_H__

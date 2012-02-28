@@ -107,6 +107,14 @@ void BrowserItem::draw(int size, int x, int y) {
 	// Determine texture dimensions
 	double width = image->getWidth();
 	double height = image->getHeight();
+
+	// Scale up if size > 128
+	if (size > 128) {
+		double scale = (double)size / 128.0;
+		width *= scale;
+		height *= scale;
+	}
+
 	if (width > height) {
 		// Scale down by width
 		if (width > size) {

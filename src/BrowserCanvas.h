@@ -14,7 +14,6 @@ private:
 
 	// Display
 	int	yoff;
-	int	item_size;
 	int	item_border;
 
 	// Item selection
@@ -27,10 +26,10 @@ public:
 	~BrowserCanvas();
 
 	vector<BrowserItem*>&	itemList() { return items; }
+	int						fullItemSizeX();
+	int						fullItemSizeY();
 	void					draw();
 	void					setScrollBar(wxScrollBar* scrollbar);
-	int						fullItemSizeX() { return item_size + (item_border*2); }
-	int						fullItemSizeY() { return item_size + (item_border*2) + 16; }
 	void					updateScrollBar();
 	BrowserItem*			getSelectedItem();
 	void					selectItem(int index);

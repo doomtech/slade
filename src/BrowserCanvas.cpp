@@ -35,6 +35,13 @@
 
 
 /*******************************************************************
+ * INCLUDES
+ *******************************************************************/
+CVAR(Bool, browser_bg_black, false, CVAR_SAVE)
+CVAR(Int, browser_item_size, 96, CVAR_SAVE)
+
+
+/*******************************************************************
  * BROWSERCANVAS CLASS FUNCTIONS
  *******************************************************************/
 
@@ -44,7 +51,6 @@
 BrowserCanvas::BrowserCanvas(wxWindow* parent) : OGLCanvas(parent, -1) {
 	// Init variables
 	yoff = 0;
-	item_size = 96;
 	item_border = 8;
 	scrollbar = NULL;
 	item_selected = 0;
@@ -61,6 +67,21 @@ BrowserCanvas::BrowserCanvas(wxWindow* parent) : OGLCanvas(parent, -1) {
  * BrowserCanvas class destructor
  *******************************************************************/
 BrowserCanvas::~BrowserCanvas() {
+}
+
+/* BrowserCanvas::fullItemSizeX
+ * Returns the 'full' (including border) width of each item
+ *******************************************************************/
+int BrowserCanvas::fullItemSizeX() {
+	return browser_item_size + (item_border*2);
+}
+
+/* BrowserCanvas::fullItemSizeY
+ * Returns the 'full' (including border and row gap) height of each
+ * item
+ *******************************************************************/
+int BrowserCanvas::fullItemSizeY() {
+	return browser_item_size + (item_border*2) + 16;
 }
 
 /* BrowserCanvas::draw
@@ -84,6 +105,10 @@ void BrowserCanvas::draw() {
 
 	// Translate to inside of pixel (otherwise inaccuracies can occur on certain gl implementations)
 	glTranslatef(0.375f, 0.375f, 0);
+
+	// Draw background if required
+	if (!browser_bg_black)
+		drawCheckeredBackground();
 
 	// Init for texture drawing
 	glEnable(GL_TEXTURE_2D);
@@ -115,7 +140,7 @@ void BrowserCanvas::draw() {
 		}
 
 		// Draw item
-		items[items_filter[a]]->draw(item_size, x, y - yoff);
+		items[items_filter[a]]->draw(browser_item_size, x, y - yoff);
 
 		// Draw selection box if selected
 		if (item_selected == a) {

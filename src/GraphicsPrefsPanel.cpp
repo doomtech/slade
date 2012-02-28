@@ -41,6 +41,7 @@ EXTERN_CVAR(String, bgtx_colour1)
 EXTERN_CVAR(String, bgtx_colour2)
 EXTERN_CVAR(Bool, gfx_show_border)
 EXTERN_CVAR(Bool, gfx_extraconv)
+EXTERN_CVAR(Bool, browser_bg_black)
 
 
 /*******************************************************************
@@ -95,6 +96,11 @@ GraphicsPrefsPanel::GraphicsPrefsPanel(wxWindow* parent) : wxPanel(parent, -1) {
 	cb_extra_gfxconv = new wxCheckBox(this, -1, "Offer additional conversion options");
 	cb_extra_gfxconv->SetValue(gfx_extraconv);
 	sizer->Add(cb_extra_gfxconv, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+	// 'Browsers use black background'
+	cb_browser_bg_black = new wxCheckBox(this, -1, "Browsers use black background");
+	cb_browser_bg_black->SetValue(browser_bg_black);
+	sizer->Add(cb_browser_bg_black, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 	
 	// Bind events
 	choice_presets->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &GraphicsPrefsPanel::onChoicePresetSelected, this);
@@ -117,6 +123,7 @@ void GraphicsPrefsPanel::applyPreferences() {
 	GLTexture::resetBgTex();
 	gfx_show_border = cb_show_border->GetValue();
 	gfx_extraconv = cb_extra_gfxconv->GetValue();
+	browser_bg_black = cb_browser_bg_black->GetValue();
 	theMainWindow->Refresh();
 }
 

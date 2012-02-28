@@ -39,6 +39,12 @@
 
 
 /*******************************************************************
+ * EXTERNAL VARIABLES
+ *******************************************************************/
+EXTERN_CVAR(Int, browser_item_size)
+
+
+/*******************************************************************
  * BROWSERTREENODE CLASS FUNCTIONS
  *******************************************************************/
 
@@ -133,9 +139,16 @@ BrowserWindow::BrowserWindow(wxWindow* parent) : wxDialog(parent, -1, "Browser",
 	wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
 	panel_browser_area->SetSizer(vbox);
 
-	// Sorting
+	// Zoom
 	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
 	vbox->Add(hbox, 0, wxEXPAND|wxBOTTOM, 4);
+	slider_zoom = new wxSlider(panel_browser_area, -1, browser_item_size, 64, 256);
+	slider_zoom->SetLineSize(16);
+	slider_zoom->SetPageSize(32);
+	hbox->Add(new wxStaticText(panel_browser_area, -1, "Zoom:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 2);
+	hbox->Add(slider_zoom, 1, wxEXPAND);
+
+	// Sorting
 	choice_sort = new wxChoice(panel_browser_area, -1);
 	hbox->AddStretchSpacer();
 	hbox->Add(new wxStaticText(panel_browser_area, -1, "Sort:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 2);
@@ -175,6 +188,7 @@ BrowserWindow::BrowserWindow(wxWindow* parent) : wxDialog(parent, -1, "Browser",
 	choice_sort->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &BrowserWindow::onChoiceSortChanged, this);
 	canvas->Bind(wxEVT_LEFT_DCLICK, &BrowserWindow::onCanvasDClick, this);
 	text_filter->Bind(wxEVT_COMMAND_TEXT_UPDATED, &BrowserWindow::onTextFilterChanged, this);
+	slider_zoom->Bind(wxEVT_COMMAND_SLIDER_UPDATED, &BrowserWindow::onZoomChanged, this);
 
 	Layout();
 	SetInitialSize(wxSize(768, 600));
@@ -412,4 +426,27 @@ void BrowserWindow::onCanvasDClick(wxMouseEvent& e) {
 void BrowserWindow::onTextFilterChanged(wxCommandEvent& e) {
 	// Filter canvas items
 	canvas->filterItems(text_filter->GetValue());
+}
+
+/* BrowserWindow::sliderZoomChanged
+ * Called when the zoom slider is changed
+ *******************************************************************/
+void BrowserWindow::onZoomChanged(wxCommandEvent& e) {
+	// Get zoom value
+	int item_size = slider_zoom->GetValue();
+
+	// Lock to increments of 16
+	int remainder = item_size % 16;
+	item_size -= remainder;
+
+	// Set slider value to locked increment
+	slider_zoom->SetValue(item_size);
+
+	// Update zoom label
+	//label_current_zoom->SetLabel(S_FMT("%d%%", zoom_percent));
+
+	// Update item size and refresh
+	browser_item_size = item_size;
+	canvas->updateScrollBar();
+	canvas->Refresh();
 }
