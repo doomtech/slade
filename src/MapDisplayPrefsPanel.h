@@ -9,6 +9,9 @@ private:
 	wxNotebook*	nb_pages;
 
 	wxCheckBox*	cb_grid_dashed;
+	wxCheckBox*	cb_animate_hilight;
+	wxCheckBox*	cb_animate_selection;
+	wxCheckBox*	cb_animate_tagged;
 	wxSlider*	slider_vertex_size;
 	wxCheckBox*	cb_vertex_round;
 	wxCheckBox*	cb_vertices_always;

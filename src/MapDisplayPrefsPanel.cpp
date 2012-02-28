@@ -19,6 +19,9 @@ EXTERN_CVAR(Float, flat_brightness)
 EXTERN_CVAR(Bool, sector_hilight_fill)
 EXTERN_CVAR(Bool, flat_ignore_light)
 EXTERN_CVAR(Bool, line_tabs_always)
+EXTERN_CVAR(Bool, map_animate_hilight)
+EXTERN_CVAR(Bool, map_animate_selection)
+EXTERN_CVAR(Bool, map_animate_tagged)
 
 MapDisplayPrefsPanel::MapDisplayPrefsPanel(wxWindow* parent) : wxPanel(parent, -1) {
 	// Create sizer
@@ -60,7 +63,19 @@ MapDisplayPrefsPanel::MapDisplayPrefsPanel(wxWindow* parent) : wxPanel(parent, -
 	cb_line_tabs_always = new wxCheckBox(panel, -1, "Always show line direction tabs");
 	sizer->Add(cb_line_tabs_always, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
-	
+	// Animate hilighted object
+	cb_animate_hilight = new wxCheckBox(panel, -1, "Animated hilight");
+	sizer->Add(cb_animate_hilight, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+	// Animate selected objects
+	cb_animate_selection = new wxCheckBox(panel, -1, "Animated selection");
+	sizer->Add(cb_animate_selection, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+	// Animate tagged objects
+	cb_animate_tagged = new wxCheckBox(panel, -1, "Animated tag indicator");
+	sizer->Add(cb_animate_tagged, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+
 	// Vertices tab
 	panel = new wxPanel(nb_pages, -1);
 	nb_pages->AddPage(panel, "Vertices");
@@ -168,6 +183,9 @@ MapDisplayPrefsPanel::MapDisplayPrefsPanel(wxWindow* parent) : wxPanel(parent, -
 	cb_thing_overlay_square->SetValue(thing_overlay_square);
 	cb_flat_ignore_light->SetValue(flat_ignore_light);
 	cb_sector_hilight_fill->SetValue(sector_hilight_fill);
+	cb_animate_hilight->SetValue(map_animate_hilight);
+	cb_animate_selection->SetValue(map_animate_selection);
+	cb_animate_tagged->SetValue(map_animate_tagged);
 
 
 	Layout();
@@ -192,4 +210,7 @@ void MapDisplayPrefsPanel::applyPreferences() {
 	flat_brightness = (float)slider_flat_brightness->GetValue() * 0.1f;
 	flat_ignore_light = cb_flat_ignore_light->GetValue();
 	sector_hilight_fill = cb_sector_hilight_fill->GetValue();
+	map_animate_hilight = cb_animate_hilight->GetValue();
+	map_animate_selection = cb_animate_selection->GetValue();
+	map_animate_tagged = cb_animate_tagged->GetValue();
 }

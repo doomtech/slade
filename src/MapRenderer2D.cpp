@@ -20,6 +20,9 @@ CVAR(Float, flat_brightness, 0.8f, CVAR_SAVE)
 CVAR(Bool, flat_ignore_light, false, CVAR_SAVE)
 CVAR(Float, thing_shadow, 0.5f, CVAR_SAVE)
 CVAR(Bool, sector_hilight_fill, true, CVAR_SAVE)
+CVAR(Bool, map_animate_hilight, true, CVAR_SAVE)
+CVAR(Bool, map_animate_selection, false, CVAR_SAVE)
+CVAR(Bool, map_animate_tagged, true, CVAR_SAVE)
 
 CVAR(Bool, test_ssplit, false, CVAR_SAVE)
 
@@ -158,6 +161,10 @@ void MapRenderer2D::renderVertexHilight(int index, float fade) {
 	if (index < 0)
 		return;
 
+	// Reset fade if hilight animation is disabled
+	if (!map_animate_hilight)
+		fade = 1.0f;
+
 	// Set hilight colour
 	rgba_t col = ColourConfiguration::getColour("map_hilight");
 	col.a *= fade;
@@ -178,13 +185,18 @@ void MapRenderer2D::renderVertexHilight(int index, float fade) {
 	}
 }
 
-void MapRenderer2D::renderVertexSelection(vector<int>& selection) {
+void MapRenderer2D::renderVertexSelection(vector<int>& selection, float fade) {
 	// Check anything is selected
 	if (selection.size() == 0)
 		return;
 
+	// Reset fade if selection animation is disabled
+	if (!map_animate_selection)
+		fade = 1.0f;
+
 	// Set selection colour
 	rgba_t col = ColourConfiguration::getColour("map_selection");
+	col.a *= fade;
 	col.set_gl();
 
 	// Setup rendering properties
@@ -335,6 +347,10 @@ void MapRenderer2D::renderLineHilight(int index, float fade) {
 	if (index < 0)
 		return;
 
+	// Reset fade if hilight animation is disabled
+	if (!map_animate_hilight)
+		fade = 1.0f;
+
 	// Set hilight colour
 	rgba_t col = ColourConfiguration::getColour("map_hilight");
 	col.a *= fade;
@@ -363,13 +379,18 @@ void MapRenderer2D::renderLineHilight(int index, float fade) {
 	glEnd();
 }
 
-void MapRenderer2D::renderLineSelection(vector<int>& selection) {
+void MapRenderer2D::renderLineSelection(vector<int>& selection, float fade) {
 	// Check anything is selected
 	if (selection.size() == 0)
 		return;
 
+	// Reset fade if selection animation is disabled
+	if (!map_animate_selection)
+		fade = 1.0f;
+
 	// Set selection colour
 	rgba_t col = ColourConfiguration::getColour("map_selection");
+	col.a *= fade;
 	col.set_gl();
 
 	// Setup rendering properties
@@ -401,6 +422,10 @@ void MapRenderer2D::renderLineSelection(vector<int>& selection) {
 }
 
 void MapRenderer2D::renderTaggedLines(vector<MapLine*>& lines, float fade) {
+	// Reset fade if tagged animation is disabled
+	if (!map_animate_tagged)
+		fade = 1.0f;
+
 	// Set hilight colour
 	rgba_t col = ColourConfiguration::getColour("map_tagged");
 	col.a *= fade;
@@ -958,6 +983,10 @@ void MapRenderer2D::renderThingHilight(int index, float fade) {
 	if (index < 0)
 		return;
 
+	// Reset fade if hilight animation is disabled
+	if (!map_animate_hilight)
+		fade = 1.0f;
+
 	// Set hilight colour
 	rgba_t col = ColourConfiguration::getColour("map_hilight");
 	col.a *= fade;
@@ -1024,13 +1053,18 @@ void MapRenderer2D::renderThingHilight(int index, float fade) {
 	glDisable(GL_TEXTURE_2D);
 }
 
-void MapRenderer2D::renderThingSelection(vector<int>& selection) {
+void MapRenderer2D::renderThingSelection(vector<int>& selection, float fade) {
 	// Check anything is selected
 	if (selection.size() == 0)
 		return;
 
+	// Reset fade if selection animation is disabled
+	if (!map_animate_selection)
+		fade = 1.0f;
+
 	// Set selection colour
 	rgba_t col = ColourConfiguration::getColour("map_selection");
+	col.a *= fade;
 	col.set_gl();
 
 	// Setup overlay rendering
@@ -1048,7 +1082,7 @@ void MapRenderer2D::renderThingSelection(vector<int>& selection) {
 			radius += 8;
 
 		// Draw it
-		renderThingOverlay(thing->xPos(), thing->yPos(), radius, point);
+		renderThingOverlay(thing->xPos(), thing->yPos(), radius*(0.8+(0.2*fade)), point);
 	}
 
 	// Clean up gl state
@@ -1058,6 +1092,10 @@ void MapRenderer2D::renderThingSelection(vector<int>& selection) {
 }
 
 void MapRenderer2D::renderTaggedThings(vector<MapThing*>& things, float fade) {
+	// Reset fade if tagged animation is disabled
+	if (!map_animate_tagged)
+		fade = 1.0f;
+
 	// Set hilight colour
 	rgba_t col = ColourConfiguration::getColour("map_tagged");
 	col.a *= fade;
@@ -1251,6 +1289,10 @@ void MapRenderer2D::renderFlatHilight(int index, float fade) {
 	if (index < 0)
 		return;
 
+	// Reset fade if hilight animation is disabled
+	if (!map_animate_hilight)
+		fade = 1.0f;
+
 	// Set hilight colour
 	rgba_t col = ColourConfiguration::getColour("map_hilight");
 	col.a *= fade;
@@ -1287,13 +1329,18 @@ void MapRenderer2D::renderFlatHilight(int index, float fade) {
 	}
 }
 
-void MapRenderer2D::renderFlatSelection(vector<int>& selection) {
+void MapRenderer2D::renderFlatSelection(vector<int>& selection, float fade) {
 	// Check anything is selected
 	if (selection.size() == 0)
 		return;
 
+	// Reset fade if selection animation is disabled
+	if (!map_animate_selection)
+		fade = 1.0f;
+
 	// Set selection colour
 	rgba_t col = ColourConfiguration::getColour("map_selection");
+	col.a *= fade;
 	col.set_gl();
 
 	// Draw selection
@@ -1348,6 +1395,10 @@ void MapRenderer2D::renderFlatSelection(vector<int>& selection) {
 }
 
 void MapRenderer2D::renderTaggedFlats(vector<MapSector*>& sectors, float fade) {
+	// Reset fade if tagged animation is disabled
+	if (!map_animate_tagged)
+		fade = 1.0f;
+
 	// Set colour
 	rgba_t col = ColourConfiguration::getColour("map_tagged");
 	col.a *= fade;

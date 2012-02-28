@@ -501,7 +501,7 @@ void MapCanvas::draw() {
 
 		// Selection if needed
 		if (mouse_state != MSTATE_MOVE)
-			renderer_2d->renderVertexSelection(editor->getSelection());
+			renderer_2d->renderVertexSelection(editor->getSelection(), anim_flash_level);
 
 		// Hilight if needed
 		if (mouse_state == MSTATE_NORMAL)
@@ -515,7 +515,7 @@ void MapCanvas::draw() {
 
 		// Selection if needed
 		if (mouse_state != MSTATE_MOVE)
-			renderer_2d->renderLineSelection(editor->getSelection());
+			renderer_2d->renderLineSelection(editor->getSelection(), anim_flash_level);
 
 		// Hilight if needed
 		if (mouse_state == MSTATE_NORMAL)
@@ -529,7 +529,7 @@ void MapCanvas::draw() {
 
 		// Selection if needed
 		if (mouse_state != MSTATE_MOVE)
-			renderer_2d->renderFlatSelection(editor->getSelection());
+			renderer_2d->renderFlatSelection(editor->getSelection(), anim_flash_level);
 
 		splitter.testRender();	// Testing
 
@@ -545,7 +545,7 @@ void MapCanvas::draw() {
 
 		// Selection if needed
 		if (mouse_state != MSTATE_MOVE)
-			renderer_2d->renderThingSelection(editor->getSelection());
+			renderer_2d->renderThingSelection(editor->getSelection(), anim_flash_level);
 
 		// Hilight if needed
 		if (mouse_state == MSTATE_NORMAL)

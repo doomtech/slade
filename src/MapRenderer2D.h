@@ -66,7 +66,7 @@ public:
 	void	renderVerticesVBO();
 	void	renderVerticesImmediate();
 	void	renderVertexHilight(int index, float fade);
-	void	renderVertexSelection(vector<int>& selection);
+	void	renderVertexSelection(vector<int>& selection, float fade = 1.0f);
 
 	// Lines
 	rgba_t	lineColour(MapLine* line, bool ignore_filter = false);
@@ -74,7 +74,7 @@ public:
 	void	renderLinesVBO(bool show_direction);
 	void	renderLinesImmediate(bool show_direction);
 	void	renderLineHilight(int index, float fade);
-	void	renderLineSelection(vector<int>& selection);
+	void	renderLineSelection(vector<int>& selection, float fade = 1.0f);
 	void	renderTaggedLines(vector<MapLine*>& lines, float fade);
 
 	// Things
@@ -87,7 +87,7 @@ public:
 	void	renderThings(float alpha = 1.0f);
 	void	renderThingsImmediate(float alpha);
 	void	renderThingHilight(int index, float fade);
-	void	renderThingSelection(vector<int>& selection);
+	void	renderThingSelection(vector<int>& selection, float fade = 1.0f);
 	void	renderTaggedThings(vector<MapThing*>& things, float fade);
 
 	// Flats (sectors)
@@ -95,7 +95,7 @@ public:
 	void	renderFlatsImmediate(int type);
 	void	renderFlatsVBO(int type);
 	void	renderFlatHilight(int index, float fade);
-	void	renderFlatSelection(vector<int>& selection);
+	void	renderFlatSelection(vector<int>& selection, float fade = 1.0f);
 	void	renderTaggedFlats(vector<MapSector*>& sectors, float fade);
 
 	// Moving

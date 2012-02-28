@@ -12,7 +12,8 @@ Compile/install the required libraries if needed.
 
 a) wxWidgets:
 -Extract the wxWidgets tar
--Follow the instructions in docs/gtk/install.txt ('the simplest case'), but add '--with-opengl' to the ../configure line
+-Follow the instructions in docs/gtk/install.txt ('the simplest case'), but add '--with-opengl --enable-mediactrl' to the ../configure line
+-If the above fails and says gstreamer not found, you need to install the gstreamer, gstreamer-plugins and gconf2 dev packages
 
 b) FreeImage:
 -Extract the FreeImage tar
@@ -31,9 +32,11 @@ a) IDE Compilation
 b) CMake Compilation
 -Make sure cmake is installed <http://cmake.org>
 -cd to the 'dist' directory
--Enter the following commands: 'cmake .. -DCMAKE_BUILD_TYPE=Release' then 'make'
+-Enter the following commands: 'cmake ..' then 'make'
 
-And that should be it. If you are having problems I can be contacted via email:
+And that should be it. There are some more detailed instructions on the SLADE wiki here: http://slade-editor.wikia.com/wiki/Compilation
+
+If you are having problems I can be contacted via email:
 sirjuddington@gmail.com
 
 
