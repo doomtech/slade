@@ -1165,6 +1165,9 @@ void MapCanvas::onMouseDown(wxMouseEvent& e) {
 	else
 		KeyBind::keyPressed(keypress_t(KeyBind::mbName(e.GetButton()), e.AltDown(), e.CmdDown(), e.ShiftDown()));
 
+	// Set focus
+	SetFocus();
+
 	e.Skip();
 }
 

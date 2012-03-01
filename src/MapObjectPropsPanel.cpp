@@ -580,6 +580,12 @@ void MapObjectPropsPanel::openObjects(vector<MapObject*>& objects) {
 		pg_properties->DisableProperty(pg_properties->GetGrid()->GetRoot());
 		pg_properties->SetPropertyValueUnspecified(pg_properties->GetGrid()->GetRoot());
 		pg_properties->Refresh();
+		pg_props_side1->DisableProperty(pg_props_side1->GetGrid()->GetRoot());
+		pg_props_side1->SetPropertyValueUnspecified(pg_props_side1->GetGrid()->GetRoot());
+		pg_props_side1->Refresh();
+		pg_props_side2->DisableProperty(pg_props_side2->GetGrid()->GetRoot());
+		pg_props_side2->SetPropertyValueUnspecified(pg_props_side2->GetGrid()->GetRoot());
+		pg_props_side2->Refresh();
 		//label_item->SetLabel("Nothing selected");
 		return;
 	}
@@ -638,17 +644,17 @@ void MapObjectPropsPanel::openObjects(vector<MapObject*>& objects) {
 		// Enable/disable side properties
 		wxPGProperty* prop = pg_properties->GetProperty("sidefront");
 		if (prop->GetValue().GetInteger() >= 0 || prop->IsValueUnspecified())
-			pg_properties->EnableProperty("side1");
+			pg_props_side1->EnableProperty(pg_props_side1->GetGrid()->GetRoot());
 		else {
-			pg_properties->DisableProperty("side1");
-			pg_properties->SetPropertyValueUnspecified("side1");
+			pg_props_side1->DisableProperty(pg_props_side1->GetGrid()->GetRoot());
+			pg_props_side1->SetPropertyValueUnspecified(pg_props_side1->GetGrid()->GetRoot());
 		}
 		prop = pg_properties->GetProperty("sideback");
 		if (prop->GetValue().GetInteger() >= 0 || prop->IsValueUnspecified())
-			pg_properties->EnableProperty("side2");
+			pg_props_side2->EnableProperty(pg_props_side2->GetGrid()->GetRoot());
 		else {
-			pg_properties->DisableProperty("side2");
-			pg_properties->SetPropertyValueUnspecified("side2");
+			pg_props_side2->DisableProperty(pg_props_side2->GetGrid()->GetRoot());
+			pg_props_side2->SetPropertyValueUnspecified(pg_props_side2->GetGrid()->GetRoot());
 		}
 	}
 
@@ -670,6 +676,8 @@ void MapObjectPropsPanel::openObjects(vector<MapObject*>& objects) {
 		this->objects.push_back(objects[a]);
 
 	pg_properties->Refresh();
+	pg_props_side1->Refresh();
+	pg_props_side2->Refresh();
 }
 
 
