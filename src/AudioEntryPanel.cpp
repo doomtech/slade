@@ -61,12 +61,13 @@ AudioEntryPanel::AudioEntryPanel(wxWindow* parent) : EntryPanel(parent, "audio")
 
 	// Create wxMediaCtrl
 	media_ctrl = new wxMediaCtrl(this, -1);
-	media_ctrl->Show(false);
 
 	// Setup sizer
 	wxGridBagSizer* sizer_gb = new wxGridBagSizer(4, 4);
 	sizer_main->AddStretchSpacer();
+#ifndef __WXOSX__
 	sizer_main->Add(media_ctrl, 0);
+#endif
 	sizer_main->Add(sizer_gb, 0, wxALIGN_CENTER);
 	sizer_main->AddStretchSpacer();
 
@@ -94,6 +95,7 @@ AudioEntryPanel::AudioEntryPanel(wxWindow* parent) : EntryPanel(parent, "audio")
 	// Disable general entrypanel buttons
 	btn_save->Disable();
 	btn_revert->Disable();
+	media_ctrl->Show(false);
 
 	// Bind events
 	btn_play->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &AudioEntryPanel::onBtnPlay, this);
