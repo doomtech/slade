@@ -21,11 +21,19 @@ MapObjectPropsPanel::MapObjectPropsPanel(wxWindow* parent) : wxPanel(parent, -1)
 	// Add item label
 	//label_item = new wxStaticText(this, -1, "");
 	//sizer->Add(label_item, 0, wxEXPAND|wxALL, 4);
-	//sizer->AddSpacer(4);
+	sizer->AddSpacer(4);
 
-	// Add property grid
-	pg_properties = new wxPropertyGrid(this, -1, wxDefaultPosition, wxDefaultSize, wxPG_TOOLTIPS|wxPG_SPLITTER_AUTO_CENTER);
-	sizer->Add(pg_properties, 1, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+	// Add tabs
+	tabs_sections = new wxNotebook(this, -1);
+	sizer->Add(tabs_sections, 1, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+	// Add main property grid
+	pg_properties = new wxPropertyGrid(tabs_sections, -1, wxDefaultPosition, wxDefaultSize, wxPG_TOOLTIPS|wxPG_SPLITTER_AUTO_CENTER);
+	tabs_sections->AddPage(pg_properties, "Properties");
+
+	// Create side property grids
+	pg_props_side1 = new wxPropertyGrid(tabs_sections, -1, wxDefaultPosition, wxDefaultSize, wxPG_TOOLTIPS|wxPG_SPLITTER_AUTO_CENTER);
+	pg_props_side2 = new wxPropertyGrid(tabs_sections, -1, wxDefaultPosition, wxDefaultSize, wxPG_TOOLTIPS|wxPG_SPLITTER_AUTO_CENTER);
 
 	// Add buttons
 	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
@@ -48,20 +56,25 @@ MapObjectPropsPanel::MapObjectPropsPanel(wxWindow* parent) : wxPanel(parent, -1)
 	btn_apply->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MapObjectPropsPanel::onBtnApply, this);
 	btn_reset->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MapObjectPropsPanel::onBtnReset, this);
 
+	// Hide side property grids
+	pg_props_side1->Show(false);
+	pg_props_side2->Show(false);
+
 	Layout();
 }
 
 MapObjectPropsPanel::~MapObjectPropsPanel() {
 }
 
-MOPGProperty* MapObjectPropsPanel::addBoolProperty(wxPGProperty* group, string label, string propname, bool readonly) {
+MOPGProperty* MapObjectPropsPanel::addBoolProperty(wxPGProperty* group, string label, string propname, bool readonly, wxPropertyGrid* grid) {
 	// Create property
 	MOPGBoolProperty* prop = new MOPGBoolProperty(label, propname);
 	prop->setParent(this);
 
 	// Add it
 	properties.push_back(prop);
-	pg_properties->AppendIn(group, prop);
+	if (!grid)	pg_properties->AppendIn(group, prop);
+	else		grid->AppendIn(group, prop);
 
 	// Set read-only if specified
 	if (readonly)
@@ -70,14 +83,15 @@ MOPGProperty* MapObjectPropsPanel::addBoolProperty(wxPGProperty* group, string l
 	return prop;
 }
 
-MOPGProperty* MapObjectPropsPanel::addIntProperty(wxPGProperty* group, string label, string propname, bool readonly) {
+MOPGProperty* MapObjectPropsPanel::addIntProperty(wxPGProperty* group, string label, string propname, bool readonly, wxPropertyGrid* grid) {
 	// Create property
 	MOPGIntProperty* prop = new MOPGIntProperty(label, propname);
 	prop->setParent(this);
 
 	// Add it
 	properties.push_back(prop);
-	pg_properties->AppendIn(group, prop);
+	if (!grid)	pg_properties->AppendIn(group, prop);
+	else		grid->AppendIn(group, prop);
 
 	// Set read-only if specified
 	if (readonly)
@@ -86,14 +100,15 @@ MOPGProperty* MapObjectPropsPanel::addIntProperty(wxPGProperty* group, string la
 	return prop;
 }
 
-MOPGProperty* MapObjectPropsPanel::addFloatProperty(wxPGProperty* group, string label, string propname, bool readonly) {
+MOPGProperty* MapObjectPropsPanel::addFloatProperty(wxPGProperty* group, string label, string propname, bool readonly, wxPropertyGrid* grid) {
 	// Create property
 	MOPGFloatProperty* prop = new MOPGFloatProperty(label, propname);
 	prop->setParent(this);
 
 	// Add it
 	properties.push_back(prop);
-	pg_properties->AppendIn(group, prop);
+	if (!grid)	pg_properties->AppendIn(group, prop);
+	else		grid->AppendIn(group, prop);
 
 	// Set read-only if specified
 	if (readonly)
@@ -102,14 +117,15 @@ MOPGProperty* MapObjectPropsPanel::addFloatProperty(wxPGProperty* group, string 
 	return prop;
 }
 
-MOPGProperty* MapObjectPropsPanel::addStringProperty(wxPGProperty* group, string label, string propname, bool readonly) {
+MOPGProperty* MapObjectPropsPanel::addStringProperty(wxPGProperty* group, string label, string propname, bool readonly, wxPropertyGrid* grid) {
 	// Create property
 	MOPGStringProperty* prop = new MOPGStringProperty(label, propname);
 	prop->setParent(this);
 
 	// Add it
 	properties.push_back(prop);
-	pg_properties->AppendIn(group, prop);
+	if (!grid)	pg_properties->AppendIn(group, prop);
+	else		grid->AppendIn(group, prop);
 
 	// Set read-only if specified
 	if (readonly)
@@ -198,64 +214,64 @@ bool MapObjectPropsPanel::setStringProperty(wxPGProperty* prop, string value, bo
 	return false;
 }
 
-void MapObjectPropsPanel::addUDMFProperty(UDMFProperty* prop, int objtype, wxPGProperty* basegroup) {
+void MapObjectPropsPanel::addUDMFProperty(UDMFProperty* prop, int objtype, string basegroup, wxPropertyGrid* grid) {
 	// Check property was given
 	if (!prop)
 		return;
 
+	// Set grid to add to (main one if grid is NULL)
+	if (!grid)
+		grid = pg_properties;
+
 	// Determine group name
 	string groupname;
-	if (basegroup)
-		groupname = basegroup->GetName() + ".";
+	if (!basegroup.IsEmpty())
+		groupname = basegroup + ".";
 	groupname += prop->getGroup();
 
 	// Get group to add
-	wxPGProperty* group = pg_properties->GetProperty(groupname);
-	if (!group) {
-		if (basegroup)
-			group = pg_properties->AppendIn(basegroup, new wxPropertyCategory(prop->getGroup(), groupname));
-		else
-			group = pg_properties->Append(new wxPropertyCategory(prop->getGroup(), groupname));
-	}
+	wxPGProperty* group = grid->GetProperty(groupname);
+	if (!group)
+		group = grid->Append(new wxPropertyCategory(prop->getGroup(), groupname));
 
 	// Determine property name
 	string propname;
-	if (basegroup)
-		propname = basegroup->GetName() + ".";
+	if (!basegroup.IsEmpty())
+		propname = basegroup + ".";
 	propname += prop->getProperty();
 
 	// Add property depending on type
 	if (prop->getType() == UDMFProperty::TYPE_BOOL)
-		addBoolProperty(group, prop->getName(), propname);
+		addBoolProperty(group, prop->getName(), propname, false, grid);
 	else if (prop->getType() == UDMFProperty::TYPE_INT)
-		addIntProperty(group, prop->getName(), propname);
+		addIntProperty(group, prop->getName(), propname, false, grid);
 	else if (prop->getType() == UDMFProperty::TYPE_FLOAT)
-		addFloatProperty(group, prop->getName(), propname);
+		addFloatProperty(group, prop->getName(), propname, false, grid);
 	else if (prop->getType() == UDMFProperty::TYPE_STRING)
-		addStringProperty(group, prop->getName(), propname);
+		addStringProperty(group, prop->getName(), propname, false, grid);
 	else if (prop->getType() == UDMFProperty::TYPE_COLOUR)
-		addIntProperty(group, prop->getName(), propname);
+		addIntProperty(group, prop->getName(), propname, false, grid);
 	else if (prop->getType() == UDMFProperty::TYPE_ASPECIAL) {
 		MOPGActionSpecialProperty* prop_as = new MOPGActionSpecialProperty("Special", propname);
 		prop_as->setParent(this);
 		properties.push_back(prop_as);
-		pg_properties->AppendIn(group, prop_as);
+		grid->AppendIn(group, prop_as);
 	}
 	else if (prop->getType() == UDMFProperty::TYPE_SSPECIAL) {
 		// For now
-		addIntProperty(group, prop->getName(), prop->getProperty());
+		addIntProperty(group, prop->getName(), prop->getProperty(), false, grid);
 	}
 	else if (prop->getType() == UDMFProperty::TYPE_TTYPE) {
 		MOPGThingTypeProperty* prop_tt = new MOPGThingTypeProperty("Type", propname);
 		prop_tt->setParent(this);
 		properties.push_back(prop_tt);
-		pg_properties->AppendIn(group, prop_tt);
+		grid->AppendIn(group, prop_tt);
 	}
 	else if (prop->getType() == UDMFProperty::TYPE_ANGLE) {
 		MOPGAngleProperty* prop_angle = new MOPGAngleProperty(prop->getName(), propname);
 		prop_angle->setParent(this);
 		properties.push_back(prop_angle);
-		pg_properties->AppendIn(group, prop_angle);
+		grid->AppendIn(group, prop_angle);
 	}
 }
 
@@ -266,10 +282,21 @@ void MapObjectPropsPanel::setupType(int objtype) {
 
 	// Clear property grid
 	pg_properties->Clear();
+	pg_props_side1->Clear();
+	pg_props_side2->Clear();
 	properties.clear();
+
+	// Remove side1/2 tabs if they exist
+	tabs_sections->RemovePage(1);
+	tabs_sections->RemovePage(1);
+	pg_props_side1->Show(false);
+	pg_props_side2->Show(false);
 
 	// Vertex properties
 	if (objtype == MOBJ_VERTEX) {
+		// Set main tab name
+		tabs_sections->SetPageText(0, "Vertex");
+
 		// Add 'basic' group
 		wxPGProperty* g_basic = pg_properties->Append(new wxPropertyCategory("General"));
 
@@ -282,6 +309,9 @@ void MapObjectPropsPanel::setupType(int objtype) {
 
 	// Line properties
 	else if (objtype == MOBJ_LINE) {
+		// Set main tab name
+		tabs_sections->SetPageText(0, "Line");
+
 		// Add 'General' group
 		wxPGProperty* g_basic = pg_properties->Append(new wxPropertyCategory("General"));
 
@@ -321,42 +351,47 @@ void MapObjectPropsPanel::setupType(int objtype) {
 		}
 
 		// --- Sides ---
-		wxPGProperty* g_side1 = pg_properties->Append(new wxPropertyCategory("Front Side", "side1"));
-		wxPGProperty* g_side2 = pg_properties->Append(new wxPropertyCategory("Back Side", "side2"));
+		pg_props_side1->Show(true);
+		pg_props_side2->Show(true);
+		tabs_sections->AddPage(pg_props_side1, "Front Side");
+		tabs_sections->AddPage(pg_props_side2, "Back Side");
 
 		// 'General' group 1
-		wxPGProperty* subgroup = pg_properties->AppendIn(g_side1, new wxPropertyCategory("General", "side1.general"));
+		wxPGProperty* subgroup = pg_props_side1->Append(new wxPropertyCategory("General", "side1.general"));
 		addIntProperty(subgroup, "Sector", "side1.sector");
 
 		// 'Textures' group 1
-		subgroup = pg_properties->AppendIn(g_side1, new wxPropertyCategory("Textures", "side1.textures"));
+		subgroup = pg_props_side1->Append(new wxPropertyCategory("Textures", "side1.textures"));
 		addStringProperty(subgroup, "Upper Texture", "side1.texturetop");
 		addStringProperty(subgroup, "Middle Texture", "side1.texturemiddle");
 		addStringProperty(subgroup, "Lower Texture", "side1.texturebottom");
 
 		// 'Offsets' group 1
-		subgroup = pg_properties->AppendIn(g_side1, new wxPropertyCategory("Offsets", "side1.offsets"));
+		subgroup = pg_props_side1->Append(new wxPropertyCategory("Offsets", "side1.offsets"));
 		addIntProperty(subgroup, "X Offset", "side1.offsetx");
 		addIntProperty(subgroup, "Y Offset", "side1.offsety");
 
 		// 'General' group 2
-		subgroup = pg_properties->AppendIn(g_side2, new wxPropertyCategory("General", "side2.general"));
+		subgroup = pg_props_side2->Append(new wxPropertyCategory("General", "side2.general"));
 		addIntProperty(subgroup, "Sector", "side2.sector");
 
 		// 'Textures' group 2
-		subgroup = pg_properties->AppendIn(g_side2, new wxPropertyCategory("Textures", "side2.textures"));
+		subgroup = pg_props_side2->Append(new wxPropertyCategory("Textures", "side2.textures"));
 		addStringProperty(subgroup, "Upper Texture", "side2.texturetop");
 		addStringProperty(subgroup, "Middle Texture", "side2.texturemiddle");
 		addStringProperty(subgroup, "Lower Texture", "side2.texturebottom");
 
 		// 'Offsets' group 2
-		subgroup = pg_properties->AppendIn(g_side2, new wxPropertyCategory("Offsets", "side2.offsets"));
+		subgroup = pg_props_side2->Append(new wxPropertyCategory("Offsets", "side2.offsets"));
 		addIntProperty(subgroup, "X Offset", "side2.offsetx");
 		addIntProperty(subgroup, "Y Offset", "side2.offsety");
 	}
 
 	// Sector properties
 	else if (objtype == MOBJ_SECTOR) {
+		// Set main tab name
+		tabs_sections->SetPageText(0, "Sector");
+
 		// Add 'General' group
 		wxPGProperty* g_basic = pg_properties->Append(new wxPropertyCategory("General"));
 
@@ -389,6 +424,9 @@ void MapObjectPropsPanel::setupType(int objtype) {
 
 	// Thing properties
 	else if (objtype == MOBJ_THING) {
+		// Set main tab name
+		tabs_sections->SetPageText(0, "Thing");
+
 		// Add 'General' group
 		wxPGProperty* g_basic = pg_properties->Append(new wxPropertyCategory("General"));
 
@@ -458,9 +496,27 @@ void MapObjectPropsPanel::setupTypeUDMF(int objtype) {
 	if (last_type == objtype)
 		return;
 
-	// Clear property grid
+	// Clear property grids
 	pg_properties->Clear();
+	pg_props_side1->Clear();
+	pg_props_side2->Clear();
 	properties.clear();
+
+	// Remove side1/2 tabs if they exist
+	tabs_sections->RemovePage(1);
+	tabs_sections->RemovePage(1);
+	pg_props_side1->Show(false);
+	pg_props_side2->Show(false);
+
+	// Set main tab title
+	if (objtype == MOBJ_VERTEX)
+		tabs_sections->SetPageText(0, "Vertex");
+	else if (objtype == MOBJ_LINE)
+		tabs_sections->SetPageText(0, "Line");
+	else if (objtype == MOBJ_SECTOR)
+		tabs_sections->SetPageText(0, "Sector");
+	else if (objtype == MOBJ_THING)
+		tabs_sections->SetPageText(0, "Thing");
 
 	// Go through all possible properties for this type
 	vector<udmfp_t> props = theGameConfiguration->allUDMFProperties(objtype);
@@ -470,19 +526,23 @@ void MapObjectPropsPanel::setupTypeUDMF(int objtype) {
 
 	// Add side properties if line type
 	if (objtype == MOBJ_LINE) {
+		// Add side tabs
+		pg_props_side1->Show(true);
+		pg_props_side2->Show(true);
+		tabs_sections->AddPage(pg_props_side1, "Front Side");
+		tabs_sections->AddPage(pg_props_side2, "Back Side");
+
 		// Get side properties
 		vector<udmfp_t> sprops = theGameConfiguration->allUDMFProperties(MOBJ_SIDE);
 		sort(sprops.begin(), sprops.end());
 
 		// Front side
-		wxPGProperty* g_side1 = pg_properties->Append(new wxPropertyCategory("Front Side", "side1"));
 		for (unsigned a = 0; a < sprops.size(); a++)
-			addUDMFProperty(sprops[a].property, objtype, g_side1);
+			addUDMFProperty(sprops[a].property, objtype, "side1", pg_props_side1);
 
 		// Back side
-		wxPGProperty* g_side2 = pg_properties->Append(new wxPropertyCategory("Back Side", "side2"));
 		for (unsigned a = 0; a < sprops.size(); a++)
-			addUDMFProperty(sprops[a].property, objtype, g_side2);
+			addUDMFProperty(sprops[a].property, objtype, "side2", pg_props_side2);
 	}
 
 	// Set all bool properties to use checkboxes

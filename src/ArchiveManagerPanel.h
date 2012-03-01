@@ -35,11 +35,10 @@ private:
 	wxAuiNotebook*		notebook_archives;
 	wxPanel*			panel_am;
 	wxPanel*			panel_archives;
-	wxPanel*			panel_maps;
+	wxPanel*			panel_rf;
 	ListView*			list_archives;
 	ListView*			list_recent;
 	ListView*			list_bookmarks;
-	wxListCtrl*			list_maps;
 	WMFileBrowser*		file_browser;
 	wxButton*			btn_browser_open;
 	wxMenu*				menu_recent;
@@ -52,6 +51,8 @@ public:
 	wxMenu*			getRecentMenu() { return menu_recent; }
 
 	// DockPanel layout
+	void	createArchivesPanel();
+	void	createRecentPanel();
 	void	layoutNormal();
 	void	layoutHorizontal();
 
@@ -59,7 +60,6 @@ public:
 	void			refreshRecentFileList();
 	void			refreshBookmarkList();
 	void			refreshAllTabs();
-	void			populateMapList(Archive* archive);
 	void			updateOpenListItem(int index);
 	void			updateRecentListItem(int index);
 	void			updateBookmarkListItem(int index);
@@ -124,8 +124,6 @@ public:
 	void	onListRecentRightClick(wxListEvent& e);
 	void	onListBookmarksActivated(wxListEvent& e);
 	void	onListBookmarksRightClick(wxListEvent& e);
-	void	onListMapsChanged(wxCommandEvent& e);
-	void	onListMapsActivated(wxListEvent& e);
 	void	onArchiveTabChanging(wxAuiNotebookEvent& e);
 	void	onArchiveTabChanged(wxAuiNotebookEvent& e);
 	void	onArchiveTabClose(wxAuiNotebookEvent& e);

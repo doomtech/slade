@@ -34,7 +34,7 @@
 #include "ArchiveManagerPanel.h"
 #include "ArchiveManager.h"
 #include "ArchivePanel.h"
-#include "MapEditorWindow.h"
+//#include "MapEditorWindow.h"
 #include "ZipArchive.h"
 #include "BaseResourceArchivesPanel.h"
 #include "TextureXEditor.h"
@@ -117,41 +117,22 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
 	notebook_tabs = new wxAuiNotebook(this, -1, wxDefaultPosition, wxDefaultSize, wxAUI_NB_TOP|wxAUI_NB_TAB_SPLIT|wxAUI_NB_TAB_MOVE|wxAUI_NB_SCROLL_BUTTONS|wxAUI_NB_WINDOWLIST_BUTTON);
 	vbox->Add(notebook_tabs, 1, wxEXPAND | wxALL, 4);
 
-	// Open archives & maps list
+	// Open archives tab
 	panel_am = new wxPanel(notebook_tabs);
 	notebook_tabs->AddPage(panel_am, "Archives", true);
 
 	// Create/setup archive list
-	panel_archives = new wxPanel(panel_am, -1);
-	wxBoxSizer* vbox2 = new wxBoxSizer(wxVERTICAL);
-	panel_archives->SetSizer(vbox2);
-	vbox2->Add(new wxStaticText(panel_archives, -1, "Open Archives:"), 0, wxEXPAND);
-	list_archives = new ListView(panel_archives, -1);
-	vbox2->Add(list_archives, 1, wxEXPAND|wxTOP, 4);
+	createArchivesPanel();
 	refreshArchiveList();
-
-	// Create/setup map list
-	panel_maps = new wxPanel(panel_am, -1);
-	vbox2 = new wxBoxSizer(wxVERTICAL);
-	panel_maps->SetSizer(vbox2);
-	vbox2->Add(new wxStaticText(panel_maps, -1, "Maps:"), 0, wxEXPAND);
-	list_maps = new wxListCtrl(panel_maps, -1, wxDefaultPosition, wxSize(-1, 128), wxLC_LIST | wxLC_SINGLE_SEL);
-	vbox2->Add(list_maps, 0, wxEXPAND|wxTOP, 4);
-
-	// Create/setup file browser
-	file_browser = new WMFileBrowser(notebook_tabs, this, -1);
-	notebook_tabs->AddPage(file_browser, _("File Browser"));
 
 	// Create/setup recent files list and menu
 	menu_recent = new wxMenu();
-	wxPanel *panel_rf = new wxPanel(notebook_tabs);
-	wxBoxSizer *box_rf = new wxBoxSizer(wxVERTICAL);
-	panel_rf->SetSizer(box_rf);
-	box_rf->Add(new wxStaticText(panel_rf, -1, "Recent Files:"), 0, wxEXPAND | wxALL, 4);
-	list_recent = new ListView(panel_rf, -1);
-	box_rf->Add(list_recent, 1, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, 4);
+	createRecentPanel();
 	refreshRecentFileList();
-	notebook_tabs->AddPage(panel_rf, "Recent Files", true);
+
+	// Create/setup file browser tab
+	file_browser = new WMFileBrowser(notebook_tabs, this, -1);
+	notebook_tabs->AddPage(file_browser, _("File Browser"));
 
 	// Create/setup bookmarks tab
 	wxPanel *panel_bm = new wxPanel(notebook_tabs);
@@ -174,8 +155,6 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
 	list_recent->Bind(wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK, &ArchiveManagerPanel::onListRecentRightClick, this);
 	list_bookmarks->Bind(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, &ArchiveManagerPanel::onListBookmarksActivated, this);
 	list_bookmarks->Bind(wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK, &ArchiveManagerPanel::onListBookmarksRightClick, this);
-	list_maps->Bind(wxEVT_COMMAND_LISTBOX_SELECTED, &ArchiveManagerPanel::onListMapsChanged, this);
-	list_maps->Bind(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, &ArchiveManagerPanel::onListMapsActivated, this);
 	notebook_archives->Bind(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGING, &ArchiveManagerPanel::onArchiveTabChanging, this);
 	notebook_archives->Bind(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED, &ArchiveManagerPanel::onArchiveTabChanged, this);
 	notebook_archives->Bind(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSE, &ArchiveManagerPanel::onArchiveTabClose, this);
@@ -194,6 +173,30 @@ ArchiveManagerPanel::ArchiveManagerPanel(wxWindow *parent, wxAuiNotebook* nb_arc
 ArchiveManagerPanel::~ArchiveManagerPanel() {
 }
 
+/* ArchiveManagerPanel::createArchivesPanel
+ * Creates the 'Open Archives' panel
+ *******************************************************************/
+void ArchiveManagerPanel::createArchivesPanel() {
+	panel_archives = new wxPanel(panel_am, -1);
+	wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
+	panel_archives->SetSizer(vbox);
+	vbox->Add(new wxStaticText(panel_archives, -1, "Open Archives:"), 0, wxEXPAND);
+	list_archives = new ListView(panel_archives, -1);
+	vbox->Add(list_archives, 1, wxEXPAND|wxTOP, 4);
+}
+
+/* ArchiveManagerPanel::createRecentPanel
+ * Creates the 'Recent Files' panel
+ *******************************************************************/
+void ArchiveManagerPanel::createRecentPanel() {
+	panel_rf = new wxPanel(panel_am, -1);
+	wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
+	panel_rf->SetSizer(vbox);
+	vbox->Add(new wxStaticText(panel_rf, -1, "Recent Files:"), 0, wxEXPAND);
+	list_recent = new ListView(panel_rf, -1);
+	vbox->Add(list_recent, 1, wxEXPAND|wxTOP, 4);
+}
+
 /* ArchiveManagerPanel::layoutNormal
  * Layout the panel normally
  *******************************************************************/
@@ -203,7 +206,7 @@ void ArchiveManagerPanel::layoutNormal() {
 	panel_am->SetSizer(vbox);
 
 	vbox->Add(panel_archives, 1, wxEXPAND|wxALL, 4);
-	vbox->Add(panel_maps, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+	vbox->Add(panel_rf, 1, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 }
 
 /* ArchiveManagerPanel::layoutHorizontal
@@ -215,7 +218,7 @@ void ArchiveManagerPanel::layoutHorizontal() {
 	panel_am->SetSizer(hbox);
 
 	hbox->Add(panel_archives, 1, wxEXPAND|wxALL, 4);
-	hbox->Add(panel_maps, 1, wxEXPAND|wxTOP|wxRIGHT|wxBOTTOM, 4);
+	hbox->Add(panel_rf, 1, wxEXPAND|wxTOP|wxRIGHT|wxBOTTOM, 4);
 }
 
 /* ArchiveManagerPanel::refreshRecentFileList
@@ -286,45 +289,6 @@ void ArchiveManagerPanel::refreshAllTabs() {
 		// Refresh if it's an archive panel
 		if (isArchivePanel(a))
 			((ArchivePanel*)tab)->refreshPanel();
-	}
-}
-
-/* ArchiveManagerPanel::populateMapList
- * Adds all maps in <archive> to the maps list widget
- *******************************************************************/
-void ArchiveManagerPanel::populateMapList(Archive* archive) {
-	// Clear current maps list
-	list_maps->ClearAll();
-
-	// Do nothing if no archive was given
-	if (!archive)
-		return;
-
-	// Get the list of maps in the selected archive
-	vector<Archive::mapdesc_t> maps = archive->detectMaps();
-
-	// Go through the list and add maps
-	for (int a = 0; a < (int) maps.size(); a++) {
-		// Setup map name string
-		string name;
-
-		// Add map format to name string
-		switch(maps[a].format) {
-			case MAP_DOOM:		name = "(D) "; break;
-			case MAP_HEXEN:		name = "(H) "; break;
-			case MAP_DOOM64:	name = "(K) "; break;
-			case MAP_UDMF:		name = "(U) "; break;
-			default:			name = "(?) "; break;
-		}
-
-		// Add map name to string
-		name += maps[a].name;
-
-		// Add the list item
-		wxListItem li;
-		li.SetText(name);
-		li.SetId(a);
-		list_maps->InsertItem(li);
 	}
 }
 
@@ -1066,7 +1030,6 @@ void ArchiveManagerPanel::onAnnouncement(Announcer* announcer, string event_name
 		int32_t index = -1;
 		event_data.read(&index, 4);
 		refreshArchiveList();
-		populateMapList(NULL);
 	}
 
 	// If an archive was added
@@ -1438,7 +1401,6 @@ void ArchiveManagerPanel::onListArchivesChanged(wxListEvent& e) {
 	if (!selected_archive)
 		return;
 
-	populateMapList(selected_archive);
 	current_maps = selected_archive;
 }
 
@@ -1449,33 +1411,6 @@ void ArchiveManagerPanel::onListArchivesChanged(wxListEvent& e) {
 void ArchiveManagerPanel::onListArchivesActivated(wxListEvent& e) {
 	// Open the archive tab, or create a new tab if it isn't already
 	openTab(e.GetIndex());
-}
-
-/* ArchiveManagerPanel::onListMapsChanged
- * Called when the user selects a map in the maps list.
- *******************************************************************/
-void ArchiveManagerPanel::onListMapsChanged(wxCommandEvent& e) {
-}
-
-/* ArchiveManagerPanel::onListMapsActivated
- * Called when the user activates a map in the maps list.
- * Opens the map in a new map editor window
- *******************************************************************/
-void ArchiveManagerPanel::onListMapsActivated(wxListEvent& e) {
-	// Check a current archive is selected
-	if (!current_maps)
-		return;
-
-	// Detect maps
-	vector<Archive::mapdesc_t> maps = current_maps->detectMaps();
-
-	// Open selected map
-	if (theMapEditor->openMap(maps[e.GetIndex()]))
-		theMapEditor->Show();
-	else {
-		theMapEditor->Hide();
-		wxMessageBox(S_FMT("Unable to open map %s: %s", CHR(maps[e.GetIndex()].head->getName()), CHR(Global::error)), "Invalid map error", wxICON_ERROR);
-	}
 }
 
 /* ArchiveManagerPanel::onListArchivesRightClick

@@ -140,8 +140,8 @@ string MapLine::stringProperty(string key) {
 void MapLine::setBoolProperty(string key, bool value) {
 	if (key.StartsWith("side1.") && side1)
 		return side1->setBoolProperty(key.Mid(6), value);
-	else if (key.StartsWith("side1.") && side1)
-		return side1->setBoolProperty(key.Mid(6), value);
+	else if (key.StartsWith("side2.") && side2)
+		return side2->setBoolProperty(key.Mid(6), value);
 	else
 		MapObject::setBoolProperty(key, value);
 }
@@ -149,8 +149,8 @@ void MapLine::setBoolProperty(string key, bool value) {
 void MapLine::setIntProperty(string key, int value) {
 	if (key.StartsWith("side1.") && side1)
 		return side1->setIntProperty(key.Mid(6), value);
-	else if (key.StartsWith("side1.") && side1)
-		return side1->setIntProperty(key.Mid(6), value);
+	else if (key.StartsWith("side2.") && side2)
+		return side2->setIntProperty(key.Mid(6), value);
 	else
 		MapObject::setIntProperty(key, value);
 }
@@ -158,8 +158,8 @@ void MapLine::setIntProperty(string key, int value) {
 void MapLine::setFloatProperty(string key, double value) {
 	if (key.StartsWith("side1.") && side1)
 		return side1->setFloatProperty(key.Mid(6), value);
-	else if (key.StartsWith("side1.") && side1)
-		return side1->setFloatProperty(key.Mid(6), value);
+	else if (key.StartsWith("side2.") && side2)
+		return side2->setFloatProperty(key.Mid(6), value);
 	else
 		MapObject::setFloatProperty(key, value);
 }
@@ -167,8 +167,8 @@ void MapLine::setFloatProperty(string key, double value) {
 void MapLine::setStringProperty(string key, string value) {
 	if (key.StartsWith("side1.") && side1)
 		return side1->setStringProperty(key.Mid(6), value);
-	else if (key.StartsWith("side1.") && side1)
-		return side1->setStringProperty(key.Mid(6), value);
+	else if (key.StartsWith("side2.") && side2)
+		return side2->setStringProperty(key.Mid(6), value);
 	else
 		MapObject::setStringProperty(key, value);
 }
