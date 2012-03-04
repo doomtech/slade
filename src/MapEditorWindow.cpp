@@ -63,7 +63,7 @@ MapEditorWindow::MapEditorWindow()
 : wxFrame((wxFrame *) NULL, -1, "SLADE", wxPoint(mew_left, mew_top), wxSize(mew_width, mew_height)) {
 	if (mew_maximized) Maximize();
 	setupLayout();
-	Show();
+	Show(false);
 
 	// Bind events
 	Bind(wxEVT_CLOSE_WINDOW, &MapEditorWindow::onClose, this);
@@ -189,8 +189,11 @@ void MapEditorWindow::setupLayout() {
 }
 
 bool MapEditorWindow::openMap(Archive::mapdesc_t map) {
+	// Get map parent archive
+	Archive* archive = map.head->getParent();
+
 	// Set texture manager archive
-	tex_man.setArchive(map.head->getParent());
+	tex_man.setArchive(archive);
 
 	// Clear current map
 	editor.clearMap();
@@ -202,6 +205,9 @@ bool MapEditorWindow::openMap(Archive::mapdesc_t map) {
 	if (ok) {
 		this->Show(true);
 		map_canvas->viewFitToMap();
+
+		// Set window title
+		SetTitle(S_FMT("SLADE - %s of %s", CHR(map.name), CHR(archive->getFilename(false))));
 	}
 
 	return ok;

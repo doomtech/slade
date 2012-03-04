@@ -31,6 +31,8 @@
 #include "Drawing.h"
 #include "GLTexture.h"
 #include "ArchiveManager.h"
+#include "Console.h"
+#include "MathStuff.h"
 
 #ifdef USE_SFML_RENDERWINDOW
 #include <SFML/Graphics.hpp>
@@ -297,7 +299,7 @@ void Drawing::drawText(string text, int x, int y, rgba_t colour, int font, int a
 		float width = sf_str.GetRect().GetWidth();
 
 		if (alignment == ALIGN_CENTER)
-			sf_str.Move(-int(width*0.5), 0.0f);
+			sf_str.Move(-MathStuff::round(width*0.5), 0.0f);
 		else
 			sf_str.Move(-width, 0.0f);
 	}
@@ -343,7 +345,7 @@ void Drawing::drawText(string text, int x, int y, rgba_t colour, int font, int a
 	float height = bbox.Upper().Y() - bbox.Lower().Y();
 	if (alignment != ALIGN_LEFT) {
 		if (alignment == ALIGN_CENTER)
-			xpos -= int(width*0.5);
+			xpos -= MathStuff::round(width*0.5);
 		else
 			xpos -= width;
 	}
@@ -402,3 +404,22 @@ void Drawing::setRenderTarget(sf::RenderWindow* target) {
 	render_target = target;
 }
 #endif
+
+
+
+CONSOLE_COMMAND(d_testfont, 1) {
+	ArchiveEntry* entry = theArchiveManager->programResourceArchive()->entryAtPath(S_FMT("fonts/%s.ttf", CHR(args[0])));
+	if (entry) {
+		if (Drawing::font_condensed) {
+			delete Drawing::font_condensed;
+			Drawing::font_condensed = NULL;
+		}
+
+		long size = 12;
+		if (args.size() > 1)
+			args[1].ToLong(&size);
+
+		Drawing::font_condensed = new FTTextureFont(entry->getData(), entry->getSize());
+		Drawing::font_condensed->FaceSize(size);
+	}
+}

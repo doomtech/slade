@@ -287,8 +287,8 @@ void MapObjectPropsPanel::setupType(int objtype) {
 	properties.clear();
 
 	// Remove side1/2 tabs if they exist
-	tabs_sections->RemovePage(1);
-	tabs_sections->RemovePage(1);
+	while (tabs_sections->GetPageCount() > 1)
+		tabs_sections->RemovePage(1);
 	pg_props_side1->Show(false);
 	pg_props_side2->Show(false);
 
@@ -503,8 +503,8 @@ void MapObjectPropsPanel::setupTypeUDMF(int objtype) {
 	properties.clear();
 
 	// Remove side1/2 tabs if they exist
-	tabs_sections->RemovePage(1);
-	tabs_sections->RemovePage(1);
+	while (tabs_sections->GetPageCount() > 1)
+		tabs_sections->RemovePage(1);
 	pg_props_side1->Show(false);
 	pg_props_side2->Show(false);
 
