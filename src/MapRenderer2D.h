@@ -115,6 +115,7 @@ public:
 	void	updateVisibility(fpoint2_t view_tl, fpoint2_t view_br);
 	void	forceUpdate();
 	double	scaledRadius(int radius);
+	bool	visOK();
 };
 
 #endif//__MAP_RENDERER_2D__

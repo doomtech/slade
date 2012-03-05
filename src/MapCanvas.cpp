@@ -93,7 +93,7 @@ MapCanvas::MapCanvas(wxWindow *parent, int id, MapEditor* editor)
 #ifdef USE_SFML_RENDERWINDOW
 	UseVerticalSync(false);
 #endif
-
+	
 	// Bind Events
 	Bind(wxEVT_SIZE, &MapCanvas::onSize, this);
 	Bind(wxEVT_KEY_DOWN, &MapCanvas::onKeyDown, this);
@@ -476,6 +476,10 @@ void MapCanvas::draw() {
 
 	// Translate to offsets
 	glTranslated(-view_xoff_inter, -view_yoff_inter, 0);
+	
+	// Update visibility info if needed
+	if (!renderer_2d->visOK())
+		renderer_2d->updateVisibility(view_tl, view_br);
 
 	// Draw flats if needed
 	if (flat_drawtype > 0) {

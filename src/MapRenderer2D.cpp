@@ -1860,3 +1860,11 @@ double MapRenderer2D::scaledRadius(int radius) {
 	else
 		return (double)radius;
 }
+
+bool MapRenderer2D::visOK() {
+	if (map->nSectors() != vis_s.size() ||
+		map->nThings() != vis_t.size())
+		return false;
+	else
+		return true;
+}
