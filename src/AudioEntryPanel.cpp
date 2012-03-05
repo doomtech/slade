@@ -114,6 +114,7 @@ AudioEntryPanel::AudioEntryPanel(wxWindow* parent) : EntryPanel(parent, "audio")
 AudioEntryPanel::~AudioEntryPanel() {
 	// Stop the timer to avoid crashes
 	timer_seek->Stop();
+	theMIDIPlayer->stop();
 }
 
 /* AudioEntryPanel::loadEntry

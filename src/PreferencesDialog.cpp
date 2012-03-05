@@ -102,9 +102,10 @@ PreferencesDialog::PreferencesDialog(wxWindow* parent) : wxDialog(parent, -1, "S
 	tree_prefs->AddPage(panel_maped, "Map Editor");
 	tree_prefs->AddSubPage(panel_map_display, "Display");
 	tree_prefs->AddPage(panel_advanced, "Advanced");
-
+	
 	// Expand all tree nodes (so it gets sized properly)
-	tree_prefs->ExpandNode(2);
+	for (unsigned page = 0; page < tree_prefs->GetPageCount(); page++)
+		tree_prefs->ExpandNode(page);
 
 	// Add preferences treebook
 	sizer->Add(tree_prefs, 1, wxEXPAND|wxALL, 4);
@@ -120,7 +121,8 @@ PreferencesDialog::PreferencesDialog(wxWindow* parent) : wxDialog(parent, -1, "S
 	Layout();
 
 	// Collapse all tree nodes
-	tree_prefs->CollapseNode(2);
+	for (unsigned page = 0; page < tree_prefs->GetPageCount(); page++)
+		tree_prefs->CollapseNode(page);
 }
 
 /* PreferencesDialog::~PreferencesDialog

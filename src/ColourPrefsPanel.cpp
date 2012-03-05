@@ -117,6 +117,9 @@ void ColourPrefsPanel::refreshPropGrid() {
 		opacity->SetAttribute("Max", 255);
 		opacity->SetAttribute("Min", 0);
 	}
+
+	// Set all bool properties to use checkboxes
+	pg_colours->SetPropertyAttributeAll(wxPG_BOOL_USE_CHECKBOX, true);
 }
 
 /* ColourPrefsPanel::applyPreferences
