@@ -62,6 +62,9 @@ public:
 	void				resetPolygon() { poly_needsupdate = true; }
 	Polygon2D*			getPolygon();
 
+	void	connectSide(MapSide* side);
+	void	disconnectSide(MapSide* side);
+
 	void	updateBBox();
 };
 

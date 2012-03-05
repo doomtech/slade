@@ -146,10 +146,12 @@ public:
 	string	thingFlag(unsigned index);
 	bool	thingFlagSet(unsigned index, MapThing* thing);
 	string	thingFlagsString(int flags);
+	void	setThingFlag(unsigned index, MapThing* thing, bool set = true);
 	int		nLineFlags() { return flags_line.size(); }
 	string	lineFlag(unsigned index);
 	bool	lineFlagSet(unsigned index, MapLine* line);
 	string	lineFlagsString(MapLine* line);
+	void	setLineFlag(unsigned index, MapLine* line, bool set = true);
 	string	spacTriggerString(MapLine* line);
 
 	// UDMF properties

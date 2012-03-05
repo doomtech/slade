@@ -407,6 +407,7 @@ void Drawing::setRenderTarget(sf::RenderWindow* target) {
 
 
 
+/*
 CONSOLE_COMMAND(d_testfont, 1) {
 	ArchiveEntry* entry = theArchiveManager->programResourceArchive()->entryAtPath(S_FMT("fonts/%s.ttf", CHR(args[0])));
 	if (entry) {
@@ -423,3 +424,4 @@ CONSOLE_COMMAND(d_testfont, 1) {
 		Drawing::font_condensed->FaceSize(size);
 	}
 }
+*/

@@ -391,10 +391,10 @@ bool MOPGThingTypeProperty::OnEvent(wxPropertyGrid* propgrid, wxWindow* window, 
 }
 
 
-MOPGLineFlagProperty::MOPGLineFlagProperty(const wxString& label, const wxString& name, int value)
+MOPGLineFlagProperty::MOPGLineFlagProperty(const wxString& label, const wxString& name, int index)
 : wxBoolProperty(label, name, false), MOPGProperty(MOPGProperty::TYPE_LFLAG) {
 	// Init variables
-	this->value = value;
+	this->index = index;
 }
 
 void MOPGLineFlagProperty::openObjects(vector<MapObject*>& objects) {
@@ -405,11 +405,11 @@ void MOPGLineFlagProperty::openObjects(vector<MapObject*>& objects) {
 	}
 
 	// Check flag against first object
-	bool first = theGameConfiguration->lineFlagSet(value, (MapLine*)objects[0]);
+	bool first = theGameConfiguration->lineFlagSet(index, (MapLine*)objects[0]);
 
 	// Check whether all objects share the same flag setting
 	for (unsigned a = 1; a < objects.size(); a++) {
-		if (theGameConfiguration->lineFlagSet(value, (MapLine*)objects[a]) != first) {
+		if (theGameConfiguration->lineFlagSet(index, (MapLine*)objects[a]) != first) {
 			// Different value found, set unspecified
 			SetValueToUnspecified();
 			return;
@@ -418,7 +418,60 @@ void MOPGLineFlagProperty::openObjects(vector<MapObject*>& objects) {
 }
 
 void MOPGLineFlagProperty::applyValue() {
+	// Do nothing if no parent (and thus no object list)
+	if (!parent || noupdate)
+		return;
 
+	// Do nothing if the value is unspecified
+	if (IsValueUnspecified())
+		return;
+
+	// Go through objects and set this value
+	vector<MapObject*>& objects = parent->getObjects();
+	for (unsigned a = 0; a < objects.size(); a++)
+		theGameConfiguration->setLineFlag(index, (MapLine*)objects[a], GetValue());
+}
+
+
+MOPGThingFlagProperty::MOPGThingFlagProperty(const wxString& label, const wxString& name, int index)
+: wxBoolProperty(label, name, false), MOPGProperty(MOPGProperty::TYPE_LFLAG) {
+	// Init variables
+	this->index = index;
+}
+
+void MOPGThingFlagProperty::openObjects(vector<MapObject*>& objects) {
+	// Set unspecified if no objects given
+	if (objects.size() == 0) {
+		SetValueToUnspecified();
+		return;
+	}
+
+	// Check flag against first object
+	bool first = theGameConfiguration->thingFlagSet(index, (MapThing*)objects[0]);
+
+	// Check whether all objects share the same flag setting
+	for (unsigned a = 1; a < objects.size(); a++) {
+		if (theGameConfiguration->thingFlagSet(index, (MapThing*)objects[a]) != first) {
+			// Different value found, set unspecified
+			SetValueToUnspecified();
+			return;
+		}
+	}
+}
+
+void MOPGThingFlagProperty::applyValue() {
+	// Do nothing if no parent (and thus no object list)
+	if (!parent || noupdate)
+		return;
+
+	// Do nothing if the value is unspecified
+	if (IsValueUnspecified())
+		return;
+
+	// Go through objects and set this value
+	vector<MapObject*>& objects = parent->getObjects();
+	for (unsigned a = 0; a < objects.size(); a++)
+		theGameConfiguration->setThingFlag(index, (MapThing*)objects[a], GetValue());
 }
 
 

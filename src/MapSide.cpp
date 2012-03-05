@@ -28,18 +28,12 @@ MapSide::~MapSide() {
 
 void MapSide::setSector(MapSector* sector) {
 	// Remove side from current sector, if any
-	if (this->sector) {
-		for (unsigned a = 0; a < sector->connected_sides.size(); a++) {
-			if (sector->connected_sides[a] == this) {
-				sector->connected_sides.erase(sector->connected_sides.begin() + a);
-				break;
-			}
-		}
-	}
+	if (this->sector)
+		this->sector->disconnectSide(this);
 
 	// Add side to new sector
 	this->sector = sector;
-	sector->connected_sides.push_back(this);
+	sector->connectSide(this);
 }
 
 int MapSide::intProperty(string key) {
@@ -51,7 +45,7 @@ int MapSide::intProperty(string key) {
 
 void MapSide::setIntProperty(string key, int value) {
 	if (key == "sector" && parent_map)
-		sector = parent_map->getSector(value);
+		setSector(parent_map->getSector(value));
 	else
 		MapObject::setIntProperty(key, value);
 }

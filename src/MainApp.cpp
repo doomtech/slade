@@ -193,6 +193,7 @@ public:
  * DIR_APP: Directory of the SLADE executable
  * DIR_TEMP: Temporary files directory
  *******************************************************************/
+int temp_fail_count = 0;
 string appPath(string filename, int dir) {
 	// Setup separator character
 #ifdef WIN32
@@ -209,22 +210,24 @@ string appPath(string filename, int dir) {
 	else if (dir == DIR_APP)
 		return dir_app + sep + filename;
 	else if (dir == DIR_TEMP) {
-		if (temp_use_appdir) {
-			// Create temp dir if necessary
-			string dir_temp = dir_app + sep + "temp";
-			if (!wxDirExists(dir_temp)) {
-				if (!wxMkdir(dir_temp)) {
-					// Unable to create it, just use system temp dir
-					wxMessageBox(S_FMT("Unable to create temp directory \"%s\", using system temp directory instead", dir_temp.c_str()), "Error", wxICON_ERROR);
-					temp_use_appdir = false;
-					return wxStandardPaths::Get().GetTempDir().Append(sep).Append(filename);
-				}
-			}
-
-			return dir_app + sep + "temp" + sep + filename;
-		}
+		// Get temp path
+		string dir_temp;
+		if (temp_use_appdir)
+			dir_temp = dir_app + sep + "temp";
 		else
-			return wxStandardPaths::Get().GetTempDir().Append(sep).Append(filename);
+			dir_temp = wxStandardPaths::Get().GetTempDir().Append(sep).Append("SLADE3");
+
+		// Create folder if necessary
+		if (!wxDirExists(dir_temp) && temp_fail_count < 2) {
+			if (!wxMkdir(dir_temp)) {
+				wxLogMessage("Unable to create temp directory \"%s\"", CHR(dir_temp));
+				temp_use_appdir = !temp_use_appdir;
+				temp_fail_count++;
+				return appPath(filename, dir);
+			}
+		}
+
+		return dir_temp + sep + filename;
 	}
 	else
 		return filename;

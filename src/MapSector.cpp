@@ -72,3 +72,21 @@ Polygon2D* MapSector::getPolygon() {
 
 	return &polygon;
 }
+
+void MapSector::connectSide(MapSide* side) {
+	connected_sides.push_back(side);
+	poly_needsupdate = true;
+	bbox.reset();
+}
+
+void MapSector::disconnectSide(MapSide* side) {
+	for (unsigned a = 0; a < connected_sides.size(); a++) {
+		if (connected_sides[a] == side) {
+			connected_sides.erase(connected_sides.begin() + a);
+			break;
+		}
+	}
+
+	poly_needsupdate = true;
+	bbox.reset();
+}

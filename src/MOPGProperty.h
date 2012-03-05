@@ -103,10 +103,21 @@ public:
 
 class MOPGLineFlagProperty : public MOPGProperty, public wxBoolProperty {
 private:
-	int	value;
+	int	index;
 
 public:
-	MOPGLineFlagProperty(const wxString& label = wxPG_LABEL, const wxString& name = wxPG_LABEL, int value = 0);
+	MOPGLineFlagProperty(const wxString& label = wxPG_LABEL, const wxString& name = wxPG_LABEL, int index = -1);
+
+	void	openObjects(vector<MapObject*>& objects);
+	void	applyValue();
+};
+
+class MOPGThingFlagProperty : public MOPGProperty, public wxBoolProperty {
+private:
+	int	index;
+
+public:
+	MOPGThingFlagProperty(const wxString& label = wxPG_LABEL, const wxString& name = wxPG_LABEL, int index = -1);
 
 	void	openObjects(vector<MapObject*>& objects);
 	void	applyValue();

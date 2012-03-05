@@ -774,6 +774,22 @@ string GameConfiguration::thingFlagsString(int flags) {
 	return ret;
 }
 
+void GameConfiguration::setThingFlag(unsigned index, MapThing* thing, bool set) {
+	// Check index
+	if (index >= flags_thing.size())
+		return;
+
+	// Determine new flags value
+	int flags = thing->prop("flags");
+	if (set)
+		flags |= flags_thing[index].flag;
+	else
+		flags = (flags & ~flags_thing[index].flag);
+
+	// Update thing flags
+	thing->setIntProperty("flags", flags);
+}
+
 string GameConfiguration::lineFlag(unsigned index) {
 	// Check index
 	if (index >= flags_line.size())
@@ -818,6 +834,22 @@ string GameConfiguration::lineFlagsString(MapLine* line) {
 		ret.RemoveLast(2);
 
 	return ret;
+}
+
+void GameConfiguration::setLineFlag(unsigned index, MapLine* line, bool set) {
+	// Check index
+	if (index >= flags_line.size())
+		return;
+
+	// Determine new flags value
+	int flags = line->prop("flags");
+	if (set)
+		flags |= flags_line[index].flag;
+	else
+		flags = (flags & ~flags_line[index].flag);
+
+	// Update line flags
+	line->setIntProperty("flags", flags);
 }
 
 string GameConfiguration::spacTriggerString(MapLine* line) {

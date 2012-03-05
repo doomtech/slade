@@ -134,6 +134,40 @@ MOPGProperty* MapObjectPropsPanel::addStringProperty(wxPGProperty* group, string
 	return prop;
 }
 
+MOPGProperty* MapObjectPropsPanel::addLineFlagProperty(wxPGProperty* group, string label, string propname, int index, bool readonly, wxPropertyGrid* grid) {
+	// Create property
+	MOPGLineFlagProperty* prop = new MOPGLineFlagProperty(label, propname, index);
+	prop->setParent(this);
+
+	// Add it
+	properties.push_back(prop);
+	if (!grid)	pg_properties->AppendIn(group, prop);
+	else		grid->AppendIn(group, prop);
+
+	// Set read-only if specified
+	if (readonly)
+		prop->ChangeFlag(wxPG_PROP_READONLY, true);
+
+	return prop;
+}
+
+MOPGProperty* MapObjectPropsPanel::addThingFlagProperty(wxPGProperty* group, string label, string propname, int index, bool readonly, wxPropertyGrid* grid) {
+	// Create property
+	MOPGThingFlagProperty* prop = new MOPGThingFlagProperty(label, propname, index);
+	prop->setParent(this);
+
+	// Add it
+	properties.push_back(prop);
+	if (!grid)	pg_properties->AppendIn(group, prop);
+	else		grid->AppendIn(group, prop);
+
+	// Set read-only if specified
+	if (readonly)
+		prop->ChangeFlag(wxPG_PROP_READONLY, true);
+
+	return prop;
+}
+
 bool MapObjectPropsPanel::setIntProperty(wxPGProperty* prop, int value, bool force_set) {
 	// Set if forcing
 	if (prop && force_set) {
@@ -339,7 +373,7 @@ void MapObjectPropsPanel::setupType(int objtype) {
 
 		// Add flags
 		for (int a = 0; a < theGameConfiguration->nLineFlags(); a++)
-			pg_properties->AppendIn(g_flags, new wxBoolProperty(theGameConfiguration->lineFlag(a), S_FMT("flag%d", a)));
+			addLineFlagProperty(g_flags, theGameConfiguration->lineFlag(a), S_FMT("flag%d", a), a);
 
 		// Hide args if doom format
 		if (theGameConfiguration->getMapFormat() == MAP_DOOM) {
@@ -465,7 +499,7 @@ void MapObjectPropsPanel::setupType(int objtype) {
 
 		// Add flags
 		for (int a = 0; a < theGameConfiguration->nThingFlags(); a++)
-			pg_properties->AppendIn(g_flags, new wxBoolProperty(theGameConfiguration->thingFlag(a), S_FMT("flag%d", a)));
+			addThingFlagProperty(g_flags, theGameConfiguration->thingFlag(a), S_FMT("flag%d", a), a);
 
 		// Add 'Scripting Special' group
 		wxPGProperty* g_special = pg_properties->Append(new wxPropertyCategory("Scripting Special"));
