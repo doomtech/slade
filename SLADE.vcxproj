@@ -235,6 +235,8 @@
     <ClCompile Include="src\SFont.cpp" />
     <ClCompile Include="src\SIFormat.cpp" />
     <ClCompile Include="src\SImageFormats.cpp" />
+    <ClCompile Include="src\SToolBar.cpp" />
+    <ClCompile Include="src\SToolBarButton.cpp" />
     <ClCompile Include="src\TarArchive.cpp" />
     <ClCompile Include="src\TextEditorPrefsPanel.cpp" />
     <ClCompile Include="src\TextLanguage.cpp" />
@@ -458,6 +460,8 @@
     <ClInclude Include="src\SIFQuake.h" />
     <ClInclude Include="src\SIFRott.h" />
     <ClInclude Include="src\SIFZDoom.h" />
+    <ClInclude Include="src\SToolBar.h" />
+    <ClInclude Include="src\SToolBarButton.h" />
     <ClInclude Include="src\Structs.h" />
     <ClInclude Include="src\TarArchive.h" />
     <ClInclude Include="src\TextEditorPrefsPanel.h" />

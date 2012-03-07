@@ -41,6 +41,7 @@
 #include "SplashWindow.h"
 #include "MapEditorWindow.h"
 #include "MapEditorConfigDialog.h"
+#include "SToolBar.h"
 #include <wx/aboutdlg.h>
 #include <wx/dnd.h>
 #include <wx/statline.h>
@@ -212,6 +213,7 @@ void MainWindow::setupLayout() {
 
 	// -- Toolbars --
 
+	/*
 	// Create File toolbar
 	wxAuiToolBar* tb_file = new wxAuiToolBar(this, -1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
 	theApp->getAction("aman_newwad")->addToToolbar(tb_file);
@@ -265,6 +267,51 @@ void MainWindow::setupLayout() {
 	m_mgr->AddPane(tb_entry, wxAuiPaneInfo().ToolbarPane().Top().Name("tb_entry").Position(2).CloseButton(false));		// Entry toolbar
 	m_mgr->AddPane(tb_bra, wxAuiPaneInfo().ToolbarPane().Top().Name("tb_bra").Position(3).CloseButton(false));			// Base Resource Archive toolbar
 	m_mgr->AddPane(tb_pal, wxAuiPaneInfo().ToolbarPane().Top().Name("tb_pal").Position(4).CloseButton(false));			// Palette toolbar
+	*/
+
+	SToolBar* toolbar = new SToolBar(this);
+	SToolBarGroup* tbg_file = new SToolBarGroup(toolbar, "File");
+	tbg_file->addActionButton("aman_newwad");
+	tbg_file->addActionButton("aman_newzip");
+	tbg_file->addActionButton("aman_open");
+	tbg_file->addActionButton("aman_save");
+	tbg_file->addActionButton("aman_saveas");
+	tbg_file->addActionButton("aman_saveall");
+	tbg_file->addActionButton("aman_close");
+	tbg_file->addActionButton("aman_closeall");
+	toolbar->addGroup(tbg_file);
+
+	SToolBarGroup* tbg_archive = new SToolBarGroup(toolbar, "Archive");
+	tbg_archive->addActionButton("arch_newentry");
+	tbg_archive->addActionButton("arch_newdir");
+	tbg_archive->addActionButton("arch_importfiles");
+	tbg_archive->addActionButton("arch_texeditor");
+	tbg_archive->addActionButton("arch_mapeditor");
+	toolbar->addGroup(tbg_archive);
+
+	SToolBarGroup* tbg_entry = new SToolBarGroup(toolbar, "Entry");
+	tbg_entry->addActionButton("arch_entry_rename");
+	tbg_entry->addActionButton("arch_entry_delete");
+	tbg_entry->addActionButton("arch_entry_import");
+	tbg_entry->addActionButton("arch_entry_export");
+	tbg_entry->addActionButton("arch_entry_moveup");
+	tbg_entry->addActionButton("arch_entry_movedown");
+	toolbar->addGroup(tbg_entry);
+
+	SToolBarGroup* tbg_bra = new SToolBarGroup(toolbar, "Base Resource", true);
+	BaseResourceChooser* brc = new BaseResourceChooser(tbg_bra);
+	tbg_bra->addCustomControl(brc);
+	tbg_bra->addActionButton("main_setbra", "t_settings");
+	toolbar->addGroup(tbg_bra);
+
+	SToolBarGroup* tbg_palette = new SToolBarGroup(toolbar, "Palette", true);
+	palette_chooser = new PaletteChooser(tbg_palette, -1);
+	palette_chooser->selectPalette(global_palette);
+	tbg_palette->addCustomControl(palette_chooser);
+	toolbar->addGroup(tbg_palette);
+
+	int height = toolbar->GetSize().x;
+	m_mgr->AddPane(toolbar, wxAuiPaneInfo().Top().CaptionVisible(false).MinSize(-1, 30).Resizable(false).PaneBorder(false).Name("toolbar"));
 
 
 	// -- Status Bar --

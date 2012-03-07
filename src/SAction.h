@@ -30,6 +30,10 @@ public:
 
 	string	getId() { return id; }
 	int		getWxId() { return wx_id; }
+	string	getText() { return text; }
+	string	getIconName() { return icon; }
+	string	getHelpText() { return helptext; }
+	string	getShortcut() { return shortcut; }
 
 	bool	addToMenu(wxMenu* menu, string text_override = "NO");
 	bool	addToToolbar(wxAuiToolBar* toolbar, string icon_override = "NO");
