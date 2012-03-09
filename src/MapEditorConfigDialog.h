@@ -4,6 +4,7 @@
 
 #include "ListView.h"
 #include "Archive.h"
+#include "MapPreviewCanvas.h"
 
 class BaseResourceChooser;
 class MapEditorConfigDialog : public wxDialog {
@@ -15,6 +16,7 @@ private:
 	wxButton*					btn_open_resource;
 	wxButton*					btn_recent;
 	wxButton*					btn_new_map;
+	MapPreviewCanvas*			canvas_preview;
 
 	Archive*					archive;
 	vector<Archive::mapdesc_t>	maps;
@@ -33,6 +35,7 @@ public:
 	void	onBtnNewMap(wxCommandEvent& e);
 	void	onBtnOpenResource(wxCommandEvent& e);
 	void	onBtnRecent(wxCommandEvent& e);
+	void	onMapSelected(wxListEvent& e);
 };
 
 #endif//__MAP_EDITOR_CONFIG_DIALOG_H__

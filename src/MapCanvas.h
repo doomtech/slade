@@ -73,6 +73,8 @@ public:
 
 	double	translateX(double x, bool inter = false);
 	double	translateY(double y, bool inter = false);
+	int		screenX(double x);
+	int		screenY(double y);
 
 	void	setView(double x, double y);
 	void	pan(double x, double y);

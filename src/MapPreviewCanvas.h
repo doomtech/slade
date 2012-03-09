@@ -1,11 +1,10 @@
 
-#ifndef __MAP_ENTRY_PANEL_H__
-#define __MAP_ENTRY_PANEL_H__
+#ifndef __MAP_PREVIEW_CANVAS_H__
+#define __MAP_PREVIEW_CANVAS_H__
 
-#include "EntryPanel.h"
-#include "MapPreviewCanvas.h"
+#include "OGLCanvas.h"
+#include "Archive.h"
 
-/*
 // Structs for basic map features
 struct mep_vertex_t {
 	double x;
@@ -23,7 +22,7 @@ struct mep_line_t {
 	mep_line_t(unsigned v1, unsigned v2) { this->v1 = v1; this->v2 = v2; }
 };
 
-class MEPCanvas : public OGLCanvas {
+class MapPreviewCanvas : public OGLCanvas {
 private:
 	vector<mep_vertex_t>	verts;
 	vector<mep_line_t>		lines;
@@ -32,32 +31,16 @@ private:
 	double					offset_y;
 
 public:
-	MEPCanvas(wxWindow* parent);
-	~MEPCanvas();
+	MapPreviewCanvas(wxWindow* parent);
+	~MapPreviewCanvas();
 
 	void addVertex(double x, double y);
 	void addLine(unsigned v1, unsigned v2, bool twosided, bool special, bool macro = false);
+	bool openMap(Archive::mapdesc_t map);
 	void clearMap();
 	void showMap();
 	void draw();
 	void createImage(ArchiveEntry& ae, int width, int height);
 };
-*/
 
-class MapEntryPanel : public EntryPanel {
-private:
-	MapPreviewCanvas*	map_canvas;
-	wxButton*			btn_saveimg;
-
-public:
-	MapEntryPanel(wxWindow* parent);
-	~MapEntryPanel();
-
-	bool	loadEntry(ArchiveEntry* entry);
-	bool	saveEntry();
-	bool	createImage();
-
-	void	onBtnSaveImage(wxCommandEvent& e);
-};
-
-#endif//__MAP_ENTRY_PANEL_H__
+#endif//__MAP_PREVIEW_CANVAS_H__

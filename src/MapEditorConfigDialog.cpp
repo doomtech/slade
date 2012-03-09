@@ -10,13 +10,18 @@
 #include "SplashWindow.h"
 #include <wx/statline.h>
 
-MapEditorConfigDialog::MapEditorConfigDialog(wxWindow* parent, Archive* archive, bool show_maplist) : wxDialog(parent, -1, "Map Editor") {
+MapEditorConfigDialog::MapEditorConfigDialog(wxWindow* parent, Archive* archive, bool show_maplist) : wxDialog(parent, -1, "Launch Map Editor") {
 	// Init variables
 	this->archive = archive;
+	canvas_preview = NULL;
 
-	// Setup sizer
+	// Setup main sizer
+	wxBoxSizer* mainsizer = new wxBoxSizer(wxHORIZONTAL);
+	SetSizer(mainsizer);
+
+	// Left side sizer
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
-	SetSizer(sizer);
+	mainsizer->Add(sizer, 0, wxEXPAND);
 
 	// Get list of game configuration titles
 	wxArrayString games;
@@ -72,6 +77,7 @@ MapEditorConfigDialog::MapEditorConfigDialog(wxWindow* parent, Archive* archive,
 	// Resource archive list
 	list_resources = new wxCheckListBox(this, -1);
 	framesizer->Add(list_resources, 1, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+	list_resources->SetInitialSize(wxSize(350, 100));
 
 	// Populate resource archive list
 	int index = 0;
@@ -95,6 +101,20 @@ MapEditorConfigDialog::MapEditorConfigDialog(wxWindow* parent, Archive* archive,
 	btn_recent = new wxButton(this, -1, "Open Recent");
 	hbox->Add(btn_recent, 0, wxEXPAND, 0);
 
+	
+	// Right side (map preview)
+	if (show_maplist) {
+		frame = new wxStaticBox(this, -1, "Preview");
+		framesizer = new wxStaticBoxSizer(frame, wxVERTICAL);
+		mainsizer->Add(framesizer, 0, wxEXPAND|wxALL, 4);
+
+		// Add map preview
+		canvas_preview = new MapPreviewCanvas(this);
+		framesizer->Add(canvas_preview->toPanel(this), 1, wxEXPAND|wxALL, 4);
+		canvas_preview->SetInitialSize(wxSize(400, 400));
+	}
+
+
 	// Dialog buttons
 	sizer->Add(CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND|wxBOTTOM, 4);
 
@@ -105,19 +125,21 @@ MapEditorConfigDialog::MapEditorConfigDialog(wxWindow* parent, Archive* archive,
 	choice_game_config->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &MapEditorConfigDialog::onChoiceGameConfigChanged, this);
 	if (show_maplist) {
 		list_maps->Bind(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, &MapEditorConfigDialog::onMapActivated, this);
+		list_maps->Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &MapEditorConfigDialog::onMapSelected, this);
 		//btn_new_map->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MapEditorConfigDialog::onBtnNewMap, this);
 	}
 	btn_open_resource->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MapEditorConfigDialog::onBtnOpenResource, this);
 	btn_recent->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MapEditorConfigDialog::onBtnRecent, this);
 
 	// Determine dialog height
-	int height = 500;
-	if (!show_maplist)
-		height = 300;
+	//int height = 500;
+	//if (!show_maplist)
+	//	height = 300;
 
-	SetSize(400, height);
-	CenterOnParent();
+	//SetSize(-1, height);
 	Layout();
+	mainsizer->Fit(this);
+	CenterOnParent();
 }
 
 MapEditorConfigDialog::~MapEditorConfigDialog() {
@@ -271,4 +293,12 @@ void MapEditorConfigDialog::onBtnRecent(wxCommandEvent& e) {
 			list_resources->Check(list_resources->GetCount()-1);
 		}
 	}
+}
+
+void MapEditorConfigDialog::onMapSelected(wxListEvent& e) {
+	if (!canvas_preview)
+		return;
+
+	canvas_preview->clearMap();
+	canvas_preview->openMap(selectedMap());
 }

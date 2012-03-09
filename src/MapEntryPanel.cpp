@@ -45,18 +45,6 @@
  *******************************************************************/
 CVAR(Int, map_image_width,  800, CVAR_SAVE)
 CVAR(Int, map_image_height, 600, CVAR_SAVE)
-CVAR(Float, map_image_thickness, 1.5, CVAR_SAVE)
-CVAR(String, map_view_col_background, "rgb(0, 0, 0)", CVAR_SAVE)
-CVAR(String, map_view_col_line_1s, "rgb(255, 255, 255)", CVAR_SAVE)
-CVAR(String, map_view_col_line_2s, "rgb(170, 170, 170)", CVAR_SAVE)
-CVAR(String, map_view_col_line_special, "rgb(130, 140, 255)", CVAR_SAVE)
-CVAR(String, map_view_col_line_macro, "rgb(255, 170, 130)", CVAR_SAVE)
-CVAR(String, map_image_col_background, "rgb(255, 255, 255)", CVAR_SAVE)
-CVAR(Int, map_image_alpha_background, 0, CVAR_SAVE)
-CVAR(String, map_image_col_line_1s, "rgb(0, 0, 0)", CVAR_SAVE)
-CVAR(String, map_image_col_line_2s, "rgb(144, 144, 144)", CVAR_SAVE)
-CVAR(String, map_image_col_line_special, "rgb(220, 130, 50)", CVAR_SAVE)
-CVAR(String, map_image_col_line_macro, "rgb(50, 130, 220)", CVAR_SAVE)
 
 
 /*******************************************************************
@@ -72,159 +60,159 @@ EXTERN_CVAR(String, dir_last)
 /* MEPCanvas::MEPCanvas
  * MEPCanvas class constructor
  *******************************************************************/
-MEPCanvas::MEPCanvas(wxWindow* parent) : OGLCanvas(parent, -1) {
-	zoom = 1;
-	offset_x = 0;
-	offset_y = 0;
-}
+//MEPCanvas::MEPCanvas(wxWindow* parent) : OGLCanvas(parent, -1) {
+//	zoom = 1;
+//	offset_x = 0;
+//	offset_y = 0;
+//}
 
 /* MEPCanvas::~MEPCanvas
  * MEPCanvas class destructor
  *******************************************************************/
-MEPCanvas::~MEPCanvas() {
-}
+//MEPCanvas::~MEPCanvas() {
+//}
 
 /* MEPCanvas::addVertex
  * Adds a vertex to the map data
  *******************************************************************/
-void MEPCanvas::addVertex(double x, double y) {
-	verts.push_back(mep_vertex_t(x, y));
-}
+//void MEPCanvas::addVertex(double x, double y) {
+//	verts.push_back(mep_vertex_t(x, y));
+//}
 
 /* MEPCanvas::addLine
  * Adds a line to the map data
  *******************************************************************/
-void MEPCanvas::addLine(unsigned v1, unsigned v2, bool twosided, bool special, bool macro) {
-	mep_line_t line(v1, v2);
-	line.twosided = twosided;
-	line.special = special;
-	line.macro = macro;
-	lines.push_back(line);
-}
+//void MEPCanvas::addLine(unsigned v1, unsigned v2, bool twosided, bool special, bool macro) {
+//	mep_line_t line(v1, v2);
+//	line.twosided = twosided;
+//	line.special = special;
+//	line.macro = macro;
+//	lines.push_back(line);
+//}
 
 /* MEPCanvas::clearMap
  * Clears map data
  *******************************************************************/
-void MEPCanvas::clearMap() {
-	verts.clear();
-	lines.clear();
-}
+//void MEPCanvas::clearMap() {
+//	verts.clear();
+//	lines.clear();
+//}
 
 /* MEPCanvas::showMap
  * Adjusts zoom and offset to show the whole map
  *******************************************************************/
-void MEPCanvas::showMap() {
-	// Find extents of map
-	mep_vertex_t m_min(999999.0, 999999.0);
-	mep_vertex_t m_max(-999999.0, -999999.0);
-	for (unsigned a = 0; a < verts.size(); a++) {
-		if (verts[a].x < m_min.x)
-			m_min.x = verts[a].x;
-		if (verts[a].x > m_max.x)
-			m_max.x = verts[a].x;
-		if (verts[a].y < m_min.y)
-			m_min.y = verts[a].y;
-		if (verts[a].y > m_max.y)
-			m_max.y = verts[a].y;
-	}
-
-	// Offset to center of map
-	double width = m_max.x - m_min.x;
-	double height = m_max.y - m_min.y;
-	offset_x = m_min.x + (width * 0.5);
-	offset_y = m_min.y + (height * 0.5);
-
-	// Zoom to fit whole map
-	double x_scale = ((double)GetClientSize().x) / width;
-	double y_scale = ((double)GetClientSize().y) / height;
-	zoom = MIN(x_scale, y_scale);
-	zoom *= 0.95;
-}
+//void MEPCanvas::showMap() {
+//	// Find extents of map
+//	mep_vertex_t m_min(999999.0, 999999.0);
+//	mep_vertex_t m_max(-999999.0, -999999.0);
+//	for (unsigned a = 0; a < verts.size(); a++) {
+//		if (verts[a].x < m_min.x)
+//			m_min.x = verts[a].x;
+//		if (verts[a].x > m_max.x)
+//			m_max.x = verts[a].x;
+//		if (verts[a].y < m_min.y)
+//			m_min.y = verts[a].y;
+//		if (verts[a].y > m_max.y)
+//			m_max.y = verts[a].y;
+//	}
+//
+//	// Offset to center of map
+//	double width = m_max.x - m_min.x;
+//	double height = m_max.y - m_min.y;
+//	offset_x = m_min.x + (width * 0.5);
+//	offset_y = m_min.y + (height * 0.5);
+//
+//	// Zoom to fit whole map
+//	double x_scale = ((double)GetClientSize().x) / width;
+//	double y_scale = ((double)GetClientSize().y) / height;
+//	zoom = MIN(x_scale, y_scale);
+//	zoom *= 0.95;
+//}
 
 /* MEPCanvas::draw
  * Draws the map
  *******************************************************************/
-void MEPCanvas::draw() {
-	// Setup colours
-	wxColour wxc;
-	wxc.Set(map_view_col_background);	rgba_t col_view_background(wxc.Red(), wxc.Green(), wxc.Blue(), 255);
-	wxc.Set(map_view_col_line_1s);		rgba_t col_view_line_1s(wxc.Red(), wxc.Green(), wxc.Blue(), 255);
-	wxc.Set(map_view_col_line_2s);		rgba_t col_view_line_2s(wxc.Red(), wxc.Green(), wxc.Blue(), 255);
-	wxc.Set(map_view_col_line_special);	rgba_t col_view_line_special(wxc.Red(), wxc.Green(), wxc.Blue(), 255);
-	wxc.Set(map_view_col_line_macro);	rgba_t col_view_line_macro(wxc.Red(), wxc.Green(), wxc.Blue(), 255);
-
-	// Setup the viewport
-	glViewport(0, 0, GetSize().x, GetSize().y);
-
-	// Setup the screen projection
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, GetSize().x, 0, GetSize().y, -1, 1);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-	// Clear
-	glClearColor(((double)col_view_background.r)/255.f, ((double)col_view_background.g)/255.f,
-				 ((double)col_view_background.b)/255.f, ((double)col_view_background.a)/255.f);
-	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-
-	// Translate to inside of pixel (otherwise inaccuracies can occur on certain gl implementations)
-	glTranslatef(0.375f, 0.375f, 0);
-
-	// Zoom/offset to show full map
-	showMap();
-
-	// Translate to middle of canvas
-	glTranslated(GetSize().x * 0.5, GetSize().y * 0.5, 0);
-
-	// Zoom
-	glScaled(zoom, zoom, 1);
-
-	// Translate to offset
-	glTranslated(-offset_x, -offset_y, 0);
-
-	// Setup drawing
-	glDisable(GL_TEXTURE_2D);
-	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-	glLineWidth(1.5f);
-	glEnable(GL_LINE_SMOOTH);
-
-	// Draw lines
-	for (unsigned a = 0; a < lines.size(); a++) {
-		mep_line_t line = lines[a];
-
-		// Check ends
-		if (line.v1 >= verts.size() || line.v2 >= verts.size())
-			continue;
-
-		// Get vertices
-		mep_vertex_t v1 = verts[lines[a].v1];
-		mep_vertex_t v2 = verts[lines[a].v2];
-
-		// Set colour
-		if (line.special)
-			col_view_line_special.set_gl();
-		else if (line.macro)
-			col_view_line_macro.set_gl();
-		else if (line.twosided)
-			col_view_line_2s.set_gl();
-		else
-			col_view_line_1s.set_gl();
-
-		// Draw line
-		glBegin(GL_LINES);
-		glVertex2d(v1.x, v1.y);
-		glVertex2d(v2.x, v2.y);
-		glEnd();
-	}
-
-	glLineWidth(1.0f);
-	glDisable(GL_LINE_SMOOTH);
-
-	// Swap buffers (ie show what was drawn)
-	SwapBuffers();
-}
+//void MEPCanvas::draw() {
+//	// Setup colours
+//	wxColour wxc;
+//	wxc.Set(map_view_col_background);	rgba_t col_view_background(wxc.Red(), wxc.Green(), wxc.Blue(), 255);
+//	wxc.Set(map_view_col_line_1s);		rgba_t col_view_line_1s(wxc.Red(), wxc.Green(), wxc.Blue(), 255);
+//	wxc.Set(map_view_col_line_2s);		rgba_t col_view_line_2s(wxc.Red(), wxc.Green(), wxc.Blue(), 255);
+//	wxc.Set(map_view_col_line_special);	rgba_t col_view_line_special(wxc.Red(), wxc.Green(), wxc.Blue(), 255);
+//	wxc.Set(map_view_col_line_macro);	rgba_t col_view_line_macro(wxc.Red(), wxc.Green(), wxc.Blue(), 255);
+//
+//	// Setup the viewport
+//	glViewport(0, 0, GetSize().x, GetSize().y);
+//
+//	// Setup the screen projection
+//	glMatrixMode(GL_PROJECTION);
+//	glLoadIdentity();
+//	glOrtho(0, GetSize().x, 0, GetSize().y, -1, 1);
+//
+//	glMatrixMode(GL_MODELVIEW);
+//	glLoadIdentity();
+//
+//	// Clear
+//	glClearColor(((double)col_view_background.r)/255.f, ((double)col_view_background.g)/255.f,
+//				 ((double)col_view_background.b)/255.f, ((double)col_view_background.a)/255.f);
+//	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+//
+//	// Translate to inside of pixel (otherwise inaccuracies can occur on certain gl implementations)
+//	glTranslatef(0.375f, 0.375f, 0);
+//
+//	// Zoom/offset to show full map
+//	showMap();
+//
+//	// Translate to middle of canvas
+//	glTranslated(GetSize().x * 0.5, GetSize().y * 0.5, 0);
+//
+//	// Zoom
+//	glScaled(zoom, zoom, 1);
+//
+//	// Translate to offset
+//	glTranslated(-offset_x, -offset_y, 0);
+//
+//	// Setup drawing
+//	glDisable(GL_TEXTURE_2D);
+//	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+//	glLineWidth(1.5f);
+//	glEnable(GL_LINE_SMOOTH);
+//
+//	// Draw lines
+//	for (unsigned a = 0; a < lines.size(); a++) {
+//		mep_line_t line = lines[a];
+//
+//		// Check ends
+//		if (line.v1 >= verts.size() || line.v2 >= verts.size())
+//			continue;
+//
+//		// Get vertices
+//		mep_vertex_t v1 = verts[lines[a].v1];
+//		mep_vertex_t v2 = verts[lines[a].v2];
+//
+//		// Set colour
+//		if (line.special)
+//			col_view_line_special.set_gl();
+//		else if (line.macro)
+//			col_view_line_macro.set_gl();
+//		else if (line.twosided)
+//			col_view_line_2s.set_gl();
+//		else
+//			col_view_line_1s.set_gl();
+//
+//		// Draw line
+//		glBegin(GL_LINES);
+//		glVertex2d(v1.x, v1.y);
+//		glVertex2d(v2.x, v2.y);
+//		glEnd();
+//	}
+//
+//	glLineWidth(1.0f);
+//	glDisable(GL_LINE_SMOOTH);
+//
+//	// Swap buffers (ie show what was drawn)
+//	SwapBuffers();
+//}
 
 
 /* MEPCanvas::createImage
@@ -233,140 +221,140 @@ void MEPCanvas::draw() {
  * TODO: Find a way to generate an arbitrary-sized image through
  * tiled rendering.
  *******************************************************************/
-void MEPCanvas::createImage(ArchiveEntry& ae, int width, int height) {
-	// Setup colours
-	wxColour wxc;
-	wxc.Set(map_image_col_background);	rgba_t col_save_background(wxc.Red(), wxc.Green(), wxc.Blue(), 255);
-	wxc.Set(map_image_col_line_1s);		rgba_t col_save_line_1s(wxc.Red(), wxc.Green(), wxc.Blue(), 255);
-	wxc.Set(map_image_col_line_2s);		rgba_t col_save_line_2s(wxc.Red(), wxc.Green(), wxc.Blue(), 255);
-	wxc.Set(map_image_col_line_special);rgba_t col_save_line_special(wxc.Red(), wxc.Green(), wxc.Blue(), 255);
-	wxc.Set(map_image_col_line_macro);	rgba_t col_save_line_macro(wxc.Red(), wxc.Green(), wxc.Blue(), 255);
-	col_save_background.a = map_image_alpha_background;
-
-	// Setup OpenGL rigmarole
-	GLuint texID, fboID;
-	if (GLEW_ARB_framebuffer_object) {
-		glGenTextures(1, &texID);
-		glBindTexture(GL_TEXTURE_2D, texID);
-		// We don't use mipmaps, but OpenGL will refuse to attach
-		// the texture to the framebuffer if they are not present
-		glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-		glBindTexture(GL_TEXTURE_2D, 0);
-		glGenFramebuffersEXT(1, &fboID);
-		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboID);
-		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, texID, 0);
-		GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
-	}
-
-	glViewport(0, 0, width, height);
-
-	// Setup the screen projection
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, width, 0, height, -1, 1);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-	// Clear
-	glClearColor(((double)col_save_background.r)/255.f, ((double)col_save_background.g)/255.f,
-				 ((double)col_save_background.b)/255.f, ((double)col_save_background.a)/255.f);
-	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-
-	// Translate to inside of pixel (otherwise inaccuracies can occur on certain gl implementations)
-	glTranslatef(0.375f, 0.375f, 0);
-
-	// Zoom/offset to show full map
-	// Find extents of map
-	mep_vertex_t m_min(999999.0, 999999.0);
-	mep_vertex_t m_max(-999999.0, -999999.0);
-	for (unsigned a = 0; a < verts.size(); a++) {
-		if (verts[a].x < m_min.x)
-			m_min.x = verts[a].x;
-		if (verts[a].x > m_max.x)
-			m_max.x = verts[a].x;
-		if (verts[a].y < m_min.y)
-			m_min.y = verts[a].y;
-		if (verts[a].y > m_max.y)
-			m_max.y = verts[a].y;
-	}
-
-	// Offset to center of map
-	double mapwidth = m_max.x - m_min.x;
-	double mapheight = m_max.y - m_min.y;
-	offset_x = m_min.x + (mapwidth * 0.5);
-	offset_y = m_min.y + (mapheight * 0.5);
-
-	// Zoom to fit whole map
-	double x_scale = ((double)width) / mapwidth;
-	double y_scale = ((double)height) / mapheight;
-	zoom = MIN(x_scale, y_scale);
-	zoom *= 0.95;
-
-	// Translate to middle of canvas
-	glTranslated(width>>1, height>>1, 0);
-
-	// Zoom
-	glScaled(zoom, zoom, 1);
-
-	// Translate to offset
-	glTranslated(-offset_x, -offset_y, 0);
-
-	// Setup drawing
-	glDisable(GL_TEXTURE_2D);
-	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-	glLineWidth(map_image_thickness);
-	glEnable(GL_LINE_SMOOTH);
-
-	// Draw lines
-	for (unsigned a = 0; a < lines.size(); a++) {
-		mep_line_t line = lines[a];
-
-		// Check ends
-		if (line.v1 >= verts.size() || line.v2 >= verts.size())
-			continue;
-
-		// Get vertices
-		mep_vertex_t v1 = verts[lines[a].v1];
-		mep_vertex_t v2 = verts[lines[a].v2];
-
-		// Set colour
-		if (line.special)
-			col_save_line_special.set_gl();
-		else if (line.macro)
-			col_save_line_macro.set_gl();
-		else if (line.twosided)
-			col_save_line_2s.set_gl();
-		else
-			col_save_line_1s.set_gl();
-
-		// Draw line
-		glBegin(GL_LINES);
-		glVertex2d(v1.x, v1.y);
-		glVertex2d(v2.x, v2.y);
-		glEnd();
-	}
-
-	glLineWidth(1.0f);
-	glDisable(GL_LINE_SMOOTH);
-
-	uint8_t * ImageBuffer = new uint8_t[width * height * 4];
-	glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, ImageBuffer);
-
-	if (GLEW_ARB_framebuffer_object) {
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glDeleteTextures( 1, &texID );
-		glDeleteFramebuffersEXT( 1, &fboID );
-	}
-	SImage img;
-	img.setImageData(ImageBuffer, width, height, RGBA);
-	img.mirror(true);
-	MemChunk mc;
-	SIFormat::getFormat("png")->saveImage(img, mc);
-	ae.importMemChunk(mc);
-
-}
+//void MEPCanvas::createImage(ArchiveEntry& ae, int width, int height) {
+//	// Setup colours
+//	wxColour wxc;
+//	wxc.Set(map_image_col_background);	rgba_t col_save_background(wxc.Red(), wxc.Green(), wxc.Blue(), 255);
+//	wxc.Set(map_image_col_line_1s);		rgba_t col_save_line_1s(wxc.Red(), wxc.Green(), wxc.Blue(), 255);
+//	wxc.Set(map_image_col_line_2s);		rgba_t col_save_line_2s(wxc.Red(), wxc.Green(), wxc.Blue(), 255);
+//	wxc.Set(map_image_col_line_special);rgba_t col_save_line_special(wxc.Red(), wxc.Green(), wxc.Blue(), 255);
+//	wxc.Set(map_image_col_line_macro);	rgba_t col_save_line_macro(wxc.Red(), wxc.Green(), wxc.Blue(), 255);
+//	col_save_background.a = map_image_alpha_background;
+//
+//	// Setup OpenGL rigmarole
+//	GLuint texID, fboID;
+//	if (GLEW_ARB_framebuffer_object) {
+//		glGenTextures(1, &texID);
+//		glBindTexture(GL_TEXTURE_2D, texID);
+//		// We don't use mipmaps, but OpenGL will refuse to attach
+//		// the texture to the framebuffer if they are not present
+//		glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+//		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+//		glBindTexture(GL_TEXTURE_2D, 0);
+//		glGenFramebuffersEXT(1, &fboID);
+//		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboID);
+//		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, texID, 0);
+//		GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+//	}
+//
+//	glViewport(0, 0, width, height);
+//
+//	// Setup the screen projection
+//	glMatrixMode(GL_PROJECTION);
+//	glLoadIdentity();
+//	glOrtho(0, width, 0, height, -1, 1);
+//
+//	glMatrixMode(GL_MODELVIEW);
+//	glLoadIdentity();
+//
+//	// Clear
+//	glClearColor(((double)col_save_background.r)/255.f, ((double)col_save_background.g)/255.f,
+//				 ((double)col_save_background.b)/255.f, ((double)col_save_background.a)/255.f);
+//	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+//
+//	// Translate to inside of pixel (otherwise inaccuracies can occur on certain gl implementations)
+//	glTranslatef(0.375f, 0.375f, 0);
+//
+//	// Zoom/offset to show full map
+//	// Find extents of map
+//	mep_vertex_t m_min(999999.0, 999999.0);
+//	mep_vertex_t m_max(-999999.0, -999999.0);
+//	for (unsigned a = 0; a < verts.size(); a++) {
+//		if (verts[a].x < m_min.x)
+//			m_min.x = verts[a].x;
+//		if (verts[a].x > m_max.x)
+//			m_max.x = verts[a].x;
+//		if (verts[a].y < m_min.y)
+//			m_min.y = verts[a].y;
+//		if (verts[a].y > m_max.y)
+//			m_max.y = verts[a].y;
+//	}
+//
+//	// Offset to center of map
+//	double mapwidth = m_max.x - m_min.x;
+//	double mapheight = m_max.y - m_min.y;
+//	offset_x = m_min.x + (mapwidth * 0.5);
+//	offset_y = m_min.y + (mapheight * 0.5);
+//
+//	// Zoom to fit whole map
+//	double x_scale = ((double)width) / mapwidth;
+//	double y_scale = ((double)height) / mapheight;
+//	zoom = MIN(x_scale, y_scale);
+//	zoom *= 0.95;
+//
+//	// Translate to middle of canvas
+//	glTranslated(width>>1, height>>1, 0);
+//
+//	// Zoom
+//	glScaled(zoom, zoom, 1);
+//
+//	// Translate to offset
+//	glTranslated(-offset_x, -offset_y, 0);
+//
+//	// Setup drawing
+//	glDisable(GL_TEXTURE_2D);
+//	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+//	glLineWidth(map_image_thickness);
+//	glEnable(GL_LINE_SMOOTH);
+//
+//	// Draw lines
+//	for (unsigned a = 0; a < lines.size(); a++) {
+//		mep_line_t line = lines[a];
+//
+//		// Check ends
+//		if (line.v1 >= verts.size() || line.v2 >= verts.size())
+//			continue;
+//
+//		// Get vertices
+//		mep_vertex_t v1 = verts[lines[a].v1];
+//		mep_vertex_t v2 = verts[lines[a].v2];
+//
+//		// Set colour
+//		if (line.special)
+//			col_save_line_special.set_gl();
+//		else if (line.macro)
+//			col_save_line_macro.set_gl();
+//		else if (line.twosided)
+//			col_save_line_2s.set_gl();
+//		else
+//			col_save_line_1s.set_gl();
+//
+//		// Draw line
+//		glBegin(GL_LINES);
+//		glVertex2d(v1.x, v1.y);
+//		glVertex2d(v2.x, v2.y);
+//		glEnd();
+//	}
+//
+//	glLineWidth(1.0f);
+//	glDisable(GL_LINE_SMOOTH);
+//
+//	uint8_t * ImageBuffer = new uint8_t[width * height * 4];
+//	glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, ImageBuffer);
+//
+//	if (GLEW_ARB_framebuffer_object) {
+//		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+//		glDeleteTextures( 1, &texID );
+//		glDeleteFramebuffersEXT( 1, &fboID );
+//	}
+//	SImage img;
+//	img.setImageData(ImageBuffer, width, height, RGBA);
+//	img.mirror(true);
+//	MemChunk mc;
+//	SIFormat::getFormat("png")->saveImage(img, mc);
+//	ae.importMemChunk(mc);
+//
+//}
 
 /*******************************************************************
  * MAPENTRYPANEL CLASS FUNCTIONS
@@ -377,7 +365,7 @@ void MEPCanvas::createImage(ArchiveEntry& ae, int width, int height) {
  *******************************************************************/
 MapEntryPanel::MapEntryPanel(wxWindow* parent) : EntryPanel(parent, "map") {
 	// Setup map canvas
-	map_canvas = new MEPCanvas(this);
+	map_canvas = new MapPreviewCanvas(this);
 	sizer_main->Add(map_canvas->toPanel(this), 1, wxEXPAND, 0);
 
 	// Add 'Save Map Image' button
@@ -428,6 +416,10 @@ bool MapEntryPanel::loadEntry(ArchiveEntry* entry) {
 		return false;
 	}
 
+	// Load map into preview canvas
+	return map_canvas->openMap(thismap);
+
+	/*
 	// Parse UDMF map
 	if (thismap.format == MAP_UDMF) {
 		ArchiveEntry* udmfdata = NULL;
@@ -669,6 +661,7 @@ bool MapEntryPanel::loadEntry(ArchiveEntry* entry) {
 	map_canvas->Refresh();
 
 	return true;
+	*/
 }
 
 /* MapEntryPanel::saveEntry

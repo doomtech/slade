@@ -795,6 +795,9 @@
     <ClCompile Include="src\ThingTypeBrowser.cpp">
       <Filter>Map Editor\UI Elements</Filter>
     </ClCompile>
+    <ClCompile Include="src\MapPreviewCanvas.cpp">
+      <Filter>UI Elements</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -1484,6 +1487,9 @@
     </ClInclude>
     <ClInclude Include="src\ThingTypeBrowser.h">
       <Filter>Map Editor\UI Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MapPreviewCanvas.h">
+      <Filter>UI Elements</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

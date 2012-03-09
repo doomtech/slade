@@ -147,6 +147,14 @@ double MapCanvas::translateY(double y, bool inter) {
 		return double(-y / view_scale) + view_yoff + (double(GetSize().y * 0.5) / view_scale);
 }
 
+int MapCanvas::screenX(double x) {
+	return MathStuff::round((GetSize().x * 0.5) + ((x - view_xoff_inter) * view_scale_inter));
+}
+
+int MapCanvas::screenY(double y) {
+	return MathStuff::round((GetSize().y * 0.5) - ((y - view_yoff_inter) * view_scale_inter));
+}
+
 void MapCanvas::setView(double x, double y) {
 	// Set new view
 	view_xoff = x;
@@ -194,6 +202,7 @@ void MapCanvas::zoom(double amount, bool toward_cursor) {
 	view_br.y = translateY(0);
 
 	// Update object visibility
+	renderer_2d->setScale(view_scale_inter);
 	renderer_2d->updateVisibility(view_tl, view_br);
 }
 
@@ -232,6 +241,7 @@ void MapCanvas::viewFitToMap(bool snap) {
 	}
 
 	// Update object visibility
+	renderer_2d->setScale(view_scale_inter);
 	renderer_2d->forceUpdate();
 	renderer_2d->updateVisibility(view_tl, view_br);
 }
@@ -434,8 +444,8 @@ void MapCanvas::drawSelectionNumbers() {
 	// Go through selection
 	for (unsigned a = 0; a < selection.size(); a++) {
 		fpoint2_t tp = selection[a]->textPoint();
-		tp.x = (GetSize().x * 0.5) + ((tp.x - view_xoff_inter) * view_scale_inter);
-		tp.y = (GetSize().y * 0.5) - ((tp.y - view_yoff_inter) * view_scale_inter);
+		tp.x = screenX(tp.x);
+		tp.y = screenY(tp.y);
 
 		// Draw text 'shadow'
 		Drawing::drawText(S_FMT("%d", a+1), tp.x+3, tp.y+3, rgba_t(0, 0, 0, 255), Drawing::FONT_BOLD);

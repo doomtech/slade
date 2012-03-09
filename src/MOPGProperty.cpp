@@ -385,10 +385,15 @@ wxString MOPGThingTypeProperty::ValueToString(wxVariant &value, int argFlags) co
 
 bool MOPGThingTypeProperty::OnEvent(wxPropertyGrid* propgrid, wxWindow* window, wxEvent& e) {
 	if (e.GetEventType() == wxEVT_COMMAND_BUTTON_CLICKED) {
-		//int type = ThingTypeTreeView::showDialog(window, GetValue().GetInteger());
-		//if (type >= 0) SetValue(type);
-		ThingTypeBrowser browser(theMapEditor, GetValue().GetInteger());
+		// Get type to select initially (if any)
+		int init_type = -1;
+		if (!IsValueUnspecified())
+			init_type = GetValue().GetInteger();
+
+		// Open thing browser
+		ThingTypeBrowser browser(theMapEditor, init_type);
 		if (browser.ShowModal() == wxID_OK) {
+			// Set the value if a type was selected
 			int type = browser.getSelectedType();
 			if (type >= 0) SetValue(type);
 		}

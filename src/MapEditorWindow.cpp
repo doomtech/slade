@@ -213,6 +213,7 @@ bool MapEditorWindow::openMap(Archive::mapdesc_t map) {
 	if (ok) {
 		this->Show(true);
 		map_canvas->viewFitToMap();
+		map_canvas->Refresh();
 
 		// Set window title
 		SetTitle(S_FMT("SLADE - %s of %s", CHR(map.name), CHR(archive->getFilename(false))));
@@ -318,6 +319,8 @@ void MapEditorWindow::onSize(wxSizeEvent& e) {
 		mew_width = GetSize().x;
 		mew_height = GetSize().y;
 	}
+
+	e.Skip();
 }
 
 /* MapEditorWindow::onMove
