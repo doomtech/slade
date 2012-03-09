@@ -77,6 +77,7 @@ bool SImage::loadFont0(const uint8_t* gfx_data, int size) {
 	clearData();
 	has_palette = false;
 	type = PALMASK;
+	format = NULL;
 
 	// Technically each character is its own image, though.
 	numimages = 1;
@@ -142,6 +143,7 @@ bool SImage::loadFont1(const uint8_t* gfx_data, int size) {
 
 	// Clear current data if it exists
 	clearData();
+	format = NULL;
 
 	// Read raw pixel data
 	data = new uint8_t[width*height];
@@ -215,6 +217,7 @@ bool SImage::loadFont2(const uint8_t* gfx_data, int size) {
 	offset_x = offset_y = 0;
 	has_palette = true;
 	type = PALMASK;
+	format = NULL;
 
 	// Technically each character is its own image, though.
 	numimages = 1;
@@ -409,6 +412,7 @@ bool SImage::loadBMF(const uint8_t* gfx_data, int size) {
 	clearData();
 	type = PALMASK;
 	has_palette = true;
+	format = NULL;
 
 	// Technically each character is its own image, though.
 	numimages = 1;
@@ -526,6 +530,7 @@ bool SImage::loadFontM(const uint8_t* gfx_data, int size) {
 	offset_x = offset_y = 0;
 	has_palette = false;
 	type = PALMASK;
+	format = NULL;
 
 	size_t charwidth = 8;
 	size_t charheight = size>>8;
@@ -588,6 +593,7 @@ bool SImage::loadWolfFont(const uint8_t* gfx_data, int size) {
 	clearData();
 	has_palette = false;
 	type = PALMASK;
+	format = NULL;
 
 	// Technically each character is its own image, though.
 	numimages = 1;
@@ -664,6 +670,7 @@ bool SImage::loadJediFNT(const uint8_t* gfx_data, int size) {
 	clearData();
 	has_palette = false;
 	type = PALMASK;
+	format = NULL;
 
 	// Technically each character is its own image, though.
 	numimages = 1;
@@ -718,6 +725,7 @@ bool SImage::loadJediFONT(const uint8_t* gfx_data, int size) {
 	width = READ_L16(gfx_data, 4);
 	has_palette = false;
 	type = PALMASK;
+	format = NULL;
 
 	// reset data
 	clearData();

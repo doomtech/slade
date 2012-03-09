@@ -59,6 +59,7 @@ SImage::SImage(SIType type) {
 	mask = NULL;
 	offset_x = 0;
 	offset_y = 0;
+	format = NULL;
 	this->type = type;
 	numimages = 1;
 	imgindex = 0;

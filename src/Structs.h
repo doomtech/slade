@@ -248,7 +248,7 @@ struct rgba_t {
 		}
 	}
 
-	// Amplify/fade colour components by absolute amounts
+	// Amplify/fade colour components by given amounts
 	rgba_t amp(int R, int G, int B, int A) {
 		int nr = r + R;
 		int ng = g + G;

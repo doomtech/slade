@@ -941,6 +941,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\ThingTypeBrowser.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ThingTypeBrowser.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\ThingTypeTreeView.cpp"
 					>
 				</File>

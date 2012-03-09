@@ -257,7 +257,6 @@ void MEPCanvas::createImage(ArchiveEntry& ae, int width, int height) {
 		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboID);
 		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, texID, 0);
 		GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
-		if(status != GL_FRAMEBUFFER_COMPLETE_EXT) DPrintf("Framebuffer not used: %x", status);
 	}
 
 	glViewport(0, 0, width, height);

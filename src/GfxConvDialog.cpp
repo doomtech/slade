@@ -162,9 +162,11 @@ bool GfxConvDialog::nextItem() {
 
 	// Setup current format string
 	string fmt_string = "Current Format: ";
-	if (items[current_item].texture == NULL)
-		fmt_string += items[current_item].image.getFormat()->getName();
-	else
+	if (items[current_item].texture == NULL) {
+		if (items[current_item].image.getFormat())
+			fmt_string += items[current_item].image.getFormat()->getName();
+		else fmt_string += "Font";
+	} else
 		fmt_string += "Texture";
 	if (items[current_item].image.getType() == RGBA)
 		fmt_string += " (Truecolour)";
