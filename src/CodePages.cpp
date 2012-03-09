@@ -3,7 +3,7 @@
  * SLADE - It's a Doom Editor
  * Copyright (C) 2008-2012 Simon Judd
  *
- * Email:       veilofsorrow@gmail.com
+ * Email:       sirjuddington@gmail.com
  * Web:         http://slade.mancubus.net
  * Filename:    CodePages.cpp
  * Description: Stuff to handle conversion of bytes into Unicode

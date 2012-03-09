@@ -4,10 +4,13 @@
 
 class SToolBarGroup : public wxPanel {
 private:
+	string	name;
 
 public:
 	SToolBarGroup(wxWindow* parent, string name, bool force_name = false);
 	~SToolBarGroup();
+
+	string	getName() { return name; }
 
 	void	addActionButton(string action, string icon = "");
 	void	addCustomControl(wxWindow* control);

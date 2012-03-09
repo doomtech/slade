@@ -3,7 +3,7 @@
  * SLADE - It's a Doom Editor
  * Copyright (C) 2008-2012 Simon Judd
  *
- * Email:       veilofsorrow@gmail.com
+ * Email:       sirjuddington@gmail.com
  * Web:         http://slade.mancubus.net
  * Filename:    OGLCanvas.cpp
  * Description: OGLCanvas class. Abstract base class for all SLADE

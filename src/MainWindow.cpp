@@ -3,7 +3,7 @@
  * SLADE - It's a Doom Editor
  * Copyright (C) 2008-2012 Simon Judd
  *
- * Email:       veilofsorrow@gmail.com
+ * Email:       sirjuddington@gmail.com
  * Web:         http://slade.mancubus.net
  * Filename:    MainWindow.cpp
  * Description: MainWindow class, ie the main SLADE window
@@ -212,64 +212,9 @@ void MainWindow::setupLayout() {
 
 
 	// -- Toolbars --
-
-	/*
-	// Create File toolbar
-	wxAuiToolBar* tb_file = new wxAuiToolBar(this, -1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
-	theApp->getAction("aman_newwad")->addToToolbar(tb_file);
-	theApp->getAction("aman_newzip")->addToToolbar(tb_file);
-	theApp->getAction("aman_open")->addToToolbar(tb_file);
-	theApp->getAction("aman_save")->addToToolbar(tb_file);
-	theApp->getAction("aman_saveas")->addToToolbar(tb_file);
-	theApp->getAction("aman_saveall")->addToToolbar(tb_file);
-	theApp->getAction("aman_close")->addToToolbar(tb_file);
-	theApp->getAction("aman_closeall")->addToToolbar(tb_file);
-	tb_file->Realize();
-
-	// Create Archive toolbar
-	wxAuiToolBar* tb_archive = new wxAuiToolBar(this, -1);
-	theApp->getAction("arch_newentry")->addToToolbar(tb_archive);
-	theApp->getAction("arch_newdir")->addToToolbar(tb_archive);
-	theApp->getAction("arch_importfiles")->addToToolbar(tb_archive);
-	theApp->getAction("arch_texeditor")->addToToolbar(tb_archive);
-	theApp->getAction("arch_mapeditor")->addToToolbar(tb_archive);
-	tb_archive->Realize();
-
-	// Create Entry toolbar
-	wxAuiToolBar* tb_entry = new wxAuiToolBar(this, -1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
-	theApp->getAction("arch_entry_rename")->addToToolbar(tb_entry);
-	theApp->getAction("arch_entry_delete")->addToToolbar(tb_entry);
-	theApp->getAction("arch_entry_import")->addToToolbar(tb_entry);
-	theApp->getAction("arch_entry_export")->addToToolbar(tb_entry);
-	theApp->getAction("arch_entry_moveup")->addToToolbar(tb_entry);
-	theApp->getAction("arch_entry_movedown")->addToToolbar(tb_entry);
-	tb_entry->Realize();
-
-	// Create Base Resource Archive toolbar
-	wxAuiToolBar* tb_bra = new wxAuiToolBar(this, -1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
-	BaseResourceChooser* brc = new BaseResourceChooser(tb_bra);
-	tb_bra->AddLabel(-1, "Base Resource:");
-	tb_bra->AddControl(brc);
-	theApp->getAction("main_setbra")->addToToolbar(tb_bra, "t_settings");
-	tb_bra->Realize();
-
-	// Create Palette Chooser toolbar
-	wxAuiToolBar* tb_pal = new wxAuiToolBar(this, -1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
-	palette_chooser = new PaletteChooser(tb_pal, -1);
-	palette_chooser->selectPalette(global_palette);
-	tb_pal->AddLabel(-1, "Palette:");
-	tb_pal->AddControl(palette_chooser);
-	tb_pal->Realize();
-
-	// Setup panel info & add toolbar panels
-	m_mgr->AddPane(tb_file, wxAuiPaneInfo().ToolbarPane().Top().Name("tb_file").CloseButton(false));					// File toolbar
-	m_mgr->AddPane(tb_archive, wxAuiPaneInfo().ToolbarPane().Top().Name("tb_archive").Position(1).CloseButton(false));	// Archive toolbar
-	m_mgr->AddPane(tb_entry, wxAuiPaneInfo().ToolbarPane().Top().Name("tb_entry").Position(2).CloseButton(false));		// Entry toolbar
-	m_mgr->AddPane(tb_bra, wxAuiPaneInfo().ToolbarPane().Top().Name("tb_bra").Position(3).CloseButton(false));			// Base Resource Archive toolbar
-	m_mgr->AddPane(tb_pal, wxAuiPaneInfo().ToolbarPane().Top().Name("tb_pal").Position(4).CloseButton(false));			// Palette toolbar
-	*/
-
 	SToolBar* toolbar = new SToolBar(this);
+
+	// Create File toolbar
 	SToolBarGroup* tbg_file = new SToolBarGroup(toolbar, "File");
 	tbg_file->addActionButton("aman_newwad");
 	tbg_file->addActionButton("aman_newzip");
@@ -281,6 +226,7 @@ void MainWindow::setupLayout() {
 	tbg_file->addActionButton("aman_closeall");
 	toolbar->addGroup(tbg_file);
 
+	// Create Archive toolbar
 	SToolBarGroup* tbg_archive = new SToolBarGroup(toolbar, "Archive");
 	tbg_archive->addActionButton("arch_newentry");
 	tbg_archive->addActionButton("arch_newdir");
@@ -289,6 +235,7 @@ void MainWindow::setupLayout() {
 	tbg_archive->addActionButton("arch_mapeditor");
 	toolbar->addGroup(tbg_archive);
 
+	// Create Entry toolbar
 	SToolBarGroup* tbg_entry = new SToolBarGroup(toolbar, "Entry");
 	tbg_entry->addActionButton("arch_entry_rename");
 	tbg_entry->addActionButton("arch_entry_delete");
@@ -298,19 +245,21 @@ void MainWindow::setupLayout() {
 	tbg_entry->addActionButton("arch_entry_movedown");
 	toolbar->addGroup(tbg_entry);
 
+	// Create Base Resource Archive toolbar
 	SToolBarGroup* tbg_bra = new SToolBarGroup(toolbar, "Base Resource", true);
 	BaseResourceChooser* brc = new BaseResourceChooser(tbg_bra);
 	tbg_bra->addCustomControl(brc);
 	tbg_bra->addActionButton("main_setbra", "t_settings");
 	toolbar->addGroup(tbg_bra);
 
+	// Create Palette Chooser toolbar
 	SToolBarGroup* tbg_palette = new SToolBarGroup(toolbar, "Palette", true);
 	palette_chooser = new PaletteChooser(tbg_palette, -1);
 	palette_chooser->selectPalette(global_palette);
 	tbg_palette->addCustomControl(palette_chooser);
 	toolbar->addGroup(tbg_palette);
 
-	int height = toolbar->GetSize().x;
+	// Add toolbar
 	m_mgr->AddPane(toolbar, wxAuiPaneInfo().Top().CaptionVisible(false).MinSize(-1, 30).Resizable(false).PaneBorder(false).Name("toolbar"));
 
 

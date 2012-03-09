@@ -39,15 +39,18 @@ public:
 		dc.Clear();
 
 		// Draw separator lines
-		dc.SetPen(wxPen(col_dark));
-		dc.DrawLine(1, 1, 1, 21);
-		dc.SetPen(wxPen(col_light));
-		dc.DrawLine(2, 1, 2, 21);
+		dc.GradientFillLinear(wxRect(1, 0, 1, 11), col_background, col_dark, wxSOUTH);
+		dc.GradientFillLinear(wxRect(1, 11, 1, 11), col_background, col_dark, wxNORTH);
+		dc.GradientFillLinear(wxRect(2, 0, 1, 11), col_background, col_light, wxSOUTH);
+		dc.GradientFillLinear(wxRect(2, 11, 1, 11), col_background, col_light, wxNORTH);
 	}
 };
 
 
 SToolBarGroup::SToolBarGroup(wxWindow* parent, string name, bool force_name) : wxPanel(parent, -1) {
+	// Init variables
+	this->name = name;
+
 	// Set colours
 	SetBackgroundColour(wxSystemSettings::GetColour(stb_bg));
 

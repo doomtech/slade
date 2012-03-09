@@ -3,7 +3,7 @@
  * SLADE - It's a Doom Editor
  * Copyright (C) 2008-2012 Simon Judd
  *
- * Email:       veilofsorrow@gmail.com
+ * Email:       sirjuddington@gmail.com
  * Web:         http://slade.mancubus.net
  * Filename:    MapEditorWindow.cpp
  * Description: MapEditorWindow class, it's a map editor window.
@@ -37,6 +37,7 @@
 #include "ArchiveManager.h"
 #include "MapObjectPropsPanel.h"
 #include "MainWindow.h"
+#include "SToolBar.h"
 #include <wx/aui/aui.h>
 
 
@@ -64,6 +65,12 @@ MapEditorWindow::MapEditorWindow()
 	if (mew_maximized) Maximize();
 	setupLayout();
 	Show(false);
+
+	// Set icon
+	string icon_filename = appPath("slade.ico", DIR_TEMP);
+	theArchiveManager->programResourceArchive()->getEntry("slade.ico")->exportFile(icon_filename);
+	SetIcon(wxIcon(icon_filename, wxBITMAP_TYPE_ICO));
+	wxRemoveFile(icon_filename);
 
 	// Bind events
 	Bind(wxEVT_CLOSE_WINDOW, &MapEditorWindow::onClose, this);
@@ -123,24 +130,25 @@ void MapEditorWindow::setupLayout() {
 
 
 	// --- Toolbars ---
+	SToolBar* toolbar = new SToolBar(this);
 
 	// Map toolbar
-	wxAuiToolBar* tb_map = new wxAuiToolBar(this, -1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
-	theApp->getAction("mapw_save")->addToToolbar(tb_map);
-	theApp->getAction("mapw_rename")->addToToolbar(tb_map);
-	tb_map->Realize();
+	SToolBarGroup* tbg_map = new SToolBarGroup(toolbar, "Map");
+	tbg_map->addActionButton("mapw_save");
+	tbg_map->addActionButton("mapw_rename");
+	toolbar->addGroup(tbg_map);
 
 	// Mode toolbar
-	wxAuiToolBar* tb_mode = new wxAuiToolBar(this, -1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
-	theApp->getAction("mapw_mode_vertices")->addToToolbar(tb_mode);
-	theApp->getAction("mapw_mode_lines")->addToToolbar(tb_mode);
-	theApp->getAction("mapw_mode_sectors")->addToToolbar(tb_mode);
-	theApp->getAction("mapw_mode_things")->addToToolbar(tb_mode);
-	tb_mode->Realize();
+	SToolBarGroup* tbg_mode = new SToolBarGroup(toolbar, "Mode");
+	tbg_mode->addActionButton("mapw_mode_vertices");
+	tbg_mode->addActionButton("mapw_mode_lines");
+	tbg_mode->addActionButton("mapw_mode_sectors");
+	tbg_mode->addActionButton("mapw_mode_things");
+	toolbar->addGroup(tbg_mode);
 
-	// Add toolbar panels
-	m_mgr->AddPane(tb_map, wxAuiPaneInfo().ToolbarPane().Top().Name("tb_map").CloseButton(false));		// Map toolbar
-	m_mgr->AddPane(tb_mode, wxAuiPaneInfo().ToolbarPane().Top().Name("tb_mode").CloseButton(false));	// Mode toolbar
+	// Add toolbar
+	m_mgr->AddPane(toolbar, wxAuiPaneInfo().Top().CaptionVisible(false).MinSize(-1, 30).Resizable(false).PaneBorder(false).Name("toolbar"));
+
 
 	// Status bar
 	CreateStatusBar();
