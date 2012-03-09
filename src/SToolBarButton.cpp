@@ -106,6 +106,11 @@ void SToolBarButton::onMouseEvent(wxMouseEvent& e) {
 	else if (e.GetEventType() == wxEVT_LEFT_DOWN) {
 		state = STATE_MOUSEDOWN;
 		Refresh();
+
+		//wxCommandEvent e(wxEVT_COMMAND_MENU_SELECTED, GetId());
+		//e.SetId(theApp->getAction(action)->getWxId());
+		//e.SetEventObject(this);
+		//GetEventHandler()->ProcessEvent(e);
 		theApp->doAction(action);
 	}
 
@@ -115,5 +120,6 @@ void SToolBarButton::onMouseEvent(wxMouseEvent& e) {
 		Refresh();
 	}
 
-	e.Skip();
+	else
+		e.Skip();
 }

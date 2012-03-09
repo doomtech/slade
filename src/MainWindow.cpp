@@ -681,6 +681,13 @@ void MainWindow::onSize(wxSizeEvent& e) {
 		mw_width = GetSize().x;
 		mw_height = GetSize().y;
 	}
+
+	wxAuiPaneInfo& p_inf = m_mgr->GetPane("toolbar");
+	p_inf.window->Layout();
+	p_inf.MinSize(-1, p_inf.window->GetBestSize().y);
+	m_mgr->Update();
+
+	e.Skip();
 }
 
 /* MainWindow::onMove

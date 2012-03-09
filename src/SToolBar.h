@@ -16,12 +16,17 @@ public:
 class SToolBar : public wxPanel {
 private:
 	vector<SToolBarGroup*>	groups;
+	vector<wxWindow*>		separators;
 
 public:
 	SToolBar(wxWindow* parent);
 	~SToolBar();
 
 	void	addGroup(SToolBarGroup* group);
+	void	updateLayout();
+
+	// Events
+	void	onSize(wxSizeEvent& e);
 };
 
 #endif//__S_TOOL_BAR_H__
