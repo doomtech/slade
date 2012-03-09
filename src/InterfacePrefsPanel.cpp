@@ -41,6 +41,7 @@ EXTERN_CVAR(Bool, show_start_page)
 EXTERN_CVAR(Bool, swap_epanel_bars)
 EXTERN_CVAR(Bool, context_submenus)
 EXTERN_CVAR(Bool, list_font_monospace)
+EXTERN_CVAR(Bool, toolbar_background_grey)
 
 
 /*******************************************************************
@@ -84,6 +85,11 @@ InterfacePrefsPanel::InterfacePrefsPanel(wxWindow* parent) : wxPanel(parent, -1)
 	cb_start_page = new wxCheckBox(this, -1, "Show Start Page on Startup");
 	sizer->Add(cb_start_page, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
+	// Force grey toolbar background
+	cb_toolbar_background_grey = new wxCheckBox(this, -1, "Force toolbar background to grey colour");
+	cb_toolbar_background_grey->SetToolTip("Forces the toolbar to have a grey background, as on some systems the native colours may make text difficult to read");
+	sizer->Add(cb_toolbar_background_grey, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
 
 	// Init controls
 	cb_size_as_string->SetValue(size_as_string);
@@ -92,6 +98,7 @@ InterfacePrefsPanel::InterfacePrefsPanel(wxWindow* parent) : wxPanel(parent, -1)
 	cb_start_page->SetValue(show_start_page);
 	cb_swap_epanel_bars->SetValue(swap_epanel_bars);
 	cb_context_submenus->SetValue(context_submenus);
+	cb_toolbar_background_grey->SetValue(toolbar_background_grey);
 }
 
 /* InterfacePrefsPanel::~InterfacePrefsPanel
@@ -110,4 +117,5 @@ void InterfacePrefsPanel::applyPreferences() {
 	show_start_page = cb_start_page->GetValue();
 	swap_epanel_bars = cb_swap_epanel_bars->GetValue();
 	context_submenus = cb_context_submenus->GetValue();
+	toolbar_background_grey = cb_toolbar_background_grey->GetValue();
 }
