@@ -32,6 +32,7 @@
 #include "Main.h"
 #include "WxStuff.h"
 #include "BrowserCanvas.h"
+#include "Drawing.h"
 
 
 /*******************************************************************
@@ -54,6 +55,9 @@ BrowserCanvas::BrowserCanvas(wxWindow* parent) : OGLCanvas(parent, -1) {
 	item_border = 8;
 	scrollbar = NULL;
 	item_selected = 0;
+	font = Drawing::FONT_BOLD;
+	show_names = NAMES_ALL;
+	item_size = -1;
 
 	// Bind events
 	Bind(wxEVT_SIZE, &BrowserCanvas::onSize, this);
@@ -73,7 +77,10 @@ BrowserCanvas::~BrowserCanvas() {
  * Returns the 'full' (including border) width of each item
  *******************************************************************/
 int BrowserCanvas::fullItemSizeX() {
-	return browser_item_size + (item_border*2);
+	if (item_size > 0)
+		return item_size + (item_border*2);
+	else
+		return browser_item_size + (item_border*2);
 }
 
 /* BrowserCanvas::fullItemSizeY
@@ -81,7 +88,14 @@ int BrowserCanvas::fullItemSizeX() {
  * item
  *******************************************************************/
 int BrowserCanvas::fullItemSizeY() {
-	return browser_item_size + (item_border*2) + 16;
+	int gap = 16;
+	if (show_names != NAMES_ALL)
+		gap = 0;
+
+	if (item_size > 0)
+		return item_size + (item_border*2) + gap;
+	else
+		return browser_item_size + (item_border*2) + gap;
 }
 
 /* BrowserCanvas::draw
@@ -139,8 +153,14 @@ void BrowserCanvas::draw() {
 			top_y = y - yoff;
 		}
 
+		// Determine whether to draw item name
+		bool showname = (show_names == NAMES_ALL);
+
 		// Draw item
-		items[items_filter[a]]->draw(browser_item_size, x, y - yoff);
+		if (item_size <= 0)
+			items[items_filter[a]]->draw(browser_item_size, x, y - yoff, font, showname);
+		else
+			items[items_filter[a]]->draw(item_size, x, y - yoff, font, showname);
 
 		// Draw selection box if selected
 		if (item_selected == a) {
@@ -183,6 +203,16 @@ void BrowserCanvas::draw() {
 			// Canvas is filled, stop drawing
 			if (y > yoff + GetSize().y)
 				break;
+		}
+	}
+
+	// Draw item name at the bottom if required
+	if (show_names == NAMES_SELECTED) {
+		BrowserItem* item = getSelectedItem();
+		if (item) {
+			int center_x = GetSize().x * 0.5;
+			Drawing::drawText(item->getName(), center_x+1, GetSize().y - 16, rgba_t(0,0,0,200), Drawing::FONT_BOLD, Drawing::ALIGN_CENTER);
+			Drawing::drawText(item->getName(), center_x, GetSize().y - 17, COL_WHITE, Drawing::FONT_BOLD, Drawing::ALIGN_CENTER);
 		}
 	}
 

@@ -15,6 +15,9 @@ private:
 	// Display
 	int	yoff;
 	int	item_border;
+	int	font;
+	int	show_names;
+	int	item_size;
 
 	// Item selection
 	int	top_index;
@@ -24,6 +27,12 @@ private:
 public:
 	BrowserCanvas(wxWindow* parent);
 	~BrowserCanvas();
+
+	enum {
+		NAMES_NONE,
+		NAMES_ALL,
+		NAMES_SELECTED,
+	};
 
 	vector<BrowserItem*>&	itemList() { return items; }
 	int						fullItemSizeX();
@@ -36,6 +45,9 @@ public:
 	void					filterItems(string filter);
 	void					showItem(int item, bool top = true);
 	bool					searchItemFrom(int from);
+	void					setFont(int font) { this->font = font; }
+	void					showNames(int show) { this->show_names = show; }
+	void					setItemSize(int size) { this->item_size = size; }
 
 	// Events
 	void	onSize(wxSizeEvent& e);

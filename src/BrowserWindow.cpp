@@ -268,6 +268,8 @@ bool BrowserWindow::selectItem(string name, BrowserTreeNode* node) {
 			openTree(node);
 			canvas->selectItem(a);
 			canvas->showItem(a);
+			tree_items->SelectItem(node->getTreeId());
+			tree_items->Expand(node->getTreeId());
 			return true;
 		}
 	}
@@ -351,6 +353,9 @@ void BrowserWindow::openTree(BrowserTreeNode* node, bool clear) {
 		canvas->updateScrollBar();
 		canvas->filterItems(text_filter->GetValue());
 	}
+
+	// Clear item selection
+	canvas->selectItem(-1);
 }
 
 /* BrowserWindow::populateItemTree
@@ -384,10 +389,41 @@ void BrowserWindow::addItemTree(BrowserTreeNode* node, wxTreeItemId& item) {
 		// Add tree item
 		BrowserTreeNode* child = (BrowserTreeNode*)node->getChild(a);
 		wxTreeItemId i = tree_items->AppendItem(item, child->getName(), -1, -1, new BrowserTreeItemData(child));
+		child->setTreeId(i);
 
 		// Add children
 		addItemTree(child, i);
 	}
+}
+
+/* BrowserWindow::setFont
+ * Sets the font to be used for item names
+ *******************************************************************/
+void BrowserWindow::setFont(int font) {
+	canvas->setFont(font);
+}
+
+/* BrowserWindow::showSelectedNameOnly
+ * Sets whether to only show the name for the currently selected item
+ * (true) or all items (false)
+ *******************************************************************/
+void BrowserWindow::showNames(int show) {
+	canvas->showNames(show);
+}
+
+/* BrowserWindow::setItemSize
+ * Sets the item size (0 or less to use zoom slider)
+ *******************************************************************/
+void BrowserWindow::setItemSize(int size) {
+	canvas->setItemSize(size);
+
+	if (size <= 0)
+		slider_zoom->Enable(true);
+	else
+		slider_zoom->Enable(false);
+
+	Layout();
+	Refresh();
 }
 
 

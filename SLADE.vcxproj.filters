@@ -792,6 +792,9 @@
     <ClCompile Include="src\SToolBarButton.cpp">
       <Filter>UI Elements\SToolBar</Filter>
     </ClCompile>
+    <ClCompile Include="src\ThingTypeBrowser.cpp">
+      <Filter>Map Editor\UI Elements</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GfxConvDialog.h">
@@ -1478,6 +1481,9 @@
     </ClInclude>
     <ClInclude Include="src\SToolBarButton.h">
       <Filter>UI Elements\SToolBar</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThingTypeBrowser.h">
+      <Filter>Map Editor\UI Elements</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

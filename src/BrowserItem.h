@@ -22,7 +22,7 @@ public:
 	unsigned	getIndex() { return index; }
 
 	virtual bool	loadImage();
-	void			draw(int size, int x, int y);
+	void			draw(int size, int x, int y, int font, bool showname = true);
 	void			clearImage();
 };
 

@@ -7,6 +7,8 @@
 #include "ThingTypeTreeView.h"
 #include "GameConfiguration.h"
 #include "MapObjectPropsPanel.h"
+#include "ThingTypeBrowser.h"
+#include "MapEditorWindow.h"
 
 
 void MOPGProperty::resetValue() {
@@ -383,8 +385,13 @@ wxString MOPGThingTypeProperty::ValueToString(wxVariant &value, int argFlags) co
 
 bool MOPGThingTypeProperty::OnEvent(wxPropertyGrid* propgrid, wxWindow* window, wxEvent& e) {
 	if (e.GetEventType() == wxEVT_COMMAND_BUTTON_CLICKED) {
-		int type = ThingTypeTreeView::showDialog(window, GetValue().GetInteger());
-		if (type >= 0) SetValue(type);
+		//int type = ThingTypeTreeView::showDialog(window, GetValue().GetInteger());
+		//if (type >= 0) SetValue(type);
+		ThingTypeBrowser browser(theMapEditor, GetValue().GetInteger());
+		if (browser.ShowModal() == wxID_OK) {
+			int type = browser.getSelectedType();
+			if (type >= 0) SetValue(type);
+		}
 	}
 
 	return wxIntProperty::OnEvent(propgrid, window, e);

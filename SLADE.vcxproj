@@ -248,6 +248,7 @@
     <ClCompile Include="src\TextureXPanel.cpp" />
     <ClCompile Include="src\ThingInfoOverlay.cpp" />
     <ClCompile Include="src\ThingType.cpp" />
+    <ClCompile Include="src\ThingTypeBrowser.cpp" />
     <ClCompile Include="src\ThingTypeTreeView.cpp" />
     <ClCompile Include="src\Tokenizer.cpp" />
     <ClCompile Include="src\Translation.cpp" />
@@ -474,6 +475,7 @@
     <ClInclude Include="src\TextureXPanel.h" />
     <ClInclude Include="src\ThingInfoOverlay.h" />
     <ClInclude Include="src\ThingType.h" />
+    <ClInclude Include="src\ThingTypeBrowser.h" />
     <ClInclude Include="src\ThingTypeTreeView.h" />
     <ClInclude Include="src\Tokenizer.h" />
     <ClInclude Include="src\Translation.h" />

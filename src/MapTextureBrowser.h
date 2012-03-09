@@ -4,6 +4,16 @@
 
 #include "BrowserWindow.h"
 
+class MapTexBrowserItem : public BrowserItem {
+private:
+
+public:
+	MapTexBrowserItem(string name);
+	~MapTexBrowserItem();
+
+	bool	loadImage();
+};
+
 class MapTextureBrowser : public BrowserWindow {
 private:
 

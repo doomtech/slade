@@ -12,6 +12,7 @@ class BrowserTreeNode : public STreeNode {
 private:
 	string 					name;
 	vector<BrowserItem*>	items;
+	wxTreeItemId			tree_id;
 
 	STreeNode* createChild(string name) {
 		BrowserTreeNode* node = new BrowserTreeNode();
@@ -23,8 +24,10 @@ public:
 	BrowserTreeNode(BrowserTreeNode* parent = NULL);
 	~BrowserTreeNode();
 
-	string		getName() { return name; }
-	void		setName(string name) { this->name = name; }
+	string			getName() { return name; }
+	wxTreeItemId	getTreeId() { return tree_id; }
+	void			setName(string name) { this->name = name; }
+	void			setTreeId(wxTreeItemId id) { this->tree_id = id; }
 
 	void			clearItems();
 	unsigned		nItems() { return items.size(); }
@@ -66,6 +69,11 @@ public:
 
 	void	populateItemTree();
 	void	addItemTree(BrowserTreeNode* node, wxTreeItemId& item);
+
+	// Canvas display options
+	void	setFont(int font);
+	void	showNames(int show);
+	void	setItemSize(int size);
 
 	// Events
 	void	onTreeItemSelected(wxTreeEvent& e);

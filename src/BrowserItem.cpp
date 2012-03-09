@@ -67,7 +67,7 @@ bool BrowserItem::loadImage() {
  * Draws the item in a [size]x[size] box, keeping the correct aspect
  * ratio of it's image
  *******************************************************************/
-void BrowserItem::draw(int size, int x, int y) {
+void BrowserItem::draw(int size, int x, int y, int font, bool showname) {
 	// Try to load image if it isn't already
 	if (!image || (image && !image->isLoaded()))
 		loadImage();
@@ -82,22 +82,24 @@ void BrowserItem::draw(int size, int x, int y) {
 		// Outline
 		glBegin(GL_LINE_LOOP);
 		glVertex2i(x, y);
-		glVertex2i(x, size);
-		glVertex2i(size, size);
-		glVertex2i(size, y);
+		glVertex2i(x, y+size);
+		glVertex2i(x+size, y+size);
+		glVertex2i(x+size, y);
 		glEnd();
 
 		// X
 		glBegin(GL_LINES);
 		glVertex2i(x, y);
-		glVertex2i(size, size);
-		glVertex2i(x, size);
-		glVertex2i(size, y);
+		glVertex2i(x+size, y+size);
+		glVertex2i(x, y+size);
+		glVertex2i(x+size, y);
 		glEnd();
 
 		// Item name
-		Drawing::drawText(name, x+(size*0.5+1), y+size+5, COL_BLACK, Drawing::FONT_BOLD, Drawing::ALIGN_CENTER);
-		Drawing::drawText(name, x+(size*0.5), y+size+4, COL_WHITE, Drawing::FONT_BOLD, Drawing::ALIGN_CENTER);
+		if (showname) {
+			Drawing::drawText(name, x+(size*0.5+1), y+size+5, COL_BLACK, font, Drawing::ALIGN_CENTER);
+			Drawing::drawText(name, x+(size*0.5), y+size+4, COL_WHITE, font, Drawing::ALIGN_CENTER);
+		}
 
 		glPopAttrib();
 
@@ -147,8 +149,10 @@ void BrowserItem::draw(int size, int x, int y) {
 	glEnd();
 
 	// Item name
-	Drawing::drawText(name, x+(size*0.5+1), y+size+5, COL_BLACK, Drawing::FONT_BOLD, Drawing::ALIGN_CENTER);
-	Drawing::drawText(name, x+(size*0.5), y+size+4, COL_WHITE, Drawing::FONT_BOLD, Drawing::ALIGN_CENTER);
+	if (showname) {
+		Drawing::drawText(name, x+(size*0.5+1), y+size+5, COL_BLACK, font, Drawing::ALIGN_CENTER);
+		Drawing::drawText(name, x+(size*0.5), y+size+4, COL_WHITE, font, Drawing::ALIGN_CENTER);
+	}
 }
 
 /* BrowserItem::clearImage
