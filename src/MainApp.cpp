@@ -373,6 +373,9 @@ void MainApp::initActions() {
 
 	// ArchivePanel
 	new SAction("arch_newentry", "New Entry", "t_newentry", "Create a new empty entry");
+	new SAction("arch_newpalette", "New PLAYPAL", "e_palette", "Create a new palette entry");
+	new SAction("arch_newanimated", "New ANIMATED", "t_animation", "Create a new Boom ANIMATED entry");
+	new SAction("arch_newswitches", "New SWITCHES", "t_switch", "Create a new Boom SWITCHES entry");
 	new SAction("arch_newdir", "New Directory", "t_newfolder", "Create a new empty directory");
 	new SAction("arch_importfiles", "&Import Files", "t_importfiles", "Import multiple files into the archive");
 	new SAction("arch_texeditor", "&Texture Editor", "t_texeditor", "Open the texture editor for the current archive");
@@ -448,6 +451,18 @@ void MainApp::initActions() {
 	new SAction("txed_patch_back", "Send Selected Patch(es) Back", "t_patch_back", "Send selected patch(es) toward the back");
 	new SAction("txed_patch_forward", "Bring Selected Patch(es) Forward", "t_patch_forward", "Bring selected patch(es) toward the front");
 	new SAction("txed_patch_duplicate", "Duplicate Selected Patch(es)", "t_patch_duplicate", "Duplicate the selected patch(es)");
+
+	// AnimatedEntryPanel
+	new SAction("anim_new", "New Animation", "t_animation_new", "Create a new, dummy animation");
+	new SAction("anim_delete", "Delete Animation", "t_animation_delete", "Deletes the selected animation(s) from the list");
+	new SAction("anim_up", "Move Up", "t_up", "Move the selected animation(s) up in the list");
+	new SAction("anim_down", "Move Down", "t_down", "Move the selected animation(s) down in the list");
+
+	// SwitchesEntryPanel
+	new SAction("swch_new", "New Switch", "t_switch_new", "Create a new, dummy switch");
+	new SAction("swch_delete", "Delete Switch", "t_switch_delete", "Deletes the selected switch(es) from the list");
+	new SAction("swch_up", "Move Up", "t_up", "Move the selected switch(es) up in the list");
+	new SAction("swch_down", "Move Down", "t_down", "Move the selected switch(es) down in the list");
 
 	// PaletteEntryPanel
 	new SAction("ppal_addcustom", "Add to Custom Palettes", "t_plus", "Add the current palette to the custom palettes list");

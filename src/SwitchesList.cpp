@@ -29,6 +29,7 @@
 #include "Main.h"
 #include "Misc.h"
 #include "SwitchesList.h"
+#include "ListView.h"
 
 /*******************************************************************
  * SWITCHESENTRY CLASS FUNCTIONS
@@ -42,6 +43,7 @@ SwitchesEntry::SwitchesEntry(switches_t entry) {
 	this->off = wxString::From8BitData(entry.off, 8);
 	this->on = wxString::From8BitData(entry.on, 8);
 	this->type = entry.type;
+	this->status = LV_STATUS_NORMAL;
 }
 
 /* SwitchesEntry::~SwitchesEntry
@@ -137,6 +139,57 @@ bool SwitchesList::readSWITCHESData(ArchiveEntry* switches) {
 	return true;
 }
 
+/* SwitchesList::addEntry
+ * Adds an entry at the given position
+ *******************************************************************/
+bool SwitchesList::addEntry(SwitchesEntry* entry, size_t pos) {
+	if (entry == NULL)
+		return false;
+	if (pos >= nEntries()) {
+		entries.push_back(entry);
+	} else {
+		vector<SwitchesEntry*>::iterator it = entries.begin() + pos;
+		entries.insert(it, entry);
+	}
+	return true;
+}
+
+/* SwitchesList::removeEntry
+ * Removes the entry at the given position
+ *******************************************************************/
+bool SwitchesList::removeEntry(size_t pos) {
+	if (pos >= nEntries()) {
+		entries.pop_back();
+	} else {
+		vector<SwitchesEntry*>::iterator it = entries.begin() + pos;
+		entries.erase(it);
+	}
+	return true;
+}
+
+/* SwitchesList::swapEntries
+ * Swaps the entries at the given positions
+ *******************************************************************/
+bool SwitchesList::swapEntries(size_t pos1, size_t pos2) {
+	if (pos1 >= nEntries()) {
+		pos1 = nEntries() - 1;
+	}
+	if (pos2 >= nEntries()) {
+		pos2 = nEntries() - 1;
+	}
+	if (pos1 == pos2) {
+		return false;
+	}
+	SwitchesEntry* swap = entries[pos1];
+	entries[pos1] = entries[pos2];
+	entries[pos2] = swap;
+	return true;
+}
+
+/* SwitchesList::convertSwitches
+ * Converts SWITCHES data in [entry] to ANIMDEFS format, written to
+ * [animdata]
+ *******************************************************************/
 bool SwitchesList::convertSwitches(ArchiveEntry* entry, MemChunk* animdata) {
 	const uint8_t * cursor = entry->getData(true);
 	const uint8_t * eodata = cursor + entry->getSize();
@@ -146,7 +199,7 @@ bool SwitchesList::convertSwitches(ArchiveEntry* entry, MemChunk* animdata) {
 	while (cursor < eodata && *cursor != SWCH_STOP) {
 		// reads an entry
 		if (cursor + sizeof(switches_t) > eodata) {
-			wxLogMessage("Error: ANIMATED entry is corrupt");
+			wxLogMessage("Error: SWITCHES entry is corrupt");
 			return false;
 		}
 		switches = (switches_t *) cursor;

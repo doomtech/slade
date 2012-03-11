@@ -29,6 +29,7 @@
 #include "Main.h"
 #include "Misc.h"
 #include "AnimatedList.h"
+#include "ListView.h"
 
 /*******************************************************************
  * ANIMATEDENTRY CLASS FUNCTIONS
@@ -44,6 +45,7 @@ AnimatedEntry::AnimatedEntry(animated_t entry) {
 	this->type = entry.type & ANIM_MASK;
 	this->speed = wxINT32_SWAP_ON_BE(entry.speed);
 	this->decals = !!(entry.type & ANIM_DECALS);
+	this->status = LV_STATUS_NORMAL;
 }
 
 /* AnimatedEntry::~AnimatedEntry
@@ -139,36 +141,50 @@ bool AnimatedList::readANIMATEDData(ArchiveEntry* animated) {
 	return true;
 }
 
-/* AnimatedList::writeANIMATEDData
- * Write in a Boom-format ANIMATED entry. Returns true on success,
- * false otherwise
+/* AnimatedList::addEntry
+ * Adds an entry at the given position
  *******************************************************************/
-bool AnimatedList::writeANIMATEDData(ArchiveEntry* animated) {
-	// Check entries were actually given
-	if (!animated)
+bool AnimatedList::addEntry(AnimatedEntry* entry, size_t pos) {
+	if (entry == NULL)
 		return false;
-
-	uint8_t * data = new uint8_t[animated->getSize()];
-	memcpy(data, animated->getData(), animated->getSize());
-	uint8_t * cursor = data;
-	uint8_t * eodata = cursor + animated->getSize();
-	animated_t * type;
-
-	while (cursor < eodata && *cursor != ANIM_STOP) {
-		// reads an entry
-		if (cursor + sizeof(animated_t) > eodata) {
-			wxLogMessage("Error: ANIMATED entry is corrupt");
-			delete[] data;
-			return false;
-		}
-		type = (animated_t *) cursor;
-		AnimatedEntry * entry = new AnimatedEntry(*type);
-		cursor += sizeof(animated_t);
-
-		// Add texture to list
+	if (pos >= nEntries()) {
 		entries.push_back(entry);
+	} else {
+		vector<AnimatedEntry*>::iterator it = entries.begin() + pos;
+		entries.insert(it, entry);
 	}
-	delete[] data;
+	return true;
+}
+
+/* AnimatedList::removeEntry
+ * Removes the entry at the given position
+ *******************************************************************/
+bool AnimatedList::removeEntry(size_t pos) {
+	if (pos >= nEntries()) {
+		entries.pop_back();
+	} else {
+		vector<AnimatedEntry*>::iterator it = entries.begin() + pos;
+		entries.erase(it);
+	}
+	return true;
+}
+
+/* AnimatedList::swapEntries
+ * Swaps the entries at the given positions
+ *******************************************************************/
+bool AnimatedList::swapEntries(size_t pos1, size_t pos2) {
+	if (pos1 >= nEntries()) {
+		pos1 = nEntries() - 1;
+	}
+	if (pos2 >= nEntries()) {
+		pos2 = nEntries() - 1;
+	}
+	if (pos1 == pos2) {
+		return false;
+	}
+	AnimatedEntry* swap = entries[pos1];
+	entries[pos1] = entries[pos2];
+	entries[pos2] = swap;
 	return true;
 }
 

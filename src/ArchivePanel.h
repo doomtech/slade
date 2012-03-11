@@ -36,6 +36,13 @@ protected:
 	EntryPanel* map_area;
 	EntryPanel* audio_area;
 
+	enum NewEntries {
+		ENTRY_EMPTY = 0,
+		ENTRY_PALETTE,
+		ENTRY_ANIMATED,
+		ENTRY_SWITCHES,
+	};
+
 public:
 	ArchivePanel(wxWindow *parent, Archive* archive);
 	~ArchivePanel();
@@ -50,7 +57,7 @@ public:
 	// Archive manipulation actions
 	bool	save();
 	bool	saveAs();
-	bool	newEntry();
+	bool	newEntry(int type = ENTRY_EMPTY);
 	bool	newDirectory();
 	bool	importFiles();
 	bool	convertArchiveTo();

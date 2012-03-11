@@ -60,6 +60,7 @@
 #include "MapEditorWindow.h"
 #include "KeyBind.h"
 #include "MapEditorConfigDialog.h"
+#include "PaletteManager.h"
 #include <wx/aui/auibook.h>
 #include <wx/aui/auibar.h>
 #include <wx/filename.h>
@@ -114,6 +115,48 @@ public:
 		}
 
 		return true;
+	}
+};
+
+/*******************************************************************
+ * CHOOSEPALETTEDIALOG CLASS
+ *******************************************************************
+ A simple dialog for the 'Choose Palette' function when creating a
+ new palette entry.
+ */
+class ChoosePaletteDialog : public wxDialog {
+private:
+	PaletteChooser*	pal_chooser;
+
+public:
+	ChoosePaletteDialog(wxWindow* parent)
+	: wxDialog(parent, -1, "Choose Base Palette", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER) {
+
+		// Set dialog icon
+		wxIcon icon;
+		icon.CopyFromBitmap(getIcon("e_palette"));
+		SetIcon(icon);
+
+		// Setup main sizer
+		wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+		SetSizer(sizer);
+
+		// Add choose
+		pal_chooser = new PaletteChooser(this, -1);
+		sizer->Add(pal_chooser, 0, wxEXPAND|wxALL, 4);
+
+		sizer->Add(CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+		// Init layout
+		Layout();
+
+		// Setup dialog size
+		SetInitialSize(wxSize(-1, -1));
+		SetMinSize(GetSize());
+	}
+
+	int getChoice() {
+		return pal_chooser->GetSelection();
 	}
 };
 
@@ -271,6 +314,9 @@ void ArchivePanel::addMenus() {
 		wxMenu* menu_new = new wxMenu("");
 		theApp->getAction("arch_newentry")->addToMenu(menu_new, "&Entry");
 		theApp->getAction("arch_newdir")->addToMenu(menu_new, "&Directory");
+		theApp->getAction("arch_newpalette")->addToMenu(menu_new, "&PLAYPAL");
+		theApp->getAction("arch_newanimated")->addToMenu(menu_new, "&ANIMATED");
+		theApp->getAction("arch_newswitches")->addToMenu(menu_new, "&SWITCHES");
 		menu_archive = new wxMenu();
 		menu_archive->AppendSubMenu(menu_new, "&New");
 		theApp->getAction("arch_importfiles")->addToMenu(menu_archive);
@@ -384,9 +430,24 @@ bool ArchivePanel::saveAs() {
  * one if no name is entered. Returns true if the entry was created,
  * false otherwise.
  *******************************************************************/
-bool ArchivePanel::newEntry() {
-	// Prompt for new entry name
-	string name = wxGetTextFromUser("Enter new entry name:", "New Entry");
+bool ArchivePanel::newEntry(int type) {
+	// Prompt for new entry name if needed
+	string name;
+	switch (type) {
+		default:
+		case ENTRY_EMPTY:
+			name = wxGetTextFromUser("Enter new entry name:", "New Entry");
+			break;
+		case ENTRY_PALETTE:
+			name = "playpal.lmp";
+			break;
+		case ENTRY_ANIMATED:
+			name = "animated.lmp";
+			break;
+		case ENTRY_SWITCHES:
+			name = "switches.lmp";
+			break;
+	}
 
 	// Check if any name was entered
 	if (name == "")
@@ -414,6 +475,44 @@ bool ArchivePanel::newEntry() {
 
 	// Add the entry to the archive
 	ArchiveEntry* new_entry = archive->addNewEntry(name, index, entry_list->getCurrentDir());
+
+	// Deal with specific entry type that we may want created
+	if (type && new_entry) {
+		ArchiveEntry* e_import;
+		MemChunk mc;
+		ChoosePaletteDialog cp(this);
+		switch (type) {
+			// Import a palette from the available ones
+			case ENTRY_PALETTE:
+				if (cp.ShowModal() == wxID_OK) {
+					Palette8bit * pal;
+					int choice = cp.getChoice();
+					if (choice)
+						pal = thePaletteManager->getPalette(choice - 1);
+					else pal = thePaletteManager->globalPalette();
+					pal->saveMem(mc);
+				} else {
+					mc.reSize(256 * 3);
+				}
+				new_entry->importMemChunk(mc);
+				break;
+			// Import the ZDoom definitions as a baseline
+			case ENTRY_ANIMATED:
+				e_import = theArchiveManager->programResourceArchive()->entryAtPath("animated.lmp");
+				if (e_import)
+					new_entry->importEntry(e_import);
+				break;
+			// Import the Boom definitions as a baseline
+			case ENTRY_SWITCHES:
+				e_import = theArchiveManager->programResourceArchive()->entryAtPath("switches.lmp");
+				if (e_import)
+					new_entry->importEntry(e_import);
+				break;
+			// This is just to silence compilers that insist on default cases being handled
+			default:
+				break;
+		}
+	}
 
 	// Return whether the entry was created ok
 	return !!new_entry;
@@ -1602,6 +1701,11 @@ bool ArchivePanel::handleAction(string id) {
 	// Archive->New->Entry
 	else if (id == "arch_newentry")
 		newEntry();
+
+	// Archive->New->Entry variants
+	else if (id == "arch_newpalette")	newEntry(ENTRY_PALETTE);
+	else if (id == "arch_newanimated")	newEntry(ENTRY_ANIMATED);
+	else if (id == "arch_newswitches")	newEntry(ENTRY_SWITCHES);
 
 	// Archive->New->Directory
 	else if (id == "arch_newdir")

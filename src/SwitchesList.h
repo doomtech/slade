@@ -7,9 +7,10 @@
 class SwitchesEntry
 {
 private:
-	uint8_t				type;
+	uint16_t			type;
 	string				off;
 	string				on;
+	int					status;
 
 public:
 	SwitchesEntry(switches_t entry);
@@ -18,7 +19,11 @@ public:
 	string		getOff()	{ return off; }
 	string		getOn()		{ return on; }
 	uint8_t		getType()	{ return type; }
-};
+	int			getStatus()	{ return status; }
+	void		setOff(string o)	{ off = o; }
+	void		setOn(string o)		{ on = o; }
+	void		setType(uint16_t t)	{ type = t; }
+	void		setStatus(int s)	{ status = s; }};
 
 class SwitchesList {
 private:
@@ -33,7 +38,9 @@ public:
 	SwitchesEntry*	getEntry(string name);
 	void			clear();
 	bool			readSWITCHESData(ArchiveEntry* switches);
-	bool			writeSWITCHESData(ArchiveEntry* switches);
+	bool			addEntry(SwitchesEntry* entry, size_t pos);
+	bool			removeEntry(size_t pos);
+	bool			swapEntries(size_t pos1, size_t pos2);
 
 	// Static functions
 	static bool convertSwitches(ArchiveEntry* entry, MemChunk* animdata);

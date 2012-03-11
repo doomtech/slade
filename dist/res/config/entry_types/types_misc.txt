@@ -120,7 +120,7 @@ entry_types
 		match_name = "animated";
 		editor = animated;
 		export_ext = "lmp";
-		icon = "e_data";
+		icon = "e_animated";
 	}
 
 	switches
@@ -130,7 +130,7 @@ entry_types
 		match_name = "switches";
 		editor = switches;
 		export_ext = "lmp";
-		icon = "e_data";
+		icon = "e_switches";
 	}
 
 	misc_rle0

@@ -16,7 +16,7 @@ enum AnimatedType
 	ANIM_FLAT = 0,
 	ANIM_TEXTURE = 1,
 	ANIM_MASK = 1,
-	ANIM_DECALS = 3, // ZDoom uses bit 1 to flag whether decals are allowed.
+	ANIM_DECALS = 2, // ZDoom uses bit 1 to flag whether decals are allowed.
 	ANIM_STOP = 255,
 };
 
@@ -35,10 +35,11 @@ struct animated_t
 
 enum SwitchesType
 {
-	SWCH_STOP = 0,
-	SWCH_DEMO = 1,
-	SWCH_FULL = 2,
-	SWCH_COMM = 3,
+	SWCH_STOP = wxINT16_SWAP_ON_BE(0),
+	SWCH_DEMO = wxINT16_SWAP_ON_BE(1),
+	SWCH_FULL = wxINT16_SWAP_ON_BE(2),
+	SWCH_COMM = wxINT16_SWAP_ON_BE(3),
+	SWCH_OOPS = wxINT16_SWAP_ON_BE(4),
 };
 
 struct switches_t
