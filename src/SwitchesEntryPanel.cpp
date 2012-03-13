@@ -159,7 +159,7 @@ bool SwitchesEntryPanel::handleAction(string id) {
  *******************************************************************/
 bool SwitchesEntryPanel::loadEntry(ArchiveEntry* entry) {
 	// Do nothing if entry is already open
-	if (this->entry == entry)
+	if (this->entry == entry && !isModified())
 		return true;
 
 	// Read SWITCHES entry into list
@@ -343,6 +343,9 @@ void SwitchesEntryPanel::add() {
 	insertListItem(se, index);
 	list_entries->enableSizeUpdate(true);
 	list_entries->EnsureVisible(index);
+
+	// Update variables
+	setModified(true);
 }
 
 /* SwitchesEntryPanel::remove
@@ -491,8 +494,10 @@ void SwitchesEntryPanel::onListRightClick(wxListEvent& e) {
 void SwitchesEntryPanel::onTypeChanged(wxCommandEvent& e) {
 	if ((rbtn_shareware->GetValue()  && se_current->getType() != SWCH_DEMO) ||
 		(rbtn_registered->GetValue() && se_current->getType() != SWCH_FULL) ||
-		(rbtn_commercial->GetValue() && se_current->getType() != SWCH_COMM))
+		(rbtn_commercial->GetValue() && se_current->getType() != SWCH_COMM)) {
 		se_modified = true;
+		setModified(true);
+	}
 }
 
 /* SwitchesEntryPanel::onOffNameChanged
@@ -509,6 +514,7 @@ void SwitchesEntryPanel::onOffNameChanged(wxCommandEvent& e) {
 		text_offname->SetInsertionPoint(ip);
 		if (tmpstr.CmpNoCase(se_current->getOff())) {
 			se_modified = true;
+			setModified(true);
 		}
 	}
 }
@@ -527,6 +533,7 @@ void SwitchesEntryPanel::onOnNameChanged(wxCommandEvent& e) {
 		text_onname->SetInsertionPoint(ip);
 		if (tmpstr.CmpNoCase(se_current->getOn())) {
 			se_modified = true;
+			setModified(true);
 		}
 	}
 }

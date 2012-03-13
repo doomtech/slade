@@ -188,7 +188,7 @@ bool AnimatedEntryPanel::handleAction(string id) {
  *******************************************************************/
 bool AnimatedEntryPanel::loadEntry(ArchiveEntry* entry) {
 	// Do nothing if entry is already open
-	if (this->entry == entry)
+	if (this->entry == entry && !isModified())
 		return true;
 
 	// Read ANIMATED entry into texturexlist
@@ -331,7 +331,6 @@ void AnimatedEntryPanel::applyChanges() {
 			break;
 		}
 	}
-	setModified(true);
 	list_entries->enableSizeUpdate(true);
 }
 
@@ -385,6 +384,9 @@ void AnimatedEntryPanel::add() {
 	insertListItem(ae, index);
 	list_entries->enableSizeUpdate(true);
 	list_entries->EnsureVisible(index);
+
+	// Update variables
+	setModified(true);
 }
 
 /* AnimatedEntryPanel::remove
@@ -531,8 +533,11 @@ void AnimatedEntryPanel::onListRightClick(wxListEvent& e) {
  * Called when the 'flat' and 'texture' radio buttons are toggled
  *******************************************************************/
 void AnimatedEntryPanel::onTypeChanged(wxCommandEvent& e) {
-	if (rbtn_texture->GetValue() != !!ae_current->getType())
+	if (rbtn_texture->GetValue() != !!ae_current->getType()) {
 		ae_modified = true;
+		setModified(true);
+	}
+
 	// Enable the decals checkbox for textures
 	if (rbtn_texture->GetValue()) {
 		cbox_decals->Enable();
@@ -549,10 +554,13 @@ void AnimatedEntryPanel::onTypeChanged(wxCommandEvent& e) {
 void AnimatedEntryPanel::onSwirlChanged(wxCommandEvent& e) {
 	if (cbox_swirl->GetValue() != ae_current->getSpeed() > 65535) {
 		ae_modified = true;
+		setModified(true);
+
 		if (cbox_swirl->GetValue())
 			ae_current->setSpeed(65536);
 		else
 			ae_current->setSpeed(8);
+
 		text_speed->ChangeValue(S_FMT("%d", ae_current->getSpeed()));
 	}
 }
@@ -567,6 +575,7 @@ void AnimatedEntryPanel::onDecalsChanged(wxCommandEvent& e) {
 	}
 	if (cbox_decals->GetValue() != ae_current->getDecals()) {
 		ae_modified = true;
+		setModified(true);
 		ae_current->setDecals(cbox_decals->GetValue());
 	}
 }
@@ -585,6 +594,7 @@ void AnimatedEntryPanel::onFirstNameChanged(wxCommandEvent& e) {
 		text_firstname->SetInsertionPoint(ip);
 		if (tmpstr.CmpNoCase(ae_current->getFirst())) {
 			ae_modified = true;
+			setModified(true);
 		}
 	}
 }
@@ -603,6 +613,7 @@ void AnimatedEntryPanel::onLastNameChanged(wxCommandEvent& e) {
 		text_lastname->SetInsertionPoint(ip);
 		if (tmpstr.CmpNoCase(ae_current->getLast())) {
 			ae_modified = true;
+			setModified(true);
 		}
 	}
 }
@@ -616,7 +627,8 @@ void AnimatedEntryPanel::onSpeedChanged(wxCommandEvent& e) {
 		string tmpstr = text_speed->GetValue();
 		long tmpval;
 		if (tmpstr.ToLong(&tmpval) && ae_current->getSpeed() != tmpval) {
-			ae_modified = true;
+			//ae_modified = true;
+			setModified(true);
 			ae_current->setSpeed(tmpval);
 		} else {
 			size_t ip = text_speed->GetInsertionPoint();
