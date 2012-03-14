@@ -1527,8 +1527,16 @@ void ArchiveManagerPanel::onArchiveTabChanged(wxAuiNotebookEvent& e) {
  * Called when the user clicks the close button on an archive tab
  *******************************************************************/
 void ArchiveManagerPanel::onArchiveTabClose(wxAuiNotebookEvent& e) {
+	// Get tab that is closing
+	int tabindex = e.GetSelection();
+	if (wxMAJOR_VERSION == 2 && wxMINOR_VERSION <= 9 && wxRELEASE_NUMBER < 2)	// For wxWidgets 2.9.1 and earlier compatibility
+		tabindex = e.GetInt();
+	if (tabindex < 0)
+		return;
+
+	// Close the tab's archive if needed
 	if (close_archive_with_tab) {
-		Archive* archive = getArchive(e.GetInt());
+		Archive* archive = getArchive(tabindex);
 		if (archive) {
 			tab_closing = theArchiveManager->archiveIndex(archive) + 1;
 			if (!closeArchive(archive))
@@ -1538,8 +1546,8 @@ void ArchiveManagerPanel::onArchiveTabClose(wxAuiNotebookEvent& e) {
 	}
 
 	// Check for texture editor
-	if (notebook_archives->GetPage(e.GetInt())->GetName() == "texture") {
-		TextureXEditor* txed = (TextureXEditor*)(notebook_archives->GetPage(e.GetInt()));
+	if (notebook_archives->GetPage(tabindex)->GetName() == "texture") {
+		TextureXEditor* txed = (TextureXEditor*)(notebook_archives->GetPage(tabindex));
 		if (!txed->close())
 			e.Veto();
 	}
