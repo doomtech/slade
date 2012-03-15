@@ -41,6 +41,7 @@ private:
 	uint8_t		mouse_state;
 	bool		zooming_cursor;
 	bool		mouse_selbegin;
+	bool		mouse_movebegin;
 
 	// Info overlays
 	int					last_hilight;
@@ -92,6 +93,7 @@ public:
 
 	void	itemSelected(int index, bool selected = true);
 	void	itemsSelected(vector<int>& items, bool selected = true);
+	void	updateInfoOverlay();
 
 	// Keybind handling
 	void	onKeyBindPress(string name);

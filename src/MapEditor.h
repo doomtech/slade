@@ -84,6 +84,7 @@ public:
 	void		getSelectedThings(vector<MapThing*>& list);
 	void		getSelectedObjects(vector<MapObject*>& list);
 	void		showItem(int index);
+	bool		isHilightOrSelection() { return selection.size() > 0 || hilight_item != -1; }
 
 	// Grid
 	void	incrementGrid();
@@ -99,6 +100,8 @@ public:
 
 	// Editing
 	void	splitLine(double x, double y, double min_dist = 64);
+	void	changeSectorHeight(int amount, bool floor = true, bool ceiling = true);
+	void	changeSectorLight(int amount);
 
 	// Editor messages
 	unsigned	numEditorMessages();
@@ -108,6 +111,8 @@ public:
 
 	// Misc
 	string	getModeString();
+	bool	handleKeyBind(string key);
+	void	updateDisplay();
 };
 
 #endif//__MAP_EDITOR_H__

@@ -88,6 +88,7 @@ MapCanvas::MapCanvas(wxWindow *parent, int id, MapEditor* editor)
 	anim_view_speed = 0.05;
 	zooming_cursor = false;
 	mouse_selbegin = false;
+	mouse_movebegin = false;
 
 	timer.Start(2);
 #ifdef USE_SFML_RENDERWINDOW
@@ -681,7 +682,7 @@ void MapCanvas::update(long frametime) {
 	float mult = (float)frametime / 10.0f;
 
 	// Update hilight if needed
-	if (mouse_state == MSTATE_NORMAL)
+	if (mouse_state == MSTATE_NORMAL && !mouse_movebegin)
 		editor->updateHilight(mouse_pos_m, view_scale);
 
 	// Do item moving if needed
@@ -932,6 +933,16 @@ void MapCanvas::itemsSelected(vector<int>& items, bool selected) {
 	}
 }
 
+void MapCanvas::updateInfoOverlay() {
+	// Update info overlay depending on edit mode
+	switch (editor->editMode()) {
+	case MapEditor::MODE_VERTICES:	info_vertex.update(editor->getHilightedVertex()); break;
+	case MapEditor::MODE_LINES:		info_line.update(editor->getHilightedLine()); break;
+	case MapEditor::MODE_SECTORS:	info_sector.update(editor->getHilightedSector()); break;
+	case MapEditor::MODE_THINGS:	info_thing.update(editor->getHilightedThing()); break;
+	}
+}
+
 void MapCanvas::onKeyBindPress(string name) {
 	// Pan left
 	if (name == "me2d_left")
@@ -1053,6 +1064,10 @@ void MapCanvas::onKeyBindPress(string name) {
 	// Split line
 	else if (name == "me2d_line_split" && editor->editMode() == MapEditor::MODE_LINES)
 		editor->splitLine(mouse_pos_m.x, mouse_pos_m.y);
+
+	// Not handled here, send to editor
+	else
+		editor->handleKeyBind(name);
 }
 
 void MapCanvas::onKeyBindRelease(string name) {
@@ -1092,7 +1107,7 @@ bool MapCanvas::handleAction(string id) {
 		return true;
 	}
 
-	// Not handled
+	// Not handled here
 	return false;
 }
 
@@ -1167,9 +1182,11 @@ void MapCanvas::onMouseDown(wxMouseEvent& e) {
 
 	// Right button
 	else if (e.RightDown()) {
-		if (editor->beginMove(mouse_downpos_m)) {
-			mouse_state = MSTATE_MOVE;
-			renderer_2d->forceUpdate();
+		//if (editor->beginMove(mouse_downpos_m)) {
+		if (editor->isHilightOrSelection()) {
+			//mouse_state = MSTATE_MOVE;
+			//renderer_2d->forceUpdate();
+			mouse_movebegin = true;
 		}
 		else if (editor->editMode() == MapEditor::MODE_VERTICES)
 			editor->splitLine(mouse_pos_m.x, mouse_pos_m.y, 16/view_scale);
@@ -1209,6 +1226,8 @@ void MapCanvas::onMouseUp(wxMouseEvent& e) {
 
 	// Right button
 	else if (e.RightUp()) {
+		mouse_movebegin = false;
+
 		if (mouse_state == MSTATE_MOVE) {
 			editor->endMove();
 			mouse_state = MSTATE_NORMAL;
@@ -1235,6 +1254,14 @@ void MapCanvas::onMouseMotion(wxMouseEvent& e) {
 	// Check if we want to start a selection box
 	if (mouse_selbegin && fpoint2_t(mouse_pos.x - mouse_downpos.x, mouse_pos.y - mouse_downpos.y).magnitude() > 16)
 		mouse_state = MSTATE_SELECTION;
+
+	// Check if we want to start moving
+	if (mouse_movebegin && fpoint2_t(mouse_pos.x - mouse_downpos.x, mouse_pos.y - mouse_downpos.y).magnitude() > 4) {
+		mouse_movebegin = false;
+		editor->beginMove(mouse_downpos_m);
+		mouse_state = MSTATE_MOVE;
+		renderer_2d->forceUpdate();
+	}
 
 	e.Skip();
 }

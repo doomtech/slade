@@ -310,10 +310,10 @@ keypress_t KeyBind::asKeyPress(int keycode, int modifiers) {
 
 void KeyBind::initBinds() {
 	// General
-	addBind("copy", keypress_t("C", false, true), "Copy");
-	addBind("cut", keypress_t("X", false, true), "Cut");
-	addBind("paste", keypress_t("V", false, true), "Paste");
-	addBind("select_all", keypress_t("A", false, true), "Select All");
+	addBind("copy", keypress_t("C", KPM_CTRL), "Copy");
+	addBind("cut", keypress_t("X", KPM_CTRL), "Cut");
+	addBind("paste", keypress_t("V", KPM_CTRL), "Paste");
+	addBind("select_all", keypress_t("A", KPM_CTRL), "Select All");
 
 	// Map Editor 2D (me2d*)
 	addBind("me2d_clear_selection", keypress_t("C"), "Clear selection");
@@ -324,10 +324,10 @@ void KeyBind::initBinds() {
 	addBind("me2d_zoom_out_m", keypress_t("mwheeldown"), "Zoom out (towards mouse)");
 	addBind("me2d_zoom_in", keypress_t(PLUSKEY), "Zoom in (towards screen center)");
 	addBind("me2d_zoom_out", keypress_t("-"), "Zoom out (towards screen center)");
-	addBind("me2d_show_object", keypress_t(PLUSKEY, false, false, true), "Zoom in, show current object");
-	addBind("me2d_show_object", keypress_t("mwheelup", false, false, true));
-	addBind("me2d_show_all", keypress_t("-", false, false, true), "Zoom out, show full map");
-	addBind("me2d_show_all", keypress_t("mwheeldown", false, false, true));
+	addBind("me2d_show_object", keypress_t(PLUSKEY, KPM_SHIFT), "Zoom in, show current object");
+	addBind("me2d_show_object", keypress_t("mwheelup", KPM_SHIFT));
+	addBind("me2d_show_all", keypress_t("-", KPM_SHIFT), "Zoom out, show full map");
+	addBind("me2d_show_all", keypress_t("mwheeldown", KPM_SHIFT));
 	addBind("me2d_left", keypress_t("left"), "Scroll left");
 	addBind("me2d_right", keypress_t("right"), "Scroll right");
 	addBind("me2d_up", keypress_t("up"), "Scroll up");
@@ -338,46 +338,64 @@ void KeyBind::initBinds() {
 	addBind("me2d_mode_lines", keypress_t("L"), "Lines mode");
 	addBind("me2d_mode_sectors", keypress_t("S"), "Sectors mode");
 	addBind("me2d_mode_things", keypress_t("T"), "Things mode");
-	addBind("me2d_flat_type", keypress_t("F", false, true), "Cycle Flat Type");
-	addBind("me2d_line_split", keypress_t("S", true, false, true), "Split nearest line");
+	addBind("me2d_flat_type", keypress_t("F", KPM_CTRL), "Cycle flat type");
+	addBind("me2d_split_line", keypress_t("S", KPM_ALT|KPM_SHIFT), "Split nearest line");
+
+	// Map Editor 2D Sectors mode (me2d_sector*)
+	addBind("me2d_sector_light_up16", keypress_t("'"), "Light level up 16");
+	addBind("me2d_sector_light_up", keypress_t("'", KPM_SHIFT), "Light level up 1");
+	addBind("me2d_sector_light_down16", keypress_t(";"), "Light level down 16");
+	addBind("me2d_sector_light_down", keypress_t(";", KPM_SHIFT), "Light level down 1");
+	addBind("me2d_sector_floor_up8", keypress_t(".", KPM_CTRL), "Floor height up 8");
+	addBind("me2d_sector_floor_up", keypress_t(".", KPM_CTRL|KPM_SHIFT), "Floor height up 1");
+	addBind("me2d_sector_floor_down8", keypress_t(",", KPM_CTRL), "Floor height down 8");
+	addBind("me2d_sector_floor_down", keypress_t(",", KPM_CTRL|KPM_SHIFT), "Floor height down 1");
+	addBind("me2d_sector_ceil_up8", keypress_t(".", KPM_ALT), "Ceiling height up 8");
+	addBind("me2d_sector_ceil_up", keypress_t(".", KPM_ALT|KPM_SHIFT), "Ceiling height up 1");
+	addBind("me2d_sector_ceil_down8", keypress_t(",", KPM_ALT), "Ceiling height down 8");
+	addBind("me2d_sector_ceil_down", keypress_t(",", KPM_ALT|KPM_SHIFT), "Ceiling height down 1");
+	addBind("me2d_sector_height_up8", keypress_t("."), "Height up 8");
+	addBind("me2d_sector_height_up", keypress_t(".", KPM_SHIFT), "Height up 1");
+	addBind("me2d_sector_height_down8", keypress_t(","), "Height down 8");
+	addBind("me2d_sector_height_down", keypress_t(",", KPM_SHIFT), "Height down 1");
 
 	// Map Editor 3D (me3d*)
 
 	// Entry List (el*)
-	addBind("el_new", keypress_t("N", false, true), "New Entry");
+	addBind("el_new", keypress_t("N", KPM_CTRL), "New Entry");
 	addBind("el_delete", keypress_t("delete"), "Delete Entry");
-	addBind("el_move_up", keypress_t("U", false, true), "Move Entry up");
-	addBind("el_move_down", keypress_t("D", false, true), "Move Entry down");
-	addBind("el_rename", keypress_t("R", false, true), "Rename Entry");
+	addBind("el_move_up", keypress_t("U", KPM_CTRL), "Move Entry up");
+	addBind("el_move_down", keypress_t("D", KPM_CTRL), "Move Entry down");
+	addBind("el_rename", keypress_t("R", KPM_CTRL), "Rename Entry");
 	addBind("el_rename", keypress_t("f2"));
-	addBind("el_import", keypress_t("I", false, true), "Import to Entry");
-	addBind("el_import_files", keypress_t("I", false, true, true), "Import Files");
-	addBind("el_export", keypress_t("E", false, true), "Export Entry");
+	addBind("el_import", keypress_t("I", KPM_CTRL), "Import to Entry");
+	addBind("el_import_files", keypress_t("I", KPM_CTRL|KPM_SHIFT), "Import Files");
+	addBind("el_export", keypress_t("E", KPM_CTRL), "Export Entry");
 	addBind("el_up_dir", keypress_t("backspace"), "Up one directory");
 
 	// Texture editor (txed*)
-	addBind("txed_patch_left", keypress_t("left", false, true), "Move Patch left");
+	addBind("txed_patch_left", keypress_t("left", KPM_CTRL), "Move Patch left");
 	addBind("txed_patch_left8", keypress_t("left"), "Move Patch left 8");
-	addBind("txed_patch_up", keypress_t("up", false, true), "Move Patch up");
+	addBind("txed_patch_up", keypress_t("up", KPM_CTRL), "Move Patch up");
 	addBind("txed_patch_up8", keypress_t("up"), "Move Patch up 8");
-	addBind("txed_patch_right", keypress_t("right", false, true), "Move Patch right");
+	addBind("txed_patch_right", keypress_t("right", KPM_CTRL), "Move Patch right");
 	addBind("txed_patch_right8", keypress_t("right"), "Move Patch right 8");
-	addBind("txed_patch_down", keypress_t("down", false, true), "Move Patch down");
+	addBind("txed_patch_down", keypress_t("down", KPM_CTRL), "Move Patch down");
 	addBind("txed_patch_down8", keypress_t("down"), "Move Patch down 8");
 	addBind("txed_patch_add", keypress_t("insert"), "Add Patch");
 	addBind("txed_patch_delete", keypress_t("delete"), "Delete Patch");
 	addBind("txed_patch_replace", keypress_t("f2"), "Replace Patch");
-	addBind("txed_patch_replace", keypress_t("R", false, true));
-	addBind("txed_patch_duplicate", keypress_t("D", false, true), "Duplicate Patch");
+	addBind("txed_patch_replace", keypress_t("R", KPM_CTRL));
+	addBind("txed_patch_duplicate", keypress_t("D", KPM_CTRL), "Duplicate Patch");
 	addBind("txed_patch_forward", keypress_t("]"), "Bring Patch forward");
 	addBind("txed_patch_back", keypress_t("["), "Send Patch back");
-	addBind("txed_tex_up", keypress_t("up", false, true), "Move Texture up");
-	addBind("txed_tex_up", keypress_t("U", false, true));
-	addBind("txed_tex_down", keypress_t("down", false, true), "Move Texture down");
-	addBind("txed_tex_down", keypress_t("D", false, true));
-	addBind("txed_tex_new", keypress_t("N", false, true), "New Texture");
-	addBind("txed_tex_new_patch", keypress_t("N", false, true, true), "New Texture from Patch");
-	addBind("txed_tex_new_file", keypress_t("N", true, true), "New Texture from File");
+	addBind("txed_tex_up", keypress_t("up", KPM_CTRL), "Move Texture up");
+	addBind("txed_tex_up", keypress_t("U", KPM_CTRL));
+	addBind("txed_tex_down", keypress_t("down", KPM_CTRL), "Move Texture down");
+	addBind("txed_tex_down", keypress_t("D", KPM_CTRL));
+	addBind("txed_tex_new", keypress_t("N", KPM_CTRL), "New Texture");
+	addBind("txed_tex_new_patch", keypress_t("N", KPM_CTRL|KPM_SHIFT), "New Texture from Patch");
+	addBind("txed_tex_new_file", keypress_t("N", KPM_CTRL|KPM_ALT), "New Texture from File");
 	addBind("txed_tex_delete", keypress_t("delete"), "Delete Texture");
 }
 

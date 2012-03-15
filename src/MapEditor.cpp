@@ -218,7 +218,7 @@ bool MapEditor::updateHilight(fpoint2_t mouse_pos, double dist_scale) {
 		}
 	}
 
-	// Update map object properties panel is the hilight changed
+	// Update map object properties panel if the hilight changed
 	if (current != hilight_item && selection.size() == 0) {
 		switch (edit_mode) {
 		case MODE_VERTICES: theMapEditor->propsPanel()->openObject(map.getVertex(hilight_item)); break;
@@ -599,15 +599,27 @@ void MapEditor::getSelectedThings(vector<MapThing*>& list) {
 
 void MapEditor::getSelectedObjects(vector<MapObject*>& list) {
 	// Go through selection
-	for (unsigned a = 0; a < selection.size(); a++) {
+	if (selection.size() > 0) {
+		for (unsigned a = 0; a < selection.size(); a++) {
+			if (edit_mode == MODE_VERTICES)
+				list.push_back(map.getVertex(selection[a]));
+			else if (edit_mode == MODE_LINES)
+				list.push_back(map.getLine(selection[a]));
+			else if (edit_mode == MODE_SECTORS)
+				list.push_back(map.getSector(selection[a]));
+			else if (edit_mode == MODE_THINGS)
+				list.push_back(map.getThing(selection[a]));
+		}
+	}
+	else {
 		if (edit_mode == MODE_VERTICES)
-			list.push_back(map.getVertex(selection[a]));
-		else if (edit_mode == MODE_LINES)
-			list.push_back(map.getLine(selection[a]));
-		else if (edit_mode == MODE_SECTORS)
-			list.push_back(map.getSector(selection[a]));
-		else if (edit_mode == MODE_THINGS)
-			list.push_back(map.getThing(selection[a]));
+			list.push_back(map.getVertex(hilight_item));
+			else if (edit_mode == MODE_LINES)
+				list.push_back(map.getLine(hilight_item));
+			else if (edit_mode == MODE_SECTORS)
+				list.push_back(map.getSector(hilight_item));
+			else if (edit_mode == MODE_THINGS)
+				list.push_back(map.getThing(hilight_item));
 	}
 }
 
@@ -837,6 +849,96 @@ void MapEditor::splitLine(double x, double y, double min_dist) {
 	map.splitLine(lindex, vindex);
 }
 
+void MapEditor::changeSectorHeight(int amount, bool floor, bool ceiling) {
+	// Do nothing if not in sectors mode
+	if (edit_mode != MODE_SECTORS)
+		return;
+
+	// Get selected sectors (if any)
+	vector<MapSector*> selection;
+	getSelectedSectors(selection);
+
+	// Do nothing if no selection or hilight
+	if (selection.size() == 0)
+		return;
+
+	// Go through selection
+	for (unsigned a = 0; a < selection.size(); a++) {
+		// Change floor height
+		if (floor) {
+			int height = selection[a]->intProperty("heightfloor");
+			selection[a]->setIntProperty("heightfloor", height + amount);
+		}
+
+		// Change ceiling height
+		if (ceiling) {
+			int height = selection[a]->intProperty("heightceiling");
+			selection[a]->setIntProperty("heightceiling", height + amount);
+		}
+	}
+
+	// Add editor message
+	string what = "";
+	if (floor && !ceiling)
+		what = "Floor";
+	else if (!floor && ceiling)
+		what = "Ceiling";
+	else
+		what = "Floor and ceiling";
+	string inc = "increased";
+	if (amount < 0)
+		inc = "decreased";
+	if (amount < 0)
+		amount = -amount;
+	addEditorMessage(S_FMT("%s height %s by %d", CHR(what), CHR(inc), amount));
+
+	// Update display
+	updateDisplay();
+}
+
+void MapEditor::changeSectorLight(int amount) {
+	// Do nothing if not in sectors mode
+	if (edit_mode != MODE_SECTORS)
+		return;
+
+	// Get selected sectors (if any)
+	vector<MapSector*> selection;
+	getSelectedSectors(selection);
+
+	// Do nothing if no selection or hilight
+	if (selection.size() == 0)
+		return;
+
+	// Go through selection
+	for (unsigned a = 0; a < selection.size(); a++) {
+		// Get modified light value
+		int light = selection[a]->intProperty("lightlevel");
+		if (light == 255 && amount < -1)
+			light = 256;
+		light += amount;
+
+		// Clamp it 0-255
+		if (light > 255)
+			light = 255;
+		if (light < 0)
+			light = 0;
+
+		// Change light level
+		selection[a]->setIntProperty("lightlevel", light);
+	}
+
+	// Add editor message
+	if (amount < 0) {
+		amount = -amount;
+		addEditorMessage(S_FMT("Light level decreased by %d", amount));
+	}
+	else
+		addEditorMessage(S_FMT("Light level increased by %d", amount));
+
+	// Update display
+	updateDisplay();
+}
+
 unsigned MapEditor::numEditorMessages() {
 	return editor_messages.size();
 }
@@ -877,6 +979,47 @@ string MapEditor::getModeString() {
 	case MODE_THINGS: return "Things";
 	default: return "Items";
 	};
+}
+
+bool MapEditor::handleKeyBind(string key) {
+	// --- Sector mode keybinds ---
+	if (key.StartsWith("me2d_sector") && edit_mode == MODE_SECTORS) {
+		// Height changes
+		if		(key == "me2d_sector_floor_up8")	changeSectorHeight(8, true, false);
+		else if (key == "me2d_sector_floor_up")		changeSectorHeight(1, true, false);
+		else if (key == "me2d_sector_floor_down8")	changeSectorHeight(-8, true, false);
+		else if (key == "me2d_sector_floor_down")	changeSectorHeight(-1, true, false);
+		else if (key == "me2d_sector_ceil_up8")		changeSectorHeight(8, false, true);
+		else if (key == "me2d_sector_ceil_up")		changeSectorHeight(1, false, true);
+		else if (key == "me2d_sector_ceil_down8")	changeSectorHeight(-8, false, true);
+		else if (key == "me2d_sector_ceil_down")	changeSectorHeight(-1, false, true);
+		else if (key == "me2d_sector_height_up8")	changeSectorHeight(8, true, true);
+		else if (key == "me2d_sector_height_up")	changeSectorHeight(1, true, true);
+		else if (key == "me2d_sector_height_down8")	changeSectorHeight(-8, true, true);
+		else if (key == "me2d_sector_height_down")	changeSectorHeight(-1, true, true);
+
+		// Light changes
+		else if (key == "me2d_sector_light_up16")	changeSectorLight(16);
+		else if (key == "me2d_sector_light_up")		changeSectorLight(1);
+		else if (key == "me2d_sector_light_down16")	changeSectorLight(-16);
+		else if (key == "me2d_sector_light_down")	changeSectorLight(-1);
+	}
+
+	// Not handled
+	return false;
+}
+
+void MapEditor::updateDisplay() {
+	// Update map object properties panel
+	vector<MapObject*> selection;
+	getSelectedObjects(selection);
+	theMapEditor->propsPanel()->openObjects(selection);
+
+	// Update canvas info overlay
+	if (canvas) {
+		canvas->updateInfoOverlay();
+		canvas->Refresh();
+	}
 }
 
 

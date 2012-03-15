@@ -4,17 +4,32 @@
 
 #include "Tokenizer.h"
 
+#define KPM_CTRL	0x01
+#define KPM_ALT		0x02
+#define KPM_SHIFT	0x04
+
 struct keypress_t {
 	string	key;
 	bool	alt;
 	bool	ctrl;
 	bool	shift;
 
-	keypress_t(string key = "", bool alt = false, bool ctrl = false, bool shift = false) {
+	keypress_t(string key, bool alt, bool ctrl, bool shift) {
 		this->key = key;
 		this->alt = alt;
 		this->ctrl = ctrl;
 		this->shift = shift;
+	}
+
+	keypress_t(string key = "", int modifiers = 0) {
+		this->key = key;
+		ctrl = alt = shift = false;
+		if (modifiers & KPM_CTRL)
+			ctrl = true;
+		if (modifiers & KPM_ALT)
+			alt = true;
+		if (modifiers & KPM_SHIFT)
+			shift = true;
 	}
 };
 
