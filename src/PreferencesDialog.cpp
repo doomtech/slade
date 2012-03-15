@@ -58,7 +58,7 @@
 /* PreferencesDialog::PreferencesDialog
  * PreferencesDialog class constructor
  *******************************************************************/
-PreferencesDialog::PreferencesDialog(wxWindow* parent) : wxDialog(parent, -1, "SLADE Preferences") {
+PreferencesDialog::PreferencesDialog(wxWindow* parent) : wxDialog(parent, -1, "SLADE Preferences", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER) {
 	// Setup main sizer
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 	SetSizer(sizer);
@@ -119,6 +119,9 @@ PreferencesDialog::PreferencesDialog(wxWindow* parent) : wxDialog(parent, -1, "S
 	// Setup layout
 	SetInitialSize(wxSize(-1, -1));
 	Layout();
+	Fit();
+	SetMinSize(GetBestSize());
+	CenterOnParent();
 
 	// Collapse all tree nodes
 	for (unsigned page = 0; page < tree_prefs->GetPageCount(); page++)

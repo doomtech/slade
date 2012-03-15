@@ -62,12 +62,20 @@ void UDMFProperty::parse(ParseTreeNode* node, string group) {
 			case TYPE_INT:		default_value = prop->getIntValue(); break;
 			case TYPE_FLOAT:	default_value = prop->getFloatValue(); break;
 			case TYPE_STRING:	default_value = prop->getStringValue(); break;
-			case TYPE_COLOUR:	default_value = prop->getStringValue(); break;
+			//case TYPE_COLOUR:	default_value = prop->getIntValue(); wxLogMessage("Colour default value %d (%s)", prop->getIntValue(), CHR(prop->getStringValue())); break;
 			case TYPE_ASPECIAL:	default_value = prop->getIntValue(); break;
 			case TYPE_SSPECIAL:	default_value = prop->getIntValue(); break;
 			case TYPE_TTYPE:	default_value = prop->getIntValue(); break;
 			case TYPE_ANGLE:	default_value = prop->getIntValue(); break;
 			default:			default_value = prop->getStringValue(); break;
+			}
+
+			// Not sure why I have to do this here, but for whatever reason prop->getIntValue() doesn't work if the value parsed was hex
+			// (or it could be to do with the colour type? who knows)
+			if (type == TYPE_COLOUR) {
+				long val;
+				prop->getStringValue().ToLong(&val, 0);
+				default_value = (int)val;
 			}
 
 			has_default = true;
@@ -126,8 +134,8 @@ string UDMFProperty::getStringRep() {
 			else
 				ret += ", default = false";
 		}
-		else if (type == TYPE_INT || type == TYPE_ASPECIAL || type == TYPE_SSPECIAL || type == TYPE_TTYPE)
-			ret += S_FMT(", default = %d", (int)default_value);
+		else if (type == TYPE_INT || type == TYPE_ASPECIAL || type == TYPE_SSPECIAL || type == TYPE_TTYPE || type == TYPE_COLOUR)
+			ret += S_FMT(", default = %d", default_value.getIntValue());
 		else if (type == TYPE_FLOAT)
 			ret += S_FMT(", default = %1.2f", (double)default_value);
 		else

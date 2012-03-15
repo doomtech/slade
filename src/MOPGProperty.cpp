@@ -570,3 +570,55 @@ wxString MOPGAngleProperty::ValueToString(wxVariant &value, int argFlags) const 
 	default:	return S_FMT("%d", angle); break;
 	}
 }
+
+
+
+MOPGColourProperty::MOPGColourProperty(const wxString& label, const wxString& name)
+: wxColourProperty(label, name), MOPGProperty(MOPGProperty::TYPE_COLOUR) {
+}
+
+void MOPGColourProperty::openObjects(vector<MapObject*>& objects) {
+	// Set unspecified if no objects given
+	if (objects.size() == 0) {
+		SetValueToUnspecified();
+		return;
+	}
+
+	// Get property of first object
+	int first = objects[0]->intProperty(GetName());
+
+	// Check whether all objects share the same value
+	for (unsigned a = 1; a < objects.size(); a++) {
+		if (objects[a]->intProperty(GetName()) != first) {
+			// Different value found, set unspecified
+			SetValueToUnspecified();
+			return;
+		}
+	}
+
+	// Set to common value
+	wxLogMessage("Colour value %d", first);
+	noupdate = true;
+	wxColor col(first);
+	wxVariant var_value;
+	var_value << col;
+	SetValue(var_value);
+	noupdate = false;
+}
+
+void MOPGColourProperty::applyValue() {
+	/*
+	// Do nothing if no parent (and thus no object list)
+	if (!parent || noupdate)
+		return;
+
+	// Do nothing if the value is unspecified
+	if (IsValueUnspecified())
+		return;
+
+	// Go through objects and set this value
+	vector<MapObject*>& objects = parent->getObjects();
+	for (unsigned a = 0; a < objects.size(); a++)
+		objects[a]->setIntProperty(GetName(), m_value.GetInteger());
+	*/
+}

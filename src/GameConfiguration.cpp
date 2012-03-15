@@ -1033,32 +1033,45 @@ void GameConfiguration::dumpValidMapNames() {
 }
 
 void GameConfiguration::dumpUDMFProperties() {
-	/*
 	// Vertex
 	wxLogMessage("\nVertex properties:");
-	for (unsigned a = 0; a < udmf_vertex_props.size(); a++)
-		wxLogMessage(udmf_vertex_props[a].property->getStringRep());
+	UDMFPropMap::iterator i = udmf_vertex_props.begin();
+	while (i != udmf_vertex_props.end()) {
+		wxLogMessage(i->second.property->getStringRep());
+		i++;
+	}
 
 	// Line
 	wxLogMessage("\nLine properties:");
-	for (unsigned a = 0; a < udmf_linedef_props.size(); a++)
-		wxLogMessage(udmf_linedef_props[a].getStringRep());
+	i = udmf_linedef_props.begin();
+	while (i != udmf_linedef_props.end()) {
+		wxLogMessage(i->second.property->getStringRep());
+		i++;
+	}
 
 	// Side
 	wxLogMessage("\nSide properties:");
-	for (unsigned a = 0; a < udmf_sidedef_props.size(); a++)
-		wxLogMessage(udmf_sidedef_props[a].getStringRep());
+	i = udmf_sidedef_props.begin();
+	while (i != udmf_sidedef_props.end()) {
+		wxLogMessage(i->second.property->getStringRep());
+		i++;
+	}
 
 	// Sector
 	wxLogMessage("\nSector properties:");
-	for (unsigned a = 0; a < udmf_sector_props.size(); a++)
-		wxLogMessage(udmf_sector_props[a].getStringRep());
+	i = udmf_sector_props.begin();
+	while (i != udmf_sector_props.end()) {
+		wxLogMessage(i->second.property->getStringRep());
+		i++;
+	}
 
 	// Thing
 	wxLogMessage("\nThing properties:");
-	for (unsigned a = 0; a < udmf_thing_props.size(); a++)
-		wxLogMessage(udmf_thing_props[a].getStringRep());
-	*/
+	i = udmf_thing_props.begin();
+	while (i != udmf_thing_props.end()) {
+		wxLogMessage(i->second.property->getStringRep());
+		i++;
+	}
 }
 
 

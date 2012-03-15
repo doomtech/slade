@@ -39,8 +39,10 @@
 /*******************************************************************
  * VARIABLES
  *******************************************************************/
-wxRegEx re_integer("[+-]?[1-9]+[0-9]* | 0[0-9]+ | 0x[0-9A-Fa-f]+");
-wxRegEx re_float("[+-]?[0-9]+'.'[0-9]*([eE][+-]?[0-9]+)?");
+wxRegEx re_int1("^[+-]?[1-9]+[0-9]*$", wxRE_DEFAULT|wxRE_NOSUB);
+wxRegEx re_int2("^0[0-9]+$", wxRE_DEFAULT|wxRE_NOSUB);
+wxRegEx re_int3("^0x[0-9A-Fa-f]+$", wxRE_DEFAULT|wxRE_NOSUB);
+wxRegEx re_float("^[+-]?[0-9]+'.'[0-9]*([eE][+-]?[0-9]+)?$", wxRE_DEFAULT|wxRE_NOSUB);
 
 
 /*******************************************************************
@@ -185,10 +187,17 @@ bool ParseTreeNode::parse(Tokenizer& tz) {
 					value = true;
 				else if (S_CMPNOCASE(token, "false"))	// Boolean (false)
 					value = false;
-				else if (re_integer.Matches(token)) {	// Integer
+				else if (re_int1.Matches(token) ||		// Integer
+						re_int2.Matches(token)) {
 					long val;
 					token.ToLong(&val);
 					value = (int)val;
+				}
+				else if (re_int3.Matches(token)) {		// Hex (0xXXXXXX)
+					long val;
+					token.ToLong(&val, 0);
+					value = (int)val;
+					//wxLogMessage("%s: %s is hex %d", CHR(name), CHR(token), value.getIntValue());
 				}
 				else if (re_float.Matches(token)) {		// Floating point
 					double val;
@@ -361,3 +370,11 @@ CONSOLE_COMMAND (testparse, 0) {
 	tp.parseText(mc);
 }
 */
+
+CONSOLE_COMMAND (testregex, 2) {
+	wxRegEx re(args[0]);
+	if (re.Matches(args[1]))
+		theConsole->logMessage("Matches");
+	else
+		theConsole->logMessage("Doesn't match");
+}

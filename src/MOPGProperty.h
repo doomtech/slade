@@ -3,6 +3,7 @@
 #define __MOPG_PROPERTY_H__
 
 #include <wx/propgrid/propgrid.h>
+#include <wx/propgrid/advprops.h>
 
 class MapObject;
 class MapObjectPropsPanel;
@@ -27,6 +28,7 @@ public:
 		TYPE_LFLAG,
 		TYPE_TFLAG,
 		TYPE_ANGLE,
+		TYPE_COLOUR,
 	};
 
 	int		getType() { return type; }
@@ -132,6 +134,14 @@ public:
 
 	// wxPGProperty overrides
 	wxString	ValueToString(wxVariant &value, int argFlags = 0) const;
+};
+
+class MOPGColourProperty : public MOPGProperty, public wxColourProperty {
+public:
+	MOPGColourProperty(const wxString& label = wxPG_LABEL, const wxString& name = wxPG_LABEL);
+
+	void	openObjects(vector<MapObject*>& objects);
+	void	applyValue();
 };
 
 

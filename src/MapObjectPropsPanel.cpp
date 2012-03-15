@@ -283,8 +283,13 @@ void MapObjectPropsPanel::addUDMFProperty(UDMFProperty* prop, int objtype, strin
 		addFloatProperty(group, prop->getName(), propname, false, grid);
 	else if (prop->getType() == UDMFProperty::TYPE_STRING)
 		addStringProperty(group, prop->getName(), propname, false, grid);
-	else if (prop->getType() == UDMFProperty::TYPE_COLOUR)
-		addIntProperty(group, prop->getName(), propname, false, grid);
+	else if (prop->getType() == UDMFProperty::TYPE_COLOUR) {
+		MOPGColourProperty* prop_col = new MOPGColourProperty(prop->getName(), propname);
+		prop_col->setParent(this);
+		properties.push_back(prop_col);
+		grid->AppendIn(group, prop_col);
+	}
+		//addIntProperty(group, prop->getName(), propname, false, grid);
 	else if (prop->getType() == UDMFProperty::TYPE_ASPECIAL) {
 		MOPGActionSpecialProperty* prop_as = new MOPGActionSpecialProperty("Special", propname);
 		prop_as->setParent(this);
