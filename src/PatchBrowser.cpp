@@ -99,6 +99,34 @@ bool PatchBrowserItem::loadImage() {
 	return image->loadImage(&img, parent->getPalette());
 }
 
+/* PatchBrowserItem::itemInfo
+ * Returns a string with extra information about the patch
+ *******************************************************************/
+string PatchBrowserItem::itemInfo() {
+	string info;
+
+	// Add dimensions if known
+	if (image)
+		info += S_FMT("%dx%d", image->getWidth(), image->getHeight());
+	else
+		info += "Unknown size";
+
+	// Add patch type
+	if (type == 0)
+		info += ", Patch";
+	else
+		info += ", Texture";
+
+	// Add namespace if it exists
+	if (!nspace.IsEmpty()) {
+		info += ", ";
+		info += nspace.Capitalize();
+		info += " namespace";
+	}
+
+	return info;
+}
+
 
 /*******************************************************************
  * PATCHBROWSER CLASS FUNCTIONS
@@ -241,7 +269,7 @@ bool PatchBrowser::openArchive(Archive* archive) {
 	// Go through the list
 	for (unsigned a = 0; a < textures.size(); a++) {
 		TextureResource::tex_res_t& res = textures[a];
-		
+
 		// Create browser item
 		PatchBrowserItem* item = new PatchBrowserItem(res.tex->getName(), res.parent, 1);
 

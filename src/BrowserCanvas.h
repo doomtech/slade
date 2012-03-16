@@ -63,4 +63,6 @@ public:
 	void	onKeyChar(wxKeyEvent& e);
 };
 
+DECLARE_EVENT_TYPE(wxEVT_BROWSERCANVAS_SELECTION_CHANGED, -1)
+
 #endif//__BROWSER_CANVAS_H__

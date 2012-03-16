@@ -302,9 +302,9 @@ bool MapEditorWindow::handleAction(string id) {
 
 void MapEditorWindow::onClose(wxCloseEvent& e) {
 	// Save current layout
+	mew_maximized = IsMaximized();
 	wxAuiManager *m_mgr = wxAuiManager::GetManager(this);
 	map_window_layout = m_mgr->SavePerspective();
-	mew_maximized = IsMaximized();
 
 	this->Show(false);
 	editor.clearMap();

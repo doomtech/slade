@@ -141,7 +141,7 @@ BrowserWindow::BrowserWindow(wxWindow* parent) : wxDialog(parent, -1, "Browser",
 
 	// Zoom
 	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
-	vbox->Add(hbox, 0, wxEXPAND|wxBOTTOM, 4);
+	vbox->Add(hbox, 0, wxEXPAND|wxBOTTOM|wxLEFT, 4);
 	slider_zoom = new wxSlider(panel_browser_area, -1, browser_item_size, 64, 256);
 	slider_zoom->SetLineSize(16);
 	slider_zoom->SetPageSize(32);
@@ -157,11 +157,11 @@ BrowserWindow::BrowserWindow(wxWindow* parent) : wxDialog(parent, -1, "Browser",
 	// Filter
 	text_filter = new wxTextCtrl(panel_browser_area, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0);
 	hbox->Add(new wxStaticText(panel_browser_area, -1, "Filter:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 2);
-	hbox->Add(text_filter, 0, wxEXPAND);
+	hbox->Add(text_filter, 0, wxEXPAND|wxRIGHT, 4);
 
 	// Browser canvas
 	hbox = new wxBoxSizer(wxHORIZONTAL);
-	vbox->Add(hbox, 1, wxEXPAND|wxBOTTOM, 4);
+	vbox->Add(hbox, 1, wxEXPAND|wxBOTTOM|wxLEFT|wxRIGHT, 4);
 	canvas = new BrowserCanvas(panel_browser_area);
 	hbox->Add(canvas, 1, wxEXPAND);
 	// Canvas scrollbar
@@ -175,8 +175,12 @@ BrowserWindow::BrowserWindow(wxWindow* parent) : wxDialog(parent, -1, "Browser",
 	sizer_bottom = new wxBoxSizer(wxHORIZONTAL);
 	vbox->Add(sizer_bottom, 0, wxEXPAND|wxBOTTOM, 4);
 
-	// Buttons
-	m_vbox->Add(CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND|wxBOTTOM, 4);
+	// Buttons and info label
+	label_info = new wxStaticText(this, -1, "Info goes here");
+	wxSizer* buttonsizer = CreateButtonSizer(wxOK|wxCANCEL);
+	buttonsizer->Insert(0, label_info, 1, wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT, 4);
+
+	m_vbox->Add(buttonsizer, 0, wxEXPAND|wxBOTTOM, 4);
 
 	// Setup sorting options
 	addSortType("Index");
@@ -189,6 +193,7 @@ BrowserWindow::BrowserWindow(wxWindow* parent) : wxDialog(parent, -1, "Browser",
 	canvas->Bind(wxEVT_LEFT_DCLICK, &BrowserWindow::onCanvasDClick, this);
 	text_filter->Bind(wxEVT_COMMAND_TEXT_UPDATED, &BrowserWindow::onTextFilterChanged, this);
 	slider_zoom->Bind(wxEVT_COMMAND_SLIDER_UPDATED, &BrowserWindow::onZoomChanged, this);
+	Bind(wxEVT_BROWSERCANVAS_SELECTION_CHANGED, &BrowserWindow::onCanvasSelectionChanged, this, canvas->GetId());
 
 	Layout();
 	SetInitialSize(wxSize(768, 600));
@@ -501,4 +506,28 @@ void BrowserWindow::onZoomChanged(wxCommandEvent& e) {
 	browser_item_size = item_size;
 	canvas->updateScrollBar();
 	canvas->Refresh();
+}
+
+void BrowserWindow::onCanvasSelectionChanged(wxEvent& e) {
+	// Get selected item
+	BrowserItem* item = canvas->getSelectedItem();
+	if (!item) {
+		// Clear info if nothing selected
+		label_info->SetLabel("");
+		Refresh();
+		return;
+	}
+
+	// Build info string
+	string info = item->getName();
+	string info_extra = item->itemInfo();
+	if (!info_extra.IsEmpty()) {
+		info += ": ";
+		info += info_extra;
+	}
+
+	// Set info label
+	label_info->SetLabel(info);
+	Refresh();
+	return;
 }

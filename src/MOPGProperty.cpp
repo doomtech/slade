@@ -687,8 +687,6 @@ bool MOPGTextureProperty::OnEvent(wxPropertyGrid* propgrid, wxWindow* window, wx
 
 		// Refresh text
 		RefreshEditor();
-
-		e.Skip();
 	}
 
 	return wxStringProperty::OnEvent(propgrid, window, e);

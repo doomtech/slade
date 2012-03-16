@@ -17,6 +17,7 @@ public:
 	~PatchBrowserItem();
 
 	bool	loadImage();
+	string	itemInfo();
 };
 
 class TextureXList;

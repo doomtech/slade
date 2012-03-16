@@ -636,6 +636,9 @@ int MainApp::OnExit() {
 	ColourConfiguration::writeConfiguration(ccfg);
 	ccfg.exportFile(appPath("colours.cfg", DIR_USER));
 
+	// Close the map editor if it's open
+	theMapEditor->Close();
+
 	// Close all open archives
 	theArchiveManager->closeAll();
 

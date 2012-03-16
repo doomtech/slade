@@ -35,6 +35,24 @@ bool MapTexBrowserItem::loadImage() {
 		return false;
 }
 
+string MapTexBrowserItem::itemInfo() {
+	string info;
+
+	// Add dimensions if known
+	if (image)
+		info += S_FMT("%dx%d", image->getWidth(), image->getHeight());
+	else
+		info += "Unknown size";
+
+	// Add type
+	if (type == "texture")
+		info += ", Texture";
+	else
+		info += ", Flat";
+
+	return info;
+}
+
 
 
 MapTextureBrowser::MapTextureBrowser(wxWindow* parent, int type, string texture) : BrowserWindow(parent) {

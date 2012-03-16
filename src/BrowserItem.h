@@ -24,6 +24,7 @@ public:
 	virtual bool	loadImage();
 	void			draw(int size, int x, int y, int font, bool showname = true);
 	void			clearImage();
+	virtual string	itemInfo() { return ""; }
 };
 
 #endif//__BROWSER_ITEM_H__

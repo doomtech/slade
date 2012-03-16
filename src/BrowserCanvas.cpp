@@ -36,10 +36,11 @@
 
 
 /*******************************************************************
- * INCLUDES
+ * VARIABLES
  *******************************************************************/
 CVAR(Bool, browser_bg_black, false, CVAR_SAVE)
 CVAR(Int, browser_item_size, 96, CVAR_SAVE)
+DEFINE_EVENT_TYPE(wxEVT_BROWSERCANVAS_SELECTION_CHANGED)
 
 
 /*******************************************************************
@@ -294,6 +295,11 @@ int BrowserCanvas::itemIndex(BrowserItem* item) {
  *******************************************************************/
 void BrowserCanvas::selectItem(BrowserItem* item) {
 	item_selected = item;
+
+	// Generate event
+	wxNotifyEvent e(wxEVT_BROWSERCANVAS_SELECTION_CHANGED, GetId());
+	e.SetEventObject(this);
+	GetEventHandler()->ProcessEvent(e);
 }
 
 /* BrowserCanvas::selectItem
@@ -305,6 +311,11 @@ void BrowserCanvas::selectItem(int index) {
 		return;
 
 	item_selected = items[items_filter[index]];
+
+	// Generate event
+	wxNotifyEvent e(wxEVT_BROWSERCANVAS_SELECTION_CHANGED, GetId());
+	e.SetEventObject(this);
+	GetEventHandler()->ProcessEvent(e);
 }
 
 /* BrowserCanvas::filterItems
@@ -386,8 +397,8 @@ bool BrowserCanvas::searchItemFrom(int from) {
 		string name = items[items_filter[index]]->getName();
 		if (name.Upper().StartsWith(search)) {
 			// Matches, update selection
-			item_selected = itemAt(index);
-			showItem(index);
+			selectItem(index);
+			showSelectedItem();
 			return true;
 		}
 
@@ -511,7 +522,7 @@ void BrowserCanvas::onMouseEvent(wxMouseEvent& e) {
 		int row = (e.GetPosition().y - top_y) / (fullItemSizeY());
 
 		// Select item
-		item_selected = itemAt(top_index + (row * num_cols) + col);
+		selectItem(top_index + (row * num_cols) + col);
 		Refresh();
 	}
 

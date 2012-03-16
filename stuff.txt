@@ -17,14 +17,13 @@ TODO List ---------------------------------------------------------------
 	- Specials with 0 tag that require a tag
 	- Invalid sector references (maybe not, shouldn't really happen)
 - Non-power-of-two textures (where simply expanding the texture canvas to 128x128 won't work)
+	- Will probably have to implement some kind of resize for this (perhaps FreeImage can do it nicely?)
 - 3d mode
 - Editing:
 	- Object creation
 	- Line drawing
 	- Object modification
 	- Map saving
-- Texture browser
-- Thing type browser
 - Better UDMF property handling
 - 'Tag edit' mode
 
@@ -179,6 +178,10 @@ Ideas / Possible Features -----------------------------------------------
 		- Entry type
 - Model viewer
 - The 'findModifiedEntries()' function could be used to create an 'Export Changes in New File' feature as an alternative to saving the archive, useful especially for IWADs.
+- EntryPanels able to handle multiple entries for special purposes
+	- GfxEntryPanel: shows all selected images in a browser kind of thing
+	- AudioEntryPanel: loads all selected entries as a playlist
+
 
 
 

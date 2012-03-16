@@ -12,6 +12,7 @@ public:
 	~MapTexBrowserItem();
 
 	bool	loadImage();
+	string	itemInfo();
 };
 
 class MapTextureBrowser : public BrowserWindow {

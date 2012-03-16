@@ -43,6 +43,7 @@ private:
 	wxTextCtrl*			text_filter;
 	wxSlider*			slider_zoom;
 	BrowserCanvas*		canvas;
+	wxStaticText*		label_info;
 
 protected:
 	BrowserTreeNode*	items_root;
@@ -82,6 +83,7 @@ public:
 	void	onCanvasDClick(wxMouseEvent& e);
 	void	onTextFilterChanged(wxCommandEvent& e);
 	void	onZoomChanged(wxCommandEvent& e);
+	void	onCanvasSelectionChanged(wxEvent& e);
 };
 
 #endif//__BROWSER_WINDOW_H__
