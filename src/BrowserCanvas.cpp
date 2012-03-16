@@ -282,7 +282,8 @@ BrowserItem* BrowserCanvas::itemAt(int index) {
 int BrowserCanvas::itemIndex(BrowserItem* item) {
 	// Search for the item in the current filtered list
 	for (unsigned a = 0; a < items_filter.size(); a++) {
-		if (items[items_filter[a]] == item)
+		if ((unsigned)items_filter[a] < items.size() &&
+			items[items_filter[a]] == item)
 			return a;
 	}
 

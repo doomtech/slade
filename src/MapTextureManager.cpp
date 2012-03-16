@@ -205,12 +205,10 @@ GLTexture* MapTextureManager::getSprite(string name, string translation, string 
 				// Why is this needed?
 				// Copying data in pal->loadMem shouldn't
 				// change it in the original entry...
-				// We shouldn't need to copy the entry first.
-				ArchiveEntry safepal;
-				safepal.importEntry(newpal);
+				// We shouldn't need to copy the data in a temporary place first.
 				pal = image.getPalette();
-				MemChunk mc = safepal.getMCData();
-				mc.seek(0, SEEK_SET);
+				MemChunk mc;
+				mc.importMem(newpal->getData(), newpal->getSize());
 				pal->loadMem(mc);
 			}
 		}
