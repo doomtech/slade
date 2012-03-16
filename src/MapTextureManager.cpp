@@ -202,8 +202,14 @@ GLTexture* MapTextureManager::getSprite(string name, string translation, string 
 		if (!palette.IsEmpty()) {
 			ArchiveEntry * newpal = theResourceManager->getPaletteEntry(palette, archive);
 			if (newpal && newpal->getSize() == 768) {
+				// Why is this needed?
+				// Copying data in pal->loadMem shouldn't
+				// change it in the original entry...
+				// We shouldn't need to copy the entry first.
+				ArchiveEntry safepal;
+				safepal.importEntry(newpal);
 				pal = image.getPalette();
-				MemChunk mc = newpal->getMCData();
+				MemChunk mc = safepal.getMCData();
 				mc.seek(0, SEEK_SET);
 				pal->loadMem(mc);
 			}

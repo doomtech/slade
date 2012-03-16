@@ -69,6 +69,7 @@ bool Palette8bit::loadMem(MemChunk& mc) {
 		return false;
 
 	// Read in colours
+	mc.seek(0, SEEK_SET);
 	int c = 0;
 	for (size_t a = 0; a < mc.getSize(); a += 3) {
 		uint8_t rgb[3] = {0, 0, 0};
@@ -84,6 +85,7 @@ bool Palette8bit::loadMem(MemChunk& mc) {
 		if (c == 256)
 			break;
 	}
+	mc.seek(0, SEEK_SET);
 
 	return true;
 }

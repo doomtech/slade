@@ -394,6 +394,8 @@ void MapObjectPropsPanel::setupType(int objtype) {
 			prop_as->addArgProperty(prop, a);
 		}
 
+		// TODO: Add SPAC
+
 		// Add 'Flags' group
 		wxPGProperty* g_flags = pg_properties->Append(new wxPropertyCategory("Flags"));
 
@@ -401,8 +403,9 @@ void MapObjectPropsPanel::setupType(int objtype) {
 		for (int a = 0; a < theGameConfiguration->nLineFlags(); a++)
 			addLineFlagProperty(g_flags, theGameConfiguration->lineFlag(a), S_FMT("flag%d", a), a);
 
-		// Hide args if doom format
-		if (theGameConfiguration->getMapFormat() == MAP_DOOM) {
+		// Hide args if doom or doom64 format
+		if (theGameConfiguration->getMapFormat() == MAP_DOOM ||
+			theGameConfiguration->getMapFormat() == MAP_DOOM64) {
 			pg_properties->GetProperty("arg0")->SetLabel("Sector Tag");	// Arg0 = sector tag
 			pg_properties->GetProperty("arg1")->Hide(true);
 			pg_properties->GetProperty("arg2")->Hide(true);
@@ -513,6 +516,15 @@ void MapObjectPropsPanel::setupType(int objtype) {
 		// Add id
 		addIntProperty(g_basic, "ID", "id");
 
+		// Add 'Scripting Special' group
+		wxPGProperty* g_special = pg_properties->Append(new wxPropertyCategory("Scripting Special"));
+
+		// Add special
+		MOPGActionSpecialProperty* prop_as = new MOPGActionSpecialProperty("Special", "special");
+		prop_as->setParent(this);
+		properties.push_back(prop_as);
+		pg_properties->AppendIn(g_special, prop_as);
+
 		// Add 'Args' group
 		wxPGProperty* g_args = pg_properties->Append(new wxPropertyCategory("Args"));
 		for (unsigned a = 0; a < 5; a++) {
@@ -527,19 +539,14 @@ void MapObjectPropsPanel::setupType(int objtype) {
 		for (int a = 0; a < theGameConfiguration->nThingFlags(); a++)
 			addThingFlagProperty(g_flags, theGameConfiguration->thingFlag(a), S_FMT("flag%d", a), a);
 
-		// Add 'Scripting Special' group
-		wxPGProperty* g_special = pg_properties->Append(new wxPropertyCategory("Scripting Special"));
-
-		// Add special
-		MOPGActionSpecialProperty* prop_as = new MOPGActionSpecialProperty("Special", "special");
-		prop_as->setParent(this);
-		properties.push_back(prop_as);
-		pg_properties->AppendIn(g_special, prop_as);
-
 		// Hide hexen extras if in doom format
 		if (theGameConfiguration->getMapFormat() == MAP_DOOM) {
 			pg_properties->GetProperty("height")->Hide(true);
 			pg_properties->GetProperty("id")->Hide(true);
+			g_args->Hide(true);
+			g_special->Hide(true);
+		// Doom 64 has TID and height, but not scripting stuff
+		} else if (theGameConfiguration->getMapFormat() == MAP_DOOM64) {
 			g_args->Hide(true);
 			g_special->Hide(true);
 		}

@@ -335,7 +335,7 @@ void BrowserWindow::doSort(unsigned sort_type) {
  *******************************************************************/
 void BrowserWindow::setSortType(int type) {
 	// Check type index
-	if (type < 0 || type >= choice_sort->GetCount())
+	if (type < 0 || (unsigned)type >= choice_sort->GetCount())
 		return;
 
 	// Select sorting type
