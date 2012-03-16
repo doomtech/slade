@@ -132,6 +132,9 @@ void GameConfiguration::init() {
 			}
 		}
 	}
+
+	// Sort game configurations list by title
+	std::sort(game_configs.begin(), game_configs.end());
 }
 
 string GameConfiguration::configTitle(unsigned index) {

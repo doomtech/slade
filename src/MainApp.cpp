@@ -492,6 +492,7 @@ void MainApp::initActions() {
 	new SAction("mapw_mode_things", "Things Mode", "t_things", "Change to things editing mode", "", SAction::RADIO);
 	new SAction("mapw_showconsole", "&Console", "t_console", "Toggle the Console window", "Ctrl+2");
 	new SAction("mapw_showproperties", "&Item Properties", "", "Toggle the Item Properties window", "Ctrl+1");
+	new SAction("mapw_thing_changetype", "Change Type", "", "Change the currently selected or hilighted thing's type(s)");
 }
 
 /* MainApp::OnInit

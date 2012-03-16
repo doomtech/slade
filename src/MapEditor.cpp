@@ -690,7 +690,7 @@ bool MapEditor::beginMove(fpoint2_t mouse_pos) {
 
 	// Begin move operation
 	move_origin = mouse_pos;
-	
+
 	// Create list of objects to move
 	if (selection.size() == 0)
 		move_items.push_back(hilight_item);
@@ -934,6 +934,34 @@ void MapEditor::changeSectorLight(int amount) {
 	}
 	else
 		addEditorMessage(S_FMT("Light level increased by %d", amount));
+
+	// Update display
+	updateDisplay();
+}
+
+void MapEditor::changeThingType(int newtype) {
+	// Do nothing if not in things mode
+	if (edit_mode != MODE_THINGS)
+		return;
+
+	// Get selected things (if any)
+	vector<MapThing*> selection;
+	getSelectedThings(selection);
+
+	// Do nothing if no selection or hilight
+	if (selection.size() == 0)
+		return;
+
+	// Go through selection
+	for (unsigned a = 0; a < selection.size(); a++)
+		selection[a]->setIntProperty("type", newtype);
+
+	// Add editor message
+	string type_name = theGameConfiguration->thingType(newtype)->getName();
+	if (selection.size() == 1)
+		addEditorMessage(S_FMT("Changed type to \"%s\"", CHR(type_name)));
+	else
+		addEditorMessage(S_FMT("Changed %d things to type \"%s\"", selection.size(), CHR(type_name)));
 
 	// Update display
 	updateDisplay();

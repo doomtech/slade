@@ -40,6 +40,7 @@
 #include "MainApp.h"
 #include "MapEditorWindow.h"
 #include "MapRenderer2D.h"
+#include "ThingTypeBrowser.h"
 
 
 /*******************************************************************
@@ -94,7 +95,7 @@ MapCanvas::MapCanvas(wxWindow *parent, int id, MapEditor* editor)
 #ifdef USE_SFML_RENDERWINDOW
 	UseVerticalSync(false);
 #endif
-	
+
 	// Bind Events
 	Bind(wxEVT_SIZE, &MapCanvas::onSize, this);
 	Bind(wxEVT_KEY_DOWN, &MapCanvas::onKeyDown, this);
@@ -487,7 +488,7 @@ void MapCanvas::draw() {
 
 	// Translate to offsets
 	glTranslated(-view_xoff_inter, -view_yoff_inter, 0);
-	
+
 	// Update visibility info if needed
 	if (!renderer_2d->visOK())
 		renderer_2d->updateVisibility(view_tl, view_br);
@@ -1107,6 +1108,25 @@ bool MapCanvas::handleAction(string id) {
 		return true;
 	}
 
+	// --- Thing context menu ---
+
+	// Change thing type
+	else if (id == "mapw_thing_changetype") {
+		// Determine the initial type
+		int type = -1;
+		vector<MapThing*> selection;
+		editor->getSelectedThings(selection);
+		if (selection.size() > 0)
+			type = selection[0]->intProperty("type");
+
+		// Open type browser
+		ThingTypeBrowser browser(theMapEditor, type);
+		if (browser.ShowModal() == wxID_OK)
+			editor->changeThingType(browser.getSelectedType());
+
+		return true;
+	}
+
 	// Not handled here
 	return false;
 }
@@ -1232,6 +1252,15 @@ void MapCanvas::onMouseUp(wxMouseEvent& e) {
 			editor->endMove();
 			mouse_state = MSTATE_NORMAL;
 			renderer_2d->forceUpdate();
+		}
+
+		else {
+			// Context menu
+			if (editor->editMode() == MapEditor::MODE_THINGS) {
+				wxMenu menu_context;
+				theApp->getAction("mapw_thing_changetype")->addToMenu(&menu_context);
+				PopupMenu(&menu_context);
+			}
 		}
 	}
 

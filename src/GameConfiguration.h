@@ -61,6 +61,8 @@ private:
 	struct gconf_t {
 		string	title;
 		string	filename;
+		bool operator>(const gconf_t& right) const { return title > right.title; }
+		bool operator<(const gconf_t& right) const { return title < right.title; }
 	};
 	vector<gconf_t>	game_configs;
 

@@ -26,6 +26,7 @@ TODO List ---------------------------------------------------------------
 - Texture browser
 - Thing type browser
 - Better UDMF property handling
+- 'Tag edit' mode
 
 
 --- Minor Problems/Annoyances ---

@@ -102,6 +102,7 @@ public:
 	void	splitLine(double x, double y, double min_dist = 64);
 	void	changeSectorHeight(int amount, bool floor = true, bool ceiling = true);
 	void	changeSectorLight(int amount);
+	void	changeThingType(int newtype);
 
 	// Editor messages
 	unsigned	numEditorMessages();

@@ -468,11 +468,17 @@ int TextEditor::replaceAll(string find, string replace) {
  * Checks for a brace match at the current cursor position
  *******************************************************************/
 void TextEditor::checkBraceMatch() {
+#ifdef __WXMAC__
+	bool refresh = false;
+#else
+	bool refresh = true;
+#endif
+
 	// Check for brace match at current position
 	int bracematch = BraceMatch(GetCurrentPos());
 	if (bracematch != wxSTC_INVALID_POSITION) {
 		BraceHighlight(GetCurrentPos(), bracematch);
-		Refresh();
+		if (refresh) Refresh();
 		return;
 	}
 
@@ -480,13 +486,13 @@ void TextEditor::checkBraceMatch() {
 	bracematch = BraceMatch(GetCurrentPos() - 1);
 	if (bracematch != wxSTC_INVALID_POSITION) {
 		BraceHighlight(GetCurrentPos() - 1, bracematch);
-		Refresh();
+		if (refresh) Refresh();
 		return;
 	}
 
 	// No match at all, clear any previous brace match
 	BraceHighlight(-1, -1);
-	Refresh();
+	if (refresh) Refresh();
 }
 
 /* TextEditor::openCalltip
