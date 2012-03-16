@@ -30,6 +30,7 @@ public:
 
 	// Events
 	void	onSize(wxSizeEvent& e);
+	void	onPaint(wxPaintEvent& e);
 };
 
 #endif//__S_TOOL_BAR_H__

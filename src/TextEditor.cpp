@@ -472,6 +472,7 @@ void TextEditor::checkBraceMatch() {
 	int bracematch = BraceMatch(GetCurrentPos());
 	if (bracematch != wxSTC_INVALID_POSITION) {
 		BraceHighlight(GetCurrentPos(), bracematch);
+		Refresh();
 		return;
 	}
 
@@ -479,11 +480,13 @@ void TextEditor::checkBraceMatch() {
 	bracematch = BraceMatch(GetCurrentPos() - 1);
 	if (bracematch != wxSTC_INVALID_POSITION) {
 		BraceHighlight(GetCurrentPos() - 1, bracematch);
+		Refresh();
 		return;
 	}
 
 	// No match at all, clear any previous brace match
 	BraceHighlight(-1, -1);
+	Refresh();
 }
 
 /* TextEditor::openCalltip

@@ -118,6 +118,7 @@ SToolBar::SToolBar(wxWindow* parent) : wxPanel(parent, -1) {
 
 	// Bind events
 	Bind(wxEVT_SIZE, &SToolBar::onSize, this);
+	Bind(wxEVT_PAINT, &SToolBar::onPaint, this);
 }
 
 SToolBar::~SToolBar() {
@@ -185,4 +186,25 @@ void SToolBar::onSize(wxSizeEvent& e) {
 	updateLayout();
 
 	e.Skip();
+}
+
+void SToolBar::onPaint(wxPaintEvent& e) {
+	wxPaintDC dc(this);
+
+	// Get system colours needed
+	wxColour col_background = Drawing::getMenuBarBGColour();
+	wxColour col_light = Drawing::lightColour(col_background, 1.5f);
+	wxColour col_dark = Drawing::darkColour(col_background, 1.5f);
+
+	// Draw background
+	dc.SetBackground(wxBrush(col_background));
+	dc.Clear();
+
+	// Draw top
+	dc.SetPen(wxPen(col_light));
+	dc.DrawLine(wxPoint(0, 0), wxPoint(GetSize().x+1, 0));
+
+	// Draw bottom
+	dc.SetPen(wxPen(col_dark));
+	dc.DrawLine(wxPoint(0, GetSize().y-1), wxPoint(GetSize().x+1, GetSize().y-1));
 }

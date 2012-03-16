@@ -511,7 +511,7 @@ MOPGAngleProperty::MOPGAngleProperty(const wxString& label, const wxString& name
 	values.Add(270);
 	labels.Add("315: Southeast");
 	values.Add(315);
-	
+
 	SetChoices(wxPGChoices(labels, values));
 }
 
@@ -597,7 +597,6 @@ void MOPGColourProperty::openObjects(vector<MapObject*>& objects) {
 	}
 
 	// Set to common value
-	wxLogMessage("Colour value %d", first);
 	noupdate = true;
 	wxColor col(first);
 	wxVariant var_value;

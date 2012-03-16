@@ -161,7 +161,7 @@ clAuiTabArt::clAuiTabArt()
 	m_border_pen                 = wxPen(border_colour);
 	m_base_colour_4              = Drawing::lightColour(m_base_colour, 4.0);
 	m_colour_gradient_active_tab = m_base_colour;
-	m_shade_colour               = Drawing::darkColour(m_base_colour, 2.0);
+	m_shade_colour               = Drawing::lightColour(m_base_colour, 0.5);
 	m_bottom_rect_colour         = m_base_colour;
 	m_active_close_bmp           = wxAuiBitmapFromBits(close_bits, 16, 16, *wxBLACK);
 	m_disabled_close_bmp         = wxAuiBitmapFromBits(close_bits, 16, 16, wxColour(128,128,128));
@@ -773,11 +773,11 @@ clAuiSimpleTabArt::clAuiSimpleTabArt()
 	m_fixed_tab_width = 100;
 
 	wxColour base_colour = wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE);
-	
+
 	wxColour background_colour  ;
 	wxColour normaltab_colour   ;
 	wxColour selectedtab_colour ;
-	
+
 	background_colour = base_colour;
 	normaltab_colour = base_colour;
 	selectedtab_colour = Drawing::lightColour(Drawing::getPanelBGColour(), 3.0);

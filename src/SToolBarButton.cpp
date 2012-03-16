@@ -45,7 +45,6 @@ void SToolBarButton::onPaint(wxPaintEvent& e) {
 
 	// Get system colours needed
 	wxColour col_background = Drawing::getMenuBarBGColour();
-	wxColour col_hilight_m = wxSystemSettings::GetColour(wxSYS_COLOUR_MENUHILIGHT);
 	wxColour col_hilight = wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT);
 
 	// Draw background
@@ -60,20 +59,24 @@ void SToolBarButton::onPaint(wxPaintEvent& e) {
 	// Draw border on mouseover
 	if (state == STATE_MOUSEOVER || state == STATE_TOGGLED || state == STATE_MOUSEDOWN) {
 		// Determine transparency level
-		int trans = 128;
+		int trans = 180;
 		if (state == STATE_MOUSEDOWN)
-			trans = 220;
+			trans = 255;
 
 		// Create semitransparent hilight colour
 		wxColour col_trans(col_hilight.Red(), col_hilight.Green(), col_hilight.Blue(), trans);
 
 		// Set brush/pen colours
 		gc->SetBrush(col_trans);
-		gc->SetPen(wxPen(col_hilight, 1));
+		gc->SetPen(wxPen(Drawing::lightColour(col_hilight, 2.0f), 1));
 
 		// Draw border
+		gc->DrawRoundedRectangle(2, 2, 18, 18, 2);
+
+		// Draw outer border
+		gc->SetBrush(wxBrush(col_hilight, wxBRUSHSTYLE_TRANSPARENT));
+		gc->SetPen(wxPen(Drawing::darkColour(col_hilight, 4.0f)));
 		gc->DrawRoundedRectangle(1, 1, 20, 20, 2);
-		//gc->DrawRectangle(1, 1, 20, 20);
 	}
 
 	// Draw icon
