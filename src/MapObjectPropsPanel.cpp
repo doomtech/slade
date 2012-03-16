@@ -168,6 +168,23 @@ MOPGProperty* MapObjectPropsPanel::addThingFlagProperty(wxPGProperty* group, str
 	return prop;
 }
 
+MOPGProperty* MapObjectPropsPanel::addTextureProperty(wxPGProperty* group, string label, string propname, int textype, bool readonly, wxPropertyGrid* grid) {
+	// Create property
+	MOPGTextureProperty* prop = new MOPGTextureProperty(textype, label, propname);
+	prop->setParent(this);
+
+	// Add it
+	properties.push_back(prop);
+	if (!grid)	pg_properties->AppendIn(group, prop);
+	else		grid->AppendIn(group, prop);
+
+	// Set read-only if specified
+	if (readonly)
+		prop->ChangeFlag(wxPG_PROP_READONLY, true);
+
+	return prop;
+}
+
 bool MapObjectPropsPanel::setIntProperty(wxPGProperty* prop, int value, bool force_set) {
 	// Set if forcing
 	if (prop && force_set) {
@@ -312,6 +329,10 @@ void MapObjectPropsPanel::addUDMFProperty(UDMFProperty* prop, int objtype, strin
 		properties.push_back(prop_angle);
 		grid->AppendIn(group, prop_angle);
 	}
+	else if (prop->getType() == UDMFProperty::TYPE_TEX_WALL)
+		addTextureProperty(group, prop->getName(), propname, 0, false, grid);
+	else if (prop->getType() == UDMFProperty::TYPE_TEX_FLAT)
+		addTextureProperty(group, prop->getName(), propname, 1, false, grid);
 }
 
 void MapObjectPropsPanel::setupType(int objtype) {
@@ -401,9 +422,9 @@ void MapObjectPropsPanel::setupType(int objtype) {
 
 		// 'Textures' group 1
 		subgroup = pg_props_side1->Append(new wxPropertyCategory("Textures", "side1.textures"));
-		addStringProperty(subgroup, "Upper Texture", "side1.texturetop");
-		addStringProperty(subgroup, "Middle Texture", "side1.texturemiddle");
-		addStringProperty(subgroup, "Lower Texture", "side1.texturebottom");
+		addTextureProperty(subgroup, "Upper Texture", "side1.texturetop", 0);
+		addTextureProperty(subgroup, "Middle Texture", "side1.texturemiddle", 0);
+		addTextureProperty(subgroup, "Lower Texture", "side1.texturebottom", 0);
 
 		// 'Offsets' group 1
 		subgroup = pg_props_side1->Append(new wxPropertyCategory("Offsets", "side1.offsets"));
@@ -416,9 +437,9 @@ void MapObjectPropsPanel::setupType(int objtype) {
 
 		// 'Textures' group 2
 		subgroup = pg_props_side2->Append(new wxPropertyCategory("Textures", "side2.textures"));
-		addStringProperty(subgroup, "Upper Texture", "side2.texturetop");
-		addStringProperty(subgroup, "Middle Texture", "side2.texturemiddle");
-		addStringProperty(subgroup, "Lower Texture", "side2.texturebottom");
+		addTextureProperty(subgroup, "Upper Texture", "side2.texturetop", 0);
+		addTextureProperty(subgroup, "Middle Texture", "side2.texturemiddle", 0);
+		addTextureProperty(subgroup, "Lower Texture", "side2.texturebottom", 0);
 
 		// 'Offsets' group 2
 		subgroup = pg_props_side2->Append(new wxPropertyCategory("Offsets", "side2.offsets"));
@@ -451,8 +472,8 @@ void MapObjectPropsPanel::setupType(int objtype) {
 		wxPGProperty* g_textures = pg_properties->Append(new wxPropertyCategory("Textures"));
 
 		// Add textures
-		addStringProperty(g_textures, "Floor Texture", "texturefloor");
-		addStringProperty(g_textures, "Ceiling Texture", "textureceiling");
+		addTextureProperty(g_textures, "Floor Texture", "texturefloor", 1);
+		addTextureProperty(g_textures, "Ceiling Texture", "textureceiling", 1);
 
 		// Add 'Special' group
 		wxPGProperty* g_special = pg_properties->Append(new wxPropertyCategory("Special"));

@@ -33,6 +33,8 @@ GameConfiguration::GameConfiguration() {
 	ttype_unknown.icon = "unknown";
 	ttype_unknown.shrink = true;
 	any_map_name = false;
+	mix_tex_flats = false;
+	tx_textures = false;
 }
 
 GameConfiguration::~GameConfiguration() {
@@ -465,6 +467,14 @@ bool GameConfiguration::readConfiguration(string& cfg, string source) {
 		// UDMF namespace
 		else if (S_CMPNOCASE(node->getName(), "udmf_namespace"))
 			udmf_namespace = node->getStringValue();
+
+		// Mixed Textures and Flats
+		else if (S_CMPNOCASE(node->getName(), "mix_tex_flats"))
+			mix_tex_flats = node->getBoolValue();
+
+		// TX_/'textures' namespace enabled
+		else if (S_CMPNOCASE(node->getName(), "tx_textures"))
+			tx_textures = node->getBoolValue();
 	}
 
 	// Go through all other config sections

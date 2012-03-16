@@ -29,6 +29,7 @@ public:
 		TYPE_TFLAG,
 		TYPE_ANGLE,
 		TYPE_COLOUR,
+		TYPE_TEXTURE,
 	};
 
 	int		getType() { return type; }
@@ -142,6 +143,20 @@ public:
 
 	void	openObjects(vector<MapObject*>& objects);
 	void	applyValue();
+};
+
+class MOPGTextureProperty : public MOPGProperty, public wxStringProperty {
+private:
+	int	textype;
+
+public:
+	MOPGTextureProperty(int textype = 0, const wxString& label = wxPG_LABEL, const wxString& name = wxPG_LABEL);
+
+	void	openObjects(vector<MapObject*>& objects);
+	void	applyValue();
+
+	// wxPGProperty overrides
+	bool 	OnEvent(wxPropertyGrid* propgrid, wxWindow* window, wxEvent& e);
 };
 
 

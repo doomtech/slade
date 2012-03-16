@@ -137,6 +137,7 @@ public:
 	size_t		nPatches() { return patches.size(); }
 	CTPatch*	getPatch(size_t index);
 	uint8_t		getState() { return state; }
+	int			getIndex();
 
 	void	setName(string name) { this->name = name; }
 	void	setWidth(uint16_t width) { this->width = width; }

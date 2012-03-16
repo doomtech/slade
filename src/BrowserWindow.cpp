@@ -266,8 +266,8 @@ bool BrowserWindow::selectItem(string name, BrowserTreeNode* node) {
 		if (S_CMPNOCASE(node->getItem(a)->getName(), name)) {
 			// Open this node in the browser and select the item
 			openTree(node);
-			canvas->selectItem(a);
-			canvas->showItem(a);
+			canvas->selectItem(node->getItem(a));
+			canvas->showSelectedItem();
 			tree_items->SelectItem(node->getTreeId());
 			tree_items->Expand(node->getTreeId());
 			return true;
@@ -321,7 +321,23 @@ void BrowserWindow::doSort(unsigned sort_type) {
 		std::sort(items.begin(), items.end(), sortBIName);
 
 	// Refresh canvas
+	canvas->showSelectedItem();
 	canvas->Refresh();
+}
+
+/* BrowserWindow::setSortType
+ * Sets the current sorting method to [type]
+ *******************************************************************/
+void BrowserWindow::setSortType(int type) {
+	// Check type index
+	if (type < 0 || type >= choice_sort->GetCount())
+		return;
+
+	// Select sorting type
+	choice_sort->SetSelection(type);
+
+	// Do sorting
+	doSort(type);
 }
 
 /* BrowserWindow::openTree

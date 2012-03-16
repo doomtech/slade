@@ -42,6 +42,8 @@ public:
 		TYPE_SSPECIAL,
 		TYPE_TTYPE,
 		TYPE_ANGLE,
+		TYPE_TEX_WALL,
+		TYPE_TEX_FLAT,
 	};
 };
 

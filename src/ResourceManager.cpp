@@ -412,6 +412,42 @@ void ResourceManager::getAllTextures(vector<TextureResource::tex_res_t>& list, A
 	}
 }
 
+/* ResourceManager::getAllFlatEntries
+ * Adds all current flat entries to [list]
+ *******************************************************************/
+void ResourceManager::getAllFlatEntries(vector<ArchiveEntry*>& list, Archive* priority) {
+	EntryResourceMap::iterator i = flats.begin();
+
+	// Add all primary entries to the list
+	while (i != flats.end()) {
+		// Skip if no entries
+		if (i->second.length() == 0) {
+			i++;
+			continue;
+		}
+
+		// Go through resource entries
+		ArchiveEntry* entry = i->second.entries[0];
+		for (int a = 0; a < i->second.length(); a++) {
+			entry = i->second.entries[a];
+
+			// If it's in the 'priority' archive, exit loop
+			if (priority && i->second.entries[a]->getParent() == priority)
+				break;
+
+			// Otherwise, if it's in a 'later' archive than the current resource entry, set it
+			if (theArchiveManager->archiveIndex(entry->getParent()) <=
+				theArchiveManager->archiveIndex(i->second.entries[a]->getParent()))
+				entry = i->second.entries[a];
+		}
+
+		// Add entry to the list
+		list.push_back(entry);
+
+		i++;
+	}
+}
+
 /* ResourceManager::getPaletteEntry
  * Returns the most appropriate managed resource entry for [palette],
  * or NULL if no match found
@@ -428,7 +464,7 @@ ArchiveEntry* ResourceManager::getPaletteEntry(string palette, Archive* priority
 		// If it's in the 'priority' archive, return it
 			if (priority && (res.entries[a]->getParent() == priority ||
 				// PK3 and Doom64 maps are contained in an embedded .wad,
-				// so for them the real priority archive is their parent 
+				// so for them the real priority archive is their parent
 				// archive's own parent archive.
 				res.entries[a]->getParent() == priority->getParentArchive()))
 			return res.entries[a];
@@ -461,7 +497,7 @@ ArchiveEntry* ResourceManager::getPatchEntry(string patch, string nspace, Archiv
 			// If it's in the 'priority' archive, return it
 			if (priority && (res.entries[a]->getParent() == priority ||
 				// PK3 and Doom64 maps are contained in an embedded .wad,
-				// so for them the real priority archive is their parent 
+				// so for them the real priority archive is their parent
 				// archive's own parent archive.
 				res.entries[a]->getParent() == priority->getParentArchive()))
 				return res.entries[a];
@@ -498,7 +534,7 @@ ArchiveEntry* ResourceManager::getFlatEntry(string flat, Archive* priority) {
 		// If it's in the 'priority' archive, return it
 			if (priority && (res.entries[a]->getParent() == priority ||
 				// PK3 and Doom64 maps are contained in an embedded .wad,
-				// so for them the real priority archive is their parent 
+				// so for them the real priority archive is their parent
 				// archive's own parent archive.
 				res.entries[a]->getParent() == priority->getParentArchive()))
 			return res.entries[a];
@@ -532,7 +568,7 @@ ArchiveEntry* ResourceManager::getTextureEntry(string texture, string nspace, Ar
 			// If it's in the 'priority' archive, return it
 			if (priority && (res.entries[a]->getParent() == priority ||
 				// PK3 and Doom64 maps are contained in an embedded .wad,
-				// so for them the real priority archive is their parent 
+				// so for them the real priority archive is their parent
 				// archive's own parent archive.
 				res.entries[a]->getParent() == priority->getParentArchive()))
 				return res.entries[a];

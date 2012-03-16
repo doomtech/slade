@@ -243,10 +243,6 @@
       <File Name="src/ArchiveEntry.h"/>
       <File Name="src/ArchiveManager.cpp"/>
       <File Name="src/ArchiveManager.h"/>
-      <File Name="src/WadArchive.cpp"/>
-      <File Name="src/WadArchive.h"/>
-      <File Name="src/ZipArchive.cpp"/>
-      <File Name="src/ZipArchive.h"/>
       <VirtualDirectory Name="EntryType">
         <File Name="src/EntryType.cpp"/>
         <File Name="src/EntryType.h"/>
@@ -262,41 +258,47 @@
           <File Name="src/ModelFormats.h"/>
         </VirtualDirectory>
       </VirtualDirectory>
-      <File Name="src/DatArchive.cpp"/>
-      <File Name="src/DatArchive.h"/>
-      <File Name="src/LibArchive.cpp"/>
-      <File Name="src/LibArchive.h"/>
-      <File Name="src/ResArchive.cpp"/>
-      <File Name="src/ResArchive.h"/>
-      <File Name="src/PakArchive.cpp"/>
-      <File Name="src/PakArchive.h"/>
-      <File Name="src/Wad2Archive.cpp"/>
-      <File Name="src/Wad2Archive.h"/>
-      <File Name="src/WadJArchive.cpp"/>
-      <File Name="src/WadJArchive.h"/>
-      <File Name="src/GrpArchive.cpp"/>
-      <File Name="src/GrpArchive.h"/>
-      <File Name="src/RffArchive.cpp"/>
-      <File Name="src/RffArchive.h"/>
-      <File Name="src/WolfArchive.cpp"/>
-      <File Name="src/WolfArchive.h"/>
-      <File Name="src/GobArchive.cpp"/>
-      <File Name="src/GobArchive.h"/>
-      <File Name="src/LfdArchive.cpp"/>
-      <File Name="src/LfdArchive.h"/>
-      <File Name="src/Archives.h"/>
-      <File Name="src/HogArchive.cpp"/>
-      <File Name="src/HogArchive.h"/>
-      <File Name="src/BSPArchive.cpp"/>
-      <File Name="src/BSPArchive.h"/>
-      <File Name="src/ADatArchive.cpp"/>
-      <File Name="src/ADatArchive.h"/>
-      <File Name="src/BZip2Archive.cpp"/>
-      <File Name="src/BZip2Archive.h"/>
-      <File Name="src/GZipArchive.cpp"/>
-      <File Name="src/GZipArchive.h"/>
-      <File Name="src/TarArchive.cpp"/>
-      <File Name="src/TarArchive.h"/>
+      <VirtualDirectory Name="Archive Formats">
+        <File Name="src/ADatArchive.cpp"/>
+        <File Name="src/ADatArchive.h"/>
+        <File Name="src/Archives.h"/>
+        <File Name="src/BSPArchive.cpp"/>
+        <File Name="src/BSPArchive.h"/>
+        <File Name="src/BZip2Archive.cpp"/>
+        <File Name="src/BZip2Archive.h"/>
+        <File Name="src/DatArchive.cpp"/>
+        <File Name="src/DatArchive.h"/>
+        <File Name="src/GobArchive.cpp"/>
+        <File Name="src/GobArchive.h"/>
+        <File Name="src/GrpArchive.cpp"/>
+        <File Name="src/GrpArchive.h"/>
+        <File Name="src/GZipArchive.cpp"/>
+        <File Name="src/GZipArchive.h"/>
+        <File Name="src/HogArchive.cpp"/>
+        <File Name="src/HogArchive.h"/>
+        <File Name="src/LfdArchive.cpp"/>
+        <File Name="src/LfdArchive.h"/>
+        <File Name="src/LibArchive.cpp"/>
+        <File Name="src/LibArchive.h"/>
+        <File Name="src/PakArchive.cpp"/>
+        <File Name="src/PakArchive.h"/>
+        <File Name="src/ResArchive.cpp"/>
+        <File Name="src/ResArchive.h"/>
+        <File Name="src/RffArchive.cpp"/>
+        <File Name="src/RffArchive.h"/>
+        <File Name="src/TarArchive.cpp"/>
+        <File Name="src/TarArchive.h"/>
+        <File Name="src/Wad2Archive.cpp"/>
+        <File Name="src/Wad2Archive.h"/>
+        <File Name="src/WadArchive.cpp"/>
+        <File Name="src/WadArchive.h"/>
+        <File Name="src/WadJArchive.cpp"/>
+        <File Name="src/WadJArchive.h"/>
+        <File Name="src/WolfArchive.cpp"/>
+        <File Name="src/WolfArchive.h"/>
+        <File Name="src/ZipArchive.cpp"/>
+        <File Name="src/ZipArchive.h"/>
+      </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="Binary Control Lumps">
       <File Name="src/AnimatedList.cpp"/>
@@ -551,6 +553,7 @@
       
       
       
+      
       ]]>
       </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
@@ -589,6 +592,7 @@
       <General OutputFile="./dist/SLADE-dbg.app/Contents/MacOS/SLADE" IntermediateDirectory="./Debug" Command="./dist/SLADE-dbg.app/Contents/MacOS/SLADE" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[
+      
       
       
       ]]>
@@ -644,6 +648,7 @@
       
       
       
+      
       ]]>
       </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
@@ -683,6 +688,7 @@
       <General OutputFile="./dist/SLADE.app/Contents/MacOS/SLADE" IntermediateDirectory="./Release" Command="./dist/SLADE.app/Contents/MacOS/SLADE" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[
+      
       
       
       ]]>

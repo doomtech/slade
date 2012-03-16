@@ -432,7 +432,7 @@ void CTexture::copyTexture(CTexture* tex, bool keep_type) {
 
 	// Clear current texture
 	clear();
-	
+
 	// Copy texture info
 	this->name = tex->name;
 	this->width = tex->width;
@@ -473,6 +473,18 @@ CTPatch* CTexture::getPatch(size_t index) {
 
 	// Return patch at index
 	return patches[index];
+}
+
+/* CTexture::getIndex
+ * Returns the index of this texture within its parent list
+ *******************************************************************/
+int CTexture::getIndex() {
+	// Check if a parent TextureXList exists
+	if (!in_list)
+		return -1;
+
+	// Find this texture in the parent list
+	return in_list->textureIndex(this->getName());
 }
 
 /* CTexture::clear

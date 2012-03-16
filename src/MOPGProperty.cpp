@@ -9,6 +9,7 @@
 #include "MapObjectPropsPanel.h"
 #include "ThingTypeBrowser.h"
 #include "MapEditorWindow.h"
+#include "MapTextureBrowser.h"
 
 
 void MOPGProperty::resetValue() {
@@ -620,4 +621,75 @@ void MOPGColourProperty::applyValue() {
 	col << m_value;
 	for (unsigned a = 0; a < objects.size(); a++)
 		objects[a]->setIntProperty(GetName(), col.GetRGB());
+}
+
+
+MOPGTextureProperty::MOPGTextureProperty(int textype, const wxString& label, const wxString& name)
+: wxStringProperty(label, name), MOPGProperty(MOPGProperty::TYPE_TEXTURE) {
+	// Init variables
+	this->textype = textype;
+
+	// Set to text+button editor
+	SetEditor(wxPGEditor_TextCtrlAndButton);
+}
+
+void MOPGTextureProperty::openObjects(vector<MapObject*>& objects) {
+	// Set unspecified if no objects given
+	if (objects.size() == 0) {
+		SetValueToUnspecified();
+		return;
+	}
+
+	// Get property of first object
+	string first = objects[0]->stringProperty(GetName());
+
+	// Check whether all objects share the same value
+	for (unsigned a = 1; a < objects.size(); a++) {
+		if (objects[a]->stringProperty(GetName()) != first) {
+			// Different value found, set unspecified
+			SetValueToUnspecified();
+			return;
+		}
+	}
+
+	// Set to common value
+	noupdate = true;
+	SetValue(first);
+	noupdate = false;
+}
+
+void MOPGTextureProperty::applyValue() {
+	// Do nothing if no parent (and thus no object list)
+	if (!parent || noupdate)
+		return;
+
+	// Do nothing if the value is unspecified
+	if (IsValueUnspecified())
+		return;
+
+	// Go through objects and set this value
+	vector<MapObject*>& objects = parent->getObjects();
+	for (unsigned a = 0; a < objects.size(); a++)
+		objects[a]->setStringProperty(GetName(), m_value.GetString());
+}
+
+bool MOPGTextureProperty::OnEvent(wxPropertyGrid* propgrid, wxWindow* window, wxEvent& e) {
+	if (e.GetEventType() == wxEVT_COMMAND_BUTTON_CLICKED) {
+		// Get current texture (if any)
+		string tex_current = "";
+		if (!IsValueUnspecified())
+			tex_current = GetValueAsString();
+
+		// Open map texture browser
+		MapTextureBrowser browser(theMapEditor, textype, tex_current);
+		if (browser.ShowModal() == wxID_OK && browser.getSelectedItem())
+			SetValue(browser.getSelectedItem()->getName());
+
+		// Refresh text
+		RefreshEditor();
+
+		e.Skip();
+	}
+
+	return wxStringProperty::OnEvent(propgrid, window, e);
 }

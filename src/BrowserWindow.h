@@ -64,6 +64,7 @@ public:
 
 	unsigned		addSortType(string name);
 	virtual void	doSort(unsigned sort_type = 0);
+	void			setSortType(int type);
 
 	void	openTree(BrowserTreeNode* node, bool clear = true);
 

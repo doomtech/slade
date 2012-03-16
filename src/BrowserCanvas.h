@@ -11,6 +11,7 @@ private:
 	vector<int>				items_filter;
 	wxScrollBar*			scrollbar;
 	string					search;
+	BrowserItem*			item_selected;
 
 	// Display
 	int	yoff;
@@ -18,11 +19,8 @@ private:
 	int	font;
 	int	show_names;
 	int	item_size;
-
-	// Item selection
-	int	top_index;
-	int	top_y;
-	int	item_selected;
+	int top_index;
+	int top_y;
 
 public:
 	BrowserCanvas(wxWindow* parent);
@@ -41,9 +39,13 @@ public:
 	void					setScrollBar(wxScrollBar* scrollbar);
 	void					updateScrollBar();
 	BrowserItem*			getSelectedItem();
+	BrowserItem*			itemAt(int index);
+	int						itemIndex(BrowserItem* item);
 	void					selectItem(int index);
+	void					selectItem(BrowserItem* item);
 	void					filterItems(string filter);
 	void					showItem(int item, bool top = true);
+	void					showSelectedItem();
 	bool					searchItemFrom(int from);
 	void					setFont(int font) { this->font = font; }
 	void					showNames(int show) { this->show_names = show; }

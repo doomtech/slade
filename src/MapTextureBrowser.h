@@ -8,7 +8,7 @@ class MapTexBrowserItem : public BrowserItem {
 private:
 
 public:
-	MapTexBrowserItem(string name);
+	MapTexBrowserItem(string name, int type, unsigned index = 0);
 	~MapTexBrowserItem();
 
 	bool	loadImage();
@@ -16,9 +16,10 @@ public:
 
 class MapTextureBrowser : public BrowserWindow {
 private:
+	int	type;
 
 public:
-	MapTextureBrowser(wxWindow* parent);
+	MapTextureBrowser(wxWindow* parent, int type = 0, string texture = "");
 	~MapTextureBrowser();
 };
 

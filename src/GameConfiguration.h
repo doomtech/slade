@@ -57,6 +57,8 @@ private:
 	ThingType		ttype_unknown;
 	vector<string>	map_names;
 	bool			any_map_name;
+	bool			mix_tex_flats;
+	bool			tx_textures;
 
 	struct gconf_t {
 		string	title;
@@ -112,6 +114,8 @@ public:
 	int		getMapFormat() { return map_format; }
 	bool	isBoom() { return boom; }
 	bool	anyMapName() { return any_map_name; }
+	bool	mixTexFlats() { return mix_tex_flats; }
+	bool	txTextures() { return tx_textures; }
 
 	string			readConfigName(MemChunk& mc);
 	void			init();
