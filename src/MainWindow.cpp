@@ -42,6 +42,7 @@
 #include "MapEditorWindow.h"
 #include "MapEditorConfigDialog.h"
 #include "SToolBar.h"
+#include "cl_notebook_art/cl_aui_notebook_art.h"
 #include <wx/aboutdlg.h>
 #include <wx/dnd.h>
 #include <wx/statline.h>
@@ -118,6 +119,7 @@ void MainWindow::setupLayout() {
 
 	// -- Editor Area --
 	notebook_tabs = new wxAuiNotebook(this, -1, wxDefaultPosition, wxDefaultSize, wxAUI_NB_DEFAULT_STYLE|wxNO_BORDER|wxAUI_NB_WINDOWLIST_BUTTON|wxNB_FLAT);
+	notebook_tabs->SetArtProvider(new clAuiTabArt());
 
 	// Setup panel info & add panel
 	p_inf.CenterPane();

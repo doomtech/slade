@@ -607,7 +607,6 @@ void MOPGColourProperty::openObjects(vector<MapObject*>& objects) {
 }
 
 void MOPGColourProperty::applyValue() {
-	/*
 	// Do nothing if no parent (and thus no object list)
 	if (!parent || noupdate)
 		return;
@@ -618,7 +617,8 @@ void MOPGColourProperty::applyValue() {
 
 	// Go through objects and set this value
 	vector<MapObject*>& objects = parent->getObjects();
+	wxColor col;
+	col << m_value;
 	for (unsigned a = 0; a < objects.size(); a++)
-		objects[a]->setIntProperty(GetName(), m_value.GetInteger());
-	*/
+		objects[a]->setIntProperty(GetName(), col.GetRGB());
 }

@@ -3,11 +3,10 @@
 #include "WxStuff.h"
 #include "SToolBar.h"
 #include "SToolBarButton.h"
+#include "Drawing.h"
 #include <wx/wrapsizer.h>
 
 CVAR(Bool, show_toolbar_names, false, CVAR_SAVE)
-CVAR(Bool, toolbar_background_grey, false, CVAR_SAVE)
-wxColour stb_bg = wxColour(220, 220, 220);
 
 class SToolBarSeparator : public wxControl {
 public:
@@ -29,7 +28,7 @@ public:
 		wxPaintDC dc(this);
 
 		// Get system colours needed
-		wxColour col_background = stb_bg;
+		wxColour col_background = Drawing::getMenuBarBGColour();
 		rgba_t bg(col_background.Red(), col_background.Green(), col_background.Blue());
 		wxColour col_light = WXCOL(bg.amp(50, 50, 50, 0));
 		wxColour col_dark = WXCOL(bg.amp(-50, -50, -50, 0));
@@ -52,7 +51,7 @@ SToolBarGroup::SToolBarGroup(wxWindow* parent, string name, bool force_name) : w
 	this->name = name;
 
 	// Set colours
-	SetBackgroundColour(stb_bg);
+	SetBackgroundColour(Drawing::getMenuBarBGColour());
 
 	// Create sizer
 	wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
@@ -61,7 +60,7 @@ SToolBarGroup::SToolBarGroup(wxWindow* parent, string name, bool force_name) : w
 	// Create group label if necessary
 	if (show_toolbar_names || force_name) {
 		wxStaticText* label = new wxStaticText(this, -1, S_FMT("%s:", CHR(name)));
-		label->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_MENUTEXT));
+		label->SetForegroundColour(Drawing::getMenuTextColour());
 		sizer->AddSpacer(4);
 		sizer->Add(label, 0, wxALIGN_CENTER_VERTICAL);
 		sizer->AddSpacer(2);
@@ -110,12 +109,8 @@ protected:
 
 
 SToolBar::SToolBar(wxWindow* parent) : wxPanel(parent, -1) {
-	// Setup background colour
-	if (!toolbar_background_grey)
-		stb_bg = wxSystemSettings::GetColour(wxSYS_COLOUR_MENUBAR);
-
 	// Set background colour
-	SetBackgroundColour(stb_bg);
+	SetBackgroundColour(Drawing::getMenuBarBGColour());
 
 	// Create sizer
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);

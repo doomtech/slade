@@ -6,6 +6,8 @@
 #include <SFML/Graphics.hpp>
 #endif
 
+#include <wx/colour.h>
+
 class GLTexture;
 namespace Drawing {
 	enum {
@@ -46,6 +48,14 @@ namespace Drawing {
 #ifdef USE_SFML_RENDERWINDOW
 	void setRenderTarget(sf::RenderWindow* target);
 #endif
+
+
+	// From CodeLite
+	wxColour getPanelBGColour();
+	wxColour getMenuTextColour();
+	wxColour getMenuBarBGColour();
+	wxColour lightColour(const wxColour& colour, float percent);
+	wxColour darkColour(const wxColour& colour, float percent);
 }
 
 #endif//__DRAWING_H__

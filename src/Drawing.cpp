@@ -33,11 +33,19 @@
 #include "ArchiveManager.h"
 #include "Console.h"
 #include "MathStuff.h"
+#include "Misc.h"
+#include <wx/settings.h>
 
 #ifdef USE_SFML_RENDERWINDOW
 #include <SFML/Graphics.hpp>
 #else
 #include <FTGL/ftgl.h>
+#endif
+
+#ifdef __WXGTK20__
+#define GSocket GlibGSocket
+#include <gtk-2.0/gtk/gtk.h>
+#undef GSocket
 #endif
 
 
@@ -405,6 +413,115 @@ void Drawing::setRenderTarget(sf::RenderWindow* target) {
 }
 #endif
 
+
+// The following functions are taken from CodeLite (http://codelite.org)
+
+wxColour Drawing::getPanelBGColour() {
+#ifdef __WXGTK__
+	static bool     intitialized(false);
+	static wxColour bgColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE));
+
+	if( !intitialized ) {
+		// try to get the background colour from a menu
+		GtkWidget *menu = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+		GtkStyle   *def = gtk_rc_get_style( menu );
+		if(!def)
+			def = gtk_widget_get_default_style();
+
+		if(def) {
+			GdkColor col = def->bg[GTK_STATE_NORMAL];
+			bgColour = wxColour(col);
+		}
+		gtk_widget_destroy( menu );
+		intitialized = true;
+	}
+	return bgColour;
+#else
+	return wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE);
+#endif
+}
+
+wxColour Drawing::getMenuTextColour() {
+#ifdef __WXGTK__
+	static bool     intitialized(false);
+	static wxColour textColour(wxSystemSettings::GetColour(wxSYS_COLOUR_MENUTEXT));
+
+	if( !intitialized ) {
+		// try to get the text colour from a menu
+		GtkWidget *menuBar = gtk_menu_new();
+		GtkStyle   *def = gtk_rc_get_style( menuBar );
+		if(!def)
+			def = gtk_widget_get_default_style();
+
+		if(def) {
+			GdkColor col = def->text[GTK_STATE_NORMAL];
+			textColour = wxColour(col);
+		}
+		gtk_widget_destroy( menuBar );
+		intitialized = true;
+	}
+	return textColour;
+#else
+	return wxSystemSettings::GetColour(wxSYS_COLOUR_MENUTEXT);
+#endif
+}
+
+wxColour Drawing::getMenuBarBGColour() {
+#ifdef __WXGTK__
+	static bool     intitialized(false);
+	static wxColour textColour(wxSystemSettings::GetColour(wxSYS_COLOUR_MENUBAR));
+
+	if( !intitialized ) {
+		// try to get the background colour from a menu
+		GtkWidget *menuBar = gtk_menu_bar_new();
+		GtkStyle   *def = gtk_rc_get_style( menuBar );
+		if(!def)
+			def = gtk_widget_get_default_style();
+
+		if(def) {
+			GdkColor col = def->bg[GTK_STATE_NORMAL];
+			textColour = wxColour(col);
+		}
+		gtk_widget_destroy( menuBar );
+		intitialized = true;
+	}
+	return textColour;
+#else
+	return wxSystemSettings::GetColour(wxSYS_COLOUR_MENUBAR);
+#endif
+}
+
+wxColour Drawing::lightColour(const wxColour& colour, float percent) {
+	if(percent == 0) {
+		return colour;
+	}
+
+	// Convert to HSL
+	hsl_t hsl = Misc::rgbToHsl(rgba_t(colour.Red(), colour.Green(), colour.Blue()));
+
+	// Increase luminance
+	hsl.l += (float)((percent * 5.0)/100.0);
+	if (hsl.l > 1.0) hsl.l = 1.0;
+
+	rgba_t rgb = Misc::hslToRgb(hsl);
+	return wxColour(rgb.r, rgb.g, rgb.b);
+}
+
+wxColour Drawing::darkColour(const wxColour& colour, float percent) {
+	if(percent == 0) {
+		return colour;
+	}
+
+	// Convert to HSL
+	hsl_t hsl = Misc::rgbToHsl(rgba_t(colour.Red(), colour.Green(), colour.Blue()));
+
+	// Decrease luminance
+	hsl.l -= (float)((percent * 5.0)/100.0);
+	if (hsl.l < 0) hsl.l = 0;
+
+	rgba_t rgb = Misc::hslToRgb(hsl);
+	return wxColour(rgb.r, rgb.g, rgb.b);
+}
 
 
 /*

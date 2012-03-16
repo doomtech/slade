@@ -10,7 +10,6 @@ private:
 	wxCheckBox*	cb_start_page;
 	wxCheckBox*	cb_context_submenus;
 	wxCheckBox*	cb_swap_epanel_bars;
-	wxCheckBox*	cb_toolbar_background_grey;
 
 public:
 	InterfacePrefsPanel(wxWindow* parent);

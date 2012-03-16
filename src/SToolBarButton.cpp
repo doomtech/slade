@@ -4,10 +4,9 @@
 #include "MainApp.h"
 #include "SToolBarButton.h"
 #include "Icons.h"
+#include "Drawing.h"
 #include <wx/graphics.h>
 
-
-extern wxColour stb_bg;
 
 SToolBarButton::SToolBarButton(wxWindow* parent, string action, string icon)
 : wxControl(parent, -1, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE) {
@@ -45,7 +44,7 @@ void SToolBarButton::onPaint(wxPaintEvent& e) {
 	wxPaintDC dc(this);
 
 	// Get system colours needed
-	wxColour col_background = stb_bg;
+	wxColour col_background = Drawing::getMenuBarBGColour();
 	wxColour col_hilight_m = wxSystemSettings::GetColour(wxSYS_COLOUR_MENUHILIGHT);
 	wxColour col_hilight = wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT);
 

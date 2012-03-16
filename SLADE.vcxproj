@@ -134,6 +134,7 @@
     <ClCompile Include="src\bzip2\decompress.c" />
     <ClCompile Include="src\bzip2\huffman.c" />
     <ClCompile Include="src\bzip2\randtable.c" />
+    <ClCompile Include="src\cl_notebook_art\cl_aui_notebook_art.cpp" />
     <ClCompile Include="src\CodePages.cpp" />
     <ClCompile Include="src\ColourConfiguration.cpp" />
     <ClCompile Include="src\ColourPrefsPanel.cpp" />
@@ -353,6 +354,7 @@
     <ClInclude Include="src\BZip2Archive.h" />
     <ClInclude Include="src\bzip2\bzlib.h" />
     <ClInclude Include="src\bzip2\bzlib_private.h" />
+    <ClInclude Include="src\cl_notebook_art\cl_aui_notebook_art.h" />
     <ClInclude Include="src\CodePages.h" />
     <ClInclude Include="src\ColourConfiguration.h" />
     <ClInclude Include="src\ColourPrefsPanel.h" />

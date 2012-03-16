@@ -139,6 +139,9 @@
     <Filter Include="UI Elements\SToolBar">
       <UniqueIdentifier>{8a2b5ffe-17e4-4358-a572-8e338e14c933}</UniqueIdentifier>
     </Filter>
+    <Filter Include="External\CodeLite Notebook Art">
+      <UniqueIdentifier>{a0b955c7-f8c3-4ccf-94dd-2137c2dd6b5d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\GfxConvDialog.cpp">
@@ -797,6 +800,9 @@
     </ClCompile>
     <ClCompile Include="src\MapPreviewCanvas.cpp">
       <Filter>UI Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="src\cl_notebook_art\cl_aui_notebook_art.cpp">
+      <Filter>External\CodeLite Notebook Art</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1490,6 +1496,9 @@
     </ClInclude>
     <ClInclude Include="src\MapPreviewCanvas.h">
       <Filter>UI Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cl_notebook_art\cl_aui_notebook_art.h">
+      <Filter>External\CodeLite Notebook Art</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
