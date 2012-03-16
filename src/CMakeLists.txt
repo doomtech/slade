@@ -3,6 +3,9 @@ include(${wxWidgets_USE_FILE})
 
 set(SFML_FIND_COMPONENTS system audio)
 
+find_package (PkgConfig REQUIRED)
+pkg_check_modules (GTK2 REQUIRED gtk+-2.0)
+
 include(../FindFluidSynth.cmake)
 include(../FindFreeImage.cmake)
 include(../FindSFML.cmake)
@@ -27,7 +30,7 @@ endif()
 if(NOT ${GLEW_FOUND})
 	message(SEND_ERROR "GLEW required.")
 endif()
-include_directories(${FLUIDSYNTH_INCLUDE_DIR} ${FREEIMAGE_INCLUDE_DIR} ${SFML_INCLUDE_DIR} ${FTGL_INCLUDE_DIR} ${FREETYPE_INCLUDE_DIRS} ${GLEW_INCLUDE_PATH})
+include_directories(${FLUIDSYNTH_INCLUDE_DIR} ${FREEIMAGE_INCLUDE_DIR} ${SFML_INCLUDE_DIR} ${FTGL_INCLUDE_DIR} ${FREETYPE_INCLUDE_DIRS} ${GLEW_INCLUDE_PATH} ${GTK2_INCLUDE_DIRS})
 
 set(SLADE_SOURCES
 )
@@ -39,8 +42,9 @@ add_executable(slade WIN32
 	zreaders/ancientzip.cpp
 	zreaders/files.cpp
 	zreaders/m_alloc.cpp
+	cl_notebook_art/cl_aui_notebook_art.cpp
 	${SLADE_SOURCES}
 )
 
-target_link_libraries(slade ${ZLIB_LIBRARY} ${BZIP2_LIBRARIES} ${wxWidgets_LIBRARIES} ${FLUIDSYNTH_LIBRARIES} ${FREEIMAGE_LIBRARIES} ${SFML_LIBRARY} ${FTGL_LIBRARY} ${OPENGL_LIBRARIES} ${FREETYPE_LIBRARIES} ${GLEW_LIBRARY})
+target_link_libraries(slade ${ZLIB_LIBRARY} ${BZIP2_LIBRARIES} ${wxWidgets_LIBRARIES} ${FLUIDSYNTH_LIBRARIES} ${FREEIMAGE_LIBRARIES} ${SFML_LIBRARY} ${FTGL_LIBRARY} ${OPENGL_LIBRARIES} ${FREETYPE_LIBRARIES} ${GLEW_LIBRARY} ${GTK2_LIBRARIES})
 set_target_properties(slade PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${SLADE_OUTPUT_DIR})
