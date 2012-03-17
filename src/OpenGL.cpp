@@ -36,7 +36,7 @@
  *******************************************************************/
 CVAR(Bool, gl_tex_enable_np2, true, CVAR_SAVE)
 CVAR(Bool, gl_point_sprite, true, CVAR_SAVE)
-CVAR(Bool, gl_tweak_accuracy, false, CVAR_SAVE)
+CVAR(Bool, gl_tweak_accuracy, true, CVAR_SAVE)
 
 namespace OpenGL {
 	wxGLContext*	context = NULL;
