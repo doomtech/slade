@@ -18,12 +18,17 @@ public:
 
 class ThingTypeBrowser : public BrowserWindow {
 private:
+	wxCheckBox*	cb_view_tiles;
 
 public:
 	ThingTypeBrowser(wxWindow* parent, int type = -1);
 	~ThingTypeBrowser();
 
-	int	getSelectedType();
+	void	setupViewOptions();
+	int		getSelectedType();
+
+	// Events
+	void	onViewTilesClicked(wxCommandEvent& e);
 };
 
 #endif//__THING_TYPE_BROWSER_H__

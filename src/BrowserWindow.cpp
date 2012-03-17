@@ -36,6 +36,7 @@
 #include "Console.h"
 #include <algorithm>
 #include <wx/splitter.h>
+#include <wx/dataview.h>
 
 
 /*******************************************************************
@@ -100,7 +101,7 @@ void BrowserTreeNode::addItem(BrowserItem* item, unsigned index) {
  *******************************************************************
  * wxTreeItemData class needed to associate BrowserTreeNodes with tree items
  */
-class BrowserTreeItemData : public wxTreeItemData {
+class BrowserTreeItemData : public wxClientData {
 private:
 	BrowserTreeNode*	node;
 
@@ -128,48 +129,52 @@ BrowserWindow::BrowserWindow(wxWindow* parent) : wxDialog(parent, -1, "Browser",
 	wxBoxSizer* m_vbox = new wxBoxSizer(wxVERTICAL);
 	SetSizer(m_vbox);
 
-	wxSplitterWindow* swin = new wxSplitterWindow(this, -1);
-	m_vbox->Add(swin, 1, wxEXPAND|wxALL, 4);
+	//wxSplitterWindow* swin = new wxSplitterWindow(this, -1);
+	wxBoxSizer* m_hbox = new wxBoxSizer(wxHORIZONTAL);
+	m_vbox->Add(m_hbox, 1, wxEXPAND|wxALL, 4);
 
 	// Browser tree
-	tree_items = new wxTreeCtrl(swin, -1, wxDefaultPosition, wxDefaultSize, wxTR_DEFAULT_STYLE);
+	tree_items = new wxTreeListCtrl(this, -1, wxDefaultPosition, wxDefaultSize, wxTL_SINGLE|wxDV_ROW_LINES);
+	m_hbox->Add(tree_items, 0, wxEXPAND|wxALL, 4);
 
 	// Browser area
-	wxPanel* panel_browser_area = new wxPanel(swin, -1);
+	//wxPanel* panel_browser_area = new wxPanel(this, -1);
 	wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
-	panel_browser_area->SetSizer(vbox);
+	m_hbox->Add(vbox, 1, wxEXPAND|wxALL, 4);
+	//panel_browser_area->SetSizer(vbox);
 
 	// Zoom
 	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
-	vbox->Add(hbox, 0, wxEXPAND|wxBOTTOM|wxLEFT, 4);
-	slider_zoom = new wxSlider(panel_browser_area, -1, browser_item_size, 64, 256);
+	vbox->Add(hbox, 0, wxEXPAND|wxBOTTOM, 4);
+	slider_zoom = new wxSlider(this, -1, browser_item_size, 64, 256);
 	slider_zoom->SetLineSize(16);
 	slider_zoom->SetPageSize(32);
-	hbox->Add(new wxStaticText(panel_browser_area, -1, "Zoom:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 2);
+	hbox->Add(new wxStaticText(this, -1, "Zoom:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 2);
 	hbox->Add(slider_zoom, 1, wxEXPAND);
 
 	// Sorting
-	choice_sort = new wxChoice(panel_browser_area, -1);
+	choice_sort = new wxChoice(this, -1);
 	hbox->AddStretchSpacer();
-	hbox->Add(new wxStaticText(panel_browser_area, -1, "Sort:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 2);
+	hbox->Add(new wxStaticText(this, -1, "Sort:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 2);
 	hbox->Add(choice_sort, 0, wxEXPAND|wxRIGHT, 4);
 
 	// Filter
-	text_filter = new wxTextCtrl(panel_browser_area, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0);
-	hbox->Add(new wxStaticText(panel_browser_area, -1, "Filter:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 2);
+	text_filter = new wxTextCtrl(this, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0);
+	hbox->Add(new wxStaticText(this, -1, "Filter:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 2);
 	hbox->Add(text_filter, 0, wxEXPAND|wxRIGHT, 4);
 
 	// Browser canvas
 	hbox = new wxBoxSizer(wxHORIZONTAL);
-	vbox->Add(hbox, 1, wxEXPAND|wxBOTTOM|wxLEFT|wxRIGHT, 4);
-	canvas = new BrowserCanvas(panel_browser_area);
+	vbox->Add(hbox, 1, wxEXPAND|wxBOTTOM, 4);
+	canvas = new BrowserCanvas(this);
 	hbox->Add(canvas, 1, wxEXPAND);
+
 	// Canvas scrollbar
-	wxScrollBar* scrollbar = new wxScrollBar(panel_browser_area, -1, wxDefaultPosition, wxDefaultSize, wxSB_VERTICAL);
+	wxScrollBar* scrollbar = new wxScrollBar(this, -1, wxDefaultPosition, wxDefaultSize, wxSB_VERTICAL);
 	hbox->Add(scrollbar, 0, wxEXPAND);
 	canvas->setScrollBar(scrollbar);
 
-	swin->SplitVertically(tree_items, panel_browser_area, 150);
+	//swin->SplitVertically(tree_items, this, 150);
 
 	// Bottom sizer
 	sizer_bottom = new wxBoxSizer(wxHORIZONTAL);
@@ -188,7 +193,7 @@ BrowserWindow::BrowserWindow(wxWindow* parent) : wxDialog(parent, -1, "Browser",
 	choice_sort->SetSelection(0);
 
 	// Bind events
-	tree_items->Bind(wxEVT_COMMAND_TREE_SEL_CHANGED, &BrowserWindow::onTreeItemSelected, this);
+	tree_items->Bind(wxEVT_COMMAND_TREELIST_SELECTION_CHANGED, &BrowserWindow::onTreeItemSelected, this);
 	choice_sort->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &BrowserWindow::onChoiceSortChanged, this);
 	canvas->Bind(wxEVT_LEFT_DCLICK, &BrowserWindow::onCanvasDClick, this);
 	text_filter->Bind(wxEVT_COMMAND_TEXT_UPDATED, &BrowserWindow::onTextFilterChanged, this);
@@ -198,7 +203,7 @@ BrowserWindow::BrowserWindow(wxWindow* parent) : wxDialog(parent, -1, "Browser",
 	Layout();
 	SetInitialSize(wxSize(768, 600));
 	SetMinSize(wxSize(540, 400));
-	CenterOnScreen();
+	CenterOnParent();
 }
 
 /* BrowserWindow::~BrowserWindow
@@ -273,7 +278,7 @@ bool BrowserWindow::selectItem(string name, BrowserTreeNode* node) {
 			openTree(node);
 			canvas->selectItem(node->getItem(a));
 			canvas->showSelectedItem();
-			tree_items->SelectItem(node->getTreeId());
+			tree_items->Select(node->getTreeId());
 			tree_items->Expand(node->getTreeId());
 			return true;
 		}
@@ -351,16 +356,13 @@ void BrowserWindow::setSortType(int type) {
  * current list contents will be cleared
  *******************************************************************/
 void BrowserWindow::openTree(BrowserTreeNode* node, bool clear) {
-	// Get item list from canvas
-	vector<BrowserItem*>& list = canvas->itemList();
-
-	// Clear it if needed
+	// Clear if needed
 	if (clear)
-		list.clear();
+		canvas->clearItems();
 
 	// Add all items in the node
 	for (unsigned a = 0; a < node->nItems(); a++) {
-		list.push_back(node->getItem(a));
+		canvas->addItem(node->getItem(a));
 		node->getItem(a)->parent = this;
 	}
 
@@ -373,10 +375,29 @@ void BrowserWindow::openTree(BrowserTreeNode* node, bool clear) {
 		doSort(choice_sort->GetSelection());
 		canvas->updateScrollBar();
 		canvas->filterItems(text_filter->GetValue());
+		canvas->showSelectedItem();
 	}
+}
 
-	// Clear item selection
-	canvas->selectItem(-1);
+int expandtree(wxTreeListCtrl* tree, wxTreeListItem& item, bool expand, int depth) {
+	if (!item.IsOk())
+		return depth;
+
+	if (expand)
+		tree->Expand(item);
+
+	// Expand first sibling
+	wxTreeListItem sibling = tree->GetNextSibling(item);
+	expandtree(tree, sibling, expand, depth);
+
+	// Expand first child
+	wxTreeListItem child = tree->GetFirstChild(item);
+	depth = expandtree(tree, child, expand, depth + 1);
+
+	if (!expand)
+		tree->Collapse(item);
+
+	return depth;
 }
 
 /* BrowserWindow::populateItemTree
@@ -386,30 +407,34 @@ void BrowserWindow::openTree(BrowserTreeNode* node, bool clear) {
 void BrowserWindow::populateItemTree() {
 	// Clear current tree
 	tree_items->DeleteAllItems();
+	tree_items->DeleteColumn(0);
 
 	// Add root item
-	wxTreeItemId item = tree_items->AddRoot("All");
+	tree_items->AppendColumn("Categories", wxCOL_WIDTH_AUTOSIZE);
+	wxTreeListItem item = tree_items->AppendItem(tree_items->GetRootItem(), "All");
 	tree_items->SetItemData(item, new BrowserTreeItemData(items_root));
 
 	// Add tree
 	addItemTree(items_root, item);
 
 	// Update window layout
-	tree_items->ExpandAll();
-	tree_items->SetInitialSize(wxSize(130, -1));
+	int depth = expandtree(tree_items, item, true, 0);
+	int colwidth = tree_items->GetColumnWidth(0);
+	if (colwidth < 30) colwidth = 200;
+	tree_items->SetMinSize(wxSize(colwidth + 16, -1));
 	Layout();
-	tree_items->CollapseAll();
+	expandtree(tree_items, item, false, 0);
 }
 
 /* BrowserWindow::addItemTree
  * Adds [node] to the wxTreeCtrl after [item]
  *******************************************************************/
-void BrowserWindow::addItemTree(BrowserTreeNode* node, wxTreeItemId& item) {
+void BrowserWindow::addItemTree(BrowserTreeNode* node, wxTreeListItem& item) {
 	// Go through child items
 	for (unsigned a = 0; a < node->nChildren(); a++) {
 		// Add tree item
 		BrowserTreeNode* child = (BrowserTreeNode*)node->getChild(a);
-		wxTreeItemId i = tree_items->AppendItem(item, child->getName(), -1, -1, new BrowserTreeItemData(child));
+		wxTreeListItem i = tree_items->AppendItem(item, child->getName(), -1, -1, new BrowserTreeItemData(child));
 		child->setTreeId(i);
 
 		// Add children
@@ -425,11 +450,10 @@ void BrowserWindow::setFont(int font) {
 }
 
 /* BrowserWindow::showSelectedNameOnly
- * Sets whether to only show the name for the currently selected item
- * (true) or all items (false)
+ * Sets the type of item names to show (in normal view mode)
  *******************************************************************/
-void BrowserWindow::showNames(int show) {
-	canvas->showNames(show);
+void BrowserWindow::setItemNameType(int type) {
+	canvas->setItemNameType(type);
 }
 
 /* BrowserWindow::setItemSize
@@ -447,6 +471,13 @@ void BrowserWindow::setItemSize(int size) {
 	Refresh();
 }
 
+/* BrowserWindow::setItemViewType
+ * Sets the item view type
+ *******************************************************************/
+void BrowserWindow::setItemViewType(int type) {
+	canvas->setItemViewType(type);
+}
+
 
 /*******************************************************************
  * BROWSERWINDOW CLASS EVENTS
@@ -455,7 +486,7 @@ void BrowserWindow::setItemSize(int size) {
 /* BrowserWindow::onTreeItemSelected
  * Called when an item on the category wxTreeCtrl is selected
  *******************************************************************/
-void BrowserWindow::onTreeItemSelected(wxTreeEvent& e) {
+void BrowserWindow::onTreeItemSelected(wxTreeListEvent& e) {
 	BrowserTreeItemData* data = (BrowserTreeItemData*)tree_items->GetItemData(e.GetItem());
 	openTree(data->getNode());
 	canvas->Refresh();

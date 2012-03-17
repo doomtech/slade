@@ -40,6 +40,7 @@ namespace Drawing {
 
 	// Text drawing
 	void drawText(string text, int x = 0, int y = 0, rgba_t colour = COL_WHITE, int font = FONT_NORMAL, int alignment = ALIGN_LEFT, frect_t* bounds = NULL);
+	fpoint2_t textExtents(string text, int font = FONT_NORMAL);
 
 	// Specific
 	void drawHud(bool statusbar, bool center, bool wide);

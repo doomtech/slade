@@ -5,14 +5,14 @@
 #include "Tree.h"
 #include "BrowserItem.h"
 #include "BrowserCanvas.h"
-#include <wx/treectrl.h>
+#include <wx/treelist.h>
 #include <wx/frame.h>
 
 class BrowserTreeNode : public STreeNode {
 private:
 	string 					name;
 	vector<BrowserItem*>	items;
-	wxTreeItemId			tree_id;
+	wxTreeListItem			tree_id;
 
 	STreeNode* createChild(string name) {
 		BrowserTreeNode* node = new BrowserTreeNode();
@@ -25,9 +25,9 @@ public:
 	~BrowserTreeNode();
 
 	string			getName() { return name; }
-	wxTreeItemId	getTreeId() { return tree_id; }
+	wxTreeListItem	getTreeId() { return tree_id; }
 	void			setName(string name) { this->name = name; }
-	void			setTreeId(wxTreeItemId id) { this->tree_id = id; }
+	void			setTreeId(wxTreeListItem id) { this->tree_id = id; }
 
 	void			clearItems();
 	unsigned		nItems() { return items.size(); }
@@ -38,17 +38,18 @@ public:
 
 class BrowserWindow : public wxDialog {
 private:
-	wxTreeCtrl*			tree_items;
+	//wxTreeCtrl*			tree_items;
+	wxTreeListCtrl*		tree_items;
 	wxChoice*			choice_sort;
 	wxTextCtrl*			text_filter;
 	wxSlider*			slider_zoom;
-	BrowserCanvas*		canvas;
 	wxStaticText*		label_info;
 
 protected:
 	BrowserTreeNode*	items_root;
 	wxBoxSizer*			sizer_bottom;
 	Palette8bit			palette;
+	BrowserCanvas*		canvas;
 
 public:
 	BrowserWindow(wxWindow* parent);
@@ -70,15 +71,16 @@ public:
 	void	openTree(BrowserTreeNode* node, bool clear = true);
 
 	void	populateItemTree();
-	void	addItemTree(BrowserTreeNode* node, wxTreeItemId& item);
+	void	addItemTree(BrowserTreeNode* node, wxTreeListItem& item);
 
 	// Canvas display options
 	void	setFont(int font);
-	void	showNames(int show);
+	void	setItemNameType(int type);
 	void	setItemSize(int size);
+	void	setItemViewType(int type);
 
 	// Events
-	void	onTreeItemSelected(wxTreeEvent& e);
+	void	onTreeItemSelected(wxTreeListEvent& e);
 	void	onChoiceSortChanged(wxCommandEvent& e);
 	void	onCanvasDClick(wxMouseEvent& e);
 	void	onTextFilterChanged(wxCommandEvent& e);

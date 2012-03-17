@@ -280,10 +280,13 @@ void Drawing::drawTextureWithin(GLTexture* tex, double x1, double y1, double x2,
 }
 
 #ifdef USE_SFML_RENDERWINDOW
+/*******************************************************************
+ * SFML TEXT FUNCTION IMPLEMENTATIONS
+ *******************************************************************/
+
 /* Drawing::drawText
  * Draws [text] at [x,y]. If [bounds] is not null, the bounding
  * coordinates of the rendered text string are written to it.
- * *SFML implementation*
  *******************************************************************/
 void Drawing::drawText(string text, int x, int y, rgba_t colour, int font, int alignment, frect_t* bounds) {
 	// Setup SFML string
@@ -322,11 +325,38 @@ void Drawing::drawText(string text, int x, int y, rgba_t colour, int font, int a
 	if (render_target)
 		render_target->Draw(sf_str);
 }
+
+/* Drawing::textExtents
+ * Returns the width and height of [text] when drawn with [font]
+ *******************************************************************/
+fpoint2_t Drawing::textExtents(string text, int font) {
+	// Setup SFML string
+	sf::String sf_str(CHR(text));
+
+	// Set font
+	switch (font) {
+	case FONT_NORMAL:			sf_str.SetFont(font_normal); break;
+	case FONT_CONDENSED:		sf_str.SetFont(font_condensed); break;
+	case FONT_BOLD:				sf_str.SetFont(font_bold); break;
+	case FONT_BOLDCONDENSED:	sf_str.SetFont(font_boldcondensed); break;
+	case FONT_MONOSPACE:		sf_str.SetFont(font_mono); break;
+	default:					sf_str.SetFont(font_normal); break;
+	};
+	sf_str.SetSize(sf_str.GetFont().GetCharacterSize());
+
+	// Return width and height of text
+	sf::FloatRect rect = sf_str.GetRect();
+	return fpoint2_t(rect.GetWidth(), rect.GetHeight());
+}
+
 #else
+/*******************************************************************
+ * FTGL TEXT FUNCTION IMPLEMENTATIONS
+ *******************************************************************/
+
 /* Drawing::drawText
  * Draws [text] at [x,y]. If [bounds] is not null, the bounding
  * coordinates of the rendered text string are written to it.
- * *non-SFML implementation*
  *******************************************************************/
 void Drawing::drawText(string text, int x, int y, rgba_t colour, int font, int alignment, frect_t* bounds) {
 	// Get desired font
@@ -372,6 +402,32 @@ void Drawing::drawText(string text, int x, int y, rgba_t colour, int font, int a
 	ftgl_font->Render(CHR(text), -1);
 	glPopMatrix();
 }
+
+/* Drawing::textExtents
+ * Returns the width and height of [text] when drawn with [font]
+ *******************************************************************/
+fpoint2_t Drawing::textExtents(string text, int font) {
+	// Get desired font
+	FTFont* ftgl_font;
+	// Set font
+	switch (font) {
+	case FONT_NORMAL:			ftgl_font = font_normal; break;
+	case FONT_CONDENSED:		ftgl_font = font_condensed; break;
+	case FONT_BOLD:				ftgl_font = font_bold; break;
+	case FONT_BOLDCONDENSED:	ftgl_font = font_boldcondensed; break;
+	case FONT_MONOSPACE:		ftgl_font = font_mono; break;
+	default:					ftgl_font = font_normal; break;
+	};
+
+	// If FTGL font is invalid, return empty
+	if (!ftgl_font)
+		return fpoint2_t(0,0);
+
+	// Return width and height of text
+	FTBBox bbox = ftgl_font->BBox(CHR(text), -1);
+	return fpoint2_t(bbox.Upper().X() - bbox.Lower().X(), bbox.Upper().Y() - bbox.Lower().Y());
+}
+
 #endif
 
 /* Drawing::drawHud

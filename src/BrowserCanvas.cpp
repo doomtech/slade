@@ -57,8 +57,10 @@ BrowserCanvas::BrowserCanvas(wxWindow* parent) : OGLCanvas(parent, -1) {
 	scrollbar = NULL;
 	item_selected = NULL;
 	font = Drawing::FONT_BOLD;
-	show_names = NAMES_ALL;
+	show_names = NAMES_NORMAL;
 	item_size = -1;
+	item_type = ITEMS_NORMAL;
+	longest_text = -1;
 
 	// Bind events
 	Bind(wxEVT_SIZE, &BrowserCanvas::onSize, this);
@@ -74,14 +76,36 @@ BrowserCanvas::BrowserCanvas(wxWindow* parent) : OGLCanvas(parent, -1) {
 BrowserCanvas::~BrowserCanvas() {
 }
 
+/* BrowserCanvas::addItem
+ * Adds [item] to the list of items
+ *******************************************************************/
+void BrowserCanvas::addItem(BrowserItem* item) {
+	items.push_back(item);
+	longest_text = -1;
+}
+
+/* BrowserCanvas::clearItems
+ * Clears all items
+ *******************************************************************/
+void BrowserCanvas::clearItems() {
+	items.clear();
+	longest_text = -1;
+}
+
 /* BrowserCanvas::fullItemSizeX
  * Returns the 'full' (including border) width of each item
  *******************************************************************/
 int BrowserCanvas::fullItemSizeX() {
+	int base_size;
 	if (item_size > 0)
-		return item_size + (item_border*2);
+		base_size = item_size + (item_border*2);
 	else
-		return browser_item_size + (item_border*2);
+		base_size = browser_item_size + (item_border*2);
+
+	if (item_type == ITEMS_TILES)
+		return base_size + longestItemTextWidth() + item_border*2;
+	else
+		return base_size;
 }
 
 /* BrowserCanvas::fullItemSizeY
@@ -90,7 +114,7 @@ int BrowserCanvas::fullItemSizeX() {
  *******************************************************************/
 int BrowserCanvas::fullItemSizeY() {
 	int gap = 16;
-	if (show_names != NAMES_ALL)
+	if (show_names == NAMES_NONE || item_type == ITEMS_TILES)
 		gap = 0;
 
 	if (item_size > 0)
@@ -155,14 +179,11 @@ void BrowserCanvas::draw() {
 			top_y = y - yoff;
 		}
 
-		// Determine whether to draw item name
-		bool showname = (show_names == NAMES_ALL);
-
 		// Draw item
 		if (item_size <= 0)
-			items[items_filter[a]]->draw(browser_item_size, x, y - yoff, font, showname);
+			items[items_filter[a]]->draw(browser_item_size, x, y - yoff, font, show_names, item_type);
 		else
-			items[items_filter[a]]->draw(item_size, x, y - yoff, font, showname);
+			items[items_filter[a]]->draw(item_size, x, y - yoff, font, show_names, item_type);
 
 		// Draw selection box if selected
 		if (item_selected == items[items_filter[a]]) {
@@ -209,6 +230,7 @@ void BrowserCanvas::draw() {
 	}
 
 	// Draw item name at the bottom if required
+	/*
 	if (show_names == NAMES_SELECTED) {
 		BrowserItem* item = getSelectedItem();
 		if (item) {
@@ -217,6 +239,7 @@ void BrowserCanvas::draw() {
 			Drawing::drawText(item->getName(), center_x, GetSize().y - 17, COL_WHITE, Drawing::FONT_BOLD, Drawing::ALIGN_CENTER);
 		}
 	}
+	*/
 
 	// Swap Buffers
 	SwapBuffers();
@@ -295,7 +318,16 @@ int BrowserCanvas::itemIndex(BrowserItem* item) {
  * Selects the item [item]
  *******************************************************************/
 void BrowserCanvas::selectItem(BrowserItem* item) {
-	item_selected = item;
+	// Check if we're clearing the selection
+	if (item == NULL)
+		item_selected = NULL;
+	else {
+		// Check the item exists in the current set
+		for (unsigned a = 0; a < items.size(); a++) {
+			if (items[a] == item)
+				item_selected = item;
+		}
+	}
 
 	// Generate event
 	wxNotifyEvent e(wxEVT_BROWSERCANVAS_SELECTION_CHANGED, GetId());
@@ -412,6 +444,22 @@ bool BrowserCanvas::searchItemFrom(int from) {
 	}
 	// Didn't get any match
 	return false;
+}
+
+int BrowserCanvas::longestItemTextWidth() {
+	// Just return it if it's already calculated
+	if (longest_text >= 0)
+		return longest_text;
+	
+	// Go through all items
+	for (unsigned a = 0; a < items.size(); a++) {
+		string name = items[a]->getName();
+		int width = Drawing::textExtents(name, font).x;
+		if (width > longest_text)
+			longest_text = width;
+	}
+
+	return longest_text;
 }
 
 

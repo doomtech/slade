@@ -21,18 +21,25 @@ private:
 	int	item_size;
 	int top_index;
 	int top_y;
+	int	item_type;
+	int	longest_text;
 
 public:
 	BrowserCanvas(wxWindow* parent);
 	~BrowserCanvas();
 
 	enum {
+		ITEMS_NORMAL = 0,
+		ITEMS_TILES = 1,
+
+		NAMES_NORMAL = 0,
+		NAMES_INDEX,
 		NAMES_NONE,
-		NAMES_ALL,
-		NAMES_SELECTED,
 	};
 
 	vector<BrowserItem*>&	itemList() { return items; }
+	void					addItem(BrowserItem* item);
+	void					clearItems();
 	int						fullItemSizeX();
 	int						fullItemSizeY();
 	void					draw();
@@ -48,8 +55,10 @@ public:
 	void					showSelectedItem();
 	bool					searchItemFrom(int from);
 	void					setFont(int font) { this->font = font; }
-	void					showNames(int show) { this->show_names = show; }
+	void					setItemNameType(int type) { this->show_names = type; }
 	void					setItemSize(int size) { this->item_size = size; }
+	void					setItemViewType(int type) { this->item_type = type; }
+	int						longestItemTextWidth();
 
 	// Events
 	void	onSize(wxSizeEvent& e);
