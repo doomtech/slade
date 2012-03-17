@@ -217,7 +217,7 @@ void MainWindow::setupLayout() {
 	toolbar = new SToolBar(this);
 
 	// Create File toolbar
-	SToolBarGroup* tbg_file = new SToolBarGroup(toolbar, "File");
+	SToolBarGroup* tbg_file = new SToolBarGroup(toolbar, "_File");
 	tbg_file->addActionButton("aman_newwad");
 	tbg_file->addActionButton("aman_newzip");
 	tbg_file->addActionButton("aman_open");
@@ -229,7 +229,7 @@ void MainWindow::setupLayout() {
 	toolbar->addGroup(tbg_file);
 
 	// Create Archive toolbar
-	SToolBarGroup* tbg_archive = new SToolBarGroup(toolbar, "Archive");
+	SToolBarGroup* tbg_archive = new SToolBarGroup(toolbar, "_Archive");
 	tbg_archive->addActionButton("arch_newentry");
 	tbg_archive->addActionButton("arch_newdir");
 	tbg_archive->addActionButton("arch_importfiles");
@@ -238,7 +238,7 @@ void MainWindow::setupLayout() {
 	toolbar->addGroup(tbg_archive);
 
 	// Create Entry toolbar
-	SToolBarGroup* tbg_entry = new SToolBarGroup(toolbar, "Entry");
+	SToolBarGroup* tbg_entry = new SToolBarGroup(toolbar, "_Entry");
 	tbg_entry->addActionButton("arch_entry_rename");
 	tbg_entry->addActionButton("arch_entry_delete");
 	tbg_entry->addActionButton("arch_entry_import");
@@ -248,22 +248,22 @@ void MainWindow::setupLayout() {
 	toolbar->addGroup(tbg_entry);
 
 	// Create Base Resource Archive toolbar
-	SToolBarGroup* tbg_bra = new SToolBarGroup(toolbar, "Base Resource", true);
+	SToolBarGroup* tbg_bra = new SToolBarGroup(toolbar, "_Base Resource", true);
 	BaseResourceChooser* brc = new BaseResourceChooser(tbg_bra);
 	tbg_bra->addCustomControl(brc);
 	tbg_bra->addActionButton("main_setbra", "t_settings");
 	toolbar->addGroup(tbg_bra);
 
 	// Create Palette Chooser toolbar
-	SToolBarGroup* tbg_palette = new SToolBarGroup(toolbar, "Palette", true);
+	SToolBarGroup* tbg_palette = new SToolBarGroup(toolbar, "_Palette", true);
 	palette_chooser = new PaletteChooser(tbg_palette, -1);
 	palette_chooser->selectPalette(global_palette);
 	tbg_palette->addCustomControl(palette_chooser);
 	toolbar->addGroup(tbg_palette);
 
 	// Archive and Entry toolbars are initially disabled
-	toolbar->enableGroup("archive", false);
-	toolbar->enableGroup("entry", false);
+	toolbar->enableGroup("_archive", false);
+	toolbar->enableGroup("_entry", false);
 
 	// Add toolbar
 	m_mgr->AddPane(toolbar, wxAuiPaneInfo().Top().CaptionVisible(false).MinSize(-1, 30).Resizable(false).PaneBorder(false).Name("toolbar"));
@@ -289,6 +289,7 @@ void MainWindow::setupLayout() {
 	Bind(wxEVT_CLOSE_WINDOW, &MainWindow::onClose, this);
 	Bind(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED, &MainWindow::onTabChanged, this);
 	Bind(wxEVT_MOVE, &MainWindow::onMove, this);
+	Bind(wxEVT_STOOLBAR_LAYOUT_UPDATED, &MainWindow::onToolBarLayoutChanged, this, toolbar->GetId());
 }
 
 /* MainWindow::createStartPage
@@ -372,9 +373,6 @@ bool MainWindow::exitProgram() {
 	// Close all archives
 	if (!panel_archivemanager->closeAll())
 		return false;
-
-	// Close map editor window (if open)
-	theMapEditor->Close();
 
 	// Save current layout
 	main_window_layout = m_mgr->SavePerspective();
@@ -475,6 +473,21 @@ void MainWindow::removeCustomMenu(wxMenu* menu) {
  *******************************************************************/
 void MainWindow::enableToolBar(string name, bool enable) {
 	toolbar->enableGroup(name, enable);
+}
+
+/* MainWindow::addCustomToolBar
+ * Adds a custom toolbar group to the toolbar, with buttons for each
+ * action in [actions]
+ *******************************************************************/
+void MainWindow::addCustomToolBar(string name, wxArrayString actions) {
+	toolbar->addActionGroup(name, actions);
+}
+
+/* MainWindow::removeCustomToolBar
+ * Removes the toolbar group matching [name]
+ *******************************************************************/
+void MainWindow::removeCustomToolBar(string name) {
+	toolbar->deleteGroup(name);
 }
 
 /* MainWindow::handleAction
@@ -634,7 +647,7 @@ void MainWindow::onTabChanged(wxAuiNotebookEvent& e) {
 	e.Skip();
 }
 
-/* MainWindow::onSie
+/* MainWindow::onSize
  * Called when the window is resized
  *******************************************************************/
 void MainWindow::onSize(wxSizeEvent& e) {
@@ -643,11 +656,6 @@ void MainWindow::onSize(wxSizeEvent& e) {
 		mw_width = GetSize().x;
 		mw_height = GetSize().y;
 	}
-
-	wxAuiPaneInfo& p_inf = m_mgr->GetPane("toolbar");
-	p_inf.window->Layout();
-	p_inf.MinSize(-1, p_inf.window->GetBestSize().y);
-	m_mgr->Update();
 
 	e.Skip();
 }
@@ -663,4 +671,15 @@ void MainWindow::onMove(wxMoveEvent& e) {
 	}
 
 	e.Skip();
+}
+
+/* MainWindow::onToolBarLayoutChanged
+ * Called when the toolbar layout is changed
+ *******************************************************************/
+void MainWindow::onToolBarLayoutChanged(wxEvent& e) {
+	// Update toolbar size
+	wxAuiPaneInfo& p_inf = m_mgr->GetPane("toolbar");
+	p_inf.window->Layout();
+	p_inf.MinSize(-1, p_inf.window->GetBestSize().y);
+	m_mgr->Update();
 }

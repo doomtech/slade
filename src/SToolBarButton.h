@@ -22,6 +22,7 @@ public:
 	// Events
 	void	onPaint(wxPaintEvent& e);
 	void	onMouseEvent(wxMouseEvent& e);
+	void	onFocus(wxFocusEvent& e);
 };
 
 #endif//__S_TOOL_BAR_BUTTON_H__

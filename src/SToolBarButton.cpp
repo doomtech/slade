@@ -5,6 +5,7 @@
 #include "SToolBarButton.h"
 #include "Icons.h"
 #include "Drawing.h"
+#include "MainWindow.h"
 #include <wx/graphics.h>
 
 
@@ -27,7 +28,9 @@ SToolBarButton::SToolBarButton(wxWindow* parent, string action, string icon)
 		this->icon = getIcon(icon);
 
 	// Set tooltip
-	SetToolTip(theApp->getAction(action)->getHelpText());
+	string tip = theApp->getAction(action)->getText();
+	tip.Replace("&", "");
+	SetToolTip(tip);
 
 	// Bind events
 	Bind(wxEVT_PAINT, &SToolBarButton::onPaint, this);
@@ -35,6 +38,7 @@ SToolBarButton::SToolBarButton(wxWindow* parent, string action, string icon)
 	Bind(wxEVT_LEAVE_WINDOW, &SToolBarButton::onMouseEvent, this);
 	Bind(wxEVT_LEFT_DOWN, &SToolBarButton::onMouseEvent, this);
 	Bind(wxEVT_LEFT_UP, &SToolBarButton::onMouseEvent, this);
+	Bind(wxEVT_KILL_FOCUS, &SToolBarButton::onFocus, this);
 }
 
 SToolBarButton::~SToolBarButton() {
@@ -100,12 +104,6 @@ void SToolBarButton::onPaint(wxPaintEvent& e) {
 }
 
 void SToolBarButton::onMouseEvent(wxMouseEvent& e) {
-	// Do nothing if disabled
-	//if (state == STATE_DISABLED) {
-	//	e.Skip();
-	//	return;
-	//}
-
 	// Mouse enter
 	if (e.GetEventType() == wxEVT_ENTER_WINDOW) {
 		// Set state to mouseover
@@ -113,6 +111,9 @@ void SToolBarButton::onMouseEvent(wxMouseEvent& e) {
 			state = STATE_MOUSEOVER;
 			Refresh();
 		}
+
+		// Set status bar help text
+		theMainWindow->SetStatusText(theApp->getAction(action)->getHelpText());
 	}
 
 	// Mouse leave
@@ -122,6 +123,9 @@ void SToolBarButton::onMouseEvent(wxMouseEvent& e) {
 			state = STATE_NORMAL;
 			Refresh();
 		}
+
+		// Clear status bar help text
+		theMainWindow->SetStatusText("");
 	}
 
 	// Left button down
@@ -140,8 +144,20 @@ void SToolBarButton::onMouseEvent(wxMouseEvent& e) {
 	else if (e.GetEventType() == wxEVT_LEFT_UP) {
 		state = STATE_MOUSEOVER;
 		Refresh();
+
+		// Clear status bar help text
+		theMainWindow->SetStatusText("");
 	}
 
 	else
 		e.Skip();
+}
+
+void SToolBarButton::onFocus(wxFocusEvent& e) {
+	// Redraw
+	state = STATE_NORMAL;
+	Update();
+	Refresh();
+
+	e.Skip();
 }

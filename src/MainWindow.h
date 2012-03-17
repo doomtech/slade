@@ -66,6 +66,8 @@ public:
 
 	// Toolbars
 	void	enableToolBar(string name, bool enable = true);
+	void	addCustomToolBar(string name, wxArrayString actions);
+	void	removeCustomToolBar(string name);
 
 	// Events
 	void	onMenuItemClicked(wxCommandEvent &e);
@@ -74,6 +76,7 @@ public:
 	void	onTabChanged(wxAuiNotebookEvent& e);
 	void	onSize(wxSizeEvent& e);
 	void	onMove(wxMoveEvent& e);
+	void	onToolBarLayoutChanged(wxEvent& e);
 };
 
 // Define for less cumbersome MainWindow::getInstance()

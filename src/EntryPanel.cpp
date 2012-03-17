@@ -102,6 +102,7 @@ EntryPanel::EntryPanel(wxWindow* parent, string id)
  *******************************************************************/
 EntryPanel::~EntryPanel() {
 	removeCustomMenu();
+	removeCustomToolBar();
 }
 
 /* EntryPanel::setModified
@@ -228,10 +229,34 @@ void EntryPanel::removeCustomMenu() {
 	theMainWindow->removeCustomMenu(menu_custom);
 }
 
+/* EntryPanel::addCustonToolBar
+ * Adds this EntryPanel's custom toolbar group to the main window
+ * toolbar
+ *******************************************************************/
+void EntryPanel::addCustomToolBar() {
+	// Check any custom actions exist
+	if (custom_toolbar_actions.IsEmpty())
+		return;
+
+	// Split list of toolbar actions
+	wxArrayString actions = wxSplit(custom_toolbar_actions, ';');
+
+	// Add to main window
+	theMainWindow->addCustomToolBar(custom_menu_name, actions);
+}
+
+/* EntryPanel::removeCustomMenu
+ * Removes this EntryPanel's custom toolbar group from the main
+ * window toolbar
+ *******************************************************************/
+void EntryPanel::removeCustomToolBar() {
+	theMainWindow->removeCustomToolBar(custom_menu_name);
+}
+
 
 /* EntryPanel::isActivePanel
  * Returns true if the entry panel is the Archive Manager Panel's
- * current area. This is needed because the wx function IsShown() 
+ * current area. This is needed because the wx function IsShown()
  * is not enough, it will return true if the panel is shown on any
  * tab, even if it is not on the one that is selected...
  *******************************************************************/

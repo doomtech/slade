@@ -354,6 +354,7 @@ void ArchivePanel::addMenus() {
 	theMainWindow->addCustomMenu(menu_archive, "&Archive");
 	theMainWindow->addCustomMenu(menu_entry, "&Entry");
 	cur_area->addCustomMenu();
+	cur_area->addCustomToolBar();
 
 	// Also enable the related toolbars
 	theMainWindow->enableToolBar("archive");
@@ -369,6 +370,7 @@ void ArchivePanel::removeMenus() {
 	theMainWindow->removeCustomMenu(menu_archive);
 	theMainWindow->removeCustomMenu(menu_entry);
 	cur_area->removeCustomMenu();
+	cur_area->removeCustomToolBar();
 
 	// Also disable the related toolbars
 	theMainWindow->enableToolBar("archive", false);
@@ -1656,12 +1658,14 @@ bool ArchivePanel::showEntryPanel(EntryPanel* new_area, bool ask_save) {
 	if (new_area != cur_area) {
 		cur_area->Show(false);				// Hide current
 		cur_area->removeCustomMenu();		// Remove current custom menu (if any)
+		cur_area->removeCustomToolBar();	// Remove current custom toolbar (if any)
 		sizer->Replace(cur_area, new_area);	// Swap the panels
 		cur_area = new_area;				// Set the new panel to current
 		cur_area->Show(true);				// Show current
 
-		// Add the current panel's custom menu if needed
+		// Add the current panel's custom menu and toolbar if needed
 		cur_area->addCustomMenu();
+		cur_area->addCustomToolBar();
 
 		// Update panel layout
 		Layout();

@@ -110,7 +110,7 @@ public:
 	// Re-apply the changes in selection and colour on a fresh palette
 	void redraw() {
 		pal_preview->setPalette(palette);
-		pal_preview->getPalette().colourise(getColour(), 
+		pal_preview->getPalette().colourise(getColour(),
 			pal_preview->getSelectionStart(), pal_preview->getSelectionEnd());
 		pal_preview->draw();
 	}
@@ -239,8 +239,8 @@ public:
 /*******************************************************************
  * PALETTECOLOURTWEAKDIALOG CLASS
  *******************************************************************
- A simple dialog for the 'Tweak Colours' function, allows the user to 
- select hue, saturation and luminosity changes and shows a preview of 
+ A simple dialog for the 'Tweak Colours' function, allows the user to
+ select hue, saturation and luminosity changes and shows a preview of
  the modified palette. TODO: More features? Maybe merge Tint, Invert
  and Colourise with it, add an "Apply Change" button so that it isn't
  needed anymore to click "OK" and close it after each change, etc.
@@ -538,6 +538,9 @@ PaletteEntryPanel::PaletteEntryPanel(wxWindow* parent)
 	menu_custom = new wxMenu();
 	fillCustomMenu(menu_custom);
 	custom_menu_name = "Palette";
+
+	// Setup custom toolbar
+	custom_toolbar_actions = "ppal_addcustom;ppal_exportas;ppal_importfrom;ppal_colourise;ppal_tint;ppal_tweak;ppal_invert;ppal_test;ppal_generate;ppal_duplicate;ppal_remove;ppal_removeothers;ppal_moveup;ppal_movedown";
 
 	// Bind events
 	btn_nextpal->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &PaletteEntryPanel::onBtnNextPal, this);
@@ -1187,9 +1190,9 @@ void PaletteEntryPanel::analysePalettes() {
 			if (b > maxB) maxB = b; if (b < minB) minB = b;
 			if (r | g | b) {
 				++wrongcount;
-				report += S_FMT("Index %003u: [%003i %003i %003i | %1.3f %1.3f %1.3f]->[%003i %003i %003i | %1.3f %1.3f %1.3f]\t\tR %+003i\tG %+003i\tB %+003i\t\t\tH %+1.3f\tS %+1.3f\tL %+1.3f\n", 
-					c, 
-					ref1.r, ref1.g, ref1.b, ref2.h, ref2.s, ref2.l, 
+				report += S_FMT("Index %003u: [%003i %003i %003i | %1.3f %1.3f %1.3f]->[%003i %003i %003i | %1.3f %1.3f %1.3f]\t\tR %+003i\tG %+003i\tB %+003i\t\t\tH %+1.3f\tS %+1.3f\tL %+1.3f\n",
+					c,
+					ref1.r, ref1.g, ref1.b, ref2.h, ref2.s, ref2.l,
 					cmp1.r, cmp1.g, cmp1.b, cmp2.h, cmp2.s, cmp2.l,
 					r, g, b, h, s, l);
 			}

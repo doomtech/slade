@@ -24,6 +24,7 @@ protected:
 
 	wxMenu*			menu_custom;
 	string			custom_menu_name;
+	string			custom_toolbar_actions;	// A simple list of action ids separated by ;
 
 	void	setModified(bool c = true);
 
@@ -46,6 +47,8 @@ public:
 	virtual string	statusString() { return ""; }
 	virtual void	addCustomMenu();
 	void			removeCustomMenu();
+	virtual void	addCustomToolBar();
+	void			removeCustomToolBar();
 	virtual bool	fillCustomMenu(wxMenu* custom) { return false; }
 	string			getCustomMenuName() { return custom_menu_name; }
 	void			callRefresh() { refreshPanel(); }

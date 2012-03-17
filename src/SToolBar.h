@@ -20,13 +20,16 @@ class SToolBar : public wxPanel {
 private:
 	vector<SToolBarGroup*>	groups;
 	vector<wxWindow*>		separators;
+	vector<wxWindow*>		vlines;
 
 public:
 	SToolBar(wxWindow* parent);
 	~SToolBar();
 
 	void	addGroup(SToolBarGroup* group);
-	void	updateLayout();
+	void	deleteGroup(string name);
+	void	addActionGroup(string name, wxArrayString actions);
+	void	updateLayout(bool generate_event = true);
 	void	enableGroup(string name, bool enable = true);
 
 	// Events
@@ -34,5 +37,7 @@ public:
 	void	onPaint(wxPaintEvent& e);
 	void	onFocus(wxFocusEvent& e);
 };
+
+DECLARE_EVENT_TYPE(wxEVT_STOOLBAR_LAYOUT_UPDATED, -1)
 
 #endif//__S_TOOL_BAR_H__

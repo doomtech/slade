@@ -311,6 +311,27 @@ GfxEntryPanel::GfxEntryPanel(wxWindow* parent)
 	fillCustomMenu(menu_custom);
 	custom_menu_name = "Graphic";
 
+	// Custom toolbar
+	custom_toolbar_actions = "pgfx_mirror;pgfx_flip;pgfx_rotate;pgfx_translate;pgfx_colourise;pgfx_tint";
+	/*
+	 * theApp->getAction("pgfx_mirror")->addToMenu(custom);
+	theApp->getAction("pgfx_flip")->addToMenu(custom);
+	theApp->getAction("pgfx_rotate")->addToMenu(custom);
+	custom->AppendSeparator();
+	theApp->getAction("pgfx_translate")->addToMenu(custom);
+	theApp->getAction("pgfx_colourise")->addToMenu(custom);
+	theApp->getAction("pgfx_tint")->addToMenu(custom);
+	custom->AppendSeparator();
+	theApp->getAction("pgfx_alph")->addToMenu(custom);
+	theApp->getAction("pgfx_trns")->addToMenu(custom);
+	custom->AppendSeparator();
+	theApp->getAction("arch_gfx_exportpng")->addToMenu(custom);
+	theApp->getAction("pgfx_extract")->addToMenu(custom);
+	custom->AppendSeparator();
+	theApp->getAction("arch_gfx_addptable")->addToMenu(custom);
+	theApp->getAction("arch_gfx_addtexturex")->addToMenu(custom);
+	 */
+
 	// Bind Events
 	slider_zoom->Bind(wxEVT_COMMAND_SLIDER_UPDATED, &GfxEntryPanel::onZoomChanged, this);
 	spin_xoffset->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &GfxEntryPanel::onXOffsetChanged, this);
@@ -927,7 +948,7 @@ void GfxEntryPanel::onAnnouncement(Announcer* announcer, string event_name, MemC
  *******************************************************************/
 void GfxEntryPanel::onBtnNextImg(wxCommandEvent& e) {
 	int num = gfx_canvas->getImage()->getSize();
-	if (num > 1) { 
+	if (num > 1) {
 		if (cur_index < num - 1)
 			loadEntry(entry, cur_index + 1);
 		else

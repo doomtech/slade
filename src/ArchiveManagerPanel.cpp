@@ -1497,6 +1497,7 @@ void ArchiveManagerPanel::onArchiveTabChanging(wxAuiNotebookEvent& e) {
 	if (page && page->GetName() == "entry") {
 		EntryPanel* ep = (EntryPanel*)page;
 		ep->removeCustomMenu();
+		ep->removeCustomToolBar();
 	}
 
 	e.Skip();
@@ -1520,6 +1521,7 @@ void ArchiveManagerPanel::onArchiveTabChanged(wxAuiNotebookEvent& e) {
 	if (notebook_archives->GetPage(selection)->GetName() == "entry") {
 		EntryPanel* ep = (EntryPanel*)notebook_archives->GetPage(selection);
 		ep->addCustomMenu();
+		ep->addCustomToolBar();
 	}
 
 	e.Skip();
