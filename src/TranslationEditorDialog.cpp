@@ -83,7 +83,8 @@ void GradientBox::draw() {
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
 	// Translate to inside of pixel (otherwise inaccuracies can occur on certain gl implementations)
-	glTranslatef(0.375f, 0.375f, 0);
+	if (OpenGL::accuracyTweak())
+		glTranslatef(0.375f, 0.375f, 0);
 
 	// Draw gradient
 	if (steps < 0) {
@@ -121,7 +122,7 @@ TranslationEditorDialog::TranslationEditorDialog(wxWindow* parent, Palette8bit* 
 		if (preview_image->hasPalette())
 			palette = preview_image->getPalette();
 	}
-	
+
 	// Set dialog icon
 	wxIcon icon;
 	icon.CopyFromBitmap(getIcon("t_remap"));
@@ -970,21 +971,21 @@ void TranslationEditorDialog::onBtnSave(wxCommandEvent& e) {
 void TranslationEditorDialog::onGfxPreviewMouseMotion(wxMouseEvent& e) {
 	// Get the image coordinates at the mouse pointer
 	point2_t pos = gfx_preview->imageCoords(e.GetX(), e.GetY()-2);
-	
+
 	int index = pal_canvas_preview->getSelectionStart();
-	
+
 	// Get palette index at position
 	if (pos.x >= 0)
 		index = gfx_preview->getImage()->getPixelIndex(pos.x, pos.y);
 	else
 		index = -1;
-	
+
 	// Update preview palette if necessary
 	if (index != pal_canvas_preview->getSelectionStart()) {
 		pal_canvas_preview->setSelection(index);
 		pal_canvas_preview->Refresh();
 	}
-	
+
 	e.Skip();
 }
 

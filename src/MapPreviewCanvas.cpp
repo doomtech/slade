@@ -379,7 +379,8 @@ void MapPreviewCanvas::draw() {
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
 	// Translate to inside of pixel (otherwise inaccuracies can occur on certain gl implementations)
-	glTranslatef(0.375f, 0.375f, 0);
+	if (OpenGL::accuracyTweak())
+		glTranslatef(0.375f, 0.375f, 0);
 
 	// Zoom/offset to show full map
 	showMap();
@@ -484,7 +485,8 @@ void MapPreviewCanvas::createImage(ArchiveEntry& ae, int width, int height) {
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
 	// Translate to inside of pixel (otherwise inaccuracies can occur on certain gl implementations)
-	glTranslatef(0.375f, 0.375f, 0);
+	if (OpenGL::accuracyTweak())
+		glTranslatef(0.375f, 0.375f, 0);
 
 	// Zoom/offset to show full map
 	// Find extents of map

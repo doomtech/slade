@@ -41,7 +41,7 @@ EXTERN_CVAR(String, bgtx_colour1)
 EXTERN_CVAR(String, bgtx_colour2)
 EXTERN_CVAR(Bool, gfx_show_border)
 EXTERN_CVAR(Bool, gfx_extraconv)
-EXTERN_CVAR(Bool, browser_bg_black)
+EXTERN_CVAR(Int, browser_bg_type)
 
 
 /*******************************************************************
@@ -74,7 +74,7 @@ GraphicsPrefsPanel::GraphicsPrefsPanel(wxWindow* parent) : wxPanel(parent, -1) {
 	// Quick colour presets
 	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
 	vbox->Add(hbox, 0, wxEXPAND|wxBOTTOM, 4);
-	string schemes[] = { "Default", 
+	string schemes[] = { "Default",
 							"Black", "Black (Checkered)",
 							"Cyan", "Cyan (Checkered)",
 							"Magenta", "Magenta (Checkered)",
@@ -86,22 +86,33 @@ GraphicsPrefsPanel::GraphicsPrefsPanel(wxWindow* parent) : wxPanel(parent, -1) {
 	hbox->Add(choice_presets, 1, wxEXPAND);
 
 	sizer->Add(vbox, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
-	
+
 	// 'Show outline around gfx'
 	cb_show_border = new wxCheckBox(this, -1, "Show outline around graphics and textures");
 	cb_show_border->SetValue(gfx_show_border);
 	sizer->Add(cb_show_border, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
-	
+
 	// 'Extra image conversion options'
 	cb_extra_gfxconv = new wxCheckBox(this, -1, "Offer additional conversion options");
 	cb_extra_gfxconv->SetValue(gfx_extraconv);
 	sizer->Add(cb_extra_gfxconv, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
+	// Browser background type
+	hbox = new wxBoxSizer(wxHORIZONTAL);
+	vbox->Add(hbox, 0, wxEXPAND|wxBOTTOM, 4);
+	string browser_types[] = { "Transparent background (as above)", "System background", "Black background" };
+	choice_browser_bg = new wxChoice(this, -1, wxDefaultPosition, wxDefaultSize, 3, browser_types);
+	choice_browser_bg->SetSelection(browser_bg_type);
+	hbox->Add(new wxStaticText(this, -1, "Browser Background:"), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 4);
+	hbox->Add(choice_browser_bg, 1, wxEXPAND);
+
+/*
 	// 'Browsers use black background'
 	cb_browser_bg_black = new wxCheckBox(this, -1, "Browsers use black background");
 	cb_browser_bg_black->SetValue(browser_bg_black);
 	sizer->Add(cb_browser_bg_black, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
-	
+*/
+
 	// Bind events
 	choice_presets->Bind(wxEVT_COMMAND_CHOICE_SELECTED, &GraphicsPrefsPanel::onChoicePresetSelected, this);
 }
@@ -123,7 +134,7 @@ void GraphicsPrefsPanel::applyPreferences() {
 	GLTexture::resetBgTex();
 	gfx_show_border = cb_show_border->GetValue();
 	gfx_extraconv = cb_extra_gfxconv->GetValue();
-	browser_bg_black = cb_browser_bg_black->GetValue();
+	browser_bg_type = choice_browser_bg->GetSelection();
 	theMainWindow->Refresh();
 }
 

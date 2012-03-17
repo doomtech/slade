@@ -478,7 +478,8 @@ void MapCanvas::draw() {
 	//glEnable(GL_COLOR_MATERIAL);
 
 	// Translate to inside of pixel (otherwise inaccuracies can occur on certain gl implemenataions)
-	glTranslatef(0.375f, 0.375f, 0);
+	if (OpenGL::accuracyTweak())
+		glTranslatef(0.375f, 0.375f, 0);
 
 	// Translate to middle of screen
 	glTranslated(GetSize().x * 0.5, GetSize().y * 0.5, 0);

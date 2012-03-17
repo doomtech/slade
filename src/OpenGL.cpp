@@ -36,6 +36,7 @@
  *******************************************************************/
 CVAR(Bool, gl_tex_enable_np2, true, CVAR_SAVE)
 CVAR(Bool, gl_point_sprite, true, CVAR_SAVE)
+CVAR(Bool, gl_tweak_accuracy, false, CVAR_SAVE)
 
 namespace OpenGL {
 	wxGLContext*	context = NULL;
@@ -173,4 +174,13 @@ unsigned OpenGL::maxTextureSize() {
  *******************************************************************/
 bool OpenGL::isInitialised() {
 	return initialised;
+}
+
+/* OpenGL::accuracyTweak
+ * Returns true if the 'accuracy tweak' is enabled. This can fix
+ * inaccuracies when rendering 2d textures, but tends to cause fonts
+ * to blur when using FTGL
+ *******************************************************************/
+bool OpenGL::accuracyTweak() {
+	return gl_tweak_accuracy;
 }

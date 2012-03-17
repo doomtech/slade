@@ -101,7 +101,8 @@ void GfxCanvas::draw() {
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
 	// Translate to inside of pixel (otherwise inaccuracies can occur on certain gl implementations)
-	glTranslatef(0.375f, 0.375f, 0);
+	if (OpenGL::accuracyTweak())
+		glTranslatef(0.375f, 0.375f, 0);
 
 	// Draw the background
 	drawCheckeredBackground();

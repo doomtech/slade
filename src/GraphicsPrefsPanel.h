@@ -10,7 +10,7 @@ private:
 	wxChoice*			choice_presets;
 	wxCheckBox*			cb_show_border;
 	wxCheckBox*			cb_extra_gfxconv;
-	wxCheckBox*			cb_browser_bg_black;
+	wxChoice*			choice_browser_bg;
 
 public:
 	GraphicsPrefsPanel(wxWindow* parent);

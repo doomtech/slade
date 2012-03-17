@@ -22,7 +22,7 @@ public:
 	unsigned	getIndex() { return index; }
 
 	virtual bool	loadImage();
-	void			draw(int size, int x, int y, int font, int nametype = 0, int viewtype = 0);
+	void			draw(int size, int x, int y, int font, int nametype = 0, int viewtype = 0, rgba_t colour = COL_WHITE);
 	void			clearImage();
 	virtual string	itemInfo() { return ""; }
 };

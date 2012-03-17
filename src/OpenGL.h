@@ -13,6 +13,7 @@ namespace OpenGL {
 	float			maxPointSize();
 	unsigned		maxTextureSize();
 	bool			isInitialised();
+	bool			accuracyTweak();
 }
 
 #endif//__OPENGL_H__

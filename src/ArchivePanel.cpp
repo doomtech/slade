@@ -357,8 +357,8 @@ void ArchivePanel::addMenus() {
 	cur_area->addCustomToolBar();
 
 	// Also enable the related toolbars
-	theMainWindow->enableToolBar("archive");
-	theMainWindow->enableToolBar("entry");
+	theMainWindow->enableToolBar("_archive");
+	theMainWindow->enableToolBar("_entry");
 }
 
 /* ArchivePanel::removeMenus
@@ -373,8 +373,8 @@ void ArchivePanel::removeMenus() {
 	cur_area->removeCustomToolBar();
 
 	// Also disable the related toolbars
-	theMainWindow->enableToolBar("archive", false);
-	theMainWindow->enableToolBar("entry", false);
+	theMainWindow->enableToolBar("_archive", false);
+	theMainWindow->enableToolBar("_entry", false);
 }
 
 /* ArchivePanel::save

@@ -38,7 +38,7 @@
 /*******************************************************************
  * VARIABLES
  *******************************************************************/
-CVAR(Bool, browser_bg_black, false, CVAR_SAVE)
+CVAR(Int, browser_bg_type, false, CVAR_SAVE)
 CVAR(Int, browser_item_size, 96, CVAR_SAVE)
 DEFINE_EVENT_TYPE(wxEVT_BROWSERCANVAS_SELECTION_CHANGED)
 
@@ -139,15 +139,35 @@ void BrowserCanvas::draw() {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
+	// Setup colours
+	rgba_t col_bg, col_text;
+	if (browser_bg_type == 1) {
+		// Get system panel background colour
+		wxColour bgcolwx = Drawing::getPanelBGColour();
+		col_bg.set(bgcolwx.Red(), bgcolwx.Green(), bgcolwx.Blue());
+
+		// Get system text colour
+		wxColour textcol = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT);
+		col_text.set(textcol.Red(), textcol.Green(), textcol.Blue());
+	}
+	else {
+		// Otherwise use black background
+		col_bg.set(0, 0, 0);
+
+		// And white text
+		col_text.set(255, 255, 255);
+	}
+
 	// Clear
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClearColor(col_bg.fr(), col_bg.fg(), col_bg.fb(), 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
 	// Translate to inside of pixel (otherwise inaccuracies can occur on certain gl implementations)
-	glTranslatef(0.375f, 0.375f, 0);
+	if (OpenGL::accuracyTweak())
+		glTranslatef(0.375f, 0.375f, 0);
 
 	// Draw background if required
-	if (!browser_bg_black)
+	if (browser_bg_type == 0)
 		drawCheckeredBackground();
 
 	// Init for texture drawing
@@ -186,12 +206,6 @@ void BrowserCanvas::draw() {
 		int xgap = (col_width - fullItemSizeX()) * 0.5;
 		x = item_border + xgap + (col * col_width);
 
-		// Draw item
-		if (item_size <= 0)
-			items[items_filter[a]]->draw(browser_item_size, x, y - yoff, font, show_names, item_type);
-		else
-			items[items_filter[a]]->draw(item_size, x, y - yoff, font, show_names, item_type);
-
 		// Draw selection box if selected
 		if (item_selected == items[items_filter[a]]) {
 			// Setup
@@ -223,6 +237,12 @@ void BrowserCanvas::draw() {
 			glEnable(GL_TEXTURE_2D);
 			glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		}
+
+		// Draw item
+		if (item_size <= 0)
+			items[items_filter[a]]->draw(browser_item_size, x, y - yoff, font, show_names, item_type, col_text);
+		else
+			items[items_filter[a]]->draw(item_size, x, y - yoff, font, show_names, item_type, col_text);
 
 		// Move over for next item
 		col++;
@@ -452,7 +472,7 @@ int BrowserCanvas::longestItemTextWidth() {
 	// Just return it if it's already calculated
 	if (longest_text >= 0)
 		return longest_text;
-	
+
 	// Go through all items
 	for (unsigned a = 0; a < items.size(); a++) {
 		string name = items[a]->getName();

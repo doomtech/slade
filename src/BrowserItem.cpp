@@ -67,7 +67,7 @@ bool BrowserItem::loadImage() {
  * Draws the item in a [size]x[size] box, keeping the correct aspect
  * ratio of it's image
  *******************************************************************/
-void BrowserItem::draw(int size, int x, int y, int font, int nametype, int viewtype) {
+void BrowserItem::draw(int size, int x, int y, int font, int nametype, int viewtype, rgba_t colour) {
 	// Try to load image if it isn't already
 	if (!image || (image && !image->isLoaded()))
 		loadImage();
@@ -105,13 +105,13 @@ void BrowserItem::draw(int size, int x, int y, int font, int nametype, int viewt
 		// Item name
 		if (viewtype == 0) {
 			Drawing::drawText(draw_name, x+(size*0.5+1), y+size+5, COL_BLACK, font, Drawing::ALIGN_CENTER);
-			Drawing::drawText(draw_name, x+(size*0.5), y+size+4, COL_WHITE, font, Drawing::ALIGN_CENTER);
+			Drawing::drawText(draw_name, x+(size*0.5), y+size+4, colour, font, Drawing::ALIGN_CENTER);
 		}
 		else if (viewtype == 1) {
 			Drawing::drawText(name, x+size+9, y+(size*0.5)+1, COL_BLACK, font);
-			Drawing::drawText(name, x+size+8, y+(size*0.5), COL_WHITE, font);
+			Drawing::drawText(name, x+size+8, y+(size*0.5), colour, font);
 			Drawing::drawText(S_FMT("%d", index), x+size+9, y+(size*0.5)-15, COL_BLACK, font);
-			Drawing::drawText(S_FMT("%d", index), x+size+8, y+(size*0.5)-16, COL_WHITE, font);
+			Drawing::drawText(S_FMT("%d", index), x+size+8, y+(size*0.5)-16, colour, font);
 		}
 
 		glPopAttrib();
@@ -153,6 +153,7 @@ void BrowserItem::draw(int size, int x, int y, int font, int nametype, int viewt
 
 	// Draw
 	image->bind();
+	COL_WHITE.set_gl(false);
 
 	glBegin(GL_QUADS);
 	glTexCoord2f(0.0f, 0.0f);	glVertex2d(left, top);
@@ -164,13 +165,13 @@ void BrowserItem::draw(int size, int x, int y, int font, int nametype, int viewt
 	// Item name
 	if (viewtype == 0) {
 		Drawing::drawText(draw_name, x+(size*0.5+1), y+size+5, COL_BLACK, font, Drawing::ALIGN_CENTER);
-		Drawing::drawText(draw_name, x+(size*0.5), y+size+4, COL_WHITE, font, Drawing::ALIGN_CENTER);
+		Drawing::drawText(draw_name, x+(size*0.5), y+size+4, colour, font, Drawing::ALIGN_CENTER);
 	}
 	else if (viewtype == 1) {
 		Drawing::drawText(name, x+size+9, y+(size*0.5)+1, COL_BLACK, font);
-		Drawing::drawText(name, x+size+8, y+(size*0.5), COL_WHITE, font);
+		Drawing::drawText(name, x+size+8, y+(size*0.5), colour, font);
 		Drawing::drawText(S_FMT("%d", index), x+size+9, y+(size*0.5)-15, COL_BLACK, font);
-		Drawing::drawText(S_FMT("%d", index), x+size+8, y+(size*0.5)-16, COL_WHITE, font);
+		Drawing::drawText(S_FMT("%d", index), x+size+8, y+(size*0.5)-16, colour, font);
 	}
 }
 

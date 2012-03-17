@@ -174,8 +174,6 @@ BrowserWindow::BrowserWindow(wxWindow* parent) : wxDialog(parent, -1, "Browser",
 	hbox->Add(scrollbar, 0, wxEXPAND);
 	canvas->setScrollBar(scrollbar);
 
-	//swin->SplitVertically(tree_items, this, 150);
-
 	// Bottom sizer
 	sizer_bottom = new wxBoxSizer(wxHORIZONTAL);
 	vbox->Add(sizer_bottom, 0, wxEXPAND|wxBOTTOM, 4);
@@ -421,7 +419,7 @@ void BrowserWindow::populateItemTree() {
 	// Update window layout
 	int depth = expandtree(tree_items, item, true, 0);
 	int colwidth = tree_items->GetColumnWidth(0);
-	if (colwidth < 30) colwidth = 200;
+	if (colwidth < 200) colwidth = 200;
 	tree_items->SetMinSize(wxSize(colwidth + 16, -1));
 	Layout();
 	expandtree(tree_items, item, false, 0);
@@ -489,7 +487,8 @@ void BrowserWindow::setItemViewType(int type) {
  *******************************************************************/
 void BrowserWindow::onTreeItemSelected(wxTreeListEvent& e) {
 	BrowserTreeItemData* data = (BrowserTreeItemData*)tree_items->GetItemData(e.GetItem());
-	openTree(data->getNode());
+	if (data)
+		openTree(data->getNode());
 	canvas->Refresh();
 }
 
@@ -537,6 +536,7 @@ void BrowserWindow::onZoomChanged(wxCommandEvent& e) {
 	// Update item size and refresh
 	browser_item_size = item_size;
 	canvas->updateScrollBar();
+	canvas->updateLayout();
 	canvas->Refresh();
 }
 
