@@ -141,6 +141,7 @@ void BrowserCanvas::draw() {
 
 	// Setup colours
 	rgba_t col_bg, col_text;
+	bool text_shadow = true;
 	if (browser_bg_type == 1) {
 		// Get system panel background colour
 		wxColour bgcolwx = Drawing::getPanelBGColour();
@@ -149,6 +150,12 @@ void BrowserCanvas::draw() {
 		// Get system text colour
 		wxColour textcol = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT);
 		col_text.set(textcol.Red(), textcol.Green(), textcol.Blue());
+		
+		// Check text colour brightness, if it's dark don't draw text shadow
+		rgba_t col_temp = col_text;
+		wxColor::MakeGrey(&col_temp.r, &col_temp.g, &col_temp.b);
+		if (col_temp.r < 60)
+			text_shadow = false;
 	}
 	else {
 		// Otherwise use black background
@@ -240,9 +247,9 @@ void BrowserCanvas::draw() {
 
 		// Draw item
 		if (item_size <= 0)
-			items[items_filter[a]]->draw(browser_item_size, x, y - yoff, font, show_names, item_type, col_text);
+			items[items_filter[a]]->draw(browser_item_size, x, y - yoff, font, show_names, item_type, col_text, text_shadow);
 		else
-			items[items_filter[a]]->draw(item_size, x, y - yoff, font, show_names, item_type, col_text);
+			items[items_filter[a]]->draw(item_size, x, y - yoff, font, show_names, item_type, col_text, text_shadow);
 
 		// Move over for next item
 		col++;
