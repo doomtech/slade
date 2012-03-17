@@ -374,6 +374,7 @@ void BrowserWindow::openTree(BrowserTreeNode* node, bool clear) {
 	if (clear) {
 		doSort(choice_sort->GetSelection());
 		canvas->updateScrollBar();
+		canvas->updateLayout();
 		canvas->filterItems(text_filter->GetValue());
 		canvas->showSelectedItem();
 	}

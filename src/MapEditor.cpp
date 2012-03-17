@@ -19,6 +19,7 @@ MapEditor::MapEditor() {
 	hilight_item = -1;
 	gridsize = 9;
 	canvas = NULL;
+	hilight_locked = false;
 }
 
 MapEditor::~MapEditor() {
@@ -63,6 +64,10 @@ void MapEditor::clearMap() {
 }
 
 bool MapEditor::updateHilight(fpoint2_t mouse_pos, double dist_scale) {
+	// Do nothing if hilight is locked
+	if (hilight_locked)
+		return false;
+
 	int current = hilight_item;
 
 	// Update hilighted object depending on mode
@@ -1010,6 +1015,22 @@ string MapEditor::getModeString() {
 }
 
 bool MapEditor::handleKeyBind(string key) {
+	// --- General keybinds ---
+
+	// Lock/unlock hilight
+	if (key == "me2d_lock_hilight") {
+		// Toggle lock
+		hilight_locked = !hilight_locked;
+
+		// Add editor message
+		if (hilight_locked)
+			addEditorMessage("Locked current hilight");
+		else
+			addEditorMessage("Unlocked hilight");
+
+		return true;
+	}
+
 	// --- Sector mode keybinds ---
 	if (key.StartsWith("me2d_sector") && edit_mode == MODE_SECTORS) {
 		// Height changes

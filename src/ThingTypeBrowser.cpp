@@ -82,12 +82,18 @@ void ThingTypeBrowser::setupViewOptions() {
 		setItemSize(80);
 		setItemViewType(BrowserCanvas::ITEMS_NORMAL);
 	}
+
+	canvas->updateScrollBar();
+	canvas->updateLayout();
+	canvas->showSelectedItem();
 }
 
 int ThingTypeBrowser::getSelectedType() {
 	BrowserItem* selected = getSelectedItem();
-	if (selected)
+	if (selected) {
+		wxLogMessage("Selected item %d", selected->getIndex());
 		return selected->getIndex();
+	}
 	else
 		return -1;
 }

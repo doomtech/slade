@@ -61,6 +61,7 @@ BrowserCanvas::BrowserCanvas(wxWindow* parent) : OGLCanvas(parent, -1) {
 	item_size = -1;
 	item_type = ITEMS_NORMAL;
 	longest_text = -1;
+	num_cols = -1;
 
 	// Bind events
 	Bind(wxEVT_SIZE, &BrowserCanvas::onSize, this);
@@ -157,13 +158,15 @@ void BrowserCanvas::draw() {
 	// Draw items
 	int x = item_border;
 	int y = item_border;
+	int col_width = GetSize().x / num_cols;
+	int col = 0;
 	top_index = -1;
 	for (unsigned a = 0; a < items_filter.size(); a++) {
 		// If we're not yet into the viewable area, skip
 		if (y < yoff - fullItemSizeY()) {
-			x += fullItemSizeX();
-			if (x - item_border > GetSize().x - fullItemSizeX()) {
-				x = item_border;
+			col++;
+			if (col >= num_cols) {
+				col = 0;
 				y += fullItemSizeY();
 
 				// Canvas is filled, stop drawing
@@ -178,6 +181,10 @@ void BrowserCanvas::draw() {
 			top_index = a;
 			top_y = y - yoff;
 		}
+
+		// Determine current x position
+		int xgap = (col_width - fullItemSizeX()) * 0.5;
+		x = item_border + xgap + (col * col_width);
 
 		// Draw item
 		if (item_size <= 0)
@@ -218,9 +225,9 @@ void BrowserCanvas::draw() {
 		}
 
 		// Move over for next item
-		x += fullItemSizeX();
-		if (x - item_border > GetSize().x - fullItemSizeX()) {
-			x = item_border;
+		col++;
+		if (col >= num_cols) {
+			col = 0;
 			y += fullItemSizeY();
 
 			// Canvas is filled, stop drawing
@@ -228,18 +235,6 @@ void BrowserCanvas::draw() {
 				break;
 		}
 	}
-
-	// Draw item name at the bottom if required
-	/*
-	if (show_names == NAMES_SELECTED) {
-		BrowserItem* item = getSelectedItem();
-		if (item) {
-			int center_x = GetSize().x * 0.5;
-			Drawing::drawText(item->getName(), center_x+1, GetSize().y - 16, rgba_t(0,0,0,200), Drawing::FONT_BOLD, Drawing::ALIGN_CENTER);
-			Drawing::drawText(item->getName(), center_x, GetSize().y - 17, COL_WHITE, Drawing::FONT_BOLD, Drawing::ALIGN_CENTER);
-		}
-	}
-	*/
 
 	// Swap Buffers
 	SwapBuffers();
@@ -277,6 +272,13 @@ void BrowserCanvas::updateScrollBar() {
 	// Setup scrollbar
 	scrollbar->SetScrollbar(scrollbar->GetThumbPosition(), GetSize().y, total_height, GetSize().y);
 	yoff = scrollbar->GetThumbPosition();
+}
+
+void BrowserCanvas::updateLayout() {
+	// Determine number of columns
+	num_cols = GetSize().x / fullItemSizeX();
+
+	Refresh();
 }
 
 /* BrowserCanvas::getSelectedItem
@@ -472,6 +474,7 @@ int BrowserCanvas::longestItemTextWidth() {
  *******************************************************************/
 void BrowserCanvas::onSize(wxSizeEvent& e) {
 	updateScrollBar();
+	updateLayout();
 
 	// Do default stuff
 	e.Skip();
@@ -564,8 +567,8 @@ void BrowserCanvas::onMouseEvent(wxMouseEvent& e) {
 		item_selected = NULL;
 
 		// Get column clicked & number of columns
-		int col = e.GetPosition().x / fullItemSizeX();
-		int num_cols = GetSize().x / fullItemSizeX();
+		int col_width = GetSize().x / num_cols;
+		int col = e.GetPosition().x / col_width;
 
 		// Get row clicked
 		int row = (e.GetPosition().y - top_y) / (fullItemSizeY());

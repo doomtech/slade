@@ -14,6 +14,7 @@ private:
 	// Editor state
 	uint8_t		edit_mode;
 	int			hilight_item;
+	bool		hilight_locked;
 	vector<int>	selection;
 	int			gridsize;
 
@@ -57,6 +58,8 @@ public:
 	vector<MapSector*>&	taggedSectors() { return tagged_sectors; }
 	vector<MapLine*>&	taggedLines() { return tagged_lines; }
 	vector<MapThing*>&	taggedThings() { return tagged_things; }
+	bool				hilightLocked() { return hilight_locked; }
+	void				lockHilight(bool lock = true) { hilight_locked = lock; }
 
 	void	setEditMode(int mode);
 	void	setCanvas(MapCanvas* canvas) { this->canvas = canvas; }
@@ -66,7 +69,7 @@ public:
 	void	clearMap();
 
 	// Selection/hilight
-	void		clearHilight() { hilight_item = -1; }
+	void		clearHilight() { if (!hilight_locked) hilight_item = -1; }
 	bool		updateHilight(fpoint2_t mouse_pos, double dist_scale = 1.0);
 	void		selectionUpdated();
 	void		clearSelection();

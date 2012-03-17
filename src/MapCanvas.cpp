@@ -1119,10 +1119,17 @@ bool MapCanvas::handleAction(string id) {
 		if (selection.size() > 0)
 			type = selection[0]->intProperty("type");
 
+		// Lock hilight in the editor
+		bool hl_lock = editor->hilightLocked();
+		editor->lockHilight();
+
 		// Open type browser
 		ThingTypeBrowser browser(theMapEditor, type);
 		if (browser.ShowModal() == wxID_OK)
 			editor->changeThingType(browser.getSelectedType());
+
+		// Unlock hilight if needed
+		editor->lockHilight(hl_lock);
 
 		return true;
 	}

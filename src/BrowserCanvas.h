@@ -23,6 +23,7 @@ private:
 	int top_y;
 	int	item_type;
 	int	longest_text;
+	int	num_cols;
 
 public:
 	BrowserCanvas(wxWindow* parent);
@@ -45,6 +46,7 @@ public:
 	void					draw();
 	void					setScrollBar(wxScrollBar* scrollbar);
 	void					updateScrollBar();
+	void					updateLayout();
 	BrowserItem*			getSelectedItem();
 	BrowserItem*			itemAt(int index);
 	int						itemIndex(BrowserItem* item);
