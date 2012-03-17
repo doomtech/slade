@@ -972,6 +972,10 @@ ArchiveEntry* WadArchive::findLast(search_options_t& options) {
 	if (options.match_namespace == "graphics")
 		options.match_namespace = "";
 
+	// "global" namespace has no name, by the way
+	if (options.match_namespace == "global")
+		options.match_namespace = "";
+
 	// Check for namespace to search
 	if (!options.match_namespace.IsEmpty()) {
 		// Find matching namespace

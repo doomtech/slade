@@ -328,6 +328,7 @@ void ArchivePanel::addMenus() {
 		theApp->getAction("arch_clean_textures")->addToMenu(menu_clean);
 		theApp->getAction("arch_clean_flats")->addToMenu(menu_clean);
 		theApp->getAction("arch_check_duplicates")->addToMenu(menu_clean);
+		theApp->getAction("arch_clean_iwaddupes")->addToMenu(menu_clean);
 		menu_archive->AppendSubMenu(menu_clean, "&Maintenance");
 	}
 	if (!menu_entry) {
@@ -1753,6 +1754,10 @@ bool ArchivePanel::handleAction(string id) {
 	// Archive->Maintenance->Check Duplicate Entry Names
 	else if (id == "arch_check_duplicates")
 		ArchiveOperations::checkDuplicateEntryNames(archive);
+
+	// Archive->Maintenance->Check Duplicate Entry Names
+	else if (id == "arch_clean_iwaddupes")
+		ArchiveOperations::removeEntriesUnchangedFromIWAD(archive);
 
 
 	// *************************************************************

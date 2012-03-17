@@ -9,6 +9,7 @@ namespace ArchiveOperations {
 	bool	checkDuplicateEntryNames(Archive* archive);
 	void	removeUnusedTextures(Archive* archive);
 	void	removeUnusedFlats(Archive* archive);
+	void	removeEntriesUnchangedFromIWAD(Archive* archive);
 };
 
 #endif//__ARCHIVE_OPERATIONS_H__

@@ -30,6 +30,7 @@
 #include "Main.h"
 #include "WxStuff.h"
 #include "ArchiveOperations.h"
+#include "ArchiveManager.h"
 #include "TextureXList.h"
 #include "ResourceManager.h"
 #include "ExtMessageDialog.h"
@@ -181,6 +182,70 @@ bool ArchiveOperations::checkDuplicateEntryNames(Archive* archive) {
 
 	return true;
 }
+
+/* ArchiveOperations::removeEntriesUnchangedFromIWAD
+ * Compare the archive's entries with those sharing the same name
+ * and namespace in the base resource archive, deleting duplicates
+ *******************************************************************/
+void ArchiveOperations::removeEntriesUnchangedFromIWAD(Archive* archive) {
+	// Do nothing if there is no base resource archive,
+	// or if the archive *is* the base resource archive.
+	Archive* bra = theArchiveManager->baseResourceArchive();
+	if (bra == NULL || bra == archive || archive == NULL)
+		return;
+
+	// Get list of all entries in archive
+	vector<ArchiveEntry*> entries;
+	archive->getEntryTreeAsList(entries);
+
+	// Init search options
+	Archive::search_options_t search;
+	ArchiveEntry* other = NULL;
+	string dups = "";
+	size_t count = 0;
+
+	// Go through list
+	for (unsigned a = 0; a < entries.size(); a++) {
+		// Skip directory entries
+		if (entries[a]->getType() == EntryType::folderType())
+			continue;
+
+		// Skip markers
+		if (entries[a]->getType() == EntryType::mapMarkerType() || entries[a]->getSize() == 0)
+			continue;
+
+		// Now, let's look for a counterpart in the IWAD
+		search.match_namespace = archive->detectNamespace(entries[a]);
+		search.match_name = entries[a]->getName();
+		other = bra->findLast(search);
+		
+		// If there is one, and it is identical, remove it
+		if (other != NULL && (other->getMCData().crc() == entries[a]->getMCData().crc())) {
+			++count;
+			dups += S_FMT("%s\n", CHR(search.match_name));
+			archive->removeEntry(entries[a], true);
+			entries[a] = NULL;
+		}
+	}
+
+
+	// If no duplicates exist, do nothing
+	if (count == 0) {
+		wxMessageBox("No duplicated entries exist");
+		return;
+	}
+
+	string message = S_FMT("The following %d entr%s were duplicated from the base resource archive and deleted:",
+		count, (count > 1) ? "ies" : "y");
+
+	// Display list of deleted duplicate entries
+	ExtMessageDialog msg(theMainWindow, (count > 1) ? "Deleted Entries" : "Deleted Entry");
+	msg.setExt(dups);
+	msg.setMessage(message);
+	msg.ShowModal();
+}
+
+
 
 
 
