@@ -15,6 +15,7 @@
 // and check against it when loading. In other words, wxAUI is silly.
 #define MW_LAYOUT_VERS 9
 
+class SToolBar;
 class MainWindow : public wxFrame, SActionHandler {
 private:
 	ArchiveManagerPanel*	panel_archivemanager;
@@ -24,6 +25,7 @@ private:
 	int						lasttipindex;
 	PaletteChooser*			palette_chooser;
 	vector<wxMenu*>			custom_menus;
+	SToolBar*				toolbar;
 
 	// Singleton instance
 	static MainWindow*		instance;
@@ -63,8 +65,7 @@ public:
 	void	removeCustomMenu(wxMenu* menu);
 
 	// Toolbars
-	void	addToolbar(wxAuiToolBar* toolbar, string name, int position);
-	void	removeToolbar(wxAuiToolBar* toolbar);
+	void	enableToolBar(string name, bool enable = true);
 
 	// Events
 	void	onMenuItemClicked(wxCommandEvent &e);

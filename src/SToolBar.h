@@ -27,10 +27,12 @@ public:
 
 	void	addGroup(SToolBarGroup* group);
 	void	updateLayout();
+	void	enableGroup(string name, bool enable = true);
 
 	// Events
 	void	onSize(wxSizeEvent& e);
 	void	onPaint(wxPaintEvent& e);
+	void	onFocus(wxFocusEvent& e);
 };
 
 #endif//__S_TOOL_BAR_H__

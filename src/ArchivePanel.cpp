@@ -354,6 +354,10 @@ void ArchivePanel::addMenus() {
 	theMainWindow->addCustomMenu(menu_archive, "&Archive");
 	theMainWindow->addCustomMenu(menu_entry, "&Entry");
 	cur_area->addCustomMenu();
+
+	// Also enable the related toolbars
+	theMainWindow->enableToolBar("archive");
+	theMainWindow->enableToolBar("entry");
 }
 
 /* ArchivePanel::removeMenus
@@ -365,6 +369,10 @@ void ArchivePanel::removeMenus() {
 	theMainWindow->removeCustomMenu(menu_archive);
 	theMainWindow->removeCustomMenu(menu_entry);
 	cur_area->removeCustomMenu();
+
+	// Also disable the related toolbars
+	theMainWindow->enableToolBar("archive", false);
+	theMainWindow->enableToolBar("entry", false);
 }
 
 /* ArchivePanel::save

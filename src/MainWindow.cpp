@@ -214,7 +214,7 @@ void MainWindow::setupLayout() {
 
 
 	// -- Toolbars --
-	SToolBar* toolbar = new SToolBar(this);
+	toolbar = new SToolBar(this);
 
 	// Create File toolbar
 	SToolBarGroup* tbg_file = new SToolBarGroup(toolbar, "File");
@@ -260,6 +260,10 @@ void MainWindow::setupLayout() {
 	palette_chooser->selectPalette(global_palette);
 	tbg_palette->addCustomControl(palette_chooser);
 	toolbar->addGroup(tbg_palette);
+
+	// Archive and Entry toolbars are initially disabled
+	toolbar->enableGroup("archive", false);
+	toolbar->enableGroup("entry", false);
 
 	// Add toolbar
 	m_mgr->AddPane(toolbar, wxAuiPaneInfo().Top().CaptionVisible(false).MinSize(-1, 30).Resizable(false).PaneBorder(false).Name("toolbar"));
@@ -464,6 +468,13 @@ void MainWindow::removeCustomMenu(wxMenu* menu) {
 			return;
 		}
 	}
+}
+
+/* MainWindow::enableToolBar
+ * Enables/disables the toolbar group matching [name]
+ *******************************************************************/
+void MainWindow::enableToolBar(string name, bool enable) {
+	toolbar->enableGroup(name, enable);
 }
 
 /* MainWindow::handleAction

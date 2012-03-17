@@ -119,6 +119,7 @@ SToolBar::SToolBar(wxWindow* parent) : wxPanel(parent, -1) {
 	// Bind events
 	Bind(wxEVT_SIZE, &SToolBar::onSize, this);
 	Bind(wxEVT_PAINT, &SToolBar::onPaint, this);
+	Bind(wxEVT_KILL_FOCUS, &SToolBar::onFocus, this);
 }
 
 SToolBar::~SToolBar() {
@@ -181,6 +182,19 @@ void SToolBar::updateLayout() {
 	Layout();
 }
 
+void SToolBar::enableGroup(string name, bool enable) {
+	// Go through toolbar groups
+	for (unsigned a = 0; a < groups.size(); a++) {
+		if (S_CMPNOCASE(groups[a]->getName(), name))
+			groups[a]->Enable(enable);
+	}
+
+	// Redraw
+	Update();
+	Refresh();
+}
+
+
 void SToolBar::onSize(wxSizeEvent& e) {
 	// Update layout
 	updateLayout();
@@ -207,4 +221,12 @@ void SToolBar::onPaint(wxPaintEvent& e) {
 	// Draw bottom
 	dc.SetPen(wxPen(col_dark));
 	dc.DrawLine(wxPoint(0, GetSize().y-1), wxPoint(GetSize().x+1, GetSize().y-1));
+}
+
+void SToolBar::onFocus(wxFocusEvent& e) {
+	// Redraw
+	Update();
+	Refresh();
+
+	e.Skip();
 }
