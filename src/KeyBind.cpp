@@ -317,7 +317,7 @@ void KeyBind::initBinds() {
 
 	// Map Editor 2D (me2d*)
 	addBind("me2d_clear_selection", keypress_t("C"), "Clear selection");
-	addBind("me2d_pan_view", keypress_t("mouse3"), "Pan View");
+	addBind("me2d_pan_view", keypress_t("mouse3"), "Pan view");
 	addBind("me2d_pan_view", keypress_t("space", true));
 	addBind("me2d_move", keypress_t("Z"), "Toggle item move mode");
 	addBind("me2d_zoom_in_m", keypress_t("mwheelup"), "Zoom in (towards mouse)");
@@ -332,8 +332,8 @@ void KeyBind::initBinds() {
 	addBind("me2d_right", keypress_t("right"), "Scroll right");
 	addBind("me2d_up", keypress_t("up"), "Scroll up");
 	addBind("me2d_down", keypress_t("down"), "Scroll down");
-	addBind("me2d_grid_inc", keypress_t("["), "Increment Grid level");
-	addBind("me2d_grid_dec", keypress_t("]"), "Decrement Grid level");
+	addBind("me2d_grid_inc", keypress_t("["), "Increment grid level");
+	addBind("me2d_grid_dec", keypress_t("]"), "Decrement grid level");
 	addBind("me2d_mode_vertices", keypress_t("V"), "Vertices mode");
 	addBind("me2d_mode_lines", keypress_t("L"), "Lines mode");
 	addBind("me2d_mode_sectors", keypress_t("S"), "Sectors mode");
@@ -359,6 +359,9 @@ void KeyBind::initBinds() {
 	addBind("me2d_sector_height_up", keypress_t(".", KPM_SHIFT), "Height up 1");
 	addBind("me2d_sector_height_down8", keypress_t(","), "Height down 8");
 	addBind("me2d_sector_height_down", keypress_t(",", KPM_SHIFT), "Height down 1");
+
+	// Map Editor 2D Things mode (me2d_thing*)
+	addBind("me2d_thing_change_type", keypress_t("T", KPM_CTRL), "Change type");
 
 	// Map Editor 3D (me3d*)
 

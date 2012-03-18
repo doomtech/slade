@@ -2,9 +2,11 @@
 #ifndef __S_TOOL_BAR_BUTTON_H__
 #define __S_TOOL_BAR_BUTTON_H__
 
+class SAction;
 class SToolBarButton : public wxControl {
 private:
-	string		action;
+	//string		action;
+	SAction*	action;
 	wxBitmap	icon;
 	int			state;
 
@@ -15,7 +17,6 @@ public:
 	enum {
 		STATE_NORMAL,
 		STATE_MOUSEOVER,
-		STATE_TOGGLED,
 		STATE_MOUSEDOWN,
 	};
 
@@ -23,6 +24,7 @@ public:
 	void	onPaint(wxPaintEvent& e);
 	void	onMouseEvent(wxMouseEvent& e);
 	void	onFocus(wxFocusEvent& e);
+	void	onEraseBackground(wxEraseEvent& e);
 };
 
 #endif//__S_TOOL_BAR_BUTTON_H__

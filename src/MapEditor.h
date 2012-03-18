@@ -17,6 +17,7 @@ private:
 	bool		hilight_locked;
 	vector<int>	selection;
 	int			gridsize;
+	int			sector_mode;
 
 	// Tagged items
 	vector<MapSector*>	tagged_sectors;
@@ -39,11 +40,16 @@ private:
 public:
 	enum {
 		// Editor modes
-		MODE_VERTICES,
+		MODE_VERTICES = 0,
 		MODE_LINES,
 		MODE_SECTORS,
 		MODE_THINGS,
 		MODE_3D,
+
+		// Sector edit modes (for shortcut keys, mostly)
+		SECTOR_BOTH = 0,
+		SECTOR_FLOOR,
+		SECTOR_CEILING,
 	};
 
 	MapEditor();
@@ -51,6 +57,7 @@ public:
 
 	SLADEMap&			getMap() { return map; }
 	uint8_t				editMode() { return edit_mode; }
+	int					sectorEditMode() { return sector_mode; }
 	double				gridSize();
 	unsigned			selectionSize() { return selection.size(); }
 	vector<int>&		getSelection() { return selection; }
@@ -115,7 +122,7 @@ public:
 
 	// Misc
 	string	getModeString();
-	bool	handleKeyBind(string key);
+	bool	handleKeyBind(string key, fpoint2_t position);
 	void	updateDisplay();
 };
 

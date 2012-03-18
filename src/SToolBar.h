@@ -5,12 +5,16 @@
 class SToolBarGroup : public wxPanel {
 private:
 	string	name;
+	bool	hidden;
 
 public:
 	SToolBarGroup(wxWindow* parent, string name, bool force_name = false);
 	~SToolBarGroup();
 
 	string	getName() { return name; }
+	bool	isHidden() { return hidden; }
+	void	hide(bool hide = true);
+	void	redraw();
 
 	void	addActionButton(string action, string icon = "");
 	void	addCustomControl(wxWindow* control);
@@ -40,6 +44,8 @@ public:
 	void	onSize(wxSizeEvent& e);
 	void	onPaint(wxPaintEvent& e);
 	void	onFocus(wxFocusEvent& e);
+	void	onMouseEvent(wxMouseEvent& e);
+	void	onContextMenu(wxCommandEvent& e);
 };
 
 DECLARE_EVENT_TYPE(wxEVT_STOOLBAR_LAYOUT_UPDATED, -1)

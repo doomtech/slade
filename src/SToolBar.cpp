@@ -7,6 +7,7 @@
 #include <wx/wrapsizer.h>
 
 CVAR(Bool, show_toolbar_names, false, CVAR_SAVE)
+CVAR(String, toolbars_hidden, "", CVAR_SAVE)
 DEFINE_EVENT_TYPE(wxEVT_STOOLBAR_LAYOUT_UPDATED)
 
 class SToolBarSeparator : public wxControl {
@@ -81,6 +82,13 @@ SToolBarGroup::SToolBarGroup(wxWindow* parent, string name, bool force_name) : w
 	// Init variables
 	this->name = name;
 
+	// Check if hidden
+	string tb_hidden = toolbars_hidden;
+	if (tb_hidden.Contains(S_FMT("[%s]", CHR(name))))
+		hidden = true;
+	else
+		hidden = false;
+
 	// Set colours
 	SetBackgroundColour(Drawing::getMenuBarBGColour());
 
@@ -105,6 +113,20 @@ SToolBarGroup::SToolBarGroup(wxWindow* parent, string name, bool force_name) : w
 SToolBarGroup::~SToolBarGroup() {
 }
 
+void SToolBarGroup::hide(bool hide) {
+	// Update variables
+	hidden = hide;
+
+	// Update 'hidden toolbars' cvar
+	string tb_hidden = toolbars_hidden;
+	if (hide)
+		tb_hidden += "[" + name + "]";
+	else
+		tb_hidden.Replace(S_FMT("[%s]", CHR(name)), "");
+
+	toolbars_hidden = tb_hidden;
+}
+
 void SToolBarGroup::addActionButton(string action, string icon) {
 	// Get sizer
 	wxSizer* sizer = GetSizer();
@@ -122,6 +144,14 @@ void SToolBarGroup::addCustomControl(wxWindow* control) {
 
 	// Add it to the group
 	GetSizer()->Add(control, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT, 2);
+}
+
+void SToolBarGroup::redraw() {
+	wxWindowList children = GetChildren();
+	for (unsigned a = 0; a < children.size(); a++) {
+		children[a]->Update();
+		children[a]->Refresh();
+	}
 }
 
 
@@ -159,6 +189,9 @@ SToolBar::SToolBar(wxWindow* parent) : wxPanel(parent, -1) {
 	Bind(wxEVT_SIZE, &SToolBar::onSize, this);
 	Bind(wxEVT_PAINT, &SToolBar::onPaint, this);
 	Bind(wxEVT_KILL_FOCUS, &SToolBar::onFocus, this);
+	Bind(wxEVT_RIGHT_DOWN, &SToolBar::onMouseEvent, this);
+	Bind(wxEVT_LEFT_DOWN, &SToolBar::onMouseEvent, this);
+	Bind(wxEVT_COMMAND_MENU_SELECTED, &SToolBar::onContextMenu, this);
 }
 
 SToolBar::~SToolBar() {
@@ -240,7 +273,14 @@ void SToolBar::updateLayout(bool force, bool generate_event) {
 	int groups_line = 0;
 	n_rows = 0;
 	for (unsigned a = 0; a < groups.size(); a++) {
+		// Skip if group is hidden
+		if (groups[a]->isHidden()) {
+			groups[a]->Show(false);
+			continue;
+		}
+
 		// Check if the group will fit
+		groups[a]->Show();
 		if (groups[a]->GetBestSize().x + current_width + 4 > GetSize().x && groups_line > 0) {
 			// The group won't fit, begin a new line
 			SToolBarVLine* vline = new SToolBarVLine(this);
@@ -271,6 +311,7 @@ void SToolBar::updateLayout(bool force, bool generate_event) {
 
 	// Apply layout
 	Layout();
+	Refresh();
 
 	// Check if the toolbar height changed
 	if (min_height != GetBestSize().y) {
@@ -304,6 +345,10 @@ int SToolBar::calculateNumRows(int width) {
 	int groups_line = 0;
 	int rows = 0;
 	for (unsigned a = 0; a < groups.size(); a++) {
+		// Skip if group is hidden
+		if (groups[a]->isHidden())
+			continue;
+
 		// Check if the group will fit
 		if (groups[a]->GetBestSize().x + current_width + 4 > width && groups_line > 0) {
 			// The group won't fit, begin a new line
@@ -362,4 +407,52 @@ void SToolBar::onFocus(wxFocusEvent& e) {
 	Refresh();
 
 	e.Skip();
+}
+
+void SToolBar::onMouseEvent(wxMouseEvent& e) {
+	// Right click
+	if (e.GetEventType() == wxEVT_RIGHT_DOWN) {
+		// Build context menu
+		wxMenu context;
+		for (unsigned a = 0; a < groups.size(); a++) {
+			string name = groups[a]->getName();
+			name.Replace("_", "");
+			wxMenuItem* item = context.AppendCheckItem(a, name);
+			item->Check(!groups[a]->isHidden());
+		}
+
+		// Add 'show names' item
+		wxMenuItem* item = context.AppendCheckItem(groups.size(), "Show group names", "Show names of toolbar groups (requires program restart to take effect)");
+		item->Check(show_toolbar_names);
+
+		// Popup context menu
+		PopupMenu(&context);
+	}
+
+	// Left click
+	if (e.GetEventType() == wxEVT_LEFT_DOWN) {
+		Refresh();
+		Update();
+	}
+
+	e.Skip();
+}
+
+void SToolBar::onContextMenu(wxCommandEvent& e) {
+	// Check index
+	if (e.GetId() < 0)
+		return;
+
+	// 'Show group names' item
+	else if (e.GetId() == groups.size())
+		show_toolbar_names = !show_toolbar_names;
+
+	// Group toggle
+	else if (e.GetId() < groups.size()) {
+		// Toggle group hidden
+		groups[e.GetId()]->hide(!groups[e.GetId()]->isHidden());
+
+		// Update layout
+		updateLayout(true);
+	}
 }

@@ -12,7 +12,7 @@
 SToolBarButton::SToolBarButton(wxWindow* parent, string action, string icon)
 : wxControl(parent, -1, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE, wxDefaultValidator, "stbutton") {
 	// Init variables
-	this->action = action;
+	this->action = theApp->getAction(action);
 	this->state = STATE_NORMAL;
 
 	// Set size
@@ -23,12 +23,12 @@ SToolBarButton::SToolBarButton(wxWindow* parent, string action, string icon)
 
 	// Load icon
 	if (icon.IsEmpty())
-		this->icon = getIcon(theApp->getAction(action)->getIconName());
+		this->icon = getIcon(this->action->getIconName());
 	else
 		this->icon = getIcon(icon);
 
 	// Set tooltip
-	string tip = theApp->getAction(action)->getText();
+	string tip = this->action->getText();
 	tip.Replace("&", "");
 	SetToolTip(tip);
 
@@ -39,6 +39,8 @@ SToolBarButton::SToolBarButton(wxWindow* parent, string action, string icon)
 	Bind(wxEVT_LEFT_DOWN, &SToolBarButton::onMouseEvent, this);
 	Bind(wxEVT_LEFT_UP, &SToolBarButton::onMouseEvent, this);
 	Bind(wxEVT_KILL_FOCUS, &SToolBarButton::onFocus, this);
+	Bind(wxEVT_LEFT_DCLICK, &SToolBarButton::onMouseEvent, this);
+	Bind(wxEVT_ERASE_BACKGROUND, &SToolBarButton::onEraseBackground, this);
 }
 
 SToolBarButton::~SToolBarButton() {
@@ -60,8 +62,31 @@ void SToolBarButton::onPaint(wxPaintEvent& e) {
 	if (!gc)
 		return;
 
+	// Draw toggled border/background
+	if (action->isToggled()) {
+		// Use greyscale version of hilight colour
+		uint8_t r = col_hilight.Red();
+		uint8_t g = col_hilight.Green();
+		uint8_t b = col_hilight.Blue();
+		wxColour::MakeGrey(&r, &g, &b);
+		wxColour col_toggle(r, g, b, 255);
+		wxColour col_trans(r, g, b, 150);
+
+		// Set brush/pen colours
+		gc->SetBrush(col_trans);
+		gc->SetPen(wxPen(Drawing::lightColour(col_toggle, 5.0f), 1));
+
+		// Draw border
+		gc->DrawRoundedRectangle(2, 2, 18, 18, 2);
+
+		// Draw outer border
+		gc->SetBrush(wxBrush(col_toggle, wxBRUSHSTYLE_TRANSPARENT));
+		gc->SetPen(wxPen(Drawing::darkColour(col_toggle, 5.0f)));
+		gc->DrawRoundedRectangle(1, 1, 20, 20, 2);
+	}
+
 	// Draw border on mouseover
-	if (state == STATE_MOUSEOVER || state == STATE_TOGGLED || state == STATE_MOUSEDOWN) {
+	if (state == STATE_MOUSEOVER || state == STATE_MOUSEDOWN) {
 		// Determine transparency level
 		int trans = 160;
 		if (state == STATE_MOUSEDOWN)
@@ -107,50 +132,40 @@ void SToolBarButton::onMouseEvent(wxMouseEvent& e) {
 	// Mouse enter
 	if (e.GetEventType() == wxEVT_ENTER_WINDOW) {
 		// Set state to mouseover
-		if (state == STATE_NORMAL) {
-			state = STATE_MOUSEOVER;
-			Refresh();
-		}
+		state = STATE_MOUSEOVER;
 
 		// Set status bar help text
-		theMainWindow->SetStatusText(theApp->getAction(action)->getHelpText());
+		theMainWindow->SetStatusText(action->getHelpText());
 	}
 
 	// Mouse leave
-	else if (e.GetEventType() == wxEVT_LEAVE_WINDOW) {
+	if (e.GetEventType() == wxEVT_LEAVE_WINDOW) {
 		// Set state to normal
-		if (state != STATE_TOGGLED) {
-			state = STATE_NORMAL;
-			Refresh();
-		}
+		state = STATE_NORMAL;
 
 		// Clear status bar help text
 		theMainWindow->SetStatusText("");
 	}
 
 	// Left button down
-	else if (e.GetEventType() == wxEVT_LEFT_DOWN) {
+	if (e.GetEventType() == wxEVT_LEFT_DOWN || e.GetEventType() == wxEVT_LEFT_DCLICK) {
 		state = STATE_MOUSEDOWN;
-		Refresh();
+		if (action->isRadio()) GetParent()->Refresh();
 
-		//wxCommandEvent e(wxEVT_COMMAND_MENU_SELECTED, GetId());
-		//e.SetId(theApp->getAction(action)->getWxId());
-		//e.SetEventObject(this);
-		//GetEventHandler()->ProcessEvent(e);
-		theApp->doAction(action);
+		theApp->doAction(action->getId());
 	}
 
 	// Left button up
-	else if (e.GetEventType() == wxEVT_LEFT_UP) {
+	if (e.GetEventType() == wxEVT_LEFT_UP) {
 		state = STATE_MOUSEOVER;
-		Refresh();
 
 		// Clear status bar help text
 		theMainWindow->SetStatusText("");
 	}
 
-	else
-		e.Skip();
+	Refresh();
+
+	e.Skip();
 }
 
 void SToolBarButton::onFocus(wxFocusEvent& e) {
@@ -160,4 +175,7 @@ void SToolBarButton::onFocus(wxFocusEvent& e) {
 	Refresh();
 
 	e.Skip();
+}
+
+void SToolBarButton::onEraseBackground(wxEraseEvent& e) {
 }

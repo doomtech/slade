@@ -20,6 +20,7 @@ MapEditor::MapEditor() {
 	gridsize = 9;
 	canvas = NULL;
 	hilight_locked = false;
+	sector_mode = SECTOR_BOTH;
 }
 
 MapEditor::~MapEditor() {
@@ -30,20 +31,35 @@ double MapEditor::gridSize() {
 }
 
 void MapEditor::setEditMode(int mode) {
+	// If the current mode is sectors and we're setting it to sectors, cycle the sector edit mode
+	if (edit_mode == MODE_SECTORS && mode == MODE_SECTORS) {
+		sector_mode++;
+		if (sector_mode > SECTOR_CEILING)
+			sector_mode = SECTOR_BOTH;
+	}
+	else {
+		sector_mode = SECTOR_BOTH;
+		selection.clear();
+	}
+
 	edit_mode = mode;
 	hilight_item = -1;
-	selection.clear();
 
 	// Clear tagged lists
 	tagged_sectors.clear();
 	tagged_lines.clear();
 	tagged_things.clear();
 
+	// Determine sectors mode string
+	string smode = "Normal";
+	if (sector_mode == SECTOR_FLOOR)		smode = "Floors";
+	else if (sector_mode == SECTOR_CEILING)	smode = "Ceilings";
+
 	// Add editor message
 	switch (edit_mode) {
 	case MODE_VERTICES: addEditorMessage("Vertices mode"); break;
 	case MODE_LINES:	addEditorMessage("Lines mode"); break;
-	case MODE_SECTORS:	addEditorMessage("Sectors mode"); break;
+	case MODE_SECTORS:	addEditorMessage(S_FMT("Sectors mode (%s)", CHR(smode))); break;
 	case MODE_THINGS:	addEditorMessage("Things mode"); break;
 	default: break;
 	};
@@ -867,6 +883,14 @@ void MapEditor::changeSectorHeight(int amount, bool floor, bool ceiling) {
 	if (selection.size() == 0)
 		return;
 
+	// If we're modifying both heights, take sector_mode into account
+	if (floor && ceiling) {
+		if (sector_mode == SECTOR_FLOOR)
+			ceiling = false;
+		if (sector_mode == SECTOR_CEILING)
+			floor = false;
+	}
+
 	// Go through selection
 	for (unsigned a = 0; a < selection.size(); a++) {
 		// Change floor height
@@ -1014,11 +1038,29 @@ string MapEditor::getModeString() {
 	};
 }
 
-bool MapEditor::handleKeyBind(string key) {
+bool MapEditor::handleKeyBind(string key, fpoint2_t position) {
 	// --- General keybinds ---
 
+	// Increment grid
+	if (key == "me2d_grid_inc")
+		incrementGrid();
+
+	// Decrement grid
+	else if (key == "me2d_grid_dec")
+		decrementGrid();
+
+	// Select all
+	else if (key == "select_all")
+		selectAll();
+
+	// Clear selection
+	else if (key == "me2d_clear_selection") {
+		clearSelection();
+		addEditorMessage("Selection cleared");
+	}
+
 	// Lock/unlock hilight
-	if (key == "me2d_lock_hilight") {
+	else if (key == "me2d_lock_hilight") {
 		// Toggle lock
 		hilight_locked = !hilight_locked;
 
@@ -1031,8 +1073,14 @@ bool MapEditor::handleKeyBind(string key) {
 		return true;
 	}
 
+	// --- Line mode keybinds ---
+	else if (key.StartsWith("me2d_line") && edit_mode == MODE_LINES) {
+		// Split line
+		if (key == "me2d_line_split")	splitLine(position.x, position.y);
+	}
+
 	// --- Sector mode keybinds ---
-	if (key.StartsWith("me2d_sector") && edit_mode == MODE_SECTORS) {
+	else if (key.StartsWith("me2d_sector") && edit_mode == MODE_SECTORS) {
 		// Height changes
 		if		(key == "me2d_sector_floor_up8")	changeSectorHeight(8, true, false);
 		else if (key == "me2d_sector_floor_up")		changeSectorHeight(1, true, false);

@@ -38,13 +38,19 @@
 
 
 /*******************************************************************
+ * VARIABLES
+ *******************************************************************/
+int SAction::n_groups = 0;
+
+
+/*******************************************************************
  * SACTION CLASS FUNCTIONS
  *******************************************************************/
 
 /* SAction::SAction
  * SAction class constructor
  *******************************************************************/
-SAction::SAction(string id, string text, string icon, string helptext, string shortcut, int type, int custom_wxid) {
+SAction::SAction(string id, string text, string icon, string helptext, string shortcut, int type, int custom_wxid, int radio_group) {
 	// Init variables
 	this->id = id;
 	this->text = text;
@@ -52,6 +58,8 @@ SAction::SAction(string id, string text, string icon, string helptext, string sh
 	this->helptext = helptext;
 	this->type = type;
 	this->shortcut = shortcut;
+	this->group = radio_group;
+	this->toggled = false;
 
 	// Add to MainApp
 	theApp->actions.push_back(this);

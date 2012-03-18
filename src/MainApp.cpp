@@ -487,10 +487,11 @@ void MainApp::initActions() {
 	new SAction("mapw_rename", "Rename Map", "t_rename", "Rename the current map");
 	new SAction("mapw_setbra", "Set &Base Resource Archive", "e_archive", "Set the Base Resource Archive, to act as the program 'IWAD'");
 	new SAction("mapw_preferences", "&Preferences...", "t_settings", "Setup SLADE options and preferences");
-	new SAction("mapw_mode_vertices", "Vertices Mode", "t_verts", "Change to vertices editing mode", "", SAction::RADIO);
-	new SAction("mapw_mode_lines", "Lines Mode", "t_lines", "Change to lines editing mode", "", SAction::RADIO);
-	new SAction("mapw_mode_sectors", "Sectors Mode", "t_sectors", "Change to sectors editing mode", "", SAction::RADIO);
-	new SAction("mapw_mode_things", "Things Mode", "t_things", "Change to things editing mode", "", SAction::RADIO);
+	int group_mode = SAction::newGroup();
+	new SAction("mapw_mode_vertices", "Vertices Mode", "t_verts", "Change to vertices editing mode", "", SAction::RADIO, -1, group_mode);
+	new SAction("mapw_mode_lines", "Lines Mode", "t_lines", "Change to lines editing mode", "", SAction::RADIO, -1, group_mode);
+	new SAction("mapw_mode_sectors", "Sectors Mode", "t_sectors", "Change to sectors editing mode", "", SAction::RADIO, -1, group_mode);
+	new SAction("mapw_mode_things", "Things Mode", "t_things", "Change to things editing mode", "", SAction::RADIO, -1, group_mode);
 	new SAction("mapw_showconsole", "&Console", "t_console", "Toggle the Console window", "Ctrl+2");
 	new SAction("mapw_showproperties", "&Item Properties", "", "Toggle the Item Properties window", "Ctrl+1");
 	new SAction("mapw_thing_changetype", "Change Type", "", "Change the currently selected or hilighted thing's type(s)");
@@ -807,6 +808,9 @@ SAction* MainApp::getAction(string id) {
 }
 
 bool MainApp::doAction(string id) {
+	// Toggle action if necessary
+	toggleAction(id);
+
 	// Send action to all handlers
 	bool handled = false;
 	for (unsigned a = 0; a < action_handlers.size(); a++) {
@@ -822,6 +826,26 @@ bool MainApp::doAction(string id) {
 
 	// Return true if handled
 	return handled;
+}
+
+void MainApp::toggleAction(string id) {
+	// Check action type for check/radio toggle
+	SAction* action = getAction(id);
+
+	// Type is 'check', just toggle it
+	if (action && action->type == SAction::CHECK)
+		action->toggled = !action->toggled;
+
+	// Type is 'radio', toggle this and un-toggle others in the group
+	else if (action && action->type == SAction::RADIO && action->group >= 0) {
+		// Go through and toggle off all other actions in the same group
+		for (unsigned a = 0; a < actions.size(); a++) {
+			if (actions[a]->group == action->group)
+				actions[a]->toggled = false;
+		}
+
+		action->toggled = true;
+	}
 }
 
 void MainApp::onMenu(wxCommandEvent& e) {

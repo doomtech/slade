@@ -15,12 +15,14 @@
 
 class MapObject;
 class MapObjectPropsPanel;
+class SToolBar;
 class MapEditorWindow : public wxFrame, public SActionHandler {
 private:
 	MapCanvas*				map_canvas;
 	MapEditor				editor;
 	MapTextureManager		tex_man;
 	MapObjectPropsPanel*	panel_obj_props;
+	SToolBar*				toolbar;
 
 	// Singleton instance
 	static MapEditorWindow*		instance;
@@ -43,6 +45,7 @@ public:
 	void	setupLayout();
 	bool	openMap(Archive::mapdesc_t map);
 	void	forceRefresh();
+	void	refreshToolBar();
 
 	MapObjectPropsPanel*	propsPanel() { return panel_obj_props; }
 

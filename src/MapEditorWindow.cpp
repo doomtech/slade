@@ -113,12 +113,14 @@ void MapEditorWindow::setupLayout() {
 	menu->Append(menu_editor, "&Editor");
 
 	// Mode menu
+	/*
 	wxMenu* menu_mode = new wxMenu("");
 	theApp->getAction("mapw_mode_vertices")->addToMenu(menu_mode);
 	theApp->getAction("mapw_mode_lines")->addToMenu(menu_mode);
 	theApp->getAction("mapw_mode_sectors")->addToMenu(menu_mode);
 	theApp->getAction("mapw_mode_things")->addToMenu(menu_mode);
 	menu->Append(menu_mode, "Mode");
+	*/
 
 	// View menu
 	wxMenu* menu_view = new wxMenu("");
@@ -130,7 +132,7 @@ void MapEditorWindow::setupLayout() {
 
 
 	// --- Toolbars ---
-	SToolBar* toolbar = new SToolBar(this);
+	toolbar = new SToolBar(this);
 
 	// Map toolbar
 	SToolBarGroup* tbg_map = new SToolBarGroup(toolbar, "Map");
@@ -144,6 +146,7 @@ void MapEditorWindow::setupLayout() {
 	tbg_mode->addActionButton("mapw_mode_lines");
 	tbg_mode->addActionButton("mapw_mode_sectors");
 	tbg_mode->addActionButton("mapw_mode_things");
+	theApp->toggleAction("mapw_mode_lines");	// Lines mode by default
 	toolbar->addGroup(tbg_mode);
 
 	// Add toolbar
@@ -224,6 +227,10 @@ bool MapEditorWindow::openMap(Archive::mapdesc_t map) {
 
 void MapEditorWindow::forceRefresh() {
 	map_canvas->Refresh();
+}
+
+void MapEditorWindow::refreshToolBar() {
+	toolbar->Refresh();
 }
 
 /* MapEditorWindow::handleAction

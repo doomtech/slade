@@ -61,6 +61,7 @@ public:
 	int			newMenuId() { return cur_id++; }
 	SAction*	getAction(string id);
 	bool		doAction(string id);
+	void		toggleAction(string id);
 
 	void	onMenu(wxCommandEvent& e);
 };

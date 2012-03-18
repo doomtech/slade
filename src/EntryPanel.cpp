@@ -242,7 +242,7 @@ void EntryPanel::addCustomToolBar() {
 	wxArrayString actions = wxSplit(custom_toolbar_actions, ';');
 
 	// Add to main window
-	theMainWindow->addCustomToolBar(custom_menu_name, actions);
+	theMainWindow->addCustomToolBar("Current Entry", actions);
 }
 
 /* EntryPanel::removeCustomMenu
@@ -250,7 +250,7 @@ void EntryPanel::addCustomToolBar() {
  * window toolbar
  *******************************************************************/
 void EntryPanel::removeCustomToolBar() {
-	theMainWindow->removeCustomToolBar(custom_menu_name);
+	theMainWindow->removeCustomToolBar("Current Entry");
 }
 
 

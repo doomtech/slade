@@ -497,7 +497,17 @@ void MapCanvas::draw() {
 	// Draw flats if needed
 	if (flat_drawtype > 0) {
 		COL_WHITE.set_gl();
-		renderer_2d->renderFlats(flat_drawtype-1);
+
+		// Adjust flat type depending on sector mode
+		int drawtype = flat_drawtype-1;
+		if (drawtype > 0 && editor->editMode() == MapEditor::MODE_SECTORS) {
+			if (editor->sectorEditMode() == MapEditor::SECTOR_FLOOR)
+				drawtype = 1;
+			else if (editor->sectorEditMode() == MapEditor::SECTOR_CEILING)
+				drawtype = 2;
+		}
+
+		renderer_2d->renderFlats(drawtype);
 	}
 
 	// Draw grid
@@ -990,29 +1000,33 @@ void MapCanvas::onKeyBindPress(string name) {
 	else if (name == "me2d_show_all")
 		viewFitToMap();
 
-	// Increment grid
-	else if (name == "me2d_grid_inc")
-		editor->incrementGrid();
-
-	// Decrement grid
-	else if (name == "me2d_grid_dec")
-		editor->decrementGrid();
-
 	// Vertices mode
-	else if (name == "me2d_mode_vertices")
+	else if (name == "me2d_mode_vertices") {
 		editor->setEditMode(MapEditor::MODE_VERTICES);
+		theApp->toggleAction("mapw_mode_vertices");
+		theMapEditor->refreshToolBar();
+	}
 
 	// Lines mode
-	else if (name == "me2d_mode_lines")
+	else if (name == "me2d_mode_lines") {
 		editor->setEditMode(MapEditor::MODE_LINES);
+		theApp->toggleAction("mapw_mode_lines");
+		theMapEditor->refreshToolBar();
+	}
 
 	// Sectors mode
-	else if (name == "me2d_mode_sectors")
+	else if (name == "me2d_mode_sectors") {
 		editor->setEditMode(MapEditor::MODE_SECTORS);
+		theApp->toggleAction("mapw_mode_sectors");
+		theMapEditor->refreshToolBar();
+	}
 
 	// Things mode
-	else if (name == "me2d_mode_things")
+	else if (name == "me2d_mode_things") {
 		editor->setEditMode(MapEditor::MODE_THINGS);
+		theApp->toggleAction("mapw_mode_things");
+		theMapEditor->refreshToolBar();
+	}
 
 	// Pan view
 	else if (name == "me2d_pan_view") {
@@ -1020,16 +1034,6 @@ void MapCanvas::onKeyBindPress(string name) {
 		mouse_state = MSTATE_PANNING;
 		editor->clearHilight();
 		SetCursor(wxCURSOR_SIZING);
-	}
-
-	// Select all
-	else if (name == "select_all")
-		editor->selectAll();
-
-	// Clear selection
-	else if (name == "me2d_clear_selection") {
-		editor->clearSelection();
-		editor->addEditorMessage("Selection cleared");
 	}
 
 	// Cycle flat type
@@ -1063,13 +1067,13 @@ void MapCanvas::onKeyBindPress(string name) {
 		}
 	}
 
-	// Split line
-	else if (name == "me2d_line_split" && editor->editMode() == MapEditor::MODE_LINES)
-		editor->splitLine(mouse_pos_m.x, mouse_pos_m.y);
+	// Change thing type
+	else if (name == "me2d_thing_change_type" && editor->editMode() == MapEditor::MODE_THINGS)
+		handleAction("mapw_thing_changetype");
 
 	// Not handled here, send to editor
 	else
-		editor->handleKeyBind(name);
+		editor->handleKeyBind(name, mouse_pos_m);
 }
 
 void MapCanvas::onKeyBindRelease(string name) {
