@@ -41,14 +41,17 @@
 #include "MapEditorWindow.h"
 #include "MapRenderer2D.h"
 #include "ThingTypeBrowser.h"
+#include "MapTextureBrowser.h"
 
 
 /*******************************************************************
  * VARIABLES
  *******************************************************************/
-CVAR(Bool, things_always, 1, CVAR_SAVE)
-CVAR(Bool, vertices_always, 0, CVAR_SAVE)
+CVAR(Int, things_always, 1, CVAR_SAVE)
+CVAR(Int, vertices_always, 0, CVAR_SAVE)
 CVAR(Bool, line_tabs_always, 0, CVAR_SAVE)
+CVAR(Bool, flat_fade, 1, CVAR_SAVE)
+CVAR(Bool, line_fade, 1, CVAR_SAVE)
 CVAR(Bool, grid_dashed, false, CVAR_SAVE)
 CVAR(Bool, scroll_smooth, true, CVAR_SAVE)
 CVAR(Int, flat_drawtype, 2, CVAR_SAVE)
@@ -78,6 +81,10 @@ MapCanvas::MapCanvas(wxWindow *parent, int id, MapEditor* editor)
 	anim_flash_level = 0.5f;
 	anim_flash_inc = true;
 	anim_info_fade = 0.0f;
+	fade_vertices = 1.0f;
+	fade_lines = 1.0f;
+	fade_flats = 1.0f;
+	fade_things = 1.0f;
 	mouse_state = MSTATE_NORMAL;
 	mouse_downpos.set(-1, -1);
 	fr_idle = 0;
@@ -507,7 +514,7 @@ void MapCanvas::draw() {
 				drawtype = 2;
 		}
 
-		renderer_2d->renderFlats(drawtype);
+		renderer_2d->renderFlats(drawtype, fade_flats);
 	}
 
 	// Draw grid
@@ -517,14 +524,14 @@ void MapCanvas::draw() {
 
 	if (editor->editMode() == MapEditor::MODE_VERTICES) {
 		// Vertices mode
-		if (things_always) renderer_2d->renderThings(0.5f);	// Things (faded)
-		renderer_2d->renderLines(line_tabs_always);			// Lines (no direction tabs)
+		renderer_2d->renderThings(fade_things);						// Things
+		renderer_2d->renderLines(line_tabs_always, fade_lines);		// Lines
 
 		// Vertices
 		if (mouse_state == MSTATE_MOVE)
 			renderer_2d->renderVertices(0.25f);
 		else
-			renderer_2d->renderVertices();
+			renderer_2d->renderVertices(fade_vertices);
 
 		// Selection if needed
 		if (mouse_state != MSTATE_MOVE)
@@ -536,9 +543,9 @@ void MapCanvas::draw() {
 	}
 	else if (editor->editMode() == MapEditor::MODE_LINES) {
 		// Lines mode
-		if (things_always) renderer_2d->renderThings(0.5f);			// Things (faded)
-		if (vertices_always) renderer_2d->renderVertices(0.5f);		// Vertices (faded)
-		renderer_2d->renderLines(true);								// Lines
+		renderer_2d->renderThings(fade_things);		// Things
+		renderer_2d->renderVertices(fade_vertices);	// Vertices
+		renderer_2d->renderLines(true);				// Lines
 
 		// Selection if needed
 		if (mouse_state != MSTATE_MOVE)
@@ -550,9 +557,9 @@ void MapCanvas::draw() {
 	}
 	else if (editor->editMode() == MapEditor::MODE_SECTORS) {
 		// Sectors mode
-		if (things_always) renderer_2d->renderThings(0.5f);			// Things (faded)
-		if (vertices_always) renderer_2d->renderVertices(0.5f);		// Vertices (faded)
-		renderer_2d->renderLines(line_tabs_always);					// Lines (no direction tabs)
+		renderer_2d->renderThings(fade_things);					// Things
+		renderer_2d->renderVertices(fade_vertices);				// Vertices
+		renderer_2d->renderLines(line_tabs_always, fade_lines);	// Lines
 
 		// Selection if needed
 		if (mouse_state != MSTATE_MOVE)
@@ -566,9 +573,9 @@ void MapCanvas::draw() {
 	}
 	else if (editor->editMode() == MapEditor::MODE_THINGS) {
 		// Things mode
-		if (vertices_always) renderer_2d->renderVertices(0.5f);		// Vertices (faded)
-		renderer_2d->renderLines(line_tabs_always);					// Lines (no direction tabs)
-		renderer_2d->renderThings();								// Things
+		renderer_2d->renderVertices(fade_vertices);				// Vertices
+		renderer_2d->renderLines(line_tabs_always, fade_lines);	// Lines
+		renderer_2d->renderThings(fade_things);					// Things
 
 		// Selection if needed
 		if (mouse_state != MSTATE_MOVE)
@@ -735,6 +742,67 @@ void MapCanvas::update(long frametime) {
 		}
 	}
 
+	// --- Fade map objects depending on mode ---
+
+	// Determine fade levels
+	float fa_vertices, fa_lines, fa_flats, fa_things;
+
+	// Vertices
+	if (vertices_always == 0)		fa_vertices = 0.0f;
+	else if (vertices_always == 1)	fa_vertices = 1.0f;
+	else							fa_vertices = 0.5f;
+
+	// Things
+	if (things_always == 0)			fa_things = 0.0f;
+	else if (things_always == 1)	fa_things = 1.0f;
+	else							fa_things = 0.5f;
+
+	// Lines
+	if (line_fade)	fa_lines = 0.5f;
+	else			fa_lines = 1.0f;
+
+	// Flats
+	if (flat_fade)	fa_flats = 0.7f;
+	else			fa_flats = 1.0f;
+
+	// Interpolate
+	bool anim_mode_crossfade = false;
+	float mcs_speed = 0.08f;
+	if (editor->editMode() == MapEditor::MODE_VERTICES) {
+		if (fade_vertices < 1.0f)  { fade_vertices += mcs_speed*(1.0f-fa_vertices)*mult; anim_mode_crossfade = true; }
+		fade_lines = fa_lines;
+		if (fade_flats > fa_flats) { fade_flats -= mcs_speed*(1.0f-fa_flats)*mult; anim_mode_crossfade = true; }
+		if (fade_things > fa_things) { fade_things -= mcs_speed*(1.0f-fa_things)*mult; anim_mode_crossfade = true; }
+	}
+	else if (editor->editMode() == MapEditor::MODE_LINES) {
+		if (fade_vertices > fa_vertices) { fade_vertices -= mcs_speed*(1.0f-fa_vertices)*mult; anim_mode_crossfade = true; }
+		fade_lines = 1.0f;
+		if (fade_flats > fa_flats) { fade_flats -= mcs_speed*(1.0f-fa_flats)*mult; anim_mode_crossfade = true; }
+		if (fade_things > fa_things) { fade_things -= mcs_speed*(1.0f-fa_things)*mult; anim_mode_crossfade = true; }
+	}
+	else if (editor->editMode() == MapEditor::MODE_SECTORS) {
+		if (fade_vertices > fa_vertices) { fade_vertices -= mcs_speed*(1.0f-fa_vertices)*mult; anim_mode_crossfade = true; }
+		fade_lines = fa_lines;
+		if (fade_flats < 1.0f) { fade_flats += mcs_speed*(1.0f-fa_flats)*mult; anim_mode_crossfade = true; }
+		if (fade_things > fa_things) { fade_things -= mcs_speed*(1.0f-fa_things)*mult; anim_mode_crossfade = true; }
+	}
+	else if (editor->editMode() == MapEditor::MODE_THINGS) {
+		if (fade_vertices > fa_vertices) { fade_vertices -= mcs_speed*(1.0f-fa_vertices)*mult; anim_mode_crossfade = true; }
+		fade_lines = fa_lines;
+		if (fade_flats > fa_flats) { fade_flats -= mcs_speed*(1.0f-fa_flats)*mult; anim_mode_crossfade = true; }
+		if (fade_things < 1.0f) { fade_things += mcs_speed*(1.0f-fa_things)*mult; anim_mode_crossfade = true; }
+	}
+
+	// Clamp
+	if (fade_vertices < fa_vertices) fade_vertices = fa_vertices;
+	if (fade_vertices > 1.0f) fade_vertices = 1.0f;
+	if (fade_lines < fa_lines) fade_lines = fa_lines;
+	if (fade_lines > 1.0f) fade_lines = 1.0f;
+	if (fade_flats < fa_flats) fade_flats = fa_flats;
+	if (fade_flats > 1.0f) fade_flats = 1.0f;
+	if (fade_things < fa_things) fade_things = fa_things;
+	if (fade_things > 1.0f) fade_things = 1.0f;
+
 	// View pan/zoom animation
 	bool view_anim = false;
 	if (scroll_smooth) {
@@ -833,12 +901,12 @@ void MapCanvas::update(long frametime) {
 	// Determine the framerate limit
 #ifdef USE_SFML_RENDERWINDOW
 	// SFML RenderWindow can handle high framerates better than wxGLCanvas, or something like that
-	if (mouse_state == MSTATE_SELECTION || mouse_state == MSTATE_PANNING || anim_running || fade_anim || view_anim)
+	if (mouse_state == MSTATE_SELECTION || mouse_state == MSTATE_PANNING || anim_running || fade_anim || view_anim || anim_mode_crossfade)
 		fr_idle = 2;
 	else	// No high-priority animations running, throttle framerate
 		fr_idle = 25;
 #else
-	if (mouse_state == MSTATE_SELECTION || mouse_state == MSTATE_PANNING || anim_running || fade_anim || view_anim)
+	if (mouse_state == MSTATE_SELECTION || mouse_state == MSTATE_PANNING || anim_running || fade_anim || view_anim || anim_mode_crossfade)
 		fr_idle = 5;
 	else	// No high-priority animations running, throttle framerate
 		fr_idle = 30;
@@ -955,6 +1023,72 @@ void MapCanvas::updateInfoOverlay() {
 	}
 }
 
+void MapCanvas::forceRefreshRenderer() {
+	renderer_2d->forceUpdate();
+}
+
+void MapCanvas::changeThingType() {
+	// Determine the initial type
+	int type = -1;
+	vector<MapThing*> selection;
+	editor->getSelectedThings(selection);
+	if (selection.size() > 0)
+		type = selection[0]->intProperty("type");
+	else
+		return;
+
+	// Lock hilight in the editor
+	bool hl_lock = editor->hilightLocked();
+	editor->lockHilight();
+
+	// Open type browser
+	ThingTypeBrowser browser(theMapEditor, type);
+	if (browser.ShowModal() == wxID_OK)
+		editor->changeThingType(browser.getSelectedType());
+
+	// Unlock hilight if needed
+	editor->lockHilight(hl_lock);
+}
+
+void MapCanvas::changeSectorTexture() {
+	// Determine the initial texture
+	string texture = "";
+	vector<MapSector*> selection;
+	editor->getSelectedSectors(selection);
+	if (selection.size() > 0) {
+		// Check edit mode
+		if (editor->sectorEditMode() == MapEditor::SECTOR_FLOOR)
+			texture = selection[0]->stringProperty("texturefloor");
+		else if (editor->sectorEditMode() == MapEditor::SECTOR_CEILING)
+			texture = selection[0]->stringProperty("textureceiling");
+		else {
+			// For now only supported in floors or ceilings edit mode
+			return;
+		}
+	}
+	else
+		return;
+
+	// Lock hilight in the editor
+	bool hl_lock = editor->hilightLocked();
+	editor->lockHilight();
+
+	// Open texture browser
+	MapTextureBrowser browser(theMapEditor, 1, texture);
+	if (browser.ShowModal() == wxID_OK) {
+		// Set texture depending on edit mode
+		for (unsigned a = 0; a < selection.size(); a++) {
+			if (editor->sectorEditMode() == MapEditor::SECTOR_FLOOR)
+				selection[a]->setStringProperty("texturefloor", browser.getSelectedItem()->getName());
+			else if (editor->sectorEditMode() == MapEditor::SECTOR_CEILING)
+				selection[a]->setStringProperty("textureceiling", browser.getSelectedItem()->getName());
+		}
+	}
+
+	// Unlock hilight if needed
+	editor->lockHilight(hl_lock);
+}
+
 void MapCanvas::onKeyBindPress(string name) {
 	// Pan left
 	if (name == "me2d_left")
@@ -1005,6 +1139,7 @@ void MapCanvas::onKeyBindPress(string name) {
 		editor->setEditMode(MapEditor::MODE_VERTICES);
 		theApp->toggleAction("mapw_mode_vertices");
 		theMapEditor->refreshToolBar();
+		renderer_2d->forceUpdate(fade_lines);
 	}
 
 	// Lines mode
@@ -1012,6 +1147,7 @@ void MapCanvas::onKeyBindPress(string name) {
 		editor->setEditMode(MapEditor::MODE_LINES);
 		theApp->toggleAction("mapw_mode_lines");
 		theMapEditor->refreshToolBar();
+		renderer_2d->forceUpdate(1.0f);
 	}
 
 	// Sectors mode
@@ -1019,6 +1155,7 @@ void MapCanvas::onKeyBindPress(string name) {
 		editor->setEditMode(MapEditor::MODE_SECTORS);
 		theApp->toggleAction("mapw_mode_sectors");
 		theMapEditor->refreshToolBar();
+		renderer_2d->forceUpdate(fade_lines);
 	}
 
 	// Things mode
@@ -1026,6 +1163,7 @@ void MapCanvas::onKeyBindPress(string name) {
 		editor->setEditMode(MapEditor::MODE_THINGS);
 		theApp->toggleAction("mapw_mode_things");
 		theMapEditor->refreshToolBar();
+		renderer_2d->forceUpdate(fade_lines);
 	}
 
 	// Pan view
@@ -1069,7 +1207,11 @@ void MapCanvas::onKeyBindPress(string name) {
 
 	// Change thing type
 	else if (name == "me2d_thing_change_type" && editor->editMode() == MapEditor::MODE_THINGS)
-		handleAction("mapw_thing_changetype");
+		changeThingType();
+
+	// Change sector texture
+	else if (name == "me2d_sector_change_texture" && editor->editMode() == MapEditor::MODE_SECTORS)
+		changeSectorTexture();
 
 	// Not handled here, send to editor
 	else
@@ -1092,24 +1234,28 @@ bool MapCanvas::handleAction(string id) {
 	// Vertices mode
 	if (id == "mapw_mode_vertices") {
 		editor->setEditMode(MapEditor::MODE_VERTICES);
+		renderer_2d->forceUpdate(fade_lines);
 		return true;
 	}
 
 	// Lines mode
 	else if (id == "mapw_mode_lines") {
 		editor->setEditMode(MapEditor::MODE_LINES);
+		renderer_2d->forceUpdate(1.0f);
 		return true;
 	}
 
 	// Sectors mode
 	else if (id == "mapw_mode_sectors") {
 		editor->setEditMode(MapEditor::MODE_SECTORS);
+		renderer_2d->forceUpdate(fade_lines);
 		return true;
 	}
 
 	// Things mode
 	else if (id == "mapw_mode_things") {
 		editor->setEditMode(MapEditor::MODE_THINGS);
+		renderer_2d->forceUpdate(fade_lines);
 		return true;
 	}
 
@@ -1117,25 +1263,15 @@ bool MapCanvas::handleAction(string id) {
 
 	// Change thing type
 	else if (id == "mapw_thing_changetype") {
-		// Determine the initial type
-		int type = -1;
-		vector<MapThing*> selection;
-		editor->getSelectedThings(selection);
-		if (selection.size() > 0)
-			type = selection[0]->intProperty("type");
+		changeThingType();
+		return true;
+	}
 
-		// Lock hilight in the editor
-		bool hl_lock = editor->hilightLocked();
-		editor->lockHilight();
+	// --- Sector context menu ---
 
-		// Open type browser
-		ThingTypeBrowser browser(theMapEditor, type);
-		if (browser.ShowModal() == wxID_OK)
-			editor->changeThingType(browser.getSelectedType());
-
-		// Unlock hilight if needed
-		editor->lockHilight(hl_lock);
-
+	// Change sector texture
+	else if (id == "mapw_sector_changetexture") {
+		changeSectorTexture();
 		return true;
 	}
 
@@ -1271,6 +1407,11 @@ void MapCanvas::onMouseUp(wxMouseEvent& e) {
 			if (editor->editMode() == MapEditor::MODE_THINGS) {
 				wxMenu menu_context;
 				theApp->getAction("mapw_thing_changetype")->addToMenu(&menu_context);
+				PopupMenu(&menu_context);
+			}
+			else if (editor->editMode() == MapEditor::MODE_SECTORS) {
+				wxMenu menu_context;
+				theApp->getAction("mapw_sector_changetexture")->addToMenu(&menu_context);
 				PopupMenu(&menu_context);
 			}
 		}

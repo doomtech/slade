@@ -129,13 +129,16 @@ void SToolBarButton::onPaint(wxPaintEvent& e) {
 }
 
 void SToolBarButton::onMouseEvent(wxMouseEvent& e) {
+	wxFrame* parent_window = (wxFrame*)wxGetTopLevelParent(this);
+
 	// Mouse enter
 	if (e.GetEventType() == wxEVT_ENTER_WINDOW) {
 		// Set state to mouseover
 		state = STATE_MOUSEOVER;
 
 		// Set status bar help text
-		theMainWindow->SetStatusText(action->getHelpText());
+		if (parent_window)
+			parent_window->SetStatusText(action->getHelpText());
 	}
 
 	// Mouse leave
@@ -144,7 +147,8 @@ void SToolBarButton::onMouseEvent(wxMouseEvent& e) {
 		state = STATE_NORMAL;
 
 		// Clear status bar help text
-		theMainWindow->SetStatusText("");
+		if (parent_window)
+			parent_window->SetStatusText("");
 	}
 
 	// Left button down
@@ -160,7 +164,8 @@ void SToolBarButton::onMouseEvent(wxMouseEvent& e) {
 		state = STATE_MOUSEOVER;
 
 		// Clear status bar help text
-		theMainWindow->SetStatusText("");
+		if (parent_window)
+			parent_window->SetStatusText("");
 	}
 
 	Refresh();

@@ -95,6 +95,10 @@ void MapRenderer2D::renderVertices(float alpha) {
 	if (map->nVertices() == 0)
 		return;
 
+	// Don't bother if (practically) invisible
+	if (alpha <= 0.01f)
+		return;
+
 	// Setup rendering properties
 	bool point = setupVertexRendering(1.0f);
 
@@ -236,9 +240,13 @@ rgba_t MapRenderer2D::lineColour(MapLine* line, bool ignore_filter) {
 	return col;
 }
 
-void MapRenderer2D::renderLines(bool show_direction) {
+void MapRenderer2D::renderLines(bool show_direction, float alpha) {
 	// Check there are any lines to render
 	if (map->nLines() == 0)
+		return;
+
+	// Don't bother if (practically) invisible
+	if (alpha <= 0.01f)
 		return;
 
 	// Setup rendering properties
@@ -251,12 +259,12 @@ void MapRenderer2D::renderLines(bool show_direction) {
 
 	// Render the lines depending on what features are supported
 	if (GLEW_ARB_vertex_buffer_object && !FORCE_NO_VBO)
-		renderLinesVBO(show_direction);
+		renderLinesVBO(show_direction, alpha);
 	else
-		renderLinesImmediate(show_direction);
+		renderLinesImmediate(show_direction, alpha);
 }
 
-void MapRenderer2D::renderLinesImmediate(bool show_direction) {
+void MapRenderer2D::renderLinesImmediate(bool show_direction, float alpha) {
 	// Use display list if it's built
 	if (list_lines > 0 && show_direction == lines_dirs && map->nLines() == n_lines && map->geometryUpdated() <= lines_updated) {
 		glCallList(list_lines);
@@ -288,7 +296,7 @@ void MapRenderer2D::renderLinesImmediate(bool show_direction) {
 		col = lineColour(line);
 
 		// Set line colour
-		glColor4f(col.fr(), col.fg(), col.fb(), col.fa());
+		glColor4f(col.fr(), col.fg(), col.fb(), alpha*col.fa());
 
 		// Draw the line
 		glVertex2d(x1, y1);
@@ -309,14 +317,14 @@ void MapRenderer2D::renderLinesImmediate(bool show_direction) {
 	lines_updated = theApp->runTimer();
 }
 
-void MapRenderer2D::renderLinesVBO(bool show_direction) {
+void MapRenderer2D::renderLinesVBO(bool show_direction, float alpha) {
 	// Do nothing if there are no lines in the map
 	if (map->nLines() == 0)
 		return;
 
 	// Update lines VBO if required
 	if (vbo_lines == 0 || show_direction != lines_dirs || map->nLines() != n_lines || map->geometryUpdated() > lines_updated)
-		updateLinesVBO(show_direction);
+		updateLinesVBO(show_direction, alpha);
 
 	// Disable any blending
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -805,6 +813,10 @@ void MapRenderer2D::renderSimpleSquareThing(double x, double y, double angle, Th
 }
 
 void MapRenderer2D::renderThings(float alpha) {
+	// Don't bother if (practically) invisible
+	if (alpha <= 0.01f)
+		return;
+
 	renderThingsImmediate(alpha);
 }
 
@@ -824,7 +836,7 @@ void MapRenderer2D::renderThingsImmediate(float alpha) {
 	vector<int> things_arrows;
 
 	// Draw thing shadows if needed
-	if (thing_shadow > 0.01f && alpha >= 0.9 && thing_drawtype != 2) {
+	if (thing_shadow > 0.01f && thing_drawtype != 2) {
 		glEnable(GL_TEXTURE_2D);
 		GLTexture* tex_shadow = theMapEditor->textureManager().getEditorImage("thing/shadow");
 		if (thing_drawtype == 0 || thing_drawtype == 3)
@@ -1125,23 +1137,27 @@ void MapRenderer2D::renderTaggedThings(vector<MapThing*>& things, float fade) {
 	glDisable(GL_TEXTURE_2D);
 }
 
-void MapRenderer2D::renderFlats(int type) {
+void MapRenderer2D::renderFlats(int type, float alpha) {
+	// Don't bother if (practically) invisible
+	if (alpha <= 0.01f)
+		return;
+
 	if (GLEW_ARB_vertex_buffer_object && !FORCE_NO_VBO)
-		renderFlatsVBO(type);
+		renderFlatsVBO(type, alpha);
 	else
-		renderFlatsImmediate(type);
+		renderFlatsImmediate(type, alpha);
 }
 
 bool sortPolyByTex(Polygon2D* left, Polygon2D* right) {
 	return left->getTexture()->glId() < right->getTexture()->glId();
 }
 
-void MapRenderer2D::renderFlatsImmediate(int type) {
+void MapRenderer2D::renderFlatsImmediate(int type, float alpha) {
 	if (type > 0)
 		glEnable(GL_TEXTURE_2D);
 
 	if (flat_ignore_light)
-		glColor4f(flat_brightness, flat_brightness, flat_brightness, 1.0f);
+		glColor4f(flat_brightness, flat_brightness, flat_brightness, alpha);
 
 	// Go through sectors
 	GLTexture* tex_last = NULL;
@@ -1182,7 +1198,7 @@ void MapRenderer2D::renderFlatsImmediate(int type) {
 		// Render the polygon
 		if (!flat_ignore_light) {
 			float light = ((int)sector->prop("lightlevel") / 255.0f) * flat_brightness;
-			glColor4f(light, light, light, 1.0f);
+			glColor4f(light, light, light, alpha);
 		}
 		poly->render();
 	}
@@ -1191,11 +1207,11 @@ void MapRenderer2D::renderFlatsImmediate(int type) {
 		glDisable(GL_TEXTURE_2D);
 }
 
-void MapRenderer2D::renderFlatsVBO(int type) {
+void MapRenderer2D::renderFlatsVBO(int type, float alpha) {
 	bool vbo_updated = false;
 
 	if (flat_ignore_light)
-		glColor4f(flat_brightness, flat_brightness, flat_brightness, 1.0f);
+		glColor4f(flat_brightness, flat_brightness, flat_brightness, alpha);
 
 	// First, check if any polygon vertex data has changed (in this case we need to refresh the entire vbo)
 	for (unsigned a = 0; a < map->nSectors(); a++) {
@@ -1272,7 +1288,7 @@ void MapRenderer2D::renderFlatsVBO(int type) {
 		// Render the polygon
 		if (!flat_ignore_light) {
 			float light = ((int)sector->prop("lightlevel") / 255.0f) * flat_brightness;
-			glColor4f(light, light, light, 1.0f);
+			glColor4f(light, light, light, alpha);
 		}
 		poly->renderVBO(false);
 	}
@@ -1682,7 +1698,7 @@ void MapRenderer2D::updateVerticesVBO() {
 	vertices_updated = theApp->runTimer();
 }
 
-void MapRenderer2D::updateLinesVBO(bool show_direction) {
+void MapRenderer2D::updateLinesVBO(bool show_direction, float base_alpha) {
 	// Create VBO if needed
 	if (vbo_lines == 0)
 		glGenBuffers(1, &vbo_lines);
@@ -1702,7 +1718,7 @@ void MapRenderer2D::updateLinesVBO(bool show_direction) {
 
 		// Get line colour
 		col = lineColour(line);
-		alpha = col.fa();
+		alpha = base_alpha*col.fa();
 
 		// Set line vertices
 		lines[v].x = line->v1()->xPos();
@@ -1829,14 +1845,14 @@ void MapRenderer2D::updateVisibility(fpoint2_t view_tl, fpoint2_t view_br) {
 }
 
 
-void MapRenderer2D::forceUpdate() {
+void MapRenderer2D::forceUpdate(float line_alpha) {
 	// Update variables
 	this->view_scale = view_scale;
 	this->view_scale_inv = 1.0 / view_scale;
 
 	if (GLEW_ARB_vertex_buffer_object && !FORCE_NO_VBO) {
 		updateVerticesVBO();
-		updateLinesVBO(lines_dirs);
+		updateLinesVBO(lines_dirs, line_alpha);
 	} else {
 		if (list_lines > 0) {
 			glDeleteLists(list_lines, 1);

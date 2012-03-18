@@ -44,7 +44,7 @@ public:
 
 	void	setupLayout();
 	bool	openMap(Archive::mapdesc_t map);
-	void	forceRefresh();
+	void	forceRefresh(bool renderer = false);
 	void	refreshToolBar();
 
 	MapObjectPropsPanel*	propsPanel() { return panel_obj_props; }

@@ -70,9 +70,9 @@ public:
 
 	// Lines
 	rgba_t	lineColour(MapLine* line, bool ignore_filter = false);
-	void	renderLines(bool show_direction);
-	void	renderLinesVBO(bool show_direction);
-	void	renderLinesImmediate(bool show_direction);
+	void	renderLines(bool show_direction, float alpha = 1.0f);
+	void	renderLinesVBO(bool show_direction, float alpha);
+	void	renderLinesImmediate(bool show_direction, float alpha);
 	void	renderLineHilight(int index, float fade);
 	void	renderLineSelection(vector<int>& selection, float fade = 1.0f);
 	void	renderTaggedLines(vector<MapLine*>& lines, float fade);
@@ -91,9 +91,9 @@ public:
 	void	renderTaggedThings(vector<MapThing*>& things, float fade);
 
 	// Flats (sectors)
-	void	renderFlats(int type = 0);
-	void	renderFlatsImmediate(int type);
-	void	renderFlatsVBO(int type);
+	void	renderFlats(int type = 0, float alpha = 1.0f);
+	void	renderFlatsImmediate(int type, float alpha);
+	void	renderFlatsVBO(int type, float alpha);
 	void	renderFlatHilight(int index, float fade);
 	void	renderFlatSelection(vector<int>& selection, float fade = 1.0f);
 	void	renderTaggedFlats(vector<MapSector*>& sectors, float fade);
@@ -107,13 +107,13 @@ public:
 
 	// VBOs
 	void	updateVerticesVBO();
-	void	updateLinesVBO(bool show_direction);
+	void	updateLinesVBO(bool show_direction, float alpha);
 	void	updateFlatsVBO();
 
 	// Misc
 	void	setScale(double scale) { view_scale = scale; view_scale_inv = 1.0 / scale; }
 	void	updateVisibility(fpoint2_t view_tl, fpoint2_t view_br);
-	void	forceUpdate();
+	void	forceUpdate(float line_alpha = 1.0f);
 	double	scaledRadius(int radius);
 	bool	visOK();
 };

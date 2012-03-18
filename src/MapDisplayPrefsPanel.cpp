@@ -7,11 +7,11 @@
 EXTERN_CVAR(Bool, grid_dashed)
 EXTERN_CVAR(Bool, vertex_round)
 EXTERN_CVAR(Int, vertex_size)
-EXTERN_CVAR(Bool, vertices_always)
+EXTERN_CVAR(Int, vertices_always)
 EXTERN_CVAR(Float, line_width)
 EXTERN_CVAR(Bool, line_smooth)
 EXTERN_CVAR(Int, thing_drawtype)
-EXTERN_CVAR(Bool, things_always)
+EXTERN_CVAR(Int, things_always)
 EXTERN_CVAR(Bool, thing_force_dir)
 EXTERN_CVAR(Bool, thing_overlay_square)
 EXTERN_CVAR(Float, thing_shadow)
@@ -22,6 +22,8 @@ EXTERN_CVAR(Bool, line_tabs_always)
 EXTERN_CVAR(Bool, map_animate_hilight)
 EXTERN_CVAR(Bool, map_animate_selection)
 EXTERN_CVAR(Bool, map_animate_tagged)
+EXTERN_CVAR(Bool, line_fade)
+EXTERN_CVAR(Bool, flat_fade)
 
 MapDisplayPrefsPanel::MapDisplayPrefsPanel(wxWindow* parent) : wxPanel(parent, -1) {
 	// Create sizer
@@ -50,14 +52,6 @@ MapDisplayPrefsPanel::MapDisplayPrefsPanel(wxWindow* parent) : wxPanel(parent, -
 	cb_grid_dashed = new wxCheckBox(panel, -1, "Dashed grid");
 	cb_grid_dashed->SetValue(grid_dashed);
 	sizer->Add(cb_grid_dashed, 0, wxEXPAND|wxALL, 4);
-
-	// Always show vertices
-	cb_vertices_always = new wxCheckBox(panel, -1, "Always show vertices");
-	sizer->Add(cb_vertices_always, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
-
-	// Always show things
-	cb_things_always = new wxCheckBox(panel, -1, "Always show things");
-	sizer->Add(cb_things_always, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
 	// Always show line direction tabs
 	cb_line_tabs_always = new wxCheckBox(panel, -1, "Always show line direction tabs");
@@ -95,6 +89,14 @@ MapDisplayPrefsPanel::MapDisplayPrefsPanel(wxWindow* parent) : wxPanel(parent, -
 	cb_vertex_round = new wxCheckBox(panel, -1, "Round vertices");
 	sizer->Add(cb_vertex_round, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
+	// When not in vertices mode
+	hbox = new wxBoxSizer(wxHORIZONTAL);
+	sizer->Add(hbox, 0, wxEXPAND|wxALL, 4);
+	hbox->Add(new wxStaticText(panel, -1, "When not in vertices mode: "), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 2);
+	string nonmodeshow[] = { "Hide", "Show", "Fade" };
+	choice_vertices_always = new wxChoice(panel, -1, wxDefaultPosition, wxDefaultSize, 3, nonmodeshow);
+	hbox->Add(choice_vertices_always, 1, wxEXPAND);
+
 
 	// Lines tab
 	panel = new wxPanel(nb_pages, -1);
@@ -114,6 +116,10 @@ MapDisplayPrefsPanel::MapDisplayPrefsPanel(wxWindow* parent) : wxPanel(parent, -
 	// Smooth lines
 	cb_line_smooth = new wxCheckBox(panel, -1, "Smooth lines");
 	sizer->Add(cb_line_smooth, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+	// Fade when not in lines mode
+	cb_line_fade = new wxCheckBox(panel, -1, "Fade when not in lines mode");
+	sizer->Add(cb_line_fade, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
 
 	// Things tab
@@ -147,6 +153,13 @@ MapDisplayPrefsPanel::MapDisplayPrefsPanel(wxWindow* parent) : wxPanel(parent, -
 	slider_thing_shadow = new wxSlider(panel, -1, thing_shadow*10, 0, 10, wxDefaultPosition, wxDefaultSize, wxSL_AUTOTICKS);
 	hbox->Add(slider_thing_shadow, 1, wxEXPAND);
 
+	// When not in things mode
+	hbox = new wxBoxSizer(wxHORIZONTAL);
+	sizer->Add(hbox, 0, wxEXPAND|wxALL, 4);
+	hbox->Add(new wxStaticText(panel, -1, "When not in things mode: "), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 2);
+	choice_things_always = new wxChoice(panel, -1, wxDefaultPosition, wxDefaultSize, 3, nonmodeshow);
+	hbox->Add(choice_things_always, 1, wxEXPAND);
+
 
 	// Sectors tab
 	panel = new wxPanel(nb_pages, -1);
@@ -171,14 +184,16 @@ MapDisplayPrefsPanel::MapDisplayPrefsPanel(wxWindow* parent) : wxPanel(parent, -
 	cb_sector_hilight_fill = new wxCheckBox(panel, -1, "Filled sector hilight");
 	sizer->Add(cb_sector_hilight_fill, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
+	// Fade when not in sectors mode
+	cb_flat_fade = new wxCheckBox(panel, -1, "Fade flats when not in sectors mode");
+	sizer->Add(cb_flat_fade, 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
 
 	// Init values
 	cb_vertex_round->SetValue(vertex_round);
 	cb_line_smooth->SetValue(line_smooth);
 	cb_line_tabs_always->SetValue(line_tabs_always);
-	cb_vertices_always->SetValue(vertices_always);
 	choice_thing_drawtype->SetSelection(thing_drawtype);
-	cb_things_always->SetValue(things_always);
 	cb_thing_force_dir = cb_thing_force_dir;
 	cb_thing_overlay_square->SetValue(thing_overlay_square);
 	cb_flat_ignore_light->SetValue(flat_ignore_light);
@@ -186,6 +201,10 @@ MapDisplayPrefsPanel::MapDisplayPrefsPanel(wxWindow* parent) : wxPanel(parent, -
 	cb_animate_hilight->SetValue(map_animate_hilight);
 	cb_animate_selection->SetValue(map_animate_selection);
 	cb_animate_tagged->SetValue(map_animate_tagged);
+	choice_vertices_always->SetSelection(vertices_always);
+	choice_things_always->SetSelection(things_always);
+	cb_line_fade->SetValue(line_fade);
+	cb_flat_fade->SetValue(flat_fade);
 
 
 	Layout();
@@ -198,12 +217,10 @@ void MapDisplayPrefsPanel::applyPreferences() {
 	grid_dashed = cb_grid_dashed->GetValue();
 	vertex_round = cb_vertex_round->GetValue();
 	vertex_size = slider_vertex_size->GetValue();
-	vertices_always = cb_vertices_always->GetValue();
 	line_width = (float)slider_line_width->GetValue() * 0.1f;
 	line_smooth = cb_line_smooth->GetValue();
 	line_tabs_always = cb_line_tabs_always->GetValue();
 	thing_drawtype = choice_thing_drawtype->GetSelection();
-	things_always = cb_things_always->GetValue();
 	thing_force_dir = cb_thing_force_dir->GetValue();
 	thing_overlay_square = cb_thing_overlay_square->GetValue();
 	thing_shadow = (float)slider_thing_shadow->GetValue() * 0.1f;
@@ -213,4 +230,8 @@ void MapDisplayPrefsPanel::applyPreferences() {
 	map_animate_hilight = cb_animate_hilight->GetValue();
 	map_animate_selection = cb_animate_selection->GetValue();
 	map_animate_tagged = cb_animate_tagged->GetValue();
+	vertices_always = choice_vertices_always->GetSelection();
+	things_always = choice_things_always->GetSelection();
+	line_fade = cb_line_fade->GetValue();
+	flat_fade = cb_flat_fade->GetValue();
 }

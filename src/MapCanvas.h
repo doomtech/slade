@@ -67,6 +67,10 @@ private:
 	double	view_yoff_inter;
 	double	view_scale_inter;
 	float	anim_move_fade;
+	float	fade_vertices;
+	float	fade_things;
+	float	fade_flats;
+	float	fade_lines;
 
 public:
 	MapCanvas(wxWindow *parent, int id, MapEditor* editor);
@@ -94,6 +98,11 @@ public:
 	void	itemSelected(int index, bool selected = true);
 	void	itemsSelected(vector<int>& items, bool selected = true);
 	void	updateInfoOverlay();
+	void	forceRefreshRenderer();
+
+	// Keybind/action handlers (that use UI features - anything else goes to MapEditor)
+	void	changeThingType();
+	void	changeSectorTexture();
 
 	// Keybind handling
 	void	onKeyBindPress(string name);

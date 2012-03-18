@@ -225,7 +225,8 @@ bool MapEditorWindow::openMap(Archive::mapdesc_t map) {
 	return ok;
 }
 
-void MapEditorWindow::forceRefresh() {
+void MapEditorWindow::forceRefresh(bool renderer) {
+	if (renderer) map_canvas->forceRefreshRenderer();
 	map_canvas->Refresh();
 }
 

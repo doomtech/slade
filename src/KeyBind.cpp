@@ -359,6 +359,7 @@ void KeyBind::initBinds() {
 	addBind("me2d_sector_height_up", keypress_t(".", KPM_SHIFT), "Height up 1");
 	addBind("me2d_sector_height_down8", keypress_t(","), "Height down 8");
 	addBind("me2d_sector_height_down", keypress_t(",", KPM_SHIFT), "Height down 1");
+	addBind("me2d_sector_change_texture", keypress_t("T", KPM_CTRL), "Change texture(s)");
 
 	// Map Editor 2D Things mode (me2d_thing*)
 	addBind("me2d_thing_change_type", keypress_t("T", KPM_CTRL), "Change type");
