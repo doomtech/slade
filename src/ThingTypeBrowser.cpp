@@ -40,6 +40,9 @@ bool ThingBrowserItem::loadImage() {
 
 
 ThingTypeBrowser::ThingTypeBrowser(wxWindow* parent, int type) : BrowserWindow(parent) {
+	// Set window title
+	SetTitle("Browse Thing Types");
+
 	// Add 'Details view' checkbox
 	cb_view_tiles = new wxCheckBox(this, -1, "Details view");
 	cb_view_tiles->SetValue(browser_thing_tiles);

@@ -101,6 +101,7 @@ private:
 	double				scale_y;
 	bool				world_panning;
 	vector<CTPatch*>	patches;
+	int					index;
 
 	// Extended (TEXTURES) info
 	bool	extended;

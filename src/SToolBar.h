@@ -21,16 +21,20 @@ private:
 	vector<SToolBarGroup*>	groups;
 	vector<wxWindow*>		separators;
 	vector<wxWindow*>		vlines;
+	int						min_height;
+	int						n_rows;
 
 public:
 	SToolBar(wxWindow* parent);
 	~SToolBar();
 
+	int		minHeight() { return min_height; }
 	void	addGroup(SToolBarGroup* group);
 	void	deleteGroup(string name);
 	void	addActionGroup(string name, wxArrayString actions);
-	void	updateLayout(bool generate_event = true);
+	void	updateLayout(bool force = false, bool generate_event = true);
 	void	enableGroup(string name, bool enable = true);
+	int		calculateNumRows(int width);
 
 	// Events
 	void	onSize(wxSizeEvent& e);

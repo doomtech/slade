@@ -60,6 +60,9 @@ MapTextureBrowser::MapTextureBrowser(wxWindow* parent, int type, string texture)
 	this->type = type;
 	setSortType(1);
 
+	// Set window title
+	SetTitle("Browse Map Textures");
+
 	// Textures
 	if (type == 0 || theGameConfiguration->mixTexFlats()) {
 		// Composite textures

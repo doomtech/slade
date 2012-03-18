@@ -87,8 +87,10 @@ CTexture* TextureXList::getTexture(string name) {
 int TextureXList::textureIndex(string name) {
 	// Search for texture by name
 	for (unsigned a = 0; a < textures.size(); a++) {
-		if (S_CMPNOCASE(textures[a]->getName(), name))
+		if (S_CMPNOCASE(textures[a]->getName(), name)) {
+			textures[a]->index = a;
 			return a;
+		}
 	}
 
 	// Not found
@@ -102,10 +104,13 @@ void TextureXList::addTexture(CTexture* tex, int position) {
 	// Add it to the list at position if valid
 	if (position >= 0 && (unsigned)position < textures.size())
 		textures.insert(textures.begin() + position, tex);
-	else
+	else {
 		textures.push_back(tex);
+		position = textures.size() - 1;
+	}
 
 	tex->in_list = this;
+	tex->index = position;
 }
 
 /* TextureXList::removeTexture
@@ -135,6 +140,11 @@ void TextureXList::swapTextures(unsigned index1, unsigned index2) {
 	CTexture* temp = textures[index1];
 	textures[index1] = textures[index2];
 	textures[index2] = temp;
+
+	// Swap indices
+	int ti = textures[index1]->index;
+	textures[index1]->index = textures[index2]->index;
+	textures[index2]->index = ti;
 }
 
 /* TextureXList::clear

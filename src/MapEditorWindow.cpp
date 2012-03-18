@@ -300,6 +300,9 @@ bool MapEditorWindow::handleAction(string id) {
 	return false;
 }
 
+/* MapEditorWindow::onClose
+ * Called when the window is closed
+ *******************************************************************/
 void MapEditorWindow::onClose(wxCloseEvent& e) {
 	// Save current layout
 	mew_maximized = IsMaximized();
@@ -319,6 +322,9 @@ void MapEditorWindow::onSize(wxSizeEvent& e) {
 		mew_width = GetSize().x;
 		mew_height = GetSize().y;
 	}
+
+	// Update maximized cvar
+	mew_maximized = IsMaximized();
 
 	e.Skip();
 }

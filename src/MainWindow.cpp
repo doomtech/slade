@@ -657,6 +657,16 @@ void MainWindow::onSize(wxSizeEvent& e) {
 		mw_height = GetSize().y;
 	}
 
+	// Update toolbar layout (if needed)
+	toolbar->updateLayout();
+#ifndef __WXMSW__
+	m_mgr->GetPane(toolbar).MinSize(-1, toolbar->minHeight());
+	m_mgr->Update();
+#endif
+
+	// Update maximized cvar
+	mw_maximized = IsMaximized();
+
 	e.Skip();
 }
 
@@ -678,8 +688,6 @@ void MainWindow::onMove(wxMoveEvent& e) {
  *******************************************************************/
 void MainWindow::onToolBarLayoutChanged(wxEvent& e) {
 	// Update toolbar size
-	wxAuiPaneInfo& p_inf = m_mgr->GetPane("toolbar");
-	p_inf.window->Layout();
-	p_inf.MinSize(-1, p_inf.window->GetBestSize().y);
+	m_mgr->GetPane(toolbar).MinSize(-1, toolbar->minHeight());
 	m_mgr->Update();
 }

@@ -292,8 +292,7 @@ void BrowserCanvas::updateScrollBar() {
 		return;
 
 	// Determine total height of all items
-	int items_row = GetSize().x / fullItemSizeX();
-	int rows = (double)items_filter.size() / (double)items_row + 0.9999;
+	int rows = (double)items_filter.size() / (double)num_cols + 0.9999;
 	int total_height = rows * fullItemSizeY();
 
 	// Setup scrollbar
@@ -301,9 +300,15 @@ void BrowserCanvas::updateScrollBar() {
 	yoff = scrollbar->GetThumbPosition();
 }
 
+/* BrowserCanvas::updateLayout
+ * Updates variables concerning the object layout
+ *******************************************************************/
 void BrowserCanvas::updateLayout() {
 	// Determine number of columns
 	num_cols = GetSize().x / fullItemSizeX();
+
+	// Update the scrollbar
+	updateScrollBar();
 
 	Refresh();
 }

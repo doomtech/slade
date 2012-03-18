@@ -148,7 +148,7 @@ PatchBrowser::PatchBrowser(wxWindow* parent) : BrowserWindow(parent) {
 	listenTo(theMainWindow->getPaletteChooser());
 
 	// Set dialog title
-	SetTitle("Patch Browser");
+	SetTitle("Browse Patches");
 }
 
 /* PatchBrowser::~PatchBrowser

@@ -419,7 +419,9 @@ void BrowserWindow::populateItemTree() {
 	// Update window layout
 	int depth = expandtree(tree_items, item, true, 0);
 	int colwidth = tree_items->GetColumnWidth(0);
-	if (colwidth < 200) colwidth = 200;
+#ifndef __WXMSW__
+	if (colwidth < 140) colwidth = 200;
+#endif
 	tree_items->SetMinSize(wxSize(colwidth + 16, -1));
 	Layout();
 	expandtree(tree_items, item, false, 0);

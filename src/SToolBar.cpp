@@ -144,6 +144,10 @@ protected:
 
 
 SToolBar::SToolBar(wxWindow* parent) : wxPanel(parent, -1) {
+	// Init variables
+	min_height = 0;
+	n_rows = 0;
+
 	// Set background colour
 	SetBackgroundColour(Drawing::getMenuBarBGColour());
 
@@ -168,7 +172,7 @@ void SToolBar::addGroup(SToolBarGroup* group) {
 	groups.push_back(group);
 
 	// Update layout
-	updateLayout();
+	updateLayout(true);
 }
 
 void SToolBar::deleteGroup(string name) {
@@ -186,7 +190,7 @@ void SToolBar::deleteGroup(string name) {
 	}
 
 	// Update layout
-	updateLayout();
+	updateLayout(true);
 }
 
 void SToolBar::addActionGroup(string name, wxArrayString actions) {
@@ -203,10 +207,16 @@ void SToolBar::addActionGroup(string name, wxArrayString actions) {
 		group->addActionButton(actions[a]);
 
 	// Update layout
-	updateLayout();
+	updateLayout(true);
 }
 
-void SToolBar::updateLayout(bool generate_event) {
+void SToolBar::updateLayout(bool force, bool generate_event) {
+	// Check if we need to update at all
+	if (calculateNumRows(GetSize().x) == n_rows && !force) {
+		Layout();
+		return;
+	}
+
 	// Clear main sizer
 	wxSizer* sizer = GetSizer();
 	sizer->Clear();
@@ -228,6 +238,7 @@ void SToolBar::updateLayout(bool generate_event) {
 	// Go through all groups
 	int current_width = 0;
 	int groups_line = 0;
+	n_rows = 0;
 	for (unsigned a = 0; a < groups.size(); a++) {
 		// Check if the group will fit
 		if (groups[a]->GetBestSize().x + current_width + 4 > GetSize().x && groups_line > 0) {
@@ -240,6 +251,7 @@ void SToolBar::updateLayout(bool generate_event) {
 			sizer->Add(hbox, 0);
 			groups_line = 0;
 			current_width = 0;
+			n_rows++;
 		}
 
 		// Add separator if needed
@@ -260,11 +272,17 @@ void SToolBar::updateLayout(bool generate_event) {
 	// Apply layout
 	Layout();
 
-	// Generate layout update event
-	if (generate_event) {
-		wxNotifyEvent e(wxEVT_STOOLBAR_LAYOUT_UPDATED, GetId());
-		e.SetEventObject(this);
-		GetEventHandler()->ProcessEvent(e);
+	// Check if the toolbar height changed
+	if (min_height != GetBestSize().y) {
+		// Update minimum height
+		min_height = GetBestSize().y;
+
+		// Generate layout update event
+		if (generate_event) {
+			wxNotifyEvent e(wxEVT_STOOLBAR_LAYOUT_UPDATED, GetId());
+			e.SetEventObject(this);
+			GetEventHandler()->ProcessEvent(e);
+		}
 	}
 }
 
@@ -280,10 +298,39 @@ void SToolBar::enableGroup(string name, bool enable) {
 	Refresh();
 }
 
+int SToolBar::calculateNumRows(int width) {
+	// Go through all groups
+	int current_width = 0;
+	int groups_line = 0;
+	int rows = 0;
+	for (unsigned a = 0; a < groups.size(); a++) {
+		// Check if the group will fit
+		if (groups[a]->GetBestSize().x + current_width + 4 > width && groups_line > 0) {
+			// The group won't fit, begin a new line
+			groups_line = 0;
+			current_width = 0;
+			rows++;
+		}
+
+		// Add separator if needed
+		if (groups_line > 0)
+			current_width += 4;
+
+		// Add the group
+		current_width += groups[a]->GetBestSize().x;
+		groups_line++;
+	}
+
+	return rows;
+}
 
 void SToolBar::onSize(wxSizeEvent& e) {
 	// Update layout
-	updateLayout(false);
+#ifndef __WXMSW__
+	updateLayout(false, false);
+#else
+	updateLayout();
+#endif
 
 	e.Skip();
 }

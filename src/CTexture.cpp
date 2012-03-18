@@ -410,6 +410,7 @@ CTexture::CTexture(bool extended) {
 	this->type = "Texture";
 	this->state = 0;
 	this->in_list = NULL;
+	this->index = -1;
 }
 
 /* CTexture::~CTexture
@@ -481,7 +482,7 @@ CTPatch* CTexture::getPatch(size_t index) {
 int CTexture::getIndex() {
 	// Check if a parent TextureXList exists
 	if (!in_list)
-		return -1;
+		return index;
 
 	// Find this texture in the parent list
 	return in_list->textureIndex(this->getName());
