@@ -1,6 +1,6 @@
 ////////////////////////////////
 // sfMod 1.0.2                //
-// Copyright © Kerli Low 2012 //
+// Copyright Â© Kerli Low 2012 //
 ////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////////
@@ -151,7 +151,7 @@ bool sfMod::Mod::LoadFromFile(const std::string& filename)
   std::string data;
 
   std::ifstream file;
-  file.open(filename, std::ios::binary);
+  file.open(filename.c_str(), std::ios::binary);
   if (!file.is_open())
     return false;
 

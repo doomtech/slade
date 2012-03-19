@@ -511,6 +511,11 @@
       <File Name="src/cl_notebook_art/cl_aui_notebook_art.cpp"/>
       <File Name="src/cl_notebook_art/cl_aui_notebook_art.h"/>
     </VirtualDirectory>
+    <VirtualDirectory Name="sfMod">
+      <File Name="src/sfMod/modplug.h"/>
+      <File Name="src/sfMod/sfMod.cpp"/>
+      <File Name="src/sfMod/sfMod.h"/>
+    </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="osx">
     <File Name="Info.plist"/>
@@ -554,6 +559,7 @@
       
       
       
+      
       ]]>
       </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
@@ -592,6 +598,7 @@
       <General OutputFile="./dist/SLADE-dbg.app/Contents/MacOS/SLADE" IntermediateDirectory="./Debug" Command="./dist/SLADE-dbg.app/Contents/MacOS/SLADE" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[
+      
       
       
       
@@ -639,17 +646,12 @@
         <Library Value="sfml-audio"/>
         <Library Value="sfml-window"/>
         <Library Value="sfml-graphics"/>
+        <Library Value="modplug"/>
       </Linker>
       <ResourceCompiler Options="$(shell wx-config --rcflags)" Required="no"/>
       <General OutputFile="./dist/slade" IntermediateDirectory="./Release" Command="./slade" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
-        <![CDATA[
-      
-      
-      
-      
-      
-      ]]>
+        <![CDATA[]]>
       </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
         <PostConnectCommands/>
@@ -688,6 +690,7 @@
       <General OutputFile="./dist/SLADE.app/Contents/MacOS/SLADE" IntermediateDirectory="./Release" Command="./dist/SLADE.app/Contents/MacOS/SLADE" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[
+      
       
       
       

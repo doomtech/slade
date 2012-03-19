@@ -253,7 +253,7 @@ bool AudioEntryPanel::openAudio(MemChunk& audio, string filename) {
 		audio_type = AUTYPE_SOUND;
 
 		// Enable play controls
-		setAudioDuration(sound_buffer->GetDuration()*100));
+		setAudioDuration(sound_buffer->GetDuration()*100);
 		btn_play->Enable();
 		btn_pause->Enable();
 		btn_stop->Enable();
@@ -286,7 +286,7 @@ bool AudioEntryPanel::openAudio(MemChunk& audio, string filename) {
 			audio_type = AUTYPE_MEDIA;
 
 			// Enable play controls
-			setAudioDuration(media_ctrl->Length()));
+			setAudioDuration(media_ctrl->Length());
 			btn_play->Enable(true);
 			btn_pause->Enable(true);
 			btn_stop->Enable(true);
@@ -632,8 +632,6 @@ void AudioEntryPanel::onSliderSeekChanged(wxCommandEvent& e) {
 #if SFML_VERSION_MAJOR < 2
 	case AUTYPE_SOUND:
 		sound.SetPlayingOffset(slider_seek->GetValue() * 0.01); break;
-	case AUTYPE_MOD:
-		mod.SetPlayingOffset(slider_seek->GetValue() * 0.01); break;
 #else
 	case AUTYPE_SOUND:
 		sound.setPlayingOffset(sf::milliseconds(slider_seek->GetValue())); break;

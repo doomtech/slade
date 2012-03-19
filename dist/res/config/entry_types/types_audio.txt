@@ -73,7 +73,7 @@ entry_types
 		export_ext = "it";
 		icon = "e_music";
 		category = "Audio";
-		//editor = audio;
+		editor = audio;
 	}
 
 	mod_xm
@@ -83,7 +83,7 @@ entry_types
 		export_ext = "xm";
 		icon = "e_music";
 		category = "Audio";
-		//editor = audio;
+		editor = audio;
 	}
 
 	mod_s3m
@@ -93,7 +93,7 @@ entry_types
 		export_ext = "s3m";
 		icon = "e_music";
 		category = "Audio";
-		//editor = audio;
+		editor = audio;
 	}
 
 	mod_mod
@@ -103,7 +103,7 @@ entry_types
 		export_ext = "mod";
 		icon = "e_music";
 		category = "Audio";
-		//editor = audio;
+		editor = audio;
 	}
 
 	snd_doom
