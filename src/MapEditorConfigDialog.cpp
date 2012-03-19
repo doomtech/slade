@@ -8,6 +8,7 @@
 #include "WadArchive.h"
 #include "SFileDialog.h"
 #include "SplashWindow.h"
+#include "ColourConfiguration.h"
 #include <wx/statline.h>
 
 MapEditorConfigDialog::MapEditorConfigDialog(wxWindow* parent, Archive* archive, bool show_maplist) : wxDialog(parent, -1, "Launch Map Editor") {
@@ -101,7 +102,7 @@ MapEditorConfigDialog::MapEditorConfigDialog(wxWindow* parent, Archive* archive,
 	btn_recent = new wxButton(this, -1, "Open Recent");
 	hbox->Add(btn_recent, 0, wxEXPAND, 0);
 
-	
+
 	// Right side (map preview)
 	if (show_maplist) {
 		frame = new wxStaticBox(this, -1, "Preview");
@@ -131,12 +132,6 @@ MapEditorConfigDialog::MapEditorConfigDialog(wxWindow* parent, Archive* archive,
 	btn_open_resource->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MapEditorConfigDialog::onBtnOpenResource, this);
 	btn_recent->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MapEditorConfigDialog::onBtnRecent, this);
 
-	// Determine dialog height
-	//int height = 500;
-	//if (!show_maplist)
-	//	height = 300;
-
-	//SetSize(-1, height);
 	Layout();
 	mainsizer->Fit(this);
 	CenterOnParent();
@@ -164,12 +159,22 @@ void MapEditorConfigDialog::populateMapList() {
 	// Add maps matching the current game configuration
 	int index = 0;
 	for (unsigned a = 0; a < maps.size(); a++) {
-		if (maps[a].format == theGameConfiguration->getMapFormat()) {
-			wxListItem li;
-			li.SetId(index++);
-			li.SetText(maps[a].name);
-			list_maps->InsertItem(li);
-		}
+		// Setup format string
+		string fmt = "D";
+		if (maps[a].format == MAP_DOOM64)		fmt = "64";
+		else if (maps[a].format == MAP_HEXEN)	fmt = "H";
+		else if (maps[a].format == MAP_UDMF)	fmt = "U";
+		else if (maps[a].format == MAP_UNKNOWN)	fmt = "?";
+
+		// Create list item
+		wxListItem li;
+		li.SetId(index++);
+		li.SetText(S_FMT("(%s) %s", CHR(fmt), CHR(maps[a].name)));
+		if (maps[a].format != theGameConfiguration->getMapFormat())
+			li.SetTextColour(WXCOL(ColourConfiguration::getColour("error")));
+
+		// Add to list
+		list_maps->InsertItem(li);
 	}
 }
 
@@ -180,20 +185,11 @@ Archive::mapdesc_t MapEditorConfigDialog::selectedMap() {
 	if (sel.size() > 0)
 		selection = sel[0];
 
-	// Check if a map is selected
-	if (selection < 0 || selection >= (int)maps.size())
+	// Return it if valid
+	if (selection >= maps.size())
 		return Archive::mapdesc_t();
-	// Return map corresponding to selection
-	// The selection is made from a subset of the maps vector,
-	// if several different formats are mixed in the archive
-	// they will not be equivalent sets.
-	else {
-		unsigned a = 0; 
-		for (; a < maps.size() && selection; ++a)
-			if (maps[a].format == theGameConfiguration->getMapFormat())
-				--selection;
-		return maps[a];
-	}
+	else
+		return maps[selection];
 }
 
 bool MapEditorConfigDialog::configMatchesMap(Archive::mapdesc_t map) {

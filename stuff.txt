@@ -54,13 +54,10 @@ TODO List ---------------------------------------------------------------
 - Basic pixel-drawing tools
 
 --- Audio ---
-- Mp3
-- Module formats (DUMB, maybe?)
 
 --- General ---
 - Preferences Dialog:
 	- List of entry types, ability to enable/disable detection of certain types
-	- Program-wide colour configuration (including general modified/new/error/locked colours)
 - Finish entry data format (EDF_*) system:
 	- Simple user-definable data formats:
 		- Minimum/maximum size
@@ -76,7 +73,6 @@ TODO List ---------------------------------------------------------------
 	- archive list on archive manager panel could have 'resource' checkboxes for each list item
 - Undo/Redo system
 	- Should be general enough to be used by the map editor also
-- Dynamic toolbars
 - Different icon sets
 - Better backup system
 - More drag-and-drop support

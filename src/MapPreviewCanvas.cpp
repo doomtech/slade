@@ -2,7 +2,7 @@
 #include "Main.h"
 #include "WxStuff.h"
 #include "MapPreviewCanvas.h"
-#include "Archive.h"
+#include "WadArchive.h"
 #include "MapLine.h"
 #include "MapVertex.h"
 #include "Parser.h"
@@ -38,6 +38,7 @@ MapPreviewCanvas::MapPreviewCanvas(wxWindow* parent) : OGLCanvas(parent, -1) {
 	zoom = 1;
 	offset_x = 0;
 	offset_y = 0;
+	temp_archive = NULL;
 }
 
 /* MapPreviewCanvas::~MapPreviewCanvas
@@ -64,9 +65,34 @@ void MapPreviewCanvas::addLine(unsigned v1, unsigned v2, bool twosided, bool spe
 	lines.push_back(line);
 }
 
+/* MapPreviewCanvas::openMap
+ * Opens a map from a mapdesc_t
+ *******************************************************************/
 bool MapPreviewCanvas::openMap(Archive::mapdesc_t map) {
 	// All errors = invalid map
 	Global::error = "Invalid map";
+
+	// Check if this map is a pk3 map
+	bool map_archive = false;
+	if (map.archive) {
+		map_archive = true;
+
+		// Attempt to open entry as wad archive
+		temp_archive = new WadArchive();
+		if (!temp_archive->open(map.head)) {
+			delete temp_archive;
+			return false;
+		}
+
+		// Detect maps
+		vector<Archive::mapdesc_t> maps = temp_archive->detectMaps();
+
+		// Set map if there are any in the archive
+		if (maps.size() > 0)
+			map = maps[0];
+		else
+			return false;
+	}
 
 	// Parse UDMF map
 	if (map.format == MAP_UDMF) {
@@ -303,6 +329,12 @@ bool MapPreviewCanvas::openMap(Archive::mapdesc_t map) {
 				addLine(l.vertex1, l.vertex2, twosided, special);
 			}
 		}
+	}
+
+	// Clean up
+	if (map_archive) {
+		delete temp_archive;
+		temp_archive = NULL;
 	}
 
 	// Refresh map

@@ -29,6 +29,7 @@ private:
 	double					zoom;
 	double					offset_x;
 	double					offset_y;
+	Archive*				temp_archive;
 
 public:
 	MapPreviewCanvas(wxWindow* parent);
