@@ -147,9 +147,13 @@ void MapRenderer2D::renderVerticesVBO() {
 	if (vbo_vertices == 0 || map->nVertices() != n_vertices || map->geometryUpdated() > vertices_updated)
 		updateVerticesVBO();
 
+	// Set VBO arrays to use
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_COLOR_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+
 	// Setup VBO pointers
 	glBindBuffer(GL_ARRAY_BUFFER, vbo_vertices);
-	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(2, GL_FLOAT, 0, 0);
 
 	// Render the VBO
@@ -329,11 +333,15 @@ void MapRenderer2D::renderLinesVBO(bool show_direction, float alpha) {
 	// Disable any blending
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+	// Set VBO arrays to use
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_COLOR_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+
 	// Setup VBO pointers
 	glBindBuffer(GL_ARRAY_BUFFER, vbo_lines);
-	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(2, GL_FLOAT, 24, 0);
-	glEnableClientState(GL_COLOR_ARRAY);
+	
 	glColorPointer(4, GL_FLOAT, 24, ((char*)NULL + 8));
 
 	// Render the VBO
@@ -1213,11 +1221,14 @@ void MapRenderer2D::renderFlatsVBO(int type, float alpha) {
 	if (flat_ignore_light)
 		glColor4f(flat_brightness, flat_brightness, flat_brightness, alpha);
 
+	if (!glGenBuffers)
+		return;
+
 	// First, check if any polygon vertex data has changed (in this case we need to refresh the entire vbo)
 	for (unsigned a = 0; a < map->nSectors(); a++) {
 		Polygon2D* poly = map->getSector(a)->getPolygon();
 		if (poly && poly->vboUpdate() > 1) {
-			wxLogMessage("Updating sector %d polygon vbo data", a);
+			//wxLogMessage("Updating sector %d polygon vbo data", a);
 			updateFlatsVBO();
 			vbo_updated = true;
 		}
@@ -1229,8 +1240,8 @@ void MapRenderer2D::renderFlatsVBO(int type, float alpha) {
 		vbo_updated = true;
 	}
 
-	if (vbo_updated)
-		wxLogMessage("Updated vbo");
+	//if (vbo_updated)
+	//	wxLogMessage("Updated vbo");
 
 	// Setup opengl state
 	if (type > 0) glEnable(GL_TEXTURE_2D);
@@ -1239,9 +1250,9 @@ void MapRenderer2D::renderFlatsVBO(int type, float alpha) {
 	// Setup VBO pointers
 	glVertexPointer(3, GL_FLOAT, 36, 0);
 	glTexCoordPointer(2, GL_FLOAT, 36, ((char*)NULL + 12));
-	//glColorPointer(4, GL_FLOAT, 36, ((char*)NULL + 20));
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisableClientState(GL_COLOR_ARRAY);
 
 	// Go through sectors
 	GLTexture* tex_last = NULL;

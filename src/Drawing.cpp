@@ -75,8 +75,10 @@ namespace Drawing {
  *******************************************************************/
 
 #ifdef USE_SFML_RENDERWINDOW
+
+#if SFML_VERSION_MAJOR < 2
 /* Drawing::initFonts
- * Loads all needed fonts for rendering. SFML implementation
+ * Loads all needed fonts for rendering. SFML 1.x implementation
  *******************************************************************/
 void Drawing::initFonts() {
 	// --- Load general fonts ---
@@ -101,6 +103,35 @@ void Drawing::initFonts() {
 	entry = theArchiveManager->programResourceArchive()->entryAtPath("fonts/dejavu_mono.ttf");
 	if (entry) font_mono.LoadFromMemory((const char*)entry->getData(), entry->getSize(), 12);
 }
+#else
+/* Drawing::initFonts
+ * Loads all needed fonts for rendering. SFML 2.x implementation
+ *******************************************************************/
+void Drawing::initFonts() {
+	// --- Load general fonts ---
+
+	// Normal
+	ArchiveEntry* entry = theArchiveManager->programResourceArchive()->entryAtPath("fonts/dejavu_sans.ttf");
+	if (entry) font_normal.loadFromMemory((const char*)entry->getData(), entry->getSize());
+
+	// Condensed
+	entry = theArchiveManager->programResourceArchive()->entryAtPath("fonts/dejavu_sans_c.ttf");
+	if (entry) font_condensed.loadFromMemory((const char*)entry->getData(), entry->getSize());
+
+	// Bold
+	entry = theArchiveManager->programResourceArchive()->entryAtPath("fonts/dejavu_sans_b.ttf");
+	if (entry) font_bold.loadFromMemory((const char*)entry->getData(), entry->getSize());
+
+	// Condensed Bold
+	entry = theArchiveManager->programResourceArchive()->entryAtPath("fonts/dejavu_sans_cb.ttf");
+	if (entry) font_boldcondensed.loadFromMemory((const char*)entry->getData(), entry->getSize());
+
+	// Monospace
+	entry = theArchiveManager->programResourceArchive()->entryAtPath("fonts/dejavu_mono.ttf");
+	if (entry) font_mono.loadFromMemory((const char*)entry->getData(), entry->getSize());
+}
+#endif//SFML_VERSION_MAJOR
+
 #else
 /* Drawing::initFonts
  * Loads all needed fonts for rendering. Non-SFML implementation
@@ -280,8 +311,9 @@ void Drawing::drawTextureWithin(GLTexture* tex, double x1, double y1, double x2,
 }
 
 #ifdef USE_SFML_RENDERWINDOW
+#if SFML_VERSION_MAJOR < 2
 /*******************************************************************
- * SFML TEXT FUNCTION IMPLEMENTATIONS
+ * SFML 1.x TEXT FUNCTION IMPLEMENTATIONS
  *******************************************************************/
 
 /* Drawing::drawText
@@ -348,6 +380,91 @@ fpoint2_t Drawing::textExtents(string text, int font) {
 	sf::FloatRect rect = sf_str.GetRect();
 	return fpoint2_t(rect.GetWidth(), rect.GetHeight());
 }
+
+#else
+/*******************************************************************
+ * SFML 2.x TEXT FUNCTION IMPLEMENTATIONS
+ *******************************************************************/
+
+/* Drawing::drawText
+ * Draws [text] at [x,y]. If [bounds] is not null, the bounding
+ * coordinates of the rendered text string are written to it.
+ *******************************************************************/
+void Drawing::drawText(string text, int x, int y, rgba_t colour, int font, int alignment, frect_t* bounds) {
+	// Setup SFML string
+	sf::Text sf_str(CHR(text));
+	sf_str.setPosition(x, y);
+	sf_str.setColor(sf::Color(colour.r, colour.g, colour.b, colour.a));
+
+	// Set font
+	switch (font) {
+	case FONT_NORMAL:			sf_str.setFont(font_normal); break;
+	case FONT_CONDENSED:		sf_str.setFont(font_condensed); break;
+	case FONT_BOLD:				sf_str.setFont(font_bold); break;
+	case FONT_BOLDCONDENSED:	sf_str.setFont(font_boldcondensed); break;
+	case FONT_MONOSPACE:		sf_str.setFont(font_mono); break;
+	default:					sf_str.setFont(font_normal); break;
+	};
+	sf_str.setCharacterSize(12);
+
+	// Setup alignment
+	if (alignment != ALIGN_LEFT) {
+		float width = sf_str.getLocalBounds().width;
+
+		if (alignment == ALIGN_CENTER)
+			sf_str.move(-MathStuff::round(width*0.5), 0.0f);
+		else
+			sf_str.move(-width, 0.0f);
+	}
+
+	// Set bounds rect
+	if (bounds) {
+		sf::FloatRect rect = sf_str.getGlobalBounds();
+		bounds->set(rect.left, rect.top, rect.left+rect.width, rect.top+rect.height);
+	}
+
+	// Draw the string
+	if (render_target) {
+		// Push related states
+		glPushMatrix();
+		glMatrixMode(GL_TEXTURE);
+		glPushMatrix();
+		render_target->resetGLStates();
+		
+		// Draw
+		render_target->draw(sf_str);
+		
+		// Pop related states
+		glMatrixMode(GL_TEXTURE);
+		glPopMatrix();
+		glMatrixMode(GL_MODELVIEW);
+		glPopMatrix();
+	}
+}
+
+/* Drawing::textExtents
+ * Returns the width and height of [text] when drawn with [font]
+ *******************************************************************/
+fpoint2_t Drawing::textExtents(string text, int font) {
+	// Setup SFML string
+	sf::Text sf_str(CHR(text));
+
+	// Set font
+	switch (font) {
+	case FONT_NORMAL:			sf_str.setFont(font_normal); break;
+	case FONT_CONDENSED:		sf_str.setFont(font_condensed); break;
+	case FONT_BOLD:				sf_str.setFont(font_bold); break;
+	case FONT_BOLDCONDENSED:	sf_str.setFont(font_boldcondensed); break;
+	case FONT_MONOSPACE:		sf_str.setFont(font_mono); break;
+	default:					sf_str.setFont(font_normal); break;
+	};
+	sf_str.setCharacterSize(12);
+
+	// Return width and height of text
+	sf::FloatRect rect = sf_str.getGlobalBounds();
+	return fpoint2_t(rect.width, rect.height);
+}
+#endif//SFML_VERSION_MAJOR
 
 #else
 /*******************************************************************

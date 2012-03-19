@@ -1555,6 +1555,8 @@ void ArchiveManagerPanel::onArchiveTabClose(wxAuiNotebookEvent& e) {
 		if (!txed->close())
 			e.Veto();
 	}
+
+	e.Skip();
 }
 
 /* ArchiveManagerPanel::onAMTabChanged

@@ -142,6 +142,9 @@
     <Filter Include="External\CodeLite Notebook Art">
       <UniqueIdentifier>{a0b955c7-f8c3-4ccf-94dd-2137c2dd6b5d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="External\sfMod">
+      <UniqueIdentifier>{5ecd0756-5410-456d-b7d8-69e3ab5098bf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\GfxConvDialog.cpp">
@@ -803,6 +806,9 @@
     </ClCompile>
     <ClCompile Include="src\cl_notebook_art\cl_aui_notebook_art.cpp">
       <Filter>External\CodeLite Notebook Art</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sfMod\sfMod.cpp">
+      <Filter>External\sfMod</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1499,6 +1505,12 @@
     </ClInclude>
     <ClInclude Include="src\cl_notebook_art\cl_aui_notebook_art.h">
       <Filter>External\CodeLite Notebook Art</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sfMod\sfMod.h">
+      <Filter>External\sfMod</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sfMod\modplug.h">
+      <Filter>External\sfMod</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

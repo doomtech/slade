@@ -47,7 +47,7 @@
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</GenerateManifest>
     <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(FLUIDSYNTH)\include;$(WXWIN)\lib\vc_lib\mswu;$(WXWIN)\include;$(FREEIMAGE)\Dist;$(SFML)\include;$(IncludePath)</IncludePath>
-    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(FLUIDSYNTH)\lib;$(WXWIN)\lib\vc_lib;$(FREEIMAGE)\Dist;$(SFML)\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(FLUIDSYNTH)\lib;$(WXWIN)\lib\vc_lib;$(FREEIMAGE)\Dist;$(SFML)\lib;$(SolutionDir)$(Configuration)\;$(LibraryPath)</LibraryPath>
     <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(WXWIN)\lib\vc_lib\mswu;$(WXWIN)\include;$(FREEIMAGE)\Dist;$(SFML)\include;$(FLUIDSYNTH)\include;$(IncludePath)</IncludePath>
     <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(WXWIN)\lib\vc_lib;$(FREEIMAGE)\Dist;$(SFML)\lib;$(FLUIDSYNTH)\lib;$(LibraryPath)</LibraryPath>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">SLADE-dbg</TargetName>
@@ -58,7 +58,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;USE_SFML_RENDERWINDOW;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;USE_SFML_RENDERWINDOW;SFML_STATIC;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -81,7 +81,7 @@
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <PreprocessorDefinitions>WIN32;USE_SFML_RENDERWINDOW;__WXMSW__;_WINDOWS;NOPCH;_CRT_SECURE_NO_WARNINGS;NDEBUG;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;USE_SFML_RENDERWINDOW;SFML_STATIC;__WXMSW__;_WINDOWS;NOPCH;_CRT_SECURE_NO_WARNINGS;NDEBUG;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
       <StringPooling>true</StringPooling>
@@ -96,14 +96,13 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>fluidsynth.lib;FreeImage.lib;wxbase29u.lib;wxmsw29u_core.lib;wxmsw29u_aui.lib;wxmsw29u_gl.lib;wxmsw29u_html.lib;wxmsw29u_adv.lib;wxmsw29u_stc.lib;wxmsw29u_propgrid.lib;wxmsw29u_media.lib;wxtiff.lib;wxjpeg.lib;wxpng.lib;wxzlib.lib;wxregexu.lib;wxexpat.lib;wxscintilla.lib;sfml-graphics-s.lib;sfml-window-s.lib;sfml-audio-s.lib;sfml-system-s.lib;sfml-main.lib;winmm.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libmodplug.lib;fluidsynth.lib;FreeImage.lib;wxbase29u.lib;wxmsw29u_core.lib;wxmsw29u_aui.lib;wxmsw29u_gl.lib;wxmsw29u_html.lib;wxmsw29u_adv.lib;wxmsw29u_stc.lib;wxmsw29u_propgrid.lib;wxmsw29u_media.lib;wxtiff.lib;wxjpeg.lib;wxpng.lib;wxzlib.lib;wxregexu.lib;wxexpat.lib;wxscintilla.lib;sfml-graphics-s.lib;sfml-window-s.lib;sfml-audio-s.lib;sfml-system-s.lib;sfml-main.lib;winmm.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <EnableUAC>false</EnableUAC>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <LinkTimeCodeGeneration>
-      </LinkTimeCodeGeneration>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <TargetMachine>MachineX86</TargetMachine>
       <AllowIsolation>true</AllowIsolation>
       <Profile>true</Profile>
@@ -237,6 +236,7 @@
     <ClCompile Include="src\SAction.cpp" />
     <ClCompile Include="src\SectorInfoOverlay.cpp" />
     <ClCompile Include="src\SFileDialog.cpp" />
+    <ClCompile Include="src\sfMod\sfMod.cpp" />
     <ClCompile Include="src\SFont.cpp" />
     <ClCompile Include="src\SIFormat.cpp" />
     <ClCompile Include="src\SImageFormats.cpp" />
@@ -459,6 +459,8 @@
     <ClInclude Include="src\SAction.h" />
     <ClInclude Include="src\SectorInfoOverlay.h" />
     <ClInclude Include="src\SFileDialog.h" />
+    <ClInclude Include="src\sfMod\modplug.h" />
+    <ClInclude Include="src\sfMod\sfMod.h" />
     <ClInclude Include="src\SIFDoom.h" />
     <ClInclude Include="src\SIFHexen.h" />
     <ClInclude Include="src\SIFImages.h" />

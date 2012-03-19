@@ -60,17 +60,26 @@ OGLCanvas::OGLCanvas(wxWindow* parent, int id)
 	timer.Start(100);
 
 	// Code taken from SFML wxWidgets integration example
-	#ifdef __WXGTK__
-		// GTK implementation requires to go deeper to find the
-		// low-level X11 identifier of the widget
-		gtk_widget_realize(m_wxwindow);
-        gtk_widget_set_double_buffered(m_wxwindow, false);
-        GdkWindow* Win = gtk_widget_get_window(m_wxwindow);
-        XFlush(GDK_WINDOW_XDISPLAY(Win));
-        sf::RenderWindow::Create(GDK_WINDOW_XWINDOW(Win));
-    #else
-		sf::RenderWindow::Create(GetHandle());
-    #endif
+	sf::WindowHandle handle;
+#ifdef __WXGTK__
+	// GTK implementation requires to go deeper to find the
+	// low-level X11 identifier of the widget
+	gtk_widget_realize(m_wxwindow);
+	gtk_widget_set_double_buffered(m_wxwindow, false);
+	GdkWindow* Win = gtk_widget_get_window(m_wxwindow);
+	XFlush(GDK_WINDOW_XDISPLAY(Win));
+	//sf::RenderWindow::Create(GDK_WINDOW_XWINDOW(Win));
+	handle = GDK_WINDOW_XWINDOW(Win);
+#else
+	//sf::RenderWindow::Create(GetHandle());
+	handle = GetHandle();
+#endif
+
+#if SFML_VERSION_MAJOR < 2
+	sf::RenderWindow::Create(handle);
+#else
+	sf::RenderWindow::create(handle);
+#endif
 
 	// Bind events
 	Bind(wxEVT_PAINT, &OGLCanvas::onPaint, this);
@@ -129,7 +138,9 @@ void OGLCanvas::init() {
 	OpenGL::init();
 
 #ifdef USE_SFML_RENDERWINDOW
+#if SFML_VERSION_MAJOR < 2
 	PreserveOpenGLStates(true);
+#endif
 #endif
 
 	glViewport(0, 0, GetSize().x, GetSize().y);
@@ -230,12 +241,18 @@ void OGLCanvas::onPaint(wxPaintEvent& e) {
 	if (IsShown()) {
 		// Set context to this window
 #ifdef USE_SFML_RENDERWINDOW
+#if SFML_VERSION_MAJOR < 2
 		sf::RenderWindow::SetActive();
 		Drawing::setRenderTarget(this);
 		SetView(sf::View(sf::FloatRect(0.0f, 0.0f, GetSize().x, GetSize().y)));
 #else
+		sf::RenderWindow::setActive();
+		Drawing::setRenderTarget(this);
+		setView(sf::View(sf::FloatRect(0.0f, 0.0f, GetSize().x, GetSize().y)));
+#endif//SFML_VERSION_MAJOR
+#else
 		setContext();
-#endif
+#endif//USE_SFML_RENDERWINDOW
 
 		// Init if needed
 		if (!init_done)

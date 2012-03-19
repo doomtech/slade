@@ -47,11 +47,11 @@
 /*******************************************************************
  * VARIABLES
  *******************************************************************/
-CVAR(Int, things_always, 1, CVAR_SAVE)
-CVAR(Int, vertices_always, 0, CVAR_SAVE)
+CVAR(Int, things_always, 2, CVAR_SAVE)
+CVAR(Int, vertices_always, 2, CVAR_SAVE)
 CVAR(Bool, line_tabs_always, 0, CVAR_SAVE)
 CVAR(Bool, flat_fade, 1, CVAR_SAVE)
-CVAR(Bool, line_fade, 1, CVAR_SAVE)
+CVAR(Bool, line_fade, 0, CVAR_SAVE)
 CVAR(Bool, grid_dashed, false, CVAR_SAVE)
 CVAR(Bool, scroll_smooth, true, CVAR_SAVE)
 CVAR(Int, flat_drawtype, 2, CVAR_SAVE)
@@ -100,7 +100,11 @@ MapCanvas::MapCanvas(wxWindow *parent, int id, MapEditor* editor)
 
 	timer.Start(2);
 #ifdef USE_SFML_RENDERWINDOW
+#if SFML_VERSION_MAJOR < 2
 	UseVerticalSync(false);
+#else
+	setVerticalSyncEnabled(false);
+#endif
 #endif
 
 	// Bind Events
@@ -479,6 +483,7 @@ void MapCanvas::draw() {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
+	// Setup GL state
 	rgba_t col_bg = ColourConfiguration::getColour("map_background");
 	glClearColor(col_bg.fr(), col_bg.fg(), col_bg.fb(), 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -501,6 +506,7 @@ void MapCanvas::draw() {
 	if (!renderer_2d->visOK())
 		renderer_2d->updateVisibility(view_tl, view_br);
 
+
 	// Draw flats if needed
 	if (flat_drawtype > 0) {
 		COL_WHITE.set_gl();
@@ -521,7 +527,6 @@ void MapCanvas::draw() {
 	drawGrid();
 
 	// --- Draw map (depending on mode) ---
-
 	if (editor->editMode() == MapEditor::MODE_VERTICES) {
 		// Vertices mode
 		renderer_2d->renderThings(fade_things);						// Things
@@ -594,7 +599,6 @@ void MapCanvas::draw() {
 		renderer_2d->renderTaggedLines(editor->taggedLines(), anim_flash_level);
 	else if (editor->taggedThings().size() > 0 && mouse_state == MSTATE_NORMAL)
 		renderer_2d->renderTaggedThings(editor->taggedThings(), anim_flash_level);
-
 
 	// Draw selection numbers if needed
 	//if (editor->selectionSize() > 0)
@@ -1306,8 +1310,8 @@ void MapCanvas::onKeyDown(wxKeyEvent& e) {
 			if (!poly.openSector(editor->getMap().getSector(a)))
 				wxLogMessage("Splitting failed for sector %d", a);
 		}
-		int ms = clock.GetElapsedTime() * 1000;
-		wxLogMessage("Polygon generation took %dms", ms);
+		//int ms = clock.GetElapsedTime() * 1000;
+		//wxLogMessage("Polygon generation took %dms", ms);
 	}
 
 	if (e.GetKeyCode() == WXK_F5 && editor->editMode() == MapEditor::MODE_SECTORS) {
@@ -1476,6 +1480,7 @@ void MapCanvas::onMouseEnter(wxMouseEvent& e) {
 	e.Skip();
 }
 
+#if SFML_VERSION_MAJOR < 2
 void MapCanvas::onIdle(wxIdleEvent& e) {
 	// Get time since last redraw
 	long frametime = (sfclock.GetElapsedTime() * 1000) - last_time;
@@ -1499,3 +1504,28 @@ void MapCanvas::onTimer(wxTimerEvent& e) {
 	update(frametime);
 	Refresh();
 }
+#else
+void MapCanvas::onIdle(wxIdleEvent& e) {
+	// Get time since last redraw
+	long frametime = (sfclock.getElapsedTime().asMilliseconds()) - last_time;
+
+	if (frametime < fr_idle)
+		return;
+
+	last_time = (sfclock.getElapsedTime().asMilliseconds());
+	update(frametime);
+	Refresh();
+}
+
+void MapCanvas::onTimer(wxTimerEvent& e) {
+	// Get time since last redraw
+	long frametime = (sfclock.getElapsedTime().asMilliseconds()) - last_time;
+
+	if (frametime < fr_idle)
+		return;
+
+	last_time = (sfclock.getElapsedTime().asMilliseconds());
+	update(frametime);
+	Refresh();
+}
+#endif

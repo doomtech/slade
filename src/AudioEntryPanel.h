@@ -7,12 +7,12 @@
 
 #undef Status
 #include <SFML/Audio.hpp>
+#include "sfMod/sfMod.h"
 
 class AudioEntryPanel : public EntryPanel {
 private:
 	string	prevfile;
 	int		audio_type;
-	//bool	midi;
 	bool	opened;
 
 	wxBitmapButton*	btn_play;
@@ -23,10 +23,10 @@ private:
 	wxTimer*		timer_seek;
 	wxMediaCtrl*	media_ctrl;
 
-	//bool				audio_music;
 	sf::SoundBuffer*	sound_buffer;
 	sf::Sound			sound;
 	sf::Music			music;
+	sfMod::Mod			mod;
 
 	enum {
 		AUTYPE_INVALID,
@@ -34,6 +34,7 @@ private:
 		AUTYPE_MUSIC,
 		AUTYPE_MIDI,
 		AUTYPE_MEDIA,
+		AUTYPE_MOD,
 	};
 
 public:
@@ -42,10 +43,12 @@ public:
 
 	bool	loadEntry(ArchiveEntry* entry);
 	bool	saveEntry();
+	void	setAudioDuration(int duration);
 
 	bool	open();
 	bool	openAudio(MemChunk& audio, string filename);
 	bool	openMidi(string filename);
+	bool	openMod(MemChunk& data);
 	void	startStream();
 	void	stopStream();
 	void	resetStream();
