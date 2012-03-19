@@ -341,7 +341,7 @@ void MapRenderer2D::renderLinesVBO(bool show_direction, float alpha) {
 	// Setup VBO pointers
 	glBindBuffer(GL_ARRAY_BUFFER, vbo_lines);
 	glVertexPointer(2, GL_FLOAT, 24, 0);
-	
+
 	glColorPointer(4, GL_FLOAT, 24, ((char*)NULL + 8));
 
 	// Render the VBO
@@ -1329,7 +1329,10 @@ void MapRenderer2D::renderFlatHilight(int index, float fade) {
 	if (sector_hilight_fill) {
 		glColor4f(col.fr(), col.fg(), col.fb(), col.fa()*0.5f);
 		map->getSector(index)->getPolygon()->render();
+		glLineWidth(line_width * 2.0f);
 	}
+	else
+		glLineWidth(line_width * 3.0f);
 
 	// Get all lines belonging to the hilighted sector
 	vector<MapLine*> lines;

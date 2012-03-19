@@ -110,6 +110,7 @@ public:
 		return instance;
 	}
 
+	void	setDefaults();
 	string	getName() { return name; }
 	int		getMapFormat() { return map_format; }
 	bool	isBoom() { return boom; }

@@ -28,13 +28,7 @@ CVAR(String, game_configuration, "", CVAR_SAVE)
  *******************************************************************/
 
 GameConfiguration::GameConfiguration() {
-	game_filter = "";
-	udmf_namespace = "";
-	ttype_unknown.icon = "unknown";
-	ttype_unknown.shrink = true;
-	any_map_name = false;
-	mix_tex_flats = false;
-	tx_textures = false;
+	setDefaults();
 }
 
 GameConfiguration::~GameConfiguration() {
@@ -50,6 +44,16 @@ GameConfiguration::~GameConfiguration() {
 		if (tt->second.type) delete tt->second.type;
 		tt++;
 	}
+}
+
+void GameConfiguration::setDefaults() {
+	game_filter = "";
+	udmf_namespace = "";
+	ttype_unknown.icon = "unknown";
+	ttype_unknown.shrink = true;
+	any_map_name = false;
+	mix_tex_flats = false;
+	tx_textures = false;
 }
 
 string GameConfiguration::readConfigName(MemChunk& mc) {
@@ -398,6 +402,7 @@ bool GameConfiguration::readConfiguration(string& cfg, string source) {
 	mc.exportFile("gctest.txt");
 
 	// Clear current configuration
+	setDefaults();
 	name = "Invalid Configuration";
 	action_specials.clear();
 	thing_types.clear();

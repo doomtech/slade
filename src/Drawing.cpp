@@ -430,10 +430,10 @@ void Drawing::drawText(string text, int x, int y, rgba_t colour, int font, int a
 		glMatrixMode(GL_TEXTURE);
 		glPushMatrix();
 		render_target->resetGLStates();
-		
+
 		// Draw
 		render_target->draw(sf_str);
-		
+
 		// Pop related states
 		glMatrixMode(GL_TEXTURE);
 		glPopMatrix();
@@ -494,8 +494,8 @@ void Drawing::drawText(string text, int x, int y, rgba_t colour, int font, int a
 
 	// Setup alignment
 	FTBBox bbox = ftgl_font->BBox(CHR(text), -1);
-	float xpos = x;
-	float ypos = y;
+	int xpos = x;
+	int ypos = y;
 	float width = bbox.Upper().X() - bbox.Lower().X();
 	float height = bbox.Upper().Y() - bbox.Lower().Y();
 	if (alignment != ALIGN_LEFT) {
@@ -515,6 +515,7 @@ void Drawing::drawText(string text, int x, int y, rgba_t colour, int font, int a
 	colour.set_gl();
 	glPushMatrix();
 	glTranslatef(xpos, ypos + ftgl_font->FaceSize(), 0.0f);
+	glTranslatef(-0.375f, -0.375f, 0);
 	glScalef(1.0f, -1.0f, 1.0f);
 	ftgl_font->Render(CHR(text), -1);
 	glPopMatrix();

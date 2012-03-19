@@ -654,6 +654,10 @@ void MapCanvas::draw() {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
+	// Translate to inside of pixel (otherwise inaccuracies can occur on certain gl implemenataions)
+	if (OpenGL::accuracyTweak())
+		glTranslatef(0.375f, 0.375f, 0);
+
 	// Check if we have to update the info
 	if (editor->hilightItem() != last_hilight) {
 		// Update hilight index
