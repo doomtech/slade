@@ -17,6 +17,7 @@ private:
 	wxButton*					btn_recent;
 	wxButton*					btn_new_map;
 	MapPreviewCanvas*			canvas_preview;
+	wxImageList*				img_list;
 
 	Archive*					archive;
 	vector<Archive::mapdesc_t>	maps;

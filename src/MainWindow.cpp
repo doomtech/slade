@@ -425,8 +425,22 @@ void MainWindow::openMapEditor(Archive* archive) {
 	MapEditorConfigDialog dlg(this, archive);
 	if (dlg.ShowModal() == wxID_OK) {
 		Archive::mapdesc_t md = dlg.selectedMap();
-		if (md.head)
-			theMapEditor->openMap(md);
+
+		if (!md.head)
+			return;
+		
+		// Check selected game configuration is ok
+		if (!dlg.configMatchesMap(md))
+			wxMessageBox("Selected Game Configuration does not match the map format", "Error", wxICON_ERROR);
+		else {
+			// Attempt to open map
+			if (theMapEditor->openMap(md))
+				theMapEditor->Show();
+			else {
+				theMapEditor->Hide();
+				wxMessageBox(S_FMT("Unable to open map %s: %s", CHR(md.name), CHR(Global::error)), "Invalid map error", wxICON_ERROR);
+			}
+		}
 	}
 }
 

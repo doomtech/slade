@@ -9,6 +9,7 @@
 #include "SFileDialog.h"
 #include "SplashWindow.h"
 #include "ColourConfiguration.h"
+#include "Icons.h"
 #include <wx/statline.h>
 
 MapEditorConfigDialog::MapEditorConfigDialog(wxWindow* parent, Archive* archive, bool show_maplist) : wxDialog(parent, -1, "Launch Map Editor") {
@@ -44,6 +45,11 @@ MapEditorConfigDialog::MapEditorConfigDialog(wxWindow* parent, Archive* archive,
 	wxStaticBox* frame;
 	wxStaticBoxSizer* framesizer;
 
+	// Setup image list
+	img_list = new wxImageList(16, 16);
+	img_list->Add(getIcon("i_tick"));
+	img_list->Add(getIcon("t_close"));
+
 	// Map section
 	if (show_maplist) {
 		frame = new wxStaticBox(this, -1, "Maps");
@@ -51,7 +57,8 @@ MapEditorConfigDialog::MapEditorConfigDialog(wxWindow* parent, Archive* archive,
 		sizer->Add(framesizer, 1, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
 
 		// Map list
-		list_maps = new ListView(this, -1, wxLC_LIST|wxLC_SINGLE_SEL);
+		list_maps = new ListView(this, -1, wxLC_SINGLE_SEL|wxLC_LIST);
+		list_maps->SetImageList(img_list, wxIMAGE_LIST_SMALL);
 		framesizer->Add(list_maps, 1, wxEXPAND|wxALL, 4);
 
 		// New map button
@@ -138,6 +145,7 @@ MapEditorConfigDialog::MapEditorConfigDialog(wxWindow* parent, Archive* archive,
 }
 
 MapEditorConfigDialog::~MapEditorConfigDialog() {
+	delete img_list;
 }
 
 void MapEditorConfigDialog::populateMapList() {
@@ -171,10 +179,14 @@ void MapEditorConfigDialog::populateMapList() {
 		li.SetId(index++);
 		li.SetText(S_FMT("(%s) %s", CHR(fmt), CHR(maps[a].name)));
 		if (maps[a].format != theGameConfiguration->getMapFormat())
-			li.SetTextColour(WXCOL(ColourConfiguration::getColour("error")));
+			li.SetImage(1);
+		else
+			li.SetImage(0);
+			//li.SetTextColour(WXCOL(ColourConfiguration::getColour("error")));
 
 		// Add to list
 		list_maps->InsertItem(li);
+		list_maps->SetItemImage(index, 0);
 	}
 }
 
