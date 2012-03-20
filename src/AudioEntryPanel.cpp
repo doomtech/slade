@@ -437,6 +437,7 @@ bool AudioEntryPanel::openMidi(string filename) {
 }
 
 bool AudioEntryPanel::openMod(MemChunk& data) {
+#ifndef NOLIBMODPLUG
 	// Attempt to load the mod
 	if (mod.LoadFromMemory(data.getData(), data.getSize())) {
 		audio_type = AUTYPE_MOD;
@@ -460,6 +461,8 @@ bool AudioEntryPanel::openMod(MemChunk& data) {
 
 		return false;
 	}
+#endif
+	return false;
 }
 
 /* AudioEntryPanel::startStream
@@ -475,15 +478,19 @@ void AudioEntryPanel::startStream() {
 		sound.Play(); break;
 	case AUTYPE_MUSIC:
 		music.Play(); break;
+#ifndef NOLIBMODPLUG
 	case AUTYPE_MOD:
 		mod.Play(); break;
+#endif
 #else
 	case AUTYPE_SOUND:
 		sound.play(); break;
 	case AUTYPE_MUSIC:
 		music.play(); break;
+#ifndef NOLIBMODPLUG
 	case AUTYPE_MOD:
 		mod.play(); break;
+#endif
 #endif
 	case AUTYPE_MIDI:
 		theMIDIPlayer->play(); break;
@@ -502,8 +509,10 @@ void AudioEntryPanel::stopStream() {
 		sound.Pause(); break;
 	case AUTYPE_MUSIC:
 		music.Pause(); break;
+#ifndef NOLIBMODPLUG
 	case AUTYPE_MOD:
 		mod.Pause(); break;
+#endif
 #else
 	case AUTYPE_SOUND:
 		sound.pause(); break;
@@ -530,15 +539,19 @@ void AudioEntryPanel::resetStream() {
 		sound.Stop(); break;
 	case AUTYPE_MUSIC:
 		music.Stop(); break;
+#ifndef NOLIBMODPLUG
 	case AUTYPE_MOD:
 		mod.Stop(); break;
+#endif
 #else
 	case AUTYPE_SOUND:
 		sound.stop(); break;
 	case AUTYPE_MUSIC:
 		music.stop(); break;
+#ifndef NOLIBMODPLUG
 	case AUTYPE_MOD:
 		mod.stop(); break;
+#endif
 #endif
 	case AUTYPE_MIDI:
 		theMIDIPlayer->stop(); break;
@@ -614,11 +627,15 @@ void AudioEntryPanel::onTimer(wxTimerEvent& e) {
 #if SFML_VERSION_MAJOR < 2
 		(audio_type == AUTYPE_SOUND && sound.GetStatus() == sf::Sound::Stopped) ||
 		(audio_type == AUTYPE_MUSIC && music.GetStatus() == sf::Sound::Stopped) ||
+#ifndef NOLIBMODPLUG
 		(audio_type == AUTYPE_MOD && mod.GetStatus() == sf::Sound::Stopped) ||
+#endif
 #else
 		(audio_type == AUTYPE_SOUND && sound.getStatus() == sf::Sound::Stopped) ||
 		(audio_type == AUTYPE_MUSIC && music.getStatus() == sf::Sound::Stopped) ||
+#ifndef NOLIBMODPLUG
 		(audio_type == AUTYPE_MOD && mod.getStatus() == sf::Sound::Stopped) ||
+#endif
 #endif
 		(audio_type == AUTYPE_MEDIA && media_ctrl->GetState() == wxMEDIASTATE_STOPPED))
 		timer_seek->Stop();

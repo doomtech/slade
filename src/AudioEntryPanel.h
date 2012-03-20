@@ -7,7 +7,9 @@
 
 #undef Status
 #include <SFML/Audio.hpp>
+#ifndef NOLIBMODPLUG
 #include "sfMod/sfMod.h"
+#endif
 
 class AudioEntryPanel : public EntryPanel {
 private:
@@ -26,7 +28,9 @@ private:
 	sf::SoundBuffer*	sound_buffer;
 	sf::Sound			sound;
 	sf::Music			music;
+#ifndef NOLIBMODPLUG
 	sfMod::Mod			mod;
+#endif
 
 	enum {
 		AUTYPE_INVALID,

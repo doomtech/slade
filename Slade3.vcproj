@@ -121,7 +121,7 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				WholeProgramOptimization="false"
-				PreprocessorDefinitions="WIN32;USE_SFML_RENDERWINDOW;__WXMSW__;_WINDOWS;NOPCH;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;GLEW_STATIC;NDEBUG;UPDATEREVISION"
+				PreprocessorDefinitions="WIN32;USE_SFML_RENDERWINDOW;__WXMSW__;_WINDOWS;NOPCH;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;GLEW_STATIC;NDEBUG;UPDATEREVISION;NOLIBMODPLUG"
 				GeneratePreprocessedFile="0"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -2106,6 +2106,10 @@
 					RelativePath=".\src\cl_notebook_art\cl_aui_notebook_art.h"
 					>
 				</File>
+			</Filter>
+			<Filter
+				Name="sfMod"
+				>
 			</Filter>
 		</Filter>
 		<File

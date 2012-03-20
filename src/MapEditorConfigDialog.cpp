@@ -186,7 +186,7 @@ Archive::mapdesc_t MapEditorConfigDialog::selectedMap() {
 		selection = sel[0];
 
 	// Return it if valid
-	if (selection >= maps.size())
+	if ((unsigned)selection >= maps.size())
 		return Archive::mapdesc_t();
 	else
 		return maps[selection];

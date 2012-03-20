@@ -467,7 +467,7 @@ void SToolBar::onContextMenu(wxCommandEvent& e) {
 		show_toolbar_names = !show_toolbar_names;
 
 	// Group toggle
-	else if (e.GetId() < groups.size()) {
+	else if ((unsigned)e.GetId() < groups.size()) {
 		// Toggle group hidden
 		groups[e.GetId()]->hide(!groups[e.GetId()]->isHidden());
 
