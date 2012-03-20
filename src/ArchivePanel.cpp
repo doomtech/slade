@@ -275,7 +275,6 @@ ArchivePanel::ArchivePanel(wxWindow* parent, Archive* archive)
  * ArchivePanel class destructor
  *******************************************************************/
 ArchivePanel::~ArchivePanel() {
-	removeMenus();
 }
 
 /* ArchivePanel::saveEntryChanges

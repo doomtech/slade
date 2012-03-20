@@ -35,6 +35,7 @@ public:
 	int		minHeight() { return min_height; }
 	void	addGroup(SToolBarGroup* group);
 	void	deleteGroup(string name);
+	void	deleteCustomGroups();
 	void	addActionGroup(string name, wxArrayString actions);
 	void	updateLayout(bool force = false, bool generate_event = true);
 	void	enableGroup(string name, bool enable = true);

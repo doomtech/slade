@@ -468,6 +468,15 @@ void MainWindow::removeCustomMenu(wxMenu* menu) {
 	}
 }
 
+/* MainWindow::removeAllCustomMenus
+ * Removes all custom menus from the menu bar
+ *******************************************************************/
+void MainWindow::removeAllCustomMenus() {
+	// Remove all custom menus from menubar
+	while (custom_menus.size() > 0)
+		removeCustomMenu(custom_menus[0]);
+}
+
 /* MainWindow::enableToolBar
  * Enables/disables the toolbar group matching [name]
  *******************************************************************/
@@ -488,6 +497,13 @@ void MainWindow::addCustomToolBar(string name, wxArrayString actions) {
  *******************************************************************/
 void MainWindow::removeCustomToolBar(string name) {
 	toolbar->deleteGroup(name);
+}
+
+/* MainWindow::removeAllCustomToolBars
+ * Removes all custom toolbar groups
+ *******************************************************************/
+void MainWindow::removeAllCustomToolBars() {
+	toolbar->deleteCustomGroups();
 }
 
 /* MainWindow::handleAction

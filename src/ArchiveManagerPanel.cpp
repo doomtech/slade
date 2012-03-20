@@ -1483,6 +1483,7 @@ void ArchiveManagerPanel::onListBookmarksRightClick(wxListEvent& e) {
  * Called when the current archive tab is about to change
  *******************************************************************/
 void ArchiveManagerPanel::onArchiveTabChanging(wxAuiNotebookEvent& e) {
+	/*
 	// Page is about to change, remove any custom menus if needed
 	int selection = notebook_archives->GetSelection();
 
@@ -1499,6 +1500,7 @@ void ArchiveManagerPanel::onArchiveTabChanging(wxAuiNotebookEvent& e) {
 		ep->removeCustomMenu();
 		ep->removeCustomToolBar();
 	}
+	*/
 
 	e.Skip();
 }
@@ -1507,8 +1509,14 @@ void ArchiveManagerPanel::onArchiveTabChanging(wxAuiNotebookEvent& e) {
  * Called when the current archive tab has changed
  *******************************************************************/
 void ArchiveManagerPanel::onArchiveTabChanged(wxAuiNotebookEvent& e) {
-	// Page has changed, add any custom menus if needed
+	// Page has changed, update custom menus and toolbars
 	int selection = notebook_archives->GetSelection();
+
+	// Remove any current custom menus/toolbars
+	theMainWindow->removeAllCustomMenus();
+	theMainWindow->removeAllCustomToolBars();
+	theMainWindow->enableToolBar("_archive", false);
+	theMainWindow->enableToolBar("_entry", false);
 
 	// ArchivePanel
 	if (isArchivePanel(selection)) {

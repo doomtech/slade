@@ -216,6 +216,7 @@ void SToolBar::deleteGroup(string name) {
 	// Find group to delete
 	for (unsigned a = 0; a < groups.size(); a++) {
 		if (S_CMPNOCASE(groups[a]->getName(), name)) {
+			// Delete group
 			delete groups[a];
 			groups.erase(groups.begin() + a);
 			break;
@@ -224,6 +225,24 @@ void SToolBar::deleteGroup(string name) {
 
 	// Update layout
 	updateLayout(true);
+}
+
+void SToolBar::deleteCustomGroups() {
+	// Go through groups
+	bool deleted = false;
+	for (unsigned a = 0; a < groups.size(); a++) {
+		// Check if group is custom (custom group names don't begin with _)
+		if (!groups[a]->getName().StartsWith("_")) {
+			// Delete group
+			delete groups[a];
+			groups.erase(groups.begin() + a);
+			deleted = true;
+		}
+	}
+
+	// Update layout
+	if (deleted)
+		updateLayout(true);
 }
 
 void SToolBar::addActionGroup(string name, wxArrayString actions) {

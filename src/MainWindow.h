@@ -63,11 +63,13 @@ public:
 	// Custom menu
 	void	addCustomMenu(wxMenu* menu, string title);
 	void	removeCustomMenu(wxMenu* menu);
+	void	removeAllCustomMenus();
 
 	// Toolbars
 	void	enableToolBar(string name, bool enable = true);
 	void	addCustomToolBar(string name, wxArrayString actions);
 	void	removeCustomToolBar(string name);
+	void	removeAllCustomToolBars();
 
 	// Events
 	void	onMenuItemClicked(wxCommandEvent &e);
