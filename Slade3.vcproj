@@ -141,7 +141,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/NODEFAULTLIB:LIBCMT"
+				AdditionalOptions="/NODEFAULTLIB:LIBCMT /LTCG"
 				AdditionalDependencies="winmm.lib comctl32.lib rpcrt4.lib wsock32.lib user32.lib shell32.lib advapi32.lib comdlg32.lib gdi32.lib ole32.lib oleaut32.lib fluidsynth.lib FreeImage.lib wxbase29u.lib wxmsw29u_core.lib wxmsw29u_aui.lib wxmsw29u_gl.lib wxmsw29u_html.lib wxmsw29u_adv.lib wxmsw29u_stc.lib wxmsw29u_media.lib wxtiff.lib wxjpeg.lib wxpng.lib wxzlib.lib wxregexu.lib wxexpat.lib wxscintilla.lib sfml-graphics-s.lib sfml-window-s.lib sfml-audio-s.lib sfml-system-s.lib sfml-main.lib"
 				LinkIncremental="1"
 				GenerateManifest="true"
@@ -957,7 +957,7 @@
 					>
 				</File>
 				<Filter
-					Name="InfoOverlay"
+					Name="Overlays"
 					>
 					<File
 						RelativePath=".\src\LineInfoOverlay.cpp"
@@ -968,11 +968,23 @@
 						>
 					</File>
 					<File
+						RelativePath=".\src\MCOverlay.h"
+						>
+					</File>
+					<File
 						RelativePath=".\src\SectorInfoOverlay.cpp"
 						>
 					</File>
 					<File
 						RelativePath=".\src\SectorInfoOverlay.h"
+						>
+					</File>
+					<File
+						RelativePath=".\src\SectorTextureOverlay.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\SectorTextureOverlay.h"
 						>
 					</File>
 					<File

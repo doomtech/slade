@@ -652,6 +652,15 @@ Archive::mapdesc_t WadArchive::getMapInfo(ArchiveEntry* maphead) {
 	if (!maphead)
 		return map;
 
+	// Check for embedded wads (e.g., Doom 64 maps)
+	if (maphead->getType()->getFormat() == "archive_wad") {
+		map.archive = true;
+		map.head = maphead;
+		map.end = maphead;
+		map.name = maphead->getName();
+		return map;
+	}
+
 	// Check for UDMF format map
 	if (S_CMPNOCASE(maphead->nextEntry()->getName(), "TEXTMAP")) {
 		// Get map info
@@ -857,8 +866,24 @@ vector<Archive::mapdesc_t> WadArchive::detectMaps() {
 			}
 		}
 
-
-
+		// Embedded WAD check (for Doom 64)
+		if (entry->getType()->getFormat() == "archive_wad") {
+			// Detect map format (probably kinda slow but whatever, no better way to do it really)
+			Archive* tempwad = new WadArchive();
+			tempwad->open(entry);
+			vector<mapdesc_t> emaps = tempwad->detectMaps();
+			if (emaps.size() > 0) {
+				mapdesc_t md;
+				md.head = entry;
+				md.end = entry;
+				md.archive = true;
+				md.name = entry->getName(true).Upper();
+				md.format = emaps[0].format;
+				maps.push_back(md);
+			}
+			delete tempwad;
+			entry->unlock();
+		}
 
 		// Not a UDMF or Doom/Hexen map lump, go to next lump
 		entry = entry->nextEntry();
@@ -866,7 +891,8 @@ vector<Archive::mapdesc_t> WadArchive::detectMaps() {
 
 	// Set all map header entries to ETYPE_MAP type
 	for (size_t a = 0; a < maps.size(); a++)
-		maps[a].head->setType(EntryType::mapMarkerType());
+		if (!maps[a].archive)
+			maps[a].head->setType(EntryType::mapMarkerType());
 
 	return maps;
 }
