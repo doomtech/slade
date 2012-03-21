@@ -379,7 +379,7 @@ void MainApp::initActions() {
 	new SAction("arch_newdir", "New Directory", "t_newfolder", "Create a new empty directory");
 	new SAction("arch_importfiles", "&Import Files", "t_importfiles", "Import multiple files into the archive");
 	new SAction("arch_texeditor", "&Texture Editor", "t_texeditor", "Open the texture editor for the current archive");
-	new SAction("arch_mapeditor", "&Map Editor", "e_map", "Open the map editor");
+	new SAction("arch_mapeditor", "&Map Editor", "t_mapeditor", "Open the map editor");
 	new SAction("arch_clean_patches", "Remove Unused &Patches", "", "Remove any unused patches, and their associated entries");
 	new SAction("arch_clean_textures", "Remove Unused &Textures", "", "Remove any unused textures");
 	new SAction("arch_clean_flats", "Remove Unused &Flats", "", "Remove any unused flats");
@@ -493,7 +493,7 @@ void MainApp::initActions() {
 	new SAction("mapw_mode_sectors", "Sectors Mode", "t_sectors", "Change to sectors editing mode", "", SAction::RADIO, -1, group_mode);
 	new SAction("mapw_mode_things", "Things Mode", "t_things", "Change to things editing mode", "", SAction::RADIO, -1, group_mode);
 	new SAction("mapw_showconsole", "&Console", "t_console", "Toggle the Console window", "Ctrl+2");
-	new SAction("mapw_showproperties", "&Item Properties", "", "Toggle the Item Properties window", "Ctrl+1");
+	new SAction("mapw_showproperties", "&Item Properties", "t_properties", "Toggle the Item Properties window", "Ctrl+1");
 	new SAction("mapw_thing_changetype", "Change Type", "", "Change the currently selected or hilighted thing type(s)");
 	new SAction("mapw_sector_changetexture", "Change Texture", "", "Change the currently selected or hilighted sector texture(s)");
 }

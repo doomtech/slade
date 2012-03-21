@@ -5,6 +5,7 @@
 #include "ListView.h"
 #include "Archive.h"
 #include "MapPreviewCanvas.h"
+#include <wx/imaglist.h>
 
 class BaseResourceChooser;
 class MapEditorConfigDialog : public wxDialog {
