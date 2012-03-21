@@ -9,6 +9,7 @@
 #include "ThingInfoOverlay.h"
 #include "KeyBind.h"
 #include "MainApp.h"
+#include "MCOverlay.h"
 #include <SFML/System.hpp>
 
 class MapEditor;
@@ -49,6 +50,7 @@ private:
 	LineInfoOverlay		info_line;
 	SectorInfoOverlay	info_sector;
 	ThingInfoOverlay	info_thing;
+	MCOverlay*			overlay_current;
 
 	// View properties
 	double		view_xoff;
@@ -62,6 +64,7 @@ private:
 	bool	anim_flash_inc;
 	float	anim_info_fade;
 	bool	anim_info_show;
+	float	anim_overlay_fade;
 	double	anim_view_speed;
 	double	view_xoff_inter;
 	double	view_yoff_inter;
@@ -75,6 +78,8 @@ private:
 public:
 	MapCanvas(wxWindow *parent, int id, MapEditor* editor);
 	~MapCanvas();
+
+	bool	overlayActive();
 
 	double	translateX(double x, bool inter = false);
 	double	translateY(double y, bool inter = false);

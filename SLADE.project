@@ -190,7 +190,7 @@
       <File Name="src/MapCanvas.h"/>
       <File Name="src/MCAnimations.cpp"/>
       <File Name="src/MCAnimations.h"/>
-      <VirtualDirectory Name="Info Overlays">
+      <VirtualDirectory Name="Overlays">
         <File Name="src/LineInfoOverlay.cpp"/>
         <File Name="src/LineInfoOverlay.h"/>
         <File Name="src/SectorInfoOverlay.cpp"/>
@@ -199,6 +199,9 @@
         <File Name="src/ThingInfoOverlay.h"/>
         <File Name="src/VertexInfoOverlay.cpp"/>
         <File Name="src/VertexInfoOverlay.h"/>
+        <File Name="src/MCOverlay.h"/>
+        <File Name="src/SectorTextureOverlay.h"/>
+        <File Name="src/SectorTextureOverlay.cpp"/>
       </VirtualDirectory>
       <File Name="src/ActionSpecialTreeView.cpp"/>
       <File Name="src/ActionSpecialTreeView.h"/>
@@ -560,6 +563,7 @@
       
       
       
+      
       ]]>
       </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
@@ -598,6 +602,7 @@
       <General OutputFile="./dist/SLADE-dbg.app/Contents/MacOS/SLADE" IntermediateDirectory="./Debug" Command="./dist/SLADE-dbg.app/Contents/MacOS/SLADE" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[
+      
       
       
       
@@ -651,7 +656,8 @@
       <ResourceCompiler Options="$(shell wx-config --rcflags)" Required="no"/>
       <General OutputFile="./dist/slade" IntermediateDirectory="./Release" Command="./slade" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
-        <![CDATA[]]>
+        <![CDATA[
+      ]]>
       </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
         <PostConnectCommands/>
@@ -690,6 +696,7 @@
       <General OutputFile="./dist/SLADE.app/Contents/MacOS/SLADE" IntermediateDirectory="./Release" Command="./dist/SLADE.app/Contents/MacOS/SLADE" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./dist" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[
+      
       
       
       

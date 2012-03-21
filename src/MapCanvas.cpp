@@ -43,6 +43,7 @@
 #include "ThingTypeBrowser.h"
 #include "MapTextureBrowser.h"
 #include "MapObjectPropsPanel.h"
+#include "SectorTextureOverlay.h"
 
 
 /*******************************************************************
@@ -82,6 +83,7 @@ MapCanvas::MapCanvas(wxWindow *parent, int id, MapEditor* editor)
 	anim_flash_level = 0.5f;
 	anim_flash_inc = true;
 	anim_info_fade = 0.0f;
+	anim_overlay_fade = 0.0f;
 	fade_vertices = 1.0f;
 	fade_lines = 1.0f;
 	fade_flats = 1.0f;
@@ -98,6 +100,7 @@ MapCanvas::MapCanvas(wxWindow *parent, int id, MapEditor* editor)
 	zooming_cursor = false;
 	mouse_selbegin = false;
 	mouse_movebegin = false;
+	overlay_current = NULL;
 
 	timer.Start(2);
 #ifdef USE_SFML_RENDERWINDOW
@@ -137,6 +140,16 @@ MapCanvas::MapCanvas(wxWindow *parent, int id, MapEditor* editor)
  *******************************************************************/
 MapCanvas::~MapCanvas() {
 	delete renderer_2d;
+}
+
+/* MapCanvas::overlayActive
+ * Returns true if there is currently a full-screen overlay active
+ *******************************************************************/
+bool MapCanvas::overlayActive() {
+	if (!overlay_current)
+		return false;
+	else
+		return overlay_current->isActive();
 }
 
 /* MapCanvas::translateX
@@ -540,11 +553,11 @@ void MapCanvas::draw() {
 			renderer_2d->renderVertices(fade_vertices);
 
 		// Selection if needed
-		if (mouse_state != MSTATE_MOVE)
+		if (mouse_state != MSTATE_MOVE && !overlayActive())
 			renderer_2d->renderVertexSelection(editor->getSelection(), anim_flash_level);
 
 		// Hilight if needed
-		if (mouse_state == MSTATE_NORMAL)
+		if (mouse_state == MSTATE_NORMAL && !overlayActive())
 			renderer_2d->renderVertexHilight(editor->hilightItem(), anim_flash_level);
 	}
 	else if (editor->editMode() == MapEditor::MODE_LINES) {
@@ -554,11 +567,11 @@ void MapCanvas::draw() {
 		renderer_2d->renderLines(true);				// Lines
 
 		// Selection if needed
-		if (mouse_state != MSTATE_MOVE)
+		if (mouse_state != MSTATE_MOVE && !overlayActive())
 			renderer_2d->renderLineSelection(editor->getSelection(), anim_flash_level);
 
 		// Hilight if needed
-		if (mouse_state == MSTATE_NORMAL)
+		if (mouse_state == MSTATE_NORMAL && !overlayActive())
 			renderer_2d->renderLineHilight(editor->hilightItem(), anim_flash_level);
 	}
 	else if (editor->editMode() == MapEditor::MODE_SECTORS) {
@@ -568,13 +581,13 @@ void MapCanvas::draw() {
 		renderer_2d->renderLines(line_tabs_always, fade_lines);	// Lines
 
 		// Selection if needed
-		if (mouse_state != MSTATE_MOVE)
+		if (mouse_state != MSTATE_MOVE && !overlayActive())
 			renderer_2d->renderFlatSelection(editor->getSelection(), anim_flash_level);
 
 		splitter.testRender();	// Testing
 
 		// Hilight if needed
-		if (mouse_state == MSTATE_NORMAL)
+		if (mouse_state == MSTATE_NORMAL && !overlayActive())
 			renderer_2d->renderFlatHilight(editor->hilightItem(), anim_flash_level);
 	}
 	else if (editor->editMode() == MapEditor::MODE_THINGS) {
@@ -584,22 +597,24 @@ void MapCanvas::draw() {
 		renderer_2d->renderThings(fade_things);					// Things
 
 		// Selection if needed
-		if (mouse_state != MSTATE_MOVE)
+		if (mouse_state != MSTATE_MOVE && !overlayActive())
 			renderer_2d->renderThingSelection(editor->getSelection(), anim_flash_level);
 
 		// Hilight if needed
-		if (mouse_state == MSTATE_NORMAL)
+		if (mouse_state == MSTATE_NORMAL && !overlayActive())
 			renderer_2d->renderThingHilight(editor->hilightItem(), anim_flash_level);
 	}
 
 
 	// Draw tagged sectors/lines/things if needed
-	if (editor->taggedSectors().size() > 0 && mouse_state == MSTATE_NORMAL)
-		renderer_2d->renderTaggedFlats(editor->taggedSectors(), anim_flash_level);
-	else if (editor->taggedLines().size() > 0 && mouse_state == MSTATE_NORMAL)
-		renderer_2d->renderTaggedLines(editor->taggedLines(), anim_flash_level);
-	else if (editor->taggedThings().size() > 0 && mouse_state == MSTATE_NORMAL)
-		renderer_2d->renderTaggedThings(editor->taggedThings(), anim_flash_level);
+	if (!overlayActive()) {
+		if (editor->taggedSectors().size() > 0 && mouse_state == MSTATE_NORMAL)
+			renderer_2d->renderTaggedFlats(editor->taggedSectors(), anim_flash_level);
+		else if (editor->taggedLines().size() > 0 && mouse_state == MSTATE_NORMAL)
+			renderer_2d->renderTaggedLines(editor->taggedLines(), anim_flash_level);
+		else if (editor->taggedThings().size() > 0 && mouse_state == MSTATE_NORMAL)
+			renderer_2d->renderTaggedThings(editor->taggedThings(), anim_flash_level);
+	}
 
 	// Draw selection numbers if needed
 	//if (editor->selectionSize() > 0)
@@ -685,6 +700,10 @@ void MapCanvas::draw() {
 	else if (editor->editMode() == MapEditor::MODE_THINGS)
 		info_thing.draw(GetSize().y, GetSize().x, anim_info_fade);
 
+	// test
+	if (overlay_current)
+		overlay_current->draw(GetSize().x, GetSize().y, anim_overlay_fade);
+
 	// FPS counter
 	if (map_showfps) {
 		if (frametime_last > 0) {
@@ -736,7 +755,7 @@ void MapCanvas::update(long frametime) {
 
 	// Fader for info overlay
 	bool fade_anim = true;
-	if (anim_info_show) {
+	if (anim_info_show && !overlayActive()) {
 		anim_info_fade += 0.1f*mult;
 		if (anim_info_fade > 1.0f) {
 			anim_info_fade = 1.0f;
@@ -748,6 +767,23 @@ void MapCanvas::update(long frametime) {
 		if (anim_info_fade < 0.0f) {
 			anim_info_fade = 0.0f;
 			fade_anim = false;
+		}
+	}
+
+	// Fader for fullscreen overlay
+	bool overlay_fade_anim = true;
+	if (overlayActive()) {
+		anim_overlay_fade += 0.1f*mult;
+		if (anim_overlay_fade > 1.0f) {
+			anim_overlay_fade = 1.0f;
+			overlay_fade_anim = false;
+		}
+	}
+	else {
+		anim_overlay_fade -= 0.05f*mult;
+		if (anim_overlay_fade < 0.0f) {
+			anim_overlay_fade = 0.0f;
+			overlay_fade_anim = false;
 		}
 	}
 
@@ -910,12 +946,12 @@ void MapCanvas::update(long frametime) {
 	// Determine the framerate limit
 #ifdef USE_SFML_RENDERWINDOW
 	// SFML RenderWindow can handle high framerates better than wxGLCanvas, or something like that
-	if (mouse_state == MSTATE_SELECTION || mouse_state == MSTATE_PANNING || anim_running || fade_anim || view_anim || anim_mode_crossfade)
+	if (mouse_state == MSTATE_SELECTION || mouse_state == MSTATE_PANNING || anim_running || fade_anim || view_anim || anim_mode_crossfade || overlay_fade_anim)
 		fr_idle = 2;
 	else	// No high-priority animations running, throttle framerate
 		fr_idle = 25;
 #else
-	if (mouse_state == MSTATE_SELECTION || mouse_state == MSTATE_PANNING || anim_running || fade_anim || view_anim || anim_mode_crossfade)
+	if (mouse_state == MSTATE_SELECTION || mouse_state == MSTATE_PANNING || anim_running || fade_anim || view_anim || anim_mode_crossfade || overlay_fade_anim)
 		fr_idle = 5;
 	else	// No high-priority animations running, throttle framerate
 		fr_idle = 30;
@@ -1072,6 +1108,10 @@ void MapCanvas::changeSectorTexture() {
 			texture = selection[0]->stringProperty("textureceiling");
 		else {
 			// For now only supported in floors or ceilings edit mode
+			if (overlay_current) delete overlay_current;
+			SectorTextureOverlay* sto = new SectorTextureOverlay();
+			sto->openSectors(selection);
+			overlay_current = sto;
 			return;
 		}
 	}
@@ -1099,6 +1139,20 @@ void MapCanvas::changeSectorTexture() {
 }
 
 void MapCanvas::onKeyBindPress(string name) {
+	// Check if an overlay is active
+	if (overlayActive()) {
+		// Accept edit
+		if (name == "me2d_edit_accept")
+			overlay_current->close();
+
+		// Cancel edit
+		else if (name == "me2d_edit_cancel")
+			overlay_current->close(true);
+
+		// Nothing else
+		return;
+	}
+
 	// Pan left
 	if (name == "me2d_left")
 		pan(-128/view_scale, 0);
@@ -1142,6 +1196,22 @@ void MapCanvas::onKeyBindPress(string name) {
 	// Zoom out (full map)
 	else if (name == "me2d_show_all")
 		viewFitToMap();
+
+	// Accept edit
+	else if (name == "me2d_edit_accept") {
+		if (overlay_current) {
+			delete overlay_current;
+			overlay_current = NULL;
+		}
+	}
+
+	// Cancel edit
+	else if (name == "me2d_edit_cancel") {
+		if (overlay_current) {
+			delete overlay_current;
+			overlay_current = NULL;
+		}
+	}
 
 	// Vertices mode
 	else if (name == "me2d_mode_vertices") {
@@ -1238,6 +1308,10 @@ void MapCanvas::onKeyBindRelease(string name) {
 bool MapCanvas::handleAction(string id) {
 	// Skip if not shown
 	if (!IsShown())
+		return false;
+
+	// Skip if overlay is active
+	if (overlayActive())
 		return false;
 
 	// Vertices mode
@@ -1380,6 +1454,19 @@ void MapCanvas::onMouseDown(wxMouseEvent& e) {
 	mouse_downpos.set(e.GetX(), e.GetY());
 	mouse_downpos_m.set(translateX(e.GetX()), translateY(e.GetY()));
 
+	// Check if a full screen overlay is active
+	if (overlayActive()) {
+		// Left click
+		if (e.LeftDown())
+			overlay_current->mouseLeftClick();
+
+		// Right click
+		else if (e.RightDown())
+			overlay_current->mouseRightClick();
+
+		return;
+	}
+
 	// Left button
 	if (e.LeftDown()) {
 		// Begin box selection if shift is held down, otherwise toggle selection on hilighted object
@@ -1414,6 +1501,11 @@ void MapCanvas::onMouseDown(wxMouseEvent& e) {
 void MapCanvas::onMouseUp(wxMouseEvent& e) {
 	// Clear mouse down position
 	mouse_downpos.set(-1, -1);
+
+	// Check if a full screen overlay is active
+	if (overlayActive()) {
+		return;
+	}
 
 	// Left button
 	if (e.LeftUp()) {
@@ -1468,6 +1560,12 @@ void MapCanvas::onMouseUp(wxMouseEvent& e) {
 }
 
 void MapCanvas::onMouseMotion(wxMouseEvent& e) {
+	// Check if a full screen overlay is active
+	if (overlayActive()) {
+		overlay_current->mouseMotion(e.GetX(), e.GetY());
+		return;
+	}
+
 	// Panning
 	if (mouse_state == MSTATE_PANNING)
 		pan((mouse_pos.x - e.GetX()) / view_scale, -((mouse_pos.y - e.GetY()) / view_scale));

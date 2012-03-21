@@ -24,6 +24,7 @@ TODO List ---------------------------------------------------------------
 	- Line drawing
 	- Object modification
 	- Map saving
+	- Generalised sector and line specials
 - Better UDMF property handling
 - 'Tag edit' mode
 

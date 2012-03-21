@@ -341,6 +341,8 @@ void KeyBind::initBinds() {
 	addBind("me2d_flat_type", keypress_t("F", KPM_CTRL), "Cycle flat type");
 	addBind("me2d_split_line", keypress_t("S", KPM_ALT|KPM_SHIFT), "Split nearest line");
 	addBind("me2d_lock_hilight", keypress_t("H", KPM_CTRL), "Lock/unlock hilight");
+	addBind("me2d_edit_accept", keypress_t("return"), "Accept edit");
+	addBind("me2d_edit_cancel", keypress_t("escape"), "Cancel edit");
 
 	// Map Editor 2D Sectors mode (me2d_sector*)
 	addBind("me2d_sector_light_up16", keypress_t("'"), "Light level up 16");
