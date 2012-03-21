@@ -280,6 +280,9 @@ void MapObjectPropsPanel::setupType(int objtype) {
 	if (last_type == objtype)
 		return;
 
+	// Get map format
+	int map_format = theGameConfiguration->getMapFormat();
+
 	// Clear property grid
 	pg_properties->Clear();
 	pg_props_side1->Clear();
@@ -330,11 +333,20 @@ void MapObjectPropsPanel::setupType(int objtype) {
 
 		// Add args
 		for (unsigned a = 0; a < 5; a++) {
+			// Add arg property
 			MOPGIntProperty* prop = (MOPGIntProperty*)addIntProperty(g_special, S_FMT("Arg%d", a+1), S_FMT("arg%d", a));
-			prop_as->addArgProperty(prop, a);
+
+			// Link to action special if appropriate
+			if (map_format == MAP_HEXEN || map_format == MAP_UDMF) prop_as->addArgProperty(prop, a);
 		}
 
-		// TODO: Add SPAC
+		// Add SPAC
+		if (map_format == MAP_HEXEN) {
+			MOPGSPACTriggerProperty* prop_spac = new MOPGSPACTriggerProperty("Trigger", "spac");
+			prop_spac->setParent(this);
+			properties.push_back(prop_spac);
+			pg_properties->AppendIn(g_special, prop_spac);
+		}
 
 		// Add 'Flags' group
 		wxPGProperty* g_flags = pg_properties->Append(new wxPropertyCategory("Flags"));
@@ -344,8 +356,7 @@ void MapObjectPropsPanel::setupType(int objtype) {
 			addLineFlagProperty(g_flags, theGameConfiguration->lineFlag(a), S_FMT("flag%d", a), a);
 
 		// Hide args if doom or doom64 format
-		if (theGameConfiguration->getMapFormat() == MAP_DOOM ||
-			theGameConfiguration->getMapFormat() == MAP_DOOM64) {
+		if (map_format != MAP_HEXEN && map_format != MAP_UDMF) {
 			pg_properties->GetProperty("arg0")->SetLabel("Sector Tag");	// Arg0 = sector tag
 			pg_properties->GetProperty("arg1")->Hide(true);
 			pg_properties->GetProperty("arg2")->Hide(true);

@@ -491,7 +491,7 @@ void MOPGThingFlagProperty::applyValue() {
 MOPGAngleProperty::MOPGAngleProperty(const wxString& label, const wxString& name)
 : wxEditEnumProperty(label, name), MOPGProperty(MOPGProperty::TYPE_ANGLE) {
 	// Set to combo box editor
-	SetEditor(wxPGEditor_ComboBox);
+	//SetEditor(wxPGEditor_ComboBox);
 
 	// Setup combo box choices
 	wxArrayString labels;
@@ -692,4 +692,56 @@ bool MOPGTextureProperty::OnEvent(wxPropertyGrid* propgrid, wxWindow* window, wx
 	}
 
 	return wxStringProperty::OnEvent(propgrid, window, e);
+}
+
+
+MOPGSPACTriggerProperty::MOPGSPACTriggerProperty(const wxString& label, const wxString& name)
+: wxEnumProperty(label, name), MOPGProperty(MOPGProperty::TYPE_SPAC) {
+	// Set to combo box editor
+	SetEditor(wxPGEditor_ComboBox);
+
+	// Setup combo box choices
+	wxArrayString labels = theGameConfiguration->allSpacTriggers();
+	SetChoices(wxPGChoices(labels));
+}
+
+void MOPGSPACTriggerProperty::openObjects(vector<MapObject*>& objects) {
+	// Set unspecified if no objects given
+	if (objects.size() == 0) {
+		SetValueToUnspecified();
+		return;
+	}
+
+	// Get property of first object
+	string first = theGameConfiguration->spacTriggerString((MapLine*)objects[0]);
+
+	// Check whether all objects share the same value
+	for (unsigned a = 1; a < objects.size(); a++) {
+		if (theGameConfiguration->spacTriggerString((MapLine*)objects[a]) != first) {
+			// Different value found, set unspecified
+			SetValueToUnspecified();
+			return;
+		}
+	}
+
+	// Set to common value
+	noupdate = true;
+	SetValue(first);
+	noupdate = false;
+}
+
+void MOPGSPACTriggerProperty::applyValue() {
+	// Do nothing if no parent (and thus no object list)
+	if (!parent || noupdate)
+		return;
+
+	// Do nothing if the value is unspecified
+	if (IsValueUnspecified())
+		return;
+
+	// Go through objects and set this value
+	vector<MapObject*>& objects = parent->getObjects();
+	for (unsigned a = 0; a < objects.size(); a++)
+		theGameConfiguration->setLineSpacTrigger(GetChoiceSelection(), (MapLine*)objects[a]);
+		//objects[a]->setIntProperty(GetName(), m_value.GetInteger());
 }

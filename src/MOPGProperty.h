@@ -30,6 +30,7 @@ public:
 		TYPE_ANGLE,
 		TYPE_COLOUR,
 		TYPE_TEXTURE,
+		TYPE_SPAC,
 	};
 
 	int		getType() { return type; }
@@ -157,6 +158,14 @@ public:
 
 	// wxPGProperty overrides
 	bool 	OnEvent(wxPropertyGrid* propgrid, wxWindow* window, wxEvent& e);
+};
+
+class MOPGSPACTriggerProperty : public MOPGProperty, public wxEnumProperty {
+public:
+	MOPGSPACTriggerProperty(const wxString& label = wxPG_LABEL, const wxString& name = wxPG_LABEL);
+
+	void	openObjects(vector<MapObject*>& objects);
+	void	applyValue();
 };
 
 

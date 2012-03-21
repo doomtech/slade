@@ -874,21 +874,77 @@ string GameConfiguration::spacTriggerString(MapLine* line) {
 	if (!line)
 		return "";
 
-	// Get raw flags
-	int flags = line->prop("flags");
-	// TODO: UDMF flags
+	// Hexen format
+	if (map_format == MAP_HEXEN) {
+		// Get raw flags
+		int flags = line->prop("flags");
 
-	// Get SPAC trigger value from flags
-	int trigger = ((flags & 0x1c00) >> 10);
+		// Get SPAC trigger value from flags
+		int trigger = ((flags & 0x1c00) >> 10);
 
-	// Find matching trigger name
-	for (unsigned a = 0; a < triggers_line.size(); a++) {
-		if (triggers_line[a].flag == trigger)
-			return triggers_line[a].name;
+		// Find matching trigger name
+		for (unsigned a = 0; a < triggers_line.size(); a++) {
+			if (triggers_line[a].flag == trigger)
+				return triggers_line[a].name;
+		}
+	}
+
+	// UDMF format
+	else if (map_format == MAP_UDMF) {
+		// Go through all line UDMF properties
+		string trigger = "";
+		vector<udmfp_t> props = allUDMFProperties(MOBJ_LINE);
+		for (unsigned a = 0; a < props.size(); a++) {
+			// Check for trigger property
+			if (props[a].property->isTrigger()) {
+				// Check if the line has this property
+				if (line->boolProperty(props[a].property->getProperty())) {
+					// Add to trigger line
+					if (!trigger.IsEmpty())
+						trigger += ", ";
+					trigger += props[a].property->getName();
+				}
+			}
+		}
+
+		// Check if there was any trigger
+		if (trigger.IsEmpty())
+			return "None";
+		else
+			return trigger;
 	}
 
 	// Unknown trigger
 	return "Unknown";
+}
+
+wxArrayString GameConfiguration::allSpacTriggers() {
+	wxArrayString ret;
+
+	for (unsigned a = 0; a < triggers_line.size(); a++)
+		ret.Add(triggers_line[a].name);
+
+	return ret;
+}
+
+void GameConfiguration::setLineSpacTrigger(unsigned index, MapLine* line) {
+	// Check index
+	if (index >= triggers_line.size())
+		return;
+
+	// Get trigger value
+	int trigger = triggers_line[index].flag;
+
+	// Get raw line flags
+	int flags = line->prop("flags");
+
+	// Apply trigger to flags
+	trigger = trigger << 10;
+	flags &= ~0x1c00;
+	flags |= trigger;
+
+	// Update line flags
+	line->setIntProperty("flags", flags);
 }
 
 UDMFProperty* GameConfiguration::getUDMFProperty(string name, int type) {

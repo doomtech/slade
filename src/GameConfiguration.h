@@ -148,18 +148,24 @@ public:
 	ThingType*		thingType(unsigned type);
 	vector<tt_t>	allThingTypes();
 
-	// Flags
+	// Thing flags
 	int		nThingFlags() { return flags_thing.size(); }
-	string	thingFlag(unsigned index);
-	bool	thingFlagSet(unsigned index, MapThing* thing);
+	string	thingFlag(unsigned flag_index);
+	bool	thingFlagSet(unsigned flag_index, MapThing* thing);
 	string	thingFlagsString(int flags);
-	void	setThingFlag(unsigned index, MapThing* thing, bool set = true);
+	void	setThingFlag(unsigned flag_index, MapThing* thing, bool set = true);
+
+	// Line flags
 	int		nLineFlags() { return flags_line.size(); }
-	string	lineFlag(unsigned index);
-	bool	lineFlagSet(unsigned index, MapLine* line);
+	string	lineFlag(unsigned flag_index);
+	bool	lineFlagSet(unsigned flag_index, MapLine* line);
 	string	lineFlagsString(MapLine* line);
-	void	setLineFlag(unsigned index, MapLine* line, bool set = true);
-	string	spacTriggerString(MapLine* line);
+	void	setLineFlag(unsigned flag_index, MapLine* line, bool set = true);
+
+	// Line action (SPAC) triggers
+	string			spacTriggerString(MapLine* line);
+	wxArrayString	allSpacTriggers();
+	void			setLineSpacTrigger(unsigned trigger_index, MapLine* line);
 
 	// UDMF properties
 	UDMFProperty*	getUDMFProperty(string name, int type);

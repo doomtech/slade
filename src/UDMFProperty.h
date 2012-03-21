@@ -27,6 +27,8 @@ public:
 	int			getType() { return type; }
 	Property	getDefaultValue() { return default_value; }
 	bool		hasDefaultValue() { return has_default; }
+	bool		isFlag() { return flag; }
+	bool		isTrigger() { return trigger; }
 
 	void	parse(ParseTreeNode* node, string group);
 
