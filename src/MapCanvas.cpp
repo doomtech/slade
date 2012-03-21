@@ -42,6 +42,7 @@
 #include "MapRenderer2D.h"
 #include "ThingTypeBrowser.h"
 #include "MapTextureBrowser.h"
+#include "MapObjectPropsPanel.h"
 
 
 /*******************************************************************
@@ -1267,6 +1268,38 @@ bool MapCanvas::handleAction(string id) {
 		return true;
 	}
 
+	// --- Context menu ---
+
+	// Edit item properties
+	else if (id == "mapw_item_properties") {
+		// Create dialog for properties panel
+		wxDialog dlg(theMapEditor, -1, "Properties", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
+		dlg.SetInitialSize(wxSize(500, 500));
+		wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+		dlg.SetSizer(sizer);
+
+		// Create properties panel
+		MapObjectPropsPanel* panel_props = new MapObjectPropsPanel(&dlg);
+		panel_props->showApplyButton(false);
+		sizer->Add(panel_props, 1, wxEXPAND|wxALL, 4);
+
+		// Add dialog buttons
+		sizer->Add(dlg.CreateButtonSizer(wxOK|wxCANCEL), 0, wxEXPAND|wxLEFT|wxRIGHT|wxBOTTOM, 4);
+
+		// Open current selection
+		vector<MapObject*> list;
+		editor->getSelectedObjects(list);
+		panel_props->openObjects(list);
+
+		// Open the dialog and apply changes if OK was clicked
+		dlg.CenterOnParent();
+		if (dlg.ShowModal() == wxID_OK) {
+			panel_props->applyChanges();
+			renderer_2d->forceUpdate(fade_lines);
+			Refresh();
+		}
+	}
+
 	// --- Thing context menu ---
 
 	// Change thing type
@@ -1412,16 +1445,18 @@ void MapCanvas::onMouseUp(wxMouseEvent& e) {
 
 		else {
 			// Context menu
-			if (editor->editMode() == MapEditor::MODE_THINGS) {
-				wxMenu menu_context;
+			wxMenu menu_context;
+
+			// Mode-specific items
+			if (editor->editMode() == MapEditor::MODE_THINGS)
 				theApp->getAction("mapw_thing_changetype")->addToMenu(&menu_context);
-				PopupMenu(&menu_context);
-			}
-			else if (editor->editMode() == MapEditor::MODE_SECTORS) {
-				wxMenu menu_context;
+			else if (editor->editMode() == MapEditor::MODE_SECTORS)
 				theApp->getAction("mapw_sector_changetexture")->addToMenu(&menu_context);
-				PopupMenu(&menu_context);
-			}
+
+			// Properties
+			theApp->getAction("mapw_item_properties")->addToMenu(&menu_context);
+
+			PopupMenu(&menu_context);
 		}
 	}
 

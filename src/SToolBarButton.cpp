@@ -170,7 +170,7 @@ void SToolBarButton::onMouseEvent(wxMouseEvent& e) {
 
 	Refresh();
 
-	e.Skip();
+	//e.Skip();
 }
 
 void SToolBarButton::onFocus(wxFocusEvent& e) {

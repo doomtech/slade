@@ -428,15 +428,13 @@ void MainWindow::openMapEditor(Archive* archive) {
 
 		if (!md.head)
 			return;
-		
+
 		// Check selected game configuration is ok
 		if (!dlg.configMatchesMap(md))
 			wxMessageBox("Selected Game Configuration does not match the map format", "Error", wxICON_ERROR);
 		else {
 			// Attempt to open map
-			if (theMapEditor->openMap(md))
-				theMapEditor->Show();
-			else {
+			if (!theMapEditor->openMap(md)) {
 				theMapEditor->Hide();
 				wxMessageBox(S_FMT("Unable to open map %s: %s", CHR(md.name), CHR(Global::error)), "Invalid map error", wxICON_ERROR);
 			}

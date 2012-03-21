@@ -142,6 +142,10 @@ MapEditorConfigDialog::MapEditorConfigDialog(wxWindow* parent, Archive* archive,
 	Layout();
 	mainsizer->Fit(this);
 	CenterOnParent();
+
+	// Select first map
+	if (show_maplist)
+		list_maps->selectItem(0);
 }
 
 MapEditorConfigDialog::~MapEditorConfigDialog() {
@@ -152,6 +156,11 @@ void MapEditorConfigDialog::populateMapList() {
 	// Do nothing if map list isn't active
 	if (!list_maps)
 		return;
+
+	// Get current selection (if any)
+	int selection = -1;
+	if (list_maps->GetSelectedItemCount() > 0)
+		selection = list_maps->selectedItems()[0];
 
 	// Clear list
 	list_maps->ClearAll();
@@ -182,12 +191,14 @@ void MapEditorConfigDialog::populateMapList() {
 			li.SetImage(1);
 		else
 			li.SetImage(0);
-			//li.SetTextColour(WXCOL(ColourConfiguration::getColour("error")));
 
 		// Add to list
 		list_maps->InsertItem(li);
 		list_maps->SetItemImage(index, 0);
 	}
+
+	// Restore selection
+	list_maps->selectItem(selection);
 }
 
 Archive::mapdesc_t MapEditorConfigDialog::selectedMap() {

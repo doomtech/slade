@@ -23,12 +23,6 @@ private:
 	wxButton*				btn_reset;
 	wxButton*				btn_apply;
 
-public:
-	MapObjectPropsPanel(wxWindow* parent);
-	~MapObjectPropsPanel();
-
-	vector<MapObject*>&	getObjects() { return objects; }
-
 	MOPGProperty*	addBoolProperty(wxPGProperty* group, string label, string propname, bool readonly = false, wxPropertyGrid* grid = NULL);
 	MOPGProperty*	addIntProperty(wxPGProperty* group, string label, string propname, bool readonly = false, wxPropertyGrid* grid = NULL);
 	MOPGProperty*	addFloatProperty(wxPGProperty* group, string label, string propname, bool readonly = false, wxPropertyGrid* grid = NULL);
@@ -36,18 +30,23 @@ public:
 	MOPGProperty*	addLineFlagProperty(wxPGProperty* group, string label, string propname, int index, bool readonly = false, wxPropertyGrid* grid = NULL);
 	MOPGProperty*	addThingFlagProperty(wxPGProperty* group, string label, string propname, int index, bool readonly = false, wxPropertyGrid* grid = NULL);
 	MOPGProperty*	addTextureProperty(wxPGProperty* group, string label, string propname, int textype, bool readonly = false, wxPropertyGrid* grid = NULL);
+	void			addUDMFProperty(UDMFProperty* prop, int objtype, string basegroup = "", wxPropertyGrid* grid = NULL);
 
-	bool	setIntProperty(wxPGProperty* prop, int value, bool force_set = false);
-	bool	setFloatProperty(wxPGProperty* prop, double value, bool force_set = false);
 	bool	setBoolProperty(wxPGProperty* prop, bool value, bool force_set = false);
-	bool	setStringProperty(wxPGProperty* prop, string value, bool force_set = false);
-
-	void	addUDMFProperty(UDMFProperty* prop, int objtype, string basegroup = "", wxPropertyGrid* grid = NULL);
 
 	void	setupType(int objtype);
 	void	setupTypeUDMF(int objtype);
+
+public:
+	MapObjectPropsPanel(wxWindow* parent);
+	~MapObjectPropsPanel();
+
+	vector<MapObject*>&	getObjects() { return objects; }
+
 	void	openObject(MapObject* object);
 	void	openObjects(vector<MapObject*>& objects);
+	void	showApplyButton(bool show = true);
+	void	applyChanges();
 
 	// Events
 	void	onBtnApply(wxCommandEvent& e);

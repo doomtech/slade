@@ -49,7 +49,7 @@
     <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(FLUIDSYNTH)\include;$(WXWIN)\lib\vc_lib\mswu;$(WXWIN)\include;$(FREEIMAGE)\Dist;$(SFML)\include;$(IncludePath)</IncludePath>
     <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(FLUIDSYNTH)\lib;$(WXWIN)\lib\vc_lib;$(FREEIMAGE)\Dist;$(SFML)\lib;$(SolutionDir)$(Configuration)\;$(LibraryPath)</LibraryPath>
     <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(WXWIN)\lib\vc_lib\mswu;$(WXWIN)\include;$(FREEIMAGE)\Dist;$(SFML)\include;$(FLUIDSYNTH)\include;$(IncludePath)</IncludePath>
-    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(WXWIN)\lib\vc_lib;$(FREEIMAGE)\Dist;$(SFML)\lib;$(FLUIDSYNTH)\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(WXWIN)\lib\vc_lib;$(FREEIMAGE)\Dist;$(SFML)\lib;$(FLUIDSYNTH)\lib;$(SolutionDir)$(Configuration)\;$(LibraryPath)</LibraryPath>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">SLADE-dbg</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -69,7 +69,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>fluidsynth.lib;winmm.lib;rpcrt4.lib;kernel32.lib;user32.lib;gdi32.lib;ole32.lib;oleaut32.lib;comctl32.lib;comdlg32.lib;uuid.lib;advapi32.lib;shell32.lib;wxbase29ud.lib;wxmsw29ud_core.lib;wxmsw29ud_gl.lib;wxmsw29ud_aui.lib;wxmsw29ud_html.lib;wxmsw29ud_adv.lib;wxmsw29ud_stc.lib;wxmsw29ud_propgrid.lib;wxmsw29ud_media.lib;wxregexud.lib;wxzlibd.lib;wxpngd.lib;wxtiffd.lib;wxjpegd.lib;wxscintillad.lib;opengl32.lib;glu32.lib;FreeImage.lib;sfml-graphics-s-d.lib;sfml-audio-s-d.lib;sfml-window-s-d.lib;sfml-system-s-d.lib;sfml-main-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fluidsynth.lib;libmodplug.lib;winmm.lib;rpcrt4.lib;kernel32.lib;user32.lib;gdi32.lib;ole32.lib;oleaut32.lib;comctl32.lib;comdlg32.lib;uuid.lib;advapi32.lib;shell32.lib;wxbase29ud.lib;wxmsw29ud_core.lib;wxmsw29ud_gl.lib;wxmsw29ud_aui.lib;wxmsw29ud_html.lib;wxmsw29ud_adv.lib;wxmsw29ud_stc.lib;wxmsw29ud_propgrid.lib;wxmsw29ud_media.lib;wxregexud.lib;wxzlibd.lib;wxpngd.lib;wxtiffd.lib;wxjpegd.lib;wxscintillad.lib;opengl32.lib;glu32.lib;FreeImage.lib;sfml-graphics-s-d.lib;sfml-audio-s-d.lib;sfml-window-s-d.lib;sfml-system-s-d.lib;sfml-main-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName)-dbg.exe</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>

@@ -185,46 +185,6 @@ MOPGProperty* MapObjectPropsPanel::addTextureProperty(wxPGProperty* group, strin
 	return prop;
 }
 
-bool MapObjectPropsPanel::setIntProperty(wxPGProperty* prop, int value, bool force_set) {
-	// Set if forcing
-	if (prop && force_set) {
-		prop->SetValue(value);
-		return false;
-	}
-
-	// Ignore if already unspecified
-	if (!prop || prop->IsValueUnspecified())
-		return true;
-
-	// Set to unspecified if values mismatch
-	if (prop->GetValue().GetInteger() != value) {
-		prop->SetValueToUnspecified();
-		return true;
-	}
-
-	return false;
-}
-
-bool MapObjectPropsPanel::setFloatProperty(wxPGProperty* prop, double value, bool force_set) {
-	// Set if forcing
-	if (prop && force_set) {
-		prop->SetValue(value);
-		return false;
-	}
-
-	// Ignore if already unspecified
-	if (!prop || prop->IsValueUnspecified())
-		return true;
-
-	// Set to unspecified if values mismatch
-	if (prop->GetValue().GetDouble() != value) {
-		prop->SetValueToUnspecified();
-		return true;
-	}
-
-	return false;
-}
-
 bool MapObjectPropsPanel::setBoolProperty(wxPGProperty* prop, bool value, bool force_set) {
 	// Set if forcing
 	if (prop && force_set) {
@@ -238,26 +198,6 @@ bool MapObjectPropsPanel::setBoolProperty(wxPGProperty* prop, bool value, bool f
 
 	// Set to unspecified if values mismatch
 	if (prop->GetValue().GetBool() != value) {
-		prop->SetValueToUnspecified();
-		return true;
-	}
-
-	return false;
-}
-
-bool MapObjectPropsPanel::setStringProperty(wxPGProperty* prop, string value, bool force_set) {
-	// Set if forcing
-	if (prop && force_set) {
-		prop->SetValue(value);
-		return false;
-	}
-
-	// Ignore if already unspecified
-	if (!prop || prop->IsValueUnspecified())
-		return true;
-
-	// Set to unspecified if values mismatch
-	if (prop->GetValue().GetString() != value) {
 		prop->SetValueToUnspecified();
 		return true;
 	}
@@ -747,11 +687,20 @@ void MapObjectPropsPanel::openObjects(vector<MapObject*>& objects) {
 	pg_props_side2->Refresh();
 }
 
+void MapObjectPropsPanel::showApplyButton(bool show) {
+	btn_apply->Show(show);
+}
 
-void MapObjectPropsPanel::onBtnApply(wxCommandEvent& e) {
+void MapObjectPropsPanel::applyChanges() {
 	// Go through all current properties and apply the current value
 	for (unsigned a = 0; a < properties.size(); a++)
 		properties[a]->applyValue();
+}
+
+
+void MapObjectPropsPanel::onBtnApply(wxCommandEvent& e) {
+	// Apply changes
+	applyChanges();
 
 	// Refresh map view
 	theMapEditor->forceRefresh();
