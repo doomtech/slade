@@ -983,8 +983,12 @@ bool ArchivePanel::exportEntry() {
 
 	// If we're just exporting 1 entry
 	if (selection.size() == 1) {
-		// Setup filename
-		wxFileName fn(selection[0]->getName());
+		// Setup filename and perform in-place renaming of backslash to caret.
+		// This should only happen for certain rare sprite frames, so only the 
+		// fifth character really needs to be checked.
+		string name = selection[0]->getName();
+		if (name[4] == '\\') name[4] = '^';
+		wxFileName fn(name);
 
 		// Add appropriate extension if needed
 		if (fn.GetExt().Len() == 0) fn.SetExt(selection[0]->getType()->getExtension());
@@ -1219,8 +1223,12 @@ bool ArchivePanel::gfxExportPNG() {
 
 	// If we're just exporting 1 entry
 	if (selection.size() == 1) {
-		// Setup filename
-		wxFileName fn(selection[0]->getName());
+		// Setup filename and perform in-place renaming of backslash to caret.
+		// This should only happen for certain rare sprite frames, so only the 
+		// fifth character really needs to be checked.
+		string name = selection[0]->getName();
+		if (name[4] == '\\') name[4] = '^';
+		wxFileName fn(name);
 
 		// Set extension
 		fn.SetExt("png");
