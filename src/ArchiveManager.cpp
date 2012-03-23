@@ -34,6 +34,7 @@
 #include "Console.h"
 #include "SplashWindow.h"
 #include "ResourceManager.h"
+#include "GameConfiguration.h"
 #include <wx/filename.h>
 
 
@@ -127,6 +128,14 @@ bool ArchiveManager::addArchive(Archive* archive) {
 
 		// Listen to the archive
 		listenTo(archive);
+
+		// Load embedded game configurations
+		Archive::search_options_t search;
+		search.match_name = "sladecfg";
+		ArchiveEntry* cfgentry = archive->findLast(search);
+		if (cfgentry) {
+			theGameConfiguration->openEmbeddedConfig(cfgentry);
+		}
 
 		// Announce the addition
 		announce("archive_added");
@@ -414,6 +423,9 @@ bool ArchiveManager::closeArchive(int index) {
 
 	// Remove from resource manager
 	theResourceManager->removeArchive(open_archives[index].archive);
+
+	// Delete any embedded configuration
+	theGameConfiguration->removeEmbeddedConfig(open_archives[index].archive->getFilename());
 
 	// Close any open child archives
 	for (size_t a = 0; a < open_archives[index].open_children.size(); a++) {

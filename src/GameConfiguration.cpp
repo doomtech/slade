@@ -141,6 +141,7 @@ void GameConfiguration::init() {
 
 	// Sort game configurations list by title
 	std::sort(game_configs.begin(), game_configs.end());
+	lastDefaultConfig = game_configs.size();
 }
 
 string GameConfiguration::configTitle(unsigned index) {
@@ -195,8 +196,9 @@ void GameConfiguration::buildConfig(string filename, string& out) {
 
 /* GameConfiguration::buildConfig
  * Reads the text entry [entry], processing any #include statements
- * in the entry text recursively. The resulting 'expanded' text
- * is written to [out]
+ * in the entry text recursively. This will search in the resource
+ * folder and archive as well as in the parent archive. The resulting 
+ * 'expanded' text is written to [out]
  *******************************************************************/
 void GameConfiguration::buildConfig(ArchiveEntry* entry, string& out) {
 	// Check entry was given
@@ -221,13 +223,29 @@ void GameConfiguration::buildConfig(ArchiveEntry* entry, string& out) {
 			Tokenizer tz;
 			tz.openString(line);
 			tz.getToken();	// Skip #include
-			string name = entry->getPath() + tz.getToken();
+			string inc_name = tz.getToken();
+			string name = entry->getPath() + inc_name;
 
 			// Get the entry
+			bool done = false;
 			ArchiveEntry* entry_inc = entry->getParent()->entryAtPath(name);
-			if (entry_inc)
+			if (entry_inc) {
 				buildConfig(entry_inc, out);
-			else
+				done = true;
+			}
+
+			// Look in resource pack
+			if (!done && theArchiveManager->programResourceArchive()) {
+				name = "config/games/" + inc_name;
+				entry_inc = theArchiveManager->programResourceArchive()->entryAtPath(name);
+				if (entry_inc) {
+					buildConfig(entry_inc, out);
+					done = true;
+				}
+			}
+
+			// Okay, we've exhausted all possibilities
+			if (!done)
 				wxLogMessage("Error: Attempting to #include nonexistant entry \"%s\"", CHR(name));
 		}
 		else
@@ -397,9 +415,9 @@ void GameConfiguration::readUDMFProperties(ParseTreeNode* block, UDMFPropMap& pl
 
 bool GameConfiguration::readConfiguration(string& cfg, string source) {
 	// Testing
-	MemChunk mc;
+	/*MemChunk mc;
 	mc.write(CHR(cfg), cfg.Length());
-	mc.exportFile("gctest.txt");
+	mc.exportFile("gctest.txt");*/
 
 	// Clear current configuration
 	setDefaults();
@@ -663,6 +681,44 @@ bool GameConfiguration::open(ArchiveEntry* entry) {
 	return readConfiguration(cfg, entry->getName());
 }
 
+bool GameConfiguration::openEmbeddedConfig(ArchiveEntry* entry) {
+	// Check entry was given
+	if (!entry)
+		return false;
+
+	// Build configuration string from entry (process #includes, etc)
+	string cfg;
+	buildConfig(entry, cfg);
+
+	if (readConfiguration(cfg, entry->getName())) {
+		string name = readConfigName(entry->getMCData());
+
+		// Add to list if valid
+		if (!name.IsEmpty()) {
+			gconf_t gc;
+			gc.filename = entry->getParent()->getFilename();
+			gc.title = name;
+			game_configs.push_back(gc);
+		}
+
+		return true;
+	}
+	return false;
+}
+
+bool GameConfiguration::removeEmbeddedConfig(string name) {
+	if (game_configs.size() > lastDefaultConfig) {
+		vector<gconf_t>::iterator it, stop = game_configs.begin() + lastDefaultConfig;
+		for (it = game_configs.end() - 1; it >= stop; --it) {
+			if (!name.Cmp(it->filename)) {
+				game_configs.erase(it);
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
 bool GameConfiguration::openConfig(string name) {
 	// Check for file in user config directory
 	string fn = appPath("games/", DIR_USER) + name + ".cfg";
@@ -675,11 +731,23 @@ bool GameConfiguration::openConfig(string name) {
 			return false;
 	}
 
-	// No user config exists, check slade.pk3
-	string epath = S_FMT("config/games/%s.cfg", CHR(name));
+	// No user config exists, check embedded archives
+	ArchiveEntry* entry = NULL;
+	Archive* archive = theArchiveManager->getArchive(name);
+	if (archive) {
+		Archive::search_options_t search;
+		search.match_name = "sladecfg";
+		entry = archive->findLast(search);
+	}
 
-	Archive* slade_pk3 = theArchiveManager->programResourceArchive();
-	ArchiveEntry* entry = slade_pk3->entryAtPath(epath);
+	// Still not found, check slade.pk3
+	if (!entry) {
+		string epath = S_FMT("config/games/%s.cfg", CHR(name));
+
+		archive = theArchiveManager->programResourceArchive();
+		entry = archive->entryAtPath(epath);
+	}
+
 	if (open(entry)) {
 		game_configuration = name;
 		return true;

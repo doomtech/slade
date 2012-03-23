@@ -12,6 +12,12 @@ entry_types
 		detectable = 0;
 		category = "Text";
 	}
+	
+	sladecfg : text
+	{
+		name = "SLADE Configuration";
+		match_name = "sladecfg";
+	}
 
 	xnmsg : text
 	{

@@ -67,6 +67,7 @@ private:
 		bool operator<(const gconf_t& right) const { return title < right.title; }
 	};
 	vector<gconf_t>	game_configs;
+	size_t lastDefaultConfig;
 
 	// Flags
 	struct flag_t {
@@ -138,6 +139,8 @@ public:
 	bool 	open(string filename);
 	bool	open(ArchiveEntry* entry);
 	bool	openConfig(string name);
+	bool	openEmbeddedConfig(ArchiveEntry* entry);
+	bool	removeEmbeddedConfig(string name);
 
 	// Action specials
 	ActionSpecial*	actionSpecial(unsigned id);
