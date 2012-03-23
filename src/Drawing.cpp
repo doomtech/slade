@@ -274,6 +274,42 @@ void Drawing::drawFilledRect(double x1, double y1, double x2, double y2) {
 	glEnd();
 }
 
+/* Drawing::fitTextureWithin
+ * Fits [tex] within the rectangle from [x1,y1] to [x2,y2], centered
+ * and keeping the correct aspect ratio. If [upscale] is true the
+ * texture will be zoomed to fit the rectangle. Returns the resulting
+ * texture rectangle coordinates
+ *******************************************************************/
+frect_t Drawing::fitTextureWithin(GLTexture* tex, double x1, double y1, double x2, double y2, double padding, bool upscale) {
+	// Ignore null texture
+	if (!tex)
+		return frect_t();
+
+	double width = x2 - x1;
+	double height = y2 - y1;
+
+	// Get image dimensions
+	double x_dim = (double)tex->getWidth();
+	double y_dim = (double)tex->getHeight();
+
+	// Get max scale for x and y (including padding)
+	double x_scale = ((double)width - padding) / x_dim;
+	double y_scale = ((double)width - padding) / y_dim;
+
+	// Set scale to smallest of the 2 (so that none of the texture will be clipped)
+	double scale = MIN(x_scale, y_scale);
+
+	// If we don't want to magnify the image, clamp scale to a max of 1.0
+	if (!upscale && scale > 1)
+		scale = 1;
+
+	// Return the fitted rectangle
+	return frect_t(x1 + width*0.5 - (scale*tex->getWidth()*0.5),
+					y1 + height*0.5 - (scale*tex->getHeight()*0.5),
+					x1 + width*0.5 + (scale*tex->getWidth()*0.5),
+					y1 + height*0.5 + (scale*tex->getHeight()*0.5));
+}
+
 /* Drawing::drawTextureWithin
  * Draws [tex] within the rectangle from [x1,y1] to [x2,y2], centered
  * and keeping the correct aspect ratio. If [upscale] is true the

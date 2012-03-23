@@ -16,9 +16,24 @@ SectorTextureOverlay::SectorTextureOverlay() {
 	middley = 0;
 	tex_size = 0;
 	border = 0;
+	anim_floor = 0;
+	anim_ceil = 0;
 }
 
 SectorTextureOverlay::~SectorTextureOverlay() {
+}
+
+void SectorTextureOverlay::update(long frametime) {
+	// Get frame time multiplier
+	float mult = (float)frametime / 10.0f;
+
+	// Update animations
+	anim_floor += 0.1f*mult;
+	if (anim_floor > tex_floor.size())
+		anim_floor = 0.0f;
+	anim_ceil += 0.1f*mult;
+	if (anim_ceil > tex_ceil.size())
+		anim_ceil = 0.0f;
 }
 
 void SectorTextureOverlay::draw(int width, int height, float fade) {
@@ -30,6 +45,12 @@ void SectorTextureOverlay::draw(int width, int height, float fade) {
 
 	col_bg.set_gl();
 	Drawing::drawFilledRect(0, 0, width, height);
+
+	// Check if any sectors are open
+	if (sectors.size() == 0) {
+		Drawing::drawText("No sectors are open. Just press escape and pretend this never happened.", width*0.5, height*0.5, COL_WHITE, 0, Drawing::ALIGN_CENTER);
+		return;
+	}
 
 	// Calculate layout related stuff
 	middlex = width * 0.5;
@@ -43,73 +64,105 @@ void SectorTextureOverlay::draw(int width, int height, float fade) {
 	int cur_size = tex_size;
 	if (active) cur_size *= fade;
 
-	// Get textures
-	string tex_floor = this->tex_floor;
-	string tex_ceiling = this->tex_ceil;
-	if (sectors.size() > 0) {
-		if (tex_floor.IsEmpty()) tex_floor = sectors[0]->stringProperty("texturefloor");
-		if (tex_ceil.IsEmpty()) tex_ceiling = sectors[0]->stringProperty("textureceiling");
+	// Determine texture name strings
+	string ftex = tex_floor[0];
+	string ctex = tex_ceil[0];
+	string ftex2, ctex2;
+	if (tex_floor.size() > 1) {
+		ftex = S_FMT("Multiple (%d)", tex_floor.size());
+		ftex2 = tex_floor[1];
+	}
+	if (tex_ceil.size() > 1) {
+		ctex = S_FMT("Multiple (%d)", tex_ceil.size());
+		ctex2 = tex_ceil[1];
 	}
 
 	// Floor texture
 	drawTexture(fade, middlex - border - tex_size*0.5 - cur_size*0.5, middley - cur_size*0.5, cur_size, tex_floor, hover_floor);
 	Drawing::drawText("Floor:", middlex - border - tex_size*0.5, middley - tex_size*0.5 - 16, col_fg, Drawing::FONT_BOLD, Drawing::ALIGN_CENTER);
-	Drawing::drawText(tex_floor, middlex - border - tex_size*0.5, middley + tex_size*0.5, col_fg, Drawing::FONT_BOLD, Drawing::ALIGN_CENTER);
+	Drawing::drawText(ftex, middlex - border - tex_size*0.5, middley + tex_size*0.5, col_fg, Drawing::FONT_BOLD, Drawing::ALIGN_CENTER);
 
 	// Ceiling texture
-	drawTexture(fade, middlex + border + tex_size*0.5 - cur_size*0.5, middley - cur_size*0.5, cur_size, tex_ceiling, hover_ceil);
+	drawTexture(fade, middlex + border + tex_size*0.5 - cur_size*0.5, middley - cur_size*0.5, cur_size, tex_ceil, hover_ceil);
 	Drawing::drawText("Ceiling:", middlex + border + tex_size*0.5, middley - tex_size*0.5 - 16, col_fg, Drawing::FONT_BOLD, Drawing::ALIGN_CENTER);
-	Drawing::drawText(tex_ceiling, middlex + border + tex_size*0.5, middley + tex_size*0.5, col_fg, Drawing::FONT_BOLD, Drawing::ALIGN_CENTER);
+	Drawing::drawText(ctex, middlex + border + tex_size*0.5, middley + tex_size*0.5, col_fg, Drawing::FONT_BOLD, Drawing::ALIGN_CENTER);
 }
 
-void SectorTextureOverlay::drawTexture(float alpha, int x, int y, int size, string texture, bool hover) {
+void SectorTextureOverlay::drawTexture(float alpha, int x, int y, int size, vector<string>& textures, bool hover) {
 	// Get colours
 	rgba_t col_bg = ColourConfiguration::getColour("map_overlay_background");
 	rgba_t col_fg = ColourConfiguration::getColour("map_overlay_foreground");
 	rgba_t col_sel = ColourConfiguration::getColour("map_hilight");
 	col_fg.a = col_fg.a*alpha;
 
-	// Check texture isn't blank
-	if (!(S_CMPNOCASE(texture, "-"))) {
-		// Draw background
-		glEnable(GL_TEXTURE_2D);
-		rgba_t(255, 255, 255, 255*alpha, 0).set_gl();
-		glPushMatrix();
-		glTranslated(x, y, 0);
-		GLTexture::bgTex().draw2dTiled(size, size);
-		glPopMatrix();
+	// Draw background
+	glEnable(GL_TEXTURE_2D);
+	rgba_t(255, 255, 255, 255*alpha, 0).set_gl();
+	glPushMatrix();
+	glTranslated(x, y, 0);
+	GLTexture::bgTex().draw2dTiled(size, size);
+	glPopMatrix();
 
-		// Get texture
-		GLTexture* tex = theMapEditor->textureManager().getFlat(texture);
+	// Draw first texture
+	rgba_t(255, 255, 255, 255*alpha, 0).set_gl();
+	Drawing::drawTextureWithin(theMapEditor->textureManager().getFlat(textures[0]), x, y, x + size, y + size, 0, true);
 
-		// Draw texture
-		if (tex) {
-			rgba_t(255, 255, 255, 255*alpha, 0).set_gl();
-			Drawing::drawTextureWithin(tex, x, y, x + size, y + size, 0, true);
-		}
+	// Draw up to 4 subsequent textures (overlaid)
+	rgba_t(255, 255, 255, 127*alpha, 0).set_gl();
+	for (unsigned a = 1; a < textures.size() && a < 5; a++)
+		Drawing::drawTextureWithin(theMapEditor->textureManager().getFlat(textures[a]), x, y, x + size, y + size, 0, true);
 
-		glDisable(GL_TEXTURE_2D);
+	glDisable(GL_TEXTURE_2D);
 
-		// Draw outline
-		if (hover) {
-			rgba_t(col_sel.r, col_sel.g, col_sel.b, 255*alpha, 0).set_gl();
-			glLineWidth(3.0f);
-		}
-		else {
-			rgba_t(col_fg.r, col_fg.g, col_fg.b, 255*alpha, 0).set_gl();
-			glLineWidth(1.5f);
-		}
-		Drawing::drawRect(x, y, x+size, y+size);
+	// Draw outline
+	if (hover) {
+		rgba_t(col_sel.r, col_sel.g, col_sel.b, 255*alpha, 0).set_gl();
+		glLineWidth(3.0f);
 	}
+	else {
+		rgba_t(col_fg.r, col_fg.g, col_fg.b, 255*alpha, 0).set_gl();
+		glLineWidth(1.5f);
+	}
+	Drawing::drawRect(x, y, x+size, y+size);
 }
 
 void SectorTextureOverlay::openSectors(vector<MapSector*>& list) {
 	// Clear current sectors list (if any)
 	sectors.clear();
+	tex_ceil.clear();
+	tex_floor.clear();
 
 	// Add list to sectors
-	for (unsigned a = 0; a < list.size(); a++)
+	for (unsigned a = 0; a < list.size(); a++) {
+		// Add sector
 		sectors.push_back(list[a]);
+
+		// Get textures
+		string ftex = list[a]->stringProperty("texturefloor");
+		string ctex = list[a]->stringProperty("textureceiling");
+
+		// Add floor texture if different
+		bool exists = false;
+		for (unsigned a = 0; a < tex_floor.size(); a++) {
+			if (tex_floor[a] == ftex) {
+				exists = true;
+				break;
+			}
+		}
+		if (!exists)
+			tex_floor.push_back(ftex);
+
+		// Add ceiling texture if different
+		exists = false;
+		for (unsigned a = 0; a < tex_ceil.size(); a++) {
+			if (tex_ceil[a] == ctex) {
+				exists = true;
+				break;
+			}
+		}
+		if (!exists)
+			tex_ceil.push_back(ctex);
+	}
 }
 
 void SectorTextureOverlay::close(bool cancel) {
@@ -119,10 +172,10 @@ void SectorTextureOverlay::close(bool cancel) {
 	// Set textures if not cancelled
 	if (!cancel) {
 		for (unsigned a = 0; a < sectors.size(); a++) {
-			if (!tex_floor.IsEmpty())
-				sectors[a]->setStringProperty("texturefloor", tex_floor);
-			if (!tex_ceil.IsEmpty())
-				sectors[a]->setStringProperty("textureceiling", tex_ceil);
+			if (tex_floor.size() == 1)
+				sectors[a]->setStringProperty("texturefloor", tex_floor[0]);
+			if (tex_ceil.size() == 1)
+				sectors[a]->setStringProperty("textureceiling", tex_ceil[0]);
 		}
 	}
 }
@@ -153,36 +206,59 @@ void SectorTextureOverlay::mouseLeftClick() {
 		return;
 
 	// Left clicked on floor texture
-	if (hover_floor) {
-		// Get initial texture
-		string texture = tex_floor;
-		if (tex_floor.IsEmpty())
-			texture = sectors[0]->stringProperty("texturefloor");
-
-		// Open texture browser
-		MapTextureBrowser browser(theMapEditor, 1, texture);
-		if (browser.ShowModal() == wxID_OK) {
-			// Set texture
-			tex_floor = browser.getSelectedItem()->getName();
-		}
-	}
+	if (hover_floor)
+		browseFloorTexture();
 
 	// Left clicked on ceiling texture
-	else if (hover_ceil) {
-		// Get initial texture
-		string texture = tex_ceil;
-		if (tex_ceil.IsEmpty())
-			texture = sectors[0]->stringProperty("textureceiling");
-
-		// Open texture browser
-		MapTextureBrowser browser(theMapEditor, 1, texture);
-		if (browser.ShowModal() == wxID_OK) {
-			// Set texture
-			tex_ceil = browser.getSelectedItem()->getName();
-		}
-	}
+	else if (hover_ceil)
+		browseCeilingTexture();
 }
 
 void SectorTextureOverlay::mouseRightClick() {
+}
 
+void SectorTextureOverlay::keyDown(string key) {
+	// Browse floor texture
+	if (key == "F" || key == "f")
+		browseFloorTexture();
+	
+	// Browse ceiling texture
+	if (key == "C" || key == "c")
+		browseCeilingTexture();
+}
+
+void SectorTextureOverlay::browseFloorTexture() {
+	// Get initial texture
+	string texture;
+	if (tex_floor.size() == 0)
+		texture = sectors[0]->stringProperty("texturefloor");
+	else
+		texture = tex_floor[0];
+
+	// Open texture browser
+	MapTextureBrowser browser(theMapEditor, 1, texture);
+	if (browser.ShowModal() == wxID_OK) {
+		// Set texture
+		tex_floor.clear();
+		tex_floor.push_back(browser.getSelectedItem()->getName());
+		close(false);
+	}
+}
+
+void SectorTextureOverlay::browseCeilingTexture() {
+	// Get initial texture
+	string texture;
+	if (tex_ceil.size() == 0)
+		texture = sectors[0]->stringProperty("textureceiling");
+	else
+		texture = tex_ceil[0];
+
+	// Open texture browser
+	MapTextureBrowser browser(theMapEditor, 1, texture);
+	if (browser.ShowModal() == wxID_OK) {
+		// Set texture
+		tex_ceil.clear();
+		tex_ceil.push_back(browser.getSelectedItem()->getName());
+		close(false);
+	}
 }

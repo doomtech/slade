@@ -36,7 +36,8 @@ namespace Drawing {
 	void drawFilledRect(double x1, double y1, double x2, double y2);
 
 	// Texture drawing
-	void drawTextureWithin(GLTexture* tex, double x1, double y1, double x2, double y2, double padding, bool upscale = false);
+	frect_t	fitTextureWithin(GLTexture* tex, double x1, double y1, double x2, double y2, double padding, bool upscale = false);
+	void	drawTextureWithin(GLTexture* tex, double x1, double y1, double x2, double y2, double padding, bool upscale = false);
 
 	// Text drawing
 	void drawText(string text, int x = 0, int y = 0, rgba_t colour = COL_WHITE, int font = FONT_NORMAL, int alignment = ALIGN_LEFT, frect_t* bounds = NULL);

@@ -106,9 +106,6 @@
     <Filter Include="Resources\Graphics\Image\Formats">
       <UniqueIdentifier>{544047dd-0bbf-43a3-b6ec-6f90661fad4c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Map Editor\UI Elements\InfoOverlay">
-      <UniqueIdentifier>{373e0e80-3aef-4e5a-b892-d9bf8b525878}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Map Editor\GameConfiguration">
       <UniqueIdentifier>{d3422c45-1960-43b3-b586-6baffde25566}</UniqueIdentifier>
     </Filter>
@@ -144,6 +141,9 @@
     </Filter>
     <Filter Include="External\sfMod">
       <UniqueIdentifier>{5ecd0756-5410-456d-b7d8-69e3ab5098bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Map Editor\UI Elements\Overlays">
+      <UniqueIdentifier>{373e0e80-3aef-4e5a-b892-d9bf8b525878}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -718,13 +718,13 @@
       <Filter>Map Editor\UI Elements</Filter>
     </ClCompile>
     <ClCompile Include="src\VertexInfoOverlay.cpp">
-      <Filter>Map Editor\UI Elements\InfoOverlay</Filter>
+      <Filter>Map Editor\UI Elements\Overlays</Filter>
     </ClCompile>
     <ClCompile Include="src\LineInfoOverlay.cpp">
-      <Filter>Map Editor\UI Elements\InfoOverlay</Filter>
+      <Filter>Map Editor\UI Elements\Overlays</Filter>
     </ClCompile>
     <ClCompile Include="src\SectorInfoOverlay.cpp">
-      <Filter>Map Editor\UI Elements\InfoOverlay</Filter>
+      <Filter>Map Editor\UI Elements\Overlays</Filter>
     </ClCompile>
     <ClCompile Include="src\MapTextureManager.cpp">
       <Filter>Map Editor</Filter>
@@ -745,7 +745,7 @@
       <Filter>Map Editor\GameConfiguration</Filter>
     </ClCompile>
     <ClCompile Include="src\ThingInfoOverlay.cpp">
-      <Filter>Map Editor\UI Elements\InfoOverlay</Filter>
+      <Filter>Map Editor\UI Elements\Overlays</Filter>
     </ClCompile>
     <ClCompile Include="src\glew\glew.c">
       <Filter>External\GLEW</Filter>
@@ -809,6 +809,9 @@
     </ClCompile>
     <ClCompile Include="src\sfMod\sfMod.cpp">
       <Filter>External\sfMod</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SectorTextureOverlay.cpp">
+      <Filter>Map Editor\UI Elements\Overlays</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1408,13 +1411,13 @@
       <Filter>Map Editor\UI Elements</Filter>
     </ClInclude>
     <ClInclude Include="src\VertexInfoOverlay.h">
-      <Filter>Map Editor\UI Elements\InfoOverlay</Filter>
+      <Filter>Map Editor\UI Elements\Overlays</Filter>
     </ClInclude>
     <ClInclude Include="src\LineInfoOverlay.h">
-      <Filter>Map Editor\UI Elements\InfoOverlay</Filter>
+      <Filter>Map Editor\UI Elements\Overlays</Filter>
     </ClInclude>
     <ClInclude Include="src\SectorInfoOverlay.h">
-      <Filter>Map Editor\UI Elements\InfoOverlay</Filter>
+      <Filter>Map Editor\UI Elements\Overlays</Filter>
     </ClInclude>
     <ClInclude Include="src\MapTextureManager.h">
       <Filter>Map Editor</Filter>
@@ -1438,7 +1441,7 @@
       <Filter>Map Editor\GameConfiguration</Filter>
     </ClInclude>
     <ClInclude Include="src\ThingInfoOverlay.h">
-      <Filter>Map Editor\UI Elements\InfoOverlay</Filter>
+      <Filter>Map Editor\UI Elements\Overlays</Filter>
     </ClInclude>
     <ClInclude Include="src\glew\glew.h">
       <Filter>External\GLEW</Filter>
@@ -1511,6 +1514,12 @@
     </ClInclude>
     <ClInclude Include="src\sfMod\modplug.h">
       <Filter>External\sfMod</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MCOverlay.h">
+      <Filter>Map Editor\UI Elements\Overlays</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SectorTextureOverlay.h">
+      <Filter>Map Editor\UI Elements\Overlays</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

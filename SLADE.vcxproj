@@ -235,6 +235,7 @@
     <ClCompile Include="src\RffArchive.cpp" />
     <ClCompile Include="src\SAction.cpp" />
     <ClCompile Include="src\SectorInfoOverlay.cpp" />
+    <ClCompile Include="src\SectorTextureOverlay.cpp" />
     <ClCompile Include="src\SFileDialog.cpp" />
     <ClCompile Include="src\sfMod\sfMod.cpp" />
     <ClCompile Include="src\SFont.cpp" />
@@ -431,6 +432,7 @@
     <ClInclude Include="src\MapTextureManager.h" />
     <ClInclude Include="src\MathStuff.h" />
     <ClInclude Include="src\MCAnimations.h" />
+    <ClInclude Include="src\MCOverlay.h" />
     <ClInclude Include="src\MIDIPlayer.h" />
     <ClInclude Include="src\MiscFormats.h" />
     <ClInclude Include="src\ModelFormats.h" />
@@ -458,6 +460,7 @@
     <ClInclude Include="src\RffArchive.h" />
     <ClInclude Include="src\SAction.h" />
     <ClInclude Include="src\SectorInfoOverlay.h" />
+    <ClInclude Include="src\SectorTextureOverlay.h" />
     <ClInclude Include="src\SFileDialog.h" />
     <ClInclude Include="src\sfMod\modplug.h" />
     <ClInclude Include="src\sfMod\sfMod.h" />

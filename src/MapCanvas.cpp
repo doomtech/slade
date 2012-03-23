@@ -943,6 +943,10 @@ void MapCanvas::update(long frametime) {
 			anim_running = true;
 	}
 
+	// Update overlay animation (if active)
+	if (overlayActive())
+		overlay_current->update(frametime);
+
 	// Determine the framerate limit
 #ifdef USE_SFML_RENDERWINDOW
 	// SFML RenderWindow can handle high framerates better than wxGLCanvas, or something like that
@@ -1411,6 +1415,10 @@ void MapCanvas::onSize(wxSizeEvent& e) {
 void MapCanvas::onKeyDown(wxKeyEvent& e) {
 	// Let keybind system handle it
 	KeyBind::keyPressed(KeyBind::asKeyPress(e.GetKeyCode(), e.GetModifiers()));
+
+	// Send to overlay if active
+	if (overlayActive())
+		overlay_current->keyDown(KeyBind::keyName(e.GetKeyCode()));
 
 	// Testing
 	if (e.GetKeyCode() == WXK_F6) {
