@@ -523,19 +523,22 @@ void MapCanvas::draw() {
 
 
 	// Draw flats if needed
+	COL_WHITE.set_gl();
 	if (flat_drawtype > 0) {
-		COL_WHITE.set_gl();
+		bool texture = false;
+		if (flat_drawtype > 1)
+			texture = true;
 
 		// Adjust flat type depending on sector mode
-		int drawtype = flat_drawtype-1;
-		if (drawtype > 0 && editor->editMode() == MapEditor::MODE_SECTORS) {
+		int drawtype = 0;
+		if (editor->editMode() == MapEditor::MODE_SECTORS) {
 			if (editor->sectorEditMode() == MapEditor::SECTOR_FLOOR)
 				drawtype = 1;
 			else if (editor->sectorEditMode() == MapEditor::SECTOR_CEILING)
 				drawtype = 2;
 		}
 
-		renderer_2d->renderFlats(drawtype, fade_flats);
+		renderer_2d->renderFlats(drawtype, texture, fade_flats);
 	}
 
 	// Draw grid
@@ -1260,15 +1263,15 @@ void MapCanvas::onKeyBindPress(string name) {
 	// Cycle flat type
 	else if (name == "me2d_flat_type") {
 		flat_drawtype = flat_drawtype + 1;
-		if (flat_drawtype > 3)
+		if (flat_drawtype > 2)
 			flat_drawtype = 0;
 
 		// Editor message
 		switch (flat_drawtype) {
 		case 0: editor->addEditorMessage("Flats: None"); break;
 		case 1: editor->addEditorMessage("Flats: Light Level"); break;
-		case 2: editor->addEditorMessage("Flats: Floor Texture"); break;
-		case 3: editor->addEditorMessage("Flats: Ceiling Texture"); break;
+		case 2: editor->addEditorMessage("Flats: Textured"); break;
+		//case 3: editor->addEditorMessage("Flats: Ceiling Texture"); break;
 		default: break;
 		};
 	}

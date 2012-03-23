@@ -36,6 +36,7 @@
 #include "MainApp.h"
 #include "Archive.h"
 #include "WadArchive.h"
+#include <wx/colour.h>
 
 SLADEMap::SLADEMap() {
 	// Init variables
@@ -1650,6 +1651,45 @@ void SLADEMap::getLinesById(int id, vector<MapLine*>& list) {
 	for (unsigned a = 0; a < lines.size(); a++) {
 		if (lines[a]->prop("id").getIntValue() == id)
 			list.push_back(lines[a]);
+	}
+}
+
+rgba_t SLADEMap::getSectorColour(MapSector* sector, int where) {
+	// Check for UDMF+ZDoom namespace
+	if (theGameConfiguration->getMapFormat() == MAP_UDMF && S_CMPNOCASE(theGameConfiguration->udmfNamespace(), "zdoom")) {
+		// Get sector light colour
+		int intcol = sector->intProperty("lightcolor");
+		wxColour wxcol(intcol);
+
+		// Get sector light level
+		int light = sector->intProperty("lightlevel");
+
+		// Get specific light level
+		if (where == 1) {
+			// Floor
+			int fl = sector->intProperty("lightfloor");
+			if (sector->boolProperty("lightfloorabsolute"))
+				light = fl;
+			else
+				light += fl;
+		}
+		else if (where == 2) {
+			// Ceiling
+			int cl = sector->intProperty("lightceiling");
+			if (sector->boolProperty("lightceilingabsolute"))
+				light = cl;
+			else
+				light += cl;
+		}
+
+		// Calculate and return the colour
+		float lightmult = (float)light / 255.0f;
+		return rgba_t(wxcol.Blue() * lightmult, wxcol.Green() * lightmult, wxcol.Red() * lightmult, 255);
+	}
+	else {
+		// Other format, simply return the light level
+		int light = sector->intProperty("lightlevel");
+		return rgba_t(light, light, light, 255);
 	}
 }
 

@@ -118,6 +118,7 @@ public:
 	bool	anyMapName() { return any_map_name; }
 	bool	mixTexFlats() { return mix_tex_flats; }
 	bool	txTextures() { return tx_textures; }
+	string	udmfNamespace() { return udmf_namespace; }
 
 	string			readConfigName(MemChunk& mc);
 	void			init();

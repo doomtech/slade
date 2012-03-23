@@ -91,9 +91,9 @@ public:
 	void	renderTaggedThings(vector<MapThing*>& things, float fade);
 
 	// Flats (sectors)
-	void	renderFlats(int type = 0, float alpha = 1.0f);
-	void	renderFlatsImmediate(int type, float alpha);
-	void	renderFlatsVBO(int type, float alpha);
+	void	renderFlats(int type = 0, bool texture = true, float alpha = 1.0f);
+	void	renderFlatsImmediate(int type, bool texture, float alpha);
+	void	renderFlatsVBO(int type, bool texture, float alpha);
 	void	renderFlatHilight(int index, float fade);
 	void	renderFlatSelection(vector<int>& selection, float fade = 1.0f);
 	void	renderTaggedFlats(vector<MapSector*>& sectors, float fade);

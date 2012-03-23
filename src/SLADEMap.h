@@ -133,6 +133,9 @@ public:
 	void	getLinesById(int id, vector<MapLine*>& list);
 	void	getThingsByIdInSectorTag(int id, int tag, vector<MapThing*>& list);
 
+	// Extra
+	rgba_t	getSectorColour(MapSector* sector, int where = 0);
+
 	// Creation
 	MapVertex*	createVertex(double x, double y);
 

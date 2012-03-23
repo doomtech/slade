@@ -1145,23 +1145,23 @@ void MapRenderer2D::renderTaggedThings(vector<MapThing*>& things, float fade) {
 	glDisable(GL_TEXTURE_2D);
 }
 
-void MapRenderer2D::renderFlats(int type, float alpha) {
+void MapRenderer2D::renderFlats(int type, bool texture, float alpha) {
 	// Don't bother if (practically) invisible
 	if (alpha <= 0.01f)
 		return;
 
 	if (GLEW_ARB_vertex_buffer_object && !FORCE_NO_VBO)
-		renderFlatsVBO(type, alpha);
+		renderFlatsVBO(type, texture, alpha);
 	else
-		renderFlatsImmediate(type, alpha);
+		renderFlatsImmediate(type, texture, alpha);
 }
 
 bool sortPolyByTex(Polygon2D* left, Polygon2D* right) {
 	return left->getTexture()->glId() < right->getTexture()->glId();
 }
 
-void MapRenderer2D::renderFlatsImmediate(int type, float alpha) {
-	if (type > 0)
+void MapRenderer2D::renderFlatsImmediate(int type, bool texture, float alpha) {
+	if (texture)
 		glEnable(GL_TEXTURE_2D);
 
 	if (flat_ignore_light)
@@ -1177,9 +1177,9 @@ void MapRenderer2D::renderFlatsImmediate(int type, float alpha) {
 		if (vis_s[a] > 0)
 			continue;
 
-		if (type > 0) {
+		if (texture) {
 			// Get the sector texture
-			if (type == 1)
+			if (type <= 1)
 				tex = theMapEditor->textureManager().getFlat(sector->floorTexture());
 			else
 				tex = theMapEditor->textureManager().getFlat(sector->ceilingTexture());
@@ -1198,24 +1198,25 @@ void MapRenderer2D::renderFlatsImmediate(int type, float alpha) {
 
 		// Setup polygon texture info if needed
 		Polygon2D* poly = sector->getPolygon();
-		if (type > 0 && poly->getTexture() != tex) {
+		if (texture && poly->getTexture() != tex) {
 			poly->setTexture(tex);
 			poly->updateTextureCoords();
 		}
 
 		// Render the polygon
 		if (!flat_ignore_light) {
-			float light = ((int)sector->prop("lightlevel") / 255.0f) * flat_brightness;
-			glColor4f(light, light, light, alpha);
+			rgba_t col = map->getSectorColour(sector, type);
+			col.ampf(flat_brightness, flat_brightness, flat_brightness, 1.0f);
+			glColor4f(col.fr(), col.fg(), col.fb(), alpha);
 		}
 		poly->render();
 	}
 
-	if (type > 0)
+	if (texture)
 		glDisable(GL_TEXTURE_2D);
 }
 
-void MapRenderer2D::renderFlatsVBO(int type, float alpha) {
+void MapRenderer2D::renderFlatsVBO(int type, bool texture, float alpha) {
 	bool vbo_updated = false;
 
 	if (flat_ignore_light)
@@ -1244,7 +1245,7 @@ void MapRenderer2D::renderFlatsVBO(int type, float alpha) {
 	//	wxLogMessage("Updated vbo");
 
 	// Setup opengl state
-	if (type > 0) glEnable(GL_TEXTURE_2D);
+	if (texture) glEnable(GL_TEXTURE_2D);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo_flats);
 
 	// Setup VBO pointers
@@ -1266,9 +1267,9 @@ void MapRenderer2D::renderFlatsVBO(int type, float alpha) {
 			continue;
 
 		first = false;
-		if (type > 0) {
+		if (texture) {
 			// Get the sector texture
-			if (type == 1)
+			if (type <= 1)
 				tex = theMapEditor->textureManager().getFlat(sector->floorTexture());
 			else
 				tex = theMapEditor->textureManager().getFlat(sector->ceilingTexture());
@@ -1276,7 +1277,7 @@ void MapRenderer2D::renderFlatsVBO(int type, float alpha) {
 
 		// Setup polygon texture info if needed
 		Polygon2D* poly = sector->getPolygon();
-		if (type > 0 && poly->getTexture() != tex) {
+		if (texture && poly->getTexture() != tex) {
 			poly->setTexture(tex);			// Set polygon texture
 			poly->updateTextureCoords();	// Update polygon texture coordinates
 		}
@@ -1298,8 +1299,9 @@ void MapRenderer2D::renderFlatsVBO(int type, float alpha) {
 
 		// Render the polygon
 		if (!flat_ignore_light) {
-			float light = ((int)sector->prop("lightlevel") / 255.0f) * flat_brightness;
-			glColor4f(light, light, light, alpha);
+			rgba_t col = map->getSectorColour(sector, type);
+			col.ampf(flat_brightness, flat_brightness, flat_brightness, 1.0f);
+			glColor4f(col.fr(), col.fg(), col.fb(), alpha);
 		}
 		poly->renderVBO(false);
 	}
@@ -1307,7 +1309,7 @@ void MapRenderer2D::renderFlatsVBO(int type, float alpha) {
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
 	// Clean up opengl state
-	if (type > 0) glDisable(GL_TEXTURE_2D);
+	if (texture) glDisable(GL_TEXTURE_2D);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
